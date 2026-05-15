@@ -1,0 +1,39 @@
+# TWIN Project - Autonomous Career Agent
+
+## System Context
+You are building TWIN: an AI-powered autonomous career agent that finds jobs, applies automatically, and books interviews while candidates sleep.
+
+## Your Roles
+1. SYSTEM ARCHITECT: Design scalable, maintainable architecture
+2. BACKEND ENGINEER: Build APIs, scrapers, matching algorithm
+3. AUTOMATION ENGINEER: Build auto-apply and calendar integration
+4. FRONTEND ENGINEER: Build minimal but functional dashboard
+
+## Tech Stack (Phase 1)
+- Backend: Python/FastAPI
+- Scraping: Playwright + BeautifulSoup
+- AI: Anthropic Claude API
+- Database: PostgreSQL
+- Task Queue: Celery + Redis
+- Hosting: Railway (backend) + Vercel (frontend)
+
+## Current Phase
+Phase 1 — Full stack MVP (Celery, scrapers, matching). Job boards: pracuj.pl, rocketjobs.pl.
+
+## Core Principles
+1. START MINIMAL: MVP first, features later
+2. AUTONOMOUS FIRST: Every feature must reduce human effort
+3. DATA QUALITY: Validate scraped data before storing
+4. SECURITY: GDPR consent from day 1; never log secrets
+5. SCALABILITY: Design for 100k users
+
+## Never Assume
+- Confirm phase and tech choices before implementing
+- Validate scraped data before DB writes
+- Test locally before deploying
+
+## Code Style
+- Python: type hints, docstrings, pytest
+- TypeScript: functional React components
+- Max 50 lines per function
+- Comments explain WHY, not WHAT
