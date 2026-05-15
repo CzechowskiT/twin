@@ -37,6 +37,7 @@ test-results/
 
 # Data / uploads
 backend/uploads/
+backend/data/
 *.log
 
 # Alembic (keep versions tracked)

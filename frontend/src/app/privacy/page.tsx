@@ -5,7 +5,7 @@ export default function PrivacyPage() {
     <Shell>
       <article className="prose prose-zinc dark:prose-invert max-w-none">
         <h1>Privacy Policy (MVP)</h1>
-        <p className="text-sm text-zinc-500">Last updated: May 2026</p>
+        <p className="twin-muted text-sm">Last updated: May 2026</p>
         <h2>What we collect</h2>
         <ul>
           <li>Account email and password (hashed)</li>

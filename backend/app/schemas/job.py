@@ -26,6 +26,35 @@ class ScrapeTaskOut(BaseModel):
     message: str
 
 
+class BoardScrapeResult(BaseModel):
+    scraped: int
+    saved: int
+    error: str | None = None
+
+
+class ScrapeAllOut(BaseModel):
+    task_id: str
+    total_saved: int
+    boards: dict[str, BoardScrapeResult]
+    errors: dict[str, str]
+    message: str
+
+
 class JobListOut(BaseModel):
     items: list[JobOut]
     total: int
+
+
+class JobFiltersOut(BaseModel):
+    job_boards: list[str]
+    locations: list[str]
+
+
+class BoardOut(BaseModel):
+    id: str
+    label: str
+    region: str
+
+
+class BoardListOut(BaseModel):
+    items: list[BoardOut]

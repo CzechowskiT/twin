@@ -1,31 +1,49 @@
 import Link from "next/link";
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from "react";
 
-export function Shell({ children }: { children: ReactNode }) {
+export function Shell({
+  children,
+  wide = false,
+}: {
+  children: ReactNode;
+  wide?: boolean;
+}) {
   return (
-    <div className="mx-auto flex min-h-full w-full max-w-lg flex-col px-6 py-12">
+    <div
+      className={`mx-auto flex w-full min-w-0 flex-col ${wide ? "max-w-5xl" : "max-w-md"}`}
+      style={{
+        paddingInline: "var(--twin-page-x)",
+        paddingBlock: "var(--twin-page-y)",
+      }}
+    >
       {children}
     </div>
   );
 }
 
-export function Card({ children }: { children: ReactNode }) {
+export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+    <div
+      className={`twin-card-panel mb-4 p-4 text-[var(--foreground)] sm:mb-6 sm:p-6 ${className}`}
+    >
       {children}
     </div>
   );
 }
 
 export function Label({ children }: { children: ReactNode }) {
-  return <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">{children}</label>;
+  return (
+    <label className="mb-1 block text-sm font-semibold text-[var(--twin-muted-strong)]">
+      {children}
+    </label>
+  );
 }
 
 export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className={`mb-4 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 ${props.className ?? ""}`}
+      className={`twin-touch-target mb-4 w-full max-w-full rounded border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-3 py-2 text-base text-[var(--foreground)] placeholder:text-[var(--twin-muted)] focus:border-[var(--twin-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--twin-accent)]/20 sm:text-sm ${props.className ?? ""}`}
     />
   );
 }
@@ -34,14 +52,33 @@ export function Button(props: ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
       {...props}
-      className={`w-full rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 ${props.className ?? ""}`}
+      className={`twin-touch-target w-full max-w-full rounded border-0 bg-[var(--twin-accent)] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--twin-accent-hover)] hover:text-white disabled:cursor-not-allowed disabled:opacity-50 ${props.className ?? ""}`}
+    />
+  );
+}
+
+export function ButtonCta(props: ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button
+      {...props}
+      className={`twin-touch-target w-full max-w-full rounded border-0 bg-[var(--twin-cta)] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--twin-cta-hover)] hover:text-white disabled:cursor-not-allowed disabled:opacity-50 ${props.className ?? ""}`}
+    />
+  );
+}
+
+export function ButtonChip(props: ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button
+      type="button"
+      {...props}
+      className={`twin-btn-chip twin-touch-target !w-auto disabled:cursor-not-allowed ${props.className ?? ""}`}
     />
   );
 }
 
 export function NavLink({ href, children }: { href: string; children: ReactNode }) {
   return (
-    <Link href={href} className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100">
+    <Link href={href} className="twin-nav-link text-sm font-medium">
       {children}
     </Link>
   );

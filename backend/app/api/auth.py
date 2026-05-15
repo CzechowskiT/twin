@@ -1,18 +1,36 @@
 """Registration and login."""
 
 from datetime import datetime, timezone
+from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.core.deps import get_current_user
 from app.core.security import create_access_token, hash_password, verify_password
 from app.database.models import User
 from app.database.session import get_db
 from app.schemas.auth import Token, UserLogin, UserOut, UserRegister
+from app.services.linkedin_auth import user_from_linkedin
+from app.services.linkedin_oauth import (
+    LinkedInOAuthError,
+    build_authorize_url,
+    create_oauth_state,
+    exchange_code_for_profile,
+    is_linkedin_oauth_configured,
+    verify_oauth_state,
+)
 
 router = APIRouter()
+
+
+def _frontend_callback_url(**params: str) -> str:
+    base = get_settings().frontend_url.rstrip("/")
+    query = urlencode(params)
+    return f"{base}/auth/callback?{query}" if query else f"{base}/auth/callback"
 
 
 @router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
@@ -50,7 +68,9 @@ def login_json(body: UserLogin, db: Session = Depends(get_db)) -> Token:
 
 def _authenticate(email: str, password: str, db: Session) -> Token:
     user = db.query(User).filter(User.email == email).first()
-    if not user or not verify_password(password, user.hashed_password):
+    if not user or not user.hashed_password:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+    if not verify_password(password, user.hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     if not user.gdpr_consent_at:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="GDPR consent missing")

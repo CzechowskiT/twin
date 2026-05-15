@@ -1,17 +1,63 @@
+"use client";
+
 import Link from "next/link";
+import { LanguageSwitcher } from "@/components/language-switcher";
+import { useTranslation } from "@/components/language-provider";
 
 export function Header() {
+  const { t } = useTranslation();
+
+  const nav = [
+    { href: "/login" as const, label: t("nav.login") },
+    { href: "/register" as const, label: t("nav.register") },
+    { href: "/profile" as const, label: t("nav.profile") },
+    { href: "/dashboard" as const, label: t("nav.dashboard") },
+  ];
+
   return (
-    <header className="border-b border-zinc-200 dark:border-zinc-800">
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-        <Link href="/" className="text-lg font-semibold tracking-tight">
-          TWIN
+    <header
+      className="relative z-10 border-b border-[var(--twin-border)] bg-[var(--twin-header-bg)]"
+      style={{ boxShadow: "var(--twin-shadow)" }}
+    >
+      <div className="twin-container flex items-center justify-between gap-4 py-3 sm:py-3.5">
+        <Link href="/" className="twin-logo shrink-0">
+          TWIN<span className="twin-logo-accent">.</span>
         </Link>
-        <nav className="flex gap-4 text-sm">
-          <Link href="/login">Log in</Link>
-          <Link href="/register">Register</Link>
-          <Link href="/dashboard">Dashboard</Link>
-        </nav>
+
+        <div className="hidden items-center gap-5 md:flex">
+          <nav className="flex items-center gap-5 text-sm" aria-label="Main">
+            {nav.map((item) => (
+              <Link key={item.href} href={item.href} className="twin-nav-link font-medium">
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+          <LanguageSwitcher />
+        </div>
+
+        <div className="flex items-center gap-2 md:hidden">
+          <LanguageSwitcher />
+          <details className="relative">
+            <summary className="twin-touch-target flex cursor-pointer list-none items-center justify-center rounded border border-[var(--twin-border)] bg-[var(--twin-card)] px-3 text-sm font-semibold text-[var(--foreground)] [&::-webkit-details-marker]:hidden">
+              {t("nav.menu")}
+            </summary>
+            <nav
+              className="absolute right-0 z-20 mt-2 min-w-[11rem] rounded border border-[var(--twin-border)] bg-[var(--twin-card)] p-2 shadow-lg"
+              aria-label="Main"
+              style={{ boxShadow: "var(--twin-shadow-md)" }}
+            >
+              {nav.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="twin-touch-target twin-nav-link block rounded px-3 py-2.5 text-sm hover:bg-[var(--twin-accent-muted)]"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          </details>
+        </div>
       </div>
     </header>
   );

@@ -28,4 +28,20 @@ export async function apiFetch<T>(
   return res.json() as Promise<T>;
 }
 
+export async function apiUpload<T>(
+  path: string,
+  file: File,
+  token?: string | null,
+): Promise<T> {
+  const headers = new Headers();
+  if (token) headers.set("Authorization", `Bearer ${token}`);
+
+  const body = new FormData();
+  body.append("file", file);
+
+  const res = await fetch(`${API_URL}${path}`, { method: "POST", headers, body });
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.json() as Promise<T>;
+}
+
 export { API_URL };

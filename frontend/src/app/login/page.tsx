@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Input, Label, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { setToken } from "@/lib/auth";
@@ -11,6 +12,7 @@ type TokenResponse = { access_token: string };
 
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -30,7 +32,7 @@ export default function LoginPage() {
       setToken(token.access_token);
       router.push("/dashboard");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      setError(err instanceof Error ? err.message : t("login.failed"));
     } finally {
       setLoading(false);
     }
@@ -39,19 +41,22 @@ export default function LoginPage() {
   return (
     <Shell>
       <Card>
-        <h1 className="mb-6 text-2xl font-semibold">Log in</h1>
+        <h1 className="mb-6 text-2xl font-semibold">{t("login.title")}</h1>
         <form onSubmit={onSubmit}>
-          <Label>Email</Label>
+          <Label>{t("login.email")}</Label>
           <Input name="email" type="email" required autoComplete="email" />
-          <Label>Password</Label>
+          <Label>{t("login.password")}</Label>
           <Input name="password" type="password" required autoComplete="current-password" />
           {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
           <Button type="submit" disabled={loading}>
-            {loading ? "Signing in…" : "Log in"}
+            {loading ? t("login.signingIn") : t("login.submit")}
           </Button>
         </form>
-        <p className="mt-4 text-center text-sm text-zinc-500">
-          No account? <Link href="/register">Register</Link>
+        <p className="twin-muted mt-4 text-center text-sm">
+          {t("login.noAccount")}{" "}
+          <Link href="/register" className="twin-link">
+            {t("login.register")}
+          </Link>
         </p>
       </Card>
     </Shell>

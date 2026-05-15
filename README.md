@@ -1,6 +1,6 @@
 # TWIN — Autonomous Career Agent
 
-AI-powered career agent: scrape jobs (pracuj.pl, rocketjobs.pl), match candidates, track applications.
+AI-powered career agent: scrape jobs (pracuj.pl, rocketjobs.pl, LinkedIn), match candidates, track applications.
 
 ## Stack
 
@@ -64,12 +64,15 @@ alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
-Celery (separate terminals):
+Celery (run **both** in separate terminals for automatic scraping every 2 minutes):
 
 ```bash
+cd backend && source .venv/bin/activate
 celery -A app.tasks.celery_app worker --loglevel=info
 celery -A app.tasks.celery_app beat --loglevel=info
 ```
+
+Beat schedules `scrape_all_boards_task` every 120s (all boards sequentially). The dashboard auto-refreshes job data on the same interval when the tab is visible.
 
 ### 5. Frontend
 
@@ -102,18 +105,44 @@ twin/
 
 With the API running: [http://localhost:8000/docs](http://localhost:8000/docs)
 
+## Deploy online
+
+See [docs/DEPLOY.md](docs/DEPLOY.md) for Docker Compose production stack and cloud hosting notes.
+
+```bash
+docker compose -f docker-compose.prod.yml up --build -d
+docker compose -f docker-compose.prod.yml exec api alembic upgrade head
+```
+
+## CV upload (contextual matching)
+
+On **Profile**, upload PDF/DOCX/TXT (max 5 MB). TWIN extracts text, enriches skills from the CV, and adds a contextual overlap score when ranking jobs. Optional: set `ANTHROPIC_API_KEY` in `.env` for smarter CV parsing via Claude.
+
+After pulling CV changes, run `alembic upgrade head` in `backend/`.
+
 ## GDPR (MVP)
 
 Registration requires explicit consent to the privacy policy (`gdpr_consent_at` stored on user).
 
 ## Job boards
 
-- `pracuj.pl` — `app.scrapers.pracuj`
-- `rocketjobs.pl` — `app.scrapers.rocketjobs`
+- `pracuj.pl` — `app.scrapers.pracuj` (IT + sales variants)
+- `rocketjobs.pl` — `app.scrapers.rocketjobs` (IT + sales variants)
+- `linkedin.com` — `app.scrapers.linkedin` (public search only, best-effort)
+
+### LinkedIn limitations (MVP)
+
+- Uses **public** job search pages only — no login, no credentials in the repo.
+- LinkedIn often **blocks headless browsers** or shows a login wall; you may get 0 jobs or an error message.
+- Scraping may violate LinkedIn’s Terms of Service; for production consider [LinkedIn’s official APIs](https://developer.linkedin.com/) or manual import.
+- Do not store LinkedIn passwords in `.env` unless you add a future authenticated integration.
 
 Trigger scrape manually:
 
 ```bash
-curl -X POST http://localhost:8000/api/v1/jobs/scrape/pracuj \
+curl -X POST "http://localhost:8000/api/v1/jobs/scrape/pracuj?sync=true" \
+  -H "Authorization: Bearer <token>"
+
+curl -X POST "http://localhost:8000/api/v1/jobs/scrape/linkedin?sync=true" \
   -H "Authorization: Bearer <token>"
 ```

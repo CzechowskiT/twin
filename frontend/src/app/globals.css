@@ -1,26 +1,278 @@
 @import "tailwindcss";
 
+/* Pracuj.pl–inspired: light-first job board UI */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+  --background: #f2f2f2;
+  --foreground: #1a1a1a;
+  --twin-muted: #5c5c5c;
+  --twin-muted-strong: #333333;
+  --twin-accent: #0066cc;
+  --twin-accent-hover: #0052a3;
+  --twin-accent-muted: #e8f2fc;
+  --twin-cta: #e35205;
+  --twin-cta-hover: #c44704;
+  --twin-link: #0066cc;
+  --twin-link-hover: #004d99;
+  --twin-card: #ffffff;
+  --twin-card-solid: #ffffff;
+  --twin-border: #e0e0e0;
+  --twin-input-bg: #ffffff;
+  --twin-header-bg: #ffffff;
+  --twin-shadow: 0 1px 3px rgb(0 0 0 / 0.08);
+  --twin-shadow-md: 0 2px 8px rgb(0 0 0 / 0.1);
+  --twin-page-x: clamp(1rem, 4vw, 1.5rem);
+  --twin-page-y: clamp(1rem, 4vw, 1.5rem);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
+  overflow-x: hidden;
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  padding-left: env(safe-area-inset-left, 0);
+  padding-right: env(safe-area-inset-right, 0);
+}
+
+.twin-glass {
+  background: var(--twin-card-solid);
+  color: var(--foreground);
+  box-shadow: var(--twin-shadow);
+}
+
+.twin-container {
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: var(--twin-page-x);
+}
+
+.twin-muted {
+  color: var(--twin-muted);
+}
+
+.twin-logo {
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+  color: var(--twin-accent);
+}
+
+.twin-logo-accent {
+  color: var(--twin-cta);
+}
+
+.twin-nav-link {
+  color: var(--twin-muted-strong);
+  transition: color 0.15s ease;
+}
+
+.twin-nav-link:hover {
+  color: var(--twin-link);
+}
+
+.twin-touch-target {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+}
+
+.twin-bg-root {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  background: var(--background);
+}
+
+.twin-hero-title {
+  color: var(--foreground);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.twin-btn-primary {
+  display: block;
+  width: 100%;
+  border-radius: 0.375rem;
+  border: none;
+  background: var(--twin-cta);
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #ffffff;
+  box-shadow: var(--twin-shadow);
+  transition: background 0.15s ease;
+}
+
+.twin-btn-primary:hover {
+  background: var(--twin-cta-hover);
+  color: #ffffff;
+}
+
+.twin-btn-secondary {
+  display: block;
+  width: 100%;
+  border-radius: 0.375rem;
+  border: 1px solid var(--twin-border);
+  background: var(--twin-card);
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--twin-accent);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.twin-btn-secondary:hover {
+  border-color: var(--twin-accent);
+  background: var(--twin-accent-muted);
+  color: var(--twin-accent-hover);
+}
+
+@media (min-width: 640px) {
+  .twin-btn-primary,
+  .twin-btn-secondary {
+    width: auto;
+    min-width: 10rem;
+  }
+}
+
+.twin-btn-solid {
+  display: inline-block;
+  border-radius: 0.375rem;
+  border: none;
+  background: var(--twin-accent);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #ffffff;
+  transition: background 0.15s ease;
+}
+
+.twin-btn-solid:hover {
+  background: var(--twin-accent-hover);
+  color: #ffffff;
+}
+
+.twin-btn-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 0.25rem;
+  border: 1px solid var(--twin-border);
+  background: var(--twin-card);
+  padding: 0.375rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--twin-muted-strong);
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.twin-btn-chip:hover:not(:disabled) {
+  border-color: var(--twin-accent);
+  background: var(--twin-accent-muted);
+  color: var(--twin-accent);
+}
+
+.twin-btn-chip:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.twin-link {
+  color: var(--twin-link);
+  transition: color 0.15s ease;
+}
+
+.twin-link:hover {
+  color: var(--twin-link-hover);
+  text-decoration: underline;
+}
+
+.twin-badge {
+  display: inline-flex;
+  border-radius: 0.25rem;
+  background: var(--twin-accent);
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.twin-card-panel {
+  background: var(--twin-card);
+  border: 1px solid var(--twin-border);
+  border-radius: 0.5rem;
+  box-shadow: var(--twin-shadow);
+}
+
+.twin-section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.twin-job-row {
+  display: block;
+  border: 1px solid var(--twin-border);
+  border-radius: 0.375rem;
+  background: var(--twin-card);
+  padding: 1rem 1.25rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.twin-job-row:hover {
+  border-color: var(--twin-accent);
+  box-shadow: var(--twin-shadow-md);
+}
+
+.twin-job-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--twin-link);
+  line-height: 1.35;
+}
+
+.twin-job-row:hover .twin-job-title {
+  color: var(--twin-link-hover);
+  text-decoration: underline;
+}
+
+.twin-job-meta {
+  margin-top: 0.375rem;
+  font-size: 0.875rem;
+  color: var(--twin-muted);
+}
+
+.twin-filter-box {
+  background: var(--twin-accent-muted);
+  border: 1px solid rgb(0 102 204 / 0.15);
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+}
+
+.twin-region-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--twin-muted-strong);
+}
+
+.twin-hint {
+  font-size: 0.75rem;
+  color: #8a4b00;
+  background: #fff8e6;
+  border: 1px solid #f5d78e;
+  border-radius: 0.25rem;
+  padding: 0.5rem 0.625rem;
 }

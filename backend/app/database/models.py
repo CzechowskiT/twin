@@ -34,7 +34,8 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
-    hashed_password: Mapped[str] = mapped_column(String(255))
+    hashed_password: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    linkedin_id: Mapped[str | None] = mapped_column(String(64), unique=True, index=True, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     gdpr_consent_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
@@ -53,6 +54,9 @@ class Candidate(Base):
     desired_salary: Mapped[int | None] = mapped_column(Integer, nullable=True)
     location: Mapped[str | None] = mapped_column(String(100), nullable=True)
     resume_path: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    cv_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    cv_filename: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    cv_uploaded_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     user: Mapped["User"] = relationship(back_populates="candidate")
