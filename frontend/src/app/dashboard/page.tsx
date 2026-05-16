@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ApplicationsPanel, type ApplicationRow } from "@/components/applications-panel";
+import { DashboardCommandCenter } from "@/components/dashboard-command-center";
 import { InvestorRoadmapPanel } from "@/components/investor-roadmap-panel";
 import { useTranslation } from "@/components/language-provider";
 import { JobFiltersBar } from "@/components/job-filters";
@@ -287,6 +288,11 @@ export default function DashboardPage() {
     }
   }
 
+  const pipelineActiveCount = useMemo(
+    () => applications.filter((a) => a.status !== "rejected").length,
+    [applications],
+  );
+
   const hasProfile = profile !== null && profile !== undefined;
 
   return (
@@ -306,6 +312,18 @@ export default function DashboardPage() {
           {t("dashboard.logout")}
         </button>
       </div>
+
+      {user ? (
+        <DashboardCommandCenter
+          email={user.email}
+          profileName={profile ? profile.name : undefined}
+          hasProfile={hasProfile}
+          showScrapeUi={SHOW_SCRAPE_UI}
+          jobsTotal={jobs?.total ?? 0}
+          matchesVisible={visibleMatches.length}
+          applicationsActive={pipelineActiveCount}
+        />
+      ) : null}
 
       <Card variant="accent">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between lg:gap-8">
@@ -345,7 +363,7 @@ export default function DashboardPage() {
           </div>
 
           {SHOW_SCRAPE_UI && (
-            <div className="twin-card-inset w-full shrink-0 p-4 sm:p-5 lg:max-w-lg xl:max-w-xl">
+            <div id="dashboard-scrape" className="twin-card-inset w-full shrink-0 p-4 sm:p-5 lg:max-w-lg xl:max-w-xl">
               <p className="text-xs font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
                 {t("dashboard.twinScrapePanelTitle")}
               </p>
@@ -369,7 +387,7 @@ export default function DashboardPage() {
       </Card>
 
       {hasProfile && (matches?.items.length ?? 0) > 0 && (
-        <Card variant="soft">
+        <Card id="dashboard-matches" variant="soft">
           <h2 className="twin-section-title mb-4">
             {t("dashboard.topMatches")} ({matches?.total ?? 0})
           </h2>
@@ -387,7 +405,7 @@ export default function DashboardPage() {
       )}
 
       {hasProfile && (
-        <Card variant="soft">
+        <Card id="dashboard-applications" variant="soft">
           <h2 className="twin-section-title mb-4">
             {t("dashboard.applications")} ({applications.length})
           </h2>
@@ -410,7 +428,7 @@ export default function DashboardPage() {
         </p>
       ) : null}
 
-      <Card variant="soft">
+      <Card id="dashboard-jobs" variant="soft">
         <h2 className="twin-section-title mb-4">
           {t("dashboard.jobs")} ({jobs?.total ?? 0})
         </h2>

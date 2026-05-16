@@ -11,6 +11,7 @@ export function Header() {
   const nav = [
     { href: "/login" as const, label: t("nav.login") },
     { href: "/register" as const, label: t("nav.register") },
+    { href: "/calculator" as const, label: t("nav.calculator") },
     { href: "/profile" as const, label: t("nav.profile") },
     { href: "/dashboard" as const, label: t("nav.dashboard") },
   ];
