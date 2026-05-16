@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+
 export type NatureVariant =
   | "canopy"
   | "meadow"
@@ -35,15 +39,40 @@ type NatureBackgroundProps = {
 };
 
 /**
- * Full-viewport soft green canvas + route-tinted mesh + slow organic blobs (CSS only).
- * Each variant nudges gradients and motion to match the screen’s intent.
+ * Full-viewport soft green canvas + horizon silhouette + mist + slow motion (CSS + light cursor parallax).
  */
 export function NatureBackground({ variant }: NatureBackgroundProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (mq.matches) return;
+
+    const onMove = (e: PointerEvent) => {
+      const x = (e.clientX / Math.max(window.innerWidth, 1)) * 2 - 1;
+      const y = (e.clientY / Math.max(window.innerHeight, 1)) * 2 - 1;
+      el.style.setProperty("--twin-nature-px", x.toFixed(4));
+      el.style.setProperty("--twin-nature-py", y.toFixed(4));
+    };
+
+    window.addEventListener("pointermove", onMove, { passive: true });
+    return () => window.removeEventListener("pointermove", onMove);
+  }, []);
+
   return (
-    <div aria-hidden className={`twin-bg-root twin-nature twin-nature--${variant}`}>
+    <div
+      ref={rootRef}
+      aria-hidden
+      className={`twin-bg-root twin-nature twin-nature--${variant}`}
+    >
       <div className="twin-nature-base" />
       <div className="twin-nature-mesh" />
       <div className="twin-nature-band" />
+      <div className="twin-nature-falls" />
+      <div className="twin-nature-horizon" />
+      <div className="twin-nature-mist" />
       <div className="twin-nature-orbs">
         <div className="twin-nature-orb twin-nature-orb--1" />
         <div className="twin-nature-orb twin-nature-orb--2" />

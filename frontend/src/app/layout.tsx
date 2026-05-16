@@ -45,7 +45,7 @@ export default function RootLayout({
         <Providers>
           <RouteAwareBackground />
           <Header />
-          <main className="relative z-0 flex-1 pb-[env(safe-area-inset-bottom,0)]">{children}</main>
+          <main className="relative z-10 flex-1 pb-[env(safe-area-inset-bottom,0)]">{children}</main>
         </Providers>
       </body>
     </html>
