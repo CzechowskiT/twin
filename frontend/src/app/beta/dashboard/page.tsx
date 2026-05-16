@@ -25,8 +25,16 @@ function DashboardInner() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    const c = sp.get("code") || localStorage.getItem(BETA_REFERRAL_STORAGE_KEY) || "";
-    setCode(c);
+    const fromUrl = sp.get("code") || "";
+    const fromStorage = (() => {
+      try {
+        return localStorage.getItem(BETA_REFERRAL_STORAGE_KEY) || "";
+      } catch {
+        return "";
+      }
+    })();
+    const c = fromUrl || fromStorage;
+    queueMicrotask(() => setCode(c));
   }, [sp]);
 
   useEffect(() => {

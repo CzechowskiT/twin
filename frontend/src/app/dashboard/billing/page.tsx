@@ -91,14 +91,18 @@ export default function BillingPage() {
   }, [router]);
 
   useEffect(() => {
-    void load();
+    queueMicrotask(() => {
+      void load();
+    });
   }, [load]);
 
   useEffect(() => {
     const p = new URLSearchParams(window.location.search);
     const c = p.get("checkout");
-    if (c === "success") setCheckoutBanner("success");
-    else if (c === "cancel") setCheckoutBanner("cancel");
+    queueMicrotask(() => {
+      if (c === "success") setCheckoutBanner("success");
+      else if (c === "cancel") setCheckoutBanner("cancel");
+    });
   }, []);
 
   async function startCheckout(plan: "premium" | "pro") {

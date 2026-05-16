@@ -32,7 +32,10 @@ function JoinInner() {
 
   useEffect(() => {
     const s = sp.get("step");
-    if (s === "2" || s === "3" || s === "4") setStep(Number(s));
+    if (s === "2" || s === "3" || s === "4") {
+      const n = Number(s);
+      queueMicrotask(() => setStep(n));
+    }
   }, [sp]);
 
   async function onJoin(e: FormEvent) {

@@ -23,12 +23,14 @@ export default function BetaAdminPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    try {
-      const s = sessionStorage.getItem(STORAGE_KEY);
-      if (s) setToken(s);
-    } catch {
-      /* ignore */
-    }
+    queueMicrotask(() => {
+      try {
+        const s = sessionStorage.getItem(STORAGE_KEY);
+        if (s) setToken(s);
+      } catch {
+        /* ignore */
+      }
+    });
   }, []);
 
   const saveToken = useCallback(() => {

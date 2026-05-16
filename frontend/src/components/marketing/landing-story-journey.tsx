@@ -83,10 +83,8 @@ export function LandingStoryJourney() {
     };
   }, [onScroll]);
 
-  // Ref targets are stable; wire observers once after mount.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    const els = sectionRefs.map((r) => r.current).filter(Boolean) as HTMLElement[];
+    const els = [refCh1, refCh2, refCh3, refTimeline].map((r) => r.current).filter(Boolean) as HTMLElement[];
     if (!els.length) return;
     const io = new IntersectionObserver(
       (entries) => {
@@ -101,7 +99,7 @@ export function LandingStoryJourney() {
     );
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
-  }, []);
+  }, [refCh1, refCh2, refCh3, refTimeline]);
 
   return (
     <>

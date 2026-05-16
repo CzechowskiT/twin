@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef } from "react";
 
 import { NATURE_WALLPAPER_URLS } from "@/lib/nature-wallpapers";
@@ -71,15 +72,15 @@ export function NatureBackground({ variant }: NatureBackgroundProps) {
       aria-hidden
       className={`twin-bg-root twin-nature twin-nature--${variant}`}
     >
-      <img
+      <Image
         className="twin-nature-wallpaper-img"
         src={src}
         alt=""
-        width={2560}
-        height={1440}
+        fill
+        sizes="100vw"
         fetchPriority="low"
         decoding="async"
-        sizes="100vw"
+        quality={88}
       />
       <div className="twin-nature-scrim" />
     </div>

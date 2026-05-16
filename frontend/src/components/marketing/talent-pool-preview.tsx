@@ -89,7 +89,9 @@ export function TalentPoolPreview() {
   );
 
   useEffect(() => {
-    void fetchPage(offset, offset > 0);
+    queueMicrotask(() => {
+      void fetchPage(offset, offset > 0);
+    });
   }, [debouncedTitle, debouncedSkills, offset, fetchPage]);
 
   const canLoadMore = items.length < total;

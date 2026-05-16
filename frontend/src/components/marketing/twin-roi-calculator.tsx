@@ -25,22 +25,20 @@ function formatMoney(amount: number, locale: Locale, currency: string) {
   }
 }
 
-function useCurrencyLabel(locale: Locale) {
-  return useMemo(() => {
-    try {
-      const loc = numberFormatLocaleForUi(locale);
-      const dn = new Intl.DisplayNames(loc, { type: "currency" });
-      return (code: string) => {
-        try {
-          return dn.of(code) ?? code;
-        } catch {
-          return code;
-        }
-      };
-    } catch {
-      return (code: string) => code;
-    }
-  }, [locale]);
+function useCurrencyLabel(locale: Locale): (code: string) => string {
+  try {
+    const loc = numberFormatLocaleForUi(locale);
+    const dn = new Intl.DisplayNames(loc, { type: "currency" });
+    return (code: string) => {
+      try {
+        return dn.of(code) ?? code;
+      } catch {
+        return code;
+      }
+    };
+  } catch {
+    return (code: string) => code;
+  }
 }
 
 type CurrencySelectProps = {

@@ -174,7 +174,6 @@ export default function DashboardPage() {
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- initial load only
   }, [router, refreshDashboardData, t]);
 
   useEffect(() => {
@@ -182,14 +181,16 @@ export default function DashboardPage() {
     if (!profile?.preferred_job_titles?.length) return;
     const token = getToken();
     if (!token) return;
-    setFilters((prev) => {
-      const next = { ...prev, title_terms: profile.preferred_job_titles.join(", ") };
-      queueMicrotask(() => {
-        void refreshDashboardData(token, true, next);
+    queueMicrotask(() => {
+      setFilters((prev) => {
+        const next = { ...prev, title_terms: profile.preferred_job_titles.join(", ") };
+        queueMicrotask(() => {
+          void refreshDashboardData(token, true, next);
+        });
+        return next;
       });
-      return next;
+      setTitleFilterPrimed(true);
     });
-    setTitleFilterPrimed(true);
   }, [profile, titleFilterPrimed, refreshDashboardData]);
 
   async function applyFilters() {

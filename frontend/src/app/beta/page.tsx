@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 import {
   BETA_REFERRAL_STORAGE_KEY,
@@ -12,12 +12,20 @@ import {
   type BetaStats,
 } from "@/lib/beta-api";
 
+function subscribeOrigin() {
+  return () => {};
+}
+
+function getOriginSnapshot() {
+  return typeof window !== "undefined" ? window.location.origin : "";
+}
+
+function getOriginServerSnapshot() {
+  return "";
+}
+
 function useOrigin(): string {
-  const [o, setO] = useState("");
-  useEffect(() => {
-    setO(window.location.origin);
-  }, []);
-  return o;
+  return useSyncExternalStore(subscribeOrigin, getOriginSnapshot, getOriginServerSnapshot);
 }
 
 function BetaLandingInner() {

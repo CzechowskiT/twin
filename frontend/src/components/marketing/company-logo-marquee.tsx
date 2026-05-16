@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useMemo, useState } from "react";
 
 /** Corporate domain for Clearbit / Google favicon when Simple Icons slug fails. */
@@ -167,7 +168,7 @@ function BrandMark({
 
   return (
     <span className="inline-flex h-10 w-[7.25rem] shrink-0 items-center justify-center sm:h-11 sm:w-[7.75rem]">
-      <img
+      <Image
         key={`${instanceKey}-${step}`}
         src={urls[step]}
         alt=""
