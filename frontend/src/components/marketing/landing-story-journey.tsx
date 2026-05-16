@@ -59,6 +59,12 @@ export function LandingStoryJourney() {
     { id: CHAPTER_ANCHORS[2], kicker: t("home.storyCh3Kicker"), title: t("home.storyCh3Title"), body: t("home.storyCh3Body") },
   ];
 
+  const chapterSurface = [
+    "twin-story-chapter",
+    "twin-story-chapter twin-story-chapter--2",
+    "twin-story-chapter twin-story-chapter--3",
+  ] as const;
+
   const onScroll = useCallback(() => {
     cancelAnimationFrame(raf.current);
     raf.current = requestAnimationFrame(() => {
@@ -144,7 +150,7 @@ export function LandingStoryJourney() {
           key={ch.id}
           id={ch.id}
           ref={sectionRefs[i]}
-          className="marketing-chapter scroll-mt-24 border-t border-[var(--twin-border)]/80 bg-[var(--background)] px-4 py-[min(18vh,6rem)] sm:px-6 md:min-h-[100svh] md:scroll-mt-28 md:py-0"
+          className={`marketing-chapter scroll-mt-24 border-t border-[var(--twin-border)]/80 px-4 py-[min(18vh,6rem)] sm:px-6 md:min-h-[100svh] md:scroll-mt-28 md:py-0 ${chapterSurface[i]}`}
         >
           <div className="mx-auto flex h-full min-h-0 max-w-4xl flex-col justify-center md:min-h-[100svh] md:py-24">
             <div className="rounded-[1.75rem] border-2 border-[var(--twin-border)] bg-[var(--twin-card)] px-5 py-8 shadow-[0_12px_40px_rgb(25_60_50_/0.12)] sm:px-8 sm:py-10">
@@ -166,7 +172,7 @@ export function LandingStoryJourney() {
       <section
         id={CHAPTER_ANCHORS[3]}
         ref={refTimeline}
-        className="marketing-chapter scroll-mt-24 border-t border-[var(--twin-border)] bg-[var(--background)] bg-gradient-to-b from-[var(--twin-accent-muted)]/45 via-[var(--background)] to-[var(--background)] px-4 py-[min(16vh,5rem)] sm:px-6 md:min-h-[min(100svh,56rem)] md:scroll-mt-28 md:py-24"
+        className="marketing-chapter twin-story-chapter twin-story-chapter--timeline scroll-mt-24 border-t border-[var(--twin-border)] px-4 py-[min(16vh,5rem)] sm:px-6 md:min-h-[min(100svh,56rem)] md:scroll-mt-28 md:py-24"
       >
         <div className="mx-auto max-w-4xl">
           <div className="rounded-[1.75rem] border-2 border-[var(--twin-border)] bg-[var(--twin-card)] px-5 py-8 shadow-[0_12px_40px_rgb(25_60_50_/0.12)] sm:px-8 sm:py-10">

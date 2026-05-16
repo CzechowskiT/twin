@@ -63,6 +63,60 @@ html {
   scroll-snap-stop: normal;
 }
 
+/* Full-viewport story beats: layered gradients + grid so sections never read as flat empty canvas */
+.twin-story-chapter {
+  --twin-story-grid: rgb(31 77 63 / 0.045);
+  position: relative;
+  isolation: isolate;
+  background-color: var(--background);
+  background-image:
+    radial-gradient(ellipse 115% 90% at 50% -28%, rgb(31 77 63 / 0.17), transparent 58%),
+    radial-gradient(ellipse 55% 48% at 96% 42%, rgb(155 187 173 / 0.38), transparent 52%),
+    linear-gradient(168deg, rgb(210 229 218 / 0.58) 0%, transparent 46%);
+  background-repeat: no-repeat;
+}
+
+.twin-story-chapter::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.35;
+  background-image: repeating-linear-gradient(
+    -14deg,
+    transparent,
+    transparent 18px,
+    var(--twin-story-grid) 18px,
+    var(--twin-story-grid) 19px
+  );
+  pointer-events: none;
+}
+
+.twin-story-chapter > * {
+  position: relative;
+  z-index: 1;
+}
+
+.twin-story-chapter--2 {
+  background-image:
+    radial-gradient(ellipse 100% 72% at 12% 78%, rgb(31 77 63 / 0.13), transparent 56%),
+    radial-gradient(ellipse 68% 52% at 88% 12%, rgb(217 119 6 / 0.09), transparent 52%),
+    linear-gradient(198deg, transparent 0%, rgb(210 229 218 / 0.45) 52%, transparent 100%);
+}
+
+.twin-story-chapter--3 {
+  background-image:
+    radial-gradient(ellipse 95% 62% at 50% 108%, rgb(31 77 63 / 0.15), transparent 56%),
+    radial-gradient(ellipse 52% 44% at 0% 32%, rgb(174 201 189 / 0.55), transparent 50%),
+    linear-gradient(180deg, rgb(238 243 240 / 0.35) 0%, var(--background) 40%);
+}
+
+.twin-story-chapter--timeline {
+  background-image:
+    radial-gradient(ellipse 85% 58% at 50% -8%, rgb(31 77 63 / 0.11), transparent 52%),
+    linear-gradient(180deg, rgb(210 229 218 / 0.62) 0%, var(--background) 36%, var(--background) 100%);
+}
+
 body {
   overflow-x: hidden;
   background: transparent;
