@@ -40,6 +40,13 @@ class User(Base):
     gdpr_consent_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
+    # Billing (Stripe Checkout + Customer Portal; Apple Pay / Google Pay via Checkout wallets)
+    plan_tier: Mapped[str] = mapped_column(String(32), default="free")
+    subscription_status: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    stripe_customer_id: Mapped[str | None] = mapped_column(String(255), nullable=True, unique=True)
+    stripe_subscription_id: Mapped[str | None] = mapped_column(String(255), nullable=True, unique=True)
+    subscription_current_period_end: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
     candidate: Mapped["Candidate | None"] = relationship(back_populates="user")
     password_reset_tokens: Mapped[list["PasswordResetToken"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"

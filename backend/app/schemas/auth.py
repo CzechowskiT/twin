@@ -35,6 +35,9 @@ class UserOut(BaseModel):
     email: EmailStr
     gdpr_consent_at: datetime | None
     linkedin_connected: bool = False
+    plan_tier: str = "free"
+    subscription_status: str | None = None
+    subscription_current_period_end: datetime | None = None
 
     model_config = {"from_attributes": True}
 
@@ -45,4 +48,7 @@ class UserOut(BaseModel):
             email=user.email,
             gdpr_consent_at=user.gdpr_consent_at,
             linkedin_connected=bool(getattr(user, "linkedin_id", None)),
+            plan_tier=getattr(user, "plan_tier", None) or "free",
+            subscription_status=getattr(user, "subscription_status", None),
+            subscription_current_period_end=getattr(user, "subscription_current_period_end", None),
         )

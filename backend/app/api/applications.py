@@ -10,6 +10,7 @@ from app.database.models import Application, ApplicationStatus, Candidate, Job, 
 from app.database.session import get_db
 from app.automation.types import ApplyOutcome
 from app.config import get_settings
+from app.core.plans import PlanTier, count_tracked_applications, effective_plan_tier, max_tracked_applications
 from app.schemas.application import (
     ApplicationCreate,
     ApplicationListOut,
@@ -60,6 +61,19 @@ def create_application(
     if existing:
         return _update_row(existing, body.status, body.notes, db, job)
 
+    tier = effective_plan_tier(user)
+    cap = max_tracked_applications(tier)
+    if cap is not None:
+        tracked = count_tracked_applications(db, candidate.id)
+        if tracked >= cap:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=(
+                    f"Free plan supports up to {cap} active tracked applications (rejected roles do not count). "
+                    "Upgrade to Premium for unlimited tracking."
+                ),
+            )
+
     app = Application(
         candidate_id=candidate.id,
         job_id=body.job_id,
@@ -80,6 +94,11 @@ def auto_apply(
     user: User = Depends(get_current_user),
 ) -> AutoApplyOut:
     """Run Playwright auto-apply (Pracuj.pl; Indeed needs visible browser for CAPTCHA)."""
+    if effective_plan_tier(user) == PlanTier.FREE:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Auto-apply is available on Premium and Pro plans.",
+        )
     settings = get_settings()
     submit = body.submit if body.submit is not None else settings.auto_apply_submit
     outcome, message, app = auto_apply_for_user(

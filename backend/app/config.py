@@ -123,6 +123,12 @@ class Settings(BaseSettings):
 
     password_reset_token_ttl_minutes: int = 60
 
+    # Stripe (https://dashboard.stripe.com/) — Checkout enables card + Apple Pay + Google Pay where supported
+    stripe_secret_key: str = ""
+    stripe_webhook_secret: str = ""
+    stripe_price_id_premium: str = ""
+    stripe_price_id_pro: str = ""
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [o for o in (x.strip() for x in self.cors_origins.split(",")) if o]

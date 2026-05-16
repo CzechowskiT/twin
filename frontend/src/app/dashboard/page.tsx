@@ -15,7 +15,13 @@ import { clearToken, getToken } from "@/lib/auth";
 import { SHOW_SCRAPE_UI } from "@/lib/features";
 import { buildJobsQuery, defaultJobFilters, type JobFilters } from "@/lib/jobs";
 
-type User = { id: number; email: string };
+type User = {
+  id: number;
+  email: string;
+  plan_tier?: string;
+  subscription_status?: string | null;
+  subscription_current_period_end?: string | null;
+};
 type Profile = {
   name: string;
   skills: string[];
@@ -308,16 +314,21 @@ export default function DashboardPage() {
         <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">
           {t("dashboard.title")}
         </h1>
-        <button
-          type="button"
-          onClick={() => {
-            clearToken();
-            router.push("/login");
-          }}
-          className="twin-btn-secondary twin-touch-target !w-full text-center sm:!w-auto"
-        >
-          {t("dashboard.logout")}
-        </button>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+          <Link href="/dashboard/billing" className="twin-link twin-touch-target text-center text-sm sm:text-left">
+            {t("dashboard.billingLink")}
+          </Link>
+          <button
+            type="button"
+            onClick={() => {
+              clearToken();
+              router.push("/login");
+            }}
+            className="twin-btn-secondary twin-touch-target !w-full text-center sm:!w-auto"
+          >
+            {t("dashboard.logout")}
+          </button>
+        </div>
       </div>
 
       {user ? (
