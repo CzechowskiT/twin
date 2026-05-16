@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
-import { ScrollReveal } from "@/components/marketing/scroll-reveal";
 
 const CHAPTER_ANCHORS = ["story-ch-1", "story-ch-2", "story-ch-3", "story-timeline"] as const;
 
@@ -35,7 +34,7 @@ function TimelineItem({
       <div className="min-w-0 pb-1">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--twin-accent)]">{when}</p>
         <h3 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-[var(--foreground)] sm:text-2xl">{title}</h3>
-        <p className="mt-3 text-sm leading-relaxed text-[var(--twin-muted)] sm:text-base">{body}</p>
+        <p className="mt-3 text-sm font-medium leading-relaxed text-[var(--foreground)] sm:text-base">{body}</p>
       </div>
     </div>
   );
@@ -145,19 +144,21 @@ export function LandingStoryJourney() {
           key={ch.id}
           id={ch.id}
           ref={sectionRefs[i]}
-          className="marketing-chapter scroll-mt-24 border-t border-[var(--twin-border)]/80 px-4 py-[min(18vh,6rem)] sm:px-6 md:min-h-[100svh] md:scroll-mt-28 md:py-0"
+          className="marketing-chapter scroll-mt-24 border-t border-[var(--twin-border)]/80 bg-[var(--background)] px-4 py-[min(18vh,6rem)] sm:px-6 md:min-h-[100svh] md:scroll-mt-28 md:py-0"
         >
           <div className="mx-auto flex h-full min-h-0 max-w-4xl flex-col justify-center md:min-h-[100svh] md:py-24">
-            <ScrollReveal delayMs={40}>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-[var(--twin-muted)]">{t("home.storyEyebrow")}</p>
-              <p className="mt-4 font-mono text-xs font-medium text-[var(--twin-accent)]">{ch.kicker}</p>
+            <div className="rounded-[1.75rem] border-2 border-[var(--twin-border)] bg-[var(--twin-card)] px-5 py-8 shadow-[0_12px_40px_rgb(25_60_50_/0.12)] sm:px-8 sm:py-10">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-[var(--twin-accent)]">
+                {t("home.storyEyebrow")}
+              </p>
+              <p className="mt-4 font-mono text-xs font-semibold text-[var(--twin-accent-hover)]">{ch.kicker}</p>
               <h2 className="mt-4 max-w-3xl text-3xl font-semibold tracking-[-0.035em] text-[var(--foreground)] sm:text-4xl md:text-[2.75rem] md:leading-[1.08]">
                 {ch.title}
               </h2>
-              <p className="mt-8 max-w-2xl text-base leading-relaxed text-[var(--twin-muted)] sm:text-lg sm:leading-relaxed">
+              <p className="mt-8 max-w-2xl text-base font-medium leading-relaxed text-[var(--foreground)] sm:text-lg sm:leading-relaxed">
                 {ch.body}
               </p>
-            </ScrollReveal>
+            </div>
           </div>
         </section>
       ))}
@@ -165,16 +166,22 @@ export function LandingStoryJourney() {
       <section
         id={CHAPTER_ANCHORS[3]}
         ref={refTimeline}
-        className="marketing-chapter scroll-mt-24 border-t border-[var(--twin-border)] bg-gradient-to-b from-[var(--twin-accent-muted)]/35 to-transparent px-4 py-[min(16vh,5rem)] sm:px-6 md:min-h-[min(100svh,56rem)] md:scroll-mt-28 md:py-24"
+        className="marketing-chapter scroll-mt-24 border-t border-[var(--twin-border)] bg-[var(--background)] bg-gradient-to-b from-[var(--twin-accent-muted)]/45 via-[var(--background)] to-[var(--background)] px-4 py-[min(16vh,5rem)] sm:px-6 md:min-h-[min(100svh,56rem)] md:scroll-mt-28 md:py-24"
       >
         <div className="mx-auto max-w-4xl">
-          <ScrollReveal delayMs={30}>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-muted)]">{t("home.timelineEyebrow")}</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-4xl">{t("home.timelineTitle")}</h2>
-            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[var(--twin-muted)] sm:text-base">{t("home.timelineSubtitle")}</p>
-          </ScrollReveal>
+          <div className="rounded-[1.75rem] border-2 border-[var(--twin-border)] bg-[var(--twin-card)] px-5 py-8 shadow-[0_12px_40px_rgb(25_60_50_/0.12)] sm:px-8 sm:py-10">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
+              {t("home.timelineEyebrow")}
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-4xl">
+              {t("home.timelineTitle")}
+            </h2>
+            <p className="mt-4 max-w-2xl text-sm font-medium leading-relaxed text-[var(--foreground)] sm:text-base">
+              {t("home.timelineSubtitle")}
+            </p>
+          </div>
 
-          <div className="relative mt-14 sm:mt-16">
+          <div className="relative mt-10 rounded-[1.75rem] border-2 border-[var(--twin-border)] bg-[var(--twin-card)] px-5 py-8 shadow-[0_12px_40px_rgb(25_60_50_/0.12)] sm:mt-12 sm:px-8 sm:py-10">
             <TimelineItem
               when={t("home.timeline1When")}
               title={t("home.timeline1Title")}

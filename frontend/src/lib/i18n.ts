@@ -40,6 +40,19 @@ export const LOCALE_LABELS: Record<Locale, string> = {
   ja: "日本語",
 };
 
+/** Flag emoji per locale for the compact header switcher (UTF-8). */
+export const LOCALE_FLAGS: Record<Locale, string> = {
+  en: "🇺🇸",
+  pl: "🇵🇱",
+  es: "🇪🇸",
+  it: "🇮🇹",
+  fr: "🇫🇷",
+  de: "🇩🇪",
+  zh: "🇨🇳",
+  ar: "🇸🇦",
+  ja: "🇯🇵",
+};
+
 export function isLocale(value: string): value is Locale {
   return (LOCALES as readonly string[]).includes(value);
 }
@@ -108,6 +121,16 @@ const en = {
     focusCta: "Start with these goals",
     focusFootnote:
       "Today’s MVP aggregates roles, scores them when you add a profile, and centralizes application status. Heavier automation ships in stages — same calm surface, more autonomy behind it.",
+    originEyebrow: "Where we came from",
+    originTitle: "The idea — and why it exists",
+    originLead:
+      "TWIN started as a stubborn answer to a boring question: why should changing roles still feel like a second job after the workday ends?",
+    originP1:
+      "The first sketches were honest about the mess: tabs, screenshots, half-filled spreadsheets, and the quiet guilt of “I’ll apply tomorrow.” The bet was simple — pull listings from the boards your workspace actually allows, keep consent and GDPR as the default posture, and let software carry the repetitive motion while people keep judgment, taste, and boundaries.",
+    originP2:
+      "The build began close to home — Poland and Central Europe first — because that is where the noise is loudest: many boards, languages, and hiring rhythms in parallel. The product discipline was to prove matching and tracking where fragmentation hurts, then widen the same calm surface to a global registry without diluting trust.",
+    originP3:
+      "What you see here is that thesis shipped: a twin that looks calm in the UI, strict about data underneath, and a roadmap that earns autonomy in production — audit trails, exports, quiet hours — instead of promising magic in a slide deck.",
     journeyScrollHint: "Scroll the page to move through the story chapters.",
     journeyRailsAria: "Story chapters on this page",
     storyEyebrow: "Story",
@@ -517,6 +540,16 @@ const pl: MessageTree = {
     focusCta: "Zacznij z tymi celami",
     focusFootnote:
       "MVP dziś: agregacja ofert, ocena po uzupełnieniu profilu, statusy aplikacji w jednym UI. Głębsza automatyzacja dochodzi etapami — ta sama spokojna powierzchnia, więcej pracy za kulisami.",
+    originEyebrow: "Skąd się to wzięło",
+    originTitle: "Pomysł i geneza",
+    originLead:
+      "TWIN zaczął od upartej odpowiedzi na nudne pytanie: czemu zmiana pracy nadal ma smak drugiego etatu po godzinach „pierwszego”?",
+    originP1:
+      "Pierwsze szkice były szczere co do bałaganu: karty, zrzuty ekranu, arkusze i ciche „aplikuję jutro”. Założenie było proste — zaciągnij oferty z portali, na które pozwala Twoje środowisko, trzymaj zgodę i RODO jako domyślną postawę, a powtarzalny ruch niech przejmie kod; człowiek zostaje przy ocenie, kontekście i granicach.",
+    originP2:
+      "Budowę zaczęliśmy „od siebie” — Polska i Europa Środkowa jako pierwszy grunt, bo tam hałas jest najgłośniejszy: wiele portali, języków i rytmów rekrutacji naraz. Dyscyplina produktowa: udowodnić dopasowanie i śledzenie tam, gdzie fragmentacja boli, a potem poszerzać ten sam spokojny interfejs o globalny rejestr bez rozmycia zaufania.",
+    originP3:
+      "To, co widzisz na stronie, to ta teza w formie produktu: bliźniak spokojny w UI, porządek danych i automatyzacji pod spodem oraz roadmapa, która autonomię musi wypracować w produkcji — logi, eksporty, godziny ciszy — zamiast obiecywać magię na slajdzie.",
     journeyScrollHint: "Przewiń stronę, żeby przejść przez kolejne rozdziały narracji.",
     journeyRailsAria: "Rozdziały historii na tej stronie",
     storyEyebrow: "Historia",

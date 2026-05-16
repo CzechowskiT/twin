@@ -19,20 +19,28 @@ export function Header() {
   ];
 
   const app = [
-    { href: "/calculator" as const, label: t("nav.calculator") },
     { href: "/login" as const, label: t("nav.login") },
     { href: "/register" as const, label: t("nav.register") },
     { href: "/profile" as const, label: t("nav.profile") },
     { href: "/dashboard" as const, label: t("nav.dashboard") },
   ];
 
+  const roiClassName =
+    "twin-touch-target inline-flex shrink-0 items-center gap-2 rounded-full bg-[var(--twin-cta)] px-4 py-2 text-[12px] font-extrabold uppercase tracking-wide text-white shadow-[0_4px_14px_rgb(217_119_6_/0.55)] ring-2 ring-white/90 ring-offset-2 ring-offset-white transition hover:bg-[var(--twin-cta-hover)] hover:shadow-[0_6px_20px_rgb(180_83_9_/0.5)] sm:px-5 sm:py-2.5 sm:text-[13px]";
+
   return (
     <header className="twin-header-bar sticky top-0 z-50">
       <div className="twin-header-stripe" aria-hidden />
       <div className="twin-container flex flex-wrap items-center justify-between gap-x-4 gap-y-2 py-3 sm:py-3.5">
-        <Link href="/" className="twin-logo shrink-0">
-          TWIN<span className="twin-logo-accent">.</span>
-        </Link>
+        <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
+          <Link href="/" className="twin-logo shrink-0">
+            TWIN<span className="twin-logo-accent">.</span>
+          </Link>
+          <Link href="/calculator" className={roiClassName}>
+            <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white shadow-sm" aria-hidden />
+            {t("nav.calculator")}
+          </Link>
+        </div>
 
         <div className="hidden min-w-0 flex-1 items-center justify-end gap-3 md:flex">
           <nav
@@ -67,6 +75,10 @@ export function Header() {
               aria-label="Main"
               style={{ boxShadow: "var(--twin-shadow-md)" }}
             >
+              <Link href="/calculator" className={`${roiClassName} mb-2 flex w-full justify-center`}>
+                <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white shadow-sm" aria-hidden />
+                {t("nav.calculator")}
+              </Link>
               <p className="px-3 pb-1 pt-1 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
                 {t("site.footerCompany")}
               </p>

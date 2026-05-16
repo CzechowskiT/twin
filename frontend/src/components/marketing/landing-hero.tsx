@@ -15,7 +15,7 @@ export function LandingHero() {
         <h1 className="marketing-gradient-heading mt-6 max-w-4xl text-[2.35rem] font-semibold leading-[1.06] tracking-[-0.04em] sm:mt-8 sm:text-5xl sm:leading-[1.04] md:text-6xl md:leading-[1.02]">
           {t("home.title")}
         </h1>
-        <p className="mt-8 max-w-2xl text-base leading-relaxed text-[var(--twin-muted)] sm:mt-10 sm:text-lg sm:leading-relaxed">
+        <p className="mt-8 max-w-2xl rounded-2xl border-2 border-neutral-200/95 bg-white px-5 py-5 text-base font-medium leading-relaxed text-[var(--foreground)] shadow-[0_12px_40px_rgb(0_0_0_/0.12)] sm:mt-10 sm:rounded-3xl sm:px-6 sm:py-6 sm:text-lg sm:leading-relaxed">
           {t("home.description")}
         </p>
         <div className="mt-12 flex flex-col gap-3 sm:mt-14 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
