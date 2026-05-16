@@ -68,7 +68,7 @@ export function DashboardCommandCenter({
             {t("dashboard.statFeedCta")}
           </a>
         </div>
-        <div className="twin-card-inset rounded-xl border border-teal-200/70 bg-gradient-to-br from-teal-50/80 to-[var(--twin-card)] p-4 shadow-sm">
+        <div className="twin-card-inset rounded-xl border border-[var(--twin-border)] bg-gradient-to-br from-[var(--twin-accent-muted)] to-[var(--twin-card)] p-4 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
             {t("dashboard.statMatchesTitle")}
           </p>
@@ -104,7 +104,7 @@ export function DashboardCommandCenter({
             <a
               key={a.href + a.label}
               href={a.href}
-              className="twin-touch-target inline-flex items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] px-4 py-2 text-sm font-medium text-[var(--twin-muted-strong)] shadow-sm transition hover:border-teal-300/80 hover:bg-[var(--twin-accent-muted)]"
+              className="twin-touch-target inline-flex items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] px-4 py-2 text-sm font-medium text-[var(--twin-muted-strong)] shadow-sm transition hover:border-[var(--twin-border-hover)] hover:bg-[var(--twin-accent-muted)]"
             >
               {a.label}
             </a>
@@ -112,7 +112,7 @@ export function DashboardCommandCenter({
             <Link
               key={a.href + a.label}
               href={a.href}
-              className="twin-touch-target inline-flex items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] px-4 py-2 text-sm font-medium text-[var(--twin-muted-strong)] shadow-sm transition hover:border-teal-300/80 hover:bg-[var(--twin-accent-muted)]"
+              className="twin-touch-target inline-flex items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] px-4 py-2 text-sm font-medium text-[var(--twin-muted-strong)] shadow-sm transition hover:border-[var(--twin-border-hover)] hover:bg-[var(--twin-accent-muted)]"
             >
               {a.label}
             </Link>

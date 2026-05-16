@@ -23,7 +23,7 @@ export function LandingFaq() {
           <div className="mt-10 divide-y divide-[var(--twin-border)] overflow-hidden rounded-2xl border border-[var(--twin-border)] bg-[var(--twin-card)] shadow-[var(--twin-shadow)]">
             {items.map((item) => (
               <details key={item.id} className="group border-0 border-[var(--twin-border)] bg-transparent">
-                <summary className="flex cursor-pointer list-none items-start justify-between gap-4 px-5 py-4 text-left transition hover:bg-teal-50/40 sm:px-6 sm:py-5 [&::-webkit-details-marker]:hidden">
+                <summary className="flex cursor-pointer list-none items-start justify-between gap-4 px-5 py-4 text-left transition hover:bg-[var(--twin-accent-muted)]/60 sm:px-6 sm:py-5 [&::-webkit-details-marker]:hidden">
                   <span className="min-w-0">
                     <span className="font-mono text-xs font-semibold text-[var(--twin-accent)]">{item.id}</span>
                     <span className="mt-1 block text-base font-semibold text-[var(--foreground)] sm:text-lg">{item.q}</span>

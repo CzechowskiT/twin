@@ -156,10 +156,10 @@ export function TwinRoiCalculator() {
             </dl>
           </section>
 
-          <section className="twin-card-panel rounded-xl border border-teal-200/90 bg-gradient-to-b from-teal-50/80 to-[var(--twin-card)] p-5 sm:p-6">
+          <section className="twin-card-panel rounded-xl border border-[var(--twin-border)] bg-gradient-to-b from-[var(--twin-accent-muted)] to-[var(--twin-card)] p-5 sm:p-6">
             <div className="mb-4 flex items-center justify-between gap-2">
-              <h3 className="text-lg font-semibold text-teal-950 sm:text-xl">{t("calculator.twinTitle")}</h3>
-              <span className="shrink-0 rounded-full bg-teal-100 px-2.5 py-1 text-xs font-semibold text-teal-900">
+              <h3 className="text-lg font-semibold text-[var(--twin-accent-hover)] sm:text-xl">{t("calculator.twinTitle")}</h3>
+              <span className="shrink-0 rounded-full bg-[var(--twin-accent-soft)]/50 px-2.5 py-1 text-xs font-semibold text-[var(--twin-accent-hover)]">
                 {t("calculator.twinBadge")}
               </span>
             </div>
@@ -171,16 +171,16 @@ export function TwinRoiCalculator() {
                   {t("calculator.twinFeeDetail").replace("{{monthly}}", money(monthlySalary, locale))}
                 </dd>
               </div>
-              <div className="border-t border-teal-200/80 pt-4">
+              <div className="border-t border-[var(--twin-border)] pt-4">
                 <dt className="text-sm text-[var(--twin-muted)]">{t("calculator.bonusForCandidate")}</dt>
                 <dd className="text-xl font-bold text-[var(--twin-accent)]">{money(candidateBonus, locale)}</dd>
                 <dd className="text-xs text-[var(--twin-muted)]">{t("calculator.bonusAfter")}</dd>
               </div>
-              <div className="border-t border-teal-200/80 pt-4">
+              <div className="border-t border-[var(--twin-border)] pt-4">
                 <dt className="text-sm text-[var(--twin-muted)]">{t("calculator.retention")}</dt>
-                <dd className="text-base font-semibold text-teal-900">{t("calculator.retentionYes")}</dd>
+                <dd className="text-base font-semibold text-[var(--twin-accent-hover)]">{t("calculator.retentionYes")}</dd>
               </div>
-              <div className="border-t border-teal-200/80 pt-4">
+              <div className="border-t border-[var(--twin-border)] pt-4">
                 <dt className="text-sm text-[var(--twin-muted)]">{t("calculator.totalAnnualCost")}</dt>
                 <dd className="text-xl font-bold text-[var(--twin-accent)]">{money(twinFee * numberOfHires, locale)}</dd>
               </div>
@@ -284,20 +284,20 @@ export function TwinRoiCalculator() {
             </div>
           </div>
 
-          <div className="mt-6 rounded-xl bg-gradient-to-r from-teal-600 to-teal-700 p-5 text-white shadow-md sm:p-6">
+          <div className="mt-6 rounded-xl bg-gradient-to-r from-[var(--twin-accent)] to-[var(--twin-accent-hover)] p-5 text-white shadow-md sm:p-6">
             <div className="grid gap-4 text-center sm:grid-cols-3">
               <div>
-                <div className="text-xs font-medium uppercase tracking-wide text-teal-100">{t("calculator.totalValue")}</div>
+                <div className="text-xs font-medium uppercase tracking-wide text-white/80">{t("calculator.totalValue")}</div>
                 <div className="mt-1 text-2xl font-bold">{money(totalEnterpriseValue, locale)}</div>
               </div>
               <div>
-                <div className="text-xs font-medium uppercase tracking-wide text-teal-100">{t("calculator.netBenefit")}</div>
+                <div className="text-xs font-medium uppercase tracking-wide text-white/80">{t("calculator.netBenefit")}</div>
                 <div className="mt-1 text-2xl font-bold">
                   {money(totalEnterpriseValue - integrationFee, locale)}
                 </div>
               </div>
               <div>
-                <div className="text-xs font-medium uppercase tracking-wide text-teal-100">{t("calculator.roiLabel")}</div>
+                <div className="text-xs font-medium uppercase tracking-wide text-white/80">{t("calculator.roiLabel")}</div>
                 <div className="mt-1 text-2xl font-bold">{enterpriseROI !== null ? `${enterpriseROI}%` : "—"}</div>
               </div>
             </div>

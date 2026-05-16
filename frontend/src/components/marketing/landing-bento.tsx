@@ -26,7 +26,7 @@ function FeatureCard({
         </span>
         <h3 className="mt-4 text-lg font-semibold tracking-[-0.02em] text-[var(--foreground)] sm:text-xl">{title}</h3>
         <p className="mt-3 flex-1 text-sm leading-relaxed text-[var(--twin-muted)] sm:text-[15px]">{body}</p>
-        <div className="mt-8 h-px w-12 bg-gradient-to-r from-teal-500/90 to-amber-500/80" />
+        <div className="mt-8 h-px w-12 bg-gradient-to-r from-[var(--twin-accent)]/95 to-amber-500/80" />
       </BentoSpotlight>
     </ScrollReveal>
   );
@@ -41,7 +41,7 @@ export function LandingBento() {
   ];
 
   return (
-    <section className="border-t border-[var(--twin-border)] bg-gradient-to-b from-teal-50/40 via-transparent to-transparent py-24 sm:py-28 md:py-32">
+    <section className="border-t border-[var(--twin-border)] bg-gradient-to-b from-[var(--twin-accent-muted)]/50 via-transparent to-transparent py-24 sm:py-28 md:py-32">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <ScrollReveal delayMs={40}>
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-muted)]">TWIN</p>
@@ -58,7 +58,7 @@ export function LandingBento() {
             <BentoSpotlight className="flex h-full min-h-[280px] flex-col p-6 sm:min-h-[320px] sm:p-8">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs font-medium uppercase tracking-widest text-[var(--twin-muted)]">{t("home.scrape")}</p>
-                <span className="rounded-full border border-teal-200/80 bg-teal-50 px-2.5 py-0.5 font-mono text-[10px] text-teal-800">
+                <span className="rounded-full border border-[var(--twin-border)] bg-[var(--twin-accent-muted)] px-2.5 py-0.5 font-mono text-[10px] text-[var(--twin-accent-hover)]">
                   MVP
                 </span>
               </div>

@@ -10,8 +10,11 @@ import {
   type ReactNode,
 } from "react";
 import {
+  LOCALE_HTML_LANG,
   LOCALE_STORAGE_KEY,
   detectBrowserLocale,
+  isLocale,
+  localeIsRtl,
   translate,
   type Locale,
   type TranslationKey,
@@ -28,7 +31,7 @@ const LanguageContext = createContext<LanguageContextValue | null>(null);
 function readStoredLocale(): Locale | null {
   if (typeof window === "undefined") return null;
   const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
-  return stored === "en" || stored === "pl" ? stored : null;
+  return stored && isLocale(stored) ? stored : null;
 }
 
 function resolveLocale(): Locale {
@@ -44,7 +47,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    document.documentElement.lang = locale;
+    document.documentElement.lang = LOCALE_HTML_LANG[locale];
+    document.documentElement.dir = localeIsRtl(locale) ? "rtl" : "ltr";
     try {
       localStorage.setItem(LOCALE_STORAGE_KEY, locale);
     } catch {
@@ -54,7 +58,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const setLocale = useCallback((next: Locale) => {
     setLocaleState(next);
-    document.documentElement.lang = next;
+    document.documentElement.lang = LOCALE_HTML_LANG[next];
+    document.documentElement.dir = localeIsRtl(next) ? "rtl" : "ltr";
     try {
       localStorage.setItem(LOCALE_STORAGE_KEY, next);
     } catch {

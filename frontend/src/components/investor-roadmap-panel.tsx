@@ -9,7 +9,7 @@ export function InvestorRoadmapPanel() {
     <details className="group mt-4 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] p-3 text-sm open:bg-[var(--twin-card)] sm:p-4">
       <summary className="cursor-pointer list-none font-semibold text-[var(--foreground)] [&::-webkit-details-marker]:hidden">
         <span className="inline-flex items-center gap-2">
-          <span className="inline-block h-2 w-2 rounded-full bg-emerald-500/80" aria-hidden />
+          <span className="inline-block h-2 w-2 rounded-full bg-[var(--twin-accent)]/85" aria-hidden />
           {t("dashboard.roadmapSummary")}
         </span>
       </summary>
@@ -25,7 +25,7 @@ export function InvestorRoadmapPanel() {
                 <span
                   className={
                     isLivePortal(p.boardId)
-                      ? "shrink-0 rounded bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-emerald-800"
+                      ? "shrink-0 rounded bg-[var(--twin-accent)]/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-[var(--twin-accent-hover)]"
                       : "shrink-0 rounded bg-[var(--twin-accent-muted)] px-1.5 py-0.5 text-[10px] font-semibold uppercase text-[var(--twin-muted-strong)]"
                   }
                 >

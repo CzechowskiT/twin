@@ -1,6 +1,51 @@
-export type Locale = "en" | "pl";
+import { mergeDeep } from "./merge-messages";
+import {
+  arOverlay,
+  deOverlay,
+  esOverlay,
+  frOverlay,
+  itOverlay,
+  jaOverlay,
+  zhOverlay,
+} from "./overlays";
 
-export const LOCALES: Locale[] = ["en", "pl"];
+export type Locale = "en" | "pl" | "es" | "it" | "fr" | "de" | "zh" | "ar" | "ja";
+
+export const LOCALES: Locale[] = ["en", "pl", "es", "it", "fr", "de", "zh", "ar", "ja"];
+
+/** BCP 47 tags for <html lang>. */
+export const LOCALE_HTML_LANG: Record<Locale, string> = {
+  en: "en",
+  pl: "pl",
+  es: "es",
+  it: "it",
+  fr: "fr",
+  de: "de",
+  zh: "zh-Hans",
+  ar: "ar",
+  ja: "ja",
+};
+
+/** Native labels for the language switcher. */
+export const LOCALE_LABELS: Record<Locale, string> = {
+  en: "English",
+  pl: "Polski",
+  es: "Español",
+  it: "Italiano",
+  fr: "Français",
+  de: "Deutsch",
+  zh: "中文",
+  ar: "العربية",
+  ja: "日本語",
+};
+
+export function isLocale(value: string): value is Locale {
+  return (LOCALES as readonly string[]).includes(value);
+}
+
+export function localeIsRtl(locale: Locale): boolean {
+  return locale === "ar";
+}
 export const LOCALE_STORAGE_KEY = "twin_locale";
 
 export type TranslationKey =
@@ -705,12 +750,48 @@ const pl: MessageTree = {
   },
 };
 
-export const dictionaries: Record<Locale, typeof en> = { en, pl: pl as typeof en };
+function messagesFromEnOverlay(overlay: Record<string, unknown>): typeof en {
+  return mergeDeep(
+    structuredClone(en) as unknown as Record<string, unknown>,
+    overlay,
+  ) as typeof en;
+}
+
+const es = messagesFromEnOverlay(esOverlay);
+const it = messagesFromEnOverlay(itOverlay);
+const fr = messagesFromEnOverlay(frOverlay);
+const de = messagesFromEnOverlay(deOverlay);
+const zh = messagesFromEnOverlay(zhOverlay);
+const ar = messagesFromEnOverlay(arOverlay);
+const ja = messagesFromEnOverlay(jaOverlay);
+
+export const dictionaries: Record<Locale, typeof en> = {
+  en,
+  pl: pl as typeof en,
+  es,
+  it,
+  fr,
+  de,
+  zh,
+  ar,
+  ja,
+};
 
 export function detectBrowserLocale(): Locale {
   if (typeof navigator === "undefined") return "en";
-  const lang = navigator.language?.toLowerCase() ?? "";
-  return lang.startsWith("pl") ? "pl" : "en";
+  const raw = navigator.language?.toLowerCase() ?? "en";
+  const primary = raw.split("-")[0] ?? "en";
+  if (raw.startsWith("zh") || primary === "zh") return "zh";
+  if (raw.startsWith("ar") || primary === "ar") return "ar";
+  const byPrimary: Record<string, Locale> = {
+    pl: "pl",
+    es: "es",
+    it: "it",
+    fr: "fr",
+    de: "de",
+    ja: "ja",
+  };
+  return byPrimary[primary] ?? "en";
 }
 
 export function getNestedValue(obj: Record<string, unknown>, path: string): string {

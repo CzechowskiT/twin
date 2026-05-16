@@ -13,7 +13,7 @@ const VARIANT_ROW: Record<
 > = {
   google: {
     enabled:
-      "twin-touch-target mb-2 flex w-full items-center justify-center gap-3 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-card)] px-4 py-3 text-sm font-semibold text-[var(--foreground)] shadow-sm transition hover:border-teal-300/80 hover:bg-[var(--twin-surface-raised)] hover:shadow",
+      "twin-touch-target mb-2 flex w-full items-center justify-center gap-3 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-card)] px-4 py-3 text-sm font-semibold text-[var(--foreground)] shadow-sm transition hover:border-[var(--twin-border-hover)] hover:bg-[var(--twin-surface-raised)] hover:shadow",
     disabled:
       "twin-touch-target mb-2 flex w-full cursor-not-allowed items-center justify-center gap-3 rounded-lg border border-dashed border-[var(--twin-border)] bg-[var(--twin-card)] px-4 py-3 text-sm font-semibold text-[var(--twin-muted)] opacity-75",
     iconWrap: "inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center overflow-visible leading-none",

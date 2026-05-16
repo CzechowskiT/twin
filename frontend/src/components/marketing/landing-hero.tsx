@@ -33,7 +33,7 @@ export function LandingHero() {
           </Link>
           <Link
             href="/login"
-            className="twin-touch-target inline-flex min-h-[3rem] items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-9 text-center text-[15px] font-semibold text-[var(--twin-muted-strong)] shadow-sm transition duration-200 hover:border-teal-300 hover:bg-[var(--twin-accent-muted)] active:scale-[0.98]"
+            className="twin-touch-target inline-flex min-h-[3rem] items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-9 text-center text-[15px] font-semibold text-[var(--twin-muted-strong)] shadow-sm transition duration-200 hover:border-[var(--twin-border-hover)] hover:bg-[var(--twin-accent-muted)] active:scale-[0.98]"
           >
             {t("home.logIn")}
           </Link>

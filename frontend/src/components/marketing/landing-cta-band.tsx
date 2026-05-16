@@ -35,7 +35,7 @@ export function LandingCtaBand() {
               </Link>
               <Link
                 href="/login"
-                className="twin-touch-target inline-flex min-h-[2.75rem] items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-7 text-center text-sm font-semibold text-[var(--twin-muted-strong)] transition hover:border-teal-300 hover:bg-[var(--twin-accent-muted)] active:scale-[0.98]"
+                className="twin-touch-target inline-flex min-h-[2.75rem] items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-7 text-center text-sm font-semibold text-[var(--twin-muted-strong)] transition hover:border-[var(--twin-border-hover)] hover:bg-[var(--twin-accent-muted)] active:scale-[0.98]"
               >
                 {t("home.logIn")}
               </Link>
