@@ -1,7 +1,6 @@
 /**
- * Browser calls use same-origin `/api/v1/...` → Next.js rewrites to FastAPI (next.config.ts).
- * Avoids CORS and avoids a wrong/missing NEXT_PUBLIC_API_URL in the client bundle on Vercel.
- * Local: set NEXT_PUBLIC_API_URL in .env.local so rewrites hit your API (e.g. http://127.0.0.1:8000).
+ * Browser calls use same-origin `/api/v1/...` → proxied by `app/api/v1/[[...path]]/route.ts` to FastAPI.
+ * Local: set NEXT_PUBLIC_API_URL in `.env.local` (e.g. http://127.0.0.1:8000).
  */
 const API_URL = "";
 
@@ -15,7 +14,7 @@ async function parseError(res: Response): Promise<string> {
   } catch {
     /* ignore */
   }
-  return res.statusText || "Request failed";
+  return res.statusText ? `${res.status} ${res.statusText}` : `HTTP ${res.status}`;
 }
 
 export async function apiFetch<T>(
