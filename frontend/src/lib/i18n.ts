@@ -77,7 +77,8 @@ export type TranslationKey =
   | `onboarding.${keyof typeof en.onboarding}`
   | `meta.${keyof typeof en.meta}`
   | `privacy.${keyof typeof en.privacy}`
-  | `common.${keyof typeof en.common}`;
+  | `common.${keyof typeof en.common}`
+  | `persona.${keyof typeof en.persona}`;
 
 const en = {
   nav: {
@@ -86,6 +87,9 @@ const en = {
     profile: "Profile",
     dashboard: "Dashboard",
     calculator: "B2B ROI calculator",
+    forCandidates: "Candidates",
+    forRecruiters: "Recruiters",
+    forCompanies: "Companies",
     menu: "Menu",
     about: "About",
     cases: "Case studies",
@@ -183,21 +187,21 @@ const en = {
       "You explicitly consent when you register. We use profile data to rank jobs and run the product. For retention, exports, and GDPR rights, read the policy linked below.",
     audienceEyebrow: "Who it is for",
     audienceDraftBadge: "Draft",
-    audienceTitle: "Candidate · Recruiter · Company (B2B)",
+    audienceTitle: "Three distinct product surfaces",
     audienceLead:
-      "Same platform spine — three entry stories. Copy and routes will harden as we ship; today this is a working sketch so navigation and CTAs stay honest.",
+      "Candidate self-serve (Stripe), recruiter seat packs (invoice), and annual company programs each ship different capabilities, SLAs, and pricing — open the lane that matches your job to be done.",
     audienceCandidateTitle: "Candidates",
     audienceCandidateBody:
-      "Aggregate roles from boards your workspace enables, rank when your profile exists, and keep every application in one pipeline — consent-first, built with GDPR defaults.",
+      "Aggregate roles from boards your workspace enables, rank when your profile exists, keep applications in one pipeline, and optionally use CV intelligence + auto-apply where boards allow.",
     audienceRecruiterTitle: "Recruiters & sourcers",
     audienceRecruiterBody:
-      "Reduce duplicate board hopping, carry clearer timestamps into hiring managers, and keep sourcing inside the geography and consent rules you configure.",
-    audienceB2bTitle: "Companies · B2B",
+      "Watchlists, hiring-manager packets, governance presets, and seat-based billing — built for sourcing teams, not the consumer dashboard SKU.",
+    audienceB2bTitle: "Companies · procurement",
     audienceB2bBody:
-      "Finance-friendly scenario: compare traditional agency success fees to a TWIN-style fee posture, model HR time back, and pressure-test an integration-style line item — open the B2B ROI calculator for the discussion, not as pricing.",
-    audienceCandidateCta: "Start free",
-    audienceRecruiterCta: "Contact us",
-    audienceB2bCta: "Open B2B ROI calculator",
+      "ROI modeling, DPA-ready documentation, SSO roadmap, and enterprise SLAs — separate from per-seat recruiter tooling; the B2B calculator anchors finance discussions.",
+    audienceCandidateCta: "Open candidate page",
+    audienceRecruiterCta: "Open recruiter page",
+    audienceB2bCta: "Open company page",
   },
   site: SITE_MESSAGES_EN,
   dashboard: {
@@ -245,6 +249,8 @@ const en = {
     applyJob: "Apply",
     autoApplyJob: "Auto-apply",
     autoApplyRunning: "Opening browser…",
+    autoApplyHint:
+      "Runs board-specific automation where supported; otherwise you’ll get a short message and can use Apply manually.",
     saveJob: "Save",
     dismissJob: "Not for me",
     applications: "My applications",
@@ -407,7 +413,8 @@ const en = {
     subtitle:
       "Add your CV for contextual matching — TWIN reads experience and skills from the document.",
     cvSection: "Your CV",
-    cvHint: "PDF, DOCX or TXT (max 5 MB). We update skills from your CV automatically.",
+    cvHint:
+      "PDF, DOCX or TXT (max 5 MB). With ANTHROPIC_API_KEY set, we extract skills, suggest job titles for matching, and store a short structured readout.",
     cvCurrent: "Uploaded",
     cvUpload: "Upload CV",
     cvReplace: "Replace CV",
@@ -439,6 +446,14 @@ const en = {
     introAudioUploading: "Uploading…",
     introAudioUploaded: "Audio saved.",
     introAudioFailed: "Could not upload audio",
+    cvAnalysisTitle: "CV insights (AI)",
+    cvAnalysisHeadline: "Summary line",
+    cvAnalysisBullets: "Highlights",
+    cvAnalysisLanguages: "Languages",
+    cvAnalysisIndustries: "Industries / domains",
+    cvAnalysisSeniority: "Seniority (estimate)",
+    cvTargetRolesHint:
+      "Suggested job titles were merged into “Target job titles” below for matching — edit anytime.",
   },
   onboarding: {
     title: "Assistant onboarding",
@@ -524,6 +539,9 @@ const en = {
     titleOnboarding: "Workspace tour — TWIN",
     titleBilling: "Plan & billing — TWIN",
     titleAuthCallback: "Signing in — TWIN",
+    titleForCandidates: "Candidates — TWIN",
+    titleForRecruiters: "Recruiters — TWIN",
+    titleForCompanies: "Companies — TWIN",
   },
   privacy: {
     title: "Privacy Policy (MVP)",
@@ -543,6 +561,11 @@ const en = {
     thirdTitle: "Third parties",
     thirdBody:
       "We use Anthropic Claude for job matching. Job data is sourced from public listings on the boards above.",
+  },
+  persona: {
+    sectionCapabilities: "Capabilities",
+    sectionPricing: "Packages & pricing",
+    sectionLogistics: "Operating notes",
   },
   common: {
     language: "Language",
@@ -569,6 +592,9 @@ const pl: MessageTree = {
     profile: "Profil",
     dashboard: "Panel",
     calculator: "Kalkulator ROI B2B",
+    forCandidates: "Kandydaci",
+    forRecruiters: "Rekruterzy",
+    forCompanies: "Firmy",
     menu: "Menu",
     about: "O nas",
     cases: "Studia przypadków",
@@ -667,21 +693,21 @@ const pl: MessageTree = {
       "Wyrażasz zgodę przy rejestracji. Dane profilu służą do rankingu ofert i działania produktu. O retencji, eksporcie i prawach RODO przeczytasz w polityce — link poniżej.",
     audienceEyebrow: "Dla kogo",
     audienceDraftBadge: "Roboczo",
-    audienceTitle: "Kandydat · Rekruter · Firma (B2B)",
+    audienceTitle: "Trzy oddzielne powierzchnie produktu",
     audienceLead:
-      "Ten sam rdzeń platformy — trzy wejścia narracyjne. Teksty i trasy doprecyzujemy wraz z produktem; to robocza siatka, żeby nawigacja i CTA były czytelne.",
+      "Self-serve dla kandydata (Stripe), pakiety miejsc dla rekruterów (faktura) i roczne programy dla firm mają różne możliwości, SLA i cenniki — wybierz ścieżkę zgodną z zadaniem.",
     audienceCandidateTitle: "Kandydaci",
     audienceCandidateBody:
-      "Agregacja ofert z portali włączonych w Twoim środowisku, ranking przy profilu i jeden pipeline aplikacji — zgoda na start, RODO jako domyślna postawa.",
+      "Agregacja ofert, ranking przy profilu, jeden pipeline aplikacji oraz opcjonalnie inteligencja CV i auto-apply tam, gdzie portal na to pozwala.",
     audienceRecruiterTitle: "Rekruterzy i sourcerzy",
     audienceRecruiterBody:
-      "Mniej powielania wyszukiwań między portalami, czytelniejsze znaczniki czasu dla hiring managerów i sourcing w granicach geografii i zgód z konfiguracji.",
-    audienceB2bTitle: "Firmy · B2B",
+      "Watchlisty, paczki dla hiring managera, presety zgodności i rozliczenie per miejsce — pod zespoły sourcingowe, nie pod SKU konsumencki.",
+    audienceB2bTitle: "Firmy · procurement",
     audienceB2bBody:
-      "Scenariusz pod rozmowy z finansami: porównanie klasycznej success fee agencji z modelem w stylu TWIN, model czasu HR i pozycja w stylu opłaty integracyjnej — użyj kalkulatora ROI B2B jako ilustracji dyskusji, nie jako cennika.",
-    audienceCandidateCta: "Zacznij za darmo",
-    audienceRecruiterCta: "Kontakt",
-    audienceB2bCta: "Kalkulator ROI B2B",
+      "Model ROI, dokumentacja pod DPA, roadmapa SSO i SLA enterprise — osobno od narzędzi per sourcer; kalkulator B2B kotwiczy rozmowy z finansami.",
+    audienceCandidateCta: "Strona dla kandydata",
+    audienceRecruiterCta: "Strona dla rekrutera",
+    audienceB2bCta: "Strona dla firmy",
   },
   site: SITE_MESSAGES_PL,
   dashboard: {
@@ -729,6 +755,8 @@ const pl: MessageTree = {
     applyJob: "Aplikuj",
     autoApplyJob: "Auto-aplikuj",
     autoApplyRunning: "Otwieram przeglądarkę…",
+    autoApplyHint:
+      "Uruchamia automatyzację tam, gdzie portal jest obsługiwany; w pozostałych przypadkach zobaczysz komunikat i możesz użyć „Aplikuj”.",
     saveJob: "Zapisz",
     dismissJob: "Nie dla mnie",
     applications: "Moje aplikacje",
@@ -894,7 +922,8 @@ const pl: MessageTree = {
     subtitle:
       "Dodaj CV, aby dopasować oferty kontekstowo — TWIN odczyta doświadczenie i umiejętności z dokumentu.",
     cvSection: "Twoje CV",
-    cvHint: "PDF, DOCX lub TXT (max 5 MB). Umiejętności uzupełnimy automatycznie z CV.",
+    cvHint:
+      "PDF, DOCX lub TXT (max 5 MB). Przy ustawionym ANTHROPIC_API_KEY odczytamy umiejętności, zaproponujemy stanowiska do dopasowania i zapiszemy krótką analizę.",
     cvCurrent: "Wgrane",
     cvUpload: "Wgraj CV",
     cvReplace: "Zmień CV",
@@ -926,6 +955,14 @@ const pl: MessageTree = {
     introAudioUploading: "Wgrywanie…",
     introAudioUploaded: "Nagranie zapisane.",
     introAudioFailed: "Nie udało się wgrać nagrania",
+    cvAnalysisTitle: "Analiza CV (AI)",
+    cvAnalysisHeadline: "Jednym zdaniem",
+    cvAnalysisBullets: "Najważniejsze fakty",
+    cvAnalysisLanguages: "Języki",
+    cvAnalysisIndustries: "Branże / obszary",
+    cvAnalysisSeniority: "Poziom (szacunek)",
+    cvTargetRolesHint:
+      "Propozycje stanowisk scaliliśmy z polem „Docelowe stanowiska” poniżej — dopasowanie ich używa; możesz edytować w każdej chwili.",
   },
   onboarding: {
     title: "Onboarding asystenta",
@@ -1011,6 +1048,9 @@ const pl: MessageTree = {
     titleOnboarding: "Tour po workspace — TWIN",
     titleBilling: "Plan i płatności — TWIN",
     titleAuthCallback: "Logowanie — TWIN",
+    titleForCandidates: "Kandydaci — TWIN",
+    titleForRecruiters: "Rekruterzy — TWIN",
+    titleForCompanies: "Firmy — TWIN",
   },
   privacy: {
     title: "Polityka prywatności (MVP)",
@@ -1030,6 +1070,11 @@ const pl: MessageTree = {
     thirdTitle: "Podmioty trzecie",
     thirdBody:
       "Do dopasowań używamy Anthropic Claude. Oferty pochodzą z publicznych ogłoszeń na wymienionych portalach.",
+  },
+  persona: {
+    sectionCapabilities: "Możliwości",
+    sectionPricing: "Pakiety i cennik",
+    sectionLogistics: "Uwagi operacyjne",
   },
   common: {
     language: "Język",

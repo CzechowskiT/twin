@@ -19,6 +19,9 @@ const MARKETING_PATH_PREFIXES = [
   "/careers",
   "/contact",
   "/calculator",
+  "/for-candidates",
+  "/for-recruiters",
+  "/for-companies",
 ] as const;
 
 /** True for public marketing URLs (same set as OS wallpaper `meadow` fallback in `resolveNatureVariant`). */

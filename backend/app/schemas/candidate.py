@@ -1,6 +1,7 @@
 """Candidate profile schemas."""
 
 from datetime import datetime
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -36,6 +37,7 @@ class CandidateOut(BaseModel):
     cv_uploaded_at: datetime | None = None
     has_intro_audio: bool = False
     intro_audio_uploaded_at: datetime | None = None
+    cv_insights: dict[str, Any] | None = None
 
     model_config = {"from_attributes": True}
 
@@ -45,8 +47,10 @@ class CvUploadOut(BaseModel):
     has_cv: bool
     cv_filename: str | None
     skills_updated: list[str]
+    preferred_job_titles: list[str] = Field(default_factory=list)
     experience_years: int
     location: str | None
+    cv_insights: dict[str, Any] | None = None
 
 
 class IntroAudioUploadOut(BaseModel):

@@ -8,6 +8,14 @@ import { Button, Card, Input, Label, Shell } from "@/components/ui";
 import { apiFetch, apiUpload } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 
+type CvInsights = {
+  headline?: string;
+  summary_bullets?: string[];
+  languages?: string[];
+  industries?: string[];
+  seniority?: string;
+};
+
 type Profile = {
   name: string;
   skills: string[];
@@ -18,6 +26,7 @@ type Profile = {
   has_cv?: boolean;
   cv_filename?: string | null;
   has_intro_audio?: boolean;
+  cv_insights?: CvInsights | null;
 };
 
 const CV_ACCEPT = ".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain";
@@ -70,6 +79,8 @@ export default function ProfilePage() {
       const result = await apiUpload<{
         message: string;
         skills_updated: string[];
+        preferred_job_titles?: string[];
+        cv_insights?: CvInsights | null;
       }>("/api/v1/candidates/me/cv", file, token);
       await reloadProfile();
       setCvMessage(result.message || t("profile.cvUploaded"));
@@ -215,6 +226,46 @@ export default function ProfilePage() {
             )}
           </div>
           {cvMessage && <p className="mt-3 text-sm text-green-700">{cvMessage}</p>}
+          {initial?.cv_insights && (
+            <div className="mt-4 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/40 p-4 text-sm">
+              <p className="mb-2 font-semibold text-[var(--foreground)]">{t("profile.cvAnalysisTitle")}</p>
+              {initial.cv_insights.headline ? (
+                <p className="mb-2 text-[var(--twin-muted-strong)]">
+                  <span className="font-medium text-[var(--foreground)]">{t("profile.cvAnalysisHeadline")}: </span>
+                  {initial.cv_insights.headline}
+                </p>
+              ) : null}
+              {initial.cv_insights.summary_bullets && initial.cv_insights.summary_bullets.length > 0 ? (
+                <div className="mb-2">
+                  <p className="font-medium text-[var(--foreground)]">{t("profile.cvAnalysisBullets")}</p>
+                  <ul className="mt-1 list-inside list-disc text-[var(--twin-muted-strong)]">
+                    {initial.cv_insights.summary_bullets.map((b, idx) => (
+                      <li key={`${idx}-${b.slice(0, 40)}`}>{b}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+              {initial.cv_insights.languages && initial.cv_insights.languages.length > 0 ? (
+                <p className="mb-1 text-[var(--twin-muted-strong)]">
+                  <span className="font-medium text-[var(--foreground)]">{t("profile.cvAnalysisLanguages")}: </span>
+                  {initial.cv_insights.languages.join(", ")}
+                </p>
+              ) : null}
+              {initial.cv_insights.industries && initial.cv_insights.industries.length > 0 ? (
+                <p className="mb-1 text-[var(--twin-muted-strong)]">
+                  <span className="font-medium text-[var(--foreground)]">{t("profile.cvAnalysisIndustries")}: </span>
+                  {initial.cv_insights.industries.join(", ")}
+                </p>
+              ) : null}
+              {initial.cv_insights.seniority && initial.cv_insights.seniority !== "unknown" ? (
+                <p className="mb-2 text-[var(--twin-muted-strong)]">
+                  <span className="font-medium text-[var(--foreground)]">{t("profile.cvAnalysisSeniority")}: </span>
+                  {initial.cv_insights.seniority}
+                </p>
+              ) : null}
+              <p className="text-xs text-[var(--twin-muted)]">{t("profile.cvTargetRolesHint")}</p>
+            </div>
+          )}
             </>
           )}
         </section>

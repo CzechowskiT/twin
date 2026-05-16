@@ -17,6 +17,9 @@ export function Header() {
   };
 
   const marketing = [
+    { href: "/for-candidates" as const, label: t("nav.forCandidates") },
+    { href: "/for-recruiters" as const, label: t("nav.forRecruiters") },
+    { href: "/for-companies" as const, label: t("nav.forCompanies") },
     { href: "/about" as const, label: t("nav.about") },
     { href: "/case-studies" as const, label: t("nav.cases") },
     { href: "/faq" as const, label: t("nav.faq") },

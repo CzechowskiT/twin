@@ -6,7 +6,7 @@ import { useTranslation } from "@/components/language-provider";
 import { Card } from "@/components/ui";
 import { ScrollReveal } from "@/components/marketing/scroll-reveal";
 
-/** Draft ICP rails: candidate vs recruiter vs B2B (ROI calculator lives in the B2B lane). */
+/** Three product lanes on the home page: deep links to dedicated marketing + pricing surfaces. */
 export function LandingAudienceSections() {
   const { t } = useTranslation();
 
@@ -16,7 +16,7 @@ export function LandingAudienceSections() {
       title: t("home.audienceCandidateTitle"),
       body: t("home.audienceCandidateBody"),
       cta: t("home.audienceCandidateCta"),
-      href: "/register" as const,
+      href: "/for-candidates" as const,
       variant: "default" as const,
     },
     {
@@ -24,7 +24,7 @@ export function LandingAudienceSections() {
       title: t("home.audienceRecruiterTitle"),
       body: t("home.audienceRecruiterBody"),
       cta: t("home.audienceRecruiterCta"),
-      href: "/contact" as const,
+      href: "/for-recruiters" as const,
       variant: "default" as const,
     },
     {
@@ -32,7 +32,7 @@ export function LandingAudienceSections() {
       title: t("home.audienceB2bTitle"),
       body: t("home.audienceB2bBody"),
       cta: t("home.audienceB2bCta"),
-      href: "/calculator" as const,
+      href: "/for-companies" as const,
       variant: "accent" as const,
     },
   ];
@@ -45,14 +45,9 @@ export function LandingAudienceSections() {
     >
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <ScrollReveal delayMs={0}>
-          <div className="flex flex-wrap items-center gap-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-muted-strong)]">
-              {t("home.audienceEyebrow")}
-            </p>
-            <span className="rounded-full border border-dashed border-[var(--twin-border)] bg-[var(--twin-card)] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
-              {t("home.audienceDraftBadge")}
-            </span>
-          </div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-muted-strong)]">
+            {t("home.audienceEyebrow")}
+          </p>
           <h2
             id="audiences-title"
             className="mt-3 max-w-3xl text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-3xl md:text-4xl"

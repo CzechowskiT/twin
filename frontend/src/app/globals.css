@@ -390,6 +390,35 @@ html[data-marketing-surface="studio"] .twin-logo-accent {
   display: inline-block;
 }
 
+/**
+ * Frosted solid read surface for dashboard copy on full-bleed nature wallpaper
+ * (billing, settings-style pages — keeps title + body off raw photo contrast).
+ */
+.twin-app-read-pane {
+  border-radius: 1rem;
+  border: 1px solid var(--twin-border);
+  background: color-mix(in srgb, var(--twin-card-solid) 92%, transparent);
+  backdrop-filter: blur(14px);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.55) inset,
+    0 10px 36px rgb(25 60 50 / 0.12);
+  padding: 1rem 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .twin-app-read-pane {
+    padding: 1.25rem 1.5rem;
+    border-radius: 1.125rem;
+  }
+}
+
+html[data-marketing-surface="studio"] .twin-app-read-pane {
+  background: color-mix(in srgb, var(--twin-card-solid) 88%, transparent);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.06),
+    0 12px 40px rgb(0 0 0 / 0.35);
+}
+
 .twin-hero-title {
   color: var(--foreground);
   font-weight: 700;

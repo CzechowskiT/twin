@@ -1,6 +1,7 @@
 """Candidate profile and match endpoints."""
 
 import json
+from typing import Any
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 from sqlalchemy.orm import Session
@@ -99,13 +100,18 @@ async def upload_cv(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
     skills = json.loads(candidate.skills) if candidate.skills else []
+    titles_raw = json.loads(candidate.preferred_job_titles) if candidate.preferred_job_titles else []
+    titles = [str(t) for t in titles_raw] if isinstance(titles_raw, list) else []
+    cv_insights = _cv_insights_from_candidate(candidate)
     return CvUploadOut(
         message="CV uploaded and profile updated for better matching.",
         has_cv=True,
         cv_filename=candidate.cv_filename,
         skills_updated=skills,
+        preferred_job_titles=titles,
         experience_years=candidate.experience_years,
         location=candidate.location,
+        cv_insights=cv_insights,
     )
 
 
@@ -208,9 +214,23 @@ def _build_candidate(user_id: int, body: CandidateCreate | CandidateUpdate) -> C
 def _apply_update(candidate: Candidate, body: CandidateUpdate) -> None:
     candidate.name = body.name
     candidate.skills = json.dumps(body.skills)
+    candidate.preferred_job_titles = json.dumps(_normalize_titles(body))
     candidate.experience_years = body.experience_years
     candidate.desired_salary = body.desired_salary
     candidate.location = body.location
+
+
+def _cv_insights_from_candidate(candidate: Candidate) -> dict[str, Any] | None:
+    if not candidate.profile_signals_json:
+        return None
+    try:
+        blob = json.loads(candidate.profile_signals_json)
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(blob, dict):
+        return None
+    raw = blob.get("cv_insights")
+    return raw if isinstance(raw, dict) else None
 
 
 def _to_out(candidate: Candidate) -> CandidateOut:
@@ -230,4 +250,5 @@ def _to_out(candidate: Candidate) -> CandidateOut:
         cv_uploaded_at=candidate.cv_uploaded_at,
         has_intro_audio=bool(candidate.intro_audio_path),
         intro_audio_uploaded_at=candidate.intro_audio_uploaded_at,
+        cv_insights=_cv_insights_from_candidate(candidate),
     )

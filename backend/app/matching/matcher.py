@@ -113,7 +113,7 @@ def _sales_role_score(candidate: dict[str, Any], job: dict[str, Any]) -> float:
 
 
 def _preferred_title_score(candidate: dict[str, Any], job: dict[str, Any]) -> float:
-    """Boost when job title overlaps user-stated target titles (substring match)."""
+    """Boost when job title overlaps user-stated target titles (substring + token overlap)."""
     raw = candidate.get("preferred_job_titles") or []
     titles: list[str]
     if isinstance(raw, list):
@@ -124,9 +124,21 @@ def _preferred_title_score(candidate: dict[str, Any], job: dict[str, Any]) -> fl
         return 0.0
     job_title, _ = _job_text(job)
     hits = sum(1 for t in titles if t in job_title)
-    if not hits:
+    if hits:
+        return min(12.0, 4.0 + 4.0 * hits)
+
+    job_words = _tokenize(job_title)
+    if not job_words:
         return 0.0
-    return min(12.0, 4.0 + 4.0 * hits)
+    overlap_pts = 0.0
+    for t in titles:
+        tw = _tokenize(t)
+        common = len(tw & job_words)
+        if common >= 2:
+            overlap_pts += 3.0
+        elif common == 1:
+            overlap_pts += 1.2
+    return min(10.0, overlap_pts)
 
 
 def _cv_context_score(candidate: dict[str, Any], job: dict[str, Any]) -> float:

@@ -119,12 +119,14 @@ export default function BillingPage() {
 
   return (
     <Shell>
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
+      <div className="twin-app-read-pane mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0 max-w-2xl">
           <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">{t("dashboard.billingPageTitle")}</h1>
-          <p className="twin-muted mt-2 max-w-2xl text-sm leading-relaxed">{t("dashboard.billingPageLead")}</p>
+          <p className="mt-3 text-sm leading-relaxed text-[var(--twin-muted-strong)] sm:text-base sm:leading-relaxed">
+            {t("dashboard.billingPageLead")}
+          </p>
         </div>
-        <Link href="/dashboard" className="twin-btn-secondary twin-touch-target inline-block text-center sm:!w-auto">
+        <Link href="/dashboard" className="twin-btn-secondary twin-touch-target inline-block shrink-0 text-center sm:!w-auto">
           ← {t("dashboard.title")}
         </Link>
       </div>
@@ -199,13 +201,13 @@ export default function BillingPage() {
             {plans.plans.map((p) => (
               <li
                 key={p.id}
-                className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-card)]/80 p-4 sm:p-5"
+                className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] p-4 sm:p-5"
               >
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0">
                     <p className="text-lg font-semibold text-[var(--foreground)]">{p.name}</p>
-                    <p className="twin-muted mt-2 text-sm leading-relaxed">{p.description}</p>
-                    <p className="twin-muted mt-2 text-xs">
+                    <p className="mt-2 text-sm leading-relaxed text-[var(--twin-muted-strong)]">{p.description}</p>
+                    <p className="mt-2 text-xs text-[var(--twin-muted)]">
                       {p.max_tracked_applications != null
                         ? t("dashboard.billingTrackedCap").replace("{n}", String(p.max_tracked_applications))
                         : t("dashboard.billingTrackedUnlimited")}

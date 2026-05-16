@@ -52,11 +52,6 @@ export function JobList({
 
   const hasActions = Boolean(onApply || onAutoApply || onSave || onDismiss);
 
-  function supportsAutoApply(board: string, url: string): boolean {
-    const b = board.toLowerCase();
-    return b.includes("pracuj") || b.includes("indeed") || url.includes("pracuj.pl") || url.includes("indeed.com");
-  }
-
   return (
     <ul className="space-y-2 text-sm">
       {items.map((item) => {
@@ -104,12 +99,13 @@ export function JobList({
                     {t("dashboard.applyJob")}
                   </button>
                 )}
-                {onAutoApply && supportsAutoApply(item.job_board, item.url) && (
+                {onAutoApply && (
                   <button
                     type="button"
                     disabled={autoApplyJobId === jobId}
                     onClick={() => onAutoApply(jobId)}
                     className="twin-btn-secondary twin-touch-target shrink-0 !w-auto border-[var(--twin-cta)] px-3 py-1.5 text-xs font-semibold text-[var(--twin-cta)]"
+                    title={t("dashboard.autoApplyHint")}
                   >
                     {autoApplyJobId === jobId ? t("dashboard.autoApplyRunning") : t("dashboard.autoApplyJob")}
                   </button>

@@ -34,6 +34,9 @@ function titleKeyForPath(path: string): TranslationKey {
     "/forgot-password": "meta.titleForgotPassword",
     "/reset-password": "meta.titleResetPassword",
     "/onboarding-assistant": "meta.titleOnboarding",
+    "/for-candidates": "meta.titleForCandidates",
+    "/for-recruiters": "meta.titleForRecruiters",
+    "/for-companies": "meta.titleForCompanies",
   };
   return map[path] ?? "meta.titleHome";
 }

@@ -17,9 +17,22 @@ def test_extract_txt_cv() -> None:
 
 def test_enrich_merges_sales_skills_from_cv() -> None:
     cv = "Senior Sales Manager B2B, HubSpot CRM, negocjacje, Warszawa"
-    out = enrich_from_cv_text(cv, {"skills": ["python"], "experience_years": 3, "location": None})
+    out = enrich_from_cv_text(
+        cv,
+        {"skills": ["python"], "experience_years": 3, "location": None, "preferred_job_titles": []},
+    )
     skills = [s.lower() for s in out["skills"]]
     assert "sales" in skills or "b2b" in skills
+
+
+def test_merge_preferred_job_titles_dedupes() -> None:
+    from app.services.cv_enrichment import merge_preferred_job_titles
+
+    merged = merge_preferred_job_titles(
+        ["Account Manager"],
+        ["account manager", "Business Development Manager"],
+    )
+    assert merged == ["Account Manager", "Business Development Manager"]
 
 
 def test_cv_context_score_boosts_relevant_job() -> None:
@@ -55,3 +68,22 @@ def test_cv_context_score_boosts_relevant_job() -> None:
     no_cv_good = calculate_match_score(without_cv, good_job)
     assert with_cv_good >= no_cv_good
     assert with_cv_good > with_cv_weak
+
+
+def test_preferred_title_token_overlap() -> None:
+    candidate = {
+        "skills": ["python"],
+        "experience_years": 4,
+        "preferred_job_titles": ["product manager", "product owner"],
+        "cv_text": None,
+    }
+    job = {
+        "title": "Senior Product Manager — Growth",
+        "requirements": "",
+        "description": "",
+        "location": None,
+        "salary_min": None,
+        "salary_max": None,
+    }
+    score = calculate_match_score(candidate, job)
+    assert score > 0
