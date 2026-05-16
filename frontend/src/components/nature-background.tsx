@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 
+import { NATURE_WALLPAPER_URLS } from "@/lib/nature-wallpapers";
+
 export type NatureVariant =
   | "canopy"
   | "meadow"
@@ -13,7 +15,7 @@ export type NatureVariant =
   | "shade"
   | "trail";
 
-/** Map URL → ambient “place” (soft nature motion stays on-brand across the app). */
+/** Map URL → wallpaper mood (each route gets a different Unsplash scene). */
 export function resolveNatureVariant(pathname: string): NatureVariant {
   const p = pathname.split("?")[0] ?? "/";
   if (p === "/" || p === "") return "canopy";
@@ -39,10 +41,12 @@ type NatureBackgroundProps = {
 };
 
 /**
- * Full-viewport soft green canvas + horizon silhouette + mist + slow motion (CSS + light cursor parallax).
+ * OS-style full-bleed photo wallpaper + soft scrim so UI stays readable.
+ * Photos: Unsplash (see `nature-wallpapers.ts`). Light pointer parallax when motion is allowed.
  */
 export function NatureBackground({ variant }: NatureBackgroundProps) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const src = NATURE_WALLPAPER_URLS[variant];
 
   useEffect(() => {
     const el = rootRef.current;
@@ -67,17 +71,17 @@ export function NatureBackground({ variant }: NatureBackgroundProps) {
       aria-hidden
       className={`twin-bg-root twin-nature twin-nature--${variant}`}
     >
-      <div className="twin-nature-base" />
-      <div className="twin-nature-mesh" />
-      <div className="twin-nature-band" />
-      <div className="twin-nature-falls" />
-      <div className="twin-nature-horizon" />
-      <div className="twin-nature-mist" />
-      <div className="twin-nature-orbs">
-        <div className="twin-nature-orb twin-nature-orb--1" />
-        <div className="twin-nature-orb twin-nature-orb--2" />
-        <div className="twin-nature-orb twin-nature-orb--3" />
-      </div>
+      <img
+        className="twin-nature-wallpaper-img"
+        src={src}
+        alt=""
+        width={2560}
+        height={1440}
+        fetchPriority="low"
+        decoding="async"
+        sizes="100vw"
+      />
+      <div className="twin-nature-scrim" />
     </div>
   );
 }

@@ -48,6 +48,20 @@ html {
   text-size-adjust: 100%;
   min-height: 100%;
   background: var(--background);
+  scroll-padding-top: 5.5rem;
+  scroll-snap-type: y proximity;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Story beats align to viewport when scrolling the document */
+.marketing-chapter {
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
 }
 
 body {
@@ -123,398 +137,95 @@ body {
   overflow: hidden;
 }
 
-/* —— Ambient nature layers (route-specific; soft motion, reduced-motion safe) —— */
+/* —— OS-style full-bleed photo wallpaper (see `nature-wallpapers.ts`) + scrim for UI contrast —— */
 .twin-nature {
   --twin-nature-px: 0;
   --twin-nature-py: 0;
   pointer-events: none;
 }
 
-.twin-nature-base {
+.twin-nature-wallpaper-img {
   position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, #e4ebe7 0%, var(--background) 32%, var(--background) 100%);
-}
-
-.twin-nature-mesh {
-  position: absolute;
-  inset: 0;
-  opacity: 0.94;
+  inset: -4%;
+  width: 108%;
+  height: 108%;
+  max-width: none;
+  object-fit: cover;
+  object-position: center;
   transform: translate3d(
-    calc(var(--twin-nature-px) * 18px),
-    calc(var(--twin-nature-py) * 12px),
-    0
-  );
-  transition: transform 0.35s ease-out;
-  background:
-    radial-gradient(ellipse 72% 48% at 10% -8%, rgb(31 77 64 / 0.14), transparent 55%),
-    radial-gradient(ellipse 58% 42% at 90% 10%, rgb(217 119 6 / 0.09), transparent 52%),
-    radial-gradient(ellipse 52% 38% at 48% 100%, rgb(56 112 94 / 0.1), transparent 55%);
+      calc(var(--twin-nature-px) * 18px),
+      calc(var(--twin-nature-py) * 12px),
+      0
+    )
+    scale(1.08);
+  transform-origin: center center;
+  transition: transform 0.5s ease-out;
+  filter: saturate(1.05) contrast(1.02);
 }
 
-.twin-nature-band {
+.twin-nature-scrim {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: min(220px, 28vh);
+  inset: 0;
+  pointer-events: none;
   background: linear-gradient(
-    180deg,
-    rgb(31 77 64 / 0.12) 0%,
-    rgb(31 77 64 / 0.04) 48%,
-    transparent 100%
+    155deg,
+    rgb(238 243 240 / 0.78) 0%,
+    rgb(238 243 240 / 0.38) 38%,
+    rgb(224 235 229 / 0.22) 62%,
+    rgb(224 235 229 / 0.85) 100%
   );
-  pointer-events: none;
 }
 
-/* Soft vertical “falls” shimmer — reads as mist / water without heavy video */
-.twin-nature-falls {
-  position: absolute;
-  inset: 0;
-  opacity: 0.42;
-  background:
-    linear-gradient(180deg, transparent 0%, rgb(186 230 253 / 0.08) 72%, rgb(255 255 255 / 0.06) 100%),
-    repeating-linear-gradient(
-      90deg,
-      transparent 0,
-      transparent 21%,
-      rgb(255 255 255 / 0.05) 22%,
-      transparent 23%,
-      transparent 47%,
-      rgb(165 243 252 / 0.07) 48%,
-      transparent 50%,
-      transparent 71%,
-      rgb(255 255 255 / 0.04) 72%,
-      transparent 74%
-    );
-  background-size: 100% 100%, min(420px, 55vw) 100%;
-  mask-image: linear-gradient(90deg, transparent 0%, black 10%, black 90%, transparent 100%);
-  animation: twin-nature-falls-shift 18s ease-in-out infinite alternate;
-}
-
-.twin-nature-horizon {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: min(42vh, 460px);
-  transform: translate3d(calc(var(--twin-nature-px) * 28px), 0, 0);
-  transition: transform 0.45s ease-out;
-  background-image: url("/nature-forest-silhouette.svg");
-  background-repeat: repeat-x;
-  background-position: 0 100%;
-  background-size: 800px 100%;
-  opacity: 0.5;
-  animation: twin-nature-horizon-scroll 200s linear infinite;
-}
-
-.twin-nature-mist {
-  position: absolute;
-  inset: 0;
-  mix-blend-mode: soft-light;
-  opacity: 0.62;
-  background:
-    radial-gradient(ellipse 120% 55% at 50% 108%, rgb(255 255 255 / 0.38), transparent 58%),
-    radial-gradient(ellipse 70% 42% at 18% 88%, rgb(232 245 238 / 0.28), transparent 52%),
-    radial-gradient(ellipse 65% 40% at 86% 82%, rgb(204 251 241 / 0.22), transparent 50%);
-  animation: twin-nature-mist-breathe 26s ease-in-out infinite;
-}
-
-@keyframes twin-nature-falls-shift {
-  0% {
-    background-position: 0 0, 0 0;
-  }
-  100% {
-    background-position: 0 0, min(420px, 55vw) 0;
-  }
-}
-
-@keyframes twin-nature-horizon-scroll {
-  from {
-    background-position-x: 0;
-  }
-  to {
-    background-position-x: 800px;
-  }
-}
-
-@keyframes twin-nature-mist-breathe {
-  0%,
-  100% {
-    opacity: 0.52;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.72;
-    transform: scale(1.02);
-  }
-}
-
-.twin-nature-orbs {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  transform: translate3d(
-    calc(var(--twin-nature-px) * -12px),
-    calc(var(--twin-nature-py) * -10px),
-    0
+.twin-nature--stream .twin-nature-scrim {
+  background: linear-gradient(
+    155deg,
+    rgb(236 253 245 / 0.72) 0%,
+    rgb(238 243 240 / 0.35) 45%,
+    rgb(224 235 229 / 0.88) 100%
   );
-  transition: transform 0.4s ease-out;
 }
 
-.twin-nature-orb {
-  position: absolute;
-  width: min(52vmin, 28rem);
-  height: min(52vmin, 28rem);
-  border-radius: 42% 58% 68% 32% / 48% 36% 64% 52%;
-  filter: blur(52px);
-  opacity: 0.4;
-  will-change: transform;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
+.twin-nature--garden .twin-nature-scrim {
+  background: linear-gradient(
+    155deg,
+    rgb(255 247 252 / 0.55) 0%,
+    rgb(238 243 240 / 0.52) 40%,
+    rgb(224 235 229 / 0.88) 100%
+  );
 }
 
-.twin-nature-orb--1 {
-  left: -8%;
-  top: 12%;
-  background: rgb(62 118 100 / 0.42);
-  animation-name: twin-nature-drift-1;
-  animation-duration: 32s;
+.twin-nature--dawn .twin-nature-scrim {
+  background: linear-gradient(
+    155deg,
+    rgb(255 251 235 / 0.7) 0%,
+    rgb(238 243 240 / 0.42) 45%,
+    rgb(224 235 229 / 0.82) 100%
+  );
 }
 
-.twin-nature-orb--2 {
-  right: -12%;
-  top: 38%;
-  background: rgb(38 96 78 / 0.36);
-  animation-name: twin-nature-drift-2;
-  animation-duration: 40s;
+.twin-nature--shade .twin-nature-scrim {
+  background: linear-gradient(
+    155deg,
+    rgb(226 232 228 / 0.88) 0%,
+    rgb(215 222 217 / 0.72) 40%,
+    rgb(208 218 212 / 0.94) 100%
+  );
 }
 
-.twin-nature-orb--3 {
-  left: 18%;
-  bottom: -18%;
-  width: min(60vmin, 32rem);
-  height: min(60vmin, 32rem);
-  background: rgb(253 224 71 / 0.22);
-  animation-name: twin-nature-drift-3;
-  animation-duration: 48s;
-}
-
-@keyframes twin-nature-drift-1 {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  35% {
-    transform: translate3d(5vw, -4vh, 0) scale(1.06);
-  }
-  70% {
-    transform: translate3d(-3vw, 3vh, 0) scale(0.95);
-  }
-}
-
-@keyframes twin-nature-drift-2 {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) rotate(0deg);
-  }
-  40% {
-    transform: translate3d(-6vw, 5vh, 0) rotate(-5deg);
-  }
-  80% {
-    transform: translate3d(4vw, -3vh, 0) rotate(4deg);
-  }
-}
-
-@keyframes twin-nature-drift-3 {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0);
-  }
-  50% {
-    transform: translate3d(4vw, 8vh, 0) scale(1.08);
-  }
-}
-
-@keyframes twin-nature-stream-1 {
-  0%,
-  100% {
-    transform: translate3d(-8vw, 1vh, 0);
-  }
-  50% {
-    transform: translate3d(8vw, -1vh, 0);
-  }
-}
-
-@keyframes twin-nature-stream-2 {
-  0%,
-  100% {
-    transform: translate3d(6vw, -2vh, 0);
-  }
-  50% {
-    transform: translate3d(-7vw, 2vh, 0);
-  }
-}
-
-@keyframes twin-nature-sprout-1 {
-  0%,
-  100% {
-    transform: translate3d(0, 5vh, 0) scale(1);
-  }
-  50% {
-    transform: translate3d(1vw, -6vh, 0) scale(1.05);
-  }
-}
-
-/* Route moods: mesh tint + orb motion (contextual “place in the journey”) */
-.twin-nature--canopy .twin-nature-mesh {
-  background:
-    radial-gradient(ellipse 58% 46% at 14% 2%, rgb(22 101 52 / 0.15), transparent 56%),
-    radial-gradient(ellipse 52% 40% at 88% 6%, rgb(253 224 71 / 0.07), transparent 52%),
-    radial-gradient(ellipse 50% 42% at 48% 100%, rgb(56 112 94 / 0.12), transparent 58%);
-}
-
-.twin-nature--canopy .twin-nature-orb--1 {
-  animation-duration: 26s;
-}
-.twin-nature--canopy .twin-nature-orb--2 {
-  animation-duration: 36s;
-}
-.twin-nature--canopy .twin-nature-orb--3 {
-  animation-duration: 44s;
-}
-
-.twin-nature--stream .twin-nature-mesh {
-  background:
-    linear-gradient(102deg, transparent 38%, rgb(62 118 100 / 0.08) 50%, transparent 62%),
-    radial-gradient(ellipse 92% 36% at 50% -6%, rgb(31 77 64 / 0.11), transparent 52%),
-    radial-gradient(ellipse 68% 48% at 100% 58%, rgb(217 119 6 / 0.07), transparent 55%);
-}
-
-.twin-nature--stream .twin-nature-orb--1 {
-  animation-name: twin-nature-stream-1;
-  animation-duration: 38s;
-}
-.twin-nature--stream .twin-nature-orb--2 {
-  animation-name: twin-nature-stream-2;
-  animation-duration: 44s;
-}
-.twin-nature--stream .twin-nature-orb--3 {
-  animation-name: twin-nature-drift-3;
-  animation-duration: 52s;
-}
-
-.twin-nature--stream .twin-nature-falls {
-  opacity: 0.62;
-  animation-duration: 12s;
-}
-
-.twin-nature--garden .twin-nature-mesh {
-  background:
-    radial-gradient(circle at 22% 32%, rgb(236 72 153 / 0.06), transparent 42%),
-    radial-gradient(ellipse 62% 46% at 82% 18%, rgb(74 128 106 / 0.14), transparent 52%),
-    radial-gradient(ellipse 54% 42% at 44% 92%, rgb(56 112 94 / 0.11), transparent 56%);
-}
-
-.twin-nature--garden .twin-nature-orb--2 {
-  background: rgb(244 114 182 / 0.18);
-}
-
-.twin-nature--dawn .twin-nature-mesh {
-  background:
-    radial-gradient(ellipse 72% 48% at 50% -12%, rgb(251 191 36 / 0.12), transparent 56%),
-    radial-gradient(ellipse 56% 44% at 8% 58%, rgb(62 118 100 / 0.1), transparent 52%),
-    radial-gradient(ellipse 52% 40% at 92% 68%, rgb(31 77 64 / 0.08), transparent 54%);
-}
-
-.twin-nature--dawn .twin-nature-orb--3 {
-  background: rgb(254 215 170 / 0.28);
-}
-
-.twin-nature--sprout .twin-nature-mesh {
-  background:
-    radial-gradient(ellipse 48% 58% at 50% 108%, rgb(36 110 72 / 0.12), transparent 52%),
-    radial-gradient(ellipse 62% 42% at 18% 12%, rgb(253 224 71 / 0.09), transparent 55%),
-    radial-gradient(ellipse 58% 40% at 86% 22%, rgb(56 112 94 / 0.1), transparent 52%);
-}
-
-.twin-nature--sprout .twin-nature-orb--1 {
-  animation-name: twin-nature-sprout-1;
-  animation-duration: 30s;
-}
-
-.twin-nature--growth .twin-nature-mesh {
-  background:
-    radial-gradient(circle at 50% 42%, rgb(31 77 64 / 0.07) 0%, transparent 36%),
-    radial-gradient(circle at 50% 42%, rgb(31 77 64 / 0.05) 36%, transparent 40%),
-    radial-gradient(ellipse 66% 50% at 82% 78%, rgb(180 83 9 / 0.09), transparent 55%);
-}
-
-.twin-nature--growth .twin-nature-orb--1 {
-  animation-duration: 36s;
-}
-
-.twin-nature--shade .twin-nature-mesh {
-  opacity: 0.9;
-  background:
-    radial-gradient(ellipse 78% 52% at 50% 100%, rgb(21 128 61 / 0.11), transparent 56%),
-    radial-gradient(ellipse 52% 42% at 12% 18%, rgb(31 77 64 / 0.09), transparent 50%);
-}
-
-.twin-nature--shade .twin-nature-band {
-  background: linear-gradient(180deg, rgb(14 48 40 / 0.08) 0%, transparent 100%);
-}
-
-.twin-nature--shade .twin-nature-orb {
-  opacity: 0.22;
-  filter: blur(56px);
-}
-
-.twin-nature--shade .twin-nature-orb--1 {
-  animation-duration: 58s;
-}
-.twin-nature--shade .twin-nature-orb--2 {
-  animation-duration: 72s;
-}
-.twin-nature--shade .twin-nature-orb--3 {
-  animation-duration: 64s;
-}
-
-.twin-nature--shade .twin-nature-horizon {
-  opacity: 0.72;
-  filter: saturate(0.85) brightness(0.92);
-}
-
-.twin-nature--shade .twin-nature-mist {
-  opacity: 0.48;
-}
-
-.twin-nature--trail .twin-nature-mesh {
-  background:
-    linear-gradient(128deg, rgb(204 251 241 / 0.4) 0%, transparent 42%, rgb(253 230 138 / 0.14) 100%),
-    radial-gradient(ellipse 58% 46% at 0% 48%, rgb(31 77 64 / 0.1), transparent 52%),
-    radial-gradient(ellipse 56% 42% at 100% 38%, rgb(74 128 106 / 0.11), transparent 52%);
-}
-
-.twin-nature--trail .twin-nature-orb--2 {
-  animation-duration: 34s;
+.twin-nature--trail .twin-nature-scrim {
+  background: linear-gradient(
+    155deg,
+    rgb(236 253 250 / 0.68) 0%,
+    rgb(238 243 240 / 0.44) 50%,
+    rgb(224 235 229 / 0.86) 100%
+  );
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .twin-nature-orb {
-    animation: none !important;
-  }
-
-  .twin-nature-falls,
-  .twin-nature-horizon,
-  .twin-nature-mist {
-    animation: none !important;
-  }
-
-  .twin-nature-mesh,
-  .twin-nature-orbs,
-  .twin-nature-horizon {
+  .twin-nature-wallpaper-img {
+    inset: 0;
+    width: 100%;
+    height: 100%;
     transform: none !important;
     transition: none !important;
   }

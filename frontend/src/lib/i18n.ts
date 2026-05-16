@@ -8,6 +8,7 @@ import {
   jaOverlay,
   zhOverlay,
 } from "./overlays";
+import { SITE_MESSAGES_EN, SITE_MESSAGES_PL } from "./site-messages";
 
 export type Locale = "en" | "pl" | "es" | "it" | "fr" | "de" | "zh" | "ar" | "ja";
 
@@ -51,6 +52,7 @@ export const LOCALE_STORAGE_KEY = "twin_locale";
 export type TranslationKey =
   | `nav.${keyof typeof en.nav}`
   | `home.${keyof typeof en.home}`
+  | `site.${keyof typeof SITE_MESSAGES_EN}`
   | `calculator.${keyof typeof en.calculator}`
   | `dashboard.${keyof typeof en.dashboard}`
   | `login.${keyof typeof en.login}`
@@ -70,6 +72,13 @@ const en = {
     dashboard: "Dashboard",
     calculator: "ROI calculator",
     menu: "Menu",
+    about: "About",
+    cases: "Case studies",
+    contact: "Contact",
+    faq: "FAQ",
+    careers: "Careers",
+    media: "Media",
+    partners: "Partners",
   },
   home: {
     tagline: "Global career platform, powered by AI",
@@ -99,6 +108,36 @@ const en = {
     focusCta: "Start with these goals",
     focusFootnote:
       "Today’s MVP aggregates roles, scores them when you add a profile, and centralizes application status. Heavier automation ships in stages — same calm surface, more autonomy behind it.",
+    journeyScrollHint: "Scroll the page to move through the story chapters.",
+    journeyRailsAria: "Story chapters on this page",
+    storyEyebrow: "Story",
+    storyCh1Kicker: "01 — The signal",
+    storyCh1Title: "The market never stands still.",
+    storyCh1Body:
+      "Postings scatter across boards and time zones. Candidates lose threads between tabs and screenshots. Teams re-run the same sourcing work in spreadsheets. TWIN starts where that noise becomes expensive.",
+    storyCh2Kicker: "02 — The surface",
+    storyCh2Title: "One calm workspace that follows you.",
+    storyCh2Body:
+      "Aggregate what your workspace allows, score roles when your profile exists, and keep every application in one pipeline. When automation lands, it stays inside boundaries you set — never a black box on your career.",
+    storyCh3Kicker: "03 — The arc",
+    storyCh3Title: "Ship the story before the feature.",
+    storyCh3Body:
+      "Like a product film, each chapter earns the next beat. Phase 1 is a disciplined pipeline you can trust. What follows is autonomy that proves itself in audit trails, exports, and quiet hours — not hype.",
+    timelineEyebrow: "Roadmap",
+    timelineTitle: "A timeline you can feel",
+    timelineSubtitle: "Milestones are ordered to remove drag before adding autonomy.",
+    timeline1When: "Phase 1 · Now",
+    timeline1Title: "Discover · Match · Track",
+    timeline1Body:
+      "Public listings, profile-aware ranking, and application status in one place — consent-first, built for GDPR from day one.",
+    timeline2When: "Phase 2",
+    timeline2Title: "Smarter motion",
+    timeline2Body:
+      "Bulk actions, richer match explanations, and nudges that respect the geographies and quiet hours you configure.",
+    timeline3When: "Phase 3",
+    timeline3Title: "Autonomous loops",
+    timeline3Body:
+      "Auto-apply where boards allow it, interview windows that sync to your calendar, and exports compliance teams can audit.",
     faqEyebrow: "FAQ",
     faqTitle: "Questions & answers",
     faqPrivacyLink: "Privacy Policy",
@@ -115,6 +154,7 @@ const en = {
     faq04A:
       "You explicitly consent when you register. We use profile data to rank jobs and run the product. For retention, exports, and GDPR rights, read the policy linked below.",
   },
+  site: SITE_MESSAGES_EN,
   dashboard: {
     title: "Dashboard",
     logout: "Log out",
@@ -422,6 +462,13 @@ const pl: MessageTree = {
     dashboard: "Panel",
     calculator: "Kalkulator ROI",
     menu: "Menu",
+    about: "O nas",
+    cases: "Studia przypadków",
+    contact: "Kontakt",
+    faq: "FAQ",
+    careers: "Kariera",
+    media: "Media",
+    partners: "Partnerzy",
   },
   home: {
     tagline: "Globalna platforma kariery napędzana sztuczną inteligencją",
@@ -452,6 +499,36 @@ const pl: MessageTree = {
     focusCta: "Zacznij z tymi celami",
     focusFootnote:
       "MVP dziś: agregacja ofert, ocena po uzupełnieniu profilu, statusy aplikacji w jednym UI. Głębsza automatyzacja dochodzi etapami — ta sama spokojna powierzchnia, więcej pracy za kulisami.",
+    journeyScrollHint: "Przewiń stronę, żeby przejść przez kolejne rozdziały narracji.",
+    journeyRailsAria: "Rozdziały historii na tej stronie",
+    storyEyebrow: "Historia",
+    storyCh1Kicker: "01 — Sygnał",
+    storyCh1Title: "Rynek pracy nie zatrzymuje się w miejscu.",
+    storyCh1Body:
+      "Oferty rozlatują się po portalach i strefach czasowych. Kandydaci gubią wątek między kartami i zrzutami ekranu. Zespoły powtarzają ten sam sourcing w arkuszach. TWIN zaczyna tam, gdzie ten szum staje się kosztowny.",
+    storyCh2Kicker: "02 — Powierzchnia",
+    storyCh2Title: "Jedna spokojna przestrzeń, która idzie z Tobą.",
+    storyCh2Body:
+      "Agreguj to, co pozwala Twoje środowisko, oceniaj role przy profilu i trzymaj każdą aplikację w jednym pipeline. Gdy pojawi się automatyzacja, zostaje w granicach, które ustawiasz — nigdy czarna skrzynka na Twojej karierze.",
+    storyCh3Kicker: "03 — Łuk narracji",
+    storyCh3Title: "Opowiedz historię, zanim pokażesz funkcję.",
+    storyCh3Body:
+      "Jak w filmie produktowym: każdy rozdział zasługuje na następny. Faza 1 to dyscyplinowany pipeline, któremu można zaufać. Potem autonomia, która udowadnia się w logach, eksportach i ciszy nocnej — nie w hasełkach marketingowych.",
+    timelineEyebrow: "Roadmapa",
+    timelineTitle: "Oś czasu, którą czuć",
+    timelineSubtitle: "Kolejność kamieni milowych usuwa tarcie, zanim dołożymy autonomię.",
+    timeline1When: "Faza 1 · Teraz",
+    timeline1Title: "Odkrywaj · Dopasuj · Śledź",
+    timeline1Body:
+      "Publiczne ogłoszenia, ranking przy profilu i status aplikacji w jednym miejscu — zgoda na start, RODO od pierwszego dnia.",
+    timeline2When: "Faza 2",
+    timeline2Title: "Mądrzejszy ruch",
+    timeline2Body:
+      "Akcje zbiorcze, bogatsze wyjaśnienia dopasowania i sygnały, które szanują geografie i godziny ciszy z konfiguracji.",
+    timeline3When: "Faza 3",
+    timeline3Title: "Pętle autonomiczne",
+    timeline3Body:
+      "Auto-aplikacja tam, gdzie portale na to pozwalają, okna rozmów zsynchronizowane z kalendarzem i eksporty pod zespół compliance.",
     faqEyebrow: "FAQ",
     faqTitle: "Pytania i odpowiedzi",
     faqPrivacyLink: "Polityka prywatności",
@@ -468,6 +545,7 @@ const pl: MessageTree = {
     faq04A:
       "Wyrażasz zgodę przy rejestracji. Dane profilu służą do rankingu ofert i działania produktu. O retencji, eksporcie i prawach RODO przeczytasz w polityce — link poniżej.",
   },
+  site: SITE_MESSAGES_PL,
   dashboard: {
     title: "Panel",
     logout: "Wyloguj",

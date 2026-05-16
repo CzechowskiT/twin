@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { RouteAwareBackground } from "@/components/route-aware-background";
 import { Header } from "@/components/header";
+import { SiteFooter } from "@/components/site-footer";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
@@ -41,11 +42,16 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
+      </head>
       <body className="relative flex min-h-full min-h-[100dvh] flex-col text-[var(--foreground)]">
         <Providers>
           <RouteAwareBackground />
           <Header />
           <main className="relative z-10 flex-1 pb-[env(safe-area-inset-bottom,0)]">{children}</main>
+          <SiteFooter />
         </Providers>
       </body>
     </html>

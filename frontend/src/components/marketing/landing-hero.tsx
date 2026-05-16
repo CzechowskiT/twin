@@ -7,7 +7,7 @@ import { ScrollReveal } from "@/components/marketing/scroll-reveal";
 export function LandingHero() {
   const { t } = useTranslation();
   return (
-    <section className="mx-auto flex w-full max-w-6xl flex-col px-4 pb-20 pt-16 sm:px-6 sm:pb-28 sm:pt-20 md:min-h-[min(82vh,56rem)] md:pb-36 md:pt-28">
+    <section className="mx-auto flex w-full max-w-6xl flex-col justify-center px-4 pb-20 pt-16 sm:px-6 sm:pb-28 sm:pt-20 md:min-h-[100svh] md:max-h-[1200px] md:pb-24 md:pt-20">
       <ScrollReveal>
         <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-[var(--twin-muted)] sm:text-[11px]">
           {t("home.tagline")}
