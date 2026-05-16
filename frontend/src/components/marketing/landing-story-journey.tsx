@@ -28,13 +28,13 @@ function TimelineItem({
   return (
     <div className={`flex gap-5 sm:gap-8 ${isLast ? "" : "pb-14 sm:pb-16"}`}>
       <div className="flex w-6 shrink-0 flex-col items-center pt-1 sm:w-8">
-        <span className="h-3 w-3 rounded-full border-2 border-[var(--twin-accent)] bg-[var(--twin-card)] shadow-sm ring-2 ring-[var(--twin-accent-muted)]/60" />
+        <span className="h-3 w-3 rounded-full border-2 border-[var(--twin-accent)] bg-[var(--background)] shadow-sm ring-2 ring-[var(--twin-accent-muted)]/60" />
         {!isLast ? <span className="mt-3 w-px flex-1 min-h-[2.5rem] bg-[var(--twin-border)]" aria-hidden /> : null}
       </div>
       <div className="min-w-0 pb-1">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--twin-accent)]">{when}</p>
         <h3 className="mt-2 text-xl font-semibold tracking-[-0.02em] text-[var(--foreground)] sm:text-2xl">{title}</h3>
-        <p className="mt-3 text-sm font-medium leading-relaxed text-[var(--foreground)] sm:text-base">{body}</p>
+        <p className="mt-3 text-sm font-medium leading-relaxed text-[var(--twin-muted-strong)] sm:text-base">{body}</p>
       </div>
     </div>
   );
@@ -153,7 +153,7 @@ export function LandingStoryJourney() {
           className={`marketing-chapter scroll-mt-24 border-t border-[var(--twin-border)]/80 px-4 py-[min(18vh,6rem)] sm:px-6 md:min-h-[100svh] md:scroll-mt-28 md:py-0 ${chapterSurface[i]}`}
         >
           <div className="mx-auto flex h-full min-h-0 max-w-4xl flex-col justify-center md:min-h-[100svh] md:py-24">
-            <div className="rounded-[1.75rem] border-2 border-[var(--twin-border)] bg-[var(--twin-card)] px-5 py-8 shadow-[0_12px_40px_rgb(25_60_50_/0.12)] sm:px-8 sm:py-10">
+            <div className="marketing-copy-rail py-2 sm:py-6 md:py-8">
               <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-[var(--twin-accent)]">
                 {t("home.storyEyebrow")}
               </p>
@@ -161,7 +161,7 @@ export function LandingStoryJourney() {
               <h2 className="mt-4 max-w-3xl text-3xl font-semibold tracking-[-0.035em] text-[var(--foreground)] sm:text-4xl md:text-[2.75rem] md:leading-[1.08]">
                 {ch.title}
               </h2>
-              <p className="mt-8 max-w-2xl text-base font-medium leading-relaxed text-[var(--foreground)] sm:text-lg sm:leading-relaxed">
+              <p className="mt-8 max-w-2xl text-base font-medium leading-relaxed text-[var(--twin-muted-strong)] sm:text-lg sm:leading-relaxed">
                 {ch.body}
               </p>
             </div>
@@ -175,19 +175,19 @@ export function LandingStoryJourney() {
         className="marketing-chapter twin-story-chapter twin-story-chapter--timeline scroll-mt-24 border-t border-[var(--twin-border)] px-4 py-[min(16vh,5rem)] sm:px-6 md:min-h-[min(100svh,56rem)] md:scroll-mt-28 md:py-24"
       >
         <div className="mx-auto max-w-4xl">
-          <div className="rounded-[1.75rem] border-2 border-[var(--twin-border)] bg-[var(--twin-card)] px-5 py-8 shadow-[0_12px_40px_rgb(25_60_50_/0.12)] sm:px-8 sm:py-10">
+          <div className="marketing-copy-rail py-2 sm:py-4">
             <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
               {t("home.timelineEyebrow")}
             </p>
             <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-4xl">
               {t("home.timelineTitle")}
             </h2>
-            <p className="mt-4 max-w-2xl text-sm font-medium leading-relaxed text-[var(--foreground)] sm:text-base">
+            <p className="mt-4 max-w-2xl text-sm font-medium leading-relaxed text-[var(--twin-muted-strong)] sm:text-base">
               {t("home.timelineSubtitle")}
             </p>
           </div>
 
-          <div className="relative mt-10 rounded-[1.75rem] border-2 border-[var(--twin-border)] bg-[var(--twin-card)] px-5 py-8 shadow-[0_12px_40px_rgb(25_60_50_/0.12)] sm:mt-12 sm:px-8 sm:py-10">
+          <div className="relative mt-10 rounded-2xl border border-[var(--twin-border)]/55 bg-gradient-to-b from-[var(--twin-accent-muted)]/18 to-transparent px-5 py-8 shadow-[inset_0_1px_0_rgb(255_255_255_/0.35)] sm:mt-12 sm:px-8 sm:py-10">
             <TimelineItem
               when={t("home.timeline1When")}
               title={t("home.timeline1Title")}

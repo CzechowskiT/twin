@@ -15,7 +15,7 @@ export function LandingOriginStory() {
     >
       <div className="mx-auto max-w-3xl">
         <ScrollReveal>
-          <div className="rounded-[1.75rem] border-2 border-[var(--twin-border)] bg-[var(--twin-card)] px-5 py-8 shadow-[0_12px_40px_rgb(25_60_50_/0.1)] sm:px-8 sm:py-10">
+          <div className="marketing-copy-rail py-2 sm:py-4">
             <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
               {t("home.originEyebrow")}
             </p>
@@ -25,10 +25,10 @@ export function LandingOriginStory() {
             >
               {t("home.originTitle")}
             </h2>
-            <p className="mt-5 text-base font-medium leading-relaxed text-[var(--foreground)] sm:text-lg">
+            <p className="mt-5 text-base font-medium leading-relaxed text-[var(--twin-muted-strong)] sm:text-lg">
               {t("home.originLead")}
             </p>
-            <div className="mt-8 space-y-5 text-sm font-medium leading-relaxed text-[var(--foreground)] sm:text-base sm:leading-relaxed">
+            <div className="mt-8 space-y-5 text-sm font-medium leading-relaxed text-[var(--twin-muted-strong)] sm:text-base sm:leading-relaxed">
               <p>{t("home.originP1")}</p>
               <p>{t("home.originP2")}</p>
               <p>{t("home.originP3")}</p>

@@ -36,6 +36,35 @@
   --twin-max-width-narrow: 28rem;
 }
 
+/* Dark marketing mode: flip `MARKETING_SURFACE` in `src/lib/marketing-surface.ts` to `heritage` to disable. */
+html[data-marketing-surface="studio"] {
+  color-scheme: dark;
+  --background: #030712;
+  --foreground: #f8fafc;
+  --twin-muted: #94a3b8;
+  --twin-muted-strong: #e2e8f0;
+  --twin-accent: #34d399;
+  --twin-accent-hover: #6ee7b7;
+  --twin-accent-muted: rgb(52 211 153 / 0.14);
+  --twin-accent-soft: rgb(167 139 250 / 0.45);
+  --twin-cta: #f8fafc;
+  --twin-cta-hover: #e2e8f0;
+  --twin-link: #6ee7b7;
+  --twin-link-hover: #34d399;
+  --twin-card: rgb(15 23 42 / 0.55);
+  --twin-card-solid: rgb(15 23 42 / 0.92);
+  --twin-surface: rgb(15 23 42 / 0.45);
+  --twin-surface-raised: rgb(30 41 59 / 0.88);
+  --twin-border: rgb(148 163 184 / 0.22);
+  --twin-border-hover: rgb(148 163 184 / 0.42);
+  --twin-input-bg: #0f172a;
+  --twin-header-bg: rgb(3 7 18 / 0.82);
+  --twin-header-stripe: #7c3aed;
+  --twin-shadow: 0 1px 3px rgb(0 0 0 / 0.45);
+  --twin-shadow-md: 0 4px 22px rgb(0 0 0 / 0.5);
+  --twin-shadow-lg: 0 10px 44px rgb(0 0 0 / 0.55);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -117,6 +146,34 @@ html {
     linear-gradient(180deg, rgb(210 229 218 / 0.62) 0%, var(--background) 36%, var(--background) 100%);
 }
 
+html[data-marketing-surface="studio"] .twin-story-chapter {
+  --twin-story-grid: rgb(148 163 184 / 0.055);
+  background-image:
+    radial-gradient(ellipse 115% 90% at 50% -28%, rgb(52 211 153 / 0.14), transparent 58%),
+    radial-gradient(ellipse 55% 48% at 96% 42%, rgb(124 58 237 / 0.14), transparent 52%),
+    linear-gradient(168deg, rgb(30 41 59 / 0.55) 0%, transparent 48%);
+}
+
+html[data-marketing-surface="studio"] .twin-story-chapter--2 {
+  background-image:
+    radial-gradient(ellipse 100% 72% at 12% 78%, rgb(124 58 237 / 0.12), transparent 56%),
+    radial-gradient(ellipse 68% 52% at 88% 12%, rgb(34 211 238 / 0.1), transparent 52%),
+    linear-gradient(198deg, transparent 0%, rgb(30 41 59 / 0.45) 52%, transparent 100%);
+}
+
+html[data-marketing-surface="studio"] .twin-story-chapter--3 {
+  background-image:
+    radial-gradient(ellipse 95% 62% at 50% 108%, rgb(52 211 153 / 0.1), transparent 56%),
+    radial-gradient(ellipse 52% 44% at 0% 32%, rgb(51 65 85 / 0.55), transparent 50%),
+    linear-gradient(180deg, rgb(15 23 42 / 0.4) 0%, var(--background) 42%);
+}
+
+html[data-marketing-surface="studio"] .twin-story-chapter--timeline {
+  background-image:
+    radial-gradient(ellipse 85% 58% at 50% -8%, rgb(124 58 237 / 0.12), transparent 52%),
+    linear-gradient(180deg, rgb(30 41 59 / 0.65) 0%, var(--background) 38%, var(--background) 100%);
+}
+
 body {
   overflow-x: hidden;
   background: transparent;
@@ -166,6 +223,14 @@ body {
   color: var(--twin-accent);
 }
 
+html[data-marketing-surface="studio"] .twin-logo {
+  color: #f8fafc;
+}
+
+html[data-marketing-surface="studio"] .twin-logo-accent {
+  color: #cbd5e1;
+}
+
 .twin-logo-accent {
   color: var(--twin-cta);
 }
@@ -194,6 +259,15 @@ body {
   inset: 0;
   z-index: 0;
   overflow: hidden;
+}
+
+/** Marketing “studio” mode: no photo — soft purple / cyan glow on deep slate (see `marketing-surface.ts`). */
+.twin-studio-ambient {
+  background-color: #020617;
+  background-image:
+    radial-gradient(ellipse 75% 95% at 0% 42%, rgb(124 58 237 / 0.38), transparent 58%),
+    radial-gradient(ellipse 65% 90% at 100% 32%, rgb(34 211 238 / 0.16), transparent 55%),
+    radial-gradient(ellipse 100% 70% at 50% 100%, rgb(15 23 42 / 0.95), transparent 60%);
 }
 
 /* —— OS-style full-bleed photo wallpaper (see `nature-wallpapers.ts`) + scrim for UI contrast —— */
@@ -458,6 +532,22 @@ body {
   box-shadow: var(--twin-shadow-md);
 }
 
+html[data-marketing-surface="studio"] .twin-header-bar {
+  backdrop-filter: blur(14px);
+}
+
+/** ROI pill stays amber on dark marketing (header `--twin-cta` is white in studio mode). */
+html[data-marketing-surface="studio"] .twin-nav-roi-pill {
+  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+  color: #fff;
+  --tw-ring-offset-color: #030712;
+  box-shadow: 0 4px 14px rgb(217 119 6 / 0.45);
+}
+
+html[data-marketing-surface="studio"] .twin-nav-roi-pill:hover {
+  background: linear-gradient(135deg, #fcd34d 0%, #b45309 100%);
+}
+
 .twin-header-stripe {
   height: 3px;
   background: linear-gradient(
@@ -637,11 +727,198 @@ body {
   color: transparent;
 }
 
+html[data-marketing-surface="studio"] .marketing-gradient-heading {
+  background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 42%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 .marketing-btn-primary-shadow {
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.55),
     0 0 0 1px rgb(31 77 64 / 0.12),
     0 14px 36px -12px rgb(31 77 64 / 0.28);
+}
+
+html[data-marketing-surface="studio"] .marketing-btn-primary-shadow {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.85),
+    0 0 0 1px rgb(15 23 42 / 0.35),
+    0 18px 40px -14px rgb(0 0 0 / 0.55);
+}
+
+/**
+ * Long-form marketing: left accent rail instead of heavy bordered “postcard” panels
+ * (editorial rhythm closer to Linear / Stripe narrative blocks).
+ */
+.marketing-copy-rail {
+  position: relative;
+}
+
+.marketing-copy-rail::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.15em;
+  bottom: 0.15em;
+  display: none;
+  width: 3px;
+  border-radius: 9999px;
+  background: linear-gradient(
+    180deg,
+    var(--twin-accent) 0%,
+    var(--twin-accent-soft) 55%,
+    color-mix(in srgb, var(--twin-accent) 40%, var(--twin-cta)) 100%
+  );
+  opacity: 0.9;
+}
+
+@media (min-width: 640px) {
+  .marketing-copy-rail {
+    padding-left: 1.35rem;
+  }
+
+  .marketing-copy-rail::before {
+    display: block;
+  }
+}
+
+/** Hero copy + CTAs: heritage uses green/amber system; studio matches dark mock (outline / white / ghost). */
+.marketing-hero-lede {
+  max-width: 42rem;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  line-height: 1.72;
+  color: var(--twin-muted-strong);
+  letter-spacing: -0.012em;
+  box-shadow: none;
+}
+
+@media (min-width: 640px) {
+  .marketing-hero-lede {
+    font-size: 1.125rem;
+    line-height: 1.72;
+  }
+}
+
+html[data-marketing-surface="studio"] .marketing-hero-lede {
+  color: rgb(203 213 225);
+}
+
+.marketing-hero-btn-twin {
+  display: inline-flex;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--twin-accent);
+  padding-left: 2.25rem;
+  padding-right: 2.25rem;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #fff;
+  box-shadow: var(--twin-shadow-md);
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.marketing-hero-btn-twin:hover {
+  background: var(--twin-accent-hover);
+}
+
+.marketing-hero-btn-twin:active {
+  transform: scale(0.98);
+}
+
+html[data-marketing-surface="studio"] .marketing-hero-btn-twin {
+  border: 1px solid rgb(248 250 252 / 0.55);
+  background: transparent;
+  color: #f8fafc;
+  box-shadow: none;
+}
+
+html[data-marketing-surface="studio"] .marketing-hero-btn-twin:hover {
+  background: rgb(248 250 252 / 0.06);
+}
+
+.marketing-hero-btn-cta {
+  display: inline-flex;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--twin-cta);
+  padding-left: 2.25rem;
+  padding-right: 2.25rem;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.marketing-hero-btn-cta:hover {
+  background: var(--twin-cta-hover);
+}
+
+.marketing-hero-btn-cta:active {
+  transform: scale(0.98);
+}
+
+html[data-marketing-surface="studio"] .marketing-hero-btn-cta {
+  color: #0f172a;
+}
+
+.marketing-hero-btn-signin {
+  display: inline-flex;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid var(--twin-border);
+  background: var(--twin-card);
+  padding-left: 2.25rem;
+  padding-right: 2.25rem;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--twin-muted-strong);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.marketing-hero-btn-signin:hover {
+  border-color: var(--twin-border-hover);
+  background: var(--twin-accent-muted);
+}
+
+.marketing-hero-btn-signin:active {
+  transform: scale(0.98);
+}
+
+html[data-marketing-surface="studio"] .marketing-hero-btn-signin {
+  border-color: rgb(148 163 184 / 0.18);
+  background: rgb(15 23 42 / 0.35);
+  color: #94a3b8;
+  box-shadow: none;
+}
+
+html[data-marketing-surface="studio"] .marketing-hero-btn-signin:hover {
+  color: #e2e8f0;
+  background: rgb(30 41 59 / 0.55);
 }
 
 @keyframes marketing-marquee {
