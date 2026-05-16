@@ -4,19 +4,79 @@ import { useMemo, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { Shell } from "@/components/ui";
+import {
+  defaultCurrencyForLocale,
+  listCalculatorCurrencies,
+  numberFormatLocaleForUi,
+} from "@/lib/calculator-currencies";
 import type { Locale } from "@/lib/i18n";
 
-function money(amount: number, locale: Locale) {
-  return new Intl.NumberFormat(locale === "pl" ? "pl-PL" : "en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(amount);
+function formatMoney(amount: number, locale: Locale, currency: string) {
+  const loc = numberFormatLocaleForUi(locale);
+  try {
+    return new Intl.NumberFormat(loc, {
+      style: "currency",
+      currency,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  } catch {
+    return `${Math.round(amount)} ${currency}`;
+  }
+}
+
+function useCurrencyLabel(locale: Locale) {
+  return useMemo(() => {
+    try {
+      const loc = numberFormatLocaleForUi(locale);
+      const dn = new Intl.DisplayNames(loc, { type: "currency" });
+      return (code: string) => {
+        try {
+          return dn.of(code) ?? code;
+        } catch {
+          return code;
+        }
+      };
+    } catch {
+      return (code: string) => code;
+    }
+  }, [locale]);
+}
+
+type CurrencySelectProps = {
+  value: string;
+  onChange: (code: string) => void;
+  label: string;
+  inputClass: string;
+  locale: Locale;
+};
+
+function CurrencySelect({ value, onChange, label, inputClass, locale }: CurrencySelectProps) {
+  const codes = useMemo(() => listCalculatorCurrencies(), []);
+  const labelOf = useCurrencyLabel(locale);
+
+  return (
+    <label className="block sm:col-span-2 lg:col-span-3">
+      <span className="mb-1.5 block text-sm font-medium text-[var(--twin-muted-strong)]">{label}</span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={inputClass}
+        aria-label={label}
+      >
+        {codes.map((code) => (
+          <option key={code} value={code}>
+            {code} — {labelOf(code)}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
 }
 
 /** Illustrative agency vs TWIN-style fee model — no TWIN revenue disclosure. */
 export function TwinRoiCalculator() {
   const { t, locale } = useTranslation();
+  const [currency, setCurrency] = useState(() => defaultCurrencyForLocale(locale));
   const [annualSalary, setAnnualSalary] = useState(60_000);
   const [agencyFeePercent, setAgencyFeePercent] = useState(15);
   const [numberOfHires, setNumberOfHires] = useState(50);
@@ -45,6 +105,8 @@ export function TwinRoiCalculator() {
   const inputClass =
     "w-full min-w-0 rounded border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-3 py-2 text-lg font-semibold text-[var(--foreground)] focus:border-[var(--twin-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--twin-accent)]/20 sm:text-xl";
 
+  const money = (amount: number) => formatMoney(amount, locale, currency);
+
   return (
     <Shell wide>
       <div className="py-6 sm:py-10">
@@ -59,6 +121,13 @@ export function TwinRoiCalculator() {
         <section className="twin-card-panel mb-6 p-5 sm:p-6">
           <h2 className="twin-section-title mb-5 text-lg sm:text-xl">{t("calculator.paramsTitle")}</h2>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <CurrencySelect
+              value={currency}
+              onChange={setCurrency}
+              label={t("calculator.currency")}
+              inputClass={inputClass}
+              locale={locale}
+            />
             <label className="block">
               <span className="mb-1.5 block text-sm font-medium text-[var(--twin-muted-strong)]">
                 {t("calculator.annualSalary")}
@@ -134,16 +203,16 @@ export function TwinRoiCalculator() {
             <dl className="space-y-4">
               <div>
                 <dt className="text-sm text-[var(--twin-muted)]">{t("calculator.costPerHire")}</dt>
-                <dd className="text-2xl font-bold text-red-700 sm:text-3xl">{money(agencyFee, locale)}</dd>
+                <dd className="text-2xl font-bold text-red-700 sm:text-3xl">{money(agencyFee)}</dd>
                 <dd className="text-xs text-[var(--twin-muted)]">
                   {t("calculator.agencyFeeDetail")
-                    .replace("{{annual}}", money(annualSalary, locale))
+                    .replace("{{annual}}", money(annualSalary))
                     .replace("{{pct}}", String(agencyFeePercent))}
                 </dd>
               </div>
               <div className="border-t border-red-200/80 pt-4">
                 <dt className="text-sm text-[var(--twin-muted)]">{t("calculator.bonusForCandidate")}</dt>
-                <dd className="text-xl font-bold text-red-700">{money(0, locale)}</dd>
+                <dd className="text-xl font-bold text-red-700">{money(0)}</dd>
               </div>
               <div className="border-t border-red-200/80 pt-4">
                 <dt className="text-sm text-[var(--twin-muted)]">{t("calculator.retention")}</dt>
@@ -151,7 +220,7 @@ export function TwinRoiCalculator() {
               </div>
               <div className="border-t border-red-200/80 pt-4">
                 <dt className="text-sm text-[var(--twin-muted)]">{t("calculator.totalAnnualCost")}</dt>
-                <dd className="text-xl font-bold text-red-700">{money(agencyFee * numberOfHires, locale)}</dd>
+                <dd className="text-xl font-bold text-red-700">{money(agencyFee * numberOfHires)}</dd>
               </div>
             </dl>
           </section>
@@ -166,14 +235,14 @@ export function TwinRoiCalculator() {
             <dl className="space-y-4">
               <div>
                 <dt className="text-sm text-[var(--twin-muted)]">{t("calculator.costPerHire")}</dt>
-                <dd className="text-2xl font-bold text-[var(--twin-accent)] sm:text-3xl">{money(twinFee, locale)}</dd>
+                <dd className="text-2xl font-bold text-[var(--twin-accent)] sm:text-3xl">{money(twinFee)}</dd>
                 <dd className="text-xs text-[var(--twin-muted)]">
-                  {t("calculator.twinFeeDetail").replace("{{monthly}}", money(monthlySalary, locale))}
+                  {t("calculator.twinFeeDetail").replace("{{monthly}}", money(monthlySalary))}
                 </dd>
               </div>
               <div className="border-t border-[var(--twin-border)] pt-4">
                 <dt className="text-sm text-[var(--twin-muted)]">{t("calculator.bonusForCandidate")}</dt>
-                <dd className="text-xl font-bold text-[var(--twin-accent)]">{money(candidateBonus, locale)}</dd>
+                <dd className="text-xl font-bold text-[var(--twin-accent)]">{money(candidateBonus)}</dd>
                 <dd className="text-xs text-[var(--twin-muted)]">{t("calculator.bonusAfter")}</dd>
               </div>
               <div className="border-t border-[var(--twin-border)] pt-4">
@@ -182,7 +251,7 @@ export function TwinRoiCalculator() {
               </div>
               <div className="border-t border-[var(--twin-border)] pt-4">
                 <dt className="text-sm text-[var(--twin-muted)]">{t("calculator.totalAnnualCost")}</dt>
-                <dd className="text-xl font-bold text-[var(--twin-accent)]">{money(twinFee * numberOfHires, locale)}</dd>
+                <dd className="text-xl font-bold text-[var(--twin-accent)]">{money(twinFee * numberOfHires)}</dd>
               </div>
             </dl>
           </section>
@@ -191,9 +260,7 @@ export function TwinRoiCalculator() {
         <section className="twin-card-panel--accent mb-6 rounded-2xl p-6 text-center sm:p-8">
           <h2 className="text-xl font-semibold text-[var(--foreground)] sm:text-2xl">{t("calculator.savingsTitle")}</h2>
           <p className="mt-2 text-sm text-[var(--twin-muted)]">{t("calculator.savingsPerHire")}</p>
-          <p className="mt-3 text-4xl font-bold tracking-tight text-[var(--twin-link)] sm:text-5xl">
-            {money(savingsPerHire, locale)}
-          </p>
+          <p className="mt-3 text-4xl font-bold tracking-tight text-[var(--twin-link)] sm:text-5xl">{money(savingsPerHire)}</p>
           {savingsPercent !== null ? (
             <p className="mt-4 inline-block rounded-full bg-[var(--twin-cta)] px-5 py-2 text-sm font-semibold text-white shadow-sm">
               {t("calculator.cheaperBy").replace("{{pct}}", savingsPercent)}
@@ -206,7 +273,7 @@ export function TwinRoiCalculator() {
               <div className="text-xs font-medium uppercase tracking-wide text-[var(--twin-muted)]">
                 {t("calculator.savingsAnnual")}
               </div>
-              <div className="mt-1 text-xl font-bold text-[var(--foreground)]">{money(totalSavings, locale)}</div>
+              <div className="mt-1 text-xl font-bold text-[var(--foreground)]">{money(totalSavings)}</div>
             </div>
             <div className="twin-card-inset rounded-lg p-4">
               <div className="text-xs font-medium uppercase tracking-wide text-[var(--twin-muted)]">
@@ -222,7 +289,7 @@ export function TwinRoiCalculator() {
         <div className="mb-6 grid gap-5 md:grid-cols-2">
           <section className="twin-card-panel rounded-xl border border-[var(--twin-border)] p-5 sm:p-6">
             <h3 className="text-lg font-semibold text-[var(--foreground)]">{t("calculator.candidateCardTitle")}</h3>
-            <p className="mt-3 text-3xl font-bold text-[var(--twin-link)]">{money(candidateBonus, locale)}</p>
+            <p className="mt-3 text-3xl font-bold text-[var(--twin-link)]">{money(candidateBonus)}</p>
             <p className="mt-1 text-sm text-[var(--twin-muted)]">{t("calculator.candidateCardSub")}</p>
             <ul className="mt-4 space-y-2 border-t border-[var(--twin-border)] pt-4 text-sm text-[var(--twin-muted-strong)]">
               <li>{t("calculator.candidateB1")}</li>
@@ -232,7 +299,7 @@ export function TwinRoiCalculator() {
           </section>
           <section className="twin-card-panel rounded-xl border border-[var(--twin-border)] p-5 sm:p-6">
             <h3 className="text-lg font-semibold text-[var(--foreground)]">{t("calculator.companyCardTitle")}</h3>
-            <p className="mt-3 text-3xl font-bold text-[var(--twin-cta)]">{money(savingsPerHire, locale)}</p>
+            <p className="mt-3 text-3xl font-bold text-[var(--twin-cta)]">{money(savingsPerHire)}</p>
             <p className="mt-1 text-sm text-[var(--twin-muted)]">{t("calculator.companyCardSub")}</p>
             <ul className="mt-4 space-y-2 border-t border-[var(--twin-border)] pt-4 text-sm text-[var(--twin-muted-strong)]">
               <li>{t("calculator.companyB1")}</li>
@@ -252,7 +319,7 @@ export function TwinRoiCalculator() {
               <div className="twin-card-inset rounded-lg p-4">
                 <div className="text-sm text-[var(--twin-muted)]">{t("calculator.integrationFee")}</div>
                 <div className="mt-1 text-2xl font-bold text-red-700">
-                  {money(integrationFee, locale)}
+                  {money(integrationFee)}
                   <span className="text-base font-medium text-[var(--twin-muted)]">{t("calculator.perYear")}</span>
                 </div>
               </div>
@@ -264,19 +331,20 @@ export function TwinRoiCalculator() {
               <div className="space-y-3">
                 <div className="twin-card-inset rounded-lg p-4">
                   <div className="text-sm text-[var(--twin-muted)]">{t("calculator.timeSavings")}</div>
-                  <div className="mt-1 text-xl font-bold text-[var(--twin-link)]">{money(timeValueSavings, locale)}</div>
+                  <div className="mt-1 text-xl font-bold text-[var(--twin-link)]">{money(timeValueSavings)}</div>
                   <div className="text-xs text-[var(--twin-muted)]">
                     {t("calculator.timeSavingsSub")
                       .replace("{{hours}}", String(hrHoursSaved))
-                      .replace("{{rate}}", String(hrHourlyRate))}
+                      .replace("{{rate}}", String(hrHourlyRate))
+                      .replace("{{code}}", currency)}
                   </div>
                 </div>
                 <div className="twin-card-inset rounded-lg p-4">
                   <div className="text-sm text-[var(--twin-muted)]">{t("calculator.hireCostSavings")}</div>
-                  <div className="mt-1 text-xl font-bold text-[var(--twin-link)]">{money(costSavings, locale)}</div>
+                  <div className="mt-1 text-xl font-bold text-[var(--twin-link)]">{money(costSavings)}</div>
                   <div className="text-xs text-[var(--twin-muted)]">
                     {t("calculator.hireCostSavingsSub")
-                      .replace("{{perHire}}", money(savingsPerHire, locale))
+                      .replace("{{perHire}}", money(savingsPerHire))
                       .replace("{{hires}}", String(numberOfHires))}
                   </div>
                 </div>
@@ -288,13 +356,11 @@ export function TwinRoiCalculator() {
             <div className="grid gap-4 text-center sm:grid-cols-3">
               <div>
                 <div className="text-xs font-medium uppercase tracking-wide text-white/80">{t("calculator.totalValue")}</div>
-                <div className="mt-1 text-2xl font-bold">{money(totalEnterpriseValue, locale)}</div>
+                <div className="mt-1 text-2xl font-bold">{money(totalEnterpriseValue)}</div>
               </div>
               <div>
                 <div className="text-xs font-medium uppercase tracking-wide text-white/80">{t("calculator.netBenefit")}</div>
-                <div className="mt-1 text-2xl font-bold">
-                  {money(totalEnterpriseValue - integrationFee, locale)}
-                </div>
+                <div className="mt-1 text-2xl font-bold">{money(totalEnterpriseValue - integrationFee)}</div>
               </div>
               <div>
                 <div className="text-xs font-medium uppercase tracking-wide text-white/80">{t("calculator.roiLabel")}</div>
