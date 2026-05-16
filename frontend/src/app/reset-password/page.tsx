@@ -63,7 +63,7 @@ function ResetPasswordContent() {
         <h1 className="mb-6 text-2xl font-semibold">{t("resetPassword.title")}</h1>
         {done ? (
           <div className="space-y-4">
-            <p className="text-sm text-green-700 dark:text-green-400">{t("resetPassword.success")}</p>
+            <p className="twin-text-success text-sm">{t("resetPassword.success")}</p>
             <Link href="/login" className="twin-link inline-block text-sm">
               {t("resetPassword.backToLogin")}
             </Link>

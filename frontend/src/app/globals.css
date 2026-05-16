@@ -120,23 +120,28 @@ body {
   overflow: hidden;
 }
 
-.twin-bg-base {
+/* —— Ambient nature layers (route-specific; soft motion, reduced-motion safe) —— */
+.twin-nature {
+  pointer-events: none;
+}
+
+.twin-nature-base {
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, #e8f5f0 0%, var(--background) 32%, var(--background) 100%);
 }
 
-.twin-bg-mesh {
+.twin-nature-mesh {
   position: absolute;
   inset: 0;
-  opacity: 0.95;
+  opacity: 0.94;
   background:
     radial-gradient(ellipse 72% 48% at 10% -8%, rgb(13 148 136 / 0.14), transparent 55%),
     radial-gradient(ellipse 58% 42% at 90% 10%, rgb(217 119 6 / 0.09), transparent 52%),
     radial-gradient(ellipse 52% 38% at 48% 100%, rgb(20 184 166 / 0.1), transparent 55%);
 }
 
-.twin-bg-band {
+.twin-nature-band {
   position: absolute;
   top: 0;
   left: 0;
@@ -149,6 +154,243 @@ body {
     transparent 100%
   );
   pointer-events: none;
+}
+
+.twin-nature-orbs {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.twin-nature-orb {
+  position: absolute;
+  width: min(52vmin, 28rem);
+  height: min(52vmin, 28rem);
+  border-radius: 42% 58% 68% 32% / 48% 36% 64% 52%;
+  filter: blur(52px);
+  opacity: 0.32;
+  will-change: transform;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.twin-nature-orb--1 {
+  left: -8%;
+  top: 12%;
+  background: rgb(45 212 191 / 0.45);
+  animation-name: twin-nature-drift-1;
+  animation-duration: 32s;
+}
+
+.twin-nature-orb--2 {
+  right: -12%;
+  top: 38%;
+  background: rgb(16 185 129 / 0.38);
+  animation-name: twin-nature-drift-2;
+  animation-duration: 40s;
+}
+
+.twin-nature-orb--3 {
+  left: 18%;
+  bottom: -18%;
+  width: min(60vmin, 32rem);
+  height: min(60vmin, 32rem);
+  background: rgb(253 224 71 / 0.22);
+  animation-name: twin-nature-drift-3;
+  animation-duration: 48s;
+}
+
+@keyframes twin-nature-drift-1 {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  35% {
+    transform: translate3d(5vw, -4vh, 0) scale(1.06);
+  }
+  70% {
+    transform: translate3d(-3vw, 3vh, 0) scale(0.95);
+  }
+}
+
+@keyframes twin-nature-drift-2 {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  40% {
+    transform: translate3d(-6vw, 5vh, 0) rotate(-5deg);
+  }
+  80% {
+    transform: translate3d(4vw, -3vh, 0) rotate(4deg);
+  }
+}
+
+@keyframes twin-nature-drift-3 {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(4vw, 8vh, 0) scale(1.08);
+  }
+}
+
+@keyframes twin-nature-stream-1 {
+  0%,
+  100% {
+    transform: translate3d(-8vw, 1vh, 0);
+  }
+  50% {
+    transform: translate3d(8vw, -1vh, 0);
+  }
+}
+
+@keyframes twin-nature-stream-2 {
+  0%,
+  100% {
+    transform: translate3d(6vw, -2vh, 0);
+  }
+  50% {
+    transform: translate3d(-7vw, 2vh, 0);
+  }
+}
+
+@keyframes twin-nature-sprout-1 {
+  0%,
+  100% {
+    transform: translate3d(0, 5vh, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(1vw, -6vh, 0) scale(1.05);
+  }
+}
+
+/* Route moods: mesh tint + orb motion (contextual “place in the journey”) */
+.twin-nature--canopy .twin-nature-mesh {
+  background:
+    radial-gradient(ellipse 58% 46% at 14% 2%, rgb(22 101 52 / 0.15), transparent 56%),
+    radial-gradient(ellipse 52% 40% at 88% 6%, rgb(253 224 71 / 0.07), transparent 52%),
+    radial-gradient(ellipse 50% 42% at 48% 100%, rgb(20 184 166 / 0.12), transparent 58%);
+}
+
+.twin-nature--canopy .twin-nature-orb--1 {
+  animation-duration: 26s;
+}
+.twin-nature--canopy .twin-nature-orb--2 {
+  animation-duration: 36s;
+}
+.twin-nature--canopy .twin-nature-orb--3 {
+  animation-duration: 44s;
+}
+
+.twin-nature--stream .twin-nature-mesh {
+  background:
+    linear-gradient(102deg, transparent 38%, rgb(45 212 191 / 0.07) 50%, transparent 62%),
+    radial-gradient(ellipse 92% 36% at 50% -6%, rgb(13 148 136 / 0.11), transparent 52%),
+    radial-gradient(ellipse 68% 48% at 100% 58%, rgb(217 119 6 / 0.07), transparent 55%);
+}
+
+.twin-nature--stream .twin-nature-orb--1 {
+  animation-name: twin-nature-stream-1;
+  animation-duration: 38s;
+}
+.twin-nature--stream .twin-nature-orb--2 {
+  animation-name: twin-nature-stream-2;
+  animation-duration: 44s;
+}
+.twin-nature--stream .twin-nature-orb--3 {
+  animation-name: twin-nature-drift-3;
+  animation-duration: 52s;
+}
+
+.twin-nature--garden .twin-nature-mesh {
+  background:
+    radial-gradient(circle at 22% 32%, rgb(236 72 153 / 0.06), transparent 42%),
+    radial-gradient(ellipse 62% 46% at 82% 18%, rgb(52 211 153 / 0.13), transparent 52%),
+    radial-gradient(ellipse 54% 42% at 44% 92%, rgb(20 184 166 / 0.11), transparent 56%);
+}
+
+.twin-nature--garden .twin-nature-orb--2 {
+  background: rgb(244 114 182 / 0.18);
+}
+
+.twin-nature--dawn .twin-nature-mesh {
+  background:
+    radial-gradient(ellipse 72% 48% at 50% -12%, rgb(251 191 36 / 0.12), transparent 56%),
+    radial-gradient(ellipse 56% 44% at 8% 58%, rgb(45 212 191 / 0.1), transparent 52%),
+    radial-gradient(ellipse 52% 40% at 92% 68%, rgb(13 148 136 / 0.08), transparent 54%);
+}
+
+.twin-nature--dawn .twin-nature-orb--3 {
+  background: rgb(254 215 170 / 0.28);
+}
+
+.twin-nature--sprout .twin-nature-mesh {
+  background:
+    radial-gradient(ellipse 48% 58% at 50% 108%, rgb(34 197 94 / 0.14), transparent 52%),
+    radial-gradient(ellipse 62% 42% at 18% 12%, rgb(253 224 71 / 0.09), transparent 55%),
+    radial-gradient(ellipse 58% 40% at 86% 22%, rgb(20 184 166 / 0.1), transparent 52%);
+}
+
+.twin-nature--sprout .twin-nature-orb--1 {
+  animation-name: twin-nature-sprout-1;
+  animation-duration: 30s;
+}
+
+.twin-nature--growth .twin-nature-mesh {
+  background:
+    radial-gradient(circle at 50% 42%, rgb(13 148 136 / 0.07) 0%, transparent 36%),
+    radial-gradient(circle at 50% 42%, rgb(13 148 136 / 0.05) 36%, transparent 40%),
+    radial-gradient(ellipse 66% 50% at 82% 78%, rgb(180 83 9 / 0.09), transparent 55%);
+}
+
+.twin-nature--growth .twin-nature-orb--1 {
+  animation-duration: 36s;
+}
+
+.twin-nature--shade .twin-nature-mesh {
+  opacity: 0.9;
+  background:
+    radial-gradient(ellipse 78% 52% at 50% 100%, rgb(21 128 61 / 0.11), transparent 56%),
+    radial-gradient(ellipse 52% 42% at 12% 18%, rgb(15 118 110 / 0.09), transparent 50%);
+}
+
+.twin-nature--shade .twin-nature-band {
+  background: linear-gradient(180deg, rgb(6 78 59 / 0.08) 0%, transparent 100%);
+}
+
+.twin-nature--shade .twin-nature-orb {
+  opacity: 0.22;
+  filter: blur(56px);
+}
+
+.twin-nature--shade .twin-nature-orb--1 {
+  animation-duration: 58s;
+}
+.twin-nature--shade .twin-nature-orb--2 {
+  animation-duration: 72s;
+}
+.twin-nature--shade .twin-nature-orb--3 {
+  animation-duration: 64s;
+}
+
+.twin-nature--trail .twin-nature-mesh {
+  background:
+    linear-gradient(128deg, rgb(204 251 241 / 0.4) 0%, transparent 42%, rgb(253 230 138 / 0.14) 100%),
+    radial-gradient(ellipse 58% 46% at 0% 48%, rgb(13 148 136 / 0.1), transparent 52%),
+    radial-gradient(ellipse 56% 42% at 100% 38%, rgb(52 211 153 / 0.11), transparent 52%);
+}
+
+.twin-nature--trail .twin-nature-orb--2 {
+  animation-duration: 34s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .twin-nature-orb {
+    animation: none !important;
+  }
 }
 
 .twin-hero-band {
@@ -402,6 +644,66 @@ body {
   border: 1px solid #f5d78e;
   border-radius: 0.25rem;
   padding: 0.5rem 0.625rem;
+}
+
+/** Long-form copy (privacy, legal) — same tokens as dashboard/auth, no Tailwind Typography / dark theme. */
+.twin-prose {
+  max-width: 48rem;
+  color: var(--twin-muted);
+  font-size: 0.9375rem;
+  line-height: 1.65;
+}
+
+.twin-prose > * + * {
+  margin-top: 0.75rem;
+}
+
+.twin-prose h1 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+.twin-prose h2 {
+  margin-top: 1.75rem;
+  margin-bottom: 0.35rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--twin-muted-strong);
+}
+
+.twin-prose ul {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding-left: 1.25rem;
+  list-style-type: disc;
+}
+
+.twin-prose li {
+  margin-top: 0.25rem;
+}
+
+.twin-prose a {
+  color: var(--twin-link);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.twin-prose a:hover {
+  color: var(--twin-link-hover);
+}
+
+.twin-prose strong {
+  color: var(--twin-muted-strong);
+  font-weight: 600;
+}
+
+.twin-text-success {
+  color: var(--twin-accent-hover);
+  font-weight: 500;
 }
 
 /* —— Marketing (same palette as app: growth teal headline, soft depth on CTAs) —— */

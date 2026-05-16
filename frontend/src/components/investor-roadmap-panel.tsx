@@ -26,7 +26,7 @@ export function InvestorRoadmapPanel() {
                   className={
                     isLivePortal(p.boardId)
                       ? "shrink-0 rounded bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-emerald-800"
-                      : "shrink-0 rounded bg-zinc-200/80 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-zinc-600"
+                      : "shrink-0 rounded bg-[var(--twin-accent-muted)] px-1.5 py-0.5 text-[10px] font-semibold uppercase text-[var(--twin-muted-strong)]"
                   }
                 >
                   {isLivePortal(p.boardId) ? t("dashboard.roadmapLiveBadge") : t("dashboard.roadmapPlannedBadge")}
@@ -43,7 +43,7 @@ export function InvestorRoadmapPanel() {
             {INVESTOR_COMPANIES.map((c) => (
               <li key={c.name} className="flex items-start justify-between gap-2">
                 <span>{c.name}</span>
-                <span className="shrink-0 rounded bg-zinc-200/80 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-zinc-600">
+                <span className="shrink-0 rounded bg-[var(--twin-accent-muted)] px-1.5 py-0.5 text-[10px] font-semibold uppercase text-[var(--twin-muted-strong)]">
                   {t("dashboard.roadmapPlannedBadge")}
                 </span>
               </li>

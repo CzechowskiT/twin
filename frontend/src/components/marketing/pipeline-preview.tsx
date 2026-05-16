@@ -13,7 +13,7 @@ export function PipelinePreview() {
               className="h-2.5 max-w-full rounded-full bg-teal-200/80"
               style={{ width: `${w * 100}%` }}
             />
-            <div className="h-2 max-w-[8rem] w-[42%] rounded-full bg-slate-200/90" />
+            <div className="h-2 max-w-[8rem] w-[42%] rounded-full bg-[var(--twin-border)]/90" />
           </div>
           <div className="hidden h-8 w-14 shrink-0 rounded-md border border-teal-200 bg-teal-50 sm:block" />
         </div>

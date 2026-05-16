@@ -1,8 +1,12 @@
 "use client";
 
-import { FuturisticBackground } from "@/components/futuristic-background";
+import { usePathname } from "next/navigation";
 
-/** Unified calm background on every route (hope / growth greens + trust teal + warm light). */
+import { NatureBackground, resolveNatureVariant } from "@/components/nature-background";
+
+/** Route-specific ambient nature layers (same palette tokens, contextual motion). */
 export function RouteAwareBackground() {
-  return <FuturisticBackground />;
+  const pathname = usePathname();
+  const variant = resolveNatureVariant(pathname ?? "/");
+  return <NatureBackground variant={variant} />;
 }

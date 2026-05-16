@@ -3,7 +3,7 @@ import { Shell } from "@/components/ui";
 export default function PrivacyPage() {
   return (
     <Shell>
-      <article className="prose prose-zinc dark:prose-invert max-w-none">
+      <article className="twin-prose max-w-none">
         <h1>Privacy Policy (MVP)</h1>
         <p className="twin-muted text-sm">Last updated: May 2026</p>
         <h2>What we collect</h2>

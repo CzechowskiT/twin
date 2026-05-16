@@ -13,23 +13,23 @@ const VARIANT_ROW: Record<
 > = {
   google: {
     enabled:
-      "twin-touch-target mb-2 flex w-full items-center justify-center gap-3 rounded-lg border border-slate-200/90 bg-white px-4 py-3 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-slate-300 hover:bg-slate-50/90 hover:shadow",
+      "twin-touch-target mb-2 flex w-full items-center justify-center gap-3 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-card)] px-4 py-3 text-sm font-semibold text-[var(--foreground)] shadow-sm transition hover:border-teal-300/80 hover:bg-[var(--twin-surface-raised)] hover:shadow",
     disabled:
-      "twin-touch-target mb-2 flex w-full cursor-not-allowed items-center justify-center gap-3 rounded-lg border border-dashed border-slate-200 bg-white/90 px-4 py-3 text-sm font-semibold text-slate-500 opacity-75",
+      "twin-touch-target mb-2 flex w-full cursor-not-allowed items-center justify-center gap-3 rounded-lg border border-dashed border-[var(--twin-border)] bg-[var(--twin-card)] px-4 py-3 text-sm font-semibold text-[var(--twin-muted)] opacity-75",
     iconWrap: "inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center overflow-visible leading-none",
   },
   github: {
     enabled:
       "twin-touch-target mb-2 flex w-full items-center justify-center gap-3 rounded-lg border border-[#24292f] bg-[#24292f] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:border-[#1a1e22] hover:bg-[#1a1e22] hover:text-white",
     disabled:
-      "twin-touch-target mb-2 flex w-full cursor-not-allowed items-center justify-center gap-3 rounded-lg border border-dashed border-slate-300 bg-[#24292f]/85 px-4 py-3 text-sm font-semibold text-white opacity-60",
+      "twin-touch-target mb-2 flex w-full cursor-not-allowed items-center justify-center gap-3 rounded-lg border border-dashed border-white/25 bg-[#24292f]/85 px-4 py-3 text-sm font-semibold text-white opacity-60",
     iconWrap: "inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center overflow-visible leading-none text-white",
   },
   apple: {
     enabled:
       "twin-touch-target mb-2 flex w-full items-center justify-center gap-3 rounded-lg border border-black bg-black px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:border-stone-800 hover:bg-stone-900 hover:text-white",
     disabled:
-      "twin-touch-target mb-2 flex w-full cursor-not-allowed items-center justify-center gap-3 rounded-lg border border-dashed border-slate-400 bg-black/90 px-4 py-3 text-sm font-semibold text-white opacity-65",
+      "twin-touch-target mb-2 flex w-full cursor-not-allowed items-center justify-center gap-3 rounded-lg border border-dashed border-white/30 bg-black/90 px-4 py-3 text-sm font-semibold text-white opacity-65",
     iconWrap:
       "inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center overflow-visible leading-none text-white [&>svg]:overflow-visible",
   },
