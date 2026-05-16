@@ -92,6 +92,7 @@ class BoardScrapeOutcome:
 
 def list_boards() -> list[dict[str, str]]:
     """Metadata for API / dashboard, grouped by geographical region."""
+    allow = scrape_allowlist_board_ids()
     boards: list[dict[str, str]] = [
         {"id": "pracuj-sales", "label": "pracuj.pl", "region": "poland"},
         {"id": "rocketjobs-sales", "label": "rocketjobs.pl", "region": "poland"},
@@ -105,6 +106,9 @@ def list_boards() -> list[dict[str, str]]:
                 "region": region_slug(spec.region),
             }
         )
+
+    if allow is not None:
+        boards = [b for b in boards if b["id"] in allow]
 
     def sort_key(item: dict[str, str]) -> tuple[int, str]:
         try:

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ApplicationsPanel, type ApplicationRow } from "@/components/applications-panel";
+import { InvestorRoadmapPanel } from "@/components/investor-roadmap-panel";
 import { useTranslation } from "@/components/language-provider";
 import { JobFiltersBar } from "@/components/job-filters";
 import { JobList } from "@/components/job-list";
@@ -344,19 +345,24 @@ export default function DashboardPage() {
           </div>
 
           {SHOW_SCRAPE_UI && (
-            <div className="twin-card-inset w-full shrink-0 p-4 sm:p-5 lg:max-w-md">
-              <p className="mb-2 text-sm font-medium">{t("dashboard.scrapeJobs")}</p>
+            <div className="twin-card-inset w-full shrink-0 p-4 sm:p-5 lg:max-w-lg xl:max-w-xl">
+              <p className="text-xs font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
+                {t("dashboard.twinScrapePanelTitle")}
+              </p>
               <ButtonCta
                 type="button"
                 onClick={() => triggerScrapeAll()}
                 disabled={scraping}
-                className="mb-2 !w-full"
+                className="!mt-4 !rounded-full !py-3.5 !text-base !font-bold !tracking-tight !shadow-lg"
               >
-                {scraping ? t("dashboard.scrapingAll") : t("dashboard.scrapeAll")}
+                {scraping ? t("dashboard.twinForYourJobRunning") : t("dashboard.twinForYourJob")}
               </ButtonCta>
-              <p className="twin-muted text-xs">{t("dashboard.scrapeAllHint")}</p>
+              <p className="twin-muted mt-3 text-xs leading-relaxed">{t("dashboard.twinForYourJobHint")}</p>
+              <p className="twin-muted mt-2 text-[11px] leading-relaxed">
+                {t("dashboard.scrapeAllHint")} {t("dashboard.keepApiOpen")}
+              </p>
+              <InvestorRoadmapPanel />
               {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
-              <p className="twin-muted mt-2 text-xs">{t("dashboard.keepApiOpen")}</p>
             </div>
           )}
         </div>

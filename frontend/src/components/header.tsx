@@ -21,7 +21,7 @@ export function Header() {
     <header
       className={
         isHome
-          ? "relative z-10 border-b border-white/10 bg-black/25 shadow-[0_8px_32px_-12px_rgb(0_0_0/0.65)] backdrop-blur-xl supports-[backdrop-filter]:bg-black/15"
+          ? "sticky top-0 z-50 border-b border-white/[0.08] bg-[#09090b]/55 shadow-[0_8px_40px_-16px_rgb(0_0_0/0.85)] backdrop-blur-2xl supports-[backdrop-filter]:bg-[#09090b]/40"
           : "twin-header-bar relative z-10"
       }
     >

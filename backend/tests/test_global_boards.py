@@ -1,5 +1,7 @@
 """Tests for global job board parsers and registry."""
 
+from unittest.mock import MagicMock, patch
+
 from app.scrapers.global_boards import (
     GLOBAL_BOARD_SPECS,
     _parse_indeed,
@@ -72,6 +74,14 @@ def test_list_boards_sorted_by_region() -> None:
     boards = list_boards()
     indices = [REGION_ORDER.index(b["region"]) for b in boards if b["region"] in REGION_ORDER]
     assert indices == sorted(indices)
+
+
+@patch("app.config.get_settings")
+def test_list_boards_respects_allowlist(mock_settings: MagicMock) -> None:
+    mock_settings.return_value.scrape_enabled_board_ids = "indeed,pracuj-sales"
+    boards = list_boards()
+    ids = {b["id"] for b in boards}
+    assert ids == {"indeed", "pracuj-sales"}
 
 
 def test_run_scrape_unknown_board_returns_empty() -> None:

@@ -40,6 +40,7 @@ const en = {
     featuresTitle: "From signal to pipeline",
     featuresSubtitle: "A calm workspace that mirrors how you already think about the market — with automation arriving step by step.",
     footerHint: "Create a profile after sign-up so matching can use your skills, titles, and goals.",
+    twinForYourJob: "Twin for your job",
   },
   dashboard: {
     title: "Dashboard",
@@ -51,7 +52,8 @@ const en = {
     years: "yrs",
     scrapeJobs: "Job feeds",
     scrapeAll: "Auto scrap",
-    scrapeAllHint: "Runs all job sources configured on the server (see SCRAPE_ENABLED_BOARD_IDS).",
+    scrapeAllHint:
+      "The board list in the dashboard and this action respect SCRAPE_ENABLED_BOARD_IDS on the API (empty = all boards). Celery workers handle async jobs; this button uses sync=true and waits in the browser session.",
     scrapingAll: "Auto scrap running…",
     scraping: "Scraping…",
     keepApiOpen: "Keep the API terminal open while scraping.",
@@ -98,6 +100,18 @@ const en = {
     appStatusHired: "Hired",
     scrapeFailed: "Scrape failed",
     scrapeFinished: "Scrape finished",
+    twinScrapePanelTitle: "Bring listings into TWIN",
+    twinForYourJob: "Twin for your job",
+    twinForYourJobHint:
+      "Runs every board allowed by SCRAPE_ENABLED_BOARD_IDS on the API (or all boards if unset). This button uses synchronous mode (waits for the API). For demos, set a short allowlist on Railway to finish quickly; full sweeps should use async Celery workers (sync=false) from automation.",
+    twinForYourJobRunning: "Running Twin for your job…",
+    roadmapSummary: "Target job boards & company career sites (roadmap)",
+    roadmapPortalsTitle: "50 global job boards",
+    roadmapCompaniesTitle: "Top employers (careers pages)",
+    roadmapLiveBadge: "Live",
+    roadmapPlannedBadge: "Planned",
+    roadmapFootnote:
+      "Today “Twin for your job” ingests implemented sources in the TWIN registry; more portals and employer career-site adapters roll out iteratively behind the same button.",
   },
   login: {
     title: "Log in",
@@ -271,6 +285,7 @@ const pl: MessageTree = {
     featuresSubtitle:
       "Spokojna przestrzeń pracy zgodna z tym, jak już myślisz o rynku — automatyzacja dołącza etapami.",
     footerHint: "Po rejestracji uzupełnij profil, żeby dopasowanie mogło uwzględnić umiejętności, stanowiska i cele.",
+    twinForYourJob: "Twin for your job",
   },
   dashboard: {
     title: "Panel",
@@ -283,7 +298,7 @@ const pl: MessageTree = {
     scrapeJobs: "Źródła ofert",
     scrapeAll: "Auto scrap",
     scrapeAllHint:
-      "Uruchamia wszystkie źródła skonfigurowane na serwerze (patrz SCRAPE_ENABLED_BOARD_IDS).",
+      "Lista portali w panelu i to polecenie respektują SCRAPE_ENABLED_BOARD_IDS na Railway (puste = wszystkie). Worker Celery + Redis obsługuje tryb asynchroniczny; tutaj używany jest sync=true.",
     scrapingAll: "Trwa auto scrap…",
     scraping: "Pobieranie…",
     keepApiOpen: "Podczas pobierania zostaw włączony terminal API.",
@@ -330,6 +345,18 @@ const pl: MessageTree = {
     appStatusHired: "Zatrudnienie",
     scrapeFailed: "Pobieranie nie powiodło się",
     scrapeFinished: "Pobieranie zakończone",
+    twinScrapePanelTitle: "Wciągnij oferty do TWIN",
+    twinForYourJob: "Twin for your job",
+    twinForYourJobHint:
+      "Uruchamia wszystkie portale z listy SCRAPE_ENABLED_BOARD_IDS na API (albo wszystkie z rejestru, jeśli zmienna jest pusta). Ten przycisk używa trybu synchronicznego (czeka na zakończenie). Na demo ustaw krótszą listę na Railway, żeby skończyć w rozsądnym czasie; pełne skany lepiej w kolejce Celery (sync=false).",
+    twinForYourJobRunning: "Twin for your job — trwa…",
+    roadmapSummary: "Docelowe portale i kariery firm (roadmapa)",
+    roadmapPortalsTitle: "50 globalnych portali pracy",
+    roadmapCompaniesTitle: "Najwięksi pracodawcy (strony kariery)",
+    roadmapLiveBadge: "Wdrożone",
+    roadmapPlannedBadge: "W planie",
+    roadmapFootnote:
+      "Dziś „Twin for your job” pobiera źródła z rejestru TWIN; kolejne portale i adaptery stron kariery firm dojdą iteracyjnie pod tym samym przyciskiem.",
   },
   login: {
     title: "Zaloguj się",
