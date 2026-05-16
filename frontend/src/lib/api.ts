@@ -1,4 +1,9 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+/**
+ * Browser calls use same-origin `/api/v1/...` → Next.js rewrites to FastAPI (next.config.ts).
+ * Avoids CORS and avoids a wrong/missing NEXT_PUBLIC_API_URL in the client bundle on Vercel.
+ * Local: set NEXT_PUBLIC_API_URL in .env.local so rewrites hit your API (e.g. http://127.0.0.1:8000).
+ */
+const API_URL = "";
 
 export type ApiError = { detail: string | { msg: string }[] };
 

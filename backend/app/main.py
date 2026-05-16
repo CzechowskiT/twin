@@ -33,6 +33,16 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
     app.include_router(api_router, prefix="/api/v1")
+
+    @app.get("/")
+    def root() -> dict[str, str]:
+        """So the public Railway URL without a path shows something useful."""
+        return {
+            "service": "TWIN API",
+            "health": "/api/v1/health",
+            "docs": "/docs",
+        }
+
     return app
 
 

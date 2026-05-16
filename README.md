@@ -79,7 +79,7 @@ celery -A app.tasks.celery_app worker --loglevel=info
 celery -A app.tasks.celery_app beat --loglevel=info
 ```
 
-Beat schedules `scrape_all_boards_task` every 120s (all boards sequentially). The dashboard auto-refreshes job data on the same interval when the tab is visible.
+Beat has **no** scheduled scrapes (no background polling). Run scrapes from the dashboard or `POST /api/v1/jobs/scrape/...`.
 
 ### 5. Frontend
 

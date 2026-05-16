@@ -19,3 +19,23 @@ def test_settings_accepts_postgres_scheme(monkeypatch) -> None:
         assert settings.database_url.startswith("postgresql+psycopg://")
     finally:
         get_settings.cache_clear()
+
+
+def test_settings_strips_trailing_slash_on_frontend_url(monkeypatch) -> None:
+    monkeypatch.setenv("FRONTEND_URL", "https://app.vercel.app/")
+    get_settings.cache_clear()
+    try:
+        assert Settings().frontend_url == "https://app.vercel.app"
+    finally:
+        get_settings.cache_clear()
+
+
+def test_settings_normalizes_cors_origins_trailing_slashes(monkeypatch) -> None:
+    monkeypatch.setenv("CORS_ORIGINS", "https://a.com/, https://b.com/")
+    get_settings.cache_clear()
+    try:
+        s = Settings()
+        assert s.cors_origins == "https://a.com,https://b.com"
+        assert s.cors_origin_list == ["https://a.com", "https://b.com"]
+    finally:
+        get_settings.cache_clear()

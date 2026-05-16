@@ -1,7 +1,6 @@
 """Celery application configuration."""
 
 from celery import Celery
-from celery.schedules import crontab
 
 from app.config import get_settings
 
@@ -20,19 +19,6 @@ celery_app.conf.update(
     enable_utc=True,
     imports=("app.tasks.scrape_tasks",),
 )
-SCRAPE_ALL_INTERVAL_SEC = 120
 
-celery_app.conf.beat_schedule = {
-    "scrape-all-boards-every-120s": {
-        "task": "app.tasks.scrape_tasks.scrape_all_boards_task",
-        "schedule": SCRAPE_ALL_INTERVAL_SEC,
-    },
-    "scrape-pracuj-daily": {
-        "task": "app.tasks.scrape_tasks.scrape_pracuj_task",
-        "schedule": crontab(hour=6, minute=0),
-    },
-    "scrape-rocketjobs-daily": {
-        "task": "app.tasks.scrape_tasks.scrape_rocketjobs_task",
-        "schedule": crontab(hour=6, minute=30),
-    },
-}
+# No periodic scraping — run from dashboard or POST /jobs/scrape/... when you want data.
+celery_app.conf.beat_schedule = {}

@@ -11,6 +11,7 @@ import { ButtonChip, ButtonCta, Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
 import { groupBoardsByRegion, regionLabelKey } from "@/lib/job-board-regions";
+import { SHOW_SCRAPE_UI } from "@/lib/features";
 import { buildJobsQuery, defaultJobFilters, type JobFilters } from "@/lib/jobs";
 
 type User = { id: number; email: string };
@@ -115,12 +116,14 @@ export default function DashboardPage() {
         } catch {
           setProfile(null);
         }
-        const [boardList, opts] = await Promise.all([
-          apiFetch<BoardList>("/api/v1/jobs/boards", {}, token),
-          apiFetch<FilterOptions>("/api/v1/jobs/filters", {}, token),
-        ]);
-        setBoards(boardList);
+        const opts = await apiFetch<FilterOptions>("/api/v1/jobs/filters", {}, token);
         setFilterOptions(opts);
+        if (SHOW_SCRAPE_UI) {
+          const boardList = await apiFetch<BoardList>("/api/v1/jobs/boards", {}, token);
+          setBoards(boardList);
+        } else {
+          setBoards(null);
+        }
         await refreshDashboardData(token, hasProfile, filters);
       })
       .catch(() => {
@@ -129,29 +132,6 @@ export default function DashboardPage() {
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- initial load only
   }, [router]);
-
-  useEffect(() => {
-    if (!user) return;
-    const token = getToken();
-    if (!token) return;
-
-    const tick = () => {
-      if (document.visibilityState !== "visible") return;
-      refreshDashboardData(token, profile !== null && profile !== undefined, filters).catch(
-        () => {},
-      );
-    };
-
-    const intervalId = window.setInterval(tick, 120_000);
-    const onVisibility = () => {
-      if (document.visibilityState === "visible") tick();
-    };
-    document.addEventListener("visibilitychange", onVisibility);
-    return () => {
-      window.clearInterval(intervalId);
-      document.removeEventListener("visibilitychange", onVisibility);
-    };
-  }, [user, profile, filters, refreshDashboardData]);
 
   async function applyFilters() {
     const token = getToken();
@@ -333,42 +313,44 @@ export default function DashboardPage() {
             )}
           </div>
 
-          <div className="twin-card-inset w-full shrink-0 p-4 sm:p-5 lg:max-w-md">
-            <p className="mb-2 text-sm font-medium">{t("dashboard.scrapeJobs")}</p>
-            <ButtonCta
-              type="button"
-              onClick={() => triggerScrapeAll()}
-              disabled={scraping}
-              className="mb-3 !w-full"
-            >
-              {scraping ? t("dashboard.scrapingAll") : t("dashboard.scrapeAll")}
-            </ButtonCta>
-            {boards && (
-              <div className="twin-filter-box space-y-3">
-                {groupBoardsByRegion(boards.items).map(({ region, boards: regionBoards }) => (
-                  <section
-                    key={region}
-                    className="border-b border-[var(--twin-border)] pb-3 last:border-0 last:pb-0"
-                  >
-                    <h3 className="twin-region-label mb-1.5">{t(regionLabelKey(region))}</h3>
-                    <div className="flex flex-wrap gap-1.5">
-                      {regionBoards.map((btn) => (
-                        <ButtonChip
-                          key={btn.id}
-                          onClick={() => triggerScrape(btn.id)}
-                          disabled={scraping}
-                        >
-                          {scraping ? t("dashboard.scraping") : btn.label}
-                        </ButtonChip>
-                      ))}
-                    </div>
-                  </section>
-                ))}
-              </div>
-            )}
-            {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
-            <p className="twin-muted mt-2 text-xs">{t("dashboard.keepApiOpen")}</p>
-          </div>
+          {SHOW_SCRAPE_UI && (
+            <div className="twin-card-inset w-full shrink-0 p-4 sm:p-5 lg:max-w-md">
+              <p className="mb-2 text-sm font-medium">{t("dashboard.scrapeJobs")}</p>
+              <ButtonCta
+                type="button"
+                onClick={() => triggerScrapeAll()}
+                disabled={scraping}
+                className="mb-3 !w-full"
+              >
+                {scraping ? t("dashboard.scrapingAll") : t("dashboard.scrapeAll")}
+              </ButtonCta>
+              {boards && (
+                <div className="twin-filter-box space-y-3">
+                  {groupBoardsByRegion(boards.items).map(({ region, boards: regionBoards }) => (
+                    <section
+                      key={region}
+                      className="border-b border-[var(--twin-border)] pb-3 last:border-0 last:pb-0"
+                    >
+                      <h3 className="twin-region-label mb-1.5">{t(regionLabelKey(region))}</h3>
+                      <div className="flex flex-wrap gap-1.5">
+                        {regionBoards.map((btn) => (
+                          <ButtonChip
+                            key={btn.id}
+                            onClick={() => triggerScrape(btn.id)}
+                            disabled={scraping}
+                          >
+                            {scraping ? t("dashboard.scraping") : btn.label}
+                          </ButtonChip>
+                        ))}
+                      </div>
+                    </section>
+                  ))}
+                </div>
+              )}
+              {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+              <p className="twin-muted mt-2 text-xs">{t("dashboard.keepApiOpen")}</p>
+            </div>
+          )}
         </div>
       </Card>
 
@@ -403,16 +385,16 @@ export default function DashboardPage() {
         </Card>
       )}
 
-      <p className="twin-muted mb-4 text-xs">
-        {t("dashboard.autoRefresh")}
-        {lastUpdated
-          ? ` · ${t("dashboard.lastUpdated")} ${lastUpdated.toLocaleTimeString(undefined, {
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-            })}`
-          : ""}
-      </p>
+      {lastUpdated ? (
+        <p className="twin-muted mb-4 text-xs">
+          {t("dashboard.lastUpdated")}{" "}
+          {lastUpdated.toLocaleTimeString(undefined, {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          })}
+        </p>
+      ) : null}
 
       <Card variant="soft">
         <h2 className="twin-section-title mb-4">

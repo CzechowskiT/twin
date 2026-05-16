@@ -11,6 +11,11 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 _ENV_FILE = _REPO_ROOT / ".env"
 
 
+def _strip_trailing_slash_url(url: str) -> str:
+    """Railway UI often appends '/' to URL variables; browsers send Origin without it."""
+    return url.strip().rstrip("/")
+
+
 def _normalize_postgres_url(url: str) -> str:
     """Railway/Render often provide postgres:// — SQLAlchemy needs psycopg driver."""
     if url.startswith("postgres://"):
@@ -41,6 +46,14 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 60 * 24 * 7
     cors_origins: str = "http://localhost:3000"
 
+    @field_validator("cors_origins", mode="before")
+    @classmethod
+    def normalize_cors_origins(cls, value: object) -> object:
+        if not isinstance(value, str) or not value.strip():
+            return value
+        parts = [_strip_trailing_slash_url(p) for p in value.split(",")]
+        return ",".join(p for p in parts if p)
+
     redis_url: str = "redis://localhost:6379/0"
     celery_broker_url: str = "redis://localhost:6379/0"
     celery_result_backend: str = "redis://localhost:6379/1"
@@ -54,6 +67,13 @@ class Settings(BaseSettings):
     linkedin_redirect_uri: str = "http://localhost:8000/api/v1/auth/linkedin/callback"
     frontend_url: str = "http://localhost:3000"
 
+    @field_validator("frontend_url", mode="before")
+    @classmethod
+    def normalize_frontend_url(cls, value: object) -> object:
+        if isinstance(value, str) and value.strip():
+            return _strip_trailing_slash_url(value)
+        return value
+
     auto_apply_headless: bool = False
     auto_apply_state_dir: str = "data/browser_state"
     auto_apply_default_phone: str = ""
@@ -61,7 +81,7 @@ class Settings(BaseSettings):
 
     @property
     def cors_origin_list(self) -> list[str]:
-        return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+        return [o for o in (x.strip() for x in self.cors_origins.split(",")) if o]
 
 
 @lru_cache

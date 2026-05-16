@@ -1,9 +1,9 @@
 # Railway service: TWIN Celery beat (scheduled scrape every 2 min)
+# Settings → Root directory: backend (same as API).
 
 [build]
 builder = "DOCKERFILE"
-dockerfilePath = "backend/Dockerfile"
-dockerContext = "backend"
+dockerfilePath = "Dockerfile"
 watchPatterns = ["backend/**"]
 
 [deploy]

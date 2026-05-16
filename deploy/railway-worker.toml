@@ -1,10 +1,9 @@
 # Railway service: TWIN Celery worker (scraping + background jobs)
-# Same repo; root directory: repo root; config: deploy/railway-worker.toml
+# Settings → Root directory: backend (same as API). Config: deploy/railway-worker.toml
 
 [build]
 builder = "DOCKERFILE"
-dockerfilePath = "backend/Dockerfile"
-dockerContext = "backend"
+dockerfilePath = "Dockerfile"
 watchPatterns = ["backend/**"]
 
 [deploy]

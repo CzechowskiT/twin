@@ -24,6 +24,7 @@ Jeśli brak commitów lokalnych — najpierw `git pull` albo użyj skryptu `./sc
 2. **PostgreSQL** (+ New → Database).
 3. **Redis** (+ New → Database).
 4. **API** — drugi serwis z tego samego repo:
+   - Settings → **Root directory:** `backend` (monorepo — Railway buduje z folderu `backend`, inaczej `requirements.txt` nie trafia do kontekstu Dockera).
    - Settings → **Config file path:** `deploy/railway-api.toml`
    - **Variables** (RAW lub pojedynczo):
 
@@ -44,8 +45,8 @@ Jeśli brak commitów lokalnych — najpierw `git pull` albo użyj skryptu `./sc
 | `AUTO_APPLY_HEADLESS` | `true` (na serwerze bez monitora) |
 
 5. **Networking** → Generate Domain → skopiuj URL API.
-6. **Worker** — trzeci serwis, config: `deploy/railway-worker.toml` — **te same** zmienne co API (bez `FRONTEND_URL` można, ale API_URL nie jest wymagane dla workera).
-7. **Beat** — czwarty serwis, config: `deploy/railway-beat.toml` — `CELERY_*` + ewentualnie reszta jak worker.
+6. **Worker** — trzeci serwis, **Root directory:** `backend`, config: `deploy/railway-worker.toml` — **te same** zmienne co API (bez `FRONTEND_URL` można, ale API_URL nie jest wymagane dla workera).
+7. **Beat** — czwarty serwis, **Root directory:** `backend`, config: `deploy/railway-beat.toml` — `CELERY_*` + ewentualnie reszta jak worker.
 
 **Test:** `https://<API>/api/v1/health` → `{"status":"ok"}` (lub podobnie).
 

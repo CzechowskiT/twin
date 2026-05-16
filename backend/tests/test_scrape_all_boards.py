@@ -77,7 +77,6 @@ def test_scrape_all_boards_task_persists_and_returns_summary() -> None:
     mock_db.close.assert_called_once()
 
 
-def test_celery_beat_schedules_scrape_all_every_120_seconds() -> None:
-    entry = celery_app.conf.beat_schedule["scrape-all-boards-every-120s"]
-    assert entry["task"] == "app.tasks.scrape_tasks.scrape_all_boards_task"
-    assert entry["schedule"] == 120
+def test_celery_beat_has_no_scheduled_scrapes() -> None:
+    """Periodic scrapes disabled — use manual scrape from UI or API."""
+    assert celery_app.conf.beat_schedule == {}
