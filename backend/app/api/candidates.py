@@ -2,7 +2,7 @@
 
 import json
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
@@ -163,8 +163,8 @@ def remove_cv(
 
 @router.get("/me/matches", response_model=JobMatchListOut)
 def get_my_matches(
-    limit: int = 10,
-    min_score: float = 40.0,
+    limit: int = Query(10, ge=1, le=400),
+    min_score: float = Query(40.0, ge=0, le=100),
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> JobMatchListOut:

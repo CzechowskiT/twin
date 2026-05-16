@@ -4,28 +4,37 @@ from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from dataclasses import dataclass
 
-from app.scrapers import linkedin, pracuj, rocketjobs
+from app.scrapers import justjoin, linkedin, praca, pracuj, rocketjobs
 from app.scrapers.base import ScrapedJob
 from app.scrapers.global_boards import GLOBAL_BOARD_SPECS, scrape_global_board
 
 ScrapeFn = Callable[[], list[ScrapedJob]]
 
 
+def _registry_limit() -> int:
+    from app.config import get_settings
+
+    return max(12, min(150, get_settings().scrape_jobs_per_board))
+
+
 def _wrap_global(board_id: str) -> ScrapeFn:
     def _run() -> list[ScrapedJob]:
-        return scrape_global_board(board_id, limit=20)
+        return scrape_global_board(board_id, limit=_registry_limit())
 
     return _run
 
 
-# Poland-focused boards (existing)
+# Poland-focused boards (Playwright / HTML)
 LOCAL_SCRAPERS: dict[str, ScrapeFn] = {
-    "pracuj": lambda: pracuj.scrape_pracuj(limit=20),
-    "pracuj-sales": lambda: pracuj.scrape_pracuj_sales(limit=25),
-    "rocketjobs": lambda: rocketjobs.scrape_rocketjobs(limit=20),
-    "rocketjobs-sales": lambda: rocketjobs.scrape_rocketjobs_sales(limit=20),
-    "linkedin": lambda: linkedin.scrape_linkedin(limit=20),
-    "linkedin-sales": lambda: linkedin.scrape_linkedin_sales(limit=20),
+    "pracuj": lambda: pracuj.scrape_pracuj(limit=_registry_limit()),
+    "pracuj-sales": lambda: pracuj.scrape_pracuj_sales(limit=_registry_limit()),
+    "rocketjobs": lambda: rocketjobs.scrape_rocketjobs(limit=_registry_limit()),
+    "rocketjobs-sales": lambda: rocketjobs.scrape_rocketjobs_sales(limit=_registry_limit()),
+    "rocketjobs-roles": lambda: rocketjobs.scrape_rocketjobs_roles(limit=_registry_limit()),
+    "justjoin": lambda: justjoin.scrape_justjoin(limit=_registry_limit()),
+    "praca": lambda: praca.scrape_praca(limit=_registry_limit()),
+    "linkedin": lambda: linkedin.scrape_linkedin(limit=_registry_limit()),
+    "linkedin-sales": lambda: linkedin.scrape_linkedin_sales(limit=_registry_limit()),
 }
 
 GLOBAL_SCRAPERS: dict[str, ScrapeFn] = {
@@ -35,6 +44,31 @@ GLOBAL_SCRAPERS: dict[str, ScrapeFn] = {
 SCRAPE_REGISTRY: dict[str, ScrapeFn] = {**LOCAL_SCRAPERS, **GLOBAL_SCRAPERS}
 
 DEFAULT_BOARD_TIMEOUT_SEC = 120
+
+# Scrape-all order: PL sources first, then LinkedIn, then globals (Indeed, Glassdoor, StepStone, …).
+PRIORITY_BOARD_ORDER: tuple[str, ...] = (
+    "pracuj",
+    "pracuj-sales",
+    "rocketjobs",
+    "rocketjobs-sales",
+    "rocketjobs-roles",
+    "justjoin",
+    "praca",
+    "linkedin",
+    "linkedin-sales",
+)
+
+BOARD_LABELS: dict[str, tuple[str, str]] = {
+    "pracuj": ("pracuj.pl", "poland"),
+    "pracuj-sales": ("pracuj.pl (wide roles)", "poland"),
+    "rocketjobs": ("rocketjobs.pl", "poland"),
+    "rocketjobs-sales": ("rocketjobs.pl (sales)", "poland"),
+    "rocketjobs-roles": ("rocketjobs.pl (multi-role)", "poland"),
+    "justjoin": ("justjoin.it", "poland"),
+    "praca": ("praca.pl", "poland"),
+    "linkedin": ("LinkedIn", "global"),
+    "linkedin-sales": ("LinkedIn (sales)", "global"),
+}
 
 
 def scrape_allowlist_board_ids() -> frozenset[str] | None:
@@ -52,10 +86,14 @@ def scrape_allowlist_board_ids() -> frozenset[str] | None:
 
 def scrape_board_ids_ordered() -> list[str]:
     allow = scrape_allowlist_board_ids()
-    ordered = sorted(SCRAPE_REGISTRY.keys())
+    all_ids = sorted(SCRAPE_REGISTRY.keys())
+    priority = [b for b in PRIORITY_BOARD_ORDER if b in SCRAPE_REGISTRY]
+    tail = [b for b in all_ids if b not in priority]
+    ordered = priority + tail
     if allow is None:
         return ordered
-    return [bid for bid in ordered if bid in allow]
+    return [b for b in ordered if b in allow]
+
 
 # Display order for dashboard / API (geographical regions, tight grouping).
 REGION_ORDER: tuple[str, ...] = (
@@ -92,23 +130,20 @@ class BoardScrapeOutcome:
 
 def list_boards() -> list[dict[str, str]]:
     """Metadata for API / dashboard, grouped by geographical region."""
-    allow = scrape_allowlist_board_ids()
-    boards: list[dict[str, str]] = [
-        {"id": "pracuj-sales", "label": "pracuj.pl", "region": "poland"},
-        {"id": "rocketjobs-sales", "label": "rocketjobs.pl", "region": "poland"},
-        {"id": "linkedin", "label": "LinkedIn", "region": "global"},
-    ]
-    for spec in GLOBAL_BOARD_SPECS.values():
-        boards.append(
-            {
-                "id": spec.board_id,
-                "label": spec.label,
-                "region": region_slug(spec.region),
-            }
-        )
-
-    if allow is not None:
-        boards = [b for b in boards if b["id"] in allow]
+    boards: list[dict[str, str]] = []
+    for board_id in scrape_board_ids_ordered():
+        if board_id in GLOBAL_BOARD_SPECS:
+            spec = GLOBAL_BOARD_SPECS[board_id]
+            boards.append(
+                {
+                    "id": board_id,
+                    "label": spec.label,
+                    "region": region_slug(spec.region),
+                }
+            )
+        else:
+            label, region = BOARD_LABELS.get(board_id, (board_id.replace("-", " ").title(), "global"))
+            boards.append({"id": board_id, "label": label, "region": region})
 
     def sort_key(item: dict[str, str]) -> tuple[int, str]:
         try:

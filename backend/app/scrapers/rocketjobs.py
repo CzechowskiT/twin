@@ -23,6 +23,47 @@ def scrape_rocketjobs_sales(limit: int = 20) -> list[ScrapedJob]:
     return scrape_rocketjobs(keyword="sales", limit=limit)
 
 
+ROLE_SEARCH_TERMS: tuple[str, ...] = (
+    "python",
+    "java",
+    "javascript",
+    "devops",
+    "data",
+    "product",
+    "project-manager",
+    "marketing",
+    "sprzedaz",
+    "hr",
+    "frontend",
+    "backend",
+    "go",
+    "rust",
+    "designer",
+    "finanse",
+)
+
+
+def scrape_rocketjobs_roles(limit: int = 50) -> list[ScrapedJob]:
+    """Scrape many role families from RocketJobs.pl (one merged feed)."""
+    results: list[ScrapedJob] = []
+    seen: set[str] = set()
+    for term in ROLE_SEARCH_TERMS:
+        if len(results) >= limit:
+            break
+        cap = min(40, max(8, limit - len(results)))
+        html = _fetch_search_html(term)
+        for job in _parse_listing_html(html, cap):
+            if job.external_id in seen:
+                continue
+            if not validate_job(job):
+                continue
+            seen.add(job.external_id)
+            results.append(job)
+            if len(results) >= limit:
+                break
+    return results
+
+
 def scrape_rocketjobs(keyword: str = "python", limit: int = 20) -> list[ScrapedJob]:
     """Scrape listings from RocketJobs.pl search results."""
     terms = KEYWORD_EXPANSIONS.get(keyword.strip().lower(), [keyword])

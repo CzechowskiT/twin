@@ -65,7 +65,14 @@ def test_list_boards_includes_all_global_specs() -> None:
     boards = list_boards()
     global_ids = {b["id"] for b in boards if b["region"] != "poland"}
     assert set(GLOBAL_BOARD_SPECS).issubset(global_ids)
-    assert {b["region"] for b in boards if b["id"] in ("pracuj-sales", "rocketjobs-sales")} == {"poland"}
+    poland_ids = {b["id"] for b in boards if b["region"] == "poland"}
+    assert {
+        "pracuj-sales",
+        "rocketjobs-sales",
+        "justjoin",
+        "praca",
+        "rocketjobs-roles",
+    }.issubset(poland_ids)
 
 
 def test_list_boards_sorted_by_region() -> None:

@@ -176,7 +176,7 @@ const en = {
     twinScrapePanelTitle: "Bring listings into TWIN",
     twinForYourJob: "Twin for your job",
     twinForYourJobHint:
-      "Runs every board allowed by SCRAPE_ENABLED_BOARD_IDS on the API (or all boards if unset). This button uses synchronous mode (waits for the API). For demos, set a short allowlist on Railway to finish quickly; full sweeps should use async Celery workers (sync=false) from automation.",
+      "Runs the full TWIN board registry (Poland: pracuj.pl, rocketjobs.pl, justjoin.it, praca.pl; then LinkedIn; then global boards such as Indeed, Glassdoor, StepStone, Reed, SEEK, …). Respect SCRAPE_ENABLED_BOARD_IDS on the API to trim the list. Sync mode waits for the API — use a short allowlist on demos.",
     twinForYourJobRunning: "Running Twin for your job…",
     roadmapSummary: "Target job boards & company career sites (roadmap)",
     roadmapPortalsTitle: "50 global job boards",
@@ -203,6 +203,12 @@ const en = {
     statPipelineTitle: "Pipeline",
     statPipelineCta: "Open tracker",
     statPipelineHint: "Save or apply on a job to populate your pipeline.",
+    applyPromptTitle: "Ready for the next move?",
+    applyPromptLead:
+      "Fresh listings are in — your best matches are sorted above. Want a nudge when a top role looks apply-ready?",
+    applyPromptYes: "Yes, nudge me",
+    applyPromptNo: "Not now",
+    applyPromptLater: "Later",
   },
   login: {
     title: "Log in",
@@ -522,7 +528,7 @@ const pl: MessageTree = {
     twinScrapePanelTitle: "Wciągnij oferty do TWIN",
     twinForYourJob: "Twin for your job",
     twinForYourJobHint:
-      "Uruchamia wszystkie portale z listy SCRAPE_ENABLED_BOARD_IDS na API (albo wszystkie z rejestru, jeśli zmienna jest pusta). Ten przycisk używa trybu synchronicznego (czeka na zakończenie). Na demo ustaw krótszą listę na Railway, żeby skończyć w rozsądnym czasie; pełne skany lepiej w kolejce Celery (sync=false).",
+      "Uruchamia pełny rejestr TWIN (PL: pracuj.pl, rocketjobs.pl, justjoin.it, praca.pl; potem LinkedIn; potem globalnie: Indeed, Glassdoor, StepStone, Reed, SEEK itd.). Lista może być przycięta przez SCRAPE_ENABLED_BOARD_IDS na API. Tryb synchroniczny czeka na API — na demo ustaw krótką listę.",
     twinForYourJobRunning: "Twin for your job — trwa…",
     roadmapSummary: "Docelowe portale i kariery firm (roadmapa)",
     roadmapPortalsTitle: "50 globalnych portali pracy",
@@ -549,6 +555,12 @@ const pl: MessageTree = {
     statPipelineTitle: "Pipeline",
     statPipelineCta: "Otwórz tracker",
     statPipelineHint: "Zapisz lub aplikuj przy ofercie, by zbudować pipeline.",
+    applyPromptTitle: "Co robimy dalej?",
+    applyPromptLead:
+      "Świeże oferty są w bazie — najlepsze dopasowania masz wyżej. Mam przypominać, gdy wierzch listy wygląda na gotowy do aplikacji?",
+    applyPromptYes: "Tak, przypominaj",
+    applyPromptNo: "Nie teraz",
+    applyPromptLater: "Później",
   },
   login: {
     title: "Zaloguj się",

@@ -43,7 +43,13 @@ def find_top_matches(
 ) -> list[dict[str, Any]]:
     """Return best matching jobs for a candidate, optionally saved to job_matches."""
     cand = candidate_to_dict(candidate)
-    jobs = db.query(Job).filter(Job.is_validated.is_(True)).all()
+    jobs = (
+        db.query(Job)
+        .filter(Job.is_validated.is_(True))
+        .order_by(Job.scraped_at.desc())
+        .limit(4000)
+        .all()
+    )
     scored: list[tuple[float, Job]] = []
 
     for job in jobs:

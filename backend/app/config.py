@@ -64,6 +64,8 @@ class Settings(BaseSettings):
 
     # Comma-separated board ids matching scraper registry (empty = all). Controls scrape-all + /jobs/boards list.
     scrape_enabled_board_ids: str = ""
+    # Per-board fetch cap for Twin scrape-all (each adapter respects this upper bound).
+    scrape_jobs_per_board: int = 48
     intro_audio_upload_dir: str = "data/intro_audio"
     intro_audio_max_bytes: int = 15 * 1024 * 1024
 

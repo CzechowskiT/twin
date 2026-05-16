@@ -62,13 +62,14 @@ export default function DashboardPage() {
   const [scraping, setScraping] = useState(false);
   const [autoApplyingId, setAutoApplyingId] = useState<number | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [showApplyPrompt, setShowApplyPrompt] = useState(false);
 
   const loadJobs = useCallback(async (token: string, activeFilters: JobFilters) => {
     return apiFetch<JobList>(`/api/v1/jobs/${buildJobsQuery(activeFilters)}`, {}, token);
   }, []);
 
   const loadMatches = useCallback(async (token: string) => {
-    return apiFetch<MatchList>("/api/v1/candidates/me/matches?limit=15&min_score=28", {}, token);
+    return apiFetch<MatchList>("/api/v1/candidates/me/matches?limit=220&min_score=18", {}, token);
   }, []);
 
   const loadApplications = useCallback(async (token: string) => {
@@ -281,6 +282,12 @@ export default function DashboardPage() {
       );
       await refreshDashboardData(token, profile !== null && profile !== undefined, filters);
       alert(result.message || t("dashboard.scrapeFinished"));
+      if (profile !== null && profile !== undefined) {
+        setShowApplyPrompt(true);
+        queueMicrotask(() => {
+          document.getElementById("dashboard-matches")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : t("dashboard.scrapeFailed"));
     } finally {
@@ -388,6 +395,39 @@ export default function DashboardPage() {
 
       {hasProfile && (matches?.items.length ?? 0) > 0 && (
         <Card id="dashboard-matches" variant="soft">
+          {showApplyPrompt && visibleMatches.length > 0 ? (
+            <div className="mb-4 rounded-xl border border-[var(--twin-border)] bg-[var(--twin-accent-muted)]/80 p-4 shadow-sm">
+              <p className="text-sm font-semibold text-[var(--twin-accent-hover)]">{t("dashboard.applyPromptTitle")}</p>
+              <p className="twin-muted mt-2 text-sm leading-relaxed">{t("dashboard.applyPromptLead")}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  className="twin-btn-solid twin-touch-target !min-h-[2.5rem] px-4 text-sm"
+                  onClick={() => {
+                    setShowApplyPrompt(false);
+                    const first = visibleMatches[0];
+                    if (first) window.open(first.url, "_blank", "noopener,noreferrer");
+                  }}
+                >
+                  {t("dashboard.applyPromptYes")}
+                </button>
+                <button
+                  type="button"
+                  className="twin-btn-secondary twin-touch-target !min-h-[2.5rem] px-4 text-sm"
+                  onClick={() => setShowApplyPrompt(false)}
+                >
+                  {t("dashboard.applyPromptNo")}
+                </button>
+                <button
+                  type="button"
+                  className="twin-touch-target rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-4 py-2 text-sm font-medium text-[var(--twin-muted-strong)]"
+                  onClick={() => setShowApplyPrompt(false)}
+                >
+                  {t("dashboard.applyPromptLater")}
+                </button>
+              </div>
+            </div>
+          ) : null}
           <h2 className="twin-section-title mb-4">
             {t("dashboard.topMatches")} ({matches?.total ?? 0})
           </h2>

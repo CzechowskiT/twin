@@ -19,10 +19,13 @@ from app.scrapers.registry import GLOBAL_BOARD_SPECS, list_boards
 from app.tasks.scrape_tasks import (
     scrape_all_boards_task,
     scrape_global_board_task,
+    scrape_justjoin_task,
     scrape_linkedin_sales_task,
     scrape_linkedin_task,
+    scrape_praca_task,
     scrape_pracuj_sales_task,
     scrape_pracuj_task,
+    scrape_rocketjobs_roles_task,
     scrape_rocketjobs_sales_task,
     scrape_rocketjobs_task,
 )
@@ -34,6 +37,9 @@ LOCAL_SCRAPE_HANDLERS = {
     "rocketjobs": scrape_rocketjobs_task,
     "pracuj-sales": scrape_pracuj_sales_task,
     "rocketjobs-sales": scrape_rocketjobs_sales_task,
+    "rocketjobs-roles": scrape_rocketjobs_roles_task,
+    "justjoin": scrape_justjoin_task,
+    "praca": scrape_praca_task,
     "linkedin": scrape_linkedin_task,
     "linkedin-sales": scrape_linkedin_sales_task,
 }
