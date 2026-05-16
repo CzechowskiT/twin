@@ -9,35 +9,35 @@ export function LandingHero() {
   return (
     <section className="mx-auto flex w-full max-w-6xl flex-col px-4 pb-20 pt-16 sm:px-6 sm:pb-28 sm:pt-20 md:min-h-[min(82vh,56rem)] md:pb-36 md:pt-28">
       <ScrollReveal>
-        <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-zinc-500 sm:text-[11px]">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-[var(--twin-muted)] sm:text-[11px]">
           {t("home.tagline")}
         </p>
         <h1 className="marketing-gradient-heading mt-6 max-w-4xl text-[2.35rem] font-semibold leading-[1.06] tracking-[-0.04em] sm:mt-8 sm:text-5xl sm:leading-[1.04] md:text-6xl md:leading-[1.02]">
           {t("home.title")}
         </h1>
-        <p className="mt-8 max-w-2xl text-base leading-relaxed text-zinc-400 sm:mt-10 sm:text-lg sm:leading-relaxed">
+        <p className="mt-8 max-w-2xl text-base leading-relaxed text-[var(--twin-muted)] sm:mt-10 sm:text-lg sm:leading-relaxed">
           {t("home.description")}
         </p>
-            <div className="mt-12 flex flex-col gap-3 sm:mt-14 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
-              <Link
-                href="/dashboard"
-                className="twin-touch-target inline-flex min-h-[3rem] items-center justify-center rounded-full border border-white/[0.18] bg-gradient-to-b from-white/[0.12] to-white/[0.04] px-9 text-center text-[15px] font-bold tracking-tight text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.12)] backdrop-blur-md transition duration-200 hover:border-sky-400/40 hover:from-white/[0.16] active:scale-[0.98]"
-              >
-                {t("home.twinForYourJob")}
-              </Link>
-              <Link
-                href="/register"
-                className="marketing-btn-primary-shadow twin-touch-target inline-flex min-h-[3rem] items-center justify-center rounded-full bg-white px-9 text-center text-[15px] font-semibold text-zinc-950 transition duration-200 hover:bg-zinc-100 active:scale-[0.98]"
-              >
-                {t("home.getStarted")}
-              </Link>
-              <Link
-                href="/login"
-                className="twin-touch-target inline-flex min-h-[3rem] items-center justify-center rounded-full border border-white/[0.12] bg-white/[0.03] px-9 text-center text-[15px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.06)] backdrop-blur-md transition duration-200 hover:border-white/25 hover:bg-white/[0.07] active:scale-[0.98]"
-              >
-                {t("home.logIn")}
-              </Link>
-            </div>
+        <div className="mt-12 flex flex-col gap-3 sm:mt-14 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+          <Link
+            href="/dashboard"
+            className="twin-touch-target inline-flex min-h-[3rem] items-center justify-center rounded-full bg-[var(--twin-accent)] px-9 text-center text-[15px] font-bold tracking-tight text-white shadow-[var(--twin-shadow-md)] transition duration-200 hover:bg-[var(--twin-accent-hover)] active:scale-[0.98]"
+          >
+            {t("home.twinForYourJob")}
+          </Link>
+          <Link
+            href="/register"
+            className="marketing-btn-primary-shadow twin-touch-target inline-flex min-h-[3rem] items-center justify-center rounded-full bg-[var(--twin-cta)] px-9 text-center text-[15px] font-semibold text-white transition duration-200 hover:bg-[var(--twin-cta-hover)] active:scale-[0.98]"
+          >
+            {t("home.getStarted")}
+          </Link>
+          <Link
+            href="/login"
+            className="twin-touch-target inline-flex min-h-[3rem] items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-9 text-center text-[15px] font-semibold text-[var(--twin-muted-strong)] shadow-sm transition duration-200 hover:border-teal-300 hover:bg-[var(--twin-accent-muted)] active:scale-[0.98]"
+          >
+            {t("home.logIn")}
+          </Link>
+        </div>
       </ScrollReveal>
     </section>
   );

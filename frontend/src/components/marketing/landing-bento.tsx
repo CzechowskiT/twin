@@ -21,12 +21,12 @@ function FeatureCard({
   return (
     <ScrollReveal delayMs={delayMs} className={`h-full ${className}`}>
       <BentoSpotlight className="flex h-full flex-col p-6 sm:p-7">
-        <span className="font-mono text-[11px] font-medium uppercase tracking-widest text-zinc-500 transition group-hover/spot:text-zinc-400">
+        <span className="font-mono text-[11px] font-medium uppercase tracking-widest text-[var(--twin-muted)] transition group-hover/spot:text-[var(--twin-accent)]">
           {step}
         </span>
-        <h3 className="mt-4 text-lg font-semibold tracking-[-0.02em] text-white sm:text-xl">{title}</h3>
-        <p className="mt-3 flex-1 text-sm leading-relaxed text-zinc-400 sm:text-[15px]">{body}</p>
-        <div className="mt-8 h-px w-12 bg-gradient-to-r from-sky-400/90 to-violet-500/70" />
+        <h3 className="mt-4 text-lg font-semibold tracking-[-0.02em] text-[var(--foreground)] sm:text-xl">{title}</h3>
+        <p className="mt-3 flex-1 text-sm leading-relaxed text-[var(--twin-muted)] sm:text-[15px]">{body}</p>
+        <div className="mt-8 h-px w-12 bg-gradient-to-r from-teal-500/90 to-amber-500/80" />
       </BentoSpotlight>
     </ScrollReveal>
   );
@@ -41,14 +41,14 @@ export function LandingBento() {
   ];
 
   return (
-    <section className="border-t border-white/[0.06] bg-gradient-to-b from-black/20 to-transparent py-24 sm:py-28 md:py-32">
+    <section className="border-t border-[var(--twin-border)] bg-gradient-to-b from-teal-50/40 via-transparent to-transparent py-24 sm:py-28 md:py-32">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <ScrollReveal delayMs={40}>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-zinc-500">TWIN</p>
-          <h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-[-0.03em] text-white sm:text-4xl">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-muted)]">TWIN</p>
+          <h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-4xl">
             {t("home.featuresTitle")}
           </h2>
-          <p className="mt-4 max-w-xl text-sm leading-relaxed text-zinc-500 sm:text-base">
+          <p className="mt-4 max-w-xl text-sm leading-relaxed text-[var(--twin-muted)] sm:text-base">
             {t("home.featuresSubtitle")}
           </p>
         </ScrollReveal>
@@ -57,15 +57,15 @@ export function LandingBento() {
           <ScrollReveal delayMs={60} className="md:col-span-8 md:row-span-2">
             <BentoSpotlight className="flex h-full min-h-[280px] flex-col p-6 sm:min-h-[320px] sm:p-8">
               <div className="flex items-center justify-between gap-3">
-                <p className="text-xs font-medium uppercase tracking-widest text-zinc-500">{t("home.scrape")}</p>
-                <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-0.5 font-mono text-[10px] text-zinc-400">
+                <p className="text-xs font-medium uppercase tracking-widest text-[var(--twin-muted)]">{t("home.scrape")}</p>
+                <span className="rounded-full border border-teal-200/80 bg-teal-50 px-2.5 py-0.5 font-mono text-[10px] text-teal-800">
                   MVP
                 </span>
               </div>
               <div className="mt-8 flex-1">
                 <PipelinePreview />
               </div>
-              <p className="mt-6 text-xs leading-relaxed text-zinc-500">{t("home.footerHint")}</p>
+              <p className="mt-6 text-xs leading-relaxed text-[var(--twin-muted)]">{t("home.footerHint")}</p>
             </BentoSpotlight>
           </ScrollReveal>
 

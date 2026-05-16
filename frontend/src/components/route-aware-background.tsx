@@ -1,14 +1,8 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { FuturisticBackground } from "@/components/futuristic-background";
-import { LandingBackground } from "@/components/landing-background";
 
-/** Light mesh for app routes; full-viewport dark mesh on the marketing home page. */
+/** Unified calm background on every route (hope / growth greens + trust teal + warm light). */
 export function RouteAwareBackground() {
-  const pathname = usePathname();
-  if (pathname === "/") {
-    return <LandingBackground fixed />;
-  }
   return <FuturisticBackground />;
 }

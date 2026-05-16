@@ -1,31 +1,34 @@
 @import "tailwindcss";
 
-/* Pracuj.pl–inspired: light-first job board UI */
+/*
+ * Palette (research-led): soft green-tinted canvas = hope & growth; teal primary = trust & career
+ * success; warm amber CTA = optimism & pleasure. One system for marketing + app.
+ */
 :root {
   color-scheme: light;
-  --background: #f2f2f2;
-  --foreground: #1a1a1a;
-  --twin-muted: #5c5c5c;
-  --twin-muted-strong: #333333;
-  --twin-accent: #0066cc;
-  --twin-accent-hover: #0052a3;
-  --twin-accent-muted: #e8f2fc;
-  --twin-accent-soft: #d4e8f9;
-  --twin-cta: #e35205;
-  --twin-cta-hover: #c44704;
-  --twin-link: #0066cc;
-  --twin-link-hover: #004d99;
+  --background: #f2f8f5;
+  --foreground: #0f172a;
+  --twin-muted: #4b5563;
+  --twin-muted-strong: #1e293b;
+  --twin-accent: #0d9488;
+  --twin-accent-hover: #0f766e;
+  --twin-accent-muted: #ccfbf1;
+  --twin-accent-soft: #99f6e4;
+  --twin-cta: #d97706;
+  --twin-cta-hover: #b45309;
+  --twin-link: #0f766e;
+  --twin-link-hover: #115e59;
   --twin-card: #ffffff;
   --twin-card-solid: #ffffff;
-  --twin-surface: #eceef1;
-  --twin-surface-raised: #f7f8fa;
-  --twin-border: #d8dce3;
+  --twin-surface: #e6f4ef;
+  --twin-surface-raised: #f8fcfa;
+  --twin-border: #c5e4d8;
   --twin-input-bg: #ffffff;
-  --twin-header-bg: #ffffff;
-  --twin-header-stripe: #0066cc;
-  --twin-shadow: 0 1px 3px rgb(15 35 60 / 0.07);
-  --twin-shadow-md: 0 4px 14px rgb(15 35 60 / 0.1);
-  --twin-shadow-lg: 0 8px 28px rgb(15 35 60 / 0.12);
+  --twin-header-bg: rgba(255, 255, 255, 0.92);
+  --twin-header-stripe: #0d9488;
+  --twin-shadow: 0 1px 3px rgb(15 118 110 / 0.06);
+  --twin-shadow-md: 0 4px 14px rgb(15 118 110 / 0.08);
+  --twin-shadow-lg: 0 8px 28px rgb(15 118 110 / 0.1);
   --twin-page-x: clamp(1rem, 3vw, 2rem);
   --twin-page-y: clamp(1rem, 3vw, 1.75rem);
   --twin-max-width: 80rem;
@@ -120,17 +123,17 @@ body {
 .twin-bg-base {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, #e9eef3 0%, var(--background) 28%, var(--background) 100%);
+  background: linear-gradient(180deg, #e8f5f0 0%, var(--background) 32%, var(--background) 100%);
 }
 
 .twin-bg-mesh {
   position: absolute;
   inset: 0;
-  opacity: 0.9;
+  opacity: 0.95;
   background:
-    radial-gradient(ellipse 70% 45% at 8% -5%, rgb(0 102 204 / 0.14), transparent 55%),
-    radial-gradient(ellipse 55% 40% at 92% 12%, rgb(227 82 5 / 0.07), transparent 50%),
-    radial-gradient(ellipse 50% 35% at 50% 100%, rgb(0 102 204 / 0.08), transparent 55%);
+    radial-gradient(ellipse 72% 48% at 10% -8%, rgb(13 148 136 / 0.14), transparent 55%),
+    radial-gradient(ellipse 58% 42% at 90% 10%, rgb(217 119 6 / 0.09), transparent 52%),
+    radial-gradient(ellipse 52% 38% at 48% 100%, rgb(20 184 166 / 0.1), transparent 55%);
 }
 
 .twin-bg-band {
@@ -141,8 +144,8 @@ body {
   height: min(220px, 28vh);
   background: linear-gradient(
     180deg,
-    rgb(0 102 204 / 0.12) 0%,
-    rgb(0 102 204 / 0.04) 45%,
+    rgb(13 148 136 / 0.12) 0%,
+    rgb(13 148 136 / 0.04) 48%,
     transparent 100%
   );
   pointer-events: none;
@@ -153,11 +156,11 @@ body {
   padding-block: clamp(2rem, 5vw, 3.5rem);
   background: linear-gradient(
     135deg,
-    rgb(0 102 204 / 0.1) 0%,
-    rgb(232 242 252 / 0.85) 42%,
+    rgb(204 251 241 / 0.65) 0%,
+    rgb(255 251 235 / 0.55) 48%,
     transparent 100%
   );
-  border-bottom: 1px solid rgb(0 102 204 / 0.12);
+  border-bottom: 1px solid rgb(13 148 136 / 0.14);
 }
 
 .twin-hero-band--bleed {
@@ -299,13 +302,9 @@ body {
 }
 
 .twin-card-panel--accent {
-  border-color: rgb(0 102 204 / 0.2);
+  border-color: rgb(13 148 136 / 0.22);
   box-shadow: var(--twin-shadow-md);
-  background: linear-gradient(
-    145deg,
-    var(--twin-card) 0%,
-    var(--twin-accent-muted) 120%
-  );
+  background: linear-gradient(145deg, var(--twin-card) 0%, var(--twin-accent-muted) 115%);
 }
 
 .twin-card-inset {
@@ -370,11 +369,11 @@ body {
 }
 
 .twin-filter-box {
-  background: linear-gradient(180deg, var(--twin-accent-muted) 0%, rgb(232 242 252 / 0.65) 100%);
-  border: 1px solid rgb(0 102 204 / 0.18);
+  background: linear-gradient(180deg, var(--twin-accent-muted) 0%, rgb(255 251 235 / 0.45) 100%);
+  border: 1px solid rgb(13 148 136 / 0.2);
   border-radius: 0.5rem;
   padding: 0.875rem;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.65);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7);
 }
 
 .twin-dashboard-grid {
@@ -405,15 +404,9 @@ body {
   padding: 0.5rem 0.625rem;
 }
 
-/* —— Marketing landing (Linear / Vercel style) —— */
+/* —— Marketing (same palette as app: growth teal headline, soft depth on CTAs) —— */
 .marketing-gradient-heading {
-  background: linear-gradient(
-    135deg,
-    rgb(250 250 250) 0%,
-    rgb(212 212 216) 38%,
-    rgb(244 244 245) 58%,
-    rgb(161 161 170) 100%
-  );
+  background: linear-gradient(135deg, rgb(6 78 59) 0%, rgb(13 148 136) 42%, rgb(15 118 110) 72%, rgb(180 83 9) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -421,9 +414,9 @@ body {
 
 .marketing-btn-primary-shadow {
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.35),
-    0 0 0 1px rgb(255 255 255 / 0.08),
-    0 18px 48px -14px rgb(0 0 0 / 0.65);
+    inset 0 1px 0 rgb(255 255 255 / 0.55),
+    0 0 0 1px rgb(13 148 136 / 0.12),
+    0 14px 36px -12px rgb(13 148 136 / 0.28);
 }
 
 @keyframes marketing-marquee {
