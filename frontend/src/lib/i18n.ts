@@ -37,6 +37,9 @@ const en = {
     matchDesc: "Scored to your skills, seniority, and goals",
     track: "Track",
     trackDesc: "One workspace for search, saves, and applications",
+    featuresTitle: "From signal to pipeline",
+    featuresSubtitle: "A calm workspace that mirrors how you already think about the market — with automation arriving step by step.",
+    footerHint: "Create a profile after sign-up so matching can use your skills, titles, and goals.",
   },
   dashboard: {
     title: "Dashboard",
@@ -115,7 +118,7 @@ const en = {
     linkedInSetupCallbackProd: "Production API (NEXT_PUBLIC_API_URL on Vercel / Railway):",
     linkedInSetupCallbackLocal: "Local API (development):",
     linkedInSetupStep3:
-      "Set LINKEDIN_REDIRECT_URI to the same URL the browser returns to (production or local), put Client ID and Secret in API env, restart API.",
+      "On the API host (e.g. Railway), set LINKEDIN_CLIENT_ID, LINKEDIN_CLIENT_SECRET, and LINKEDIN_REDIRECT_URI to exactly the production callback URL above (or localhost for dev), then redeploy the API.",
     linkedInSetupDoc: "Full guide: docs/LINKEDIN_KONFIGURACJA_PL.md in the project folder.",
     errorLinkedinNotConfigured:
       "LinkedIn is not fully configured on the server (missing credentials or redirect URI). Use email or fix Railway env vars.",
@@ -125,7 +128,8 @@ const en = {
     oauthGithub: "Continue with GitHub",
     oauthApple: "Continue with Apple",
     oauthMicrosoft: "Continue with Microsoft",
-    oauthMicrosoftSoon: "Microsoft sign-in is not available yet (see API TODO).",
+    oauthMicrosoftSoon:
+      "Microsoft sign-in off — set MICROSOFT_CLIENT_ID, MICROSOFT_CLIENT_SECRET, MICROSOFT_REDIRECT_URI (and optional MICROSOFT_TENANT=common) on the API, then redeploy.",
   },
   forgotPassword: {
     title: "Reset password",
@@ -264,6 +268,10 @@ const pl: MessageTree = {
     matchDesc: "Ocena pod umiejętności, poziom i cele",
     track: "Śledź",
     trackDesc: "Jedna przestrzeń: wyszukiwanie, zapisane oferty, aplikacje",
+    featuresTitle: "Od sygnału do pipeline’u",
+    featuresSubtitle:
+      "Spokojna przestrzeń pracy zgodna z tym, jak już myślisz o rynku — automatyzacja dołącza etapami.",
+    footerHint: "Po rejestracji uzupełnij profil, żeby dopasowanie mogło uwzględnić umiejętności, stanowiska i cele.",
   },
   dashboard: {
     title: "Panel",
@@ -343,7 +351,7 @@ const pl: MessageTree = {
     linkedInSetupCallbackProd: "API produkcyjne (NEXT_PUBLIC_API_URL na Vercel / Railway):",
     linkedInSetupCallbackLocal: "API lokalne (development):",
     linkedInSetupStep3:
-      "Ustaw LINKEDIN_REDIRECT_URI na ten sam URL, na który wraca przeglądarka (prod lub lokalnie), wklej Client ID i Secret do zmiennych API, zrestartuj API.",
+      "Na hoście API (np. Railway) ustaw LINKEDIN_CLIENT_ID, LINKEDIN_CLIENT_SECRET i LINKEDIN_REDIRECT_URI dokładnie na adres callback powyżej (lub localhost w dev), potem redeploy API.",
     linkedInSetupDoc: "Instrukcja: docs/LINKEDIN_KONFIGURACJA_PL.md w folderze projektu.",
     errorLinkedinNotConfigured:
       "Logowanie przez LinkedIn jest niedostępne. Użyj formularza e-mail poniżej.",
@@ -353,7 +361,8 @@ const pl: MessageTree = {
     oauthGithub: "Kontynuuj z GitHub",
     oauthApple: "Kontynuuj z Apple",
     oauthMicrosoft: "Kontynuuj z Microsoft",
-    oauthMicrosoftSoon: "Logowanie Microsoft nie jest jeszcze dostępne (TODO po stronie API).",
+    oauthMicrosoftSoon:
+      "Logowanie Microsoft wyłączone — ustaw MICROSOFT_CLIENT_ID, MICROSOFT_CLIENT_SECRET, MICROSOFT_REDIRECT_URI (opcjonalnie MICROSOFT_TENANT=common) na API i zrób redeploy.",
   },
   forgotPassword: {
     title: "Reset hasła",

@@ -51,7 +51,12 @@ from app.services.linkedin_profile_sync import (
     ensure_candidate_from_linkedin,
     ensure_candidate_from_oauth_profile,
 )
-from app.services.microsoft_oauth import MicrosoftOAuthError
+from app.services.microsoft_oauth import (
+    MicrosoftOAuthError,
+    build_microsoft_authorize_url,
+    exchange_microsoft_code_for_profile,
+    is_microsoft_configured,
+)
 from app.services.oauth_state import create_oauth_state, verify_oauth_state
 from app.services.oauth_types import OAuthUserProfile
 from app.services.oauth_user import user_from_oauth
@@ -86,6 +91,8 @@ def _web_oauth_configured(provider: WebOAuthProvider) -> bool:
         return is_github_configured()
     if provider == WebOAuthProvider.apple:
         return is_apple_configured()
+    if provider == WebOAuthProvider.microsoft:
+        return is_microsoft_configured()
     return False
 
 
@@ -96,7 +103,9 @@ def _web_oauth_authorize_url(provider: WebOAuthProvider, state: str) -> str:
         return build_github_authorize_url(state)
     if provider == WebOAuthProvider.apple:
         return build_apple_authorize_url(state)
-    raise MicrosoftOAuthError("Microsoft login is not implemented yet")
+    if provider == WebOAuthProvider.microsoft:
+        return build_microsoft_authorize_url(state)
+    raise MicrosoftOAuthError("Unknown OAuth provider")
 
 
 def _web_oauth_exchange_profile(
@@ -108,7 +117,9 @@ def _web_oauth_exchange_profile(
         return exchange_github_code_for_profile(code)
     if provider == WebOAuthProvider.apple:
         return exchange_apple_code_for_profile(code, apple_user)
-    raise MicrosoftOAuthError("Microsoft login is not implemented yet")
+    if provider == WebOAuthProvider.microsoft:
+        return exchange_microsoft_code_for_profile(code)
+    raise MicrosoftOAuthError("Unknown OAuth provider")
 
 
 async def _read_web_oauth_callback(
@@ -199,8 +210,6 @@ def me(user: User = Depends(get_current_user)) -> UserOut:
 
 @router.get("/oauth/status")
 def oauth_status() -> dict[str, bool]:
-    from app.services.microsoft_oauth import is_microsoft_configured
-
     return {
         "linkedin": is_linkedin_oauth_configured(),
         "google": is_google_configured(),

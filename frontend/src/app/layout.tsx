@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { FuturisticBackground } from "@/components/futuristic-background";
+import { RouteAwareBackground } from "@/components/route-aware-background";
 import { Header } from "@/components/header";
 import { Providers } from "@/components/providers";
 import "./globals.css";
@@ -43,7 +43,7 @@ export default function RootLayout({
     >
       <body className="relative flex min-h-full min-h-[100dvh] flex-col text-[var(--foreground)]">
         <Providers>
-          <FuturisticBackground />
+          <RouteAwareBackground />
           <Header />
           <main className="relative z-0 flex-1 pb-[env(safe-area-inset-bottom,0)]">{children}</main>
         </Providers>

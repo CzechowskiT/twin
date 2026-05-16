@@ -89,6 +89,8 @@ class Settings(BaseSettings):
     microsoft_client_id: str = ""
     microsoft_client_secret: str = ""
     microsoft_redirect_uri: str = "http://localhost:8000/api/v1/auth/microsoft/callback"
+    # Entra tenant: common (work + personal), organizations (work only), or tenant GUID.
+    microsoft_tenant: str = "common"
 
     @field_validator("apple_private_key", mode="before")
     @classmethod
