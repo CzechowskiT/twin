@@ -81,9 +81,9 @@ sequenceDiagram
 
 ## 8. Other OAuth providers (Google, GitHub, Apple)
 
-Same server-side redirect flow: `GET /api/v1/auth/{google|github|apple|microsoft}/login` → provider → callback on the API → JWT → `FRONTEND_URL/auth/callback?token=…`.
+Same server-side redirect flow: `GET /api/v1/auth/{google|github|apple}/login` → provider → callback on the API → JWT → `FRONTEND_URL/auth/callback?token=…`.
 
-- **Status (all providers):** `GET /api/v1/auth/oauth/status` returns `{ linkedin, google, github, apple, microsoft }`.
+- **Status (all providers):** `GET /api/v1/auth/oauth/status` returns `{ linkedin, google, github, apple }`.
 - **Redirect URIs** (must match the corresponding `*_REDIRECT_URI` env var exactly):
 
 | Provider | Example redirect URL |
@@ -91,8 +91,7 @@ Same server-side redirect flow: `GET /api/v1/auth/{google|github|apple|microsoft
 | Google | `https://<api>/api/v1/auth/google/callback` |
 | GitHub | `https://<api>/api/v1/auth/github/callback` |
 | Apple | `https://<api>/api/v1/auth/apple/callback` (web uses `response_mode=form_post`; callback is **POST**) |
-| Microsoft | `https://<api>/api/v1/auth/microsoft/callback` — Entra multitenant (`MICROSOFT_TENANT=common` default); app needs delegated `User.Read` + sign-in. |
 
 Account linking uses the `oauth_accounts` table (migration `005_oauth_accounts`). Same email across providers maps to one user; `gdpr_consent_at` is set when linking or creating via OAuth.
 
-Environment variables: see `/.env.example` (`GOOGLE_*`, `GITHUB_*`, `APPLE_*`, `MICROSOFT_*`, optional `MICROSOFT_TENANT`).
+Environment variables: see `/.env.example` (`GOOGLE_*`, `GITHUB_*`, `APPLE_*`).

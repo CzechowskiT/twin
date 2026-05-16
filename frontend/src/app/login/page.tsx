@@ -31,7 +31,6 @@ function LoginPageContent() {
           google: false,
           github: false,
           apple: false,
-          microsoft: false,
         }),
       );
   }, []);
@@ -97,8 +96,6 @@ function LoginPageContent() {
                 google: t("login.oauthGoogle"),
                 github: t("login.oauthGithub"),
                 apple: t("login.oauthApple"),
-                microsoft: t("login.oauthMicrosoft"),
-                microsoftSoon: t("login.oauthMicrosoftSoon"),
               }}
             />
             {!oauthStatus.linkedin && <LinkedInSetupHint />}

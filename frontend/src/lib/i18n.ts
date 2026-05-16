@@ -65,6 +65,8 @@ const en = {
     topMatches: "Top matches",
     jobs: "Jobs",
     noJobs: "No jobs yet — run Auto scrap above (if enabled) or ask an admin to seed listings.",
+    noJobsNoScrapeUi:
+      "No jobs in the database yet. Listings show up after data is scraped on the server (admin / backend) or imported. Your profile is for ranking and filters once jobs exist — it does not crawl the web by itself.",
     noJobsFiltered: "No jobs match these filters.",
     filterSearch: "Search",
     filterSearchPlaceholder: "Title, company, keywords…",
@@ -127,9 +129,6 @@ const en = {
     oauthGoogle: "Continue with Google",
     oauthGithub: "Continue with GitHub",
     oauthApple: "Continue with Apple",
-    oauthMicrosoft: "Continue with Microsoft",
-    oauthMicrosoftSoon:
-      "Microsoft sign-in off — set MICROSOFT_CLIENT_ID, MICROSOFT_CLIENT_SECRET, MICROSOFT_REDIRECT_URI (and optional MICROSOFT_TENANT=common) on the API, then redeploy.",
   },
   forgotPassword: {
     title: "Reset password",
@@ -298,6 +297,8 @@ const pl: MessageTree = {
     topMatches: "Najlepsze dopasowania",
     jobs: "Oferty",
     noJobs: "Brak ofert — uruchom Auto scrap powyżej (jeśli włączone) lub poproś administratora o dane.",
+    noJobsNoScrapeUi:
+      "Brak ofert w bazie — pojawią się po pobraniu danych na serwerze (scrap przez administratora / backend) lub imporcie. Profil służy do dopasowania i filtrów, gdy oferty już są; sam z siebie nie przeszukuje internetu.",
     noJobsFiltered: "Brak ofert dla wybranych filtrów.",
     filterSearch: "Szukaj",
     filterSearchPlaceholder: "Stanowisko, firma, słowa kluczowe…",
@@ -360,9 +361,6 @@ const pl: MessageTree = {
     oauthGoogle: "Kontynuuj z Google",
     oauthGithub: "Kontynuuj z GitHub",
     oauthApple: "Kontynuuj z Apple",
-    oauthMicrosoft: "Kontynuuj z Microsoft",
-    oauthMicrosoftSoon:
-      "Logowanie Microsoft wyłączone — ustaw MICROSOFT_CLIENT_ID, MICROSOFT_CLIENT_SECRET, MICROSOFT_REDIRECT_URI (opcjonalnie MICROSOFT_TENANT=common) na API i zrób redeploy.",
   },
   forgotPassword: {
     title: "Reset hasła",

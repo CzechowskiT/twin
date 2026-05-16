@@ -31,7 +31,6 @@ function RegisterPageContent() {
           google: false,
           github: false,
           apple: false,
-          microsoft: false,
         }),
       );
   }, []);
@@ -115,8 +114,6 @@ function RegisterPageContent() {
                 google: t("login.oauthGoogle"),
                 github: t("login.oauthGithub"),
                 apple: t("login.oauthApple"),
-                microsoft: t("login.oauthMicrosoft"),
-                microsoftSoon: t("login.oauthMicrosoftSoon"),
               }}
             />
             {!oauthStatus.linkedin && <LinkedInSetupHint variant="register" />}

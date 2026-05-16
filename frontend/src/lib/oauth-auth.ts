@@ -5,7 +5,6 @@ export type OAuthProviderStatus = {
   google: boolean;
   github: boolean;
   apple: boolean;
-  microsoft: boolean;
 };
 
 export async function fetchOAuthProviderStatus(): Promise<OAuthProviderStatus> {

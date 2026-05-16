@@ -25,7 +25,6 @@ def test_oauth_status_shape(_li: MagicMock, client: TestClient) -> None:
         "google": False,
         "github": False,
         "apple": False,
-        "microsoft": False,
     }
 
 
@@ -89,15 +88,6 @@ def test_google_callback_success(
     )
     assert res.status_code in (302, 307)
     assert res.headers["location"] == "http://localhost:3000/auth/callback?token=jwt-user"
-
-
-@patch("app.api.auth.build_microsoft_authorize_url", return_value="https://login.microsoftonline.com/common/oauth2/v2.0/authorize?x=1")
-@patch("app.api.auth.create_oauth_state", return_value="state-jwt")
-@patch("app.api.auth.is_microsoft_configured", return_value=True)
-def test_microsoft_login_redirect(_cfg: MagicMock, _s: MagicMock, _u: MagicMock, client: TestClient) -> None:
-    res = client.get("/api/v1/auth/microsoft/login", follow_redirects=False)
-    assert res.status_code == 302
-    assert res.headers["location"].startswith("https://login.microsoftonline.com")
 
 
 def test_oauth_state_module_roundtrip() -> None:

@@ -15,8 +15,6 @@ type Labels = {
   google: string;
   github: string;
   apple: string;
-  microsoft: string;
-  microsoftSoon: string;
 };
 
 type OAuthWebButtonsProps = {
@@ -45,19 +43,6 @@ export function OAuthWebButtons({ status, labels }: OAuthWebButtonsProps) {
         label={labels.apple}
         icon={<AppleIcon />}
       />
-      {status.microsoft ? (
-        <Row
-          configured
-          href={`${API_URL}/api/v1/auth/microsoft/login`}
-          label={labels.microsoft}
-          icon={<MicrosoftIcon />}
-        />
-      ) : (
-        <div className={DISABLED}>
-          <MicrosoftIcon />
-          {labels.microsoftSoon}
-        </div>
-      )}
     </>
   );
 }
@@ -124,17 +109,6 @@ function AppleIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
       <path d="M16.365 1.43c0 1.14-.493 2.27-1.177 3.08-.744.9-1.99 1.57-2.975 1.57-.12 0-.23-.01-.36-.02-.01-.02-.01-.04-.01-.06 0-1.09.474-2.2 1.17-2.96.734-.79 1.99-1.44 2.84-1.44.12 0 .24.01.35.02.01.02.01.04.01.06zm4.99 17.32c-.98.95-2.1 1.01-2.84 1.01-.89 0-2.86-.1-4.28-.1-1.46 0-2.92.1-3.78.1-.79 0-2.05-.06-3.01-1.01C2.79 17.25 1.5 12.36 1.5 8.28c0-4.5 2.91-6.78 5.74-6.78 1.03 0 2.05.19 2.95.56.89.37 1.67.89 2.31 1.52.64-.63 1.42-1.15 2.31-1.52.9-.37 1.92-.56 2.95-.56 2.83 0 5.74 2.28 5.74 6.78 0 4.08-1.29 8.97-3.65 11.47z" />
-    </svg>
-  );
-}
-
-function MicrosoftIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="#f35325" d="M1 1h10v10H1z" />
-      <path fill="#81bc06" d="M13 1h10v10H13z" />
-      <path fill="#05a6f0" d="M1 13h10v10H1z" />
-      <path fill="#ffba08" d="M13 13h10v10H13z" />
     </svg>
   );
 }
