@@ -67,7 +67,7 @@ function LoginPageContent() {
   }
 
   return (
-    <Shell>
+    <Shell rail>
       <Card>
         <h1 className="mb-6 text-2xl font-semibold">{t("login.title")}</h1>
         <form onSubmit={onSubmit}>
@@ -123,7 +123,7 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <Shell>
+        <Shell rail>
           <Card>
             <p className="twin-muted text-sm">{t("login.signingIn")}</p>
           </Card>

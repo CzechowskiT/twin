@@ -309,7 +309,7 @@ export default function DashboardPage() {
   const hasProfile = profile !== null && profile !== undefined;
 
   return (
-    <Shell wide>
+    <Shell wide rail>
       <div className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">
           {t("dashboard.title")}

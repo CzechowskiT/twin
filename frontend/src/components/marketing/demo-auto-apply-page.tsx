@@ -109,7 +109,7 @@ export function DemoAutoApplyPage() {
   const titlesLine = DEMO_MATCH_CANDIDATE.preferred_job_titles.join(", ");
 
   return (
-    <Shell wide>
+    <Shell wide rail>
       <MarketingPageSurface wide withCard={false}>
         <div className="marketing-copy-rail space-y-10 sm:space-y-12">
           <header className="space-y-4">

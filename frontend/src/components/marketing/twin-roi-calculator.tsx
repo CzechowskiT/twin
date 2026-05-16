@@ -109,7 +109,7 @@ export function TwinRoiCalculator() {
   const money = (amount: number) => formatMoney(amount, locale, currency);
 
   return (
-    <Shell wide>
+    <Shell wide rail>
       <MarketingPageSurface wide withCard={false}>
         <header className="mb-8 text-center sm:mb-10">
           <h1 className="twin-page-intro twin-section-title text-2xl sm:text-3xl">{t("calculator.title")}</h1>

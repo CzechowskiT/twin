@@ -31,7 +31,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <Shell>
+    <Shell rail>
       <Card>
         <h1 className="mb-6 text-2xl font-semibold">{t("forgotPassword.title")}</h1>
         {sent ? (

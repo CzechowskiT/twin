@@ -45,7 +45,7 @@ function ResetPasswordContent() {
 
   if (!token && !done) {
     return (
-      <Shell>
+      <Shell rail>
         <Card>
           <h1 className="mb-4 text-2xl font-semibold">{t("resetPassword.title")}</h1>
           <p className="twin-muted mb-4 text-sm">{t("resetPassword.missingToken")}</p>
@@ -58,7 +58,7 @@ function ResetPasswordContent() {
   }
 
   return (
-    <Shell>
+    <Shell rail>
       <Card>
         <h1 className="mb-6 text-2xl font-semibold">{t("resetPassword.title")}</h1>
         {done ? (
@@ -103,7 +103,7 @@ export default function ResetPasswordPage() {
   return (
     <Suspense
       fallback={
-        <Shell>
+        <Shell rail>
           <Card>
             <p className="twin-muted text-sm">{t("resetPassword.updating")}</p>
           </Card>

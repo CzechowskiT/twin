@@ -1,26 +1,22 @@
 "use client";
 
 import { useEffect } from "react";
-import { usePathname } from "next/navigation";
 
-import { isMarketingPath, MARKETING_SURFACE } from "@/lib/marketing-surface";
+import { MARKETING_SURFACE } from "@/lib/marketing-surface";
 
 const ATTR = "data-marketing-surface";
 
-/** Applies studio tokens on <html> for marketing routes only (see `marketing-surface.ts` to switch back). */
+/** Applies studio design tokens on <html> for the whole app when `MARKETING_SURFACE` is `"studio"`. */
 export function MarketingSurfaceSync() {
-  const pathname = usePathname() ?? "/";
-
   useEffect(() => {
     const root = document.documentElement;
-    const studioHere = isMarketingPath(pathname) && MARKETING_SURFACE === "studio";
-    if (studioHere) {
+    if (MARKETING_SURFACE === "studio") {
       root.setAttribute(ATTR, "studio");
     } else {
       root.removeAttribute(ATTR);
     }
     return () => root.removeAttribute(ATTR);
-  }, [pathname]);
+  }, []);
 
   return null;
 }

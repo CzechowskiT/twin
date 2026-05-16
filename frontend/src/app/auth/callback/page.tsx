@@ -47,7 +47,7 @@ function AuthCallbackContent() {
   }, [router, searchParams, t]);
 
   return (
-    <Shell>
+    <Shell rail>
       <Card>
         <h1 className="mb-4 text-2xl font-semibold">{t("authCallback.title")}</h1>
         <p className="twin-muted text-sm">
@@ -64,7 +64,7 @@ export default function AuthCallbackPage() {
   return (
     <Suspense
       fallback={
-        <Shell>
+        <Shell rail>
           <Card>
             <p className="twin-muted text-sm">{t("authCallback.signingIn")}</p>
           </Card>

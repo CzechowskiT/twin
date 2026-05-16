@@ -109,7 +109,7 @@ function IdentityPageContent() {
   if (!token) return null;
 
   return (
-    <Shell wide>
+    <Shell wide rail>
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">{t("dashboard.identityPageTitle")}</h1>
         <Link href="/dashboard" className="twin-link twin-touch-target text-sm">
@@ -175,7 +175,7 @@ export default function IdentityPage() {
   return (
     <Suspense
       fallback={
-        <Shell wide>
+        <Shell wide rail>
           <Card>
             <p className="twin-muted text-sm">{t("dashboard.identityLoading")}</p>
           </Card>

@@ -139,7 +139,7 @@ export default function BillingPage() {
   const showPortal = paid;
 
   return (
-    <Shell>
+    <Shell rail>
       <div className="twin-app-read-pane mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 max-w-2xl">
           <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">{t("dashboard.billingPageTitle")}</h1>

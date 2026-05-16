@@ -80,7 +80,7 @@ function RegisterPageContent() {
   }
 
   return (
-    <Shell>
+    <Shell rail>
       <Card>
         <h1 className="mb-6 text-2xl font-semibold">{t("register.title")}</h1>
         <form onSubmit={onSubmit}>
@@ -141,7 +141,7 @@ export default function RegisterPage() {
   return (
     <Suspense
       fallback={
-        <Shell>
+        <Shell rail>
           <Card>
             <p className="twin-muted text-sm">{t("register.creating")}</p>
           </Card>

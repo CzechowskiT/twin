@@ -171,14 +171,14 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <Shell>
+      <Shell rail>
         <p className="twin-muted">{t("profile.loading")}</p>
       </Shell>
     );
   }
 
   return (
-    <Shell>
+    <Shell rail>
       <Card>
         <h1 className="mb-2 text-2xl font-semibold">{t("profile.title")}</h1>
         <p className="twin-muted mb-6 text-sm">{t("profile.subtitle")}</p>

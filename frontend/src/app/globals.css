@@ -36,7 +36,7 @@
   --twin-max-width-narrow: 28rem;
 }
 
-/* Dark marketing mode: flip `MARKETING_SURFACE` in `src/lib/marketing-surface.ts` to `heritage` to disable. */
+/* Dark studio mode: when `MARKETING_SURFACE` in `src/lib/marketing-surface.ts` is `"studio"`, applies app-wide (see `MarketingSurfaceSync`). */
 html[data-marketing-surface="studio"] {
   color-scheme: dark;
   --background: #030712;

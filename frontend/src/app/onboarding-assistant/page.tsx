@@ -16,7 +16,7 @@ export default function OnboardingAssistantPage() {
   }, [router]);
 
   return (
-    <Shell>
+    <Shell rail>
       <Card>
         <h1 className="mb-2 text-2xl font-semibold">{t("onboarding.title")}</h1>
         <p className="twin-muted mb-6 text-sm leading-relaxed">{t("onboarding.body")}</p>

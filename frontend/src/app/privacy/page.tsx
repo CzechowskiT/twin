@@ -7,7 +7,7 @@ export default function PrivacyPage() {
   const { t } = useTranslation();
 
   return (
-    <Shell>
+    <Shell rail>
       <article className="twin-prose max-w-none">
         <h1>{t("privacy.title")}</h1>
         <p className="twin-muted text-sm">{t("privacy.updated")}</p>
