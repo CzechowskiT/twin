@@ -17,6 +17,7 @@ function titleKeyForPath(path: string): TranslationKey {
   if (path.startsWith("/dashboard/identity")) return "meta.titleIdentity";
   if (path.startsWith("/dashboard")) return "meta.titleDashboard";
   if (path.startsWith("/auth/callback")) return "meta.titleAuthCallback";
+  if (path.startsWith("/consent/gdpr")) return "meta.titleGdprConsent";
 
   const map: Record<string, TranslationKey> = {
     "/": "meta.titleHome",

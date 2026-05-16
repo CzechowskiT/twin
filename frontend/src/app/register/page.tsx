@@ -61,6 +61,7 @@ function RegisterPageContent() {
           email: form.get("email"),
           password: form.get("password"),
           gdpr_consent: true,
+          marketing_emails_opt_in: form.get("marketing_emails_opt_in") === "on",
         }),
       });
       const token = await apiFetch<TokenResponse>("/api/v1/auth/login/json", {
@@ -96,6 +97,13 @@ function RegisterPageContent() {
                 {t("register.privacyPolicy")}
               </Link>{" "}
               {t("register.gdprAfter")}
+            </span>
+          </label>
+          <label className="mb-6 flex items-start gap-2 text-sm">
+            <input name="marketing_emails_opt_in" type="checkbox" className="mt-1" />
+            <span>
+              <span className="font-medium text-[var(--foreground)]">{t("register.marketingOptIn")}</span>
+              <span className="mt-1 block text-xs text-[var(--twin-muted-strong)]">{t("register.marketingHint")}</span>
             </span>
           </label>
           {displayError && <p className="mb-4 text-sm text-red-600">{displayError}</p>}

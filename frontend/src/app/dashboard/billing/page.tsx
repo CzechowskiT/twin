@@ -57,7 +57,7 @@ type UrlPayload = { url: string };
 const PAID = new Set(["active", "trialing", "past_due"]);
 
 export default function BillingPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const router = useRouter();
   const [me, setMe] = useState<Me | null>(null);
   const [plans, setPlans] = useState<PlansPayload | null>(null);

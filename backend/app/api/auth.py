@@ -16,9 +16,11 @@ from app.database.models import User
 from app.database.session import get_db
 from app.schemas.auth import (
     ForgotPasswordRequest,
+    GdprConsentIn,
     ResetPasswordRequest,
     Token,
     UserLogin,
+    UserMarketingPreference,
     UserOut,
     UserRegister,
 )
@@ -141,6 +143,10 @@ def register(body: UserRegister, db: Session = Depends(get_db)) -> User:
         email=body.email,
         hashed_password=hash_password(body.password),
         gdpr_consent_at=datetime.now(timezone.utc),
+        marketing_emails_opt_in=body.marketing_emails_opt_in,
+        marketing_emails_opt_in_at=(
+            datetime.now(timezone.utc) if body.marketing_emails_opt_in else None
+        ),
     )
     db.add(user)
     db.commit()
@@ -192,6 +198,41 @@ def _authenticate(email: str, password: str, db: Session) -> Token:
 
 @router.get("/me", response_model=UserOut)
 def me(user: User = Depends(get_current_user)) -> UserOut:
+    return UserOut.from_user(user)
+
+
+@router.post("/gdpr-consent", response_model=UserOut)
+def record_gdpr_consent(
+    body: GdprConsentIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> UserOut:
+    if not body.accept_privacy_policy:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Privacy policy acceptance is required",
+        )
+    if user.gdpr_consent_at is None:
+        user.gdpr_consent_at = datetime.now(timezone.utc)
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+    return UserOut.from_user(user)
+
+
+@router.patch("/me/marketing", response_model=UserOut)
+def update_marketing_preference(
+    body: UserMarketingPreference,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> UserOut:
+    user.marketing_emails_opt_in = body.marketing_emails_opt_in
+    user.marketing_emails_opt_in_at = (
+        datetime.now(timezone.utc) if body.marketing_emails_opt_in else None
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
     return UserOut.from_user(user)
 
 

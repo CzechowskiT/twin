@@ -17,6 +17,7 @@ type CvInsights = {
 };
 
 type Profile = {
+  id?: number;
   name: string;
   skills: string[];
   preferred_job_titles?: string[];
@@ -28,6 +29,12 @@ type Profile = {
   cv_filename?: string | null;
   has_intro_audio?: boolean;
   cv_insights?: CvInsights | null;
+  cv_processing_consent_at?: string | null;
+  intro_audio_processing_consent_at?: string | null;
+};
+
+type UserPrefs = {
+  marketing_emails_opt_in: boolean;
 };
 
 const CV_ACCEPT = ".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain";
@@ -46,6 +53,9 @@ export default function ProfilePage() {
   const [cvMessage, setCvMessage] = useState<string | null>(null);
   const [introMessage, setIntroMessage] = useState<string | null>(null);
   const [initial, setInitial] = useState<Profile | null>(null);
+  const [userPrefs, setUserPrefs] = useState<UserPrefs | null>(null);
+  const [cvUploadConsent, setCvUploadConsent] = useState(false);
+  const [introUploadConsent, setIntroUploadConsent] = useState(false);
 
   useEffect(() => {
     const token = getToken();
@@ -53,9 +63,14 @@ export default function ProfilePage() {
       router.replace("/login");
       return;
     }
-    apiFetch<Profile>("/api/v1/candidates/me", {}, token)
-      .then(setInitial)
-      .catch(() => setInitial(null))
+    Promise.all([
+      apiFetch<Profile>("/api/v1/candidates/me", {}, token).catch(() => null),
+      apiFetch<UserPrefs>("/api/v1/auth/me", {}, token).catch(() => null),
+    ])
+      .then(([prof, prefs]) => {
+        setInitial(prof);
+        setUserPrefs(prefs);
+      })
       .finally(() => setLoading(false));
   }, [router]);
 
@@ -63,7 +78,12 @@ export default function ProfilePage() {
     const token = getToken();
     if (!token) return;
     try {
-      setInitial(await apiFetch<Profile>("/api/v1/candidates/me", {}, token));
+      const [prof, prefs] = await Promise.all([
+        apiFetch<Profile>("/api/v1/candidates/me", {}, token),
+        apiFetch<UserPrefs>("/api/v1/auth/me", {}, token),
+      ]);
+      setInitial(prof);
+      setUserPrefs(prefs);
     } catch {
       /* ignore */
     }
@@ -75,15 +95,22 @@ export default function ProfilePage() {
     if (!token) return;
     setError(null);
     setCvMessage(null);
+    if (initial && !initial.cv_processing_consent_at && !cvUploadConsent) {
+      setError(t("profile.cvConsentRequiredUpload"));
+      return;
+    }
     setCvBusy(true);
     try {
+      const extra =
+        initial && !initial.cv_processing_consent_at ? { processing_consent: "true" } : undefined;
       const result = await apiUpload<{
         message: string;
         skills_updated: string[];
         preferred_job_titles?: string[];
         cv_insights?: CvInsights | null;
-      }>("/api/v1/candidates/me/cv", file, token);
+      }>("/api/v1/candidates/me/cv", file, token, extra);
       await reloadProfile();
+      setCvUploadConsent(false);
       setCvMessage(result.message || t("profile.cvUploaded"));
     } catch (err) {
       setError(err instanceof Error ? err.message : t("profile.cvFailed"));
@@ -115,14 +142,24 @@ export default function ProfilePage() {
     if (!token) return;
     setError(null);
     setIntroMessage(null);
+    if (initial && !initial.intro_audio_processing_consent_at && !introUploadConsent) {
+      setError(t("profile.introConsentRequiredUpload"));
+      return;
+    }
     setIntroBusy(true);
     try {
+      const extra =
+        initial && !initial.intro_audio_processing_consent_at
+          ? { processing_consent: "true" }
+          : undefined;
       const result = await apiUpload<{ message: string }>(
         "/api/v1/candidates/me/intro-audio",
         file,
         token,
+        extra,
       );
       await reloadProfile();
+      setIntroUploadConsent(false);
       setIntroMessage(result.message || t("profile.introAudioUploaded"));
     } catch (err) {
       setError(err instanceof Error ? err.message : t("profile.introAudioFailed"));
@@ -158,9 +195,19 @@ export default function ProfilePage() {
       desired_salary: salaryRaw ? Number(salaryRaw) : null,
       location: String(form.get("location") || "") || null,
       talent_pool_opt_in: Boolean(form.get("talent_pool_opt_in")),
+      cv_processing_consent: form.get("cv_processing_consent") === "on",
+      intro_audio_processing_consent: form.get("intro_audio_processing_consent") === "on",
     };
+    const marketing_emails_opt_in = form.get("marketing_emails_opt_in") === "on";
     try {
-      await apiFetch("/api/v1/candidates/me", { method: "PUT", body: JSON.stringify(body) }, token);
+      await Promise.all([
+        apiFetch("/api/v1/candidates/me", { method: "PUT", body: JSON.stringify(body) }, token),
+        apiFetch(
+          "/api/v1/auth/me/marketing",
+          { method: "PATCH", body: JSON.stringify({ marketing_emails_opt_in }) },
+          token,
+        ),
+      ]);
       router.push("/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : t("profile.failed"));
@@ -188,6 +235,22 @@ export default function ProfilePage() {
             {t("profile.cvSection")}
           </h2>
           <p className="twin-muted mb-3 text-xs">{t("profile.cvHint")}</p>
+          {initial && !initial.cv_processing_consent_at && (
+            <label className="mb-3 flex cursor-pointer items-start gap-3 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/30 p-3 text-sm">
+              <input
+                type="checkbox"
+                checked={cvUploadConsent}
+                onChange={(e) => setCvUploadConsent(e.target.checked)}
+                className="mt-1 h-4 w-4 shrink-0 rounded border-[var(--twin-border)]"
+              />
+              <span>
+                <span className="font-medium text-[var(--foreground)]">{t("profile.cvProcessingConsentLabel")}</span>
+                <span className="mt-1 block text-xs text-[var(--twin-muted-strong)]">
+                  {t("profile.cvProcessingConsentHint")}
+                </span>
+              </span>
+            </label>
+          )}
           {initial?.has_cv && (
             <p className="mb-3 text-sm text-[var(--twin-accent)]">
               {t("profile.cvCurrent")}: <strong>{initial.cv_filename}</strong>
@@ -278,6 +341,24 @@ export default function ProfilePage() {
               {t("profile.introAudioSection")}
             </h2>
             <p className="twin-muted mb-3 text-xs">{t("profile.introAudioHint")}</p>
+            {initial && !initial.intro_audio_processing_consent_at && (
+              <label className="mb-3 flex cursor-pointer items-start gap-3 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/30 p-3 text-sm">
+                <input
+                  type="checkbox"
+                  checked={introUploadConsent}
+                  onChange={(e) => setIntroUploadConsent(e.target.checked)}
+                  className="mt-1 h-4 w-4 shrink-0 rounded border-[var(--twin-border)]"
+                />
+                <span>
+                  <span className="font-medium text-[var(--foreground)]">
+                    {t("profile.introAudioProcessingConsentLabel")}
+                  </span>
+                  <span className="mt-1 block text-xs text-[var(--twin-muted-strong)]">
+                    {t("profile.introAudioProcessingConsentHint")}
+                  </span>
+                </span>
+              </label>
+            )}
             {initial.has_intro_audio && (
               <p className="mb-3 text-sm text-[var(--twin-accent)]">{t("profile.introAudioUploaded")}</p>
             )}
@@ -337,6 +418,57 @@ export default function ProfilePage() {
             placeholder={t("profile.locationPlaceholder")}
             defaultValue={initial?.location ?? ""}
           />
+          <div className="mb-4 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/40 p-4">
+            <label className="flex cursor-pointer items-start gap-3 text-sm">
+              <input
+                type="checkbox"
+                name="cv_processing_consent"
+                value="on"
+                defaultChecked={Boolean(initial?.cv_processing_consent_at)}
+                className="mt-1 h-4 w-4 shrink-0 rounded border-[var(--twin-border)]"
+              />
+              <span>
+                <span className="font-medium text-[var(--foreground)]">{t("profile.cvProcessingConsentLabel")}</span>
+                <span className="mt-1 block text-xs text-[var(--twin-muted-strong)]">
+                  {t("profile.cvProcessingConsentHint")}
+                </span>
+              </span>
+            </label>
+          </div>
+          <div className="mb-4 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/40 p-4">
+            <label className="flex cursor-pointer items-start gap-3 text-sm">
+              <input
+                type="checkbox"
+                name="intro_audio_processing_consent"
+                value="on"
+                defaultChecked={Boolean(initial?.intro_audio_processing_consent_at)}
+                className="mt-1 h-4 w-4 shrink-0 rounded border-[var(--twin-border)]"
+              />
+              <span>
+                <span className="font-medium text-[var(--foreground)]">
+                  {t("profile.introAudioProcessingConsentLabel")}
+                </span>
+                <span className="mt-1 block text-xs text-[var(--twin-muted-strong)]">
+                  {t("profile.introAudioProcessingConsentHint")}
+                </span>
+              </span>
+            </label>
+          </div>
+          <div className="mb-4 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/40 p-4">
+            <label className="flex cursor-pointer items-start gap-3 text-sm">
+              <input
+                type="checkbox"
+                name="marketing_emails_opt_in"
+                value="on"
+                defaultChecked={Boolean(userPrefs?.marketing_emails_opt_in)}
+                className="mt-1 h-4 w-4 shrink-0 rounded border-[var(--twin-border)]"
+              />
+              <span>
+                <span className="font-medium text-[var(--foreground)]">{t("profile.marketingEmailsOptIn")}</span>
+                <span className="mt-1 block text-xs text-[var(--twin-muted-strong)]">{t("profile.marketingEmailsHint")}</span>
+              </span>
+            </label>
+          </div>
           <div className="mb-4 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/40 p-4">
             <label className="flex cursor-pointer items-start gap-3 text-sm">
               <input

@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { useTranslation } from "@/components/language-provider";
 import { StoreDownloadLinks } from "@/components/store-download-links";
+import { clearCookieConsent } from "@/lib/cookie-consent";
 
 const SOCIAL_LINKEDIN = "https://www.linkedin.com";
 const SOCIAL_X = "https://x.com";
@@ -136,6 +137,15 @@ export function SiteFooter() {
                 <Link href="/privacy" className="twin-link font-medium">
                   {t("site.footerPrivacy")}
                 </Link>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  className="twin-link cursor-pointer font-medium text-left"
+                  onClick={() => clearCookieConsent()}
+                >
+                  {t("site.footerCookieSettings")}
+                </button>
               </li>
             </ul>
           </div>

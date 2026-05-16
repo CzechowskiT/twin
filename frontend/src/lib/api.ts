@@ -64,6 +64,7 @@ export async function apiUpload<T>(
   path: string,
   file: File,
   token?: string | null,
+  extraFields?: Record<string, string>,
 ): Promise<T> {
   const headers = new Headers();
   const hasAuth = Boolean(token);
@@ -75,6 +76,11 @@ export async function apiUpload<T>(
 
   const body = new FormData();
   body.append("file", file);
+  if (extraFields) {
+    for (const [k, v] of Object.entries(extraFields)) {
+      body.append(k, v);
+    }
+  }
 
   const origin = clientApiOriginForRequest(hasAuth);
   const res = await fetch(`${origin}${path}`, {

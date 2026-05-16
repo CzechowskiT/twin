@@ -5,7 +5,10 @@ import { Suspense, useEffect, useState } from "react";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { setToken } from "@/lib/auth";
+import { apiFetch } from "@/lib/api";
 import type { TranslationKey } from "@/lib/i18n";
+
+type AuthMe = { gdpr_consent_at: string | null };
 
 function authErrorKey(error: string): TranslationKey {
   if (error === "linkedin_denied") return "authCallback.errorLinkedinDenied";
@@ -34,16 +37,33 @@ function AuthCallbackContent() {
       setToken(token);
       const next = searchParams.get("next");
       const path = next?.startsWith("/") ? next : "/dashboard";
-      router.replace(path);
+      queueMicrotask(() => {
+        void (async () => {
+          try {
+            const me = await apiFetch<AuthMe>("/api/v1/auth/me", {}, token);
+            if (!me.gdpr_consent_at) {
+              router.replace(`/consent/gdpr?next=${encodeURIComponent(path)}`);
+              return;
+            }
+          } catch {
+            /* if /me fails, still send user onward */
+          }
+          router.replace(path);
+        })();
+      });
       return;
     }
 
     if (error) {
-      setMessage(t(authErrorKey(error)));
+      queueMicrotask(() => {
+        setMessage(t(authErrorKey(error)));
+      });
       return;
     }
 
-    setMessage(t("authCallback.errorUnknown"));
+    queueMicrotask(() => {
+      setMessage(t("authCallback.errorUnknown"));
+    });
   }, [router, searchParams, t]);
 
   return (

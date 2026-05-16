@@ -38,6 +38,8 @@ class User(Base):
     linkedin_id: Mapped[str | None] = mapped_column(String(64), unique=True, index=True, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     gdpr_consent_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    marketing_emails_opt_in: Mapped[bool] = mapped_column(Boolean, default=False)
+    marketing_emails_opt_in_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     # Billing (Stripe Checkout + Customer Portal; Apple Pay / Google Pay via Checkout wallets)
@@ -127,6 +129,8 @@ class Candidate(Base):
     intro_audio_transcript: Mapped[str | None] = mapped_column(Text, nullable=True)
     profile_signals_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     talent_pool_opt_in: Mapped[bool] = mapped_column(Boolean, default=False)
+    cv_processing_consent_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    intro_audio_processing_consent_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     user: Mapped["User"] = relationship(back_populates="candidate")

@@ -24,6 +24,8 @@ class CandidateUpdate(BaseModel):
     desired_salary: int | None = Field(default=None, ge=0)
     location: str | None = Field(default=None, max_length=100)
     talent_pool_opt_in: bool | None = None
+    cv_processing_consent: bool | None = None
+    intro_audio_processing_consent: bool | None = None
 
 
 class CandidateOut(BaseModel):
@@ -41,6 +43,8 @@ class CandidateOut(BaseModel):
     has_intro_audio: bool = False
     intro_audio_uploaded_at: datetime | None = None
     cv_insights: dict[str, Any] | None = None
+    cv_processing_consent_at: datetime | None = None
+    intro_audio_processing_consent_at: datetime | None = None
 
     model_config = {"from_attributes": True}
 

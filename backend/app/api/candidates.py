@@ -1,9 +1,9 @@
 """Candidate profile and match endpoints."""
 
-import json
+from datetime import datetime, timezone
 from typing import Any
 
-from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
@@ -70,6 +70,7 @@ def update_profile(
 @router.post("/me/cv", response_model=CvUploadOut)
 async def upload_cv(
     file: UploadFile = File(...),
+    processing_consent: bool = Form(default=False),
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> CvUploadOut:
@@ -81,6 +82,16 @@ async def upload_cv(
         )
     if not file.filename:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing filename")
+
+    if candidate.cv_processing_consent_at is None:
+        if not processing_consent:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="CV upload requires explicit consent to storage and automated parsing (see Privacy Policy).",
+            )
+        candidate.cv_processing_consent_at = datetime.now(timezone.utc)
+        db.add(candidate)
+        db.flush()
 
     content = await file.read()
     max_bytes = get_settings().cv_max_bytes
@@ -118,10 +129,10 @@ async def upload_cv(
 @router.post("/me/intro-audio", response_model=IntroAudioUploadOut)
 async def upload_intro_audio(
     file: UploadFile = File(...),
+    processing_consent: bool = Form(default=False),
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> IntroAudioUploadOut:
-    """Store a short voice intro; transcription + preference extraction are Phase 2 (see env docs)."""
     candidate = db.query(Candidate).filter(Candidate.user_id == user.id).first()
     if not candidate:
         raise HTTPException(
@@ -130,6 +141,16 @@ async def upload_intro_audio(
         )
     if not file.filename:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing filename")
+
+    if candidate.intro_audio_processing_consent_at is None:
+        if not processing_consent:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Voice intro upload requires explicit consent to storage and future processing (see Privacy Policy).",
+            )
+        candidate.intro_audio_processing_consent_at = datetime.now(timezone.utc)
+        db.add(candidate)
+        db.flush()
 
     content = await file.read()
     max_bytes = get_settings().intro_audio_max_bytes
@@ -226,6 +247,14 @@ def _apply_update(candidate: Candidate, body: CandidateUpdate) -> None:
     candidate.location = body.location
     if body.talent_pool_opt_in is not None:
         candidate.talent_pool_opt_in = body.talent_pool_opt_in
+    if body.cv_processing_consent is True:
+        candidate.cv_processing_consent_at = datetime.now(timezone.utc)
+    elif body.cv_processing_consent is False:
+        candidate.cv_processing_consent_at = None
+    if body.intro_audio_processing_consent is True:
+        candidate.intro_audio_processing_consent_at = datetime.now(timezone.utc)
+    elif body.intro_audio_processing_consent is False:
+        candidate.intro_audio_processing_consent_at = None
 
 
 def _cv_insights_from_candidate(candidate: Candidate) -> dict[str, Any] | None:
@@ -260,4 +289,6 @@ def _to_out(candidate: Candidate) -> CandidateOut:
         has_intro_audio=bool(candidate.intro_audio_path),
         intro_audio_uploaded_at=candidate.intro_audio_uploaded_at,
         cv_insights=_cv_insights_from_candidate(candidate),
+        cv_processing_consent_at=candidate.cv_processing_consent_at,
+        intro_audio_processing_consent_at=candidate.intro_audio_processing_consent_at,
     )

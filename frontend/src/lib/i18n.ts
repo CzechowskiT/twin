@@ -73,10 +73,12 @@ export type TranslationKey =
   | `resetPassword.${keyof typeof en.resetPassword}`
   | `register.${keyof typeof en.register}`
   | `authCallback.${keyof typeof en.authCallback}`
+  | `consentGdpr.${keyof typeof en.consentGdpr}`
   | `profile.${keyof typeof en.profile}`
   | `onboarding.${keyof typeof en.onboarding}`
   | `meta.${keyof typeof en.meta}`
   | `privacy.${keyof typeof en.privacy}`
+  | `cookies.${keyof typeof en.cookies}`
   | `common.${keyof typeof en.common}`
   | `persona.${keyof typeof en.persona}`
   | `demo.${keyof typeof en.demo}`;
@@ -421,6 +423,17 @@ const en = {
     errorOAuthDenied: "Sign-in was cancelled.",
     errorOAuthFailed: "Sign-in failed. Check the provider configuration on the API.",
   },
+  consentGdpr: {
+    title: "Privacy consent",
+    lead: "Social sign-in created your account. To use TWIN we need the same explicit acceptance as for email registration.",
+    checkboxBefore: "I accept the",
+    privacyLink: "Privacy Policy",
+    checkboxAfter: "and consent to processing my personal data for job matching and operating this service (GDPR / UK GDPR where applicable).",
+    required: "Please confirm acceptance to continue.",
+    submit: "Continue",
+    submitting: "Saving…",
+    failed: "Could not save your choice. Try again.",
+  },
   register: {
     title: "Create account",
     email: "Email",
@@ -443,6 +456,8 @@ const en = {
     linkedInComingSoon:
       "LinkedIn sign-up is off until the API has Client ID, Secret, and LINKEDIN_REDIRECT_URI (see yellow box). Use the form below.",
     linkedInSetupTitle: "Enable LinkedIn sign-up (one-time setup)",
+    marketingOptIn: "Send me occasional product updates and tips by email (optional).",
+    marketingHint: "You can change this anytime in your profile. Separate from core matching consent.",
   },
   profile: {
     title: "Your career profile",
@@ -493,6 +508,15 @@ const en = {
     talentPoolOptIn: "Show my anonymized profile in the B2B talent pool",
     talentPoolOptInHint:
       "Recruiters may see skills, a validation badge, and a match score only — never your name, email, phone, CV text, or exact location.",
+    cvProcessingConsentLabel: "I consent to storing my CV and automated parsing to improve matching (see Privacy Policy).",
+    cvProcessingConsentHint: "Required before upload if not already recorded. You can withdraw by saving with this unchecked (your CV file will be removed separately).",
+    introAudioProcessingConsentLabel:
+      "I consent to storing my voice intro and future processing (e.g. transcription) as described in the Privacy Policy.",
+    introAudioProcessingConsentHint: "Required before upload if not already recorded.",
+    marketingEmailsOptIn: "Email me occasional product updates and tips (optional)",
+    marketingEmailsHint: "Separate legal basis from core matching — change anytime here.",
+    cvConsentRequiredUpload: "Confirm CV processing consent above, or check the consent box for this upload.",
+    introConsentRequiredUpload: "Confirm voice intro processing consent before uploading.",
   },
   onboarding: {
     title: "Assistant onboarding",
@@ -579,6 +603,7 @@ const en = {
     titleBilling: "Plan & billing — TWIN",
     titleIdentity: "Identity verification — TWIN",
     titleAuthCallback: "Signing in — TWIN",
+    titleGdprConsent: "Privacy consent — TWIN",
     titleForCandidates: "Candidates — TWIN",
     titleForRecruiters: "Recruiters — TWIN",
     titleForCompanies: "Companies — TWIN",
@@ -627,6 +652,8 @@ const en = {
     collect1: "Account email and password (hashed)",
     collect2: "Career profile: skills, experience, salary expectations, location",
     collect3: "Application and match history within TWIN",
+    collect4:
+      "If you upload a CV or voice intro: file contents and derived signals (e.g. skills, summaries) processed to run the product, including automated parsing where enabled.",
     whyTitle: "Why we process data",
     whyBody:
       "To match you with job listings from pracuj.pl and rocketjobs.pl and to track application status. Legal basis: your explicit consent at registration (GDPR Art. 6(1)(a)).",
@@ -638,6 +665,17 @@ const en = {
     thirdTitle: "Third parties",
     thirdBody:
       "We use Anthropic Claude for job matching. Job data is sourced from public listings on the boards above.",
+    cookieTitle: "Cookies & local storage",
+    cookieBody:
+      "We use strictly necessary cookies and browser storage for things like keeping you signed in and remembering your language. If you accept optional cookies, we may enable analytics or marketing tags when those products ship—your choice is stored on this device and you can change it anytime from the footer link.",
+  },
+  cookies: {
+    ariaRegion: "Cookie consent",
+    bannerTitle: "Cookies on this site",
+    bannerBody:
+      "We use essential storage for the product to work. You can allow optional analytics and marketing cookies for when we turn those services on, or keep only what’s necessary.",
+    acceptAll: "Accept all",
+    essentialOnly: "Essential only",
   },
   persona: {
     sectionCapabilities: "Capabilities",
@@ -1017,6 +1055,19 @@ const pl: MessageTree = {
     errorOAuthDenied: "Logowanie zostało anulowane.",
     errorOAuthFailed: "Logowanie nie powiodło się. Sprawdź konfigurację dostawcy na API.",
   },
+  consentGdpr: {
+    title: "Zgoda na przetwarzanie danych",
+    lead:
+      "Logowanie społecznościowe utworzyło konto. Żeby korzystać z TWIN, potrzebujemy takiej samej wyraźnej akceptacji jak przy rejestracji e-mailem.",
+    checkboxBefore: "Akceptuję",
+    privacyLink: "Politykę prywatności",
+    checkboxAfter:
+      "i wyrażam zgodę na przetwarzanie moich danych osobowych w celu dopasowania ofert i działania usługi (RODO / UK GDPR, jeśli ma zastosowanie).",
+    required: "Potwierdź akceptację, aby kontynuować.",
+    submit: "Kontynuuj",
+    submitting: "Zapisywanie…",
+    failed: "Nie udało się zapisać wyboru. Spróbuj ponownie.",
+  },
   register: {
     title: "Utwórz konto",
     email: "E-mail",
@@ -1040,6 +1091,8 @@ const pl: MessageTree = {
     linkedInComingSoon:
       "Rejestracja przez LinkedIn jest wyłączona, dopóki API nie ma Client ID, Secret i LINKEDIN_REDIRECT_URI (żółta ramka). Użyj formularza poniżej.",
     linkedInSetupTitle: "Włącz rejestrację przez LinkedIn (jednorazowo)",
+    marketingOptIn: "Chcę sporadyczne maile z nowościami produktu i wskazówkami (opcjonalnie).",
+    marketingHint: "Zmienisz to w profilu. Osobno od zgody na dopasowanie ofert.",
   },
   profile: {
     title: "Twój profil zawodowy",
@@ -1090,6 +1143,17 @@ const pl: MessageTree = {
     talentPoolOptIn: "Pokaż mój zanonimizowany profil w puli talentów B2B",
     talentPoolOptInHint:
       "Rekruterzy widzą tylko umiejętności, znacznik walidacji i dopasowanie w procentach — bez imienia, e-maila, telefonu, treści CV ani dokładnej lokalizacji.",
+    cvProcessingConsentLabel:
+      "Wyrażam zgodę na przechowywanie CV i automatyczny odczyt w celu lepszego dopasowania (szczegóły w polityce prywatności).",
+    cvProcessingConsentHint:
+      "Wymagane przed pierwszym uploadem, jeśli nie zapisano wcześniej. Cofniesz zgodę, odznaczając i zapisując profil (plik CV usuń osobno).",
+    introAudioProcessingConsentLabel:
+      "Wyrażam zgodę na przechowywanie nagrania głosu i przyszłe przetwarzanie (np. transkrypcja) zgodnie z polityką prywatności.",
+    introAudioProcessingConsentHint: "Wymagane przed pierwszym uploadem, jeśli nie zapisano wcześniej.",
+    marketingEmailsOptIn: "Wysyłaj mi sporadyczne nowości produktu i porady e-mailem (opcjonalnie)",
+    marketingEmailsHint: "Osobna podstawa prawna od dopasowania ofert — zmienisz tutaj w każdej chwili.",
+    cvConsentRequiredUpload: "Potwierdź zgodę na przetwarzanie CV powyżej albo zaznacz zgodę przy tym uploadzie.",
+    introConsentRequiredUpload: "Potwierdź zgodę na przetwarzanie nagrania przed wgraniem.",
   },
   onboarding: {
     title: "Onboarding asystenta",
@@ -1176,6 +1240,7 @@ const pl: MessageTree = {
     titleBilling: "Plan i płatności — TWIN",
     titleIdentity: "Weryfikacja tożsamości — TWIN",
     titleAuthCallback: "Logowanie — TWIN",
+    titleGdprConsent: "Zgoda na przetwarzanie — TWIN",
     titleForCandidates: "Kandydaci — TWIN",
     titleForRecruiters: "Rekruterzy — TWIN",
     titleForCompanies: "Firmy — TWIN",
@@ -1224,6 +1289,8 @@ const pl: MessageTree = {
     collect1: "E-mail konta i hasło (w postaci hash)",
     collect2: "Profil kariery: umiejętności, doświadczenie, oczekiwania płacowe, lokalizacja",
     collect3: "Historia aplikacji i dopasowań w TWIN",
+    collect4:
+      "Jeśli wgrasz CV lub nagranie głosu: treść pliku i wyprowadzone sygnały (np. umiejętności, streszczenia) przetwarzamy w celu działania produktu, w tym automatycznego odczytu tam, gdzie jest włączony.",
     whyTitle: "Po co przetwarzamy dane",
     whyBody:
       "Żeby dopasowywać oferty z pracuj.pl i rocketjobs.pl oraz śledzić status aplikacji. Podstawa prawna: wyraźna zgoda przy rejestracji (RODO art. 6 ust. 1 lit. a).",
@@ -1235,6 +1302,17 @@ const pl: MessageTree = {
     thirdTitle: "Podmioty trzecie",
     thirdBody:
       "Do dopasowań używamy Anthropic Claude. Oferty pochodzą z publicznych ogłoszeń na wymienionych portalach.",
+    cookieTitle: "Pliki cookie i pamięć przeglądarki",
+    cookieBody:
+      "Używamy niezbędnych plików cookie i pamięci przeglądarki m.in. do utrzymania sesji i języka. Jeśli zezwolisz na opcjonalne pliki cookie, możemy włączyć analitykę lub marketing, gdy te usługi się pojawią — wybór zapisujemy na tym urządzeniu; zmienisz go w stopce („Ustawienia plików cookie”).",
+  },
+  cookies: {
+    ariaRegion: "Zgoda na pliki cookie",
+    bannerTitle: "Pliki cookie na tej stronie",
+    bannerBody:
+      "Używamy niezbędnego storage, żeby produkt działał. Możesz zezwolić na opcjonalne pliki cookie analityczne i marketingowe na przyszłość albo zostać przy samym minimum.",
+    acceptAll: "Akceptuję wszystkie",
+    essentialOnly: "Tylko niezbędne",
   },
   persona: {
     sectionCapabilities: "Możliwości",
