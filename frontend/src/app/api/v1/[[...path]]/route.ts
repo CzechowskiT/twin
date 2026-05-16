@@ -36,6 +36,7 @@ async function proxy(req: NextRequest, pathSegments: string[]): Promise<NextResp
     if (HOP_BY_HOP.has(key.toLowerCase())) return;
     headers.set(key, value);
   });
+  headers.set("accept-encoding", "identity");
 
   const hasBody = !["GET", "HEAD"].includes(req.method);
   const body = hasBody ? await req.arrayBuffer() : undefined;
@@ -57,7 +58,8 @@ async function proxy(req: NextRequest, pathSegments: string[]): Promise<NextResp
     );
   }
 
-  const res = new NextResponse(upstream.body, {
+  const payload = await upstream.arrayBuffer();
+  const res = new NextResponse(payload, {
     status: upstream.status,
     statusText: upstream.statusText,
   });
