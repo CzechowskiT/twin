@@ -26,6 +26,13 @@ export type PersonaBundle = {
   heroTitle: string;
   heroLead: string;
   pillars: FeatureBlock[];
+  /** Optional: post-hire retention / growth lane (candidates marketing). */
+  growthLane?: {
+    eyebrow: string;
+    title: string;
+    lead: string;
+    items: FeatureBlock[];
+  };
   pricingTitle: string;
   pricingLead: string;
   pricingFootnote: string;
@@ -55,6 +62,34 @@ const candidatesEn: PersonaBundle = {
       body: "Statuses for pending, applied, rejected; manual apply opens the employer flow; auto-apply runs only on supported boards and paid tiers — GDPR-first consent at registration.",
     },
   ],
+  growthLane: {
+    eyebrow: "After the offer",
+    title: "Stay with TWIN once you’re in-seat — growth, not just job search",
+    lead:
+      "The hire is a milestone, not an off-boarding event. We’re building a second act inside the same workspace: light-touch market awareness, review-ready artifacts, and nudges that respect employed life (quiet hours, digests). Depth lands in phases — here’s the lane we’re selling so you keep opening TWIN monthly.",
+    items: [
+      {
+        title: "Calibrated passive watch",
+        body: "Turn the firehose into a trickle: a small stream of high-signal roles, salary band deltas, and skill gaps vs your lane — enough to notice mis-hires early without doom-scrolling.",
+      },
+      {
+        title: "30 / 60 / 90 + review pulse",
+        body: "Structured checklists, prompts before probation milestones, and a lightweight wins log so “what did I ship?” isn’t reconstructed from memory the night before calibration.",
+      },
+      {
+        title: "Skills & market drift radar",
+        body: "Fresh listings vs your profile as a living diff: emerging stacks in your title family, certifications hiring managers suddenly mention, and suggested micro-upskills tied to real JD language.",
+      },
+      {
+        title: "Promotion-ready packet",
+        body: "One-click export: headline impact, quantified outcomes, languages, and internal mobility hooks sourced from your CV + tracked applications — formatted for managers who live in PDFs.",
+      },
+      {
+        title: "Quiet mode for employed life",
+        body: "Weekly digest instead of intraday pings, calendar-aware nudges for review windows, and explicit “I’m heads-down” toggles so the twin whispers instead of shouts.",
+      },
+    ],
+  },
   pricingTitle: "Candidate pricing (self-serve)",
   pricingLead: "Stripe checkout powers Premium/Pro today; numbers below are illustrative MSRP excluding VAT.",
   pricingFootnote:
@@ -130,6 +165,34 @@ const candidatesPl: PersonaBundle = {
       body: "Statusy pending/applied/rejected; ręczne „Aplikuj” otwiera flow pracodawcy; auto-apply tylko na obsługiwanych portalach i płatnych planach — RODO od rejestracji.",
     },
   ],
+  growthLane: {
+    eyebrow: "Po podpisaniu umowy",
+    title: "Zostań z TWIN także w roli — rozwój, nie tylko poszukiwania",
+    lead:
+      "Zatrudnienie to kamień milowy, a nie powód do wylogowania. Budujemy drugi akt w tym samym workspace: lekki kontakt z rynkiem, materiały pod rozmowy o awansie i przypomnienia, które szanują tryb „jestem w pracy” (cisza, digest). Głębia wchodzi falami — poniżej kontrakt produktowy, żebyś otwierał TWIN co miesiąc, nie tylko w kryzysie tabów.",
+    items: [
+      {
+        title: "Uspokojony passive watch",
+        body: "Zamiast zalewu — cienka struga sygnałów: wybrane role w Twojej ścieżce, zmiany widełek wynagrodzeń i luka kompetencyjna vs świeże JD — wystarczająco, by wcześnie wyczuć nietrafione dopasowanie, bez doom-scrolla.",
+      },
+      {
+        title: "Puls 30 / 60 / 90 i okienek ocen",
+        body: "Checklisty okresów próbnych, delikatne nudge przed ważnymi datami oraz lekki dziennik sukcesów („co dowiozłem?”), żeby nie składać narracji awansu z pamięci na dzień przed kalibracją.",
+      },
+      {
+        title: "Radar dryfu umiejętności i rynku",
+        body: "Świeże ogłoszenia vs Twój profil jako żyjąca różnica: stack w rodzinie stanowisk, certyfikacje, które nagle wracają w ofertach, i mikro-sugestie rozwoju osadzone w realnym języku JD.",
+      },
+      {
+        title: "Pakiet pod rozmowę o awansie",
+        body: "Eksport jednym kliknięciem: efekt, liczby, języki, wątki mobilności wewnętrznej — z CV i historii aplikacji w TWIN — pod PDF-y managera i HRBP.",
+      },
+      {
+        title: "Tryb ciszy dla etatu",
+        body: "Digest tygodniowy zamiast pingów w ciągu dnia, szacunek dla kalendarza (np. okna ocen) i jawny przełącznik „jestem w głębokiej robocie”, żeby bliźniak szepnął, a nie krzyczał.",
+      },
+    ],
+  },
   pricingTitle: "Cennik kandydata (self-serve)",
   pricingLead: "Stripe obsługuje Premium/Pro; kwoty poniżej to ilustracyjne MSRP netto orientacyjnie.",
   pricingFootnote:

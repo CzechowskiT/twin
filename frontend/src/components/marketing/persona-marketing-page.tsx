@@ -55,6 +55,32 @@ export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
           </ul>
         </section>
 
+        {c.growthLane ? (
+          <section id="growth-post-offer" className="scroll-mt-24" aria-labelledby="persona-growth-lane">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
+              {c.growthLane.eyebrow}
+            </p>
+            <h2 id="persona-growth-lane" className="twin-page-intro twin-section-title mt-3 max-w-4xl text-lg sm:text-xl">
+              {c.growthLane.title}
+            </h2>
+            <p className="mt-4 max-w-3xl text-sm leading-relaxed text-[var(--twin-muted-strong)] sm:text-base">
+              {c.growthLane.lead}
+            </p>
+            <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {c.growthLane.items.map((item) => (
+                <li
+                  key={item.title}
+                  className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/90 p-4 sm:p-5"
+                >
+                  <h3 className="text-base font-semibold text-[var(--foreground)]">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-[var(--twin-muted-strong)]">{item.body}</p>
+                </li>
+              ))}
+            </ul>
+            <p className="twin-muted mt-4 max-w-3xl text-xs leading-relaxed">{t("persona.growthRoadmapFootnote")}</p>
+          </section>
+        ) : null}
+
         {persona === "recruiters" || persona === "companies" ? (
           <TalentPoolPreview />
         ) : null}

@@ -16,7 +16,7 @@ export function LandingAudienceSections() {
       title: t("home.audienceCandidateTitle"),
       body: t("home.audienceCandidateBody"),
       cta: t("home.audienceCandidateCta"),
-      href: "/for-candidates" as const,
+      href: "/for-candidates#growth-post-offer" as const,
       variant: "default" as const,
     },
     {

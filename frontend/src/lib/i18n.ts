@@ -197,7 +197,7 @@ const en = {
       "Three different products, three different receipts: candidate checkout (Stripe), recruiter seats (invoice), company programs (annual). Pick the lane — don’t mix the SKUs.",
     audienceCandidateTitle: "Candidates",
     audienceCandidateBody:
-      "Aggregate roles from boards your workspace enables, rank when your profile exists, keep applications in one pipeline, and optionally use CV intelligence + auto-apply where boards allow.",
+      "Aggregate roles from boards your workspace enables, rank when your profile exists, keep applications in one pipeline, and optionally use CV intelligence + auto-apply where boards allow. After you land, TWIN keeps a growth lane: passive market watch, review-ready exports, and quiet-mode digests so you stay a monthly habit — not a panic tab.",
     audienceRecruiterTitle: "Recruiters & sourcers",
     audienceRecruiterBody:
       "Watchlists, hiring-manager packets, governance presets, and seat-based billing — built for sourcing teams, not the consumer dashboard SKU.",
@@ -290,6 +290,7 @@ const en = {
     quickTopMatches: "Top matches",
     quickApplications: "Applications",
     quickWorkspaceTour: "Workspace tour",
+    quickGrowthPostOffer: "After you’re hired — keep growing",
     quickRefreshListings: "Refresh listings",
     statFeedTitle: "In your feed",
     statFeedCta: "Jump to listings",
@@ -653,6 +654,8 @@ const en = {
     talentPoolNoSkills: "No skills listed",
     talentPoolEmpty: "No candidates in the pool yet — check back after users opt in.",
     talentPoolLoadMore: "Load more",
+    growthRoadmapFootnote:
+      "Order of delivery can change; some items may be tier-gated when they ship. Tell us what you’d open weekly — it steers the roadmap.",
   },
   common: {
     language: "Language",
@@ -788,7 +791,7 @@ const pl: MessageTree = {
       "Trzy różne produkty, trzy różne cenniki: kandydat (Stripe), rekruter (faktura), firma (rocznie). Wybierz pasującą ścieżkę — bez mylenia SKU.",
     audienceCandidateTitle: "Kandydaci",
     audienceCandidateBody:
-      "Agregacja ofert, ranking przy profilu, jeden pipeline aplikacji oraz opcjonalnie inteligencja CV i auto-apply tam, gdzie portal na to pozwala.",
+      "Agregacja ofert, ranking przy profilu, jeden pipeline aplikacji oraz opcjonalnie inteligencja CV i auto-apply tam, gdzie portal na to pozwala. Po starcie w roli TWIN zostaje z Tobą: lekki passive watch, eksporty pod rozmowy o awansie i digest w trybie ciszy — żebyś wracał co miesiąc, nie tylko w panice tabów.",
     audienceRecruiterTitle: "Rekruterzy i sourcerzy",
     audienceRecruiterBody:
       "Watchlisty, paczki dla hiring managera, presety zgodności i rozliczenie per miejsce — pod zespoły sourcingowe, nie pod SKU konsumencki.",
@@ -881,6 +884,7 @@ const pl: MessageTree = {
     quickTopMatches: "Najlepsze dopasowania",
     quickApplications: "Aplikacje",
     quickWorkspaceTour: "Krótki przewodnik",
+    quickGrowthPostOffer: "Po starcie w roli — dalej z TWIN",
     quickRefreshListings: "Odśwież listingi",
     statFeedTitle: "W feedzie",
     statFeedCta: "Przejdź do listy",
@@ -1247,6 +1251,8 @@ const pl: MessageTree = {
     talentPoolNoSkills: "Brak umiejętności na liście",
     talentPoolEmpty: "Pula jest jeszcze pusta — wróć, gdy użytkownicy włączą udział.",
     talentPoolLoadMore: "Załaduj więcej",
+    growthRoadmapFootnote:
+      "Kolejność wdrożeń może się zmieniać; część funkcji może być powiązana z planem po starcie. Napisz, co otwierałbyś co tydzień — to ustawia roadmapę.",
   },
   common: {
     language: "Język",
