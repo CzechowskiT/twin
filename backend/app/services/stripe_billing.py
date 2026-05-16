@@ -14,6 +14,76 @@ from app.database.models import User
 
 logger = logging.getLogger(__name__)
 
+# Stripe Checkout `payment_method_types` for subscription mode — unknown env entries are dropped (logged).
+# Apple Pay / Google Pay are not separate ids: they appear on `card` when the account + browser support wallets.
+_CHECKOUT_SUBSCRIPTION_TYPES: frozenset[str] = frozenset(
+    {
+        "card",
+        "link",
+        "amazon_pay",
+        "paypal",
+        "us_bank_account",
+        "sepa_debit",
+        "bacs_debit",
+        "acss_debit",
+        "bancontact",
+        "eps",
+        "giropay",
+        "ideal",
+        "p24",
+        "blik",
+        "cashapp",
+        "customer_balance",
+        "konbini",
+        "paynow",
+        "promptpay",
+        "grabpay",
+        "oxxo",
+        "boleto",
+        "fpx",
+        "afterpay_clearpay",
+        "klarna",
+        "affirm",
+    }
+)
+
+
+def checkout_payment_method_types(settings: Settings) -> list[str]:
+    """Parse STRIPE_CHECKOUT_PAYMENT_METHOD_TYPES; default card + Link."""
+    raw = (settings.stripe_checkout_payment_method_types or "").strip()
+    if not raw:
+        return ["card", "link"]
+    seen: set[str] = set()
+    out: list[str] = []
+    for part in raw.split(","):
+        p = part.strip().lower()
+        if not p or p in seen:
+            continue
+        if p not in _CHECKOUT_SUBSCRIPTION_TYPES:
+            logger.warning("Ignoring unknown Stripe checkout payment_method_type: %s", p)
+            continue
+        seen.add(p)
+        out.append(p)
+    return out if out else ["card", "link"]
+
+
+def checkout_payment_methods_note(types: list[str]) -> str:
+    """Short English sentence for API consumers (dashboard shows typed chips too)."""
+    if not types:
+        return "Checkout uses Stripe-hosted payment methods from server configuration."
+    if types == ["card"]:
+        return (
+            "Checkout: cards — Apple Pay and Google Pay show automatically when the browser "
+            "and Stripe account support them."
+        )
+    if set(types) == {"card", "link"}:
+        return (
+            "Checkout: cards (with Apple Pay / Google Pay when supported) and Stripe Link — "
+            "hosted by Stripe."
+        )
+    joined = ", ".join(types)
+    return f"Checkout payment method types (Stripe): {joined}."
+
 
 def _subscription_as_dict(sub: Any) -> dict[str, Any]:
     if isinstance(sub, dict):

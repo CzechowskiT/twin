@@ -20,9 +20,13 @@ class PlanOut(BaseModel):
 class PlansPublicResponse(BaseModel):
     plans: list[PlanOut]
     checkout_configured: bool
-    payment_methods_note: str = (
-        "Checkout accepts major cards; Apple Pay and Google Pay appear automatically when the "
-        "browser and wallet are supported (Stripe)."
+    checkout_payment_methods: list[str] = Field(
+        default_factory=list,
+        description="Stripe Checkout payment_method_types enabled on this server.",
+    )
+    payment_methods_note: str = Field(
+        default="",
+        description="Human-readable summary (English) of checkout methods for dashboards.",
     )
 
 

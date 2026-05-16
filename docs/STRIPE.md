@@ -1,6 +1,11 @@
 # Stripe billing (TWIN)
 
-Subscriptions use **Stripe Checkout** (hosted payment page). Checkout automatically offers **Apple Pay** and **Google Pay** when the shopper’s browser and wallet support them, alongside cards — no separate PayPal integration is required for those wallets.
+Subscriptions use **Stripe Checkout** (hosted payment page). Which rails appear is controlled by **`STRIPE_CHECKOUT_PAYMENT_METHOD_TYPES`** (comma-separated `payment_method_types`). Defaults to **`card,link`**.
+
+- **`card`**: major cards plus **Apple Pay** and **Google Pay** when the Stripe account, domain, and browser support wallets (they are not separate type ids).
+- **`link`**: [Stripe Link](https://stripe.com/docs/payments/link) one-tap checkout where enabled.
+
+Other methods (e.g. `ideal`, `sepa_debit`, `paypal`, `amazon_pay`) may be added if your Stripe account and **Price currency** support them for **subscription** Checkout; invalid values are ignored at startup (see server logs).
 
 ## Environment variables (API / Railway)
 
@@ -10,6 +15,7 @@ Subscriptions use **Stripe Checkout** (hosted payment page). Checkout automatica
 | `STRIPE_WEBHOOK_SECRET` | Signing secret from the Stripe Dashboard webhook endpoint (`whsec_…`). |
 | `STRIPE_PRICE_ID_PREMIUM` | **Price** ID for the Premium monthly (or yearly) subscription (`price_…`). |
 | `STRIPE_PRICE_ID_PRO` | Optional second paid tier; if empty, “Upgrade to Pro” stays disabled in the UI. |
+| `STRIPE_CHECKOUT_PAYMENT_METHOD_TYPES` | Optional. Comma-separated Stripe Checkout `payment_method_types` (default `card,link`). |
 | `FRONTEND_URL` | Used for Checkout success/cancel and Customer Portal return URL (no trailing slash). |
 
 Do **not** commit keys. Configure them in Railway (API + worker if webhooks hit API only — webhooks go to the API service).

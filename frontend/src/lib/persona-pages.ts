@@ -38,9 +38,9 @@ export type PersonaBundle = {
 
 const candidatesEn: PersonaBundle = {
   heroEyebrow: "Candidate workspace",
-  heroTitle: "One pipeline for every board you enable",
+  heroTitle: "Let the boring career admin run in the background",
   heroLead:
-    "TWIN aggregates listings, scores them to your profile when it exists, and tracks applications — CV intelligence and auto-apply ship where boards and your plan allow.",
+    "One aggressive feed, profile-aware scores, CV smarts, tracked applications — built for people who’d rather be in flow state than in job-tab hell. Auto-apply unlocks where boards + your plan allow.",
   pillars: [
     {
       title: "Discovery & match",
@@ -107,15 +107,15 @@ const candidatesEn: PersonaBundle = {
     "Auto-apply requires Playwright-friendly boards and Premium/Pro entitlements.",
     "CV parsing reads PDF/DOCX/TXT; scanned PDFs without text remain a best-effort extraction.",
   ],
-  primaryCta: { label: "Start as a candidate", href: "/register" },
-  secondaryCta: { label: "Open dashboard", href: "/dashboard" },
+  primaryCta: { label: "Ship my twin — free", href: "/register" },
+  secondaryCta: { label: "I already run hot — dashboard", href: "/dashboard" },
 };
 
 const candidatesPl: PersonaBundle = {
   heroEyebrow: "Przestrzeń dla kandydata",
-  heroTitle: "Jeden pipeline na wszystkie włączone portale",
+  heroTitle: "Nudny admin kariery niech leci w tle",
   heroLead:
-    "TWIN zbiera oferty, ocenia je względem profilu (gdy jest), śledzi aplikacje — inteligencja CV i auto-aplikacja tam, gdzie portal i plan na to pozwalają.",
+    "Jeden agresywnie czytelny feed, scoring pod profil, inteligencja CV, śledzenie aplikacji — dla ludzi, którzy wolą flow niż piekło tabów. Auto-apply tam, gdzie portal i plan pozwalają.",
   pillars: [
     {
       title: "Odkrywanie i dopasowanie",
@@ -182,8 +182,8 @@ const candidatesPl: PersonaBundle = {
     "Auto-apply wymaga Playwright + uprawnień Premium/Pro.",
     "PDF skanowany bez warstwy tekstu = ekstrakcja na najlepszym wysiłku.",
   ],
-  primaryCta: { label: "Zacznij jako kandydat", href: "/register" },
-  secondaryCta: { label: "Otwórz panel", href: "/dashboard" },
+  primaryCta: { label: "Odpalam TWIN — za darmo", href: "/register" },
+  secondaryCta: { label: "Mam już tempo — panel", href: "/dashboard" },
 };
 
 const recruitersEn: PersonaBundle = {

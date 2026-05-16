@@ -8,6 +8,7 @@ import { useTranslation } from "@/components/language-provider";
 import { Button, ButtonCta, Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
+import type { TranslationKey } from "@/lib/i18n";
 
 type Me = {
   id: number;
@@ -28,8 +29,28 @@ type PlanRow = {
 type PlansPayload = {
   plans: PlanRow[];
   checkout_configured: boolean;
+  checkout_payment_methods: string[];
   payment_methods_note: string;
 };
+
+function stripeCheckoutMethodLabel(method: string): TranslationKey | null {
+  const map: Record<string, TranslationKey> = {
+    card: "dashboard.billingPmCard",
+    link: "dashboard.billingPmLink",
+    paypal: "dashboard.billingPmPaypal",
+    amazon_pay: "dashboard.billingPmAmazonPay",
+    sepa_debit: "dashboard.billingPmSepa",
+    ideal: "dashboard.billingPmIdeal",
+    us_bank_account: "dashboard.billingPmUsBank",
+    bancontact: "dashboard.billingPmBancontact",
+    p24: "dashboard.billingPmP24",
+    blik: "dashboard.billingPmBlik",
+    cashapp: "dashboard.billingPmCashapp",
+    klarna: "dashboard.billingPmKlarna",
+    affirm: "dashboard.billingPmAffirm",
+  };
+  return map[method] ?? null;
+}
 
 type UrlPayload = { url: string };
 
@@ -196,7 +217,33 @@ export default function BillingPage() {
           <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
             {t("dashboard.billingPlansTitle")}
           </p>
-          <p className="twin-muted mt-2 text-xs leading-relaxed">{plans.payment_methods_note}</p>
+          {plans.checkout_payment_methods.length > 0 ? (
+            <div className="mt-4 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/50 p-3 sm:p-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
+                {t("dashboard.billingCheckoutMethodsEyebrow")}
+              </p>
+              <ul className="mt-2 flex flex-wrap gap-2">
+                {plans.checkout_payment_methods.map((m) => {
+                  const key = stripeCheckoutMethodLabel(m);
+                  const label = key ? t(key) : `${t("dashboard.billingPmGeneric")} (${m})`;
+                  return (
+                    <li
+                      key={m}
+                      className="rounded-full border border-[var(--twin-border)] bg-[var(--twin-surface)] px-3 py-1 text-xs font-medium text-[var(--foreground)]"
+                    >
+                      {label}
+                    </li>
+                  );
+                })}
+              </ul>
+              {plans.checkout_payment_methods.includes("card") ? (
+                <p className="twin-muted mt-2 text-xs leading-relaxed">{t("dashboard.billingWalletsHint")}</p>
+              ) : null}
+              {locale === "en" && plans.payment_methods_note ? (
+                <p className="twin-muted mt-2 text-xs leading-relaxed">{plans.payment_methods_note}</p>
+              ) : null}
+            </div>
+          ) : null}
           <ul className="mt-6 space-y-5">
             {plans.plans.map((p) => (
               <li

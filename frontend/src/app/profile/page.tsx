@@ -23,6 +23,7 @@ type Profile = {
   experience_years: number;
   desired_salary: number | null;
   location: string | null;
+  talent_pool_opt_in?: boolean;
   has_cv?: boolean;
   cv_filename?: string | null;
   has_intro_audio?: boolean;
@@ -156,6 +157,7 @@ export default function ProfilePage() {
       experience_years: Number(form.get("experience_years") || 0),
       desired_salary: salaryRaw ? Number(salaryRaw) : null,
       location: String(form.get("location") || "") || null,
+      talent_pool_opt_in: Boolean(form.get("talent_pool_opt_in")),
     };
     try {
       await apiFetch("/api/v1/candidates/me", { method: "PUT", body: JSON.stringify(body) }, token);
@@ -335,12 +337,30 @@ export default function ProfilePage() {
             placeholder={t("profile.locationPlaceholder")}
             defaultValue={initial?.location ?? ""}
           />
+          <div className="mb-4 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/40 p-4">
+            <label className="flex cursor-pointer items-start gap-3 text-sm">
+              <input
+                type="checkbox"
+                name="talent_pool_opt_in"
+                value="on"
+                defaultChecked={Boolean(initial?.talent_pool_opt_in)}
+                className="mt-1 h-4 w-4 shrink-0 rounded border-[var(--twin-border)]"
+              />
+              <span>
+                <span className="font-medium text-[var(--foreground)]">{t("profile.talentPoolOptIn")}</span>
+                <span className="mt-1 block text-xs text-[var(--twin-muted-strong)]">{t("profile.talentPoolOptInHint")}</span>
+              </span>
+            </label>
+          </div>
           {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
           <Button type="submit" disabled={saving || cvBusy || introBusy}>
             {saving ? t("profile.saving") : t("profile.submit")}
           </Button>
         </form>
         <p className="twin-muted mt-4 text-center text-sm">
+          <Link href="/dashboard/identity" className="twin-link mr-3">
+            {t("dashboard.identityLink")}
+          </Link>
           <Link href="/dashboard" className="twin-link">
             {t("profile.backToDashboard")}
           </Link>

@@ -46,6 +46,7 @@ class User(Base):
     stripe_customer_id: Mapped[str | None] = mapped_column(String(255), nullable=True, unique=True)
     stripe_subscription_id: Mapped[str | None] = mapped_column(String(255), nullable=True, unique=True)
     subscription_current_period_end: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    identity_verified_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     candidate: Mapped["Candidate | None"] = relationship(back_populates="user")
     password_reset_tokens: Mapped[list["PasswordResetToken"]] = relationship(
@@ -54,6 +55,31 @@ class User(Base):
     oauth_accounts: Mapped[list["OAuthAccount"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
+    identity_verifications: Mapped[list["IdentityVerification"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+
+
+class IdentityVerification(Base):
+    """Provider-backed identity check (e.g. Authologic). Stores status only — not document images."""
+
+    __tablename__ = "identity_verifications"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    provider: Mapped[str] = mapped_column(String(32), default="authologic")
+    conversation_id: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    user_key: Mapped[str] = mapped_column(String(200))
+    conversation_status: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    identity_status: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    redirect_url: Mapped[str | None] = mapped_column(String(1024), nullable=True)
+    summary_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+    user: Mapped["User"] = relationship(back_populates="identity_verifications")
 
 
 class OAuthAccount(Base):
@@ -100,6 +126,7 @@ class Candidate(Base):
     intro_audio_uploaded_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     intro_audio_transcript: Mapped[str | None] = mapped_column(Text, nullable=True)
     profile_signals_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    talent_pool_opt_in: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     user: Mapped["User"] = relationship(back_populates="candidate")

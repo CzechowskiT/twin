@@ -1,0 +1,21 @@
+JAN KOWALSKI — Fullstack Engineer (przykład syntetyczny, bez prawdziwych danych kontaktowych)
+Lokalizacja: Warszawa · tryb pracy: hybrydowy / zdalny
+
+PODSUMOWANIE
+Inżynier oprogramowania z ~7 latami doświadczenia w budowie produktów B2B: backend w Pythonie (FastAPI), frontend w React i TypeScript, PostgreSQL, Docker, integracje REST. Skupienie na czytelnej architekturze i jakości wdrożeń.
+
+DOŚWIADCZENIE
+• Lead Developer — platforma logistyczna (2021–obecnie): mikroserwisy FastAPI, panel operacyjny React, observability, code review.
+• Software Engineer — HR tech / ATS (2018–2021): migracje schematu, raporty SQL, automatyzacje CI.
+
+STACK
+Python · FastAPI · React · TypeScript · PostgreSQL · Docker · Git
+
+WYKSZTAŁCENIE
+Informatyka — studia inżynierskie (uczelnia fikcyjna w celach demonstracyjnych)
+
+JĘZYKI
+Polski (ojczysty), angielski (B2/C1) — praca z dokumentacją i zespołem międzynarodowym
+
+UWAGA DLA DEMO
+Ten dokument służy wyłącznie do prezentacji produktu (MVP). W produkcji TWIN przetwarza CV po wyraźnej zgodzie użytkownika (RODO).

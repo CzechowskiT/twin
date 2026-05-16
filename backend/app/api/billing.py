@@ -42,8 +42,12 @@ def _checkout_configured(settings: Settings) -> bool:
 def list_plans(settings: Annotated[Settings, Depends(get_settings)]) -> PlansPublicResponse:
     premium_ready = bool(settings.stripe_price_id_premium)
     pro_ready = bool(settings.stripe_price_id_pro)
+    pm_types = stripe_svc.checkout_payment_method_types(settings)
+    pm_note = stripe_svc.checkout_payment_methods_note(pm_types)
     return PlansPublicResponse(
         checkout_configured=_checkout_configured(settings),
+        checkout_payment_methods=pm_types,
+        payment_methods_note=pm_note,
         plans=[
             PlanOut(
                 id="free",
@@ -104,7 +108,7 @@ def create_checkout_session(
             "cancel_url": f"{settings.frontend_url}/dashboard/billing?checkout=cancel",
             "metadata": {"user_id": str(user.id)},
             "subscription_data": {"metadata": {"user_id": str(user.id)}},
-            "payment_method_types": ["card"],
+            "payment_method_types": stripe_svc.checkout_payment_method_types(settings),
         }
         if user.stripe_customer_id:
             params["customer"] = user.stripe_customer_id

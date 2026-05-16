@@ -2,7 +2,7 @@
 export const SITE_MESSAGES_EN = {
   aboutTitle: "About TWIN",
   aboutLead:
-    "TWIN is an autonomous career agent: one workspace to discover roles across boards, score them to your profile, and track applications — with deeper automation shipping in stages.",
+    "TWIN sells you time back: one layer above noisy job boards so your ambition isn’t taxed by tab chaos — autonomy ships in public phases, not vaporware vibes.",
   aboutP1:
     "We sit above public job markets instead of replacing them. Employers keep their apply flows; candidates keep control of where they send their data.",
   aboutP2:
@@ -94,7 +94,7 @@ export const SITE_MESSAGES_EN = {
 export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } = {
   aboutTitle: "O TWIN",
   aboutLead:
-    "TWIN to autonomiczny agent kariery: jedna przestrzeń do odkrywania ofert z wielu portali, oceny pod Twój profil i śledzenia aplikacji — z głębszą automatyzacją wdrażaną etapami.",
+    "TWIN oddaje Ci czas: warstwa nad hałaśliwymi portalami, żeby ambicja nie ginęła w chaosie tabów — autonomia wchodzi etapami na żywo, nie jako marketingowy „wow”.",
   aboutP1:
     "Działamy ponad publicznymi rynkami pracy, zamiast je zastępować. Pracodawcy zachowują swoje ścieżki aplikacji; kandydaci kontrolują, gdzie wysyłają dane.",
   aboutP2:

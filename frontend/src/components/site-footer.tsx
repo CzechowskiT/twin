@@ -47,6 +47,7 @@ export function SiteFooter() {
 
   const explore = [
     { href: "/", label: t("site.footerHome") },
+    { href: "/demo", label: t("nav.demo") },
     { href: "/for-candidates", label: t("nav.forCandidates") },
     { href: "/for-recruiters", label: t("nav.forRecruiters") },
     { href: "/for-companies", label: t("nav.forCompanies") },

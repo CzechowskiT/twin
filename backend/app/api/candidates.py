@@ -200,6 +200,11 @@ def _normalize_titles(body: CandidateCreate | CandidateUpdate) -> list[str]:
 
 
 def _build_candidate(user_id: int, body: CandidateCreate | CandidateUpdate) -> Candidate:
+    opt_in = getattr(body, "talent_pool_opt_in", None)
+    if opt_in is None:
+        opt_in_default = False
+    else:
+        opt_in_default = bool(opt_in)
     return Candidate(
         user_id=user_id,
         name=body.name,
@@ -208,6 +213,7 @@ def _build_candidate(user_id: int, body: CandidateCreate | CandidateUpdate) -> C
         experience_years=body.experience_years,
         desired_salary=body.desired_salary,
         location=body.location,
+        talent_pool_opt_in=opt_in_default,
     )
 
 
@@ -218,6 +224,8 @@ def _apply_update(candidate: Candidate, body: CandidateUpdate) -> None:
     candidate.experience_years = body.experience_years
     candidate.desired_salary = body.desired_salary
     candidate.location = body.location
+    if body.talent_pool_opt_in is not None:
+        candidate.talent_pool_opt_in = body.talent_pool_opt_in
 
 
 def _cv_insights_from_candidate(candidate: Candidate) -> dict[str, Any] | None:
@@ -245,6 +253,7 @@ def _to_out(candidate: Candidate) -> CandidateOut:
         experience_years=candidate.experience_years,
         desired_salary=candidate.desired_salary,
         location=candidate.location,
+        talent_pool_opt_in=bool(candidate.talent_pool_opt_in),
         has_cv=bool(candidate.cv_text),
         cv_filename=candidate.cv_filename,
         cv_uploaded_at=candidate.cv_uploaded_at,

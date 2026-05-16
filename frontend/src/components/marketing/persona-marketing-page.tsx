@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { useTranslation } from "@/components/language-provider";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
+import { TalentPoolPreview } from "@/components/marketing/talent-pool-preview";
 import { Shell } from "@/components/ui";
 import { getPersonaBundle, type PersonaId } from "@/lib/persona-pages";
 
@@ -53,6 +54,10 @@ export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
             ))}
           </ul>
         </section>
+
+        {persona === "recruiters" || persona === "companies" ? (
+          <TalentPoolPreview />
+        ) : null}
 
         <section aria-labelledby="persona-pricing">
           <h2 id="persona-pricing" className="twin-section-title text-lg sm:text-xl">

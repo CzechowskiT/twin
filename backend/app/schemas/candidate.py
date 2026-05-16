@@ -13,6 +13,7 @@ class CandidateCreate(BaseModel):
     experience_years: int = Field(ge=0, le=50)
     desired_salary: int | None = Field(default=None, ge=0)
     location: str | None = Field(default=None, max_length=100)
+    talent_pool_opt_in: bool = False
 
 
 class CandidateUpdate(BaseModel):
@@ -22,6 +23,7 @@ class CandidateUpdate(BaseModel):
     experience_years: int = Field(ge=0, le=50)
     desired_salary: int | None = Field(default=None, ge=0)
     location: str | None = Field(default=None, max_length=100)
+    talent_pool_opt_in: bool | None = None
 
 
 class CandidateOut(BaseModel):
@@ -32,6 +34,7 @@ class CandidateOut(BaseModel):
     experience_years: int
     desired_salary: int | None
     location: str | None
+    talent_pool_opt_in: bool = False
     has_cv: bool = False
     cv_filename: str | None = None
     cv_uploaded_at: datetime | None = None

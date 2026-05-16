@@ -128,6 +128,21 @@ class Settings(BaseSettings):
     stripe_webhook_secret: str = ""
     stripe_price_id_premium: str = ""
     stripe_price_id_pro: str = ""
+    # Comma-separated Stripe Checkout `payment_method_types` for subscriptions (e.g. card,link).
+    # `card` includes Apple Pay / Google Pay where Stripe presents wallets; `link` enables Link.
+    # Invalid entries are ignored; see docs/STRIPE.md.
+    stripe_checkout_payment_method_types: str = "card,link"
+
+    # Authologic Customer API (KYC / identity) — https://developer.authologic.com
+    # Basic auth: OmniPanel login as user, API key as password (see OpenAPI securitySchemes).
+    authologic_api_base_url: str = "https://sandbox.authologic.com"
+    authologic_api_login: str = ""
+    authologic_api_key: str = ""
+    authologic_strategy: str = "public:default"
+    # Optional: absolute public API URL (https://…) for server-side callbackUrl in CreateConversation.
+    authologic_server_public_url: str = ""
+    # When non-empty, GET/POST /kyc/authologic/callback must pass ?token= matching value (shared secret).
+    authologic_callback_token: str = ""
 
     @property
     def cors_origin_list(self) -> list[str]:

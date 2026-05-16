@@ -38,6 +38,7 @@ class UserOut(BaseModel):
     plan_tier: str = "free"
     subscription_status: str | None = None
     subscription_current_period_end: datetime | None = None
+    identity_verified_at: datetime | None = None
 
     model_config = {"from_attributes": True}
 
@@ -51,4 +52,5 @@ class UserOut(BaseModel):
             plan_tier=getattr(user, "plan_tier", None) or "free",
             subscription_status=getattr(user, "subscription_status", None),
             subscription_current_period_end=getattr(user, "subscription_current_period_end", None),
+            identity_verified_at=getattr(user, "identity_verified_at", None),
         )

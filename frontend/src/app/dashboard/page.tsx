@@ -318,6 +318,9 @@ export default function DashboardPage() {
           <Link href="/dashboard/billing" className="twin-link twin-touch-target text-center text-sm sm:text-left">
             {t("dashboard.billingLink")}
           </Link>
+          <Link href="/dashboard/identity" className="twin-link twin-touch-target text-center text-sm sm:text-left">
+            {t("dashboard.identityLink")}
+          </Link>
           <button
             type="button"
             onClick={() => {
