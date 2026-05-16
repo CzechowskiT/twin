@@ -64,6 +64,7 @@ def list_jobs(
     location: str | None = None,
     job_board: str | None = None,
     min_salary: int | None = None,
+    title_terms: str | None = None,
     sort: str = SORT_NEWEST,
     db: Session = Depends(get_db),
     _user: User = Depends(get_current_user),
@@ -79,6 +80,7 @@ def list_jobs(
         location=location,
         job_board=job_board,
         min_salary=min_salary,
+        title_terms=title_terms,
         sort=sort,
     )
     total = query.count()

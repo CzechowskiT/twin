@@ -60,8 +60,8 @@ sequenceDiagram
 ## 5. Account linking
 
 - New LinkedIn users get an account with email from LinkedIn and no password.
-- If the same email already exists (email/password signup), `linkedin_id` is attached on first LinkedIn login.
-- Email/password login still works for users who set a password; OAuth-only users must use LinkedIn.
+- If the same email already exists (email/password signup), the provider is linked on first OAuth login (`oauth_accounts` row; LinkedIn also sets `users.linkedin_id` for backward compatibility).
+- Email/password login still works for users who set a password; OAuth-only users must use a linked provider.
 
 ## 6. Troubleshooting
 
@@ -78,3 +78,21 @@ sequenceDiagram
 - [ ] Production redirect URI added in LinkedIn app
 - [ ] `FRONTEND_URL` set to production app URL
 - [ ] Secrets stored in platform env (Railway/Render), not committed
+
+## 8. Other OAuth providers (Google, GitHub, Apple)
+
+Same server-side redirect flow: `GET /api/v1/auth/{google|github|apple}/login` → provider → callback on the API → JWT → `FRONTEND_URL/auth/callback?token=…`.
+
+- **Status (all providers):** `GET /api/v1/auth/oauth/status` returns `{ linkedin, google, github, apple, microsoft }`.
+- **Redirect URIs** (must match the corresponding `*_REDIRECT_URI` env var exactly):
+
+| Provider | Example redirect URL |
+|----------|----------------------|
+| Google | `https://<api>/api/v1/auth/google/callback` |
+| GitHub | `https://<api>/api/v1/auth/github/callback` |
+| Apple | `https://<api>/api/v1/auth/apple/callback` (web uses `response_mode=form_post`; callback is **POST**) |
+| Microsoft | Stub — `microsoft` stays `false` in status until Entra is implemented. |
+
+Account linking uses the `oauth_accounts` table (migration `005_oauth_accounts`). Same email across providers maps to one user; `gdpr_consent_at` is set when linking or creating via OAuth.
+
+Environment variables: see `/.env.example` (`GOOGLE_*`, `GITHUB_*`, `APPLE_*`, `MICROSOFT_*`).

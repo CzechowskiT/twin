@@ -41,6 +41,37 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     candidate: Mapped["Candidate | None"] = relationship(back_populates="user")
+    password_reset_tokens: Mapped[list["PasswordResetToken"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+    oauth_accounts: Mapped[list["OAuthAccount"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+
+
+class OAuthAccount(Base):
+    __tablename__ = "oauth_accounts"
+    __table_args__ = (UniqueConstraint("provider", "subject", name="uq_oauth_accounts_provider_subject"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    provider: Mapped[str] = mapped_column(String(32), index=True)
+    subject: Mapped[str] = mapped_column(String(255), index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    user: Mapped["User"] = relationship(back_populates="oauth_accounts")
+
+
+class PasswordResetToken(Base):
+    __tablename__ = "password_reset_tokens"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    token_hash: Mapped[str] = mapped_column(String(64), index=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    user: Mapped["User"] = relationship(back_populates="password_reset_tokens")
 
 
 class Candidate(Base):
@@ -57,6 +88,11 @@ class Candidate(Base):
     cv_text: Mapped[str | None] = mapped_column(Text, nullable=True)
     cv_filename: Mapped[str | None] = mapped_column(String(255), nullable=True)
     cv_uploaded_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    preferred_job_titles: Mapped[str] = mapped_column(Text, default="[]")
+    intro_audio_path: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    intro_audio_uploaded_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    intro_audio_transcript: Mapped[str | None] = mapped_column(Text, nullable=True)
+    profile_signals_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     user: Mapped["User"] = relationship(back_populates="candidate")

@@ -6,7 +6,7 @@ from urllib.parse import urlencode
 import httpx
 
 from app.config import get_settings
-from app.core.security import create_access_token, decode_access_token
+from app.services.oauth_state import create_oauth_state, verify_oauth_state
 
 LINKEDIN_AUTH_URL = "https://www.linkedin.com/oauth/v2/authorization"
 LINKEDIN_TOKEN_URL = "https://www.linkedin.com/oauth/v2/accessToken"
@@ -48,14 +48,6 @@ def build_authorize_url(state: str) -> str:
         "scope": SCOPES,
     }
     return f"{LINKEDIN_AUTH_URL}?{urlencode(params)}"
-
-
-def create_oauth_state() -> str:
-    return create_access_token("__linkedin_oauth_state__")
-
-
-def verify_oauth_state(state: str) -> bool:
-    return decode_access_token(state) == "__linkedin_oauth_state__"
 
 
 def exchange_code_for_profile(code: str) -> LinkedInProfile:

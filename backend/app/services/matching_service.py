@@ -11,8 +11,10 @@ from app.matching.matcher import calculate_match_score
 
 def candidate_to_dict(candidate: Candidate) -> dict[str, Any]:
     skills = json.loads(candidate.skills) if candidate.skills else []
+    titles = json.loads(candidate.preferred_job_titles) if candidate.preferred_job_titles else []
     return {
         "skills": skills,
+        "preferred_job_titles": titles if isinstance(titles, list) else [],
         "experience_years": candidate.experience_years,
         "desired_salary": candidate.desired_salary,
         "location": candidate.location,

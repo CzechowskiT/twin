@@ -9,7 +9,7 @@ Na ekranie logowania widać **„LinkedIn login coming soon”**, gdy w pliku `.
 1. Wejdź: https://www.linkedin.com/developers/apps  
 2. **Create app** (lub wybierz istniejącą).  
 3. W zakładce **Products** dodaj: **Sign In with LinkedIn using OpenID Connect**.  
-4. Zakładka **Auth** → **OAuth 2.0 settings** → **Authorized redirect URLs** → dodaj **dokładnie**:
+4. Zakładka **Auth** → **OAuth 2.0 settings** → **Authorized redirect URLs** → dodaj **dokładnie** adresy zwracane przez API (na ekranie logowania, gdy `NEXT_PUBLIC_API_URL` jest ustawione na Vercelu, zobaczysz też gotowy URL produkcyjny do skopiowania):
 
 ```
 http://localhost:8000/api/v1/auth/linkedin/callback

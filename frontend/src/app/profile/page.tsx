@@ -11,24 +11,30 @@ import { getToken } from "@/lib/auth";
 type Profile = {
   name: string;
   skills: string[];
+  preferred_job_titles?: string[];
   experience_years: number;
   desired_salary: number | null;
   location: string | null;
   has_cv?: boolean;
   cv_filename?: string | null;
+  has_intro_audio?: boolean;
 };
 
 const CV_ACCEPT = ".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain";
+const AUDIO_ACCEPT = "audio/webm,audio/mpeg,audio/mp4,audio/wav,.webm,.mp3,.m4a,.wav,.ogg";
 
 export default function ProfilePage() {
   const router = useRouter();
   const { t } = useTranslation();
   const fileRef = useRef<HTMLInputElement>(null);
+  const audioRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [cvBusy, setCvBusy] = useState(false);
+  const [introBusy, setIntroBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [cvMessage, setCvMessage] = useState<string | null>(null);
+  const [introMessage, setIntroMessage] = useState<string | null>(null);
   const [initial, setInitial] = useState<Profile | null>(null);
 
   useEffect(() => {
@@ -91,6 +97,29 @@ export default function ProfilePage() {
     }
   }
 
+  async function onIntroSelected(file: File | null) {
+    if (!file) return;
+    const token = getToken();
+    if (!token) return;
+    setError(null);
+    setIntroMessage(null);
+    setIntroBusy(true);
+    try {
+      const result = await apiUpload<{ message: string }>(
+        "/api/v1/candidates/me/intro-audio",
+        file,
+        token,
+      );
+      await reloadProfile();
+      setIntroMessage(result.message || t("profile.introAudioUploaded"));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("profile.introAudioFailed"));
+    } finally {
+      setIntroBusy(false);
+      if (audioRef.current) audioRef.current.value = "";
+    }
+  }
+
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const token = getToken();
@@ -103,10 +132,16 @@ export default function ProfilePage() {
       .split(",")
       .map((s) => s.trim())
       .filter(Boolean);
+    const titlesRaw = String(form.get("preferred_job_titles") || "");
+    const preferred_job_titles = titlesRaw
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
     const salaryRaw = String(form.get("desired_salary") || "").trim();
     const body = {
       name: String(form.get("name")),
       skills,
+      preferred_job_titles,
       experience_years: Number(form.get("experience_years") || 0),
       desired_salary: salaryRaw ? Number(salaryRaw) : null,
       location: String(form.get("location") || "") || null,
@@ -184,6 +219,33 @@ export default function ProfilePage() {
           )}
         </section>
 
+        {initial && (
+          <section className="twin-filter-box mb-6">
+            <h2 className="mb-1 text-sm font-semibold text-[var(--foreground)]">
+              {t("profile.introAudioSection")}
+            </h2>
+            <p className="twin-muted mb-3 text-xs">{t("profile.introAudioHint")}</p>
+            {initial.has_intro_audio && (
+              <p className="mb-3 text-sm text-[var(--twin-accent)]">{t("profile.introAudioUploaded")}</p>
+            )}
+            <input
+              ref={audioRef}
+              type="file"
+              accept={AUDIO_ACCEPT}
+              className="hidden"
+              onChange={(e) => onIntroSelected(e.target.files?.[0] ?? null)}
+            />
+            <Button
+              type="button"
+              disabled={introBusy || saving || cvBusy}
+              onClick={() => audioRef.current?.click()}
+            >
+              {introBusy ? t("profile.introAudioUploading") : t("profile.introAudioUpload")}
+            </Button>
+            {introMessage && <p className="mt-3 text-sm text-green-700">{introMessage}</p>}
+          </section>
+        )}
+
         <form onSubmit={onSubmit}>
           <Label>{t("profile.fullName")}</Label>
           <Input name="name" required defaultValue={initial?.name ?? ""} />
@@ -192,6 +254,12 @@ export default function ProfilePage() {
             name="skills"
             placeholder={t("profile.skillsPlaceholder")}
             defaultValue={initial?.skills?.join(", ") ?? ""}
+          />
+          <Label>{t("profile.preferredJobTitles")}</Label>
+          <Input
+            name="preferred_job_titles"
+            placeholder={t("profile.preferredJobTitlesPlaceholder")}
+            defaultValue={initial?.preferred_job_titles?.join(", ") ?? ""}
           />
           <Label>{t("profile.yearsExperience")}</Label>
           <Input
@@ -217,7 +285,7 @@ export default function ProfilePage() {
             defaultValue={initial?.location ?? ""}
           />
           {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
-          <Button type="submit" disabled={saving || cvBusy}>
+          <Button type="submit" disabled={saving || cvBusy || introBusy}>
             {saving ? t("profile.saving") : t("profile.submit")}
           </Button>
         </form>

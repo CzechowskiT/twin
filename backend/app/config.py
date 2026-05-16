@@ -62,10 +62,40 @@ class Settings(BaseSettings):
     cv_upload_dir: str = "data/cvs"
     cv_max_bytes: int = 5 * 1024 * 1024
 
+    # Comma-separated board ids matching scraper registry (empty = all). Controls scrape-all + /jobs/boards list.
+    scrape_enabled_board_ids: str = ""
+    intro_audio_upload_dir: str = "data/intro_audio"
+    intro_audio_max_bytes: int = 15 * 1024 * 1024
+
     linkedin_client_id: str = ""
     linkedin_client_secret: str = ""
     linkedin_redirect_uri: str = "http://localhost:8000/api/v1/auth/linkedin/callback"
     frontend_url: str = "http://localhost:3000"
+
+    google_client_id: str = ""
+    google_client_secret: str = ""
+    google_redirect_uri: str = "http://localhost:8000/api/v1/auth/google/callback"
+
+    github_client_id: str = ""
+    github_client_secret: str = ""
+    github_redirect_uri: str = "http://localhost:8000/api/v1/auth/github/callback"
+
+    apple_client_id: str = ""
+    apple_team_id: str = ""
+    apple_key_id: str = ""
+    apple_private_key: str = ""
+    apple_redirect_uri: str = "http://localhost:8000/api/v1/auth/apple/callback"
+
+    microsoft_client_id: str = ""
+    microsoft_client_secret: str = ""
+    microsoft_redirect_uri: str = "http://localhost:8000/api/v1/auth/microsoft/callback"
+
+    @field_validator("apple_private_key", mode="before")
+    @classmethod
+    def normalize_apple_private_key(cls, value: object) -> object:
+        if isinstance(value, str) and "\\n" in value:
+            return value.replace("\\n", "\n")
+        return value
 
     @field_validator("frontend_url", mode="before")
     @classmethod
@@ -78,6 +108,18 @@ class Settings(BaseSettings):
     auto_apply_state_dir: str = "data/browser_state"
     auto_apply_default_phone: str = ""
     auto_apply_submit: bool = False
+
+    debug: bool = False
+
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_from: str = ""
+    resend_api_key: str = ""
+    mail_from: str = ""
+
+    password_reset_token_ttl_minutes: int = 60
 
     @property
     def cors_origin_list(self) -> list[str]:

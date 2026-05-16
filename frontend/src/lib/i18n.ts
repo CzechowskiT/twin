@@ -8,9 +8,12 @@ export type TranslationKey =
   | `home.${keyof typeof en.home}`
   | `dashboard.${keyof typeof en.dashboard}`
   | `login.${keyof typeof en.login}`
+  | `forgotPassword.${keyof typeof en.forgotPassword}`
+  | `resetPassword.${keyof typeof en.resetPassword}`
   | `register.${keyof typeof en.register}`
   | `authCallback.${keyof typeof en.authCallback}`
   | `profile.${keyof typeof en.profile}`
+  | `onboarding.${keyof typeof en.onboarding}`
   | `common.${keyof typeof en.common}`;
 
 const en = {
@@ -22,18 +25,18 @@ const en = {
     menu: "Menu",
   },
   home: {
-    tagline: "For sales & commercial professionals",
-    title: "The right roles. Less manual search.",
+    tagline: "Global career platform, powered by AI",
+    title: "Your AI career twin works the market around the clock",
     description:
-      "TWIN monitors Polish job boards, scores openings against your profile, and keeps your pipeline organised — built for managers and B2B careers.",
+      "TWIN is an autonomous career agent for professionals everywhere: it aggregates roles from the job boards and regions your workspace enables, scores them against your profile, and keeps your pipeline in one place — with auto-apply and interview scheduling on the roadmap.",
     getStarted: "Start free",
     logIn: "Sign in",
     scrape: "Discover",
-    scrapeDesc: "Curated listings from top boards",
+    scrapeDesc: "Boards and regions you configure — expandable as you grow",
     match: "Match",
-    matchDesc: "Scored to your skills and goals",
+    matchDesc: "Scored to your skills, seniority, and goals",
     track: "Track",
-    trackDesc: "One dashboard for your search",
+    trackDesc: "One workspace for search, saves, and applications",
   },
   dashboard: {
     title: "Dashboard",
@@ -43,10 +46,10 @@ const en = {
     setupProfile: "Set up profile",
     edit: "Edit",
     years: "yrs",
-    scrapeJobs: "Scrape jobs",
-    scrapeAll: "Scrape all boards",
-    scrapeAllHint: "Any button scrapes every board below. This may take several minutes.",
-    scrapingAll: "Scraping all boards…",
+    scrapeJobs: "Job feeds",
+    scrapeAll: "Auto scrap",
+    scrapeAllHint: "Runs all job sources configured on the server (see SCRAPE_ENABLED_BOARD_IDS).",
+    scrapingAll: "Auto scrap running…",
     scraping: "Scraping…",
     keepApiOpen: "Keep the API terminal open while scraping.",
     lastUpdated: "Last updated",
@@ -58,10 +61,12 @@ const en = {
     regionGlobal: "Global",
     topMatches: "Top matches",
     jobs: "Jobs",
-    noJobs: "No jobs yet — use the buttons above to scrape.",
+    noJobs: "No jobs yet — run Auto scrap above (if enabled) or ask an admin to seed listings.",
     noJobsFiltered: "No jobs match these filters.",
     filterSearch: "Search",
     filterSearchPlaceholder: "Title, company, keywords…",
+    filterTitleTerms: "Target titles (comma = any match)",
+    filterTitlePlaceholder: "e.g. Account Executive, SDR",
     filterLocation: "Location",
     filterBoard: "Job board",
     filterMinSalary: "Min. salary (PLN/mo)",
@@ -95,27 +100,67 @@ const en = {
     password: "Password",
     signingIn: "Signing in…",
     submit: "Log in",
+    forgotPassword: "Forgot password?",
     noAccount: "No account?",
     register: "Register",
     failed: "Login failed",
     orContinue: "or continue with",
     linkedIn: "Continue with LinkedIn",
-    linkedInComingSoon: "LinkedIn login coming soon — use email below",
+    linkedInComingSoon:
+      "LinkedIn sign-in is off until the API has Client ID, Secret, and LINKEDIN_REDIRECT_URI (see yellow box). Use email below.",
     linkedInSetupTitle: "Enable LinkedIn login (one-time setup)",
     linkedInSetupStep1: "Create an app at linkedin.com/developers → add “Sign In with OpenID Connect”.",
-    linkedInSetupStep2: "Add redirect URL: http://localhost:8000/api/v1/auth/linkedin/callback",
-    linkedInSetupStep3: "Paste Client ID and Secret into .env, restart API (make api).",
+    linkedInSetupStep2Intro:
+      "In LinkedIn → Auth → Authorized redirect URLs, add each line below exactly (must match API env).",
+    linkedInSetupCallbackProd: "Production API (NEXT_PUBLIC_API_URL on Vercel / Railway):",
+    linkedInSetupCallbackLocal: "Local API (development):",
+    linkedInSetupStep3:
+      "Set LINKEDIN_REDIRECT_URI to the same URL the browser returns to (production or local), put Client ID and Secret in API env, restart API.",
     linkedInSetupDoc: "Full guide: docs/LINKEDIN_KONFIGURACJA_PL.md in the project folder.",
-    errorLinkedinNotConfigured: "LinkedIn login is not available yet. Please use email below.",
+    errorLinkedinNotConfigured:
+      "LinkedIn is not fully configured on the server (missing credentials or redirect URI). Use email or fix Railway env vars.",
+    errorOAuthNotConfigured:
+      "That sign-in provider is not set up on the server yet. Use email or ask an admin.",
+    oauthGoogle: "Continue with Google",
+    oauthGithub: "Continue with GitHub",
+    oauthApple: "Continue with Apple",
+    oauthMicrosoft: "Continue with Microsoft",
+    oauthMicrosoftSoon: "Microsoft sign-in is not available yet (see API TODO).",
+  },
+  forgotPassword: {
+    title: "Reset password",
+    email: "Email",
+    submit: "Send reset link",
+    sending: "Sending…",
+    backToLogin: "Back to log in",
+    sentTitle: "Check your email",
+    sentBody:
+      "If an account exists for that address, we sent instructions to reset your password. The link expires in about an hour.",
+  },
+  resetPassword: {
+    title: "Choose a new password",
+    password: "New password",
+    passwordConfirm: "Confirm new password",
+    mismatch: "Passwords do not match.",
+    missingToken: "This reset link is invalid or incomplete. Request a new link from the log in page.",
+    submit: "Update password",
+    updating: "Saving…",
+    success: "Your password was updated. You can log in now.",
+    backToLogin: "Log in",
+    failed: "Could not reset password",
   },
   authCallback: {
     title: "Signing you in",
     signingIn: "Completing sign-in…",
     errorLinkedinDenied: "LinkedIn sign-in was cancelled.",
+    errorLinkedinNotConfigured:
+      "LinkedIn sign-in is not set up on the server yet. Use email below or ask an admin.",
     errorInvalidState: "Sign-in session expired. Please try again.",
     errorLinkedinFailed: "LinkedIn sign-in failed. Check API configuration.",
     errorInactive: "This account is inactive.",
     errorUnknown: "Sign-in could not be completed.",
+    errorOAuthDenied: "Sign-in was cancelled.",
+    errorOAuthFailed: "Sign-in failed. Check the provider configuration on the API.",
   },
   register: {
     title: "Create account",
@@ -131,8 +176,14 @@ const en = {
     gdprRequired: "You must accept the privacy policy.",
     failed: "Registration failed",
     orContinue: "or continue with",
+    errorLinkedinNotConfigured:
+      "LinkedIn sign-up is not set up on the server yet. Use the form below or ask an admin.",
+    errorOAuthNotConfigured:
+      "That sign-up provider is not set up on the server yet. Use the form below or ask an admin.",
     linkedIn: "Sign up with LinkedIn",
-    linkedInComingSoon: "LinkedIn login coming soon — use email below",
+    linkedInComingSoon:
+      "LinkedIn sign-up is off until the API has Client ID, Secret, and LINKEDIN_REDIRECT_URI (see yellow box). Use the form below.",
+    linkedInSetupTitle: "Enable LinkedIn sign-up (one-time setup)",
   },
   profile: {
     title: "Your career profile",
@@ -151,7 +202,7 @@ const en = {
     cvSaveProfileFirst: "Save your profile below first, then upload a CV.",
     fullName: "Full name",
     skills: "Skills (comma-separated)",
-    skillsPlaceholder: "sales, B2B, CRM, negotiation, key account",
+    skillsPlaceholder: "e.g. Python, stakeholder management, GTM, UX research",
     yearsExperience: "Years of experience",
     desiredSalary: "Desired salary (PLN / month, gross)",
     salaryPlaceholder: "15000",
@@ -162,6 +213,22 @@ const en = {
     loading: "Loading profile…",
     backToDashboard: "Back to dashboard",
     failed: "Could not save profile",
+    preferredJobTitles: "Target job titles (comma-separated)",
+    preferredJobTitlesPlaceholder: "Account Executive, Business Development Manager",
+    introAudioSection: "Voice intro (optional)",
+    introAudioHint:
+      "Short recording for future “tell me about yourself” matching. Stored securely; transcription is Phase 2.",
+    introAudioUpload: "Upload audio",
+    introAudioUploading: "Uploading…",
+    introAudioUploaded: "Audio saved.",
+    introAudioFailed: "Could not upload audio",
+  },
+  onboarding: {
+    title: "Assistant onboarding",
+    body:
+      "A Fluently-style guided flow (voice + chat) will orchestrate goals, languages, and seniority here. Today: use Profile for skills and CV, Dashboard for matches.",
+    profileLink: "Open profile",
+    dashboardLink: "Back to dashboard",
   },
   common: {
     language: "Language",
@@ -185,18 +252,18 @@ const pl: MessageTree = {
     menu: "Menu",
   },
   home: {
-    tagline: "Dla sprzedawców i menedżerów B2B",
-    title: "Właściwe oferty. Mniej ręcznego szukania.",
+    tagline: "Globalna platforma kariery napędzana sztuczną inteligencją",
+    title: "Twój bliźniak AI pracuje na rynku przez całą dobę",
     description:
-      "TWIN monitoruje polskie portale pracy, ocenia oferty względem Twojego profilu i porządkuje proces rekrutacji — dla menedżerów i karier B2B.",
+      "TWIN to autonomiczny agent kariery dla profesjonalistów na całym świecie: agreguje oferty z portali i regionów włączonych w Twoim środowisku, ocenia je względem profilu i prowadzi pipeline w jednym miejscu — z auto-aplikacją i umawianiem rozmów w planie rozwoju produktu.",
     getStarted: "Zacznij za darmo",
     logIn: "Zaloguj się",
     scrape: "Odkrywaj",
-    scrapeDesc: "Oferty z wiodących portali",
+    scrapeDesc: "Portale i regiony wg konfiguracji — gotowe na rozszerzanie",
     match: "Dopasuj",
-    matchDesc: "Ocena pod Twoje umiejętności",
+    matchDesc: "Ocena pod umiejętności, poziom i cele",
     track: "Śledź",
-    trackDesc: "Jeden panel całego procesu",
+    trackDesc: "Jedna przestrzeń: wyszukiwanie, zapisane oferty, aplikacje",
   },
   dashboard: {
     title: "Panel",
@@ -206,11 +273,11 @@ const pl: MessageTree = {
     setupProfile: "Utwórz profil",
     edit: "Edytuj",
     years: "lat dośw.",
-    scrapeJobs: "Pobierz oferty",
-    scrapeAll: "Pobierz ze wszystkich portali",
+    scrapeJobs: "Źródła ofert",
+    scrapeAll: "Auto scrap",
     scrapeAllHint:
-      "Każdy przycisk pobiera oferty ze wszystkich portali poniżej. Może to potrwać kilka minut.",
-    scrapingAll: "Pobieranie ze wszystkich portali…",
+      "Uruchamia wszystkie źródła skonfigurowane na serwerze (patrz SCRAPE_ENABLED_BOARD_IDS).",
+    scrapingAll: "Trwa auto scrap…",
     scraping: "Pobieranie…",
     keepApiOpen: "Podczas pobierania zostaw włączony terminal API.",
     lastUpdated: "Ostatnia aktualizacja",
@@ -222,10 +289,12 @@ const pl: MessageTree = {
     regionGlobal: "Globalne",
     topMatches: "Najlepsze dopasowania",
     jobs: "Oferty",
-    noJobs: "Brak ofert — użyj przycisków powyżej, aby pobrać dane.",
+    noJobs: "Brak ofert — uruchom Auto scrap powyżej (jeśli włączone) lub poproś administratora o dane.",
     noJobsFiltered: "Brak ofert dla wybranych filtrów.",
     filterSearch: "Szukaj",
     filterSearchPlaceholder: "Stanowisko, firma, słowa kluczowe…",
+    filterTitleTerms: "Docelowe stanowiska (przecinek = dowolne dopasowanie)",
+    filterTitlePlaceholder: "np. Account Executive, SDR",
     filterLocation: "Lokalizacja",
     filterBoard: "Portal",
     filterMinSalary: "Min. wynagrodzenie (PLN/mies.)",
@@ -259,29 +328,69 @@ const pl: MessageTree = {
     password: "Hasło",
     signingIn: "Logowanie…",
     submit: "Zaloguj się",
+    forgotPassword: "Nie pamiętasz hasła?",
     noAccount: "Nie masz konta?",
     register: "Zarejestruj się",
     failed: "Logowanie nie powiodło się",
     orContinue: "lub kontynuuj przez",
     linkedIn: "Kontynuuj z LinkedIn",
-    linkedInComingSoon: "Logowanie przez LinkedIn wkrótce — użyj formularza e-mail poniżej",
+    linkedInComingSoon:
+      "Logowanie LinkedIn jest wyłączone, dopóki API nie ma Client ID, Secret i LINKEDIN_REDIRECT_URI (żółta ramka). Użyj e-mail poniżej.",
     linkedInSetupTitle: "Włącz logowanie LinkedIn (jednorazowo)",
     linkedInSetupStep1: "Załóż aplikację na linkedin.com/developers → „Sign In with OpenID Connect”.",
-    linkedInSetupStep2: "Redirect URL: http://localhost:8000/api/v1/auth/linkedin/callback",
-    linkedInSetupStep3: "Wklej Client ID i Secret do pliku .env, zrestartuj API (make api).",
+    linkedInSetupStep2Intro:
+      "W LinkedIn → Auth → Authorized redirect URLs dodaj dokładnie każdy adres poniżej (zgodny z konfiguracją API).",
+    linkedInSetupCallbackProd: "API produkcyjne (NEXT_PUBLIC_API_URL na Vercel / Railway):",
+    linkedInSetupCallbackLocal: "API lokalne (development):",
+    linkedInSetupStep3:
+      "Ustaw LINKEDIN_REDIRECT_URI na ten sam URL, na który wraca przeglądarka (prod lub lokalnie), wklej Client ID i Secret do zmiennych API, zrestartuj API.",
     linkedInSetupDoc: "Instrukcja: docs/LINKEDIN_KONFIGURACJA_PL.md w folderze projektu.",
     errorLinkedinNotConfigured:
       "Logowanie przez LinkedIn jest niedostępne. Użyj formularza e-mail poniżej.",
+    errorOAuthNotConfigured:
+      "Ten sposób logowania nie jest jeszcze skonfigurowany na serwerze. Użyj e-mail lub poproś administratora.",
+    oauthGoogle: "Kontynuuj z Google",
+    oauthGithub: "Kontynuuj z GitHub",
+    oauthApple: "Kontynuuj z Apple",
+    oauthMicrosoft: "Kontynuuj z Microsoft",
+    oauthMicrosoftSoon: "Logowanie Microsoft nie jest jeszcze dostępne (TODO po stronie API).",
+  },
+  forgotPassword: {
+    title: "Reset hasła",
+    email: "E-mail",
+    submit: "Wyślij link resetujący",
+    sending: "Wysyłanie…",
+    backToLogin: "Wróć do logowania",
+    sentTitle: "Sprawdź skrzynkę",
+    sentBody:
+      "Jeśli istnieje konto dla tego adresu, wysłaliśmy instrukcję resetu hasła. Link wygasa po ok. godzinie.",
+  },
+  resetPassword: {
+    title: "Ustaw nowe hasło",
+    password: "Nowe hasło",
+    passwordConfirm: "Potwierdź hasło",
+    mismatch: "Hasła nie są takie same.",
+    missingToken:
+      "Link resetujący jest niepoprawny lub niekompletny. Poproś o nowy link na stronie logowania.",
+    submit: "Zapisz hasło",
+    updating: "Zapisywanie…",
+    success: "Hasło zostało zmienione. Możesz się zalogować.",
+    backToLogin: "Zaloguj się",
+    failed: "Nie udało się zresetować hasła",
   },
   authCallback: {
     title: "Logowanie",
     signingIn: "Kończenie logowania…",
     errorLinkedinDenied: "Logowanie przez LinkedIn zostało anulowane.",
+    errorLinkedinNotConfigured:
+      "Logowanie przez LinkedIn nie jest jeszcze skonfigurowane na serwerze. Użyj e-mail poniżej lub poproś administratora.",
     errorInvalidState: "Sesja wygasła. Spróbuj ponownie.",
     errorLinkedinFailed:
       "Logowanie przez LinkedIn nie powiodło się. Sprawdź konfigurację API.",
     errorInactive: "To konto jest nieaktywne.",
     errorUnknown: "Nie udało się dokończyć logowania.",
+    errorOAuthDenied: "Logowanie zostało anulowane.",
+    errorOAuthFailed: "Logowanie nie powiodło się. Sprawdź konfigurację dostawcy na API.",
   },
   register: {
     title: "Utwórz konto",
@@ -298,8 +407,14 @@ const pl: MessageTree = {
     gdprRequired: "Musisz zaakceptować politykę prywatności.",
     failed: "Rejestracja nie powiodła się",
     orContinue: "lub kontynuuj przez",
+    errorLinkedinNotConfigured:
+      "Rejestracja przez LinkedIn nie jest jeszcze skonfigurowana na serwerze. Użyj formularza poniżej lub poproś administratora.",
+    errorOAuthNotConfigured:
+      "Ta metoda rejestracji nie jest jeszcze skonfigurowana na serwerze. Użyj formularza poniżej lub poproś administratora.",
     linkedIn: "Zarejestruj się przez LinkedIn",
-    linkedInComingSoon: "Logowanie przez LinkedIn wkrótce — użyj formularza e-mail poniżej",
+    linkedInComingSoon:
+      "Rejestracja przez LinkedIn jest wyłączona, dopóki API nie ma Client ID, Secret i LINKEDIN_REDIRECT_URI (żółta ramka). Użyj formularza poniżej.",
+    linkedInSetupTitle: "Włącz rejestrację przez LinkedIn (jednorazowo)",
   },
   profile: {
     title: "Twój profil zawodowy",
@@ -318,7 +433,7 @@ const pl: MessageTree = {
     cvSaveProfileFirst: "Najpierw zapisz profil poniżej, potem wgraj CV.",
     fullName: "Imię i nazwisko",
     skills: "Umiejętności (oddzielone przecinkami)",
-    skillsPlaceholder: "sales, B2B, CRM, negotiation, key account",
+    skillsPlaceholder: "np. Python, zarządzanie interesariuszami, GTM, badania UX",
     yearsExperience: "Lata doświadczenia",
     desiredSalary: "Oczekiwane wynagrodzenie (PLN / mies., brutto)",
     salaryPlaceholder: "15000",
@@ -329,6 +444,22 @@ const pl: MessageTree = {
     loading: "Ładowanie profilu…",
     backToDashboard: "Wróć do panelu",
     failed: "Nie udało się zapisać profilu",
+    preferredJobTitles: "Docelowe stanowiska (oddzielone przecinkami)",
+    preferredJobTitlesPlaceholder: "Account Executive, Business Development Manager",
+    introAudioSection: "Nagranie głosowe (opcjonalnie)",
+    introAudioHint:
+      "Krótkie nagranie pod przyszłe dopasowanie „opowiedz o sobie”. Przechowywane bezpiecznie; transkrypcja w fazie 2.",
+    introAudioUpload: "Wgraj nagranie",
+    introAudioUploading: "Wgrywanie…",
+    introAudioUploaded: "Nagranie zapisane.",
+    introAudioFailed: "Nie udało się wgrać nagrania",
+  },
+  onboarding: {
+    title: "Onboarding asystenta",
+    body:
+      "Tutaj powstanie prowadzony przepływ (głos + czat) w stylu Fluently: cele, języki, poziom. Na dziś: uzupełnij Profil (umiejętności, CV) i wróć do Panelu po dopasowania.",
+    profileLink: "Otwórz profil",
+    dashboardLink: "Wróć do panelu",
   },
   common: {
     language: "Język",

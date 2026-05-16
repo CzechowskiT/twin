@@ -1,30 +1,49 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
 import { LinkedInLoginButton } from "@/components/linkedin-login-button";
 import { LinkedInSetupHint } from "@/components/linkedin-setup-hint";
+import { OAuthWebButtons } from "@/components/oauth-web-buttons";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Input, Label, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { setToken } from "@/lib/auth";
-import { fetchLinkedInAuthStatus } from "@/lib/linkedin-auth";
+import { fetchOAuthProviderStatus, type OAuthProviderStatus } from "@/lib/oauth-auth";
 
 type TokenResponse = { access_token: string };
 
-export default function RegisterPage() {
+function RegisterPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [linkedInConfigured, setLinkedInConfigured] = useState<boolean | null>(null);
+  const [oauthStatus, setOauthStatus] = useState<OAuthProviderStatus | null>(null);
 
   useEffect(() => {
-    fetchLinkedInAuthStatus()
-      .then((status) => setLinkedInConfigured(status.configured))
-      .catch(() => setLinkedInConfigured(false));
+    fetchOAuthProviderStatus()
+      .then((s) => setOauthStatus(s))
+      .catch(() =>
+        setOauthStatus({
+          linkedin: false,
+          google: false,
+          github: false,
+          apple: false,
+          microsoft: false,
+        }),
+      );
   }, []);
+
+  const oauthUrlError = useMemo(() => {
+    const err = searchParams.get("error");
+    if (err === "linkedin_not_configured") return t("register.errorLinkedinNotConfigured");
+    if (err?.endsWith("_not_configured")) return t("register.errorOAuthNotConfigured");
+    return null;
+  }, [searchParams, t]);
+
+  const displayError = error ?? oauthUrlError;
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -80,20 +99,30 @@ export default function RegisterPage() {
               {t("register.gdprAfter")}
             </span>
           </label>
-          {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+          {displayError && <p className="mb-4 text-sm text-red-600">{displayError}</p>}
           <Button type="submit" disabled={loading}>
             {loading ? t("register.creating") : t("register.submit")}
           </Button>
         </form>
-        {linkedInConfigured !== null && (
+        {oauthStatus !== null && (
           <>
             <p className="twin-muted my-4 text-center text-xs uppercase tracking-wide">
               {t("register.orContinue")}
             </p>
-            {!linkedInConfigured && <LinkedInSetupHint />}
+            <OAuthWebButtons
+              status={oauthStatus}
+              labels={{
+                google: t("login.oauthGoogle"),
+                github: t("login.oauthGithub"),
+                apple: t("login.oauthApple"),
+                microsoft: t("login.oauthMicrosoft"),
+                microsoftSoon: t("login.oauthMicrosoftSoon"),
+              }}
+            />
+            {!oauthStatus.linkedin && <LinkedInSetupHint variant="register" />}
             <LinkedInLoginButton
               label={t("register.linkedIn")}
-              configured={linkedInConfigured}
+              configured={oauthStatus.linkedin}
               comingSoonMessage={t("register.linkedInComingSoon")}
             />
           </>
@@ -106,5 +135,23 @@ export default function RegisterPage() {
         </p>
       </Card>
     </Shell>
+  );
+}
+
+export default function RegisterPage() {
+  const { t } = useTranslation();
+
+  return (
+    <Suspense
+      fallback={
+        <Shell>
+          <Card>
+            <p className="twin-muted text-sm">{t("register.creating")}</p>
+          </Card>
+        </Shell>
+      }
+    >
+      <RegisterPageContent />
+    </Suspense>
   );
 }

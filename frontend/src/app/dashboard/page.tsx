@@ -7,10 +7,9 @@ import { ApplicationsPanel, type ApplicationRow } from "@/components/application
 import { useTranslation } from "@/components/language-provider";
 import { JobFiltersBar } from "@/components/job-filters";
 import { JobList } from "@/components/job-list";
-import { ButtonChip, ButtonCta, Card, Shell } from "@/components/ui";
+import { ButtonCta, Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
-import { groupBoardsByRegion, regionLabelKey } from "@/lib/job-board-regions";
 import { SHOW_SCRAPE_UI } from "@/lib/features";
 import { buildJobsQuery, defaultJobFilters, type JobFilters } from "@/lib/jobs";
 
@@ -18,6 +17,7 @@ type User = { id: number; email: string };
 type Profile = {
   name: string;
   skills: string[];
+  preferred_job_titles: string[];
   experience_years: number;
   desired_salary: number | null;
   location: string | null;
@@ -43,8 +43,6 @@ type MatchItem = {
   job_board: string;
 };
 type MatchList = { items: MatchItem[]; total: number };
-type BoardItem = { id: string; label: string; region: string };
-type BoardList = { items: BoardItem[] };
 type FilterOptions = { job_boards: string[]; locations: string[] };
 
 export default function DashboardPage() {
@@ -55,9 +53,9 @@ export default function DashboardPage() {
   const [matches, setMatches] = useState<MatchList | null>(null);
   const [jobs, setJobs] = useState<JobList | null>(null);
   const [applications, setApplications] = useState<ApplicationRow[]>([]);
-  const [boards, setBoards] = useState<BoardList | null>(null);
   const [filterOptions, setFilterOptions] = useState<FilterOptions | null>(null);
   const [filters, setFilters] = useState<JobFilters>(defaultJobFilters);
+  const [titleFilterPrimed, setTitleFilterPrimed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [scraping, setScraping] = useState(false);
   const [autoApplyingId, setAutoApplyingId] = useState<number | null>(null);
@@ -105,33 +103,85 @@ export default function DashboardPage() {
       router.replace("/login");
       return;
     }
-    apiFetch<User>("/api/v1/auth/me", {}, token)
-      .then(async (u) => {
-        setUser(u);
-        let hasProfile = false;
-        try {
-          const p = await apiFetch<Profile>("/api/v1/candidates/me", {}, token);
-          setProfile(p);
-          hasProfile = true;
-        } catch {
-          setProfile(null);
-        }
-        const opts = await apiFetch<FilterOptions>("/api/v1/jobs/filters", {}, token);
-        setFilterOptions(opts);
-        if (SHOW_SCRAPE_UI) {
-          const boardList = await apiFetch<BoardList>("/api/v1/jobs/boards", {}, token);
-          setBoards(boardList);
+
+    let cancelled = false;
+
+    (async () => {
+      let u: User;
+      try {
+        u = await apiFetch<User>("/api/v1/auth/me", {}, token);
+      } catch (e) {
+        if (cancelled) return;
+        const msg = e instanceof Error ? e.message : String(e);
+        const lower = msg.toLowerCase();
+        const looksLikeAuthFailure =
+          lower.includes("401") ||
+          lower.includes("403") ||
+          lower.includes("invalid token") ||
+          lower.includes("inactive user") ||
+          lower.includes("not authenticated") ||
+          lower.includes("could not validate credentials");
+        if (looksLikeAuthFailure) {
+          clearToken();
+          router.replace("/login");
         } else {
-          setBoards(null);
+          setError(msg);
         }
-        await refreshDashboardData(token, hasProfile, filters);
-      })
-      .catch(() => {
-        clearToken();
-        router.replace("/login");
-      });
+        return;
+      }
+
+      if (cancelled) return;
+      setUser(u);
+
+      let hasProfile = false;
+      try {
+        const p = await apiFetch<Profile>("/api/v1/candidates/me", {}, token);
+        if (cancelled) return;
+        setProfile(p);
+        hasProfile = true;
+      } catch {
+        if (cancelled) return;
+        setProfile(null);
+      }
+
+      try {
+        const opts = await apiFetch<FilterOptions>("/api/v1/jobs/filters", {}, token);
+        if (cancelled) return;
+        setFilterOptions(opts);
+      } catch (e) {
+        if (cancelled) return;
+        setFilterOptions({ job_boards: [], locations: [] });
+        setError(e instanceof Error ? e.message : t("dashboard.scrapeFailed"));
+      }
+
+      try {
+        await refreshDashboardData(token, hasProfile, defaultJobFilters);
+      } catch (e) {
+        if (cancelled) return;
+        setError(e instanceof Error ? e.message : t("dashboard.scrapeFailed"));
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- initial load only
-  }, [router]);
+  }, [router, refreshDashboardData, t]);
+
+  useEffect(() => {
+    if (titleFilterPrimed) return;
+    if (!profile?.preferred_job_titles?.length) return;
+    const token = getToken();
+    if (!token) return;
+    setFilters((prev) => {
+      const next = { ...prev, title_terms: profile.preferred_job_titles.join(", ") };
+      queueMicrotask(() => {
+        void refreshDashboardData(token, true, next);
+      });
+      return next;
+    });
+    setTitleFilterPrimed(true);
+  }, [profile, titleFilterPrimed, refreshDashboardData]);
 
   async function applyFilters() {
     const token = getToken();
@@ -214,26 +264,6 @@ export default function DashboardPage() {
     if (!token) return;
     await apiFetch(`/api/v1/applications/${id}`, { method: "DELETE" }, token);
     setApplications(await loadApplications(token));
-  }
-
-  async function triggerScrape(boardId: string) {
-    const token = getToken();
-    if (!token) return;
-    setError(null);
-    setScraping(true);
-    try {
-      const result = await apiFetch<{ message: string }>(
-        `/api/v1/jobs/scrape/${boardId}?sync=true`,
-        { method: "POST" },
-        token,
-      );
-      await refreshDashboardData(token, profile !== null && profile !== undefined, filters);
-      alert(result.message || t("dashboard.scrapeFinished"));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t("dashboard.scrapeFailed"));
-    } finally {
-      setScraping(false);
-    }
   }
 
   async function triggerScrapeAll() {
@@ -320,33 +350,11 @@ export default function DashboardPage() {
                 type="button"
                 onClick={() => triggerScrapeAll()}
                 disabled={scraping}
-                className="mb-3 !w-full"
+                className="mb-2 !w-full"
               >
                 {scraping ? t("dashboard.scrapingAll") : t("dashboard.scrapeAll")}
               </ButtonCta>
-              {boards && (
-                <div className="twin-filter-box space-y-3">
-                  {groupBoardsByRegion(boards.items).map(({ region, boards: regionBoards }) => (
-                    <section
-                      key={region}
-                      className="border-b border-[var(--twin-border)] pb-3 last:border-0 last:pb-0"
-                    >
-                      <h3 className="twin-region-label mb-1.5">{t(regionLabelKey(region))}</h3>
-                      <div className="flex flex-wrap gap-1.5">
-                        {regionBoards.map((btn) => (
-                          <ButtonChip
-                            key={btn.id}
-                            onClick={() => triggerScrape(btn.id)}
-                            disabled={scraping}
-                          >
-                            {scraping ? t("dashboard.scraping") : btn.label}
-                          </ButtonChip>
-                        ))}
-                      </div>
-                    </section>
-                  ))}
-                </div>
-              )}
+              <p className="twin-muted text-xs">{t("dashboard.scrapeAllHint")}</p>
               {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
               <p className="twin-muted mt-2 text-xs">{t("dashboard.keepApiOpen")}</p>
             </div>

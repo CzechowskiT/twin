@@ -17,6 +17,7 @@ def apply_job_filters(
     location: str | None = None,
     job_board: str | None = None,
     min_salary: int | None = None,
+    title_terms: str | None = None,
     sort: str = SORT_NEWEST,
 ) -> Query:
     if q:
@@ -41,6 +42,10 @@ def apply_job_filters(
                 Job.salary_min >= min_salary,
             )
         )
+    if title_terms and title_terms.strip():
+        parts = [p.strip() for p in title_terms.replace("|", ",").split(",") if p.strip()]
+        if parts:
+            query = query.filter(or_(*(Job.title.ilike(f"%{p}%") for p in parts)))
 
     if sort == SORT_SALARY:
         return query.order_by(Job.salary_max.desc().nullslast(), Job.scraped_at.desc())

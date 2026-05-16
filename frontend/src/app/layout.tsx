@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "TWIN — Career Agent",
-  description: "Autonomous job matching and application tracking",
+  description: "Global career platform: AI job matching, pipeline, and autonomous workflows.",
   appleWebApp: { capable: true, title: "TWIN" },
 };
 

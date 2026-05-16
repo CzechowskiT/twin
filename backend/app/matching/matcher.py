@@ -37,6 +37,7 @@ def calculate_match_score(candidate: dict[str, Any], job: dict[str, Any]) -> flo
     score = 0.0
     score += _skills_score(candidate, job)
     score += _sales_role_score(candidate, job)
+    score += _preferred_title_score(candidate, job)
     score += _cv_context_score(candidate, job)
     score += _salary_score(candidate, job)
     score += _location_score(candidate, job)
@@ -109,6 +110,23 @@ def _sales_role_score(candidate: dict[str, Any], job: dict[str, Any]) -> float:
     if any(sig in title for sig in SALES_TITLE_SIGNALS):
         return 10.0
     return 0.0
+
+
+def _preferred_title_score(candidate: dict[str, Any], job: dict[str, Any]) -> float:
+    """Boost when job title overlaps user-stated target titles (substring match)."""
+    raw = candidate.get("preferred_job_titles") or []
+    titles: list[str]
+    if isinstance(raw, list):
+        titles = [str(t).lower().strip() for t in raw if str(t).strip()]
+    else:
+        titles = []
+    if not titles:
+        return 0.0
+    job_title, _ = _job_text(job)
+    hits = sum(1 for t in titles if t in job_title)
+    if not hits:
+        return 0.0
+    return min(12.0, 4.0 + 4.0 * hits)
 
 
 def _cv_context_score(candidate: dict[str, Any], job: dict[str, Any]) -> float:

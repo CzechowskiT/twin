@@ -1,23 +1,14 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-export const dynamic = "force-dynamic";
+import { getPublicApiBase } from "@/lib/public-api-base";
 
-function upstreamBase(): string | null {
-  const raw = process.env.NEXT_PUBLIC_API_URL?.trim();
-  if (!raw) return null;
-  let u = raw.replace(/\/$/, "");
-  // Host-only values (common copy-paste from Railway) break `new URL(relative, base)` without a scheme.
-  if (!/^https?:\/\//i.test(u)) {
-    u = `https://${u}`;
-  }
-  return u;
-}
+export const dynamic = "force-dynamic";
 
 const HOP_BY_HOP = new Set(["connection", "keep-alive", "proxy-authenticate", "proxy-authorization", "te", "trailers", "transfer-encoding", "upgrade", "host"]);
 
 async function proxy(req: NextRequest, pathSegments: string[]): Promise<NextResponse> {
-  const base = upstreamBase();
+  const base = getPublicApiBase();
   if (!base) {
     const onVercel = process.env.VERCEL === "1";
     return NextResponse.json(
@@ -41,6 +32,14 @@ async function proxy(req: NextRequest, pathSegments: string[]): Promise<NextResp
     if (HOP_BY_HOP.has(key.toLowerCase())) return;
     headers.set(key, value);
   });
+  const bearer =
+    req.headers.get("authorization") ??
+    req.headers.get("Authorization") ??
+    req.headers.get("x-twin-authorization") ??
+    req.headers.get("X-Twin-Authorization");
+  if (bearer) {
+    headers.set("Authorization", bearer);
+  }
   headers.set("accept-encoding", "identity");
 
   const hasBody = !["GET", "HEAD"].includes(req.method);
@@ -52,6 +51,8 @@ async function proxy(req: NextRequest, pathSegments: string[]): Promise<NextResp
       method: req.method,
       headers,
       body: body && body.byteLength > 0 ? body : undefined,
+      // Default "follow" would chase OAuth 302 to LinkedIn and return HTML instead of passing Location to the browser.
+      redirect: "manual",
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "fetch failed";

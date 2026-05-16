@@ -18,8 +18,6 @@ export function LinkedInLoginButton({
   if (!configured) {
     return (
       <div
-        role="status"
-        aria-disabled="true"
         className="twin-muted mb-4 flex w-full cursor-not-allowed items-center justify-center gap-2 rounded border border-dashed border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-4 py-2.5 text-sm opacity-70"
       >
         <LinkedInIcon />

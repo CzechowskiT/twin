@@ -53,14 +53,14 @@ def test_is_configured(mock_settings: MagicMock) -> None:
     assert is_linkedin_oauth_configured()
 
 
-@patch("app.api.auth.is_linkedin_credentials_configured", return_value=False)
+@patch("app.api.auth.is_linkedin_oauth_configured", return_value=False)
 def test_linkedin_status_not_configured(_mock: MagicMock, client: TestClient) -> None:
     res = client.get("/api/v1/auth/linkedin/status")
     assert res.status_code == 200
     assert res.json() == {"configured": False}
 
 
-@patch("app.api.auth.is_linkedin_credentials_configured", return_value=True)
+@patch("app.api.auth.is_linkedin_oauth_configured", return_value=True)
 def test_linkedin_status_configured(_mock: MagicMock, client: TestClient) -> None:
     res = client.get("/api/v1/auth/linkedin/status")
     assert res.status_code == 200
@@ -99,7 +99,7 @@ def test_exchange_code_for_profile(mock_settings: MagicMock, mock_client_cls: Ma
 
 
 @patch("app.api.auth.get_settings")
-@patch("app.api.auth.is_linkedin_credentials_configured", return_value=False)
+@patch("app.api.auth.is_linkedin_oauth_configured", return_value=False)
 def test_linkedin_login_not_configured(
     _cfg: MagicMock,
     mock_settings: MagicMock,
@@ -113,7 +113,7 @@ def test_linkedin_login_not_configured(
 
 @patch("app.api.auth.build_authorize_url", return_value="https://www.linkedin.com/oauth/v2/authorization?x=1")
 @patch("app.api.auth.create_oauth_state", return_value="state-jwt")
-@patch("app.api.auth.is_linkedin_credentials_configured", return_value=True)
+@patch("app.api.auth.is_linkedin_oauth_configured", return_value=True)
 def test_linkedin_login_redirect(
     _cfg: MagicMock,
     _state: MagicMock,

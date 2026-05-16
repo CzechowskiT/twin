@@ -36,6 +36,27 @@ SCRAPE_REGISTRY: dict[str, ScrapeFn] = {**LOCAL_SCRAPERS, **GLOBAL_SCRAPERS}
 
 DEFAULT_BOARD_TIMEOUT_SEC = 120
 
+
+def scrape_allowlist_board_ids() -> frozenset[str] | None:
+    """If set (non-empty env with at least one valid id), scrape-all and board list use this subset."""
+    from app.config import get_settings
+
+    raw = (get_settings().scrape_enabled_board_ids or "").strip()
+    if not raw:
+        return None
+    valid = frozenset(bid for bid in (x.strip() for x in raw.split(",")) if bid in SCRAPE_REGISTRY)
+    if not valid:
+        return None
+    return valid
+
+
+def scrape_board_ids_ordered() -> list[str]:
+    allow = scrape_allowlist_board_ids()
+    ordered = sorted(SCRAPE_REGISTRY.keys())
+    if allow is None:
+        return ordered
+    return [bid for bid in ordered if bid in allow]
+
 # Display order for dashboard / API (geographical regions, tight grouping).
 REGION_ORDER: tuple[str, ...] = (
     "poland",
@@ -117,7 +138,7 @@ def scrape_all_boards(
 ) -> list[BoardScrapeOutcome]:
     """Run every registered board scraper sequentially (one board at a time)."""
     outcomes: list[BoardScrapeOutcome] = []
-    for board_id in sorted(SCRAPE_REGISTRY):
+    for board_id in scrape_board_ids_ordered():
         fn = SCRAPE_REGISTRY[board_id]
         error: str | None = None
         jobs: list[ScrapedJob] = []

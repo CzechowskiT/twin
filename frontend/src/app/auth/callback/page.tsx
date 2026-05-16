@@ -7,12 +7,18 @@ import { Card, Shell } from "@/components/ui";
 import { setToken } from "@/lib/auth";
 import type { TranslationKey } from "@/lib/i18n";
 
-const ERROR_I18N: Record<string, TranslationKey> = {
-  linkedin_denied: "authCallback.errorLinkedinDenied",
-  invalid_state: "authCallback.errorInvalidState",
-  linkedin_failed: "authCallback.errorLinkedinFailed",
-  inactive: "authCallback.errorInactive",
-};
+function authErrorKey(error: string): TranslationKey {
+  if (error === "linkedin_denied") return "authCallback.errorLinkedinDenied";
+  if (error === "linkedin_failed") return "authCallback.errorLinkedinFailed";
+  if (error.endsWith("_denied")) return "authCallback.errorOAuthDenied";
+  if (error.endsWith("_failed")) return "authCallback.errorOAuthFailed";
+  const map: Record<string, TranslationKey> = {
+    invalid_state: "authCallback.errorInvalidState",
+    inactive: "authCallback.errorInactive",
+    linkedin_not_configured: "authCallback.errorLinkedinNotConfigured",
+  };
+  return map[error] ?? "authCallback.errorUnknown";
+}
 
 function AuthCallbackContent() {
   const router = useRouter();
@@ -32,8 +38,8 @@ function AuthCallbackContent() {
       return;
     }
 
-    if (error && error in ERROR_I18N) {
-      setMessage(t(ERROR_I18N[error]));
+    if (error) {
+      setMessage(t(authErrorKey(error)));
       return;
     }
 

@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, Suspense, useEffect, useState } from "react";
+import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
 import { LinkedInLoginButton } from "@/components/linkedin-login-button";
 import { LinkedInSetupHint } from "@/components/linkedin-setup-hint";
+import { OAuthWebButtons } from "@/components/oauth-web-buttons";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Input, Label, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { setToken } from "@/lib/auth";
-import { fetchLinkedInAuthStatus } from "@/lib/linkedin-auth";
+import { fetchOAuthProviderStatus, type OAuthProviderStatus } from "@/lib/oauth-auth";
 
 type TokenResponse = { access_token: string };
 
@@ -19,19 +20,30 @@ function LoginPageContent() {
   const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [linkedInConfigured, setLinkedInConfigured] = useState<boolean | null>(null);
+  const [oauthStatus, setOauthStatus] = useState<OAuthProviderStatus | null>(null);
 
   useEffect(() => {
-    fetchLinkedInAuthStatus()
-      .then((status) => setLinkedInConfigured(status.configured))
-      .catch(() => setLinkedInConfigured(false));
+    fetchOAuthProviderStatus()
+      .then((status) => setOauthStatus(status))
+      .catch(() =>
+        setOauthStatus({
+          linkedin: false,
+          google: false,
+          github: false,
+          apple: false,
+          microsoft: false,
+        }),
+      );
   }, []);
 
-  useEffect(() => {
-    if (searchParams.get("error") === "linkedin_not_configured") {
-      setError(t("login.errorLinkedinNotConfigured"));
-    }
+  const oauthUrlError = useMemo(() => {
+    const err = searchParams.get("error");
+    if (err === "linkedin_not_configured") return t("login.errorLinkedinNotConfigured");
+    if (err?.endsWith("_not_configured")) return t("login.errorOAuthNotConfigured");
+    return null;
   }, [searchParams, t]);
+
+  const displayError = error ?? oauthUrlError;
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -64,20 +76,35 @@ function LoginPageContent() {
           <Input name="email" type="email" required autoComplete="email" />
           <Label>{t("login.password")}</Label>
           <Input name="password" type="password" required autoComplete="current-password" />
-          {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+          <p className="mb-4 text-right text-sm">
+            <Link href="/forgot-password" className="twin-link">
+              {t("login.forgotPassword")}
+            </Link>
+          </p>
+          {displayError && <p className="mb-4 text-sm text-red-600">{displayError}</p>}
           <Button type="submit" disabled={loading}>
             {loading ? t("login.signingIn") : t("login.submit")}
           </Button>
         </form>
-        {linkedInConfigured !== null && (
+        {oauthStatus !== null && (
           <>
             <p className="twin-muted my-4 text-center text-xs uppercase tracking-wide">
               {t("login.orContinue")}
             </p>
-            {!linkedInConfigured && <LinkedInSetupHint />}
+            <OAuthWebButtons
+              status={oauthStatus}
+              labels={{
+                google: t("login.oauthGoogle"),
+                github: t("login.oauthGithub"),
+                apple: t("login.oauthApple"),
+                microsoft: t("login.oauthMicrosoft"),
+                microsoftSoon: t("login.oauthMicrosoftSoon"),
+              }}
+            />
+            {!oauthStatus.linkedin && <LinkedInSetupHint />}
             <LinkedInLoginButton
               label={t("login.linkedIn")}
-              configured={linkedInConfigured}
+              configured={oauthStatus.linkedin}
               comingSoonMessage={t("login.linkedInComingSoon")}
             />
           </>

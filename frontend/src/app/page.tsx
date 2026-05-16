@@ -14,7 +14,7 @@ export default function Home() {
           <h1 className="twin-hero-title mt-3 text-3xl sm:mt-4 sm:text-4xl md:text-[2.75rem] md:leading-tight">
             {t("home.title")}
           </h1>
-          <p className="twin-muted mt-4 max-w-xl text-base leading-relaxed sm:text-lg">
+          <p className="twin-muted mt-4 max-w-2xl text-base leading-relaxed sm:text-lg">
             {t("home.description")}
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:gap-4">
