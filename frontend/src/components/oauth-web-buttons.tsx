@@ -5,35 +5,15 @@ import type { ReactNode } from "react";
 import { API_URL } from "@/lib/api";
 import type { OAuthProviderStatus } from "@/lib/oauth-auth";
 
-type OAuthVariant = "google" | "github" | "apple";
+/** Light “Sign in with …” rows: white surface + neutral chrome (brand marks keep official colors). */
+const ROW_ENABLED =
+  "twin-touch-target mb-2 flex w-full items-center justify-center gap-3 rounded-lg border border-neutral-200 bg-white px-4 py-3 text-sm font-semibold text-neutral-900 shadow-sm transition hover:border-neutral-300 hover:bg-neutral-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--twin-accent)]";
 
-const VARIANT_ROW: Record<
-  OAuthVariant,
-  { enabled: string; disabled: string; iconWrap: string }
-> = {
-  google: {
-    enabled:
-      "twin-touch-target mb-2 flex w-full items-center justify-center gap-3 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-card)] px-4 py-3 text-sm font-semibold text-[var(--foreground)] shadow-sm transition hover:border-[var(--twin-border-hover)] hover:bg-[var(--twin-surface-raised)] hover:shadow",
-    disabled:
-      "twin-touch-target mb-2 flex w-full cursor-not-allowed items-center justify-center gap-3 rounded-lg border border-dashed border-[var(--twin-border)] bg-[var(--twin-card)] px-4 py-3 text-sm font-semibold text-[var(--twin-muted)] opacity-75",
-    iconWrap: "inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center overflow-visible leading-none",
-  },
-  github: {
-    enabled:
-      "twin-touch-target mb-2 flex w-full items-center justify-center gap-3 rounded-lg border border-[#24292f] bg-[#24292f] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:border-[#1a1e22] hover:bg-[#1a1e22] hover:text-white",
-    disabled:
-      "twin-touch-target mb-2 flex w-full cursor-not-allowed items-center justify-center gap-3 rounded-lg border border-dashed border-white/25 bg-[#24292f]/85 px-4 py-3 text-sm font-semibold text-white opacity-60",
-    iconWrap: "inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center overflow-visible leading-none text-white",
-  },
-  apple: {
-    enabled:
-      "twin-touch-target mb-2 flex w-full items-center justify-center gap-3 rounded-lg border border-black bg-black px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:border-stone-800 hover:bg-stone-900 hover:text-white",
-    disabled:
-      "twin-touch-target mb-2 flex w-full cursor-not-allowed items-center justify-center gap-3 rounded-lg border border-dashed border-white/30 bg-black/90 px-4 py-3 text-sm font-semibold text-white opacity-65",
-    iconWrap:
-      "inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center overflow-visible leading-none text-white [&>svg]:overflow-visible",
-  },
-};
+const ROW_DISABLED =
+  "twin-touch-target mb-2 flex w-full cursor-not-allowed items-center justify-center gap-3 rounded-lg border border-dashed border-neutral-300 bg-white px-4 py-3 text-sm font-semibold text-neutral-400";
+
+const ICON_WRAP =
+  "inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center overflow-visible leading-none";
 
 type Labels = {
   google: string;
@@ -50,21 +30,18 @@ export function OAuthWebButtons({ status, labels }: OAuthWebButtonsProps) {
   return (
     <>
       <Row
-        variant="google"
         configured={status.google}
         href={`${API_URL}/api/v1/auth/google/login`}
         label={labels.google}
         icon={<GoogleIcon />}
       />
       <Row
-        variant="github"
         configured={status.github}
         href={`${API_URL}/api/v1/auth/github/login`}
         label={labels.github}
         icon={<GitHubIcon />}
       />
       <Row
-        variant="apple"
         configured={status.apple}
         href={`${API_URL}/api/v1/auth/apple/login`}
         label={labels.apple}
@@ -75,45 +52,36 @@ export function OAuthWebButtons({ status, labels }: OAuthWebButtonsProps) {
 }
 
 function Row({
-  variant,
   configured,
   href,
   label,
   icon,
 }: {
-  variant: OAuthVariant;
   configured: boolean;
   href: string;
   label: string;
   icon: ReactNode;
 }) {
-  const styles = VARIANT_ROW[variant];
   if (!configured) {
     return (
-      <div className={styles.disabled}>
-        <span className={styles.iconWrap}>{icon}</span>
+      <div className={ROW_DISABLED}>
+        <span className={ICON_WRAP}>{icon}</span>
         <span className="min-w-0 leading-snug">{label}</span>
       </div>
     );
   }
   return (
-    <a href={href} className={styles.enabled}>
-      <span className={styles.iconWrap}>{icon}</span>
+    <a href={href} className={ROW_ENABLED}>
+      <span className={ICON_WRAP}>{icon}</span>
       <span className="min-w-0 leading-snug">{label}</span>
     </a>
   );
 }
 
-/** Google “G” with official brand colors (marketing guidelines). */
+/** Google “G” — official multi-color mark on white (brand guidelines). */
 function GoogleIcon() {
   return (
-    <svg
-      className="block overflow-visible"
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-    >
+    <svg className="block overflow-visible" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
       <path
         fill="#4285F4"
         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -134,6 +102,7 @@ function GoogleIcon() {
   );
 }
 
+/** GitHub Octocat — light-bg mark uses #24292f (GitHub logo guidelines). */
 function GitHubIcon() {
   return (
     <svg
@@ -142,25 +111,26 @@ function GitHubIcon() {
       height="20"
       viewBox="0 0 24 24"
       aria-hidden="true"
-      fill="currentColor"
+      fill="#24292f"
     >
       <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
     </svg>
   );
 }
 
-/** Apple mark — extra headroom in viewBox so the leaf is not clipped at small sizes. */
+/**
+ * Apple logo silhouette — canonical fill path (widely used Apple mark on light backgrounds).
+ * Matches the familiar “bitten apple + leaf” shape; black on white aligns with Sign in with Apple white-button style.
+ */
 function AppleIcon() {
   return (
     <svg
-      className="block overflow-visible"
-      width="20"
-      height="20"
-      viewBox="0 -2.5 24 26.5"
+      className="block h-[19px] w-[15px] shrink-0 overflow-visible"
+      viewBox="0 0 814 1000"
       aria-hidden="true"
-      fill="currentColor"
+      fill="#000000"
     >
-      <path d="M16.365 1.43c0 1.14-.493 2.27-1.177 3.08-.744.9-1.99 1.57-2.975 1.57-.12 0-.23-.01-.36-.02-.01-.02-.01-.04-.01-.06 0-1.09.474-2.2 1.17-2.96.734-.79 1.99-1.44 2.84-1.44.12 0 .24.01.35.02.01.02.01.04.01.06zm4.99 17.32c-.98.95-2.1 1.01-2.84 1.01-.89 0-2.86-.1-4.28-.1-1.46 0-2.92.1-3.78.1-.79 0-2.05-.06-3.01-1.01C2.79 17.25 1.5 12.36 1.5 8.28c0-4.5 2.91-6.78 5.74-6.78 1.03 0 2.05.19 2.95.56.89.37 1.67.89 2.31 1.52.64-.63 1.42-1.15 2.31-1.52.9-.37 1.92-.56 2.95-.56 2.83 0 5.74 2.28 5.74 6.78 0 4.08-1.29 8.97-3.65 11.47z" />
+      <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.4 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76.5 0-103.3 40.8-165.9 40.8s-105.6-57-155.5-127.4C-8.6 622.8 42 367.7 42 236.2 42 112.3 121.7 16.5 229.8 16.5c74.7 0 127.7 49.4 152.9 49.4 23.5 0 91-52.6 162.4-52.6 28 0 84.6 2.4 129.3 39.2-115.2 67.5-97 243.4 33.9 243.4C722.4 349.4 788.1 340.9 788.1 340.9zM554.1 0c-4.5 79.8-43.5 147.1-119.4 199.3-4.5 3.2-10.2 6.4-15.3 9.6 1.3 3.2 2.6 6.4 4.5 9.6 20.7 43.5 65.9 127.4 150.7 127.4 4.5 0 9.6-.6 14.5-1.9C757.3 203.8 554.1 0 554.1 0z" />
     </svg>
   );
 }
