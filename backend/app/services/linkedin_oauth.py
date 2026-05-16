@@ -25,9 +25,15 @@ class LinkedInProfile:
     name: str | None
 
 
+def is_linkedin_credentials_configured() -> bool:
+    """True when LinkedIn app credentials are set (status UI and login guard)."""
+    s = get_settings()
+    return bool(s.linkedin_client_id and s.linkedin_client_secret)
+
+
 def is_linkedin_oauth_configured() -> bool:
     s = get_settings()
-    return bool(s.linkedin_client_id and s.linkedin_client_secret and s.linkedin_redirect_uri)
+    return is_linkedin_credentials_configured() and bool(s.linkedin_redirect_uri)
 
 
 def build_authorize_url(state: str) -> str:

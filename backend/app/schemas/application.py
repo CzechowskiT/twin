@@ -44,3 +44,15 @@ class ApplicationOut(BaseModel):
 class ApplicationListOut(BaseModel):
     items: list[ApplicationOut]
     total: int
+
+
+class AutoApplyRequest(BaseModel):
+    job_id: int
+    submit: bool | None = None
+
+
+class AutoApplyOut(BaseModel):
+    success: bool
+    outcome: str
+    message: str
+    application_id: int | None = None

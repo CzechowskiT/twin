@@ -15,10 +15,8 @@ export function Header() {
   ];
 
   return (
-    <header
-      className="relative z-10 border-b border-[var(--twin-border)] bg-[var(--twin-header-bg)]"
-      style={{ boxShadow: "var(--twin-shadow)" }}
-    >
+    <header className="twin-header-bar relative z-10">
+      <div className="twin-header-stripe" aria-hidden />
       <div className="twin-container flex items-center justify-between gap-4 py-3 sm:py-3.5">
         <Link href="/" className="twin-logo shrink-0">
           TWIN<span className="twin-logo-accent">.</span>

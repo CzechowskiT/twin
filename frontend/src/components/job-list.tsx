@@ -29,17 +29,32 @@ export function JobList({
   items,
   showScore = false,
   applicationStatus,
-  onTrack,
+  onApply,
+  onAutoApply,
+  onSave,
+  onDismiss,
+  autoApplyJobId,
 }: {
   items: JobRow[];
   showScore?: boolean;
   applicationStatus?: Record<number, string>;
-  onTrack?: (jobId: number) => void;
+  onApply?: (jobId: number, url: string) => void;
+  onAutoApply?: (jobId: number) => void;
+  onSave?: (jobId: number) => void;
+  onDismiss?: (jobId: number) => void;
+  autoApplyJobId?: number | null;
 }) {
   const { t } = useTranslation();
 
   if (!items.length) {
     return <p className="twin-muted text-sm">{t("dashboard.noJobsFiltered")}</p>;
+  }
+
+  const hasActions = Boolean(onApply || onAutoApply || onSave || onDismiss);
+
+  function supportsAutoApply(board: string, url: string): boolean {
+    const b = board.toLowerCase();
+    return b.includes("pracuj") || b.includes("indeed") || url.includes("pracuj.pl") || url.includes("indeed.com");
   }
 
   return (
@@ -49,14 +64,16 @@ export function JobList({
         const key = jobId || item.url;
         const salary = formatSalary(item.salary_min, item.salary_max);
         const status = applicationStatus?.[jobId];
+        const showActionRow =
+          hasActions && jobId > 0 && status !== "applied" && status !== "rejected";
 
         return (
-          <li key={key} className="twin-job-row flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <li key={key} className="twin-job-row flex flex-col gap-2">
             <a
               href={item.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="min-w-0 flex-1 hover:no-underline"
+              className="min-w-0 hover:no-underline"
             >
               <div className="flex flex-wrap items-start gap-2">
                 {showScore && item.score != null && (
@@ -76,14 +93,46 @@ export function JobList({
                 <span> · {item.job_board}</span>
               </p>
             </a>
-            {onTrack && jobId > 0 && !status && (
-              <button
-                type="button"
-                onClick={() => onTrack(jobId)}
-                className="twin-btn-secondary twin-touch-target shrink-0 !w-auto px-3 py-1.5 text-xs"
-              >
-                {t("dashboard.trackJob")}
-              </button>
+            {showActionRow && (
+              <div className="flex flex-wrap gap-2">
+                {onApply && (
+                  <button
+                    type="button"
+                    onClick={() => onApply(jobId, item.url)}
+                    className="twin-btn-solid twin-touch-target shrink-0 !w-auto px-3 py-1.5 text-xs"
+                  >
+                    {t("dashboard.applyJob")}
+                  </button>
+                )}
+                {onAutoApply && supportsAutoApply(item.job_board, item.url) && (
+                  <button
+                    type="button"
+                    disabled={autoApplyJobId === jobId}
+                    onClick={() => onAutoApply(jobId)}
+                    className="twin-btn-secondary twin-touch-target shrink-0 !w-auto border-[var(--twin-cta)] px-3 py-1.5 text-xs font-semibold text-[var(--twin-cta)]"
+                  >
+                    {autoApplyJobId === jobId ? t("dashboard.autoApplyRunning") : t("dashboard.autoApplyJob")}
+                  </button>
+                )}
+                {onSave && !status && (
+                  <button
+                    type="button"
+                    onClick={() => onSave(jobId)}
+                    className="twin-btn-secondary twin-touch-target shrink-0 !w-auto px-3 py-1.5 text-xs"
+                  >
+                    {t("dashboard.saveJob")}
+                  </button>
+                )}
+                {onDismiss && (
+                  <button
+                    type="button"
+                    onClick={() => onDismiss(jobId)}
+                    className="twin-btn-secondary twin-touch-target shrink-0 !w-auto px-3 py-1.5 text-xs opacity-80"
+                  >
+                    {t("dashboard.dismissJob")}
+                  </button>
+                )}
+              </div>
             )}
           </li>
         );

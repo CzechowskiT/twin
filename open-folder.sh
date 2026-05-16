@@ -52,6 +52,20 @@ if [[ ! -f frontend/.env.local ]]; then
 fi
 
 # Docker: Postgres + Redis
+if ! docker info >/dev/null 2>&1; then
+  echo ""
+  echo "ERROR: Docker is not running."
+  echo ""
+  echo "TWIN needs Docker Desktop for the database. Do this:"
+  echo "  1. Open Docker Desktop (Applications → Docker)"
+  echo "  2. Wait until the whale icon says Docker is running"
+  echo "  3. Run again:  ./open-folder.sh --launch"
+  echo ""
+  if [[ ! -d "/Applications/Docker.app" ]]; then
+    echo "Docker is not installed. Install from: https://www.docker.com/products/docker-desktop/"
+  fi
+  exit 1
+fi
 echo "==> Starting Postgres + Redis (docker compose)"
 docker compose up -d postgres redis
 

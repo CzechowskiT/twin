@@ -31,23 +31,35 @@ function readStoredLocale(): Locale | null {
   return stored === "en" || stored === "pl" ? stored : null;
 }
 
+function resolveLocale(): Locale {
+  return readStoredLocale() ?? detectBrowserLocale();
+}
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>("pl");
-  const [ready, setReady] = useState(false);
+  const [locale, setLocaleState] = useState<Locale>(resolveLocale);
 
   useEffect(() => {
-    setLocaleState(readStoredLocale() ?? detectBrowserLocale());
-    setReady(true);
+    const resolved = resolveLocale();
+    setLocaleState((current) => (current === resolved ? current : resolved));
   }, []);
 
   useEffect(() => {
-    if (!ready) return;
     document.documentElement.lang = locale;
-    localStorage.setItem(LOCALE_STORAGE_KEY, locale);
-  }, [locale, ready]);
+    try {
+      localStorage.setItem(LOCALE_STORAGE_KEY, locale);
+    } catch {
+      // private browsing / blocked storage
+    }
+  }, [locale]);
 
   const setLocale = useCallback((next: Locale) => {
     setLocaleState(next);
+    document.documentElement.lang = next;
+    try {
+      localStorage.setItem(LOCALE_STORAGE_KEY, next);
+    } catch {
+      // private browsing / blocked storage
+    }
   }, []);
 
   const t = useCallback((key: TranslationKey) => translate(locale, key), [locale]);

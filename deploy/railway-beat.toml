@@ -1,0 +1,11 @@
+# Railway service: TWIN Celery beat (scheduled scrape every 2 min)
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+dockerContext = "backend"
+watchPatterns = ["backend/**"]
+
+[deploy]
+startCommand = "celery -A app.tasks.celery_app beat --loglevel=info"
+restartPolicyType = "ON_FAILURE"

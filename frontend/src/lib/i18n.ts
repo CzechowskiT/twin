@@ -9,6 +9,7 @@ export type TranslationKey =
   | `dashboard.${keyof typeof en.dashboard}`
   | `login.${keyof typeof en.login}`
   | `register.${keyof typeof en.register}`
+  | `authCallback.${keyof typeof en.authCallback}`
   | `profile.${keyof typeof en.profile}`
   | `common.${keyof typeof en.common}`;
 
@@ -72,8 +73,13 @@ const en = {
     sortSalary: "Highest salary",
     sortCompany: "Company A–Z",
     trackJob: "Track",
+    applyJob: "Apply",
+    autoApplyJob: "Auto-apply",
+    autoApplyRunning: "Opening browser…",
+    saveJob: "Save",
+    dismissJob: "Not for me",
     applications: "My applications",
-    noApplications: "No tracked applications yet — click Track on a job.",
+    noApplications: "No tracked applications yet — use Save or Apply on a job.",
     applicationStatus: "Application status",
     removeApplication: "Remove",
     appStatusPending: "Saved",
@@ -93,6 +99,24 @@ const en = {
     noAccount: "No account?",
     register: "Register",
     failed: "Login failed",
+    orContinue: "or continue with",
+    linkedIn: "Continue with LinkedIn",
+    linkedInComingSoon: "LinkedIn login coming soon — use email below",
+    linkedInSetupTitle: "Enable LinkedIn login (one-time setup)",
+    linkedInSetupStep1: "Create an app at linkedin.com/developers → add “Sign In with OpenID Connect”.",
+    linkedInSetupStep2: "Add redirect URL: http://localhost:8000/api/v1/auth/linkedin/callback",
+    linkedInSetupStep3: "Paste Client ID and Secret into .env, restart API (make api).",
+    linkedInSetupDoc: "Full guide: docs/LINKEDIN_KONFIGURACJA_PL.md in the project folder.",
+    errorLinkedinNotConfigured: "LinkedIn login is not available yet. Please use email below.",
+  },
+  authCallback: {
+    title: "Signing you in",
+    signingIn: "Completing sign-in…",
+    errorLinkedinDenied: "LinkedIn sign-in was cancelled.",
+    errorInvalidState: "Sign-in session expired. Please try again.",
+    errorLinkedinFailed: "LinkedIn sign-in failed. Check API configuration.",
+    errorInactive: "This account is inactive.",
+    errorUnknown: "Sign-in could not be completed.",
   },
   register: {
     title: "Create account",
@@ -107,6 +131,9 @@ const en = {
     login: "Log in",
     gdprRequired: "You must accept the privacy policy.",
     failed: "Registration failed",
+    orContinue: "or continue with",
+    linkedIn: "Sign up with LinkedIn",
+    linkedInComingSoon: "LinkedIn login coming soon — use email below",
   },
   profile: {
     title: "Your career profile",
@@ -211,8 +238,13 @@ const pl: MessageTree = {
     sortSalary: "Najwyższe wynagrodzenie",
     sortCompany: "Firma A–Z",
     trackJob: "Śledź",
+    applyJob: "Aplikuj",
+    autoApplyJob: "Auto-aplikuj",
+    autoApplyRunning: "Otwieram przeglądarkę…",
+    saveJob: "Zapisz",
+    dismissJob: "Nie dla mnie",
     applications: "Moje aplikacje",
-    noApplications: "Brak śledzonych aplikacji — kliknij Śledź przy ofercie.",
+    noApplications: "Brak śledzonych aplikacji — użyj Zapisz lub Aplikuj przy ofercie.",
     applicationStatus: "Status aplikacji",
     removeApplication: "Usuń",
     appStatusPending: "Zapisana",
@@ -232,6 +264,26 @@ const pl: MessageTree = {
     noAccount: "Nie masz konta?",
     register: "Zarejestruj się",
     failed: "Logowanie nie powiodło się",
+    orContinue: "lub kontynuuj przez",
+    linkedIn: "Kontynuuj z LinkedIn",
+    linkedInComingSoon: "Logowanie przez LinkedIn wkrótce — użyj formularza e-mail poniżej",
+    linkedInSetupTitle: "Włącz logowanie LinkedIn (jednorazowo)",
+    linkedInSetupStep1: "Załóż aplikację na linkedin.com/developers → „Sign In with OpenID Connect”.",
+    linkedInSetupStep2: "Redirect URL: http://localhost:8000/api/v1/auth/linkedin/callback",
+    linkedInSetupStep3: "Wklej Client ID i Secret do pliku .env, zrestartuj API (make api).",
+    linkedInSetupDoc: "Instrukcja: docs/LINKEDIN_KONFIGURACJA_PL.md w folderze projektu.",
+    errorLinkedinNotConfigured:
+      "Logowanie przez LinkedIn jest niedostępne. Użyj formularza e-mail poniżej.",
+  },
+  authCallback: {
+    title: "Logowanie",
+    signingIn: "Kończenie logowania…",
+    errorLinkedinDenied: "Logowanie przez LinkedIn zostało anulowane.",
+    errorInvalidState: "Sesja wygasła. Spróbuj ponownie.",
+    errorLinkedinFailed:
+      "Logowanie przez LinkedIn nie powiodło się. Sprawdź konfigurację API.",
+    errorInactive: "To konto jest nieaktywne.",
+    errorUnknown: "Nie udało się dokończyć logowania.",
   },
   register: {
     title: "Utwórz konto",
@@ -247,6 +299,9 @@ const pl: MessageTree = {
     login: "Zaloguj się",
     gdprRequired: "Musisz zaakceptować politykę prywatności.",
     failed: "Rejestracja nie powiodła się",
+    orContinue: "lub kontynuuj przez",
+    linkedIn: "Zarejestruj się przez LinkedIn",
+    linkedInComingSoon: "Logowanie przez LinkedIn wkrótce — użyj formularza e-mail poniżej",
   },
   profile: {
     title: "Twój profil zawodowy",
@@ -287,7 +342,7 @@ const pl: MessageTree = {
 export const dictionaries: Record<Locale, typeof en> = { en, pl: pl as typeof en };
 
 export function detectBrowserLocale(): Locale {
-  if (typeof navigator === "undefined") return "pl";
+  if (typeof navigator === "undefined") return "en";
   const lang = navigator.language?.toLowerCase() ?? "";
   return lang.startsWith("pl") ? "pl" : "en";
 }

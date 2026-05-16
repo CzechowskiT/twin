@@ -13,6 +13,13 @@ AI-powered career agent: scrape jobs (pracuj.pl, rocketjobs.pl, LinkedIn), match
 | AI | Anthropic Claude |
 | Frontend | Next.js (TypeScript) |
 
+## Beta online (share a link with testers) — P0
+
+**Checklist (repo + Railway + Vercel):** **[docs/P0_CHECKLIST.md](docs/P0_CHECKLIST.md)**  
+**Start here (plain Polish):** **[docs/WDROZENIE_LINK.md](docs/WDROZENIE_LINK.md)**  
+Terminal helper: `./scripts/wrzuc-na-github.sh CzechowskiT`  
+Technical: [docs/BETA_ONLINE_PL.md](docs/BETA_ONLINE_PL.md), [docs/DEPLOY.md](docs/DEPLOY.md).
+
 ## Quick start
 
 One command (setup + Docker + migrations; add `--launch` for macOS Terminal tabs):

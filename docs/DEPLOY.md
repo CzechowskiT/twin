@@ -1,5 +1,7 @@
 # Deploying TWIN
 
+**Beta online (Polish, step-by-step for founders):** [BETA_ONLINE_PL.md](./BETA_ONLINE_PL.md)
+
 ## Option 1: Docker Compose (VPS / local server)
 
 1. Copy `.env.example` to `.env` and set:
@@ -8,6 +10,7 @@
    - `NEXT_PUBLIC_API_URL` (public API URL, e.g. `https://api.yourdomain.com`)
    - `CORS_ORIGINS` (frontend URL, e.g. `https://app.yourdomain.com`)
    - `ANTHROPIC_API_KEY` (optional, for CV parsing)
+   - LinkedIn OAuth: `LINKEDIN_CLIENT_ID`, `LINKEDIN_CLIENT_SECRET`, `LINKEDIN_REDIRECT_URI`, `FRONTEND_URL` (see [LINKEDIN_OAUTH.md](./LINKEDIN_OAUTH.md))
 
 2. Start the stack:
 
@@ -25,18 +28,31 @@ docker compose -f docker-compose.prod.yml exec api alembic upgrade head
 
 Services: **frontend** :3000, **api** :8000, Postgres, Redis, Celery worker + beat.
 
-## Option 2: Railway / Render (split services)
+## Option 2: Vercel + Railway (recommended beta)
+
+| Piece | Host | Config |
+|-------|------|--------|
+| Frontend | [Vercel](https://vercel.com) — root `frontend/` | `NEXT_PUBLIC_API_URL` → Railway API URL |
+| API | Railway — `deploy/railway-api.toml` | Auto-migrate on start; health `/api/v1/health` |
+| Worker | Railway — `deploy/railway-worker.toml` | Same env as API |
+| Beat | Railway — `deploy/railway-beat.toml` | Same env as API |
+| Postgres | Railway plugin | Reference `DATABASE_URL` on API/worker |
+| Redis | Railway plugin | `CELERY_BROKER_URL` / `CELERY_RESULT_BACKEND` |
+
+Env template: `.env.production.example` in repo root.
+
+`DATABASE_URL` from Railway (`postgres://`) is normalized to `postgresql+psycopg://` in `app/config.py`.
+
+## Option 3: Railway / Render (manual commands)
 
 | Service | Command | Notes |
 |---------|---------|--------|
 | Postgres | managed plugin | Copy `DATABASE_URL` |
 | Redis | managed plugin | Copy `REDIS_URL` |
-| API | `uvicorn app.main:app --host 0.0.0.0 --port $PORT` | Root: `backend/` |
+| API | `/app/scripts/start-api.sh` (Docker) | Migrations + uvicorn on `$PORT` |
 | Worker | `celery -A app.tasks.celery_app worker` | Same env as API |
 | Beat | `celery -A app.tasks.celery_app beat` | Same env as API |
-| Frontend | `npm run build && npm start` | Set `NEXT_PUBLIC_API_URL` |
-
-After deploy, run `alembic upgrade head` against the production database.
+| Frontend | Vercel or `npm run build && npm start` | Set `NEXT_PUBLIC_API_URL` |
 
 ## Health check
 

@@ -10,21 +10,31 @@ export function Shell({
 }) {
   return (
     <div
-      className={`mx-auto flex w-full min-w-0 flex-col ${wide ? "max-w-5xl" : "max-w-md"}`}
-      style={{
-        paddingInline: "var(--twin-page-x)",
-        paddingBlock: "var(--twin-page-y)",
-      }}
+      className={`twin-shell flex min-w-0 flex-col ${wide ? "twin-shell--wide" : "twin-shell--narrow"}`}
     >
       {children}
     </div>
   );
 }
 
-export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
+export function Card({
+  children,
+  className = "",
+  variant = "default",
+}: {
+  children: ReactNode;
+  className?: string;
+  variant?: "default" | "soft" | "accent";
+}) {
+  const variantClass =
+    variant === "accent"
+      ? "twin-card-panel--accent"
+      : variant === "soft"
+        ? "twin-card-panel--soft"
+        : "";
   return (
     <div
-      className={`twin-card-panel mb-4 p-4 text-[var(--foreground)] sm:mb-6 sm:p-6 ${className}`}
+      className={`twin-card-panel mb-4 p-4 text-[var(--foreground)] sm:mb-6 sm:p-6 ${variantClass} ${className}`}
     >
       {children}
     </div>

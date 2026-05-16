@@ -36,7 +36,7 @@ export function ApplicationsPanel({
       {items.map((app) => (
         <li
           key={app.id}
-          className="flex flex-col gap-2 rounded border border-[var(--twin-border)] bg-[var(--twin-card)] p-3 sm:flex-row sm:items-center sm:justify-between"
+          className="twin-card-inset flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:justify-between"
         >
           <div className="min-w-0">
             <a href={app.url} target="_blank" rel="noopener noreferrer" className="twin-link font-medium">

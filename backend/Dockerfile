@@ -12,4 +12,9 @@ RUN pip install --no-cache-dir -r requirements.txt \
 
 COPY . .
 
+RUN chmod +x /app/scripts/start-api.sh
+
 ENV PYTHONPATH=/app
+
+# API service (override for Celery worker/beat)
+CMD ["/app/scripts/start-api.sh"]

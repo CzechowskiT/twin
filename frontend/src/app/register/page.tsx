@@ -2,11 +2,14 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { LinkedInLoginButton } from "@/components/linkedin-login-button";
+import { LinkedInSetupHint } from "@/components/linkedin-setup-hint";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Input, Label, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { setToken } from "@/lib/auth";
+import { fetchLinkedInAuthStatus } from "@/lib/linkedin-auth";
 
 type TokenResponse = { access_token: string };
 
@@ -15,6 +18,13 @@ export default function RegisterPage() {
   const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [linkedInConfigured, setLinkedInConfigured] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    fetchLinkedInAuthStatus()
+      .then((status) => setLinkedInConfigured(status.configured))
+      .catch(() => setLinkedInConfigured(false));
+  }, []);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -75,6 +85,19 @@ export default function RegisterPage() {
             {loading ? t("register.creating") : t("register.submit")}
           </Button>
         </form>
+        {linkedInConfigured !== null && (
+          <>
+            <p className="twin-muted my-4 text-center text-xs uppercase tracking-wide">
+              {t("register.orContinue")}
+            </p>
+            {!linkedInConfigured && <LinkedInSetupHint />}
+            <LinkedInLoginButton
+              label={t("register.linkedIn")}
+              configured={linkedInConfigured}
+              comingSoonMessage={t("register.linkedInComingSoon")}
+            />
+          </>
+        )}
         <p className="twin-muted mt-4 text-center text-sm">
           {t("register.hasAccount")}{" "}
           <Link href="/login" className="twin-link">

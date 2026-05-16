@@ -1,0 +1,12 @@
+# Railway service: TWIN Celery worker (scraping + background jobs)
+# Same repo; root directory: repo root; config: deploy/railway-worker.toml
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+dockerContext = "backend"
+watchPatterns = ["backend/**"]
+
+[deploy]
+startCommand = "celery -A app.tasks.celery_app worker --loglevel=info"
+restartPolicyType = "ON_FAILURE"

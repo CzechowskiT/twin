@@ -1,0 +1,13 @@
+# Railway service: TWIN API
+# Dashboard → Service → Settings → Config file path: deploy/railway-api.toml
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+dockerContext = "backend"
+watchPatterns = ["backend/**"]
+
+[deploy]
+healthcheckPath = "/api/v1/health"
+healthcheckTimeout = 120
+restartPolicyType = "ON_FAILURE"

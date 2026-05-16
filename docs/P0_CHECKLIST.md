@@ -1,0 +1,75 @@
+# P0 — link online (checklista)
+
+Repo GitHub: **https://github.com/CzechowskiT/twin** (po `git push`).
+
+---
+
+## A. Kod na GitHub (Mac, Terminal)
+
+```bash
+cd ~/Projects/twin
+git remote add origin https://github.com/CzechowskiT/twin.git
+# jeśli origin już jest: git remote set-url origin https://github.com/CzechowskiT/twin.git
+
+git push -u origin cursor/phase1-monorepo-scaffold
+```
+
+Jeśli brak commitów lokalnych — najpierw `git pull` albo użyj skryptu `./scripts/wrzuc-na-github.sh CzechowskiT` (tworzy commit i pyta o Enter przed pushem).
+
+---
+
+## B. Railway — kolejność
+
+1. **New project** → Deploy from GitHub → `CzechowskiT/twin`.
+2. **PostgreSQL** (+ New → Database).
+3. **Redis** (+ New → Database).
+4. **API** — drugi serwis z tego samego repo:
+   - Settings → **Config file path:** `deploy/railway-api.toml`
+   - **Variables** (RAW lub pojedynczo):
+
+| Zmienna | Wartość |
+|---------|---------|
+| `SECRET_KEY` | `openssl rand -hex 32` na Macu |
+| `ENVIRONMENT` | `production` |
+| `DATABASE_URL` | Reference → Postgres |
+| `CELERY_BROKER_URL` | `${{Redis.REDIS_URL}}` |
+| `CELERY_RESULT_BACKEND` | `${{Redis.REDIS_URL}}` |
+| `ANTHROPIC_API_KEY` | Twój klucz |
+| `FRONTEND_URL` | Tymczasowo `https://placeholder.vercel.app` → **zmień po Vercel** |
+| `CORS_ORIGINS` | **To samo** co `FRONTEND_URL` |
+| `API_URL` | Zostaw puste lub URL API po wygenerowaniu domeny |
+| `LINKEDIN_CLIENT_ID` | Jak w `.env` lokalnie |
+| `LINKEDIN_CLIENT_SECRET` | Jak w `.env` |
+| `LINKEDIN_REDIRECT_URI` | `https://<TWOJE-API>.up.railway.app/api/v1/auth/linkedin/callback` |
+| `AUTO_APPLY_HEADLESS` | `true` (na serwerze bez monitora) |
+
+5. **Networking** → Generate Domain → skopiuj URL API.
+6. **Worker** — trzeci serwis, config: `deploy/railway-worker.toml` — **te same** zmienne co API (bez `FRONTEND_URL` można, ale API_URL nie jest wymagane dla workera).
+7. **Beat** — czwarty serwis, config: `deploy/railway-beat.toml` — `CELERY_*` + ewentualnie reszta jak worker.
+
+**Test:** `https://<API>/api/v1/health` → `{"status":"ok"}` (lub podobnie).
+
+---
+
+## C. Vercel
+
+1. Import `CzechowskiT/twin`, **Root Directory:** `frontend`.
+2. **Environment variable:** `NEXT_PUBLIC_API_URL` = `https://<TWOJE-API>.up.railway.app` (bez końcowego `/`).
+3. Deploy → skopiuj URL aplikacji.
+
+---
+
+## D. Domknięcie
+
+1. Railway → API → `FRONTEND_URL` i `CORS_ORIGINS` = URL z Vercel.
+2. LinkedIn Developer → **Redirect URL** = ten sam co `LINKEDIN_REDIRECT_URI` na Railway.
+3. **Redeploy** API na Railway.
+
+---
+
+## E. Test końcowy
+
+- Wejdź na link Vercel → rejestracja → profil → pobierz oferty.
+- LinkedIn login: tylko jeśli redirect w aplikacji LinkedIn = produkcyjny callback.
+
+Szczegóły: [WDROZENIE_LINK.md](./WDROZENIE_LINK.md) · [BETA_ONLINE_PL.md](./BETA_ONLINE_PL.md)

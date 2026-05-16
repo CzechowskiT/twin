@@ -59,6 +59,7 @@ export default function DashboardPage() {
   const [filters, setFilters] = useState<JobFilters>(defaultJobFilters);
   const [error, setError] = useState<string | null>(null);
   const [scraping, setScraping] = useState(false);
+  const [autoApplyingId, setAutoApplyingId] = useState<number | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const loadJobs = useCallback(async (token: string, activeFilters: JobFilters) => {
@@ -158,7 +159,7 @@ export default function DashboardPage() {
     await refreshDashboardData(token, profile !== null && profile !== undefined, filters);
   }
 
-  async function trackJob(jobId: number) {
+  async function setJobApplication(jobId: number, status: string) {
     const token = getToken();
     if (!token) return;
     try {
@@ -166,7 +167,7 @@ export default function DashboardPage() {
         "/api/v1/applications/",
         {
           method: "POST",
-          body: JSON.stringify({ job_id: jobId, status: "pending" }),
+          body: JSON.stringify({ job_id: jobId, status }),
         },
         token,
       );
@@ -175,6 +176,47 @@ export default function DashboardPage() {
       setError(err instanceof Error ? err.message : t("dashboard.scrapeFailed"));
     }
   }
+
+  function applyToJob(jobId: number, url: string) {
+    window.open(url, "_blank", "noopener,noreferrer");
+    void setJobApplication(jobId, "applied");
+  }
+
+  function saveJob(jobId: number) {
+    void setJobApplication(jobId, "pending");
+  }
+
+  function dismissJob(jobId: number) {
+    void setJobApplication(jobId, "rejected");
+  }
+
+  async function autoApplyToJob(jobId: number) {
+    const token = getToken();
+    if (!token) return;
+    setAutoApplyingId(jobId);
+    setError(null);
+    try {
+      const result = await apiFetch<{
+        success: boolean;
+        message: string;
+      }>(
+        "/api/v1/applications/auto-apply",
+        { method: "POST", body: JSON.stringify({ job_id: jobId }) },
+        token,
+      );
+      setApplications(await loadApplications(token));
+      alert(result.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("dashboard.scrapeFailed"));
+    } finally {
+      setAutoApplyingId(null);
+    }
+  }
+
+  const visibleMatches = useMemo(() => {
+    const items = matches?.items ?? [];
+    return items.filter((job) => applicationByJobId[job.job_id] !== "rejected");
+  }, [matches?.items, applicationByJobId]);
 
   async function updateApplicationStatus(id: number, status: string) {
     const token = getToken();
@@ -239,7 +281,9 @@ export default function DashboardPage() {
   return (
     <Shell wide>
       <div className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="twin-section-title text-xl sm:text-2xl">{t("dashboard.title")}</h1>
+        <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">
+          {t("dashboard.title")}
+        </h1>
         <button
           type="button"
           onClick={() => {
@@ -252,9 +296,9 @@ export default function DashboardPage() {
         </button>
       </div>
 
-      <Card>
+      <Card variant="accent">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between lg:gap-8">
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1 twin-card-inset p-4 sm:p-5">
             {user && (
               <>
                 <p className="twin-muted text-sm">{t("dashboard.signedInAs")}</p>
@@ -289,7 +333,7 @@ export default function DashboardPage() {
             )}
           </div>
 
-          <div className="w-full shrink-0 lg:max-w-md">
+          <div className="twin-card-inset w-full shrink-0 p-4 sm:p-5 lg:max-w-md">
             <p className="mb-2 text-sm font-medium">{t("dashboard.scrapeJobs")}</p>
             <ButtonCta
               type="button"
@@ -329,21 +373,25 @@ export default function DashboardPage() {
       </Card>
 
       {hasProfile && (matches?.items.length ?? 0) > 0 && (
-        <Card>
+        <Card variant="soft">
           <h2 className="twin-section-title mb-4">
             {t("dashboard.topMatches")} ({matches?.total ?? 0})
           </h2>
           <JobList
-            items={matches?.items ?? []}
+            items={visibleMatches}
             showScore
             applicationStatus={applicationByJobId}
-            onTrack={trackJob}
+            onApply={applyToJob}
+            onAutoApply={autoApplyToJob}
+            autoApplyJobId={autoApplyingId}
+            onSave={saveJob}
+            onDismiss={dismissJob}
           />
         </Card>
       )}
 
       {hasProfile && (
-        <Card>
+        <Card variant="soft">
           <h2 className="twin-section-title mb-4">
             {t("dashboard.applications")} ({applications.length})
           </h2>
@@ -366,7 +414,7 @@ export default function DashboardPage() {
           : ""}
       </p>
 
-      <Card>
+      <Card variant="soft">
         <h2 className="twin-section-title mb-4">
           {t("dashboard.jobs")} ({jobs?.total ?? 0})
         </h2>
@@ -379,7 +427,11 @@ export default function DashboardPage() {
         <JobList
           items={jobs?.items ?? []}
           applicationStatus={applicationByJobId}
-          onTrack={hasProfile ? trackJob : undefined}
+          onApply={hasProfile ? applyToJob : undefined}
+          onAutoApply={hasProfile ? autoApplyToJob : undefined}
+          autoApplyJobId={autoApplyingId}
+          onSave={hasProfile ? saveJob : undefined}
+          onDismiss={hasProfile ? dismissJob : undefined}
         />
         {!jobs?.items.length && (
           <p className="twin-muted mt-3 text-sm">{t("dashboard.noJobs")}</p>

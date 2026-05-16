@@ -38,6 +38,7 @@ test-results/
 # Data / uploads
 backend/uploads/
 backend/data/
+backend/celerybeat-schedule*
 *.log
 
 # Alembic (keep versions tracked)

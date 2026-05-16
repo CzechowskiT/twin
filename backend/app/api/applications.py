@@ -8,13 +8,18 @@ from sqlalchemy.orm import Session
 from app.core.deps import get_current_user
 from app.database.models import Application, ApplicationStatus, Candidate, Job, User
 from app.database.session import get_db
+from app.automation.types import ApplyOutcome
+from app.config import get_settings
 from app.schemas.application import (
     ApplicationCreate,
     ApplicationListOut,
     ApplicationOut,
     ApplicationStatusEnum,
     ApplicationUpdate,
+    AutoApplyOut,
+    AutoApplyRequest,
 )
+from app.services.auto_apply_service import auto_apply_for_user
 
 router = APIRouter()
 
@@ -66,6 +71,26 @@ def create_application(
     db.commit()
     db.refresh(app)
     return _to_out(app, job)
+
+
+@router.post("/auto-apply", response_model=AutoApplyOut)
+def auto_apply(
+    body: AutoApplyRequest,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> AutoApplyOut:
+    """Run Playwright auto-apply (Pracuj.pl; Indeed needs visible browser for CAPTCHA)."""
+    settings = get_settings()
+    submit = body.submit if body.submit is not None else settings.auto_apply_submit
+    outcome, message, app = auto_apply_for_user(
+        db, user=user, job_id=body.job_id, submit=submit
+    )
+    return AutoApplyOut(
+        success=outcome in (ApplyOutcome.SUBMITTED, ApplyOutcome.FORM_FILLED),
+        outcome=outcome.value,
+        message=message,
+        application_id=app.id if app else None,
+    )
 
 
 @router.patch("/{application_id}", response_model=ApplicationOut)
