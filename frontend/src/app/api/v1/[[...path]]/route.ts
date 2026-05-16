@@ -3,17 +3,30 @@ import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-function upstreamBase(): string {
+function upstreamBase(): string | null {
   const raw = process.env.NEXT_PUBLIC_API_URL?.trim();
-  if (!raw) return "http://127.0.0.1:8000";
+  if (!raw) return null;
   return raw.replace(/\/$/, "");
 }
 
 const HOP_BY_HOP = new Set(["connection", "keep-alive", "proxy-authenticate", "proxy-authorization", "te", "trailers", "transfer-encoding", "upgrade", "host"]);
 
 async function proxy(req: NextRequest, pathSegments: string[]): Promise<NextResponse> {
+  const base = upstreamBase();
+  if (!base) {
+    const onVercel = process.env.VERCEL === "1";
+    return NextResponse.json(
+      {
+        detail: onVercel
+          ? "Missing NEXT_PUBLIC_API_URL on Vercel. Add it in Project → Settings → Environment Variables (Railway https://…up.railway.app, no trailing slash), then redeploy."
+          : "Missing NEXT_PUBLIC_API_URL. Set it in .env.local for local dev.",
+      },
+      { status: 503 },
+    );
+  }
+
   const sub = pathSegments.length ? pathSegments.join("/") : "";
-  const target = new URL(`/api/v1/${sub}`, upstreamBase());
+  const target = new URL(`/api/v1/${sub}`, base);
   req.nextUrl.searchParams.forEach((v, k) => {
     target.searchParams.set(k, v);
   });
@@ -27,11 +40,22 @@ async function proxy(req: NextRequest, pathSegments: string[]): Promise<NextResp
   const hasBody = !["GET", "HEAD"].includes(req.method);
   const body = hasBody ? await req.arrayBuffer() : undefined;
 
-  const upstream = await fetch(target.toString(), {
-    method: req.method,
-    headers,
-    body: body && body.byteLength > 0 ? body : undefined,
-  });
+  let upstream: Response;
+  try {
+    upstream = await fetch(target.toString(), {
+      method: req.method,
+      headers,
+      body: body && body.byteLength > 0 ? body : undefined,
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "fetch failed";
+    return NextResponse.json(
+      {
+        detail: `Cannot reach API (${msg}). Check NEXT_PUBLIC_API_URL matches your live Railway URL and Railway service is Active.`,
+      },
+      { status: 502 },
+    );
+  }
 
   const res = new NextResponse(upstream.body, {
     status: upstream.status,
