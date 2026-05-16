@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { useTranslation } from "@/components/language-provider";
 import { Shell } from "@/components/ui";
 
@@ -10,9 +11,10 @@ export default function AboutPage() {
 
   return (
     <Shell wide>
-      <article className="twin-prose mx-auto max-w-3xl py-10 sm:py-14">
+      <MarketingPageSurface>
+        <article className="twin-prose twin-prose--solid max-w-none">
         <h1>{t("site.aboutTitle")}</h1>
-        <p className="lead text-[var(--twin-muted-strong)]">{t("site.aboutLead")}</p>
+        <p className="lead">{t("site.aboutLead")}</p>
         <p>{t("site.aboutP1")}</p>
         <p>{t("site.aboutP2")}</p>
         <h2>{t("site.aboutValuesTitle")}</h2>
@@ -22,7 +24,7 @@ export default function AboutPage() {
         <p>{t("site.aboutV2Body")}</p>
         <h3>{t("site.aboutV3Title")}</h3>
         <p>{t("site.aboutV3Body")}</p>
-        <p className="text-sm text-[var(--twin-muted)]">
+        <p className="text-sm text-[var(--twin-muted-strong)]">
           <Link href="/contact" className="twin-link font-medium">
             {t("nav.contact")}
           </Link>
@@ -32,6 +34,7 @@ export default function AboutPage() {
           </Link>
         </p>
       </article>
+      </MarketingPageSurface>
     </Shell>
   );
 }

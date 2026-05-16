@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { BentoSpotlight } from "@/components/marketing/bento-spotlight";
 import { PipelinePreview } from "@/components/marketing/pipeline-preview";
 import { ScrollReveal } from "@/components/marketing/scroll-reveal";
@@ -66,6 +68,12 @@ export function LandingBento() {
                 <PipelinePreview />
               </div>
               <p className="mt-6 text-xs leading-relaxed text-[var(--twin-muted)]">{t("home.footerHint")}</p>
+              <Link
+                href="/register"
+                className="twin-link mt-3 inline-block text-sm font-semibold text-[var(--twin-link)] underline-offset-2 hover:text-[var(--twin-link-hover)]"
+              >
+                {t("home.getStarted")}
+              </Link>
             </BentoSpotlight>
           </ScrollReveal>
 

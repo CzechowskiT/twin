@@ -1,6 +1,8 @@
 "use client";
 
+import type { MouseEvent } from "react";
 import Link from "next/link";
+
 import { useTranslation } from "@/components/language-provider";
 
 function displayName(email: string | undefined, profileName: string | undefined): string {
@@ -10,6 +12,20 @@ function displayName(email: string | undefined, profileName: string | undefined)
   const local = email.split("@")[0] ?? "";
   if (!local) return "";
   return local.charAt(0).toUpperCase() + local.slice(1);
+}
+
+/** Same-document anchors: explicit scroll so SPA navigations still land on the section. */
+function scrollToDashboardHash(e: MouseEvent<HTMLAnchorElement>) {
+  if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+  const href = e.currentTarget.getAttribute("href");
+  if (!href?.startsWith("#")) return;
+  const el = document.getElementById(href.slice(1));
+  if (!el) return;
+  e.preventDefault();
+  const reduce =
+    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  window.history.replaceState(null, "", href);
 }
 
 type DashboardCommandCenterProps = {
@@ -64,7 +80,11 @@ export function DashboardCommandCenter({
             {t("dashboard.statFeedTitle")}
           </p>
           <p className="mt-2 text-3xl font-semibold tabular-nums text-[var(--twin-link)]">{jobsTotal}</p>
-          <a href="#dashboard-jobs" className="twin-link mt-2 inline-block text-sm font-medium">
+          <a
+            href="#dashboard-jobs"
+            onClick={scrollToDashboardHash}
+            className="twin-link mt-2 inline-block text-sm font-medium"
+          >
             {t("dashboard.statFeedCta")}
           </a>
         </div>
@@ -74,7 +94,11 @@ export function DashboardCommandCenter({
           </p>
           <p className="mt-2 text-3xl font-semibold tabular-nums text-[var(--twin-accent)]">{hasProfile ? matchesVisible : "—"}</p>
           {hasProfile ? (
-            <a href="#dashboard-matches" className="twin-link mt-2 inline-block text-sm font-medium">
+            <a
+              href="#dashboard-matches"
+              onClick={scrollToDashboardHash}
+              className="twin-link mt-2 inline-block text-sm font-medium"
+            >
               {t("dashboard.statMatchesCta")}
             </a>
           ) : (
@@ -89,11 +113,17 @@ export function DashboardCommandCenter({
           </p>
           <p className="mt-2 text-3xl font-semibold tabular-nums text-[var(--twin-cta)]">{hasProfile ? applicationsActive : "—"}</p>
           {hasProfile ? (
-            <a href="#dashboard-applications" className="twin-link mt-2 inline-block text-sm font-medium">
+            <a
+              href="#dashboard-applications"
+              onClick={scrollToDashboardHash}
+              className="twin-link mt-2 inline-block text-sm font-medium"
+            >
               {t("dashboard.statPipelineCta")}
             </a>
           ) : (
-            <span className="mt-2 inline-block text-sm text-[var(--twin-muted)]">{t("dashboard.statPipelineHint")}</span>
+            <Link href="/profile" className="twin-link mt-2 inline-block text-sm font-medium">
+              {t("dashboard.statPipelineHint")}
+            </Link>
           )}
         </div>
       </div>
@@ -104,6 +134,7 @@ export function DashboardCommandCenter({
             <a
               key={a.href + a.label}
               href={a.href}
+              onClick={scrollToDashboardHash}
               className="twin-touch-target inline-flex items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] px-4 py-2 text-sm font-medium text-[var(--twin-muted-strong)] shadow-sm transition hover:border-[var(--twin-border-hover)] hover:bg-[var(--twin-accent-muted)]"
             >
               {a.label}

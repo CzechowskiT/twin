@@ -61,20 +61,22 @@ export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
   );
 }
 
-export function Button(props: ButtonHTMLAttributes<HTMLButtonElement>) {
+export function Button({ type = "button", className, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
+      type={type}
       {...props}
-      className={`twin-touch-target w-full max-w-full rounded border-0 bg-[var(--twin-accent)] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--twin-accent-hover)] hover:text-white disabled:cursor-not-allowed disabled:opacity-50 ${props.className ?? ""}`}
+      className={`twin-touch-target w-full max-w-full rounded border-0 bg-[var(--twin-accent)] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--twin-accent-hover)] hover:text-white disabled:cursor-not-allowed disabled:opacity-50 ${className ?? ""}`}
     />
   );
 }
 
-export function ButtonCta(props: ButtonHTMLAttributes<HTMLButtonElement>) {
+export function ButtonCta({ type = "button", className, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
+      type={type}
       {...props}
-      className={`twin-touch-target w-full max-w-full rounded border-0 bg-[var(--twin-cta)] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--twin-cta-hover)] hover:text-white disabled:cursor-not-allowed disabled:opacity-50 ${props.className ?? ""}`}
+      className={`twin-touch-target w-full max-w-full rounded border-0 bg-[var(--twin-cta)] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--twin-cta-hover)] hover:text-white disabled:cursor-not-allowed disabled:opacity-50 ${className ?? ""}`}
     />
   );
 }

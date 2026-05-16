@@ -40,7 +40,7 @@ export function FaqPanel({ className = "" }: { className?: string }) {
                 +
               </span>
             </summary>
-            <div className="border-t border-[var(--twin-border)]/80 px-5 pb-5 pt-3 text-sm leading-relaxed text-[var(--twin-muted)] sm:px-6 sm:text-[15px]">
+            <div className="border-t border-[var(--twin-border)]/80 px-5 pb-5 pt-3 text-sm leading-relaxed text-[var(--foreground)] sm:px-6 sm:text-[15px]">
               <p>{item.a}</p>
               {item.id === "04" ? (
                 <p className="mt-3">

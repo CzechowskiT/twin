@@ -1,12 +1,20 @@
 "use client";
 
 import Link from "next/link";
+import { useRef } from "react";
+
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useTranslation } from "@/components/language-provider";
 
 /** One chrome everywhere: calm light header (matches hope / growth palette in globals). */
 export function Header() {
   const { t } = useTranslation();
+  const mobileMenuRef = useRef<HTMLDetailsElement>(null);
+
+  const closeMobileMenu = () => {
+    const d = mobileMenuRef.current;
+    if (d) d.open = false;
+  };
 
   const marketing = [
     { href: "/about" as const, label: t("nav.about") },
@@ -66,7 +74,7 @@ export function Header() {
 
         <div className="flex items-center gap-2 md:hidden">
           <LanguageSwitcher />
-          <details className="relative">
+          <details ref={mobileMenuRef} className="relative">
             <summary className="twin-touch-target flex cursor-pointer list-none items-center justify-center rounded border border-[var(--twin-border)] bg-[var(--twin-card)] px-3 text-sm font-semibold text-[var(--foreground)] [&::-webkit-details-marker]:hidden">
               {t("nav.menu")}
             </summary>
@@ -75,7 +83,11 @@ export function Header() {
               aria-label="Main"
               style={{ boxShadow: "var(--twin-shadow-md)" }}
             >
-              <Link href="/calculator" className={`${roiClassName} mb-2 flex w-full justify-center`}>
+              <Link
+                href="/calculator"
+                onClick={closeMobileMenu}
+                className={`${roiClassName} mb-2 flex w-full justify-center`}
+              >
                 <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white shadow-sm" aria-hidden />
                 {t("nav.calculator")}
               </Link>
@@ -98,6 +110,7 @@ export function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={closeMobileMenu}
                   className="twin-touch-target twin-nav-link block rounded px-3 py-2.5 text-sm hover:bg-[var(--twin-accent-muted)]"
                 >
                   {item.label}

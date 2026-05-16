@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 
+import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { useTranslation } from "@/components/language-provider";
 import { Shell } from "@/components/ui";
 import {
@@ -109,13 +110,13 @@ export function TwinRoiCalculator() {
 
   return (
     <Shell wide>
-      <div className="py-6 sm:py-10">
+      <MarketingPageSurface wide withCard={false}>
         <header className="mb-8 text-center sm:mb-10">
           <h1 className="twin-page-intro twin-section-title text-2xl sm:text-3xl">{t("calculator.title")}</h1>
-          <p className="mx-auto mt-3 max-w-3xl text-sm leading-relaxed text-[var(--twin-muted)] sm:text-base">
+          <p className="mx-auto mt-3 max-w-3xl text-sm leading-relaxed text-[var(--twin-muted-strong)] sm:text-base">
             {t("calculator.subtitle")}
           </p>
-          <p className="mx-auto mt-2 max-w-2xl text-xs text-[var(--twin-muted)]">{t("calculator.disclaimer")}</p>
+          <p className="mx-auto mt-2 max-w-2xl text-xs text-[var(--twin-muted-strong)]">{t("calculator.disclaimer")}</p>
         </header>
 
         <section className="twin-card-panel mb-6 p-5 sm:p-6">
@@ -374,8 +375,10 @@ export function TwinRoiCalculator() {
           </p>
         </section>
 
-        <p className="mt-8 text-center text-xs leading-relaxed text-[var(--twin-muted)] sm:text-sm">{t("calculator.footerNote")}</p>
-      </div>
+        <p className="mt-8 text-center text-xs leading-relaxed text-[var(--twin-muted-strong)] sm:text-sm">
+          {t("calculator.footerNote")}
+        </p>
+      </MarketingPageSurface>
     </Shell>
   );
 }

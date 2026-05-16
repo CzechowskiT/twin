@@ -539,6 +539,32 @@ body {
   font-weight: 600;
 }
 
+/** Use on white/card surfaces: body copy at full foreground contrast (marketing tabs). */
+.twin-prose.twin-prose--solid {
+  color: var(--foreground);
+  font-size: 1rem;
+  line-height: 1.72;
+}
+
+.twin-prose.twin-prose--solid h2 {
+  color: var(--foreground);
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.twin-prose.twin-prose--solid h3 {
+  color: var(--twin-muted-strong);
+  font-size: 1.08rem;
+  font-weight: 600;
+}
+
+.twin-prose.twin-prose--solid .lead {
+  color: var(--twin-muted-strong);
+  font-weight: 600;
+  font-size: 1.0625rem;
+  line-height: 1.55;
+}
+
 .twin-text-success {
   color: var(--twin-accent-hover);
   font-weight: 500;

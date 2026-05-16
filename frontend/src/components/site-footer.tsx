@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { useTranslation } from "@/components/language-provider";
+import { StoreDownloadLinks } from "@/components/store-download-links";
 
 const SOCIAL_LINKEDIN = "https://www.linkedin.com";
 const SOCIAL_X = "https://x.com";
@@ -57,9 +58,9 @@ export function SiteFooter() {
       <div className="twin-container py-10 sm:py-12">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="min-w-0">
-            <div className="twin-logo text-lg">
+            <Link href="/" className="twin-logo inline-block text-lg no-underline hover:opacity-90">
               TWIN<span className="twin-logo-accent">.</span>
-            </div>
+            </Link>
             <p className="mt-3 text-sm leading-relaxed text-[var(--twin-muted)]">{t("site.footerTagline")}</p>
           </div>
           <div>
@@ -134,6 +135,9 @@ export function SiteFooter() {
               </li>
             </ul>
           </div>
+        </div>
+        <div className="mt-10 max-w-xl">
+          <StoreDownloadLinks />
         </div>
         <p className="mt-10 border-t border-[var(--twin-border)] pt-6 text-center text-xs text-[var(--twin-muted)]">
           {t("site.footerRights")}

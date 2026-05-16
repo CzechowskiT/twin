@@ -83,6 +83,12 @@ export const SITE_MESSAGES_EN = {
   footerLinkedInAria: "TWIN on LinkedIn",
   footerGithubAria: "TWIN on GitHub",
   footerXAria: "TWIN on X",
+
+  footerMobileTitle: "Mobile app",
+  footerMobileLead: "Install TWIN on iPhone (App Store) or Android (Google Play).",
+  footerMobileAppStore: "Download on the App Store",
+  footerMobileGooglePlay: "Get it on Google Play",
+  footerMobileSoonHint: "Store link not configured yet — coming soon.",
 } as const;
 
 export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } = {
@@ -170,4 +176,10 @@ export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } 
   footerLinkedInAria: "TWIN na LinkedIn",
   footerGithubAria: "TWIN na GitHubie",
   footerXAria: "TWIN na X",
+
+  footerMobileTitle: "Aplikacja mobilna",
+  footerMobileLead: "Zainstaluj TWIN na iPhone (App Store) lub Androidzie (Google Play).",
+  footerMobileAppStore: "Pobierz z App Store",
+  footerMobileGooglePlay: "Pobierz z Google Play",
+  footerMobileSoonHint: "Link do sklepu jeszcze nie ustawiony — wkrótce.",
 };

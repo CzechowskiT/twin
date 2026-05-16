@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { useTranslation } from "@/components/language-provider";
 import { Shell } from "@/components/ui";
 
@@ -10,9 +11,10 @@ export default function ContactPage() {
 
   return (
     <Shell wide>
-      <article className="twin-prose mx-auto max-w-3xl py-10 sm:py-14">
+      <MarketingPageSurface>
+        <article className="twin-prose twin-prose--solid max-w-none">
         <h1>{t("site.contactTitle")}</h1>
-        <p className="lead text-[var(--twin-muted-strong)]">{t("site.contactLead")}</p>
+        <p className="lead">{t("site.contactLead")}</p>
         <h2>{t("site.contactGeneralTitle")}</h2>
         <p>{t("site.contactGeneralBody")}</p>
         <h2>{t("site.contactSalesTitle")}</h2>
@@ -21,7 +23,7 @@ export default function ContactPage() {
         <p>{t("site.contactPressBody")}</p>
         <h2>{t("site.contactOfficeTitle")}</h2>
         <p>{t("site.contactOfficeBody")}</p>
-        <p className="text-sm text-[var(--twin-muted)]">
+        <p className="text-sm text-[var(--twin-muted-strong)]">
           <Link href="/media" className="twin-link font-medium">
             {t("nav.media")}
           </Link>
@@ -31,6 +33,7 @@ export default function ContactPage() {
           </Link>
         </p>
       </article>
+      </MarketingPageSurface>
     </Shell>
   );
 }
