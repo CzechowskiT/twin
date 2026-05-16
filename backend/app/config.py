@@ -144,6 +144,13 @@ class Settings(BaseSettings):
     # When non-empty, GET/POST /kyc/authologic/callback must pass ?token= matching value (shared secret).
     authologic_callback_token: str = ""
 
+    # Beta waitlist (public landing `/beta` — see `app/api/beta_waitlist.py`)
+    beta_waitlist_cap: int = 1000
+    beta_campaign_ends_at: str = ""
+    beta_admin_token: str = ""
+    beta_upload_dir: str = "data/beta_waitlist"
+    beta_upload_max_bytes: int = 15 * 1024 * 1024
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [o for o in (x.strip() for x in self.cors_origins.split(",")) if o]

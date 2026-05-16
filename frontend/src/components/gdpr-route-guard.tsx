@@ -14,6 +14,10 @@ const GDPR_SKIP_PATHS = new Set([
   "/forgot-password",
   "/reset-password",
   "/privacy",
+  "/beta",
+  "/beta/join",
+  "/beta/dashboard",
+  "/admin/beta",
 ]);
 
 type AuthMe = { gdpr_consent_at: string | null };

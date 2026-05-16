@@ -138,6 +138,42 @@ class Candidate(Base):
     matches: Mapped[list["JobMatch"]] = relationship(back_populates="candidate")
 
 
+class BetaWaitlist(Base):
+    """Pre-launch waitlist signups (separate from `users`)."""
+
+    __tablename__ = "beta_waitlist"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    linkedin_subject: Mapped[str | None] = mapped_column(String(255), nullable=True, index=True)
+    job_title: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    location: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    min_salary: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    cv_path: Mapped[str | None] = mapped_column(Text, nullable=True)
+    voice_path: Mapped[str | None] = mapped_column(Text, nullable=True)
+    referral_code: Mapped[str] = mapped_column(String(32), unique=True, index=True)
+    referred_by_code: Mapped[str | None] = mapped_column(String(32), index=True, nullable=True)
+    priority_points: Mapped[int] = mapped_column(Integer, default=0)
+    linkedin_shared: Mapped[bool] = mapped_column(Boolean, default=False)
+    cv_uploaded: Mapped[bool] = mapped_column(Boolean, default=False)
+    voice_recorded: Mapped[bool] = mapped_column(Boolean, default=False)
+    testimonial_posted: Mapped[bool] = mapped_column(Boolean, default=False)
+    source: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class BetaReferral(Base):
+    """Referee joined with `?ref=` pointing at referrer's `referral_code`."""
+
+    __tablename__ = "beta_referrals"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    referrer_code: Mapped[str] = mapped_column(String(32), index=True)
+    referee_waitlist_id: Mapped[int] = mapped_column(ForeignKey("beta_waitlist.id", ondelete="CASCADE"))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
 class Job(Base):
     __tablename__ = "jobs"
     __table_args__ = (UniqueConstraint("job_board", "external_id", name="uq_job_board_external"),)
