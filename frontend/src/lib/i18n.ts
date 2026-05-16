@@ -75,6 +75,8 @@ export type TranslationKey =
   | `authCallback.${keyof typeof en.authCallback}`
   | `profile.${keyof typeof en.profile}`
   | `onboarding.${keyof typeof en.onboarding}`
+  | `meta.${keyof typeof en.meta}`
+  | `privacy.${keyof typeof en.privacy}`
   | `common.${keyof typeof en.common}`;
 
 const en = {
@@ -83,7 +85,7 @@ const en = {
     register: "Register",
     profile: "Profile",
     dashboard: "Dashboard",
-    calculator: "ROI calculator",
+    calculator: "B2B ROI calculator",
     menu: "Menu",
     about: "About",
     cases: "Case studies",
@@ -92,6 +94,9 @@ const en = {
     careers: "Careers",
     media: "Media",
     partners: "Partners",
+    ariaCompanyNav: "Company navigation",
+    ariaAccountNav: "Account navigation",
+    ariaMobileNav: "Main menu",
   },
   home: {
     tagline: "Global career platform, powered by AI",
@@ -176,6 +181,23 @@ const en = {
     faq04Q: "What about my data?",
     faq04A:
       "You explicitly consent when you register. We use profile data to rank jobs and run the product. For retention, exports, and GDPR rights, read the policy linked below.",
+    audienceEyebrow: "Who it is for",
+    audienceDraftBadge: "Draft",
+    audienceTitle: "Candidate · Recruiter · Company (B2B)",
+    audienceLead:
+      "Same platform spine — three entry stories. Copy and routes will harden as we ship; today this is a working sketch so navigation and CTAs stay honest.",
+    audienceCandidateTitle: "Candidates",
+    audienceCandidateBody:
+      "Aggregate roles from boards your workspace enables, rank when your profile exists, and keep every application in one pipeline — consent-first, built with GDPR defaults.",
+    audienceRecruiterTitle: "Recruiters & sourcers",
+    audienceRecruiterBody:
+      "Reduce duplicate board hopping, carry clearer timestamps into hiring managers, and keep sourcing inside the geography and consent rules you configure.",
+    audienceB2bTitle: "Companies · B2B",
+    audienceB2bBody:
+      "Finance-friendly scenario: compare traditional agency success fees to a TWIN-style fee posture, model HR time back, and pressure-test an integration-style line item — open the B2B ROI calculator for the discussion, not as pricing.",
+    audienceCandidateCta: "Start free",
+    audienceRecruiterCta: "Contact us",
+    audienceB2bCta: "Open B2B ROI calculator",
   },
   site: SITE_MESSAGES_EN,
   dashboard: {
@@ -426,9 +448,9 @@ const en = {
     dashboardLink: "Back to dashboard",
   },
   calculator: {
-    title: "ROI calculator",
+    title: "B2B ROI calculator",
     subtitle:
-      "Illustrative comparison: a traditional agency success fee vs a TWIN-style monthly fee model — company savings and a candidate bonus pool (not a commercial offer).",
+      "B2B-oriented illustrative comparison: a traditional agency success fee vs a TWIN-style monthly fee model — company savings, HR time, and a candidate bonus pool (not a commercial offer).",
     disclaimer: "Numbers are examples only. Real fees depend on contract, region, and scope.",
     paramsTitle: "Parameters",
     annualSalary: "Candidate annual salary (amounts in selected currency)",
@@ -482,10 +504,55 @@ const en = {
     footerNote:
       "Illustrative model for discussion: companies and candidates can both win when fees align to outcomes. Not pricing, not tax or legal advice.",
   },
+  meta: {
+    titleHome: "TWIN — Career agent",
+    titleAbout: "About — TWIN",
+    titleCaseStudies: "Case studies — TWIN",
+    titleFaq: "FAQ — TWIN",
+    titlePartners: "Partners — TWIN",
+    titleMedia: "Media — TWIN",
+    titleCareers: "Careers — TWIN",
+    titleContact: "Contact — TWIN",
+    titleCalculator: "B2B ROI calculator — TWIN",
+    titleLogin: "Log in — TWIN",
+    titleRegister: "Register — TWIN",
+    titleProfile: "Profile — TWIN",
+    titleDashboard: "Dashboard — TWIN",
+    titlePrivacy: "Privacy — TWIN",
+    titleForgotPassword: "Forgot password — TWIN",
+    titleResetPassword: "Reset password — TWIN",
+    titleOnboarding: "Workspace tour — TWIN",
+    titleBilling: "Plan & billing — TWIN",
+    titleAuthCallback: "Signing in — TWIN",
+  },
+  privacy: {
+    title: "Privacy Policy (MVP)",
+    updated: "Last updated: May 2026",
+    collectTitle: "What we collect",
+    collect1: "Account email and password (hashed)",
+    collect2: "Career profile: skills, experience, salary expectations, location",
+    collect3: "Application and match history within TWIN",
+    whyTitle: "Why we process data",
+    whyBody:
+      "To match you with job listings from pracuj.pl and rocketjobs.pl and to track application status. Legal basis: your explicit consent at registration (GDPR Art. 6(1)(a)).",
+    rightsTitle: "Your rights",
+    rightsBody:
+      "You may request access, correction, or deletion of your data by contacting the TWIN team. You may withdraw consent by deleting your account (feature coming in a later release).",
+    retentionTitle: "Retention",
+    retentionBody: "Data is retained while your account is active and deleted on request.",
+    thirdTitle: "Third parties",
+    thirdBody:
+      "We use Anthropic Claude for job matching. Job data is sourced from public listings on the boards above.",
+  },
   common: {
     language: "Language",
     switchToPl: "Polski",
     switchToEn: "English",
+    loading: "Loading",
+    loadingEllipsis: "Loading…",
+    errorTitle: "Something went wrong",
+    errorBody: "Please try again. If the problem persists, refresh the page.",
+    tryAgain: "Try again",
   },
 } as const;
 
@@ -501,7 +568,7 @@ const pl: MessageTree = {
     register: "Rejestracja",
     profile: "Profil",
     dashboard: "Panel",
-    calculator: "Kalkulator ROI",
+    calculator: "Kalkulator ROI B2B",
     menu: "Menu",
     about: "O nas",
     cases: "Studia przypadków",
@@ -510,6 +577,9 @@ const pl: MessageTree = {
     careers: "Kariera",
     media: "Media",
     partners: "Partnerzy",
+    ariaCompanyNav: "Nawigacja firmowa",
+    ariaAccountNav: "Nawigacja konta",
+    ariaMobileNav: "Menu główne",
   },
   home: {
     tagline: "Globalna platforma kariery napędzana sztuczną inteligencją",
@@ -595,6 +665,23 @@ const pl: MessageTree = {
     faq04Q: "Co z moimi danymi?",
     faq04A:
       "Wyrażasz zgodę przy rejestracji. Dane profilu służą do rankingu ofert i działania produktu. O retencji, eksporcie i prawach RODO przeczytasz w polityce — link poniżej.",
+    audienceEyebrow: "Dla kogo",
+    audienceDraftBadge: "Roboczo",
+    audienceTitle: "Kandydat · Rekruter · Firma (B2B)",
+    audienceLead:
+      "Ten sam rdzeń platformy — trzy wejścia narracyjne. Teksty i trasy doprecyzujemy wraz z produktem; to robocza siatka, żeby nawigacja i CTA były czytelne.",
+    audienceCandidateTitle: "Kandydaci",
+    audienceCandidateBody:
+      "Agregacja ofert z portali włączonych w Twoim środowisku, ranking przy profilu i jeden pipeline aplikacji — zgoda na start, RODO jako domyślna postawa.",
+    audienceRecruiterTitle: "Rekruterzy i sourcerzy",
+    audienceRecruiterBody:
+      "Mniej powielania wyszukiwań między portalami, czytelniejsze znaczniki czasu dla hiring managerów i sourcing w granicach geografii i zgód z konfiguracji.",
+    audienceB2bTitle: "Firmy · B2B",
+    audienceB2bBody:
+      "Scenariusz pod rozmowy z finansami: porównanie klasycznej success fee agencji z modelem w stylu TWIN, model czasu HR i pozycja w stylu opłaty integracyjnej — użyj kalkulatora ROI B2B jako ilustracji dyskusji, nie jako cennika.",
+    audienceCandidateCta: "Zacznij za darmo",
+    audienceRecruiterCta: "Kontakt",
+    audienceB2bCta: "Kalkulator ROI B2B",
   },
   site: SITE_MESSAGES_PL,
   dashboard: {
@@ -848,9 +935,9 @@ const pl: MessageTree = {
     dashboardLink: "Wróć do panelu",
   },
   calculator: {
-    title: "Kalkulator ROI",
+    title: "Kalkulator ROI B2B",
     subtitle:
-      "Model przykładowy: success fee agencji tradycyjnej vs model opłaty miesięcznej w stylu TWIN — oszczędności firmy i pula bonusu dla kandydata (nie jest ofertą handlową).",
+      "Model ilustracyjny pod B2B: success fee agencji tradycyjnej vs model opłaty miesięcznej w stylu TWIN — oszczędności firmy, czas HR i pula bonusu dla kandydata (nie jest ofertą handlową).",
     disclaimer: "To liczby ilustracyjne. Realne stawki zależą od umowy, regionu i zakresu.",
     paramsTitle: "Parametry",
     annualSalary: "Roczna pensja kandydata (kwoty w wybranej walucie)",
@@ -904,10 +991,55 @@ const pl: MessageTree = {
     footerNote:
       "Model dyskusyjny: firma i kandydat mogą wygrać, gdy opłaty wiążą się z efektem. To nie cennik ani porada prawno-podatkowa.",
   },
+  meta: {
+    titleHome: "TWIN — Agent kariery",
+    titleAbout: "O nas — TWIN",
+    titleCaseStudies: "Studia przypadków — TWIN",
+    titleFaq: "FAQ — TWIN",
+    titlePartners: "Partnerzy — TWIN",
+    titleMedia: "Media — TWIN",
+    titleCareers: "Kariera — TWIN",
+    titleContact: "Kontakt — TWIN",
+    titleCalculator: "Kalkulator ROI B2B — TWIN",
+    titleLogin: "Logowanie — TWIN",
+    titleRegister: "Rejestracja — TWIN",
+    titleProfile: "Profil — TWIN",
+    titleDashboard: "Panel — TWIN",
+    titlePrivacy: "Prywatność — TWIN",
+    titleForgotPassword: "Reset hasła — TWIN",
+    titleResetPassword: "Nowe hasło — TWIN",
+    titleOnboarding: "Tour po workspace — TWIN",
+    titleBilling: "Plan i płatności — TWIN",
+    titleAuthCallback: "Logowanie — TWIN",
+  },
+  privacy: {
+    title: "Polityka prywatności (MVP)",
+    updated: "Ostatnia aktualizacja: maj 2026",
+    collectTitle: "Co zbieramy",
+    collect1: "E-mail konta i hasło (w postaci hash)",
+    collect2: "Profil kariery: umiejętności, doświadczenie, oczekiwania płacowe, lokalizacja",
+    collect3: "Historia aplikacji i dopasowań w TWIN",
+    whyTitle: "Po co przetwarzamy dane",
+    whyBody:
+      "Żeby dopasowywać oferty z pracuj.pl i rocketjobs.pl oraz śledzić status aplikacji. Podstawa prawna: wyraźna zgoda przy rejestracji (RODO art. 6 ust. 1 lit. a).",
+    rightsTitle: "Twoje prawa",
+    rightsBody:
+      "Możesz żądać dostępu, sprostowania lub usunięcia danych, kontaktując się z zespołem TWIN. Cofnięcie zgody przez usunięcie konta (funkcja w późniejszej wersji).",
+    retentionTitle: "Przechowywanie",
+    retentionBody: "Dane przechowujemy, dopóki konto jest aktywne; usuwamy na żądanie.",
+    thirdTitle: "Podmioty trzecie",
+    thirdBody:
+      "Do dopasowań używamy Anthropic Claude. Oferty pochodzą z publicznych ogłoszeń na wymienionych portalach.",
+  },
   common: {
     language: "Język",
     switchToPl: "PL",
     switchToEn: "EN",
+    loading: "Ładowanie",
+    loadingEllipsis: "Ładowanie…",
+    errorTitle: "Coś poszło nie tak",
+    errorBody: "Spróbuj ponownie. Jeśli problem wraca, odśwież stronę.",
+    tryAgain: "Spróbuj ponownie",
   },
 };
 

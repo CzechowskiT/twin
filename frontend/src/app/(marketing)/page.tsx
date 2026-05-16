@@ -1,5 +1,6 @@
 "use client";
 
+import { LandingAudienceSections } from "@/components/marketing/landing-audience-sections";
 import { LandingBento } from "@/components/marketing/landing-bento";
 import { LandingCtaBand } from "@/components/marketing/landing-cta-band";
 import { LandingFaq } from "@/components/marketing/landing-faq";
@@ -17,6 +18,7 @@ export default function Home() {
         <LandingOriginStory />
         <LandingStoryJourney />
         <CompanyLogoMarquee />
+        <LandingAudienceSections />
         <LandingFocusChips />
         <LandingBento />
         <LandingFaq />

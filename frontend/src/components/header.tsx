@@ -34,7 +34,7 @@ export function Header() {
   ];
 
   const roiClassName =
-    "twin-touch-target inline-flex shrink-0 items-center gap-2 rounded-full bg-[var(--twin-cta)] px-4 py-2 text-[12px] font-extrabold uppercase tracking-wide text-white shadow-[0_4px_14px_rgb(217_119_6_/0.55)] ring-2 ring-white/90 ring-offset-2 ring-offset-white transition hover:bg-[var(--twin-cta-hover)] hover:shadow-[0_6px_20px_rgb(180_83_9_/0.5)] sm:px-5 sm:py-2.5 sm:text-[13px]";
+    "twin-touch-target inline-flex max-w-[10.5rem] shrink-0 items-center justify-center gap-2 whitespace-normal rounded-full bg-[var(--twin-cta)] px-3 py-2 text-center text-[10px] font-extrabold uppercase leading-tight tracking-wide text-white shadow-[0_4px_14px_rgb(217_119_6_/0.55)] ring-2 ring-white/90 ring-offset-2 ring-offset-white transition hover:bg-[var(--twin-cta-hover)] hover:shadow-[0_6px_20px_rgb(180_83_9_/0.5)] sm:max-w-[16rem] sm:px-5 sm:py-2.5 sm:text-[12px] sm:leading-snug md:text-[13px]";
 
   return (
     <header className="twin-header-bar sticky top-0 z-50">
@@ -53,7 +53,7 @@ export function Header() {
         <div className="hidden min-w-0 flex-1 items-center justify-end gap-3 md:flex">
           <nav
             className="flex max-w-[56rem] flex-wrap items-center justify-end gap-x-2.5 gap-y-1 text-[12px] font-medium sm:text-[13px]"
-            aria-label="Company"
+            aria-label={t("nav.ariaCompanyNav")}
           >
             {marketing.map((item) => (
               <Link key={item.href} href={item.href} className="twin-nav-link whitespace-nowrap">
@@ -62,7 +62,10 @@ export function Header() {
             ))}
           </nav>
           <div className="hidden h-6 w-px shrink-0 bg-[var(--twin-border)] sm:block" aria-hidden />
-          <nav className="flex flex-wrap items-center justify-end gap-x-2.5 gap-y-1 text-[12px] sm:text-[13px]" aria-label="Account">
+          <nav
+            className="flex flex-wrap items-center justify-end gap-x-2.5 gap-y-1 text-[12px] sm:text-[13px]"
+            aria-label={t("nav.ariaAccountNav")}
+          >
             {app.map((item) => (
               <Link key={item.href} href={item.href} className="twin-nav-link whitespace-nowrap font-medium">
                 {item.label}
@@ -80,7 +83,7 @@ export function Header() {
             </summary>
             <nav
               className="absolute right-0 z-20 max-h-[min(70vh,28rem)] w-[min(18rem,calc(100vw-2rem))] overflow-y-auto rounded border border-[var(--twin-border)] bg-[var(--twin-card)] p-2 shadow-lg"
-              aria-label="Main"
+              aria-label={t("nav.ariaMobileNav")}
               style={{ boxShadow: "var(--twin-shadow-md)" }}
             >
               <Link
@@ -98,6 +101,7 @@ export function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={closeMobileMenu}
                   className="twin-touch-target twin-nav-link block rounded px-3 py-2.5 text-sm hover:bg-[var(--twin-accent-muted)]"
                 >
                   {item.label}

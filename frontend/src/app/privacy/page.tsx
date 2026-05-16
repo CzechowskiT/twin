@@ -1,34 +1,30 @@
+"use client";
+
+import { useTranslation } from "@/components/language-provider";
 import { Shell } from "@/components/ui";
 
 export default function PrivacyPage() {
+  const { t } = useTranslation();
+
   return (
     <Shell>
       <article className="twin-prose max-w-none">
-        <h1>Privacy Policy (MVP)</h1>
-        <p className="twin-muted text-sm">Last updated: May 2026</p>
-        <h2>What we collect</h2>
+        <h1>{t("privacy.title")}</h1>
+        <p className="twin-muted text-sm">{t("privacy.updated")}</p>
+        <h2>{t("privacy.collectTitle")}</h2>
         <ul>
-          <li>Account email and password (hashed)</li>
-          <li>Career profile: skills, experience, salary expectations, location</li>
-          <li>Application and match history within TWIN</li>
+          <li>{t("privacy.collect1")}</li>
+          <li>{t("privacy.collect2")}</li>
+          <li>{t("privacy.collect3")}</li>
         </ul>
-        <h2>Why we process data</h2>
-        <p>
-          To match you with job listings from pracuj.pl and rocketjobs.pl and to track application
-          status. Legal basis: your explicit consent at registration (GDPR Art. 6(1)(a)).
-        </p>
-        <h2>Your rights</h2>
-        <p>
-          You may request access, correction, or deletion of your data by contacting the TWIN team.
-          You may withdraw consent by deleting your account (feature coming in a later release).
-        </p>
-        <h2>Retention</h2>
-        <p>Data is retained while your account is active and deleted on request.</p>
-        <h2>Third parties</h2>
-        <p>
-          We use Anthropic Claude for job matching. Job data is sourced from public listings on the
-          boards above.
-        </p>
+        <h2>{t("privacy.whyTitle")}</h2>
+        <p>{t("privacy.whyBody")}</p>
+        <h2>{t("privacy.rightsTitle")}</h2>
+        <p>{t("privacy.rightsBody")}</p>
+        <h2>{t("privacy.retentionTitle")}</h2>
+        <p>{t("privacy.retentionBody")}</p>
+        <h2>{t("privacy.thirdTitle")}</h2>
+        <p>{t("privacy.thirdBody")}</p>
       </article>
     </Shell>
   );

@@ -130,6 +130,11 @@ body {
   min-width: 2.75rem;
 }
 
+/** `<details class="twin-lang-switcher">` — chevron reflects open state (no portable `open:` variant on summary children). */
+.twin-lang-switcher[open] .twin-lang-switcher-chevron {
+  transform: rotate(180deg);
+}
+
 .twin-bg-root {
   position: fixed;
   inset: 0;
