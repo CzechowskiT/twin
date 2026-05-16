@@ -72,6 +72,10 @@ class Settings(BaseSettings):
     linkedin_client_id: str = ""
     linkedin_client_secret: str = ""
     linkedin_redirect_uri: str = "http://localhost:8000/api/v1/auth/linkedin/callback"
+    # Jobs search (Playwright scrape — not OAuth). Optional geoId sharpens location (e.g. 105072130 = Poland).
+    linkedin_jobs_geo_id: str = ""
+    # Set false locally to debug auth walls (slower; not for production automation).
+    linkedin_jobs_browser_headless: bool = True
     frontend_url: str = "http://localhost:3000"
 
     google_client_id: str = ""

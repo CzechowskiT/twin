@@ -7,16 +7,19 @@ from bs4 import BeautifulSoup
 
 USER_AGENT = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
 )
 
 COOKIE_SELECTORS = (
     "#onetrust-accept-btn-handler",
+    'button[action-type="ACCEPT"]',
     'button:has-text("Accept All")',
     'button:has-text("Accept all")',
     'button:has-text("Akceptuję")',
+    'button:has-text("Akceptuj")',
     'button:has-text("Accept")',
     'button:has-text("I agree")',
+    'button:has-text("Agree")',
     '[data-testid="accept-btn"]',
 )
 
