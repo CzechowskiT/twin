@@ -50,7 +50,11 @@ export async function apiFetch<T>(
   }
 
   const origin = clientApiOriginForRequest(hasAuth);
-  const res = await fetch(`${origin}${path}`, { ...options, headers });
+  const res = await fetch(`${origin}${path}`, {
+    ...options,
+    cache: options.cache ?? "no-store",
+    headers,
+  });
   if (!res.ok) throw new Error(await parseError(res));
   if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
@@ -73,7 +77,12 @@ export async function apiUpload<T>(
   body.append("file", file);
 
   const origin = clientApiOriginForRequest(hasAuth);
-  const res = await fetch(`${origin}${path}`, { method: "POST", headers, body });
+  const res = await fetch(`${origin}${path}`, {
+    method: "POST",
+    cache: "no-store",
+    headers,
+    body,
+  });
   if (!res.ok) throw new Error(await parseError(res));
   return res.json() as Promise<T>;
 }

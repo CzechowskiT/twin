@@ -39,11 +39,15 @@ function resolveLocale(): Locale {
 }
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(resolveLocale);
+  // First paint must match the server (always "en") to avoid React #418 hydration mismatches
+  // when localStorage / navigator prefers another locale. We sync the real choice after mount.
+  const [locale, setLocaleState] = useState<Locale>("en");
 
   useEffect(() => {
     const resolved = resolveLocale();
-    setLocaleState((current) => (current === resolved ? current : resolved));
+    queueMicrotask(() => {
+      setLocaleState((current) => (current === resolved ? current : resolved));
+    });
   }, []);
 
   useEffect(() => {
