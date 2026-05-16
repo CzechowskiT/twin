@@ -6,7 +6,12 @@ export const dynamic = "force-dynamic";
 function upstreamBase(): string | null {
   const raw = process.env.NEXT_PUBLIC_API_URL?.trim();
   if (!raw) return null;
-  return raw.replace(/\/$/, "");
+  let u = raw.replace(/\/$/, "");
+  // Host-only values (common copy-paste from Railway) break `new URL(relative, base)` without a scheme.
+  if (!/^https?:\/\//i.test(u)) {
+    u = `https://${u}`;
+  }
+  return u;
 }
 
 const HOP_BY_HOP = new Set(["connection", "keep-alive", "proxy-authenticate", "proxy-authorization", "te", "trailers", "transfer-encoding", "upgrade", "host"]);
