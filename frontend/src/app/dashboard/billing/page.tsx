@@ -43,9 +43,30 @@ function normalizePlansPayload(raw: unknown): PlansPayload {
     };
   }
   const o = raw as Record<string, unknown>;
-  const plans = Array.isArray(o.plans) ? (o.plans as PlanRow[]) : [];
+  const rawPlans = Array.isArray(o.plans) ? o.plans : [];
+  const plans: PlanRow[] = [];
+  for (const row of rawPlans) {
+    if (row == null || typeof row !== "object") continue;
+    const r = row as Record<string, unknown>;
+    const id = typeof r.id === "string" ? r.id.trim() : "";
+    if (!id) continue;
+    plans.push({
+      id,
+      name: typeof r.name === "string" && r.name.trim() ? r.name.trim() : id,
+      description: typeof r.description === "string" ? r.description : "",
+      max_tracked_applications:
+        r.max_tracked_applications === null || r.max_tracked_applications === undefined
+          ? null
+          : typeof r.max_tracked_applications === "number"
+            ? r.max_tracked_applications
+            : null,
+      stripe_price_configured: Boolean(r.stripe_price_configured),
+    });
+  }
   const pm = o.checkout_payment_methods;
-  const checkout_payment_methods = Array.isArray(pm) ? (pm as string[]) : [];
+  const checkout_payment_methods = Array.isArray(pm)
+    ? [...new Set(pm.map((x) => String(x).trim().toLowerCase()).filter(Boolean))]
+    : [];
   return {
     plans,
     checkout_configured: Boolean(o.checkout_configured),
@@ -55,6 +76,7 @@ function normalizePlansPayload(raw: unknown): PlansPayload {
 }
 
 function stripeCheckoutMethodLabel(method: string): TranslationKey | null {
+  const slug = method.trim().toLowerCase();
   const map: Record<string, TranslationKey> = {
     card: "dashboard.billingPmCard",
     link: "dashboard.billingPmLink",
@@ -70,7 +92,14 @@ function stripeCheckoutMethodLabel(method: string): TranslationKey | null {
     klarna: "dashboard.billingPmKlarna",
     affirm: "dashboard.billingPmAffirm",
   };
-  return map[method] ?? null;
+  return map[slug] ?? null;
+}
+
+function formatSubscriptionPeriodEnd(iso: string | null | undefined): string | null {
+  if (iso == null || typeof iso !== "string" || !iso.trim()) return null;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
 }
 
 function formatSubscriptionStatusLabel(
@@ -293,15 +322,16 @@ export default function BillingPage() {
               {formatSubscriptionStatusLabel(t, me.subscription_status)}
             </span>
           </p>
-          {me.subscription_current_period_end ? (
-            <p className="twin-muted mt-1 text-sm">
-              {t("dashboard.billingPeriodEnds")}:{" "}
-              {new Date(me.subscription_current_period_end).toLocaleString(undefined, {
-                dateStyle: "medium",
-                timeStyle: "short",
-              })}
-            </p>
-          ) : null}
+          {(() => {
+            const periodEnd = formatSubscriptionPeriodEnd(me.subscription_current_period_end);
+            if (!periodEnd) return null;
+            return (
+              <p className="twin-muted mt-1 text-sm">
+                {t("dashboard.billingPeriodEnds")}:{" "}
+                <span className="font-medium text-[var(--foreground)]">{periodEnd}</span>
+              </p>
+            );
+          })()}
           {showPortal ? (
             <div className="mt-4 border-t border-[var(--twin-border)] pt-4">
               <p className="twin-muted mb-3 text-sm">{t("dashboard.billingPortalHint")}</p>

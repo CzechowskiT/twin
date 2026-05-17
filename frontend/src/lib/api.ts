@@ -1,9 +1,9 @@
 /**
- * Browser calls use same-origin `/api/v1/...` → proxied by `app/api/v1/[[...path]]/route.ts` to FastAPI.
- * When `NEXT_PUBLIC_API_URL` is set in the browser, requests that include a Bearer token use that origin
- * directly so Vercel does not strip `Authorization` on dynamic `/api` routes. Unauthenticated calls stay
- * on the proxy (no extra CORS for login/register).
- * Local: set NEXT_PUBLIC_API_URL in `.env.local` (e.g. http://127.0.0.1:8000).
+ * Browser JSON calls use same-origin `/api/v1/...` → proxied by `app/api/v1/[[...path]]/route.ts` to FastAPI.
+ * The proxy forwards `Authorization` / `X-Twin-Authorization`, so the SPA does not depend on Railway
+ * `CORS_ORIGINS` matching every Vercel preview/production URL (a common billing/dashboard break).
+ * Multipart uploads use the public API origin when set to reduce Vercel function body limits on proxies.
+ * Local: set `NEXT_PUBLIC_API_URL` in `.env.local` so the server-side proxy can reach the API.
  */
 
 import { getPublicApiBase } from "@/lib/public-api-base";
@@ -11,14 +11,18 @@ import { getPublicApiBase } from "@/lib/public-api-base";
 /** Same-origin relative path (SSR and unauthenticated browser calls). */
 export const API_URL = "";
 
-/**
- * In the browser, when `NEXT_PUBLIC_API_URL` is set, return the Railway base for authenticated fetches only.
- */
-export function clientApiOriginForRequest(authenticated: boolean): string {
+/** JSON `fetch` from the browser: always same-origin so the App Route proxy adds the upstream base. */
+export function clientApiOriginForRequest(_authenticated: boolean): string {
+  if (typeof window === "undefined") return "";
+  return "";
+}
+
+/** Multipart uploads: when authenticated + `NEXT_PUBLIC_API_URL` is set, hit the API host directly. */
+export function clientUploadApiOrigin(hasAuth: boolean): string {
   if (typeof window === "undefined") return "";
   const base = getPublicApiBase();
-  if (!base) return "";
-  return authenticated ? base : "";
+  if (!base || !hasAuth) return "";
+  return base;
 }
 
 export type ApiError = { detail?: string | { msg: string }[]; message?: string };
@@ -85,7 +89,7 @@ export async function apiUpload<T>(
     }
   }
 
-  const origin = clientApiOriginForRequest(hasAuth);
+  const origin = clientUploadApiOrigin(hasAuth);
   const res = await fetch(`${origin}${path}`, {
     method: "POST",
     cache: "no-store",
