@@ -9,6 +9,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.exception_handlers import request_validation_exception_handler
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import OperationalError
 
 from app.api.router import api_router
 from app.config import get_settings
@@ -40,6 +41,20 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
     app.include_router(api_router, prefix="/api/v1")
+
+    @app.exception_handler(OperationalError)
+    async def database_unavailable(_request: Request, exc: OperationalError) -> JSONResponse:
+        """Surface DB connectivity issues instead of the generic 500 body."""
+        logger.error("Database operational error: %s", exc, exc_info=True)
+        return JSONResponse(
+            status_code=503,
+            content={
+                "detail": (
+                    "Database unavailable. Ensure PostgreSQL is running and DATABASE_URL "
+                    "matches your environment (see .env.example)."
+                )
+            },
+        )
 
     @app.exception_handler(Exception)
     async def unhandled_exception(request: Request, exc: Exception) -> JSONResponse:

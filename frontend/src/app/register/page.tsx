@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
+import { FormEvent, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { LinkedInLoginButton } from "@/components/linkedin-login-button";
 import { LinkedInSetupHint } from "@/components/linkedin-setup-hint";
 import { LegalRegionNotice } from "@/components/legal-region-notice";
@@ -25,6 +25,7 @@ function RegisterPageContent() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [oauthStatus, setOauthStatus] = useState<OAuthProviderStatus | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const safeNext = useMemo(() => {
     const nextRaw = searchParams.get("next");
@@ -74,6 +75,22 @@ function RegisterPageContent() {
   }, [searchParams, t]);
 
   const displayError = error ?? oauthUrlError;
+
+  function selectAllConsentCheckboxes() {
+    const root = formRef.current;
+    if (!root) return;
+    const names = [
+      "gdpr_privacy",
+      "terms_of_service",
+      "job_data_processing",
+      "ai_matching",
+      "marketing_emails_opt_in",
+    ] as const;
+    for (const name of names) {
+      const el = root.querySelector<HTMLInputElement>(`input[type="checkbox"][name="${name}"]`);
+      if (el) el.checked = true;
+    }
+  }
 
   const attributionFromUrl = useMemo(() => {
     const ref = searchParams.get("ref")?.trim();
@@ -149,7 +166,7 @@ function RegisterPageContent() {
     <Shell rail>
       <Card>
         <h1 className="mb-6 text-2xl font-semibold">{t("register.title")}</h1>
-        <form onSubmit={onSubmit}>
+        <form ref={formRef} onSubmit={onSubmit}>
           <Label>{t("register.email")}</Label>
           <Input name="email" type="email" required autoComplete="email" />
           <Label>{t("register.password")}</Label>
@@ -165,6 +182,13 @@ function RegisterPageContent() {
           />
           <p className="twin-muted mb-4 text-xs">{t("register.referredByHint")}</p>
           <LegalRegionNotice />
+          <Button
+            type="button"
+            className="mb-4 border border-[var(--twin-border)] bg-[var(--twin-input-bg)] text-[var(--foreground)] hover:bg-[var(--twin-border)]/30"
+            onClick={selectAllConsentCheckboxes}
+          >
+            {t("register.selectAllConsents")}
+          </Button>
           <label className="mb-4 flex items-start gap-2 text-sm">
             <input name="gdpr_privacy" type="checkbox" className="mt-1" required />
             <span>
