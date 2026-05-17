@@ -2,10 +2,11 @@
 
 from fastapi import APIRouter
 
-from app.api import applications, auth, beta_waitlist, billing, candidates, curated_careers, health, jobs, kyc, talent_pool
+from app.api import applications, auth, beta_waitlist, billing, candidates, curated_careers, geo, health, jobs, kyc, talent_pool
 
 api_router = APIRouter()
 api_router.include_router(health.router, tags=["health"])
+api_router.include_router(geo.router, prefix="/geo", tags=["geo"])
 api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
 api_router.include_router(beta_waitlist.router, prefix="/beta", tags=["beta"])
 api_router.include_router(billing.router, prefix="/billing", tags=["billing"])

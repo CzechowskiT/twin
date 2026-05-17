@@ -1,5 +1,6 @@
 """Candidate profile and match endpoints."""
 
+import json
 from datetime import datetime, timezone
 from typing import Any
 
@@ -34,6 +35,11 @@ def create_profile(
 ) -> CandidateOut:
     if db.query(Candidate).filter(Candidate.user_id == user.id).first():
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Profile already exists")
+    if body.talent_pool_opt_in and not body.talent_pool_processing_consent:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Talent pool opt-in requires explicit consent (see Privacy Policy).",
+        )
     candidate = _build_candidate(user.id, body)
     db.add(candidate)
     db.commit()
@@ -58,6 +64,11 @@ def update_profile(
 ) -> CandidateOut:
     candidate = db.query(Candidate).filter(Candidate.user_id == user.id).first()
     if not candidate:
+        if body.talent_pool_opt_in and not body.talent_pool_processing_consent:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Talent pool opt-in requires explicit consent (see Privacy Policy).",
+            )
         candidate = _build_candidate(user.id, body)
         db.add(candidate)
     else:
@@ -226,6 +237,10 @@ def _build_candidate(user_id: int, body: CandidateCreate | CandidateUpdate) -> C
         opt_in_default = False
     else:
         opt_in_default = bool(opt_in)
+    now = datetime.now(timezone.utc)
+    pool_at: datetime | None = None
+    if opt_in_default and getattr(body, "talent_pool_processing_consent", False) is True:
+        pool_at = now
     return Candidate(
         user_id=user_id,
         name=body.name,
@@ -235,6 +250,7 @@ def _build_candidate(user_id: int, body: CandidateCreate | CandidateUpdate) -> C
         desired_salary=body.desired_salary,
         location=body.location,
         talent_pool_opt_in=opt_in_default,
+        talent_pool_opt_in_at=pool_at,
     )
 
 
@@ -246,7 +262,18 @@ def _apply_update(candidate: Candidate, body: CandidateUpdate) -> None:
     candidate.desired_salary = body.desired_salary
     candidate.location = body.location
     if body.talent_pool_opt_in is not None:
-        candidate.talent_pool_opt_in = body.talent_pool_opt_in
+        prev = candidate.talent_pool_opt_in
+        if body.talent_pool_opt_in:
+            if not prev and not body.talent_pool_processing_consent:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Talent pool opt-in requires explicit consent on the same save (see Privacy Policy).",
+                )
+            candidate.talent_pool_opt_in = True
+            candidate.talent_pool_opt_in_at = datetime.now(timezone.utc)
+        else:
+            candidate.talent_pool_opt_in = False
+            candidate.talent_pool_opt_in_at = None
     if body.cv_processing_consent is True:
         candidate.cv_processing_consent_at = datetime.now(timezone.utc)
     elif body.cv_processing_consent is False:
@@ -283,6 +310,7 @@ def _to_out(candidate: Candidate) -> CandidateOut:
         desired_salary=candidate.desired_salary,
         location=candidate.location,
         talent_pool_opt_in=bool(candidate.talent_pool_opt_in),
+        talent_pool_opt_in_at=candidate.talent_pool_opt_in_at,
         has_cv=bool(candidate.cv_text),
         cv_filename=candidate.cv_filename,
         cv_uploaded_at=candidate.cv_uploaded_at,

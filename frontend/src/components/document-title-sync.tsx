@@ -38,6 +38,7 @@ function titleKeyForPath(path: string): TranslationKey {
     "/register": "meta.titleRegister",
     "/profile": "meta.titleProfile",
     "/privacy": "meta.titlePrivacy",
+    "/terms": "meta.titleTerms",
     "/forgot-password": "meta.titleForgotPassword",
     "/reset-password": "meta.titleResetPassword",
     "/onboarding-assistant": "meta.titleOnboarding",

@@ -78,6 +78,7 @@ export const SITE_MESSAGES_EN = {
   footerCompany: "Company",
   footerLegal: "Legal",
   footerPrivacy: "Privacy Policy",
+  footerTerms: "Terms of Service",
   footerCookieSettings: "Cookie settings",
   footerRights: "© 2026 TWIN. All rights reserved.",
   footerSocial: "Social",
@@ -90,6 +91,23 @@ export const SITE_MESSAGES_EN = {
   footerMobileAppStore: "Download on the App Store",
   footerMobileGooglePlay: "Get it on Google Play",
   footerMobileSoonHint: "Store link not configured yet — coming soon.",
+
+  momentumAria: "Tips and shortcuts",
+  momentumEyebrow: "Keep momentum",
+  momentumLead: "Small rituals beat heroic once-a-week job hunts.",
+  momentumTip1:
+    "When you save or apply from matches or the feed, applications land in one timeline — treat it as your private CRM until interviews appear.",
+  momentumTip2: "Refresh filters after you edit skills or target titles so the feed picks up the new signal.",
+  momentumTip3: "Statuses that match reality (applied, interview, rejected) keep weekly momentum charts believable.",
+  momentumTip4: "If the feed feels too wide, tighten title terms; widen again once you see titles you actually want.",
+  momentumTip5: "Premium lifts caps on tracked applications when billing is enabled in your environment — free stays strong for focused searches.",
+  momentumTip6: "Open tricky listings in a new tab; let TWIN remember what you decided so you are not re-reading the same JD.",
+  momentumCtaWorkspace: "Open workspace",
+  momentumCtaProfile: "Profile & CV",
+  momentumCtaHome: "Home story",
+  momentumCtaRegister: "Create account",
+  momentumCtaLogin: "Log in",
+  momentumCtaFaq: "FAQ",
 } as const;
 
 export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } = {
@@ -172,6 +190,7 @@ export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } 
   footerCompany: "Firma",
   footerLegal: "Prawne",
   footerPrivacy: "Polityka prywatności",
+  footerTerms: "Regulamin",
   footerCookieSettings: "Ustawienia plików cookie",
   footerRights: "© 2026 TWIN. Wszelkie prawa zastrzeżone.",
   footerSocial: "Social media",
@@ -184,4 +203,21 @@ export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } 
   footerMobileAppStore: "Pobierz z App Store",
   footerMobileGooglePlay: "Pobierz z Google Play",
   footerMobileSoonHint: "Link do sklepu jeszcze nie ustawiony — wkrótce.",
+
+  momentumAria: "Podpowiedzi i skróty",
+  momentumEyebrow: "Utrzymaj tempo",
+  momentumLead: "Małe nawyki wygrywają z „job huntem” raz w tygodniu.",
+  momentumTip1:
+    "Gdy zapiszesz ofertę lub wyślesz aplikację z dopasowań albo feedu, wpisy trafiają do jednej osi czasu — traktuj to jak prywatny CRM do momentu rozmów.",
+  momentumTip2: "Po edycji umiejętności lub docelowych stanowisk odśwież filtry, żeby feed złapał nowy sygnał.",
+  momentumTip3: "Statusy zgodne z rzeczywistością (applied, interview, rejected) utrzymują wiarygodność tygodniowego tempa.",
+  momentumTip4: "Gdy feed jest zbyt szeroki, zacieśnij frazy w tytule; poluzuj, gdy zobaczysz realne nazwy ról.",
+  momentumTip5: "Premium zdejmuje limity śledzonych aplikacji, gdy billing jest włączony w Twoim środowisku — Free wystarczy do skupionego szukania.",
+  momentumTip6: "Wymagające ogłoszenia otwieraj w nowej karcie; TWIN zapamięta decyzję, żebyś nie czytał tego samego JD po raz kolejny.",
+  momentumCtaWorkspace: "Otwórz workspace",
+  momentumCtaProfile: "Profil i CV",
+  momentumCtaHome: "Strona główna",
+  momentumCtaRegister: "Załóż konto",
+  momentumCtaLogin: "Zaloguj się",
+  momentumCtaFaq: "FAQ",
 };

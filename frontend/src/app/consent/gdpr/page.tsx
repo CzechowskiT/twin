@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useState } from "react";
 
+import { LegalRegionNotice } from "@/components/legal-region-notice";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
@@ -28,15 +29,28 @@ function ConsentGdprInner() {
       return;
     }
     const form = new FormData(e.currentTarget);
-    if (form.get("gdpr") !== "on") {
-      setError(t("consentGdpr.required"));
+    const ok =
+      form.get("accept_privacy_policy") === "on" &&
+      form.get("accept_terms_of_service") === "on" &&
+      form.get("accept_job_data_processing") === "on" &&
+      form.get("accept_ai_matching") === "on";
+    if (!ok) {
+      setError(t("consentGdpr.requiredAll"));
       return;
     }
     setLoading(true);
     try {
       await apiFetch(
         "/api/v1/auth/gdpr-consent",
-        { method: "POST", body: JSON.stringify({ accept_privacy_policy: true }) },
+        {
+          method: "POST",
+          body: JSON.stringify({
+            accept_privacy_policy: true,
+            accept_terms_of_service: true,
+            accept_job_data_processing: true,
+            accept_ai_matching: true,
+          }),
+        },
         token,
       );
       router.replace(nextPath);
@@ -52,15 +66,46 @@ function ConsentGdprInner() {
       <Card>
         <h1 className="mb-2 text-2xl font-semibold">{t("consentGdpr.title")}</h1>
         <p className="twin-muted mb-6 text-sm">{t("consentGdpr.lead")}</p>
+        <LegalRegionNotice />
         <form onSubmit={onSubmit}>
-          <label className="mb-6 flex items-start gap-2 text-sm">
-            <input name="gdpr" type="checkbox" className="mt-1" />
+          <label className="mb-4 flex items-start gap-2 text-sm">
+            <input name="accept_privacy_policy" type="checkbox" className="mt-1" />
             <span>
-              {t("consentGdpr.checkboxBefore")}{" "}
+              {t("consentGdpr.checkboxPrivacyBefore")}{" "}
               <Link href="/privacy" className="twin-link underline" target="_blank">
                 {t("consentGdpr.privacyLink")}
-              </Link>{" "}
-              {t("consentGdpr.checkboxAfter")}
+              </Link>
+              {t("consentGdpr.checkboxPrivacyAfter")}
+            </span>
+          </label>
+          <label className="mb-4 flex items-start gap-2 text-sm">
+            <input name="accept_terms_of_service" type="checkbox" className="mt-1" />
+            <span>
+              {t("consentGdpr.checkboxTermsBefore")}{" "}
+              <Link href="/terms" className="twin-link underline" target="_blank" rel="noopener noreferrer">
+                {t("consentGdpr.termsLink")}
+              </Link>
+              {t("consentGdpr.checkboxTermsAfter")}
+            </span>
+          </label>
+          <label className="mb-4 flex items-start gap-2 text-sm">
+            <input name="accept_job_data_processing" type="checkbox" className="mt-1" />
+            <span>
+              {t("consentGdpr.checkboxJobDataBefore")}{" "}
+              <Link href="/privacy" className="twin-link underline" target="_blank">
+                {t("consentGdpr.privacyLink")}
+              </Link>
+              {t("consentGdpr.checkboxJobDataAfter")}
+            </span>
+          </label>
+          <label className="mb-6 flex items-start gap-2 text-sm">
+            <input name="accept_ai_matching" type="checkbox" className="mt-1" />
+            <span>
+              {t("consentGdpr.checkboxAiBefore")}{" "}
+              <Link href="/privacy" className="twin-link underline" target="_blank">
+                {t("consentGdpr.privacyLink")}
+              </Link>
+              {t("consentGdpr.checkboxAiAfter")}
             </span>
           </label>
           {error && <p className="mb-4 text-sm text-red-600">{error}</p>}

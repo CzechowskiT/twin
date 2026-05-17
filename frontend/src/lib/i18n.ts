@@ -74,10 +74,13 @@ export type TranslationKey =
   | `register.${keyof typeof en.register}`
   | `authCallback.${keyof typeof en.authCallback}`
   | `consentGdpr.${keyof typeof en.consentGdpr}`
+  | `betaJoin.${keyof typeof en.betaJoin}`
   | `profile.${keyof typeof en.profile}`
   | `onboarding.${keyof typeof en.onboarding}`
   | `meta.${keyof typeof en.meta}`
   | `privacy.${keyof typeof en.privacy}`
+  | `terms.${keyof typeof en.terms}`
+  | `legalRegion.${keyof typeof en.legalRegion}`
   | `cookies.${keyof typeof en.cookies}`
   | `common.${keyof typeof en.common}`
   | `persona.${keyof typeof en.persona}`
@@ -240,6 +243,8 @@ const en = {
     noJobs: "No jobs yet — run Auto scrap above (if enabled) or ask an admin to seed listings.",
     noJobsNoScrapeUi:
       "No jobs in the database yet. Listings show up after data is scraped on the server (admin / backend) or imported. Your profile is for ranking and filters once jobs exist — it does not crawl the web by itself.",
+    jobsEmptyMomentum:
+      "Loosen filters or clear title terms for a wider scan, then tighten again once real titles start flowing back.",
     noJobsFiltered: "No jobs match these filters.",
     filterSearch: "Search",
     filterSearchPlaceholder: "Title, company, keywords…",
@@ -264,6 +269,8 @@ const en = {
     dismissJob: "Not for me",
     applications: "My applications",
     noApplications: "No tracked applications yet — use Save or Apply on a job.",
+    appsEmptyMomentum:
+      "Every saved role gets a timestamp you can trust when recruiters ping you weeks later — start from Top matches or the job feed below.",
     applicationStatus: "Application status",
     removeApplication: "Remove",
     appStatusPending: "Saved",
@@ -371,6 +378,11 @@ const en = {
     identityError: "Something went wrong. Try again or contact support.",
     identityConversation: "Conversation",
     identityRedirectHint: "You will leave TWIN to complete checks at Authologic, then return here automatically.",
+    identityProviderConsentLabel:
+      "I consent to identity data being processed by our verification provider (Authologic) as described in the Privacy Policy.",
+    identityProviderConsentHint:
+      "Required to start verification. You will leave TWIN briefly to complete the provider’s flow.",
+    identityProviderConsentRequired: "Confirm provider processing consent before starting verification.",
   },
   login: {
     title: "Log in",
@@ -440,11 +452,20 @@ const en = {
   },
   consentGdpr: {
     title: "Privacy consent",
-    lead: "Social sign-in created your account. To use TWIN we need the same explicit acceptance as for email registration.",
-    checkboxBefore: "I accept the",
+    lead: "To use TWIN we need explicit acceptance of privacy, terms, job listing data use, and AI-assisted matching — the same as for email registration.",
     privacyLink: "Privacy Policy",
-    checkboxAfter: "and consent to processing my personal data for job matching and operating this service (GDPR / UK GDPR where applicable).",
-    required: "Please confirm acceptance to continue.",
+    termsLink: "Terms of Service",
+    checkboxPrivacyBefore: "I accept the",
+    checkboxPrivacyAfter: "and consent to processing my personal data to operate this service (GDPR / UK GDPR where applicable).",
+    checkboxTermsBefore: "I accept the",
+    checkboxTermsAfter: ".",
+    checkboxJobDataBefore:
+      "I consent to TWIN using third-party job listing data to build my personalised feed and applications, as described in the",
+    checkboxJobDataAfter: ".",
+    checkboxAiBefore:
+      "I consent to AI-assisted matching (for example scoring and suggestions) using my profile and listings, as described in the",
+    checkboxAiAfter: ".",
+    requiredAll: "Please accept all four items to continue.",
     submit: "Continue",
     submitting: "Saving…",
     failed: "Could not save your choice. Try again.",
@@ -453,14 +474,23 @@ const en = {
     title: "Create account",
     email: "Email",
     password: "Password",
-    gdprBefore: "I accept the",
     privacyPolicy: "Privacy Policy",
-    gdprAfter: "and consent to processing my data for job matching (GDPR).",
+    termsOfService: "Terms of Service",
+    consentPrivacyBefore: "I accept the",
+    consentPrivacyAfter: "and consent to processing my personal data to operate TWIN (GDPR / UK GDPR where applicable).",
+    consentTermsBefore: "I accept the",
+    consentTermsAfter: ".",
+    consentJobDataBefore:
+      "I consent to TWIN using third-party job listing data for my personalised feed and applications, as described in the",
+    consentJobDataAfter: ".",
+    consentAiBefore:
+      "I consent to AI-assisted matching (for example scoring) using my profile and job listings, as described in the",
+    consentAiAfter: ".",
     creating: "Creating…",
     submit: "Register",
     hasAccount: "Already have an account?",
     login: "Log in",
-    gdprRequired: "You must accept the privacy policy.",
+    coreConsentsRequired: "Please accept privacy, terms, job data use, and AI matching to register.",
     failed: "Registration failed",
     orContinue: "or continue with",
     errorLinkedinNotConfigured:
@@ -537,6 +567,11 @@ const en = {
     marketingEmailsHint: "Separate legal basis from core matching — change anytime here.",
     cvConsentRequiredUpload: "Confirm CV processing consent above, or check the consent box for this upload.",
     introConsentRequiredUpload: "Confirm voice intro processing consent before uploading.",
+    talentPoolProcessingConsentLabel:
+      "I consent to anonymised B2B talent pool processing as described in the Privacy Policy (required the first time you opt in).",
+    talentPoolProcessingConsentHint:
+      "Recruiters see only aggregated signals — not your name, email, phone, CV text, or exact address.",
+    talentPoolProcessingConsentRequired: "Confirm talent pool processing consent to enable the pool.",
   },
   onboarding: {
     title: "Assistant onboarding",
@@ -617,6 +652,7 @@ const en = {
     titleProfile: "Profile — TWIN",
     titleDashboard: "Dashboard — TWIN",
     titlePrivacy: "Privacy — TWIN",
+    titleTerms: "Terms of Service — TWIN",
     titleForgotPassword: "Forgot password — TWIN",
     titleResetPassword: "Reset password — TWIN",
     titleOnboarding: "Workspace tour — TWIN",
@@ -678,6 +714,8 @@ const en = {
     collect3: "Application and match history within TWIN",
     collect4:
       "If you upload a CV or voice intro: file contents and derived signals (e.g. skills, summaries) processed to run the product, including automated parsing where enabled.",
+    collect5:
+      "Approximate region (country) derived from your IP address, CDN headers, or — only if you opt in — browser geolocation, to show jurisdiction-aware legal notices and consent text. We do not use this for continuous tracking.",
     whyTitle: "Why we process data",
     whyBody:
       "To match you with job listings from pracuj.pl and rocketjobs.pl and to track application status. Legal basis: your explicit consent at registration (GDPR Art. 6(1)(a)).",
@@ -692,6 +730,46 @@ const en = {
     cookieTitle: "Cookies & local storage",
     cookieBody:
       "We use strictly necessary cookies and browser storage for things like keeping you signed in and remembering your language. If you accept optional cookies, we may enable analytics or marketing tags when those products ship—your choice is stored on this device and you can change it anytime from the footer link.",
+    termsTitle: "Terms of Service",
+    termsBody:
+      "By creating an account or continuing to use TWIN after sign-in, you agree to follow these terms: use the product lawfully, keep your credentials confidential, and provide accurate profile information where you choose to share it. Features (including job aggregation, matching, applications, and identity checks) are provided as-is while we iterate; we may change or pause functionality with notice where required. Paid plans, when available, are billed according to the checkout or contract you accept. For data processing and your GDPR rights, see the sections above and contact the team for requests.",
+    termsFullLink: "Open the full Terms of Service (versioned)",
+  },
+  terms: {
+    notLegalAdvice:
+      "This page is for transparency and contract formation. It is not legal advice. Mandatory consumer and employment laws in your country may override parts of these Terms.",
+    loading: "Loading terms…",
+    loadError: "Could not load the terms file. Try again in a moment.",
+    backHome: "Home",
+    privacyLink: "Privacy Policy",
+  },
+  legalRegion: {
+    title: "Location-based legal defaults",
+    lead:
+      "We estimate your region to show the right legal context. This is not a determination of your citizenship or tax residence — check the boxes that apply to you.",
+    sourceCloudflare: "Region from network edge (CDN).",
+    sourceIp: "Region from IP address lookup.",
+    sourceCoordinates: "Region from device coordinates you allowed.",
+    sourceUnknown: "Region could not be detected — general notices apply.",
+    refineCta: "Refine with device location",
+    refineBusy: "Requesting location…",
+    refineDenied: "Location permission was not granted — IP-based region stays in use.",
+    refineUnavailable: "Browser location is not available on this device.",
+    refineError: "Could not refine region. Try again.",
+    bodyEU_EEA:
+      "EU/EEA: you may have GDPR rights (access, erasure, portability, objection) and protections around automated decision-making where applicable. Mandatory consumer laws in your country still apply.",
+    bodyUK:
+      "United Kingdom: UK GDPR and Data Protection Act 2018 may apply alongside these Terms. Nothing here limits non-waivable UK consumer rights.",
+    bodyUS:
+      "United States: some states grant additional privacy rights; arbitration clauses (if any) may not apply to certain consumers or claims. Read the Terms of Service for dispute resolution.",
+    bodyCH:
+      "Switzerland: the Federal Act on Data Protection (FADP) may grant you additional rights. Cross-border transfers may be relevant if you use AI subprocessors outside Switzerland.",
+    bodyJP:
+      "Japan: the Act on the Protection of Personal Information (APPI) may apply to our processing. You may have rights to disclosure, correction, and cessation of use.",
+    bodyCN:
+      "China: if you access the Service from mainland China, the Personal Information Protection Law (PIPL) and related rules may impose additional requirements on cross-border transfers and consent.",
+    bodyOTHER:
+      "General: local employment, consumer, and privacy laws may apply. If mandatory law conflicts with any clause, mandatory law prevails.",
   },
   cookies: {
     ariaRegion: "Cookie consent",
@@ -700,6 +778,41 @@ const en = {
       "We use essential storage for the product to work. You can allow optional analytics and marketing cookies for when we turn those services on, or keep only what’s necessary.",
     acceptAll: "Accept all",
     essentialOnly: "Essential only",
+  },
+  betaJoin: {
+    title: "Join TWIN beta",
+    stepOf: "Step {step} of 4 · referral boosts are server-side",
+    email: "Email",
+    nameOptional: "Name (optional)",
+    joinWaitlist: "Join waitlist",
+    saving: "Saving…",
+    privacyCheckbox:
+      "I have read the privacy notice for the waitlist and consent to TWIN storing my email and related waitlist data as described in the",
+    privacyLink: "Privacy Policy",
+    privacyCheckboxAfter: ".",
+    emailUpdatesCheckbox: "I consent to email updates about my queue position and the beta programme.",
+    joinFootnote:
+      "Full account registration and the core GDPR consent flow live on /register — this waitlist is separate.",
+    positionLine: "You are {position} in line · spots left {spots}.",
+    jobTitle: "Job title",
+    location: "Location",
+    minSalaryOptional: "Min salary (optional)",
+    skip: "Skip",
+    save: "Save",
+    voiceHeading: "Optional voice note (+50 priority)",
+    upload: "Upload",
+    youreIn: "You're in",
+    positionDash: "Position {position} · referrals {referrals}",
+    markLinkedIn: "Mark LinkedIn shared (+5)",
+    copy: "Copy",
+    dashboard: "Dashboard",
+    backLanding: "← Beta landing",
+    loading: "Loading…",
+    joinFailed: "Join failed",
+    consentsRequired: "Please accept both consent checkboxes to join the waitlist.",
+    saveFailed: "Save failed",
+    uploadFailed: "Upload failed",
+    updateFailed: "Update failed",
   },
   persona: {
     sectionCapabilities: "Capabilities",
@@ -894,6 +1007,8 @@ const pl: MessageTree = {
     noJobs: "Brak ofert — uruchom Auto scrap powyżej (jeśli włączone) lub poproś administratora o dane.",
     noJobsNoScrapeUi:
       "Brak ofert w bazie — pojawią się po pobraniu danych na serwerze (scrap przez administratora / backend) lub imporcie. Profil służy do dopasowania i filtrów, gdy oferty już są; sam z siebie nie przeszukuje internetu.",
+    jobsEmptyMomentum:
+      "Poluzuj filtry albo wyczyść frazy w tytule dla szerszego skanu, potem zawęź, gdy zaczną wracać realne nazwy stanowisk.",
     noJobsFiltered: "Brak ofert dla wybranych filtrów.",
     filterSearch: "Szukaj",
     filterSearchPlaceholder: "Stanowisko, firma, słowa kluczowe…",
@@ -918,6 +1033,8 @@ const pl: MessageTree = {
     dismissJob: "Nie dla mnie",
     applications: "Moje aplikacje",
     noApplications: "Brak śledzonych aplikacji — użyj Zapisz lub Aplikuj przy ofercie.",
+    appsEmptyMomentum:
+      "Każda zapisana rola ma znacznik czasu, któremu zaufasz, gdy rekruter odezwie się po tygodniach — zacznij od Najlepszych dopasowań albo feedu ofert poniżej.",
     applicationStatus: "Status aplikacji",
     removeApplication: "Usuń",
     appStatusPending: "Zapisana",
@@ -1025,6 +1142,11 @@ const pl: MessageTree = {
     identityError: "Coś poszło nie tak. Spróbuj ponownie lub napisz do supportu.",
     identityConversation: "Konwersacja",
     identityRedirectHint: "Opuszczasz TWIN, by dokończyć proces u Authologic, potem wrócisz tutaj automatycznie.",
+    identityProviderConsentLabel:
+      "Wyrażam zgodę na przetwarzanie danych tożsamości przez dostawcę weryfikacji (Authologic) zgodnie z Polityką prywatności.",
+    identityProviderConsentHint:
+      "Wymagane, by rozpocząć weryfikację. Na chwilę opuścisz TWIN, by dokończyć proces u dostawcy.",
+    identityProviderConsentRequired: "Potwierdź zgodę na przetwarzanie u dostawcy przed startem weryfikacji.",
   },
   login: {
     title: "Zaloguj się",
@@ -1097,12 +1219,21 @@ const pl: MessageTree = {
   consentGdpr: {
     title: "Zgoda na przetwarzanie danych",
     lead:
-      "Logowanie społecznościowe utworzyło konto. Żeby korzystać z TWIN, potrzebujemy takiej samej wyraźnej akceptacji jak przy rejestracji e-mailem.",
-    checkboxBefore: "Akceptuję",
+      "Żeby korzystać z TWIN, potrzebujemy wyraźnej akceptacji: prywatność, regulamin, wykorzystanie listingów z portali oraz dopasowanie wspierane przez AI — tak jak przy rejestracji e-mailem.",
     privacyLink: "Politykę prywatności",
-    checkboxAfter:
-      "i wyrażam zgodę na przetwarzanie moich danych osobowych w celu dopasowania ofert i działania usługi (RODO / UK GDPR, jeśli ma zastosowanie).",
-    required: "Potwierdź akceptację, aby kontynuować.",
+    termsLink: "Regulamin",
+    checkboxPrivacyBefore: "Akceptuję",
+    checkboxPrivacyAfter:
+      "i wyrażam zgodę na przetwarzanie moich danych osobowych w celu świadczenia usługi (RODO / UK GDPR, jeśli ma zastosowanie).",
+    checkboxTermsBefore: "Akceptuję",
+    checkboxTermsAfter: ".",
+    checkboxJobDataBefore:
+      "Wyrażam zgodę na wykorzystywanie przez TWIN danych z ogłoszeń z portali zewnętrznych do mojego spersonalizowanego feedu i aplikacji, zgodnie z",
+    checkboxJobDataAfter: ".",
+    checkboxAiBefore:
+      "Wyrażam zgodę na dopasowanie wspierane przez AI (np. scoring, podpowiedzi) z użyciem mojego profilu i ofert, zgodnie z",
+    checkboxAiAfter: ".",
+    requiredAll: "Zaakceptuj wszystkie cztery pola, aby kontynuować.",
     submit: "Kontynuuj",
     submitting: "Zapisywanie…",
     failed: "Nie udało się zapisać wyboru. Spróbuj ponownie.",
@@ -1111,15 +1242,24 @@ const pl: MessageTree = {
     title: "Utwórz konto",
     email: "E-mail",
     password: "Hasło",
-    gdprBefore: "Akceptuję",
     privacyPolicy: "Politykę prywatności",
-    gdprAfter:
-      "i wyrażam zgodę na przetwarzanie danych w celu dopasowania ofert pracy (RODO).",
+    termsOfService: "Regulamin",
+    consentPrivacyBefore: "Akceptuję",
+    consentPrivacyAfter:
+      "i wyrażam zgodę na przetwarzanie moich danych osobowych w celu świadczenia usługi TWIN (RODO / UK GDPR, jeśli ma zastosowanie).",
+    consentTermsBefore: "Akceptuję",
+    consentTermsAfter: ".",
+    consentJobDataBefore:
+      "Wyrażam zgodę na wykorzystywanie przez TWIN danych z ogłoszeń z portali zewnętrznych do mojego spersonalizowanego feedu i aplikacji, zgodnie z",
+    consentJobDataAfter: ".",
+    consentAiBefore:
+      "Wyrażam zgodę na dopasowanie wspierane przez AI (np. scoring) z użyciem mojego profilu i ofert, zgodnie z",
+    consentAiAfter: ".",
     creating: "Tworzenie konta…",
     submit: "Zarejestruj się",
     hasAccount: "Masz już konto?",
     login: "Zaloguj się",
-    gdprRequired: "Musisz zaakceptować politykę prywatności.",
+    coreConsentsRequired: "Zaakceptuj prywatność, regulamin, wykorzystanie danych ofert oraz dopasowanie AI, aby się zarejestrować.",
     failed: "Rejestracja nie powiodła się",
     orContinue: "lub kontynuuj przez",
     errorLinkedinNotConfigured:
@@ -1198,6 +1338,11 @@ const pl: MessageTree = {
     marketingEmailsHint: "Osobna podstawa prawna od dopasowania ofert — zmienisz tutaj w każdej chwili.",
     cvConsentRequiredUpload: "Potwierdź zgodę na przetwarzanie CV powyżej albo zaznacz zgodę przy tym uploadzie.",
     introConsentRequiredUpload: "Potwierdź zgodę na przetwarzanie nagrania przed wgraniem.",
+    talentPoolProcessingConsentLabel:
+      "Wyrażam zgodę na przetwarzanie danych w zanonimizowanej puli talentów B2B zgodnie z Polityką prywatności (wymagane przy pierwszym włączeniu).",
+    talentPoolProcessingConsentHint:
+      "Rekruterzy widzą tylko zagregowane sygnały — bez imienia, e-maila, telefonu, treści CV ani dokładnego adresu.",
+    talentPoolProcessingConsentRequired: "Potwierdź zgodę na pulę talentów, aby włączyć udział.",
   },
   onboarding: {
     title: "Onboarding asystenta",
@@ -1278,6 +1423,7 @@ const pl: MessageTree = {
     titleProfile: "Profil — TWIN",
     titleDashboard: "Panel — TWIN",
     titlePrivacy: "Prywatność — TWIN",
+    titleTerms: "Regulamin — TWIN",
     titleForgotPassword: "Reset hasła — TWIN",
     titleResetPassword: "Nowe hasło — TWIN",
     titleOnboarding: "Tour po workspace — TWIN",
@@ -1339,6 +1485,8 @@ const pl: MessageTree = {
     collect3: "Historia aplikacji i dopasowań w TWIN",
     collect4:
       "Jeśli wgrasz CV lub nagranie głosu: treść pliku i wyprowadzone sygnały (np. umiejętności, streszczenia) przetwarzamy w celu działania produktu, w tym automatycznego odczytu tam, gdzie jest włączony.",
+    collect5:
+      "Przybliżony region (kraj) z adresu IP, nagłówków CDN lub — tylko po Twojej zgodzie — geolokalizacji przeglądarki, by pokazywać kontekst prawny i teksty zgód adekwatne do jurysdykcji. Nie służy to ciągłemu śledzeniu.",
     whyTitle: "Po co przetwarzamy dane",
     whyBody:
       "Żeby dopasowywać oferty z pracuj.pl i rocketjobs.pl oraz śledzić status aplikacji. Podstawa prawna: wyraźna zgoda przy rejestracji (RODO art. 6 ust. 1 lit. a).",
@@ -1353,6 +1501,46 @@ const pl: MessageTree = {
     cookieTitle: "Pliki cookie i pamięć przeglądarki",
     cookieBody:
       "Używamy niezbędnych plików cookie i pamięci przeglądarki m.in. do utrzymania sesji i języka. Jeśli zezwolisz na opcjonalne pliki cookie, możemy włączyć analitykę lub marketing, gdy te usługi się pojawią — wybór zapisujemy na tym urządzeniu; zmienisz go w stopce („Ustawienia plików cookie”).",
+    termsTitle: "Regulamin (ToS)",
+    termsBody:
+      "Tworząc konto lub korzystając z TWIN po zalogowaniu, zobowiązujesz się korzystać z produktu zgodnie z prawem, chronić swoje dane logowania oraz podawać rzetelne informacje w profilu tam, gdzie je udostępniasz. Funkcje (w tym agregacja ofert, dopasowanie, aplikacje i weryfikacja tożsamości) są dostarczane w modelu ciągłej iteracji; możemy zmieniać lub wstrzymywać funkcjonalność z informacją tam, gdzie wymaga tego prawo. Plany płatne — gdy będą dostępne — rozliczane według checkoutu lub umowy, którą zaakceptujesz. O przetwarzaniu danych i prawach RODO: sekcje powyżej oraz kontakt z zespołem przy żądaniach.",
+    termsFullLink: "Pełny regulamin (wersjonowany)",
+  },
+  terms: {
+    notLegalAdvice:
+      "Ta strona służy przejrzystości i zawarciu umowy — to nie jest porada prawna. Bezwzględnie obowiązujące przepisy (np. konsumenckie i pracy) mogą mieć pierwszeństwo przed częścią postanowień.",
+    loading: "Ładowanie regulaminu…",
+    loadError: "Nie udało się wczytać pliku regulaminu. Spróbuj ponownie za chwilę.",
+    backHome: "Strona główna",
+    privacyLink: "Polityka prywatności",
+  },
+  legalRegion: {
+    title: "Dopasowanie przepisów do regionu",
+    lead:
+      "Szacujemy Twój region, by pokazać właściwy kontekst prawny. To nie jest ustalenie obywatelstwa ani rezydencji podatkowej — i tak musisz zaznaczyć zgody, które Cię dotyczą.",
+    sourceCloudflare: "Region z krawędzi sieci (CDN).",
+    sourceIp: "Region z wyszukiwania po adresie IP.",
+    sourceCoordinates: "Region z współrzędnych urządzenia po Twojej zgodzie.",
+    sourceUnknown: "Nie udało się wykryć regionu — obowiązują ogólne informacje.",
+    refineCta: "Doprecyzuj lokalizacją urządzenia",
+    refineBusy: "Prośba o lokalizację…",
+    refineDenied: "Brak zgody na lokalizację — zostaje region z IP.",
+    refineUnavailable: "Ta przeglądarka nie udostępnia geolokalizacji.",
+    refineError: "Nie udało się doprecyzować regionu. Spróbuj ponownie.",
+    bodyEU_EEA:
+      "UE/EOG: mogą przysługiwać Ci prawa RODO (dostęp, usunięcie, przenoszenie, sprzeciw) oraz ochrona przed wyłącznie zautomatyzowanym podejmowaniem decyzji, tam gdzie ma to zastosowanie. Bezwzględnie obowiązujące przepisy konsumenckie w Twoim kraju nadal obowiązują.",
+    bodyUK:
+      "Zjednoczone Królestwo: mogą mieć zastosowanie UK GDPR i DPA 2018 obok Regulaminu. Nic tu nie ogranicza nienaruszalnych praw konsumenta w UK.",
+    bodyUS:
+      "Stany Zjednoczone: część stanów przyznaje dodatkowe prawa prywatności; klauzule arbitrażowe (jeśli występują) mogą nie mieć zastosowania do niektórych konsumentów lub roszczeń — szczegóły w Regulaminie.",
+    bodyCH:
+      "Szwajcaria: federalna ustawa o ochronie danych (FADP) może dawać dodatkowe prawa. Transfery transgraniczne mogą mieć znaczenie przy podprocesorach AI poza CH.",
+    bodyJP:
+      "Japonia: APPI może mieć zastosowanie do przetwarzania; mogą przysługiwać m.in. prawo do ujawnienia, sprostowania i zaprzestania użycia.",
+    bodyCN:
+      "Chiny: jeśli korzystasz z Chin kontynentalnych, PIPL i powiązane akty mogą nakładać dodatkowe wymogi co do transferów transgranicznych i zgód.",
+    bodyOTHER:
+      "Ogólnie: lokalne przepisy pracy, konsumenckie i o ochronie danych mogą mieć zastosowanie. Gdy przepis bezwzględnie obowiązujący jest sprzeczny z postanowieniem — pierwszeństwo ma przepis.",
   },
   cookies: {
     ariaRegion: "Zgoda na pliki cookie",
@@ -1361,6 +1549,41 @@ const pl: MessageTree = {
       "Używamy niezbędnego storage, żeby produkt działał. Możesz zezwolić na opcjonalne pliki cookie analityczne i marketingowe na przyszłość albo zostać przy samym minimum.",
     acceptAll: "Akceptuję wszystkie",
     essentialOnly: "Tylko niezbędne",
+  },
+  betaJoin: {
+    title: "Dołącz do bety TWIN",
+    stepOf: "Krok {step} z 4 · pozycja z poleceń liczy się po stronie serwera",
+    email: "E-mail",
+    nameOptional: "Imię (opcjonalnie)",
+    joinWaitlist: "Dołącz do listy",
+    saving: "Zapisywanie…",
+    privacyCheckbox:
+      "Zapoznałem(-am) się z informacją o prywatności listy oczekujących i wyrażam zgodę na przechowywanie przez TWIN mojego e-maila i powiązanych danych listy, zgodnie z",
+    privacyLink: "Polityką prywatności",
+    privacyCheckboxAfter: ".",
+    emailUpdatesCheckbox: "Wyrażam zgodę na e-mailowe aktualizacje o miejscu w kolejce i programie beta.",
+    joinFootnote:
+      "Pełna rejestracja konta i podstawowy flow zgód RODO są na /register — lista beta jest osobna.",
+    positionLine: "Jesteś {position} w kolejce · zostało miejsc: {spots}.",
+    jobTitle: "Stanowisko",
+    location: "Lokalizacja",
+    minSalaryOptional: "Min. wynagrodzenie (opcjonalnie)",
+    skip: "Pomiń",
+    save: "Zapisz",
+    voiceHeading: "Opcjonalna notatka głosowa (+50 priorytetu)",
+    upload: "Wyślij",
+    youreIn: "Jesteś na liście",
+    positionDash: "Pozycja {position} · polecenia: {referrals}",
+    markLinkedIn: "Oznacz udostępnienie LinkedIn (+5)",
+    copy: "Kopiuj",
+    dashboard: "Panel beta",
+    backLanding: "← Strona beta",
+    loading: "Ładowanie…",
+    joinFailed: "Dołączenie nie powiodło się",
+    consentsRequired: "Zaakceptuj obie zgody, aby dołączyć do listy.",
+    saveFailed: "Zapis nie powiódł się",
+    uploadFailed: "Wysyłka nie powiodła się",
+    updateFailed: "Aktualizacja nie powiodła się",
   },
   persona: {
     sectionCapabilities: "Możliwości",

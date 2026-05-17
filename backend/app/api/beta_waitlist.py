@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 import secrets
+from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, Header, HTTPException, UploadFile, status
@@ -173,6 +174,11 @@ def beta_join(body: BetaJoinIn, db: Session = Depends(get_db), settings: Setting
     total = int(db.query(func.count(BetaWaitlist.id)).scalar() or 0)
     if total >= settings.beta_waitlist_cap:
         raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Beta waitlist is full")
+    if not body.accept_privacy_notice or not body.consent_beta_email_updates:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            detail="Privacy acknowledgement and email consent are required to join the waitlist",
+        )
     email = str(body.email).lower().strip()
     existing = db.query(BetaWaitlist).filter(BetaWaitlist.email == email).first()
     if existing:
@@ -192,6 +198,7 @@ def beta_join(body: BetaJoinIn, db: Session = Depends(get_db), settings: Setting
         referral_code=code,
         referred_by_code=ref_in,
         source=(body.source or "email")[:32],
+        privacy_and_email_consent_at=datetime.now(timezone.utc),
     )
     db.add(row)
     db.flush()

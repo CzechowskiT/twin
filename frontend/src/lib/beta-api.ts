@@ -74,7 +74,12 @@ export async function betaJoin(body: {
   name?: string;
   referred_by?: string | null;
   source?: string;
+  accept_privacy_notice: true;
+  consent_beta_email_updates: true;
 }): Promise<BetaJoinResult> {
+  if (!body.accept_privacy_notice || !body.consent_beta_email_updates) {
+    throw new Error("Beta join requires privacy notice acceptance and email update consent.");
+  }
   const res = await fetch("/api/v1/beta/join", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -83,6 +88,8 @@ export async function betaJoin(body: {
       name: body.name || null,
       referred_by: body.referred_by || null,
       source: body.source || "email",
+      accept_privacy_notice: true,
+      consent_beta_email_updates: true,
     }),
   });
   if (!res.ok) throw new Error(await parseErr(res));

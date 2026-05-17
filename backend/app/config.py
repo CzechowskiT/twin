@@ -66,6 +66,12 @@ class Settings(BaseSettings):
     scrape_enabled_board_ids: str = ""
     # Per-board fetch cap for Twin scrape-all (each adapter respects this upper bound).
     scrape_jobs_per_board: int = 48
+    # When true, honour robots.txt before Playwright fetches (LinkedIn uses Disallow: / for generic bots).
+    scrape_respect_robots_txt: bool = True
+    # Pause between boards in scrape-all (serial) to reduce burst traffic on third-party sites.
+    scrape_between_boards_sec: float = 1.5
+    # Optional extra delay after each fetch_html session (0 = off).
+    scrape_post_fetch_delay_sec: float = 0.0
     intro_audio_upload_dir: str = "data/intro_audio"
     intro_audio_max_bytes: int = 15 * 1024 * 1024
 
@@ -150,6 +156,9 @@ class Settings(BaseSettings):
     beta_admin_token: str = ""
     beta_upload_dir: str = "data/beta_waitlist"
     beta_upload_max_bytes: int = 15 * 1024 * 1024
+
+    # When false, /geo/jurisdiction-hint returns OTHER without outbound IP/geo calls (strict/air-gapped).
+    geo_jurisdiction_lookup_enabled: bool = True
 
     @property
     def cors_origin_list(self) -> list[str]:

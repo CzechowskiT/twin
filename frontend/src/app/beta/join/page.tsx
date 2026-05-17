@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useEffect, useState } from "react";
 
+import { useTranslation } from "@/components/language-provider";
 import {
   BETA_REFERRAL_STORAGE_KEY,
   betaDashboard,
@@ -15,9 +16,18 @@ import {
   type BetaJoinResult,
 } from "@/lib/beta-api";
 
+function fillParams(s: string, params: Record<string, string>): string {
+  let out = s;
+  for (const [k, v] of Object.entries(params)) {
+    out = out.split(`{${k}}`).join(v);
+  }
+  return out;
+}
+
 function JoinInner() {
   const router = useRouter();
   const sp = useSearchParams();
+  const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -29,6 +39,8 @@ function JoinInner() {
   const [dash, setDash] = useState<BetaDashboard | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [acceptPrivacyNotice, setAcceptPrivacyNotice] = useState(false);
+  const [consentBetaEmailUpdates, setConsentBetaEmailUpdates] = useState(false);
 
   useEffect(() => {
     const s = sp.get("step");
@@ -42,14 +54,26 @@ function JoinInner() {
     e.preventDefault();
     setBusy(true);
     setErr(null);
+    if (!acceptPrivacyNotice || !consentBetaEmailUpdates) {
+      setErr(t("betaJoin.consentsRequired"));
+      setBusy(false);
+      return;
+    }
     try {
       const ref = localStorage.getItem(BETA_REFERRAL_STORAGE_KEY);
-      const res = await betaJoin({ email, name: name || undefined, referred_by: ref, source: "email" });
+      const res = await betaJoin({
+        email,
+        name: name || undefined,
+        referred_by: ref,
+        source: "email",
+        accept_privacy_notice: true,
+        consent_beta_email_updates: true,
+      });
       setJoin(res);
       localStorage.setItem(BETA_REFERRAL_STORAGE_KEY, res.referral_code);
       setStep(2);
     } catch (x: unknown) {
-      setErr(x instanceof Error ? x.message : "Join failed");
+      setErr(x instanceof Error ? x.message : t("betaJoin.joinFailed"));
     } finally {
       setBusy(false);
     }
@@ -69,7 +93,7 @@ function JoinInner() {
       }
       setStep(3);
     } catch (x: unknown) {
-      setErr(x instanceof Error ? x.message : "Save failed");
+      setErr(x instanceof Error ? x.message : t("betaJoin.saveFailed"));
     } finally {
       setBusy(false);
     }
@@ -84,7 +108,7 @@ function JoinInner() {
       setStep(4);
       setDash(await betaDashboard(join.referral_code));
     } catch (x: unknown) {
-      setErr(x instanceof Error ? x.message : "Upload failed");
+      setErr(x instanceof Error ? x.message : t("betaJoin.uploadFailed"));
     } finally {
       setBusy(false);
     }
@@ -98,37 +122,72 @@ function JoinInner() {
       await betaLinkedInShare(join.referral_code);
       setDash(await betaDashboard(join.referral_code));
     } catch (x: unknown) {
-      setErr(x instanceof Error ? x.message : "Update failed");
+      setErr(x instanceof Error ? x.message : t("betaJoin.updateFailed"));
     } finally {
       setBusy(false);
     }
   }
 
-  const origin =
-    typeof window !== "undefined" ? window.location.origin : "";
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
   const refLink = join ? `${origin}/beta?ref=${join.referral_code}` : "";
+
+  const stepLabel = fillParams(t("betaJoin.stepOf"), { step: String(step) });
 
   return (
     <div className="beta-container max-w-lg">
-      <h1 className="beta-hero-title text-3xl">Join TWIN beta</h1>
-      <p className="mt-2 text-sm text-[var(--beta-muted)]">Step {step} of 4 · referral boosts are server-side</p>
+      <h1 className="beta-hero-title text-3xl">{t("betaJoin.title")}</h1>
+      <p className="mt-2 text-sm text-[var(--beta-muted)]">{stepLabel}</p>
       {err ? <p className="mt-3 text-sm text-red-600">{err}</p> : null}
 
       {step === 1 ? (
         <form className="beta-card mt-6 space-y-4" onSubmit={onJoin}>
           <div>
-            <label className="text-sm font-semibold">Email</label>
-            <input className="beta-input mt-1" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+            <label className="text-sm font-semibold">{t("betaJoin.email")}</label>
+            <input
+              className="beta-input mt-1"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </div>
           <div>
-            <label className="text-sm font-semibold">Name (optional)</label>
+            <label className="text-sm font-semibold">{t("betaJoin.nameOptional")}</label>
             <input className="beta-input mt-1" value={name} onChange={(e) => setName(e.target.value)} />
           </div>
-          <button className="beta-cta beta-cta-primary w-full justify-center" type="submit" disabled={busy}>
-            {busy ? "Saving…" : "Join waitlist"}
+          <label className="flex items-start gap-2 text-sm text-[var(--beta-muted)]">
+            <input
+              type="checkbox"
+              className="mt-1"
+              checked={acceptPrivacyNotice}
+              onChange={(e) => setAcceptPrivacyNotice(e.target.checked)}
+            />
+            <span>
+              {t("betaJoin.privacyCheckbox")}{" "}
+              <Link className="font-semibold text-[var(--beta-blue)] underline" href="/privacy" target="_blank">
+                {t("betaJoin.privacyLink")}
+              </Link>
+              {t("betaJoin.privacyCheckboxAfter")}
+            </span>
+          </label>
+          <label className="flex items-start gap-2 text-sm text-[var(--beta-muted)]">
+            <input
+              type="checkbox"
+              className="mt-1"
+              checked={consentBetaEmailUpdates}
+              onChange={(e) => setConsentBetaEmailUpdates(e.target.checked)}
+            />
+            <span>{t("betaJoin.emailUpdatesCheckbox")}</span>
+          </label>
+          <button
+            className="beta-cta beta-cta-primary w-full justify-center"
+            type="submit"
+            disabled={busy || !acceptPrivacyNotice || !consentBetaEmailUpdates}
+          >
+            {busy ? t("betaJoin.saving") : t("betaJoin.joinWaitlist")}
           </button>
           <p className="text-xs text-[var(--beta-muted)]">
-            By joining you accept we will email you about the beta. Full account + GDPR flow stays on{" "}
+            {t("betaJoin.joinFootnote")}{" "}
             <Link className="font-semibold text-[var(--beta-blue)] underline" href="/register">
               /register
             </Link>
@@ -140,18 +199,21 @@ function JoinInner() {
       {step === 2 && join ? (
         <div className="beta-card mt-6 space-y-4">
           <p className="text-sm text-[var(--beta-muted)]">
-            You are <strong>#{join.position}</strong> in line · spots left {join.spots_left}.
+            {fillParams(t("betaJoin.positionLine"), {
+              position: String(join.position),
+              spots: String(join.spots_left),
+            })}
           </p>
           <div>
-            <label className="text-sm font-semibold">Job title</label>
+            <label className="text-sm font-semibold">{t("betaJoin.jobTitle")}</label>
             <input className="beta-input mt-1" value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} />
           </div>
           <div>
-            <label className="text-sm font-semibold">Location</label>
+            <label className="text-sm font-semibold">{t("betaJoin.location")}</label>
             <input className="beta-input mt-1" value={location} onChange={(e) => setLocation(e.target.value)} />
           </div>
           <div>
-            <label className="text-sm font-semibold">Min salary (optional)</label>
+            <label className="text-sm font-semibold">{t("betaJoin.minSalaryOptional")}</label>
             <input
               className="beta-input mt-1"
               type="number"
@@ -161,11 +223,21 @@ function JoinInner() {
             />
           </div>
           <div className="flex gap-2">
-            <button type="button" className="beta-cta beta-cta-ghost flex-1 justify-center" disabled={busy} onClick={() => saveProfile(true)}>
-              Skip
+            <button
+              type="button"
+              className="beta-cta beta-cta-ghost flex-1 justify-center"
+              disabled={busy}
+              onClick={() => saveProfile(true)}
+            >
+              {t("betaJoin.skip")}
             </button>
-            <button type="button" className="beta-cta beta-cta-primary flex-1 justify-center" disabled={busy} onClick={() => saveProfile(false)}>
-              Save
+            <button
+              type="button"
+              className="beta-cta beta-cta-primary flex-1 justify-center"
+              disabled={busy}
+              onClick={() => saveProfile(false)}
+            >
+              {t("betaJoin.save")}
             </button>
           </div>
         </div>
@@ -173,14 +245,24 @@ function JoinInner() {
 
       {step === 3 && join ? (
         <div className="beta-card mt-6 space-y-4">
-          <h2 className="text-lg font-bold">Optional voice note (+50 priority)</h2>
+          <h2 className="text-lg font-bold">{t("betaJoin.voiceHeading")}</h2>
           <input type="file" accept="audio/*" onChange={(e) => setVoice(e.target.files?.[0] ?? null)} />
           <div className="flex gap-2">
-            <button type="button" className="beta-cta beta-cta-ghost flex-1 justify-center" disabled={busy} onClick={() => saveVoice(true)}>
-              Skip
+            <button
+              type="button"
+              className="beta-cta beta-cta-ghost flex-1 justify-center"
+              disabled={busy}
+              onClick={() => saveVoice(true)}
+            >
+              {t("betaJoin.skip")}
             </button>
-            <button type="button" className="beta-cta beta-cta-primary flex-1 justify-center" disabled={busy} onClick={() => saveVoice(false)}>
-              Upload
+            <button
+              type="button"
+              className="beta-cta beta-cta-primary flex-1 justify-center"
+              disabled={busy}
+              onClick={() => saveVoice(false)}
+            >
+              {t("betaJoin.upload")}
             </button>
           </div>
         </div>
@@ -188,28 +270,31 @@ function JoinInner() {
 
       {step === 4 && join ? (
         <div className="beta-card mt-6 space-y-4">
-          <h2 className="text-lg font-bold">You&apos;re in</h2>
+          <h2 className="text-lg font-bold">{t("betaJoin.youreIn")}</h2>
           <p className="text-sm text-[var(--beta-muted)]">
-            Position #{dash?.position ?? join.position} · referrals {dash?.referrals_count ?? 0}
+            {fillParams(t("betaJoin.positionDash"), {
+              position: String(dash?.position ?? join.position),
+              referrals: String(dash?.referrals_count ?? 0),
+            })}
           </p>
           <p className="break-all text-xs">{refLink}</p>
           <div className="flex flex-wrap gap-2">
             <button type="button" className="beta-cta beta-cta-secondary" disabled={busy} onClick={markLinkedIn}>
-              Mark LinkedIn shared (+5)
+              {t("betaJoin.markLinkedIn")}
             </button>
             <button
               type="button"
               className="beta-cta beta-cta-ghost"
               onClick={() => void navigator.clipboard.writeText(refLink)}
             >
-              Copy
+              {t("betaJoin.copy")}
             </button>
             <button
               type="button"
               className="beta-cta beta-cta-primary"
               onClick={() => router.push(`/beta/dashboard?code=${encodeURIComponent(join.referral_code)}`)}
             >
-              Dashboard
+              {t("betaJoin.dashboard")}
             </button>
           </div>
         </div>
@@ -217,7 +302,7 @@ function JoinInner() {
 
       <p className="mt-6 text-center text-sm">
         <Link href="/beta" className="text-[var(--beta-blue)] underline">
-          ← Beta landing
+          {t("betaJoin.backLanding")}
         </Link>
       </p>
     </div>
@@ -225,8 +310,11 @@ function JoinInner() {
 }
 
 export default function BetaJoinPage() {
+  const { t } = useTranslation();
   return (
-    <Suspense fallback={<div className="beta-container p-8 text-sm text-[var(--beta-muted)]">Loading…</div>}>
+    <Suspense
+      fallback={<div className="beta-container p-8 text-sm text-[var(--beta-muted)]">{t("betaJoin.loading")}</div>}
+    >
       <JoinInner />
     </Suspense>
   );

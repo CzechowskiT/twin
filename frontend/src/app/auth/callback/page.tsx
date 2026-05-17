@@ -6,9 +6,8 @@ import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { setToken } from "@/lib/auth";
 import { apiFetch } from "@/lib/api";
+import { hasCoreConsents, type AuthMeCoreConsents } from "@/lib/core-consents";
 import type { TranslationKey } from "@/lib/i18n";
-
-type AuthMe = { gdpr_consent_at: string | null };
 
 function authErrorKey(error: string): TranslationKey {
   if (error === "linkedin_denied") return "authCallback.errorLinkedinDenied";
@@ -40,8 +39,8 @@ function AuthCallbackContent() {
       queueMicrotask(() => {
         void (async () => {
           try {
-            const me = await apiFetch<AuthMe>("/api/v1/auth/me", {}, token);
-            if (!me.gdpr_consent_at) {
+            const me = await apiFetch<AuthMeCoreConsents>("/api/v1/auth/me", {}, token);
+            if (!hasCoreConsents(me)) {
               router.replace(`/consent/gdpr?next=${encodeURIComponent(path)}`);
               return;
             }

@@ -39,6 +39,7 @@ type Profile = {
   desired_salary: number | null;
   location: string | null;
   talent_pool_opt_in?: boolean;
+  talent_pool_opt_in_at?: string | null;
   has_cv?: boolean;
   cv_filename?: string | null;
   has_intro_audio?: boolean;
@@ -70,6 +71,8 @@ export default function ProfilePage() {
   const [userPrefs, setUserPrefs] = useState<UserPrefs | null>(null);
   const [cvUploadConsent, setCvUploadConsent] = useState(false);
   const [introUploadConsent, setIntroUploadConsent] = useState(false);
+  const [talentPoolOptIn, setTalentPoolOptIn] = useState(false);
+  const [talentPoolProcessingConsent, setTalentPoolProcessingConsent] = useState(false);
 
   useEffect(() => {
     const token = getToken();
@@ -84,6 +87,10 @@ export default function ProfilePage() {
       .then(([prof, prefs]) => {
         setInitial(prof);
         setUserPrefs(prefs);
+        if (prof) {
+          setTalentPoolOptIn(Boolean(prof.talent_pool_opt_in));
+          setTalentPoolProcessingConsent(false);
+        }
       })
       .finally(() => setLoading(false));
   }, [router]);
@@ -98,6 +105,8 @@ export default function ProfilePage() {
       ]);
       setInitial(prof);
       setUserPrefs(prefs);
+      setTalentPoolOptIn(Boolean(prof.talent_pool_opt_in));
+      setTalentPoolProcessingConsent(false);
     } catch {
       /* ignore */
     }
@@ -201,17 +210,25 @@ export default function ProfilePage() {
       .map((s) => s.trim())
       .filter(Boolean);
     const salaryRaw = String(form.get("desired_salary") || "").trim();
-    const body = {
+    if (talentPoolOptIn && !initial?.talent_pool_opt_in_at && !talentPoolProcessingConsent) {
+      setError(t("profile.talentPoolProcessingConsentRequired"));
+      setSaving(false);
+      return;
+    }
+    const body: Record<string, unknown> = {
       name: String(form.get("name")),
       skills,
       preferred_job_titles,
       experience_years: Number(form.get("experience_years") || 0),
       desired_salary: salaryRaw ? Number(salaryRaw) : null,
       location: String(form.get("location") || "") || null,
-      talent_pool_opt_in: Boolean(form.get("talent_pool_opt_in")),
+      talent_pool_opt_in: talentPoolOptIn,
       cv_processing_consent: form.get("cv_processing_consent") === "on",
       intro_audio_processing_consent: form.get("intro_audio_processing_consent") === "on",
     };
+    if (talentPoolOptIn && !initial?.talent_pool_opt_in_at) {
+      body.talent_pool_processing_consent = talentPoolProcessingConsent;
+    }
     const marketing_emails_opt_in = form.get("marketing_emails_opt_in") === "on";
     try {
       await Promise.all([
@@ -491,9 +508,11 @@ export default function ProfilePage() {
             <label className="flex cursor-pointer items-start gap-3 text-sm">
               <input
                 type="checkbox"
-                name="talent_pool_opt_in"
-                value="on"
-                defaultChecked={Boolean(initial?.talent_pool_opt_in)}
+                checked={talentPoolOptIn}
+                onChange={(e) => {
+                  setTalentPoolOptIn(e.target.checked);
+                  if (!e.target.checked) setTalentPoolProcessingConsent(false);
+                }}
                 className="mt-1 h-4 w-4 shrink-0 rounded border-[var(--twin-border)]"
               />
               <span>
@@ -501,6 +520,24 @@ export default function ProfilePage() {
                 <span className="mt-1 block text-xs text-[var(--twin-muted-strong)]">{t("profile.talentPoolOptInHint")}</span>
               </span>
             </label>
+            {talentPoolOptIn && !initial?.talent_pool_opt_in_at ? (
+              <label className="mt-4 flex cursor-pointer items-start gap-3 border-t border-[var(--twin-border)] pt-4 text-sm">
+                <input
+                  type="checkbox"
+                  checked={talentPoolProcessingConsent}
+                  onChange={(e) => setTalentPoolProcessingConsent(e.target.checked)}
+                  className="mt-1 h-4 w-4 shrink-0 rounded border-[var(--twin-border)]"
+                />
+                <span>
+                  <span className="font-medium text-[var(--foreground)]">
+                    {t("profile.talentPoolProcessingConsentLabel")}
+                  </span>
+                  <span className="mt-1 block text-xs text-[var(--twin-muted-strong)]">
+                    {t("profile.talentPoolProcessingConsentHint")}
+                  </span>
+                </span>
+              </label>
+            ) : null}
           </div>
           {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
           <Button type="submit" disabled={saving || cvBusy || introBusy}>

@@ -61,6 +61,16 @@ from app.services.password_reset import request_password_reset, reset_password_w
 router = APIRouter()
 
 
+def _core_consents_complete(user: User) -> bool:
+    """Privacy + ToS + job-data + AI matching — required for product use (password login + route guard)."""
+    return bool(
+        user.gdpr_consent_at
+        and user.terms_of_service_accepted_at
+        and user.job_data_processing_consent_at
+        and user.ai_matching_consent_at
+    )
+
+
 class WebOAuthProvider(str, Enum):
     google = "google"
     github = "github"
@@ -132,21 +142,28 @@ async def _read_web_oauth_callback(
 
 @router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
 def register(body: UserRegister, db: Session = Depends(get_db)) -> User:
-    if not body.gdpr_consent:
+    if not (
+        body.gdpr_consent
+        and body.terms_of_service_consent
+        and body.job_data_processing_consent
+        and body.ai_matching_consent
+    ):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="GDPR consent is required",
+            detail="All required consents must be accepted (privacy, terms, job data, AI matching)",
         )
     if db.query(User).filter(User.email == body.email).first():
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
+    now = datetime.now(timezone.utc)
     user = User(
         email=body.email,
         hashed_password=hash_password(body.password),
-        gdpr_consent_at=datetime.now(timezone.utc),
+        gdpr_consent_at=now,
+        terms_of_service_accepted_at=now,
+        job_data_processing_consent_at=now,
+        ai_matching_consent_at=now,
         marketing_emails_opt_in=body.marketing_emails_opt_in,
-        marketing_emails_opt_in_at=(
-            datetime.now(timezone.utc) if body.marketing_emails_opt_in else None
-        ),
+        marketing_emails_opt_in_at=(now if body.marketing_emails_opt_in else None),
     )
     db.add(user)
     db.commit()
@@ -190,8 +207,11 @@ def _authenticate(email: str, password: str, db: Session) -> Token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     if not verify_password(password, user.hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
-    if not user.gdpr_consent_at:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="GDPR consent missing")
+    if not _core_consents_complete(user):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Privacy and consent setup incomplete — finish the consent flow in the app.",
+        )
     token = create_access_token(user.email)
     return Token(access_token=token)
 
@@ -207,16 +227,24 @@ def record_gdpr_consent(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> UserOut:
-    if not body.accept_privacy_policy:
+    if not (
+        body.accept_privacy_policy
+        and body.accept_terms_of_service
+        and body.accept_job_data_processing
+        and body.accept_ai_matching
+    ):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Privacy policy acceptance is required",
+            detail="All required consents must be accepted",
         )
-    if user.gdpr_consent_at is None:
-        user.gdpr_consent_at = datetime.now(timezone.utc)
-        db.add(user)
-        db.commit()
-        db.refresh(user)
+    now = datetime.now(timezone.utc)
+    user.gdpr_consent_at = now
+    user.terms_of_service_accepted_at = now
+    user.job_data_processing_consent_at = now
+    user.ai_matching_consent_at = now
+    db.add(user)
+    db.commit()
+    db.refresh(user)
     return UserOut.from_user(user)
 
 

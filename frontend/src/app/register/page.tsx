@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
 import { LinkedInLoginButton } from "@/components/linkedin-login-button";
 import { LinkedInSetupHint } from "@/components/linkedin-setup-hint";
+import { LegalRegionNotice } from "@/components/legal-region-notice";
 import { OAuthWebButtons } from "@/components/oauth-web-buttons";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Input, Label, Shell } from "@/components/ui";
@@ -48,9 +49,12 @@ function RegisterPageContent() {
     e.preventDefault();
     setError(null);
     const form = new FormData(e.currentTarget);
-    const gdpr = form.get("gdpr") === "on";
-    if (!gdpr) {
-      setError(t("register.gdprRequired"));
+    const gdpr = form.get("gdpr_privacy") === "on";
+    const terms = form.get("terms_of_service") === "on";
+    const jobData = form.get("job_data_processing") === "on";
+    const ai = form.get("ai_matching") === "on";
+    if (!gdpr || !terms || !jobData || !ai) {
+      setError(t("register.coreConsentsRequired"));
       return;
     }
     setLoading(true);
@@ -61,6 +65,9 @@ function RegisterPageContent() {
           email: form.get("email"),
           password: form.get("password"),
           gdpr_consent: true,
+          terms_of_service_consent: true,
+          job_data_processing_consent: true,
+          ai_matching_consent: true,
           marketing_emails_opt_in: form.get("marketing_emails_opt_in") === "on",
         }),
       });
@@ -89,14 +96,45 @@ function RegisterPageContent() {
           <Input name="email" type="email" required autoComplete="email" />
           <Label>{t("register.password")}</Label>
           <Input name="password" type="password" required minLength={8} autoComplete="new-password" />
-          <label className="mb-6 flex items-start gap-2 text-sm">
-            <input name="gdpr" type="checkbox" className="mt-1" required />
+          <LegalRegionNotice />
+          <label className="mb-4 flex items-start gap-2 text-sm">
+            <input name="gdpr_privacy" type="checkbox" className="mt-1" required />
             <span>
-              {t("register.gdprBefore")}{" "}
+              {t("register.consentPrivacyBefore")}{" "}
               <Link href="/privacy" className="twin-link underline" target="_blank">
                 {t("register.privacyPolicy")}
-              </Link>{" "}
-              {t("register.gdprAfter")}
+              </Link>
+              {t("register.consentPrivacyAfter")}
+            </span>
+          </label>
+          <label className="mb-4 flex items-start gap-2 text-sm">
+            <input name="terms_of_service" type="checkbox" className="mt-1" required />
+            <span>
+              {t("register.consentTermsBefore")}{" "}
+              <Link href="/terms" className="twin-link underline" target="_blank" rel="noopener noreferrer">
+                {t("register.termsOfService")}
+              </Link>
+              {t("register.consentTermsAfter")}
+            </span>
+          </label>
+          <label className="mb-4 flex items-start gap-2 text-sm">
+            <input name="job_data_processing" type="checkbox" className="mt-1" required />
+            <span>
+              {t("register.consentJobDataBefore")}{" "}
+              <Link href="/privacy" className="twin-link underline" target="_blank">
+                {t("register.privacyPolicy")}
+              </Link>
+              {t("register.consentJobDataAfter")}
+            </span>
+          </label>
+          <label className="mb-6 flex items-start gap-2 text-sm">
+            <input name="ai_matching" type="checkbox" className="mt-1" required />
+            <span>
+              {t("register.consentAiBefore")}{" "}
+              <Link href="/privacy" className="twin-link underline" target="_blank">
+                {t("register.privacyPolicy")}
+              </Link>
+              {t("register.consentAiAfter")}
             </span>
           </label>
           <label className="mb-6 flex items-start gap-2 text-sm">

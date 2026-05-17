@@ -33,6 +33,7 @@ export function resolveNatureVariant(pathname: string): NatureVariant {
   if (p.startsWith("/register")) return "sprout";
   if (p.startsWith("/calculator")) return "growth";
   if (p.startsWith("/privacy")) return "shade";
+  if (p.startsWith("/terms")) return "shade";
   if (p.startsWith("/onboarding-assistant")) return "trail";
   return "meadow";
 }

@@ -34,12 +34,15 @@ def _parse_skills_json(raw: str | None) -> list[str]:
 
 
 def is_talent_pool_validated(user: User, candidate: Candidate) -> bool:
-    """Pool 'validated' badge: GDPR consent, pool opt-in, and substantive profile.
-
-    Substantive means at least three declared skills or non-empty stored CV text
-    (signals the profile is populated enough for serious matching).
-    """
-    if user.gdpr_consent_at is None or not candidate.talent_pool_opt_in:
+    """Pool 'validated' badge: full account consents, pool opt-in with audit timestamp, substantive profile."""
+    if not candidate.talent_pool_opt_in or candidate.talent_pool_opt_in_at is None:
+        return False
+    if (
+        user.gdpr_consent_at is None
+        or user.terms_of_service_accepted_at is None
+        or user.job_data_processing_consent_at is None
+        or user.ai_matching_consent_at is None
+    ):
         return False
     if len(_parse_skills_json(candidate.skills)) >= 3:
         return True
@@ -96,7 +99,14 @@ def list_anonymous_talent_pool(
     rows = (
         db.query(Candidate)
         .join(User, User.id == Candidate.user_id)
-        .filter(Candidate.talent_pool_opt_in.is_(True), User.gdpr_consent_at.isnot(None))
+        .filter(
+            Candidate.talent_pool_opt_in.is_(True),
+            Candidate.talent_pool_opt_in_at.isnot(None),
+            User.gdpr_consent_at.isnot(None),
+            User.terms_of_service_accepted_at.isnot(None),
+            User.job_data_processing_consent_at.isnot(None),
+            User.ai_matching_consent_at.isnot(None),
+        )
         .options(joinedload(Candidate.user))
         .all()
     )

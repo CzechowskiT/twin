@@ -139,6 +139,11 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li>
+                <Link href="/terms" className="twin-link font-medium">
+                  {t("site.footerTerms")}
+                </Link>
+              </li>
+              <li>
                 <button
                   type="button"
                   className="twin-link cursor-pointer font-medium text-left"

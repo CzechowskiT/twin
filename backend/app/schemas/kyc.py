@@ -9,6 +9,12 @@ class KycConfiguredOut(BaseModel):
     configured: bool
 
 
+class AuthologicStartRequest(BaseModel):
+    identity_provider_processing_consent: bool = Field(
+        description="Must be true — Authologic processes identity data per their terms and our Privacy Policy",
+    )
+
+
 class AuthologicStartResponse(BaseModel):
     redirect_url: str
     conversation_id: str

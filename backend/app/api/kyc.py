@@ -5,14 +5,22 @@ from __future__ import annotations
 import logging
 from typing import Annotated
 
+from datetime import datetime, timezone
+
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
 from app.core.deps import get_current_user
-from app.database.models import User
+from app.database.models import IdentityVerification, User
 from app.database.session import get_db
-from app.schemas.kyc import AuthologicStartResponse, KycConfiguredOut, KycStatusOut, KycSyncBody
+from app.schemas.kyc import (
+    AuthologicStartRequest,
+    AuthologicStartResponse,
+    KycConfiguredOut,
+    KycStatusOut,
+    KycSyncBody,
+)
 from app.services import authologic_client
 from app.services import kyc_service
 
@@ -56,15 +64,24 @@ def kyc_status(
 
 @router.post("/authologic/start", response_model=AuthologicStartResponse)
 def authologic_start(
+    body: AuthologicStartRequest,
     user: Annotated[User, Depends(get_current_user)],
     db: Annotated[Session, Depends(get_db)],
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> AuthologicStartResponse:
+    if not body.identity_provider_processing_consent:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Explicit consent is required before starting identity verification.",
+        )
     if not authologic_client.is_authologic_configured(settings):
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Identity verification is not configured on this server.",
         )
+    user.identity_provider_processing_consent_at = datetime.now(timezone.utc)
+    db.add(user)
+    db.commit()
     try:
         row = kyc_service.start_verification_session(db, user, settings)
     except authologic_client.AuthologicClientError as e:

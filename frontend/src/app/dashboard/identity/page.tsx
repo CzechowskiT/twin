@@ -29,6 +29,7 @@ function IdentityPageContent() {
   const [status, setStatus] = useState<KycStatus | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [identityProviderConsent, setIdentityProviderConsent] = useState(false);
 
   const load = useCallback(async (t0: string) => {
     const [cfg, st] = await Promise.all([
@@ -75,10 +76,21 @@ function IdentityPageContent() {
 
   async function onStart() {
     if (!token) return;
+    if (!identityProviderConsent) {
+      setError(t("dashboard.identityProviderConsentRequired"));
+      return;
+    }
     setBusy("start");
     setError(null);
     try {
-      const res = await apiFetch<StartResp>("/api/v1/kyc/authologic/start", { method: "POST" }, token);
+      const res = await apiFetch<StartResp>(
+        "/api/v1/kyc/authologic/start",
+        {
+          method: "POST",
+          body: JSON.stringify({ identity_provider_processing_consent: true }),
+        },
+        token,
+      );
       window.location.assign(res.redirect_url);
     } catch (e) {
       setError(e instanceof Error ? e.message : t("dashboard.identityError"));
@@ -145,11 +157,26 @@ function IdentityPageContent() {
               </p>
             ) : null}
           </div>
+          <label className="mb-4 flex cursor-pointer items-start gap-3 text-sm">
+            <input
+              type="checkbox"
+              checked={identityProviderConsent}
+              onChange={(e) => {
+                setIdentityProviderConsent(e.target.checked);
+                if (e.target.checked) setError(null);
+              }}
+              className="mt-1 h-4 w-4 shrink-0 rounded border-[var(--twin-border)]"
+            />
+            <span>
+              <span className="font-medium text-[var(--foreground)]">{t("dashboard.identityProviderConsentLabel")}</span>
+              <span className="twin-muted mt-1 block text-xs">{t("dashboard.identityProviderConsentHint")}</span>
+            </span>
+          </label>
           <div className="flex flex-col gap-2 sm:flex-row">
             <Button
               type="button"
               className="twin-touch-target"
-              disabled={!configured || busy !== null}
+              disabled={!configured || busy !== null || !identityProviderConsent}
               onClick={() => void onStart()}
             >
               {busy === "start" ? "…" : t("dashboard.identityStart")}

@@ -8,7 +8,14 @@ from pydantic import BaseModel, EmailStr, Field
 class UserRegister(BaseModel):
     email: EmailStr
     password: str = Field(min_length=8, max_length=128)
-    gdpr_consent: bool = Field(description="Must accept privacy policy")
+    gdpr_consent: bool = Field(description="Privacy policy — personal data processing for the service")
+    terms_of_service_consent: bool = Field(description="Terms of Service acceptance")
+    job_data_processing_consent: bool = Field(
+        description="Use of third-party job listing data for your personalised feed and applications",
+    )
+    ai_matching_consent: bool = Field(
+        description="AI-assisted matching (e.g. scoring) using your profile and listings",
+    )
     marketing_emails_opt_in: bool = Field(
         default=False,
         description="Optional: product updates and tips by email (separate legal basis).",
@@ -35,7 +42,10 @@ class Token(BaseModel):
 
 
 class GdprConsentIn(BaseModel):
-    accept_privacy_policy: bool = Field(description="Must be true to record GDPR consent")
+    accept_privacy_policy: bool = Field(description="Privacy policy for personal data")
+    accept_terms_of_service: bool = Field(description="Terms of Service")
+    accept_job_data_processing: bool = Field(description="Third-party job listings for your account")
+    accept_ai_matching: bool = Field(description="AI-assisted job matching")
 
 
 class UserMarketingPreference(BaseModel):
@@ -46,6 +56,10 @@ class UserOut(BaseModel):
     id: int
     email: EmailStr
     gdpr_consent_at: datetime | None
+    terms_of_service_accepted_at: datetime | None = None
+    job_data_processing_consent_at: datetime | None = None
+    ai_matching_consent_at: datetime | None = None
+    identity_provider_processing_consent_at: datetime | None = None
     marketing_emails_opt_in: bool = False
     marketing_emails_opt_in_at: datetime | None = None
     linkedin_connected: bool = False
@@ -62,6 +76,12 @@ class UserOut(BaseModel):
             id=user.id,
             email=user.email,
             gdpr_consent_at=user.gdpr_consent_at,
+            terms_of_service_accepted_at=getattr(user, "terms_of_service_accepted_at", None),
+            job_data_processing_consent_at=getattr(user, "job_data_processing_consent_at", None),
+            ai_matching_consent_at=getattr(user, "ai_matching_consent_at", None),
+            identity_provider_processing_consent_at=getattr(
+                user, "identity_provider_processing_consent_at", None
+            ),
             marketing_emails_opt_in=bool(getattr(user, "marketing_emails_opt_in", False)),
             marketing_emails_opt_in_at=getattr(user, "marketing_emails_opt_in_at", None),
             linkedin_connected=bool(getattr(user, "linkedin_id", None)),

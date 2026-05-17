@@ -14,6 +14,10 @@ class CandidateCreate(BaseModel):
     desired_salary: int | None = Field(default=None, ge=0)
     location: str | None = Field(default=None, max_length=100)
     talent_pool_opt_in: bool = False
+    talent_pool_processing_consent: bool = Field(
+        default=False,
+        description="Required when talent_pool_opt_in is true — B2B anonymised pool per Privacy Policy",
+    )
 
 
 class CandidateUpdate(BaseModel):
@@ -24,6 +28,10 @@ class CandidateUpdate(BaseModel):
     desired_salary: int | None = Field(default=None, ge=0)
     location: str | None = Field(default=None, max_length=100)
     talent_pool_opt_in: bool | None = None
+    talent_pool_processing_consent: bool | None = Field(
+        default=None,
+        description="When enabling talent pool, must be true on the same request",
+    )
     cv_processing_consent: bool | None = None
     intro_audio_processing_consent: bool | None = None
 
@@ -37,6 +45,7 @@ class CandidateOut(BaseModel):
     desired_salary: int | None
     location: str | None
     talent_pool_opt_in: bool = False
+    talent_pool_opt_in_at: datetime | None = None
     has_cv: bool = False
     cv_filename: str | None = None
     cv_uploaded_at: datetime | None = None
