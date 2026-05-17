@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRef } from "react";
 
-import { SocialIconRow } from "@/components/social-icon-row";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useTranslation } from "@/components/language-provider";
 import { PersonaSwitcher } from "@/components/persona-switcher";
@@ -103,7 +102,6 @@ export function Header() {
             <PersonaSwitcher />
             <LanguageSwitcher />
           </div>
-          <SocialIconRow variant="header" compact className="w-full justify-end" />
         </div>
 
         <div className="flex w-full basis-full flex-col items-stretch gap-y-2 border-t border-[var(--twin-border)]/60 py-2 md:hidden">
@@ -175,7 +173,6 @@ export function Header() {
               </nav>
             </details>
           </div>
-          <SocialIconRow variant="header" inline compact className="justify-center" />
         </div>
       </div>
     </header>

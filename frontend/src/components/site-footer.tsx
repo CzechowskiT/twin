@@ -3,7 +3,6 @@
 import Link from "next/link";
 
 import { useTranslation } from "@/components/language-provider";
-import { CompanySocialStrip } from "@/components/company-social-strip";
 import { clearCookieConsent } from "@/lib/cookie-consent";
 
 const SOCIAL_LINKEDIN = "https://www.linkedin.com";
@@ -136,9 +135,6 @@ export function SiteFooter() {
               </li>
             </ul>
           </div>
-        </div>
-        <div className="mt-10 w-full">
-          <CompanySocialStrip />
         </div>
         <p className="mt-10 border-t border-[var(--twin-border)] pt-6 text-center text-xs text-[var(--twin-muted)]">
           {t("site.footerRights")}
