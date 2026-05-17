@@ -48,7 +48,7 @@ export function LandingVacationTest() {
                   </li>
                 ))}
               </ul>
-              <p className="mt-6 border-t border-[var(--twin-border)] pt-4 text-sm font-semibold text-amber-950/90">
+              <p className="mt-6 border-t border-[var(--twin-border)] pt-4 text-sm font-semibold text-[var(--foreground)]">
                 {t("home.vacationResultWithout")}
               </p>
             </div>
