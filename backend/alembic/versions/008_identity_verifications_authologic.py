@@ -6,7 +6,8 @@ import sqlalchemy as sa
 from alembic import op
 from sqlalchemy import inspect
 
-revision: str = "008_identity_verifications_authologic"
+# Keep <= 32 chars: PostgreSQL alembic_version.version_num is VARCHAR(32).
+revision: str = "008_identity_verif_authologic"
 down_revision: Union[str, None] = "007_candidate_talent_pool_opt_in"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None

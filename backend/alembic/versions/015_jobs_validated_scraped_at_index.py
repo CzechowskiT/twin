@@ -4,7 +4,7 @@ from typing import Sequence, Union
 
 from alembic import op
 
-revision: str = "015_jobs_validated_scraped_at_index"
+revision: str = "015_jobs_val_scraped_at_idx"
 down_revision: Union[str, None] = "014_scheduled_interviews"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None

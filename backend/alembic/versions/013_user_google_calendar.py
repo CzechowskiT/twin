@@ -6,7 +6,7 @@ import sqlalchemy as sa
 from alembic import op
 
 revision: str = "013_user_google_calendar"
-down_revision: Union[str, None] = "012_application_recruiter_feedback"
+down_revision: Union[str, None] = "012_app_recruiter_feedback"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

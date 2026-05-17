@@ -5,8 +5,8 @@ from typing import Sequence, Union
 import sqlalchemy as sa
 from alembic import op
 
-revision: str = "009_gdpr_processing_marketing_prefs"
-down_revision: Union[str, None] = "008_identity_verifications_authologic"
+revision: str = "009_gdpr_proc_marketing_prefs"
+down_revision: Union[str, None] = "008_identity_verif_authologic"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
