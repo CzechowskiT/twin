@@ -9,6 +9,14 @@ def client():
     return TestClient(app)
 
 
+def test_jurisdiction_hint_uae(client: TestClient):
+    r = client.get("/api/v1/geo/jurisdiction-hint", headers={"CF-IPCountry": "AE"})
+    assert r.status_code == 200
+    data = r.json()
+    assert data["country_code"] == "AE"
+    assert data["legal_region"] == "UAE"
+
+
 def test_jurisdiction_hint_cf_header(client: TestClient):
     r = client.get(
         "/api/v1/geo/jurisdiction-hint",

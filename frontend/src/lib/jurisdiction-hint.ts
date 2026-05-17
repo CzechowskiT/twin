@@ -1,6 +1,6 @@
 import { apiFetch } from "@/lib/api";
 
-export type LegalRegion = "EU_EEA" | "UK" | "US" | "CH" | "JP" | "CN" | "OTHER";
+export type LegalRegion = "EU_EEA" | "UK" | "US" | "CH" | "JP" | "CN" | "UAE" | "OTHER";
 
 export type JurisdictionHint = {
   country_code: string | null;
@@ -8,11 +8,31 @@ export type JurisdictionHint = {
   source: string;
 };
 
-const LEGAL_REGIONS = new Set<LegalRegion>(["EU_EEA", "UK", "US", "CH", "JP", "CN", "OTHER"]);
+const LEGAL_REGIONS = new Set<LegalRegion>(["EU_EEA", "UK", "US", "CH", "JP", "CN", "UAE", "OTHER"]);
 
 export function normalizeLegalRegion(value: string): LegalRegion {
   const v = value.toUpperCase();
   return LEGAL_REGIONS.has(v as LegalRegion) ? (v as LegalRegion) : "OTHER";
+}
+
+const hintCache = new Map<string, Promise<JurisdictionHint>>();
+
+function hintCacheKey(opts?: { lat?: number; lon?: number }): string {
+  if (opts?.lat != null && opts?.lon != null) {
+    return `coords:${opts.lat.toFixed(4)},${opts.lon.toFixed(4)}`;
+  }
+  return "network";
+}
+
+/** Dedupe parallel calls (register notice + privacy page in one session). */
+export function getJurisdictionHintCached(opts?: { lat?: number; lon?: number }): Promise<JurisdictionHint> {
+  const key = hintCacheKey(opts);
+  let p = hintCache.get(key);
+  if (!p) {
+    p = fetchJurisdictionHint(opts);
+    hintCache.set(key, p);
+  }
+  return p;
 }
 
 /** Unauthenticated — used on register / consent before login. */

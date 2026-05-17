@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "@/components/language-provider";
 import { Button } from "@/components/ui";
 import {
-  fetchJurisdictionHint,
+  getJurisdictionHintCached,
   normalizeLegalRegion,
   type JurisdictionHint,
   type LegalRegion,
@@ -16,6 +16,7 @@ function bodyKey(region: LegalRegion): TranslationKey {
   const m: Record<LegalRegion, TranslationKey> = {
     EU_EEA: "legalRegion.bodyEU_EEA",
     UK: "legalRegion.bodyUK",
+    UAE: "legalRegion.bodyUAE",
     US: "legalRegion.bodyUS",
     CH: "legalRegion.bodyCH",
     JP: "legalRegion.bodyJP",
@@ -44,8 +45,8 @@ export function LegalRegionNotice() {
 
   useEffect(() => {
     let cancelled = false;
-    void fetchJurisdictionHint()
-      .then((h) => {
+    void getJurisdictionHintCached()
+      .then((h: JurisdictionHint) => {
         if (!cancelled) load(h);
       })
       .catch(() => {
@@ -65,7 +66,7 @@ export function LegalRegionNotice() {
     setBusy(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        void fetchJurisdictionHint({
+        void getJurisdictionHintCached({
           lat: pos.coords.latitude,
           lon: pos.coords.longitude,
         })
@@ -75,7 +76,7 @@ export function LegalRegionNotice() {
           })
           .catch(async () => {
             try {
-              const h = await fetchJurisdictionHint();
+              const h = await getJurisdictionHintCached();
               load(h);
               setGeoMsg(t("legalRegion.refineUsedNetworkHint"));
             } catch {
@@ -98,7 +99,7 @@ export function LegalRegionNotice() {
 
   return (
     <section
-      className="mb-6 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/50 p-4 text-sm"
+      className="mb-6 space-y-3 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/50 p-4 text-sm"
       aria-labelledby="legal-region-title"
     >
       <h2 id="legal-region-title" className="mb-2 text-base font-semibold text-[var(--foreground)]">

@@ -52,6 +52,8 @@ def country_to_legal_region(country: str | None) -> str:
         return "JP"
     if cc == "CN":
         return "CN"
+    if cc == "AE":
+        return "UAE"
     return "OTHER"
 
 

@@ -81,6 +81,7 @@ export type TranslationKey =
   | `privacy.${keyof typeof en.privacy}`
   | `terms.${keyof typeof en.terms}`
   | `legalRegion.${keyof typeof en.legalRegion}`
+  | `legalDoc.${keyof typeof en.legalDoc}`
   | `cookies.${keyof typeof en.cookies}`
   | `common.${keyof typeof en.common}`
   | `persona.${keyof typeof en.persona}`
@@ -860,6 +861,8 @@ const en = {
   privacy: {
     title: "Privacy Policy (MVP)",
     updated: "Last updated: May 2026",
+    loadingMarkdown: "Loading jurisdiction-specific privacy text…",
+    loadMarkdownError: "Could not load the privacy file. Try again shortly.",
     collectTitle: "What we collect",
     collect1: "Account email and password (hashed)",
     collect2: "Career profile: skills, experience, salary expectations, location",
@@ -898,7 +901,7 @@ const en = {
   legalRegion: {
     title: "Location-based legal defaults",
     lead:
-      "We estimate your region to show the right legal context. This is not a determination of your citizenship or tax residence. Tick the boxes that apply to you.",
+      "We estimate your region so we can apply the right legal context and show the matching full privacy / terms text. This is not a determination of citizenship or tax residence. You must still tick the consents that apply to you.",
     sourceCloudflare: "Region from network edge (CDN).",
     sourceIp: "Region from IP address lookup.",
     sourceCoordinates: "Region from device coordinates you allowed.",
@@ -922,8 +925,25 @@ const en = {
       "Japan: the Act on the Protection of Personal Information (APPI) may apply to our processing. You may have rights to disclosure, correction, and cessation of use.",
     bodyCN:
       "China: if you access the Service from mainland China, the Personal Information Protection Law (PIPL) and related rules may impose additional requirements on cross-border transfers and consent.",
+    bodyUAE:
+      "United Arab Emirates: Federal Decree-Law No. 45 of 2021 on the Protection of Personal Data (UAE PDPL) may apply. The full privacy text below is offered in Arabic (default) and English for the UAE when we estimate you are in the Emirates.",
     bodyOTHER:
       "General: local employment, consumer, and privacy laws may apply. If mandatory law conflicts with any clause, mandatory law prevails.",
+  },
+  legalDoc: {
+    notLegalAdvice:
+      "This page is for transparency. It is not legal advice. Mandatory laws where you live override any conflicting wording.",
+    detectingRegion: "Detecting your region to pick the correct full document…",
+    privacyBannerPrefix: "Full privacy text matched to estimated country",
+    privacyBannerMiddle: "and legal region",
+    privacyBannerSuffix:
+      ". The document language follows local practice (for example Arabic in the UAE), not necessarily the language of the rest of the site.",
+    openAeEnglish: "Open English (UAE) full text",
+    openAeArabic: "النسخة العربية الكاملة (الإمارات)",
+    termsBannerPrefix: "Full terms matched to estimated country",
+    termsBannerMiddle: "and legal region",
+    termsBannerSuffix:
+      ". The document language follows local practice where we provide a localised file (for example Arabic in the UAE).",
   },
   cookies: {
     ariaRegion: "Cookie consent",
@@ -1786,6 +1806,8 @@ const pl: MessageTree = {
   privacy: {
     title: "Polityka prywatności (MVP)",
     updated: "Ostatnia aktualizacja: maj 2026",
+    loadingMarkdown: "Ładowanie pełnego tekstu polityki pod Twój region prawny…",
+    loadMarkdownError: "Nie udało się wczytać pliku polityki. Spróbuj ponownie za chwilę.",
     collectTitle: "Co zbieramy",
     collect1: "E-mail konta i hasło (w postaci hash)",
     collect2: "Profil kariery: umiejętności, doświadczenie, oczekiwania płacowe, lokalizacja",
@@ -1824,7 +1846,7 @@ const pl: MessageTree = {
   legalRegion: {
     title: "Dopasowanie przepisów do regionu",
     lead:
-      "Szacujemy Twój region, by pokazać właściwy kontekst prawny. To nie jest ustalenie obywatelstwa ani rezydencji podatkowej. I tak musisz zaznaczyć zgody, które Cię dotyczą.",
+      "Szacujemy Twój region, żeby zastosować właściwy kontekst prawny i pokazać dopasowany pełny tekst polityki oraz regulaminu. To nie jest ustalenie obywatelstwa ani rezydencji podatkowej. Musisz nadal zaznaczyć zgody, które Cię dotyczą.",
     sourceCloudflare: "Region z krawędzi sieci (CDN).",
     sourceIp: "Region z wyszukiwania po adresie IP.",
     sourceCoordinates: "Region z współrzędnych urządzenia po Twojej zgodzie.",
@@ -1848,8 +1870,25 @@ const pl: MessageTree = {
       "Japonia: APPI może mieć zastosowanie do przetwarzania; mogą przysługiwać m.in. prawo do ujawnienia, sprostowania i zaprzestania użycia.",
     bodyCN:
       "Chiny: jeśli korzystasz z Chin kontynentalnych, PIPL i powiązane akty mogą nakładać dodatkowe wymogi co do transferów transgranicznych i zgód.",
+    bodyUAE:
+      "Zjednoczone Emiraty Arabskie: może mieć zastosowanie federalna ustawa z dekretu nr 45 z 2021 r. o ochronie danych osobowych (PDPL ZEA). Pełny tekst polityki poniżej udostępniamy po arabsku (domyślnie) i po angielsku dla ZEA, gdy szacujemy, że jesteś w Emiratach.",
     bodyOTHER:
       "Ogólnie: lokalne przepisy pracy, konsumenckie i o ochronie danych mogą mieć zastosowanie. Gdy przepis bezwzględnie obowiązujący jest sprzeczny z postanowieniem, pierwszeństwo ma przepis.",
+  },
+  legalDoc: {
+    notLegalAdvice:
+      "Ta strona służy przejrzystości; to nie jest porada prawna. Bezwzględnie obowiązujące przepisy tam, gdzie mieszkasz, mają pierwszeństwo przed sprzecznym brzmieniem.",
+    detectingRegion: "Wykrywamy region, żeby dobrać właściwy pełny dokument…",
+    privacyBannerPrefix: "Pełny tekst polityki dopasowany do szacowanego kraju",
+    privacyBannerMiddle: "i regionu prawnego",
+    privacyBannerSuffix:
+      ". Język dokumentu wynika z lokalnej praktyki (np. arabski w ZEA), a niekoniecznie z języka reszty serwisu.",
+    openAeEnglish: "Otwórz pełny tekst po angielsku (ZEA)",
+    openAeArabic: "النسخة العربية الكاملة (الإمارات)",
+    termsBannerPrefix: "Pełny regulamin dopasowany do szacowanego kraju",
+    termsBannerMiddle: "i regionu prawnego",
+    termsBannerSuffix:
+      ". Język dokumentu wynika z lokalnej praktyki tam, gdzie udostępniamy plik zlokalizowany (np. arabski w ZEA).",
   },
   cookies: {
     ariaRegion: "Zgoda na pliki cookie",

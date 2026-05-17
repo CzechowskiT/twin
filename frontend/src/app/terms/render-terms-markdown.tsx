@@ -1,5 +1,15 @@
 import type { ReactNode } from "react";
 
+function slugHeadingId(title: string): string {
+  const ascii = title
+    .normalize("NFKD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return ascii.length > 0 ? ascii : "";
+}
+
 function formatInline(text: string): ReactNode {
   const parts = text.split(/(\*\*[^*]+\*\*)/g);
   return parts.map((part, idx) => {
@@ -50,9 +60,17 @@ export function renderTermsMarkdown(md: string): ReactNode {
     }
     if (line.startsWith("## ")) {
       flushList();
+      const raw = line.slice(3).trim();
+      const idMatch = /^(.+?)\s*\{#([^}]+)\}\s*$/.exec(raw);
+      const title = (idMatch ? idMatch[1] : raw).trim();
+      const anchorId = idMatch ? idMatch[2].trim() : slugHeadingId(title);
       elements.push(
-        <h2 key={`h2-${k++}`} className="mb-3 mt-10 scroll-mt-20 text-xl font-semibold text-[var(--foreground)]">
-          {formatInline(line.slice(3).trim())}
+        <h2
+          key={`h2-${k++}`}
+          id={anchorId || undefined}
+          className="mb-3 mt-10 scroll-mt-20 text-xl font-semibold text-[var(--foreground)]"
+        >
+          {formatInline(title)}
         </h2>,
       );
       continue;
