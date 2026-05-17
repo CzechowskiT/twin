@@ -15,6 +15,11 @@ class PlanOut(BaseModel):
         description="Null means unlimited tracked applications (non-rejected).",
     )
     stripe_price_configured: bool = False
+    monthly_list_price_usd: float = Field(
+        ...,
+        ge=0,
+        description="Marketing list price per month in USD for UI; Stripe Checkout uses configured price IDs.",
+    )
 
 
 class PlansPublicResponse(BaseModel):

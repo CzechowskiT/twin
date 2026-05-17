@@ -82,6 +82,7 @@ export function TwinRoiCalculator() {
   const [numberOfHires, setNumberOfHires] = useState(50);
   const [hrHoursSaved, setHrHoursSaved] = useState(100);
   const [hrHourlyRate, setHrHourlyRate] = useState(50);
+  const [recruiterSeats, setRecruiterSeats] = useState(3);
 
   const monthlySalary = annualSalary / 12;
   const agencyFee = annualSalary * (agencyFeePercent / 100);
@@ -101,6 +102,10 @@ export function TwinRoiCalculator() {
   const totalEnterpriseValue = timeValueSavings + costSavings;
   const enterpriseROI =
     integrationFee > 0 ? (((totalEnterpriseValue - integrationFee) / integrationFee) * 100).toFixed(1) : null;
+
+  const workspaceListSeatUsd = 99.99;
+  const workspaceMonthlyUsd = recruiterSeats * workspaceListSeatUsd;
+  const workspaceAnnualUsd = workspaceMonthlyUsd * 12;
 
   const inputClass =
     "w-full min-w-0 rounded border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-3 py-2 text-lg font-semibold text-[var(--foreground)] focus:border-[var(--twin-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--twin-accent)]/20 sm:text-xl";
@@ -308,6 +313,63 @@ export function TwinRoiCalculator() {
             </ul>
           </section>
         </div>
+
+        <section className="twin-card-panel mb-6 rounded-2xl border border-[var(--twin-border)] p-5 sm:p-8">
+          <h2 className="twin-section-title mb-3 text-lg sm:text-xl">{t("calculator.workspaceIntegrationsTitle")}</h2>
+          <p className="max-w-3xl text-sm leading-relaxed text-[var(--twin-muted-strong)]">
+            {t("calculator.workspaceIntegrationsLead")}
+          </p>
+          <div className="mt-6 grid gap-6 lg:grid-cols-2">
+            <div className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/60 p-4 sm:p-5">
+              <div className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
+                {t("calculator.workspaceSeatPriceLabel")}
+              </div>
+              <p className="mt-2 text-2xl font-bold text-[var(--foreground)]">{t("calculator.workspaceSeatPriceValue")}</p>
+              <label className="mt-6 block">
+                <span className="mb-1.5 block text-sm font-medium text-[var(--twin-muted-strong)]">
+                  {t("calculator.workspaceSeatCount")}
+                </span>
+                <input
+                  type="number"
+                  min={1}
+                  step={1}
+                  value={recruiterSeats}
+                  onChange={(e) => setRecruiterSeats(Math.max(1, Math.floor(Number(e.target.value)) || 1))}
+                  className={inputClass}
+                />
+              </label>
+              <p className="mt-2 text-xs leading-relaxed text-[var(--twin-muted)]">{t("calculator.workspaceSeatHint")}</p>
+            </div>
+            <div className="flex flex-col justify-center gap-5 rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface)] p-4 sm:p-5">
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
+                  {t("calculator.workspaceMonthlyTotal")}
+                </div>
+                <p className="mt-1 text-2xl font-bold text-[var(--twin-link)]">
+                  {formatMoney(workspaceMonthlyUsd, locale, "USD")}
+                </p>
+              </div>
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
+                  {t("calculator.workspaceAnnualTotal")}
+                </div>
+                <p className="mt-1 text-2xl font-bold text-[var(--twin-link)]">
+                  {formatMoney(workspaceAnnualUsd, locale, "USD")}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="mt-6">
+            <h3 className="text-sm font-semibold text-[var(--foreground)]">{t("calculator.workspaceScopeTitle")}</h3>
+            <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed text-[var(--twin-muted-strong)]">
+              <li>{t("calculator.workspaceScope1")}</li>
+              <li>{t("calculator.workspaceScope2")}</li>
+              <li>{t("calculator.workspaceScope3")}</li>
+              <li>{t("calculator.workspaceScope4")}</li>
+            </ul>
+          </div>
+          <p className="mt-5 text-xs leading-relaxed text-[var(--twin-muted)]">{t("calculator.workspaceFoot")}</p>
+        </section>
 
         <section className="twin-card-panel rounded-2xl border border-amber-200/80 bg-gradient-to-b from-amber-50/50 to-[var(--twin-card)] p-5 sm:p-8">
           <h2 className="twin-section-title mb-6 text-lg sm:text-xl">{t("calculator.enterpriseTitle")}</h2>

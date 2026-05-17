@@ -307,6 +307,51 @@ export default function DashboardCalendarPage() {
         </Link>
       </div>
 
+      <Card className="mb-6">
+        <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
+          {t("dashboard.calendarProvidersEyebrow")}
+        </p>
+        <ul className="mt-4 grid list-none gap-3 p-0 sm:grid-cols-2 lg:grid-cols-4">
+          <li className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/80 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.calendarProviderGoogleTitle")}</span>
+              <span className="shrink-0 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-300">
+                {t("dashboard.calendarStatusLive")}
+              </span>
+            </div>
+            <p className="mt-2 text-xs leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.calendarProviderGoogleBody")}</p>
+          </li>
+          <li className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/50 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.calendarProviderMicrosoftTitle")}</span>
+              <span className="shrink-0 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-800 dark:text-amber-200">
+                {t("dashboard.calendarStatusPlanned")}
+              </span>
+            </div>
+            <p className="mt-2 text-xs leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.calendarProviderMicrosoftBody")}</p>
+          </li>
+          <li className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/50 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.calendarProviderAppleTitle")}</span>
+              <span className="shrink-0 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-800 dark:text-amber-200">
+                {t("dashboard.calendarStatusPlanned")}
+              </span>
+            </div>
+            <p className="mt-2 text-xs leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.calendarProviderAppleBody")}</p>
+          </li>
+          <li className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/50 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.calendarProviderOtherTitle")}</span>
+              <span className="shrink-0 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-800 dark:text-amber-200">
+                {t("dashboard.calendarStatusPlanned")}
+              </span>
+            </div>
+            <p className="mt-2 text-xs leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.calendarProviderOtherBody")}</p>
+          </li>
+        </ul>
+        <p className="twin-muted mt-4 text-xs leading-relaxed">{t("dashboard.calendarProvidersFoot")}</p>
+      </Card>
+
       {banner === "connected" ? (
         <Card variant="soft" className="mb-4 border-emerald-200/80 bg-emerald-50/90 text-emerald-950 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-50">
           <p className="text-sm font-medium">{t("dashboard.calendarConnected")}</p>

@@ -56,6 +56,21 @@ export const SITE_MESSAGES_EN = {
     "We prioritize partners who share standards on listing quality, rate limits, and candidate consent. If you represent a board or HR platform, reach out via Contact with “Partnership” in the subject and your API or data-sharing posture.",
   partnersNote:
     "Logos shown on the home marquee are illustrative of the global hiring landscape and are not partnership endorsements unless separately announced.",
+  partnersReferencesTitle: "Written references",
+  partnersReferencesLead:
+    "Letters of recommendation, security or procurement attestations, and signed integration summaries from partners who agree to publish them.",
+  partnersReferencesPlaceholder:
+    "References will appear here after partner approval and a short legal review. If you are an existing partner and want a letter listed, mention it in your Contact thread.",
+  partnersUseCasesTitle: "Partner use cases",
+  partnersUseCasesLead:
+    "Integration narratives: traffic sources, consent and data contracts, SLAs, and what shipped in phase one versus later phases.",
+  partnersUseCasesPlaceholder:
+    "Partner-specific write-ups will be published here as integrations go live and both sides sign off on public wording.",
+  partnersTestimonialsTitle: "Testimonials",
+  partnersTestimonialsLead:
+    "Short quotes from partner product, engineering, or talent leaders who co-built the integration with TWIN.",
+  partnersTestimonialsPlaceholder:
+    "Testimonials will be added when partners approve attributed quotes. Anonymous endorsements are not listed on this page.",
 
   casesTitle: "Case studies",
   casesLead: "Anonymized scenarios aligned with workflows the MVP already supports or is explicitly building toward.",
@@ -89,12 +104,17 @@ export const SITE_MESSAGES_EN = {
   headerSocialAria: "TWIN on social media",
   footerFollowTitle: "Follow TWIN",
   footerFollowLead:
-    "YouTube, Instagram, X, Facebook, and Twitter. Configure NEXT_PUBLIC_SOCIAL_* in your environment; icons appear as placeholders until each URL is set.",
-  footerSocialSoonHint: "Social link not configured yet.",
+    "YouTube, Instagram, X, Facebook, and Twitter. Each icon opens the official site; set NEXT_PUBLIC_SOCIAL_* to point to TWIN’s profiles instead of the generic homepages.",
   footerYoutubeAria: "TWIN on YouTube",
+  footerYoutubeOfficialAria: "YouTube — official website",
   footerInstagramAria: "TWIN on Instagram",
+  footerInstagramOfficialAria: "Instagram — official website",
   footerFacebookAria: "TWIN on Facebook",
+  footerFacebookOfficialAria: "Facebook — official website",
   footerTwitterAria: "TWIN on Twitter",
+  footerTwitterOfficialAria: "Twitter — official website",
+  footerXOfficialAria: "X — official website",
+  marqueeBrandLinkSuffix: " — official website",
 
   momentumAria: "Tips and shortcuts",
   momentumEyebrow: "Keep momentum",
@@ -171,6 +191,21 @@ export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } 
     "Priorytet mają partnerzy z podobnymi standardami jakości ogłoszeń, limitów zapytań i zgody kandydata. Jeśli reprezentujesz portal lub platformę HR, napisz z Kontaktu z tematem „Partnership” i informacją o API lub udostępnianiu danych.",
   partnersNote:
     "Logotypy na stronie głównej ilustrują globalny krajobraz rekrutacji i nie oznaczają partnerstwa, dopóki nie ogłosimy tego osobno.",
+  partnersReferencesTitle: "Referencje pisemne",
+  partnersReferencesLead:
+    "Listy referencyjne, poświadczenia bezpieczeństwa lub zakupów oraz podsumowania integracji od partnerów, którzy wyrażą zgodę na publikację.",
+  partnersReferencesPlaceholder:
+    "Referencje pojawią się tu po akceptacji partnera i krótkiej weryfikacji prawnej. Jeśli jesteś partnerem i chcesz opublikować list, napisz o tym w wątku z Kontaktu.",
+  partnersUseCasesTitle: "Przypadki użycia z partnerami",
+  partnersUseCasesLead:
+    "Opisy integracji: źródła ruchu, zgody i umowy danych, SLA oraz to, co trafiło do pierwszej fazy wdrożenia a co zaplanowano na później.",
+  partnersUseCasesPlaceholder:
+    "Materiały pod konkretnych partnerów opublikujemy tutaj, gdy integracje wejdą na produkcję i obie strony zaakceptują publiczne brzmienie tekstu.",
+  partnersTestimonialsTitle: "Testimoniale",
+  partnersTestimonialsLead:
+    "Krótkie cytaty od osób odpowiedzialnych za produkt, inżynierię lub talent po stronie partnera, które współtworzyły integrację z TWIN.",
+  partnersTestimonialsPlaceholder:
+    "Testimoniale dodamy, gdy partner zaakceptuje cytat z imieniem i nazwiskiem lub stanowiskiem. Nie publikujemy tu anonimowych pochwał.",
 
   casesTitle: "Studia przypadków",
   casesLead: "Scenariusze zanonimizowane, zgodne z tym, co MVP już wspiera lub jawnie buduje.",
@@ -204,12 +239,17 @@ export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } 
   headerSocialAria: "TWIN w mediach społecznościowych",
   footerFollowTitle: "Obserwuj TWIN",
   footerFollowLead:
-    "YouTube, Instagram, X, Facebook i Twitter. Ustaw w środowisku zmienne NEXT_PUBLIC_SOCIAL_*; ikony są widoczne jako placeholdery, dopóki nie podasz URL.",
-  footerSocialSoonHint: "Link do social mediów jeszcze nie ustawiony.",
+    "YouTube, Instagram, X, Facebook i Twitter. Każda ikona otwiera stronę oficjalną; ustaw NEXT_PUBLIC_SOCIAL_* jeśli chcesz prowadzić do profili TWIN zamiast do stron głównych serwisów.",
   footerYoutubeAria: "TWIN na YouTube",
+  footerYoutubeOfficialAria: "YouTube — strona oficjalna",
   footerInstagramAria: "TWIN na Instagramie",
+  footerInstagramOfficialAria: "Instagram — strona oficjalna",
   footerFacebookAria: "TWIN na Facebooku",
+  footerFacebookOfficialAria: "Facebook — strona oficjalna",
   footerTwitterAria: "TWIN na Twitterze",
+  footerTwitterOfficialAria: "Twitter — strona oficjalna",
+  footerXOfficialAria: "X — strona oficjalna",
+  marqueeBrandLinkSuffix: " — strona oficjalna",
 
   momentumAria: "Podpowiedzi i skróty",
   momentumEyebrow: "Utrzymaj tempo",

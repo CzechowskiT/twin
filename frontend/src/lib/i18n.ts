@@ -119,7 +119,7 @@ const en = {
   },
   home: {
     tagline: "AI career twin. The market keeps moving when you step away.",
-    title: "You live in real life. Your pipeline doesn’t clock out.",
+    title: "You live in real life. Sometimes you need a pause. Your pipeline doesn’t clock out.",
     heroHook:
       "Let the listings find you. Step away, come back, and the tedious parts have already moved.",
     description:
@@ -478,17 +478,42 @@ const en = {
     billingPmKlarna: "Klarna",
     billingPmAffirm: "Affirm",
     billingPmGeneric: "Other (Stripe)",
+    billingPerMonth: "/ month",
+    billingListPricesNote:
+      "Prices in USD before tax. Checkout is powered by Stripe; your invoice may show proration or local tax.",
+    billingPlanCurrent: "Current plan",
+    billingPlanOpenWorkspace: "Open workspace",
+    billingPlanUpgradeCta: "Upgrade via Stripe",
+    billingPlanIncludedFree: "Included — no card required.",
+    billingPlanProPending: "Pro price is not wired to Stripe on this deployment yet.",
     identityLink: "Identity (KYC)",
     calendarLink: "Calendar",
-    calendarPageTitle: "Google Calendar",
+    calendarPageTitle: "Calendars & availability",
     calendarPageLead:
-      "Connect your primary Google calendar so TWIN can read busy windows and place interview holds as automation rolls out. OAuth uses Google’s consent screen; we store only an encrypted refresh token.",
+      "Connect calendars so TWIN can read busy time and place interview holds. Google Calendar is available today via OAuth. Microsoft 365 / Outlook and Apple Calendar (iCloud) are on the roadmap with the same consent, audit, and revoke story.",
+    calendarProvidersEyebrow: "Providers",
+    calendarStatusLive: "Live",
+    calendarStatusPlanned: "Planned",
+    calendarProviderGoogleTitle: "Google Calendar",
+    calendarProviderGoogleBody:
+      "Workspace and personal Google accounts — free/busy, create events, and schedule interviews from this page.",
+    calendarProviderMicrosoftTitle: "Microsoft 365 & Outlook",
+    calendarProviderMicrosoftBody:
+      "Microsoft Graph Calendar for Exchange Online — shared calendars, booking policies, and room resources (roadmap).",
+    calendarProviderAppleTitle: "Apple Calendar (iCloud)",
+    calendarProviderAppleBody:
+      "CalDAV access for iCloud calendars (app-specific passwords or delegated flows where Apple permits automation — roadmap; UX will differ from one-click Google).",
+    calendarProviderOtherTitle: "Other CalDAV & ICS",
+    calendarProviderOtherBody:
+      "Read-only busy blocks from extra CalDAV servers or subscribed ICS feeds once privacy defaults are locked (evaluating).",
+    calendarProvidersFoot:
+      "Order and timing follow enterprise demand and security review — not a promise of ship dates.",
     calendarConnected: "Connected",
     calendarNotConnected: "Not connected",
     calendarConnect: "Connect Google Calendar",
     calendarDisconnect: "Disconnect",
     calendarConfiguredHint:
-      "Uses the same Google OAuth client as sign-in. Add the Calendar redirect URI from the API env (`GOOGLE_CALENDAR_REDIRECT_URI`) in Google Cloud Console.",
+      "Today this OAuth client powers Google Calendar only. Add `GOOGLE_CALENDAR_REDIRECT_URI` in Google Cloud Console. Outlook and Apple will use separate Microsoft / Apple consent flows when they ship.",
     calendarFreebusyTitle: "Check availability (next 3 days)",
     calendarFreebusyGo: "Run free/busy",
     calendarBlockTitle: "Place a 45-minute interview block (UTC, test)",
@@ -809,6 +834,23 @@ const en = {
     roiLabel: "ROI on integration fee (illustrative)",
     enterpriseFoot:
       "Where modeled value exceeds the integration line item, the surplus is shown as net benefit. This block does not describe TWIN revenue.",
+    workspaceIntegrationsTitle: "Recruiter workspace integrations (illustrative)",
+    workspaceIntegrationsLead:
+      "Model for procurement: connect your ATS, calendars, and candidate scoring into one governed TWIN workspace. Seat count is recruiters with active integration access — not every employee in HR.",
+    workspaceSeatPriceLabel: "List price (model)",
+    workspaceSeatPriceValue: "$99.99 / seat / month",
+    workspaceSeatCount: "Recruiter seats (integrated)",
+    workspaceSeatHint: "Illustrative only. Real enterprise quotes depend on ATS vendor, SSO, data residency, and rollout scope.",
+    workspaceMonthlyTotal: "Modeled monthly (seats × list)",
+    workspaceAnnualTotal: "Modeled annual (×12)",
+    workspaceScopeTitle: "What “integrated” covers in this model",
+    workspaceScope1: "ATS or CRM hand-offs: requisitions, stages, and candidate URLs stay in sync where APIs allow.",
+    workspaceScope2:
+      "Calendar rails: Google Calendar today; Microsoft 365 / Outlook and Apple Calendar on the roadmap — interview windows and quiet hours respected for both sides.",
+    workspaceScope3: "Scoring & governance: profile-aware ranking, audit trails, and export paths your compliance team can review.",
+    workspaceScope4: "Roadmap items (not implied as shipped): deeper webhooks, SCIM/SSO packages, and board-specific auto-apply where legally permitted.",
+    workspaceFoot:
+      "This block is a planning aid for B2B conversations — not a binding quote, not legal or tax advice, and not a promise of feature availability on a date.",
     footerNote:
       "Illustrative model for discussion: companies and candidates can both win when fees align to outcomes. Not pricing, not tax or legal advice.",
     linkInvestorModel: "Open the investor scenario calculator →",
@@ -946,7 +988,7 @@ const en = {
     titleRegister: "Register · TWIN",
     titleProfile: "Profile · TWIN",
     titleDashboard: "Dashboard · TWIN",
-    titleDashboardCalendar: "Calendar · TWIN",
+    titleDashboardCalendar: "Calendars · TWIN",
     titlePrivacy: "Privacy · TWIN",
     titleTerms: "Terms of Service · TWIN",
     titleForgotPassword: "Forgot password · TWIN",
@@ -1200,7 +1242,7 @@ const pl: MessageTree = {
   },
   home: {
     tagline: "Bliźniak kariery AI. Rynek nie stoi, kiedy ty odchodzisz od ekranu.",
-    title: "Ty żyjesz offline. Pipeline nie musi.",
+    title: "Ty żyjesz offline. Czasem potrzebujesz pauzy. Pipeline nie musi.",
     heroHook:
       "Niech oferty same się ustawiają w kolejce. Wyjdziesz na spacer, wrócisz, a żmudna część już poszła do przodu. Kalendarz i pełny auto-ruch wejdą etapami; dziś chodzi o spokój i porządek.",
     description:
@@ -1560,17 +1602,42 @@ const pl: MessageTree = {
     billingPmKlarna: "Klarna",
     billingPmAffirm: "Affirm",
     billingPmGeneric: "Inna metoda (Stripe)",
+    billingPerMonth: "/ miesiąc",
+    billingListPricesNote:
+      "Kwoty w USD przed podatkiem. Checkout przez Stripe; na fakturze mogą pojawić się proration lub lokalny VAT.",
+    billingPlanCurrent: "Obecny plan",
+    billingPlanOpenWorkspace: "Otwórz workspace",
+    billingPlanUpgradeCta: "Upgrade przez Stripe",
+    billingPlanIncludedFree: "W cenie — bez karty.",
+    billingPlanProPending: "Cena Pro nie jest jeszcze podpięta pod Stripe na tym środowisku.",
     identityLink: "Tożsamość (KYC)",
     calendarLink: "Kalendarz",
-    calendarPageTitle: "Google Calendar",
+    calendarPageTitle: "Kalendarze i dostępność",
     calendarPageLead:
-      "Połącz główny kalendarz Google, żeby TWIN mógł odczytywać okna zajętości i rezerwować sloty na rozmowy, gdy automatyzacja będzie gotowa. OAuth przez ekran zgody Google; przechowujemy tylko zaszyfrowany refresh token.",
+      "Podłącz kalendarze, żeby TWIN widział zajętość i mógł stawiać sloty rozmów. Google Calendar działa dziś przez OAuth. Microsoft 365 / Outlook oraz Apple Calendar (iCloud) są w roadmapie z tą samą historią zgody, audytu i odwołania dostępu.",
+    calendarProvidersEyebrow: "Dostawcy",
+    calendarStatusLive: "Aktywny",
+    calendarStatusPlanned: "W planie",
+    calendarProviderGoogleTitle: "Google Calendar",
+    calendarProviderGoogleBody:
+      "Konta Google Workspace i osobiste — free/busy, tworzenie wydarzeń i planowanie rozmów z tej strony.",
+    calendarProviderMicrosoftTitle: "Microsoft 365 i Outlook",
+    calendarProviderMicrosoftBody:
+      "Microsoft Graph Calendar dla Exchange Online — współdzielone kalendarze, polityki rezerwacji i zasoby sal (roadmapa).",
+    calendarProviderAppleTitle: "Apple Calendar (iCloud)",
+    calendarProviderAppleBody:
+      "Dostęp CalDAV do kalendarzy iCloud (hasła aplikacji lub delegacja tam, gdzie Apple pozwala na automatyzację — roadmapa; UX inny niż jednoklikowy Google).",
+    calendarProviderOtherTitle: "Inne CalDAV i ICS",
+    calendarProviderOtherBody:
+      "Odczyt zajętości z dodatkowych serwerów CalDAV lub subskrybowanych kanałów ICS po domknięciu ustawień prywatności (w ocenie).",
+    calendarProvidersFoot:
+      "Kolejność i terminy wynikają z popytu enterprise i przeglądu bezpieczeństwa — to nie obietnica dat wdrożenia.",
     calendarConnected: "Połączono",
     calendarNotConnected: "Nie połączono",
     calendarConnect: "Połącz Google Calendar",
     calendarDisconnect: "Odłącz",
     calendarConfiguredHint:
-      "Ten sam klient OAuth co logowanie. Dodaj URI przekierowania kalendarza z env API (`GOOGLE_CALENDAR_REDIRECT_URI`) w Google Cloud Console.",
+      "Dziś ten klient OAuth obsługuje wyłącznie Google Calendar. Dodaj `GOOGLE_CALENDAR_REDIRECT_URI` w Google Cloud Console. Outlook i Apple dostaną osobne przepływy zgody Microsoft / Apple przy wdrożeniu.",
     calendarFreebusyTitle: "Sprawdź dostępność (następne 3 dni)",
     calendarFreebusyGo: "Uruchom free/busy",
     calendarBlockTitle: "Dodaj 45-min blok „interview” (UTC, test)",
@@ -1899,6 +1966,25 @@ const pl: MessageTree = {
     roiLabel: "ROI od opłaty integracyjnej (ilustracja)",
     enterpriseFoot:
       "Gdy zamodelowana wartość przewyższa linię integracji, nadwyżka jest pokazana jako korzyść netto. Ten blok nie opisuje przychodu TWIN.",
+    workspaceIntegrationsTitle: "Integracje workspace rekrutera (ilustracja)",
+    workspaceIntegrationsLead:
+      "Model pod procurement: ATS, kalendarze i scoring kandydata w jednym nadzorowanym workspace TWIN. Liczba miejsc to rekruterzy z aktywnym dostępem integracyjnym — nie każdy pracownik HR.",
+    workspaceSeatPriceLabel: "Cena listowa (model)",
+    workspaceSeatPriceValue: "99,99 USD / miejsce / miesiąc",
+    workspaceSeatCount: "Miejsca rekruterów (zintegrowane)",
+    workspaceSeatHint:
+      "Wyłącznie ilustracja. Realne oferty enterprise zależą od ATS, SSO, residency danych i zakresu wdrożenia.",
+    workspaceMonthlyTotal: "Miesięcznie w modelu (miejsca × cena listowa)",
+    workspaceAnnualTotal: "Rocznie w modelu (×12)",
+    workspaceScopeTitle: "Co oznacza „zintegrowane” w tym modelu",
+    workspaceScope1: "ATS lub CRM: rekrutacje, etapy i URL-e kandydatów zsynchronizowane tam, gdzie pozwalają API.",
+    workspaceScope2:
+      "Tory kalendarzowe: dziś Google Calendar; Microsoft 365 / Outlook i Apple Calendar w roadmapie — okna rozmów i cisza nocna po obu stronach.",
+    workspaceScope3: "Scoring i zgodność: ranking pod profil, logi audytu i eksporty do przeglądu przez compliance.",
+    workspaceScope4:
+      "Roadmap (bez obietnicy daty): webhooki, pakiety SCIM/SSO, auto-apply per portal tam, gdzie prawo pozwala.",
+    workspaceFoot:
+      "Blok pomocniczy do rozmów B2B — nie wiążąca wycena, nie porada prawno-podatkowa ani obietnica dostępności funkcji w terminie.",
     footerNote:
       "Model dyskusyjny: firma i kandydat mogą wygrać, gdy opłaty wiążą się z efektem. To nie cennik ani porada prawno-podatkowa.",
     linkInvestorModel: "Otwórz kalkulator scenariuszy inwestorskich →",
@@ -2037,7 +2123,7 @@ const pl: MessageTree = {
     titleRegister: "Rejestracja · TWIN",
     titleProfile: "Profil · TWIN",
     titleDashboard: "Panel · TWIN",
-    titleDashboardCalendar: "Kalendarz · TWIN",
+    titleDashboardCalendar: "Kalendarze · TWIN",
     titlePrivacy: "Prywatność · TWIN",
     titleTerms: "Regulamin · TWIN",
     titleForgotPassword: "Reset hasła · TWIN",

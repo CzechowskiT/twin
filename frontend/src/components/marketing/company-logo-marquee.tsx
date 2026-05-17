@@ -1,7 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+import { useTranslation } from "@/components/language-provider";
+import type { TranslationKey } from "@/lib/i18n";
 
 /** Corporate domain for Clearbit / Google favicon when Simple Icons slug fails. */
 type Brand = {
@@ -108,7 +111,27 @@ const BRANDS: Brand[] = [
   { slug: "moderna", name: "Moderna", domain: "modernatx.com" },
 ];
 
-const MARQUEE_SEGMENTS = 4;
+/** Two identical strips; CSS animates -50% for a gapless loop. */
+const MARQUEE_SEGMENTS = 2;
+
+/** Uniform slot for every mark — images use `fill` + `object-contain` so scaling matches the box, not intrinsic width. */
+const MARK_BOX_CLASS = "h-10 w-[7.25rem] sm:h-11 sm:w-[7.75rem]";
+
+/** Light plate so dark / monochrome marks stay legible on studio (dark) and light marketing rails. */
+const MARK_PLATE_CLASS =
+  "border border-zinc-200/90 bg-white shadow-sm ring-1 ring-zinc-950/[0.04] dark:border-zinc-500/40 dark:bg-zinc-100 dark:ring-white/10";
+
+function usePrefersReducedMotion(): boolean {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onChange = () => setReduced(mq.matches);
+    onChange();
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+  return reduced;
+}
 
 function siUrl(slug: string) {
   return `https://cdn.simpleicons.org/${slug}`;
@@ -135,20 +158,23 @@ function initials(name: string): string {
 function BrandMark({
   brand,
   instanceKey,
+  linkSuffix,
+  tabIndex,
 }: {
   brand: Brand;
   instanceKey: string;
+  /** Appended to `brand.name` for `aria-label` / `title` (locale-aware). */
+  linkSuffix: string;
+  /** Omit from tab order when this mark sits in a visually duplicated marquee strip. */
+  tabIndex?: number;
 }) {
   const urls = useMemo(() => {
     const slugs = [brand.slug, ...(brand.altSlugs ?? [])];
     const uniq = [...new Set(slugs)];
     const si = uniq.map(siUrl);
-    const domain = [clearbitUrl(brand.domain), googleFaviconUrl(brand.domain)];
-    /* Apple on Simple Icons is pure black — invisible on studio (dark) marquee; try favicon/Clearbit first. */
-    if (brand.slug === "apple") {
-      return [...domain, ...si];
-    }
-    return [...si, ...domain];
+    const raster = [clearbitUrl(brand.domain), googleFaviconUrl(brand.domain)];
+    /* Prefer Clearbit / favicon (usually full-color); SI last — often flat black on transparent. */
+    return [...raster, ...si];
   }, [brand]);
 
   const [step, setStep] = useState(0);
@@ -157,59 +183,112 @@ function BrandMark({
     setStep((s) => (s + 1 < urls.length ? s + 1 : s));
   }, [urls.length]);
 
-  if (step >= urls.length) {
-    return (
+  const href = `https://${brand.domain}/`;
+  const a11y = `${brand.name}${linkSuffix}`;
+
+  const anchorClass = `${MARK_BOX_CLASS} ${MARK_PLATE_CLASS} relative block shrink-0 overflow-hidden rounded-lg no-underline transition-[opacity,box-shadow] hover:opacity-90 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--twin-accent)]`;
+
+  const inner =
+    step >= urls.length ? (
       <span
-        title={brand.name}
-        className="inline-flex h-10 w-[7.25rem] shrink-0 items-center justify-center rounded-lg border border-[var(--twin-border)] bg-gradient-to-br from-[var(--twin-accent-muted)] to-[var(--twin-card)] text-sm font-bold tracking-tight text-[var(--twin-accent-hover)] shadow-sm sm:h-11 sm:w-[7.75rem]"
+        title={a11y}
+        className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--twin-accent-muted)]/80 to-[var(--twin-card)]/80 text-sm font-bold tracking-tight text-[var(--twin-accent-hover)] sm:text-base"
       >
         {initials(brand.name)}
       </span>
-    );
-  }
-
-  return (
-    <span className="inline-flex h-10 w-[7.25rem] shrink-0 items-center justify-center sm:h-11 sm:w-[7.75rem]">
+    ) : (
       <Image
         key={`${instanceKey}-${step}`}
         src={urls[step]}
         alt=""
-        width={120}
-        height={40}
-        loading="lazy"
+        fill
+        sizes="(min-width: 640px) 124px, 116px"
+        loading="eager"
         decoding="async"
         referrerPolicy="no-referrer"
-        className="max-h-10 w-auto max-w-[7.25rem] object-contain contrast-[1.12] drop-shadow-[0_1px_2px_rgb(0_0_0_/_0.14)] transition-[filter,opacity] sm:max-h-11 sm:max-w-[7.75rem]"
+        className="object-contain object-center p-1.5 contrast-[1.08] brightness-[1.02] transition-[filter,opacity]"
         onError={onError}
       />
-    </span>
+    );
+
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      tabIndex={tabIndex}
+      aria-label={a11y}
+      title={a11y}
+      className={anchorClass}
+    >
+      {inner}
+    </a>
   );
 }
 
-function LogoRow({ segmentIndex, ariaHidden }: { segmentIndex: number; ariaHidden?: boolean }) {
+function LogoRow({
+  segmentIndex,
+  ariaHidden,
+  linkSuffixKey,
+}: {
+  segmentIndex: number;
+  ariaHidden?: boolean;
+  linkSuffixKey: TranslationKey;
+}) {
+  const { t } = useTranslation();
+  const linkSuffix = t(linkSuffixKey);
   return (
     <div
-      className="inline-flex shrink-0 items-center gap-x-8 gap-y-3 px-6 sm:gap-x-12 sm:px-10"
+      className="marketing-marquee-segment inline-flex shrink-0 items-center gap-x-5 sm:gap-x-6"
       aria-hidden={ariaHidden}
     >
       {BRANDS.map((brand) => (
-        <BrandMark key={`${segmentIndex}-${brand.slug}`} brand={brand} instanceKey={`${segmentIndex}-${brand.slug}`} />
+        <BrandMark
+          key={`${segmentIndex}-${brand.slug}`}
+          brand={brand}
+          instanceKey={`${segmentIndex}-${brand.slug}`}
+          linkSuffix={linkSuffix}
+          tabIndex={ariaHidden ? -1 : undefined}
+        />
       ))}
     </div>
   );
 }
 
-/** Infinite marquee — four segments; most marks try SI → Clearbit → favicon → monogram (Apple tries domain sources first). */
+/** Infinite marquee — duplicated strip; marks try SI → Clearbit → favicon → monogram (Apple: domain sources first). */
 export function CompanyLogoMarquee() {
+  const reducedMotion = usePrefersReducedMotion();
+  const linkSuffixKey: TranslationKey = "site.marqueeBrandLinkSuffix";
+
+  if (reducedMotion) {
+    return (
+      <div
+        className="border-y border-[var(--twin-border)] bg-[var(--twin-surface)]/90 py-4 backdrop-blur-[2px]"
+        role="presentation"
+      >
+        <div className="overflow-x-auto overflow-y-hidden [-webkit-overflow-scrolling:touch] px-3 sm:px-5">
+          <div className="flex w-max items-center py-1">
+            <LogoRow segmentIndex={0} ariaHidden={false} linkSuffixKey={linkSuffixKey} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className="border-y border-[var(--twin-border)] bg-[var(--twin-surface)]/90 py-4 backdrop-blur-[2px]"
       role="presentation"
     >
-      <div className="overflow-hidden" aria-hidden>
+      <div className="overflow-hidden px-3 sm:px-5" aria-hidden>
         <div className="marketing-marquee-track flex w-max items-center will-change-transform">
           {Array.from({ length: MARQUEE_SEGMENTS }, (_, segmentIndex) => (
-            <LogoRow key={segmentIndex} segmentIndex={segmentIndex} ariaHidden={segmentIndex > 0} />
+            <LogoRow
+              key={segmentIndex}
+              segmentIndex={segmentIndex}
+              ariaHidden={segmentIndex > 0}
+              linkSuffixKey={linkSuffixKey}
+            />
           ))}
         </div>
       </div>

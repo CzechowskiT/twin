@@ -48,80 +48,92 @@ function IconTwitter({ className }: { className?: string }) {
 type BrandId = "youtube" | "instagram" | "x" | "facebook" | "twitter";
 
 /** Recognised brand hues (approx. official palette) so icons stay legible on light + dark chrome. */
-const BRAND: Record<BrandId, { icon: string; shellLink: string; shellIdle: string }> = {
+const BRAND: Record<BrandId, { icon: string; shellLink: string }> = {
   youtube: {
     icon: "text-[#FF0000]",
     shellLink:
       "border-[#FF0000]/55 bg-white shadow-sm ring-1 ring-[#FF0000]/20 hover:bg-red-50 hover:ring-[#FF0000]/40 dark:bg-zinc-950 dark:hover:bg-zinc-900",
-    shellIdle:
-      "border-[#FF0000]/45 bg-[#FF0000]/12 ring-1 ring-[#FF0000]/15 dark:bg-[#FF0000]/14 dark:ring-[#FF0000]/25",
   },
   instagram: {
     icon: "text-[#E4405F]",
     shellLink:
       "border-[#E4405F]/55 bg-[#E4405F]/10 shadow-sm ring-1 ring-[#E4405F]/20 hover:bg-[#E4405F]/16 hover:ring-[#E4405F]/35 dark:bg-[#E4405F]/12 dark:ring-[#E4405F]/25 dark:hover:bg-[#E4405F]/18 dark:hover:ring-pink-400/35",
-    shellIdle:
-      "border-[#E4405F]/45 bg-[#E4405F]/10 ring-1 ring-[#E4405F]/15 dark:bg-[#E4405F]/12 dark:ring-[#E4405F]/28",
   },
   x: {
     icon: "text-white",
     shellLink: "border-zinc-600 bg-black shadow-sm ring-1 ring-white/10 hover:bg-zinc-950 hover:ring-white/25",
-    shellIdle: "border-zinc-700 bg-zinc-950 ring-1 ring-white/5",
   },
   facebook: {
     icon: "text-[#1877F2]",
     shellLink:
       "border-[#1877F2]/55 bg-white shadow-sm ring-1 ring-[#1877F2]/20 hover:bg-blue-50/95 hover:ring-[#1877F2]/40 dark:bg-zinc-950 dark:hover:bg-zinc-900",
-    shellIdle:
-      "border-[#1877F2]/45 bg-[#1877F2]/10 ring-1 ring-[#1877F2]/15 dark:bg-[#1877F2]/15 dark:ring-[#1877F2]/30",
   },
   twitter: {
     icon: "text-[#1D9BF0]",
     shellLink:
       "border-[#1D9BF0]/55 bg-white shadow-sm ring-1 ring-sky-400/30 hover:bg-sky-50/95 hover:ring-[#1D9BF0]/45 dark:bg-zinc-950 dark:hover:bg-zinc-900",
-    shellIdle:
-      "border-[#1D9BF0]/45 bg-[#1D9BF0]/10 ring-1 ring-sky-400/20 dark:bg-sky-500/12 dark:ring-sky-400/25",
   },
+};
+
+/** Canonical homepages when `NEXT_PUBLIC_SOCIAL_*` is unset (always clickable). */
+const OFFICIAL_HOME: Record<BrandId, string> = {
+  youtube: "https://www.youtube.com/",
+  instagram: "https://www.instagram.com/",
+  x: "https://x.com/",
+  facebook: "https://www.facebook.com/",
+  twitter: "https://twitter.com/",
 };
 
 type Net = {
   brand: BrandId;
-  href: string | undefined;
+  href: string;
   Icon: (p: { className?: string }) => ReactElement;
   aria: TranslationKey;
+  isCustom: boolean;
 };
 
 function readNetworks(): Net[] {
+  const yt = process.env.NEXT_PUBLIC_SOCIAL_YOUTUBE?.trim();
+  const ig = process.env.NEXT_PUBLIC_SOCIAL_INSTAGRAM?.trim();
+  const x = process.env.NEXT_PUBLIC_SOCIAL_X?.trim();
+  const fb = process.env.NEXT_PUBLIC_SOCIAL_FACEBOOK?.trim();
+  const tw = process.env.NEXT_PUBLIC_SOCIAL_TWITTER?.trim();
+
   return [
     {
       brand: "youtube",
-      href: process.env.NEXT_PUBLIC_SOCIAL_YOUTUBE?.trim() || undefined,
+      href: yt || OFFICIAL_HOME.youtube,
       Icon: IconYouTube,
-      aria: "site.footerYoutubeAria",
+      aria: yt ? "site.footerYoutubeAria" : "site.footerYoutubeOfficialAria",
+      isCustom: Boolean(yt),
     },
     {
       brand: "instagram",
-      href: process.env.NEXT_PUBLIC_SOCIAL_INSTAGRAM?.trim() || undefined,
+      href: ig || OFFICIAL_HOME.instagram,
       Icon: IconInstagram,
-      aria: "site.footerInstagramAria",
+      aria: ig ? "site.footerInstagramAria" : "site.footerInstagramOfficialAria",
+      isCustom: Boolean(ig),
     },
     {
       brand: "x",
-      href: process.env.NEXT_PUBLIC_SOCIAL_X?.trim() || undefined,
+      href: x || OFFICIAL_HOME.x,
       Icon: IconX,
-      aria: "site.footerXAria",
+      aria: x ? "site.footerXAria" : "site.footerXOfficialAria",
+      isCustom: Boolean(x),
     },
     {
       brand: "facebook",
-      href: process.env.NEXT_PUBLIC_SOCIAL_FACEBOOK?.trim() || undefined,
+      href: fb || OFFICIAL_HOME.facebook,
       Icon: IconFacebook,
-      aria: "site.footerFacebookAria",
+      aria: fb ? "site.footerFacebookAria" : "site.footerFacebookOfficialAria",
+      isCustom: Boolean(fb),
     },
     {
       brand: "twitter",
-      href: process.env.NEXT_PUBLIC_SOCIAL_TWITTER?.trim() || undefined,
+      href: tw || OFFICIAL_HOME.twitter,
       Icon: IconTwitter,
-      aria: "site.footerTwitterAria",
+      aria: tw ? "site.footerTwitterAria" : "site.footerTwitterOfficialAria",
+      isCustom: Boolean(tw),
     },
   ];
 }
@@ -135,10 +147,9 @@ type SocialIconRowProps = {
   compact?: boolean;
 };
 
-/** YouTube, Instagram, X, Facebook, Twitter — brand-coloured; URLs from `NEXT_PUBLIC_SOCIAL_*`. */
+/** YouTube, Instagram, X, Facebook, Twitter — brand-coloured; `NEXT_PUBLIC_SOCIAL_*` overrides official homepages. */
 export function SocialIconRow({ variant, inline = false, className = "", compact = false }: SocialIconRowProps) {
   const { t } = useTranslation();
-  const soon = t("site.footerSocialSoonHint");
   const networks = readNetworks();
   const headerCompact = Boolean(compact) && variant === "header";
   const size =
@@ -154,7 +165,7 @@ export function SocialIconRow({ variant, inline = false, className = "", compact
     headerCompact
       ? "inline-flex !min-h-0 !min-w-0"
       : "twin-touch-target inline-flex"
-  } ${size} shrink-0 items-center justify-center ${corner} border transition duration-150 hover:scale-[1.04] active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--twin-accent)]`;
+  } ${size} shrink-0 items-center justify-center ${corner} border transition duration-150 hover:scale-[1.04] active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--twin-accent)] cursor-pointer`;
 
   return (
     <div
@@ -162,29 +173,24 @@ export function SocialIconRow({ variant, inline = false, className = "", compact
       role="list"
       aria-label={variant === "header" ? t("site.headerSocialAria") : undefined}
     >
-      {networks.map(({ href, Icon, aria, brand }) => {
+      {networks.map(({ href, Icon, aria, brand, isCustom }) => {
         const b = BRAND[brand];
-        const shell = href
-          ? `${shellBase} ${b.shellLink} cursor-pointer`
-          : `${shellBase} ${b.shellIdle} cursor-not-allowed`;
+        const shell = `${shellBase} ${b.shellLink}`;
         const iconClass = `${iconInner} ${b.icon}`;
-        return href ? (
+        const label = t(aria);
+        return (
           <a
-            key={aria}
+            key={brand}
             role="listitem"
             href={href}
             target="_blank"
-            rel="noopener noreferrer me"
+            rel={isCustom ? "noopener noreferrer me" : "noopener noreferrer"}
             className={shell}
-            aria-label={t(aria)}
-            title={t(aria)}
+            aria-label={label}
+            title={label}
           >
             <Icon className={iconClass} />
           </a>
-        ) : (
-          <span key={aria} role="listitem" className={shell} title={soon} aria-label={t(aria)}>
-            <Icon className={iconClass} />
-          </span>
         );
       })}
     </div>

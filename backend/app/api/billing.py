@@ -55,6 +55,7 @@ def list_plans(settings: Annotated[Settings, Depends(get_settings)]) -> PlansPub
                 description="Core pipeline: discover roles, track applications, stay GDPR-first.",
                 max_tracked_applications=25,
                 stripe_price_configured=False,
+                monthly_list_price_usd=0.0,
             ),
             PlanOut(
                 id="premium",
@@ -62,6 +63,7 @@ def list_plans(settings: Annotated[Settings, Depends(get_settings)]) -> PlansPub
                 description="Unlimited tracked applications, auto-apply where boards allow, priority roadmap.",
                 max_tracked_applications=None,
                 stripe_price_configured=premium_ready,
+                monthly_list_price_usd=4.99,
             ),
             PlanOut(
                 id="pro",
@@ -69,6 +71,7 @@ def list_plans(settings: Annotated[Settings, Depends(get_settings)]) -> PlansPub
                 description="Same entitlements as Premium today; reserved for team billing and higher limits.",
                 max_tracked_applications=None,
                 stripe_price_configured=pro_ready,
+                monthly_list_price_usd=9.99,
             ),
         ],
     )

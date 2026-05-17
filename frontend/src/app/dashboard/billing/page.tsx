@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
-import { Button, ButtonCta, Card, Shell } from "@/components/ui";
+import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
 import type { TranslationKey } from "@/lib/i18n";
@@ -24,6 +24,7 @@ type PlanRow = {
   description: string;
   max_tracked_applications: number | null;
   stripe_price_configured: boolean;
+  monthly_list_price_usd: number;
 };
 
 type PlansPayload = {
@@ -32,6 +33,21 @@ type PlansPayload = {
   checkout_payment_methods: string[];
   payment_methods_note: string;
 };
+
+const PLAN_PRICE_FALLBACK_USD: Record<string, number> = {
+  free: 0,
+  premium: 4.99,
+  pro: 9.99,
+};
+
+function formatUsdListMonthly(n: number): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: n % 1 === 0 ? 0 : 2,
+    maximumFractionDigits: 2,
+  }).format(n);
+}
 
 function normalizePlansPayload(raw: unknown): PlansPayload {
   if (raw == null || typeof raw !== "object") {
@@ -50,6 +66,12 @@ function normalizePlansPayload(raw: unknown): PlansPayload {
     const r = row as Record<string, unknown>;
     const id = typeof r.id === "string" ? r.id.trim() : "";
     if (!id) continue;
+    let monthly = 0;
+    if (typeof r.monthly_list_price_usd === "number" && Number.isFinite(r.monthly_list_price_usd)) {
+      monthly = r.monthly_list_price_usd;
+    } else if (PLAN_PRICE_FALLBACK_USD[id] != null) {
+      monthly = PLAN_PRICE_FALLBACK_USD[id];
+    }
     plans.push({
       id,
       name: typeof r.name === "string" && r.name.trim() ? r.name.trim() : id,
@@ -61,6 +83,7 @@ function normalizePlansPayload(raw: unknown): PlansPayload {
             ? r.max_tracked_applications
             : null,
       stripe_price_configured: Boolean(r.stripe_price_configured),
+      monthly_list_price_usd: monthly,
     });
   }
   const pm = o.checkout_payment_methods;
@@ -386,48 +409,90 @@ export default function BillingPage() {
                 {t("dashboard.billingPlansEmpty")}
               </li>
             ) : (
-              plans.plans.map((p) => (
-              <li
-                key={p.id}
-                className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] p-4 sm:p-5"
-              >
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="min-w-0">
-                    <p className="text-lg font-semibold text-[var(--foreground)]">{p.name}</p>
-                    <p className="mt-2 text-sm leading-relaxed text-[var(--twin-muted-strong)]">{p.description}</p>
-                    <p className="mt-2 text-xs text-[var(--twin-muted)]">
-                      {p.max_tracked_applications != null
-                        ? t("dashboard.billingTrackedCap").replace("{n}", String(p.max_tracked_applications))
-                        : t("dashboard.billingTrackedUnlimited")}
-                    </p>
-                  </div>
-                  <div className="flex shrink-0 flex-col gap-2 sm:items-end">
-                    {p.id === "premium" && plans.checkout_configured && !paid ? (
-                      <ButtonCta
-                        type="button"
-                        className="!w-full sm:!w-auto"
-                        disabled={busy !== null}
-                        onClick={() => void startCheckout("premium")}
-                      >
-                        {busy === "checkout-premium" ? "…" : t("dashboard.billingUpgradePremium")}
-                      </ButtonCta>
-                    ) : null}
-                    {p.id === "pro" && plans.checkout_configured && p.stripe_price_configured && !paid ? (
-                      <ButtonCta
-                        type="button"
-                        className="!w-full sm:!w-auto"
-                        disabled={busy !== null}
-                        onClick={() => void startCheckout("pro")}
-                      >
-                        {busy === "checkout-pro" ? "…" : t("dashboard.billingUpgradePro")}
-                      </ButtonCta>
-                    ) : null}
-                  </div>
-                </div>
-              </li>
-              ))
+              plans.plans.map((p) => {
+                const tier = (me?.plan_tier ?? "free").toLowerCase();
+                const isCurrent = me != null && tier === p.id;
+                const canOpenWorkspace = p.id === "free" && !isCurrent;
+                const canCheckoutPremium = !paid && p.id === "premium" && plans.checkout_configured;
+                const canCheckoutPro = !paid && p.id === "pro" && plans.checkout_configured && p.stripe_price_configured;
+                const actionable = canOpenWorkspace || canCheckoutPremium || canCheckoutPro;
+                const disabled = busy !== null || isCurrent || !actionable;
+                let footerKey: TranslationKey = "dashboard.billingPlanCurrent";
+                if (!isCurrent) {
+                  if (p.id === "free") footerKey = "dashboard.billingPlanOpenWorkspace";
+                  else if (p.id === "premium")
+                    footerKey = plans.checkout_configured ? "dashboard.billingUpgradePremium" : "dashboard.billingNotConfigured";
+                  else if (p.id === "pro") {
+                    if (!plans.checkout_configured) footerKey = "dashboard.billingNotConfigured";
+                    else if (!p.stripe_price_configured) footerKey = "dashboard.billingPlanProPending";
+                    else footerKey = "dashboard.billingUpgradePro";
+                  }
+                }
+
+                return (
+                  <li key={p.id} className="list-none">
+                    <button
+                      type="button"
+                      disabled={disabled}
+                      onClick={() => {
+                        if (busy !== null) return;
+                        if (isCurrent) return;
+                        if (canOpenWorkspace) {
+                          router.push("/dashboard");
+                          return;
+                        }
+                        if (canCheckoutPremium) void startCheckout("premium");
+                        if (canCheckoutPro) void startCheckout("pro");
+                      }}
+                      className={`w-full rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] p-4 text-left transition sm:p-5 ${
+                        actionable && busy === null
+                          ? "cursor-pointer hover:border-[var(--twin-accent)] hover:shadow-[0_0_0_1px_var(--twin-accent-muted)] focus-visible:outline focus-visible:ring-2 focus-visible:ring-[var(--twin-accent)]/35"
+                          : ""
+                      } ${disabled && !isCurrent ? "opacity-75" : ""} ${isCurrent ? "ring-2 ring-[var(--twin-accent-muted)]" : ""}`}
+                    >
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-4">
+                            <p className="text-lg font-semibold capitalize text-[var(--foreground)]">{p.name}</p>
+                            <p className="text-2xl font-bold tracking-tight text-[var(--twin-accent)] sm:text-3xl">
+                              {formatUsdListMonthly(p.monthly_list_price_usd)}
+                              <span className="ml-1.5 text-sm font-medium text-[var(--twin-muted-strong)]">
+                                {t("dashboard.billingPerMonth")}
+                              </span>
+                            </p>
+                          </div>
+                          <p className="mt-2 text-sm leading-relaxed text-[var(--twin-muted-strong)]">{p.description}</p>
+                          <p className="mt-2 text-xs text-[var(--twin-muted)]">
+                            {p.max_tracked_applications != null
+                              ? t("dashboard.billingTrackedCap").replace("{n}", String(p.max_tracked_applications))
+                              : t("dashboard.billingTrackedUnlimited")}
+                          </p>
+                        </div>
+                        <div className="flex shrink-0 flex-col items-start gap-1 sm:items-end">
+                          <span
+                            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                              isCurrent
+                                ? "bg-[var(--twin-accent-muted)] text-[var(--twin-accent-hover)]"
+                                : actionable
+                                  ? "bg-[var(--twin-cta)] text-[var(--twin-on-cta)]"
+                                  : "bg-[var(--twin-surface)] text-[var(--twin-muted-strong)]"
+                            }`}
+                          >
+                            {busy === "checkout-premium" && p.id === "premium"
+                              ? "…"
+                              : busy === "checkout-pro" && p.id === "pro"
+                                ? "…"
+                                : t(footerKey)}
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                  </li>
+                );
+              })
             )}
           </ul>
+          <p className="mt-5 text-xs leading-relaxed text-[var(--twin-muted)]">{t("dashboard.billingListPricesNote")}</p>
         </Card>
       ) : null}
     </Shell>
