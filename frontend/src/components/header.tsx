@@ -89,103 +89,100 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="hidden shrink-0 flex-wrap items-center justify-end gap-x-2 gap-y-1 md:flex md:gap-x-2.5">
-          <nav
-            className="flex flex-wrap items-center justify-end gap-x-2.5 gap-y-1 text-[12px] sm:text-[13px]"
-            aria-label={t("nav.ariaAccountNav")}
-          >
-            {app.map((item) => (
-              <Link key={item.href} href={item.href} className={`${linkClass} font-medium`}>
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-          <SocialIconRow variant="header" />
-          <HeaderStoreIcons />
-          <div className="hidden h-6 w-px shrink-0 bg-[var(--twin-border)] sm:block" aria-hidden />
+        <div className="hidden shrink-0 flex-col items-end gap-y-2 md:flex">
+          <div className="flex flex-wrap items-center justify-end gap-x-2.5 gap-y-1 text-[12px] sm:text-[13px]">
+            <nav className="flex flex-wrap items-center justify-end gap-x-2.5 gap-y-1" aria-label={t("nav.ariaAccountNav")}>
+              {app.map((item) => (
+                <Link key={item.href} href={item.href} className={`${linkClass} font-medium`}>
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+            <HeaderStoreIcons />
+          </div>
           <div className="flex flex-wrap items-center justify-end gap-x-2 gap-y-1">
             <PersonaSwitcher />
             <LanguageSwitcher />
           </div>
+          <SocialIconRow variant="header" compact />
         </div>
 
-        <div className="flex w-full basis-full items-center justify-end gap-2 md:hidden">
-          <PersonaSwitcher />
-          <LanguageSwitcher />
-          <details ref={mobileMenuRef} className="relative">
-            <summary className="twin-touch-target flex cursor-pointer list-none items-center justify-center rounded border border-[var(--twin-border)] bg-[var(--twin-card)] px-3 text-sm font-semibold text-[var(--foreground)] [&::-webkit-details-marker]:hidden">
-              {t("nav.menu")}
-            </summary>
-            <nav
-              className="absolute right-0 z-20 max-h-[min(70vh,28rem)] w-[min(18rem,calc(100vw-2rem))] overflow-y-auto rounded border border-[var(--twin-border)] bg-[var(--twin-card)] p-2 shadow-lg"
-              aria-label={t("nav.ariaMobileNav")}
-              style={{ boxShadow: "var(--twin-shadow-md)" }}
-            >
-              <div className="mb-2 flex flex-col gap-2">
-                <Link
-                  href="/calculator"
-                  onClick={closeMobileMenu}
-                  className={`${roiClassName} flex w-full justify-center`}
-                >
-                  <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white shadow-sm" aria-hidden />
-                  {t("nav.calculator")}
-                </Link>
-                <Link
-                  href="/demo"
-                  onClick={closeMobileMenu}
-                  className={`${demoClassName} flex w-full justify-center`}
-                >
-                  <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white/90 shadow-sm" aria-hidden />
-                  {t("nav.demo")}
-                </Link>
-                <Link
-                  href="/dashboard/calendar"
-                  onClick={closeMobileMenu}
-                  className={`${calendarNavPillClassName} flex w-full justify-center ${calendarActive ? "ring-4 ring-white/95 ring-offset-2 ring-offset-[var(--twin-card)]" : ""}`}
-                  aria-current={calendarActive ? "page" : undefined}
-                >
-                  <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white/90 shadow-sm" aria-hidden />
-                  {t("dashboard.calendarLink")}
-                </Link>
-              </div>
-              <p className="mt-2 border-t border-[var(--twin-border)] px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
-                {t("site.footerCompany")}
-              </p>
-              {corporateNav.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={closeMobileMenu}
-                  className="twin-touch-target twin-nav-link block rounded px-3 py-2.5 text-sm hover:bg-[var(--twin-accent-muted)]"
-                >
-                  {item.label}
-                </Link>
-              ))}
-              <p className="mt-2 border-t border-[var(--twin-border)] px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
-                {t("site.footerExplore")}
-              </p>
-              {app.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={closeMobileMenu}
-                  className="twin-touch-target twin-nav-link block rounded px-3 py-2.5 text-sm hover:bg-[var(--twin-accent-muted)]"
-                >
-                  {item.label}
-                </Link>
-              ))}
-              <p className="mt-2 border-t border-[var(--twin-border)] px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
-                {t("site.footerMobileTitle")}
-              </p>
-              <div className="flex justify-center px-2 pb-2 pt-1">
-                <HeaderStoreIcons inline />
-              </div>
-            </nav>
-          </details>
-        </div>
-
-        <div className="flex w-full basis-full items-center justify-center border-t border-[var(--twin-border)]/60 py-2 md:hidden">
-          <SocialIconRow variant="header" inline className="justify-center" />
+        <div className="flex w-full basis-full flex-col items-stretch gap-y-2 border-t border-[var(--twin-border)]/60 py-2 md:hidden">
+          <div className="flex items-center justify-end gap-2">
+            <PersonaSwitcher />
+            <LanguageSwitcher />
+            <details ref={mobileMenuRef} className="relative">
+              <summary className="twin-touch-target flex cursor-pointer list-none items-center justify-center rounded border border-[var(--twin-border)] bg-[var(--twin-card)] px-3 text-sm font-semibold text-[var(--foreground)] [&::-webkit-details-marker]:hidden">
+                {t("nav.menu")}
+              </summary>
+              <nav
+                className="absolute right-0 z-20 max-h-[min(70vh,28rem)] w-[min(18rem,calc(100vw-2rem))] overflow-y-auto rounded border border-[var(--twin-border)] bg-[var(--twin-card)] p-2 shadow-lg"
+                aria-label={t("nav.ariaMobileNav")}
+                style={{ boxShadow: "var(--twin-shadow-md)" }}
+              >
+                <div className="mb-2 flex flex-col gap-2">
+                  <Link
+                    href="/calculator"
+                    onClick={closeMobileMenu}
+                    className={`${roiClassName} flex w-full justify-center`}
+                  >
+                    <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white shadow-sm" aria-hidden />
+                    {t("nav.calculator")}
+                  </Link>
+                  <Link
+                    href="/demo"
+                    onClick={closeMobileMenu}
+                    className={`${demoClassName} flex w-full justify-center`}
+                  >
+                    <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white/90 shadow-sm" aria-hidden />
+                    {t("nav.demo")}
+                  </Link>
+                  <Link
+                    href="/dashboard/calendar"
+                    onClick={closeMobileMenu}
+                    className={`${calendarNavPillClassName} flex w-full justify-center ${calendarActive ? "ring-4 ring-white/95 ring-offset-2 ring-offset-[var(--twin-card)]" : ""}`}
+                    aria-current={calendarActive ? "page" : undefined}
+                  >
+                    <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white/90 shadow-sm" aria-hidden />
+                    {t("dashboard.calendarLink")}
+                  </Link>
+                </div>
+                <p className="mt-2 border-t border-[var(--twin-border)] px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
+                  {t("site.footerCompany")}
+                </p>
+                {corporateNav.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={closeMobileMenu}
+                    className="twin-touch-target twin-nav-link block rounded px-3 py-2.5 text-sm hover:bg-[var(--twin-accent-muted)]"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+                <p className="mt-2 border-t border-[var(--twin-border)] px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
+                  {t("site.footerExplore")}
+                </p>
+                {app.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={closeMobileMenu}
+                    className="twin-touch-target twin-nav-link block rounded px-3 py-2.5 text-sm hover:bg-[var(--twin-accent-muted)]"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+                <p className="mt-2 border-t border-[var(--twin-border)] px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
+                  {t("site.footerMobileTitle")}
+                </p>
+                <div className="flex justify-center px-2 pb-2 pt-1">
+                  <HeaderStoreIcons inline />
+                </div>
+              </nav>
+            </details>
+          </div>
+          <SocialIconRow variant="header" inline compact className="justify-center" />
         </div>
       </div>
     </header>

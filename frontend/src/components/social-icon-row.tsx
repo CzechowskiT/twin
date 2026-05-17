@@ -131,15 +131,20 @@ type SocialIconRowProps = {
   /** When true, always `flex` (e.g. mobile menu). */
   inline?: boolean;
   className?: string;
+  /** Smaller hit targets for header when stacked under persona/language. */
+  compact?: boolean;
 };
 
 /** YouTube, Instagram, X, Facebook, Twitter — brand-coloured; URLs from `NEXT_PUBLIC_SOCIAL_*`. */
-export function SocialIconRow({ variant, inline = false, className = "" }: SocialIconRowProps) {
+export function SocialIconRow({ variant, inline = false, className = "", compact = false }: SocialIconRowProps) {
   const { t } = useTranslation();
   const soon = t("site.footerSocialSoonHint");
   const networks = readNetworks();
-  const size = variant === "footer" ? "h-10 w-10" : "h-9 w-9";
-  const gap = variant === "header" ? "gap-1.5" : "gap-3";
+  const headerCompact = Boolean(compact) && variant === "header";
+  const size =
+    variant === "footer" ? "h-10 w-10" : headerCompact ? "h-7 w-7" : "h-9 w-9";
+  const iconInner = headerCompact ? "h-3.5 w-3.5" : "h-5 w-5";
+  const gap = variant === "header" ? (headerCompact ? "gap-1" : "gap-1.5") : "gap-3";
   const flex = inline ? "flex" : variant === "header" ? "hidden md:flex" : "flex";
   const justify = variant === "header" ? "justify-end" : "justify-center sm:justify-start";
 
@@ -156,7 +161,7 @@ export function SocialIconRow({ variant, inline = false, className = "" }: Socia
         const shell = href
           ? `${shellBase} ${b.shellLink} cursor-pointer`
           : `${shellBase} ${b.shellIdle} cursor-not-allowed`;
-        const iconClass = `h-5 w-5 ${b.icon}`;
+        const iconClass = `${iconInner} ${b.icon}`;
         return href ? (
           <a
             key={aria}
