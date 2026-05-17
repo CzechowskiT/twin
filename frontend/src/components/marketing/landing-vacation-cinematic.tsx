@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
+import { MarketingStoryVideo } from "@/components/marketing/marketing-story-video";
 
 const SCENE_MS = [5200, 7000, 6400, 6000] as const;
 const LAST_SCENE = SCENE_MS.length - 1;
@@ -89,6 +90,7 @@ export function LandingVacationCinematic() {
       <p className="mb-3 text-center text-[10px] font-bold uppercase tracking-[0.28em] text-[var(--twin-muted)]">
         {t("home.vacationFilmEyebrow")}
       </p>
+      <MarketingStoryVideo />
       <div
         className="relative overflow-hidden rounded-2xl border border-[var(--twin-border)] bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950/90 text-slate-50 shadow-[var(--twin-shadow-lg),inset_0_0_100px_rgba(0,0,0,0.35)]"
         style={{ minHeight: "min(72svh, 560px)" }}

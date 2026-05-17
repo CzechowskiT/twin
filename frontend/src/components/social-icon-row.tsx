@@ -45,7 +45,47 @@ function IconTwitter({ className }: { className?: string }) {
   );
 }
 
+type BrandId = "youtube" | "instagram" | "x" | "facebook" | "twitter";
+
+/** Recognised brand hues (approx. official palette) so icons stay legible on light + dark chrome. */
+const BRAND: Record<BrandId, { icon: string; shellLink: string; shellIdle: string }> = {
+  youtube: {
+    icon: "text-[#FF0000]",
+    shellLink:
+      "border-[#FF0000]/55 bg-white shadow-sm ring-1 ring-[#FF0000]/20 hover:bg-red-50 hover:ring-[#FF0000]/40 dark:bg-zinc-950 dark:hover:bg-zinc-900",
+    shellIdle:
+      "border-[#FF0000]/45 bg-[#FF0000]/12 ring-1 ring-[#FF0000]/15 dark:bg-[#FF0000]/14 dark:ring-[#FF0000]/25",
+  },
+  instagram: {
+    icon: "text-[#E4405F]",
+    shellLink:
+      "border-[#E4405F]/55 bg-white shadow-sm ring-1 ring-pink-500/25 hover:bg-pink-50/90 hover:ring-pink-500/40 dark:bg-zinc-950 dark:hover:bg-zinc-900",
+    shellIdle:
+      "border-[#E4405F]/45 bg-gradient-to-br from-[#fdf4f9] to-[#fce7f3] ring-1 ring-pink-500/20 dark:from-pink-950/40 dark:to-purple-950/35 dark:ring-pink-400/25",
+  },
+  x: {
+    icon: "text-white",
+    shellLink: "border-zinc-600 bg-black shadow-sm ring-1 ring-white/10 hover:bg-zinc-950 hover:ring-white/25",
+    shellIdle: "border-zinc-700 bg-zinc-950 ring-1 ring-white/5",
+  },
+  facebook: {
+    icon: "text-[#1877F2]",
+    shellLink:
+      "border-[#1877F2]/55 bg-white shadow-sm ring-1 ring-[#1877F2]/20 hover:bg-blue-50/95 hover:ring-[#1877F2]/40 dark:bg-zinc-950 dark:hover:bg-zinc-900",
+    shellIdle:
+      "border-[#1877F2]/45 bg-[#1877F2]/10 ring-1 ring-[#1877F2]/15 dark:bg-[#1877F2]/15 dark:ring-[#1877F2]/30",
+  },
+  twitter: {
+    icon: "text-[#1D9BF0]",
+    shellLink:
+      "border-[#1D9BF0]/55 bg-white shadow-sm ring-1 ring-sky-400/30 hover:bg-sky-50/95 hover:ring-[#1D9BF0]/45 dark:bg-zinc-950 dark:hover:bg-zinc-900",
+    shellIdle:
+      "border-[#1D9BF0]/45 bg-[#1D9BF0]/10 ring-1 ring-sky-400/20 dark:bg-sky-500/12 dark:ring-sky-400/25",
+  },
+};
+
 type Net = {
+  brand: BrandId;
   href: string | undefined;
   Icon: (p: { className?: string }) => ReactElement;
   aria: TranslationKey;
@@ -53,22 +93,38 @@ type Net = {
 
 function readNetworks(): Net[] {
   return [
-    { href: process.env.NEXT_PUBLIC_SOCIAL_YOUTUBE?.trim() || undefined, Icon: IconYouTube, aria: "site.footerYoutubeAria" },
-    { href: process.env.NEXT_PUBLIC_SOCIAL_INSTAGRAM?.trim() || undefined, Icon: IconInstagram, aria: "site.footerInstagramAria" },
-    { href: process.env.NEXT_PUBLIC_SOCIAL_X?.trim() || undefined, Icon: IconX, aria: "site.footerXAria" },
-    { href: process.env.NEXT_PUBLIC_SOCIAL_FACEBOOK?.trim() || undefined, Icon: IconFacebook, aria: "site.footerFacebookAria" },
-    { href: process.env.NEXT_PUBLIC_SOCIAL_TWITTER?.trim() || undefined, Icon: IconTwitter, aria: "site.footerTwitterAria" },
+    {
+      brand: "youtube",
+      href: process.env.NEXT_PUBLIC_SOCIAL_YOUTUBE?.trim() || undefined,
+      Icon: IconYouTube,
+      aria: "site.footerYoutubeAria",
+    },
+    {
+      brand: "instagram",
+      href: process.env.NEXT_PUBLIC_SOCIAL_INSTAGRAM?.trim() || undefined,
+      Icon: IconInstagram,
+      aria: "site.footerInstagramAria",
+    },
+    {
+      brand: "x",
+      href: process.env.NEXT_PUBLIC_SOCIAL_X?.trim() || undefined,
+      Icon: IconX,
+      aria: "site.footerXAria",
+    },
+    {
+      brand: "facebook",
+      href: process.env.NEXT_PUBLIC_SOCIAL_FACEBOOK?.trim() || undefined,
+      Icon: IconFacebook,
+      aria: "site.footerFacebookAria",
+    },
+    {
+      brand: "twitter",
+      href: process.env.NEXT_PUBLIC_SOCIAL_TWITTER?.trim() || undefined,
+      Icon: IconTwitter,
+      aria: "site.footerTwitterAria",
+    },
   ];
 }
-
-const footerBtn =
-  "twin-touch-target inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[var(--twin-border)] bg-[var(--twin-card)]/80 text-[var(--twin-muted-strong)] transition hover:border-[var(--twin-accent)]/40 hover:bg-[var(--twin-accent-muted)] hover:text-[var(--twin-accent)]";
-
-const headerBtn =
-  "twin-touch-target inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[var(--twin-border)] bg-[var(--twin-card-solid)] text-[var(--foreground)] shadow-sm transition hover:border-[var(--twin-accent)]/45 hover:bg-[var(--twin-accent-muted)] hover:text-[var(--twin-accent)]";
-
-const placeholderFooter = `${footerBtn} cursor-not-allowed opacity-45`;
-const placeholderHeader = `${headerBtn} cursor-default border-dashed text-[var(--foreground)]/90`;
 
 type SocialIconRowProps = {
   variant: "header" | "footer";
@@ -77,16 +133,17 @@ type SocialIconRowProps = {
   className?: string;
 };
 
-/** YouTube, Instagram, X, Facebook, Twitter — same env vars in header and footer. */
+/** YouTube, Instagram, X, Facebook, Twitter — brand-coloured; URLs from `NEXT_PUBLIC_SOCIAL_*`. */
 export function SocialIconRow({ variant, inline = false, className = "" }: SocialIconRowProps) {
   const { t } = useTranslation();
   const soon = t("site.footerSocialSoonHint");
   const networks = readNetworks();
-  const btn = variant === "header" ? headerBtn : footerBtn;
-  const ph = variant === "header" ? placeholderHeader : placeholderFooter;
+  const size = variant === "footer" ? "h-10 w-10" : "h-9 w-9";
   const gap = variant === "header" ? "gap-1.5" : "gap-3";
   const flex = inline ? "flex" : variant === "header" ? "hidden md:flex" : "flex";
   const justify = variant === "header" ? "justify-end" : "justify-center sm:justify-start";
+
+  const shellBase = `twin-touch-target inline-flex ${size} shrink-0 items-center justify-center rounded-lg border transition duration-150 hover:scale-[1.06] active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--twin-accent)]`;
 
   return (
     <div
@@ -94,25 +151,31 @@ export function SocialIconRow({ variant, inline = false, className = "" }: Socia
       role="list"
       aria-label={variant === "header" ? t("site.headerSocialAria") : undefined}
     >
-      {networks.map(({ href, Icon, aria }) =>
-        href ? (
+      {networks.map(({ href, Icon, aria, brand }) => {
+        const b = BRAND[brand];
+        const shell = href
+          ? `${shellBase} ${b.shellLink} cursor-pointer`
+          : `${shellBase} ${b.shellIdle} cursor-not-allowed`;
+        const iconClass = `h-5 w-5 ${b.icon}`;
+        return href ? (
           <a
             key={aria}
             role="listitem"
             href={href}
             target="_blank"
             rel="noopener noreferrer me"
-            className={btn}
+            className={shell}
             aria-label={t(aria)}
+            title={t(aria)}
           >
-            <Icon className="h-5 w-5" />
+            <Icon className={iconClass} />
           </a>
         ) : (
-          <span key={aria} role="listitem" className={ph} title={soon} aria-label={t(aria)}>
-            <Icon className="h-5 w-5" />
+          <span key={aria} role="listitem" className={shell} title={soon} aria-label={t(aria)}>
+            <Icon className={iconClass} />
           </span>
-        ),
-      )}
+        );
+      })}
     </div>
   );
 }

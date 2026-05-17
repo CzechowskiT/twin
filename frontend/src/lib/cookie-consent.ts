@@ -40,7 +40,11 @@ export function hasCookieConsentDecision(): boolean {
 }
 
 /** Floating cookie banner only on the registration flow (not home, login, or dashboard). */
-const COOKIE_BANNER_PATHS = new Set(["/register"]);
+function pathShowsCookieBanner(normalized: string): boolean {
+  if (normalized === "/register") return true;
+  // Optional locale prefix: /pl/register, /en/register
+  return /^\/[a-z]{2}\/register$/.test(normalized);
+}
 
 export function normalizePathnameForCookieBanner(pathname: string): string {
   const raw = pathname.split("?")[0] || "/";
@@ -49,7 +53,7 @@ export function normalizePathnameForCookieBanner(pathname: string): string {
 
 export function shouldShowCookieBannerOnPath(pathname: string | null): boolean {
   if (!pathname) return false;
-  return COOKIE_BANNER_PATHS.has(normalizePathnameForCookieBanner(pathname));
+  return pathShowsCookieBanner(normalizePathnameForCookieBanner(pathname));
 }
 
 export function writeCookieConsent(choice: { analytics: boolean; marketing: boolean }): void {

@@ -65,7 +65,7 @@ class Settings(BaseSettings):
     # Comma-separated board ids matching scraper registry (empty = all). Controls scrape-all + /jobs/boards list.
     scrape_enabled_board_ids: str = ""
     # Per-board fetch cap for Twin scrape-all (each adapter respects this upper bound).
-    scrape_jobs_per_board: int = 48
+    scrape_jobs_per_board: int = 100
     # When true, honour robots.txt before Playwright fetches (LinkedIn uses Disallow: / for generic bots).
     scrape_respect_robots_txt: bool = True
     # Pause between boards in scrape-all (serial) to reduce burst traffic on third-party sites.

@@ -16,6 +16,12 @@ OFFER_SELECTORS = (
     '[data-test="promoted-offer"]'
 )
 EXTERNAL_ID_RE = re.compile(r",oferta,(\d+)")
+# Listing strip: "15 000–20 000 zł brutto / mies." (en dash or hyphen)
+_PL_SALARY_RANGE = re.compile(
+    r"(\d[\d\s\u00a0]{2,})\s*[–-]\s*(\d[\d\s\u00a0]{2,})\s*(?:zł|PLN)",
+    re.I,
+)
+_PL_SALARY_SINGLE = re.compile(r"(\d[\d\s\u00a0]{2,})\s*(?:zł|PLN)", re.I)
 SALES_SEARCH_TERMS = (
     "sprzedaz",
     "handlowiec",
@@ -46,12 +52,32 @@ SALES_SEARCH_TERMS = (
 def scrape_pracuj(
     keyword: str = "python",
     location: str = "warszawa",
-    limit: int = 20,
+    limit: int = 100,
 ) -> list[ScrapedJob]:
-    """Scrape job listings from Pracuj.pl search results."""
-    html = _fetch_search_html(keyword, location)
-    jobs = _parse_listing_html(html, limit)
-    return [j for j in jobs if validate_job(j)]
+    """Scrape job listings from Pracuj.pl search results (paginated via ?pn=)."""
+    results: list[ScrapedJob] = []
+    seen: set[str] = set()
+    # Pracuj shows ~20 cards per page; cap pages to stay polite and bounded.
+    max_pages = min(25, max(2, (limit + 18) // 18 + 2))
+    for page in range(1, max_pages + 1):
+        if len(results) >= limit:
+            break
+        html = _fetch_search_html(keyword, location, page=page)
+        page_jobs = _parse_listing_html(html, limit=None)
+        if not page_jobs:
+            break
+        added = 0
+        for job in page_jobs:
+            if job.external_id in seen:
+                continue
+            seen.add(job.external_id)
+            results.append(job)
+            added += 1
+            if len(results) >= limit:
+                break
+        if added == 0:
+            break
+    return [j for j in results if validate_job(j)]
 
 
 def scrape_pracuj_sales(location: str = "warszawa", limit: int = 25) -> list[ScrapedJob]:
@@ -76,36 +102,41 @@ def scrape_pracuj_sales(location: str = "warszawa", limit: int = 25) -> list[Scr
     return results
 
 
-def _build_search_url(keyword: str, location: str) -> str:
+def _build_search_url(keyword: str, location: str, *, page: int = 1) -> str:
     slug_kw = keyword.strip().lower().replace(" ", "-")
     slug_loc = location.strip().lower().replace(" ", "-")
-    return f"{BASE_URL}/praca/{slug_kw};kw/{slug_loc};wp"
+    base = f"{BASE_URL}/praca/{slug_kw};kw/{slug_loc};wp"
+    if page < 1:
+        page = 1
+    if page > 1:
+        return f"{base}?pn={page}"
+    return base
 
 
-def _fetch_search_html(keyword: str, location: str) -> str:
+def _fetch_search_html(keyword: str, location: str, *, page: int = 1) -> str:
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
         return ""
 
-    url = _build_search_url(keyword, location)
+    url = _build_search_url(keyword, location, page=page)
     if not assert_url_may_be_fetched(url):
         return ""
     with sync_playwright() as pw:
         browser = pw.chromium.launch(headless=True)
         context = browser.new_context(locale="pl-PL", user_agent=get_scrape_user_agent())
-        page = context.new_page()
-        page.goto(url, wait_until="domcontentloaded", timeout=60_000)
-        _dismiss_cookie_banner(page)
-        page.wait_for_timeout(2_500)
-        html = page.content()
+        pw_page = context.new_page()
+        pw_page.goto(url, wait_until="domcontentloaded", timeout=60_000)
+        _dismiss_cookie_banner(pw_page)
+        pw_page.wait_for_timeout(2_500)
+        html = pw_page.content()
         context.close()
         browser.close()
     post_fetch_delay()
     return html
 
 
-def _dismiss_cookie_banner(page) -> None:
+def _dismiss_cookie_banner(pw_page) -> None:
     """Accept cookies so listing markup renders consistently."""
     selectors = (
         "#onetrust-accept-btn-handler",
@@ -114,16 +145,16 @@ def _dismiss_cookie_banner(page) -> None:
     )
     for selector in selectors:
         try:
-            button = page.locator(selector).first
+            button = pw_page.locator(selector).first
             if button.is_visible(timeout=1_500):
                 button.click()
-                page.wait_for_timeout(500)
+                pw_page.wait_for_timeout(500)
                 return
         except Exception:
             continue
 
 
-def _parse_listing_html(html: str, limit: int) -> list[ScrapedJob]:
+def _parse_listing_html(html: str, limit: int | None) -> list[ScrapedJob]:
     if not html:
         return []
 
@@ -133,7 +164,7 @@ def _parse_listing_html(html: str, limit: int) -> list[ScrapedJob]:
     seen_ids: set[str] = set()
 
     for card in cards:
-        if len(results) >= limit:
+        if limit is not None and len(results) >= limit:
             break
         job = _parse_offer_card(card)
         if not job or job.external_id in seen_ids:
@@ -169,6 +200,9 @@ def _parse_offer_card(card) -> ScrapedJob | None:
     if not company:
         company = "Nie podano"
 
+    salary_text = salary_el.get_text(strip=True) if salary_el else None
+    salary_min, salary_max = _parse_salary_pl(salary_text)
+
     return ScrapedJob(
         job_board=JOB_BOARD,
         external_id=external_id,
@@ -176,8 +210,28 @@ def _parse_offer_card(card) -> ScrapedJob | None:
         company=company,
         url=_canonical_offer_url(url),
         location=region_el.get_text(strip=True) if region_el else None,
-        requirements=salary_el.get_text(strip=True) if salary_el else None,
+        salary_min=salary_min,
+        salary_max=salary_max,
+        requirements=None,
+        description=None,
     )
+
+
+def _parse_salary_pl(text: str | None) -> tuple[int | None, int | None]:
+    """Extract gross monthly bounds from Pracuj listing salary line (PLN or zł)."""
+    if not text:
+        return None, None
+    normalized = text.replace("\xa0", " ")
+    m = _PL_SALARY_RANGE.search(normalized)
+    if m:
+        lo = int(re.sub(r"\s", "", m.group(1)))
+        hi = int(re.sub(r"\s", "", m.group(2)))
+        return lo, hi
+    m2 = _PL_SALARY_SINGLE.search(normalized)
+    if m2:
+        v = int(re.sub(r"\s", "", m2.group(1)))
+        return v, v
+    return None, None
 
 
 def _external_id_from_url(url: str) -> str | None:
