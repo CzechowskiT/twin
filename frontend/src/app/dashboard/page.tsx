@@ -406,6 +406,9 @@ export default function DashboardPage() {
           <Link href="/dashboard/identity" className="twin-link twin-touch-target text-center text-sm sm:text-left">
             {t("dashboard.identityLink")}
           </Link>
+          <Link href="/dashboard/calendar" className="twin-link twin-touch-target text-center text-sm sm:text-left">
+            {t("dashboard.calendarLink")}
+          </Link>
           <button
             type="button"
             onClick={() => {

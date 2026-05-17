@@ -64,6 +64,25 @@ class User(Base):
     identity_verifications: Mapped[list["IdentityVerification"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
+    google_calendar: Mapped["UserGoogleCalendar | None"] = relationship(
+        back_populates="user", uselist=False, cascade="all, delete-orphan"
+    )
+
+
+class UserGoogleCalendar(Base):
+    """Offline Google Calendar access for availability checks and interview blocks."""
+
+    __tablename__ = "user_google_calendar"
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    refresh_token_encrypted: Mapped[str] = mapped_column(Text)
+    google_email: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+    user: Mapped["User"] = relationship(back_populates="google_calendar")
 
 
 class IdentityVerification(Base):

@@ -15,6 +15,7 @@ function normalizePath(pathname: string): string {
 function titleKeyForPath(path: string): TranslationKey {
   if (path.startsWith("/dashboard/billing")) return "meta.titleBilling";
   if (path.startsWith("/dashboard/identity")) return "meta.titleIdentity";
+  if (path.startsWith("/dashboard/calendar")) return "meta.titleDashboardCalendar";
   if (path.startsWith("/dashboard")) return "meta.titleDashboard";
   if (path.startsWith("/auth/callback")) return "meta.titleAuthCallback";
   if (path.startsWith("/consent/gdpr")) return "meta.titleGdprConsent";

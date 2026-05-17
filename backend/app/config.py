@@ -87,6 +87,8 @@ class Settings(BaseSettings):
     google_client_id: str = ""
     google_client_secret: str = ""
     google_redirect_uri: str = "http://localhost:8000/api/v1/auth/google/callback"
+    # Separate OAuth redirect for Calendar scopes (add this exact URI in Google Cloud Console).
+    google_calendar_redirect_uri: str = "http://localhost:8000/api/v1/calendar/google/callback"
 
     github_client_id: str = ""
     github_client_secret: str = ""

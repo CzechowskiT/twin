@@ -19,11 +19,10 @@ def verify_password(plain: str, hashed: str) -> bool:
     return pwd_context.verify(plain, hashed)
 
 
-def create_access_token(subject: str) -> str:
+def create_access_token(subject: str, *, expires_minutes: int | None = None) -> str:
     settings = get_settings()
-    expire = datetime.now(timezone.utc) + timedelta(
-        minutes=settings.access_token_expire_minutes
-    )
+    ttl = expires_minutes if expires_minutes is not None else settings.access_token_expire_minutes
+    expire = datetime.now(timezone.utc) + timedelta(minutes=ttl)
     # jose expects numeric `exp` (JWT NumericDate); datetime can break encoding on some stacks.
     payload = {"sub": subject, "exp": int(expire.timestamp())}
     return jwt.encode(payload, settings.secret_key, algorithm=ALGORITHM)

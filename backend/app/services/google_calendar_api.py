@@ -1,0 +1,64 @@
+"""Minimal Google Calendar v3 calls (free/busy + create event)."""
+
+from __future__ import annotations
+
+from typing import Any
+
+import httpx
+
+CAL_BASE = "https://www.googleapis.com/calendar/v3"
+
+
+class GoogleCalendarApiError(Exception):
+    """Upstream Calendar API error."""
+
+
+def query_freebusy(access_token: str, time_min: str, time_max: str) -> dict[str, Any]:
+    payload = {
+        "timeMin": time_min,
+        "timeMax": time_max,
+        "items": [{"id": "primary"}],
+    }
+    with httpx.Client(timeout=30.0) as client:
+        res = client.post(
+            f"{CAL_BASE}/freeBusy",
+            json=payload,
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "Content-Type": "application/json",
+            },
+        )
+        if res.status_code != 200:
+            raise GoogleCalendarApiError(res.text or "freeBusy failed")
+        return res.json()
+
+
+def insert_primary_event(
+    access_token: str,
+    *,
+    summary: str,
+    description: str | None,
+    start_iso: str,
+    end_iso: str,
+    time_zone: str,
+) -> dict[str, Any]:
+    body: dict[str, Any] = {
+        "summary": summary,
+        "start": {"dateTime": start_iso, "timeZone": time_zone},
+        "end": {"dateTime": end_iso, "timeZone": time_zone},
+    }
+    if description:
+        body["description"] = description
+    with httpx.Client(timeout=30.0) as client:
+        res = client.post(
+            f"{CAL_BASE}/calendars/primary/events",
+            json=body,
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "Content-Type": "application/json",
+            },
+            params={"sendUpdates": "none"},
+        )
+        if res.status_code not in (200, 201):
+            raise GoogleCalendarApiError(res.text or "event insert failed")
+        return res.json()
