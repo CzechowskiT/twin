@@ -17,6 +17,11 @@ You are building TWIN: an AI-powered autonomous career agent that finds jobs, ap
 - Task Queue: Celery + Redis
 - Hosting: Railway (backend) + Vercel (frontend)
 
+## North Star — calendar of acceptance (candidate & recruiter)
+The product is **not** “more volume in your inbox.” Outside TWIN, someone returns from holiday to **random interview spam** or **thousands of raw CVs**. In TWIN they return to a **short calendar of pre-qualified moments**: candidates see **slots worth showing up for**; recruiters see **profiles already matched to the bar** — **accept / decline / reschedule**, not blind sifting.
+
+**Mechanic (build toward this):** matching + consent + async work while away → ranked pipeline → **scheduled or batch acceptance UI** → calendar export / sync. Every new surface (copy, API, UI) should ask: *does this reduce noise toward acceptance-ready calendar items, or add noise?*
+
 ## Current Phase
 Phase 1 — Full stack MVP (Celery, scrapers, matching). Job boards: pracuj.pl, rocketjobs.pl.
 
