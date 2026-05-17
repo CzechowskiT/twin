@@ -1,11 +1,13 @@
 """Job listing and scrape trigger endpoints."""
 
 import logging
+import threading
 from collections.abc import Callable
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.core.deps import get_current_user
 from app.database.models import Candidate, Job, User
 from app.database.session import get_db
@@ -162,9 +164,33 @@ def trigger_scrape_all(
             message=msg,
         )
 
+    # Eager mode runs the task inside the API process; doing that in this request would exceed
+    # typical reverse-proxy timeouts (e.g. Vercel 45s) and can surface as opaque 500s. Offload to a
+    # daemon thread so the client gets an immediate 200 while scraping continues.
+    if get_settings().celery_task_always_eager:
+
+        def _run_eager_scrape_all() -> None:
+            try:
+                scrape_all_boards_task.delay()
+            except Exception:
+                logger.exception("Background scrape-all failed (CELERY_TASK_ALWAYS_EAGER)")
+
+        threading.Thread(
+            target=_run_eager_scrape_all,
+            name="twin-scrape-all-eager",
+            daemon=True,
+        ).start()
+        return ScrapeAllOut(
+            task_id="eager-background",
+            total_saved=0,
+            boards={},
+            errors={},
+            message="Scrape all boards started in background (eager API mode)",
+        )
+
     async_result = _celery_send(lambda: scrape_all_boards_task.delay())
     return ScrapeAllOut(
-        task_id=async_result.id,
+        task_id=str(async_result.id),
         total_saved=0,
         boards={},
         errors={},
