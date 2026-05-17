@@ -5,6 +5,7 @@ import { useRef } from "react";
 
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useTranslation } from "@/components/language-provider";
+import { PersonaSwitcher } from "@/components/persona-switcher";
 
 /** One chrome everywhere: calm light header (matches hope / growth palette in globals). */
 export function Header() {
@@ -16,16 +17,14 @@ export function Header() {
     if (d) d.open = false;
   };
 
-  /** Demo + persona lanes — grouped with account on the right (desktop). */
-  const productNav = [
-    { href: "/demo" as const, label: t("nav.demo") },
-    { href: "/for-candidates" as const, label: t("nav.forCandidates") },
-    { href: "/for-recruiters" as const, label: t("nav.forRecruiters") },
-    { href: "/for-companies" as const, label: t("nav.forCompanies") },
+  /** Account + app entry — profile lives in the dashboard panel, not global chrome. */
+  const app = [
+    { href: "/login" as const, label: t("nav.login") },
+    { href: "/register" as const, label: t("nav.register") },
+    { href: "/dashboard" as const, label: t("nav.dashboard") },
   ];
 
-  /** Corporate / marketing pages — sit next to logo so the top bar does not orphan a short second row. */
-  const siteNav = [
+  const corporateNav = [
     { href: "/about" as const, label: t("nav.about") },
     { href: "/case-studies" as const, label: t("nav.cases") },
     { href: "/faq" as const, label: t("nav.faq") },
@@ -35,15 +34,11 @@ export function Header() {
     { href: "/contact" as const, label: t("nav.contact") },
   ];
 
-  const app = [
-    { href: "/login" as const, label: t("nav.login") },
-    { href: "/register" as const, label: t("nav.register") },
-    { href: "/profile" as const, label: t("nav.profile") },
-    { href: "/dashboard" as const, label: t("nav.dashboard") },
-  ];
-
   const roiClassName =
     "twin-nav-roi-pill twin-touch-target inline-flex max-w-[10.5rem] shrink-0 items-center justify-center gap-2 whitespace-normal rounded-full bg-[var(--twin-cta)] px-3 py-2 text-center text-[10px] font-extrabold uppercase leading-tight tracking-wide text-[var(--twin-on-cta)] shadow-[0_4px_14px_rgb(217_119_6_/0.55)] ring-2 ring-white/90 ring-offset-2 ring-offset-white transition hover:bg-[var(--twin-cta-hover)] hover:shadow-[0_6px_20px_rgb(180_83_9_/0.5)] sm:max-w-[16rem] sm:px-5 sm:py-2.5 sm:text-[12px] sm:leading-snug md:text-[13px]";
+
+  const demoClassName =
+    "twin-nav-demo-pill twin-touch-target inline-flex max-w-[10.5rem] shrink-0 items-center justify-center gap-2 whitespace-normal rounded-full bg-[var(--twin-accent)] px-3 py-2 text-center text-[10px] font-extrabold uppercase leading-tight tracking-wide text-[var(--twin-on-accent)] shadow-[0_4px_14px_rgb(31_77_64_/0.45)] ring-2 ring-white/90 ring-offset-2 ring-offset-white transition hover:bg-[var(--twin-accent-hover)] hover:shadow-[0_6px_20px_rgb(22_56_46_/0.42)] sm:max-w-[16rem] sm:px-5 sm:py-2.5 sm:text-[12px] sm:leading-snug md:text-[13px]";
 
   const linkClass = "twin-nav-link whitespace-nowrap";
 
@@ -55,15 +50,21 @@ export function Header() {
           <Link href="/" className="twin-logo shrink-0">
             TWIN<span className="twin-logo-accent">.</span>
           </Link>
-          <Link href="/calculator" className={roiClassName}>
-            <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white shadow-sm" aria-hidden />
-            {t("nav.calculator")}
-          </Link>
+          <div className="flex shrink-0 flex-wrap items-center gap-x-1.5 gap-y-1 sm:gap-x-2">
+            <Link href="/calculator" className={roiClassName}>
+              <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white shadow-sm" aria-hidden />
+              {t("nav.calculator")}
+            </Link>
+            <Link href="/demo" className={demoClassName}>
+              <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white/90 shadow-sm" aria-hidden />
+              {t("nav.demo")}
+            </Link>
+          </div>
           <nav
             className="hidden min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1 text-[12px] font-medium sm:text-[13px] md:flex"
             aria-label={t("nav.ariaSiteNav")}
           >
-            {siteNav.map((item) => (
+            {corporateNav.map((item) => (
               <Link key={item.href} href={item.href} className={linkClass}>
                 {item.label}
               </Link>
@@ -71,18 +72,7 @@ export function Header() {
           </nav>
         </div>
 
-        <div className="hidden shrink-0 flex-wrap items-center justify-end gap-x-2.5 gap-y-1 md:flex">
-          <nav
-            className="flex flex-wrap items-center justify-end gap-x-2.5 gap-y-1 text-[12px] font-medium sm:text-[13px]"
-            aria-label={t("nav.ariaProductNav")}
-          >
-            {productNav.map((item) => (
-              <Link key={item.href} href={item.href} className={linkClass}>
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-          <div className="hidden h-6 w-px shrink-0 bg-[var(--twin-border)] sm:block" aria-hidden />
+        <div className="hidden shrink-0 flex-wrap items-center justify-end gap-x-2 gap-y-1 md:flex md:gap-x-2.5">
           <nav
             className="flex flex-wrap items-center justify-end gap-x-2.5 gap-y-1 text-[12px] sm:text-[13px]"
             aria-label={t("nav.ariaAccountNav")}
@@ -93,10 +83,15 @@ export function Header() {
               </Link>
             ))}
           </nav>
-          <LanguageSwitcher />
+          <div className="hidden h-6 w-px shrink-0 bg-[var(--twin-border)] sm:block" aria-hidden />
+          <div className="flex flex-wrap items-center justify-end gap-x-2 gap-y-1">
+            <PersonaSwitcher />
+            <LanguageSwitcher />
+          </div>
         </div>
 
         <div className="flex items-center gap-2 md:hidden">
+          <PersonaSwitcher />
           <LanguageSwitcher />
           <details ref={mobileMenuRef} className="relative">
             <summary className="twin-touch-target flex cursor-pointer list-none items-center justify-center rounded border border-[var(--twin-border)] bg-[var(--twin-card)] px-3 text-sm font-semibold text-[var(--foreground)] [&::-webkit-details-marker]:hidden">
@@ -107,31 +102,28 @@ export function Header() {
               aria-label={t("nav.ariaMobileNav")}
               style={{ boxShadow: "var(--twin-shadow-md)" }}
             >
-              <Link
-                href="/calculator"
-                onClick={closeMobileMenu}
-                className={`${roiClassName} mb-2 flex w-full justify-center`}
-              >
-                <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white shadow-sm" aria-hidden />
-                {t("nav.calculator")}
-              </Link>
-              <p className="px-3 pb-1 pt-1 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
-                {t("nav.ariaProductNav")}
-              </p>
-              {productNav.map((item) => (
+              <div className="mb-2 flex flex-col gap-2">
                 <Link
-                  key={item.href}
-                  href={item.href}
+                  href="/calculator"
                   onClick={closeMobileMenu}
-                  className="twin-touch-target twin-nav-link block rounded px-3 py-2.5 text-sm hover:bg-[var(--twin-accent-muted)]"
+                  className={`${roiClassName} flex w-full justify-center`}
                 >
-                  {item.label}
+                  <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white shadow-sm" aria-hidden />
+                  {t("nav.calculator")}
                 </Link>
-              ))}
+                <Link
+                  href="/demo"
+                  onClick={closeMobileMenu}
+                  className={`${demoClassName} flex w-full justify-center`}
+                >
+                  <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white/90 shadow-sm" aria-hidden />
+                  {t("nav.demo")}
+                </Link>
+              </div>
               <p className="mt-2 border-t border-[var(--twin-border)] px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
                 {t("site.footerCompany")}
               </p>
-              {siteNav.map((item) => (
+              {corporateNav.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}

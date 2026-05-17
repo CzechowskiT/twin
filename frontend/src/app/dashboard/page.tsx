@@ -393,7 +393,10 @@ export default function DashboardPage() {
         <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">
           {t("dashboard.title")}
         </h1>
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-2">
+          <Link href="/profile" className="twin-link twin-touch-target text-center text-sm sm:text-left">
+            {t("nav.profile")}
+          </Link>
           <Link href="/dashboard/career" className="twin-link twin-touch-target text-center text-sm sm:text-left">
             {t("dashboard.careerCompassLink")}
           </Link>
@@ -414,6 +417,13 @@ export default function DashboardPage() {
             {t("dashboard.logout")}
           </button>
         </div>
+      </div>
+
+      <div className="mb-6 rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/50 px-4 py-3 sm:px-5">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
+          {t("dashboard.northStarEyebrow")}
+        </p>
+        <p className="mt-2 text-sm leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.northStarLead")}</p>
       </div>
 
       {user ? (

@@ -260,6 +260,22 @@ html[data-marketing-surface="studio"] .twin-logo-accent {
   transform: rotate(180deg);
 }
 
+.twin-persona-switcher[open] .twin-persona-switcher-chevron {
+  transform: rotate(180deg);
+}
+
+/** Demo CTA pill — brand green, same visual weight as ROI calculator pill. */
+html[data-marketing-surface="studio"] .twin-nav-demo-pill {
+  background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+  color: #fff;
+  --tw-ring-offset-color: #030712;
+  box-shadow: 0 4px 14px rgb(16 185 129 / 0.35);
+}
+
+html[data-marketing-surface="studio"] .twin-nav-demo-pill:hover {
+  background: linear-gradient(135deg, #6ee7b7 0%, #047857 100%);
+}
+
 .twin-bg-root {
   position: fixed;
   inset: 0;

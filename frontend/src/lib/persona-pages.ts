@@ -47,11 +47,11 @@ const candidatesEn: PersonaBundle = {
   heroEyebrow: "Candidate workspace",
   heroTitle: "Let the boring career admin run in the background",
   heroLead:
-    "One aggressive feed, profile-aware scores, CV smarts, tracked applications — built for people who’d rather be in flow state than in job-tab hell. Auto-apply unlocks where boards + your plan allow.",
+    "One aggressive feed, profile-aware scores, CV smarts, and tracked applications for people who would rather stay in flow than live in job-tab hell. Auto-apply unlocks where boards and your plan allow.",
   pillars: [
     {
       title: "Discovery & match",
-      body: "Multi-board feed with filters, match scores tied to skills, titles, CV text, and salary/location signals — not another siloed search tab.",
+      body: "Multi-board feed with filters and match scores tied to skills, titles, CV text, and salary or location signals. Not another siloed search tab.",
     },
     {
       title: "Profile & CV intelligence",
@@ -59,18 +59,18 @@ const candidatesEn: PersonaBundle = {
     },
     {
       title: "Applications & consent",
-      body: "Statuses for pending, applied, rejected; manual apply opens the employer flow; auto-apply runs only on supported boards and paid tiers — GDPR-first consent at registration.",
+      body: "Statuses for pending, applied, rejected; manual apply opens the employer flow; auto-apply runs only on supported boards and paid tiers. GDPR-first consent at registration.",
     },
   ],
   growthLane: {
     eyebrow: "After the offer",
-    title: "Stay with TWIN once you’re in-seat — growth, not just job search",
+    title: "Stay with TWIN after you land: growth, not just job search",
     lead:
-      "The hire is a milestone, not an off-boarding event. We’re building a second act inside the same workspace: light-touch market awareness, review-ready artifacts, and nudges that respect employed life (quiet hours, digests). Depth lands in phases — here’s the lane we’re selling so you keep opening TWIN monthly.",
+      "The hire is a milestone, not an off-boarding event. We are building a second act in the same workspace: light-touch market awareness, review-ready artifacts, and nudges that respect employed life (quiet hours, digests). Depth ships in phases. This is the lane we want you to open monthly, not only when tabs spin out of control.",
     items: [
       {
         title: "Calibrated passive watch",
-        body: "Turn the firehose into a trickle: a small stream of high-signal roles, salary band deltas, and skill gaps vs your lane — enough to notice mis-hires early without doom-scrolling.",
+        body: "Turn the firehose into a trickle: a thin stream of high-signal roles, salary band deltas, and skill gaps versus your lane, enough to spot mis-hires early without doom-scrolling.",
       },
       {
         title: "30 / 60 / 90 + review pulse",
@@ -82,7 +82,7 @@ const candidatesEn: PersonaBundle = {
       },
       {
         title: "Promotion-ready packet",
-        body: "One-click export: headline impact, quantified outcomes, languages, and internal mobility hooks sourced from your CV + tracked applications — formatted for managers who live in PDFs.",
+        body: "One-click export: headline impact, quantified outcomes, languages, and internal mobility hooks from your CV and tracked applications, formatted for managers who live in PDFs.",
       },
       {
         title: "Quiet mode for employed life",
@@ -142,38 +142,38 @@ const candidatesEn: PersonaBundle = {
     "Auto-apply requires Playwright-friendly boards and Premium/Pro entitlements.",
     "CV parsing reads PDF/DOCX/TXT; scanned PDFs without text remain a best-effort extraction.",
   ],
-  primaryCta: { label: "Ship my twin — free", href: "/register" },
-  secondaryCta: { label: "I already run hot — dashboard", href: "/dashboard" },
+  primaryCta: { label: "Start free with TWIN", href: "/register" },
+  secondaryCta: { label: "I already use TWIN · dashboard", href: "/dashboard" },
 };
 
 const candidatesPl: PersonaBundle = {
   heroEyebrow: "Przestrzeń dla kandydata",
   heroTitle: "Nudny admin kariery niech leci w tle",
   heroLead:
-    "Jeden agresywnie czytelny feed, scoring pod profil, inteligencja CV, śledzenie aplikacji — dla ludzi, którzy wolą flow niż piekło tabów. Auto-apply tam, gdzie portal i plan pozwalają.",
+    "Jeden czytelny feed, scoring pod profil, inteligencja CV i śledzenie aplikacji dla ludzi, którzy wolą flow niż piekło tabów. Auto-apply tam, gdzie portal i plan pozwalają.",
   pillars: [
     {
       title: "Odkrywanie i dopasowanie",
-      body: "Feed z wielu portali, filtry, scoring od umiejętności, tytułów, tekstu CV oraz płacy/lokalizacji — bez kolejnego „osobnego wyszukiwarka-only”.",
+      body: "Feed z wielu portali, filtry, scoring od umiejętności, tytułów, tekstu CV oraz płacy i lokalizacji. Bez kolejnego „osobnego tylko wyszukiwarka”.",
     },
     {
       title: "Profil i inteligencja CV",
-      body: "Profil strukturalny, upload CV z ekstrakcją tekstu, opcjonalne wzbogacenie LLM (umiejętności, propozycje stanowisk, krótka analiza) — jasno pokazane w profilu.",
+      body: "Profil strukturalny, upload CV z ekstrakcją tekstu, opcjonalne wzbogacenie LLM (umiejętności, propozycje stanowisk, krótka analiza), wszystko czytelnie w profilu.",
     },
     {
       title: "Aplikacje i zgoda",
-      body: "Statusy pending/applied/rejected; ręczne „Aplikuj” otwiera flow pracodawcy; auto-apply tylko na obsługiwanych portalach i płatnych planach — RODO od rejestracji.",
+      body: "Statusy pending/applied/rejected; ręczne „Aplikuj” otwiera flow pracodawcy; auto-apply tylko na obsługiwanych portalach i płatnych planach. RODO od rejestracji.",
     },
   ],
   growthLane: {
     eyebrow: "Po podpisaniu umowy",
-    title: "Zostań z TWIN także w roli — rozwój, nie tylko poszukiwania",
+    title: "Zostań z TWIN także w roli: rozwój, nie tylko poszukiwania",
     lead:
-      "Zatrudnienie to kamień milowy, a nie powód do wylogowania. Budujemy drugi akt w tym samym workspace: lekki kontakt z rynkiem, materiały pod rozmowy o awansie i przypomnienia, które szanują tryb „jestem w pracy” (cisza, digest). Głębia wchodzi falami — poniżej kontrakt produktowy, żebyś otwierał TWIN co miesiąc, nie tylko w kryzysie tabów.",
+      "Zatrudnienie to kamień milowy, a nie powód do wylogowania. Budujemy drugi akt w tym samym workspace: lekki kontakt z rynkiem, materiały pod rozmowy o awansie i przypomnienia, które szanują tryb „jestem w pracy” (cisza, digest). Głębia wchodzi falami. Poniżej kontrakt produktowy, żebyś otwierał TWIN co miesiąc, nie tylko w kryzysie tabów.",
     items: [
       {
         title: "Uspokojony passive watch",
-        body: "Zamiast zalewu — cienka struga sygnałów: wybrane role w Twojej ścieżce, zmiany widełek wynagrodzeń i luka kompetencyjna vs świeże JD — wystarczająco, by wcześnie wyczuć nietrafione dopasowanie, bez doom-scrolla.",
+        body: "Zamiast zalewu: cienka struga sygnałów (wybrane role w Twojej ścieżce, zmiany widełek, luka kompetencyjna wobec świeżych JD), wystarczająco wcześnie, by wyczuć nietrafione dopasowanie, bez doom-scrolla.",
       },
       {
         title: "Puls 30 / 60 / 90 i okienek ocen",
@@ -185,7 +185,7 @@ const candidatesPl: PersonaBundle = {
       },
       {
         title: "Pakiet pod rozmowę o awansie",
-        body: "Eksport jednym kliknięciem: efekt, liczby, języki, wątki mobilności wewnętrznej — z CV i historii aplikacji w TWIN — pod PDF-y managera i HRBP.",
+        body: "Eksport jednym kliknięciem: efekt, liczby, języki, wątki mobilności wewnętrznej z CV i historii aplikacji w TWIN, pod PDF-y managera i HRBP.",
       },
       {
         title: "Tryb ciszy dla etatu",
@@ -241,27 +241,27 @@ const candidatesPl: PersonaBundle = {
   ],
   logisticsTitle: "Granice operacyjne",
   logistics: [
-    "Nadal aplikujesz u pracodawcy tam, gdzie wymaga tego portal — TWIN nie zastępuje umów z boardami.",
+    "Nadal aplikujesz u pracodawcy tam, gdzie wymaga tego portal. TWIN nie zastępuje umów z portalami.",
     "Auto-apply wymaga Playwright + uprawnień Premium/Pro.",
     "PDF skanowany bez warstwy tekstu = ekstrakcja na najlepszym wysiłku.",
   ],
-  primaryCta: { label: "Odpalam TWIN — za darmo", href: "/register" },
-  secondaryCta: { label: "Mam już tempo — panel", href: "/dashboard" },
+  primaryCta: { label: "Zacznij z TWIN za darmo", href: "/register" },
+  secondaryCta: { label: "Już korzystam · panel", href: "/dashboard" },
 };
 
 const recruitersEn: PersonaBundle = {
   heroEyebrow: "Recruiter & sourcer workspace",
   heroTitle: "Evidence-first sourcing without candidate PII leaks",
   heroLead:
-    "A different SKU: multi-seat watchlists across boards you license, exportable hiring-manager packets with timestamps, and audit-friendly geography presets — not the candidate auto-apply product.",
+    "A different SKU: multi-seat watchlists on boards you license, exportable hiring-manager packets with timestamps, and audit-friendly geography presets. This is not the consumer auto-apply product.",
   pillars: [
     {
       title: "Board-aware watchlists",
-      body: "Curate role families per client, attach source URLs, and freeze snapshots for compliance — separate from individual candidate accounts.",
+      body: "Curate role families per client, attach source URLs, and freeze snapshots for compliance, kept apart from individual candidate accounts.",
     },
     {
       title: "Handoff packets",
-      body: "Generate concise PDF/Markdown summaries: role, last verified date, salary band signals, and sourcer notes — built for hiring manager inboxes, not consumer dashboards.",
+      body: "Generate concise PDF or Markdown summaries (role, last verified date, salary band signals, sourcer notes) built for hiring-manager inboxes, not consumer dashboards.",
     },
     {
       title: "Governance presets",
@@ -270,9 +270,9 @@ const recruitersEn: PersonaBundle = {
   ],
   pricingTitle: "Recruiter seat packs (invoice)",
   pricingLead:
-    "Billed monthly per active seat; onboarding call included. Candidate self-serve checkout does not apply — agreements are manual in MVP.",
+    "Billed monthly per active seat; onboarding call included. Candidate self-serve checkout does not apply here, so agreements stay manual during MVP.",
   pricingFootnote:
-    "Seat limits and API SLAs are contractual. RocketJobs/Pracuj data usage still respects each board’s terms — TWIN surfaces links, not scraped redistribution for recruiters without entitlement.",
+    "Seat limits and API SLAs are contractual. RocketJobs/Pracuj data usage still respects each board’s terms. TWIN surfaces links, not scraped redistribution for recruiters without entitlement.",
   tiers: [
     {
       id: "sourcer",
@@ -313,7 +313,7 @@ const recruitersEn: PersonaBundle = {
   ],
   logisticsTitle: "What recruiters do NOT get here",
   logistics: [
-    "No bulk download of candidate CVs from TWIN consumer accounts — different legal basis.",
+    "No bulk download of candidate CVs from TWIN consumer accounts; different legal basis.",
     "No promise of auto-apply into third-party ATS without integration work.",
     "Recruiter features roll out on a separate roadmap from the candidate mobile/web MVP.",
   ],
@@ -325,15 +325,15 @@ const recruitersPl: PersonaBundle = {
   heroEyebrow: "Przestrzeń rekrutera i sourcera",
   heroTitle: "Sourcing oparty o dowody, bez wycieku PII kandydatów",
   heroLead:
-    "Odrębny produkt: wielostanowiskowe listy obserwowanych ofert na portalach, które licencjonujesz, eksportowalne paczki dla hiring managera ze znacznikami czasu i presetami geografii — to nie jest konsumencki auto-apply.",
+    "Odrębny produkt: wielostanowiskowe listy obserwowanych ofert na portalach, które licencjonujesz, eksportowalne paczki dla hiring managera ze znacznikami czasu i presetami geografii. To nie jest konsumencki auto-apply.",
   pillars: [
     {
       title: "Listy per portal",
-      body: "Rodziny stanowisk per klient, URL źródeł, „zamrożone” snapshoty pod compliance — oddzielone od kont kandydata.",
+      body: "Rodziny stanowisk per klient, URL źródeł, „zamrożone” snapshoty pod compliance, oddzielone od kont kandydata.",
     },
     {
       title: "Paczki przekazania",
-      body: "PDF/Markdown: rola, data weryfikacji, widełki płacowe, notatki sourcera — pod inbox HM, nie pod dashboard konsumenta.",
+      body: "PDF lub Markdown: rola, data weryfikacji, widełki płacowe, notatki sourcera, pod inbox HM, nie pod dashboard konsumenta.",
     },
     {
       title: "Presety zgodności",
@@ -342,9 +342,9 @@ const recruitersPl: PersonaBundle = {
   ],
   pricingTitle: "Pakiety miejsc dla rekruterów (faktura)",
   pricingLead:
-    "Miesięcznie za aktywne miejsce; wdrożenie z calliem. Self-serve Stripe kandydata tu nie działa — umowy ręcznie w MVP.",
+    "Miesięcznie za aktywne miejsce, wdrożenie z rozmową startową. Self-serve Stripe kandydata tu nie działa, więc umowy są ręczne w MVP.",
   pricingFootnote:
-    "Limity miejsc i SLA API są umowne. Dane RocketJobs/Pracuj — nadal tylko zgodnie z regulaminem portalu; TWIN podaje linki, nie redystrybucję bez uprawnień.",
+    "Limity miejsc i SLA API są umowne. Dane z RocketJobs i Pracuj wciąż tylko zgodnie z regulaminem portalu; TWIN podaje linki, nie redystrybucję bez uprawnień.",
   tiers: [
     {
       id: "sourcer",
@@ -385,31 +385,31 @@ const recruitersPl: PersonaBundle = {
   ],
   logisticsTitle: "Czego rekruter NIE dostaje w tej linii",
   logistics: [
-    "Brak masowego pobierania CV z kont konsumenckich TWIN — inna podstawa prawna.",
+    "Brak masowego pobierania CV z kont konsumenckich TWIN; inna podstawa prawna.",
     "Brak obietnicy auto-apply do ATS bez integracji.",
     "Funkcje rekrutera mają osobny roadmap od MVP kandydata.",
   ],
-  primaryCta: { label: "Kontakt — sprzedaż dla rekruterów", href: "/contact" },
+  primaryCta: { label: "Kontakt: sprzedaż dla rekruterów", href: "/contact" },
   secondaryCta: { label: "Integracje partnerskie", href: "/partners" },
 };
 
 const companiesEn: PersonaBundle = {
   heroEyebrow: "Company & procurement",
-  heroTitle: "Economics, security, and delivery — not per-seat sourcing",
+  heroTitle: "Economics, security, and delivery beyond per-seat sourcing",
   heroLead:
-    "Enterprise programs bundle ROI modeling, DPA-ready documentation, SSO roadmap, and annual commitments. This lane owns the B2B calculator and vendor security reviews — orthogonal to recruiter seat SKUs.",
+    "Enterprise programs bundle ROI modeling, DPA-ready documentation, SSO roadmap, and annual commitments. This lane owns the B2B calculator and vendor security reviews. It sits apart from recruiter seat SKUs.",
   pillars: [
     {
       title: "Finance-grade ROI",
-      body: "Use the B2B calculator to compare agency success fees vs a TWIN-style operating fee, HR hour savings, and illustrative candidate bonus pools — exportable talking points for CFO decks.",
+      body: "Use the B2B calculator to compare agency success fees with a TWIN-style operating fee, HR hour savings, and illustrative candidate bonus pools. Exportable talking points for CFO decks.",
     },
     {
       title: "Security & data residency",
-      body: "DPA templates, sub-processor transparency, EU-grade hosting posture, and named contacts for RfPs — separate from consumer GDPR copy on the candidate privacy page.",
+      body: "DPA templates, sub-processor transparency, EU-grade hosting posture, and named contacts for RfPs, separate from the consumer GDPR copy on the candidate privacy page.",
     },
     {
       title: "Delivery & SLA",
-      body: "Named CSM, uptime targets on paid integrations, quarterly business reviews, and custom board contracts when volume warrants — not the same support queue as Premium candidates.",
+      body: "Named CSM, uptime targets on paid integrations, quarterly business reviews, and custom board contracts when volume warrants. Not the same support queue as Premium candidates.",
     },
   ],
   pricingTitle: "Company programs (annual)",
@@ -461,9 +461,9 @@ const companiesEn: PersonaBundle = {
   ],
   logisticsTitle: "How this differs from recruiter seats",
   logistics: [
-    "Company programs anchor on procurement, residency, and ROI — not per-sourcer packet volume.",
+    "Company programs anchor on procurement, residency, and ROI, not on per-sourcer packet volume.",
     "Candidate marketing SKUs never include SSO or custom DPA unless upgraded through this lane.",
-    "Calculator output remains illustrative — legal/financial sign-off stays with your teams.",
+    "Calculator output remains illustrative; legal and financial sign-off stays with your teams.",
   ],
   primaryCta: { label: "Open B2B ROI calculator", href: "/calculator" },
   secondaryCta: { label: "Contact enterprise", href: "/contact" },
@@ -471,21 +471,21 @@ const companiesEn: PersonaBundle = {
 
 const companiesPl: PersonaBundle = {
   heroEyebrow: "Firma i procurement",
-  heroTitle: "Ekonomia, bezpieczeństwo i dostawa — nie licencja per sourcer",
+  heroTitle: "Ekonomia, bezpieczeństwo i dostawa zamiast licencji per sourcer",
   heroLead:
-    "Programy enterprise łączą model ROI, dokumentację pod DPA, roadmapę SSO i umowy roczne. To jest ścieżka kalkulatora B2B i security review — prostopadle do pakietów „miejsca dla rekruterów”.",
+    "Programy enterprise łączą model ROI, dokumentację pod DPA, roadmapę SSO i umowy roczne. To ścieżka kalkulatora B2B i przeglądów bezpieczeństwa, osobna od pakietów „miejsc dla rekruterów”.",
   pillars: [
     {
       title: "ROI pod finanse",
-      body: "Kalkulator B2B: success fee agencji vs model operacyjny w stylu TWIN, oszczędność czasu HR, przykładowe pule bonusów dla kandydatów — materiał eksportowalny na deck CFO.",
+      body: "Kalkulator B2B: success fee agencji obok modelu operacyjnego w stylu TWIN, oszczędność czasu HR, przykładowe pule bonusów dla kandydatów. Materiał pod deck CFO.",
     },
     {
       title: "Security i residency",
-      body: "Szablony DPA, transparentność subprocessors, hosting w stylu EU-grade i nazwany kontakt RfP — osobno od polityki prywatności kandydata.",
+      body: "Szablony DPA, transparentność subprocessors, hosting w stylu EU-grade i nazwany kontakt RfP, osobno od polityki prywatności kandydata.",
     },
     {
       title: "Dostawa i SLA",
-      body: "Nazwany CSM, cele uptime na płatnych integracjach, QBR i kontrakty na portale przy wolumenie — inna kolejka niż support Premium dla kandydatów.",
+      body: "Nazwany CSM, cele uptime na płatnych integracjach, QBR i kontrakty na portale przy wolumenie. Inna kolejka niż support Premium dla kandydatów.",
     },
   ],
   pricingTitle: "Programy dla firm (rocznie)",
@@ -537,9 +537,9 @@ const companiesPl: PersonaBundle = {
   ],
   logisticsTitle: "Różnica względem miejsc dla rekruterów",
   logistics: [
-    "Program firmowy kotwiczy w procurement, residency i ROI — nie w liczbie paczek sourcerskich.",
-    "SKU kandydata nie obejmuje SSO ani custom DPA bez przejścia tą ścieżką.",
-    "Wynik kalkulatora pozostaje ilustracyjny — akceptacja prawno-finansowa po stronie klienta.",
+    "Program firmowy kotwiczy w procurement, residency i ROI, a nie w liczbie paczek sourcerskich.",
+    "SKU kandydata nie obejmuje SSO ani custom DPA bez przejścia tę ścieżką.",
+    "Wynik kalkulatora pozostaje ilustracyjny; akceptacja prawno-finansowa pozostaje po stronie klienta.",
   ],
   primaryCta: { label: "Otwórz kalkulator ROI B2B", href: "/calculator" },
   secondaryCta: { label: "Kontakt enterprise", href: "/contact" },
