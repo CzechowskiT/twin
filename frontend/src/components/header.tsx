@@ -62,9 +62,9 @@ export function Header() {
 
   const linkClass = "twin-nav-link whitespace-nowrap";
 
-  /** Outline “account” control — matches Dashboard link and Log out (same flex box model as `.twin-touch-target` min-height). */
+  /** Outline “account” control — grid centers label the same on `<a>` and `<button>` inside `.twin-touch-target` min-height. */
   const accountOutlineDesktopClass =
-    "twin-touch-target inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-[var(--twin-border)] bg-[var(--twin-card)] px-2.5 py-1 text-center text-[11px] font-semibold leading-none text-[var(--twin-accent)] transition hover:border-[var(--twin-accent)]/50 hover:bg-[var(--twin-accent-muted)] hover:text-[var(--twin-accent-hover)] sm:px-3 sm:py-1.5 sm:text-[12px]";
+    "twin-touch-target inline-grid shrink-0 place-items-center whitespace-nowrap rounded-md border border-[var(--twin-border)] bg-[var(--twin-card)] px-2.5 py-0 text-[11px] font-semibold leading-normal text-[var(--twin-accent)] transition hover:border-[var(--twin-accent)]/50 hover:bg-[var(--twin-accent-muted)] hover:text-[var(--twin-accent-hover)] sm:px-3 sm:text-[12px]";
 
   const dashboardDesktopActiveClass =
     "border-[var(--twin-accent)]/50 bg-[var(--twin-accent-muted)] text-[var(--twin-accent-hover)]";
@@ -125,12 +125,8 @@ export function Header() {
                   href="/dashboard"
                   className={`${accountOutlineDesktopClass} ${dashboardSectionActive ? dashboardDesktopActiveClass : ""}`}
                   aria-current={dashboardSectionActive ? "page" : undefined}
-                >
-                  {t("nav.dashboard")}
-                </Link>
-                <button type="button" onClick={logout} className={`${accountOutlineDesktopClass} cursor-pointer`}>
-                  {t("dashboard.logout")}
-                </button>
+                >{t("nav.dashboard")}</Link>
+                <button type="button" onClick={logout} className={`${accountOutlineDesktopClass} cursor-pointer`}>{t("dashboard.logout")}</button>
               </>
             ) : (
               app.map((item) => (
@@ -189,11 +185,9 @@ export function Header() {
                     <Link
                       href="/dashboard"
                       onClick={closeMobileMenu}
-                      className={`twin-touch-target inline-flex w-full items-center justify-center rounded-md border border-[var(--twin-border)] bg-[var(--twin-card)] px-3 py-2.5 text-center text-sm font-semibold leading-none text-[var(--twin-accent)] transition hover:border-[var(--twin-accent)]/50 hover:bg-[var(--twin-accent-muted)] hover:text-[var(--twin-accent-hover)] ${dashboardSectionActive ? "border-[var(--twin-accent)]/50 bg-[var(--twin-accent-muted)] text-[var(--twin-accent-hover)]" : ""}`}
+                      className={`twin-touch-target grid w-full place-items-center rounded-md border border-[var(--twin-border)] bg-[var(--twin-card)] px-3 py-2.5 text-sm font-semibold leading-normal text-[var(--twin-accent)] transition hover:border-[var(--twin-accent)]/50 hover:bg-[var(--twin-accent-muted)] hover:text-[var(--twin-accent-hover)] ${dashboardSectionActive ? "border-[var(--twin-accent)]/50 bg-[var(--twin-accent-muted)] text-[var(--twin-accent-hover)]" : ""}`}
                       aria-current={dashboardSectionActive ? "page" : undefined}
-                    >
-                      {t("nav.dashboard")}
-                    </Link>
+                    >{t("nav.dashboard")}</Link>
                   ) : null}
                 </div>
                 <p className="mt-2 border-t border-[var(--twin-border)] px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
@@ -216,10 +210,8 @@ export function Header() {
                   <button
                     type="button"
                     onClick={logout}
-                    className="twin-touch-target mt-1 inline-flex w-full cursor-pointer items-center justify-center rounded-md border border-[var(--twin-border)] bg-[var(--twin-card)] px-3 py-2.5 text-center text-sm font-semibold leading-none text-[var(--twin-accent)] transition hover:border-[var(--twin-accent)]/50 hover:bg-[var(--twin-accent-muted)] hover:text-[var(--twin-accent-hover)]"
-                  >
-                    {t("dashboard.logout")}
-                  </button>
+                    className="twin-touch-target mt-1 grid w-full cursor-pointer place-items-center rounded-md border border-[var(--twin-border)] bg-[var(--twin-card)] px-3 py-2.5 text-sm font-semibold leading-normal text-[var(--twin-accent)] transition hover:border-[var(--twin-accent)]/50 hover:bg-[var(--twin-accent-muted)] hover:text-[var(--twin-accent-hover)]"
+                  >{t("dashboard.logout")}</button>
                 ) : (
                   app.map((item) => (
                     <Link
