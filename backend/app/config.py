@@ -115,7 +115,7 @@ class Settings(BaseSettings):
     auto_apply_headless: bool = False
     auto_apply_state_dir: str = "data/browser_state"
     auto_apply_default_phone: str = ""
-    auto_apply_submit: bool = False
+    auto_apply_submit: bool = True
 
     debug: bool = False
 

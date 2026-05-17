@@ -4,14 +4,14 @@
 
 | Portal | Auto-apply | CAPTCHA „jesteś człowiekiem” |
 |--------|------------|------------------------------|
-| **Pracuj.pl** | Tak (wypełnia formularz, opcjonalnie wysyła) | Rzadko |
+| **Pracuj.pl** | Tak (wypełnia formularz i domyślnie wysyła) | Rzadko |
 | **Indeed** | Częściowo | **Cloudflare — nie da się legalnie „kliknąć za Ciebie”** |
 
 Cloudflare Turnstile jest zaprojektowany tak, żeby **boty nie mogły** same zaznaczyć checkboxa. TWIN robi coś sensownego:
 
 1. Otwiera **widoczną** przeglądarkę (na Twoim Macu).
 2. Czeka, aż **Ty** zaznaczysz „Potwierdź, że jesteś człowiekiem”.
-3. Potem sam klika **Aplikuj**, wypełnia e-mail / CV i — jeśli włączysz — wysyła.
+3. Potem sam klika **Aplikuj**, wypełnia e-mail / CV i — domyślnie — wysyła formularz (`AUTO_APPLY_SUBMIT=true`; ustaw `false` tylko do podglądu bez wysyłki).
 
 Na serwerze w chmurze (Railway, headless) Indeed **zawsze** zatrzyma się na CAPTCHA.
 
@@ -25,12 +25,12 @@ Na serwerze w chmurze (Railway, headless) Indeed **zawsze** zatrzyma się na CAP
 
 ```env
 AUTO_APPLY_HEADLESS=false
-AUTO_APPLY_SUBMIT=false
+AUTO_APPLY_SUBMIT=true
 AUTO_APPLY_DEFAULT_PHONE=+48123456789
 ```
 
 - `HEADLESS=false` — wymagane przy CAPTCHA.
-- `SUBMIT=false` — tylko wypełnia formularz, nie wysyła (bezpieczniejsze na start).
+- `SUBMIT=true` (domyślnie w kodzie i zalecane w `.env`) — po wypełnieniu klika wysyłkę. Ustaw `false`, jeśli chcesz tylko przygotować formularz bez wysłania (dry-run).
 
 ## CLI (terminal)
 
@@ -40,7 +40,7 @@ source .venv/bin/activate
 python -m app.automation.cli --email twoj@email.com --job-id 42
 ```
 
-Z wysyłką: dodaj `--submit`.
+Z wysyłką: domyślnie tak (jak `AUTO_APPLY_SUBMIT` w `.env` / ustawieniach). Wymuś tylko wypełnienie bez wysłania: `python -m app.automation.cli ... --no-submit`.
 
 ## Prawo i ToS
 
