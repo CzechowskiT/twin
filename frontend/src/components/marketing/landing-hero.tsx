@@ -15,7 +15,7 @@ export function LandingHero() {
         <h1 className="marketing-gradient-heading mt-6 max-w-4xl text-[2.35rem] font-semibold leading-[1.06] tracking-[-0.04em] sm:mt-8 sm:text-5xl sm:leading-[1.04] md:text-6xl md:leading-[1.02]">
           {t("home.title")}
         </h1>
-        <p className="mt-5 max-w-3xl border-l-[3px] border-[var(--twin-accent)] pl-4 text-[1.05rem] font-semibold leading-snug tracking-[-0.02em] text-[var(--foreground)] sm:mt-6 sm:pl-5 sm:text-xl sm:leading-snug">
+        <p className="mt-5 max-w-3xl text-[1.05rem] font-semibold leading-snug tracking-[-0.02em] text-[var(--foreground)] sm:mt-6 sm:text-xl sm:leading-snug">
           {t("home.heroHook")}
         </p>
         <p className="marketing-copy-rail marketing-hero-lede mt-6 sm:mt-8">{t("home.description")}</p>

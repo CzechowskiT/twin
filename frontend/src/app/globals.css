@@ -778,39 +778,11 @@ html[data-marketing-surface="studio"] .marketing-btn-primary-shadow {
 }
 
 /**
- * Long-form marketing: left accent rail instead of heavy bordered “postcard” panels
- * (editorial rhythm closer to Linear / Stripe narrative blocks).
+ * Marketing long-form wrapper: clean blocks without a side accent bar
+ * (vertical rules beside body copy read stiff on long pages).
  */
 .marketing-copy-rail {
-  position: relative;
-}
-
-.marketing-copy-rail::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0.15em;
-  bottom: 0.15em;
-  display: none;
-  width: 3px;
-  border-radius: 9999px;
-  background: linear-gradient(
-    180deg,
-    var(--twin-accent) 0%,
-    var(--twin-accent-soft) 55%,
-    color-mix(in srgb, var(--twin-accent) 40%, var(--twin-cta)) 100%
-  );
-  opacity: 0.9;
-}
-
-@media (min-width: 640px) {
-  .marketing-copy-rail {
-    padding-left: 1.35rem;
-  }
-
-  .marketing-copy-rail::before {
-    display: block;
-  }
+  /* shared hook for marketing sections; keep layout to spacing + type only */
 }
 
 /** Hero copy + CTAs: heritage uses green/amber system; studio matches dark mock (outline / white / ghost). */

@@ -121,11 +121,11 @@ export function DemoAutoApplyPage() {
           </header>
 
           <aside
-            className="rounded-2xl border border-amber-200/80 bg-amber-50/90 px-4 py-3 text-sm leading-relaxed text-amber-950 shadow-sm dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-100"
+            className="rounded-2xl border border-amber-200/90 bg-amber-50/95 px-4 py-3 text-sm leading-relaxed text-amber-950 shadow-sm"
             role="status"
           >
-            <p className="font-semibold">{t("demo.simulationTitle")}</p>
-            <p className="mt-1 text-[var(--twin-muted-strong)] dark:text-amber-100/90">{t("demo.simulationBody")}</p>
+            <p className="font-semibold text-amber-950">{t("demo.simulationTitle")}</p>
+            <p className="mt-1 text-amber-900/95">{t("demo.simulationBody")}</p>
           </aside>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -220,17 +220,12 @@ export function DemoAutoApplyPage() {
                 return (
                   <li
                     key={key}
-                    className={`relative border-l-2 pl-6 transition-all duration-500 ease-out ${
-                      state === "done"
-                        ? "border-[var(--twin-accent)] opacity-100"
-                        : state === "active"
-                          ? "border-[var(--twin-cta)] opacity-100"
-                          : "border-[var(--twin-border)] opacity-55"
-                    }`}
-                    style={{ paddingBottom: idx === STEP_KEYS.length - 1 ? 0 : "1.25rem" }}
+                    className={`flex gap-3 transition-all duration-500 ease-out sm:gap-4 ${
+                      idx === STEP_KEYS.length - 1 ? "" : "pb-5"
+                    } ${state === "pending" ? "opacity-55" : "opacity-100"}`}
                   >
                     <span
-                      className={`absolute -left-[9px] top-1 flex h-4 w-4 rounded-full border-2 transition-transform duration-300 ${
+                      className={`mt-1.5 h-3 w-3 shrink-0 rounded-full border-2 transition-transform duration-300 ${
                         state === "done"
                           ? "scale-100 border-[var(--twin-accent)] bg-[var(--twin-accent)]"
                           : state === "active"
@@ -239,10 +234,16 @@ export function DemoAutoApplyPage() {
                       }`}
                       aria-hidden
                     />
-                    <p className="text-sm font-semibold text-[var(--foreground)]">{t(key)}</p>
-                    <p className="mt-1 text-xs text-[var(--twin-muted)]">
-                      {state === "done" ? t("demo.stepDone") : state === "active" ? t("demo.stepActive") : t("demo.stepPending")}
-                    </p>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-[var(--foreground)]">{t(key)}</p>
+                      <p className="mt-1 text-xs text-[var(--twin-muted)]">
+                        {state === "done"
+                          ? t("demo.stepDone")
+                          : state === "active"
+                            ? t("demo.stepActive")
+                            : t("demo.stepPending")}
+                      </p>
+                    </div>
                   </li>
                 );
               })}

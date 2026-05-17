@@ -4,12 +4,12 @@ type MarketingPageSurfaceProps = {
   children: ReactNode;
   /** Wider max-width for dense layouts (e.g. ROI calculator). */
   wide?: boolean;
-  /** When false, only the solid page band is applied — no inner typographic rail wrapper. */
+  /** When false, only the solid page band is applied — no inner content wrapper. */
   withCard?: boolean;
 };
 
 /**
- * Solid background band + optional typographic rail so long copy reads clearly
+ * Solid background band + optional inner wrapper so long copy reads clearly
  * without a heavy bordered “postcard” on the wallpaper.
  */
 export function MarketingPageSurface({ children, wide = false, withCard = true }: MarketingPageSurfaceProps) {
