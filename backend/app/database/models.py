@@ -67,6 +67,9 @@ class User(Base):
     google_calendar: Mapped["UserGoogleCalendar | None"] = relationship(
         back_populates="user", uselist=False, cascade="all, delete-orphan"
     )
+    scheduled_interviews: Mapped[list["ScheduledInterview"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
 
 
 class UserGoogleCalendar(Base):
@@ -254,3 +257,39 @@ class Application(Base):
 
     candidate: Mapped["Candidate"] = relationship(back_populates="applications")
     job: Mapped["Job"] = relationship(back_populates="applications")
+    scheduled_interviews: Mapped[list["ScheduledInterview"]] = relationship(
+        back_populates="application",
+    )
+
+
+class ScheduledInterview(Base):
+    """Interview blocks placed on the user's Google Calendar (and mirrored here)."""
+
+    __tablename__ = "scheduled_interviews"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    application_id: Mapped[int | None] = mapped_column(
+        ForeignKey("applications.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    company_name: Mapped[str] = mapped_column(String(255))
+    job_title: Mapped[str] = mapped_column(String(255))
+    interviewer_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    interviewer_email: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    interview_start: Mapped[datetime] = mapped_column(DateTime, index=True)
+    interview_end: Mapped[datetime] = mapped_column(DateTime)
+    timezone: Mapped[str] = mapped_column(String(50), default="UTC")
+    calendar_event_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    calendar_provider: Mapped[str] = mapped_column(String(50), default="google")
+    meeting_link: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    meeting_location: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    interview_type: Mapped[str] = mapped_column(String(50), default="video")
+    status: Mapped[str] = mapped_column(String(50), default="scheduled")
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+    user: Mapped["User"] = relationship(back_populates="scheduled_interviews")
+    application: Mapped["Application | None"] = relationship(back_populates="scheduled_interviews")

@@ -41,6 +41,9 @@ def insert_primary_event(
     start_iso: str,
     end_iso: str,
     time_zone: str,
+    location: str | None = None,
+    attendee_emails: list[str] | None = None,
+    send_updates: str = "none",
 ) -> dict[str, Any]:
     body: dict[str, Any] = {
         "summary": summary,
@@ -49,6 +52,11 @@ def insert_primary_event(
     }
     if description:
         body["description"] = description
+    if location:
+        body["location"] = location
+    if attendee_emails:
+        body["attendees"] = [{"email": e.strip()} for e in attendee_emails if e and e.strip()]
+    params: dict[str, str] = {"sendUpdates": send_updates}
     with httpx.Client(timeout=30.0) as client:
         res = client.post(
             f"{CAL_BASE}/calendars/primary/events",
@@ -57,7 +65,7 @@ def insert_primary_event(
                 "Authorization": f"Bearer {access_token}",
                 "Content-Type": "application/json",
             },
-            params={"sendUpdates": "none"},
+            params=params,
         )
         if res.status_code not in (200, 201):
             raise GoogleCalendarApiError(res.text or "event insert failed")

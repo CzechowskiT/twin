@@ -20,8 +20,54 @@ type FreeBusyOut = { busy: { start: string; end: string }[] };
 
 type EventOut = { id: string | null; html_link: string | null };
 
+type NextSlotOut = { start_iso: string; end_iso: string };
+
+type ScheduledInterview = {
+  id: number;
+  company_name: string;
+  job_title: string;
+  interviewer_name: string | null;
+  interviewer_email: string | null;
+  interview_start: string;
+  interview_end: string;
+  timezone: string;
+  meeting_link: string | null;
+  meeting_location: string | null;
+  interview_type: string;
+  status: string;
+  calendar_event_id: string | null;
+};
+
+function isoToDatetimeLocalValue(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function datetimeLocalToIso(local: string): string | null {
+  if (!local) return null;
+  const d = new Date(local);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toISOString();
+}
+
+function formatInterviewRange(isoStart: string, isoEnd: string, locale: string): string {
+  const a = new Date(isoStart);
+  const b = new Date(isoEnd);
+  if (Number.isNaN(a.getTime()) || Number.isNaN(b.getTime())) return "";
+  const opts: Intl.DateTimeFormatOptions = {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  };
+  return `${a.toLocaleString(locale, opts)} → ${b.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })}`;
+}
+
 export default function DashboardCalendarPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
@@ -31,6 +77,13 @@ export default function DashboardCalendarPage() {
   const [actionError, setActionError] = useState(false);
   const [freeBusyResult, setFreeBusyResult] = useState<FreeBusyOut | null>(null);
   const [eventResult, setEventResult] = useState<EventOut | null>(null);
+  const [interviews, setInterviews] = useState<ScheduledInterview[]>([]);
+  const [scheduleNote, setScheduleNote] = useState<string | null>(null);
+  const [companyName, setCompanyName] = useState("");
+  const [jobTitle, setJobTitle] = useState("");
+  const [interviewerEmail, setInterviewerEmail] = useState("");
+  const [startLocal, setStartLocal] = useState("");
+  const [endLocal, setEndLocal] = useState("");
 
   const load = useCallback(async () => {
     const token = getToken();
@@ -43,6 +96,12 @@ export default function DashboardCalendarPage() {
     try {
       const s = await apiFetch<CalendarStatus>("/api/v1/calendar/google/status", {}, token);
       setStatus(s);
+      if (s.connected) {
+        const rows = await apiFetch<ScheduledInterview[]>("/api/v1/calendar/google/interviews", {}, token);
+        setInterviews(rows);
+      } else {
+        setInterviews([]);
+      }
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       if (msg.includes("401")) {
@@ -52,6 +111,7 @@ export default function DashboardCalendarPage() {
       }
       setActionError(true);
       setStatus(null);
+      setInterviews([]);
     } finally {
       setLoading(false);
     }
@@ -64,11 +124,13 @@ export default function DashboardCalendarPage() {
   }, [load]);
 
   useEffect(() => {
-    const c = searchParams.get("calendar_connected");
-    const err = searchParams.get("calendar_error");
-    if (c === "1") setBanner("connected");
-    else if (err === "google_denied") setBanner("denied");
-    else if (err) setBanner("error");
+    queueMicrotask(() => {
+      const c = searchParams.get("calendar_connected");
+      const err = searchParams.get("calendar_error");
+      if (c === "1") setBanner("connected");
+      else if (err === "google_denied") setBanner("denied");
+      else if (err) setBanner("error");
+    });
   }, [searchParams]);
 
   async function connect() {
@@ -96,6 +158,8 @@ export default function DashboardCalendarPage() {
       await apiFetch("/api/v1/calendar/google", { method: "DELETE" }, token);
       setFreeBusyResult(null);
       setEventResult(null);
+      setInterviews([]);
+      setScheduleNote(null);
       await load();
     } catch (e) {
       setActionError(true);
@@ -161,6 +225,76 @@ export default function DashboardCalendarPage() {
     }
   }
 
+  async function suggestNextSlot() {
+    const token = getToken();
+    if (!token) return;
+    setActionBusy("suggest");
+    setScheduleNote(null);
+    setActionError(false);
+    try {
+      const out = await apiFetch<NextSlotOut>("/api/v1/calendar/google/slots/next?duration_minutes=60&days_ahead=14", {}, token);
+      setStartLocal(isoToDatetimeLocalValue(out.start_iso));
+      setEndLocal(isoToDatetimeLocalValue(out.end_iso));
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      if (msg.includes("404")) setScheduleNote(t("dashboard.calendarScheduleNoSlot"));
+      else {
+        setActionError(true);
+        console.warn("[calendar] suggest slot failed", e);
+      }
+    } finally {
+      setActionBusy(null);
+    }
+  }
+
+  async function saveInterview() {
+    const token = getToken();
+    if (!token) return;
+    const startIso = datetimeLocalToIso(startLocal);
+    const endIso = datetimeLocalToIso(endLocal);
+    if (!companyName.trim() || !jobTitle.trim() || !startIso || !endIso) {
+      setScheduleNote(null);
+      return;
+    }
+    setActionBusy("schedule");
+    setScheduleNote(null);
+    setActionError(false);
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+    try {
+      await apiFetch<ScheduledInterview>(
+        "/api/v1/calendar/google/interviews",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            application_id: null,
+            company_name: companyName.trim(),
+            job_title: jobTitle.trim(),
+            interviewer_email: interviewerEmail.trim() || null,
+            start_iso: startIso,
+            end_iso: endIso,
+            time_zone: tz,
+            interview_type: "video",
+          }),
+        },
+        token,
+      );
+      setScheduleNote(t("dashboard.calendarScheduleSaved"));
+      await load();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      if (msg.toLowerCase().includes("not available") || msg.includes("409")) {
+        setScheduleNote(t("dashboard.calendarScheduleConflict"));
+      } else {
+        setActionError(true);
+        console.warn("[calendar] schedule interview failed", e);
+      }
+    } finally {
+      setActionBusy(null);
+    }
+  }
+
+  const loc = locale === "pl" ? "pl-PL" : "en-US";
+
   return (
     <Shell wide rail>
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -219,6 +353,99 @@ export default function DashboardCalendarPage() {
             >
               {actionBusy === "disconnect" ? "…" : t("dashboard.calendarDisconnect")}
             </Button>
+          </div>
+
+          <div className="border-t border-[var(--twin-border)] pt-6">
+            <h2 className="text-base font-semibold text-[var(--foreground)]">{t("dashboard.calendarInterviewsTitle")}</h2>
+            {interviews.length === 0 ? (
+              <p className="twin-muted mt-2 text-sm leading-relaxed">{t("dashboard.calendarInterviewsEmpty")}</p>
+            ) : (
+              <ul className="mt-3 space-y-2">
+                {interviews.map((row) => (
+                  <li
+                    key={row.id}
+                    className="rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-2)] px-3 py-2 text-sm text-[var(--foreground)]"
+                  >
+                    <span className="font-medium">
+                      {row.company_name} — {row.job_title}
+                    </span>
+                    <span className="twin-muted mt-1 block text-xs">
+                      {formatInterviewRange(row.interview_start, row.interview_end, loc)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div className="border-t border-[var(--twin-border)] pt-6">
+            <h2 className="text-base font-semibold text-[var(--foreground)]">{t("dashboard.calendarScheduleTitle")}</h2>
+            <p className="twin-muted mt-2 max-w-2xl text-sm leading-relaxed">{t("dashboard.calendarScheduleHint")}</p>
+            <div className="mt-4 flex flex-col gap-3 sm:max-w-xl">
+              <label className="block text-sm">
+                <span className="twin-muted block text-xs">{t("dashboard.calendarScheduleCompany")}</span>
+                <input
+                  className="mt-1 w-full rounded-md border border-[var(--twin-border)] bg-[var(--background)] px-3 py-2 text-sm"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                  autoComplete="organization"
+                />
+              </label>
+              <label className="block text-sm">
+                <span className="twin-muted block text-xs">{t("dashboard.calendarScheduleJob")}</span>
+                <input
+                  className="mt-1 w-full rounded-md border border-[var(--twin-border)] bg-[var(--background)] px-3 py-2 text-sm"
+                  value={jobTitle}
+                  onChange={(e) => setJobTitle(e.target.value)}
+                />
+              </label>
+              <label className="block text-sm">
+                <span className="twin-muted block text-xs">{t("dashboard.calendarScheduleInterviewerEmail")}</span>
+                <input
+                  className="mt-1 w-full rounded-md border border-[var(--twin-border)] bg-[var(--background)] px-3 py-2 text-sm"
+                  type="email"
+                  value={interviewerEmail}
+                  onChange={(e) => setInterviewerEmail(e.target.value)}
+                  autoComplete="email"
+                />
+              </label>
+              <label className="block text-sm">
+                <span className="twin-muted block text-xs">{t("dashboard.calendarScheduleStart")}</span>
+                <input
+                  className="mt-1 w-full rounded-md border border-[var(--twin-border)] bg-[var(--background)] px-3 py-2 text-sm"
+                  type="datetime-local"
+                  value={startLocal}
+                  onChange={(e) => setStartLocal(e.target.value)}
+                />
+              </label>
+              <label className="block text-sm">
+                <span className="twin-muted block text-xs">{t("dashboard.calendarScheduleEnd")}</span>
+                <input
+                  className="mt-1 w-full rounded-md border border-[var(--twin-border)] bg-[var(--background)] px-3 py-2 text-sm"
+                  type="datetime-local"
+                  value={endLocal}
+                  onChange={(e) => setEndLocal(e.target.value)}
+                />
+              </label>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  className="twin-touch-target twin-btn-secondary"
+                  disabled={Boolean(actionBusy)}
+                  onClick={() => void suggestNextSlot()}
+                >
+                  {actionBusy === "suggest" ? "…" : t("dashboard.calendarScheduleSuggest")}
+                </Button>
+                <Button type="button" className="twin-touch-target" disabled={Boolean(actionBusy)} onClick={() => void saveInterview()}>
+                  {actionBusy === "schedule" ? "…" : t("dashboard.calendarScheduleSubmit")}
+                </Button>
+              </div>
+              {scheduleNote ? (
+                <p className="text-sm text-[var(--twin-muted-strong)]" role="status">
+                  {scheduleNote}
+                </p>
+              ) : null}
+            </div>
           </div>
 
           <div className="border-t border-[var(--twin-border)] pt-6">

@@ -2,19 +2,20 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from urllib.parse import urlencode
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import RedirectResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.core.deps import get_current_user
 from app.core.security import create_access_token, decode_access_token
-from app.database.models import User, UserGoogleCalendar
+from app.database.models import Application, Candidate, ScheduledInterview, User, UserGoogleCalendar
 from app.database.session import get_db
+from app.services.calendar_scheduling import find_next_slot_iso, freebusy_overlaps_slot
 from app.services.google_calendar_api import GoogleCalendarApiError, insert_primary_event, query_freebusy
 from app.services.google_calendar_oauth import (
     GoogleCalendarOAuthError,
@@ -226,3 +227,186 @@ def google_calendar_create_event(
     except GoogleCalendarApiError as e:
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Calendar create event failed") from e
     return CalendarCreateEventOut(id=created.get("id"), html_link=created.get("htmlLink"))
+
+
+def _parse_instant_iso(iso: str) -> datetime:
+    dt = datetime.fromisoformat(iso.replace("Z", "+00:00"))
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
+
+
+def _to_db_naive_utc(dt: datetime) -> datetime:
+    return dt.astimezone(timezone.utc).replace(tzinfo=None)
+
+
+def _ensure_application_owned(db: Session, user_id: int, application_id: int | None) -> None:
+    if application_id is None:
+        return
+    cand = db.query(Candidate).filter(Candidate.user_id == user_id).first()
+    if not cand:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "No candidate profile for this user")
+    row = (
+        db.query(Application)
+        .filter(Application.id == application_id, Application.candidate_id == cand.id)
+        .first()
+    )
+    if not row:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Application not found")
+
+
+class NextSlotOut(BaseModel):
+    start_iso: str
+    end_iso: str
+
+
+class ScheduleInterviewIn(BaseModel):
+    application_id: int | None = None
+    company_name: str = Field(..., min_length=1, max_length=255)
+    job_title: str = Field(..., min_length=1, max_length=255)
+    interviewer_name: str | None = Field(None, max_length=255)
+    interviewer_email: str | None = Field(None, max_length=255)
+    start_iso: str
+    end_iso: str
+    time_zone: str = Field("UTC", max_length=80)
+    meeting_link: str | None = Field(None, max_length=500)
+    meeting_location: str | None = Field(None, max_length=500)
+    interview_type: str = Field("video", max_length=50)
+    notes: str | None = Field(None, max_length=8000)
+
+
+class ScheduledInterviewOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    company_name: str
+    job_title: str
+    interviewer_name: str | None
+    interviewer_email: str | None
+    interview_start: datetime
+    interview_end: datetime
+    timezone: str
+    meeting_link: str | None
+    meeting_location: str | None
+    interview_type: str
+    status: str
+    calendar_event_id: str | None
+
+
+@router.get("/google/slots/next", response_model=NextSlotOut)
+def google_calendar_next_slot(
+    duration_minutes: int = Query(60, ge=15, le=480),
+    days_ahead: int = Query(14, ge=1, le=60),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> NextSlotOut:
+    access = _calendar_access_token(db, current_user.id)
+    now = datetime.now(timezone.utc)
+    time_min = now.isoformat().replace("+00:00", "Z")
+    time_max = (now + timedelta(days=days_ahead)).isoformat().replace("+00:00", "Z")
+    try:
+        raw = query_freebusy(access, time_min, time_max)
+    except GoogleCalendarApiError as e:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Calendar free/busy failed") from e
+    pair = find_next_slot_iso(raw, duration_minutes=duration_minutes, days_ahead=days_ahead, now=now)
+    if not pair:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No free slot in range")
+    return NextSlotOut(start_iso=pair[0], end_iso=pair[1])
+
+
+@router.get("/google/interviews", response_model=list[ScheduledInterviewOut])
+def google_calendar_list_interviews(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[ScheduledInterviewOut]:
+    now = datetime.utcnow()
+    rows = (
+        db.query(ScheduledInterview)
+        .filter(ScheduledInterview.user_id == current_user.id)
+        .filter(ScheduledInterview.interview_start >= now)
+        .filter(ScheduledInterview.status != "cancelled")
+        .order_by(ScheduledInterview.interview_start.asc())
+        .limit(25)
+        .all()
+    )
+    return rows
+
+
+@router.post("/google/interviews", response_model=ScheduledInterviewOut)
+def google_calendar_schedule_interview(
+    body: ScheduleInterviewIn,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> ScheduledInterviewOut:
+    access = _calendar_access_token(db, current_user.id)
+    _ensure_application_owned(db, current_user.id, body.application_id)
+
+    start_aware = _parse_instant_iso(body.start_iso)
+    end_aware = _parse_instant_iso(body.end_iso)
+    if end_aware <= start_aware:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="end_iso must be after start_iso")
+
+    try:
+        fb = query_freebusy(access, body.start_iso, body.end_iso)
+    except GoogleCalendarApiError as e:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Calendar free/busy failed") from e
+    if freebusy_overlaps_slot(fb, start_aware, end_aware):
+        raise HTTPException(status.HTTP_409_CONFLICT, detail="Time slot not available")
+
+    attendees: list[str] = []
+    if body.interviewer_email and body.interviewer_email.strip():
+        attendees.append(body.interviewer_email.strip())
+
+    desc_parts = [
+        f"Interview: {body.job_title} at {body.company_name}",
+        "",
+    ]
+    if body.interviewer_name:
+        desc_parts.append(f"Interviewer: {body.interviewer_name}")
+    if body.notes:
+        desc_parts.extend(["", body.notes])
+    description = "\n".join(desc_parts).strip()
+
+    loc = body.meeting_location or body.meeting_link or None
+    summary = f"Interview: {body.company_name} — {body.job_title}"
+
+    try:
+        created = insert_primary_event(
+            access,
+            summary=summary,
+            description=description or None,
+            start_iso=body.start_iso,
+            end_iso=body.end_iso,
+            time_zone=body.time_zone,
+            location=loc,
+            attendee_emails=attendees or None,
+            send_updates="all",
+        )
+    except GoogleCalendarApiError as e:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Calendar create event failed") from e
+
+    now = datetime.utcnow()
+    row = ScheduledInterview(
+        user_id=current_user.id,
+        application_id=body.application_id,
+        company_name=body.company_name,
+        job_title=body.job_title,
+        interviewer_name=body.interviewer_name,
+        interviewer_email=body.interviewer_email,
+        interview_start=_to_db_naive_utc(start_aware),
+        interview_end=_to_db_naive_utc(end_aware),
+        timezone=body.time_zone,
+        calendar_event_id=str(created.get("id") or "") or None,
+        calendar_provider="google",
+        meeting_link=body.meeting_link,
+        meeting_location=body.meeting_location,
+        interview_type=body.interview_type,
+        status="scheduled",
+        notes=body.notes,
+        created_at=now,
+        updated_at=now,
+    )
+    db.add(row)
+    db.commit()
+    db.refresh(row)
+    return row
