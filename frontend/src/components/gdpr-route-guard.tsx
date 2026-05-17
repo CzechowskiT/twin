@@ -22,6 +22,29 @@ const GDPR_SKIP_PATHS = new Set([
   "/admin/beta",
 ]);
 
+/** Public marketing — logged-in users without consents may browse here without `/consent/gdpr`. */
+const GDPR_SKIP_MARKETING = new Set([
+  "/",
+  "/about",
+  "/case-studies",
+  "/faq",
+  "/partners",
+  "/media",
+  "/careers",
+  "/contact",
+  "/demo",
+  "/calculator",
+  "/for-companies",
+  "/for-recruiters",
+  "/for-candidates",
+]);
+
+function shouldSkipGdprGuard(path: string): boolean {
+  if (GDPR_SKIP_PATHS.has(path)) return true;
+  if (GDPR_SKIP_MARKETING.has(path)) return true;
+  return false;
+}
+
 export function GdprRouteGuard() {
   const pathname = usePathname() ?? "/";
   const router = useRouter();
@@ -35,7 +58,7 @@ export function GdprRouteGuard() {
       ranForPath.current = null;
       return;
     }
-    if (GDPR_SKIP_PATHS.has(normalized)) {
+    if (shouldSkipGdprGuard(normalized)) {
       ranForPath.current = null;
       return;
     }
@@ -49,7 +72,7 @@ export function GdprRouteGuard() {
           if (!hasCoreConsents(me)) {
             const next = encodeURIComponent(normalized || "/dashboard");
             ranForPath.current = normalized;
-            router.replace(`/consent/gdpr?next=${next}`);
+            router.replace(`/register?next=${next}`);
           } else {
             ranForPath.current = null;
           }

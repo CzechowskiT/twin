@@ -5,6 +5,7 @@ from typing import Any
 
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.database.models import Candidate, Job, JobMatch
 from app.matching.matcher import calculate_match_score
 
@@ -43,11 +44,12 @@ def find_top_matches(
 ) -> list[dict[str, Any]]:
     """Return best matching jobs for a candidate, optionally saved to job_matches."""
     cand = candidate_to_dict(candidate)
+    scan_limit = max(50, min(50_000, int(get_settings().match_jobs_scan_limit)))
     jobs = (
         db.query(Job)
         .filter(Job.is_validated.is_(True))
         .order_by(Job.scraped_at.desc())
-        .limit(4000)
+        .limit(scan_limit)
         .all()
     )
     scored: list[tuple[float, Job]] = []

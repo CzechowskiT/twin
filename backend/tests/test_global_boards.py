@@ -5,6 +5,7 @@ from unittest.mock import MagicMock, patch
 from app.scrapers.global_boards import (
     GLOBAL_BOARD_SPECS,
     _parse_indeed,
+    _parse_indeed_pl,
     _parse_reed,
 )
 from app.scrapers.registry import list_boards, run_scrape
@@ -30,9 +31,10 @@ REED_SNIPPET = """
 
 
 def test_global_board_specs_count() -> None:
-    assert len(GLOBAL_BOARD_SPECS) == 10
+    assert len(GLOBAL_BOARD_SPECS) == 11
     assert set(GLOBAL_BOARD_SPECS) == {
         "indeed",
+        "indeed-pl",
         "glassdoor",
         "monster",
         "ziprecruiter",
@@ -61,10 +63,17 @@ def test_parse_reed_fixture() -> None:
     assert jobs[0].job_board == "reed.co.uk"
 
 
+def test_parse_indeed_pl_fixture() -> None:
+    jobs = _parse_indeed_pl(INDEED_SNIPPET, limit=5)
+    assert len(jobs) == 1
+    assert jobs[0].job_board == "indeed.pl"
+    assert jobs[0].title == "Sales Manager"
+
+
 def test_list_boards_includes_all_global_specs() -> None:
     boards = list_boards()
-    global_ids = {b["id"] for b in boards if b["region"] != "poland"}
-    assert set(GLOBAL_BOARD_SPECS).issubset(global_ids)
+    ids = {b["id"] for b in boards}
+    assert set(GLOBAL_BOARD_SPECS).issubset(ids)
     poland_ids = {b["id"] for b in boards if b["region"] == "poland"}
     assert {
         "pracuj-sales",
@@ -72,6 +81,7 @@ def test_list_boards_includes_all_global_specs() -> None:
         "justjoin",
         "praca",
         "rocketjobs-roles",
+        "indeed-pl",
     }.issubset(poland_ids)
 
 

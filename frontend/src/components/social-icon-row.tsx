@@ -59,9 +59,9 @@ const BRAND: Record<BrandId, { icon: string; shellLink: string; shellIdle: strin
   instagram: {
     icon: "text-[#E4405F]",
     shellLink:
-      "border-[#E4405F]/55 bg-white shadow-sm ring-1 ring-pink-500/25 hover:bg-pink-50/90 hover:ring-pink-500/40 dark:bg-zinc-950 dark:hover:bg-zinc-900",
+      "border-[#E4405F]/55 bg-[#E4405F]/10 shadow-sm ring-1 ring-[#E4405F]/20 hover:bg-[#E4405F]/16 hover:ring-[#E4405F]/35 dark:bg-[#E4405F]/12 dark:ring-[#E4405F]/25 dark:hover:bg-[#E4405F]/18 dark:hover:ring-pink-400/35",
     shellIdle:
-      "border-[#E4405F]/45 bg-gradient-to-br from-[#fdf4f9] to-[#fce7f3] ring-1 ring-pink-500/20 dark:from-pink-950/40 dark:to-purple-950/35 dark:ring-pink-400/25",
+      "border-[#E4405F]/45 bg-[#E4405F]/10 ring-1 ring-[#E4405F]/15 dark:bg-[#E4405F]/12 dark:ring-[#E4405F]/28",
   },
   x: {
     icon: "text-white",

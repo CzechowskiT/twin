@@ -20,5 +20,22 @@ celery_app.conf.update(
     imports=("app.tasks.scrape_tasks",),
 )
 
-# No periodic scraping — run from dashboard or POST /jobs/scrape/... when you want data.
-celery_app.conf.beat_schedule = {}
+
+def _configure_beat_schedule() -> None:
+    """Optional daily scrape-all when SCRAPE_BEAT_ENABLED=true (run `celery -A app.tasks.celery_app beat`)."""
+    from celery.schedules import crontab
+
+    s = get_settings()
+    if not s.scrape_beat_enabled:
+        celery_app.conf.beat_schedule = {}
+        return
+    hour = min(23, max(0, int(s.scrape_beat_hour_utc)))
+    celery_app.conf.beat_schedule = {
+        "scrape-all-boards-daily": {
+            "task": "app.tasks.scrape_tasks.scrape_all_boards_task",
+            "schedule": crontab(hour=hour, minute=12),
+        },
+    }
+
+
+_configure_beat_schedule()

@@ -7,21 +7,57 @@ import { LinkedInLoginButton } from "@/components/linkedin-login-button";
 import { LinkedInSetupHint } from "@/components/linkedin-setup-hint";
 import { LegalRegionNotice } from "@/components/legal-region-notice";
 import { OAuthWebButtons } from "@/components/oauth-web-buttons";
+import { PostLoginCoreConsentForm } from "@/components/post-login-core-consent-form";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Input, Label, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
-import { setToken } from "@/lib/auth";
+import { getToken, setToken } from "@/lib/auth";
+import { hasCoreConsents, type AuthMeCoreConsents } from "@/lib/core-consents";
 import { fetchOAuthProviderStatus, type OAuthProviderStatus } from "@/lib/oauth-auth";
 
 type TokenResponse = { access_token: string };
+
+type SessionPhase = "boot" | "anon" | "consent" | "gone";
 
 function RegisterPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t } = useTranslation();
+  const [sessionPhase, setSessionPhase] = useState<SessionPhase>("boot");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [oauthStatus, setOauthStatus] = useState<OAuthProviderStatus | null>(null);
+
+  const safeNext = useMemo(() => {
+    const nextRaw = searchParams.get("next");
+    return nextRaw?.startsWith("/") && !nextRaw.startsWith("//") ? nextRaw : "/dashboard";
+  }, [searchParams]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const token = getToken();
+    if (!token) {
+      setSessionPhase("anon");
+      return;
+    }
+    void (async () => {
+      try {
+        const me = await apiFetch<AuthMeCoreConsents>("/api/v1/auth/me", {}, token);
+        if (cancelled) return;
+        if (hasCoreConsents(me)) {
+          setSessionPhase("gone");
+          router.replace(safeNext);
+          return;
+        }
+        setSessionPhase("consent");
+      } catch {
+        if (!cancelled) setSessionPhase("anon");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [router, safeNext]);
 
   useEffect(() => {
     fetchOAuthProviderStatus()
@@ -85,6 +121,34 @@ function RegisterPageContent() {
     } finally {
       setLoading(false);
     }
+  }
+
+  if (sessionPhase === "boot" || sessionPhase === "gone") {
+    return (
+      <Shell rail>
+        <Card>
+          <p className="twin-muted text-sm">{t("authCallback.signingIn")}</p>
+        </Card>
+      </Shell>
+    );
+  }
+
+  if (sessionPhase === "consent") {
+    return (
+      <Shell rail>
+        <Card>
+          <h1 className="mb-2 text-2xl font-semibold">{t("consentGdpr.title")}</h1>
+          <p className="twin-muted mb-6 text-sm">{t("consentGdpr.lead")}</p>
+          <LegalRegionNotice />
+          <PostLoginCoreConsentForm nextPath={safeNext} />
+          <p className="twin-muted mt-6 text-center text-sm">
+            <Link href="/" className="twin-link">
+              {t("site.footerHome")}
+            </Link>
+          </p>
+        </Card>
+      </Shell>
+    );
   }
 
   return (

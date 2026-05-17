@@ -27,11 +27,22 @@ def _indeed_url(keyword: str, location: str) -> str:
     )
 
 
-def _parse_indeed(html: str, limit: int) -> list[ScrapedJob]:
+def _indeed_pl_url(keyword: str, location: str) -> str:
+    """Indeed Poland — separate board id from US (.com) for deduping and locale."""
+    return f"https://pl.indeed.com/praca?q={quote_plus(keyword)}&l={quote_plus(location)}"
+
+
+def _parse_indeed_html(
+    html: str,
+    limit: int,
+    *,
+    job_board: str,
+    base_url: str,
+) -> list[ScrapedJob]:
     jobs = parse_with_selectors(
         html,
-        job_board="indeed.com",
-        base_url="https://www.indeed.com",
+        job_board=job_board,
+        base_url=base_url,
         card_selector=".job_seen_beacon, .jobsearch-SerpJobCard, div.slider_item",
         title_selector="h2.jobTitle span, a.jcs-JobTitle, h2 a",
         company_selector=".companyName, [data-testid='company-name']",
@@ -41,7 +52,21 @@ def _parse_indeed(html: str, limit: int) -> list[ScrapedJob]:
     )
     if jobs:
         return jobs
-    return parse_job_links(html, job_board="indeed.com", base_url="https://www.indeed.com", href_contains="/rc/clk", limit=limit)
+    for marker in ("/rc/clk", "jk=", "/viewjob", "pagead/clk"):
+        alt = parse_job_links(
+            html, job_board=job_board, base_url=base_url, href_contains=marker, limit=limit
+        )
+        if alt:
+            return alt
+    return []
+
+
+def _parse_indeed(html: str, limit: int) -> list[ScrapedJob]:
+    return _parse_indeed_html(html, limit, job_board="indeed.com", base_url="https://www.indeed.com")
+
+
+def _parse_indeed_pl(html: str, limit: int) -> list[ScrapedJob]:
+    return _parse_indeed_html(html, limit, job_board="indeed.pl", base_url="https://pl.indeed.com")
 
 
 def _glassdoor_url(keyword: str, location: str) -> str:
@@ -252,6 +277,7 @@ def _parse_seek(html: str, limit: int) -> list[ScrapedJob]:
 
 GLOBAL_BOARD_SPECS: dict[str, BoardSpec] = {
     "indeed": BoardSpec("indeed", "indeed.com", "Indeed", "Global", _indeed_url, _parse_indeed),
+    "indeed-pl": BoardSpec("indeed-pl", "indeed.pl", "Indeed (Poland)", "Poland", _indeed_pl_url, _parse_indeed_pl),
     "glassdoor": BoardSpec("glassdoor", "glassdoor.com", "Glassdoor", "Global", _glassdoor_url, _parse_glassdoor),
     "monster": BoardSpec("monster", "monster.com", "Monster", "Americas", _monster_url, _parse_monster),
     "ziprecruiter": BoardSpec("ziprecruiter", "ziprecruiter.com", "ZipRecruiter", "Americas", _ziprecruiter_url, _parse_ziprecruiter),
@@ -275,6 +301,7 @@ def scrape_global_board(
     if not spec:
         return []
     url = spec.build_url(keyword, location)
-    html = fetch_html(url, locale="en-US")
+    locale = "pl-PL" if board_id == "indeed-pl" else "en-US"
+    html = fetch_html(url, locale=locale)
     jobs = spec.parse(html, limit)
     return [j for j in jobs if validate_job(j)]

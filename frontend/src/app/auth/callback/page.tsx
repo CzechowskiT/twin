@@ -41,7 +41,7 @@ function AuthCallbackContent() {
           try {
             const me = await apiFetch<AuthMeCoreConsents>("/api/v1/auth/me", {}, token);
             if (!hasCoreConsents(me)) {
-              router.replace(`/consent/gdpr?next=${encodeURIComponent(path)}`);
+              router.replace(`/register?next=${encodeURIComponent(path)}`);
               return;
             }
           } catch {

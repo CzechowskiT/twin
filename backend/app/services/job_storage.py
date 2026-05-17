@@ -2,14 +2,45 @@
 
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.database.models import Job
 from app.scrapers.base import ScrapedJob
+
+
+def _job_body_len(job: ScrapedJob) -> int:
+    req = (job.requirements or "").strip()
+    desc = (job.description or "").strip()
+    return len(req) + len(desc)
+
+
+def _soft_dedupe_key(job: ScrapedJob) -> tuple[str, str, str]:
+    return (
+        job.job_board,
+        (job.title or "").strip().lower()[:200],
+        (job.company or "").strip().lower()[:200],
+    )
+
+
+def _prepare_jobs_for_persist(jobs: list[ScrapedJob]) -> list[ScrapedJob]:
+    """Drop too-thin rows (optional) and duplicate board+title+company within the same batch."""
+    min_body = max(0, get_settings().scrape_min_job_body_chars)
+    seen_soft: set[tuple[str, str, str]] = set()
+    out: list[ScrapedJob] = []
+    for job in jobs:
+        if min_body > 0 and _job_body_len(job) < min_body:
+            continue
+        sk = _soft_dedupe_key(job)
+        if sk in seen_soft:
+            continue
+        seen_soft.add(sk)
+        out.append(job)
+    return out
 
 
 def upsert_jobs(db: Session, jobs: list[ScrapedJob]) -> int:
     """Insert new jobs; skip duplicates. Returns count of new rows."""
     saved = 0
-    for item in jobs:
+    for item in _prepare_jobs_for_persist(jobs):
         exists = (
             db.query(Job)
             .filter(Job.job_board == item.job_board, Job.external_id == item.external_id)

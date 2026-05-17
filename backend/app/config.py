@@ -66,6 +66,13 @@ class Settings(BaseSettings):
     scrape_enabled_board_ids: str = ""
     # Per-board fetch cap for Twin scrape-all (each adapter respects this upper bound).
     scrape_jobs_per_board: int = 100
+    # When >0, skip persisting listings whose requirements+description are shorter (listing-only rows stay at 0).
+    scrape_min_job_body_chars: int = 0
+    # When true, Celery Beat runs scrape-all once per day at scrape_beat_hour_utc (requires celery beat process).
+    scrape_beat_enabled: bool = False
+    scrape_beat_hour_utc: int = 5
+    # Max jobs considered per find_top_matches scan (newest validated first).
+    match_jobs_scan_limit: int = 4000
     # When true, honour robots.txt before Playwright fetches (LinkedIn uses Disallow: / for generic bots).
     scrape_respect_robots_txt: bool = True
     # Pause between boards in scrape-all (serial) to reduce burst traffic on third-party sites.

@@ -45,7 +45,7 @@ SCRAPE_REGISTRY: dict[str, ScrapeFn] = {**LOCAL_SCRAPERS, **GLOBAL_SCRAPERS}
 
 DEFAULT_BOARD_TIMEOUT_SEC = 120
 
-# Scrape-all order: PL sources first, then LinkedIn, then globals (Indeed, Glassdoor, StepStone, …).
+# Scrape-all order: PL sources first, LinkedIn, Indeed PL, then remaining globals (US Indeed, Glassdoor, …).
 PRIORITY_BOARD_ORDER: tuple[str, ...] = (
     "pracuj",
     "pracuj-sales",
@@ -56,6 +56,7 @@ PRIORITY_BOARD_ORDER: tuple[str, ...] = (
     "praca",
     "linkedin",
     "linkedin-sales",
+    "indeed-pl",
 )
 
 BOARD_LABELS: dict[str, tuple[str, str]] = {
