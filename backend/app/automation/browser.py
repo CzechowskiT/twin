@@ -6,7 +6,8 @@ from contextlib import contextmanager
 from pathlib import Path
 
 from app.automation.challenges import page_has_challenge, wait_for_human_clear
-from app.scrapers.playwright_utils import USER_AGENT, dismiss_cookies
+from app.scrapers.compliance import get_scrape_user_agent
+from app.scrapers.playwright_utils import dismiss_cookies
 
 STATE_FILE = "storage.json"
 
@@ -20,7 +21,7 @@ def browser_page(*, headless: bool, state_dir: Path):
 
     with sync_playwright() as pw:
         browser = pw.chromium.launch(headless=headless)
-        context_kwargs: dict = {"locale": "pl-PL", "user_agent": USER_AGENT}
+        context_kwargs: dict = {"locale": "pl-PL", "user_agent": get_scrape_user_agent()}
         if state_path.exists():
             context_kwargs["storage_state"] = str(state_path)
         context = browser.new_context(**context_kwargs)

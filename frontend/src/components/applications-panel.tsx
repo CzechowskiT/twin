@@ -33,7 +33,12 @@ export function ApplicationsPanel({
   const { t } = useTranslation();
 
   if (!items.length) {
-    return <p className="twin-muted text-sm">{t("dashboard.noApplications")}</p>;
+    return (
+      <div className="rounded-lg border border-dashed border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/35 p-5 sm:p-6">
+        <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.noApplications")}</p>
+        <p className="mt-2 text-sm leading-relaxed text-[var(--twin-muted)]">{t("dashboard.appsEmptyMomentum")}</p>
+      </div>
+    );
   }
 
   return (

@@ -3,9 +3,12 @@
 MVP uses unauthenticated search only. LinkedIn may block headless browsers,
 show login walls, or rate-limit requests — results are best-effort.
 
+LinkedIn's robots.txt disallows generic automated access (``User-agent: *`` /
+``Disallow: /``). With ``SCRAPE_RESPECT_ROBOTS_TXT=true`` (default), this
+adapter does not fetch. Production needs LinkedIn permission (see their
+robots.txt notice) or an official API — not a silent bypass.
+
 Do NOT commit credentials. For future login support use env vars only.
-Scraping may conflict with LinkedIn Terms; production at scale should prefer
-official hiring APIs where you have a commercial relationship.
 """
 
 from __future__ import annotations
@@ -18,7 +21,8 @@ from bs4 import BeautifulSoup
 
 from app.config import get_settings
 from app.scrapers.base import ScrapedJob, validate_job
-from app.scrapers.playwright_utils import USER_AGENT, dismiss_cookies
+from app.scrapers.compliance import assert_url_may_be_fetched, get_scrape_user_agent, post_fetch_delay
+from app.scrapers.playwright_utils import dismiss_cookies
 
 JOB_BOARD = "linkedin.com"
 BASE_URL = "https://www.linkedin.com"
@@ -85,6 +89,13 @@ def _fetch_search_html(keyword: str, location: str) -> str:
 
     settings = get_settings()
     url = _build_search_url(keyword, location, geo_id=settings.linkedin_jobs_geo_id)
+    if not assert_url_may_be_fetched(url):
+        raise LinkedInScrapeError(
+            "LinkedIn robots.txt disallows this automated fetch for our user-agent. "
+            "Use official LinkedIn APIs or written crawl permission; or exclude `linkedin` from "
+            "SCRAPE_ENABLED_BOARD_IDS. SCRAPE_RESPECT_ROBOTS_TXT=false is only for environments "
+            "with explicit contractual clearance — not a default."
+        )
 
     init_js = """
         Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
@@ -101,7 +112,7 @@ def _fetch_search_html(keyword: str, location: str) -> str:
         )
         context = browser.new_context(
             locale="en-US",
-            user_agent=USER_AGENT,
+            user_agent=get_scrape_user_agent(),
             viewport={"width": 1280, "height": 900},
             extra_http_headers={
                 "Accept-Language": "en-US,en;q=0.9,pl;q=0.8",
@@ -115,7 +126,9 @@ def _fetch_search_html(keyword: str, location: str) -> str:
         _wait_for_job_listing(page)
         _scroll_results(page)
         html = page.content()
+        context.close()
         browser.close()
+    post_fetch_delay()
     return html
 
 

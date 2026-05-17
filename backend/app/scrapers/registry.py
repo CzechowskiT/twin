@@ -4,7 +4,7 @@ from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from dataclasses import dataclass
 
-from app.scrapers import justjoin, linkedin, praca, pracuj, rocketjobs
+from app.scrapers import compliance, justjoin, linkedin, praca, pracuj, rocketjobs
 from app.scrapers.base import ScrapedJob
 from app.scrapers.global_boards import GLOBAL_BOARD_SPECS, scrape_global_board
 
@@ -177,7 +177,8 @@ def scrape_all_boards(
 ) -> list[BoardScrapeOutcome]:
     """Run every registered board scraper sequentially (one board at a time)."""
     outcomes: list[BoardScrapeOutcome] = []
-    for board_id in scrape_board_ids_ordered():
+    ordered = scrape_board_ids_ordered()
+    for index, board_id in enumerate(ordered):
         fn = SCRAPE_REGISTRY[board_id]
         error: str | None = None
         jobs: list[ScrapedJob] = []
@@ -189,4 +190,6 @@ def scrape_all_boards(
         except Exception as exc:
             error = str(exc)
         outcomes.append(BoardScrapeOutcome(board_id=board_id, jobs=jobs, error=error))
+        if index < len(ordered) - 1:
+            compliance.sleep_between_boards()
     return outcomes

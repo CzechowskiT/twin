@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import { PageMomentumRail } from "@/components/page-momentum-rail";
+
 import "./beta.css";
 
 function metadataBaseUrl(): URL {
@@ -25,5 +27,10 @@ export const metadata: Metadata = {
 };
 
 export default function BetaLayout({ children }: { children: React.ReactNode }) {
-  return <div className="beta-root">{children}</div>;
+  return (
+    <div className="beta-root flex min-h-0 flex-1 flex-col">
+      {children}
+      <PageMomentumRail variant="marketing" />
+    </div>
+  );
 }

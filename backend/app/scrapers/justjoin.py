@@ -4,7 +4,8 @@ import json
 from typing import Any
 
 from app.scrapers.base import ScrapedJob, validate_job
-from app.scrapers.playwright_utils import USER_AGENT, dismiss_cookies
+from app.scrapers.compliance import assert_url_may_be_fetched, get_scrape_user_agent, post_fetch_delay
+from app.scrapers.playwright_utils import dismiss_cookies
 
 JOB_BOARD = "justjoin.it"
 BASE = "https://justjoin.it"
@@ -25,9 +26,13 @@ def _fetch_offers_json_text() -> str:
     except ImportError:
         return ""
 
+    home = f"{BASE}/"
+    if not assert_url_may_be_fetched(home):
+        return ""
+
     with sync_playwright() as pw:
         browser = pw.chromium.launch(headless=True)
-        context = browser.new_context(locale="pl-PL", user_agent=USER_AGENT)
+        context = browser.new_context(locale="pl-PL", user_agent=get_scrape_user_agent())
         page = context.new_page()
         page.goto(f"{BASE}/", wait_until="domcontentloaded", timeout=90_000)
         dismiss_cookies(page)
@@ -44,7 +49,9 @@ def _fetch_offers_json_text() -> str:
               }
             }"""
         )
+        context.close()
         browser.close()
+    post_fetch_delay()
     return raw if isinstance(raw, str) else ""
 
 

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from "react";
 
+import { PageMomentumRail } from "@/components/page-momentum-rail";
+
 export function Shell({
   children,
   wide = false,
@@ -13,14 +15,18 @@ export function Shell({
 }) {
   return (
     <div
-      className={`twin-shell flex min-w-0 flex-col ${wide ? "twin-shell--wide" : "twin-shell--narrow"}`}
+      className={`twin-shell flex min-h-0 min-w-0 flex-1 flex-col ${wide ? "twin-shell--wide" : "twin-shell--narrow"}`}
     >
       {rail ? (
         <div className="marketing-copy-rail flex w-full min-w-0 flex-1 flex-col gap-6 sm:gap-8">
           {children}
+          <PageMomentumRail />
         </div>
       ) : (
-        children
+        <div className="flex w-full min-w-0 flex-1 flex-col">
+          {children}
+          <PageMomentumRail />
+        </div>
       )}
     </div>
   );

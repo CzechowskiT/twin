@@ -6,6 +6,7 @@ from urllib.parse import urljoin, urlparse
 from bs4 import BeautifulSoup
 
 from app.scrapers.base import ScrapedJob, validate_job
+from app.scrapers.compliance import assert_url_may_be_fetched, get_scrape_user_agent, post_fetch_delay
 
 JOB_BOARD = "rocketjobs.pl"
 BASE_URL = "https://rocketjobs.pl"
@@ -99,20 +100,19 @@ def _fetch_search_html(keyword: str) -> str:
         return ""
 
     url = _build_search_url(keyword)
+    if not assert_url_may_be_fetched(url):
+        return ""
     with sync_playwright() as pw:
         browser = pw.chromium.launch(headless=True)
-        page = browser.new_page(
-            locale="pl-PL",
-            user_agent=(
-                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-            ),
-        )
+        context = browser.new_context(locale="pl-PL", user_agent=get_scrape_user_agent())
+        page = context.new_page()
         page.goto(url, wait_until="networkidle", timeout=90_000)
         _dismiss_cookie_banner(page)
         _scroll_to_load_offers(page)
         html = page.content()
+        context.close()
         browser.close()
+    post_fetch_delay()
     return html
 
 

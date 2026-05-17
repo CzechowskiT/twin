@@ -5,10 +5,7 @@ from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
 
-USER_AGENT = (
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
-)
+from app.scrapers import compliance
 
 COOKIE_SELECTORS = (
     "#onetrust-accept-btn-handler",
@@ -33,6 +30,8 @@ def fetch_html(
     timeout_ms: int = 90_000,
 ) -> str:
     """Load URL in headless Chromium and return page HTML."""
+    if not compliance.assert_url_may_be_fetched(url):
+        return ""
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
@@ -40,7 +39,7 @@ def fetch_html(
 
     with sync_playwright() as pw:
         browser = pw.chromium.launch(headless=True)
-        context = browser.new_context(locale=locale, user_agent=USER_AGENT)
+        context = browser.new_context(locale=locale, user_agent=compliance.get_scrape_user_agent())
         page = context.new_page()
         page.goto(url, wait_until=wait_until, timeout=timeout_ms)
         dismiss_cookies(page)
@@ -51,6 +50,7 @@ def fetch_html(
             default_scroll(page)
         html = page.content()
         browser.close()
+    compliance.post_fetch_delay()
     return html
 
 

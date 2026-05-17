@@ -503,9 +503,12 @@ export default function DashboardPage() {
           onDismiss={hasProfile ? dismissJob : undefined}
         />
         {!jobs?.items.length && (
-          <p className="twin-muted mt-3 text-sm">
-            {SHOW_SCRAPE_UI ? t("dashboard.noJobs") : t("dashboard.noJobsNoScrapeUi")}
-          </p>
+          <div className="mt-3 space-y-2 rounded-lg border border-dashed border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/35 p-4 sm:p-5">
+            <p className="twin-muted text-sm">
+              {SHOW_SCRAPE_UI ? t("dashboard.noJobs") : t("dashboard.noJobsNoScrapeUi")}
+            </p>
+            <p className="twin-muted text-sm leading-relaxed">{t("dashboard.jobsEmptyMomentum")}</p>
+          </div>
         )}
       </Card>
     </Shell>
