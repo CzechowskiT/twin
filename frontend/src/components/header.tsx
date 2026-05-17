@@ -45,8 +45,8 @@ export function Header() {
   return (
     <header className="twin-header-bar sticky top-0 z-50">
       <div className="twin-header-stripe" aria-hidden />
-      <div className="twin-container flex flex-wrap items-center justify-between gap-x-4 gap-y-2 py-3 sm:py-3.5">
-        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1 sm:gap-x-3 sm:gap-y-1">
+      <div className="twin-container flex max-md:flex-wrap max-md:items-center max-md:justify-between max-md:gap-x-3 max-md:gap-y-2 py-3 md:grid md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center md:gap-x-4 md:gap-y-2 md:py-3.5">
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1 sm:gap-x-3 sm:gap-y-1 md:flex-none">
           <Link href="/" className="twin-logo shrink-0">
             TWIN<span className="twin-logo-accent">.</span>
           </Link>
@@ -60,17 +60,18 @@ export function Header() {
               {t("nav.demo")}
             </Link>
           </div>
-          <nav
-            className="hidden min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1 text-[12px] font-medium sm:text-[13px] md:flex"
-            aria-label={t("nav.ariaSiteNav")}
-          >
-            {corporateNav.map((item) => (
-              <Link key={item.href} href={item.href} className={linkClass}>
-                {item.label}
-              </Link>
-            ))}
-          </nav>
         </div>
+
+        <nav
+          className="hidden min-w-0 flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-[12px] font-medium sm:text-[13px] md:flex md:justify-self-stretch md:px-2"
+          aria-label={t("nav.ariaSiteNav")}
+        >
+          {corporateNav.map((item) => (
+            <Link key={item.href} href={item.href} className={linkClass}>
+              {item.label}
+            </Link>
+          ))}
+        </nav>
 
         <div className="hidden shrink-0 flex-wrap items-center justify-end gap-x-2 gap-y-1 md:flex md:gap-x-2.5">
           <nav
