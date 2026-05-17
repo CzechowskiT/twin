@@ -52,6 +52,34 @@ function stripeCheckoutMethodLabel(method: string): TranslationKey | null {
   return map[method] ?? null;
 }
 
+function formatSubscriptionStatusLabel(
+  t: (key: TranslationKey, vars?: Record<string, string | number>) => string,
+  status: string | null | undefined,
+): string {
+  if (status == null) return t("dashboard.billingNotActive");
+  const raw = status.trim();
+  if (!raw.length) return t("dashboard.billingNotActive");
+  const s = raw.toLowerCase();
+  if (s === "unknown" || s === "none") return t("dashboard.billingNotActive");
+  const map: Record<string, TranslationKey> = {
+    active: "dashboard.billingSubActive",
+    trialing: "dashboard.billingSubTrialing",
+    past_due: "dashboard.billingSubPastDue",
+    canceled: "dashboard.billingSubCanceled",
+    unpaid: "dashboard.billingSubUnpaid",
+    incomplete: "dashboard.billingSubIncomplete",
+    incomplete_expired: "dashboard.billingSubIncompleteExpired",
+    paused: "dashboard.billingSubPaused",
+  };
+  const key = map[s];
+  if (key) return t(key);
+  return raw
+    .split(/[_\s]+/)
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(" ");
+}
+
 type UrlPayload = { url: string };
 
 const PAID = new Set(["active", "trialing", "past_due"]);
@@ -237,7 +265,7 @@ export default function BillingPage() {
           <p className="twin-muted mt-1 text-sm">
             {t("dashboard.billingSubscriptionStatus")}:{" "}
             <span className="font-medium text-[var(--foreground)]">
-              {me.subscription_status ?? t("dashboard.billingNotActive")}
+              {formatSubscriptionStatusLabel(t, me.subscription_status)}
             </span>
           </p>
           {me.subscription_current_period_end ? (

@@ -16,6 +16,11 @@ export type ApplicationRow = {
 
 const STATUSES = ["pending", "applied", "interview", "rejected", "hired"] as const;
 
+function normalizeApplicationSelectStatus(status: string): (typeof STATUSES)[number] {
+  const s = status.trim().toLowerCase();
+  return (STATUSES as readonly string[]).includes(s) ? (s as (typeof STATUSES)[number]) : "pending";
+}
+
 export function ApplicationsPanel({
   items,
   onStatusChange,
@@ -49,7 +54,7 @@ export function ApplicationsPanel({
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <select
-              value={app.status}
+              value={normalizeApplicationSelectStatus(app.status)}
               onChange={(e) => onStatusChange(app.id, e.target.value)}
               className="rounded border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-2 py-1 text-xs"
               aria-label={t("dashboard.applicationStatus")}

@@ -7,6 +7,20 @@ import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Input, Label, Shell } from "@/components/ui";
 import { apiFetch, apiUpload } from "@/lib/api";
 import { getToken } from "@/lib/auth";
+import type { TranslationKey } from "@/lib/i18n";
+
+function cvSeniorityTranslationKey(raw: string): TranslationKey | null {
+  const s = raw.trim().toLowerCase();
+  if (!s || s === "unknown") return null;
+  const map: Record<string, TranslationKey> = {
+    junior: "profile.cvSeniorityJunior",
+    mid: "profile.cvSeniorityMid",
+    senior: "profile.cvSenioritySenior",
+    lead: "profile.cvSeniorityLead",
+    executive: "profile.cvSeniorityExecutive",
+  };
+  return map[s] ?? null;
+}
 
 type CvInsights = {
   headline?: string;
@@ -322,12 +336,16 @@ export default function ProfilePage() {
                   {initial.cv_insights.industries.join(", ")}
                 </p>
               ) : null}
-              {initial.cv_insights.seniority && initial.cv_insights.seniority !== "unknown" ? (
-                <p className="mb-2 text-[var(--twin-muted-strong)]">
-                  <span className="font-medium text-[var(--foreground)]">{t("profile.cvAnalysisSeniority")}: </span>
-                  {initial.cv_insights.seniority}
-                </p>
-              ) : null}
+              {(() => {
+                const raw = initial.cv_insights.seniority;
+                const sk = raw ? cvSeniorityTranslationKey(raw) : null;
+                return sk ? (
+                  <p className="mb-2 text-[var(--twin-muted-strong)]">
+                    <span className="font-medium text-[var(--foreground)]">{t("profile.cvAnalysisSeniority")}: </span>
+                    {t(sk)}
+                  </p>
+                ) : null;
+              })()}
               <p className="text-xs text-[var(--twin-muted)]">{t("profile.cvTargetRolesHint")}</p>
             </div>
           )}
