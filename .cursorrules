@@ -22,6 +22,17 @@ The product is **not** “more volume in your inbox.” Outside TWIN, someone re
 
 **Mechanic (build toward this):** matching + consent + async work while away → ranked pipeline → **scheduled or batch acceptance UI** → calendar export / sync. Every new surface (copy, API, UI) should ask: *does this reduce noise toward acceptance-ready calendar items, or add noise?*
 
+## Calendar integrations (candidate reality)
+Users live across stacks — plan for **all major consumer + corporate calendars**, not only one vendor.
+
+- **Shipped / in repo:** **Google Calendar** (OAuth: read busy + write events where configured).
+- **Next priority (typical corporate + personal):** **Microsoft 365 / Outlook.com** via **Microsoft Graph** (OAuth; calendar read + propose events). Covers most desk jobs on Entra ID / Outlook.
+- **Apple ecosystem:** **Apple Calendar** is usually **iCloud CalDAV** or subscribed **ICS/WebCal** feeds — there is no single “Sign in with Apple Calendar” like Google for arbitrary apps; support via **ICS export / subscribe URL** (works in Apple Calendar, Google, Outlook) and/or **CalDAV** where product scope allows.
+- **Universal fallback everyone understands:** **ICS (.ics) download + WebCal subscribe** for “interview holds” and confirmed slots (also works with Fastmail, Proton Calendar clients that support CalDAV/ICS, etc.).
+- **Meeting links:** treat **Google Meet / Microsoft Teams / Zoom** as **metadata on events** (URLs on calendar entries), not separate calendar products — still part of “how interviews land on the calendar.”
+
+When adding calendar features, prefer **OAuth where the provider offers it** (Google, Microsoft) plus **open ICS/WebCal** so Apple-only users are not second-class.
+
 ## Current Phase
 Phase 1 — Full stack MVP (Celery, scrapers, matching). Job boards: pracuj.pl, rocketjobs.pl.
 
