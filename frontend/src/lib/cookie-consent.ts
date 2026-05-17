@@ -39,15 +39,8 @@ export function hasCookieConsentDecision(): boolean {
   return readCookieConsent() !== null;
 }
 
-/** Marketing home and public pages must not show the floating cookie banner. */
-const COOKIE_BANNER_PATHS = new Set([
-  "/register",
-  "/login",
-  "/forgot-password",
-  "/reset-password",
-  "/consent/gdpr",
-  "/auth/callback",
-]);
+/** Floating cookie banner only on the registration flow (not home, login, or dashboard). */
+const COOKIE_BANNER_PATHS = new Set(["/register"]);
 
 export function normalizePathnameForCookieBanner(pathname: string): string {
   const raw = pathname.split("?")[0] || "/";

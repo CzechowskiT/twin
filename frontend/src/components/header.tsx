@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRef } from "react";
 
 import { HeaderStoreIcons } from "@/components/header-store-icons";
+import { SocialIconRow } from "@/components/social-icon-row";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useTranslation } from "@/components/language-provider";
 import { PersonaSwitcher } from "@/components/persona-switcher";
@@ -85,6 +86,7 @@ export function Header() {
               </Link>
             ))}
           </nav>
+          <SocialIconRow variant="header" />
           <HeaderStoreIcons />
           <div className="hidden h-6 w-px shrink-0 bg-[var(--twin-border)] sm:block" aria-hidden />
           <div className="flex flex-wrap items-center justify-end gap-x-2 gap-y-1">
@@ -93,7 +95,7 @@ export function Header() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex w-full basis-full items-center justify-end gap-2 md:hidden">
           <PersonaSwitcher />
           <LanguageSwitcher />
           <details ref={mobileMenuRef} className="relative">
@@ -157,6 +159,10 @@ export function Header() {
               </div>
             </nav>
           </details>
+        </div>
+
+        <div className="flex w-full basis-full items-center justify-center border-t border-[var(--twin-border)]/60 py-2 md:hidden">
+          <SocialIconRow variant="header" inline className="justify-center" />
         </div>
       </div>
     </header>
