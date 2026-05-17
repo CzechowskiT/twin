@@ -33,6 +33,27 @@ type PlansPayload = {
   payment_methods_note: string;
 };
 
+function normalizePlansPayload(raw: unknown): PlansPayload {
+  if (raw == null || typeof raw !== "object") {
+    return {
+      plans: [],
+      checkout_configured: false,
+      checkout_payment_methods: [],
+      payment_methods_note: "",
+    };
+  }
+  const o = raw as Record<string, unknown>;
+  const plans = Array.isArray(o.plans) ? (o.plans as PlanRow[]) : [];
+  const pm = o.checkout_payment_methods;
+  const checkout_payment_methods = Array.isArray(pm) ? (pm as string[]) : [];
+  return {
+    plans,
+    checkout_configured: Boolean(o.checkout_configured),
+    checkout_payment_methods,
+    payment_methods_note: typeof o.payment_methods_note === "string" ? o.payment_methods_note : "",
+  };
+}
+
 function stripeCheckoutMethodLabel(method: string): TranslationKey | null {
   const map: Record<string, TranslationKey> = {
     card: "dashboard.billingPmCard",
@@ -54,10 +75,10 @@ function stripeCheckoutMethodLabel(method: string): TranslationKey | null {
 
 function formatSubscriptionStatusLabel(
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string,
-  status: string | null | undefined,
+  status: unknown,
 ): string {
   if (status == null) return t("dashboard.billingNotActive");
-  const raw = status.trim();
+  const raw = typeof status === "string" ? status.trim() : String(status).trim();
   if (!raw.length) return t("dashboard.billingNotActive");
   const s = raw.toLowerCase();
   if (s === "unknown" || s === "none") return t("dashboard.billingNotActive");
@@ -134,7 +155,7 @@ export default function BillingPage() {
     }
 
     if (plansRes.status === "fulfilled") {
-      setPlans(plansRes.value);
+      setPlans(normalizePlansPayload(plansRes.value));
     } else {
       setPlans(null);
       const msg = plansRes.reason instanceof Error ? plansRes.reason.message : String(plansRes.reason);
@@ -197,7 +218,11 @@ export default function BillingPage() {
     }
   }
 
-  const paid = me?.subscription_status != null && PAID.has(me.subscription_status);
+  const subscriptionStatus =
+    me?.subscription_status != null && typeof me.subscription_status === "string"
+      ? me.subscription_status
+      : null;
+  const paid = subscriptionStatus != null && PAID.has(subscriptionStatus);
   const showPortal = paid;
 
   return (
