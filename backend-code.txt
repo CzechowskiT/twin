@@ -1,0 +1,363 @@
+=== BACKEND API FILES ===
+backend/app/api/__init__.py
+backend/app/api/applications.py
+backend/app/api/auth.py
+backend/app/api/beta_waitlist.py
+backend/app/api/billing.py
+backend/app/api/calendar.py
+backend/app/api/candidates.py
+backend/app/api/curated_careers.py
+backend/app/api/geo.py
+backend/app/api/health.py
+backend/app/api/jobs.py
+backend/app/api/kyc.py
+backend/app/api/linkedin_viral.py
+backend/app/api/referrals.py
+backend/app/api/router.py
+backend/app/api/talent_pool.py
+
+
+=== BACKEND API CODE (first 3 files) ===
+=== BACKEND MODELS ===
+
+
+=== BACKEND MODELS CODE ===
+=== MATCHING ALGORITHM ===
+FILE: backend/app/matching/matcher.py
+"""Rule-based matching tuned for sales, business, and tech profiles."""
+
+import json
+import re
+from typing import Any
+
+from app.matching.synonyms import SALES_TITLE_SIGNALS, SKILL_ALIASES, SKILL_SYNONYMS
+
+_SALARY_RE = re.compile(r"(\d[\d\s]{2,})\s*(?:–|-)?\s*(\d[\d\s]{2,})?\s*PLN", re.I)
+
+
+_PL_STOP = frozenset(
+    {
+        "oraz",
+        "przez",
+        "jest",
+        "być",
+        "jako",
+        "oraz",
+        "praca",
+        "pracy",
+        "oferta",
+        "the",
+        "and",
+        "for",
+        "with",
+        "your",
+        "that",
+        "this",
+        "from",
+    }
+)
+
+
+def calculate_match_score(candidate: dict[str, Any], job: dict[str, Any]) -> float:
+    """Score 0–100 from skills, salary, location, experience, and optional CV context."""
+    score = 0.0
+    score += _skills_score(candidate, job)
+    score += _sales_role_score(candidate, job)
+    score += _preferred_title_score(candidate, job)
+    score += _cv_context_score(candidate, job)
+    score += _salary_score(candidate, job)
+    score += _location_score(candidate, job)
+    score += _experience_score(candidate, job)
+    return round(min(score, 100.0), 2)
+
+
+def _normalize_skills(raw: Any) -> list[str]:
+    if isinstance(raw, list):
+        items = raw
+    else:
+        items = json.loads(raw) if raw else []
+    normalized: list[str] = []
+    for item in items:
+        key = str(item).lower().strip()
+        if not key:
+            continue
+        normalized.append(SKILL_ALIASES.get(key, key))
+    return normalized
+
+
+def _job_text(job: dict[str, Any]) -> tuple[str, str]:
+    title = (job.get("title") or "").lower()
+    body = " ".join(
+        p for p in [job.get("requirements"), job.get("description")] if p
+    ).lower()
+    return title, body
+
+
+def _skills_score(candidate: dict[str, Any], job: dict[str, Any]) -> float:
+    skills = _normalize_skills(candidate.get("skills", []))
+    if not skills:
+        return 0.0
+
+    title, body = _job_text(job)
+    full = f"{title} {body}"
+    hits = 0.0
+    for skill in skills:
+        terms = SKILL_SYNONYMS.get(skill, [skill])
+        if _any_term_in_text(terms, title):
+            hits += 1.0
+        elif _any_term_in_text(terms, full):
+            hits += 0.65
+
+    return min(55.0, (hits / len(skills)) * 55.0)
+
+
+def _any_term_in_text(terms: list[str], text: str) -> bool:
+    return any(term in text for term in terms)
+
+
+def _tokenize(text: str) -> set[str]:
+    tokens: set[str] = set()
+    for word in re.findall(r"[a-ząćęłńóśźż0-9]{4,}", text.lower()):
+        if word not in _PL_STOP:
+            tokens.add(word)
+    return tokens
+
+
+def _sales_role_score(candidate: dict[str, Any], job: dict[str, Any]) -> float:
+    """Extra points when profile looks sales-oriented and job title matches."""
+    skills = _normalize_skills(candidate.get("skills", []))
+    sales_profile = bool(
+        skills
+        and any(s in skills for s in ("sales", "b2b", "key account", "business", "crm"))
+    )
+    if not sales_profile:
+        return 0.0
+    title, _ = _job_text(job)
+    if any(sig in title for sig in SALES_TITLE_SIGNALS):
+        return 10.0
+    return 0.0
+
+
+def _preferred_title_score(candidate: dict[str, Any], job: dict[str, Any]) -> float:
+    """Boost when job title overlaps user-stated target titles (substring + token overlap)."""
+    raw = candidate.get("preferred_job_titles") or []
+    titles: list[str]
+    if isinstance(raw, list):
+        titles = [str(t).lower().strip() for t in raw if str(t).strip()]
+    else:
+        titles = []
+    if not titles:
+        return 0.0
+    job_title, _ = _job_text(job)
+    hits = sum(1 for t in titles if t in job_title)
+    if hits:
+        return min(12.0, 4.0 + 4.0 * hits)
+
+    job_words = _tokenize(job_title)
+    if not job_words:
+        return 0.0
+    overlap_pts = 0.0
+    for t in titles:
+        tw = _tokenize(t)
+        common = len(tw & job_words)
+        if common >= 2:
+            overlap_pts += 3.0
+        elif common == 1:
+            overlap_pts += 1.2
+    return min(10.0, overlap_pts)
+
+
+def _cv_context_score(candidate: dict[str, Any], job: dict[str, Any]) -> float:
+    """Overlap between full CV text and job posting (contextual fit)."""
+    cv_text = (candidate.get("cv_text") or "").strip()
+    if not cv_text:
+        return 0.0
+
+    title, body = _job_text(job)
+    job_tokens = _tokenize(f"{title} {body}")
+    cv_tokens = _tokenize(cv_text[:8000])
+    if not job_tokens or not cv_tokens:
+        return 0.0
+
+    overlap = len(job_tokens & cv_tokens)
+    ratio = overlap / max(len(job_tokens), 1)
+    # Up to 20 pts for strong contextual overlap
+    return min(20.0, ratio * 35.0)
+
+
+def _salary_score(candidate: dict[str, Any], job: dict[str, Any]) -> float:
+    desired = candidate.get("desired_salary")
+    if not desired:
+        return 5.0
+
+    lo, hi = job.get("salary_min"), job.get("salary_max")
+    if not lo or not hi:
+        lo, hi = _salary_from_text(job.get("requirements") or "")
+
+    if not lo:
+        return 5.0
+    if not hi:
+        hi = lo
+    if lo <= desired <= hi:
+        return 15.0
+    if desired < lo:
+        return 8.0
+    if desired <= hi * 1.2:
+        return 5.0
+    return 0.0
+
+
+def _salary_from_text(text: str) -> tuple[int | None, int | None]:
+    match = _SALARY_RE.search(text.replace("\xa0", " "))
+    if not match:
+        return None, None
+    lo = int(re.sub(r"\s", "", match.group(1)))
+    hi = int(re.sub(r"\s", "", match.group(2))) if match.group(2) else lo
+    return lo, hi
+
+
+def _location_score(candidate: dict[str, Any], job: dict[str, Any]) -> float:
+    city = (candidate.get("location") or "").lower().strip()
+    if not city:
+        return 0.0
+
+    title, body = _job_text(job)
+    loc = (job.get("location") or "").lower()
+    combined = f"{title} {loc} {body}"
+    if city in combined:
+        return 15.0
+    if "cała polska" in combined or "zdalna" in combined or "remote" in combined:
+        return 8.0
+    return 0.0
+
+
+def _experience_score(candidate: dict[str, Any], job: dict[str, Any]) -> float:
+    years = candidate.get("experience_years") or 0
+    title, _ = _job_text(job)
+    if years >= 10 and any(w in title for w in ("senior", "lead", "head", "dyrektor")):
+        return 15.0
+    if years >= 5 and any(w in title for w in ("senior", "manager", "owner", "kierownik")):
+        return 12.0
+    if years >= 3 and "junior" not in title:
+        return 10.0
+    if years < 3 and "junior" in title:
+        return 12.0
+    return 8.0
+-e \n\n
+FILE: backend/app/schemas/match.py
+"""Match result schemas."""
+
+from pydantic import BaseModel
+
+
+class JobMatchOut(BaseModel):
+    job_id: int
+    score: float
+    title: str
+    company: str
+    location: str | None
+    url: str
+    job_board: str
+
+
+class JobMatchListOut(BaseModel):
+    items: list[JobMatchOut]
+    total: int
+-e \n\n
+FILE: backend/app/services/matching_service.py
+"""Compute job–candidate match scores."""
+
+import json
+from typing import Any
+
+from sqlalchemy.orm import Session
+
+from app.config import get_settings
+from app.database.models import Candidate, Job, JobMatch
+from app.matching.matcher import calculate_match_score
+
+
+def candidate_to_dict(candidate: Candidate) -> dict[str, Any]:
+    skills = json.loads(candidate.skills) if candidate.skills else []
+    titles = json.loads(candidate.preferred_job_titles) if candidate.preferred_job_titles else []
+    return {
+        "skills": skills,
+        "preferred_job_titles": titles if isinstance(titles, list) else [],
+        "experience_years": candidate.experience_years,
+        "desired_salary": candidate.desired_salary,
+        "location": candidate.location,
+        "cv_text": candidate.cv_text,
+    }
+
+
+def job_to_dict(job: Job) -> dict[str, Any]:
+    return {
+        "title": job.title,
+        "requirements": job.requirements,
+        "description": job.description,
+        "salary_min": job.salary_min,
+        "salary_max": job.salary_max,
+        "location": job.location,
+    }
+
+
+def find_top_matches(
+    db: Session,
+    candidate: Candidate,
+    *,
+    limit: int = 10,
+    min_score: float = 40.0,
+    persist: bool = True,
+) -> list[dict[str, Any]]:
+    """Return best matching jobs for a candidate, optionally saved to job_matches."""
+    cand = candidate_to_dict(candidate)
+    scan_limit = max(50, min(50_000, int(get_settings().match_jobs_scan_limit)))
+    jobs = (
+        db.query(Job)
+        .filter(Job.is_validated.is_(True))
+        .order_by(Job.scraped_at.desc())
+        .limit(scan_limit)
+        .all()
+    )
+    scored: list[tuple[float, Job]] = []
+
+    for job in jobs:
+        score = calculate_match_score(cand, job_to_dict(job))
+        if score >= min_score:
+            scored.append((score, job))
+
+    scored.sort(key=lambda x: x[0], reverse=True)
+    top = scored[:limit]
+    results: list[dict[str, Any]] = []
+
+    for score, job in top:
+        if persist:
+            _upsert_match(db, candidate.id, job.id, score)
+        results.append(
+            {
+                "job_id": job.id,
+                "score": score,
+                "title": job.title,
+                "company": job.company,
+                "location": job.location,
+                "url": job.url,
+                "job_board": job.job_board,
+            }
+        )
+
+    if persist:
+        db.commit()
+    return results
+
+
+def _upsert_match(db: Session, candidate_id: int, job_id: int, score: float) -> None:
+    row = (
+        db.query(JobMatch)
+        .filter(JobMatch.candidate_id == candidate_id, JobMatch.job_id == job_id)
+        .first()
+    )
+    if row:
+        row.score = score
+    else:
+        db.add(JobMatch(candidate_id=candidate_id, job_id=job_id, score=score))
+-e \n\n
