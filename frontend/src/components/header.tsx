@@ -16,11 +16,16 @@ export function Header() {
     if (d) d.open = false;
   };
 
-  const marketing = [
+  /** Demo + persona lanes — grouped with account on the right (desktop). */
+  const productNav = [
     { href: "/demo" as const, label: t("nav.demo") },
     { href: "/for-candidates" as const, label: t("nav.forCandidates") },
     { href: "/for-recruiters" as const, label: t("nav.forRecruiters") },
     { href: "/for-companies" as const, label: t("nav.forCompanies") },
+  ];
+
+  /** Corporate / marketing pages — sit next to logo so the top bar does not orphan a short second row. */
+  const siteNav = [
     { href: "/about" as const, label: t("nav.about") },
     { href: "/case-studies" as const, label: t("nav.cases") },
     { href: "/faq" as const, label: t("nav.faq") },
@@ -40,11 +45,13 @@ export function Header() {
   const roiClassName =
     "twin-nav-roi-pill twin-touch-target inline-flex max-w-[10.5rem] shrink-0 items-center justify-center gap-2 whitespace-normal rounded-full bg-[var(--twin-cta)] px-3 py-2 text-center text-[10px] font-extrabold uppercase leading-tight tracking-wide text-[var(--twin-on-cta)] shadow-[0_4px_14px_rgb(217_119_6_/0.55)] ring-2 ring-white/90 ring-offset-2 ring-offset-white transition hover:bg-[var(--twin-cta-hover)] hover:shadow-[0_6px_20px_rgb(180_83_9_/0.5)] sm:max-w-[16rem] sm:px-5 sm:py-2.5 sm:text-[12px] sm:leading-snug md:text-[13px]";
 
+  const linkClass = "twin-nav-link whitespace-nowrap";
+
   return (
     <header className="twin-header-bar sticky top-0 z-50">
       <div className="twin-header-stripe" aria-hidden />
       <div className="twin-container flex flex-wrap items-center justify-between gap-x-4 gap-y-2 py-3 sm:py-3.5">
-        <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1 sm:gap-x-3 sm:gap-y-1">
           <Link href="/" className="twin-logo shrink-0">
             TWIN<span className="twin-logo-accent">.</span>
           </Link>
@@ -52,15 +59,25 @@ export function Header() {
             <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white shadow-sm" aria-hidden />
             {t("nav.calculator")}
           </Link>
+          <nav
+            className="hidden min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1 text-[12px] font-medium sm:text-[13px] md:flex"
+            aria-label={t("nav.ariaSiteNav")}
+          >
+            {siteNav.map((item) => (
+              <Link key={item.href} href={item.href} className={linkClass}>
+                {item.label}
+              </Link>
+            ))}
+          </nav>
         </div>
 
-        <div className="hidden min-w-0 flex-1 items-center justify-end gap-3 md:flex">
+        <div className="hidden shrink-0 flex-wrap items-center justify-end gap-x-2.5 gap-y-1 md:flex">
           <nav
-            className="flex max-w-[56rem] flex-wrap items-center justify-end gap-x-2.5 gap-y-1 text-[12px] font-medium sm:text-[13px]"
-            aria-label={t("nav.ariaCompanyNav")}
+            className="flex flex-wrap items-center justify-end gap-x-2.5 gap-y-1 text-[12px] font-medium sm:text-[13px]"
+            aria-label={t("nav.ariaProductNav")}
           >
-            {marketing.map((item) => (
-              <Link key={item.href} href={item.href} className="twin-nav-link whitespace-nowrap">
+            {productNav.map((item) => (
+              <Link key={item.href} href={item.href} className={linkClass}>
                 {item.label}
               </Link>
             ))}
@@ -71,7 +88,7 @@ export function Header() {
             aria-label={t("nav.ariaAccountNav")}
           >
             {app.map((item) => (
-              <Link key={item.href} href={item.href} className="twin-nav-link whitespace-nowrap font-medium">
+              <Link key={item.href} href={item.href} className={`${linkClass} font-medium`}>
                 {item.label}
               </Link>
             ))}
@@ -99,9 +116,22 @@ export function Header() {
                 {t("nav.calculator")}
               </Link>
               <p className="px-3 pb-1 pt-1 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
+                {t("nav.ariaProductNav")}
+              </p>
+              {productNav.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={closeMobileMenu}
+                  className="twin-touch-target twin-nav-link block rounded px-3 py-2.5 text-sm hover:bg-[var(--twin-accent-muted)]"
+                >
+                  {item.label}
+                </Link>
+              ))}
+              <p className="mt-2 border-t border-[var(--twin-border)] px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
                 {t("site.footerCompany")}
               </p>
-              {marketing.map((item) => (
+              {siteNav.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}

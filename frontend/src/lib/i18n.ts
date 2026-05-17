@@ -105,6 +105,8 @@ const en = {
     ariaCompanyNav: "Company navigation",
     ariaAccountNav: "Account navigation",
     ariaMobileNav: "Main menu",
+    ariaSiteNav: "Site pages",
+    ariaProductNav: "Product & personas",
   },
   home: {
     tagline: "AI career twin · market moves while you’re off-screen",
@@ -744,6 +746,8 @@ const pl: MessageTree = {
     ariaCompanyNav: "Nawigacja firmowa",
     ariaAccountNav: "Nawigacja konta",
     ariaMobileNav: "Menu główne",
+    ariaSiteNav: "Strony serwisu",
+    ariaProductNav: "Produkt i persony",
   },
   home: {
     tagline: "Bliźniak kariery AI · rynek leci, jak ty żyjesz",
