@@ -1,26 +1,33 @@
 import Link from "next/link";
-import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, ComponentProps, InputHTMLAttributes, ReactNode } from "react";
 
 import { PageMomentumRail } from "@/components/page-momentum-rail";
+
+type PageMomentumRailProps = ComponentProps<typeof PageMomentumRail>;
 
 export function Shell({
   children,
   wide = false,
-  /** Editorial left rail + rhythm (studio marketing look on app/auth pages). */
+  /** Editorial rail: tips/CTAs; on large screens a sticky column beside main content. */
   rail = false,
+  /** Passed through to `PageMomentumRail` (e.g. dashboard snapshot counts). */
+  pageMomentumRailProps,
 }: {
   children: ReactNode;
   wide?: boolean;
   rail?: boolean;
+  pageMomentumRailProps?: Omit<PageMomentumRailProps, "variant">;
 }) {
   return (
     <div
       className={`twin-shell flex min-h-0 min-w-0 flex-1 flex-col ${wide ? "twin-shell--wide" : "twin-shell--narrow"}`}
     >
       {rail ? (
-        <div className="marketing-copy-rail flex w-full min-w-0 flex-1 flex-col gap-6 sm:gap-8">
-          {children}
-          <PageMomentumRail />
+        <div className="marketing-copy-rail flex w-full min-w-0 flex-1 flex-col gap-6 sm:gap-8 lg:flex-row lg:items-start lg:gap-8">
+          <div className="w-full shrink-0 lg:sticky lg:top-24 lg:w-[min(18rem,92vw)] lg:max-w-xs lg:self-start">
+            <PageMomentumRail variant="app" {...pageMomentumRailProps} />
+          </div>
+          <div className="min-w-0 flex-1">{children}</div>
         </div>
       ) : (
         <div className="flex w-full min-w-0 flex-1 flex-col">

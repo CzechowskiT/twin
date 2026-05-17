@@ -1,9 +1,9 @@
 "use client";
 
-import type { MouseEvent } from "react";
 import Link from "next/link";
 
 import { useTranslation } from "@/components/language-provider";
+import { scrollToDashboardHash } from "@/lib/dashboard-anchor";
 
 function displayName(email: string | undefined, profileName: string | undefined): string {
   const trimmed = profileName?.trim();
@@ -12,20 +12,6 @@ function displayName(email: string | undefined, profileName: string | undefined)
   const local = email.split("@")[0] ?? "";
   if (!local) return "";
   return local.charAt(0).toUpperCase() + local.slice(1);
-}
-
-/** Same-document anchors: explicit scroll so SPA navigations still land on the section. */
-function scrollToDashboardHash(e: MouseEvent<HTMLAnchorElement>) {
-  if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
-  const href = e.currentTarget.getAttribute("href");
-  if (!href?.startsWith("#")) return;
-  const el = document.getElementById(href.slice(1));
-  if (!el) return;
-  e.preventDefault();
-  const reduce =
-    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
-  window.history.replaceState(null, "", href);
 }
 
 type DashboardCommandCenterProps = {

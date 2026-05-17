@@ -397,6 +397,10 @@ const en = {
     statPipelineTitle: "Pipeline",
     statPipelineCta: "Open tracker",
     statPipelineHint: "Save or apply on a job to populate your pipeline.",
+    statApplicationsTitle: "Applications",
+    statApplicationsCta: "View applications",
+    railSnapshotEyebrow: "At a glance",
+    railMatchesShownOfTotal: "{visible} on list · {total} ranked",
     applyPromptTitle: "Ready for the next move?",
     applyPromptLead:
       "Fresh listings are in, and your best matches sit above. Want a nudge when a top role looks ready to apply?",
@@ -1531,6 +1535,10 @@ const pl: MessageTree = {
     statPipelineTitle: "Pipeline",
     statPipelineCta: "Otwórz tracker",
     statPipelineHint: "Zapisz lub aplikuj przy ofercie, by zbudować pipeline.",
+    statApplicationsTitle: "Aplikacje",
+    statApplicationsCta: "Zobacz aplikacje",
+    railSnapshotEyebrow: "W skrócie",
+    railMatchesShownOfTotal: "{visible} na liście · {total} w rankingu",
     applyPromptTitle: "Co robimy dalej?",
     applyPromptLead:
       "Świeże oferty są w bazie, a najlepsze dopasowania masz wyżej. Mam przypominać, gdy wierzch listy wygląda na gotowy do aplikacji?",
