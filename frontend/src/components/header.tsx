@@ -47,7 +47,7 @@ export function Header() {
   return (
     <header className="twin-header-bar sticky top-0 z-50">
       <div className="twin-header-stripe" aria-hidden />
-      <div className="twin-container flex max-md:flex-wrap max-md:items-center max-md:justify-between max-md:gap-x-3 max-md:gap-y-2 py-3 md:grid md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center md:gap-x-4 md:gap-y-2 md:py-3.5">
+      <div className="twin-container flex max-md:flex-wrap max-md:items-center max-md:justify-between max-md:gap-x-3 max-md:gap-y-2 py-3 md:grid md:grid-cols-[auto_auto_minmax(0,1fr)_auto] md:items-center md:gap-x-3 md:gap-y-2 md:py-3.5 lg:gap-x-4">
         <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1 sm:gap-x-3 sm:gap-y-1 md:flex-none">
           <Link href="/" className="twin-logo shrink-0">
             TWIN<span className="twin-logo-accent">.</span>
@@ -63,6 +63,13 @@ export function Header() {
             </Link>
           </div>
         </div>
+
+        <Link
+          href="/dashboard/calendar"
+          className={`${linkClass} twin-touch-target hidden shrink-0 self-center whitespace-nowrap font-medium md:inline`}
+        >
+          {t("dashboard.calendarLink")}
+        </Link>
 
         <nav
           className="hidden min-w-0 flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-[12px] font-medium sm:text-[13px] md:flex md:justify-self-stretch md:px-2"
@@ -96,6 +103,12 @@ export function Header() {
         </div>
 
         <div className="flex w-full basis-full items-center justify-end gap-2 md:hidden">
+          <Link
+            href="/dashboard/calendar"
+            className={`${linkClass} twin-touch-target shrink-0 whitespace-nowrap font-medium`}
+          >
+            {t("dashboard.calendarLink")}
+          </Link>
           <PersonaSwitcher />
           <LanguageSwitcher />
           <details ref={mobileMenuRef} className="relative">
@@ -123,6 +136,13 @@ export function Header() {
                 >
                   <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white/90 shadow-sm" aria-hidden />
                   {t("nav.demo")}
+                </Link>
+                <Link
+                  href="/dashboard/calendar"
+                  onClick={closeMobileMenu}
+                  className="twin-touch-target twin-nav-link block rounded border border-[var(--twin-border)] bg-[var(--twin-card)] px-3 py-2.5 text-center text-sm font-medium hover:bg-[var(--twin-accent-muted)]"
+                >
+                  {t("dashboard.calendarLink")}
                 </Link>
               </div>
               <p className="mt-2 border-t border-[var(--twin-border)] px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
