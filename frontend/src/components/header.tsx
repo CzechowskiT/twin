@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRef } from "react";
 
+import { HeaderStoreIcons } from "@/components/header-store-icons";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useTranslation } from "@/components/language-provider";
 import { PersonaSwitcher } from "@/components/persona-switcher";
@@ -84,6 +85,7 @@ export function Header() {
               </Link>
             ))}
           </nav>
+          <HeaderStoreIcons />
           <div className="hidden h-6 w-px shrink-0 bg-[var(--twin-border)] sm:block" aria-hidden />
           <div className="flex flex-wrap items-center justify-end gap-x-2 gap-y-1">
             <PersonaSwitcher />
@@ -147,6 +149,12 @@ export function Header() {
                   {item.label}
                 </Link>
               ))}
+              <p className="mt-2 border-t border-[var(--twin-border)] px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
+                {t("site.footerMobileTitle")}
+              </p>
+              <div className="flex justify-center px-2 pb-2 pt-1">
+                <HeaderStoreIcons inline />
+              </div>
             </nav>
           </details>
         </div>
