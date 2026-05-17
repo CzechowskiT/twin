@@ -4,9 +4,9 @@
 #   - Root directory: backend   (required — isolated monorepo)
 # With root = backend, Dockerfile lives next to requirements.txt → Dockerfile
 #
-# Scraping: add Redis + a worker service (deploy/railway-worker.toml), OR set env on this API only:
-#   CELERY_TASK_ALWAYS_EAGER=true
-# so /jobs/scrape/* runs in-process without a broker (demo / single-instance; not for high scale).
+# Scraping: add Redis + a worker service (deploy/railway-worker.toml), OR leave broker env unset so
+# scripts/start-api.sh sets CELERY_TASK_ALWAYS_EAGER=true on Railway (in-process scrape on the API).
+# You can also set CELERY_TASK_ALWAYS_EAGER=true explicitly on the API only (demo / single-instance).
 
 [build]
 builder = "DOCKERFILE"

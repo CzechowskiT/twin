@@ -2,6 +2,15 @@
 set -e
 cd /app
 
+# Solo API on Railway: without Redis, default Celery broker (localhost) never accepts jobs.
+# When neither broker env is set, run scrape tasks in-process (matches CELERY_TASK_ALWAYS_EAGER).
+if [ -n "${RAILWAY_ENVIRONMENT:-}" ] && [ -z "${CELERY_TASK_ALWAYS_EAGER:-}" ]; then
+  if [ -z "${REDIS_URL:-}" ] && [ -z "${CELERY_BROKER_URL:-}" ]; then
+    export CELERY_TASK_ALWAYS_EAGER=true
+    echo "Railway solo: REDIS_URL/CELERY_BROKER_URL unset — CELERY_TASK_ALWAYS_EAGER=true (in-process scrape)." >&2
+  fi
+fi
+
 # Railway: Postgres may not accept connections for a few seconds after the container starts.
 i=1
 while [ "$i" -le 30 ]; do

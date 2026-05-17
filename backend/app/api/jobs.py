@@ -48,6 +48,18 @@ _CELERY_QUEUE_DETAIL = (
 )
 
 
+def _eager_background_run(thread_name: str, thunk: Callable[[], None]) -> None:
+    """Run Celery `.delay()` off the request thread so proxies do not time out."""
+
+    def _runner() -> None:
+        try:
+            thunk()
+        except Exception:
+            logger.exception("%s failed (CELERY_TASK_ALWAYS_EAGER)", thread_name)
+
+    threading.Thread(target=_runner, name=thread_name, daemon=True).start()
+
+
 def _celery_send(fn: Callable[[], object]) -> object:
     """Run a Celery `.delay()` / `.apply()`; translate broker errors into a clear 503."""
     try:
@@ -168,18 +180,7 @@ def trigger_scrape_all(
     # typical reverse-proxy timeouts (e.g. Vercel 45s) and can surface as opaque 500s. Offload to a
     # daemon thread so the client gets an immediate 200 while scraping continues.
     if get_settings().celery_task_always_eager:
-
-        def _run_eager_scrape_all() -> None:
-            try:
-                scrape_all_boards_task.delay()
-            except Exception:
-                logger.exception("Background scrape-all failed (CELERY_TASK_ALWAYS_EAGER)")
-
-        threading.Thread(
-            target=_run_eager_scrape_all,
-            name="twin-scrape-all-eager",
-            daemon=True,
-        ).start()
+        _eager_background_run("twin-scrape-all-eager", lambda: scrape_all_boards_task.delay())
         return ScrapeAllOut(
             task_id="eager-background",
             total_saved=0,
@@ -228,12 +229,24 @@ def trigger_scrape(
             message=f"Scrape finished: {saved} new jobs saved ({scraped} fetched)",
         )
 
+    if get_settings().celery_task_always_eager:
+        if is_global:
+            _eager_background_run(f"twin-scrape-{board}", lambda b=board: scrape_global_board_task.delay(b))
+        else:
+            assert handler is not None
+            _eager_background_run(f"twin-scrape-{board}", lambda: handler.delay())
+        return ScrapeTaskOut(
+            task_id="eager-background",
+            job_board=board,
+            message=f"Scrape started in background for {board} (eager API mode)",
+        )
+
     if is_global:
         async_result = _celery_send(lambda: scrape_global_board_task.delay(board))
     else:
         async_result = _celery_send(lambda: handler.delay())
     return ScrapeTaskOut(
-        task_id=async_result.id,
+        task_id=str(async_result.id),
         job_board=board,
         message=f"Scrape queued for {board}",
     )
