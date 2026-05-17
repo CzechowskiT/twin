@@ -69,6 +69,22 @@ type DevelopmentFocus = {
   roles_with_insights: { application_id: number; job_id: number; title: string; company: string; summary: string | null }[];
 };
 
+function isLikelyBrowserNetworkFailure(message: string): boolean {
+  const m = message.trim();
+  return (
+    m === "Failed to fetch" ||
+    m === "Load failed" ||
+    m.startsWith("NetworkError") ||
+    m.includes("fetch resource")
+  );
+}
+
+function dashboardLoadErrorMessage(err: unknown, networkLabel: string, fallbackLabel: string): string {
+  const raw = err instanceof Error ? err.message : String(err);
+  if (isLikelyBrowserNetworkFailure(raw)) return networkLabel;
+  return raw || fallbackLabel;
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const { t } = useTranslation();
@@ -93,7 +109,7 @@ export default function DashboardPage() {
   }, []);
 
   const loadMatches = useCallback(async (token: string) => {
-    return apiFetch<MatchList>("/api/v1/candidates/me/matches?limit=220&min_score=18", {}, token);
+    return apiFetch<MatchList>("/api/v1/candidates/me/matches?limit=220&min_score=15", {}, token);
   }, []);
 
   const loadApplications = useCallback(async (token: string) => {
@@ -188,14 +204,14 @@ export default function DashboardPage() {
       } catch (e) {
         if (cancelled) return;
         setFilterOptions({ job_boards: [], locations: [] });
-        setError(e instanceof Error ? e.message : t("dashboard.scrapeFailed"));
+        setError(dashboardLoadErrorMessage(e, t("dashboard.scrapeNetworkError"), t("dashboard.scrapeFailed")));
       }
 
       try {
         await refreshDashboardData(token, hasProfile, defaultJobFilters);
       } catch (e) {
         if (cancelled) return;
-        setError(e instanceof Error ? e.message : t("dashboard.scrapeFailed"));
+        setError(dashboardLoadErrorMessage(e, t("dashboard.scrapeNetworkError"), t("dashboard.scrapeFailed")));
       }
     })();
 
@@ -242,7 +258,7 @@ export default function DashboardPage() {
       setApplications(await loadApplications(token));
       setDevFocus(await loadDevelopmentFocus(token));
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("dashboard.scrapeFailed"));
+      setError(dashboardLoadErrorMessage(err, t("dashboard.scrapeNetworkError"), t("dashboard.scrapeFailed")));
     }
   }
 
@@ -277,7 +293,7 @@ export default function DashboardPage() {
       setDevFocus(await loadDevelopmentFocus(token));
       alert(result.message);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("dashboard.scrapeFailed"));
+      setError(dashboardLoadErrorMessage(err, t("dashboard.scrapeNetworkError"), t("dashboard.scrapeFailed")));
     } finally {
       setAutoApplyingId(null);
     }
@@ -333,7 +349,7 @@ export default function DashboardPage() {
       setApplications(await loadApplications(token));
       setDevFocus(await loadDevelopmentFocus(token));
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("dashboard.scrapeFailed"));
+      setError(dashboardLoadErrorMessage(err, t("dashboard.scrapeNetworkError"), t("dashboard.scrapeFailed")));
     } finally {
       setFeedbackBusy(null);
     }
@@ -349,7 +365,7 @@ export default function DashboardPage() {
       setApplications(await loadApplications(token));
       setDevFocus(await loadDevelopmentFocus(token));
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("dashboard.scrapeFailed"));
+      setError(dashboardLoadErrorMessage(err, t("dashboard.scrapeNetworkError"), t("dashboard.scrapeFailed")));
     } finally {
       setFeedbackBusy(null);
     }
@@ -361,13 +377,17 @@ export default function DashboardPage() {
     setError(null);
     setScraping(true);
     try {
-      const result = await apiFetch<{ message: string }>(
-        "/api/v1/jobs/scrape/all?sync=true",
+      const result = await apiFetch<{ message: string; task_id?: string }>(
+        "/api/v1/jobs/scrape/all",
         { method: "POST" },
         token,
       );
       await refreshDashboardData(token, profile !== null && profile !== undefined, filters);
-      alert(result.message || t("dashboard.scrapeFinished"));
+      alert(
+        result.task_id && result.task_id !== "sync"
+          ? t("dashboard.scrapeQueued")
+          : result.message || t("dashboard.scrapeFinished"),
+      );
       if (profile !== null && profile !== undefined) {
         setShowApplyPrompt(true);
         queueMicrotask(() => {
@@ -375,7 +395,7 @@ export default function DashboardPage() {
         });
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("dashboard.scrapeFailed"));
+      setError(dashboardLoadErrorMessage(err, t("dashboard.scrapeNetworkError"), t("dashboard.scrapeFailed")));
     } finally {
       setScraping(false);
     }

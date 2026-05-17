@@ -285,10 +285,10 @@ const en = {
     scrapeJobs: "Job feeds",
     scrapeAll: "Auto scrap",
     scrapeAllHint:
-      "The board list in the dashboard and this action respect SCRAPE_ENABLED_BOARD_IDS on the API (empty = all boards). Celery workers handle async jobs; this button uses sync=true and waits in the browser session.",
+      "The board list in the dashboard and this action respect SCRAPE_ENABLED_BOARD_IDS on the API (empty = all boards). This button queues a Celery scrape-all job and returns immediately so hosted dashboards do not hit proxy timeouts.",
     scrapingAll: "Auto scrap running…",
     scraping: "Scraping…",
-    keepApiOpen: "Keep the API terminal open while scraping.",
+    keepApiOpen: "Celery workers and Redis must be running on the API host; refresh the job list after a minute or two.",
     lastUpdated: "Last updated",
     regionPoland: "Poland",
     regionEurope: "Europe",
@@ -361,11 +361,15 @@ const en = {
     appFeedbackUpskill: "Upskill actions",
     appFeedbackSummary: "Summary",
     scrapeFailed: "Scrape failed",
+    scrapeNetworkError:
+      "Could not reach the API (network). Check NEXT_PUBLIC_API_URL on Vercel, that Railway is up, and your connection. Long synchronous scrapes time out through the dashboard proxy — this action uses the async queue instead.",
+    scrapeQueued:
+      "Scrape queued. New listings appear after Celery workers finish — refresh the job feed in a minute or two (or check worker logs on the API host).",
     scrapeFinished: "Scrape finished",
     twinScrapePanelTitle: "Bring listings into TWIN",
     twinForYourJob: "Twin for your job",
     twinForYourJobHint:
-      "Runs the full TWIN board registry (Poland: pracuj.pl, rocketjobs.pl, justjoin.it, praca.pl; then LinkedIn; then global boards such as Indeed, Glassdoor, StepStone, Reed, SEEK, …). Respect SCRAPE_ENABLED_BOARD_IDS on the API to trim the list. Sync mode waits for the API; on demos, keep a short allowlist.",
+      "Queues the full TWIN board registry (Poland: pracuj.pl, rocketjobs.pl, justjoin.it, praca.pl; then LinkedIn; then global boards such as Indeed, Glassdoor, StepStone, Reed, SEEK, …). Respect SCRAPE_ENABLED_BOARD_IDS on the API to trim the list. Workers run in the background; on demos, keep a short allowlist.",
     twinForYourJobRunning: "Twin for your job is running…",
     roadmapSummary: "Target job boards & company career sites (roadmap)",
     roadmapPortalsTitle: "50 global job boards",
@@ -747,7 +751,7 @@ const en = {
       "Suggested job titles were merged into “Target job titles” below for matching. You can edit anytime.",
     cvTailorSection: "Application pitch (auto-apply)",
     cvTailorHint:
-      "Generate a short pitch and bullets from your CV for motivation / cover-letter fields. Your PDF still attaches as-is; this text fills empty textareas when the board shows them. Optional: pick a matched job so the pitch is used only for that offer; leave “Any offer” to reuse the same text for every auto-apply.",
+      "Generate a short pitch and bullets from your CV for motivation / cover-letter fields. Your PDF still attaches as-is; this text fills empty textareas when the board shows them. Optional: pick a matched job so the pitch is used only for that offer; leave “Any offer” to reuse the same text for every auto-apply. Choosing “Any offer” clears the target title so you can enter a generic role (the job picker prefills the title when you select a specific listing — edit it if needed).",
     cvTailorTargetTitle: "Target role title",
     cvTailorTargetTitlePlaceholder: "e.g. Senior Product Manager",
     cvTailorPickJob: "Match from your feed (optional)",
@@ -1414,10 +1418,10 @@ const pl: MessageTree = {
     scrapeJobs: "Źródła ofert",
     scrapeAll: "Auto scrap",
     scrapeAllHint:
-      "Lista portali w panelu i to polecenie respektują SCRAPE_ENABLED_BOARD_IDS na Railway (puste = wszystkie). Worker Celery + Redis obsługuje tryb asynchroniczny; tutaj używany jest sync=true.",
+      "Lista portali w panelu i to polecenie respektują SCRAPE_ENABLED_BOARD_IDS na API (puste = wszystkie). Przycisk kolejkuje zadanie Celery (scrape-all) i od razu wraca — hostowany panel nie wpada w timeout proxy.",
     scrapingAll: "Trwa auto scrap…",
     scraping: "Pobieranie…",
-    keepApiOpen: "Podczas pobierania zostaw włączony terminal API.",
+    keepApiOpen: "Na hoście API muszą działać worker Celery i Redis; odśwież listę ofert po chwili, gdy zadania się skończą.",
     lastUpdated: "Ostatnia aktualizacja",
     regionPoland: "Polska",
     regionEurope: "Europa",
@@ -1491,11 +1495,15 @@ const pl: MessageTree = {
     appFeedbackUpskill: "Działania rozwojowe",
     appFeedbackSummary: "Podsumowanie",
     scrapeFailed: "Pobieranie nie powiodło się",
+    scrapeNetworkError:
+      "Brak połączenia z API (sieć). Sprawdź NEXT_PUBLIC_API_URL na Vercel, czy Railway działa i połączenie. Długi synchroniczny scraping przez proxy panelu się wykrzacza — to polecenie używa kolejki asynchronicznej.",
+    scrapeQueued:
+      "Pobieranie zakolejkowane. Nowe oferty pojawią się po zakończeniu zadań Celery — odśwież feed za minutę–dwie (albo zajrzyj w logi workerów na hoście API).",
     scrapeFinished: "Pobieranie zakończone",
     twinScrapePanelTitle: "Wciągnij oferty do TWIN",
     twinForYourJob: "Twin for your job",
     twinForYourJobHint:
-      "Uruchamia pełny rejestr TWIN (Polska: pracuj.pl, rocketjobs.pl, justjoin.it, praca.pl; potem LinkedIn; potem globalnie m.in. Indeed, Glassdoor, StepStone, Reed, SEEK). Listę można przyciąć przez SCRAPE_ENABLED_BOARD_IDS na API. Tryb synchroniczny czeka na odpowiedź API; na demo trzymaj krótką listę portali.",
+      "Kolejkuje pełny rejestr TWIN (Polska: pracuj.pl, rocketjobs.pl, justjoin.it, praca.pl; potem LinkedIn; potem globalnie m.in. Indeed, Glassdoor, StepStone, Reed, SEEK). Listę można przyciąć przez SCRAPE_ENABLED_BOARD_IDS na API. Workerzy działają w tle; na demo trzymaj krótką listę portali.",
     twinForYourJobRunning: "Twin for your job: trwa…",
     roadmapSummary: "Docelowe portale i kariery firm (roadmapa)",
     roadmapPortalsTitle: "50 globalnych portali pracy",
@@ -1884,7 +1892,7 @@ const pl: MessageTree = {
       "Propozycje stanowisk scaliliśmy z polem „Docelowe stanowiska” poniżej; dopasowanie z nich korzysta. Możesz edytować w każdej chwili.",
     cvTailorSection: "Pitch do aplikacji (auto-apply)",
     cvTailorHint:
-      "Wygeneruj krótki pitch i punkty z CV pod pola typu list motywacyjny / cover letter. PDF nadal wysyłasz jako załącznik; ten tekst wypełnia puste pola textarea, gdy portal je pokazuje. Opcjonalnie wybierz ofertę z dopasowań, żeby użyć pitcha tylko na tę aplikację; zostaw „Dowolna oferta”, aby ten sam tekst szedł przy każdym auto-apply.",
+      "Wygeneruj krótki pitch i punkty z CV pod pola typu list motywacyjny / cover letter. PDF nadal wysyłasz jako załącznik; ten tekst wypełnia puste pola textarea, gdy portal je pokazuje. Opcjonalnie wybierz ofertę z dopasowań, żeby użyć pitcha tylko na tę aplikację; zostaw „Dowolna oferta”, aby ten sam tekst szedł przy każdym auto-apply. „Dowolna oferta” czyści pole tytułu, żebyś wpisał ogólne stanowisko (wybór konkretnej oferty wstawia tytuł z listingu — możesz go poprawić).",
     cvTailorTargetTitle: "Docelowe stanowisko (tytuł)",
     cvTailorTargetTitlePlaceholder: "np. Senior Product Manager",
     cvTailorPickJob: "Oferta z feedu (opcjonalnie)",

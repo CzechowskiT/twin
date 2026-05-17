@@ -494,10 +494,12 @@ export default function ProfilePage() {
                   onChange={(e) => {
                     const v = e.target.value;
                     setTailorJobId(v);
-                    if (v) {
-                      const row = tailorMatches.find((m) => String(m.job_id) === v);
-                      if (row?.title) setTailorTitle(row.title);
+                    if (!v) {
+                      setTailorTitle("");
+                      return;
                     }
+                    const row = tailorMatches.find((m) => String(m.job_id) === v);
+                    if (row?.title) setTailorTitle(row.title);
                   }}
                   disabled={tailorBusy || saving}
                 >
