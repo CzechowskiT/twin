@@ -9,7 +9,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.exception_handlers import request_validation_exception_handler
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import IntegrityError, OperationalError, ProgrammingError
 
 from app.api.router import api_router
 from app.config import get_settings
@@ -54,6 +54,30 @@ def create_app() -> FastAPI:
                     "matches your environment (see .env.example)."
                 )
             },
+        )
+
+    @app.exception_handler(ProgrammingError)
+    async def database_schema_mismatch(_request: Request, exc: ProgrammingError) -> JSONResponse:
+        logger.error("Database programming error (migrations?): %s", exc, exc_info=True)
+        return JSONResponse(
+            status_code=503,
+            content={
+                "detail": (
+                    "Database schema mismatch. Run Alembic migrations on the API service "
+                    "(e.g. `alembic upgrade head` in the Railway deploy / release phase)."
+                )
+            },
+        )
+
+    @app.exception_handler(IntegrityError)
+    async def database_integrity(_request: Request, exc: IntegrityError) -> JSONResponse:
+        logger.warning("IntegrityError: %s", exc)
+        msg = str(getattr(exc, "orig", None) or exc).lower()
+        if "email" in msg and ("unique" in msg or "duplicate" in msg):
+            return JSONResponse(status_code=409, content={"detail": "Email already registered"})
+        return JSONResponse(
+            status_code=409,
+            content={"detail": "Conflict with existing data. If this persists, contact support."},
         )
 
     @app.exception_handler(Exception)

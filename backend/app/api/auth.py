@@ -23,6 +23,7 @@ from app.schemas.auth import (
     UserMarketingPreference,
     UserOut,
     UserRegister,
+    UserRegisteredOut,
 )
 from app.services.apple_oauth import (
     AppleOAuthError,
@@ -146,8 +147,8 @@ async def _read_web_oauth_callback(
     )
 
 
-@router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
-def register(body: UserRegister, db: Session = Depends(get_db)) -> User:
+@router.post("/register", response_model=UserRegisteredOut, status_code=status.HTTP_201_CREATED)
+def register(body: UserRegister, db: Session = Depends(get_db)) -> UserRegisteredOut:
     if not (
         body.gdpr_consent
         and body.terms_of_service_consent
@@ -215,7 +216,9 @@ def register(body: UserRegister, db: Session = Depends(get_db)) -> User:
         )
     db.commit()
     db.refresh(user)
-    return user
+    token = create_access_token(user.email)
+    out = UserOut.from_user(user)
+    return UserRegisteredOut(**out.model_dump(), access_token=token)
 
 
 @router.post("/login", response_model=Token)

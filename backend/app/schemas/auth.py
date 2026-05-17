@@ -110,3 +110,10 @@ class UserOut(BaseModel):
             identity_verified_at=getattr(user, "identity_verified_at", None),
             referral_public_token=getattr(user, "referral_public_token", None),
         )
+
+
+class UserRegisteredOut(UserOut):
+    """Password registration response: profile plus bearer token (avoids a second login request)."""
+
+    access_token: str
+    token_type: str = "bearer"

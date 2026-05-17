@@ -13,7 +13,7 @@ import { apiFetch } from "@/lib/api";
 import { getToken, setToken } from "@/lib/auth";
 import { fetchOAuthProviderStatus, type OAuthProviderStatus } from "@/lib/oauth-auth";
 
-type TokenResponse = { access_token: string };
+type RegisterSuccessResponse = { access_token: string };
 
 type SessionPhase = "boot" | "anon" | "gone";
 
@@ -111,10 +111,16 @@ function RegisterPageContent() {
     e.preventDefault();
     setError(null);
     const form = new FormData(e.currentTarget);
+    const email = String(form.get("email") ?? "").trim();
+    const password = String(form.get("password") ?? "");
     const gdpr = form.get("gdpr_privacy") === "on";
     const terms = form.get("terms_of_service") === "on";
     const jobData = form.get("job_data_processing") === "on";
     const ai = form.get("ai_matching") === "on";
+    if (!email || !password) {
+      setError(t("register.emailPasswordRequired"));
+      return;
+    }
     if (!gdpr || !terms || !jobData || !ai) {
       setError(t("register.coreConsentsRequired"));
       return;
@@ -122,11 +128,11 @@ function RegisterPageContent() {
     setLoading(true);
     try {
       const referredRaw = String(form.get("referred_by_note") ?? "").trim();
-      await apiFetch("/api/v1/auth/register", {
+      const registered = await apiFetch<RegisterSuccessResponse>("/api/v1/auth/register", {
         method: "POST",
         body: JSON.stringify({
-          email: form.get("email"),
-          password: form.get("password"),
+          email,
+          password,
           gdpr_consent: true,
           terms_of_service_consent: true,
           job_data_processing_consent: true,
@@ -136,14 +142,7 @@ function RegisterPageContent() {
           ...(referredRaw ? { referred_by_note: referredRaw.slice(0, 500) } : {}),
         }),
       });
-      const token = await apiFetch<TokenResponse>("/api/v1/auth/login/json", {
-        method: "POST",
-        body: JSON.stringify({
-          email: form.get("email"),
-          password: form.get("password"),
-        }),
-      });
-      setToken(token.access_token);
+      setToken(registered.access_token);
       router.push("/profile");
     } catch (err) {
       setError(err instanceof Error ? err.message : t("register.failed"));
