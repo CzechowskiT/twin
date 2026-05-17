@@ -430,16 +430,6 @@ export default function DashboardPage() {
           <Link href="/dashboard/calendar" className="twin-link twin-touch-target text-center text-sm sm:text-left">
             {t("dashboard.calendarLink")}
           </Link>
-          <button
-            type="button"
-            onClick={() => {
-              clearToken();
-              router.push("/login");
-            }}
-            className="twin-btn-secondary twin-touch-target !w-full text-center sm:!w-auto"
-          >
-            {t("dashboard.logout")}
-          </button>
         </div>
       </div>
 

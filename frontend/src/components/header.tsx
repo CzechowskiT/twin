@@ -1,19 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useRef } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useTranslation } from "@/components/language-provider";
 import { PersonaSwitcher } from "@/components/persona-switcher";
+import { clearToken, getToken } from "@/lib/auth";
 
 /** One chrome everywhere: calm light header (matches hope / growth palette in globals). */
 export function Header() {
   const { t } = useTranslation();
   const pathname = usePathname();
+  const router = useRouter();
   const mobileMenuRef = useRef<HTMLDetailsElement>(null);
+  const [hasSession, setHasSession] = useState(false);
   const calendarActive = pathname === "/dashboard/calendar" || pathname.startsWith("/dashboard/calendar/");
+
+  useEffect(() => {
+    const sync = () => setHasSession(Boolean(getToken()));
+    sync();
+    window.addEventListener("storage", sync);
+    return () => window.removeEventListener("storage", sync);
+  }, [pathname]);
 
   const closeMobileMenu = () => {
     const d = mobileMenuRef.current;
@@ -47,6 +57,15 @@ export function Header() {
   const calendarNavPillClassName = demoClassName;
 
   const linkClass = "twin-nav-link whitespace-nowrap";
+
+  const logout = () => {
+    clearToken();
+    closeMobileMenu();
+    router.push("/login");
+  };
+
+  const logoutButtonClass =
+    "twin-touch-target shrink-0 rounded-md border border-[var(--twin-border)] bg-[var(--twin-card)] px-2.5 py-1 text-[11px] font-semibold text-[var(--twin-accent)] transition hover:border-[var(--twin-accent)]/50 hover:bg-[var(--twin-accent-muted)] hover:text-[var(--twin-accent-hover)] sm:px-3 sm:py-1.5 sm:text-[12px]";
 
   return (
     <header className="twin-header-bar sticky top-0 z-50">
@@ -89,14 +108,25 @@ export function Header() {
 
         <div className="hidden min-w-0 flex-col items-end gap-y-2 md:flex md:justify-self-end">
           <nav
-            className="flex w-full min-w-0 flex-wrap items-center justify-end gap-x-2.5 gap-y-1 text-[12px] sm:text-[13px]"
+            className="flex w-full min-w-0 flex-wrap items-center justify-end gap-x-2 gap-y-1 text-[12px] sm:text-[13px]"
             aria-label={t("nav.ariaAccountNav")}
           >
-            {app.map((item) => (
-              <Link key={item.href} href={item.href} className={`${linkClass} font-medium`}>
-                {item.label}
-              </Link>
-            ))}
+            {hasSession ? (
+              <>
+                <Link href="/dashboard" className={`${linkClass} font-medium`}>
+                  {t("nav.dashboard")}
+                </Link>
+                <button type="button" onClick={logout} className={logoutButtonClass}>
+                  {t("dashboard.logout")}
+                </button>
+              </>
+            ) : (
+              app.map((item) => (
+                <Link key={item.href} href={item.href} className={`${linkClass} font-medium`}>
+                  {item.label}
+                </Link>
+              ))
+            )}
           </nav>
           <div className="flex w-full flex-wrap items-center justify-end gap-x-2 gap-y-1">
             <PersonaSwitcher />
@@ -160,16 +190,35 @@ export function Header() {
                 <p className="mt-2 border-t border-[var(--twin-border)] px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
                   {t("site.footerExplore")}
                 </p>
-                {app.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={closeMobileMenu}
-                    className="twin-touch-target twin-nav-link block rounded px-3 py-2.5 text-sm hover:bg-[var(--twin-accent-muted)]"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
+                {hasSession ? (
+                  <>
+                    <Link
+                      href="/dashboard"
+                      onClick={closeMobileMenu}
+                      className="twin-touch-target twin-nav-link block rounded px-3 py-2.5 text-sm hover:bg-[var(--twin-accent-muted)]"
+                    >
+                      {t("nav.dashboard")}
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={logout}
+                      className="twin-touch-target mt-1 block w-full rounded border border-[var(--twin-border)] bg-[var(--twin-card)] px-3 py-2.5 text-left text-sm font-semibold text-[var(--twin-accent)] hover:bg-[var(--twin-accent-muted)]"
+                    >
+                      {t("dashboard.logout")}
+                    </button>
+                  </>
+                ) : (
+                  app.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={closeMobileMenu}
+                      className="twin-touch-target twin-nav-link block rounded px-3 py-2.5 text-sm hover:bg-[var(--twin-accent-muted)]"
+                    >
+                      {item.label}
+                    </Link>
+                  ))
+                )}
               </nav>
             </details>
           </div>
