@@ -9,18 +9,37 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.core.deps import get_current_user
-from app.database.models import Candidate, User
+from app.database.models import Candidate, Job, User
 from app.database.session import get_db
 from app.schemas.candidate import (
     CandidateCreate,
     CandidateOut,
     CandidateUpdate,
+    CvTailoringOut,
+    CvTailorIn,
     CvUploadOut,
     IntroAudioUploadOut,
+)
+from app.schemas.career_compass import (
+    CareerCompassOut,
+    CareerCompassPreviewOut,
+    CareerCompassPutIn,
+    CareerSnapshotOut,
+    MilestonePatchIn,
+    PathOut,
 )
 from app.schemas.match import JobMatchListOut, JobMatchOut
 from app.services.cv_parser import CvParseError
 from app.services.cv_storage import delete_cv_for_candidate, save_cv_for_candidate
+from app.services.cv_tailoring import build_cv_tailoring_blob
+from app.services.career_compass import (
+    build_career_compass,
+    candidate_profile_dict,
+    get_career_compass_blob,
+    ideal_dict_from_pydantic,
+    next_open_milestone_title,
+    set_milestone_done,
+)
 from app.services.intro_audio_storage import save_intro_audio_for_candidate
 from app.services.matching_service import find_top_matches
 
@@ -199,6 +218,79 @@ def remove_cv(
     return _to_out(candidate)
 
 
+@router.post("/me/cv/tailor", response_model=CvTailoringOut)
+def tailor_cv_for_role(
+    body: CvTailorIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> CvTailoringOut:
+    candidate = _get_candidate_or_404(db, user.id)
+    cv_text = (candidate.cv_text or "").strip()
+    if not cv_text:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Upload a CV first — tailoring uses your CV text.",
+        )
+    job: Job | None = None
+    if body.job_id is not None:
+        job = db.query(Job).filter(Job.id == body.job_id).first()
+        if not job:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+    company: str | None = job.company if job else None
+    job_ctx: str | None = None
+    if job:
+        chunks = [job.title or "", job.company or "", job.description or "", job.requirements or ""]
+        job_ctx = "\n\n".join(c for c in chunks if c).strip()[:12_000] or None
+    try:
+        blob = build_cv_tailoring_blob(
+            candidate.cv_text,
+            target_job_title=body.target_job_title,
+            job_id=body.job_id,
+            company=company,
+            job_context=job_ctx,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+    signals: dict[str, Any] = {}
+    if candidate.profile_signals_json:
+        try:
+            parsed = json.loads(candidate.profile_signals_json)
+            signals = parsed if isinstance(parsed, dict) else {}
+        except json.JSONDecodeError:
+            signals = {}
+    signals["cv_tailoring"] = blob
+    candidate.profile_signals_json = json.dumps(signals)
+    db.add(candidate)
+    db.commit()
+    db.refresh(candidate)
+    return CvTailoringOut(
+        message="Tailoring saved — auto-apply will use it for matching motivation fields when applicable.",
+        tailoring=blob,
+    )
+
+
+@router.delete("/me/cv/tailoring", response_model=CandidateOut)
+def remove_cv_tailoring(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> CandidateOut:
+    candidate = _get_candidate_or_404(db, user.id)
+    signals: dict[str, Any] = {}
+    if candidate.profile_signals_json:
+        try:
+            parsed = json.loads(candidate.profile_signals_json)
+            signals = parsed if isinstance(parsed, dict) else {}
+        except json.JSONDecodeError:
+            signals = {}
+    signals.pop("cv_tailoring", None)
+    candidate.profile_signals_json = json.dumps(signals) if signals else None
+    db.add(candidate)
+    db.commit()
+    db.refresh(candidate)
+    return _to_out(candidate)
+
+
 @router.get("/me/matches", response_model=JobMatchListOut)
 def get_my_matches(
     limit: int = Query(10, ge=1, le=400),
@@ -210,6 +302,76 @@ def get_my_matches(
     rows = find_top_matches(db, candidate, limit=limit, min_score=min_score)
     items = [JobMatchOut(**row) for row in rows]
     return JobMatchListOut(items=items, total=len(items))
+
+
+@router.get("/me/career-compass", response_model=CareerCompassOut)
+def get_career_compass(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> CareerCompassOut:
+    candidate = _get_candidate_or_404(db, user.id)
+    return _career_compass_detail(candidate)
+
+
+@router.put("/me/career-compass", response_model=CareerCompassOut)
+def put_career_compass(
+    body: CareerCompassPutIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> CareerCompassOut:
+    candidate = _get_candidate_or_404(db, user.id)
+    skills = json.loads(candidate.skills) if candidate.skills else []
+    titles_raw = json.loads(candidate.preferred_job_titles) if candidate.preferred_job_titles else []
+    titles = [str(t) for t in titles_raw] if isinstance(titles_raw, list) else []
+    ideal = ideal_dict_from_pydantic(body.ideal)
+    profile = candidate_profile_dict(candidate, skills, titles)
+    sig = _signals_dict(candidate)
+    prev = get_career_compass_blob(sig) or {}
+    cc = build_career_compass(ideal, profile, prev=prev, regenerate_path=body.regenerate_path)
+    sig["career_compass"] = cc
+    candidate.profile_signals_json = json.dumps(sig) if sig else None
+    db.add(candidate)
+    db.commit()
+    db.refresh(candidate)
+    return _career_compass_detail(candidate)
+
+
+@router.patch("/me/career-compass/milestones/{milestone_id}", response_model=CareerCompassOut)
+def patch_career_compass_milestone(
+    milestone_id: str,
+    body: MilestonePatchIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> CareerCompassOut:
+    candidate = _get_candidate_or_404(db, user.id)
+    sig = _signals_dict(candidate)
+    cc = get_career_compass_blob(sig)
+    if not cc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Career compass not configured")
+    cc2, err = set_milestone_done(cc, milestone_id, body.done)
+    if err:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=err)
+    sig["career_compass"] = cc2
+    candidate.profile_signals_json = json.dumps(sig) if sig else None
+    db.add(candidate)
+    db.commit()
+    db.refresh(candidate)
+    return _career_compass_detail(candidate)
+
+
+@router.delete("/me/career-compass", response_model=CandidateOut)
+def delete_career_compass(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> CandidateOut:
+    candidate = _get_candidate_or_404(db, user.id)
+    sig = _signals_dict(candidate)
+    sig.pop("career_compass", None)
+    candidate.profile_signals_json = json.dumps(sig) if sig else None
+    db.add(candidate)
+    db.commit()
+    db.refresh(candidate)
+    return _to_out(candidate)
 
 
 def _get_candidate_or_404(db: Session, user_id: int) -> Candidate:
@@ -297,6 +459,80 @@ def _cv_insights_from_candidate(candidate: Candidate) -> dict[str, Any] | None:
     return raw if isinstance(raw, dict) else None
 
 
+def _cv_tailoring_from_candidate(candidate: Candidate) -> dict[str, Any] | None:
+    if not candidate.profile_signals_json:
+        return None
+    try:
+        blob = json.loads(candidate.profile_signals_json)
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(blob, dict):
+        return None
+    raw = blob.get("cv_tailoring")
+    return raw if isinstance(raw, dict) else None
+
+
+def _signals_dict(candidate: Candidate) -> dict[str, Any]:
+    if not candidate.profile_signals_json:
+        return {}
+    try:
+        d = json.loads(candidate.profile_signals_json)
+        return d if isinstance(d, dict) else {}
+    except json.JSONDecodeError:
+        return {}
+
+
+def _career_compass_detail(candidate: Candidate) -> CareerCompassOut:
+    sig = _signals_dict(candidate)
+    cc = get_career_compass_blob(sig)
+    if not cc or not cc.get("ideal"):
+        return CareerCompassOut(configured=False)
+    ideal = cc["ideal"]
+    snap_out = None
+    if isinstance(cc.get("snapshot"), dict):
+        try:
+            snap_out = CareerSnapshotOut.model_validate(cc["snapshot"])
+        except Exception:
+            snap_out = None
+    path_out = None
+    if isinstance(cc.get("path"), dict):
+        try:
+            path_out = PathOut.model_validate(cc["path"])
+        except Exception:
+            path_out = None
+    return CareerCompassOut(configured=True, ideal=ideal, snapshot=snap_out, path=path_out)
+
+
+def _career_compass_preview_for_out(candidate: Candidate) -> CareerCompassPreviewOut | None:
+    sig = _signals_dict(candidate)
+    cc = get_career_compass_blob(sig)
+    if not cc or not cc.get("ideal"):
+        return None
+    snap = cc.get("snapshot") if isinstance(cc.get("snapshot"), dict) else {}
+    path = cc.get("path") if isinstance(cc.get("path"), dict) else {}
+    try:
+        xp = int(path.get("xp_total") or 0)
+    except (TypeError, ValueError):
+        xp = 0
+    try:
+        lv = int(path.get("level") or 1)
+    except (TypeError, ValueError):
+        lv = 1
+    rs = snap.get("readiness_score")
+    rss: int | None
+    try:
+        rss = int(rs) if rs is not None else None
+    except (TypeError, ValueError):
+        rss = None
+    return CareerCompassPreviewOut(
+        configured=True,
+        readiness_score=rss,
+        level=lv,
+        xp_total=xp,
+        next_milestone_title=next_open_milestone_title(cc),
+    )
+
+
 def _to_out(candidate: Candidate) -> CandidateOut:
     skills = json.loads(candidate.skills) if candidate.skills else []
     titles_raw = json.loads(candidate.preferred_job_titles) if candidate.preferred_job_titles else []
@@ -319,4 +555,6 @@ def _to_out(candidate: Candidate) -> CandidateOut:
         cv_insights=_cv_insights_from_candidate(candidate),
         cv_processing_consent_at=candidate.cv_processing_consent_at,
         intro_audio_processing_consent_at=candidate.intro_audio_processing_consent_at,
+        cv_tailoring=_cv_tailoring_from_candidate(candidate),
+        career_compass_preview=_career_compass_preview_for_out(candidate),
     )

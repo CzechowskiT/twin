@@ -1,5 +1,6 @@
 """Store optional “tell me about yourself” audio; transcription wired in a later phase."""
 
+import json
 from datetime import datetime
 from pathlib import Path
 
@@ -32,7 +33,14 @@ def save_intro_audio_for_candidate(
     candidate.intro_audio_path = str(file_path)
     candidate.intro_audio_uploaded_at = datetime.utcnow()
     candidate.intro_audio_transcript = None
-    candidate.profile_signals_json = None
+    signals: dict = {}
+    if candidate.profile_signals_json:
+        try:
+            parsed = json.loads(candidate.profile_signals_json)
+            signals = parsed if isinstance(parsed, dict) else {}
+        except json.JSONDecodeError:
+            signals = {}
+    candidate.profile_signals_json = json.dumps(signals) if signals else None
 
     db.commit()
     db.refresh(candidate)

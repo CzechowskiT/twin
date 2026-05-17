@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from app.automation.browser import browser_page, open_and_clear_challenges
-from app.automation.form_fill import attach_cv, click_first, fill_if_empty
+from app.automation.form_fill import attach_cv, click_first, fill_if_empty, fill_motivation_textareas
 from app.automation.types import ApplyOutcome, ApplyResult
 
 APPLY_SELECTORS = (
@@ -28,6 +28,7 @@ def apply_pracuj(
     email: str,
     phone: str,
     resume_path: str | None,
+    motivation_text: str | None = None,
     headless: bool,
     state_dir,
     submit: bool,
@@ -50,6 +51,7 @@ def apply_pracuj(
         fill_if_empty(page, ('input[type="email"]',), email)
         fill_if_empty(page, ('input[type="tel"]', 'input[name*="telefon" i]'), phone)
         attach_cv(page, resume_path)
+        fill_motivation_textareas(page, motivation_text)
 
         if not submit:
             return ApplyResult(

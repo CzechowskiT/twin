@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ApplicationsPanel, type ApplicationRow } from "@/components/applications-panel";
+import { ApplicationsPanel, type ApplicationRow, type FeedbackBusy } from "@/components/applications-panel";
 import { DashboardCommandCenter } from "@/components/dashboard-command-center";
 import { InvestorRoadmapPanel } from "@/components/investor-roadmap-panel";
 import { useTranslation } from "@/components/language-provider";
@@ -29,6 +29,13 @@ type Profile = {
   experience_years: number;
   desired_salary: number | null;
   location: string | null;
+  career_compass_preview?: {
+    configured: boolean;
+    readiness_score: number | null;
+    level: number | null;
+    xp_total: number | null;
+    next_milestone_title: string | null;
+  } | null;
 };
 type JobItem = {
   id: number;
@@ -53,6 +60,14 @@ type MatchItem = {
 type MatchList = { items: MatchItem[]; total: number };
 type FilterOptions = { job_boards: string[]; locations: string[] };
 
+type DevelopmentFocus = {
+  skill_tool_gaps: string[];
+  positioning_themes: string[];
+  stronger_candidate_signals: string[];
+  upskill_actions_prioritized: { title: string; priority: string; rationale: string }[];
+  roles_with_insights: { application_id: number; job_id: number; title: string; company: string; summary: string | null }[];
+};
+
 export default function DashboardPage() {
   const router = useRouter();
   const { t } = useTranslation();
@@ -61,6 +76,8 @@ export default function DashboardPage() {
   const [matches, setMatches] = useState<MatchList | null>(null);
   const [jobs, setJobs] = useState<JobList | null>(null);
   const [applications, setApplications] = useState<ApplicationRow[]>([]);
+  const [devFocus, setDevFocus] = useState<DevelopmentFocus | null>(null);
+  const [feedbackBusy, setFeedbackBusy] = useState<FeedbackBusy>(null);
   const [filterOptions, setFilterOptions] = useState<FilterOptions | null>(null);
   const [filters, setFilters] = useState<JobFilters>(defaultJobFilters);
   const [titleFilterPrimed, setTitleFilterPrimed] = useState(false);
@@ -83,19 +100,29 @@ export default function DashboardPage() {
     return data.items;
   }, []);
 
+  const loadDevelopmentFocus = useCallback(async (token: string) => {
+    try {
+      return await apiFetch<DevelopmentFocus>("/api/v1/applications/me/development-focus", {}, token);
+    } catch {
+      return null;
+    }
+  }, []);
+
   const refreshDashboardData = useCallback(
     async (token: string, hasProfile: boolean, activeFilters: JobFilters) => {
-      const [jobList, matchList, apps] = await Promise.all([
+      const [jobList, matchList, apps, focus] = await Promise.all([
         loadJobs(token, activeFilters),
         hasProfile ? loadMatches(token) : Promise.resolve(null),
         hasProfile ? loadApplications(token) : Promise.resolve([]),
+        hasProfile ? loadDevelopmentFocus(token) : Promise.resolve(null),
       ]);
       setJobs(jobList);
       if (matchList) setMatches(matchList);
       setApplications(apps);
+      setDevFocus(focus);
       setLastUpdated(new Date());
     },
-    [loadJobs, loadMatches, loadApplications],
+    [loadJobs, loadMatches, loadApplications, loadDevelopmentFocus],
   );
 
   const applicationByJobId = useMemo(() => {
@@ -212,6 +239,7 @@ export default function DashboardPage() {
         token,
       );
       setApplications(await loadApplications(token));
+      setDevFocus(await loadDevelopmentFocus(token));
     } catch (err) {
       setError(err instanceof Error ? err.message : t("dashboard.scrapeFailed"));
     }
@@ -245,6 +273,7 @@ export default function DashboardPage() {
         token,
       );
       setApplications(await loadApplications(token));
+      setDevFocus(await loadDevelopmentFocus(token));
       alert(result.message);
     } catch (err) {
       setError(err instanceof Error ? err.message : t("dashboard.scrapeFailed"));
@@ -258,6 +287,17 @@ export default function DashboardPage() {
     return items.filter((job) => applicationByJobId[job.job_id] !== "rejected");
   }, [matches?.items, applicationByJobId]);
 
+  const developmentFocusHasData = useMemo(() => {
+    if (!devFocus) return false;
+    return (
+      devFocus.skill_tool_gaps.length > 0 ||
+      devFocus.positioning_themes.length > 0 ||
+      devFocus.stronger_candidate_signals.length > 0 ||
+      devFocus.upskill_actions_prioritized.length > 0 ||
+      devFocus.roles_with_insights.length > 0
+    );
+  }, [devFocus]);
+
   async function updateApplicationStatus(id: number, status: string) {
     const token = getToken();
     if (!token) return;
@@ -267,6 +307,7 @@ export default function DashboardPage() {
       token,
     );
     setApplications(await loadApplications(token));
+    setDevFocus(await loadDevelopmentFocus(token));
   }
 
   async function removeApplication(id: number) {
@@ -274,6 +315,43 @@ export default function DashboardPage() {
     if (!token) return;
     await apiFetch(`/api/v1/applications/${id}`, { method: "DELETE" }, token);
     setApplications(await loadApplications(token));
+    setDevFocus(await loadDevelopmentFocus(token));
+  }
+
+  async function saveApplicationFeedback(id: number, raw: string) {
+    const token = getToken();
+    if (!token) return;
+    setFeedbackBusy({ id, kind: "save" });
+    setError(null);
+    try {
+      await apiFetch(
+        `/api/v1/applications/${id}`,
+        { method: "PATCH", body: JSON.stringify({ recruiter_feedback_raw: raw }) },
+        token,
+      );
+      setApplications(await loadApplications(token));
+      setDevFocus(await loadDevelopmentFocus(token));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("dashboard.scrapeFailed"));
+    } finally {
+      setFeedbackBusy(null);
+    }
+  }
+
+  async function parseApplicationFeedback(id: number) {
+    const token = getToken();
+    if (!token) return;
+    setFeedbackBusy({ id, kind: "parse" });
+    setError(null);
+    try {
+      await apiFetch(`/api/v1/applications/${id}/parse-feedback`, { method: "POST", body: "{}" }, token);
+      setApplications(await loadApplications(token));
+      setDevFocus(await loadDevelopmentFocus(token));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("dashboard.scrapeFailed"));
+    } finally {
+      setFeedbackBusy(null);
+    }
   }
 
   async function triggerScrapeAll() {
@@ -316,6 +394,9 @@ export default function DashboardPage() {
           {t("dashboard.title")}
         </h1>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+          <Link href="/dashboard/career" className="twin-link twin-touch-target text-center text-sm sm:text-left">
+            {t("dashboard.careerCompassLink")}
+          </Link>
           <Link href="/dashboard/billing" className="twin-link twin-touch-target text-center text-sm sm:text-left">
             {t("dashboard.billingLink")}
           </Link>
@@ -345,6 +426,35 @@ export default function DashboardPage() {
           matchesVisible={visibleMatches.length}
           applicationsActive={pipelineActiveCount}
         />
+      ) : null}
+
+      {hasProfile && profile?.career_compass_preview?.configured ? (
+        <Card variant="soft" className="mb-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.careerCompassLink")}</p>
+              <p className="twin-muted mt-1 text-xs">
+                {t("dashboard.careerCompassStats")
+                  .replace("{readiness}", String(profile.career_compass_preview.readiness_score ?? "—"))
+                  .replace("{level}", String(profile.career_compass_preview.level ?? "—"))
+                  .replace("{xp}", String(profile.career_compass_preview.xp_total ?? "—"))}
+                {profile.career_compass_preview.next_milestone_title
+                  ? ` · ${t("dashboard.careerCompassNextMilestone").replace("{title}", profile.career_compass_preview.next_milestone_title)}`
+                  : ""}
+              </p>
+            </div>
+            <Link href="/dashboard/career" className="twin-btn-solid twin-touch-target shrink-0 text-center text-sm">
+              {t("dashboard.careerCompassPageTitle")}
+            </Link>
+          </div>
+        </Card>
+      ) : hasProfile ? (
+        <Card variant="soft" className="mb-4">
+          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.careerCompassPreviewHint")}</p>
+          <Link href="/dashboard/career" className="twin-link mt-2 inline-block text-sm font-medium">
+            {t("dashboard.careerCompassLink")} →
+          </Link>
+        </Card>
       ) : null}
 
       <Card variant="accent">
@@ -460,6 +570,81 @@ export default function DashboardPage() {
       )}
 
       {hasProfile && (
+        <Card id="dashboard-development-focus" variant="soft">
+          <h2 className="twin-section-title mb-2">{t("dashboard.developmentFocusTitle")}</h2>
+          <p className="twin-muted mb-4 text-sm leading-relaxed">{t("dashboard.developmentFocusLead")}</p>
+          {!developmentFocusHasData ? (
+            <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.developmentFocusEmpty")}</p>
+          ) : (
+            <div className="space-y-4 text-sm">
+              {devFocus!.skill_tool_gaps.length > 0 ? (
+                <div>
+                  <p className="font-semibold text-[var(--foreground)]">{t("dashboard.developmentFocusSkills")}</p>
+                  <ul className="mt-1 list-inside list-disc text-[var(--twin-muted-strong)]">
+                    {devFocus!.skill_tool_gaps.map((x) => (
+                      <li key={x}>{x}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+              {devFocus!.positioning_themes.length > 0 ? (
+                <div>
+                  <p className="font-semibold text-[var(--foreground)]">
+                    {t("dashboard.developmentFocusPositioning")}
+                  </p>
+                  <ul className="mt-1 list-inside list-disc text-[var(--twin-muted-strong)]">
+                    {devFocus!.positioning_themes.map((x) => (
+                      <li key={x}>{x}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+              {devFocus!.stronger_candidate_signals.length > 0 ? (
+                <div>
+                  <p className="font-semibold text-[var(--foreground)]">{t("dashboard.developmentFocusOthers")}</p>
+                  <ul className="mt-1 list-inside list-disc text-[var(--twin-muted-strong)]">
+                    {devFocus!.stronger_candidate_signals.map((x) => (
+                      <li key={x}>{x}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+              {devFocus!.upskill_actions_prioritized.length > 0 ? (
+                <div>
+                  <p className="font-semibold text-[var(--foreground)]">{t("dashboard.developmentFocusActions")}</p>
+                  <ul className="mt-1 space-y-2 text-[var(--twin-muted-strong)]">
+                    {devFocus!.upskill_actions_prioritized.map((a) => (
+                      <li key={`${a.title}-${a.priority}`}>
+                        <span className="font-medium text-[var(--foreground)]">[{a.priority}]</span> {a.title}
+                        {a.rationale ? (
+                          <span className="mt-0.5 block text-xs text-[var(--twin-muted)]">{a.rationale}</span>
+                        ) : null}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+              {devFocus!.roles_with_insights.length > 0 ? (
+                <div>
+                  <p className="font-semibold text-[var(--foreground)]">{t("dashboard.developmentFocusRoles")}</p>
+                  <ul className="mt-1 space-y-2 text-xs text-[var(--twin-muted-strong)]">
+                    {devFocus!.roles_with_insights.map((r) => (
+                      <li key={r.application_id}>
+                        <span className="font-medium text-[var(--foreground)]">{r.title}</span> — {r.company}
+                        {r.summary ? (
+                          <span className="mt-0.5 block text-[var(--twin-muted)]">{r.summary}</span>
+                        ) : null}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </div>
+          )}
+        </Card>
+      )}
+
+      {hasProfile && (
         <Card id="dashboard-applications" variant="soft">
           <h2 className="twin-section-title mb-4">
             {t("dashboard.applications")} ({applications.length})
@@ -468,6 +653,9 @@ export default function DashboardPage() {
             items={applications}
             onStatusChange={updateApplicationStatus}
             onRemove={removeApplication}
+            onSaveFeedback={saveApplicationFeedback}
+            onParseFeedback={parseApplicationFeedback}
+            feedbackBusy={feedbackBusy}
           />
         </Card>
       )}

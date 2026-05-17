@@ -226,6 +226,8 @@ class Application(Base):
         Enum(ApplicationStatus), default=ApplicationStatus.PENDING
     )
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    recruiter_feedback_raw: Mapped[str | None] = mapped_column(Text, nullable=True)
+    feedback_insights_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     applied_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow

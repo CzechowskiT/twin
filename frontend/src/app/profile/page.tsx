@@ -46,6 +46,24 @@ type Profile = {
   cv_insights?: CvInsights | null;
   cv_processing_consent_at?: string | null;
   intro_audio_processing_consent_at?: string | null;
+  cv_tailoring?: CvTailoring | null;
+};
+
+type CvTailoring = {
+  target_job_title?: string;
+  job_id?: number | null;
+  company?: string | null;
+  pitch_paragraph?: string;
+  strength_bullets?: string[];
+  keywords?: string[];
+  updated_at?: string;
+  source?: string;
+};
+
+type TailorMatchRow = {
+  job_id: number;
+  title: string;
+  company: string;
 };
 
 type UserPrefs = {
@@ -73,6 +91,38 @@ export default function ProfilePage() {
   const [introUploadConsent, setIntroUploadConsent] = useState(false);
   const [talentPoolOptIn, setTalentPoolOptIn] = useState(false);
   const [talentPoolProcessingConsent, setTalentPoolProcessingConsent] = useState(false);
+  const [tailorMatches, setTailorMatches] = useState<TailorMatchRow[]>([]);
+  const [tailorJobId, setTailorJobId] = useState("");
+  const [tailorTitle, setTailorTitle] = useState("");
+  const [tailorBusy, setTailorBusy] = useState(false);
+  const [tailorMsg, setTailorMsg] = useState<string | null>(null);
+
+  function applyTailoringFromProfile(prof: Profile | null) {
+    if (!prof) return;
+    const tailoring = prof.cv_tailoring;
+    if (tailoring) {
+      setTailorTitle(String(tailoring.target_job_title || ""));
+      setTailorJobId(
+        tailoring.job_id != null && tailoring.job_id !== undefined ? String(tailoring.job_id) : "",
+      );
+    } else {
+      setTailorTitle("");
+      setTailorJobId("");
+    }
+  }
+
+  async function loadTailorMatches(token: string) {
+    try {
+      const r = await apiFetch<{ items: TailorMatchRow[] }>(
+        "/api/v1/candidates/me/matches?limit=100&min_score=15",
+        {},
+        token,
+      );
+      setTailorMatches(r.items ?? []);
+    } catch {
+      setTailorMatches([]);
+    }
+  }
 
   useEffect(() => {
     const token = getToken();
@@ -90,6 +140,8 @@ export default function ProfilePage() {
         if (prof) {
           setTalentPoolOptIn(Boolean(prof.talent_pool_opt_in));
           setTalentPoolProcessingConsent(false);
+          applyTailoringFromProfile(prof);
+          void loadTailorMatches(token);
         }
       })
       .finally(() => setLoading(false));
@@ -107,8 +159,63 @@ export default function ProfilePage() {
       setUserPrefs(prefs);
       setTalentPoolOptIn(Boolean(prof.talent_pool_opt_in));
       setTalentPoolProcessingConsent(false);
+      applyTailoringFromProfile(prof);
+      void loadTailorMatches(token);
     } catch {
       /* ignore */
+    }
+  }
+
+  async function generateCvTailoring() {
+    const token = getToken();
+    if (!token || !initial) return;
+    setError(null);
+    setTailorMsg(null);
+    if (!initial.has_cv) {
+      setError(t("profile.cvTailorNeedCv"));
+      return;
+    }
+    const title = tailorTitle.trim();
+    if (!title) {
+      setError(t("profile.cvTailorTargetTitle"));
+      return;
+    }
+    setTailorBusy(true);
+    try {
+      await apiFetch<{ message: string }>(
+        "/api/v1/candidates/me/cv/tailor",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            target_job_title: title,
+            job_id: tailorJobId ? Number(tailorJobId) : null,
+          }),
+        },
+        token,
+      );
+      await reloadProfile();
+      setTailorMsg(t("profile.cvTailorSaved"));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("profile.failed"));
+    } finally {
+      setTailorBusy(false);
+    }
+  }
+
+  async function clearCvTailoring() {
+    const token = getToken();
+    if (!token) return;
+    setError(null);
+    setTailorMsg(null);
+    setTailorBusy(true);
+    try {
+      await apiFetch("/api/v1/candidates/me/cv/tailoring", { method: "DELETE" }, token);
+      await reloadProfile();
+      setTailorMsg(t("profile.cvTailorCleared"));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("profile.failed"));
+    } finally {
+      setTailorBusy(false);
     }
   }
 
@@ -369,6 +476,107 @@ export default function ProfilePage() {
             </>
           )}
         </section>
+
+        {initial && (
+          <section className="twin-filter-box mb-6">
+            <h2 className="mb-1 text-sm font-semibold text-[var(--foreground)]">
+              {t("profile.cvTailorSection")}
+            </h2>
+            <p className="twin-muted mb-3 text-xs">{t("profile.cvTailorHint")}</p>
+            {!initial.has_cv ? (
+              <p className="twin-muted text-sm">{t("profile.cvTailorNeedCv")}</p>
+            ) : (
+              <>
+                <Label>{t("profile.cvTailorPickJob")}</Label>
+                <select
+                  className="mb-3 mt-1 w-full max-w-xl rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface)] px-3 py-2 text-sm text-[var(--foreground)]"
+                  value={tailorJobId}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setTailorJobId(v);
+                    if (v) {
+                      const row = tailorMatches.find((m) => String(m.job_id) === v);
+                      if (row?.title) setTailorTitle(row.title);
+                    }
+                  }}
+                  disabled={tailorBusy || saving}
+                >
+                  <option value="">{t("profile.cvTailorNoJob")}</option>
+                  {tailorMatches.map((m) => (
+                    <option key={m.job_id} value={m.job_id}>
+                      {m.title} — {m.company}
+                    </option>
+                  ))}
+                </select>
+                <Label>{t("profile.cvTailorTargetTitle")}</Label>
+                <Input
+                  value={tailorTitle}
+                  onChange={(e) => setTailorTitle(e.target.value)}
+                  placeholder={t("profile.cvTailorTargetTitlePlaceholder")}
+                  disabled={tailorBusy || saving}
+                  className="mb-3"
+                />
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    disabled={tailorBusy || saving || cvBusy || introBusy}
+                    onClick={() => void generateCvTailoring()}
+                  >
+                    {tailorBusy ? t("profile.cvTailorGenerating") : t("profile.cvTailorGenerate")}
+                  </Button>
+                  {initial.cv_tailoring ? (
+                    <button
+                      type="button"
+                      disabled={tailorBusy || saving}
+                      onClick={() => void clearCvTailoring()}
+                      className="twin-btn-secondary twin-touch-target !w-auto px-4 py-2 text-sm"
+                    >
+                      {t("profile.cvTailorClear")}
+                    </button>
+                  ) : null}
+                </div>
+                {tailorMsg && <p className="mt-3 text-sm text-green-700">{tailorMsg}</p>}
+                {initial.cv_tailoring ? (
+                  <div className="mt-4 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/40 p-4 text-sm">
+                    {initial.cv_tailoring.company ? (
+                      <p className="mb-2 text-[var(--twin-muted-strong)]">
+                        <span className="font-medium text-[var(--foreground)]">{initial.cv_tailoring.target_job_title}</span>
+                        {" · "}
+                        {initial.cv_tailoring.company}
+                      </p>
+                    ) : (
+                      <p className="mb-2 font-medium text-[var(--foreground)]">
+                        {initial.cv_tailoring.target_job_title}
+                      </p>
+                    )}
+                    {initial.cv_tailoring.pitch_paragraph ? (
+                      <p className="mb-3 whitespace-pre-wrap text-[var(--twin-muted-strong)]">
+                        {initial.cv_tailoring.pitch_paragraph}
+                      </p>
+                    ) : null}
+                    {initial.cv_tailoring.strength_bullets &&
+                    initial.cv_tailoring.strength_bullets.length > 0 ? (
+                      <ul className="mb-3 list-inside list-disc text-[var(--twin-muted-strong)]">
+                        {initial.cv_tailoring.strength_bullets.map((b, idx) => (
+                          <li key={`${idx}-${b.slice(0, 48)}`}>{b}</li>
+                        ))}
+                      </ul>
+                    ) : null}
+                    {initial.cv_tailoring.keywords && initial.cv_tailoring.keywords.length > 0 ? (
+                      <p className="mb-1 text-xs text-[var(--twin-muted)]">
+                        {t("profile.cvTailorKeywords")}: {initial.cv_tailoring.keywords.join(", ")}
+                      </p>
+                    ) : null}
+                    <p className="text-xs text-[var(--twin-muted)]">
+                      {t("profile.cvTailorUpdated")}: {initial.cv_tailoring.updated_at ?? "—"} ·{" "}
+                      {t("profile.cvTailorSource")}: {initial.cv_tailoring.source ?? "—"}
+                    </p>
+                  </div>
+                ) : null}
+              </>
+            )}
+          </section>
+        )}
 
         {initial && (
           <section className="twin-filter-box mb-6">

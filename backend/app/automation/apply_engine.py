@@ -19,6 +19,7 @@ def run_auto_apply(
     email: str,
     phone: str,
     resume_path: str | None,
+    motivation_text: str | None = None,
     headless: bool,
     state_dir: Path,
     submit: bool,
@@ -31,6 +32,7 @@ def run_auto_apply(
             email=email,
             phone=phone,
             resume_path=resume_path,
+            motivation_text=motivation_text,
             headless=headless,
             state_dir=state_dir,
             submit=submit,
@@ -42,6 +44,7 @@ def run_auto_apply(
             email=email,
             phone=phone,
             resume_path=resume_path,
+            motivation_text=motivation_text,
             headless=headless,
             state_dir=state_dir,
             submit=submit,
@@ -59,13 +62,14 @@ def _apply_with_challenge_handoff(
     email: str,
     phone: str,
     resume_path: str | None,
+    motivation_text: str | None,
     headless: bool,
     state_dir: Path,
     submit: bool,
 ) -> ApplyResult:
     """Indeed: open page, wait for human on Cloudflare, then best-effort apply click."""
     from app.automation.browser import browser_page, open_and_clear_challenges
-    from app.automation.form_fill import attach_cv, click_first, fill_if_empty
+    from app.automation.form_fill import attach_cv, click_first, fill_if_empty, fill_motivation_textareas
 
     apply_btns = (
         'button:has-text("Apply")',
@@ -85,6 +89,7 @@ def _apply_with_challenge_handoff(
         fill_if_empty(page, ('input[type="email"]',), email)
         fill_if_empty(page, ('input[name*="name" i]',), name)
         attach_cv(page, resume_path)
+        fill_motivation_textareas(page, motivation_text)
         if submit and click_first(page, ('button[type="submit"]',)):
             return ApplyResult(ApplyOutcome.SUBMITTED, "Indeed: wysłano (jeśli formularz był prosty).")
         return ApplyResult(

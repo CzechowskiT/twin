@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
+from typing import Any
 
 from sqlalchemy.orm import Session
 
@@ -10,6 +12,7 @@ from app.automation.apply_engine import run_auto_apply
 from app.automation.types import ApplyOutcome
 from app.config import get_settings
 from app.database.models import Application, ApplicationStatus, Candidate, Job, User
+from app.services.cv_tailoring import get_tailoring_pitch_for_job
 
 
 def auto_apply_for_user(
@@ -29,6 +32,14 @@ def auto_apply_for_user(
         return ApplyOutcome.FAILED, "Nie znaleziono oferty.", None
 
     state_dir = Path(settings.auto_apply_state_dir) / str(user.id)
+    signals: dict[str, Any] = {}
+    if candidate.profile_signals_json:
+        try:
+            parsed = json.loads(candidate.profile_signals_json)
+            signals = parsed if isinstance(parsed, dict) else {}
+        except json.JSONDecodeError:
+            signals = {}
+    motivation_text = get_tailoring_pitch_for_job(signals, job_id)
     result = run_auto_apply(
         job_board=job.job_board,
         job_url=job.url,
@@ -36,6 +47,7 @@ def auto_apply_for_user(
         email=user.email,
         phone=settings.auto_apply_default_phone,
         resume_path=candidate.resume_path,
+        motivation_text=motivation_text,
         headless=settings.auto_apply_headless,
         state_dir=state_dir,
         submit=submit,

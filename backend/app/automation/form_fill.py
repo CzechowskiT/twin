@@ -14,6 +14,19 @@ EMAIL_SELECTORS = ('input[type="email"]', 'input[name*="mail" i]')
 PHONE_SELECTORS = ('input[type="tel"]', 'input[name*="phone" i]', 'input[name*="telefon" i]')
 FILE_SELECTORS = ('input[type="file"]',)
 
+MOTIVATION_TEXTAREA_SELECTORS = (
+    'textarea[name*="motivation" i]',
+    'textarea[name*="cover" i]',
+    'textarea[name*="letter" i]',
+    'textarea[name*="message" i]',
+    'textarea[name*="additional" i]',
+    'textarea[id*="motivation" i]',
+    'textarea[id*="cover" i]',
+    'textarea[placeholder*="motivation" i]',
+    'textarea[placeholder*="list motywacyjny" i]',
+    'textarea[placeholder*="cover" i]',
+)
+
 
 def fill_if_empty(page, selectors: tuple[str, ...], value: str) -> None:
     if not value:
@@ -29,6 +42,36 @@ def fill_if_empty(page, selectors: tuple[str, ...], value: str) -> None:
             return
         except Exception:
             continue
+
+
+def fill_motivation_textareas(page, text: str | None) -> None:
+    """Fill first empty motivation / cover-letter style textarea when auto-apply has tailored copy."""
+    if not text or not str(text).strip():
+        return
+    value = str(text).strip()[:8000]
+    for sel in MOTIVATION_TEXTAREA_SELECTORS:
+        loc = page.locator(sel).first
+        try:
+            if loc.count() == 0 or not loc.is_visible():
+                continue
+            if str(loc.input_value() or "").strip():
+                continue
+            loc.fill(value)
+            return
+        except Exception:
+            continue
+    try:
+        n = page.locator("textarea").count()
+        for i in range(min(n, 24)):
+            loc = page.locator("textarea").nth(i)
+            if not loc.is_visible():
+                continue
+            if str(loc.input_value() or "").strip():
+                continue
+            loc.fill(value)
+            return
+    except Exception:
+        return
 
 
 def attach_cv(page, resume_path: str | None) -> bool:

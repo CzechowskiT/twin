@@ -23,6 +23,27 @@ class ApplicationCreate(BaseModel):
 class ApplicationUpdate(BaseModel):
     status: ApplicationStatusEnum | None = None
     notes: str | None = Field(default=None, max_length=2000)
+    recruiter_feedback_raw: str | None = Field(
+        default=None,
+        max_length=12_000,
+        description="Verbatim notes from recruiter email/call — use Parse feedback to structure upskill plan.",
+    )
+
+
+class UpskillActionOut(BaseModel):
+    title: str
+    priority: str = "medium"
+    rationale: str = ""
+
+
+class ApplicationFeedbackInsightsOut(BaseModel):
+    skill_tool_gaps: list[str] = Field(default_factory=list)
+    positioning_gaps: list[str] = Field(default_factory=list)
+    what_stronger_candidates_showed: list[str] = Field(default_factory=list)
+    upskill_actions: list[UpskillActionOut] = Field(default_factory=list)
+    summary: str | None = None
+    parsed_at: str | None = None
+    source: str | None = None
 
 
 class ApplicationOut(BaseModel):
@@ -30,6 +51,8 @@ class ApplicationOut(BaseModel):
     job_id: int
     status: ApplicationStatusEnum
     notes: str | None
+    recruiter_feedback_raw: str | None = None
+    feedback_insights: ApplicationFeedbackInsightsOut | None = None
     applied_at: datetime | None
     updated_at: datetime
     title: str
@@ -39,6 +62,30 @@ class ApplicationOut(BaseModel):
     job_board: str
 
     model_config = {"from_attributes": True}
+
+
+class ParseFeedbackIn(BaseModel):
+    """Optional override; default is to parse `recruiter_feedback_raw` already saved on the application."""
+
+    raw_notes: str | None = Field(default=None, max_length=12_000)
+
+
+class RoleInsightRefOut(BaseModel):
+    application_id: int
+    job_id: int
+    title: str
+    company: str
+    summary: str | None = None
+
+
+class DevelopmentFocusOut(BaseModel):
+    """Merged view across applications for reskilling priorities."""
+
+    skill_tool_gaps: list[str] = Field(default_factory=list)
+    positioning_themes: list[str] = Field(default_factory=list)
+    stronger_candidate_signals: list[str] = Field(default_factory=list)
+    upskill_actions_prioritized: list[UpskillActionOut] = Field(default_factory=list)
+    roles_with_insights: list[RoleInsightRefOut] = Field(default_factory=list)
 
 
 class ApplicationListOut(BaseModel):

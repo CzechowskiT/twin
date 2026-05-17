@@ -96,6 +96,7 @@ def delete_cv_for_candidate(db: Session, candidate: Candidate) -> Candidate:
     candidate.cv_uploaded_at = None
     signals = _parse_profile_signals(candidate.profile_signals_json)
     signals.pop("cv_insights", None)
+    signals.pop("cv_tailoring", None)
     candidate.profile_signals_json = json.dumps(signals) if signals else None
     db.commit()
     db.refresh(candidate)

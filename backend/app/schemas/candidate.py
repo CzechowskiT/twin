@@ -5,6 +5,8 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
+from app.schemas.career_compass import CareerCompassPreviewOut
+
 
 class CandidateCreate(BaseModel):
     name: str = Field(min_length=1, max_length=200)
@@ -54,6 +56,14 @@ class CandidateOut(BaseModel):
     cv_insights: dict[str, Any] | None = None
     cv_processing_consent_at: datetime | None = None
     intro_audio_processing_consent_at: datetime | None = None
+    cv_tailoring: dict[str, Any] | None = Field(
+        default=None,
+        description="Role-specific pitch/bullets for application forms (see POST /me/cv/tailor)",
+    )
+    career_compass_preview: CareerCompassPreviewOut | None = Field(
+        default=None,
+        description="Ideal job + path progress (see GET /me/career-compass)",
+    )
 
     model_config = {"from_attributes": True}
 
@@ -74,3 +84,19 @@ class IntroAudioUploadOut(BaseModel):
     has_intro_audio: bool
     intro_audio_uploaded_at: datetime | None = None
     transcription_status: str = "skipped"
+
+
+class CvTailorIn(BaseModel):
+    """Tailor CV narrative for a target role (stored for auto-apply motivation fields)."""
+
+    target_job_title: str = Field(min_length=2, max_length=200)
+    job_id: int | None = Field(
+        default=None,
+        ge=1,
+        description="When set, tailoring is used only for auto-apply on this job",
+    )
+
+
+class CvTailoringOut(BaseModel):
+    message: str
+    tailoring: dict[str, Any]
