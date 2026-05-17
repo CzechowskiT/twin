@@ -178,7 +178,7 @@ const en = {
     timeline1When: "Phase 1 · Now",
     timeline1Title: "Discover · Match · Track",
     timeline1Body:
-      "Public listings, profile-aware ranking, and application status in one place. Consent first, GDPR from day one.",
+      "Public listings, profile-aware ranking, and application status in one place—built for a clear, trustworthy surface from day one.",
     timeline2When: "Phase 2",
     timeline2Title: "Smarter motion",
     timeline2Body:
@@ -1130,7 +1130,7 @@ const pl: MessageTree = {
     timeline1When: "Faza 1 · Teraz",
     timeline1Title: "Odkrywaj · Dopasuj · Śledź",
     timeline1Body:
-      "Publiczne ogłoszenia, ranking przy profilu i status aplikacji w jednym miejscu. Zgoda na start, RODO od pierwszego dnia.",
+      "Publiczne ogłoszenia, ranking przy profilu i status aplikacji w jednym miejscu — z myślą o przejrzystej, zaufanej powierzchni od pierwszego dnia.",
     timeline2When: "Faza 2",
     timeline2Title: "Mądrzejszy ruch",
     timeline2Body:

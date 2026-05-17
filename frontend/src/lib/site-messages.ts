@@ -87,9 +87,6 @@ export const SITE_MESSAGES_EN = {
   footerGithubAria: "TWIN on GitHub",
   footerXAria: "TWIN on X",
   headerSocialAria: "TWIN on social media",
-  headerStoresAria: "Get the TWIN mobile app",
-  headerAppStoreAria: "Download on the App Store",
-  headerGooglePlayAria: "Get it on Google Play",
   footerFollowTitle: "Follow TWIN",
   footerFollowLead:
     "YouTube, Instagram, X, Facebook, and Twitter. Configure NEXT_PUBLIC_SOCIAL_* in your environment; icons appear as placeholders until each URL is set.",
@@ -98,12 +95,6 @@ export const SITE_MESSAGES_EN = {
   footerInstagramAria: "TWIN on Instagram",
   footerFacebookAria: "TWIN on Facebook",
   footerTwitterAria: "TWIN on Twitter",
-
-  footerMobileTitle: "Mobile app",
-  footerMobileLead: "Install TWIN on iPhone (App Store) or Android (Google Play).",
-  footerMobileAppStore: "Download on the App Store",
-  footerMobileGooglePlay: "Get it on Google Play",
-  footerMobileSoonHint: "Store link not configured yet. Coming soon.",
 
   momentumAria: "Tips and shortcuts",
   momentumEyebrow: "Keep momentum",
@@ -211,9 +202,6 @@ export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } 
   footerGithubAria: "TWIN na GitHubie",
   footerXAria: "TWIN na X",
   headerSocialAria: "TWIN w mediach społecznościowych",
-  headerStoresAria: "Aplikacja mobilna TWIN",
-  headerAppStoreAria: "Pobierz z App Store",
-  headerGooglePlayAria: "Pobierz z Google Play",
   footerFollowTitle: "Obserwuj TWIN",
   footerFollowLead:
     "YouTube, Instagram, X, Facebook i Twitter. Ustaw w środowisku zmienne NEXT_PUBLIC_SOCIAL_*; ikony są widoczne jako placeholdery, dopóki nie podasz URL.",
@@ -222,12 +210,6 @@ export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } 
   footerInstagramAria: "TWIN na Instagramie",
   footerFacebookAria: "TWIN na Facebooku",
   footerTwitterAria: "TWIN na Twitterze",
-
-  footerMobileTitle: "Aplikacja mobilna",
-  footerMobileLead: "Zainstaluj TWIN na iPhone (App Store) lub Androidzie (Google Play).",
-  footerMobileAppStore: "Pobierz z App Store",
-  footerMobileGooglePlay: "Pobierz z Google Play",
-  footerMobileSoonHint: "Link do sklepu jeszcze nie ustawiony. Wkrótce.",
 
   momentumAria: "Podpowiedzi i skróty",
   momentumEyebrow: "Utrzymaj tempo",

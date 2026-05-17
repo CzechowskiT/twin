@@ -131,7 +131,7 @@ type SocialIconRowProps = {
   /** When true, always `flex` (e.g. mobile menu). */
   inline?: boolean;
   className?: string;
-  /** Smaller hit targets for header when stacked under persona/language. */
+  /** Smaller header row: no 44px touch minimum on these decorative links. */
   compact?: boolean;
 };
 
@@ -142,13 +142,19 @@ export function SocialIconRow({ variant, inline = false, className = "", compact
   const networks = readNetworks();
   const headerCompact = Boolean(compact) && variant === "header";
   const size =
-    variant === "footer" ? "h-10 w-10" : headerCompact ? "h-7 w-7" : "h-9 w-9";
-  const iconInner = headerCompact ? "h-3.5 w-3.5" : "h-5 w-5";
-  const gap = variant === "header" ? (headerCompact ? "gap-1" : "gap-1.5") : "gap-3";
+    variant === "footer" ? "h-10 w-10" : headerCompact ? "h-6 w-6" : "h-9 w-9";
+  const iconInner = headerCompact ? "h-3 w-3" : "h-5 w-5";
+  const gap = variant === "header" ? (headerCompact ? "gap-0.5" : "gap-1.5") : "gap-3";
   const flex = inline ? "flex" : variant === "header" ? "hidden md:flex" : "flex";
   const justify = variant === "header" ? "justify-end" : "justify-center sm:justify-start";
 
-  const shellBase = `twin-touch-target inline-flex ${size} shrink-0 items-center justify-center rounded-lg border transition duration-150 hover:scale-[1.06] active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--twin-accent)]`;
+  const corner = headerCompact ? "rounded-md" : "rounded-lg";
+  /** Header compact: skip `twin-touch-target` — its 2.75rem min size was blowing up small icon shells. */
+  const shellBase = `${
+    headerCompact
+      ? "inline-flex !min-h-0 !min-w-0"
+      : "twin-touch-target inline-flex"
+  } ${size} shrink-0 items-center justify-center ${corner} border transition duration-150 hover:scale-[1.04] active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--twin-accent)]`;
 
   return (
     <div

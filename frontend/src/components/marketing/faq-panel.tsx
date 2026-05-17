@@ -5,54 +5,78 @@ import { useMemo } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 
-export function useMarketingFaqItems() {
+export function useMarketingFaqItems(includeDataQuestion = true) {
   const { t } = useTranslation();
-  return useMemo(
-    () => [
+  return useMemo(() => {
+    const all = [
       { id: "01", q: t("home.faq01Q"), a: t("home.faq01A") },
       { id: "02", q: t("home.faq02Q"), a: t("home.faq02A") },
       { id: "03", q: t("home.faq03Q"), a: t("home.faq03A") },
       { id: "04", q: t("home.faq04Q"), a: t("home.faq04A") },
-    ],
-    [t],
-  );
+    ] as const;
+    return includeDataQuestion ? [...all] : all.filter((item) => item.id !== "04");
+  }, [t, includeDataQuestion]);
 }
 
 /** Shared FAQ disclosure list (home + /faq). */
-export function FaqPanel({ className = "" }: { className?: string }) {
+export function FaqPanel({
+  className = "",
+  includeDataQuestion = true,
+  layout = "stack",
+}: {
+  className?: string;
+  /** Home omits the data/consent FAQ; full list stays on /faq. */
+  includeDataQuestion?: boolean;
+  /** `row`: three cards in one row from `md` (home); `stack`: single column list (/faq). */
+  layout?: "stack" | "row";
+}) {
   const { t } = useTranslation();
-  const items = useMarketingFaqItems();
+  const items = useMarketingFaqItems(includeDataQuestion);
+  const rowLayout = layout === "row";
+
+  const itemShell = (item: (typeof items)[number]) => (
+    <details
+      key={item.id}
+      className={
+        rowLayout
+          ? "group overflow-hidden rounded-2xl border border-[var(--twin-border)] bg-[var(--twin-card)] shadow-[var(--twin-shadow)]"
+          : "group border-0 border-[var(--twin-border)] bg-transparent"
+      }
+    >
+      <summary className="flex cursor-pointer list-none items-start justify-between gap-4 px-5 py-4 text-left transition hover:bg-[var(--twin-accent-muted)]/60 sm:px-6 sm:py-5 [&::-webkit-details-marker]:hidden">
+        <span className="min-w-0">
+          <span className="font-mono text-xs font-semibold text-[var(--twin-accent)]">{item.id}</span>
+          <span className="mt-1 block text-base font-semibold text-[var(--foreground)] sm:text-lg">{item.q}</span>
+        </span>
+        <span
+          className="mt-1 shrink-0 text-lg leading-none text-[var(--twin-muted)] transition group-open:rotate-45"
+          aria-hidden
+        >
+          +
+        </span>
+      </summary>
+      <div className="border-t border-[var(--twin-border)]/80 px-5 pb-5 pt-3 text-sm leading-relaxed text-[var(--foreground)] sm:px-6 sm:text-[15px]">
+        <p>{item.a}</p>
+        {item.id === "04" ? (
+          <p className="mt-3">
+            <Link href="/privacy" className="twin-link font-medium">
+              {t("home.faqPrivacyLink")}
+            </Link>
+          </p>
+        ) : null}
+      </div>
+    </details>
+  );
 
   return (
     <div className={className}>
-      <div className="divide-y divide-[var(--twin-border)] overflow-hidden rounded-2xl border border-[var(--twin-border)] bg-[var(--twin-card)] shadow-[var(--twin-shadow)]">
-        {items.map((item) => (
-          <details key={item.id} className="group border-0 border-[var(--twin-border)] bg-transparent">
-            <summary className="flex cursor-pointer list-none items-start justify-between gap-4 px-5 py-4 text-left transition hover:bg-[var(--twin-accent-muted)]/60 sm:px-6 sm:py-5 [&::-webkit-details-marker]:hidden">
-              <span className="min-w-0">
-                <span className="font-mono text-xs font-semibold text-[var(--twin-accent)]">{item.id}</span>
-                <span className="mt-1 block text-base font-semibold text-[var(--foreground)] sm:text-lg">{item.q}</span>
-              </span>
-              <span
-                className="mt-1 shrink-0 text-lg leading-none text-[var(--twin-muted)] transition group-open:rotate-45"
-                aria-hidden
-              >
-                +
-              </span>
-            </summary>
-            <div className="border-t border-[var(--twin-border)]/80 px-5 pb-5 pt-3 text-sm leading-relaxed text-[var(--foreground)] sm:px-6 sm:text-[15px]">
-              <p>{item.a}</p>
-              {item.id === "04" ? (
-                <p className="mt-3">
-                  <Link href="/privacy" className="twin-link font-medium">
-                    {t("home.faqPrivacyLink")}
-                  </Link>
-                </p>
-              ) : null}
-            </div>
-          </details>
-        ))}
-      </div>
+      {rowLayout ? (
+        <div className="grid gap-4 md:grid-cols-3">{items.map(itemShell)}</div>
+      ) : (
+        <div className="divide-y divide-[var(--twin-border)] overflow-hidden rounded-2xl border border-[var(--twin-border)] bg-[var(--twin-card)] shadow-[var(--twin-shadow)]">
+          {items.map(itemShell)}
+        </div>
+      )}
     </div>
   );
 }

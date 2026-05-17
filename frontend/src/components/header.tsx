@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRef } from "react";
 
-import { HeaderStoreIcons } from "@/components/header-store-icons";
 import { SocialIconRow } from "@/components/social-icon-row";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useTranslation } from "@/components/language-provider";
@@ -79,7 +78,7 @@ export function Header() {
         </div>
 
         <nav
-          className="hidden min-w-0 flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-[12px] font-medium sm:text-[13px] md:flex md:justify-self-stretch md:px-2"
+          className="hidden min-w-0 flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-[12px] font-medium sm:text-[13px] md:flex md:justify-self-center md:px-2"
           aria-label={t("nav.ariaSiteNav")}
         >
           {corporateNav.map((item) => (
@@ -89,22 +88,22 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="hidden shrink-0 flex-col items-end gap-y-2 md:flex">
-          <div className="flex flex-wrap items-center justify-end gap-x-2.5 gap-y-1 text-[12px] sm:text-[13px]">
-            <nav className="flex flex-wrap items-center justify-end gap-x-2.5 gap-y-1" aria-label={t("nav.ariaAccountNav")}>
-              {app.map((item) => (
-                <Link key={item.href} href={item.href} className={`${linkClass} font-medium`}>
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-            <HeaderStoreIcons />
-          </div>
-          <div className="flex flex-wrap items-center justify-end gap-x-2 gap-y-1">
+        <div className="hidden min-w-0 flex-col items-end gap-y-2 md:flex md:justify-self-end">
+          <nav
+            className="flex w-full min-w-0 flex-wrap items-center justify-end gap-x-2.5 gap-y-1 text-[12px] sm:text-[13px]"
+            aria-label={t("nav.ariaAccountNav")}
+          >
+            {app.map((item) => (
+              <Link key={item.href} href={item.href} className={`${linkClass} font-medium`}>
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+          <div className="flex w-full flex-wrap items-center justify-end gap-x-2 gap-y-1">
             <PersonaSwitcher />
             <LanguageSwitcher />
           </div>
-          <SocialIconRow variant="header" compact />
+          <SocialIconRow variant="header" compact className="w-full justify-end" />
         </div>
 
         <div className="flex w-full basis-full flex-col items-stretch gap-y-2 border-t border-[var(--twin-border)]/60 py-2 md:hidden">
@@ -173,12 +172,6 @@ export function Header() {
                     {item.label}
                   </Link>
                 ))}
-                <p className="mt-2 border-t border-[var(--twin-border)] px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
-                  {t("site.footerMobileTitle")}
-                </p>
-                <div className="flex justify-center px-2 pb-2 pt-1">
-                  <HeaderStoreIcons inline />
-                </div>
               </nav>
             </details>
           </div>
