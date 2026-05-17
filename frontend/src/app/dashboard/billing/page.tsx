@@ -61,7 +61,9 @@ export default function BillingPage() {
   const router = useRouter();
   const [me, setMe] = useState<Me | null>(null);
   const [plans, setPlans] = useState<PlansPayload | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState(false);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [checkoutBanner, setCheckoutBanner] = useState<"success" | "cancel" | null>(null);
 
@@ -71,23 +73,49 @@ export default function BillingPage() {
       router.replace("/login");
       return;
     }
-    setError(null);
-    try {
-      const [u, p] = await Promise.all([
-        apiFetch<Me>("/api/v1/auth/me", {}, token),
-        apiFetch<PlansPayload>("/api/v1/billing/plans", { method: "GET" }),
-      ]);
-      setMe(u);
-      setPlans(p);
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      if (msg.includes("401") || msg.toLowerCase().includes("invalid token")) {
+    setLoading(true);
+    setActionError(false);
+    setLoadFailed(false);
+
+    const [meRes, plansRes] = await Promise.allSettled([
+      apiFetch<Me>("/api/v1/auth/me", {}, token),
+      apiFetch<PlansPayload>("/api/v1/billing/plans", { method: "GET" }),
+    ]);
+
+    let anyLoadFailure = false;
+
+    if (meRes.status === "fulfilled") {
+      setMe(meRes.value);
+    } else {
+      setMe(null);
+      const msg = meRes.reason instanceof Error ? meRes.reason.message : String(meRes.reason);
+      const lower = msg.toLowerCase();
+      const looksLikeAuthFailure =
+        msg.includes("401") ||
+        lower.includes("invalid token") ||
+        lower.includes("could not validate credentials") ||
+        lower.includes("not authenticated");
+      if (looksLikeAuthFailure) {
         clearToken();
         router.replace("/login");
+        setLoading(false);
         return;
       }
-      setError(msg);
+      anyLoadFailure = true;
+      console.warn("[billing] /auth/me failed", msg);
     }
+
+    if (plansRes.status === "fulfilled") {
+      setPlans(plansRes.value);
+    } else {
+      setPlans(null);
+      const msg = plansRes.reason instanceof Error ? plansRes.reason.message : String(plansRes.reason);
+      anyLoadFailure = true;
+      console.warn("[billing] /billing/plans failed", msg);
+    }
+
+    setLoadFailed(anyLoadFailure);
+    setLoading(false);
   }, [router]);
 
   useEffect(() => {
@@ -109,7 +137,7 @@ export default function BillingPage() {
     const token = getToken();
     if (!token) return;
     setBusy(`checkout-${plan}`);
-    setError(null);
+    setActionError(false);
     try {
       const res = await apiFetch<UrlPayload>(
         "/api/v1/billing/checkout-session",
@@ -118,7 +146,8 @@ export default function BillingPage() {
       );
       window.location.href = res.url;
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setActionError(true);
+      console.warn("[billing] checkout-session failed", e);
     } finally {
       setBusy(null);
     }
@@ -128,12 +157,13 @@ export default function BillingPage() {
     const token = getToken();
     if (!token) return;
     setBusy("portal");
-    setError(null);
+    setActionError(false);
     try {
       const res = await apiFetch<UrlPayload>("/api/v1/billing/portal-session", { method: "POST" }, token);
       window.location.href = res.url;
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setActionError(true);
+      console.warn("[billing] portal-session failed", e);
     } finally {
       setBusy(null);
     }
@@ -173,9 +203,28 @@ export default function BillingPage() {
         </Card>
       ) : null}
 
-      {error ? (
+      {actionError ? (
         <Card variant="soft" className="mb-4 border-red-200">
-          <p className="text-sm text-red-700">{error}</p>
+          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingCheckoutError")}</p>
+        </Card>
+      ) : null}
+
+      {loading ? (
+        <Card className="mb-6">
+          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingLoading")}</p>
+        </Card>
+      ) : null}
+
+      {!loading && loadFailed ? (
+        <Card variant="soft" className="mb-6 border-[var(--twin-border)]">
+          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingLoadIssue")}</p>
+          <button
+            type="button"
+            className="twin-link mt-3 text-sm font-semibold"
+            onClick={() => void load()}
+          >
+            {t("dashboard.billingRetry")}
+          </button>
         </Card>
       ) : null}
 
@@ -216,7 +265,7 @@ export default function BillingPage() {
         </Card>
       ) : null}
 
-      {plans ? (
+      {plans && !loading ? (
         <Card>
           <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
             {t("dashboard.billingPlansTitle")}
@@ -249,7 +298,12 @@ export default function BillingPage() {
             </div>
           ) : null}
           <ul className="mt-6 space-y-5">
-            {plans.plans.map((p) => (
+            {plans.plans.length === 0 ? (
+              <li className="rounded-xl border border-dashed border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/60 p-4 text-sm text-[var(--twin-muted-strong)]">
+                {t("dashboard.billingPlansEmpty")}
+              </li>
+            ) : (
+              plans.plans.map((p) => (
               <li
                 key={p.id}
                 className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] p-4 sm:p-5"
@@ -288,7 +342,8 @@ export default function BillingPage() {
                   </div>
                 </div>
               </li>
-            ))}
+              ))
+            )}
           </ul>
         </Card>
       ) : null}

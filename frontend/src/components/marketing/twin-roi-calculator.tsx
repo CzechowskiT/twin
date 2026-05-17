@@ -261,7 +261,7 @@ export function TwinRoiCalculator() {
           <p className="mt-2 text-sm text-[var(--twin-muted)]">{t("calculator.savingsPerHire")}</p>
           <p className="mt-3 text-4xl font-bold tracking-tight text-[var(--twin-link)] sm:text-5xl">{money(savingsPerHire)}</p>
           {savingsPercent !== null ? (
-            <p className="mt-4 inline-block rounded-full bg-[var(--twin-cta)] px-5 py-2 text-sm font-semibold text-white shadow-sm">
+            <p className="mt-4 inline-block rounded-full bg-[var(--twin-cta)] px-5 py-2 text-sm font-semibold text-[var(--twin-on-cta)] shadow-sm">
               {t("calculator.cheaperBy").replace("{{pct}}", savingsPercent)}
             </p>
           ) : (
@@ -351,18 +351,24 @@ export function TwinRoiCalculator() {
             </div>
           </div>
 
-          <div className="mt-6 rounded-xl bg-gradient-to-r from-[var(--twin-accent)] to-[var(--twin-accent-hover)] p-5 text-white shadow-md sm:p-6">
+          <div className="twin-roi-enterprise-strip mt-6 rounded-xl bg-gradient-to-r from-[var(--twin-accent)] to-[var(--twin-accent-hover)] p-5 shadow-md sm:p-6">
             <div className="grid gap-4 text-center sm:grid-cols-3">
               <div>
-                <div className="text-xs font-medium uppercase tracking-wide text-white/80">{t("calculator.totalValue")}</div>
+                <div className="twin-roi-enterprise-strip-muted text-xs font-medium uppercase tracking-wide">
+                  {t("calculator.totalValue")}
+                </div>
                 <div className="mt-1 text-2xl font-bold">{money(totalEnterpriseValue)}</div>
               </div>
               <div>
-                <div className="text-xs font-medium uppercase tracking-wide text-white/80">{t("calculator.netBenefit")}</div>
+                <div className="twin-roi-enterprise-strip-muted text-xs font-medium uppercase tracking-wide">
+                  {t("calculator.netBenefit")}
+                </div>
                 <div className="mt-1 text-2xl font-bold">{money(totalEnterpriseValue - integrationFee)}</div>
               </div>
               <div>
-                <div className="text-xs font-medium uppercase tracking-wide text-white/80">{t("calculator.roiLabel")}</div>
+                <div className="twin-roi-enterprise-strip-muted text-xs font-medium uppercase tracking-wide">
+                  {t("calculator.roiLabel")}
+                </div>
                 <div className="mt-1 text-2xl font-bold">{enterpriseROI !== null ? `${enterpriseROI}%` : "—"}</div>
               </div>
             </div>

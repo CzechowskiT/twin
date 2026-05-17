@@ -15,7 +15,7 @@ export function LandingFocusChips() {
   ];
 
   return (
-    <section className="border-t border-[var(--twin-border)] bg-gradient-to-b from-amber-50/25 via-[var(--background)] to-[var(--background)] py-20 sm:py-24 md:py-28">
+    <section className="border-t border-[var(--twin-border)] bg-gradient-to-b from-[var(--twin-surface-raised)]/35 via-[var(--background)] to-[var(--background)] py-20 sm:py-24 md:py-28">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <ScrollReveal delayMs={30}>
           <h2 className="max-w-3xl text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-3xl md:text-4xl">
@@ -41,7 +41,7 @@ export function LandingFocusChips() {
           <div className="mt-10">
             <Link
               href="/register"
-              className="marketing-btn-primary-shadow twin-touch-target inline-flex min-h-[3rem] items-center justify-center rounded-full bg-[var(--twin-cta)] px-10 text-center text-[15px] font-semibold text-white transition hover:bg-[var(--twin-cta-hover)] active:scale-[0.98]"
+              className="marketing-cta-filled-pill marketing-btn-primary-shadow twin-touch-target inline-flex min-h-[3rem] items-center justify-center rounded-full bg-[var(--twin-cta)] px-10 text-center text-[15px] font-semibold text-[var(--twin-on-cta)] transition hover:bg-[var(--twin-cta-hover)] active:scale-[0.98]"
             >
               {t("home.focusCta")}
             </Link>

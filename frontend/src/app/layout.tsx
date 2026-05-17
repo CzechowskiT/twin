@@ -4,6 +4,7 @@ import { RouteAwareBackground } from "@/components/route-aware-background";
 import { Header } from "@/components/header";
 import { SiteFooter } from "@/components/site-footer";
 import { Providers } from "@/components/providers";
+import { MARKETING_SURFACE } from "@/lib/marketing-surface";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -41,6 +42,7 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      {...(MARKETING_SURFACE === "studio" ? { "data-marketing-surface": "studio" } : {})}
     >
       <head>
         <link rel="dns-prefetch" href="https://images.unsplash.com" />

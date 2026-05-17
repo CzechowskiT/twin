@@ -23,7 +23,7 @@ export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
           <div className="flex flex-wrap gap-3 pt-2">
             <Link
               href={c.primaryCta.href}
-              className="marketing-btn-primary-shadow twin-touch-target inline-flex min-h-[2.75rem] items-center justify-center rounded-full bg-[var(--twin-cta)] px-6 text-sm font-semibold text-white transition hover:bg-[var(--twin-cta-hover)] active:scale-[0.98]"
+              className="marketing-cta-filled-pill marketing-btn-primary-shadow twin-touch-target inline-flex min-h-[2.75rem] items-center justify-center rounded-full bg-[var(--twin-cta)] px-6 text-sm font-semibold text-[var(--twin-on-cta)] transition hover:bg-[var(--twin-cta-hover)] active:scale-[0.98]"
             >
               {c.primaryCta.label}
             </Link>
@@ -115,7 +115,7 @@ export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
                   href={tier.href}
                   className={`twin-touch-target mt-6 inline-flex min-h-[2.75rem] w-full items-center justify-center rounded-full px-4 text-center text-sm font-semibold transition active:scale-[0.98] ${
                     tier.highlight
-                      ? "marketing-btn-primary-shadow bg-[var(--twin-cta)] text-white hover:bg-[var(--twin-cta-hover)]"
+                      ? "marketing-cta-filled-pill marketing-btn-primary-shadow bg-[var(--twin-cta)] text-[var(--twin-on-cta)] hover:bg-[var(--twin-cta-hover)]"
                       : "border border-[var(--twin-border)] bg-[var(--twin-card)] text-[var(--twin-muted-strong)] hover:border-[var(--twin-border-hover)]"
                   }`}
                 >

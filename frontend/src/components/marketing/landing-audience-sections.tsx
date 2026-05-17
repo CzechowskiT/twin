@@ -69,7 +69,7 @@ export function LandingAudienceSections() {
                   href={col.href}
                   className={
                     col.variant === "accent"
-                      ? "marketing-btn-primary-shadow twin-touch-target mt-6 inline-flex min-h-[2.75rem] w-full items-center justify-center rounded-full bg-[var(--twin-cta)] px-4 text-center text-sm font-semibold text-white transition hover:bg-[var(--twin-cta-hover)] active:scale-[0.98]"
+                      ? "marketing-cta-filled-pill marketing-btn-primary-shadow twin-touch-target mt-6 inline-flex min-h-[2.75rem] w-full items-center justify-center rounded-full bg-[var(--twin-cta)] px-4 text-center text-sm font-semibold text-[var(--twin-on-cta)] transition hover:bg-[var(--twin-cta-hover)] active:scale-[0.98]"
                       : "twin-touch-target mt-6 inline-flex min-h-[2.75rem] w-full items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-4 text-center text-sm font-semibold text-[var(--twin-muted-strong)] shadow-sm transition hover:border-[var(--twin-border-hover)] hover:bg-[var(--twin-accent-muted)] active:scale-[0.98]"
                   }
                 >

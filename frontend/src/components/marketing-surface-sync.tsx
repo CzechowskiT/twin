@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 
 import { MARKETING_SURFACE } from "@/lib/marketing-surface";
 
 const ATTR = "data-marketing-surface";
 
-/** Applies studio design tokens on <html> for the whole app when `MARKETING_SURFACE` is `"studio"`. */
+/**
+ * Syncs `<html data-marketing-surface>` with `MARKETING_SURFACE` before paint (root layout also sets it for SSR).
+ */
 export function MarketingSurfaceSync() {
-  useEffect(() => {
+  useLayoutEffect(() => {
     const root = document.documentElement;
     if (MARKETING_SURFACE === "studio") {
       root.setAttribute(ATTR, "studio");

@@ -14,8 +14,12 @@
   --twin-accent-hover: #16382e;
   --twin-accent-muted: #d2e5da;
   --twin-accent-soft: #9bbbad;
+  /** Label on solid `--twin-accent` fills (dark green in light mode, mint in studio). */
+  --twin-on-accent: #ffffff;
   --twin-cta: #d97706;
   --twin-cta-hover: #b45309;
+  /** Text on solid `--twin-cta` fills (amber in light mode, near-white pill in studio). */
+  --twin-on-cta: #ffffff;
   --twin-link: #245544;
   --twin-link-hover: #16382e;
   --twin-card: #ffffff;
@@ -47,8 +51,10 @@ html[data-marketing-surface="studio"] {
   --twin-accent-hover: #6ee7b7;
   --twin-accent-muted: rgb(52 211 153 / 0.14);
   --twin-accent-soft: rgb(167 139 250 / 0.45);
+  --twin-on-accent: #0f172a;
   --twin-cta: #f8fafc;
   --twin-cta-hover: #e2e8f0;
+  --twin-on-cta: #0f172a;
   --twin-link: #6ee7b7;
   --twin-link-hover: #34d399;
   --twin-card: rgb(15 23 42 / 0.55);
@@ -811,7 +817,7 @@ html[data-marketing-surface="studio"] .marketing-hero-lede {
   color: rgb(203 213 225);
 }
 
-.marketing-hero-btn-twin {
+a.marketing-hero-btn-twin {
   display: inline-flex;
   min-height: 3rem;
   align-items: center;
@@ -824,33 +830,33 @@ html[data-marketing-surface="studio"] .marketing-hero-lede {
   font-size: 15px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: #fff;
+  color: var(--twin-on-accent) !important;
   box-shadow: var(--twin-shadow-md);
   transition:
     background-color 0.2s ease,
     transform 0.15s ease;
 }
 
-.marketing-hero-btn-twin:hover {
+a.marketing-hero-btn-twin:hover {
   background: var(--twin-accent-hover);
 }
 
-.marketing-hero-btn-twin:active {
+a.marketing-hero-btn-twin:active {
   transform: scale(0.98);
 }
 
-html[data-marketing-surface="studio"] .marketing-hero-btn-twin {
+html[data-marketing-surface="studio"] a.marketing-hero-btn-twin {
   border: 1px solid rgb(248 250 252 / 0.55);
   background: transparent;
-  color: #f8fafc;
+  color: #f8fafc !important;
   box-shadow: none;
 }
 
-html[data-marketing-surface="studio"] .marketing-hero-btn-twin:hover {
+html[data-marketing-surface="studio"] a.marketing-hero-btn-twin:hover {
   background: rgb(248 250 252 / 0.06);
 }
 
-.marketing-hero-btn-cta {
+a.marketing-hero-btn-cta {
   display: inline-flex;
   min-height: 3rem;
   align-items: center;
@@ -862,25 +868,25 @@ html[data-marketing-surface="studio"] .marketing-hero-btn-twin:hover {
   text-align: center;
   font-size: 15px;
   font-weight: 600;
-  color: #fff;
+  color: var(--twin-on-cta) !important;
   transition:
     background-color 0.2s ease,
     transform 0.15s ease;
 }
 
-.marketing-hero-btn-cta:hover {
+html[data-marketing-surface="studio"] a.marketing-hero-btn-cta {
+  color: #0f172a !important;
+}
+
+a.marketing-hero-btn-cta:hover {
   background: var(--twin-cta-hover);
 }
 
-.marketing-hero-btn-cta:active {
+a.marketing-hero-btn-cta:active {
   transform: scale(0.98);
 }
 
-html[data-marketing-surface="studio"] .marketing-hero-btn-cta {
-  color: #0f172a;
-}
-
-.marketing-hero-btn-signin {
+a.marketing-hero-btn-signin {
   display: inline-flex;
   min-height: 3rem;
   align-items: center;
@@ -901,23 +907,23 @@ html[data-marketing-surface="studio"] .marketing-hero-btn-cta {
     transform 0.15s ease;
 }
 
-.marketing-hero-btn-signin:hover {
+a.marketing-hero-btn-signin:hover {
   border-color: var(--twin-border-hover);
   background: var(--twin-accent-muted);
 }
 
-.marketing-hero-btn-signin:active {
+a.marketing-hero-btn-signin:active {
   transform: scale(0.98);
 }
 
-html[data-marketing-surface="studio"] .marketing-hero-btn-signin {
+html[data-marketing-surface="studio"] a.marketing-hero-btn-signin {
   border-color: rgb(148 163 184 / 0.18);
   background: rgb(15 23 42 / 0.35);
   color: #94a3b8;
   box-shadow: none;
 }
 
-html[data-marketing-surface="studio"] .marketing-hero-btn-signin:hover {
+html[data-marketing-surface="studio"] a.marketing-hero-btn-signin:hover {
   color: #e2e8f0;
   background: rgb(30 41 59 / 0.55);
 }
@@ -953,4 +959,44 @@ html[data-marketing-surface="studio"] .marketing-hero-btn-signin:hover {
   .marketing-marquee-track > *:nth-child(n + 2) {
     display: none;
   }
+}
+
+/**
+ * Next.js `<Link>` → `<a>`. Preflight `a { color: inherit }` + late utility order can leave
+ * light `--foreground` on a light `--twin-cta` pill — force label colors (studio uses hex).
+ */
+a.marketing-cta-filled-pill {
+  color: var(--twin-on-cta) !important;
+}
+
+html[data-marketing-surface="studio"] a.marketing-cta-filled-pill {
+  color: #0f172a !important;
+}
+
+/** Solid mint / emerald pills — same `a { color: inherit }` pitfall as CTA white pills. */
+a.marketing-accent-filled-pill {
+  color: var(--twin-on-accent) !important;
+}
+
+html[data-marketing-surface="studio"] a.marketing-accent-filled-pill {
+  color: #0f172a !important;
+}
+
+/**
+ * Enterprise summary strip: gradient uses light accent hues in studio — white copy fails WCAG.
+ */
+.twin-roi-enterprise-strip {
+  color: var(--twin-on-accent);
+}
+
+.twin-roi-enterprise-strip-muted {
+  color: color-mix(in srgb, var(--twin-on-accent) 78%, transparent);
+}
+
+html[data-marketing-surface="studio"] .twin-roi-enterprise-strip {
+  color: #0f172a;
+}
+
+html[data-marketing-surface="studio"] .twin-roi-enterprise-strip-muted {
+  color: rgb(15 23 42 / 0.72);
 }

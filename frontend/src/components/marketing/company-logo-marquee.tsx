@@ -142,11 +142,13 @@ function BrandMark({
   const urls = useMemo(() => {
     const slugs = [brand.slug, ...(brand.altSlugs ?? [])];
     const uniq = [...new Set(slugs)];
-    return [
-      ...uniq.map(siUrl),
-      clearbitUrl(brand.domain),
-      googleFaviconUrl(brand.domain),
-    ];
+    const si = uniq.map(siUrl);
+    const domain = [clearbitUrl(brand.domain), googleFaviconUrl(brand.domain)];
+    /* Apple on Simple Icons is pure black — invisible on studio (dark) marquee; try favicon/Clearbit first. */
+    if (brand.slug === "apple") {
+      return [...domain, ...si];
+    }
+    return [...si, ...domain];
   }, [brand]);
 
   const [step, setStep] = useState(0);
@@ -197,7 +199,7 @@ function LogoRow({ segmentIndex, ariaHidden }: { segmentIndex: number; ariaHidde
   );
 }
 
-/** Infinite marquee — four segments; every mark has SI → Clearbit → favicon → monogram fallbacks. */
+/** Infinite marquee — four segments; most marks try SI → Clearbit → favicon → monogram (Apple tries domain sources first). */
 export function CompanyLogoMarquee() {
   return (
     <div

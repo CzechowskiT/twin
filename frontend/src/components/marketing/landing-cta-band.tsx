@@ -23,13 +23,13 @@ export function LandingCtaBand() {
             <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
               <Link
                 href="/dashboard"
-                className="twin-touch-target inline-flex min-h-[2.75rem] items-center justify-center rounded-full bg-[var(--twin-accent)] px-7 text-center text-sm font-bold tracking-tight text-white shadow-[var(--twin-shadow-md)] transition hover:bg-[var(--twin-accent-hover)] active:scale-[0.98]"
+                className="marketing-accent-filled-pill twin-touch-target inline-flex min-h-[2.75rem] items-center justify-center rounded-full bg-[var(--twin-accent)] px-7 text-center text-sm font-bold tracking-tight text-[var(--twin-on-accent)] shadow-[var(--twin-shadow-md)] transition hover:bg-[var(--twin-accent-hover)] active:scale-[0.98]"
               >
                 {t("home.twinForYourJob")}
               </Link>
               <Link
                 href="/register"
-                className="marketing-btn-primary-shadow twin-touch-target inline-flex min-h-[2.75rem] items-center justify-center rounded-full bg-[var(--twin-cta)] px-7 text-center text-sm font-semibold text-white transition hover:bg-[var(--twin-cta-hover)] active:scale-[0.98]"
+                className="marketing-cta-filled-pill marketing-btn-primary-shadow twin-touch-target inline-flex min-h-[2.75rem] items-center justify-center rounded-full bg-[var(--twin-cta)] px-7 text-center text-sm font-semibold text-[var(--twin-on-cta)] transition hover:bg-[var(--twin-cta-hover)] active:scale-[0.98]"
               >
                 {t("home.getStarted")}
               </Link>

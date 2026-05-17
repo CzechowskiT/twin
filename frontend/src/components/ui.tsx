@@ -75,7 +75,7 @@ export function Button({ type = "button", className, ...props }: ButtonHTMLAttri
     <button
       type={type}
       {...props}
-      className={`twin-touch-target w-full max-w-full rounded border-0 bg-[var(--twin-accent)] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--twin-accent-hover)] hover:text-white disabled:cursor-not-allowed disabled:opacity-50 ${className ?? ""}`}
+      className={`twin-touch-target w-full max-w-full rounded border-0 bg-[var(--twin-accent)] px-4 py-2.5 text-sm font-semibold text-[var(--twin-on-accent)] transition hover:bg-[var(--twin-accent-hover)] hover:text-[var(--twin-on-accent)] disabled:cursor-not-allowed disabled:opacity-50 ${className ?? ""}`}
     />
   );
 }
@@ -85,7 +85,7 @@ export function ButtonCta({ type = "button", className, ...props }: ButtonHTMLAt
     <button
       type={type}
       {...props}
-      className={`twin-touch-target w-full max-w-full rounded border-0 bg-[var(--twin-cta)] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--twin-cta-hover)] hover:text-white disabled:cursor-not-allowed disabled:opacity-50 ${className ?? ""}`}
+      className={`twin-touch-target w-full max-w-full rounded border-0 bg-[var(--twin-cta)] px-4 py-2.5 text-sm font-semibold text-[var(--twin-on-cta)] transition hover:bg-[var(--twin-cta-hover)] hover:text-[var(--twin-on-cta)] disabled:cursor-not-allowed disabled:opacity-50 ${className ?? ""}`}
     />
   );
 }
