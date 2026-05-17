@@ -19,8 +19,8 @@ export function normalizeLegalRegion(value: string): LegalRegion {
 export async function fetchJurisdictionHint(opts?: { lat?: number; lon?: number }): Promise<JurisdictionHint> {
   const q = new URLSearchParams();
   if (opts?.lat != null && opts?.lon != null) {
-    q.set("lat", String(opts.lat));
-    q.set("lon", String(opts.lon));
+    q.set("lat", opts.lat.toFixed(6));
+    q.set("lon", opts.lon.toFixed(6));
   }
   const suffix = q.toString() ? `?${q}` : "";
   return apiFetch<JurisdictionHint>(`/api/v1/geo/jurisdiction-hint${suffix}`, { method: "GET" });

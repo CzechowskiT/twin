@@ -39,7 +39,6 @@ export function GdprRouteGuard() {
       ranForPath.current = null;
       return;
     }
-    if (ranForPath.current === normalized) return;
 
     let cancelled = false;
     queueMicrotask(() => {

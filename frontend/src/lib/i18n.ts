@@ -597,6 +597,7 @@ const en = {
     submit: "Continue",
     submitting: "Saving…",
     failed: "Could not save your choice. Try again.",
+    failedIncomplete: "The server responded but consent timestamps look incomplete. Refresh the page or contact support.",
   },
   register: {
     title: "Create account",
@@ -901,6 +902,8 @@ const en = {
     refineDenied: "Location permission was not granted. IP-based region stays in use.",
     refineUnavailable: "Browser location is not available on this device.",
     refineError: "Could not refine region. Try again.",
+    refineUsedNetworkHint:
+      "GPS place lookup did not return a country, so we kept your region from network hints (IP / CDN). You can still continue.",
     bodyEU_EEA:
       "EU/EEA: you may have GDPR rights (access, erasure, portability, objection) and protections around automated decision-making where applicable. Mandatory consumer laws in your country still apply.",
     bodyUK:
@@ -1511,6 +1514,7 @@ const pl: MessageTree = {
     submit: "Kontynuuj",
     submitting: "Zapisywanie…",
     failed: "Nie udało się zapisać wyboru. Spróbuj ponownie.",
+    failedIncomplete: "Serwer odpowiedział, ale znaczniki zgód wyglądają na niepełne. Odśwież stronę lub napisz do supportu.",
   },
   register: {
     title: "Utwórz konto",
@@ -1818,6 +1822,8 @@ const pl: MessageTree = {
     refineDenied: "Brak zgody na lokalizację. Zostaje region z IP.",
     refineUnavailable: "Ta przeglądarka nie udostępnia geolokalizacji.",
     refineError: "Nie udało się doprecyzować regionu. Spróbuj ponownie.",
+    refineUsedNetworkHint:
+      "Odwrotne geokodowanie GPS nie zwróciło kraju, więc zostawiamy region z sieci (IP / CDN). Możesz kontynuować.",
     bodyEU_EEA:
       "UE/EOG: mogą przysługiwać Ci prawa RODO (dostęp, usunięcie, przenoszenie, sprzeciw) oraz ochrona przed wyłącznie zautomatyzowanym podejmowaniem decyzji, tam gdzie ma to zastosowanie. Bezwzględnie obowiązujące przepisy konsumenckie w Twoim kraju nadal obowiązują.",
     bodyUK:

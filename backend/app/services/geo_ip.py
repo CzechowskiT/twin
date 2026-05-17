@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import ipaddress
 import logging
-import re
+import math
 
 import httpx
 from fastapi import Request
@@ -70,38 +70,64 @@ def country_from_ip_whois(ip: str) -> str | None:
     return None
 
 
-def country_from_coordinates(lat: float, lon: float) -> str | None:
-    """Reverse geocode with OpenStreetMap Nominatim (rate-limited; use sparingly)."""
-    try:
-        with httpx.Client(timeout=5.0) as client:
-            r = client.get(
-                _NOMINATIM_URL,
-                params={"lat": lat, "lon": lon, "format": "json", "zoom": 3, "addressdetails": "0"},
-                headers={"User-Agent": _NOMINATIM_UA},
-            )
-            r.raise_for_status()
-            data = r.json()
-    except (httpx.HTTPError, ValueError, TypeError) as e:
-        logger.info("nominatim reverse failed: %s", e)
+def _country_from_nominatim_payload(data: object) -> str | None:
+    """Extract ISO country from Nominatim reverse JSON (shape varies slightly by zoom/version)."""
+    if not isinstance(data, dict):
+        return None
+    if isinstance(data.get("error"), str):
         return None
     addr = data.get("address")
     if isinstance(addr, dict):
         cc = addr.get("country_code")
         if isinstance(cc, str) and len(cc) == 2:
             return cc.upper()
-    # fallback: parse from display_name country code pattern rare
+        iso = addr.get("ISO3166-2-lvl4")
+        if isinstance(iso, str) and len(iso) >= 2 and iso[:2].isalpha():
+            return iso[:2].upper()
     return None
 
 
-_COORD_RE = re.compile(r"^-?\d+(\.\d+)?$")
+def country_from_coordinates(lat: float, lon: float) -> str | None:
+    """Reverse geocode with OpenStreetMap Nominatim (rate-limited; use sparingly)."""
+    headers = {
+        "User-Agent": _NOMINATIM_UA,
+        "Accept": "application/json",
+        "Accept-Language": "en",
+    }
+    params = {"lat": lat, "lon": lon, "format": "json", "zoom": 3, "addressdetails": "1"}
+    for attempt in (0, 1):
+        try:
+            with httpx.Client(timeout=8.0) as client:
+                r = client.get(_NOMINATIM_URL, params=params, headers=headers)
+                if r.status_code in (429, 503) and attempt == 0:
+                    continue
+                r.raise_for_status()
+                data = r.json()
+        except (httpx.HTTPError, ValueError, TypeError) as e:
+            logger.info("nominatim reverse failed (attempt %s): %s", attempt, e)
+            if attempt == 0:
+                continue
+            return None
+        cc = _country_from_nominatim_payload(data)
+        if cc:
+            return cc
+        if attempt == 0:
+            continue
+        return None
 
 
 def parse_coordinate(value: str | None, min_v: float, max_v: float) -> float | None:
-    if value is None or not _COORD_RE.match(value.strip()):
+    """Parse query lat/lon; accepts normal floats and scientific notation from some clients."""
+    if value is None:
+        return None
+    s = str(value).strip()
+    if not s:
         return None
     try:
-        f = float(value)
+        f = float(s)
     except ValueError:
+        return None
+    if math.isnan(f) or math.isinf(f):
         return None
     if not (min_v <= f <= max_v):
         return None

@@ -7,12 +7,17 @@ export type AuthMeCoreConsents = {
   ai_matching_consent_at: string | null;
 };
 
+function consentFieldPresent(v: string | null | undefined): boolean {
+  if (v == null) return false;
+  return String(v).trim().length > 0;
+}
+
 export function hasCoreConsents(me: AuthMeCoreConsents | null | undefined): boolean {
   if (!me) return false;
   return (
-    me.gdpr_consent_at != null &&
-    me.terms_of_service_accepted_at != null &&
-    me.job_data_processing_consent_at != null &&
-    me.ai_matching_consent_at != null
+    consentFieldPresent(me.gdpr_consent_at) &&
+    consentFieldPresent(me.terms_of_service_accepted_at) &&
+    consentFieldPresent(me.job_data_processing_consent_at) &&
+    consentFieldPresent(me.ai_matching_consent_at)
   );
 }

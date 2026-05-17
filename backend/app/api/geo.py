@@ -36,15 +36,14 @@ def jurisdiction_hint(
     lat_f = parse_coordinate(lat, -90.0, 90.0) if lat else None
     lon_f = parse_coordinate(lon, -180.0, 180.0) if lon else None
     if lat_f is not None and lon_f is not None:
-        cc = country_from_coordinates(lat_f, lon_f)
-        if cc:
+        cc_geo = country_from_coordinates(lat_f, lon_f)
+        if cc_geo:
             return JurisdictionHintOut(
-                country_code=cc,
-                legal_region=country_to_legal_region(cc),
+                country_code=cc_geo,
+                legal_region=country_to_legal_region(cc_geo),
                 source="coordinates",
             )
-        return JurisdictionHintOut(country_code=None, legal_region="OTHER", source="coordinates_failed")
-
+        # Reverse geocode failed (timeout, rate limit, ocean tile, …) — fall back to CDN / IP hints.
     cc_cf, _src_cf = country_from_cloudflare(request)
     if cc_cf:
         return JurisdictionHintOut(

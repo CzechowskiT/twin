@@ -11,5 +11,5 @@ class JurisdictionHintOut(BaseModel):
         description="EU_EEA | UK | US | CH | JP | CN | OTHER — drives default legal notices in the UI",
     )
     source: str = Field(
-        description="cloudflare_header | ip_lookup | coordinates | fallback",
+        description="cloudflare_header | ip_lookup | coordinates | fallback | disabled",
     )

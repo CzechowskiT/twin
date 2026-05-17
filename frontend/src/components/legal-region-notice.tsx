@@ -73,7 +73,15 @@ export function LegalRegionNotice() {
             load(h);
             setGeoMsg(null);
           })
-          .catch(() => setGeoMsg(t("legalRegion.refineError")))
+          .catch(async () => {
+            try {
+              const h = await fetchJurisdictionHint();
+              load(h);
+              setGeoMsg(t("legalRegion.refineUsedNetworkHint"));
+            } catch {
+              setGeoMsg(t("legalRegion.refineError"));
+            }
+          })
           .finally(() => setBusy(false));
       },
       () => {
