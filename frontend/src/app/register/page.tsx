@@ -137,15 +137,24 @@ function RegisterPageContent() {
     return (
       <Shell rail>
         <Card>
+          {safeNext === "/" ? (
+            <p className="mb-6 text-sm text-[var(--twin-muted-strong)]">
+              <Link href="/" className="twin-link font-semibold text-[var(--foreground)]">
+                {t("site.footerHome")}
+              </Link>
+            </p>
+          ) : null}
           <h1 className="mb-2 text-2xl font-semibold">{t("consentGdpr.title")}</h1>
           <p className="twin-muted mb-6 text-sm">{t("consentGdpr.lead")}</p>
           <LegalRegionNotice />
           <PostLoginCoreConsentForm nextPath={safeNext} />
-          <p className="twin-muted mt-6 text-center text-sm">
-            <Link href="/" className="twin-link">
-              {t("site.footerHome")}
-            </Link>
-          </p>
+          {safeNext !== "/" ? (
+            <p className="twin-muted mt-6 text-center text-sm">
+              <Link href="/" className="twin-link">
+                {t("site.footerHome")}
+              </Link>
+            </p>
+          ) : null}
         </Card>
       </Shell>
     );

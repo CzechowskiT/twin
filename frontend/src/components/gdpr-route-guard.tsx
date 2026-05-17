@@ -22,9 +22,8 @@ const GDPR_SKIP_PATHS = new Set([
   "/admin/beta",
 ]);
 
-/** Public marketing — logged-in users without consents may browse here without `/consent/gdpr`. */
-const GDPR_SKIP_MARKETING = new Set([
-  "/",
+/** Marketing / public site — prefix match (handles subpaths). `/` handled separately. */
+const PUBLIC_MARKETING_PREFIXES: readonly string[] = [
   "/about",
   "/case-studies",
   "/faq",
@@ -37,19 +36,34 @@ const GDPR_SKIP_MARKETING = new Set([
   "/for-companies",
   "/for-recruiters",
   "/for-candidates",
-]);
+];
 
-function shouldSkipGdprGuard(path: string): boolean {
-  if (GDPR_SKIP_PATHS.has(path)) return true;
-  if (GDPR_SKIP_MARKETING.has(path)) return true;
+export function normalizePathnameForGdpr(pathname: string | null | undefined): string {
+  const raw = (pathname ?? "").trim();
+  const noQuery = (raw.split("?")[0] ?? "").trim();
+  let base = noQuery === "" ? "/" : noQuery.startsWith("/") ? noQuery : `/${noQuery}`;
+  if (base !== "/" && base.endsWith("/")) base = base.slice(0, -1);
+  if (base === "") return "/";
+  return base;
+}
+
+function isPublicMarketingPath(normalized: string): boolean {
+  if (normalized === "/") return true;
+  return PUBLIC_MARKETING_PREFIXES.some(
+    (prefix) => normalized === prefix || normalized.startsWith(`${prefix}/`),
+  );
+}
+
+function shouldSkipGdprGuard(normalized: string): boolean {
+  if (GDPR_SKIP_PATHS.has(normalized)) return true;
+  if (isPublicMarketingPath(normalized)) return true;
   return false;
 }
 
 export function GdprRouteGuard() {
-  const pathname = usePathname() ?? "/";
+  const pathname = usePathname();
   const router = useRouter();
-  const raw = pathname.split("?")[0] ?? "/";
-  const normalized = raw !== "/" && raw.endsWith("/") ? raw.slice(0, -1) : raw;
+  const normalized = normalizePathnameForGdpr(pathname);
   const ranForPath = useRef<string | null>(null);
 
   useEffect(() => {
