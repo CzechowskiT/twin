@@ -598,6 +598,12 @@ const en = {
     submitting: "Saving…",
     failed: "Could not save your choice. Try again.",
     failedIncomplete: "The server responded but consent timestamps look incomplete. Refresh the page or contact support.",
+    checkAllRequired: "Check all required consents",
+    checkAllRequiredHint:
+      "Selects the four mandatory boxes only. The optional marketing email choice below stays unchanged until you tick it yourself.",
+    marketingOptIn: "Email me about new features, releases, and practical tips (optional).",
+    marketingHint:
+      "Separate legal basis from core service and matching. You can turn this off anytime in your profile. We use it sparingly for product news, not cold sales blasts.",
   },
   register: {
     title: "Create account",
@@ -1515,6 +1521,12 @@ const pl: MessageTree = {
     submitting: "Zapisywanie…",
     failed: "Nie udało się zapisać wyboru. Spróbuj ponownie.",
     failedIncomplete: "Serwer odpowiedział, ale znaczniki zgód wyglądają na niepełne. Odśwież stronę lub napisz do supportu.",
+    checkAllRequired: "Zaznacz wszystkie wymagane zgody",
+    checkAllRequiredHint:
+      "Zaznacza tylko cztery obowiązkowe pola. Opcjonalna zgoda na e-mail marketingowy poniżej nie zmienia się, dopóki sam jej nie zaznaczysz.",
+    marketingOptIn: "Chcę e-maile o nowych funkcjach, wydaniach i praktycznych wskazówkach (opcjonalnie).",
+    marketingHint:
+      "Osobna podstawa prawna od działania usługi i dopasowania ofert. Wyłączysz to w każdej chwili w profilu. Rzadko: nowości produktowe, bez zimnej sprzedaży.",
   },
   register: {
     title: "Utwórz konto",

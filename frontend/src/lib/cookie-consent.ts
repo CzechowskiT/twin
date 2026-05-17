@@ -39,6 +39,26 @@ export function hasCookieConsentDecision(): boolean {
   return readCookieConsent() !== null;
 }
 
+/** Marketing home and public pages must not show the floating cookie banner. */
+const COOKIE_BANNER_PATHS = new Set([
+  "/register",
+  "/login",
+  "/forgot-password",
+  "/reset-password",
+  "/consent/gdpr",
+  "/auth/callback",
+]);
+
+export function normalizePathnameForCookieBanner(pathname: string): string {
+  const raw = pathname.split("?")[0] || "/";
+  return raw !== "/" && raw.endsWith("/") ? raw.slice(0, -1) : raw;
+}
+
+export function shouldShowCookieBannerOnPath(pathname: string | null): boolean {
+  if (!pathname) return false;
+  return COOKIE_BANNER_PATHS.has(normalizePathnameForCookieBanner(pathname));
+}
+
 export function writeCookieConsent(choice: { analytics: boolean; marketing: boolean }): void {
   const record: CookieConsentV1 = {
     v: 1,

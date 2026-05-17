@@ -242,6 +242,9 @@ def record_gdpr_consent(
     user.terms_of_service_accepted_at = now
     user.job_data_processing_consent_at = now
     user.ai_matching_consent_at = now
+    if body.marketing_emails_opt_in is not None:
+        user.marketing_emails_opt_in = bool(body.marketing_emails_opt_in)
+        user.marketing_emails_opt_in_at = now if body.marketing_emails_opt_in else None
     db.add(user)
     db.commit()
     db.refresh(user)

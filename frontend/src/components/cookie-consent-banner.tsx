@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
@@ -8,26 +9,31 @@ import { Button } from "@/components/ui";
 import {
   COOKIE_CONSENT_CLEARED_EVENT,
   hasCookieConsentDecision,
+  shouldShowCookieBannerOnPath,
   writeCookieConsent,
 } from "@/lib/cookie-consent";
 
 export function CookieConsentBanner() {
   const { t } = useTranslation();
+  const pathname = usePathname();
   const [visible, setVisible] = useState<boolean | null>(null);
 
   useEffect(() => {
     queueMicrotask(() => {
-      setVisible(!hasCookieConsentDecision());
+      const onPath = shouldShowCookieBannerOnPath(pathname);
+      setVisible(onPath && !hasCookieConsentDecision());
     });
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     const onCleared = () => {
-      queueMicrotask(() => setVisible(true));
+      queueMicrotask(() => {
+        if (shouldShowCookieBannerOnPath(pathname)) setVisible(true);
+      });
     };
     window.addEventListener(COOKIE_CONSENT_CLEARED_EVENT, onCleared);
     return () => window.removeEventListener(COOKIE_CONSENT_CLEARED_EVENT, onCleared);
-  }, []);
+  }, [pathname]);
 
   if (visible === null || !visible) return null;
 

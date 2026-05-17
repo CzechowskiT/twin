@@ -46,6 +46,10 @@ class GdprConsentIn(BaseModel):
     accept_terms_of_service: bool = Field(description="Terms of Service")
     accept_job_data_processing: bool = Field(description="Third-party job listings for your account")
     accept_ai_matching: bool = Field(description="AI-assisted job matching")
+    marketing_emails_opt_in: bool | None = Field(
+        default=None,
+        description="If set, updates optional marketing email opt-in; if omitted, existing preference is unchanged.",
+    )
 
 
 class UserMarketingPreference(BaseModel):
