@@ -17,6 +17,10 @@ export function Header() {
   const mobileMenuRef = useRef<HTMLDetailsElement>(null);
   const [hasSession, setHasSession] = useState(false);
   const calendarActive = pathname === "/dashboard/calendar" || pathname.startsWith("/dashboard/calendar/");
+  /** Main dashboard and subpages except calendar (calendar has its own green pill). */
+  const dashboardSectionActive =
+    pathname === "/dashboard" ||
+    (pathname.startsWith("/dashboard/") && !pathname.startsWith("/dashboard/calendar"));
 
   useEffect(() => {
     const sync = () => setHasSession(Boolean(getToken()));
@@ -53,8 +57,9 @@ export function Header() {
   const demoClassName =
     "twin-nav-demo-pill twin-touch-target inline-flex max-w-[10.5rem] shrink-0 items-center justify-center gap-2 whitespace-normal rounded-full bg-[var(--twin-accent)] px-3 py-2 text-center text-[10px] font-extrabold uppercase leading-tight tracking-wide text-[var(--twin-on-accent)] shadow-[0_4px_14px_rgb(31_77_64_/0.45)] ring-2 ring-white/90 ring-offset-2 ring-offset-white transition hover:bg-[var(--twin-accent-hover)] hover:shadow-[0_6px_20px_rgb(22_56_46_/0.42)] sm:max-w-[16rem] sm:px-5 sm:py-2.5 sm:text-[12px] sm:leading-snug md:text-[13px]";
 
-  /** Same chrome as Demo — primary nav pill for calendar (dashboard). */
+  /** Same chrome as Demo — primary nav pills for calendar and main dashboard. */
   const calendarNavPillClassName = demoClassName;
+  const dashboardNavPillClassName = demoClassName;
 
   const linkClass = "twin-nav-link whitespace-nowrap";
 
@@ -113,7 +118,12 @@ export function Header() {
           >
             {hasSession ? (
               <>
-                <Link href="/dashboard" className={`${linkClass} font-medium`}>
+                <Link
+                  href="/dashboard"
+                  className={`${dashboardNavPillClassName} ${dashboardSectionActive ? "ring-4 ring-white/95 ring-offset-2 ring-offset-[var(--twin-header-bg,var(--background))]" : ""}`}
+                  aria-current={dashboardSectionActive ? "page" : undefined}
+                >
+                  <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white/90 shadow-sm" aria-hidden />
                   {t("nav.dashboard")}
                 </Link>
                 <button type="button" onClick={logout} className={logoutButtonClass}>
@@ -173,6 +183,17 @@ export function Header() {
                     <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white/90 shadow-sm" aria-hidden />
                     {t("dashboard.calendarLink")}
                   </Link>
+                  {hasSession ? (
+                    <Link
+                      href="/dashboard"
+                      onClick={closeMobileMenu}
+                      className={`${dashboardNavPillClassName} flex w-full justify-center ${dashboardSectionActive ? "ring-4 ring-white/95 ring-offset-2 ring-offset-[var(--twin-card)]" : ""}`}
+                      aria-current={dashboardSectionActive ? "page" : undefined}
+                    >
+                      <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white/90 shadow-sm" aria-hidden />
+                      {t("nav.dashboard")}
+                    </Link>
+                  ) : null}
                 </div>
                 <p className="mt-2 border-t border-[var(--twin-border)] px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
                   {t("site.footerCompany")}
@@ -191,22 +212,13 @@ export function Header() {
                   {t("site.footerExplore")}
                 </p>
                 {hasSession ? (
-                  <>
-                    <Link
-                      href="/dashboard"
-                      onClick={closeMobileMenu}
-                      className="twin-touch-target twin-nav-link block rounded px-3 py-2.5 text-sm hover:bg-[var(--twin-accent-muted)]"
-                    >
-                      {t("nav.dashboard")}
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={logout}
-                      className="twin-touch-target mt-1 block w-full rounded border border-[var(--twin-border)] bg-[var(--twin-card)] px-3 py-2.5 text-left text-sm font-semibold text-[var(--twin-accent)] hover:bg-[var(--twin-accent-muted)]"
-                    >
-                      {t("dashboard.logout")}
-                    </button>
-                  </>
+                  <button
+                    type="button"
+                    onClick={logout}
+                    className="twin-touch-target mt-1 block w-full rounded border border-[var(--twin-border)] bg-[var(--twin-card)] px-3 py-2.5 text-left text-sm font-semibold text-[var(--twin-accent)] hover:bg-[var(--twin-accent-muted)]"
+                  >
+                    {t("dashboard.logout")}
+                  </button>
                 ) : (
                   app.map((item) => (
                     <Link

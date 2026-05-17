@@ -362,7 +362,7 @@ const en = {
     appFeedbackSummary: "Summary",
     scrapeFailed: "Scrape failed",
     scrapeNetworkError:
-      "Could not reach the API (network). Check NEXT_PUBLIC_API_URL on Vercel, that Railway is up, and your connection. Long synchronous scrapes time out through the dashboard proxy — this action uses the async queue instead.",
+      "Could not reach the API (network). If the address in your browser is a long vercel.app link with “git” in the name, that is a preview build: open your normal production site instead (or turn off Vercel → Settings → Deployment Protection for previews). On production, check TWIN_API_BASE_URL or NEXT_PUBLIC_API_URL, that Railway is Active, and your connection. This button uses the async queue, not a long blocking scrape.",
     scrapeQueued:
       "Scrape queued. New listings appear after Celery workers finish — refresh the job feed in a minute or two (or check worker logs on the API host).",
     scrapeFinished: "Scrape finished",
@@ -1496,7 +1496,7 @@ const pl: MessageTree = {
     appFeedbackSummary: "Podsumowanie",
     scrapeFailed: "Pobieranie nie powiodło się",
     scrapeNetworkError:
-      "Brak połączenia z API (sieć). Sprawdź NEXT_PUBLIC_API_URL na Vercel, czy Railway działa i połączenie. Długi synchroniczny scraping przez proxy panelu się wykrzacza — to polecenie używa kolejki asynchronicznej.",
+      "Brak połączenia z API (sieć). Jeśli w pasku adresu masz długi link vercel.app z „git” w nazwie, to podgląd (preview): wejdź na zwykłą stronę produkcyjną albo wyłącz Vercel → Settings → Deployment Protection dla preview. Na produkcji sprawdź TWIN_API_BASE_URL lub NEXT_PUBLIC_API_URL, czy Railway jest Active i internet. To polecenie idzie w kolejkę, nie blokuje na długo.",
     scrapeQueued:
       "Pobieranie zakolejkowane. Nowe oferty pojawią się po zakończeniu zadań Celery — odśwież feed za minutę–dwie (albo zajrzyj w logi workerów na hoście API).",
     scrapeFinished: "Pobieranie zakończone",
