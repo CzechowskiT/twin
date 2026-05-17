@@ -15,7 +15,7 @@ from app.core.deps import get_current_user
 from app.core.security import create_access_token, decode_access_token
 from app.database.models import Application, Candidate, ScheduledInterview, User, UserGoogleCalendar
 from app.database.session import get_db
-from app.services.calendar_scheduling import find_next_slot_iso, freebusy_overlaps_slot
+from app.services.calendar_scheduling import find_free_slots_iso, find_next_slot_iso, freebusy_overlaps_slot
 from app.services.google_calendar_api import GoogleCalendarApiError, insert_primary_event, query_freebusy
 from app.services.google_calendar_oauth import (
     GoogleCalendarOAuthError,
@@ -260,6 +260,15 @@ class NextSlotOut(BaseModel):
     end_iso: str
 
 
+class CalendarSlotOut(BaseModel):
+    start_iso: str
+    end_iso: str
+
+
+class CalendarSlotsOut(BaseModel):
+    slots: list[CalendarSlotOut]
+
+
 class ScheduleInterviewIn(BaseModel):
     application_id: int | None = None
     company_name: str = Field(..., min_length=1, max_length=255)
@@ -291,6 +300,33 @@ class ScheduledInterviewOut(BaseModel):
     interview_type: str
     status: str
     calendar_event_id: str | None
+
+
+@router.get("/google/slots", response_model=CalendarSlotsOut)
+def google_calendar_slots(
+    duration_minutes: int = Query(60, ge=15, le=480),
+    days_ahead: int = Query(14, ge=1, le=60),
+    limit: int = Query(10, ge=1, le=50),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> CalendarSlotsOut:
+    """Several suggested interview windows from primary-calendar free/busy (same rules as next slot)."""
+    access = _calendar_access_token(db, current_user.id)
+    now = datetime.now(timezone.utc)
+    time_min = now.isoformat().replace("+00:00", "Z")
+    time_max = (now + timedelta(days=days_ahead)).isoformat().replace("+00:00", "Z")
+    try:
+        raw = query_freebusy(access, time_min, time_max)
+    except GoogleCalendarApiError as e:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Calendar free/busy failed") from e
+    pairs = find_free_slots_iso(
+        raw,
+        duration_minutes=duration_minutes,
+        days_ahead=days_ahead,
+        now=now,
+        max_slots=limit,
+    )
+    return CalendarSlotsOut(slots=[CalendarSlotOut(start_iso=a, end_iso=b) for a, b in pairs])
 
 
 @router.get("/google/slots/next", response_model=NextSlotOut)

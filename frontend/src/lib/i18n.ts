@@ -539,6 +539,10 @@ const en = {
     calendarScheduleNoSlot: "No free slot found in range.",
     calendarScheduleConflict: "That time overlaps something on your calendar.",
     calendarScheduleSaved: "Interview saved and added to your calendar.",
+    calendarSlotsTitle: "More suggested slots",
+    calendarSlotsGo: "Load several options",
+    calendarSlotsEmpty: "No free slots in this window — your calendar may be fully booked for MVP weekday rules.",
+    calendarSlotsHint: "Tap a row to copy its start and end into the form above.",
     identityLoading: "Loading…",
     identityPageTitle: "Identity verification",
     identityPageLead:
@@ -1664,6 +1668,11 @@ const pl: MessageTree = {
     calendarScheduleNoSlot: "Brak wolnego slotu w zadanym zakresie.",
     calendarScheduleConflict: "Ten czas koliduje z kalendarzem.",
     calendarScheduleSaved: "Rozmowa zapisana i dodana do kalendarza.",
+    calendarSlotsTitle: "Więcej proponowanych slotów",
+    calendarSlotsGo: "Wczytaj kilka opcji",
+    calendarSlotsEmpty:
+      "Brak wolnych slotów w tym oknie — kalendarz może być pełny przy zasadach MVP (pn–pt, UTC).",
+    calendarSlotsHint: "Kliknij wiersz, żeby skopiować start i koniec do formularza powyżej.",
     identityLoading: "Ładowanie…",
     identityPageTitle: "Weryfikacja tożsamości",
     identityPageLead:

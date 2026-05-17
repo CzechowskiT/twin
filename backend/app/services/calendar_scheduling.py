@@ -30,14 +30,15 @@ def _fmt_iso_z(dt: datetime) -> str:
     return dt.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
-def find_next_slot_iso(
+def find_free_slots_iso(
     fb: dict[str, Any],
     *,
     duration_minutes: int,
     days_ahead: int,
     now: datetime | None = None,
-) -> tuple[str, str] | None:
-    """Next 30-min-aligned slot Mon–Fri 09:00–17:00 UTC that does not overlap freeBusy."""
+    max_slots: int = 10,
+) -> list[tuple[str, str]]:
+    """Up to `max_slots` non-overlapping 30-min-aligned windows Mon–Fri 09:00–17:00 UTC."""
     now = now or datetime.utcnow().replace(tzinfo=timezone.utc)
     if now.tzinfo is None:
         now = now.replace(tzinfo=timezone.utc)
@@ -52,11 +53,12 @@ def find_next_slot_iso(
     if t <= now:
         t = now + step
 
+    slots: list[tuple[str, str]] = []
     while t + duration <= horizon:
         while t.weekday() >= 5:
             t = (t + timedelta(days=1)).replace(hour=9, minute=0, second=0, microsecond=0)
             if t + duration > horizon:
-                return None
+                return slots
 
         day_open = t.replace(hour=9, minute=0, second=0, microsecond=0)
         day_close = t.replace(hour=17, minute=0, second=0, microsecond=0)
@@ -66,6 +68,26 @@ def find_next_slot_iso(
             t = (t + timedelta(days=1)).replace(hour=9, minute=0, second=0, microsecond=0)
             continue
         if not freebusy_overlaps_slot(fb, t, t + duration):
-            return _fmt_iso_z(t), _fmt_iso_z(t + duration)
+            slots.append((_fmt_iso_z(t), _fmt_iso_z(t + duration)))
+            if len(slots) >= max_slots:
+                return slots
         t += step
-    return None
+    return slots
+
+
+def find_next_slot_iso(
+    fb: dict[str, Any],
+    *,
+    duration_minutes: int,
+    days_ahead: int,
+    now: datetime | None = None,
+) -> tuple[str, str] | None:
+    """First 30-min-aligned slot Mon–Fri 09:00–17:00 UTC that does not overlap freeBusy."""
+    found = find_free_slots_iso(
+        fb,
+        duration_minutes=duration_minutes,
+        days_ahead=days_ahead,
+        now=now,
+        max_slots=1,
+    )
+    return found[0] if found else None

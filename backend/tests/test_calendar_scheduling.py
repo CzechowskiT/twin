@@ -2,7 +2,7 @@
 
 from datetime import datetime, timezone
 
-from app.services.calendar_scheduling import find_next_slot_iso, freebusy_overlaps_slot
+from app.services.calendar_scheduling import find_free_slots_iso, find_next_slot_iso, freebusy_overlaps_slot
 
 
 def _fb(busy: list[tuple[str, str]]) -> dict:
@@ -45,3 +45,15 @@ def test_find_next_slot_from_saturday_jumps_to_monday() -> None:
     start_dt = datetime.fromisoformat(pair[0].replace("Z", "+00:00"))
     assert start_dt.weekday() == 0  # Monday
     assert start_dt.date() == datetime(2026, 5, 18, tzinfo=timezone.utc).date()
+
+
+def test_find_free_slots_returns_several() -> None:
+    now = datetime(2026, 5, 18, 9, 0, 0, tzinfo=timezone.utc)
+    fb = _fb([("2026-05-18T10:00:00Z", "2026-05-18T10:30:00Z")])
+    slots = find_free_slots_iso(fb, duration_minutes=60, days_ahead=3, now=now, max_slots=4)
+    assert len(slots) >= 2
+    for start, end in slots:
+        assert start.endswith("Z") and end.endswith("Z")
+        assert datetime.fromisoformat(start.replace("Z", "+00:00")) < datetime.fromisoformat(
+            end.replace("Z", "+00:00")
+        )

@@ -22,6 +22,8 @@ type EventOut = { id: string | null; html_link: string | null };
 
 type NextSlotOut = { start_iso: string; end_iso: string };
 
+type CalendarSlotsPayload = { slots: { start_iso: string; end_iso: string }[] };
+
 type ScheduledInterview = {
   id: number;
   company_name: string;
@@ -79,6 +81,7 @@ export default function DashboardCalendarPage() {
   const [eventResult, setEventResult] = useState<EventOut | null>(null);
   const [interviews, setInterviews] = useState<ScheduledInterview[]>([]);
   const [scheduleNote, setScheduleNote] = useState<string | null>(null);
+  const [suggestedSlots, setSuggestedSlots] = useState<{ start_iso: string; end_iso: string }[] | null>(null);
   const [companyName, setCompanyName] = useState("");
   const [jobTitle, setJobTitle] = useState("");
   const [interviewerEmail, setInterviewerEmail] = useState("");
@@ -160,6 +163,8 @@ export default function DashboardCalendarPage() {
       setEventResult(null);
       setInterviews([]);
       setScheduleNote(null);
+      setSuggestedSlots(null);
+      setSuggestedSlots(null);
       await load();
     } catch (e) {
       setActionError(true);
@@ -230,6 +235,7 @@ export default function DashboardCalendarPage() {
     if (!token) return;
     setActionBusy("suggest");
     setScheduleNote(null);
+    setSuggestedSlots(null);
     setActionError(false);
     try {
       const out = await apiFetch<NextSlotOut>("/api/v1/calendar/google/slots/next?duration_minutes=60&days_ahead=14", {}, token);
@@ -242,6 +248,29 @@ export default function DashboardCalendarPage() {
         setActionError(true);
         console.warn("[calendar] suggest slot failed", e);
       }
+    } finally {
+      setActionBusy(null);
+    }
+  }
+
+  async function loadSlotOptions() {
+    const token = getToken();
+    if (!token) return;
+    setActionBusy("slots");
+    setScheduleNote(null);
+    setSuggestedSlots(null);
+    setActionError(false);
+    try {
+      const out = await apiFetch<CalendarSlotsPayload>(
+        "/api/v1/calendar/google/slots?duration_minutes=60&days_ahead=14&limit=8",
+        {},
+        token,
+      );
+      setSuggestedSlots(out.slots);
+      if (!out.slots.length) setScheduleNote(t("dashboard.calendarSlotsEmpty"));
+    } catch (e) {
+      setActionError(true);
+      console.warn("[calendar] load slots failed", e);
     } finally {
       setActionBusy(null);
     }
@@ -481,10 +510,42 @@ export default function DashboardCalendarPage() {
                 >
                   {actionBusy === "suggest" ? "…" : t("dashboard.calendarScheduleSuggest")}
                 </Button>
+                <Button
+                  type="button"
+                  className="twin-touch-target twin-btn-secondary"
+                  disabled={Boolean(actionBusy)}
+                  onClick={() => void loadSlotOptions()}
+                >
+                  {actionBusy === "slots" ? "…" : t("dashboard.calendarSlotsGo")}
+                </Button>
                 <Button type="button" className="twin-touch-target" disabled={Boolean(actionBusy)} onClick={() => void saveInterview()}>
                   {actionBusy === "schedule" ? "…" : t("dashboard.calendarScheduleSubmit")}
                 </Button>
               </div>
+              {suggestedSlots && suggestedSlots.length > 0 ? (
+                <div className="mt-4 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-2)] p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
+                    {t("dashboard.calendarSlotsTitle")}
+                  </p>
+                  <p className="twin-muted mt-1 text-xs leading-relaxed">{t("dashboard.calendarSlotsHint")}</p>
+                  <ul className="mt-2 space-y-1">
+                    {suggestedSlots.map((s) => (
+                      <li key={`${s.start_iso}-${s.end_iso}`}>
+                        <button
+                          type="button"
+                          className="w-full rounded-md border border-transparent px-2 py-1.5 text-left text-sm text-[var(--foreground)] hover:border-[var(--twin-border)] hover:bg-[var(--twin-surface-raised)]"
+                          onClick={() => {
+                            setStartLocal(isoToDatetimeLocalValue(s.start_iso));
+                            setEndLocal(isoToDatetimeLocalValue(s.end_iso));
+                          }}
+                        >
+                          {formatInterviewRange(s.start_iso, s.end_iso, loc)}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
               {scheduleNote ? (
                 <p className="text-sm text-[var(--twin-muted-strong)]" role="status">
                   {scheduleNote}
