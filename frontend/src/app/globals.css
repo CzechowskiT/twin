@@ -535,7 +535,8 @@ html[data-marketing-surface="studio"] .twin-app-read-pane {
   padding: 0.125rem 0.5rem;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #ffffff;
+  /* Use `--twin-on-accent`: studio accent fill is mint — white label vanishes. */
+  color: var(--twin-on-accent);
 }
 
 .twin-card-panel {
