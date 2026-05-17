@@ -7,7 +7,8 @@
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
-watchPatterns = ["backend/**"]
+# Paths are relative to the service root directory (set `backend` in Railway UI).
+watchPatterns = ["app/**", "alembic/**", "scripts/**", "requirements.txt", "Dockerfile", "alembic.ini"]
 
 [deploy]
 healthcheckPath = "/api/v1/health"
