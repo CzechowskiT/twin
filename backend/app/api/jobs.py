@@ -4,8 +4,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user
-from app.database.models import Job, User
+from app.database.models import Candidate, Job, User
 from app.database.session import get_db
+from app.matching.matcher import calculate_match_score
 from app.schemas.job import (
     BoardListOut,
     BoardScrapeResult,
@@ -15,6 +16,7 @@ from app.schemas.job import (
     ScrapeTaskOut,
 )
 from app.services.job_query import SORT_COMPANY, SORT_NEWEST, SORT_SALARY, apply_job_filters, job_filter_options
+from app.services.matching_service import candidate_to_dict, job_to_dict
 from app.scrapers.registry import GLOBAL_BOARD_SPECS, list_boards
 from app.tasks.scrape_tasks import (
     scrape_all_boards_task,
@@ -91,7 +93,19 @@ def list_jobs(
     )
     total = query.count()
     items = query.offset(skip).limit(limit).all()
-    return JobListOut(items=items, total=total)
+
+    candidate = db.query(Candidate).filter(Candidate.user_id == _user.id).first()
+    cand_dict = candidate_to_dict(candidate) if candidate else None
+    out_items: list[JobOut] = []
+    for job in items:
+        base = JobOut.model_validate(job, from_attributes=True)
+        if cand_dict is None:
+            out_items.append(base)
+            continue
+        raw = float(calculate_match_score(cand_dict, job_to_dict(job)))
+        out_items.append(base.model_copy(update={"score": raw}))
+
+    return JobListOut(items=out_items, total=total)
 
 
 @router.post("/scrape/all", response_model=ScrapeAllOut)

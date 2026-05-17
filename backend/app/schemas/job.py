@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class JobOut(BaseModel):
@@ -16,6 +16,7 @@ class JobOut(BaseModel):
     url: str
     is_validated: bool
     scraped_at: datetime
+    score: float | None = Field(default=None, description="Match vs current user's profile (0–100); null without profile.")
 
     model_config = {"from_attributes": True}
 

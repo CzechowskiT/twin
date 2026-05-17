@@ -11,7 +11,7 @@ export type JobRow = {
   location: string | null;
   url: string;
   job_board: string;
-  score?: number;
+  score?: number | null;
   salary_min?: number | null;
   salary_max?: number | null;
 };
@@ -72,7 +72,9 @@ export function JobList({
             >
               <div className="flex flex-wrap items-start gap-2">
                 {showScore && item.score != null && (
-                  <span className="twin-badge shrink-0">{item.score}%</span>
+                  <span className="twin-badge shrink-0" title={t("dashboard.matchPercentTitle")}>
+                    {Math.round(item.score)}%
+                  </span>
                 )}
                 {status && (
                   <span className="shrink-0 rounded bg-[var(--twin-accent-muted)] px-2 py-0.5 text-xs font-medium text-[var(--twin-accent)]">

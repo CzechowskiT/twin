@@ -46,6 +46,7 @@ type JobItem = {
   url: string;
   salary_min: number | null;
   salary_max: number | null;
+  score?: number | null;
 };
 type JobList = { items: JobItem[]; total: number };
 type MatchItem = {
@@ -696,6 +697,7 @@ export default function DashboardPage() {
         />
         <JobList
           items={jobs?.items ?? []}
+          showScore={hasProfile}
           applicationStatus={applicationByJobId}
           onApply={hasProfile ? applyToJob : undefined}
           onAutoApply={hasProfile ? autoApplyToJob : undefined}

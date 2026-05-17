@@ -119,7 +119,7 @@ const en = {
   },
   home: {
     tagline: "AI career twin. The market keeps moving when you step away.",
-    title: "You live IRL. Your pipeline doesn’t clock out.",
+    title: "You live in real life. Your pipeline doesn’t clock out.",
     heroHook:
       "Let the listings find you. Step away, come back, and the tedious parts have already moved.",
     description:
@@ -297,6 +297,7 @@ const en = {
     regionAsiaPacific: "Asia-Pacific",
     regionGlobal: "Global",
     topMatches: "Top matches",
+    matchPercentTitle: "Match score vs your profile (0–100%)",
     jobs: "Jobs",
     noJobs: "No jobs yet. Run Auto scrap above (if enabled) or ask an admin to seed listings.",
     noJobsNoScrapeUi:
@@ -1377,6 +1378,7 @@ const pl: MessageTree = {
     regionAsiaPacific: "Azja i Pacyfik",
     regionGlobal: "Globalne",
     topMatches: "Najlepsze dopasowania",
+    matchPercentTitle: "Dopasowanie do profilu (0–100%)",
     jobs: "Oferty",
     noJobs: "Brak ofert. Uruchom Auto scrap powyżej (jeśli włączone) lub poproś administratora o dane.",
     noJobsNoScrapeUi:
