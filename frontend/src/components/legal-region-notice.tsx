@@ -5,6 +5,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "@/components/language-provider";
 import { Button } from "@/components/ui";
 import {
+  clearJurisdictionHintCache,
+  fetchJurisdictionHint,
   getJurisdictionHintCached,
   normalizeLegalRegion,
   type JurisdictionHint,
@@ -50,6 +52,7 @@ export function LegalRegionNotice() {
         if (!cancelled) load(h);
       })
       .catch(() => {
+        clearJurisdictionHintCache();
         if (!cancelled) load({ country_code: null, legal_region: "OTHER", source: "fallback" });
       });
     return () => {
@@ -76,7 +79,7 @@ export function LegalRegionNotice() {
           })
           .catch(async () => {
             try {
-              const h = await getJurisdictionHintCached();
+              const h = await fetchJurisdictionHint();
               load(h);
               setGeoMsg(t("legalRegion.refineUsedNetworkHint"));
             } catch {

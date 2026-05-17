@@ -7,17 +7,15 @@ import { LinkedInLoginButton } from "@/components/linkedin-login-button";
 import { LinkedInSetupHint } from "@/components/linkedin-setup-hint";
 import { LegalRegionNotice } from "@/components/legal-region-notice";
 import { OAuthWebButtons } from "@/components/oauth-web-buttons";
-import { PostLoginCoreConsentForm } from "@/components/post-login-core-consent-form";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Input, Label, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { getToken, setToken } from "@/lib/auth";
-import { hasCoreConsents, type AuthMeCoreConsents } from "@/lib/core-consents";
 import { fetchOAuthProviderStatus, type OAuthProviderStatus } from "@/lib/oauth-auth";
 
 type TokenResponse = { access_token: string };
 
-type SessionPhase = "boot" | "anon" | "consent" | "gone";
+type SessionPhase = "boot" | "anon" | "gone";
 
 function RegisterPageContent() {
   const router = useRouter();
@@ -42,14 +40,10 @@ function RegisterPageContent() {
     }
     void (async () => {
       try {
-        const me = await apiFetch<AuthMeCoreConsents>("/api/v1/auth/me", {}, token);
+        await apiFetch("/api/v1/auth/me", {}, token);
         if (cancelled) return;
-        if (hasCoreConsents(me)) {
-          setSessionPhase("gone");
-          router.replace(safeNext);
-          return;
-        }
-        setSessionPhase("consent");
+        setSessionPhase("gone");
+        router.replace(safeNext);
       } catch {
         if (!cancelled) setSessionPhase("anon");
       }
@@ -81,6 +75,21 @@ function RegisterPageContent() {
 
   const displayError = error ?? oauthUrlError;
 
+  const attributionFromUrl = useMemo(() => {
+    const ref = searchParams.get("ref")?.trim();
+    const utm_source = searchParams.get("utm_source")?.trim();
+    const utm_medium = searchParams.get("utm_medium")?.trim();
+    const utm_campaign = searchParams.get("utm_campaign")?.trim();
+    const utm_content = searchParams.get("utm_content")?.trim();
+    const out: Record<string, string> = {};
+    if (ref) out.ref = ref.slice(0, 128);
+    if (utm_source) out.utm_source = utm_source.slice(0, 128);
+    if (utm_medium) out.utm_medium = utm_medium.slice(0, 128);
+    if (utm_campaign) out.utm_campaign = utm_campaign.slice(0, 128);
+    if (utm_content) out.utm_content = utm_content.slice(0, 128);
+    return out;
+  }, [searchParams]);
+
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
@@ -95,6 +104,7 @@ function RegisterPageContent() {
     }
     setLoading(true);
     try {
+      const referredRaw = String(form.get("referred_by_note") ?? "").trim();
       await apiFetch("/api/v1/auth/register", {
         method: "POST",
         body: JSON.stringify({
@@ -105,6 +115,8 @@ function RegisterPageContent() {
           job_data_processing_consent: true,
           ai_matching_consent: true,
           marketing_emails_opt_in: form.get("marketing_emails_opt_in") === "on",
+          ...attributionFromUrl,
+          ...(referredRaw ? { referred_by_note: referredRaw.slice(0, 500) } : {}),
         }),
       });
       const token = await apiFetch<TokenResponse>("/api/v1/auth/login/json", {
@@ -133,33 +145,6 @@ function RegisterPageContent() {
     );
   }
 
-  if (sessionPhase === "consent") {
-    return (
-      <Shell rail>
-        <Card>
-          {safeNext === "/" ? (
-            <p className="mb-6 text-sm text-[var(--twin-muted-strong)]">
-              <Link href="/" className="twin-link font-semibold text-[var(--foreground)]">
-                {t("site.footerHome")}
-              </Link>
-            </p>
-          ) : null}
-          <h1 className="mb-2 text-2xl font-semibold">{t("consentGdpr.title")}</h1>
-          <p className="twin-muted mb-6 text-sm">{t("consentGdpr.lead")}</p>
-          <LegalRegionNotice />
-          <PostLoginCoreConsentForm nextPath={safeNext} />
-          {safeNext !== "/" ? (
-            <p className="twin-muted mt-6 text-center text-sm">
-              <Link href="/" className="twin-link">
-                {t("site.footerHome")}
-              </Link>
-            </p>
-          ) : null}
-        </Card>
-      </Shell>
-    );
-  }
-
   return (
     <Shell rail>
       <Card>
@@ -169,6 +154,16 @@ function RegisterPageContent() {
           <Input name="email" type="email" required autoComplete="email" />
           <Label>{t("register.password")}</Label>
           <Input name="password" type="password" required minLength={8} autoComplete="new-password" />
+          <Label>{t("register.referredByLabel")}</Label>
+          <textarea
+            name="referred_by_note"
+            rows={2}
+            maxLength={500}
+            autoComplete="off"
+            placeholder={t("register.referredByPlaceholder")}
+            className="twin-touch-target mb-4 w-full max-w-full resize-y rounded border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-3 py-2 text-base text-[var(--foreground)] placeholder:text-[var(--twin-muted)] focus:border-[var(--twin-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--twin-accent)]/20 sm:text-sm"
+          />
+          <p className="twin-muted mb-4 text-xs">{t("register.referredByHint")}</p>
           <LegalRegionNotice />
           <label className="mb-4 flex items-start gap-2 text-sm">
             <input name="gdpr_privacy" type="checkbox" className="mt-1" required />

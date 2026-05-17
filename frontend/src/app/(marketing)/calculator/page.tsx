@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 
-import { TwinRoiCalculator } from "@/components/marketing/twin-roi-calculator";
+import { InvestorCalculator } from "@/components/marketing/investor-calculator";
 
 export const metadata: Metadata = {
-  title: "B2B ROI calculator — TWIN",
+  title: "Investor calculator — TWIN",
   description:
-    "B2B-oriented illustrative model: traditional agency success fees vs a TWIN-style fee structure — company savings, HR time, and candidate upside (not a commercial offer).",
+    "Illustrative investor model: subscriptions, success-fee economics, team and infrastructure costs, referral incentives, break-even and five-year projection — not disclosed actuals or investment advice.",
 };
 
 export default function CalculatorPage() {
-  return <TwinRoiCalculator />;
+  return <InvestorCalculator />;
 }

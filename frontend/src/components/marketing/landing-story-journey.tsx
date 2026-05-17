@@ -141,6 +141,34 @@ export function LandingStoryJourney() {
         ))}
       </nav>
 
+      <nav
+        className="pointer-events-auto fixed bottom-28 left-1/2 z-40 flex max-w-[min(calc(100vw-1.5rem),20rem)] -translate-x-1/2 items-center justify-center gap-2 rounded-full border border-[var(--twin-border)]/85 bg-[var(--twin-card)]/95 px-3 py-2.5 shadow-[var(--twin-shadow-lg)] backdrop-blur-sm md:hidden"
+        aria-label={t("home.journeyRailsAria")}
+      >
+        {CHAPTER_ANCHORS.map((id, i) => (
+          <button
+            key={`mobile-${id}`}
+            type="button"
+            onClick={() => scrollToId(id)}
+            className={`group flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition ${
+              activeChapter === i
+                ? "border-[var(--twin-accent)] bg-[var(--twin-card)] shadow-[var(--twin-shadow)]"
+                : "border-transparent bg-[var(--twin-card)]/70 hover:border-[var(--twin-border)]"
+            }`}
+            aria-label={
+              i < chapters.length ? `${chapters[i].kicker}. ${chapters[i].title}` : `${t("home.timelineEyebrow")}. ${t("home.timelineTitle")}`
+            }
+            aria-current={activeChapter === i ? "step" : undefined}
+          >
+            <span
+              className={`h-2.5 w-2.5 rounded-full transition ${
+                activeChapter === i ? "bg-[var(--twin-accent)]" : "bg-[var(--twin-muted)] group-hover:bg-[var(--twin-accent-soft)]"
+              }`}
+            />
+          </button>
+        ))}
+      </nav>
+
       <p className="sr-only">{t("home.journeyScrollHint")}</p>
 
       {chapters.map((ch, i) => (

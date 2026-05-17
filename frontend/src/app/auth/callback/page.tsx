@@ -5,8 +5,6 @@ import { Suspense, useEffect, useState } from "react";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { setToken } from "@/lib/auth";
-import { apiFetch } from "@/lib/api";
-import { hasCoreConsents, type AuthMeCoreConsents } from "@/lib/core-consents";
 import type { TranslationKey } from "@/lib/i18n";
 
 function authErrorKey(error: string): TranslationKey {
@@ -37,18 +35,7 @@ function AuthCallbackContent() {
       const next = searchParams.get("next");
       const path = next?.startsWith("/") ? next : "/dashboard";
       queueMicrotask(() => {
-        void (async () => {
-          try {
-            const me = await apiFetch<AuthMeCoreConsents>("/api/v1/auth/me", {}, token);
-            if (!hasCoreConsents(me)) {
-              router.replace(`/register?next=${encodeURIComponent(path)}`);
-              return;
-            }
-          } catch {
-            /* if /me fails, still send user onward */
-          }
-          router.replace(path);
-        })();
+        router.replace(path);
       });
       return;
     }

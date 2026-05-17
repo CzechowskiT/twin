@@ -29,6 +29,14 @@ class ApplicationStatus(str, PyEnum):
     HIRED = "hired"
 
 
+class ViralClaimStatus(str, PyEnum):
+    DRAFT = "draft"
+    SUBMITTED = "submitted"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    PAID = "paid"
+
+
 class User(Base):
     __tablename__ = "users"
 
@@ -54,6 +62,24 @@ class User(Base):
     subscription_current_period_end: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     identity_verified_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
+    signup_referred_by_note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    signup_referrer_user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+    referral_public_token: Mapped[str | None] = mapped_column(
+        String(32),
+        unique=True,
+        index=True,
+        nullable=True,
+    )
+    signup_utm_source: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    signup_utm_medium: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    signup_utm_campaign: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    signup_utm_content: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
+    subscription_invoice_payment_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+
     candidate: Mapped["Candidate | None"] = relationship(back_populates="user")
     password_reset_tokens: Mapped[list["PasswordResetToken"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
@@ -69,6 +95,10 @@ class User(Base):
     )
     scheduled_interviews: Mapped[list["ScheduledInterview"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
+    )
+    viral_incentive_claims: Mapped[list["LinkedInViralIncentiveClaim"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
     )
 
 
@@ -202,6 +232,38 @@ class BetaReferral(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
+class AccountReferral(Base):
+    """Edge when a registered user was acquired via another user's share token or email-shaped note."""
+
+    __tablename__ = "account_referrals"
+    __table_args__ = (UniqueConstraint("referred_user_id", name="uq_account_referrals_referred_user_id"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    referrer_user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    referred_user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), unique=True)
+    ref_code_used: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    utm_source: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    utm_medium: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    utm_campaign: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    utm_content: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class ReferralPayout(Base):
+    """Bonus owed to referrer; `referral_id` null means aggregate milestone (not tied to one edge)."""
+
+    __tablename__ = "referral_payouts"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    referral_id: Mapped[int | None] = mapped_column(ForeignKey("account_referrals.id", ondelete="CASCADE"), nullable=True)
+    referrer_user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    payout_type: Mapped[str] = mapped_column(String(32), nullable=False)
+    amount_cents: Mapped[int] = mapped_column(Integer, nullable=False)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    paid_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
 class Job(Base):
     __tablename__ = "jobs"
     __table_args__ = (UniqueConstraint("job_board", "external_id", name="uq_job_board_external"),)
@@ -260,6 +322,42 @@ class Application(Base):
     scheduled_interviews: Mapped[list["ScheduledInterview"]] = relationship(
         back_populates="application",
     )
+    viral_incentive_claims: Mapped[list["LinkedInViralIncentiveClaim"]] = relationship(
+        back_populates="application",
+    )
+
+
+class LinkedInViralIncentiveClaim(Base):
+    """Placement-linked LinkedIn post bonus claim (tiered cents, reviewer workflow)."""
+
+    __tablename__ = "linkedin_viral_incentive_claims"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    application_id: Mapped[int | None] = mapped_column(
+        ForeignKey("applications.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+    post_url: Mapped[str] = mapped_column(String(2048))
+    word_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    has_offer_letter_photo: Mapped[bool] = mapped_column(Boolean, default=False)
+    has_video_testimonial: Mapped[bool] = mapped_column(Boolean, default=False)
+    screenshot_url_primary: Mapped[str | None] = mapped_column(String(2048), nullable=True)
+    screenshot_url_secondary: Mapped[str | None] = mapped_column(String(2048), nullable=True)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    bonus_cents_calculated: Mapped[int] = mapped_column(Integer, default=0)
+    bonus_currency: Mapped[str] = mapped_column(String(8), default="USD")
+    status: Mapped[ViralClaimStatus] = mapped_column(Enum(ViralClaimStatus), default=ViralClaimStatus.DRAFT)
+    reviewer_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    submitted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+    user: Mapped["User"] = relationship(back_populates="viral_incentive_claims")
+    application: Mapped["Application | None"] = relationship(back_populates="viral_incentive_claims")
 
 
 class ScheduledInterview(Base):

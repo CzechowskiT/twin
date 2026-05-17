@@ -8,6 +8,11 @@ from pydantic import BaseModel, EmailStr, Field
 class UserRegister(BaseModel):
     email: EmailStr
     password: str = Field(min_length=8, max_length=128)
+    referred_by_note: str | None = Field(
+        default=None,
+        max_length=500,
+        description="Optional: who referred you (free text). If it is an active user's email, they stay eligible for a future referral bonus.",
+    )
     gdpr_consent: bool = Field(description="Privacy policy — personal data processing for the service")
     terms_of_service_consent: bool = Field(description="Terms of Service acceptance")
     job_data_processing_consent: bool = Field(
@@ -19,6 +24,15 @@ class UserRegister(BaseModel):
     marketing_emails_opt_in: bool = Field(
         default=False,
         description="Optional: product updates and tips by email (separate legal basis).",
+    )
+    utm_source: str | None = Field(default=None, max_length=128)
+    utm_medium: str | None = Field(default=None, max_length=128)
+    utm_campaign: str | None = Field(default=None, max_length=128)
+    utm_content: str | None = Field(default=None, max_length=128)
+    ref: str | None = Field(
+        default=None,
+        max_length=128,
+        description="Optional share token (same as referrer's referral_public_token); also sendable as ?ref= on /register.",
     )
 
 
@@ -71,6 +85,7 @@ class UserOut(BaseModel):
     subscription_status: str | None = None
     subscription_current_period_end: datetime | None = None
     identity_verified_at: datetime | None = None
+    referral_public_token: str | None = None
 
     model_config = {"from_attributes": True}
 
@@ -93,4 +108,5 @@ class UserOut(BaseModel):
             subscription_status=getattr(user, "subscription_status", None),
             subscription_current_period_end=getattr(user, "subscription_current_period_end", None),
             identity_verified_at=getattr(user, "identity_verified_at", None),
+            referral_public_token=getattr(user, "referral_public_token", None),
         )

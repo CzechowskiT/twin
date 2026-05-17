@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
-import { MarketingStoryVideo } from "@/components/marketing/marketing-story-video";
 
 const SCENE_MS = [5200, 7000, 6400, 6000] as const;
 const LAST_SCENE = SCENE_MS.length - 1;
@@ -66,6 +65,26 @@ export function LandingVacationCinematic() {
     setPhase("done");
   }, []);
 
+  const goToScene = useCallback(
+    (i: number) => {
+      if (reduceMotion) return;
+      const clamped = Math.max(0, Math.min(i, LAST_SCENE));
+      setScene(clamped);
+      setPhase(clamped === LAST_SCENE ? "done" : "playing");
+    },
+    [reduceMotion],
+  );
+
+  const nextScene = useCallback(() => {
+    if (reduceMotion) return;
+    if (scene >= LAST_SCENE) {
+      setPhase("done");
+      return;
+    }
+    setScene((s) => Math.min(s + 1, LAST_SCENE));
+    setPhase("playing");
+  }, [scene, reduceMotion]);
+
   const replay = useCallback(() => {
     if (reduceMotion) return;
     setScene(0);
@@ -90,7 +109,6 @@ export function LandingVacationCinematic() {
       <p className="mb-3 text-center text-[10px] font-bold uppercase tracking-[0.28em] text-[var(--twin-muted)]">
         {t("home.vacationFilmEyebrow")}
       </p>
-      <MarketingStoryVideo />
       <div
         className="relative overflow-hidden rounded-2xl border border-[var(--twin-border)] bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950/90 text-slate-50 shadow-[var(--twin-shadow-lg),inset_0_0_100px_rgba(0,0,0,0.35)]"
         style={{ minHeight: "min(72svh, 560px)" }}
@@ -99,15 +117,24 @@ export function LandingVacationCinematic() {
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[3] h-[12%] bg-gradient-to-t from-black/55 to-transparent" aria-hidden />
 
         {!reduceMotion ? (
-          <div className="absolute right-3 top-3 z-[5] flex items-center gap-2 sm:right-4 sm:top-4">
+          <div className="absolute right-3 top-3 z-[5] flex flex-wrap items-center justify-end gap-2 sm:right-4 sm:top-4">
             {!done ? (
-              <button
-                type="button"
-                onClick={skip}
-                className="twin-touch-target rounded-lg border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/90 backdrop-blur-sm transition hover:bg-white/20"
-              >
-                {t("home.vacationSkip")}
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={nextScene}
+                  className="twin-touch-target rounded-lg border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/90 backdrop-blur-sm transition hover:bg-white/20"
+                >
+                  {t("home.vacationNext")}
+                </button>
+                <button
+                  type="button"
+                  onClick={skip}
+                  className="twin-touch-target rounded-lg border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/90 backdrop-blur-sm transition hover:bg-white/20"
+                >
+                  {t("home.vacationSkip")}
+                </button>
+              </>
             ) : (
               <button
                 type="button"
@@ -120,16 +147,31 @@ export function LandingVacationCinematic() {
           </div>
         ) : null}
 
-        <div className="absolute bottom-4 left-0 right-0 z-[5] flex justify-center gap-2">
-          {SCENE_MS.map((_, i) => (
-            <span
-              key={i}
-              className={`h-1.5 w-1.5 rounded-full transition-all duration-300 ${
-                i === scene && !done ? "w-6 bg-emerald-400" : done && i === LAST_SCENE ? "bg-emerald-400/90" : "bg-white/25"
-              }`}
-            />
-          ))}
-        </div>
+        {!reduceMotion ? (
+          <div
+            className="absolute bottom-4 left-0 right-0 z-[5] flex justify-center gap-2 px-4"
+            role="tablist"
+            aria-label={t("home.vacationFilmAria")}
+          >
+            {SCENE_MS.map((_, i) => {
+              const current = i === scene && !done;
+              const endedHere = done && i === LAST_SCENE;
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  role="tab"
+                  aria-selected={current || endedHere}
+                  aria-label={`${t("home.vacationDotAria")} ${i + 1}`}
+                  onClick={() => goToScene(i)}
+                  className={`twin-touch-target h-2.5 min-w-[0.45rem] rounded-full transition-all duration-300 ${
+                    current ? "w-7 bg-emerald-400" : endedHere ? "w-7 bg-emerald-400/90" : "w-2.5 bg-white/25 hover:bg-white/45"
+                  }`}
+                />
+              );
+            })}
+          </div>
+        ) : null}
 
         <div className="relative min-h-[min(72svh,560px)] pb-16">
           {scenePanel(scene === 0 && !reduceMotion, (

@@ -13,6 +13,7 @@ function normalizePath(pathname: string): string {
 }
 
 function titleKeyForPath(path: string): TranslationKey {
+  if (path.startsWith("/calculator/b2b")) return "meta.titleCalculatorB2b";
   if (path.startsWith("/dashboard/billing")) return "meta.titleBilling";
   if (path.startsWith("/dashboard/identity")) return "meta.titleIdentity";
   if (path.startsWith("/dashboard/calendar")) return "meta.titleDashboardCalendar";

@@ -169,6 +169,23 @@ class Settings(BaseSettings):
     # When false, /geo/jurisdiction-hint returns OTHER without outbound IP/geo calls (strict/air-gapped).
     geo_jurisdiction_lookup_enabled: bool = True
 
+    # LinkedIn viral incentive (placement post bonus tiers; amounts in integer USD cents).
+    # Ops can tune payouts without code changes by setting these env vars.
+    linkedin_viral_base_tag_bonus_cents: int = 2500
+    linkedin_viral_story_bonus_cents: int = 5000
+    linkedin_viral_story_min_words: int = 150
+    linkedin_viral_photo_bonus_cents: int = 2500
+    linkedin_viral_video_bonus_cents: int = 10000
+    linkedin_viral_per_signup_bonus_cents: int = 500
+
+    # Account referral program (USD cents; paid out manually / via future Stripe Connect).
+    referral_bonus_first_payment_cents: int = 1500
+    referral_bonus_retained_3m_cents: int = 2500
+    referral_bonus_hired_cents: int = 10000
+    referral_milestone_10_cents: int = 10000
+    referral_milestone_50_cents: int = 50000
+    referral_milestone_100_cents: int = 150000
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [o for o in (x.strip() for x in self.cors_origins.split(",")) if o]

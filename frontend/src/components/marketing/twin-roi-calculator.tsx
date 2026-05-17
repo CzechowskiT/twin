@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
@@ -379,7 +380,12 @@ export function TwinRoiCalculator() {
           </p>
         </section>
 
-        <p className="mt-8 text-center text-xs leading-relaxed text-[var(--twin-muted-strong)] sm:text-sm">
+        <p className="mt-6 text-center text-sm text-[var(--twin-muted-strong)]">
+          <Link href="/calculator" className="twin-link font-medium">
+            {t("calculator.linkInvestorModel")}
+          </Link>
+        </p>
+        <p className="mt-4 text-center text-xs leading-relaxed text-[var(--twin-muted-strong)] sm:text-sm">
           {t("calculator.footerNote")}
         </p>
       </MarketingPageSurface>

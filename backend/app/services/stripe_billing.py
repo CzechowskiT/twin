@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 
 from app.config import Settings
 from app.database.models import User
+from app.services import referral_program as referral_prog
 
 logger = logging.getLogger(__name__)
 
@@ -199,4 +200,29 @@ def process_subscription_deleted(db: Session, sub: dict[str, Any]) -> None:
     if not user:
         return
     clear_paid_subscription(user)
+    db.commit()
+
+
+def process_invoice_payment_succeeded(db: Session, invoice: dict[str, Any], settings: Settings) -> None:
+    """Count paid subscription invoices for referral retention bonuses (idempotent per payout row)."""
+    cust = invoice.get("customer")
+    if isinstance(cust, dict):
+        cust = cust.get("id")
+    sub_id = invoice.get("subscription")
+    if isinstance(sub_id, dict):
+        sub_id = sub_id.get("id")
+    if not sub_id:
+        return
+    try:
+        if int(invoice.get("amount_paid") or 0) <= 0:
+            return
+    except (TypeError, ValueError):
+        return
+    reason = str(invoice.get("billing_reason") or "")
+    if reason not in ("subscription_create", "subscription_cycle", "subscription_update"):
+        return
+    user = user_by_stripe_customer(db, cust)
+    if not user:
+        return
+    referral_prog.on_subscription_invoice_paid(db, user, settings)
     db.commit()

@@ -194,6 +194,8 @@ async def stripe_webhook(
             stripe_svc.process_subscription_updated(db, obj_d, settings)
         elif etype == "customer.subscription.deleted":
             stripe_svc.process_subscription_deleted(db, obj_d)
+        elif etype == "invoice.payment_succeeded":
+            stripe_svc.process_invoice_payment_succeeded(db, obj_d, settings)
     except Exception:
         logger.exception("Stripe webhook handler failed for %s", etype)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Webhook handler error.")

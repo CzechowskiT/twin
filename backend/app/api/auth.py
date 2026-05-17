@@ -57,6 +57,12 @@ from app.services.oauth_state import create_oauth_state, verify_oauth_state
 from app.services.oauth_types import OAuthUserProfile
 from app.services.oauth_user import user_from_oauth
 from app.services.password_reset import request_password_reset, reset_password_with_token
+from app.services.referral_public_token import ensure_user_referral_public_token
+from app.services.signup_referrer import (
+    normalize_stored_referred_by_note,
+    normalize_utm_field,
+    resolve_combined_signup_referrer_user_id,
+)
 
 router = APIRouter()
 
@@ -154,6 +160,26 @@ def register(body: UserRegister, db: Session = Depends(get_db)) -> User:
         )
     if db.query(User).filter(User.email == body.email).first():
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
+    stored_ref_note = normalize_stored_referred_by_note(body.referred_by_note)
+    referrer_id = resolve_combined_signup_referrer_user_id(
+        db,
+        stored_note=stored_ref_note,
+        new_user_email=str(body.email),
+        ref=body.ref,
+        utm_content=body.utm_content,
+    )
+    tok_match = normalize_utm_field(body.ref) or normalize_utm_field(body.utm_content)
+    ref_snapshot = None
+    if referrer_id and tok_match:
+        from app.services.signup_referrer import resolve_signup_referrer_from_utm_content
+
+        if (
+            resolve_signup_referrer_from_utm_content(
+                db, utm_content=tok_match, new_user_email=str(body.email)
+            )
+            == referrer_id
+        ):
+            ref_snapshot = tok_match
     now = datetime.now(timezone.utc)
     user = User(
         email=body.email,
@@ -164,8 +190,29 @@ def register(body: UserRegister, db: Session = Depends(get_db)) -> User:
         ai_matching_consent_at=now,
         marketing_emails_opt_in=body.marketing_emails_opt_in,
         marketing_emails_opt_in_at=(now if body.marketing_emails_opt_in else None),
+        signup_referred_by_note=stored_ref_note,
+        signup_referrer_user_id=referrer_id,
+        signup_utm_source=normalize_utm_field(body.utm_source),
+        signup_utm_medium=normalize_utm_field(body.utm_medium),
+        signup_utm_campaign=normalize_utm_field(body.utm_campaign),
+        signup_utm_content=normalize_utm_field(body.utm_content) or normalize_utm_field(body.ref),
     )
     db.add(user)
+    db.flush()
+    ensure_user_referral_public_token(db, user)
+    if referrer_id:
+        from app.services import referral_program as rp
+
+        rp.record_account_referral_edge(
+            db,
+            referrer_user_id=referrer_id,
+            referred_user_id=user.id,
+            ref_code_used=ref_snapshot,
+            utm_source=user.signup_utm_source,
+            utm_medium=user.signup_utm_medium,
+            utm_campaign=user.signup_utm_campaign,
+            utm_content=user.signup_utm_content,
+        )
     db.commit()
     db.refresh(user)
     return user
@@ -217,7 +264,10 @@ def _authenticate(email: str, password: str, db: Session) -> Token:
 
 
 @router.get("/me", response_model=UserOut)
-def me(user: User = Depends(get_current_user)) -> UserOut:
+def me(user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> UserOut:
+    ensure_user_referral_public_token(db, user)
+    db.commit()
+    db.refresh(user)
     return UserOut.from_user(user)
 
 

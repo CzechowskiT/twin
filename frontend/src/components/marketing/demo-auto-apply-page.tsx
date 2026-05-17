@@ -103,6 +103,38 @@ export function DemoAutoApplyPage() {
     timersRef.current.push(idDone);
   }, [clearTimers]);
 
+  const jumpToStep = useCallback(
+    (idx: number) => {
+      clearTimers();
+      setRunning(false);
+      setStepStates(STEP_KEYS.map((_, i) => (i < idx ? "done" : i === idx ? "active" : "pending")));
+    },
+    [clearTimers],
+  );
+
+  const advanceManualStep = useCallback(() => {
+    clearTimers();
+    setRunning(false);
+    setStepStates((prev) => {
+      const next = [...prev];
+      const active = next.indexOf("active");
+      if (active >= 0) {
+        next[active] = "done";
+        if (active + 1 < next.length) {
+          next[active + 1] = "active";
+        }
+        return next;
+      }
+      const firstP = next.indexOf("pending");
+      if (firstP >= 0) {
+        for (let j = 0; j < firstP; j += 1) next[j] = "done";
+        next[firstP] = "active";
+        return next;
+      }
+      return next;
+    });
+  }, [clearTimers]);
+
   useEffect(() => () => clearTimers(), [clearTimers]);
 
   const skillsLine = DEMO_MATCH_CANDIDATE.skills.join(", ");
@@ -132,6 +164,13 @@ export function DemoAutoApplyPage() {
             <ButtonCta type="button" disabled={running} onClick={runSequence} className="!w-auto min-w-[12rem] px-6">
               {running ? t("demo.runningCta") : t("demo.runCta")}
             </ButtonCta>
+            <button
+              type="button"
+              onClick={advanceManualStep}
+              className="twin-touch-target inline-flex min-h-[2.75rem] min-w-[10rem] items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-5 text-sm font-semibold text-[var(--foreground)] transition hover:border-[var(--twin-border-hover)] hover:bg-[var(--twin-accent-muted)] active:scale-[0.98]"
+            >
+              {t("demo.nextStep")}
+            </button>
             <Link
               href="/register"
               className="twin-touch-target inline-flex min-h-[2.75rem] items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-5 text-sm font-semibold text-[var(--twin-muted-strong)] transition hover:border-[var(--twin-border-hover)] hover:bg-[var(--twin-accent-muted)] active:scale-[0.98]"
@@ -139,6 +178,7 @@ export function DemoAutoApplyPage() {
               {t("demo.registerCta")}
             </Link>
           </div>
+          <p className="max-w-3xl text-xs leading-relaxed text-[var(--twin-muted)]">{t("demo.manualFlowHint")}</p>
 
           <div className="grid gap-6 lg:grid-cols-2">
             <section
@@ -218,32 +258,35 @@ export function DemoAutoApplyPage() {
               {STEP_KEYS.map((key, idx) => {
                 const state = stepStates[idx] ?? "pending";
                 return (
-                  <li
-                    key={key}
-                    className={`flex gap-3 transition-all duration-500 ease-out sm:gap-4 ${
-                      idx === STEP_KEYS.length - 1 ? "" : "pb-5"
-                    } ${state === "pending" ? "opacity-55" : "opacity-100"}`}
-                  >
-                    <span
-                      className={`mt-1.5 h-3 w-3 shrink-0 rounded-full border-2 transition-transform duration-300 ${
-                        state === "done"
-                          ? "scale-100 border-[var(--twin-accent)] bg-[var(--twin-accent)]"
-                          : state === "active"
-                            ? "scale-110 border-[var(--twin-cta)] bg-[var(--twin-cta)] shadow-[0_0_0_4px_rgb(217_119_6_/0.25)]"
-                            : "border-[var(--twin-border)] bg-[var(--twin-card)]"
+                  <li key={key} className={idx === STEP_KEYS.length - 1 ? "" : "pb-5"}>
+                    <button
+                      type="button"
+                      onClick={() => jumpToStep(idx)}
+                      className={`flex w-full gap-3 rounded-xl border border-transparent p-2 text-left transition-all duration-500 ease-out sm:gap-4 ${
+                        state === "pending" ? "opacity-55 hover:border-[var(--twin-border)]/60 hover:bg-[var(--twin-surface-raised)]/50" : "opacity-100"
                       }`}
-                      aria-hidden
-                    />
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-[var(--foreground)]">{t(key)}</p>
-                      <p className="mt-1 text-xs text-[var(--twin-muted)]">
-                        {state === "done"
-                          ? t("demo.stepDone")
-                          : state === "active"
-                            ? t("demo.stepActive")
-                            : t("demo.stepPending")}
-                      </p>
-                    </div>
+                    >
+                      <span
+                        className={`mt-1.5 h-3 w-3 shrink-0 rounded-full border-2 transition-transform duration-300 ${
+                          state === "done"
+                            ? "scale-100 border-[var(--twin-accent)] bg-[var(--twin-accent)]"
+                            : state === "active"
+                              ? "scale-110 border-[var(--twin-cta)] bg-[var(--twin-cta)] shadow-[0_0_0_4px_rgb(217_119_6_/0.25)]"
+                              : "border-[var(--twin-border)] bg-[var(--twin-card)]"
+                        }`}
+                        aria-hidden
+                      />
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-[var(--foreground)]">{t(key)}</p>
+                        <p className="mt-1 text-xs text-[var(--twin-muted)]">
+                          {state === "done"
+                            ? t("demo.stepDone")
+                            : state === "active"
+                              ? t("demo.stepActive")
+                              : t("demo.stepPending")}
+                        </p>
+                      </div>
+                    </button>
                   </li>
                 );
               })}

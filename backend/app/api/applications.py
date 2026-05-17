@@ -27,6 +27,7 @@ from app.schemas.application import (
     UpskillActionOut,
 )
 from app.services.auto_apply_service import auto_apply_for_user
+from app.services import referral_program as referral_prog
 from app.services.recruitment_feedback import build_feedback_insights, parse_stored_insights_json
 
 router = APIRouter()
@@ -237,6 +238,10 @@ def _apply_application_update(
         app.status = _status(ApplicationStatusEnum(patch["status"]))
         if app.status == ApplicationStatus.APPLIED and not app.applied_at:
             app.applied_at = datetime.utcnow()
+        if app.status == ApplicationStatus.HIRED:
+            cand = db.query(Candidate).filter(Candidate.id == app.candidate_id).first()
+            if cand:
+                referral_prog.on_referred_user_hired(db, cand.user_id, get_settings())
     if "notes" in patch:
         app.notes = patch["notes"]
     if "recruiter_feedback_raw" in patch:

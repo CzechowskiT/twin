@@ -39,11 +39,10 @@ export function hasCookieConsentDecision(): boolean {
   return readCookieConsent() !== null;
 }
 
-/** Floating cookie banner only on the registration flow (not home, login, or dashboard). */
+/** Show banner site-wide except fleeting OAuth handoff (avoids flash over redirect UI). */
 function pathShowsCookieBanner(normalized: string): boolean {
-  if (normalized === "/register") return true;
-  // Optional locale prefix: /pl/register, /en/register
-  return /^\/[a-z]{2}\/register$/.test(normalized);
+  if (normalized.startsWith("/auth/callback")) return false;
+  return true;
 }
 
 export function normalizePathnameForCookieBanner(pathname: string): string {

@@ -24,14 +24,23 @@ function hintCacheKey(opts?: { lat?: number; lon?: number }): string {
   return "network";
 }
 
+/** Drop memoized hints (e.g. after a failed fetch) so the next call can retry. */
+export function clearJurisdictionHintCache(): void {
+  hintCache.clear();
+}
+
 /** Dedupe parallel calls (register notice + privacy page in one session). */
 export function getJurisdictionHintCached(opts?: { lat?: number; lon?: number }): Promise<JurisdictionHint> {
   const key = hintCacheKey(opts);
-  let p = hintCache.get(key);
-  if (!p) {
-    p = fetchJurisdictionHint(opts);
-    hintCache.set(key, p);
+  const existing = hintCache.get(key);
+  if (existing) {
+    return existing;
   }
+  const p = fetchJurisdictionHint(opts).catch((err) => {
+    hintCache.delete(key);
+    throw err;
+  });
+  hintCache.set(key, p);
   return p;
 }
 

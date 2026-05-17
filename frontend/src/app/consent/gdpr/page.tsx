@@ -14,7 +14,7 @@ function RedirectToRegister() {
   useEffect(() => {
     const n = searchParams.get("next");
     const next = n?.startsWith("/") && !n.startsWith("//") ? n : "/dashboard";
-    router.replace(`/register?next=${encodeURIComponent(next)}`);
+    router.replace(next);
   }, [router, searchParams]);
 
   return (
