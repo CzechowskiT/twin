@@ -1,21 +1,23 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-import { getPublicApiBase } from "@/lib/public-api-base";
+import { getUpstreamApiBase } from "@/lib/public-api-base";
 
 export const dynamic = "force-dynamic";
+/** Avoid Edge TLS/DNS quirks when proxying to Railway Postgres hosts. */
+export const runtime = "nodejs";
 
 const HOP_BY_HOP = new Set(["connection", "keep-alive", "proxy-authenticate", "proxy-authorization", "te", "trailers", "transfer-encoding", "upgrade", "host"]);
 
 async function proxy(req: NextRequest, pathSegments: string[]): Promise<NextResponse> {
-  const base = getPublicApiBase();
+  const base = getUpstreamApiBase();
   if (!base) {
     const onVercel = process.env.VERCEL === "1";
     return NextResponse.json(
       {
         detail: onVercel
-          ? "Missing NEXT_PUBLIC_API_URL on Vercel. Add it in Project → Settings → Environment Variables (Railway https://…up.railway.app, no trailing slash), then redeploy."
-          : "Missing NEXT_PUBLIC_API_URL. Set it in .env.local for local dev.",
+          ? "Missing API base URL. Set TWIN_API_BASE_URL (recommended, server-only) or NEXT_PUBLIC_API_URL in Vercel → Environment Variables to your Railway API (https://…up.railway.app, no trailing slash), then redeploy."
+          : "Missing API base URL. Set TWIN_API_BASE_URL or NEXT_PUBLIC_API_URL in .env.local (e.g. http://localhost:8000).",
       },
       { status: 503 },
     );
@@ -53,12 +55,14 @@ async function proxy(req: NextRequest, pathSegments: string[]): Promise<NextResp
       body: body && body.byteLength > 0 ? body : undefined,
       // Default "follow" would chase OAuth 302 to LinkedIn and return HTML instead of passing Location to the browser.
       redirect: "manual",
+      cache: "no-store",
+      signal: AbortSignal.timeout(45_000),
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "fetch failed";
     return NextResponse.json(
       {
-        detail: `Cannot reach API (${msg}). Check NEXT_PUBLIC_API_URL matches your live Railway URL and Railway service is Active.`,
+        detail: `Cannot reach API (${msg}). Check TWIN_API_BASE_URL / NEXT_PUBLIC_API_URL on Vercel matches your live Railway URL and the Railway service is Active.`,
       },
       { status: 502 },
     );

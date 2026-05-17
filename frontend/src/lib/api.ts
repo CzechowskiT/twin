@@ -3,7 +3,7 @@
  * The proxy forwards `Authorization` / `X-Twin-Authorization`, so the SPA does not depend on Railway
  * `CORS_ORIGINS` matching every Vercel preview/production URL (a common billing/dashboard break).
  * Multipart uploads use the public API origin when set to reduce Vercel function body limits on proxies.
- * Local: set `NEXT_PUBLIC_API_URL` in `.env.local` so the server-side proxy can reach the API.
+ * Local / Vercel: set `TWIN_API_BASE_URL` or `NEXT_PUBLIC_API_URL` so the server-side proxy can reach the API.
  */
 
 import { getPublicApiBase } from "@/lib/public-api-base";

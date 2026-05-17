@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getPublicApiBase } from "@/lib/public-api-base";
+import { getUpstreamApiBase } from "@/lib/public-api-base";
 
 export const dynamic = "force-dynamic";
 
@@ -17,9 +17,12 @@ export async function GET(req: Request) {
   if (auth !== `Bearer ${serverToken}`) {
     return NextResponse.json({ detail: "Unauthorized" }, { status: 401 });
   }
-  const base = getPublicApiBase();
+  const base = getUpstreamApiBase();
   if (!base) {
-    return NextResponse.json({ detail: "NEXT_PUBLIC_API_URL is not set" }, { status: 503 });
+    return NextResponse.json(
+      { detail: "TWIN_API_BASE_URL or NEXT_PUBLIC_API_URL is not set" },
+      { status: 503 },
+    );
   }
   const url = `${base.replace(/\/$/, "")}/api/v1/beta/admin/stats`;
   const upstream = await fetch(url, {
