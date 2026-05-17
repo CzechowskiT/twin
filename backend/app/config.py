@@ -57,6 +57,9 @@ class Settings(BaseSettings):
     redis_url: str = "redis://localhost:6379/0"
     celery_broker_url: str = "redis://localhost:6379/0"
     celery_result_backend: str = "redis://localhost:6379/1"
+    # When true, Celery `.delay()` runs inside the API worker (no broker). Use on a single Railway
+    # service without Redis/worker, or local dev; use Redis + separate worker for production scale.
+    celery_task_always_eager: bool = False
 
     anthropic_api_key: str = ""
     cv_upload_dir: str = "data/cvs"

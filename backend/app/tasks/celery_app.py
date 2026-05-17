@@ -19,6 +19,9 @@ celery_app.conf.update(
     enable_utc=True,
     imports=("app.tasks.scrape_tasks",),
 )
+# In-process tasks (no Redis): set CELERY_TASK_ALWAYS_EAGER=true on the API when no worker service exists.
+celery_app.conf.task_always_eager = settings.celery_task_always_eager
+celery_app.conf.task_eager_propagates = True
 
 
 def _configure_beat_schedule() -> None:

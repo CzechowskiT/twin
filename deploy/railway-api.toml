@@ -3,6 +3,10 @@
 #   - Config file path: deploy/railway-api.toml
 #   - Root directory: backend   (required — isolated monorepo)
 # With root = backend, Dockerfile lives next to requirements.txt → Dockerfile
+#
+# Scraping: add Redis + a worker service (deploy/railway-worker.toml), OR set env on this API only:
+#   CELERY_TASK_ALWAYS_EAGER=true
+# so /jobs/scrape/* runs in-process without a broker (demo / single-instance; not for high scale).
 
 [build]
 builder = "DOCKERFILE"

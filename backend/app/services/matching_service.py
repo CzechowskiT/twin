@@ -10,12 +10,22 @@ from app.database.models import Candidate, Job, JobMatch
 from app.matching.matcher import calculate_match_score
 
 
+def _json_list_field(raw: str | None) -> list[Any]:
+    if not raw or not str(raw).strip():
+        return []
+    try:
+        parsed = json.loads(raw)
+    except (json.JSONDecodeError, TypeError, ValueError):
+        return []
+    return parsed if isinstance(parsed, list) else []
+
+
 def candidate_to_dict(candidate: Candidate) -> dict[str, Any]:
-    skills = json.loads(candidate.skills) if candidate.skills else []
-    titles = json.loads(candidate.preferred_job_titles) if candidate.preferred_job_titles else []
+    skills = _json_list_field(candidate.skills)
+    titles = _json_list_field(candidate.preferred_job_titles)
     return {
         "skills": skills,
-        "preferred_job_titles": titles if isinstance(titles, list) else [],
+        "preferred_job_titles": titles,
         "experience_years": candidate.experience_years,
         "desired_salary": candidate.desired_salary,
         "location": candidate.location,

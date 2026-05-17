@@ -1,5 +1,8 @@
 """Job listing and scrape trigger endpoints."""
 
+import logging
+from collections.abc import Callable
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -12,6 +15,7 @@ from app.schemas.job import (
     BoardScrapeResult,
     JobFiltersOut,
     JobListOut,
+    JobOut,
     ScrapeAllOut,
     ScrapeTaskOut,
 )
@@ -33,6 +37,26 @@ from app.tasks.scrape_tasks import (
 )
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
+
+_CELERY_QUEUE_DETAIL = (
+    "Job queue unavailable: cannot reach Redis/Celery broker. On Railway set REDIS_URL (or "
+    "CELERY_BROKER_URL) on the API service, run a separate Celery worker "
+    "(`celery -A app.tasks.celery_app worker`), then retry."
+)
+
+
+def _celery_send(fn: Callable[[], object]) -> object:
+    """Run a Celery `.delay()` / `.apply()`; translate broker errors into a clear 503."""
+    try:
+        return fn()
+    except Exception as exc:
+        logger.warning("Celery enqueue failed: %s", exc, exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=_CELERY_QUEUE_DETAIL,
+        ) from exc
+
 
 LOCAL_SCRAPE_HANDLERS = {
     "pracuj": scrape_pracuj_task,
@@ -114,7 +138,7 @@ def trigger_scrape_all(
     _user: User = Depends(get_current_user),
 ) -> ScrapeAllOut:
     if sync:
-        result = scrape_all_boards_task.apply()
+        result = _celery_send(lambda: scrape_all_boards_task.apply())
         data = result.get() if hasattr(result, "get") else result
         errors = data.get("errors", {})
         total = int(data.get("total_saved", 0))
@@ -138,7 +162,7 @@ def trigger_scrape_all(
             message=msg,
         )
 
-    async_result = scrape_all_boards_task.delay()
+    async_result = _celery_send(lambda: scrape_all_boards_task.delay())
     return ScrapeAllOut(
         task_id=async_result.id,
         total_saved=0,
@@ -161,9 +185,9 @@ def trigger_scrape(
 
     if sync:
         if is_global:
-            result = scrape_global_board_task.apply(args=[board])
+            result = _celery_send(lambda: scrape_global_board_task.apply(args=[board]))
         else:
-            result = handler.apply()
+            result = _celery_send(lambda: handler.apply())
         data = result.get() if hasattr(result, "get") else result
         if isinstance(data, dict) and data.get("error"):
             raise HTTPException(
@@ -179,9 +203,9 @@ def trigger_scrape(
         )
 
     if is_global:
-        async_result = scrape_global_board_task.delay(board)
+        async_result = _celery_send(lambda: scrape_global_board_task.delay(board))
     else:
-        async_result = handler.delay()
+        async_result = _celery_send(lambda: handler.delay())
     return ScrapeTaskOut(
         task_id=async_result.id,
         job_board=board,
