@@ -103,7 +103,7 @@ function RegisterPageContent() {
               {t("register.consentPrivacyBefore")}{" "}
               <Link href="/privacy" className="twin-link underline" target="_blank">
                 {t("register.privacyPolicy")}
-              </Link>
+              </Link>{" "}
               {t("register.consentPrivacyAfter")}
             </span>
           </label>
@@ -113,7 +113,7 @@ function RegisterPageContent() {
               {t("register.consentTermsBefore")}{" "}
               <Link href="/terms" className="twin-link underline" target="_blank" rel="noopener noreferrer">
                 {t("register.termsOfService")}
-              </Link>
+              </Link>{" "}
               {t("register.consentTermsAfter")}
             </span>
           </label>
@@ -123,7 +123,7 @@ function RegisterPageContent() {
               {t("register.consentJobDataBefore")}{" "}
               <Link href="/privacy" className="twin-link underline" target="_blank">
                 {t("register.privacyPolicy")}
-              </Link>
+              </Link>{" "}
               {t("register.consentJobDataAfter")}
             </span>
           </label>
@@ -133,7 +133,7 @@ function RegisterPageContent() {
               {t("register.consentAiBefore")}{" "}
               <Link href="/privacy" className="twin-link underline" target="_blank">
                 {t("register.privacyPolicy")}
-              </Link>
+              </Link>{" "}
               {t("register.consentAiAfter")}
             </span>
           </label>

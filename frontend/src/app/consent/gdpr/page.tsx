@@ -135,7 +135,7 @@ function ConsentGdprInner() {
               {t("consentGdpr.checkboxPrivacyBefore")}{" "}
               <Link href="/privacy" className="twin-link underline" target="_blank">
                 {t("consentGdpr.privacyLink")}
-              </Link>
+              </Link>{" "}
               {t("consentGdpr.checkboxPrivacyAfter")}
             </span>
           </label>
@@ -151,7 +151,7 @@ function ConsentGdprInner() {
               {t("consentGdpr.checkboxTermsBefore")}{" "}
               <Link href="/terms" className="twin-link underline" target="_blank" rel="noopener noreferrer">
                 {t("consentGdpr.termsLink")}
-              </Link>
+              </Link>{" "}
               {t("consentGdpr.checkboxTermsAfter")}
             </span>
           </label>
@@ -167,7 +167,7 @@ function ConsentGdprInner() {
               {t("consentGdpr.checkboxJobDataBefore")}{" "}
               <Link href="/privacy" className="twin-link underline" target="_blank">
                 {t("consentGdpr.privacyLink")}
-              </Link>
+              </Link>{" "}
               {t("consentGdpr.checkboxJobDataAfter")}
             </span>
           </label>
@@ -177,7 +177,7 @@ function ConsentGdprInner() {
               {t("consentGdpr.checkboxAiBefore")}{" "}
               <Link href="/privacy" className="twin-link underline" target="_blank">
                 {t("consentGdpr.privacyLink")}
-              </Link>
+              </Link>{" "}
               {t("consentGdpr.checkboxAiAfter")}
             </span>
           </label>
