@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useTranslation } from "@/components/language-provider";
 import { ScrollReveal } from "@/components/marketing/scroll-reveal";
 
-/** Before / after “Vacation Test” — anchors `#vacation-test` from the cinematic intro. */
+/** Before / after “Vacation Test” — section `#vacation-test` for home CTAs. */
 export function LandingVacationTest() {
   const { t } = useTranslation();
 

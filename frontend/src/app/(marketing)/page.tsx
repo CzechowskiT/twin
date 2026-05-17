@@ -8,7 +8,6 @@ import { LandingFocusChips } from "@/components/marketing/landing-focus-chips";
 import { LandingHero } from "@/components/marketing/landing-hero";
 import { LandingOriginStory } from "@/components/marketing/landing-origin";
 import { LandingStoryJourney } from "@/components/marketing/landing-story-journey";
-import { LandingVacationCinematic } from "@/components/marketing/landing-vacation-cinematic";
 import { LandingVacationTest } from "@/components/marketing/landing-vacation-test";
 import { PageMomentumRail } from "@/components/page-momentum-rail";
 
@@ -16,7 +15,6 @@ export default function Home() {
   return (
     <div className="marketing-journey-host relative z-0 flex flex-1 flex-col">
       <div className="relative z-10 flex flex-1 flex-col">
-        <LandingVacationCinematic />
         <LandingHero />
         <LandingVacationTest />
         <LandingOriginStory />
