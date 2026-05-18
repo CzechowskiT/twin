@@ -171,6 +171,7 @@ function BillingPlanTierCard({
   plan: p,
   busy,
   footerLabel,
+  buttonHint,
   locale,
   t,
   onPrimary,
@@ -180,6 +181,8 @@ function BillingPlanTierCard({
   plan: PlanOut;
   busy: string | null;
   footerLabel: string;
+  /** Full explanation for tooltip / aria when label is shortened. */
+  buttonHint?: string;
   locale: string;
   t: (key: TranslationKey) => string;
   onPrimary: () => void;
@@ -198,7 +201,7 @@ function BillingPlanTierCard({
 
   return (
     <article
-      className={`flex h-full flex-col rounded-2xl border bg-[var(--twin-surface-raised)] p-5 shadow-sm transition sm:p-6 ${
+      className={`flex min-h-0 min-w-0 w-full max-w-full flex-col rounded-2xl border bg-[var(--twin-surface-raised)] p-5 shadow-sm transition sm:p-6 ${
         isCurrent
           ? "border-[var(--twin-accent)] ring-2 ring-[var(--twin-accent-muted)]"
           : "border-[var(--twin-border)] hover:border-[var(--twin-accent)]/50"
@@ -213,27 +216,31 @@ function BillingPlanTierCard({
         ) : null}
       </div>
 
-      <div className="mt-4 border-b border-[var(--twin-border)] pb-4">
-        <p className="text-3xl font-bold tabular-nums tracking-tight text-[var(--twin-accent)] sm:text-4xl">
-          {price}
-          <span className="ml-1.5 text-sm font-semibold text-[var(--twin-muted-strong)]">{t("dashboard.billingPerMonth")}</span>
+      <div className="mt-4 min-w-0 border-b border-[var(--twin-border)] pb-4">
+        <p className="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-3xl font-bold tabular-nums tracking-tight text-[var(--twin-accent)] sm:text-4xl">
+          <span className="min-w-0 shrink">{price}</span>
+          <span className="text-sm font-semibold text-[var(--twin-muted-strong)]">{t("dashboard.billingPerMonth")}</span>
         </p>
         {p.list_price_monthly != null && p.list_price_currency ? (
           <p className="mt-1 text-[11px] font-medium text-[var(--twin-muted)]">{t("dashboard.billingLiveStripeList")}</p>
         ) : null}
       </div>
 
-      <p className="mt-4 flex-1 text-sm leading-relaxed text-[var(--twin-muted-strong)]">{p.description}</p>
-      <p className="mt-3 text-xs text-[var(--twin-muted)]">
+      <p className="mt-4 min-w-0 flex-1 text-pretty text-sm leading-relaxed text-[var(--twin-muted-strong)] [overflow-wrap:anywhere]">
+        {p.description}
+      </p>
+      <p className="mt-3 min-w-0 text-xs leading-snug text-[var(--twin-muted)] [overflow-wrap:anywhere]">
         {p.max_tracked_applications != null
           ? t("dashboard.billingTrackedCap").replace("{n}", String(p.max_tracked_applications))
           : t("dashboard.billingTrackedUnlimited")}
       </p>
 
-      <div className="mt-6">
+      <div className="mt-6 min-w-0">
         <Button
           type="button"
-          className="w-full sm:w-auto sm:min-w-[11rem]"
+          title={buttonHint}
+          aria-label={buttonHint ?? footerLabel}
+          className="h-auto min-h-[2.75rem] w-full whitespace-normal py-2.5 leading-snug sm:w-auto sm:min-w-[11rem] sm:max-w-full sm:px-4"
           disabled={disabled}
           onClick={() => {
             if (disabled) return;
@@ -551,7 +558,7 @@ export default function BillingPage() {
       ) : null}
 
       {plans && !loading ? (
-        <Card className="!mb-0 mt-6">
+        <Card className="!mb-0 mt-6 min-w-0 max-w-full">
           <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">{t("dashboard.billingPlansTitle")}</p>
           {(plans.checkout_payment_methods ?? []).length > 0 ? (
             <div className="mt-5 rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/60 p-4 sm:p-5">
@@ -586,7 +593,7 @@ export default function BillingPage() {
               {t("dashboard.billingPlansEmpty")}
             </div>
           ) : (
-            <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3">
+            <div className="mt-6 grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3">
               {plans.plans.map((p) => {
                 const tier = (me?.plan_tier ?? "free").toLowerCase();
                 const isCurrent = me != null && tier === p.id;
@@ -606,7 +613,18 @@ export default function BillingPage() {
                     else footerKey = "dashboard.billingUpgradePro";
                   }
                 }
-                const footerLabel = t(footerKey);
+                const footerLabelLong = t(footerKey);
+                let footerLabel = footerLabelLong;
+                let buttonHint: string | undefined;
+                if (!isCurrent) {
+                  if (footerKey === "dashboard.billingNotConfigured") {
+                    footerLabel = t("dashboard.billingCtaUnavailableShort");
+                    buttonHint = footerLabelLong;
+                  } else if (footerKey === "dashboard.billingPlanProPending") {
+                    footerLabel = t("dashboard.billingCtaProPendingShort");
+                    buttonHint = footerLabelLong;
+                  }
+                }
 
                 return (
                   <BillingPlanTierCard
@@ -614,6 +632,7 @@ export default function BillingPage() {
                     plan={p}
                     busy={busy}
                     footerLabel={footerLabel}
+                    buttonHint={buttonHint}
                     locale={locale}
                     t={t}
                     disabled={disabled}
