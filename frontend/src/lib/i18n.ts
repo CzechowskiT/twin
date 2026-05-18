@@ -535,6 +535,8 @@ const en = {
     calendarNextInterviewEmpty:
       "No upcoming interviews in TWIN yet. Open calendar settings to schedule one (saved here and in Google Calendar when connected).",
     calendarInterviewDownloadIcs: "Download .ics (Apple, Outlook…)",
+    calendarInterviewCancel: "Mark as cancelled",
+    calendarInterviewCancelledBadge: "Cancelled",
     calendarPageTitle: "Calendars & availability",
     calendarPageLead:
       "Connect calendars so TWIN can read busy time and place interview holds. Google Calendar is available today via OAuth. Microsoft 365 / Outlook and Apple Calendar (iCloud) are on the roadmap with the same consent, audit, and revoke story.",
@@ -1714,6 +1716,8 @@ const pl: MessageTree = {
     calendarNextInterviewEmpty:
       "Brak nadchodzących rozmów w TWIN. Otwórz kalendarz, żeby zaplanować slot (zapis tutaj i w Google Calendar po połączeniu).",
     calendarInterviewDownloadIcs: "Pobierz .ics (Apple, Outlook…)",
+    calendarInterviewCancel: "Oznacz jako odwołane",
+    calendarInterviewCancelledBadge: "Odwołane",
     calendarPageTitle: "Kalendarze i dostępność",
     calendarPageLead:
       "Podłącz kalendarze, żeby TWIN widział zajętość i mógł stawiać sloty rozmów. Google Calendar działa dziś przez OAuth. Microsoft 365 / Outlook oraz Apple Calendar (iCloud) są w roadmapie z tą samą historią zgody, audytu i odwołania dostępu.",

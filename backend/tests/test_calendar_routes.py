@@ -30,6 +30,11 @@ def test_interview_ics_unauthenticated(client: TestClient) -> None:
     assert res.status_code == 401
 
 
+def test_interview_cancel_unauthenticated(client: TestClient) -> None:
+    res = client.post("/api/v1/calendar/interviews/1/cancel")
+    assert res.status_code == 401
+
+
 @patch("app.api.calendar.is_google_calendar_oauth_configured", return_value=False)
 def test_calendar_authorize_not_configured(_mock: MagicMock, client: TestClient) -> None:
     from app.core.deps import get_current_user

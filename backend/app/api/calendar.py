@@ -399,6 +399,30 @@ def download_interview_ics(
     )
 
 
+@router.post("/interviews/{interview_id}/cancel", status_code=status.HTTP_204_NO_CONTENT)
+def cancel_scheduled_interview(
+    interview_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> None:
+    """Mark a scheduled interview as cancelled in TWIN (does not auto-delete Google event)."""
+    row = (
+        db.query(ScheduledInterview)
+        .filter(
+            ScheduledInterview.id == interview_id,
+            ScheduledInterview.user_id == current_user.id,
+        )
+        .first()
+    )
+    if row is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Interview not found")
+    if row.status != "cancelled":
+        row.status = "cancelled"
+        row.updated_at = datetime.utcnow()
+        db.add(row)
+        db.commit()
+
+
 @router.post("/google/interviews", response_model=ScheduledInterviewOut)
 def google_calendar_schedule_interview(
     body: ScheduleInterviewIn,

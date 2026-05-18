@@ -74,6 +74,12 @@ async function downloadInterviewIcs(interviewId: number): Promise<Blob> {
   return apiFetchBlob(`/api/v1/calendar/interviews/${interviewId}/ics`, {}, token);
 }
 
+async function cancelInterviewRequest(interviewId: number): Promise<void> {
+  const token = getToken();
+  if (!token) throw new Error("Not signed in");
+  await apiFetch(`/api/v1/calendar/interviews/${interviewId}/cancel`, { method: "POST", body: "{}" }, token);
+}
+
 export default function DashboardCalendarPage() {
   const { t, locale } = useTranslation();
   const router = useRouter();
@@ -94,6 +100,7 @@ export default function DashboardCalendarPage() {
   const [startLocal, setStartLocal] = useState("");
   const [endLocal, setEndLocal] = useState("");
   const [icsBusyId, setIcsBusyId] = useState<number | null>(null);
+  const [cancelBusyId, setCancelBusyId] = useState<number | null>(null);
 
   const load = useCallback(async () => {
     const token = getToken();
@@ -445,36 +452,69 @@ export default function DashboardCalendarPage() {
                 {interviews.map((row) => (
                   <li
                     key={row.id}
-                    className="flex flex-col gap-2 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-2)] px-3 py-2 text-sm text-[var(--foreground)] sm:flex-row sm:items-center sm:justify-between"
+                    className={`flex flex-col gap-2 rounded-lg border border-[var(--twin-border)] px-3 py-2 text-sm sm:flex-row sm:items-center sm:justify-between ${
+                      row.status === "cancelled"
+                        ? "bg-[var(--twin-surface-2)]/50 opacity-75"
+                        : "bg-[var(--twin-surface-2)] text-[var(--foreground)]"
+                    }`}
                   >
                     <div className="min-w-0">
                       <span className="font-medium">
                         {row.company_name} — {row.job_title}
+                        {row.status === "cancelled" ? (
+                          <span className="ml-2 text-xs font-normal uppercase text-[var(--twin-muted)]">
+                            {t("dashboard.calendarInterviewCancelledBadge")}
+                          </span>
+                        ) : null}
                       </span>
                       <span className="twin-muted mt-1 block text-xs">
                         {formatInterviewRange(row.interview_start, row.interview_end, loc)}
                       </span>
                     </div>
-                    <button
-                      type="button"
-                      className="twin-link shrink-0 self-start text-xs font-medium sm:self-center"
-                      disabled={icsBusyId === row.id}
-                      onClick={() => {
-                        void (async () => {
-                          setIcsBusyId(row.id);
-                          try {
-                            const blob = await downloadInterviewIcs(row.id);
-                            saveBlobAsFile(blob, `twin-interview-${row.id}.ics`);
-                          } catch (e) {
-                            console.warn("[calendar] ics download failed", e);
-                          } finally {
-                            setIcsBusyId(null);
-                          }
-                        })();
-                      }}
-                    >
-                      {icsBusyId === row.id ? "…" : t("dashboard.calendarInterviewDownloadIcs")}
-                    </button>
+                    <div className="flex shrink-0 flex-wrap gap-2 self-start sm:self-center">
+                      <button
+                        type="button"
+                        className="twin-link text-xs font-medium"
+                        disabled={icsBusyId === row.id || row.status === "cancelled"}
+                        onClick={() => {
+                          void (async () => {
+                            setIcsBusyId(row.id);
+                            try {
+                              const blob = await downloadInterviewIcs(row.id);
+                              saveBlobAsFile(blob, `twin-interview-${row.id}.ics`);
+                            } catch (e) {
+                              console.warn("[calendar] ics download failed", e);
+                            } finally {
+                              setIcsBusyId(null);
+                            }
+                          })();
+                        }}
+                      >
+                        {icsBusyId === row.id ? "…" : t("dashboard.calendarInterviewDownloadIcs")}
+                      </button>
+                      {row.status !== "cancelled" ? (
+                        <button
+                          type="button"
+                          className="text-xs font-medium text-red-600 hover:underline dark:text-red-400"
+                          disabled={cancelBusyId === row.id}
+                          onClick={() => {
+                            void (async () => {
+                              setCancelBusyId(row.id);
+                              try {
+                                await cancelInterviewRequest(row.id);
+                                await load();
+                              } catch (e) {
+                                console.warn("[calendar] cancel failed", e);
+                              } finally {
+                                setCancelBusyId(null);
+                              }
+                            })();
+                          }}
+                        >
+                          {cancelBusyId === row.id ? "…" : t("dashboard.calendarInterviewCancel")}
+                        </button>
+                      ) : null}
+                    </div>
                   </li>
                 ))}
               </ul>
