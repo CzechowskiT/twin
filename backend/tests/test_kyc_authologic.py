@@ -76,6 +76,7 @@ def test_kyc_start_persists_conversation(monkeypatch) -> None:
             res = client.post(
                 "/api/v1/kyc/authologic/start",
                 headers={"Authorization": f"Bearer {token}"},
+                json={"identity_provider_processing_consent": True},
             )
         assert res.status_code == 200
         body = res.json()

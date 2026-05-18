@@ -1,6 +1,6 @@
 """Talent pool anonymous listing API."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient
@@ -13,6 +13,19 @@ from app.database.session import get_db
 from app.main import app
 from app.api.talent_pool import candidate_public_id, is_talent_pool_validated
 
+_CONSENT_TS = datetime(2024, 1, 1, tzinfo=timezone.utc)
+
+
+def _user_with_pool_consents(**kwargs) -> User:
+    return User(
+        email=kwargs.get("email", "u@example.com"),
+        hashed_password="x",
+        gdpr_consent_at=_CONSENT_TS,
+        terms_of_service_accepted_at=_CONSENT_TS,
+        job_data_processing_consent_at=_CONSENT_TS,
+        ai_matching_consent_at=_CONSENT_TS,
+    )
+
 
 def test_candidate_public_id_stable() -> None:
     a = candidate_public_id("secret", 42)
@@ -23,16 +36,13 @@ def test_candidate_public_id_stable() -> None:
 
 
 def test_pool_validated_requires_skills_or_cv() -> None:
-    user_ok = User(
-        email="u1@example.com",
-        hashed_password="x",
-        gdpr_consent_at=datetime(2024, 1, 1),
-    )
+    user_ok = _user_with_pool_consents(email="u1@example.com")
     c_skills = Candidate(
         user_id=1,
         name="Hidden",
         skills='["a","b","c"]',
         talent_pool_opt_in=True,
+        talent_pool_opt_in_at=_CONSENT_TS,
     )
     c_skills.user = user_ok
     assert is_talent_pool_validated(user_ok, c_skills) is True
@@ -43,6 +53,7 @@ def test_pool_validated_requires_skills_or_cv() -> None:
         skills="[]",
         cv_text="some text",
         talent_pool_opt_in=True,
+        talent_pool_opt_in_at=_CONSENT_TS,
     )
     c_cv.user = user_ok
     assert is_talent_pool_validated(user_ok, c_cv) is True
@@ -53,6 +64,7 @@ def test_pool_validated_requires_skills_or_cv() -> None:
         skills='["x","y"]',
         cv_text=None,
         talent_pool_opt_in=True,
+        talent_pool_opt_in_at=_CONSENT_TS,
     )
     c_weak.user = user_ok
     assert is_talent_pool_validated(user_ok, c_weak) is False
@@ -70,11 +82,7 @@ def _sqlite_session():
 
 def test_anonymous_talent_pool_endpoint() -> None:
     db = _sqlite_session()
-    user = User(
-        email="pool@example.com",
-        hashed_password="x",
-        gdpr_consent_at=datetime(2024, 1, 1),
-    )
+    user = _user_with_pool_consents(email="pool@example.com")
     db.add(user)
     db.commit()
     db.refresh(user)
@@ -86,6 +94,7 @@ def test_anonymous_talent_pool_endpoint() -> None:
         experience_years=6,
         desired_salary=20000,
         talent_pool_opt_in=True,
+        talent_pool_opt_in_at=_CONSENT_TS,
     )
     db.add(cand)
     db.commit()
@@ -143,11 +152,7 @@ def test_anonymous_talent_pool_job_id_404() -> None:
 
 def test_anonymous_talent_pool_uses_saved_job() -> None:
     db = _sqlite_session()
-    user = User(
-        email="j@example.com",
-        hashed_password="x",
-        gdpr_consent_at=datetime(2024, 1, 1),
-    )
+    user = _user_with_pool_consents(email="j@example.com")
     db.add(user)
     db.commit()
     db.refresh(user)
@@ -169,6 +174,7 @@ def test_anonymous_talent_pool_uses_saved_job() -> None:
         name="X",
         skills='["python","fastapi"]',
         talent_pool_opt_in=True,
+        talent_pool_opt_in_at=_CONSENT_TS,
     )
     db.add(cand)
     db.commit()

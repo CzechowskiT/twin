@@ -59,3 +59,14 @@ Deferred here to respect minimal-diff scope and time; each item remains valid ba
 ### Step 50 (full `pytest tests/`)
 
 Run on 2026-05-18: **153 passed**, 1 skipped, **4 failed** (appear unrelated to steps 1–13: `test_kyc_authologic.py`, `test_talent_pool.py` ×3). No `chore: ci fixes` commit until those are triaged against a live Postgres + Authologic fixtures.
+
+### 2026-05-18 — Triage: KYC + talent pool “failures”
+
+**Root cause (not live Authologic / Postgres):**
+
+- `POST /kyc/authologic/start` now requires JSON `identity_provider_processing_consent: true`; the test sent an empty body → **422**. Fixed test payload only.
+- Talent pool `is_talent_pool_validated` and anonymous listing filter require **pool opt-in timestamp** plus **terms / job-data / AI-matching** consent timestamps on `User`. Tests only set `gdpr_consent_at` → candidates never counted as validated or listed. Fixed fixtures to set those fields.
+
+**Run:** from `backend/`, use project venv (`backend/.venv/bin/pytest tests/`) so optional deps like `fpdf2` resolve; system `python3 -m pytest` may miss them.
+
+**Result:** `157 passed`, 1 skipped (2026-05-18 after fixes).
