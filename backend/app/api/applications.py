@@ -26,6 +26,7 @@ from app.schemas.application import (
     ApplicationStatusEnum,
     ApplicationUpdate,
     AutoApplyOut,
+    AutoApplyPackageUrlOut,
     AutoApplyRequest,
     DevelopmentFocusOut,
     ParseFeedbackIn,
@@ -47,6 +48,7 @@ from app.services.auto_apply_guards import (
 )
 from app.services.auto_apply_service import auto_apply_for_user
 from app.services.employer_webhook import dispatch_auto_apply_webhook
+from app.services.s3_storage import get_s3_blob_store
 from app.services.idempotency import (
     normalize_idempotency_key,
     store_idempotent_response,
@@ -58,6 +60,8 @@ from app.services.recruitment_feedback import build_feedback_insights, parse_sto
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
+
+_PACKAGE_PRESIGN_DEFAULT_TTL_SEC = 3600
 
 _APPLICATION_EXPORT_CSV_MAX_ROWS = 5000
 _APPLICATION_EXPORT_CSV_NOTES_MAX = 50_000
@@ -150,6 +154,55 @@ def list_my_applications(
     )
     items = [_to_out(app, job) for app, job in rows]
     return ApplicationListOut(items=items, total=total)
+
+
+@router.get(
+    "/{application_id}/auto-apply-package-url",
+    response_model=AutoApplyPackageUrlOut,
+    summary="Presigned URL for tailored auto-apply PDF",
+    description="Time-limited HTTPS URL to the PDF package uploaded after auto-apply (S3). Owner-only.",
+)
+def get_auto_apply_package_presigned_url(
+    application_id: int,
+    expires_in: int = Query(
+        _PACKAGE_PRESIGN_DEFAULT_TTL_SEC,
+        ge=60,
+        le=86400 * 7,
+        description="Presigned URL lifetime in seconds (clamped server-side).",
+    ),
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> AutoApplyPackageUrlOut:
+    candidate = _candidate_or_404(db, user.id)
+    app = (
+        db.query(Application)
+        .filter(Application.id == application_id, Application.candidate_id == candidate.id)
+        .first()
+    )
+    if not app:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Application not found")
+    if not app.auto_apply_package_s3_key:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No auto-apply package PDF stored for this application.",
+        )
+    store = get_s3_blob_store()
+    if not store.enabled:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Object storage is not configured.",
+        )
+    url = store.presigned_get_url(key=app.auto_apply_package_s3_key, expires_in=expires_in)
+    if not url:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Could not generate download URL.",
+        )
+    return AutoApplyPackageUrlOut(
+        url=url,
+        expires_in_seconds=expires_in,
+        uploaded_at=app.auto_apply_package_uploaded_at,
+    )
 
 
 @router.get(
@@ -431,11 +484,28 @@ def auto_apply(
             application_id=None,
         )
     else:
+        pkg_url: str | None = None
+        pkg_ttl: int | None = None
+        if (
+            outcome in (ApplyOutcome.SUBMITTED, ApplyOutcome.FORM_FILLED)
+            and app is not None
+            and app.auto_apply_package_s3_key
+        ):
+            store = get_s3_blob_store()
+            if store.enabled:
+                u = store.presigned_get_url(
+                    key=app.auto_apply_package_s3_key,
+                    expires_in=_PACKAGE_PRESIGN_DEFAULT_TTL_SEC,
+                )
+                if u:
+                    pkg_url, pkg_ttl = u, _PACKAGE_PRESIGN_DEFAULT_TTL_SEC
         out = AutoApplyOut(
             success=outcome in (ApplyOutcome.SUBMITTED, ApplyOutcome.FORM_FILLED),
             outcome=outcome.value,
             message=message,
             application_id=app.id if app else None,
+            package_pdf_url=pkg_url,
+            package_pdf_url_expires_in_seconds=pkg_ttl,
         )
         if out.success and settings.employer_webhook_url.strip():
             background_tasks.add_task(
@@ -762,4 +832,5 @@ def _to_out(app: Application, job: Job) -> ApplicationOut:
         placement_reported_at=app.placement_reported_at,
         placement_verified_at=app.placement_verified_at,
         placement_declaration_note=app.placement_declaration_note,
+        auto_apply_package_uploaded_at=app.auto_apply_package_uploaded_at,
     )

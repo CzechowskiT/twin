@@ -358,6 +358,8 @@ const en = {
       "Every saved role gets a timestamp you can trust when recruiters ping you weeks later. Start from Top matches or the job feed below.",
     applicationStatus: "Application status",
     removeApplication: "Remove",
+    autoApplyPackagePdf: "Package PDF",
+    autoApplyPackagePdfFailedToast: "Could not get a download link for the package PDF.",
     appStatusPending: "Saved",
     appStatusApplied: "Applied",
     appStatusInterview: "Interview",
@@ -395,10 +397,11 @@ const en = {
     scrapeUpstreamHint:
       "The Twin website could not reach your API from Vercel’s servers. Open Vercel → your project → Settings → Environment Variables: set **TWIN_API_BASE_URL** (best: server-only) or **NEXT_PUBLIC_API_URL** to your Railway API URL (`https://…up.railway.app` with **no** trailing slash), save, then **Redeploy** the frontend. In Railway, open the API service and confirm it is **Active** and the latest deploy succeeded — then **Redeploy** the API too. After that, hard-refresh this page (Cmd+Shift+R / Ctrl+Shift+R).",
     scrapeQueued:
-      "Scrape queued. New listings appear after Celery workers finish — refresh the job feed in a minute or two (or check worker logs on the API host).",
+      "Scrape started. This page refreshes the job list every few seconds until counts stabilize — you do not need to reload manually (waits up to about 25 minutes while workers run).",
     scrapeFinished: "Scrape finished",
     scrapeRefreshFailed:
       "Scrape was queued, but refreshing the dashboard failed (details below). Try reloading the page in a minute.",
+    scrapeListUpdatedToast: "Job feed updated: {n} listings.",
     placementDeclareHint:
       "First confirm in-app that you accepted an offer or started in this role. This creates an audit trail before we send any work-email link.",
     placementDeclareNotePlaceholder:
@@ -1679,6 +1682,8 @@ const pl: MessageTree = {
       "Każda zapisana rola ma znacznik czasu, któremu zaufasz, gdy rekruter odezwie się po tygodniach. Zacznij od Najlepszych dopasowań albo feedu ofert poniżej.",
     applicationStatus: "Status aplikacji",
     removeApplication: "Usuń",
+    autoApplyPackagePdf: "PDF paczki",
+    autoApplyPackagePdfFailedToast: "Nie udało się pobrać linku do PDF paczki.",
     appStatusPending: "Zapisana",
     appStatusApplied: "Wysłana",
     appStatusInterview: "Rozmowa",
@@ -1717,10 +1722,11 @@ const pl: MessageTree = {
     scrapeUpstreamHint:
       "Strona na Vercelu nie może połączyć się z Twoim API (Railway). Wejdź w Vercel → projekt → Settings → Environment Variables: ustaw **TWIN_API_BASE_URL** (najlepiej tylko serwer) albo **NEXT_PUBLIC_API_URL** na adres API z Railway (`https://…up.railway.app` **bez** ukośnika na końcu), zapisz i zrób **Redeploy** frontu. W Railway sprawdź, czy usługa API jest **Active** i ostatni deploy jest OK — zrób też **Redeploy** API. Potem twarde odświeżenie strony (Cmd+Shift+R / Ctrl+Shift+R).",
     scrapeQueued:
-      "Pobieranie zakolejkowane. Nowe oferty pojawią się po zakończeniu zadań Celery — odśwież feed za minutę–dwie (albo zajrzyj w logi workerów na hoście API).",
+      "Pobieranie uruchomione. Strona sama odświeża listę ofert co kilka sekund, aż licznik się ustabilizuje — nie musisz ręcznie przeładowywać (do ok. 25 min, dopóki działają workery).",
     scrapeFinished: "Pobieranie zakończone",
     scrapeRefreshFailed:
       "Pobieranie zostało zakolejkowane, ale odświeżenie panelu się nie powiodło (szczegóły poniżej). Za minutę odśwież stronę.",
+    scrapeListUpdatedToast: "Feed ofert zaktualizowany: {n} ofert.",
     placementDeclareHint:
       "Najpierw potwierdź w aplikacji, że przyjąłeś ofertę lub rozpocząłeś pracę w tej roli. To tworzy ślad audytowy zanim wyślemy link na służbowy mail.",
     placementDeclareNotePlaceholder:

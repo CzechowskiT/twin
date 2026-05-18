@@ -32,6 +32,8 @@ export type ApplicationRow = {
   placement_reported_at?: string | null;
   placement_verified_at?: string | null;
   placement_declaration_note?: string | null;
+  /** ISO timestamp when tailored auto-apply PDF was stored (S3). */
+  auto_apply_package_uploaded_at?: string | null;
 };
 
 export type FeedbackBusy = { id: number; kind: "save" | "parse" } | null;
@@ -70,6 +72,7 @@ export function ApplicationsPanel({
   placementFlowBusy,
   onPlacementEventsLoad,
   placementEventsInvalidateKey,
+  onOpenAutoApplyPackage,
 }: {
   items: ApplicationRow[];
   onStatusChange: (id: number, status: string) => void;
@@ -83,6 +86,8 @@ export function ApplicationsPanel({
   onPlacementEventsLoad?: (applicationId: number) => Promise<PlacementEventRow[]>;
   /** Bump after declare/verify so the audit log refetches from the API on next open. */
   placementEventsInvalidateKey?: number;
+  /** Fetch presigned URL and open tailored auto-apply PDF (when `auto_apply_package_uploaded_at` is set). */
+  onOpenAutoApplyPackage?: (applicationId: number) => Promise<void>;
 }) {
   const { t } = useTranslation();
   const [statusFilter, setStatusFilter] = useState<(typeof STATUSES)[number] | "all">("all");
@@ -95,6 +100,7 @@ export function ApplicationsPanel({
   const [placementEventsByAppId, setPlacementEventsByAppId] = useState<Record<number, PlacementEventRow[]>>({});
   const [placementEventsLoadingId, setPlacementEventsLoadingId] = useState<number | null>(null);
   const [placementEventsErrById, setPlacementEventsErrById] = useState<Record<number, string>>({});
+  const [packagePdfBusyId, setPackagePdfBusyId] = useState<number | null>(null);
 
   useEffect(() => {
     setDraftById((prev) => {
@@ -494,6 +500,19 @@ export function ApplicationsPanel({
               >
                 {t("dashboard.removeApplication")}
               </button>
+              {onOpenAutoApplyPackage && app.auto_apply_package_uploaded_at ? (
+                <button
+                  type="button"
+                  disabled={packagePdfBusyId === app.id}
+                  onClick={() => {
+                    setPackagePdfBusyId(app.id);
+                    void onOpenAutoApplyPackage(app.id).finally(() => setPackagePdfBusyId(null));
+                  }}
+                  className="text-xs text-[var(--twin-accent-hover)] hover:underline disabled:opacity-50"
+                >
+                  {packagePdfBusyId === app.id ? "…" : t("dashboard.autoApplyPackagePdf")}
+                </button>
+              ) : null}
             </div>
           </li>
         );

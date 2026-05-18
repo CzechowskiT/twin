@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import {
   ApplicationsPanel,
@@ -160,6 +160,8 @@ export default function DashboardPage() {
   const [titleFilterPrimed, setTitleFilterPrimed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [scraping, setScraping] = useState(false);
+  /** Stops background job-list polling when the dashboard unmounts or user leaves. */
+  const scrapePollCancelRef = useRef(false);
   const [autoApplyingId, setAutoApplyingId] = useState<number | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [showApplyPrompt, setShowApplyPrompt] = useState(false);
@@ -265,9 +267,10 @@ export default function DashboardPage() {
   }, []);
 
   const refreshDashboardData = useCallback(
-    async (token: string, hasProfile: boolean, activeFilters: JobFilters) => {
+    async (token: string, hasProfile: boolean, activeFilters: JobFilters): Promise<number> => {
       void loadGoogleCalendarStrip(token);
       if (hasProfile) setMatchesRefreshing(true);
+      let jobsTotal = 0;
       try {
         if (!hasProfile) {
           setSavedJobIds(new Set());
@@ -280,6 +283,7 @@ export default function DashboardPage() {
           hasProfile ? loadSavedJobIds(token) : Promise.resolve(null),
         ]);
         setJobs(jobList);
+        jobsTotal = jobList.total;
         if (matchList) setMatches(matchList);
         setApplications(apps.items);
         setApplicationsTotal(apps.total);
@@ -288,9 +292,16 @@ export default function DashboardPage() {
       } finally {
         if (hasProfile) setMatchesRefreshing(false);
       }
+      return jobsTotal;
     },
     [loadJobs, loadMatches, loadApplications, loadDevelopmentFocus, loadGoogleCalendarStrip, loadSavedJobIds],
   );
+
+  useEffect(() => {
+    return () => {
+      scrapePollCancelRef.current = true;
+    };
+  }, []);
 
   const applicationByJobId = useMemo(() => {
     const map: Record<number, string> = {};
@@ -549,6 +560,7 @@ export default function DashboardPage() {
       const result = await apiFetch<{
         success: boolean;
         message: string;
+        package_pdf_url?: string | null;
       }>(
         "/api/v1/applications/auto-apply",
         { method: "POST", body: JSON.stringify({ job_id: jobId, human_acknowledged: true }) },
@@ -557,10 +569,30 @@ export default function DashboardPage() {
       syncApplicationsFromApi(await loadApplications(token));
       setDevFocus(await loadDevelopmentFocus(token));
       toast.success(result.message);
+      if (result.package_pdf_url) {
+        window.open(result.package_pdf_url, "_blank", "noopener,noreferrer");
+      }
     } catch (err) {
       setError(dashboardFetchUserMessage(err, t));
     } finally {
       setAutoApplyingId(null);
+    }
+  }
+
+  async function openAutoApplyPackagePdf(applicationId: number) {
+    const token = getToken();
+    if (!token) return;
+    setError(null);
+    try {
+      const data = await apiFetch<{ url: string }>(
+        `/api/v1/applications/${applicationId}/auto-apply-package-url`,
+        {},
+        token,
+      );
+      window.open(data.url, "_blank", "noopener,noreferrer");
+    } catch (err) {
+      setError(dashboardFetchUserMessage(err, t));
+      toast.error(t("dashboard.autoApplyPackagePdfFailedToast"));
     }
   }
 
@@ -783,7 +815,10 @@ export default function DashboardPage() {
   async function triggerScrapeAll() {
     const token = getToken();
     if (!token) return;
+    const baselineTotal = jobs?.total ?? 0;
+    const hasProf = profile !== null && profile !== undefined;
     setError(null);
+    scrapePollCancelRef.current = false;
     setScraping(true);
     try {
       const result = await apiFetch<{ message: string; task_id?: string }>(
@@ -791,19 +826,48 @@ export default function DashboardPage() {
         { method: "POST" },
         token,
       );
-      alert(
-        result.task_id && result.task_id !== "sync"
-          ? t("dashboard.scrapeQueued")
-          : result.message || t("dashboard.scrapeFinished"),
-      );
-      if (profile !== null && profile !== undefined) {
+      const queued = Boolean(result.task_id && result.task_id !== "sync");
+      toast.success(queued ? t("dashboard.scrapeQueued") : result.message || t("dashboard.scrapeFinished"));
+      if (hasProf) {
         setShowApplyPrompt(true);
         queueMicrotask(() => {
           document.getElementById("dashboard-matches")?.scrollIntoView({ behavior: "smooth", block: "start" });
         });
       }
       try {
-        await refreshDashboardData(token, profile !== null && profile !== undefined, filters);
+        let lastTotal = await refreshDashboardData(token, hasProf, filters);
+        if (queued) {
+          const intervalMs = 4000;
+          const maxMs = 25 * 60 * 1000;
+          const stableNeeded = 5;
+          const minStableMs = 12_000;
+          const start = Date.now();
+          let stableTicks = 0;
+          let prev = lastTotal;
+          let sawIncrease = lastTotal > baselineTotal;
+
+          while (!scrapePollCancelRef.current && Date.now() - start < maxMs) {
+            await new Promise((r) => setTimeout(r, intervalMs));
+            if (scrapePollCancelRef.current) break;
+            try {
+              lastTotal = await refreshDashboardData(token, hasProf, filters);
+            } catch {
+              /* keep polling — transient API errors during long scrapes */
+              continue;
+            }
+            if (lastTotal > baselineTotal) sawIncrease = true;
+            if (lastTotal === prev) {
+              stableTicks += 1;
+            } else {
+              stableTicks = 0;
+              prev = lastTotal;
+            }
+            if (sawIncrease && stableTicks >= stableNeeded && Date.now() - start >= minStableMs) {
+              toast.success(t("dashboard.scrapeListUpdatedToast").replace("{n}", String(lastTotal)));
+              break;
+            }
+          }
+        }
       } catch (refreshErr) {
         setError(
           `${t("dashboard.scrapeRefreshFailed")} ${dashboardFetchUserMessage(refreshErr, t, "scrape")}`,
@@ -811,6 +875,8 @@ export default function DashboardPage() {
       }
     } catch (err) {
       setError(dashboardFetchUserMessage(err, t, "scrape"));
+    } finally {
+      setScraping(false);
     }
   }
 
@@ -1308,6 +1374,7 @@ export default function DashboardPage() {
             placementFlowBusy={placementFlowBusy}
             onPlacementEventsLoad={loadPlacementEvents}
             placementEventsInvalidateKey={placementEventsInvalidateKey}
+            onOpenAutoApplyPackage={openAutoApplyPackagePdf}
           />
         </Card>
       )}

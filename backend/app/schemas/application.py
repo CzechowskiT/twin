@@ -65,6 +65,8 @@ class ApplicationOut(BaseModel):
     placement_reported_at: datetime | None = None
     placement_verified_at: datetime | None = None
     placement_declaration_note: str | None = None
+    # Set when a tailored auto-apply PDF was uploaded to object storage (presigned URL via dedicated GET).
+    auto_apply_package_uploaded_at: datetime | None = None
 
     model_config = {"from_attributes": True}
 
@@ -147,3 +149,12 @@ class AutoApplyOut(BaseModel):
     outcome: str
     message: str
     application_id: int | None = None
+    # Short-lived HTTPS URL to the tailored package PDF (only when S3 upload succeeded).
+    package_pdf_url: str | None = None
+    package_pdf_url_expires_in_seconds: int | None = None
+
+
+class AutoApplyPackageUrlOut(BaseModel):
+    url: str
+    expires_in_seconds: int
+    uploaded_at: datetime | None = None
