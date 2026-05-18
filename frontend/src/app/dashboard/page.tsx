@@ -156,12 +156,22 @@ export default function DashboardPage() {
   }, []);
 
   const loadApplications = useCallback(async (token: string) => {
-    const data = await apiFetch<{ items: ApplicationRow[]; total: number }>(
-      "/api/v1/applications/me?limit=500&offset=0",
-      {},
-      token,
-    );
-    return { items: data.items, total: data.total };
+    const pageSize = 200;
+    let offset = 0;
+    let total = 0;
+    const items: ApplicationRow[] = [];
+    for (;;) {
+      const data = await apiFetch<{ items: ApplicationRow[]; total: number }>(
+        `/api/v1/applications/me?limit=${pageSize}&offset=${offset}`,
+        {},
+        token,
+      );
+      total = data.total;
+      items.push(...data.items);
+      if (items.length >= total || data.items.length === 0) break;
+      offset += pageSize;
+    }
+    return { items, total };
   }, []);
 
   const syncApplicationsFromApi = useCallback((payload: { items: ApplicationRow[]; total: number }) => {
