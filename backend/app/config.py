@@ -141,6 +141,12 @@ class Settings(BaseSettings):
     auto_apply_state_dir: str = "data/browser_state"
     auto_apply_default_phone: str = ""
     auto_apply_submit: bool = True
+    # One PDF: tailored pitch + consent + verbatim CV text; attached instead of raw CV when possible.
+    auto_apply_tailored_pdf: bool = True
+    # Optional TTF with Polish glyphs (defaults to backend/assets/fonts/NotoSans-Regular.ttf).
+    auto_apply_font_path: str = ""
+    # Extra consent paragraphs (Polish), double-newline separated, appended after defaults.
+    auto_apply_consent_extra_pl: str = ""
 
     debug: bool = False
 

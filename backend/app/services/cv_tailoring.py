@@ -20,6 +20,7 @@ Return ONLY valid JSON with this exact shape:
 
 Rules:
 - Use ONLY facts supported by the CV text; do not invent employers, degrees, dates, or tools.
+- Never claim certifications, job titles, employers, or degrees that are not clearly supported by the CV text.
 - Match the dominant language of the CV (Polish vs English) for the pitch and bullets.
 - pitch_paragraph: 3–6 sentences, max ~1200 characters, focused on fit for the target role.
 - strength_bullets: 4–6 bullets, each max 220 characters, concrete achievements or responsibilities.
@@ -196,3 +197,44 @@ def get_tailoring_pitch_for_job(signals: dict[str, Any] | None, apply_job_id: in
             parts.append("\n".join(lines))
     out = "\n\n".join(parts).strip()
     return out[:8000] if out else None
+
+
+def _pitch_from_tailoring_dict(body: dict[str, Any]) -> str:
+    parts: list[str] = []
+    p = body.get("pitch_paragraph")
+    if isinstance(p, str) and p.strip():
+        parts.append(p.strip())
+    bullets = body.get("strength_bullets")
+    if isinstance(bullets, list):
+        lines = [f"• {str(b).strip()}" for b in bullets if str(b).strip()][:8]
+        if lines:
+            parts.append("\n".join(lines))
+    kw = body.get("keywords")
+    if isinstance(kw, list):
+        flat = [str(x).strip() for x in kw if str(x).strip()][:16]
+        if flat:
+            parts.append("Keywords: " + ", ".join(flat))
+    out = "\n\n".join(parts).strip()
+    return out[:8000]
+
+
+def build_motivation_text_for_auto_apply(
+    cv_text: str,
+    *,
+    job_title: str,
+    company: str | None,
+    job_context: str | None,
+) -> str:
+    """Fresh pitch for each auto-apply from CV text + job listing (Claude or deterministic fallback)."""
+    text = (cv_text or "").strip()
+    if not text:
+        return ""
+    title = (job_title or "").strip()[:200] or "wybrana rola"
+    comp = (company or "").strip()[:200] or None
+    ctx = (job_context or "").strip()[:8000] or None
+    if is_anthropic_configured():
+        ai = _tailor_with_claude(text, target_job_title=title, company=comp, job_context=ctx)
+        if ai:
+            return _pitch_from_tailoring_dict(ai)
+    fb = _fallback_tailoring(text, title)
+    return _pitch_from_tailoring_dict(fb)

@@ -1,6 +1,10 @@
 """CV tailoring helpers for auto-apply motivation fields."""
 
-from app.services.cv_tailoring import build_cv_tailoring_blob, get_tailoring_pitch_for_job
+from app.services.cv_tailoring import (
+    build_cv_tailoring_blob,
+    build_motivation_text_for_auto_apply,
+    get_tailoring_pitch_for_job,
+)
 
 
 def test_get_tailoring_pitch_when_job_id_matches() -> None:
@@ -40,3 +44,14 @@ def test_build_tailoring_blob_shape() -> None:
     assert "pitch_paragraph" in blob
     assert isinstance(blob["strength_bullets"], list)
     assert blob["source"] in ("claude", "fallback")
+
+
+def test_build_motivation_text_for_auto_apply_fallback() -> None:
+    txt = build_motivation_text_for_auto_apply(
+        "Anna Nowak\n• Zarządzanie zespołem sprzedaży\n• CRM Salesforce",
+        job_title="Sales Director",
+        company="Contoso",
+        job_context="B2B sales, Warsaw",
+    )
+    assert "Sales Director" in txt or "sprzedaż" in txt.lower()
+    assert len(txt) > 40

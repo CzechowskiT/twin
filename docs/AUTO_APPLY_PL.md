@@ -15,6 +15,16 @@ Cloudflare Turnstile jest zaprojektowany tak, żeby **boty nie mogły** same zaz
 
 Na serwerze w chmurze (Railway, headless) Indeed **zawsze** zatrzyma się na CAPTCHA.
 
+## Zawartość pakietu (PDF) przy auto-apply
+
+Domyślnie (`AUTO_APPLY_TAILORED_PDF=true`) TWIN przed uruchomieniem Playwrighta buduje **jeden plik PDF**:
+
+1. **Dopasowanie do oferty** — świeży tekst z CV + treści ogłoszenia (Claude, jeśli skonfigurowany `ANTHROPIC_API_KEY`, w przeciwnym razie deterministyczny fallback). Reguły: bez wymyślania pracodawców, dat, certyfikatów spoza CV.
+2. **Oświadczenia i zgody** — domyślne akapity po polsku (RODO / prawda CV / świadome użycie auto-apply). Własne akapity można dopisać w `AUTO_APPLY_CONSENT_EXTRA_PL` (bloki oddzielone pustą linią).
+3. **Treść CV (źródłowa)** — tekst wyekstrahowany z przekazanego pliku (do limitu znaków), jako załącznik referencyjny.
+
+Czcionka Unicode: `backend/assets/fonts/NotoSans-Regular.ttf` (SIL OFL) albo ścieżka w `AUTO_APPLY_FONT_PATH`.
+
 ## Użycie z panelu
 
 1. Przy ofercie z Pracuj.pl kliknij **Auto-apply**.
@@ -27,6 +37,9 @@ Na serwerze w chmurze (Railway, headless) Indeed **zawsze** zatrzyma się na CAP
 AUTO_APPLY_HEADLESS=false
 AUTO_APPLY_SUBMIT=true
 AUTO_APPLY_DEFAULT_PHONE=+48123456789
+AUTO_APPLY_TAILORED_PDF=true
+# AUTO_APPLY_FONT_PATH=/abs/path/NotoSans-Regular.ttf
+# AUTO_APPLY_CONSENT_EXTRA_PL=Własny akapit zgody.\n\nDrugi akapit.
 ```
 
 - `HEADLESS=false` — wymagane przy CAPTCHA.

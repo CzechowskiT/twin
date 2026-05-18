@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import logging
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -12,7 +14,43 @@ from app.automation.apply_engine import run_auto_apply
 from app.automation.types import ApplyOutcome
 from app.config import get_settings
 from app.database.models import Application, ApplicationStatus, Candidate, Job, User
-from app.services.cv_tailoring import get_tailoring_pitch_for_job
+from app.services.application_package_pdf import render_application_package_pdf
+from app.services.cv_parser import CvParseError, extract_cv_text
+from app.services.cv_tailoring import build_motivation_text_for_auto_apply, get_tailoring_pitch_for_job
+
+logger = logging.getLogger(__name__)
+
+
+def _job_context_text(job: Job) -> str:
+    parts: list[str] = []
+    if job.description:
+        parts.append(job.description.strip())
+    if job.requirements:
+        parts.append(job.requirements.strip())
+    return "\n\n".join(p for p in parts if p)[:9000]
+
+
+def _cv_text_for_apply(candidate: Candidate) -> str | None:
+    if candidate.cv_text and str(candidate.cv_text).strip():
+        return str(candidate.cv_text).strip()
+    if candidate.resume_path:
+        rp = Path(candidate.resume_path)
+        if rp.is_file():
+            try:
+                raw = rp.read_bytes()
+                fn = candidate.cv_filename or rp.name
+                return extract_cv_text(raw, fn).strip()
+            except (CvParseError, OSError) as exc:
+                logger.warning("Could not extract CV text from resume_path: %s", exc)
+                return None
+    return None
+
+
+def _extra_consent_tuple(raw: str) -> tuple[str, ...] | None:
+    if not raw or not str(raw).strip():
+        return None
+    chunks = [p.strip() for p in str(raw).split("\n\n") if p.strip()]
+    return tuple(chunks) if chunks else None
 
 
 def auto_apply_for_user(
@@ -31,7 +69,14 @@ def auto_apply_for_user(
     if not job:
         return ApplyOutcome.FAILED, "Nie znaleziono oferty.", None
 
-    state_dir = Path(settings.auto_apply_state_dir) / str(user.id)
+    cv_text = _cv_text_for_apply(candidate)
+    if not cv_text:
+        return (
+            ApplyOutcome.FAILED,
+            "Wgraj CV lub poczekaj na przetworzenie tekstu — auto-apply wymaga treści życiorysu.",
+            None,
+        )
+
     signals: dict[str, Any] = {}
     if candidate.profile_signals_json:
         try:
@@ -39,19 +84,74 @@ def auto_apply_for_user(
             signals = parsed if isinstance(parsed, dict) else {}
         except json.JSONDecodeError:
             signals = {}
-    motivation_text = get_tailoring_pitch_for_job(signals, job_id)
-    result = run_auto_apply(
-        job_board=job.job_board,
-        job_url=job.url,
-        name=candidate.name,
-        email=user.email,
-        phone=settings.auto_apply_default_phone,
-        resume_path=candidate.resume_path,
-        motivation_text=motivation_text,
-        headless=settings.auto_apply_headless,
-        state_dir=state_dir,
-        submit=submit,
-    )
+
+    motivation = build_motivation_text_for_auto_apply(
+        cv_text,
+        job_title=job.title,
+        company=job.company,
+        job_context=_job_context_text(job),
+    ) or (get_tailoring_pitch_for_job(signals, job_id) or "")
+
+    state_dir = Path(settings.auto_apply_state_dir) / str(user.id)
+    state_dir.mkdir(parents=True, exist_ok=True)
+
+    package_pdf: Path | None = None
+    resume_path = candidate.resume_path
+    if settings.auto_apply_tailored_pdf:
+        try:
+            package_pdf = state_dir / f"apply_pkg_{job_id}_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}.pdf"
+            render_application_package_pdf(
+                package_pdf,
+                candidate_name=candidate.name,
+                job_title=job.title,
+                job_company=job.company,
+                job_board=job.job_board,
+                motivation_text=motivation,
+                cv_text=cv_text,
+                extra_consent_paragraphs=_extra_consent_tuple(settings.auto_apply_consent_extra_pl),
+                font_path_override=settings.auto_apply_font_path or None,
+            )
+            resume_path = str(package_pdf)
+        except FileNotFoundError as exc:
+            logger.warning("%s — używam oryginalnego CV.", exc)
+            if candidate.resume_path and Path(candidate.resume_path).is_file():
+                resume_path = candidate.resume_path
+            else:
+                return ApplyOutcome.FAILED, str(exc), None
+        except Exception:
+            logger.exception("Tailored PDF failed — falling back to original CV upload.")
+            if candidate.resume_path and Path(candidate.resume_path).is_file():
+                resume_path = candidate.resume_path
+                package_pdf = None
+            else:
+                return (
+                    ApplyOutcome.FAILED,
+                    "Nie udało się zbudować PDF ani znaleźć oryginalnego pliku CV.",
+                    None,
+                )
+
+    if not resume_path or not Path(resume_path).is_file():
+        return ApplyOutcome.FAILED, "Brak pliku CV do załączenia (wgraj CV w profilu).", None
+
+    try:
+        result = run_auto_apply(
+            job_board=job.job_board,
+            job_url=job.url,
+            name=candidate.name,
+            email=user.email,
+            phone=settings.auto_apply_default_phone,
+            resume_path=resume_path,
+            motivation_text=motivation or None,
+            headless=settings.auto_apply_headless,
+            state_dir=state_dir,
+            submit=submit,
+        )
+    finally:
+        if package_pdf and package_pdf.is_file():
+            try:
+                package_pdf.unlink()
+            except OSError:
+                logger.warning("Could not remove temp package PDF %s", package_pdf)
 
     app = _upsert_application(db, candidate.id, job_id, result.outcome)
     return result.outcome, result.message, app
@@ -63,8 +163,6 @@ def _upsert_application(
     job_id: int,
     outcome: ApplyOutcome,
 ) -> Application:
-    from datetime import datetime
-
     app = (
         db.query(Application)
         .filter(Application.candidate_id == candidate_id, Application.job_id == job_id)
