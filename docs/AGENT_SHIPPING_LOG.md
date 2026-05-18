@@ -5,6 +5,15 @@
 - `GET /api/v1/public/mvp-stats` — aggregate non-PII counters (jobs, users, applications, CV profiles, registry size, LinkedIn/Stripe config flags) for investor diligence.
 - `/calculator` page: `MvpLiveStatsStrip` fetches the endpoint (EN/PL copy).
 
+### MVP backlog (steps 16–18, 24–25, 33–34, 41)
+
+- **16–18 GDPR JSON export:** `GET /api/v1/candidates/me/export.json` returns an attachment (`twin-my-data.json`) assembled by `build_user_owned_export_payload` — account fields without Stripe customer/subscription IDs or `referral_public_token`, full `candidate` row, `applications`, joined **`applications_summary`** (`total`, `by_status`, per-row job title/company/url, etc.). Tests: `backend/tests/test_candidates_me_export_json.py`. Dashboard download + EN/PL strings (`exportMyDataJson`, `exportMyDataJsonAria`) shipped in `8d45286`.
+- **24–25 FE CSV / export errors + matches loading:** `csvExportUserMessage` maps 401/403/404 and network failures to `dashboard.csvExport*` / `dashboard.apiNetworkError` copy; matches panel shows a pulse skeleton with `aria-busy` while initial matches load (`matchesInitialSkeleton`). `8d45286`.
+- **33–34 Health DB flag:** `GET /api/v1/health/features` includes **`database_reachable`** (cheap `SELECT 1` via SQLAlchemy `engine.begin()`, with PostgreSQL `SET LOCAL statement_timeout = '2s'`). `GET /api/v1/health?db=true` still adds **`db_ok`** for the same probe without changing the default `/health` JSON shape for existing clients.
+- **41 Dashboard footer:** main dashboard footer links to `/privacy` and `/terms` with i18n keys `dashboard.footerPrivacy` / `dashboard.footerTerms`. `8d45286`.
+
+**Pytest (`backend/tests/`):** 166 passed, 1 skipped (2026-05-19, project venv).
+
 ## 2026-05-18 — 50-step MVP pass (partial)
 
 **Branch:** `cursor/phase1-monorepo-scaffold`
