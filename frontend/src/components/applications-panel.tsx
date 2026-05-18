@@ -86,6 +86,7 @@ export function ApplicationsPanel({
 }) {
   const { t } = useTranslation();
   const [statusFilter, setStatusFilter] = useState<(typeof STATUSES)[number] | "all">("all");
+  const [appSearch, setAppSearch] = useState("");
   const [openId, setOpenId] = useState<number | null>(null);
   const [draftById, setDraftById] = useState<Record<number, string>>({});
   const [workEmailById, setWorkEmailById] = useState<Record<number, string>>({});
@@ -130,9 +131,18 @@ export function ApplicationsPanel({
   }
 
   const visibleItems = useMemo(() => {
-    if (statusFilter === "all") return items;
-    return items.filter((a) => normalizeApplicationSelectStatus(a.status) === statusFilter);
-  }, [items, statusFilter]);
+    let rows = statusFilter === "all" ? items : items.filter((a) => normalizeApplicationSelectStatus(a.status) === statusFilter);
+    const q = appSearch.trim().toLowerCase();
+    if (q) {
+      rows = rows.filter(
+        (a) =>
+          a.title.toLowerCase().includes(q) ||
+          a.company.toLowerCase().includes(q) ||
+          Boolean(a.notes && a.notes.toLowerCase().includes(q)),
+      );
+    }
+    return rows;
+  }, [items, statusFilter, appSearch]);
 
   return (
     <>
@@ -155,8 +165,23 @@ export function ApplicationsPanel({
             ))}
           </select>
         </label>
+        <label className="flex min-w-0 flex-1 flex-col gap-1 text-xs text-[var(--twin-muted-strong)] sm:max-w-md">
+          <span>{t("dashboard.appsSearchLabel")}</span>
+          <input
+            type="search"
+            value={appSearch}
+            onChange={(e) => setAppSearch(e.target.value)}
+            placeholder={t("dashboard.appsSearchPlaceholder")}
+            className="w-full rounded border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-2 py-1.5 text-sm text-[var(--foreground)] placeholder:text-[var(--twin-muted)]"
+          />
+        </label>
       </div>
       <ul className="space-y-2 text-sm">
+        {visibleItems.length === 0 ? (
+          <li className="twin-muted rounded-lg border border-dashed border-[var(--twin-border)] px-3 py-6 text-center text-sm">
+            {t("dashboard.appsFilterEmpty")}
+          </li>
+        ) : null}
         {visibleItems.map((app) => {
         const busy = feedbackBusy?.id === app.id ? feedbackBusy.kind : null;
         const draft = draftFor(app);

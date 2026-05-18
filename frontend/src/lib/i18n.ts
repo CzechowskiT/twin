@@ -330,6 +330,9 @@ const en = {
     applicationsExportCsv: "Export applications (.csv)",
     appsFilterStatus: "Filter by status",
     appsFilterAll: "All statuses",
+    appsSearchLabel: "Search",
+    appsSearchPlaceholder: "Title, company, notes…",
+    appsFilterEmpty: "No applications match these filters.",
     noApplications: "No tracked applications yet. Use Save or Apply on a job.",
     appsEmptyMomentum:
       "Every saved role gets a timestamp you can trust when recruiters ping you weeks later. Start from Top matches or the job feed below.",
@@ -1513,6 +1516,9 @@ const pl: MessageTree = {
     applicationsExportCsv: "Eksport aplikacji (.csv)",
     appsFilterStatus: "Filtruj po statusie",
     appsFilterAll: "Wszystkie statusy",
+    appsSearchLabel: "Szukaj",
+    appsSearchPlaceholder: "Tytuł, firma, notatki…",
+    appsFilterEmpty: "Żadna aplikacja nie pasuje do filtrów.",
     noApplications: "Brak śledzonych aplikacji. Użyj Zapisz lub Aplikuj przy ofercie.",
     appsEmptyMomentum:
       "Każda zapisana rola ma znacznik czasu, któremu zaufasz, gdy rekruter odezwie się po tygodniach. Zacznij od Najlepszych dopasowań albo feedu ofert poniżej.",
