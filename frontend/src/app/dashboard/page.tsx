@@ -20,7 +20,7 @@ import { apiFetch, apiFetchBlob, isLikelyBrowserNetworkFailureMessage, saveBlobA
 import { clearToken, getToken } from "@/lib/auth";
 import { SHOW_SCRAPE_UI } from "@/lib/features";
 import type { TranslationKey } from "@/lib/i18n";
-import { buildJobsQuery, defaultJobFilters, type JobFilters } from "@/lib/jobs";
+import { buildJobsQuery, defaultJobFilters, loadStoredJobFilters, persistJobFilters, type JobFilters } from "@/lib/jobs";
 
 type User = {
   id: number;
@@ -376,9 +376,15 @@ export default function DashboardPage() {
     return () => ac.abort();
   }, [router, t, loadApplications, loadDevelopmentFocus]);
 
+  useEffect(() => {
+    const restored = loadStoredJobFilters();
+    if (restored) setFilters(restored);
+  }, []);
+
   async function applyFilters() {
     const token = getToken();
     if (!token) return;
+    persistJobFilters(filters);
     await refreshDashboardData(token, profile !== null && profile !== undefined, filters);
   }
 
