@@ -43,8 +43,31 @@ def record_placement_event(
     event_type: str,
     actor: str,
     detail: dict | None = None,
+    owner_user_id: int | None = None,
+    from_magic_link: bool = False,
 ) -> None:
-    """Persist one append-only row (no raw tokens or full mailbox addresses)."""
+    """Persist one append-only row (no raw tokens or full mailbox addresses).
+
+    Callers must pass ``owner_user_id`` for candidate-initiated flows, or
+    ``from_magic_link=True`` only after ``confirm_placement_token`` has already
+    authenticated the row via hashed token (defense-in-depth against IDOR).
+    """
+    if from_magic_link:
+        exists = db.query(Application.id).filter(Application.id == application_id).first()
+        if not exists:
+            raise ValueError("Application not found.")
+    elif owner_user_id is not None:
+        ok = (
+            db.query(Application.id)
+            .join(Candidate, Candidate.id == Application.candidate_id)
+            .filter(Application.id == application_id, Candidate.user_id == owner_user_id)
+            .first()
+        )
+        if not ok:
+            raise ValueError("Application not found.")
+    else:
+        raise ValueError("Placement event requires owner_user_id or from_magic_link.")
+
     body: str | None
     if detail:
         raw = json.dumps(detail, separators=(",", ":"), ensure_ascii=False)
@@ -117,6 +140,7 @@ def declare_placement_intent(
         event_type="placement.self_declared",
         actor="candidate",
         detail={"has_note": bool(cleaned), "note_chars": len(cleaned or "")},
+        owner_user_id=user.id,
     )
     db.commit()
     db.refresh(app)
@@ -196,6 +220,7 @@ def start_work_email_verification(
         event_type="placement.verify_link_issued",
         actor="candidate",
         detail={"work_email_domain": _work_email_domain(email), "mail_sent": sent},
+        owner_user_id=user.id,
     )
     db.commit()
 
@@ -237,6 +262,7 @@ def confirm_placement_token(db: Session, raw_token: str) -> tuple[bool, str]:
         event_type="placement.verify_confirmed",
         actor="magic_link",
         detail={"promoted_to_hired": promoted},
+        from_magic_link=True,
     )
     db.commit()
     return True, "Placement verified. Thank you."
