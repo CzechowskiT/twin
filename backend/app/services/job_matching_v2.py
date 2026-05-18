@@ -1,4 +1,4 @@
-"""Match scoring v2: v1 rules plus optional salary overlap bonus and optional TF–IDF text similarity."""
+"""Match scoring v2: v1 rules plus optional salary overlap bonus and optional TF-IDF text similarity."""
 
 from __future__ import annotations
 
@@ -62,7 +62,7 @@ def _job_text_blob(job: dict[str, Any]) -> str:
 
 
 def _tfidf_similarity_bonus(candidate: dict[str, Any], job: dict[str, Any]) -> float:
-    """Cosine similarity on a two-document TF–IDF fit; mapped to a small additive slice (max ~20)."""
+    """Cosine similarity on a two-document TF-IDF fit; mapped to a small additive slice (max ~20)."""
     doc_a = _candidate_text_blob(candidate)
     doc_b = _job_text_blob(job)
     if len(doc_a) < 24 or len(doc_b) < 24:
@@ -94,7 +94,7 @@ def calculate_match_score_v2_tfidf(
     *,
     include_v2_salary_bonus: bool,
 ) -> float:
-    """v1 or v2 base plus TF–IDF layer (capped at 100)."""
+    """v1 or v2 base plus TF-IDF layer (capped at 100)."""
     base_fn = calculate_match_score_v2 if include_v2_salary_bonus else calculate_match_score
     base = base_fn(candidate, job)
     return round(min(100.0, base + _tfidf_similarity_bonus(candidate, job)), 2)
