@@ -68,6 +68,8 @@ type MatchItem = {
 type MatchList = { items: MatchItem[]; total: number };
 type FilterOptions = { job_boards: string[]; locations: string[] };
 
+type GoogleCalendarStrip = { connected: boolean; google_email: string | null };
+
 type DevelopmentFocus = {
   skill_tool_gaps: string[];
   positioning_themes: string[];
@@ -113,6 +115,7 @@ export default function DashboardPage() {
   const [showApplyPrompt, setShowApplyPrompt] = useState(false);
   const [placementFlowBusy, setPlacementFlowBusy] = useState<PlacementFlowBusy>(null);
   const [placementEventsInvalidateKey, setPlacementEventsInvalidateKey] = useState(0);
+  const [googleCalendarStrip, setGoogleCalendarStrip] = useState<GoogleCalendarStrip | null>(null);
 
   const loadJobs = useCallback(async (token: string, activeFilters: JobFilters) => {
     return apiFetch<JobList>(`/api/v1/jobs/${buildJobsQuery(activeFilters)}`, {}, token);
@@ -135,8 +138,18 @@ export default function DashboardPage() {
     }
   }, []);
 
+  const loadGoogleCalendarStrip = useCallback(async (token: string) => {
+    try {
+      const s = await apiFetch<GoogleCalendarStrip>("/api/v1/calendar/google/status", {}, token);
+      setGoogleCalendarStrip(s);
+    } catch {
+      setGoogleCalendarStrip({ connected: false, google_email: null });
+    }
+  }, []);
+
   const refreshDashboardData = useCallback(
     async (token: string, hasProfile: boolean, activeFilters: JobFilters) => {
+      void loadGoogleCalendarStrip(token);
       const [jobList, matchList, apps, focus] = await Promise.all([
         loadJobs(token, activeFilters),
         hasProfile ? loadMatches(token) : Promise.resolve(null),
@@ -149,7 +162,7 @@ export default function DashboardPage() {
       setDevFocus(focus);
       setLastUpdated(new Date());
     },
-    [loadJobs, loadMatches, loadApplications, loadDevelopmentFocus],
+    [loadJobs, loadMatches, loadApplications, loadDevelopmentFocus, loadGoogleCalendarStrip],
   );
 
   const applicationByJobId = useMemo(() => {
@@ -582,15 +595,40 @@ export default function DashboardPage() {
       </div>
 
       {user ? (
-        <DashboardCommandCenter
-          email={user.email}
-          profileName={profile ? profile.name : undefined}
-          hasProfile={hasProfile}
-          showScrapeUi={SHOW_SCRAPE_UI}
-          jobsTotal={jobs?.total ?? 0}
-          matchesVisible={visibleMatches.length}
-          applicationsActive={pipelineActiveCount}
-        />
+        <>
+          <DashboardCommandCenter
+            email={user.email}
+            profileName={profile ? profile.name : undefined}
+            hasProfile={hasProfile}
+            showScrapeUi={SHOW_SCRAPE_UI}
+            jobsTotal={jobs?.total ?? 0}
+            matchesVisible={visibleMatches.length}
+            applicationsActive={pipelineActiveCount}
+          />
+          <Card variant="soft" className="mb-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.calendarStripTitle")}</p>
+                <p className="twin-muted mt-1 text-xs leading-relaxed">
+                  {googleCalendarStrip === null
+                    ? t("dashboard.calendarStripLoading")
+                    : googleCalendarStrip.connected
+                      ? t("dashboard.calendarStripConnected").replace(
+                          "{email}",
+                          googleCalendarStrip.google_email?.trim() || "—",
+                        )
+                      : t("dashboard.calendarStripDisconnected")}
+                </p>
+              </div>
+              <Link
+                href="/dashboard/calendar"
+                className="twin-btn-secondary twin-touch-target shrink-0 text-center text-sm sm:text-left"
+              >
+                {t("dashboard.calendarStripCta")}
+              </Link>
+            </div>
+          </Card>
+        </>
       ) : null}
 
       {hasProfile && profile?.career_compass_preview?.configured ? (

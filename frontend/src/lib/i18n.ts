@@ -523,6 +523,12 @@ const en = {
     billingPlanProPending: "Pro price is not wired to Stripe on this deployment yet.",
     identityLink: "Identity (KYC)",
     calendarLink: "Calendar",
+    calendarStripTitle: "Interview calendar",
+    calendarStripLoading: "Checking Google Calendar connection…",
+    calendarStripConnected: "Google Calendar connected as {email}.",
+    calendarStripDisconnected:
+      "Google Calendar is not connected. Connect so TWIN can read busy time before proposing interview slots.",
+    calendarStripCta: "Open calendar settings",
     calendarPageTitle: "Calendars & availability",
     calendarPageLead:
       "Connect calendars so TWIN can read busy time and place interview holds. Google Calendar is available today via OAuth. Microsoft 365 / Outlook and Apple Calendar (iCloud) are on the roadmap with the same consent, audit, and revoke story.",
@@ -1690,6 +1696,12 @@ const pl: MessageTree = {
     billingPlanProPending: "Cena Pro nie jest jeszcze podpięta pod Stripe na tym środowisku.",
     identityLink: "Tożsamość (KYC)",
     calendarLink: "Kalendarz",
+    calendarStripTitle: "Kalendarz rozmów",
+    calendarStripLoading: "Sprawdzanie połączenia z Google Calendar…",
+    calendarStripConnected: "Google Calendar: połączono jako {email}.",
+    calendarStripDisconnected:
+      "Google Calendar nie jest połączony. Połącz, żeby TWIN widział zajętość przy propozycjach slotów rozmów.",
+    calendarStripCta: "Ustawienia kalendarza",
     calendarPageTitle: "Kalendarze i dostępność",
     calendarPageLead:
       "Podłącz kalendarze, żeby TWIN widział zajętość i mógł stawiać sloty rozmów. Google Calendar działa dziś przez OAuth. Microsoft 365 / Outlook oraz Apple Calendar (iCloud) są w roadmapie z tą samą historią zgody, audytu i odwołania dostępu.",
