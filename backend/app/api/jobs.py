@@ -47,6 +47,36 @@ _CELERY_QUEUE_DETAIL = (
     "(`celery -A app.tasks.celery_app worker`), then retry."
 )
 
+_SCRAPE_FALLBACK_MSG = (
+    "Kolejka Redis/Celery nie odebrała zadania — uruchomiłem pełny scraping w tle w procesie API "
+    "(bez workera). Poczekaj kilka minut i odśwież listę ofert."
+)
+
+
+def _is_brokerish_failure(exc: BaseException) -> bool:
+    """True when Redis/broker is down — not for scraper logic failures inside .apply()."""
+    if isinstance(exc, (ConnectionError, TimeoutError)):
+        return True
+    errno = getattr(exc, "errno", None)
+    if isinstance(exc, OSError) and errno in {111, 61, 99, 110, 113}:
+        return True
+    mod = type(exc).__module__.lower()
+    if any(x in mod for x in ("kombu", "redis", "amqp", "billiard")):
+        return True
+    low = str(exc).lower()
+    return any(
+        n in low
+        for n in (
+            "connection refused",
+            "error 111",
+            "name or service not known",
+            "could not connect",
+            "timeout connecting",
+            "redis connection",
+            "error 8 connecting",
+        )
+    )
+
 
 def _eager_background_run(thread_name: str, thunk: Callable[[], None]) -> None:
     """Run Celery `.delay()` off the request thread so proxies do not time out."""
@@ -55,16 +85,20 @@ def _eager_background_run(thread_name: str, thunk: Callable[[], None]) -> None:
         try:
             thunk()
         except Exception:
-            logger.exception("%s failed (CELERY_TASK_ALWAYS_EAGER)", thread_name)
+            logger.exception("%s failed", thread_name)
 
     threading.Thread(target=_runner, name=thread_name, daemon=True).start()
 
 
-def _celery_send(fn: Callable[[], object]) -> object:
-    """Run a Celery `.delay()` / `.apply()`; translate broker errors into a clear 503."""
+def _celery_delay(task, *args, **kwargs):
+    """Enqueue Celery `.delay()`; only translate **broker** failures into HTTP 503."""
     try:
-        return fn()
+        return task.delay(*args, **kwargs)
+    except HTTPException:
+        raise
     except Exception as exc:
+        if not _is_brokerish_failure(exc):
+            raise
         logger.warning("Celery enqueue failed: %s", exc, exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -151,52 +185,81 @@ def trigger_scrape_all(
     sync: bool = False,
     _user: User = Depends(get_current_user),
 ) -> ScrapeAllOut:
-    if sync:
-        result = _celery_send(lambda: scrape_all_boards_task.apply())
-        data = result.get() if hasattr(result, "get") else result
-        errors = data.get("errors", {})
-        total = int(data.get("total_saved", 0))
-        boards = {
-            board_id: BoardScrapeResult(
-                scraped=int(entry.get("scraped", 0)),
-                saved=int(entry.get("saved", 0)),
-                error=str(entry["error"]) if entry.get("error") else None,
+    try:
+        if sync:
+            try:
+                result = scrape_all_boards_task.apply()
+            except Exception as exc:
+                logger.exception("sync scrape-all failed")
+                raise HTTPException(
+                    status_code=status.HTTP_502_BAD_GATEWAY,
+                    detail=f"Scrape nie powiódł się: {exc}",
+                ) from exc
+            data = result.get() if hasattr(result, "get") else result
+            errors = data.get("errors", {})
+            total = int(data.get("total_saved", 0))
+            boards = {
+                board_id: BoardScrapeResult(
+                    scraped=int(entry.get("scraped", 0)),
+                    saved=int(entry.get("saved", 0)),
+                    error=str(entry["error"]) if entry.get("error") else None,
+                )
+                for board_id, entry in data.get("boards", {}).items()
+            }
+            msg = f"Scrape finished: {total} new jobs saved across all boards"
+            if errors:
+                failed = ", ".join(sorted(errors.keys()))
+                msg += f" ({len(errors)} failed: {failed})"
+            return ScrapeAllOut(
+                task_id="sync",
+                total_saved=total,
+                boards=boards,
+                errors=errors,
+                message=msg,
             )
-            for board_id, entry in data.get("boards", {}).items()
-        }
-        msg = f"Scrape finished: {total} new jobs saved across all boards"
-        if errors:
-            failed = ", ".join(sorted(errors.keys()))
-            msg += f" ({len(errors)} failed: {failed})"
-        return ScrapeAllOut(
-            task_id="sync",
-            total_saved=total,
-            boards=boards,
-            errors=errors,
-            message=msg,
-        )
 
-    # Eager mode runs the task inside the API process; doing that in this request would exceed
-    # typical reverse-proxy timeouts (e.g. Vercel 45s) and can surface as opaque 500s. Offload to a
-    # daemon thread so the client gets an immediate 200 while scraping continues.
-    if get_settings().celery_task_always_eager:
-        _eager_background_run("twin-scrape-all-eager", lambda: scrape_all_boards_task.delay())
+        # Eager mode runs the task inside the API process; doing that in this request would exceed
+        # typical reverse-proxy timeouts (e.g. Vercel 45s) and can surface as opaque 500s. Offload to a
+        # daemon thread so the client gets an immediate 200 while scraping continues.
+        if get_settings().celery_task_always_eager:
+            _eager_background_run("twin-scrape-all-eager", lambda: scrape_all_boards_task.delay())
+            return ScrapeAllOut(
+                task_id="eager-background",
+                total_saved=0,
+                boards={},
+                errors={},
+                message="Scrape all boards started in background (eager API mode)",
+            )
+
+        try:
+            async_result = _celery_delay(scrape_all_boards_task)
+        except HTTPException as exc:
+            if exc.status_code != status.HTTP_503_SERVICE_UNAVAILABLE:
+                raise
+            logger.warning("scrape/all: broker unavailable, falling back to in-process thread")
+            _eager_background_run("twin-scrape-all-fallback", lambda: scrape_all_boards_task.apply())
+            return ScrapeAllOut(
+                task_id="api-thread-fallback",
+                total_saved=0,
+                boards={},
+                errors={},
+                message=_SCRAPE_FALLBACK_MSG,
+            )
         return ScrapeAllOut(
-            task_id="eager-background",
+            task_id=str(async_result.id),
             total_saved=0,
             boards={},
             errors={},
-            message="Scrape all boards started in background (eager API mode)",
+            message="Scrape all boards queued",
         )
-
-    async_result = _celery_send(lambda: scrape_all_boards_task.delay())
-    return ScrapeAllOut(
-        task_id=str(async_result.id),
-        total_saved=0,
-        boards={},
-        errors={},
-        message="Scrape all boards queued",
-    )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.exception("POST /jobs/scrape/all failed")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Nie udało się uruchomić pełnego scrapingu. Sprawdź logi API albo spróbuj ponownie za chwilę.",
+        ) from exc
 
 
 @router.post("/scrape/{board}", response_model=ScrapeTaskOut)
@@ -205,48 +268,85 @@ def trigger_scrape(
     sync: bool = False,
     _user: User = Depends(get_current_user),
 ) -> ScrapeTaskOut:
-    is_global = board in GLOBAL_BOARD_SPECS
-    handler = LOCAL_SCRAPE_HANDLERS.get(board)
-    if not handler and not is_global:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown job board")
+    try:
+        is_global = board in GLOBAL_BOARD_SPECS
+        handler = LOCAL_SCRAPE_HANDLERS.get(board)
+        if not handler and not is_global:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown job board")
 
-    if sync:
-        if is_global:
-            result = _celery_send(lambda: scrape_global_board_task.apply(args=[board]))
-        else:
-            result = _celery_send(lambda: handler.apply())
-        data = result.get() if hasattr(result, "get") else result
-        if isinstance(data, dict) and data.get("error"):
-            raise HTTPException(
-                status_code=status.HTTP_502_BAD_GATEWAY,
-                detail=str(data["error"]),
+        if sync:
+            try:
+                if is_global:
+                    result = scrape_global_board_task.apply(args=[board])
+                else:
+                    assert handler is not None
+                    result = handler.apply()
+            except Exception as exc:
+                logger.exception("sync scrape failed board=%s", board)
+                raise HTTPException(
+                    status_code=status.HTTP_502_BAD_GATEWAY,
+                    detail=f"Scrape nie powiódł się: {exc}",
+                ) from exc
+            data = result.get() if hasattr(result, "get") else result
+            if isinstance(data, dict) and data.get("error"):
+                raise HTTPException(
+                    status_code=status.HTTP_502_BAD_GATEWAY,
+                    detail=str(data["error"]),
+                )
+            saved = data.get("saved", 0) if isinstance(data, dict) else 0
+            scraped = data.get("scraped", 0) if isinstance(data, dict) else 0
+            return ScrapeTaskOut(
+                task_id="sync",
+                job_board=board,
+                message=f"Scrape finished: {saved} new jobs saved ({scraped} fetched)",
             )
-        saved = data.get("saved", 0) if isinstance(data, dict) else 0
-        scraped = data.get("scraped", 0) if isinstance(data, dict) else 0
-        return ScrapeTaskOut(
-            task_id="sync",
-            job_board=board,
-            message=f"Scrape finished: {saved} new jobs saved ({scraped} fetched)",
-        )
 
-    if get_settings().celery_task_always_eager:
-        if is_global:
-            _eager_background_run(f"twin-scrape-{board}", lambda b=board: scrape_global_board_task.delay(b))
-        else:
-            assert handler is not None
-            _eager_background_run(f"twin-scrape-{board}", lambda: handler.delay())
-        return ScrapeTaskOut(
-            task_id="eager-background",
-            job_board=board,
-            message=f"Scrape started in background for {board} (eager API mode)",
-        )
+        if get_settings().celery_task_always_eager:
+            if is_global:
+                _eager_background_run(f"twin-scrape-{board}", lambda b=board: scrape_global_board_task.delay(b))
+            else:
+                assert handler is not None
+                _eager_background_run(f"twin-scrape-{board}", lambda: handler.delay())
+            return ScrapeTaskOut(
+                task_id="eager-background",
+                job_board=board,
+                message=f"Scrape started in background for {board} (eager API mode)",
+            )
 
-    if is_global:
-        async_result = _celery_send(lambda: scrape_global_board_task.delay(board))
-    else:
-        async_result = _celery_send(lambda: handler.delay())
-    return ScrapeTaskOut(
-        task_id=str(async_result.id),
-        job_board=board,
-        message=f"Scrape queued for {board}",
-    )
+        try:
+            if is_global:
+                async_result = _celery_delay(scrape_global_board_task, board)
+            else:
+                assert handler is not None
+                async_result = _celery_delay(handler)
+        except HTTPException as exc:
+            if exc.status_code != status.HTTP_503_SERVICE_UNAVAILABLE:
+                raise
+            logger.warning("scrape/%s: broker unavailable, falling back to in-process thread", board)
+
+            def _fallback() -> None:
+                if is_global:
+                    scrape_global_board_task.apply(args=[board])
+                else:
+                    assert handler is not None
+                    handler.apply()
+
+            _eager_background_run(f"twin-scrape-{board}-fallback", _fallback)
+            return ScrapeTaskOut(
+                task_id="api-thread-fallback",
+                job_board=board,
+                message=_SCRAPE_FALLBACK_MSG,
+            )
+        return ScrapeTaskOut(
+            task_id=str(async_result.id),
+            job_board=board,
+            message=f"Scrape queued for {board}",
+        )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.exception("POST /jobs/scrape/{board} failed board=%s", board)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Nie udało się uruchomić scrapingu dla tego portalu. Spróbuj ponownie za chwilę.",
+        ) from exc
