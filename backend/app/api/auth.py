@@ -257,6 +257,23 @@ def _authenticate(email: str, password: str, db: Session) -> Token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     if not verify_password(password, user.hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+    # Migration 011 copies gdpr_consent_at into extended fields; if that migration never ran (or
+    # partially failed), users would be locked out with 403 despite having accepted privacy before.
+    base = user.gdpr_consent_at
+    if base and (
+        user.terms_of_service_accepted_at is None
+        or user.job_data_processing_consent_at is None
+        or user.ai_matching_consent_at is None
+    ):
+        if user.terms_of_service_accepted_at is None:
+            user.terms_of_service_accepted_at = base
+        if user.job_data_processing_consent_at is None:
+            user.job_data_processing_consent_at = base
+        if user.ai_matching_consent_at is None:
+            user.ai_matching_consent_at = base
+        db.add(user)
+        db.commit()
+        db.refresh(user)
     if not _core_consents_complete(user):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

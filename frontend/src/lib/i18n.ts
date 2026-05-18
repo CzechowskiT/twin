@@ -581,6 +581,8 @@ const en = {
     noAccount: "No account?",
     register: "Register",
     failed: "Login failed",
+    configMissingApi:
+      "The website cannot reach the API. On Vercel, set TWIN_API_BASE_URL (server-only) or NEXT_PUBLIC_API_URL to your Railway API URL (https://… without trailing slash), then redeploy the frontend.",
     orContinue: "or continue with",
     linkedIn: "Continue with LinkedIn",
     linkedInComingSoon:
@@ -1723,6 +1725,8 @@ const pl: MessageTree = {
     noAccount: "Nie masz konta?",
     register: "Zarejestruj się",
     failed: "Logowanie nie powiodło się",
+    configMissingApi:
+      "Strona nie łączy się z API. Na Vercelu ustaw TWIN_API_BASE_URL (tylko serwer) albo NEXT_PUBLIC_API_URL na adres API z Railway (https://… bez ukośnika na końcu) i zrób redeploy frontu.",
     orContinue: "lub kontynuuj przez",
     linkedIn: "Kontynuuj z LinkedIn",
     linkedInComingSoon:

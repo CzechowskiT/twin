@@ -60,7 +60,17 @@ function LoginPageContent() {
       setToken(token.access_token);
       router.push("/dashboard");
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("login.failed"));
+      const msg = err instanceof Error ? err.message : "";
+      if (
+        msg.includes("Missing API base URL") ||
+        msg.includes("TWIN_API_BASE_URL") ||
+        msg.includes("NEXT_PUBLIC_API_URL") ||
+        msg.includes("Cannot reach API")
+      ) {
+        setError(t("login.configMissingApi"));
+      } else {
+        setError(msg || t("login.failed"));
+      }
     } finally {
       setLoading(false);
     }
