@@ -64,6 +64,7 @@ class ApplicationOut(BaseModel):
     placement_work_email: str | None = None
     placement_reported_at: datetime | None = None
     placement_verified_at: datetime | None = None
+    placement_declaration_note: str | None = None
 
     model_config = {"from_attributes": True}
 
@@ -75,6 +76,10 @@ class PlacementVerifyStartIn(BaseModel):
 class PlacementVerifyStartOut(BaseModel):
     mail_sent: bool
     message: str
+
+
+class PlacementDeclareIn(BaseModel):
+    note: str | None = Field(default=None, max_length=2000)
 
 
 class PlacementConfirmIn(BaseModel):

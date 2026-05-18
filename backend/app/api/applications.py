@@ -23,6 +23,7 @@ from app.schemas.application import (
     AutoApplyRequest,
     DevelopmentFocusOut,
     ParseFeedbackIn,
+    PlacementDeclareIn,
     PlacementVerifyStartIn,
     PlacementVerifyStartOut,
     PlacementEventListOut,
@@ -32,7 +33,7 @@ from app.schemas.application import (
 )
 from app.services.auto_apply_service import auto_apply_for_user
 from app.services import referral_program as referral_prog
-from app.services.placement_verification import start_work_email_verification
+from app.services.placement_verification import declare_placement_intent, start_work_email_verification
 from app.services.recruitment_feedback import build_feedback_insights, parse_stored_insights_json
 
 router = APIRouter()
@@ -169,6 +170,24 @@ def placement_verify_start(
         return PlacementVerifyStartOut(mail_sent=sent, message=msg)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/{application_id}/placement-declare", response_model=ApplicationOut)
+def placement_declare(
+    application_id: int,
+    body: PlacementDeclareIn = Body(default_factory=PlacementDeclareIn),
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> ApplicationOut:
+    """Self-declare placement intent (required before work-email magic link)."""
+    try:
+        app = declare_placement_intent(db, user=user, application_id=application_id, note=body.note)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    job = db.query(Job).filter(Job.id == app.job_id).first()
+    if not job:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+    return _to_out(app, job)
 
 
 @router.get("/{application_id}/placement-events", response_model=PlacementEventListOut)
@@ -424,4 +443,5 @@ def _to_out(app: Application, job: Job) -> ApplicationOut:
         placement_work_email=app.placement_work_email,
         placement_reported_at=app.placement_reported_at,
         placement_verified_at=app.placement_verified_at,
+        placement_declaration_note=app.placement_declaration_note,
     )

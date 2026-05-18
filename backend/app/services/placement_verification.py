@@ -18,6 +18,7 @@ from app.services.mail import is_mail_configured, send_placement_verification_em
 logger = logging.getLogger(__name__)
 
 PLACEMENT_NONE = "none"
+PLACEMENT_DECLARED = "declared"
 PLACEMENT_VERIFY_PENDING = "verify_pending"
 PLACEMENT_VERIFIED = "verified"
 
@@ -68,6 +69,60 @@ def _allowed_status(status: ApplicationStatus) -> bool:
     )
 
 
+def declare_placement_intent(
+    db: Session,
+    *,
+    user: User,
+    application_id: int,
+    note: str | None,
+) -> Application:
+    """In-app self-declaration before work-email verification (audit + state)."""
+    candidate = db.query(Candidate).filter(Candidate.user_id == user.id).first()
+    if not candidate:
+        raise ValueError("Complete your candidate profile first.")
+
+    row = (
+        db.query(Application, Job)
+        .join(Job, Application.job_id == Job.id)
+        .filter(Application.id == application_id, Application.candidate_id == candidate.id)
+        .first()
+    )
+    if not row:
+        raise ValueError("Application not found.")
+    app, _job = row
+
+    if app.placement_state == PLACEMENT_VERIFIED:
+        raise ValueError("Placement is already verified for this application.")
+    if app.placement_state == PLACEMENT_VERIFY_PENDING:
+        raise ValueError("A verification link is already pending — check your work inbox or wait for it to expire.")
+    if not _allowed_status(app.status):
+        raise ValueError("Set application status to Applied, Interview, or Hired before declaring placement.")
+
+    now = datetime.now(timezone.utc)
+    cleaned = (note or "").strip()[:2000] or None
+
+    if app.placement_state == PLACEMENT_NONE:
+        app.placement_state = PLACEMENT_DECLARED
+        app.placement_reported_at = now
+        app.placement_declaration_note = cleaned
+    elif app.placement_state == PLACEMENT_DECLARED:
+        app.placement_declaration_note = cleaned
+    else:
+        raise ValueError("Invalid placement state for declaration.")
+
+    app.updated_at = datetime.utcnow()
+    record_placement_event(
+        db,
+        application_id=app.id,
+        event_type="placement.self_declared",
+        actor="candidate",
+        detail={"has_note": bool(cleaned), "note_chars": len(cleaned or "")},
+    )
+    db.commit()
+    db.refresh(app)
+    return app
+
+
 def start_work_email_verification(
     db: Session,
     settings: Settings,
@@ -100,6 +155,11 @@ def start_work_email_verification(
 
     if not _allowed_status(app.status):
         raise ValueError("Set application status to Applied, Interview, or Hired before verifying placement.")
+
+    if app.placement_state not in (PLACEMENT_DECLARED, PLACEMENT_VERIFY_PENDING):
+        raise ValueError(
+            "Confirm your placement intent in the dashboard before requesting a work-email verification link.",
+        )
 
     raw = secrets.token_urlsafe(32)
     digest = hash_placement_token(raw)

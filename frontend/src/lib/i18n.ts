@@ -372,8 +372,14 @@ const en = {
     scrapeFinished: "Scrape finished",
     scrapeRefreshFailed:
       "Scrape was queued, but refreshing the dashboard failed (details below). Try reloading the page in a minute.",
+    placementDeclareHint:
+      "First confirm in-app that you accepted an offer or started in this role. This creates an audit trail before we send any work-email link.",
+    placementDeclareNotePlaceholder:
+      "Optional: start date, job title on the contract, or other context (max 2000 characters).",
+    placementDeclareSubmit: "Confirm placement — continue to email step",
+    placementDeclareDone: "Intent recorded. Next, verify with your work email.",
     placementVerifyHint:
-      "Confirm you started (or accepted an offer) using your work email — we send one automated link; no recruiter calls from TWIN.",
+      "Send one automated link to your work inbox (same company domain as the role when you can). No recruiter calls from TWIN.",
     placementWorkEmailPlaceholder: "you@company.com",
     placementSendLink: "Send verification link",
     placementVerified: "Placement verified",
@@ -1526,8 +1532,14 @@ const pl: MessageTree = {
     scrapeFinished: "Pobieranie zakończone",
     scrapeRefreshFailed:
       "Pobieranie zostało zakolejkowane, ale odświeżenie panelu się nie powiodło (szczegóły poniżej). Za minutę odśwież stronę.",
+    placementDeclareHint:
+      "Najpierw potwierdź w aplikacji, że przyjąłeś ofertę lub rozpocząłeś pracę w tej roli. To tworzy ślad audytowy zanim wyślemy link na służbowy mail.",
+    placementDeclareNotePlaceholder:
+      "Opcjonalnie: data startu, stanowisko z umowy albo inny kontekst (maks. 2000 znaków).",
+    placementDeclareSubmit: "Potwierdzam placement — przejdź do maila służbowego",
+    placementDeclareDone: "Zapisaliśmy intencję. Teraz weryfikacja służbowym mailem.",
     placementVerifyHint:
-      "Potwierdź start (lub ofertę) służbowym mailem — jeden automatyczny link, bez telefonów od TWIN.",
+      "Wyślij jeden automatyczny link na służbową skrzynkę (najlepiej ta sama domena co rola). Bez telefonów od TWIN.",
     placementWorkEmailPlaceholder: "ty@firma.pl",
     placementSendLink: "Wyślij link weryfikacyjny",
     placementVerified: "Placement potwierdzony",

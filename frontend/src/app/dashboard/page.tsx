@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ApplicationsPanel, type ApplicationRow, type FeedbackBusy } from "@/components/applications-panel";
+import { ApplicationsPanel, type ApplicationRow, type FeedbackBusy, type PlacementFlowBusy } from "@/components/applications-panel";
 import { DashboardCommandCenter } from "@/components/dashboard-command-center";
 import { InvestorRoadmapPanel } from "@/components/investor-roadmap-panel";
 import { useTranslation } from "@/components/language-provider";
@@ -115,7 +115,7 @@ export default function DashboardPage() {
   const [autoApplyingId, setAutoApplyingId] = useState<number | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [showApplyPrompt, setShowApplyPrompt] = useState(false);
-  const [placementBusyId, setPlacementBusyId] = useState<number | null>(null);
+  const [placementFlowBusy, setPlacementFlowBusy] = useState<PlacementFlowBusy>(null);
 
   const loadJobs = useCallback(async (token: string, activeFilters: JobFilters) => {
     return apiFetch<JobList>(`/api/v1/jobs/${buildJobsQuery(activeFilters)}`, {}, token);
@@ -440,10 +440,30 @@ export default function DashboardPage() {
     }
   }
 
+  async function declarePlacement(applicationId: number, note: string) {
+    const token = getToken();
+    if (!token) return;
+    setPlacementFlowBusy({ id: applicationId, kind: "declare" });
+    setError(null);
+    try {
+      await apiFetch<ApplicationRow>(
+        `/api/v1/applications/${applicationId}/placement-declare`,
+        { method: "POST", body: JSON.stringify({ note: note.trim() || null }) },
+        token,
+      );
+      setApplications(await loadApplications(token));
+      setDevFocus(await loadDevelopmentFocus(token));
+    } catch (err) {
+      setError(dashboardFetchUserMessage(err, t));
+    } finally {
+      setPlacementFlowBusy(null);
+    }
+  }
+
   async function startPlacementVerify(applicationId: number, workEmail: string) {
     const token = getToken();
     if (!token) return;
-    setPlacementBusyId(applicationId);
+    setPlacementFlowBusy({ id: applicationId, kind: "verify" });
     setError(null);
     try {
       const out = await apiFetch<{ mail_sent: boolean; message: string }>(
@@ -457,7 +477,7 @@ export default function DashboardPage() {
     } catch (err) {
       setError(dashboardFetchUserMessage(err, t));
     } finally {
-      setPlacementBusyId(null);
+      setPlacementFlowBusy(null);
     }
   }
 
@@ -787,8 +807,9 @@ export default function DashboardPage() {
             onSaveFeedback={saveApplicationFeedback}
             onParseFeedback={parseApplicationFeedback}
             feedbackBusy={feedbackBusy}
+            onPlacementDeclare={declarePlacement}
             onPlacementVerifyStart={startPlacementVerify}
-            placementBusyId={placementBusyId}
+            placementFlowBusy={placementFlowBusy}
           />
         </Card>
       )}

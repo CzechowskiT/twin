@@ -31,9 +31,12 @@ export type ApplicationRow = {
   placement_work_email?: string | null;
   placement_reported_at?: string | null;
   placement_verified_at?: string | null;
+  placement_declaration_note?: string | null;
 };
 
 export type FeedbackBusy = { id: number; kind: "save" | "parse" } | null;
+
+export type PlacementFlowBusy = { id: number; kind: "declare" | "verify" } | null;
 
 const STATUSES = ["pending", "applied", "interview", "rejected", "hired"] as const;
 
@@ -54,8 +57,9 @@ export function ApplicationsPanel({
   onSaveFeedback,
   onParseFeedback,
   feedbackBusy,
+  onPlacementDeclare,
   onPlacementVerifyStart,
-  placementBusyId,
+  placementFlowBusy,
 }: {
   items: ApplicationRow[];
   onStatusChange: (id: number, status: string) => void;
@@ -63,13 +67,15 @@ export function ApplicationsPanel({
   onSaveFeedback: (id: number, raw: string) => Promise<void>;
   onParseFeedback: (id: number) => Promise<void>;
   feedbackBusy: FeedbackBusy;
+  onPlacementDeclare?: (id: number, note: string) => Promise<void>;
   onPlacementVerifyStart?: (id: number, workEmail: string) => Promise<void>;
-  placementBusyId?: number | null;
+  placementFlowBusy?: PlacementFlowBusy;
 }) {
   const { t } = useTranslation();
   const [openId, setOpenId] = useState<number | null>(null);
   const [draftById, setDraftById] = useState<Record<number, string>>({});
   const [workEmailById, setWorkEmailById] = useState<Record<number, string>>({});
+  const [declareNoteById, setDeclareNoteById] = useState<Record<number, string>>({});
 
   useEffect(() => {
     setDraftById((prev) => {
@@ -77,6 +83,17 @@ export function ApplicationsPanel({
       for (const app of items) {
         const fromApi = app.recruiter_feedback_raw ?? "";
         if (next[app.id] === undefined) next[app.id] = fromApi;
+      }
+      return next;
+    });
+  }, [items]);
+
+  useEffect(() => {
+    setDeclareNoteById((prev) => {
+      const next = { ...prev };
+      for (const app of items) {
+        const note = app.placement_declaration_note ?? "";
+        if (next[app.id] === undefined && note) next[app.id] = note;
       }
       return next;
     });
@@ -105,19 +122,50 @@ export function ApplicationsPanel({
                 {app.company}
                 {app.location ? ` · ${app.location}` : ""} · {app.job_board}
               </p>
-              {onPlacementVerifyStart && showPlacementRow(app) ? (
+              {onPlacementDeclare && onPlacementVerifyStart && showPlacementRow(app) ? (
                 <div className="mt-2 max-w-md space-y-2 rounded border border-[var(--twin-accent)]/25 bg-[var(--twin-accent-muted)]/25 p-2 text-xs">
-                  <p className="leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.placementVerifyHint")}</p>
                   {(app.placement_state ?? "none") === "verified" ? (
                     <p className="font-semibold text-[var(--twin-accent)]">{t("dashboard.placementVerified")}</p>
+                  ) : (app.placement_state ?? "none") === "none" ? (
+                    <>
+                      <p className="leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.placementDeclareHint")}</p>
+                      <textarea
+                        className="min-h-[72px] w-full rounded border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-2 py-1.5 text-[var(--foreground)] placeholder:text-[var(--twin-muted)]"
+                        placeholder={t("dashboard.placementDeclareNotePlaceholder")}
+                        value={declareNoteById[app.id] ?? ""}
+                        disabled={placementFlowBusy?.id === app.id && placementFlowBusy.kind === "declare"}
+                        onChange={(e) =>
+                          setDeclareNoteById((prev) => ({ ...prev, [app.id]: e.target.value }))
+                        }
+                      />
+                      <button
+                        type="button"
+                        disabled={placementFlowBusy?.id === app.id && placementFlowBusy.kind === "declare"}
+                        onClick={() => void onPlacementDeclare(app.id, declareNoteById[app.id] ?? "")}
+                        className="twin-btn-solid twin-touch-target !w-auto px-3 py-1.5 text-xs"
+                      >
+                        {placementFlowBusy?.id === app.id && placementFlowBusy.kind === "declare"
+                          ? "…"
+                          : t("dashboard.placementDeclareSubmit")}
+                      </button>
+                    </>
                   ) : (
                     <>
+                      {(app.placement_state ?? "none") === "declared" ? (
+                        <p className="font-medium text-[var(--twin-accent-hover)]">{t("dashboard.placementDeclareDone")}</p>
+                      ) : null}
+                      {app.placement_declaration_note ? (
+                        <p className="whitespace-pre-wrap rounded border border-[var(--twin-border)]/60 bg-[var(--twin-surface-raised)]/40 p-2 text-[var(--twin-muted-strong)]">
+                          {app.placement_declaration_note}
+                        </p>
+                      ) : null}
+                      <p className="leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.placementVerifyHint")}</p>
                       <input
                         type="email"
                         autoComplete="email"
                         placeholder={t("dashboard.placementWorkEmailPlaceholder")}
                         value={workEmailById[app.id] ?? app.placement_work_email ?? ""}
-                        disabled={placementBusyId === app.id}
+                        disabled={placementFlowBusy?.id === app.id && placementFlowBusy.kind === "verify"}
                         onChange={(e) =>
                           setWorkEmailById((prev) => ({ ...prev, [app.id]: e.target.value }))
                         }
@@ -126,7 +174,7 @@ export function ApplicationsPanel({
                       <button
                         type="button"
                         disabled={
-                          placementBusyId === app.id ||
+                          (placementFlowBusy?.id === app.id && placementFlowBusy.kind === "verify") ||
                           !(workEmailById[app.id] ?? app.placement_work_email ?? "").trim()
                         }
                         onClick={() =>
@@ -137,7 +185,9 @@ export function ApplicationsPanel({
                         }
                         className="twin-btn-solid twin-touch-target !w-auto px-3 py-1.5 text-xs"
                       >
-                        {placementBusyId === app.id ? "…" : t("dashboard.placementSendLink")}
+                        {placementFlowBusy?.id === app.id && placementFlowBusy.kind === "verify"
+                          ? "…"
+                          : t("dashboard.placementSendLink")}
                       </button>
                       {(app.placement_state ?? "none") === "verify_pending" ? (
                         <p className="text-[var(--twin-muted)]">{t("dashboard.placementVerifyPending")}</p>

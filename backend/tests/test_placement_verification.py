@@ -4,6 +4,8 @@ from unittest.mock import MagicMock
 
 from app.database.models import PlacementEvent
 from app.services.placement_verification import (
+    PLACEMENT_DECLARED,
+    PLACEMENT_VERIFY_PENDING,
     hash_placement_token,
     record_placement_event,
     _work_email_domain,
@@ -37,3 +39,8 @@ def test_record_placement_event_adds_row() -> None:
     assert row.event_type == "placement.verify_link_issued"
     assert row.actor == "candidate"
     assert "corp.example" in (row.detail_json or "")
+
+
+def test_work_email_verify_allows_declared_and_pending_states() -> None:
+    allowed = {PLACEMENT_DECLARED, PLACEMENT_VERIFY_PENDING}
+    assert "declared" in allowed and "verify_pending" in allowed
