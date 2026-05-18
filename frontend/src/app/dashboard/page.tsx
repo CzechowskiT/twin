@@ -81,14 +81,18 @@ function isLikelyBrowserNetworkFailure(message: string): boolean {
 }
 
 /** Map API/proxy failures to actionable copy (Vercel ↔ Railway). */
-function dashboardFetchUserMessage(err: unknown, t: (key: TranslationKey) => string): string {
+function dashboardFetchUserMessage(
+  err: unknown,
+  t: (key: TranslationKey) => string,
+  networkHint: "scrape" | "general" = "general",
+): string {
   const raw = err instanceof Error ? err.message : String(err);
   const lc = raw.trim().toLowerCase();
   if (lc.includes("missing api base url") || lc.includes("cannot reach api")) {
     return t("dashboard.scrapeUpstreamHint");
   }
   if (isLikelyBrowserNetworkFailure(raw)) {
-    return t("dashboard.scrapeNetworkError");
+    return networkHint === "scrape" ? t("dashboard.scrapeNetworkError") : t("dashboard.apiNetworkError");
   }
   return raw.trim() || t("dashboard.scrapeFailed");
 }
@@ -405,13 +409,11 @@ export default function DashboardPage() {
         await refreshDashboardData(token, profile !== null && profile !== undefined, filters);
       } catch (refreshErr) {
         setError(
-          `${t("dashboard.scrapeRefreshFailed")} ${dashboardFetchUserMessage(refreshErr, t)}`,
+          `${t("dashboard.scrapeRefreshFailed")} ${dashboardFetchUserMessage(refreshErr, t, "scrape")}`,
         );
       }
     } catch (err) {
-      setError(dashboardFetchUserMessage(err, t));
-    } finally {
-      setScraping(false);
+      setError(dashboardFetchUserMessage(err, t, "scrape"));
     }
   }
 
