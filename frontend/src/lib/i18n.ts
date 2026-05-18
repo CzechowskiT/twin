@@ -327,6 +327,7 @@ const en = {
     saveJob: "Save",
     dismissJob: "Not for me",
     applications: "My applications",
+    applicationsExportCsv: "Export applications (.csv)",
     noApplications: "No tracked applications yet. Use Save or Apply on a job.",
     appsEmptyMomentum:
       "Every saved role gets a timestamp you can trust when recruiters ping you weeks later. Start from Top matches or the job feed below.",
@@ -1504,6 +1505,7 @@ const pl: MessageTree = {
     saveJob: "Zapisz",
     dismissJob: "Nie dla mnie",
     applications: "Moje aplikacje",
+    applicationsExportCsv: "Eksport aplikacji (.csv)",
     noApplications: "Brak śledzonych aplikacji. Użyj Zapisz lub Aplikuj przy ofercie.",
     appsEmptyMomentum:
       "Każda zapisana rola ma znacznik czasu, któremu zaufasz, gdy rekruter odezwie się po tygodniach. Zacznij od Najlepszych dopasowań albo feedu ofert poniżej.",

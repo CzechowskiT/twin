@@ -142,6 +142,7 @@ export default function DashboardPage() {
   const [placementEventsInvalidateKey, setPlacementEventsInvalidateKey] = useState(0);
   const [dashboardCalendarBundle, setDashboardCalendarBundle] = useState<DashboardCalendarBundle | null>(null);
   const [nextInterviewIcsBusy, setNextInterviewIcsBusy] = useState(false);
+  const [applicationsCsvBusy, setApplicationsCsvBusy] = useState(false);
 
   const loadJobs = useCallback(async (token: string, activeFilters: JobFilters) => {
     return apiFetch<JobList>(`/api/v1/jobs/${buildJobsQuery(activeFilters)}`, {}, token);
@@ -502,6 +503,21 @@ export default function DashboardPage() {
       setError(dashboardFetchUserMessage(err, t));
     } finally {
       setFeedbackBusy(null);
+    }
+  }
+
+  async function downloadApplicationsCsv() {
+    const token = getToken();
+    if (!token) return;
+    setApplicationsCsvBusy(true);
+    setError(null);
+    try {
+      const blob = await apiFetchBlob("/api/v1/applications/me/export.csv", {}, token);
+      saveBlobAsFile(blob, "twin-applications.csv");
+    } catch (err) {
+      setError(dashboardFetchUserMessage(err, t));
+    } finally {
+      setApplicationsCsvBusy(false);
     }
   }
 
@@ -960,9 +976,19 @@ export default function DashboardPage() {
 
       {hasProfile && (
         <Card id="dashboard-applications" variant="soft">
-          <h2 className="twin-section-title mb-4">
-            {t("dashboard.applications")} ({applications.length})
-          </h2>
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="twin-section-title">
+              {t("dashboard.applications")} ({applications.length})
+            </h2>
+            <button
+              type="button"
+              disabled={applicationsCsvBusy}
+              onClick={() => void downloadApplicationsCsv()}
+              className="twin-btn-secondary twin-touch-target shrink-0 self-start text-sm"
+            >
+              {applicationsCsvBusy ? "…" : t("dashboard.applicationsExportCsv")}
+            </button>
+          </div>
           <ApplicationsPanel
             items={applications}
             onStatusChange={updateApplicationStatus}

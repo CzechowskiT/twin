@@ -1,10 +1,13 @@
 """Track job applications per candidate."""
 
+import csv
 import json
 import logging
 from datetime import datetime
+from io import StringIO
 
 from fastapi import APIRouter, Body, Depends, HTTPException, status
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user
@@ -56,6 +59,65 @@ def list_my_applications(
     )
     items = [_to_out(app, job) for app, job in rows]
     return ApplicationListOut(items=items, total=len(items))
+
+
+@router.get("/me/export.csv")
+def export_my_applications_csv(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> Response:
+    """CSV export of the candidate's application pipeline (GDPR-friendly portable copy)."""
+    candidate = _candidate_or_404(db, user.id)
+    rows = (
+        db.query(Application, Job)
+        .join(Job, Application.job_id == Job.id)
+        .filter(Application.candidate_id == candidate.id)
+        .order_by(Application.updated_at.desc())
+        .all()
+    )
+    buf = StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(
+        [
+            "application_id",
+            "job_id",
+            "status",
+            "title",
+            "company",
+            "location",
+            "job_board",
+            "url",
+            "applied_at",
+            "updated_at",
+            "notes",
+            "placement_state",
+            "placement_verified_at",
+        ],
+    )
+    for app, job in rows:
+        notes = (app.notes or "").replace("\r\n", "\n").replace("\r", "\n")
+        writer.writerow(
+            [
+                app.id,
+                job.id,
+                app.status.value,
+                job.title,
+                job.company,
+                job.location or "",
+                job.job_board,
+                job.url,
+                app.applied_at.isoformat() if app.applied_at else "",
+                app.updated_at.isoformat() if app.updated_at else "",
+                notes,
+                app.placement_state or "none",
+                app.placement_verified_at.isoformat() if app.placement_verified_at else "",
+            ],
+        )
+    return Response(
+        content=buf.getvalue().encode("utf-8"),
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": 'attachment; filename="twin-applications.csv"'},
+    )
 
 
 @router.get("/me/development-focus", response_model=DevelopmentFocusOut)
