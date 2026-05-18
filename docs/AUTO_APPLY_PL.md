@@ -27,7 +27,8 @@ Czcionka Unicode: `backend/assets/fonts/NotoSans-Regular.ttf` (SIL OFL) albo śc
 
 ## Użycie z panelu
 
-1. Przy ofercie z Pracuj.pl kliknij **Auto-apply**.
+1. Auto-apply jest **dostępny na każdym planie** (domyślnie), żeby demo / prezentacja dla inwestora działała bez Stripe. Na produkcji możesz włączyć paywall: `AUTO_APPLY_REQUIRE_PREMIUM=true` na API.
+2. Przy ofercie z Pracuj.pl kliknij **Auto-apply**.
 2. Zostaw włączone API (`make api`) — otworzy się okno Chromium.
 3. Jeśli Indeed: zaznacz checkbox w oknie przeglądarki, potem dokończ w razie potrzeby.
 

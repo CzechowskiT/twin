@@ -123,12 +123,12 @@ def auto_apply(
     user: User = Depends(get_current_user),
 ) -> AutoApplyOut:
     """Run Playwright auto-apply (Pracuj.pl; Indeed needs visible browser for CAPTCHA)."""
-    if effective_plan_tier(user) == PlanTier.FREE:
+    settings = get_settings()
+    if settings.auto_apply_require_premium and effective_plan_tier(user) == PlanTier.FREE:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Auto-apply is available on Premium and Pro plans.",
         )
-    settings = get_settings()
     submit = body.submit if body.submit is not None else settings.auto_apply_submit
     outcome, message, app = auto_apply_for_user(
         db, user=user, job_id=body.job_id, submit=submit

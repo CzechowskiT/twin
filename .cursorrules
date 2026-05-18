@@ -22,6 +22,9 @@ The product is **not** “more volume in your inbox.” Outside TWIN, someone re
 
 **Mechanic (build toward this):** matching + consent + async work while away → ranked pipeline → **scheduled or batch acceptance UI** → calendar export / sync. Every new surface (copy, API, UI) should ask: *does this reduce noise toward acceptance-ready calendar items, or add noise?*
 
+## Placement verification & economics (no “CS tennis”)
+Some marketplaces rely on **manual email threads** (“signed yet?”, “still employed?”) and **outbound employer nudging** to decide success fees. TWIN should **not** default to that: use **in-product, self-serve, machine-assisted** verification (state machine + append-only events + transactional email only), optional **employer one-click attestation** or **ATS webhooks** for B2B, and **Celery date-driven** retention checks — with **exception queues** for disputes, not human ping-pong as the primary path. See **`docs/PLACEMENT_VERIFICATION.md`**.
+
 ## Calendar integrations (candidate reality)
 Users live across stacks — plan for **all major consumer + corporate calendars**, not only one vendor.
 

@@ -147,6 +147,8 @@ class Settings(BaseSettings):
     auto_apply_font_path: str = ""
     # Extra consent paragraphs (Polish), double-newline separated, appended after defaults.
     auto_apply_consent_extra_pl: str = ""
+    # When true, POST /applications/auto-apply returns 403 on Free tier. Default false for demos / investors.
+    auto_apply_require_premium: bool = False
 
     debug: bool = False
 
