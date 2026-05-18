@@ -78,6 +78,7 @@ type DashboardCalendarBundle = {
     job_title: string;
     interview_start: string;
     interview_end: string;
+    meeting_link: string | null;
   } | null;
 };
 
@@ -178,6 +179,7 @@ export default function DashboardPage() {
             interview_start: string;
             interview_end: string;
             status: string;
+            meeting_link: string | null;
           }[]
         >("/api/v1/calendar/google/interviews", {}, token);
         const pick = rows[0];
@@ -188,6 +190,7 @@ export default function DashboardPage() {
             job_title: pick.job_title,
             interview_start: pick.interview_start,
             interview_end: pick.interview_end,
+            meeting_link: pick.meeting_link,
           };
         }
       } catch {
@@ -711,6 +714,16 @@ export default function DashboardPage() {
                             locale,
                           )}
                         </p>
+                        {dashboardCalendarBundle.nextInterview.meeting_link?.trim() ? (
+                          <a
+                            href={dashboardCalendarBundle.nextInterview.meeting_link.trim()}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="twin-link mt-1 inline-block text-xs font-medium"
+                          >
+                            {t("dashboard.calendarNextInterviewJoinLink")}
+                          </a>
+                        ) : null}
                         <button
                           type="button"
                           disabled={nextInterviewIcsBusy}

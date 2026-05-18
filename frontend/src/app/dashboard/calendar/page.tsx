@@ -470,6 +470,16 @@ export default function DashboardCalendarPage() {
                       <span className="twin-muted mt-1 block text-xs">
                         {formatInterviewRange(row.interview_start, row.interview_end, loc)}
                       </span>
+                      {row.meeting_link?.trim() ? (
+                        <a
+                          href={row.meeting_link.trim()}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="twin-link mt-1 inline-block text-xs font-medium"
+                        >
+                          {t("dashboard.calendarNextInterviewJoinLink")}
+                        </a>
+                      ) : null}
                     </div>
                     <div className="flex shrink-0 flex-wrap gap-2 self-start sm:self-center">
                       <button
