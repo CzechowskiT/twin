@@ -3,11 +3,12 @@
 import csv
 import json
 from datetime import datetime, timezone
-from io import StringIO
+from io import BytesIO, StringIO
 from typing import Any
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
 from fastapi.responses import JSONResponse, Response
+from openpyxl import Workbook
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
@@ -337,6 +338,43 @@ def export_my_matches_csv(
         content=buf.getvalue().encode("utf-8"),
         media_type="text/csv; charset=utf-8",
         headers={"Content-Disposition": 'attachment; filename="twin-matches.csv"'},
+    )
+
+
+@router.get("/me/matches/export.xlsx")
+def export_my_matches_xlsx(
+    limit: int = Query(220, ge=1, le=400),
+    min_score: float = Query(15.0, ge=0, le=100),
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> Response:
+    """Excel (.xlsx) export of ranked matches — same rows as export.csv."""
+    candidate = _get_candidate_or_404(db, user.id)
+    rows = find_top_matches(db, candidate, limit=limit, min_score=min_score)
+    wb = Workbook()
+    ws = wb.active
+    assert ws is not None
+    ws.title = "Matches"
+    ws.append(["job_id", "score", "title", "company", "location", "job_board", "url"])
+    for row in rows:
+        ws.append(
+            [
+                row["job_id"],
+                round(float(row["score"]), 2),
+                row["title"],
+                row["company"],
+                row.get("location") or "",
+                row["job_board"],
+                row["url"],
+            ],
+        )
+    out = BytesIO()
+    wb.save(out)
+    out.seek(0)
+    return Response(
+        content=out.getvalue(),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": 'attachment; filename="twin-matches.xlsx"'},
     )
 
 

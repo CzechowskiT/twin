@@ -9,3 +9,9 @@ def test_matches_csv_export_unauthenticated() -> None:
     client = TestClient(app)
     res = client.get("/api/v1/candidates/me/matches/export.csv")
     assert res.status_code == 401
+
+
+def test_matches_xlsx_export_unauthenticated() -> None:
+    client = TestClient(app)
+    res = client.get("/api/v1/candidates/me/matches/export.xlsx")
+    assert res.status_code == 401

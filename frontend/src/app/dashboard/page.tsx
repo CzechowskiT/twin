@@ -168,6 +168,7 @@ export default function DashboardPage() {
   const [nextInterviewIcsBusy, setNextInterviewIcsBusy] = useState(false);
   const [applicationsCsvBusy, setApplicationsCsvBusy] = useState(false);
   const [matchesCsvBusy, setMatchesCsvBusy] = useState(false);
+  const [matchesXlsxBusy, setMatchesXlsxBusy] = useState(false);
   const [matchesRefreshing, setMatchesRefreshing] = useState(false);
   const [exportJsonBusy, setExportJsonBusy] = useState(false);
 
@@ -600,6 +601,25 @@ export default function DashboardPage() {
     }
   }
 
+  async function downloadMatchesXlsx() {
+    const token = getToken();
+    if (!token) return;
+    setMatchesXlsxBusy(true);
+    setError(null);
+    try {
+      const blob = await apiFetchBlob(
+        "/api/v1/candidates/me/matches/export.xlsx?limit=220&min_score=15",
+        {},
+        token,
+      );
+      saveBlobAsFile(blob, "twin-matches.xlsx");
+    } catch (err) {
+      setError(csvExportUserMessage(err, t));
+    } finally {
+      setMatchesXlsxBusy(false);
+    }
+  }
+
   async function downloadMyDataJson() {
     const token = getToken();
     if (!token) return;
@@ -1012,15 +1032,26 @@ export default function DashboardPage() {
             <h2 className="twin-section-title">
               {t("dashboard.topMatches")} ({matches?.total ?? 0})
             </h2>
-            <button
-              type="button"
-              aria-label={t("dashboard.matchesExportCsv")}
-              disabled={matchesCsvBusy}
-              onClick={() => void downloadMatchesCsv()}
-              className="twin-btn-secondary twin-touch-target shrink-0 self-start text-sm"
-            >
-              {matchesCsvBusy ? "…" : t("dashboard.matchesExportCsv")}
-            </button>
+            <div className="flex flex-wrap gap-2 self-start sm:self-auto sm:shrink-0">
+              <button
+                type="button"
+                aria-label={t("dashboard.matchesExportCsv")}
+                disabled={matchesCsvBusy || matchesXlsxBusy}
+                onClick={() => void downloadMatchesCsv()}
+                className="twin-btn-secondary twin-touch-target text-sm"
+              >
+                {matchesCsvBusy ? "…" : t("dashboard.matchesExportCsv")}
+              </button>
+              <button
+                type="button"
+                aria-label={t("dashboard.matchesExportXlsxAria")}
+                disabled={matchesCsvBusy || matchesXlsxBusy}
+                onClick={() => void downloadMatchesXlsx()}
+                className="twin-btn-secondary twin-touch-target text-sm"
+              >
+                {matchesXlsxBusy ? "…" : t("dashboard.matchesExportXlsx")}
+              </button>
+            </div>
           </div>
           <JobList
             items={visibleMatches}
