@@ -366,10 +366,12 @@ const en = {
     scrapeQueued:
       "Scrape queued. New listings appear after Celery workers finish — refresh the job feed in a minute or two (or check worker logs on the API host).",
     scrapeFinished: "Scrape finished",
+    scrapeRefreshFailed:
+      "Scrape was queued, but refreshing the dashboard failed (details below). Try reloading the page in a minute.",
     twinScrapePanelTitle: "Bring listings into TWIN",
     twinForYourJob: "Twin for your job",
     twinForYourJobHint:
-      "Queues the full TWIN board registry (Poland: pracuj.pl, rocketjobs.pl, justjoin.it, praca.pl; then LinkedIn; then global boards such as Indeed, Glassdoor, StepStone, Reed, SEEK, …). Respect SCRAPE_ENABLED_BOARD_IDS on the API to trim the list. Workers run in the background; on demos, keep a short allowlist.",
+      "Queues the full TWIN board registry (Poland: pracuj.pl, rocketjobs.pl, justjoin.it, praca.pl; then LinkedIn; then global boards such as Indeed, Glassdoor, StepStone, Reed, SEEK, …). Respect SCRAPE_ENABLED_BOARD_IDS on the API to trim the list. On a single Railway API without Redis, scraping runs in-process (no separate worker). With Redis + workers, tasks queue in Celery.",
     twinForYourJobRunning: "Twin for your job is running…",
     roadmapSummary: "Target job boards & company career sites (roadmap)",
     roadmapPortalsTitle: "50 global job boards",
@@ -1504,10 +1506,12 @@ const pl: MessageTree = {
     scrapeQueued:
       "Pobieranie zakolejkowane. Nowe oferty pojawią się po zakończeniu zadań Celery — odśwież feed za minutę–dwie (albo zajrzyj w logi workerów na hoście API).",
     scrapeFinished: "Pobieranie zakończone",
+    scrapeRefreshFailed:
+      "Pobieranie zostało zakolejkowane, ale odświeżenie panelu się nie powiodło (szczegóły poniżej). Za minutę odśwież stronę.",
     twinScrapePanelTitle: "Wciągnij oferty do TWIN",
     twinForYourJob: "Twin for your job",
     twinForYourJobHint:
-      "Kolejkuje pełny rejestr TWIN (Polska: pracuj.pl, rocketjobs.pl, justjoin.it, praca.pl; potem LinkedIn; potem globalnie m.in. Indeed, Glassdoor, StepStone, Reed, SEEK). Listę można przyciąć przez SCRAPE_ENABLED_BOARD_IDS na API. Workerzy działają w tle; na demo trzymaj krótką listę portali.",
+      "Kolejkuje pełny rejestr TWIN (Polska: pracuj.pl, rocketjobs.pl, justjoin.it, praca.pl; potem LinkedIn; potem globalnie m.in. Indeed, Glassdoor, StepStone, Reed, SEEK). Listę można przyciąć przez SCRAPE_ENABLED_BOARD_IDS na API. Na jednym serwisie Railway bez Redis scraping działa w procesie API (bez osobnego workera). Z Redis + workerami zadania idą do Celery.",
     twinForYourJobRunning: "Twin for your job: trwa…",
     roadmapSummary: "Docelowe portale i kariery firm (roadmapa)",
     roadmapPortalsTitle: "50 globalnych portali pracy",

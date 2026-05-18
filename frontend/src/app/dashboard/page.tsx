@@ -382,7 +382,6 @@ export default function DashboardPage() {
         { method: "POST" },
         token,
       );
-      await refreshDashboardData(token, profile !== null && profile !== undefined, filters);
       alert(
         result.task_id && result.task_id !== "sync"
           ? t("dashboard.scrapeQueued")
@@ -393,6 +392,13 @@ export default function DashboardPage() {
         queueMicrotask(() => {
           document.getElementById("dashboard-matches")?.scrollIntoView({ behavior: "smooth", block: "start" });
         });
+      }
+      try {
+        await refreshDashboardData(token, profile !== null && profile !== undefined, filters);
+      } catch (refreshErr) {
+        setError(
+          `${t("dashboard.scrapeRefreshFailed")} ${dashboardLoadErrorMessage(refreshErr, t("dashboard.scrapeNetworkError"), t("dashboard.scrapeFailed"))}`,
+        );
       }
     } catch (err) {
       setError(dashboardLoadErrorMessage(err, t("dashboard.scrapeNetworkError"), t("dashboard.scrapeFailed")));

@@ -39,3 +39,38 @@ def test_settings_normalizes_cors_origins_trailing_slashes(monkeypatch) -> None:
         assert s.cors_origin_list == ["https://a.com", "https://b.com"]
     finally:
         get_settings.cache_clear()
+
+
+def test_railway_solo_infer_celery_eager(monkeypatch) -> None:
+    monkeypatch.setenv("RAILWAY_ENVIRONMENT", "production")
+    monkeypatch.delenv("REDIS_URL", raising=False)
+    monkeypatch.delenv("CELERY_BROKER_URL", raising=False)
+    monkeypatch.delenv("CELERY_TASK_ALWAYS_EAGER", raising=False)
+    get_settings.cache_clear()
+    try:
+        assert Settings().celery_task_always_eager is True
+    finally:
+        get_settings.cache_clear()
+
+
+def test_explicit_celery_eager_false_not_overridden(monkeypatch) -> None:
+    monkeypatch.setenv("RAILWAY_ENVIRONMENT", "production")
+    monkeypatch.delenv("REDIS_URL", raising=False)
+    monkeypatch.delenv("CELERY_BROKER_URL", raising=False)
+    monkeypatch.setenv("CELERY_TASK_ALWAYS_EAGER", "0")
+    get_settings.cache_clear()
+    try:
+        assert Settings().celery_task_always_eager is False
+    finally:
+        get_settings.cache_clear()
+
+
+def test_redis_url_prevents_railway_eager_infer(monkeypatch) -> None:
+    monkeypatch.setenv("RAILWAY_ENVIRONMENT", "production")
+    monkeypatch.setenv("REDIS_URL", "redis://redis:6379/0")
+    monkeypatch.delenv("CELERY_TASK_ALWAYS_EAGER", raising=False)
+    get_settings.cache_clear()
+    try:
+        assert Settings().celery_task_always_eager is False
+    finally:
+        get_settings.cache_clear()

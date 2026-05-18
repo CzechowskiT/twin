@@ -21,6 +21,12 @@ logger = logging.getLogger("uvicorn.error")
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
+    # Rebuild Settings once at startup so Railway-only env (e.g. RAILWAY_ENVIRONMENT) is visible
+    # before Celery reads CELERY_TASK_ALWAYS_EAGER (import order can cache Settings too early).
+    get_settings.cache_clear()
+    from app.tasks.celery_app import apply_celery_runtime_config
+
+    apply_celery_runtime_config()
     yield
     engine.dispose()
 

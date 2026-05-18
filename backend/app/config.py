@@ -1,9 +1,10 @@
 """Application settings loaded from environment."""
 
 from functools import lru_cache
+import os
 from pathlib import Path
 
-from pydantic import field_validator
+from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Repo root .env (make api runs from backend/, so plain ".env" would miss it)
@@ -60,6 +61,18 @@ class Settings(BaseSettings):
     # When true, Celery `.delay()` runs inside the API worker (no broker). Use on a single Railway
     # service without Redis/worker, or local dev; use Redis + separate worker for production scale.
     celery_task_always_eager: bool = False
+
+    @model_validator(mode="after")
+    def solo_railway_celery_eager(self) -> "Settings":
+        """Railway one-off API: no Redis URL env vars → in-process Celery (mirrors start-api.sh)."""
+        raw = os.getenv("CELERY_TASK_ALWAYS_EAGER")
+        if raw is not None and str(raw).strip() != "":
+            return self
+        if os.getenv("RAILWAY_ENVIRONMENT") and not (
+            (os.getenv("REDIS_URL") or "").strip() or (os.getenv("CELERY_BROKER_URL") or "").strip()
+        ):
+            self.celery_task_always_eager = True
+        return self
 
     anthropic_api_key: str = ""
     cv_upload_dir: str = "data/cvs"

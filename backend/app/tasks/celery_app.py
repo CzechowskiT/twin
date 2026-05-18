@@ -19,8 +19,16 @@ celery_app.conf.update(
     enable_utc=True,
     imports=("app.tasks.scrape_tasks",),
 )
+
+
+def apply_celery_runtime_config() -> None:
+    """Re-read Settings (e.g. after get_settings.cache_clear) and sync Celery eager mode."""
+    s = get_settings()
+    celery_app.conf.task_always_eager = s.celery_task_always_eager
+
+
 # In-process tasks (no Redis): set CELERY_TASK_ALWAYS_EAGER=true on the API when no worker service exists.
-celery_app.conf.task_always_eager = settings.celery_task_always_eager
+apply_celery_runtime_config()
 celery_app.conf.task_eager_propagates = True
 
 
