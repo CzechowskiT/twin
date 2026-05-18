@@ -3,6 +3,10 @@
  * When `NEXT_PUBLIC_API_URL` is set, **authenticated** browser calls go straight to FastAPI so scraping
  * and dashboard survive Vercel proxy timeouts / misconfigured server-only env; Railway must list the
  * frontend origin in `CORS_ORIGINS`. Login/register without a token still use the proxy.
+ *
+ * If a direct authenticated call fails with a **browser network error** (e.g. CORS, preview protection,
+ * DNS), we **retry once** via the same-origin proxy so actions like auto-apply still work without
+ * manual env surgery on every preview URL.
  * Multipart uploads use the public API origin when set to reduce Vercel function body limits on proxies.
  */
 
@@ -28,6 +32,21 @@ export function clientUploadApiOrigin(hasAuth: boolean): string {
 }
 
 export type ApiError = { detail?: string | { msg: string }[]; message?: string };
+
+/** True when the browser failed before a normal HTTP response (CORS, blocked preview, offline, etc.). */
+export function isLikelyBrowserNetworkFailureMessage(message: string): boolean {
+  const m = message.trim();
+  return (
+    m === "Failed to fetch" ||
+    m === "Load failed" ||
+    m.startsWith("NetworkError") ||
+    m.includes("fetch resource")
+  );
+}
+
+function isLikelyBrowserNetworkFailure(err: unknown): boolean {
+  return err instanceof Error && isLikelyBrowserNetworkFailureMessage(err.message);
+}
 
 async function parseError(res: Response): Promise<string> {
   try {
@@ -58,12 +77,23 @@ export async function apiFetch<T>(
     headers.set("X-Twin-Authorization", bearer);
   }
 
-  const origin = clientApiOriginForRequest(hasAuth);
-  const res = await fetch(`${origin}${path}`, {
+  const directOrigin = clientApiOriginForRequest(hasAuth);
+  const fetchOpts: RequestInit = {
     ...options,
     cache: options.cache ?? "no-store",
     headers,
-  });
+  };
+
+  let res: Response;
+  try {
+    res = await fetch(`${directOrigin}${path}`, fetchOpts);
+  } catch (err) {
+    if (hasAuth && directOrigin && isLikelyBrowserNetworkFailure(err)) {
+      res = await fetch(`${API_URL}${path}`, fetchOpts);
+    } else {
+      throw err;
+    }
+  }
   if (!res.ok) throw new Error(await parseError(res));
   if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
@@ -91,13 +121,24 @@ export async function apiUpload<T>(
     }
   }
 
-  const origin = clientUploadApiOrigin(hasAuth);
-  const res = await fetch(`${origin}${path}`, {
+  const directOrigin = clientUploadApiOrigin(hasAuth);
+  const uploadOpts: RequestInit = {
     method: "POST",
     cache: "no-store",
     headers,
     body,
-  });
+  };
+
+  let res: Response;
+  try {
+    res = await fetch(`${directOrigin}${path}`, uploadOpts);
+  } catch (err) {
+    if (hasAuth && directOrigin && isLikelyBrowserNetworkFailure(err)) {
+      res = await fetch(`${API_URL}${path}`, uploadOpts);
+    } else {
+      throw err;
+    }
+  }
   if (!res.ok) throw new Error(await parseError(res));
   return res.json() as Promise<T>;
 }

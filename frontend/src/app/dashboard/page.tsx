@@ -10,7 +10,7 @@ import { useTranslation } from "@/components/language-provider";
 import { JobFiltersBar } from "@/components/job-filters";
 import { JobList } from "@/components/job-list";
 import { ButtonCta, Card, Shell } from "@/components/ui";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, isLikelyBrowserNetworkFailureMessage } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
 import { SHOW_SCRAPE_UI } from "@/lib/features";
 import type { TranslationKey } from "@/lib/i18n";
@@ -70,16 +70,6 @@ type DevelopmentFocus = {
   roles_with_insights: { application_id: number; job_id: number; title: string; company: string; summary: string | null }[];
 };
 
-function isLikelyBrowserNetworkFailure(message: string): boolean {
-  const m = message.trim();
-  return (
-    m === "Failed to fetch" ||
-    m === "Load failed" ||
-    m.startsWith("NetworkError") ||
-    m.includes("fetch resource")
-  );
-}
-
 /** Map API/proxy failures to actionable copy (Vercel ↔ Railway). */
 function dashboardFetchUserMessage(
   err: unknown,
@@ -91,7 +81,7 @@ function dashboardFetchUserMessage(
   if (lc.includes("missing api base url") || lc.includes("cannot reach api")) {
     return t("dashboard.scrapeUpstreamHint");
   }
-  if (isLikelyBrowserNetworkFailure(raw)) {
+  if (isLikelyBrowserNetworkFailureMessage(raw)) {
     return networkHint === "scrape" ? t("dashboard.scrapeNetworkError") : t("dashboard.apiNetworkError");
   }
   return raw.trim() || t("dashboard.scrapeFailed");
