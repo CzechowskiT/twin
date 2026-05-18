@@ -21,7 +21,20 @@ import {
   DEMO_MATCH_JOB,
   DEMO_MATCH_SCORE,
 } from "@/lib/demo-auto-apply-data";
-import type { TranslationKey } from "@/lib/i18n";
+import type { Locale, TranslationKey } from "@/lib/i18n";
+
+type DemoReceipt = {
+  mode: string;
+  apply_outcome: string;
+  application_reference: string;
+  job_title: string;
+  company: string;
+  interview_title: string;
+  interview_start: string;
+  interview_end: string;
+  ics_path: string;
+  disclaimer: string;
+};
 
 const STEP_KEYS = [
   "demo.stepScan",
@@ -29,19 +42,35 @@ const STEP_KEYS = [
   "demo.stepAnswers",
   "demo.stepSubmit",
   "demo.stepConfirm",
+  "demo.stepCalendar",
 ] as const satisfies readonly TranslationKey[];
 
-const STEP_MS = [900, 1100, 1000, 1200, 900];
+const STEP_MS = [900, 1100, 1000, 1200, 900, 1000];
 
 type StepState = "pending" | "active" | "done";
 
+function formatUtcRange(locale: Locale, startIso: string, endIso: string): string {
+  const loc = locale === "pl" ? "pl-PL" : "en-GB";
+  const fmt = new Intl.DateTimeFormat(loc, {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "UTC",
+  });
+  const a = fmt.format(new Date(startIso));
+  const b = fmt.format(new Date(endIso));
+  return `${a} — ${b}`;
+}
+
 export function DemoAutoApplyPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [cvText, setCvText] = useState<string>("");
   const [cvError, setCvError] = useState(false);
   const [running, setRunning] = useState(false);
   const [stepStates, setStepStates] = useState<StepState[]>(() => STEP_KEYS.map(() => "pending"));
   const timersRef = useRef<number[]>([]);
+  const [receipt, setReceipt] = useState<DemoReceipt | null>(null);
+  const [receiptError, setReceiptError] = useState(false);
+  const [receiptLoading, setReceiptLoading] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -69,6 +98,9 @@ export function DemoAutoApplyPage() {
   const runSequence = useCallback(() => {
     clearTimers();
     setRunning(true);
+    setReceipt(null);
+    setReceiptError(false);
+    setReceiptLoading(false);
     setStepStates(STEP_KEYS.map(() => "pending"));
 
     let tAccum = 0;
@@ -134,6 +166,46 @@ export function DemoAutoApplyPage() {
       return next;
     });
   }, [clearTimers]);
+
+  useEffect(() => {
+    const everyDone = stepStates.every((s) => s === "done");
+    if (!everyDone || running) {
+      if (!everyDone) {
+        queueMicrotask(() => {
+          setReceipt(null);
+          setReceiptError(false);
+          setReceiptLoading(false);
+        });
+      }
+      return;
+    }
+
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (!cancelled) setReceiptLoading(true);
+    });
+    fetch("/api/v1/public/demo-receipt")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((data: DemoReceipt) => {
+        if (!cancelled) {
+          setReceipt(data);
+          setReceiptError(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setReceipt(null);
+          setReceiptError(true);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setReceiptLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [stepStates, running]);
 
   useEffect(() => () => clearTimers(), [clearTimers]);
 
@@ -292,6 +364,61 @@ export function DemoAutoApplyPage() {
               })}
             </ol>
           </section>
+
+          {(receiptLoading || receiptError || receipt) && (
+            <section
+              aria-labelledby="demo-receipt-heading"
+              className="rounded-2xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/90 p-5 shadow-sm sm:p-6"
+            >
+              <h2 id="demo-receipt-heading" className="twin-section-title text-lg">
+                {t("demo.receiptTitle")}
+              </h2>
+              {receiptLoading && !receipt && !receiptError && (
+                <p className="mt-3 text-sm text-[var(--twin-muted-strong)]">{t("demo.receiptLoading")}</p>
+              )}
+              {receiptError && (
+                <p className="mt-3 text-sm text-amber-800 dark:text-amber-200">{t("demo.receiptError")}</p>
+              )}
+              {receipt && (
+                <div className="mt-4 space-y-4 text-sm">
+                  <p className="inline-flex rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-3 py-1 text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted-strong)]">
+                    {receipt.mode}
+                  </p>
+                  <dl className="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <dt className="text-xs font-bold uppercase tracking-wider text-[var(--twin-muted)]">{t("demo.receiptRefLabel")}</dt>
+                      <dd className="mt-1 font-mono text-[var(--foreground)]">{receipt.application_reference}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs font-bold uppercase tracking-wider text-[var(--twin-muted)]">{t("demo.receiptApplyLabel")}</dt>
+                      <dd className="mt-1 capitalize text-[var(--foreground)]">{receipt.apply_outcome}</dd>
+                    </div>
+                    <div className="sm:col-span-2">
+                      <dt className="text-xs font-bold uppercase tracking-wider text-[var(--twin-muted)]">{t("demo.receiptJobLabel")}</dt>
+                      <dd className="mt-1 text-[var(--foreground)]">
+                        {receipt.job_title} · {receipt.company}
+                      </dd>
+                    </div>
+                    <div className="sm:col-span-2">
+                      <dt className="text-xs font-bold uppercase tracking-wider text-[var(--twin-muted)]">{t("demo.receiptInterviewLabel")}</dt>
+                      <dd className="mt-1 text-[var(--foreground)]">{formatUtcRange(locale, receipt.interview_start, receipt.interview_end)}</dd>
+                      <p className="mt-1 text-xs text-[var(--twin-muted)]">{receipt.interview_title}</p>
+                    </div>
+                  </dl>
+                  <div className="flex flex-wrap gap-3 pt-1">
+                    <a
+                      href={receipt.ics_path}
+                      download
+                      className="twin-touch-target inline-flex min-h-[2.75rem] items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-5 text-sm font-semibold text-[var(--foreground)] transition hover:border-[var(--twin-border-hover)] hover:bg-[var(--twin-accent-muted)] active:scale-[0.98]"
+                    >
+                      {t("demo.downloadIcsCta")}
+                    </a>
+                  </div>
+                  <p className="text-xs leading-relaxed text-[var(--twin-muted)]">{receipt.disclaimer}</p>
+                </div>
+              )}
+            </section>
+          )}
 
           <p className="max-w-3xl text-xs leading-relaxed text-[var(--twin-muted)]">{t("demo.footerNote")}</p>
         </div>

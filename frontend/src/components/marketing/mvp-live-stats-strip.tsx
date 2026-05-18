@@ -97,6 +97,31 @@ export function MvpLiveStatsStrip() {
           <dd className="mt-1 text-sm font-semibold text-[var(--foreground)]">{flag(data.stripe_checkout_ready)}</dd>
         </div>
       </dl>
+      <div className="mt-4 sm:mx-auto sm:max-w-lg">
+        <div className="rounded-lg border border-[var(--twin-border)]/60 bg-[var(--twin-surface-2)] px-3 py-3 text-center">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--twin-accent)]">
+            {t("investorCalc.liveStatsPulseEyebrow")}
+          </p>
+          <dl className="mt-3 grid grid-cols-2 gap-3">
+            <div>
+              <dt className="text-[10px] font-medium uppercase text-[var(--twin-muted-strong)]">
+                {t("investorCalc.liveStatsApplied7d")}
+              </dt>
+              <dd className="mt-0.5 text-lg font-bold tabular-nums text-[var(--foreground)]">
+                {fmt(data.applications_applied_last_7_days)}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-[10px] font-medium uppercase text-[var(--twin-muted-strong)]">
+                {t("investorCalc.liveStatsCvUpload30d")}
+              </dt>
+              <dd className="mt-0.5 text-lg font-bold tabular-nums text-[var(--foreground)]">
+                {fmt(data.candidates_cv_uploaded_last_30_days)}
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </div>
       <div className="mt-4 border-t border-[var(--twin-border)]/80 pt-4">
         <h3 className="text-center text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
           {t("investorCalc.liveStatsJobsByBoard")}

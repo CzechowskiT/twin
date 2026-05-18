@@ -200,7 +200,7 @@ export function TwinRoiCalculator() {
         <div className="mb-6 grid gap-5 md:grid-cols-2">
           <section className="twin-card-panel rounded-xl border border-red-200/80 bg-gradient-to-b from-red-50/90 to-[var(--twin-card)] p-5 sm:p-6">
             <div className="mb-4 flex items-center justify-between gap-2">
-              <h3 className="text-lg font-semibold text-red-950 sm:text-xl">{t("calculator.traditionalTitle")}</h3>
+              <h3 className="text-lg font-semibold text-red-700 sm:text-xl">{t("calculator.traditionalTitle")}</h3>
               <span className="shrink-0 rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-800">
                 {t("calculator.traditionalBadge")}
               </span>

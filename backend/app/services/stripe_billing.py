@@ -281,3 +281,41 @@ def process_invoice_payment_succeeded(db: Session, invoice: dict[str, Any], sett
         return
     referral_prog.on_subscription_invoice_paid(db, user, settings)
     db.commit()
+
+
+def process_invoice_payment_failed(db: Session, invoice: dict[str, Any], settings: Settings) -> None:
+    """Renewal or charge failed — refresh subscription from Stripe (e.g. past_due, unpaid)."""
+    cust = invoice.get("customer")
+    if isinstance(cust, dict):
+        cust = cust.get("id")
+    sub_id = invoice.get("subscription")
+    if isinstance(sub_id, dict):
+        sub_id = sub_id.get("id")
+    if not sub_id or not cust:
+        return
+    user = user_by_stripe_customer(db, cust)
+    if not user:
+        return
+    configure_stripe(settings)
+    try:
+        sub = stripe.Subscription.retrieve(sub_id)
+    except stripe.StripeError as exc:
+        logger.warning(
+            "invoice.payment_failed: could not refresh subscription %s: %s",
+            sub_id,
+            exc.user_message or exc,
+        )
+        return
+    apply_subscription_dict(user, _subscription_as_dict(sub), settings)
+    db.commit()
+
+
+def process_checkout_session_async_payment_failed(db: Session, session: dict[str, Any], _settings: Settings) -> None:
+    """Async payment modes only — Checkout session completed without an active paid subscription."""
+    meta = session.get("metadata") or {}
+    uid = meta.get("user_id")
+    logger.info(
+        "checkout.session.async_payment_failed session_id=%s user_id=%s",
+        session.get("id"),
+        uid,
+    )

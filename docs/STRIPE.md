@@ -29,8 +29,11 @@ In [Stripe Dashboard → Developers → Webhooks](https://dashboard.stripe.com/w
 Subscribe to at least:
 
 - `checkout.session.completed`
+- `checkout.session.async_payment_failed` (async payment methods — logged; subscription refresh not applicable until Checkout completes)
 - `customer.subscription.updated`
 - `customer.subscription.deleted`
+- `invoice.payment_succeeded` (referral retention accounting)
+- `invoice.payment_failed` (syncs subscription status e.g. `past_due` / `unpaid` from Stripe)
 
 Use the endpoint’s **signing secret** as `STRIPE_WEBHOOK_SECRET`.
 

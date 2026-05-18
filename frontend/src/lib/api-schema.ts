@@ -41,6 +41,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/public/demo-receipt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Public Demo Receipt
+         * @description Return a fixed sandbox receipt so the marketing /demo page can show a live API handshake.
+         *
+         *     Does not create applications, interviews, or calendar events in the database.
+         */
+        get: operations["public_demo_receipt_api_v1_public_demo_receipt_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/demo-interview.ics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Public Demo Interview Ics
+         * @description Download a static iCalendar file matching ``/public/demo-receipt`` times.
+         */
+        get: operations["public_demo_interview_ics_api_v1_public_demo_interview_ics_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/geo/jurisdiction-hint": {
         parameters: {
             query?: never;
@@ -2456,6 +2498,63 @@ export interface components {
             } | null;
         };
         /**
+         * DemoReceiptOut
+         * @description Sandbox orchestration receipt for the public /demo page — no DB writes, no auth.
+         */
+        DemoReceiptOut: {
+            /**
+             * Mode
+             * @description Always ``sandbox`` for this endpoint.
+             * @default sandbox
+             */
+            mode: string;
+            /**
+             * Apply Outcome
+             * @description Illustrative outcome label (e.g. submitted).
+             */
+            apply_outcome: string;
+            /**
+             * Application Reference
+             * @description Human-readable demo reference, not a DB id.
+             */
+            application_reference: string;
+            /**
+             * Job Title
+             * @description Synthetic job title aligned with the marketing demo.
+             */
+            job_title: string;
+            /**
+             * Company
+             * @description Synthetic company name.
+             */
+            company: string;
+            /**
+             * Interview Title
+             * @description Short title for the illustrative calendar event.
+             */
+            interview_title: string;
+            /**
+             * Interview Start
+             * @description ISO-8601 UTC start for the demo screening slot.
+             */
+            interview_start: string;
+            /**
+             * Interview End
+             * @description ISO-8601 UTC end for the demo screening slot.
+             */
+            interview_end: string;
+            /**
+             * Ics Path
+             * @description Same-origin path to download the matching .ics file.
+             */
+            ics_path: string;
+            /**
+             * Disclaimer
+             * @description Plain-language notice that this is not a real employer application or interview.
+             */
+            disclaimer: string;
+        };
+        /**
          * DevelopmentFocusOut
          * @description Merged view across applications for reskilling priorities.
          */
@@ -2874,6 +2973,16 @@ export interface components {
              * @description Application rows across all candidates.
              */
             total_applications: number;
+            /**
+             * Applications Applied Last 7 Days
+             * @description Applications in ``applied`` status whose applied_at (or updated_at if applied_at is null) falls within the last 7×24h — weekly product pulse for demos and ops.
+             */
+            applications_applied_last_7_days: number;
+            /**
+             * Candidates Cv Uploaded Last 30 Days
+             * @description Candidates with cv_uploaded_at set within the last 30×24h (CV activity pulse).
+             */
+            candidates_cv_uploaded_last_30_days: number;
             /**
              * Profiles With Cv
              * @description Candidates who uploaded a CV at least once.
@@ -3624,6 +3733,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MvpStatsOut"];
+                };
+            };
+        };
+    };
+    public_demo_receipt_api_v1_public_demo_receipt_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DemoReceiptOut"];
+                };
+            };
+        };
+    };
+    public_demo_interview_ics_api_v1_public_demo_interview_ics_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
         };

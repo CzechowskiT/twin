@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
-import { Button, Card, Shell } from "@/components/ui";
+import { Button, Card, Input, Label, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import type { PlanOut, PlansPublicResponse } from "@/lib/api-types";
 import { clearToken, getToken } from "@/lib/auth";
@@ -332,235 +332,239 @@ export default function BillingPage() {
   const paid = subscriptionStatus != null && PAID.has(subscriptionStatus);
   const showPortal = paid;
 
-  return (
-    <Shell rail>
-      <div className="twin-app-read-pane mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="min-w-0 max-w-2xl">
-          <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">{t("dashboard.billingPageTitle")}</h1>
-          <p className="mt-3 text-sm leading-relaxed text-[var(--twin-muted-strong)] sm:text-base sm:leading-relaxed">
-            {t("dashboard.billingPageLead")}
-          </p>
+  if (loading && me === null) {
+    return (
+      <Shell wide rail>
+        <div className="flex min-h-[40vh] flex-col items-center justify-center gap-4 py-16">
+          <div
+            className="h-10 w-10 animate-spin rounded-full border-[3px] border-[var(--twin-accent)] border-t-transparent"
+            aria-hidden
+          />
+          <p className="twin-muted text-sm">{t("dashboard.billingLoading")}</p>
         </div>
-        <Link href="/dashboard" className="twin-btn-secondary twin-touch-target inline-block shrink-0 text-center sm:!w-auto">
-          ← {t("dashboard.title")}
-        </Link>
-      </div>
+      </Shell>
+    );
+  }
 
-      {checkoutBanner === "success" ? (
-        <Card variant="soft" className="mb-4 border-[var(--twin-accent-muted)]">
-          <p className="text-sm font-medium text-[var(--twin-accent-hover)]">{t("dashboard.billingCheckoutSuccess")}</p>
-        </Card>
-      ) : null}
-      {checkoutBanner === "cancel" ? (
-        <Card variant="soft" className="mb-4">
-          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingCheckoutCancelled")}</p>
-        </Card>
-      ) : null}
-
-      {plans && !plans.checkout_configured ? (
-        <Card variant="soft" className="mb-4">
-          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingNotConfigured")}</p>
-        </Card>
-      ) : null}
-
-      {actionError ? (
-        <Card variant="soft" className="mb-4 border-red-200">
-          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingCheckoutError")}</p>
-        </Card>
-      ) : null}
-
-      {loading ? (
-        <Card className="mb-6">
-          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingLoading")}</p>
-        </Card>
-      ) : null}
-
-      {!loading && loadFailed ? (
-        <Card variant="soft" className="mb-6 border-[var(--twin-border)]">
-          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingLoadIssue")}</p>
-          <button
-            type="button"
-            className="twin-link mt-3 text-sm font-semibold"
-            onClick={() => void load()}
-          >
-            {t("dashboard.billingRetry")}
-          </button>
-        </Card>
-      ) : null}
-
-      {me ? (
-        <Card className="mb-6">
-          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
-            {t("dashboard.billingCurrentPlan")}
-          </p>
-          <p className="mt-2 text-lg font-semibold capitalize text-[var(--foreground)]">{me.plan_tier}</p>
-          <p className="twin-muted mt-1 text-sm">
-            {t("dashboard.billingSubscriptionStatus")}:{" "}
-            <span className="font-medium text-[var(--foreground)]">
-              {formatSubscriptionStatusLabel(t, me.subscription_status)}
-            </span>
-          </p>
-          {(() => {
-            const periodEnd = formatSubscriptionPeriodEnd(me.subscription_current_period_end);
-            if (!periodEnd) return null;
-            return (
-              <p className="twin-muted mt-1 text-sm">
-                {t("dashboard.billingPeriodEnds")}:{" "}
-                <span className="font-medium text-[var(--foreground)]">{periodEnd}</span>
-              </p>
-            );
-          })()}
-          {showPortal ? (
-            <div className="mt-4 border-t border-[var(--twin-border)] pt-4">
-              <p className="twin-muted mb-3 text-sm">{t("dashboard.billingPortalHint")}</p>
-              <Button
-                type="button"
-                className="!w-auto sm:!min-w-[12rem]"
-                disabled={busy !== null}
-                onClick={() => void openPortal()}
-              >
-                {busy === "portal" ? "…" : t("dashboard.billingManagePortal")}
-              </Button>
-            </div>
-          ) : null}
-        </Card>
-      ) : null}
-
-      {me && !loading ? (
-        <Card variant="soft" className="mb-6">
-          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
-            {t("dashboard.billingInvoiceProfileTitle")}
-          </p>
-          <p className="twin-muted mt-1 text-sm leading-relaxed">{t("dashboard.billingInvoiceProfileLead")}</p>
-          <div className="mt-4 space-y-3">
-            <div>
-              <label htmlFor="billing-company" className="block text-sm font-medium text-[var(--foreground)]">
-                {t("dashboard.billingCompanyLabel")}
-              </label>
-              <input
-                id="billing-company"
-                type="text"
-                autoComplete="organization"
-                value={billingCompany}
-                onChange={(e) => setBillingCompany(e.target.value)}
-                className="mt-1 w-full max-w-md rounded-md border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-3 py-2 text-sm text-[var(--foreground)]"
-                maxLength={200}
-              />
-            </div>
-            <div>
-              <label htmlFor="billing-tax" className="block text-sm font-medium text-[var(--foreground)]">
-                {t("dashboard.billingTaxIdLabel")}
-              </label>
-              <input
-                id="billing-tax"
-                type="text"
-                autoComplete="off"
-                value={billingTaxId}
-                onChange={(e) => setBillingTaxId(e.target.value)}
-                className="mt-1 w-full max-w-md rounded-md border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-3 py-2 text-sm text-[var(--foreground)]"
-                maxLength={64}
-              />
-            </div>
-            <Button
-              type="button"
-              className="!w-auto"
-              disabled={billingSaveBusy}
-              onClick={() => void saveBillingProfile()}
-            >
-              {billingSaveBusy ? "…" : t("dashboard.billingSaveInvoiceProfile")}
-            </Button>
-            {billingSaveOk ? (
-              <p className="text-sm font-medium text-[var(--twin-accent-hover)]">{t("dashboard.billingSavedInvoiceProfile")}</p>
-            ) : null}
+  return (
+    <Shell wide rail>
+      <div className="twin-app-read-pane space-y-6 sm:space-y-8">
+        <div className="flex flex-col gap-4 border-b border-[var(--twin-border)] pb-6 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0 max-w-3xl space-y-3">
+            <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">{t("dashboard.billingPageTitle")}</h1>
+            <p className="text-sm leading-relaxed text-[var(--twin-muted-strong)] sm:text-base">{t("dashboard.billingPageLead")}</p>
           </div>
-          <p className="twin-muted mt-4 text-xs leading-relaxed">{t("dashboard.billingCheckoutPromoHint")}</p>
-          <p className="twin-muted mt-2 text-xs leading-relaxed">{t("dashboard.billingPauseViaPortal")}</p>
-        </Card>
-      ) : null}
+          <nav
+            className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-2"
+            aria-label={t("dashboard.billingPageTitle")}
+          >
+            <Link
+              href="/dashboard"
+              className="twin-link inline-flex min-h-[2.75rem] items-center justify-center px-1 text-sm sm:justify-start"
+            >
+              {t("profile.backToDashboard")}
+            </Link>
+            <Link href="/profile" className="twin-link inline-flex min-h-[2.75rem] items-center justify-center px-1 text-sm sm:justify-start">
+              {t("nav.profile")}
+            </Link>
+          </nav>
+        </div>
 
-      {plans && !loading ? (
-        <Card>
-          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
-            {t("dashboard.billingPlansTitle")}
-          </p>
-          {(plans.checkout_payment_methods ?? []).length > 0 ? (
-            <div className="mt-4 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/50 p-3 sm:p-4">
-              <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
-                {t("dashboard.billingCheckoutMethodsEyebrow")}
-              </p>
-              <ul className="mt-2 flex flex-wrap gap-2">
-                {(plans.checkout_payment_methods ?? []).map((m) => {
-                  const key = stripeCheckoutMethodLabel(m);
-                  const label = key ? t(key) : `${t("dashboard.billingPmGeneric")} (${m})`;
-                  return (
-                    <li
-                      key={m}
-                      className="rounded-full border border-[var(--twin-border)] bg-[var(--twin-surface)] px-3 py-1 text-xs font-medium text-[var(--foreground)]"
-                    >
-                      {label}
-                    </li>
-                  );
-                })}
-              </ul>
-              {(plans.checkout_payment_methods ?? []).includes("card") ? (
-                <p className="twin-muted mt-2 text-xs leading-relaxed">{t("dashboard.billingWalletsHint")}</p>
-              ) : null}
-              {locale === "en" && plans.payment_methods_note ? (
-                <p className="twin-muted mt-2 text-xs leading-relaxed">{plans.payment_methods_note}</p>
-              ) : null}
-            </div>
+        <div className="space-y-4 sm:space-y-5">
+          {checkoutBanner === "success" ? (
+            <Card variant="soft" className="!mb-0 border-[var(--twin-accent)]/25 bg-[var(--twin-accent-muted)]/25">
+              <p className="text-sm font-medium text-[var(--twin-accent-hover)]">{t("dashboard.billingCheckoutSuccess")}</p>
+            </Card>
           ) : null}
-          <ul className="mt-6 space-y-5">
-            {plans.plans.length === 0 ? (
-              <li className="rounded-xl border border-dashed border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/60 p-4 text-sm text-[var(--twin-muted-strong)]">
-                {t("dashboard.billingPlansEmpty")}
-              </li>
-            ) : (
-              plans.plans.map((p) => {
-                const tier = (me?.plan_tier ?? "free").toLowerCase();
-                const isCurrent = me != null && tier === p.id;
-                const canOpenWorkspace = p.id === "free" && !isCurrent;
-                const canCheckoutPremium = !paid && p.id === "premium" && plans.checkout_configured;
-                const canCheckoutPro = !paid && p.id === "pro" && plans.checkout_configured && p.stripe_price_configured;
-                const actionable = canOpenWorkspace || canCheckoutPremium || canCheckoutPro;
-                const disabled = busy !== null || isCurrent || !actionable;
-                let footerKey: TranslationKey = "dashboard.billingPlanCurrent";
-                if (!isCurrent) {
-                  if (p.id === "free") footerKey = "dashboard.billingPlanOpenWorkspace";
-                  else if (p.id === "premium")
-                    footerKey = plans.checkout_configured ? "dashboard.billingUpgradePremium" : "dashboard.billingNotConfigured";
-                  else if (p.id === "pro") {
-                    if (!plans.checkout_configured) footerKey = "dashboard.billingNotConfigured";
-                    else if (!p.stripe_price_configured) footerKey = "dashboard.billingPlanProPending";
-                    else footerKey = "dashboard.billingUpgradePro";
-                  }
-                }
+          {checkoutBanner === "cancel" ? (
+            <Card variant="soft" className="!mb-0">
+              <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingCheckoutCancelled")}</p>
+            </Card>
+          ) : null}
 
-                return (
-                  <li key={p.id} className="list-none">
-                    <button
+          {plans && !plans.checkout_configured ? (
+            <Card variant="soft" className="!mb-0">
+              <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingNotConfigured")}</p>
+            </Card>
+          ) : null}
+
+          {actionError ? (
+            <Card variant="soft" className="!mb-0 border-red-300/80 dark:border-red-900/50">
+              <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingCheckoutError")}</p>
+            </Card>
+          ) : null}
+
+          {!loading && loadFailed ? (
+            <Card variant="soft" className="!mb-0">
+              <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingLoadIssue")}</p>
+              <button type="button" className="twin-link mt-3 text-sm font-semibold" onClick={() => void load()}>
+                {t("dashboard.billingRetry")}
+              </button>
+            </Card>
+          ) : null}
+
+          {me ? (
+            <Card className="!mb-0">
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+                <div className="min-w-0 flex-1 space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
+                    {t("dashboard.billingCurrentPlan")}
+                  </p>
+                  <p className="text-xl font-semibold capitalize tracking-tight text-[var(--foreground)] sm:text-2xl">{me.plan_tier}</p>
+                  <p className="text-sm text-[var(--twin-muted-strong)]">
+                    {t("dashboard.billingSubscriptionStatus")}:{" "}
+                    <span className="font-semibold text-[var(--foreground)]">
+                      {formatSubscriptionStatusLabel(t, me.subscription_status)}
+                    </span>
+                  </p>
+                  {(() => {
+                    const periodEnd = formatSubscriptionPeriodEnd(me.subscription_current_period_end);
+                    if (!periodEnd) return null;
+                    return (
+                      <p className="text-sm text-[var(--twin-muted-strong)]">
+                        {t("dashboard.billingPeriodEnds")}: <span className="font-semibold text-[var(--foreground)]">{periodEnd}</span>
+                      </p>
+                    );
+                  })()}
+                </div>
+                {showPortal ? (
+                  <div className="w-full shrink-0 border-t border-[var(--twin-border)] pt-5 lg:w-auto lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+                    <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingPortalHint")}</p>
+                    <Button
                       type="button"
-                      disabled={disabled}
-                      onClick={() => {
-                        if (busy !== null) return;
-                        if (isCurrent) return;
-                        if (canOpenWorkspace) {
-                          router.push("/dashboard");
-                          return;
-                        }
-                        if (canCheckoutPremium) void startCheckout("premium");
-                        if (canCheckoutPro) void startCheckout("pro");
-                      }}
-                      className={`w-full rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] p-4 text-left transition sm:p-5 ${
-                        actionable && busy === null
-                          ? "cursor-pointer hover:border-[var(--twin-accent)] hover:shadow-[0_0_0_1px_var(--twin-accent-muted)] focus-visible:outline focus-visible:ring-2 focus-visible:ring-[var(--twin-accent)]/35"
-                          : ""
-                      } ${disabled && !isCurrent ? "opacity-75" : ""} ${isCurrent ? "ring-2 ring-[var(--twin-accent-muted)]" : ""}`}
+                      className="mt-3 !w-full sm:!w-auto sm:!min-w-[12rem]"
+                      disabled={busy !== null}
+                      onClick={() => void openPortal()}
                     >
-                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                        <div className="min-w-0 flex-1">
-                          <div className="flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-4">
-                            <p className="text-lg font-semibold capitalize text-[var(--foreground)]">{p.name}</p>
+                      {busy === "portal" ? "…" : t("dashboard.billingManagePortal")}
+                    </Button>
+                  </div>
+                ) : null}
+              </div>
+            </Card>
+          ) : null}
+
+          {me && !loading ? (
+            <Card variant="soft" className="!mb-0">
+              <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
+                {t("dashboard.billingInvoiceProfileTitle")}
+              </p>
+              <p className="twin-muted mt-1 max-w-prose text-sm leading-relaxed">{t("dashboard.billingInvoiceProfileLead")}</p>
+              <div className="mt-5 grid max-w-xl gap-4">
+                <div>
+                  <Label>{t("dashboard.billingCompanyLabel")}</Label>
+                  <Input
+                    id="billing-company"
+                    type="text"
+                    autoComplete="organization"
+                    value={billingCompany}
+                    onChange={(e) => setBillingCompany(e.target.value)}
+                    className="!mb-0 max-w-full"
+                    maxLength={200}
+                  />
+                </div>
+                <div>
+                  <Label>{t("dashboard.billingTaxIdLabel")}</Label>
+                  <Input
+                    id="billing-tax"
+                    type="text"
+                    autoComplete="off"
+                    value={billingTaxId}
+                    onChange={(e) => setBillingTaxId(e.target.value)}
+                    className="!mb-0 max-w-full"
+                    maxLength={64}
+                  />
+                </div>
+                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+                  <Button type="button" className="!w-full sm:!w-auto" disabled={billingSaveBusy} onClick={() => void saveBillingProfile()}>
+                    {billingSaveBusy ? "…" : t("dashboard.billingSaveInvoiceProfile")}
+                  </Button>
+                  {billingSaveOk ? (
+                    <p className="text-sm font-medium text-[var(--twin-accent-hover)]">{t("dashboard.billingSavedInvoiceProfile")}</p>
+                  ) : null}
+                </div>
+              </div>
+              <p className="twin-muted mt-5 text-xs leading-relaxed">{t("dashboard.billingCheckoutPromoHint")}</p>
+              <p className="twin-muted mt-2 text-xs leading-relaxed">{t("dashboard.billingPauseViaPortal")}</p>
+            </Card>
+          ) : null}
+
+          {plans && !loading ? (
+            <section className="space-y-4" aria-labelledby="billing-plans-heading">
+              <h2 id="billing-plans-heading" className="twin-section-title text-lg sm:text-xl">
+                {t("dashboard.billingPlansTitle")}
+              </h2>
+              {(plans.checkout_payment_methods ?? []).length > 0 ? (
+                <Card variant="soft" className="!mb-0">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
+                    {t("dashboard.billingCheckoutMethodsEyebrow")}
+                  </p>
+                  <ul className="mt-3 flex flex-wrap gap-2">
+                    {(plans.checkout_payment_methods ?? []).map((m) => {
+                      const key = stripeCheckoutMethodLabel(m);
+                      const label = key ? t(key) : `${t("dashboard.billingPmGeneric")} (${m})`;
+                      return (
+                        <li
+                          key={m}
+                          className="rounded-full border border-[var(--twin-border)] bg-[var(--twin-surface)] px-3 py-1.5 text-xs font-medium text-[var(--foreground)]"
+                        >
+                          {label}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  {(plans.checkout_payment_methods ?? []).includes("card") ? (
+                    <p className="twin-muted mt-3 text-xs leading-relaxed">{t("dashboard.billingWalletsHint")}</p>
+                  ) : null}
+                  {locale === "en" && plans.payment_methods_note ? (
+                    <p className="twin-muted mt-2 text-xs leading-relaxed">{plans.payment_methods_note}</p>
+                  ) : null}
+                </Card>
+              ) : null}
+
+              {plans.plans.length === 0 ? (
+                <Card variant="soft" className="!mb-0 border-dashed">
+                  <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingPlansEmpty")}</p>
+                </Card>
+              ) : (
+                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                  {plans.plans.map((p) => {
+                    const tier = (me?.plan_tier ?? "free").toLowerCase();
+                    const isCurrent = me != null && tier === p.id;
+                    const canOpenWorkspace = p.id === "free" && !isCurrent;
+                    const canCheckoutPremium = !paid && p.id === "premium" && plans.checkout_configured;
+                    const canCheckoutPro = !paid && p.id === "pro" && plans.checkout_configured && p.stripe_price_configured;
+                    const actionable = canOpenWorkspace || canCheckoutPremium || canCheckoutPro;
+                    const ctaDisabled = busy !== null || isCurrent || !actionable;
+                    let footerKey: TranslationKey = "dashboard.billingPlanCurrent";
+                    if (!isCurrent) {
+                      if (p.id === "free") footerKey = "dashboard.billingPlanOpenWorkspace";
+                      else if (p.id === "premium")
+                        footerKey = plans.checkout_configured ? "dashboard.billingUpgradePremium" : "dashboard.billingNotConfigured";
+                      else if (p.id === "pro") {
+                        if (!plans.checkout_configured) footerKey = "dashboard.billingNotConfigured";
+                        else if (!p.stripe_price_configured) footerKey = "dashboard.billingPlanProPending";
+                        else footerKey = "dashboard.billingUpgradePro";
+                      }
+                    }
+
+                    const ctaLabel =
+                      busy === "checkout-premium" && p.id === "premium"
+                        ? "…"
+                        : busy === "checkout-pro" && p.id === "pro"
+                          ? "…"
+                          : t(footerKey);
+
+                    return (
+                      <Card
+                        key={p.id}
+                        className={`!mb-0 flex min-h-[280px] flex-col ${
+                          isCurrent ? "ring-2 ring-[var(--twin-accent)]/40" : ""
+                        } ${!isCurrent && actionable && busy === null ? "shadow-[0_1px_0_0_var(--twin-accent-muted)]" : ""}`}
+                      >
+                        <div className="flex min-w-0 flex-1 flex-col">
+                          <p className="text-lg font-semibold capitalize leading-snug text-[var(--foreground)]">{p.name}</p>
+                          <div className="mt-3">
                             <p className="text-2xl font-bold tracking-tight text-[var(--twin-accent)] sm:text-3xl">
                               {formatPlanListMonthly(
                                 locale,
@@ -569,48 +573,56 @@ export default function BillingPage() {
                                   ? { amount: p.list_price_monthly, currency: p.list_price_currency }
                                   : null,
                               )}
-                              <span className="ml-1.5 text-sm font-medium text-[var(--twin-muted-strong)]">
-                                {t("dashboard.billingPerMonth")}
-                              </span>
+                              <span className="ml-1.5 text-sm font-medium text-[var(--twin-muted-strong)]">{t("dashboard.billingPerMonth")}</span>
                             </p>
                             {p.list_price_monthly != null && p.list_price_currency ? (
-                              <p className="text-[11px] font-medium text-[var(--twin-muted)]">{t("dashboard.billingLiveStripeList")}</p>
+                              <p className="mt-1 text-[11px] font-medium text-[var(--twin-muted)]">{t("dashboard.billingLiveStripeList")}</p>
                             ) : null}
                           </div>
-                          <p className="mt-2 text-sm leading-relaxed text-[var(--twin-muted-strong)]">{p.description}</p>
-                          <p className="mt-2 text-xs text-[var(--twin-muted)]">
+                          <p className="mt-3 flex-1 text-sm leading-relaxed text-[var(--twin-muted-strong)]">{p.description}</p>
+                          <p className="mt-3 text-xs text-[var(--twin-muted)]">
                             {p.max_tracked_applications != null
                               ? t("dashboard.billingTrackedCap").replace("{n}", String(p.max_tracked_applications))
                               : t("dashboard.billingTrackedUnlimited")}
                           </p>
                         </div>
-                        <div className="flex shrink-0 flex-col items-start gap-1 sm:items-end">
-                          <span
-                            className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                              isCurrent
-                                ? "bg-[var(--twin-accent-muted)] text-[var(--twin-accent-hover)]"
-                                : actionable
-                                  ? "bg-[var(--twin-cta)] text-[var(--twin-on-cta)]"
-                                  : "bg-[var(--twin-surface)] text-[var(--twin-muted-strong)]"
-                            }`}
-                          >
-                            {busy === "checkout-premium" && p.id === "premium"
-                              ? "…"
-                              : busy === "checkout-pro" && p.id === "pro"
-                                ? "…"
-                                : t(footerKey)}
-                          </span>
+                        <div className="mt-5 border-t border-[var(--twin-border)] pt-4">
+                          {isCurrent ? (
+                            <p className="text-center text-sm font-semibold text-[var(--twin-accent-hover)]">{t("dashboard.billingPlanCurrent")}</p>
+                          ) : (
+                            <Button
+                              type="button"
+                              className={
+                                actionable && busy === null
+                                  ? "!bg-[var(--twin-cta)] !text-[var(--twin-on-cta)] hover:!bg-[var(--twin-cta-hover)]"
+                                  : ""
+                              }
+                              disabled={ctaDisabled}
+                              onClick={() => {
+                                if (busy !== null) return;
+                                if (isCurrent) return;
+                                if (canOpenWorkspace) {
+                                  router.push("/dashboard");
+                                  return;
+                                }
+                                if (canCheckoutPremium) void startCheckout("premium");
+                                if (canCheckoutPro) void startCheckout("pro");
+                              }}
+                            >
+                              {ctaLabel}
+                            </Button>
+                          )}
                         </div>
-                      </div>
-                    </button>
-                  </li>
-                );
-              })
-            )}
-          </ul>
-          <p className="mt-5 text-xs leading-relaxed text-[var(--twin-muted)]">{t("dashboard.billingListPricesNote")}</p>
-        </Card>
-      ) : null}
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+              <p className="text-xs leading-relaxed text-[var(--twin-muted)]">{t("dashboard.billingListPricesNote")}</p>
+            </section>
+          ) : null}
+        </div>
+      </div>
     </Shell>
   );
 }

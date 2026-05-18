@@ -676,14 +676,40 @@ export function InvestorCalculator() {
             </table>
           </div>
           {firstProfitIdx >= 0 ? (
-            <div className="mt-4 rounded-lg border border-emerald-500/40 bg-emerald-500/10 p-4 text-sm text-emerald-950 dark:text-emerald-100">
-              <p className="font-semibold">
-                {t("investorCalc.beBannerTitle").replace(
-                  "{{y}}",
-                  String(calc.projection[firstProfitIdx]!.year),
-                )}
-              </p>
-              <p className="mt-1 text-emerald-900/90 dark:text-emerald-200/90">
+            <div
+              className="mt-5 rounded-2xl border-2 border-[var(--twin-accent)]/45 bg-[var(--twin-accent-muted)]/40 p-5 shadow-md sm:p-6"
+              role="status"
+            >
+              <div className="border-b border-[var(--twin-border)]/55 pb-4">
+                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[var(--twin-accent)]">
+                  {t("investorCalc.beBannerEyebrow")}
+                </p>
+                <p className="mt-2 text-lg font-semibold leading-snug text-[var(--foreground)] sm:text-xl">
+                  {t("investorCalc.beBannerTitle").replace(
+                    "{{y}}",
+                    String(calc.projection[firstProfitIdx]!.year),
+                  )}
+                </p>
+              </div>
+              <dl className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+                <div className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/95 px-4 py-3.5 sm:px-5 sm:py-4">
+                  <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--twin-muted-strong)]">
+                    {t("investorCalc.colUsers")}
+                  </dt>
+                  <dd className="mt-1.5 font-mono text-xl font-bold tabular-nums tracking-tight text-[var(--foreground)] sm:text-2xl">
+                    ≈ {calc.projection[firstProfitIdx]!.users.toLocaleString(locale)}
+                  </dd>
+                </div>
+                <div className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/95 px-4 py-3.5 sm:px-5 sm:py-4">
+                  <dt className="text-[11px] font-semibold uppercase tracking-wide text-[var(--twin-muted-strong)]">
+                    {t("investorCalc.colNet")}
+                  </dt>
+                  <dd className="mt-1.5 font-mono text-xl font-bold tabular-nums tracking-tight text-emerald-700 dark:text-emerald-300 sm:text-2xl">
+                    {money(calc.projection[firstProfitIdx]!.netIncome, 0)}
+                  </dd>
+                </div>
+              </dl>
+              <p className="sr-only">
                 {t("investorCalc.beBannerBody")
                   .replace("{{u}}", calc.projection[firstProfitIdx]!.users.toLocaleString(locale))
                   .replace("{{m}}", money(calc.projection[firstProfitIdx]!.netIncome, 0))}
