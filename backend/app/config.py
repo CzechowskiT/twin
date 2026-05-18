@@ -95,10 +95,16 @@ class Settings(BaseSettings):
     match_jobs_scan_limit: int = 4000
     # When true, use ``job_matching_v2`` (salary overlap bonus on top of v1 rules).
     match_scoring_v2: bool = False
+    # When true (env MATCHING_V2_TFIDF), add a bounded TF–IDF cosine layer on top of v1 or v2 (see matching_service).
+    matching_v2_tfidf: bool = False
     # When true, honour robots.txt before Playwright fetches (LinkedIn uses Disallow: / for generic bots).
     scrape_respect_robots_txt: bool = True
     # Pause between boards in scrape-all (serial) to reduce burst traffic on third-party sites.
     scrape_between_boards_sec: float = 1.5
+    # --- Ops note (job corpus scale): tens or hundreds of thousands of validated rows are built by sustained
+    # Celery ingestion (beat + workers), not one-off migrations. Tune scrape_jobs_per_board,
+    # scrape_between_boards_sec, scrape_post_fetch_delay_sec, and match_jobs_scan_limit for polite traffic.
+    # scrape_respect_robots_txt defaults true; ignoring ToS/robots risks blocks and legal exposure.
     # Optional extra delay after each fetch_html session (0 = off).
     scrape_post_fetch_delay_sec: float = 0.0
     intro_audio_upload_dir: str = "data/intro_audio"

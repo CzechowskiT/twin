@@ -377,6 +377,9 @@ class Application(Base):
     # Optional link to employer ATS (webhook ingest; see /integrations/ats).
     external_ats_id: Mapped[str | None] = mapped_column(String(255), nullable=True, index=True)
     external_ats_provider: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    # Tailored auto-apply PDF persisted to S3 (key only; use presigned GET in API).
+    auto_apply_package_s3_key: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    auto_apply_package_uploaded_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     candidate: Mapped["Candidate"] = relationship(back_populates="applications")
     job: Mapped["Job"] = relationship(back_populates="applications")
@@ -502,6 +505,22 @@ class ScheduledInterview(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
+    # Optional unauthenticated .ics download (hashed token; see calendar API).
+    ics_access_token_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    ics_access_token_expires_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     user: Mapped["User"] = relationship(back_populates="scheduled_interviews")
     application: Mapped["Application | None"] = relationship(back_populates="scheduled_interviews")
+
+
+class EmployerLead(Base):
+    """Inbound interest from company / employer signup forms (public lead capture)."""
+
+    __tablename__ = "employer_leads"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    email: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    company_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+

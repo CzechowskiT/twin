@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import hashlib
 import logging
+import secrets
 from datetime import datetime, timedelta, timezone
 from urllib.parse import urlencode
 
@@ -107,6 +109,17 @@ class CalendarCreateEventIn(BaseModel):
 class CalendarCreateEventOut(BaseModel):
     id: str | None = None
     html_link: str | None = None
+
+
+class InterviewIcsTokenOut(BaseModel):
+    """One-time style secret URL segment for unauthenticated .ics fetch."""
+
+    token: str
+    expires_at: str
+    download_path: str
+
+
+_ICS_SHARE_TOKEN_TTL_DAYS = 30
 
 
 @router.get("/google/status", response_model=CalendarStatusOut)
@@ -404,6 +417,74 @@ def download_interview_ics(
     )
     if row is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Interview not found")
+    if row.status == "cancelled":
+        raise HTTPException(status.HTTP_410_GONE, detail="Interview was cancelled")
+    body = scheduled_interview_to_ics(row)
+    return Response(
+        content=body.encode("utf-8"),
+        media_type="text/calendar; charset=utf-8",
+        headers={
+            "Content-Disposition": f'attachment; filename="twin-interview-{interview_id}.ics"',
+            "Cache-Control": "private, no-store",
+        },
+    )
+
+
+def _ics_token_digest(raw: str) -> str:
+    return hashlib.sha256(raw.strip().encode("utf-8")).hexdigest()
+
+
+@router.post("/interviews/{interview_id}/ics-token", response_model=InterviewIcsTokenOut)
+def mint_interview_ics_share_token(
+    interview_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> InterviewIcsTokenOut:
+    """Issue (or rotate) a time-limited secret for unauthenticated .ics download (e.g. share with assistant)."""
+    row = (
+        db.query(ScheduledInterview)
+        .filter(
+            ScheduledInterview.id == interview_id,
+            ScheduledInterview.user_id == current_user.id,
+        )
+        .first()
+    )
+    if row is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Interview not found")
+    if row.status == "cancelled":
+        raise HTTPException(status.HTTP_410_GONE, detail="Interview was cancelled")
+    raw = secrets.token_urlsafe(32)
+    row.ics_access_token_hash = _ics_token_digest(raw)
+    row.ics_access_token_expires_at = datetime.utcnow() + timedelta(days=_ICS_SHARE_TOKEN_TTL_DAYS)
+    row.updated_at = datetime.utcnow()
+    db.add(row)
+    db.commit()
+    exp = row.ics_access_token_expires_at
+    exp_s = exp.isoformat() + "Z" if exp and exp.tzinfo is None else (exp.isoformat() if exp else "")
+    path = f"/api/v1/calendar/interviews/{interview_id}/ics-shared?token={raw}"
+    return InterviewIcsTokenOut(token=raw, expires_at=exp_s, download_path=path)
+
+
+@router.get("/interviews/{interview_id}/ics-shared")
+def download_interview_ics_shared(
+    interview_id: int,
+    token: str = Query(..., min_length=16, max_length=512),
+    db: Session = Depends(get_db),
+) -> Response:
+    """Download .ics using a minted token (no login) — token is hashed at rest."""
+    digest = _ics_token_digest(token)
+    row = (
+        db.query(ScheduledInterview)
+        .filter(
+            ScheduledInterview.id == interview_id,
+            ScheduledInterview.ics_access_token_hash == digest,
+            ScheduledInterview.ics_access_token_expires_at.isnot(None),
+            ScheduledInterview.ics_access_token_expires_at > datetime.utcnow(),
+        )
+        .first()
+    )
+    if row is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Interview not found or link expired")
     if row.status == "cancelled":
         raise HTTPException(status.HTTP_410_GONE, detail="Interview was cancelled")
     body = scheduled_interview_to_ics(row)

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from io import BytesIO
 from pathlib import Path
 from typing import Iterable
 
@@ -52,8 +53,7 @@ def _write_blocks(pdf: FPDF, paragraphs: Iterable[str], size: int = 11) -> None:
         pdf.ln(2)
 
 
-def render_application_package_pdf(
-    output_path: Path,
+def _build_package_fpdf(
     *,
     candidate_name: str,
     job_title: str,
@@ -63,7 +63,7 @@ def render_application_package_pdf(
     cv_text: str,
     extra_consent_paragraphs: tuple[str, ...] | None = None,
     font_path_override: str | None = None,
-) -> Path:
+) -> FPDF:
     font = _font_path(font_path_override)
     if font is None:
         raise FileNotFoundError(
@@ -71,7 +71,6 @@ def render_application_package_pdf(
             "lub AUTO_APPLY_FONT_PATH).",
         )
 
-    output_path.parent.mkdir(parents=True, exist_ok=True)
     pdf = FPDF(unit="mm", format="A4")
     pdf.set_auto_page_break(auto=True, margin=14)
     pdf.add_page()
@@ -108,6 +107,57 @@ def render_application_package_pdf(
     for para in re.split(r"\n{2,}", appendix):
         _write_blocks(pdf, [para], size=9)
         pdf.ln(1)
+    return pdf
 
+
+def render_application_package_pdf(
+    output_path: Path,
+    *,
+    candidate_name: str,
+    job_title: str,
+    job_company: str,
+    job_board: str,
+    motivation_text: str,
+    cv_text: str,
+    extra_consent_paragraphs: tuple[str, ...] | None = None,
+    font_path_override: str | None = None,
+) -> Path:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    pdf = _build_package_fpdf(
+        candidate_name=candidate_name,
+        job_title=job_title,
+        job_company=job_company,
+        job_board=job_board,
+        motivation_text=motivation_text,
+        cv_text=cv_text,
+        extra_consent_paragraphs=extra_consent_paragraphs,
+        font_path_override=font_path_override,
+    )
     pdf.output(str(output_path))
     return output_path
+
+
+def render_application_package_pdf_bytes(
+    *,
+    candidate_name: str,
+    job_title: str,
+    job_company: str,
+    job_board: str,
+    motivation_text: str,
+    cv_text: str,
+    extra_consent_paragraphs: tuple[str, ...] | None = None,
+    font_path_override: str | None = None,
+) -> bytes:
+    """Same PDF as ``render_application_package_pdf`` but returned as bytes (for S3 upload)."""
+    pdf = _build_package_fpdf(
+        candidate_name=candidate_name,
+        job_title=job_title,
+        job_company=job_company,
+        job_board=job_board,
+        motivation_text=motivation_text,
+        cv_text=cv_text,
+        extra_consent_paragraphs=extra_consent_paragraphs,
+        font_path_override=font_path_override,
+    )
+    raw = pdf.output(dest="S")
+    return bytes(raw) if not isinstance(raw, bytes) else raw

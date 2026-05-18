@@ -66,6 +66,21 @@ class S3BlobStore:
             logger.error("S3 put_object failed: %s", exc)
             return None
 
+    def presigned_get_url(self, *, key: str, expires_in: int = 3600) -> str | None:
+        """Time-limited HTTPS URL for private objects (default 1 hour)."""
+        if not self.enabled or self._client is None or not self._bucket:
+            return None
+        expires_in = max(60, min(86400 * 7, int(expires_in)))
+        try:
+            return self._client.generate_presigned_url(
+                "get_object",
+                Params={"Bucket": self._bucket, "Key": key},
+                ExpiresIn=expires_in,
+            )
+        except Exception as exc:
+            logger.error("S3 presign failed: %s", exc)
+            return None
+
 
 def get_s3_blob_store() -> S3BlobStore:
     return S3BlobStore()

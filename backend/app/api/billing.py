@@ -1,5 +1,10 @@
 """Stripe billing: public plans, Checkout, Customer Portal, webhooks."""
 
+# B2B note: this module covers candidate subscription Checkout + Customer Portal + webhooks only.
+# A separate "per hire" / success-fee flow for employers (Stripe Connect, invoices, or usage-based)
+# and a company billing dashboard are not implemented here — extend these handlers (or add a sibling
+# router under the same Stripe config) once employer pricing models exist; avoid duplicating Stripe setup.
+
 import logging
 from typing import Annotated, Any
 

@@ -65,6 +65,15 @@ def test_explicit_celery_eager_false_not_overridden(monkeypatch) -> None:
         get_settings.cache_clear()
 
 
+def test_matching_v2_tfidf_flag_from_env(monkeypatch) -> None:
+    monkeypatch.setenv("MATCHING_V2_TFIDF", "true")
+    get_settings.cache_clear()
+    try:
+        assert Settings().matching_v2_tfidf is True
+    finally:
+        get_settings.cache_clear()
+
+
 def test_redis_url_prevents_railway_eager_infer(monkeypatch) -> None:
     monkeypatch.setenv("RAILWAY_ENVIRONMENT", "production")
     monkeypatch.setenv("REDIS_URL", "redis://redis:6379/0")

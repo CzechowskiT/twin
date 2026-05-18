@@ -18,6 +18,7 @@ from app.database.models import Application, ApplicationStatus, Candidate, Job, 
 from app.services.application_package_pdf import render_application_package_pdf
 from app.services.cv_parser import CvParseError, extract_cv_text
 from app.services.cv_tailoring import build_motivation_text_for_auto_apply, get_tailoring_pitch_for_job
+from app.services.s3_storage import get_s3_blob_store
 
 logger = logging.getLogger(__name__)
 
@@ -116,6 +117,7 @@ def auto_apply_for_user(
     state_dir = _writable_state_dir(Path(settings.auto_apply_state_dir), user.id)
 
     package_pdf: Path | None = None
+    pdf_bytes_for_s3: bytes | None = None
     resume_path = candidate.resume_path
     if settings.auto_apply_tailored_pdf:
         try:
@@ -132,6 +134,10 @@ def auto_apply_for_user(
                 font_path_override=settings.auto_apply_font_path or None,
             )
             resume_path = str(package_pdf)
+            try:
+                pdf_bytes_for_s3 = package_pdf.read_bytes()
+            except OSError:
+                pdf_bytes_for_s3 = None
         except FileNotFoundError as exc:
             logger.warning("%s — używam oryginalnego CV.", exc)
             if candidate.resume_path and Path(candidate.resume_path).is_file():
@@ -187,6 +193,16 @@ def auto_apply_for_user(
                 logger.warning("Could not remove temp package PDF %s", package_pdf)
 
     app = _upsert_application(db, candidate.id, job_id, result.outcome)
+    if pdf_bytes_for_s3 and get_s3_blob_store().enabled:
+        store = get_s3_blob_store()
+        ts = datetime.utcnow().strftime("%Y%m%d%H%M%S")
+        key = f"auto_apply_packages/u{user.id}/a{app.id}_{ts}.pdf"
+        if store.put_bytes(key=key, data=pdf_bytes_for_s3, content_type="application/pdf"):
+            app.auto_apply_package_s3_key = key
+            app.auto_apply_package_uploaded_at = datetime.utcnow()
+            db.add(app)
+            db.commit()
+            db.refresh(app)
     return result.outcome, result.message, app
 
 

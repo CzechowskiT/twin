@@ -1,5 +1,6 @@
 """Google Calendar API routes (no live Google calls)."""
 
+import hashlib
 from datetime import datetime, timedelta
 from unittest.mock import MagicMock, patch
 
@@ -37,6 +38,73 @@ def test_calendar_authorize_unauthenticated(client: TestClient) -> None:
 def test_interview_ics_unauthenticated(client: TestClient) -> None:
     res = client.get("/api/v1/calendar/interviews/1/ics")
     assert res.status_code == 401
+
+
+def test_interview_ics_token_mint_and_shared_download(client: TestClient) -> None:
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+    db = Session()
+    u = User(email="ics-share@example.com", hashed_password="x")
+    db.add(u)
+    db.commit()
+    db.refresh(u)
+    start = datetime.utcnow() + timedelta(days=1)
+    end = start + timedelta(hours=1)
+    inv = ScheduledInterview(
+        user_id=u.id,
+        company_name="Twin Labs",
+        job_title="Backend",
+        interviewer_name=None,
+        interviewer_email=None,
+        interview_start=start,
+        interview_end=end,
+        timezone="UTC",
+        interview_type="video",
+        status="scheduled",
+    )
+    db.add(inv)
+    db.commit()
+    db.refresh(inv)
+
+    def override_db():
+        try:
+            yield db
+        finally:
+            pass
+
+    def _user() -> User:
+        x = User(email="ics-share@example.com", hashed_password=None)
+        x.id = u.id
+        return x
+
+    app.dependency_overrides[get_db] = override_db
+    app.dependency_overrides[get_current_user] = _user
+    token = create_access_token(u.email)
+    try:
+        mint = client.post(
+            f"/api/v1/calendar/interviews/{inv.id}/ics-token",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert mint.status_code == 200
+        payload = mint.json()
+        raw = payload["token"]
+        assert len(raw) >= 16
+        db.refresh(inv)
+        assert inv.ics_access_token_hash == hashlib.sha256(raw.encode("utf-8")).hexdigest()
+        assert inv.ics_access_token_expires_at is not None
+
+        dl = client.get(f"/api/v1/calendar/interviews/{inv.id}/ics-shared?token={raw}")
+        assert dl.status_code == 200
+        assert "BEGIN:VCALENDAR" in dl.text
+    finally:
+        app.dependency_overrides.pop(get_current_user, None)
+        app.dependency_overrides.pop(get_db, None)
+        db.close()
 
 
 def test_interview_cancel_unauthenticated(client: TestClient) -> None:
