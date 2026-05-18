@@ -1,5 +1,6 @@
 """Celery tasks for job board scraping."""
 
+import logging
 from typing import Any
 
 from app.config import get_settings
@@ -10,13 +11,19 @@ from app.scrapers.registry import DEFAULT_BOARD_TIMEOUT_SEC, scrape_all_boards
 from app.services.job_storage import upsert_jobs
 from app.tasks.celery_app import celery_app
 
+logger = logging.getLogger(__name__)
+
 
 def _scrape_limit() -> int:
     return max(12, min(150, get_settings().scrape_jobs_per_board))
 
 
 def _persist_global_board(board_id: str) -> dict[str, int]:
-    jobs = scrape_global_board(board_id, limit=_scrape_limit())
+    try:
+        jobs = scrape_global_board(board_id, limit=_scrape_limit())
+    except Exception:
+        logger.exception("Global board scrape failed (board_id=%s)", board_id)
+        raise
     db = SessionLocal()
     try:
         saved = upsert_jobs(db, jobs)
