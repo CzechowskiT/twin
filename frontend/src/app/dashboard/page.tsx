@@ -129,6 +129,7 @@ export default function DashboardPage() {
   const [matches, setMatches] = useState<MatchList | null>(null);
   const [jobs, setJobs] = useState<JobList | null>(null);
   const [applications, setApplications] = useState<ApplicationRow[]>([]);
+  const [applicationsTotal, setApplicationsTotal] = useState(0);
   const [devFocus, setDevFocus] = useState<DevelopmentFocus | null>(null);
   const [feedbackBusy, setFeedbackBusy] = useState<FeedbackBusy>(null);
   const [filterOptions, setFilterOptions] = useState<FilterOptions | null>(null);
@@ -155,8 +156,17 @@ export default function DashboardPage() {
   }, []);
 
   const loadApplications = useCallback(async (token: string) => {
-    const data = await apiFetch<{ items: ApplicationRow[] }>("/api/v1/applications/me", {}, token);
-    return data.items;
+    const data = await apiFetch<{ items: ApplicationRow[]; total: number }>(
+      "/api/v1/applications/me?limit=500&offset=0",
+      {},
+      token,
+    );
+    return { items: data.items, total: data.total };
+  }, []);
+
+  const syncApplicationsFromApi = useCallback((payload: { items: ApplicationRow[]; total: number }) => {
+    setApplications(payload.items);
+    setApplicationsTotal(payload.total);
   }, []);
 
   const loadDevelopmentFocus = useCallback(async (token: string) => {
@@ -212,12 +222,13 @@ export default function DashboardPage() {
       const [jobList, matchList, apps, focus] = await Promise.all([
         loadJobs(token, activeFilters),
         hasProfile ? loadMatches(token) : Promise.resolve(null),
-        hasProfile ? loadApplications(token) : Promise.resolve([]),
+        hasProfile ? loadApplications(token) : Promise.resolve({ items: [] as ApplicationRow[], total: 0 }),
         hasProfile ? loadDevelopmentFocus(token) : Promise.resolve(null),
       ]);
       setJobs(jobList);
       if (matchList) setMatches(matchList);
-      setApplications(apps);
+      setApplications(apps.items);
+      setApplicationsTotal(apps.total);
       setDevFocus(focus);
       setLastUpdated(new Date());
     },
@@ -332,7 +343,7 @@ export default function DashboardPage() {
       router.replace(qs ? `/dashboard?${qs}` : "/dashboard");
       const authToken = getToken();
       if (authToken) {
-        void loadApplications(authToken).then(setApplications).catch(() => {});
+        void loadApplications(authToken).then(syncApplicationsFromApi).catch(() => {});
         void loadDevelopmentFocus(authToken).then(setDevFocus).catch(() => {});
       }
       return;
@@ -352,7 +363,7 @@ export default function DashboardPage() {
         const authToken = getToken();
         if (authToken) {
           try {
-            setApplications(await loadApplications(authToken));
+            syncApplicationsFromApi(await loadApplications(authToken));
             setDevFocus(await loadDevelopmentFocus(authToken));
             setPlacementEventsInvalidateKey((k) => k + 1);
           } catch {
@@ -374,7 +385,7 @@ export default function DashboardPage() {
     })();
 
     return () => ac.abort();
-  }, [router, t, loadApplications, loadDevelopmentFocus]);
+  }, [router, t, loadApplications, loadDevelopmentFocus, syncApplicationsFromApi]);
 
   useEffect(() => {
     const restored = loadStoredJobFilters();
@@ -400,7 +411,7 @@ export default function DashboardPage() {
         },
         token,
       );
-      setApplications(await loadApplications(token));
+      syncApplicationsFromApi(await loadApplications(token));
       setDevFocus(await loadDevelopmentFocus(token));
     } catch (err) {
       setError(dashboardFetchUserMessage(err, t));
@@ -434,7 +445,7 @@ export default function DashboardPage() {
         { method: "POST", body: JSON.stringify({ job_id: jobId }) },
         token,
       );
-      setApplications(await loadApplications(token));
+      syncApplicationsFromApi(await loadApplications(token));
       setDevFocus(await loadDevelopmentFocus(token));
       alert(result.message);
     } catch (err) {
@@ -468,7 +479,7 @@ export default function DashboardPage() {
       { method: "PATCH", body: JSON.stringify({ status }) },
       token,
     );
-    setApplications(await loadApplications(token));
+    syncApplicationsFromApi(await loadApplications(token));
     setDevFocus(await loadDevelopmentFocus(token));
   }
 
@@ -476,7 +487,7 @@ export default function DashboardPage() {
     const token = getToken();
     if (!token) return;
     await apiFetch(`/api/v1/applications/${id}`, { method: "DELETE" }, token);
-    setApplications(await loadApplications(token));
+    syncApplicationsFromApi(await loadApplications(token));
     setDevFocus(await loadDevelopmentFocus(token));
   }
 
@@ -491,7 +502,7 @@ export default function DashboardPage() {
         { method: "PATCH", body: JSON.stringify({ recruiter_feedback_raw: raw }) },
         token,
       );
-      setApplications(await loadApplications(token));
+      syncApplicationsFromApi(await loadApplications(token));
       setDevFocus(await loadDevelopmentFocus(token));
     } catch (err) {
       setError(dashboardFetchUserMessage(err, t));
@@ -507,7 +518,7 @@ export default function DashboardPage() {
     setError(null);
     try {
       await apiFetch(`/api/v1/applications/${id}/parse-feedback`, { method: "POST", body: "{}" }, token);
-      setApplications(await loadApplications(token));
+      syncApplicationsFromApi(await loadApplications(token));
       setDevFocus(await loadDevelopmentFocus(token));
     } catch (err) {
       setError(dashboardFetchUserMessage(err, t));
@@ -561,7 +572,7 @@ export default function DashboardPage() {
         { method: "POST", body: JSON.stringify({ note: note.trim() || null }) },
         token,
       );
-      setApplications(await loadApplications(token));
+      syncApplicationsFromApi(await loadApplications(token));
       setDevFocus(await loadDevelopmentFocus(token));
       setPlacementEventsInvalidateKey((k) => k + 1);
     } catch (err) {
@@ -582,7 +593,7 @@ export default function DashboardPage() {
         { method: "POST", body: JSON.stringify({ work_email: workEmail }) },
         token,
       );
-      setApplications(await loadApplications(token));
+      syncApplicationsFromApi(await loadApplications(token));
       setDevFocus(await loadDevelopmentFocus(token));
       alert(out.message || t("dashboard.placementVerifyPending"));
       setPlacementEventsInvalidateKey((k) => k + 1);
@@ -1029,7 +1040,14 @@ export default function DashboardPage() {
         <Card id="dashboard-applications" variant="soft">
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="twin-section-title">
-              {t("dashboard.applications")} ({applications.length})
+              {t("dashboard.applications")}{" "}
+              <span className="twin-muted text-base font-normal">
+                {applications.length >= applicationsTotal
+                  ? t("dashboard.applicationsSummaryAll").replace("{total}", String(applicationsTotal))
+                  : t("dashboard.applicationsSummaryPartial")
+                      .replace("{shown}", String(applications.length))
+                      .replace("{total}", String(applicationsTotal))}
+              </span>
             </h2>
             <button
               type="button"
