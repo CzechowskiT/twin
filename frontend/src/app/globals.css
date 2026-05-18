@@ -201,6 +201,32 @@ body {
   }
 }
 
+/**
+ * Billing: `body` uses justified + hyphenated prose; plan copy must wrap normally.
+ */
+.twin-billing-surface {
+  text-align: start !important;
+  hyphens: manual !important;
+  -webkit-hyphens: manual !important;
+  text-wrap: wrap !important;
+}
+
+.twin-billing-surface .twin-billing-plan-card {
+  align-self: stretch;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+}
+
+.twin-billing-surface .twin-billing-plan-card p {
+  hyphens: none;
+  -webkit-hyphens: none;
+  word-break: normal;
+  overflow-wrap: break-word;
+  text-align: start;
+  text-wrap: wrap;
+}
+
 button,
 input,
 textarea,

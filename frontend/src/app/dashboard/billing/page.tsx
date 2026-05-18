@@ -320,62 +320,55 @@ export default function BillingPage() {
 
   return (
     <Shell rail>
-      <div className="twin-app-read-pane mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="min-w-0 max-w-2xl">
-          <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">{t("dashboard.billingPageTitle")}</h1>
-          <p className="mt-3 text-sm leading-relaxed text-[var(--twin-muted-strong)] sm:text-base sm:leading-relaxed">
-            {t("dashboard.billingPageLead")}
-          </p>
+      <div className="twin-billing-surface">
+        <div className="twin-app-read-pane mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0 max-w-2xl">
+            <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">{t("dashboard.billingPageTitle")}</h1>
+          </div>
+          <Link href="/dashboard" className="twin-btn-secondary twin-touch-target inline-block shrink-0 text-center sm:!w-auto">
+            ← {t("dashboard.title")}
+          </Link>
         </div>
-        <Link href="/dashboard" className="twin-btn-secondary twin-touch-target inline-block shrink-0 text-center sm:!w-auto">
-          ← {t("dashboard.title")}
-        </Link>
-      </div>
 
-      {checkoutBanner === "success" ? (
-        <Card variant="soft" className="mb-4 border-[var(--twin-accent-muted)]">
-          <p className="text-sm font-medium text-[var(--twin-accent-hover)]">{t("dashboard.billingCheckoutSuccess")}</p>
-        </Card>
-      ) : null}
-      {checkoutBanner === "cancel" ? (
-        <Card variant="soft" className="mb-4">
-          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingCheckoutCancelled")}</p>
-        </Card>
-      ) : null}
+        <div className="space-y-4 sm:space-y-5">
+          {checkoutBanner === "success" ? (
+            <Card variant="soft" className="!mb-0 border-[var(--twin-accent-muted)]">
+              <p className="text-sm font-medium text-[var(--twin-accent-hover)]">{t("dashboard.billingCheckoutSuccess")}</p>
+            </Card>
+          ) : null}
+          {checkoutBanner === "cancel" ? (
+            <Card variant="soft" className="!mb-0">
+              <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingCheckoutCancelled")}</p>
+            </Card>
+          ) : null}
+          {actionError ? (
+            <Card variant="soft" className="!mb-0 border-red-200 dark:border-red-900/50">
+              <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingCheckoutError")}</p>
+            </Card>
+          ) : null}
+        </div>
 
-      {plans && !plans.checkout_configured ? (
-        <Card variant="soft" className="mb-4">
-          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingNotConfigured")}</p>
-        </Card>
-      ) : null}
+        {loading ? (
+          <Card className="mb-6">
+            <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingLoading")}</p>
+          </Card>
+        ) : null}
 
-      {actionError ? (
-        <Card variant="soft" className="mb-4 border-red-200">
-          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingCheckoutError")}</p>
-        </Card>
-      ) : null}
+        {!loading && loadFailed ? (
+          <Card variant="soft" className="mb-6 border-[var(--twin-border)]">
+            <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingLoadIssue")}</p>
+            <button
+              type="button"
+              className="twin-link mt-3 text-sm font-semibold"
+              onClick={() => void load()}
+            >
+              {t("dashboard.billingRetry")}
+            </button>
+          </Card>
+        ) : null}
 
-      {loading ? (
-        <Card className="mb-6">
-          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingLoading")}</p>
-        </Card>
-      ) : null}
-
-      {!loading && loadFailed ? (
-        <Card variant="soft" className="mb-6 border-[var(--twin-border)]">
-          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingLoadIssue")}</p>
-          <button
-            type="button"
-            className="twin-link mt-3 text-sm font-semibold"
-            onClick={() => void load()}
-          >
-            {t("dashboard.billingRetry")}
-          </button>
-        </Card>
-      ) : null}
-
-      {me ? (
-        <Card className="mb-6">
+        {me ? (
+          <Card className="mb-6">
           <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
             {t("dashboard.billingCurrentPlan")}
           </p>
@@ -496,11 +489,11 @@ export default function BillingPage() {
               ) : null}
             </div>
           ) : null}
-          <ul className="mt-6 space-y-5">
+          <div className="mt-6 flex w-full min-w-0 flex-col gap-4 sm:gap-5">
             {plans.plans.length === 0 ? (
-              <li className="rounded-xl border border-dashed border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/60 p-4 text-sm text-[var(--twin-muted-strong)]">
+              <div className="rounded-xl border border-dashed border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/60 p-4 text-sm text-[var(--twin-muted-strong)]">
                 {t("dashboard.billingPlansEmpty")}
-              </li>
+              </div>
             ) : (
               plans.plans.map((p) => {
                 const tier = (me?.plan_tier ?? "free").toLowerCase();
@@ -523,7 +516,7 @@ export default function BillingPage() {
                 }
 
                 return (
-                  <li key={p.id} className="list-none">
+                  <div key={p.id} className="min-w-0 w-full">
                     <button
                       type="button"
                       disabled={disabled}
@@ -537,7 +530,7 @@ export default function BillingPage() {
                         if (canCheckoutPremium) void startCheckout("premium");
                         if (canCheckoutPro) void startCheckout("pro");
                       }}
-                      className={`w-full rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] p-4 text-left transition sm:p-5 ${
+                      className={`twin-billing-plan-card flex w-full min-w-0 max-w-none flex-col self-stretch rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] p-4 text-left transition sm:p-5 ${
                         actionable && busy === null
                           ? "cursor-pointer hover:border-[var(--twin-accent)] hover:shadow-[0_0_0_1px_var(--twin-accent-muted)] focus-visible:outline focus-visible:ring-2 focus-visible:ring-[var(--twin-accent)]/35"
                           : ""
@@ -580,14 +573,15 @@ export default function BillingPage() {
                         </div>
                       </div>
                     </button>
-                  </li>
+                  </div>
                 );
               })
             )}
-          </ul>
+          </div>
           <p className="mt-5 text-xs leading-relaxed text-[var(--twin-muted)]">{t("dashboard.billingListPricesNote")}</p>
         </Card>
       ) : null}
+      </div>
     </Shell>
   );
 }
