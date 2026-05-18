@@ -18,9 +18,9 @@ export function Shell({
   rail?: boolean;
   pageMomentumRailProps?: Omit<PageMomentumRailProps, "variant">;
 }) {
-  // Narrow shell (28rem) + side-by-side rail leaves almost no room for the main column on lg.
-  // Any `rail` layout needs the wide page width so the form / copy column stays usable.
-  const shellWidthClass = wide || rail ? "twin-shell--wide" : "twin-shell--narrow";
+  // Narrow (28rem) + side-by-side rail crushes the main column; full wide (80rem) stretches auth forms.
+  // `twin-shell--rail` is an intermediate max width for two-column rail layouts.
+  const shellWidthClass = wide ? "twin-shell--wide" : rail ? "twin-shell--rail" : "twin-shell--narrow";
   return (
     <div className={`twin-shell flex min-h-0 min-w-0 flex-1 flex-col ${shellWidthClass}`}>
       {rail ? (

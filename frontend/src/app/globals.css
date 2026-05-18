@@ -37,6 +37,8 @@
   --twin-page-x: clamp(1rem, 3vw, 2rem);
   --twin-page-y: clamp(1rem, 3vw, 1.75rem);
   --twin-max-width: 80rem;
+  /** App pages with `Shell rail`: two columns without crushing the main pane or stretching to marketing width. */
+  --twin-max-width-rail: 52rem;
   --twin-max-width-narrow: 28rem;
 }
 
@@ -216,6 +218,10 @@ body {
 
 .twin-shell--narrow {
   max-width: var(--twin-max-width-narrow);
+}
+
+.twin-shell--rail {
+  max-width: min(100%, var(--twin-max-width-rail));
 }
 
 .twin-muted {
