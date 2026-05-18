@@ -12,12 +12,9 @@ class MvpStatsOut(BaseModel):
     profiles_with_cv: int = Field(ge=0, description="Candidates who uploaded a CV at least once.")
     job_boards_in_registry: int = Field(ge=0, description="Board adapters in the current scrape registry order.")
     generated_at: str = Field(description="ISO-8601 UTC timestamp when counts were computed.")
-    # Present only when investor_mvp_stats_demo_mode is on (fundraiser strip); omitted otherwise (exclude_none).
-    linkedin_oauth_configured: bool | None = Field(
-        default=None,
-        description="LinkedIn OIDC env vars present (demo strip only; not exposed when demo mode is off).",
+    linkedin_oauth_configured: bool = Field(
+        description="True when LinkedIn OIDC client id, secret, and redirect URI are configured on the API.",
     )
-    stripe_checkout_ready: bool | None = Field(
-        default=None,
-        description="Stripe secret + at least one subscription price id (demo strip only).",
+    stripe_checkout_ready: bool = Field(
+        description="True when Stripe secret key and at least one subscription price id are configured.",
     )

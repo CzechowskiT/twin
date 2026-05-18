@@ -28,9 +28,9 @@ def _stripe_checkout_ready(settings: Settings) -> bool:
     )
 
 
-@router.get("/mvp-stats", response_model=MvpStatsOut, response_model_exclude_none=True)
+@router.get("/mvp-stats", response_model=MvpStatsOut)
 def mvp_stats(db: Session = Depends(get_db)) -> MvpStatsOut:
-    """Aggregate product metrics for fundraising decks (no personal fields)."""
+    """Aggregate product metrics for investor surfaces (no personal fields; all counts from DB or env wiring)."""
     try:
         v_jobs = db.query(func.count()).select_from(Job).filter(Job.is_validated.is_(True)).scalar() or 0
         users = db.query(func.count()).select_from(User).scalar() or 0
@@ -39,27 +39,17 @@ def mvp_stats(db: Session = Depends(get_db)) -> MvpStatsOut:
             db.query(func.count()).select_from(Candidate).filter(Candidate.cv_uploaded_at.isnot(None)).scalar() or 0
         )
         boards = len(scrape_board_ids_ordered())
-        stats = MvpStatsOut(
+        s = get_settings()
+        return MvpStatsOut(
             validated_jobs=int(v_jobs),
             registered_users=int(users),
             total_applications=int(apps),
             profiles_with_cv=int(cv_profiles),
             job_boards_in_registry=boards,
+            linkedin_oauth_configured=is_linkedin_oauth_configured(),
+            stripe_checkout_ready=_stripe_checkout_ready(s),
             generated_at=datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         )
-        s = get_settings()
-        if s.investor_mvp_stats_demo_mode:
-            force = bool(s.investor_mvp_stats_demo_force_integrations_on)
-            li = force or is_linkedin_oauth_configured()
-            st = force or _stripe_checkout_ready(s)
-            stats = stats.model_copy(
-                update={
-                    "validated_jobs": int(s.investor_mvp_stats_demo_validated_jobs),
-                    "linkedin_oauth_configured": li,
-                    "stripe_checkout_ready": st,
-                }
-            )
-        return stats
     except HTTPException:
         raise
     except Exception as exc:

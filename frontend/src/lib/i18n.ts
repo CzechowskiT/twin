@@ -1022,7 +1022,7 @@ const en = {
     liveStatsEyebrow: "Product traction",
     liveStatsTitle: "Live aggregates (this deployment)",
     liveStatsLead:
-      "Non-PII counters from the running API — useful for diligence calls; not audited financials and not a promise of scale.",
+      "Non-PII counters from the running API (validated jobs = full validated index in Postgres; dashboard job cards use your current filters). LinkedIn/Stripe show Ready only when those integrations are configured on the host. Not audited financials.",
     liveStatsLoading: "Loading live metrics…",
     liveStatsUnavailable: "Live metrics could not be loaded. Open the same origin as the API or check the Vercel → Railway proxy.",
     liveStatsJobs: "Validated jobs",
@@ -2365,7 +2365,7 @@ const pl: MessageTree = {
     liveStatsEyebrow: "Traction produktu",
     liveStatsTitle: "Agregaty na żywo (to środowisko)",
     liveStatsLead:
-      "Licznikowe metryki z działającego API (bez danych osobowych) — do rozmów due diligence; to nie audyt finansowy ani gwarancja skali.",
+      "Licznikowe metryki z API (zwalidowane oferty = cały indeks w Postgresie; lista ofert na panelu używa bieżących filtrów). LinkedIn/Stripe „Aktywne” tylko przy skonfigurowanej integracji na hoście. To nie audyt finansowy.",
     liveStatsLoading: "Ładowanie metryk…",
     liveStatsUnavailable:
       "Nie udało się pobrać metryk. Użyj tej samej domeny co API albo sprawdź proxy Vercel → Railway.",

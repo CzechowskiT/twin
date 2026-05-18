@@ -189,15 +189,6 @@ class Settings(BaseSettings):
     # Invalid entries are ignored; see docs/STRIPE.md.
     stripe_checkout_payment_method_types: str = "card,link"
 
-    # When true, GET /public/mvp-stats returns headline validated_jobs (see below) plus LinkedIn/Stripe booleans
-    # for the investor strip; other counters stay live from the database. Set explicitly on the API host
-    # (e.g. Railway) — see docs/DEPLOY.md § Fundraising strip.
-    investor_mvp_stats_demo_mode: bool = False
-    investor_mvp_stats_demo_validated_jobs: int = 100_000
-    # When true together with investor_mvp_stats_demo_mode, integration strip shows "on" even if keys are missing
-    # (deck-only; prefer wiring real LinkedIn + Stripe env vars instead).
-    investor_mvp_stats_demo_force_integrations_on: bool = False
-
     # Greenhouse ATS webhooks — optional shared secret for signature checks.
     greenhouse_webhook_secret: str = ""
 

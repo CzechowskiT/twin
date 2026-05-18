@@ -57,11 +57,6 @@ type JobItem = {
   score?: number | null;
 };
 type JobList = { items: JobItem[]; total: number };
-type PublicMvpStatsHeadline = {
-  validated_jobs: number;
-  linkedin_oauth_configured?: boolean;
-  stripe_checkout_ready?: boolean;
-};
 type MatchItem = {
   job_id: number;
   score: number;
@@ -183,24 +178,6 @@ export default function DashboardPage() {
   const [jobsLoadMoreBusy, setJobsLoadMoreBusy] = useState(false);
   const [dashboardBootstrapping, setDashboardBootstrapping] = useState(true);
   const [savedJobIds, setSavedJobIds] = useState<Set<number>>(() => new Set());
-  const [publicMvpStats, setPublicMvpStats] = useState<PublicMvpStatsHeadline | null>(null);
-
-  useEffect(() => {
-    let alive = true;
-    void (async () => {
-      try {
-        const res = await fetch("/api/v1/public/mvp-stats", { cache: "no-store" });
-        if (!res.ok) throw new Error("mvp-stats");
-        const json = (await res.json()) as PublicMvpStatsHeadline;
-        if (alive) setPublicMvpStats(json);
-      } catch {
-        if (alive) setPublicMvpStats(null);
-      }
-    })();
-    return () => {
-      alive = false;
-    };
-  }, []);
 
   const loadJobs = useCallback(async (token: string, activeFilters: JobFilters, opts?: { skip?: number; limit?: number }) => {
     return apiFetch<JobList>(`/api/v1/jobs/${buildJobsQuery(activeFilters, opts)}`, {}, token);
@@ -956,11 +933,6 @@ export default function DashboardPage() {
     [applications],
   );
 
-  const feedCorpusHeadline = useMemo(() => {
-    if (typeof publicMvpStats?.validated_jobs === "number") return publicMvpStats.validated_jobs;
-    return jobs?.total ?? 0;
-  }, [publicMvpStats, jobs]);
-
   const hasProfile = profile !== null && profile !== undefined;
   const matchesInitialSkeleton = hasProfile && matches === null && matchesRefreshing;
 
@@ -984,7 +956,7 @@ export default function DashboardPage() {
       rail
       pageMomentumRailProps={{
         dashboardStats: {
-          jobsTotal: feedCorpusHeadline,
+          jobsTotal: jobs?.total ?? 0,
           matchesTotal: hasProfile ? matches?.total ?? null : null,
           matchesVisible: hasProfile ? visibleMatches.length : 0,
           applicationsTotal: hasProfile ? applications.length : 0,
@@ -1057,7 +1029,7 @@ export default function DashboardPage() {
             profileName={profile ? profile.name : undefined}
             hasProfile={hasProfile}
             showScrapeUi={SHOW_SCRAPE_UI}
-            jobsTotal={feedCorpusHeadline}
+            jobsTotal={jobs?.total ?? 0}
             matchesVisible={visibleMatches.length}
             applicationsActive={pipelineActiveCount}
           />
