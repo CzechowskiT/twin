@@ -363,6 +363,8 @@ const en = {
     scrapeFailed: "Scrape failed",
     scrapeNetworkError:
       "Could not reach the API (network). If the address in your browser is a long vercel.app link with “git” in the name, that is a preview build: open your normal production site instead (or turn off Vercel → Settings → Deployment Protection for previews). On production, check TWIN_API_BASE_URL or NEXT_PUBLIC_API_URL, that Railway is Active, and your connection. This button uses the async queue, not a long blocking scrape.",
+    scrapeUpstreamHint:
+      "The Twin website could not reach your API from Vercel’s servers. Open Vercel → your project → Settings → Environment Variables: set **TWIN_API_BASE_URL** (best: server-only) or **NEXT_PUBLIC_API_URL** to your Railway API URL (`https://…up.railway.app` with **no** trailing slash), save, then **Redeploy** the frontend. In Railway, open the API service and confirm it is **Active** and the latest deploy succeeded — then **Redeploy** the API too. After that, hard-refresh this page (Cmd+Shift+R / Ctrl+Shift+R).",
     scrapeQueued:
       "Scrape queued. New listings appear after Celery workers finish — refresh the job feed in a minute or two (or check worker logs on the API host).",
     scrapeFinished: "Scrape finished",
@@ -1505,6 +1507,8 @@ const pl: MessageTree = {
     scrapeFailed: "Pobieranie nie powiodło się",
     scrapeNetworkError:
       "Brak połączenia z API (sieć). Jeśli w pasku adresu masz długi link vercel.app z „git” w nazwie, to podgląd (preview): wejdź na zwykłą stronę produkcyjną albo wyłącz Vercel → Settings → Deployment Protection dla preview. Na produkcji sprawdź TWIN_API_BASE_URL lub NEXT_PUBLIC_API_URL, czy Railway jest Active i internet. To polecenie idzie w kolejkę, nie blokuje na długo.",
+    scrapeUpstreamHint:
+      "Strona na Vercelu nie może połączyć się z Twoim API (Railway). Wejdź w Vercel → projekt → Settings → Environment Variables: ustaw **TWIN_API_BASE_URL** (najlepiej tylko serwer) albo **NEXT_PUBLIC_API_URL** na adres API z Railway (`https://…up.railway.app` **bez** ukośnika na końcu), zapisz i zrób **Redeploy** frontu. W Railway sprawdź, czy usługa API jest **Active** i ostatni deploy jest OK — zrób też **Redeploy** API. Potem twarde odświeżenie strony (Cmd+Shift+R / Ctrl+Shift+R).",
     scrapeQueued:
       "Pobieranie zakolejkowane. Nowe oferty pojawią się po zakończeniu zadań Celery — odśwież feed za minutę–dwie (albo zajrzyj w logi workerów na hoście API).",
     scrapeFinished: "Pobieranie zakończone",

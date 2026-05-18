@@ -6,6 +6,8 @@ import { getUpstreamApiBase } from "@/lib/public-api-base";
 export const dynamic = "force-dynamic";
 /** Avoid Edge TLS/DNS quirks when proxying to Railway Postgres hosts. */
 export const runtime = "nodejs";
+/** Allow slow Railway responses (cold start / scrape) so the client proxy does not time out too early. */
+export const maxDuration = 300;
 
 const HOP_BY_HOP = new Set(["connection", "keep-alive", "proxy-authenticate", "proxy-authorization", "te", "trailers", "transfer-encoding", "upgrade", "host"]);
 

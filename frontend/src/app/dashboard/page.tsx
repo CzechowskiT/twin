@@ -13,6 +13,7 @@ import { ButtonCta, Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
 import { SHOW_SCRAPE_UI } from "@/lib/features";
+import type { TranslationKey } from "@/lib/i18n";
 import { buildJobsQuery, defaultJobFilters, type JobFilters } from "@/lib/jobs";
 
 type User = {
@@ -79,10 +80,17 @@ function isLikelyBrowserNetworkFailure(message: string): boolean {
   );
 }
 
-function dashboardLoadErrorMessage(err: unknown, networkLabel: string, fallbackLabel: string): string {
+/** Map API/proxy failures to actionable copy (Vercel ↔ Railway). */
+function dashboardFetchUserMessage(err: unknown, t: (key: TranslationKey) => string): string {
   const raw = err instanceof Error ? err.message : String(err);
-  if (isLikelyBrowserNetworkFailure(raw)) return networkLabel;
-  return raw || fallbackLabel;
+  const lc = raw.trim().toLowerCase();
+  if (lc.includes("missing api base url") || lc.includes("cannot reach api")) {
+    return t("dashboard.scrapeUpstreamHint");
+  }
+  if (isLikelyBrowserNetworkFailure(raw)) {
+    return t("dashboard.scrapeNetworkError");
+  }
+  return raw.trim() || t("dashboard.scrapeFailed");
 }
 
 export default function DashboardPage() {
@@ -204,14 +212,14 @@ export default function DashboardPage() {
       } catch (e) {
         if (cancelled) return;
         setFilterOptions({ job_boards: [], locations: [] });
-        setError(dashboardLoadErrorMessage(e, t("dashboard.scrapeNetworkError"), t("dashboard.scrapeFailed")));
+        setError(dashboardFetchUserMessage(e, t));
       }
 
       try {
         await refreshDashboardData(token, hasProfile, defaultJobFilters);
       } catch (e) {
         if (cancelled) return;
-        setError(dashboardLoadErrorMessage(e, t("dashboard.scrapeNetworkError"), t("dashboard.scrapeFailed")));
+        setError(dashboardFetchUserMessage(e, t));
       }
     })();
 
@@ -258,7 +266,7 @@ export default function DashboardPage() {
       setApplications(await loadApplications(token));
       setDevFocus(await loadDevelopmentFocus(token));
     } catch (err) {
-      setError(dashboardLoadErrorMessage(err, t("dashboard.scrapeNetworkError"), t("dashboard.scrapeFailed")));
+      setError(dashboardFetchUserMessage(err, t));
     }
   }
 
@@ -293,7 +301,7 @@ export default function DashboardPage() {
       setDevFocus(await loadDevelopmentFocus(token));
       alert(result.message);
     } catch (err) {
-      setError(dashboardLoadErrorMessage(err, t("dashboard.scrapeNetworkError"), t("dashboard.scrapeFailed")));
+      setError(dashboardFetchUserMessage(err, t));
     } finally {
       setAutoApplyingId(null);
     }
@@ -349,7 +357,7 @@ export default function DashboardPage() {
       setApplications(await loadApplications(token));
       setDevFocus(await loadDevelopmentFocus(token));
     } catch (err) {
-      setError(dashboardLoadErrorMessage(err, t("dashboard.scrapeNetworkError"), t("dashboard.scrapeFailed")));
+      setError(dashboardFetchUserMessage(err, t));
     } finally {
       setFeedbackBusy(null);
     }
@@ -365,7 +373,7 @@ export default function DashboardPage() {
       setApplications(await loadApplications(token));
       setDevFocus(await loadDevelopmentFocus(token));
     } catch (err) {
-      setError(dashboardLoadErrorMessage(err, t("dashboard.scrapeNetworkError"), t("dashboard.scrapeFailed")));
+      setError(dashboardFetchUserMessage(err, t));
     } finally {
       setFeedbackBusy(null);
     }
@@ -397,11 +405,11 @@ export default function DashboardPage() {
         await refreshDashboardData(token, profile !== null && profile !== undefined, filters);
       } catch (refreshErr) {
         setError(
-          `${t("dashboard.scrapeRefreshFailed")} ${dashboardLoadErrorMessage(refreshErr, t("dashboard.scrapeNetworkError"), t("dashboard.scrapeFailed"))}`,
+          `${t("dashboard.scrapeRefreshFailed")} ${dashboardFetchUserMessage(refreshErr, t)}`,
         );
       }
     } catch (err) {
-      setError(dashboardLoadErrorMessage(err, t("dashboard.scrapeNetworkError"), t("dashboard.scrapeFailed")));
+      setError(dashboardFetchUserMessage(err, t));
     } finally {
       setScraping(false);
     }
