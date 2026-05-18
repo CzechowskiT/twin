@@ -316,6 +316,13 @@ class Application(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
+    # Placement verification (self-serve; see docs/PLACEMENT_VERIFICATION.md)
+    placement_state: Mapped[str] = mapped_column(String(32), default="none")
+    placement_reported_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    placement_work_email: Mapped[str | None] = mapped_column(String(320), nullable=True)
+    placement_verification_token_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    placement_verification_expires_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    placement_verified_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     candidate: Mapped["Candidate"] = relationship(back_populates="applications")
     job: Mapped["Job"] = relationship(back_populates="applications")

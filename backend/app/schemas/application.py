@@ -60,8 +60,30 @@ class ApplicationOut(BaseModel):
     location: str | None
     url: str
     job_board: str
+    placement_state: str = "none"
+    placement_work_email: str | None = None
+    placement_reported_at: datetime | None = None
+    placement_verified_at: datetime | None = None
 
     model_config = {"from_attributes": True}
+
+
+class PlacementVerifyStartIn(BaseModel):
+    work_email: str = Field(..., max_length=320)
+
+
+class PlacementVerifyStartOut(BaseModel):
+    mail_sent: bool
+    message: str
+
+
+class PlacementConfirmIn(BaseModel):
+    token: str = Field(..., min_length=8, max_length=512)
+
+
+class PlacementConfirmOut(BaseModel):
+    ok: bool
+    message: str
 
 
 class ParseFeedbackIn(BaseModel):

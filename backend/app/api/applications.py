@@ -23,11 +23,14 @@ from app.schemas.application import (
     AutoApplyRequest,
     DevelopmentFocusOut,
     ParseFeedbackIn,
+    PlacementVerifyStartIn,
+    PlacementVerifyStartOut,
     RoleInsightRefOut,
     UpskillActionOut,
 )
 from app.services.auto_apply_service import auto_apply_for_user
 from app.services import referral_program as referral_prog
+from app.services.placement_verification import start_work_email_verification
 from app.services.recruitment_feedback import build_feedback_insights, parse_stored_insights_json
 
 router = APIRouter()
@@ -139,6 +142,31 @@ def auto_apply(
         message=message,
         application_id=app.id if app else None,
     )
+
+
+@router.post(
+    "/{application_id}/placement-verify/start",
+    response_model=PlacementVerifyStartOut,
+)
+def placement_verify_start(
+    application_id: int,
+    body: PlacementVerifyStartIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> PlacementVerifyStartOut:
+    """Send a magic link to the candidate's work email to confirm placement (self-serve, no CS)."""
+    settings = get_settings()
+    try:
+        sent, msg = start_work_email_verification(
+            db,
+            settings,
+            user=user,
+            application_id=application_id,
+            work_email=body.work_email,
+        )
+        return PlacementVerifyStartOut(mail_sent=sent, message=msg)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
 
 @router.patch("/{application_id}", response_model=ApplicationOut)
@@ -348,4 +376,8 @@ def _to_out(app: Application, job: Job) -> ApplicationOut:
         location=job.location,
         url=job.url,
         job_board=job.job_board,
+        placement_state=(app.placement_state or "none"),
+        placement_work_email=app.placement_work_email,
+        placement_reported_at=app.placement_reported_at,
+        placement_verified_at=app.placement_verified_at,
     )

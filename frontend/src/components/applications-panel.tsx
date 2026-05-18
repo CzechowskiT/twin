@@ -27,6 +27,10 @@ export type ApplicationRow = {
   recruiter_feedback_raw?: string | null;
   feedback_insights?: FeedbackInsights | null;
   updated_at?: string;
+  placement_state?: string;
+  placement_work_email?: string | null;
+  placement_reported_at?: string | null;
+  placement_verified_at?: string | null;
 };
 
 export type FeedbackBusy = { id: number; kind: "save" | "parse" } | null;
@@ -38,6 +42,11 @@ function normalizeApplicationSelectStatus(status: string): (typeof STATUSES)[num
   return (STATUSES as readonly string[]).includes(s) ? (s as (typeof STATUSES)[number]) : "pending";
 }
 
+function showPlacementRow(app: ApplicationRow): boolean {
+  const s = app.status.trim().toLowerCase();
+  return s === "applied" || s === "interview" || s === "hired";
+}
+
 export function ApplicationsPanel({
   items,
   onStatusChange,
@@ -45,6 +54,8 @@ export function ApplicationsPanel({
   onSaveFeedback,
   onParseFeedback,
   feedbackBusy,
+  onPlacementVerifyStart,
+  placementBusyId,
 }: {
   items: ApplicationRow[];
   onStatusChange: (id: number, status: string) => void;
@@ -52,10 +63,13 @@ export function ApplicationsPanel({
   onSaveFeedback: (id: number, raw: string) => Promise<void>;
   onParseFeedback: (id: number) => Promise<void>;
   feedbackBusy: FeedbackBusy;
+  onPlacementVerifyStart?: (id: number, workEmail: string) => Promise<void>;
+  placementBusyId?: number | null;
 }) {
   const { t } = useTranslation();
   const [openId, setOpenId] = useState<number | null>(null);
   const [draftById, setDraftById] = useState<Record<number, string>>({});
+  const [workEmailById, setWorkEmailById] = useState<Record<number, string>>({});
 
   useEffect(() => {
     setDraftById((prev) => {
@@ -91,6 +105,47 @@ export function ApplicationsPanel({
                 {app.company}
                 {app.location ? ` · ${app.location}` : ""} · {app.job_board}
               </p>
+              {onPlacementVerifyStart && showPlacementRow(app) ? (
+                <div className="mt-2 max-w-md space-y-2 rounded border border-[var(--twin-accent)]/25 bg-[var(--twin-accent-muted)]/25 p-2 text-xs">
+                  <p className="leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.placementVerifyHint")}</p>
+                  {(app.placement_state ?? "none") === "verified" ? (
+                    <p className="font-semibold text-[var(--twin-accent)]">{t("dashboard.placementVerified")}</p>
+                  ) : (
+                    <>
+                      <input
+                        type="email"
+                        autoComplete="email"
+                        placeholder={t("dashboard.placementWorkEmailPlaceholder")}
+                        value={workEmailById[app.id] ?? app.placement_work_email ?? ""}
+                        disabled={placementBusyId === app.id}
+                        onChange={(e) =>
+                          setWorkEmailById((prev) => ({ ...prev, [app.id]: e.target.value }))
+                        }
+                        className="w-full rounded border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-2 py-1.5 text-[var(--foreground)]"
+                      />
+                      <button
+                        type="button"
+                        disabled={
+                          placementBusyId === app.id ||
+                          !(workEmailById[app.id] ?? app.placement_work_email ?? "").trim()
+                        }
+                        onClick={() =>
+                          void onPlacementVerifyStart(
+                            app.id,
+                            (workEmailById[app.id] ?? app.placement_work_email ?? "").trim(),
+                          )
+                        }
+                        className="twin-btn-solid twin-touch-target !w-auto px-3 py-1.5 text-xs"
+                      >
+                        {placementBusyId === app.id ? "…" : t("dashboard.placementSendLink")}
+                      </button>
+                      {(app.placement_state ?? "none") === "verify_pending" ? (
+                        <p className="text-[var(--twin-muted)]">{t("dashboard.placementVerifyPending")}</p>
+                      ) : null}
+                    </>
+                  )}
+                </div>
+              ) : null}
               <button
                 type="button"
                 className="twin-link mt-2 text-xs font-medium"

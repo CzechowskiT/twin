@@ -372,6 +372,14 @@ const en = {
     scrapeFinished: "Scrape finished",
     scrapeRefreshFailed:
       "Scrape was queued, but refreshing the dashboard failed (details below). Try reloading the page in a minute.",
+    placementVerifyHint:
+      "Confirm you started (or accepted an offer) using your work email — we send one automated link; no recruiter calls from TWIN.",
+    placementWorkEmailPlaceholder: "you@company.com",
+    placementSendLink: "Send verification link",
+    placementVerified: "Placement verified",
+    placementVerifyPending: "Check your work inbox for the confirmation link.",
+    placementVerifyFailed: "Placement verification failed.",
+    placementVerifyOkAlert: "Placement verified. Thank you.",
     twinScrapePanelTitle: "Bring listings into TWIN",
     twinForYourJob: "Twin for your job",
     twinForYourJobHint:
@@ -1518,6 +1526,14 @@ const pl: MessageTree = {
     scrapeFinished: "Pobieranie zakończone",
     scrapeRefreshFailed:
       "Pobieranie zostało zakolejkowane, ale odświeżenie panelu się nie powiodło (szczegóły poniżej). Za minutę odśwież stronę.",
+    placementVerifyHint:
+      "Potwierdź start (lub ofertę) służbowym mailem — jeden automatyczny link, bez telefonów od TWIN.",
+    placementWorkEmailPlaceholder: "ty@firma.pl",
+    placementSendLink: "Wyślij link weryfikacyjny",
+    placementVerified: "Placement potwierdzony",
+    placementVerifyPending: "Sprawdź skrzynkę służbową — link potwierdzający.",
+    placementVerifyFailed: "Weryfikacja placementu nie powiodła się.",
+    placementVerifyOkAlert: "Placement potwierdzony. Dziękujemy.",
     twinScrapePanelTitle: "Wciągnij oferty do TWIN",
     twinForYourJob: "Twin for your job",
     twinForYourJobHint:

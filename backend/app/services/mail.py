@@ -47,6 +47,29 @@ def send_password_reset_email(settings: Settings, *, to_email: str, reset_url: s
     raise RuntimeError("Mail is not configured")
 
 
+def send_placement_verification_email(settings: Settings, *, to_email: str, verify_url: str) -> None:
+    """Transactional: confirm you started / received offer — link hits dashboard then API confirm."""
+    subject = "Confirm your placement with TWIN"
+    text_body = (
+        "TWIN recorded a request to verify your new role using this work email address.\n\n"
+        f"Open this link to confirm (one time, expires in 48 hours):\n{verify_url}\n\n"
+        "If you did not request this, you can ignore this message.\n"
+    )
+    html_body = (
+        "<p>TWIN recorded a request to verify your new role using this work email address.</p>"
+        f'<p><a href="{verify_url}">Confirm placement</a></p>'
+        "<p>If you did not request this, you can ignore this message.</p>"
+    )
+    from_addr = _from_address(settings)
+    if settings.resend_api_key.strip():
+        _send_via_resend(settings, to_email, from_addr, subject, text_body, html_body)
+        return
+    if settings.smtp_host.strip():
+        _send_via_smtp(settings, to_email, from_addr, subject, text_body, html_body)
+        return
+    raise RuntimeError("Mail is not configured")
+
+
 def _send_via_resend(
     settings: Settings,
     to_email: str,

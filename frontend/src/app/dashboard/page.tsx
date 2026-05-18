@@ -115,6 +115,7 @@ export default function DashboardPage() {
   const [autoApplyingId, setAutoApplyingId] = useState<number | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [showApplyPrompt, setShowApplyPrompt] = useState(false);
+  const [placementBusyId, setPlacementBusyId] = useState<number | null>(null);
 
   const loadJobs = useCallback(async (token: string, activeFilters: JobFilters) => {
     return apiFetch<JobList>(`/api/v1/jobs/${buildJobsQuery(activeFilters)}`, {}, token);
@@ -249,6 +250,62 @@ export default function DashboardPage() {
     });
   }, [profile, titleFilterPrimed, refreshDashboardData]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("placement_verify")?.trim();
+    if (!token) return;
+
+    const doneKey = `twin_placement_verify_done:${token}`;
+    if (sessionStorage.getItem(doneKey)) {
+      params.delete("placement_verify");
+      const qs = params.toString();
+      router.replace(qs ? `/dashboard?${qs}` : "/dashboard");
+      const authToken = getToken();
+      if (authToken) {
+        void loadApplications(authToken).then(setApplications).catch(() => {});
+        void loadDevelopmentFocus(authToken).then(setDevFocus).catch(() => {});
+      }
+      return;
+    }
+
+    const ac = new AbortController();
+    (async () => {
+      try {
+        await apiFetch<{ ok: boolean; message: string }>(
+          "/api/v1/placement/verify/confirm",
+          { method: "POST", body: JSON.stringify({ token }), signal: ac.signal },
+          undefined,
+        );
+        if (ac.signal.aborted) return;
+        sessionStorage.setItem(doneKey, "1");
+        alert(t("dashboard.placementVerifyOkAlert"));
+        const authToken = getToken();
+        if (authToken) {
+          try {
+            setApplications(await loadApplications(authToken));
+            setDevFocus(await loadDevelopmentFocus(authToken));
+          } catch {
+            /* ignore refresh errors after confirm */
+          }
+        }
+      } catch (e) {
+        if (e instanceof DOMException && e.name === "AbortError") return;
+        if (e instanceof Error && e.name === "AbortError") return;
+        if (ac.signal.aborted) return;
+        const msg = e instanceof Error ? e.message : String(e);
+        alert(`${t("dashboard.placementVerifyFailed")}: ${msg}`);
+      } finally {
+        if (ac.signal.aborted) return;
+        params.delete("placement_verify");
+        const qs = params.toString();
+        router.replace(qs ? `/dashboard?${qs}` : "/dashboard");
+      }
+    })();
+
+    return () => ac.abort();
+  }, [router, t, loadApplications, loadDevelopmentFocus]);
+
   async function applyFilters() {
     const token = getToken();
     if (!token) return;
@@ -380,6 +437,27 @@ export default function DashboardPage() {
       setError(dashboardFetchUserMessage(err, t));
     } finally {
       setFeedbackBusy(null);
+    }
+  }
+
+  async function startPlacementVerify(applicationId: number, workEmail: string) {
+    const token = getToken();
+    if (!token) return;
+    setPlacementBusyId(applicationId);
+    setError(null);
+    try {
+      const out = await apiFetch<{ mail_sent: boolean; message: string }>(
+        `/api/v1/applications/${applicationId}/placement-verify/start`,
+        { method: "POST", body: JSON.stringify({ work_email: workEmail }) },
+        token,
+      );
+      setApplications(await loadApplications(token));
+      setDevFocus(await loadDevelopmentFocus(token));
+      alert(out.message || t("dashboard.placementVerifyPending"));
+    } catch (err) {
+      setError(dashboardFetchUserMessage(err, t));
+    } finally {
+      setPlacementBusyId(null);
     }
   }
 
@@ -709,6 +787,8 @@ export default function DashboardPage() {
             onSaveFeedback={saveApplicationFeedback}
             onParseFeedback={parseApplicationFeedback}
             feedbackBusy={feedbackBusy}
+            onPlacementVerifyStart={startPlacementVerify}
+            placementBusyId={placementBusyId}
           />
         </Card>
       )}
