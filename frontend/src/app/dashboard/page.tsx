@@ -107,6 +107,28 @@ function dashboardFetchUserMessage(
   return raw.trim() || t("dashboard.scrapeFailed");
 }
 
+function csvExportUserMessage(err: unknown, t: (key: TranslationKey) => string): string {
+  const raw = err instanceof Error ? err.message : String(err);
+  const lc = raw.trim().toLowerCase();
+  if (
+    lc.includes("401") ||
+    lc.includes("403") ||
+    lc.includes("invalid token") ||
+    lc.includes("inactive user") ||
+    lc.includes("not authenticated") ||
+    lc.includes("could not validate credentials")
+  ) {
+    return t("dashboard.csvExportSession");
+  }
+  if (lc.includes("404")) {
+    return t("dashboard.csvExportNotFound");
+  }
+  if (isLikelyBrowserNetworkFailureMessage(raw)) {
+    return t("dashboard.apiNetworkError");
+  }
+  return `${t("dashboard.csvExportCouldNotDownload")} ${t("dashboard.csvExportDetailPrefix")} ${raw.trim() || "—"}`;
+}
+
 function formatInterviewRangeShort(isoStart: string, isoEnd: string, locale: string): string {
   const a = new Date(isoStart);
   const b = new Date(isoEnd);
@@ -146,6 +168,8 @@ export default function DashboardPage() {
   const [nextInterviewIcsBusy, setNextInterviewIcsBusy] = useState(false);
   const [applicationsCsvBusy, setApplicationsCsvBusy] = useState(false);
   const [matchesCsvBusy, setMatchesCsvBusy] = useState(false);
+  const [matchesRefreshing, setMatchesRefreshing] = useState(false);
+  const [exportJsonBusy, setExportJsonBusy] = useState(false);
 
   const loadJobs = useCallback(async (token: string, activeFilters: JobFilters) => {
     return apiFetch<JobList>(`/api/v1/jobs/${buildJobsQuery(activeFilters)}`, {}, token);
@@ -229,18 +253,23 @@ export default function DashboardPage() {
   const refreshDashboardData = useCallback(
     async (token: string, hasProfile: boolean, activeFilters: JobFilters) => {
       void loadGoogleCalendarStrip(token);
-      const [jobList, matchList, apps, focus] = await Promise.all([
-        loadJobs(token, activeFilters),
-        hasProfile ? loadMatches(token) : Promise.resolve(null),
-        hasProfile ? loadApplications(token) : Promise.resolve({ items: [] as ApplicationRow[], total: 0 }),
-        hasProfile ? loadDevelopmentFocus(token) : Promise.resolve(null),
-      ]);
-      setJobs(jobList);
-      if (matchList) setMatches(matchList);
-      setApplications(apps.items);
-      setApplicationsTotal(apps.total);
-      setDevFocus(focus);
-      setLastUpdated(new Date());
+      if (hasProfile) setMatchesRefreshing(true);
+      try {
+        const [jobList, matchList, apps, focus] = await Promise.all([
+          loadJobs(token, activeFilters),
+          hasProfile ? loadMatches(token) : Promise.resolve(null),
+          hasProfile ? loadApplications(token) : Promise.resolve({ items: [] as ApplicationRow[], total: 0 }),
+          hasProfile ? loadDevelopmentFocus(token) : Promise.resolve(null),
+        ]);
+        setJobs(jobList);
+        if (matchList) setMatches(matchList);
+        setApplications(apps.items);
+        setApplicationsTotal(apps.total);
+        setDevFocus(focus);
+        setLastUpdated(new Date());
+      } finally {
+        if (hasProfile) setMatchesRefreshing(false);
+      }
     },
     [loadJobs, loadMatches, loadApplications, loadDevelopmentFocus, loadGoogleCalendarStrip],
   );
@@ -546,7 +575,7 @@ export default function DashboardPage() {
       const blob = await apiFetchBlob("/api/v1/applications/me/export.csv", {}, token);
       saveBlobAsFile(blob, "twin-applications.csv");
     } catch (err) {
-      setError(dashboardFetchUserMessage(err, t));
+      setError(csvExportUserMessage(err, t));
     } finally {
       setApplicationsCsvBusy(false);
     }
@@ -565,9 +594,25 @@ export default function DashboardPage() {
       );
       saveBlobAsFile(blob, "twin-matches.csv");
     } catch (err) {
-      setError(dashboardFetchUserMessage(err, t));
+      setError(csvExportUserMessage(err, t));
     } finally {
       setMatchesCsvBusy(false);
+    }
+  }
+
+  async function downloadMyDataJson() {
+    const token = getToken();
+    if (!token) return;
+    setExportJsonBusy(true);
+    setError(null);
+    try {
+      const data = await apiFetch<Record<string, unknown>>("/api/v1/candidates/me/export.json", {}, token);
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json;charset=utf-8" });
+      saveBlobAsFile(blob, "twin-my-data.json");
+    } catch (err) {
+      setError(csvExportUserMessage(err, t));
+    } finally {
+      setExportJsonBusy(false);
     }
   }
 
@@ -668,6 +713,7 @@ export default function DashboardPage() {
   );
 
   const hasProfile = profile !== null && profile !== undefined;
+  const matchesInitialSkeleton = hasProfile && matches === null && matchesRefreshing;
 
   return (
     <Shell
@@ -704,6 +750,15 @@ export default function DashboardPage() {
           <Link href="/dashboard/calendar" className="twin-link twin-touch-target text-center text-sm sm:text-left">
             {t("dashboard.calendarLink")}
           </Link>
+          <button
+            type="button"
+            className="twin-link twin-touch-target text-center text-sm sm:text-left disabled:opacity-50"
+            disabled={exportJsonBusy}
+            aria-label={t("dashboard.exportMyDataJsonAria")}
+            onClick={() => void downloadMyDataJson()}
+          >
+            {exportJsonBusy ? "…" : t("dashboard.exportMyDataJson")}
+          </button>
         </div>
       </div>
 
@@ -909,9 +964,18 @@ export default function DashboardPage() {
         </div>
       </Card>
 
-      {hasProfile && (matches?.items.length ?? 0) > 0 && (
+      {hasProfile && (matchesInitialSkeleton || (matches && matches.items.length > 0)) && (
         <Card id="dashboard-matches" variant="soft">
-          {showApplyPrompt && visibleMatches.length > 0 ? (
+          {matchesInitialSkeleton ? (
+            <div className="space-y-4" aria-busy="true" aria-live="polite">
+              <p className="twin-muted text-sm">{t("dashboard.matchesLoading")}</p>
+              <div className="h-8 w-56 max-w-full animate-pulse rounded bg-[var(--twin-border)]" />
+              <div className="h-28 w-full animate-pulse rounded-lg bg-[var(--twin-border)]/70" />
+              <div className="h-28 w-full animate-pulse rounded-lg bg-[var(--twin-border)]/70" />
+            </div>
+          ) : (
+            <>
+              {showApplyPrompt && visibleMatches.length > 0 ? (
             <div className="mb-4 rounded-xl border border-[var(--twin-border)] bg-[var(--twin-accent-muted)]/80 p-4 shadow-sm">
               <p className="text-sm font-semibold text-[var(--twin-accent-hover)]">{t("dashboard.applyPromptTitle")}</p>
               <p className="twin-muted mt-2 text-sm leading-relaxed">{t("dashboard.applyPromptLead")}</p>
@@ -968,6 +1032,8 @@ export default function DashboardPage() {
             onSave={saveJob}
             onDismiss={dismissJob}
           />
+            </>
+          )}
         </Card>
       )}
 
@@ -1125,6 +1191,15 @@ export default function DashboardPage() {
           </div>
         )}
       </Card>
+
+      <footer className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-[var(--twin-border)] pt-5 text-sm text-[var(--twin-muted-strong)]">
+        <Link href="/privacy" className="twin-link">
+          {t("dashboard.footerPrivacy")}
+        </Link>
+        <Link href="/terms" className="twin-link">
+          {t("dashboard.footerTerms")}
+        </Link>
+      </footer>
     </Shell>
   );
 }
