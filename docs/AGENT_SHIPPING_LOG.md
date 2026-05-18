@@ -1,5 +1,10 @@
 # Agent shipping log
 
+## 2026-05-19 — Fundraising / traction
+
+- `GET /api/v1/public/mvp-stats` — aggregate non-PII counters (jobs, users, applications, CV profiles, registry size, LinkedIn/Stripe config flags) for investor diligence.
+- `/calculator` page: `MvpLiveStatsStrip` fetches the endpoint (EN/PL copy).
+
 ## 2026-05-18 — 50-step MVP pass (partial)
 
 **Branch:** `cursor/phase1-monorepo-scaffold`

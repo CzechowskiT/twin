@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
+import { MvpLiveStatsStrip } from "@/components/marketing/mvp-live-stats-strip";
 import { Input, Shell } from "@/components/ui";
 import { numberFormatLocaleForUi } from "@/lib/calculator-currencies";
 import {
@@ -221,6 +222,8 @@ export function InvestorCalculator() {
           </p>
           <p className="mx-auto mt-2 max-w-2xl text-xs text-[var(--twin-muted-strong)]">{t("investorCalc.disclaimer")}</p>
         </header>
+
+        <MvpLiveStatsStrip />
 
         <section className="twin-card-panel mb-6 p-5 sm:p-6">
           <h2 className="twin-section-title mb-4 text-lg">{t("investorCalc.quickScenarios")}</h2>
