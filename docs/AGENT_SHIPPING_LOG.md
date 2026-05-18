@@ -55,3 +55,7 @@ Deferred here to respect minimal-diff scope and time; each item remains valid ba
 
 - Rate limiter is in-process (not shared across API replicas); document for horizontal scale.
 - Applications dashboard loads up to 500 rows; very large pipelines may still need virtualized UI.
+
+### Step 50 (full `pytest tests/`)
+
+Run on 2026-05-18: **153 passed**, 1 skipped, **4 failed** (appear unrelated to steps 1–13: `test_kyc_authologic.py`, `test_talent_pool.py` ×3). No `chore: ci fixes` commit until those are triaged against a live Postgres + Authologic fixtures.
