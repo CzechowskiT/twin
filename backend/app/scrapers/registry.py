@@ -72,7 +72,7 @@ SCRAPE_REGISTRY: dict[str, ScrapeFn] = {**LOCAL_SCRAPERS, **GREENHOUSE_SCRAPERS,
 
 DEFAULT_BOARD_TIMEOUT_SEC = 120
 
-# Scrape-all order: PL sources first, LinkedIn, Indeed PL, then remaining globals (US Indeed, Glassdoor, …).
+# Scrape-all order: PL sources first, LinkedIn, then every global board id (explicit — same ids as API / filters).
 PRIORITY_BOARD_ORDER: tuple[str, ...] = (
     "pracuj",
     "pracuj-sales",
@@ -84,6 +84,18 @@ PRIORITY_BOARD_ORDER: tuple[str, ...] = (
     "linkedin",
     "linkedin-sales",
     "indeed-pl",
+    "indeed",
+    "glassdoor",
+    "monster",
+    "ziprecruiter",
+    "careerbuilder",
+    "simplyhired",
+    "jooble",
+    "reed",
+    "stepstone",
+    "seek",
+    "google-jobs",
+    "snagajob",
 )
 
 BOARD_LABELS: dict[str, tuple[str, str]] = {
@@ -96,6 +108,19 @@ BOARD_LABELS: dict[str, tuple[str, str]] = {
     "praca": ("praca.pl", "poland"),
     "linkedin": ("LinkedIn", "global"),
     "linkedin-sales": ("LinkedIn (sales)", "global"),
+    "indeed": ("Indeed", "global"),
+    "indeed-pl": ("Indeed (Poland)", "poland"),
+    "glassdoor": ("Glassdoor", "global"),
+    "monster": ("Monster", "americas"),
+    "ziprecruiter": ("ZipRecruiter", "americas"),
+    "careerbuilder": ("CareerBuilder", "americas"),
+    "simplyhired": ("SimplyHired", "global"),
+    "jooble": ("Jooble", "global"),
+    "reed": ("Reed", "uk"),
+    "stepstone": ("StepStone", "europe"),
+    "seek": ("SEEK", "asia-pacific"),
+    "google-jobs": ("Google for Jobs", "global"),
+    "snagajob": ("Snagajob", "americas"),
 }
 
 

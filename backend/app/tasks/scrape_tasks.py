@@ -5,7 +5,7 @@ from typing import Any
 from app.config import get_settings
 from app.database.session import SessionLocal
 from app.scrapers import justjoin, linkedin, praca, pracuj, rocketjobs
-from app.scrapers.global_boards import scrape_global_board
+from app.scrapers.global_boards import GLOBAL_BOARD_SPECS, scrape_global_board
 from app.scrapers.registry import DEFAULT_BOARD_TIMEOUT_SEC, scrape_all_boards
 from app.services.job_storage import upsert_jobs
 from app.tasks.celery_app import celery_app
@@ -13,6 +13,16 @@ from app.tasks.celery_app import celery_app
 
 def _scrape_limit() -> int:
     return max(12, min(150, get_settings().scrape_jobs_per_board))
+
+
+def _persist_global_board(board_id: str) -> dict[str, int]:
+    jobs = scrape_global_board(board_id, limit=_scrape_limit())
+    db = SessionLocal()
+    try:
+        saved = upsert_jobs(db, jobs)
+    finally:
+        db.close()
+    return {"scraped": len(jobs), "saved": saved}
 
 
 @celery_app.task(name="app.tasks.scrape_tasks.scrape_pracuj_task")
@@ -122,13 +132,29 @@ def scrape_linkedin_sales_task() -> dict[str, int | str]:
 
 @celery_app.task(name="app.tasks.scrape_tasks.scrape_global_board_task")
 def scrape_global_board_task(board_id: str) -> dict[str, int]:
-    jobs = scrape_global_board(board_id, limit=_scrape_limit())
-    db = SessionLocal()
-    try:
-        saved = upsert_jobs(db, jobs)
-    finally:
-        db.close()
-    return {"scraped": len(jobs), "saved": saved}
+    """Generic entrypoint with a board id (scripts, retries). Prefer board-specific tasks below."""
+    return _persist_global_board(board_id)
+
+
+def _register_global_board_celery_tasks() -> dict[str, Any]:
+    """One Celery task per global board id (same ids as /jobs/scrape/{board} and SCRAPE_REGISTRY)."""
+    out: dict[str, Any] = {}
+    for board_id in GLOBAL_BOARD_SPECS:
+        suffix = board_id.replace("-", "_")
+        task_name = f"app.tasks.scrape_tasks.scrape_{suffix}_task"
+
+        def _make_task(bid: str, tname: str) -> Any:
+            @celery_app.task(name=tname)
+            def _board_task() -> dict[str, int]:
+                return _persist_global_board(bid)
+
+            return _board_task
+
+        out[board_id] = _make_task(board_id, task_name)
+    return out
+
+
+GLOBAL_BOARD_SCRAPE_TASKS: dict[str, Any] = _register_global_board_celery_tasks()
 
 
 @celery_app.task(name="app.tasks.scrape_tasks.scrape_all_boards_task")
