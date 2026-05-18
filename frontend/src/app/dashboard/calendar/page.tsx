@@ -101,6 +101,7 @@ export default function DashboardCalendarPage() {
   const [endLocal, setEndLocal] = useState("");
   const [icsBusyId, setIcsBusyId] = useState<number | null>(null);
   const [cancelBusyId, setCancelBusyId] = useState<number | null>(null);
+  const [showCancelledInterviews, setShowCancelledInterviews] = useState(false);
 
   const load = useCallback(async () => {
     const token = getToken();
@@ -114,7 +115,8 @@ export default function DashboardCalendarPage() {
       const s = await apiFetch<CalendarStatus>("/api/v1/calendar/google/status", {}, token);
       setStatus(s);
       if (s.connected) {
-        const rows = await apiFetch<ScheduledInterview[]>("/api/v1/calendar/google/interviews", {}, token);
+        const q = showCancelledInterviews ? "?include_cancelled=true" : "";
+        const rows = await apiFetch<ScheduledInterview[]>(`/api/v1/calendar/google/interviews${q}`, {}, token);
         setInterviews(rows);
       } else {
         setInterviews([]);
@@ -132,7 +134,7 @@ export default function DashboardCalendarPage() {
     } finally {
       setLoading(false);
     }
-  }, [router]);
+  }, [router, showCancelledInterviews]);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -445,6 +447,15 @@ export default function DashboardCalendarPage() {
 
           <div className="border-t border-[var(--twin-border)] pt-6">
             <h2 className="text-base font-semibold text-[var(--foreground)]">{t("dashboard.calendarInterviewsTitle")}</h2>
+            <label className="mt-2 flex cursor-pointer items-center gap-2 text-sm text-[var(--twin-muted-strong)]">
+              <input
+                type="checkbox"
+                checked={showCancelledInterviews}
+                onChange={(e) => setShowCancelledInterviews(e.target.checked)}
+                className="h-4 w-4 rounded border border-[var(--twin-border)] accent-[var(--foreground)]"
+              />
+              <span>{t("dashboard.calendarShowCancelledInterviews")}</span>
+            </label>
             {interviews.length === 0 ? (
               <p className="twin-muted mt-2 text-sm leading-relaxed">{t("dashboard.calendarInterviewsEmpty")}</p>
             ) : (

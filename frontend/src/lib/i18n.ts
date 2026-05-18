@@ -582,6 +582,7 @@ const en = {
     calendarOpenGoogle: "Open in Google Calendar",
     calendarInterviewsTitle: "Upcoming interviews",
     calendarInterviewsEmpty: "Nothing on the horizon yet. When TWIN books a slot, it shows up here and in Google Calendar.",
+    calendarShowCancelledInterviews: "Show cancelled interviews",
     calendarScheduleTitle: "Schedule an interview",
     calendarScheduleHint:
       "“Suggest slot” scans the next two weeks for a free hour on weekdays 09:00–17:00 UTC (MVP). You can edit the times before saving.",
@@ -1771,6 +1772,7 @@ const pl: MessageTree = {
     calendarInterviewsTitle: "Nadchodzące rozmowy",
     calendarInterviewsEmpty:
       "Na razie pusto. Gdy TWIN zarezerwuje slot, pojawi się tu i w Google Calendar.",
+    calendarShowCancelledInterviews: "Pokaż odwołane rozmowy",
     calendarScheduleTitle: "Zaplanuj rozmowę",
     calendarScheduleHint:
       "„Zaproponuj slot” szuka wolnej godziny w ciągu 14 dni, pn–pt 09:00–17:00 UTC (MVP). Czasy możesz poprawić przed zapisem.",

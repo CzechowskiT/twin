@@ -353,19 +353,22 @@ def google_calendar_next_slot(
 
 @router.get("/google/interviews", response_model=list[ScheduledInterviewOut])
 def google_calendar_list_interviews(
+    include_cancelled: bool = Query(
+        False,
+        description="When true, include interviews marked cancelled (still upcoming by start time).",
+    ),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> list[ScheduledInterviewOut]:
     now = datetime.utcnow()
-    rows = (
+    q = (
         db.query(ScheduledInterview)
         .filter(ScheduledInterview.user_id == current_user.id)
         .filter(ScheduledInterview.interview_start >= now)
-        .filter(ScheduledInterview.status != "cancelled")
-        .order_by(ScheduledInterview.interview_start.asc())
-        .limit(25)
-        .all()
     )
+    if not include_cancelled:
+        q = q.filter(ScheduledInterview.status != "cancelled")
+    rows = q.order_by(ScheduledInterview.interview_start.asc()).limit(25).all()
     return rows
 
 
