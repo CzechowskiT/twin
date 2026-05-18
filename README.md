@@ -114,6 +114,37 @@ twin/
 
 With the API running: [http://localhost:8000/docs](http://localhost:8000/docs)
 
+## Security
+
+TWIN implements multiple security layers:
+
+### Authentication
+
+- JWT tokens with 24h expiry
+- OAuth 2.0 (Google, GitHub, Apple, LinkedIn)
+- Password hashing with bcrypt
+- Rate limiting: 5 requests/minute on auth endpoints (SlowAPI)
+
+### Authorization
+
+- Row-level security (users can only access their own data)
+- Ownership checks on sensitive endpoints (applications, interviews, exports)
+- Placement history and CSV exports are scoped to the authenticated candidate
+
+### Data Protection
+
+- Encrypted Google Calendar refresh tokens (AES-256)
+- GDPR-compliant consent tracking
+- Secure password reset flow (1h token expiry)
+
+### Known limitations (beta)
+
+- No 2FA yet (planned)
+- Per-IP rate limits are coarse; additional abuse protection may be needed at the edge
+- Self-hosted email (consider SendGrid or similar for production)
+
+Report security issues: **security@twin.app**
+
 ## Deploy online
 
 See [docs/DEPLOY.md](docs/DEPLOY.md) for Docker Compose production stack and cloud hosting notes.

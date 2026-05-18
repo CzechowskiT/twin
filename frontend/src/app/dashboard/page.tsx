@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import toast from "react-hot-toast";
 import {
   ApplicationsPanel,
   type ApplicationRow,
@@ -171,6 +172,8 @@ export default function DashboardPage() {
   const [matchesXlsxBusy, setMatchesXlsxBusy] = useState(false);
   const [matchesRefreshing, setMatchesRefreshing] = useState(false);
   const [exportJsonBusy, setExportJsonBusy] = useState(false);
+  const [dashboardBootstrapping, setDashboardBootstrapping] = useState(true);
+  const [savedJobIds, setSavedJobIds] = useState<Set<number>>(() => new Set());
 
   const loadJobs = useCallback(async (token: string, activeFilters: JobFilters) => {
     return apiFetch<JobList>(`/api/v1/jobs/${buildJobsQuery(activeFilters)}`, {}, token);
@@ -209,6 +212,15 @@ export default function DashboardPage() {
       return await apiFetch<DevelopmentFocus>("/api/v1/applications/me/development-focus", {}, token);
     } catch {
       return null;
+    }
+  }, []);
+
+  const loadSavedJobIds = useCallback(async (token: string) => {
+    try {
+      const rows = await apiFetch<JobItem[]>("/api/v1/jobs/saved", {}, token);
+      setSavedJobIds(new Set(rows.map((r) => r.id)));
+    } catch {
+      setSavedJobIds(new Set());
     }
   }, []);
 
@@ -256,11 +268,15 @@ export default function DashboardPage() {
       void loadGoogleCalendarStrip(token);
       if (hasProfile) setMatchesRefreshing(true);
       try {
+        if (!hasProfile) {
+          setSavedJobIds(new Set());
+        }
         const [jobList, matchList, apps, focus] = await Promise.all([
           loadJobs(token, activeFilters),
           hasProfile ? loadMatches(token) : Promise.resolve(null),
           hasProfile ? loadApplications(token) : Promise.resolve({ items: [] as ApplicationRow[], total: 0 }),
           hasProfile ? loadDevelopmentFocus(token) : Promise.resolve(null),
+          hasProfile ? loadSavedJobIds(token) : Promise.resolve(null),
         ]);
         setJobs(jobList);
         if (matchList) setMatches(matchList);
@@ -272,7 +288,7 @@ export default function DashboardPage() {
         if (hasProfile) setMatchesRefreshing(false);
       }
     },
-    [loadJobs, loadMatches, loadApplications, loadDevelopmentFocus, loadGoogleCalendarStrip],
+    [loadJobs, loadMatches, loadApplications, loadDevelopmentFocus, loadGoogleCalendarStrip, loadSavedJobIds],
   );
 
   const applicationByJobId = useMemo(() => {
@@ -283,10 +299,19 @@ export default function DashboardPage() {
     return map;
   }, [applications]);
 
+  const displayApplicationStatus = useMemo(() => {
+    const m: Record<number, string> = { ...applicationByJobId };
+    savedJobIds.forEach((id) => {
+      if (!(id in m)) m[id] = "saved";
+    });
+    return m;
+  }, [applicationByJobId, savedJobIds]);
+
   useEffect(() => {
     const token = getToken();
     if (!token) {
       router.replace("/login");
+      setDashboardBootstrapping(false);
       return;
     }
 
@@ -346,7 +371,9 @@ export default function DashboardPage() {
         if (cancelled) return;
         setError(dashboardFetchUserMessage(e, t));
       }
-    })();
+    })().finally(() => {
+      if (!cancelled) setDashboardBootstrapping(false);
+    });
 
     return () => {
       cancelled = true;
@@ -460,6 +487,9 @@ export default function DashboardPage() {
       );
       syncApplicationsFromApi(await loadApplications(token));
       setDevFocus(await loadDevelopmentFocus(token));
+      if (status === "applied") {
+        toast.success(t("dashboard.applicationTrackedAppliedToast"));
+      }
     } catch (err) {
       setError(dashboardFetchUserMessage(err, t));
     }
@@ -471,10 +501,41 @@ export default function DashboardPage() {
   }
 
   function saveJob(jobId: number) {
-    void setJobApplication(jobId, "pending");
+    const token = getToken();
+    if (!token) return;
+    void (async () => {
+      try {
+        await apiFetch(`/api/v1/jobs/saved/${jobId}`, { method: "POST" }, token);
+        setSavedJobIds((prev) => new Set(prev).add(jobId));
+        toast.success(t("dashboard.jobBookmarkedToast"));
+      } catch (err) {
+        setError(dashboardFetchUserMessage(err, t));
+        toast.error(t("dashboard.jobBookmarkFailedToast"));
+      }
+    })();
   }
 
   function dismissJob(jobId: number) {
+    const token = getToken();
+    if (!token) return;
+    const statusForJob = applicationByJobId[jobId];
+    if (savedJobIds.has(jobId) && !statusForJob) {
+      void (async () => {
+        try {
+          await apiFetch(`/api/v1/jobs/saved/${jobId}`, { method: "DELETE" }, token);
+          setSavedJobIds((prev) => {
+            const next = new Set(prev);
+            next.delete(jobId);
+            return next;
+          });
+          toast.success(t("dashboard.jobRemovedToast"));
+        } catch (err) {
+          setError(dashboardFetchUserMessage(err, t));
+          toast.error(t("dashboard.jobRemoveFailedToast"));
+        }
+      })();
+      return;
+    }
     void setJobApplication(jobId, "rejected");
   }
 
@@ -494,7 +555,7 @@ export default function DashboardPage() {
       );
       syncApplicationsFromApi(await loadApplications(token));
       setDevFocus(await loadDevelopmentFocus(token));
-      alert(result.message);
+      toast.success(result.message);
     } catch (err) {
       setError(dashboardFetchUserMessage(err, t));
     } finally {
@@ -582,6 +643,7 @@ export default function DashboardPage() {
     try {
       const blob = await apiFetchBlob("/api/v1/applications/me/export.csv", {}, token);
       saveBlobAsFile(blob, "twin-applications.csv");
+      toast.success(t("dashboard.applicationsCsvDownloadedToast"));
     } catch (err) {
       setError(csvExportUserMessage(err, t));
     } finally {
@@ -601,6 +663,7 @@ export default function DashboardPage() {
         token,
       );
       saveBlobAsFile(blob, "twin-matches.csv");
+      toast.success(t("dashboard.matchesCsvDownloadedToast"));
     } catch (err) {
       setError(csvExportUserMessage(err, t));
     } finally {
@@ -741,6 +804,20 @@ export default function DashboardPage() {
 
   const hasProfile = profile !== null && profile !== undefined;
   const matchesInitialSkeleton = hasProfile && matches === null && matchesRefreshing;
+
+  if (dashboardBootstrapping) {
+    return (
+      <Shell wide rail>
+        <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 py-16">
+          <div
+            className="h-12 w-12 animate-spin rounded-full border-4 border-[var(--twin-accent)] border-t-transparent"
+            aria-hidden
+          />
+          <p className="twin-muted text-sm">{t("dashboard.loadingJobs")}</p>
+        </div>
+      </Shell>
+    );
+  }
 
   return (
     <Shell
@@ -1063,7 +1140,7 @@ export default function DashboardPage() {
           <JobList
             items={visibleMatches}
             showScore
-            applicationStatus={applicationByJobId}
+            applicationStatus={displayApplicationStatus}
             onApply={applyToJob}
             onAutoApply={autoApplyToJob}
             autoApplyJobId={autoApplyingId}
@@ -1220,7 +1297,7 @@ export default function DashboardPage() {
           <JobList
             items={jobs.items}
             showScore={hasProfile}
-            applicationStatus={applicationByJobId}
+            applicationStatus={displayApplicationStatus}
             onApply={hasProfile ? applyToJob : undefined}
             onAutoApply={hasProfile ? autoApplyToJob : undefined}
             autoApplyJobId={autoApplyingId}

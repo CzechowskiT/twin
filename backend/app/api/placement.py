@@ -1,4 +1,8 @@
-"""Public placement verification (magic link confirmation)."""
+"""Public placement verification (magic link confirmation).
+
+HTTP listing of placement audit events lives under ``/applications/{id}/placement-events``
+(see ``applications.list_placement_events``) with strict candidate ownership checks.
+"""
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session

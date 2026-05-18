@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class JobOut(BaseModel):
@@ -18,7 +18,26 @@ class JobOut(BaseModel):
     scraped_at: datetime
     score: float | None = Field(default=None, description="Match vs current user's profile (0–100); null without profile.")
 
-    model_config = {"from_attributes": True}
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
+            "examples": [
+                {
+                    "id": 1,
+                    "job_board": "pracuj",
+                    "title": "Senior Python Developer",
+                    "company": "Acme Corp",
+                    "location": "Warsaw, Poland",
+                    "salary_min": 80000,
+                    "salary_max": 120000,
+                    "url": "https://pracuj.pl/oferta/123",
+                    "is_validated": True,
+                    "scraped_at": "2026-01-15T12:00:00",
+                    "score": 87.5,
+                }
+            ]
+        },
+    )
 
 
 class ScrapeTaskOut(BaseModel):

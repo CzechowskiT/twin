@@ -9,9 +9,13 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.exception_handlers import http_exception_handler, request_validation_exception_handler
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 from sqlalchemy.exc import IntegrityError, OperationalError, ProgrammingError
 
 from app.api.router import api_router
+from app.limiter import limiter
 from app.config import get_settings
 from app.database.session import engine
 from app.database import models  # noqa: F401 — register metadata
@@ -42,6 +46,9 @@ def create_app() -> FastAPI:
     from app.middleware.request_id import add_request_id_middleware
 
     add_request_id_middleware(app)
+    app.state.limiter = limiter
+    app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+    app.add_middleware(SlowAPIMiddleware)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origin_list,

@@ -223,6 +223,10 @@ class Candidate(Base):
     user: Mapped["User"] = relationship(back_populates="candidate")
     applications: Mapped[list["Application"]] = relationship(back_populates="candidate")
     matches: Mapped[list["JobMatch"]] = relationship(back_populates="candidate")
+    saved_jobs: Mapped[list["SavedJob"]] = relationship(
+        back_populates="candidate",
+        cascade="all, delete-orphan",
+    )
 
 
 class BetaWaitlist(Base):
@@ -314,6 +318,22 @@ class Job(Base):
 
     matches: Mapped[list["JobMatch"]] = relationship(back_populates="job")
     applications: Mapped[list["Application"]] = relationship(back_populates="job")
+    saved_by: Mapped[list["SavedJob"]] = relationship(back_populates="job")
+
+
+class SavedJob(Base):
+    """User-bookmarked job listing (separate from application pipeline)."""
+
+    __tablename__ = "saved_jobs"
+    __table_args__ = (UniqueConstraint("candidate_id", "job_id", name="uq_saved_jobs"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(ForeignKey("candidates.id", ondelete="CASCADE"), index=True)
+    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id", ondelete="CASCADE"))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    candidate: Mapped["Candidate"] = relationship(back_populates="saved_jobs")
+    job: Mapped["Job"] = relationship(back_populates="saved_by")
 
 
 class JobMatch(Base):

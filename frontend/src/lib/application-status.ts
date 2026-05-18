@@ -6,6 +6,7 @@ const STATUS_KEYS: Record<string, TranslationKey> = {
   interview: "dashboard.appStatusInterview",
   rejected: "dashboard.appStatusRejected",
   hired: "dashboard.appStatusHired",
+  saved: "dashboard.appStatusBookmark",
 };
 
 export function applicationStatusKey(status: string): TranslationKey {

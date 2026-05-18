@@ -119,7 +119,12 @@ def _iter_applications_csv_rows(db: Session, candidate_id: int, limit: int):
         buf.truncate(0)
 
 
-@router.get("/me", response_model=ApplicationListOut)
+@router.get(
+    "/me",
+    response_model=ApplicationListOut,
+    summary="List my applications",
+    description="Tracked applications for the signed-in candidate (newest first), with pagination.",
+)
 def list_my_applications(
     limit: int = Query(
         100,
@@ -146,7 +151,11 @@ def list_my_applications(
     return ApplicationListOut(items=items, total=total)
 
 
-@router.get("/me/export.csv")
+@router.get(
+    "/me/export.csv",
+    summary="Export applications as CSV",
+    description="Portable CSV of your pipeline (bounded rows; UTF-8).",
+)
 def export_my_applications_csv(
     limit: int = Query(
         2000,
@@ -423,7 +432,7 @@ def list_placement_events(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> PlacementEventListOut:
-    """Append-only placement verification history for this application (owner only)."""
+    """Append-only placement verification history (owner-only; IDOR-safe via Application join)."""
     candidate = _candidate_or_404(db, user.id)
     app = (
         db.query(Application)

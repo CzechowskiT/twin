@@ -14,6 +14,7 @@ from app.core.deps import get_current_user
 from app.core.security import create_access_token, hash_password, verify_password
 from app.database.models import User
 from app.database.session import get_db
+from app.limiter import limiter
 from app.schemas.auth import (
     BillingProfileIn,
     ForgotPasswordRequest,
@@ -60,7 +61,6 @@ from app.services.oauth_state import create_oauth_state, verify_oauth_state
 from app.services.oauth_types import OAuthUserProfile
 from app.services.oauth_user import user_from_oauth
 from app.services.password_reset import request_password_reset, reset_password_with_token
-from app.services.login_rate_limit import enforce_login_rate_limit_per_minute
 from app.services.referral_public_token import ensure_user_referral_public_token
 from app.services.signup_referrer import (
     normalize_stored_referred_by_note,
@@ -69,12 +69,6 @@ from app.services.signup_referrer import (
 )
 
 router = APIRouter()
-
-
-def _login_rate_limit_client_key(request: Request) -> str:
-    if request.client and request.client.host:
-        return request.client.host
-    return "unknown"
 
 
 def _core_consents_complete(user: User) -> bool:
@@ -157,7 +151,8 @@ async def _read_web_oauth_callback(
 
 
 @router.post("/register", response_model=UserRegisteredOut, status_code=status.HTTP_201_CREATED)
-def register(body: UserRegister, db: Session = Depends(get_db)) -> UserRegisteredOut:
+@limiter.limit("5/minute")
+def register(request: Request, body: UserRegister, db: Session = Depends(get_db)) -> UserRegisteredOut:
     if not (
         body.gdpr_consent
         and body.terms_of_service_consent
@@ -231,40 +226,29 @@ def register(body: UserRegister, db: Session = Depends(get_db)) -> UserRegistere
 
 
 @router.post("/login", response_model=Token)
+@limiter.limit("5/minute")
 def login(
     request: Request,
     form: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ) -> Token:
-    s = get_settings()
-    enforce_login_rate_limit_per_minute(
-        client_key=_login_rate_limit_client_key(request),
-        max_per_minute=s.auth_login_rate_limit_per_minute,
-    )
     return _authenticate(form.username, form.password, db)
 
 
 @router.post("/login/json", response_model=Token)
+@limiter.limit("5/minute")
 def login_json(request: Request, body: UserLogin, db: Session = Depends(get_db)) -> Token:
-    s = get_settings()
-    enforce_login_rate_limit_per_minute(
-        client_key=_login_rate_limit_client_key(request),
-        max_per_minute=s.auth_login_rate_limit_per_minute,
-    )
     return _authenticate(body.email, body.password, db)
 
 
 @router.post("/forgot-password")
+@limiter.limit("5/minute")
 def forgot_password(
     request: Request,
     body: ForgotPasswordRequest,
     db: Session = Depends(get_db),
 ) -> dict[str, str]:
     settings = get_settings()
-    enforce_login_rate_limit_per_minute(
-        client_key=f"forgot:{_login_rate_limit_client_key(request)}",
-        max_per_minute=settings.auth_forgot_password_rate_limit_per_minute,
-    )
     message = request_password_reset(db, settings, str(body.email))
     return {"message": message}
 

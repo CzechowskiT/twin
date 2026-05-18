@@ -1,15 +1,13 @@
-"""Login rate limiting."""
+"""Login rate limiting via SlowAPI."""
 
-import os
 from unittest.mock import MagicMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
 
-from app.config import get_settings
+from app.limiter import limiter
 from app.main import app
 from app.schemas.auth import Token
-from app.services.login_rate_limit import reset_login_rate_limit_state
 
 
 @pytest.fixture
@@ -18,27 +16,29 @@ def client() -> TestClient:
 
 
 @pytest.fixture(autouse=True)
-def _clear_rate_limit_state() -> None:
-    reset_login_rate_limit_state()
+def _reset_slowapi() -> None:
+    limiter.reset()
     yield
-    reset_login_rate_limit_state()
+    limiter.reset()
 
 
 @patch("app.api.auth._authenticate", return_value=Token(access_token="test-token"))
-def test_login_json_rate_limit_returns_429(_mock_auth: MagicMock, client: TestClient) -> None:
-    get_settings.cache_clear()
-    with patch.dict(os.environ, {"AUTH_LOGIN_RATE_LIMIT_PER_MINUTE": "2"}):
-        get_settings.cache_clear()
-        for _ in range(2):
-            r = client.post(
-                "/api/v1/auth/login/json",
-                json={"email": "nobody@example.com", "password": "any"},
-            )
-            assert r.status_code == 200
-        r3 = client.post(
+def test_login_json_rate_limit_returns_429_after_five(_mock_auth: MagicMock, client: TestClient) -> None:
+    for i in range(5):
+        r = client.post(
             "/api/v1/auth/login/json",
             json={"email": "nobody@example.com", "password": "any"},
         )
-        assert r3.status_code == 429
-        assert "Too many" in r3.json().get("detail", "")
-    get_settings.cache_clear()
+        assert r.status_code == 200, r.text
+    r6 = client.post(
+        "/api/v1/auth/login/json",
+        json={"email": "nobody@example.com", "password": "any"},
+    )
+    assert r6.status_code == 429
+    body = r6.json()
+    detail = body.get("detail") or body.get("error") or ""
+    if isinstance(detail, list):
+        detail = " ".join(str(x) for x in detail)
+    else:
+        detail = str(detail or "")
+    assert "rate" in detail.lower() or "limit" in detail.lower() or "exceeded" in detail.lower()

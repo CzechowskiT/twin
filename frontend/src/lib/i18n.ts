@@ -274,6 +274,7 @@ const en = {
   site: SITE_MESSAGES_EN,
   dashboard: {
     title: "Dashboard",
+    loadingJobs: "Loading your workspace…",
     northStarEyebrow: "How TWIN thinks",
     northStarLead:
       "Without TWIN you return from time off to a calendar of random interviews or an inbox of thousands of CVs. With TWIN you return to a short list of moments that matter: interviews worth taking, candidates you can accept in one tap. Not noise.",
@@ -334,8 +335,15 @@ const en = {
       "Runs board-specific automation where supported; otherwise you’ll get a short message and can use Apply manually.",
     saveJob: "Save",
     dismissJob: "Not for me",
+    jobBookmarkedToast: "Job bookmarked",
+    jobBookmarkFailedToast: "Could not bookmark this job",
+    jobRemovedToast: "Removed from bookmarks",
+    jobRemoveFailedToast: "Could not update bookmarks",
     applications: "My applications",
     applicationsExportCsv: "Export applications (.csv)",
+    applicationsCsvDownloadedToast: "Applications export downloaded",
+    matchesCsvDownloadedToast: "Matches export downloaded",
+    applicationTrackedAppliedToast: "Application tracked as applied",
     applicationsSummaryAll: "({total} tracked)",
     applicationsSummaryPartial: "({shown} of {total} tracked)",
     appsFilterStatus: "Filter by status",
@@ -353,6 +361,7 @@ const en = {
     appStatusInterview: "Interview",
     appStatusRejected: "Rejected",
     appStatusHired: "Hired",
+    appStatusBookmark: "Bookmarked",
     developmentFocusTitle: "Your reskilling focus (from recruiter feedback)",
     developmentFocusLead:
       "When a process ends without a hire, capture what you heard. TWIN turns it into gaps (tools, positioning, what others showed stronger) and lands it here so you can level up before the next wave of applications.",
@@ -1567,6 +1576,7 @@ const pl: MessageTree = {
   site: SITE_MESSAGES_PL,
   dashboard: {
     title: "Panel",
+    loadingJobs: "Ładowanie panelu…",
     northStarEyebrow: "Logika TWIN",
     northStarLead:
       "Bez TWIN wracasz z przerwy do kalendarza przypadkowych rozmów albo tysięcy CV. Z TWIN wracasz do krótkiej listy momentów, które mają sens: rozmowy warte czasu, kandydaci do akceptacji jednym gestem. Bez szumu.",
@@ -1627,8 +1637,15 @@ const pl: MessageTree = {
       "Uruchamia automatyzację tam, gdzie portal jest obsługiwany; w pozostałych przypadkach zobaczysz komunikat i możesz użyć „Aplikuj”.",
     saveJob: "Zapisz",
     dismissJob: "Nie dla mnie",
+    jobBookmarkedToast: "Oferta dodana do zakładek",
+    jobBookmarkFailedToast: "Nie udało się zapisać oferty",
+    jobRemovedToast: "Usunięto z zakładek",
+    jobRemoveFailedToast: "Nie udało się zaktualizować zakładek",
     applications: "Moje aplikacje",
     applicationsExportCsv: "Eksport aplikacji (.csv)",
+    applicationsCsvDownloadedToast: "Pobrano eksport aplikacji",
+    matchesCsvDownloadedToast: "Pobrano eksport dopasowań",
+    applicationTrackedAppliedToast: "Zapisano aplikację jako wysłaną",
     applicationsSummaryAll: "({total} śledzonych)",
     applicationsSummaryPartial: "({shown} z {total} śledzonych)",
     appsFilterStatus: "Filtruj po statusie",
@@ -1646,6 +1663,7 @@ const pl: MessageTree = {
     appStatusInterview: "Rozmowa",
     appStatusRejected: "Odrzucona",
     appStatusHired: "Zatrudnienie",
+    appStatusBookmark: "Zakładka",
     developmentFocusTitle: "Twój kierunek rozwoju (z feedbacku rekrutacji)",
     developmentFocusLead:
       "Gdy proces kończy się bez oferty, zapisz to, co usłyszałeś. TWIN porządkuje luki (narzędzia, sposób prezentacji, czym wyróżniali się inni) i zrzuca je tutaj, żebyś zdążył podciągnąć kompetencje przed kolejną falą aplikacji.",

@@ -3,13 +3,14 @@
 import logging
 import threading
 from collections.abc import Callable
+from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.core.deps import get_current_user
-from app.database.models import Candidate, Job, User
+from app.database.models import Candidate, Job, SavedJob, User
 from app.database.session import get_db
 from app.matching.matcher import calculate_match_score
 from app.schemas.job import (
@@ -137,18 +138,25 @@ def job_filters(
 
 @router.get("/", response_model=JobListOut)
 def list_jobs(
-    skip: int = 0,
-    limit: int = 50,
-    validated_only: bool = True,
-    q: str | None = None,
-    location: str | None = None,
-    job_board: str | None = None,
-    min_salary: int | None = None,
-    title_terms: str | None = None,
-    sort: str = SORT_NEWEST,
+    skip: Annotated[int, Query(ge=0, description="Pagination offset into the filtered result set.")] = 0,
+    limit: Annotated[int, Query(ge=1, le=200, description="Maximum jobs to return (default 50, cap 200).")] = 50,
+    validated_only: Annotated[
+        bool,
+        Query(description="When true (default), only listings that passed validation are returned."),
+    ] = True,
+    q: Annotated[str | None, Query(description="Free-text search across title, company, and location.")] = None,
+    location: Annotated[str | None, Query(description="Filter by city or region (substring match).")] = None,
+    job_board: Annotated[str | None, Query(description="Restrict to a single board id (e.g. pracuj, rocketjobs).")] = None,
+    min_salary: Annotated[int | None, Query(ge=0, description="Minimum advertised salary (PLN) when present on the listing.")] = None,
+    title_terms: Annotated[
+        str | None,
+        Query(description="Comma-separated tokens; job title must contain each token (case-insensitive)."),
+    ] = None,
+    sort: Annotated[str, Query(description=f"Sort order: `{SORT_NEWEST}`, `{SORT_SALARY}`, or `{SORT_COMPANY}`.")] = SORT_NEWEST,
     db: Session = Depends(get_db),
     _user: User = Depends(get_current_user),
 ) -> JobListOut:
+    """Paginated job feed with optional filters and match scores for the authenticated candidate."""
     if sort not in (SORT_NEWEST, SORT_SALARY, SORT_COMPANY):
         sort = SORT_NEWEST
     query = db.query(Job)
@@ -178,6 +186,74 @@ def list_jobs(
         out_items.append(base.model_copy(update={"score": raw}))
 
     return JobListOut(items=out_items, total=total)
+
+
+@router.post("/saved/{job_id}")
+def save_job(
+    job_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> dict[str, str]:
+    job = db.query(Job).filter(Job.id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+    candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
+    if not candidate:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Candidate not found")
+    existing = (
+        db.query(SavedJob)
+        .filter(SavedJob.candidate_id == candidate.id, SavedJob.job_id == job_id)
+        .first()
+    )
+    if existing:
+        return {"message": "Already saved"}
+    db.add(SavedJob(candidate_id=candidate.id, job_id=job_id))
+    db.commit()
+    return {"message": "Job saved"}
+
+
+@router.delete("/saved/{job_id}")
+def unsave_job(
+    job_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> dict[str, str]:
+    candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
+    if not candidate:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Candidate not found")
+    saved = (
+        db.query(SavedJob)
+        .filter(SavedJob.candidate_id == candidate.id, SavedJob.job_id == job_id)
+        .first()
+    )
+    if saved:
+        db.delete(saved)
+        db.commit()
+    return {"message": "Job unsaved"}
+
+
+@router.get("/saved", response_model=list[JobOut])
+def get_saved_jobs(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> list[JobOut]:
+    candidate = db.query(Candidate).filter(Candidate.user_id == current_user.id).first()
+    if not candidate:
+        return []
+    rows = (
+        db.query(Job)
+        .join(SavedJob, SavedJob.job_id == Job.id)
+        .filter(SavedJob.candidate_id == candidate.id)
+        .order_by(SavedJob.created_at.desc())
+        .all()
+    )
+    cand_dict = candidate_to_dict(candidate)
+    out: list[JobOut] = []
+    for job in rows:
+        base = JobOut.model_validate(job, from_attributes=True)
+        raw = float(calculate_match_score(cand_dict, job_to_dict(job)))
+        out.append(base.model_copy(update={"score": raw}))
+    return out
 
 
 @router.post("/scrape/all", response_model=ScrapeAllOut)

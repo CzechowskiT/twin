@@ -7,6 +7,7 @@ import { DocumentTitleSync } from "@/components/document-title-sync";
 import { LanguageProvider } from "@/components/language-provider";
 import { MarketingSurfaceSync } from "@/components/marketing-surface-sync";
 import { PersonaProvider } from "@/components/persona-provider";
+import { Toaster } from "react-hot-toast";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -15,6 +16,7 @@ export function Providers({ children }: { children: ReactNode }) {
         <DocumentTitleSync />
         <MarketingSurfaceSync />
         <CookieConsentBanner />
+        <Toaster position="top-right" />
         {children}
       </PersonaProvider>
     </LanguageProvider>
