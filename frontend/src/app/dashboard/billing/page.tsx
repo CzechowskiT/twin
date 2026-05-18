@@ -415,9 +415,9 @@ export default function BillingPage() {
   return (
     <Shell wide rail>
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0">
+        <div className="min-w-0 text-start">
           <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">{t("dashboard.billingPageTitle")}</h1>
-          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[var(--twin-muted-strong)] sm:text-base">
+          <p className="mt-2 max-w-prose text-pretty text-sm leading-relaxed text-[var(--twin-muted-strong)] sm:text-base">
             {t("dashboard.billingPageLead")}
           </p>
         </div>

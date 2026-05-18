@@ -519,7 +519,7 @@ const en = {
     billingPlansEmpty: "No plans are available here yet.",
     billingCheckoutError: "That action could not be completed. Please try again in a moment.",
     billingPageLead:
-      "Free keeps a tight cap on tracked applications; Premium unlocks unlimited tracking. Auto-apply runs on every plan by default (investor demos); set AUTO_APPLY_REQUIRE_PREMIUM=true on the API to gate it to paid tiers. Checkout runs on Stripe. Which cards, Link, or bank methods appear comes from server configuration; the chips below spell it out.",
+      "Manage your plan, invoice details, and upgrades. Free has a limit on tracked applications; Premium removes that cap. Checkout is powered by Stripe — when upgrades are enabled, supported payment methods appear in the section below.",
     billingCurrentPlan: "Current plan",
     billingSubscriptionStatus: "Subscription status",
     billingPeriodEnds: "Current period ends",
@@ -1875,7 +1875,7 @@ const pl: MessageTree = {
     billingPlansEmpty: "Na razie nie ma tu planów do wyświetlenia.",
     billingCheckoutError: "Nie udało się dokończyć tej czynności. Spróbuj ponownie za chwilę.",
     billingPageLead:
-      "Free trzyma limit śledzonych aplikacji; Premium daje nielimit. Auto-apply domyślnie na każdym planie (demo / inwestor); na produkcji możesz ograniczyć do płatnych: AUTO_APPLY_REQUIRE_PREMIUM=true na API. Płatności przez Stripe. Które karty, Link czy przelew zobaczysz na checkoutcie, wynika ze zmiennych na serwerze; poniżej widać, co jest włączone.",
+      "Tu zarządzasz planem, danymi do faktury i ewentualnym upgrade. Free ma limit śledzonych aplikacji; Premium zdejmuje ten limit. Płatności obsługuje Stripe — gdy płatne plany są włączone, dostępne metody płatności zobaczysz w sekcji poniżej.",
     billingCurrentPlan: "Obecny plan",
     billingSubscriptionStatus: "Status subskrypcji",
     billingPeriodEnds: "Koniec bieżącego okresu",
