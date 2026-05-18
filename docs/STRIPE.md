@@ -47,7 +47,13 @@ Use the endpoint’s **signing secret** as `STRIPE_WEBHOOK_SECRET`.
 | Free | Up to 25 | Not allowed |
 | Premium / Pro (active / trialing / past_due) | Unlimited | Allowed |
 
-`plan_tier` and `subscription_status` on `users` are updated from webhooks; the API treats you as paid only while Stripe reports an entitled subscription status.
+`plan_tier` and `subscription_status` on `users` are updated from webhooks; the API treats you as paid only while Stripe reports an entitled subscription status (`active`, `trialing`, or `past_due`).
+
+## `GET /api/v1/billing/plans` (list prices vs Checkout)
+
+- **Checkout** always charges the **Price IDs** from `STRIPE_PRICE_ID_PREMIUM` / `STRIPE_PRICE_ID_PRO`.
+- **Public “Stripe ready”** (`GET /api/v1/public/mvp-stats` → `stripe_checkout_ready`) matches **billing**: it is true only when **`STRIPE_SECRET_KEY` and `STRIPE_PRICE_ID_PREMIUM`** are set. Pro alone is not enough to open Checkout.
+- The plans payload includes **`list_price_monthly` + `list_price_currency`** when the API can `Price.retrieve` the configured id (same recurring basis as customers see, normalized to a monthly figure for yearly/week prices). If Stripe is unreachable, the API falls back to illustrative USD defaults and omits those fields; **`monthly_list_price_usd`** remains a rough USD hint for older clients.
 
 ## Local testing
 

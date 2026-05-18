@@ -8,7 +8,7 @@ import secrets
 from datetime import datetime, timedelta, timezone
 from urllib.parse import urlencode
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from fastapi.responses import RedirectResponse, Response
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Session
@@ -117,6 +117,11 @@ class InterviewIcsTokenOut(BaseModel):
     token: str
     expires_at: str
     download_path: str
+    https_url: str = Field(description="Absolute HTTPS URL for GET (download / refresh subscription).")
+    webcal_url: str | None = Field(
+        default=None,
+        description="webcal:// variant of https_url for one-click subscribe in Apple Calendar and similar clients.",
+    )
 
 
 _ICS_SHARE_TOKEN_TTL_DAYS = 30
@@ -434,8 +439,21 @@ def _ics_token_digest(raw: str) -> str:
     return hashlib.sha256(raw.strip().encode("utf-8")).hexdigest()
 
 
+def _ics_shared_absolute_urls(request: Request, interview_id: int, raw_token: str) -> tuple[str, str | None]:
+    """Build https and optional webcal URLs for calendar clients that subscribe by URL."""
+    rel_path = f"/api/v1/calendar/interviews/{interview_id}/ics-shared?token={raw_token}"
+    base = str(request.base_url).rstrip("/")
+    https_url = f"{base}{rel_path}"
+    if https_url.startswith("https://"):
+        return https_url, "webcal://" + https_url[len("https://") :]
+    if https_url.startswith("http://"):
+        return https_url, "webcal://" + https_url[len("http://") :]
+    return https_url, None
+
+
 @router.post("/interviews/{interview_id}/ics-token", response_model=InterviewIcsTokenOut)
 def mint_interview_ics_share_token(
+    request: Request,
     interview_id: int,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -462,7 +480,14 @@ def mint_interview_ics_share_token(
     exp = row.ics_access_token_expires_at
     exp_s = exp.isoformat() + "Z" if exp and exp.tzinfo is None else (exp.isoformat() if exp else "")
     path = f"/api/v1/calendar/interviews/{interview_id}/ics-shared?token={raw}"
-    return InterviewIcsTokenOut(token=raw, expires_at=exp_s, download_path=path)
+    https_url, webcal_url = _ics_shared_absolute_urls(request, interview_id, raw)
+    return InterviewIcsTokenOut(
+        token=raw,
+        expires_at=exp_s,
+        download_path=path,
+        https_url=https_url,
+        webcal_url=webcal_url,
+    )
 
 
 @router.get("/interviews/{interview_id}/ics-shared")

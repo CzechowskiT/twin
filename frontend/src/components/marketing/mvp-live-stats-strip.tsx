@@ -3,21 +3,11 @@
 import { useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
-
-type MvpStats = {
-  validated_jobs: number;
-  registered_users: number;
-  total_applications: number;
-  profiles_with_cv: number;
-  job_boards_in_registry: number;
-  generated_at: string;
-  linkedin_oauth_configured: boolean;
-  stripe_checkout_ready: boolean;
-};
+import type { MvpStatsOut } from "@/lib/api-types";
 
 export function MvpLiveStatsStrip() {
   const { t, locale } = useTranslation();
-  const [data, setData] = useState<MvpStats | null>(null);
+  const [data, setData] = useState<MvpStatsOut | null>(null);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
@@ -26,7 +16,7 @@ export function MvpLiveStatsStrip() {
       try {
         const res = await fetch("/api/v1/public/mvp-stats", { cache: "no-store" });
         if (!res.ok) throw new Error(String(res.status));
-        const json = (await res.json()) as MvpStats;
+        const json = (await res.json()) as MvpStatsOut;
         if (!cancelled) setData(json);
       } catch {
         if (!cancelled) setFailed(true);
@@ -107,6 +97,25 @@ export function MvpLiveStatsStrip() {
           <dd className="mt-1 text-sm font-semibold text-[var(--foreground)]">{flag(data.stripe_checkout_ready)}</dd>
         </div>
       </dl>
+      <div className="mt-4 border-t border-[var(--twin-border)]/80 pt-4">
+        <h3 className="text-center text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
+          {t("investorCalc.liveStatsJobsByBoard")}
+        </h3>
+        <ul className="mt-3 grid gap-x-4 gap-y-1.5 sm:grid-cols-2" aria-label={t("investorCalc.liveStatsJobsByBoard")}>
+          {data.validated_jobs_by_board.map((row) => (
+            <li
+              key={row.job_board}
+              className="flex items-baseline justify-between gap-3 rounded-md bg-[var(--twin-surface-2)]/80 px-2.5 py-1.5 text-xs"
+            >
+              <span className="min-w-0 truncate font-mono text-[var(--twin-muted-strong)]" title={row.job_board}>
+                {row.job_board}
+              </span>
+              <span className="shrink-0 tabular-nums font-semibold text-[var(--foreground)]">{fmt(row.count)}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="twin-muted mt-3 text-center text-[10px] leading-relaxed">{t("investorCalc.liveStatsJobsByBoardFoot")}</p>
+      </div>
       <p className="mt-4 text-center text-[10px] text-[var(--twin-muted)]">{t("investorCalc.liveStatsAsOf").replace("{ts}", snap)}</p>
     </section>
   );

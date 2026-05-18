@@ -83,6 +83,14 @@ type DashboardCalendarBundle = {
   } | null;
 };
 
+type InterviewIcsShareOut = {
+  token: string;
+  expires_at: string;
+  download_path: string;
+  https_url: string;
+  webcal_url: string | null;
+};
+
 type DevelopmentFocus = {
   skill_tool_gaps: string[];
   positioning_themes: string[];
@@ -169,6 +177,7 @@ export default function DashboardPage() {
   const [placementEventsInvalidateKey, setPlacementEventsInvalidateKey] = useState(0);
   const [dashboardCalendarBundle, setDashboardCalendarBundle] = useState<DashboardCalendarBundle | null>(null);
   const [nextInterviewIcsBusy, setNextInterviewIcsBusy] = useState(false);
+  const [nextInterviewSubscribeBusy, setNextInterviewSubscribeBusy] = useState(false);
   const [applicationsCsvBusy, setApplicationsCsvBusy] = useState(false);
   const [applicationsXlsxBusy, setApplicationsXlsxBusy] = useState(false);
   const [matchesCsvBusy, setMatchesCsvBusy] = useState(false);
@@ -1079,33 +1088,66 @@ export default function DashboardPage() {
                             {t("dashboard.calendarNextInterviewJoinLink")}
                           </a>
                         ) : null}
-                        <button
-                          type="button"
-                          disabled={nextInterviewIcsBusy}
-                          className="twin-link mt-2 text-xs font-medium"
-                          onClick={() => {
-                            void (async () => {
-                              const token = getToken();
-                              const ni = dashboardCalendarBundle.nextInterview;
-                              if (!token || !ni) return;
-                              setNextInterviewIcsBusy(true);
-                              try {
-                                const blob = await apiFetchBlob(
-                                  `/api/v1/calendar/interviews/${ni.id}/ics`,
-                                  {},
-                                  token,
-                                );
-                                saveBlobAsFile(blob, `twin-interview-${ni.id}.ics`);
-                              } catch {
-                                /* optional: surface via setError */
-                              } finally {
-                                setNextInterviewIcsBusy(false);
-                              }
-                            })();
-                          }}
-                        >
-                          {nextInterviewIcsBusy ? "…" : t("dashboard.calendarInterviewDownloadIcs")}
-                        </button>
+                        <div className="mt-2 flex flex-col items-start gap-1.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+                          <button
+                            type="button"
+                            disabled={nextInterviewIcsBusy}
+                            className="twin-link text-xs font-medium"
+                            onClick={() => {
+                              void (async () => {
+                                const token = getToken();
+                                const ni = dashboardCalendarBundle.nextInterview;
+                                if (!token || !ni) return;
+                                setNextInterviewIcsBusy(true);
+                                try {
+                                  const blob = await apiFetchBlob(
+                                    `/api/v1/calendar/interviews/${ni.id}/ics`,
+                                    {},
+                                    token,
+                                  );
+                                  saveBlobAsFile(blob, `twin-interview-${ni.id}.ics`);
+                                } catch {
+                                  /* optional: surface via setError */
+                                } finally {
+                                  setNextInterviewIcsBusy(false);
+                                }
+                              })();
+                            }}
+                          >
+                            {nextInterviewIcsBusy ? "…" : t("dashboard.calendarInterviewDownloadIcs")}
+                          </button>
+                          <button
+                            type="button"
+                            disabled={nextInterviewSubscribeBusy || nextInterviewIcsBusy}
+                            className="twin-link text-xs font-medium"
+                            onClick={() => {
+                              void (async () => {
+                                const token = getToken();
+                                const ni = dashboardCalendarBundle.nextInterview;
+                                if (!token || !ni) return;
+                                setNextInterviewSubscribeBusy(true);
+                                try {
+                                  const out = await apiFetch<InterviewIcsShareOut>(
+                                    `/api/v1/calendar/interviews/${ni.id}/ics-token`,
+                                    { method: "POST", body: "{}" },
+                                    token,
+                                  );
+                                  const url = (out.webcal_url || out.https_url).trim();
+                                  await navigator.clipboard.writeText(url);
+                                  toast.success(t("dashboard.calendarInterviewSubscribeLinkToast"));
+                                } catch {
+                                  toast.error(t("dashboard.calendarInterviewSubscribeLinkFailed"));
+                                } finally {
+                                  setNextInterviewSubscribeBusy(false);
+                                }
+                              })();
+                            }}
+                          >
+                            {nextInterviewSubscribeBusy
+                              ? t("dashboard.calendarInterviewSubscribeLinkBusy")
+                              : t("dashboard.calendarInterviewSubscribeLink")}
+                          </button>
+                        </div>
                       </>
                     ) : (
                       <p className="twin-muted mt-1.5 text-xs leading-relaxed">

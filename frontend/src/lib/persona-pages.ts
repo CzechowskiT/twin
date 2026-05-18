@@ -3,12 +3,17 @@
  * Copy is authoritative for marketing pages (EN/PL); other locales fall back to EN in the UI.
  */
 
+import { formatMarketingListPrice } from "@/lib/pricing-display";
+
 export type PersonaId = "candidates" | "recruiters" | "companies";
 
 export type PricingTier = {
   id: string;
   name: string;
+  /** Shown when `pricePln` is omitted (e.g. Custom). Otherwise set in `getPersonaBundle` from `pricePln`. */
   price: string;
+  /** Whole PLN MSRP; formatted as PLN for Polish UI and USD for other locales. */
+  pricePln?: number;
   cadence: string;
   bullets: string[];
   cta: string;
@@ -98,7 +103,8 @@ const candidatesEn: PersonaBundle = {
     {
       id: "free",
       name: "Free",
-      price: "0",
+      price: "",
+      pricePln: 0,
       cadence: "forever",
       bullets: [
         "Core pipeline: browse, save, dismiss",
@@ -111,7 +117,8 @@ const candidatesEn: PersonaBundle = {
     {
       id: "premium",
       name: "Premium",
-      price: "49 PLN",
+      price: "",
+      pricePln: 49,
       cadence: "per month",
       highlight: true,
       bullets: [
@@ -125,7 +132,8 @@ const candidatesEn: PersonaBundle = {
     {
       id: "pro",
       name: "Pro",
-      price: "99 PLN",
+      price: "",
+      pricePln: 99,
       cadence: "per month",
       bullets: [
         "Everything in Premium",
@@ -201,7 +209,8 @@ const candidatesPl: PersonaBundle = {
     {
       id: "free",
       name: "Free",
-      price: "0",
+      price: "",
+      pricePln: 0,
       cadence: "bezterminowo",
       bullets: [
         "Rdzeń pipeline: przeglądaj, zapisuj, odrzucaj",
@@ -214,7 +223,8 @@ const candidatesPl: PersonaBundle = {
     {
       id: "premium",
       name: "Premium",
-      price: "49 PLN",
+      price: "",
+      pricePln: 49,
       cadence: "miesięcznie",
       highlight: true,
       bullets: [
@@ -228,7 +238,8 @@ const candidatesPl: PersonaBundle = {
     {
       id: "pro",
       name: "Pro",
-      price: "99 PLN",
+      price: "",
+      pricePln: 99,
       cadence: "miesięcznie",
       bullets: [
         "Wszystko z Premium",
@@ -277,7 +288,8 @@ const recruitersEn: PersonaBundle = {
     {
       id: "sourcer",
       name: "Sourcer",
-      price: "149 PLN",
+      price: "",
+      pricePln: 149,
       cadence: "per seat / month",
       bullets: ["1 seat", "Up to 50 shortlist packets / month", "Email support (48h)"],
       cta: "Book sourcer pack",
@@ -286,7 +298,8 @@ const recruitersEn: PersonaBundle = {
     {
       id: "talent",
       name: "Talent team",
-      price: "399 PLN",
+      price: "",
+      pricePln: 399,
       cadence: "per month (5 seats)",
       highlight: true,
       bullets: [
@@ -300,7 +313,8 @@ const recruitersEn: PersonaBundle = {
     {
       id: "rpo",
       name: "RPO desk",
-      price: "990 PLN",
+      price: "",
+      pricePln: 990,
       cadence: "per month (15 seats)",
       bullets: [
         "Includes API roadmap slot for ATS export",
@@ -349,7 +363,8 @@ const recruitersPl: PersonaBundle = {
     {
       id: "sourcer",
       name: "Sourcer",
-      price: "149 PLN",
+      price: "",
+      pricePln: 149,
       cadence: "miejsce / miesiąc",
       bullets: ["1 miejsce", "Do 50 paczek shortlist / mies.", "Support mail (48h)"],
       cta: "Umów pakiet sourcer",
@@ -358,7 +373,8 @@ const recruitersPl: PersonaBundle = {
     {
       id: "talent",
       name: "Zespół talentów",
-      price: "399 PLN",
+      price: "",
+      pricePln: 399,
       cadence: "miesięcznie (5 miejsc)",
       highlight: true,
       bullets: [
@@ -372,7 +388,8 @@ const recruitersPl: PersonaBundle = {
     {
       id: "rpo",
       name: "Biurko RPO",
-      price: "990 PLN",
+      price: "",
+      pricePln: 990,
       cadence: "miesięcznie (15 miejsc)",
       bullets: [
         "Slot na roadmapę API pod eksport ATS",
@@ -421,7 +438,8 @@ const companiesEn: PersonaBundle = {
     {
       id: "growth",
       name: "Growth",
-      price: "2 900 PLN",
+      price: "",
+      pricePln: 2900,
       cadence: "per month (billed annually)",
       bullets: [
         "Single business unit rollout",
@@ -434,7 +452,8 @@ const companiesEn: PersonaBundle = {
     {
       id: "scale",
       name: "Scale",
-      price: "7 900 PLN",
+      price: "",
+      pricePln: 7900,
       cadence: "per month (billed annually)",
       highlight: true,
       bullets: [
@@ -497,7 +516,8 @@ const companiesPl: PersonaBundle = {
     {
       id: "growth",
       name: "Growth",
-      price: "2 900 PLN",
+      price: "",
+      pricePln: 2900,
       cadence: "miesięcznie (fakturowane rocznie)",
       bullets: [
         "Wdrożenie dla jednej jednostki biznesowej",
@@ -510,7 +530,8 @@ const companiesPl: PersonaBundle = {
     {
       id: "scale",
       name: "Scale",
-      price: "7 900 PLN",
+      price: "",
+      pricePln: 7900,
       cadence: "miesięcznie (fakturowane rocznie)",
       highlight: true,
       bullets: [
@@ -552,5 +573,13 @@ export const PERSONA_PAGES: Record<PersonaId, { en: PersonaBundle; pl: PersonaBu
 };
 
 export function getPersonaBundle(persona: PersonaId, locale: string): PersonaBundle {
-  return locale === "pl" ? PERSONA_PAGES[persona].pl : PERSONA_PAGES[persona].en;
+  const raw = locale === "pl" ? PERSONA_PAGES[persona].pl : PERSONA_PAGES[persona].en;
+  return {
+    ...raw,
+    tiers: raw.tiers.map((tier) =>
+      tier.pricePln != null
+        ? { ...tier, price: formatMarketingListPrice(locale, tier.pricePln) }
+        : tier,
+    ),
+  };
 }

@@ -90,6 +90,10 @@ export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
             {t("persona.sectionPricing")}
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[var(--twin-muted-strong)] sm:text-base">{c.pricingLead}</p>
+          <p className="twin-muted mt-2 max-w-3xl text-xs leading-relaxed">{t("persona.pricingCurrencyHint")}</p>
+          {persona === "candidates" ? (
+            <p className="twin-muted mt-2 max-w-3xl text-xs leading-relaxed">{t("persona.pricingStripeLiveNote")}</p>
+          ) : null}
           <ul className="mt-8 grid gap-5 lg:grid-cols-3">
             {c.tiers.map((tier) => (
               <li

@@ -187,9 +187,15 @@ export function LandingStoryJourney() {
               <h2 className="mt-4 max-w-3xl text-3xl font-semibold tracking-[-0.035em] text-[var(--foreground)] sm:text-4xl md:text-[2.75rem] md:leading-[1.08]">
                 {ch.title}
               </h2>
-              <p className="mt-8 max-w-2xl text-base font-medium leading-relaxed text-[var(--twin-muted-strong)] sm:text-lg sm:leading-relaxed">
-                {ch.body}
-              </p>
+              <div className="mt-8 max-w-2xl space-y-4 text-base font-medium leading-relaxed text-[var(--twin-muted-strong)] sm:text-lg sm:leading-relaxed">
+                {ch.body
+                  .split(/\n\n+/)
+                  .map((p) => p.trim())
+                  .filter(Boolean)
+                  .map((para, idx) => (
+                    <p key={idx}>{para}</p>
+                  ))}
+              </div>
             </div>
           </div>
         </section>

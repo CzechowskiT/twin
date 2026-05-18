@@ -45,9 +45,17 @@ Env template: `.env.production.example` in repo root.
 
 ### Public investor metrics (`GET /api/v1/public/mvp-stats`)
 
-Counters are **read from the live database** (validated job rows, users, applications, etc.). `linkedin_oauth_configured` and `stripe_checkout_ready` reflect whether the API host has the corresponding env vars wired — not marketing overrides.
+Counters are **read from the live database** (validated job rows, users, applications, etc.). `validated_jobs` and `validated_jobs_by_board` use the same traction-scope board list (Poland-first adapters + LinkedIn); per-board counts sum to the headline total. `linkedin_oauth_configured` reflects LinkedIn OIDC env wiring. `stripe_checkout_ready` is true only when **`STRIPE_SECRET_KEY` and `STRIPE_PRICE_ID_PREMIUM`** are set (same gate as Checkout — Pro alone is not enough).
 
 To grow the **validated job corpus** toward six figures, use sustained ingestion: Celery worker + beat, higher per-board caps (`SCRAPE_JOBS_PER_BOARD`), and (when appropriate) bulk import — see comments in `app/config.py` around scraping and `docs/DEPLOY.md` Option 2 services.
+
+### Match scoring (optional)
+
+Candidate→job ranking defaults to rule-based v1. Optional layers (field names in `app/config.py`):
+
+- `MATCH_SCORING_V2=true` — small salary-band overlap bonus on top of v1.
+- `MATCHING_V2_TFIDF=true` — bounded TF–IDF cosine similarity (scikit-learn; listed in `backend/requirements.txt`). With both flags set, TF–IDF stacks on v2.
+- `MATCH_JOBS_SCAN_LIMIT` — max newest validated jobs considered per match request (default 4000).
 
 LinkedIn: [LINKEDIN_OAUTH.md](./LINKEDIN_OAUTH.md). Stripe: [STRIPE.md](./STRIPE.md).
 

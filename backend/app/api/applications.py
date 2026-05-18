@@ -46,7 +46,7 @@ from app.services.auto_apply_guards import (
     enforce_job_blocklists,
     record_auto_apply_event,
 )
-from app.services.auto_apply_service import auto_apply_for_user
+from app.services.auto_apply_service import AutoApplyConsentBlocked, auto_apply_for_user
 from app.services.employer_webhook import dispatch_auto_apply_webhook
 from app.services.s3_storage import get_s3_blob_store
 from app.services.idempotency import (
@@ -472,6 +472,8 @@ def auto_apply(
         outcome, message, app = auto_apply_for_user(
             db, user=user, job_id=body.job_id, submit=submit
         )
+    except AutoApplyConsentBlocked as exc:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=exc.detail) from exc
     except Exception:
         logger.exception("auto_apply failed job_id=%s user_id=%s", body.job_id, user.id)
         out = AutoApplyOut(

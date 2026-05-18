@@ -2,14 +2,14 @@
 
 from datetime import datetime, timezone
 
+import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from app.automation.types import ApplyOutcome
 from app.core.security import hash_password
 from app.database.models import Base, Candidate, Job, User
-from app.services.auto_apply_service import auto_apply_for_user
+from app.services.auto_apply_service import AutoApplyConsentBlocked, auto_apply_for_user
 
 
 def _db():
@@ -50,8 +50,7 @@ def test_auto_apply_requires_ai_matching_consent() -> None:
     db.commit()
     db.refresh(j)
 
-    outcome, msg, app = auto_apply_for_user(db, user=u, job_id=j.id, submit=False)
-    assert outcome == ApplyOutcome.FAILED
-    assert "zgód" in msg.lower() or "zgod" in msg.lower()
-    assert app is None
+    with pytest.raises(AutoApplyConsentBlocked) as excinfo:
+        auto_apply_for_user(db, user=u, job_id=j.id, submit=False)
+    assert "zgód" in excinfo.value.detail.lower() or "zgod" in excinfo.value.detail.lower()
     db.close()

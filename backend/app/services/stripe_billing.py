@@ -100,6 +100,56 @@ def configure_stripe(settings: Settings) -> None:
         stripe.api_key = settings.stripe_secret_key
 
 
+def stripe_monthly_list_from_price(settings: Settings, price_id: str) -> tuple[float, str] | None:
+    """Return (amount per month in major currency, ISO currency lower) from a Stripe Price, or None on failure.
+
+    Normalizes yearly (and coarse week/day) recurring prices to an approximate monthly figure for UI parity
+    with Checkout. Does not replace legal invoices — display only.
+    """
+    if not settings.stripe_secret_key.strip() or not price_id.strip():
+        return None
+    configure_stripe(settings)
+    try:
+        price = stripe.Price.retrieve(price_id.strip())
+    except stripe.StripeError as exc:
+        logger.info("Could not load Stripe price %s for plan list: %s", price_id, exc.user_message or exc)
+        return None
+    ua = price.unit_amount
+    if ua is None:
+        return None
+    cur = (price.currency or "usd").lower()
+    major = float(ua) / 100.0
+    rec = price.recurring
+    if not rec:
+        return (round(major, 2), cur)
+    interval = (getattr(rec, "interval", None) or "month").lower()
+    count = int(getattr(rec, "interval_count", None) or 1)
+    if count < 1:
+        count = 1
+    per_month = major
+    if interval == "year":
+        per_month = major / (12 * count)
+    elif interval == "month":
+        per_month = major / count
+    elif interval == "week":
+        per_month = major * (52.0 / 12.0) / count
+    elif interval == "day":
+        per_month = major * (365.25 / 12.0) / count
+    return (round(per_month, 2), cur)
+
+
+def list_price_usd_hint(amount: float, currency_lower: str) -> float:
+    """Map non-USD Stripe list to a USD number for the legacy ``monthly_list_price_usd`` field (display hint only)."""
+    c = currency_lower.lower()
+    if c == "usd":
+        return round(amount, 2)
+    rates_to_usd = {"pln": 1 / 4.05, "eur": 1.08, "gbp": 1.27}
+    rate = rates_to_usd.get(c)
+    if rate:
+        return round(amount * rate, 2)
+    return round(amount, 2)
+
+
 def price_id_for_plan(settings: Settings, plan: str) -> str:
     if plan == "premium":
         if not settings.stripe_price_id_premium:
@@ -119,6 +169,11 @@ def tier_for_price_id(settings: Settings, price_id: str | None) -> str:
         return "premium"
     if settings.stripe_price_id_pro and price_id == settings.stripe_price_id_pro:
         return "pro"
+    logger.warning(
+        "Stripe subscription price id %s does not match STRIPE_PRICE_ID_PREMIUM / STRIPE_PRICE_ID_PRO; "
+        "defaulting plan_tier to premium",
+        price_id,
+    )
     return "premium"
 
 

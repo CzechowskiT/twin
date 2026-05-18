@@ -94,6 +94,12 @@ def test_interview_ics_token_mint_and_shared_download(client: TestClient) -> Non
         payload = mint.json()
         raw = payload["token"]
         assert len(raw) >= 16
+        assert payload["download_path"].endswith(raw)
+        assert payload["https_url"].startswith("http://testserver")
+        assert "ics-shared" in payload["https_url"]
+        assert raw in payload["https_url"]
+        assert payload.get("webcal_url", "").startswith("webcal://testserver")
+        assert raw in (payload.get("webcal_url") or "")
         db.refresh(inv)
         assert inv.ics_access_token_hash == hashlib.sha256(raw.encode("utf-8")).hexdigest()
         assert inv.ics_access_token_expires_at is not None

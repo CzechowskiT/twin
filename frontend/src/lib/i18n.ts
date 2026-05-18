@@ -165,15 +165,15 @@ const en = {
     storyCh1Kicker: "01 · The signal",
     storyCh1Title: "The market scrolls faster than your thumb.",
     storyCh1Body:
-      "Roles scatter across boards, time zones, and group chats. You screenshot, promise yourself you will apply tomorrow, then lose the tab. TWIN begins where that small friction quietly eats ambition.",
+      "Roles scatter across boards, time zones, and group chats. You screenshot, promise yourself you will apply tomorrow, then lose the tab. TWIN begins where that small friction quietly eats ambition.\n\nEvery hop between sites resets context: different logins, filters that never line up the same way twice, and salary bands that read differently depending on the template. The tax is not “hard work”; it is switching cost that never shows up on a spreadsheet.\n\nThe blunt proposition: you should not need a second brain to remember which CV variant lived on which portal, or whether you already hit submit while half asleep on the train.",
     storyCh2Kicker: "02 · The surface",
     storyCh2Title: "One cockpit. Zero tab shame.",
     storyCh2Body:
-      "Aggregate what your workspace allows, score roles when your profile exists, and keep every application in one pipeline. When automation arrives, it stays inside the boundaries you set. Your career is not a black box.",
+      "Aggregate what your workspace allows, score roles when your profile exists, and keep every application in one pipeline. When automation arrives, it stays inside the boundaries you set. Your career is not a black box.\n\nDiscovery stays board-aware: you choose which sources appear, which geographies matter, and how aggressive the feed is when life is busy. Matching layers skills, titles, salary intent, and CV text so scores are something you can argue with—not vibes.\n\nTracking is deliberately boring in a good way: pending, applied, interview, rejected, with notes and timestamps you can trust. Manual apply still opens the employer flow where contracts require it; auto-apply only lands where boards and your plan allow, with consent and audit trails as the default stance—not a footnote.",
     storyCh3Kicker: "03 · The arc",
     storyCh3Title: "Let the work earn the next chapter before the feature parade starts.",
     storyCh3Body:
-      "Each chapter has to earn the next. Phase 1 is a pipeline you can actually trust. Later comes autonomy that shows up in audit trails, exports, and quiet hours, not in hype.",
+      "Each chapter has to earn the next. Phase 1 is a pipeline you can actually trust. Later comes autonomy that shows up in audit trails, exports, and quiet hours, not in hype.\n\nShip order is honest: we widen what software is allowed to do only after you can see receipts—what moved, when, and under which checkbox. Nudges respect calendars; exports exist for the compliance-minded version of you that appears once a quarter.\n\nIf a feature does not reduce drag on your real week, it does not jump ahead of the foundations. The bar is simple: fewer embarrassed “sorry, I missed that thread” messages and fewer 11 p.m. tab archaeology sessions.",
     timelineEyebrow: "Roadmap",
     timelineTitle: "A timeline you can feel",
     timelineSubtitle: "Milestones are ordered to remove drag before adding autonomy.",
@@ -573,6 +573,7 @@ const en = {
     billingPerMonth: "/ month",
     billingListPricesNote:
       "Prices in USD before tax. Checkout is powered by Stripe; your invoice may show proration or local tax.",
+    billingLiveStripeList: "Amount from your Stripe Price (same basis as Checkout).",
     billingPlanCurrent: "Current plan",
     billingPlanOpenWorkspace: "Open workspace",
     billingPlanUpgradeCta: "Upgrade via Stripe",
@@ -608,6 +609,10 @@ const en = {
       "No upcoming interviews in TWIN yet. Open calendar settings to schedule one (saved here and in Google Calendar when connected).",
     calendarNextInterviewJoinLink: "Join meeting link",
     calendarInterviewDownloadIcs: "Download .ics (Apple, Outlook…)",
+    calendarInterviewSubscribeLink: "Copy calendar subscribe link",
+    calendarInterviewSubscribeLinkBusy: "Creating link…",
+    calendarInterviewSubscribeLinkToast: "Subscribe link copied — paste it in Calendar “Subscribe by URL”.",
+    calendarInterviewSubscribeLinkFailed: "Could not create subscribe link.",
     calendarInterviewCancel: "Mark as cancelled",
     calendarInterviewCancelledBadge: "Cancelled",
     calendarPageTitle: "Calendars & availability",
@@ -1035,6 +1040,9 @@ const en = {
     liveStatsOn: "Ready",
     liveStatsOff: "Off",
     liveStatsAsOf: "Snapshot: {ts}",
+    liveStatsJobsByBoard: "Validated feed by board",
+    liveStatsJobsByBoardFoot:
+      "Fixed adapter list for the traction counter; zeros mean no validated rows yet. Per-row counts sum to the headline total.",
     quickScenarios: "Quick scenarios",
     scenarioCurrent: "Current model",
     scenarioCurrentDesc: "10% paying · 5% placement · $4.99/mo (model USD)",
@@ -1400,6 +1408,10 @@ const en = {
     talentPoolLoadMore: "Load more",
     growthRoadmapFootnote:
       "Order of delivery can change; some items may be tier-gated when they ship. Tell us what you would open weekly. It steers the roadmap.",
+    pricingCurrencyHint:
+      "Amounts follow the language menu: Polish → PLN; any other language → USD (illustrative MSRP).",
+    pricingStripeLiveNote:
+      "After you sign in, Dashboard → Billing shows live plan amounts from Stripe; currency and checkout methods there can differ from the illustrative packages on this page.",
   },
   common: {
     language: "Language",
@@ -1495,15 +1507,15 @@ const pl: MessageTree = {
     storyCh1Kicker: "01 · Sygnał",
     storyCh1Title: "Rynek scrolluje szybciej niż kciuk.",
     storyCh1Body:
-      "Oferty rozsypują się po portalach i grupach. Screen, „aplikuję jutro”, znikający tab. TWIN zaczyna tam, gdzie to tarcie po cichu zjada ambicję.",
+      "Oferty rozsypują się po portalach, strefach czasowych i grupach. Screen, „aplikuję jutro”, znikający tab. TWIN zaczyna tam, gdzie to tarcie po cichu zjada ambicję.\n\nKażde przejście między serwisami zeruje kontekst: inne loginy, filtry, które nigdy nie układają się tak samo, i widełki, które wyglądają inaczej w zależności od szablonu. To nie „ciężka praca” — to koszt przełączania, który nie wpisuje się w żaden arkusz.\n\nProste twierdzenie: nie powinieneś potrzebować drugiego mózgu, żeby pamiętać, która wersja CV wylądowała na którym portalu, albo czy już kliknąłeś „Wyślij”, ledwo trzymając się poręczy w pociągu.",
     storyCh2Kicker: "02 · Powierzchnia",
     storyCh2Title: "Jeden cockpit. Zero wstydu z tabów.",
     storyCh2Body:
-      "Agreguj to, co pozwala Twoje środowisko, oceniaj role przy profilu i trzymaj każdą aplikację w jednym pipeline. Gdy pojawi się automatyzacja, zostaje w granicach, które ustawiasz. Twoja kariera nie jest czarną skrzynką.",
+      "Agreguj to, co pozwala Twoje środowisko, oceniaj role przy profilu i trzymaj każdą aplikację w jednym pipeline. Gdy pojawi się automatyzacja, zostaje w granicach, które ustawiasz. Twoja kariera nie jest czarną skrzynką.\n\nOdkrywanie zostaje świadome portali: wybierasz źródła, geografie i to, jak agresywny ma być feed, gdy życie jest zapchane. Scoring składa umiejętności, tytuły, intencję płacową i tekst CV — żeby wynik dało się kwestionować, a nie tylko „poczuć”.\n\nŚledzenie jest celowo nudne w dobrym sensie: pending, applied, interview, rejected, z notatkami i znacznikami czasu, którym można zaufać. Ręczne „Aplikuj” nadal otwiera flow pracodawcy tam, gdzie wymagają tego umowy; auto-aplikacja tylko tam, gdzie portal i plan na to pozwalają — ze zgodą i śladem audytu jako domyślną postawą, nie przypisem od prawnika.",
     storyCh3Kicker: "03 · Łuk",
     storyCh3Title: "Zasłuż na przewagę, zanim poleci kolejny feature.",
     storyCh3Body:
-      "Każdy rozdział musi zasłużyć na następny. Faza 1 to pipeline, któremu można zaufać. Potem autonomia, która pokazuje się w logach, eksportach i ciszy nocnej, a nie w hasełkach marketingowych.",
+      "Każdy rozdział musi zasłużyć na następny. Faza 1 to pipeline, któremu można zaufać. Potem autonomia, która pokazuje się w logach, eksportach i ciszy nocnej, a nie w hasełkach marketingowych.\n\nKolejność wdrożeń jest uczciwa: poszerzamy pole działania kodu dopiero wtedy, gdy widać paragony — co się zmieniło, kiedy i pod którym checkboxem. Przypomnienia szanują kalendarz; eksporty są dla tej wersji Ciebie, która raz na kwartał patrzy na compliance.\n\nJeśli funkcja nie skraca tarcia w realnym tygodniu, nie wyprzedza fundamentów. Liczy się mniej wstydliwych „przepraszam, przeoczyłem wątek” i mniej archeologii kart o 23:00.",
     timelineEyebrow: "Roadmapa",
     timelineTitle: "Oś czasu, którą czuć",
     timelineSubtitle: "Kolejność kamieni milowych usuwa tarcie, zanim dołożymy autonomię.",
@@ -1904,6 +1916,7 @@ const pl: MessageTree = {
     billingPerMonth: "/ miesiąc",
     billingListPricesNote:
       "Kwoty w USD przed podatkiem. Checkout przez Stripe; na fakturze mogą pojawić się proration lub lokalny VAT.",
+    billingLiveStripeList: "Kwota z Price w Stripe (ta sama baza co Checkout).",
     billingPlanCurrent: "Obecny plan",
     billingPlanOpenWorkspace: "Otwórz workspace",
     billingPlanUpgradeCta: "Upgrade przez Stripe",
@@ -1939,6 +1952,10 @@ const pl: MessageTree = {
       "Brak nadchodzących rozmów w TWIN. Otwórz kalendarz, żeby zaplanować slot (zapis tutaj i w Google Calendar po połączeniu).",
     calendarNextInterviewJoinLink: "Link do rozmowy",
     calendarInterviewDownloadIcs: "Pobierz .ics (Apple, Outlook…)",
+    calendarInterviewSubscribeLink: "Skopiuj link subskrypcji kalendarza",
+    calendarInterviewSubscribeLinkBusy: "Tworzenie linku…",
+    calendarInterviewSubscribeLinkToast: "Skopiowano link subskrypcji — wklej go w kalendarzu (subskrypcja po URL).",
+    calendarInterviewSubscribeLinkFailed: "Nie udało się utworzyć linku subskrypcji.",
     calendarInterviewCancel: "Oznacz jako odwołane",
     calendarInterviewCancelledBadge: "Odwołane",
     calendarPageTitle: "Kalendarze i dostępność",
@@ -2379,6 +2396,9 @@ const pl: MessageTree = {
     liveStatsOn: "Aktywne",
     liveStatsOff: "Wyłączone",
     liveStatsAsOf: "Migawka: {ts}",
+    liveStatsJobsByBoard: "Rdzeń ofert wg portalu",
+    liveStatsJobsByBoardFoot:
+      "Stała lista adapterów dla licznika traction; zero = brak zwalidowanych wierszy. Suma wierszy = nagłówek.",
     quickScenarios: "Szybkie scenariusze",
     scenarioCurrent: "Model bazowy",
     scenarioCurrentDesc: "10% płaci · 5% placement · 4,99 USD/mies. (model USD)",
@@ -2711,6 +2731,10 @@ const pl: MessageTree = {
     talentPoolLoadMore: "Załaduj więcej",
     growthRoadmapFootnote:
       "Kolejność wdrożeń może się zmieniać; część funkcji może być powiązana z planem po starcie. Napisz, co otwierałbyś co tydzień: to ustawia roadmapę.",
+    pricingCurrencyHint:
+      "Kwoty zależą od języka interfejsu: polski → PLN; pozostałe → USD (orientacyjne MSRP).",
+    pricingStripeLiveNote:
+      "Po zalogowaniu w Panel → Rozliczenia zobaczysz żywe kwoty planów ze Stripe; waluta i metody płatności przy kasie mogą różnić się od orientacyjnych pakietów na tej stronie.",
   },
   first1000: {
     kicker: "Krąg founderski · na żywo",

@@ -43,6 +43,14 @@ def test_public_mvp_stats_shape_empty(_mock_li: object, _mock_stripe: object) ->
         assert res.status_code == 200
         body = res.json()
         assert body["validated_jobs"] == 0
+        assert body["validated_jobs_by_board"] == [
+            {"job_board": "pracuj.pl", "count": 0},
+            {"job_board": "rocketjobs.pl", "count": 0},
+            {"job_board": "justjoin.it", "count": 0},
+            {"job_board": "praca.pl", "count": 0},
+            {"job_board": "indeed.pl", "count": 0},
+            {"job_board": "linkedin.com", "count": 0},
+        ]
         assert body["registered_users"] == 0
         assert body["total_applications"] == 0
         assert body["profiles_with_cv"] == 0
@@ -94,7 +102,12 @@ def test_public_mvp_stats_validated_jobs_excludes_bulk_global_boards(_mock_li: o
         client = TestClient(app)
         res = client.get("/api/v1/public/mvp-stats")
         assert res.status_code == 200
-        assert res.json()["validated_jobs"] == 1
+        body = res.json()
+        assert body["validated_jobs"] == 1
+        by = {r["job_board"]: r["count"] for r in body["validated_jobs_by_board"]}
+        assert by["pracuj.pl"] == 1
+        assert by["rocketjobs.pl"] == 0
+        assert sum(r["count"] for r in body["validated_jobs_by_board"]) == 1
     finally:
         app.dependency_overrides.pop(get_db, None)
         db.close()
@@ -165,11 +178,73 @@ def test_public_mvp_stats_counts(_mock_li: object, _mock_stripe: object) -> None
         assert res.status_code == 200
         body = res.json()
         assert body["validated_jobs"] == 1
+        assert {r["job_board"]: r["count"] for r in body["validated_jobs_by_board"]}["pracuj.pl"] == 1
+        assert sum(r["count"] for r in body["validated_jobs_by_board"]) == 1
         assert body["registered_users"] == 1
         assert body["total_applications"] == 1
         assert body["profiles_with_cv"] == 1
         assert body["linkedin_oauth_configured"] is False
         assert body["stripe_checkout_ready"] is False
+    finally:
+        app.dependency_overrides.pop(get_db, None)
+        db.close()
+
+
+@patch("app.api.public._stripe_checkout_ready", return_value=False)
+@patch("app.api.public.is_linkedin_oauth_configured", return_value=False)
+def test_public_mvp_stats_validated_jobs_by_board_multi(_mock_li: object, _mock_stripe: object) -> None:
+    db = _sqlite()
+    db.add(
+        Job(
+            job_board="pracuj.pl",
+            external_id="p1",
+            title="A",
+            company="C",
+            url="https://ex/p1",
+            is_validated=True,
+        )
+    )
+    db.add(
+        Job(
+            job_board="pracuj.pl",
+            external_id="p2",
+            title="B",
+            company="C",
+            url="https://ex/p2",
+            is_validated=True,
+        )
+    )
+    db.add(
+        Job(
+            job_board="linkedin.com",
+            external_id="l1",
+            title="L",
+            company="C",
+            url="https://ex/l1",
+            is_validated=True,
+        )
+    )
+    db.commit()
+
+    def override_db():
+        try:
+            yield db
+        finally:
+            pass
+
+    app.dependency_overrides[get_db] = override_db
+    try:
+        client = TestClient(app)
+        res = client.get("/api/v1/public/mvp-stats")
+        assert res.status_code == 200
+        body = res.json()
+        assert body["validated_jobs"] == 3
+        by = {r["job_board"]: r["count"] for r in body["validated_jobs_by_board"]}
+        assert by["pracuj.pl"] == 2
+        assert by["linkedin.com"] == 1
+        assert by["rocketjobs.pl"] == 0
+        assert len(body["validated_jobs_by_board"]) == 6
+        assert sum(r["count"] for r in body["validated_jobs_by_board"]) == 3
     finally:
         app.dependency_overrides.pop(get_db, None)
         db.close()

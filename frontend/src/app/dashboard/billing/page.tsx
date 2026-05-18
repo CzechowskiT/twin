@@ -7,6 +7,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
+import type { PlanOut, PlansPublicResponse } from "@/lib/api-types";
 import { clearToken, getToken } from "@/lib/auth";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -18,22 +19,6 @@ type Me = {
   subscription_current_period_end: string | null;
   billing_company_name?: string | null;
   billing_tax_id?: string | null;
-};
-
-type PlanRow = {
-  id: string;
-  name: string;
-  description: string;
-  max_tracked_applications: number | null;
-  stripe_price_configured: boolean;
-  monthly_list_price_usd: number;
-};
-
-type PlansPayload = {
-  plans: PlanRow[];
-  checkout_configured: boolean;
-  checkout_payment_methods: string[];
-  payment_methods_note: string;
 };
 
 const PLAN_PRICE_FALLBACK_USD: Record<string, number> = {
@@ -51,7 +36,24 @@ function formatUsdListMonthly(n: number): string {
   }).format(n);
 }
 
-function normalizePlansPayload(raw: unknown): PlansPayload {
+function formatPlanListMonthly(
+  locale: string,
+  fallbackUsd: number,
+  live: { amount: number; currency: string } | null,
+): string {
+  const loc = locale === "pl" ? "pl-PL" : "en-US";
+  if (live && live.currency.length === 3) {
+    return new Intl.NumberFormat(loc, {
+      style: "currency",
+      currency: live.currency,
+      minimumFractionDigits: live.amount % 1 === 0 ? 0 : 2,
+      maximumFractionDigits: 2,
+    }).format(live.amount);
+  }
+  return formatUsdListMonthly(fallbackUsd);
+}
+
+function normalizePlansPayload(raw: unknown): PlansPublicResponse {
   if (raw == null || typeof raw !== "object") {
     return {
       plans: [],
@@ -62,7 +64,7 @@ function normalizePlansPayload(raw: unknown): PlansPayload {
   }
   const o = raw as Record<string, unknown>;
   const rawPlans = Array.isArray(o.plans) ? o.plans : [];
-  const plans: PlanRow[] = [];
+  const plans: PlanOut[] = [];
   for (const row of rawPlans) {
     if (row == null || typeof row !== "object") continue;
     const r = row as Record<string, unknown>;
@@ -73,6 +75,14 @@ function normalizePlansPayload(raw: unknown): PlansPayload {
       monthly = r.monthly_list_price_usd;
     } else if (PLAN_PRICE_FALLBACK_USD[id] != null) {
       monthly = PLAN_PRICE_FALLBACK_USD[id];
+    }
+    let liveAmt: number | null = null;
+    let liveCur: string | null = null;
+    if (typeof r.list_price_monthly === "number" && Number.isFinite(r.list_price_monthly) && r.list_price_monthly >= 0) {
+      liveAmt = r.list_price_monthly;
+    }
+    if (typeof r.list_price_currency === "string" && /^[A-Za-z]{3}$/.test(r.list_price_currency.trim())) {
+      liveCur = r.list_price_currency.trim().toUpperCase();
     }
     plans.push({
       id,
@@ -86,6 +96,8 @@ function normalizePlansPayload(raw: unknown): PlansPayload {
             : null,
       stripe_price_configured: Boolean(r.stripe_price_configured),
       monthly_list_price_usd: monthly,
+      list_price_monthly: liveAmt,
+      list_price_currency: liveCur,
     });
   }
   const pm = o.checkout_payment_methods;
@@ -163,7 +175,7 @@ export default function BillingPage() {
   const { t, locale } = useTranslation();
   const router = useRouter();
   const [me, setMe] = useState<Me | null>(null);
-  const [plans, setPlans] = useState<PlansPayload | null>(null);
+  const [plans, setPlans] = useState<PlansPublicResponse | null>(null);
   const [actionError, setActionError] = useState(false);
   const [loadFailed, setLoadFailed] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -186,7 +198,7 @@ export default function BillingPage() {
 
     const [meRes, plansRes] = await Promise.allSettled([
       apiFetch<Me>("/api/v1/auth/me", {}, token),
-      apiFetch<PlansPayload>("/api/v1/billing/plans", { method: "GET" }),
+      apiFetch<PlansPublicResponse>("/api/v1/billing/plans", { method: "GET" }),
     ]);
 
     let anyLoadFailure = false;
@@ -469,13 +481,13 @@ export default function BillingPage() {
           <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
             {t("dashboard.billingPlansTitle")}
           </p>
-          {plans.checkout_payment_methods.length > 0 ? (
+          {(plans.checkout_payment_methods ?? []).length > 0 ? (
             <div className="mt-4 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/50 p-3 sm:p-4">
               <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
                 {t("dashboard.billingCheckoutMethodsEyebrow")}
               </p>
               <ul className="mt-2 flex flex-wrap gap-2">
-                {plans.checkout_payment_methods.map((m) => {
+                {(plans.checkout_payment_methods ?? []).map((m) => {
                   const key = stripeCheckoutMethodLabel(m);
                   const label = key ? t(key) : `${t("dashboard.billingPmGeneric")} (${m})`;
                   return (
@@ -488,7 +500,7 @@ export default function BillingPage() {
                   );
                 })}
               </ul>
-              {plans.checkout_payment_methods.includes("card") ? (
+              {(plans.checkout_payment_methods ?? []).includes("card") ? (
                 <p className="twin-muted mt-2 text-xs leading-relaxed">{t("dashboard.billingWalletsHint")}</p>
               ) : null}
               {locale === "en" && plans.payment_methods_note ? (
@@ -548,11 +560,20 @@ export default function BillingPage() {
                           <div className="flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-4">
                             <p className="text-lg font-semibold capitalize text-[var(--foreground)]">{p.name}</p>
                             <p className="text-2xl font-bold tracking-tight text-[var(--twin-accent)] sm:text-3xl">
-                              {formatUsdListMonthly(p.monthly_list_price_usd)}
+                              {formatPlanListMonthly(
+                                locale,
+                                p.monthly_list_price_usd,
+                                p.list_price_monthly != null && p.list_price_currency
+                                  ? { amount: p.list_price_monthly, currency: p.list_price_currency }
+                                  : null,
+                              )}
                               <span className="ml-1.5 text-sm font-medium text-[var(--twin-muted-strong)]">
                                 {t("dashboard.billingPerMonth")}
                               </span>
                             </p>
+                            {p.list_price_monthly != null && p.list_price_currency ? (
+                              <p className="text-[11px] font-medium text-[var(--twin-muted)]">{t("dashboard.billingLiveStripeList")}</p>
+                            ) : null}
                           </div>
                           <p className="mt-2 text-sm leading-relaxed text-[var(--twin-muted-strong)]">{p.description}</p>
                           <p className="mt-2 text-xs text-[var(--twin-muted)]">

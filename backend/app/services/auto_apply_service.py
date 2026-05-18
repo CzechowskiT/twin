@@ -23,6 +23,14 @@ from app.services.s3_storage import get_s3_blob_store
 logger = logging.getLogger(__name__)
 
 
+class AutoApplyConsentBlocked(Exception):
+    """Raised before Playwright when required account consents are missing (API maps to HTTP 403)."""
+
+    def __init__(self, detail: str):
+        self.detail = detail
+        super().__init__(detail)
+
+
 def _job_context_text(job: Job) -> str:
     parts: list[str] = []
     if job.description:
@@ -97,11 +105,9 @@ def auto_apply_for_user(
         or user.job_data_processing_consent_at is None
         or user.ai_matching_consent_at is None
     ):
-        return (
-            ApplyOutcome.FAILED,
+        raise AutoApplyConsentBlocked(
             "Brak wymaganych zgód konta (RODO, regulamin, przetwarzanie danych o ofertach, dopasowanie AI). "
-            "Uzupełnij je w profilu lub przy rejestracji — auto-apply ich wymaga.",
-            None,
+            "Uzupełnij je w profilu lub przy rejestracji — auto-apply ich wymaga."
         )
 
     cv_text = _cv_text_for_apply(candidate)

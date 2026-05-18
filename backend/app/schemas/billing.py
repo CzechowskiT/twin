@@ -1,6 +1,5 @@
 """Public billing / plan payloads."""
 
-from datetime import datetime
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -18,7 +17,20 @@ class PlanOut(BaseModel):
     monthly_list_price_usd: float = Field(
         ...,
         ge=0,
-        description="Marketing list price per month in USD for UI; Stripe Checkout uses configured price IDs.",
+        description=(
+            "Rough monthly amount in USD for legacy clients: when Stripe exposes a live price in another "
+            "currency, this is an illustrative USD conversion; Checkout still charges the configured Price IDs."
+        ),
+    )
+    list_price_monthly: float | None = Field(
+        default=None,
+        description="Monthly list from Stripe Price when retrievable (major currency units); null uses fallback only.",
+    )
+    list_price_currency: str | None = Field(
+        default=None,
+        min_length=3,
+        max_length=3,
+        description="ISO 4217 uppercase (e.g. USD, PLN) when list_price_monthly is set.",
     )
 
 

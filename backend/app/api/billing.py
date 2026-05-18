@@ -43,6 +43,44 @@ def _checkout_configured(settings: Settings) -> bool:
     return bool(settings.stripe_secret_key and settings.stripe_price_id_premium)
 
 
+def _plan_row(
+    settings: Settings,
+    *,
+    id: str,
+    name: str,
+    description: str,
+    max_tracked: int | None,
+    stripe_price_configured: bool,
+    price_id: str,
+    fallback_usd: float,
+) -> PlanOut:
+    live: tuple[float, str] | None = None
+    if stripe_price_configured and price_id.strip() and settings.stripe_secret_key.strip():
+        live = stripe_svc.stripe_monthly_list_from_price(settings, price_id.strip())
+    if live:
+        amt, cur = live
+        return PlanOut(
+            id=id,
+            name=name,
+            description=description,
+            max_tracked_applications=max_tracked,
+            stripe_price_configured=stripe_price_configured,
+            monthly_list_price_usd=stripe_svc.list_price_usd_hint(amt, cur),
+            list_price_monthly=amt,
+            list_price_currency=cur.upper(),
+        )
+    return PlanOut(
+        id=id,
+        name=name,
+        description=description,
+        max_tracked_applications=max_tracked,
+        stripe_price_configured=stripe_price_configured,
+        monthly_list_price_usd=fallback_usd,
+        list_price_monthly=None,
+        list_price_currency=None,
+    )
+
+
 @router.get("/plans", response_model=PlansPublicResponse)
 def list_plans(settings: Annotated[Settings, Depends(get_settings)]) -> PlansPublicResponse:
     premium_ready = bool(settings.stripe_price_id_premium)
@@ -54,29 +92,35 @@ def list_plans(settings: Annotated[Settings, Depends(get_settings)]) -> PlansPub
         checkout_payment_methods=pm_types,
         payment_methods_note=pm_note,
         plans=[
-            PlanOut(
+            _plan_row(
+                settings,
                 id="free",
                 name="Free",
                 description="Core pipeline: discover roles, track applications, stay GDPR-first.",
-                max_tracked_applications=25,
+                max_tracked=25,
                 stripe_price_configured=False,
-                monthly_list_price_usd=0.0,
+                price_id="",
+                fallback_usd=0.0,
             ),
-            PlanOut(
+            _plan_row(
+                settings,
                 id="premium",
                 name="Premium",
                 description="Unlimited tracked applications, auto-apply where boards allow, priority roadmap.",
-                max_tracked_applications=None,
+                max_tracked=None,
                 stripe_price_configured=premium_ready,
-                monthly_list_price_usd=4.99,
+                price_id=settings.stripe_price_id_premium,
+                fallback_usd=4.99,
             ),
-            PlanOut(
+            _plan_row(
+                settings,
                 id="pro",
                 name="Pro",
                 description="Same entitlements as Premium today; reserved for team billing and higher limits.",
-                max_tracked_applications=None,
+                max_tracked=None,
                 stripe_price_configured=pro_ready,
-                monthly_list_price_usd=9.99,
+                price_id=settings.stripe_price_id_pro,
+                fallback_usd=9.99,
             ),
         ],
     )

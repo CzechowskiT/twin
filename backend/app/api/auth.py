@@ -450,11 +450,10 @@ def web_oauth_login(provider: WebOAuthProvider) -> RedirectResponse:
     return RedirectResponse(url, status_code=302)
 
 
-@router.api_route("/{provider}/callback", methods=["GET", "POST"])
-async def web_oauth_callback(
+async def _web_oauth_callback_impl(
     request: Request,
     provider: WebOAuthProvider,
-    db: Session = Depends(get_db),
+    db: Session,
 ) -> RedirectResponse:
     slug = provider.value
     code, state, error, apple_user = await _read_web_oauth_callback(request)
@@ -481,3 +480,21 @@ async def web_oauth_callback(
         params["next"] = "/profile"
         params["oauth"] = "1"
     return RedirectResponse(_frontend_callback_url(**params), status_code=302)
+
+
+@router.get("/{provider}/callback", operation_id="web_oauth_callback_get")
+async def web_oauth_callback_get(
+    request: Request,
+    provider: WebOAuthProvider,
+    db: Session = Depends(get_db),
+) -> RedirectResponse:
+    return await _web_oauth_callback_impl(request, provider, db)
+
+
+@router.post("/{provider}/callback", operation_id="web_oauth_callback_post")
+async def web_oauth_callback_post(
+    request: Request,
+    provider: WebOAuthProvider,
+    db: Session = Depends(get_db),
+) -> RedirectResponse:
+    return await _web_oauth_callback_impl(request, provider, db)

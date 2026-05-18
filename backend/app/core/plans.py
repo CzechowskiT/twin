@@ -19,7 +19,7 @@ ACTIVE_SUBSCRIPTION_STATUSES = frozenset({"active", "trialing", "past_due"})
 
 
 def effective_plan_tier(user: User) -> PlanTier:
-    """Paid tier only while Stripe subscription is active or trialing."""
+    """Paid tier while Stripe subscription is active, trialing, or past_due (see ACTIVE_SUBSCRIPTION_STATUSES)."""
     status = getattr(user, "subscription_status", None)
     if status in ACTIVE_SUBSCRIPTION_STATUSES:
         raw = (getattr(user, "plan_tier", None) or "premium").lower()

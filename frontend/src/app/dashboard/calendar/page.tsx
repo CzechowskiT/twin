@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Shell } from "@/components/ui";
@@ -45,6 +46,14 @@ type ScheduledInterview = {
   calendar_event_id: string | null;
 };
 
+type InterviewIcsShareOut = {
+  token: string;
+  expires_at: string;
+  download_path: string;
+  https_url: string;
+  webcal_url: string | null;
+};
+
 function isoToDatetimeLocalValue(iso: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
@@ -85,6 +94,17 @@ async function cancelInterviewRequest(interviewId: number): Promise<void> {
   await apiFetch(`/api/v1/calendar/interviews/${interviewId}/cancel`, { method: "POST", body: "{}" }, token);
 }
 
+async function mintInterviewSubscribeUrl(interviewId: number): Promise<string> {
+  const token = getToken();
+  if (!token) throw new Error("Not signed in");
+  const out = await apiFetch<InterviewIcsShareOut>(
+    `/api/v1/calendar/interviews/${interviewId}/ics-token`,
+    { method: "POST", body: "{}" },
+    token,
+  );
+  return (out.webcal_url || out.https_url).trim();
+}
+
 export default function DashboardCalendarPage() {
   const { t, locale } = useTranslation();
   const router = useRouter();
@@ -105,6 +125,7 @@ export default function DashboardCalendarPage() {
   const [startLocal, setStartLocal] = useState("");
   const [endLocal, setEndLocal] = useState("");
   const [icsBusyId, setIcsBusyId] = useState<number | null>(null);
+  const [subscribeBusyId, setSubscribeBusyId] = useState<number | null>(null);
   const [cancelBusyId, setCancelBusyId] = useState<number | null>(null);
   const [showCancelledInterviews, setShowCancelledInterviews] = useState(false);
   const [emailProductUpdates, setEmailProductUpdates] = useState(false);
@@ -632,7 +653,7 @@ export default function DashboardCalendarPage() {
                       <button
                         type="button"
                         className="twin-link text-xs font-medium"
-                        disabled={icsBusyId === row.id || row.status === "cancelled"}
+                        disabled={icsBusyId === row.id || subscribeBusyId === row.id || row.status === "cancelled"}
                         onClick={() => {
                           void (async () => {
                             setIcsBusyId(row.id);
@@ -648,6 +669,32 @@ export default function DashboardCalendarPage() {
                         }}
                       >
                         {icsBusyId === row.id ? "…" : t("dashboard.calendarInterviewDownloadIcs")}
+                      </button>
+                      <button
+                        type="button"
+                        className="twin-link text-xs font-medium"
+                        disabled={
+                          icsBusyId === row.id || subscribeBusyId === row.id || row.status === "cancelled"
+                        }
+                        onClick={() => {
+                          void (async () => {
+                            setSubscribeBusyId(row.id);
+                            try {
+                              const url = await mintInterviewSubscribeUrl(row.id);
+                              await navigator.clipboard.writeText(url);
+                              toast.success(t("dashboard.calendarInterviewSubscribeLinkToast"));
+                            } catch (e) {
+                              console.warn("[calendar] subscribe link mint failed", e);
+                              toast.error(t("dashboard.calendarInterviewSubscribeLinkFailed"));
+                            } finally {
+                              setSubscribeBusyId(null);
+                            }
+                          })();
+                        }}
+                      >
+                        {subscribeBusyId === row.id
+                          ? t("dashboard.calendarInterviewSubscribeLinkBusy")
+                          : t("dashboard.calendarInterviewSubscribeLink")}
                       </button>
                       {row.status !== "cancelled" ? (
                         <button
