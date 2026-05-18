@@ -33,7 +33,11 @@ celery_app.conf.task_eager_propagates = True
 
 
 def _configure_beat_schedule() -> None:
-    """Optional daily scrape-all when SCRAPE_BEAT_ENABLED=true (run `celery -A app.tasks.celery_app beat`)."""
+    """Optional daily scrape-all when SCRAPE_BEAT_ENABLED=true (run `celery -A app.tasks.celery_app beat`).
+
+    Interview reminder email (`app.tasks.reminder_tasks.send_interview_reminder_email`) is not on the
+    default beat schedule: add an entry only after batching which interviews to nudge (args/kwargs).
+    """
     from celery.schedules import crontab
 
     s = get_settings()
@@ -47,6 +51,12 @@ def _configure_beat_schedule() -> None:
             "schedule": crontab(hour=hour, minute=12),
         },
     }
+    # Example only — uncomment after wiring batch selection (never pass a stale hard-coded id):
+    # celery_app.conf.beat_schedule["interview-reminder-email"] = {
+    #     "task": "app.tasks.reminder_tasks.send_interview_reminder_email",
+    #     "schedule": crontab(minute=30),
+    #     "args": (0,),
+    # }
 
 
 _configure_beat_schedule()
