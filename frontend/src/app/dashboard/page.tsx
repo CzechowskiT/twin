@@ -16,7 +16,7 @@ import { useTranslation } from "@/components/language-provider";
 import { JobFiltersBar } from "@/components/job-filters";
 import { JobList } from "@/components/job-list";
 import { ButtonCta, Card, Shell } from "@/components/ui";
-import { apiFetch, isLikelyBrowserNetworkFailureMessage } from "@/lib/api";
+import { apiFetch, apiFetchBlob, isLikelyBrowserNetworkFailureMessage, saveBlobAsFile } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
 import { SHOW_SCRAPE_UI } from "@/lib/features";
 import type { TranslationKey } from "@/lib/i18n";
@@ -73,6 +73,7 @@ type GoogleCalendarStrip = { connected: boolean; google_email: string | null };
 type DashboardCalendarBundle = {
   status: GoogleCalendarStrip;
   nextInterview: {
+    id: number;
     company_name: string;
     job_title: string;
     interview_start: string;
@@ -140,6 +141,7 @@ export default function DashboardPage() {
   const [placementFlowBusy, setPlacementFlowBusy] = useState<PlacementFlowBusy>(null);
   const [placementEventsInvalidateKey, setPlacementEventsInvalidateKey] = useState(0);
   const [dashboardCalendarBundle, setDashboardCalendarBundle] = useState<DashboardCalendarBundle | null>(null);
+  const [nextInterviewIcsBusy, setNextInterviewIcsBusy] = useState(false);
 
   const loadJobs = useCallback(async (token: string, activeFilters: JobFilters) => {
     return apiFetch<JobList>(`/api/v1/jobs/${buildJobsQuery(activeFilters)}`, {}, token);
@@ -166,29 +168,29 @@ export default function DashboardPage() {
     try {
       const s = await apiFetch<GoogleCalendarStrip>("/api/v1/calendar/google/status", {}, token);
       let nextInterview: DashboardCalendarBundle["nextInterview"] = null;
-      if (s.connected) {
-        try {
-          const rows = await apiFetch<
-            {
-              company_name: string;
-              job_title: string;
-              interview_start: string;
-              interview_end: string;
-              status: string;
-            }[]
-          >("/api/v1/calendar/google/interviews", {}, token);
-          const pick = rows[0];
-          if (pick && pick.status !== "cancelled") {
-            nextInterview = {
-              company_name: pick.company_name,
-              job_title: pick.job_title,
-              interview_start: pick.interview_start,
-              interview_end: pick.interview_end,
-            };
-          }
-        } catch {
-          nextInterview = null;
+      try {
+        const rows = await apiFetch<
+          {
+            id: number;
+            company_name: string;
+            job_title: string;
+            interview_start: string;
+            interview_end: string;
+            status: string;
+          }[]
+        >("/api/v1/calendar/google/interviews", {}, token);
+        const pick = rows[0];
+        if (pick && pick.status !== "cancelled") {
+          nextInterview = {
+            id: pick.id,
+            company_name: pick.company_name,
+            job_title: pick.job_title,
+            interview_start: pick.interview_start,
+            interview_end: pick.interview_end,
+          };
         }
+      } catch {
+        nextInterview = null;
       }
       setDashboardCalendarBundle({ status: s, nextInterview });
     } catch {
@@ -671,7 +673,8 @@ export default function DashboardPage() {
                         )
                       : t("dashboard.calendarStripDisconnected")}
                 </p>
-                {dashboardCalendarBundle?.status.connected ? (
+                {dashboardCalendarBundle &&
+                (dashboardCalendarBundle.nextInterview || dashboardCalendarBundle.status.connected) ? (
                   <div className="mt-3 border-t border-[var(--twin-border)] pt-3">
                     <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
                       {t("dashboard.calendarNextInterviewTitle")}
@@ -692,6 +695,33 @@ export default function DashboardPage() {
                             locale,
                           )}
                         </p>
+                        <button
+                          type="button"
+                          disabled={nextInterviewIcsBusy}
+                          className="twin-link mt-2 text-xs font-medium"
+                          onClick={() => {
+                            void (async () => {
+                              const token = getToken();
+                              const ni = dashboardCalendarBundle.nextInterview;
+                              if (!token || !ni) return;
+                              setNextInterviewIcsBusy(true);
+                              try {
+                                const blob = await apiFetchBlob(
+                                  `/api/v1/calendar/interviews/${ni.id}/ics`,
+                                  {},
+                                  token,
+                                );
+                                saveBlobAsFile(blob, `twin-interview-${ni.id}.ics`);
+                              } catch {
+                                /* optional: surface via setError */
+                              } finally {
+                                setNextInterviewIcsBusy(false);
+                              }
+                            })();
+                          }}
+                        >
+                          {nextInterviewIcsBusy ? "…" : t("dashboard.calendarInterviewDownloadIcs")}
+                        </button>
                       </>
                     ) : (
                       <p className="twin-muted mt-1.5 text-xs leading-relaxed">

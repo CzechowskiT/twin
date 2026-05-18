@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, Response
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Session
 
@@ -24,6 +24,7 @@ from app.services.google_calendar_oauth import (
     is_google_calendar_oauth_configured,
     refresh_google_calendar_access_token,
 )
+from app.services.ics_export import scheduled_interview_to_ics
 from app.services.token_crypto import decrypt_secret, encrypt_secret
 
 router = APIRouter()
@@ -366,6 +367,36 @@ def google_calendar_list_interviews(
         .all()
     )
     return rows
+
+
+@router.get("/interviews/{interview_id}/ics")
+def download_interview_ics(
+    interview_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> Response:
+    """Download a single interview as .ics (Apple Calendar, Outlook, etc.) — DB-backed, no Google token required."""
+    row = (
+        db.query(ScheduledInterview)
+        .filter(
+            ScheduledInterview.id == interview_id,
+            ScheduledInterview.user_id == current_user.id,
+        )
+        .first()
+    )
+    if row is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Interview not found")
+    if row.status == "cancelled":
+        raise HTTPException(status.HTTP_410_GONE, detail="Interview was cancelled")
+    body = scheduled_interview_to_ics(row)
+    return Response(
+        content=body.encode("utf-8"),
+        media_type="text/calendar; charset=utf-8",
+        headers={
+            "Content-Disposition": f'attachment; filename="twin-interview-{interview_id}.ics"',
+            "Cache-Control": "private, no-store",
+        },
+    )
 
 
 @router.post("/google/interviews", response_model=ScheduledInterviewOut)

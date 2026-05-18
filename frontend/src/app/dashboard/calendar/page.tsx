@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Shell } from "@/components/ui";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, apiFetchBlob, saveBlobAsFile } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
 
 type CalendarStatus = {
@@ -68,6 +68,12 @@ function formatInterviewRange(isoStart: string, isoEnd: string, locale: string):
   return `${a.toLocaleString(locale, opts)} → ${b.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })}`;
 }
 
+async function downloadInterviewIcs(interviewId: number): Promise<Blob> {
+  const token = getToken();
+  if (!token) throw new Error("Not signed in");
+  return apiFetchBlob(`/api/v1/calendar/interviews/${interviewId}/ics`, {}, token);
+}
+
 export default function DashboardCalendarPage() {
   const { t, locale } = useTranslation();
   const router = useRouter();
@@ -87,6 +93,7 @@ export default function DashboardCalendarPage() {
   const [interviewerEmail, setInterviewerEmail] = useState("");
   const [startLocal, setStartLocal] = useState("");
   const [endLocal, setEndLocal] = useState("");
+  const [icsBusyId, setIcsBusyId] = useState<number | null>(null);
 
   const load = useCallback(async () => {
     const token = getToken();
@@ -438,14 +445,36 @@ export default function DashboardCalendarPage() {
                 {interviews.map((row) => (
                   <li
                     key={row.id}
-                    className="rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-2)] px-3 py-2 text-sm text-[var(--foreground)]"
+                    className="flex flex-col gap-2 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-2)] px-3 py-2 text-sm text-[var(--foreground)] sm:flex-row sm:items-center sm:justify-between"
                   >
-                    <span className="font-medium">
-                      {row.company_name} — {row.job_title}
-                    </span>
-                    <span className="twin-muted mt-1 block text-xs">
-                      {formatInterviewRange(row.interview_start, row.interview_end, loc)}
-                    </span>
+                    <div className="min-w-0">
+                      <span className="font-medium">
+                        {row.company_name} — {row.job_title}
+                      </span>
+                      <span className="twin-muted mt-1 block text-xs">
+                        {formatInterviewRange(row.interview_start, row.interview_end, loc)}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      className="twin-link shrink-0 self-start text-xs font-medium sm:self-center"
+                      disabled={icsBusyId === row.id}
+                      onClick={() => {
+                        void (async () => {
+                          setIcsBusyId(row.id);
+                          try {
+                            const blob = await downloadInterviewIcs(row.id);
+                            saveBlobAsFile(blob, `twin-interview-${row.id}.ics`);
+                          } catch (e) {
+                            console.warn("[calendar] ics download failed", e);
+                          } finally {
+                            setIcsBusyId(null);
+                          }
+                        })();
+                      }}
+                    >
+                      {icsBusyId === row.id ? "…" : t("dashboard.calendarInterviewDownloadIcs")}
+                    </button>
                   </li>
                 ))}
               </ul>

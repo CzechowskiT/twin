@@ -99,6 +99,56 @@ export async function apiFetch<T>(
   return res.json() as Promise<T>;
 }
 
+/** Authenticated GET (or other method) returning a non-JSON body (e.g. `.ics`). */
+export async function apiFetchBlob(
+  path: string,
+  options: RequestInit = {},
+  token?: string | null,
+): Promise<Blob> {
+  const headers = new Headers(options.headers);
+  const method = (options.method ?? "GET").toUpperCase();
+  if (method !== "GET" && method !== "HEAD") {
+    headers.set("Content-Type", "application/json");
+  }
+  const hasAuth = Boolean(token);
+  if (hasAuth) {
+    const bearer = `Bearer ${token}`;
+    headers.set("Authorization", bearer);
+    headers.set("X-Twin-Authorization", bearer);
+  }
+
+  const directOrigin = clientApiOriginForRequest(hasAuth);
+  const fetchOpts: RequestInit = {
+    ...options,
+    cache: options.cache ?? "no-store",
+    headers,
+  };
+
+  let res: Response;
+  try {
+    res = await fetch(`${directOrigin}${path}`, fetchOpts);
+  } catch (err) {
+    if (hasAuth && directOrigin && isLikelyBrowserNetworkFailure(err)) {
+      res = await fetch(`${API_URL}${path}`, fetchOpts);
+    } else {
+      throw err;
+    }
+  }
+  if (!res.ok) throw new Error(await parseError(res));
+  return res.blob();
+}
+
+/** Trigger a browser download for a Blob (e.g. `.ics` from the API). */
+export function saveBlobAsFile(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.rel = "noopener";
+  a.click();
+  queueMicrotask(() => URL.revokeObjectURL(url));
+}
+
 export async function apiUpload<T>(
   path: string,
   file: File,
