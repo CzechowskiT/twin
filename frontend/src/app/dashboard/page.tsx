@@ -1202,7 +1202,8 @@ export default function DashboardPage() {
 
       <Card id="dashboard-jobs" variant="soft">
         <h2 className="twin-section-title mb-4">
-          {t("dashboard.jobs")} ({jobs?.total ?? 0})
+          {t("dashboard.jobs")}
+          {jobs !== null ? ` (${jobs.total})` : ""}
         </h2>
         <JobFiltersBar
           filters={filters}
@@ -1210,24 +1211,40 @@ export default function DashboardPage() {
           onChange={setFilters}
           onApply={applyFilters}
         />
-        <JobList
-          items={jobs?.items ?? []}
-          showScore={hasProfile}
-          applicationStatus={applicationByJobId}
-          onApply={hasProfile ? applyToJob : undefined}
-          onAutoApply={hasProfile ? autoApplyToJob : undefined}
-          autoApplyJobId={autoApplyingId}
-          onSave={hasProfile ? saveJob : undefined}
-          onDismiss={hasProfile ? dismissJob : undefined}
-        />
-        {!jobs?.items.length && (
-          <div className="mt-3 space-y-2 rounded-lg border border-dashed border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/35 p-4 sm:p-5">
-            <p className="twin-muted text-sm">
-              {SHOW_SCRAPE_UI ? t("dashboard.noJobs") : t("dashboard.noJobsNoScrapeUi")}
-            </p>
-            <p className="twin-muted text-sm leading-relaxed">{t("dashboard.jobsEmptyMomentum")}</p>
+        {jobs === null ? (
+          <div className="mt-3 space-y-3" aria-busy="true" aria-live="polite">
+            <p className="twin-muted text-sm">{t("dashboard.jobsLoading")}</p>
+            <div className="h-24 w-full animate-pulse rounded-lg bg-[var(--twin-border)]/70" />
           </div>
+        ) : (
+          <JobList
+            items={jobs.items}
+            showScore={hasProfile}
+            applicationStatus={applicationByJobId}
+            onApply={hasProfile ? applyToJob : undefined}
+            onAutoApply={hasProfile ? autoApplyToJob : undefined}
+            autoApplyJobId={autoApplyingId}
+            onSave={hasProfile ? saveJob : undefined}
+            onDismiss={hasProfile ? dismissJob : undefined}
+          />
         )}
+        {jobs !== null && (jobs.total === 0 || jobs.items.length === 0) ? (
+          <div className="mt-3 space-y-2 rounded-lg border border-dashed border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/35 p-4 sm:p-5">
+            {hasProfile ? (
+              <>
+                <p className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.jobsEmptyFilteredTitle")}</p>
+                <p className="twin-muted text-sm leading-relaxed">{t("dashboard.jobsEmptyFilteredLead")}</p>
+              </>
+            ) : (
+              <>
+                <p className="twin-muted text-sm">
+                  {SHOW_SCRAPE_UI ? t("dashboard.noJobs") : t("dashboard.noJobsNoScrapeUi")}
+                </p>
+                <p className="twin-muted text-sm leading-relaxed">{t("dashboard.jobsEmptyMomentum")}</p>
+              </>
+            )}
+          </div>
+        ) : null}
       </Card>
 
       <footer className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-[var(--twin-border)] pt-5 text-sm text-[var(--twin-muted-strong)]">

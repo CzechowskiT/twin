@@ -60,6 +60,14 @@ async function parseError(res: Response): Promise<string> {
   return res.statusText ? `${res.status} ${res.statusText}` : `HTTP ${res.status}`;
 }
 
+/** When the server echoes a request id, append it for support correlation (single line for inline UI). */
+export function formatApiErrorMessageWithResponseId(message: string, res: Response): string {
+  const trimmed = message.trim();
+  const rid = res.headers.get("X-Request-ID")?.trim();
+  if (!rid) return trimmed;
+  return `${trimmed} Request ID: ${rid}`;
+}
+
 function ensureTraceHeaders(headers: Headers): void {
   if (headers.has("X-Request-ID")) return;
   const id =
@@ -104,9 +112,14 @@ export async function apiFetch<T>(
       throw err;
     }
   }
-  if (!res.ok) throw new Error(await parseError(res));
+  if (!res.ok) throw new Error(formatApiErrorMessageWithResponseId(await parseError(res), res));
   if (res.status === 204) return undefined as T;
-  return res.json() as Promise<T>;
+  try {
+    return (await res.json()) as T;
+  } catch (e) {
+    const base = e instanceof Error ? e.message : String(e);
+    throw new Error(formatApiErrorMessageWithResponseId(base, res));
+  }
 }
 
 /** Authenticated GET (or other method) returning a non-JSON body (e.g. `.ics`). */
@@ -145,8 +158,13 @@ export async function apiFetchBlob(
       throw err;
     }
   }
-  if (!res.ok) throw new Error(await parseError(res));
-  return res.blob();
+  if (!res.ok) throw new Error(formatApiErrorMessageWithResponseId(await parseError(res), res));
+  try {
+    return await res.blob();
+  } catch (e) {
+    const base = e instanceof Error ? e.message : String(e);
+    throw new Error(formatApiErrorMessageWithResponseId(base, res));
+  }
 }
 
 /** Trigger a browser download for a Blob (e.g. `.ics` from the API). */

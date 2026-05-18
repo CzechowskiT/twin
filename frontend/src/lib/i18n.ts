@@ -302,6 +302,10 @@ const en = {
     matchesExportXlsxAria: "Download top matches as an Excel spreadsheet",
     matchPercentTitle: "Match score vs your profile (0–100%)",
     jobs: "Jobs",
+    jobsLoading: "Loading jobs…",
+    jobsEmptyFilteredTitle: "No roles match your current filters",
+    jobsEmptyFilteredLead:
+      "Widen salary or location, try another board, or clear target title terms (they may be pre-filled from your profile), then tap Apply filters again. If the feed is still empty, listings may not be in the database yet.",
     noJobs: "No jobs yet. Run Auto scrap above (if enabled) or ask an admin to seed listings.",
     noJobsNoScrapeUi:
       "No jobs in the database yet. Listings appear after data is scraped on the server (admin or backend) or imported. Your profile is for ranking and filters once jobs exist; it does not crawl the web on its own.",
@@ -1530,6 +1534,10 @@ const pl: MessageTree = {
     matchesExportXlsxAria: "Pobierz najlepsze dopasowania jako arkusz Excel",
     matchPercentTitle: "Dopasowanie do profilu (0–100%)",
     jobs: "Oferty",
+    jobsLoading: "Ładowanie ofert…",
+    jobsEmptyFilteredTitle: "Żadna oferta nie pasuje do obecnych filtrów",
+    jobsEmptyFilteredLead:
+      "Poluzuj widełka wynagrodzenia lub lokalizację, wybierz inny portal albo wyczyść pole docelowych tytułów (może być uzupełnione z profilu), potem ponownie „Zastosuj filtry”. Jeśli nadal pusto, w bazie może jeszcze nie być ogłoszeń.",
     noJobs: "Brak ofert. Uruchom Auto scrap powyżej (jeśli włączone) lub poproś administratora o dane.",
     noJobsNoScrapeUi:
       "Brak ofert w bazie. Pojawią się po pobraniu danych na serwerze (scrap przez administratora lub backend) lub imporcie. Profil służy do dopasowania i filtrów, gdy oferty już są; sam z siebie nie przeszukuje internetu.",
