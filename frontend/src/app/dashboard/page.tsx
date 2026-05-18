@@ -144,6 +144,7 @@ export default function DashboardPage() {
   const [dashboardCalendarBundle, setDashboardCalendarBundle] = useState<DashboardCalendarBundle | null>(null);
   const [nextInterviewIcsBusy, setNextInterviewIcsBusy] = useState(false);
   const [applicationsCsvBusy, setApplicationsCsvBusy] = useState(false);
+  const [matchesCsvBusy, setMatchesCsvBusy] = useState(false);
 
   const loadJobs = useCallback(async (token: string, activeFilters: JobFilters) => {
     return apiFetch<JobList>(`/api/v1/jobs/${buildJobsQuery(activeFilters)}`, {}, token);
@@ -524,6 +525,25 @@ export default function DashboardPage() {
     }
   }
 
+  async function downloadMatchesCsv() {
+    const token = getToken();
+    if (!token) return;
+    setMatchesCsvBusy(true);
+    setError(null);
+    try {
+      const blob = await apiFetchBlob(
+        "/api/v1/candidates/me/matches/export.csv?limit=220&min_score=15",
+        {},
+        token,
+      );
+      saveBlobAsFile(blob, "twin-matches.csv");
+    } catch (err) {
+      setError(dashboardFetchUserMessage(err, t));
+    } finally {
+      setMatchesCsvBusy(false);
+    }
+  }
+
   async function declarePlacement(applicationId: number, note: string) {
     const token = getToken();
     if (!token) return;
@@ -896,9 +916,19 @@ export default function DashboardPage() {
               </div>
             </div>
           ) : null}
-          <h2 className="twin-section-title mb-4">
-            {t("dashboard.topMatches")} ({matches?.total ?? 0})
-          </h2>
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="twin-section-title">
+              {t("dashboard.topMatches")} ({matches?.total ?? 0})
+            </h2>
+            <button
+              type="button"
+              disabled={matchesCsvBusy}
+              onClick={() => void downloadMatchesCsv()}
+              className="twin-btn-secondary twin-touch-target shrink-0 self-start text-sm"
+            >
+              {matchesCsvBusy ? "…" : t("dashboard.matchesExportCsv")}
+            </button>
+          </div>
           <JobList
             items={visibleMatches}
             showScore

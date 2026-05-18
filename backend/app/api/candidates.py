@@ -1,10 +1,13 @@
 """Candidate profile and match endpoints."""
 
+import csv
 import json
 from datetime import datetime, timezone
+from io import StringIO
 from typing import Any
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
@@ -302,6 +305,38 @@ def get_my_matches(
     rows = find_top_matches(db, candidate, limit=limit, min_score=min_score)
     items = [JobMatchOut(**row) for row in rows]
     return JobMatchListOut(items=items, total=len(items))
+
+
+@router.get("/me/matches/export.csv")
+def export_my_matches_csv(
+    limit: int = Query(220, ge=1, le=400),
+    min_score: float = Query(15.0, ge=0, le=100),
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> Response:
+    """CSV export of current ranked matches (same scoring window as the dashboard list)."""
+    candidate = _get_candidate_or_404(db, user.id)
+    rows = find_top_matches(db, candidate, limit=limit, min_score=min_score)
+    buf = StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(["job_id", "score", "title", "company", "location", "job_board", "url"])
+    for row in rows:
+        writer.writerow(
+            [
+                row["job_id"],
+                round(float(row["score"]), 2),
+                row["title"],
+                row["company"],
+                row.get("location") or "",
+                row["job_board"],
+                row["url"],
+            ],
+        )
+    return Response(
+        content=buf.getvalue().encode("utf-8"),
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": 'attachment; filename="twin-matches.csv"'},
+    )
 
 
 @router.get("/me/career-compass", response_model=CareerCompassOut)
