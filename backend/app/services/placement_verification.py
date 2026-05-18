@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import logging
 import re
 import secrets
@@ -11,7 +12,7 @@ from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 
 from app.config import Settings
-from app.database.models import Application, ApplicationStatus, Candidate, Job, User
+from app.database.models import Application, ApplicationStatus, Candidate, Job, PlacementEvent, User
 from app.services.mail import is_mail_configured, send_placement_verification_email
 
 logger = logging.getLogger(__name__)
@@ -26,6 +27,37 @@ _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 def hash_placement_token(raw: str) -> str:
     return hashlib.sha256(raw.strip().encode("utf-8")).hexdigest()
+
+
+def _work_email_domain(email: str) -> str | None:
+    if "@" not in email:
+        return None
+    return email.rsplit("@", 1)[-1].lower()[:255]
+
+
+def record_placement_event(
+    db: Session,
+    *,
+    application_id: int,
+    event_type: str,
+    actor: str,
+    detail: dict | None = None,
+) -> None:
+    """Persist one append-only row (no raw tokens or full mailbox addresses)."""
+    body: str | None
+    if detail:
+        raw = json.dumps(detail, separators=(",", ":"), ensure_ascii=False)
+        body = raw[:8000]
+    else:
+        body = None
+    db.add(
+        PlacementEvent(
+            application_id=application_id,
+            event_type=event_type,
+            actor=actor,
+            detail_json=body,
+        )
+    )
 
 
 def _allowed_status(status: ApplicationStatus) -> bool:
@@ -81,8 +113,6 @@ def start_work_email_verification(
     if app.placement_reported_at is None:
         app.placement_reported_at = now
 
-    db.commit()
-
     base = settings.frontend_url.rstrip("/")
     link = f"{base}/dashboard?placement_verify={raw}"
 
@@ -99,6 +129,15 @@ def start_work_email_verification(
             application_id,
             link,
         )
+
+    record_placement_event(
+        db,
+        application_id=app.id,
+        event_type="placement.verify_link_issued",
+        actor="candidate",
+        detail={"work_email_domain": _work_email_domain(email), "mail_sent": sent},
+    )
+    db.commit()
 
     msg = (
         "Verification email sent. Open the link from your work inbox."
@@ -129,7 +168,15 @@ def confirm_placement_token(db: Session, raw_token: str) -> tuple[bool, str]:
     app.placement_state = PLACEMENT_VERIFIED
     app.placement_verification_token_hash = None
     app.placement_verification_expires_at = None
-    if app.status != ApplicationStatus.HIRED:
+    promoted = app.status != ApplicationStatus.HIRED
+    if promoted:
         app.status = ApplicationStatus.HIRED
+    record_placement_event(
+        db,
+        application_id=app.id,
+        event_type="placement.verify_confirmed",
+        actor="magic_link",
+        detail={"promoted_to_hired": promoted},
+    )
     db.commit()
     return True, "Placement verified. Thank you."

@@ -86,6 +86,19 @@ class PlacementConfirmOut(BaseModel):
     message: str
 
 
+class PlacementEventOut(BaseModel):
+    id: int
+    event_type: str
+    actor: str
+    detail: dict | None = None
+    created_at: datetime
+
+
+class PlacementEventListOut(BaseModel):
+    items: list[PlacementEventOut]
+    total: int
+
+
 class ParseFeedbackIn(BaseModel):
     """Optional override; default is to parse `recruiter_feedback_raw` already saved on the application."""
 

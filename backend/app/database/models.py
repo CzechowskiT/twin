@@ -332,6 +332,28 @@ class Application(Base):
     viral_incentive_claims: Mapped[list["LinkedInViralIncentiveClaim"]] = relationship(
         back_populates="application",
     )
+    placement_events: Mapped[list["PlacementEvent"]] = relationship(
+        back_populates="application",
+        cascade="all, delete-orphan",
+    )
+
+
+class PlacementEvent(Base):
+    """Append-only audit trail for placement verification (no raw tokens)."""
+
+    __tablename__ = "placement_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    application_id: Mapped[int] = mapped_column(
+        ForeignKey("applications.id", ondelete="CASCADE"),
+        index=True,
+    )
+    event_type: Mapped[str] = mapped_column(String(64))
+    actor: Mapped[str] = mapped_column(String(32))
+    detail_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    application: Mapped["Application"] = relationship(back_populates="placement_events")
 
 
 class LinkedInViralIncentiveClaim(Base):

@@ -7,7 +7,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user
-from app.database.models import Application, ApplicationStatus, Candidate, Job, User
+from app.database.models import Application, ApplicationStatus, Candidate, Job, PlacementEvent, User
 from app.database.session import get_db
 from app.automation.types import ApplyOutcome
 from app.config import get_settings
@@ -25,6 +25,8 @@ from app.schemas.application import (
     ParseFeedbackIn,
     PlacementVerifyStartIn,
     PlacementVerifyStartOut,
+    PlacementEventListOut,
+    PlacementEventOut,
     RoleInsightRefOut,
     UpskillActionOut,
 )
@@ -167,6 +169,48 @@ def placement_verify_start(
         return PlacementVerifyStartOut(mail_sent=sent, message=msg)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.get("/{application_id}/placement-events", response_model=PlacementEventListOut)
+def list_placement_events(
+    application_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> PlacementEventListOut:
+    """Append-only placement verification history for this application (owner only)."""
+    candidate = _candidate_or_404(db, user.id)
+    app = (
+        db.query(Application)
+        .filter(Application.id == application_id, Application.candidate_id == candidate.id)
+        .first()
+    )
+    if not app:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Application not found")
+    rows = (
+        db.query(PlacementEvent)
+        .filter(PlacementEvent.application_id == application_id)
+        .order_by(PlacementEvent.created_at.desc())
+        .limit(100)
+        .all()
+    )
+    items: list[PlacementEventOut] = []
+    for ev in rows:
+        detail: dict | None = None
+        if ev.detail_json:
+            try:
+                detail = json.loads(ev.detail_json)
+            except json.JSONDecodeError:
+                detail = None
+        items.append(
+            PlacementEventOut(
+                id=ev.id,
+                event_type=ev.event_type,
+                actor=ev.actor,
+                detail=detail,
+                created_at=ev.created_at,
+            )
+        )
+    return PlacementEventListOut(items=items, total=len(items))
 
 
 @router.patch("/{application_id}", response_model=ApplicationOut)
