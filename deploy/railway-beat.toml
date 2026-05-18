@@ -1,10 +1,10 @@
-# Railway service: TWIN Celery beat (scheduled scrape every 2 min)
+# Railway service: TWIN Celery beat (optional periodic tasks when SCRAPE_BEAT_ENABLED=true).
 # Settings → Root directory: backend (same as API).
 
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
-watchPatterns = ["app/**", "alembic/**", "scripts/**", "requirements.txt", "Dockerfile", "alembic.ini"]
+watchPatterns = ["**"]
 
 [deploy]
 startCommand = "celery -A app.tasks.celery_app beat --loglevel=info"

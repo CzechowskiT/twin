@@ -17,6 +17,7 @@ AI-powered career agent: scrape jobs (pracuj.pl, rocketjobs.pl, LinkedIn), match
 
 **Checklist (repo + Railway + Vercel):** **[docs/P0_CHECKLIST.md](docs/P0_CHECKLIST.md)**  
 **Start here (plain Polish):** **[docs/WDROZENIE_LINK.md](docs/WDROZENIE_LINK.md)**  
+**Wersje Vercel + Railway:** ten sam **branch** GitHub na obu (np. `cursor/phase1-monorepo-scaffold`); na Railway **Root directory = `backend`**. Jeśli deploy się „skipuje”, w Railway użyj **Redeploy**.  
 Terminal helper: `./scripts/wrzuc-na-github.sh CzechowskiT`  
 Technical: [docs/BETA_ONLINE_PL.md](docs/BETA_ONLINE_PL.md), [docs/DEPLOY.md](docs/DEPLOY.md).
 

@@ -4,7 +4,7 @@
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
-watchPatterns = ["app/**", "alembic/**", "scripts/**", "requirements.txt", "Dockerfile", "alembic.ini"]
+watchPatterns = ["**"]
 
 [deploy]
 startCommand = "celery -A app.tasks.celery_app worker --loglevel=info"

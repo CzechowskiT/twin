@@ -20,6 +20,8 @@ Jeśli brak commitów lokalnych — najpierw `git pull` albo użyj skryptu `./sc
 
 ## B. Railway — kolejność
 
+**Żeby się nie rozjeżdżało z Vercelem:** na obu platformach ten **sam branch** GitHub (np. `cursor/phase1-monorepo-scaffold`). Po pushu poczekaj na zielony deploy; jeśli Railway pisze **SKIPPED** / „No changes to watched files”, wejdź w ostatni deployment i zrób **Redeploy** (wymuszenie).
+
 1. **New project** → Deploy from GitHub → `CzechowskiT/twin`.
 2. **PostgreSQL** (+ New → Database).
 3. **Redis** (+ New → Database).
@@ -53,6 +55,8 @@ Jeśli brak commitów lokalnych — najpierw `git pull` albo użyj skryptu `./sc
 ---
 
 ## C. Vercel
+
+**Ten sam branch co Railway** (np. `cursor/phase1-monorepo-scaffold`): Vercel → Project → **Settings** → **Git** → **Production Branch** (i ewentualnie Preview = ten sam branch, jeśli testujesz preview).
 
 1. Import `CzechowskiT/twin`, **Root Directory:** `frontend`.
 2. **Environment variable:** `NEXT_PUBLIC_API_URL` = `https://<TWOJE-API>.up.railway.app` (bez końcowego `/`).
