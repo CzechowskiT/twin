@@ -1159,15 +1159,17 @@ export default function DashboardPage() {
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between lg:gap-8">
           <div className="min-w-0 flex-1 twin-card-inset p-4 sm:p-5">
             {user && (
-              <>
+              <div className="min-w-0 max-w-full">
                 <p className="twin-muted text-xs">{t("dashboard.signedInAs")}</p>
+                {/* Inline whiteSpace/overflow so the address never wraps at hyphens (Tailwind alone was still breaking in narrow layouts). */}
                 <p
-                  className="min-w-0 max-w-full truncate whitespace-nowrap text-xs font-medium leading-tight tracking-tight sm:text-sm"
+                  className="mt-0.5 max-w-full text-[10px] font-medium leading-tight tracking-tight text-[var(--foreground)] sm:text-[11px]"
+                  style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
                   title={user.email}
                 >
                   {user.email}
                 </p>
-              </>
+              </div>
             )}
             {profile === null && (
               <div className="mt-4">
