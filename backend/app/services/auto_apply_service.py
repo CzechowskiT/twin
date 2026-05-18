@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import tempfile
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -53,6 +54,26 @@ def _extra_consent_tuple(raw: str) -> tuple[str, ...] | None:
     return tuple(chunks) if chunks else None
 
 
+def _writable_state_dir(base: Path, user_id: int) -> Path:
+    """Prefer configured path; fall back to /tmp when the image filesystem is read-only (common on PaaS)."""
+    rel = base / str(user_id)
+    try:
+        rel.mkdir(parents=True, exist_ok=True)
+        probe = rel / ".twin_write_probe"
+        probe.write_text("ok", encoding="utf-8")
+        probe.unlink(missing_ok=True)
+        return rel
+    except OSError:
+        logger.warning(
+            "auto_apply_state_dir not writable (%s), using temp dir for user_id=%s",
+            rel,
+            user_id,
+        )
+    fallback = Path(tempfile.gettempdir()) / "twin_auto_apply_state" / str(user_id)
+    fallback.mkdir(parents=True, exist_ok=True)
+    return fallback
+
+
 def auto_apply_for_user(
     db: Session,
     *,
@@ -92,8 +113,7 @@ def auto_apply_for_user(
         job_context=_job_context_text(job),
     ) or (get_tailoring_pitch_for_job(signals, job_id) or "")
 
-    state_dir = Path(settings.auto_apply_state_dir) / str(user.id)
-    state_dir.mkdir(parents=True, exist_ok=True)
+    state_dir = _writable_state_dir(Path(settings.auto_apply_state_dir), user.id)
 
     package_pdf: Path | None = None
     resume_path = candidate.resume_path

@@ -1,6 +1,7 @@
 """Track job applications per candidate."""
 
 import json
+import logging
 from datetime import datetime
 
 from fastapi import APIRouter, Body, Depends, HTTPException, status
@@ -37,6 +38,7 @@ from app.services.placement_verification import declare_placement_intent, start_
 from app.services.recruitment_feedback import build_feedback_insights, parse_stored_insights_json
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 @router.get("/me", response_model=ApplicationListOut)
@@ -136,9 +138,21 @@ def auto_apply(
             detail="Auto-apply is available on Premium and Pro plans.",
         )
     submit = body.submit if body.submit is not None else settings.auto_apply_submit
-    outcome, message, app = auto_apply_for_user(
-        db, user=user, job_id=body.job_id, submit=submit
-    )
+    try:
+        outcome, message, app = auto_apply_for_user(
+            db, user=user, job_id=body.job_id, submit=submit
+        )
+    except Exception:
+        logger.exception("auto_apply failed job_id=%s user_id=%s", body.job_id, user.id)
+        return AutoApplyOut(
+            success=False,
+            outcome=ApplyOutcome.FAILED.value,
+            message=(
+                "Auto-apply nie zadziałał z powodu błędu serwera (np. brak zapisalnego katalogu tymczasowego). "
+                "Użyj „Aplikuj”, żeby otworzyć ofertę w nowej karcie, albo spróbuj ponownie później."
+            ),
+            application_id=None,
+        )
     return AutoApplyOut(
         success=outcome in (ApplyOutcome.SUBMITTED, ApplyOutcome.FORM_FILLED),
         outcome=outcome.value,

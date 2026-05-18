@@ -26,7 +26,7 @@ async function proxy(req: NextRequest, pathSegments: string[]): Promise<NextResp
   }
 
   const sub = pathSegments.length ? pathSegments.join("/") : "";
-  const longRunning = sub.includes("jobs/scrape");
+  const longRunning = sub.includes("jobs/scrape") || sub.includes("applications/auto-apply");
   const target = new URL(`/api/v1/${sub}`, base);
   req.nextUrl.searchParams.forEach((v, k) => {
     target.searchParams.set(k, v);
