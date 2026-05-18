@@ -95,6 +95,7 @@ export function JobList({
                 {onApply && (
                   <button
                     type="button"
+                    aria-label={`${t("dashboard.applyJob")}: ${item.title}, ${item.company}`}
                     onClick={() => onApply(jobId, item.url)}
                     className="twin-btn-solid twin-touch-target shrink-0 !w-auto px-3 py-1.5 text-xs"
                   >
@@ -104,6 +105,7 @@ export function JobList({
                 {onAutoApply && (
                   <button
                     type="button"
+                    aria-label={`${t("dashboard.autoApplyJob")}: ${item.title}, ${item.company}`}
                     disabled={autoApplyJobId === jobId}
                     onClick={() => onAutoApply(jobId)}
                     className="twin-btn-secondary twin-touch-target shrink-0 !w-auto border-[var(--twin-cta)] px-3 py-1.5 text-xs font-semibold text-[var(--twin-cta)]"
@@ -115,6 +117,7 @@ export function JobList({
                 {onSave && !status && (
                   <button
                     type="button"
+                    aria-label={`${t("dashboard.saveJob")}: ${item.title}, ${item.company}`}
                     onClick={() => onSave(jobId)}
                     className="twin-btn-secondary twin-touch-target shrink-0 !w-auto px-3 py-1.5 text-xs"
                   >
@@ -124,6 +127,7 @@ export function JobList({
                 {onDismiss && (
                   <button
                     type="button"
+                    aria-label={`${t("dashboard.dismissJob")}: ${item.title}, ${item.company}`}
                     onClick={() => onDismiss(jobId)}
                     className="twin-btn-secondary twin-touch-target shrink-0 !w-auto px-3 py-1.5 text-xs opacity-80"
                   >

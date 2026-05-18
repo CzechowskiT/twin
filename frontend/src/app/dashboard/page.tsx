@@ -870,6 +870,7 @@ export default function DashboardPage() {
               </p>
               <ButtonCta
                 type="button"
+                aria-label={t("dashboard.twinForYourJob")}
                 onClick={() => triggerScrapeAll()}
                 disabled={scraping}
                 className="!mt-4 !rounded-full !py-3.5 !text-base !font-bold !tracking-tight !shadow-lg"
@@ -928,6 +929,7 @@ export default function DashboardPage() {
             </h2>
             <button
               type="button"
+              aria-label={t("dashboard.matchesExportCsv")}
               disabled={matchesCsvBusy}
               onClick={() => void downloadMatchesCsv()}
               className="twin-btn-secondary twin-touch-target shrink-0 self-start text-sm"
@@ -1031,6 +1033,7 @@ export default function DashboardPage() {
             </h2>
             <button
               type="button"
+              aria-label={t("dashboard.applicationsExportCsv")}
               disabled={applicationsCsvBusy}
               onClick={() => void downloadApplicationsCsv()}
               className="twin-btn-secondary twin-touch-target shrink-0 self-start text-sm"
