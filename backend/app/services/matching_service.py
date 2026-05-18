@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.config import get_settings
 from app.database.models import Candidate, Job, JobMatch
 from app.matching.matcher import calculate_match_score
+from app.services.job_matching_v2 import calculate_match_score_v2
 
 
 def _json_list_field(raw: str | None) -> list[Any]:
@@ -55,6 +56,7 @@ def find_top_matches(
     """Return best matching jobs for a candidate, optionally saved to job_matches."""
     cand = candidate_to_dict(candidate)
     scan_limit = max(50, min(50_000, int(get_settings().match_jobs_scan_limit)))
+    score_fn = calculate_match_score_v2 if get_settings().match_scoring_v2 else calculate_match_score
     jobs = (
         db.query(Job)
         .filter(Job.is_validated.is_(True))
@@ -65,7 +67,7 @@ def find_top_matches(
     scored: list[tuple[float, Job]] = []
 
     for job in jobs:
-        score = calculate_match_score(cand, job_to_dict(job))
+        score = score_fn(cand, job_to_dict(job))
         if score >= min_score:
             scored.append((score, job))
 

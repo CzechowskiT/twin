@@ -374,6 +374,9 @@ class Application(Base):
     placement_verification_expires_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     placement_verified_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     placement_declaration_note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Optional link to employer ATS (webhook ingest; see /integrations/ats).
+    external_ats_id: Mapped[str | None] = mapped_column(String(255), nullable=True, index=True)
+    external_ats_provider: Mapped[str | None] = mapped_column(String(32), nullable=True)
 
     candidate: Mapped["Candidate"] = relationship(back_populates="applications")
     job: Mapped["Job"] = relationship(back_populates="applications")
