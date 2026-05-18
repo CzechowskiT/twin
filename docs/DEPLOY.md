@@ -67,6 +67,33 @@ LinkedIn: [LINKEDIN_OAUTH.md](./LINKEDIN_OAUTH.md). Stripe: [STRIPE.md](./STRIPE
 - API: `GET /api/v1/health`
 - Docs: `/docs`
 
+### CI (GitHub Actions)
+
+If your Git credential can create workflow files (**Personal Access Token** needs the **`workflow` scope**), add `.github/workflows/backend-tests.yml` to run `pytest` on every push/PR. Tokens without that scope will get `remote rejected` when pushing new workflow paths — run `pytest` locally or on Railway instead.
+
+Example workflow:
+
+```yaml
+name: Backend tests
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - run: python -m pytest -q
+```
+
 ## GDPR
 
 Use HTTPS in production. Update `CORS_ORIGINS` to your real frontend origin only.

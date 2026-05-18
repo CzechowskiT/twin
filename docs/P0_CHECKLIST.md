@@ -59,7 +59,9 @@ Jeśli brak commitów lokalnych — najpierw `git pull` albo użyj skryptu `./sc
 **Ten sam branch co Railway** (np. `cursor/phase1-monorepo-scaffold`): Vercel → Project → **Settings** → **Git** → **Production Branch** (i ewentualnie Preview = ten sam branch, jeśli testujesz preview).
 
 1. Import `CzechowskiT/twin`, **Root Directory:** `frontend`.
-2. **Environment variable:** `NEXT_PUBLIC_API_URL` = `https://<TWOJE-API>.up.railway.app` (bez końcowego `/`).
+2. **Environment variables (proxy do API):**
+   - Zalecane (serwerowe, bez wpinania Railway URL do bundle przeglądarki): **`TWIN_API_BASE_URL`** = `https://<TWOJE-API>.up.railway.app` (bez końcowego `/`). Next.js proxy (`/api/v1/...`) używa tego na Vercel — patrz `frontend/src/lib/public-api-base.ts`.
+   - Alternatywa: **`NEXT_PUBLIC_API_URL`** = ten sam adres API (wtedy URL Railway jest w kliencie; OK na beta).
 3. Deploy → skopiuj URL aplikacji.
 
 ---
@@ -78,3 +80,16 @@ Jeśli brak commitów lokalnych — najpierw `git pull` albo użyj skryptu `./sc
 - LinkedIn login: tylko jeśli redirect w aplikacji LinkedIn = produkcyjny callback.
 
 Szczegóły: [WDROZENIE_LINK.md](./WDROZENIE_LINK.md) · [BETA_ONLINE_PL.md](./BETA_ONLINE_PL.md)
+
+---
+
+## F. Szybki smoke z terminala (opcjonalnie)
+
+Po ustawieniu `BASE_URL` na publiczny root API (jak w sekcji B, krok „Test”):
+
+```bash
+chmod +x scripts/smoke-p0.sh
+BASE_URL="https://<TWOJE-API>.up.railway.app" ./scripts/smoke-p0.sh
+# głębszy test (SELECT 1 w DB, 2 s timeout):
+BASE_URL="https://<TWOJE-API>.up.railway.app" ./scripts/smoke-p0.sh --db
+```
