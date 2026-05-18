@@ -18,9 +18,20 @@ export const defaultJobFilters: JobFilters = {
   sort: "newest",
 };
 
-export function buildJobsQuery(filters: JobFilters, limit = 50): string {
+/** Backend GET /jobs caps `limit` at this value. */
+export const JOB_FEED_PAGE_MAX = 200;
+
+export type JobsQueryOpts = {
+  limit?: number;
+  skip?: number;
+};
+
+export function buildJobsQuery(filters: JobFilters, opts?: JobsQueryOpts): string {
   const params = new URLSearchParams();
+  const limit = Math.min(JOB_FEED_PAGE_MAX, Math.max(1, opts?.limit ?? JOB_FEED_PAGE_MAX));
+  const skip = Math.max(0, opts?.skip ?? 0);
   params.set("limit", String(limit));
+  if (skip > 0) params.set("skip", String(skip));
   if (filters.q.trim()) params.set("q", filters.q.trim());
   if (filters.location.trim()) params.set("location", filters.location.trim());
   if (filters.job_board.trim()) params.set("job_board", filters.job_board.trim());

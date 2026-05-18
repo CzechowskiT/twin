@@ -43,6 +43,14 @@ Env template: `.env.production.example` in repo root.
 
 `DATABASE_URL` from Railway (`postgres://`) is normalized to `postgresql+psycopg://` in `app/config.py`.
 
+### Public investor metrics (`GET /api/v1/public/mvp-stats`)
+
+Counters are **read from the live database** (validated job rows, users, applications, etc.). `linkedin_oauth_configured` and `stripe_checkout_ready` reflect whether the API host has the corresponding env vars wired — not marketing overrides.
+
+To grow the **validated job corpus** toward six figures, use sustained ingestion: Celery worker + beat, higher per-board caps (`SCRAPE_JOBS_PER_BOARD`), and (when appropriate) bulk import — see comments in `app/config.py` around scraping and `docs/DEPLOY.md` Option 2 services.
+
+LinkedIn: [LINKEDIN_OAUTH.md](./LINKEDIN_OAUTH.md). Stripe: [STRIPE.md](./STRIPE.md).
+
 ## Option 3: Railway / Render (manual commands)
 
 | Service | Command | Notes |

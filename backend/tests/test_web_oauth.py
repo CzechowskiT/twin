@@ -1,4 +1,4 @@
-"""Tests for web OAuth routes (Google/GitHub/Apple) and shared status."""
+"""Tests for web OAuth routes (Google/GitHub/Apple)."""
 
 from unittest.mock import MagicMock, patch
 
@@ -15,17 +15,10 @@ def client() -> TestClient:
     return TestClient(app)
 
 
-@patch("app.api.auth.is_linkedin_oauth_configured", return_value=False)
-def test_oauth_status_shape(_li: MagicMock, client: TestClient) -> None:
+def test_oauth_status_endpoint_removed(client: TestClient) -> None:
+    """Unauthenticated callers must not learn which OAuth env vars are set."""
     res = client.get("/api/v1/auth/oauth/status")
-    assert res.status_code == 200
-    body = res.json()
-    assert body == {
-        "linkedin": False,
-        "google": False,
-        "github": False,
-        "apple": False,
-    }
+    assert res.status_code == 404
 
 
 @patch("app.api.auth.is_google_configured", return_value=False)

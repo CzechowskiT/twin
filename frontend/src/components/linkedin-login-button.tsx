@@ -4,40 +4,19 @@ import { API_URL } from "@/lib/api";
 
 const LINKEDIN_LOGIN_URL = `${API_URL}/api/v1/auth/linkedin/login`;
 
-/** Same white “method row” as OAuth buttons; LinkedIn “in” stays brand blue on white. */
-const ENABLED =
+const ROW =
   "twin-touch-target mb-2 flex w-full items-center justify-center gap-3 rounded-lg border border-neutral-200 bg-white px-4 py-3 text-sm font-semibold text-neutral-900 shadow-sm transition hover:border-neutral-300 hover:bg-neutral-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--twin-accent)]";
-
-const DISABLED =
-  "twin-touch-target mb-2 flex w-full cursor-not-allowed items-center justify-center gap-3 rounded-lg border border-dashed border-neutral-300 bg-white px-4 py-3 text-sm font-semibold text-neutral-400";
 
 const ICON_WRAP =
   "inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center overflow-visible leading-none";
 
 type LinkedInLoginButtonProps = {
   label: string;
-  configured: boolean;
-  comingSoonMessage: string;
 };
 
-export function LinkedInLoginButton({
-  label,
-  configured,
-  comingSoonMessage,
-}: LinkedInLoginButtonProps) {
-  if (!configured) {
-    return (
-      <div className={DISABLED}>
-        <span className={ICON_WRAP}>
-          <LinkedInIcon />
-        </span>
-        <span className="min-w-0 text-left leading-snug">{comingSoonMessage}</span>
-      </div>
-    );
-  }
-
+export function LinkedInLoginButton({ label }: LinkedInLoginButtonProps) {
   return (
-    <a href={LINKEDIN_LOGIN_URL} className={ENABLED}>
+    <a href={LINKEDIN_LOGIN_URL} className={ROW}>
       <span className={ICON_WRAP}>
         <LinkedInIcon />
       </span>

@@ -26,8 +26,8 @@ from app.services.job_query import SORT_COMPANY, SORT_NEWEST, SORT_SALARY, apply
 from app.services.matching_service import candidate_to_dict, job_to_dict
 from app.scrapers.registry import GLOBAL_BOARD_SPECS, list_boards
 from app.tasks.scrape_tasks import (
+    GLOBAL_BOARD_SCRAPE_TASKS,
     scrape_all_boards_task,
-    scrape_global_board_task,
     scrape_justjoin_task,
     scrape_linkedin_sales_task,
     scrape_linkedin_task,
@@ -118,6 +118,8 @@ LOCAL_SCRAPE_HANDLERS = {
     "linkedin": scrape_linkedin_task,
     "linkedin-sales": scrape_linkedin_sales_task,
 }
+
+PER_BOARD_SCRAPE_HANDLERS = {**LOCAL_SCRAPE_HANDLERS, **GLOBAL_BOARD_SCRAPE_TASKS}
 
 
 @router.get("/boards", response_model=BoardListOut)
@@ -345,18 +347,13 @@ def trigger_scrape(
     _user: User = Depends(get_current_user),
 ) -> ScrapeTaskOut:
     try:
-        is_global = board in GLOBAL_BOARD_SPECS
-        handler = LOCAL_SCRAPE_HANDLERS.get(board)
-        if not handler and not is_global:
+        handler = PER_BOARD_SCRAPE_HANDLERS.get(board)
+        if not handler:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown job board")
 
         if sync:
             try:
-                if is_global:
-                    result = scrape_global_board_task.apply(args=[board])
-                else:
-                    assert handler is not None
-                    result = handler.apply()
+                result = handler.apply()
             except Exception as exc:
                 logger.exception("sync scrape failed board=%s", board)
                 raise HTTPException(
@@ -378,11 +375,7 @@ def trigger_scrape(
             )
 
         if get_settings().celery_task_always_eager:
-            if is_global:
-                _eager_background_run(f"twin-scrape-{board}", lambda b=board: scrape_global_board_task.delay(b))
-            else:
-                assert handler is not None
-                _eager_background_run(f"twin-scrape-{board}", lambda: handler.delay())
+            _eager_background_run(f"twin-scrape-{board}", lambda: handler.delay())
             return ScrapeTaskOut(
                 task_id="eager-background",
                 job_board=board,
@@ -390,22 +383,14 @@ def trigger_scrape(
             )
 
         try:
-            if is_global:
-                async_result = _celery_delay(scrape_global_board_task, board)
-            else:
-                assert handler is not None
-                async_result = _celery_delay(handler)
+            async_result = _celery_delay(handler)
         except HTTPException as exc:
             if exc.status_code != status.HTTP_503_SERVICE_UNAVAILABLE:
                 raise
             logger.warning("scrape/%s: broker unavailable, falling back to in-process thread", board)
 
             def _fallback() -> None:
-                if is_global:
-                    scrape_global_board_task.apply(args=[board])
-                else:
-                    assert handler is not None
-                    handler.apply()
+                handler.apply()
 
             _eager_background_run(f"twin-scrape-{board}-fallback", _fallback)
             return ScrapeTaskOut(

@@ -103,5 +103,11 @@ def test_list_boards_respects_allowlist(mock_settings: MagicMock) -> None:
     assert ids == {"indeed", "pracuj-sales"}
 
 
+def test_global_board_celery_tasks_cover_all_specs() -> None:
+    from app.tasks.scrape_tasks import GLOBAL_BOARD_SCRAPE_TASKS
+
+    assert set(GLOBAL_BOARD_SCRAPE_TASKS) == set(GLOBAL_BOARD_SPECS)
+
+
 def test_run_scrape_unknown_board_returns_empty() -> None:
     assert run_scrape("not-a-board") == []

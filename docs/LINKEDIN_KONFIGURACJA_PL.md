@@ -46,13 +46,9 @@ Zapisz plik.
 
 ## Krok 4 — Sprawdzenie
 
-W przeglądarce otwórz:
+Na stronie logowania frontendu (`/login`) kliknij **Kontynuuj z LinkedIn**. Jeśli zmienne `LINKEDIN_*` są ustawione, przeglądarka poleci na LinkedIn. Jeśli nie — wrócisz na `/login?error=linkedin_not_configured` (to normalne przy pustej konfiguracji).
 
-http://localhost:8000/api/v1/auth/linkedin/status
-
-Powinno być: `{"configured":true}`
-
-Odśwież http://localhost:3000/login — zamiast „coming soon” zobaczysz **Continue with LinkedIn** / **Kontynuuj z LinkedIn**.
+Alternatywnie (bez przeglądarki): `curl -sI "http://localhost:8000/api/v1/auth/linkedin/login"` — przy poprawnej konfiguracji zobaczysz `302` z nagłówkiem `Location` na `linkedin.com/oauth`.
 
 ---
 

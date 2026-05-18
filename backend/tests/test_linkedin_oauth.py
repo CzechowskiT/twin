@@ -53,18 +53,9 @@ def test_is_configured(mock_settings: MagicMock) -> None:
     assert is_linkedin_oauth_configured()
 
 
-@patch("app.api.auth.is_linkedin_oauth_configured", return_value=False)
-def test_linkedin_status_not_configured(_mock: MagicMock, client: TestClient) -> None:
+def test_linkedin_status_endpoint_removed(client: TestClient) -> None:
     res = client.get("/api/v1/auth/linkedin/status")
-    assert res.status_code == 200
-    assert res.json() == {"configured": False}
-
-
-@patch("app.api.auth.is_linkedin_oauth_configured", return_value=True)
-def test_linkedin_status_configured(_mock: MagicMock, client: TestClient) -> None:
-    res = client.get("/api/v1/auth/linkedin/status")
-    assert res.status_code == 200
-    assert res.json() == {"configured": True}
+    assert res.status_code == 404
 
 
 @patch("app.services.linkedin_oauth.httpx.Client")

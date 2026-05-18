@@ -6,11 +6,21 @@ from pydantic import BaseModel, Field
 class MvpStatsOut(BaseModel):
     """Aggregate counters only — safe for public investor / traction strip."""
 
-    validated_jobs: int = Field(ge=0, description="Jobs marked validated in the index.")
+    validated_jobs: int = Field(
+        ge=0,
+        description=(
+            "Validated jobs from Poland-first core sources (pracuj.pl, rocketjobs.pl, justjoin, praca.pl, "
+            "indeed.pl, linkedin.com) — excludes bulk global boards so the figure tracks typical candidate use."
+        ),
+    )
     registered_users: int = Field(ge=0, description="User accounts (includes incomplete onboarding).")
     total_applications: int = Field(ge=0, description="Application rows across all candidates.")
     profiles_with_cv: int = Field(ge=0, description="Candidates who uploaded a CV at least once.")
     job_boards_in_registry: int = Field(ge=0, description="Board adapters in the current scrape registry order.")
-    linkedin_oauth_configured: bool = Field(description="LinkedIn OAuth client id+secret present on the API.")
-    stripe_checkout_ready: bool = Field(description="Stripe secret + Premium price id configured.")
     generated_at: str = Field(description="ISO-8601 UTC timestamp when counts were computed.")
+    linkedin_oauth_configured: bool = Field(
+        description="True when LinkedIn OIDC client id, secret, and redirect URI are configured on the API.",
+    )
+    stripe_checkout_ready: bool = Field(
+        description="True when Stripe secret key and at least one subscription price id are configured.",
+    )

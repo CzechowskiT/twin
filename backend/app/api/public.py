@@ -9,57 +9,48 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from app.config import get_settings
-from app.database.models import Application, Candidate, Job, User
+from app.config import Settings, get_settings
+from app.database.models import Application, Candidate, User
 from app.database.session import get_db
 from app.scrapers.registry import scrape_board_ids_ordered
 from app.schemas.public import MvpStatsOut
+from app.services.linkedin_oauth import is_linkedin_oauth_configured
+from app.services.mvp_public_metrics import count_validated_jobs_public_traction
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-def _stripe_checkout_ready() -> bool:
-    s = get_settings()
-    return bool(s.stripe_secret_key.strip() and s.stripe_price_id_premium.strip())
-
-
-def _linkedin_oauth_configured() -> bool:
-    s = get_settings()
-    return bool(s.linkedin_client_id.strip() and s.linkedin_client_secret.strip())
+def _stripe_checkout_ready(settings: Settings) -> bool:
+    s = settings
+    return bool(
+        s.stripe_secret_key.strip()
+        and (s.stripe_price_id_premium.strip() or s.stripe_price_id_pro.strip())
+    )
 
 
 @router.get("/mvp-stats", response_model=MvpStatsOut)
 def mvp_stats(db: Session = Depends(get_db)) -> MvpStatsOut:
-    """Aggregate product metrics for fundraising decks (no personal fields)."""
+    """Aggregate product metrics for investor surfaces (no personal fields; all counts from DB or env wiring)."""
     try:
-        v_jobs = db.query(func.count()).select_from(Job).filter(Job.is_validated.is_(True)).scalar() or 0
+        v_jobs = count_validated_jobs_public_traction(db)
         users = db.query(func.count()).select_from(User).scalar() or 0
         apps = db.query(func.count()).select_from(Application).scalar() or 0
         cv_profiles = (
             db.query(func.count()).select_from(Candidate).filter(Candidate.cv_uploaded_at.isnot(None)).scalar() or 0
         )
         boards = len(scrape_board_ids_ordered())
-        stats = MvpStatsOut(
+        s = get_settings()
+        return MvpStatsOut(
             validated_jobs=int(v_jobs),
             registered_users=int(users),
             total_applications=int(apps),
             profiles_with_cv=int(cv_profiles),
             job_boards_in_registry=boards,
-            linkedin_oauth_configured=_linkedin_oauth_configured(),
-            stripe_checkout_ready=_stripe_checkout_ready(),
+            linkedin_oauth_configured=is_linkedin_oauth_configured(),
+            stripe_checkout_ready=_stripe_checkout_ready(s),
             generated_at=datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         )
-        s = get_settings()
-        if s.investor_mvp_stats_demo_mode:
-            stats = stats.model_copy(
-                update={
-                    "validated_jobs": int(s.investor_mvp_stats_demo_validated_jobs),
-                    "linkedin_oauth_configured": True,
-                    "stripe_checkout_ready": True,
-                }
-            )
-        return stats
     except HTTPException:
         raise
     except Exception as exc:

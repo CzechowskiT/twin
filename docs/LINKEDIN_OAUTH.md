@@ -83,7 +83,7 @@ sequenceDiagram
 
 Same server-side redirect flow: `GET /api/v1/auth/{google|github|apple}/login` → provider → callback on the API → JWT → `FRONTEND_URL/auth/callback?token=…`.
 
-- **Status (all providers):** `GET /api/v1/auth/oauth/status` returns `{ linkedin, google, github, apple }`.
+- **Per-provider configuration is not exposed over HTTP** (removed `GET /api/v1/auth/oauth/status` to avoid disclosing which env vars are set). The login UI always offers provider rows; if a provider is not configured, `GET /api/v1/auth/{provider}/login` redirects to the frontend with `?error={provider}_not_configured`.
 - **Redirect URIs** (must match the corresponding `*_REDIRECT_URI` env var exactly):
 
 | Provider | Example redirect URL |
