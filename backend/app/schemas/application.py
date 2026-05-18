@@ -136,6 +136,10 @@ class ApplicationListOut(BaseModel):
 class AutoApplyRequest(BaseModel):
     job_id: int
     submit: bool | None = None
+    human_acknowledged: bool = Field(
+        default=False,
+        description="Set true when the user explicitly confirmed autonomous submission (required when server enables human-in-the-loop).",
+    )
 
 
 class AutoApplyOut(BaseModel):

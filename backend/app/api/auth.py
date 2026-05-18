@@ -15,6 +15,7 @@ from app.core.security import create_access_token, hash_password, verify_passwor
 from app.database.models import User
 from app.database.session import get_db
 from app.schemas.auth import (
+    BillingProfileIn,
     ForgotPasswordRequest,
     GdprConsentIn,
     ResetPasswordRequest,
@@ -349,6 +350,24 @@ def update_marketing_preference(
     user.marketing_emails_opt_in_at = (
         datetime.now(timezone.utc) if body.marketing_emails_opt_in else None
     )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return UserOut.from_user(user)
+
+
+@router.patch("/me/billing-profile", response_model=UserOut)
+def update_billing_profile(
+    body: BillingProfileIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> UserOut:
+    if body.billing_company_name is not None:
+        v = body.billing_company_name.strip()
+        user.billing_company_name = v or None
+    if body.billing_tax_id is not None:
+        v = body.billing_tax_id.strip()
+        user.billing_tax_id = v or None
     db.add(user)
     db.commit()
     db.refresh(user)

@@ -16,6 +16,8 @@ type Me = {
   plan_tier: string;
   subscription_status: string | null;
   subscription_current_period_end: string | null;
+  billing_company_name?: string | null;
+  billing_tax_id?: string | null;
 };
 
 type PlanRow = {
@@ -167,6 +169,10 @@ export default function BillingPage() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [checkoutBanner, setCheckoutBanner] = useState<"success" | "cancel" | null>(null);
+  const [billingCompany, setBillingCompany] = useState("");
+  const [billingTaxId, setBillingTaxId] = useState("");
+  const [billingSaveBusy, setBillingSaveBusy] = useState(false);
+  const [billingSaveOk, setBillingSaveOk] = useState(false);
 
   const load = useCallback(async () => {
     const token = getToken();
@@ -234,6 +240,13 @@ export default function BillingPage() {
     });
   }, []);
 
+  useEffect(() => {
+    if (!me) return;
+    setBillingCompany((me.billing_company_name ?? "").trim());
+    setBillingTaxId((me.billing_tax_id ?? "").trim());
+    setBillingSaveOk(false);
+  }, [me]);
+
   async function startCheckout(plan: "premium" | "pro") {
     const token = getToken();
     if (!token) return;
@@ -267,6 +280,34 @@ export default function BillingPage() {
       console.warn("[billing] portal-session failed", e);
     } finally {
       setBusy(null);
+    }
+  }
+
+  async function saveBillingProfile() {
+    const token = getToken();
+    if (!token) return;
+    setBillingSaveBusy(true);
+    setBillingSaveOk(false);
+    setActionError(false);
+    try {
+      const updated = await apiFetch<Me>(
+        "/api/v1/auth/me/billing-profile",
+        {
+          method: "PATCH",
+          body: JSON.stringify({
+            billing_company_name: billingCompany.trim() || null,
+            billing_tax_id: billingTaxId.trim() || null,
+          }),
+        },
+        token,
+      );
+      setMe(updated);
+      setBillingSaveOk(true);
+    } catch (e) {
+      setActionError(true);
+      console.warn("[billing] billing-profile save failed", e);
+    } finally {
+      setBillingSaveBusy(false);
     }
   }
 
@@ -368,6 +409,58 @@ export default function BillingPage() {
               </Button>
             </div>
           ) : null}
+        </Card>
+      ) : null}
+
+      {me && !loading ? (
+        <Card variant="soft" className="mb-6">
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
+            {t("dashboard.billingInvoiceProfileTitle")}
+          </p>
+          <p className="twin-muted mt-1 text-sm leading-relaxed">{t("dashboard.billingInvoiceProfileLead")}</p>
+          <div className="mt-4 space-y-3">
+            <div>
+              <label htmlFor="billing-company" className="block text-sm font-medium text-[var(--foreground)]">
+                {t("dashboard.billingCompanyLabel")}
+              </label>
+              <input
+                id="billing-company"
+                type="text"
+                autoComplete="organization"
+                value={billingCompany}
+                onChange={(e) => setBillingCompany(e.target.value)}
+                className="mt-1 w-full max-w-md rounded-md border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-3 py-2 text-sm text-[var(--foreground)]"
+                maxLength={200}
+              />
+            </div>
+            <div>
+              <label htmlFor="billing-tax" className="block text-sm font-medium text-[var(--foreground)]">
+                {t("dashboard.billingTaxIdLabel")}
+              </label>
+              <input
+                id="billing-tax"
+                type="text"
+                autoComplete="off"
+                value={billingTaxId}
+                onChange={(e) => setBillingTaxId(e.target.value)}
+                className="mt-1 w-full max-w-md rounded-md border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-3 py-2 text-sm text-[var(--foreground)]"
+                maxLength={64}
+              />
+            </div>
+            <Button
+              type="button"
+              className="!w-auto"
+              disabled={billingSaveBusy}
+              onClick={() => void saveBillingProfile()}
+            >
+              {billingSaveBusy ? "…" : t("dashboard.billingSaveInvoiceProfile")}
+            </Button>
+            {billingSaveOk ? (
+              <p className="text-sm font-medium text-[var(--twin-accent-hover)]">{t("dashboard.billingSavedInvoiceProfile")}</p>
+            ) : null}
+          </div>
+          <p className="twin-muted mt-4 text-xs leading-relaxed">{t("dashboard.billingCheckoutPromoHint")}</p>
+          <p className="twin-muted mt-2 text-xs leading-relaxed">{t("dashboard.billingPauseViaPortal")}</p>
         </Card>
       ) : null}
 

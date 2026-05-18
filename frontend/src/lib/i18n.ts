@@ -515,6 +515,17 @@ const en = {
     billingCheckoutSuccess: "Thank you. Your subscription should activate within a minute after Stripe confirms payment.",
     billingCheckoutCancelled: "Checkout was cancelled. You can try again whenever you are ready.",
     billingPortalHint: "Use the customer portal to update payment method, cancel, or download invoices.",
+    billingInvoiceProfileTitle: "Invoice & company details",
+    billingInvoiceProfileLead:
+      "Optional: company name and tax id (e.g. EU VAT / Polish NIP) are stored on your account, passed into Stripe Checkout metadata, and help operations issue correct invoices.",
+    billingCompanyLabel: "Company / legal name",
+    billingTaxIdLabel: "Tax / VAT id",
+    billingSaveInvoiceProfile: "Save billing profile",
+    billingSavedInvoiceProfile: "Saved.",
+    billingCheckoutPromoHint:
+      "Stripe Checkout may show a “Promotion code” field when your Stripe account allows promotion codes on subscriptions.",
+    billingPauseViaPortal:
+      "To pause or cancel, open “Manage subscription & invoices” — the Stripe Customer Portal handles plan changes, payment methods, and PDF invoices.",
     billingTrackedCap: "Up to {n} active tracked applications (rejected do not count).",
     billingTrackedUnlimited: "Unlimited active tracked applications.",
     billingCheckoutMethodsEyebrow: "Checkout payment rails (Stripe)",
@@ -1733,6 +1744,17 @@ const pl: MessageTree = {
     billingCheckoutSuccess: "Dziękujemy. Subskrypcja powinna aktywować się w ciągu około minuty po potwierdzeniu płatności przez Stripe.",
     billingCheckoutCancelled: "Płatność anulowana. Możesz spróbować ponownie w dowolnym momencie.",
     billingPortalHint: "W portalu klienta zmienisz kartę, anulujesz subskrypcję lub pobierzesz faktury.",
+    billingInvoiceProfileTitle: "Dane do faktury i firmy",
+    billingInvoiceProfileLead:
+      "Opcjonalnie: nazwa firmy i identyfikator podatkowy (np. NIP / VAT UE) są zapisane na koncie, trafiają do metadanych Stripe Checkout i ułatwiają poprawne wystawienie faktury.",
+    billingCompanyLabel: "Nazwa firmy / podmiotu",
+    billingTaxIdLabel: "NIP / identyfikator podatkowy",
+    billingSaveInvoiceProfile: "Zapisz dane do faktury",
+    billingSavedInvoiceProfile: "Zapisano.",
+    billingCheckoutPromoHint:
+      "Stripe Checkout może pokazać pole „kod promocyjny”, jeśli na koncie Stripe włączone są kody na subskrypcje.",
+    billingPauseViaPortal:
+      "Aby wstrzymać lub anulować subskrypcję, użyj „Zarządzaj subskrypcją i fakturami” — portal klienta Stripe obsługuje zmianę planu, metodę płatności i faktury PDF.",
     billingTrackedCap: "Do {n} aktywnie śledzonych aplikacji (odrzucone się nie liczą).",
     billingTrackedUnlimited: "Nielimitowane aktywne aplikacje w trackerze.",
     billingCheckoutMethodsEyebrow: "Tory płatności w Stripe Checkout",

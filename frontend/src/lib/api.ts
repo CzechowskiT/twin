@@ -60,12 +60,22 @@ async function parseError(res: Response): Promise<string> {
   return res.statusText ? `${res.status} ${res.statusText}` : `HTTP ${res.status}`;
 }
 
+function ensureTraceHeaders(headers: Headers): void {
+  if (headers.has("X-Request-ID")) return;
+  const id =
+    typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID()
+      : `twin-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+  headers.set("X-Request-ID", id);
+}
+
 export async function apiFetch<T>(
   path: string,
   options: RequestInit = {},
   token?: string | null,
 ): Promise<T> {
   const headers = new Headers(options.headers);
+  ensureTraceHeaders(headers);
   const method = (options.method ?? "GET").toUpperCase();
   if (method !== "GET" && method !== "HEAD") {
     headers.set("Content-Type", "application/json");
@@ -106,6 +116,7 @@ export async function apiFetchBlob(
   token?: string | null,
 ): Promise<Blob> {
   const headers = new Headers(options.headers);
+  ensureTraceHeaders(headers);
   const method = (options.method ?? "GET").toUpperCase();
   if (method !== "GET" && method !== "HEAD") {
     headers.set("Content-Type", "application/json");
@@ -156,6 +167,7 @@ export async function apiUpload<T>(
   extraFields?: Record<string, string>,
 ): Promise<T> {
   const headers = new Headers();
+  ensureTraceHeaders(headers);
   const hasAuth = Boolean(token);
   if (hasAuth) {
     const bearer = `Bearer ${token}`;

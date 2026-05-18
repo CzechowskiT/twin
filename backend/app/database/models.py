@@ -80,6 +80,9 @@ class User(Base):
     signup_utm_content: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
     subscription_invoice_payment_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
+    billing_company_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    billing_tax_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+
     candidate: Mapped["Candidate | None"] = relationship(back_populates="user")
     password_reset_tokens: Mapped[list["PasswordResetToken"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
@@ -355,6 +358,37 @@ class PlacementEvent(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     application: Mapped["Application"] = relationship(back_populates="placement_events")
+
+
+class ApiIdempotency(Base):
+    """Stores replay payloads for safe retries (Idempotency-Key header)."""
+
+    __tablename__ = "api_idempotency"
+    __table_args__ = (
+        UniqueConstraint("user_id", "scope", "idempotency_key", name="uq_api_idempotency_user_scope_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    scope: Mapped[str] = mapped_column(String(64), nullable=False)
+    idempotency_key: Mapped[str] = mapped_column(String(128), nullable=False)
+    body_fingerprint: Mapped[str] = mapped_column(String(64), nullable=False)
+    response_status: Mapped[int] = mapped_column(Integer, nullable=False)
+    response_json: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class AutoApplyEvent(Base):
+    """Lightweight audit for auto-apply rate limits and company cooldowns."""
+
+    __tablename__ = "auto_apply_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id", ondelete="CASCADE"), index=True)
+    company_key: Mapped[str | None] = mapped_column(String(255), nullable=True, index=True)
+    outcome: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
 class LinkedInViralIncentiveClaim(Base):

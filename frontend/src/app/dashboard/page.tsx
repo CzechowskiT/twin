@@ -443,11 +443,18 @@ export default function DashboardPage() {
     const token = getToken();
     if (!token) return;
     try {
+      const idem =
+        typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+          ? crypto.randomUUID()
+          : "";
+      const h = new Headers();
+      if (idem) h.set("Idempotency-Key", idem);
       await apiFetch(
         "/api/v1/applications/",
         {
           method: "POST",
           body: JSON.stringify({ job_id: jobId, status }),
+          headers: h,
         },
         token,
       );
@@ -482,7 +489,7 @@ export default function DashboardPage() {
         message: string;
       }>(
         "/api/v1/applications/auto-apply",
-        { method: "POST", body: JSON.stringify({ job_id: jobId }) },
+        { method: "POST", body: JSON.stringify({ job_id: jobId, human_acknowledged: true }) },
         token,
       );
       syncApplicationsFromApi(await loadApplications(token));

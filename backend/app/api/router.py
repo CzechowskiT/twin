@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter
 
-from app.api import applications, auth, beta_waitlist, billing, calendar, candidates, curated_careers, geo, health, jobs, kyc, linkedin_viral, placement, public, referrals, talent_pool
+from app.api import applications, auth, beta_waitlist, billing, calendar, candidates, curated_careers, geo, health, jobs, kyc, linkedin_viral, partner, placement, public, referrals, talent_pool
 
 api_router = APIRouter()
 api_router.include_router(health.router, tags=["health"])
@@ -20,4 +20,5 @@ api_router.include_router(talent_pool.router, prefix="/talent-pool", tags=["tale
 api_router.include_router(jobs.router, prefix="/jobs", tags=["jobs"])
 api_router.include_router(placement.router, prefix="/placement", tags=["placement"])
 api_router.include_router(curated_careers.router, prefix="/employers", tags=["employers"])
+api_router.include_router(partner.router, prefix="/partner", tags=["partner"])
 api_router.include_router(applications.router, prefix="/applications", tags=["applications"])

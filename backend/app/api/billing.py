@@ -104,14 +104,23 @@ def create_checkout_session(
 
     stripe_svc.configure_stripe(settings)
     try:
+        md: dict[str, str] = {"user_id": str(user.id)}
+        bn = (getattr(user, "billing_company_name", None) or "").strip()
+        tid = (getattr(user, "billing_tax_id", None) or "").strip()
+        if bn:
+            md["billing_company_name"] = bn[:200]
+        if tid:
+            md["billing_tax_id"] = tid[:64]
         params: dict[str, object] = {
             "mode": "subscription",
             "line_items": [{"price": price_id, "quantity": 1}],
             "success_url": f"{settings.frontend_url}/dashboard/billing?checkout=success",
             "cancel_url": f"{settings.frontend_url}/dashboard/billing?checkout=cancel",
-            "metadata": {"user_id": str(user.id)},
-            "subscription_data": {"metadata": {"user_id": str(user.id)}},
+            "metadata": md,
+            "subscription_data": {"metadata": md},
             "payment_method_types": stripe_svc.checkout_payment_method_types(settings),
+            "allow_promotion_codes": True,
+            "tax_id_collection": {"enabled": True},
         }
         if user.stripe_customer_id:
             params["customer"] = user.stripe_customer_id

@@ -39,6 +39,9 @@ def create_app() -> FastAPI:
         version="0.1.0",
         lifespan=lifespan,
     )
+    from app.middleware.request_id import add_request_id_middleware
+
+    add_request_id_middleware(app)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origin_list,
@@ -95,10 +98,11 @@ def create_app() -> FastAPI:
             body = {"detail": detail} if isinstance(detail, str) else {"detail": str(detail)}
             return JSONResponse(status_code=exc.status_code, content=body)
         logger.error(
-            "Unhandled %s on %s %s: %s\n%s",
+            "Unhandled %s on %s %s rid=%s: %s\n%s",
             type(exc).__name__,
             request.method,
             request.url.path,
+            getattr(request.state, "request_id", None),
             exc,
             traceback.format_exc(),
         )

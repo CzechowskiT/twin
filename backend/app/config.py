@@ -211,6 +211,23 @@ class Settings(BaseSettings):
     referral_milestone_50_cents: int = 50000
     referral_milestone_100_cents: int = 150000
 
+    # Auto-apply guards (0 = disabled for numeric caps).
+    auto_apply_daily_max_per_user: int = 0
+    auto_apply_company_cooldown_hours: int = 0
+    auto_apply_company_blocklist: str = ""
+    auto_apply_title_blocklist: str = ""
+    # Redis-backed per-minute cap per user (0 = off). Uses `redis_url`.
+    auto_apply_rate_limit_per_minute: int = 0
+    # When true, client must send human_acknowledged=true on auto-apply requests.
+    auto_apply_require_human_ack: bool = False
+
+    # Outbound webhook after auto-apply (HMAC optional; empty URL disables).
+    employer_webhook_url: str = ""
+    employer_webhook_secret: str = ""
+
+    # Partner / ATS export (Bearer-style token via X-Twin-Partner-Token header).
+    partner_export_token: str = ""
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [o for o in (x.strip() for x in self.cors_origins.split(",")) if o]

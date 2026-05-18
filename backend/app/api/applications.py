@@ -5,8 +5,9 @@ import json
 import logging
 from datetime import datetime
 from io import StringIO
+from typing import Annotated
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Query, status
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, Header, HTTPException, Query, status
 from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
@@ -35,7 +36,21 @@ from app.schemas.application import (
     RoleInsightRefOut,
     UpskillActionOut,
 )
+from app.services.auto_apply_guards import (
+    enforce_auto_apply_redis_rate_limit,
+    enforce_company_cooldown,
+    enforce_daily_auto_apply_cap,
+    enforce_human_ack_if_required,
+    enforce_job_blocklists,
+    record_auto_apply_event,
+)
 from app.services.auto_apply_service import auto_apply_for_user
+from app.services.employer_webhook import dispatch_auto_apply_webhook
+from app.services.idempotency import (
+    normalize_idempotency_key,
+    store_idempotent_response,
+    try_replay_idempotent,
+)
 from app.services import referral_program as referral_prog
 from app.services.placement_verification import declare_placement_intent, start_work_email_verification
 from app.services.recruitment_feedback import build_feedback_insights, parse_stored_insights_json
@@ -146,12 +161,49 @@ def development_focus(
     return _aggregate_development_focus(rows)
 
 
+def _maybe_store_application_create_idem(
+    db: Session,
+    *,
+    idem_key: str | None,
+    user_id: int,
+    idem_payload: dict,
+    out: ApplicationOut,
+    response_status: int,
+) -> None:
+    if not idem_key:
+        return
+    store_idempotent_response(
+        db,
+        user_id=user_id,
+        scope="applications.create",
+        idempotency_key=idem_key,
+        body=idem_payload,
+        response_status=response_status,
+        response_json=out.model_dump_json(),
+    )
+
+
 @router.post("/", response_model=ApplicationOut, status_code=status.HTTP_201_CREATED)
 def create_application(
     body: ApplicationCreate,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
-) -> ApplicationOut:
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> ApplicationOut | Response:
+    idem_key = normalize_idempotency_key(idempotency_key)
+    idem_payload = body.model_dump(mode="json")
+    if idem_key:
+        replay = try_replay_idempotent(
+            db,
+            user_id=user.id,
+            scope="applications.create",
+            idempotency_key=idem_key,
+            body=idem_payload,
+        )
+        if replay:
+            st, js = replay
+            return Response(content=js.encode("utf-8"), media_type="application/json", status_code=st)
+
     candidate = _candidate_or_404(db, user.id)
     job = db.query(Job).filter(Job.id == body.job_id).first()
     if not job:
@@ -163,12 +215,21 @@ def create_application(
         .first()
     )
     if existing:
-        return _apply_application_update(
+        out = _apply_application_update(
             existing,
             ApplicationUpdate(status=body.status, notes=body.notes),
             db,
             job,
         )
+        _maybe_store_application_create_idem(
+            db,
+            idem_key=idem_key,
+            user_id=user.id,
+            idem_payload=idem_payload,
+            out=out,
+            response_status=status.HTTP_201_CREATED,
+        )
+        return out
 
     tier = effective_plan_tier(user)
     cap = max_tracked_applications(tier)
@@ -193,22 +254,57 @@ def create_application(
     db.add(app)
     db.commit()
     db.refresh(app)
-    return _to_out(app, job)
+    out = _to_out(app, job)
+    _maybe_store_application_create_idem(
+        db,
+        idem_key=idem_key,
+        user_id=user.id,
+        idem_payload=idem_payload,
+        out=out,
+        response_status=status.HTTP_201_CREATED,
+    )
+    return out
 
 
 @router.post("/auto-apply", response_model=AutoApplyOut)
 def auto_apply(
+    background_tasks: BackgroundTasks,
     body: AutoApplyRequest,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
 ) -> AutoApplyOut:
     """Run Playwright auto-apply (Pracuj.pl; Indeed needs visible browser for CAPTCHA)."""
     settings = get_settings()
+    idem_key = normalize_idempotency_key(idempotency_key)
+    idem_payload = body.model_dump(mode="json")
+    if idem_key:
+        replay = try_replay_idempotent(
+            db,
+            user_id=user.id,
+            scope="applications.auto_apply",
+            idempotency_key=idem_key,
+            body=idem_payload,
+        )
+        if replay:
+            return AutoApplyOut.model_validate_json(replay[1])
+
     if settings.auto_apply_require_premium and effective_plan_tier(user) == PlanTier.FREE:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Auto-apply is available on Premium and Pro plans.",
         )
+    enforce_human_ack_if_required(settings=settings, human_acknowledged=body.human_acknowledged)
+    enforce_auto_apply_redis_rate_limit(user_id=user.id, settings=settings)
+
+    job = db.query(Job).filter(Job.id == body.job_id).first()
+    if not job:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+
+    enforce_job_blocklists(settings=settings, job=job)
+    enforce_daily_auto_apply_cap(db=db, user_id=user.id, settings=settings)
+    enforce_company_cooldown(db=db, user_id=user.id, settings=settings, job=job)
+
     submit = body.submit if body.submit is not None else settings.auto_apply_submit
     try:
         outcome, message, app = auto_apply_for_user(
@@ -216,7 +312,7 @@ def auto_apply(
         )
     except Exception:
         logger.exception("auto_apply failed job_id=%s user_id=%s", body.job_id, user.id)
-        return AutoApplyOut(
+        out = AutoApplyOut(
             success=False,
             outcome=ApplyOutcome.FAILED.value,
             message=(
@@ -225,12 +321,35 @@ def auto_apply(
             ),
             application_id=None,
         )
-    return AutoApplyOut(
-        success=outcome in (ApplyOutcome.SUBMITTED, ApplyOutcome.FORM_FILLED),
-        outcome=outcome.value,
-        message=message,
-        application_id=app.id if app else None,
-    )
+    else:
+        out = AutoApplyOut(
+            success=outcome in (ApplyOutcome.SUBMITTED, ApplyOutcome.FORM_FILLED),
+            outcome=outcome.value,
+            message=message,
+            application_id=app.id if app else None,
+        )
+        if out.success and settings.employer_webhook_url.strip():
+            background_tasks.add_task(
+                dispatch_auto_apply_webhook,
+                get_settings(),
+                application_id=out.application_id,
+                job_id=body.job_id,
+                user_id=user.id,
+                outcome=out.outcome,
+            )
+
+    record_auto_apply_event(db, user_id=user.id, job=job, outcome=out.outcome)
+    if idem_key:
+        store_idempotent_response(
+            db,
+            user_id=user.id,
+            scope="applications.auto_apply",
+            idempotency_key=idem_key,
+            body=idem_payload,
+            response_status=status.HTTP_200_OK,
+            response_json=out.model_dump_json(),
+        )
+    return out
 
 
 @router.post(

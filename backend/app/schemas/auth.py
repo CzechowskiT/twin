@@ -70,6 +70,17 @@ class UserMarketingPreference(BaseModel):
     marketing_emails_opt_in: bool
 
 
+class BillingProfileIn(BaseModel):
+    """Optional invoice / VAT details stored on the user for Stripe metadata and ops."""
+
+    billing_company_name: str | None = Field(default=None, max_length=200)
+    billing_tax_id: str | None = Field(
+        default=None,
+        max_length=64,
+        description="EU VAT number, Polish NIP, or other tax id shown on invoices when supported.",
+    )
+
+
 class UserOut(BaseModel):
     id: int
     email: EmailStr
@@ -86,6 +97,8 @@ class UserOut(BaseModel):
     subscription_current_period_end: datetime | None = None
     identity_verified_at: datetime | None = None
     referral_public_token: str | None = None
+    billing_company_name: str | None = None
+    billing_tax_id: str | None = None
 
     model_config = {"from_attributes": True}
 
@@ -109,6 +122,8 @@ class UserOut(BaseModel):
             subscription_current_period_end=getattr(user, "subscription_current_period_end", None),
             identity_verified_at=getattr(user, "identity_verified_at", None),
             referral_public_token=getattr(user, "referral_public_token", None),
+            billing_company_name=getattr(user, "billing_company_name", None),
+            billing_tax_id=getattr(user, "billing_tax_id", None),
         )
 
 
