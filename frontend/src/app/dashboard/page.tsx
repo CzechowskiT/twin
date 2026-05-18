@@ -1160,8 +1160,13 @@ export default function DashboardPage() {
           <div className="min-w-0 flex-1 twin-card-inset p-4 sm:p-5">
             {user && (
               <>
-                <p className="twin-muted text-sm">{t("dashboard.signedInAs")}</p>
-                <p className="min-w-0 text-sm font-medium leading-snug sm:text-base">{user.email}</p>
+                <p className="twin-muted text-xs">{t("dashboard.signedInAs")}</p>
+                <p
+                  className="min-w-0 max-w-full truncate whitespace-nowrap text-xs font-medium leading-tight tracking-tight sm:text-sm"
+                  title={user.email}
+                >
+                  {user.email}
+                </p>
               </>
             )}
             {profile === null && (
