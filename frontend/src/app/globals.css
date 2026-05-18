@@ -190,6 +190,33 @@ body {
   padding-left: env(safe-area-inset-left, 0);
   padding-right: env(safe-area-inset-right, 0);
   text-rendering: optimizeLegibility;
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+@supports (text-wrap: pretty) {
+  body {
+    text-wrap: pretty;
+  }
+}
+
+button,
+input,
+textarea,
+select,
+code,
+pre,
+kbd,
+samp {
+  text-align: start;
+}
+
+.twin-btn-primary,
+.twin-btn-secondary,
+.twin-btn-solid,
+.twin-btn-chip {
+  text-align: center;
 }
 
 .twin-glass {
@@ -697,6 +724,9 @@ html[data-marketing-surface="studio"] .twin-nav-roi-pill:hover {
   color: var(--twin-muted);
   font-size: 0.9375rem;
   line-height: 1.65;
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
 }
 
 .twin-prose > * + * {
