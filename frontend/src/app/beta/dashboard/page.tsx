@@ -14,6 +14,7 @@ import {
   type BetaDashboard,
   type BetaMatchItem,
 } from "@/lib/beta-api";
+import { safeStorage } from "@/lib/safe-storage";
 
 function DashboardInner() {
   const sp = useSearchParams();
@@ -26,13 +27,7 @@ function DashboardInner() {
 
   useEffect(() => {
     const fromUrl = sp.get("code") || "";
-    const fromStorage = (() => {
-      try {
-        return localStorage.getItem(BETA_REFERRAL_STORAGE_KEY) || "";
-      } catch {
-        return "";
-      }
-    })();
+    const fromStorage = safeStorage.getItem(BETA_REFERRAL_STORAGE_KEY) || "";
     const c = fromUrl || fromStorage;
     queueMicrotask(() => setCode(c));
   }, [sp]);

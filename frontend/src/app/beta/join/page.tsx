@@ -15,6 +15,7 @@ import {
   type BetaDashboard,
   type BetaJoinResult,
 } from "@/lib/beta-api";
+import { safeStorage } from "@/lib/safe-storage";
 
 function fillParams(s: string, params: Record<string, string>): string {
   let out = s;
@@ -60,7 +61,7 @@ function JoinInner() {
       return;
     }
     try {
-      const ref = localStorage.getItem(BETA_REFERRAL_STORAGE_KEY);
+      const ref = safeStorage.getItem(BETA_REFERRAL_STORAGE_KEY);
       const res = await betaJoin({
         email,
         name: name || undefined,
@@ -70,7 +71,7 @@ function JoinInner() {
         consent_beta_email_updates: true,
       });
       setJoin(res);
-      localStorage.setItem(BETA_REFERRAL_STORAGE_KEY, res.referral_code);
+      safeStorage.setItem(BETA_REFERRAL_STORAGE_KEY, res.referral_code);
       setStep(2);
     } catch (x: unknown) {
       setErr(x instanceof Error ? x.message : t("betaJoin.joinFailed"));

@@ -1,3 +1,5 @@
+import { safeStorage } from "@/lib/safe-storage";
+
 export type JobFilters = {
   q: string;
   location: string;
@@ -35,12 +37,8 @@ let memoryJobFiltersJson: string | null = null;
 
 function readJobFilterString(): string | null {
   if (typeof window === "undefined") return null;
-  try {
-    const fromLocal = localStorage.getItem(JOB_FILTERS_STORAGE_KEY);
-    if (fromLocal?.trim()) return fromLocal;
-  } catch {
-    /* fall through to session / memory */
-  }
+  const fromLocal = safeStorage.getItem(JOB_FILTERS_STORAGE_KEY);
+  if (fromLocal?.trim()) return fromLocal;
   try {
     const fromSession = sessionStorage.getItem(JOB_FILTERS_STORAGE_KEY);
     if (fromSession?.trim()) return fromSession;
@@ -53,16 +51,14 @@ function readJobFilterString(): string | null {
 function writeJobFilterString(value: string): void {
   if (typeof window === "undefined") return;
   memoryJobFiltersJson = value;
-  try {
-    localStorage.setItem(JOB_FILTERS_STORAGE_KEY, value);
+  if (safeStorage.setItem(JOB_FILTERS_STORAGE_KEY, value)) {
     return;
+  }
+  console.warn("localStorage not available for job filters; using sessionStorage");
+  try {
+    sessionStorage.setItem(JOB_FILTERS_STORAGE_KEY, value);
   } catch {
-    console.warn("localStorage not available for job filters; using sessionStorage");
-    try {
-      sessionStorage.setItem(JOB_FILTERS_STORAGE_KEY, value);
-    } catch {
-      console.warn("sessionStorage not available for job filters; using in-memory fallback only");
-    }
+    console.warn("sessionStorage not available for job filters; using in-memory fallback only");
   }
 }
 

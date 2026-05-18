@@ -19,6 +19,7 @@ import {
   type Locale,
   type TranslationKey,
 } from "@/lib/i18n";
+import { safeStorage } from "@/lib/safe-storage";
 
 type LanguageContextValue = {
   locale: Locale;
@@ -30,7 +31,7 @@ const LanguageContext = createContext<LanguageContextValue | null>(null);
 
 function readStoredLocale(): Locale | null {
   if (typeof window === "undefined") return null;
-  const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
+  const stored = safeStorage.getItem(LOCALE_STORAGE_KEY);
   return stored && isLocale(stored) ? stored : null;
 }
 
@@ -53,22 +54,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     document.documentElement.lang = LOCALE_HTML_LANG[locale];
     document.documentElement.dir = localeIsRtl(locale) ? "rtl" : "ltr";
-    try {
-      localStorage.setItem(LOCALE_STORAGE_KEY, locale);
-    } catch {
-      // private browsing / blocked storage
-    }
+    safeStorage.setItem(LOCALE_STORAGE_KEY, locale);
   }, [locale]);
 
   const setLocale = useCallback((next: Locale) => {
     setLocaleState(next);
     document.documentElement.lang = LOCALE_HTML_LANG[next];
     document.documentElement.dir = localeIsRtl(next) ? "rtl" : "ltr";
-    try {
-      localStorage.setItem(LOCALE_STORAGE_KEY, next);
-    } catch {
-      // private browsing / blocked storage
-    }
+    safeStorage.setItem(LOCALE_STORAGE_KEY, next);
   }, []);
 
   const t = useCallback((key: TranslationKey) => translate(locale, key), [locale]);

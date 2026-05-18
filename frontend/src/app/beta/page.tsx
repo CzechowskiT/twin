@@ -11,6 +11,7 @@ import {
   type BetaMatchItem,
   type BetaStats,
 } from "@/lib/beta-api";
+import { safeStorage } from "@/lib/safe-storage";
 
 function subscribeOrigin() {
   return () => {};
@@ -39,7 +40,7 @@ function BetaLandingInner() {
 
   useEffect(() => {
     const ref = searchParams.get("ref");
-    if (ref) localStorage.setItem(BETA_REFERRAL_STORAGE_KEY, ref.trim().toLowerCase());
+    if (ref) safeStorage.setItem(BETA_REFERRAL_STORAGE_KEY, ref.trim().toLowerCase());
   }, [searchParams]);
 
   useEffect(() => {
@@ -85,7 +86,7 @@ function BetaLandingInner() {
 
   const shareUrl = origin ? `${origin}/beta` : "/beta";
   const refStored =
-    typeof window !== "undefined" ? localStorage.getItem(BETA_REFERRAL_STORAGE_KEY) : null;
+    typeof window !== "undefined" ? safeStorage.getItem(BETA_REFERRAL_STORAGE_KEY) : null;
   const shareWithRef = refStored ? `${shareUrl}?ref=${encodeURIComponent(refStored)}` : shareUrl;
 
   const linkedInShare = () => {

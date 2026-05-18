@@ -18,6 +18,7 @@ import {
   type MarketingPersona,
   PERSONA_STORAGE_KEY,
 } from "@/lib/marketing-persona";
+import { safeStorage } from "@/lib/safe-storage";
 
 type PersonaContextValue = {
   persona: MarketingPersona;
@@ -28,7 +29,7 @@ const PersonaContext = createContext<PersonaContextValue | null>(null);
 
 function readStoredPersona(): MarketingPersona | null {
   if (typeof window === "undefined") return null;
-  const raw = localStorage.getItem(PERSONA_STORAGE_KEY);
+  const raw = safeStorage.getItem(PERSONA_STORAGE_KEY);
   return raw && isMarketingPersona(raw) ? raw : null;
 }
 
@@ -45,11 +46,7 @@ export function PersonaProvider({ children }: { children: ReactNode }) {
   }, [pathname]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(PERSONA_STORAGE_KEY, persona);
-    } catch {
-      // private browsing / blocked storage
-    }
+    safeStorage.setItem(PERSONA_STORAGE_KEY, persona);
   }, [persona]);
 
   const setPersona = useCallback((next: MarketingPersona) => {
