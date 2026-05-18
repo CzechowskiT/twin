@@ -201,7 +201,7 @@ function BillingPlanTierCard({
 
   return (
     <article
-      className={`twin-billing-plan-card flex min-h-0 w-full flex-col rounded-2xl border bg-[var(--twin-surface-raised)] p-5 text-start shadow-sm transition sm:p-6 ${
+      className={`twin-billing-plan-card flex w-full min-w-0 max-w-none flex-col self-stretch rounded-2xl border bg-[var(--twin-surface-raised)] p-5 text-start shadow-sm transition sm:p-6 ${
         isCurrent
           ? "border-[var(--twin-accent)] ring-2 ring-[var(--twin-accent-muted)]"
           : "border-[var(--twin-border)] hover:border-[var(--twin-accent)]/50"
@@ -226,8 +226,29 @@ function BillingPlanTierCard({
         ) : null}
       </div>
 
-      <p className="mt-4 flex-1 text-sm leading-relaxed text-[var(--twin-muted-strong)] break-words">{p.description}</p>
-      <p className="mt-3 text-xs leading-snug text-[var(--twin-muted)] break-words">
+      <p
+        className="mt-4 flex-1 text-sm leading-relaxed text-[var(--twin-muted-strong)] break-words"
+        style={{
+          textAlign: "start",
+          hyphens: "none",
+          WebkitHyphens: "none",
+          wordBreak: "normal",
+          overflowWrap: "break-word",
+          textWrap: "wrap",
+        }}
+      >
+        {p.description}
+      </p>
+      <p
+        className="mt-3 text-xs leading-snug text-[var(--twin-muted)] break-words"
+        style={{
+          textAlign: "start",
+          hyphens: "none",
+          WebkitHyphens: "none",
+          wordBreak: "normal",
+          overflowWrap: "break-word",
+        }}
+      >
         {p.max_tracked_applications != null
           ? t("dashboard.billingTrackedCap").replace("{n}", String(p.max_tracked_applications))
           : t("dashboard.billingTrackedUnlimited")}

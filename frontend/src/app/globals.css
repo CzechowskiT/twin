@@ -206,17 +206,17 @@ body {
  * normal alignment and wrapping so Stripe copy is not squeezed letter-by-letter.
  */
 .twin-billing-surface {
-  text-align: start;
-  hyphens: manual;
-  -webkit-hyphens: manual;
-  text-wrap: wrap;
+  text-align: start !important;
+  hyphens: manual !important;
+  -webkit-hyphens: manual !important;
+  text-wrap: wrap !important;
 }
 
 .twin-billing-surface .twin-billing-plan-card {
+  align-self: stretch;
   width: 100%;
-  max-width: min(40rem, 100%);
   min-width: 0;
-  margin-inline: auto;
+  max-width: none;
 }
 
 .twin-billing-surface .twin-billing-plan-card p {
@@ -224,6 +224,8 @@ body {
   -webkit-hyphens: none;
   word-break: normal;
   overflow-wrap: break-word;
+  text-align: start;
+  text-wrap: wrap;
 }
 
 button,
