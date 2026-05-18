@@ -255,8 +255,16 @@ def login_json(request: Request, body: UserLogin, db: Session = Depends(get_db))
 
 
 @router.post("/forgot-password")
-def forgot_password(body: ForgotPasswordRequest, db: Session = Depends(get_db)) -> dict[str, str]:
+def forgot_password(
+    request: Request,
+    body: ForgotPasswordRequest,
+    db: Session = Depends(get_db),
+) -> dict[str, str]:
     settings = get_settings()
+    enforce_login_rate_limit_per_minute(
+        client_key=f"forgot:{_login_rate_limit_client_key(request)}",
+        max_per_minute=settings.auth_forgot_password_rate_limit_per_minute,
+    )
     message = request_password_reset(db, settings, str(body.email))
     return {"message": message}
 

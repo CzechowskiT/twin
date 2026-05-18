@@ -45,7 +45,12 @@ class Settings(BaseSettings):
         return value
     secret_key: str = "dev-only-change-me"
     access_token_expire_minutes: int = 60 * 24 * 7
-    auth_login_rate_limit_per_minute: int = 0
+    # 0 = disabled (local only). Production should keep a positive cap to slow credential stuffing.
+    auth_login_rate_limit_per_minute: int = 30
+    # Separate bucket for POST /auth/forgot-password (abuse / enumeration). 0 = disabled.
+    auth_forgot_password_rate_limit_per_minute: int = 5
+    # When non-empty, GET /health/features requires matching X-Twin-Health-Token (see docs).
+    health_features_token: str = ""
     cors_origins: str = "http://localhost:3000"
 
     @field_validator("cors_origins", mode="before")
@@ -98,6 +103,11 @@ class Settings(BaseSettings):
     scrape_post_fetch_delay_sec: float = 0.0
     intro_audio_upload_dir: str = "data/intro_audio"
     intro_audio_max_bytes: int = 15 * 1024 * 1024
+
+    # User-owned attachments on Profile (certificates, portfolio exports, etc.) — not parsed for matching.
+    profile_documents_upload_dir: str = "data/profile_documents"
+    profile_document_max_bytes: int = 15 * 1024 * 1024
+    profile_documents_max_per_user: int = 25
 
     linkedin_client_id: str = ""
     linkedin_client_secret: str = ""

@@ -108,6 +108,7 @@ class UserOut(BaseModel):
     billing_tax_id: str | None = None
     email_product_updates: bool = False
     email_interview_reminders: bool = False
+    profile_documents_processing_consent_at: datetime | None = None
 
     model_config = {"from_attributes": True}
 
@@ -135,6 +136,9 @@ class UserOut(BaseModel):
             billing_tax_id=getattr(user, "billing_tax_id", None),
             email_product_updates=bool(getattr(user, "email_product_updates", False)),
             email_interview_reminders=bool(getattr(user, "email_interview_reminders", False)),
+            profile_documents_processing_consent_at=getattr(
+                user, "profile_documents_processing_consent_at", None
+            ),
         )
 
 

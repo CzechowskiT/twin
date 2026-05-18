@@ -86,6 +86,9 @@ class User(Base):
     # Optional email channels (default off — separate opt-in from service/consent emails).
     email_product_updates: Mapped[bool] = mapped_column(Boolean, default=False)
     email_interview_reminders: Mapped[bool] = mapped_column(Boolean, default=False)
+    profile_documents_processing_consent_at: Mapped[datetime | None] = mapped_column(
+        DateTime, nullable=True
+    )
 
     candidate: Mapped["Candidate | None"] = relationship(back_populates="user")
     password_reset_tokens: Mapped[list["PasswordResetToken"]] = relationship(
@@ -107,6 +110,26 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan",
     )
+    profile_documents: Mapped[list["UserProfileDocument"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+
+
+class UserProfileDocument(Base):
+    """Arbitrary user files from Profile → Documents (storage only; no automated parsing in MVP)."""
+
+    __tablename__ = "user_profile_documents"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    original_filename: Mapped[str] = mapped_column(String(512))
+    storage_path: Mapped[str] = mapped_column(String(768))
+    content_type: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    size_bytes: Mapped[int] = mapped_column(Integer)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    user: Mapped["User"] = relationship(back_populates="profile_documents")
 
 
 class UserGoogleCalendar(Base):

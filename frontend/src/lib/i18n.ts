@@ -876,6 +876,24 @@ const en = {
     talentPoolProcessingConsentHint:
       "Recruiters see only aggregated signals, not your name, email, phone, CV text, or exact address.",
     talentPoolProcessingConsentRequired: "Confirm talent pool processing consent to enable the pool.",
+    documentsSection: "Documents",
+    documentsHint:
+      "Store certificates, portfolios, or other files you may need for applications (PDF, Office, images, CSV — max 15 MB each, up to 25 files). Stored for your use only; not parsed for matching.",
+    documentsUpload: "Upload file",
+    documentsUploading: "Uploading…",
+    documentsUploaded: "File saved to your vault.",
+    documentsUploadFailed: "Could not upload file",
+    documentsDownload: "Download",
+    documentsDelete: "Remove",
+    documentsDeleted: "File removed.",
+    documentsDeleteFailed: "Could not remove file",
+    documentsDownloadFailed: "Could not download file",
+    documentsConsentRequiredUpload:
+      "Confirm document storage consent below, or tick the consent box for this upload (not needed if you already accepted CV storage).",
+    documentsProcessingConsentLabel:
+      "I consent to storing these profile documents as described in the Privacy Policy (required before the first upload unless CV storage consent already applies).",
+    documentsProcessingConsentHint:
+      "Files stay in your account until you delete them. You can export metadata with “Download my data” on the dashboard.",
   },
   onboarding: {
     title: "Assistant onboarding",
@@ -2161,6 +2179,24 @@ const pl: MessageTree = {
     talentPoolProcessingConsentHint:
       "Rekruterzy widzą tylko zagregowane sygnały, bez imienia, e-maila, telefonu, treści CV ani dokładnego adresu.",
     talentPoolProcessingConsentRequired: "Potwierdź zgodę na pulę talentów, aby włączyć udział.",
+    documentsSection: "Dokumenty",
+    documentsHint:
+      "Przechowuj certyfikaty, portfolio lub inne pliki przydatne przy aplikacjach (PDF, Office, obrazy, CSV — max 15 MB każdy, do 25 plików). Tylko dla Ciebie; nie są parsowane do dopasowania.",
+    documentsUpload: "Wgraj plik",
+    documentsUploading: "Wgrywanie…",
+    documentsUploaded: "Plik zapisany w Twoim magazynie.",
+    documentsUploadFailed: "Nie udało się wgrać pliku",
+    documentsDownload: "Pobierz",
+    documentsDelete: "Usuń",
+    documentsDeleted: "Plik usunięty.",
+    documentsDeleteFailed: "Nie udało się usunąć pliku",
+    documentsDownloadFailed: "Nie udało się pobrać pliku",
+    documentsConsentRequiredUpload:
+      "Potwierdź zgodę na przechowywanie dokumentów poniżej albo zaznacz zgodę przy tym uploadzie (niepotrzebne, jeśli masz już zgodę na przechowywanie CV).",
+    documentsProcessingConsentLabel:
+      "Wyrażam zgodę na przechowywanie tych dokumentów profilu zgodnie z Polityką prywatności (wymagane przed pierwszym uploadem, chyba że obejmuje Cię zgoda na CV).",
+    documentsProcessingConsentHint:
+      "Pliki zostają na koncie, dopóki ich nie usuniesz. Metadane możesz wyeksportować przez „Pobierz moje dane” w panelu.",
   },
   onboarding: {
     title: "Onboarding asystenta",

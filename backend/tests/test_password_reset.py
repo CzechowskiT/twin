@@ -95,8 +95,10 @@ def test_request_reset_creates_token_and_sends_mail(mock_send: MagicMock, _mc: M
 
 def test_forgot_password_route_does_not_require_real_db() -> None:
     from app.database.session import get_db
+    from app.services.login_rate_limit import reset_login_rate_limit_state
 
     mock_session = MagicMock()
+    reset_login_rate_limit_state()
 
     def _override_db():
         yield mock_session

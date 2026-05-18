@@ -3,6 +3,7 @@
 import csv
 import json
 from datetime import datetime, timezone
+from urllib.parse import quote
 from io import BytesIO, StringIO
 from typing import Any
 
@@ -13,7 +14,7 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.core.deps import get_current_user
-from app.database.models import Candidate, Job, User
+from app.database.models import Candidate, Job, User, UserProfileDocument
 from app.database.session import get_db
 from app.schemas.candidate import (
     CandidateCreate,
@@ -23,6 +24,9 @@ from app.schemas.candidate import (
     CvTailorIn,
     CvUploadOut,
     IntroAudioUploadOut,
+    ProfileDocumentOut,
+    ProfileDocumentsListOut,
+    ProfileDocumentUploadOut,
 )
 from app.schemas.career_compass import (
     CareerCompassOut,
@@ -45,6 +49,13 @@ from app.services.career_compass import (
     set_milestone_done,
 )
 from app.services.intro_audio_storage import save_intro_audio_for_candidate
+from app.services.profile_document_storage import (
+    delete_profile_document_file,
+    read_profile_document_bytes,
+    safe_original_filename,
+    validate_profile_document_filename,
+    write_profile_document_file,
+)
 from app.services.matching_service import find_top_matches
 from app.services.user_data_export import build_user_owned_export_payload
 
@@ -221,6 +232,169 @@ def remove_cv(
     candidate = _get_candidate_or_404(db, user.id)
     candidate = delete_cv_for_candidate(db, candidate)
     return _to_out(candidate)
+
+
+def _profile_docs_storage_covered(db: Session, user: User) -> bool:
+    if user.profile_documents_processing_consent_at is not None:
+        return True
+    cand = db.query(Candidate).filter(Candidate.user_id == user.id).first()
+    return bool(cand and cand.cv_processing_consent_at)
+
+
+def _form_bool_flag(raw: str | None) -> bool:
+    if raw is None:
+        return False
+    return raw.strip().lower() in ("true", "1", "on", "yes")
+
+
+def _document_attachment_headers(filename: str) -> dict[str, str]:
+    safe = filename.replace("\r", " ").replace("\n", " ").strip() or "document"
+    ascii_name = safe.encode("ascii", "replace").decode("ascii").replace('"', "'")[:200]
+    disp = f"attachment; filename=\"{ascii_name}\"; filename*=UTF-8''{quote(safe)}"
+    return {"Content-Disposition": disp}
+
+
+@router.get("/me/documents", response_model=ProfileDocumentsListOut)
+def list_profile_documents(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> ProfileDocumentsListOut:
+    db.refresh(user)
+    rows = (
+        db.query(UserProfileDocument)
+        .filter(UserProfileDocument.user_id == user.id)
+        .order_by(UserProfileDocument.created_at.desc())
+        .all()
+    )
+    items = [ProfileDocumentOut.model_validate(r) for r in rows]
+    return ProfileDocumentsListOut(
+        items=items,
+        storage_consent_covered=_profile_docs_storage_covered(db, user),
+    )
+
+
+@router.post("/me/documents", response_model=ProfileDocumentUploadOut)
+async def upload_profile_document(
+    file: UploadFile = File(...),
+    processing_consent: str = Form(default="false"),
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> ProfileDocumentUploadOut:
+    settings = get_settings()
+    db.refresh(user)
+    if not _profile_docs_storage_covered(db, user):
+        if not _form_bool_flag(processing_consent):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=(
+                    "Storing profile documents requires explicit consent (see Privacy Policy), "
+                    "unless you already accepted CV storage."
+                ),
+            )
+        user.profile_documents_processing_consent_at = datetime.now(timezone.utc)
+        db.add(user)
+        db.flush()
+
+    count = db.query(UserProfileDocument).filter(UserProfileDocument.user_id == user.id).count()
+    if count >= settings.profile_documents_max_per_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Maximum number of stored documents reached.",
+        )
+
+    if not file.filename:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing filename")
+
+    content = await file.read()
+    if not content:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Empty file")
+    max_bytes = settings.profile_document_max_bytes
+    if len(content) > max_bytes:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"File too large (max {max_bytes // (1024 * 1024)} MB).",
+        )
+
+    try:
+        validate_profile_document_filename(file.filename)
+        orig_safe = safe_original_filename(file.filename)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+    ct = (file.content_type or "").strip()[:128] or None
+    storage_path: str
+    try:
+        storage_path = write_profile_document_file(
+            user_id=user.id, content=content, original_filename=file.filename
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+    doc = UserProfileDocument(
+        user_id=user.id,
+        original_filename=orig_safe,
+        storage_path=storage_path,
+        content_type=ct,
+        size_bytes=len(content),
+    )
+    db.add(doc)
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
+        delete_profile_document_file(storage_path)
+        raise
+    db.refresh(doc)
+    return ProfileDocumentUploadOut(
+        document=ProfileDocumentOut.model_validate(doc),
+        message="File stored.",
+    )
+
+
+@router.get("/me/documents/{document_id}/file")
+def download_profile_document(
+    document_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> Response:
+    doc = (
+        db.query(UserProfileDocument)
+        .filter(UserProfileDocument.id == document_id, UserProfileDocument.user_id == user.id)
+        .first()
+    )
+    if not doc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
+    try:
+        body = read_profile_document_bytes(doc.storage_path)
+    except FileNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_410_GONE,
+            detail="File missing on server",
+        ) from exc
+    return Response(
+        content=body,
+        media_type=doc.content_type or "application/octet-stream",
+        headers=_document_attachment_headers(doc.original_filename),
+    )
+
+
+@router.delete("/me/documents/{document_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_profile_document(
+    document_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> Response:
+    doc = (
+        db.query(UserProfileDocument)
+        .filter(UserProfileDocument.id == document_id, UserProfileDocument.user_id == user.id)
+        .first()
+    )
+    if not doc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
+    delete_profile_document_file(doc.storage_path)
+    db.delete(doc)
+    db.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.post("/me/cv/tailor", response_model=CvTailoringOut)

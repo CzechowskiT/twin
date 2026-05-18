@@ -100,3 +100,23 @@ class CvTailorIn(BaseModel):
 class CvTailoringOut(BaseModel):
     message: str
     tailoring: dict[str, Any]
+
+
+class ProfileDocumentOut(BaseModel):
+    id: int
+    original_filename: str
+    content_type: str | None = None
+    size_bytes: int
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class ProfileDocumentsListOut(BaseModel):
+    items: list[ProfileDocumentOut]
+    storage_consent_covered: bool
+
+
+class ProfileDocumentUploadOut(BaseModel):
+    document: ProfileDocumentOut
+    message: str = "File stored."

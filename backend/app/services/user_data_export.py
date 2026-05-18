@@ -16,6 +16,7 @@ from app.database.models import (
     ScheduledInterview,
     User,
     UserGoogleCalendar,
+    UserProfileDocument,
 )
 
 
@@ -59,6 +60,9 @@ def build_user_owned_export_payload(
         "signup_utm_campaign": user.signup_utm_campaign,
         "signup_utm_content": user.signup_utm_content,
         "subscription_invoice_payment_count": user.subscription_invoice_payment_count,
+        "profile_documents_processing_consent_at": _iso(
+            getattr(user, "profile_documents_processing_consent_at", None)
+        ),
     }
 
     cand_out: dict[str, Any] | None = None
@@ -196,6 +200,23 @@ def build_user_owned_export_payload(
     else:
         gcal_out = {"connected": False, "google_email": None}
 
+    profile_docs_out: list[dict[str, Any]] = []
+    for row in (
+        db.query(UserProfileDocument)
+        .filter(UserProfileDocument.user_id == user.id)
+        .order_by(UserProfileDocument.id)
+        .all()
+    ):
+        profile_docs_out.append(
+            {
+                "id": row.id,
+                "original_filename": row.original_filename,
+                "content_type": row.content_type,
+                "size_bytes": row.size_bytes,
+                "created_at": _iso(row.created_at),
+            }
+        )
+
     return {
         "export_schema_version": 1,
         "dashboard_url": dashboard_url,
@@ -207,4 +228,5 @@ def build_user_owned_export_payload(
         "identity_verifications": idv_out,
         "oauth_accounts": oauth_out,
         "google_calendar": gcal_out,
+        "profile_documents": profile_docs_out,
     }

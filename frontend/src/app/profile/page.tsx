@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Input, Label, Shell } from "@/components/ui";
-import { apiFetch, apiUpload } from "@/lib/api";
+import { apiFetch, apiFetchBlob, apiUpload, saveBlobAsFile } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -68,16 +68,34 @@ type TailorMatchRow = {
 
 type UserPrefs = {
   marketing_emails_opt_in: boolean;
+  profile_documents_processing_consent_at?: string | null;
 };
+
+type ProfileDocumentRow = {
+  id: number;
+  original_filename: string;
+  content_type: string | null;
+  size_bytes: number;
+  created_at: string;
+};
+
+function formatDocSize(n: number): string {
+  if (n < 1024) return `${n} B`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 const CV_ACCEPT = ".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain";
 const AUDIO_ACCEPT = "audio/webm,audio/mpeg,audio/mp4,audio/wav,.webm,.mp3,.m4a,.wav,.ogg";
+const DOCUMENT_ACCEPT =
+  ".pdf,.docx,.txt,.png,.jpg,.jpeg,.webp,.csv,.xlsx,.pptx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,image/png,image/jpeg,image/webp,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation";
 
 export default function ProfilePage() {
   const router = useRouter();
   const { t } = useTranslation();
   const fileRef = useRef<HTMLInputElement>(null);
   const audioRef = useRef<HTMLInputElement>(null);
+  const docsRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [cvBusy, setCvBusy] = useState(false);
@@ -96,6 +114,11 @@ export default function ProfilePage() {
   const [tailorTitle, setTailorTitle] = useState("");
   const [tailorBusy, setTailorBusy] = useState(false);
   const [tailorMsg, setTailorMsg] = useState<string | null>(null);
+  const [profileDocs, setProfileDocs] = useState<ProfileDocumentRow[]>([]);
+  const [docStorageCovered, setDocStorageCovered] = useState(false);
+  const [docsBusy, setDocsBusy] = useState(false);
+  const [docsMessage, setDocsMessage] = useState<string | null>(null);
+  const [docUploadConsent, setDocUploadConsent] = useState(false);
 
   function applyTailoringFromProfile(prof: Profile | null) {
     if (!prof) return;
@@ -124,6 +147,21 @@ export default function ProfilePage() {
     }
   }
 
+  async function loadDocumentsList(token: string) {
+    try {
+      const r = await apiFetch<{ items: ProfileDocumentRow[]; storage_consent_covered: boolean }>(
+        "/api/v1/candidates/me/documents",
+        {},
+        token,
+      );
+      setProfileDocs(r.items ?? []);
+      setDocStorageCovered(Boolean(r.storage_consent_covered));
+    } catch {
+      setProfileDocs([]);
+      setDocStorageCovered(false);
+    }
+  }
+
   useEffect(() => {
     const token = getToken();
     if (!token) {
@@ -133,6 +171,7 @@ export default function ProfilePage() {
     Promise.all([
       apiFetch<Profile>("/api/v1/candidates/me", {}, token).catch(() => null),
       apiFetch<UserPrefs>("/api/v1/auth/me", {}, token).catch(() => null),
+      loadDocumentsList(token),
     ])
       .then(([prof, prefs]) => {
         setInitial(prof);
@@ -151,10 +190,13 @@ export default function ProfilePage() {
     const token = getToken();
     if (!token) return;
     try {
-      const [prof, prefs] = await Promise.all([
+      const results = await Promise.all([
         apiFetch<Profile>("/api/v1/candidates/me", {}, token),
         apiFetch<UserPrefs>("/api/v1/auth/me", {}, token),
+        loadDocumentsList(token),
       ]);
+      const prof = results[0];
+      const prefs = results[1];
       setInitial(prof);
       setUserPrefs(prefs);
       setTalentPoolOptIn(Boolean(prof.talent_pool_opt_in));
@@ -296,6 +338,68 @@ export default function ProfilePage() {
     } finally {
       setIntroBusy(false);
       if (audioRef.current) audioRef.current.value = "";
+    }
+  }
+
+  async function onProfileDocSelected(file: File | null) {
+    if (!file) return;
+    const token = getToken();
+    if (!token) return;
+    setError(null);
+    setDocsMessage(null);
+    if (!docStorageCovered && !docUploadConsent) {
+      setError(t("profile.documentsConsentRequiredUpload"));
+      return;
+    }
+    setDocsBusy(true);
+    try {
+      const extra = !docStorageCovered ? { processing_consent: "true" } : undefined;
+      await apiUpload<{ document: ProfileDocumentRow }>(
+        "/api/v1/candidates/me/documents",
+        file,
+        token,
+        extra,
+      );
+      setDocUploadConsent(false);
+      await reloadProfile();
+      setDocsMessage(t("profile.documentsUploaded"));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("profile.documentsUploadFailed"));
+    } finally {
+      setDocsBusy(false);
+      if (docsRef.current) docsRef.current.value = "";
+    }
+  }
+
+  async function downloadProfileDoc(row: ProfileDocumentRow) {
+    const token = getToken();
+    if (!token) return;
+    setError(null);
+    setDocsBusy(true);
+    try {
+      const blob = await apiFetchBlob(`/api/v1/candidates/me/documents/${row.id}/file`, {}, token);
+      saveBlobAsFile(blob, row.original_filename);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("profile.documentsDownloadFailed"));
+    } finally {
+      setDocsBusy(false);
+    }
+  }
+
+  async function deleteProfileDoc(id: number) {
+    const token = getToken();
+    if (!token) return;
+    setError(null);
+    setDocsMessage(null);
+    setDocsBusy(true);
+    try {
+      await apiFetch(`/api/v1/candidates/me/documents/${id}`, { method: "DELETE" }, token);
+      await reloadProfile();
+      setDocsMessage(t("profile.documentsDeleted"));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("profile.documentsDeleteFailed"));
+    } finally {
+      setDocsBusy(false);
     }
   }
 
@@ -625,6 +729,78 @@ export default function ProfilePage() {
           </section>
         )}
 
+        <section className="twin-filter-box mb-6">
+          <h2 className="mb-1 text-sm font-semibold text-[var(--foreground)]">{t("profile.documentsSection")}</h2>
+          <p className="twin-muted mb-3 text-xs">{t("profile.documentsHint")}</p>
+          {!docStorageCovered && (
+            <label className="mb-3 flex cursor-pointer items-start gap-3 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/30 p-3 text-sm">
+              <input
+                type="checkbox"
+                checked={docUploadConsent}
+                onChange={(e) => setDocUploadConsent(e.target.checked)}
+                className="mt-1 h-4 w-4 shrink-0 rounded border-[var(--twin-border)]"
+              />
+              <span>
+                <span className="font-medium text-[var(--foreground)]">{t("profile.documentsProcessingConsentLabel")}</span>
+                <span className="mt-1 block text-xs text-[var(--twin-muted-strong)]">
+                  {t("profile.documentsProcessingConsentHint")}
+                </span>
+              </span>
+            </label>
+          )}
+          <input
+            ref={docsRef}
+            type="file"
+            accept={DOCUMENT_ACCEPT}
+            className="hidden"
+            onChange={(e) => void onProfileDocSelected(e.target.files?.[0] ?? null)}
+          />
+          <Button
+            type="button"
+            disabled={docsBusy || saving || cvBusy || introBusy}
+            onClick={() => docsRef.current?.click()}
+          >
+            {docsBusy ? t("profile.documentsUploading") : t("profile.documentsUpload")}
+          </Button>
+          {docsMessage && <p className="mt-3 text-sm text-green-700">{docsMessage}</p>}
+          {profileDocs.length > 0 ? (
+            <ul className="mt-4 divide-y divide-[var(--twin-border)] rounded-lg border border-[var(--twin-border)] text-sm">
+              {profileDocs.map((d) => (
+                <li
+                  key={d.id}
+                  className="flex flex-col gap-2 px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-medium text-[var(--foreground)]">{d.original_filename}</p>
+                    <p className="twin-muted text-xs">
+                      {formatDocSize(d.size_bytes)}
+                      {d.created_at ? ` · ${d.created_at}` : ""}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 flex-wrap gap-2">
+                    <button
+                      type="button"
+                      disabled={docsBusy || saving || cvBusy || introBusy}
+                      onClick={() => void downloadProfileDoc(d)}
+                      className="twin-btn-secondary twin-touch-target !w-auto px-3 py-1.5 text-xs"
+                    >
+                      {t("profile.documentsDownload")}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={docsBusy || saving || cvBusy || introBusy}
+                      onClick={() => void deleteProfileDoc(d.id)}
+                      className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs text-red-800 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-200"
+                    >
+                      {t("profile.documentsDelete")}
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </section>
+
         <form onSubmit={onSubmit}>
           <Label>{t("profile.fullName")}</Label>
           <Input name="name" required defaultValue={initial?.name ?? ""} />
@@ -750,7 +926,7 @@ export default function ProfilePage() {
             ) : null}
           </div>
           {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
-          <Button type="submit" disabled={saving || cvBusy || introBusy}>
+          <Button type="submit" disabled={saving || cvBusy || introBusy || docsBusy}>
             {saving ? t("profile.saving") : t("profile.submit")}
           </Button>
         </form>

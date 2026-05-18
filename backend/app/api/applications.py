@@ -8,7 +8,7 @@ from io import StringIO
 from typing import Annotated
 
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, Header, HTTPException, Query, status
-from fastapi.responses import Response
+from fastapi.responses import Response, StreamingResponse
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user
@@ -58,6 +58,66 @@ from app.services.recruitment_feedback import build_feedback_insights, parse_sto
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
+_APPLICATION_EXPORT_CSV_MAX_ROWS = 5000
+_APPLICATION_EXPORT_CSV_NOTES_MAX = 50_000
+
+
+def _iter_applications_csv_rows(db: Session, candidate_id: int, limit: int):
+    """Yield UTF-8 chunks for CSV export (bounded rows; truncates huge notes cells)."""
+    buf = StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(
+        [
+            "application_id",
+            "job_id",
+            "status",
+            "title",
+            "company",
+            "location",
+            "job_board",
+            "url",
+            "applied_at",
+            "updated_at",
+            "notes",
+            "placement_state",
+            "placement_verified_at",
+        ],
+    )
+    yield buf.getvalue().encode("utf-8")
+    buf.seek(0)
+    buf.truncate(0)
+    base = (
+        db.query(Application, Job)
+        .join(Job, Application.job_id == Job.id)
+        .filter(Application.candidate_id == candidate_id)
+        .order_by(Application.updated_at.desc())
+        .limit(limit)
+    )
+    for app, job in base.yield_per(200):
+        notes = (app.notes or "").replace("\r\n", "\n").replace("\r", "\n")
+        if len(notes) > _APPLICATION_EXPORT_CSV_NOTES_MAX:
+            notes = notes[: _APPLICATION_EXPORT_CSV_NOTES_MAX] + "\n…(truncated)"
+        writer.writerow(
+            [
+                app.id,
+                job.id,
+                app.status.value,
+                job.title,
+                job.company,
+                job.location or "",
+                job.job_board,
+                job.url,
+                app.applied_at.isoformat() if app.applied_at else "",
+                app.updated_at.isoformat() if app.updated_at else "",
+                notes,
+                app.placement_state or "none",
+                app.placement_verified_at.isoformat() if app.placement_verified_at else "",
+            ],
+        )
+        yield buf.getvalue().encode("utf-8")
+        buf.seek(0)
+        buf.truncate(0)
+
 
 @router.get("/me", response_model=ApplicationListOut)
 def list_my_applications(
@@ -88,58 +148,20 @@ def list_my_applications(
 
 @router.get("/me/export.csv")
 def export_my_applications_csv(
+    limit: int = Query(
+        2000,
+        ge=1,
+        le=_APPLICATION_EXPORT_CSV_MAX_ROWS,
+        description="Maximum rows (newest first). Caps memory for very large pipelines.",
+    ),
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
-) -> Response:
+) -> StreamingResponse:
     """CSV export of the candidate's application pipeline (GDPR-friendly portable copy)."""
     candidate = _candidate_or_404(db, user.id)
-    rows = (
-        db.query(Application, Job)
-        .join(Job, Application.job_id == Job.id)
-        .filter(Application.candidate_id == candidate.id)
-        .order_by(Application.updated_at.desc())
-        .all()
-    )
-    buf = StringIO()
-    writer = csv.writer(buf)
-    writer.writerow(
-        [
-            "application_id",
-            "job_id",
-            "status",
-            "title",
-            "company",
-            "location",
-            "job_board",
-            "url",
-            "applied_at",
-            "updated_at",
-            "notes",
-            "placement_state",
-            "placement_verified_at",
-        ],
-    )
-    for app, job in rows:
-        notes = (app.notes or "").replace("\r\n", "\n").replace("\r", "\n")
-        writer.writerow(
-            [
-                app.id,
-                job.id,
-                app.status.value,
-                job.title,
-                job.company,
-                job.location or "",
-                job.job_board,
-                job.url,
-                app.applied_at.isoformat() if app.applied_at else "",
-                app.updated_at.isoformat() if app.updated_at else "",
-                notes,
-                app.placement_state or "none",
-                app.placement_verified_at.isoformat() if app.placement_verified_at else "",
-            ],
-        )
-    return Response(
-        content=buf.getvalue().encode("utf-8"),
+    lim = min(limit, _APPLICATION_EXPORT_CSV_MAX_ROWS)
+    return StreamingResponse(
+        _iter_applications_csv_rows(db, candidate.id, lim),
         media_type="text/csv; charset=utf-8",
         headers={"Content-Disposition": 'attachment; filename="twin-applications.csv"'},
     )
@@ -412,7 +434,11 @@ def list_placement_events(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Application not found")
     rows = (
         db.query(PlacementEvent)
-        .filter(PlacementEvent.application_id == application_id)
+        .join(Application, Application.id == PlacementEvent.application_id)
+        .filter(
+            Application.candidate_id == candidate.id,
+            PlacementEvent.application_id == application_id,
+        )
         .order_by(PlacementEvent.created_at.desc())
         .limit(100)
         .all()
