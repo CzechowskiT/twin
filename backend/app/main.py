@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.exception_handlers import request_validation_exception_handler
+from fastapi.exception_handlers import http_exception_handler, request_validation_exception_handler
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError, OperationalError, ProgrammingError
@@ -51,6 +51,19 @@ def create_app() -> FastAPI:
     )
     app.include_router(api_router, prefix="/api/v1")
 
+    @app.exception_handler(HTTPException)
+    async def http_exception_sanitize_500(request: Request, exc: HTTPException) -> JSONResponse:
+        if exc.status_code == 500:
+            logger.error(
+                "HTTP 500 on %s %s rid=%s (client detail sanitized): %r",
+                request.method,
+                request.url.path,
+                getattr(request.state, "request_id", None),
+                exc.detail,
+            )
+            return JSONResponse(status_code=500, content={"detail": "Internal server error"})
+        return await http_exception_handler(request, exc)
+
     @app.exception_handler(OperationalError)
     async def database_unavailable(_request: Request, exc: OperationalError) -> JSONResponse:
         """Surface DB connectivity issues instead of the generic 500 body."""
@@ -93,10 +106,6 @@ def create_app() -> FastAPI:
     async def unhandled_exception(request: Request, exc: Exception) -> JSONResponse:
         if isinstance(exc, RequestValidationError):
             return await request_validation_exception_handler(request, exc)
-        if isinstance(exc, HTTPException):
-            detail = exc.detail
-            body = {"detail": detail} if isinstance(detail, str) else {"detail": str(detail)}
-            return JSONResponse(status_code=exc.status_code, content=body)
         logger.error(
             "Unhandled %s on %s %s rid=%s: %s\n%s",
             type(exc).__name__,

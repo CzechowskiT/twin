@@ -86,7 +86,8 @@ export type TranslationKey =
   | `cookies.${keyof typeof en.cookies}`
   | `common.${keyof typeof en.common}`
   | `persona.${keyof typeof en.persona}`
-  | `demo.${keyof typeof en.demo}`;
+  | `demo.${keyof typeof en.demo}`
+  | `first1000.${keyof typeof en.first1000}`;
 
 const en = {
   nav: {
@@ -1163,6 +1164,39 @@ const en = {
     stepDone: "Complete",
     footerNote:
       "GDPR: real accounts require explicit consent at registration. This page uses only fictional data suitable for a public demo.",
+  },
+  first1000: {
+    kicker: "Founder circle · live",
+    headline: "1,000 people get TWIN free. Forever. Then we launch loud.",
+    subline:
+      "No gimmicks, no “trial then we bill your card”: if you’re wishlisted inside the first thousand when the counter hits zero, access stays free. We’re building a career agent that applies, tracks status, and fights tab chaos — this page is a public promise.",
+    counterEyebrow: "Spots left",
+    counterCaption:
+      "Every real wishlist signup lowers the counter. When it hits zero, the founder offer closes and we flip the public switch.",
+    counterOf: "of",
+    statsErr: "The counter is briefly unavailable — refresh in a moment.",
+    manifestoEyebrow: "Read it like a trailer",
+    manifestoTitle: "You shouldn’t need a second brain to apply with dignity.",
+    manifestoBody:
+      "Career isn’t a content feed. It’s a chain of decisions with deadlines, and the internet turned it into seventeen tabs and shame about opening your phone in bed again.\n\nTWIN is a quiet layer that weighs what matters, remembers what you already sent, and — where boards allow — moves repeat clicks away from you. We’re not selling hustle; we’re selling sleep.\n\nThe First 1,000 isn’t a beta you pay for later. It’s proof this is allowed to exist. If you want an unfair edge from an agent that doesn’t fatigue on your pipeline, claim a spot before the counter stops.",
+    videoTitle: "Founder manifesto video",
+    videoHint:
+      "Optional: set NEXT_PUBLIC_LAUNCH_MANIFESTO_YOUTUBE_ID in deploy to show a nocookie embed here.",
+    ctaEyebrow: "Two doors · the same moment",
+    ctaLead:
+      "Wishlist = founder spot + zero fees forever if you land under the cap. Full account = the product now, standard plans later.",
+    ctaFinePrint:
+      "Wishlist drives the global counter. Full account signup is a separate path when you want to jump straight into the dashboard.",
+    soldOutBody:
+      "All 1,000 founder spots are closed — thank you. You can still create a full account in the public product; free‑forever founders access is no longer available.",
+    ctaWishlist: "Claim a founder spot",
+    ctaOpenProduct: "Wishlist full — open the product",
+    ctaRegister: "Create full account",
+    shareEyebrow: "Pass it on",
+    shareButton: "Copy launch link",
+    shareCopied: "Copied. Send it to someone doom-scrolling applications.",
+    footerLegal:
+      "Counts reflect wishlist rows in the API (BETA_WAITLIST_CAP, default 1,000). “Free forever” for founders is a campaign promise — final rules live in Terms and Privacy.",
   },
   privacy: {
     title: "Privacy Policy (MVP)",
@@ -2567,6 +2601,39 @@ const pl: MessageTree = {
     talentPoolLoadMore: "Załaduj więcej",
     growthRoadmapFootnote:
       "Kolejność wdrożeń może się zmieniać; część funkcji może być powiązana z planem po starcie. Napisz, co otwierałbyś co tydzień: to ustawia roadmapę.",
+  },
+  first1000: {
+    kicker: "Krąg founderski · na żywo",
+    headline: "1000 osób dostaje TWIN za darmo. Na zawsze. Potem start na cały głos.",
+    subline:
+      "Bez trików i bez „trial, a potem kasujemy kartę”: jeśli jesteś na liście życzeń wśród pierwszego tysiąca, gdy licznik dojdzie do zera, dostęp zostaje bezpłatny. Budujemy agenta kariery, który aplikuje, pilnuje statusów i walczy z chaosem kart — ta strona to publiczna obietnica.",
+    counterEyebrow: "Wolne miejsca",
+    counterCaption:
+      "Każda prawdziwa rejestracja na liście życzeń obniża licznik. Gdy spadnie do zera, oferta founderska się zamyka i odpalamy publiczny start.",
+    counterOf: "z",
+    statsErr: "Licznik chwilowo nie odpowiada — odśwież za chwilę.",
+    manifestoEyebrow: "Czytaj jak trailer",
+    manifestoTitle: "Nie powinieneś potrzebować drugiego mózgu, żeby aplikować z godnością.",
+    manifestoBody:
+      "Kariera to nie feed treści. To ciąg decyzji z terminami, a internet zamienił to w siedemnaście kart i wstyd, że znów odpalasz telefon w łóżku.\n\nTWIN to cicha warstwa, która waży, co ma znaczenie, pamięta co wysłałaś i — tam, gdzie portale pozwalają — odsuwa powtarzalne kliki od Ciebie. Nie sprzedajemy hustle’u; sprzedajemy sen.\n\nPierwsze tysiąc to nie beta płatna później. To dowód, że to ma prawo istnieć. Jeśli chcesz niesprawiedliwą przewagę agenta, który nie męczy się Twoim pipeline’em, zajmij miejsce, zanim licznik stanie.",
+    videoTitle: "Manifest founderski",
+    videoHint:
+      "Opcjonalnie: ustaw NEXT_PUBLIC_LAUNCH_MANIFESTO_YOUTUBE_ID w deployu, żeby tu wkleić film (embed nocookie).",
+    ctaEyebrow: "Dwie bramy — ten sam moment",
+    ctaLead:
+      "Lista życzeń = miejsce founderskie + zero opłat na zawsze, jeśli zmieścisz się w limicie. Pełne konto = produkt dziś, standardowe plany później.",
+    ctaFinePrint:
+      "Lista życzeń rusza globalny licznik. Pełna rejestracja konta to osobna ścieżka — gdy chcesz od razu wejść w panel.",
+    soldOutBody:
+      "Tysiąc founderskich miejsc jest zamknięty — dziękujemy. Nadal możesz założyć pełne konto w publicznym produkcie; darmowe „na zawsze” dla foundersów jest już niedostępne.",
+    ctaWishlist: "Zajmij founderskie miejsce",
+    ctaOpenProduct: "Lista pełna — wejdź w produkt",
+    ctaRegister: "Załóż pełne konto",
+    shareEyebrow: "Podeślij dalej",
+    shareButton: "Skopiuj link startowy",
+    shareCopied: "Skopiowano. Wyślij komuś, kto znów aplikuje z łóżka.",
+    footerLegal:
+      "Licznik opiera się na zapisach na liście życzeń po stronie API (BETA_WAITLIST_CAP, domyślnie 1000). „Za darmo na zawsze” dla foundersów to obietnica kampanii — ostateczne zasady w Regulaminie i Polityce prywatności.",
   },
   common: {
     language: "Język",

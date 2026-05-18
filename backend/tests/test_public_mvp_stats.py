@@ -1,16 +1,18 @@
 """Public MVP traction stats."""
 
+import logging
 from datetime import datetime
+from unittest.mock import patch
 
+from fastapi import HTTPException
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from fastapi.testclient import TestClient
-
 from app.database.models import Application, ApplicationStatus, Base, Candidate, Job, User
 from app.database.session import get_db
-from app.main import app
+from app.main import app, create_app
 
 
 def _sqlite():
@@ -96,3 +98,42 @@ def test_public_mvp_stats_counts() -> None:
     finally:
         app.dependency_overrides.pop(get_db, None)
         db.close()
+
+
+@patch("app.api.public.scrape_board_ids_ordered", side_effect=RuntimeError("registry-boom-secret"))
+def test_public_mvp_stats_500_is_generic_and_logs_exception(mock_scrape: object, caplog) -> None:
+    caplog.set_level(logging.ERROR, logger="app.api.public")
+    db = _sqlite()
+
+    def override_db():
+        try:
+            yield db
+        finally:
+            pass
+
+    app.dependency_overrides[get_db] = override_db
+    try:
+        client = TestClient(app)
+        res = client.get("/api/v1/public/mvp-stats")
+        assert res.status_code == 500
+        assert res.json() == {"detail": "Internal server error"}
+        assert "registry-boom" not in res.text
+        assert "registry-boom-secret" in caplog.text
+    finally:
+        app.dependency_overrides.pop(get_db, None)
+        db.close()
+
+
+def test_http_500_http_exception_detail_sanitized() -> None:
+    """Global handler must not echo arbitrary HTTPException(500) detail to clients."""
+    probe_app = create_app()
+
+    @probe_app.get("/__probe_http500")
+    def _probe_http500() -> None:
+        raise HTTPException(status_code=500, detail="internal-db-secret-leak")
+
+    client = TestClient(probe_app)
+    res = client.get("/__probe_http500")
+    assert res.status_code == 500
+    assert res.json() == {"detail": "Internal server error"}
+    assert "internal-db-secret" not in res.text

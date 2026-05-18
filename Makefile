@@ -1,4 +1,11 @@
-.PHONY: up down api worker beat migrate test setup open
+.PHONY: up down api worker beat migrate test setup open ci-check
+
+# ci-check: fast local gate (subset of backend tests + frontend typecheck).
+# Assumes backend/.venv exists (see `make migrate` / project README); uses that venv's pytest.
+# Assumes `npm install` was run in frontend/ so npx resolves typescript.
+ci-check:
+	cd backend && . .venv/bin/activate && pytest -q tests/test_health_features.py tests/test_request_id.py
+	cd frontend && npx tsc --noEmit
 
 setup:
 	@./open-folder.sh
