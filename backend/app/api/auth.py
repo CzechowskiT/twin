@@ -18,6 +18,7 @@ from app.schemas.auth import (
     BillingProfileIn,
     ForgotPasswordRequest,
     GdprConsentIn,
+    NotificationPreferencesIn,
     ResetPasswordRequest,
     Token,
     UserLogin,
@@ -350,6 +351,28 @@ def update_marketing_preference(
     user.marketing_emails_opt_in_at = (
         datetime.now(timezone.utc) if body.marketing_emails_opt_in else None
     )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return UserOut.from_user(user)
+
+
+@router.patch("/me/notification-preferences", response_model=UserOut)
+def update_notification_preferences(
+    body: NotificationPreferencesIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> UserOut:
+    data = body.model_dump(exclude_unset=True)
+    if not data:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Provide at least one preference field to update",
+        )
+    if "email_product_updates" in data:
+        user.email_product_updates = bool(data["email_product_updates"])
+    if "email_interview_reminders" in data:
+        user.email_interview_reminders = bool(data["email_interview_reminders"])
     db.add(user)
     db.commit()
     db.refresh(user)

@@ -628,6 +628,16 @@ const en = {
     calendarSlotsGo: "Load several options",
     calendarSlotsEmpty: "No free slots in this window — your calendar may be fully booked for MVP weekday rules.",
     calendarSlotsHint: "Tap a row to copy its start and end into the form above.",
+    calendarNotifSectionTitle: "Email notifications",
+    calendarNotifSectionLead:
+      "Optional channels only — off by default. Account and legally required messages may still be sent separately.",
+    calendarNotifProductLabel: "Product updates and tips",
+    calendarNotifProductHint: "Occasional email about features and how to get more from TWIN.",
+    calendarNotifInterviewLabel: "Interview reminders",
+    calendarNotifInterviewHint: "Email nudges when interviews are scheduled or about to start (when we send them).",
+    calendarNotifPrefsLoadError: "Could not load notification preferences.",
+    calendarNotifPrefsSaveError: "Could not save that preference. Try again.",
+    calendarNotifSaving: "Saving…",
     identityLoading: "Loading…",
     identityPageTitle: "Identity verification",
     identityPageLead:
@@ -1863,6 +1873,16 @@ const pl: MessageTree = {
     calendarSlotsEmpty:
       "Brak wolnych slotów w tym oknie — kalendarz może być pełny przy zasadach MVP (pn–pt, UTC).",
     calendarSlotsHint: "Kliknij wiersz, żeby skopiować start i koniec do formularza powyżej.",
+    calendarNotifSectionTitle: "Powiadomienia e-mail",
+    calendarNotifSectionLead:
+      "Opcjonalne kanały — domyślnie wyłączone. Wiadomości kontowe i wymagane prawnie mogą nadal być wysyłane osobno.",
+    calendarNotifProductLabel: "Aktualizacje produktu i wskazówki",
+    calendarNotifProductHint: "Okazjonalny e-mail o funkcjach i lepszym wykorzystaniu TWIN.",
+    calendarNotifInterviewLabel: "Przypomnienia o rozmowach",
+    calendarNotifInterviewHint: "E-mail z przypomnieniami, gdy rozmowy są planowane lub zbliżają się w czasie (gdy je wyślemy).",
+    calendarNotifPrefsLoadError: "Nie udało się wczytać preferencji powiadomień.",
+    calendarNotifPrefsSaveError: "Nie udało się zapisać preferencji. Spróbuj ponownie.",
+    calendarNotifSaving: "Zapisywanie…",
     identityLoading: "Ładowanie…",
     identityPageTitle: "Weryfikacja tożsamości",
     identityPageLead:

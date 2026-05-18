@@ -70,6 +70,13 @@ class UserMarketingPreference(BaseModel):
     marketing_emails_opt_in: bool
 
 
+class NotificationPreferencesIn(BaseModel):
+    """PATCH body: include only fields to change (both optional)."""
+
+    email_product_updates: bool | None = None
+    email_interview_reminders: bool | None = None
+
+
 class BillingProfileIn(BaseModel):
     """Optional invoice / VAT details stored on the user for Stripe metadata and ops."""
 
@@ -99,6 +106,8 @@ class UserOut(BaseModel):
     referral_public_token: str | None = None
     billing_company_name: str | None = None
     billing_tax_id: str | None = None
+    email_product_updates: bool = False
+    email_interview_reminders: bool = False
 
     model_config = {"from_attributes": True}
 
@@ -124,6 +133,8 @@ class UserOut(BaseModel):
             referral_public_token=getattr(user, "referral_public_token", None),
             billing_company_name=getattr(user, "billing_company_name", None),
             billing_tax_id=getattr(user, "billing_tax_id", None),
+            email_product_updates=bool(getattr(user, "email_product_updates", False)),
+            email_interview_reminders=bool(getattr(user, "email_interview_reminders", False)),
         )
 
 

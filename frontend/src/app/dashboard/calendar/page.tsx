@@ -24,6 +24,11 @@ type NextSlotOut = { start_iso: string; end_iso: string };
 
 type CalendarSlotsPayload = { slots: { start_iso: string; end_iso: string }[] };
 
+type AuthMeOut = {
+  email_product_updates: boolean;
+  email_interview_reminders: boolean;
+};
+
 type ScheduledInterview = {
   id: number;
   company_name: string;
@@ -102,6 +107,11 @@ export default function DashboardCalendarPage() {
   const [icsBusyId, setIcsBusyId] = useState<number | null>(null);
   const [cancelBusyId, setCancelBusyId] = useState<number | null>(null);
   const [showCancelledInterviews, setShowCancelledInterviews] = useState(false);
+  const [emailProductUpdates, setEmailProductUpdates] = useState(false);
+  const [emailInterviewReminders, setEmailInterviewReminders] = useState(false);
+  const [notifPrefsLoadError, setNotifPrefsLoadError] = useState(false);
+  const [notifPrefsSaveError, setNotifPrefsSaveError] = useState(false);
+  const [notifPrefsSaving, setNotifPrefsSaving] = useState<null | keyof AuthMeOut>(null);
   const interviewRefreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchInterviewRows = useCallback(
@@ -151,9 +161,23 @@ export default function DashboardCalendarPage() {
     }
     setLoading(true);
     setActionError(false);
+    setNotifPrefsLoadError(false);
     try {
-      const s = await apiFetch<CalendarStatus>("/api/v1/calendar/google/status", {}, token);
+      const [calRes, meRes] = await Promise.allSettled([
+        apiFetch<CalendarStatus>("/api/v1/calendar/google/status", {}, token),
+        apiFetch<AuthMeOut>("/api/v1/auth/me", {}, token),
+      ]);
+      if (calRes.status === "rejected") {
+        throw calRes.reason;
+      }
+      const s = calRes.value;
       setStatus(s);
+      if (meRes.status === "fulfilled") {
+        setEmailProductUpdates(Boolean(meRes.value.email_product_updates));
+        setEmailInterviewReminders(Boolean(meRes.value.email_interview_reminders));
+      } else {
+        setNotifPrefsLoadError(true);
+      }
       await fetchInterviewRows(token, s.connected);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
@@ -185,6 +209,27 @@ export default function DashboardCalendarPage() {
       else if (err) setBanner("error");
     });
   }, [searchParams]);
+
+  async function patchNotificationPreference<K extends keyof AuthMeOut>(key: K, value: boolean) {
+    const token = getToken();
+    if (!token) return;
+    setNotifPrefsSaving(key);
+    setNotifPrefsSaveError(false);
+    try {
+      const me = await apiFetch<AuthMeOut>(
+        "/api/v1/auth/me/notification-preferences",
+        { method: "PATCH", body: JSON.stringify({ [key]: value }) },
+        token,
+      );
+      setEmailProductUpdates(Boolean(me.email_product_updates));
+      setEmailInterviewReminders(Boolean(me.email_interview_reminders));
+    } catch (e) {
+      setNotifPrefsSaveError(true);
+      console.warn("[calendar] notification preference patch failed", e);
+    } finally {
+      setNotifPrefsSaving(null);
+    }
+  }
 
   async function connect() {
     const token = getToken();
@@ -429,6 +474,63 @@ export default function DashboardCalendarPage() {
           </li>
         </ul>
         <p className="twin-muted mt-4 text-xs leading-relaxed">{t("dashboard.calendarProvidersFoot")}</p>
+      </Card>
+
+      <Card className="mb-6">
+        <h2 className="text-base font-semibold text-[var(--foreground)]">{t("dashboard.calendarNotifSectionTitle")}</h2>
+        <p className="twin-muted mt-2 max-w-2xl text-sm leading-relaxed">{t("dashboard.calendarNotifSectionLead")}</p>
+        {notifPrefsLoadError ? (
+          <p className="mt-3 text-sm text-[var(--twin-muted-strong)]" role="alert">
+            {t("dashboard.calendarNotifPrefsLoadError")}
+          </p>
+        ) : null}
+        {notifPrefsSaveError ? (
+          <p className="mt-3 text-sm text-red-600 dark:text-red-400" role="alert">
+            {t("dashboard.calendarNotifPrefsSaveError")}
+          </p>
+        ) : null}
+        <ul className="mt-4 list-none space-y-4 p-0">
+          <li>
+            <label className="flex cursor-pointer flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
+              <span>
+                <span className="block text-sm font-medium text-[var(--foreground)]">{t("dashboard.calendarNotifProductLabel")}</span>
+                <span className="twin-muted mt-0.5 block text-xs leading-relaxed">{t("dashboard.calendarNotifProductHint")}</span>
+              </span>
+              <span className="flex shrink-0 items-center gap-2 sm:pt-0.5">
+                {notifPrefsSaving === "email_product_updates" ? (
+                  <span className="text-xs text-[var(--twin-muted-strong)]">{t("dashboard.calendarNotifSaving")}</span>
+                ) : null}
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 rounded border border-[var(--twin-border)] accent-[var(--foreground)]"
+                  checked={emailProductUpdates}
+                  disabled={Boolean(notifPrefsSaving) || notifPrefsLoadError}
+                  onChange={(e) => void patchNotificationPreference("email_product_updates", e.target.checked)}
+                />
+              </span>
+            </label>
+          </li>
+          <li>
+            <label className="flex cursor-pointer flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
+              <span>
+                <span className="block text-sm font-medium text-[var(--foreground)]">{t("dashboard.calendarNotifInterviewLabel")}</span>
+                <span className="twin-muted mt-0.5 block text-xs leading-relaxed">{t("dashboard.calendarNotifInterviewHint")}</span>
+              </span>
+              <span className="flex shrink-0 items-center gap-2 sm:pt-0.5">
+                {notifPrefsSaving === "email_interview_reminders" ? (
+                  <span className="text-xs text-[var(--twin-muted-strong)]">{t("dashboard.calendarNotifSaving")}</span>
+                ) : null}
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 rounded border border-[var(--twin-border)] accent-[var(--foreground)]"
+                  checked={emailInterviewReminders}
+                  disabled={Boolean(notifPrefsSaving) || notifPrefsLoadError}
+                  onChange={(e) => void patchNotificationPreference("email_interview_reminders", e.target.checked)}
+                />
+              </span>
+            </label>
+          </li>
+        </ul>
       </Card>
 
       {banner === "connected" ? (

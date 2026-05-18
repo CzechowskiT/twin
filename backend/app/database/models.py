@@ -83,6 +83,10 @@ class User(Base):
     billing_company_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
     billing_tax_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
 
+    # Optional email channels (default off — separate opt-in from service/consent emails).
+    email_product_updates: Mapped[bool] = mapped_column(Boolean, default=False)
+    email_interview_reminders: Mapped[bool] = mapped_column(Boolean, default=False)
+
     candidate: Mapped["Candidate | None"] = relationship(back_populates="user")
     password_reset_tokens: Mapped[list["PasswordResetToken"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
