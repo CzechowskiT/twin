@@ -201,6 +201,31 @@ body {
   }
 }
 
+/**
+ * Plan & billing: `body` uses justified + hyphenated long-form defaults; plan cards need
+ * normal alignment and wrapping so Stripe copy is not squeezed letter-by-letter.
+ */
+.twin-billing-surface {
+  text-align: start;
+  hyphens: manual;
+  -webkit-hyphens: manual;
+  text-wrap: wrap;
+}
+
+.twin-billing-surface .twin-billing-plan-card {
+  width: 100%;
+  max-width: min(40rem, 100%);
+  min-width: 0;
+  margin-inline: auto;
+}
+
+.twin-billing-surface .twin-billing-plan-card p {
+  hyphens: none;
+  -webkit-hyphens: none;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
 button,
 input,
 textarea,

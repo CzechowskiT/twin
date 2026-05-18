@@ -201,7 +201,7 @@ function BillingPlanTierCard({
 
   return (
     <article
-      className={`flex min-h-0 w-full max-w-full flex-col rounded-2xl border bg-[var(--twin-surface-raised)] p-5 text-start shadow-sm transition [hyphens:manual] sm:p-6 ${
+      className={`twin-billing-plan-card flex min-h-0 w-full flex-col rounded-2xl border bg-[var(--twin-surface-raised)] p-5 text-start shadow-sm transition sm:p-6 ${
         isCurrent
           ? "border-[var(--twin-accent)] ring-2 ring-[var(--twin-accent-muted)]"
           : "border-[var(--twin-border)] hover:border-[var(--twin-accent)]/50"
@@ -419,6 +419,7 @@ export default function BillingPage() {
 
   return (
     <Shell wide rail>
+      <div className="twin-billing-surface w-full min-w-0">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0 text-start">
           <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">{t("dashboard.billingPageTitle")}</h1>
@@ -583,7 +584,7 @@ export default function BillingPage() {
               {t("dashboard.billingPlansEmpty")}
             </div>
           ) : (
-            <div className="mt-6 grid w-full gap-4 sm:gap-5 [grid-template-columns:repeat(auto-fit,minmax(min(100%,17.5rem),1fr))]">
+            <div className="mt-6 flex w-full flex-col gap-5">
               {plans.plans.map((p) => {
                 const tier = (me?.plan_tier ?? "free").toLowerCase();
                 const isCurrent = me != null && tier === p.id;
@@ -645,6 +646,7 @@ export default function BillingPage() {
           <p className="mt-6 text-xs leading-relaxed text-[var(--twin-muted)]">{t("dashboard.billingListPricesNote")}</p>
         </Card>
       ) : null}
+      </div>
     </Shell>
   );
 }
