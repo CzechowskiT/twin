@@ -201,7 +201,7 @@ function BillingPlanTierCard({
 
   return (
     <article
-      className={`flex min-h-0 min-w-0 w-full max-w-full flex-col rounded-2xl border bg-[var(--twin-surface-raised)] p-5 shadow-sm transition sm:p-6 ${
+      className={`flex min-h-0 w-full max-w-full flex-col rounded-2xl border bg-[var(--twin-surface-raised)] p-5 text-start shadow-sm transition [hyphens:manual] sm:p-6 ${
         isCurrent
           ? "border-[var(--twin-accent)] ring-2 ring-[var(--twin-accent-muted)]"
           : "border-[var(--twin-border)] hover:border-[var(--twin-accent)]/50"
@@ -216,9 +216,9 @@ function BillingPlanTierCard({
         ) : null}
       </div>
 
-      <div className="mt-4 min-w-0 border-b border-[var(--twin-border)] pb-4">
+      <div className="mt-4 border-b border-[var(--twin-border)] pb-4">
         <p className="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-3xl font-bold tabular-nums tracking-tight text-[var(--twin-accent)] sm:text-4xl">
-          <span className="min-w-0 shrink">{price}</span>
+          <span>{price}</span>
           <span className="text-sm font-semibold text-[var(--twin-muted-strong)]">{t("dashboard.billingPerMonth")}</span>
         </p>
         {p.list_price_monthly != null && p.list_price_currency ? (
@@ -226,21 +226,19 @@ function BillingPlanTierCard({
         ) : null}
       </div>
 
-      <p className="mt-4 min-w-0 flex-1 text-pretty text-sm leading-relaxed text-[var(--twin-muted-strong)] [overflow-wrap:anywhere]">
-        {p.description}
-      </p>
-      <p className="mt-3 min-w-0 text-xs leading-snug text-[var(--twin-muted)] [overflow-wrap:anywhere]">
+      <p className="mt-4 flex-1 text-sm leading-relaxed text-[var(--twin-muted-strong)] break-words">{p.description}</p>
+      <p className="mt-3 text-xs leading-snug text-[var(--twin-muted)] break-words">
         {p.max_tracked_applications != null
           ? t("dashboard.billingTrackedCap").replace("{n}", String(p.max_tracked_applications))
           : t("dashboard.billingTrackedUnlimited")}
       </p>
 
-      <div className="mt-6 min-w-0">
+      <div className="mt-6 w-full">
         <Button
           type="button"
           title={buttonHint}
           aria-label={buttonHint ?? footerLabel}
-          className="h-auto min-h-[2.75rem] w-full whitespace-normal py-2.5 leading-snug sm:w-auto sm:min-w-[11rem] sm:max-w-full sm:px-4"
+          className="h-auto min-h-[2.75rem] w-full whitespace-normal py-2.5 text-center leading-snug sm:w-auto sm:min-w-[11rem] sm:px-4"
           disabled={disabled}
           onClick={() => {
             if (disabled) return;
@@ -424,9 +422,6 @@ export default function BillingPage() {
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0 text-start">
           <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">{t("dashboard.billingPageTitle")}</h1>
-          <p className="mt-2 max-w-prose text-pretty text-sm leading-relaxed text-[var(--twin-muted-strong)] sm:text-base">
-            {t("dashboard.billingPageLead")}
-          </p>
         </div>
         <nav className="flex shrink-0 flex-wrap gap-x-4 gap-y-2 text-sm" aria-label={t("dashboard.billingPageTitle")}>
           <Link href="/dashboard" className="twin-link twin-touch-target">
@@ -447,11 +442,6 @@ export default function BillingPage() {
         {checkoutBanner === "cancel" ? (
           <Card variant="soft" className="!mb-0">
             <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingCheckoutCancelled")}</p>
-          </Card>
-        ) : null}
-        {plans && !plans.checkout_configured ? (
-          <Card variant="soft" className="!mb-0">
-            <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingNotConfigured")}</p>
           </Card>
         ) : null}
         {actionError ? (
@@ -593,7 +583,7 @@ export default function BillingPage() {
               {t("dashboard.billingPlansEmpty")}
             </div>
           ) : (
-            <div className="mt-6 grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3">
+            <div className="mt-6 grid w-full gap-4 sm:gap-5 [grid-template-columns:repeat(auto-fit,minmax(min(100%,17.5rem),1fr))]">
               {plans.plans.map((p) => {
                 const tier = (me?.plan_tier ?? "free").toLowerCase();
                 const isCurrent = me != null && tier === p.id;
