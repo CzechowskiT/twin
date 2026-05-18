@@ -69,6 +69,7 @@ export function ApplicationsPanel({
   onPlacementVerifyStart,
   placementFlowBusy,
   onPlacementEventsLoad,
+  placementEventsInvalidateKey,
 }: {
   items: ApplicationRow[];
   onStatusChange: (id: number, status: string) => void;
@@ -80,6 +81,8 @@ export function ApplicationsPanel({
   onPlacementVerifyStart?: (id: number, workEmail: string) => Promise<void>;
   placementFlowBusy?: PlacementFlowBusy;
   onPlacementEventsLoad?: (applicationId: number) => Promise<PlacementEventRow[]>;
+  /** Bump after declare/verify so the audit log refetches from the API on next open. */
+  placementEventsInvalidateKey?: number;
 }) {
   const { t } = useTranslation();
   const [openId, setOpenId] = useState<number | null>(null);
@@ -113,6 +116,14 @@ export function ApplicationsPanel({
     });
   }, [items]);
 
+  useEffect(() => {
+    if (placementEventsInvalidateKey === undefined) return;
+    setPlacementEventsByAppId({});
+    setPlacementEventsErrById({});
+    setPlacementEventsLoadingId(null);
+    setPlacementHistoryOpenId(null);
+  }, [placementEventsInvalidateKey]);
+
   function draftFor(app: ApplicationRow): string {
     return draftById[app.id] ?? app.recruiter_feedback_raw ?? "";
   }
@@ -139,7 +150,20 @@ export function ApplicationsPanel({
               {onPlacementDeclare && onPlacementVerifyStart && showPlacementRow(app) ? (
                 <div className="mt-2 max-w-md space-y-2 rounded border border-[var(--twin-accent)]/25 bg-[var(--twin-accent-muted)]/25 p-2 text-xs">
                   {(app.placement_state ?? "none") === "verified" ? (
-                    <p className="font-semibold text-[var(--twin-accent)]">{t("dashboard.placementVerified")}</p>
+                    <>
+                      <p className="font-semibold text-[var(--twin-accent)]">{t("dashboard.placementVerified")}</p>
+                      {app.placement_verified_at ? (
+                        <p className="mt-1 text-xs text-[var(--twin-muted)]">
+                          {t("dashboard.placementVerifiedAt").replace(
+                            "{when}",
+                            new Date(app.placement_verified_at).toLocaleString(undefined, {
+                              dateStyle: "medium",
+                              timeStyle: "short",
+                            }),
+                          )}
+                        </p>
+                      ) : null}
+                    </>
                   ) : (app.placement_state ?? "none") === "none" ? (
                     <>
                       <p className="leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.placementDeclareHint")}</p>

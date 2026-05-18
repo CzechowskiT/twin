@@ -112,6 +112,7 @@ export default function DashboardPage() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [showApplyPrompt, setShowApplyPrompt] = useState(false);
   const [placementFlowBusy, setPlacementFlowBusy] = useState<PlacementFlowBusy>(null);
+  const [placementEventsInvalidateKey, setPlacementEventsInvalidateKey] = useState(0);
 
   const loadJobs = useCallback(async (token: string, activeFilters: JobFilters) => {
     return apiFetch<JobList>(`/api/v1/jobs/${buildJobsQuery(activeFilters)}`, {}, token);
@@ -281,6 +282,7 @@ export default function DashboardPage() {
           try {
             setApplications(await loadApplications(authToken));
             setDevFocus(await loadDevelopmentFocus(authToken));
+            setPlacementEventsInvalidateKey((k) => k + 1);
           } catch {
             /* ignore refresh errors after confirm */
           }
@@ -449,6 +451,7 @@ export default function DashboardPage() {
       );
       setApplications(await loadApplications(token));
       setDevFocus(await loadDevelopmentFocus(token));
+      setPlacementEventsInvalidateKey((k) => k + 1);
     } catch (err) {
       setError(dashboardFetchUserMessage(err, t));
     } finally {
@@ -470,6 +473,7 @@ export default function DashboardPage() {
       setApplications(await loadApplications(token));
       setDevFocus(await loadDevelopmentFocus(token));
       alert(out.message || t("dashboard.placementVerifyPending"));
+      setPlacementEventsInvalidateKey((k) => k + 1);
     } catch (err) {
       setError(dashboardFetchUserMessage(err, t));
     } finally {
@@ -821,6 +825,7 @@ export default function DashboardPage() {
             onPlacementVerifyStart={startPlacementVerify}
             placementFlowBusy={placementFlowBusy}
             onPlacementEventsLoad={loadPlacementEvents}
+            placementEventsInvalidateKey={placementEventsInvalidateKey}
           />
         </Card>
       )}
