@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from slowapi.util import get_remote_address
 
 from app.config import get_settings
 from app.core.deps import get_current_user
@@ -57,6 +58,7 @@ from app.services.linkedin_profile_sync import (
     ensure_candidate_from_linkedin,
     ensure_candidate_from_oauth_profile,
 )
+from app.services.login_rate_limit import enforce_login_rate_limit_per_minute
 from app.services.oauth_state import create_oauth_state, verify_oauth_state
 from app.services.oauth_types import OAuthUserProfile
 from app.services.oauth_user import user_from_oauth
@@ -249,6 +251,10 @@ def forgot_password(
     db: Session = Depends(get_db),
 ) -> dict[str, str]:
     settings = get_settings()
+    enforce_login_rate_limit_per_minute(
+        client_key=f"forgot:{get_remote_address(request)}",
+        max_per_minute=settings.auth_forgot_password_rate_limit_per_minute,
+    )
     message = request_password_reset(db, settings, str(body.email))
     return {"message": message}
 

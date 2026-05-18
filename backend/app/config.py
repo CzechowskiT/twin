@@ -48,7 +48,7 @@ class Settings(BaseSettings):
     # 0 = disabled (local only). Production should keep a positive cap to slow credential stuffing.
     auth_login_rate_limit_per_minute: int = 30
     # Separate bucket for POST /auth/forgot-password (abuse / enumeration). 0 = disabled.
-    auth_forgot_password_rate_limit_per_minute: int = 5
+    auth_forgot_password_rate_limit_per_minute: int = 3
     cors_origins: str = "http://localhost:3000"
 
     @field_validator("cors_origins", mode="before")
@@ -93,6 +93,8 @@ class Settings(BaseSettings):
     scrape_beat_hour_utc: int = 5
     # Max jobs considered per find_top_matches scan (newest validated first).
     match_jobs_scan_limit: int = 4000
+    # When true, use ``job_matching_v2`` (salary overlap bonus on top of v1 rules).
+    match_scoring_v2: bool = False
     # When true, honour robots.txt before Playwright fetches (LinkedIn uses Disallow: / for generic bots).
     scrape_respect_robots_txt: bool = True
     # Pause between boards in scrape-all (serial) to reduce burst traffic on third-party sites.
@@ -186,9 +188,17 @@ class Settings(BaseSettings):
     investor_mvp_stats_demo_mode: bool = False
     investor_mvp_stats_demo_validated_jobs: int = 100_000
 
+    # Greenhouse ATS webhooks — optional shared secret for signature checks.
+    greenhouse_webhook_secret: str = ""
+
+    # S3-compatible storage (AWS S3, Cloudflare R2, MinIO). Empty keys = disabled.
+    s3_endpoint_url: str = ""
+    s3_access_key_id: str = ""
+    s3_secret_access_key: str = ""
+    s3_bucket_name: str = ""
+    s3_region: str = "auto"
+
     # Authologic Customer API (KYC / identity) — https://developer.authologic.com
-    # Basic auth: OmniPanel login as user, API key as password (see OpenAPI securitySchemes).
-    authologic_api_base_url: str = "https://sandbox.authologic.com"
     authologic_api_login: str = ""
     authologic_api_key: str = ""
     authologic_strategy: str = "public:default"
