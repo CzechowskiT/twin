@@ -7,7 +7,7 @@ from io import StringIO
 from typing import Any
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
-from fastapi.responses import Response
+from fastapi.responses import JSONResponse, Response
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
@@ -45,6 +45,7 @@ from app.services.career_compass import (
 )
 from app.services.intro_audio_storage import save_intro_audio_for_candidate
 from app.services.matching_service import find_top_matches
+from app.services.user_data_export import build_user_owned_export_payload
 
 router = APIRouter()
 
@@ -336,6 +337,24 @@ def export_my_matches_csv(
         content=buf.getvalue().encode("utf-8"),
         media_type="text/csv; charset=utf-8",
         headers={"Content-Disposition": 'attachment; filename="twin-matches.csv"'},
+    )
+
+
+@router.get("/me/export.json")
+def export_my_data_json(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> JSONResponse:
+    """Machine-readable export of account and profile data owned by the signed-in user (GDPR-style portability)."""
+    settings = get_settings()
+    dashboard_url = f"{settings.frontend_url.rstrip('/')}/dashboard"
+    row = db.query(User).filter(User.id == user.id).first()
+    if not row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    body = build_user_owned_export_payload(db=db, user=row, dashboard_url=dashboard_url)
+    return JSONResponse(
+        content=body,
+        headers={"Content-Disposition": 'attachment; filename="twin-my-data.json"'},
     )
 
 
