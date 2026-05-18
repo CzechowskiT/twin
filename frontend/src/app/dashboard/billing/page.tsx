@@ -204,9 +204,16 @@ export default function BillingPage() {
     let anyLoadFailure = false;
 
     if (meRes.status === "fulfilled") {
-      setMe(meRes.value);
+      const m = meRes.value;
+      setMe(m);
+      setBillingCompany((m.billing_company_name ?? "").trim());
+      setBillingTaxId((m.billing_tax_id ?? "").trim());
+      setBillingSaveOk(false);
     } else {
       setMe(null);
+      setBillingCompany("");
+      setBillingTaxId("");
+      setBillingSaveOk(false);
       const msg = meRes.reason instanceof Error ? meRes.reason.message : String(meRes.reason);
       const lower = msg.toLowerCase();
       const looksLikeAuthFailure =
@@ -252,13 +259,6 @@ export default function BillingPage() {
     });
   }, []);
 
-  useEffect(() => {
-    if (!me) return;
-    setBillingCompany((me.billing_company_name ?? "").trim());
-    setBillingTaxId((me.billing_tax_id ?? "").trim());
-    setBillingSaveOk(false);
-  }, [me]);
-
   async function startCheckout(plan: "premium" | "pro") {
     const token = getToken();
     if (!token) return;
@@ -270,7 +270,7 @@ export default function BillingPage() {
         { method: "POST", body: JSON.stringify({ plan }) },
         token,
       );
-      window.location.href = res.url;
+      window.location.assign(res.url);
     } catch (e) {
       setActionError(true);
       console.warn("[billing] checkout-session failed", e);
@@ -286,7 +286,7 @@ export default function BillingPage() {
     setActionError(false);
     try {
       const res = await apiFetch<UrlPayload>("/api/v1/billing/portal-session", { method: "POST" }, token);
-      window.location.href = res.url;
+      window.location.assign(res.url);
     } catch (e) {
       setActionError(true);
       console.warn("[billing] portal-session failed", e);
@@ -314,6 +314,8 @@ export default function BillingPage() {
         token,
       );
       setMe(updated);
+      setBillingCompany((updated.billing_company_name ?? "").trim());
+      setBillingTaxId((updated.billing_tax_id ?? "").trim());
       setBillingSaveOk(true);
     } catch (e) {
       setActionError(true);
