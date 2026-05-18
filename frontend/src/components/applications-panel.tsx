@@ -38,6 +38,14 @@ export type FeedbackBusy = { id: number; kind: "save" | "parse" } | null;
 
 export type PlacementFlowBusy = { id: number; kind: "declare" | "verify" } | null;
 
+export type PlacementEventRow = {
+  id: number;
+  event_type: string;
+  actor: string;
+  detail: Record<string, unknown> | null;
+  created_at: string;
+};
+
 const STATUSES = ["pending", "applied", "interview", "rejected", "hired"] as const;
 
 function normalizeApplicationSelectStatus(status: string): (typeof STATUSES)[number] {
@@ -60,6 +68,7 @@ export function ApplicationsPanel({
   onPlacementDeclare,
   onPlacementVerifyStart,
   placementFlowBusy,
+  onPlacementEventsLoad,
 }: {
   items: ApplicationRow[];
   onStatusChange: (id: number, status: string) => void;
@@ -70,12 +79,17 @@ export function ApplicationsPanel({
   onPlacementDeclare?: (id: number, note: string) => Promise<void>;
   onPlacementVerifyStart?: (id: number, workEmail: string) => Promise<void>;
   placementFlowBusy?: PlacementFlowBusy;
+  onPlacementEventsLoad?: (applicationId: number) => Promise<PlacementEventRow[]>;
 }) {
   const { t } = useTranslation();
   const [openId, setOpenId] = useState<number | null>(null);
   const [draftById, setDraftById] = useState<Record<number, string>>({});
   const [workEmailById, setWorkEmailById] = useState<Record<number, string>>({});
   const [declareNoteById, setDeclareNoteById] = useState<Record<number, string>>({});
+  const [placementHistoryOpenId, setPlacementHistoryOpenId] = useState<number | null>(null);
+  const [placementEventsByAppId, setPlacementEventsByAppId] = useState<Record<number, PlacementEventRow[]>>({});
+  const [placementEventsLoadingId, setPlacementEventsLoadingId] = useState<number | null>(null);
+  const [placementEventsErrById, setPlacementEventsErrById] = useState<Record<number, string>>({});
 
   useEffect(() => {
     setDraftById((prev) => {
@@ -195,6 +209,80 @@ export function ApplicationsPanel({
                     </>
                   )}
                 </div>
+              ) : null}
+              {onPlacementEventsLoad && showPlacementRow(app) ? (
+                <>
+                  <button
+                    type="button"
+                    className="twin-link mt-2 text-xs font-medium"
+                    onClick={() => {
+                      void (async () => {
+                        if (!onPlacementEventsLoad) return;
+                        if (placementHistoryOpenId === app.id) {
+                          setPlacementHistoryOpenId(null);
+                          return;
+                        }
+                        setPlacementHistoryOpenId(app.id);
+                        if (app.id in placementEventsByAppId) return;
+                        setPlacementEventsLoadingId(app.id);
+                        setPlacementEventsErrById((prev) => {
+                          const next = { ...prev };
+                          delete next[app.id];
+                          return next;
+                        });
+                        try {
+                          const rows = await onPlacementEventsLoad(app.id);
+                          setPlacementEventsByAppId((prev) => ({ ...prev, [app.id]: rows }));
+                        } catch (err) {
+                          const msg = err instanceof Error ? err.message : String(err);
+                          setPlacementEventsErrById((prev) => ({ ...prev, [app.id]: msg }));
+                        } finally {
+                          setPlacementEventsLoadingId((cur) => (cur === app.id ? null : cur));
+                        }
+                      })();
+                    }}
+                  >
+                    {placementHistoryOpenId === app.id ? "− " : "+ "}
+                    {t("dashboard.placementEventsToggle")}
+                  </button>
+                  {placementHistoryOpenId === app.id ? (
+                    <div className="mt-2 max-w-2xl rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/40 p-3 text-xs">
+                      {placementEventsLoadingId === app.id ? (
+                        <p className="text-[var(--twin-muted)]">{t("dashboard.placementEventsLoading")}</p>
+                      ) : placementEventsErrById[app.id] ? (
+                        <p className="text-red-600 dark:text-red-400">{placementEventsErrById[app.id]}</p>
+                      ) : (placementEventsByAppId[app.id] ?? []).length === 0 ? (
+                        <p className="text-[var(--twin-muted)]">{t("dashboard.placementEventsEmpty")}</p>
+                      ) : (
+                        <ul className="space-y-3">
+                          {(placementEventsByAppId[app.id] ?? []).map((ev) => (
+                            <li
+                              key={ev.id}
+                              className="border-b border-[var(--twin-border)] pb-3 last:border-0 last:pb-0"
+                            >
+                              <p className="font-medium text-[var(--foreground)]">{ev.event_type}</p>
+                              <p className="mt-0.5 text-[var(--twin-muted)]">
+                                {new Date(ev.created_at).toLocaleString(undefined, {
+                                  dateStyle: "medium",
+                                  timeStyle: "short",
+                                })}
+                              </p>
+                              <p className="mt-1 text-[var(--twin-muted-strong)]">
+                                <span className="text-[var(--twin-muted)]">{t("dashboard.placementEventsActor")}: </span>
+                                {ev.actor}
+                              </p>
+                              {ev.detail && Object.keys(ev.detail).length > 0 ? (
+                                <pre className="mt-2 max-h-40 overflow-auto whitespace-pre-wrap break-words rounded bg-[var(--twin-input-bg)]/80 p-2 font-mono text-[10px] leading-relaxed text-[var(--twin-muted-strong)]">
+                                  {t("dashboard.placementEventsDetail")}: {JSON.stringify(ev.detail, null, 2)}
+                                </pre>
+                              ) : null}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ) : null}
+                </>
               ) : null}
               <button
                 type="button"

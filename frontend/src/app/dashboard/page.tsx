@@ -3,7 +3,13 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ApplicationsPanel, type ApplicationRow, type FeedbackBusy, type PlacementFlowBusy } from "@/components/applications-panel";
+import {
+  ApplicationsPanel,
+  type ApplicationRow,
+  type FeedbackBusy,
+  type PlacementEventRow,
+  type PlacementFlowBusy,
+} from "@/components/applications-panel";
 import { DashboardCommandCenter } from "@/components/dashboard-command-center";
 import { InvestorRoadmapPanel } from "@/components/investor-roadmap-panel";
 import { useTranslation } from "@/components/language-provider";
@@ -471,6 +477,20 @@ export default function DashboardPage() {
     }
   }
 
+  const loadPlacementEvents = useCallback(
+    async (applicationId: number) => {
+      const token = getToken();
+      if (!token) throw new Error(t("dashboard.placementEventsNotSignedIn"));
+      const data = await apiFetch<{ items: PlacementEventRow[]; total: number }>(
+        `/api/v1/applications/${applicationId}/placement-events`,
+        {},
+        token,
+      );
+      return data.items;
+    },
+    [t],
+  );
+
   async function triggerScrapeAll() {
     const token = getToken();
     if (!token) return;
@@ -800,6 +820,7 @@ export default function DashboardPage() {
             onPlacementDeclare={declarePlacement}
             onPlacementVerifyStart={startPlacementVerify}
             placementFlowBusy={placementFlowBusy}
+            onPlacementEventsLoad={loadPlacementEvents}
           />
         </Card>
       )}
