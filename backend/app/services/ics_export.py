@@ -23,7 +23,13 @@ def scheduled_interview_to_ics(row: ScheduledInterview) -> str:
     """Build a minimal PUBLISH calendar with one VEVENT (stable UID per interview id)."""
     uid = f"twin-interview-{row.id}@twin"
     summary = _ics_escape(f"{row.company_name} — {row.job_title}")
-    parts_desc = [f"Interview: {row.job_title} at {row.company_name}"]
+    tz_label = (getattr(row, "timezone", None) or "").strip() or "UTC"
+    type_label = (getattr(row, "interview_type", None) or "").strip() or "video"
+    parts_desc = [
+        f"Interview: {row.job_title} at {row.company_name}",
+        f"Timezone: {tz_label}",
+        f"Interview type: {type_label}",
+    ]
     if row.meeting_link and row.meeting_link.strip():
         parts_desc.append(f"Link: {row.meeting_link.strip()}")
     elif row.meeting_location and row.meeting_location.strip():

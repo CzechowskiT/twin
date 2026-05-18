@@ -17,6 +17,8 @@ def test_scheduled_interview_to_ics_structure() -> None:
     row.meeting_link = "https://meet.example/room"
     row.meeting_location = None
     row.status = "scheduled"
+    row.timezone = "Europe/Warsaw"
+    row.interview_type = "video"
 
     text = scheduled_interview_to_ics(row)
     assert text.startswith("BEGIN:VCALENDAR\r\n")
@@ -26,6 +28,9 @@ def test_scheduled_interview_to_ics_structure() -> None:
     assert "DTSTART:20260601T140000Z\r\n" in text
     assert "DTEND:20260601T150000Z\r\n" in text
     assert "LOCATION:https://meet.example/room\r\n" in text
+    assert "DESCRIPTION:" in text
+    assert "Timezone: Europe/Warsaw" in text
+    assert "Interview type: video" in text
     assert text.endswith("END:VCALENDAR\r\n")
 
 
@@ -39,6 +44,8 @@ def test_scheduled_interview_to_ics_escapes_text() -> None:
     row.meeting_link = None
     row.meeting_location = None
     row.status = "scheduled"
+    row.timezone = "UTC"
+    row.interview_type = "phone"
 
     text = scheduled_interview_to_ics(row)
     assert "Big\\;Co" in text
