@@ -45,6 +45,7 @@ class Settings(BaseSettings):
         return value
     secret_key: str = "dev-only-change-me"
     access_token_expire_minutes: int = 60 * 24 * 7
+    auth_login_rate_limit_per_minute: int = 0
     cors_origins: str = "http://localhost:3000"
 
     @field_validator("cors_origins", mode="before")

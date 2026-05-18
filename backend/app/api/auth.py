@@ -58,6 +58,7 @@ from app.services.oauth_state import create_oauth_state, verify_oauth_state
 from app.services.oauth_types import OAuthUserProfile
 from app.services.oauth_user import user_from_oauth
 from app.services.password_reset import request_password_reset, reset_password_with_token
+from app.services.login_rate_limit import enforce_login_rate_limit_per_minute
 from app.services.referral_public_token import ensure_user_referral_public_token
 from app.services.signup_referrer import (
     normalize_stored_referred_by_note,
@@ -66,6 +67,12 @@ from app.services.signup_referrer import (
 )
 
 router = APIRouter()
+
+
+def _login_rate_limit_client_key(request: Request) -> str:
+    if request.client and request.client.host:
+        return request.client.host
+    return "unknown"
 
 
 def _core_consents_complete(user: User) -> bool:
@@ -223,14 +230,25 @@ def register(body: UserRegister, db: Session = Depends(get_db)) -> UserRegistere
 
 @router.post("/login", response_model=Token)
 def login(
+    request: Request,
     form: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ) -> Token:
+    s = get_settings()
+    enforce_login_rate_limit_per_minute(
+        client_key=_login_rate_limit_client_key(request),
+        max_per_minute=s.auth_login_rate_limit_per_minute,
+    )
     return _authenticate(form.username, form.password, db)
 
 
 @router.post("/login/json", response_model=Token)
-def login_json(body: UserLogin, db: Session = Depends(get_db)) -> Token:
+def login_json(request: Request, body: UserLogin, db: Session = Depends(get_db)) -> Token:
+    s = get_settings()
+    enforce_login_rate_limit_per_minute(
+        client_key=_login_rate_limit_client_key(request),
+        max_per_minute=s.auth_login_rate_limit_per_minute,
+    )
     return _authenticate(body.email, body.password, db)
 
 
