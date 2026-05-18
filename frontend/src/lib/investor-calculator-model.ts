@@ -1,5 +1,14 @@
 /** ISO codes supported by the investor model (illustrative FX). */
-export type InvestorModelCurrency = "USD" | "EUR" | "PLN" | "GBP";
+export type InvestorModelCurrency =
+  | "USD"
+  | "EUR"
+  | "PLN"
+  | "GBP"
+  | "CHF"
+  | "JPY"
+  | "CNY"
+  | "SAR"
+  | "AED";
 
 /** Units of local currency per 1 USD (static illustrative rates). */
 export const LOCAL_PER_USD: Record<InvestorModelCurrency, number> = {
@@ -7,6 +16,11 @@ export const LOCAL_PER_USD: Record<InvestorModelCurrency, number> = {
   EUR: 0.92,
   PLN: 4.05,
   GBP: 0.79,
+  CHF: 0.87,
+  JPY: 150,
+  CNY: 7.2,
+  SAR: 3.75,
+  AED: 3.67,
 };
 
 export type InvestorScenario = "current" | "optimized" | "aggressive";

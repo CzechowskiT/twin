@@ -20,7 +20,17 @@ import {
 } from "@/lib/investor-calculator-model";
 import type { Locale } from "@/lib/i18n";
 
-const INVESTOR_CURRENCIES: InvestorModelCurrency[] = ["USD", "EUR", "PLN", "GBP"];
+const INVESTOR_CURRENCIES: InvestorModelCurrency[] = [
+  "USD",
+  "EUR",
+  "PLN",
+  "GBP",
+  "CHF",
+  "JPY",
+  "CNY",
+  "SAR",
+  "AED",
+];
 
 function usdToDisplayAmount(usd: number, currency: InvestorModelCurrency): number {
   return usd * LOCAL_PER_USD[currency];
