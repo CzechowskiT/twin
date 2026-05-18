@@ -305,6 +305,10 @@ const en = {
     matchPercentTitle: "Match score vs your profile (0–100%)",
     jobs: "Jobs",
     jobsLoading: "Loading jobs…",
+    jobsShowingSummary: "Showing {shown} of {total} listings in this feed (filters apply).",
+    jobsLoadMore: "Load more jobs",
+    jobsCorpusNote:
+      "The number in the section title is how many validated rows exist in your API database — not “the entire web”. Six-figure corpora require sustained scraping or bulk import on the server; the UI loads up to 200 per request and you can page with “Load more”.",
     jobsEmptyFilteredTitle: "No roles match your current filters",
     jobsEmptyFilteredLead:
       "Widen salary or location, try another board, or clear target title terms (they may be pre-filled from your profile), then tap Apply filters again. If the feed is still empty, listings may not be in the database yet.",
@@ -402,6 +406,8 @@ const en = {
     scrapeRefreshFailed:
       "Scrape was queued, but refreshing the dashboard failed (details below). Try reloading the page in a minute.",
     scrapeListUpdatedToast: "Job feed updated: {n} listings.",
+    scrapePollFinalSyncToast:
+      "Auto-refresh finished. Current job total in your filters: {n}. If numbers still look stale, reload once (Cmd+Shift+R).",
     placementDeclareHint:
       "First confirm in-app that you accepted an offer or started in this role. This creates an audit trail before we send any work-email link.",
     placementDeclareNotePlaceholder:
@@ -1629,6 +1635,10 @@ const pl: MessageTree = {
     matchPercentTitle: "Dopasowanie do profilu (0–100%)",
     jobs: "Oferty",
     jobsLoading: "Ładowanie ofert…",
+    jobsShowingSummary: "W feedzie: {shown} z {total} ofert (działają filtry).",
+    jobsLoadMore: "Załaduj więcej ofert",
+    jobsCorpusNote:
+      "Liczba w nagłówku to tyle zweryfikowanych wierszy w bazie API — nie „cały internet”. Setki tysięcy pozycji wymagają ciągłego scrapingu lub importu na serwerze; UI pobiera do 200 na żądanie, dalej jest „Załaduj więcej”.",
     jobsEmptyFilteredTitle: "Żadna oferta nie pasuje do obecnych filtrów",
     jobsEmptyFilteredLead:
       "Poluzuj widełka wynagrodzenia lub lokalizację, wybierz inny portal albo wyczyść pole docelowych tytułów (może być uzupełnione z profilu), potem ponownie „Zastosuj filtry”. Jeśli nadal pusto, w bazie może jeszcze nie być ogłoszeń.",
@@ -1727,6 +1737,8 @@ const pl: MessageTree = {
     scrapeRefreshFailed:
       "Pobieranie zostało zakolejkowane, ale odświeżenie panelu się nie powiodło (szczegóły poniżej). Za minutę odśwież stronę.",
     scrapeListUpdatedToast: "Feed ofert zaktualizowany: {n} ofert.",
+    scrapePollFinalSyncToast:
+      "Auto-odświeżanie zakończone. Liczba ofert (z filtrami): {n}. Jeśli nadal wygląda na stare, zrób twarde odświeżenie (Cmd+Shift+R).",
     placementDeclareHint:
       "Najpierw potwierdź w aplikacji, że przyjąłeś ofertę lub rozpocząłeś pracę w tej roli. To tworzy ślad audytowy zanim wyślemy link na służbowy mail.",
     placementDeclareNotePlaceholder:

@@ -19,16 +19,6 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-def _stripe_checkout_ready() -> bool:
-    s = get_settings()
-    return bool(s.stripe_secret_key.strip() and s.stripe_price_id_premium.strip())
-
-
-def _linkedin_oauth_configured() -> bool:
-    s = get_settings()
-    return bool(s.linkedin_client_id.strip() and s.linkedin_client_secret.strip())
-
-
 @router.get("/mvp-stats", response_model=MvpStatsOut)
 def mvp_stats(db: Session = Depends(get_db)) -> MvpStatsOut:
     """Aggregate product metrics for fundraising decks (no personal fields)."""
@@ -46,8 +36,6 @@ def mvp_stats(db: Session = Depends(get_db)) -> MvpStatsOut:
             total_applications=int(apps),
             profiles_with_cv=int(cv_profiles),
             job_boards_in_registry=boards,
-            linkedin_oauth_configured=_linkedin_oauth_configured(),
-            stripe_checkout_ready=_stripe_checkout_ready(),
             generated_at=datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         )
         s = get_settings()
@@ -55,8 +43,6 @@ def mvp_stats(db: Session = Depends(get_db)) -> MvpStatsOut:
             stats = stats.model_copy(
                 update={
                     "validated_jobs": int(s.investor_mvp_stats_demo_validated_jobs),
-                    "linkedin_oauth_configured": True,
-                    "stripe_checkout_ready": True,
                 }
             )
         return stats

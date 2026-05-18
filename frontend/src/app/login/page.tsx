@@ -2,15 +2,14 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
+import { FormEvent, Suspense, useMemo, useState } from "react";
 import { LinkedInLoginButton } from "@/components/linkedin-login-button";
-import { LinkedInSetupHint } from "@/components/linkedin-setup-hint";
 import { OAuthWebButtons } from "@/components/oauth-web-buttons";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Input, Label, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { setToken } from "@/lib/auth";
-import { fetchOAuthProviderStatus, type OAuthProviderStatus } from "@/lib/oauth-auth";
+import { OAUTH_LOGIN_BUTTONS_ENABLED } from "@/lib/oauth-auth";
 
 type TokenResponse = { access_token: string };
 
@@ -20,20 +19,6 @@ function LoginPageContent() {
   const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [oauthStatus, setOauthStatus] = useState<OAuthProviderStatus | null>(null);
-
-  useEffect(() => {
-    fetchOAuthProviderStatus()
-      .then((status) => setOauthStatus(status))
-      .catch(() =>
-        setOauthStatus({
-          linkedin: false,
-          google: false,
-          github: false,
-          apple: false,
-        }),
-      );
-  }, []);
 
   const oauthUrlError = useMemo(() => {
     const err = searchParams.get("error");
@@ -95,27 +80,20 @@ function LoginPageContent() {
             {loading ? t("login.signingIn") : t("login.submit")}
           </Button>
         </form>
-        {oauthStatus !== null && (
-          <>
-            <p className="twin-muted my-4 text-center text-xs uppercase tracking-wide">
-              {t("login.orContinue")}
-            </p>
-            <OAuthWebButtons
-              status={oauthStatus}
-              labels={{
-                google: t("login.oauthGoogle"),
-                github: t("login.oauthGithub"),
-                apple: t("login.oauthApple"),
-              }}
-            />
-            {!oauthStatus.linkedin && <LinkedInSetupHint />}
-            <LinkedInLoginButton
-              label={t("login.linkedIn")}
-              configured={oauthStatus.linkedin}
-              comingSoonMessage={t("login.linkedInComingSoon")}
-            />
-          </>
-        )}
+        <>
+          <p className="twin-muted my-4 text-center text-xs uppercase tracking-wide">
+            {t("login.orContinue")}
+          </p>
+          <OAuthWebButtons
+            status={OAUTH_LOGIN_BUTTONS_ENABLED}
+            labels={{
+              google: t("login.oauthGoogle"),
+              github: t("login.oauthGithub"),
+              apple: t("login.oauthApple"),
+            }}
+          />
+          <LinkedInLoginButton label={t("login.linkedIn")} />
+        </>
         <p className="twin-muted mt-4 text-center text-sm">
           {t("login.noAccount")}{" "}
           <Link href="/register" className="twin-link">

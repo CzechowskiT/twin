@@ -21,7 +21,7 @@ import { apiFetch, apiFetchBlob, isLikelyBrowserNetworkFailureMessage, saveBlobA
 import { clearToken, getToken } from "@/lib/auth";
 import { SHOW_SCRAPE_UI } from "@/lib/features";
 import type { TranslationKey } from "@/lib/i18n";
-import { buildJobsQuery, defaultJobFilters, loadStoredJobFilters, persistJobFilters, type JobFilters } from "@/lib/jobs";
+import { buildJobsQuery, defaultJobFilters, loadStoredJobFilters, persistJobFilters, type JobFilters, JOB_FEED_PAGE_MAX } from "@/lib/jobs";
 
 type User = {
   id: number;
@@ -175,11 +175,12 @@ export default function DashboardPage() {
   const [matchesXlsxBusy, setMatchesXlsxBusy] = useState(false);
   const [matchesRefreshing, setMatchesRefreshing] = useState(false);
   const [exportJsonBusy, setExportJsonBusy] = useState(false);
+  const [jobsLoadMoreBusy, setJobsLoadMoreBusy] = useState(false);
   const [dashboardBootstrapping, setDashboardBootstrapping] = useState(true);
   const [savedJobIds, setSavedJobIds] = useState<Set<number>>(() => new Set());
 
-  const loadJobs = useCallback(async (token: string, activeFilters: JobFilters) => {
-    return apiFetch<JobList>(`/api/v1/jobs/${buildJobsQuery(activeFilters)}`, {}, token);
+  const loadJobs = useCallback(async (token: string, activeFilters: JobFilters, opts?: { skip?: number; limit?: number }) => {
+    return apiFetch<JobList>(`/api/v1/jobs/${buildJobsQuery(activeFilters, opts)}`, {}, token);
   }, []);
 
   const loadMatches = useCallback(async (token: string) => {
@@ -476,6 +477,36 @@ export default function DashboardPage() {
     if (!token) return;
     persistJobFilters(filters);
     await refreshDashboardData(token, profile !== null && profile !== undefined, filters);
+  }
+
+  async function loadMoreJobs() {
+    const token = getToken();
+    if (!token || jobs === null) return;
+    if (jobs.items.length >= jobs.total) return;
+    setJobsLoadMoreBusy(true);
+    setError(null);
+    try {
+      const page = await loadJobs(token, filters, {
+        skip: jobs.items.length,
+        limit: JOB_FEED_PAGE_MAX,
+      });
+      setJobs((prev) => {
+        if (!prev) return page;
+        const seen = new Set(prev.items.map((j) => j.id));
+        const merged = [...prev.items];
+        for (const row of page.items) {
+          if (!seen.has(row.id)) {
+            seen.add(row.id);
+            merged.push(row);
+          }
+        }
+        return { total: page.total, items: merged };
+      });
+    } catch (err) {
+      setError(dashboardFetchUserMessage(err, t));
+    } finally {
+      setJobsLoadMoreBusy(false);
+    }
   }
 
   async function setJobApplication(jobId: number, status: string) {
@@ -836,6 +867,7 @@ export default function DashboardPage() {
       }
       try {
         let lastTotal = await refreshDashboardData(token, hasProf, filters);
+        let scrapeListToastShown = false;
         if (queued) {
           const intervalMs = 4000;
           const maxMs = 25 * 60 * 1000;
@@ -864,8 +896,24 @@ export default function DashboardPage() {
             }
             if (sawIncrease && stableTicks >= stableNeeded && Date.now() - start >= minStableMs) {
               toast.success(t("dashboard.scrapeListUpdatedToast").replace("{n}", String(lastTotal)));
+              scrapeListToastShown = true;
               break;
             }
+          }
+        }
+        if (!scrapePollCancelRef.current) {
+          try {
+            lastTotal = await refreshDashboardData(token, hasProf, filters);
+          } catch {
+            /* ignore */
+          }
+          try {
+            router.refresh();
+          } catch {
+            /* ignore */
+          }
+          if (queued && !scrapeListToastShown) {
+            toast.success(t("dashboard.scrapePollFinalSyncToast").replace("{n}", String(lastTotal)));
           }
         }
       } catch (refreshErr) {
@@ -1407,16 +1455,38 @@ export default function DashboardPage() {
             <div className="h-24 w-full animate-pulse rounded-lg bg-[var(--twin-border)]/70" />
           </div>
         ) : (
-          <JobList
-            items={jobs.items}
-            showScore={hasProfile}
-            applicationStatus={displayApplicationStatus}
-            onApply={hasProfile ? applyToJob : undefined}
-            onAutoApply={hasProfile ? autoApplyToJob : undefined}
-            autoApplyJobId={autoApplyingId}
-            onSave={hasProfile ? saveJob : undefined}
-            onDismiss={hasProfile ? dismissJob : undefined}
-          />
+          <>
+            {jobs.total > 0 ? (
+              <p className="twin-muted mb-2 text-xs leading-relaxed">
+                {t("dashboard.jobsShowingSummary")
+                  .replace("{shown}", String(jobs.items.length))
+                  .replace("{total}", String(jobs.total))}
+              </p>
+            ) : null}
+            <JobList
+              items={jobs.items}
+              showScore={hasProfile}
+              applicationStatus={displayApplicationStatus}
+              onApply={hasProfile ? applyToJob : undefined}
+              onAutoApply={hasProfile ? autoApplyToJob : undefined}
+              autoApplyJobId={autoApplyingId}
+              onSave={hasProfile ? saveJob : undefined}
+              onDismiss={hasProfile ? dismissJob : undefined}
+            />
+            {jobs.items.length < jobs.total ? (
+              <div className="mt-4 flex justify-center">
+                <button
+                  type="button"
+                  disabled={jobsLoadMoreBusy}
+                  onClick={() => void loadMoreJobs()}
+                  className="twin-btn-secondary twin-touch-target text-sm"
+                >
+                  {jobsLoadMoreBusy ? "…" : t("dashboard.jobsLoadMore")}
+                </button>
+              </div>
+            ) : null}
+            <p className="twin-muted mt-3 text-[11px] leading-relaxed">{t("dashboard.jobsCorpusNote")}</p>
+          </>
         )}
         {jobs !== null && (jobs.total === 0 || jobs.items.length === 0) ? (
           <div className="mt-3 space-y-2 rounded-lg border border-dashed border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/35 p-4 sm:p-5">

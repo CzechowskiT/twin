@@ -4,14 +4,13 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { LinkedInLoginButton } from "@/components/linkedin-login-button";
-import { LinkedInSetupHint } from "@/components/linkedin-setup-hint";
 import { LegalRegionNotice } from "@/components/legal-region-notice";
 import { OAuthWebButtons } from "@/components/oauth-web-buttons";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Input, Label, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { getToken, setToken } from "@/lib/auth";
-import { fetchOAuthProviderStatus, type OAuthProviderStatus } from "@/lib/oauth-auth";
+import { OAUTH_LOGIN_BUTTONS_ENABLED } from "@/lib/oauth-auth";
 
 type RegisterSuccessResponse = { access_token: string };
 
@@ -24,7 +23,6 @@ function RegisterPageContent() {
   const [sessionPhase, setSessionPhase] = useState<SessionPhase>("boot");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [oauthStatus, setOauthStatus] = useState<OAuthProviderStatus | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   const safeNext = useMemo(() => {
@@ -53,19 +51,6 @@ function RegisterPageContent() {
       cancelled = true;
     };
   }, [router, safeNext]);
-
-  useEffect(() => {
-    fetchOAuthProviderStatus()
-      .then((s) => setOauthStatus(s))
-      .catch(() =>
-        setOauthStatus({
-          linkedin: false,
-          google: false,
-          github: false,
-          apple: false,
-        }),
-      );
-  }, []);
 
   const oauthUrlError = useMemo(() => {
     const err = searchParams.get("error");
@@ -240,27 +225,20 @@ function RegisterPageContent() {
             {loading ? t("register.creating") : t("register.submit")}
           </Button>
         </form>
-        {oauthStatus !== null && (
-          <>
-            <p className="twin-muted my-4 text-center text-xs uppercase tracking-wide">
-              {t("register.orContinue")}
-            </p>
-            <OAuthWebButtons
-              status={oauthStatus}
-              labels={{
-                google: t("login.oauthGoogle"),
-                github: t("login.oauthGithub"),
-                apple: t("login.oauthApple"),
-              }}
-            />
-            {!oauthStatus.linkedin && <LinkedInSetupHint variant="register" />}
-            <LinkedInLoginButton
-              label={t("register.linkedIn")}
-              configured={oauthStatus.linkedin}
-              comingSoonMessage={t("register.linkedInComingSoon")}
-            />
-          </>
-        )}
+        <>
+          <p className="twin-muted my-4 text-center text-xs uppercase tracking-wide">
+            {t("register.orContinue")}
+          </p>
+          <OAuthWebButtons
+            status={OAUTH_LOGIN_BUTTONS_ENABLED}
+            labels={{
+              google: t("login.oauthGoogle"),
+              github: t("login.oauthGithub"),
+              apple: t("login.oauthApple"),
+            }}
+          />
+          <LinkedInLoginButton label={t("register.linkedIn")} />
+        </>
         <p className="twin-muted mt-4 text-center text-sm">
           {t("register.hasAccount")}{" "}
           <Link href="/login" className="twin-link">

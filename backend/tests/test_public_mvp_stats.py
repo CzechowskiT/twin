@@ -45,8 +45,7 @@ def test_public_mvp_stats_shape_empty() -> None:
         assert body["total_applications"] == 0
         assert body["profiles_with_cv"] == 0
         assert body["job_boards_in_registry"] >= 1
-        assert "linkedin_oauth_configured" in body
-        assert "stripe_checkout_ready" in body
+        assert "generated_at" in body
         assert body["generated_at"].endswith("Z")
     finally:
         app.dependency_overrides.pop(get_db, None)
@@ -55,7 +54,7 @@ def test_public_mvp_stats_shape_empty() -> None:
 
 @patch("app.api.public.get_settings")
 def test_public_mvp_stats_investor_demo_mode(mock_get_settings) -> None:
-    """Optional deck mode: headline jobs + OAuth/Stripe flags without changing other counters."""
+    """Optional deck mode: headline jobs counter without changing other aggregates."""
     db = _sqlite()
     mock_s = MagicMock()
     mock_s.investor_mvp_stats_demo_mode = True
@@ -79,8 +78,6 @@ def test_public_mvp_stats_investor_demo_mode(mock_get_settings) -> None:
         assert res.status_code == 200
         body = res.json()
         assert body["validated_jobs"] == 100_000
-        assert body["linkedin_oauth_configured"] is True
-        assert body["stripe_checkout_ready"] is True
         assert body["registered_users"] == 0
     finally:
         app.dependency_overrides.pop(get_db, None)

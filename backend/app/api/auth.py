@@ -395,22 +395,6 @@ def update_billing_profile(
     return UserOut.from_user(user)
 
 
-@router.get("/oauth/status")
-def oauth_status() -> dict[str, bool]:
-    return {
-        "linkedin": is_linkedin_oauth_configured(),
-        "google": is_google_configured(),
-        "github": is_github_configured(),
-        "apple": is_apple_configured(),
-    }
-
-
-@router.get("/linkedin/status")
-def linkedin_status() -> dict[str, bool]:
-    """True when Client ID, Secret, and redirect URI are set (same gate as token exchange)."""
-    return {"configured": is_linkedin_oauth_configured()}
-
-
 @router.get("/linkedin/login")
 def linkedin_login() -> RedirectResponse:
     if not is_linkedin_oauth_configured():
