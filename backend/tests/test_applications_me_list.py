@@ -95,6 +95,13 @@ def test_applications_me_pagination_offset_limit(client: TestClient) -> None:
         assert b2["total"] == 3
         assert len(b2["items"]) == 1
         assert b2["items"][0]["job_id"] != b1["items"][0]["job_id"]
+
+        r500 = client.get("/api/v1/applications/me?limit=500&offset=0")
+        assert r500.status_code == 200
+        assert len(r500.json()["items"]) == 3
+
+        r501 = client.get("/api/v1/applications/me?limit=501&offset=0")
+        assert r501.status_code == 422
     finally:
         app.dependency_overrides.pop(get_current_user, None)
         app.dependency_overrides.pop(get_db, None)

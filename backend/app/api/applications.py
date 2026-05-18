@@ -46,7 +46,12 @@ logger = logging.getLogger(__name__)
 
 @router.get("/me", response_model=ApplicationListOut)
 def list_my_applications(
-    limit: int = Query(100, ge=1, le=200, description="Page size for application rows."),
+    limit: int = Query(
+        100,
+        ge=1,
+        le=500,
+        description="Page size for application rows (dashboard may request up to 500).",
+    ),
     offset: int = Query(0, ge=0, description="Offset into the candidate's applications (newest first)."),
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
