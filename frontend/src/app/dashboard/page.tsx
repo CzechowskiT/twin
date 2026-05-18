@@ -70,6 +70,16 @@ type FilterOptions = { job_boards: string[]; locations: string[] };
 
 type GoogleCalendarStrip = { connected: boolean; google_email: string | null };
 
+type DashboardCalendarBundle = {
+  status: GoogleCalendarStrip;
+  nextInterview: {
+    company_name: string;
+    job_title: string;
+    interview_start: string;
+    interview_end: string;
+  } | null;
+};
+
 type DevelopmentFocus = {
   skill_tool_gaps: string[];
   positioning_themes: string[];
@@ -95,9 +105,23 @@ function dashboardFetchUserMessage(
   return raw.trim() || t("dashboard.scrapeFailed");
 }
 
+function formatInterviewRangeShort(isoStart: string, isoEnd: string, locale: string): string {
+  const a = new Date(isoStart);
+  const b = new Date(isoEnd);
+  if (Number.isNaN(a.getTime()) || Number.isNaN(b.getTime())) return "";
+  const opts: Intl.DateTimeFormatOptions = {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  };
+  return `${a.toLocaleString(locale, opts)} → ${b.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })}`;
+}
+
 export default function DashboardPage() {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null | undefined>(undefined);
   const [matches, setMatches] = useState<MatchList | null>(null);
@@ -115,7 +139,7 @@ export default function DashboardPage() {
   const [showApplyPrompt, setShowApplyPrompt] = useState(false);
   const [placementFlowBusy, setPlacementFlowBusy] = useState<PlacementFlowBusy>(null);
   const [placementEventsInvalidateKey, setPlacementEventsInvalidateKey] = useState(0);
-  const [googleCalendarStrip, setGoogleCalendarStrip] = useState<GoogleCalendarStrip | null>(null);
+  const [dashboardCalendarBundle, setDashboardCalendarBundle] = useState<DashboardCalendarBundle | null>(null);
 
   const loadJobs = useCallback(async (token: string, activeFilters: JobFilters) => {
     return apiFetch<JobList>(`/api/v1/jobs/${buildJobsQuery(activeFilters)}`, {}, token);
@@ -141,9 +165,37 @@ export default function DashboardPage() {
   const loadGoogleCalendarStrip = useCallback(async (token: string) => {
     try {
       const s = await apiFetch<GoogleCalendarStrip>("/api/v1/calendar/google/status", {}, token);
-      setGoogleCalendarStrip(s);
+      let nextInterview: DashboardCalendarBundle["nextInterview"] = null;
+      if (s.connected) {
+        try {
+          const rows = await apiFetch<
+            {
+              company_name: string;
+              job_title: string;
+              interview_start: string;
+              interview_end: string;
+              status: string;
+            }[]
+          >("/api/v1/calendar/google/interviews", {}, token);
+          const pick = rows[0];
+          if (pick && pick.status !== "cancelled") {
+            nextInterview = {
+              company_name: pick.company_name,
+              job_title: pick.job_title,
+              interview_start: pick.interview_start,
+              interview_end: pick.interview_end,
+            };
+          }
+        } catch {
+          nextInterview = null;
+        }
+      }
+      setDashboardCalendarBundle({ status: s, nextInterview });
     } catch {
-      setGoogleCalendarStrip({ connected: false, google_email: null });
+      setDashboardCalendarBundle({
+        status: { connected: false, google_email: null },
+        nextInterview: null,
+      });
     }
   }, []);
 
@@ -606,23 +658,52 @@ export default function DashboardPage() {
             applicationsActive={pipelineActiveCount}
           />
           <Card variant="soft" className="mb-4">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="min-w-0">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.calendarStripTitle")}</p>
                 <p className="twin-muted mt-1 text-xs leading-relaxed">
-                  {googleCalendarStrip === null
+                  {dashboardCalendarBundle === null
                     ? t("dashboard.calendarStripLoading")
-                    : googleCalendarStrip.connected
+                    : dashboardCalendarBundle.status.connected
                       ? t("dashboard.calendarStripConnected").replace(
                           "{email}",
-                          googleCalendarStrip.google_email?.trim() || "—",
+                          dashboardCalendarBundle.status.google_email?.trim() || "—",
                         )
                       : t("dashboard.calendarStripDisconnected")}
                 </p>
+                {dashboardCalendarBundle?.status.connected ? (
+                  <div className="mt-3 border-t border-[var(--twin-border)] pt-3">
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
+                      {t("dashboard.calendarNextInterviewTitle")}
+                    </p>
+                    {dashboardCalendarBundle.nextInterview ? (
+                      <>
+                        <p className="mt-1.5 text-sm font-medium text-[var(--foreground)]">
+                          {dashboardCalendarBundle.nextInterview.job_title}
+                          <span className="font-normal text-[var(--twin-muted-strong)]">
+                            {" "}
+                            · {dashboardCalendarBundle.nextInterview.company_name}
+                          </span>
+                        </p>
+                        <p className="twin-muted mt-0.5 text-xs">
+                          {formatInterviewRangeShort(
+                            dashboardCalendarBundle.nextInterview.interview_start,
+                            dashboardCalendarBundle.nextInterview.interview_end,
+                            locale,
+                          )}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="twin-muted mt-1.5 text-xs leading-relaxed">
+                        {t("dashboard.calendarNextInterviewEmpty")}
+                      </p>
+                    )}
+                  </div>
+                ) : null}
               </div>
               <Link
                 href="/dashboard/calendar"
-                className="twin-btn-secondary twin-touch-target shrink-0 text-center text-sm sm:text-left"
+                className="twin-btn-secondary twin-touch-target shrink-0 self-start text-center text-sm sm:text-left"
               >
                 {t("dashboard.calendarStripCta")}
               </Link>
