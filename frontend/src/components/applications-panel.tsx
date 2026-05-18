@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "@/components/language-provider";
 import { applicationStatusKey } from "@/lib/application-status";
 
@@ -85,6 +85,7 @@ export function ApplicationsPanel({
   placementEventsInvalidateKey?: number;
 }) {
   const { t } = useTranslation();
+  const [statusFilter, setStatusFilter] = useState<(typeof STATUSES)[number] | "all">("all");
   const [openId, setOpenId] = useState<number | null>(null);
   const [draftById, setDraftById] = useState<Record<number, string>>({});
   const [workEmailById, setWorkEmailById] = useState<Record<number, string>>({});
@@ -128,9 +129,35 @@ export function ApplicationsPanel({
     return draftById[app.id] ?? app.recruiter_feedback_raw ?? "";
   }
 
+  const visibleItems = useMemo(() => {
+    if (statusFilter === "all") return items;
+    return items.filter((a) => normalizeApplicationSelectStatus(a.status) === statusFilter);
+  }, [items, statusFilter]);
+
   return (
-    <ul className="space-y-2 text-sm">
-      {items.map((app) => {
+    <>
+      <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <label className="flex flex-wrap items-center gap-2 text-xs text-[var(--twin-muted-strong)]">
+          <span>{t("dashboard.appsFilterStatus")}</span>
+          <select
+            className="rounded border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-2 py-1.5 text-sm text-[var(--foreground)]"
+            value={statusFilter}
+            onChange={(e) => {
+              const v = e.target.value;
+              setStatusFilter(v === "all" ? "all" : (v as (typeof STATUSES)[number]));
+            }}
+          >
+            <option value="all">{t("dashboard.appsFilterAll")}</option>
+            {STATUSES.map((s) => (
+              <option key={s} value={s}>
+                {t(applicationStatusKey(s))}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <ul className="space-y-2 text-sm">
+        {visibleItems.map((app) => {
         const busy = feedbackBusy?.id === app.id ? feedbackBusy.kind : null;
         const draft = draftFor(app);
         const ins = app.feedback_insights;
@@ -447,5 +474,6 @@ export function ApplicationsPanel({
         );
       })}
     </ul>
+    </>
   );
 }
