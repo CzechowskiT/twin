@@ -363,6 +363,12 @@ def google_calendar_list_interviews(
         False,
         description="When true, include interviews marked cancelled (still upcoming by start time).",
     ),
+    limit: int = Query(
+        25,
+        ge=1,
+        le=50,
+        description="Max interviews to return (1–50).",
+    ),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> list[ScheduledInterviewOut]:
@@ -374,7 +380,7 @@ def google_calendar_list_interviews(
     )
     if not include_cancelled:
         q = q.filter(ScheduledInterview.status != "cancelled")
-    rows = q.order_by(ScheduledInterview.interview_start.asc()).limit(25).all()
+    rows = q.order_by(ScheduledInterview.interview_start.asc()).limit(limit).all()
     return rows
 
 

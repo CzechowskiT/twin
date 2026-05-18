@@ -139,6 +139,10 @@ def test_google_calendar_list_interviews_include_cancelled(client: TestClient) -
         ids2 = {r["id"] for r in res2.json()}
         assert active.id in ids2
         assert cancelled.id in ids2
+
+        res_limit = client.get("/api/v1/calendar/google/interviews?limit=1")
+        assert res_limit.status_code == 200
+        assert len(res_limit.json()) == 1
     finally:
         app.dependency_overrides.pop(get_current_user, None)
         app.dependency_overrides.pop(get_db, None)
