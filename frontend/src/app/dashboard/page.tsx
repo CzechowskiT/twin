@@ -168,6 +168,7 @@ export default function DashboardPage() {
   const [dashboardCalendarBundle, setDashboardCalendarBundle] = useState<DashboardCalendarBundle | null>(null);
   const [nextInterviewIcsBusy, setNextInterviewIcsBusy] = useState(false);
   const [applicationsCsvBusy, setApplicationsCsvBusy] = useState(false);
+  const [applicationsXlsxBusy, setApplicationsXlsxBusy] = useState(false);
   const [matchesCsvBusy, setMatchesCsvBusy] = useState(false);
   const [matchesXlsxBusy, setMatchesXlsxBusy] = useState(false);
   const [matchesRefreshing, setMatchesRefreshing] = useState(false);
@@ -651,6 +652,22 @@ export default function DashboardPage() {
     }
   }
 
+  async function downloadApplicationsXlsx() {
+    const token = getToken();
+    if (!token) return;
+    setApplicationsXlsxBusy(true);
+    setError(null);
+    try {
+      const blob = await apiFetchBlob("/api/v1/applications/me/export.xlsx", {}, token);
+      saveBlobAsFile(blob, "twin-applications.xlsx");
+      toast.success(t("dashboard.applicationsXlsxDownloadedToast"));
+    } catch (err) {
+      setError(csvExportUserMessage(err, t));
+    } finally {
+      setApplicationsXlsxBusy(false);
+    }
+  }
+
   async function downloadMatchesCsv() {
     const token = getToken();
     if (!token) return;
@@ -834,36 +851,54 @@ export default function DashboardPage() {
         },
       }}
     >
-      <div className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-start sm:justify-between">
         <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">
           {t("dashboard.title")}
         </h1>
-        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-2">
-          <Link href="/profile" className="twin-link twin-touch-target text-center text-sm sm:text-left">
+        <nav
+          className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-2"
+          aria-label={t("dashboard.title")}
+        >
+          <Link
+            href="/profile"
+            className="twin-link inline-flex min-h-[2.75rem] items-center justify-center px-1 text-sm sm:justify-start sm:text-left"
+          >
             {t("nav.profile")}
           </Link>
-          <Link href="/dashboard/career" className="twin-link twin-touch-target text-center text-sm sm:text-left">
+          <Link
+            href="/dashboard/career"
+            className="twin-link inline-flex min-h-[2.75rem] items-center justify-center px-1 text-sm sm:justify-start sm:text-left"
+          >
             {t("dashboard.careerCompassLink")}
           </Link>
-          <Link href="/dashboard/billing" className="twin-link twin-touch-target text-center text-sm sm:text-left">
+          <Link
+            href="/dashboard/billing"
+            className="twin-link inline-flex min-h-[2.75rem] items-center justify-center px-1 text-sm sm:justify-start sm:text-left"
+          >
             {t("dashboard.billingLink")}
           </Link>
-          <Link href="/dashboard/identity" className="twin-link twin-touch-target text-center text-sm sm:text-left">
+          <Link
+            href="/dashboard/identity"
+            className="twin-link inline-flex min-h-[2.75rem] items-center justify-center px-1 text-sm sm:justify-start sm:text-left"
+          >
             {t("dashboard.identityLink")}
           </Link>
-          <Link href="/dashboard/calendar" className="twin-link twin-touch-target text-center text-sm sm:text-left">
+          <Link
+            href="/dashboard/calendar"
+            className="twin-link inline-flex min-h-[2.75rem] items-center justify-center px-1 text-sm sm:justify-start sm:text-left"
+          >
             {t("dashboard.calendarLink")}
           </Link>
           <button
             type="button"
-            className="twin-link twin-touch-target text-center text-sm sm:text-left disabled:opacity-50"
+            className="twin-link inline-flex min-h-[2.75rem] cursor-pointer items-center justify-center border-0 bg-transparent p-0 px-1 text-sm font-[inherit] sm:justify-start sm:text-left disabled:opacity-50"
             disabled={exportJsonBusy}
             aria-label={t("dashboard.exportMyDataJsonAria")}
             onClick={() => void downloadMyDataJson()}
           >
             {exportJsonBusy ? "…" : t("dashboard.exportMyDataJson")}
           </button>
-        </div>
+        </nav>
       </div>
 
       <div className="mb-6 rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/50 px-4 py-3 sm:px-5">
@@ -1012,7 +1047,7 @@ export default function DashboardPage() {
             {user && (
               <>
                 <p className="twin-muted text-sm">{t("dashboard.signedInAs")}</p>
-                <p className="break-all text-base font-medium sm:text-lg">{user.email}</p>
+                <p className="min-w-0 text-sm font-medium leading-snug sm:text-base">{user.email}</p>
               </>
             )}
             {profile === null && (
@@ -1240,15 +1275,26 @@ export default function DashboardPage() {
                       .replace("{total}", String(applicationsTotal))}
               </span>
             </h2>
-            <button
-              type="button"
-              aria-label={t("dashboard.applicationsExportCsv")}
-              disabled={applicationsCsvBusy}
-              onClick={() => void downloadApplicationsCsv()}
-              className="twin-btn-secondary twin-touch-target shrink-0 self-start text-sm"
-            >
-              {applicationsCsvBusy ? "…" : t("dashboard.applicationsExportCsv")}
-            </button>
+            <div className="flex flex-wrap gap-2 self-start sm:justify-end">
+              <button
+                type="button"
+                aria-label={t("dashboard.applicationsExportCsv")}
+                disabled={applicationsCsvBusy || applicationsXlsxBusy}
+                onClick={() => void downloadApplicationsCsv()}
+                className="twin-btn-secondary twin-touch-target text-sm"
+              >
+                {applicationsCsvBusy ? "…" : t("dashboard.applicationsExportCsv")}
+              </button>
+              <button
+                type="button"
+                aria-label={t("dashboard.applicationsExportXlsx")}
+                disabled={applicationsCsvBusy || applicationsXlsxBusy}
+                onClick={() => void downloadApplicationsXlsx()}
+                className="twin-btn-secondary twin-touch-target text-sm"
+              >
+                {applicationsXlsxBusy ? "…" : t("dashboard.applicationsExportXlsx")}
+              </button>
+            </div>
           </div>
           <ApplicationsPanel
             items={applications}

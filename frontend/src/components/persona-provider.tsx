@@ -6,6 +6,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -36,7 +37,7 @@ export function PersonaProvider({ children }: { children: ReactNode }) {
   /** Default matches primary product lane; hydrated from path or storage after mount. */
   const [persona, setPersonaState] = useState<MarketingPersona>("candidate");
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const fromPath = marketingPersonaFromPath(pathname);
     const stored = readStoredPersona();
     const resolved = fromPath ?? stored ?? "candidate";

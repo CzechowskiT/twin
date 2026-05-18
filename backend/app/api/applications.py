@@ -4,11 +4,12 @@ import csv
 import json
 import logging
 from datetime import datetime
-from io import StringIO
+from io import BytesIO, StringIO
 from typing import Annotated
 
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, Header, HTTPException, Query, status
 from fastapi.responses import Response, StreamingResponse
+from openpyxl import Workbook
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user
@@ -173,6 +174,83 @@ def export_my_applications_csv(
         _iter_applications_csv_rows(db, candidate.id, lim),
         media_type="text/csv; charset=utf-8",
         headers={"Content-Disposition": 'attachment; filename="twin-applications.csv"'},
+    )
+
+
+@router.get(
+    "/me/export.xlsx",
+    summary="Export applications as Excel",
+    description="Same columns as CSV, as an .xlsx workbook (bounded rows).",
+)
+def export_my_applications_xlsx(
+    limit: int = Query(
+        2000,
+        ge=1,
+        le=_APPLICATION_EXPORT_CSV_MAX_ROWS,
+        description="Maximum rows (newest first). Same cap as CSV export.",
+    ),
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> Response:
+    """Excel export of the candidate's application pipeline (same fields as CSV)."""
+    candidate = _candidate_or_404(db, user.id)
+    lim = min(limit, _APPLICATION_EXPORT_CSV_MAX_ROWS)
+    wb = Workbook()
+    ws = wb.active
+    assert ws is not None
+    ws.title = "Applications"
+    ws.append(
+        [
+            "application_id",
+            "job_id",
+            "status",
+            "title",
+            "company",
+            "location",
+            "job_board",
+            "url",
+            "applied_at",
+            "updated_at",
+            "notes",
+            "placement_state",
+            "placement_verified_at",
+        ],
+    )
+    base = (
+        db.query(Application, Job)
+        .join(Job, Application.job_id == Job.id)
+        .filter(Application.candidate_id == candidate.id)
+        .order_by(Application.updated_at.desc())
+        .limit(lim)
+    )
+    for app, job in base.yield_per(200):
+        notes = (app.notes or "").replace("\r\n", "\n").replace("\r", "\n")
+        if len(notes) > _APPLICATION_EXPORT_CSV_NOTES_MAX:
+            notes = notes[: _APPLICATION_EXPORT_CSV_NOTES_MAX] + "\n…(truncated)"
+        ws.append(
+            [
+                app.id,
+                job.id,
+                app.status.value,
+                job.title,
+                job.company,
+                job.location or "",
+                job.job_board,
+                job.url,
+                app.applied_at.isoformat() if app.applied_at else "",
+                app.updated_at.isoformat() if app.updated_at else "",
+                notes,
+                app.placement_state or "none",
+                app.placement_verified_at.isoformat() if app.placement_verified_at else "",
+            ],
+        )
+    out = BytesIO()
+    wb.save(out)
+    out.seek(0)
+    return Response(
+        content=out.getvalue(),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": 'attachment; filename="twin-applications.xlsx"'},
     )
 
 
