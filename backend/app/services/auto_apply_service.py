@@ -12,7 +12,7 @@ from typing import Any
 from sqlalchemy.orm import Session
 
 from app.automation.apply_engine import run_auto_apply
-from app.automation.types import ApplyOutcome
+from app.automation.types import ApplyOutcome, ApplyResult
 from app.config import get_settings
 from app.database.models import Application, ApplicationStatus, Candidate, Job, User
 from app.services.application_package_pdf import render_application_package_pdf
@@ -153,6 +153,7 @@ def auto_apply_for_user(
     if not resume_path or not Path(resume_path).is_file():
         return ApplyOutcome.FAILED, "Brak pliku CV do załączenia (wgraj CV w profilu).", None
 
+    result: ApplyResult
     try:
         result = run_auto_apply(
             job_board=job.job_board,
@@ -165,6 +166,18 @@ def auto_apply_for_user(
             headless=settings.auto_apply_headless,
             state_dir=state_dir,
             submit=submit,
+        )
+    except Exception:
+        logger.exception(
+            "run_auto_apply crashed job_id=%s board=%s user_id=%s",
+            job_id,
+            job.job_board,
+            user.id,
+        )
+        result = ApplyResult(
+            ApplyOutcome.FAILED,
+            "Auto-apply przerwany na serwerze (np. błąd przeglądarki albo zmiana strony portalu). "
+            "Użyj „Aplikuj”, żeby otworzyć ogłoszenie w nowej karcie i dokończyć wysyłkę ręcznie.",
         )
     finally:
         if package_pdf and package_pdf.is_file():
