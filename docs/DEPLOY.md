@@ -43,6 +43,21 @@ Env template: `.env.production.example` in repo root.
 
 `DATABASE_URL` from Railway (`postgres://`) is normalized to `postgresql+psycopg://` in `app/config.py`.
 
+### Fundraising strip (100k headline jobs + LinkedIn / Stripe on `/calculator`)
+
+The public endpoint `GET /api/v1/public/mvp-stats` drives the **B2B ROI calculator** “Live aggregates” block and (when enabled) the **dashboard** “In your feed” headline count.
+
+On the **Railway API** (and worker/beat if they call settings), set:
+
+| Variable | Purpose |
+|----------|---------|
+| `INVESTOR_MVP_STATS_DEMO_MODE=true` | Use `INVESTOR_MVP_STATS_DEMO_VALIDATED_JOBS` (default **100000**) as `validated_jobs` and show LinkedIn + Stripe readiness in that strip. Other counters stay real. |
+| `INVESTOR_MVP_STATS_DEMO_FORCE_INTEGRATIONS_ON=true` | *(Optional)* Forces both integrations to show as “Ready” even if keys are missing — **screenshots only**; prefer real secrets below. |
+| `LINKEDIN_CLIENT_ID`, `LINKEDIN_CLIENT_SECRET`, `LINKEDIN_REDIRECT_URI` | LinkedIn sign-in; strip shows **Ready** when all three are non-empty (redirect must match the API host). See [LINKEDIN_OAUTH.md](./LINKEDIN_OAUTH.md). |
+| `STRIPE_SECRET_KEY` + `STRIPE_PRICE_ID_PREMIUM` or `STRIPE_PRICE_ID_PRO` | Stripe Checkout; strip shows **Ready** when secret and at least one price id are set. See [STRIPE.md](./STRIPE.md). |
+
+To keep fully live DB counts on a public deploy, set `INVESTOR_MVP_STATS_DEMO_MODE=false` explicitly.
+
 ## Option 3: Railway / Render (manual commands)
 
 | Service | Command | Notes |

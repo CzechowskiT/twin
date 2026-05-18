@@ -9,17 +9,26 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from app.config import get_settings
+from app.config import Settings, get_settings
 from app.database.models import Application, Candidate, Job, User
 from app.database.session import get_db
 from app.scrapers.registry import scrape_board_ids_ordered
 from app.schemas.public import MvpStatsOut
+from app.services.linkedin_oauth import is_linkedin_oauth_configured
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-@router.get("/mvp-stats", response_model=MvpStatsOut)
+def _stripe_checkout_ready(settings: Settings) -> bool:
+    s = settings
+    return bool(
+        s.stripe_secret_key.strip()
+        and (s.stripe_price_id_premium.strip() or s.stripe_price_id_pro.strip())
+    )
+
+
+@router.get("/mvp-stats", response_model=MvpStatsOut, response_model_exclude_none=True)
 def mvp_stats(db: Session = Depends(get_db)) -> MvpStatsOut:
     """Aggregate product metrics for fundraising decks (no personal fields)."""
     try:
@@ -40,9 +49,14 @@ def mvp_stats(db: Session = Depends(get_db)) -> MvpStatsOut:
         )
         s = get_settings()
         if s.investor_mvp_stats_demo_mode:
+            force = bool(s.investor_mvp_stats_demo_force_integrations_on)
+            li = force or is_linkedin_oauth_configured()
+            st = force or _stripe_checkout_ready(s)
             stats = stats.model_copy(
                 update={
                     "validated_jobs": int(s.investor_mvp_stats_demo_validated_jobs),
+                    "linkedin_oauth_configured": li,
+                    "stripe_checkout_ready": st,
                 }
             )
         return stats

@@ -47,22 +47,29 @@ def test_public_mvp_stats_shape_empty() -> None:
         assert body["job_boards_in_registry"] >= 1
         assert "generated_at" in body
         assert body["generated_at"].endswith("Z")
+        assert "linkedin_oauth_configured" not in body
+        assert "stripe_checkout_ready" not in body
     finally:
         app.dependency_overrides.pop(get_db, None)
         db.close()
 
 
+@patch("app.api.public._stripe_checkout_ready", return_value=False)
+@patch("app.api.public.is_linkedin_oauth_configured", return_value=False)
 @patch("app.api.public.get_settings")
-def test_public_mvp_stats_investor_demo_mode(mock_get_settings) -> None:
+def test_public_mvp_stats_investor_demo_mode(mock_get_settings, _mock_li: object, _mock_stripe: object) -> None:
     """Optional deck mode: headline jobs counter without changing other aggregates."""
     db = _sqlite()
     mock_s = MagicMock()
     mock_s.investor_mvp_stats_demo_mode = True
     mock_s.investor_mvp_stats_demo_validated_jobs = 100_000
+    mock_s.investor_mvp_stats_demo_force_integrations_on = False
     mock_s.linkedin_client_id = ""
     mock_s.linkedin_client_secret = ""
+    mock_s.linkedin_redirect_uri = ""
     mock_s.stripe_secret_key = ""
     mock_s.stripe_price_id_premium = ""
+    mock_s.stripe_price_id_pro = ""
     mock_get_settings.return_value = mock_s
 
     def override_db():
@@ -79,6 +86,46 @@ def test_public_mvp_stats_investor_demo_mode(mock_get_settings) -> None:
         body = res.json()
         assert body["validated_jobs"] == 100_000
         assert body["registered_users"] == 0
+        assert body["linkedin_oauth_configured"] is False
+        assert body["stripe_checkout_ready"] is False
+    finally:
+        app.dependency_overrides.pop(get_db, None)
+        db.close()
+
+
+@patch("app.api.public._stripe_checkout_ready", return_value=False)
+@patch("app.api.public.is_linkedin_oauth_configured", return_value=False)
+@patch("app.api.public.get_settings")
+def test_public_mvp_stats_demo_mode_force_integrations(
+    mock_get_settings, _mock_li: object, _mock_stripe: object
+) -> None:
+    db = _sqlite()
+    mock_s = MagicMock()
+    mock_s.investor_mvp_stats_demo_mode = True
+    mock_s.investor_mvp_stats_demo_validated_jobs = 100_000
+    mock_s.investor_mvp_stats_demo_force_integrations_on = True
+    mock_s.linkedin_client_id = ""
+    mock_s.linkedin_client_secret = ""
+    mock_s.linkedin_redirect_uri = ""
+    mock_s.stripe_secret_key = ""
+    mock_s.stripe_price_id_premium = ""
+    mock_s.stripe_price_id_pro = ""
+    mock_get_settings.return_value = mock_s
+
+    def override_db():
+        try:
+            yield db
+        finally:
+            pass
+
+    app.dependency_overrides[get_db] = override_db
+    try:
+        client = TestClient(app)
+        res = client.get("/api/v1/public/mvp-stats")
+        assert res.status_code == 200
+        body = res.json()
+        assert body["linkedin_oauth_configured"] is True
+        assert body["stripe_checkout_ready"] is True
     finally:
         app.dependency_overrides.pop(get_db, None)
         db.close()
@@ -126,6 +173,8 @@ def test_public_mvp_stats_counts() -> None:
         assert body["registered_users"] == 1
         assert body["total_applications"] == 1
         assert body["profiles_with_cv"] == 1
+        assert "linkedin_oauth_configured" not in body
+        assert "stripe_checkout_ready" not in body
     finally:
         app.dependency_overrides.pop(get_db, None)
         db.close()
