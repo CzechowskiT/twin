@@ -6,7 +6,7 @@ import logging
 from datetime import datetime
 from io import StringIO
 
-from fastapi import APIRouter, Body, Depends, HTTPException, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, status
 from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
@@ -46,19 +46,24 @@ logger = logging.getLogger(__name__)
 
 @router.get("/me", response_model=ApplicationListOut)
 def list_my_applications(
+    limit: int = Query(100, ge=1, le=200, description="Page size for application rows."),
+    offset: int = Query(0, ge=0, description="Offset into the candidate's applications (newest first)."),
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> ApplicationListOut:
     candidate = _candidate_or_404(db, user.id)
+    total = db.query(Application).filter(Application.candidate_id == candidate.id).count()
     rows = (
         db.query(Application, Job)
         .join(Job, Application.job_id == Job.id)
         .filter(Application.candidate_id == candidate.id)
         .order_by(Application.updated_at.desc())
+        .offset(offset)
+        .limit(limit)
         .all()
     )
     items = [_to_out(app, job) for app, job in rows]
-    return ApplicationListOut(items=items, total=len(items))
+    return ApplicationListOut(items=items, total=total)
 
 
 @router.get("/me/export.csv")
