@@ -90,6 +90,14 @@ Po ustawieniu `BASE_URL` na publiczny root API (jak w sekcji B, krok „Test”)
 ```bash
 chmod +x scripts/smoke-p0.sh
 BASE_URL="https://<TWOJE-API>.up.railway.app" ./scripts/smoke-p0.sh
-# głębszy test (SELECT 1 w DB, 2 s timeout):
+# głębszy test (SELECT 1 w DB):
 BASE_URL="https://<TWOJE-API>.up.railway.app" ./scripts/smoke-p0.sh --db
+# publiczne metryki (slajd inwestorski vs API):
+BASE_URL="https://<TWOJE-API>.up.railway.app" ./scripts/smoke-p0.sh --mvp
+# feed z tokenem JWT (żeby nie wchodzić na pusty feed) — token z sesji demo:
+DEMO_BEARER_TOKEN="<jwt>" BASE_URL="https://<TWOJE-API>.up.railway.app" ./scripts/smoke-p0.sh --jobs
+# wszystko naraz:
+BASE_URL="https://<TWOJE-API>.up.railway.app" ./scripts/smoke-p0.sh --db --mvp --jobs
 ```
+
+Demo przed inwestorem (złota ścieżka, plan B, narracja): **[INVESTOR_DEMO_P0.md](./INVESTOR_DEMO_P0.md)**.
