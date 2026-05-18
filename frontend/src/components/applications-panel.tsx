@@ -197,6 +197,19 @@ export function ApplicationsPanel({
                           {app.placement_declaration_note}
                         </p>
                       ) : null}
+                      {app.placement_reported_at &&
+                      (app.placement_state ?? "none") !== "none" &&
+                      (app.placement_state ?? "none") !== "verified" ? (
+                        <p className="text-xs text-[var(--twin-muted)]">
+                          {t("dashboard.placementDeclaredAt").replace(
+                            "{when}",
+                            new Date(app.placement_reported_at).toLocaleString(undefined, {
+                              dateStyle: "medium",
+                              timeStyle: "short",
+                            }),
+                          )}
+                        </p>
+                      ) : null}
                       <p className="leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.placementVerifyHint")}</p>
                       <input
                         type="email"
