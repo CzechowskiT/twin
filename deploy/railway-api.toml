@@ -12,7 +12,22 @@
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 # Paths are relative to the service root directory (set `backend` in Railway UI).
-watchPatterns = ["app/**", "alembic/**", "scripts/**", "requirements.txt", "Dockerfile", "alembic.ini"]
+# Include both `app/**` (root = backend) and `backend/app/**` (root = repo root) so deploys are not
+# skipped with "No changes to watched files" when the root directory is misconfigured.
+watchPatterns = [
+  "app/**",
+  "alembic/**",
+  "scripts/**",
+  "requirements.txt",
+  "Dockerfile",
+  "alembic.ini",
+  "backend/app/**",
+  "backend/alembic/**",
+  "backend/scripts/**",
+  "backend/requirements.txt",
+  "backend/Dockerfile",
+  "backend/alembic.ini",
+]
 
 [deploy]
 healthcheckPath = "/api/v1/health"
