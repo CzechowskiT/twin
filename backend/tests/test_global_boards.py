@@ -31,7 +31,7 @@ REED_SNIPPET = """
 
 
 def test_global_board_specs_count() -> None:
-    assert len(GLOBAL_BOARD_SPECS) == 11
+    assert len(GLOBAL_BOARD_SPECS) == 13
     assert set(GLOBAL_BOARD_SPECS) == {
         "indeed",
         "indeed-pl",
@@ -44,6 +44,8 @@ def test_global_board_specs_count() -> None:
         "reed",
         "stepstone",
         "seek",
+        "google-jobs",
+        "snagajob",
     }
 
 

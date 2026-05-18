@@ -275,6 +275,51 @@ def _parse_seek(html: str, limit: int) -> list[ScrapedJob]:
     )
 
 
+def _google_jobs_url(keyword: str, location: str) -> str:
+    """Google Jobs rich-result pack (HTML layout changes frequently — best-effort)."""
+    q = quote_plus(f"{keyword} jobs {location}")
+    return f"https://www.google.com/search?q={q}&ibp=htl;jobs"
+
+
+def _parse_google_jobs(html: str, limit: int) -> list[ScrapedJob]:
+    job_board = "google.com/jobs"
+    base = "https://www.google.com"
+    for marker in ("jobs/detail", "/jobs/collections/", "jobposting", "htidocid"):
+        alt = parse_job_links(
+            html, job_board=job_board, base_url=base, href_contains=marker, limit=limit
+        )
+        if alt:
+            return alt
+    return []
+
+
+def _snagajob_url(keyword: str, location: str) -> str:
+    return (
+        "https://www.snagajob.com/search?"
+        f"q={quote_plus(keyword)}&w={quote_plus(location)}"
+    )
+
+
+def _parse_snagajob(html: str, limit: int) -> list[ScrapedJob]:
+    job_board = "snagajob.com"
+    base = "https://www.snagajob.com"
+    jobs = parse_with_selectors(
+        html,
+        job_board=job_board,
+        base_url=base,
+        card_selector="article, li.job-card, div[data-test='job-card']",
+        title_selector="h2, h3, a[data-test='job-link']",
+        company_selector="[data-test='company-name'], .company-name, span.company",
+        link_selector="a[href*='/job/']",
+        limit=limit,
+    )
+    if jobs:
+        return jobs
+    return parse_job_links(
+        html, job_board=job_board, base_url=base, href_contains="/job/", limit=limit
+    )
+
+
 GLOBAL_BOARD_SPECS: dict[str, BoardSpec] = {
     "indeed": BoardSpec("indeed", "indeed.com", "Indeed", "Global", _indeed_url, _parse_indeed),
     "indeed-pl": BoardSpec("indeed-pl", "indeed.pl", "Indeed (Poland)", "Poland", _indeed_pl_url, _parse_indeed_pl),
@@ -287,6 +332,22 @@ GLOBAL_BOARD_SPECS: dict[str, BoardSpec] = {
     "reed": BoardSpec("reed", "reed.co.uk", "Reed", "UK", _reed_url, _parse_reed),
     "stepstone": BoardSpec("stepstone", "stepstone.de", "StepStone", "Europe", _stepstone_url, _parse_stepstone),
     "seek": BoardSpec("seek", "seek.com.au", "SEEK", "Asia-Pacific", _seek_url, _parse_seek),
+    "google-jobs": BoardSpec(
+        "google-jobs",
+        "google.com/jobs",
+        "Google for Jobs",
+        "Global",
+        _google_jobs_url,
+        _parse_google_jobs,
+    ),
+    "snagajob": BoardSpec(
+        "snagajob",
+        "snagajob.com",
+        "Snagajob",
+        "Americas",
+        _snagajob_url,
+        _parse_snagajob,
+    ),
 }
 
 

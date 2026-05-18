@@ -41,10 +41,16 @@ export function InvestorRoadmapPanel() {
           </p>
           <ul className="max-h-48 space-y-1 overflow-y-auto pr-1 text-xs text-[var(--twin-muted)]">
             {INVESTOR_COMPANIES.map((c) => (
-              <li key={c.name} className="flex items-start justify-between gap-2">
+              <li key={`${c.name}-${c.boardId ?? "planned"}`} className="flex items-start justify-between gap-2">
                 <span>{c.name}</span>
-                <span className="shrink-0 rounded bg-[var(--twin-accent-muted)] px-1.5 py-0.5 text-[10px] font-semibold uppercase text-[var(--twin-muted-strong)]">
-                  {t("dashboard.roadmapPlannedBadge")}
+                <span
+                  className={
+                    isLivePortal(c.boardId)
+                      ? "shrink-0 rounded bg-[var(--twin-accent)]/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-[var(--twin-accent-hover)]"
+                      : "shrink-0 rounded bg-[var(--twin-accent-muted)] px-1.5 py-0.5 text-[10px] font-semibold uppercase text-[var(--twin-muted-strong)]"
+                  }
+                >
+                  {isLivePortal(c.boardId) ? t("dashboard.roadmapLiveBadge") : t("dashboard.roadmapPlannedBadge")}
                 </span>
               </li>
             ))}

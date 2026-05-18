@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from app.scrapers import compliance, justjoin, linkedin, praca, pracuj, rocketjobs
 from app.scrapers.base import ScrapedJob
 from app.scrapers.global_boards import GLOBAL_BOARD_SPECS, scrape_global_board
+from app.scrapers.greenhouse import scrape_greenhouse_board
 
 ScrapeFn = Callable[[], list[ScrapedJob]]
 
@@ -37,11 +38,37 @@ LOCAL_SCRAPERS: dict[str, ScrapeFn] = {
     "linkedin-sales": lambda: linkedin.scrape_linkedin_sales(limit=_registry_limit()),
 }
 
+# Greenhouse JSON boards — public ``/v1/boards/{token}/jobs`` (verified tokens only).
+_GREENHOUSE_SPECS: tuple[tuple[str, str, str], ...] = (
+    ("gh-stripe", "stripe", "Stripe"),
+    ("gh-databricks", "databricks", "Databricks"),
+    ("gh-airbnb", "airbnb", "Airbnb"),
+    ("gh-duolingo", "duolingo", "Duolingo"),
+    ("gh-cloudflare", "cloudflare", "Cloudflare"),
+    ("gh-robinhood", "robinhood", "Robinhood"),
+    ("gh-figma", "figma", "Figma"),
+    ("gh-anthropic", "anthropic", "Anthropic"),
+)
+
+
+def _greenhouse_fn(token: str, label: str) -> ScrapeFn:
+    def _run() -> list[ScrapedJob]:
+        return scrape_greenhouse_board(token, label, limit=_registry_limit())
+
+    return _run
+
+
+GREENHOUSE_SCRAPERS: dict[str, ScrapeFn] = {
+    bid: _greenhouse_fn(tok, lab) for bid, tok, lab in _GREENHOUSE_SPECS
+}
+
+_GREENHOUSE_LABEL_BY_ID: dict[str, str] = {bid: lab for bid, _, lab in _GREENHOUSE_SPECS}
+
 GLOBAL_SCRAPERS: dict[str, ScrapeFn] = {
     board_id: _wrap_global(board_id) for board_id in GLOBAL_BOARD_SPECS
 }
 
-SCRAPE_REGISTRY: dict[str, ScrapeFn] = {**LOCAL_SCRAPERS, **GLOBAL_SCRAPERS}
+SCRAPE_REGISTRY: dict[str, ScrapeFn] = {**LOCAL_SCRAPERS, **GREENHOUSE_SCRAPERS, **GLOBAL_SCRAPERS}
 
 DEFAULT_BOARD_TIMEOUT_SEC = 120
 
@@ -70,6 +97,18 @@ BOARD_LABELS: dict[str, tuple[str, str]] = {
     "linkedin": ("LinkedIn", "global"),
     "linkedin-sales": ("LinkedIn (sales)", "global"),
 }
+
+
+def _board_label(board_id: str) -> tuple[str, str]:
+    if board_id in BOARD_LABELS:
+        return BOARD_LABELS[board_id]
+    if board_id.startswith("gh-"):
+        human = _GREENHOUSE_LABEL_BY_ID.get(board_id)
+        if human:
+            return (f"{human} (Greenhouse)", "global")
+        tail = board_id.removeprefix("gh-").replace("-", " ").title()
+        return (f"Greenhouse ({tail})", "global")
+    return (board_id.replace("-", " ").title(), "global")
 
 
 def scrape_allowlist_board_ids() -> frozenset[str] | None:
@@ -143,7 +182,7 @@ def list_boards() -> list[dict[str, str]]:
                 }
             )
         else:
-            label, region = BOARD_LABELS.get(board_id, (board_id.replace("-", " ").title(), "global"))
+            label, region = _board_label(board_id)
             boards.append({"id": board_id, "label": label, "region": region})
 
     def sort_key(item: dict[str, str]) -> tuple[int, str]:

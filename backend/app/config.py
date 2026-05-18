@@ -181,6 +181,11 @@ class Settings(BaseSettings):
     # Invalid entries are ignored; see docs/STRIPE.md.
     stripe_checkout_payment_method_types: str = "card,link"
 
+    # When true, GET /public/mvp-stats returns fixed headline counters for diligence decks
+    # (validated_jobs + OAuth/Stripe flags); other counters stay live from the database.
+    investor_mvp_stats_demo_mode: bool = False
+    investor_mvp_stats_demo_validated_jobs: int = 100_000
+
     # Authologic Customer API (KYC / identity) — https://developer.authologic.com
     # Basic auth: OmniPanel login as user, API key as password (see OpenAPI securitySchemes).
     authologic_api_base_url: str = "https://sandbox.authologic.com"

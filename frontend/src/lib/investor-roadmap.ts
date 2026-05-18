@@ -3,7 +3,7 @@
  * One button (“Twin for your job”) runs scrape-all over SCRAPE_ENABLED_BOARD_IDS (or all when unset).
  */
 export type InvestorPortal = { name: string; boardId?: string };
-export type InvestorCompany = { name: string };
+export type InvestorCompany = { name: string; boardId?: string };
 
 const PORTAL_PAIRS: [string, string | undefined][] = [
   ["Indeed", "indeed"],
@@ -12,9 +12,9 @@ const PORTAL_PAIRS: [string, string | undefined][] = [
   ["ZipRecruiter", "ziprecruiter"],
   ["Monster", "monster"],
   ["CareerBuilder", "careerbuilder"],
-  ["Google for Jobs", undefined],
+  ["Google for Jobs", "google-jobs"],
   ["SimplyHired", "simplyhired"],
-  ["Snagajob", undefined],
+  ["Snagajob", "snagajob"],
   ["LinkUp", undefined],
   ["Wellfound (AngelList Talent)", undefined],
   ["Dice", undefined],
@@ -28,6 +28,7 @@ const PORTAL_PAIRS: [string, string | undefined][] = [
   ["eFinancialCareers", undefined],
   ["BioSpace", undefined],
   ["Rigzone", undefined],
+  ["Jooble", "jooble"],
   ["StepStone", "stepstone"],
   ["Totaljobs", undefined],
   ["Reed.co.uk", "reed"],
@@ -62,6 +63,18 @@ export const INVESTOR_PORTALS: InvestorPortal[] = PORTAL_PAIRS.map(([name, board
   name,
   boardId,
 }));
+
+/** Employers with public Greenhouse JSON boards wired in ``registry.py`` (careers adapter). */
+const INVESTOR_GREENHOUSE_LIVE: InvestorCompany[] = [
+  { name: "Stripe", boardId: "gh-stripe" },
+  { name: "Databricks", boardId: "gh-databricks" },
+  { name: "Airbnb", boardId: "gh-airbnb" },
+  { name: "Duolingo", boardId: "gh-duolingo" },
+  { name: "Cloudflare", boardId: "gh-cloudflare" },
+  { name: "Robinhood", boardId: "gh-robinhood" },
+  { name: "Figma", boardId: "gh-figma" },
+  { name: "Anthropic", boardId: "gh-anthropic" },
+];
 
 const COMPANY_NAMES = [
   "Microsoft",
@@ -166,7 +179,10 @@ const COMPANY_NAMES = [
   "Netflix",
 ];
 
-export const INVESTOR_COMPANIES: InvestorCompany[] = COMPANY_NAMES.map((name) => ({ name }));
+export const INVESTOR_COMPANIES: InvestorCompany[] = [
+  ...INVESTOR_GREENHOUSE_LIVE,
+  ...COMPANY_NAMES.map((name) => ({ name })),
+];
 
 export function isLivePortal(boardId: string | undefined): boolean {
   return typeof boardId === "string" && boardId.length > 0;

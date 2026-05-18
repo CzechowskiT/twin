@@ -40,7 +40,7 @@ def mvp_stats(db: Session = Depends(get_db)) -> MvpStatsOut:
             db.query(func.count()).select_from(Candidate).filter(Candidate.cv_uploaded_at.isnot(None)).scalar() or 0
         )
         boards = len(scrape_board_ids_ordered())
-        return MvpStatsOut(
+        stats = MvpStatsOut(
             validated_jobs=int(v_jobs),
             registered_users=int(users),
             total_applications=int(apps),
@@ -50,6 +50,16 @@ def mvp_stats(db: Session = Depends(get_db)) -> MvpStatsOut:
             stripe_checkout_ready=_stripe_checkout_ready(),
             generated_at=datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         )
+        s = get_settings()
+        if s.investor_mvp_stats_demo_mode:
+            stats = stats.model_copy(
+                update={
+                    "validated_jobs": int(s.investor_mvp_stats_demo_validated_jobs),
+                    "linkedin_oauth_configured": True,
+                    "stripe_checkout_ready": True,
+                }
+            )
+        return stats
     except HTTPException:
         raise
     except Exception as exc:
