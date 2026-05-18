@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Shell } from "@/components/ui";
@@ -102,6 +102,46 @@ export default function DashboardCalendarPage() {
   const [icsBusyId, setIcsBusyId] = useState<number | null>(null);
   const [cancelBusyId, setCancelBusyId] = useState<number | null>(null);
   const [showCancelledInterviews, setShowCancelledInterviews] = useState(false);
+  const interviewRefreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const fetchInterviewRows = useCallback(
+    async (token: string, connected: boolean) => {
+      if (!connected) {
+        setInterviews([]);
+        return;
+      }
+      const q = showCancelledInterviews ? "?include_cancelled=true" : "";
+      const rows = await apiFetch<ScheduledInterview[]>(`/api/v1/calendar/google/interviews${q}`, {}, token);
+      setInterviews(rows);
+    },
+    [showCancelledInterviews],
+  );
+
+  const scheduleDebouncedInterviewRefresh = useCallback(
+    (connected: boolean) => {
+      const token = getToken();
+      if (!token || !connected) return;
+      if (interviewRefreshTimerRef.current) {
+        clearTimeout(interviewRefreshTimerRef.current);
+      }
+      interviewRefreshTimerRef.current = setTimeout(() => {
+        interviewRefreshTimerRef.current = null;
+        void fetchInterviewRows(token, true).catch((e) => {
+          console.warn("[calendar] debounced interview refresh failed", e);
+        });
+      }, 320);
+    },
+    [fetchInterviewRows],
+  );
+
+  useEffect(
+    () => () => {
+      if (interviewRefreshTimerRef.current) {
+        clearTimeout(interviewRefreshTimerRef.current);
+      }
+    },
+    [],
+  );
 
   const load = useCallback(async () => {
     const token = getToken();
@@ -114,13 +154,7 @@ export default function DashboardCalendarPage() {
     try {
       const s = await apiFetch<CalendarStatus>("/api/v1/calendar/google/status", {}, token);
       setStatus(s);
-      if (s.connected) {
-        const q = showCancelledInterviews ? "?include_cancelled=true" : "";
-        const rows = await apiFetch<ScheduledInterview[]>(`/api/v1/calendar/google/interviews${q}`, {}, token);
-        setInterviews(rows);
-      } else {
-        setInterviews([]);
-      }
+      await fetchInterviewRows(token, s.connected);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       if (msg.includes("401")) {
@@ -134,7 +168,7 @@ export default function DashboardCalendarPage() {
     } finally {
       setLoading(false);
     }
-  }, [router, showCancelledInterviews]);
+  }, [router, fetchInterviewRows]);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -523,7 +557,12 @@ export default function DashboardCalendarPage() {
                               setCancelBusyId(row.id);
                               try {
                                 await cancelInterviewRequest(row.id);
-                                await load();
+                                setInterviews((prev) =>
+                                  prev.map((r) =>
+                                    r.id === row.id ? { ...r, status: "cancelled" } : r,
+                                  ),
+                                );
+                                scheduleDebouncedInterviewRefresh(true);
                               } catch (e) {
                                 console.warn("[calendar] cancel failed", e);
                               } finally {
