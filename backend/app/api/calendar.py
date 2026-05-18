@@ -246,14 +246,20 @@ def _ensure_application_owned(db: Session, user_id: int, application_id: int | N
         return
     cand = db.query(Candidate).filter(Candidate.user_id == user_id).first()
     if not cand:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, "No candidate profile for this user")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No candidate profile for this user",
+        )
     row = (
         db.query(Application)
         .filter(Application.id == application_id, Application.candidate_id == cand.id)
         .first()
     )
     if not row:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Application not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Application not found",
+        )
 
 
 class NextSlotOut(BaseModel):
