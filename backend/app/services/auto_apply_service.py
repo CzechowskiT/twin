@@ -91,6 +91,19 @@ def auto_apply_for_user(
     if not job:
         return ApplyOutcome.FAILED, "Nie znaleziono oferty.", None
 
+    if (
+        user.gdpr_consent_at is None
+        or user.terms_of_service_accepted_at is None
+        or user.job_data_processing_consent_at is None
+        or user.ai_matching_consent_at is None
+    ):
+        return (
+            ApplyOutcome.FAILED,
+            "Brak wymaganych zgód konta (RODO, regulamin, przetwarzanie danych o ofertach, dopasowanie AI). "
+            "Uzupełnij je w profilu lub przy rejestracji — auto-apply ich wymaga.",
+            None,
+        )
+
     cv_text = _cv_text_for_apply(candidate)
     if not cv_text:
         return (
