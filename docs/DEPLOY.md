@@ -77,30 +77,20 @@ LinkedIn: [LINKEDIN_OAUTH.md](./LINKEDIN_OAUTH.md). Stripe: [STRIPE.md](./STRIPE
 
 ### CI (GitHub Actions)
 
-If your Git credential can create workflow files (**Personal Access Token** needs the **`workflow` scope**), add `.github/workflows/backend-tests.yml` to run `pytest` on every push/PR. Tokens without that scope will get `remote rejected` when pushing new workflow paths — run `pytest` locally or on Railway instead.
+Canonical workflow (backend `pytest` + frontend `npm run build`): **[ci-workflow.example.yml](./ci-workflow.example.yml)**.
 
-Example workflow:
+**Why this file lives under `docs/`:** GitHub rejects pushes that *introduce* new paths under `.github/workflows/` when the credential is a **Personal Access Token** without the **`workflow` scope** (`refusing to allow … without workflow scope`). Keeping the YAML here avoids that trap; copy it when you are ready:
 
-```yaml
-name: Backend tests
-on:
-  push:
-    branches: ["**"]
-  pull_request:
-jobs:
-  pytest:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install -r requirements.txt
-      - run: python -m pytest -q
+```bash
+mkdir -p .github/workflows
+cp docs/ci-workflow.example.yml .github/workflows/ci.yml
+git add .github/workflows/ci.yml
+# use HTTPS/SSH with a token that has `workflow`, or SSH deploy keys that allow workflow updates
+git commit -m "ci: add GitHub Actions workflow"
+git push
 ```
+
+SSH keys or a PAT **with** `workflow` can push `.github/workflows/` normally.
 
 ## GDPR
 
