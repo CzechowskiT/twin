@@ -10,11 +10,12 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
-from app.database.models import Application, Candidate, Job, User
+from app.database.models import Application, Candidate, User
 from app.database.session import get_db
 from app.scrapers.registry import scrape_board_ids_ordered
 from app.schemas.public import MvpStatsOut
 from app.services.linkedin_oauth import is_linkedin_oauth_configured
+from app.services.mvp_public_metrics import count_validated_jobs_public_traction
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -32,7 +33,7 @@ def _stripe_checkout_ready(settings: Settings) -> bool:
 def mvp_stats(db: Session = Depends(get_db)) -> MvpStatsOut:
     """Aggregate product metrics for investor surfaces (no personal fields; all counts from DB or env wiring)."""
     try:
-        v_jobs = db.query(func.count()).select_from(Job).filter(Job.is_validated.is_(True)).scalar() or 0
+        v_jobs = count_validated_jobs_public_traction(db)
         users = db.query(func.count()).select_from(User).scalar() or 0
         apps = db.query(func.count()).select_from(Application).scalar() or 0
         cv_profiles = (

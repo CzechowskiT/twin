@@ -1022,10 +1022,10 @@ const en = {
     liveStatsEyebrow: "Product traction",
     liveStatsTitle: "Live aggregates (this deployment)",
     liveStatsLead:
-      "Non-PII counters from the running API (validated jobs = full validated index in Postgres; dashboard job cards use your current filters). LinkedIn/Stripe show Ready only when those integrations are configured on the host. Not audited financials.",
+      "Non-PII counters from the running API. Validated jobs counts the Poland-first + LinkedIn core feed only (excludes bulk global boards like Indeed US / Glassdoor so the number tracks typical browsing, not scrape-all volume). Your dashboard total still changes with job-board and location filters. LinkedIn/Stripe show Ready only when those integrations are configured on the host. Not audited financials.",
     liveStatsLoading: "Loading live metrics…",
     liveStatsUnavailable: "Live metrics could not be loaded. Open the same origin as the API or check the Vercel → Railway proxy.",
-    liveStatsJobs: "Validated jobs",
+    liveStatsJobs: "Core job feed (validated)",
     liveStatsUsers: "Registered accounts",
     liveStatsApps: "Applications tracked",
     liveStatsCv: "Profiles with CV",
@@ -2365,11 +2365,11 @@ const pl: MessageTree = {
     liveStatsEyebrow: "Traction produktu",
     liveStatsTitle: "Agregaty na żywo (to środowisko)",
     liveStatsLead:
-      "Licznikowe metryki z API (zwalidowane oferty = cały indeks w Postgresie; lista ofert na panelu używa bieżących filtrów). LinkedIn/Stripe „Aktywne” tylko przy skonfigurowanej integracji na hoście. To nie audyt finansowy.",
+      "Metryki z API bez danych osobowych. Licznik ofert obejmuje tylko rdzeń PL + LinkedIn (bez masowych portali globalnych typu Indeed US / Glassdoor), żeby liczba odzwierciedlała typowe przeglądanie, a nie wolumen „scrape wszystkiego”. Suma na panelu nadal zależy od filtrów portalu i lokalizacji. LinkedIn/Stripe „Aktywne” tylko przy skonfigurowanej integracji na hoście. To nie audyt finansowy.",
     liveStatsLoading: "Ładowanie metryk…",
     liveStatsUnavailable:
       "Nie udało się pobrać metryk. Użyj tej samej domeny co API albo sprawdź proxy Vercel → Railway.",
-    liveStatsJobs: "Zwalidowane oferty",
+    liveStatsJobs: "Rdzeń ofert (zwalidowane)",
     liveStatsUsers: "Zarejestrowane konta",
     liveStatsApps: "Śledzone aplikacje",
     liveStatsCv: "Profile z CV",

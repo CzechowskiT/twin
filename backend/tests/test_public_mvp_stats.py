@@ -56,6 +56,50 @@ def test_public_mvp_stats_shape_empty(_mock_li: object, _mock_stripe: object) ->
         db.close()
 
 
+@patch("app.api.public._stripe_checkout_ready", return_value=False)
+@patch("app.api.public.is_linkedin_oauth_configured", return_value=False)
+def test_public_mvp_stats_validated_jobs_excludes_bulk_global_boards(_mock_li: object, _mock_stripe: object) -> None:
+    """Traction counter is Poland-first + LinkedIn core only — not raw global scrape volume."""
+    db = _sqlite()
+    db.add(
+        Job(
+            job_board="indeed.com",
+            external_id="g1",
+            title="Global",
+            company="Co",
+            url="https://ex/g1",
+            is_validated=True,
+        )
+    )
+    db.add(
+        Job(
+            job_board="pracuj.pl",
+            external_id="p1",
+            title="PL",
+            company="Co",
+            url="https://ex/p1",
+            is_validated=True,
+        )
+    )
+    db.commit()
+
+    def override_db():
+        try:
+            yield db
+        finally:
+            pass
+
+    app.dependency_overrides[get_db] = override_db
+    try:
+        client = TestClient(app)
+        res = client.get("/api/v1/public/mvp-stats")
+        assert res.status_code == 200
+        assert res.json()["validated_jobs"] == 1
+    finally:
+        app.dependency_overrides.pop(get_db, None)
+        db.close()
+
+
 @patch("app.api.public._stripe_checkout_ready", return_value=True)
 @patch("app.api.public.is_linkedin_oauth_configured", return_value=True)
 def test_public_mvp_stats_integration_flags_true(_mock_li: object, _mock_stripe: object) -> None:
@@ -93,7 +137,7 @@ def test_public_mvp_stats_counts(_mock_li: object, _mock_stripe: object) -> None
     db.commit()
     db.refresh(cand)
     j = Job(
-        job_board="test",
+        job_board="pracuj.pl",
         external_id="e1",
         title="T",
         company="C",
