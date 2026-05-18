@@ -52,7 +52,7 @@ Phase 1 — Full stack MVP (Celery, scrapers, matching). Job boards: pracuj.pl, 
 - Test locally before deploying
 
 ## Git (agent workflow)
-After substantive edits (code, config, or project docs like `docs/`), **commit and push** to the current branch without waiting for an explicit “commit” prompt — stage only files from that change; skip if nothing to commit or if the user asked not to. Follow repo/user safety: no secrets, no destructive git, no `--no-verify` unless requested.
+After substantive edits (code, config, or project docs like `docs/`), **verify the change works** (targeted `pytest`, `npm run build` / lint for touched frontend, or another minimal check that matches what you changed), then **commit and push** to the current branch without waiting for an explicit “commit” prompt — stage only files from that change; skip if nothing to commit or if the user asked not to. Follow repo/user safety: no secrets, no destructive git, no `--no-verify` unless requested.
 
 ## Code Style
 - Python: type hints, docstrings, pytest
