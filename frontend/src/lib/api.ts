@@ -1,9 +1,9 @@
 /**
- * Browser JSON calls use same-origin `/api/v1/...` → proxied by `app/api/v1/[[...path]]/route.ts` to FastAPI.
- * The proxy forwards `Authorization` / `X-Twin-Authorization`, so the SPA does not depend on Railway
- * `CORS_ORIGINS` matching every Vercel preview/production URL (a common billing/dashboard break).
+ * Browser JSON calls default to same-origin `/api/v1/...` → proxied by `app/api/v1/[[...path]]/route.ts`.
+ * When `NEXT_PUBLIC_API_URL` is set, **authenticated** browser calls go straight to FastAPI so scraping
+ * and dashboard survive Vercel proxy timeouts / misconfigured server-only env; Railway must list the
+ * frontend origin in `CORS_ORIGINS`. Login/register without a token still use the proxy.
  * Multipart uploads use the public API origin when set to reduce Vercel function body limits on proxies.
- * Local / Vercel: set `TWIN_API_BASE_URL` or `NEXT_PUBLIC_API_URL` so the server-side proxy can reach the API.
  */
 
 import { getPublicApiBase } from "@/lib/public-api-base";
@@ -11,9 +11,11 @@ import { getPublicApiBase } from "@/lib/public-api-base";
 /** Same-origin relative path (SSR and unauthenticated browser calls). */
 export const API_URL = "";
 
-/** JSON `fetch` from the browser: always same-origin so the App Route proxy adds the upstream base. */
-export function clientApiOriginForRequest(_authenticated: boolean): string {
+/** JSON `fetch` from the browser: same-origin unless we can hit the public API base with a bearer token. */
+export function clientApiOriginForRequest(authenticated: boolean): string {
   if (typeof window === "undefined") return "";
+  const base = getPublicApiBase();
+  if (authenticated && base) return base;
   return "";
 }
 
