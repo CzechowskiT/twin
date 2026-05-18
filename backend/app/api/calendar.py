@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from datetime import datetime, timedelta, timezone
 from urllib.parse import urlencode
 
@@ -16,7 +17,7 @@ from app.core.security import create_access_token, decode_access_token
 from app.database.models import Application, Candidate, ScheduledInterview, User, UserGoogleCalendar
 from app.database.session import get_db
 from app.services.calendar_scheduling import find_free_slots_iso, find_next_slot_iso, freebusy_overlaps_slot
-from app.services.google_calendar_api import GoogleCalendarApiError, insert_primary_event, query_freebusy
+from app.services.google_calendar_api import GoogleCalendarApiError, delete_primary_event, insert_primary_event, query_freebusy
 from app.services.google_calendar_oauth import (
     GoogleCalendarOAuthError,
     build_google_calendar_authorize_url,
@@ -28,6 +29,8 @@ from app.services.ics_export import scheduled_interview_to_ics
 from app.services.token_crypto import decrypt_secret, encrypt_secret
 
 router = APIRouter()
+
+logger = logging.getLogger(__name__)
 
 _CALENDAR_STATE_PREFIX = "gcal:"
 
@@ -420,7 +423,7 @@ def cancel_scheduled_interview(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> None:
-    """Mark a scheduled interview as cancelled in TWIN (does not auto-delete Google event)."""
+    """Mark interview cancelled in TWIN; best-effort delete linked Google Calendar event when configured."""
     row = (
         db.query(ScheduledInterview)
         .filter(
@@ -432,6 +435,17 @@ def cancel_scheduled_interview(
     if row is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Interview not found")
     if row.status != "cancelled":
+        prov = (row.calendar_provider or "google").lower()
+        if row.calendar_event_id and prov == "google":
+            try:
+                access = _calendar_access_token(db, current_user.id)
+                delete_primary_event(access, row.calendar_event_id)
+            except (HTTPException, GoogleCalendarApiError) as exc:
+                logger.warning(
+                    "Google Calendar event delete skipped for interview %s: %s",
+                    interview_id,
+                    exc,
+                )
         row.status = "cancelled"
         row.updated_at = datetime.utcnow()
         db.add(row)

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import Any
+from urllib.parse import quote
 
 import httpx
 
@@ -70,3 +71,16 @@ def insert_primary_event(
         if res.status_code not in (200, 201):
             raise GoogleCalendarApiError(res.text or "event insert failed")
         return res.json()
+
+
+def delete_primary_event(access_token: str, event_id: str) -> None:
+    """Delete an event on the user's primary calendar (best-effort; raises on hard API errors)."""
+    eid = quote(event_id, safe="")
+    with httpx.Client(timeout=30.0) as client:
+        res = client.delete(
+            f"{CAL_BASE}/calendars/primary/events/{eid}",
+            headers={"Authorization": f"Bearer {access_token}"},
+            params={"sendUpdates": "none"},
+        )
+        if res.status_code not in (200, 204):
+            raise GoogleCalendarApiError(res.text or "event delete failed")
