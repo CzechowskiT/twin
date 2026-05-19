@@ -43,3 +43,4 @@ backend/celerybeat-schedule*
 
 # Alembic (keep versions tracked)
 # migrations are committed
+.cursor/
