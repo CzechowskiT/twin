@@ -1,5 +1,8 @@
 # 🔍 TWIN MVP - Raport Audytu Technicznego i Produktowego
 
+> ⚠️ **SUPERSEDED:** Scalony backlog i aktualne PoC: [MERGED-AUDIT-2026-05-19.md](./MERGED-AUDIT-2026-05-19.md).
+> Ścieżki API i numery linii w tym pliku mogą nie pasować do gałęzi `cursor/phase1-monorepo-scaffold`.
+
 **Data audytu:** 2026-05-19  
 **Audytor:** Claude (Niezależny)  
 **Wersja:** cursor/phase1-monorepo-scaffold branch  

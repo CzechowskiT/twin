@@ -6,7 +6,7 @@ Imported from external drafts (`twin_test_plan.md`, `twin_security_detailed.md`,
 
 | Topic | Docs often say | Current codebase |
 |-------|----------------|------------------|
-| Health | `/api/v1/health/features` returns many OAuth flags | `GET /api/v1/health/features` returns only `google_calendar_oauth_configured`, `smtp_configured` (`backend/app/api/health.py`). |
+| Health | `/api/v1/health/features` returns many OAuth flags | Route **removed** (404). `GET /api/v1/health` returns `status`, `service`; optional `git_commit` when `GIT_COMMIT_SHA` / `RAILWAY_GIT_COMMIT_SHA` / `VERCEL_GIT_COMMIT_SHA` is set; `?db=true` adds `db_ok`. |
 | Job filters | `?skills=Python`, URL `skills=` | `GET /api/v1/jobs/` uses `q`, `title_terms`, `location`, `job_board`, `min_salary`, `sort`, `skip`/`limit` (`backend/app/api/jobs.py`). |
 | Dashboard filter persistence | Key `job-filters` | `localStorage` key `twin_dashboard_job_filters_v1` (`frontend/src/lib/jobs.ts`). |
 | Applications CSV filename | `applications.csv` | Response uses `twin-applications.csv` (`Content-Disposition` in `applications.py`). |

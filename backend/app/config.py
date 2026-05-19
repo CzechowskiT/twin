@@ -11,6 +11,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _ENV_FILE = _REPO_ROOT / ".env"
 
+# Default dev secret — must not be used when environment is production/staging.
+_DEV_SECRET_KEY = "dev-only-change-me"
+
 
 def _strip_trailing_slash_url(url: str) -> str:
     """Railway UI often appends '/' to URL variables; browsers send Origin without it."""
@@ -43,7 +46,7 @@ class Settings(BaseSettings):
         if isinstance(value, str) and value:
             return _normalize_postgres_url(value)
         return value
-    secret_key: str = "dev-only-change-me"
+    secret_key: str = _DEV_SECRET_KEY
     access_token_expire_minutes: int = 60 * 24 * 7
     # 0 = disabled (local only). Production should keep a positive cap to slow credential stuffing.
     auth_login_rate_limit_per_minute: int = 30
@@ -76,6 +79,21 @@ class Settings(BaseSettings):
             (os.getenv("REDIS_URL") or "").strip() or (os.getenv("CELERY_BROKER_URL") or "").strip()
         ):
             self.celery_task_always_eager = True
+        return self
+
+    @model_validator(mode="after")
+    def reject_insecure_production_secrets(self) -> "Settings":
+        """Fail fast at startup when production/staging still uses the dev JWT secret."""
+        env = (self.environment or "").strip().lower()
+        if env not in ("production", "staging"):
+            return self
+        key = (self.secret_key or "").strip()
+        if key == _DEV_SECRET_KEY:
+            raise ValueError(
+                "SECRET_KEY must be set to a unique random value in production/staging (not the dev default)."
+            )
+        if len(key) < 32:
+            raise ValueError("SECRET_KEY must be at least 32 characters in production/staging.")
         return self
 
     anthropic_api_key: str = ""

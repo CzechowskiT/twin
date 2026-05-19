@@ -1,5 +1,7 @@
 """Settings helpers for cloud databases."""
 
+import pytest
+
 from app.config import Settings, _normalize_postgres_url, get_settings
 
 
@@ -72,6 +74,19 @@ def test_matching_v2_tfidf_flag_from_env(monkeypatch) -> None:
         assert Settings().matching_v2_tfidf is True
     finally:
         get_settings.cache_clear()
+
+
+def test_production_rejects_dev_secret_key(monkeypatch) -> None:
+    monkeypatch.setenv("ENVIRONMENT", "production")
+    monkeypatch.delenv("SECRET_KEY", raising=False)
+    with pytest.raises(ValueError, match="SECRET_KEY"):
+        Settings()
+
+
+def test_production_accepts_long_secret_key(monkeypatch) -> None:
+    monkeypatch.setenv("ENVIRONMENT", "production")
+    monkeypatch.setenv("SECRET_KEY", "x" * 32)
+    assert Settings().secret_key == "x" * 32
 
 
 def test_redis_url_prevents_railway_eager_infer(monkeypatch) -> None:
