@@ -7,10 +7,10 @@
 3. **SEO** — `app/sitemap.xml` includes `/waitlist` (daily priority).
 4. **Locale UX** — Form remounts on `locale` change (Zod messages + placeholders).
 
-## Next (batch 3 backlog)
+## Batch 3 (done)
 
-- PostHog / Plausible event on waitlist signup.
-- Full FAQ/compare copy for zh, ja, ar (currently EN fallback sections).
-- `/beta/join` → optional redirect or A/B to `/waitlist`.
-- OpenGraph images per locale.
-- Backend: `signups_today` in admin export.
+- Consent-gated Plausible + PostHog `waitlist_signup` event.
+- Full FAQ/compare/terminal copy for zh, ja, ar.
+- `/beta/join` → `/waitlist` (preserve `?ref=`; `?classic=1` keeps multi-step join).
+- OpenGraph title/description per `Accept-Language`.
+- Admin: `signups_today` on stats + CSV export.

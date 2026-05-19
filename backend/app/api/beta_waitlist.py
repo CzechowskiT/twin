@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import csv
+import io
 import re
 import secrets
 from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, Header, HTTPException, UploadFile, status
+from fastapi.responses import StreamingResponse
 from sqlalchemy import and_, func, or_
 from sqlalchemy.orm import Session
 
@@ -164,15 +167,19 @@ def _require_beta_admin(settings: Settings, authorization: str | None) -> None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid admin token")
 
 
+def _signups_today_count(db: Session) -> int:
+    today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    return int(
+        db.query(func.count(BetaWaitlist.id)).filter(BetaWaitlist.created_at >= today_start).scalar() or 0
+    )
+
+
 @router.get("/stats", response_model=BetaStatsOut)
 def beta_stats(db: Session = Depends(get_db), settings: Settings = Depends(get_settings)) -> BetaStatsOut:
     total = int(db.query(func.count(BetaWaitlist.id)).scalar() or 0)
     jobs_n = int(db.query(func.count(Job.id)).scalar() or 0)
     boards_n = len(GLOBAL_BOARD_SPECS)
-    today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
-    signups_today = int(
-        db.query(func.count(BetaWaitlist.id)).filter(BetaWaitlist.created_at >= today_start).scalar() or 0
-    )
+    signups_today = _signups_today_count(db)
     recent_rows = db.query(BetaWaitlist).order_by(BetaWaitlist.id.desc()).limit(18).all()
     recent = [_anonym_caption(r.name, r.location, r.job_title) for r in reversed(recent_rows)]
     ends = settings.beta_campaign_ends_at.strip() or None
@@ -439,10 +446,68 @@ def beta_admin_stats(
         total_signups=total,
         cap=settings.beta_waitlist_cap,
         spots_left=max(0, settings.beta_waitlist_cap - total),
+        signups_today=_signups_today_count(db),
         linkedin_shared=linkedin_n,
         cv_uploaded=cv_n,
         voice_recorded=voice_n,
         by_source=by_source,
         referral_rows=ref_rows,
         top_referrers=top_referrers,
+    )
+
+
+@router.get("/admin/export")
+def beta_admin_export(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(None),
+) -> StreamingResponse:
+    """CSV export of waitlist rows for ops (admin token required)."""
+    _require_beta_admin(settings, authorization)
+    rows = db.query(BetaWaitlist).order_by(BetaWaitlist.id).all()
+    buf = io.StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(
+        [
+            "id",
+            "email",
+            "name",
+            "job_title",
+            "location",
+            "min_salary",
+            "source",
+            "referral_code",
+            "referred_by_code",
+            "priority_points",
+            "linkedin_shared",
+            "cv_uploaded",
+            "voice_recorded",
+            "created_at",
+        ]
+    )
+    for row in rows:
+        created = row.created_at.isoformat() if row.created_at else ""
+        writer.writerow(
+            [
+                row.id,
+                row.email,
+                row.name or "",
+                row.job_title or "",
+                row.location or "",
+                row.min_salary if row.min_salary is not None else "",
+                row.source or "",
+                row.referral_code,
+                row.referred_by_code or "",
+                row.priority_points,
+                int(row.linkedin_shared),
+                int(row.cv_uploaded),
+                int(row.voice_recorded),
+                created,
+            ]
+        )
+    buf.seek(0)
+    return StreamingResponse(
+        iter([buf.getvalue()]),
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": 'attachment; filename="beta_waitlist.csv"'},
     )

@@ -9,6 +9,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { trackEvent } from "@/lib/analytics";
 import { betaJoin, BETA_REFERRAL_STORAGE_KEY, type BetaJoinResult } from "@/lib/beta-api";
 import { formatWaitlist } from "@/lib/waitlist-messages";
 import { useWaitlistCopy } from "@/lib/waitlist/use-waitlist-copy";
@@ -70,6 +71,11 @@ function WaitlistFormInner({
       });
       setJoin(res);
       safeStorage.setItem(BETA_REFERRAL_STORAGE_KEY, res.referral_code);
+      trackEvent("waitlist_signup", {
+        source: "waitlist",
+        position: res.position,
+        spots_left: res.spots_left,
+      });
       void confetti({ particleCount: 120, spread: 70, origin: { y: 0.65 } });
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : copy.formErrorGeneric);

@@ -1,4 +1,8 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
+
+import { WAITLIST_MESSAGES } from "@/lib/waitlist-messages";
+import { localeFromAcceptLanguage } from "@/lib/waitlist/locale-from-request";
 
 import "./waitlist.css";
 
@@ -10,18 +14,27 @@ function metadataBaseUrl(): URL {
   return new URL("http://localhost:3000");
 }
 
-export const metadata: Metadata = {
-  metadataBase: metadataBaseUrl(),
-  title: "TWIN Wishlist — join the first 1,000",
-  description:
-    "Your digital twin takes over job search. Join the waitlist — free lifetime access for early adopters.",
-  openGraph: {
-    title: "TWIN — stop chasing job boards",
-    description: "Developer waitlist. No CVs. Interview invites on your calendar.",
-    type: "website",
-    url: "/waitlist",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const hdrs = await headers();
+  const locale = localeFromAcceptLanguage(hdrs.get("accept-language"));
+  const copy = WAITLIST_MESSAGES[locale];
+  const base = metadataBaseUrl();
+  return {
+    metadataBase: base,
+    title: copy.metaTitle,
+    description: copy.metaDescription,
+    openGraph: {
+      title: copy.metaTitle,
+      description: copy.metaDescription,
+      type: "website",
+      url: "/waitlist",
+      locale: locale === "zh" ? "zh_CN" : locale === "ar" ? "ar_SA" : locale,
+    },
+    alternates: {
+      canonical: "/waitlist",
+    },
+  };
+}
 
 export default function WaitlistLayout({ children }: { children: React.ReactNode }) {
   return children;

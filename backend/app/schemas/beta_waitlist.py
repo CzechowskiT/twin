@@ -91,6 +91,7 @@ class BetaAdminStatsOut(BaseModel):
     total_signups: int
     cap: int
     spots_left: int
+    signups_today: int = 0
     linkedin_shared: int
     cv_uploaded: int
     voice_recorded: int

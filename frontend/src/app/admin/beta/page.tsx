@@ -8,6 +8,7 @@ export type BetaAdminStats = {
   total_signups: number;
   cap: number;
   spots_left: number;
+  signups_today: number;
   linkedin_shared: number;
   cv_uploaded: number;
   voice_recorded: number;
@@ -21,6 +22,7 @@ export default function BetaAdminPage() {
   const [stats, setStats] = useState<BetaAdminStats | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -71,6 +73,39 @@ export default function BetaAdminPage() {
     }
   }, [token, saveToken]);
 
+  const downloadCsv = useCallback(async () => {
+    setExporting(true);
+    setErr(null);
+    saveToken();
+    const t = token.trim();
+    if (!t) {
+      setErr("Paste the admin token first.");
+      setExporting(false);
+      return;
+    }
+    try {
+      const res = await fetch("/api/beta-admin/export", {
+        headers: { Authorization: `Bearer ${t}` },
+        cache: "no-store",
+      });
+      if (!res.ok) {
+        setErr(await res.text());
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "beta_waitlist.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e: unknown) {
+      setErr(e instanceof Error ? e.message : "Export failed");
+    } finally {
+      setExporting(false);
+    }
+  }, [token, saveToken]);
+
   const viral = useMemo(() => {
     if (!stats || stats.total_signups <= 0) return null;
     return stats.referral_rows / stats.total_signups;
@@ -114,6 +149,14 @@ export default function BetaAdminPage() {
         >
           {loading ? "Loading…" : "Load stats"}
         </button>
+        <button
+          type="button"
+          className="rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 shadow-sm hover:bg-slate-50 disabled:opacity-50"
+          disabled={exporting}
+          onClick={() => void downloadCsv()}
+        >
+          {exporting ? "Exporting…" : "Download CSV"}
+        </button>
       </div>
 
       {err ? (
@@ -126,6 +169,7 @@ export default function BetaAdminPage() {
             <StatCard label="Total signups" value={stats.total_signups} accent="blue" />
             <StatCard label="Cap" value={stats.cap} accent="slate" />
             <StatCard label="Spots left" value={stats.spots_left} accent="orange" />
+            <StatCard label="Signups today" value={stats.signups_today ?? 0} accent="green" />
             <StatCard label="Referral rows" value={stats.referral_rows} accent="green" />
           </section>
 

@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 
+import { AnalyticsInit } from "@/components/analytics-init";
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import { DocumentTitleSync } from "@/components/document-title-sync";
 import { LanguageProvider } from "@/components/language-provider";
@@ -15,6 +16,7 @@ export function Providers({ children }: { children: ReactNode }) {
       <PersonaProvider>
         <DocumentTitleSync />
         <MarketingSurfaceSync />
+        <AnalyticsInit />
         <CookieConsentBanner />
         <Toaster position="top-right" />
         {children}
