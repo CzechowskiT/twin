@@ -1,5 +1,8 @@
 # 🔐 TWIN - Security Issues - Detailed Analysis
 
+> ⚠️ **SUPERSEDED (częściowo):** Ten dokument jest nieaktualny względem obecnego kodu (m.in. placement IDOR, `/health/features`).
+> **Używaj:** [MERGED-AUDIT-2026-05-19.md](../reviews/MERGED-AUDIT-2026-05-19.md) oraz [ERRATA-vs-codebase.md](./ERRATA-vs-codebase.md).
+
 ## ISSUE #1: IDOR w `/placement/events/{application_id}` 
 
 ### Severity: HIGH (Data Exposure)

@@ -1,6 +1,42 @@
 # Deploying TWIN
 
-**Beta online (Polish, step-by-step for founders):** [BETA_ONLINE_PL.md](./BETA_ONLINE_PL.md)
+**Beta online (Polish, step-by-step for founders):** [BETA_ONLINE_PL.md](./BETA_ONLINE_PL.md)  
+**Scalony audyt techniczny (backlog):** [reviews/MERGED-AUDIT-2026-05-19.md](./reviews/MERGED-AUDIT-2026-05-19.md)
+
+## Deploy truth (single source — update when you change hosts)
+
+| What | Expected value |
+|------|----------------|
+| **GitHub repo (developers)** | `CzechowskiT/twin` |
+| **Production git branch** | `cursor/phase1-monorepo-scaffold` (lub branch jawnie wybrany w Vercel → Production) |
+| **Vercel project** | Root directory: `frontend/` |
+| **Vercel Production URL** | `https://twin-sooty.vercel.app` (lub Twoja domena) |
+| **Railway API** | Root: `backend/` — ten sam branch co frontend |
+| **Verify deploy SHA** | Vercel → Deployments → commit **musi** = `git rev-parse origin/<branch>` |
+
+**Common failure:** Vercel podpięty do **innego** repo (np. `CzechowskiD/twin` → 404 na GitHub) albo innej gałęzi — wtedy poprawki w `CzechowskiT` **nie trafiają** na produkcję.
+
+### Sprint Day 1 — deploy drift + secrets (TODAY)
+
+- [ ] Vercel → Settings → Git → repository = **`CzechowskiT/twin`**
+- [ ] Environments → Production → branch = **`cursor/phase1-monorepo-scaffold`** (lub świadomie inna, zapisana w tabeli powyżej)
+- [ ] Redeploy Production; porównaj **commit SHA** z `git fetch && git rev-parse origin/cursor/phase1-monorepo-scaffold`
+- [ ] Railway: `SECRET_KEY` ustawiony (≥32 znaków, **nie** `dev-only-change-me`); `ENVIRONMENT=production`
+- [ ] Railway: `REDIS_URL` + worker + beat (unikaj samego API z eager Celery na skalę)
+- [ ] Smoke: `curl -s https://twin-sooty.vercel.app/api/v1/health` → `status: ok`; opcjonalnie `?db=true` na staging
+- [ ] Smoke UI: DevTools na `/dashboard/billing` — klasa `twin-billing-surface` po deployu z fixem billing
+
+```bash
+# Lokalnie: oczekiwany commit na branchu produkcyjnym
+git fetch origin cursor/phase1-monorepo-scaffold
+git rev-parse --short origin/cursor/phase1-monorepo-scaffold
+
+# Produkcja (proxy Vercel → Railway API)
+curl -s "https://twin-sooty.vercel.app/api/v1/health" | jq .
+# Jeśli API ma GIT_COMMIT_SHA / RAILWAY_GIT_COMMIT_SHA w env, health zwróci pole git_commit
+```
+
+Skrypt pomocniczy: `scripts/verify-deploy.sh` (read-only checks).
 
 ## Option 1: Docker Compose (VPS / local server)
 

@@ -34,6 +34,14 @@ def test_health_with_db_flag_reports_false_when_unreachable(_mock_db: MagicMock)
     assert res.json().get("db_ok") is False
 
 
+def test_health_includes_git_commit_when_env_set(monkeypatch) -> None:
+    monkeypatch.setenv("GIT_COMMIT_SHA", "abc123def456")
+    client = TestClient(app)
+    res = client.get("/api/v1/health")
+    assert res.status_code == 200
+    assert res.json().get("git_commit") == "abc123def456"
+
+
 def test_health_features_route_removed() -> None:
     client = TestClient(app)
     res = client.get("/api/v1/health/features")
