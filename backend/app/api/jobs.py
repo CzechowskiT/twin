@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
-from app.core.deps import get_current_user
+from app.core.deps import get_current_user, require_ops_user
 from app.database.models import Candidate, Job, SavedJob, User
 from app.database.session import get_db
 from app.matching.matcher import calculate_match_score
@@ -261,7 +261,7 @@ def get_saved_jobs(
 @router.post("/scrape/all", response_model=ScrapeAllOut)
 def trigger_scrape_all(
     sync: bool = False,
-    _user: User = Depends(get_current_user),
+    _ops_user: User = Depends(require_ops_user),
 ) -> ScrapeAllOut:
     try:
         if sync:
@@ -344,7 +344,7 @@ def trigger_scrape_all(
 def trigger_scrape(
     board: str,
     sync: bool = False,
-    _user: User = Depends(get_current_user),
+    _ops_user: User = Depends(require_ops_user),
 ) -> ScrapeTaskOut:
     try:
         handler = PER_BOARD_SCRAPE_HANDLERS.get(board)
