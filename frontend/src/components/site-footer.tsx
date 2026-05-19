@@ -38,6 +38,7 @@ export function SiteFooter() {
 
   const explore = [
     { href: "/", label: t("site.footerHome") },
+    { href: "/waitlist", label: t("site.footerWishlist") },
     { href: "/demo", label: t("nav.demo") },
     { href: "/for-candidates", label: t("nav.forCandidates") },
     { href: "/for-recruiters", label: t("nav.forRecruiters") },

@@ -28,8 +28,14 @@ export function LandingCtaBand() {
                 {t("home.twinForYourJob")}
               </Link>
               <Link
-                href="/register"
+                href="/waitlist"
                 className="marketing-cta-filled-pill marketing-btn-primary-shadow twin-touch-target inline-flex min-h-[2.75rem] items-center justify-center rounded-full bg-[var(--twin-cta)] px-7 text-center text-sm font-semibold text-[var(--twin-on-cta)] transition hover:bg-[var(--twin-cta-hover)] active:scale-[0.98]"
+              >
+                {t("home.joinWishlist")}
+              </Link>
+              <Link
+                href="/register"
+                className="twin-touch-target inline-flex min-h-[2.75rem] items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-7 text-center text-sm font-semibold text-[var(--twin-muted-strong)] transition hover:border-[var(--twin-border-hover)] active:scale-[0.98]"
               >
                 {t("home.getStarted")}
               </Link>

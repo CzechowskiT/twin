@@ -127,6 +127,7 @@ const en = {
     description:
       "TWIN sits on the boards you turn on: one feed, ranking that respects your profile, CV intelligence, and a single place for every application status. Calendar sync and deeper auto-apply are on the roadmap; what ships now is calm motion, with consent wired in from day one.",
     getStarted: "Start free",
+    joinWishlist: "Join wishlist",
     logIn: "Sign in",
     scrape: "Discover",
     scrapeDesc: "Boards and regions you choose, ready to widen as you grow",
@@ -1464,6 +1465,7 @@ const pl: MessageTree = {
     description:
       "TWIN siedzi na portalach, które włączysz: jeden feed, ranking pod Twój profil, inteligencja CV i jedno miejsce na status każdej aplikacji. Bez nocnego doom-scrollowania po kartach. Auto-aplikacja i dogrywka kalendarza są w planie; teraz dowozimy zgodę, przejrzystość i konkret.",
     getStarted: "Start za zero",
+    joinWishlist: "Dołącz do wishlist",
     logIn: "Zaloguj się",
     scrape: "Odkrywaj",
     scrapeDesc: "Portale i regiony z konfiguracji, gotowe do poszerzenia, gdy rośniesz",

@@ -24,8 +24,14 @@ export function LandingHero() {
             {t("home.twinForYourJob")}
           </Link>
           <Link
-            href="/register"
+            href="/waitlist"
             className="marketing-hero-btn-cta marketing-btn-primary-shadow twin-touch-target transition duration-200"
+          >
+            {t("home.joinWishlist")}
+          </Link>
+          <Link
+            href="/register"
+            className="marketing-hero-btn-signin twin-touch-target border border-[var(--twin-border)] transition duration-200 sm:order-last"
           >
             {t("home.getStarted")}
           </Link>
