@@ -12,12 +12,12 @@ function metadataBaseUrl(): URL {
 
 export const metadata: Metadata = {
   metadataBase: metadataBaseUrl(),
-  title: "TWIN Wishlist — dołącz do pierwszych 1000",
+  title: "TWIN Wishlist — join the first 1,000",
   description:
-    "Twój cyfrowy bliźniak przejmuje szukanie pracy. Zapisz się na listę — darmowy dostęp dla Early Adopters.",
+    "Your digital twin takes over job search. Join the waitlist — free lifetime access for early adopters.",
   openGraph: {
-    title: "TWIN — zwolnij się z szukania pracy",
-    description: "Waitlist dla developerów. Zero CV. Gotowe rozmowy w kalendarzu.",
+    title: "TWIN — stop chasing job boards",
+    description: "Developer waitlist. No CVs. Interview invites on your calendar.",
     type: "website",
     url: "/waitlist",
   },

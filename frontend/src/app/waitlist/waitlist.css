@@ -67,8 +67,42 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
   padding: 1rem 1.25rem;
   border-bottom: 1px solid rgb(148 163 184 / 0.12);
+}
+
+.wl-top-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem 1rem;
+}
+
+.wl-back-home {
+  font-size: 0.875rem;
+  color: var(--wl-text-secondary);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.wl-back-home:hover {
+  color: #fff;
+}
+
+/* Language switcher on dark immersive landing */
+.wl-root .twin-lang-switcher summary,
+.wl-root .twin-lang-switcher button {
+  color: #e2e8f0;
+  border-color: rgb(148 163 184 / 0.35);
+  background: rgb(15 23 42 / 0.55);
+}
+
+.wl-root .twin-lang-switcher [role="listbox"],
+.wl-root .twin-lang-switcher menu {
+  background: #0e0e12;
+  border-color: rgb(148 163 184 / 0.25);
 }
 
 .wl-logo {

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 import { useTranslation } from "@/components/language-provider";
 import type { TranslationKey } from "@/lib/i18n";
+import { WAITLIST_MESSAGES } from "@/lib/waitlist-messages";
 
 function normalizePath(pathname: string): string {
   const raw = pathname.split("?")[0] ?? "/";
@@ -59,6 +60,10 @@ export function DocumentTitleSync() {
 
   useEffect(() => {
     const path = normalizePath(pathname ?? "/");
+    if (path.startsWith("/waitlist")) {
+      document.title = WAITLIST_MESSAGES[locale].metaTitle;
+      return;
+    }
     document.title = t(titleKeyForPath(path));
   }, [pathname, locale, t]);
 

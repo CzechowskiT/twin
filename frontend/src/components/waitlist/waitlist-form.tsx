@@ -5,21 +5,20 @@ import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { betaJoin, type BetaJoinResult } from "@/lib/beta-api";
-import { BETA_REFERRAL_STORAGE_KEY } from "@/lib/beta-api";
+import { betaJoin, BETA_REFERRAL_STORAGE_KEY, type BetaJoinResult } from "@/lib/beta-api";
+import { formatWaitlist } from "@/lib/waitlist-messages";
+import { useWaitlistCopy } from "@/lib/waitlist/use-waitlist-copy";
 import { safeStorage } from "@/lib/safe-storage";
 
-const schema = z.object({
-  email: z.string().email("Nieprawidłowy adres email"),
-  acceptPrivacy: z.boolean().refine((v) => v === true, { message: "Wymagana zgoda" }),
-  acceptEmail: z.boolean().refine((v) => v === true, { message: "Wymagana zgoda" }),
-});
-
-type FormData = z.infer<typeof schema>;
+type FormData = {
+  email: string;
+  acceptPrivacy: boolean;
+  acceptEmail: boolean;
+};
 
 function WaitlistFormInner({
   spotsRemaining,
@@ -32,9 +31,20 @@ function WaitlistFormInner({
   cap: number;
   compact?: boolean;
 }) {
+  const copy = useWaitlistCopy();
   const searchParams = useSearchParams();
   const [busy, setBusy] = useState(false);
   const [join, setJoin] = useState<BetaJoinResult | null>(null);
+
+  const schema = useMemo(
+    () =>
+      z.object({
+        email: z.string().email(copy.validationEmail),
+        acceptPrivacy: z.boolean().refine((v) => v === true, { message: copy.validationConsent }),
+        acceptEmail: z.boolean().refine((v) => v === true, { message: copy.validationConsent }),
+      }),
+    [copy.validationEmail, copy.validationConsent],
+  );
 
   useEffect(() => {
     const ref = searchParams.get("ref");
@@ -62,7 +72,7 @@ function WaitlistFormInner({
       safeStorage.setItem(BETA_REFERRAL_STORAGE_KEY, res.referral_code);
       void confetti({ particleCount: 120, spread: 70, origin: { y: 0.65 } });
     } catch (e: unknown) {
-      alert(e instanceof Error ? e.message : "Wystąpił błąd. Spróbuj ponownie.");
+      alert(e instanceof Error ? e.message : copy.formErrorGeneric);
     } finally {
       setBusy(false);
     }
@@ -75,21 +85,23 @@ function WaitlistFormInner({
     return (
       <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} className="wl-form-card">
         <p className="text-5xl">🎉</p>
-        <h3 className="mt-3 text-2xl font-bold text-white">Jesteś na liście!</h3>
+        <h3 className="mt-3 text-2xl font-bold text-white">{copy.formSuccessTitle}</h3>
         <p className="mt-2 text-lg text-[var(--wl-text-secondary)]">
-          Pozycja: <span className="font-bold text-cyan-400">#{join.position}</span>
+          {formatWaitlist(copy.formSuccessPosition, { position: join.position })}
         </p>
-        <motion.div className="mt-6 flex gap-2" layout>
-          <input readOnly value={referralLink} className="wl-input flex-1 text-sm" aria-label="Link referralny" />
-          <button type="button" className="wl-btn-secondary shrink-0" onClick={() => void navigator.clipboard.writeText(referralLink)}>
-            Kopiuj
+        <div className="mt-6 flex gap-2">
+          <input readOnly value={referralLink} className="wl-input flex-1 text-sm" aria-label={copy.formCopy} />
+          <button
+            type="button"
+            className="wl-btn-secondary shrink-0"
+            onClick={() => void navigator.clipboard.writeText(referralLink)}
+          >
+            {copy.formCopy}
           </button>
-        </motion.div>
-        <p className="mt-4 text-sm text-[var(--wl-text-secondary)]">
-          Zaproś znajomych — każda osoba = wyższa pozycja na liście.
-        </p>
+        </div>
+        <p className="mt-4 text-sm text-[var(--wl-text-secondary)]">{copy.formReferralHint}</p>
         <Link href="/beta/dashboard" className="wl-btn-primary mt-6 inline-block text-center no-underline">
-          Otwórz panel waitlisty
+          {copy.formOpenDashboard}
         </Link>
       </motion.div>
     );
@@ -104,16 +116,21 @@ function WaitlistFormInner({
       transition={{ delay: 0.35 }}
     >
       {!compact ? (
-        <p className="text-center text-sm font-bold uppercase tracking-wider text-cyan-400">🎯 Dołącz do pierwszych {cap}</p>
+        <p className="text-center text-sm font-bold uppercase tracking-wider text-cyan-400">
+          {formatWaitlist(copy.formJoinCap, { cap })}
+        </p>
       ) : null}
-      <label htmlFor={compact ? "wl-email-2" : "wl-email"} className="mt-4 block text-sm font-medium text-[var(--wl-text-secondary)]">
-        Twój email (developer)
+      <label
+        htmlFor={compact ? "wl-email-2" : "wl-email"}
+        className="mt-4 block text-sm font-medium text-[var(--wl-text-secondary)]"
+      >
+        {copy.formEmailLabel}
       </label>
       <input
         {...register("email")}
         id={compact ? "wl-email-2" : "wl-email"}
         type="email"
-        placeholder="jan.kowalski@gmail.com"
+        placeholder={copy.formEmailPlaceholder}
         className="wl-input mt-2"
         autoComplete="email"
       />
@@ -121,34 +138,34 @@ function WaitlistFormInner({
       <label className="mt-4 flex items-start gap-2 text-xs text-[var(--wl-text-muted)]">
         <input type="checkbox" {...register("acceptPrivacy")} className="mt-0.5" />
         <span>
-          Akceptuję{" "}
+          {copy.formPrivacyPrefix}{" "}
           <Link href="/privacy" className="text-cyan-400 underline">
-            politykę prywatności
+            {copy.formPrivacyLink}
           </Link>
         </span>
       </label>
       <label className="mt-2 flex items-start gap-2 text-xs text-[var(--wl-text-muted)]">
         <input type="checkbox" {...register("acceptEmail")} className="mt-0.5" />
-        <span>Zgoda na email o kolejce i beta (wymagane)</span>
+        <span>{copy.formEmailConsent}</span>
       </label>
       {(errors.acceptPrivacy || errors.acceptEmail) && (
-        <p className="mt-1 text-sm text-red-400">Zaznacz obie zgody, aby dołączyć.</p>
+        <p className="mt-1 text-sm text-red-400">{copy.formConsentsError}</p>
       )}
       <button type="submit" disabled={busy} className="wl-btn-primary wl-btn-pulse mt-6 w-full">
-        {busy ? "Zapisuję…" : "Zdobądź darmowy dostęp na zawsze ✨"}
+        {busy ? copy.formSubmitting : copy.formSubmit}
       </button>
-      <motion.div className="mt-5 flex flex-wrap justify-between gap-2 text-xs text-cyan-400" layout>
+      <div className="mt-5 flex flex-wrap justify-between gap-2 text-xs text-cyan-400">
         <span className="flex items-center gap-2">
           <span className="wl-live-dot" aria-hidden />
-          Pozostało: <strong>{spotsRemaining}</strong>/{cap}
+          {formatWaitlist(copy.formSpotsLine, { remaining: spotsRemaining, cap })}
         </span>
-        <span>⚡ Dziś: <strong>{signupsToday}</strong> zapisów</span>
-      </motion.div>
+        <span>{formatWaitlist(copy.formTodayLine, { today: signupsToday })}</span>
+      </div>
       {!compact ? (
         <ul className="mt-4 space-y-1 border-t border-white/10 pt-4 text-center text-xs text-[var(--wl-text-muted)]">
-          <li>✓ Dożywotni darmowy dostęp dla Early Adopters</li>
-          <li>✓ Zero kart kredytowych</li>
-          <li>✓ Dostęp w ciągu 14 dni od rejestracji</li>
+          <li>{copy.formBullet1}</li>
+          <li>{copy.formBullet2}</li>
+          <li>{copy.formBullet3}</li>
         </ul>
       ) : null}
     </motion.form>
@@ -162,7 +179,7 @@ export function WaitlistForm(props: {
   compact?: boolean;
 }) {
   return (
-    <Suspense fallback={<motion.div className="wl-form-card h-48 animate-pulse" aria-hidden />}>
+    <Suspense fallback={<div className="wl-form-card h-48 animate-pulse" aria-hidden />}>
       <WaitlistFormInner {...props} />
     </Suspense>
   );
