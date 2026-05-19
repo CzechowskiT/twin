@@ -260,7 +260,12 @@ def forgot_password(
 
 
 @router.post("/reset-password")
-def reset_password(body: ResetPasswordRequest, db: Session = Depends(get_db)) -> dict[str, str]:
+@limiter.limit("3/minute")
+def reset_password(
+    request: Request,
+    body: ResetPasswordRequest,
+    db: Session = Depends(get_db),
+) -> dict[str, str]:
     if not reset_password_with_token(db, body.token, body.password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

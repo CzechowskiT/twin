@@ -52,6 +52,10 @@ class Settings(BaseSettings):
     auth_login_rate_limit_per_minute: int = 30
     # Separate bucket for POST /auth/forgot-password (abuse / enumeration). 0 = disabled.
     auth_forgot_password_rate_limit_per_minute: int = 3
+    # POST /auth/reset-password — brute-force on reset tokens. 0 = disabled.
+    auth_reset_password_rate_limit_per_minute: int = 3
+    # Comma-separated user IDs allowed to trigger POST /jobs/scrape/* (empty = deny all).
+    scrape_ops_user_ids: str = ""
     cors_origins: str = "http://localhost:3000"
 
     @field_validator("cors_origins", mode="before")
