@@ -104,7 +104,7 @@ export function Header() {
         </div>
 
         <nav
-          className="hidden min-w-0 flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-[12px] font-medium sm:text-[13px] md:flex md:justify-self-center md:px-2"
+          className="hidden min-w-0 max-w-full flex-nowrap items-center justify-center gap-x-2 overflow-x-auto overscroll-x-contain text-[11px] font-medium [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-x-2.5 sm:text-[12px] md:flex md:justify-self-center md:px-1 lg:gap-x-3 lg:text-[13px] [&::-webkit-scrollbar]:hidden"
           aria-label={t("nav.ariaSiteNav")}
         >
           {corporateNav.map((item) => (
