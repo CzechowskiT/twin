@@ -1,6 +1,8 @@
 import type { Locale } from "@/lib/i18n";
+import type { WaitlistNarrative } from "@/lib/waitlist/waitlist-narrative";
 
-export type WaitlistCopy = {
+/** Core landing strings (narrative blocks merged in `useWaitlistCopy`). */
+export type WaitlistCopyBase = {
   metaTitle: string;
   metaDescription: string;
   backHome: string;
@@ -63,6 +65,8 @@ export type WaitlistCopy = {
   validationConsent: string;
 };
 
+export type WaitlistCopy = WaitlistCopyBase & WaitlistNarrative;
+
 const TERMINAL_EN = [
   "> Initializing agent...",
   "✓ Agent active",
@@ -80,10 +84,10 @@ const TERMINAL_EN = [
   "✓ 5 meetings scheduled",
 ];
 
-const en: WaitlistCopy = {
+const en: WaitlistCopyBase = {
   metaTitle: "TWIN Wishlist — join the first 1,000",
   metaDescription:
-    "Your digital twin takes over job search. Join the waitlist — free lifetime access for early adopters.",
+    "Join the first 1,000 — lifetime Pro & Enterprise free. Your digital twin builds a calendar of interviews worth showing up for.",
   backHome: "← Home",
   heroHeadline: "STOP CHASING JOB BOARDS",
   heroLead1: "Your digital twin takes the wheel.",
@@ -180,9 +184,9 @@ const en: WaitlistCopy = {
   formSubmitting: "Saving…",
   formSpotsLine: "Spots left: {remaining}/{cap}",
   formTodayLine: "⚡ Today: {today} signups",
-  formBullet1: "✓ Lifetime free access for early adopters",
-  formBullet2: "✓ No credit card",
-  formBullet3: "✓ Access within 14 days of signup",
+  formBullet1: "✓ Lifetime Pro & Enterprise for the first 1,000",
+  formBullet2: "✓ No credit card — founding tier locked in",
+  formBullet3: "✓ Typical access ~14 days after signup",
   formSuccessTitle: "You're on the list!",
   formSuccessPosition: "Position: #{position}",
   formCopy: "Copy",
@@ -193,11 +197,11 @@ const en: WaitlistCopy = {
   validationConsent: "Consent required",
 };
 
-const pl: WaitlistCopy = {
+const pl: WaitlistCopyBase = {
   ...en,
   metaTitle: "TWIN Wishlist — dołącz do pierwszych 1000",
   metaDescription:
-    "Twój cyfrowy bliźniak przejmuje szukanie pracy. Zapisz się — darmowy dostęp dla Early Adopters.",
+    "Dołącz do pierwszych 1000 — Pro i Enterprise na zawsze za 0 zł. Kalendarz rozmów zamiast szumu w inboxie.",
   backHome: "← Strona główna",
   heroHeadline: "ZWOLNIJ SIĘ Z SZUKANIA PRACY",
   heroLead1: "Twój cyfrowy bliźniak przejmuje stery.",
@@ -309,7 +313,7 @@ const pl: WaitlistCopy = {
   formSubmitting: "Zapisuję…",
   formSpotsLine: "Pozostało: {remaining}/{cap}",
   formTodayLine: "⚡ Dziś: {today} zapisów",
-  formBullet1: "✓ Dożywotni darmowy dostęp dla Early Adopters",
+  formBullet1: "✓ Dożywotnie Pro i Enterprise dla pierwszej tysiątki",
   formBullet2: "✓ Zero kart kredytowych",
   formBullet3: "✓ Dostęp w ciągu 14 dni od rejestracji",
   formSuccessTitle: "Jesteś na liście!",
@@ -323,7 +327,7 @@ const pl: WaitlistCopy = {
 };
 
 /** Localized waitlist copy; non-EN/PL locales use professional translations of the EN base. */
-function esCopy(): WaitlistCopy {
+function esCopy(): WaitlistCopyBase {
   return {
     ...en,
     metaTitle: "TWIN Wishlist — únete a los primeros 1.000",
@@ -428,7 +432,7 @@ function esCopy(): WaitlistCopy {
   };
 }
 
-function frCopy(): WaitlistCopy {
+function frCopy(): WaitlistCopyBase {
   return {
     ...en,
     metaTitle: "TWIN Wishlist — rejoignez les 1 000 premiers",
@@ -498,7 +502,7 @@ function frCopy(): WaitlistCopy {
   };
 }
 
-function deCopy(): WaitlistCopy {
+function deCopy(): WaitlistCopyBase {
   return {
     ...en,
     metaTitle: "TWIN Wishlist — sichere dir einen der ersten 1.000 Plätze",
@@ -542,7 +546,7 @@ function deCopy(): WaitlistCopy {
   };
 }
 
-function itCopy(): WaitlistCopy {
+function itCopy(): WaitlistCopyBase {
   return {
     ...en,
     metaTitle: "TWIN Wishlist — entra nei primi 1.000",
@@ -586,7 +590,7 @@ function itCopy(): WaitlistCopy {
   };
 }
 
-function zhCopy(): WaitlistCopy {
+function zhCopy(): WaitlistCopyBase {
   return {
     ...en,
     metaTitle: "TWIN Wishlist — 加入前 1000 名",
@@ -709,7 +713,7 @@ function zhCopy(): WaitlistCopy {
   };
 }
 
-function jaCopy(): WaitlistCopy {
+function jaCopy(): WaitlistCopyBase {
   return {
     ...en,
     metaTitle: "TWIN Wishlist — 最初の1000人に参加",
@@ -832,7 +836,7 @@ function jaCopy(): WaitlistCopy {
   };
 }
 
-function arCopy(): WaitlistCopy {
+function arCopy(): WaitlistCopyBase {
   return {
     ...en,
     metaTitle: "TWIN Wishlist — انضم إلى أول 1000",
@@ -955,7 +959,7 @@ function arCopy(): WaitlistCopy {
   };
 }
 
-export const WAITLIST_MESSAGES: Record<Locale, WaitlistCopy> = {
+export const WAITLIST_MESSAGES: Record<Locale, WaitlistCopyBase> = {
   en,
   pl,
   es: esCopy(),

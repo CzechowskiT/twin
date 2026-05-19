@@ -142,12 +142,35 @@ export function WaitlistPageClient() {
             <br />
             {copy.heroLead3}
           </motion.p>
+          <p className="wl-hero-badge">{copy.heroOfferBadge}</p>
+          <p className="wl-hero-offer-sub">{copy.heroOfferSub}</p>
+          <ul className="wl-value-strip" aria-label="Founding offer">
+            {copy.valueStrip.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
           <WaitlistForm
             key={locale}
             spotsRemaining={spotsRemaining}
             signupsToday={signupsToday}
             cap={cap}
           />
+        </section>
+
+        <section className="wl-section wl-section--why">
+          <h2 className="wl-section-title">{copy.sectionWhy}</h2>
+          <p className="wl-section-lead">{copy.whyLead}</p>
+          <motion.div className="wl-pillar-grid">
+            {copy.whyPillars.map((pillar) => (
+              <motion.article key={pillar.title} className="wl-card wl-pillar-card">
+                <span className="wl-pillar-icon" aria-hidden>
+                  {pillar.icon}
+                </span>
+                <h3 className="text-lg font-bold">{pillar.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-[var(--wl-text-secondary)]">{pillar.body}</p>
+              </motion.article>
+            ))}
+          </motion.div>
         </section>
 
         <section className="wl-section">
@@ -201,6 +224,35 @@ export function WaitlistPageClient() {
               </ul>
             </div>
           </div>
+        </section>
+
+        <section className="wl-section wl-section--shift">
+          <h2 className="wl-section-title">{copy.sectionShift}</h2>
+          <p className="wl-section-lead">{copy.shiftLead}</p>
+          <ul className="wl-shift-list">
+            {copy.shiftPoints.map((point) => (
+              <li key={point}>{point}</li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="wl-section">
+          <motion.article
+            className="wl-founding-card"
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <p className="wl-founding-eyebrow">{copy.sectionFounding}</p>
+            <h2 className="wl-founding-title">{copy.foundingHeadline}</h2>
+            <p className="wl-founding-sub">{copy.foundingSub}</p>
+            <ul className="wl-founding-perks">
+              {copy.foundingPerks.map((perk) => (
+                <li key={perk}>{perk}</li>
+              ))}
+            </ul>
+            <p className="wl-founding-fine">{copy.foundingFinePrint}</p>
+          </motion.article>
         </section>
 
         <section className="wl-section">
