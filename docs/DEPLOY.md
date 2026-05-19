@@ -22,6 +22,9 @@
 - [ ] Environments → Production → branch = **`cursor/phase1-monorepo-scaffold`** (lub świadomie inna, zapisana w tabeli powyżej)
 - [ ] Redeploy Production; porównaj **commit SHA** z `git fetch && git rev-parse origin/cursor/phase1-monorepo-scaffold`
 - [ ] Railway: `SECRET_KEY` ustawiony (≥32 znaków, **nie** `dev-only-change-me`); `ENVIRONMENT=production`
+- [ ] Railway: `GREENHOUSE_WEBHOOK_SECRET` jeśli używasz webhooków ATS (bez sekretu → 403 w prod)
+- [ ] Railway: `SCRAPE_OPS_USER_IDS` — lista ID użytkowników z uprawnieniem do `POST /jobs/scrape/*` (np. `1,5`)
+- [ ] Railway: `STRIPE_WEBHOOK_SECRET` gdy `STRIPE_SECRET_KEY` jest ustawiony
 - [ ] Railway: `REDIS_URL` + worker + beat (unikaj samego API z eager Celery na skalę)
 - [ ] Smoke: `curl -s https://twin-sooty.vercel.app/api/v1/health` → `status: ok`; opcjonalnie `?db=true` na staging
 - [ ] Smoke UI: DevTools na `/dashboard/billing` — klasa `twin-billing-surface` po deployu z fixem billing
