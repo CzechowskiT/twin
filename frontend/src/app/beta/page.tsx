@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
+import { WaitlistBetaBanner } from "@/components/waitlist/waitlist-beta-banner";
 import {
   BETA_REFERRAL_STORAGE_KEY,
   betaFetchStats,
@@ -99,6 +100,7 @@ function BetaLandingInner() {
 
   return (
     <div className="beta-container">
+      <WaitlistBetaBanner />
       <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-wider text-[var(--beta-muted)]">TWIN · Beta access</p>

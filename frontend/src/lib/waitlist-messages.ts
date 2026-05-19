@@ -365,8 +365,66 @@ function esCopy(): WaitlistCopy {
     boostPositionTitle: "🎯 Tu posición en la lista",
     leaderboardTitle: "🏆 Mejores referidores",
     leaderboardLine: "{referrals} invitaciones → {reward}",
+    compareBad: [
+      "⏰ Más de 4 h/día en portales",
+      "📝 Cientos de solicitudes, ~5 % de respuestas",
+      "😫 Ghosting sin feedback",
+      "💸 Agencias que se llevan un % del salario",
+    ],
+    compareGood: [
+      "😴 El agente trabaja mientras duermes",
+      "🎯 Solo ofertas que encajan",
+      "💬 Estado en un solo panel",
+      "🚀 Entrevistas en semanas, no meses",
+    ],
+    sectionFaq: "Preguntas frecuentes",
+    faq: [
+      {
+        q: "¿Funciona de verdad?",
+        a: "TWIN envía candidaturas y sigue las respuestas en un solo lugar. La lista beta es acceso anticipado; las métricas de esta página son datos en vivo del producto.",
+      },
+      {
+        q: "¿Cuánto tardo en entrar?",
+        a: "Primeros 1.000: unos 14 días tras registrarte. Después: acceso progresivo en 4–6 semanas.",
+      },
+      {
+        q: "¿Cuánto cuesta?",
+        a: "Primeros 1.000 = gratis para early adopters. Después: freemium / tarifa por éxito — detalles antes del lanzamiento público.",
+      },
+      {
+        q: "¿Y si no encuentro trabajo?",
+        a: "La beta es gratis para los primeros mil — sin riesgo financiero al apuntarte.",
+      },
+      {
+        q: "¿Cómo personaliza TWIN las candidaturas?",
+        a: "La IA adapta la oferta a tu perfil y genera materiales únicos — cada solicitud es distinta.",
+      },
+      {
+        q: "¿Las empresas saben que es IA?",
+        a: "TWIN automatiza el trabajo manual — la candidatura parece tuya, con tu consentimiento y datos.",
+      },
+    ],
+    formJoinCap: "🎯 Únete a los primeros {cap}",
+    formEmailLabel: "Tu email (desarrollador/a)",
+    formPrivacyPrefix: "Acepto la",
+    formPrivacyLink: "política de privacidad",
+    formEmailConsent: "Consentimiento para emails sobre la cola y la beta (obligatorio)",
+    formConsentsError: "Marca las dos casillas para unirte.",
+    formSubmitting: "Guardando…",
     formSubmit: "Acceso gratis para siempre ✨",
+    formSpotsLine: "Quedan: {remaining}/{cap}",
+    formTodayLine: "⚡ Hoy: {today} inscripciones",
+    formBullet1: "✓ Acceso gratis de por vida para early adopters",
+    formBullet2: "✓ Sin tarjeta de crédito",
+    formBullet3: "✓ Acceso en unos 14 días",
     formSuccessTitle: "¡Estás en la lista!",
+    formSuccessPosition: "Posición: #{position}",
+    formCopy: "Copiar",
+    formReferralHint: "Invita amigos — cada persona sube tu posición.",
+    formOpenDashboard: "Abrir panel de la lista",
+    formErrorGeneric: "Algo falló. Inténtalo de nuevo.",
+    validationEmail: "Email no válido",
+    validationConsent: "Consentimiento obligatorio",
   };
 }
 
@@ -394,8 +452,49 @@ function frCopy(): WaitlistCopy {
     boostPositionTitle: "🎯 Votre position",
     leaderboardTitle: "🏆 Meilleurs parrains",
     leaderboardLine: "{referrals} invitations → {reward}",
+    sectionFaq: "FAQ",
+    faq: [
+      {
+        q: "Est-ce que ça marche vraiment ?",
+        a: "TWIN envoie les candidatures et suit les réponses au même endroit. La liste d'attente beta est un accès anticipé ; les métriques viennent du produit en direct.",
+      },
+      {
+        q: "Combien de temps avant l'accès ?",
+        a: "Les 1 000 premiers : environ 14 jours après inscription. Ensuite : accès progressif en 4 à 6 semaines.",
+      },
+      {
+        q: "Quel est le prix ?",
+        a: "Les 1 000 premiers = gratuit pour les early adopters. Ensuite : freemium / success fee — détails avant le lancement public.",
+      },
+      {
+        q: "Et si je ne trouve pas de poste ?",
+        a: "La beta est gratuite pour les premiers mille — aucun risque financier à l'inscription.",
+      },
+      {
+        q: "Comment TWIN personnalise les candidatures ?",
+        a: "L'IA adapte l'offre à votre profil et génère des supports uniques — chaque candidature est distincte.",
+      },
+      {
+        q: "Les entreprises savent-elles que c'est de l'IA ?",
+        a: "TWIN automatise le travail manuel — la candidature ressemble à la vôtre, avec votre consentement.",
+      },
+    ],
+    compareBad: [
+      "⏰ Plus de 4 h/jour sur les portails",
+      "📝 Des centaines de candidatures, ~5 % de réponses",
+      "😫 Ghosting sans retour",
+      "💸 Agences qui prélèvent un % du salaire",
+    ],
+    compareGood: [
+      "😴 L'agent travaille pendant que vous dormez",
+      "🎯 Offres ciblées uniquement",
+      "💬 Statut dans un seul tableau de bord",
+      "🚀 Entretiens en semaines",
+    ],
     formSubmit: "Accès gratuit à vie ✨",
     formSuccessTitle: "Vous êtes sur la liste !",
+    validationEmail: "Adresse e-mail invalide",
+    validationConsent: "Consentement requis",
   };
 }
 
@@ -423,8 +522,23 @@ function deCopy(): WaitlistCopy {
     boostPositionTitle: "🎯 Deine Listenposition",
     leaderboardTitle: "🏆 Top-Einladende",
     leaderboardLine: "{referrals} Einladungen → {reward}",
+    sectionFaq: "FAQ",
+    compareBad: [
+      "⏰ Über 4 Std./Tag auf Jobportalen",
+      "📝 Hunderte Bewerbungen, ~5 % Antworten",
+      "😫 Ghosting ohne Feedback",
+      "💸 Agenturen nehmen Gehaltsprozente",
+    ],
+    compareGood: [
+      "😴 Agent arbeitet, während du schläfst",
+      "🎯 Nur passende Rollen",
+      "💬 Status in einem Dashboard",
+      "🚀 Interviews in Wochen",
+    ],
     formSubmit: "Kostenlosen Zugang für immer ✨",
     formSuccessTitle: "Du stehst auf der Liste!",
+    validationEmail: "Ungültige E-Mail-Adresse",
+    validationConsent: "Zustimmung erforderlich",
   };
 }
 
@@ -452,8 +566,23 @@ function itCopy(): WaitlistCopy {
     boostPositionTitle: "🎯 La tua posizione",
     leaderboardTitle: "🏆 Migliori referrer",
     leaderboardLine: "{referrals} inviti → {reward}",
+    sectionFaq: "FAQ",
+    compareBad: [
+      "⏰ Oltre 4 ore/giorno sui portali",
+      "📝 Centinaia di candidature, ~5% risposte",
+      "😫 Ghosting senza feedback",
+      "💸 Agenzie che prendono una % dello stipendio",
+    ],
+    compareGood: [
+      "😴 L'agente lavora mentre dormi",
+      "🎯 Solo offerte in target",
+      "💬 Stato in un'unica dashboard",
+      "🚀 Colloqui in settimane",
+    ],
     formSubmit: "Accesso gratuito per sempre ✨",
     formSuccessTitle: "Sei in lista!",
+    validationEmail: "Email non valida",
+    validationConsent: "Consenso obbligatorio",
   };
 }
 

@@ -1,5 +1,12 @@
 # Agent shipping log
 
+## 2026-05-19 — Waitlist batch 2 (auto)
+
+- **i18n:** `/waitlist` copy for all 9 app locales (`waitlist-messages.ts`, language switcher on page).
+- **Discovery:** Home hero + CTA → `/waitlist`; footer `site.footerWishlist`; beta banner → new landing.
+- **SEO:** `frontend/src/app/sitemap.ts` with `/waitlist` priority.
+- **UX:** `WaitlistForm` remounts on locale change for validation messages.
+
 ## 2026-05-19 — Fundraising / traction
 
 - `GET /api/v1/public/mvp-stats` — aggregate non-PII counters (jobs, users, applications, CV profiles, registry size, LinkedIn/Stripe config flags) for investor diligence.

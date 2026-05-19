@@ -14,6 +14,8 @@ import { formatWaitlist } from "@/lib/waitlist-messages";
 import { useWaitlistCopy } from "@/lib/waitlist/use-waitlist-copy";
 import { useWaitlistStats } from "@/lib/waitlist/use-waitlist-stats";
 
+// Re-mount form when locale changes so Zod messages and placeholders refresh.
+
 function useTypingHeadline(text: string) {
   const [shown, setShown] = useState("");
   useEffect(() => {
@@ -140,7 +142,12 @@ export function WaitlistPageClient() {
             <br />
             {copy.heroLead3}
           </motion.p>
-          <WaitlistForm spotsRemaining={spotsRemaining} signupsToday={signupsToday} cap={cap} />
+          <WaitlistForm
+            key={locale}
+            spotsRemaining={spotsRemaining}
+            signupsToday={signupsToday}
+            cap={cap}
+          />
         </section>
 
         <section className="wl-section">
@@ -264,7 +271,13 @@ export function WaitlistPageClient() {
             </p>
             <p className="mt-2 text-xs text-[var(--wl-text-muted)]">{countdown}</p>
             <div className="mt-8">
-              <WaitlistForm spotsRemaining={spotsRemaining} signupsToday={signupsToday} cap={cap} compact />
+              <WaitlistForm
+                key={`${locale}-compact`}
+                spotsRemaining={spotsRemaining}
+                signupsToday={signupsToday}
+                cap={cap}
+                compact
+              />
             </div>
           </div>
         </section>
