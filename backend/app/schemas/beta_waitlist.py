@@ -32,10 +32,22 @@ class BetaStatsOut(BaseModel):
     total_signups: int
     cap: int
     spots_left: int
+    signups_today: int = 0
     validated_jobs: int
     job_boards: int
     recent: list[str]
     campaign_ends_at: str | None = None
+
+
+class BetaLeaderboardEntry(BaseModel):
+    rank: int
+    display_name: str
+    referrals: int
+    reward: str
+
+
+class BetaLeaderboardOut(BaseModel):
+    leaderboard: list[BetaLeaderboardEntry]
 
 
 class BetaMatchItem(BaseModel):

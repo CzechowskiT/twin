@@ -1,9 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { RouteAwareBackground } from "@/components/route-aware-background";
-import { SiteTopMarquee } from "@/components/site-top-marquee";
-import { Header } from "@/components/header";
-import { SiteFooter } from "@/components/site-footer";
+import { SiteChrome } from "@/components/site-chrome";
 import { Providers } from "@/components/providers";
 import { MARKETING_SURFACE } from "@/lib/marketing-surface";
 import "./globals.css";
@@ -51,13 +48,7 @@ export default function RootLayout({
       </head>
       <body className="relative flex min-h-full min-h-[100dvh] flex-col text-[var(--foreground)]">
         <Providers>
-          <RouteAwareBackground />
-          <SiteTopMarquee />
-          <Header />
-          <main className="relative z-10 flex min-h-0 flex-1 flex-col pb-[env(safe-area-inset-bottom,0)]">
-            {children}
-          </main>
-          <SiteFooter />
+          <SiteChrome>{children}</SiteChrome>
         </Providers>
       </body>
     </html>

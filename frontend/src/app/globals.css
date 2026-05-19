@@ -218,13 +218,18 @@ body {
   max-width: none;
 }
 
-.twin-billing-surface .twin-billing-plan-card p {
+.twin-billing-surface .twin-billing-plan-card,
+.twin-billing-surface .twin-billing-plan-card * {
+  text-align: start;
   hyphens: none;
   -webkit-hyphens: none;
   word-break: normal;
   overflow-wrap: break-word;
-  text-align: start;
   text-wrap: wrap;
+}
+
+.twin-billing-surface .twin-billing-plan-card button {
+  text-align: center;
 }
 
 button,

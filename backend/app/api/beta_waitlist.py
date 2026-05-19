@@ -22,6 +22,8 @@ from app.schemas.beta_waitlist import (
     BetaDashboardOut,
     BetaJoinIn,
     BetaJoinOut,
+    BetaLeaderboardEntry,
+    BetaLeaderboardOut,
     BetaMatchItem,
     BetaMatchPreviewOut,
     BetaProfileUpdate,
@@ -73,6 +75,24 @@ def _apply_referrer_bonus(db: Session, referred_by: str | None, referee: BetaWai
     ref.priority_points += 5
     db.add(ref)
     db.add(BetaReferral(referrer_code=ref.referral_code, referee_waitlist_id=referee.id))
+
+
+def _display_name(name: str | None, email: str) -> str:
+    if name and name.strip():
+        parts = name.strip().split()
+        if len(parts) >= 2:
+            return f"{parts[0]} {parts[-1][0]}."
+        return parts[0]
+    local = email.split("@", 1)[0]
+    return local[:1].upper() + local[1:3] if len(local) > 1 else local.upper()
+
+
+def _leaderboard_reward(rank: int) -> str:
+    if rank <= 3:
+        return "Beta + $1000"
+    if rank <= 10:
+        return "Beta + $500"
+    return "Beta + $200"
 
 
 def _anonym_caption(name: str | None, location: str | None, job_title: str | None) -> str:
@@ -149,6 +169,10 @@ def beta_stats(db: Session = Depends(get_db), settings: Settings = Depends(get_s
     total = int(db.query(func.count(BetaWaitlist.id)).scalar() or 0)
     jobs_n = int(db.query(func.count(Job.id)).scalar() or 0)
     boards_n = len(GLOBAL_BOARD_SPECS)
+    today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    signups_today = int(
+        db.query(func.count(BetaWaitlist.id)).filter(BetaWaitlist.created_at >= today_start).scalar() or 0
+    )
     recent_rows = db.query(BetaWaitlist).order_by(BetaWaitlist.id.desc()).limit(18).all()
     recent = [_anonym_caption(r.name, r.location, r.job_title) for r in reversed(recent_rows)]
     ends = settings.beta_campaign_ends_at.strip() or None
@@ -156,11 +180,38 @@ def beta_stats(db: Session = Depends(get_db), settings: Settings = Depends(get_s
         total_signups=total,
         cap=settings.beta_waitlist_cap,
         spots_left=max(0, settings.beta_waitlist_cap - total),
+        signups_today=signups_today,
         validated_jobs=jobs_n,
         job_boards=boards_n,
         recent=recent,
         campaign_ends_at=ends,
     )
+
+
+@router.get("/leaderboard", response_model=BetaLeaderboardOut)
+def beta_leaderboard(db: Session = Depends(get_db), limit: int = 10) -> BetaLeaderboardOut:
+    cap = min(50, max(1, limit))
+    rows = (
+        db.query(BetaReferral.referrer_code, func.count(BetaReferral.id).label("cnt"))
+        .group_by(BetaReferral.referrer_code)
+        .order_by(func.count(BetaReferral.id).desc())
+        .limit(cap)
+        .all()
+    )
+    out: list[BetaLeaderboardEntry] = []
+    for idx, (code, cnt) in enumerate(rows, start=1):
+        ref = db.query(BetaWaitlist).filter(BetaWaitlist.referral_code == code).first()
+        if not ref:
+            continue
+        out.append(
+            BetaLeaderboardEntry(
+                rank=idx,
+                display_name=_display_name(ref.name, ref.email),
+                referrals=int(cnt),
+                reward=_leaderboard_reward(idx),
+            )
+        )
+    return BetaLeaderboardOut(leaderboard=out)
 
 
 @router.get("/match-preview", response_model=BetaMatchPreviewOut)

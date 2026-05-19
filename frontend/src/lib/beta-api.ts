@@ -4,10 +4,18 @@ export type BetaStats = {
   total_signups: number;
   cap: number;
   spots_left: number;
+  signups_today: number;
   validated_jobs: number;
   job_boards: number;
   recent: string[];
   campaign_ends_at: string | null;
+};
+
+export type BetaLeaderboardEntry = {
+  rank: number;
+  display_name: string;
+  referrals: number;
+  reward: string;
 };
 
 export type BetaMatchItem = {
@@ -60,6 +68,14 @@ export async function betaFetchStats(): Promise<BetaStats> {
   const res = await fetch("/api/v1/beta/stats", { cache: "no-store" });
   if (!res.ok) throw new Error(await parseErr(res));
   return res.json() as Promise<BetaStats>;
+}
+
+export async function betaFetchLeaderboard(limit = 10): Promise<BetaLeaderboardEntry[]> {
+  const q = new URLSearchParams({ limit: String(limit) });
+  const res = await fetch(`/api/v1/beta/leaderboard?${q}`, { cache: "no-store" });
+  if (!res.ok) throw new Error(await parseErr(res));
+  const body = (await res.json()) as { leaderboard: BetaLeaderboardEntry[] };
+  return body.leaderboard ?? [];
 }
 
 export async function betaMatchPreview(title: string): Promise<BetaMatchPreview> {
