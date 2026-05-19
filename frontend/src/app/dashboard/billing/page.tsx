@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
+import { BillingPlanTierCard } from "@/components/billing/billing-plan-tier-card";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
@@ -41,15 +42,6 @@ const PLAN_PRICE_FALLBACK_USD: Record<string, number> = {
   premium: 4.99,
   pro: 9.99,
 };
-
-function formatUsdListMonthly(n: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: n % 1 === 0 ? 0 : 2,
-    maximumFractionDigits: 2,
-  }).format(n);
-}
 
 function normalizePlansPayload(raw: unknown): PlansPayload {
   if (raw == null || typeof raw !== "object") {
@@ -219,79 +211,6 @@ function planCtaLabels(
   return { label: t("dashboard.billingPlanUpgradeCta"), actionable: false };
 }
 
-function BillingPlanTierCard({
-  plan: p,
-  displayName,
-  busy,
-  footerLabel,
-  buttonHint,
-  t,
-  onPrimary,
-  disabled,
-  isCurrent,
-}: {
-  plan: PlanRow;
-  displayName: string;
-  busy: string | null;
-  footerLabel: string;
-  buttonHint?: string;
-  t: (key: TranslationKey) => string;
-  onPrimary: () => void;
-  disabled: boolean;
-  isCurrent: boolean;
-}) {
-  const busyHere =
-    (busy === "checkout-premium" && p.id === "premium") || (busy === "checkout-pro" && p.id === "pro");
-
-  return (
-    <article
-      className={`twin-billing-plan-card flex w-full min-w-0 max-w-none flex-col self-stretch rounded-2xl border bg-[var(--twin-surface-raised)] p-5 text-start shadow-sm transition sm:p-6 ${
-        isCurrent
-          ? "border-[var(--twin-accent)] ring-2 ring-[var(--twin-accent-muted)]"
-          : "border-[var(--twin-border)] hover:border-[var(--twin-accent)]/50"
-      } ${disabled && !isCurrent ? "opacity-[0.88]" : ""}`}
-    >
-      <div className="flex flex-wrap items-start justify-between gap-2">
-        <h3 className="text-lg font-semibold tracking-tight text-[var(--foreground)]">{displayName}</h3>
-        {isCurrent ? (
-          <span className="shrink-0 rounded-full bg-[var(--twin-accent-muted)] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--twin-accent-hover)]">
-            {t("dashboard.billingPlanCurrent")}
-          </span>
-        ) : null}
-      </div>
-
-      <div className="mt-4 border-b border-[var(--twin-border)] pb-4">
-        <p className="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-3xl font-bold tabular-nums tracking-tight text-[var(--twin-accent)] sm:text-4xl">
-          <span>{formatUsdListMonthly(p.monthly_list_price_usd)}</span>
-          <span className="text-sm font-semibold text-[var(--twin-muted-strong)]">{t("dashboard.billingPerMonth")}</span>
-        </p>
-      </div>
-
-      <p className="mt-4 flex-1 text-sm leading-relaxed text-[var(--twin-muted-strong)] break-words">{p.description}</p>
-      <p className="mt-3 text-xs leading-snug text-[var(--twin-muted)] break-words">
-        {p.max_tracked_applications != null
-          ? t("dashboard.billingTrackedCap").replace("{n}", String(p.max_tracked_applications))
-          : t("dashboard.billingTrackedUnlimited")}
-      </p>
-
-      <div className="mt-6 w-full">
-        <Button
-          type="button"
-          title={buttonHint}
-          aria-label={buttonHint ?? footerLabel}
-          className="h-auto min-h-[2.75rem] w-full whitespace-normal py-2.5 text-center leading-snug"
-          disabled={disabled}
-          onClick={() => {
-            if (disabled) return;
-            onPrimary();
-          }}
-        >
-          {busyHere ? "…" : footerLabel}
-        </Button>
-      </div>
-    </article>
-  );
-}
 
 export default function BillingPage() {
   const { t, locale } = useTranslation();
@@ -453,7 +372,7 @@ export default function BillingPage() {
   const showPortal = paid;
 
   return (
-    <Shell rail>
+    <Shell wide>
       <div className="twin-billing-surface">
         <div className="twin-app-read-pane mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0 max-w-2xl">
@@ -626,7 +545,7 @@ export default function BillingPage() {
           {!plans.checkout_configured ? (
             <p className="mt-4 text-sm leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.billingNotConfigured")}</p>
           ) : null}
-          <div className="mt-6 flex w-full min-w-0 flex-col gap-4 sm:gap-5">
+          <div className="twin-billing-plans-grid mt-6">
             {plans.plans.length === 0 ? (
               <div className="rounded-xl border border-dashed border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/60 p-4 text-sm text-[var(--twin-muted-strong)]">
                 {t("dashboard.billingPlansEmpty")}
