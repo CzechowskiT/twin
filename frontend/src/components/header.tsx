@@ -51,14 +51,18 @@ export function Header() {
     { href: "/contact" as const, label: t("nav.contact") },
   ];
 
+  /** Shared pill chrome: shadow + hairline edge (no ring-offset halo on header). */
+  const navPillEdge =
+    "border border-white/20 shadow-sm transition-[box-shadow,filter,background-color,border-color]";
+
   const roiClassName =
-    "twin-nav-roi-pill twin-touch-target inline-flex max-w-[10.5rem] shrink-0 items-center justify-center gap-2 whitespace-normal rounded-full bg-[var(--twin-cta)] px-3 py-2 text-center text-[10px] font-extrabold uppercase leading-tight tracking-wide text-[var(--twin-on-cta)] shadow-[0_4px_14px_rgb(217_119_6_/0.55)] ring-2 ring-white/90 ring-offset-2 ring-offset-white transition hover:bg-[var(--twin-cta-hover)] hover:shadow-[0_6px_20px_rgb(180_83_9_/0.5)] sm:max-w-[16rem] sm:px-5 sm:py-2.5 sm:text-[12px] sm:leading-snug md:text-[13px]";
+    `twin-nav-roi-pill twin-touch-target inline-flex max-w-[10.5rem] shrink-0 items-center justify-center gap-2 whitespace-normal rounded-full bg-[var(--twin-cta)] px-3 py-2 text-center text-[10px] font-extrabold uppercase leading-tight tracking-wide text-[var(--twin-on-cta)] shadow-[0_4px_14px_rgb(217_119_6_/0.55)] ${navPillEdge} hover:bg-[var(--twin-cta-hover)] hover:shadow-[0_6px_20px_rgb(180_83_9_/0.5)] sm:max-w-[16rem] sm:px-5 sm:py-2.5 sm:text-[12px] sm:leading-snug md:text-[13px]`;
 
   const demoClassName =
-    "twin-nav-demo-pill twin-touch-target inline-flex max-w-[10.5rem] shrink-0 items-center justify-center gap-2 whitespace-normal rounded-full bg-[var(--twin-accent)] px-3 py-2 text-center text-[10px] font-extrabold uppercase leading-tight tracking-wide text-[var(--twin-on-accent)] shadow-[0_4px_14px_rgb(31_77_64_/0.45)] ring-2 ring-white/90 ring-offset-2 ring-offset-white transition hover:bg-[var(--twin-accent-hover)] hover:shadow-[0_6px_20px_rgb(22_56_46_/0.42)] sm:max-w-[16rem] sm:px-5 sm:py-2.5 sm:text-[12px] sm:leading-snug md:text-[13px]";
+    `twin-nav-demo-pill twin-touch-target inline-flex max-w-[10.5rem] shrink-0 items-center justify-center gap-2 whitespace-normal rounded-full bg-[var(--twin-accent)] px-3 py-2 text-center text-[10px] font-extrabold uppercase leading-tight tracking-wide text-[var(--twin-on-accent)] shadow-[0_4px_14px_rgb(31_77_64_/0.45)] ${navPillEdge} hover:bg-[var(--twin-accent-hover)] hover:shadow-[0_6px_20px_rgb(22_56_46_/0.42)] sm:max-w-[16rem] sm:px-5 sm:py-2.5 sm:text-[12px] sm:leading-snug md:text-[13px]`;
 
   const waitlistClassName =
-    "twin-touch-target inline-flex max-w-[10.5rem] shrink-0 items-center justify-center gap-2 whitespace-normal rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-3 py-2 text-center text-[10px] font-extrabold uppercase leading-tight tracking-wide text-white shadow-[0_4px_14px_rgb(139_92_246_/0.45)] ring-2 ring-white/90 ring-offset-2 ring-offset-white transition hover:brightness-110 sm:max-w-[16rem] sm:px-5 sm:py-2.5 sm:text-[12px] sm:leading-snug md:text-[13px]";
+    `twin-nav-waitlist-pill twin-touch-target inline-flex max-w-[10.5rem] shrink-0 items-center justify-center gap-2 whitespace-normal rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-3 py-2 text-center text-[10px] font-extrabold uppercase leading-tight tracking-wide text-white shadow-[0_4px_14px_rgb(139_92_246_/0.45)] ${navPillEdge} hover:brightness-110 hover:shadow-[0_6px_20px_rgb(139_92_246_/0.5)] sm:max-w-[16rem] sm:px-5 sm:py-2.5 sm:text-[12px] sm:leading-snug md:text-[13px]`;
 
   /** Same chrome as Demo — primary nav pill for calendar. */
   const calendarNavPillClassName = demoClassName;
@@ -98,7 +102,7 @@ export function Header() {
               </Link>
               <Link
                 href="/dashboard/calendar"
-                className={`${calendarNavPillClassName} ${calendarActive ? "ring-4 ring-white/95 ring-offset-2 ring-offset-[var(--twin-header-bg,var(--background))]" : ""}`}
+                className={`${calendarNavPillClassName} ${calendarActive ? "border-white/40 ring-2 ring-white/50 ring-offset-2 ring-offset-[var(--twin-header-bg,var(--background))]" : ""}`}
                 aria-current={calendarActive ? "page" : undefined}
               >
                 <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white/90 shadow-sm" aria-hidden />
@@ -183,7 +187,7 @@ export function Header() {
                   <Link
                     href="/dashboard/calendar"
                     onClick={closeMobileMenu}
-                    className={`${calendarNavPillClassName} flex w-full justify-center ${calendarActive ? "ring-4 ring-white/95 ring-offset-2 ring-offset-[var(--twin-card)]" : ""}`}
+                    className={`${calendarNavPillClassName} flex w-full justify-center ${calendarActive ? "border-white/40 ring-2 ring-white/50 ring-offset-2 ring-offset-[var(--twin-card)]" : ""}`}
                     aria-current={calendarActive ? "page" : undefined}
                   >
                     <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white/90 shadow-sm" aria-hidden />

@@ -467,7 +467,7 @@ html[data-marketing-surface="studio"] .twin-logo-accent {
 html[data-marketing-surface="studio"] .twin-nav-demo-pill {
   background: linear-gradient(135deg, #34d399 0%, #059669 100%);
   color: #fff;
-  --tw-ring-offset-color: #030712;
+  border-color: rgb(255 255 255 / 0.14);
   box-shadow: 0 4px 14px rgb(16 185 129 / 0.35);
 }
 
@@ -791,8 +791,19 @@ html[data-marketing-surface="studio"] .twin-header-bar {
 html[data-marketing-surface="studio"] .twin-nav-roi-pill {
   background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
   color: #fff;
-  --tw-ring-offset-color: #030712;
+  border-color: rgb(255 255 255 / 0.14);
   box-shadow: 0 4px 14px rgb(217 119 6 / 0.45);
+}
+
+html[data-marketing-surface="studio"] .twin-nav-waitlist-pill {
+  background: linear-gradient(135deg, #8b5cf6 0%, #0891b2 100%);
+  color: #fff;
+  border-color: rgb(255 255 255 / 0.14);
+  box-shadow: 0 4px 14px rgb(139 92 246 / 0.4);
+}
+
+html[data-marketing-surface="studio"] .twin-nav-waitlist-pill:hover {
+  background: linear-gradient(135deg, #a78bfa 0%, #06b6d4 100%);
 }
 
 html[data-marketing-surface="studio"] .twin-nav-roi-pill:hover {
