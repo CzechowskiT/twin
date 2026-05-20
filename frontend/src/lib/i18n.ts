@@ -635,7 +635,15 @@ const en = {
       "Workspace and personal Google accounts — free/busy, create events, and schedule interviews from this page.",
     calendarProviderMicrosoftTitle: "Microsoft 365 & Outlook",
     calendarProviderMicrosoftBody:
-      "Microsoft Graph Calendar for Exchange Online — shared calendars, booking policies, and room resources (roadmap).",
+      "Microsoft Graph Calendar for Exchange Online — connect Outlook or Microsoft 365 to read busy time and place interview holds.",
+    calendarConnectMicrosoft: "Connect Microsoft 365 / Outlook",
+    calendarDisconnectMicrosoft: "Disconnect Microsoft",
+    calendarMicrosoftConnectedAs: "Microsoft account",
+    calendarWebcalTitle: "Subscribe in any calendar app",
+    calendarWebcalHint:
+      "Generate a private WebCal link (Apple Calendar, Outlook, Google via URL). Refreshes with your upcoming TWIN interviews.",
+    calendarWebcalGenerate: "Generate subscribe link",
+    calendarWebcalCopy: "Copy WebCal URL",
     calendarProviderAppleTitle: "Apple Calendar (iCloud)",
     calendarProviderAppleBody:
       "CalDAV access for iCloud calendars (app-specific passwords or delegated flows where Apple permits automation — roadmap; UX will differ from one-click Google).",
@@ -1981,7 +1989,15 @@ const pl: MessageTree = {
       "Konta Google Workspace i osobiste — free/busy, tworzenie wydarzeń i planowanie rozmów z tej strony.",
     calendarProviderMicrosoftTitle: "Microsoft 365 i Outlook",
     calendarProviderMicrosoftBody:
-      "Microsoft Graph Calendar dla Exchange Online — współdzielone kalendarze, polityki rezerwacji i zasoby sal (roadmapa).",
+      "Microsoft Graph Calendar dla Exchange Online — połącz Outlook lub Microsoft 365, żeby widzieć zajętość i stawiać sloty rozmów.",
+    calendarConnectMicrosoft: "Połącz Microsoft 365 / Outlook",
+    calendarDisconnectMicrosoft: "Odłącz Microsoft",
+    calendarMicrosoftConnectedAs: "Konto Microsoft",
+    calendarWebcalTitle: "Subskrypcja w dowolnym kalendarzu",
+    calendarWebcalHint:
+      "Wygeneruj prywatny link WebCal (Apple Calendar, Outlook, Google przez URL). Odświeża nadchodzące rozmowy z TWIN.",
+    calendarWebcalGenerate: "Wygeneruj link subskrypcji",
+    calendarWebcalCopy: "Kopiuj URL WebCal",
     calendarProviderAppleTitle: "Apple Calendar (iCloud)",
     calendarProviderAppleBody:
       "Dostęp CalDAV do kalendarzy iCloud (hasła aplikacji lub delegacja tam, gdzie Apple pozwala na automatyzację — roadmapa; UX inny niż jednoklikowy Google).",

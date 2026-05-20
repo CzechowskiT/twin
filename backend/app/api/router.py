@@ -2,7 +2,27 @@
 
 from fastapi import APIRouter
 
-from app.api import applications, auth, beta_waitlist, billing, calendar, candidates, curated_careers, geo, health, integrations_ats, jobs, kyc, linkedin_viral, partner, placement, public, referrals, talent_pool
+from app.api import (
+    applications,
+    auth,
+    beta_waitlist,
+    billing,
+    calendar,
+    calendar_microsoft,
+    candidates,
+    curated_careers,
+    geo,
+    health,
+    integrations_ats,
+    jobs,
+    kyc,
+    linkedin_viral,
+    partner,
+    placement,
+    public,
+    referrals,
+    talent_pool,
+)
 
 api_router = APIRouter()
 api_router.include_router(health.router, tags=["Health"])
@@ -12,6 +32,7 @@ api_router.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 api_router.include_router(linkedin_viral.router, prefix="/linkedin-viral", tags=["LinkedIn viral"])
 api_router.include_router(referrals.router, prefix="/referrals", tags=["Referrals"])
 api_router.include_router(calendar.router, prefix="/calendar", tags=["Calendar"])
+api_router.include_router(calendar_microsoft.router, prefix="/calendar", tags=["Calendar"])
 api_router.include_router(beta_waitlist.router, prefix="/beta", tags=["Beta waitlist"])
 api_router.include_router(billing.router, prefix="/billing", tags=["Billing"])
 api_router.include_router(kyc.router, prefix="/kyc", tags=["KYC"])

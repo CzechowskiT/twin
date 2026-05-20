@@ -147,12 +147,20 @@ class Settings(BaseSettings):
     # Set false locally to debug auth walls (slower; not for production automation).
     linkedin_jobs_browser_headless: bool = True
     frontend_url: str = "http://localhost:3000"
+    # Public API base URL (Railway domain) — used for WebCal subscribe links and OAuth callbacks docs.
+    api_url: str = "http://localhost:8000"
 
     google_client_id: str = ""
     google_client_secret: str = ""
     google_redirect_uri: str = "http://localhost:8000/api/v1/auth/google/callback"
     # Separate OAuth redirect for Calendar scopes (add this exact URI in Google Cloud Console).
     google_calendar_redirect_uri: str = "http://localhost:8000/api/v1/calendar/google/callback"
+
+    # Microsoft Graph Calendar (separate redirect from Google; Azure app registration).
+    microsoft_client_id: str = ""
+    microsoft_client_secret: str = ""
+    microsoft_calendar_redirect_uri: str = "http://localhost:8000/api/v1/calendar/microsoft/callback"
+    microsoft_tenant: str = "common"
 
     github_client_id: str = ""
     github_client_secret: str = ""
@@ -171,7 +179,7 @@ class Settings(BaseSettings):
             return value.replace("\\n", "\n")
         return value
 
-    @field_validator("frontend_url", mode="before")
+    @field_validator("frontend_url", "api_url", mode="before")
     @classmethod
     def normalize_frontend_url(cls, value: object) -> object:
         if isinstance(value, str) and value.strip():

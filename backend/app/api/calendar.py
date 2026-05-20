@@ -17,6 +17,7 @@ from app.config import get_settings
 from app.core.deps import get_current_user
 from app.core.security import create_access_token, decode_access_token
 from app.database.models import Application, Candidate, ScheduledInterview, User, UserGoogleCalendar
+from app.services.microsoft_calendar_api import MicrosoftCalendarApiError, delete_calendar_event as delete_microsoft_event
 from app.database.session import get_db
 from app.services.calendar_scheduling import find_free_slots_iso, find_next_slot_iso, freebusy_overlaps_slot
 from app.services.google_calendar_api import GoogleCalendarApiError, delete_primary_event, insert_primary_event, query_freebusy
@@ -27,7 +28,7 @@ from app.services.google_calendar_oauth import (
     is_google_calendar_oauth_configured,
     refresh_google_calendar_access_token,
 )
-from app.services.ics_export import scheduled_interview_to_ics
+from app.services.ics_export import interviews_feed_to_ics, scheduled_interview_to_ics
 from app.services.token_crypto import decrypt_secret, encrypt_secret
 
 router = APIRouter()
@@ -527,6 +528,27 @@ def cancel_scheduled_interview(
                     interview_id,
                     exc,
                 )
+        elif row.calendar_event_id and prov == "microsoft":
+            try:
+                from app.database.models import UserMicrosoftCalendar
+                from app.services.microsoft_calendar_oauth import refresh_microsoft_calendar_access_token
+                from app.services.token_crypto import decrypt_secret
+
+                ms_row = (
+                    db.query(UserMicrosoftCalendar)
+                    .filter(UserMicrosoftCalendar.user_id == current_user.id)
+                    .first()
+                )
+                if ms_row:
+                    plain = decrypt_secret(ms_row.refresh_token_encrypted)
+                    access = refresh_microsoft_calendar_access_token(plain)
+                    delete_microsoft_event(access, row.calendar_event_id)
+            except (HTTPException, MicrosoftCalendarApiError, Exception) as exc:
+                logger.warning(
+                    "Microsoft Calendar event delete skipped for interview %s: %s",
+                    interview_id,
+                    exc,
+                )
         row.status = "cancelled"
         row.updated_at = datetime.utcnow()
         db.add(row)
@@ -611,3 +633,82 @@ def google_calendar_schedule_interview(
     db.commit()
     db.refresh(row)
     return row
+
+
+class WebcalFeedTokenOut(BaseModel):
+    token: str
+    expires_at: str
+    subscribe_path: str
+    webcal_url: str
+
+
+_WEBCAL_FEED_TTL_DAYS = 365
+
+
+@router.post("/me/webcal-token", response_model=WebcalFeedTokenOut)
+def mint_webcal_feed_token(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> WebcalFeedTokenOut:
+    """Issue a long-lived secret URL for calendar apps to subscribe (WebCal / ICS feed)."""
+    raw = secrets.token_urlsafe(32)
+    current_user.webcal_feed_token_hash = _ics_token_digest(raw)
+    current_user.webcal_feed_token_expires_at = datetime.utcnow() + timedelta(days=_WEBCAL_FEED_TTL_DAYS)
+    db.add(current_user)
+    db.commit()
+    exp = current_user.webcal_feed_token_expires_at
+    exp_s = exp.isoformat() + "Z" if exp and exp.tzinfo is None else (exp.isoformat() if exp else "")
+    path = f"/api/v1/calendar/me/webcal.ics?token={raw}"
+    settings = get_settings()
+    api_public = (settings.api_url or settings.frontend_url).strip().rstrip("/")
+    host = api_public.removeprefix("https://").removeprefix("http://")
+    webcal_url = f"webcal://{host}{path}"
+    return WebcalFeedTokenOut(
+        token=raw,
+        expires_at=exp_s,
+        subscribe_path=path,
+        webcal_url=webcal_url,
+    )
+
+
+@router.get("/me/webcal.ics")
+def download_webcal_feed(
+    token: str = Query(..., min_length=16, max_length=512),
+    db: Session = Depends(get_db),
+) -> Response:
+    """Subscribe URL: all upcoming TWIN interviews for the user (Apple Calendar, Outlook, Google via URL)."""
+    digest = _ics_token_digest(token)
+    user = (
+        db.query(User)
+        .filter(
+            User.webcal_feed_token_hash == digest,
+            User.webcal_feed_token_expires_at.isnot(None),
+            User.webcal_feed_token_expires_at > datetime.utcnow(),
+        )
+        .first()
+    )
+    if user is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Feed not found or link expired")
+    now = datetime.utcnow()
+    rows = (
+        db.query(ScheduledInterview)
+        .filter(
+            ScheduledInterview.user_id == user.id,
+            ScheduledInterview.interview_start >= now,
+            ScheduledInterview.status != "cancelled",
+        )
+        .order_by(ScheduledInterview.interview_start.asc())
+        .limit(100)
+        .all()
+    )
+    body = interviews_feed_to_ics(rows)
+    return Response(
+        content=body.encode("utf-8"),
+        media_type="text/calendar; charset=utf-8",
+        headers={
+            "Content-Disposition": 'inline; filename="twin-interviews.ics"',
+            "Cache-Control": "private, max-age=300",
+        },
+    )
+
+

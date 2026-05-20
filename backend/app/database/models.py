@@ -103,6 +103,11 @@ class User(Base):
     google_calendar: Mapped["UserGoogleCalendar | None"] = relationship(
         back_populates="user", uselist=False, cascade="all, delete-orphan"
     )
+    microsoft_calendar: Mapped["UserMicrosoftCalendar | None"] = relationship(
+        back_populates="user", uselist=False, cascade="all, delete-orphan"
+    )
+    webcal_feed_token_hash: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    webcal_feed_token_expires_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     scheduled_interviews: Mapped[list["ScheduledInterview"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
@@ -146,6 +151,22 @@ class UserGoogleCalendar(Base):
     )
 
     user: Mapped["User"] = relationship(back_populates="google_calendar")
+
+
+class UserMicrosoftCalendar(Base):
+    """Offline Microsoft Graph calendar access (Outlook / Microsoft 365)."""
+
+    __tablename__ = "user_microsoft_calendar"
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    refresh_token_encrypted: Mapped[str] = mapped_column(Text)
+    microsoft_email: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+    user: Mapped["User"] = relationship(back_populates="microsoft_calendar")
 
 
 class IdentityVerification(Base):

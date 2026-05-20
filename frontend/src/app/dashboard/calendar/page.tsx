@@ -14,7 +14,19 @@ type CalendarStatus = {
   google_email: string | null;
 };
 
+type MicrosoftCalendarStatus = {
+  connected: boolean;
+  microsoft_email: string | null;
+};
+
 type AuthorizePayload = { authorize_url: string };
+
+type WebcalFeedOut = {
+  token: string;
+  expires_at: string;
+  subscribe_path: string;
+  webcal_url: string;
+};
 
 type FreeBusyOut = { busy: { start: string; end: string }[] };
 
@@ -91,6 +103,8 @@ export default function DashboardCalendarPage() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState<CalendarStatus | null>(null);
+  const [msStatus, setMsStatus] = useState<MicrosoftCalendarStatus | null>(null);
+  const [webcalUrl, setWebcalUrl] = useState<string | null>(null);
   const [banner, setBanner] = useState<"connected" | "denied" | "error" | null>(null);
   const [actionBusy, setActionBusy] = useState<string | null>(null);
   const [actionError, setActionError] = useState(false);
@@ -115,11 +129,7 @@ export default function DashboardCalendarPage() {
   const interviewRefreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchInterviewRows = useCallback(
-    async (token: string, connected: boolean) => {
-      if (!connected) {
-        setInterviews([]);
-        return;
-      }
+    async (token: string) => {
       const q = showCancelledInterviews ? "?include_cancelled=true" : "";
       const rows = await apiFetch<ScheduledInterview[]>(`/api/v1/calendar/google/interviews${q}`, {}, token);
       setInterviews(rows);
@@ -127,16 +137,15 @@ export default function DashboardCalendarPage() {
     [showCancelledInterviews],
   );
 
-  const scheduleDebouncedInterviewRefresh = useCallback(
-    (connected: boolean) => {
+  const scheduleDebouncedInterviewRefresh = useCallback(() => {
       const token = getToken();
-      if (!token || !connected) return;
+      if (!token) return;
       if (interviewRefreshTimerRef.current) {
         clearTimeout(interviewRefreshTimerRef.current);
       }
       interviewRefreshTimerRef.current = setTimeout(() => {
         interviewRefreshTimerRef.current = null;
-        void fetchInterviewRows(token, true).catch((e) => {
+        void fetchInterviewRows(token).catch((e) => {
           console.warn("[calendar] debounced interview refresh failed", e);
         });
       }, 320);
@@ -163,8 +172,9 @@ export default function DashboardCalendarPage() {
     setActionError(false);
     setNotifPrefsLoadError(false);
     try {
-      const [calRes, meRes] = await Promise.allSettled([
+      const [calRes, msRes, meRes] = await Promise.allSettled([
         apiFetch<CalendarStatus>("/api/v1/calendar/google/status", {}, token),
+        apiFetch<MicrosoftCalendarStatus>("/api/v1/calendar/microsoft/status", {}, token),
         apiFetch<AuthMeOut>("/api/v1/auth/me", {}, token),
       ]);
       if (calRes.status === "rejected") {
@@ -172,13 +182,14 @@ export default function DashboardCalendarPage() {
       }
       const s = calRes.value;
       setStatus(s);
+      setMsStatus(msRes.status === "fulfilled" ? msRes.value : { connected: false, microsoft_email: null });
       if (meRes.status === "fulfilled") {
         setEmailProductUpdates(Boolean(meRes.value.email_product_updates));
         setEmailInterviewReminders(Boolean(meRes.value.email_interview_reminders));
       } else {
         setNotifPrefsLoadError(true);
       }
-      await fetchInterviewRows(token, s.connected);
+      await fetchInterviewRows(token);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       if (msg.includes("401")) {
@@ -204,8 +215,8 @@ export default function DashboardCalendarPage() {
     queueMicrotask(() => {
       const c = searchParams.get("calendar_connected");
       const err = searchParams.get("calendar_error");
-      if (c === "1") setBanner("connected");
-      else if (err === "google_denied") setBanner("denied");
+      if (c === "1" || c === "microsoft") setBanner("connected");
+      else if (err === "google_denied" || err === "microsoft_denied") setBanner("denied");
       else if (err) setBanner("error");
     });
   }, [searchParams]);
@@ -247,6 +258,59 @@ export default function DashboardCalendarPage() {
     }
   }
 
+  async function connectMicrosoft() {
+    const token = getToken();
+    if (!token) return;
+    setActionBusy("ms-connect");
+    setActionError(false);
+    try {
+      const res = await apiFetch<AuthorizePayload>("/api/v1/calendar/microsoft/authorize", {}, token);
+      window.location.href = res.authorize_url;
+    } catch (e) {
+      setActionError(true);
+      console.warn("[calendar] microsoft authorize failed", e);
+    } finally {
+      setActionBusy(null);
+    }
+  }
+
+  async function disconnectMicrosoft() {
+    const token = getToken();
+    if (!token) return;
+    setActionBusy("ms-disconnect");
+    setActionError(false);
+    try {
+      await apiFetch("/api/v1/calendar/microsoft", { method: "DELETE" }, token);
+      setMsStatus({ connected: false, microsoft_email: null });
+      await load();
+    } catch (e) {
+      setActionError(true);
+      console.warn("[calendar] microsoft disconnect failed", e);
+    } finally {
+      setActionBusy(null);
+    }
+  }
+
+  async function generateWebcalLink() {
+    const token = getToken();
+    if (!token) return;
+    setActionBusy("webcal");
+    setActionError(false);
+    try {
+      const out = await apiFetch<WebcalFeedOut>(
+        "/api/v1/calendar/me/webcal-token",
+        { method: "POST", body: "{}" },
+        token,
+      );
+      setWebcalUrl(out.webcal_url);
+    } catch (e) {
+      setActionError(true);
+      console.warn("[calendar] webcal mint failed", e);
+    } finally {
+      setActionBusy(null);
+    }
+  }
+
   async function disconnect() {
     const token = getToken();
     if (!token) return;
@@ -269,9 +333,16 @@ export default function DashboardCalendarPage() {
     }
   }
 
+  function activeCalendarProvider(): "google" | "microsoft" | null {
+    if (status?.connected) return "google";
+    if (msStatus?.connected) return "microsoft";
+    return null;
+  }
+
   async function runFreeBusy() {
     const token = getToken();
-    if (!token) return;
+    const prov = activeCalendarProvider();
+    if (!token || !prov) return;
     setActionBusy("freebusy");
     setActionError(false);
     const now = new Date();
@@ -279,7 +350,7 @@ export default function DashboardCalendarPage() {
     const timeMax = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString();
     try {
       const out = await apiFetch<FreeBusyOut>(
-        "/api/v1/calendar/google/freebusy",
+        `/api/v1/calendar/${prov}/freebusy`,
         { method: "POST", body: JSON.stringify({ time_min: timeMin, time_max: timeMax }) },
         token,
       );
@@ -294,7 +365,8 @@ export default function DashboardCalendarPage() {
 
   async function createTestBlock() {
     const token = getToken();
-    if (!token) return;
+    const prov = activeCalendarProvider();
+    if (!token || prov !== "google") return;
     setActionBusy("event");
     setActionError(false);
     const start = new Date(Date.now() + 24 * 60 * 60 * 1000);
@@ -327,13 +399,18 @@ export default function DashboardCalendarPage() {
 
   async function suggestNextSlot() {
     const token = getToken();
-    if (!token) return;
+    const prov = activeCalendarProvider();
+    if (!token || !prov) return;
     setActionBusy("suggest");
     setScheduleNote(null);
     setSuggestedSlots(null);
     setActionError(false);
     try {
-      const out = await apiFetch<NextSlotOut>("/api/v1/calendar/google/slots/next?duration_minutes=60&days_ahead=14", {}, token);
+      const out = await apiFetch<NextSlotOut>(
+        `/api/v1/calendar/${prov}/slots/next?duration_minutes=60&days_ahead=14`,
+        {},
+        token,
+      );
       setStartLocal(isoToDatetimeLocalValue(out.start_iso));
       setEndLocal(isoToDatetimeLocalValue(out.end_iso));
     } catch (e) {
@@ -350,14 +427,15 @@ export default function DashboardCalendarPage() {
 
   async function loadSlotOptions() {
     const token = getToken();
-    if (!token) return;
+    const prov = activeCalendarProvider();
+    if (!token || !prov) return;
     setActionBusy("slots");
     setScheduleNote(null);
     setSuggestedSlots(null);
     setActionError(false);
     try {
       const out = await apiFetch<CalendarSlotsPayload>(
-        "/api/v1/calendar/google/slots?duration_minutes=60&days_ahead=14&limit=8",
+        `/api/v1/calendar/${prov}/slots?duration_minutes=60&days_ahead=14&limit=8`,
         {},
         token,
       );
@@ -373,7 +451,8 @@ export default function DashboardCalendarPage() {
 
   async function saveInterview() {
     const token = getToken();
-    if (!token) return;
+    const prov = activeCalendarProvider();
+    if (!token || !prov) return;
     const startIso = datetimeLocalToIso(startLocal);
     const endIso = datetimeLocalToIso(endLocal);
     if (!companyName.trim() || !jobTitle.trim() || !startIso || !endIso) {
@@ -386,7 +465,7 @@ export default function DashboardCalendarPage() {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
     try {
       await apiFetch<ScheduledInterview>(
-        "/api/v1/calendar/google/interviews",
+        `/api/v1/calendar/${prov}/interviews`,
         {
           method: "POST",
           body: JSON.stringify({
@@ -448,8 +527,14 @@ export default function DashboardCalendarPage() {
           <li className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/50 p-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.calendarProviderMicrosoftTitle")}</span>
-              <span className="shrink-0 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-800 dark:text-amber-200">
-                {t("dashboard.calendarStatusPlanned")}
+              <span
+                className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
+                  msStatus?.connected
+                    ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                    : "bg-amber-500/15 text-amber-800 dark:text-amber-200"
+                }`}
+              >
+                {msStatus?.connected ? t("dashboard.calendarStatusLive") : t("dashboard.calendarStatusPlanned")}
               </span>
             </div>
             <p className="mt-2 text-xs leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.calendarProviderMicrosoftBody")}</p>
@@ -466,8 +551,8 @@ export default function DashboardCalendarPage() {
           <li className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/50 p-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.calendarProviderOtherTitle")}</span>
-              <span className="shrink-0 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-800 dark:text-amber-200">
-                {t("dashboard.calendarStatusPlanned")}
+              <span className="shrink-0 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-300">
+                {t("dashboard.calendarStatusLive")}
               </span>
             </div>
             <p className="mt-2 text-xs leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.calendarProviderOtherBody")}</p>
@@ -558,27 +643,96 @@ export default function DashboardCalendarPage() {
         <p className="twin-muted text-xs leading-relaxed">{t("dashboard.calendarConfiguredHint")}</p>
       </Card>
 
+      <Card className="mb-6">
+        <h2 className="text-base font-semibold text-[var(--foreground)]">{t("dashboard.calendarWebcalTitle")}</h2>
+        <p className="twin-muted mt-2 max-w-2xl text-sm leading-relaxed">{t("dashboard.calendarWebcalHint")}</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Button
+            type="button"
+            className="twin-touch-target"
+            disabled={Boolean(actionBusy)}
+            onClick={() => void generateWebcalLink()}
+          >
+            {actionBusy === "webcal" ? "…" : t("dashboard.calendarWebcalGenerate")}
+          </Button>
+          {webcalUrl ? (
+            <>
+              <input readOnly value={webcalUrl} className="twin-input min-w-0 flex-1 text-sm" aria-label="WebCal URL" />
+              <Button
+                type="button"
+                className="twin-btn-secondary twin-touch-target shrink-0"
+                onClick={() => void navigator.clipboard.writeText(webcalUrl)}
+              >
+                {t("dashboard.calendarWebcalCopy")}
+              </Button>
+            </>
+          ) : null}
+        </div>
+      </Card>
+
       {loading ? (
         <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.identityLoading")}</p>
-      ) : status?.connected ? (
+      ) : status?.connected || msStatus?.connected ? (
         <div className="flex flex-col gap-6">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.calendarConnected")}</p>
-              {status.google_email ? (
-                <p className="twin-muted mt-1 text-sm">
-                  {t("dashboard.calendarConnectedAs")}: {status.google_email}
-                </p>
-              ) : null}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-xl border border-[var(--twin-border)] p-4">
+              <p className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.calendarProviderGoogleTitle")}</p>
+              {status?.connected ? (
+                <>
+                  {status.google_email ? (
+                    <p className="twin-muted mt-1 text-sm">
+                      {t("dashboard.calendarConnectedAs")}: {status.google_email}
+                    </p>
+                  ) : null}
+                  <Button
+                    type="button"
+                    className="twin-btn-secondary twin-touch-target mt-3"
+                    disabled={Boolean(actionBusy)}
+                    onClick={() => void disconnect()}
+                  >
+                    {actionBusy === "disconnect" ? "…" : t("dashboard.calendarDisconnect")}
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  type="button"
+                  className="twin-touch-target mt-3"
+                  disabled={Boolean(actionBusy)}
+                  onClick={() => void connect()}
+                >
+                  {actionBusy === "connect" ? "…" : t("dashboard.calendarConnect")}
+                </Button>
+              )}
             </div>
-            <Button
-              type="button"
-              className="twin-btn-secondary twin-touch-target"
-              disabled={Boolean(actionBusy)}
-              onClick={() => void disconnect()}
-            >
-              {actionBusy === "disconnect" ? "…" : t("dashboard.calendarDisconnect")}
-            </Button>
+            <div className="rounded-xl border border-[var(--twin-border)] p-4">
+              <p className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.calendarProviderMicrosoftTitle")}</p>
+              {msStatus?.connected ? (
+                <>
+                  {msStatus.microsoft_email ? (
+                    <p className="twin-muted mt-1 text-sm">
+                      {t("dashboard.calendarMicrosoftConnectedAs")}: {msStatus.microsoft_email}
+                    </p>
+                  ) : null}
+                  <Button
+                    type="button"
+                    className="twin-btn-secondary twin-touch-target mt-3"
+                    disabled={Boolean(actionBusy)}
+                    onClick={() => void disconnectMicrosoft()}
+                  >
+                    {actionBusy === "ms-disconnect" ? "…" : t("dashboard.calendarDisconnectMicrosoft")}
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  type="button"
+                  className="twin-touch-target mt-3"
+                  disabled={Boolean(actionBusy)}
+                  onClick={() => void connectMicrosoft()}
+                >
+                  {actionBusy === "ms-connect" ? "…" : t("dashboard.calendarConnectMicrosoft")}
+                </Button>
+              )}
+            </div>
           </div>
 
           <div className="border-t border-[var(--twin-border)] pt-6">
@@ -664,7 +818,7 @@ export default function DashboardCalendarPage() {
                                     r.id === row.id ? { ...r, status: "cancelled" } : r,
                                   ),
                                 );
-                                scheduleDebouncedInterviewRefresh(true);
+                                scheduleDebouncedInterviewRefresh();
                               } catch (e) {
                                 console.warn("[calendar] cancel failed", e);
                               } finally {
@@ -830,11 +984,24 @@ export default function DashboardCalendarPage() {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col gap-4">
-          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.calendarNotConnected")}</p>
-          <Button type="button" className="twin-touch-target w-fit" disabled={Boolean(actionBusy)} onClick={() => void connect()}>
-            {actionBusy === "connect" ? "…" : t("dashboard.calendarConnect")}
-          </Button>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="rounded-xl border border-[var(--twin-border)] p-4">
+            <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.calendarNotConnected")}</p>
+            <Button type="button" className="twin-touch-target mt-3" disabled={Boolean(actionBusy)} onClick={() => void connect()}>
+              {actionBusy === "connect" ? "…" : t("dashboard.calendarConnect")}
+            </Button>
+          </div>
+          <div className="rounded-xl border border-[var(--twin-border)] p-4">
+            <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.calendarProviderMicrosoftBody")}</p>
+            <Button
+              type="button"
+              className="twin-touch-target mt-3"
+              disabled={Boolean(actionBusy)}
+              onClick={() => void connectMicrosoft()}
+            >
+              {actionBusy === "ms-connect" ? "…" : t("dashboard.calendarConnectMicrosoft")}
+            </Button>
+          </div>
         </div>
       )}
     </Shell>

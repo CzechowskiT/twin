@@ -63,3 +63,33 @@ def scheduled_interview_to_ics(row: ScheduledInterview) -> str:
         lines.append(f"LOCATION:{location}")
     lines.extend(["END:VEVENT", "END:VCALENDAR"])
     return "\r\n".join(lines) + "\r\n"
+
+
+def interviews_feed_to_ics(rows: list[ScheduledInterview]) -> str:
+    """Multi-event calendar for WebCal subscribe feeds."""
+    if not rows:
+        return "\r\n".join(
+            [
+                "BEGIN:VCALENDAR",
+                "VERSION:2.0",
+                "PRODID:-//TWIN//Interviews//EN",
+                "CALSCALE:GREGORIAN",
+                "METHOD:PUBLISH",
+                "END:VCALENDAR",
+            ]
+        ) + "\r\n"
+    events: list[str] = []
+    for row in rows:
+        block = scheduled_interview_to_ics(row)
+        for line in block.splitlines():
+            if line in ("BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//TWIN//Interview//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH", "END:VCALENDAR", ""):
+                continue
+            events.append(line)
+    header = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//TWIN//Interviews//EN",
+        "CALSCALE:GREGORIAN",
+        "METHOD:PUBLISH",
+    ]
+    return "\r\n".join(header + events + ["END:VCALENDAR"]) + "\r\n"
