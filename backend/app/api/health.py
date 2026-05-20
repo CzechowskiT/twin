@@ -37,10 +37,12 @@ def _database_reachable(eng: Engine | None = None) -> bool:
 def health_check(
     db: bool = Query(False, description="When true, include db_ok from SELECT 1 (no DSN in response)."),
 ) -> dict[str, str | bool]:
-    out: dict[str, str | bool] = {"status": "ok", "service": "twin-api"}
     commit = _git_commit_sha()
-    if commit:
-        out["git_commit"] = commit
+    out: dict[str, str | bool] = {
+        "status": "ok",
+        "service": "twin-api",
+        "git_commit": commit if commit else "unknown",
+    }
     if db:
         out["db_ok"] = _database_reachable()
     return out

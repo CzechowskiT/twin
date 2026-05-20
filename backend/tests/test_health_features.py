@@ -14,6 +14,7 @@ def test_health_ok() -> None:
     data = res.json()
     assert data.get("status") == "ok"
     assert data.get("service") == "twin-api"
+    assert data.get("git_commit") == "unknown"
     assert "db_ok" not in data
 
 
