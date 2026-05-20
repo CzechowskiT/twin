@@ -36,6 +36,10 @@ def _database_reachable(eng: Engine | None = None) -> bool:
 @router.get("/health")
 def health_check(
     db: bool = Query(False, description="When true, include db_ok from SELECT 1 (no DSN in response)."),
+    ops: bool = Query(
+        False,
+        description="When true, include non-secret ops flags (mail/calendar wiring) for deploy checks.",
+    ),
 ) -> dict[str, str | bool]:
     commit = _git_commit_sha()
     out: dict[str, str | bool] = {
@@ -45,4 +49,12 @@ def health_check(
     }
     if db:
         out["db_ok"] = _database_reachable()
+    if ops:
+        from app.config import get_settings
+        from app.services.mail import is_mail_configured
+        from app.services.microsoft_calendar_oauth import is_microsoft_calendar_oauth_configured
+
+        s = get_settings()
+        out["mail_configured"] = is_mail_configured(s)
+        out["microsoft_calendar_configured"] = is_microsoft_calendar_oauth_configured()
     return out
