@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { trackEvent } from "@/lib/analytics";
+import { fetchOpsHealth } from "@/lib/ops-health";
 import { betaJoin, BETA_REFERRAL_STORAGE_KEY, type BetaJoinResult } from "@/lib/beta-api";
 import { betaDashboardUrl } from "@/lib/waitlist/deep-links";
 import { formatWaitlist } from "@/lib/waitlist-messages";
@@ -37,6 +38,7 @@ function WaitlistFormInner({
   const searchParams = useSearchParams();
   const [busy, setBusy] = useState(false);
   const [join, setJoin] = useState<BetaJoinResult | null>(null);
+  const [mailConfigured, setMailConfigured] = useState<boolean | null>(null);
 
   const schema = useMemo(
     () =>
@@ -71,6 +73,9 @@ function WaitlistFormInner({
         consent_beta_email_updates: true,
       });
       setJoin(res);
+      void fetchOpsHealth().then((ops) => {
+        if (ops) setMailConfigured(ops.mail_configured);
+      });
       safeStorage.setItem(BETA_REFERRAL_STORAGE_KEY, res.referral_code);
       trackEvent("waitlist_signup", {
         source: "waitlist",
@@ -122,6 +127,9 @@ function WaitlistFormInner({
           ) : null}
         </div>
         <p className="mt-4 text-sm text-[var(--wl-text-secondary)]">{copy.formReferralHint}</p>
+        {mailConfigured === false ? (
+          <p className="mt-3 text-sm text-amber-300/90">{copy.formWelcomeMailDeferred}</p>
+        ) : null}
         <Link
           href={betaDashboardUrl(origin, join.referral_code)}
           className="wl-btn-primary mt-6 inline-block text-center no-underline"

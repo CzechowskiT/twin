@@ -17,7 +17,7 @@ celery_app.conf.update(
     result_serializer="json",
     timezone="Europe/Warsaw",
     enable_utc=True,
-    imports=("app.tasks.scrape_tasks", "app.tasks.reminder_tasks"),
+    imports=("app.tasks.scrape_tasks", "app.tasks.reminder_tasks", "app.tasks.placement_tasks"),
 )
 
 

@@ -60,6 +60,7 @@ export type WaitlistCopyBase = {
   formCopy: string;
   formShare: string;
   formReferralHint: string;
+  formWelcomeMailDeferred: string;
   formOpenDashboard: string;
   formErrorGeneric: string;
   validationEmail: string;
@@ -193,6 +194,8 @@ const en: WaitlistCopyBase = {
   formCopy: "Copy",
   formShare: "Share link",
   formReferralHint: "Invite friends — each person moves you up the queue.",
+  formWelcomeMailDeferred:
+    "Welcome email may be delayed — the API mail provider is not configured yet. You are still on the list.",
   formOpenDashboard: "Open waitlist panel",
   formErrorGeneric: "Something went wrong. Try again.",
   validationEmail: "Invalid email address",
@@ -323,6 +326,8 @@ const pl: WaitlistCopyBase = {
   formCopy: "Kopiuj",
   formShare: "Udostępnij link",
   formReferralHint: "Zaproś znajomych — każda osoba = wyższa pozycja na liście.",
+  formWelcomeMailDeferred:
+    "Mail powitalny może przyjść później — dostawca maili na API nie jest jeszcze skonfigurowany. Jesteś na liście.",
   formOpenDashboard: "Otwórz panel waitlisty",
   formErrorGeneric: "Wystąpił błąd. Spróbuj ponownie.",
   validationEmail: "Nieprawidłowy adres email",
@@ -428,6 +433,8 @@ function esCopy(): WaitlistCopyBase {
     formSuccessPosition: "Posición: #{position}",
     formCopy: "Copiar",
     formReferralHint: "Invita amigos — cada persona sube tu posición.",
+    formWelcomeMailDeferred:
+      "Welcome email may be delayed — the API mail provider is not configured yet. You are still on the list.",
     formOpenDashboard: "Abrir panel de la lista",
     formErrorGeneric: "Algo falló. Inténtalo de nuevo.",
     validationEmail: "Email no válido",
@@ -709,6 +716,8 @@ function zhCopy(): WaitlistCopyBase {
     formSuccessPosition: "排位：#{position}",
     formCopy: "复制",
     formReferralHint: "邀请好友 — 每多一人你的排位都会上升。",
+    formWelcomeMailDeferred:
+      "Welcome email may be delayed — the API mail provider is not configured yet. You are still on the list.",
     formOpenDashboard: "打开候补面板",
     formErrorGeneric: "出了点问题，请重试。",
     validationEmail: "邮箱格式无效",
@@ -832,6 +841,8 @@ function jaCopy(): WaitlistCopyBase {
     formSuccessPosition: "順位：#{position}",
     formCopy: "コピー",
     formReferralHint: "友達を招待 — 1人ごとに順位が上がります。",
+    formWelcomeMailDeferred:
+      "Welcome email may be delayed — the API mail provider is not configured yet. You are still on the list.",
     formOpenDashboard: "ウェイトリストパネルを開く",
     formErrorGeneric: "問題が発生しました。もう一度お試しください。",
     validationEmail: "無効なメールアドレス",
@@ -955,6 +966,8 @@ function arCopy(): WaitlistCopyBase {
     formSuccessPosition: "الترتيب: #{position}",
     formCopy: "نسخ",
     formReferralHint: "ادعُ أصدقاءك — كل شخص يرفع ترتيبك.",
+    formWelcomeMailDeferred:
+      "Welcome email may be delayed — the API mail provider is not configured yet. You are still on the list.",
     formOpenDashboard: "فتح لوحة الانتظار",
     formErrorGeneric: "حدث خطأ. حاول مرة أخرى.",
     validationEmail: "عنوان بريد غير صالح",

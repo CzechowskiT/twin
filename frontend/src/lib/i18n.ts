@@ -280,6 +280,9 @@ const en = {
     northStarEyebrow: "How TWIN thinks",
     northStarLead:
       "Without TWIN you return from time off to a calendar of random interviews or an inbox of thousands of CVs. With TWIN you return to a short list of moments that matter: interviews worth taking, candidates you can accept in one tap. Not noise.",
+    mailNotConfiguredTitle: "Transactional email is off on the server",
+    mailNotConfiguredBody:
+      "Password reset, waitlist welcome mail, and placement verification links need RESEND_API_KEY (or SMTP) and MAIL_FROM on the API host. Until then those flows still work in-app but may not send email.",
     logout: "Log out",
     signedInAs: "Signed in as",
     addProfileHint: "Add a profile so TWIN can rank jobs for you.",
@@ -762,6 +765,8 @@ const en = {
     sentTitle: "Check your email",
     sentBody:
       "If an account exists for that address, we sent instructions to reset your password. The link expires in about an hour.",
+    mailNotConfiguredHint:
+      "Note: the API is not sending email yet (Resend/SMTP not configured). If you requested a reset, ask the operator to check server logs or configure mail on Railway.",
   },
   resetPassword: {
     title: "Choose a new password",
@@ -1637,6 +1642,9 @@ const pl: MessageTree = {
     northStarEyebrow: "Logika TWIN",
     northStarLead:
       "Bez TWIN wracasz z przerwy do kalendarza przypadkowych rozmów albo tysięcy CV. Z TWIN wracasz do krótkiej listy momentów, które mają sens: rozmowy warte czasu, kandydaci do akceptacji jednym gestem. Bez szumu.",
+    mailNotConfiguredTitle: "Mail transakcyjny wyłączony na serwerze",
+    mailNotConfiguredBody:
+      "Reset hasła, mail powitalny waitlisty i linki weryfikacji placementu wymagają RESEND_API_KEY (lub SMTP) i MAIL_FROM na API (Railway). Do tego czasu flow działają w aplikacji, ale e-mail może nie wyjść.",
     logout: "Wyloguj",
     signedInAs: "Zalogowano jako",
     addProfileHint: "Dodaj profil, aby TWIN mógł oceniać oferty pracy.",
@@ -2122,6 +2130,8 @@ const pl: MessageTree = {
     sentTitle: "Sprawdź skrzynkę",
     sentBody:
       "Jeśli istnieje konto dla tego adresu, wysłaliśmy instrukcję resetu hasła. Link wygasa po ok. godzinie.",
+    mailNotConfiguredHint:
+      "Uwaga: API jeszcze nie wysyła maili (brak Resend/SMTP). Jeśli prosiłeś o reset, operator musi sprawdzić logi serwera lub skonfigurować mail na Railway.",
   },
   resetPassword: {
     title: "Ustaw nowe hasło",

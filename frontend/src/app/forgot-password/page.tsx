@@ -1,16 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Input, Label, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
+import { fetchOpsHealth } from "@/lib/ops-health";
 
 export default function ForgotPasswordPage() {
   const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const [mailConfigured, setMailConfigured] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    void fetchOpsHealth().then((ops) => {
+      if (ops) setMailConfigured(ops.mail_configured);
+    });
+  }, []);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -38,6 +46,9 @@ export default function ForgotPasswordPage() {
           <div className="space-y-4">
             <p className="font-medium">{t("forgotPassword.sentTitle")}</p>
             <p className="twin-muted text-sm">{t("forgotPassword.sentBody")}</p>
+            {mailConfigured === false ? (
+              <p className="mt-3 text-sm text-amber-700 dark:text-amber-300">{t("forgotPassword.mailNotConfiguredHint")}</p>
+            ) : null}
             <Link href="/login" className="twin-link inline-block text-sm">
               {t("forgotPassword.backToLogin")}
             </Link>

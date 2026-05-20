@@ -31,6 +31,8 @@ type User = {
   subscription_current_period_end?: string | null;
   scrape_ops_configured?: boolean;
   can_trigger_scrape?: boolean;
+  mail_configured?: boolean;
+  microsoft_calendar_oauth_configured?: boolean;
 };
 type Profile = {
   name: string;
@@ -1126,6 +1128,18 @@ export default function DashboardPage() {
         </p>
         <p className="mt-2 text-sm leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.northStarLead")}</p>
       </div>
+
+      {user && user.mail_configured === false ? (
+        <div
+          className="mb-6 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 sm:px-5"
+          role="status"
+        >
+          <p className="text-sm font-medium text-amber-900 dark:text-amber-100">{t("dashboard.mailNotConfiguredTitle")}</p>
+          <p className="mt-1 text-sm leading-relaxed text-amber-800/90 dark:text-amber-200/90">
+            {t("dashboard.mailNotConfiguredBody")}
+          </p>
+        </div>
+      ) : null}
 
       {user ? (
         <>
