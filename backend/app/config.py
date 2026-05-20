@@ -56,6 +56,8 @@ class Settings(BaseSettings):
     auth_reset_password_rate_limit_per_minute: int = 3
     # Comma-separated user IDs allowed to trigger POST /jobs/scrape/* (empty = deny all).
     scrape_ops_user_ids: str = ""
+    # Comma-separated emails (same allowlist; easier than looking up numeric IDs on Railway).
+    scrape_ops_emails: str = ""
     cors_origins: str = "http://localhost:3000"
 
     @field_validator("cors_origins", mode="before")

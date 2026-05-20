@@ -105,6 +105,12 @@ function dashboardFetchUserMessage(
   if (isLikelyBrowserNetworkFailureMessage(raw)) {
     return networkHint === "scrape" ? t("dashboard.scrapeNetworkError") : t("dashboard.apiNetworkError");
   }
+  if (networkHint === "scrape" && lc.includes("ops role")) {
+    if (lc.includes("scrape_ops_emails") || lc.includes("scrape_ops_user_ids") || lc.includes("configure")) {
+      return t("dashboard.scrapeOpsNotConfigured");
+    }
+    return t("dashboard.scrapeOpsDenied");
+  }
   return raw.trim() || t("dashboard.scrapeFailed");
 }
 

@@ -396,6 +396,10 @@ const en = {
     appFeedbackUpskill: "Upskill actions",
     appFeedbackSummary: "Summary",
     scrapeFailed: "Scrape failed",
+    scrapeOpsNotConfigured:
+      "Scraping is locked on the server until an admin adds your email. In Railway → API service → Variables, add SCRAPE_OPS_EMAILS with the same address you use to log in here, then Redeploy the API. After that, try this button again.",
+    scrapeOpsDenied:
+      "Your account is not on the scrape allowlist yet. Ask whoever runs Railway to add your login email to SCRAPE_OPS_EMAILS (or your user id to SCRAPE_OPS_USER_IDS), then redeploy the API.",
     scrapeNetworkError:
       "Could not reach the API (network). If the address in your browser is a long vercel.app link with “git” in the name, that is a preview build: open your normal production site instead (or turn off Vercel → Settings → Deployment Protection for previews). On production, check TWIN_API_BASE_URL or NEXT_PUBLIC_API_URL, that Railway is Active, and your connection. This button uses the async queue, not a long blocking scrape.",
     apiNetworkError:
@@ -1735,6 +1739,10 @@ const pl: MessageTree = {
     appFeedbackUpskill: "Działania rozwojowe",
     appFeedbackSummary: "Podsumowanie",
     scrapeFailed: "Pobieranie nie powiodło się",
+    scrapeOpsNotConfigured:
+      "Pobieranie ofert jest zablokowane, dopóki na serwerze API nie dodasz swojego maila. W Railway → usługa API → Variables wpisz SCRAPE_OPS_EMAILS z tym samym adresem, którym logujesz się tutaj, potem Redeploy API. Potem spróbuj ponownie.",
+    scrapeOpsDenied:
+      "Twoje konto nie jest jeszcze na liście operatorów. Ktoś z dostępem do Railway musi dodać Twój email do SCRAPE_OPS_EMAILS (albo numer id użytkownika do SCRAPE_OPS_USER_IDS) i zrobić redeploy API.",
     scrapeNetworkError:
       "Brak połączenia z API (sieć). Jeśli w pasku adresu masz długi link vercel.app z „git” w nazwie, to podgląd (preview): wejdź na zwykłą stronę produkcyjną albo wyłącz Vercel → Settings → Deployment Protection dla preview. Na produkcji sprawdź TWIN_API_BASE_URL lub NEXT_PUBLIC_API_URL, czy Railway jest Active i internet. To polecenie idzie w kolejkę, nie blokuje na długo.",
     apiNetworkError:

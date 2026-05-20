@@ -84,6 +84,7 @@ def test_scrape_all_allowed_for_ops_user(mock_delay, scrape_client, monkeypatch)
 def test_scrape_forbidden_when_ops_list_empty(scrape_client, monkeypatch) -> None:
     client, _regular, ops, _db = scrape_client
     monkeypatch.setenv("SCRAPE_OPS_USER_IDS", "")
+    monkeypatch.delenv("SCRAPE_OPS_EMAILS", raising=False)
     get_settings.cache_clear()
     try:
         token = create_access_token(ops.email)
@@ -92,5 +93,30 @@ def test_scrape_forbidden_when_ops_list_empty(scrape_client, monkeypatch) -> Non
             headers={"Authorization": f"Bearer {token}"},
         )
         assert res.status_code == 403
+    finally:
+        get_settings.cache_clear()
+
+
+@patch("app.api.jobs._celery_delay")
+def test_scrape_allowed_by_ops_email(mock_delay, scrape_client, monkeypatch) -> None:
+    client, regular, ops, _db = scrape_client
+    monkeypatch.setenv("SCRAPE_OPS_USER_IDS", "")
+    monkeypatch.setenv("SCRAPE_OPS_EMAILS", ops.email)
+    get_settings.cache_clear()
+    mock_delay.return_value = type("R", (), {"id": "task-2"})()
+    try:
+        token = create_access_token(ops.email)
+        res = client.post(
+            "/api/v1/jobs/scrape/all",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert res.status_code == 200
+        mock_delay.assert_called_once()
+        token_regular = create_access_token(regular.email)
+        denied = client.post(
+            "/api/v1/jobs/scrape/all",
+            headers={"Authorization": f"Bearer {token_regular}"},
+        )
+        assert denied.status_code == 403
     finally:
         get_settings.cache_clear()
