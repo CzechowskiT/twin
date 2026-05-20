@@ -71,5 +71,30 @@ def test_auth_me_scrape_flags_when_unconfigured(me_client, monkeypatch) -> None:
         body = res.json()
         assert body["scrape_ops_configured"] is False
         assert body["can_trigger_scrape"] is False
+        assert body["mail_configured"] is False
+        assert body["microsoft_calendar_oauth_configured"] is False
+    finally:
+        get_settings.cache_clear()
+
+
+@patch("app.api.auth.is_microsoft_calendar_oauth_configured", return_value=True)
+@patch("app.api.auth.is_mail_configured", return_value=True)
+def test_auth_me_includes_mail_and_calendar_ops_flags(
+    _mock_mail: object,
+    _mock_ms: object,
+    me_client,
+    monkeypatch,
+) -> None:
+    client, user, _db = me_client
+    monkeypatch.setenv("RESEND_API_KEY", "re_test")
+    monkeypatch.setenv("MAIL_FROM", "TWIN <test@resend.dev>")
+    get_settings.cache_clear()
+    try:
+        token = create_access_token(user.email)
+        res = client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {token}"})
+        assert res.status_code == 200
+        body = res.json()
+        assert body["mail_configured"] is True
+        assert body["microsoft_calendar_oauth_configured"] is True
     finally:
         get_settings.cache_clear()
