@@ -7,6 +7,7 @@ export type WaitlistNarrative = {
   heroOfferSub: string;
   valueStrip: [string, string, string];
   statsLiveLabel: string;
+  statsLoadingLabel: string;
   statsOfflineHint: string;
   sectionWhy: string;
   whyLead: string;
@@ -32,6 +33,7 @@ const en: WaitlistNarrative = {
     "Access in ~14 days if you're in the first thousand",
   ],
   statsLiveLabel: "Live waitlist data",
+  statsLoadingLabel: "Connecting to live stats…",
   statsOfflineHint: "Could not reach live stats — numbers below may be delayed. Signup still works.",
   sectionWhy: "Why developers are leaving the job-board treadmill",
   whyLead:
@@ -95,6 +97,7 @@ const pl: WaitlistNarrative = {
     "Dostęp w ~14 dni, jeśli jesteś w pierwszej tysiątce",
   ],
   statsLiveLabel: "Dane na żywo z listy",
+  statsLoadingLabel: "Łączenie ze statystykami na żywo…",
   statsOfflineHint: "Brak połączenia ze statystykami — liczby mogą być opóźnione. Zapis nadal działa.",
   sectionWhy: "Dlaczego developerzy schodzą z bieżni portali",
   whyLead:

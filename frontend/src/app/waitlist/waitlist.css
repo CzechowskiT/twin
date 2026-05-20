@@ -346,6 +346,10 @@
   color: var(--wl-accent-lime);
 }
 
+.wl-stats-live--loading {
+  color: var(--wl-text-secondary);
+}
+
 .wl-stats-offline {
   max-width: 36rem;
   margin: 0 auto 1rem;

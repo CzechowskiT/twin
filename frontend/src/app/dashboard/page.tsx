@@ -31,6 +31,7 @@ type User = {
   subscription_current_period_end?: string | null;
   scrape_ops_configured?: boolean;
   can_trigger_scrape?: boolean;
+  scrape_worker_ready?: boolean;
   mail_configured?: boolean;
   microsoft_calendar_oauth_configured?: boolean;
 };
@@ -1315,7 +1316,11 @@ export default function DashboardPage() {
                 type="button"
                 aria-label={t("dashboard.twinForYourJob")}
                 onClick={() => triggerScrapeAll()}
-                disabled={scraping || user?.can_trigger_scrape === false}
+                disabled={
+                  scraping ||
+                  user?.can_trigger_scrape === false ||
+                  user?.scrape_worker_ready === false
+                }
                 className="!mt-4 !rounded-full !py-3.5 !text-base !font-bold !tracking-tight !shadow-lg"
               >
                 {scraping ? t("dashboard.twinForYourJobRunning") : t("dashboard.twinForYourJob")}
@@ -1336,6 +1341,10 @@ export default function DashboardPage() {
                       (id {user.id}, {user.email})
                     </>
                   ) : null}
+                </p>
+              ) : user?.scrape_worker_ready === false ? (
+                <p className="mt-3 text-sm text-amber-700 dark:text-amber-300">
+                  {t("dashboard.scrapeWorkerNotReady")}
                 </p>
               ) : null}
               {user?.can_trigger_scrape === true && user.mail_configured === false ? (

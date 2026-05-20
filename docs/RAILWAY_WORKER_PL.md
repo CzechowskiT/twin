@@ -31,4 +31,6 @@ Tylko jeśli `SCRAPE_BEAT_ENABLED=true` na API/worker.
 
 ## 4. Placement retention (MVP)
 
-Task `app.tasks.placement_tasks.placement_retention_sweep` jest zarejestrowany — wywołaj ręcznie z Railway shell lub dodaj beat entry w kolejnej fazie.
+Task `app.tasks.placement_tasks.placement_retention_sweep` runs daily on **twin-beat** (06:15 Europe/Warsaw by default). Disable with `PLACEMENT_RETENTION_BEAT_ENABLED=false`.
+
+When API runs with `CELERY_TASK_ALWAYS_EAGER=false`, set **`SCRAPE_WORKER_READY=true`** on the API after the worker service is live so the dashboard scrape button stays enabled for ops users.

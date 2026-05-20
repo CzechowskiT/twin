@@ -33,30 +33,24 @@ celery_app.conf.task_eager_propagates = True
 
 
 def _configure_beat_schedule() -> None:
-    """Optional daily scrape-all when SCRAPE_BEAT_ENABLED=true (run `celery -A app.tasks.celery_app beat`).
-
-    Interview reminder email (`app.tasks.reminder_tasks.send_interview_reminder_email`) is not on the
-    default beat schedule: add an entry only after batching which interviews to nudge (args/kwargs).
-    """
+    """Optional daily scrape-all when SCRAPE_BEAT_ENABLED=true; placement retention sweep by default."""
     from celery.schedules import crontab
 
     s = get_settings()
-    if not s.scrape_beat_enabled:
-        celery_app.conf.beat_schedule = {}
-        return
-    hour = min(23, max(0, int(s.scrape_beat_hour_utc)))
-    celery_app.conf.beat_schedule = {
-        "scrape-all-boards-daily": {
+    schedule: dict[str, dict] = {}
+    if s.scrape_beat_enabled:
+        hour = min(23, max(0, int(s.scrape_beat_hour_utc)))
+        schedule["scrape-all-boards-daily"] = {
             "task": "app.tasks.scrape_tasks.scrape_all_boards_task",
             "schedule": crontab(hour=hour, minute=12),
-        },
-    }
-    # Example only — uncomment after wiring batch selection (never pass a stale hard-coded id):
-    # celery_app.conf.beat_schedule["interview-reminder-email"] = {
-    #     "task": "app.tasks.reminder_tasks.send_interview_reminder_email",
-    #     "schedule": crontab(minute=30),
-    #     "args": (0,),
-    # }
+        }
+    if s.placement_retention_beat_enabled:
+        ph = min(23, max(0, int(s.placement_retention_beat_hour_utc)))
+        schedule["placement-retention-sweep-daily"] = {
+            "task": "app.tasks.placement_tasks.placement_retention_sweep",
+            "schedule": crontab(hour=ph, minute=15),
+        }
+    celery_app.conf.beat_schedule = schedule
 
 
 _configure_beat_schedule()

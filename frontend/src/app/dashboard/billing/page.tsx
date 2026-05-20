@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
-import { BillingPlanTierCard } from "@/components/billing/billing-plan-tier-card";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
@@ -42,6 +41,15 @@ const PLAN_PRICE_FALLBACK_USD: Record<string, number> = {
   premium: 4.99,
   pro: 9.99,
 };
+
+function formatUsdListMonthly(n: number): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: n % 1 === 0 ? 0 : 2,
+    maximumFractionDigits: 2,
+  }).format(n);
+}
 
 function normalizePlansPayload(raw: unknown): PlansPayload {
   if (raw == null || typeof raw !== "object") {
@@ -150,67 +158,6 @@ function formatSubscriptionStatusLabel(
 type UrlPayload = { url: string };
 
 const PAID = new Set(["active", "trialing", "past_due"]);
-
-const PLAN_NAME_KEYS: Record<string, TranslationKey> = {
-  free: "dashboard.billingPlanNameFree",
-  premium: "dashboard.billingPlanNamePremium",
-  pro: "dashboard.billingPlanNamePro",
-};
-
-function planDisplayName(p: PlanRow, t: (key: TranslationKey) => string): string {
-  const key = PLAN_NAME_KEYS[p.id];
-  return key ? t(key) : p.name;
-}
-
-function planCtaLabels(
-  p: PlanRow,
-  plans: PlansPayload,
-  isCurrent: boolean,
-  paid: boolean,
-  t: (key: TranslationKey) => string,
-): { label: string; hint?: string; actionable: boolean } {
-  if (isCurrent) {
-    return { label: t("dashboard.billingPlanCurrent"), actionable: false };
-  }
-  if (p.id === "free") {
-    return { label: t("dashboard.billingPlanOpenWorkspace"), actionable: true };
-  }
-  if (p.id === "premium") {
-    if (!plans.checkout_configured) {
-      return {
-        label: t("dashboard.billingCtaUnavailableShort"),
-        hint: t("dashboard.billingNotConfigured"),
-        actionable: false,
-      };
-    }
-    if (paid) {
-      return { label: t("dashboard.billingPlanCurrent"), actionable: false };
-    }
-    return { label: t("dashboard.billingUpgradePremium"), actionable: true };
-  }
-  if (p.id === "pro") {
-    if (!plans.checkout_configured) {
-      return {
-        label: t("dashboard.billingCtaUnavailableShort"),
-        hint: t("dashboard.billingNotConfigured"),
-        actionable: false,
-      };
-    }
-    if (!p.stripe_price_configured) {
-      return {
-        label: t("dashboard.billingCtaProPendingShort"),
-        hint: t("dashboard.billingPlanProPending"),
-        actionable: false,
-      };
-    }
-    if (paid) {
-      return { label: t("dashboard.billingPlanCurrent"), actionable: false };
-    }
-    return { label: t("dashboard.billingUpgradePro"), actionable: true };
-  }
-  return { label: t("dashboard.billingPlanUpgradeCta"), actionable: false };
-}
-
 
 export default function BillingPage() {
   const { t, locale } = useTranslation();
@@ -372,7 +319,7 @@ export default function BillingPage() {
   const showPortal = paid;
 
   return (
-    <Shell wide>
+    <Shell rail>
       <div className="twin-billing-surface">
         <div className="twin-app-read-pane mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0 max-w-2xl">
@@ -542,10 +489,7 @@ export default function BillingPage() {
               ) : null}
             </div>
           ) : null}
-          {!plans.checkout_configured ? (
-            <p className="mt-4 text-sm leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.billingNotConfigured")}</p>
-          ) : null}
-          <div className="twin-billing-plans-grid mt-6">
+          <div className="mt-6 flex w-full min-w-0 flex-col gap-4 sm:gap-5">
             {plans.plans.length === 0 ? (
               <div className="rounded-xl border border-dashed border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/60 p-4 text-sm text-[var(--twin-muted-strong)]">
                 {t("dashboard.billingPlansEmpty")}
@@ -554,30 +498,82 @@ export default function BillingPage() {
               plans.plans.map((p) => {
                 const tier = (me?.plan_tier ?? "free").toLowerCase();
                 const isCurrent = me != null && tier === p.id;
-                const { label, hint, actionable } = planCtaLabels(p, plans, isCurrent, paid, t);
+                const canOpenWorkspace = p.id === "free" && !isCurrent;
+                const canCheckoutPremium = !paid && p.id === "premium" && plans.checkout_configured;
+                const canCheckoutPro = !paid && p.id === "pro" && plans.checkout_configured && p.stripe_price_configured;
+                const actionable = canOpenWorkspace || canCheckoutPremium || canCheckoutPro;
                 const disabled = busy !== null || isCurrent || !actionable;
+                let footerKey: TranslationKey = "dashboard.billingPlanCurrent";
+                if (!isCurrent) {
+                  if (p.id === "free") footerKey = "dashboard.billingPlanOpenWorkspace";
+                  else if (p.id === "premium")
+                    footerKey = plans.checkout_configured ? "dashboard.billingUpgradePremium" : "dashboard.billingNotConfigured";
+                  else if (p.id === "pro") {
+                    if (!plans.checkout_configured) footerKey = "dashboard.billingNotConfigured";
+                    else if (!p.stripe_price_configured) footerKey = "dashboard.billingPlanProPending";
+                    else footerKey = "dashboard.billingUpgradePro";
+                  }
+                }
 
                 return (
-                  <BillingPlanTierCard
-                    key={p.id}
-                    plan={p}
-                    displayName={planDisplayName(p, t)}
-                    busy={busy}
-                    footerLabel={label}
-                    buttonHint={hint}
-                    t={t}
-                    disabled={disabled}
-                    isCurrent={isCurrent}
-                    onPrimary={() => {
-                      if (busy !== null || disabled) return;
-                      if (p.id === "free") {
-                        router.push("/dashboard");
-                        return;
-                      }
-                      if (p.id === "premium") void startCheckout("premium");
-                      if (p.id === "pro") void startCheckout("pro");
-                    }}
-                  />
+                  <div key={p.id} className="min-w-0 w-full">
+                    <button
+                      type="button"
+                      disabled={disabled}
+                      onClick={() => {
+                        if (busy !== null) return;
+                        if (isCurrent) return;
+                        if (canOpenWorkspace) {
+                          router.push("/dashboard");
+                          return;
+                        }
+                        if (canCheckoutPremium) void startCheckout("premium");
+                        if (canCheckoutPro) void startCheckout("pro");
+                      }}
+                      className={`twin-billing-plan-card flex w-full min-w-0 max-w-none flex-col self-stretch rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] p-4 text-left transition sm:p-5 ${
+                        actionable && busy === null
+                          ? "cursor-pointer hover:border-[var(--twin-accent)] hover:shadow-[0_0_0_1px_var(--twin-accent-muted)] focus-visible:outline focus-visible:ring-2 focus-visible:ring-[var(--twin-accent)]/35"
+                          : ""
+                      } ${disabled && !isCurrent ? "opacity-75" : ""} ${isCurrent ? "ring-2 ring-[var(--twin-accent-muted)]" : ""}`}
+                    >
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-4">
+                            <p className="text-lg font-semibold capitalize text-[var(--foreground)]">{p.name}</p>
+                            <p className="text-2xl font-bold tracking-tight text-[var(--twin-accent)] sm:text-3xl">
+                              {formatUsdListMonthly(p.monthly_list_price_usd)}
+                              <span className="ml-1.5 text-sm font-medium text-[var(--twin-muted-strong)]">
+                                {t("dashboard.billingPerMonth")}
+                              </span>
+                            </p>
+                          </div>
+                          <p className="mt-2 text-sm leading-relaxed text-[var(--twin-muted-strong)]">{p.description}</p>
+                          <p className="mt-2 text-xs text-[var(--twin-muted)]">
+                            {p.max_tracked_applications != null
+                              ? t("dashboard.billingTrackedCap").replace("{n}", String(p.max_tracked_applications))
+                              : t("dashboard.billingTrackedUnlimited")}
+                          </p>
+                        </div>
+                        <div className="flex shrink-0 flex-col items-start gap-1 sm:items-end">
+                          <span
+                            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                              isCurrent
+                                ? "bg-[var(--twin-accent-muted)] text-[var(--twin-accent-hover)]"
+                                : actionable
+                                  ? "bg-[var(--twin-cta)] text-[var(--twin-on-cta)]"
+                                  : "bg-[var(--twin-surface)] text-[var(--twin-muted-strong)]"
+                            }`}
+                          >
+                            {busy === "checkout-premium" && p.id === "premium"
+                              ? "…"
+                              : busy === "checkout-pro" && p.id === "pro"
+                                ? "…"
+                                : t(footerKey)}
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
                 );
               })
             )}

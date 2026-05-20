@@ -115,6 +115,11 @@ class Settings(BaseSettings):
     # When true, Celery Beat runs scrape-all once per day at scrape_beat_hour_utc (requires celery beat process).
     scrape_beat_enabled: bool = False
     scrape_beat_hour_utc: int = 5
+    # Set SCRAPE_WORKER_READY=true on API when a separate Celery worker service is deployed (non-eager mode).
+    scrape_worker_ready: bool = False
+    # Daily placement retention sweep on Celery beat (log-only MVP; see placement_tasks).
+    placement_retention_beat_enabled: bool = True
+    placement_retention_beat_hour_utc: int = 6
     # Max jobs considered per find_top_matches scan (newest validated first).
     match_jobs_scan_limit: int = 4000
     # When true, use ``job_matching_v2`` (salary overlap bonus on top of v1 rules).

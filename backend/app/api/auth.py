@@ -12,7 +12,7 @@ from slowapi.util import get_remote_address
 
 from app.config import get_settings
 from app.core.deps import get_current_user
-from app.core.scrape_ops import scrape_ops_configured, user_has_scrape_ops
+from app.core.scrape_ops import scrape_ops_configured, scrape_worker_ready, user_has_scrape_ops
 from app.core.security import create_access_token, hash_password, verify_password
 from app.database.models import User
 from app.database.session import get_db
@@ -321,6 +321,7 @@ def me(user: User = Depends(get_current_user), db: Session = Depends(get_db)) ->
         update={
             "scrape_ops_configured": scrape_ops_configured(settings),
             "can_trigger_scrape": user_has_scrape_ops(user, settings),
+            "scrape_worker_ready": scrape_worker_ready(settings),
             "mail_configured": is_mail_configured(settings),
             "google_calendar_oauth_configured": is_google_calendar_oauth_configured(),
             "microsoft_calendar_oauth_configured": is_microsoft_calendar_oauth_configured(),

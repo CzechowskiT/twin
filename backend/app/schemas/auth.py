@@ -111,6 +111,7 @@ class UserOut(BaseModel):
     profile_documents_processing_consent_at: datetime | None = None
     scrape_ops_configured: bool = False
     can_trigger_scrape: bool = False
+    scrape_worker_ready: bool = False
     mail_configured: bool = False
     google_calendar_oauth_configured: bool = False
     microsoft_calendar_oauth_configured: bool = False

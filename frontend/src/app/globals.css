@@ -202,169 +202,29 @@ body {
 }
 
 /**
- * Billing: `body` uses justified + hyphenated prose; plan cards use a dedicated grid + BEM
- * so paid tiers never collapse into a single-character column beside long CTAs.
+ * Billing: `body` uses justified + hyphenated prose; plan copy must wrap normally.
  */
-.twin-billing-surface,
-.twin-billing-surface * {
+.twin-billing-surface {
   text-align: start !important;
-  hyphens: none !important;
-  -webkit-hyphens: none !important;
+  hyphens: manual !important;
+  -webkit-hyphens: manual !important;
   text-wrap: wrap !important;
-  word-break: normal !important;
-  overflow-wrap: break-word;
 }
 
-.twin-billing-plans-grid {
-  display: grid;
-  width: 100%;
-  min-width: 0;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 1rem;
-}
-
-@media (min-width: 768px) {
-  .twin-billing-plans-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.25rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .twin-billing-plans-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-.twin-billing-plan-card {
-  display: flex;
-  flex-direction: column;
+.twin-billing-surface .twin-billing-plan-card {
   align-self: stretch;
   width: 100%;
   min-width: 0;
   max-width: none;
-  min-height: 100%;
-  padding: 1.25rem 1.35rem;
-  border-radius: 1rem;
-  border: 1px solid var(--twin-border);
-  background: var(--twin-surface-raised);
-  box-shadow: var(--twin-shadow-md);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-@media (min-width: 640px) {
-  .twin-billing-plan-card {
-    padding: 1.5rem 1.65rem;
-  }
-}
-
-.twin-billing-plan-card:hover {
-  border-color: color-mix(in srgb, var(--twin-accent) 45%, var(--twin-border));
-}
-
-.twin-billing-plan-card--current {
-  border-color: var(--twin-accent);
-  box-shadow:
-    0 0 0 1px var(--twin-accent-muted),
-    var(--twin-shadow-md);
-}
-
-.twin-billing-plan-card--muted {
-  opacity: 0.9;
-}
-
-.twin-billing-plan-card__head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.5rem 0.75rem;
-  margin-bottom: 1rem;
-}
-
-.twin-billing-plan-card__title {
-  margin: 0;
-  font-size: 1.125rem;
-  font-weight: 700;
-  line-height: 1.3;
-  letter-spacing: -0.02em;
-  color: var(--foreground);
-}
-
-.twin-billing-plan-card__badge {
-  flex-shrink: 0;
-  border-radius: 9999px;
-  background: var(--twin-accent-muted);
-  padding: 0.25rem 0.65rem;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--twin-accent-hover);
-}
-
-.twin-billing-plan-card__price {
-  display: block;
-  margin: 0 0 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--twin-border);
-}
-
-.twin-billing-plan-card__amount {
-  display: block;
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 1.1;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.03em;
-  color: var(--twin-accent);
-}
-
-@media (min-width: 640px) {
-  .twin-billing-plan-card__amount {
-    font-size: 2.25rem;
-  }
-}
-
-.twin-billing-plan-card__period {
-  display: block;
-  margin-top: 0.35rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  line-height: 1.35;
-  color: var(--twin-muted-strong);
-}
-
-.twin-billing-plan-card__desc {
-  flex: 1 1 auto;
-  margin: 0 0 0.75rem;
-  font-size: 0.9375rem;
-  line-height: 1.55;
-  color: var(--twin-muted-strong);
-}
-
-.twin-billing-plan-card__meta {
-  margin: 0 0 1.25rem;
-  font-size: 0.75rem;
-  line-height: 1.45;
-  color: var(--twin-muted);
-}
-
-.twin-billing-plan-card__cta {
-  margin-top: auto;
-  width: 100%;
-}
-
-.twin-billing-plan-card__btn {
-  display: block !important;
-  width: 100% !important;
-  max-width: none !important;
-  min-height: 2.75rem;
-  height: auto !important;
-  padding: 0.65rem 1rem !important;
-  white-space: normal !important;
-  text-align: center !important;
-  line-height: 1.35 !important;
+.twin-billing-surface .twin-billing-plan-card p {
+  hyphens: none;
+  -webkit-hyphens: none;
+  word-break: normal;
+  overflow-wrap: break-word;
+  text-align: start;
+  text-wrap: wrap;
 }
 
 button,

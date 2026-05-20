@@ -16,6 +16,7 @@ export function useWaitlistStats() {
   const [stats, setStats] = useState<BetaStats | null>(null);
   const [leaderboard, setLeaderboard] = useState<BetaLeaderboardEntry[]>(DEMO_LEADERBOARD);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let alive = true;
@@ -28,6 +29,8 @@ export function useWaitlistStats() {
         setError(null);
       } catch (e: unknown) {
         if (alive) setError(e instanceof Error ? e.message : "Stats unavailable");
+      } finally {
+        if (alive) setLoading(false);
       }
     };
     void load();
@@ -44,5 +47,5 @@ export function useWaitlistStats() {
   const total = stats?.total_signups ?? cap - spotsRemaining;
   const statsLive = stats !== null;
 
-  return { stats, leaderboard, error, spotsRemaining, signupsToday, cap, total, statsLive };
+  return { stats, leaderboard, error, loading, spotsRemaining, signupsToday, cap, total, statsLive };
 }
