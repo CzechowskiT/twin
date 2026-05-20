@@ -35,6 +35,7 @@ export type BetaJoinResult = {
   priority_points: number;
   spots_left: number;
   total_signups: number;
+  welcome_email_sent?: boolean;
 };
 
 export type BetaDashboard = {
@@ -90,6 +91,7 @@ export async function betaJoin(body: {
   name?: string;
   referred_by?: string | null;
   source?: string;
+  locale?: string;
   accept_privacy_notice: true;
   consent_beta_email_updates: true;
 }): Promise<BetaJoinResult> {
@@ -104,6 +106,7 @@ export async function betaJoin(body: {
       name: body.name || null,
       referred_by: body.referred_by || null,
       source: body.source || "email",
+      locale: body.locale || null,
       accept_privacy_notice: true,
       consent_beta_email_updates: true,
     }),

@@ -87,14 +87,14 @@ export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
 
         <section aria-labelledby="persona-pricing">
           <h2 id="persona-pricing" className="twin-section-title text-lg sm:text-xl">
-            {t("persona.sectionPricing")}
+            {c.pricingTitle}
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[var(--twin-muted-strong)] sm:text-base">{c.pricingLead}</p>
-          <ul className="mt-8 grid gap-5 lg:grid-cols-3">
+          <ul className="mt-8 grid items-stretch gap-5 lg:grid-cols-3">
             {c.tiers.map((tier) => (
               <li
                 key={tier.id}
-                className={`flex flex-col rounded-2xl border p-5 sm:p-6 ${
+                className={`flex min-h-0 flex-col rounded-2xl border p-5 sm:p-6 ${
                   tier.highlight
                     ? "border-[var(--twin-accent)] bg-[var(--twin-accent-muted)]/35 shadow-[0_12px_40px_rgb(25_60_50_/0.12)]"
                     : "border-[var(--twin-border)] bg-[var(--twin-card)]/70"
@@ -103,13 +103,35 @@ export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
                 <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">{tier.name}</p>
                 <p className="mt-3 text-3xl font-semibold tracking-tight text-[var(--foreground)]">{tier.price}</p>
                 <p className="text-sm text-[var(--twin-muted-strong)]">{tier.cadence}</p>
-                <ul className="mt-4 flex-1 space-y-2 text-sm text-[var(--twin-muted-strong)]">
-                  {tier.bullets.map((b) => (
-                    <li key={b} className="flex gap-2">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--twin-accent)]" aria-hidden />
-                      <span>{b}</span>
-                    </li>
-                  ))}
+                {tier.quotaSummary ? (
+                  <p className="mt-2 text-xs font-medium leading-snug text-[var(--twin-accent)]">{tier.quotaSummary}</p>
+                ) : null}
+                <ul
+                  className={`mt-4 flex-1 space-y-2 ${
+                    tier.bullets.length > 6 ? "text-xs leading-relaxed" : "text-sm"
+                  } text-[var(--twin-muted-strong)]`}
+                >
+                  {tier.bullets.map((b, idx) => {
+                    const isIncludes = /^(Everything in|Wszystko z|Wszystko ze)/i.test(b);
+                    return (
+                      <li
+                        key={`${tier.id}-${idx}`}
+                        className={isIncludes ? "font-semibold text-[var(--foreground)]" : "flex gap-2"}
+                      >
+                        {isIncludes ? (
+                          <span>{b}</span>
+                        ) : (
+                          <>
+                            <span
+                              className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--twin-accent)]"
+                              aria-hidden
+                            />
+                            <span>{b}</span>
+                          </>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
                 <Link
                   href={tier.href}

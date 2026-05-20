@@ -29,6 +29,9 @@ def test_send_welcome_when_mail_configured(mock_send: MagicMock) -> None:
     assert kwargs["to_email"] == "a@b.com"
     assert "deadbeef" in kwargs["text_body"]
     assert "beta/dashboard?code=deadbeef" in kwargs["text_body"]
+    assert "#42" in kwargs["html_body"]
+    assert "waitlist dashboard" in kwargs["html_body"].lower()
+    assert "TWIN" in kwargs["html_body"]
 
 
 @patch("app.services.beta_waitlist_mail.send_generic_email")

@@ -3,17 +3,21 @@
 export const betaEmailSequence = [
   {
     day: 0,
-    subject: "You're on the TWIN beta waitlist — here's what happens next",
-    text: `You're in.
+    subject: "You're in — waitlist {{position}} · one link moves you up",
+    text: `You're on the TWIN waitlist.
 
-Next steps:
-1) Open your dashboard and copy your referral link.
-2) Optional: upload a CV for an instant top-3 preview from live scraped jobs.
-3) Optional: record a short voice note so we can tune matching later.
+Your spot: about {{position}}
 
-Your spot moves up when friends join via your link.
+While you wait, TWIN ranks roles for an acceptance-ready pipeline — not random interview spam.
 
-Dashboard: {{link}}`,
+Next (≈2 min):
+1) Dashboard + referral link: {{link}}
+2) Share your link — each friend bumps your priority
+3) Optional: CV preview from live scraped boards (dashboard)
+
+Tip: LinkedIn featured section — referrals compound.
+
+— TWIN Career Agent`,
   },
   {
     day: 2,

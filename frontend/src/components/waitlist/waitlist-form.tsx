@@ -14,6 +14,7 @@ import { fetchOpsHealth } from "@/lib/ops-health";
 import { betaJoin, BETA_REFERRAL_STORAGE_KEY, type BetaJoinResult } from "@/lib/beta-api";
 import { betaDashboardUrl } from "@/lib/waitlist/deep-links";
 import { formatWaitlist } from "@/lib/waitlist-messages";
+import { useTranslation } from "@/components/language-provider";
 import { useWaitlistCopy } from "@/lib/waitlist/use-waitlist-copy";
 import { safeStorage } from "@/lib/safe-storage";
 
@@ -35,6 +36,7 @@ function WaitlistFormInner({
   compact?: boolean;
 }) {
   const copy = useWaitlistCopy();
+  const { locale } = useTranslation();
   const searchParams = useSearchParams();
   const [busy, setBusy] = useState(false);
   const [join, setJoin] = useState<BetaJoinResult | null>(null);
@@ -69,6 +71,7 @@ function WaitlistFormInner({
         email: data.email,
         referred_by: ref,
         source: "waitlist",
+        locale: locale === "pl" ? "pl" : "en",
         accept_privacy_notice: true,
         consent_beta_email_updates: true,
       });
@@ -127,7 +130,9 @@ function WaitlistFormInner({
           ) : null}
         </div>
         <p className="mt-4 text-sm text-[var(--wl-text-secondary)]">{copy.formReferralHint}</p>
-        {mailConfigured === false ? (
+        {join.welcome_email_sent ? (
+          <p className="mt-3 text-sm text-emerald-300/95">{copy.formWelcomeMailSent}</p>
+        ) : mailConfigured === false ? (
           <p className="mt-3 text-sm text-amber-300/90">{copy.formWelcomeMailDeferred}</p>
         ) : null}
         <Link

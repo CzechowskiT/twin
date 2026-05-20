@@ -10,6 +10,7 @@ class BetaJoinIn(BaseModel):
     name: str | None = Field(default=None, max_length=255)
     referred_by: str | None = Field(default=None, max_length=32, description="Referrer referral_code")
     source: str = Field(default="email", max_length=32)
+    locale: str | None = Field(default=None, max_length=8, description="en or pl for welcome email copy")
     accept_privacy_notice: bool = Field(description="Privacy notice for waitlist data")
     consent_beta_email_updates: bool = Field(description="Email about queue position and beta")
 
@@ -20,6 +21,7 @@ class BetaJoinOut(BaseModel):
     priority_points: int
     spots_left: int
     total_signups: int
+    welcome_email_sent: bool = False
 
 
 class BetaProfileUpdate(BaseModel):

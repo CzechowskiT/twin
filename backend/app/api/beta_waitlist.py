@@ -248,6 +248,7 @@ def beta_join(body: BetaJoinIn, db: Session = Depends(get_db), settings: Setting
             priority_points=existing.priority_points,
             spots_left=max(0, settings.beta_waitlist_cap - n),
             total_signups=n,
+            welcome_email_sent=False,
         )
     code = _new_referral_code(db)
     ref_in = _slug_code(body.referred_by) if body.referred_by else None
@@ -266,11 +267,13 @@ def beta_join(body: BetaJoinIn, db: Session = Depends(get_db), settings: Setting
     db.refresh(row)
     n2 = int(db.query(func.count(BetaWaitlist.id)).scalar() or 0)
     pos = _queue_position(db, row)
-    send_beta_waitlist_welcome_email(
+    locale = (body.locale or "en").strip().lower()[:8]
+    mail_sent = send_beta_waitlist_welcome_email(
         settings,
         to_email=row.email,
         referral_code=row.referral_code,
         position=pos,
+        locale=locale,
     )
     return BetaJoinOut(
         referral_code=row.referral_code,
@@ -278,6 +281,7 @@ def beta_join(body: BetaJoinIn, db: Session = Depends(get_db), settings: Setting
         priority_points=row.priority_points,
         spots_left=max(0, settings.beta_waitlist_cap - n2),
         total_signups=n2,
+        welcome_email_sent=mail_sent,
     )
 
 

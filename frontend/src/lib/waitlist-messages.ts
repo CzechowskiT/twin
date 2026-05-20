@@ -61,6 +61,7 @@ export type WaitlistCopyBase = {
   formShare: string;
   formReferralHint: string;
   formWelcomeMailDeferred: string;
+  formWelcomeMailSent: string;
   formOpenDashboard: string;
   formErrorGeneric: string;
   validationEmail: string;
@@ -196,6 +197,7 @@ const en: WaitlistCopyBase = {
   formReferralHint: "Invite friends — each person moves you up the queue.",
   formWelcomeMailDeferred:
     "Welcome email may be delayed — the API mail provider is not configured yet. You are still on the list.",
+  formWelcomeMailSent: "Check your inbox — we sent a welcome email with your dashboard link and referral code.",
   formOpenDashboard: "Open waitlist panel",
   formErrorGeneric: "Something went wrong. Try again.",
   validationEmail: "Invalid email address",
@@ -328,6 +330,8 @@ const pl: WaitlistCopyBase = {
   formReferralHint: "Zaproś znajomych — każda osoba = wyższa pozycja na liście.",
   formWelcomeMailDeferred:
     "Mail powitalny może przyjść później — dostawca maili na API nie jest jeszcze skonfigurowany. Jesteś na liście.",
+  formWelcomeMailSent:
+    "Sprawdź skrzynkę — wysłaliśmy mail powitalny z linkiem do panelu i kodem polecającym.",
   formOpenDashboard: "Otwórz panel waitlisty",
   formErrorGeneric: "Wystąpił błąd. Spróbuj ponownie.",
   validationEmail: "Nieprawidłowy adres email",
