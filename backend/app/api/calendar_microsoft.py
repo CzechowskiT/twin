@@ -92,6 +92,7 @@ def _ms_busy_as_google_fb(access_token: str, time_min: str, time_max: str, tz: s
 class MicrosoftCalendarStatusOut(BaseModel):
     connected: bool
     microsoft_email: str | None = None
+    oauth_configured: bool = False
 
 
 class MicrosoftCalendarAuthorizeOut(BaseModel):
@@ -103,10 +104,15 @@ def microsoft_calendar_status(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> MicrosoftCalendarStatusOut:
+    oauth_configured = is_microsoft_calendar_oauth_configured()
     row = db.query(UserMicrosoftCalendar).filter(UserMicrosoftCalendar.user_id == current_user.id).first()
     if not row:
-        return MicrosoftCalendarStatusOut(connected=False)
-    return MicrosoftCalendarStatusOut(connected=True, microsoft_email=row.microsoft_email)
+        return MicrosoftCalendarStatusOut(connected=False, oauth_configured=oauth_configured)
+    return MicrosoftCalendarStatusOut(
+        connected=True,
+        microsoft_email=row.microsoft_email,
+        oauth_configured=oauth_configured,
+    )
 
 
 @router.get("/microsoft/authorize", response_model=MicrosoftCalendarAuthorizeOut)

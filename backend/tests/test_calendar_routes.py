@@ -356,3 +356,62 @@ def test_google_calendar_list_interviews_include_cancelled(client: TestClient) -
         app.dependency_overrides.pop(get_current_user, None)
         app.dependency_overrides.pop(get_db, None)
         db.close()
+
+
+def _sqlite_calendar_session():
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+    db = Session()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+@patch("app.api.calendar.is_google_calendar_oauth_configured", return_value=False)
+def test_google_calendar_status_reports_oauth_configured(_mock: MagicMock, client: TestClient) -> None:
+    from app.core.deps import get_current_user
+
+    def _user() -> User:
+        u = User(email="cal@twin.test", hashed_password=None)
+        u.id = 1
+        return u
+
+    app.dependency_overrides[get_current_user] = _user
+    app.dependency_overrides[get_db] = _sqlite_calendar_session
+    try:
+        res = client.get("/api/v1/calendar/google/status")
+        assert res.status_code == 200
+        data = res.json()
+        assert data["connected"] is False
+        assert data["oauth_configured"] is False
+    finally:
+        app.dependency_overrides.pop(get_current_user, None)
+        app.dependency_overrides.pop(get_db, None)
+
+
+@patch("app.api.calendar_microsoft.is_microsoft_calendar_oauth_configured", return_value=True)
+def test_microsoft_calendar_status_reports_oauth_configured(_mock: MagicMock, client: TestClient) -> None:
+    from app.core.deps import get_current_user
+
+    def _user() -> User:
+        u = User(email="ms@twin.test", hashed_password=None)
+        u.id = 2
+        return u
+
+    app.dependency_overrides[get_current_user] = _user
+    app.dependency_overrides[get_db] = _sqlite_calendar_session
+    try:
+        res = client.get("/api/v1/calendar/microsoft/status")
+        assert res.status_code == 200
+        data = res.json()
+        assert data["connected"] is False
+        assert data["oauth_configured"] is True
+    finally:
+        app.dependency_overrides.pop(get_current_user, None)
+        app.dependency_overrides.pop(get_db, None)

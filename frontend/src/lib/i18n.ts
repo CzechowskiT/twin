@@ -637,6 +637,10 @@ const en = {
     calendarProviderMicrosoftBody:
       "Microsoft Graph Calendar for Exchange Online — connect Outlook or Microsoft 365 to read busy time and place interview holds.",
     calendarConnectMicrosoft: "Connect Microsoft 365 / Outlook",
+    calendarMicrosoftOAuthNotConfigured:
+      "Microsoft Calendar is not wired on this server yet. Add MICROSOFT_CLIENT_ID, MICROSOFT_CLIENT_SECRET, and MICROSOFT_CALENDAR_REDIRECT_URI on the API host (Railway), then redeploy.",
+    calendarGoogleOAuthNotConfigured:
+      "Google Calendar OAuth is not configured on this server yet. Add Google Calendar client credentials on the API host, then redeploy.",
     calendarDisconnectMicrosoft: "Disconnect Microsoft",
     calendarMicrosoftConnectedAs: "Microsoft account",
     calendarWebcalTitle: "Subscribe in any calendar app",
@@ -1991,6 +1995,10 @@ const pl: MessageTree = {
     calendarProviderMicrosoftBody:
       "Microsoft Graph Calendar dla Exchange Online — połącz Outlook lub Microsoft 365, żeby widzieć zajętość i stawiać sloty rozmów.",
     calendarConnectMicrosoft: "Połącz Microsoft 365 / Outlook",
+    calendarMicrosoftOAuthNotConfigured:
+      "Kalendarz Microsoft nie jest jeszcze podłączony na serwerze. Ustaw MICROSOFT_CLIENT_ID, MICROSOFT_CLIENT_SECRET i MICROSOFT_CALENDAR_REDIRECT_URI na API (Railway) i zrób redeploy.",
+    calendarGoogleOAuthNotConfigured:
+      "OAuth Google Calendar nie jest skonfigurowany na serwerze. Dodaj dane klienta Google na hoście API i zrób redeploy.",
     calendarDisconnectMicrosoft: "Odłącz Microsoft",
     calendarMicrosoftConnectedAs: "Konto Microsoft",
     calendarWebcalTitle: "Subskrypcja w dowolnym kalendarzu",

@@ -12,11 +12,13 @@ import { clearToken, getToken } from "@/lib/auth";
 type CalendarStatus = {
   connected: boolean;
   google_email: string | null;
+  oauth_configured?: boolean;
 };
 
 type MicrosoftCalendarStatus = {
   connected: boolean;
   microsoft_email: string | null;
+  oauth_configured?: boolean;
 };
 
 type AuthorizePayload = { authorize_url: string };
@@ -182,7 +184,11 @@ export default function DashboardCalendarPage() {
       }
       const s = calRes.value;
       setStatus(s);
-      setMsStatus(msRes.status === "fulfilled" ? msRes.value : { connected: false, microsoft_email: null });
+      setMsStatus(
+        msRes.status === "fulfilled"
+          ? msRes.value
+          : { connected: false, microsoft_email: null, oauth_configured: false },
+      );
       if (meRes.status === "fulfilled") {
         setEmailProductUpdates(Boolean(meRes.value.email_product_updates));
         setEmailInterviewReminders(Boolean(meRes.value.email_interview_reminders));
@@ -693,6 +699,10 @@ export default function DashboardCalendarPage() {
                     {actionBusy === "disconnect" ? "…" : t("dashboard.calendarDisconnect")}
                   </Button>
                 </>
+              ) : status?.oauth_configured === false ? (
+                <p className="mt-3 text-sm text-amber-700 dark:text-amber-300">
+                  {t("dashboard.calendarGoogleOAuthNotConfigured")}
+                </p>
               ) : (
                 <Button
                   type="button"
@@ -722,6 +732,10 @@ export default function DashboardCalendarPage() {
                     {actionBusy === "ms-disconnect" ? "…" : t("dashboard.calendarDisconnectMicrosoft")}
                   </Button>
                 </>
+              ) : msStatus?.oauth_configured === false ? (
+                <p className="mt-3 text-sm text-amber-700 dark:text-amber-300">
+                  {t("dashboard.calendarMicrosoftOAuthNotConfigured")}
+                </p>
               ) : (
                 <Button
                   type="button"
@@ -987,20 +1001,32 @@ export default function DashboardCalendarPage() {
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="rounded-xl border border-[var(--twin-border)] p-4">
             <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.calendarNotConnected")}</p>
-            <Button type="button" className="twin-touch-target mt-3" disabled={Boolean(actionBusy)} onClick={() => void connect()}>
-              {actionBusy === "connect" ? "…" : t("dashboard.calendarConnect")}
-            </Button>
+            {status?.oauth_configured === false ? (
+              <p className="mt-3 text-sm text-amber-700 dark:text-amber-300">
+                {t("dashboard.calendarGoogleOAuthNotConfigured")}
+              </p>
+            ) : (
+              <Button type="button" className="twin-touch-target mt-3" disabled={Boolean(actionBusy)} onClick={() => void connect()}>
+                {actionBusy === "connect" ? "…" : t("dashboard.calendarConnect")}
+              </Button>
+            )}
           </div>
           <div className="rounded-xl border border-[var(--twin-border)] p-4">
             <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.calendarProviderMicrosoftBody")}</p>
-            <Button
-              type="button"
-              className="twin-touch-target mt-3"
-              disabled={Boolean(actionBusy)}
-              onClick={() => void connectMicrosoft()}
-            >
-              {actionBusy === "ms-connect" ? "…" : t("dashboard.calendarConnectMicrosoft")}
-            </Button>
+            {msStatus?.oauth_configured === false ? (
+              <p className="mt-3 text-sm text-amber-700 dark:text-amber-300">
+                {t("dashboard.calendarMicrosoftOAuthNotConfigured")}
+              </p>
+            ) : (
+              <Button
+                type="button"
+                className="twin-touch-target mt-3"
+                disabled={Boolean(actionBusy)}
+                onClick={() => void connectMicrosoft()}
+              >
+                {actionBusy === "ms-connect" ? "…" : t("dashboard.calendarConnectMicrosoft")}
+              </Button>
+            )}
           </div>
         </div>
       )}

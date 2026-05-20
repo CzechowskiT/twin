@@ -79,6 +79,7 @@ def _calendar_access_token(db: Session, user_id: int) -> str:
 class CalendarStatusOut(BaseModel):
     connected: bool
     google_email: str | None = None
+    oauth_configured: bool = False
 
 
 class CalendarAuthorizeOut(BaseModel):
@@ -128,10 +129,15 @@ def google_calendar_status(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> CalendarStatusOut:
+    oauth_configured = is_google_calendar_oauth_configured()
     row = db.query(UserGoogleCalendar).filter(UserGoogleCalendar.user_id == current_user.id).first()
     if not row:
-        return CalendarStatusOut(connected=False)
-    return CalendarStatusOut(connected=True, google_email=row.google_email)
+        return CalendarStatusOut(connected=False, oauth_configured=oauth_configured)
+    return CalendarStatusOut(
+        connected=True,
+        google_email=row.google_email,
+        oauth_configured=oauth_configured,
+    )
 
 
 @router.get("/google/authorize", response_model=CalendarAuthorizeOut)
