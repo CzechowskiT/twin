@@ -292,7 +292,8 @@ const en = {
       "The board list in the dashboard and this action respect SCRAPE_ENABLED_BOARD_IDS on the API (empty = all boards). This button queues a Celery scrape-all job and returns immediately so hosted dashboards do not hit proxy timeouts.",
     scrapingAll: "Auto scrap running…",
     scraping: "Scraping…",
-    keepApiOpen: "Celery workers and Redis must be running on the API host; refresh the job list after a minute or two.",
+    keepApiOpen:
+      "Celery workers and Redis must be running on the API host; the feed refreshes itself while scraping runs.",
     lastUpdated: "Last updated",
     regionPoland: "Poland",
     regionEurope: "Europe",
@@ -407,7 +408,8 @@ const en = {
     scrapeUpstreamHint:
       "The Twin website could not reach your API from Vercel’s servers. Open Vercel → your project → Settings → Environment Variables: set **TWIN_API_BASE_URL** (best: server-only) or **NEXT_PUBLIC_API_URL** to your Railway API URL (`https://…up.railway.app` with **no** trailing slash), save, then **Redeploy** the frontend. In Railway, open the API service and confirm it is **Active** and the latest deploy succeeded — then **Redeploy** the API too. After that, hard-refresh this page (Cmd+Shift+R / Ctrl+Shift+R).",
     scrapeQueued:
-      "Scrape started. This page refreshes the job list every few seconds until counts stabilize — you do not need to reload manually (waits up to about 25 minutes while workers run).",
+      "Scrape started. The job list below updates on its own every few seconds — scroll to “Job feed” or watch the counter; no manual reload needed.",
+    scrapeRefreshingBanner: "Refreshing listings… {n} in your feed so far. New rows appear automatically.",
     scrapeFinished: "Scrape finished",
     scrapeRefreshFailed:
       "Scrape was queued, but refreshing the dashboard failed (details below). Try reloading the page in a minute.",
@@ -441,6 +443,7 @@ const en = {
     twinForYourJobHint:
       "Queues the full TWIN board registry (Poland: pracuj.pl, rocketjobs.pl, justjoin.it, praca.pl; then LinkedIn; then global boards such as Indeed, Glassdoor, StepStone, Reed, SEEK, …). Respect SCRAPE_ENABLED_BOARD_IDS on the API to trim the list. On a single Railway API without Redis, scraping runs in-process (no separate worker). With Redis + workers, tasks queue in Celery.",
     twinForYourJobRunning: "Twin for your job is running…",
+    twinForYourJobRefreshing: "Refreshing your feed…",
     roadmapSummary: "Target job boards & company career sites (roadmap)",
     roadmapPortalsTitle: "50 global job boards",
     roadmapCompaniesTitle: "Top employers (careers pages)",
@@ -1634,7 +1637,8 @@ const pl: MessageTree = {
       "Lista portali w panelu i to polecenie respektują SCRAPE_ENABLED_BOARD_IDS na API (puste = wszystkie). Przycisk kolejkuje zadanie Celery (scrape-all) i od razu wraca — hostowany panel nie wpada w timeout proxy.",
     scrapingAll: "Trwa auto scrap…",
     scraping: "Pobieranie…",
-    keepApiOpen: "Na hoście API muszą działać worker Celery i Redis; odśwież listę ofert po chwili, gdy zadania się skończą.",
+    keepApiOpen:
+      "Na hoście API muszą działać worker Celery i Redis; feed odświeża się sam, dopóki trwa pobieranie.",
     lastUpdated: "Ostatnia aktualizacja",
     regionPoland: "Polska",
     regionEurope: "Europa",
@@ -1750,7 +1754,8 @@ const pl: MessageTree = {
     scrapeUpstreamHint:
       "Strona na Vercelu nie może połączyć się z Twoim API (Railway). Wejdź w Vercel → projekt → Settings → Environment Variables: ustaw **TWIN_API_BASE_URL** (najlepiej tylko serwer) albo **NEXT_PUBLIC_API_URL** na adres API z Railway (`https://…up.railway.app` **bez** ukośnika na końcu), zapisz i zrób **Redeploy** frontu. W Railway sprawdź, czy usługa API jest **Active** i ostatni deploy jest OK — zrób też **Redeploy** API. Potem twarde odświeżenie strony (Cmd+Shift+R / Ctrl+Shift+R).",
     scrapeQueued:
-      "Pobieranie uruchomione. Strona sama odświeża listę ofert co kilka sekund, aż licznik się ustabilizuje — nie musisz ręcznie przeładowywać (do ok. 25 min, dopóki działają workery).",
+      "Pobieranie uruchomione. Lista ofert poniżej odświeża się sama co kilka sekund — przewiń do feedu albo patrz na licznik; bez ręcznego przeładowania.",
+    scrapeRefreshingBanner: "Odświeżanie ofert… w feedzie jest już {n}. Nowe wiersze pojawiają się automatycznie.",
     scrapeFinished: "Pobieranie zakończone",
     scrapeRefreshFailed:
       "Pobieranie zostało zakolejkowane, ale odświeżenie panelu się nie powiodło (szczegóły poniżej). Za minutę odśwież stronę.",
@@ -1784,6 +1789,7 @@ const pl: MessageTree = {
     twinForYourJobHint:
       "Kolejkuje pełny rejestr TWIN (Polska: pracuj.pl, rocketjobs.pl, justjoin.it, praca.pl; potem LinkedIn; potem globalnie m.in. Indeed, Glassdoor, StepStone, Reed, SEEK). Listę można przyciąć przez SCRAPE_ENABLED_BOARD_IDS na API. Na jednym serwisie Railway bez Redis scraping działa w procesie API (bez osobnego workera). Z Redis + workerami zadania idą do Celery.",
     twinForYourJobRunning: "Twin for your job: trwa…",
+    twinForYourJobRefreshing: "Odświeżanie feedu…",
     roadmapSummary: "Docelowe portale i kariery firm (roadmapa)",
     roadmapPortalsTitle: "50 globalnych portali pracy",
     roadmapCompaniesTitle: "Najwięksi pracodawcy (strony kariery)",

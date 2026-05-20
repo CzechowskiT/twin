@@ -168,8 +168,18 @@ export default function DashboardPage() {
   const [titleFilterPrimed, setTitleFilterPrimed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [scraping, setScraping] = useState(false);
+  /** Background refresh after a queued scrape — button stays usable; feed updates on its own. */
+  const [scrapePollActive, setScrapePollActive] = useState(false);
   /** Stops background job-list polling when the dashboard unmounts or user leaves. */
   const scrapePollCancelRef = useRef(false);
+  const scrapePollMetaRef = useRef<{
+    baselineTotal: number;
+    pollFilters: JobFilters;
+    hasProfile: boolean;
+    startedAt: number;
+  } | null>(null);
+  const scrapePollStableRef = useRef({ prev: 0, ticks: 0 });
+  const scrapeListToastShownRef = useRef(false);
   const [autoApplyingId, setAutoApplyingId] = useState<number | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [showApplyPrompt, setShowApplyPrompt] = useState(false);
@@ -276,9 +286,14 @@ export default function DashboardPage() {
   }, []);
 
   const refreshDashboardData = useCallback(
-    async (token: string, hasProfile: boolean, activeFilters: JobFilters): Promise<number> => {
+    async (
+      token: string,
+      hasProfile: boolean,
+      activeFilters: JobFilters,
+      opts?: { light?: boolean },
+    ): Promise<number> => {
       void loadGoogleCalendarStrip(token);
-      if (hasProfile) setMatchesRefreshing(true);
+      if (hasProfile && !opts?.light) setMatchesRefreshing(true);
       let jobsTotal = 0;
       try {
         if (!hasProfile) {
@@ -299,7 +314,7 @@ export default function DashboardPage() {
         setDevFocus(focus);
         setLastUpdated(new Date());
       } finally {
-        if (hasProfile) setMatchesRefreshing(false);
+        if (hasProfile && !opts?.light) setMatchesRefreshing(false);
       }
       return jobsTotal;
     },
@@ -311,6 +326,109 @@ export default function DashboardPage() {
       scrapePollCancelRef.current = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!scrapePollActive) return;
+    const meta = scrapePollMetaRef.current;
+    if (!meta) return;
+
+    const intervalMs = 3000;
+    const maxMs = 12 * 60 * 1000;
+    const stableNeeded = 3;
+    const minStableMs = 8000;
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    const finishPoll = async (finalTotal: number) => {
+      if (cancelled) return;
+      setScrapePollActive(false);
+      scrapePollMetaRef.current = null;
+      const token = getToken();
+      if (!token) return;
+      try {
+        await refreshDashboardData(token, meta.hasProfile, meta.pollFilters);
+        router.refresh();
+      } catch {
+        /* ignore final sync errors */
+      }
+      if (!scrapeListToastShownRef.current) {
+        toast.success(t("dashboard.scrapePollFinalSyncToast").replace("{n}", String(finalTotal)));
+      }
+    };
+
+    const tick = async () => {
+      if (cancelled || scrapePollCancelRef.current) {
+        setScrapePollActive(false);
+        scrapePollMetaRef.current = null;
+        return;
+      }
+      if (Date.now() - meta.startedAt > maxMs) {
+        const token = getToken();
+        let finalTotal = scrapePollStableRef.current.prev;
+        if (token) {
+          try {
+            finalTotal = await refreshDashboardData(token, meta.hasProfile, meta.pollFilters, { light: true });
+          } catch {
+            /* use last known total */
+          }
+        }
+        await finishPoll(finalTotal);
+        return;
+      }
+
+      const token = getToken();
+      if (!token) {
+        setScrapePollActive(false);
+        scrapePollMetaRef.current = null;
+        return;
+      }
+
+      let total = scrapePollStableRef.current.prev;
+      try {
+        total = await refreshDashboardData(token, meta.hasProfile, meta.pollFilters, { light: true });
+      } catch {
+        timer = setTimeout(() => void tick(), intervalMs);
+        return;
+      }
+
+      if (total > meta.baselineTotal) {
+        if (!scrapeListToastShownRef.current) {
+          toast.success(t("dashboard.scrapeListUpdatedToast").replace("{n}", String(total)));
+          scrapeListToastShownRef.current = true;
+        }
+        queueMicrotask(() => {
+          document.getElementById("dashboard-jobs")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+
+      const stable = scrapePollStableRef.current;
+      if (total === stable.prev) {
+        stable.ticks += 1;
+      } else {
+        stable.prev = total;
+        stable.ticks = 0;
+      }
+
+      const elapsed = Date.now() - meta.startedAt;
+      const sawIncrease = total > meta.baselineTotal;
+      if (sawIncrease && stable.ticks >= stableNeeded && elapsed >= minStableMs) {
+        await finishPoll(total);
+        return;
+      }
+      if (total > 0 && stable.ticks >= stableNeeded + 2 && elapsed >= minStableMs) {
+        await finishPoll(total);
+        return;
+      }
+
+      timer = setTimeout(() => void tick(), intervalMs);
+    };
+
+    void tick();
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [scrapePollActive, refreshDashboardData, router, t]);
 
   const applicationByJobId = useMemo(() => {
     const map: Record<number, string> = {};
@@ -854,10 +972,17 @@ export default function DashboardPage() {
   async function triggerScrapeAll() {
     const token = getToken();
     if (!token) return;
-    const baselineTotal = jobs?.total ?? 0;
     const hasProf = profile !== null && profile !== undefined;
+    const pollFilters: JobFilters = { ...filters, title_terms: "" };
+    if (pollFilters.title_terms !== filters.title_terms) {
+      setFilters(pollFilters);
+      persistJobFilters(pollFilters);
+    }
+    const baselineTotal = jobs?.total ?? 0;
     setError(null);
     scrapePollCancelRef.current = false;
+    scrapeListToastShownRef.current = false;
+    scrapePollStableRef.current = { prev: baselineTotal, ticks: 0 };
     setScraping(true);
     try {
       const result = await apiFetch<{ message: string; task_id?: string }>(
@@ -869,60 +994,32 @@ export default function DashboardPage() {
       toast.success(queued ? t("dashboard.scrapeQueued") : result.message || t("dashboard.scrapeFinished"));
       if (hasProf) {
         setShowApplyPrompt(true);
-        queueMicrotask(() => {
-          document.getElementById("dashboard-matches")?.scrollIntoView({ behavior: "smooth", block: "start" });
-        });
       }
       try {
-        let lastTotal = await refreshDashboardData(token, hasProf, filters);
-        let scrapeListToastShown = false;
-        if (queued) {
-          const intervalMs = 4000;
-          const maxMs = 25 * 60 * 1000;
-          const stableNeeded = 5;
-          const minStableMs = 12_000;
-          const start = Date.now();
-          let stableTicks = 0;
-          let prev = lastTotal;
-          let sawIncrease = lastTotal > baselineTotal;
-
-          while (!scrapePollCancelRef.current && Date.now() - start < maxMs) {
-            await new Promise((r) => setTimeout(r, intervalMs));
-            if (scrapePollCancelRef.current) break;
-            try {
-              lastTotal = await refreshDashboardData(token, hasProf, filters);
-            } catch {
-              /* keep polling — transient API errors during long scrapes */
-              continue;
-            }
-            if (lastTotal > baselineTotal) sawIncrease = true;
-            if (lastTotal === prev) {
-              stableTicks += 1;
-            } else {
-              stableTicks = 0;
-              prev = lastTotal;
-            }
-            if (sawIncrease && stableTicks >= stableNeeded && Date.now() - start >= minStableMs) {
-              toast.success(t("dashboard.scrapeListUpdatedToast").replace("{n}", String(lastTotal)));
-              scrapeListToastShown = true;
-              break;
-            }
-          }
+        const lastTotal = await refreshDashboardData(token, hasProf, pollFilters, { light: true });
+        scrapePollStableRef.current = { prev: lastTotal, ticks: 0 };
+        if (lastTotal > baselineTotal) {
+          toast.success(t("dashboard.scrapeListUpdatedToast").replace("{n}", String(lastTotal)));
+          scrapeListToastShownRef.current = true;
+          queueMicrotask(() => {
+            document.getElementById("dashboard-jobs")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          });
+        } else if (!queued) {
+          queueMicrotask(() => {
+            document.getElementById("dashboard-jobs")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          });
         }
-        if (!scrapePollCancelRef.current) {
-          try {
-            lastTotal = await refreshDashboardData(token, hasProf, filters);
-          } catch {
-            /* ignore */
-          }
-          try {
-            router.refresh();
-          } catch {
-            /* ignore */
-          }
-          if (queued && !scrapeListToastShown) {
-            toast.success(t("dashboard.scrapePollFinalSyncToast").replace("{n}", String(lastTotal)));
-          }
+        if (queued) {
+          scrapePollMetaRef.current = {
+            baselineTotal: Math.max(baselineTotal, lastTotal),
+            pollFilters,
+            hasProfile: hasProf,
+            startedAt: Date.now(),
+          };
+          setScrapePollActive(true);
+        } else {
+          await refreshDashboardData(token, hasProf, pollFilters);
+          router.refresh();
         }
       } catch (refreshErr) {
         setError(
@@ -1221,6 +1318,11 @@ export default function DashboardPage() {
               >
                 {scraping ? t("dashboard.twinForYourJobRunning") : t("dashboard.twinForYourJob")}
               </ButtonCta>
+              {scrapePollActive ? (
+                <p className="mt-3 text-sm font-medium text-[var(--twin-link)]" aria-live="polite">
+                  {t("dashboard.scrapeRefreshingBanner").replace("{n}", String(jobs?.total ?? 0))}
+                </p>
+              ) : null}
               {user?.can_trigger_scrape === false ? (
                 <p className="mt-3 text-sm text-amber-700 dark:text-amber-300">
                   {user.scrape_ops_configured
