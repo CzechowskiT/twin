@@ -25,7 +25,8 @@ curl -sS "https://twin-production-bcd9.up.railway.app/api/v1/health?ops=1"
 ```
 
 - `mail_configured: true` — Resend lub SMTP + MAIL_FROM
-- `microsoft_calendar_configured: true` — Azure app + zmienne poniżej
+- `google_calendar_configured: true` — Google Cloud OAuth + zmienne w sekcji 3
+- `microsoft_calendar_configured: true` — Azure app + zmienne w sekcji 4
 
 ---
 
@@ -46,7 +47,29 @@ Test: zapis na `/waitlist` — mail powitalny z linkami do panelu.
 
 ---
 
-## 3. Microsoft Calendar (Azure)
+## 3. Google Calendar (Google Cloud)
+
+1. [Google Cloud Console](https://console.cloud.google.com/) → **APIs & Services** → włącz **Google Calendar API**
+2. **Credentials** → **Create credentials** → **OAuth client ID** (Web application)
+3. **Authorized redirect URIs**:
+   `https://twin-production-bcd9.up.railway.app/api/v1/calendar/google/callback`
+4. Railway → Variables:
+
+| Zmienna | Wartość |
+|---------|---------|
+| `GOOGLE_CLIENT_ID` | Client ID z Google |
+| `GOOGLE_CLIENT_SECRET` | Client secret |
+| `GOOGLE_CALENDAR_REDIRECT_URI` | jak wyżej (bez `/` na końcu) |
+
+5. **Redeploy** API
+
+W aplikacji: **Dashboard → Calendar → Connect Google Calendar**
+
+(Możesz użyć tego samego OAuth client co logowanie Google, ale **redirect URI musi być osobny** dla Calendar.)
+
+---
+
+## 4. Microsoft Calendar (Azure)
 
 1. [Azure Portal](https://portal.azure.com) → **Microsoft Entra ID** → **App registrations** → **New registration**
 2. Redirect URI (Web):  
@@ -68,11 +91,11 @@ W aplikacji: **Dashboard → Calendar → Connect Microsoft 365 / Outlook**
 
 ---
 
-## 4. Skrypt (gdy masz Railway CLI)
+## 5. Skrypt (gdy masz Railway CLI)
 
 ```bash
 cp .env.railway.example .env.railway
-# uzupełnij RESEND_API_KEY, MAIL_FROM, MICROSOFT_* w .env.railway
+# uzupełnij RESEND_API_KEY, MAIL_FROM, GOOGLE_*, MICROSOFT_* w .env.railway
 
 npx @railway/cli login
 cd twin   # repo root

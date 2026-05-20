@@ -49,10 +49,12 @@ def test_health_features_route_removed() -> None:
     assert res.status_code == 404
 
 
+@patch("app.services.google_calendar_oauth.is_google_calendar_oauth_configured", return_value=False)
 @patch("app.services.microsoft_calendar_oauth.is_microsoft_calendar_oauth_configured", return_value=False)
 @patch("app.services.mail.is_mail_configured", return_value=True)
 def test_health_ops_includes_mail_and_calendar_flags(
     _mock_ms: MagicMock,
+    _mock_google: MagicMock,
     _mock_mail: MagicMock,
 ) -> None:
     client = TestClient(app)
@@ -60,4 +62,5 @@ def test_health_ops_includes_mail_and_calendar_flags(
     assert res.status_code == 200
     data = res.json()
     assert data.get("mail_configured") is True
+    assert data.get("google_calendar_configured") is False
     assert data.get("microsoft_calendar_configured") is False

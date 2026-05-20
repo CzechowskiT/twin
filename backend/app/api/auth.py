@@ -60,6 +60,7 @@ from app.services.linkedin_profile_sync import (
     ensure_candidate_from_oauth_profile,
 )
 from app.services.login_rate_limit import enforce_login_rate_limit_per_minute
+from app.services.google_calendar_oauth import is_google_calendar_oauth_configured
 from app.services.mail import is_mail_configured
 from app.services.microsoft_calendar_oauth import is_microsoft_calendar_oauth_configured
 from app.services.oauth_state import create_oauth_state, verify_oauth_state
@@ -321,6 +322,7 @@ def me(user: User = Depends(get_current_user), db: Session = Depends(get_db)) ->
             "scrape_ops_configured": scrape_ops_configured(settings),
             "can_trigger_scrape": user_has_scrape_ops(user, settings),
             "mail_configured": is_mail_configured(settings),
+            "google_calendar_oauth_configured": is_google_calendar_oauth_configured(),
             "microsoft_calendar_oauth_configured": is_microsoft_calendar_oauth_configured(),
         }
     )

@@ -58,9 +58,14 @@ set_var MICROSOFT_CLIENT_SECRET "${MICROSOFT_CLIENT_SECRET:-}"
 set_var MICROSOFT_CALENDAR_REDIRECT_URI "$MS_REDIRECT"
 set_var MICROSOFT_TENANT "${MICROSOFT_TENANT:-common}"
 
+GCAL_REDIRECT="${GOOGLE_CALENDAR_REDIRECT_URI:-$API_URL/api/v1/calendar/google/callback}"
+set_var GOOGLE_CLIENT_ID "${GOOGLE_CLIENT_ID:-}"
+set_var GOOGLE_CLIENT_SECRET "${GOOGLE_CLIENT_SECRET:-}"
+set_var GOOGLE_CALENDAR_REDIRECT_URI "$GCAL_REDIRECT"
+
 echo "Redeploying API service…"
 "${CLI[@]}" redeploy --yes
 
 echo "Done. Verify:"
 echo "  curl -sS \"$API_URL/api/v1/health?ops=1\" | jq ."
-echo "Expect mail_configured:true and (after Azure) microsoft_calendar_configured:true"
+echo "Expect mail_configured:true; google_calendar_configured / microsoft_calendar_configured after OAuth secrets"

@@ -643,7 +643,7 @@ const en = {
     calendarMicrosoftOAuthNotConfigured:
       "Microsoft Calendar is not wired on this server yet. Add MICROSOFT_CLIENT_ID, MICROSOFT_CLIENT_SECRET, and MICROSOFT_CALENDAR_REDIRECT_URI on the API host (Railway), then redeploy.",
     calendarGoogleOAuthNotConfigured:
-      "Google Calendar OAuth is not configured on this server yet. Add Google Calendar client credentials on the API host, then redeploy.",
+      "Google Calendar OAuth is not wired on this server yet. Add GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_CALENDAR_REDIRECT_URI on the API host (Railway), then redeploy.",
     calendarDisconnectMicrosoft: "Disconnect Microsoft",
     calendarMicrosoftConnectedAs: "Microsoft account",
     calendarWebcalTitle: "Subscribe in any calendar app",
@@ -2006,7 +2006,7 @@ const pl: MessageTree = {
     calendarMicrosoftOAuthNotConfigured:
       "Kalendarz Microsoft nie jest jeszcze podłączony na serwerze. Ustaw MICROSOFT_CLIENT_ID, MICROSOFT_CLIENT_SECRET i MICROSOFT_CALENDAR_REDIRECT_URI na API (Railway) i zrób redeploy.",
     calendarGoogleOAuthNotConfigured:
-      "OAuth Google Calendar nie jest skonfigurowany na serwerze. Dodaj dane klienta Google na hoście API i zrób redeploy.",
+      "OAuth Google Calendar nie jest jeszcze podłączony na serwerze. Ustaw GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET i GOOGLE_CALENDAR_REDIRECT_URI na API (Railway) i zrób redeploy.",
     calendarDisconnectMicrosoft: "Odłącz Microsoft",
     calendarMicrosoftConnectedAs: "Konto Microsoft",
     calendarWebcalTitle: "Subskrypcja w dowolnym kalendarzu",

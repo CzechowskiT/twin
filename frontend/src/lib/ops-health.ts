@@ -2,6 +2,7 @@ import { getPublicApiBase } from "@/lib/public-api-base";
 
 export type OpsHealth = {
   mail_configured: boolean;
+  google_calendar_configured: boolean;
   microsoft_calendar_configured: boolean;
 };
 
@@ -15,6 +16,7 @@ export async function fetchOpsHealth(): Promise<OpsHealth | null> {
     const data = (await res.json()) as Partial<OpsHealth>;
     return {
       mail_configured: Boolean(data.mail_configured),
+      google_calendar_configured: Boolean(data.google_calendar_configured),
       microsoft_calendar_configured: Boolean(data.microsoft_calendar_configured),
     };
   } catch {
