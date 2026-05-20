@@ -115,12 +115,13 @@ export function TwinRoiCalculator() {
   return (
     <Shell wide rail>
       <MarketingPageSurface wide withCard={false}>
-        <header className="mb-8 text-center sm:mb-10">
+        <div className="marketing-calculator-page">
+        <header className="marketing-hero-rail mb-8 sm:mb-10">
           <h1 className="twin-page-intro twin-section-title text-2xl sm:text-3xl">{t("calculator.title")}</h1>
-          <p className="mx-auto mt-3 max-w-3xl text-sm leading-relaxed text-[var(--twin-muted-strong)] sm:text-base">
+          <p className="mt-3 text-sm leading-relaxed text-[var(--twin-muted-strong)] sm:text-base">
             {t("calculator.subtitle")}
           </p>
-          <p className="mx-auto mt-2 max-w-2xl text-xs text-[var(--twin-muted-strong)]">{t("calculator.disclaimer")}</p>
+          <p className="mt-2 text-xs text-[var(--twin-muted-strong)]">{t("calculator.disclaimer")}</p>
         </header>
 
         <section className="twin-card-panel mb-6 p-5 sm:p-6">
@@ -437,19 +438,29 @@ export function TwinRoiCalculator() {
             </div>
           </div>
 
-          <p className="mt-5 text-center text-xs leading-relaxed text-[var(--twin-muted)] sm:text-sm">
+          <p className="mt-5 text-start text-xs leading-relaxed text-[var(--twin-muted)] sm:text-sm">
             {t("calculator.enterpriseFoot")}
           </p>
         </section>
 
-        <p className="mt-6 text-center text-sm text-[var(--twin-muted-strong)]">
-          <Link href="/calculator" className="twin-link font-medium">
-            {t("calculator.linkInvestorModel")}
-          </Link>
-        </p>
-        <p className="mt-4 text-center text-xs leading-relaxed text-[var(--twin-muted-strong)] sm:text-sm">
-          {t("calculator.footerNote")}
-        </p>
+        <footer className="marketing-hero-rail mt-10 border-t border-[var(--twin-border)] pt-8">
+          <p className="text-sm leading-relaxed text-[var(--twin-muted-strong)]">{t("calculator.wishlistLead")}</p>
+          <div className="marketing-cta-stack mt-4">
+            <Link
+              href="/waitlist"
+              className="marketing-cta-filled-pill marketing-btn-primary-shadow twin-touch-target inline-flex min-h-[2.75rem] w-full items-center justify-center rounded-full bg-[var(--twin-cta)] px-6 text-sm font-semibold text-[var(--twin-on-cta)] transition hover:bg-[var(--twin-cta-hover)] active:scale-[0.98]"
+            >
+              {t("home.joinWishlist")}
+            </Link>
+          </div>
+          <p className="mt-6 text-sm text-[var(--twin-muted-strong)]">
+            <Link href="/calculator" className="twin-link font-medium">
+              {t("calculator.linkInvestorModel")}
+            </Link>
+          </p>
+          <p className="mt-4 text-xs leading-relaxed text-[var(--twin-muted-strong)]">{t("calculator.footerNote")}</p>
+        </footer>
+        </div>
       </MarketingPageSurface>
     </Shell>
   );

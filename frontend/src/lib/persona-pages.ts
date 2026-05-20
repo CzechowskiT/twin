@@ -42,6 +42,8 @@ export type PersonaBundle = {
   logisticsTitle: string;
   logistics: string[];
   primaryCta: { label: string; href: string };
+  /** Stacked under primary (e.g. wishlist under B2B calculator on for-companies). */
+  stackedCta?: { label: string; href: string };
   secondaryCta?: { label: string; href: string };
 };
 
@@ -491,7 +493,8 @@ const companiesEn: PersonaBundle = {
     "Candidate marketing SKUs never include SSO or custom DPA unless upgraded through this lane.",
     "Calculator output remains illustrative; legal and financial sign-off stays with your teams.",
   ],
-  primaryCta: { label: "Open B2B ROI calculator", href: "/calculator" },
+  primaryCta: { label: "Open B2B ROI calculator", href: "/calculator/b2b" },
+  stackedCta: { label: "Join founding wishlist", href: "/waitlist" },
   secondaryCta: { label: "Contact enterprise", href: "/contact" },
 };
 
@@ -591,7 +594,8 @@ const companiesPl: PersonaBundle = {
     "SKU kandydata nie obejmuje SSO ani custom DPA bez przejścia tę ścieżką.",
     "Wynik kalkulatora pozostaje ilustracyjny; akceptacja prawno-finansowa pozostaje po stronie klienta.",
   ],
-  primaryCta: { label: "Otwórz kalkulator ROI B2B", href: "/calculator" },
+  primaryCta: { label: "Otwórz kalkulator ROI B2B", href: "/calculator/b2b" },
+  stackedCta: { label: "Dołącz do founding wishlist", href: "/waitlist" },
   secondaryCta: { label: "Kontakt enterprise", href: "/contact" },
 };
 

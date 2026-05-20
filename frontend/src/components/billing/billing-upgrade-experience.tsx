@@ -84,7 +84,6 @@ export function BillingUpgradeExperience({ checkoutConfigured, currentTier }: Bi
 
   return (
     <section className="twin-billing-engage" aria-labelledby="billing-engage-title">
-      <div className="twin-billing-engage__mesh" aria-hidden />
       <div className="twin-billing-engage__inner">
         <p className="twin-billing-engage__eyebrow">{t("dashboard.billingEngagementEyebrow")}</p>
         <h2 id="billing-engage-title" className="twin-billing-engage__title">
@@ -143,13 +142,23 @@ export function BillingUpgradeExperience({ checkoutConfigured, currentTier }: Bi
         </ul>
 
         {showWishlistBand ? (
-          <aside className="twin-billing-engage__wishlist">
+          <aside className="twin-billing-engage__wishlist text-start">
             <p className="twin-billing-engage__wishlist-eyebrow">{t("dashboard.billingEngagementWishlistEyebrow")}</p>
             <h3 className="twin-billing-engage__wishlist-title">{t("dashboard.billingEngagementWishlistTitle")}</h3>
             <p className="twin-billing-engage__wishlist-lead">{t("dashboard.billingEngagementWishlistLead")}</p>
-            <Link href="/waitlist" className="twin-billing-engage__wishlist-cta twin-touch-target">
-              {t("dashboard.billingEngagementWishlistCta")}
-            </Link>
+            <div className="marketing-hero-rail mt-4">
+              <div className="marketing-cta-stack">
+                <Link
+                  href="/calculator/b2b"
+                  className="twin-touch-target inline-flex min-h-[2.75rem] w-full items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] px-4 text-sm font-semibold text-[var(--twin-muted-strong)] transition hover:border-[var(--twin-border-hover)]"
+                >
+                  {t("dashboard.workspaceGateLinkB2bCalculator")}
+                </Link>
+                <Link href="/waitlist" className="twin-billing-engage__wishlist-cta twin-touch-target">
+                  {t("dashboard.billingEngagementWishlistCta")}
+                </Link>
+              </div>
+            </div>
           </aside>
         ) : null}
       </div>

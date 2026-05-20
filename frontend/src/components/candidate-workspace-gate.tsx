@@ -8,7 +8,13 @@ import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 
 const linkClass =
-  "twin-link inline-flex min-h-[2.75rem] items-center justify-center rounded-md border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] px-3 text-sm font-medium transition hover:border-[var(--twin-accent)]/40 hover:bg-[var(--twin-accent-muted)]";
+  "twin-link inline-flex min-h-[2.75rem] w-full items-center justify-center rounded-md border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] px-3 text-sm font-medium transition hover:border-[var(--twin-accent)]/40 hover:bg-[var(--twin-accent-muted)]";
+
+const primaryStackClass =
+  "marketing-cta-filled-pill marketing-btn-primary-shadow twin-touch-target inline-flex min-h-[2.75rem] w-full items-center justify-center rounded-full bg-[var(--twin-cta)] px-4 text-sm font-semibold text-[var(--twin-on-cta)] transition hover:bg-[var(--twin-cta-hover)] active:scale-[0.98]";
+
+const wishlistStackClass =
+  "marketing-cta-filled-pill twin-touch-target inline-flex min-h-[2.75rem] w-full items-center justify-center rounded-full bg-[var(--twin-accent)] px-4 text-sm font-semibold text-[var(--twin-on-accent)] transition hover:bg-[var(--twin-accent-hover)] active:scale-[0.98]";
 
 export function CandidateWorkspaceGate({ surface }: { surface: "dashboard" | "profile" }) {
   const { t } = useTranslation();
@@ -33,6 +39,7 @@ export function CandidateWorkspaceGate({ surface }: { surface: "dashboard" | "pr
   return (
     <Shell wide>
       <Card variant="soft" className="p-6 sm:p-8">
+        <div className="marketing-hero-rail text-start">
         <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
           {t("nav.ariaPersonaNav")}: {t(persona === "company" ? "nav.personaCompany" : "nav.personaRecruiter")}
         </p>
@@ -40,30 +47,43 @@ export function CandidateWorkspaceGate({ surface }: { surface: "dashboard" | "pr
         {surface === "profile" ? (
           <p className="twin-muted mt-1 text-sm font-medium">{t("dashboard.workspaceGateSurfaceProfile")}</p>
         ) : null}
-        <p className="twin-muted mt-4 max-w-2xl text-sm leading-relaxed">{t(leadKey)}</p>
+        <p className="twin-muted mt-4 text-sm leading-relaxed">{t(leadKey)}</p>
         {surface === "dashboard" && pathname !== "/dashboard" ? (
-          <p className="twin-muted mt-3 max-w-2xl text-sm">
+          <p className="twin-muted mt-3 text-sm">
             {t("dashboard.workspaceGateSubpathNotice").replace("{path}", pathname)}
           </p>
+        ) : null}
+
+        {persona === "company" ? (
+          <div className="marketing-cta-stack mt-8">
+            <Link href="/calculator/b2b" className={primaryStackClass}>
+              {t("dashboard.workspaceGateLinkB2bCalculator")}
+            </Link>
+            <Link href="/waitlist" className={wishlistStackClass}>
+              {t("home.joinWishlist")}
+            </Link>
+          </div>
         ) : null}
 
         <div className="mt-8">
           <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
             {t("dashboard.workspaceGateExploreHeading")}
           </p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Link href="/for-recruiters" className={linkClass}>
+          <div className="mt-3 flex max-w-md flex-col gap-2 sm:max-w-none sm:flex-row sm:flex-wrap">
+            <Link href="/for-recruiters" className={`${linkClass} sm:!w-auto`}>
               {t("dashboard.workspaceGateLinkForRecruiters")}
             </Link>
-            <Link href="/for-companies" className={linkClass}>
+            <Link href="/for-companies" className={`${linkClass} sm:!w-auto`}>
               {t("dashboard.workspaceGateLinkForCompanies")}
             </Link>
-            <Link href="/contact" className={linkClass}>
+            <Link href="/contact" className={`${linkClass} sm:!w-auto`}>
               {t("dashboard.workspaceGateLinkContact")}
             </Link>
-            <Link href="/calculator/b2b" className={linkClass}>
-              {t("dashboard.workspaceGateLinkB2bCalculator")}
-            </Link>
+            {persona !== "company" ? (
+              <Link href="/calculator/b2b" className={`${linkClass} sm:!w-auto`}>
+                {t("dashboard.workspaceGateLinkB2bCalculator")}
+              </Link>
+            ) : null}
           </div>
         </div>
 
@@ -75,9 +95,10 @@ export function CandidateWorkspaceGate({ surface }: { surface: "dashboard" | "pr
           >
             {t("dashboard.workspaceGateSwitchCta")}
           </button>
-          <p className="max-w-md text-xs leading-relaxed text-[var(--twin-muted-strong)]">
+          <p className="text-xs leading-relaxed text-[var(--twin-muted-strong)] sm:max-w-md">
             {t("dashboard.workspaceGateSwitchHint")}
           </p>
+        </div>
         </div>
       </Card>
     </Shell>

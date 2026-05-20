@@ -1092,6 +1092,8 @@ const en = {
     footerNote:
       "Illustrative model for discussion: companies and candidates can both win when fees align to outcomes. Not pricing, not tax or legal advice.",
     linkInvestorModel: "Open the investor scenario calculator →",
+    wishlistLead:
+      "Early companies can join the founding wishlist for priority access and founding-tier pricing — no card required today.",
   },
   investorCalc: {
     title: "TWIN investor calculator",
@@ -2516,6 +2518,8 @@ const pl: MessageTree = {
     footerNote:
       "Model dyskusyjny: firma i kandydat mogą wygrać, gdy opłaty wiążą się z efektem. To nie cennik ani porada prawno-podatkowa.",
     linkInvestorModel: "Otwórz kalkulator scenariuszy inwestorskich →",
+    wishlistLead:
+      "Firmy z wczesnej fazy mogą dołączyć do founding wishlist — priorytetowy dostęp i cennik founding, dziś bez karty.",
   },
   investorCalc: {
     title: "Kalkulator inwestorski TWIN",

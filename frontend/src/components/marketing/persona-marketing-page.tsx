@@ -16,29 +16,54 @@ export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
     <Shell wide>
       <MarketingPageSurface wide withCard={false}>
       <div className="marketing-copy-rail space-y-14 sm:space-y-16">
-        <header className="space-y-4">
+        <header className={`space-y-4 text-start ${c.stackedCta ? "marketing-hero-rail" : ""}`}>
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">{c.heroEyebrow}</p>
           <h1 className="twin-page-intro twin-section-title max-w-4xl text-2xl sm:text-3xl md:text-4xl">{c.heroTitle}</h1>
           <p className="max-w-3xl text-base leading-relaxed text-[var(--twin-muted-strong)] sm:text-lg">{c.heroLead}</p>
-          <div className="flex flex-wrap gap-3 pt-2">
-            <Link
-              href={c.primaryCta.href}
-              className="marketing-cta-filled-pill marketing-btn-primary-shadow twin-touch-target inline-flex min-h-[2.75rem] items-center justify-center rounded-full bg-[var(--twin-cta)] px-6 text-sm font-semibold text-[var(--twin-on-cta)] transition hover:bg-[var(--twin-cta-hover)] active:scale-[0.98]"
-            >
-              {c.primaryCta.label}
-            </Link>
-            {c.secondaryCta ? (
+          {c.stackedCta ? (
+            <div className="marketing-cta-stack pt-2">
               <Link
-                href={c.secondaryCta.href}
-                className="twin-touch-target inline-flex min-h-[2.75rem] items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-6 text-sm font-semibold text-[var(--twin-muted-strong)] shadow-sm transition hover:border-[var(--twin-border-hover)] hover:bg-[var(--twin-accent-muted)] active:scale-[0.98]"
+                href={c.primaryCta.href}
+                className="marketing-cta-filled-pill marketing-btn-primary-shadow twin-touch-target inline-flex min-h-[2.75rem] w-full items-center justify-center rounded-full bg-[var(--twin-cta)] px-6 text-sm font-semibold text-[var(--twin-on-cta)] transition hover:bg-[var(--twin-cta-hover)] active:scale-[0.98]"
               >
-                {c.secondaryCta.label}
+                {c.primaryCta.label}
               </Link>
-            ) : null}
-          </div>
+              <Link
+                href={c.stackedCta.href}
+                className="marketing-cta-filled-pill marketing-btn-primary-shadow twin-touch-target inline-flex min-h-[2.75rem] w-full items-center justify-center rounded-full bg-[var(--twin-accent)] px-6 text-sm font-semibold text-[var(--twin-on-accent)] transition hover:bg-[var(--twin-accent-hover)] active:scale-[0.98]"
+              >
+                {c.stackedCta.label}
+              </Link>
+              {c.secondaryCta ? (
+                <Link
+                  href={c.secondaryCta.href}
+                  className="twin-touch-target inline-flex min-h-[2.75rem] w-full items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-6 text-sm font-semibold text-[var(--twin-muted-strong)] shadow-sm transition hover:border-[var(--twin-border-hover)] hover:bg-[var(--twin-accent-muted)] active:scale-[0.98]"
+                >
+                  {c.secondaryCta.label}
+                </Link>
+              ) : null}
+            </div>
+          ) : (
+            <div className="flex flex-wrap gap-3 pt-2">
+              <Link
+                href={c.primaryCta.href}
+                className="marketing-cta-filled-pill marketing-btn-primary-shadow twin-touch-target inline-flex min-h-[2.75rem] items-center justify-center rounded-full bg-[var(--twin-cta)] px-6 text-sm font-semibold text-[var(--twin-on-cta)] transition hover:bg-[var(--twin-cta-hover)] active:scale-[0.98]"
+              >
+                {c.primaryCta.label}
+              </Link>
+              {c.secondaryCta ? (
+                <Link
+                  href={c.secondaryCta.href}
+                  className="twin-touch-target inline-flex min-h-[2.75rem] items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-6 text-sm font-semibold text-[var(--twin-muted-strong)] shadow-sm transition hover:border-[var(--twin-border-hover)] hover:bg-[var(--twin-accent-muted)] active:scale-[0.98]"
+                >
+                  {c.secondaryCta.label}
+                </Link>
+              ) : null}
+            </div>
+          )}
         </header>
 
-        <section aria-labelledby="persona-capabilities">
+        <section aria-labelledby="persona-capabilities" className="text-start">
           <h2 id="persona-capabilities" className="twin-section-title text-lg sm:text-xl">
             {t("persona.sectionCapabilities")}
           </h2>
@@ -85,7 +110,7 @@ export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
           <TalentPoolPreview />
         ) : null}
 
-        <section aria-labelledby="persona-pricing">
+        <section aria-labelledby="persona-pricing" className="text-start">
           <h2 id="persona-pricing" className="twin-section-title text-lg sm:text-xl">
             {c.pricingTitle}
           </h2>
@@ -96,8 +121,8 @@ export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
                 key={tier.id}
                 className={`flex min-h-0 flex-col rounded-2xl border p-5 sm:p-6 ${
                   tier.highlight
-                    ? "border-[var(--twin-accent)] bg-[var(--twin-accent-muted)]/35 shadow-[0_12px_40px_rgb(25_60_50_/0.12)]"
-                    : "border-[var(--twin-border)] bg-[var(--twin-card)]/70"
+                    ? "border-[var(--twin-accent)] bg-[var(--twin-surface-raised)] shadow-[0_0_0_1px_color-mix(in_srgb,var(--twin-accent)_35%,transparent)]"
+                    : "border-[var(--twin-border)] bg-[var(--twin-surface-raised)]"
                 }`}
               >
                 <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">{tier.name}</p>
@@ -149,7 +174,7 @@ export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
           <p className="twin-muted mt-4 max-w-3xl text-xs leading-relaxed">{c.pricingFootnote}</p>
         </section>
 
-        <section aria-labelledby="persona-logistics">
+        <section aria-labelledby="persona-logistics" className="text-start">
           <h2 id="persona-logistics" className="twin-section-title text-lg sm:text-xl">
             {t("persona.sectionLogistics")}
           </h2>

@@ -235,42 +235,30 @@ body {
 
 .twin-billing-surface .twin-billing-plan-card--featured {
   border-color: color-mix(in srgb, var(--twin-accent) 55%, var(--twin-border));
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--twin-accent) 35%, transparent),
-    0 12px 40px rgb(124 58 237 / 0.12);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--twin-accent) 35%, transparent);
 }
 
 .twin-billing-surface .twin-billing-plan-card__badge--featured {
-  background: linear-gradient(90deg, rgb(124 58 237), rgb(6 182 212));
-  color: #fff;
+  background: var(--twin-accent);
+  color: var(--twin-on-accent);
 }
 
 .twin-billing-surface .twin-billing-plan-card--muted {
   opacity: 0.88;
 }
 
-/* Billing upgrade experience — waitlist-grade engagement inside dashboard */
+/* Billing upgrade experience — same surfaces as plan cards / dashboard panels */
 .twin-billing-surface .twin-billing-engage {
   position: relative;
-  overflow: hidden;
   margin-bottom: 1.5rem;
-  border-radius: 1rem;
+  border-radius: 0.75rem;
   border: 1px solid var(--twin-border);
-  background: linear-gradient(
-    145deg,
-    color-mix(in srgb, var(--twin-accent) 12%, var(--twin-surface-raised)) 0%,
-    var(--twin-surface-raised) 42%,
-    var(--background) 100%
-  );
+  background: var(--twin-surface-raised);
+  box-shadow: var(--twin-shadow-md);
 }
 
 .twin-billing-surface .twin-billing-engage__mesh {
-  pointer-events: none;
-  position: absolute;
-  inset: -40% -20% auto;
-  height: 70%;
-  background: radial-gradient(ellipse at 20% 30%, rgb(139 92 246 / 0.22), transparent 55%),
-    radial-gradient(ellipse at 80% 20%, rgb(6 182 212 / 0.18), transparent 50%);
-  filter: blur(2px);
+  display: none;
 }
 
 .twin-billing-surface .twin-billing-engage__inner {
@@ -324,7 +312,7 @@ body {
 .twin-billing-surface .twin-billing-engage__metric {
   border-radius: 0.75rem;
   border: 1px solid var(--twin-border);
-  background: color-mix(in srgb, var(--background) 65%, transparent);
+  background: var(--twin-card);
   padding: 0.75rem 0.5rem;
   text-align: center;
 }
@@ -413,13 +401,13 @@ body {
   border: 1px solid var(--twin-border);
 }
 
-.twin-billing-surface .twin-billing-engage__compare-card--before {
-  background: color-mix(in srgb, rgb(239 68 68) 6%, var(--twin-card));
+.twin-billing-surface .twin-billing-engage__compare-card--before,
+.twin-billing-surface .twin-billing-engage__compare-card--after {
+  background: var(--twin-card);
 }
 
 .twin-billing-surface .twin-billing-engage__compare-card--after {
-  background: color-mix(in srgb, rgb(16 185 129) 8%, var(--twin-card));
-  box-shadow: 0 0 0 1px color-mix(in srgb, rgb(16 185 129) 25%, transparent);
+  border-color: color-mix(in srgb, var(--twin-accent) 40%, var(--twin-border));
 }
 
 .twin-billing-surface .twin-billing-engage__compare-heading {
@@ -431,11 +419,11 @@ body {
 }
 
 .twin-billing-surface .twin-billing-engage__compare-card--before .twin-billing-engage__compare-heading {
-  color: rgb(185 28 28);
+  color: var(--twin-muted-strong);
 }
 
 .twin-billing-surface .twin-billing-engage__compare-card--after .twin-billing-engage__compare-heading {
-  color: rgb(5 150 105);
+  color: var(--twin-accent);
 }
 
 .twin-billing-surface .twin-billing-engage__compare-card ul {
@@ -464,12 +452,12 @@ body {
 
 .twin-billing-surface .twin-billing-engage__compare-card--before li::before {
   content: "×";
-  color: rgb(220 38 38);
+  color: var(--twin-muted);
 }
 
 .twin-billing-surface .twin-billing-engage__compare-card--after li::before {
   content: "✓";
-  color: rgb(5 150 105);
+  color: var(--twin-accent);
 }
 
 .twin-billing-surface .twin-billing-engage__trust {
@@ -487,7 +475,7 @@ body {
   margin-top: 1.25rem;
   border-radius: 0.75rem;
   border: 1px dashed color-mix(in srgb, var(--twin-accent) 45%, var(--twin-border));
-  background: linear-gradient(90deg, rgb(139 92 246 / 0.08), rgb(6 182 212 / 0.08));
+  background: var(--twin-card);
   padding: 1rem 1.15rem;
 }
 
@@ -517,21 +505,24 @@ body {
 
 .twin-billing-surface .twin-billing-engage__wishlist-cta {
   display: inline-flex;
-  margin-top: 0.85rem;
+  width: 100%;
+  margin-top: 0;
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
   padding: 0.55rem 1.25rem;
   font-size: 0.8125rem;
   font-weight: 700;
-  color: #fff;
-  background: linear-gradient(90deg, rgb(124 58 237), rgb(6 182 212));
-  box-shadow: 0 8px 24px rgb(124 58 237 / 0.35);
-  transition: filter 0.15s ease, transform 0.12s ease;
+  color: var(--twin-on-cta);
+  background: var(--twin-cta);
+  box-shadow: var(--twin-shadow-md);
+  transition: background 0.15s ease, transform 0.12s ease;
+  text-decoration: none;
 }
 
 .twin-billing-surface .twin-billing-engage__wishlist-cta:hover {
-  filter: brightness(1.06);
+  background: var(--twin-cta-hover);
+  color: var(--twin-on-cta);
 }
 
 .twin-billing-surface .twin-billing-plan-card__head {
@@ -1281,6 +1272,43 @@ html[data-marketing-surface="studio"] .marketing-btn-primary-shadow {
  */
 .marketing-copy-rail {
   /* shared hook for marketing sections; keep layout to spacing + type only */
+}
+
+/** Hero + footer copy rail — shared left edge with full-width stacked CTAs inside. */
+.marketing-hero-rail,
+.marketing-content-rail {
+  width: 100%;
+  max-width: 48rem;
+  text-align: start;
+}
+
+.marketing-cta-stack {
+  display: flex;
+  width: 100%;
+  max-width: 48rem;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+}
+
+.marketing-hero-rail .marketing-cta-stack {
+  max-width: 100%;
+}
+
+.marketing-calculator-page {
+  width: 100%;
+  max-width: 64rem;
+  margin-inline: auto;
+  text-align: start;
+}
+
+.marketing-calculator-page .marketing-hero-rail,
+.marketing-calculator-page .marketing-content-rail {
+  max-width: 48rem;
+}
+
+.marketing-calculator-page .marketing-cta-stack {
+  max-width: 100%;
 }
 
 /** Hero copy + CTAs: heritage uses green/amber system; studio matches dark mock (outline / white / ghost). */
