@@ -26,6 +26,7 @@ type BillingPlanTierCardProps = {
   displayName: string;
   busy: string | null;
   footerLabel: string;
+  statusNote?: string;
   buttonHint?: string;
   t: (key: TranslationKey) => string;
   onPrimary: () => void;
@@ -38,6 +39,7 @@ export function BillingPlanTierCard({
   displayName,
   busy,
   footerLabel,
+  statusNote,
   buttonHint,
   t,
   onPrimary,
@@ -72,11 +74,13 @@ export function BillingPlanTierCard({
           : t("dashboard.billingTrackedUnlimited")}
       </p>
 
+      {statusNote ? <p className="twin-billing-plan-card__note">{statusNote}</p> : null}
+
       <div className="twin-billing-plan-card__cta">
         <Button
           type="button"
-          title={buttonHint}
-          aria-label={buttonHint ?? footerLabel}
+          title={buttonHint ?? statusNote}
+          aria-label={buttonHint ?? statusNote ?? footerLabel}
           className="twin-billing-plan-card__btn"
           disabled={disabled}
           onClick={() => {

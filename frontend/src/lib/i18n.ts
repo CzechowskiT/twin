@@ -665,6 +665,9 @@ const en = {
     calendarNotConnected: "Not connected",
     calendarConnect: "Connect Google Calendar",
     calendarDisconnect: "Disconnect",
+    calendarGoogleRedirectSetup:
+      "If Google shows “redirect_uri_mismatch”, open Google Cloud Console → APIs & Services → Credentials → your OAuth client (Web) → Authorized redirect URIs → add this exact line (then Save) and click Connect again.",
+    calendarGoogleRedirectCopy: "Copy redirect URI",
     calendarConfiguredHint:
       "Today this OAuth client powers Google Calendar only. Add `GOOGLE_CALENDAR_REDIRECT_URI` in Google Cloud Console. Outlook and Apple will use separate Microsoft / Apple consent flows when they ship.",
     calendarFreebusyTitle: "Check availability (next 3 days)",
@@ -2030,6 +2033,9 @@ const pl: MessageTree = {
     calendarNotConnected: "Nie połączono",
     calendarConnect: "Połącz Google Calendar",
     calendarDisconnect: "Odłącz",
+    calendarGoogleRedirectSetup:
+      "Jeśli Google pokazuje „redirect_uri_mismatch”, wejdź w Google Cloud Console → APIs & Services → Credentials → Twój klient OAuth (Web) → Authorized redirect URIs → wklej dokładnie ten adres (Zapisz) i kliknij Połącz ponownie.",
+    calendarGoogleRedirectCopy: "Kopiuj adres przekierowania",
     calendarConfiguredHint:
       "Dziś ten klient OAuth obsługuje wyłącznie Google Calendar. Dodaj `GOOGLE_CALENDAR_REDIRECT_URI` w Google Cloud Console. Outlook i Apple dostaną osobne przepływy zgody Microsoft / Apple przy wdrożeniu.",
     calendarFreebusyTitle: "Sprawdź dostępność (następne 3 dni)",

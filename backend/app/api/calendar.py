@@ -80,6 +80,8 @@ class CalendarStatusOut(BaseModel):
     connected: bool
     google_email: str | None = None
     oauth_configured: bool = False
+    # Exact URI to whitelist in Google Cloud Console (fixes redirect_uri_mismatch).
+    oauth_redirect_uri: str | None = None
 
 
 class CalendarAuthorizeOut(BaseModel):
@@ -129,14 +131,21 @@ def google_calendar_status(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> CalendarStatusOut:
+    s = get_settings()
     oauth_configured = is_google_calendar_oauth_configured()
+    redirect_uri = (s.google_calendar_redirect_uri or "").strip() or None if oauth_configured else None
     row = db.query(UserGoogleCalendar).filter(UserGoogleCalendar.user_id == current_user.id).first()
     if not row:
-        return CalendarStatusOut(connected=False, oauth_configured=oauth_configured)
+        return CalendarStatusOut(
+            connected=False,
+            oauth_configured=oauth_configured,
+            oauth_redirect_uri=redirect_uri,
+        )
     return CalendarStatusOut(
         connected=True,
         google_email=row.google_email,
         oauth_configured=oauth_configured,
+        oauth_redirect_uri=redirect_uri,
     )
 
 

@@ -212,19 +212,117 @@ body {
 }
 
 .twin-billing-surface .twin-billing-plan-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
   align-self: stretch;
   width: 100%;
   min-width: 0;
   max-width: none;
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--twin-border);
+  background: var(--twin-surface-raised);
+  text-align: start;
+  hyphens: none;
+  -webkit-hyphens: none;
+  text-wrap: wrap;
 }
 
-.twin-billing-surface .twin-billing-plan-card p {
+.twin-billing-surface .twin-billing-plan-card--current {
+  box-shadow: 0 0 0 2px var(--twin-accent-muted);
+}
+
+.twin-billing-surface .twin-billing-plan-card--muted {
+  opacity: 0.88;
+}
+
+.twin-billing-surface .twin-billing-plan-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.twin-billing-surface .twin-billing-plan-card__title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--foreground);
+  text-transform: capitalize;
+}
+
+.twin-billing-surface .twin-billing-plan-card__badge {
+  flex-shrink: 0;
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--twin-accent-muted);
+  color: var(--twin-accent-hover);
+}
+
+.twin-billing-surface .twin-billing-plan-card__price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.twin-billing-surface .twin-billing-plan-card__amount {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--twin-accent);
+}
+
+.twin-billing-surface .twin-billing-plan-card__period {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--twin-muted-strong);
+}
+
+.twin-billing-surface .twin-billing-plan-card__desc,
+.twin-billing-surface .twin-billing-plan-card__meta,
+.twin-billing-surface .twin-billing-plan-card__note {
+  margin: 0.5rem 0 0;
+  max-width: 100%;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  text-align: start;
   hyphens: none;
   -webkit-hyphens: none;
   word-break: normal;
   overflow-wrap: break-word;
-  text-align: start;
+  white-space: normal;
   text-wrap: wrap;
+}
+
+.twin-billing-surface .twin-billing-plan-card__desc {
+  color: var(--twin-muted-strong);
+}
+
+.twin-billing-surface .twin-billing-plan-card__meta {
+  font-size: 0.75rem;
+  color: var(--twin-muted);
+}
+
+.twin-billing-surface .twin-billing-plan-card__note {
+  font-size: 0.8125rem;
+  color: var(--twin-muted-strong);
+}
+
+.twin-billing-surface .twin-billing-plan-card__cta {
+  margin-top: 1rem;
+}
+
+.twin-billing-surface .twin-billing-plan-card__btn {
+  width: auto;
+  min-width: min(100%, 12rem);
 }
 
 button,

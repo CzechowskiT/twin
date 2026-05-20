@@ -8,12 +8,43 @@ import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch, apiFetchBlob, saveBlobAsFile } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
+import type { TranslationKey } from "@/lib/i18n";
 
 type CalendarStatus = {
   connected: boolean;
   google_email: string | null;
   oauth_configured?: boolean;
+  oauth_redirect_uri?: string | null;
 };
+
+function GoogleRedirectSetupHint({
+  redirectUri,
+  t,
+}: {
+  redirectUri: string;
+  t: (key: TranslationKey) => string;
+}) {
+  return (
+    <div className="mt-3 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-900 dark:text-amber-100">
+      <p className="leading-relaxed">{t("dashboard.calendarGoogleRedirectSetup")}</p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        <input
+          readOnly
+          value={redirectUri}
+          className="twin-input min-w-0 flex-1 font-mono text-xs"
+          aria-label="Google OAuth redirect URI"
+        />
+        <Button
+          type="button"
+          className="twin-btn-secondary twin-touch-target shrink-0"
+          onClick={() => void navigator.clipboard.writeText(redirectUri)}
+        >
+          {t("dashboard.calendarGoogleRedirectCopy")}
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 type MicrosoftCalendarStatus = {
   connected: boolean;
@@ -704,14 +735,19 @@ export default function DashboardCalendarPage() {
                   {t("dashboard.calendarGoogleOAuthNotConfigured")}
                 </p>
               ) : (
-                <Button
-                  type="button"
-                  className="twin-touch-target mt-3"
-                  disabled={Boolean(actionBusy)}
-                  onClick={() => void connect()}
-                >
-                  {actionBusy === "connect" ? "…" : t("dashboard.calendarConnect")}
-                </Button>
+                <>
+                  <Button
+                    type="button"
+                    className="twin-touch-target mt-3"
+                    disabled={Boolean(actionBusy)}
+                    onClick={() => void connect()}
+                  >
+                    {actionBusy === "connect" ? "…" : t("dashboard.calendarConnect")}
+                  </Button>
+                  {status?.oauth_redirect_uri ? (
+                    <GoogleRedirectSetupHint redirectUri={status.oauth_redirect_uri} t={t} />
+                  ) : null}
+                </>
               )}
             </div>
             <div className="rounded-xl border border-[var(--twin-border)] p-4">
@@ -1006,9 +1042,14 @@ export default function DashboardCalendarPage() {
                 {t("dashboard.calendarGoogleOAuthNotConfigured")}
               </p>
             ) : (
-              <Button type="button" className="twin-touch-target mt-3" disabled={Boolean(actionBusy)} onClick={() => void connect()}>
-                {actionBusy === "connect" ? "…" : t("dashboard.calendarConnect")}
-              </Button>
+              <>
+                <Button type="button" className="twin-touch-target mt-3" disabled={Boolean(actionBusy)} onClick={() => void connect()}>
+                  {actionBusy === "connect" ? "…" : t("dashboard.calendarConnect")}
+                </Button>
+                {status?.oauth_redirect_uri ? (
+                  <GoogleRedirectSetupHint redirectUri={status.oauth_redirect_uri} t={t} />
+                ) : null}
+              </>
             )}
           </div>
           <div className="rounded-xl border border-[var(--twin-border)] p-4">
