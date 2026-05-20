@@ -58,6 +58,7 @@ export type WaitlistCopyBase = {
   formSuccessTitle: string;
   formSuccessPosition: string;
   formCopy: string;
+  formShare: string;
   formReferralHint: string;
   formOpenDashboard: string;
   formErrorGeneric: string;
@@ -190,6 +191,7 @@ const en: WaitlistCopyBase = {
   formSuccessTitle: "You're on the list!",
   formSuccessPosition: "Position: #{position}",
   formCopy: "Copy",
+  formShare: "Share link",
   formReferralHint: "Invite friends — each person moves you up the queue.",
   formOpenDashboard: "Open waitlist panel",
   formErrorGeneric: "Something went wrong. Try again.",
@@ -319,6 +321,7 @@ const pl: WaitlistCopyBase = {
   formSuccessTitle: "Jesteś na liście!",
   formSuccessPosition: "Pozycja: #{position}",
   formCopy: "Kopiuj",
+  formShare: "Udostępnij link",
   formReferralHint: "Zaproś znajomych — każda osoba = wyższa pozycja na liście.",
   formOpenDashboard: "Otwórz panel waitlisty",
   formErrorGeneric: "Wystąpił błąd. Spróbuj ponownie.",

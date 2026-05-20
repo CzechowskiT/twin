@@ -42,6 +42,7 @@ export function useWaitlistStats() {
   const signupsToday = stats?.signups_today ?? 23;
   const cap = stats?.cap ?? 1000;
   const total = stats?.total_signups ?? cap - spotsRemaining;
+  const statsLive = stats !== null;
 
-  return { stats, leaderboard, error, spotsRemaining, signupsToday, cap, total };
+  return { stats, leaderboard, error, spotsRemaining, signupsToday, cap, total, statsLive };
 }

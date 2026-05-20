@@ -29,6 +29,8 @@ type User = {
   plan_tier?: string;
   subscription_status?: string | null;
   subscription_current_period_end?: string | null;
+  scrape_ops_configured?: boolean;
+  can_trigger_scrape?: boolean;
 };
 type Profile = {
   name: string;
@@ -1214,11 +1216,24 @@ export default function DashboardPage() {
                 type="button"
                 aria-label={t("dashboard.twinForYourJob")}
                 onClick={() => triggerScrapeAll()}
-                disabled={scraping}
+                disabled={scraping || user?.can_trigger_scrape === false}
                 className="!mt-4 !rounded-full !py-3.5 !text-base !font-bold !tracking-tight !shadow-lg"
               >
                 {scraping ? t("dashboard.twinForYourJobRunning") : t("dashboard.twinForYourJob")}
               </ButtonCta>
+              {user?.can_trigger_scrape === false ? (
+                <p className="mt-3 text-sm text-amber-700 dark:text-amber-300">
+                  {user.scrape_ops_configured
+                    ? t("dashboard.scrapeOpsDenied")
+                    : t("dashboard.scrapeOpsNotConfigured")}
+                  {user.scrape_ops_configured ? (
+                    <>
+                      {" "}
+                      (id {user.id}, {user.email})
+                    </>
+                  ) : null}
+                </p>
+              ) : null}
               <p className="twin-muted mt-3 text-xs leading-relaxed">{t("dashboard.twinForYourJobHint")}</p>
               <p className="twin-muted mt-2 text-[11px] leading-relaxed">
                 {t("dashboard.scrapeAllHint")} {t("dashboard.keepApiOpen")}

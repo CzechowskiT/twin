@@ -95,8 +95,8 @@ function WaitlistFormInner({
         <p className="mt-2 text-lg text-[var(--wl-text-secondary)]">
           {formatWaitlist(copy.formSuccessPosition, { position: join.position })}
         </p>
-        <div className="mt-6 flex gap-2">
-          <input readOnly value={referralLink} className="wl-input flex-1 text-sm" aria-label={copy.formCopy} />
+        <div className="mt-6 flex flex-wrap gap-2">
+          <input readOnly value={referralLink} className="wl-input min-w-0 flex-1 text-sm" aria-label={copy.formCopy} />
           <button
             type="button"
             className="wl-btn-secondary shrink-0"
@@ -104,6 +104,21 @@ function WaitlistFormInner({
           >
             {copy.formCopy}
           </button>
+          {typeof navigator !== "undefined" && typeof navigator.share === "function" ? (
+            <button
+              type="button"
+              className="wl-btn-secondary shrink-0"
+              onClick={() =>
+                void navigator.share({
+                  title: "TWIN Wishlist",
+                  text: copy.formReferralHint,
+                  url: referralLink,
+                })
+              }
+            >
+              {copy.formShare}
+            </button>
+          ) : null}
         </div>
         <p className="mt-4 text-sm text-[var(--wl-text-secondary)]">{copy.formReferralHint}</p>
         <Link href="/beta/dashboard" className="wl-btn-primary mt-6 inline-block text-center no-underline">

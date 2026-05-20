@@ -6,6 +6,8 @@ export type WaitlistNarrative = {
   heroOfferBadge: string;
   heroOfferSub: string;
   valueStrip: [string, string, string];
+  statsLiveLabel: string;
+  statsOfflineHint: string;
   sectionWhy: string;
   whyLead: string;
   whyPillars: [WaitlistPillar, WaitlistPillar, WaitlistPillar];
@@ -29,6 +31,8 @@ const en: WaitlistNarrative = {
     "No credit card · cancel nothing later",
     "Access in ~14 days if you're in the first thousand",
   ],
+  statsLiveLabel: "Live waitlist data",
+  statsOfflineHint: "Could not reach live stats — numbers below may be delayed. Signup still works.",
   sectionWhy: "Why developers are leaving the job-board treadmill",
   whyLead:
     "You didn't fail at job search — the game was designed for volume, not fit. TWIN is an autonomous agent that does the grind and only puts acceptance-ready moments on your calendar.",
@@ -90,6 +94,8 @@ const pl: WaitlistNarrative = {
     "Bez karty · bez ukrytych opłat później",
     "Dostęp w ~14 dni, jeśli jesteś w pierwszej tysiątce",
   ],
+  statsLiveLabel: "Dane na żywo z listy",
+  statsOfflineHint: "Brak połączenia ze statystykami — liczby mogą być opóźnione. Zapis nadal działa.",
   sectionWhy: "Dlaczego developerzy schodzą z bieżni portali",
   whyLead:
     "To nie Ty przegrałeś z rynkiem pracy — gra była ustawiona na wolumen, nie na dopasowanie. TWIN to autonomiczny agent, który robi harówkę i zostawia na kalendarzu tylko momenty gotowe do akceptacji.",

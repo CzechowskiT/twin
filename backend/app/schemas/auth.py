@@ -109,6 +109,8 @@ class UserOut(BaseModel):
     email_product_updates: bool = False
     email_interview_reminders: bool = False
     profile_documents_processing_consent_at: datetime | None = None
+    scrape_ops_configured: bool = False
+    can_trigger_scrape: bool = False
 
     model_config = {"from_attributes": True}
 

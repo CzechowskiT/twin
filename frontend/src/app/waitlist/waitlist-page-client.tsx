@@ -80,7 +80,8 @@ export function WaitlistPageClient() {
   const { locale } = useTranslation();
   const typed = useTypingHeadline(copy.heroHeadline);
   const countdown = useCountdown(copy.finalMidnight);
-  const { stats, leaderboard, spotsRemaining, signupsToday, cap, total } = useWaitlistStats();
+  const { stats, leaderboard, spotsRemaining, signupsToday, cap, total, statsLive, error: statsError } =
+    useWaitlistStats();
   const [terminalStep, setTerminalStep] = useState(0);
   const [testimonialIdx, setTestimonialIdx] = useState(0);
 
@@ -149,6 +150,16 @@ export function WaitlistPageClient() {
               <li key={line}>{line}</li>
             ))}
           </ul>
+          {statsError ? (
+            <p className="wl-stats-offline" role="status">
+              {copy.statsOfflineHint}
+            </p>
+          ) : statsLive ? (
+            <p className="wl-stats-live" role="status">
+              <span className="wl-live-dot" aria-hidden />
+              {copy.statsLiveLabel}
+            </p>
+          ) : null}
           <WaitlistForm
             key={locale}
             spotsRemaining={spotsRemaining}
