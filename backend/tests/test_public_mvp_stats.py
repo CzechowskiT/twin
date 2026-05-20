@@ -25,9 +25,11 @@ def _sqlite():
     return sessionmaker(bind=engine, autocommit=False, autoflush=False)()
 
 
+@patch("app.api.public.is_google_calendar_oauth_configured", return_value=False)
+@patch("app.api.public.is_mail_configured", return_value=False)
 @patch("app.api.public._stripe_checkout_ready", return_value=False)
 @patch("app.api.public.is_linkedin_oauth_configured", return_value=False)
-def test_public_mvp_stats_shape_empty(_mock_li: object, _mock_stripe: object) -> None:
+def test_public_mvp_stats_shape_empty(_mock_li: object, _mock_stripe: object, *_rest: object) -> None:
     db = _sqlite()
 
     def override_db():
@@ -51,14 +53,18 @@ def test_public_mvp_stats_shape_empty(_mock_li: object, _mock_stripe: object) ->
         assert body["generated_at"].endswith("Z")
         assert body["linkedin_oauth_configured"] is False
         assert body["stripe_checkout_ready"] is False
+        assert body["mail_configured"] is False
+        assert body["google_calendar_configured"] is False
     finally:
         app.dependency_overrides.pop(get_db, None)
         db.close()
 
 
+@patch("app.api.public.is_google_calendar_oauth_configured", return_value=False)
+@patch("app.api.public.is_mail_configured", return_value=False)
 @patch("app.api.public._stripe_checkout_ready", return_value=False)
 @patch("app.api.public.is_linkedin_oauth_configured", return_value=False)
-def test_public_mvp_stats_validated_jobs_excludes_bulk_global_boards(_mock_li: object, _mock_stripe: object) -> None:
+def test_public_mvp_stats_validated_jobs_excludes_bulk_global_boards(_mock_li: object, _mock_stripe: object, *_rest: object) -> None:
     """Traction counter is Poland-first + LinkedIn core only — not raw global scrape volume."""
     db = _sqlite()
     db.add(
@@ -100,9 +106,11 @@ def test_public_mvp_stats_validated_jobs_excludes_bulk_global_boards(_mock_li: o
         db.close()
 
 
+@patch("app.api.public.is_google_calendar_oauth_configured", return_value=True)
+@patch("app.api.public.is_mail_configured", return_value=True)
 @patch("app.api.public._stripe_checkout_ready", return_value=True)
 @patch("app.api.public.is_linkedin_oauth_configured", return_value=True)
-def test_public_mvp_stats_integration_flags_true(_mock_li: object, _mock_stripe: object) -> None:
+def test_public_mvp_stats_integration_flags_true(_mock_li: object, _mock_stripe: object, *_rest: object) -> None:
     db = _sqlite()
 
     def override_db():
@@ -119,14 +127,18 @@ def test_public_mvp_stats_integration_flags_true(_mock_li: object, _mock_stripe:
         body = res.json()
         assert body["linkedin_oauth_configured"] is True
         assert body["stripe_checkout_ready"] is True
+        assert body["mail_configured"] is True
+        assert body["google_calendar_configured"] is True
     finally:
         app.dependency_overrides.pop(get_db, None)
         db.close()
 
 
+@patch("app.api.public.is_google_calendar_oauth_configured", return_value=False)
+@patch("app.api.public.is_mail_configured", return_value=False)
 @patch("app.api.public._stripe_checkout_ready", return_value=False)
 @patch("app.api.public.is_linkedin_oauth_configured", return_value=False)
-def test_public_mvp_stats_counts(_mock_li: object, _mock_stripe: object) -> None:
+def test_public_mvp_stats_counts(_mock_li: object, _mock_stripe: object, *_rest: object) -> None:
     db = _sqlite()
     u = User(email="stats@example.com", hashed_password="x")
     db.add(u)

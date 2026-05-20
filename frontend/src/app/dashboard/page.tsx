@@ -16,7 +16,7 @@ import { InvestorRoadmapPanel } from "@/components/investor-roadmap-panel";
 import { useTranslation } from "@/components/language-provider";
 import { JobFiltersBar } from "@/components/job-filters";
 import { JobList } from "@/components/job-list";
-import { ButtonCta, Card, Shell } from "@/components/ui";
+import { Button, ButtonCta, Card, Shell } from "@/components/ui";
 import { apiFetch, apiFetchBlob, isLikelyBrowserNetworkFailureMessage, saveBlobAsFile } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
 import { SHOW_SCRAPE_UI } from "@/lib/features";
@@ -74,7 +74,12 @@ type MatchItem = {
 type MatchList = { items: MatchItem[]; total: number };
 type FilterOptions = { job_boards: string[]; locations: string[] };
 
-type GoogleCalendarStrip = { connected: boolean; google_email: string | null };
+type GoogleCalendarStrip = {
+  connected: boolean;
+  google_email: string | null;
+  oauth_configured?: boolean;
+  oauth_redirect_uri?: string | null;
+};
 
 type DashboardCalendarBundle = {
   status: GoogleCalendarStrip;
@@ -190,6 +195,7 @@ export default function DashboardPage() {
   const [placementEventsInvalidateKey, setPlacementEventsInvalidateKey] = useState(0);
   const [dashboardCalendarBundle, setDashboardCalendarBundle] = useState<DashboardCalendarBundle | null>(null);
   const [nextInterviewIcsBusy, setNextInterviewIcsBusy] = useState(false);
+  const [calendarConnectBusy, setCalendarConnectBusy] = useState(false);
   const [applicationsCsvBusy, setApplicationsCsvBusy] = useState(false);
   const [applicationsXlsxBusy, setApplicationsXlsxBusy] = useState(false);
   const [matchesCsvBusy, setMatchesCsvBusy] = useState(false);
@@ -915,6 +921,21 @@ export default function DashboardPage() {
     }
   }
 
+  async function connectGoogleCalendarFromDashboard() {
+    const token = getToken();
+    if (!token) return;
+    setCalendarConnectBusy(true);
+    setError(null);
+    try {
+      const res = await apiFetch<{ authorize_url: string }>("/api/v1/calendar/google/authorize", {}, token);
+      window.location.href = res.authorize_url;
+    } catch (err) {
+      setError(dashboardFetchUserMessage(err, t));
+    } finally {
+      setCalendarConnectBusy(false);
+    }
+  }
+
   async function declarePlacement(applicationId: number, note: string) {
     const token = getToken();
     if (!token) return;
@@ -1153,8 +1174,22 @@ export default function DashboardPage() {
                           "{email}",
                           dashboardCalendarBundle.status.google_email?.trim() || "—",
                         )
-                      : t("dashboard.calendarStripDisconnected")}
+                      : dashboardCalendarBundle.status.oauth_configured === false
+                        ? t("dashboard.calendarGoogleOAuthNotConfigured")
+                        : t("dashboard.calendarStripDisconnected")}
                 </p>
+                {dashboardCalendarBundle &&
+                !dashboardCalendarBundle.status.connected &&
+                dashboardCalendarBundle.status.oauth_configured ? (
+                  <Button
+                    type="button"
+                    className="twin-touch-target mt-3 !w-auto"
+                    disabled={calendarConnectBusy}
+                    onClick={() => void connectGoogleCalendarFromDashboard()}
+                  >
+                    {calendarConnectBusy ? "…" : t("dashboard.calendarStripConnectGoogle")}
+                  </Button>
+                ) : null}
                 {dashboardCalendarBundle &&
                 (dashboardCalendarBundle.nextInterview || dashboardCalendarBundle.status.connected) ? (
                   <div className="mt-3 border-t border-[var(--twin-border)] pt-3">
@@ -1223,12 +1258,14 @@ export default function DashboardPage() {
                   </div>
                 ) : null}
               </div>
-              <Link
-                href="/dashboard/calendar"
-                className="twin-btn-secondary twin-touch-target shrink-0 self-start text-center text-sm sm:text-left"
-              >
-                {t("dashboard.calendarStripCta")}
-              </Link>
+              <div className="flex shrink-0 flex-col gap-2 self-start">
+                <Link
+                  href="/dashboard/calendar"
+                  className="twin-btn-secondary twin-touch-target text-center text-sm sm:text-left"
+                >
+                  {t("dashboard.calendarStripCta")}
+                </Link>
+              </div>
             </div>
           </Card>
         </>

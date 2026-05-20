@@ -14,7 +14,9 @@ from app.database.models import Application, Candidate, User
 from app.database.session import get_db
 from app.scrapers.registry import scrape_board_ids_ordered
 from app.schemas.public import MvpStatsOut
+from app.services.google_calendar_oauth import is_google_calendar_oauth_configured
 from app.services.linkedin_oauth import is_linkedin_oauth_configured
+from app.services.mail import is_mail_configured
 from app.services.mvp_public_metrics import count_validated_jobs_public_traction
 
 router = APIRouter()
@@ -49,6 +51,8 @@ def mvp_stats(db: Session = Depends(get_db)) -> MvpStatsOut:
             job_boards_in_registry=boards,
             linkedin_oauth_configured=is_linkedin_oauth_configured(),
             stripe_checkout_ready=_stripe_checkout_ready(s),
+            mail_configured=is_mail_configured(s),
+            google_calendar_configured=is_google_calendar_oauth_configured(),
             generated_at=datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         )
     except HTTPException:

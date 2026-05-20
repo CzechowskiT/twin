@@ -24,3 +24,9 @@ class MvpStatsOut(BaseModel):
     stripe_checkout_ready: bool = Field(
         description="True when Stripe secret key and at least one subscription price id are configured.",
     )
+    mail_configured: bool = Field(
+        description="True when transactional email (Resend or SMTP) is wired on the API host.",
+    )
+    google_calendar_configured: bool = Field(
+        description="True when Google Calendar OAuth client id, secret, and redirect URI are configured.",
+    )

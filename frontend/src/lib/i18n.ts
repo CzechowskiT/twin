@@ -621,6 +621,7 @@ const en = {
     calendarStripConnected: "Google Calendar connected as {email}.",
     calendarStripDisconnected:
       "Google Calendar is not connected. Connect so TWIN can read busy time before proposing interview slots.",
+    calendarStripConnectGoogle: "Connect Google Calendar",
     calendarStripCta: "Open calendar settings",
     calendarNextInterviewTitle: "Next interview",
     calendarNextInterviewEmpty:
@@ -1068,6 +1069,8 @@ const en = {
     liveStatsBoards: "Board adapters",
     liveStatsLinkedin: "LinkedIn OAuth",
     liveStatsStripe: "Stripe checkout",
+    liveStatsMail: "Transactional email",
+    liveStatsGoogleCal: "Google Calendar OAuth",
     liveStatsOn: "Ready",
     liveStatsOff: "Off",
     liveStatsAsOf: "Snapshot: {ts}",
@@ -1989,6 +1992,7 @@ const pl: MessageTree = {
     calendarStripConnected: "Google Calendar: połączono jako {email}.",
     calendarStripDisconnected:
       "Google Calendar nie jest połączony. Połącz, żeby TWIN widział zajętość przy propozycjach slotów rozmów.",
+    calendarStripConnectGoogle: "Połącz Google Calendar",
     calendarStripCta: "Ustawienia kalendarza",
     calendarNextInterviewTitle: "Najbliższa rozmowa",
     calendarNextInterviewEmpty:
@@ -2449,6 +2453,8 @@ const pl: MessageTree = {
     liveStatsBoards: "Adaptery portali",
     liveStatsLinkedin: "OAuth LinkedIn",
     liveStatsStripe: "Stripe checkout",
+    liveStatsMail: "E-mail transakcyjny",
+    liveStatsGoogleCal: "OAuth Google Calendar",
     liveStatsOn: "Aktywne",
     liveStatsOff: "Wyłączone",
     liveStatsAsOf: "Migawka: {ts}",

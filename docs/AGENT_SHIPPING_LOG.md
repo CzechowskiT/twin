@@ -1,5 +1,12 @@
 # Agent shipping log
 
+## 2026-05-19 — MVP batch: billing, calendar connect, investor ops flags
+
+- **Billing:** plan tier cards use shared `BillingPlanTierCard` + CSS; long “not configured” copy under CTA, not in pill.
+- **Calendar:** `oauth_redirect_uri` on `/calendar/google/status`; setup hint + copy on calendar page; dashboard strip **Connect Google Calendar** when OAuth wired.
+- **Public:** `GET /mvp-stats` adds `mail_configured`, `google_calendar_configured`; investor strip shows both.
+- **Docs:** `docs/NEXT_10_STEPS.md` — shipped vs backlog.
+
 ## 2026-05-19 — Waitlist batch 2 (auto)
 
 - **i18n:** `/waitlist` copy for all 9 app locales (`waitlist-messages.ts`, language switcher on page).

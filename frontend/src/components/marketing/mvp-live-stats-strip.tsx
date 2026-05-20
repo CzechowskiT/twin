@@ -13,6 +13,8 @@ type MvpStats = {
   generated_at: string;
   linkedin_oauth_configured: boolean;
   stripe_checkout_ready: boolean;
+  mail_configured: boolean;
+  google_calendar_configured: boolean;
 };
 
 export function MvpLiveStatsStrip() {
@@ -77,7 +79,7 @@ export function MvpLiveStatsStrip() {
         <h2 className="mt-1 text-base font-semibold text-[var(--foreground)]">{t("investorCalc.liveStatsTitle")}</h2>
         <p className="mt-1 text-xs leading-relaxed text-[var(--twin-muted-strong)]">{t("investorCalc.liveStatsLead")}</p>
       </div>
-      <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-7">
+      <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-9">
         <div className="rounded-lg bg-[var(--twin-surface-2)] px-3 py-2 text-center">
           <dt className="text-[10px] font-medium uppercase text-[var(--twin-muted-strong)]">{t("investorCalc.liveStatsJobs")}</dt>
           <dd className="mt-1 text-lg font-bold tabular-nums text-[var(--foreground)]">{fmt(data.validated_jobs)}</dd>
@@ -105,6 +107,14 @@ export function MvpLiveStatsStrip() {
         <div className="rounded-lg bg-[var(--twin-surface-2)] px-3 py-2 text-center">
           <dt className="text-[10px] font-medium uppercase text-[var(--twin-muted-strong)]">{t("investorCalc.liveStatsStripe")}</dt>
           <dd className="mt-1 text-sm font-semibold text-[var(--foreground)]">{flag(data.stripe_checkout_ready)}</dd>
+        </div>
+        <div className="rounded-lg bg-[var(--twin-surface-2)] px-3 py-2 text-center">
+          <dt className="text-[10px] font-medium uppercase text-[var(--twin-muted-strong)]">{t("investorCalc.liveStatsMail")}</dt>
+          <dd className="mt-1 text-sm font-semibold text-[var(--foreground)]">{flag(data.mail_configured)}</dd>
+        </div>
+        <div className="rounded-lg bg-[var(--twin-surface-2)] px-3 py-2 text-center">
+          <dt className="text-[10px] font-medium uppercase text-[var(--twin-muted-strong)]">{t("investorCalc.liveStatsGoogleCal")}</dt>
+          <dd className="mt-1 text-sm font-semibold text-[var(--foreground)]">{flag(data.google_calendar_configured)}</dd>
         </div>
       </dl>
       <p className="mt-4 text-center text-[10px] text-[var(--twin-muted)]">{t("investorCalc.liveStatsAsOf").replace("{ts}", snap)}</p>
