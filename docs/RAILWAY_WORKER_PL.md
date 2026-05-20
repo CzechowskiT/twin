@@ -16,13 +16,18 @@ Scraping i zadania w tle **nie działają na samym API** — potrzebujesz osobne
 5. **Networking** — worker **nie potrzebuje** publicznej domeny.
 6. **Deploy**.
 
-## 2. Serwis `twin-beat` (opcjonalnie)
+## 2. Beat (wbudowany w worker)
 
-Tylko jeśli `SCRAPE_BEAT_ENABLED=true` na API/worker.
+`deploy/railway-worker.toml` uruchamia **`worker --beat`** (jeden serwis zamiast osobnego `twin-beat`).
 
-1. Trzeci serwis z repo, **Root:** `backend`, **Config:** `deploy/railway-beat.toml`
-2. Te same `CELERY_*` + Redis co worker.
-3. Start: `celery -A app.tasks.celery_app beat --loglevel=info`
+Na API i worker ustaw m.in.:
+
+- `CELERY_BROKER_URL` / `CELERY_RESULT_BACKEND` = `${{Redis.REDIS_URL}}`
+- `CELERY_TASK_ALWAYS_EAGER=false`
+- `SCRAPE_WORKER_READY=true`
+- `SCRAPE_BEAT_ENABLED=true`
+
+Opcjonalnie osobny serwis: **Config** `deploy/railway-beat.toml` (tylko gdy nie używasz `--beat` na workerze).
 
 ## 3. Weryfikacja
 

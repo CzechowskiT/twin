@@ -55,8 +55,15 @@ def health_check(
         from app.services.mail import is_mail_configured
         from app.services.microsoft_calendar_oauth import is_microsoft_calendar_oauth_configured
 
+        from app.api.public import _stripe_checkout_ready
+        from app.core.scrape_ops import scrape_worker_ready
+
         s = get_settings()
         out["mail_configured"] = is_mail_configured(s)
         out["google_calendar_configured"] = is_google_calendar_oauth_configured()
         out["microsoft_calendar_configured"] = is_microsoft_calendar_oauth_configured()
+        out["stripe_checkout_ready"] = _stripe_checkout_ready(s)
+        out["scrape_worker_ready"] = scrape_worker_ready(s)
+        out["scrape_beat_enabled"] = s.scrape_beat_enabled
+        out["celery_task_always_eager"] = s.celery_task_always_eager
     return out

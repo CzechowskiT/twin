@@ -64,3 +64,7 @@ def test_health_ops_includes_mail_and_calendar_flags(
     assert data.get("mail_configured") is True
     assert data.get("google_calendar_configured") is False
     assert data.get("microsoft_calendar_configured") is False
+    assert data.get("stripe_checkout_ready") is False
+    assert data.get("scrape_worker_ready") is False
+    assert data.get("scrape_beat_enabled") is False
+    assert data.get("celery_task_always_eager") is False

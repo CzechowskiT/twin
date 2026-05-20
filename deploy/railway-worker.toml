@@ -7,5 +7,6 @@ dockerfilePath = "Dockerfile"
 watchPatterns = ["**"]
 
 [deploy]
-startCommand = "celery -A app.tasks.celery_app worker --loglevel=info"
+# --beat: daily scrape-all + placement retention (avoids a third Railway service)
+startCommand = "celery -A app.tasks.celery_app worker --beat --loglevel=info"
 restartPolicyType = "ON_FAILURE"

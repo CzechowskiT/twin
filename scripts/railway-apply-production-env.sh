@@ -63,9 +63,25 @@ set_var GOOGLE_CLIENT_ID "${GOOGLE_CLIENT_ID:-}"
 set_var GOOGLE_CLIENT_SECRET "${GOOGLE_CLIENT_SECRET:-}"
 set_var GOOGLE_CALENDAR_REDIRECT_URI "$GCAL_REDIRECT"
 
+# Celery + scrape worker (Redis plugin must exist; worker service uses deploy/railway-worker.toml --beat)
+REDIS_REF="${CELERY_BROKER_URL:-\${{Redis.REDIS_URL}}}"
+set_var CELERY_BROKER_URL "$REDIS_REF"
+set_var CELERY_RESULT_BACKEND "${CELERY_RESULT_BACKEND:-$REDIS_REF}"
+set_var REDIS_URL "${REDIS_URL:-$REDIS_REF}"
+set_var CELERY_TASK_ALWAYS_EAGER "${CELERY_TASK_ALWAYS_EAGER:-false}"
+set_var SCRAPE_WORKER_READY "${SCRAPE_WORKER_READY:-true}"
+set_var SCRAPE_BEAT_ENABLED "${SCRAPE_BEAT_ENABLED:-true}"
+set_var AUTO_APPLY_HEADLESS "${AUTO_APPLY_HEADLESS:-true}"
+
+# Stripe Checkout (run scripts/stripe-bootstrap-test.py first to create price + webhook in test mode)
+set_var STRIPE_SECRET_KEY "${STRIPE_SECRET_KEY:-}"
+set_var STRIPE_WEBHOOK_SECRET "${STRIPE_WEBHOOK_SECRET:-}"
+set_var STRIPE_PRICE_ID_PREMIUM "${STRIPE_PRICE_ID_PREMIUM:-}"
+set_var STRIPE_PRICE_ID_PRO "${STRIPE_PRICE_ID_PRO:-}"
+
 echo "Redeploying API service…"
 "${CLI[@]}" redeploy --yes
 
 echo "Done. Verify:"
 echo "  curl -sS \"$API_URL/api/v1/health?ops=1\" | jq ."
-echo "Expect mail_configured:true; google_calendar_configured / microsoft_calendar_configured after OAuth secrets"
+echo "Expect scrape_worker_ready, stripe_checkout_ready when Stripe vars are set."
