@@ -32,6 +32,7 @@ type BillingPlanTierCardProps = {
   onPrimary: () => void;
   disabled: boolean;
   isCurrent: boolean;
+  featured?: boolean;
 };
 
 export function BillingPlanTierCard({
@@ -45,6 +46,7 @@ export function BillingPlanTierCard({
   onPrimary,
   disabled,
   isCurrent,
+  featured = false,
 }: BillingPlanTierCardProps) {
   const busyHere =
     (busy === "checkout-premium" && p.id === "premium") || (busy === "checkout-pro" && p.id === "pro");
@@ -52,14 +54,21 @@ export function BillingPlanTierCard({
   return (
     <article
       className={`twin-billing-plan-card${isCurrent ? " twin-billing-plan-card--current" : ""}${
-        disabled && !isCurrent ? " twin-billing-plan-card--muted" : ""
-      }`}
+        featured && !isCurrent ? " twin-billing-plan-card--featured" : ""
+      }${disabled && !isCurrent ? " twin-billing-plan-card--muted" : ""}`}
     >
       <header className="twin-billing-plan-card__head">
         <h3 className="twin-billing-plan-card__title">{displayName}</h3>
-        {isCurrent ? (
-          <span className="twin-billing-plan-card__badge">{t("dashboard.billingPlanCurrent")}</span>
-        ) : null}
+        <span className="twin-billing-plan-card__badges">
+          {featured && !isCurrent ? (
+            <span className="twin-billing-plan-card__badge twin-billing-plan-card__badge--featured">
+              {t("dashboard.billingEngagementRecommended")}
+            </span>
+          ) : null}
+          {isCurrent ? (
+            <span className="twin-billing-plan-card__badge">{t("dashboard.billingPlanCurrent")}</span>
+          ) : null}
+        </span>
       </header>
 
       <div className="twin-billing-plan-card__price">

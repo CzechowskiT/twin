@@ -233,8 +233,305 @@ body {
   box-shadow: 0 0 0 2px var(--twin-accent-muted);
 }
 
+.twin-billing-surface .twin-billing-plan-card--featured {
+  border-color: color-mix(in srgb, var(--twin-accent) 55%, var(--twin-border));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--twin-accent) 35%, transparent),
+    0 12px 40px rgb(124 58 237 / 0.12);
+}
+
+.twin-billing-surface .twin-billing-plan-card__badge--featured {
+  background: linear-gradient(90deg, rgb(124 58 237), rgb(6 182 212));
+  color: #fff;
+}
+
 .twin-billing-surface .twin-billing-plan-card--muted {
   opacity: 0.88;
+}
+
+/* Billing upgrade experience — waitlist-grade engagement inside dashboard */
+.twin-billing-surface .twin-billing-engage {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid var(--twin-border);
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--twin-accent) 12%, var(--twin-surface-raised)) 0%,
+    var(--twin-surface-raised) 42%,
+    var(--background) 100%
+  );
+}
+
+.twin-billing-surface .twin-billing-engage__mesh {
+  pointer-events: none;
+  position: absolute;
+  inset: -40% -20% auto;
+  height: 70%;
+  background: radial-gradient(ellipse at 20% 30%, rgb(139 92 246 / 0.22), transparent 55%),
+    radial-gradient(ellipse at 80% 20%, rgb(6 182 212 / 0.18), transparent 50%);
+  filter: blur(2px);
+}
+
+.twin-billing-surface .twin-billing-engage__inner {
+  position: relative;
+  z-index: 1;
+  padding: 1.25rem 1.25rem 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .twin-billing-surface .twin-billing-engage__inner {
+    padding: 1.5rem 1.75rem 1.75rem;
+  }
+}
+
+.twin-billing-surface .twin-billing-engage__eyebrow {
+  margin: 0;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--twin-accent);
+}
+
+.twin-billing-surface .twin-billing-engage__title {
+  margin: 0.75rem 0 0;
+  max-width: 36rem;
+  font-size: clamp(1.35rem, 3.5vw, 1.85rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: var(--foreground);
+}
+
+.twin-billing-surface .twin-billing-engage__lead {
+  margin: 0.75rem 0 0;
+  max-width: 40rem;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--twin-muted-strong);
+}
+
+.twin-billing-surface .twin-billing-engage__metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.twin-billing-surface .twin-billing-engage__metric {
+  border-radius: 0.75rem;
+  border: 1px solid var(--twin-border);
+  background: color-mix(in srgb, var(--background) 65%, transparent);
+  padding: 0.75rem 0.5rem;
+  text-align: center;
+}
+
+.twin-billing-surface .twin-billing-engage__metric-value {
+  display: block;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--twin-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.twin-billing-surface .twin-billing-engage__metric-label {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--twin-muted);
+}
+
+.twin-billing-surface .twin-billing-engage__pillars {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 768px) {
+  .twin-billing-surface .twin-billing-engage__pillars {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.twin-billing-surface .twin-billing-engage__pillar {
+  border-radius: 0.75rem;
+  border: 1px solid var(--twin-border);
+  background: var(--twin-card);
+  padding: 1rem;
+}
+
+.twin-billing-surface .twin-billing-engage__pillar-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  background: var(--twin-accent-muted);
+  font-size: 0.9rem;
+  color: var(--twin-accent-hover);
+}
+
+.twin-billing-surface .twin-billing-engage__pillar-title {
+  margin: 0.65rem 0 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.twin-billing-surface .twin-billing-engage__pillar-body {
+  margin: 0.35rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--twin-muted-strong);
+}
+
+.twin-billing-surface .twin-billing-engage__compare {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .twin-billing-surface .twin-billing-engage__compare {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.twin-billing-surface .twin-billing-engage__compare-card {
+  border-radius: 0.75rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--twin-border);
+}
+
+.twin-billing-surface .twin-billing-engage__compare-card--before {
+  background: color-mix(in srgb, rgb(239 68 68) 6%, var(--twin-card));
+}
+
+.twin-billing-surface .twin-billing-engage__compare-card--after {
+  background: color-mix(in srgb, rgb(16 185 129) 8%, var(--twin-card));
+  box-shadow: 0 0 0 1px color-mix(in srgb, rgb(16 185 129) 25%, transparent);
+}
+
+.twin-billing-surface .twin-billing-engage__compare-heading {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.twin-billing-surface .twin-billing-engage__compare-card--before .twin-billing-engage__compare-heading {
+  color: rgb(185 28 28);
+}
+
+.twin-billing-surface .twin-billing-engage__compare-card--after .twin-billing-engage__compare-heading {
+  color: rgb(5 150 105);
+}
+
+.twin-billing-surface .twin-billing-engage__compare-card ul {
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.twin-billing-surface .twin-billing-engage__compare-card li {
+  position: relative;
+  padding-left: 1.1rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--twin-muted-strong);
+}
+
+.twin-billing-surface .twin-billing-engage__compare-card li + li {
+  margin-top: 0.45rem;
+}
+
+.twin-billing-surface .twin-billing-engage__compare-card li::before {
+  position: absolute;
+  left: 0;
+  font-weight: 700;
+}
+
+.twin-billing-surface .twin-billing-engage__compare-card--before li::before {
+  content: "×";
+  color: rgb(220 38 38);
+}
+
+.twin-billing-surface .twin-billing-engage__compare-card--after li::before {
+  content: "✓";
+  color: rgb(5 150 105);
+}
+
+.twin-billing-surface .twin-billing-engage__trust {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.75rem;
+  color: var(--twin-muted);
+}
+
+.twin-billing-surface .twin-billing-engage__wishlist {
+  margin-top: 1.25rem;
+  border-radius: 0.75rem;
+  border: 1px dashed color-mix(in srgb, var(--twin-accent) 45%, var(--twin-border));
+  background: linear-gradient(90deg, rgb(139 92 246 / 0.08), rgb(6 182 212 / 0.08));
+  padding: 1rem 1.15rem;
+}
+
+.twin-billing-surface .twin-billing-engage__wishlist-eyebrow {
+  margin: 0;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--twin-accent);
+}
+
+.twin-billing-surface .twin-billing-engage__wishlist-title {
+  margin: 0.5rem 0 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.twin-billing-surface .twin-billing-engage__wishlist-lead {
+  margin: 0.35rem 0 0;
+  max-width: 36rem;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--twin-muted-strong);
+}
+
+.twin-billing-surface .twin-billing-engage__wishlist-cta {
+  display: inline-flex;
+  margin-top: 0.85rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  padding: 0.55rem 1.25rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(90deg, rgb(124 58 237), rgb(6 182 212));
+  box-shadow: 0 8px 24px rgb(124 58 237 / 0.35);
+  transition: filter 0.15s ease, transform 0.12s ease;
+}
+
+.twin-billing-surface .twin-billing-engage__wishlist-cta:hover {
+  filter: brightness(1.06);
 }
 
 .twin-billing-surface .twin-billing-plan-card__head {
@@ -243,6 +540,13 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem 1rem;
+}
+
+.twin-billing-surface .twin-billing-plan-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
 }
 
 .twin-billing-surface .twin-billing-plan-card__title {

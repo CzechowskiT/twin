@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { BillingPlanTierCard } from "@/components/billing/billing-plan-tier-card";
+import { BillingUpgradeExperience } from "@/components/billing/billing-upgrade-experience";
 import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
@@ -326,11 +327,17 @@ export default function BillingPage() {
         <div className="twin-app-read-pane mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0 max-w-2xl">
             <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">{t("dashboard.billingPageTitle")}</h1>
+            <p className="twin-muted mt-2 max-w-xl text-sm leading-relaxed">{t("dashboard.billingPageSubtitle")}</p>
           </div>
           <Link href="/dashboard" className="twin-btn-secondary twin-touch-target inline-block shrink-0 text-center sm:!w-auto">
             ← {t("dashboard.title")}
           </Link>
         </div>
+
+        <BillingUpgradeExperience
+          checkoutConfigured={plans?.checkout_configured ?? false}
+          currentTier={me?.plan_tier ?? "free"}
+        />
 
         <div className="space-y-4 sm:space-y-5">
           {checkoutBanner === "success" ? (
@@ -459,6 +466,19 @@ export default function BillingPage() {
         </Card>
       ) : null}
 
+      {plans && !loading && !plans.checkout_configured ? (
+        <Card variant="soft" className="mb-6 border-[var(--twin-accent-muted)]">
+          <p className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.billingStripeSoonTitle")}</p>
+          <p className="twin-muted mt-2 text-sm leading-relaxed">{t("dashboard.billingStripeSoonLead")}</p>
+          <Link
+            href="/waitlist"
+            className="twin-billing-engage__wishlist-cta twin-touch-target mt-4 inline-flex"
+          >
+            {t("dashboard.billingCtaJoinWishlist")}
+          </Link>
+        </Card>
+      ) : null}
+
       {plans && !loading ? (
         <Card>
           <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
@@ -500,23 +520,28 @@ export default function BillingPage() {
               plans.plans.map((p) => {
                 const tier = (me?.plan_tier ?? "free").toLowerCase();
                 const isCurrent = me != null && tier === p.id;
+                const featured = !paid && p.id === "premium";
                 const canOpenWorkspace = p.id === "free" && !isCurrent;
+                const canJoinWishlist =
+                  !paid && !plans.checkout_configured && (p.id === "premium" || p.id === "pro");
                 const canCheckoutPremium = !paid && p.id === "premium" && plans.checkout_configured;
                 const canCheckoutPro = !paid && p.id === "pro" && plans.checkout_configured && p.stripe_price_configured;
-                const actionable = canOpenWorkspace || canCheckoutPremium || canCheckoutPro;
+                const actionable = canOpenWorkspace || canJoinWishlist || canCheckoutPremium || canCheckoutPro;
                 const disabled = busy !== null || isCurrent || !actionable;
                 let footerKey: TranslationKey = "dashboard.billingPlanCurrent";
                 let statusNote: string | undefined;
                 if (!isCurrent) {
                   if (p.id === "free") footerKey = "dashboard.billingPlanOpenWorkspace";
                   else if (p.id === "premium") {
-                    if (plans.checkout_configured) footerKey = "dashboard.billingUpgradePremium";
+                    if (canJoinWishlist) footerKey = "dashboard.billingCtaJoinWishlist";
+                    else if (plans.checkout_configured) footerKey = "dashboard.billingUpgradePremium";
                     else {
                       footerKey = "dashboard.billingCtaUnavailableShort";
                       statusNote = t("dashboard.billingNotConfigured");
                     }
                   } else if (p.id === "pro") {
-                    if (!plans.checkout_configured) {
+                    if (canJoinWishlist) footerKey = "dashboard.billingCtaJoinWishlist";
+                    else if (!plans.checkout_configured) {
                       footerKey = "dashboard.billingCtaUnavailableShort";
                       statusNote = t("dashboard.billingNotConfigured");
                     } else if (!p.stripe_price_configured) {
@@ -538,10 +563,15 @@ export default function BillingPage() {
                     t={t}
                     disabled={disabled}
                     isCurrent={isCurrent}
+                    featured={featured}
                     onPrimary={() => {
                       if (busy !== null || isCurrent) return;
                       if (canOpenWorkspace) {
                         router.push("/dashboard");
+                        return;
+                      }
+                      if (canJoinWishlist) {
+                        router.push("/waitlist");
                         return;
                       }
                       if (canCheckoutPremium) void startCheckout("premium");
