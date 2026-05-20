@@ -263,10 +263,10 @@ export function CompanyLogoMarquee() {
   if (reducedMotion) {
     return (
       <div
-        className="border-y border-[var(--twin-border)] bg-[var(--twin-surface)]/90 py-4 backdrop-blur-[2px]"
+        className="company-logo-marquee shrink-0 border-y border-[var(--twin-border)] bg-[var(--twin-surface)]/90 py-5 backdrop-blur-[2px] sm:py-5"
         role="presentation"
       >
-        <div className="overflow-x-auto overflow-y-hidden [-webkit-overflow-scrolling:touch] px-3 sm:px-5">
+        <div className="company-logo-marquee__viewport overflow-x-auto [-webkit-overflow-scrolling:touch] px-3 sm:px-5">
           <div className="flex w-max items-center py-1">
             <LogoRow segmentIndex={0} ariaHidden={false} linkSuffixKey={linkSuffixKey} />
           </div>
@@ -277,11 +277,11 @@ export function CompanyLogoMarquee() {
 
   return (
     <div
-      className="border-y border-[var(--twin-border)] bg-[var(--twin-surface)]/90 py-4 backdrop-blur-[2px]"
+      className="company-logo-marquee shrink-0 border-y border-[var(--twin-border)] bg-[var(--twin-surface)]/90 py-5 backdrop-blur-[2px] sm:py-5"
       role="presentation"
     >
-      <div className="overflow-hidden px-3 sm:px-5" aria-hidden>
-        <div className="marketing-marquee-track flex w-max items-center will-change-transform">
+      <div className="company-logo-marquee__viewport overflow-x-clip px-3 sm:px-5" aria-hidden>
+        <div className="marketing-marquee-track flex w-max items-center py-0.5 will-change-transform">
           {Array.from({ length: MARQUEE_SEGMENTS }, (_, segmentIndex) => (
             <LogoRow
               key={segmentIndex}

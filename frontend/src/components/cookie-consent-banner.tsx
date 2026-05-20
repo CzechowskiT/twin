@@ -35,6 +35,18 @@ export function CookieConsentBanner() {
     return () => window.removeEventListener(COOKIE_CONSENT_CLEARED_EVENT, onCleared);
   }, [pathname]);
 
+  useEffect(() => {
+    const root = document.documentElement;
+    if (visible) {
+      root.dataset.cookieBanner = "open";
+    } else {
+      delete root.dataset.cookieBanner;
+    }
+    return () => {
+      delete root.dataset.cookieBanner;
+    };
+  }, [visible]);
+
   if (visible === null || !visible) return null;
 
   return (

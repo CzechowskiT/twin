@@ -32,7 +32,7 @@ export function SiteTopMarquee() {
   const pathname = usePathname();
   if (!showMarqueeForPath(pathname)) return null;
   return (
-    <div className="relative z-[1] w-full shrink-0">
+    <div className="site-top-marquee-band relative z-[45] w-full shrink-0">
       <CompanyLogoMarquee />
     </div>
   );

@@ -86,16 +86,22 @@ export function Header() {
     <header className="twin-header-bar sticky top-0 z-50">
       <div className="twin-header-stripe" aria-hidden />
       <div className="twin-container flex max-md:flex-wrap max-md:items-center max-md:justify-between max-md:gap-x-3 max-md:gap-y-2 py-3 md:grid md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center md:gap-x-3 md:gap-y-2 md:py-3.5 lg:gap-x-4">
-        <div className="flex min-w-0 flex-1 flex-wrap items-start gap-x-2 gap-y-1.5 sm:gap-x-3 md:flex-none">
+        <div className="flex min-w-0 flex-1 flex-wrap items-start gap-x-2 gap-y-2 sm:gap-x-3 md:flex-none">
           <Link href="/" className="twin-logo shrink-0">
             TWIN<span className="twin-logo-accent">.</span>
           </Link>
-          <div className="flex min-w-0 flex-col gap-1.5">
-            <div className="flex shrink-0 flex-wrap items-center gap-x-1.5 gap-y-1 sm:gap-x-2">
-              <Link href="/calculator" className={roiClassName}>
+          <div className="twin-header-promo min-w-0">
+            <div className="twin-header-promo__stack">
+              <Link href="/calculator" className={`${roiClassName} twin-header-promo__pill`}>
                 <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white shadow-sm" aria-hidden />
                 {t("nav.calculator")}
               </Link>
+              <Link href="/waitlist" className={`${waitlistClassName} twin-header-promo__pill`}>
+                <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white shadow-sm" aria-hidden />
+                {t("nav.waitlist")}
+              </Link>
+            </div>
+            <div className="twin-header-promo__secondary flex flex-wrap items-center gap-x-1.5 gap-y-1 sm:gap-x-2">
               <Link href="/demo" className={demoClassName}>
                 <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white/90 shadow-sm" aria-hidden />
                 {t("nav.demo")}
@@ -109,10 +115,6 @@ export function Header() {
                 {t("dashboard.calendarLink")}
               </Link>
             </div>
-            <Link href="/waitlist" className={`${waitlistClassName} w-full justify-center sm:w-auto`}>
-              <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white shadow-sm" aria-hidden />
-              {t("nav.waitlist")}
-            </Link>
           </div>
         </div>
         <nav
