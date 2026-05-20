@@ -19,6 +19,7 @@ from app.database.models import BetaReferral, BetaWaitlist, Job
 from app.database.session import get_db
 from app.matching.matcher import calculate_match_score
 from app.scrapers.registry import GLOBAL_BOARD_SPECS
+from app.services.beta_waitlist_mail import send_beta_waitlist_welcome_email
 from app.schemas.beta_waitlist import (
     BetaActionOut,
     BetaAdminStatsOut,
@@ -264,9 +265,16 @@ def beta_join(body: BetaJoinIn, db: Session = Depends(get_db), settings: Setting
     db.commit()
     db.refresh(row)
     n2 = int(db.query(func.count(BetaWaitlist.id)).scalar() or 0)
+    pos = _queue_position(db, row)
+    send_beta_waitlist_welcome_email(
+        settings,
+        to_email=row.email,
+        referral_code=row.referral_code,
+        position=pos,
+    )
     return BetaJoinOut(
         referral_code=row.referral_code,
-        position=_queue_position(db, row),
+        position=pos,
         priority_points=row.priority_points,
         spots_left=max(0, settings.beta_waitlist_cap - n2),
         total_signups=n2,

@@ -29,6 +29,13 @@ export async function generateMetadata(): Promise<Metadata> {
       type: "website",
       url: "/waitlist",
       locale: locale === "zh" ? "zh_CN" : locale === "ar" ? "ar_SA" : locale,
+      images: [{ url: "/waitlist/opengraph-image", width: 1200, height: 630, alt: copy.metaTitle }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: copy.metaTitle,
+      description: copy.metaDescription,
+      images: ["/waitlist/opengraph-image"],
     },
     alternates: {
       canonical: "/waitlist",

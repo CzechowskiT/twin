@@ -47,6 +47,25 @@ def send_password_reset_email(settings: Settings, *, to_email: str, reset_url: s
     raise RuntimeError("Mail is not configured")
 
 
+def send_generic_email(
+    settings: Settings,
+    *,
+    to_email: str,
+    subject: str,
+    text_body: str,
+    html_body: str,
+) -> None:
+    """Send a simple transactional message (waitlist, ops, etc.)."""
+    from_addr = _from_address(settings)
+    if settings.resend_api_key.strip():
+        _send_via_resend(settings, to_email, from_addr, subject, text_body, html_body)
+        return
+    if settings.smtp_host.strip():
+        _send_via_smtp(settings, to_email, from_addr, subject, text_body, html_body)
+        return
+    raise RuntimeError("Mail is not configured")
+
+
 def send_placement_verification_email(settings: Settings, *, to_email: str, verify_url: str) -> None:
     """Transactional: confirm you started / received offer — link hits dashboard then API confirm."""
     subject = "Confirm your placement with TWIN"

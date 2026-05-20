@@ -26,7 +26,7 @@ function DashboardInner() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    const fromUrl = sp.get("code") || "";
+    const fromUrl = sp.get("code") || sp.get("ref") || "";
     const fromStorage = safeStorage.getItem(BETA_REFERRAL_STORAGE_KEY) || "";
     const c = fromUrl || fromStorage;
     queueMicrotask(() => setCode(c));

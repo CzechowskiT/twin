@@ -11,6 +11,7 @@ import { z } from "zod";
 
 import { trackEvent } from "@/lib/analytics";
 import { betaJoin, BETA_REFERRAL_STORAGE_KEY, type BetaJoinResult } from "@/lib/beta-api";
+import { betaDashboardUrl } from "@/lib/waitlist/deep-links";
 import { formatWaitlist } from "@/lib/waitlist-messages";
 import { useWaitlistCopy } from "@/lib/waitlist/use-waitlist-copy";
 import { safeStorage } from "@/lib/safe-storage";
@@ -121,7 +122,10 @@ function WaitlistFormInner({
           ) : null}
         </div>
         <p className="mt-4 text-sm text-[var(--wl-text-secondary)]">{copy.formReferralHint}</p>
-        <Link href="/beta/dashboard" className="wl-btn-primary mt-6 inline-block text-center no-underline">
+        <Link
+          href={betaDashboardUrl(origin, join.referral_code)}
+          className="wl-btn-primary mt-6 inline-block text-center no-underline"
+        >
           {copy.formOpenDashboard}
         </Link>
       </motion.div>
