@@ -1116,45 +1116,122 @@ html[data-marketing-surface="studio"] .twin-nav-roi-pill:hover {
   padding-block: 0.375rem;
 }
 
-.twin-header-promo {
+/** Header CTAs — filled growth actions (brand) + ghost product shortcuts (right rail). */
+.twin-header-cta {
   display: inline-flex;
+  min-height: 2.5rem;
   max-width: 100%;
   min-width: 0;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0.5rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  padding: 0.5rem 1rem;
+  text-align: center;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    color 0.15s ease;
 }
 
-/** Column width = widest label (B2B calculator); wishlist stretches to match. */
-.twin-header-promo__stack {
+@media (min-width: 640px) {
+  .twin-header-cta {
+    min-height: 2.625rem;
+    padding: 0.5rem 1.125rem;
+    font-size: 0.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .twin-header-cta {
+    font-size: 0.8125rem;
+    letter-spacing: 0.03em;
+  }
+}
+
+.twin-header-cta--roi {
+  border-color: rgb(255 255 255 / 0.18);
+  background: var(--twin-cta);
+  color: var(--twin-on-cta);
+  box-shadow: 0 2px 10px rgb(217 119 6 / 0.35);
+}
+
+.twin-header-cta--roi:hover {
+  background: var(--twin-cta-hover);
+  box-shadow: 0 4px 14px rgb(180 83 9 / 0.4);
+}
+
+.twin-header-cta--waitlist {
+  border-color: rgb(255 255 255 / 0.18);
+  background: linear-gradient(135deg, #7c3aed 0%, #0891b2 100%);
+  color: #fff;
+  box-shadow: 0 2px 10px rgb(139 92 246 / 0.35);
+}
+
+.twin-header-cta--waitlist:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 4px 14px rgb(139 92 246 / 0.42);
+}
+
+.twin-header-cta--ghost {
+  border-color: var(--twin-border);
+  background: var(--twin-card);
+  color: var(--twin-accent);
+  box-shadow: var(--twin-shadow-sm);
+}
+
+.twin-header-cta--ghost:hover {
+  border-color: color-mix(in srgb, var(--twin-accent) 40%, var(--twin-border));
+  background: var(--twin-accent-muted);
+  color: var(--twin-accent-hover);
+}
+
+.twin-header-cta--calendar.twin-header-cta--ghost {
+  color: #0f766e;
+}
+
+html[data-marketing-surface="studio"] .twin-header-cta--calendar.twin-header-cta--ghost {
+  color: #38bdf8;
+}
+
+.twin-header-cta--active {
+  border-color: color-mix(in srgb, var(--twin-accent) 55%, var(--twin-border));
+  background: var(--twin-accent-muted);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--twin-accent) 25%, transparent);
+}
+
+/** Growth pair beside logo: equal width when stacked; side-by-side from sm. */
+.twin-header-growth__pair {
   display: inline-grid;
   max-width: 100%;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: max-content;
+  justify-items: stretch;
   gap: 0.375rem;
 }
 
-.twin-header-promo__stack .twin-header-promo__pill {
-  display: flex;
+.twin-header-growth__pair > .twin-header-cta {
   width: 100%;
-  max-width: none;
-  min-width: 0;
-  justify-content: center;
-  text-align: center;
 }
 
-.twin-header-promo__secondary {
-  display: flex;
-  width: 100%;
-  align-items: stretch;
-  gap: 0.375rem;
+@media (min-width: 640px) {
+  .twin-header-growth__pair {
+    grid-template-columns: repeat(2, minmax(9.5rem, max-content));
+    gap: 0.5rem;
+  }
 }
 
-.twin-header-promo__secondary .twin-header-promo__secondary-pill {
-  flex: 1 1 0;
-  min-width: 0;
-  max-width: none;
-  justify-content: center;
-  text-align: center;
+@media (min-width: 1024px) {
+  .twin-header-growth__pair {
+    grid-template-columns: repeat(2, minmax(10.25rem, max-content));
+  }
 }
 
 .twin-section-title {

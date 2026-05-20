@@ -51,20 +51,12 @@ export function Header() {
     { href: "/contact" as const, label: t("nav.contact") },
   ];
 
-  /** Shared pill chrome: shadow + hairline edge (no ring-offset halo on header). */
-  const navPillEdge =
-    "border border-white/20 shadow-sm transition-[box-shadow,filter,background-color,border-color]";
+  const headerCtaBase = "twin-header-cta twin-touch-target";
 
-  const navPillBase = `twin-touch-target inline-flex min-h-[2.75rem] items-center justify-center gap-2 rounded-full px-4 py-2 text-center text-[10px] font-extrabold uppercase leading-tight tracking-wide sm:px-5 sm:py-2.5 sm:text-[12px] sm:leading-snug md:text-[13px] ${navPillEdge}`;
-
-  const roiClassName = `${navPillBase} twin-nav-roi-pill twin-header-promo__pill whitespace-nowrap bg-[var(--twin-cta)] text-[var(--twin-on-cta)] shadow-[0_4px_14px_rgb(217_119_6_/0.55)] hover:bg-[var(--twin-cta-hover)] hover:shadow-[0_6px_20px_rgb(180_83_9_/0.5)]`;
-
-  const waitlistClassName = `${navPillBase} twin-nav-waitlist-pill twin-header-promo__pill whitespace-nowrap bg-gradient-to-r from-violet-600 to-cyan-500 text-white shadow-[0_4px_14px_rgb(139_92_246_/0.45)] hover:brightness-110 hover:shadow-[0_6px_20px_rgb(139_92_246_/0.5)]`;
-
-  const demoClassName = `${navPillBase} twin-nav-demo-pill twin-header-promo__secondary-pill whitespace-nowrap bg-[var(--twin-accent)] text-[var(--twin-on-accent)] shadow-[0_4px_14px_rgb(31_77_64_/0.45)] hover:bg-[var(--twin-accent-hover)] hover:shadow-[0_6px_20px_rgb(22_56_46_/0.42)]`;
-
-  /** Teal → blue so Demo (emerald) and Calendar are visually distinct. */
-  const calendarNavPillClassName = `${navPillBase} twin-nav-calendar-pill twin-header-promo__secondary-pill whitespace-nowrap text-white shadow-[0_4px_14px_rgb(13_148_136_/0.4)] hover:brightness-110 hover:shadow-[0_6px_20px_rgb(3_105_161_/0.45)]`;
+  const roiClassName = `${headerCtaBase} twin-header-cta--roi twin-nav-roi-pill`;
+  const waitlistClassName = `${headerCtaBase} twin-header-cta--waitlist twin-nav-waitlist-pill`;
+  const demoClassName = `${headerCtaBase} twin-header-cta--ghost`;
+  const calendarClassName = `${headerCtaBase} twin-header-cta--ghost twin-header-cta--calendar`;
 
   const linkClass = "twin-nav-link whitespace-nowrap";
 
@@ -85,33 +77,17 @@ export function Header() {
     <header className="twin-header-bar sticky top-0 z-50">
       <div className="twin-header-stripe" aria-hidden />
       <div className="twin-container flex max-md:flex-wrap max-md:items-center max-md:justify-between max-md:gap-x-3 max-md:gap-y-2 py-3 md:grid md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center md:gap-x-3 md:gap-y-2 md:py-3.5 lg:gap-x-4">
-        <div className="flex min-w-0 flex-1 flex-wrap items-start gap-x-2 gap-y-2 sm:gap-x-3 md:flex-none">
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3 md:flex-none lg:gap-4">
           <Link href="/" className="twin-logo shrink-0">
             TWIN<span className="twin-logo-accent">.</span>
           </Link>
-          <div className="twin-header-promo min-w-0">
-            <div className="twin-header-promo__stack">
+          <div className="twin-header-growth hidden min-w-0 sm:block" aria-label={t("nav.ariaGrowthCta")}>
+            <div className="twin-header-growth__pair">
               <Link href="/calculator" className={roiClassName}>
-                <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white shadow-sm" aria-hidden />
                 {t("nav.calculator")}
               </Link>
               <Link href="/waitlist" className={waitlistClassName}>
-                <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white shadow-sm" aria-hidden />
                 {t("nav.waitlist")}
-              </Link>
-            </div>
-            <div className="twin-header-promo__secondary flex flex-wrap items-center gap-x-1.5 gap-y-1 sm:gap-x-2">
-              <Link href="/demo" className={demoClassName}>
-                <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white/90 shadow-sm" aria-hidden />
-                {t("nav.demo")}
-              </Link>
-              <Link
-                href="/dashboard/calendar"
-                className={`${calendarNavPillClassName} ${calendarActive ? "border-white/40 ring-2 ring-white/50 ring-offset-2 ring-offset-[var(--twin-header-bg,var(--background))]" : ""}`}
-                aria-current={calendarActive ? "page" : undefined}
-              >
-                <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white/90 shadow-sm" aria-hidden />
-                {t("dashboard.calendarLink")}
               </Link>
             </div>
           </div>
@@ -128,6 +104,22 @@ export function Header() {
         </nav>
 
         <div className="hidden min-w-0 flex-col items-end gap-y-2 md:flex md:justify-self-end">
+          <div
+            className="flex w-full min-w-0 flex-wrap items-center justify-end gap-x-2 gap-y-1"
+            role="group"
+            aria-label={t("nav.ariaProductCta")}
+          >
+            <Link href="/demo" className={demoClassName}>
+              {t("nav.demo")}
+            </Link>
+            <Link
+              href="/dashboard/calendar"
+              className={`${calendarClassName} ${calendarActive ? "twin-header-cta--active" : ""}`}
+              aria-current={calendarActive ? "page" : undefined}
+            >
+              {t("dashboard.calendarLink")}
+            </Link>
+          </div>
           <nav
             className="flex w-full min-w-0 flex-wrap items-center justify-end gap-x-2 gap-y-1 text-[12px] sm:text-[13px]"
             aria-label={t("nav.ariaAccountNav")}
@@ -168,38 +160,22 @@ export function Header() {
                 aria-label={t("nav.ariaMobileNav")}
                 style={{ boxShadow: "var(--twin-shadow-md)" }}
               >
-                <div className="mb-2 flex flex-col gap-2">
-                  <Link
-                    href="/calculator"
-                    onClick={closeMobileMenu}
-                    className={`${roiClassName} !flex w-full justify-center`}
-                  >
-                    <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white shadow-sm" aria-hidden />
+                <div className="marketing-cta-stack mb-2">
+                  <Link href="/calculator" onClick={closeMobileMenu} className={`${roiClassName} w-full`}>
                     {t("nav.calculator")}
                   </Link>
-                  <Link
-                    href="/waitlist"
-                    onClick={closeMobileMenu}
-                    className={`${waitlistClassName} !flex w-full justify-center`}
-                  >
-                    <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white shadow-sm" aria-hidden />
+                  <Link href="/waitlist" onClick={closeMobileMenu} className={`${waitlistClassName} w-full`}>
                     {t("nav.waitlist")}
                   </Link>
-                  <Link
-                    href="/demo"
-                    onClick={closeMobileMenu}
-                    className={`${demoClassName} !flex w-full justify-center`}
-                  >
-                    <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white/90 shadow-sm" aria-hidden />
+                  <Link href="/demo" onClick={closeMobileMenu} className={`${demoClassName} w-full`}>
                     {t("nav.demo")}
                   </Link>
                   <Link
                     href="/dashboard/calendar"
                     onClick={closeMobileMenu}
-                    className={`${calendarNavPillClassName} !flex w-full justify-center ${calendarActive ? "border-white/40 ring-2 ring-white/50 ring-offset-2 ring-offset-[var(--twin-card)]" : ""}`}
+                    className={`${calendarClassName} w-full ${calendarActive ? "twin-header-cta--active" : ""}`}
                     aria-current={calendarActive ? "page" : undefined}
                   >
-                    <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-white/90 shadow-sm" aria-hidden />
                     {t("dashboard.calendarLink")}
                   </Link>
                   {hasSession ? (
