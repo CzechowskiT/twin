@@ -1129,18 +1129,6 @@ export default function DashboardPage() {
         <p className="mt-2 text-sm leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.northStarLead")}</p>
       </div>
 
-      {user && user.mail_configured === false ? (
-        <div
-          className="mb-6 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 sm:px-5"
-          role="status"
-        >
-          <p className="text-sm font-medium text-amber-900 dark:text-amber-100">{t("dashboard.mailNotConfiguredTitle")}</p>
-          <p className="mt-1 text-sm leading-relaxed text-amber-800/90 dark:text-amber-200/90">
-            {t("dashboard.mailNotConfiguredBody")}
-          </p>
-        </div>
-      ) : null}
-
       {user ? (
         <>
           <DashboardCommandCenter
@@ -1348,6 +1336,13 @@ export default function DashboardPage() {
                       (id {user.id}, {user.email})
                     </>
                   ) : null}
+                </p>
+              ) : null}
+              {user?.can_trigger_scrape === true && user.mail_configured === false ? (
+                <p className="mt-3 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-800 dark:text-amber-200">
+                  <span className="font-medium">{t("dashboard.mailNotConfiguredTitle")}</span>
+                  {" — "}
+                  {t("dashboard.mailNotConfiguredBody")}
                 </p>
               ) : null}
               <p className="twin-muted mt-3 text-xs leading-relaxed">{t("dashboard.twinForYourJobHint")}</p>
