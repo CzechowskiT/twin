@@ -1276,6 +1276,12 @@ export default function DashboardPage() {
           >
             {t("dashboard.calendarLink")}
           </Link>
+          <Link
+            href="/dashboard/settings/auto-apply"
+            className="twin-link inline-flex min-h-[2.75rem] items-center justify-center px-1 text-sm sm:justify-start sm:text-left"
+          >
+            {t("dashboard.nightlyAutoApplyLink")}
+          </Link>
           <button
             type="button"
             className="twin-link inline-flex min-h-[2.75rem] cursor-pointer items-center justify-center border-0 bg-transparent p-0 px-1 text-sm font-[inherit] sm:justify-start sm:text-left disabled:opacity-50"

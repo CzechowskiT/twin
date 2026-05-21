@@ -292,6 +292,15 @@ class Settings(BaseSettings):
     # When true, client must send human_acknowledged=true on auto-apply requests.
     auto_apply_require_human_ack: bool = False
 
+    # Nightly autonomous apply (Celery beat; requires worker + Redis).
+    nightly_auto_apply_beat_enabled: bool = True
+    nightly_auto_apply_hour: int = 2
+    nightly_auto_apply_minute: int = 0
+    nightly_auto_apply_default_min_score: float = 90.0
+    nightly_auto_apply_default_daily_limit: int = 10
+    nightly_auto_apply_cooldown_seconds: int = 30
+    nightly_auto_apply_supported_boards: str = "pracuj,pracuj.pl"
+
     # Outbound webhook after auto-apply (HMAC optional; empty URL disables).
     employer_webhook_url: str = ""
     employer_webhook_secret: str = ""

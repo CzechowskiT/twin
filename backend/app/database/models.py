@@ -248,6 +248,10 @@ class Candidate(Base):
     user: Mapped["User"] = relationship(back_populates="candidate")
     applications: Mapped[list["Application"]] = relationship(back_populates="candidate")
     matches: Mapped[list["JobMatch"]] = relationship(back_populates="candidate")
+    auto_apply_consent: Mapped["AutoApplyConsent | None"] = relationship(
+        back_populates="candidate",
+        uselist=False,
+    )
     saved_jobs: Mapped[list["SavedJob"]] = relationship(
         back_populates="candidate",
         cascade="all, delete-orphan",
@@ -407,6 +411,8 @@ class Application(Base):
     # Tailored auto-apply PDF persisted to S3 (key only; use presigned GET in API).
     auto_apply_package_s3_key: Mapped[str | None] = mapped_column(String(512), nullable=True)
     auto_apply_package_uploaded_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    auto_applied: Mapped[bool] = mapped_column(Boolean, default=False)
+    application_method: Mapped[str | None] = mapped_column(String(32), nullable=True)
 
     candidate: Mapped["Candidate"] = relationship(back_populates="applications")
     job: Mapped["Job"] = relationship(back_populates="applications")
@@ -455,6 +461,49 @@ class ApiIdempotency(Base):
     body_fingerprint: Mapped[str] = mapped_column(String(64), nullable=False)
     response_status: Mapped[int] = mapped_column(Integer, nullable=False)
     response_json: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class AutoApplyConsent(Base):
+    """GDPR-style consent for nightly autonomous applications."""
+
+    __tablename__ = "auto_apply_consents"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"),
+        unique=True,
+        index=True,
+    )
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    consent_given_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    consent_text_version: Mapped[str] = mapped_column(String(32), default="v1")
+    min_score_threshold: Mapped[float] = mapped_column(Float, default=90.0)
+    daily_limit: Mapped[int] = mapped_column(Integer, default=10)
+    total_applications_submitted: Mapped[int] = mapped_column(Integer, default=0)
+    last_run_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
+
+    candidate: Mapped["Candidate"] = relationship(back_populates="auto_apply_consent")
+
+
+class AutoApplyRun(Base):
+    """Audit log for scheduled nightly auto-apply sweeps."""
+
+    __tablename__ = "auto_apply_runs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    started_at: Mapped[datetime] = mapped_column(DateTime)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    total_users_processed: Mapped[int] = mapped_column(Integer, default=0)
+    total_applications_submitted: Mapped[int] = mapped_column(Integer, default=0)
+    total_applications_failed: Mapped[int] = mapped_column(Integer, default=0)
+    stats_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 

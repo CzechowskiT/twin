@@ -1,0 +1,174 @@
+"""Nightly auto-apply consent, settings, and manual trigger."""
+
+from datetime import datetime, timezone
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+
+from app.config import get_settings
+from app.core.deps import get_current_user
+from app.database.models import AutoApplyConsent, Candidate, User
+from app.database.session import get_db
+from app.schemas.auto_apply_settings import (
+    AutoApplyConsentIn,
+    AutoApplySettingsOut,
+    AutoApplySettingsPatch,
+    AutoApplyTriggerOut,
+)
+from app.services.nightly_auto_apply import process_user_nightly_auto_apply, supported_board_ids
+from app.tasks.nightly_auto_apply import nightly_auto_apply_sweep
+
+router = APIRouter()
+
+CONSENT_VERSION = "v1"
+
+
+def _candidate_or_404(db: Session, user_id: int) -> Candidate:
+    row = db.query(Candidate).filter(Candidate.user_id == user_id).first()
+    if not row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Candidate profile not found")
+    return row
+
+
+def _next_run_label() -> str:
+    s = get_settings()
+    h = min(23, max(0, int(s.nightly_auto_apply_hour)))
+    m = min(59, max(0, int(s.nightly_auto_apply_minute)))
+    return f"{h:02d}:{m:02d} Europe/Warsaw (daily)"
+
+
+def _to_out(consent: AutoApplyConsent | None) -> AutoApplySettingsOut:
+    settings = get_settings()
+    if not consent:
+        return AutoApplySettingsOut(
+            is_active=False,
+            min_score_threshold=float(settings.nightly_auto_apply_default_min_score),
+            daily_limit=int(settings.nightly_auto_apply_default_daily_limit),
+            consent_given_at=None,
+            total_applications_submitted=0,
+            last_run_at=None,
+            next_run_label=_next_run_label(),
+            supported_boards=", ".join(sorted(supported_board_ids(settings))),
+        )
+    return AutoApplySettingsOut(
+        is_active=bool(consent.is_active),
+        min_score_threshold=float(consent.min_score_threshold),
+        daily_limit=int(consent.daily_limit),
+        consent_given_at=consent.consent_given_at,
+        total_applications_submitted=int(consent.total_applications_submitted or 0),
+        last_run_at=consent.last_run_at,
+        next_run_label=_next_run_label(),
+        supported_boards=", ".join(sorted(supported_board_ids(settings))),
+    )
+
+
+@router.get("/settings", response_model=AutoApplySettingsOut)
+def get_settings_route(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> AutoApplySettingsOut:
+    candidate = _candidate_or_404(db, user.id)
+    consent = db.query(AutoApplyConsent).filter(AutoApplyConsent.candidate_id == candidate.id).first()
+    return _to_out(consent)
+
+
+@router.post("/consent", response_model=AutoApplySettingsOut)
+def give_consent(
+    body: AutoApplyConsentIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> AutoApplySettingsOut:
+    if not body.consent_acknowledged:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Consent must be acknowledged")
+    candidate = _candidate_or_404(db, user.id)
+    settings = get_settings()
+    now = datetime.now(timezone.utc)
+    consent = db.query(AutoApplyConsent).filter(AutoApplyConsent.candidate_id == candidate.id).first()
+    if consent:
+        consent.is_active = True
+        consent.consent_given_at = now
+        consent.consent_text_version = CONSENT_VERSION
+        consent.min_score_threshold = float(body.min_score_threshold)
+        consent.daily_limit = int(body.daily_limit)
+        consent.updated_at = now
+    else:
+        consent = AutoApplyConsent(
+            candidate_id=candidate.id,
+            is_active=True,
+            consent_given_at=now,
+            consent_text_version=CONSENT_VERSION,
+            min_score_threshold=float(body.min_score_threshold),
+            daily_limit=int(body.daily_limit),
+        )
+        db.add(consent)
+    db.commit()
+    db.refresh(consent)
+    return _to_out(consent)
+
+
+@router.patch("/settings", response_model=AutoApplySettingsOut)
+def patch_settings(
+    body: AutoApplySettingsPatch,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> AutoApplySettingsOut:
+    candidate = _candidate_or_404(db, user.id)
+    consent = db.query(AutoApplyConsent).filter(AutoApplyConsent.candidate_id == candidate.id).first()
+    if not consent or not consent.consent_given_at:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Enable auto-apply with consent first")
+    if body.is_active is not None:
+        consent.is_active = body.is_active
+    if body.min_score_threshold is not None:
+        consent.min_score_threshold = float(body.min_score_threshold)
+    if body.daily_limit is not None:
+        consent.daily_limit = int(body.daily_limit)
+    consent.updated_at = datetime.now(timezone.utc)
+    db.commit()
+    db.refresh(consent)
+    return _to_out(consent)
+
+
+@router.post("/trigger", response_model=AutoApplyTriggerOut)
+def trigger_nightly_for_me(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> AutoApplyTriggerOut:
+    """Run the same logic as the nightly job for the current user (demo / test)."""
+    candidate = _candidate_or_404(db, user.id)
+    consent = db.query(AutoApplyConsent).filter(AutoApplyConsent.candidate_id == candidate.id).first()
+    if not consent or not consent.is_active or not consent.consent_given_at:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Enable nightly auto-apply with consent before triggering",
+        )
+    settings = get_settings()
+    row = process_user_nightly_auto_apply(db, user=user, consent=consent, settings=settings)
+    submitted = int(row.get("applications_submitted", 0))
+    failed = int(row.get("applications_failed", 0))
+    reason = row.get("skipped_reason")
+    if reason == "rate_limit":
+        msg = "Daily auto-apply limit reached for today."
+    elif reason == "no_matches":
+        msg = "No eligible matches above your score threshold (or already applied)."
+    elif submitted > 0:
+        msg = f"Submitted {submitted} application(s)."
+    else:
+        msg = "No applications submitted."
+    return AutoApplyTriggerOut(
+        applications_submitted=submitted,
+        applications_failed=failed,
+        skipped_reason=reason,
+        message=msg,
+    )
+
+
+@router.post("/trigger-sweep")
+def trigger_full_sweep(
+    user: User = Depends(get_current_user),
+) -> dict:
+    """Enqueue full nightly sweep (ops-style; requires active consent users)."""
+    settings = get_settings()
+    if settings.celery_task_always_eager:
+        return nightly_auto_apply_sweep(dry_run=False)
+    async_result = nightly_auto_apply_sweep.delay(dry_run=False)
+    return {"task_id": async_result.id, "status": "queued"}
