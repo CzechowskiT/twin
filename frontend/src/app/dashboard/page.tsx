@@ -12,6 +12,9 @@ import {
   type PlacementFlowBusy,
 } from "@/components/applications-panel";
 import { DashboardCommandCenter } from "@/components/dashboard-command-center";
+import { DashboardTutorial } from "@/components/dashboard/dashboard-tutorial";
+import { FeedbackModal } from "@/components/feedback/feedback-modal";
+import { HelpWidget } from "@/components/help/help-widget";
 import { InvestorRoadmapPanel } from "@/components/investor-roadmap-panel";
 import { useTranslation } from "@/components/language-provider";
 import { JobFiltersBar } from "@/components/job-filters";
@@ -175,6 +178,7 @@ export default function DashboardPage() {
   const [filters, setFilters] = useState<JobFilters>(defaultJobFilters);
   const [titleFilterPrimed, setTitleFilterPrimed] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [scraping, setScraping] = useState(false);
   /** Background refresh after a queued scrape — button stays usable; feed updates on its own. */
   const [scrapePollActive, setScrapePollActive] = useState(false);
@@ -1693,6 +1697,9 @@ export default function DashboardPage() {
       </Card>
 
       <footer className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-[var(--twin-border)] pt-5 text-sm text-[var(--twin-muted-strong)]">
+        <button type="button" className="twin-link" onClick={() => setFeedbackOpen(true)}>
+          {t("feedback.title")}
+        </button>
         <Link href="/privacy" className="twin-link">
           {t("dashboard.footerPrivacy")}
         </Link>
@@ -1700,6 +1707,9 @@ export default function DashboardPage() {
           {t("dashboard.footerTerms")}
         </Link>
       </footer>
+      <DashboardTutorial onOpenFeedback={() => setFeedbackOpen(true)} />
+      <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
+      <HelpWidget />
     </Shell>
   );
 }

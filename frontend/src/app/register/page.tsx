@@ -128,7 +128,7 @@ function RegisterPageContent() {
         }),
       });
       setToken(registered.access_token);
-      router.push("/profile");
+      router.push("/onboarding");
     } catch (err) {
       setError(err instanceof Error ? err.message : t("register.failed"));
     } finally {

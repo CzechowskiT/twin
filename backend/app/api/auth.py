@@ -226,6 +226,12 @@ def register(request: Request, body: UserRegister, db: Session = Depends(get_db)
         )
     db.commit()
     db.refresh(user)
+    try:
+        from app.tasks.notification_tasks import send_welcome_email_task
+
+        send_welcome_email_task.delay(user.id)
+    except Exception:
+        pass
     token = create_access_token(user.email)
     out = UserOut.from_user(user)
     return UserRegisteredOut(**out.model_dump(), access_token=token)
@@ -412,6 +418,19 @@ def update_billing_profile(
     db.add(user)
     db.commit()
     db.refresh(user)
+    return UserOut.from_user(user)
+
+
+@router.post("/onboarding/complete", response_model=UserOut)
+def complete_onboarding(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> UserOut:
+    if user.onboarding_completed_at is None:
+        user.onboarding_completed_at = datetime.now(timezone.utc)
+        db.add(user)
+        db.commit()
+        db.refresh(user)
     return UserOut.from_user(user)
 
 

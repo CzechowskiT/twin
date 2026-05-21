@@ -102,6 +102,11 @@ def find_top_matches(
 
     if persist:
         db.commit()
+        from app.services.product_notifications import maybe_send_first_match_after_match
+
+        maybe_send_first_match_after_match(
+            db, candidate_id=candidate.id, user_id=candidate.user_id
+        )
     return results
 
 

@@ -115,6 +115,7 @@ class UserOut(BaseModel):
     mail_configured: bool = False
     google_calendar_oauth_configured: bool = False
     microsoft_calendar_oauth_configured: bool = False
+    onboarding_completed_at: datetime | None = None
 
     model_config = {"from_attributes": True}
 
@@ -145,6 +146,7 @@ class UserOut(BaseModel):
             profile_documents_processing_consent_at=getattr(
                 user, "profile_documents_processing_consent_at", None
             ),
+            onboarding_completed_at=getattr(user, "onboarding_completed_at", None),
         )
 
 

@@ -89,8 +89,12 @@ class User(Base):
     profile_documents_processing_consent_at: Mapped[datetime | None] = mapped_column(
         DateTime, nullable=True
     )
+    onboarding_completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    welcome_email_sent_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    first_match_email_sent_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     candidate: Mapped["Candidate | None"] = relationship(back_populates="user")
+    product_feedback: Mapped[list["ProductFeedback"]] = relationship(back_populates="user")
     password_reset_tokens: Mapped[list["PasswordResetToken"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
@@ -545,4 +549,20 @@ class EmployerLead(Base):
     company_name: Mapped[str] = mapped_column(String(255), nullable=False)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class ProductFeedback(Base):
+    """In-app product feedback (distinct from recruiter application feedback)."""
+
+    __tablename__ = "product_feedback"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    category: Mapped[str] = mapped_column(String(32))
+    rating: Mapped[int] = mapped_column(Integer)
+    message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    page_path: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    user: Mapped["User"] = relationship(back_populates="product_feedback")
 

@@ -3,6 +3,7 @@
 from fastapi import APIRouter
 
 from app.api import (
+    admin_ops,
     applications,
     auth,
     beta_waitlist,
@@ -13,6 +14,7 @@ from app.api import (
     curated_careers,
     geo,
     health,
+    feedback,
     integrations_ats,
     jobs,
     kyc,
@@ -44,3 +46,5 @@ api_router.include_router(placement.router, prefix="/placement", tags=["Placemen
 api_router.include_router(curated_careers.router, prefix="/employers", tags=["Employers"])
 api_router.include_router(partner.router, prefix="/partner", tags=["Partner"])
 api_router.include_router(applications.router, prefix="/applications", tags=["Applications"])
+api_router.include_router(feedback.router, prefix="/feedback", tags=["Feedback"])
+api_router.include_router(admin_ops.router, prefix="/admin", tags=["Admin"])

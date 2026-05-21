@@ -41,3 +41,22 @@ def test_interview_reminder_on_beat_by_default(monkeypatch) -> None:
         from app.tasks import celery_app as mod
 
         mod._configure_beat_schedule()
+
+
+def test_weekly_digest_on_beat_by_default(monkeypatch) -> None:
+    monkeypatch.setenv("WEEKLY_DIGEST_BEAT_ENABLED", "true")
+    get_settings.cache_clear()
+    try:
+        from app.tasks import celery_app as mod
+
+        mod._configure_beat_schedule()
+        schedule = celery_app.conf.beat_schedule
+        assert "weekly-product-digest" in schedule
+        assert schedule["weekly-product-digest"]["task"] == (
+            "app.tasks.notification_tasks.weekly_product_digest_sweep"
+        )
+    finally:
+        get_settings.cache_clear()
+        from app.tasks import celery_app as mod
+
+        mod._configure_beat_schedule()

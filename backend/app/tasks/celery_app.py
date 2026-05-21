@@ -17,7 +17,12 @@ celery_app.conf.update(
     result_serializer="json",
     timezone="Europe/Warsaw",
     enable_utc=True,
-    imports=("app.tasks.scrape_tasks", "app.tasks.reminder_tasks", "app.tasks.placement_tasks"),
+    imports=(
+        "app.tasks.scrape_tasks",
+        "app.tasks.reminder_tasks",
+        "app.tasks.placement_tasks",
+        "app.tasks.notification_tasks",
+    ),
 )
 
 
@@ -54,6 +59,13 @@ def _configure_beat_schedule() -> None:
         schedule["interview-reminders-hourly"] = {
             "task": "app.tasks.reminder_tasks.interview_reminders_sweep",
             "schedule": crontab(minute=20),
+        }
+    if s.weekly_digest_beat_enabled:
+        wd = min(6, max(0, int(s.weekly_digest_beat_weekday)))
+        wh = min(23, max(0, int(s.weekly_digest_beat_hour_utc)))
+        schedule["weekly-product-digest"] = {
+            "task": "app.tasks.notification_tasks.weekly_product_digest_sweep",
+            "schedule": crontab(hour=wh, minute=5, day_of_week=wd),
         }
     celery_app.conf.beat_schedule = schedule
 

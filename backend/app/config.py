@@ -252,6 +252,11 @@ class Settings(BaseSettings):
     beta_waitlist_cap: int = 1000
     beta_campaign_ends_at: str = ""
     beta_admin_token: str = ""
+    # Ops dashboards (/admin/data-quality, /admin/metrics); falls back to beta_admin_token when empty.
+    ops_admin_token: str = ""
+    weekly_digest_beat_enabled: bool = True
+    weekly_digest_beat_hour_utc: int = 8
+    weekly_digest_beat_weekday: int = 1
     beta_upload_dir: str = "data/beta_waitlist"
     beta_upload_max_bytes: int = 15 * 1024 * 1024
 
