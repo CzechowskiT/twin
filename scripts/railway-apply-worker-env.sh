@@ -8,7 +8,8 @@ cd "$ROOT"
 source "$ROOT/scripts/railway-auth.sh"
 
 ENV_FILE="${RAILWAY_ENV_FILE:-.env.railway}"
-WORKER_SERVICE="${RAILWAY_WORKER_SERVICE:-twin-worker}"
+# Default matches Railway service name in project responsible-success (override if renamed).
+WORKER_SERVICE="${RAILWAY_WORKER_SERVICE:-enthusiastic-encouragement}"
 
 if [[ ! -f "$ENV_FILE" ]]; then
   echo "Missing $ENV_FILE — copy .env.railway.example and fill secrets." >&2

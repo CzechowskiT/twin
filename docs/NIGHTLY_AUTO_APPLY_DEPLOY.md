@@ -26,10 +26,17 @@ curl -sS "$API/api/v1/health/celery-status" | python3 -m json.tool
 2. **Run now** with Pracuj.pl match ≥ threshold
 3. Dashboard strip shows next run label
 
-## Blockers (2026-05-21)
+## Status (2026-05-19)
 
 | Item | Status |
 |------|--------|
-| GitHub PR via `gh` | PAT lacks `createPullRequest` — merged via git push instead |
-| Railway `alembic upgrade` | CLI not linked in this environment |
-| Prod `celery_task_always_eager` | Still `true` until Raw Editor / `railway-apply-production-env.sh` |
+| Code on scaffold | Done (`9933fd3` + header `6ed830e`) |
+| `/health/celery-status` | Done |
+| Integration tests (mock apply) | Done — `backend/tests/test_nightly_auto_apply_integration.py` |
+| Dashboard strip | Done — `NightlyAutoApplyStrip` on `/dashboard` |
+| `DEPLOYMENT.sh` / `ERRORS.md` | Done (root) |
+| Prod env (`CELERY_TASK_ALWAYS_EAGER=false`, ops tokens) | Done via `railway link` + `railway-apply-production-env.sh` |
+| Migration 037 | Runs on API deploy (`start-api.sh`); verify with consent/settings API |
+| Worker + beat | Service `enthusiastic-encouragement` — keep `CELERY_BROKER_URL=${{Redis.REDIS_URL}}` |
+| GitHub PR via `gh` | Optional — merge/push to `cursor/phase1-monorepo-scaffold` |
+| Load test 100 users | Not in MVP scope |

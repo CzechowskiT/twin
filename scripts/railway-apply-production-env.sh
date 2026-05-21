@@ -67,6 +67,10 @@ set_var GOOGLE_CALENDAR_REDIRECT_URI "$GCAL_REDIRECT"
 
 # Celery + scrape worker (Redis plugin must exist; worker service uses deploy/railway-worker.toml --beat)
 REDIS_REF="${CELERY_BROKER_URL:-\${{Redis.REDIS_URL}}}"
+if [[ "$REDIS_REF" == *"}}'"* || "$REDIS_REF" == *"6379}}"* ]]; then
+  echo "WARN: CELERY_BROKER_URL in $ENV_FILE looks malformed — using \${{Redis.REDIS_URL}}" >&2
+  REDIS_REF='${{Redis.REDIS_URL}}'
+fi
 set_var CELERY_BROKER_URL "$REDIS_REF"
 set_var CELERY_RESULT_BACKEND "${CELERY_RESULT_BACKEND:-$REDIS_REF}"
 set_var REDIS_URL "${REDIS_URL:-$REDIS_REF}"
