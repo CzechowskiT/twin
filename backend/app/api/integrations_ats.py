@@ -6,6 +6,7 @@ import hashlib
 import hmac
 import json
 import logging
+from datetime import datetime, timezone
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
@@ -14,6 +15,7 @@ from sqlalchemy.orm import Session
 from app.config import Settings, get_settings
 from app.database.models import Application, ApplicationStatus
 from app.database.session import get_db
+from app.services.placement_verification import PLACEMENT_VERIFIED, record_placement_event
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -77,6 +79,17 @@ async def greenhouse_webhook(request: Request, db: Session = Depends(get_db)) ->
         )
         if row:
             row.status = ApplicationStatus.HIRED
+            if row.placement_state != PLACEMENT_VERIFIED:
+                row.placement_state = PLACEMENT_VERIFIED
+                row.placement_verified_at = datetime.now(timezone.utc)
+                record_placement_event(
+                    db,
+                    application_id=row.id,
+                    event_type="placement.ats_hire_confirmed",
+                    actor="ats_webhook",
+                    detail={"provider": "greenhouse", "external_id": ext},
+                    from_magic_link=True,
+                )
             db.commit()
             logger.info("ATS webhook marked application %s hired (greenhouse)", row.id)
         else:

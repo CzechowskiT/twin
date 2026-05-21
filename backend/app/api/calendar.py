@@ -339,6 +339,7 @@ class ScheduledInterviewOut(BaseModel):
     interview_type: str
     status: str
     calendar_event_id: str | None
+    calendar_provider: str = "google"
 
 
 @router.get("/google/slots", response_model=CalendarSlotsOut)
