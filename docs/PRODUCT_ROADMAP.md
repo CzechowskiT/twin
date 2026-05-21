@@ -19,6 +19,7 @@ North star: **short calendar of acceptance-ready moments** — not inbox noise.
 - Placement: work-email verify, employer attest link, dispute queue, ATS hire → verified
 - Ops: data-quality + metrics + placement dispute admin UI
 - Worker: interview reminders, placement retention beat, scrape beat guards
+- Ops dispute queue + resolve API; Ashby/Lever/Greenhouse ATS hire → verified
 
 ## Next 10 (proposed)
 

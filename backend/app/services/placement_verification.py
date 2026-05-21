@@ -274,6 +274,44 @@ def file_placement_dispute(
     return app
 
 
+def ops_resolve_placement_dispute(
+    db: Session,
+    *,
+    application_id: int,
+    resolution: str,
+    note: str | None = None,
+) -> Application:
+    """Ops closes a dispute without email ping-pong — verified or back to declared."""
+    app = db.query(Application).filter(Application.id == application_id).first()
+    if not app:
+        raise ValueError("Application not found.")
+    if app.placement_state != PLACEMENT_DISPUTED:
+        raise ValueError("Application is not in disputed state.")
+    cleaned_note = (note or "").strip()[:2000] or None
+    res = resolution.strip().lower()
+    if res == "verified":
+        app.placement_state = PLACEMENT_VERIFIED
+        app.placement_verified_at = datetime.now(timezone.utc)
+        event_type = "placement.ops_resolved_verified"
+    elif res == "dismissed":
+        app.placement_state = PLACEMENT_DECLARED
+        event_type = "placement.ops_resolved_dismissed"
+    else:
+        raise ValueError("resolution must be 'verified' or 'dismissed'")
+    app.updated_at = datetime.now(timezone.utc)
+    record_placement_event(
+        db,
+        application_id=app.id,
+        event_type=event_type,
+        actor="ops_admin",
+        detail={"resolution": res, "has_note": bool(cleaned_note)},
+        from_magic_link=True,
+    )
+    db.commit()
+    db.refresh(app)
+    return app
+
+
 def issue_employer_attestation_link(
     db: Session,
     settings: Settings,

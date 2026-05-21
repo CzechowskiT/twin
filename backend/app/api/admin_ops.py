@@ -1,5 +1,7 @@
 """Ops admin dashboards (data quality, product metrics). Bearer token required."""
 
+from pydantic import BaseModel, Field
+
 from fastapi import APIRouter, Depends, Header, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -8,6 +10,7 @@ from app.core.deps import get_db
 from app.services.admin_metrics import build_admin_metrics
 from app.services.admin_placement_queue import build_placement_dispute_queue
 from app.services.data_quality_metrics import build_data_quality_report
+from app.services.placement_verification import ops_resolve_placement_dispute
 
 router = APIRouter()
 
@@ -49,3 +52,29 @@ def admin_placement_disputes(
 ) -> dict:
     _require_ops_admin(settings, authorization)
     return build_placement_dispute_queue(db, limit=limit)
+
+
+class PlacementDisputeResolveIn(BaseModel):
+    resolution: str = Field(..., description="verified | dismissed")
+    note: str | None = Field(default=None, max_length=2000)
+
+
+@router.post("/placement-disputes/{application_id}/resolve")
+def admin_resolve_placement_dispute(
+    application_id: int,
+    body: PlacementDisputeResolveIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+) -> dict:
+    _require_ops_admin(settings, authorization)
+    try:
+        app = ops_resolve_placement_dispute(
+            db,
+            application_id=application_id,
+            resolution=body.resolution,
+            note=body.note,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    return {"application_id": app.id, "placement_state": app.placement_state}

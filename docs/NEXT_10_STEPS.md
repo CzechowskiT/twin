@@ -40,6 +40,8 @@ Aligned with the north star: **short calendar of acceptance-ready moments**, not
 | 17 | Employer attest branding | `GET /placement/employer/preview` + company on confirm page |
 | 18 | WebCal regenerate | New subscribe link on dashboard strip |
 | 19 | Lever ATS webhook | `LEVER_WEBHOOK_SECRET` + hire → verified |
+| 20 | Ashby ATS webhook | `ASHBY_WEBHOOK_SECRET` + hire → verified |
+| 21 | Ops dispute resolve | `POST …/placement-disputes/{id}/resolve` + admin UI buttons |
 
 See **`docs/PRODUCT_ROADMAP.md`** for product rationale on next priorities.
 
@@ -49,9 +51,9 @@ See **`docs/PRODUCT_ROADMAP.md`** for product rationale on next priorities.
 2. **Dedicated twin-worker** — Celery beat off API (`docs/RAILWAY_WORKER_PL.md`)
 3. **Stripe E2E staging** — `docs/STRIPE_E2E.md`
 4. **Scrape corpus growth** — ops allowlist + daily beat
-5. **Ashby webhook** — signature validation
-6. **Placement dispute resolve** — ops API to clear dispute state
-7. **Partner API keys** — scoped integrator tokens
-8. **Recruiter batch acceptance UI** — calendar north star
-9. **Interview reminders prod verify** — beat on worker
-10. **PR merge to default branch** — when `main` exists + CI green
+5. **Partner API keys** — scoped integrator tokens
+6. **Recruiter batch acceptance UI** — calendar north star
+7. **Interview reminders prod verify** — beat on worker
+8. **PR merge to default branch** — when `main` exists + CI green
+9. **Mobile dashboard calendar strip** — next interview on phone
+10. **B2B portal per company slug** — branded attest URLs

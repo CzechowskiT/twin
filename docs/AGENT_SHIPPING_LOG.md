@@ -7,9 +7,10 @@
 - **Ops:** `GET /api/v1/admin/placement-disputes` + `/admin/placements` UI; metrics link.
 - **Placement B2B:** `preview_employer_attestation` + `GET /placement/employer/preview`; branded confirm page.
 - **Dashboard:** WebCal regenerate button + i18n.
-- **ATS:** Lever webhook with `LEVER_WEBHOOK_SECRET` / `X-Lever-Signature` → hire → placement verified.
+- **ATS:** Lever + Ashby webhooks (`LEVER_*`, `ASHBY_*` secrets) → hire → placement verified; shared `_apply_ats_hire`.
+- **Ops resolve:** `POST /admin/placement-disputes/{id}/resolve` + UI buttons (verified / dismissed).
 - **Docs:** `docs/PRODUCT_ROADMAP.md`, updated `NEXT_10_STEPS`, `ATS_WEBHOOKS.md`.
-- **Tests:** `test_admin_placement_queue`, `test_placement_employer_preview`.
+- **Tests:** placement queue, employer preview, ops resolve, ATS webhooks.
 
 Prior same-day commits on branch: Quantica compliance, `/status`, `/developers`, employer attest, dispute, Greenhouse ATS, interview reminders, disputed count on admin metrics.
 

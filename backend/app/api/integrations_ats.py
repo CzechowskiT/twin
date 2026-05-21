@@ -21,6 +21,39 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
+def _apply_ats_hire(
+    db: Session,
+    *,
+    provider: str,
+    external_id: str,
+) -> None:
+    row = (
+        db.query(Application)
+        .filter(
+            Application.external_ats_id == external_id,
+            Application.external_ats_provider == provider,
+        )
+        .first()
+    )
+    if not row:
+        logger.info("ATS hire event for unknown external id=%s (%s)", external_id, provider)
+        return
+    row.status = ApplicationStatus.HIRED
+    if row.placement_state != PLACEMENT_VERIFIED:
+        row.placement_state = PLACEMENT_VERIFIED
+        row.placement_verified_at = datetime.now(timezone.utc)
+        record_placement_event(
+            db,
+            application_id=row.id,
+            event_type="placement.ats_hire_confirmed",
+            actor="ats_webhook",
+            detail={"provider": provider, "external_id": external_id},
+            from_magic_link=True,
+        )
+    db.commit()
+    logger.info("ATS webhook marked application %s hired (%s)", row.id, provider)
+
+
 def _verify_greenhouse_webhook(settings: Settings, body: bytes, header_sig: str | None) -> None:
     """Validate Greenhouse webhook HMAC-SHA256; reject unsigned traffic in production."""
     secret = (settings.greenhouse_webhook_secret or "").strip()
@@ -71,29 +104,7 @@ async def greenhouse_webhook(request: Request, db: Session = Depends(get_db)) ->
             app_id = inner.get("id")
 
     if action and "hire" in action.lower() and app_id is not None:
-        ext = str(app_id)
-        row = (
-            db.query(Application)
-            .filter(Application.external_ats_id == ext, Application.external_ats_provider == "greenhouse")
-            .first()
-        )
-        if row:
-            row.status = ApplicationStatus.HIRED
-            if row.placement_state != PLACEMENT_VERIFIED:
-                row.placement_state = PLACEMENT_VERIFIED
-                row.placement_verified_at = datetime.now(timezone.utc)
-                record_placement_event(
-                    db,
-                    application_id=row.id,
-                    event_type="placement.ats_hire_confirmed",
-                    actor="ats_webhook",
-                    detail={"provider": "greenhouse", "external_id": ext},
-                    from_magic_link=True,
-                )
-            db.commit()
-            logger.info("ATS webhook marked application %s hired (greenhouse)", row.id)
-        else:
-            logger.info("ATS hire event for unknown external id=%s", ext)
+        _apply_ats_hire(db, provider="greenhouse", external_id=str(app_id))
 
     return {"status": "ok"}
 
@@ -134,39 +145,51 @@ async def lever_webhook(request: Request, db: Session = Depends(get_db)) -> dict
     if isinstance(data, dict):
         app_id = data.get("applicationId") or data.get("application_id")
     if event and "hire" in event.lower() and app_id is not None:
-        ext = str(app_id)
-        row = (
-            db.query(Application)
-            .filter(Application.external_ats_id == ext, Application.external_ats_provider == "lever")
-            .first()
-        )
-        if row:
-            row.status = ApplicationStatus.HIRED
-            if row.placement_state != "verified":
-                from datetime import datetime, timezone
-
-                from app.services.placement_verification import PLACEMENT_VERIFIED, record_placement_event
-
-                row.placement_state = PLACEMENT_VERIFIED
-                row.placement_verified_at = datetime.now(timezone.utc)
-                record_placement_event(
-                    db,
-                    application_id=row.id,
-                    event_type="placement.ats_hire_confirmed",
-                    actor="ats_webhook",
-                    detail={"provider": "lever", "external_id": ext},
-                    from_magic_link=True,
-                )
-            db.commit()
-            logger.info("ATS webhook marked application %s hired (lever)", row.id)
+        _apply_ats_hire(db, provider="lever", external_id=str(app_id))
 
     return {"status": "ok"}
 
 
+def _verify_ashby_webhook(settings: Settings, body: bytes, header_sig: str | None) -> None:
+    secret = (settings.ashby_webhook_secret or "").strip()
+    env = (settings.environment or "").strip().lower()
+    if not secret:
+        if env in ("production", "staging"):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Webhook secret not configured. Set ASHBY_WEBHOOK_SECRET.",
+            )
+        logger.warning("Ashby webhook secret not set — allowing in non-production")
+        return
+    if not header_sig:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Missing Ashby-Signature header")
+    digest = hmac.new(secret.encode("utf-8"), body, hashlib.sha256).hexdigest()
+    expected = f"sha256={digest}"
+    if not hmac.compare_digest(expected, header_sig.strip()):
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Invalid Ashby webhook signature")
+
+
 @router.post("/ats/ashby")
-async def ashby_webhook() -> dict[str, str]:
-    """Ashby webhook — disabled until signature validation is implemented."""
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Ashby webhook integration not yet implemented",
-    )
+async def ashby_webhook(request: Request, db: Session = Depends(get_db)) -> dict[str, str]:
+    """Ashby hire events — HMAC via Ashby-Signature (sha256=…) when ASHBY_WEBHOOK_SECRET is set."""
+    settings = get_settings()
+    body = await request.body()
+    _verify_ashby_webhook(settings, body, request.headers.get("Ashby-Signature"))
+
+    try:
+        payload: dict[str, Any] = json.loads(body.decode("utf-8") or "{}")
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid JSON") from exc
+
+    event = str(payload.get("eventName") or payload.get("type") or payload.get("event") or "")
+    data = payload.get("data") if isinstance(payload.get("data"), dict) else payload
+    app_id = None
+    if isinstance(data, dict):
+        app = data.get("application")
+        if isinstance(app, dict):
+            app_id = app.get("id")
+        app_id = app_id or data.get("applicationId") or data.get("application_id")
+    if event and "hire" in event.lower() and app_id is not None:
+        _apply_ats_hire(db, provider="ashby", external_id=str(app_id))
+
+    return {"status": "ok"}

@@ -89,13 +89,40 @@ def test_greenhouse_webhook_accepts_valid_signature(mock_gs: MagicMock) -> None:
     assert res.status_code == 200
 
 
-def test_lever_webhook_not_implemented() -> None:
+@patch("app.api.integrations_ats.get_settings")
+def test_lever_webhook_ok_without_secret_in_development(mock_gs: MagicMock) -> None:
+    s = MagicMock()
+    s.environment = "development"
+    s.lever_webhook_secret = ""
+    mock_gs.return_value = s
     client = TestClient(app)
-    res = client.post("/api/v1/integrations/ats/lever", json={})
-    assert res.status_code == 501
+    res = client.post("/api/v1/integrations/ats/lever", json={"event": "ping"})
+    assert res.status_code == 200
 
 
-def test_ashby_webhook_not_implemented() -> None:
+@patch("app.api.integrations_ats.get_settings")
+def test_ashby_webhook_ok_without_secret_in_development(mock_gs: MagicMock) -> None:
+    s = MagicMock()
+    s.environment = "development"
+    s.ashby_webhook_secret = ""
+    mock_gs.return_value = s
     client = TestClient(app)
-    res = client.post("/api/v1/integrations/ats/ashby", json={})
-    assert res.status_code == 501
+    res = client.post("/api/v1/integrations/ats/ashby", json={"eventName": "ping"})
+    assert res.status_code == 200
+
+
+@patch("app.api.integrations_ats.get_settings")
+def test_ashby_webhook_rejects_bad_signature(mock_gs: MagicMock) -> None:
+    secret = "ashby-secret"
+    body = b'{"eventName":"applicationHired","data":{"application":{"id":"a1"}}}'
+    s = MagicMock()
+    s.environment = "production"
+    s.ashby_webhook_secret = secret
+    mock_gs.return_value = s
+    client = TestClient(app)
+    res = client.post(
+        "/api/v1/integrations/ats/ashby",
+        content=body,
+        headers={"Content-Type": "application/json", "Ashby-Signature": "sha256=bad"},
+    )
+    assert res.status_code == 403

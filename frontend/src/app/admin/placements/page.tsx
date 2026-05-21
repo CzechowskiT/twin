@@ -59,6 +59,29 @@ export default function AdminPlacementsPage() {
     }
   }, [token]);
 
+  const resolveRow = useCallback(
+    async (applicationId: number, resolution: "verified" | "dismissed") => {
+      const t = token.trim();
+      if (!t) return;
+      setLoading(true);
+      setErr(null);
+      try {
+        const res = await fetch(`/api/ops-admin/placement-disputes/${applicationId}/resolve`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${t}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ resolution }),
+        });
+        if (!res.ok) throw new Error(await res.text());
+        await load();
+      } catch (e) {
+        setErr(e instanceof Error ? e.message : "Resolve failed");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [token, load],
+  );
+
   return (
     <main className="twin-shell twin-shell--wide py-10">
       <h1 className="mb-2 text-2xl font-semibold">Placement dispute queue</h1>
@@ -91,6 +114,24 @@ export default function AdminPlacementsPage() {
               <p className="twin-muted mt-1 text-xs">
                 App #{r.application_id} · {r.candidate_email} · updated {new Date(r.updated_at).toLocaleString()}
               </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  className="twin-btn-solid text-xs"
+                  disabled={loading}
+                  onClick={() => void resolveRow(r.application_id, "verified")}
+                >
+                  Mark verified
+                </button>
+                <button
+                  type="button"
+                  className="twin-btn-ghost text-xs"
+                  disabled={loading}
+                  onClick={() => void resolveRow(r.application_id, "dismissed")}
+                >
+                  Dismiss dispute
+                </button>
+              </div>
             </li>
           ))}
         </ul>

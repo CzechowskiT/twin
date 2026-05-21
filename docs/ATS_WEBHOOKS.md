@@ -24,9 +24,13 @@ Inbound webhooks let employers confirm hires inside their ATS — aligned with [
 
 Hire-style events with `applicationId` match `external_ats_provider=lever` and mark placement verified (same as Greenhouse).
 
-## Ashby
+## Ashby (implemented)
 
-Route returns `501` until signature validation is implemented — do not expose publicly without auth.
+**Endpoint:** `POST /api/v1/integrations/ats/ashby`
+
+**Env:** `ASHBY_WEBHOOK_SECRET` — header `Ashby-Signature: sha256=<hex>` (HMAC-SHA256 of raw body).
+
+Hire-style `eventName` with `data.application.id` matches `external_ats_provider=ashby`.
 
 ## Outbound employer webhook
 
