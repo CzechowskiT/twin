@@ -30,7 +30,7 @@ Repo → **Settings** → **Secrets and variables** → **Actions**:
 | `RESEND_API_KEY` | Resend dashboard |
 | opcjonalnie `RECRUITER_INBOX_TOKEN`, `PARTNER_EXPORT_TOKEN` | `.env.railway` |
 
-Workflow: `.github/workflows/prod-env-apply.yml` (push na `cursor/phase1-monorepo-scaffold` lub **Run workflow**).
+Workflow: skopiuj `docs/github-workflow-prod-env-apply.yml.example` → `.github/workflows/prod-env-apply.yml` (push wymaga PAT z zakresem `workflow`).
 
 ## Worker Celery
 
