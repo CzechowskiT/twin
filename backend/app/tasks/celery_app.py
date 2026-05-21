@@ -22,6 +22,7 @@ celery_app.conf.update(
         "app.tasks.reminder_tasks",
         "app.tasks.placement_tasks",
         "app.tasks.notification_tasks",
+        "app.tasks.nightly_auto_apply",
     ),
 )
 
@@ -66,6 +67,14 @@ def _configure_beat_schedule() -> None:
         schedule["weekly-product-digest"] = {
             "task": "app.tasks.notification_tasks.weekly_product_digest_sweep",
             "schedule": crontab(hour=wh, minute=5, day_of_week=wd),
+        }
+    if s.nightly_auto_apply_beat_enabled:
+        nh = min(23, max(0, int(s.nightly_auto_apply_hour)))
+        nm = min(59, max(0, int(s.nightly_auto_apply_minute)))
+        schedule["nightly-auto-apply"] = {
+            "task": "app.tasks.nightly_auto_apply.nightly_auto_apply_sweep",
+            "schedule": crontab(hour=nh, minute=nm),
+            "options": {"expires": 7200},
         }
     celery_app.conf.beat_schedule = schedule
 
