@@ -1,5 +1,10 @@
 # Agent shipping log
 
+## 2026-05-21 — Worker env automation + branch sync
+
+- `scripts/railway-apply-worker-env.sh` + `deploy-all.sh` calls it after API vars.
+- `docs/PR_PERSONA_TO_PHASE1.md` — gh/compare instructions; `cursor/persona-space-isolation` synced to scaffold tip.
+
 ## 2026-05-19 — Persona isolation + six todos merged to scaffold
 
 **Branch:** `cursor/phase1-monorepo-scaffold` (fast-forward merge of `cursor/persona-space-isolation` → `e0ff720`)

@@ -8,6 +8,7 @@ cd "$ROOT"
 
 if npx --yes @railway/cli@4 whoami >/dev/null 2>&1; then
   ./scripts/railway-apply-production-env.sh
+  ./scripts/railway-apply-worker-env.sh || echo "Railway worker: skip or create twin-worker (docs/RAILWAY_WORKER_PL.md)" >&2
 else
   echo "Railway: skip (run: npx @railway/cli login && npx @railway/cli link)" >&2
 fi

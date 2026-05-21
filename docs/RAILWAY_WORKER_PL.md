@@ -29,6 +29,16 @@ Na API i worker ustaw m.in.:
 
 Opcjonalnie osobny serwis: **Config** `deploy/railway-beat.toml` (tylko gdy nie używasz `--beat` na workerze).
 
+## 2b. Zmienne (automatycznie)
+
+Po `npx @railway/cli login` i `railway link` (serwis API):
+
+```bash
+./scripts/railway-apply-worker-env.sh
+```
+
+Używa `.env.railway` i serwisu `twin-worker` (nadpisz: `RAILWAY_WORKER_SERVICE=…`).
+
 ## 3. Weryfikacja
 
 - Railway → **twin-worker** → Logs: `celery@... ready`
