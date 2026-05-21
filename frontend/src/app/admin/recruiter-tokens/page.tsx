@@ -5,15 +5,21 @@ import { useCallback, useEffect, useState } from "react";
 
 const STORAGE_KEY = "twin_ops_admin_token";
 
-type KeyRow = { id: number; label: string; scopes: string; created_at: string };
+type Row = { id: number; label: string; company_slug: string; inbox_path: string; created_at: string };
 
-type MintOut = { id: number; label: string; scopes: string; token: string; header: string };
+type MintOut = {
+  id: number;
+  label: string;
+  company_slug: string;
+  token: string;
+  inbox_url: string;
+};
 
-export default function AdminPartnerKeysPage() {
+export default function AdminRecruiterTokensPage() {
   const [token, setToken] = useState("");
-  const [rows, setRows] = useState<KeyRow[]>([]);
+  const [rows, setRows] = useState<Row[]>([]);
   const [label, setLabel] = useState("");
-  const [scopes, setScopes] = useState("export");
+  const [companySlug, setCompanySlug] = useState("");
   const [minted, setMinted] = useState<MintOut | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -28,26 +34,21 @@ export default function AdminPartnerKeysPage() {
   }, []);
 
   const load = useCallback(async () => {
-    setLoading(true);
-    setErr(null);
     const t = token.trim();
     if (!t) {
       setErr("Paste ops admin token first.");
-      setLoading(false);
       return;
     }
+    setLoading(true);
+    setErr(null);
     try {
       sessionStorage.setItem(STORAGE_KEY, t);
-    } catch {
-      /* ignore */
-    }
-    try {
-      const res = await fetch("/api/ops-admin/partner-api-keys", {
+      const res = await fetch("/api/ops-admin/recruiter-company-tokens", {
         headers: { Authorization: `Bearer ${t}` },
         cache: "no-store",
       });
       if (!res.ok) throw new Error(await res.text());
-      const data = (await res.json()) as { items: KeyRow[] };
+      const data = (await res.json()) as { items: Row[] };
       setRows(data.items ?? []);
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Load failed");
@@ -59,19 +60,19 @@ export default function AdminPartnerKeysPage() {
 
   async function mint() {
     const t = token.trim();
-    if (!t || !label.trim()) return;
+    if (!t || !label.trim() || !companySlug.trim()) return;
     setLoading(true);
-    setErr(null);
     setMinted(null);
     try {
-      const res = await fetch("/api/ops-admin/partner-api-keys", {
+      const res = await fetch("/api/ops-admin/recruiter-company-tokens", {
         method: "POST",
         headers: { Authorization: `Bearer ${t}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ label: label.trim(), scopes: scopes.trim() || "export" }),
+        body: JSON.stringify({ label: label.trim(), company_slug: companySlug.trim() }),
       });
       if (!res.ok) throw new Error(await res.text());
       setMinted((await res.json()) as MintOut);
       setLabel("");
+      setCompanySlug("");
       await load();
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Mint failed");
@@ -85,7 +86,7 @@ export default function AdminPartnerKeysPage() {
     if (!t) return;
     setLoading(true);
     try {
-      const res = await fetch(`/api/ops-admin/partner-api-keys/${id}/revoke`, {
+      const res = await fetch(`/api/ops-admin/recruiter-company-tokens/${id}/revoke`, {
         method: "POST",
         headers: { Authorization: `Bearer ${t}` },
       });
@@ -100,77 +101,65 @@ export default function AdminPartnerKeysPage() {
 
   return (
     <main className="twin-shell twin-shell--wide py-10">
-      <h1 className="mb-2 text-2xl font-semibold">Partner API keys</h1>
+      <h1 className="mb-2 text-2xl font-semibold">Recruiter company tokens</h1>
       <p className="twin-muted mb-6 text-sm">
-        Mint hashed integrator tokens for CSV export. Copy the token once — it is not shown again.
+        One token per employer — share the inbox URL once; company slug is baked in.
       </p>
       <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end">
         <input
           className="twin-input min-w-0 flex-1"
           type="password"
-          placeholder="OPS / BETA admin token"
+          placeholder="OPS admin token"
           value={token}
           onChange={(e) => setToken(e.target.value)}
         />
         <button type="button" className="twin-btn-solid" disabled={loading} onClick={() => void load()}>
-          {loading ? "Loading…" : "Refresh"}
+          Refresh
         </button>
       </div>
       <div className="mb-6 flex flex-col gap-2 rounded-lg border border-[var(--twin-border)] p-4 sm:flex-row sm:items-end">
         <input
-          className="twin-input min-w-0 flex-1"
-          placeholder="Label (e.g. acme-ats)"
+          className="twin-input flex-1"
+          placeholder="Label"
           value={label}
           onChange={(e) => setLabel(e.target.value)}
         />
         <input
-          className="twin-input w-full sm:w-40"
-          placeholder="Scopes"
-          value={scopes}
-          onChange={(e) => setScopes(e.target.value)}
+          className="twin-input flex-1"
+          placeholder="Company (Acme Corp → acme-corp)"
+          value={companySlug}
+          onChange={(e) => setCompanySlug(e.target.value)}
         />
-        <button type="button" className="twin-btn-solid" disabled={loading || !label.trim()} onClick={() => void mint()}>
-          Mint key
+        <button type="button" className="twin-btn-solid" disabled={loading} onClick={() => void mint()}>
+          Mint + inbox URL
         </button>
       </div>
       {minted ? (
-        <div className="mb-6 rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm">
-          <p className="font-semibold">Copy now — shown once</p>
-          <p className="twin-muted mt-1 text-xs">
-            Header: <code>{minted.header}</code>
-          </p>
-          <input readOnly className="twin-input mt-2 text-xs" value={minted.token} onFocus={(e) => e.target.select()} />
+        <div className="mb-6 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm">
+          <p className="font-semibold">Share with recruiter (once)</p>
+          <input readOnly className="twin-input mt-2 text-xs" value={minted.inbox_url} onFocus={(e) => e.target.select()} />
         </div>
       ) : null}
       {err ? <p className="mb-4 text-sm text-red-600">{err}</p> : null}
       <ul className="space-y-2">
         {rows.map((r) => (
-          <li
-            key={r.id}
-            className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[var(--twin-border)] px-4 py-3 text-sm"
-          >
+          <li key={r.id} className="flex flex-wrap justify-between gap-2 rounded-lg border border-[var(--twin-border)] px-4 py-3 text-sm">
             <span>
-              <strong>{r.label}</strong> · {r.scopes} · #{r.id}
+              <strong>{r.label}</strong> · {r.company_slug}
             </span>
-            <button type="button" className="twin-btn-ghost text-xs" disabled={loading} onClick={() => void revoke(r.id)}>
+            <button type="button" className="twin-btn-ghost text-xs" onClick={() => void revoke(r.id)}>
               Revoke
             </button>
           </li>
         ))}
       </ul>
-      <div className="mt-8 flex flex-wrap gap-4 text-sm">
+      <div className="mt-8 flex gap-4 text-sm">
+        <Link href="/admin/partner-keys" className="twin-link">
+          Partner keys
+        </Link>
         <Link href="/admin/metrics" className="twin-link">
           Metrics
         </Link>
-        <Link href="/admin/placements" className="twin-link">
-          Placements
-        </Link>
-        <Link href="/admin/recruiter-tokens" className="twin-link">
-          Recruiter tokens
-        </Link>
-        <a href="/developers" className="twin-link">
-          Developers
-        </a>
       </div>
     </main>
   );

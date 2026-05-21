@@ -541,6 +541,19 @@ class ScheduledInterview(Base):
     application: Mapped["Application | None"] = relationship(back_populates="scheduled_interviews")
 
 
+class RecruiterCompanyToken(Base):
+    """Per-employer recruiter inbox token (scoped to one company_slug)."""
+
+    __tablename__ = "recruiter_company_tokens"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    company_slug: Mapped[str] = mapped_column(String(80), index=True, nullable=False)
+    label: Mapped[str] = mapped_column(String(120), nullable=False)
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
 class PartnerApiKey(Base):
     """Hashed integrator tokens (scoped exports; minted via ops admin)."""
 

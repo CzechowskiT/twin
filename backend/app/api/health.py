@@ -66,4 +66,9 @@ def health_check(
         out["scrape_worker_ready"] = scrape_worker_ready(s)
         out["scrape_beat_enabled"] = s.scrape_beat_enabled
         out["celery_task_always_eager"] = s.celery_task_always_eager
+        out["recruiter_inbox_configured"] = bool((s.recruiter_inbox_token or "").strip())
+        out["ops_admin_configured"] = bool(
+            (s.ops_admin_token or "").strip() or (s.beta_admin_token or "").strip()
+        )
+        out["partner_export_configured"] = bool((s.partner_export_token or "").strip())
     return out

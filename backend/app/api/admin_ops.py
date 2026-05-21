@@ -7,12 +7,13 @@ from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
 from app.core.deps import get_db
+from app.database.models import PartnerApiKey, RecruiterCompanyToken
 from app.services.admin_metrics import build_admin_metrics
 from app.services.admin_placement_queue import build_placement_dispute_queue
 from app.services.data_quality_metrics import build_data_quality_report
 from app.services.partner_auth import mint_partner_api_key, revoke_partner_api_key
 from app.services.placement_verification import ops_resolve_placement_dispute
-from app.database.models import PartnerApiKey
+from app.services.recruiter_company_auth import mint_recruiter_company_token, revoke_recruiter_company_token
 
 router = APIRouter()
 
@@ -140,3 +141,73 @@ def admin_revoke_partner_api_key(
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
     return {"id": key_id, "revoked": True}
+
+
+class RecruiterCompanyTokenCreateIn(BaseModel):
+    company_slug: str = Field(..., min_length=1, max_length=80)
+    label: str = Field(..., min_length=1, max_length=120)
+
+
+@router.get("/recruiter-company-tokens")
+def admin_list_recruiter_company_tokens(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+) -> dict:
+    _require_ops_admin(settings, authorization)
+    rows = (
+        db.query(RecruiterCompanyToken)
+        .filter(RecruiterCompanyToken.revoked_at.is_(None))
+        .order_by(RecruiterCompanyToken.created_at.desc())
+        .limit(50)
+        .all()
+    )
+    base = settings.frontend_url.rstrip("/")
+    return {
+        "items": [
+            {
+                "id": r.id,
+                "label": r.label,
+                "company_slug": r.company_slug,
+                "inbox_path": f"/recruiter/inbox?company_slug={r.company_slug}",
+                "created_at": r.created_at.isoformat(),
+            }
+            for r in rows
+        ],
+        "frontend_base": base,
+    }
+
+
+@router.post("/recruiter-company-tokens")
+def admin_create_recruiter_company_token(
+    body: RecruiterCompanyTokenCreateIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+) -> dict:
+    _require_ops_admin(settings, authorization)
+    row, raw = mint_recruiter_company_token(db, company_slug=body.company_slug, label=body.label)
+    base = settings.frontend_url.rstrip("/")
+    return {
+        "id": row.id,
+        "label": row.label,
+        "company_slug": row.company_slug,
+        "token": raw,
+        "header": "X-Twin-Recruiter-Token",
+        "inbox_url": f"{base}/recruiter/inbox?token={raw}&company_slug={row.company_slug}",
+    }
+
+
+@router.post("/recruiter-company-tokens/{token_id}/revoke")
+def admin_revoke_recruiter_company_token(
+    token_id: int,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+) -> dict:
+    _require_ops_admin(settings, authorization)
+    try:
+        revoke_recruiter_company_token(db, token_id=token_id)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    return {"id": token_id, "revoked": True}

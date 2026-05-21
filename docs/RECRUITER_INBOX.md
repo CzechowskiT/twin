@@ -6,7 +6,10 @@ North star: **short list of pre-qualified applications** — accept for intervie
 
 | Env (API + Vercel proxy) | Value |
 |--------------------------|--------|
-| `RECRUITER_INBOX_TOKEN` | Long random secret (share once with pilot recruiter) |
+| `RECRUITER_INBOX_TOKEN` | Global pilot secret (`./scripts/generate-deploy-secrets.sh`) |
+| Per-company token | Ops: **`POST /api/v1/admin/recruiter-company-tokens`** or UI `/admin/recruiter-tokens` → full `inbox_url` |
+
+Company tokens embed `company_slug`; global token still requires `company_slug` query param.
 
 ## URL
 
