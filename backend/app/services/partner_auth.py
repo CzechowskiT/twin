@@ -48,6 +48,19 @@ def verify_partner_token(db: Session, settings: Settings, raw_token: str | None)
     return False, ""
 
 
+def revoke_partner_api_key(db: Session, *, key_id: int) -> None:
+    row = db.query(PartnerApiKey).filter(PartnerApiKey.id == key_id).first()
+    if not row:
+        raise ValueError("Partner API key not found.")
+    if row.revoked_at is not None:
+        raise ValueError("Key already revoked.")
+    from datetime import datetime, timezone
+
+    row.revoked_at = datetime.now(timezone.utc)
+    db.add(row)
+    db.commit()
+
+
 def partner_has_scope(scopes_csv: str, required: str) -> bool:
     parts = {p.strip().lower() for p in (scopes_csv or "").split(",") if p.strip()}
     return required.lower() in parts or "export" in parts

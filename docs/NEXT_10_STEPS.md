@@ -46,6 +46,9 @@ Aligned with the north star: **short calendar of acceptance-ready moments**, not
 | 23 | Acceptance queue | `/dashboard/acceptance` + `GET /candidates/me/acceptance-queue` |
 | 24 | Mobile calendar strip | Next interview card first on small screens |
 | 25 | Employer attest slug URL | `/placement/employer/{company-slug}?token=…` |
+| 26 | Admin partner keys UI | `/admin/partner-keys` mint + revoke |
+| 27 | Recruiter batch inbox | `/recruiter/inbox` + `docs/RECRUITER_INBOX.md` |
+| 28 | Logo marquee everywhere | All routes except `/waitlist` |
 
 See **`docs/PRODUCT_ROADMAP.md`** for product rationale on next priorities.
 

@@ -299,6 +299,9 @@ class Settings(BaseSettings):
     # Partner / ATS export (Bearer-style token via X-Twin-Partner-Token header).
     partner_export_token: str = ""
 
+    # Recruiter batch inbox pilot (X-Twin-Recruiter-Token + company_slug filter).
+    recruiter_inbox_token: str = ""
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [o for o in (x.strip() for x in self.cors_origins.split(",")) if o]

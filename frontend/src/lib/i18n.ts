@@ -85,6 +85,7 @@ export type TranslationKey =
   | `status.${keyof typeof en.status}`
   | `placementEmployer.${keyof typeof en.placementEmployer}`
   | `acceptanceQueue.${keyof typeof en.acceptanceQueue}`
+  | `recruiterInbox.${keyof typeof en.recruiterInbox}`
   | `developers.${keyof typeof en.developers}`
   | `meta.${keyof typeof en.meta}`
   | `privacy.${keyof typeof en.privacy}`
@@ -1103,6 +1104,18 @@ const en = {
     partnerApi: "Partner export API",
     partnerApiHint: "Token-gated CSV exports for ATS integrators — see docs/PARTNER_API.md in the repo.",
     authNote: "Write endpoints live under /api/v1/ with JWT from /auth/login or register.",
+  },
+  recruiterInbox: {
+    title: "Recruiter acceptance inbox",
+    lead: "Short batch list for one company — accept candidates for interview or decline without inbox noise.",
+    tokenPlaceholder: "Recruiter inbox token",
+    companyPlaceholder: "Company slug (e.g. acme-corp)",
+    load: "Load queue",
+    empty: "No applications waiting for this company slug.",
+    missingAuth: "Enter recruiter token and company slug (from your TWIN pilot link).",
+    accept: "Accept for interview",
+    decline: "Decline",
+    back: "For recruiters",
   },
   acceptanceQueue: {
     stripTitle: "Acceptance queue",
@@ -2666,6 +2679,18 @@ const pl: MessageTree = {
     partnerApi: "Partner export API",
     partnerApiHint: "Eksport CSV pod tokenem integratora — docs/PARTNER_API.md w repozytorium.",
     authNote: "Zapis pod /api/v1/ z JWT z /auth/login lub rejestracji.",
+  },
+  recruiterInbox: {
+    title: "Skrzynka akceptacji rekrutera",
+    lead: "Krótka lista dla jednej firmy — zaakceptuj na rozmowę lub odrzuć bez szumu w skrzynce.",
+    tokenPlaceholder: "Token inbox rekrutera",
+    companyPlaceholder: "Slug firmy (np. acme-corp)",
+    load: "Załaduj kolejkę",
+    empty: "Brak aplikacji dla tego sluga firmy.",
+    missingAuth: "Podaj token rekrutera i slug firmy (z linku pilotażowego TWIN).",
+    accept: "Zaakceptuj na rozmowę",
+    decline: "Odrzuć",
+    back: "Dla rekruterów",
   },
   acceptanceQueue: {
     stripTitle: "Kolejka akceptacji",

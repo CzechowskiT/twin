@@ -22,6 +22,7 @@ from app.api import (
     partner,
     placement,
     public,
+    recruiter,
     referrals,
     talent_pool,
 )
@@ -48,3 +49,4 @@ api_router.include_router(partner.router, prefix="/partner", tags=["Partner"])
 api_router.include_router(applications.router, prefix="/applications", tags=["Applications"])
 api_router.include_router(feedback.router, prefix="/feedback", tags=["Feedback"])
 api_router.include_router(admin_ops.router, prefix="/admin", tags=["Admin"])
+api_router.include_router(recruiter.router, prefix="/recruiter", tags=["Recruiter"])

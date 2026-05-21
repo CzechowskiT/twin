@@ -10,7 +10,7 @@ from app.core.deps import get_db
 from app.services.admin_metrics import build_admin_metrics
 from app.services.admin_placement_queue import build_placement_dispute_queue
 from app.services.data_quality_metrics import build_data_quality_report
-from app.services.partner_auth import mint_partner_api_key
+from app.services.partner_auth import mint_partner_api_key, revoke_partner_api_key
 from app.services.placement_verification import ops_resolve_placement_dispute
 from app.database.models import PartnerApiKey
 
@@ -125,3 +125,18 @@ def admin_create_partner_api_key(
         "token": raw,
         "header": "X-Twin-Partner-Token",
     }
+
+
+@router.post("/partner-api-keys/{key_id}/revoke")
+def admin_revoke_partner_api_key(
+    key_id: int,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+) -> dict:
+    _require_ops_admin(settings, authorization)
+    try:
+        revoke_partner_api_key(db, key_id=key_id)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    return {"id": key_id, "revoked": True}

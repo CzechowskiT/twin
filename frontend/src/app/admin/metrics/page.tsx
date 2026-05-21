@@ -121,9 +121,14 @@ export default function AdminMetricsPage() {
             </div>
           </section>
           <p className="twin-muted mt-6 text-xs">Generated {data.generated_at}</p>
-          <Link href="/admin/placements" className="twin-link mt-4 inline-block text-sm">
-            Open placement dispute queue →
-          </Link>
+          <div className="mt-4 flex flex-wrap gap-4 text-sm">
+            <Link href="/admin/placements" className="twin-link">
+              Placement disputes →
+            </Link>
+            <Link href="/admin/partner-keys" className="twin-link">
+              Partner API keys →
+            </Link>
+          </div>
         </>
       ) : null}
     </main>
