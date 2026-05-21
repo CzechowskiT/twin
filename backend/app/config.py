@@ -20,6 +20,16 @@ def _strip_trailing_slash_url(url: str) -> str:
     return url.strip().rstrip("/")
 
 
+def _clean_redis_url(value: object) -> object:
+    """Strip trailing `}` from malformed Railway template pastes (e.g. port `6379}}`)."""
+    if not isinstance(value, str):
+        return value
+    v = value.strip()
+    while v.endswith("}"):
+        v = v[:-1]
+    return v
+
+
 def _normalize_postgres_url(url: str) -> str:
     """Railway/Render often provide postgres:// — SQLAlchemy needs psycopg driver."""
     if url.startswith("postgres://"):
@@ -71,6 +81,11 @@ class Settings(BaseSettings):
     redis_url: str = "redis://localhost:6379/0"
     celery_broker_url: str = "redis://localhost:6379/0"
     celery_result_backend: str = "redis://localhost:6379/1"
+
+    @field_validator("redis_url", "celery_broker_url", "celery_result_backend", mode="before")
+    @classmethod
+    def clean_redis_urls(cls, value: object) -> object:
+        return _clean_redis_url(value)
     # When true, Celery `.delay()` runs inside the API worker (no broker). Use on a single Railway
     # service without Redis/worker, or local dev; use Redis + separate worker for production scale.
     celery_task_always_eager: bool = False

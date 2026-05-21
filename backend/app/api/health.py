@@ -80,6 +80,9 @@ def celery_status() -> dict[str, str | bool | list[str]]:
     from app.config import get_settings
     from app.tasks.celery_app import celery_app
 
+    from app.tasks.celery_app import apply_celery_runtime_config
+
+    apply_celery_runtime_config()
     s = get_settings()
     schedule = celery_app.conf.beat_schedule or {}
     out: dict[str, str | bool | list[str]] = {

@@ -37,6 +37,13 @@ upsert_if_empty "API_URL" "https://twin-production-bcd9.up.railway.app"
 upsert_if_empty "ENVIRONMENT" "production"
 upsert_if_empty "CELERY_BROKER_URL" '${{Redis.REDIS_URL}}'
 upsert_if_empty "CELERY_RESULT_BACKEND" '${{Redis.REDIS_URL}}'
+# Strip common corruption from manual Raw Editor paste (port 6379}).
+if grep -qE 'CELERY_BROKER_URL=.*6379\}\}' "$ENV_FILE" 2>/dev/null; then
+  sed -i.bak 's|^CELERY_BROKER_URL=.*|CELERY_BROKER_URL=${{Redis.REDIS_URL}}|' "$ENV_FILE" && rm -f "${ENV_FILE}.bak"
+  sed -i.bak 's|^CELERY_RESULT_BACKEND=.*|CELERY_RESULT_BACKEND=${{Redis.REDIS_URL}}|' "$ENV_FILE" && rm -f "${ENV_FILE}.bak"
+  sed -i.bak 's|^REDIS_URL=.*|REDIS_URL=${{Redis.REDIS_URL}}|' "$ENV_FILE" && rm -f "${ENV_FILE}.bak"
+  echo "Fixed malformed CELERY_BROKER_URL / REDIS_URL in $ENV_FILE"
+fi
 upsert_if_empty "CELERY_TASK_ALWAYS_EAGER" "false"
 upsert_if_empty "SCRAPE_WORKER_READY" "true"
 upsert_if_empty "SCRAPE_BEAT_ENABLED" "true"

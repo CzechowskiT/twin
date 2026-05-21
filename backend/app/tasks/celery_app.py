@@ -28,8 +28,10 @@ celery_app.conf.update(
 
 
 def apply_celery_runtime_config() -> None:
-    """Re-read Settings (e.g. after get_settings.cache_clear) and sync Celery eager mode."""
+    """Re-read Settings (e.g. after get_settings.cache_clear) and sync broker + eager mode."""
     s = get_settings()
+    celery_app.conf.broker_url = s.celery_broker_url
+    celery_app.conf.result_backend = s.celery_result_backend
     celery_app.conf.task_always_eager = s.celery_task_always_eager
 
 

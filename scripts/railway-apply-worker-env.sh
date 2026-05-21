@@ -6,6 +6,8 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 # shellcheck source=/dev/null
 source "$ROOT/scripts/railway-auth.sh"
+# shellcheck source=/dev/null
+source "$ROOT/scripts/railway-redis-ref.sh"
 
 ENV_FILE="${RAILWAY_ENV_FILE:-.env.railway}"
 # Default matches Railway service name in project responsible-success (override if renamed).
@@ -37,7 +39,7 @@ set_var() {
   "${CLI[@]}" variables set "$name=$value" --service "$WORKER_SERVICE" --skip-deploys
 }
 
-REDIS_REF="${CELERY_BROKER_URL:-\${{Redis.REDIS_URL}}}"
+REDIS_REF="$(sanitize_redis_broker_ref "${CELERY_BROKER_URL:-}")"
 
 set_var DATABASE_URL "${DATABASE_URL:-\${{Postgres.DATABASE_URL}}}"
 set_var CELERY_BROKER_URL "$REDIS_REF"

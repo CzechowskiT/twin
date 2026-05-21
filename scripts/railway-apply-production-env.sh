@@ -6,6 +6,8 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 # shellcheck source=/dev/null
 source "$ROOT/scripts/railway-auth.sh"
+# shellcheck source=/dev/null
+source "$ROOT/scripts/railway-redis-ref.sh"
 
 ENV_FILE="${RAILWAY_ENV_FILE:-.env.railway}"
 if [[ ! -f "$ENV_FILE" ]]; then
@@ -66,10 +68,9 @@ set_var GOOGLE_CLIENT_SECRET "${GOOGLE_CLIENT_SECRET:-}"
 set_var GOOGLE_CALENDAR_REDIRECT_URI "$GCAL_REDIRECT"
 
 # Celery + scrape worker (Redis plugin must exist; worker service uses deploy/railway-worker.toml --beat)
-REDIS_REF="${CELERY_BROKER_URL:-\${{Redis.REDIS_URL}}}"
-if [[ "$REDIS_REF" == *"}}'"* || "$REDIS_REF" == *"6379}}"* ]]; then
-  echo "WARN: CELERY_BROKER_URL in $ENV_FILE looks malformed — using \${{Redis.REDIS_URL}}" >&2
-  REDIS_REF='${{Redis.REDIS_URL}}'
+REDIS_REF="$(sanitize_redis_broker_ref "${CELERY_BROKER_URL:-}")"
+if [[ "$REDIS_REF" != "${CELERY_BROKER_URL:-}" ]] && [[ -n "${CELERY_BROKER_URL:-}" ]]; then
+  echo "WARN: CELERY_BROKER_URL in $ENV_FILE sanitized → Railway reference" >&2
 fi
 set_var CELERY_BROKER_URL "$REDIS_REF"
 set_var CELERY_RESULT_BACKEND "${CELERY_RESULT_BACKEND:-$REDIS_REF}"

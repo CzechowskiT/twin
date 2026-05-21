@@ -23,6 +23,13 @@ if ! (cd "$FRONTEND" && "${CLI[@]}" whoami >/dev/null 2>&1); then
   exit 1
 fi
 
+if [[ ! -f "$FRONTEND/.vercel/project.json" ]]; then
+  echo "Vercel project not linked in frontend/.vercel — skipping env push." >&2
+  echo "  Fix: cd frontend && npx vercel link   (pick team + twin / twin-sooty project)" >&2
+  echo "  Or paste: ./scripts/copy-vercel-vars-to-clipboard.sh → Vercel → Settings → Environment Variables" >&2
+  exit 0
+fi
+
 push_env() {
   local name="$1"
   local value="$2"
@@ -31,7 +38,9 @@ push_env() {
     return 0
   fi
   echo "Set $name on Vercel (production)"
-  (cd "$FRONTEND" && printf '%s' "$value" | "${CLI[@]}" env add "$name" production --force) || true
+  if ! (cd "$FRONTEND" && printf '%s' "$value" | "${CLI[@]}" env add "$name" production --force); then
+    echo "WARN: failed to set $name (check vercel link)" >&2
+  fi
 }
 
 API_PUBLIC="${NEXT_PUBLIC_API_URL:-${RAILWAY_API_URL:-}}"

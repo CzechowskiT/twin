@@ -7,7 +7,7 @@ Quick fixes for production and local nightly auto-apply. Full runbooks: [docs/NI
 | Symptom | Likely cause | Fix |
 |--------|----------------|-----|
 | `celery_task_always_eager: true` | API has no Redis broker or solo-mode fallback | Set `CELERY_BROKER_URL=${{Redis.REDIS_URL}}`, `CELERY_TASK_ALWAYS_EAGER=false`, redeploy API + worker. Run `./DEPLOYMENT.sh` or `./scripts/railway-apply-production-env.sh` after `railway link`. |
-| `celery-status` → `Port could not be cast … '6379}}'` | Malformed `CELERY_BROKER_URL` (extra `}}`) | Reset broker vars to `${{Redis.REDIS_URL}}` on **twin** and worker service. |
+| `celery-status` → `Port could not be cast … '6379}}'` | Malformed `CELERY_BROKER_URL` (extra `}}`) | Run `./scripts/railway-fix-redis-broker.sh` (sets `${{Redis.REDIS_URL}}` on API + worker, redeploys). |
 | `worker_active: false` | Worker down or broker broken | Redeploy worker (`enthusiastic-encouragement` or `twin-worker`), check `railway logs --service <worker>`. |
 | `ops_admin_configured: false` | Missing `OPS_ADMIN_TOKEN` | Set in Railway Raw Editor or `.env.railway` + `./scripts/railway-apply-production-env.sh`. |
 | `GET /health/celery-status` 404 | Old API image | Deploy `cursor/phase1-monorepo-scaffold` (includes nightly auto-apply merge). |
