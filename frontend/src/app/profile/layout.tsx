@@ -2,15 +2,12 @@
 
 import type { ReactNode } from "react";
 
-import { CandidateWorkspaceGate } from "@/components/candidate-workspace-gate";
-import { useMarketingPersona } from "@/components/persona-provider";
+import { PersonaWorkspaceGate } from "@/components/persona-workspace-gate";
 
 export default function ProfileLayout({ children }: { children: ReactNode }) {
-  const { persona } = useMarketingPersona();
-
-  if (persona !== "candidate") {
-    return <CandidateWorkspaceGate surface="profile" />;
-  }
-
-  return <>{children}</>;
+  return (
+    <PersonaWorkspaceGate allowed={["candidate"]} surface="candidate">
+      {children}
+    </PersonaWorkspaceGate>
+  );
 }

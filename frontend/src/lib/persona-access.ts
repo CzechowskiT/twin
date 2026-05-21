@@ -7,7 +7,7 @@ import {
   PERSONA_ROUTE,
   type MarketingPersona,
 } from "@/lib/marketing-persona";
-import { LOGIN_PATH, REGISTER_PATH } from "@/lib/persona-auth";
+import { LOGIN_PATH, REGISTER_PATH, WORKSPACE_PATH } from "@/lib/persona-auth";
 import type { TranslationKey } from "@/lib/i18n";
 
 export type PersonaAudience = MarketingPersona;
@@ -21,6 +21,11 @@ const PATH_IMPLIES_PERSONA: { prefix: string; persona: MarketingPersona }[] = [
   { prefix: "/for-recruiters", persona: "recruiter" },
   { prefix: "/recruiter", persona: "recruiter" },
   { prefix: "/for-companies", persona: "company" },
+  { prefix: "/workspace/candidate", persona: "candidate" },
+  { prefix: "/workspace/recruiter", persona: "recruiter" },
+  { prefix: "/workspace/investor", persona: "company" },
+  { prefix: "/workspace", persona: "candidate" },
+  { prefix: "/investor", persona: "company" },
   { prefix: "/login/candidate", persona: "candidate" },
   { prefix: "/login/recruiter", persona: "recruiter" },
   { prefix: "/login/investor", persona: "company" },
@@ -35,6 +40,11 @@ const PREFIX_ALLOWED: { prefix: string; allowed: readonly MarketingPersona[] }[]
   { prefix: "/dashboard", allowed: ["candidate"] },
   { prefix: "/profile", allowed: ["candidate"] },
   { prefix: "/onboarding", allowed: ["candidate"] },
+  { prefix: "/workspace/candidate", allowed: ["candidate"] },
+  { prefix: "/workspace/recruiter", allowed: ["recruiter", "company"] },
+  { prefix: "/workspace/investor", allowed: ["company"] },
+  { prefix: "/workspace", allowed: ["candidate", "recruiter", "company"] },
+  { prefix: "/investor", allowed: ["company"] },
   { prefix: "/calculator/b2b", allowed: ["company", "candidate", "recruiter"] },
   { prefix: "/calculator", allowed: ["company", "recruiter"] },
   { prefix: "/recruiter", allowed: ["recruiter", "company"] },
@@ -69,6 +79,8 @@ const ALWAYS_ALLOWED_PREFIXES = [
   "/consent",
   "/auth",
   "/api",
+  "/workspace",
+  "/investor",
 ];
 
 const MARKETING_HUB_PATHS = new Set([
@@ -149,7 +161,9 @@ export type HeaderGrowthLabelKey =
   | "nav.calculatorB2bForCompanies"
   | "nav.waitlist"
   | "nav.forCompanies"
-  | "nav.forRecruiters";
+  | "nav.forRecruiters"
+  | "workspace.investorHome"
+  | "workspace.recruiterHome";
 
 export type GrowthCtaVariant = "candidate" | "recruiter" | "investor";
 
@@ -168,7 +182,7 @@ export function headerGrowthLinksForPersona(
     return [
       { href: "/demo", labelKey: "nav.demo", variant: "candidate" },
       { href: "/calculator/b2b", labelKey: "nav.calculatorB2bForCompanies", variant: "recruiter" },
-      { href: "/calculator", labelKey: "nav.calculatorInvestor", variant: "investor" },
+      { href: "/for-companies", labelKey: "nav.forCompanies", variant: "investor" },
     ];
   }
   if (persona === "candidate") {
@@ -184,7 +198,7 @@ export function headerGrowthLinksForPersona(
     ];
   }
   return [
-    { href: "/calculator", labelKey: "nav.calculatorInvestor", variant: "investor" },
+    { href: "/workspace/investor", labelKey: "workspace.investorHome", variant: "investor" },
     { href: "/for-companies", labelKey: "nav.forCompanies", variant: "investor" },
   ];
 }
@@ -194,9 +208,8 @@ export type HeaderProductLink = {
   labelKey:
     | "nav.demo"
     | "dashboard.calendarLink"
-    | "nav.calculatorB2bForCompanies"
-    | "nav.calculatorInvestor"
-    | "recruiterInbox.title";
+    | "workspace.recruiterHome"
+    | "workspace.investorHome";
 };
 
 export function headerProductLinks(
@@ -208,9 +221,9 @@ export function headerProductLinks(
     return [{ href: "/demo", labelKey: "nav.demo" }];
   }
   if (persona === "recruiter") {
-    return [{ href: "/calculator/b2b", labelKey: "nav.calculatorB2bForCompanies" }];
+    return [{ href: "/workspace/recruiter", labelKey: "workspace.recruiterHome" }];
   }
-  return [{ href: "/calculator", labelKey: "nav.calculatorInvestor" }];
+  return [{ href: "/workspace/investor", labelKey: "workspace.investorHome" }];
 }
 
 export function showCandidateProductNav(persona: MarketingPersona): boolean {
@@ -231,18 +244,20 @@ export function headerAccountLinks(
   }
   if (persona === "candidate") {
     return [
+      { href: WORKSPACE_PATH.candidate, labelKey: "workspace.candidateHome" },
       { href: "/dashboard", labelKey: "nav.dashboard" },
       { href: "#", labelKey: "dashboard.logout", isLogout: true },
     ];
   }
   if (persona === "recruiter") {
     return [
+      { href: WORKSPACE_PATH.recruiter, labelKey: "workspace.recruiterHome" },
       { href: "/recruiter/inbox", labelKey: "recruiterInbox.title" },
       { href: "#", labelKey: "dashboard.logout", isLogout: true },
     ];
   }
   return [
-    { href: "/for-companies", labelKey: "nav.forCompanies" },
+    { href: WORKSPACE_PATH.company, labelKey: "workspace.investorHome" },
     { href: "#", labelKey: "dashboard.logout", isLogout: true },
   ];
 }
@@ -250,12 +265,34 @@ export function headerAccountLinks(
 export function footerExploreHrefsForPersona(persona: MarketingPersona): string[] {
   const common = ["/", "/waitlist", "/demo", "/faq", "/status", "/developers"];
   if (persona === "company") {
-    return [...common, "/for-companies", "/calculator", "/calculator/b2b", "/login/investor", "/contact"];
+    return [
+      ...common,
+      "/for-companies",
+      "/workspace/investor",
+      "/investor/calculator",
+      "/login/investor",
+      "/contact",
+    ];
   }
   if (persona === "recruiter") {
-    return [...common, "/for-recruiters", "/calculator/b2b", "/recruiter/inbox", "/login/recruiter", "/contact"];
+    return [
+      ...common,
+      "/for-recruiters",
+      "/workspace/recruiter",
+      "/calculator/b2b",
+      "/recruiter/inbox",
+      "/login/recruiter",
+      "/contact",
+    ];
   }
-  return [...common, "/for-candidates", "/login/candidate", "/register/candidate", "/contact"];
+  return [
+    ...common,
+    "/for-candidates",
+    "/workspace/candidate",
+    "/login/candidate",
+    "/register/candidate",
+    "/contact",
+  ];
 }
 
 export function personaGateRedirect(persona: MarketingPersona): string {

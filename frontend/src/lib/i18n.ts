@@ -86,6 +86,7 @@ export type TranslationKey =
   | `placementEmployer.${keyof typeof en.placementEmployer}`
   | `acceptanceQueue.${keyof typeof en.acceptanceQueue}`
   | `recruiterInbox.${keyof typeof en.recruiterInbox}`
+  | `workspace.${keyof typeof en.workspace}`
   | `developers.${keyof typeof en.developers}`
   | `meta.${keyof typeof en.meta}`
   | `privacy.${keyof typeof en.privacy}`
@@ -1130,6 +1131,49 @@ const en = {
     next: "Next",
     skip: "Skip tour",
     done: "Done",
+  },
+  workspace: {
+    pickerTitle: "Choose your workspace",
+    pickerLead:
+      "You are signed in. Pick the context for this session — each lane has its own tools and content.",
+    enterZone: "Enter workspace",
+    switchContext: "Switch context",
+    signedInEyebrow: "Signed in",
+    backMarketing: "Back to marketing site",
+    marketingStory: "Product story (marketing)",
+    goMyWorkspace: "Go to my workspace",
+    candidateHome: "Candidate home",
+    recruiterHome: "Recruiter home",
+    investorHome: "Investor workspace",
+    gateTitleCandidate: "Candidate workspace only",
+    gateLeadCandidate:
+      "Dashboard, matches, and applications live here. Switch context or open your candidate home.",
+    gateTitleRecruiter: "Recruiter workspace only",
+    gateLeadRecruiter:
+      "Inbox and B2B ROI tools live in the recruiter lane. Switch context to continue.",
+    gateTitleInvestor: "Investor workspace only",
+    gateLeadInvestor:
+      "Scenario calculator and company programs live in the investor lane. Switch context to continue.",
+    zoneCandidateTitle: "Candidate",
+    zoneCandidateLead: "Job search, auto-apply, calendar, and applications.",
+    zoneCandidateTools: "Demo · Dashboard · Matches",
+    zoneRecruiterTitle: "Recruiter",
+    zoneRecruiterLead: "Acceptance inbox and client ROI conversations.",
+    zoneRecruiterTools: "Inbox · B2B ROI calculator",
+    zoneInvestorTitle: "Investor / company",
+    zoneInvestorLead: "Programs, scenario model, and procurement materials.",
+    zoneInvestorTools: "Investor calculator · For companies",
+    recruiterHomeTitle: "Recruiter workspace",
+    recruiterHomeLead: "Tools for batch acceptance and employer-facing ROI — separate from the candidate app.",
+    investorHomeTitle: "Investor workspace",
+    investorHomeLead: "Internal scenario model and B2B program pages — not mixed with candidate job search.",
+    toolRecruiterInbox: "Review pre-qualified candidates for one company slug.",
+    toolRecruiterB2b: "Illustrative fee model for client conversations.",
+    toolRecruiterStory: "How TWIN works for recruiting teams (marketing).",
+    toolInvestorCalc: "Five-year scenario model (illustrative, not advice).",
+    toolInvestorProgram: "Enterprise programs, DPA, and procurement story.",
+    toolInvestorSignup: "Company program signup",
+    toolInvestorSignupDesc: "Start a B2B program conversation with TWIN.",
   },
   developers: {
     title: "Developers & integrators",
@@ -2753,6 +2797,49 @@ const pl: MessageTree = {
     next: "Dalej",
     skip: "Pomiń tour",
     done: "Gotowe",
+  },
+  workspace: {
+    pickerTitle: "Wybierz strefę pracy",
+    pickerLead:
+      "Jesteś zalogowany. Wybierz kontekst na tę sesję — każda strefa ma własne narzędzia i treści.",
+    enterZone: "Wejdź do strefy",
+    switchContext: "Zmień kontekst",
+    signedInEyebrow: "Zalogowany",
+    backMarketing: "Strona marketingowa",
+    marketingStory: "Opis produktu (marketing)",
+    goMyWorkspace: "Przejdź do mojej strefy",
+    candidateHome: "Strefa kandydata",
+    recruiterHome: "Strefa rekrutera",
+    investorHome: "Strefa inwestora",
+    gateTitleCandidate: "Tylko strefa kandydata",
+    gateLeadCandidate:
+      "Panel, dopasowania i aplikacje są tutaj. Zmień kontekst lub otwórz strefę kandydata.",
+    gateTitleRecruiter: "Tylko strefa rekrutera",
+    gateLeadRecruiter:
+      "Inbox i kalkulator ROI B2B są w strefie rekrutera. Zmień kontekst, aby kontynuować.",
+    gateTitleInvestor: "Tylko strefa inwestora",
+    gateLeadInvestor:
+      "Kalkulator scenariusza i programy firmowe są w strefie inwestora. Zmień kontekst, aby kontynuować.",
+    zoneCandidateTitle: "Kandydat",
+    zoneCandidateLead: "Szukanie pracy, auto-apply, kalendarz i aplikacje.",
+    zoneCandidateTools: "Demo · Panel · Dopasowania",
+    zoneRecruiterTitle: "Rekruter",
+    zoneRecruiterLead: "Inbox akceptacji i rozmowy ROI z klientem.",
+    zoneRecruiterTools: "Inbox · Kalkulator ROI B2B",
+    zoneInvestorTitle: "Inwestor / firma",
+    zoneInvestorLead: "Programy, model scenariusza i materiały procurement.",
+    zoneInvestorTools: "Kalkulator inwestora · Dla firm",
+    recruiterHomeTitle: "Strefa rekrutera",
+    recruiterHomeLead: "Narzędzia akceptacji i ROI dla klienta — oddzielone od aplikacji kandydata.",
+    investorHomeTitle: "Strefa inwestora",
+    investorHomeLead: "Model scenariusza i strony B2B — bez mieszania z panelem kandydata.",
+    toolRecruiterInbox: "Przegląd pre-kwalifikowanych kandydatów dla jednego slug firmy.",
+    toolRecruiterB2b: "Ilustracyjny model opłat do rozmów z klientem.",
+    toolRecruiterStory: "Jak TWIN działa dla zespołów rekrutacyjnych (marketing).",
+    toolInvestorCalc: "Model pięcioletni (ilustracyjny, nie porada inwestycyjna).",
+    toolInvestorProgram: "Programy enterprise, DPA i historia procurement.",
+    toolInvestorSignup: "Zapis programu firmowego",
+    toolInvestorSignupDesc: "Rozpocznij rozmowę B2B z TWIN.",
   },
   developers: {
     title: "Dla developerów i integratorów",

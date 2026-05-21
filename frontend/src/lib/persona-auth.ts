@@ -1,5 +1,5 @@
 /**
- * Auth entry points per marketing persona — same account, different post-login home.
+ * Auth entry points and post-login workspace homes per marketing persona.
  */
 
 import type { MarketingPersona } from "@/lib/marketing-persona";
@@ -18,15 +18,20 @@ export const REGISTER_PATH: Record<LoginZone, string> = {
   company: "/register/investor",
 };
 
+/** Logged-in home for each lane (context picker or tool hub). */
+export const WORKSPACE_PATH: Record<LoginZone, string> = {
+  candidate: "/workspace/candidate",
+  recruiter: "/workspace/recruiter",
+  company: "/workspace/investor",
+};
+
 export function postLoginPath(zone: LoginZone): string {
-  if (zone === "recruiter") return "/recruiter/inbox";
-  if (zone === "company") return "/for-companies";
-  return "/dashboard";
+  return WORKSPACE_PATH[zone];
 }
 
 export function postRegisterPath(zone: LoginZone): string {
   if (zone === "candidate") return "/onboarding";
-  return postLoginPath(zone);
+  return WORKSPACE_PATH[zone];
 }
 
 export function loginZoneFromPath(pathname: string): LoginZone | null {
@@ -38,5 +43,5 @@ export function loginZoneFromPath(pathname: string): LoginZone | null {
 }
 
 export function workspaceHomePath(persona: MarketingPersona): string {
-  return postLoginPath(persona);
+  return WORKSPACE_PATH[persona];
 }

@@ -5,11 +5,13 @@ import { useRef } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { useMarketingPersona } from "@/components/persona-provider";
+import { getToken } from "@/lib/auth";
 import {
   MARKETING_PERSONAS,
   PERSONA_ROUTE,
   type MarketingPersona,
 } from "@/lib/marketing-persona";
+import { WORKSPACE_PATH } from "@/lib/persona-auth";
 import type { TranslationKey } from "@/lib/i18n";
 
 function ChevronIcon({ className }: { className?: string }) {
@@ -45,7 +47,7 @@ export function PersonaSwitcher({ className }: { className?: string }) {
 
   const pick = (next: MarketingPersona) => {
     setPersona(next);
-    router.push(PERSONA_ROUTE[next]);
+    router.push(getToken() ? WORKSPACE_PATH[next] : PERSONA_ROUTE[next]);
     close();
   };
 
