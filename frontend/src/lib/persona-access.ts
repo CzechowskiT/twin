@@ -1,5 +1,5 @@
 /**
- * Persona boundaries — candidate app vs recruiter vs company (B2B) must not mix in UI or routes.
+ * Persona boundaries — candidate app vs recruiter vs investor (company) lanes.
  */
 
 import {
@@ -7,6 +7,8 @@ import {
   PERSONA_ROUTE,
   type MarketingPersona,
 } from "@/lib/marketing-persona";
+import { LOGIN_PATH, REGISTER_PATH } from "@/lib/persona-auth";
+import type { TranslationKey } from "@/lib/i18n";
 
 export type PersonaAudience = MarketingPersona;
 
@@ -19,7 +21,12 @@ const PATH_IMPLIES_PERSONA: { prefix: string; persona: MarketingPersona }[] = [
   { prefix: "/for-recruiters", persona: "recruiter" },
   { prefix: "/recruiter", persona: "recruiter" },
   { prefix: "/for-companies", persona: "company" },
-  /** /calculator/b2b is linked from every persona header — do not force company on visit. */
+  { prefix: "/login/candidate", persona: "candidate" },
+  { prefix: "/login/recruiter", persona: "recruiter" },
+  { prefix: "/login/investor", persona: "company" },
+  { prefix: "/register/candidate", persona: "candidate" },
+  { prefix: "/register/recruiter", persona: "recruiter" },
+  { prefix: "/register/investor", persona: "company" },
   { prefix: "/calculator", persona: "company" },
 ];
 
@@ -29,11 +36,12 @@ const PREFIX_ALLOWED: { prefix: string; allowed: readonly MarketingPersona[] }[]
   { prefix: "/profile", allowed: ["candidate"] },
   { prefix: "/onboarding", allowed: ["candidate"] },
   { prefix: "/calculator/b2b", allowed: ["company", "candidate", "recruiter"] },
-  { prefix: "/calculator", allowed: ["company"] },
+  { prefix: "/calculator", allowed: ["company", "recruiter"] },
   { prefix: "/recruiter", allowed: ["recruiter", "company"] },
   { prefix: "/for-recruiters", allowed: ["recruiter", "candidate", "company"] },
   { prefix: "/for-companies", allowed: ["company", "candidate", "recruiter"] },
   { prefix: "/for-candidates", allowed: ["candidate", "recruiter", "company"] },
+  { prefix: "/demo", allowed: ["candidate", "recruiter", "company"] },
 ];
 
 const ALWAYS_ALLOWED_PREFIXES = [
@@ -63,6 +71,18 @@ const ALWAYS_ALLOWED_PREFIXES = [
   "/api",
 ];
 
+const MARKETING_HUB_PATHS = new Set([
+  "/",
+  "/about",
+  "/faq",
+  "/contact",
+  "/case-studies",
+  "/partners",
+  "/media",
+  "/careers",
+  "/testimonials",
+]);
+
 function normalizePath(pathname: string): string {
   const base = pathname.split("?")[0]?.split("#")[0] ?? "/";
   if (base.length > 1 && base.endsWith("/")) return base.slice(0, -1);
@@ -71,7 +91,6 @@ function normalizePath(pathname: string): string {
 
 function pathMatchesPersonaPrefix(path: string, prefix: string): boolean {
   if (path === prefix) return true;
-  // Investor model at /calculator only — /calculator/b2b stays on the user's chosen persona.
   if (prefix === "/calculator") return false;
   return path.startsWith(`${prefix}/`);
 }
@@ -107,6 +126,11 @@ export function isPathAllowedForPersona(pathname: string, persona: MarketingPers
   return rule.allowed.includes(persona);
 }
 
+export function isMarketingHubPath(pathname: string): boolean {
+  const path = normalizePath(pathname);
+  return MARKETING_HUB_PATHS.has(path);
+}
+
 export function isCandidateWorkspacePath(pathname: string): boolean {
   const path = normalizePath(pathname);
   return (
@@ -120,46 +144,118 @@ export function isCandidateWorkspacePath(pathname: string): boolean {
 }
 
 export type HeaderGrowthLabelKey =
-  | "nav.calculator"
+  | "nav.demo"
+  | "nav.calculatorInvestor"
+  | "nav.calculatorB2bForCompanies"
   | "nav.waitlist"
   | "nav.forCompanies"
-  | "nav.forRecruiters"
-  | "nav.forCandidates";
+  | "nav.forRecruiters";
 
-export type HeaderGrowthLink = { href: string; labelKey: HeaderGrowthLabelKey };
+export type GrowthCtaVariant = "candidate" | "recruiter" | "investor";
 
-export function headerGrowthLinksForPersona(persona: MarketingPersona): HeaderGrowthLink[] {
-  if (persona === "company") {
+export type HeaderGrowthLink = {
+  href: string;
+  labelKey: HeaderGrowthLabelKey;
+  variant: GrowthCtaVariant;
+};
+
+/** Hub pages show all three product entry tools; elsewhere — persona-specific pair. */
+export function headerGrowthLinksForPersona(
+  persona: MarketingPersona,
+  pathname: string,
+): HeaderGrowthLink[] {
+  if (isMarketingHubPath(pathname)) {
     return [
-      { href: "/calculator/b2b", labelKey: "nav.calculator" },
-      { href: "/for-companies", labelKey: "nav.forCompanies" },
+      { href: "/demo", labelKey: "nav.demo", variant: "candidate" },
+      { href: "/calculator/b2b", labelKey: "nav.calculatorB2bForCompanies", variant: "recruiter" },
+      { href: "/calculator", labelKey: "nav.calculatorInvestor", variant: "investor" },
+    ];
+  }
+  if (persona === "candidate") {
+    return [
+      { href: "/demo", labelKey: "nav.demo", variant: "candidate" },
+      { href: "/waitlist", labelKey: "nav.waitlist", variant: "recruiter" },
     ];
   }
   if (persona === "recruiter") {
     return [
-      { href: "/for-recruiters", labelKey: "nav.forRecruiters" },
-      { href: "/waitlist", labelKey: "nav.waitlist" },
+      { href: "/calculator/b2b", labelKey: "nav.calculatorB2bForCompanies", variant: "recruiter" },
+      { href: "/for-recruiters", labelKey: "nav.forRecruiters", variant: "recruiter" },
     ];
   }
   return [
-    { href: "/calculator/b2b", labelKey: "nav.calculator" },
-    { href: "/waitlist", labelKey: "nav.waitlist" },
+    { href: "/calculator", labelKey: "nav.calculatorInvestor", variant: "investor" },
+    { href: "/for-companies", labelKey: "nav.forCompanies", variant: "investor" },
   ];
+}
+
+export type HeaderProductLink = {
+  href: string;
+  labelKey:
+    | "nav.demo"
+    | "dashboard.calendarLink"
+    | "nav.calculatorB2bForCompanies"
+    | "nav.calculatorInvestor"
+    | "recruiterInbox.title";
+};
+
+export function headerProductLinks(
+  persona: MarketingPersona,
+  pathname: string,
+): HeaderProductLink[] {
+  if (persona === "candidate") {
+    if (isMarketingHubPath(pathname)) return [];
+    return [{ href: "/demo", labelKey: "nav.demo" }];
+  }
+  if (persona === "recruiter") {
+    return [{ href: "/calculator/b2b", labelKey: "nav.calculatorB2bForCompanies" }];
+  }
+  return [{ href: "/calculator", labelKey: "nav.calculatorInvestor" }];
 }
 
 export function showCandidateProductNav(persona: MarketingPersona): boolean {
   return persona === "candidate";
 }
 
-export function footerExploreHrefsForPersona(persona: MarketingPersona): string[] {
-  const common = ["/", "/waitlist", "/demo", "/faq", "/status", "/developers", "/login", "/register"];
-  if (persona === "company") {
-    return [...common, "/for-companies", "/calculator/b2b", "/contact"];
+export type HeaderAccountLink = { href: string; labelKey: TranslationKey; isLogout?: boolean };
+
+export function headerAccountLinks(
+  persona: MarketingPersona,
+  hasSession: boolean,
+): HeaderAccountLink[] {
+  if (!hasSession) {
+    return [
+      { href: LOGIN_PATH[persona], labelKey: "nav.login" },
+      { href: REGISTER_PATH[persona], labelKey: "nav.register" },
+    ];
+  }
+  if (persona === "candidate") {
+    return [
+      { href: "/dashboard", labelKey: "nav.dashboard" },
+      { href: "#", labelKey: "dashboard.logout", isLogout: true },
+    ];
   }
   if (persona === "recruiter") {
-    return [...common, "/for-recruiters", "/recruiter/inbox", "/contact"];
+    return [
+      { href: "/recruiter/inbox", labelKey: "recruiterInbox.title" },
+      { href: "#", labelKey: "dashboard.logout", isLogout: true },
+    ];
   }
-  return [...common, "/for-candidates", "/calculator/b2b", "/register", "/login"];
+  return [
+    { href: "/for-companies", labelKey: "nav.forCompanies" },
+    { href: "#", labelKey: "dashboard.logout", isLogout: true },
+  ];
+}
+
+export function footerExploreHrefsForPersona(persona: MarketingPersona): string[] {
+  const common = ["/", "/waitlist", "/demo", "/faq", "/status", "/developers"];
+  if (persona === "company") {
+    return [...common, "/for-companies", "/calculator", "/calculator/b2b", "/login/investor", "/contact"];
+  }
+  if (persona === "recruiter") {
+    return [...common, "/for-recruiters", "/calculator/b2b", "/recruiter/inbox", "/login/recruiter", "/contact"];
+  }
+  return [...common, "/for-candidates", "/login/candidate", "/register/candidate", "/contact"];
 }
 
 export function personaGateRedirect(persona: MarketingPersona): string {

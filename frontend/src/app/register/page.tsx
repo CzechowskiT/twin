@@ -11,6 +11,8 @@ import { Button, Card, Input, Label, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { getToken, setToken } from "@/lib/auth";
 import { OAUTH_LOGIN_BUTTONS_ENABLED } from "@/lib/oauth-auth";
+import { isMarketingPersona } from "@/lib/marketing-persona";
+import { LOGIN_PATH, postRegisterPath } from "@/lib/persona-auth";
 
 type RegisterSuccessResponse = { access_token: string };
 
@@ -25,10 +27,16 @@ function RegisterPageContent() {
   const [loading, setLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
+  const registerZone = useMemo(() => {
+    const z = searchParams.get("zone");
+    return z && isMarketingPersona(z) ? z : "candidate";
+  }, [searchParams]);
+
   const safeNext = useMemo(() => {
     const nextRaw = searchParams.get("next");
-    return nextRaw?.startsWith("/") && !nextRaw.startsWith("//") ? nextRaw : "/dashboard";
-  }, [searchParams]);
+    if (nextRaw?.startsWith("/") && !nextRaw.startsWith("//")) return nextRaw;
+    return postRegisterPath(registerZone);
+  }, [searchParams, registerZone]);
 
   useEffect(() => {
     let cancelled = false;
@@ -241,7 +249,7 @@ function RegisterPageContent() {
         </>
         <p className="twin-muted mt-4 text-center text-sm">
           {t("register.hasAccount")}{" "}
-          <Link href="/login" className="twin-link">
+          <Link href={LOGIN_PATH[registerZone]} className="twin-link">
             {t("register.login")}
           </Link>
         </p>

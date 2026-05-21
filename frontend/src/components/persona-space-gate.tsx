@@ -43,9 +43,9 @@ const SURFACE_I18N: Record<
   },
 };
 
-function personaLabelKey(persona: MarketingPersona): "nav.personaCandidate" | "nav.personaRecruiter" | "nav.personaCompany" {
+function personaLabelKey(persona: MarketingPersona): "nav.personaCandidate" | "nav.personaRecruiter" | "nav.personaInvestor" {
   if (persona === "recruiter") return "nav.personaRecruiter";
-  if (persona === "company") return "nav.personaCompany";
+  if (persona === "company") return "nav.personaInvestor";
   return "nav.personaCandidate";
 }
 

@@ -9,23 +9,38 @@ import { useTranslation } from "@/components/language-provider";
 import { PersonaSwitcher } from "@/components/persona-switcher";
 import { useMarketingPersona } from "@/components/persona-provider";
 import { clearToken, getToken } from "@/lib/auth";
-import { headerGrowthLinksForPersona, showCandidateProductNav } from "@/lib/persona-access";
+import type { TranslationKey } from "@/lib/i18n";
+import {
+  type GrowthCtaVariant,
+  headerAccountLinks,
+  headerGrowthLinksForPersona,
+  headerProductLinks,
+  showCandidateProductNav,
+} from "@/lib/persona-access";
+
+function growthCtaClass(variant: GrowthCtaVariant, base: string): string {
+  if (variant === "candidate") return `${base} twin-header-cta--roi twin-nav-roi-pill`;
+  if (variant === "investor") return `${base} twin-header-cta--waitlist twin-nav-waitlist-pill`;
+  return `${base} twin-header-cta--waitlist twin-nav-waitlist-pill`;
+}
 
 /** One chrome everywhere: calm light header (matches hope / growth palette in globals). */
 export function Header() {
   const { t } = useTranslation();
   const { persona } = useMarketingPersona();
   const pathname = usePathname();
-  const growthLinks = headerGrowthLinksForPersona(persona);
+  const growthLinks = headerGrowthLinksForPersona(persona, pathname);
+  const productLinks = headerProductLinks(persona, pathname);
   const showCandidateNav = showCandidateProductNav(persona);
   const router = useRouter();
   const mobileMenuRef = useRef<HTMLDetailsElement>(null);
   const [hasSession, setHasSession] = useState(false);
+  const accountLinks = headerAccountLinks(persona, hasSession);
   const calendarActive = pathname === "/dashboard/calendar" || pathname.startsWith("/dashboard/calendar/");
-  /** Main dashboard and subpages except calendar (calendar has its own green pill). */
   const dashboardSectionActive =
     pathname === "/dashboard" ||
     (pathname.startsWith("/dashboard/") && !pathname.startsWith("/dashboard/calendar"));
+  const growthTriple = growthLinks.length >= 3;
 
   useEffect(() => {
     const sync = () => setHasSession(Boolean(getToken()));
@@ -39,13 +54,6 @@ export function Header() {
     if (d) d.open = false;
   };
 
-  /** Account + app entry — profile lives in the dashboard panel, not global chrome. */
-  const app = [
-    { href: "/login" as const, label: t("nav.login") },
-    { href: "/register" as const, label: t("nav.register") },
-    ...(showCandidateNav ? [{ href: "/dashboard" as const, label: t("nav.dashboard") }] : []),
-  ];
-
   const corporateNav = [
     { href: "/about" as const, label: t("nav.about") },
     { href: "/case-studies" as const, label: t("nav.cases") },
@@ -57,18 +65,11 @@ export function Header() {
   ];
 
   const headerCtaBase = "twin-header-cta twin-touch-target";
-
-  const roiClassName = `${headerCtaBase} twin-header-cta--roi twin-nav-roi-pill`;
-  const waitlistClassName = `${headerCtaBase} twin-header-cta--waitlist twin-nav-waitlist-pill`;
   const demoClassName = `${headerCtaBase} twin-header-cta--ghost`;
   const calendarClassName = `${headerCtaBase} twin-header-cta--ghost twin-header-cta--calendar`;
-
   const linkClass = "twin-nav-link whitespace-nowrap";
-
-  /** Outline “account” control — grid centers label the same on `<a>` and `<button>` inside `.twin-touch-target` min-height. */
   const accountOutlineDesktopClass =
     "twin-touch-target inline-grid shrink-0 place-items-center whitespace-nowrap rounded-md border border-[var(--twin-border)] bg-[var(--twin-card)] px-2.5 py-0 text-[11px] font-semibold leading-normal text-[var(--twin-accent)] transition hover:border-[var(--twin-accent)]/50 hover:bg-[var(--twin-accent-muted)] hover:text-[var(--twin-accent-hover)] sm:px-3 sm:text-[12px]";
-
   const dashboardDesktopActiveClass =
     "border-[var(--twin-accent)]/50 bg-[var(--twin-accent-muted)] text-[var(--twin-accent-hover)]";
 
@@ -87,12 +88,12 @@ export function Header() {
             TWIN<span className="twin-logo-accent">.</span>
           </Link>
           <div className="twin-header-growth hidden min-w-0 sm:block" aria-label={t("nav.ariaGrowthCta")}>
-            <div className="twin-header-growth__pair">
-              {growthLinks.map((item, i) => (
+            <div className={growthTriple ? "twin-header-growth__triple" : "twin-header-growth__pair"}>
+              {growthLinks.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={i === 0 ? roiClassName : waitlistClassName}
+                  className={growthCtaClass(item.variant, headerCtaBase)}
                 >
                   {t(item.labelKey)}
                 </Link>
@@ -117,10 +118,12 @@ export function Header() {
             role="group"
             aria-label={t("nav.ariaProductCta")}
           >
-            <Link href="/demo" className={demoClassName}>
-              {t("nav.demo")}
-            </Link>
-            {showCandidateNav ? (
+            {productLinks.map((item) => (
+              <Link key={item.href} href={item.href} className={demoClassName}>
+                {t(item.labelKey)}
+              </Link>
+            ))}
+            {showCandidateNav && hasSession ? (
               <Link
                 href="/dashboard/calendar"
                 className={`${calendarClassName} ${calendarActive ? "twin-header-cta--active" : ""}`}
@@ -134,23 +137,28 @@ export function Header() {
             className="flex w-full min-w-0 flex-wrap items-center justify-end gap-x-2 gap-y-1 text-[12px] sm:text-[13px]"
             aria-label={t("nav.ariaAccountNav")}
           >
-            {hasSession && showCandidateNav ? (
-              <>
+            {accountLinks.map((item) =>
+              item.isLogout ? (
+                <button
+                  key="logout"
+                  type="button"
+                  onClick={logout}
+                  className={`${accountOutlineDesktopClass} cursor-pointer`}
+                >
+                  {t(item.labelKey)}
+                </button>
+              ) : (
                 <Link
-                  href="/dashboard"
-                  className={`${accountOutlineDesktopClass} ${dashboardSectionActive ? dashboardDesktopActiveClass : ""}`}
-                  aria-current={dashboardSectionActive ? "page" : undefined}
-                >{t("nav.dashboard")}</Link>
-                <button type="button" onClick={logout} className={`${accountOutlineDesktopClass} cursor-pointer`}>{t("dashboard.logout")}</button>
-              </>
-            ) : hasSession ? (
-              <button type="button" onClick={logout} className={`${accountOutlineDesktopClass} cursor-pointer`}>{t("dashboard.logout")}</button>
-            ) : (
-              app.map((item) => (
-                <Link key={item.href} href={item.href} className={`${linkClass} font-medium`}>
-                  {item.label}
+                  key={item.href}
+                  href={item.href}
+                  className={`${accountOutlineDesktopClass} ${
+                    item.href === "/dashboard" && dashboardSectionActive ? dashboardDesktopActiveClass : ""
+                  }`}
+                  aria-current={item.href === "/dashboard" && dashboardSectionActive ? "page" : undefined}
+                >
+                  {t(item.labelKey)}
                 </Link>
-              ))
+              ),
             )}
           </nav>
           <div className="flex w-full flex-wrap items-center justify-end gap-x-2 gap-y-1">
@@ -173,20 +181,27 @@ export function Header() {
                 style={{ boxShadow: "var(--twin-shadow-md)" }}
               >
                 <div className="marketing-cta-stack mb-2">
-                  {growthLinks.map((item, i) => (
+                  {growthLinks.map((item) => (
                     <Link
                       key={item.href}
                       href={item.href}
                       onClick={closeMobileMenu}
-                      className={`${i === 0 ? roiClassName : waitlistClassName} w-full`}
+                      className={`${growthCtaClass(item.variant, headerCtaBase)} w-full`}
                     >
                       {t(item.labelKey)}
                     </Link>
                   ))}
-                  <Link href="/demo" onClick={closeMobileMenu} className={`${demoClassName} w-full`}>
-                    {t("nav.demo")}
-                  </Link>
-                  {showCandidateNav ? (
+                  {productLinks.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={closeMobileMenu}
+                      className={`${demoClassName} w-full`}
+                    >
+                      {t(item.labelKey)}
+                    </Link>
+                  ))}
+                  {showCandidateNav && hasSession ? (
                     <Link
                       href="/dashboard/calendar"
                       onClick={closeMobileMenu}
@@ -202,7 +217,9 @@ export function Header() {
                       onClick={closeMobileMenu}
                       className={`twin-touch-target grid w-full place-items-center rounded-md border border-[var(--twin-border)] bg-[var(--twin-card)] px-3 py-2.5 text-sm font-semibold leading-normal text-[var(--twin-accent)] transition hover:border-[var(--twin-accent)]/50 hover:bg-[var(--twin-accent-muted)] hover:text-[var(--twin-accent-hover)] ${dashboardSectionActive ? "border-[var(--twin-accent)]/50 bg-[var(--twin-accent-muted)] text-[var(--twin-accent-hover)]" : ""}`}
                       aria-current={dashboardSectionActive ? "page" : undefined}
-                    >{t("nav.dashboard")}</Link>
+                    >
+                      {t("nav.dashboard")}
+                    </Link>
                   ) : null}
                 </div>
                 <p className="mt-2 border-t border-[var(--twin-border)] px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
@@ -221,23 +238,26 @@ export function Header() {
                 <p className="mt-2 border-t border-[var(--twin-border)] px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
                   {t("site.footerExplore")}
                 </p>
-                {hasSession ? (
-                  <button
-                    type="button"
-                    onClick={logout}
-                    className="twin-touch-target mt-1 grid w-full cursor-pointer place-items-center rounded-md border border-[var(--twin-border)] bg-[var(--twin-card)] px-3 py-2.5 text-sm font-semibold leading-normal text-[var(--twin-accent)] transition hover:border-[var(--twin-accent)]/50 hover:bg-[var(--twin-accent-muted)] hover:text-[var(--twin-accent-hover)]"
-                  >{t("dashboard.logout")}</button>
-                ) : (
-                  app.map((item) => (
+                {accountLinks.map((item) =>
+                  item.isLogout ? (
+                    <button
+                      key="logout-m"
+                      type="button"
+                      onClick={logout}
+                      className="twin-touch-target mt-1 grid w-full cursor-pointer place-items-center rounded-md border border-[var(--twin-border)] bg-[var(--twin-card)] px-3 py-2.5 text-sm font-semibold leading-normal text-[var(--twin-accent)] transition hover:border-[var(--twin-accent)]/50 hover:bg-[var(--twin-accent-muted)] hover:text-[var(--twin-accent-hover)]"
+                    >
+                      {t("dashboard.logout")}
+                    </button>
+                  ) : (
                     <Link
                       key={item.href}
                       href={item.href}
                       onClick={closeMobileMenu}
                       className="twin-touch-target twin-nav-link block rounded px-3 py-2.5 text-sm hover:bg-[var(--twin-accent-muted)]"
                     >
-                      {item.label}
+                      {t(item.labelKey)}
                     </Link>
-                  ))
+                  ),
                 )}
               </nav>
             </details>

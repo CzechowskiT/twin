@@ -1234,6 +1234,38 @@ html[data-marketing-surface="studio"] .twin-header-cta--calendar.twin-header-cta
   }
 }
 
+.twin-header-growth__triple {
+  display: inline-grid;
+  max-width: 100%;
+  grid-template-columns: max-content;
+  justify-items: stretch;
+  gap: 0.375rem;
+}
+
+.twin-header-growth__triple > .twin-header-cta {
+  width: 100%;
+  font-size: 0.65rem;
+  padding-inline: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .twin-header-growth__triple {
+    grid-template-columns: repeat(3, minmax(7.5rem, max-content));
+    gap: 0.4rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .twin-header-growth__triple {
+    grid-template-columns: repeat(3, minmax(9rem, max-content));
+  }
+
+  .twin-header-growth__triple > .twin-header-cta {
+    font-size: inherit;
+    padding-inline: 0.75rem;
+  }
+}
+
 .twin-section-title {
   font-size: 1.125rem;
   font-weight: 600;

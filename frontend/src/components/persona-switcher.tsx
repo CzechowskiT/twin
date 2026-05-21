@@ -23,7 +23,7 @@ function ChevronIcon({ className }: { className?: string }) {
 const PERSONA_LABEL_KEY: Record<MarketingPersona, TranslationKey> = {
   candidate: "nav.personaCandidate",
   recruiter: "nav.personaRecruiter",
-  company: "nav.personaCompany",
+  company: "nav.personaInvestor",
 };
 
 const PERSONA_ICON: Record<MarketingPersona, string> = {
