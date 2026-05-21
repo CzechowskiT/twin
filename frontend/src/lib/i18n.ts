@@ -83,6 +83,7 @@ export type TranslationKey =
   | `tutorial.${keyof typeof en.tutorial}`
   | `feedback.${keyof typeof en.feedback}`
   | `status.${keyof typeof en.status}`
+  | `placementEmployer.${keyof typeof en.placementEmployer}`
   | `meta.${keyof typeof en.meta}`
   | `privacy.${keyof typeof en.privacy}`
   | `terms.${keyof typeof en.terms}`
@@ -444,6 +445,8 @@ const en = {
       "Send one automated link to your work inbox (same company domain as the role when you can). No recruiter calls from TWIN.",
     placementWorkEmailPlaceholder: "you@company.com",
     placementSendLink: "Send verification link",
+    placementEmployerAttest: "Copy employer attest link",
+    placementEmployerAttestCopied: "Employer link copied — send it to your hiring contact.",
     placementVerified: "Placement verified",
     placementVerifiedAt: "Verified on {when}.",
     placementDeclaredAt: "Declaration recorded on {when}.",
@@ -1076,6 +1079,15 @@ const en = {
     skip: "Skip tour",
     done: "Done",
   },
+  placementEmployer: {
+    title: "Confirm hire for TWIN",
+    lead: "Your candidate shared this link so you can confirm they accepted the role — one click, no account required.",
+    confirm: "Confirm placement",
+    success: "Placement confirmed. The candidate will see verified status in TWIN.",
+    failed: "Could not confirm placement.",
+    missingToken: "Missing or invalid link — ask the candidate for a new employer attestation URL.",
+    home: "Back to home",
+  },
   status: {
     title: "TWIN system status",
     lead: "Public liveness for the API and database — no personal data.",
@@ -1095,6 +1107,7 @@ const en = {
     notConfigured: "not configured",
     generated: "Stats generated",
     home: "Back to home",
+    openapi: "OpenAPI schema",
   },
   feedback: {
     title: "Send feedback",
@@ -1948,6 +1961,8 @@ const pl: MessageTree = {
       "Wyślij jeden automatyczny link na służbową skrzynkę (najlepiej ta sama domena co rola). Bez telefonów od TWIN.",
     placementWorkEmailPlaceholder: "ty@firma.pl",
     placementSendLink: "Wyślij link weryfikacyjny",
+    placementEmployerAttest: "Kopiuj link dla pracodawcy",
+    placementEmployerAttestCopied: "Link skopiowany — prześlij kontaktowi po stronie firmy.",
     placementVerified: "Placement potwierdzony",
     placementVerifiedAt: "Potwierdzono {when}.",
     placementDeclaredAt: "Zapis intencji: {when}.",
@@ -2589,6 +2604,15 @@ const pl: MessageTree = {
     skip: "Pomiń tour",
     done: "Gotowe",
   },
+  placementEmployer: {
+    title: "Potwierdzenie zatrudnienia w TWIN",
+    lead: "Kandydat przesłał ten link, żebyś potwierdził przyjęcie roli — jeden klik, bez konta.",
+    confirm: "Potwierdź placement",
+    success: "Placement potwierdzony. Kandydat zobaczy status w TWIN.",
+    failed: "Nie udało się potwierdzić.",
+    missingToken: "Brak lub nieprawidłowy link — poproś kandydata o nowy URL attestacji.",
+    home: "Strona główna",
+  },
   status: {
     title: "Status systemu TWIN",
     lead: "Publiczna dostępność API i bazy — bez danych osobowych.",
@@ -2608,6 +2632,7 @@ const pl: MessageTree = {
     notConfigured: "brak konfiguracji",
     generated: "Statystyki z",
     home: "Strona główna",
+    openapi: "Schemat OpenAPI",
   },
   feedback: {
     title: "Wyślij opinię",

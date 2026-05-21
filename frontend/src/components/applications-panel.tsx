@@ -38,7 +38,7 @@ export type ApplicationRow = {
 
 export type FeedbackBusy = { id: number; kind: "save" | "parse" } | null;
 
-export type PlacementFlowBusy = { id: number; kind: "declare" | "verify" } | null;
+export type PlacementFlowBusy = { id: number; kind: "declare" | "verify" | "employer_attest" } | null;
 
 export type PlacementEventRow = {
   id: number;
@@ -69,6 +69,7 @@ export function ApplicationsPanel({
   feedbackBusy,
   onPlacementDeclare,
   onPlacementVerifyStart,
+  onPlacementEmployerAttest,
   placementFlowBusy,
   onPlacementEventsLoad,
   placementEventsInvalidateKey,
@@ -82,6 +83,7 @@ export function ApplicationsPanel({
   feedbackBusy: FeedbackBusy;
   onPlacementDeclare?: (id: number, note: string) => Promise<void>;
   onPlacementVerifyStart?: (id: number, workEmail: string) => Promise<void>;
+  onPlacementEmployerAttest?: (id: number) => Promise<string>;
   placementFlowBusy?: PlacementFlowBusy;
   onPlacementEventsLoad?: (applicationId: number) => Promise<PlacementEventRow[]>;
   /** Bump after declare/verify so the audit log refetches from the API on next open. */
@@ -300,6 +302,30 @@ export function ApplicationsPanel({
                       </button>
                       {(app.placement_state ?? "none") === "verify_pending" ? (
                         <p className="text-[var(--twin-muted)]">{t("dashboard.placementVerifyPending")}</p>
+                      ) : null}
+                      {onPlacementEmployerAttest ? (
+                        <button
+                          type="button"
+                          disabled={
+                            placementFlowBusy?.id === app.id &&
+                            placementFlowBusy.kind === "employer_attest"
+                          }
+                          onClick={() => {
+                            void (async () => {
+                              try {
+                                const url = await onPlacementEmployerAttest(app.id);
+                                await navigator.clipboard.writeText(url);
+                              } catch {
+                                /* parent surfaces error */
+                              }
+                            })();
+                          }}
+                          className="twin-btn-secondary twin-touch-target !w-auto px-3 py-1.5 text-xs"
+                        >
+                          {placementFlowBusy?.id === app.id && placementFlowBusy.kind === "employer_attest"
+                            ? "…"
+                            : t("dashboard.placementEmployerAttest")}
+                        </button>
                       ) : null}
                     </>
                   )}

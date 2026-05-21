@@ -23,6 +23,7 @@ PLACEMENT_VERIFY_PENDING = "verify_pending"
 PLACEMENT_VERIFIED = "verified"
 
 _TOKEN_TTL_HOURS = 48
+_EMPLOYER_ATTEST_TTL_DAYS = 14
 _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
@@ -230,6 +231,91 @@ def start_work_email_verification(
         else "Mail is not configured on the server — check API logs for the verification link, or set SMTP / Resend."
     )
     return sent, msg
+
+
+def issue_employer_attestation_link(
+    db: Session,
+    settings: Settings,
+    *,
+    user: User,
+    application_id: int,
+) -> tuple[str, str]:
+    """Generate a shareable employer attestation URL (no employer email required)."""
+    candidate = db.query(Candidate).filter(Candidate.user_id == user.id).first()
+    if not candidate:
+        raise ValueError("Complete your candidate profile first.")
+
+    app = (
+        db.query(Application)
+        .filter(Application.id == application_id, Application.candidate_id == candidate.id)
+        .first()
+    )
+    if not app:
+        raise ValueError("Application not found.")
+    if app.placement_state == PLACEMENT_VERIFIED:
+        raise ValueError("Placement is already verified.")
+    if app.placement_state == PLACEMENT_NONE:
+        raise ValueError("Declare placement intent before sharing an employer attestation link.")
+
+    raw = secrets.token_urlsafe(32)
+    digest = hash_placement_token(raw)
+    now = datetime.now(timezone.utc)
+    app.placement_employer_attest_token_hash = digest
+    app.placement_employer_attest_expires_at = now + timedelta(days=_EMPLOYER_ATTEST_TTL_DAYS)
+    app.updated_at = datetime.utcnow()
+
+    record_placement_event(
+        db,
+        application_id=app.id,
+        event_type="placement.employer_attest_link_issued",
+        actor="candidate",
+        detail={"expires_days": _EMPLOYER_ATTEST_TTL_DAYS},
+        owner_user_id=user.id,
+    )
+    db.commit()
+
+    url = f"{settings.frontend_url.rstrip('/')}/placement/employer?token={raw}"
+    exp = app.placement_employer_attest_expires_at
+    exp_s = exp.isoformat() + "Z" if exp and exp.tzinfo is None else (exp.isoformat() if exp else "")
+    return url, exp_s
+
+
+def confirm_employer_attestation(db: Session, raw_token: str) -> tuple[bool, str]:
+    """Employer one-click confirm — marks placement verified without work-email magic link."""
+    if not raw_token.strip():
+        return False, "Missing token."
+    digest = hash_placement_token(raw_token.strip())
+    app = (
+        db.query(Application)
+        .filter(
+            Application.placement_employer_attest_token_hash == digest,
+            Application.placement_employer_attest_expires_at > datetime.now(timezone.utc),
+        )
+        .first()
+    )
+    if not app:
+        return False, "Invalid or expired employer attestation link."
+    if app.placement_state == PLACEMENT_VERIFIED:
+        return True, "Placement already verified."
+
+    now = datetime.now(timezone.utc)
+    app.placement_verified_at = now
+    app.placement_state = PLACEMENT_VERIFIED
+    app.placement_employer_attest_token_hash = None
+    app.placement_employer_attest_expires_at = None
+    promoted = app.status != ApplicationStatus.HIRED
+    if promoted:
+        app.status = ApplicationStatus.HIRED
+    record_placement_event(
+        db,
+        application_id=app.id,
+        event_type="placement.employer_attested",
+        actor="employer",
+        detail={"promoted_to_hired": promoted},
+        from_magic_link=True,
+    )
+    db.commit()
+    return True, "Placement confirmed by employer. Thank you."
 
 
 def confirm_placement_token(db: Session, raw_token: str) -> tuple[bool, str]:

@@ -397,6 +397,8 @@ class Application(Base):
     placement_work_email: Mapped[str | None] = mapped_column(String(320), nullable=True)
     placement_verification_token_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
     placement_verification_expires_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    placement_employer_attest_token_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    placement_employer_attest_expires_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     placement_verified_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     placement_declaration_note: Mapped[str | None] = mapped_column(Text, nullable=True)
     # Optional link to employer ATS (webhook ingest; see /integrations/ats).

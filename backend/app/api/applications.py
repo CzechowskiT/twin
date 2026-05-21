@@ -31,6 +31,7 @@ from app.schemas.application import (
     DevelopmentFocusOut,
     ParseFeedbackIn,
     PlacementDeclareIn,
+    PlacementEmployerAttestOut,
     PlacementVerifyStartIn,
     PlacementVerifyStartOut,
     PlacementEventListOut,
@@ -55,7 +56,11 @@ from app.services.idempotency import (
     try_replay_idempotent,
 )
 from app.services import referral_program as referral_prog
-from app.services.placement_verification import declare_placement_intent, start_work_email_verification
+from app.services.placement_verification import (
+    declare_placement_intent,
+    issue_employer_attestation_link,
+    start_work_email_verification,
+)
 from app.services.recruitment_feedback import build_feedback_insights, parse_stored_insights_json
 
 router = APIRouter()
@@ -572,6 +577,26 @@ def placement_declare(
     if not job:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
     return _to_out(app, job)
+
+
+@router.post(
+    "/{application_id}/placement-employer-attest-link",
+    response_model=PlacementEmployerAttestOut,
+)
+def placement_employer_attest_link(
+    application_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> PlacementEmployerAttestOut:
+    """Issue a one-click attestation URL for the hiring company (share with recruiter)."""
+    settings = get_settings()
+    try:
+        url, expires = issue_employer_attestation_link(
+            db, settings, user=user, application_id=application_id
+        )
+        return PlacementEmployerAttestOut(attest_url=url, expires_at=expires)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
 
 @router.get("/{application_id}/placement-events", response_model=PlacementEventListOut)

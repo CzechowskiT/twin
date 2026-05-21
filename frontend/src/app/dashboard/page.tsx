@@ -110,6 +110,7 @@ type DashboardCalendarBundle = {
     interview_start: string;
     interview_end: string;
     meeting_link: string | null;
+    calendar_provider?: string | null;
   } | null;
 };
 
@@ -299,8 +300,9 @@ export default function DashboardPage() {
             interview_end: string;
             status: string;
             meeting_link: string | null;
+            calendar_provider?: string | null;
           }[]
-        >("/api/v1/calendar/google/interviews", {}, token);
+        >("/api/v1/calendar/me/interviews", {}, token);
         const pick = rows[0];
         if (pick && pick.status !== "cancelled") {
           nextInterview = {
@@ -310,6 +312,7 @@ export default function DashboardPage() {
             interview_start: pick.interview_start,
             interview_end: pick.interview_end,
             meeting_link: pick.meeting_link,
+            calendar_provider: pick.calendar_provider,
           };
         }
       } catch {
@@ -1035,6 +1038,28 @@ export default function DashboardPage() {
     }
   }
 
+  async function issuePlacementEmployerAttest(applicationId: number): Promise<string> {
+    const token = getToken();
+    if (!token) throw new Error(t("dashboard.placementEventsNotSignedIn"));
+    setPlacementFlowBusy({ id: applicationId, kind: "employer_attest" });
+    setError(null);
+    try {
+      const out = await apiFetch<{ attest_url: string }>(
+        `/api/v1/applications/${applicationId}/placement-employer-attest-link`,
+        { method: "POST", body: "{}" },
+        token,
+      );
+      setPlacementEventsInvalidateKey((k) => k + 1);
+      toast.success(t("dashboard.placementEmployerAttestCopied"));
+      return out.attest_url;
+    } catch (err) {
+      setError(dashboardFetchUserMessage(err, t));
+      throw err;
+    } finally {
+      setPlacementFlowBusy(null);
+    }
+  }
+
   async function startPlacementVerify(applicationId: number, workEmail: string) {
     const token = getToken();
     if (!token) return;
@@ -1319,6 +1344,11 @@ export default function DashboardPage() {
                             dashboardCalendarBundle.nextInterview.interview_end,
                             locale,
                           )}
+                          {dashboardCalendarBundle.nextInterview.calendar_provider ? (
+                            <span className="ml-1 text-[var(--twin-muted-strong)]">
+                              · {dashboardCalendarBundle.nextInterview.calendar_provider}
+                            </span>
+                          ) : null}
                         </p>
                         {dashboardCalendarBundle.nextInterview.meeting_link?.trim() ? (
                           <a
@@ -1739,6 +1769,7 @@ export default function DashboardPage() {
             feedbackBusy={feedbackBusy}
             onPlacementDeclare={declarePlacement}
             onPlacementVerifyStart={startPlacementVerify}
+            onPlacementEmployerAttest={issuePlacementEmployerAttest}
             placementFlowBusy={placementFlowBusy}
             onPlacementEventsLoad={loadPlacementEvents}
             placementEventsInvalidateKey={placementEventsInvalidateKey}

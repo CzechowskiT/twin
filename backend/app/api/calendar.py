@@ -389,6 +389,37 @@ def google_calendar_next_slot(
     return NextSlotOut(start_iso=pair[0], end_iso=pair[1])
 
 
+def _list_upcoming_interviews(
+    db: Session,
+    *,
+    user_id: int,
+    include_cancelled: bool,
+    limit: int,
+) -> list[ScheduledInterview]:
+    now = datetime.utcnow()
+    q = (
+        db.query(ScheduledInterview)
+        .filter(ScheduledInterview.user_id == user_id)
+        .filter(ScheduledInterview.interview_start >= now)
+    )
+    if not include_cancelled:
+        q = q.filter(ScheduledInterview.status != "cancelled")
+    return q.order_by(ScheduledInterview.interview_start.asc()).limit(limit).all()
+
+
+@router.get("/me/interviews", response_model=list[ScheduledInterviewOut])
+def list_my_interviews(
+    include_cancelled: bool = Query(False),
+    limit: int = Query(25, ge=1, le=50),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[ScheduledInterviewOut]:
+    """Upcoming interviews for the user (Google + Microsoft + manual — unified DB feed)."""
+    return _list_upcoming_interviews(
+        db, user_id=current_user.id, include_cancelled=include_cancelled, limit=limit
+    )
+
+
 @router.get("/google/interviews", response_model=list[ScheduledInterviewOut])
 def google_calendar_list_interviews(
     include_cancelled: bool = Query(
@@ -404,16 +435,9 @@ def google_calendar_list_interviews(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> list[ScheduledInterviewOut]:
-    now = datetime.utcnow()
-    q = (
-        db.query(ScheduledInterview)
-        .filter(ScheduledInterview.user_id == current_user.id)
-        .filter(ScheduledInterview.interview_start >= now)
+    return _list_upcoming_interviews(
+        db, user_id=current_user.id, include_cancelled=include_cancelled, limit=limit
     )
-    if not include_cancelled:
-        q = q.filter(ScheduledInterview.status != "cancelled")
-    rows = q.order_by(ScheduledInterview.interview_start.asc()).limit(limit).all()
-    return rows
 
 
 @router.get("/interviews/{interview_id}/ics")

@@ -94,9 +94,14 @@ export default function StatusPage() {
         <p className="twin-muted mt-6 text-xs">
           {stats ? `${t("status.generated")} ${stats.generated_at}` : null}
         </p>
-        <Link href="/" className="twin-link mt-6 inline-block text-sm">
-          {t("status.home")}
-        </Link>
+        <div className="mt-6 flex flex-wrap gap-4 text-sm">
+          <Link href="/" className="twin-link">
+            {t("status.home")}
+          </Link>
+          <a href="/api/openapi" className="twin-link" target="_blank" rel="noopener noreferrer">
+            {t("status.openapi")}
+          </a>
+        </div>
       </Card>
     </Shell>
   );

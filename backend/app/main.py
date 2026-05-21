@@ -133,7 +133,13 @@ def create_app() -> FastAPI:
             "service": "TWIN API",
             "health": "/api/v1/health",
             "docs": "/docs",
+            "openapi": "/openapi.json",
         }
+
+    @app.get("/openapi.json", include_in_schema=False)
+    def openapi_export() -> dict:
+        """Machine-readable OpenAPI schema for integrators and codegen."""
+        return app.openapi()
 
     return app
 

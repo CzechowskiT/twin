@@ -24,15 +24,23 @@ Aligned with the north star: **short calendar of acceptance-ready moments**, not
 | 9 | Waitlist + mail | Resend on Railway when keys set (ops) |
 | 10 | `make ci-check` | Fast local gate (health + request-id + tsc) |
 
+## Shipped (continued)
+
+| # | Slice | Outcome |
+|---|--------|---------|
+| 10 | Employer placement attestation | `POST …/placement-employer-attest-link`, `/placement/employer`, public confirm API |
+| 11 | OpenAPI export | `GET /openapi.json` + Next proxy `/api/openapi` |
+| 12 | Unified interviews API | `GET /api/v1/calendar/me/interviews`; dashboard uses it |
+
 ## Recommended next 10 (backlog)
 
-1. **Railway `twin-worker` + `twin-beat`** — see `docs/RAILWAY_WORKER_PL.md`; set `SCRAPE_WORKER_READY=true` on API.
-2. **Microsoft Calendar OAuth** — Azure app + `MICROSOFT_*` on Railway (user deferred; code path exists).
-3. **Stripe live checkout** — `STRIPE_*` on Railway; verify Premium upgrade E2E.
-4. **Placement retention emails** — Celery beat + mail when `mail_configured`.
-5. **Microsoft Calendar on Railway** — Azure app + `MICROSOFT_*` (see `docs/RAILWAY_PROD_ENV_PL.md` §4).
-6. **Stripe live checkout** — `sk_live_…` on Railway; run `docs/STRIPE_E2E.md` in test mode first.
-7. **B2B placement attestation link** — employer one-click confirm (schema in `docs/PLACEMENT_VERIFICATION.md`).
-8. **OpenAPI export** — publish `/openapi.json` for integrators.
-9. **Interview list unified** — dashboard next-interview from Google + Microsoft rows.
-10. **Marketing status in sitemap** — add `/status` to `sitemap.ts` if SEO needed.
+1. **Railway `twin-worker` + `twin-beat`** — `docs/RAILWAY_WORKER_PL.md`
+2. **Microsoft + Stripe secrets on Railway** — `docs/RAILWAY_PROD_ENV_PL.md`, `docs/STRIPE_E2E.md`
+3. **Placement retention emails** — beat shipped; tune copy when mail live
+4. **Employer attestation email** — optional transactional notify when link issued
+5. **B2B attestation portal** — branded page per company slug
+6. **ATS webhook ingest** — `employer_webhook_url` already in config
+7. **Interview provider badge i18n** — translate google/microsoft labels
+8. **OpenAPI publish to docs site** — link from `/docs` marketing page
+9. **Placement dispute queue** — exception state in dashboard
+10. **Live scrape corpus growth** — ops scrape + validation metrics

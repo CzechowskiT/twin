@@ -93,6 +93,15 @@ class PlacementConfirmOut(BaseModel):
     message: str
 
 
+class PlacementEmployerAttestOut(BaseModel):
+    attest_url: str
+    expires_at: str
+
+
+class PlacementEmployerConfirmIn(BaseModel):
+    token: str = Field(..., min_length=8, max_length=512)
+
+
 class PlacementEventOut(BaseModel):
     id: int
     event_type: str
