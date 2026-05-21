@@ -472,12 +472,6 @@ export default function BillingPage() {
             <p className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.billingStripeSoonTitle")}</p>
             <p className="twin-muted mt-2 text-sm leading-relaxed">{t("dashboard.billingStripeSoonLead")}</p>
             <div className="marketing-cta-stack mt-4">
-              <Link
-                href="/calculator/b2b"
-                className="twin-touch-target inline-flex min-h-[2.75rem] w-full items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-4 text-sm font-semibold text-[var(--twin-muted-strong)] transition hover:border-[var(--twin-border-hover)]"
-              >
-                {t("dashboard.workspaceGateLinkB2bCalculator")}
-              </Link>
               <Link href="/waitlist" className="twin-billing-engage__wishlist-cta twin-touch-target inline-flex w-full justify-center">
                 {t("dashboard.billingCtaJoinWishlist")}
               </Link>

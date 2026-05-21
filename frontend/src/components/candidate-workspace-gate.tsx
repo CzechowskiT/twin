@@ -79,11 +79,6 @@ export function CandidateWorkspaceGate({ surface }: { surface: "dashboard" | "pr
             <Link href="/contact" className={`${linkClass} sm:!w-auto`}>
               {t("dashboard.workspaceGateLinkContact")}
             </Link>
-            {persona !== "company" ? (
-              <Link href="/calculator/b2b" className={`${linkClass} sm:!w-auto`}>
-                {t("dashboard.workspaceGateLinkB2bCalculator")}
-              </Link>
-            ) : null}
           </div>
         </div>
 

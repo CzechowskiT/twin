@@ -3,7 +3,10 @@
 import Link from "next/link";
 
 import { useTranslation } from "@/components/language-provider";
+import { useMarketingPersona } from "@/components/persona-provider";
 import { clearCookieConsent } from "@/lib/cookie-consent";
+import { footerExploreHrefsForPersona } from "@/lib/persona-access";
+import type { TranslationKey } from "@/lib/i18n";
 
 const SOCIAL_LINKEDIN = "https://www.linkedin.com";
 const SOCIAL_GITHUB = "https://github.com/CzechowskiT/twin";
@@ -24,8 +27,31 @@ function IconGithub({ className }: { className?: string }) {
   );
 }
 
+const EXPLORE_LABEL_KEYS: Record<string, TranslationKey> = {
+  "/": "site.footerHome",
+  "/waitlist": "site.footerWishlist",
+  "/demo": "nav.demo",
+  "/for-candidates": "nav.forCandidates",
+  "/for-recruiters": "nav.forRecruiters",
+  "/for-companies": "nav.forCompanies",
+  "/faq": "nav.faq",
+  "/status": "site.footerStatus",
+  "/developers": "site.footerDevelopers",
+  "/calculator/b2b": "nav.calculator",
+  "/register": "nav.register",
+  "/login": "nav.login",
+  "/recruiter/inbox": "nav.forRecruiters",
+  "/contact": "nav.contact",
+};
+
+function exploreLabel(href: string, t: (key: TranslationKey) => string): string {
+  const key = EXPLORE_LABEL_KEYS[href];
+  return key ? t(key) : href;
+}
+
 export function SiteFooter() {
   const { t } = useTranslation();
+  const { persona } = useMarketingPersona();
 
   const company = [
     { href: "/about", label: t("nav.about") },
@@ -36,20 +62,10 @@ export function SiteFooter() {
     { href: "/contact", label: t("nav.contact") },
   ];
 
-  const explore = [
-    { href: "/", label: t("site.footerHome") },
-    { href: "/waitlist", label: t("site.footerWishlist") },
-    { href: "/demo", label: t("nav.demo") },
-    { href: "/for-candidates", label: t("nav.forCandidates") },
-    { href: "/for-recruiters", label: t("nav.forRecruiters") },
-    { href: "/for-companies", label: t("nav.forCompanies") },
-    { href: "/faq", label: t("nav.faq") },
-    { href: "/status", label: t("site.footerStatus") },
-    { href: "/developers", label: t("site.footerDevelopers") },
-    { href: "/calculator", label: t("nav.calculator") },
-    { href: "/register", label: t("nav.register") },
-    { href: "/login", label: t("nav.login") },
-  ];
+  const explore = footerExploreHrefsForPersona(persona).map((href) => ({
+    href,
+    label: exploreLabel(href, t),
+  }));
 
   return (
     <footer className="border-t border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/80">

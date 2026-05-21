@@ -18,6 +18,7 @@ import {
   type MarketingPersona,
   PERSONA_STORAGE_KEY,
 } from "@/lib/marketing-persona";
+import { marketingPersonaFromPathExtended } from "@/lib/persona-access";
 import { safeStorage } from "@/lib/safe-storage";
 
 type PersonaContextValue = {
@@ -39,7 +40,7 @@ export function PersonaProvider({ children }: { children: ReactNode }) {
   const [persona, setPersonaState] = useState<MarketingPersona>("candidate");
 
   useLayoutEffect(() => {
-    const fromPath = marketingPersonaFromPath(pathname);
+    const fromPath = marketingPersonaFromPathExtended(pathname) ?? marketingPersonaFromPath(pathname);
     const stored = readStoredPersona();
     const resolved = fromPath ?? stored ?? "candidate";
     setPersonaState((current) => (current === resolved ? current : resolved));

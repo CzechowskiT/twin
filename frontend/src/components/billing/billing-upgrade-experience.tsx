@@ -148,12 +148,6 @@ export function BillingUpgradeExperience({ checkoutConfigured, currentTier }: Bi
             <p className="twin-billing-engage__wishlist-lead">{t("dashboard.billingEngagementWishlistLead")}</p>
             <div className="marketing-hero-rail mt-4">
               <div className="marketing-cta-stack">
-                <Link
-                  href="/calculator/b2b"
-                  className="twin-touch-target inline-flex min-h-[2.75rem] w-full items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] px-4 text-sm font-semibold text-[var(--twin-muted-strong)] transition hover:border-[var(--twin-border-hover)]"
-                >
-                  {t("dashboard.workspaceGateLinkB2bCalculator")}
-                </Link>
                 <Link href="/waitlist" className="twin-billing-engage__wishlist-cta twin-touch-target">
                   {t("dashboard.billingEngagementWishlistCta")}
                 </Link>

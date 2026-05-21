@@ -81,10 +81,10 @@ export function LandingVacationTest() {
               {t("home.vacationTestCtaRegister")}
             </Link>
             <Link
-              href="/calculator"
+              href="/for-candidates"
               className="marketing-hero-btn-signin twin-touch-target inline-flex min-w-[12rem] items-center justify-center px-8 py-3 text-center text-sm font-semibold transition"
             >
-              {t("home.vacationTestCtaCalculator")}
+              {t("nav.forCandidates")}
             </Link>
           </div>
         </ScrollReveal>

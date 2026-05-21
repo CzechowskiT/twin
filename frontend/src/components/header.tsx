@@ -7,12 +7,17 @@ import { useEffect, useRef, useState } from "react";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useTranslation } from "@/components/language-provider";
 import { PersonaSwitcher } from "@/components/persona-switcher";
+import { useMarketingPersona } from "@/components/persona-provider";
 import { clearToken, getToken } from "@/lib/auth";
+import { headerGrowthLinksForPersona, showCandidateProductNav } from "@/lib/persona-access";
 
 /** One chrome everywhere: calm light header (matches hope / growth palette in globals). */
 export function Header() {
   const { t } = useTranslation();
+  const { persona } = useMarketingPersona();
   const pathname = usePathname();
+  const growthLinks = headerGrowthLinksForPersona(persona);
+  const showCandidateNav = showCandidateProductNav(persona);
   const router = useRouter();
   const mobileMenuRef = useRef<HTMLDetailsElement>(null);
   const [hasSession, setHasSession] = useState(false);
@@ -38,7 +43,7 @@ export function Header() {
   const app = [
     { href: "/login" as const, label: t("nav.login") },
     { href: "/register" as const, label: t("nav.register") },
-    { href: "/dashboard" as const, label: t("nav.dashboard") },
+    ...(showCandidateNav ? [{ href: "/dashboard" as const, label: t("nav.dashboard") }] : []),
   ];
 
   const corporateNav = [
@@ -83,12 +88,15 @@ export function Header() {
           </Link>
           <div className="twin-header-growth hidden min-w-0 sm:block" aria-label={t("nav.ariaGrowthCta")}>
             <div className="twin-header-growth__pair">
-              <Link href="/calculator" className={roiClassName}>
-                {t("nav.calculator")}
-              </Link>
-              <Link href="/waitlist" className={waitlistClassName}>
-                {t("nav.waitlist")}
-              </Link>
+              {growthLinks.map((item, i) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={i === 0 ? roiClassName : waitlistClassName}
+                >
+                  {t(item.labelKey)}
+                </Link>
+              ))}
             </div>
           </div>
         </div>
@@ -112,19 +120,21 @@ export function Header() {
             <Link href="/demo" className={demoClassName}>
               {t("nav.demo")}
             </Link>
-            <Link
-              href="/dashboard/calendar"
-              className={`${calendarClassName} ${calendarActive ? "twin-header-cta--active" : ""}`}
-              aria-current={calendarActive ? "page" : undefined}
-            >
-              {t("dashboard.calendarLink")}
-            </Link>
+            {showCandidateNav ? (
+              <Link
+                href="/dashboard/calendar"
+                className={`${calendarClassName} ${calendarActive ? "twin-header-cta--active" : ""}`}
+                aria-current={calendarActive ? "page" : undefined}
+              >
+                {t("dashboard.calendarLink")}
+              </Link>
+            ) : null}
           </div>
           <nav
             className="flex w-full min-w-0 flex-wrap items-center justify-end gap-x-2 gap-y-1 text-[12px] sm:text-[13px]"
             aria-label={t("nav.ariaAccountNav")}
           >
-            {hasSession ? (
+            {hasSession && showCandidateNav ? (
               <>
                 <Link
                   href="/dashboard"
@@ -133,6 +143,8 @@ export function Header() {
                 >{t("nav.dashboard")}</Link>
                 <button type="button" onClick={logout} className={`${accountOutlineDesktopClass} cursor-pointer`}>{t("dashboard.logout")}</button>
               </>
+            ) : hasSession ? (
+              <button type="button" onClick={logout} className={`${accountOutlineDesktopClass} cursor-pointer`}>{t("dashboard.logout")}</button>
             ) : (
               app.map((item) => (
                 <Link key={item.href} href={item.href} className={`${linkClass} font-medium`}>
@@ -161,24 +173,30 @@ export function Header() {
                 style={{ boxShadow: "var(--twin-shadow-md)" }}
               >
                 <div className="marketing-cta-stack mb-2">
-                  <Link href="/calculator" onClick={closeMobileMenu} className={`${roiClassName} w-full`}>
-                    {t("nav.calculator")}
-                  </Link>
-                  <Link href="/waitlist" onClick={closeMobileMenu} className={`${waitlistClassName} w-full`}>
-                    {t("nav.waitlist")}
-                  </Link>
+                  {growthLinks.map((item, i) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={closeMobileMenu}
+                      className={`${i === 0 ? roiClassName : waitlistClassName} w-full`}
+                    >
+                      {t(item.labelKey)}
+                    </Link>
+                  ))}
                   <Link href="/demo" onClick={closeMobileMenu} className={`${demoClassName} w-full`}>
                     {t("nav.demo")}
                   </Link>
-                  <Link
-                    href="/dashboard/calendar"
-                    onClick={closeMobileMenu}
-                    className={`${calendarClassName} w-full ${calendarActive ? "twin-header-cta--active" : ""}`}
-                    aria-current={calendarActive ? "page" : undefined}
-                  >
-                    {t("dashboard.calendarLink")}
-                  </Link>
-                  {hasSession ? (
+                  {showCandidateNav ? (
+                    <Link
+                      href="/dashboard/calendar"
+                      onClick={closeMobileMenu}
+                      className={`${calendarClassName} w-full ${calendarActive ? "twin-header-cta--active" : ""}`}
+                      aria-current={calendarActive ? "page" : undefined}
+                    >
+                      {t("dashboard.calendarLink")}
+                    </Link>
+                  ) : null}
+                  {hasSession && showCandidateNav ? (
                     <Link
                       href="/dashboard"
                       onClick={closeMobileMenu}
