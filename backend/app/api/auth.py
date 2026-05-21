@@ -294,6 +294,7 @@ def verify_email(request: Request, body: VerifyEmailRequest, db: Session = Depen
 @router.post("/verify-email/resend")
 @limiter.limit("3/minute")
 def verify_email_resend(
+    request: Request,
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> dict[str, str]:
