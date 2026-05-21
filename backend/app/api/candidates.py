@@ -36,7 +36,9 @@ from app.schemas.career_compass import (
     MilestonePatchIn,
     PathOut,
 )
+from app.schemas.acceptance_queue import AcceptanceQueueOut, AcceptanceRespondIn
 from app.schemas.match import JobMatchListOut, JobMatchOut
+from app.services.acceptance_queue import build_acceptance_queue, respond_acceptance_item
 from app.services.cv_parser import CvParseError
 from app.services.cv_storage import delete_cv_for_candidate, save_cv_for_candidate
 from app.services.cv_tailoring import build_cv_tailoring_blob
@@ -468,6 +470,37 @@ def remove_cv_tailoring(
     db.commit()
     db.refresh(candidate)
     return _to_out(candidate)
+
+
+@router.get("/me/acceptance-queue", response_model=AcceptanceQueueOut)
+def get_acceptance_queue(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> AcceptanceQueueOut:
+    """Short list of acceptance-ready interviews and high-fit matches (north star)."""
+    candidate = _get_candidate_or_404(db, user.id)
+    payload = build_acceptance_queue(db, candidate)
+    return AcceptanceQueueOut(**payload)
+
+
+@router.post("/me/acceptance-queue/{item_id}/respond")
+def respond_acceptance_queue_item(
+    item_id: int,
+    body: AcceptanceRespondIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    candidate = _get_candidate_or_404(db, user.id)
+    try:
+        return respond_acceptance_item(
+            db,
+            candidate,
+            kind=body.kind,
+            item_id=item_id,
+            action=body.action,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
 
 @router.get("/me/matches", response_model=JobMatchListOut)

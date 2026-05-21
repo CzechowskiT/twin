@@ -1300,7 +1300,13 @@ export default function DashboardPage() {
             applicationsActive={pipelineActiveCount}
           />
           <Card variant="soft" className="mb-4">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <p className="text-sm font-semibold text-[var(--foreground)]">{t("acceptanceQueue.stripTitle")}</p>
+              <Link href="/dashboard/acceptance" className="twin-btn-secondary twin-touch-target text-xs">
+                {t("acceptanceQueue.stripCta")}
+              </Link>
+            </div>
+            <div className="dashboard-calendar-strip flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.calendarStripTitle")}</p>
                 <p className="twin-muted mt-1 text-xs leading-relaxed">
@@ -1359,7 +1365,7 @@ export default function DashboardPage() {
                 (dashboardCalendarBundle.nextInterview ||
                   dashboardCalendarBundle.google.connected ||
                   dashboardCalendarBundle.microsoft.connected) ? (
-                  <div className="mt-3 border-t border-[var(--twin-border)] pt-3">
+                  <div className="calendar-next-block mt-3 border-t border-[var(--twin-border)] pt-3 sm:border-t-0 sm:pt-0">
                     <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
                       {t("dashboard.calendarNextInterviewTitle")}
                     </p>
@@ -1434,7 +1440,7 @@ export default function DashboardPage() {
                   </div>
                 ) : null}
               </div>
-              <div className="flex shrink-0 flex-col gap-2 self-start sm:min-w-[12rem]">
+              <div className="calendar-actions-block flex shrink-0 flex-col gap-2 self-start sm:min-w-[12rem]">
                 <button
                   type="button"
                   className="twin-btn-solid twin-touch-target text-sm"

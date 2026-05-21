@@ -84,6 +84,7 @@ export type TranslationKey =
   | `feedback.${keyof typeof en.feedback}`
   | `status.${keyof typeof en.status}`
   | `placementEmployer.${keyof typeof en.placementEmployer}`
+  | `acceptanceQueue.${keyof typeof en.acceptanceQueue}`
   | `developers.${keyof typeof en.developers}`
   | `meta.${keyof typeof en.meta}`
   | `privacy.${keyof typeof en.privacy}`
@@ -1099,7 +1100,24 @@ const en = {
     statusHint: "API liveness, database reachability, and integration flags.",
     mvpStats: "Public MVP stats (JSON)",
     mvpStatsHint: "Aggregate counters only — no personal data.",
+    partnerApi: "Partner export API",
+    partnerApiHint: "Token-gated CSV exports for ATS integrators — see docs/PARTNER_API.md in the repo.",
     authNote: "Write endpoints live under /api/v1/ with JWT from /auth/login or register.",
+  },
+  acceptanceQueue: {
+    stripTitle: "Acceptance queue",
+    stripCta: "Review slots",
+    title: "Your acceptance queue",
+    lead: "A short list of interviews and high-fit roles — accept what is worth your calendar, decline the rest.",
+    loading: "Loading…",
+    empty: "Nothing waiting right now. Check back after matching runs or when a recruiter proposes a slot.",
+    back: "Back to dashboard",
+    interviewBadge: "Interview",
+    matchBadge: "Strong match",
+    keep: "Keep on calendar",
+    cancelInterview: "Cancel hold",
+    save: "Save for later",
+    decline: "Not for me",
   },
   placementEmployer: {
     title: "Confirm hire for TWIN",
@@ -2645,7 +2663,24 @@ const pl: MessageTree = {
     statusHint: "Dostępność API, baza i flagi integracji.",
     mvpStats: "Publiczne MVP stats (JSON)",
     mvpStatsHint: "Tylko agregaty — bez danych osobowych.",
+    partnerApi: "Partner export API",
+    partnerApiHint: "Eksport CSV pod tokenem integratora — docs/PARTNER_API.md w repozytorium.",
     authNote: "Zapis pod /api/v1/ z JWT z /auth/login lub rejestracji.",
+  },
+  acceptanceQueue: {
+    stripTitle: "Kolejka akceptacji",
+    stripCta: "Przejrzyj sloty",
+    title: "Twoja kolejka akceptacji",
+    lead: "Krótka lista rozmów i dopasowań — zaakceptuj to, co warto kalendarza, odrzuć resztę.",
+    loading: "Ładowanie…",
+    empty: "Na razie nic nie czeka. Wróć po kolejnym dopasowaniu lub propozycji terminu.",
+    back: "Wróć do panelu",
+    interviewBadge: "Rozmowa",
+    matchBadge: "Silne dopasowanie",
+    keep: "Zostaw w kalendarzu",
+    cancelInterview: "Anuluj rezerwację",
+    save: "Zapisz na później",
+    decline: "Nie dla mnie",
   },
   placementEmployer: {
     title: "Potwierdzenie zatrudnienia w TWIN",

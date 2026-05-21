@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 
 from app.config import Settings
 from app.database.models import Application, ApplicationStatus, Candidate, Job, PlacementEvent, User
+from app.utils.slug import slugify_company
 from app.services.mail import (
     is_mail_configured,
     send_employer_attestation_email,
@@ -356,7 +357,8 @@ def issue_employer_attestation_link(
     )
     db.commit()
 
-    url = f"{settings.frontend_url.rstrip('/')}/placement/employer?token={raw}"
+    slug = slugify_company(job.company)
+    url = f"{settings.frontend_url.rstrip('/')}/placement/employer/{slug}?token={raw}"
     exp = app.placement_employer_attest_expires_at
     exp_s = exp.isoformat() + "Z" if exp and exp.tzinfo is None else (exp.isoformat() if exp else "")
     mail_sent = False
@@ -398,7 +400,11 @@ def preview_employer_attestation(db: Session, raw_token: str) -> dict | None:
     if not row:
         return None
     _app, job = row
-    return {"company_name": job.company, "job_title": job.title}
+    return {
+        "company_name": job.company,
+        "job_title": job.title,
+        "company_slug": slugify_company(job.company),
+    }
 
 
 def confirm_employer_attestation(db: Session, raw_token: str) -> tuple[bool, str]:

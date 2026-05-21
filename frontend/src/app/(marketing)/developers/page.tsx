@@ -26,6 +26,10 @@ export default function DevelopersPage() {
             <p className="twin-muted mt-1">{t("developers.statusHint")}</p>
           </li>
           <li>
+            <span className="font-medium text-[var(--foreground)]">{t("developers.partnerApi")}</span>
+            <p className="twin-muted mt-1">{t("developers.partnerApiHint")}</p>
+          </li>
+          <li>
             <a
               href="/api/v1/public/mvp-stats"
               className="twin-link font-medium"

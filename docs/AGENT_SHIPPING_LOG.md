@@ -14,6 +14,13 @@
 
 Prior same-day commits on branch: Quantica compliance, `/status`, `/developers`, employer attest, dispute, Greenhouse ATS, interview reminders, disputed count on admin metrics.
 
+## 2026-05-19 — Batch 3 (partner keys, acceptance queue, mobile calendar)
+
+- **Partner:** `partner_api_keys` table, `POST/GET /admin/partner-api-keys`, hashed `X-Twin-Partner-Token`, `docs/PARTNER_API.md`.
+- **Acceptance queue:** `GET/POST /candidates/me/acceptance-queue`, `/dashboard/acceptance` (interviews + high-fit matches).
+- **Mobile:** `.dashboard-calendar-strip` — next interview card first on &lt;640px.
+- **B2B:** attest URLs `/placement/employer/{slug}?token=…`, preview includes `company_slug`.
+
 ## 2026-05-19 — MVP batch: billing, calendar connect, investor ops flags
 
 - **Billing:** plan tier cards use shared `BillingPlanTierCard` + CSS; long “not configured” copy under CTA, not in pill.

@@ -13,27 +13,32 @@ from sqlalchemy.orm import Session
 from app.config import Settings, get_settings
 from app.database.models import Application, Job
 from app.database.session import get_db
+from app.services.partner_auth import partner_has_scope, verify_partner_token
 
 router = APIRouter()
 
 
-def _require_partner_token(
+def _require_partner_export(
     settings: Annotated[Settings, Depends(get_settings)],
+    db: Session = Depends(get_db),
     x_twin_partner_token: Annotated[str | None, Header(alias="X-Twin-Partner-Token")] = None,
-) -> None:
-    expected = (settings.partner_export_token or "").strip()
-    if not expected:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Partner export is not configured.",
-        )
-    if (x_twin_partner_token or "").strip() != expected:
+) -> str:
+    ok, scopes = verify_partner_token(db, settings, x_twin_partner_token)
+    if not ok:
+        if not (settings.partner_export_token or "").strip():
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Partner export is not configured.",
+            )
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid partner token.")
+    if not partner_has_scope(scopes, "export"):
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Missing scope: export")
+    return scopes
 
 
 @router.get("/exports/applications-recent.csv")
 def export_recent_applications_csv(
-    _auth: Annotated[None, Depends(_require_partner_token)],
+    _auth: Annotated[str, Depends(_require_partner_export)],
     db: Session = Depends(get_db),
     limit: int = Query(200, ge=1, le=500),
 ) -> Response:

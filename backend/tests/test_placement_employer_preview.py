@@ -51,6 +51,8 @@ def test_preview_employer_attestation() -> None:
         assert info is not None
         assert info["company_name"] == "Branded Co"
         assert info["job_title"] == "Engineer"
+        assert info["company_slug"] == "branded-co"
+        assert "/placement/employer/branded-co?" in url
     finally:
         db.close()
         get_settings.cache_clear()

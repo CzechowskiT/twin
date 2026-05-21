@@ -10,7 +10,9 @@ from app.core.deps import get_db
 from app.services.admin_metrics import build_admin_metrics
 from app.services.admin_placement_queue import build_placement_dispute_queue
 from app.services.data_quality_metrics import build_data_quality_report
+from app.services.partner_auth import mint_partner_api_key
 from app.services.placement_verification import ops_resolve_placement_dispute
+from app.database.models import PartnerApiKey
 
 router = APIRouter()
 
@@ -78,3 +80,48 @@ def admin_resolve_placement_dispute(
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
     return {"application_id": app.id, "placement_state": app.placement_state}
+
+
+class PartnerApiKeyCreateIn(BaseModel):
+    label: str = Field(..., min_length=1, max_length=120)
+    scopes: str = Field(default="export", max_length=255)
+
+
+@router.get("/partner-api-keys")
+def admin_list_partner_api_keys(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+) -> dict:
+    _require_ops_admin(settings, authorization)
+    rows = (
+        db.query(PartnerApiKey)
+        .filter(PartnerApiKey.revoked_at.is_(None))
+        .order_by(PartnerApiKey.created_at.desc())
+        .limit(50)
+        .all()
+    )
+    return {
+        "items": [
+            {"id": r.id, "label": r.label, "scopes": r.scopes, "created_at": r.created_at.isoformat()}
+            for r in rows
+        ]
+    }
+
+
+@router.post("/partner-api-keys")
+def admin_create_partner_api_key(
+    body: PartnerApiKeyCreateIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+) -> dict:
+    _require_ops_admin(settings, authorization)
+    row, raw = mint_partner_api_key(db, label=body.label, scopes=body.scopes)
+    return {
+        "id": row.id,
+        "label": row.label,
+        "scopes": row.scopes,
+        "token": raw,
+        "header": "X-Twin-Partner-Token",
+    }

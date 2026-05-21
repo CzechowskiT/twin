@@ -42,6 +42,10 @@ Aligned with the north star: **short calendar of acceptance-ready moments**, not
 | 19 | Lever ATS webhook | `LEVER_WEBHOOK_SECRET` + hire → verified |
 | 20 | Ashby ATS webhook | `ASHBY_WEBHOOK_SECRET` + hire → verified |
 | 21 | Ops dispute resolve | `POST …/placement-disputes/{id}/resolve` + admin UI buttons |
+| 22 | Partner API keys | DB-hashed keys + `docs/PARTNER_API.md` + admin mint |
+| 23 | Acceptance queue | `/dashboard/acceptance` + `GET /candidates/me/acceptance-queue` |
+| 24 | Mobile calendar strip | Next interview card first on small screens |
+| 25 | Employer attest slug URL | `/placement/employer/{company-slug}?token=…` |
 
 See **`docs/PRODUCT_ROADMAP.md`** for product rationale on next priorities.
 
@@ -51,9 +55,9 @@ See **`docs/PRODUCT_ROADMAP.md`** for product rationale on next priorities.
 2. **Dedicated twin-worker** — Celery beat off API (`docs/RAILWAY_WORKER_PL.md`)
 3. **Stripe E2E staging** — `docs/STRIPE_E2E.md`
 4. **Scrape corpus growth** — ops allowlist + daily beat
-5. **Partner API keys** — scoped integrator tokens
-6. **Recruiter batch acceptance UI** — calendar north star
-7. **Interview reminders prod verify** — beat on worker
-8. **PR merge to default branch** — when `main` exists + CI green
-9. **Mobile dashboard calendar strip** — next interview on phone
-10. **B2B portal per company slug** — branded attest URLs
+5. **Interview reminders prod verify** — beat on worker + mail on Railway
+6. **PR merge to default branch** — when `main` exists + CI green
+7. **Recruiter-side batch UI** — employer view of pre-qualified candidates
+8. **Partner matches export** — second CSV scope for integrators
+9. **Admin partner-keys UI** — mint/revoke in `/admin` without curl
+10. **Apple CalDAV** — optional iCloud path beyond WebCal

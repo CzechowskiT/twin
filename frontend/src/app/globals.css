@@ -1735,3 +1735,21 @@ html[data-marketing-surface="studio"] .twin-roi-enterprise-strip-muted {
 .feedback-star.is-on {
   color: var(--twin-accent);
 }
+
+/* Dashboard calendar strip — next interview first on narrow viewports */
+@media (max-width: 639px) {
+  .dashboard-calendar-strip {
+    flex-direction: column;
+  }
+  .dashboard-calendar-strip .calendar-next-block {
+    order: -1;
+    margin-bottom: 0.25rem;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--twin-border);
+    background: var(--twin-accent-muted);
+  }
+  .dashboard-calendar-strip .calendar-actions-block {
+    width: 100%;
+  }
+}
