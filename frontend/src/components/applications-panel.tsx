@@ -38,7 +38,9 @@ export type ApplicationRow = {
 
 export type FeedbackBusy = { id: number; kind: "save" | "parse" } | null;
 
-export type PlacementFlowBusy = { id: number; kind: "declare" | "verify" | "employer_attest" } | null;
+export type PlacementFlowBusy =
+  | { id: number; kind: "declare" | "verify" | "employer_attest" | "dispute" }
+  | null;
 
 export type PlacementEventRow = {
   id: number;
@@ -70,6 +72,7 @@ export function ApplicationsPanel({
   onPlacementDeclare,
   onPlacementVerifyStart,
   onPlacementEmployerAttest,
+  onPlacementDispute,
   placementFlowBusy,
   onPlacementEventsLoad,
   placementEventsInvalidateKey,
@@ -83,7 +86,8 @@ export function ApplicationsPanel({
   feedbackBusy: FeedbackBusy;
   onPlacementDeclare?: (id: number, note: string) => Promise<void>;
   onPlacementVerifyStart?: (id: number, workEmail: string) => Promise<void>;
-  onPlacementEmployerAttest?: (id: number) => Promise<string>;
+  onPlacementEmployerAttest?: (id: number, employerEmail?: string) => Promise<string>;
+  onPlacementDispute?: (id: number, reason: string) => Promise<void>;
   placementFlowBusy?: PlacementFlowBusy;
   onPlacementEventsLoad?: (applicationId: number) => Promise<PlacementEventRow[]>;
   /** Bump after declare/verify so the audit log refetches from the API on next open. */
@@ -97,6 +101,8 @@ export function ApplicationsPanel({
   const [openId, setOpenId] = useState<number | null>(null);
   const [draftById, setDraftById] = useState<Record<number, string>>({});
   const [workEmailById, setWorkEmailById] = useState<Record<number, string>>({});
+  const [employerEmailById, setEmployerEmailById] = useState<Record<number, string>>({});
+  const [disputeNoteById, setDisputeNoteById] = useState<Record<number, string>>({});
   const [declareNoteById, setDeclareNoteById] = useState<Record<number, string>>({});
   const [placementHistoryOpenId, setPlacementHistoryOpenId] = useState<number | null>(null);
   const [placementEventsByAppId, setPlacementEventsByAppId] = useState<Record<number, PlacementEventRow[]>>({});
@@ -209,7 +215,14 @@ export function ApplicationsPanel({
               </p>
               {onPlacementDeclare && onPlacementVerifyStart && showPlacementRow(app) ? (
                 <div className="mt-2 max-w-md space-y-2 rounded border border-[var(--twin-accent)]/25 bg-[var(--twin-accent-muted)]/25 p-2 text-xs">
-                  {(app.placement_state ?? "none") === "verified" ? (
+                  {(app.placement_state ?? "none") === "disputed" ? (
+                    <>
+                      <p className="font-semibold text-amber-700">{t("dashboard.placementDisputed")}</p>
+                      {onPlacementDispute ? (
+                        <p className="twin-muted text-xs">{t("dashboard.placementDisputeHint")}</p>
+                      ) : null}
+                    </>
+                  ) : (app.placement_state ?? "none") === "verified" ? (
                     <>
                       <p className="font-semibold text-[var(--twin-accent)]">{t("dashboard.placementVerified")}</p>
                       {app.placement_verified_at ? (
@@ -222,6 +235,28 @@ export function ApplicationsPanel({
                             }),
                           )}
                         </p>
+                      ) : null}
+                      {onPlacementDispute ? (
+                        <div className="mt-2 space-y-2">
+                          <textarea
+                            className="w-full rounded border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-2 py-1.5 text-xs"
+                            placeholder={t("dashboard.placementDisputePlaceholder")}
+                            value={disputeNoteById[app.id] ?? ""}
+                            onChange={(e) =>
+                              setDisputeNoteById((prev) => ({ ...prev, [app.id]: e.target.value }))
+                            }
+                          />
+                          <button
+                            type="button"
+                            className="twin-btn-secondary text-xs"
+                            disabled={placementFlowBusy?.id === app.id && placementFlowBusy.kind === "dispute"}
+                            onClick={() => void onPlacementDispute(app.id, disputeNoteById[app.id] ?? "")}
+                          >
+                            {placementFlowBusy?.id === app.id && placementFlowBusy.kind === "dispute"
+                              ? "…"
+                              : t("dashboard.placementDispute")}
+                          </button>
+                        </div>
                       ) : null}
                     </>
                   ) : (app.placement_state ?? "none") === "none" ? (
@@ -304,27 +339,52 @@ export function ApplicationsPanel({
                         <p className="text-[var(--twin-muted)]">{t("dashboard.placementVerifyPending")}</p>
                       ) : null}
                       {onPlacementEmployerAttest ? (
+                        <div className="flex flex-col gap-2">
+                          <input
+                            type="email"
+                            autoComplete="email"
+                            placeholder={t("dashboard.placementEmployerEmailPlaceholder")}
+                            value={employerEmailById[app.id] ?? ""}
+                            onChange={(e) =>
+                              setEmployerEmailById((prev) => ({ ...prev, [app.id]: e.target.value }))
+                            }
+                            className="w-full rounded border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-2 py-1.5 text-xs"
+                          />
+                          <button
+                            type="button"
+                            disabled={
+                              placementFlowBusy?.id === app.id &&
+                              placementFlowBusy.kind === "employer_attest"
+                            }
+                            onClick={() => {
+                              void (async () => {
+                                try {
+                                  const url = await onPlacementEmployerAttest(
+                                    app.id,
+                                    employerEmailById[app.id],
+                                  );
+                                  await navigator.clipboard.writeText(url);
+                                } catch {
+                                  /* parent surfaces error */
+                                }
+                              })();
+                            }}
+                            className="twin-btn-secondary twin-touch-target !w-auto px-3 py-1.5 text-xs"
+                          >
+                            {placementFlowBusy?.id === app.id && placementFlowBusy.kind === "employer_attest"
+                              ? "…"
+                              : t("dashboard.placementEmployerAttest")}
+                          </button>
+                        </div>
+                      ) : null}
+                      {onPlacementDispute ? (
                         <button
                           type="button"
-                          disabled={
-                            placementFlowBusy?.id === app.id &&
-                            placementFlowBusy.kind === "employer_attest"
-                          }
-                          onClick={() => {
-                            void (async () => {
-                              try {
-                                const url = await onPlacementEmployerAttest(app.id);
-                                await navigator.clipboard.writeText(url);
-                              } catch {
-                                /* parent surfaces error */
-                              }
-                            })();
-                          }}
-                          className="twin-btn-secondary twin-touch-target !w-auto px-3 py-1.5 text-xs"
+                          className="twin-link text-xs"
+                          disabled={placementFlowBusy?.id === app.id && placementFlowBusy.kind === "dispute"}
+                          onClick={() => void onPlacementDispute(app.id, disputeNoteById[app.id] ?? "")}
                         >
-                          {placementFlowBusy?.id === app.id && placementFlowBusy.kind === "employer_attest"
-                            ? "…"
-                            : t("dashboard.placementEmployerAttest")}
+                          {t("dashboard.placementDispute")}
                         </button>
                       ) : null}
                     </>

@@ -31,6 +31,8 @@ from app.schemas.application import (
     DevelopmentFocusOut,
     ParseFeedbackIn,
     PlacementDeclareIn,
+    PlacementDisputeIn,
+    PlacementEmployerAttestIn,
     PlacementEmployerAttestOut,
     PlacementVerifyStartIn,
     PlacementVerifyStartOut,
@@ -58,6 +60,7 @@ from app.services.idempotency import (
 from app.services import referral_program as referral_prog
 from app.services.placement_verification import (
     declare_placement_intent,
+    file_placement_dispute,
     issue_employer_attestation_link,
     start_work_email_verification,
 )
@@ -585,18 +588,43 @@ def placement_declare(
 )
 def placement_employer_attest_link(
     application_id: int,
+    body: PlacementEmployerAttestIn = Body(default_factory=PlacementEmployerAttestIn),
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> PlacementEmployerAttestOut:
     """Issue a one-click attestation URL for the hiring company (share with recruiter)."""
     settings = get_settings()
     try:
-        url, expires = issue_employer_attestation_link(
-            db, settings, user=user, application_id=application_id
+        url, expires, mail_sent = issue_employer_attestation_link(
+            db,
+            settings,
+            user=user,
+            application_id=application_id,
+            employer_email=body.employer_email,
         )
-        return PlacementEmployerAttestOut(attest_url=url, expires_at=expires)
+        return PlacementEmployerAttestOut(attest_url=url, expires_at=expires, mail_sent=mail_sent)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/{application_id}/placement-dispute", response_model=ApplicationOut)
+def placement_dispute(
+    application_id: int,
+    body: PlacementDisputeIn = Body(default_factory=PlacementDisputeIn),
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> ApplicationOut:
+    """Flag placement verification conflict for ops triage (in-app, not CS email threads)."""
+    try:
+        app = file_placement_dispute(
+            db, user=user, application_id=application_id, reason=body.reason
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    job = db.query(Job).filter(Job.id == app.job_id).first()
+    if not job:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+    return _to_out(app, job)
 
 
 @router.get("/{application_id}/placement-events", response_model=PlacementEventListOut)

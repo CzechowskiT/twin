@@ -32,15 +32,19 @@ Aligned with the north star: **short calendar of acceptance-ready moments**, not
 | 11 | OpenAPI export | `GET /openapi.json` + Next proxy `/api/openapi` |
 | 12 | Unified interviews API | `GET /api/v1/calendar/me/interviews`; dashboard uses it |
 
+| 13 | Placement dispute + employer attest email | `POST …/placement-dispute`, optional recruiter email on attest link |
+| 14 | Developers page | `/developers` + OpenAPI / status / mvp-stats links |
+| 15 | Calendar provider i18n | Google / Microsoft labels on dashboard |
+
 ## Recommended next 10 (backlog)
 
-1. **Railway `twin-worker` + `twin-beat`** — `docs/RAILWAY_WORKER_PL.md`
-2. **Microsoft + Stripe secrets on Railway** — `docs/RAILWAY_PROD_ENV_PL.md`, `docs/STRIPE_E2E.md`
-3. **Placement retention emails** — beat shipped; tune copy when mail live
-4. **Employer attestation email** — optional transactional notify when link issued
-5. **B2B attestation portal** — branded page per company slug
-6. **ATS webhook ingest** — `employer_webhook_url` already in config
-7. **Interview provider badge i18n** — translate google/microsoft labels
-8. **OpenAPI publish to docs site** — link from `/docs` marketing page
-9. **Placement dispute queue** — exception state in dashboard
-10. **Live scrape corpus growth** — ops scrape + validation metrics
+1. **Railway secrets** — `MICROSOFT_*`, `STRIPE_*`, mail (`docs/RAILWAY_PROD_ENV_PL.md`)
+2. **Ops admin dispute queue UI** — filter `placement_state=disputed` on `/admin/metrics`
+3. **B2B attestation portal** — `/placement/employer/{companySlug}` branding
+4. **Placement retention copy** — tune welcome email when mail live
+5. **Scrape corpus growth** — ops allowlist + daily beat
+6. **Lever / Ashby webhooks** — signature validation
+7. **Stripe live E2E** — `docs/STRIPE_E2E.md` then production keys
+8. **Interview reminders prod** — verify beat on worker service
+9. **WebCal rotate** — re-mint expired feed tokens in UI
+10. **Partner API keys** — scoped tokens for B2B integrators

@@ -13,7 +13,11 @@ from sqlalchemy.orm import Session
 
 from app.config import Settings
 from app.database.models import Application, ApplicationStatus, Candidate, Job, PlacementEvent, User
-from app.services.mail import is_mail_configured, send_placement_verification_email
+from app.services.mail import (
+    is_mail_configured,
+    send_employer_attestation_email,
+    send_placement_verification_email,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +25,7 @@ PLACEMENT_NONE = "none"
 PLACEMENT_DECLARED = "declared"
 PLACEMENT_VERIFY_PENDING = "verify_pending"
 PLACEMENT_VERIFIED = "verified"
+PLACEMENT_DISPUTED = "disputed"
 
 _TOKEN_TTL_HOURS = 48
 _EMPLOYER_ATTEST_TTL_DAYS = 14
@@ -233,18 +238,17 @@ def start_work_email_verification(
     return sent, msg
 
 
-def issue_employer_attestation_link(
+def file_placement_dispute(
     db: Session,
-    settings: Settings,
     *,
     user: User,
     application_id: int,
-) -> tuple[str, str]:
-    """Generate a shareable employer attestation URL (no employer email required)."""
+    reason: str | None,
+) -> Application:
+    """Candidate flags a conflict — ops triage via events, not email ping-pong."""
     candidate = db.query(Candidate).filter(Candidate.user_id == user.id).first()
     if not candidate:
         raise ValueError("Complete your candidate profile first.")
-
     app = (
         db.query(Application)
         .filter(Application.id == application_id, Application.candidate_id == candidate.id)
@@ -252,6 +256,46 @@ def issue_employer_attestation_link(
     )
     if not app:
         raise ValueError("Application not found.")
+    if app.placement_state in (PLACEMENT_NONE, PLACEMENT_DISPUTED):
+        raise ValueError("Nothing to dispute on this application yet.")
+    cleaned = (reason or "").strip()[:2000] or None
+    app.placement_state = PLACEMENT_DISPUTED
+    app.updated_at = datetime.utcnow()
+    record_placement_event(
+        db,
+        application_id=app.id,
+        event_type="placement.disputed",
+        actor="candidate",
+        detail={"has_reason": bool(cleaned), "reason_chars": len(cleaned or "")},
+        owner_user_id=user.id,
+    )
+    db.commit()
+    db.refresh(app)
+    return app
+
+
+def issue_employer_attestation_link(
+    db: Session,
+    settings: Settings,
+    *,
+    user: User,
+    application_id: int,
+    employer_email: str | None = None,
+) -> tuple[str, str, bool]:
+    """Generate a shareable employer attestation URL (no employer email required)."""
+    candidate = db.query(Candidate).filter(Candidate.user_id == user.id).first()
+    if not candidate:
+        raise ValueError("Complete your candidate profile first.")
+
+    row = (
+        db.query(Application, Job)
+        .join(Job, Application.job_id == Job.id)
+        .filter(Application.id == application_id, Application.candidate_id == candidate.id)
+        .first()
+    )
+    if not row:
+        raise ValueError("Application not found.")
+    app, job = row
     if app.placement_state == PLACEMENT_VERIFIED:
         raise ValueError("Placement is already verified.")
     if app.placement_state == PLACEMENT_NONE:
@@ -277,7 +321,26 @@ def issue_employer_attestation_link(
     url = f"{settings.frontend_url.rstrip('/')}/placement/employer?token={raw}"
     exp = app.placement_employer_attest_expires_at
     exp_s = exp.isoformat() + "Z" if exp and exp.tzinfo is None else (exp.isoformat() if exp else "")
-    return url, exp_s
+    mail_sent = False
+    emp = (employer_email or "").strip().lower()
+    if emp and _EMAIL_RE.match(emp) and is_mail_configured(settings):
+        try:
+            send_employer_attestation_email(
+                settings, to_email=emp, attest_url=url, company_name=job.company
+            )
+            mail_sent = True
+            record_placement_event(
+                db,
+                application_id=app.id,
+                event_type="placement.employer_attest_email_sent",
+                actor="system",
+                detail={"mail_sent": True},
+                owner_user_id=user.id,
+            )
+            db.commit()
+        except Exception:
+            logger.exception("employer attestation email failed application_id=%s", application_id)
+    return url, exp_s, mail_sent
 
 
 def confirm_employer_attestation(db: Session, raw_token: str) -> tuple[bool, str]:

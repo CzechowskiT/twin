@@ -66,6 +66,28 @@ def send_generic_email(
     raise RuntimeError("Mail is not configured")
 
 
+def send_employer_attestation_email(
+    settings: Settings,
+    *,
+    to_email: str,
+    attest_url: str,
+    company_name: str,
+) -> None:
+    """Transactional: employer one-click placement confirm (candidate shared link)."""
+    subject = f"Confirm hire via TWIN — {company_name}"
+    text_body = (
+        f"A TWIN candidate asked you to confirm their placement at {company_name}.\n\n"
+        f"One-click confirm (no account):\n{attest_url}\n\n"
+        "If you did not expect this, ignore the message.\n"
+    )
+    html_body = (
+        f"<p>A TWIN candidate asked you to confirm their placement at <strong>{company_name}</strong>.</p>"
+        f'<p><a href="{attest_url}">Confirm placement</a></p>'
+        "<p>If you did not expect this, you can ignore this message.</p>"
+    )
+    send_generic_email(settings, to_email=to_email, subject=subject, text_body=text_body, html_body=html_body)
+
+
 def send_placement_verification_email(settings: Settings, *, to_email: str, verify_url: str) -> None:
     """Transactional: confirm you started / received offer — link hits dashboard then API confirm."""
     subject = "Confirm your placement with TWIN"

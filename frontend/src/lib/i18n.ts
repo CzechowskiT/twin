@@ -84,6 +84,7 @@ export type TranslationKey =
   | `feedback.${keyof typeof en.feedback}`
   | `status.${keyof typeof en.status}`
   | `placementEmployer.${keyof typeof en.placementEmployer}`
+  | `developers.${keyof typeof en.developers}`
   | `meta.${keyof typeof en.meta}`
   | `privacy.${keyof typeof en.privacy}`
   | `terms.${keyof typeof en.terms}`
@@ -447,6 +448,13 @@ const en = {
     placementSendLink: "Send verification link",
     placementEmployerAttest: "Copy employer attest link",
     placementEmployerAttestCopied: "Employer link copied — send it to your hiring contact.",
+    placementEmployerAttestEmailed: "Attestation link emailed to recruiter.",
+    placementEmployerEmailPlaceholder: "Recruiter email (optional — send link)",
+    placementDispute: "Report placement issue",
+    placementDisputeSubmit: "Submit dispute",
+    placementDisputed: "Under review — we logged your dispute.",
+    placementDisputeHint: "Ops will triage from the event log — no email ping-pong.",
+    placementDisputePlaceholder: "What looks wrong? (optional)",
     placementVerified: "Placement verified",
     placementVerifiedAt: "Verified on {when}.",
     placementDeclaredAt: "Declaration recorded on {when}.",
@@ -687,6 +695,8 @@ const en = {
     calendarStripMicrosoftConnected: "Microsoft Calendar connected as {email}.",
     calendarStripMicrosoftDisconnected: "Microsoft Calendar not connected — connect for corporate Outlook schedules.",
     calendarStripConnectMicrosoft: "Connect Microsoft 365",
+    calendarProviderGoogle: "Google Calendar",
+    calendarProviderMicrosoft: "Microsoft 365",
     calendarNextInterviewTitle: "Next interview",
     calendarNextInterviewEmpty:
       "No upcoming interviews in TWIN yet. Open calendar settings to schedule one (saved here and in Google Calendar when connected).",
@@ -1078,6 +1088,17 @@ const en = {
     next: "Next",
     skip: "Skip tour",
     done: "Done",
+  },
+  developers: {
+    title: "Developers & integrators",
+    lead: "Public machine-readable surfaces for health checks, traction metrics, and API exploration.",
+    openapi: "OpenAPI 3 schema (JSON)",
+    openapiHint: "Import into Postman, Swagger UI, or codegen. Authenticated routes require Bearer tokens.",
+    status: "System status",
+    statusHint: "API liveness, database reachability, and integration flags.",
+    mvpStats: "Public MVP stats (JSON)",
+    mvpStatsHint: "Aggregate counters only — no personal data.",
+    authNote: "Write endpoints live under /api/v1/ with JWT from /auth/login or register.",
   },
   placementEmployer: {
     title: "Confirm hire for TWIN",
@@ -1963,6 +1984,13 @@ const pl: MessageTree = {
     placementSendLink: "Wyślij link weryfikacyjny",
     placementEmployerAttest: "Kopiuj link dla pracodawcy",
     placementEmployerAttestCopied: "Link skopiowany — prześlij kontaktowi po stronie firmy.",
+    placementEmployerAttestEmailed: "Link attestacji wysłany na e-mail rekrutera.",
+    placementEmployerEmailPlaceholder: "E-mail rekrutera (opcjonalnie — wyślij link)",
+    placementDispute: "Zgłoś problem placementu",
+    placementDisputeSubmit: "Wyślij zgłoszenie",
+    placementDisputed: "Weryfikacja — zapisaliśmy zgłoszenie.",
+    placementDisputeHint: "Ops przejrzy log zdarzeń — bez mailowego ping-ponga.",
+    placementDisputePlaceholder: "Co jest nie tak? (opcjonalnie)",
     placementVerified: "Placement potwierdzony",
     placementVerifiedAt: "Potwierdzono {when}.",
     placementDeclaredAt: "Zapis intencji: {when}.",
@@ -2203,6 +2231,8 @@ const pl: MessageTree = {
     calendarStripMicrosoftConnected: "Microsoft Calendar: połączono jako {email}.",
     calendarStripMicrosoftDisconnected: "Brak połączenia z Microsoft Calendar — podłącz Outlook służbowy.",
     calendarStripConnectMicrosoft: "Połącz Microsoft 365",
+    calendarProviderGoogle: "Google Calendar",
+    calendarProviderMicrosoft: "Microsoft 365",
     calendarNextInterviewTitle: "Najbliższa rozmowa",
     calendarNextInterviewEmpty:
       "Brak nadchodzących rozmów w TWIN. Otwórz kalendarz, żeby zaplanować slot (zapis tutaj i w Google Calendar po połączeniu).",
@@ -2603,6 +2633,17 @@ const pl: MessageTree = {
     next: "Dalej",
     skip: "Pomiń tour",
     done: "Gotowe",
+  },
+  developers: {
+    title: "Dla developerów i integratorów",
+    lead: "Publiczne endpointy: health, metryki trakcji i eksploracja API.",
+    openapi: "Schemat OpenAPI 3 (JSON)",
+    openapiHint: "Import do Postmana lub codegen. Trasy chronione wymagają Bearer JWT.",
+    status: "Status systemu",
+    statusHint: "Dostępność API, baza i flagi integracji.",
+    mvpStats: "Publiczne MVP stats (JSON)",
+    mvpStatsHint: "Tylko agregaty — bez danych osobowych.",
+    authNote: "Zapis pod /api/v1/ z JWT z /auth/login lub rejestracji.",
   },
   placementEmployer: {
     title: "Potwierdzenie zatrudnienia w TWIN",

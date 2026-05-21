@@ -24,6 +24,7 @@ import { apiFetch, apiFetchBlob, isLikelyBrowserNetworkFailureMessage, saveBlobA
 import { clearToken, getToken } from "@/lib/auth";
 import { SHOW_SCRAPE_UI } from "@/lib/features";
 import type { TranslationKey } from "@/lib/i18n";
+import { calendarProviderLabel } from "@/lib/calendar-provider";
 import {
   buildJobsQuery,
   defaultJobFilters,
@@ -1038,23 +1039,56 @@ export default function DashboardPage() {
     }
   }
 
-  async function issuePlacementEmployerAttest(applicationId: number): Promise<string> {
+  async function issuePlacementEmployerAttest(
+    applicationId: number,
+    employerEmail?: string,
+  ): Promise<string> {
     const token = getToken();
     if (!token) throw new Error(t("dashboard.placementEventsNotSignedIn"));
     setPlacementFlowBusy({ id: applicationId, kind: "employer_attest" });
     setError(null);
     try {
-      const out = await apiFetch<{ attest_url: string }>(
+      const out = await apiFetch<{ attest_url: string; mail_sent: boolean }>(
         `/api/v1/applications/${applicationId}/placement-employer-attest-link`,
-        { method: "POST", body: "{}" },
+        {
+          method: "POST",
+          body: JSON.stringify({
+            ...(employerEmail?.trim() ? { employer_email: employerEmail.trim() } : {}),
+          }),
+        },
         token,
       );
       setPlacementEventsInvalidateKey((k) => k + 1);
-      toast.success(t("dashboard.placementEmployerAttestCopied"));
+      toast.success(
+        out.mail_sent
+          ? t("dashboard.placementEmployerAttestEmailed")
+          : t("dashboard.placementEmployerAttestCopied"),
+      );
       return out.attest_url;
     } catch (err) {
       setError(dashboardFetchUserMessage(err, t));
       throw err;
+    } finally {
+      setPlacementFlowBusy(null);
+    }
+  }
+
+  async function filePlacementDispute(applicationId: number, reason: string) {
+    const token = getToken();
+    if (!token) return;
+    setPlacementFlowBusy({ id: applicationId, kind: "dispute" });
+    setError(null);
+    try {
+      await apiFetch<ApplicationRow>(
+        `/api/v1/applications/${applicationId}/placement-dispute`,
+        { method: "POST", body: JSON.stringify({ reason: reason.trim() || null }) },
+        token,
+      );
+      syncApplicationsFromApi(await loadApplications(token));
+      setPlacementEventsInvalidateKey((k) => k + 1);
+      toast.success(t("dashboard.placementDisputed"));
+    } catch (err) {
+      setError(dashboardFetchUserMessage(err, t));
     } finally {
       setPlacementFlowBusy(null);
     }
@@ -1346,7 +1380,11 @@ export default function DashboardPage() {
                           )}
                           {dashboardCalendarBundle.nextInterview.calendar_provider ? (
                             <span className="ml-1 text-[var(--twin-muted-strong)]">
-                              · {dashboardCalendarBundle.nextInterview.calendar_provider}
+                              ·{" "}
+                              {calendarProviderLabel(
+                                dashboardCalendarBundle.nextInterview.calendar_provider,
+                                t,
+                              )}
                             </span>
                           ) : null}
                         </p>
@@ -1770,6 +1808,7 @@ export default function DashboardPage() {
             onPlacementDeclare={declarePlacement}
             onPlacementVerifyStart={startPlacementVerify}
             onPlacementEmployerAttest={issuePlacementEmployerAttest}
+            onPlacementDispute={filePlacementDispute}
             placementFlowBusy={placementFlowBusy}
             onPlacementEventsLoad={loadPlacementEvents}
             placementEventsInvalidateKey={placementEventsInvalidateKey}

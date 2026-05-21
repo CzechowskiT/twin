@@ -93,9 +93,22 @@ class PlacementConfirmOut(BaseModel):
     message: str
 
 
+class PlacementEmployerAttestIn(BaseModel):
+    employer_email: str | None = Field(
+        default=None,
+        max_length=320,
+        description="Optional: send attestation link directly to recruiter / HR inbox.",
+    )
+
+
 class PlacementEmployerAttestOut(BaseModel):
     attest_url: str
     expires_at: str
+    mail_sent: bool = False
+
+
+class PlacementDisputeIn(BaseModel):
+    reason: str | None = Field(default=None, max_length=2000)
 
 
 class PlacementEmployerConfirmIn(BaseModel):

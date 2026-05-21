@@ -45,6 +45,7 @@ export function SiteFooter() {
     { href: "/for-companies", label: t("nav.forCompanies") },
     { href: "/faq", label: t("nav.faq") },
     { href: "/status", label: t("site.footerStatus") },
+    { href: "/developers", label: t("site.footerDevelopers") },
     { href: "/calculator", label: t("nav.calculator") },
     { href: "/register", label: t("nav.register") },
     { href: "/login", label: t("nav.login") },
