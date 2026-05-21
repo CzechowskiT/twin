@@ -1,5 +1,16 @@
 # Agent shipping log
 
+## 2026-05-19 — Original 6 to-dos closed
+
+See **`docs/TODAY_6_TODOS_DONE.md`**. All six items verified in repo + pytest/build:
+
+1. Header refactor — `23be2fe`
+2. Interview reminder + placement retention beat — `5728aa1`
+3. Dashboard WebCal one-click — `4ec621b`
+4. Jobs empty state (zero corpus) — `4ec621b`
+5. `/status` + `database_reachable` + `docs/SCRAPE_OPS.md` — `4ec621b`
+6. Tests/build/push on `cursor/phase1-monorepo-scaffold` — ongoing through `665bd9c`
+
 ## 2026-05-19 — Autonomous marathon (placement ops, ATS, calendar UX)
 
 **Branch:** `cursor/phase1-monorepo-scaffold` (pushed)

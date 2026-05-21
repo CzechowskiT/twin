@@ -101,6 +101,9 @@ export default function StatusPage() {
           <a href="/api/openapi" className="twin-link" target="_blank" rel="noopener noreferrer">
             {t("status.openapi")}
           </a>
+          <Link href="/developers" className="twin-link">
+            {t("status.developers")}
+          </Link>
         </div>
       </Card>
     </Shell>

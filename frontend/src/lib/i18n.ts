@@ -1161,6 +1161,7 @@ const en = {
     generated: "Stats generated",
     home: "Back to home",
     openapi: "OpenAPI schema",
+    developers: "Developers & ops docs",
   },
   feedback: {
     title: "Send feedback",
@@ -2736,6 +2737,7 @@ const pl: MessageTree = {
     generated: "Statystyki z",
     home: "Strona główna",
     openapi: "Schemat OpenAPI",
+    developers: "Developerzy i dokumentacja ops",
   },
   feedback: {
     title: "Wyślij opinię",
