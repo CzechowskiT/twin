@@ -1,5 +1,18 @@
 # Agent shipping log
 
+## 2026-05-19 — Autonomous marathon (placement ops, ATS, calendar UX)
+
+**Branch:** `cursor/phase1-monorepo-scaffold` (pushed)
+
+- **Ops:** `GET /api/v1/admin/placement-disputes` + `/admin/placements` UI; metrics link.
+- **Placement B2B:** `preview_employer_attestation` + `GET /placement/employer/preview`; branded confirm page.
+- **Dashboard:** WebCal regenerate button + i18n.
+- **ATS:** Lever webhook with `LEVER_WEBHOOK_SECRET` / `X-Lever-Signature` → hire → placement verified.
+- **Docs:** `docs/PRODUCT_ROADMAP.md`, updated `NEXT_10_STEPS`, `ATS_WEBHOOKS.md`.
+- **Tests:** `test_admin_placement_queue`, `test_placement_employer_preview`.
+
+Prior same-day commits on branch: Quantica compliance, `/status`, `/developers`, employer attest, dispute, Greenhouse ATS, interview reminders, disputed count on admin metrics.
+
 ## 2026-05-19 — MVP batch: billing, calendar connect, investor ops flags
 
 - **Billing:** plan tier cards use shared `BillingPlanTierCard` + CSS; long “not configured” copy under CTA, not in pill.

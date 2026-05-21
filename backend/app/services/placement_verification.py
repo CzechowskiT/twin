@@ -343,6 +343,26 @@ def issue_employer_attestation_link(
     return url, exp_s, mail_sent
 
 
+def preview_employer_attestation(db: Session, raw_token: str) -> dict | None:
+    """Return non-sensitive context for employer landing (company, role)."""
+    if not raw_token.strip():
+        return None
+    digest = hash_placement_token(raw_token.strip())
+    row = (
+        db.query(Application, Job)
+        .join(Job, Application.job_id == Job.id)
+        .filter(
+            Application.placement_employer_attest_token_hash == digest,
+            Application.placement_employer_attest_expires_at > datetime.now(timezone.utc),
+        )
+        .first()
+    )
+    if not row:
+        return None
+    _app, job = row
+    return {"company_name": job.company, "job_title": job.title}
+
+
 def confirm_employer_attestation(db: Session, raw_token: str) -> tuple[bool, str]:
     """Employer one-click confirm — marks placement verified without work-email magic link."""
     if not raw_token.strip():

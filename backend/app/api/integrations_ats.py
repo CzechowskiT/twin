@@ -98,13 +98,69 @@ async def greenhouse_webhook(request: Request, db: Session = Depends(get_db)) ->
     return {"status": "ok"}
 
 
+def _verify_lever_webhook(settings: Settings, body: bytes, header_sig: str | None) -> None:
+    secret = (settings.lever_webhook_secret or "").strip()
+    env = (settings.environment or "").strip().lower()
+    if not secret:
+        if env in ("production", "staging"):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Webhook secret not configured. Set LEVER_WEBHOOK_SECRET.",
+            )
+        logger.warning("Lever webhook secret not set — allowing in non-production")
+        return
+    if not header_sig or not hmac.compare_digest(
+        header_sig.strip(),
+        hmac.new(secret.encode("utf-8"), body, hashlib.sha256).hexdigest(),
+    ):
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Invalid Lever webhook signature")
+
+
 @router.post("/ats/lever")
-async def lever_webhook() -> dict[str, str]:
-    """Lever webhook — disabled until signature validation is implemented."""
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Lever webhook integration not yet implemented",
-    )
+async def lever_webhook(request: Request, db: Session = Depends(get_db)) -> dict[str, str]:
+    """Lever hire events — HMAC via X-Lever-Signature when LEVER_WEBHOOK_SECRET is set."""
+    settings = get_settings()
+    body = await request.body()
+    _verify_lever_webhook(settings, body, request.headers.get("X-Lever-Signature"))
+
+    try:
+        payload: dict[str, Any] = json.loads(body.decode("utf-8") or "{}")
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid JSON") from exc
+
+    event = str(payload.get("event") or payload.get("type") or "")
+    data = payload.get("data") if isinstance(payload.get("data"), dict) else payload
+    app_id = None
+    if isinstance(data, dict):
+        app_id = data.get("applicationId") or data.get("application_id")
+    if event and "hire" in event.lower() and app_id is not None:
+        ext = str(app_id)
+        row = (
+            db.query(Application)
+            .filter(Application.external_ats_id == ext, Application.external_ats_provider == "lever")
+            .first()
+        )
+        if row:
+            row.status = ApplicationStatus.HIRED
+            if row.placement_state != "verified":
+                from datetime import datetime, timezone
+
+                from app.services.placement_verification import PLACEMENT_VERIFIED, record_placement_event
+
+                row.placement_state = PLACEMENT_VERIFIED
+                row.placement_verified_at = datetime.now(timezone.utc)
+                record_placement_event(
+                    db,
+                    application_id=row.id,
+                    event_type="placement.ats_hire_confirmed",
+                    actor="ats_webhook",
+                    detail={"provider": "lever", "external_id": ext},
+                    from_magic_link=True,
+                )
+            db.commit()
+            logger.info("ATS webhook marked application %s hired (lever)", row.id)
+
+    return {"status": "ok"}
 
 
 @router.post("/ats/ashby")

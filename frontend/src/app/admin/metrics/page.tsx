@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 const STORAGE_KEY = "twin_ops_admin_token";
@@ -120,6 +121,9 @@ export default function AdminMetricsPage() {
             </div>
           </section>
           <p className="twin-muted mt-6 text-xs">Generated {data.generated_at}</p>
+          <Link href="/admin/placements" className="twin-link mt-4 inline-block text-sm">
+            Open placement dispute queue →
+          </Link>
         </>
       ) : null}
     </main>

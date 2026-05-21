@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.config import Settings, get_settings
 from app.core.deps import get_db
 from app.services.admin_metrics import build_admin_metrics
+from app.services.admin_placement_queue import build_placement_dispute_queue
 from app.services.data_quality_metrics import build_data_quality_report
 
 router = APIRouter()
@@ -37,3 +38,14 @@ def admin_metrics(
 ) -> dict:
     _require_ops_admin(settings, authorization)
     return build_admin_metrics(db)
+
+
+@router.get("/placement-disputes")
+def admin_placement_disputes(
+    limit: int = 50,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+) -> dict:
+    _require_ops_admin(settings, authorization)
+    return build_placement_dispute_queue(db, limit=limit)

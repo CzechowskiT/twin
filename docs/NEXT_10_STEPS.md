@@ -36,15 +36,22 @@ Aligned with the north star: **short calendar of acceptance-ready moments**, not
 | 14 | Developers page | `/developers` + OpenAPI / status / mvp-stats links |
 | 15 | Calendar provider i18n | Google / Microsoft labels on dashboard |
 
+| 16 | Ops placement dispute queue | `/admin/placements` + `GET /admin/placement-disputes` |
+| 17 | Employer attest branding | `GET /placement/employer/preview` + company on confirm page |
+| 18 | WebCal regenerate | New subscribe link on dashboard strip |
+| 19 | Lever ATS webhook | `LEVER_WEBHOOK_SECRET` + hire → verified |
+
+See **`docs/PRODUCT_ROADMAP.md`** for product rationale on next priorities.
+
 ## Recommended next 10 (backlog)
 
-1. **Railway secrets** — `MICROSOFT_*`, `STRIPE_*`, mail (`docs/RAILWAY_PROD_ENV_PL.md`)
-2. **Ops admin dispute queue UI** — filter `placement_state=disputed` on `/admin/metrics`
-3. **B2B attestation portal** — `/placement/employer/{companySlug}` branding
-4. **Placement retention copy** — tune welcome email when mail live
-5. **Scrape corpus growth** — ops allowlist + daily beat
-6. **Lever / Ashby webhooks** — signature validation
-7. **Stripe live E2E** — `docs/STRIPE_E2E.md` then production keys
-8. **Interview reminders prod** — verify beat on worker service
-9. **WebCal rotate** — re-mint expired feed tokens in UI
-10. **Partner API keys** — scoped tokens for B2B integrators
+1. **Railway secrets** — mail, Stripe, Microsoft (`docs/RAILWAY_PROD_ENV_PL.md`)
+2. **Dedicated twin-worker** — Celery beat off API (`docs/RAILWAY_WORKER_PL.md`)
+3. **Stripe E2E staging** — `docs/STRIPE_E2E.md`
+4. **Scrape corpus growth** — ops allowlist + daily beat
+5. **Ashby webhook** — signature validation
+6. **Placement dispute resolve** — ops API to clear dispute state
+7. **Partner API keys** — scoped integrator tokens
+8. **Recruiter batch acceptance UI** — calendar north star
+9. **Interview reminders prod verify** — beat on worker
+10. **PR merge to default branch** — when `main` exists + CI green

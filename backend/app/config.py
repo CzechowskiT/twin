@@ -231,6 +231,7 @@ class Settings(BaseSettings):
 
     # Greenhouse ATS webhooks — optional shared secret for signature checks.
     greenhouse_webhook_secret: str = ""
+    lever_webhook_secret: str = ""
 
     # S3-compatible storage (AWS S3, Cloudflare R2, MinIO). Empty keys = disabled.
     s3_endpoint_url: str = ""

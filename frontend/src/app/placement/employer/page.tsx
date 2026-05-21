@@ -2,17 +2,44 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
+
+type Preview = { company_name: string; job_title: string };
 
 export default function PlacementEmployerConfirmPage() {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const token = searchParams.get("token")?.trim() ?? "";
+  const companyParam = searchParams.get("company")?.trim() ?? "";
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [preview, setPreview] = useState<Preview | null>(null);
+
+  useEffect(() => {
+    if (!token) return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await fetch(
+          `/api/v1/placement/employer/preview?token=${encodeURIComponent(token)}`,
+          { cache: "no-store" },
+        );
+        if (!res.ok) return;
+        const data = (await res.json()) as Preview;
+        if (!cancelled) setPreview(data);
+      } catch {
+        /* optional branding */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
+
+  const companyLabel = preview?.company_name || companyParam;
 
   async function confirm() {
     if (!token) {
@@ -40,6 +67,12 @@ export default function PlacementEmployerConfirmPage() {
   return (
     <Shell>
       <Card>
+        {companyLabel ? (
+          <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--twin-accent)]">
+            {companyLabel}
+            {preview?.job_title ? ` · ${preview.job_title}` : ""}
+          </p>
+        ) : null}
         <h1 className="mb-2 text-2xl font-semibold">{t("placementEmployer.title")}</h1>
         <p className="twin-muted mb-6 text-sm leading-relaxed">{t("placementEmployer.lead")}</p>
         {!token ? <p className="text-sm text-amber-700">{t("placementEmployer.missingToken")}</p> : null}

@@ -16,9 +16,17 @@ Inbound webhooks let employers confirm hires inside their ATS — aligned with [
 2. Register webhook URL in Greenhouse to your Railway API host.
 3. Set secret on API service and redeploy.
 
-## Lever / Ashby
+## Lever (implemented)
 
-Routes exist but return `501` until signature validation is implemented — do not expose publicly without auth.
+**Endpoint:** `POST /api/v1/integrations/ats/lever`
+
+**Env:** `LEVER_WEBHOOK_SECRET` — HMAC-SHA256 hex digest of raw body in header `X-Lever-Signature`.
+
+Hire-style events with `applicationId` match `external_ats_provider=lever` and mark placement verified (same as Greenhouse).
+
+## Ashby
+
+Route returns `501` until signature validation is implemented — do not expose publicly without auth.
 
 ## Outbound employer webhook
 

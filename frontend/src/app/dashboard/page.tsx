@@ -1451,13 +1451,23 @@ export default function DashboardPage() {
                       className="twin-input text-xs"
                       aria-label="WebCal subscribe URL"
                     />
-                    <button
-                      type="button"
-                      className="twin-btn-secondary text-xs"
-                      onClick={() => void navigator.clipboard.writeText(dashboardWebcalUrl)}
-                    >
-                      {t("dashboard.calendarStripWebcalCopy")}
-                    </button>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        className="twin-btn-secondary text-xs"
+                        onClick={() => void navigator.clipboard.writeText(dashboardWebcalUrl)}
+                      >
+                        {t("dashboard.calendarStripWebcalCopy")}
+                      </button>
+                      <button
+                        type="button"
+                        className="twin-btn-secondary text-xs"
+                        disabled={dashboardWebcalBusy}
+                        onClick={() => void mintDashboardWebcalLink()}
+                      >
+                        {dashboardWebcalBusy ? "…" : t("dashboard.calendarStripWebcalRegenerate")}
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <p className="twin-muted text-[11px] leading-snug">{t("dashboard.calendarStripWebcalHint")}</p>
