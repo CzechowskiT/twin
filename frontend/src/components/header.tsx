@@ -52,6 +52,8 @@ export function Header() {
 
   const corporateNavPrimary = [
     { href: "/about" as const, label: t("nav.about") },
+    { href: "/how-it-works" as const, label: t("nav.howItWorks") },
+    { href: "/pricing" as const, label: t("nav.pricing") },
     { href: "/case-studies" as const, label: t("nav.cases") },
     { href: "/faq" as const, label: t("nav.faq") },
     { href: "/contact" as const, label: t("nav.contact") },

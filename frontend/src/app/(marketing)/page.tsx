@@ -6,6 +6,7 @@ import { LandingCtaBand } from "@/components/marketing/landing-cta-band";
 import { LandingFaq } from "@/components/marketing/landing-faq";
 import { LandingFocusChips } from "@/components/marketing/landing-focus-chips";
 import { LandingHero } from "@/components/marketing/landing-hero";
+import { MvpLiveStatsStrip } from "@/components/marketing/mvp-live-stats-strip";
 import { LandingOriginStory } from "@/components/marketing/landing-origin";
 import { LandingStoryJourney } from "@/components/marketing/landing-story-journey";
 import { LandingVacationTest } from "@/components/marketing/landing-vacation-test";
@@ -16,6 +17,9 @@ export default function Home() {
     <div className="marketing-journey-host relative z-0 flex flex-1 flex-col">
       <div className="relative z-10 flex flex-1 flex-col">
         <LandingHero />
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+          <MvpLiveStatsStrip />
+        </div>
         <LandingVacationTest />
         <LandingOriginStory />
         <LandingStoryJourney />
