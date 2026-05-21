@@ -7,7 +7,7 @@ import {
   PERSONA_ROUTE,
   type MarketingPersona,
 } from "@/lib/marketing-persona";
-import { LOGIN_PATH, REGISTER_PATH, WORKSPACE_PATH } from "@/lib/persona-auth";
+import { LOGIN_PATH, REGISTER_PATH } from "@/lib/persona-auth";
 import type { TranslationKey } from "@/lib/i18n";
 
 export type PersonaAudience = MarketingPersona;
@@ -157,13 +157,9 @@ export function isCandidateWorkspacePath(pathname: string): boolean {
 
 export type HeaderGrowthLabelKey =
   | "nav.demo"
-  | "nav.calculatorInvestor"
-  | "nav.calculatorB2bForCompanies"
-  | "nav.waitlist"
+  | "nav.calculator"
   | "nav.forCompanies"
-  | "nav.forRecruiters"
-  | "workspace.investorHome"
-  | "workspace.recruiterHome";
+  | "nav.forRecruiters";
 
 export type GrowthCtaVariant = "candidate" | "recruiter" | "investor";
 
@@ -173,57 +169,23 @@ export type HeaderGrowthLink = {
   variant: GrowthCtaVariant;
 };
 
-/** Hub pages show all three product entry tools; elsewhere — persona-specific pair. */
+/**
+ * One primary marketing CTA beside the logo (logged-out only).
+ * Logged-in users use PersonaSwitcher → workspace; no duplicate pills here.
+ */
 export function headerGrowthLinksForPersona(
   persona: MarketingPersona,
   pathname: string,
+  hasSession: boolean,
 ): HeaderGrowthLink[] {
-  if (isMarketingHubPath(pathname)) {
-    return [
-      { href: "/demo", labelKey: "nav.demo", variant: "candidate" },
-      { href: "/calculator/b2b", labelKey: "nav.calculatorB2bForCompanies", variant: "recruiter" },
-      { href: "/for-companies", labelKey: "nav.forCompanies", variant: "investor" },
-    ];
-  }
+  if (hasSession || isMarketingHubPath(pathname)) return [];
   if (persona === "candidate") {
-    return [
-      { href: "/demo", labelKey: "nav.demo", variant: "candidate" },
-      { href: "/waitlist", labelKey: "nav.waitlist", variant: "recruiter" },
-    ];
+    return [{ href: "/demo", labelKey: "nav.demo", variant: "candidate" }];
   }
   if (persona === "recruiter") {
-    return [
-      { href: "/calculator/b2b", labelKey: "nav.calculatorB2bForCompanies", variant: "recruiter" },
-      { href: "/for-recruiters", labelKey: "nav.forRecruiters", variant: "recruiter" },
-    ];
+    return [{ href: "/calculator/b2b", labelKey: "nav.calculator", variant: "recruiter" }];
   }
-  return [
-    { href: "/workspace/investor", labelKey: "workspace.investorHome", variant: "investor" },
-    { href: "/for-companies", labelKey: "nav.forCompanies", variant: "investor" },
-  ];
-}
-
-export type HeaderProductLink = {
-  href: string;
-  labelKey:
-    | "nav.demo"
-    | "dashboard.calendarLink"
-    | "workspace.recruiterHome"
-    | "workspace.investorHome";
-};
-
-export function headerProductLinks(
-  persona: MarketingPersona,
-  pathname: string,
-): HeaderProductLink[] {
-  if (persona === "candidate") {
-    if (isMarketingHubPath(pathname)) return [];
-    return [{ href: "/demo", labelKey: "nav.demo" }];
-  }
-  if (persona === "recruiter") {
-    return [{ href: "/workspace/recruiter", labelKey: "workspace.recruiterHome" }];
-  }
-  return [{ href: "/workspace/investor", labelKey: "workspace.investorHome" }];
+  return [{ href: "/for-companies", labelKey: "nav.forCompanies", variant: "investor" }];
 }
 
 export function showCandidateProductNav(persona: MarketingPersona): boolean {
@@ -244,22 +206,17 @@ export function headerAccountLinks(
   }
   if (persona === "candidate") {
     return [
-      { href: WORKSPACE_PATH.candidate, labelKey: "workspace.candidateHome" },
       { href: "/dashboard", labelKey: "nav.dashboard" },
       { href: "#", labelKey: "dashboard.logout", isLogout: true },
     ];
   }
   if (persona === "recruiter") {
     return [
-      { href: WORKSPACE_PATH.recruiter, labelKey: "workspace.recruiterHome" },
       { href: "/recruiter/inbox", labelKey: "recruiterInbox.title" },
       { href: "#", labelKey: "dashboard.logout", isLogout: true },
     ];
   }
-  return [
-    { href: WORKSPACE_PATH.company, labelKey: "workspace.investorHome" },
-    { href: "#", labelKey: "dashboard.logout", isLogout: true },
-  ];
+  return [{ href: "#", labelKey: "dashboard.logout", isLogout: true }];
 }
 
 export function footerExploreHrefsForPersona(persona: MarketingPersona): string[] {
