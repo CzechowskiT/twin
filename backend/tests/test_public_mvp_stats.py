@@ -55,6 +55,7 @@ def test_public_mvp_stats_shape_empty(_mock_li: object, _mock_stripe: object, *_
         assert body["stripe_checkout_ready"] is False
         assert body["mail_configured"] is False
         assert body["google_calendar_configured"] is False
+        assert body["database_reachable"] is True
     finally:
         app.dependency_overrides.pop(get_db, None)
         db.close()

@@ -24,7 +24,15 @@ import { apiFetch, apiFetchBlob, isLikelyBrowserNetworkFailureMessage, saveBlobA
 import { clearToken, getToken } from "@/lib/auth";
 import { SHOW_SCRAPE_UI } from "@/lib/features";
 import type { TranslationKey } from "@/lib/i18n";
-import { buildJobsQuery, defaultJobFilters, loadStoredJobFilters, persistJobFilters, type JobFilters, JOB_FEED_PAGE_MAX } from "@/lib/jobs";
+import {
+  buildJobsQuery,
+  defaultJobFilters,
+  jobFiltersAreDefault,
+  loadStoredJobFilters,
+  persistJobFilters,
+  type JobFilters,
+  JOB_FEED_PAGE_MAX,
+} from "@/lib/jobs";
 
 type User = {
   id: number;
@@ -199,6 +207,8 @@ export default function DashboardPage() {
   const [placementEventsInvalidateKey, setPlacementEventsInvalidateKey] = useState(0);
   const [dashboardCalendarBundle, setDashboardCalendarBundle] = useState<DashboardCalendarBundle | null>(null);
   const [nextInterviewIcsBusy, setNextInterviewIcsBusy] = useState(false);
+  const [dashboardWebcalUrl, setDashboardWebcalUrl] = useState<string | null>(null);
+  const [dashboardWebcalBusy, setDashboardWebcalBusy] = useState(false);
   const [calendarConnectBusy, setCalendarConnectBusy] = useState(false);
   const [applicationsCsvBusy, setApplicationsCsvBusy] = useState(false);
   const [applicationsXlsxBusy, setApplicationsXlsxBusy] = useState(false);
@@ -940,6 +950,24 @@ export default function DashboardPage() {
     }
   }
 
+  async function mintDashboardWebcalLink() {
+    const token = getToken();
+    if (!token) return;
+    setDashboardWebcalBusy(true);
+    try {
+      const out = await apiFetch<{ webcal_url: string }>(
+        "/api/v1/calendar/me/webcal-token",
+        { method: "POST", body: "{}" },
+        token,
+      );
+      setDashboardWebcalUrl(out.webcal_url);
+    } catch (err) {
+      setError(dashboardFetchUserMessage(err, t));
+    } finally {
+      setDashboardWebcalBusy(false);
+    }
+  }
+
   async function declarePlacement(applicationId: number, note: string) {
     const token = getToken();
     if (!token) return;
@@ -1262,7 +1290,34 @@ export default function DashboardPage() {
                   </div>
                 ) : null}
               </div>
-              <div className="flex shrink-0 flex-col gap-2 self-start">
+              <div className="flex shrink-0 flex-col gap-2 self-start sm:min-w-[12rem]">
+                <button
+                  type="button"
+                  className="twin-btn-solid twin-touch-target text-sm"
+                  disabled={dashboardWebcalBusy}
+                  onClick={() => void mintDashboardWebcalLink()}
+                >
+                  {dashboardWebcalBusy ? "…" : t("dashboard.calendarStripWebcalGenerate")}
+                </button>
+                {dashboardWebcalUrl ? (
+                  <div className="flex flex-col gap-1">
+                    <input
+                      readOnly
+                      value={dashboardWebcalUrl}
+                      className="twin-input text-xs"
+                      aria-label="WebCal subscribe URL"
+                    />
+                    <button
+                      type="button"
+                      className="twin-btn-secondary text-xs"
+                      onClick={() => void navigator.clipboard.writeText(dashboardWebcalUrl)}
+                    >
+                      {t("dashboard.calendarStripWebcalCopy")}
+                    </button>
+                  </div>
+                ) : (
+                  <p className="twin-muted text-[11px] leading-snug">{t("dashboard.calendarStripWebcalHint")}</p>
+                )}
                 <Link
                   href="/dashboard/calendar"
                   className="twin-btn-secondary twin-touch-target text-center text-sm sm:text-left"
@@ -1678,11 +1733,41 @@ export default function DashboardPage() {
           </>
         )}
         {jobs !== null && (jobs.total === 0 || jobs.items.length === 0) ? (
-          <div className="mt-3 space-y-2 rounded-lg border border-dashed border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/35 p-4 sm:p-5">
-            {hasProfile ? (
+          <div className="mt-3 space-y-3 rounded-lg border border-dashed border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/35 p-4 sm:p-5">
+            {jobs.total === 0 && jobFiltersAreDefault(filters) ? (
+              <>
+                <p className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.jobsEmptyZeroTitle")}</p>
+                <p className="twin-muted text-sm leading-relaxed">{t("dashboard.jobsEmptyZeroLead")}</p>
+                <div className="flex flex-wrap gap-2">
+                  <Link href="/profile" className="twin-btn-solid twin-touch-target text-sm">
+                    {t("dashboard.jobsEmptyZeroProfileCta")}
+                  </Link>
+                  {SHOW_SCRAPE_UI && user?.can_trigger_scrape ? (
+                    <button
+                      type="button"
+                      className="twin-btn-secondary text-sm"
+                      disabled={scraping}
+                      onClick={() => void triggerScrapeAll()}
+                    >
+                      {scraping ? t("dashboard.scrapingAll") : t("dashboard.jobsEmptyZeroScrapeCta")}
+                    </button>
+                  ) : null}
+                </div>
+              </>
+            ) : hasProfile ? (
               <>
                 <p className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.jobsEmptyFilteredTitle")}</p>
                 <p className="twin-muted text-sm leading-relaxed">{t("dashboard.jobsEmptyFilteredLead")}</p>
+                <button
+                  type="button"
+                  className="twin-btn-secondary text-sm"
+                  onClick={() => {
+                    setFilters(defaultJobFilters);
+                    persistJobFilters(defaultJobFilters);
+                  }}
+                >
+                  {t("dashboard.jobsEmptyZeroResetFilters")}
+                </button>
               </>
             ) : (
               <>
@@ -1690,6 +1775,9 @@ export default function DashboardPage() {
                   {SHOW_SCRAPE_UI ? t("dashboard.noJobs") : t("dashboard.noJobsNoScrapeUi")}
                 </p>
                 <p className="twin-muted text-sm leading-relaxed">{t("dashboard.jobsEmptyMomentum")}</p>
+                <Link href="/profile" className="twin-btn-solid twin-touch-target inline-block text-sm">
+                  {t("dashboard.jobsEmptyZeroProfileCta")}
+                </Link>
               </>
             )}
           </div>

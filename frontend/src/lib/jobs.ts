@@ -18,6 +18,17 @@ export const defaultJobFilters: JobFilters = {
   sort: "newest",
 };
 
+export function jobFiltersAreDefault(filters: JobFilters): boolean {
+  return (
+    !filters.q.trim() &&
+    !filters.location.trim() &&
+    !filters.job_board.trim() &&
+    !filters.min_salary.trim() &&
+    !filters.title_terms.trim() &&
+    filters.sort === "newest"
+  );
+}
+
 /** Backend GET /jobs caps `limit` at this value. */
 export const JOB_FEED_PAGE_MAX = 200;
 

@@ -82,6 +82,7 @@ export type TranslationKey =
   | `help.${keyof typeof en.help}`
   | `tutorial.${keyof typeof en.tutorial}`
   | `feedback.${keyof typeof en.feedback}`
+  | `status.${keyof typeof en.status}`
   | `meta.${keyof typeof en.meta}`
   | `privacy.${keyof typeof en.privacy}`
   | `terms.${keyof typeof en.terms}`
@@ -329,6 +330,12 @@ const en = {
       "No jobs in the database yet. Listings appear after data is scraped on the server (admin or backend) or imported. Your profile is for ranking and filters once jobs exist; it does not crawl the web on its own.",
     jobsEmptyMomentum:
       "Loosen filters or clear title terms for a wider scan, then tighten again once real titles start flowing back.",
+    jobsEmptyZeroTitle: "No job listings in the database yet",
+    jobsEmptyZeroLead:
+      "Complete your profile for matching, subscribe your calendar for interview holds, and ask ops to run a scrape if you are on the allowlist.",
+    jobsEmptyZeroProfileCta: "Complete profile",
+    jobsEmptyZeroResetFilters: "Reset filters",
+    jobsEmptyZeroScrapeCta: "Queue scrape (ops)",
     noJobsFiltered: "No jobs match these filters.",
     filterSearch: "Search",
     filterSearchPlaceholder: "Title, company, keywords…",
@@ -671,6 +678,9 @@ const en = {
       "Google Calendar is not connected. Connect so TWIN can read busy time before proposing interview slots.",
     calendarStripConnectGoogle: "Connect Google Calendar",
     calendarStripCta: "Open calendar settings",
+    calendarStripWebcalGenerate: "Subscribe all interviews (WebCal)",
+    calendarStripWebcalCopy: "Copy subscribe URL",
+    calendarStripWebcalHint: "One click — paste into Apple Calendar, Outlook, or Google via URL.",
     calendarNextInterviewTitle: "Next interview",
     calendarNextInterviewEmpty:
       "No upcoming interviews in TWIN yet. Open calendar settings to schedule one (saved here and in Google Calendar when connected).",
@@ -1062,6 +1072,24 @@ const en = {
     next: "Next",
     skip: "Skip tour",
     done: "Done",
+  },
+  status: {
+    title: "TWIN system status",
+    lead: "Public liveness for the API and database — no personal data.",
+    loading: "Loading status…",
+    loadFailed: "Could not load status from the API.",
+    api: "API",
+    database: "Database",
+    mail: "Transactional mail",
+    calendar: "Google Calendar OAuth",
+    validatedJobs: "Validated jobs (public count)",
+    git: "Deploy commit",
+    up: "reachable",
+    down: "unreachable",
+    configured: "configured",
+    notConfigured: "not configured",
+    generated: "Stats generated",
+    home: "Back to home",
   },
   feedback: {
     title: "Send feedback",
@@ -1800,6 +1828,12 @@ const pl: MessageTree = {
       "Brak ofert w bazie. Pojawią się po pobraniu danych na serwerze (scrap przez administratora lub backend) lub imporcie. Profil służy do dopasowania i filtrów, gdy oferty już są; sam z siebie nie przeszukuje internetu.",
     jobsEmptyMomentum:
       "Poluzuj filtry albo wyczyść frazy w tytule dla szerszego skanu, potem zawęź, gdy zaczną wracać realne nazwy stanowisk.",
+    jobsEmptyZeroTitle: "Brak ofert w bazie",
+    jobsEmptyZeroLead:
+      "Uzupełnij profil pod dopasowanie, podłącz kalendarz na terminy rozmów; scrape uruchamia ops z allowlisty.",
+    jobsEmptyZeroProfileCta: "Uzupełnij profil",
+    jobsEmptyZeroResetFilters: "Resetuj filtry",
+    jobsEmptyZeroScrapeCta: "Kolejka scrape (ops)",
     noJobsFiltered: "Brak ofert dla wybranych filtrów.",
     filterSearch: "Szukaj",
     filterSearchPlaceholder: "Stanowisko, firma, słowa kluczowe…",
@@ -2143,6 +2177,9 @@ const pl: MessageTree = {
       "Google Calendar nie jest połączony. Połącz, żeby TWIN widział zajętość przy propozycjach slotów rozmów.",
     calendarStripConnectGoogle: "Połącz Google Calendar",
     calendarStripCta: "Ustawienia kalendarza",
+    calendarStripWebcalGenerate: "Subskrybuj rozmowy (WebCal)",
+    calendarStripWebcalCopy: "Kopiuj URL subskrypcji",
+    calendarStripWebcalHint: "Jeden klik — wklej w Apple Calendar, Outlook lub Google przez URL.",
     calendarNextInterviewTitle: "Najbliższa rozmowa",
     calendarNextInterviewEmpty:
       "Brak nadchodzących rozmów w TWIN. Otwórz kalendarz, żeby zaplanować slot (zapis tutaj i w Google Calendar po połączeniu).",
@@ -2543,6 +2580,24 @@ const pl: MessageTree = {
     next: "Dalej",
     skip: "Pomiń tour",
     done: "Gotowe",
+  },
+  status: {
+    title: "Status systemu TWIN",
+    lead: "Publiczna dostępność API i bazy — bez danych osobowych.",
+    loading: "Ładowanie statusu…",
+    loadFailed: "Nie udało się pobrać statusu z API.",
+    api: "API",
+    database: "Baza danych",
+    mail: "Mail transakcyjny",
+    calendar: "OAuth Google Calendar",
+    validatedJobs: "Oferty zwalidowane (licznik publiczny)",
+    git: "Commit deployu",
+    up: "osiągalna",
+    down: "niedostępna",
+    configured: "skonfigurowane",
+    notConfigured: "brak konfiguracji",
+    generated: "Statystyki z",
+    home: "Strona główna",
   },
   feedback: {
     title: "Wyślij opinię",
