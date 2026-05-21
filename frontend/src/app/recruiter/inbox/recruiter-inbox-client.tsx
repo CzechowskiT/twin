@@ -109,7 +109,7 @@ export default function RecruiterInboxClient() {
             onChange={(e) => setCompanySlug(e.target.value)}
           />
           <button type="button" className="twin-btn-solid twin-touch-target" disabled={loading} onClick={() => void load()}>
-            {loading ? "…" : t("recruiterInbox.load")}
+            {loading ? t("common.loadingEllipsis") : t("recruiterInbox.load")}
           </button>
         </div>
         {err ? <p className="mb-4 text-sm text-red-600">{err}</p> : null}
@@ -135,7 +135,7 @@ export default function RecruiterInboxClient() {
                     disabled={busyId !== null}
                     onClick={() => void respond(r.application_id, "accept")}
                   >
-                    {busyId === `${r.application_id}-accept` ? "…" : t("recruiterInbox.accept")}
+                    {busyId === `${r.application_id}-accept` ? t("common.loadingEllipsis") : t("recruiterInbox.accept")}
                   </button>
                   <button
                     type="button"
@@ -143,16 +143,21 @@ export default function RecruiterInboxClient() {
                     disabled={busyId !== null}
                     onClick={() => void respond(r.application_id, "decline")}
                   >
-                    {busyId === `${r.application_id}-decline` ? "…" : t("recruiterInbox.decline")}
+                    {busyId === `${r.application_id}-decline` ? t("common.loadingEllipsis") : t("recruiterInbox.decline")}
                   </button>
                 </div>
               </li>
             ))}
           </ul>
         )}
-        <Link href="/for-recruiters" className="twin-link mt-8 inline-block text-sm">
-          {t("recruiterInbox.back")}
-        </Link>
+        <div className="mt-8 flex flex-wrap gap-4">
+          <Link href="/recruiter/jobs" className="twin-link text-sm font-medium">
+            {t("recruiterInbox.jobsLink")}
+          </Link>
+          <Link href="/for-recruiters" className="twin-link text-sm">
+            {t("recruiterInbox.back")}
+          </Link>
+        </div>
       </Card>
     </Shell>
   );

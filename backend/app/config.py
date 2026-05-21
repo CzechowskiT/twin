@@ -218,6 +218,7 @@ class Settings(BaseSettings):
     mail_from: str = ""
 
     password_reset_token_ttl_minutes: int = 60
+    email_verification_token_ttl_minutes: int = 60 * 24
 
     # Stripe (https://dashboard.stripe.com/) — Checkout enables card + Apple Pay + Google Pay where supported
     stripe_secret_key: str = ""

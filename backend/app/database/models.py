@@ -90,12 +90,16 @@ class User(Base):
         DateTime, nullable=True
     )
     onboarding_completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    email_verified_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     welcome_email_sent_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     first_match_email_sent_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     candidate: Mapped["Candidate | None"] = relationship(back_populates="user")
     product_feedback: Mapped[list["ProductFeedback"]] = relationship(back_populates="user")
     password_reset_tokens: Mapped[list["PasswordResetToken"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+    email_verification_tokens: Mapped[list["EmailVerificationToken"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
     oauth_accounts: Mapped[list["OAuthAccount"]] = relationship(
@@ -218,6 +222,18 @@ class PasswordResetToken(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     user: Mapped["User"] = relationship(back_populates="password_reset_tokens")
+
+
+class EmailVerificationToken(Base):
+    __tablename__ = "email_verification_tokens"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    token_hash: Mapped[str] = mapped_column(String(64), index=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    user: Mapped["User"] = relationship(back_populates="email_verification_tokens")
 
 
 class Candidate(Base):

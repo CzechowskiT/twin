@@ -16,6 +16,11 @@ export default function WorkspaceRecruiterPage() {
             description: "workspace.toolRecruiterInbox",
           },
           {
+            href: "/recruiter/jobs",
+            label: "recruiterJobs.title",
+            description: "workspace.toolRecruiterJobs",
+          },
+          {
             href: "/calculator/b2b",
             label: "nav.calculatorB2bForCompanies",
             description: "workspace.toolRecruiterB2b",

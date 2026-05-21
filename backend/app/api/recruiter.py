@@ -12,6 +12,7 @@ from app.config import Settings, get_settings
 from app.database.session import get_db
 from app.services.recruiter_company_auth import resolve_recruiter_access
 from app.services.recruiter_inbox import build_recruiter_batch, respond_recruiter_batch
+from app.services.recruiter_jobs import create_company_job, list_company_jobs
 
 router = APIRouter()
 
@@ -35,6 +36,15 @@ def _resolved_company_slug(
 
 class RecruiterRespondIn(BaseModel):
     action: str = Field(..., description="accept | decline")
+
+
+class RecruiterJobCreateIn(BaseModel):
+    title: str = Field(..., min_length=2, max_length=300)
+    location: str | None = Field(None, max_length=200)
+    description: str | None = Field(None, max_length=20_000)
+    url: str | None = Field(None, max_length=500)
+    salary_min: int | None = Field(None, ge=0)
+    salary_max: int | None = Field(None, ge=0)
 
 
 @router.get("/inbox")
@@ -71,6 +81,48 @@ def recruiter_inbox_respond(
             company_slug=slug,
             application_id=application_id,
             action=body.action,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.get("/jobs")
+def recruiter_jobs_list(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+    limit: int = Query(50, ge=1, le=100),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        items = list_company_jobs(db, company_slug=slug, limit=limit)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    return {"company_slug": slug, "items": items}
+
+
+@router.post("/jobs", status_code=status.HTTP_201_CREATED)
+def recruiter_jobs_create(
+    body: RecruiterJobCreateIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return create_company_job(
+            db,
+            company_slug=slug,
+            title=body.title,
+            location=body.location,
+            description=body.description,
+            url=body.url,
+            salary_min=body.salary_min,
+            salary_max=body.salary_max,
         )
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc

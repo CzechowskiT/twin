@@ -1,5 +1,7 @@
 """Create or link users from federated OAuth (multi-provider)."""
 
+from datetime import datetime, timezone
+
 from sqlalchemy.orm import Session
 
 from app.database.models import OAuthAccount, User
@@ -16,6 +18,8 @@ def _link_oauth(db: Session, user: User, profile: OAuthUserProfile) -> None:
         db.add(OAuthAccount(user_id=user.id, provider=profile.provider, subject=profile.subject))
     if profile.provider == "linkedin" and not user.linkedin_id:
         user.linkedin_id = profile.subject
+    if not user.email_verified_at:
+        user.email_verified_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(user)
 
@@ -52,7 +56,8 @@ def user_from_oauth(db: Session, profile: OAuthUserProfile) -> User:
     }
     if profile.provider == "linkedin":
         kwargs["linkedin_id"] = profile.subject
-    user = User(**kwargs)
+    now = datetime.now(timezone.utc)
+    user = User(**kwargs, email_verified_at=now)
     db.add(user)
     db.flush()
     db.add(OAuthAccount(user_id=user.id, provider=profile.provider, subject=profile.subject))

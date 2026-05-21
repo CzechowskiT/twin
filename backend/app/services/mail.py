@@ -47,6 +47,27 @@ def send_password_reset_email(settings: Settings, *, to_email: str, reset_url: s
     raise RuntimeError("Mail is not configured")
 
 
+def send_email_verification_email(settings: Settings, *, to_email: str, verify_url: str) -> None:
+    subject = "Verify your TWIN email"
+    text_body = (
+        "Welcome to TWIN. Confirm your email to activate your account fully.\n\n"
+        f"Open this link (valid for a limited time):\n{verify_url}\n\n"
+        "If you did not create an account, ignore this message.\n"
+    )
+    html_body = (
+        "<p>Welcome to TWIN. Confirm your email to activate your account fully.</p>"
+        f'<p><a href="{verify_url}">Verify email</a></p>'
+        "<p>If you did not create an account, ignore this message.</p>"
+    )
+    send_generic_email(
+        settings,
+        to_email=to_email,
+        subject=subject,
+        text_body=text_body,
+        html_body=html_body,
+    )
+
+
 def send_generic_email(
     settings: Settings,
     *,

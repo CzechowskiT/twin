@@ -11,6 +11,11 @@ export default function WorkspaceInvestorPage() {
         lead="workspace.investorHomeLead"
         tools={[
           {
+            href: "/investor/metrics",
+            label: "investorMetrics.title",
+            description: "workspace.toolInvestorMetrics",
+          },
+          {
             href: "/investor/calculator",
             label: "nav.calculatorInvestor",
             description: "workspace.toolInvestorCalc",

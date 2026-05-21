@@ -23,6 +23,7 @@ from app.schemas.auth import (
     GdprConsentIn,
     NotificationPreferencesIn,
     ResetPasswordRequest,
+    VerifyEmailRequest,
     Token,
     UserLogin,
     UserMarketingPreference,
@@ -66,6 +67,11 @@ from app.services.microsoft_calendar_oauth import is_microsoft_calendar_oauth_co
 from app.services.oauth_state import create_oauth_state, verify_oauth_state
 from app.services.oauth_types import OAuthUserProfile
 from app.services.oauth_user import user_from_oauth
+from app.services.email_verification import (
+    issue_verification_email,
+    resend_verification,
+    verify_email_with_token,
+)
 from app.services.password_reset import request_password_reset, reset_password_with_token
 from app.services.referral_public_token import ensure_user_referral_public_token
 from app.services.signup_referrer import (
@@ -232,6 +238,10 @@ def register(request: Request, body: UserRegister, db: Session = Depends(get_db)
         send_welcome_email_task.delay(user.id)
     except Exception:
         pass
+    try:
+        issue_verification_email(db, get_settings(), user)
+    except Exception:
+        pass
     token = create_access_token(user.email)
     out = UserOut.from_user(user)
     return UserRegisteredOut(**out.model_dump(), access_token=token)
@@ -267,6 +277,28 @@ def forgot_password(
     )
     message = request_password_reset(db, settings, str(body.email))
     return {"message": message}
+
+
+@router.post("/verify-email")
+@limiter.limit("10/minute")
+def verify_email(request: Request, body: VerifyEmailRequest, db: Session = Depends(get_db)) -> dict[str, str]:
+    """Confirm email with token from message (same shape as reset-password token field)."""
+    if not verify_email_with_token(db, body.token):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired verification link",
+        )
+    return {"message": "Email verified. You can use all TWIN features."}
+
+
+@router.post("/verify-email/resend")
+@limiter.limit("3/minute")
+def verify_email_resend(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict[str, str]:
+    settings = get_settings()
+    return {"message": resend_verification(db, settings, user)}
 
 
 @router.post("/reset-password")

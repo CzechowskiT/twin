@@ -50,6 +50,10 @@ class ResetPasswordRequest(BaseModel):
     password: str = Field(min_length=8, max_length=128)
 
 
+class VerifyEmailRequest(BaseModel):
+    token: str = Field(min_length=1, max_length=512)
+
+
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
@@ -116,6 +120,8 @@ class UserOut(BaseModel):
     google_calendar_oauth_configured: bool = False
     microsoft_calendar_oauth_configured: bool = False
     onboarding_completed_at: datetime | None = None
+    email_verified_at: datetime | None = None
+    email_verified: bool = False
 
     model_config = {"from_attributes": True}
 
@@ -147,6 +153,8 @@ class UserOut(BaseModel):
                 user, "profile_documents_processing_consent_at", None
             ),
             onboarding_completed_at=getattr(user, "onboarding_completed_at", None),
+            email_verified_at=getattr(user, "email_verified_at", None),
+            email_verified=getattr(user, "email_verified_at", None) is not None,
         )
 
 

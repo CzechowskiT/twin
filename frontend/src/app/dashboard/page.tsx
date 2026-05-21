@@ -12,6 +12,7 @@ import {
   type PlacementFlowBusy,
 } from "@/components/applications-panel";
 import { DashboardCommandCenter } from "@/components/dashboard-command-center";
+import { EmailVerificationBanner } from "@/components/email-verification-banner";
 import { NightlyAutoApplyStrip } from "@/components/nightly-auto-apply-strip";
 import { DashboardTutorial } from "@/components/dashboard/dashboard-tutorial";
 import { FeedbackModal } from "@/components/feedback/feedback-modal";
@@ -1302,6 +1303,7 @@ export default function DashboardPage() {
         <p className="mt-2 text-sm leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.northStarLead")}</p>
       </div>
 
+      {user ? <EmailVerificationBanner /> : null}
       {user ? <NightlyAutoApplyStrip /> : null}
 
       {user ? (

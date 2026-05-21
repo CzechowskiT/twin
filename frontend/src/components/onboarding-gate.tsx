@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 
+import { useTranslation } from "@/components/language-provider";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 
@@ -16,6 +17,7 @@ function shouldBypass(pathname: string): boolean {
 
 /** US-C005: resume onboarding until the user marks it complete. */
 export function OnboardingGate({ children }: { children: ReactNode }) {
+  const { t } = useTranslation();
   const router = useRouter();
   const pathname = usePathname();
   const [ready, setReady] = useState(false);
@@ -47,7 +49,7 @@ export function OnboardingGate({ children }: { children: ReactNode }) {
   }, [pathname, router]);
 
   if (!ready) {
-    return <p className="twin-muted px-4 py-8 text-sm">…</p>;
+    return <p className="twin-muted px-4 py-8 text-sm">{t("common.loadingEllipsis")}</p>;
   }
 
   return <>{children}</>;
