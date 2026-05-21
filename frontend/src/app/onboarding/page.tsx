@@ -12,7 +12,17 @@ import { Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 
-const STEPS = ["welcome", "profile", "calendar", "done"] as const;
+const STEPS = ["welcome", "profile", "skills", "preferences", "cv"] as const;
+const STORAGE_KEY = "twin_onboarding_step_v1";
+
+type StepKey = (typeof STEPS)[number];
+
+function readStoredStep(): number {
+  if (typeof window === "undefined") return 0;
+  const raw = window.localStorage.getItem(STORAGE_KEY);
+  const n = raw ? Number.parseInt(raw, 10) : 0;
+  return Number.isFinite(n) && n >= 0 && n < STEPS.length ? n : 0;
+}
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -21,13 +31,19 @@ export default function OnboardingPage() {
   const [finishing, setFinishing] = useState(false);
 
   useEffect(() => {
-    if (!getToken()) router.replace("/login");
+    if (!getToken()) router.replace("/login/candidate");
+    else setStep(readStoredStep());
   }, [router]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") window.localStorage.setItem(STORAGE_KEY, String(step));
+  }, [step]);
 
   const finish = useCallback(async () => {
     setFinishing(true);
     try {
       await apiFetch("/api/v1/auth/onboarding/complete", { method: "POST" });
+      if (typeof window !== "undefined") window.localStorage.removeItem(STORAGE_KEY);
       confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
       toast.success(t("onboardingFlow.doneToast"));
       router.push("/dashboard");
@@ -38,8 +54,14 @@ export default function OnboardingPage() {
     }
   }, [router, t]);
 
-  const key = STEPS[step] ?? "welcome";
+  const key: StepKey = STEPS[step] ?? "welcome";
   const isLast = step >= STEPS.length - 1;
+
+  const profileCta = (
+    <Link href="/profile" className="twin-btn-solid twin-touch-target mb-4 inline-block text-center">
+      {t("onboarding.profileLink")}
+    </Link>
+  );
 
   return (
     <Shell rail>
@@ -56,20 +78,10 @@ export default function OnboardingPage() {
               {t("onboardingFlow.progressLabel")} {step + 1}/{STEPS.length}
             </p>
             <h1 className="mb-2 text-2xl font-semibold">{t(`onboardingFlow.${key}Title` as TranslationKey)}</h1>
-            <p className="twin-muted mb-6 text-sm leading-relaxed">{t(`onboardingFlow.${key}Body` as TranslationKey)}</p>
-            {key === "profile" ? (
-              <Link href="/profile" className="twin-btn-solid twin-touch-target mb-4 inline-block text-center">
-                {t("onboarding.profileLink")}
-              </Link>
-            ) : null}
-            {key === "calendar" ? (
-              <Link
-                href="/dashboard"
-                className="twin-btn-secondary twin-touch-target mb-4 inline-block text-center text-sm"
-              >
-                {t("onboardingFlow.calendarLink")}
-              </Link>
-            ) : null}
+            <p className="twin-muted mb-6 text-sm leading-relaxed">
+              {t(`onboardingFlow.${key}Body` as TranslationKey)}
+            </p>
+            {key !== "welcome" ? profileCta : null}
             <div className="flex flex-wrap gap-3">
               {!isLast ? (
                 <button type="button" className="twin-btn-solid twin-touch-target" onClick={() => setStep((s) => s + 1)}>
