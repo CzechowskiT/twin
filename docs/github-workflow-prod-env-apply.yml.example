@@ -1,0 +1,46 @@
+# Apply production env to Railway when RAILWAY_TOKEN repo secret is set.
+# GitHub → Settings → Secrets → Actions: RAILWAY_TOKEN (Railway account token).
+name: prod-env-apply
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - cursor/phase1-monorepo-scaffold
+
+jobs:
+  railway-env:
+    if: ${{ secrets.RAILWAY_TOKEN != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Apply Railway API env
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          chmod +x scripts/*.sh
+          # CI has no .env.railway — inject from GitHub secrets (add as needed)
+          touch .env.railway
+          {
+            echo "RAILWAY_API_URL=${{ vars.RAILWAY_API_URL || 'https://twin-production-bcd9.up.railway.app' }}"
+            echo "FRONTEND_URL=${{ vars.FRONTEND_URL || 'https://twin-sooty.vercel.app' }}"
+            echo "API_URL=${{ vars.RAILWAY_API_URL || 'https://twin-production-bcd9.up.railway.app' }}"
+            echo "CELERY_BROKER_URL=\${{Redis.REDIS_URL}}"
+            echo "CELERY_RESULT_BACKEND=\${{Redis.REDIS_URL}}"
+            echo "CELERY_TASK_ALWAYS_EAGER=false"
+            echo "SCRAPE_WORKER_READY=true"
+            echo "SCRAPE_BEAT_ENABLED=true"
+            echo "ENVIRONMENT=production"
+          } >> .env.railway
+          echo "OPS_ADMIN_TOKEN=${{ secrets.OPS_ADMIN_TOKEN }}" >> .env.railway
+          echo "RECRUITER_INBOX_TOKEN=${{ secrets.RECRUITER_INBOX_TOKEN }}" >> .env.railway
+          echo "PARTNER_EXPORT_TOKEN=${{ secrets.PARTNER_EXPORT_TOKEN }}" >> .env.railway
+          echo "RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}" >> .env.railway
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env.railway
+          npx --yes @railway/cli@4 link --yes 2>/dev/null || true
+          ./scripts/railway-apply-production-env.sh || exit 1
+      - name: Prod health smoke
+        run: ./scripts/verify-prod-health.sh || true

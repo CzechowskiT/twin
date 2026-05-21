@@ -4,6 +4,8 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
+# shellcheck source=/dev/null
+source "$ROOT/scripts/railway-auth.sh"
 
 ENV_FILE="${RAILWAY_ENV_FILE:-.env.railway}"
 WORKER_SERVICE="${RAILWAY_WORKER_SERVICE:-twin-worker}"
@@ -13,10 +15,8 @@ if [[ ! -f "$ENV_FILE" ]]; then
   exit 1
 fi
 
-# shellcheck disable=SC1090
-set -a
-source "$ENV_FILE"
-set +a
+# shellcheck disable=SC1091
+source "$ROOT/scripts/load-env-railway.sh" "$ENV_FILE"
 
 CLI=(npx --yes @railway/cli@4)
 

@@ -6,15 +6,15 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 ENV_FILE="${VERCEL_ENV_FILE:-$ROOT/.env.railway}"
 FRONTEND="$ROOT/frontend"
 
+export VERCEL_TOKEN="${VERCEL_TOKEN:-$(grep -E '^VERCEL_TOKEN=' "$ENV_FILE" 2>/dev/null | head -1 | cut -d= -f2- || true)}"
+
 if [[ ! -f "$ENV_FILE" ]]; then
   echo "Missing $ENV_FILE — run ./scripts/generate-deploy-secrets.sh first." >&2
   exit 1
 fi
 
-# shellcheck disable=SC1090
-set -a
-source "$ENV_FILE"
-set +a
+# shellcheck disable=SC1091
+source "$ROOT/scripts/load-env-railway.sh" "$ENV_FILE"
 
 CLI=(npx --yes vercel@latest)
 

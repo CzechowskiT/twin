@@ -36,6 +36,7 @@ upsert "OPS_ADMIN_TOKEN" "$OPS"
 upsert "BETA_ADMIN_TOKEN" "$OPS"
 upsert "RECRUITER_INBOX_TOKEN" "$RECR"
 upsert "PARTNER_EXPORT_TOKEN" "$(gen)"
+upsert "SECRET_KEY" "$(gen)"
 
-echo "Done. Apply to Railway: ./scripts/railway-apply-production-env.sh"
+echo "Done. Apply to Railway: ./scripts/apply-prod-autonomous.sh"
 echo "Sync Vercel (after vercel login): ./scripts/vercel-apply-production-env.sh"

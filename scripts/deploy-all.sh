@@ -4,7 +4,13 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
+# Prefer full autonomous path (same as deploy-all tail):
+# ./scripts/apply-prod-autonomous.sh
+
+./scripts/ensure-env-railway.sh
 ./scripts/generate-deploy-secrets.sh
+# shellcheck source=/dev/null
+source "$ROOT/scripts/railway-auth.sh"
 
 if npx --yes @railway/cli@4 whoami >/dev/null 2>&1; then
   ./scripts/railway-apply-production-env.sh

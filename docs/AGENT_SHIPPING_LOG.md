@@ -1,5 +1,14 @@
 # Agent shipping log
 
+## 2026-05-21 — Prod autonomous apply (env fix + CI)
+
+- Fixed `API_URL` not applied to Railway (`RAILWAY_API_URL` → `API_URL`).
+- `load-env-railway.sh` — safe parse of `${{Redis.REDIS_URL}}` (no bash `source` break).
+- `apply-prod-autonomous.sh`, `verify-prod-health.sh`, `ensure-env-railway.sh`, GitHub `prod-env-apply.yml`.
+- `docs/PROD_AUTONOMOUS.md` — one-command + GitHub secrets table.
+
+**Prod gaps until Railway vars pasted:** `ops_admin_configured`, `celery_task_always_eager` (needs `CELERY_BROKER_URL` + `OPS_ADMIN_TOKEN` on API).
+
 ## 2026-05-21 — Worker env automation + branch sync
 
 - `scripts/railway-apply-worker-env.sh` + `deploy-all.sh` calls it after API vars.

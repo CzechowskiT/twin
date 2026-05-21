@@ -2,6 +2,14 @@
 
 Plik z hasłami na Macu: **`.env.railway`** (ukryty — w Finderze: `Cmd + Shift + .`).
 
+## Agent / jedna komenda (zalecane)
+
+```bash
+./scripts/apply-prod-autonomous.sh
+```
+
+Pełny opis: `docs/PROD_AUTONOMOUS.md`. Jeśli Railway CLI nie jest podlinkowany, skrypt kopiuje zmienne do schowka — wklej w Raw Editor (poniżej).
+
 ## Sposób najszybszy (schowek)
 
 ### Railway (API)

@@ -4,6 +4,8 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
+# shellcheck source=/dev/null
+source "$ROOT/scripts/railway-auth.sh"
 
 ENV_FILE="${RAILWAY_ENV_FILE:-.env.railway}"
 if [[ ! -f "$ENV_FILE" ]]; then
@@ -11,10 +13,8 @@ if [[ ! -f "$ENV_FILE" ]]; then
   exit 1
 fi
 
-# shellcheck disable=SC1090
-set -a
-source "$ENV_FILE"
-set +a
+# shellcheck disable=SC1091
+source "$ROOT/scripts/load-env-railway.sh" "$ENV_FILE"
 
 API_URL="${RAILWAY_API_URL:-}"
 if [[ -z "$API_URL" ]]; then
@@ -25,7 +25,7 @@ fi
 CLI=(npx --yes @railway/cli@4)
 
 if ! "${CLI[@]}" whoami >/dev/null 2>&1; then
-  echo "Not logged in. Run: npx @railway/cli login" >&2
+  echo "Not logged in. Run: npx @railway/cli login OR set RAILWAY_TOKEN in .env.railway" >&2
   exit 1
 fi
 
@@ -40,9 +40,11 @@ set_var() {
   "${CLI[@]}" variables set "$name=$value" --skip-deploys
 }
 
-set_var API_URL "$API_URL"
+set_var API_URL "${API_URL:-${RAILWAY_API_URL:-}}"
 set_var FRONTEND_URL "${FRONTEND_URL:-https://twin-sooty.vercel.app}"
 set_var CORS_ORIGINS "${CORS_ORIGINS:-https://twin-sooty.vercel.app}"
+set_var ENVIRONMENT "${ENVIRONMENT:-production}"
+set_var SECRET_KEY "${SECRET_KEY:-}"
 
 set_var RESEND_API_KEY "${RESEND_API_KEY:-}"
 set_var MAIL_FROM "${MAIL_FROM:-}"
