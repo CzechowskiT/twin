@@ -11,6 +11,7 @@ type AdminMetrics = {
   onboarding_completion_pct: number;
   matches_total: number;
   applications_total: number;
+  disputed_placements: number;
   feedback_count: number;
   feedback_avg_rating: number | null;
   feedback_rating_histogram: Record<string, number>;
@@ -90,6 +91,7 @@ export default function AdminMetricsPage() {
             <Stat label="Onboarding done" value={`${data.onboarding_completed} (${data.onboarding_completion_pct}%)`} />
             <Stat label="Matches" value={String(data.matches_total)} />
             <Stat label="Applications" value={String(data.applications_total)} />
+            <Stat label="Disputed placements" value={String(data.disputed_placements)} />
             <Stat label="Feedback" value={String(data.feedback_count)} />
             <Stat
               label="Avg rating"

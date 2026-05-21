@@ -21,6 +21,11 @@ def build_admin_metrics(db: Session) -> dict:
     )
     matches_total = db.query(func.count(JobMatch.id)).scalar() or 0
     applications_total = db.query(func.count(Application.id)).scalar() or 0
+    from app.database.models import Application
+
+    disputed_placements = (
+        db.query(func.count(Application.id)).filter(Application.placement_state == "disputed").scalar() or 0
+    )
     feedback_count = db.query(func.count(ProductFeedback.id)).scalar() or 0
     avg_rating = db.query(func.avg(ProductFeedback.rating)).scalar()
     rating_histogram = {i: 0 for i in range(1, 6)}
@@ -40,6 +45,7 @@ def build_admin_metrics(db: Session) -> dict:
         else 0.0,
         "matches_total": matches_total,
         "applications_total": applications_total,
+        "disputed_placements": disputed_placements,
         "feedback_count": feedback_count,
         "feedback_avg_rating": round(float(avg_rating), 2) if avg_rating is not None else None,
         "feedback_rating_histogram": rating_histogram,
