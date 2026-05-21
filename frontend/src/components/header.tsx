@@ -18,7 +18,8 @@ import {
 
 function growthCtaClass(variant: GrowthCtaVariant, base: string): string {
   if (variant === "candidate") return `${base} twin-header-cta--roi twin-nav-roi-pill`;
-  if (variant === "investor") return `${base} twin-header-cta--waitlist twin-nav-waitlist-pill`;
+  if (variant === "company") return `${base} twin-header-cta--waitlist twin-nav-waitlist-pill`;
+  if (variant === "investor") return `${base} twin-header-cta--roi twin-nav-roi-pill`;
   return `${base} twin-header-cta--waitlist twin-nav-waitlist-pill`;
 }
 

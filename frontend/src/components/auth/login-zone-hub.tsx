@@ -10,7 +10,8 @@ import type { TranslationKey } from "@/lib/i18n";
 const ZONES: { href: string; title: TranslationKey; lead: TranslationKey }[] = [
   { href: LOGIN_PATH.candidate, title: "login.zoneCandidateTitle", lead: "login.zoneCandidateLead" },
   { href: LOGIN_PATH.recruiter, title: "login.zoneRecruiterTitle", lead: "login.zoneRecruiterLead" },
-  { href: LOGIN_PATH.company, title: "login.zoneInvestorTitle", lead: "login.zoneInvestorLead" },
+  { href: LOGIN_PATH.company, title: "login.zoneCompanyTitle", lead: "login.zoneCompanyLead" },
+  { href: LOGIN_PATH.investor, title: "login.zoneInvestorTitle", lead: "login.zoneInvestorLead" },
 ];
 
 export function LoginZoneHub() {
@@ -19,7 +20,7 @@ export function LoginZoneHub() {
     <Card>
       <h1 className="mb-2 text-2xl font-semibold">{t("login.hubTitle")}</h1>
       <p className="twin-muted mb-6 text-sm leading-relaxed">{t("login.hubLead")}</p>
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {ZONES.map((z) => (
           <Link
             key={z.href}

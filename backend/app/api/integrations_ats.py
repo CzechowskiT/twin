@@ -13,12 +13,59 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
+from app.core.deps import get_current_user
+from app.database.models import User
+from app.schemas.integrations_ats import AtsProviderSetupOut, AtsSetupOut
 from app.database.models import Application, ApplicationStatus
 from app.database.session import get_db
 from app.services.placement_verification import PLACEMENT_VERIFIED, record_placement_event
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
+
+_ATS_PROVIDERS: tuple[tuple[str, str, str, str], ...] = (
+    ("greenhouse", "Greenhouse", "/api/v1/integrations/ats/greenhouse", "X-Greenhouse-Signature"),
+    ("lever", "Lever", "/api/v1/integrations/ats/lever", "X-Lever-Signature"),
+    ("ashby", "Ashby", "/api/v1/integrations/ats/ashby", "Ashby-Signature"),
+)
+
+
+def _secret_configured(settings: Settings, provider: str) -> bool:
+    if provider == "greenhouse":
+        return bool((settings.greenhouse_webhook_secret or "").strip())
+    if provider == "lever":
+        return bool((settings.lever_webhook_secret or "").strip())
+    if provider == "ashby":
+        return bool((settings.ashby_webhook_secret or "").strip())
+    return False
+
+
+@router.get("/ats/setup", response_model=AtsSetupOut)
+def ats_integration_setup(
+    request: Request,
+    settings: Settings = Depends(get_settings),
+    _: User = Depends(get_current_user),
+) -> AtsSetupOut:
+    """Webhook endpoints and secret status for recruiter ATS configuration UI."""
+    base = str(request.base_url).rstrip("/")
+    providers = [
+        AtsProviderSetupOut(
+            provider=pid,
+            display_name=label,
+            webhook_path=path,
+            webhook_url=f"{base}{path}",
+            secret_configured=_secret_configured(settings, pid),
+            signature_header=sig_header,
+        )
+        for pid, label, path, sig_header in _ATS_PROVIDERS
+    ]
+    return AtsSetupOut(
+        providers=providers,
+        linkage_note=(
+            "Set Application.external_ats_id and external_ats_provider on each hire "
+            "so hire webhooks can mark placement verified."
+        ),
+    )
 
 
 def _apply_ats_hire(

@@ -5,11 +5,16 @@ import { WorkspaceLaneHome } from "@/components/workspace-lane-home";
 
 export default function WorkspaceInvestorPage() {
   return (
-    <PersonaWorkspaceGate allowed={["company"]} surface="investor">
+    <PersonaWorkspaceGate allowed={["investor"]} surface="investor">
       <WorkspaceLaneHome
         title="workspace.investorHomeTitle"
         lead="workspace.investorHomeLead"
         tools={[
+          {
+            href: "/investor/data-room",
+            label: "dataRoom.title",
+            description: "workspace.toolInvestorDataRoom",
+          },
           {
             href: "/investor/metrics",
             label: "investorMetrics.title",
@@ -21,14 +26,9 @@ export default function WorkspaceInvestorPage() {
             description: "workspace.toolInvestorCalc",
           },
           {
-            href: "/for-companies",
-            label: "nav.forCompanies",
-            description: "workspace.toolInvestorProgram",
-          },
-          {
-            href: "/companies/signup",
-            label: "workspace.toolInvestorSignup",
-            description: "workspace.toolInvestorSignupDesc",
+            href: "/for-investors",
+            label: "nav.forInvestors",
+            description: "workspace.toolInvestorStory",
           },
         ]}
       />

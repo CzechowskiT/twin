@@ -35,7 +35,8 @@ const SURFACE_COPY: Record<
 const PERSONA_LABEL: Record<MarketingPersona, TranslationKey> = {
   candidate: "nav.personaCandidate",
   recruiter: "nav.personaRecruiter",
-  company: "nav.personaInvestor",
+  company: "nav.personaCompany",
+  investor: "nav.personaInvestor",
 };
 
 const linkClass =
@@ -91,11 +92,16 @@ export function PersonaWorkspaceGate({
   };
 
   const suggested =
-    persona === "company"
+    persona === "investor"
       ? [
-          { href: WORKSPACE_PATH.company, label: "workspace.investorHome" as TranslationKey },
+          { href: WORKSPACE_PATH.investor, label: "workspace.investorHome" as TranslationKey },
           { href: "/investor/calculator", label: "nav.calculatorInvestor" as TranslationKey },
         ]
+      : persona === "company"
+        ? [
+            { href: WORKSPACE_PATH.company, label: "nav.forCompanies" as TranslationKey },
+            { href: "/calculator/b2b", label: "nav.calculatorB2bForCompanies" as TranslationKey },
+          ]
       : persona === "recruiter"
         ? [
             { href: WORKSPACE_PATH.recruiter, label: "workspace.recruiterHome" as TranslationKey },

@@ -43,9 +43,12 @@ const SURFACE_I18N: Record<
   },
 };
 
-function personaLabelKey(persona: MarketingPersona): "nav.personaCandidate" | "nav.personaRecruiter" | "nav.personaInvestor" {
+function personaLabelKey(
+  persona: MarketingPersona,
+): "nav.personaCandidate" | "nav.personaRecruiter" | "nav.personaCompany" | "nav.personaInvestor" {
   if (persona === "recruiter") return "nav.personaRecruiter";
-  if (persona === "company") return "nav.personaInvestor";
+  if (persona === "company") return "nav.personaCompany";
+  if (persona === "investor") return "nav.personaInvestor";
   return "nav.personaCandidate";
 }
 
@@ -89,9 +92,11 @@ export function PersonaSpaceGate({
               {t(
                 persona === "company"
                   ? "dashboard.workspaceGateLinkForCompanies"
-                  : persona === "recruiter"
-                    ? "dashboard.workspaceGateLinkForRecruiters"
-                    : "nav.forCandidates"
+                  : persona === "investor"
+                    ? "nav.forInvestors"
+                    : persona === "recruiter"
+                      ? "dashboard.workspaceGateLinkForRecruiters"
+                      : "nav.forCandidates"
               )}
             </Link>
             {surface !== "calculatorB2b" ? (

@@ -21,13 +21,15 @@ type TokenResponse = { access_token: string };
 const ZONE_TITLE: Record<LoginZone, TranslationKey> = {
   candidate: "login.zoneCandidateTitle",
   recruiter: "login.zoneRecruiterTitle",
-  company: "login.zoneInvestorTitle",
+  company: "login.zoneCompanyTitle",
+  investor: "login.zoneInvestorTitle",
 };
 
 const ZONE_LEAD: Record<LoginZone, TranslationKey> = {
   candidate: "login.zoneCandidateLead",
   recruiter: "login.zoneRecruiterLead",
-  company: "login.zoneInvestorLead",
+  company: "login.zoneCompanyLead",
+  investor: "login.zoneInvestorLead",
 };
 
 export function LoginZoneForm({ zone }: { zone: LoginZone }) {
@@ -94,7 +96,8 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
             {
               candidate: "nav.personaCandidate",
               recruiter: "nav.personaRecruiter",
-              company: "nav.personaInvestor",
+              company: "nav.personaCompany",
+              investor: "nav.personaInvestor",
             } as const
           )[zone],
         )}

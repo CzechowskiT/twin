@@ -47,6 +47,7 @@ export function DashboardCommandCenter({
     actions.push({ href: "#dashboard-applications", label: t("dashboard.quickApplications") });
   }
   actions.push({ href: "/onboarding-assistant", label: t("dashboard.quickWorkspaceTour") });
+  actions.push({ href: "/dashboard/referrals", label: t("dashboard.quickReferrals") });
   actions.push({ href: "/for-candidates#growth-post-offer", label: t("dashboard.quickGrowthPostOffer") });
   if (showScrapeUi) {
     actions.push({ href: "#dashboard-scrape", label: t("dashboard.quickRefreshListings") });

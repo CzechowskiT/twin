@@ -17,7 +17,7 @@ export default function LoginInvestorPage() {
           </Card>
         }
       >
-        <LoginZoneForm zone="company" />
+        <LoginZoneForm zone="investor" />
       </Suspense>
     </Shell>
   );

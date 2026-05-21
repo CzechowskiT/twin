@@ -20,9 +20,16 @@ Source spec: [USER_STORIES_COMPLETE.md](./USER_STORIES_COMPLETE.md) (2617 lines)
 - [ ] Prod job corpus always populated (ops scrape)
 - [ ] Full 50/50 story acceptance criteria from spec
 
+## Slice 2026-05-19 (growth / B2B / investor)
+
+- [x] Referral program UI — `/dashboard/referrals` (link, earnings, leaderboard) → `GET /api/v1/referrals/*`
+- [x] ATS recruiter UI — `/recruiter/integrations/ats` → `GET /api/v1/integrations/ats/setup` + existing webhooks
+- [x] Investor data room (MVP) — `/investor/data-room` (traction pack + confidential placeholders)
+
 ## Not in 16h scope
 
-- ATS integrations (Greenhouse/Lever) — Phase 2+
+- Full ATS OAuth sync (jobs two-way) — webhooks + setup UI only
+- Cap table / audited financials upload — contact-gated placeholders
 - 200+ dedicated endpoints / 1000+ tests per spec fiction
 - Load test 100 concurrent users
 
