@@ -92,8 +92,17 @@ type GoogleCalendarStrip = {
   oauth_redirect_uri?: string | null;
 };
 
+type MicrosoftCalendarStrip = {
+  connected: boolean;
+  microsoft_email: string | null;
+  oauth_configured?: boolean;
+};
+
+const DASHBOARD_WEBCAL_STORAGE_KEY = "twin_dashboard_webcal_url";
+
 type DashboardCalendarBundle = {
-  status: GoogleCalendarStrip;
+  google: GoogleCalendarStrip;
+  microsoft: MicrosoftCalendarStrip;
   nextInterview: {
     id: number;
     company_name: string;
@@ -209,7 +218,7 @@ export default function DashboardPage() {
   const [nextInterviewIcsBusy, setNextInterviewIcsBusy] = useState(false);
   const [dashboardWebcalUrl, setDashboardWebcalUrl] = useState<string | null>(null);
   const [dashboardWebcalBusy, setDashboardWebcalBusy] = useState(false);
-  const [calendarConnectBusy, setCalendarConnectBusy] = useState(false);
+  const [calendarConnectBusy, setCalendarConnectBusy] = useState<"google" | "microsoft" | null>(null);
   const [applicationsCsvBusy, setApplicationsCsvBusy] = useState(false);
   const [applicationsXlsxBusy, setApplicationsXlsxBusy] = useState(false);
   const [matchesCsvBusy, setMatchesCsvBusy] = useState(false);
@@ -271,7 +280,14 @@ export default function DashboardPage() {
 
   const loadGoogleCalendarStrip = useCallback(async (token: string) => {
     try {
-      const s = await apiFetch<GoogleCalendarStrip>("/api/v1/calendar/google/status", {}, token);
+      const [google, microsoft] = await Promise.all([
+        apiFetch<GoogleCalendarStrip>("/api/v1/calendar/google/status", {}, token),
+        apiFetch<MicrosoftCalendarStrip>("/api/v1/calendar/microsoft/status", {}, token).catch(() => ({
+          connected: false,
+          microsoft_email: null,
+          oauth_configured: false,
+        })),
+      ]);
       let nextInterview: DashboardCalendarBundle["nextInterview"] = null;
       try {
         const rows = await apiFetch<
@@ -299,12 +315,22 @@ export default function DashboardPage() {
       } catch {
         nextInterview = null;
       }
-      setDashboardCalendarBundle({ status: s, nextInterview });
+      setDashboardCalendarBundle({ google, microsoft, nextInterview });
     } catch {
       setDashboardCalendarBundle({
-        status: { connected: false, google_email: null },
+        google: { connected: false, google_email: null },
+        microsoft: { connected: false, microsoft_email: null },
         nextInterview: null,
       });
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem(DASHBOARD_WEBCAL_STORAGE_KEY);
+      if (stored?.trim()) setDashboardWebcalUrl(stored.trim());
+    } catch {
+      /* ignore */
     }
   }, []);
 
@@ -938,7 +964,7 @@ export default function DashboardPage() {
   async function connectGoogleCalendarFromDashboard() {
     const token = getToken();
     if (!token) return;
-    setCalendarConnectBusy(true);
+    setCalendarConnectBusy("google");
     setError(null);
     try {
       const res = await apiFetch<{ authorize_url: string }>("/api/v1/calendar/google/authorize", {}, token);
@@ -946,7 +972,22 @@ export default function DashboardPage() {
     } catch (err) {
       setError(dashboardFetchUserMessage(err, t));
     } finally {
-      setCalendarConnectBusy(false);
+      setCalendarConnectBusy(null);
+    }
+  }
+
+  async function connectMicrosoftCalendarFromDashboard() {
+    const token = getToken();
+    if (!token) return;
+    setCalendarConnectBusy("microsoft");
+    setError(null);
+    try {
+      const res = await apiFetch<{ authorize_url: string }>("/api/v1/calendar/microsoft/authorize", {}, token);
+      window.location.href = res.authorize_url;
+    } catch (err) {
+      setError(dashboardFetchUserMessage(err, t));
+    } finally {
+      setCalendarConnectBusy(null);
     }
   }
 
@@ -961,6 +1002,11 @@ export default function DashboardPage() {
         token,
       );
       setDashboardWebcalUrl(out.webcal_url);
+      try {
+        sessionStorage.setItem(DASHBOARD_WEBCAL_STORAGE_KEY, out.webcal_url);
+      } catch {
+        /* ignore */
+      }
     } catch (err) {
       setError(dashboardFetchUserMessage(err, t));
     } finally {
@@ -1201,29 +1247,59 @@ export default function DashboardPage() {
                 <p className="twin-muted mt-1 text-xs leading-relaxed">
                   {dashboardCalendarBundle === null
                     ? t("dashboard.calendarStripLoading")
-                    : dashboardCalendarBundle.status.connected
+                    : dashboardCalendarBundle.google.connected
                       ? t("dashboard.calendarStripConnected").replace(
                           "{email}",
-                          dashboardCalendarBundle.status.google_email?.trim() || "—",
+                          dashboardCalendarBundle.google.google_email?.trim() || "—",
                         )
-                      : dashboardCalendarBundle.status.oauth_configured === false
+                      : dashboardCalendarBundle.google.oauth_configured === false
                         ? t("dashboard.calendarGoogleOAuthNotConfigured")
                         : t("dashboard.calendarStripDisconnected")}
                 </p>
                 {dashboardCalendarBundle &&
-                !dashboardCalendarBundle.status.connected &&
-                dashboardCalendarBundle.status.oauth_configured ? (
+                !dashboardCalendarBundle.google.connected &&
+                dashboardCalendarBundle.google.oauth_configured ? (
                   <Button
                     type="button"
                     className="twin-touch-target mt-3 !w-auto"
-                    disabled={calendarConnectBusy}
+                    disabled={calendarConnectBusy !== null}
                     onClick={() => void connectGoogleCalendarFromDashboard()}
                   >
-                    {calendarConnectBusy ? "…" : t("dashboard.calendarStripConnectGoogle")}
+                    {calendarConnectBusy === "google" ? "…" : t("dashboard.calendarStripConnectGoogle")}
                   </Button>
                 ) : null}
+                {dashboardCalendarBundle ? (
+                  <div className="mt-3 border-t border-[var(--twin-border)] pt-3">
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
+                      Microsoft 365 / Outlook
+                    </p>
+                    <p className="twin-muted mt-1 text-xs leading-relaxed">
+                      {dashboardCalendarBundle.microsoft.connected
+                        ? t("dashboard.calendarStripMicrosoftConnected").replace(
+                            "{email}",
+                            dashboardCalendarBundle.microsoft.microsoft_email?.trim() || "—",
+                          )
+                        : dashboardCalendarBundle.microsoft.oauth_configured === false
+                          ? t("dashboard.calendarMicrosoftOAuthNotConfigured")
+                          : t("dashboard.calendarStripMicrosoftDisconnected")}
+                    </p>
+                    {!dashboardCalendarBundle.microsoft.connected &&
+                    dashboardCalendarBundle.microsoft.oauth_configured ? (
+                      <Button
+                        type="button"
+                        className="twin-touch-target mt-2 !w-auto"
+                        disabled={calendarConnectBusy !== null}
+                        onClick={() => void connectMicrosoftCalendarFromDashboard()}
+                      >
+                        {calendarConnectBusy === "microsoft" ? "…" : t("dashboard.calendarStripConnectMicrosoft")}
+                      </Button>
+                    ) : null}
+                  </div>
+                ) : null}
                 {dashboardCalendarBundle &&
-                (dashboardCalendarBundle.nextInterview || dashboardCalendarBundle.status.connected) ? (
+                (dashboardCalendarBundle.nextInterview ||
+                  dashboardCalendarBundle.google.connected ||
+                  dashboardCalendarBundle.microsoft.connected) ? (
                   <div className="mt-3 border-t border-[var(--twin-border)] pt-3">
                     <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
                       {t("dashboard.calendarNextInterviewTitle")}

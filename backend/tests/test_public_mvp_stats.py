@@ -25,6 +25,7 @@ def _sqlite():
     return sessionmaker(bind=engine, autocommit=False, autoflush=False)()
 
 
+@patch("app.api.public.is_microsoft_calendar_oauth_configured", return_value=False)
 @patch("app.api.public.is_google_calendar_oauth_configured", return_value=False)
 @patch("app.api.public.is_mail_configured", return_value=False)
 @patch("app.api.public._stripe_checkout_ready", return_value=False)
@@ -55,12 +56,14 @@ def test_public_mvp_stats_shape_empty(_mock_li: object, _mock_stripe: object, *_
         assert body["stripe_checkout_ready"] is False
         assert body["mail_configured"] is False
         assert body["google_calendar_configured"] is False
+        assert body["microsoft_calendar_configured"] is False
         assert body["database_reachable"] is True
     finally:
         app.dependency_overrides.pop(get_db, None)
         db.close()
 
 
+@patch("app.api.public.is_microsoft_calendar_oauth_configured", return_value=False)
 @patch("app.api.public.is_google_calendar_oauth_configured", return_value=False)
 @patch("app.api.public.is_mail_configured", return_value=False)
 @patch("app.api.public._stripe_checkout_ready", return_value=False)
@@ -135,6 +138,7 @@ def test_public_mvp_stats_integration_flags_true(_mock_li: object, _mock_stripe:
         db.close()
 
 
+@patch("app.api.public.is_microsoft_calendar_oauth_configured", return_value=False)
 @patch("app.api.public.is_google_calendar_oauth_configured", return_value=False)
 @patch("app.api.public.is_mail_configured", return_value=False)
 @patch("app.api.public._stripe_checkout_ready", return_value=False)

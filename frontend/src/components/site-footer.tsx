@@ -126,6 +126,11 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li>
+                <Link href="/status" className="twin-link font-medium">
+                  {t("site.footerStatus")}
+                </Link>
+              </li>
+              <li>
                 <button
                   type="button"
                   className="twin-link cursor-pointer font-medium text-left"

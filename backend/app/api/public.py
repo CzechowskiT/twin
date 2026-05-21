@@ -15,6 +15,7 @@ from app.database.session import get_db
 from app.scrapers.registry import scrape_board_ids_ordered
 from app.schemas.public import MvpStatsOut
 from app.services.google_calendar_oauth import is_google_calendar_oauth_configured
+from app.services.microsoft_calendar_oauth import is_microsoft_calendar_oauth_configured
 from app.services.linkedin_oauth import is_linkedin_oauth_configured
 from app.services.mail import is_mail_configured
 from app.api.health import _database_reachable
@@ -54,6 +55,7 @@ def mvp_stats(db: Session = Depends(get_db)) -> MvpStatsOut:
             stripe_checkout_ready=_stripe_checkout_ready(s),
             mail_configured=is_mail_configured(s),
             google_calendar_configured=is_google_calendar_oauth_configured(),
+            microsoft_calendar_configured=is_microsoft_calendar_oauth_configured(),
             database_reachable=_database_reachable(db.get_bind()),
             generated_at=datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         )

@@ -11,6 +11,7 @@ type MvpStats = {
   database_reachable: boolean;
   mail_configured: boolean;
   google_calendar_configured: boolean;
+  microsoft_calendar_configured: boolean;
   stripe_checkout_ready: boolean;
   generated_at: string;
 };
@@ -75,6 +76,16 @@ export default function StatusPage() {
               label={t("status.calendar")}
               value={stats.google_calendar_configured ? t("status.configured") : t("status.notConfigured")}
               ok={stats.google_calendar_configured}
+            />
+            <Row
+              label={t("status.microsoftCalendar")}
+              value={stats.microsoft_calendar_configured ? t("status.configured") : t("status.notConfigured")}
+              ok={stats.microsoft_calendar_configured}
+            />
+            <Row
+              label={t("status.stripe")}
+              value={stats.stripe_checkout_ready ? t("status.configured") : t("status.notConfigured")}
+              ok={stats.stripe_checkout_ready}
             />
             <Row label={t("status.validatedJobs")} value={String(stats.validated_jobs)} ok={stats.validated_jobs > 0} />
             <Row label={t("status.git")} value={health.git_commit ?? "unknown"} ok />

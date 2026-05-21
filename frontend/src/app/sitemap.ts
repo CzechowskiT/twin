@@ -21,6 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/calculator",
     "/privacy",
     "/terms",
+    "/status",
   ];
   const now = new Date();
   return routes.map((path) => ({

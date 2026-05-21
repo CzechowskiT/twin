@@ -30,6 +30,9 @@ class MvpStatsOut(BaseModel):
     google_calendar_configured: bool = Field(
         description="True when Google Calendar OAuth client id, secret, and redirect URI are configured.",
     )
+    microsoft_calendar_configured: bool = Field(
+        description="True when Microsoft Calendar OAuth client id, secret, and redirect URI are configured.",
+    )
     database_reachable: bool = Field(
         description="True when the API can run SELECT 1 against the configured database.",
     )
