@@ -214,6 +214,7 @@ def run_nightly_auto_apply_sweep(*, dry_run: bool = False) -> dict[str, Any]:
     try:
         consents = (
             db.query(AutoApplyConsent, User)
+            .select_from(AutoApplyConsent)
             .join(Candidate, AutoApplyConsent.candidate_id == Candidate.id)
             .join(User, Candidate.user_id == User.id)
             .filter(

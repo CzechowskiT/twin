@@ -31,8 +31,12 @@ TWIN can apply to top Pracuj.pl matches while the candidate sleeps.
 ## Production
 
 1. Migration: `alembic upgrade head` (revision `037_auto_apply_consent_nightly`).
+   - Local: `cd backend && alembic upgrade head`
+   - Railway: `./scripts/railway-alembic-upgrade.sh` (linked CLI + service `twin`)
 2. Railway **worker** service with Redis broker (`CELERY_BROKER_URL`), `CELERY_TASK_ALWAYS_EAGER=false`.
 3. Worker runs beat + worker (`deploy/railway-worker.toml`).
+4. Smoke: `./scripts/verify-prod-health.sh` and `GET /api/v1/health/celery-status`.
+5. One-shot env: `./scripts/apply-prod-autonomous.sh`
 
 ## Investor demo
 

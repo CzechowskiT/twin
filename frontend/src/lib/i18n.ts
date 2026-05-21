@@ -687,6 +687,11 @@ const en = {
     nightlyAutoApplyConsentCancel: "Cancel",
     nightlyAutoApplySupportedBoards: "Supported boards",
     nightlyAutoApplyNeedProfile: "Complete your candidate profile and upload a CV first.",
+    nightlyAutoApplyStripTitle: "Nightly auto-apply",
+    nightlyAutoApplyStripActive:
+      "Active — next run {next}. Total auto-applications: {total}.",
+    nightlyAutoApplyStripInactive: "Off — enable to apply to top matches while you sleep.",
+    nightlyAutoApplyStripCta: "Settings",
     workspaceGateTitleRecruiter: "Recruiter workspace",
     workspaceGateTitleCompany: "Company workspace",
     workspaceGateLeadRecruiter:
@@ -2283,6 +2288,12 @@ const pl: MessageTree = {
     nightlyAutoApplyConsentCancel: "Anuluj",
     nightlyAutoApplySupportedBoards: "Obsługiwane portale",
     nightlyAutoApplyNeedProfile: "Uzupełnij profil kandydata i wgraj CV.",
+    nightlyAutoApplyStripTitle: "Auto-aplikowanie nocne",
+    nightlyAutoApplyStripActive:
+      "Włączone — następne uruchomienie {next}. Łącznie auto-aplikacji: {total}.",
+    nightlyAutoApplyStripInactive:
+      "Wyłączone — włącz, aby aplikować do najlepszych ofert, gdy śpisz.",
+    nightlyAutoApplyStripCta: "Ustawienia",
     workspaceGateTitleRecruiter: "Widok rekrutera",
     workspaceGateTitleCompany: "Widok firmy",
     workspaceGateLeadRecruiter:

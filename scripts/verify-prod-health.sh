@@ -29,6 +29,19 @@ check ops_admin_configured True
 check celery_task_always_eager False
 check scrape_worker_ready True
 
+celery_json=$(curl -fsS "${API%/}/api/v1/health/celery-status" 2>/dev/null || echo "{}")
+echo "Celery status:"
+echo "$celery_json" | python3 -m json.tool 2>/dev/null || echo "$celery_json"
+celery_eager=$(echo "$celery_json" | python3 -c "import sys,json; print(json.load(sys.stdin).get('celery_task_always_eager'))" 2>/dev/null || echo "None")
+if [[ "$celery_eager" != "False" ]]; then
+  echo "WARN: celery-status eager=$celery_eager (expected False for background beat)"
+  fail=1
+fi
+beat_nightly=$(echo "$celery_json" | python3 -c "import sys,json; print(json.load(sys.stdin).get('beat_schedule_has_nightly'))" 2>/dev/null || echo "None")
+if [[ "$beat_nightly" != "True" ]]; then
+  echo "WARN: beat_schedule_has_nightly=$beat_nightly"
+fi
+
 code=$(curl -fsS -o /dev/null -w "%{http_code}" "${FE%/}/status" || echo "000")
 if [[ "$code" != "200" ]]; then
   echo "FAIL: frontend /status HTTP $code"

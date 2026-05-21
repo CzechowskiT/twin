@@ -1,6 +1,6 @@
 # TWIN — Autonomous Career Agent
 
-AI-powered career agent: scrape jobs (pracuj.pl, rocketjobs.pl, LinkedIn), match candidates, track applications.
+AI-powered career agent: scrape jobs (pracuj.pl, rocketjobs.pl, LinkedIn), match candidates, track applications, optional **nightly auto-apply** (consent + Celery beat — see [docs/NIGHTLY_AUTO_APPLY.md](docs/NIGHTLY_AUTO_APPLY.md)).
 
 ## Stack
 
