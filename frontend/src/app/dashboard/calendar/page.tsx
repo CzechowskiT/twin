@@ -9,6 +9,13 @@ import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch, apiFetchBlob, saveBlobAsFile } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
 import type { TranslationKey } from "@/lib/i18n";
+import {
+  mintAndOpenWebcalSubscribe,
+  mintWebcalFeed,
+  persistWebcalUrl,
+  readStoredWebcalUrl,
+  webcalToHttps,
+} from "@/lib/webcal-subscribe";
 
 type CalendarStatus = {
   connected: boolean;
@@ -53,13 +60,6 @@ type MicrosoftCalendarStatus = {
 };
 
 type AuthorizePayload = { authorize_url: string };
-
-type WebcalFeedOut = {
-  token: string;
-  expires_at: string;
-  subscribe_path: string;
-  webcal_url: string;
-};
 
 type FreeBusyOut = { busy: { start: string; end: string }[] };
 
@@ -328,18 +328,36 @@ export default function DashboardCalendarPage() {
     }
   }
 
+  useEffect(() => {
+    const stored = readStoredWebcalUrl();
+    if (stored) setWebcalUrl(stored);
+  }, []);
+
+  async function subscribeWebcalOneClick() {
+    const token = getToken();
+    if (!token) return;
+    setActionBusy("webcal");
+    setActionError(false);
+    try {
+      const out = await mintAndOpenWebcalSubscribe(token);
+      setWebcalUrl(out.webcal_url);
+    } catch (e) {
+      setActionError(true);
+      console.warn("[calendar] webcal subscribe failed", e);
+    } finally {
+      setActionBusy(null);
+    }
+  }
+
   async function generateWebcalLink() {
     const token = getToken();
     if (!token) return;
     setActionBusy("webcal");
     setActionError(false);
     try {
-      const out = await apiFetch<WebcalFeedOut>(
-        "/api/v1/calendar/me/webcal-token",
-        { method: "POST", body: "{}" },
-        token,
-      );
+      const out = await mintWebcalFeed(token);
       setWebcalUrl(out.webcal_url);
+      persistWebcalUrl(out.webcal_url);
     } catch (e) {
       setActionError(true);
       console.warn("[calendar] webcal mint failed", e);
@@ -683,26 +701,41 @@ export default function DashboardCalendarPage() {
       <Card className="mb-6">
         <h2 className="text-base font-semibold text-[var(--foreground)]">{t("dashboard.calendarWebcalTitle")}</h2>
         <p className="twin-muted mt-2 max-w-2xl text-sm leading-relaxed">{t("dashboard.calendarWebcalHint")}</p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Button
-            type="button"
-            className="twin-touch-target"
-            disabled={Boolean(actionBusy)}
-            onClick={() => void generateWebcalLink()}
-          >
-            {actionBusy === "webcal" ? "…" : t("dashboard.calendarWebcalGenerate")}
-          </Button>
+        <div className="mt-4 flex flex-col gap-3">
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              className="twin-touch-target"
+              disabled={Boolean(actionBusy)}
+              onClick={() => void subscribeWebcalOneClick()}
+            >
+              {actionBusy === "webcal" ? "…" : t("dashboard.calendarWebcalOneClick")}
+            </Button>
+            <Button
+              type="button"
+              className="twin-btn-secondary twin-touch-target"
+              disabled={Boolean(actionBusy)}
+              onClick={() => void generateWebcalLink()}
+            >
+              {actionBusy === "webcal" ? "…" : t("dashboard.calendarWebcalGenerate")}
+            </Button>
+          </div>
           {webcalUrl ? (
-            <>
-              <input readOnly value={webcalUrl} className="twin-input min-w-0 flex-1 text-sm" aria-label="WebCal URL" />
+            <div className="flex flex-wrap gap-2">
+              <input
+                readOnly
+                value={webcalToHttps(webcalUrl)}
+                className="twin-input min-w-0 flex-1 text-sm"
+                aria-label="WebCal URL"
+              />
               <Button
                 type="button"
                 className="twin-btn-secondary twin-touch-target shrink-0"
-                onClick={() => void navigator.clipboard.writeText(webcalUrl)}
+                onClick={() => void navigator.clipboard.writeText(webcalToHttps(webcalUrl))}
               >
                 {t("dashboard.calendarWebcalCopy")}
               </Button>
-            </>
+            </div>
           ) : null}
         </div>
       </Card>

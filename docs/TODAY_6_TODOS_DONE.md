@@ -4,7 +4,7 @@
 |---|------|--------|--------|
 | 1 | Commit header refactor + push | Done | `23be2fe` fix(header): SaaS layout |
 | 2 | Interview reminder beat + placement retention emails | Done | `5728aa1` + `backend/app/tasks/reminder_tasks.py`, beat in `celery_app.py` |
-| 3 | Dashboard WebCal one-click from calendar strip | Done | `4ec621b` — `mintDashboardWebcalLink()` on `/dashboard`, sessionStorage persist |
+| 3 | Dashboard WebCal one-click from calendar strip | Done | `mintAndOpenWebcalSubscribe()` — opens `webcal://` from dashboard strip + `/dashboard/calendar`, sessionStorage persist |
 | 4 | FE empty state for zero jobs on dashboard feed | Done | `4ec621b` — `jobsEmptyZero*` when `jobs.total === 0` |
 | 5 | Public health/database on marketing status + scrape ops docs | Done | `/status` + `database_reachable` on mvp-stats (`4ec621b`), `docs/SCRAPE_OPS.md` |
 | 6 | Tests, build, commit push merge scaffold | Done | pytest + `npm run build` green; branch `cursor/phase1-monorepo-scaffold` pushed (`665bd9c`+) |

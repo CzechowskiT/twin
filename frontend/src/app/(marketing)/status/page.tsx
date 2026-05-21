@@ -91,6 +91,9 @@ export default function StatusPage() {
             <Row label={t("status.git")} value={health.git_commit ?? "unknown"} ok />
           </dl>
         ) : null}
+        {stats && stats.validated_jobs === 0 ? (
+          <p className="twin-muted mt-4 text-sm leading-relaxed">{t("status.scrapeOpsZeroHint")}</p>
+        ) : null}
         <p className="twin-muted mt-6 text-xs">
           {stats ? `${t("status.generated")} ${stats.generated_at}` : null}
         </p>

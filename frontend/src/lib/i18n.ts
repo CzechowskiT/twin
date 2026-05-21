@@ -692,8 +692,9 @@ const en = {
     calendarStripConnectGoogle: "Connect Google Calendar",
     calendarStripCta: "Open calendar settings",
     calendarStripWebcalGenerate: "Subscribe all interviews (WebCal)",
+    calendarStripWebcalOneClick: "Open in calendar app",
     calendarStripWebcalCopy: "Copy subscribe URL",
-    calendarStripWebcalHint: "One click — paste into Apple Calendar, Outlook, or Google via URL.",
+    calendarStripWebcalHint: "One click opens your calendar app — or copy the URL for Google Calendar.",
     calendarStripWebcalRegenerate: "New subscribe link",
     calendarStripMicrosoftConnected: "Microsoft Calendar connected as {email}.",
     calendarStripMicrosoftDisconnected: "Microsoft Calendar not connected — connect for corporate Outlook schedules.",
@@ -730,6 +731,7 @@ const en = {
     calendarWebcalHint:
       "Generate a private WebCal link (Apple Calendar, Outlook, Google via URL). Refreshes with your upcoming TWIN interviews.",
     calendarWebcalGenerate: "Generate subscribe link",
+    calendarWebcalOneClick: "Open in calendar app",
     calendarWebcalCopy: "Copy WebCal URL",
     calendarProviderAppleTitle: "Apple Calendar (iCloud)",
     calendarProviderAppleBody:
@@ -1153,6 +1155,8 @@ const en = {
     microsoftCalendar: "Microsoft Calendar OAuth",
     stripe: "Stripe Checkout",
     validatedJobs: "Validated jobs (public count)",
+    scrapeOpsZeroHint:
+      "Zero validated jobs usually means scrape worker or ops allowlist is not configured yet — see docs/SCRAPE_OPS.md in the repo and /developers.",
     git: "Deploy commit",
     up: "reachable",
     down: "unreachable",
@@ -2259,8 +2263,9 @@ const pl: MessageTree = {
     calendarStripConnectGoogle: "Połącz Google Calendar",
     calendarStripCta: "Ustawienia kalendarza",
     calendarStripWebcalGenerate: "Subskrybuj rozmowy (WebCal)",
+    calendarStripWebcalOneClick: "Otwórz w aplikacji kalendarza",
     calendarStripWebcalCopy: "Kopiuj URL subskrypcji",
-    calendarStripWebcalHint: "Jeden klik — wklej w Apple Calendar, Outlook lub Google przez URL.",
+    calendarStripWebcalHint: "Jeden klik otwiera kalendarz — lub skopiuj URL do Google Calendar.",
     calendarStripWebcalRegenerate: "Nowy link subskrypcji",
     calendarStripMicrosoftConnected: "Microsoft Calendar: połączono jako {email}.",
     calendarStripMicrosoftDisconnected: "Brak połączenia z Microsoft Calendar — podłącz Outlook służbowy.",
@@ -2297,6 +2302,7 @@ const pl: MessageTree = {
     calendarWebcalHint:
       "Wygeneruj prywatny link WebCal (Apple Calendar, Outlook, Google przez URL). Odświeża nadchodzące rozmowy z TWIN.",
     calendarWebcalGenerate: "Wygeneruj link subskrypcji",
+    calendarWebcalOneClick: "Otwórz w aplikacji kalendarza",
     calendarWebcalCopy: "Kopiuj URL WebCal",
     calendarProviderAppleTitle: "Apple Calendar (iCloud)",
     calendarProviderAppleBody:
@@ -2729,6 +2735,8 @@ const pl: MessageTree = {
     microsoftCalendar: "OAuth Microsoft Calendar",
     stripe: "Stripe Checkout",
     validatedJobs: "Oferty zwalidowane (licznik publiczny)",
+    scrapeOpsZeroHint:
+      "Zero ofert zwykle oznacza brak workera scrape lub allowlisty ops — zobacz docs/SCRAPE_OPS.md w repo oraz /developers.",
     git: "Commit deployu",
     up: "osiągalna",
     down: "niedostępna",

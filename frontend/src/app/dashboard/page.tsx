@@ -34,6 +34,13 @@ import {
   type JobFilters,
   JOB_FEED_PAGE_MAX,
 } from "@/lib/jobs";
+import {
+  mintAndOpenWebcalSubscribe,
+  mintWebcalFeed,
+  persistWebcalUrl,
+  readStoredWebcalUrl,
+  webcalToHttps,
+} from "@/lib/webcal-subscribe";
 
 type User = {
   id: number;
@@ -98,8 +105,6 @@ type MicrosoftCalendarStrip = {
   microsoft_email: string | null;
   oauth_configured?: boolean;
 };
-
-const DASHBOARD_WEBCAL_STORAGE_KEY = "twin_dashboard_webcal_url";
 
 type DashboardCalendarBundle = {
   google: GoogleCalendarStrip;
@@ -330,12 +335,8 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
-    try {
-      const stored = sessionStorage.getItem(DASHBOARD_WEBCAL_STORAGE_KEY);
-      if (stored?.trim()) setDashboardWebcalUrl(stored.trim());
-    } catch {
-      /* ignore */
-    }
+    const stored = readStoredWebcalUrl();
+    if (stored) setDashboardWebcalUrl(stored);
   }, []);
 
   const refreshDashboardData = useCallback(
@@ -995,22 +996,28 @@ export default function DashboardPage() {
     }
   }
 
-  async function mintDashboardWebcalLink() {
+  async function subscribeDashboardWebcalOneClick() {
     const token = getToken();
     if (!token) return;
     setDashboardWebcalBusy(true);
     try {
-      const out = await apiFetch<{ webcal_url: string }>(
-        "/api/v1/calendar/me/webcal-token",
-        { method: "POST", body: "{}" },
-        token,
-      );
+      const out = await mintAndOpenWebcalSubscribe(token);
       setDashboardWebcalUrl(out.webcal_url);
-      try {
-        sessionStorage.setItem(DASHBOARD_WEBCAL_STORAGE_KEY, out.webcal_url);
-      } catch {
-        /* ignore */
-      }
+    } catch (err) {
+      setError(dashboardFetchUserMessage(err, t));
+    } finally {
+      setDashboardWebcalBusy(false);
+    }
+  }
+
+  async function refreshDashboardWebcalLink() {
+    const token = getToken();
+    if (!token) return;
+    setDashboardWebcalBusy(true);
+    try {
+      const out = await mintWebcalFeed(token);
+      setDashboardWebcalUrl(out.webcal_url);
+      persistWebcalUrl(out.webcal_url);
     } catch (err) {
       setError(dashboardFetchUserMessage(err, t));
     } finally {
@@ -1445,15 +1452,15 @@ export default function DashboardPage() {
                   type="button"
                   className="twin-btn-solid twin-touch-target text-sm"
                   disabled={dashboardWebcalBusy}
-                  onClick={() => void mintDashboardWebcalLink()}
+                  onClick={() => void subscribeDashboardWebcalOneClick()}
                 >
-                  {dashboardWebcalBusy ? "…" : t("dashboard.calendarStripWebcalGenerate")}
+                  {dashboardWebcalBusy ? "…" : t("dashboard.calendarStripWebcalOneClick")}
                 </button>
                 {dashboardWebcalUrl ? (
                   <div className="flex flex-col gap-1">
                     <input
                       readOnly
-                      value={dashboardWebcalUrl}
+                      value={webcalToHttps(dashboardWebcalUrl)}
                       className="twin-input text-xs"
                       aria-label="WebCal subscribe URL"
                     />
@@ -1461,7 +1468,7 @@ export default function DashboardPage() {
                       <button
                         type="button"
                         className="twin-btn-secondary text-xs"
-                        onClick={() => void navigator.clipboard.writeText(dashboardWebcalUrl)}
+                        onClick={() => void navigator.clipboard.writeText(webcalToHttps(dashboardWebcalUrl))}
                       >
                         {t("dashboard.calendarStripWebcalCopy")}
                       </button>
@@ -1469,7 +1476,7 @@ export default function DashboardPage() {
                         type="button"
                         className="twin-btn-secondary text-xs"
                         disabled={dashboardWebcalBusy}
-                        onClick={() => void mintDashboardWebcalLink()}
+                        onClick={() => void refreshDashboardWebcalLink()}
                       >
                         {dashboardWebcalBusy ? "…" : t("dashboard.calendarStripWebcalRegenerate")}
                       </button>
@@ -1869,17 +1876,19 @@ export default function DashboardPage() {
                   .replace("{total}", String(jobs.total))}
               </p>
             ) : null}
-            <JobList
-              items={jobs.items}
-              showScore={hasProfile}
-              applicationStatus={displayApplicationStatus}
-              onApply={hasProfile ? applyToJob : undefined}
-              onAutoApply={hasProfile ? autoApplyToJob : undefined}
-              autoApplyJobId={autoApplyingId}
-              onSave={hasProfile ? saveJob : undefined}
-              onDismiss={hasProfile ? dismissJob : undefined}
-            />
-            {jobs.items.length < jobs.total ? (
+            {jobs.total > 0 ? (
+              <JobList
+                items={jobs.items}
+                showScore={hasProfile}
+                applicationStatus={displayApplicationStatus}
+                onApply={hasProfile ? applyToJob : undefined}
+                onAutoApply={hasProfile ? autoApplyToJob : undefined}
+                autoApplyJobId={autoApplyingId}
+                onSave={hasProfile ? saveJob : undefined}
+                onDismiss={hasProfile ? dismissJob : undefined}
+              />
+            ) : null}
+            {jobs.total > 0 && jobs.items.length < jobs.total ? (
               <div className="mt-4 flex justify-center">
                 <button
                   type="button"
