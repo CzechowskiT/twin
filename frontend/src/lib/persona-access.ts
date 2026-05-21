@@ -19,7 +19,7 @@ const PATH_IMPLIES_PERSONA: { prefix: string; persona: MarketingPersona }[] = [
   { prefix: "/for-recruiters", persona: "recruiter" },
   { prefix: "/recruiter", persona: "recruiter" },
   { prefix: "/for-companies", persona: "company" },
-  { prefix: "/calculator/b2b", persona: "company" },
+  /** /calculator/b2b is linked from every persona header — do not force company on visit. */
   { prefix: "/calculator", persona: "company" },
 ];
 
@@ -28,7 +28,7 @@ const PREFIX_ALLOWED: { prefix: string; allowed: readonly MarketingPersona[] }[]
   { prefix: "/dashboard", allowed: ["candidate"] },
   { prefix: "/profile", allowed: ["candidate"] },
   { prefix: "/onboarding", allowed: ["candidate"] },
-  { prefix: "/calculator/b2b", allowed: ["company"] },
+  { prefix: "/calculator/b2b", allowed: ["company", "candidate", "recruiter"] },
   { prefix: "/calculator", allowed: ["company"] },
   { prefix: "/recruiter", allowed: ["recruiter", "company"] },
   { prefix: "/for-recruiters", allowed: ["recruiter", "candidate", "company"] },
@@ -69,11 +69,18 @@ function normalizePath(pathname: string): string {
   return base || "/";
 }
 
+function pathMatchesPersonaPrefix(path: string, prefix: string): boolean {
+  if (path === prefix) return true;
+  // Investor model at /calculator only — /calculator/b2b stays on the user's chosen persona.
+  if (prefix === "/calculator") return false;
+  return path.startsWith(`${prefix}/`);
+}
+
 export function marketingPersonaFromPathExtended(pathname: string): MarketingPersona | null {
   const path = normalizePath(pathname);
   let best: { prefix: string; persona: MarketingPersona } | null = null;
   for (const row of PATH_IMPLIES_PERSONA) {
-    if (path === row.prefix || path.startsWith(`${row.prefix}/`)) {
+    if (pathMatchesPersonaPrefix(path, row.prefix)) {
       if (!best || row.prefix.length > best.prefix.length) best = row;
     }
   }
@@ -135,7 +142,7 @@ export function headerGrowthLinksForPersona(persona: MarketingPersona): HeaderGr
     ];
   }
   return [
-    { href: "/for-candidates", labelKey: "nav.forCandidates" },
+    { href: "/calculator/b2b", labelKey: "nav.calculator" },
     { href: "/waitlist", labelKey: "nav.waitlist" },
   ];
 }
@@ -152,7 +159,7 @@ export function footerExploreHrefsForPersona(persona: MarketingPersona): string[
   if (persona === "recruiter") {
     return [...common, "/for-recruiters", "/recruiter/inbox", "/contact"];
   }
-  return [...common, "/for-candidates", "/register", "/login"];
+  return [...common, "/for-candidates", "/calculator/b2b", "/register", "/login"];
 }
 
 export function personaGateRedirect(persona: MarketingPersona): string {

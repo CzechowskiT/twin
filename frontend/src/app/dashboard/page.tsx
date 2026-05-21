@@ -12,6 +12,7 @@ import {
   type PlacementFlowBusy,
 } from "@/components/applications-panel";
 import { DashboardCommandCenter } from "@/components/dashboard-command-center";
+import { NightlyAutoApplyStrip } from "@/components/nightly-auto-apply-strip";
 import { DashboardTutorial } from "@/components/dashboard/dashboard-tutorial";
 import { FeedbackModal } from "@/components/feedback/feedback-modal";
 import { HelpWidget } from "@/components/help/help-widget";
@@ -1300,6 +1301,8 @@ export default function DashboardPage() {
         </p>
         <p className="mt-2 text-sm leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.northStarLead")}</p>
       </div>
+
+      {user ? <NightlyAutoApplyStrip /> : null}
 
       {user ? (
         <>

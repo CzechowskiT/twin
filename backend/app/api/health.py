@@ -72,3 +72,36 @@ def health_check(
         )
         out["partner_export_configured"] = bool((s.partner_export_token or "").strip())
     return out
+
+
+@router.get("/health/celery-status")
+def celery_status() -> dict[str, str | bool | list[str]]:
+    """Celery worker reachability and nightly auto-apply beat wiring (no secrets)."""
+    from app.config import get_settings
+    from app.tasks.celery_app import celery_app
+
+    s = get_settings()
+    schedule = celery_app.conf.beat_schedule or {}
+    out: dict[str, str | bool | list[str]] = {
+        "celery_task_always_eager": s.celery_task_always_eager,
+        "broker_configured": bool((s.celery_broker_url or "").strip()),
+        "nightly_auto_apply_beat_enabled": s.nightly_auto_apply_beat_enabled,
+        "beat_schedule_has_nightly": "nightly-auto-apply" in schedule,
+        "worker_active": False,
+    }
+    if s.celery_task_always_eager:
+        out["worker_active"] = True
+        out["mode"] = "eager"
+        return out
+    try:
+        inspect = celery_app.control.inspect(timeout=2.0)
+        ping = inspect.ping() if inspect else None
+        if ping:
+            out["worker_active"] = True
+            out["worker_nodes"] = list(ping.keys())
+        else:
+            out["mode"] = "no_workers"
+    except Exception as exc:
+        out["error"] = str(exc)[:200]
+        out["mode"] = "inspect_failed"
+    return out

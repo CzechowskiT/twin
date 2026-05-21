@@ -1,0 +1,101 @@
+"""Auto-apply settings API."""
+
+from datetime import datetime, timezone
+
+import pytest
+from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
+
+from app.core.security import create_access_token
+from app.database.models import Application, AutoApplyConsent, Base, Candidate, Job, JobMatch, User
+from app.database.session import get_db
+from app.main import app
+
+
+@pytest.fixture
+def auto_apply_client():
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+    db = Session()
+    user = User(email="auto@test.com", hashed_password="x", is_active=True)
+    db.add(user)
+    db.commit()
+    candidate = Candidate(user_id=user.id, name="Auto")
+    db.add(candidate)
+    db.commit()
+    job = Job(
+        title="Dev",
+        company="Acme",
+        job_board="pracuj",
+        external_id="x-1",
+        url="https://www.pracuj.pl/x",
+        is_validated=True,
+    )
+    db.add(job)
+    db.commit()
+    db.add(JobMatch(candidate_id=candidate.id, job_id=job.id, score=95.0))
+    db.commit()
+
+    def override_db():
+        try:
+            yield db
+        finally:
+            pass
+
+    app.dependency_overrides[get_db] = override_db
+    client = TestClient(app)
+    token = create_access_token(user.email)
+    headers = {"Authorization": f"Bearer {token}"}
+    yield client, headers, db, candidate, job
+    app.dependency_overrides.clear()
+    db.close()
+
+
+def test_settings_default(auto_apply_client) -> None:
+    client, headers, _db, _c, _job = auto_apply_client
+    res = client.get("/api/v1/auto-apply/settings", headers=headers)
+    assert res.status_code == 200
+    body = res.json()
+    assert body["is_active"] is False
+    assert body["min_score_threshold"] == 90.0
+
+
+def test_consent_and_trigger(auto_apply_client, monkeypatch) -> None:
+    from unittest.mock import patch
+
+    from app.automation.types import ApplyOutcome
+
+    client, headers, db, candidate, job = auto_apply_client
+    monkeypatch.setenv("NIGHTLY_AUTO_APPLY_COOLDOWN_SECONDS", "0")
+    res = client.post(
+        "/api/v1/auto-apply/consent",
+        headers=headers,
+        json={"consent_acknowledged": True, "min_score_threshold": 90, "daily_limit": 5},
+    )
+    assert res.status_code == 200
+    assert res.json()["is_active"] is True
+
+    app_row = Application(candidate_id=candidate.id, job_id=job.id, status="applied")
+
+    with (
+        patch("app.services.nightly_auto_apply.find_top_matches"),
+        patch(
+            "app.services.nightly_auto_apply.auto_apply_for_user",
+            return_value=(ApplyOutcome.SUBMITTED, "ok", app_row),
+        ),
+    ):
+        trig = client.post("/api/v1/auto-apply/trigger", headers=headers)
+
+    assert trig.status_code == 200
+    assert trig.json()["applications_submitted"] == 1
+    assert "message" in trig.json()
+    consent = db.query(AutoApplyConsent).filter(AutoApplyConsent.candidate_id == candidate.id).first()
+    assert consent is not None
+    assert consent.consent_given_at is not None

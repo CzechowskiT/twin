@@ -94,7 +94,7 @@ export function PersonaSpaceGate({
                     : "nav.forCandidates"
               )}
             </Link>
-            {persona === "company" && surface !== "calculatorB2b" ? (
+            {surface !== "calculatorB2b" ? (
               <Link href="/calculator/b2b" className={linkClass}>
                 {t("dashboard.workspaceGateLinkB2bCalculator")}
               </Link>
