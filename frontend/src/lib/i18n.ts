@@ -1105,6 +1105,9 @@ const en = {
     mvpStatsHint: "Aggregate counters only — no personal data.",
     partnerApi: "Partner export API",
     partnerApiHint: "Token-gated CSV exports for ATS integrators — see docs/PARTNER_API.md in the repo.",
+    scrapeOps: "Scrape operations (ops)",
+    scrapeOpsHint:
+      "Set SCRAPE_OPS_EMAILS or SCRAPE_OPS_USER_IDS on the API, SCRAPE_WORKER_READY=true on the worker, and Redis for Celery. Monitor validated_jobs on /status. Full runbook: docs/SCRAPE_OPS.md in the repo.",
     authNote: "Write endpoints live under /api/v1/ with JWT from /auth/login or register.",
   },
   recruiterInbox: {
@@ -2685,6 +2688,9 @@ const pl: MessageTree = {
     mvpStatsHint: "Tylko agregaty — bez danych osobowych.",
     partnerApi: "Partner export API",
     partnerApiHint: "Eksport CSV pod tokenem integratora — docs/PARTNER_API.md w repozytorium.",
+    scrapeOps: "Operacje scrape (ops)",
+    scrapeOpsHint:
+      "Ustaw SCRAPE_OPS_EMAILS lub SCRAPE_OPS_USER_IDS na API, SCRAPE_WORKER_READY=true na workerze i Redis dla Celery. Licznik ofert na /status. Runbook: docs/SCRAPE_OPS.md w repozytorium.",
     authNote: "Zapis pod /api/v1/ z JWT z /auth/login lub rejestracji.",
   },
   recruiterInbox: {

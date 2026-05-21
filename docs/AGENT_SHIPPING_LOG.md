@@ -1,5 +1,13 @@
 # Agent shipping log
 
+## 2026-05-19 — Persona isolation + six todos merged to scaffold
+
+**Branch:** `cursor/phase1-monorepo-scaffold` (fast-forward merge of `cursor/persona-space-isolation` → `e0ff720`)
+
+- Persona route gates (candidate / recruiter / company), persona-aware header/footer.
+- WebCal true one-click (`webcal-subscribe.ts`), jobs empty state without duplicate list, status scrape hint.
+- `scripts/verify-mvp-six.sh` for repeatable local + optional prod smoke.
+
 ## 2026-05-19 — Original 6 to-dos closed
 
 See **`docs/TODAY_6_TODOS_DONE.md`**. All six items verified in repo + pytest/build:
