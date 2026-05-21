@@ -529,6 +529,7 @@ class ScheduledInterview(Base):
     # Optional unauthenticated .ics download (hashed token; see calendar API).
     ics_access_token_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
     ics_access_token_expires_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    reminder_email_sent_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     user: Mapped["User"] = relationship(back_populates="scheduled_interviews")
     application: Mapped["Application | None"] = relationship(back_populates="scheduled_interviews")

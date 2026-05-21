@@ -22,3 +22,22 @@ def test_placement_retention_on_beat_by_default(monkeypatch) -> None:
         from app.tasks import celery_app as mod
 
         mod._configure_beat_schedule()
+
+
+def test_interview_reminder_on_beat_by_default(monkeypatch) -> None:
+    monkeypatch.setenv("INTERVIEW_REMINDER_BEAT_ENABLED", "true")
+    get_settings.cache_clear()
+    try:
+        from app.tasks import celery_app as mod
+
+        mod._configure_beat_schedule()
+        schedule = celery_app.conf.beat_schedule
+        assert "interview-reminders-hourly" in schedule
+        assert schedule["interview-reminders-hourly"]["task"] == (
+            "app.tasks.reminder_tasks.interview_reminders_sweep"
+        )
+    finally:
+        get_settings.cache_clear()
+        from app.tasks import celery_app as mod
+
+        mod._configure_beat_schedule()

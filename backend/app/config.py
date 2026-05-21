@@ -120,6 +120,9 @@ class Settings(BaseSettings):
     # Daily placement retention sweep on Celery beat (log-only MVP; see placement_tasks).
     placement_retention_beat_enabled: bool = True
     placement_retention_beat_hour_utc: int = 6
+    # Hourly sweep: email users ~24h before scheduled interviews (when mail + prefs allow).
+    interview_reminder_beat_enabled: bool = True
+    interview_reminder_hours_before: int = 24
     # Max jobs considered per find_top_matches scan (newest validated first).
     match_jobs_scan_limit: int = 4000
     # When true, use ``job_matching_v2`` (salary overlap bonus on top of v1 rules).

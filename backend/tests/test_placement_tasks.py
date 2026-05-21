@@ -19,6 +19,6 @@ def test_placement_retention_sweep_returns_count(mock_session_local) -> None:
     celery_app.conf.task_always_eager = True
     try:
         out = placement_retention_sweep.apply().get()
-        assert out == "verified_placements=2"
+        assert out == "verified_placements=2 retention_emails=0"
     finally:
         celery_app.conf.task_always_eager = False

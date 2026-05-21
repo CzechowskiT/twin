@@ -50,6 +50,11 @@ def _configure_beat_schedule() -> None:
             "task": "app.tasks.placement_tasks.placement_retention_sweep",
             "schedule": crontab(hour=ph, minute=15),
         }
+    if s.interview_reminder_beat_enabled:
+        schedule["interview-reminders-hourly"] = {
+            "task": "app.tasks.reminder_tasks.interview_reminders_sweep",
+            "schedule": crontab(minute=20),
+        }
     celery_app.conf.beat_schedule = schedule
 
 
