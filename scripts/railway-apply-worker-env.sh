@@ -62,7 +62,7 @@ set_var SMTP_USER "${SMTP_USER:-}"
 set_var SMTP_PASSWORD "${SMTP_PASSWORD:-}"
 set_var SMTP_FROM "${SMTP_FROM:-}"
 
-echo "Redeploying worker service $WORKER_SERVICE…"
+echo "Redeploying worker service $WORKER_SERVICE..."
 "${CLI[@]}" redeploy --service "$WORKER_SERVICE" --yes
 
 echo "Done. Logs: railway logs --service $WORKER_SERVICE"
