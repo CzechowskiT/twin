@@ -188,12 +188,8 @@ def _parse_offer_anchor(anchor) -> ScrapedJob | None:
     if not href:
         return None
 
-    title_el = anchor.find(["h2", "h3", "h4"])
-    if not title_el:
-        title_el = anchor.find_parent(["h2", "h3", "h4"])
-
-    title = title_el.get_text(strip=True) if title_el else _title_from_slug(href)
-    if not title:
+    title = _title_from_anchor(anchor, href)
+    if not title or len(title) < 4:
         return None
 
     company, location, salary = _parse_anchor_meta(anchor, title)
@@ -211,6 +207,28 @@ def _parse_offer_anchor(anchor) -> ScrapedJob | None:
     )
 
 
+def _title_from_anchor(anchor, href: str) -> str:
+    for attr in ("aria-label", "title"):
+        label = (anchor.get(attr) or "").strip()
+        if label and len(label) >= 4 and label.lower() not in ("oferta", "szczegóły", "zobacz"):
+            return label
+    title_el = anchor.find(["h2", "h3", "h4"])
+    if not title_el:
+        title_el = anchor.find_parent(["h2", "h3", "h4"])
+    if title_el:
+        text = title_el.get_text(strip=True)
+        if text and text.lower() not in ("oferta pracy",):
+            return text
+    card = anchor.find_parent(attrs={"data-testid": True}) or anchor.find_parent("article")
+    if card:
+        head = card.find(["h2", "h3"])
+        if head:
+            text = head.get_text(strip=True)
+            if text:
+                return text
+    return _title_from_slug(href)
+
+
 def _parse_anchor_meta(anchor, title: str) -> tuple[str | None, str | None, str | None]:
     raw = anchor.get_text("|", strip=True)
     parts = [p.strip() for p in raw.split("|") if p.strip()] if "|" in raw else []
@@ -218,13 +236,24 @@ def _parse_anchor_meta(anchor, title: str) -> tuple[str | None, str | None, str 
     location = parts[1] if len(parts) > 1 else None
 
     salary = None
-    for part in parts:
-        if "PLN" in part or "Wynagrodzenie" in part:
-            salary = part
-            break
+    blob = raw if raw else ""
+    salary_match = re.search(
+        r"(\d[\d\s]{2,8}\s*[-–]\s*\d[\d\s]{2,8}\s*PLN|\d[\d\s]{2,8}\s*PLN|Wynagrodzenie[^|]{0,40})",
+        blob,
+        re.IGNORECASE,
+    )
+    if salary_match:
+        salary = salary_match.group(1).strip()
+    else:
+        for part in parts:
+            if "PLN" in part or "Wynagrodzenie" in part or "zł" in part.lower():
+                salary = part
+                break
 
     if not company or company == title or title in company:
         company = _company_from_slug(anchor.get("href", ""))
+    if location and location == company:
+        location = parts[2] if len(parts) > 2 else None
     return company, location, salary
 
 

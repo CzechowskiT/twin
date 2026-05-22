@@ -247,6 +247,11 @@ class Settings(BaseSettings):
 
     # Greenhouse ATS webhooks — optional shared secret for signature checks.
     greenhouse_webhook_secret: str = ""
+    # Greenhouse Harvest partner OAuth (authorization code grant).
+    greenhouse_client_id: str = ""
+    greenhouse_client_secret: str = ""
+    greenhouse_oauth_redirect_uri: str = ""
+    greenhouse_oauth_scopes: str = ""
     lever_webhook_secret: str = ""
     ashby_webhook_secret: str = ""
 
@@ -256,6 +261,9 @@ class Settings(BaseSettings):
     s3_secret_access_key: str = ""
     s3_bucket_name: str = ""
     s3_region: str = "auto"
+    # Local filesystem store when S3_* is unset (dev / air-gapped).
+    data_room_local_upload_dir: str = "data/data_room_uploads"
+    data_room_local_upload_enabled: bool = True
 
     # Authologic Customer API (KYC / identity) — https://developer.authologic.com
     authologic_api_login: str = ""

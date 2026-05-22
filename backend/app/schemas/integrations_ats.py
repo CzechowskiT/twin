@@ -28,6 +28,7 @@ class AtsConnectOut(BaseModel):
     oauth_available: bool
     message: str
     oauth_state: str | None = None
+    authorize_url: str | None = None
 
 
 class AtsSetupOut(BaseModel):

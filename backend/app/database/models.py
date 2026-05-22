@@ -358,7 +358,7 @@ class ReferralCashOutRequest(Base):
 
 
 class RecruiterAtsOAuthConnection(Base):
-    """Placeholder ATS OAuth row until Greenhouse/Lever app credentials ship."""
+    """Recruiter ATS OAuth (Greenhouse Harvest partner flow when env is set)."""
 
     __tablename__ = "recruiter_ats_oauth_connections"
     __table_args__ = (UniqueConstraint("user_id", "provider", name="uq_recruiter_ats_oauth_user_provider"),)
@@ -369,6 +369,9 @@ class RecruiterAtsOAuthConnection(Base):
     status: Mapped[str] = mapped_column(String(32), nullable=False, default="pending")
     oauth_state: Mapped[str | None] = mapped_column(String(64), nullable=True)
     external_account_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    oauth_access_token_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
+    oauth_refresh_token_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
+    oauth_token_expires_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -385,6 +388,7 @@ class DataRoomDocumentMetadata(Base):
     content_type: Mapped[str] = mapped_column(String(128), nullable=False)
     size_bytes: Mapped[int] = mapped_column(Integer, nullable=False)
     checksum_sha256: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    storage_key: Mapped[str | None] = mapped_column(String(512), nullable=True)
     status: Mapped[str] = mapped_column(String(32), nullable=False, default="validated")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 

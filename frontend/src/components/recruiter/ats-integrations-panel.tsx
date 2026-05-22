@@ -26,16 +26,35 @@ type AtsOAuthConnection = {
   oauth_state: string | null;
 };
 
+type AtsConnectResponse = {
+  provider: string;
+  status: string;
+  oauth_available: boolean;
+  message: string;
+  oauth_state: string | null;
+  authorize_url: string | null;
+};
+
 type AtsSetup = {
   providers: AtsProvider[];
   oauth_connections: AtsOAuthConnection[];
   linkage_note: string;
 };
 
+type AtsConnectResponse = {
+  provider: string;
+  status: string;
+  oauth_available: boolean;
+  message: string;
+  authorize_url?: string | null;
+};
+
 export function AtsIntegrationsPanel() {
   const { t } = useTranslation();
   const [setup, setSetup] = useState<AtsSetup | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [connectBusy, setConnectBusy] = useState<string | null>(null);
+  const [connectBusy, setConnectBusy] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const token = getToken();
@@ -51,7 +70,41 @@ export function AtsIntegrationsPanel() {
 
   useEffect(() => {
     void load();
-  }, [load]);
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const oauth = params.get("oauth");
+    if (oauth === "connected") {
+      toast.success(t("atsIntegrations.oauthConnected"));
+      window.history.replaceState({}, "", window.location.pathname);
+      void load();
+    } else if (oauth === "denied" || oauth === "error") {
+      toast.error(t("atsIntegrations.oauthFailed"));
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, [load, t]);
+
+  const connectOAuth = async (provider: string) => {
+    const token = getToken();
+    if (!token) return;
+    setConnectBusy(provider);
+    try {
+      const res = await apiFetch<AtsConnectResponse>(
+        `/api/v1/integrations/ats/${provider}/connect`,
+        { method: "POST" },
+        token,
+      );
+      if (res.authorize_url) {
+        window.location.href = res.authorize_url;
+        return;
+      }
+      toast(res.message, { icon: "ℹ️" });
+      await load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : t("atsIntegrations.loadFailed"));
+    } finally {
+      setConnectBusy(null);
+    }
+  };
 
   const copy = async (url: string) => {
     try {
@@ -59,6 +112,29 @@ export function AtsIntegrationsPanel() {
       toast.success(t("atsIntegrations.copied"));
     } catch {
       toast.error(url);
+    }
+  };
+
+  const connectOAuth = async (provider: string) => {
+    const token = getToken();
+    if (!token) return;
+    setConnectBusy(provider);
+    try {
+      const out = await apiFetch<AtsConnectResponse>(
+        `/api/v1/integrations/ats/${provider}/connect`,
+        { method: "POST" },
+        token,
+      );
+      if (out.authorize_url) {
+        window.location.href = out.authorize_url;
+        return;
+      }
+      toast(out.message, { icon: "ℹ️" });
+      await load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : t("atsIntegrations.oauthFailed"));
+    } finally {
+      setConnectBusy(null);
     }
   };
 
@@ -72,17 +148,24 @@ export function AtsIntegrationsPanel() {
         {setup.oauth_connections.map((c) => (
           <Card key={c.provider} className="flex flex-col p-5">
             <h2 className="text-lg font-semibold">{c.display_name}</h2>
-            <p className="twin-muted mt-2 text-xs leading-relaxed">{t("atsIntegrations.oauthComingSoon")}</p>
+            <p className="twin-muted mt-2 text-xs leading-relaxed">
+              {c.oauth_available ? t("atsIntegrations.oauthReady") : t("atsIntegrations.oauthComingSoon")}
+            </p>
             <p className="mt-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
               {t("atsIntegrations.oauthStatus")}: {c.status}
             </p>
             <button
               type="button"
-              className="twin-btn-secondary twin-touch-target mt-4 w-full text-sm opacity-60"
-              disabled
-              title={t("atsIntegrations.oauthDisabledHint")}
+              className="twin-btn-secondary twin-touch-target mt-4 w-full text-sm disabled:opacity-50"
+              disabled={!c.oauth_available || connectBusy === c.provider}
+              title={
+                c.oauth_available ? undefined : t("atsIntegrations.oauthDisabledHint")
+              }
+              onClick={() => void connectOAuth(c.provider)}
             >
-              {t("atsIntegrations.connectOAuth").replace("{name}", c.display_name)}
+              {connectBusy === c.provider
+                ? "…"
+                : t("atsIntegrations.connectOAuth").replace("{name}", c.display_name)}
             </button>
           </Card>
         ))}

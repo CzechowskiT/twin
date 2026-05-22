@@ -82,6 +82,36 @@ Optional: `STRIPE_CHECKOUT_PAYMENT_METHOD_TYPES` (default `card,link`).
 - `LEVER_WEBHOOK_SECRET`
 - `ASHBY_WEBHOOK_SECRET`
 
+## Greenhouse Harvest OAuth (recruiter connect; optional)
+
+- `GREENHOUSE_CLIENT_ID`
+- `GREENHOUSE_CLIENT_SECRET`
+- `GREENHOUSE_OAUTH_REDIRECT_URI` (must match Greenhouse app; e.g. `https://<api>/api/v1/integrations/ats/greenhouse/callback`)
+- `GREENHOUSE_OAUTH_SCOPES` (optional)
+
+## Investor data room S3 (optional; presigned PUT when set)
+
+- `S3_ENDPOINT_URL` (Cloudflare R2 or AWS)
+- `S3_ACCESS_KEY_ID`
+- `S3_SECRET_ACCESS_KEY`
+- `S3_BUCKET_NAME`
+- `S3_REGION`
+
+## Greenhouse Harvest OAuth (recruiter connect)
+
+- `GREENHOUSE_CLIENT_ID`
+- `GREENHOUSE_CLIENT_SECRET`
+- `GREENHOUSE_OAUTH_REDIRECT_URI` (e.g. `https://<api-host>/api/v1/integrations/ats/greenhouse/callback`)
+- `GREENHOUSE_OAUTH_SCOPES` (optional; default Harvest read scopes)
+
+## Investor data room / auto-apply blobs (S3-compatible)
+
+- `S3_BUCKET_NAME`
+- `S3_ACCESS_KEY_ID`
+- `S3_SECRET_ACCESS_KEY`
+- `S3_ENDPOINT_URL` (Cloudflare R2 or MinIO; omit for AWS)
+- `S3_REGION` (e.g. `auto` for R2, `eu-central-1` for AWS)
+
 ## CLI / apply scripts (local only, not Railway service vars)
 
 - `RAILWAY_TOKEN` (in `.env.railway` for `railway-apply-production-env.sh`)
@@ -98,6 +128,8 @@ When secrets are filled locally (never print values):
 ```
 
 If Stripe/Microsoft keys are empty in `.env.railway`, paste the **Stripe** and **Microsoft** blocks below into Railway Raw Editor manually, then redeploy API.
+
+**Agent note (2026-05-22):** local `.env.railway` had `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` missing and `MICROSOFT_CLIENT_ID` / `MICROSOFT_CLIENT_SECRET` empty — skipped `railway-apply-production-env.sh` (no invented secrets). Paste those four plus `STRIPE_PRICE_ID_PREMIUM` (or `STRIPE_PRICE_ID_PRO`) and `MICROSOFT_CALENDAR_REDIRECT_URI` + `MICROSOFT_TENANT` in Railway to flip `stripe_checkout_ready` and `microsoft_calendar_configured` on `/api/v1/health?ops=1`.
 
 ## Copy-paste blocks (variable names only)
 
@@ -135,4 +167,24 @@ MAIL_FROM=
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
 GOOGLE_CALENDAR_REDIRECT_URI=
+```
+
+### Greenhouse Harvest OAuth (recruiter ATS connect)
+
+```
+GREENHOUSE_CLIENT_ID=
+GREENHOUSE_CLIENT_SECRET=
+GREENHOUSE_OAUTH_REDIRECT_URI=
+GREENHOUSE_OAUTH_SCOPES=
+GREENHOUSE_WEBHOOK_SECRET=
+```
+
+### S3 / R2 (data room uploads + auto-apply packages)
+
+```
+S3_BUCKET_NAME=
+S3_ACCESS_KEY_ID=
+S3_SECRET_ACCESS_KEY=
+S3_ENDPOINT_URL=
+S3_REGION=
 ```

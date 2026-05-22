@@ -1,4 +1,4 @@
-"""Investor data room upload stub schemas."""
+"""Investor data room upload schemas."""
 
 from datetime import datetime
 
@@ -21,6 +21,10 @@ class DataRoomUploadOut(BaseModel):
     size_bytes: int
     status: str
     storage_note: str
+    storage_mode: str = "metadata_only"
+    storage_key: str | None = None
+    upload_url: str | None = None
+    upload_url_expires_in_seconds: int | None = None
     created_at: datetime
 
     model_config = {"from_attributes": True}

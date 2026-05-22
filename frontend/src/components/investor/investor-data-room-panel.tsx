@@ -153,7 +153,7 @@ export function InvestorDataRoomPanel() {
                   return;
                 }
                 setUploadBusy(true);
-                void apiFetch<{ storage_note?: string }>(
+                void apiFetch<{ storage_note?: string; upload_url?: string | null }>(
                   "/api/v1/investor/data-room/uploads",
                   {
                     method: "POST",
@@ -168,7 +168,11 @@ export function InvestorDataRoomPanel() {
                 )
                   .then((res) => {
                     toast.success(t("dataRoom.uploadSuccess"));
-                    if (res.storage_note) toast(res.storage_note, { icon: "ℹ️" });
+                    if (res.upload_url) {
+                      toast(t("dataRoom.uploadPresignHint"), { icon: "ℹ️", duration: 8000 });
+                    } else if (res.storage_note) {
+                      toast(res.storage_note, { icon: "ℹ️", duration: 6000 });
+                    }
                     setUploadFilename("");
                   })
                   .catch(() => toast.error(t("dataRoom.uploadFailed")))

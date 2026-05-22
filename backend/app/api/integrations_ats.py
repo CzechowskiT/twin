@@ -9,7 +9,8 @@ import logging
 from datetime import datetime, timezone
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
@@ -21,7 +22,8 @@ from app.schemas.integrations_ats import (
     AtsProviderSetupOut,
     AtsSetupOut,
 )
-from app.services import ats_oauth_stub as ats_oauth
+from app.services import ats_oauth
+from app.services.greenhouse_oauth import GreenhouseOAuthError
 from app.database.models import Application, ApplicationStatus
 from app.database.session import get_db
 from app.services.placement_verification import PLACEMENT_VERIFIED, record_placement_event
@@ -99,33 +101,63 @@ def ats_integration_setup(
 
 
 @router.post("/ats/{provider}/connect", response_model=AtsConnectOut)
-def ats_oauth_connect_stub(
+def ats_oauth_connect(
     provider: str,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
+    settings: Settings = Depends(get_settings),
 ) -> AtsConnectOut:
-    """Persist OAuth placeholder state; full redirect when vendor credentials are configured."""
+    """Start ATS OAuth (Greenhouse authorize URL when credentials are configured)."""
     try:
-        row = ats_oauth.start_connect_stub(db, user_id=user.id, provider=provider)
+        row, authorize_url = ats_oauth.start_connect(db, user_id=user.id, provider=provider)
     except ValueError as exc:
         if str(exc) == "unsupported_provider":
             raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Unknown ATS provider.") from exc
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Invalid connect request.") from exc
+    except GreenhouseOAuthError as exc:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
     db.commit()
     pid = row.provider
     available = ats_oauth.oauth_available(pid)
     label = next((n for p, n in _OAUTH_UI_PROVIDERS if p == pid), pid)
-    message = (
-        f"{label} OAuth is not enabled on this environment yet. "
-        "Use hire webhooks below; OAuth job sync ships when credentials are configured."
-    )
+    if authorize_url:
+        message = f"Redirect to {label} to authorize TWIN."
+    else:
+        message = (
+            f"{label} OAuth is not enabled on this environment yet. "
+            "Set GREENHOUSE_CLIENT_ID, GREENHOUSE_CLIENT_SECRET, and GREENHOUSE_OAUTH_REDIRECT_URI "
+            "on the API, or use hire webhooks below."
+        )
     return AtsConnectOut(
         provider=pid,
         status=row.status,
         oauth_available=available,
         message=message,
         oauth_state=row.oauth_state,
+        authorize_url=authorize_url,
     )
+
+
+@router.get("/ats/greenhouse/callback")
+def greenhouse_oauth_callback(
+    code: str | None = Query(default=None),
+    state: str | None = Query(default=None),
+    error: str | None = Query(default=None),
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+) -> RedirectResponse:
+    """OAuth redirect target — exchanges code and sends recruiter back to the dashboard."""
+    frontend = (settings.frontend_url or "").rstrip("/") or "/"
+    dest = f"{frontend}/recruiter/integrations/ats"
+    if error or not code or not state:
+        return RedirectResponse(url=f"{dest}?oauth=denied", status_code=302)
+    try:
+        ats_oauth.complete_greenhouse_callback(db, state=state, code=code)
+        db.commit()
+    except (ValueError, GreenhouseOAuthError):
+        db.rollback()
+        return RedirectResponse(url=f"{dest}?oauth=error", status_code=302)
+    return RedirectResponse(url=f"{dest}?oauth=connected&provider=greenhouse", status_code=302)
 
 
 def _apply_ats_hire(

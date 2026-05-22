@@ -1332,7 +1332,10 @@ const en = {
     loadFailed: "Could not load ATS setup",
     backRecruiter: "Recruiter workspace",
     oauthComingSoon:
-      "OAuth job sync is coming soon. Hire webhooks below already mark placements verified — no email ping-pong.",
+      "Set GREENHOUSE_CLIENT_ID, GREENHOUSE_CLIENT_SECRET, and GREENHOUSE_OAUTH_REDIRECT_URI on the API to enable OAuth. Hire webhooks below still work.",
+    oauthReady: "OAuth is configured — connect to authorize TWIN in your ATS.",
+    oauthConnected: "ATS connected successfully.",
+    oauthFailed: "ATS connection failed or was cancelled.",
     oauthStatus: "Connection",
     connectOAuth: "Connect {name}",
     oauthDisabledHint: "Enable when Greenhouse/Lever OAuth credentials are configured on the API",
@@ -1425,11 +1428,13 @@ const en = {
     ndaAcceptedNote: "Preview unlocked for this browser session. Request signed access for downloads.",
     backInvestor: "Investor workspace",
     uploadTitle: "Register document (metadata)",
-    uploadLead: "After NDA: register filename, type, and size. File bytes are stored when S3 is configured on the API.",
+    uploadLead:
+      "After NDA: register filename, type, and size. When S3_BUCKET_NAME + keys are set on the API you get a presigned PUT URL; otherwise only metadata is stored.",
     uploadCategory: "Category",
     uploadFilename: "Filename",
     uploadSubmit: "Register metadata",
     uploadSuccess: "Metadata registered",
+    uploadPresignHint: "Use the presigned upload URL from API response (PUT) within 15 minutes.",
     uploadFailed: "Could not register metadata",
   },
   recruiterJobs: {
@@ -3250,7 +3255,10 @@ const pl: MessageTree = {
     loadFailed: "Nie udało się załadować ATS",
     backRecruiter: "Strefa rekrutera",
     oauthComingSoon:
-      "Synchronizacja OAuth wkrótce. Webhooki poniżej już oznaczają placement — bez ping-ponga mailowego.",
+      "Ustaw GREENHOUSE_CLIENT_ID, GREENHOUSE_CLIENT_SECRET i GREENHOUSE_OAUTH_REDIRECT_URI na API. Webhooki poniżej działają bez OAuth.",
+    oauthReady: "OAuth skonfigurowane — połącz, aby autoryzować TWIN w ATS.",
+    oauthConnected: "ATS połączony.",
+    oauthFailed: "Połączenie ATS nie powiodło się lub zostało anulowane.",
     oauthStatus: "Połączenie",
     connectOAuth: "Połącz {name}",
     oauthDisabledHint: "Aktywne po skonfigurowaniu OAuth Greenhouse/Lever na API",
@@ -3343,11 +3351,13 @@ const pl: MessageTree = {
     ndaAcceptedNote: "Podgląd odblokowany w tej sesji przeglądarki. Pobrania wymagają podpisanego NDA.",
     backInvestor: "Strefa inwestora",
     uploadTitle: "Zarejestruj dokument (metadane)",
-    uploadLead: "Po NDA: nazwa pliku, typ i rozmiar. Bajty pliku trafiają do S3, gdy bucket jest skonfigurowany na API.",
+    uploadLead:
+      "Po NDA: nazwa, typ i rozmiar. Przy S3_BUCKET_NAME + kluczach na API dostaniesz presigned PUT; inaczej tylko metadane.",
     uploadCategory: "Kategoria",
     uploadFilename: "Nazwa pliku",
     uploadSubmit: "Zarejestruj metadane",
     uploadSuccess: "Metadane zapisane",
+    uploadPresignHint: "Wyślij plik metodą PUT na presigned URL z API (ważny 15 min).",
     uploadFailed: "Nie udało się zapisać metadanych",
   },
   recruiterJobs: {

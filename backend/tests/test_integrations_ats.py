@@ -245,3 +245,134 @@ def test_ats_setup_returns_providers() -> None:
         app.dependency_overrides.pop(get_current_user, None)
         app.dependency_overrides.pop(get_db, None)
         db.close()
+
+
+@patch("app.services.ats_oauth.gh_oauth.is_greenhouse_oauth_configured", return_value=True)
+@patch(
+    "app.services.ats_oauth.gh_oauth.build_greenhouse_authorize_url",
+    return_value="https://auth.greenhouse.io/authorize?state=test",
+)
+def test_greenhouse_connect_returns_authorize_url(_mock_url: MagicMock, _mock_cfg: MagicMock) -> None:
+    from datetime import datetime, timezone
+
+    from app.core.deps import get_current_user
+    from app.core.security import hash_password
+    from app.database.models import Base, User
+    from app.database.session import get_db
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+    from sqlalchemy.pool import StaticPool
+
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+    db = Session()
+    now = datetime.now(timezone.utc)
+    user = User(
+        email="rec-gh-oauth@example.com",
+        hashed_password=hash_password("password12"),
+        gdpr_consent_at=now,
+        is_active=True,
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    def _user() -> User:
+        return user
+
+    def override_db():
+        try:
+            yield db
+        finally:
+            pass
+
+    app.dependency_overrides[get_current_user] = _user
+    app.dependency_overrides[get_db] = override_db
+    try:
+        client = TestClient(app)
+        res = client.post("/api/v1/integrations/ats/greenhouse/connect")
+        assert res.status_code == 200
+        body = res.json()
+        assert body["oauth_available"] is True
+        assert body["authorize_url"].startswith("https://auth.greenhouse.io/")
+    finally:
+        app.dependency_overrides.pop(get_current_user, None)
+        app.dependency_overrides.pop(get_db, None)
+        db.close()
+
+
+@patch("app.services.ats_oauth.gh_oauth.exchange_greenhouse_code")
+def test_greenhouse_oauth_callback_stores_tokens(mock_exchange: MagicMock) -> None:
+    from datetime import datetime, timezone
+
+    from app.core.security import hash_password
+    from app.database.models import Base, RecruiterAtsOAuthConnection, User
+    from app.database.session import get_db
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+    from sqlalchemy.pool import StaticPool
+
+    mock_exchange.return_value = {
+        "access_token": "gh-access",
+        "refresh_token": "gh-refresh",
+        "expires_in": 3600,
+    }
+
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+    db = Session()
+    now = datetime.now(timezone.utc)
+    user = User(
+        email="rec-cb@example.com",
+        hashed_password=hash_password("password12"),
+        gdpr_consent_at=now,
+        is_active=True,
+    )
+    db.add(user)
+    db.flush()
+    db.add(
+        RecruiterAtsOAuthConnection(
+            user_id=user.id,
+            provider="greenhouse",
+            status="pending",
+            oauth_state="csrf-state-xyz",
+        )
+    )
+    db.commit()
+
+    def override_db():
+        try:
+            yield db
+        finally:
+            pass
+
+    app.dependency_overrides[get_db] = override_db
+    try:
+        with patch("app.api.integrations_ats.get_settings") as mock_gs:
+            s = MagicMock()
+            s.frontend_url = "https://app.example.com"
+            mock_gs.return_value = s
+            client = TestClient(app)
+            res = client.get(
+                "/api/v1/integrations/ats/greenhouse/callback",
+                params={"code": "auth-code", "state": "csrf-state-xyz"},
+                follow_redirects=False,
+            )
+        assert res.status_code == 302
+        assert "oauth=connected" in res.headers["location"]
+        row = db.query(RecruiterAtsOAuthConnection).filter_by(provider="greenhouse").one()
+        assert row.status == "connected"
+        assert row.oauth_access_token_encrypted
+    finally:
+        app.dependency_overrides.pop(get_db, None)
+        db.close()
