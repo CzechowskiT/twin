@@ -19,7 +19,7 @@ from app.services.microsoft_calendar_oauth import is_microsoft_calendar_oauth_co
 from app.services.linkedin_oauth import is_linkedin_oauth_configured
 from app.services.mail import is_mail_configured
 from app.api.health import _database_reachable
-from app.services.data_room_upload import object_storage_enabled
+from app.services.data_room_upload import object_storage_configured
 from app.services.mvp_public_metrics import count_validated_jobs_public_traction
 
 router = APIRouter()
@@ -59,7 +59,7 @@ def mvp_stats(db: Session = Depends(get_db)) -> MvpStatsOut:
         )
         boards = len(scrape_board_ids_ordered())
         s = get_settings()
-        s3_on = object_storage_enabled()
+        s3_on = object_storage_configured()
         return MvpStatsOut(
             validated_jobs=int(v_jobs),
             registered_users=int(users),

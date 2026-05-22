@@ -52,6 +52,16 @@ def validate_upload_metadata(
             raise ValueError("invalid_checksum")
 
 
+def object_storage_configured() -> bool:
+    """True when S3 env vars are set (no network I/O — safe for hot public endpoints)."""
+    s = get_settings()
+    return bool(
+        (s.s3_access_key_id or "").strip()
+        and (s.s3_secret_access_key or "").strip()
+        and (s.s3_bucket_name or "").strip()
+    )
+
+
 def object_storage_enabled() -> bool:
     return get_s3_blob_store().enabled
 

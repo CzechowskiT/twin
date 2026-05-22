@@ -25,11 +25,7 @@ if str(BACKEND_ROOT) not in sys.path:
 
 from app.database.connection import get_session  # noqa: E402
 from app.database.models import Application, ApplicationStatus, Job  # noqa: E402
-from app.services.investor_demo_seed import (  # noqa: E402
-    DEFAULT_DEMO_EMAIL,
-    demo_email_from_env,
-    run_investor_demo_seed,
-)
+from app.services.investor_demo_seed import run_investor_demo_seed  # noqa: E402
 from app.services.placement_verification import (  # noqa: E402
     PLACEMENT_VERIFIED,
     record_placement_event,
