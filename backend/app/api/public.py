@@ -34,55 +34,72 @@ def _stripe_checkout_ready(settings: Settings) -> bool:
     )
 
 
+def _safe_count(db: Session, label: str, fn: object) -> int:
+    """Run a count lambda; log and return 0 so investor surfaces stay up if one query fails."""
+    try:
+        return int(fn())  # type: ignore[operator]
+    except Exception:
+        logger.warning("mvp-stats %s count failed", label, exc_info=True)
+        return 0
+
+
 @router.get("/mvp-stats", response_model=MvpStatsOut)
 def mvp_stats(db: Session = Depends(get_db)) -> MvpStatsOut:
     """Aggregate product metrics for investor surfaces (no personal fields; all counts from DB or env wiring)."""
+    s = get_settings()
+    s3_on = object_storage_configured()
+    v_jobs = _safe_count(db, "validated_jobs", lambda: count_validated_jobs_public_traction(db))
+    users = _safe_count(db, "users", lambda: db.query(func.count()).select_from(User).scalar())
+    apps = _safe_count(db, "applications", lambda: db.query(func.count()).select_from(Application).scalar())
+    verified_placements = _safe_count(
+        db,
+        "verified_placements",
+        lambda: db.query(func.count())
+        .select_from(Application)
+        .filter(
+            Application.status == ApplicationStatus.HIRED,
+            Application.placement_verified_at.isnot(None),
+        )
+        .scalar(),
+    )
+    interviews_scheduled = _safe_count(
+        db,
+        "interviews_scheduled",
+        lambda: db.query(func.count()).select_from(ScheduledInterview).scalar(),
+    )
+    cv_profiles = _safe_count(
+        db,
+        "cv_profiles",
+        lambda: db.query(func.count())
+        .select_from(Candidate)
+        .filter(Candidate.cv_uploaded_at.isnot(None))
+        .scalar(),
+    )
     try:
-        v_jobs = count_validated_jobs_public_traction(db)
-        users = db.query(func.count()).select_from(User).scalar() or 0
-        apps = db.query(func.count()).select_from(Application).scalar() or 0
-        verified_placements = (
-            db.query(func.count())
-            .select_from(Application)
-            .filter(
-                Application.status == ApplicationStatus.HIRED,
-                Application.placement_verified_at.isnot(None),
-            )
-            .scalar()
-            or 0
-        )
-        interviews_scheduled = (
-            db.query(func.count()).select_from(ScheduledInterview).scalar() or 0
-        )
-        cv_profiles = (
-            db.query(func.count()).select_from(Candidate).filter(Candidate.cv_uploaded_at.isnot(None)).scalar() or 0
-        )
         boards = len(scrape_board_ids_ordered())
-        s = get_settings()
-        s3_on = object_storage_configured()
-        return MvpStatsOut(
-            validated_jobs=int(v_jobs),
-            registered_users=int(users),
-            total_applications=int(apps),
-            verified_placements=int(verified_placements),
-            interviews_scheduled=int(interviews_scheduled),
-            profiles_with_cv=int(cv_profiles),
-            job_boards_in_registry=boards,
-            linkedin_oauth_configured=is_linkedin_oauth_configured(),
-            stripe_checkout_ready=_stripe_checkout_ready(s),
-            mail_configured=is_mail_configured(s),
-            google_calendar_configured=is_google_calendar_oauth_configured(),
-            microsoft_calendar_configured=is_microsoft_calendar_oauth_configured(),
-            database_reachable=_database_reachable(db.get_bind()),
-            data_room_s3_enabled=s3_on,
-            data_room_local_demo=not s3_on and bool(s.data_room_local_upload_enabled),
-            generated_at=datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-        )
-    except HTTPException:
-        raise
-    except Exception as exc:
-        logger.exception("GET /public/mvp-stats failed")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal server error",
-        ) from exc
+    except Exception:
+        logger.warning("mvp-stats job_boards_in_registry failed", exc_info=True)
+        boards = 0
+    db_ok = False
+    try:
+        db_ok = _database_reachable(db.get_bind())
+    except Exception:
+        logger.warning("mvp-stats database_reachable check failed", exc_info=True)
+    return MvpStatsOut(
+        validated_jobs=v_jobs,
+        registered_users=users,
+        total_applications=apps,
+        verified_placements=verified_placements,
+        interviews_scheduled=interviews_scheduled,
+        profiles_with_cv=cv_profiles,
+        job_boards_in_registry=boards,
+        linkedin_oauth_configured=is_linkedin_oauth_configured(),
+        stripe_checkout_ready=_stripe_checkout_ready(s),
+        mail_configured=is_mail_configured(s),
+        google_calendar_configured=is_google_calendar_oauth_configured(),
+        microsoft_calendar_configured=is_microsoft_calendar_oauth_configured(),
+        database_reachable=db_ok,
+        data_room_s3_enabled=s3_on,
+        data_room_local_demo=not s3_on and bool(s.data_room_local_upload_enabled),
+        generated_at=datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+    )

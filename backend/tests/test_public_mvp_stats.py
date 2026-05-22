@@ -197,8 +197,8 @@ def test_public_mvp_stats_counts(_mock_li: object, _mock_stripe: object, *_rest:
 
 
 @patch("app.api.public.scrape_board_ids_ordered", side_effect=RuntimeError("registry-boom-secret"))
-def test_public_mvp_stats_500_is_generic_and_logs_exception(mock_scrape: object, caplog) -> None:
-    caplog.set_level(logging.ERROR, logger="app.api.public")
+def test_public_mvp_stats_registry_failure_returns_zero_boards(mock_scrape: object, caplog) -> None:
+    caplog.set_level(logging.WARNING, logger="app.api.public")
     db = _sqlite()
 
     def override_db():
@@ -211,8 +211,8 @@ def test_public_mvp_stats_500_is_generic_and_logs_exception(mock_scrape: object,
     try:
         client = TestClient(app)
         res = client.get("/api/v1/public/mvp-stats")
-        assert res.status_code == 500
-        assert res.json() == {"detail": "Internal server error"}
+        assert res.status_code == 200
+        assert res.json()["job_boards_in_registry"] == 0
         assert "registry-boom" not in res.text
         assert "registry-boom-secret" in caplog.text
     finally:
