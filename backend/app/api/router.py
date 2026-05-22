@@ -45,8 +45,6 @@ api_router.include_router(candidates.router, prefix="/candidates", tags=["Candid
 api_router.include_router(
     career_assistant.router, prefix="/career-assistant", tags=["Career assistant"]
 )
-api_router.include_router(career_assistant.spec_router, tags=["Career assistant"])
-api_router.include_router(career_assistant.spec_router, tags=["Career assistant"])
 api_router.include_router(talent_pool.router, prefix="/talent-pool", tags=["Talent pool"])
 api_router.include_router(integrations_ats.router, prefix="/integrations", tags=["Integrations"])
 api_router.include_router(jobs.router, prefix="/jobs", tags=["Jobs"])
