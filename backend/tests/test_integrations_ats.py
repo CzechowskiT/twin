@@ -128,6 +128,72 @@ def test_ashby_webhook_rejects_bad_signature(mock_gs: MagicMock) -> None:
     assert res.status_code == 403
 
 
+@patch("app.api.integrations_ats.ats_oauth.oauth_available", return_value=True)
+@patch("app.api.integrations_ats.ats_oauth.start_connect")
+def test_ats_oauth_connect_returns_authorize_url(mock_start, _mock_avail: MagicMock) -> None:
+    from datetime import datetime, timezone
+
+    from app.core.deps import get_current_user
+    from app.core.security import hash_password
+    from app.database.models import Base, RecruiterAtsOAuthConnection, User
+    from app.database.session import get_db
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+    from sqlalchemy.pool import StaticPool
+
+    now = datetime.now(timezone.utc)
+    row = RecruiterAtsOAuthConnection(
+        user_id=1,
+        provider="greenhouse",
+        status="pending",
+        oauth_state="state-abc",
+        created_at=now,
+        updated_at=now,
+    )
+    mock_start.return_value = (row, "https://auth.greenhouse.io/authorize?state=state-abc")
+
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+    db = Session()
+    user = User(
+        email="rec-oauth2@example.com",
+        hashed_password=hash_password("password12"),
+        gdpr_consent_at=now,
+        is_active=True,
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    def _user() -> User:
+        return user
+
+    def override_db():
+        try:
+            yield db
+        finally:
+            pass
+
+    app.dependency_overrides[get_current_user] = _user
+    app.dependency_overrides[get_db] = override_db
+    try:
+        client = TestClient(app)
+        res = client.post("/api/v1/integrations/ats/greenhouse/connect")
+        assert res.status_code == 200
+        body = res.json()
+        assert body["authorize_url"].startswith("https://auth.greenhouse.io/")
+        assert body["oauth_available"] is True
+    finally:
+        app.dependency_overrides.pop(get_current_user, None)
+        app.dependency_overrides.pop(get_db, None)
+        db.close()
+
+
 def test_ats_oauth_connect_stub_persists_state() -> None:
     from app.core.deps import get_current_user
     from app.database.models import Base, User

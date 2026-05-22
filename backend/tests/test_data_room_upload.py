@@ -1,5 +1,7 @@
 """Investor data room upload metadata validation."""
 
+from unittest.mock import MagicMock, patch
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -42,6 +44,31 @@ def test_record_upload_metadata_valid() -> None:
     db.commit()
     assert row.status == "validated"
     assert row.filename == "Q1-2026.pdf"
+
+
+@patch("app.services.data_room_upload.get_s3_blob_store")
+def test_prepare_upload_slot_metadata_only_when_s3_disabled(mock_store: MagicMock) -> None:
+    mock_store.return_value.enabled = False
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+    db = Session()
+    row, url, mode = dr.prepare_upload_slot(
+        db,
+        user_id=1,
+        category="legal",
+        filename="nda.pdf",
+        content_type="application/pdf",
+        size_bytes=2048,
+    )
+    assert mode == "metadata_only"
+    assert url is None
+    assert row.storage_key
+    db.close()
 
 
 def test_validate_rejects_bad_type() -> None:

@@ -41,19 +41,10 @@ type AtsSetup = {
   linkage_note: string;
 };
 
-type AtsConnectResponse = {
-  provider: string;
-  status: string;
-  oauth_available: boolean;
-  message: string;
-  authorize_url?: string | null;
-};
-
 export function AtsIntegrationsPanel() {
   const { t } = useTranslation();
   const [setup, setSetup] = useState<AtsSetup | null>(null);
   const [err, setErr] = useState<string | null>(null);
-  const [connectBusy, setConnectBusy] = useState<string | null>(null);
   const [connectBusy, setConnectBusy] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -100,7 +91,7 @@ export function AtsIntegrationsPanel() {
       toast(res.message, { icon: "ℹ️" });
       await load();
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : t("atsIntegrations.loadFailed"));
+      toast.error(e instanceof Error ? e.message : t("atsIntegrations.oauthFailed"));
     } finally {
       setConnectBusy(null);
     }
@@ -112,29 +103,6 @@ export function AtsIntegrationsPanel() {
       toast.success(t("atsIntegrations.copied"));
     } catch {
       toast.error(url);
-    }
-  };
-
-  const connectOAuth = async (provider: string) => {
-    const token = getToken();
-    if (!token) return;
-    setConnectBusy(provider);
-    try {
-      const out = await apiFetch<AtsConnectResponse>(
-        `/api/v1/integrations/ats/${provider}/connect`,
-        { method: "POST" },
-        token,
-      );
-      if (out.authorize_url) {
-        window.location.href = out.authorize_url;
-        return;
-      }
-      toast(out.message, { icon: "ℹ️" });
-      await load();
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : t("atsIntegrations.oauthFailed"));
-    } finally {
-      setConnectBusy(null);
     }
   };
 
@@ -158,13 +126,11 @@ export function AtsIntegrationsPanel() {
               type="button"
               className="twin-btn-secondary twin-touch-target mt-4 w-full text-sm disabled:opacity-50"
               disabled={!c.oauth_available || connectBusy === c.provider}
-              title={
-                c.oauth_available ? undefined : t("atsIntegrations.oauthDisabledHint")
-              }
+              title={c.oauth_available ? undefined : t("atsIntegrations.oauthDisabledHint")}
               onClick={() => void connectOAuth(c.provider)}
             >
               {connectBusy === c.provider
-                ? "…"
+                ? t("common.loading")
                 : t("atsIntegrations.connectOAuth").replace("{name}", c.display_name)}
             </button>
           </Card>
