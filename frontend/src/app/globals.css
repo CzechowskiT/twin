@@ -1114,6 +1114,8 @@ html[data-marketing-surface="studio"] .twin-nav-roi-pill:hover {
   overflow-x: clip;
   overflow-y: visible;
   padding-block: 0.375rem;
+  /* Keep first/last plates from being sliced at the viewport edge at rest. */
+  padding-inline: 0.75rem;
 }
 
 /** Header CTAs — filled growth actions (brand) + ghost product shortcuts (right rail). */

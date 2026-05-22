@@ -6,17 +6,19 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "@/components/language-provider";
 import type { TranslationKey } from "@/lib/i18n";
 
-/** Corporate domain for Clearbit / Google favicon when Simple Icons slug fails. */
+/** Corporate domain for favicon fallbacks when Simple Icons slug fails. */
 type Brand = {
   slug: string;
   name: string;
   domain: string;
   /** Extra Simple Icons slug attempts before leaving SI CDN. */
   altSlugs?: string[];
+  /** Known-good raster URLs when SI / favicon CDNs miss (e.g. Capital One). */
+  extraUrls?: string[];
 };
 
 /**
- * Fortune 500–heavy mix. Each row has a working SI slug when possible + domain fallbacks.
+ * Fortune 500–heavy mix. Each row has a working SI slug when possible + raster fallbacks.
  * (Simple Icons: https://simpleicons.org/ — CDN: cdn.simpleicons.org)
  */
 const BRANDS: Brand[] = [
@@ -37,7 +39,15 @@ const BRANDS: Brand[] = [
   { slug: "morganstanley", name: "Morgan Stanley", domain: "morganstanley.com" },
   { slug: "wellsfargo", name: "Wells Fargo", domain: "wellsfargo.com" },
   { slug: "americanexpress", name: "American Express", domain: "americanexpress.com" },
-  { slug: "capitalone", name: "Capital One", domain: "capitalone.com" },
+  {
+    slug: "capitalone",
+    name: "Capital One",
+    domain: "capitalone.com",
+    extraUrls: [
+      "https://www.capitalone.com/favicon.ico",
+      "https://icons.duckduckgo.com/ip3/capitalone.com.ico",
+    ],
+  },
   { slug: "walmart", name: "Walmart", domain: "walmart.com" },
   { slug: "costco", name: "Costco", domain: "costco.com" },
   { slug: "target", name: "Target", domain: "target.com" },
@@ -114,8 +124,8 @@ const BRANDS: Brand[] = [
 /** Two identical strips; CSS animates -50% for a gapless loop. */
 const MARQUEE_SEGMENTS = 2;
 
-/** Uniform slot for every mark — images use `fill` + `object-contain` so scaling matches the box, not intrinsic width. */
-const MARK_BOX_CLASS = "h-10 w-[7.25rem] sm:h-11 sm:w-[7.75rem]";
+/** Uniform slot — inner inset + `object-contain` keeps wide wordmarks (e.g. Amex) inside the plate. */
+const MARK_BOX_CLASS = "h-10 w-[7.5rem] sm:h-11 sm:w-32";
 
 /** Light plate so dark / monochrome marks stay legible on studio (dark) and light marketing rails. */
 const MARK_PLATE_CLASS =
@@ -137,12 +147,24 @@ function siUrl(slug: string) {
   return `https://cdn.simpleicons.org/${slug}`;
 }
 
-function clearbitUrl(domain: string) {
-  return `https://logo.clearbit.com/${domain}`;
+function jsdelivrSiUrl(slug: string) {
+  return `https://cdn.jsdelivr.net/npm/simple-icons@16/icons/${slug}.svg`;
 }
 
 function googleFaviconUrl(domain: string) {
   return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=128`;
+}
+
+function duckduckgoIconUrl(domain: string) {
+  return `https://icons.duckduckgo.com/ip3/${domain}.ico`;
+}
+
+function brandLogoUrls(brand: Brand): string[] {
+  const slugs = [...new Set([brand.slug, ...(brand.altSlugs ?? [])])];
+  const vector = slugs.flatMap((slug) => [siUrl(slug), jsdelivrSiUrl(slug)]);
+  const raster = [googleFaviconUrl(brand.domain), duckduckgoIconUrl(brand.domain)];
+  const custom = brand.extraUrls ?? [];
+  return [...custom, ...vector, ...raster];
 }
 
 function initials(name: string): string {
@@ -168,25 +190,18 @@ function BrandMark({
   /** Omit from tab order when this mark sits in a visually duplicated marquee strip. */
   tabIndex?: number;
 }) {
-  const urls = useMemo(() => {
-    const slugs = [brand.slug, ...(brand.altSlugs ?? [])];
-    const uniq = [...new Set(slugs)];
-    const si = uniq.map(siUrl);
-    const raster = [clearbitUrl(brand.domain), googleFaviconUrl(brand.domain)];
-    /* Prefer Clearbit / favicon (usually full-color); SI last — often flat black on transparent. */
-    return [...raster, ...si];
-  }, [brand]);
+  const urls = useMemo(() => brandLogoUrls(brand), [brand]);
 
   const [step, setStep] = useState(0);
 
   const onError = useCallback(() => {
-    setStep((s) => (s + 1 < urls.length ? s + 1 : s));
+    setStep((s) => Math.min(s + 1, urls.length));
   }, [urls.length]);
 
   const href = `https://${brand.domain}/`;
   const a11y = `${brand.name}${linkSuffix}`;
 
-  const anchorClass = `${MARK_BOX_CLASS} ${MARK_PLATE_CLASS} relative block shrink-0 overflow-hidden rounded-lg no-underline transition-[opacity,box-shadow] hover:opacity-90 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--twin-accent)]`;
+  const anchorClass = `${MARK_BOX_CLASS} ${MARK_PLATE_CLASS} relative flex shrink-0 items-center justify-center rounded-lg no-underline transition-[opacity,box-shadow] hover:opacity-90 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--twin-accent)]`;
 
   const inner =
     step >= urls.length ? (
@@ -197,18 +212,21 @@ function BrandMark({
         {initials(brand.name)}
       </span>
     ) : (
-      <Image
-        key={`${instanceKey}-${step}`}
-        src={urls[step]}
-        alt=""
-        fill
-        sizes="(min-width: 640px) 124px, 116px"
-        loading="eager"
-        decoding="async"
-        referrerPolicy="no-referrer"
-        className="object-contain object-center p-1.5 contrast-[1.08] brightness-[1.02] transition-[filter,opacity]"
-        onError={onError}
-      />
+      <span className="relative flex h-full w-full items-center justify-center px-2 py-1.5 sm:px-2.5">
+        <Image
+          key={`${instanceKey}-${step}`}
+          src={urls[step]}
+          alt=""
+          width={96}
+          height={32}
+          sizes="(min-width: 640px) 128px, 120px"
+          loading="eager"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          className="max-h-full max-w-full object-contain object-center contrast-[1.08] brightness-[1.02] transition-[filter,opacity]"
+          onError={onError}
+        />
+      </span>
     );
 
   return (
@@ -255,7 +273,7 @@ function LogoRow({
   );
 }
 
-/** Infinite marquee — duplicated strip; marks try SI → Clearbit → favicon → monogram (Apple: domain sources first). */
+/** Infinite marquee — duplicated strip; marks try SI → jsDelivr SI → favicon → DuckDuckGo → monogram. */
 export function CompanyLogoMarquee() {
   const reducedMotion = usePrefersReducedMotion();
   const linkSuffixKey: TranslationKey = "site.marqueeBrandLinkSuffix";
