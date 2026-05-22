@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useCallback, useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
-import { Card } from "@/components/ui";
+import { Button, Card } from "@/components/ui";
 import { getPublicApiBase } from "@/lib/public-api-base";
 
 const CONFIDENTIAL_KEYS = [
@@ -12,11 +13,33 @@ const CONFIDENTIAL_KEYS = [
   "dataRoom.confidentialLegal",
 ] as const;
 
+const NDA_STORAGE_KEY = "twin_investor_nda_v1";
+
 export function InvestorDataRoomPanel() {
   const { t } = useTranslation();
   const apiBase = getPublicApiBase();
   const statsUrl = apiBase ? `${apiBase}/api/v1/public/mvp-stats` : "/api/v1/public/mvp-stats";
   const openApiUrl = apiBase ? `${apiBase}/openapi.json` : "/api/v1/openapi.json";
+
+  const [ndaAccepted, setNdaAccepted] = useState(false);
+  const [ndaChecked, setNdaChecked] = useState(false);
+
+  useEffect(() => {
+    try {
+      setNdaAccepted(sessionStorage.getItem(NDA_STORAGE_KEY) === "1");
+    } catch {
+      setNdaAccepted(false);
+    }
+  }, []);
+
+  const acceptNda = useCallback(() => {
+    try {
+      sessionStorage.setItem(NDA_STORAGE_KEY, "1");
+    } catch {
+      /* private mode */
+    }
+    setNdaAccepted(true);
+  }, []);
 
   const packLinks = [
     { href: "/investor/metrics", label: t("dataRoom.packMetrics") },
@@ -57,23 +80,43 @@ export function InvestorDataRoomPanel() {
         </ul>
       </section>
 
-      <section>
-        <h2 className="text-lg font-semibold">{t("dataRoom.confidentialTitle")}</h2>
-        <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          {CONFIDENTIAL_KEYS.map((key) => (
-            <Card key={key} variant="soft" className="p-4 opacity-90">
-              <p className="text-sm font-medium">{t(key)}</p>
-              <p className="twin-muted mt-2 text-xs">{t("dataRoom.accessNote")}</p>
-            </Card>
-          ))}
-        </div>
-        <Link
-          href="/contact"
-          className="marketing-cta-filled-pill marketing-btn-primary-shadow twin-touch-target mt-6 inline-flex min-h-[2.75rem] items-center justify-center rounded-full bg-[var(--twin-cta)] px-5 text-sm font-semibold text-[var(--twin-on-cta)]"
-        >
-          {t("dataRoom.confidentialContact")}
-        </Link>
-      </section>
+      {!ndaAccepted ? (
+        <Card variant="soft" className="p-5 sm:p-6">
+          <h2 className="text-lg font-semibold">{t("dataRoom.ndaTitle")}</h2>
+          <p className="twin-muted mt-2 max-w-2xl text-sm leading-relaxed">{t("dataRoom.ndaLead")}</p>
+          <label className="mt-4 flex cursor-pointer items-start gap-3 text-sm">
+            <input
+              type="checkbox"
+              className="mt-1 h-4 w-4 shrink-0 accent-[var(--twin-accent)]"
+              checked={ndaChecked}
+              onChange={(e) => setNdaChecked(e.target.checked)}
+            />
+            <span>{t("dataRoom.ndaCheckbox")}</span>
+          </label>
+          <Button type="button" className="mt-4" disabled={!ndaChecked} onClick={acceptNda}>
+            {t("dataRoom.ndaAccept")}
+          </Button>
+        </Card>
+      ) : (
+        <section>
+          <p className="twin-muted mb-4 text-xs">{t("dataRoom.ndaAcceptedNote")}</p>
+          <h2 className="text-lg font-semibold">{t("dataRoom.confidentialTitle")}</h2>
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            {CONFIDENTIAL_KEYS.map((key) => (
+              <Card key={key} variant="soft" className="p-4 opacity-90">
+                <p className="text-sm font-medium">{t(key)}</p>
+                <p className="twin-muted mt-2 text-xs">{t("dataRoom.accessNote")}</p>
+              </Card>
+            ))}
+          </div>
+          <Link
+            href="/contact"
+            className="marketing-cta-filled-pill marketing-btn-primary-shadow twin-touch-target mt-6 inline-flex min-h-[2.75rem] items-center justify-center rounded-full bg-[var(--twin-cta)] px-5 text-sm font-semibold text-[var(--twin-on-cta)]"
+          >
+            {t("dataRoom.confidentialContact")}
+          </Link>
+        </section>
+      )}
 
       <Link href="/workspace/investor" className="twin-link text-sm font-medium">
         ← {t("dataRoom.backInvestor")}

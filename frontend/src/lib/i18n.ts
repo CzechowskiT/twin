@@ -1376,6 +1376,12 @@ const en = {
     confidentialLegal: "Legal & compliance pack",
     confidentialContact: "Request access",
     accessNote: "Document downloads are logged when full due diligence is enabled.",
+    ndaTitle: "Confidential preview (NDA stub)",
+    ndaLead:
+      "Check the box to preview gated placeholders. Full cap table, financials, and legal downloads still require a signed NDA via contact.",
+    ndaCheckbox: "I agree to keep preview materials confidential and not redistribute them.",
+    ndaAccept: "Continue to preview",
+    ndaAcceptedNote: "Preview unlocked for this browser session. Request signed access for downloads.",
     backInvestor: "Investor workspace",
   },
   recruiterJobs: {
@@ -3240,6 +3246,12 @@ const pl: MessageTree = {
     confidentialLegal: "Pakiet prawny i compliance",
     confidentialContact: "Poproś o dostęp",
     accessNote: "Pobrania dokumentów są logowane po włączeniu pełnego due diligence.",
+    ndaTitle: "Podgląd poufny (NDA — szkic)",
+    ndaLead:
+      "Zaznacz zgodę, aby zobaczyć placeholdery. Pełny cap table, finanse i dokumenty prawne wymagają podpisanego NDA przez kontakt.",
+    ndaCheckbox: "Zobowiązuję się zachować poufność materiałów podglądu i ich nie udostępniać.",
+    ndaAccept: "Przejdź do podglądu",
+    ndaAcceptedNote: "Podgląd odblokowany w tej sesji przeglądarki. Pobrania wymagają podpisanego NDA.",
     backInvestor: "Strefa inwestora",
   },
   recruiterJobs: {

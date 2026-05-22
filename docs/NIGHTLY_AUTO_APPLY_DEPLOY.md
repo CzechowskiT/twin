@@ -47,6 +47,8 @@ Source checklist lives in Downloads; code path is **`app.services.nightly_auto_a
 
 ### Prod verification (do once after env green)
 
+**Morning verification:** after 02:00 Europe/Warsaw, run `./scripts/verify-prod-health.sh` and `GET /api/v1/health/celery-status` (`beat_schedule_has_nightly: true`); confirm worker logs show `nightly_auto_apply_sweep` and a new `auto_apply_runs` row for the night.
+
 - [ ] `./scripts/verify-prod-health.sh` → `worker_active: true`, `celery_task_always_eager: false`
 - [ ] `GET /api/v1/health/celery-status` on Railway API
 - [ ] Enable consent on prod → **Run now** → strip shows `last_run_at` + count
