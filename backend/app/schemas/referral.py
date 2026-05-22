@@ -46,3 +46,19 @@ class ReferralLeaderboardEntryOut(BaseModel):
 class ReferralLeaderboardOut(BaseModel):
     window: str
     entries: list[ReferralLeaderboardEntryOut]
+
+
+class ReferralCashOutRequestIn(BaseModel):
+    payout_method: str = Field(pattern="^(bank_transfer|paypal)$")
+    payout_details: str | None = Field(default=None, max_length=500)
+
+
+class ReferralCashOutRequestOut(BaseModel):
+    id: int
+    amount_cents: int
+    payout_method: str
+    payout_details: str | None
+    status: str
+    created_at: datetime
+
+    model_config = {"from_attributes": True}

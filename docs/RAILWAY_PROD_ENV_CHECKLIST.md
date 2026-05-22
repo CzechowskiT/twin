@@ -97,4 +97,42 @@ When secrets are filled locally (never print values):
 ./scripts/railway-apply-worker-env.sh
 ```
 
-If Stripe/Microsoft keys are empty in `.env.railway`, paste the **Stripe** and **Microsoft** blocks above into Railway Raw Editor manually, then redeploy API.
+If Stripe/Microsoft keys are empty in `.env.railway`, paste the **Stripe** and **Microsoft** blocks below into Railway Raw Editor manually, then redeploy API.
+
+## Copy-paste blocks (variable names only)
+
+Paste into Railway → **twin** (API) → Variables → Raw Editor. Fill values in Railway UI — never commit secrets.
+
+### Stripe Checkout
+
+```
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+STRIPE_PRICE_ID_PREMIUM=
+STRIPE_PRICE_ID_PRO=
+STRIPE_CHECKOUT_PAYMENT_METHOD_TYPES=
+```
+
+### Microsoft 365 Calendar OAuth
+
+```
+MICROSOFT_CLIENT_ID=
+MICROSOFT_CLIENT_SECRET=
+MICROSOFT_CALENDAR_REDIRECT_URI=
+MICROSOFT_TENANT=
+```
+
+### Mail (if `mail_configured` is false)
+
+```
+RESEND_API_KEY=
+MAIL_FROM=
+```
+
+### Google Calendar OAuth (if `google_calendar_configured` is false)
+
+```
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_CALENDAR_REDIRECT_URI=
+```

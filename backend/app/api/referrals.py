@@ -11,12 +11,15 @@ from app.core.deps import get_current_user
 from app.database.models import AccountReferral, ReferralPayout, User
 from app.database.session import get_db
 from app.schemas.referral import (
+    ReferralCashOutRequestIn,
+    ReferralCashOutRequestOut,
     ReferralLeaderboardEntryOut,
     ReferralLeaderboardOut,
     ReferralMeOut,
     ReferralPayoutOut,
     ReferralPreviewOut,
 )
+from app.services import referral_cash_out as rco
 from app.services import referral_program as rp
 from app.services.referral_public_token import ensure_user_referral_public_token
 
@@ -71,6 +74,48 @@ def referral_me(
         lifetime_earnings_cents=rp.sum_all_earnings_cents(db, user.id),
         recent_payouts=[ReferralPayoutOut.model_validate(p) for p in recent],
     )
+
+
+@router.get("/cash-out/latest", response_model=ReferralCashOutRequestOut | None)
+def referral_cash_out_latest(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> ReferralCashOutRequestOut | None:
+    row = rco.latest_open_cash_out_request(db, user.id)
+    if not row:
+        return None
+    return ReferralCashOutRequestOut.model_validate(row)
+
+
+@router.post("/cash-out", response_model=ReferralCashOutRequestOut, status_code=status.HTTP_201_CREATED)
+def referral_cash_out_request(
+    body: ReferralCashOutRequestIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> ReferralCashOutRequestOut:
+    try:
+        row = rco.create_cash_out_request(
+            db,
+            user_id=user.id,
+            payout_method=body.payout_method,
+            payout_details=body.payout_details,
+        )
+    except ValueError as exc:
+        code = str(exc)
+        if code == "no_pending_earnings":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No pending referral earnings to cash out.",
+            ) from exc
+        if code == "open_request_exists":
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="You already have an open cash-out request.",
+            ) from exc
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid cash-out request.") from exc
+    db.commit()
+    db.refresh(row)
+    return ReferralCashOutRequestOut.model_validate(row)
 
 
 @router.get("/leaderboard", response_model=ReferralLeaderboardOut)

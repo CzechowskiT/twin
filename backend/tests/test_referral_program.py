@@ -183,3 +183,114 @@ def test_hired_creates_hire_payout() -> None:
         .count()
         == 1
     )
+
+
+def test_referral_cash_out_request_requires_pending_earnings() -> None:
+    db = _sqlite()
+    now = datetime.now(timezone.utc)
+    user = User(
+        email="cash@example.com",
+        hashed_password=hash_password("password12"),
+        gdpr_consent_at=now,
+        is_active=True,
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    def override_db():
+        try:
+            yield db
+        finally:
+            pass
+
+    from app.core.security import create_access_token
+
+    app.dependency_overrides[get_db] = override_db
+    try:
+        client = TestClient(app)
+        jwt = create_access_token(user.email)
+        res = client.post(
+            "/api/v1/referrals/cash-out",
+            json={"payout_method": "paypal", "payout_details": "pay@example.com"},
+            headers={"Authorization": f"Bearer {jwt}"},
+        )
+        assert res.status_code == 400, res.text
+    finally:
+        app.dependency_overrides.pop(get_db, None)
+        db.close()
+
+
+def test_referral_cash_out_request_creates_row() -> None:
+    db = _sqlite()
+    now = datetime.now(timezone.utc)
+    ref = User(
+        email="refcash@example.com",
+        hashed_password=hash_password("password12"),
+        gdpr_consent_at=now,
+        is_active=True,
+    )
+    child = User(
+        email="childcash@example.com",
+        hashed_password=hash_password("password12"),
+        gdpr_consent_at=now,
+        is_active=True,
+    )
+    db.add_all([ref, child])
+    db.commit()
+    db.refresh(ref)
+    db.refresh(child)
+    rp.record_account_referral_edge(
+        db,
+        referrer_user_id=ref.id,
+        referred_user_id=child.id,
+        ref_code_used="tok",
+        utm_source=None,
+        utm_medium=None,
+        utm_campaign=None,
+        utm_content=None,
+    )
+    db.commit()
+    settings = MagicMock()
+    settings.referral_bonus_first_payment_cents = 5000
+    settings.referral_bonus_retained_3m_cents = 0
+    settings.referral_bonus_hired_cents = 0
+    settings.referral_milestone_10_cents = 0
+    settings.referral_milestone_50_cents = 0
+    settings.referral_milestone_100_cents = 0
+    rp.on_subscription_invoice_paid(db, child, settings)
+    db.commit()
+
+    def override_db():
+        try:
+            yield db
+        finally:
+            pass
+
+    from app.core.security import create_access_token
+    from app.database.models import ReferralCashOutRequest
+
+    app.dependency_overrides[get_db] = override_db
+    try:
+        client = TestClient(app)
+        jwt = create_access_token(ref.email)
+        res = client.post(
+            "/api/v1/referrals/cash-out",
+            json={"payout_method": "bank_transfer", "payout_details": "PL00 0000"},
+            headers={"Authorization": f"Bearer {jwt}"},
+        )
+        assert res.status_code == 201, res.text
+        body = res.json()
+        assert body["amount_cents"] == 5000
+        assert body["status"] == "requested"
+        row = db.query(ReferralCashOutRequest).filter(ReferralCashOutRequest.user_id == ref.id).one()
+        assert row.amount_cents == 5000
+        dup = client.post(
+            "/api/v1/referrals/cash-out",
+            json={"payout_method": "paypal"},
+            headers={"Authorization": f"Bearer {jwt}"},
+        )
+        assert dup.status_code == 409
+    finally:
+        app.dependency_overrides.pop(get_db, None)
+        db.close()

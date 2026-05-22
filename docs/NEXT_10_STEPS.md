@@ -63,6 +63,6 @@ See **`docs/PRODUCT_ROADMAP.md`** for product rationale on next priorities.
 7. **Interview reminders prod verify** — beat on worker + mail on Railway
 8. **ATS OAuth / job sync** — beyond hire webhooks (`docs/ATS_WEBHOOKS.md`)
 9. **Data room v2** — NDA gate, document upload, download audit log
-10. **Referral cash-out** — payout fulfillment UI on top of `referral_payouts`
+10. **Referral cash-out** — payout fulfillment UI on top of `referral_payouts` *(cash-out request form + ops queue stub shipped)*
 
 Mega-prompt reference: `~/Downloads/cursor_autonomous_nightly_autoapply.md` (implementation largely in repo; ops checklist in `NIGHTLY_AUTO_APPLY_DEPLOY.md`).

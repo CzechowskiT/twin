@@ -134,6 +134,15 @@ export function ReferralsDashboard() {
         {t("referrals.lifetime")}: <strong>{formatMoney(me.lifetime_earnings_cents)}</strong>
       </p>
 
+      {me.pending_earnings_cents > 0 ? (
+        <Link
+          href="/dashboard/referrals/cash-out"
+          className="twin-btn-solid twin-touch-target inline-flex text-sm font-semibold"
+        >
+          {t("referrals.cashOutLink")}
+        </Link>
+      ) : null}
+
       <section>
         <h2 className="text-lg font-semibold">{t("referrals.payoutsTitle")}</h2>
         {me.recent_payouts.length === 0 ? (

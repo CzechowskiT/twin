@@ -343,6 +343,20 @@ class ReferralPayout(Base):
     paid_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
 
+class ReferralCashOutRequest(Base):
+    """User-requested withdrawal of pending referral earnings (manual ops fulfillment)."""
+
+    __tablename__ = "referral_cash_out_requests"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    amount_cents: Mapped[int] = mapped_column(Integer, nullable=False)
+    payout_method: Mapped[str] = mapped_column(String(32), nullable=False)
+    payout_details: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="requested")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
 class Job(Base):
     __tablename__ = "jobs"
     __table_args__ = (UniqueConstraint("job_board", "external_id", name="uq_job_board_external"),)

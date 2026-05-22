@@ -1279,6 +1279,12 @@ export default function DashboardPage() {
             {t("dashboard.billingLink")}
           </Link>
           <Link
+            href="/dashboard/referrals"
+            className="twin-link inline-flex min-h-[2.75rem] items-center justify-center px-1 text-sm sm:justify-start sm:text-left"
+          >
+            {t("dashboard.referralsLink")}
+          </Link>
+          <Link
             href="/dashboard/identity"
             className="twin-link inline-flex min-h-[2.75rem] items-center justify-center px-1 text-sm sm:justify-start sm:text-left"
           >
