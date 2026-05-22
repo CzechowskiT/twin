@@ -92,6 +92,7 @@ export type TranslationKey =
   | `referrals.${keyof typeof en.referrals}`
   | `atsIntegrations.${keyof typeof en.atsIntegrations}`
   | `dataRoom.${keyof typeof en.dataRoom}`
+  | `careerAssistant.${keyof typeof en.careerAssistant}`
   | `marketingHowItWorks.${keyof typeof en.marketingHowItWorks}`
   | `workspace.${keyof typeof en.workspace}`
   | `developers.${keyof typeof en.developers}`
@@ -1296,6 +1297,21 @@ const en = {
     docsLink: "Read ATS_WEBHOOKS.md in the repo",
     loadFailed: "Could not load ATS setup",
     backRecruiter: "Recruiter workspace",
+  },
+  careerAssistant: {
+    intelEyebrow: "Company intelligence",
+    intelLoading: "Researching company and role…",
+    intelReady: "Intelligence report ready",
+    intelCached: "Loaded cached research (7 days)",
+    intelFailed: "Could not research company",
+    researchCompany: "Company intel",
+    priorities: "Top priorities",
+    painPoints: "Team pain points",
+    useTerms: "Use in your application",
+    avoidTerms: "Avoid",
+    coverLetter: "Cover letter draft",
+    copyLetter: "Copy letter",
+    copied: "Copied to clipboard",
   },
   dataRoom: {
     eyebrow: "Due diligence",
@@ -3098,6 +3114,21 @@ const pl: MessageTree = {
     docsLink: "ATS_WEBHOOKS.md w repozytorium",
     loadFailed: "Nie udało się załadować ATS",
     backRecruiter: "Strefa rekrutera",
+  },
+  careerAssistant: {
+    intelEyebrow: "Inteligencja firmy",
+    intelLoading: "Analizuję firmę i rolę…",
+    intelReady: "Raport gotowy",
+    intelCached: "Z cache (7 dni)",
+    intelFailed: "Nie udało się przeanalizować firmy",
+    researchCompany: "Intel firmy",
+    priorities: "Priorytety",
+    painPoints: "Bóle zespołu",
+    useTerms: "Użyj w aplikacji",
+    avoidTerms: "Unikaj",
+    coverLetter: "Szkic listu",
+    copyLetter: "Kopiuj list",
+    copied: "Skopiowano",
   },
   dataRoom: {
     eyebrow: "Due diligence",

@@ -13,6 +13,7 @@ from app.core.deps import get_current_user, require_ops_user
 from app.database.models import Candidate, Job, SavedJob, User
 from app.database.session import get_db
 from app.matching.matcher import calculate_match_score
+from app.schemas.company_intelligence import CompanyIntelBodyOut, CompanyIntelOut, InsiderLanguageOut
 from app.schemas.job import (
     BoardListOut,
     BoardScrapeResult,
@@ -22,6 +23,7 @@ from app.schemas.job import (
     ScrapeAllOut,
     ScrapeTaskOut,
 )
+from app.services.company_intelligence import research_company_for_job
 from app.services.job_query import SORT_COMPANY, SORT_NEWEST, SORT_SALARY, apply_job_filters, job_filter_options
 from app.services.matching_service import candidate_to_dict, job_to_dict
 from app.scrapers.registry import GLOBAL_BOARD_SPECS, list_boards
@@ -411,3 +413,30 @@ def trigger_scrape(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Nie udało się uruchomić scrapingu dla tego portalu. Spróbuj ponownie za chwilę.",
         ) from exc
+
+
+@router.post("/{job_id}/research", response_model=CompanyIntelOut)
+def research_job_company(
+    job_id: int,
+    db: Session = Depends(get_db),
+    _user: User = Depends(get_current_user),
+) -> CompanyIntelOut:
+    """US-C051: company priorities, pain points, insider language, cover letter draft."""
+    job = db.query(Job).filter(Job.id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+    intel, researched_at, from_cache = research_company_for_job(db, job)
+    body = CompanyIntelBodyOut(
+        priorities=intel["priorities"],
+        pain_points=intel["pain_points"],
+        insider_language=InsiderLanguageOut(**intel["insider_language"]),
+        cover_letter_draft=intel["cover_letter_draft"],
+    )
+    return CompanyIntelOut(
+        job_id=job_id,
+        company=job.company,
+        job_title=job.title,
+        intel=body,
+        researched_at=researched_at,
+        from_cache=from_cache,
+    )

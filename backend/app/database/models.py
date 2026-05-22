@@ -659,3 +659,16 @@ class ProductFeedback(Base):
 
     user: Mapped["User"] = relationship(back_populates="product_feedback")
 
+
+class CompanyIntelligenceCache(Base):
+    """Cached company research per company + role title (US-C051)."""
+
+    __tablename__ = "company_intelligence_cache"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    company_name: Mapped[str] = mapped_column(String(200), index=True)
+    job_title: Mapped[str] = mapped_column(String(200), index=True)
+    intel_json: Mapped[str] = mapped_column(Text, nullable=False)
+    researched_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+

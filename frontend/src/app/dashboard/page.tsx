@@ -11,6 +11,7 @@ import {
   type PlacementEventRow,
   type PlacementFlowBusy,
 } from "@/components/applications-panel";
+import { CompanyIntelligenceModal } from "@/components/career-assistant/company-intelligence-modal";
 import { DashboardCommandCenter } from "@/components/dashboard-command-center";
 import { EmailVerificationBanner } from "@/components/email-verification-banner";
 import { NightlyAutoApplyStrip } from "@/components/nightly-auto-apply-strip";
@@ -219,6 +220,7 @@ export default function DashboardPage() {
   const scrapePollStableRef = useRef({ prev: 0, ticks: 0 });
   const scrapeListToastShownRef = useRef(false);
   const [autoApplyingId, setAutoApplyingId] = useState<number | null>(null);
+  const [intelJob, setIntelJob] = useState<{ id: number; title: string; company: string } | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [showApplyPrompt, setShowApplyPrompt] = useState(false);
   const [placementFlowBusy, setPlacementFlowBusy] = useState<PlacementFlowBusy>(null);
@@ -1714,6 +1716,7 @@ export default function DashboardPage() {
             applicationStatus={displayApplicationStatus}
             onApply={applyToJob}
             onAutoApply={autoApplyToJob}
+            onResearch={(id, title, company) => setIntelJob({ id, title, company })}
             autoApplyJobId={autoApplyingId}
             onSave={saveJob}
             onDismiss={dismissJob}
@@ -1894,6 +1897,11 @@ export default function DashboardPage() {
                 applicationStatus={displayApplicationStatus}
                 onApply={hasProfile ? applyToJob : undefined}
                 onAutoApply={hasProfile ? autoApplyToJob : undefined}
+                onResearch={
+                  hasProfile
+                    ? (id, title, company) => setIntelJob({ id, title, company })
+                    : undefined
+                }
                 autoApplyJobId={autoApplyingId}
                 onSave={hasProfile ? saveJob : undefined}
                 onDismiss={hasProfile ? dismissJob : undefined}
@@ -1979,6 +1987,13 @@ export default function DashboardPage() {
       </footer>
       <DashboardTutorial onOpenFeedback={() => setFeedbackOpen(true)} />
       <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
+      <CompanyIntelligenceModal
+        jobId={intelJob?.id ?? null}
+        jobTitle={intelJob?.title ?? ""}
+        company={intelJob?.company ?? ""}
+        open={intelJob !== null}
+        onClose={() => setIntelJob(null)}
+      />
       <HelpWidget />
     </Shell>
   );

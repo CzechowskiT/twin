@@ -31,6 +31,7 @@ export function JobList({
   applicationStatus,
   onApply,
   onAutoApply,
+  onResearch,
   onSave,
   onDismiss,
   autoApplyJobId,
@@ -40,6 +41,7 @@ export function JobList({
   applicationStatus?: Record<number, string>;
   onApply?: (jobId: number, url: string) => void;
   onAutoApply?: (jobId: number) => void;
+  onResearch?: (jobId: number, title: string, company: string) => void;
   onSave?: (jobId: number) => void;
   onDismiss?: (jobId: number) => void;
   autoApplyJobId?: number | null;
@@ -50,7 +52,7 @@ export function JobList({
     return <p className="twin-muted text-sm">{t("dashboard.noJobsFiltered")}</p>;
   }
 
-  const hasActions = Boolean(onApply || onAutoApply || onSave || onDismiss);
+  const hasActions = Boolean(onApply || onAutoApply || onResearch || onSave || onDismiss);
 
   return (
     <ul className="space-y-2 text-sm">
@@ -112,6 +114,16 @@ export function JobList({
                     title={t("dashboard.autoApplyHint")}
                   >
                     {autoApplyJobId === jobId ? t("dashboard.autoApplyRunning") : t("dashboard.autoApplyJob")}
+                  </button>
+                )}
+                {onResearch && (
+                  <button
+                    type="button"
+                    aria-label={`${t("careerAssistant.researchCompany")}: ${item.title}, ${item.company}`}
+                    onClick={() => onResearch(jobId, item.title, item.company)}
+                    className="twin-btn-secondary twin-touch-target shrink-0 !w-auto px-3 py-1.5 text-xs"
+                  >
+                    {t("careerAssistant.researchCompany")}
                   </button>
                 )}
                 {onSave && !status && (
