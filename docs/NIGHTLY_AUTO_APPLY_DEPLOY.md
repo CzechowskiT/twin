@@ -49,6 +49,8 @@ Source checklist lives in Downloads; code path is **`app.services.nightly_auto_a
 
 **Morning verification:** after 02:00 Europe/Warsaw, run `./scripts/verify-prod-health.sh` and `GET /api/v1/health/celery-status` (`beat_schedule_has_nightly: true`); confirm worker logs show `nightly_auto_apply_sweep` and a new `auto_apply_runs` row for the night.
 
+**Agent log (2026-05-22 14:38 CEST):** Morning verification run — see **`docs/ops/nightly-verify-2026-05-22.md`**. `beat_schedule_has_nightly` / `worker_active` OK; `last-run` shows sweep at 2026-05-22T00:00:00Z with **0 users** (expected without prod consent). Railway CLI absent — no log grep.
+
 **Agent log (2026-05-22 ~13:55 CEST):** prod already shows `beat_schedule_has_nightly: true`, `worker_active: true`, `celery_task_always_eager: false`. The 02:00 Europe/Warsaw sweep cannot be confirmed until **2026-05-23 morning** — check Railway worker logs for `nightly_auto_apply_sweep`, `GET /api/v1/ops/auto-apply/last-run` (Bearer `OPS_ADMIN_TOKEN`), and a new `auto_apply_runs` row for the night.
 
 - [ ] `./scripts/verify-prod-health.sh` → `worker_active: true`, `celery_task_always_eager: false`
