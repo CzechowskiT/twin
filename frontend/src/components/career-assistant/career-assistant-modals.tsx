@@ -65,10 +65,12 @@ export function CvOptimizerModal({
     optimized_cv_text: string;
     changes: CvChange[];
   } | null>(null);
+  const [emptyReason, setEmptyReason] = useState<"no_cv" | null>(null);
 
   const load = useCallback(async () => {
     if (!applicationId || !getToken()) return;
     setLoading(true);
+    setEmptyReason(null);
     try {
       const res = await apiFetch<{
         match_before: number;
@@ -79,7 +81,12 @@ export function CvOptimizerModal({
       setData(res);
       toast.success(t("careerAssistant.cvReady"));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : t("careerAssistant.cvFailed"));
+      const msg = e instanceof Error ? e.message : "";
+      if (msg.toLowerCase().includes("cv")) {
+        setEmptyReason("no_cv");
+      } else {
+        toast.error(msg || t("careerAssistant.cvFailed"));
+      }
     } finally {
       setLoading(false);
     }
@@ -100,6 +107,17 @@ export function CvOptimizerModal({
       onClose={onClose}
     >
       {loading ? <p className="twin-muted text-sm">{t("careerAssistant.cvLoading")}</p> : null}
+      {!loading && emptyReason === "no_cv" ? (
+        <p className="twin-muted text-sm leading-relaxed">
+          {t("careerAssistant.cvEmptyNoCv")}{" "}
+          <a href="/profile" className="twin-link font-medium">
+            Profile →
+          </a>
+        </p>
+      ) : null}
+      {!loading && !data && !emptyReason ? (
+        <p className="twin-muted text-sm">{t("careerAssistant.cvEmptyNoData")}</p>
+      ) : null}
       {data ? (
         <div className="space-y-4 text-sm">
           <p>

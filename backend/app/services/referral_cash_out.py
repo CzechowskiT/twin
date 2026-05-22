@@ -16,6 +16,16 @@ PAYOUT_METHOD_PAYPAL = "paypal"
 ALLOWED_PAYOUT_METHODS = frozenset({PAYOUT_METHOD_BANK, PAYOUT_METHOD_PAYPAL})
 
 
+def list_cash_out_requests(db: Session, user_id: int, *, limit: int = 50) -> list[ReferralCashOutRequest]:
+    return (
+        db.query(ReferralCashOutRequest)
+        .filter(ReferralCashOutRequest.user_id == user_id)
+        .order_by(ReferralCashOutRequest.created_at.desc())
+        .limit(limit)
+        .all()
+    )
+
+
 def latest_open_cash_out_request(db: Session, user_id: int) -> ReferralCashOutRequest | None:
     return (
         db.query(ReferralCashOutRequest)

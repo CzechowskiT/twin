@@ -18,8 +18,17 @@ type AtsProvider = {
   signature_header: string;
 };
 
+type AtsOAuthConnection = {
+  provider: string;
+  display_name: string;
+  status: string;
+  oauth_available: boolean;
+  oauth_state: string | null;
+};
+
 type AtsSetup = {
   providers: AtsProvider[];
+  oauth_connections: AtsOAuthConnection[];
   linkage_note: string;
 };
 
@@ -32,7 +41,8 @@ export function AtsIntegrationsPanel() {
     const token = getToken();
     if (!token) return;
     try {
-      setSetup(await apiFetch<AtsSetup>("/api/v1/integrations/ats/setup", {}, token));
+      const raw = await apiFetch<AtsSetup>("/api/v1/integrations/ats/setup", {}, token);
+      setSetup({ ...raw, oauth_connections: raw.oauth_connections ?? [] });
       setErr(null);
     } catch (e) {
       setErr(e instanceof Error ? e.message : t("atsIntegrations.loadFailed"));
@@ -58,6 +68,25 @@ export function AtsIntegrationsPanel() {
   return (
     <div className="space-y-6">
       <p className="twin-muted max-w-2xl text-sm leading-relaxed">{setup.linkage_note}</p>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {setup.oauth_connections.map((c) => (
+          <Card key={c.provider} className="flex flex-col p-5">
+            <h2 className="text-lg font-semibold">{c.display_name}</h2>
+            <p className="twin-muted mt-2 text-xs leading-relaxed">{t("atsIntegrations.oauthComingSoon")}</p>
+            <p className="mt-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
+              {t("atsIntegrations.oauthStatus")}: {c.status}
+            </p>
+            <button
+              type="button"
+              className="twin-btn-secondary twin-touch-target mt-4 w-full text-sm opacity-60"
+              disabled
+              title={t("atsIntegrations.oauthDisabledHint")}
+            >
+              {t("atsIntegrations.connectOAuth").replace("{name}", c.display_name)}
+            </button>
+          </Card>
+        ))}
+      </div>
       <div className="grid gap-4 lg:grid-cols-3">
         {setup.providers.map((p) => (
           <Card key={p.provider} className="flex flex-col p-5">

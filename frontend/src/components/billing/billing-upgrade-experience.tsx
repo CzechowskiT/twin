@@ -143,15 +143,21 @@ export function BillingUpgradeExperience({ checkoutConfigured, currentTier }: Bi
 
         {showWishlistBand ? (
           <aside className="twin-billing-engage__wishlist text-start">
-            <p className="twin-billing-engage__wishlist-eyebrow">{t("dashboard.billingEngagementWishlistEyebrow")}</p>
+            <p className="twin-billing-engage__wishlist-eyebrow">{t("dashboard.billingStripeNotReadyTitle")}</p>
             <h3 className="twin-billing-engage__wishlist-title">{t("dashboard.billingEngagementWishlistTitle")}</h3>
-            <p className="twin-billing-engage__wishlist-lead">{t("dashboard.billingEngagementWishlistLead")}</p>
-            <div className="marketing-hero-rail mt-4">
-              <div className="marketing-cta-stack">
-                <Link href="/waitlist" className="twin-billing-engage__wishlist-cta twin-touch-target">
-                  {t("dashboard.billingEngagementWishlistCta")}
-                </Link>
-              </div>
+            <p className="twin-billing-engage__wishlist-lead">{t("dashboard.billingStripeNotReadyLead")}</p>
+            <div className="marketing-hero-rail mt-4 flex flex-wrap gap-3">
+              <Link href="/waitlist" className="twin-billing-engage__wishlist-cta twin-touch-target">
+                {t("dashboard.billingStripeNotReadyPricing")}
+              </Link>
+              <a
+                href="https://github.com/CzechowskiT/twin/blob/main/docs/STRIPE_E2E.md"
+                className="twin-link twin-touch-target inline-flex items-center text-sm font-semibold"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t("dashboard.billingStripeNotReadyDocs")} ↗
+              </a>
             </div>
           </aside>
         ) : null}

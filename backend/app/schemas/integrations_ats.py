@@ -12,7 +12,26 @@ class AtsProviderSetupOut(BaseModel):
     signature_header: str
 
 
+class AtsOAuthConnectionOut(BaseModel):
+    provider: str
+    display_name: str
+    status: str
+    oauth_available: bool
+    oauth_state: str | None = None
+
+    model_config = {"from_attributes": True}
+
+
+class AtsConnectOut(BaseModel):
+    provider: str
+    status: str
+    oauth_available: bool
+    message: str
+    oauth_state: str | None = None
+
+
 class AtsSetupOut(BaseModel):
     providers: list[AtsProviderSetupOut]
+    oauth_connections: list[AtsOAuthConnectionOut] = Field(default_factory=list)
     docs_markdown_path: str = Field(default="/docs/ATS_WEBHOOKS.md")
     linkage_note: str

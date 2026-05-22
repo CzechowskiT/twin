@@ -7,10 +7,11 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.core.deps import get_current_user
-from app.database.models import AutoApplyConsent, Candidate, User
+from app.database.models import AutoApplyConsent, AutoApplyRun, Candidate, User
 from app.database.session import get_db
 from app.schemas.auto_apply_settings import (
     AutoApplyConsentIn,
+    AutoApplyLastSweepOut,
     AutoApplySettingsOut,
     AutoApplySettingsPatch,
     AutoApplyTriggerOut,
@@ -59,6 +60,28 @@ def _to_out(consent: AutoApplyConsent | None) -> AutoApplySettingsOut:
         last_run_at=consent.last_run_at,
         next_run_label=_next_run_label(),
         supported_boards=", ".join(sorted(supported_board_ids(settings))),
+    )
+
+
+@router.get("/last-sweep", response_model=AutoApplyLastSweepOut)
+def get_last_platform_sweep(
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_user),
+) -> AutoApplyLastSweepOut:
+    """Latest nightly sweep across all users (for dashboard observability)."""
+    row = db.query(AutoApplyRun).order_by(AutoApplyRun.started_at.desc()).first()
+    if not row:
+        return AutoApplyLastSweepOut(
+            started_at=None,
+            finished_at=None,
+            total_applications_submitted=0,
+            total_applications_failed=0,
+        )
+    return AutoApplyLastSweepOut(
+        started_at=row.started_at,
+        finished_at=row.finished_at,
+        total_applications_submitted=int(row.total_applications_submitted or 0),
+        total_applications_failed=int(row.total_applications_failed or 0),
     )
 
 

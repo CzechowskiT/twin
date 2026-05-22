@@ -88,6 +88,8 @@ def post_ats_cv_optimize(
     try:
         row = optimize_cv_for_application(db, candidate=candidate, application=app, job=job)
     except ValueError as exc:
+        if str(exc) == "Upload a CV first.":
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
     return _ats_out(row, app.id)
 

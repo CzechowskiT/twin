@@ -11,6 +11,7 @@ from app.core.deps import get_current_user
 from app.database.models import AccountReferral, ReferralPayout, User
 from app.database.session import get_db
 from app.schemas.referral import (
+    ReferralCashOutHistoryOut,
     ReferralCashOutRequestIn,
     ReferralCashOutRequestOut,
     ReferralLeaderboardEntryOut,
@@ -73,6 +74,17 @@ def referral_me(
         pending_earnings_cents=rp.sum_pending_earnings_cents(db, user.id),
         lifetime_earnings_cents=rp.sum_all_earnings_cents(db, user.id),
         recent_payouts=[ReferralPayoutOut.model_validate(p) for p in recent],
+    )
+
+
+@router.get("/cash-out/history", response_model=ReferralCashOutHistoryOut)
+def referral_cash_out_history(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> ReferralCashOutHistoryOut:
+    rows = rco.list_cash_out_requests(db, user.id, limit=50)
+    return ReferralCashOutHistoryOut(
+        requests=[ReferralCashOutRequestOut.model_validate(r) for r in rows],
     )
 
 

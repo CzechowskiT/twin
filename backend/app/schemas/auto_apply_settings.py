@@ -28,6 +28,13 @@ class AutoApplySettingsPatch(BaseModel):
     daily_limit: int | None = Field(default=None, ge=1, le=20)
 
 
+class AutoApplyLastSweepOut(BaseModel):
+    started_at: datetime | None
+    finished_at: datetime | None
+    total_applications_submitted: int
+    total_applications_failed: int
+
+
 class AutoApplyTriggerOut(BaseModel):
     applications_submitted: int
     applications_failed: int

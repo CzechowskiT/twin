@@ -15,7 +15,13 @@ from sqlalchemy.orm import Session
 from app.config import Settings, get_settings
 from app.core.deps import get_current_user
 from app.database.models import User
-from app.schemas.integrations_ats import AtsProviderSetupOut, AtsSetupOut
+from app.schemas.integrations_ats import (
+    AtsConnectOut,
+    AtsOAuthConnectionOut,
+    AtsProviderSetupOut,
+    AtsSetupOut,
+)
+from app.services import ats_oauth_stub as ats_oauth
 from app.database.models import Application, ApplicationStatus
 from app.database.session import get_db
 from app.services.placement_verification import PLACEMENT_VERIFIED, record_placement_event
@@ -29,6 +35,11 @@ _ATS_PROVIDERS: tuple[tuple[str, str, str, str], ...] = (
     ("ashby", "Ashby", "/api/v1/integrations/ats/ashby", "Ashby-Signature"),
 )
 
+_OAUTH_UI_PROVIDERS: tuple[tuple[str, str], ...] = (
+    ("greenhouse", "Greenhouse"),
+    ("lever", "Lever"),
+)
+
 
 def _secret_configured(settings: Settings, provider: str) -> bool:
     if provider == "greenhouse":
@@ -40,11 +51,29 @@ def _secret_configured(settings: Settings, provider: str) -> bool:
     return False
 
 
+def _oauth_connections_for_user(db: Session, user_id: int) -> list[AtsOAuthConnectionOut]:
+    rows = {r.provider: r for r in ats_oauth.list_connections(db, user_id)}
+    out: list[AtsOAuthConnectionOut] = []
+    for pid, label in _OAUTH_UI_PROVIDERS:
+        row = rows.get(pid)
+        out.append(
+            AtsOAuthConnectionOut(
+                provider=pid,
+                display_name=label,
+                status=row.status if row else "not_started",
+                oauth_available=ats_oauth.oauth_available(pid),
+                oauth_state=row.oauth_state if row else None,
+            )
+        )
+    return out
+
+
 @router.get("/ats/setup", response_model=AtsSetupOut)
 def ats_integration_setup(
     request: Request,
+    db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
-    _: User = Depends(get_current_user),
+    user: User = Depends(get_current_user),
 ) -> AtsSetupOut:
     """Webhook endpoints and secret status for recruiter ATS configuration UI."""
     base = str(request.base_url).rstrip("/")
@@ -61,10 +90,41 @@ def ats_integration_setup(
     ]
     return AtsSetupOut(
         providers=providers,
+        oauth_connections=_oauth_connections_for_user(db, user.id),
         linkage_note=(
             "Set Application.external_ats_id and external_ats_provider on each hire "
             "so hire webhooks can mark placement verified."
         ),
+    )
+
+
+@router.post("/ats/{provider}/connect", response_model=AtsConnectOut)
+def ats_oauth_connect_stub(
+    provider: str,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> AtsConnectOut:
+    """Persist OAuth placeholder state; full redirect when vendor credentials are configured."""
+    try:
+        row = ats_oauth.start_connect_stub(db, user_id=user.id, provider=provider)
+    except ValueError as exc:
+        if str(exc) == "unsupported_provider":
+            raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Unknown ATS provider.") from exc
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Invalid connect request.") from exc
+    db.commit()
+    pid = row.provider
+    available = ats_oauth.oauth_available(pid)
+    label = next((n for p, n in _OAUTH_UI_PROVIDERS if p == pid), pid)
+    message = (
+        f"{label} OAuth is not enabled on this environment yet. "
+        "Use hire webhooks below; OAuth job sync ships when credentials are configured."
+    )
+    return AtsConnectOut(
+        provider=pid,
+        status=row.status,
+        oauth_available=available,
+        message=message,
+        oauth_state=row.oauth_state,
     )
 
 

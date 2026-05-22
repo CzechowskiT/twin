@@ -132,6 +132,41 @@ def test_hiring_insights_cache(ca_db) -> None:
     assert insights["bar_summary"] == "Cached."
 
 
+def test_ats_cv_api_404_without_cv() -> None:
+    db_engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    Base.metadata.create_all(db_engine)
+    Session = sessionmaker(bind=db_engine, autocommit=False, autoflush=False)
+    session = Session()
+    user, candidate, job, application = _seed_user_candidate_job_app(session)
+    candidate.cv_text = ""
+    session.commit()
+
+    def override_db():
+        try:
+            yield session
+        finally:
+            pass
+
+    app.dependency_overrides[get_db] = override_db
+    token = create_access_token(user.email)
+    headers = {"Authorization": f"Bearer {token}"}
+    try:
+        client = TestClient(app)
+        res = client.post(
+            f"/api/v1/career-assistant/applications/{application.id}/ats-cv",
+            headers=headers,
+        )
+        assert res.status_code == 404
+        assert "CV" in res.json()["detail"]
+    finally:
+        app.dependency_overrides.clear()
+        session.close()
+
+
 def test_career_assistant_api_hiring_insights() -> None:
     db = create_engine(
         "sqlite://",

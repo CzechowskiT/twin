@@ -102,18 +102,33 @@ def _fetch_search_html(keyword: str) -> str:
     url = _build_search_url(keyword)
     if not assert_url_may_be_fetched(url):
         return ""
-    with sync_playwright() as pw:
-        browser = pw.chromium.launch(headless=True)
-        context = browser.new_context(locale="pl-PL", user_agent=get_scrape_user_agent())
-        page = context.new_page()
-        page.goto(url, wait_until="networkidle", timeout=90_000)
-        _dismiss_cookie_banner(page)
-        _scroll_to_load_offers(page)
-        html = page.content()
-        context.close()
-        browser.close()
+
+    last_html = ""
+    for attempt in range(3):
+        try:
+            with sync_playwright() as pw:
+                browser = pw.chromium.launch(headless=True)
+                context = browser.new_context(locale="pl-PL", user_agent=get_scrape_user_agent())
+                page = context.new_page()
+                wait_until = "domcontentloaded" if attempt else "networkidle"
+                page.goto(url, wait_until=wait_until, timeout=90_000)
+                _dismiss_cookie_banner(page)
+                try:
+                    page.wait_for_selector('a[href*="/oferta-pracy/"]', timeout=12_000)
+                except Exception:
+                    pass
+                _scroll_to_load_offers(page)
+                last_html = page.content()
+                context.close()
+                browser.close()
+            if last_html and "/oferta-pracy/" in last_html:
+                break
+        except Exception:
+            if attempt == 2:
+                return last_html
+            continue
     post_fetch_delay()
-    return html
+    return last_html
 
 
 def _dismiss_cookie_banner(page) -> None:
@@ -149,7 +164,14 @@ def _parse_listing_html(html: str, limit: int) -> list[ScrapedJob]:
     results: list[ScrapedJob] = []
     seen: set[str] = set()
 
-    for anchor in soup.find_all("a", href=OFFER_HREF_RE):
+    anchors = soup.find_all("a", href=OFFER_HREF_RE)
+    if not anchors:
+        anchors = [
+            a
+            for a in soup.find_all("a", href=True)
+            if "/oferta-pracy/" in str(a.get("href", ""))
+        ]
+    for anchor in anchors:
         if len(results) >= limit:
             break
         job = _parse_offer_anchor(anchor)

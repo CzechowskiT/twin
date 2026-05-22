@@ -5,7 +5,10 @@ import { useCallback, useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card } from "@/components/ui";
+import { apiFetch } from "@/lib/api";
+import { getToken } from "@/lib/auth";
 import { getPublicApiBase } from "@/lib/public-api-base";
+import toast from "react-hot-toast";
 
 const CONFIDENTIAL_KEYS = [
   "dataRoom.confidentialCap",
@@ -23,6 +26,9 @@ export function InvestorDataRoomPanel() {
 
   const [ndaAccepted, setNdaAccepted] = useState(false);
   const [ndaChecked, setNdaChecked] = useState(false);
+  const [uploadCategory, setUploadCategory] = useState("financials");
+  const [uploadFilename, setUploadFilename] = useState("");
+  const [uploadBusy, setUploadBusy] = useState(false);
 
   useEffect(() => {
     try {
@@ -109,6 +115,69 @@ export function InvestorDataRoomPanel() {
               </Card>
             ))}
           </div>
+          <Card variant="soft" className="mt-6 p-5">
+            <h3 className="font-semibold">{t("dataRoom.uploadTitle")}</h3>
+            <p className="twin-muted mt-2 text-sm leading-relaxed">{t("dataRoom.uploadLead")}</p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <label className="text-sm">
+                <span className="twin-muted text-xs">{t("dataRoom.uploadCategory")}</span>
+                <select
+                  className="twin-input mt-1 w-full"
+                  value={uploadCategory}
+                  onChange={(e) => setUploadCategory(e.target.value)}
+                >
+                  <option value="cap_table">cap_table</option>
+                  <option value="financials">financials</option>
+                  <option value="legal">legal</option>
+                  <option value="other">other</option>
+                </select>
+              </label>
+              <label className="text-sm">
+                <span className="twin-muted text-xs">{t("dataRoom.uploadFilename")}</span>
+                <input
+                  className="twin-input mt-1 w-full"
+                  value={uploadFilename}
+                  onChange={(e) => setUploadFilename(e.target.value)}
+                  placeholder="Q1-2026.pdf"
+                />
+              </label>
+            </div>
+            <Button
+              type="button"
+              className="mt-4"
+              disabled={uploadBusy || !uploadFilename.trim()}
+              onClick={() => {
+                const token = getToken();
+                if (!token) {
+                  toast.error(t("dataRoom.uploadFailed"));
+                  return;
+                }
+                setUploadBusy(true);
+                void apiFetch<{ storage_note?: string }>(
+                  "/api/v1/investor/data-room/uploads",
+                  {
+                    method: "POST",
+                    body: JSON.stringify({
+                      category: uploadCategory,
+                      filename: uploadFilename.trim(),
+                      content_type: "application/pdf",
+                      size_bytes: 1024,
+                    }),
+                  },
+                  token,
+                )
+                  .then((res) => {
+                    toast.success(t("dataRoom.uploadSuccess"));
+                    if (res.storage_note) toast(res.storage_note, { icon: "ℹ️" });
+                    setUploadFilename("");
+                  })
+                  .catch(() => toast.error(t("dataRoom.uploadFailed")))
+                  .finally(() => setUploadBusy(false));
+              }}
+            >
+              {t("dataRoom.uploadSubmit")}
+            </Button>
+          </Card>
           <Link
             href="/contact"
             className="marketing-cta-filled-pill marketing-btn-primary-shadow twin-touch-target mt-6 inline-flex min-h-[2.75rem] items-center justify-center rounded-full bg-[var(--twin-cta)] px-5 text-sm font-semibold text-[var(--twin-on-cta)]"

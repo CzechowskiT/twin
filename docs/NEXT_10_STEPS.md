@@ -2,67 +2,47 @@
 
 Aligned with the north star: **short calendar of acceptance-ready moments**, not inbox noise.
 
-## Shipped in latest pass
+## Shipped in latest sprint (May 2026)
+
+| # | Slice | Outcome |
+|---|--------|---------|
+| 0 | Referral cash-out deploy | `16ff417` on prod (`git_commit` health); cash-out request form + ops queue |
+| 1 | ATS OAuth placeholder | `POST /integrations/ats/{provider}/connect`, DB `recruiter_ats_oauth_connections`, disabled Connect UI |
+| 2 | Data room v2 upload stub | `POST /investor/data-room/uploads` metadata validation; migration `043` |
+| 3 | Referral cash-out status | `GET /referrals/cash-out/history`; dashboard pending/paid states |
+| 4 | Career assistant polish | PL empty states; `404` when no CV on ATS optimize |
+| 5 | Microsoft calendar dev UX | Callback error copy + `RAILWAY_PROD_ENV_CHECKLIST.md` link on calendar page |
+| 6 | Stripe checkout gate UX | Billing band → pricing + `STRIPE_E2E.md` when checkout not ready |
+| 7 | Nightly auto-apply observability | `GET /ops/auto-apply/last-run` (ops token); `GET /auto-apply/last-sweep` + dashboard strip |
+| 8 | RocketJobs scraper | Selector fallback + fetch retry; fixture test |
+| 9 | Docs | This file + next 3 priorities below |
+
+## Shipped (prior passes)
 
 | # | Slice | Outcome |
 |---|--------|---------|
 | 1 | Quantica compliance MVP | Onboarding, help, feedback, admin metrics, lifecycle email — `docs/QUANTICA_COMPLIANCE.md` |
 | 2 | Dashboard WebCal one-click | Mint + copy subscribe URL on main calendar strip |
-| 3 | Jobs empty state (zero corpus) | CTAs: profile, reset filters, ops scrape |
-| 4 | Public `/status` | `database_reachable` on mvp-stats + marketing status page |
-| 5 | Scrape ops doc | `docs/SCRAPE_OPS.md` |
-| 6 | Footer `/status` + Microsoft on dashboard strip | Legal footer link; Connect Microsoft 365 on main dashboard |
-| 7 | Stripe E2E doc | `docs/STRIPE_E2E.md`; status page shows Stripe + Microsoft flags |
-| 8 | WebCal URL persist | sessionStorage on dashboard after mint |
-| 9 | Billing plan cards | Premium/Pro match Free layout; no vertical letter glitch |
-| 2 | Google Calendar OAuth UX | Redirect URI copy on calendar page; fixes `redirect_uri_mismatch` |
-| 3 | Dashboard calendar strip | **Connect Google Calendar** on main dashboard when OAuth is wired |
-| 4 | Public `mvp-stats` | `mail_configured` + `google_calendar_configured` for investor strip |
-| 5 | Calendar status API | `oauth_redirect_uri` on `/calendar/google/status` for setup |
-| 7 | Placement + calendar | Existing flows kept; docs updated |
-| 8 | Scrape worker guard | `SCRAPE_WORKER_READY` + beat schedule (prior commit) |
-| 9 | Waitlist + mail | Resend on Railway when keys set (ops) |
-| 10 | `make ci-check` | Fast local gate (health + request-id + tsc) |
-
-## Shipped (continued)
-
-| # | Slice | Outcome |
-|---|--------|---------|
-| 10 | Employer placement attestation | `POST …/placement-employer-attest-link`, `/placement/employer`, public confirm API |
-| 11 | OpenAPI export | `GET /openapi.json` + Next proxy `/api/openapi` |
-| 12 | Unified interviews API | `GET /api/v1/calendar/me/interviews`; dashboard uses it |
-
-| 13 | Placement dispute + employer attest email | `POST …/placement-dispute`, optional recruiter email on attest link |
-| 14 | Developers page | `/developers` + OpenAPI / status / mvp-stats links |
-| 15 | Calendar provider i18n | Google / Microsoft labels on dashboard |
-
-| 16 | Ops placement dispute queue | `/admin/placements` + `GET /admin/placement-disputes` |
-| 17 | Employer attest branding | `GET /placement/employer/preview` + company on confirm page |
-| 18 | WebCal regenerate | New subscribe link on dashboard strip |
+| 10 | Employer placement attestation | `POST …/placement-employer-attest-link`, public confirm API |
 | 19 | Lever ATS webhook | `LEVER_WEBHOOK_SECRET` + hire → verified |
-| 20 | Ashby ATS webhook | `ASHBY_WEBHOOK_SECRET` + hire → verified |
-| 21 | Ops dispute resolve | `POST …/placement-disputes/{id}/resolve` + admin UI buttons |
-| 22 | Partner API keys | DB-hashed keys + `docs/PARTNER_API.md` + admin mint |
-| 23 | Acceptance queue | `/dashboard/acceptance` + `GET /candidates/me/acceptance-queue` |
-| 24 | Mobile calendar strip | Next interview card first on small screens |
-| 25 | Employer attest slug URL | `/placement/employer/{company-slug}?token=…` |
-| 26 | Admin partner keys UI | `/admin/partner-keys` mint + revoke |
 | 27 | Recruiter batch inbox | `/recruiter/inbox` + `docs/RECRUITER_INBOX.md` |
-| 28 | Logo marquee everywhere | All routes except `/waitlist` |
 
-See **`docs/PRODUCT_ROADMAP.md`** for product rationale on next priorities.
+See **`docs/PRODUCT_ROADMAP.md`** for product rationale.
 
-## Recommended next 10 (backlog)
+## Recommended next 3 priorities
 
-1. **Merge `cursor/referrals-ats-dataroom-personas`** — investor vs companies personas + referrals / ATS UI / data room MVP
-2. **Nightly auto-apply prod night** — post-02:00 verify beat + `auto_apply_runs` + summary mail (`docs/NIGHTLY_AUTO_APPLY_DEPLOY.md`, mega-prompt checklist)
-3. **Railway secrets** — mail, Stripe, Microsoft (`docs/RAILWAY_PROD_ENV_PL.md`)
-4. **Dedicated twin-worker** — Celery beat off API (`docs/RAILWAY_WORKER_PL.md`)
-5. **Stripe E2E staging** — `docs/STRIPE_E2E.md`
-6. **Scrape corpus growth** — ops allowlist + daily beat
-7. **Interview reminders prod verify** — beat on worker + mail on Railway
-8. **ATS OAuth / job sync** — beyond hire webhooks (`docs/ATS_WEBHOOKS.md`)
-9. **Data room v2** — NDA gate, document upload, download audit log
-10. **Referral cash-out** — payout fulfillment UI on top of `referral_payouts` *(cash-out request form + ops queue stub shipped)*
+1. **Railway user secrets** — `MICROSOFT_CLIENT_*`, `STRIPE_*`, mail (`docs/RAILWAY_PROD_ENV_CHECKLIST.md`) — flip `microsoft_calendar_configured` + `stripe_checkout_ready` on prod health
+2. **Nightly auto-apply prod night** — post-02:00 verify beat + `auto_apply_runs` row + summary mail (`docs/NIGHTLY_AUTO_APPLY_DEPLOY.md`)
+3. **ATS OAuth live** — Greenhouse/Lever redirect when app credentials exist; job sync beyond hire webhooks
 
-Mega-prompt reference: `~/Downloads/cursor_autonomous_nightly_autoapply.md` (implementation largely in repo; ops checklist in `NIGHTLY_AUTO_APPLY_DEPLOY.md`).
+## Backlog (next 10)
+
+4. Dedicated twin-worker — Celery beat off API (`docs/RAILWAY_WORKER_PL.md`)
+5. Stripe E2E staging — `docs/STRIPE_E2E.md`
+6. Scrape corpus growth — ops allowlist + daily beat
+7. Interview reminders prod verify — beat on worker + mail on Railway
+8. Data room S3 blobs — wire upload bytes when `S3_BUCKET_NAME` set
+9. Referral cash-out fulfillment — ops mark paid + optional email stub
+10. WebCal one-click polish — persist + regenerate UX on all calendar strips
+
+Mega-prompt reference: `~/Downloads/cursor_autonomous_nightly_autoapply.md` (ops checklist in `NIGHTLY_AUTO_APPLY_DEPLOY.md`).

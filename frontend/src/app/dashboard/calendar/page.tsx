@@ -143,6 +143,7 @@ export default function DashboardCalendarPage() {
   const [msStatus, setMsStatus] = useState<MicrosoftCalendarStatus | null>(null);
   const [webcalUrl, setWebcalUrl] = useState<string | null>(null);
   const [banner, setBanner] = useState<"connected" | "denied" | "error" | null>(null);
+  const [calendarErrorCode, setCalendarErrorCode] = useState<string | null>(null);
   const [actionBusy, setActionBusy] = useState<string | null>(null);
   const [actionError, setActionError] = useState(false);
   const [freeBusyResult, setFreeBusyResult] = useState<FreeBusyOut | null>(null);
@@ -258,11 +259,24 @@ export default function DashboardCalendarPage() {
     queueMicrotask(() => {
       const c = searchParams.get("calendar_connected");
       const err = searchParams.get("calendar_error");
+      setCalendarErrorCode(err);
       if (c === "1" || c === "microsoft") setBanner("connected");
       else if (err === "google_denied" || err === "microsoft_denied") setBanner("denied");
       else if (err) setBanner("error");
     });
   }, [searchParams]);
+
+  const calendarErrorMessage = (() => {
+    if (!calendarErrorCode) return null;
+    const map: Record<string, TranslationKey> = {
+      microsoft_denied: "dashboard.calendarErrorMicrosoftDenied",
+      exchange_failed: "dashboard.calendarErrorMicrosoftExchange",
+      no_refresh_token: "dashboard.calendarErrorMicrosoftNoRefresh",
+      invalid_state: "dashboard.calendarErrorInvalidState",
+    };
+    const key = map[calendarErrorCode];
+    return key ? t(key) : t("dashboard.calendarErrorGeneric");
+  })();
 
   async function patchNotificationPreference<K extends keyof AuthMeOut>(key: K, value: boolean) {
     const token = getToken();
@@ -691,7 +705,19 @@ export default function DashboardCalendarPage() {
       ) : null}
       {banner === "error" ? (
         <Card variant="soft" className="mb-4">
-          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.calendarErrorGeneric")}</p>
+          <p className="text-sm text-[var(--twin-muted-strong)]">{calendarErrorMessage}</p>
+          {calendarErrorCode?.startsWith("microsoft") ||
+          calendarErrorCode === "exchange_failed" ||
+          calendarErrorCode === "no_refresh_token" ? (
+            <a
+              href="https://github.com/CzechowskiT/twin/blob/main/docs/RAILWAY_PROD_ENV_CHECKLIST.md"
+              className="twin-link mt-2 inline-block text-sm font-medium"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t("dashboard.calendarMicrosoftEnvChecklist")} ↗
+            </a>
+          ) : null}
         </Card>
       ) : null}
       {actionError ? (
@@ -808,9 +834,19 @@ export default function DashboardCalendarPage() {
                   </Button>
                 </>
               ) : msStatus?.oauth_configured === false ? (
-                <p className="mt-3 text-sm text-amber-700 dark:text-amber-300">
-                  {t("dashboard.calendarMicrosoftOAuthNotConfigured")}
-                </p>
+                <div className="mt-3 space-y-2">
+                  <p className="text-sm text-amber-700 dark:text-amber-300">
+                    {t("dashboard.calendarMicrosoftOAuthNotConfigured")}
+                  </p>
+                  <a
+                    href="https://github.com/CzechowskiT/twin/blob/main/docs/RAILWAY_PROD_ENV_CHECKLIST.md"
+                    className="twin-link text-sm font-medium"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {t("dashboard.calendarMicrosoftEnvChecklist")} ↗
+                  </a>
+                </div>
               ) : (
                 <Button
                   type="button"

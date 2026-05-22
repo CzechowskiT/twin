@@ -5,6 +5,8 @@ from fastapi import APIRouter
 from app.api import (
     auto_apply_settings,
     admin_ops,
+    ops,
+    investor_data_room,
     applications,
     auth,
     beta_waitlist,
@@ -55,4 +57,6 @@ api_router.include_router(applications.router, prefix="/applications", tags=["Ap
 api_router.include_router(auto_apply_settings.router, prefix="/auto-apply", tags=["Auto-apply"])
 api_router.include_router(feedback.router, prefix="/feedback", tags=["Feedback"])
 api_router.include_router(admin_ops.router, prefix="/admin", tags=["Admin"])
+api_router.include_router(ops.router, prefix="/ops", tags=["Ops"])
+api_router.include_router(investor_data_room.router, prefix="/investor", tags=["Investor"])
 api_router.include_router(recruiter.router, prefix="/recruiter", tags=["Recruiter"])

@@ -18,6 +18,14 @@ type ReferralPayout = {
   created_at: string;
 };
 
+type CashOutRequest = {
+  id: number;
+  amount_cents: number;
+  payout_method: string;
+  status: string;
+  created_at: string;
+};
+
 type ReferralMe = {
   referral_public_token: string;
   share_example_path: string;
@@ -54,6 +62,7 @@ export function ReferralsDashboard() {
   const { t } = useTranslation();
   const [me, setMe] = useState<ReferralMe | null>(null);
   const [board, setBoard] = useState<LeaderboardEntry[]>([]);
+  const [cashOutHistory, setCashOutHistory] = useState<CashOutRequest[]>([]);
   const [lbWindow, setLbWindow] = useState<"month" | "all">("month");
   const [err, setErr] = useState<string | null>(null);
 
@@ -67,16 +76,18 @@ export function ReferralsDashboard() {
     if (!token) return;
     setErr(null);
     try {
-      const [meRes, lbRes] = await Promise.all([
+      const [meRes, lbRes, histRes] = await Promise.all([
         apiFetch<ReferralMe>("/api/v1/referrals/me", {}, token),
         apiFetch<{ entries: LeaderboardEntry[] }>(
           `/api/v1/referrals/leaderboard?window=${lbWindow}`,
           {},
           token,
         ),
+        apiFetch<{ requests: CashOutRequest[] }>("/api/v1/referrals/cash-out/history", {}, token),
       ]);
       setMe(meRes);
       setBoard(lbRes.entries);
+      setCashOutHistory(histRes.requests);
     } catch (e) {
       setErr(e instanceof Error ? e.message : t("referrals.loadFailed"));
     }
@@ -142,6 +153,34 @@ export function ReferralsDashboard() {
           {t("referrals.cashOutLink")}
         </Link>
       ) : null}
+
+      <section>
+        <h2 className="text-lg font-semibold">{t("referrals.cashOutHistoryTitle")}</h2>
+        {cashOutHistory.length === 0 ? (
+          <p className="twin-muted mt-2 text-sm">{t("referrals.cashOutNoHistory")}</p>
+        ) : (
+          <ul className="mt-3 space-y-2">
+            {cashOutHistory.map((r) => {
+              const statusKey =
+                r.status === "paid"
+                  ? "referrals.cashOutStatusPaid"
+                  : r.status === "requested"
+                    ? "referrals.cashOutStatusRequested"
+                    : "referrals.cashOutStatusPending";
+              return (
+                <li
+                  key={r.id}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[var(--twin-border)] px-3 py-2 text-sm"
+                >
+                  <span className="tabular-nums font-medium">{formatMoney(r.amount_cents)}</span>
+                  <span className="twin-muted text-xs">{new Date(r.created_at).toLocaleString()}</span>
+                  <span className="text-xs font-medium capitalize">{t(statusKey)}</span>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
 
       <section>
         <h2 className="text-lg font-semibold">{t("referrals.payoutsTitle")}</h2>

@@ -128,16 +128,110 @@ def test_ashby_webhook_rejects_bad_signature(mock_gs: MagicMock) -> None:
     assert res.status_code == 403
 
 
-def test_ats_setup_returns_providers() -> None:
+def test_ats_oauth_connect_stub_persists_state() -> None:
     from app.core.deps import get_current_user
-    from app.database.models import User
+    from app.database.models import Base, User
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+    from sqlalchemy.pool import StaticPool
 
-    user = User(id=1, email="rec@example.com", hashed_password="x", is_active=True)
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+    from datetime import datetime, timezone
+
+    from app.core.security import hash_password
+
+    db = Session()
+    now = datetime.now(timezone.utc)
+    user = User(
+        email="rec-oauth@example.com",
+        hashed_password=hash_password("password12"),
+        gdpr_consent_at=now,
+        is_active=True,
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
 
     def _user() -> User:
         return user
 
+    def override_db():
+        try:
+            yield db
+        finally:
+            pass
+
+    from app.database.session import get_db
+
     app.dependency_overrides[get_current_user] = _user
+    app.dependency_overrides[get_db] = override_db
+    try:
+        client = TestClient(app)
+        res = client.post("/api/v1/integrations/ats/greenhouse/connect")
+        assert res.status_code == 200
+        body = res.json()
+        assert body["provider"] == "greenhouse"
+        assert body["status"] == "pending"
+        assert body["oauth_available"] is False
+        assert body["oauth_state"]
+        setup = client.get("/api/v1/integrations/ats/setup")
+        assert setup.status_code == 200
+        oauth = setup.json()["oauth_connections"]
+        gh = next(c for c in oauth if c["provider"] == "greenhouse")
+        assert gh["status"] == "pending"
+    finally:
+        app.dependency_overrides.pop(get_current_user, None)
+        app.dependency_overrides.pop(get_db, None)
+        db.close()
+
+
+def test_ats_setup_returns_providers() -> None:
+    from datetime import datetime, timezone
+
+    from app.core.deps import get_current_user
+    from app.core.security import hash_password
+    from app.database.models import Base, User
+    from app.database.session import get_db
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+    from sqlalchemy.pool import StaticPool
+
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+    db = Session()
+    now = datetime.now(timezone.utc)
+    user = User(
+        email="rec-setup@example.com",
+        hashed_password=hash_password("password12"),
+        gdpr_consent_at=now,
+        is_active=True,
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    def _user() -> User:
+        return user
+
+    def override_db():
+        try:
+            yield db
+        finally:
+            pass
+
+    app.dependency_overrides[get_current_user] = _user
+    app.dependency_overrides[get_db] = override_db
     try:
         client = TestClient(app)
         res = client.get("/api/v1/integrations/ats/setup")
@@ -146,5 +240,8 @@ def test_ats_setup_returns_providers() -> None:
         assert len(body["providers"]) == 3
         assert body["providers"][0]["provider"] == "greenhouse"
         assert "/api/v1/integrations/ats/greenhouse" in body["providers"][0]["webhook_url"]
+        assert len(body["oauth_connections"]) == 2
     finally:
         app.dependency_overrides.pop(get_current_user, None)
+        app.dependency_overrides.pop(get_db, None)
+        db.close()
