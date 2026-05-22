@@ -13,6 +13,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
+import { DemoLiveSnapshot } from "@/components/marketing/demo-live-snapshot";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { ButtonCta, Shell } from "@/components/ui";
 import {
@@ -151,6 +152,8 @@ export function DemoAutoApplyPage() {
             <h1 className="twin-page-intro twin-section-title max-w-4xl text-2xl sm:text-3xl md:text-4xl">{t("demo.pageTitle")}</h1>
             <p className="max-w-3xl text-base leading-relaxed text-[var(--twin-muted-strong)] sm:text-lg">{t("demo.pageLead")}</p>
           </header>
+
+          <DemoLiveSnapshot />
 
           <aside
             className="rounded-2xl border border-amber-200/90 bg-amber-50/95 px-4 py-3 text-sm leading-relaxed text-amber-950 shadow-sm"

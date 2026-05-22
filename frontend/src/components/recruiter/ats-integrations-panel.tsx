@@ -117,7 +117,11 @@ export function AtsIntegrationsPanel() {
           <Card key={c.provider} className="flex flex-col p-5">
             <h2 className="text-lg font-semibold">{c.display_name}</h2>
             <p className="twin-muted mt-2 text-xs leading-relaxed">
-              {c.oauth_available ? t("atsIntegrations.oauthReady") : t("atsIntegrations.oauthComingSoon")}
+              {c.oauth_available
+                ? t("atsIntegrations.oauthReady")
+                : c.provider === "lever"
+                  ? t("atsIntegrations.oauthComingSoonLever")
+                  : t("atsIntegrations.oauthComingSoon")}
             </p>
             <p className="mt-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
               {t("atsIntegrations.oauthStatus")}: {c.status}

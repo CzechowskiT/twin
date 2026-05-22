@@ -838,6 +838,9 @@ export default function DashboardCalendarPage() {
                   <p className="text-sm text-amber-700 dark:text-amber-300">
                     {t("dashboard.calendarMicrosoftOAuthNotConfigured")}
                   </p>
+                  <p className="text-xs leading-relaxed text-[var(--twin-muted-strong)]">
+                    {t("dashboard.calendarMicrosoftSetupWizard")}
+                  </p>
                   <a
                     href="https://github.com/CzechowskiT/twin/blob/main/docs/RAILWAY_PROD_ENV_CHECKLIST.md"
                     className="twin-link text-sm font-medium"

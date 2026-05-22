@@ -104,6 +104,7 @@ export function ReferralCashOutForm() {
           {t("referrals.cashOutPending")}
         </p>
         <p className="mt-1 text-2xl font-semibold tabular-nums">{formatMoney(me.pending_earnings_cents)}</p>
+        <p className="twin-muted mt-3 text-xs leading-relaxed">{t("referrals.cashOutLead")}</p>
       </Card>
 
       {open ? (
@@ -112,6 +113,7 @@ export function ReferralCashOutForm() {
           <p className="twin-muted mt-2 text-sm">
             {formatMoney(open.amount_cents)} · {open.payout_method} · {open.status}
           </p>
+          <p className="twin-muted mt-2 text-xs leading-relaxed">{t("referrals.cashOutManualNote")}</p>
         </Card>
       ) : me.pending_earnings_cents <= 0 ? (
         <p className="twin-muted text-sm">{t("referrals.cashOutNoPending")}</p>

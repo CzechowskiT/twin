@@ -89,6 +89,7 @@ export type TranslationKey =
   | `recruiterJobs.${keyof typeof en.recruiterJobs}`
   | `verifyEmail.${keyof typeof en.verifyEmail}`
   | `investorMetrics.${keyof typeof en.investorMetrics}`
+  | `placementDemo.${keyof typeof en.placementDemo}`
   | `referrals.${keyof typeof en.referrals}`
   | `atsIntegrations.${keyof typeof en.atsIntegrations}`
   | `dataRoom.${keyof typeof en.dataRoom}`
@@ -772,6 +773,8 @@ const en = {
     calendarConnectMicrosoft: "Connect Microsoft 365 / Outlook",
     calendarMicrosoftOAuthNotConfigured:
       "Microsoft Calendar is not wired on this server yet. Add MICROSOFT_CLIENT_ID, MICROSOFT_CLIENT_SECRET, and MICROSOFT_CALENDAR_REDIRECT_URI on the API host (Railway), then redeploy.",
+    calendarMicrosoftSetupWizard:
+      "1) Azure app registration → redirect URI = MICROSOFT_CALENDAR_REDIRECT_URI. 2) API permissions: Calendars.Read, Calendars.ReadWrite, offline_access. 3) Paste client id/secret + tenant into Railway (see checklist). 4) Redeploy API and connect here.",
     calendarGoogleOAuthNotConfigured:
       "Google Calendar OAuth is not wired on this server yet. Add GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_CALENDAR_REDIRECT_URI on the API host (Railway), then redeploy.",
     calendarDisconnectMicrosoft: "Disconnect Microsoft",
@@ -1216,6 +1219,8 @@ const en = {
     toolInvestorSignupDesc: "Start a B2B program conversation with TWIN.",
     toolInvestorMetrics: "Live traction dashboard",
     toolInvestorMetricsDesc: "Validated jobs, users, applications — public aggregates only.",
+    toolInvestorPlacement: "Placement verification timeline",
+    toolInvestorPlacementDesc: "Append-only hire events — investor walkthrough + seeded demo login.",
   },
   developers: {
     title: "Developers & integrators",
@@ -1262,12 +1267,25 @@ const en = {
     applications: "Applications tracked",
     cvProfiles: "Profiles with CV",
     boards: "Job boards in registry",
+    placements: "Verified placements",
+    interviews: "Scheduled interviews",
+    dataRoomDemoMode:
+      "Data room: demo mode (local upload on API). Set S3_BUCKET_NAME + keys on Railway for presigned cloud PUT.",
     flagMail: "Mail",
     flagStripe: "Stripe checkout",
     flagGoogle: "Google Calendar",
     flagMicrosoft: "Microsoft Calendar",
     updated: "Updated",
     loadFailed: "Could not load metrics",
+  },
+  placementDemo: {
+    eyebrow: "Trust layer",
+    title: "Placement verification timeline",
+    lead: "Append-only events — no CS email ping-pong. Candidates declare; work email or employer attestation confirms hire.",
+    actor: "Actor",
+    seedNote:
+      "Log in as investor-demo@twin.local (see docs/INVESTOR_DEMO_RUNBOOK.md) and open Applications → placement events on the hired row.",
+    loginDemo: "Sign in to live demo account",
   },
   referrals: {
     title: "Refer friends",
@@ -1297,7 +1315,9 @@ const en = {
     cashOutLink: "Cash out",
     cashOutTitle: "Request payout",
     cashOutLead:
-      "Withdraw pending referral earnings. Payouts are processed manually within a few business days.",
+      "Withdraw pending referral earnings. Payouts are manual bank/PayPal transfer — no Stripe Connect in this demo.",
+    cashOutManualNote:
+      "Status requested means ops will mark paid after manual transfer (typically a few business days).",
     cashOutPending: "Available to cash out",
     cashOutMethod: "Payout method",
     cashOutMethodBank: "Bank transfer (PLN)",
@@ -1333,6 +1353,8 @@ const en = {
     backRecruiter: "Recruiter workspace",
     oauthComingSoon:
       "Set GREENHOUSE_CLIENT_ID, GREENHOUSE_CLIENT_SECRET, and GREENHOUSE_OAUTH_REDIRECT_URI on the API to enable OAuth. Hire webhooks below still work.",
+    oauthComingSoonLever:
+      "Lever OAuth stub: set LEVER_CLIENT_ID, LEVER_CLIENT_SECRET, and LEVER_OAUTH_REDIRECT_URI (authorize URL ships in a later slice). Hire webhooks work today.",
     oauthReady: "OAuth is configured — connect to authorize TWIN in your ATS.",
     oauthConnected: "ATS connected successfully.",
     oauthFailed: "ATS connection failed or was cancelled.",
@@ -1436,6 +1458,9 @@ const en = {
     uploadSuccess: "Metadata registered",
     uploadPresignHint: "Use the presigned upload URL from API response (PUT) within 15 minutes.",
     uploadFailed: "Could not register metadata",
+    demoModeBanner:
+      "Demo mode: no S3 on API — register metadata, then PUT the file to POST /api/v1/investor/data-room/uploads/{id}/file (local disk). Production uses presigned S3 URLs.",
+    demoModeDocLink: "Railway env checklist (S3 optional)",
   },
   recruiterJobs: {
     title: "Post a job",
@@ -1815,6 +1840,12 @@ const en = {
     stepPending: "Waiting",
     stepActive: "In progress…",
     stepDone: "Complete",
+    liveEyebrow: "Live preview",
+    liveTitle: "Ranked roles (read-only)",
+    liveLead: "When demo mode is on, this list comes from the API — fictional companies only, no login.",
+    liveSourceDb: "Seeded demo account.",
+    signUpToApply: "Sign up to apply",
+    liveInterviewHint: "Upcoming interview hold",
     footerNote:
       "GDPR: real accounts require explicit consent at registration. This page uses only fictional data suitable for a public demo.",
   },
@@ -2686,6 +2717,8 @@ const pl: MessageTree = {
     calendarConnectMicrosoft: "Połącz Microsoft 365 / Outlook",
     calendarMicrosoftOAuthNotConfigured:
       "Kalendarz Microsoft nie jest jeszcze podłączony na serwerze. Ustaw MICROSOFT_CLIENT_ID, MICROSOFT_CLIENT_SECRET i MICROSOFT_CALENDAR_REDIRECT_URI na API (Railway) i zrób redeploy.",
+    calendarMicrosoftSetupWizard:
+      "1) Rejestracja aplikacji w Azure → redirect URI = MICROSOFT_CALENDAR_REDIRECT_URI. 2) Uprawnienia: Calendars.Read, Calendars.ReadWrite, offline_access. 3) Wklej id/sekret + tenant na Railway (checklista). 4) Redeploy API i połącz tutaj.",
     calendarGoogleOAuthNotConfigured:
       "OAuth Google Calendar nie jest jeszcze podłączony na serwerze. Ustaw GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET i GOOGLE_CALENDAR_REDIRECT_URI na API (Railway) i zrób redeploy.",
     calendarDisconnectMicrosoft: "Odłącz Microsoft",
@@ -3139,6 +3172,8 @@ const pl: MessageTree = {
     toolInvestorSignupDesc: "Rozpocznij rozmowę B2B z TWIN.",
     toolInvestorMetrics: "Panel metryk na żywo",
     toolInvestorMetricsDesc: "Oferty, użytkownicy, aplikacje — tylko agregaty publiczne.",
+    toolInvestorPlacement: "Oś czasu placementu",
+    toolInvestorPlacementDesc: "Zdarzenia zatrudnienia — demo inwestora + konto seed.",
   },
   developers: {
     title: "Dla developerów i integratorów",
@@ -3185,12 +3220,25 @@ const pl: MessageTree = {
     applications: "Śledzone aplikacje",
     cvProfiles: "Profile z CV",
     boards: "Portale w rejestrze",
+    placements: "Zweryfikowane placementy",
+    interviews: "Zaplanowane rozmowy",
+    dataRoomDemoMode:
+      "Data room: tryb demo (lokalny upload na API). Ustaw S3_BUCKET_NAME + klucze na Railway dla presigned PUT w chmurze.",
     flagMail: "Poczta",
     flagStripe: "Stripe checkout",
     flagGoogle: "Kalendarz Google",
     flagMicrosoft: "Kalendarz Microsoft",
     updated: "Aktualizacja",
     loadFailed: "Nie udało się załadować metryk",
+  },
+  placementDemo: {
+    eyebrow: "Warstwa zaufania",
+    title: "Oś czasu weryfikacji placementu",
+    lead: "Zdarzenia tylko do dopisywania — bez ping-ponga mailowego. Kandydat deklaruje; e-mail służbowy lub atest pracodawcy potwierdza zatrudnienie.",
+    actor: "Aktor",
+    seedNote:
+      "Zaloguj się jako investor-demo@twin.local (docs/INVESTOR_DEMO_RUNBOOK.md) i otwórz Aplikacje → zdarzenia placementu przy zatrudnieniu.",
+    loginDemo: "Zaloguj na konto demo",
   },
   referrals: {
     title: "Poleć znajomych",
@@ -3220,7 +3268,9 @@ const pl: MessageTree = {
     cashOutLink: "Wypłać",
     cashOutTitle: "Zlecenie wypłaty",
     cashOutLead:
-      "Wypłać oczekujące zarobki z poleceń. Wypłaty realizujemy ręcznie w ciągu kilku dni roboczych.",
+      "Wypłać oczekujące zarobki. Wypłata ręczna (przelew/PayPal) — bez Stripe Connect w tym demo.",
+    cashOutManualNote:
+      "Status „złożono” oznacza, że ops oznaczy wypłatę po ręcznym przelewie (zwykle kilka dni roboczych).",
     cashOutPending: "Do wypłaty",
     cashOutMethod: "Metoda wypłaty",
     cashOutMethodBank: "Przelew bankowy (PLN)",
@@ -3256,6 +3306,8 @@ const pl: MessageTree = {
     backRecruiter: "Strefa rekrutera",
     oauthComingSoon:
       "Ustaw GREENHOUSE_CLIENT_ID, GREENHOUSE_CLIENT_SECRET i GREENHOUSE_OAUTH_REDIRECT_URI na API. Webhooki poniżej działają bez OAuth.",
+    oauthComingSoonLever:
+      "Szkic OAuth Lever: LEVER_CLIENT_ID, LEVER_CLIENT_SECRET, LEVER_OAUTH_REDIRECT_URI (URL autoryzacji w kolejnym kroku). Webhooki działają.",
     oauthReady: "OAuth skonfigurowane — połącz, aby autoryzować TWIN w ATS.",
     oauthConnected: "ATS połączony.",
     oauthFailed: "Połączenie ATS nie powiodło się lub zostało anulowane.",
@@ -3359,6 +3411,9 @@ const pl: MessageTree = {
     uploadSuccess: "Metadane zapisane",
     uploadPresignHint: "Wyślij plik metodą PUT na presigned URL z API (ważny 15 min).",
     uploadFailed: "Nie udało się zapisać metadanych",
+    demoModeBanner:
+      "Tryb demo: brak S3 — zarejestruj metadane, potem PUT na POST /api/v1/investor/data-room/uploads/{id}/file (dysk API). Produkcja: presigned S3.",
+    demoModeDocLink: "Checklista env Railway (S3 opcjonalnie)",
   },
   recruiterJobs: {
     title: "Opublikuj ofertę",
@@ -3742,6 +3797,12 @@ const pl: MessageTree = {
     stepPending: "Oczekuje",
     stepActive: "W toku…",
     stepDone: "Gotowe",
+    liveEyebrow: "Podgląd na żywo",
+    liveTitle: "Ranking ofert (tylko odczyt)",
+    liveLead: "Gdy demo mode jest włączone, lista pochodzi z API — fikcyjne firmy, bez logowania.",
+    liveSourceDb: "Konto demo z seeda.",
+    signUpToApply: "Załóż konto, by aplikować",
+    liveInterviewHint: "Zaplanowana rozmowa",
     footerNote:
       "RODO: prawdziwe konta wymagają wyraźnej zgody przy rejestracji. Ta strona używa wyłącznie fikcyjnych danych nadających się do publicznego demo.",
   },

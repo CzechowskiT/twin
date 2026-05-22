@@ -253,6 +253,9 @@ class Settings(BaseSettings):
     greenhouse_oauth_redirect_uri: str = ""
     greenhouse_oauth_scopes: str = ""
     lever_webhook_secret: str = ""
+    lever_client_id: str = ""
+    lever_client_secret: str = ""
+    lever_oauth_redirect_uri: str = ""
     ashby_webhook_secret: str = ""
 
     # S3-compatible storage (AWS S3, Cloudflare R2, MinIO). Empty keys = disabled.
@@ -331,6 +334,10 @@ class Settings(BaseSettings):
 
     # Partner / ATS export (Bearer-style token via X-Twin-Partner-Token header).
     partner_export_token: str = ""
+
+    # Investor demo: public GET /api/v1/demo/snapshot (read-only; default off in production).
+    demo_mode_enabled: bool = False
+    demo_user_email: str = "demo@twin.career"
 
     # Recruiter batch inbox pilot (X-Twin-Recruiter-Token + company_slug filter).
     recruiter_inbox_token: str = ""

@@ -122,6 +122,12 @@ def ats_oauth_connect(
     label = next((n for p, n in _OAUTH_UI_PROVIDERS if p == pid), pid)
     if authorize_url:
         message = f"Redirect to {label} to authorize TWIN."
+    elif pid == "lever":
+        message = (
+            f"{label} OAuth is a stub until partner credentials are set. "
+            "Configure LEVER_CLIENT_ID, LEVER_CLIENT_SECRET, and LEVER_OAUTH_REDIRECT_URI on the API, "
+            "or use the Lever hire webhook below."
+        )
     else:
         message = (
             f"{label} OAuth is not enabled on this environment yet. "

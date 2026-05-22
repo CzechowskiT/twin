@@ -9,8 +9,12 @@ type MvpStats = {
   validated_jobs: number;
   registered_users: number;
   total_applications: number;
+  verified_placements: number;
+  interviews_scheduled: number;
   profiles_with_cv: number;
   job_boards_in_registry: number;
+  data_room_s3_enabled: boolean;
+  data_room_local_demo: boolean;
   stripe_checkout_ready: boolean;
   mail_configured: boolean;
   google_calendar_configured: boolean;
@@ -47,6 +51,8 @@ export function InvestorMetricsPanel() {
     { label: t("investorMetrics.jobs"), value: stats.validated_jobs },
     { label: t("investorMetrics.users"), value: stats.registered_users },
     { label: t("investorMetrics.applications"), value: stats.total_applications },
+    { label: t("investorMetrics.placements"), value: stats.verified_placements },
+    { label: t("investorMetrics.interviews"), value: stats.interviews_scheduled },
     { label: t("investorMetrics.cvProfiles"), value: stats.profiles_with_cv },
     { label: t("investorMetrics.boards"), value: stats.job_boards_in_registry },
   ];
@@ -63,6 +69,11 @@ export function InvestorMetricsPanel() {
           </Card>
         ))}
       </div>
+      {stats.data_room_local_demo && !stats.data_room_s3_enabled ? (
+        <p className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-900 dark:text-amber-200">
+          {t("investorMetrics.dataRoomDemoMode")}
+        </p>
+      ) : null}
       <ul className="twin-muted grid gap-1 text-xs sm:grid-cols-2">
         <li>{t("investorMetrics.flagMail")}: {stats.mail_configured ? "✓" : "—"}</li>
         <li>{t("investorMetrics.flagStripe")}: {stats.stripe_checkout_ready ? "✓" : "—"}</li>

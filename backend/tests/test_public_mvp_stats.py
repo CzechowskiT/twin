@@ -48,6 +48,8 @@ def test_public_mvp_stats_shape_empty(_mock_li: object, _mock_stripe: object, *_
         assert body["validated_jobs"] == 0
         assert body["registered_users"] == 0
         assert body["total_applications"] == 0
+        assert body["verified_placements"] == 0
+        assert body["interviews_scheduled"] == 0
         assert body["profiles_with_cv"] == 0
         assert body["job_boards_in_registry"] >= 1
         assert "generated_at" in body
@@ -58,6 +60,8 @@ def test_public_mvp_stats_shape_empty(_mock_li: object, _mock_stripe: object, *_
         assert body["google_calendar_configured"] is False
         assert body["microsoft_calendar_configured"] is False
         assert body["database_reachable"] is True
+        assert body["data_room_s3_enabled"] is False
+        assert body["data_room_local_demo"] is True
     finally:
         app.dependency_overrides.pop(get_db, None)
         db.close()

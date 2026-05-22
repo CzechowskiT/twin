@@ -15,6 +15,11 @@ class MvpStatsOut(BaseModel):
     )
     registered_users: int = Field(ge=0, description="User accounts (includes incomplete onboarding).")
     total_applications: int = Field(ge=0, description="Application rows across all candidates.")
+    verified_placements: int = Field(
+        ge=0,
+        description="Applications with placement verified (HIRED + placement_verified_at).",
+    )
+    interviews_scheduled: int = Field(ge=0, description="Scheduled interview rows on calendars.")
     profiles_with_cv: int = Field(ge=0, description="Candidates who uploaded a CV at least once.")
     job_boards_in_registry: int = Field(ge=0, description="Board adapters in the current scrape registry order.")
     generated_at: str = Field(description="ISO-8601 UTC timestamp when counts were computed.")
@@ -35,4 +40,10 @@ class MvpStatsOut(BaseModel):
     )
     database_reachable: bool = Field(
         description="True when the API can run SELECT 1 against the configured database.",
+    )
+    data_room_s3_enabled: bool = Field(
+        description="True when S3-compatible object storage is configured for data room blobs.",
+    )
+    data_room_local_demo: bool = Field(
+        description="True when uploads use local API disk (no S3) — investor demo mode.",
     )

@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.database.models import RecruiterAtsOAuthConnection
 from app.services import greenhouse_oauth as gh_oauth
+from app.services import lever_oauth as lv_oauth
 from app.services.token_crypto import encrypt_secret
 
 _OAUTH_PROVIDERS = frozenset({"greenhouse", "lever"})
@@ -18,6 +19,8 @@ def oauth_available(provider: str) -> bool:
     pid = provider.strip().lower()
     if pid == "greenhouse":
         return gh_oauth.is_greenhouse_oauth_configured()
+    if pid == "lever":
+        return lv_oauth.is_lever_oauth_configured()
     return False
 
 
@@ -67,6 +70,11 @@ def start_connect(
     authorize_url: str | None = None
     if pid == "greenhouse" and gh_oauth.is_greenhouse_oauth_configured():
         authorize_url = gh_oauth.build_greenhouse_authorize_url(state=state)
+    elif pid == "lever" and lv_oauth.is_lever_oauth_configured():
+        try:
+            authorize_url = lv_oauth.build_lever_authorize_url(state=state)
+        except NotImplementedError:
+            authorize_url = None
     return row, authorize_url
 
 
