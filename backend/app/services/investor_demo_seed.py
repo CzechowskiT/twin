@@ -119,6 +119,12 @@ def _now() -> datetime:
     return datetime.now(timezone.utc)
 
 
+def _as_utc(dt: datetime) -> datetime:
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
+
+
 def upsert_demo_jobs(db: Session) -> list[Job]:
     """Create or refresh investor-demo job rows (idempotent on external_id)."""
     jobs: list[Job] = []
@@ -290,14 +296,20 @@ def upsert_demo_auto_apply(db: Session, candidate: Candidate) -> None:
     consent.consent_given_at = consent.consent_given_at or now
     consent.min_score_threshold = 85.0
     consent.daily_limit = 5
-    consent.total_applications_submitted = max(consent.total_applications_submitted, 2)
+    consent.total_applications_submitted = max(int(consent.total_applications_submitted or 0), 2)
     consent.last_run_at = now - timedelta(hours=10)
 
     recent = (
         db.execute(select(AutoApplyRun).order_by(AutoApplyRun.started_at.desc()).limit(1))
         .scalar_one_or_none()
     )
-    if recent is None or (now - recent.started_at).total_seconds() > 86400:
+    stale = True
+    if recent is not None and recent.started_at is not None:
+        started = recent.started_at
+        if started.tzinfo is None:
+            started = started.replace(tzinfo=timezone.utc)
+        stale = (now - started).total_seconds() > 86400
+    if recent is None or stale:
         run = AutoApplyRun(
             started_at=now - timedelta(hours=8),
             finished_at=now - timedelta(hours=7, minutes=55),
