@@ -4,26 +4,49 @@ Inspired by candidate manual workflows (company research, ATS CV, interview prep
 
 ## Status
 
-| Story | Feature | API | UI |
-|-------|---------|-----|-----|
-| US-C051 | Company intelligence | `POST /api/v1/jobs/{job_id}/research` | Job row → Company intel modal |
-| US-C052 | ATS CV optimizer | `POST /api/v1/applications/{id}/optimize-cv` | Applications → Optimize CV |
-| US-C053 | Interview prep | `GET /api/v1/interviews/{id}/prep` | Calendar → Interview prep |
-| US-C054 | Salary negotiation | `POST /api/v1/offers/{id}/negotiate` (`id` = application_id) | Applications → Negotiate offer |
-| US-C055 | Follow-up generator | `POST /api/v1/interviews/{id}/follow-up` | Calendar → Follow-up |
-| US-C056 | Hiring manager mindset | `GET /api/v1/jobs/{job_id}/hiring-insights` | Job row → Hiring insights |
-| US-C057 | LinkedIn optimizer | `POST /api/v1/candidates/me/optimize-linkedin` | Dashboard profile → Optimize LinkedIn |
+| Story | Feature | Repo today | Notes |
+|-------|---------|------------|-------|
+| US-C051 | Company intelligence | **MVP** | `company_intelligence` + `POST /jobs/{id}/research` |
+| US-C052 | ATS CV optimizer | **MVP** | `career_assistant/ats_cv` + match before/after + modal |
+| US-C053 | Interview prep | **MVP** | `interview_prep` + calendar/dashboard modals |
+| US-C054 | Salary negotiation | **MVP** | Market band + counter email draft |
+| US-C055 | Follow-up generator | **MVP** | Post-interview email from notes |
+| US-C056 | Hiring manager mindset | **MVP** | Job-level top traits / red flags / interview focus |
+| US-C057 | LinkedIn optimizer | **MVP** | Headline, about, skills from CV |
 
-**Backend:** `backend/app/api/career_assistant.py` (except C051 on `jobs.py`). Services under `backend/app/services/`. Shared Claude JSON helper: `career_assistant_common.py`. Migration `040_career_assistant_tables.py`.
+## API (`/api/v1/career-assistant`)
+
+| Method | Path | Story |
+|--------|------|-------|
+| POST | `/applications/{id}/ats-cv` | US-C052 |
+| GET | `/applications/{id}/ats-cv` | US-C052 (last run) |
+| POST | `/interview-prep` body `{application_id?, scheduled_interview_id?}` | US-C053 |
+| POST | `/applications/{id}/salary-negotiation` body `{offer_pln?}` | US-C054 |
+| POST | `/interviews/{id}/follow-up` body `{notes}` | US-C055 |
+| POST | `/jobs/{job_id}/hiring-insights` | US-C056 |
+| POST | `/me/linkedin-optimize` body `{target_role}` | US-C057 |
+
+**Also (US-C051):** `POST /api/v1/jobs/{job_id}/research`
+
+## Database (migration `040_career_assistant_tables`)
+
+- `optimized_cvs` — one row per application (US-C052)
+- `interview_prep_sessions` — prep packs (US-C053)
+- `salary_negotiations` — negotiation JSON per application (US-C054)
+- `follow_up_emails` — drafts per scheduled interview (US-C055)
+- `hiring_insights_cache` — 7-day TTL per job (US-C056)
+- `linkedin_optimizations` — snapshots per candidate + target role (US-C057)
+- `company_intelligence_cache` — migration `039` (US-C051)
+
+## UI
+
+- **Jobs feed:** Company intel, Hiring insights
+- **Applications:** Optimize CV, Negotiate offer
+- **Calendar:** Interview prep, Follow-up email
+- **Dashboard:** LinkedIn optimizer (target role from profile)
 
 ## Principles
 
 - North star: fewer noisy applications, more **acceptance-ready** moments — intel must reduce spam, not encourage blast apply.
 - No fabricated employers/skills (same rules as `cv_tailoring.py`).
-- Expensive calls cached where applicable (company intel, hiring insights: 7-day TTL).
-
-## Overlap (do not duplicate)
-
-- **cv_tailoring** — profile-level pitch; C052 is per-application ATS rewrite + match delta.
-- **recruitment_feedback** — post-rejection notes; C056 is job-level “what top applicants show”.
-- **linkedin_viral** — referral incentives; C057 is profile copy optimization.
+- Expensive calls cached where repeated (company intel, hiring insights); Claude via `career_assistant_common.call_claude_json` with deterministic fallbacks.
