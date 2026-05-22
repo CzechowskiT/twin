@@ -12,7 +12,7 @@ export default function InvestorMetricsPage() {
   const { t } = useTranslation();
 
   return (
-    <PersonaWorkspaceGate allowed={["company"]} surface="investor">
+    <PersonaWorkspaceGate allowed={["investor"]} surface="investor">
       <Shell wide>
         <header className="mb-8 space-y-2">
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">

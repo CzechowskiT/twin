@@ -25,13 +25,15 @@ function ChevronIcon({ className }: { className?: string }) {
 const PERSONA_LABEL_KEY: Record<MarketingPersona, TranslationKey> = {
   candidate: "nav.personaCandidate",
   recruiter: "nav.personaRecruiter",
-  company: "nav.personaInvestor",
+  company: "nav.personaCompany",
+  investor: "nav.personaInvestor",
 };
 
 const PERSONA_ICON: Record<MarketingPersona, string> = {
   candidate: "◆",
   recruiter: "◇",
   company: "▣",
+  investor: "◎",
 };
 
 export function PersonaSwitcher({ className }: { className?: string }) {

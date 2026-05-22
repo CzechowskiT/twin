@@ -1,5 +1,5 @@
 /**
- * Persona boundaries — candidate app vs recruiter vs investor (company) lanes.
+ * Persona boundaries — candidate app vs recruiter vs company (employers) vs investor lanes.
  */
 
 import {
@@ -15,24 +15,29 @@ export type PersonaAudience = MarketingPersona;
 /** Routes that imply this persona when visited (syncs PersonaProvider). */
 const PATH_IMPLIES_PERSONA: { prefix: string; persona: MarketingPersona }[] = [
   { prefix: "/for-candidates", persona: "candidate" },
+  { prefix: "/dashboard/referrals", persona: "candidate" },
   { prefix: "/dashboard", persona: "candidate" },
   { prefix: "/profile", persona: "candidate" },
   { prefix: "/onboarding", persona: "candidate" },
   { prefix: "/for-recruiters", persona: "recruiter" },
   { prefix: "/recruiter", persona: "recruiter" },
   { prefix: "/for-companies", persona: "company" },
+  { prefix: "/for-investors", persona: "investor" },
+  { prefix: "/companies/signup", persona: "company" },
   { prefix: "/workspace/candidate", persona: "candidate" },
   { prefix: "/workspace/recruiter", persona: "recruiter" },
-  { prefix: "/workspace/investor", persona: "company" },
+  { prefix: "/workspace/investor", persona: "investor" },
   { prefix: "/workspace", persona: "candidate" },
-  { prefix: "/investor", persona: "company" },
+  { prefix: "/recruiter/integrations", persona: "recruiter" },
+  { prefix: "/investor", persona: "investor" },
   { prefix: "/login/candidate", persona: "candidate" },
   { prefix: "/login/recruiter", persona: "recruiter" },
-  { prefix: "/login/investor", persona: "company" },
+  { prefix: "/login/investor", persona: "investor" },
   { prefix: "/register/candidate", persona: "candidate" },
   { prefix: "/register/recruiter", persona: "recruiter" },
-  { prefix: "/register/investor", persona: "company" },
-  { prefix: "/calculator", persona: "company" },
+  { prefix: "/register/investor", persona: "investor" },
+  { prefix: "/calculator/b2b", persona: "company" },
+  { prefix: "/calculator", persona: "recruiter" },
 ];
 
 /** Only these personas may access the path prefix (longest match wins). */
@@ -41,17 +46,20 @@ const PREFIX_ALLOWED: { prefix: string; allowed: readonly MarketingPersona[] }[]
   { prefix: "/profile", allowed: ["candidate"] },
   { prefix: "/onboarding", allowed: ["candidate"] },
   { prefix: "/workspace/candidate", allowed: ["candidate"] },
-  { prefix: "/workspace/recruiter", allowed: ["recruiter", "company"] },
-  { prefix: "/workspace/investor", allowed: ["company"] },
-  { prefix: "/workspace", allowed: ["candidate", "recruiter", "company"] },
-  { prefix: "/investor", allowed: ["company"] },
+  { prefix: "/workspace/recruiter", allowed: ["recruiter", "investor"] },
+  { prefix: "/workspace/investor", allowed: ["investor"] },
+  { prefix: "/workspace", allowed: ["candidate", "recruiter", "company", "investor"] },
+  { prefix: "/investor", allowed: ["investor"] },
   { prefix: "/calculator/b2b", allowed: ["company", "candidate", "recruiter"] },
   { prefix: "/calculator", allowed: ["company", "recruiter"] },
-  { prefix: "/recruiter", allowed: ["recruiter", "company"] },
-  { prefix: "/for-recruiters", allowed: ["recruiter", "candidate", "company"] },
-  { prefix: "/for-companies", allowed: ["company", "candidate", "recruiter"] },
-  { prefix: "/for-candidates", allowed: ["candidate", "recruiter", "company"] },
-  { prefix: "/demo", allowed: ["candidate", "recruiter", "company"] },
+  { prefix: "/recruiter/integrations", allowed: ["recruiter", "investor", "company"] },
+  { prefix: "/recruiter", allowed: ["recruiter", "investor"] },
+  { prefix: "/for-investors", allowed: ["investor", "candidate", "recruiter", "company"] },
+  { prefix: "/for-recruiters", allowed: ["recruiter", "candidate", "company", "investor"] },
+  { prefix: "/for-companies", allowed: ["company", "candidate", "recruiter", "investor"] },
+  { prefix: "/for-candidates", allowed: ["candidate", "recruiter", "company", "investor"] },
+  { prefix: "/companies/signup", allowed: ["company", "investor", "recruiter", "candidate"] },
+  { prefix: "/demo", allowed: ["candidate", "recruiter", "company", "investor"] },
 ];
 
 const ALWAYS_ALLOWED_PREFIXES = [
@@ -159,9 +167,10 @@ export type HeaderGrowthLabelKey =
   | "nav.demo"
   | "nav.calculator"
   | "nav.forCompanies"
+  | "nav.forInvestors"
   | "nav.forRecruiters";
 
-export type GrowthCtaVariant = "candidate" | "recruiter" | "investor";
+export type GrowthCtaVariant = "candidate" | "recruiter" | "company" | "investor";
 
 export type HeaderGrowthLink = {
   href: string;
@@ -185,7 +194,10 @@ export function headerGrowthLinksForPersona(
   if (persona === "recruiter") {
     return [{ href: "/calculator/b2b", labelKey: "nav.calculator", variant: "recruiter" }];
   }
-  return [{ href: "/for-companies", labelKey: "nav.forCompanies", variant: "investor" }];
+  if (persona === "company") {
+    return [{ href: "/for-companies", labelKey: "nav.forCompanies", variant: "company" }];
+  }
+  return [{ href: "/for-investors", labelKey: "nav.forInvestors", variant: "investor" }];
 }
 
 export function showCandidateProductNav(persona: MarketingPersona): boolean {
@@ -216,7 +228,16 @@ export function headerAccountLinks(
       { href: "#", labelKey: "dashboard.logout", isLogout: true },
     ];
   }
-  return [{ href: "#", labelKey: "dashboard.logout", isLogout: true }];
+  if (persona === "investor") {
+    return [
+      { href: "/workspace/investor", labelKey: "workspace.investorHome" },
+      { href: "#", labelKey: "dashboard.logout", isLogout: true },
+    ];
+  }
+  return [
+    { href: "/for-companies", labelKey: "nav.forCompanies" },
+    { href: "/contact", labelKey: "nav.contact" },
+  ];
 }
 
 export function footerExploreHrefsForPersona(persona: MarketingPersona): string[] {
@@ -225,8 +246,18 @@ export function footerExploreHrefsForPersona(persona: MarketingPersona): string[
     return [
       ...common,
       "/for-companies",
+      "/calculator/b2b",
+      "/companies/signup",
+      "/contact",
+    ];
+  }
+  if (persona === "investor") {
+    return [
+      ...common,
+      "/for-investors",
       "/workspace/investor",
       "/investor/calculator",
+      "/investor/metrics",
       "/login/investor",
       "/contact",
     ];

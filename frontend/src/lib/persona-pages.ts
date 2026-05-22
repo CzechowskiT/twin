@@ -5,7 +5,7 @@
  */
 import { localizeTierPrice } from "@/lib/pricing-locale";
 
-export type PersonaId = "candidates" | "recruiters" | "companies";
+export type PersonaId = "candidates" | "recruiters" | "companies" | "investors";
 
 export type PricingTier = {
   id: string;
@@ -500,6 +500,123 @@ const companiesEn: PersonaBundle = {
   secondaryCta: { label: "Contact enterprise", href: "/contact" },
 };
 
+const investorsEn: PersonaBundle = {
+  heroEyebrow: "Investor workspace",
+  heroTitle: "Scenario models and traction metrics — not employer procurement",
+  heroLead:
+    "This lane is for funds and angels: five-year scenario calculator, live-style metrics panels, and deck-ready exports. Employer pricing, DPA packs, and the B2B ROI calculator live under Companies — a separate commercial story.",
+  pillars: [
+    {
+      title: "Scenario calculator",
+      body: "Illustrative revenue mix, success-fee sensitivity, team and infra costs — tuned for investor diligence, not CFO procurement decks.",
+    },
+    {
+      title: "Metrics & narrative",
+      body: "Traction snapshots, cohort placeholders, and export hooks you can paste into a data room after sign-in.",
+    },
+    {
+      title: "Clear boundary vs Companies",
+      body: "No annual enterprise SKUs here. If you are HR or procurement, switch to Companies for program pricing and vendor security.",
+    },
+  ],
+  pricingTitle: "Access (post sign-in)",
+  pricingLead: "Tools open after investor workspace login. Marketing below is a preview; calculators are not mixed with employer checkout.",
+  pricingFootnote: "Numbers are illustrative models only — not an offer or forecast.",
+  tiers: [
+    {
+      id: "preview",
+      name: "Public preview",
+      price: "—",
+      cadence: "marketing",
+      bullets: [
+        "Read the investor story and lane boundaries on this page",
+        "See which tools exist before you authenticate",
+      ],
+      cta: "Sign in to workspace",
+      href: "/login/investor",
+    },
+    {
+      id: "workspace",
+      name: "Investor workspace",
+      price: "Invite",
+      cadence: "gated",
+      highlight: true,
+      bullets: [
+        "Five-year scenario calculator (/investor/calculator)",
+        "Metrics panel (/investor/metrics)",
+        "Deck-oriented exports (as shipped in workspace)",
+      ],
+      cta: "Open workspace",
+      href: "/workspace/investor",
+    },
+  ],
+  logisticsTitle: "Not the same as Companies",
+  logistics: [
+    "Companies owns B2B ROI, DPA templates, and annual program tiers.",
+    "Investor owns fund-style models — sign in to run calculators, not to buy recruiter seats.",
+    "Recruiter SKUs remain on the Recruiters lane.",
+  ],
+  primaryCta: { label: "Sign in to investor workspace", href: "/login/investor" },
+  secondaryCta: { label: "Browse Companies pricing", href: "/for-companies" },
+};
+
+const investorsPl: PersonaBundle = {
+  heroEyebrow: "Workspace inwestora",
+  heroTitle: "Modele scenariusza i metryki — nie procurement pracodawcy",
+  heroLead:
+    "Ścieżka dla funduszy i aniołów: kalkulator pięcioletni, panele metryk i eksporty pod deck. Cennik firm, DPA i kalkulator ROI B2B są w sekcji Firmy — osobna historia komercyjna.",
+  pillars: [
+    {
+      title: "Kalkulator scenariusza",
+      body: "Ilustracyjny mix przychodów, wrażliwość success fee, koszty zespołu i infra — pod due diligence inwestora, nie decki CFO.",
+    },
+    {
+      title: "Metryki i narracja",
+      body: "Snapshoty trakcji, placeholdery kohort i eksporty do data room po zalogowaniu.",
+    },
+    {
+      title: "Granica względem Firm",
+      body: "Bez rocznych SKU enterprise. HR i procurement → przełącz na Firmy.",
+    },
+  ],
+  pricingTitle: "Dostęp (po logowaniu)",
+  pricingLead: "Narzędzia po zalogowaniu do workspace inwestora. Poniżej podgląd — kalkulatory nie są mieszane z checkoutem pracodawcy.",
+  pricingFootnote: "Liczby to modele ilustracyjne — nie oferta ani prognoza.",
+  tiers: [
+    {
+      id: "preview",
+      name: "Podgląd publiczny",
+      price: "—",
+      cadence: "marketing",
+      bullets: ["Historia inwestora i granice ścieżek", "Lista narzędzi przed autentykacją"],
+      cta: "Zaloguj się",
+      href: "/login/investor",
+    },
+    {
+      id: "workspace",
+      name: "Workspace inwestora",
+      price: "Zaproszenie",
+      cadence: "po logowaniu",
+      highlight: true,
+      bullets: [
+        "Kalkulator pięcioletni (/investor/calculator)",
+        "Panel metryk (/investor/metrics)",
+        "Eksporty pod deck (wg workspace)",
+      ],
+      cta: "Otwórz workspace",
+      href: "/workspace/investor",
+    },
+  ],
+  logisticsTitle: "To nie to samo co Firmy",
+  logistics: [
+    "Firmy: ROI B2B, DPA, roczne programy.",
+    "Inwestor: modele funduszowe — logowanie, nie zakup miejsc rekrutera.",
+    "SKU rekrutera zostaje w ścieżce Rekruterów.",
+  ],
+  primaryCta: { label: "Zaloguj do workspace inwestora", href: "/login/investor" },
+  secondaryCta: { label: "Cennik Firm", href: "/for-companies" },
+};
+
 const companiesPl: PersonaBundle = {
   heroEyebrow: "Firma i procurement",
   heroTitle: "Ekonomia, bezpieczeństwo i dostawa zamiast licencji per sourcer",
@@ -605,6 +722,7 @@ export const PERSONA_PAGES: Record<PersonaId, { en: PersonaBundle; pl: PersonaBu
   candidates: { en: candidatesEn, pl: candidatesPl },
   recruiters: { en: recruitersEn, pl: recruitersPl },
   companies: { en: companiesEn, pl: companiesPl },
+  investors: { en: investorsEn, pl: investorsPl },
 };
 
 function withLocalePricing(bundle: PersonaBundle, locale: string): PersonaBundle {

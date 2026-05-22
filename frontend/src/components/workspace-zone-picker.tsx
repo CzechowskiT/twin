@@ -30,6 +30,12 @@ const ZONES: {
   },
   {
     persona: "company",
+    title: "workspace.zoneCompanyTitle",
+    lead: "workspace.zoneCompanyLead",
+    tools: "workspace.zoneCompanyTools",
+  },
+  {
+    persona: "investor",
     title: "workspace.zoneInvestorTitle",
     lead: "workspace.zoneInvestorLead",
     tools: "workspace.zoneInvestorTools",
@@ -51,7 +57,7 @@ export function WorkspaceZonePicker() {
       <div className="mx-auto max-w-4xl">
         <h1 className="twin-section-title text-2xl sm:text-3xl">{t("workspace.pickerTitle")}</h1>
         <p className="twin-muted mt-3 max-w-2xl text-sm leading-relaxed">{t("workspace.pickerLead")}</p>
-        <div className="mt-8 grid gap-4 md:grid-cols-3">
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {ZONES.map((z) => (
             <Card key={z.persona} variant="soft" className="flex flex-col p-5">
               <h2 className="text-lg font-semibold">{t(z.title)}</h2>

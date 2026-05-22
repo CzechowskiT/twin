@@ -126,3 +126,25 @@ def test_ashby_webhook_rejects_bad_signature(mock_gs: MagicMock) -> None:
         headers={"Content-Type": "application/json", "Ashby-Signature": "sha256=bad"},
     )
     assert res.status_code == 403
+
+
+def test_ats_setup_returns_providers() -> None:
+    from app.core.deps import get_current_user
+    from app.database.models import User
+
+    user = User(id=1, email="rec@example.com", hashed_password="x", is_active=True)
+
+    def _user() -> User:
+        return user
+
+    app.dependency_overrides[get_current_user] = _user
+    try:
+        client = TestClient(app)
+        res = client.get("/api/v1/integrations/ats/setup")
+        assert res.status_code == 200
+        body = res.json()
+        assert len(body["providers"]) == 3
+        assert body["providers"][0]["provider"] == "greenhouse"
+        assert "/api/v1/integrations/ats/greenhouse" in body["providers"][0]["webhook_url"]
+    finally:
+        app.dependency_overrides.pop(get_current_user, None)

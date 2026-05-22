@@ -54,13 +54,15 @@ See **`docs/PRODUCT_ROADMAP.md`** for product rationale on next priorities.
 
 ## Recommended next 10 (backlog)
 
-1. **Railway secrets** — mail, Stripe, Microsoft (`docs/RAILWAY_PROD_ENV_PL.md`)
-2. **Dedicated twin-worker** — Celery beat off API (`docs/RAILWAY_WORKER_PL.md`)
-3. **Stripe E2E staging** — `docs/STRIPE_E2E.md`
-4. **Scrape corpus growth** — ops allowlist + daily beat
-5. **Interview reminders prod verify** — beat on worker + mail on Railway
-6. **PR merge to default branch** — when `main` exists + CI green
-7. **Recruiter-side batch UI** — employer view of pre-qualified candidates
-8. **Partner matches export** — second CSV scope for integrators
-9. **Admin partner-keys UI** — mint/revoke in `/admin` without curl
-10. **Apple CalDAV** — optional iCloud path beyond WebCal
+1. **Merge `cursor/referrals-ats-dataroom-personas`** — investor vs companies personas + referrals / ATS UI / data room MVP
+2. **Nightly auto-apply prod night** — post-02:00 verify beat + `auto_apply_runs` + summary mail (`docs/NIGHTLY_AUTO_APPLY_DEPLOY.md`, mega-prompt checklist)
+3. **Railway secrets** — mail, Stripe, Microsoft (`docs/RAILWAY_PROD_ENV_PL.md`)
+4. **Dedicated twin-worker** — Celery beat off API (`docs/RAILWAY_WORKER_PL.md`)
+5. **Stripe E2E staging** — `docs/STRIPE_E2E.md`
+6. **Scrape corpus growth** — ops allowlist + daily beat
+7. **Interview reminders prod verify** — beat on worker + mail on Railway
+8. **ATS OAuth / job sync** — beyond hire webhooks (`docs/ATS_WEBHOOKS.md`)
+9. **Data room v2** — NDA gate, document upload, download audit log
+10. **Referral cash-out** — payout fulfillment UI on top of `referral_payouts`
+
+Mega-prompt reference: `~/Downloads/cursor_autonomous_nightly_autoapply.md` (implementation largely in repo; ops checklist in `NIGHTLY_AUTO_APPLY_DEPLOY.md`).

@@ -27,9 +27,17 @@ export function CandidateWorkspaceGate({ surface }: { surface: "dashboard" | "pr
   }
 
   const titleKey =
-    persona === "company" ? "dashboard.workspaceGateTitleCompany" : "dashboard.workspaceGateTitleRecruiter";
+    persona === "company"
+      ? "dashboard.workspaceGateTitleCompany"
+      : persona === "investor"
+        ? "workspace.gateTitleInvestor"
+        : "dashboard.workspaceGateTitleRecruiter";
   const leadKey =
-    persona === "company" ? "dashboard.workspaceGateLeadCompany" : "dashboard.workspaceGateLeadRecruiter";
+    persona === "company"
+      ? "dashboard.workspaceGateLeadCompany"
+      : persona === "investor"
+        ? "workspace.gateLeadInvestor"
+        : "dashboard.workspaceGateLeadRecruiter";
 
   const goCandidate = () => {
     setPersona("candidate");
@@ -41,7 +49,14 @@ export function CandidateWorkspaceGate({ surface }: { surface: "dashboard" | "pr
       <Card variant="soft" className="p-6 sm:p-8">
         <div className="marketing-hero-rail text-start">
         <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
-          {t("nav.ariaPersonaNav")}: {t(persona === "company" ? "nav.personaCompany" : "nav.personaRecruiter")}
+          {t("nav.ariaPersonaNav")}:{" "}
+          {t(
+            persona === "company"
+              ? "nav.personaCompany"
+              : persona === "investor"
+                ? "nav.personaInvestor"
+                : "nav.personaRecruiter",
+          )}
         </p>
         <h1 className="twin-section-title mt-2 text-xl sm:text-2xl">{t(titleKey)}</h1>
         {surface === "profile" ? (
@@ -65,6 +80,17 @@ export function CandidateWorkspaceGate({ surface }: { surface: "dashboard" | "pr
           </div>
         ) : null}
 
+        {persona === "investor" ? (
+          <div className="marketing-cta-stack mt-8">
+            <Link href="/login/investor" className={primaryStackClass}>
+              {t("login.zoneInvestorTitle")}
+            </Link>
+            <Link href="/for-investors" className={linkClass}>
+              {t("nav.forInvestors")}
+            </Link>
+          </div>
+        ) : null}
+
         <div className="mt-8">
           <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
             {t("dashboard.workspaceGateExploreHeading")}
@@ -75,6 +101,9 @@ export function CandidateWorkspaceGate({ surface }: { surface: "dashboard" | "pr
             </Link>
             <Link href="/for-companies" className={`${linkClass} sm:!w-auto`}>
               {t("dashboard.workspaceGateLinkForCompanies")}
+            </Link>
+            <Link href="/for-investors" className={`${linkClass} sm:!w-auto`}>
+              {t("nav.forInvestors")}
             </Link>
             <Link href="/contact" className={`${linkClass} sm:!w-auto`}>
               {t("dashboard.workspaceGateLinkContact")}
