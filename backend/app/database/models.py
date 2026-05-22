@@ -672,3 +672,87 @@ class CompanyIntelligenceCache(Base):
     researched_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
+
+class OptimizedCv(Base):
+    """ATS CV optimization per application (US-C052)."""
+
+    __tablename__ = "optimized_cvs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    application_id: Mapped[int] = mapped_column(
+        ForeignKey("applications.id", ondelete="CASCADE"), unique=True, index=True
+    )
+    match_before: Mapped[float] = mapped_column(Float, default=0.0)
+    match_after: Mapped[float] = mapped_column(Float, default=0.0)
+    changes_json: Mapped[str] = mapped_column(Text, default="[]")
+    optimized_cv_text: Mapped[str] = mapped_column(Text, default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class InterviewPrepSession(Base):
+    """Cached interview prep per interview or application (US-C053)."""
+
+    __tablename__ = "interview_prep_sessions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    scheduled_interview_id: Mapped[int | None] = mapped_column(
+        ForeignKey("scheduled_interviews.id", ondelete="CASCADE"), nullable=True, index=True
+    )
+    application_id: Mapped[int | None] = mapped_column(
+        ForeignKey("applications.id", ondelete="CASCADE"), nullable=True, index=True
+    )
+    prep_json: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class SalaryNegotiation(Base):
+    """Salary negotiation drafts per application (US-C054)."""
+
+    __tablename__ = "salary_negotiations"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    application_id: Mapped[int] = mapped_column(
+        ForeignKey("applications.id", ondelete="CASCADE"), index=True
+    )
+    negotiation_json: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class FollowUpEmail(Base):
+    """Post-interview follow-up drafts (US-C055)."""
+
+    __tablename__ = "follow_up_emails"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    scheduled_interview_id: Mapped[int] = mapped_column(
+        ForeignKey("scheduled_interviews.id", ondelete="CASCADE"), index=True
+    )
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    email_json: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class HiringInsightsCache(Base):
+    """Cached hiring-manager mindset per job (US-C056)."""
+
+    __tablename__ = "hiring_insights_cache"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id", ondelete="CASCADE"), index=True)
+    insights_json: Mapped[str] = mapped_column(Text, nullable=False)
+    researched_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+
+
+class LinkedinOptimization(Base):
+    """LinkedIn profile optimization snapshots (US-C057)."""
+
+    __tablename__ = "linkedin_optimizations"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(ForeignKey("candidates.id", ondelete="CASCADE"), index=True)
+    target_role: Mapped[str] = mapped_column(String(200))
+    optimization_json: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+

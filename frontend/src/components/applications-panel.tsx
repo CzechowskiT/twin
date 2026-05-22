@@ -77,6 +77,8 @@ export function ApplicationsPanel({
   onPlacementEventsLoad,
   placementEventsInvalidateKey,
   onOpenAutoApplyPackage,
+  onOptimizeCv,
+  onNegotiateSalary,
 }: {
   items: ApplicationRow[];
   onStatusChange: (id: number, status: string) => void;
@@ -94,6 +96,8 @@ export function ApplicationsPanel({
   placementEventsInvalidateKey?: number;
   /** Fetch presigned URL and open tailored auto-apply PDF (when `auto_apply_package_uploaded_at` is set). */
   onOpenAutoApplyPackage?: (applicationId: number) => Promise<void>;
+  onOptimizeCv?: (applicationId: number, jobTitle: string) => void;
+  onNegotiateSalary?: (applicationId: number, jobTitle: string) => void;
 }) {
   const { t } = useTranslation();
   const [statusFilter, setStatusFilter] = useState<(typeof STATUSES)[number] | "all">("all");
@@ -465,6 +469,29 @@ export function ApplicationsPanel({
                   ) : null}
                 </>
               ) : null}
+              {(onOptimizeCv || onNegotiateSalary) && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {onOptimizeCv ? (
+                    <button
+                      type="button"
+                      className="twin-btn-secondary twin-touch-target !w-auto px-3 py-1.5 text-xs"
+                      onClick={() => onOptimizeCv(app.id, app.title)}
+                    >
+                      {t("careerAssistant.optimizeCv")}
+                    </button>
+                  ) : null}
+                  {onNegotiateSalary &&
+                  ["applied", "interview", "hired"].includes(app.status.trim().toLowerCase()) ? (
+                    <button
+                      type="button"
+                      className="twin-btn-secondary twin-touch-target !w-auto px-3 py-1.5 text-xs"
+                      onClick={() => onNegotiateSalary(app.id, app.title)}
+                    >
+                      {t("careerAssistant.negotiateSalary")}
+                    </button>
+                  ) : null}
+                </div>
+              )}
               <button
                 type="button"
                 className="twin-link mt-2 text-xs font-medium"

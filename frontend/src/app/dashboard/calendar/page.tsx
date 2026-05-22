@@ -4,6 +4,10 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import {
+  FollowUpModal,
+  InterviewPrepModal,
+} from "@/components/career-assistant/career-assistant-modals";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch, apiFetchBlob, saveBlobAsFile } from "@/lib/api";
@@ -154,6 +158,8 @@ export default function DashboardCalendarPage() {
   const [icsBusyId, setIcsBusyId] = useState<number | null>(null);
   const [cancelBusyId, setCancelBusyId] = useState<number | null>(null);
   const [showCancelledInterviews, setShowCancelledInterviews] = useState(false);
+  const [prepInterview, setPrepInterview] = useState<{ id: number; title: string } | null>(null);
+  const [followUpInterview, setFollowUpInterview] = useState<{ id: number; title: string } | null>(null);
   const [emailProductUpdates, setEmailProductUpdates] = useState(false);
   const [emailInterviewReminders, setEmailInterviewReminders] = useState(false);
   const [notifPrefsLoadError, setNotifPrefsLoadError] = useState(false);
@@ -866,6 +872,34 @@ export default function DashboardCalendarPage() {
                       ) : null}
                     </div>
                     <div className="flex shrink-0 flex-wrap gap-2 self-start sm:self-center">
+                      {row.status !== "cancelled" ? (
+                        <>
+                          <button
+                            type="button"
+                            className="twin-btn-secondary !w-auto px-2 py-1 text-xs"
+                            onClick={() =>
+                              setPrepInterview({
+                                id: row.id,
+                                title: `${row.company_name} — ${row.job_title}`,
+                              })
+                            }
+                          >
+                            {t("careerAssistant.interviewPrep")}
+                          </button>
+                          <button
+                            type="button"
+                            className="twin-btn-secondary !w-auto px-2 py-1 text-xs"
+                            onClick={() =>
+                              setFollowUpInterview({
+                                id: row.id,
+                                title: `${row.company_name} — ${row.job_title}`,
+                              })
+                            }
+                          >
+                            {t("careerAssistant.followUpEmail")}
+                          </button>
+                        </>
+                      ) : null}
                       <button
                         type="button"
                         className="twin-link text-xs font-medium"
@@ -1104,6 +1138,18 @@ export default function DashboardCalendarPage() {
           </div>
         </div>
       )}
+      <InterviewPrepModal
+        interviewId={prepInterview?.id ?? null}
+        title={prepInterview?.title ?? ""}
+        open={prepInterview !== null}
+        onClose={() => setPrepInterview(null)}
+      />
+      <FollowUpModal
+        interviewId={followUpInterview?.id ?? null}
+        title={followUpInterview?.title ?? ""}
+        open={followUpInterview !== null}
+        onClose={() => setFollowUpInterview(null)}
+      />
     </Shell>
   );
 }

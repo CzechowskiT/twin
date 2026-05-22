@@ -3,9 +3,67 @@
 from __future__ import annotations
 
 import json
+import re
 from typing import Any
 
+from fastapi import HTTPException, status
+from sqlalchemy.orm import Session
+
+from app.database.models import Application, Candidate, Job, ScheduledInterview
 from app.services.anthropic_client import get_anthropic_client, is_anthropic_configured
+
+
+def job_posting_text(job: Job) -> str:
+    """Concatenate job fields for prompts and keyword scoring."""
+    chunks = [job.title or "", job.company or "", job.description or "", job.requirements or ""]
+    return "\n\n".join(c for c in chunks if c).strip()
+
+
+def keyword_match_percent(cv_text: str, job_text: str) -> float:
+    """Rough ATS overlap score (0–100) from shared tokens."""
+    cv_tokens = {w for w in re.findall(r"\w{4,}", (cv_text or "").lower())}
+    job_tokens = {w for w in re.findall(r"\w{4,}", (job_text or "").lower())}
+    if not job_tokens:
+        return 0.0
+    overlap = len(cv_tokens & job_tokens) / len(job_tokens)
+    return round(min(100.0, overlap * 100.0), 1)
+
+
+def get_candidate_for_user(db: Session, user_id: int) -> Candidate:
+    row = db.query(Candidate).filter(Candidate.user_id == user_id).first()
+    if not row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Candidate profile not found")
+    return row
+
+
+def get_application_for_user(db: Session, user_id: int, application_id: int) -> Application:
+    candidate = get_candidate_for_user(db, user_id)
+    app = (
+        db.query(Application)
+        .filter(Application.id == application_id, Application.candidate_id == candidate.id)
+        .first()
+    )
+    if not app:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Application not found")
+    return app
+
+
+def get_job_for_application(db: Session, app: Application) -> Job:
+    job = db.query(Job).filter(Job.id == app.job_id).first()
+    if not job:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+    return job
+
+
+def get_interview_for_user(db: Session, user_id: int, interview_id: int) -> ScheduledInterview:
+    row = (
+        db.query(ScheduledInterview)
+        .filter(ScheduledInterview.id == interview_id, ScheduledInterview.user_id == user_id)
+        .first()
+    )
+    if not row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Interview not found")
+    return row
 
 
 def parse_claude_json(text: str) -> dict[str, Any] | None:

@@ -12,6 +12,12 @@ import {
   type PlacementFlowBusy,
 } from "@/components/applications-panel";
 import { CompanyIntelligenceModal } from "@/components/career-assistant/company-intelligence-modal";
+import {
+  CvOptimizerModal,
+  HiringInsightsModal,
+  LinkedinOptimizerModal,
+  SalaryNegotiateModal,
+} from "@/components/career-assistant/career-assistant-modals";
 import { DashboardCommandCenter } from "@/components/dashboard-command-center";
 import { EmailVerificationBanner } from "@/components/email-verification-banner";
 import { NightlyAutoApplyStrip } from "@/components/nightly-auto-apply-strip";
@@ -221,6 +227,10 @@ export default function DashboardPage() {
   const scrapeListToastShownRef = useRef(false);
   const [autoApplyingId, setAutoApplyingId] = useState<number | null>(null);
   const [intelJob, setIntelJob] = useState<{ id: number; title: string; company: string } | null>(null);
+  const [insightsJob, setInsightsJob] = useState<{ id: number; title: string } | null>(null);
+  const [cvApp, setCvApp] = useState<{ id: number; title: string } | null>(null);
+  const [negotiateApp, setNegotiateApp] = useState<{ id: number; title: string } | null>(null);
+  const [linkedinOpen, setLinkedinOpen] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [showApplyPrompt, setShowApplyPrompt] = useState(false);
   const [placementFlowBusy, setPlacementFlowBusy] = useState<PlacementFlowBusy>(null);
@@ -1579,6 +1589,13 @@ export default function DashboardPage() {
                     ? ` · ${profile.desired_salary.toLocaleString()} PLN/mo`
                     : ""}
                 </p>
+                <button
+                  type="button"
+                  className="twin-btn-secondary twin-touch-target mt-3 !w-auto px-3 py-1.5 text-xs"
+                  onClick={() => setLinkedinOpen(true)}
+                >
+                  {t("careerAssistant.optimizeLinkedin")}
+                </button>
               </div>
             )}
           </div>
@@ -1717,6 +1734,7 @@ export default function DashboardPage() {
             onApply={applyToJob}
             onAutoApply={autoApplyToJob}
             onResearch={(id, title, company) => setIntelJob({ id, title, company })}
+            onHiringInsights={(id, title) => setInsightsJob({ id, title })}
             autoApplyJobId={autoApplyingId}
             onSave={saveJob}
             onDismiss={dismissJob}
@@ -1850,6 +1868,8 @@ export default function DashboardPage() {
             onPlacementEventsLoad={loadPlacementEvents}
             placementEventsInvalidateKey={placementEventsInvalidateKey}
             onOpenAutoApplyPackage={openAutoApplyPackagePdf}
+            onOptimizeCv={(id, title) => setCvApp({ id, title })}
+            onNegotiateSalary={(id, title) => setNegotiateApp({ id, title })}
           />
         </Card>
       )}
@@ -1901,6 +1921,9 @@ export default function DashboardPage() {
                   hasProfile
                     ? (id, title, company) => setIntelJob({ id, title, company })
                     : undefined
+                }
+                onHiringInsights={
+                  hasProfile ? (id, title) => setInsightsJob({ id, title }) : undefined
                 }
                 autoApplyJobId={autoApplyingId}
                 onSave={hasProfile ? saveJob : undefined}
@@ -1993,6 +2016,29 @@ export default function DashboardPage() {
         company={intelJob?.company ?? ""}
         open={intelJob !== null}
         onClose={() => setIntelJob(null)}
+      />
+      <HiringInsightsModal
+        jobId={insightsJob?.id ?? null}
+        jobTitle={insightsJob?.title ?? ""}
+        open={insightsJob !== null}
+        onClose={() => setInsightsJob(null)}
+      />
+      <CvOptimizerModal
+        applicationId={cvApp?.id ?? null}
+        jobTitle={cvApp?.title ?? ""}
+        open={cvApp !== null}
+        onClose={() => setCvApp(null)}
+      />
+      <SalaryNegotiateModal
+        applicationId={negotiateApp?.id ?? null}
+        jobTitle={negotiateApp?.title ?? ""}
+        open={negotiateApp !== null}
+        onClose={() => setNegotiateApp(null)}
+      />
+      <LinkedinOptimizerModal
+        open={linkedinOpen}
+        onClose={() => setLinkedinOpen(false)}
+        defaultRole={profile?.preferred_job_titles?.[0] ?? ""}
       />
       <HelpWidget />
     </Shell>

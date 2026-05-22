@@ -32,6 +32,7 @@ export function JobList({
   onApply,
   onAutoApply,
   onResearch,
+  onHiringInsights,
   onSave,
   onDismiss,
   autoApplyJobId,
@@ -42,6 +43,7 @@ export function JobList({
   onApply?: (jobId: number, url: string) => void;
   onAutoApply?: (jobId: number) => void;
   onResearch?: (jobId: number, title: string, company: string) => void;
+  onHiringInsights?: (jobId: number, title: string) => void;
   onSave?: (jobId: number) => void;
   onDismiss?: (jobId: number) => void;
   autoApplyJobId?: number | null;
@@ -124,6 +126,16 @@ export function JobList({
                     className="twin-btn-secondary twin-touch-target shrink-0 !w-auto px-3 py-1.5 text-xs"
                   >
                     {t("careerAssistant.researchCompany")}
+                  </button>
+                )}
+                {onHiringInsights && (
+                  <button
+                    type="button"
+                    aria-label={`${t("careerAssistant.hiringInsights")}: ${item.title}`}
+                    onClick={() => onHiringInsights(jobId, item.title)}
+                    className="twin-btn-secondary twin-touch-target shrink-0 !w-auto px-3 py-1.5 text-xs"
+                  >
+                    {t("careerAssistant.hiringInsights")}
                   </button>
                 )}
                 {onSave && !status && (
