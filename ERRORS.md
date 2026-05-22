@@ -12,6 +12,7 @@ Quick fixes for production and local nightly auto-apply. Full runbooks: [docs/NI
 | `ops_admin_configured: false` | Missing `OPS_ADMIN_TOKEN` | Set in Railway Raw Editor or `.env.railway` + `./scripts/railway-apply-production-env.sh`. |
 | `GET /health/celery-status` 404 | Old API image | Deploy `cursor/phase1-monorepo-scaffold` (includes nightly auto-apply merge). |
 | Nightly beat never fires | Eager mode or no worker+beat | Worker must run `celery … worker --beat` (`deploy/railway-worker.toml`). |
+| Railway healthcheck fails; logs: `No "request" or "websocket" argument` on `verify_email_resend` | `@limiter.limit` without `request: Request` (slowapi raises at import → API never binds port) | Add `request: Request` to every limited route; deploy `079c722` or later. |
 
 ## Migrations (037 auto-apply)
 

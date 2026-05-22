@@ -1,7 +1,9 @@
 /**
  * Three distinct product surfaces: candidate app vs recruiter workspace vs company program.
- * Copy is authoritative for marketing pages (EN/PL); other locales fall back to EN in the UI.
+ * Copy is authoritative for marketing pages (EN/PL); other locales fall back to EN copy.
+ * Numeric tier MSRP is localized to the active locale currency in getPersonaBundle.
  */
+import { localizeTierPrice } from "@/lib/pricing-locale";
 
 export type PersonaId = "candidates" | "recruiters" | "companies";
 
@@ -605,6 +607,17 @@ export const PERSONA_PAGES: Record<PersonaId, { en: PersonaBundle; pl: PersonaBu
   companies: { en: companiesEn, pl: companiesPl },
 };
 
+function withLocalePricing(bundle: PersonaBundle, locale: string): PersonaBundle {
+  return {
+    ...bundle,
+    tiers: bundle.tiers.map((tier) => ({
+      ...tier,
+      price: localizeTierPrice(tier.id, tier.price, locale),
+    })),
+  };
+}
+
 export function getPersonaBundle(persona: PersonaId, locale: string): PersonaBundle {
-  return locale === "pl" ? PERSONA_PAGES[persona].pl : PERSONA_PAGES[persona].en;
+  const copy = locale === "pl" ? PERSONA_PAGES[persona].pl : PERSONA_PAGES[persona].en;
+  return withLocalePricing(copy, locale);
 }
