@@ -270,6 +270,7 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
             google: t("login.oauthGoogle"),
             github: t("login.oauthGithub"),
             apple: t("login.oauthApple"),
+            microsoft: t("login.oauthMicrosoft"),
           }}
         />
         <LinkedInLoginButton label={t("register.linkedIn")} />

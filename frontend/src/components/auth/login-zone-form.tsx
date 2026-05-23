@@ -129,6 +129,7 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
           google: t("login.oauthGoogle"),
           github: t("login.oauthGithub"),
           apple: t("login.oauthApple"),
+          microsoft: t("login.oauthMicrosoft"),
         }}
       />
       <p className="twin-muted mt-4 text-center text-sm">

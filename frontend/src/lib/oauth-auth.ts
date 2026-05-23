@@ -8,6 +8,7 @@ export type OAuthProviderStatus = {
   google: boolean;
   github: boolean;
   apple: boolean;
+  microsoft: boolean;
 };
 
 /** UI treats all social rows as enabled; the API gates real OAuth on redirect. */
@@ -16,4 +17,5 @@ export const OAUTH_LOGIN_BUTTONS_ENABLED: OAuthProviderStatus = {
   google: true,
   github: true,
   apple: true,
+  microsoft: true,
 };
