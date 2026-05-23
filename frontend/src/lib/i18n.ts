@@ -810,7 +810,10 @@ const en = {
     nightlyAutoApplyStatsLastRun: "Last run",
     nightlyAutoApplyStatsNextRun: "Next scheduled run",
     nightlyAutoApplyTrigger: "Run now (test)",
+    nightlyAutoApplyTriggerRunning: "Running auto-apply test…",
     nightlyAutoApplyTriggerOk: "Done: {message}",
+    nightlyAutoApplyTriggerFail: "Could not run test — enable consent first or complete your profile.",
+    nightlyAutoApplyTriggerViewApps: "View applications →",
     nightlyAutoApplyConsentTitle: "Consent for autonomous applications",
     nightlyAutoApplyConsentBody:
       "You authorize TWIN to submit applications on supported job boards using your CV and AI-tailored materials. You can disable this anytime.",
@@ -3158,7 +3161,10 @@ const pl: MessageTree = {
     nightlyAutoApplyStatsLastRun: "Ostatnie uruchomienie",
     nightlyAutoApplyStatsNextRun: "Następne uruchomienie",
     nightlyAutoApplyTrigger: "Uruchom teraz (test)",
+    nightlyAutoApplyTriggerRunning: "Trwa test auto-aplikacji…",
     nightlyAutoApplyTriggerOk: "Gotowe: {message}",
+    nightlyAutoApplyTriggerFail: "Nie udało się uruchomić testu — włącz zgodę lub uzupełnij profil.",
+    nightlyAutoApplyTriggerViewApps: "Zobacz aplikacje →",
     nightlyAutoApplyConsentTitle: "Zgoda na autonomiczne aplikacje",
     nightlyAutoApplyConsentBody:
       "Upoważniasz TWIN do składania aplikacji na obsługiwanych portalach z Twoim CV i materiałami AI. Możesz wyłączyć to w każdej chwili.",

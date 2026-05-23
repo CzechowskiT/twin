@@ -141,6 +141,14 @@ def demo_email_from_env() -> str:
     return (os.environ.get("DEMO_USER_EMAIL") or DEFAULT_DEMO_EMAIL).strip().lower()
 
 
+def is_investor_demo_job(job: Job | None) -> bool:
+    """True for seeded investor-demo rows (synthetic Pracuj URLs — no live portal submit)."""
+    if job is None:
+        return False
+    ext = (job.external_id or "").strip()
+    return ext.startswith(DEMO_JOB_PREFIX)
+
+
 def _now() -> datetime:
     return datetime.now(timezone.utc)
 

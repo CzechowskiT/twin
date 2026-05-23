@@ -17,7 +17,11 @@ from app.schemas.auto_apply_settings import (
     AutoApplyTriggerOut,
 )
 from app.services.candidate_readiness import auto_apply_profile_ready
-from app.services.nightly_auto_apply import process_user_nightly_auto_apply, supported_board_ids
+from app.services.nightly_auto_apply import (
+    METHOD_MANUAL_TRIGGER,
+    process_user_nightly_auto_apply,
+    supported_board_ids,
+)
 from app.tasks.nightly_auto_apply import nightly_auto_apply_sweep
 
 router = APIRouter()
@@ -191,7 +195,15 @@ def trigger_nightly_for_me(
             detail="Enable nightly auto-apply with consent before triggering",
         )
     settings = get_settings()
-    row = process_user_nightly_auto_apply(db, user=user, consent=consent, settings=settings)
+    row = process_user_nightly_auto_apply(
+        db,
+        user=user,
+        consent=consent,
+        settings=settings,
+        max_jobs=1,
+        cooldown_seconds=0,
+        application_method=METHOD_MANUAL_TRIGGER,
+    )
     submitted = int(row.get("applications_submitted", 0))
     failed = int(row.get("applications_failed", 0))
     reason = row.get("skipped_reason")
@@ -199,8 +211,12 @@ def trigger_nightly_for_me(
         msg = "Daily auto-apply limit reached for today."
     elif reason == "no_matches":
         msg = "No eligible matches above your score threshold (or already applied)."
+    elif submitted > 0 and failed > 0:
+        msg = f"Submitted {submitted} application(s); {failed} failed."
     elif submitted > 0:
         msg = f"Submitted {submitted} application(s)."
+    elif failed > 0:
+        msg = f"No submissions; {failed} attempt(s) failed (portal, CV, or browser)."
     else:
         msg = "No applications submitted."
     return AutoApplyTriggerOut(

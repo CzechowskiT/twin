@@ -35,6 +35,7 @@ export default function NightlyAutoApplySettingsPage() {
   const [settings, setSettings] = useState<AutoApplySettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [triggering, setTriggering] = useState(false);
   const [showConsent, setShowConsent] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -104,16 +105,18 @@ export default function NightlyAutoApplySettingsPage() {
   }
 
   async function runNow() {
-    setSaving(true);
+    setTriggering(true);
     setError(null);
+    setStatus(null);
     try {
       const out = await apiFetch<TriggerOut>("/api/v1/auto-apply/trigger", { method: "POST" });
       setStatus(t("dashboard.nightlyAutoApplyTriggerOk").replace("{message}", out.message));
       await load();
-    } catch {
-      setError("Trigger failed — enable consent first");
+    } catch (err) {
+      const detail = err instanceof Error ? err.message : t("dashboard.nightlyAutoApplyTriggerFail");
+      setError(detail || t("dashboard.nightlyAutoApplyTriggerFail"));
     } finally {
-      setSaving(false);
+      setTriggering(false);
     }
   }
 
@@ -280,14 +283,23 @@ export default function NightlyAutoApplySettingsPage() {
               <Button
                 type="button"
                 className="twin-btn-secondary w-full"
-                disabled={saving}
+                disabled={saving || triggering}
                 onClick={() => void runNow()}
               >
-                {t("dashboard.nightlyAutoApplyTrigger")}
+                {triggering
+                  ? t("dashboard.nightlyAutoApplyTriggerRunning")
+                  : t("dashboard.nightlyAutoApplyTrigger")}
               </Button>
             )}
 
-            {status && <p className="text-sm text-[var(--twin-muted-strong)]">{status}</p>}
+            {status && (
+              <div className="space-y-2 text-sm text-[var(--twin-muted-strong)]">
+                <p>{status}</p>
+                <Link href="/dashboard/applications" className="twin-link inline-block text-sm">
+                  {t("dashboard.nightlyAutoApplyTriggerViewApps")}
+                </Link>
+              </div>
+            )}
           </>
         )}
 

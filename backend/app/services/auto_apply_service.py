@@ -19,9 +19,12 @@ from app.services.application_package_pdf import render_application_package_pdf
 from app.services.cv_parser import CvParseError, extract_cv_text
 from app.services.cv_tailoring import build_motivation_text_for_auto_apply, get_tailoring_pitch_for_job
 from app.services.request_locale import is_polish_locale, normalize_locale
+from app.services.investor_demo_seed import is_investor_demo_job
 from app.services.s3_storage import get_s3_blob_store
 
 logger = logging.getLogger(__name__)
+
+METHOD_DEMO_SIMULATED = "auto_apply_demo_simulated"
 
 _AUTO_APPLY_USER_MSG: dict[str, dict[str, str]] = {
     "en": {
@@ -34,6 +37,10 @@ _AUTO_APPLY_USER_MSG: dict[str, dict[str, str]] = {
             "Auto-apply stopped on the server (e.g. browser error or portal page change). "
             "Use Apply to open the listing in a new tab and finish manually."
         ),
+        "demo_simulated": (
+            "Demo: application saved in TWIN (test listing — not sent to Pracuj.pl). "
+            "Check Applications on your dashboard."
+        ),
     },
     "pl": {
         "no_candidate": "Uzupełnij profil kandydata.",
@@ -44,6 +51,10 @@ _AUTO_APPLY_USER_MSG: dict[str, dict[str, str]] = {
         "server_interrupted": (
             "Auto-apply przerwany na serwerze (np. błąd przeglądarki albo zmiana strony portalu). "
             "Użyj „Aplikuj”, żeby otworzyć ogłoszenie w nowej karcie i dokończyć wysyłkę ręcznie."
+        ),
+        "demo_simulated": (
+            "Demo: aplikacja zapisana w TWIN (oferta testowa — bez wysyłki na Pracuj.pl). "
+            "Sprawdź Aplikacje w panelu."
         ),
     },
 }
@@ -188,18 +199,26 @@ def auto_apply_for_user(
 
     result: ApplyResult
     try:
-        result = run_auto_apply(
-            job_board=job.job_board,
-            job_url=job.url,
-            name=candidate.name,
-            email=user.email,
-            phone=settings.auto_apply_default_phone,
-            resume_path=resume_path,
-            motivation_text=motivation or None,
-            headless=settings.auto_apply_headless,
-            state_dir=state_dir,
-            submit=submit,
-        )
+        if is_investor_demo_job(job):
+            outcome = (
+                ApplyOutcome.FORM_FILLED
+                if not submit
+                else ApplyOutcome.SUBMITTED
+            )
+            result = ApplyResult(outcome, _auto_apply_msg(loc, "demo_simulated"))
+        else:
+            result = run_auto_apply(
+                job_board=job.job_board,
+                job_url=job.url,
+                name=candidate.name,
+                email=user.email,
+                phone=settings.auto_apply_default_phone,
+                resume_path=resume_path,
+                motivation_text=motivation or None,
+                headless=settings.auto_apply_headless,
+                state_dir=state_dir,
+                submit=submit,
+            )
     except Exception:
         logger.exception(
             "run_auto_apply crashed job_id=%s board=%s user_id=%s",
@@ -216,6 +235,15 @@ def auto_apply_for_user(
                 logger.warning("Could not remove temp package PDF %s", package_pdf)
 
     app = _upsert_application(db, candidate.id, job_id, result.outcome)
+    if is_investor_demo_job(job) and result.outcome in (
+        ApplyOutcome.SUBMITTED,
+        ApplyOutcome.FORM_FILLED,
+    ):
+        app.auto_applied = True
+        app.application_method = METHOD_DEMO_SIMULATED
+        db.add(app)
+        db.commit()
+        db.refresh(app)
     if pdf_bytes_for_s3 and get_s3_blob_store().enabled:
         store = get_s3_blob_store()
         ts = datetime.utcnow().strftime("%Y%m%d%H%M%S")
