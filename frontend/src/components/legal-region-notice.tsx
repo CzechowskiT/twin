@@ -12,7 +12,9 @@ import {
   type JurisdictionHint,
   type LegalRegion,
 } from "@/lib/jurisdiction-hint";
-import type { TranslationKey } from "@/lib/i18n";
+import { isLocale, LOCALE_STORAGE_KEY, type Locale, type TranslationKey } from "@/lib/i18n";
+import { marketingLocaleForCountryCode } from "@/lib/pricing-locale";
+import { safeStorage } from "@/lib/safe-storage";
 
 function bodyKey(region: LegalRegion): TranslationKey {
   const m: Record<LegalRegion, TranslationKey> = {
@@ -35,14 +37,38 @@ function sourceCaption(source: string): TranslationKey {
   return "legalRegion.sourceUnknown";
 }
 
+type GeoFeedback = {
+  key: TranslationKey;
+  tone: "neutral" | "success";
+};
+
+function hasStoredLocaleChoice(): boolean {
+  const stored = safeStorage.getItem(LOCALE_STORAGE_KEY);
+  return Boolean(stored && isLocale(stored));
+}
+
+function applyMarketingLocaleFromHint(
+  hint: JurisdictionHint,
+  setLocale: (locale: Locale) => void,
+): void {
+  if (hasStoredLocaleChoice()) return;
+  const suggested = marketingLocaleForCountryCode(hint.country_code);
+  if (suggested) setLocale(suggested);
+}
+
 export function LegalRegionNotice() {
-  const { t } = useTranslation();
+  const { t, setLocale } = useTranslation();
   const [hint, setHint] = useState<JurisdictionHint | null>(null);
-  const [geoMsg, setGeoMsg] = useState<string | null>(null);
+  const [geoFeedback, setGeoFeedback] = useState<GeoFeedback | null>(null);
   const [busy, setBusy] = useState(false);
+  const [geoSupported, setGeoSupported] = useState(false);
 
   const load = useCallback((h: JurisdictionHint) => {
     setHint(h);
+  }, []);
+
+  useEffect(() => {
+    setGeoSupported(typeof navigator !== "undefined" && Boolean(navigator.geolocation));
   }, []);
 
   useEffect(() => {
@@ -62,10 +88,9 @@ export function LegalRegionNotice() {
 
   const onRefine = useCallback(() => {
     if (typeof navigator === "undefined" || !navigator.geolocation) {
-      setGeoMsg(t("legalRegion.refineUnavailable"));
       return;
     }
-    setGeoMsg(null);
+    setGeoFeedback(null);
     setBusy(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
@@ -75,30 +100,39 @@ export function LegalRegionNotice() {
         })
           .then((h) => {
             load(h);
-            setGeoMsg(null);
+            applyMarketingLocaleFromHint(h, setLocale);
+            if (h.source === "coordinates") {
+              setGeoFeedback({ key: "legalRegion.refineSuccess", tone: "success" });
+            } else {
+              setGeoFeedback({ key: "legalRegion.refineUsedNetworkHint", tone: "neutral" });
+            }
           })
           .catch(async () => {
             try {
               const h = await fetchJurisdictionHint();
               load(h);
-              setGeoMsg(t("legalRegion.refineUsedNetworkHint"));
+              setGeoFeedback({ key: "legalRegion.refineUsedNetworkHint", tone: "neutral" });
             } catch {
-              setGeoMsg(t("legalRegion.refineError"));
+              setGeoFeedback({ key: "legalRegion.refineError", tone: "neutral" });
             }
           })
           .finally(() => setBusy(false));
       },
       () => {
         setBusy(false);
-        setGeoMsg(t("legalRegion.refineDenied"));
+        setGeoFeedback({ key: "legalRegion.refineDenied", tone: "neutral" });
       },
       { enableHighAccuracy: false, timeout: 12_000, maximumAge: 120_000 },
     );
-  }, [load, t]);
+  }, [load, setLocale]);
 
   if (!hint) return null;
 
   const region = normalizeLegalRegion(hint.legal_region);
+  const feedbackClass =
+    geoFeedback?.tone === "success"
+      ? "mt-3 text-xs text-[var(--twin-accent)]"
+      : "twin-muted mt-3 text-xs leading-relaxed";
 
   return (
     <section
@@ -114,17 +148,20 @@ export function LegalRegionNotice() {
         <p className="mb-3 font-mono text-xs text-[var(--twin-muted-strong)]">{hint.country_code}</p>
       ) : null}
       <p className="leading-relaxed text-[var(--foreground)]/95">{t(bodyKey(region))}</p>
-      {geoMsg ? <p className="mt-3 text-xs text-amber-800 dark:text-amber-200">{geoMsg}</p> : null}
-      <div className="mt-4">
-        <Button
-          type="button"
-          className="twin-touch-target twin-btn-secondary !text-[var(--twin-fg)]"
-          disabled={busy}
-          onClick={() => void onRefine()}
-        >
-          {busy ? t("legalRegion.refineBusy") : t("legalRegion.refineCta")}
-        </Button>
-      </div>
+      {geoFeedback ? <p className={feedbackClass}>{t(geoFeedback.key)}</p> : null}
+      {geoSupported ? (
+        <div className="mt-4 space-y-2">
+          <p className="twin-muted text-xs leading-relaxed">{t("legalRegion.refineCtaHint")}</p>
+          <Button
+            type="button"
+            className="twin-touch-target twin-btn-secondary !text-[var(--twin-fg)]"
+            disabled={busy}
+            onClick={() => void onRefine()}
+          >
+            {busy ? t("legalRegion.refineBusy") : t("legalRegion.refineCta")}
+          </Button>
+        </div>
+      ) : null}
     </section>
   );
 }

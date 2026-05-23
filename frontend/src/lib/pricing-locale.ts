@@ -1,6 +1,28 @@
 import { defaultCurrencyForLocale, numberFormatLocaleForUi } from "@/lib/calculator-currencies";
 import { isLocale, type Locale } from "@/lib/i18n";
 
+/** ISO 3166-1 alpha-2 → UI / marketing locale when geolocation refines region. */
+const MARKETING_LOCALE_BY_COUNTRY: Partial<Record<string, Locale>> = {
+  PL: "pl",
+  DE: "de",
+  FR: "fr",
+  ES: "es",
+  IT: "it",
+  JP: "ja",
+  CN: "zh",
+  AE: "ar",
+  US: "en",
+  GB: "en",
+  UK: "en",
+};
+
+/** Suggest pricing / marketing locale from a detected country code (null = keep current UI locale). */
+export function marketingLocaleForCountryCode(countryCode: string | null | undefined): Locale | null {
+  const cc = (countryCode ?? "").trim().toUpperCase();
+  if (!cc) return null;
+  return MARKETING_LOCALE_BY_COUNTRY[cc] ?? null;
+}
+
 /** Locale → ISO 4217 for marketing MSRP (aligned with calculator defaults). */
 export function marketingCurrencyForLocale(locale: string): string {
   return isLocale(locale) ? defaultCurrencyForLocale(locale) : "USD";
