@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { DemoMatchGauge } from "@/components/marketing/demo-match-gauge";
 import { useTranslation } from "@/components/language-provider";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -56,10 +57,11 @@ export function DemoLiveSnapshot({ fullDemoHref }: DemoLiveSnapshotProps = {}) {
   if (loading || !snapshot) return null;
 
   const signup = snapshot.signup_cta_path || "/register";
+  const maxScore = Math.max(...snapshot.top_matches.map((row) => row.score), 1);
 
   return (
     <section
-      className="marketing-section-demo-feed rounded-2xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/90 p-5 shadow-sm sm:p-6"
+      className="marketing-section-demo-feed demo-glass-panel p-5 sm:p-6"
       aria-labelledby="demo-live-feed-heading"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -82,23 +84,36 @@ export function DemoLiveSnapshot({ fullDemoHref }: DemoLiveSnapshotProps = {}) {
         </Link>
       </div>
       <ul className="mt-5 space-y-3">
-        {snapshot.top_matches.slice(0, 5).map((row) => (
-          <li
-            key={`${row.company}-${row.title}`}
-            className="flex flex-wrap items-baseline justify-between gap-2 rounded-xl border border-[var(--twin-border)]/80 bg-[var(--twin-card)] px-4 py-3"
-          >
-            <div>
-              <p className="font-semibold text-[var(--foreground)]">{row.title}</p>
-              <p className="text-sm text-[var(--twin-muted-strong)]">
-                {row.company}
-                {row.location ? ` · ${row.location}` : ""}
-              </p>
-            </div>
-            <span className="text-lg font-semibold tabular-nums text-[var(--twin-accent)]">
-              {Math.round(row.score)}%
-            </span>
-          </li>
-        ))}
+        {snapshot.top_matches.slice(0, 5).map((row, i) => {
+          const score = Math.round(row.score);
+          const barWidth = Math.round((row.score / maxScore) * 100);
+          return (
+            <li
+              key={`${row.company}-${row.title}`}
+              className="demo-ranking-row group rounded-xl px-4 py-3"
+              style={{ animationDelay: `${i * 80}ms` }}
+            >
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-[var(--foreground)] transition-colors group-hover:text-[var(--twin-accent)]">
+                    {row.title}
+                  </p>
+                  <p className="text-sm text-[var(--twin-muted-strong)]">
+                    {row.company}
+                    {row.location ? ` · ${row.location}` : ""}
+                  </p>
+                </div>
+                <DemoMatchGauge score={score} size="sm" />
+              </div>
+              <div className="demo-ranking-bar mt-3 h-1.5 overflow-hidden rounded-full bg-[var(--twin-border)]/50">
+                <div
+                  className="demo-ranking-bar__fill h-full rounded-full"
+                  style={{ width: `${barWidth}%`, animationDelay: `${i * 80 + 150}ms` }}
+                />
+              </div>
+            </li>
+          );
+        })}
       </ul>
       {snapshot.scheduled_interview ? (
         <p className="mt-4 text-xs text-[var(--twin-muted)]">
@@ -110,7 +125,7 @@ export function DemoLiveSnapshot({ fullDemoHref }: DemoLiveSnapshotProps = {}) {
         <p className="mt-4">
           <Link
             href={fullDemoHref}
-            className="text-sm font-semibold text-[var(--twin-accent)] underline-offset-4 hover:underline"
+            className="demo-full-experience-link inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--twin-accent)]"
           >
             {t("demo.fullExperienceCta" as TranslationKey)} →
           </Link>

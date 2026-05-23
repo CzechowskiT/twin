@@ -128,17 +128,28 @@ export const DemoAutoApplyTheater = forwardRef<HTMLElement, DemoAutoApplyTheater
 
         <div className="relative space-y-4">
           {(activeIdx === 0 || stepStates[0] === "done") && (
-            <div className="demo-theater-reveal space-y-2 rounded-xl border border-[var(--twin-border)] bg-[var(--twin-card)] p-4">
+            <div className="demo-theater-reveal demo-ranking-panel space-y-3 rounded-xl p-4">
               <p className="text-xs font-bold uppercase tracking-wider text-[var(--twin-accent)]">{t("demo.theaterScanTitle")}</p>
               <ul className="space-y-2">
                 {SCAN_JOBS.map((job, i) => (
                   <li
                     key={job.title}
-                    className="demo-theater-reveal flex items-center justify-between gap-2 rounded-lg border border-[var(--twin-border)]/80 px-3 py-2 text-sm"
+                    className={`demo-ranking-row demo-theater-reveal rounded-lg px-3 py-2.5 ${job.score >= DEMO_MATCH_SCORE ? "demo-ranking-row--top" : ""}`}
                     style={{ animationDelay: `${i * 120}ms` }}
                   >
-                    <span className="font-medium text-[var(--foreground)]">{job.title}</span>
-                    <span className="text-xs text-[var(--twin-muted)]">{job.board}</span>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-[var(--foreground)]">{job.title}</p>
+                        <p className="mt-0.5 text-xs text-[var(--twin-muted)]">{job.board}</p>
+                      </div>
+                      <DemoMatchGauge score={job.score} size="sm" />
+                    </div>
+                    <div className="demo-ranking-bar mt-2 h-1 overflow-hidden rounded-full bg-[var(--twin-border)]/60">
+                      <div
+                        className="demo-ranking-bar__fill h-full rounded-full"
+                        style={{ width: `${job.score}%`, animationDelay: `${i * 120 + 200}ms` }}
+                      />
+                    </div>
                   </li>
                 ))}
               </ul>

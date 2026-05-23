@@ -61,8 +61,11 @@ export function LandingHero() {
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
             <Link
               href="/demo"
-              className="landing-hero-demo-cta--secondary font-semibold text-[var(--twin-muted-strong)] underline-offset-4 hover:text-[var(--foreground)] hover:underline"
+              className="landing-hero-demo-cta landing-hero-demo-cta--secondary inline-flex items-center gap-2 font-semibold"
             >
+              <span className="landing-hero-demo-cta__icon" aria-hidden>
+                ▶
+              </span>
               {t("home.ctaDemoSecondary")}
             </Link>
             <span className="text-[var(--twin-muted)]" aria-hidden>
