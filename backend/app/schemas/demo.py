@@ -54,6 +54,17 @@ class DemoNightlyRunOut(BaseModel):
     total_applications_submitted: int = 0
 
 
+class DemoApplyTargetOut(BaseModel):
+    """Seeded investor-demo job for authenticated live apply on /demo."""
+
+    job_id: int
+    title: str
+    company: str
+    job_board: str
+    external_id: str
+    url: str | None = None
+
+
 class DemoSnapshotOut(BaseModel):
     """Anonymized pipeline preview for GET /api/v1/demo/snapshot (no login)."""
 

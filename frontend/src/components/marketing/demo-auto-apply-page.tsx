@@ -237,19 +237,49 @@ export function DemoAutoApplyPage() {
           <DemoLiveSnapshot />
 
           <aside
-            className="rounded-2xl border border-amber-200/90 bg-amber-50/95 px-4 py-3 text-sm leading-relaxed text-amber-950 shadow-sm"
+            className={
+              canRunLiveApply
+                ? "rounded-2xl border border-emerald-200/90 bg-emerald-50/95 px-4 py-3 text-sm leading-relaxed text-emerald-950 shadow-sm dark:border-emerald-800/60 dark:bg-emerald-950/40 dark:text-emerald-100"
+                : "rounded-2xl border border-amber-200/90 bg-amber-50/95 px-4 py-3 text-sm leading-relaxed text-amber-950 shadow-sm dark:border-amber-800/60 dark:bg-amber-950/30 dark:text-amber-100"
+            }
             role="status"
           >
-            <p className="font-semibold text-amber-950">{t("demo.simulationTitle")}</p>
-            <p className="mt-1 text-amber-900/95">{t("demo.simulationBody")}</p>
+            <p className="font-semibold">
+              {canRunLiveApply ? t("demo.liveApplyTitle") : t("demo.simulationTitle")}
+            </p>
+            <p className="mt-1 opacity-95">
+              {canRunLiveApply ? t("demo.liveApplyBody") : t("demo.simulationBody")}
+            </p>
+            {isLoggedIn && applyTargetError ? (
+              <p className="mt-2 text-xs font-medium opacity-90">{t("demo.noApplyTarget")}</p>
+            ) : null}
+            {canRunLiveApply && applyTarget ? (
+              <p className="mt-2 text-xs opacity-90">
+                {applyTarget.title} · {applyTarget.company} ({applyTarget.job_board})
+              </p>
+            ) : null}
           </aside>
 
           <div className="marketing-section-demo-actions flex flex-wrap items-center gap-3">
+            {canRunLiveApply ? (
+              <ButtonCta
+                type="button"
+                disabled={realApplying}
+                onClick={() => void runRealAutoApply()}
+                className="section-cta-primary marketing-btn-primary-shadow !w-auto min-w-[12rem] px-6"
+              >
+                {realApplying ? t("demo.runningRealCta") : t("demo.runRealCta")}
+              </ButtonCta>
+            ) : null}
             <ButtonCta
               type="button"
-              disabled={running}
+              disabled={running || realApplying}
               onClick={runSequence}
-              className="section-cta-primary marketing-btn-primary-shadow !w-auto min-w-[12rem] px-6"
+              className={
+                canRunLiveApply
+                  ? "section-cta-secondary !w-auto min-w-[12rem] px-6"
+                  : "section-cta-primary marketing-btn-primary-shadow !w-auto min-w-[12rem] px-6"
+              }
             >
               {running ? t("demo.runningCta") : t("demo.runCta")}
             </ButtonCta>
@@ -260,9 +290,16 @@ export function DemoAutoApplyPage() {
             >
               {t("demo.nextStep")}
             </button>
-            <Link href="/register" className="section-cta-secondary twin-touch-target px-5 text-sm">
-              {t("demo.registerCta")}
-            </Link>
+            {!isLoggedIn ? (
+              <Link href="/login/candidate?next=/demo" className="section-cta-secondary twin-touch-target px-5 text-sm">
+                {t("demo.loginForRealCta")}
+              </Link>
+            ) : null}
+            {!isLoggedIn ? (
+              <Link href="/register" className="section-cta-secondary twin-touch-target px-5 text-sm">
+                {t("demo.registerCta")}
+              </Link>
+            ) : null}
           </div>
           <p className="max-w-3xl text-xs leading-relaxed text-[var(--twin-muted)]">{t("demo.manualFlowHint")}</p>
 

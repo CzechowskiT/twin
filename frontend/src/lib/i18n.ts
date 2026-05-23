@@ -1844,9 +1844,17 @@ const en = {
     pageTitle: "From CV scan to application: one calm pipeline",
     pageLead:
       "Below is a synthetic candidate and a fictional listing shaped like production data. The match score uses the same rule-based engine as the dashboard, and the apply steps are a timed simulation. The live product runs Playwright against supported boards when you are signed in on a paid plan.",
-    simulationTitle: "Simulation: no application is sent from this page",
+    simulationTitle: "Demo mode: timed story only",
     simulationBody:
-      "In production, auto-apply calls POST /api/v1/applications/auto-apply with your session and runs board-specific automation (e.g. pracuj.pl). This marketing demo never touches that endpoint and uses no credentials.",
+      "Sign in to run a real auto-apply on the seeded pracuj.pl investor-demo job. Until then, the button below plays a timed walkthrough with no API calls.",
+    liveApplyTitle: "Live apply: real submission on seeded demo job",
+    liveApplyBody:
+      "You are signed in. “Run real auto-apply” calls POST /api/v1/applications/auto-apply on the investor-demo pracuj.pl listing (same path as the dashboard). Requires CV on your profile and consent where configured.",
+    runRealCta: "Run real auto-apply",
+    runningRealCta: "Submitting…",
+    loginForRealCta: "Sign in for live apply",
+    noApplyTarget:
+      "Demo apply job not found in this environment. Ask your team to run scripts/seed-investor-demo.py on the API database.",
     runCta: "Play auto-apply story",
     runningCta: "Running…",
     nextStep: "Next step",
@@ -3836,9 +3844,17 @@ const pl: MessageTree = {
     pageTitle: "Od skanu CV do aplikacji: jeden spokojny pipeline",
     pageLead:
       "Poniżej syntetyczny kandydat i fikcyjna oferta w kształcie danych produkcyjnych. Wynik dopasowania liczy ten sam silnik reguł co w panelu, a kroki auto-aplikacji to zsynchronizowana symulacja. W produkcji, po zalogowaniu i na płatnym planie, odpala się Playwright na obsługiwanych portalach.",
-    simulationTitle: "Symulacja: z tej strony nie wysyłamy aplikacji",
+    simulationTitle: "Tryb demo: tylko odtwarzanie kroków",
     simulationBody:
-      "W produkcji auto-apply woła POST /api/v1/applications/auto-apply w Twojej sesji i uruchamia automatyzację pod konkretny portal (np. pracuj.pl). Ten marketingowy demo nie łączy się z tym endpointem i nie używa żadnych poświadczeń.",
+      "Zaloguj się, aby uruchomić prawdziwe auto-apply na ofercie demo z seeda (pracuj.pl). Bez logowania przycisk poniżej odtwarza scenariusz czasowo — bez wywołań API.",
+    liveApplyTitle: "Live apply: prawdziwe wysłanie na ofercie demo",
+    liveApplyBody:
+      "Jesteś zalogowany. „Uruchom prawdziwe auto-apply” woła POST /api/v1/applications/auto-apply na ofercie investor-demo (ten sam endpoint co w panelu). Wymaga CV w profilu i zgody tam, gdzie jest włączona.",
+    runRealCta: "Uruchom prawdziwe auto-apply",
+    runningRealCta: "Wysyłanie…",
+    loginForRealCta: "Zaloguj się, by użyć live apply",
+    noApplyTarget:
+      "Brak oferty demo w tej bazie. Zespół powinien uruchomić scripts/seed-investor-demo.py na bazie API.",
     runCta: "Odtwórz scenariusz auto-apply",
     runningCta: "Trwa…",
     nextStep: "Następny krok",

@@ -26,6 +26,8 @@ from app.services.matching_service import find_top_matches
 
 DEMO_BOARD = "pracuj"
 DEMO_JOB_PREFIX = "investor-demo-"
+# Primary pracuj investor-demo job used for live apply on /demo (founder walkthrough).
+DEMO_APPLY_JOB_EXTERNAL_ID = f"{DEMO_JOB_PREFIX}python-lead"
 DEFAULT_DEMO_EMAIL = "demo@twin.career"
 
 CV_TEXT = """\
