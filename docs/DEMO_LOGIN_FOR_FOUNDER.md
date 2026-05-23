@@ -97,6 +97,8 @@ Weryfikacja workera (dev): `GET https://twin-production-bcd9.up.railway.app/api/
 
 ## Co powinieneś zobaczyć po zalogowaniu
 
+- **Przycisk „Demo”** w nagłówku (obok logo oraz obok **Kalendarz** / **Panel**) — prowadzi na `/demo` (symulacja + live apply po zalogowaniu).
+- Na koncie founder (`czechowski@protonmail.ch`) dodatkowo **wyróżniony pasek Demo** na górze panelu (`/dashboard`).
 - **5 dopasowanych ofert** (demo inwestorskie + ranking).
 - **Aplikacja** w toku i **zaplanowana rozmowa** w kalendarzu.
 - **Data room** w trybie demo (lokalny podgląd, gdy S3 wyłączone na prod).

@@ -2606,6 +2606,18 @@ html[data-marketing-surface="studio"] .marketing-founding-value-strip li {
   box-shadow: 0 0 0 0 var(--demo-mint-glow);
 }
 
+.twin-header-cta--demo-pulse {
+  animation: demo-mint-pulse 2s ease-in-out infinite;
+  box-shadow: 0 0 0 0 rgb(52 211 153 / 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .twin-header-cta--demo-pulse {
+    animation: none;
+    box-shadow: none;
+  }
+}
+
 .demo-theater-step--active {
   box-shadow: 0 0 0 1px rgb(52 211 153 / 0.2), 0 8px 24px rgb(31 77 63 / 0.08);
 }
