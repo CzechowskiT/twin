@@ -840,6 +840,13 @@ samp {
   max-width: 42rem;
 }
 
+/** Beside the sticky rail, use the full main column — a 42rem cap + side-by-side panels crushed layout. */
+@media (min-width: 64rem) {
+  .twin-shell-rail-main.twin-readable-measure {
+    max-width: 100%;
+  }
+}
+
 /**
  * Captions above inputs (modals/forms): keep short PL phrases together (e.g. "Docelowa rola");
  * block layout only — never flex space-between on the label row.

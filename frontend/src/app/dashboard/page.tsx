@@ -1540,8 +1540,9 @@ export default function DashboardPage() {
       ) : null}
 
       <Card variant="accent">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between lg:gap-8">
-          <div className="min-w-0 flex-1 twin-card-inset p-4 sm:p-5">
+        {/* Stack profile + scrape: rail main is ~34rem at lg while flex-row needs ~44rem+ (see twin-readable-measure). */}
+        <div className="flex flex-col gap-6">
+          <div className="min-w-0 twin-card-inset p-4 sm:p-5">
             {user && (
               <div className="min-w-0 max-w-full">
                 <p className="twin-muted text-xs">{t("dashboard.signedInAs")}</p>
@@ -1565,14 +1566,14 @@ export default function DashboardPage() {
             )}
             {profile && (
               <div className="mt-4 border-t border-[var(--twin-border)] pt-4">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="font-medium">{profile.name}</p>
+                <div className="flex min-w-0 items-start justify-between gap-3">
+                  <p className="min-w-0 break-words font-medium leading-snug">{profile.name}</p>
                   <Link href="/profile" className="twin-link shrink-0 text-sm">
                     {t("dashboard.edit")}
                   </Link>
                 </div>
-                <p className="twin-muted mt-1 text-sm">{profile.skills.join(", ")}</p>
-                <p className="twin-muted mt-1 text-sm">
+                <p className="twin-muted mt-2 break-words text-sm leading-relaxed">{profile.skills.join(", ")}</p>
+                <p className="twin-muted mt-2 break-words text-sm leading-relaxed">
                   {profile.experience_years} {t("dashboard.years")}
                   {profile.location ? ` · ${profile.location}` : ""}
                   {profile.desired_salary
@@ -1591,8 +1592,8 @@ export default function DashboardPage() {
           </div>
 
           {SHOW_SCRAPE_UI && (
-            <div id="dashboard-scrape" className="twin-card-inset w-full shrink-0 p-4 sm:p-5 lg:max-w-lg xl:max-w-xl">
-              <p className="text-xs font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
+            <div id="dashboard-scrape" className="twin-card-inset min-w-0 w-full p-4 sm:p-5">
+              <p className="break-words text-xs font-bold uppercase tracking-wide text-[var(--twin-muted-strong)] sm:tracking-wider">
                 {t("dashboard.twinScrapePanelTitle")}
               </p>
               <ButtonCta
@@ -1604,7 +1605,7 @@ export default function DashboardPage() {
                   user?.can_trigger_scrape === false ||
                   user?.scrape_worker_ready === false
                 }
-                className="!mt-4 !rounded-full !py-3.5 !text-base !font-bold !tracking-tight !shadow-lg"
+                className="!mt-4 !whitespace-normal !rounded-full !py-3.5 !text-base !font-bold !leading-snug !tracking-tight !shadow-lg"
               >
                 {scraping ? t("dashboard.twinForYourJobRunning") : t("dashboard.twinForYourJob")}
               </ButtonCta>
@@ -1629,9 +1630,9 @@ export default function DashboardPage() {
                   {t("dashboard.mailNotConfiguredBody")}
                 </p>
               ) : null}
-              <p className="twin-muted mt-3 text-xs leading-relaxed">{t("dashboard.twinForYourJobHint")}</p>
+              <p className="twin-muted mt-3 break-words text-xs leading-relaxed">{t("dashboard.twinForYourJobHint")}</p>
               <ScrapeRegistryCoverageHint />
-              <p className="twin-muted mt-2 text-[11px] leading-relaxed">
+              <p className="twin-muted mt-2 break-words text-[11px] leading-relaxed">
                 {t("dashboard.scrapeAllHint")} {t("dashboard.keepApiOpen")}
               </p>
               <InvestorRoadmapPanel />
