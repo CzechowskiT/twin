@@ -9,16 +9,25 @@ Instrukcja po polsku — bez terminala. Hasła **nie ma** w tym pliku (dostajesz
 
 Alternatywnie: strona główna https://twin-sooty.vercel.app → **Zaloguj się**.
 
-## Konto demo
+## Konto demo (founder — Twoje konto)
+
+| Pole | Wartość |
+|------|---------|
+| **E-mail** | `czechowski@protonmail.ch` (Twoje konto produkcyjne) |
+| **Hasło** | To samo, którego używasz na produkcji — **nie** resetujemy go przy konfiguracji demo. |
+
+Po zalogowaniu `/demo` i panel rozpoznają Cię jako użytkownika demo (`NEXT_PUBLIC_DEMO_USER_EMAIL` + `DEMO_USER_EMAIL` na Railway). Profil (imię, CV) **nie** jest nadpisywany personą „Alex Kowalski”.
+
+### Konto demo@twin.career (legacy, opcjonalne)
 
 | Pole | Wartość |
 |------|---------|
 | **E-mail** | `demo@twin.career` |
-| **Hasło** | Jednorazowo od agenta / dev (Signal, 1Password, wiadomość prywatna — **nie** w GitHubie). |
+| **Hasło** | Jednorazowo od agenta / dev (Signal, 1Password — **nie** w GitHubie). |
 
-> **Uwaga:** Użyj **najnowszego hasła od dev** (po każdym resecie — nie szukaj go w repozytorium).
+> **Uwaga:** Użyj **najnowszego hasła od dev** tylko jeśli celowo logujesz się na `demo@twin.career`.
 
-Hasło można zresetować bez Twojej pracy w terminalu — wystarczy prośba do zespołu dev.
+Hasło legacy można zresetować przez dev (`seed-investor-demo.py --reset-password`) — **nie** używaj tego na koncie founder.
 
 ### Jednolinijkowiec dla dev (seed na produkcji)
 
@@ -30,7 +39,17 @@ export DEMO_USER_PASSWORD='twoje-haslo-12-znakow'
 python3 scripts/seed-investor-demo.py --reset-password
 ```
 
-API musi mieć `DEMO_MODE_ENABLED=true` i `DEMO_USER_EMAIL=demo@twin.career` — patrz [RAILWAY_DEMO_ENV_CHECKLIST.md](./RAILWAY_DEMO_ENV_CHECKLIST.md).
+API: `DEMO_MODE_ENABLED=true`, `DEMO_USER_EMAIL=czechowski@protonmail.ch`. Vercel: `NEXT_PUBLIC_DEMO_USER_EMAIL` — ten sam e-mail.
+
+```bash
+./scripts/railway-apply-founder-demo-env.sh
+./scripts/vercel-apply-founder-demo-env.sh   # po `cd frontend && npx vercel link -p twin-sooty`
+# Uzupełnienie profilu bez resetu hasła (Railway Postgres → DATABASE_PUBLIC_URL):
+export DATABASE_URL='…'
+python3 scripts/ensure-founder-demo-profile.py
+```
+
+Patrz też [RAILWAY_DEMO_ENV_CHECKLIST.md](./RAILWAY_DEMO_ENV_CHECKLIST.md).
 
 ## Dashboard (oferty) zamiast onboardingu
 
@@ -61,8 +80,8 @@ To konto nie ma gotowych 5 ofert demo — służy do sprawdzenia „prawdziwej�
 
 ## Gdy coś nie działa
 
-- E-mail musi być dokładnie: `demo@twin.career` (małe litery).
-- „Nieprawidłowe dane logowania” → poproś dev o **reset hasła demo** (`seed-investor-demo.py --reset-password`).
+- Founder: loguj się jako `czechowski@protonmail.ch` (własne hasło).
+- Legacy demo: `demo@twin.career` — reset hasła tylko przez dev (`seed-investor-demo.py --reset-password`), nie na koncie founder.
 - Status API (dla dev): https://twin-production-bcd9.up.railway.app/api/v1/health
 
 ## Bezpieczeństwo
@@ -71,4 +90,4 @@ Konto tylko do prezentacji produktu. Nie publikuj hasła i nie używaj go poza T
 
 ---
 
-*Ostatnia aktualizacja: 2026-05-23 — reset hasła demo na produkcji (Railway `responsible-success`); hasło tylko od dev.*
+*Ostatnia aktualizacja: 2026-05-23 — demo na koncie founder (`czechowski@protonmail.ch`), config-only Railway/Vercel + `ensure-founder-demo-profile.py`.*
