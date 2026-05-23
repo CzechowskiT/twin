@@ -1,77 +1,84 @@
-# Microsoft 365 / Azure — logowanie i kalendarz w TWIN
+# Microsoft / Azure — krok po kroku (jak Stripe)
 
-Jedna aplikacja w **Microsoft Entra** obsługuje:
-- **logowanie / rejestrację** (`/api/v1/auth/microsoft/...`)
-- **kalendarz Outlook** (`/api/v1/calendar/microsoft/...`)
-
-Bez `MICROSOFT_CLIENT_ID` i `MICROSOFT_CLIENT_SECRET` w `.env` przycisk Microsoft na stronie logowania przekieruje z błędem `microsoft_not_configured`.
+Jedna aplikacja Azure obsługuje **logowanie** i **kalendarz Outlook** w TWIN.
 
 ---
 
-## Krok 1 — Rejestracja aplikacji w Azure (10 min)
+## Sposób A — automatyczny (polecany, ~2 minuty Twojej uwagi)
 
-1. Wejdź: https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade  
-2. **New registration**  
-   - Name: `TWIN local` (dowolna)  
-   - Supported account types: **Accounts in any organizational directory and personal Microsoft accounts**  
-   - Redirect URI: **Web** → na razie zostaw puste, dodasz za chwilę  
-3. Po utworzeniu skopiuj **Application (client) ID** → to `MICROSOFT_CLIENT_ID`  
-4. **Certificates & secrets** → **New client secret** → skopiuj wartość → `MICROSOFT_CLIENT_SECRET`  
-5. **Authentication** → **Add a platform** → **Web** → dodaj **oba** adresy (dokładnie):
+### Krok 1 — Zaloguj się do Microsoft (raz)
+
+W terminalu Cursora (**nowa zakładka**, nie „read-only”):
+
+```bash
+/Library/Frameworks/Python.framework/Versions/3.14/bin/az login --use-device-code
+```
+
+1. Otworzy się strona https://login.microsoft.com/device (albo skopiuj link z terminala).
+2. Wpisz **kod z terminala** (np. `CF3WTAAH7`).
+3. Zaloguj się kontem Microsoft (to samo co do Outlook / Azure).
+
+### Krok 2 — Uruchom skrypt (reszta robi się sama)
+
+```bash
+cd ~/Projects/twin
+./scripts/setup-microsoft-azure.sh
+```
+
+Skrypt:
+- tworzy aplikację w Azure,
+- ustawia redirect URI,
+- generuje Client Secret,
+- zapisuje `MICROSOFT_*` do `.env`.
+
+### Krok 3 — Restart API
+
+```bash
+cd ~/Projects/twin
+make api
+```
+
+(albo `./open-folder.sh --launch`)
+
+### Krok 4 — Test
+
+http://localhost:3000/login → **Kontynuuj z Microsoft**
+
+---
+
+## Sposób B — ręcznie w przeglądarce (gdy skrypt nie działa)
+
+1. https://portal.azure.com → **Microsoft Entra ID** → **App registrations** → **New registration**
+2. Nazwa: `TWIN local`
+3. Konta: **Accounts in any organizational directory and personal Microsoft accounts**
+4. Skopiuj **Application (client) ID**
+5. **Certificates & secrets** → **New client secret** → skopiuj wartość
+6. **Authentication** → redirect URI (Web), **oba** adresy:
 
 ```
 http://localhost:8000/api/v1/auth/microsoft/callback
 http://localhost:8000/api/v1/calendar/microsoft/callback
 ```
 
-6. **API permissions** → **Add a permission** → **Microsoft Graph** → **Delegated**:
-   - `openid`, `profile`, `email`, `User.Read` (logowanie)
-   - `Calendars.ReadWrite`, `offline_access` (kalendarz)  
-7. **Grant admin consent** (jeśli masz konto firmowe z uprawnieniami admina).
+7. Wklej do `.env`:
 
----
-
-## Krok 2 — Wklej do `~/Projects/twin/.env`
-
-```env
-MICROSOFT_CLIENT_ID=twoj_application_client_id
-MICROSOFT_CLIENT_SECRET=twoj_client_secret
-MICROSOFT_REDIRECT_URI=http://localhost:8000/api/v1/auth/microsoft/callback
-MICROSOFT_CALENDAR_REDIRECT_URI=http://localhost:8000/api/v1/calendar/microsoft/callback
-MICROSOFT_TENANT=common
+```bash
+cd ~/Projects/twin
+node scripts/sync-microsoft-env.mjs TWOJ_CLIENT_ID TWOJ_SECRET
 ```
 
-Zapisz plik.
+8. Restart API.
 
 ---
 
-## Krok 3 — Restart API
+## LinkedIn (osobno)
 
-Zatrzymaj API (Ctrl+C) i uruchom ponownie (`make api` lub `./open-folder.sh --launch`).
-
----
-
-## Krok 4 — Sprawdzenie
-
-- Logowanie: http://localhost:3000/login → **Kontynuuj z Microsoft**  
-- Kalendarz: panel → połącz Microsoft 365  
+Masz już klucze w `.env` — po restarcie API użyj **Kontynuuj z LinkedIn** na `/login`.  
+Instrukcja: `docs/LINKEDIN_KONFIGURACJA_PL.md`.
 
 ---
 
-## LinkedIn
+## Produkcja
 
-LinkedIn jest osobną aplikacją — patrz `docs/LINKEDIN_KONFIGURACJA_PL.md`.  
-Jeśli w `.env` masz już `LINKEDIN_CLIENT_ID` i `LINKEDIN_CLIENT_SECRET`, przycisk LinkedIn działa po restarcie API.
-
----
-
-## Produkcja (Railway / Vercel)
-
-W Azure dodaj redirecty z domeną produkcyjną, np.:
-
-```
-https://twoje-api.up.railway.app/api/v1/auth/microsoft/callback
-https://twoje-api.up.railway.app/api/v1/calendar/microsoft/callback
-```
-
-Te same wartości ustaw w zmiennych Railway (`MICROSOFT_*`).
+W Azure dodaj te same redirecty z domeną Railway, np.  
+`https://twoje-api.up.railway.app/api/v1/auth/microsoft/callback`
