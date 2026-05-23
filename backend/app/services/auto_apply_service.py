@@ -18,9 +18,40 @@ from app.database.models import Application, ApplicationStatus, Candidate, Job, 
 from app.services.application_package_pdf import render_application_package_pdf
 from app.services.cv_parser import CvParseError, extract_cv_text
 from app.services.cv_tailoring import build_motivation_text_for_auto_apply, get_tailoring_pitch_for_job
+from app.services.request_locale import is_polish_locale, normalize_locale
 from app.services.s3_storage import get_s3_blob_store
 
 logger = logging.getLogger(__name__)
+
+_AUTO_APPLY_USER_MSG: dict[str, dict[str, str]] = {
+    "en": {
+        "no_candidate": "Complete your candidate profile first.",
+        "job_not_found": "Job not found.",
+        "no_cv_text": "Upload a CV or wait for text extraction — auto-apply needs CV content.",
+        "no_cv_file": "No CV file to attach (upload a CV in your profile).",
+        "pdf_build_failed": "Could not build a PDF or find the original CV file.",
+        "server_interrupted": (
+            "Auto-apply stopped on the server (e.g. browser error or portal page change). "
+            "Use Apply to open the listing in a new tab and finish manually."
+        ),
+    },
+    "pl": {
+        "no_candidate": "Uzupełnij profil kandydata.",
+        "job_not_found": "Nie znaleziono oferty.",
+        "no_cv_text": "Wgraj CV lub poczekaj na przetworzenie tekstu — auto-apply wymaga treści życiorysu.",
+        "no_cv_file": "Brak pliku CV do załączenia (wgraj CV w profilu).",
+        "pdf_build_failed": "Nie udało się zbudować PDF ani znaleźć oryginalnego pliku CV.",
+        "server_interrupted": (
+            "Auto-apply przerwany na serwerze (np. błąd przeglądarki albo zmiana strony portalu). "
+            "Użyj „Aplikuj”, żeby otworzyć ogłoszenie w nowej karcie i dokończyć wysyłkę ręcznie."
+        ),
+    },
+}
+
+
+def _auto_apply_msg(locale: str, key: str) -> str:
+    loc = "pl" if is_polish_locale(locale) else "en"
+    return _AUTO_APPLY_USER_MSG[loc][key]
 
 
 def _job_context_text(job: Job) -> str:
@@ -81,23 +112,21 @@ def auto_apply_for_user(
     user: User,
     job_id: int,
     submit: bool,
+    locale: str = "en",
 ) -> tuple[ApplyOutcome, str, Application | None]:
+    loc = normalize_locale(locale)
     settings = get_settings()
     candidate = db.query(Candidate).filter(Candidate.user_id == user.id).first()
     if not candidate:
-        return ApplyOutcome.FAILED, "Uzupełnij profil kandydata.", None
+        return ApplyOutcome.FAILED, _auto_apply_msg(loc, "no_candidate"), None
 
     job = db.query(Job).filter(Job.id == job_id).first()
     if not job:
-        return ApplyOutcome.FAILED, "Nie znaleziono oferty.", None
+        return ApplyOutcome.FAILED, _auto_apply_msg(loc, "job_not_found"), None
 
     cv_text = _cv_text_for_apply(candidate)
     if not cv_text:
-        return (
-            ApplyOutcome.FAILED,
-            "Wgraj CV lub poczekaj na przetworzenie tekstu — auto-apply wymaga treści życiorysu.",
-            None,
-        )
+        return ApplyOutcome.FAILED, _auto_apply_msg(loc, "no_cv_text"), None
 
     signals: dict[str, Any] = {}
     if candidate.profile_signals_json:
@@ -112,6 +141,7 @@ def auto_apply_for_user(
         job_title=job.title,
         company=job.company,
         job_context=_job_context_text(job),
+        locale=loc,
     ) or (get_tailoring_pitch_for_job(signals, job_id) or "")
 
     state_dir = _writable_state_dir(Path(settings.auto_apply_state_dir), user.id)
@@ -132,6 +162,7 @@ def auto_apply_for_user(
                 cv_text=cv_text,
                 extra_consent_paragraphs=_extra_consent_tuple(settings.auto_apply_consent_extra_pl),
                 font_path_override=settings.auto_apply_font_path or None,
+                locale=loc,
             )
             resume_path = str(package_pdf)
             try:
@@ -150,14 +181,10 @@ def auto_apply_for_user(
                 resume_path = candidate.resume_path
                 package_pdf = None
             else:
-                return (
-                    ApplyOutcome.FAILED,
-                    "Nie udało się zbudować PDF ani znaleźć oryginalnego pliku CV.",
-                    None,
-                )
+                return ApplyOutcome.FAILED, _auto_apply_msg(loc, "pdf_build_failed"), None
 
     if not resume_path or not Path(resume_path).is_file():
-        return ApplyOutcome.FAILED, "Brak pliku CV do załączenia (wgraj CV w profilu).", None
+        return ApplyOutcome.FAILED, _auto_apply_msg(loc, "no_cv_file"), None
 
     result: ApplyResult
     try:
@@ -180,11 +207,7 @@ def auto_apply_for_user(
             job.job_board,
             user.id,
         )
-        result = ApplyResult(
-            ApplyOutcome.FAILED,
-            "Auto-apply przerwany na serwerze (np. błąd przeglądarki albo zmiana strony portalu). "
-            "Użyj „Aplikuj”, żeby otworzyć ogłoszenie w nowej karcie i dokończyć wysyłkę ręcznie.",
-        )
+        result = ApplyResult(ApplyOutcome.FAILED, _auto_apply_msg(loc, "server_interrupted"))
     finally:
         if package_pdf and package_pdf.is_file():
             try:

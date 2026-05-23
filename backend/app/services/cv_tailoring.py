@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from app.services.anthropic_client import get_anthropic_client, is_anthropic_configured
+from app.services.request_locale import is_polish_locale, normalize_locale
 
 _TAILOR_PROMPT = """You tailor a candidate's CV content to a specific target job for use in application "motivation / cover letter" text fields and recruiter skim.
 
@@ -19,9 +20,9 @@ Return ONLY valid JSON with this exact shape:
 }}
 
 Rules:
+- Write ALL output in {output_language}. Do not mix languages.
 - Use ONLY facts supported by the CV text; do not invent employers, degrees, dates, or tools.
 - Never claim certifications, job titles, employers, or degrees that are not clearly supported by the CV text.
-- Match the dominant language of the CV (Polish vs English) for the pitch and bullets.
 - pitch_paragraph: 3–6 sentences, max ~1200 characters, focused on fit for the target role.
 - strength_bullets: 4–6 bullets, each max 220 characters, concrete achievements or responsibilities.
 - keywords: 6–14 short phrases (skills/tools/domains) to echo the job — only if they appear in the CV or are obvious synonyms of CV content.
@@ -40,9 +41,14 @@ CV TEXT:
 """
 
 
-def _fallback_tailoring(cv_text: str, target_title: str) -> dict[str, Any]:
+def _output_language_label(locale: str) -> str:
+    return "Polish" if is_polish_locale(locale) else "English"
+
+
+def _fallback_tailoring(cv_text: str, target_title: str, *, locale: str = "en") -> dict[str, Any]:
+    pl = is_polish_locale(locale)
     snippet = re.sub(r"\s+", " ", (cv_text or "").strip())[:900]
-    title = (target_title or "wybrana rola").strip()[:200]
+    title = (target_title or ("wybrana rola" if pl else "selected role")).strip()[:200]
     bullets: list[str] = []
     for line in (cv_text or "").splitlines():
         s = line.strip()
@@ -51,18 +57,34 @@ def _fallback_tailoring(cv_text: str, target_title: str) -> dict[str, Any]:
         if len(bullets) >= 5:
             break
     if len(bullets) < 3:
-        bullets = [
-            f"Doświadczenie zawodowe opisane w CV — dopasowanie do roli: {title}.",
-            "Szczegóły realizacji projektów i narzędzi — w załączonym CV.",
-            "Gotowość do omówienia zakresu obowiązków na rozmowie.",
-        ]
-    pitch = (
-        f"Chcę aplikować na stanowisko: {title}. "
-        f"Poniżej skrót moich kompetencji z CV; pełna dokumentacja w załączniku. "
-        f"Fragment profilu: {snippet[:400]}…"
-        if snippet
-        else f"Aplikuję na {title}. Szczegóły doświadczenia przekazuję w załączonym CV."
-    )
+        if pl:
+            bullets = [
+                f"Doświadczenie zawodowe opisane w CV — dopasowanie do roli: {title}.",
+                "Szczegóły realizacji projektów i narzędzi — w załączonym CV.",
+                "Gotowość do omówienia zakresu obowiązków na rozmowie.",
+            ]
+        else:
+            bullets = [
+                f"Professional experience in my CV — aligned with the role: {title}.",
+                "Project delivery and tools — see the attached CV for detail.",
+                "Happy to discuss scope and expectations in an interview.",
+            ]
+    if pl:
+        pitch = (
+            f"Chcę aplikować na stanowisko: {title}. "
+            f"Poniżej skrót moich kompetencji z CV; pełna dokumentacja w załączniku. "
+            f"Fragment profilu: {snippet[:400]}…"
+            if snippet
+            else f"Aplikuję na {title}. Szczegóły doświadczenia przekazuję w załączonym CV."
+        )
+    else:
+        pitch = (
+            f"I am applying for the role of {title}. "
+            f"Below is a concise summary of my skills from my CV; the full document is attached. "
+            f"Profile excerpt: {snippet[:400]}…"
+            if snippet
+            else f"I am applying for {title}. Full experience details are in my attached CV."
+        )
     words = [w.strip(".,;:") for w in re.findall(r"\w{4,}", (cv_text or "").lower())]
     freq: dict[str, int] = {}
     for w in words:
@@ -83,6 +105,7 @@ def _tailor_with_claude(
     target_job_title: str,
     company: str | None,
     job_context: str | None,
+    locale: str = "en",
 ) -> dict[str, Any] | None:
     client = get_anthropic_client()
     if not client:
@@ -90,8 +113,17 @@ def _tailor_with_claude(
     snippet = cv_text[:14_000]
     title = target_job_title.strip()[:200]
     comp = (company or "").strip()[:200] or "null"
-    ctx = (job_context or "").strip()[:8000] or "(brak treści oferty — tylko tytuł roli)"
-    prompt = _TAILOR_PROMPT.format(title=title, company=comp, job_ctx=ctx, cv_snippet=snippet)
+    pl = is_polish_locale(locale)
+    ctx = (job_context or "").strip()[:8000] or (
+        "(brak treści oferty — tylko tytuł roli)" if pl else "(no job posting text — role title only)"
+    )
+    prompt = _TAILOR_PROMPT.format(
+        output_language=_output_language_label(locale),
+        title=title,
+        company=comp,
+        job_ctx=ctx,
+        cv_snippet=snippet,
+    )
     try:
         msg = client.messages.create(
             model="claude-sonnet-4-20250514",
@@ -137,8 +169,10 @@ def build_cv_tailoring_blob(
     job_id: int | None,
     company: str | None,
     job_context: str | None,
+    locale: str = "en",
 ) -> dict[str, Any]:
     """Produce cv_tailoring dict to merge into profile_signals_json."""
+    loc = normalize_locale(locale)
     text = (cv_text or "").strip()
     if not text:
         raise ValueError("CV text is empty — upload a CV first.")
@@ -149,14 +183,20 @@ def build_cv_tailoring_blob(
     source = "fallback"
     body: dict[str, Any]
     if is_anthropic_configured():
-        ai = _tailor_with_claude(text, target_job_title=title, company=company, job_context=job_context)
+        ai = _tailor_with_claude(
+            text,
+            target_job_title=title,
+            company=company,
+            job_context=job_context,
+            locale=loc,
+        )
         if ai:
             body = ai
             source = "claude"
         else:
-            body = _fallback_tailoring(text, title)
+            body = _fallback_tailoring(text, title, locale=loc)
     else:
-        body = _fallback_tailoring(text, title)
+        body = _fallback_tailoring(text, title, locale=loc)
 
     now = datetime.now(timezone.utc).isoformat()
     out: dict[str, Any] = {
@@ -168,6 +208,7 @@ def build_cv_tailoring_blob(
         "keywords": body.get("keywords") or [],
         "updated_at": now,
         "source": source,
+        "locale": loc,
     }
     return out
 
@@ -186,20 +227,11 @@ def get_tailoring_pitch_for_job(signals: dict[str, Any] | None, apply_job_id: in
                 return None
         except (TypeError, ValueError):
             return None
-    parts: list[str] = []
-    p = t.get("pitch_paragraph")
-    if isinstance(p, str) and p.strip():
-        parts.append(p.strip())
-    bullets = t.get("strength_bullets")
-    if isinstance(bullets, list):
-        lines = [f"• {str(b).strip()}" for b in bullets if str(b).strip()][:8]
-        if lines:
-            parts.append("\n".join(lines))
-    out = "\n\n".join(parts).strip()
-    return out[:8000] if out else None
+    loc = str(t.get("locale") or "en")
+    return _pitch_from_tailoring_dict(t, locale=loc) or None
 
 
-def _pitch_from_tailoring_dict(body: dict[str, Any]) -> str:
+def _pitch_from_tailoring_dict(body: dict[str, Any], *, locale: str = "en") -> str:
     parts: list[str] = []
     p = body.get("pitch_paragraph")
     if isinstance(p, str) and p.strip():
@@ -213,7 +245,8 @@ def _pitch_from_tailoring_dict(body: dict[str, Any]) -> str:
     if isinstance(kw, list):
         flat = [str(x).strip() for x in kw if str(x).strip()][:16]
         if flat:
-            parts.append("Keywords: " + ", ".join(flat))
+            label = "Słowa kluczowe" if is_polish_locale(locale) else "Keywords"
+            parts.append(f"{label}: " + ", ".join(flat))
     out = "\n\n".join(parts).strip()
     return out[:8000]
 
@@ -224,17 +257,20 @@ def build_motivation_text_for_auto_apply(
     job_title: str,
     company: str | None,
     job_context: str | None,
+    locale: str = "en",
 ) -> str:
     """Fresh pitch for each auto-apply from CV text + job listing (Claude or deterministic fallback)."""
+    loc = normalize_locale(locale)
     text = (cv_text or "").strip()
     if not text:
         return ""
-    title = (job_title or "").strip()[:200] or "wybrana rola"
+    default_title = "wybrana rola" if is_polish_locale(loc) else "selected role"
+    title = (job_title or "").strip()[:200] or default_title
     comp = (company or "").strip()[:200] or None
     ctx = (job_context or "").strip()[:8000] or None
     if is_anthropic_configured():
-        ai = _tailor_with_claude(text, target_job_title=title, company=comp, job_context=ctx)
+        ai = _tailor_with_claude(text, target_job_title=title, company=comp, job_context=ctx, locale=loc)
         if ai:
-            return _pitch_from_tailoring_dict(ai)
-    fb = _fallback_tailoring(text, title)
-    return _pitch_from_tailoring_dict(fb)
+            return _pitch_from_tailoring_dict(ai, locale=loc)
+    fb = _fallback_tailoring(text, title, locale=loc)
+    return _pitch_from_tailoring_dict(fb, locale=loc)

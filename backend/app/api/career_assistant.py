@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user
@@ -33,6 +33,7 @@ from app.services.career_assistant import (
     optimize_linkedin_profile,
     research_hiring_insights_for_job,
 )
+from app.services.request_locale import locale_from_request
 from app.services.career_assistant_common import (
     get_application_for_user,
     get_candidate_for_user,
@@ -79,6 +80,7 @@ def _ats_out(row: OptimizedCv, application_id: int) -> AtsCvOptimizeOut:
 @router.post("/applications/{application_id}/ats-cv", response_model=AtsCvOptimizeOut)
 def post_ats_cv_optimize(
     application_id: int,
+    request: Request,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> AtsCvOptimizeOut:
@@ -86,7 +88,13 @@ def post_ats_cv_optimize(
     candidate = get_candidate_for_user(db, user.id)
     job = get_job_for_application(db, app)
     try:
-        row = optimize_cv_for_application(db, candidate=candidate, application=app, job=job)
+        row = optimize_cv_for_application(
+            db,
+            candidate=candidate,
+            application=app,
+            job=job,
+            locale=locale_from_request(request),
+        )
     except ValueError as exc:
         if str(exc) == "Upload a CV first.":
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc

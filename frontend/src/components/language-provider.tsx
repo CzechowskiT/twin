@@ -19,6 +19,7 @@ import {
   type Locale,
   type TranslationKey,
 } from "@/lib/i18n";
+import { setClientApiLocale } from "@/lib/api-locale";
 import { safeStorage } from "@/lib/safe-storage";
 
 type LanguageContextValue = {
@@ -55,6 +56,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     document.documentElement.lang = LOCALE_HTML_LANG[locale];
     document.documentElement.dir = localeIsRtl(locale) ? "rtl" : "ltr";
     safeStorage.setItem(LOCALE_STORAGE_KEY, locale);
+    setClientApiLocale(locale);
   }, [locale]);
 
   const setLocale = useCallback((next: Locale) => {

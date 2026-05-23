@@ -7,7 +7,7 @@ from urllib.parse import quote
 from io import BytesIO, StringIO
 from typing import Any
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Request, UploadFile, status
 from fastapi.responses import JSONResponse, Response
 from openpyxl import Workbook
 from sqlalchemy.orm import Session
@@ -42,6 +42,7 @@ from app.services.acceptance_queue import build_acceptance_queue, respond_accept
 from app.services.cv_parser import CvParseError
 from app.services.cv_storage import delete_cv_for_candidate, save_cv_for_candidate
 from app.services.cv_tailoring import build_cv_tailoring_blob
+from app.services.request_locale import locale_from_request
 from app.services.career_compass import (
     build_career_compass,
     candidate_profile_dict,
@@ -402,6 +403,7 @@ def delete_profile_document(
 @router.post("/me/cv/tailor", response_model=CvTailoringOut)
 def tailor_cv_for_role(
     body: CvTailorIn,
+    request: Request,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> CvTailoringOut:
@@ -429,6 +431,7 @@ def tailor_cv_for_role(
             job_id=body.job_id,
             company=company,
             job_context=job_ctx,
+            locale=locale_from_request(request),
         )
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc

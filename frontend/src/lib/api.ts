@@ -10,6 +10,7 @@
  * Multipart uploads use the public API origin when set to reduce Vercel function body limits on proxies.
  */
 
+import { getClientApiLocale } from "@/lib/api-locale";
 import { getPublicApiBase } from "@/lib/public-api-base";
 
 /** Same-origin relative path (SSR and unauthenticated browser calls). */
@@ -68,6 +69,13 @@ export function formatApiErrorMessageWithResponseId(message: string, res: Respon
   return `${trimmed} Request ID: ${rid}`;
 }
 
+function ensureLocaleHeader(headers: Headers, locale?: string | null): void {
+  const loc = (locale ?? getClientApiLocale())?.trim();
+  if (loc) {
+    headers.set("X-Locale", loc);
+  }
+}
+
 function ensureTraceHeaders(headers: Headers): void {
   if (headers.has("X-Request-ID")) return;
   const id =
@@ -77,14 +85,18 @@ function ensureTraceHeaders(headers: Headers): void {
   headers.set("X-Request-ID", id);
 }
 
+export type ApiFetchOptions = RequestInit & { locale?: string | null };
+
 export async function apiFetch<T>(
   path: string,
-  options: RequestInit = {},
+  options: ApiFetchOptions = {},
   token?: string | null,
 ): Promise<T> {
-  const headers = new Headers(options.headers);
+  const { locale: localeOverride, ...fetchOptions } = options;
+  const headers = new Headers(fetchOptions.headers);
+  ensureLocaleHeader(headers, localeOverride);
   ensureTraceHeaders(headers);
-  const method = (options.method ?? "GET").toUpperCase();
+  const method = (fetchOptions.method ?? "GET").toUpperCase();
   if (method !== "GET" && method !== "HEAD") {
     headers.set("Content-Type", "application/json");
   }
@@ -97,8 +109,8 @@ export async function apiFetch<T>(
 
   const directOrigin = clientApiOriginForRequest(hasAuth);
   const fetchOpts: RequestInit = {
-    ...options,
-    cache: options.cache ?? "no-store",
+    ...fetchOptions,
+    cache: fetchOptions.cache ?? "no-store",
     headers,
   };
 
@@ -125,12 +137,14 @@ export async function apiFetch<T>(
 /** Authenticated GET (or other method) returning a non-JSON body (e.g. `.ics`). */
 export async function apiFetchBlob(
   path: string,
-  options: RequestInit = {},
+  options: ApiFetchOptions = {},
   token?: string | null,
 ): Promise<Blob> {
-  const headers = new Headers(options.headers);
+  const { locale: localeOverride, ...fetchOptions } = options;
+  const headers = new Headers(fetchOptions.headers);
+  ensureLocaleHeader(headers, localeOverride);
   ensureTraceHeaders(headers);
-  const method = (options.method ?? "GET").toUpperCase();
+  const method = (fetchOptions.method ?? "GET").toUpperCase();
   if (method !== "GET" && method !== "HEAD") {
     headers.set("Content-Type", "application/json");
   }
@@ -143,8 +157,8 @@ export async function apiFetchBlob(
 
   const directOrigin = clientApiOriginForRequest(hasAuth);
   const fetchOpts: RequestInit = {
-    ...options,
-    cache: options.cache ?? "no-store",
+    ...fetchOptions,
+    cache: fetchOptions.cache ?? "no-store",
     headers,
   };
 

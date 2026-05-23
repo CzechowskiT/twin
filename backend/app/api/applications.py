@@ -7,7 +7,7 @@ from datetime import datetime
 from io import BytesIO, StringIO
 from typing import Annotated
 
-from fastapi import APIRouter, BackgroundTasks, Body, Depends, Header, HTTPException, Query, status
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, Header, HTTPException, Query, Request, status
 from fastapi.responses import Response, StreamingResponse
 from openpyxl import Workbook
 from sqlalchemy.orm import Session
@@ -50,6 +50,7 @@ from app.services.auto_apply_guards import (
     record_auto_apply_event,
 )
 from app.services.auto_apply_service import auto_apply_for_user
+from app.services.request_locale import locale_from_request
 from app.services.employer_webhook import dispatch_auto_apply_webhook
 from app.services.s3_storage import get_s3_blob_store
 from app.services.idempotency import (
@@ -440,6 +441,7 @@ def create_application(
 def auto_apply(
     background_tasks: BackgroundTasks,
     body: AutoApplyRequest,
+    request: Request,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
     idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
@@ -478,7 +480,11 @@ def auto_apply(
     submit = body.submit if body.submit is not None else settings.auto_apply_submit
     try:
         outcome, message, app = auto_apply_for_user(
-            db, user=user, job_id=body.job_id, submit=submit
+            db,
+            user=user,
+            job_id=body.job_id,
+            submit=submit,
+            locale=locale_from_request(request),
         )
     except Exception:
         logger.exception("auto_apply failed job_id=%s user_id=%s", body.job_id, user.id)

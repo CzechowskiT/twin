@@ -28,11 +28,11 @@ import {
 import type { TranslationKey } from "@/lib/i18n";
 
 const STEP_KEYS = [
-  "demo.stepScan",
+  "demo.stepScanJobs",
   "demo.stepMatch",
-  "demo.stepAnswers",
+  "demo.stepTailor",
   "demo.stepSubmit",
-  "demo.stepConfirm",
+  "demo.stepCalendar",
 ] as const satisfies readonly TranslationKey[];
 
 const STEP_MS = [900, 1100, 1000, 1200, 900];

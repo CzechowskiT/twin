@@ -94,6 +94,7 @@ def optimize_cv_for_application(
     candidate: Candidate,
     application: Application,
     job: Job,
+    locale: str = "en",
 ) -> OptimizedCv:
     """Build or refresh ATS optimization row for an application."""
     cv_text = (candidate.cv_text or "").strip()
@@ -108,6 +109,7 @@ def optimize_cv_for_application(
         job_id=job.id,
         company=job.company,
         job_context=job_ctx,
+        locale=locale,
     )
     body = _claude_optimized(cv_text, job) or _fallback_optimized(cv_text, job, tailoring)
     optimized_text = body["optimized_cv_text"]

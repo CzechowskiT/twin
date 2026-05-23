@@ -61,3 +61,7 @@ If the user asks to **keep shipping** until they say **enough** (e.g. Polish *â€
 - TypeScript: functional React components
 - Max 50 lines per function
 - Comments explain WHY, not WHAT
+
+## i18n
+- No user-facing string literals outside i18n (frontend `t()` / `i18n.ts`) or locale-aware backend copy.
+- Browser API calls send **`X-Locale`**; backend uses `locale_from_request()` â€” see **`docs/I18N.md`**.
