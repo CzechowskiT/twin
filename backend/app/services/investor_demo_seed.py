@@ -23,6 +23,7 @@ from app.database.models import (
     User,
 )
 from app.services.matching_service import find_top_matches
+from app.services.placement_verification import PLACEMENT_VERIFIED, record_placement_event
 
 DEMO_BOARD = "pracuj"
 DEMO_JOB_PREFIX = "investor-demo-"
@@ -424,6 +425,68 @@ def ensure_recruiter_inbox_demo(
                 reset += 1
     db.flush()
     return {"company": company, "reset_to_applied": reset, "created": created}
+
+
+def ensure_demo_placement_verified(db: Session, *, application_id: int | None = None) -> dict[str, int | bool]:
+    """Mark one investor-demo application as placement verified (idempotent; bumps mvp-stats)."""
+    from app.database.models import PlacementEvent
+
+    app: Application | None = None
+    if application_id is not None:
+        app = db.get(Application, application_id)
+    else:
+        demo_user = db.execute(select(User).where(User.email == demo_email_from_env())).scalar_one_or_none()
+        if demo_user is not None:
+            demo_cand = db.execute(
+                select(Candidate).where(Candidate.user_id == demo_user.id)
+            ).scalar_one_or_none()
+            primary = db.execute(
+                select(Job).where(Job.external_id == DEMO_APPLY_JOB_EXTERNAL_ID)
+            ).scalar_one_or_none()
+            if demo_cand is not None and primary is not None:
+                app = db.execute(
+                    select(Application).where(
+                        Application.candidate_id == demo_cand.id,
+                        Application.job_id == primary.id,
+                    )
+                ).scalar_one_or_none()
+    if app is None:
+        return {"application_id": 0, "verified": False, "already_verified": False}
+
+    if app.placement_verified_at is not None and app.placement_state == PLACEMENT_VERIFIED:
+        return {"application_id": app.id, "verified": True, "already_verified": True}
+
+    owner_user_id = db.execute(
+        select(Candidate.user_id).where(Candidate.id == app.candidate_id)
+    ).scalar_one_or_none()
+    event_count = (
+        db.query(PlacementEvent).filter(PlacementEvent.application_id == app.id).count()
+    )
+    if event_count < 1:
+        record_placement_event(
+            db,
+            application_id=app.id,
+            event_type="placement.declared",
+            actor="candidate",
+            detail={"source": "demo_seed"},
+            owner_user_id=owner_user_id,
+        )
+        app.placement_state = "declared"
+    record_placement_event(
+        db,
+        application_id=app.id,
+        event_type="placement.verified",
+        actor="system",
+        detail={"method": "demo_seed"},
+        owner_user_id=owner_user_id,
+    )
+    now = _now()
+    app.placement_verified_at = now
+    app.placement_state = PLACEMENT_VERIFIED
+    app.status = ApplicationStatus.HIRED
+    db.add(app)
+    db.flush()
+    return {"application_id": app.id, "verified": True, "already_verified": False}
 
 
 def run_investor_demo_seed(

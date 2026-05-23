@@ -40,9 +40,9 @@ def health_check(
         False,
         description="When true, include non-secret ops flags (mail/calendar wiring) for deploy checks.",
     ),
-) -> dict[str, str | bool]:
+) -> dict[str, str | bool | int]:
     commit = _git_commit_sha()
-    out: dict[str, str | bool] = {
+    out: dict[str, str | bool | int] = {
         "status": "ok",
         "service": "twin-api",
         "git_commit": commit if commit else "unknown",
@@ -94,6 +94,24 @@ def health_check(
             (s.ops_admin_token or "").strip() or (s.beta_admin_token or "").strip()
         )
         out["partner_export_configured"] = bool((s.partner_export_token or "").strip())
+        from app.services.linkedin_oauth import is_linkedin_oauth_configured
+
+        out["linkedin_oauth_configured"] = is_linkedin_oauth_configured()
+        s3_on = bool(
+            (s.s3_bucket_name or "").strip()
+            and (s.s3_access_key_id or "").strip()
+            and (s.s3_secret_access_key or "").strip()
+        )
+        out["data_room_s3_enabled"] = s3_on
+        out["data_room_local_demo"] = not s3_on and s.data_room_local_upload_enabled
+        try:
+            from app.database.session import SessionLocal
+            from app.services.mvp_public_metrics import count_validated_jobs_public_traction
+
+            with SessionLocal() as db:
+                out["validated_jobs"] = count_validated_jobs_public_traction(db)
+        except Exception:
+            out["validated_jobs"] = 0
     return out
 
 
