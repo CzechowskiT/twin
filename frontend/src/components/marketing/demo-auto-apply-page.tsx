@@ -274,7 +274,7 @@ export function DemoAutoApplyPage() {
         <div className="marketing-copy-rail space-y-10 sm:space-y-12">
           <header className="demo-hero relative overflow-hidden rounded-3xl border border-[var(--twin-border)]/60 px-5 py-8 sm:px-8 sm:py-10">
             <LandingAmbient />
-            <motion.div className="demo-hero__grid pointer-events-none absolute inset-0" aria-hidden />
+            <div className="demo-hero__grid pointer-events-none absolute inset-0" aria-hidden />
             <div className="relative space-y-4">
               <p className="demo-hero__eyebrow text-[10px] font-semibold uppercase tracking-[0.32em] text-[var(--twin-accent)]">
                 {t("demo.pageEyebrow")}

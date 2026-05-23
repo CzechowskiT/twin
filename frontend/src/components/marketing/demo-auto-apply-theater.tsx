@@ -4,6 +4,7 @@ import Link from "next/link";
 import { forwardRef } from "react";
 
 import { DemoConfettiBurst } from "@/components/marketing/demo-confetti-burst";
+import { DemoMatchGauge } from "@/components/marketing/demo-match-gauge";
 import { useTranslation } from "@/components/language-provider";
 import {
   DEMO_JOB_CARD,
@@ -28,9 +29,9 @@ type DemoAutoApplyTheaterProps = {
 };
 
 const SCAN_JOBS = [
-  { title: "Senior Fullstack Developer", board: "pracuj.pl" },
-  { title: "Python Backend Engineer", board: "rocketjobs.pl" },
-  { title: "Staff Platform Engineer", board: "pracuj.pl" },
+  { title: "Senior Fullstack Developer", board: "pracuj.pl", score: DEMO_MATCH_SCORE },
+  { title: "Python Backend Engineer", board: "rocketjobs.pl", score: 72 },
+  { title: "Staff Platform Engineer", board: "pracuj.pl", score: 58 },
 ] as const;
 
 export const DemoAutoApplyTheater = forwardRef<HTMLElement, DemoAutoApplyTheaterProps>(function DemoAutoApplyTheater(
