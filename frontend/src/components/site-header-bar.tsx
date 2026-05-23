@@ -57,6 +57,7 @@ export function SiteHeaderBar({ showPersonaSwitcher }: SiteHeaderBarProps) {
   };
 
   const corporateNavPrimary = [
+    { href: "/waitlist" as const, label: t("nav.waitlist") },
     { href: "/about" as const, label: t("nav.about") },
     { href: "/how-it-works" as const, label: t("nav.howItWorks") },
     { href: "/pricing" as const, label: t("nav.pricing") },

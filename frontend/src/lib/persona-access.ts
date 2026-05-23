@@ -165,6 +165,7 @@ export function isCandidateWorkspacePath(pathname: string): boolean {
 
 export type HeaderGrowthLabelKey =
   | "nav.demo"
+  | "nav.waitlist"
   | "nav.calculator"
   | "nav.forCompanies"
   | "nav.forInvestors"
@@ -189,9 +190,9 @@ export function headerGrowthLinksForPersona(
 ): HeaderGrowthLink[] {
   if (hasSession) return [];
   const path = normalizePath(pathname);
-  // Homepage hero carries the main demo CTA; still show the orange header pill for discoverability.
+  // Homepage hero carries register + wishlist; header pill surfaces founding list without scrolling.
   if (path === "/" && persona === "candidate") {
-    return [{ href: "/demo", labelKey: "nav.demo", variant: "candidate" }];
+    return [{ href: "/waitlist", labelKey: "nav.waitlist", variant: "company" }];
   }
   if (isMarketingHubPath(pathname)) return [];
   if (persona === "candidate") {
@@ -247,7 +248,7 @@ export function headerAccountLinks(
 }
 
 export function footerExploreHrefsForPersona(persona: MarketingPersona): string[] {
-  const common = ["/", "/waitlist", "/demo", "/faq", "/status", "/developers"];
+  const common = ["/waitlist", "/", "/demo", "/faq", "/status", "/developers"];
   if (persona === "company") {
     return [
       ...common,

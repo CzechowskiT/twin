@@ -25,14 +25,24 @@ export function LandingHero() {
         <p className="mt-3 max-w-lg text-sm leading-relaxed text-[var(--twin-muted-strong)] sm:text-base">{t("home.description")}</p>
 
         <div className="mt-10 flex flex-col gap-4 sm:mt-12">
-          <div className="flex flex-col gap-2">
-            <Link
-              href="/register"
-              className="landing-hero-register-cta section-cta-primary marketing-hero-btn-cta marketing-btn-primary-shadow twin-touch-target w-full max-w-sm transition duration-200 sm:w-auto"
-            >
-              {t("home.getStarted")}
-            </Link>
-            <p className="max-w-sm text-xs font-medium text-[var(--twin-accent)]">{t("home.ctaRegisterMicro")}</p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start">
+            <div className="flex flex-col gap-2">
+              <Link
+                href="/waitlist"
+                className="twin-header-cta twin-nav-waitlist-pill landing-hero-wishlist-cta marketing-hero-btn-cta twin-touch-target w-full max-w-sm transition duration-200 sm:w-auto"
+              >
+                {t("home.joinWishlist")}
+              </Link>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Link
+                href="/register"
+                className="landing-hero-register-cta section-cta-primary marketing-hero-btn-cta marketing-btn-primary-shadow twin-touch-target w-full max-w-sm transition duration-200 sm:w-auto"
+              >
+                {t("home.getStarted")}
+              </Link>
+              <p className="max-w-sm text-xs font-medium text-[var(--twin-accent)]">{t("home.ctaRegisterMicro")}</p>
+            </div>
           </div>
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
             <Link
