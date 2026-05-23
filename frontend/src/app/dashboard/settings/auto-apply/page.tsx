@@ -153,6 +153,16 @@ export default function NightlyAutoApplySettingsPage() {
 
         {settings && (
           <>
+            {!settings.consent_given_at && settings.profile_ready ? (
+              <Card variant="soft" className="border-[var(--twin-accent-muted)] p-5">
+                <p className="font-semibold text-[var(--foreground)]">{t("dashboard.nightlyAutoApplyConsentNudgeTitle")}</p>
+                <p className="twin-muted mt-2 text-sm leading-relaxed">{t("dashboard.nightlyAutoApplyConsentNudgeBody")}</p>
+                <Button type="button" className="twin-btn-primary mt-4 !w-auto" onClick={() => setShowConsent(true)}>
+                  {t("dashboard.nightlyAutoApplyConsentNudgeCta")}
+                </Button>
+              </Card>
+            ) : null}
+
             <Card className="space-y-4 p-5">
               <label className="flex cursor-pointer items-center justify-between gap-4">
                 <span className="font-semibold">{t("dashboard.nightlyAutoApplyEnable")}</span>
