@@ -135,6 +135,16 @@ def auto_apply_for_user(
     if not job:
         return ApplyOutcome.FAILED, _auto_apply_msg(loc, "job_not_found"), None
 
+    if settings.demo_mode_enabled and is_investor_demo_job(job):
+        outcome = ApplyOutcome.FORM_FILLED if not submit else ApplyOutcome.SUBMITTED
+        app = _upsert_application(db, candidate.id, job_id, outcome)
+        app.auto_applied = True
+        app.application_method = METHOD_DEMO_SIMULATED
+        db.add(app)
+        db.commit()
+        db.refresh(app)
+        return outcome, _auto_apply_msg(loc, "demo_simulated"), app
+
     cv_text = _cv_text_for_apply(candidate)
     if not cv_text:
         return ApplyOutcome.FAILED, _auto_apply_msg(loc, "no_cv_text"), None
@@ -199,26 +209,18 @@ def auto_apply_for_user(
 
     result: ApplyResult
     try:
-        if is_investor_demo_job(job):
-            outcome = (
-                ApplyOutcome.FORM_FILLED
-                if not submit
-                else ApplyOutcome.SUBMITTED
-            )
-            result = ApplyResult(outcome, _auto_apply_msg(loc, "demo_simulated"))
-        else:
-            result = run_auto_apply(
-                job_board=job.job_board,
-                job_url=job.url,
-                name=candidate.name,
-                email=user.email,
-                phone=settings.auto_apply_default_phone,
-                resume_path=resume_path,
-                motivation_text=motivation or None,
-                headless=settings.auto_apply_headless,
-                state_dir=state_dir,
-                submit=submit,
-            )
+        result = run_auto_apply(
+            job_board=job.job_board,
+            job_url=job.url,
+            name=candidate.name,
+            email=user.email,
+            phone=settings.auto_apply_default_phone,
+            resume_path=resume_path,
+            motivation_text=motivation or None,
+            headless=settings.auto_apply_headless,
+            state_dir=state_dir,
+            submit=submit,
+        )
     except Exception:
         logger.exception(
             "run_auto_apply crashed job_id=%s board=%s user_id=%s",
@@ -235,15 +237,6 @@ def auto_apply_for_user(
                 logger.warning("Could not remove temp package PDF %s", package_pdf)
 
     app = _upsert_application(db, candidate.id, job_id, result.outcome)
-    if is_investor_demo_job(job) and result.outcome in (
-        ApplyOutcome.SUBMITTED,
-        ApplyOutcome.FORM_FILLED,
-    ):
-        app.auto_applied = True
-        app.application_method = METHOD_DEMO_SIMULATED
-        db.add(app)
-        db.commit()
-        db.refresh(app)
     if pdf_bytes_for_s3 and get_s3_blob_store().enabled:
         store = get_s3_blob_store()
         ts = datetime.utcnow().strftime("%Y%m%d%H%M%S")
