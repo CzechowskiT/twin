@@ -1,6 +1,6 @@
-import { redirect } from "next/navigation";
+import { PricingRedirectClient } from "@/components/marketing/pricing-redirect-client";
 
-/** US-C001: dedicated pricing route → candidate self-serve tiers. */
+/** US-C001: Cennik follows the active marketing persona (not candidate-only). */
 export default function PricingPage() {
-  redirect("/for-candidates#persona-pricing");
+  return <PricingRedirectClient />;
 }
