@@ -1,18 +1,20 @@
 import assert from "node:assert/strict";
 
 import {
-  REFERRAL_BONUS_FIRST_PAYMENT_USD,
-  REFERRAL_BONUS_HIRED_USD,
-  REFERRAL_BONUS_RETAINED_3M_USD,
-} from "../src/lib/candidate-rewards-constants";
-import {
   ANNUAL_PREPAY_DISCOUNT,
+  computeCandidateEconomicsExample,
   computeInvestorCalculator,
   INVESTOR_CALCULATOR_DEFAULTS,
   patchScenario,
   PLACEMENT_EMPLOYER_FEE_PERCENT,
   PLACEMENT_NET_TAKE_RATE_PERCENT,
 } from "../src/lib/investor-calculator-model";
+import {
+  PLACEMENT_CANDIDATE_BONUS_PCT_OF_MONTHLY_SALARY,
+  REFERRAL_BONUS_FIRST_PAYMENT_USD,
+  REFERRAL_BONUS_HIRED_USD,
+  REFERRAL_BONUS_RETAINED_3M_USD,
+} from "../src/lib/candidate-rewards-constants";
 import { annualPrepayUsdFromMonthly } from "../src/lib/pricing-locale";
 
 function run(name: string, fn: () => void) {
@@ -132,4 +134,30 @@ run("optimized scenario is profitable at 100k users", () => {
   });
   assert.ok(r.netIncome > 0);
   assert.ok(r.breakEvenUsers < INVESTOR_CALCULATOR_DEFAULTS.totalUsers);
+});
+
+run("candidate economics example matches marketing USD constants", () => {
+  const ex = computeCandidateEconomicsExample(INVESTOR_CALCULATOR_DEFAULTS);
+  const monthly = INVESTOR_CALCULATOR_DEFAULTS.averageSalary / 12;
+  assert.ok(Math.abs(ex.placementBonusToCandidateUsd - monthly * (PLACEMENT_CANDIDATE_BONUS_PCT_OF_MONTHLY_SALARY / 100)) < 0.02);
+  assert.ok(Math.abs(ex.employerFeeUsd - monthly * (PLACEMENT_EMPLOYER_FEE_PERCENT / 100)) < 0.02);
+  assert.ok(Math.abs(ex.twinNetPlacementUsd - ex.employerFeeUsd + ex.placementBonusToCandidateUsd) < 0.02);
+  assert.equal(ex.referralTiersUsd.activation, REFERRAL_BONUS_FIRST_PAYMENT_USD);
+  assert.equal(ex.referralTiersUsd.retained3m, REFERRAL_BONUS_RETAINED_3M_USD);
+  assert.equal(ex.referralTiersUsd.hire, REFERRAL_BONUS_HIRED_USD);
+  assert.equal(ex.referralTiersUsd.maxStackUsd, 140);
+  assert.equal(ex.interviewMaxAnnualUsd, 320);
+});
+
+run("referral tiers stack without double-counting hire as separate funnel", () => {
+  const r = computeInvestorCalculator(INVESTOR_CALCULATOR_DEFAULTS);
+  const { activation, retained3m, hire, total } = r.referralCostBreakdown;
+  const users = INVESTOR_CALCULATOR_DEFAULTS.totalUsers;
+  const growth = INVESTOR_CALCULATOR_DEFAULTS.viralGrowthRate / 100;
+  const refShare = INVESTOR_CALCULATOR_DEFAULTS.referralRate / 100;
+  const newRefs = users * growth * refShare;
+  const activated = newRefs * (INVESTOR_CALCULATOR_DEFAULTS.percentPaying / 100);
+  assert.ok(Math.abs(activation - activated * REFERRAL_BONUS_FIRST_PAYMENT_USD) < 0.02);
+  assert.ok(Math.abs(hire - activated * (INVESTOR_CALCULATOR_DEFAULTS.placementRate / 100) * REFERRAL_BONUS_HIRED_USD) < 0.02);
+  assert.ok(total >= activation + retained3m + hire);
 });

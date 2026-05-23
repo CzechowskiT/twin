@@ -11,11 +11,13 @@ import { Input, Shell } from "@/components/ui";
 import { convertModelUsdToDisplay } from "@/lib/calculator-fx";
 import { numberFormatLocaleForUi } from "@/lib/calculator-currencies";
 import {
+  PLACEMENT_CANDIDATE_BONUS_PCT_OF_MONTHLY_SALARY,
   REFERRAL_BONUS_FIRST_PAYMENT_USD,
   REFERRAL_BONUS_HIRED_USD,
   REFERRAL_BONUS_RETAINED_3M_USD,
 } from "@/lib/candidate-rewards-constants";
 import {
+  computeCandidateEconomicsExample,
   computeInvestorCalculator,
   INVESTOR_CALCULATOR_DEFAULTS,
   patchScenario,
@@ -198,6 +200,7 @@ export function InvestorCalculator() {
   const c = inputs.currency;
 
   const calc = useMemo(() => computeInvestorCalculator(inputs), [inputs]);
+  const econ = useMemo(() => computeCandidateEconomicsExample(inputs), [inputs]);
 
   const money = (usd: number, digits = 0) => formatModelMoney(usd, locale, c, digits);
 
@@ -291,6 +294,86 @@ export function InvestorCalculator() {
               title={t("investorCalc.scenarioAggressive")}
               desc={scenarioDesc(20, 20, 9.99)}
             />
+          </div>
+        </section>
+
+        <section className="twin-card-panel mb-6 p-5 sm:p-6">
+          <h2 className="twin-section-title mb-2 text-lg">{t("investorCalc.candidateEconomicsTitle")}</h2>
+          <p className="mb-5 max-w-3xl text-sm leading-relaxed text-[var(--twin-muted-strong)]">
+            {t("investorCalc.candidateEconomicsLead")}
+          </p>
+          <div className="overflow-x-auto rounded-xl border border-[var(--twin-border)]">
+            <table className="w-full min-w-[36rem] border-collapse text-sm">
+              <thead>
+                <tr className="border-b border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/80 text-left text-[11px] font-semibold uppercase tracking-wider text-[var(--twin-muted-strong)]">
+                  <th className="px-4 py-3 sm:px-5">{t("candidateRewards.colTrigger")}</th>
+                  <th className="px-4 py-3 sm:px-5">{t("candidateRewards.colReward")}</th>
+                  <th className="hidden px-4 py-3 sm:table-cell sm:px-5">{t("candidateRewards.colTiming")}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[var(--twin-border)]">
+                <EconomicsRow
+                  title={t("investorCalc.econCandidatePays")}
+                  detail={t("investorCalc.econCandidatePaysDetail")}
+                  amount={`${money(econ.subscriptionMonthlyUsd, 2)}${t("investorCalc.perMonth")} · ${money(econ.subscriptionAnnualUsd, 0)}${t("investorCalc.perYear")}`}
+                  timing="—"
+                />
+                <EconomicsRow
+                  title={t("investorCalc.econFoundingBenefit")}
+                  detail={t("investorCalc.econFoundingBenefitDetail")}
+                  amount={money(econ.foundingBenefitUsd, 0)}
+                  timing={t("candidateRewards.foundingTiming")}
+                />
+                <EconomicsRow
+                  title={t("investorCalc.econPlacementBonus")}
+                  detail={t("investorCalc.econPlacementBonusDetail")
+                    .replace("{pct}", String(PLACEMENT_CANDIDATE_BONUS_PCT_OF_MONTHLY_SALARY))
+                    .replace("{days}", String(inputs.placementPayoutDelayDays))}
+                  amount={money(econ.placementBonusToCandidateUsd, 0)}
+                  timing={t("candidateRewards.placementTiming")}
+                />
+                <EconomicsRow
+                  title={t("investorCalc.econReferralActivation")}
+                  detail={t("investorCalc.econReferralActivationDetail")}
+                  amount={listPrice(econ.referralTiersUsd.activation)}
+                  timing={t("candidateRewards.referralTiming")}
+                />
+                <EconomicsRow
+                  title={t("investorCalc.econReferralRetained")}
+                  detail={t("investorCalc.econReferralRetainedDetail")}
+                  amount={listPrice(econ.referralTiersUsd.retained3m)}
+                  timing={t("candidateRewards.referralTiming")}
+                />
+                <EconomicsRow
+                  title={t("investorCalc.econReferralHire")}
+                  detail={t("investorCalc.econReferralHireDetail")}
+                  amount={`${listPrice(econ.referralTiersUsd.hire)} · ${t("investorCalc.econReferralMaxStack").replace("{amount}", listPrice(econ.referralTiersUsd.maxStackUsd))}`}
+                  timing={t("candidateRewards.referralTiming")}
+                />
+                <EconomicsRow
+                  title={t("investorCalc.econInterviewBonus")}
+                  detail={t("investorCalc.econInterviewBonusDetail")
+                    .replace("{max}", String(inputs.interviewBonusMaxPerQuarter))
+                    .replace("{annual}", listPrice(econ.interviewMaxAnnualUsd))}
+                  amount={`${listPrice(econ.interviewBonusPerSlotUsd)}/slot · ${listPrice(econ.interviewMaxAnnualUsd)}${t("investorCalc.perYear")} cap`}
+                  timing={t("candidateRewards.interviewTiming")}
+                />
+                <EconomicsRow
+                  title={t("investorCalc.econEmployerPays")}
+                  detail={t("investorCalc.econEmployerPaysDetail").replace("{pct}", String(inputs.successFeePercent))}
+                  amount={money(econ.employerFeeUsd, 0)}
+                  timing={t("candidateRewards.placementTiming")}
+                  accent="employer"
+                />
+                <EconomicsRow
+                  title={t("investorCalc.econTwinNet")}
+                  detail={t("investorCalc.econTwinNetDetail")}
+                  amount={`${money(econ.twinNetPlacementUsd, 0)} (${calc.twinNetPlacementPctOfMonthlySalary.toFixed(1)}% ${t("investorCalc.ofMonthlySalary")})`}
+                  timing={t("investorCalc.econTwinNetLinkedInNote")}
+                  accent="twin"
+                />
+              </tbody>
+            </table>
           </div>
         </section>
 
@@ -519,6 +602,7 @@ export function InvestorCalculator() {
                   minLabel="10%"
                   maxLabel="80%"
                 />
+                <p className="text-xs text-[var(--twin-muted)]">{t("investorCalc.referralRateNote")}</p>
                 <RangeRow
                   label={`${referralTierLabel("bonusActivation", inputs.referralBonusPerActivation)}`}
                   min={5}
@@ -733,17 +817,10 @@ export function InvestorCalculator() {
             rows={[
               {
                 title: t("investorCalc.rowSubscriptions"),
-                detail: `${Math.round(calc.payingUsers).toLocaleString(locale)} × ${money(effectiveMonthlyUsd, 2)} × 12`,
-                value: money(calc.subscriptionRevenueGross, 0),
-                pct: calc.totalRevenue > 0 ? (calc.subscriptionRevenueGross / calc.totalRevenue) * 100 : 0,
+                detail: `${Math.round(calc.payingUsers).toLocaleString(locale)} × ${money(effectiveMonthlyUsd, 2)} × 12 − ${t("investorCalc.rowFoundingDrag").toLowerCase()} ${money(calc.foundingRevenueDrag, 0)}`,
+                value: money(calc.subscriptionRevenue, 0),
+                pct: calc.totalRevenue > 0 ? (calc.subscriptionRevenue / calc.totalRevenue) * 100 : 0,
                 valueClass: "text-sky-700 dark:text-sky-300",
-              },
-              {
-                title: t("investorCalc.rowFoundingDrag"),
-                detail: t("investorCalc.programFounding"),
-                value: money(-calc.foundingRevenueDrag, 0),
-                pct: calc.totalRevenue > 0 ? (-calc.foundingRevenueDrag / calc.totalRevenue) * 100 : 0,
-                valueClass: "text-amber-700 dark:text-amber-300",
               },
               {
                 title: t("investorCalc.rowSuccessFees"),
@@ -980,6 +1057,40 @@ export function InvestorCalculator() {
         </footer>
       </MarketingPageSurface>
     </Shell>
+  );
+}
+
+function EconomicsRow({
+  title,
+  detail,
+  amount,
+  timing,
+  accent,
+}: {
+  title: string;
+  detail: string;
+  amount: string;
+  timing: string;
+  accent?: "employer" | "twin";
+}) {
+  const amountClass =
+    accent === "employer"
+      ? "font-semibold text-amber-800 dark:text-amber-200"
+      : accent === "twin"
+        ? "font-semibold text-emerald-800 dark:text-emerald-200"
+        : "font-semibold text-[var(--foreground)]";
+
+  return (
+    <tr>
+      <td className="align-top px-4 py-4 sm:px-5">
+        <p className="font-semibold text-[var(--foreground)]">{title}</p>
+        <p className="mt-1 text-xs leading-relaxed text-[var(--twin-muted-strong)]">{detail}</p>
+      </td>
+      <td className={`align-top px-4 py-4 sm:px-5 tabular-nums ${amountClass}`}>{amount}</td>
+      <td className="hidden align-top px-4 py-4 text-xs leading-relaxed text-[var(--twin-muted-strong)] sm:table-cell sm:px-5">
+        {timing}
+      </td>
+    </tr>
   );
 }
 

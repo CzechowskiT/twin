@@ -4,6 +4,7 @@ import {
   FOUNDING_FREE_PREMIUM_MONTHS_DEFAULT,
   INTERVIEW_BOOKED_BONUS_MAX_PER_QUARTER,
   INTERVIEW_BOOKED_BONUS_USD,
+  PLACEMENT_CANDIDATE_BONUS_PCT_OF_MONTHLY_SALARY,
   PLACEMENT_EMPLOYER_FEE_PCT_OF_MONTHLY_SALARY,
   PLACEMENT_PAYOUT_DELAY_DAYS_DEFAULT,
   REFERRAL_BONUS_FIRST_PAYMENT_USD,
@@ -208,8 +209,13 @@ type ReferralFunnel = {
   hiredReferrals: number;
 };
 
+/**
+ * Referral volume for the model year: new referred users =
+ * totalUsers × viralGrowthRate × referralShareOfGrowth.
+ * referralRate is the share of viral growth attributed to referrals (not “% who refer once”).
+ */
 function referralFunnel(i: InvestorCalculatorInputs, totalUsers: number): ReferralFunnel {
-  const newReferrals = totalUsers * (i.referralRate / 100) * (i.viralGrowthRate / 100);
+  const newReferrals = totalUsers * (i.viralGrowthRate / 100) * (i.referralRate / 100);
   const activatedReferrals = newReferrals * (i.percentPaying / 100);
   const retained3mReferrals = activatedReferrals * (i.referralRetention3mRate / 100);
   const hiredReferrals = activatedReferrals * (i.placementRate / 100);
@@ -416,6 +422,64 @@ export function patchScenario(
     viralGrowthRate: 10.5,
     linkedInAdoptionRate: 60,
     referralRate: 40,
+  };
+}
+
+export type CandidateEconomicsExample = {
+  /** Blended effective monthly subscription (annual prepay mix). */
+  subscriptionMonthlyUsd: number;
+  subscriptionAnnualUsd: number;
+  /** Forgone Premium value for a founding member in the model year. */
+  foundingBenefitUsd: number;
+  /** Cash to candidate on verified placement (half of employer fee at default split). */
+  placementBonusToCandidateUsd: number;
+  /** Employer success fee on placement (% of monthly salary). */
+  employerFeeUsd: number;
+  /** Net to TWIN per placement before LinkedIn sharing. */
+  twinNetPlacementUsd: number;
+  /** Referral cash tiers (stack if milestones hit — not mutually exclusive). */
+  referralTiersUsd: {
+    activation: number;
+    retained3m: number;
+    hire: number;
+    maxStackUsd: number;
+  };
+  interviewBonusPerSlotUsd: number;
+  interviewMaxAnnualUsd: number;
+};
+
+/** Single paying candidate journey — illustrative USD amounts aligned with marketing constants. */
+export function computeCandidateEconomicsExample(
+  i: InvestorCalculatorInputs,
+): CandidateEconomicsExample {
+  const monthlySalary = i.averageSalary / 12;
+  const employerFee = monthlySalary * (i.successFeePercent / 100);
+  const candidateSharePct = PLACEMENT_CANDIDATE_BONUS_PCT_OF_MONTHLY_SALARY / 100;
+  const placementBonusToCandidateUsd = monthlySalary * candidateSharePct;
+  const twinNetPlacementUsd = employerFee - placementBonusToCandidateUsd;
+  const subscriptionMonthlyUsd = effectiveMonthlyUsd(i);
+  const monthsForgone = Math.min(12, Math.max(0, i.foundingFreePremiumMonths));
+  const foundingBenefitUsd = subscriptionMonthlyUsd * monthsForgone;
+  const interviewMaxAnnualUsd =
+    i.interviewBonusUsd * i.interviewBonusMaxPerQuarter * 4;
+  return {
+    subscriptionMonthlyUsd,
+    subscriptionAnnualUsd: subscriptionMonthlyUsd * 12,
+    foundingBenefitUsd,
+    placementBonusToCandidateUsd,
+    employerFeeUsd: employerFee,
+    twinNetPlacementUsd,
+    referralTiersUsd: {
+      activation: i.referralBonusPerActivation,
+      retained3m: i.referralBonusRetained3m,
+      hire: i.referralBonusPerHire,
+      maxStackUsd:
+        i.referralBonusPerActivation +
+        i.referralBonusRetained3m +
+        i.referralBonusPerHire,
+    },
+    interviewBonusPerSlotUsd: i.interviewBonusUsd,
+    interviewMaxAnnualUsd,
   };
 }
 
