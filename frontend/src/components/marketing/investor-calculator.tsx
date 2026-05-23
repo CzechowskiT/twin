@@ -11,6 +11,11 @@ import { Input, Shell } from "@/components/ui";
 import { convertModelUsdToDisplay } from "@/lib/calculator-fx";
 import { numberFormatLocaleForUi } from "@/lib/calculator-currencies";
 import {
+  REFERRAL_BONUS_FIRST_PAYMENT_USD,
+  REFERRAL_BONUS_HIRED_USD,
+  REFERRAL_BONUS_RETAINED_3M_USD,
+} from "@/lib/candidate-rewards-constants";
+import {
   computeInvestorCalculator,
   INVESTOR_CALCULATOR_DEFAULTS,
   patchScenario,
@@ -19,7 +24,11 @@ import {
   type InvestorScenario,
 } from "@/lib/investor-calculator-model";
 import type { Locale } from "@/lib/i18n";
-import { effectiveMonthlySubscriptionUsd, formatPlanPrice } from "@/lib/pricing-locale";
+import {
+  effectiveMonthlySubscriptionUsd,
+  formatCandidateListPriceUsd,
+  formatPlanPrice,
+} from "@/lib/pricing-locale";
 
 const INVESTOR_CURRENCIES: InvestorModelCurrency[] = ["USD", "EUR", "PLN", "GBP"];
 
@@ -230,6 +239,24 @@ export function InvestorCalculator() {
     inputs.annualPrepayShare,
   );
 
+  const listPrice = (usd: number) => formatCandidateListPriceUsd(usd, locale);
+
+  const referralTierLabel = (key: "bonusActivation" | "bonusRetained3m" | "bonusHire", usd: number) =>
+    t(`investorCalc.${key}`).replace("{amount}", listPrice(usd));
+
+  const programReferralPnl = t("investorCalc.programReferralPnl")
+    .replace("{first}", listPrice(REFERRAL_BONUS_FIRST_PAYMENT_USD))
+    .replace("{retained}", listPrice(REFERRAL_BONUS_RETAINED_3M_USD))
+    .replace("{hired}", listPrice(REFERRAL_BONUS_HIRED_USD));
+
+  const programFoundingPnl = t("investorCalc.programFoundingPnl")
+    .replace("{months}", String(inputs.foundingFreePremiumMonths))
+    .replace("{cohort}", inputs.foundingCohortSize.toLocaleString(locale));
+
+  const programInterviewPnl = t("investorCalc.programInterviewPnl")
+    .replace("{amount}", listPrice(inputs.interviewBonusUsd))
+    .replace("{max}", String(inputs.interviewBonusMaxPerQuarter));
+
   return (
     <Shell wide rail>
       <MarketingPageSurface wide withCard={false}>
@@ -434,6 +461,10 @@ export function InvestorCalculator() {
                 {t("investorCalc.avgToTwin")} {money(calc.avgSuccessFee, 0)}
               </p>
               <p className="text-xs text-[var(--twin-muted)]">{t("investorCalc.placementNetNote")}</p>
+              <p className="text-xs text-[var(--twin-muted)]">
+                {t("investorCalc.placementPayoutDelay")}:{" "}
+                {t("investorCalc.placementPayoutDays").replace("{{n}}", String(inputs.placementPayoutDelayDays))}
+              </p>
             </div>
           </section>
 
@@ -489,29 +520,133 @@ export function InvestorCalculator() {
                   maxLabel="80%"
                 />
                 <RangeRow
-                  label={`${t("investorCalc.bonusActivation")}: ${money(inputs.referralBonusPerActivation, 0)}`}
+                  label={`${referralTierLabel("bonusActivation", inputs.referralBonusPerActivation)}`}
                   min={5}
                   max={50}
                   step={5}
                   value={inputs.referralBonusPerActivation}
                   onChange={(n) => setInputs({ ...inputs, referralBonusPerActivation: n })}
-                  minLabel={money(5, 0)}
-                  maxLabel={money(50, 0)}
+                  minLabel={listPrice(5)}
+                  maxLabel={listPrice(50)}
                 />
                 <RangeRow
-                  label={`${t("investorCalc.bonusHire")}: ${money(inputs.referralBonusPerHire, 0)}`}
+                  label={`${referralTierLabel("bonusRetained3m", inputs.referralBonusRetained3m)}`}
+                  min={10}
+                  max={75}
+                  step={5}
+                  value={inputs.referralBonusRetained3m}
+                  onChange={(n) => setInputs({ ...inputs, referralBonusRetained3m: n })}
+                  minLabel={listPrice(10)}
+                  maxLabel={listPrice(75)}
+                />
+                <RangeRow
+                  label={`${t("investorCalc.referralRetention3m")}: ${inputs.referralRetention3mRate}%`}
+                  min={10}
+                  max={100}
+                  step={5}
+                  value={inputs.referralRetention3mRate}
+                  onChange={(n) => setInputs({ ...inputs, referralRetention3mRate: n })}
+                  minLabel="10%"
+                  maxLabel="100%"
+                />
+                <RangeRow
+                  label={`${referralTierLabel("bonusHire", inputs.referralBonusPerHire)}`}
                   min={50}
                   max={300}
                   step={25}
                   value={inputs.referralBonusPerHire}
                   onChange={(n) => setInputs({ ...inputs, referralBonusPerHire: n })}
-                  minLabel={money(50, 0)}
-                  maxLabel={money(300, 0)}
+                  minLabel={listPrice(50)}
+                  maxLabel={listPrice(300)}
                 />
+              </div>
+              <div className="rounded-xl border border-[var(--twin-border)] bg-violet-500/10 p-4 dark:bg-violet-950/30">
+                <h4 className="mb-3 font-semibold text-[var(--foreground)]">{t("investorCalc.programFounding")}</h4>
+                <RangeRow
+                  label={`${t("investorCalc.foundingCohortSize")}: ${inputs.foundingCohortSize.toLocaleString(locale)}`}
+                  min={100}
+                  max={5000}
+                  step={100}
+                  value={inputs.foundingCohortSize}
+                  onChange={(n) => setInputs({ ...inputs, foundingCohortSize: n })}
+                  minLabel="100"
+                  maxLabel="5K"
+                />
+                <RangeRow
+                  label={`${t("investorCalc.foundingFreeMonths")}: ${inputs.foundingFreePremiumMonths}`}
+                  min={0}
+                  max={12}
+                  step={1}
+                  value={inputs.foundingFreePremiumMonths}
+                  onChange={(n) => setInputs({ ...inputs, foundingFreePremiumMonths: n })}
+                  minLabel="0"
+                  maxLabel="12"
+                />
+              </div>
+              <div className="rounded-xl border border-[var(--twin-border)] bg-sky-500/10 p-4 dark:bg-sky-950/30">
+                <h4 className="mb-3 font-semibold text-[var(--foreground)]">{t("investorCalc.programInterview")}</h4>
+                <RangeRow
+                  label={`${t("investorCalc.interviewAdoption")}: ${inputs.interviewBonusAdoptionRate}%`}
+                  min={0}
+                  max={50}
+                  step={1}
+                  value={inputs.interviewBonusAdoptionRate}
+                  onChange={(n) => setInputs({ ...inputs, interviewBonusAdoptionRate: n })}
+                  minLabel="0%"
+                  maxLabel="50%"
+                />
+                <RangeRow
+                  label={`${t("investorCalc.interviewAvgSlots")}: ${inputs.interviewAvgSlotsPerActiveUser}`}
+                  min={0}
+                  max={inputs.interviewBonusMaxPerQuarter * 4}
+                  step={1}
+                  value={inputs.interviewAvgSlotsPerActiveUser}
+                  onChange={(n) => setInputs({ ...inputs, interviewAvgSlotsPerActiveUser: n })}
+                  minLabel="0"
+                  maxLabel={String(inputs.interviewBonusMaxPerQuarter * 4)}
+                />
+                <p className="text-xs text-[var(--twin-muted)]">
+                  {t("investorCalc.interviewMaxPerQuarter")}: {inputs.interviewBonusMaxPerQuarter} ·{" "}
+                  {listPrice(inputs.interviewBonusUsd)}/slot
+                </p>
               </div>
             </div>
           </section>
         </div>
+
+        <section className="twin-card-panel mb-6 p-5 sm:p-6">
+          <h3 className="twin-section-title mb-4 text-lg">{t("investorCalc.sectionCandidateRewards")}</h3>
+          <div className="grid gap-4 md:grid-cols-2">
+            <RewardProgramCard
+              title={t("investorCalc.programPlacement")}
+              detail={t("investorCalc.programPlacementPnl")}
+              value={money(calc.successFeeRevenue, 0)}
+              valueClass="text-emerald-700 dark:text-emerald-300"
+              sub={`${calc.twinNetPlacementPctOfMonthlySalary.toFixed(1)}% ${t("investorCalc.ofMonthlySalary")}`}
+            />
+            <RewardProgramCard
+              title={t("investorCalc.programReferral")}
+              detail={programReferralPnl}
+              value={money(-calc.referralCosts, 0)}
+              valueClass="text-rose-700 dark:text-rose-300"
+              sub={`${money(calc.referralCostBreakdown.activation, 0)} + ${money(calc.referralCostBreakdown.retained3m, 0)} + ${money(calc.referralCostBreakdown.hire, 0)}`}
+            />
+            <RewardProgramCard
+              title={t("investorCalc.programFounding")}
+              detail={programFoundingPnl}
+              value={money(-calc.foundingRevenueDrag, 0)}
+              valueClass="text-amber-700 dark:text-amber-300"
+              sub={t("investorCalc.subscriptionGrossNote")}
+            />
+            <RewardProgramCard
+              title={t("investorCalc.programInterview")}
+              detail={programInterviewPnl}
+              value={money(-calc.interviewBonusCosts, 0)}
+              valueClass="text-rose-700 dark:text-rose-300"
+              sub={`${inputs.interviewBonusAdoptionRate}% × ${inputs.interviewAvgSlotsPerActiveUser} slots`}
+            />
+          </div>
+        </section>
 
         <section className="twin-card-panel mb-6 p-5 sm:p-6">
           <h3 className="twin-section-title mb-4 text-lg">{t("investorCalc.sectionCosts")}</h3>
@@ -581,9 +716,9 @@ export function InvestorCalculator() {
                   value={inputs.officeMisc}
                   onChange={(n) => setInputs({ ...inputs, officeMisc: n })}
                 />
-                <p className="text-xs text-[var(--twin-muted)]">{t("investorCalc.referralCostLine")}</p>
+                <p className="text-xs text-[var(--twin-muted)]">{t("investorCalc.rowCandidateRewards")}</p>
                 <p className="rounded border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] px-2 py-1 font-mono text-sm">
-                  {money(calc.referralCosts, 0)}
+                  {money(calc.candidateRewardCosts, 0)}
                 </p>
                 <p className="border-t border-[var(--twin-border)] pt-2 text-xs text-[var(--twin-muted)]">{t("investorCalc.allCosts")}</p>
                 <p className="font-bold text-rose-700 dark:text-rose-300">{money(calc.totalCosts, 0)}</p>
@@ -599,9 +734,16 @@ export function InvestorCalculator() {
               {
                 title: t("investorCalc.rowSubscriptions"),
                 detail: `${Math.round(calc.payingUsers).toLocaleString(locale)} × ${money(effectiveMonthlyUsd, 2)} × 12`,
-                value: money(calc.subscriptionRevenue, 0),
-                pct: calc.totalRevenue > 0 ? (calc.subscriptionRevenue / calc.totalRevenue) * 100 : 0,
+                value: money(calc.subscriptionRevenueGross, 0),
+                pct: calc.totalRevenue > 0 ? (calc.subscriptionRevenueGross / calc.totalRevenue) * 100 : 0,
                 valueClass: "text-sky-700 dark:text-sky-300",
+              },
+              {
+                title: t("investorCalc.rowFoundingDrag"),
+                detail: t("investorCalc.programFounding"),
+                value: money(-calc.foundingRevenueDrag, 0),
+                pct: calc.totalRevenue > 0 ? (-calc.foundingRevenueDrag / calc.totalRevenue) * 100 : 0,
+                valueClass: "text-amber-700 dark:text-amber-300",
               },
               {
                 title: t("investorCalc.rowSuccessFees"),
@@ -655,11 +797,32 @@ export function InvestorCalculator() {
                 valueClass: "text-amber-700 dark:text-amber-300",
               },
               {
-                title: t("investorCalc.rowViral"),
-                detail: `${money(calc.referralCostPerUser, 2)} ${t("investorCalc.perUserYr")}`,
-                value: money(calc.referralCosts, 0),
-                pct: calc.totalCosts > 0 ? (calc.referralCosts / calc.totalCosts) * 100 : 0,
+                title: t("investorCalc.rowReferralActivation"),
+                detail: listPrice(inputs.referralBonusPerActivation),
+                value: money(calc.referralCostBreakdown.activation, 0),
+                pct: calc.totalCosts > 0 ? (calc.referralCostBreakdown.activation / calc.totalCosts) * 100 : 0,
                 valueClass: "text-violet-700 dark:text-violet-300",
+              },
+              {
+                title: t("investorCalc.rowReferralRetained3m"),
+                detail: listPrice(inputs.referralBonusRetained3m),
+                value: money(calc.referralCostBreakdown.retained3m, 0),
+                pct: calc.totalCosts > 0 ? (calc.referralCostBreakdown.retained3m / calc.totalCosts) * 100 : 0,
+                valueClass: "text-violet-700 dark:text-violet-300",
+              },
+              {
+                title: t("investorCalc.rowReferralHire"),
+                detail: listPrice(inputs.referralBonusPerHire),
+                value: money(calc.referralCostBreakdown.hire, 0),
+                pct: calc.totalCosts > 0 ? (calc.referralCostBreakdown.hire / calc.totalCosts) * 100 : 0,
+                valueClass: "text-violet-700 dark:text-violet-300",
+              },
+              {
+                title: t("investorCalc.rowInterviewBonus"),
+                detail: `${listPrice(inputs.interviewBonusUsd)}/slot`,
+                value: money(calc.interviewBonusCosts, 0),
+                pct: calc.totalCosts > 0 ? (calc.interviewBonusCosts / calc.totalCosts) * 100 : 0,
+                valueClass: "text-sky-700 dark:text-sky-300",
               },
               {
                 title: t("investorCalc.rowOther"),
@@ -761,7 +924,7 @@ export function InvestorCalculator() {
               title={t("investorCalc.insightUnit")}
               rows={[
                 [t("investorCalc.insRpu"), money(calc.revenuePerUser, 2)],
-                [t("investorCalc.insVcpu"), money(calc.infrastructureCostPerUser + calc.referralCostPerUser, 2)],
+                [t("investorCalc.insVcpu"), money(calc.infrastructureCostPerUser + calc.candidateRewardCostPerUser, 2)],
                 [t("investorCalc.insCm"), money(calc.contributionMargin, 2)],
               ]}
             />
@@ -817,6 +980,29 @@ export function InvestorCalculator() {
         </footer>
       </MarketingPageSurface>
     </Shell>
+  );
+}
+
+function RewardProgramCard({
+  title,
+  detail,
+  value,
+  valueClass,
+  sub,
+}: {
+  title: string;
+  detail: string;
+  value: string;
+  valueClass: string;
+  sub: string;
+}) {
+  return (
+    <div className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/60 p-4">
+      <div className="font-semibold text-[var(--foreground)]">{title}</div>
+      <p className="mt-1 text-xs leading-relaxed text-[var(--twin-muted)]">{detail}</p>
+      <div className={`mt-3 text-xl font-bold tabular-nums ${valueClass}`}>{value}</div>
+      <p className="mt-1 text-xs text-[var(--twin-muted-strong)]">{sub}</p>
+    </div>
   );
 }
 
