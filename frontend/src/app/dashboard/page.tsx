@@ -31,6 +31,7 @@ import { HelpWidget } from "@/components/help/help-widget";
 import { InvestorRoadmapPanel } from "@/components/investor-roadmap-panel";
 import { useTranslation } from "@/components/language-provider";
 import { JobFiltersBar } from "@/components/job-filters";
+import { JobEmployerModal } from "@/components/job-employer/job-employer-modal";
 import { JobList } from "@/components/job-list";
 import { Button, ButtonCta, Card, Shell } from "@/components/ui";
 import {
@@ -42,6 +43,7 @@ import {
 } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
 import { SHOW_SCRAPE_UI } from "@/lib/features";
+import type { JobEmployerTabId } from "@/lib/job-employer-demo";
 import type { TranslationKey } from "@/lib/i18n";
 import { calendarProviderLabel } from "@/lib/calendar-provider";
 import {
@@ -236,8 +238,21 @@ export default function DashboardPage() {
   const scrapePollStableRef = useRef({ prev: 0, ticks: 0 });
   const scrapeListToastShownRef = useRef(false);
   const [autoApplyingId, setAutoApplyingId] = useState<number | null>(null);
-  const [intelJob, setIntelJob] = useState<{ id: number; title: string; company: string } | null>(null);
+  const [intelJob, setIntelJob] = useState<{
+    id: number;
+    title: string;
+    company: string;
+    location: string | null;
+  } | null>(null);
   const [insightsJob, setInsightsJob] = useState<{ id: number; title: string } | null>(null);
+  const [employerHubJob, setEmployerHubJob] = useState<{
+    id: number;
+    title: string;
+    company: string;
+    location: string | null;
+    url?: string;
+    initialTab?: JobEmployerTabId;
+  } | null>(null);
   const [cvApp, setCvApp] = useState<{ id: number; title: string } | null>(null);
   const [negotiateApp, setNegotiateApp] = useState<{ id: number; title: string } | null>(null);
   const [linkedinOpen, setLinkedinOpen] = useState(false);
@@ -1695,8 +1710,20 @@ export default function DashboardPage() {
               applicationStatus={displayApplicationStatus}
               onApply={applyToJob}
               onAutoApply={autoApplyToJob}
-              onResearch={(id, title, company) => setIntelJob({ id, title, company })}
+              onResearch={(id, title, company, location) =>
+                setIntelJob({ id, title, company, location: location ?? null })
+              }
               onHiringInsights={(id, title) => setInsightsJob({ id, title })}
+              onViewEmployer={(id, title, company, url, location) =>
+                setEmployerHubJob({
+                  id,
+                  title,
+                  company,
+                  location: location ?? null,
+                  url,
+                  initialTab: "overview",
+                })
+              }
               autoApplyJobId={autoApplyingId}
               onSave={saveJob}
               onDismiss={dismissJob}
@@ -1890,11 +1917,25 @@ export default function DashboardPage() {
                 onAutoApply={hasProfile ? autoApplyToJob : undefined}
                 onResearch={
                   hasProfile
-                    ? (id, title, company) => setIntelJob({ id, title, company })
+                    ? (id, title, company, location) =>
+                        setIntelJob({ id, title, company, location: location ?? null })
                     : undefined
                 }
                 onHiringInsights={
                   hasProfile ? (id, title) => setInsightsJob({ id, title }) : undefined
+                }
+                onViewEmployer={
+                  hasProfile
+                    ? (id, title, company, url, location) =>
+                        setEmployerHubJob({
+                          id,
+                          title,
+                          company,
+                          location: location ?? null,
+                          url,
+                          initialTab: "overview",
+                        })
+                    : undefined
                 }
                 autoApplyJobId={autoApplyingId}
                 onSave={hasProfile ? saveJob : undefined}
@@ -1955,6 +1996,7 @@ export default function DashboardPage() {
         jobId={intelJob?.id ?? null}
         jobTitle={intelJob?.title ?? ""}
         company={intelJob?.company ?? ""}
+        location={intelJob?.location ?? null}
         open={intelJob !== null}
         onClose={() => setIntelJob(null)}
       />
@@ -1963,6 +2005,16 @@ export default function DashboardPage() {
         jobTitle={insightsJob?.title ?? ""}
         open={insightsJob !== null}
         onClose={() => setInsightsJob(null)}
+      />
+      <JobEmployerModal
+        jobId={employerHubJob?.id ?? null}
+        jobTitle={employerHubJob?.title ?? ""}
+        company={employerHubJob?.company ?? ""}
+        location={employerHubJob?.location ?? null}
+        jobUrl={employerHubJob?.url}
+        initialTab={employerHubJob?.initialTab ?? "overview"}
+        open={employerHubJob !== null}
+        onClose={() => setEmployerHubJob(null)}
       />
       <CvOptimizerModal
         applicationId={cvApp?.id ?? null}

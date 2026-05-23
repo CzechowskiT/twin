@@ -13,6 +13,14 @@ import {
   EMPLOYER_MEDIA_MESSAGES_EN,
   EMPLOYER_MEDIA_MESSAGES_PL,
 } from "./employer-media-messages";
+import {
+  EMPLOYER_FAQ_MESSAGES_EN,
+  EMPLOYER_FAQ_MESSAGES_PL,
+} from "./employer-faq-messages";
+import {
+  JOB_EMPLOYER_MESSAGES_EN,
+  JOB_EMPLOYER_MESSAGES_PL,
+} from "./job-employer-messages";
 import { SITE_MESSAGES_EN, SITE_MESSAGES_PL } from "./site-messages";
 
 export type Locale = "en" | "pl" | "es" | "it" | "fr" | "de" | "zh" | "ar" | "ja";
@@ -118,7 +126,8 @@ export type TranslationKey =
   | `demo.${keyof typeof en.demo}`
   | `first1000.${keyof typeof en.first1000}`
   | `ux.${keyof typeof en.ux}`
-  | `employerMedia.${keyof typeof EMPLOYER_MEDIA_MESSAGES_EN}`;
+  | `employerMedia.${keyof typeof EMPLOYER_MEDIA_MESSAGES_EN}`
+  | `jobEmployer.${keyof typeof JOB_EMPLOYER_MESSAGES_EN}`;
 
 const en = {
   nav: {
@@ -1400,9 +1409,9 @@ const en = {
     placements: "Verified placements",
     interviews: "Scheduled interviews",
     dataRoomDemoMode:
-      "Data room: demo mode (local upload on API). Set S3_BUCKET_NAME + keys on Railway for presigned cloud PUT.",
+      "Demo materials in the data room — full cloud upload for enterprise diligence goes live with production rollout.",
     flagMail: "Mail",
-    flagStripe: "Stripe checkout",
+    flagStripe: "Stripe payments",
     flagGoogle: "Google Calendar",
     flagMicrosoft: "Microsoft Calendar",
     updated: "Updated",
@@ -1412,11 +1421,16 @@ const en = {
     earlyStageBadge: "Early stage",
     earlyStageNote:
       "Pilot-shaped traction — counts are real aggregates, not financial KPIs. See /status for system health.",
-    flagConfigurable: "configurable",
-    unitEconomicsTitle: "Unit economics (honest)",
+    flagStatusLive: "Live",
+    flagStatusSoon: "Coming soon",
+    flagStatusPrep: "In preparation",
+    readinessTitle: "Platform integrations",
+    unitEconomicsTitle: "Unit economics (transparent)",
     unitEconomicsLead:
-      "Pre-scale: illustrative scenario models in the investor calculator only — not GAAP forecasts or audited unit economics.",
-    preRevenueNote: "Pre-revenue MVP — revenue instruments ship with Stripe when enabled in environment.",
+      "We are pre-revenue. Use the scenario calculator for upside and sensitivity — illustrative models only, not audited financials.",
+    preRevenueNote:
+      "Subscriptions and placement fees will run through Stripe when we turn on billing in production.",
+    dbUnreachable: "database temporarily unavailable",
   },
   investorFundraising: {
     eyebrow: "For investors",
@@ -1688,18 +1702,17 @@ const en = {
     ndaAccept: "Continue to preview",
     ndaAcceptedNote: "Preview unlocked for this browser session. Request signed access for downloads.",
     backInvestor: "Investor workspace",
-    uploadTitle: "Register document (metadata)",
+    uploadTitle: "Register a document",
     uploadLead:
-      "After NDA: register filename, type, and size. When S3_BUCKET_NAME + keys are set on the API you get a presigned PUT URL; otherwise only metadata is stored.",
+      "After NDA: register the file name, category, and size. We will confirm secure upload steps by email for full diligence.",
     uploadCategory: "Category",
     uploadFilename: "Filename",
-    uploadSubmit: "Register metadata",
-    uploadSuccess: "Metadata registered",
-    uploadPresignHint: "Use the presigned upload URL from API response (PUT) within 15 minutes.",
-    uploadFailed: "Could not register metadata",
+    uploadSubmit: "Register document",
+    uploadSuccess: "Document registered",
+    uploadPresignHint: "Use the secure upload link from your confirmation — valid for 15 minutes.",
+    uploadFailed: "Could not register document",
     demoModeBanner:
-      "Demo mode: no S3 on API — register metadata, then PUT the file to POST /api/v1/investor/data-room/uploads/{id}/file (local disk). Production uses presigned S3 URLs.",
-    demoModeDocLink: "Railway env checklist (S3 optional)",
+      "Demo materials — you can register filenames here; full cloud upload for enterprise diligence goes live with production rollout.",
   },
   recruiterJobs: {
     title: "Post a job",
@@ -1721,16 +1734,31 @@ const en = {
   },
   recruiterInbox: {
     title: "Recruiter acceptance inbox",
-    lead: "Short batch list for one company — accept candidates for interview or decline without inbox noise.",
-    tokenPlaceholder: "Recruiter inbox token",
-    companyPlaceholder: "Company slug (e.g. acme-corp)",
+    lead: "Pre-qualified applications for your company — accept for interview or decline without inbox noise.",
+    helperInvite:
+      "Open the link from your TWIN invite email, or enter the access code and company name below. We remember your choice on this device.",
+    emptyStateTitle: "What is this inbox?",
+    emptyStateBody:
+      "A short queue of candidates TWIN already matched to your roles. You accept who gets an interview slot or decline in one click — no CV spam, no email ping-pong.",
+    accessCodeLabel: "Access code",
+    accessCodeHint: "From your TWIN invite email (one-time pilot link).",
+    accessCodePlaceholder: "Paste access code",
+    companyLabel: "Company",
+    companyHint: "The employer name on your TWIN contract or invite.",
+    companyPlaceholder: "Select company",
+    companyOptionOther: "Another company…",
     load: "Load queue",
-    empty: "No applications waiting for this company slug.",
-    missingAuth: "Enter recruiter token and company slug (from your TWIN pilot link).",
+    empty: "No applications waiting for this company right now.",
+    missingAuth: "Enter your access code and choose a company (from your TWIN invite).",
+    loadFailed: "Could not load the queue — check your access code and company, then try again.",
     accept: "Accept for interview",
     decline: "Decline",
     back: "For recruiters",
     jobsLink: "Post a job",
+    demoCompanyCta: "Use demo company (Nova Hiring PL)",
+    signedInCompanyHint: "Signed in — billing company on file: {company}. Pick it in the list if it matches your inbox.",
+    queueTitle: "Queue · {company}",
+    changeWorkspace: "Change company or access code",
   },
   acceptanceQueue: {
     stripTitle: "Acceptance queue",
@@ -3645,9 +3673,9 @@ const pl: MessageTree = {
     placements: "Zweryfikowane placementy",
     interviews: "Zaplanowane rozmowy",
     dataRoomDemoMode:
-      "Data room: tryb demo (lokalny upload na API). Ustaw S3_BUCKET_NAME + klucze na Railway dla presigned PUT w chmurze.",
+      "Materiały demo w data room — pełny upload w chmurze włączymy na produkcji enterprise.",
     flagMail: "Poczta",
-    flagStripe: "Stripe checkout",
+    flagStripe: "Płatności Stripe",
     flagGoogle: "Kalendarz Google",
     flagMicrosoft: "Kalendarz Microsoft",
     updated: "Aktualizacja",
@@ -3657,11 +3685,16 @@ const pl: MessageTree = {
     earlyStageBadge: "Wczesny etap",
     earlyStageNote:
       "Trakcja w kształcie pilota — agregaty produktowe, nie KPI finansowe. Zdrowie systemu: /status.",
-    flagConfigurable: "konfigurowalne",
-    unitEconomicsTitle: "Ekonomia jednostkowa (uczciwie)",
+    flagStatusLive: "Działa",
+    flagStatusSoon: "Wkrótce",
+    flagStatusPrep: "W przygotowaniu",
+    readinessTitle: "Integracje platformy",
+    unitEconomicsTitle: "Ekonomia jednostkowa (transparentnie)",
     unitEconomicsLead:
-      "Przed skalą: modele scenariusza w kalkulatorze inwestora — nie prognozy GAAP ani audytowana ekonomia jednostkowa.",
-    preRevenueNote: "MVP przed przychodem — Stripe włącza się, gdy skonfigurowany w środowisku.",
+      "Jesteśmy przed przychodem. Kalkulator scenariusza pokazuje wrażliwość i potencjał — modele poglądowe, bez audytowanych finansów.",
+    preRevenueNote:
+      "Subskrypcje i opłaty placementowe uruchomimy przez Stripe, gdy włączymy rozliczenia na produkcji.",
+    dbUnreachable: "baza tymczasowo niedostępna",
   },
   investorFundraising: {
     eyebrow: "Dla inwestorów",
@@ -3934,24 +3967,23 @@ const pl: MessageTree = {
     ndaAccept: "Przejdź do podglądu",
     ndaAcceptedNote: "Podgląd odblokowany w tej sesji przeglądarki. Pobrania wymagają podpisanego NDA.",
     backInvestor: "Strefa inwestora",
-    uploadTitle: "Zarejestruj dokument (metadane)",
+    uploadTitle: "Zarejestruj dokument",
     uploadLead:
-      "Po NDA: nazwa, typ i rozmiar. Przy S3_BUCKET_NAME + kluczach na API dostaniesz presigned PUT; inaczej tylko metadane.",
+      "Po NDA: nazwa pliku, kategoria i rozmiar. Pełny, bezpieczny upload potwierdzimy mailem w ramach due diligence.",
     uploadCategory: "Kategoria",
     uploadFilename: "Nazwa pliku",
-    uploadSubmit: "Zarejestruj metadane",
-    uploadSuccess: "Metadane zapisane",
-    uploadPresignHint: "Wyślij plik metodą PUT na presigned URL z API (ważny 15 min).",
-    uploadFailed: "Nie udało się zapisać metadanych",
+    uploadSubmit: "Zarejestruj dokument",
+    uploadSuccess: "Dokument zarejestrowany",
+    uploadPresignHint: "Użyj bezpiecznego linku z potwierdzenia — ważny 15 minut.",
+    uploadFailed: "Nie udało się zarejestrować dokumentu",
     demoModeBanner:
-      "Tryb demo: brak S3 — zarejestruj metadane, potem PUT na POST /api/v1/investor/data-room/uploads/{id}/file (dysk API). Produkcja: presigned S3.",
-    demoModeDocLink: "Checklista env Railway (S3 opcjonalnie)",
+      "Materiały demo — możesz zarejestrować nazwy plików; pełny upload w chmurze włączymy na produkcji enterprise.",
   },
   recruiterJobs: {
     title: "Opublikuj ofertę",
-    lead: "Dodaj ogłoszenie pracodawcy dla sluga firmy — kandydaci mogą dopasować się i aplikować.",
-    tokenPlaceholder: "Token rekrutera",
-    companyPlaceholder: "Slug firmy",
+    lead: "Dodaj ogłoszenie pracodawcy — kandydaci mogą dopasować się i aplikować.",
+    tokenPlaceholder: "Kod dostępu z maila",
+    companyPlaceholder: "Wybierz firmę",
     fieldTitle: "Stanowisko",
     fieldLocation: "Lokalizacja",
     fieldDescription: "Opis",
@@ -3960,23 +3992,38 @@ const pl: MessageTree = {
     fieldSalaryMax: "Max. wynagrodzenie (PLN/mies.)",
     submit: "Opublikuj",
     listTitle: "Twoje ogłoszenia",
-    empty: "Brak ogłoszeń pracodawcy dla tego sluga.",
+    empty: "Brak ogłoszeń pracodawcy dla tej firmy.",
     success: "Oferta opublikowana",
     failed: "Nie udało się opublikować",
-    inboxLink: "Wróć do inbox",
+    inboxLink: "Wróć do skrzynki",
   },
   recruiterInbox: {
     title: "Skrzynka akceptacji rekrutera",
-    lead: "Krótka lista dla jednej firmy — zaakceptuj na rozmowę lub odrzuć bez szumu w skrzynce.",
-    tokenPlaceholder: "Token inbox rekrutera",
-    companyPlaceholder: "Slug firmy (np. acme-corp)",
+    lead: "Pre-kwalifikowane aplikacje dla Twojej firmy — zaakceptuj na rozmowę lub odrzuć bez szumu w skrzynce.",
+    helperInvite:
+      "Otwórz link z maila od TWIN albo wpisz kod dostępu i firmę poniżej. Zapamiętamy wybór na tym urządzeniu.",
+    emptyStateTitle: "Czym jest ta skrzynka?",
+    emptyStateBody:
+      "Krótka kolejka kandydatów, których TWIN już dopasował do Twoich ról. Akceptujesz, kto dostaje slot na rozmowę, lub odrzucasz jednym kliknięciem — bez spamu CV i wymiany maili.",
+    accessCodeLabel: "Kod dostępu",
+    accessCodeHint: "Z maila z zaproszeniem TWIN (link pilotażowy).",
+    accessCodePlaceholder: "Wklej kod dostępu",
+    companyLabel: "Firma",
+    companyHint: "Nazwa pracodawcy z umowy lub zaproszenia TWIN.",
+    companyPlaceholder: "Wybierz firmę",
+    companyOptionOther: "Inna firma…",
     load: "Załaduj kolejkę",
-    empty: "Brak aplikacji dla tego sluga firmy.",
-    missingAuth: "Podaj token rekrutera i slug firmy (z linku pilotażowego TWIN).",
+    empty: "Brak aplikacji oczekujących u tej firmy.",
+    missingAuth: "Podaj kod dostępu i wybierz firmę (z zaproszenia TWIN).",
+    loadFailed: "Nie udało się załadować kolejki — sprawdź kod i firmę, potem spróbuj ponownie.",
     accept: "Zaakceptuj na rozmowę",
     decline: "Odrzuć",
     back: "Dla rekruterów",
     jobsLink: "Opublikuj ofertę",
+    demoCompanyCta: "Firma demo (Nova Hiring PL)",
+    signedInCompanyHint: "Zalogowano — firma na fakturze: {company}. Wybierz ją z listy, jeśli pasuje do skrzynki.",
+    queueTitle: "Kolejka · {company}",
+    changeWorkspace: "Zmień firmę lub kod dostępu",
   },
   acceptanceQueue: {
     stripTitle: "Kolejka akceptacji",
@@ -4563,7 +4610,7 @@ const pl: MessageTree = {
       "Licznik opiera się na zapisach na liście życzeń po stronie API (BETA_WAITLIST_CAP, domyślnie 1000). „Za darmo na zawsze” dla foundersów to obietnica kampanii — ostateczne zasady w Regulaminie i Polityce prywatności.",
   },
   employerMedia: EMPLOYER_MEDIA_MESSAGES_PL,
-  jobEmployer: JOB_EMPLOYER_MESSAGES_PL,
+  jobEmployer: { ...JOB_EMPLOYER_MESSAGES_PL, ...EMPLOYER_FAQ_MESSAGES_PL },
   ux: {
     flowNavAria: "Kroki w Twojej przestrzeni roboczej",
     flowStepDashboard: "Panel",

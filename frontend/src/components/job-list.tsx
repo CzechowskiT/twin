@@ -33,6 +33,7 @@ export function JobList({
   onAutoApply,
   onResearch,
   onHiringInsights,
+  onViewEmployer,
   onSave,
   onDismiss,
   autoApplyJobId,
@@ -42,8 +43,15 @@ export function JobList({
   applicationStatus?: Record<number, string>;
   onApply?: (jobId: number, url: string) => void;
   onAutoApply?: (jobId: number) => void;
-  onResearch?: (jobId: number, title: string, company: string) => void;
+  onResearch?: (jobId: number, title: string, company: string, location: string | null) => void;
   onHiringInsights?: (jobId: number, title: string) => void;
+  onViewEmployer?: (
+    jobId: number,
+    title: string,
+    company: string,
+    url: string,
+    location: string | null,
+  ) => void;
   onSave?: (jobId: number) => void;
   onDismiss?: (jobId: number) => void;
   autoApplyJobId?: number | null;
@@ -54,7 +62,7 @@ export function JobList({
     return <p className="twin-muted text-sm">{t("dashboard.noJobsFiltered")}</p>;
   }
 
-  const hasActions = Boolean(onApply || onAutoApply || onResearch || onSave || onDismiss);
+  const hasActions = Boolean(onApply || onAutoApply || onResearch || onViewEmployer || onSave || onDismiss);
 
   return (
     <ul className="space-y-2 text-sm">
@@ -121,11 +129,11 @@ export function JobList({
                 {onResearch && (
                   <button
                     type="button"
-                    aria-label={`${t("careerAssistant.researchCompany")}: ${item.title}, ${item.company}`}
-                    onClick={() => onResearch(jobId, item.title, item.company)}
+                    aria-label={`${t("careerAssistant.researchCompanyBrief")}: ${item.title}, ${item.company}`}
+                    onClick={() => onResearch(jobId, item.title, item.company, item.location ?? null)}
                     className="twin-btn-secondary twin-touch-target shrink-0 !w-auto px-3 py-1.5 text-xs"
                   >
-                    {t("careerAssistant.researchCompany")}
+                    {t("careerAssistant.researchCompanyBrief")}
                   </button>
                 )}
                 {onHiringInsights && (
@@ -136,6 +144,18 @@ export function JobList({
                     className="twin-btn-secondary twin-touch-target shrink-0 !w-auto px-3 py-1.5 text-xs"
                   >
                     {t("careerAssistant.hiringInsights")}
+                  </button>
+                )}
+                {onViewEmployer && (
+                  <button
+                    type="button"
+                    aria-label={`${t("jobEmployer.openEmployerHub")}: ${item.company}`}
+                    onClick={() =>
+                      onViewEmployer(jobId, item.title, item.company, item.url, item.location ?? null)
+                    }
+                    className="twin-btn-secondary twin-touch-target shrink-0 !w-auto px-3 py-1.5 text-xs"
+                  >
+                    {t("jobEmployer.openEmployerHub")}
                   </button>
                 )}
                 {onSave && !status && (
