@@ -132,6 +132,21 @@ export const FAQ_MESSAGES_EN = {
   investors07Q: "How do I request a deeper diligence call?",
   investors07A:
     "Use confidential access request flows in the data room or contact paths listed on the investor workspace. Bring your checklist — we prefer concrete security and unit-economics questions over generic deck tours.",
+  investors08Q: "I'm an angel — what dilution and cap table should I expect?",
+  investors08A:
+    "We are pre-institutional round: no public cap table on the marketing site. Confidential materials and round terms are shared after NDA and mutual fit — not on a landing page. Traction and product depth are inspectable without a meeting via live metrics and the demo path.",
+  investors09Q: "We're VC — what is the Poland + EU wedge?",
+  investors09A:
+    "Phase 1 ships on Polish boards (pracuj.pl, rocketjobs.pl) with EU-remote roles in the feed, GDPR-first consent, and calendar-of-acceptance UX in English and Polish. Expansion is adapter-driven (registry of boards + compliance), not a single-country job board clone.",
+  investors10Q: "We're PE — is there revenue and audited financials?",
+  investors10A:
+    "Honest answer: early MVP traction, not PE-scale revenue or audited statements on the public site. Enterprise programs and placement verification economics are the margin story we are building toward; financials stay in confidential diligence until appropriate.",
+  investors11Q: "Can I see unit economics before a partner meeting?",
+  investors11A:
+    "Yes — the investor scenario calculator is illustrative (success-fee sensitivity, team costs, infra). It is a diligence model, not a forecast or offer. Live usage aggregates are on /investor/metrics with beta labels.",
+  investors12Q: "What should YC partners open first?",
+  investors12A:
+    "Start at /for-investors/yc: interactive demo, live MVP stats JSON, metrics dashboard, and workspace sign-in for exports. We prefer concrete product questions over a generic deck walk.",
 } as const;
 
 export const FAQ_MESSAGES_PL = {
@@ -266,6 +281,21 @@ export const FAQ_MESSAGES_PL = {
   investors07Q: "Jak poprosić o głębszy diligence?",
   investors07A:
     "Proces w data room lub kontakt z przestrzenią inwestora. Przyjdź z checklistą — wolimy konkretne pytania o bezpieczeństwo i ekonomię jednostkową niż generyczny pitch deck.",
+  investors08Q: "Jestem aniołem — jaka rozwodnienie i cap table?",
+  investors08A:
+    "Przed rundą instytucjonalną: brak publicznego cap table na stronie marketingowej. Warunki rundy i materiały poufne po NDA i dopasowaniu stron. Trakcję i produkt można ocenić bez spotkania przez metryki na żywo i ścieżkę demo.",
+  investors09Q: "Jesteśmy VC — jaka jest przewaga Polska + UE?",
+  investors09A:
+    "Faza 1 na polskich portalach (pracuj.pl, rocketjobs.pl) z ofertami remote UE, zgodą RODO i UX kalendarza akceptacji po PL i EN. Ekspansja przez adaptery portali i compliance, nie klon jednego portalu.",
+  investors10Q: "Jesteśmy PE — czy są przychody i audyt?",
+  investors10A:
+    "Uczciwie: wczesna trakcja MVP, bez skali przychodów PE ani audytu na stronie publicznej. Programy enterprise i ekonomia weryfikacji placementu to kierunek marży; finanse w poufnej due diligence, gdy to ma sens.",
+  investors11Q: "Czy zobaczę ekonomię jednostkową przed spotkaniem?",
+  investors11A:
+    "Tak — kalkulator scenariusza inwestora jest ilustracyjny (success fee, zespół, infra). To model do due diligence, nie prognoza ani oferta. Agregaty użycia: /investor/metrics z etykietą beta.",
+  investors12Q: "Co partner YC powinien otworzyć najpierw?",
+  investors12A:
+    "Zacznij od /for-investors/yc: demo interaktywne, JSON metryk MVP, panel metryk i logowanie do workspace pod eksporty. Wolimy konkretne pytania o produkt niż generyczny deck.",
 } as const;
 
 export type FaqMessageKey = keyof typeof FAQ_MESSAGES_EN;
@@ -276,7 +306,7 @@ export const FAQ_SECTIONS = [
   { id: "candidates", count: 11 },
   { id: "recruiters", count: 9 },
   { id: "companies", count: 7 },
-  { id: "investors", count: 7 },
+  { id: "investors", count: 12 },
 ] as const;
 
 export type FaqSectionId = (typeof FAQ_SECTIONS)[number]["id"];

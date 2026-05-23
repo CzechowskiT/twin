@@ -6,9 +6,13 @@ import { useMvpStats } from "@/lib/use-mvp-stats";
 /** Hero social proof: live job counter + honest join line. */
 export function LandingLiveProof({ className = "" }: { className?: string }) {
   const { t, locale } = useTranslation();
-  const stats = useMvpStats();
+  const { data: stats, loading } = useMvpStats();
   const loc = locale === "pl" ? "pl-PL" : "en-US";
-  const count = stats.validated_jobs.toLocaleString(loc);
+  const count = stats
+    ? stats.validated_jobs.toLocaleString(loc)
+    : loading
+      ? "…"
+      : t("home.liveCounterUnavailable");
   const counter = t("home.liveCounter").replace("{count}", count);
 
   return (

@@ -9,16 +9,10 @@ export type MvpStatsPublic = {
   job_boards_in_registry: number;
 };
 
-const FALLBACK: MvpStatsPublic = {
-  validated_jobs: 637,
-  registered_users: 420,
-  total_applications: 890,
-  job_boards_in_registry: 24,
-};
-
-/** Live traction counters from public API; falls back when offline. */
+/** Live traction counters from public API; null when loading or unavailable (no fake fallbacks). */
 export function useMvpStats() {
   const [data, setData] = useState<MvpStatsPublic | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -29,7 +23,9 @@ export function useMvpStats() {
         const json = (await res.json()) as MvpStatsPublic;
         if (!cancelled) setData(json);
       } catch {
-        /* fallback */
+        /* leave null */
+      } finally {
+        if (!cancelled) setLoading(false);
       }
     })();
     return () => {
@@ -37,5 +33,5 @@ export function useMvpStats() {
     };
   }, []);
 
-  return data ?? FALLBACK;
+  return { data, loading };
 }

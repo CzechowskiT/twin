@@ -14,6 +14,8 @@ const MARKETING_PUBLIC_PREFIXES = [
   "/for-recruiters",
   "/for-companies",
   "/for-investors",
+  "/for-investors/yc",
+  "/for-investors/yc",
   "/compare/",
   "/calculator",
   "/developers",

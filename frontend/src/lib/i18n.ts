@@ -111,7 +111,8 @@ export type TranslationKey =
   | `common.${keyof typeof en.common}`
   | `persona.${keyof typeof en.persona}`
   | `demo.${keyof typeof en.demo}`
-  | `first1000.${keyof typeof en.first1000}`;
+  | `first1000.${keyof typeof en.first1000}`
+  | `ux.${keyof typeof en.ux}`;
 
 const en = {
   nav: {
@@ -4423,6 +4424,26 @@ const pl: MessageTree = {
     shareCopied: "Skopiowano. Wyślij komuś, kto znów aplikuje z łóżka.",
     footerLegal:
       "Licznik opiera się na zapisach na liście życzeń po stronie API (BETA_WAITLIST_CAP, domyślnie 1000). „Za darmo na zawsze” dla foundersów to obietnica kampanii — ostateczne zasady w Regulaminie i Polityce prywatności.",
+  },
+  ux: {
+    flowNavAria: "Kroki w Twojej przestrzeni roboczej",
+    flowStepDashboard: "Panel",
+    flowStepProfile: "Profil",
+    flowStepMatches: "Dopasowania",
+    flowStepActions: "Aplikacje",
+    profileStepEyebrow: "Krok 2 · Profil",
+    profileMissingLead: "Uzupełnij profil, żeby TWIN mógł rankować oferty.",
+    profileIncompleteLead: "Dodaj umiejętności i docelowe stanowiska, żeby uruchomić dopasowania.",
+    profileIncompleteCta: "Uzupełnij profil",
+    jobsEmptyMessage: "Brak ofert przy tych filtrach — zresetuj filtry lub odśwież feed.",
+    jobsEmptyCta: "Resetuj filtry",
+    jobsEmptyNoProfileMessage: "Najpierw uzupełnij profil, potem otwórz feed ofert.",
+    jobsEmptyNoProfileCta: "Uzupełnij profil",
+    matchesEmptyMessage: "Brak mocnych dopasowań — uzupełnij profil lub wróć po kolejnym przebiegu.",
+    matchesEmptyCta: "Uzupełnij profil",
+    apiErrorGeneric: "Coś poszło nie tak. Spróbuj za chwilę.",
+    apiErrorSession: "Sesja wygasła — zaloguj się ponownie.",
+    apiErrorNetwork: "Brak połączenia z serwerem. Sprawdź sieć i spróbuj ponownie.",
   },
   common: {
     language: "Język",

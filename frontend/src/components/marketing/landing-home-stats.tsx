@@ -6,15 +6,16 @@ import { useMvpStats } from "@/lib/use-mvp-stats";
 
 export function LandingHomeStats() {
   const { t, locale } = useTranslation();
-  const stats = useMvpStats();
+  const { data: stats, loading } = useMvpStats();
   const loc = locale === "pl" ? "pl-PL" : "en-US";
   const fmt = (n: number) => n.toLocaleString(loc);
+  const dash = "—";
 
   const items = [
-    { label: t("home.statJobs"), value: fmt(stats.validated_jobs) },
-    { label: t("home.statUsers"), value: fmt(stats.registered_users) },
-    { label: t("home.statApps"), value: fmt(stats.total_applications) },
-    { label: t("home.statBoards"), value: fmt(stats.job_boards_in_registry) },
+    { label: t("home.statJobs"), value: stats ? fmt(stats.validated_jobs) : loading ? "…" : dash },
+    { label: t("home.statUsers"), value: stats ? fmt(stats.registered_users) : loading ? "…" : dash },
+    { label: t("home.statApps"), value: stats ? fmt(stats.total_applications) : loading ? "…" : dash },
+    { label: t("home.statBoards"), value: stats ? fmt(stats.job_boards_in_registry) : loading ? "…" : dash },
   ];
 
   return (

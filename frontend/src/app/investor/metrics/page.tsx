@@ -20,6 +20,7 @@ export default function InvestorMetricsPage() {
           </p>
           <h1 className="twin-page-intro text-2xl font-semibold sm:text-3xl">{t("investorMetrics.title")}</h1>
           <p className="twin-muted max-w-2xl text-sm leading-relaxed">{t("investorMetrics.lead")}</p>
+          <p className="max-w-2xl text-xs leading-relaxed text-[var(--twin-muted)]">{t("investorMetrics.earlyStageNote")}</p>
           <Link href="/investor/calculator" className="twin-link text-sm font-medium">
             {t("investorMetrics.calcLink")}
           </Link>

@@ -62,6 +62,7 @@ export function SiteFooter() {
     { href: "/careers", label: t("nav.careers") },
     { href: "/partners", label: t("nav.partners") },
     { href: "/media", label: t("nav.media") },
+    { href: "/for-investors", label: t("nav.forInvestors") },
     { href: "/contact", label: t("nav.contact") },
   ];
 

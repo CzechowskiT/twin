@@ -68,6 +68,7 @@ export function SiteHeaderBar({ showPersonaSwitcher }: SiteHeaderBarProps) {
     { href: "/partners" as const, label: t("nav.partners") },
     { href: "/media" as const, label: t("nav.media") },
     { href: "/careers" as const, label: t("nav.careers") },
+    { href: "/for-investors" as const, label: t("nav.forInvestors") },
   ];
 
   const headerCtaBase = "twin-header-cta twin-touch-target";

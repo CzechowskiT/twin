@@ -282,6 +282,7 @@ export function footerExploreHrefsForPersona(persona: MarketingPersona): string[
   return [
     ...common,
     "/for-candidates",
+    "/for-investors",
     "/workspace/candidate",
     "/login/candidate",
     "/register/candidate",
