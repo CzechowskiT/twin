@@ -107,6 +107,9 @@ def process_user_nightly_auto_apply(
     consent: AutoApplyConsent,
     settings: Settings,
     submit: bool = True,
+    max_jobs: int | None = None,
+    cooldown_seconds: int | None = None,
+    application_method: str = METHOD_NIGHTLY,
 ) -> dict[str, Any]:
     """Apply to top eligible matches for one user."""
     result: dict[str, Any] = {
@@ -138,7 +141,17 @@ def process_user_nightly_auto_apply(
         result["skipped_reason"] = "no_matches"
         return result
 
-    cooldown = max(0, int(settings.nightly_auto_apply_cooldown_seconds))
+    if max_jobs is not None:
+        matches = matches[: max(0, int(max_jobs))]
+
+    cooldown = max(
+        0,
+        int(
+            cooldown_seconds
+            if cooldown_seconds is not None
+            else settings.nightly_auto_apply_cooldown_seconds
+        ),
+    )
     for match in matches:
         job = match.job
         try:
@@ -162,7 +175,7 @@ def process_user_nightly_auto_apply(
 
         if outcome in (ApplyOutcome.SUBMITTED, ApplyOutcome.FORM_FILLED) and app is not None:
             app.auto_applied = True
-            app.application_method = METHOD_NIGHTLY
+            app.application_method = application_method
             db.add(app)
             result["applications_submitted"] += 1
             consent.total_applications_submitted = int(consent.total_applications_submitted or 0) + 1
