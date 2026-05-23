@@ -179,16 +179,35 @@ export type HeaderGrowthLink = {
   variant: GrowthCtaVariant;
 };
 
+export type HeaderSessionProductLink = {
+  href: string;
+  labelKey: "nav.demo";
+};
+
+/** Logged-in candidate product shortcuts (demo walkthrough + live apply). */
+export function headerCandidateSessionLinks(
+  persona: MarketingPersona,
+  hasSession: boolean,
+): HeaderSessionProductLink[] {
+  if (!hasSession || persona !== "candidate") return [];
+  return [{ href: "/demo", labelKey: "nav.demo" }];
+}
+
 /**
- * One primary marketing CTA beside the logo (logged-out only).
- * Logged-in users use PersonaSwitcher → workspace; no duplicate pills here.
+ * One primary marketing CTA beside the logo.
+ * Logged-out: persona-specific growth pill. Logged-in candidates: keep Demo for founder walkthroughs.
  */
 export function headerGrowthLinksForPersona(
   persona: MarketingPersona,
   pathname: string,
   hasSession: boolean,
 ): HeaderGrowthLink[] {
-  if (hasSession) return [];
+  if (hasSession) {
+    if (persona === "candidate") {
+      return [{ href: "/demo", labelKey: "nav.demo", variant: "candidate" }];
+    }
+    return [];
+  }
   const path = normalizePath(pathname);
   // Homepage hero carries register + wishlist; header pill surfaces founding list without scrolling.
   if (path === "/" && persona === "candidate") {

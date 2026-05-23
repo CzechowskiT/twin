@@ -8,10 +8,13 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 import { useTranslation } from "@/components/language-provider";
 import { PersonaSwitcher } from "@/components/persona-switcher";
 import { useMarketingPersona } from "@/components/persona-provider";
+import { apiFetch } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
+import { isDemoUserEmail } from "@/lib/demo-user";
 import {
   type GrowthCtaVariant,
   headerAccountLinks,
+  headerCandidateSessionLinks,
   headerGrowthLinksForPersona,
   showCandidateProductNav,
 } from "@/lib/persona-access";
@@ -36,13 +39,17 @@ export function SiteHeaderBar({ showPersonaSwitcher }: SiteHeaderBarProps) {
   const router = useRouter();
   const mobileMenuRef = useRef<HTMLDetailsElement>(null);
   const [hasSession, setHasSession] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const growthLinks = headerGrowthLinksForPersona(persona, pathname, hasSession);
+  const sessionProductLinks = headerCandidateSessionLinks(persona, hasSession);
   const showCandidateNav = showCandidateProductNav(persona);
   const accountLinks = headerAccountLinks(persona, hasSession);
   const calendarActive = pathname === "/dashboard/calendar" || pathname.startsWith("/dashboard/calendar/");
+  const demoActive = pathname === "/demo" || pathname.startsWith("/demo/");
   const dashboardSectionActive =
     pathname === "/dashboard" ||
     (pathname.startsWith("/dashboard/") && !pathname.startsWith("/dashboard/calendar"));
+  const highlightDemoNav = isDemoUserEmail(userEmail);
 
   useEffect(() => {
     const sync = () => setHasSession(Boolean(getToken()));
@@ -50,6 +57,25 @@ export function SiteHeaderBar({ showPersonaSwitcher }: SiteHeaderBarProps) {
     window.addEventListener("storage", sync);
     return () => window.removeEventListener("storage", sync);
   }, [pathname]);
+
+  useEffect(() => {
+    const token = getToken();
+    if (!token || !hasSession) {
+      setUserEmail(null);
+      return;
+    }
+    let cancelled = false;
+    void apiFetch<{ email?: string }>("/api/v1/auth/me", {}, token)
+      .then((me) => {
+        if (!cancelled) setUserEmail(me.email ?? null);
+      })
+      .catch(() => {
+        if (!cancelled) setUserEmail(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [hasSession, pathname]);
 
   const closeMobileMenu = () => {
     const d = mobileMenuRef.current;
@@ -74,6 +100,9 @@ export function SiteHeaderBar({ showPersonaSwitcher }: SiteHeaderBarProps) {
 
   const headerCtaBase = "twin-header-cta twin-touch-target";
   const calendarClassName = `${headerCtaBase} twin-header-cta--ghost twin-header-cta--calendar`;
+  const demoNavClassName = `${headerCtaBase} twin-header-cta--ghost twin-header-cta--demo${
+    highlightDemoNav ? " twin-header-cta--demo-pulse" : ""
+  }`;
   const linkClass = "twin-nav-link whitespace-nowrap";
   const accountOutlineClass =
     "twin-header-account-link twin-touch-target inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-[var(--twin-border)] bg-[var(--twin-card)] px-2.5 py-0 text-[11px] font-semibold leading-normal text-[var(--twin-accent)] transition hover:border-[var(--twin-accent)]/50 hover:bg-[var(--twin-accent-muted)] hover:text-[var(--twin-accent-hover)] sm:px-3 sm:text-[12px]";
@@ -99,7 +128,10 @@ export function SiteHeaderBar({ showPersonaSwitcher }: SiteHeaderBarProps) {
           {primaryGrowth ? (
             <Link
               href={primaryGrowth.href}
-              className={`${growthCtaClass(primaryGrowth.variant, headerCtaBase)} hidden sm:inline-flex`}
+              className={`${growthCtaClass(primaryGrowth.variant, headerCtaBase)} hidden sm:inline-flex${
+                primaryGrowth.href === "/demo" && highlightDemoNav ? " twin-header-cta--demo-pulse" : ""
+              }`}
+              aria-current={primaryGrowth.href === "/demo" && demoActive ? "page" : undefined}
             >
               {t(primaryGrowth.labelKey)}
             </Link>
@@ -124,13 +156,25 @@ export function SiteHeaderBar({ showPersonaSwitcher }: SiteHeaderBarProps) {
 
         <div className="ml-auto flex min-w-0 shrink-0 flex-wrap items-center justify-end gap-x-2 gap-y-1">
           {showCandidateNav && hasSession ? (
-            <Link
-              href="/dashboard/calendar"
-              className={`${calendarClassName} hidden md:inline-flex ${calendarActive ? "twin-header-cta--active" : ""}`}
-              aria-current={calendarActive ? "page" : undefined}
-            >
-              {t("dashboard.calendarLink")}
-            </Link>
+            <>
+              {sessionProductLinks.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`${demoNavClassName} hidden md:inline-flex ${demoActive ? "twin-header-cta--active" : ""}`}
+                  aria-current={demoActive ? "page" : undefined}
+                >
+                  {t(item.labelKey)}
+                </Link>
+              ))}
+              <Link
+                href="/dashboard/calendar"
+                className={`${calendarClassName} hidden md:inline-flex ${calendarActive ? "twin-header-cta--active" : ""}`}
+                aria-current={calendarActive ? "page" : undefined}
+              >
+                {t("dashboard.calendarLink")}
+              </Link>
+            </>
           ) : null}
           {accountLinks.map((item) =>
             item.isLogout ? (
@@ -170,13 +214,27 @@ export function SiteHeaderBar({ showPersonaSwitcher }: SiteHeaderBarProps) {
                 <Link
                   href={primaryGrowth.href}
                   onClick={closeMobileMenu}
-                  className={`${growthCtaClass(primaryGrowth.variant, headerCtaBase)} mb-2 w-full`}
+                  className={`${growthCtaClass(primaryGrowth.variant, headerCtaBase)} mb-2 w-full${
+                    primaryGrowth.href === "/demo" && highlightDemoNav ? " twin-header-cta--demo-pulse" : ""
+                  }`}
+                  aria-current={primaryGrowth.href === "/demo" && demoActive ? "page" : undefined}
                 >
                   {t(primaryGrowth.labelKey)}
                 </Link>
               ) : null}
               {showCandidateNav && hasSession ? (
                 <>
+                  {sessionProductLinks.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={closeMobileMenu}
+                      className={`${demoNavClassName} mb-2 w-full ${demoActive ? "twin-header-cta--active" : ""}`}
+                      aria-current={demoActive ? "page" : undefined}
+                    >
+                      {t(item.labelKey)}
+                    </Link>
+                  ))}
                   <Link
                     href="/dashboard/calendar"
                     onClick={closeMobileMenu}
