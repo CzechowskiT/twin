@@ -16,6 +16,8 @@ import toast from "react-hot-toast";
 import { useTranslation } from "@/components/language-provider";
 import { DemoAutoApplyTheater } from "@/components/marketing/demo-auto-apply-theater";
 import { DemoLiveSnapshot } from "@/components/marketing/demo-live-snapshot";
+import { DemoMatchGauge } from "@/components/marketing/demo-match-gauge";
+import { LandingAmbient } from "@/components/marketing/landing-ambient";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
@@ -270,22 +272,28 @@ export function DemoAutoApplyPage() {
     <Shell wide rail>
       <MarketingPageSurface wide withCard={false}>
         <div className="marketing-copy-rail space-y-10 sm:space-y-12">
-          <header className="space-y-4">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
-              {t("demo.pageEyebrow")}
-            </p>
-            <h1 className="twin-page-intro twin-section-title max-w-4xl text-2xl sm:text-3xl md:text-4xl">{t("demo.pageTitle")}</h1>
-            <p className="max-w-3xl text-base leading-relaxed text-[var(--twin-muted-strong)] sm:text-lg">{t("demo.pageLead")}</p>
+          <header className="demo-hero relative overflow-hidden rounded-3xl border border-[var(--twin-border)]/60 px-5 py-8 sm:px-8 sm:py-10">
+            <LandingAmbient />
+            <motion.div className="demo-hero__grid pointer-events-none absolute inset-0" aria-hidden />
+            <div className="relative space-y-4">
+              <p className="demo-hero__eyebrow text-[10px] font-semibold uppercase tracking-[0.32em] text-[var(--twin-accent)]">
+                {t("demo.pageEyebrow")}
+              </p>
+              <h1 className="marketing-gradient-heading max-w-4xl text-2xl font-semibold leading-tight tracking-[-0.03em] sm:text-3xl md:text-4xl lg:text-[2.65rem]">
+                {t("demo.pageTitle")}
+              </h1>
+              <p className="max-w-3xl text-base leading-relaxed text-[var(--twin-muted-strong)] sm:text-lg">{t("demo.pageLead")}</p>
+            </div>
           </header>
 
           <DemoLiveSnapshot />
 
-          <aside
-            className="rounded-2xl border border-amber-200/90 bg-amber-50/95 px-4 py-3 text-sm leading-relaxed text-amber-950 shadow-sm dark:border-amber-500/30 dark:bg-amber-950/40 dark:text-amber-100"
-            role="status"
-          >
-            <p className="font-semibold">{t("demo.simulationTitle")}</p>
-            <p className="mt-1 opacity-95">{t("demo.simulationBody")}</p>
+          <aside className="demo-mode-pill flex flex-wrap items-start gap-3 px-4 py-3 sm:px-5" role="status">
+            <span className="demo-mode-pill__dot mt-1.5 shrink-0" aria-hidden />
+            <div className="min-w-0 flex-1 text-sm leading-relaxed">
+              <p className="font-semibold text-[var(--foreground)]">{t("demo.simulationTitle")}</p>
+              <p className="mt-1 text-[var(--twin-muted-strong)]">{t("demo.simulationBody")}</p>
+            </div>
           </aside>
 
           {isLoggedIn ? (
