@@ -1,0 +1,20 @@
+---
+description: Automatically commit and push completed work without waiting to be asked
+alwaysApply: true
+---
+
+# Git: auto commit and push
+
+When you finish a coherent unit of work (feature, fix, or setup) with file changes:
+
+1. **Commit** without waiting for the user to ask.
+   - Stage only files related to the task (never `.env`, credentials, or unrelated edits).
+   - Use a concise commit message focused on why.
+
+2. **Push** after a successful commit.
+   - Push the current branch (`git push -u origin HEAD` if no upstream).
+   - Do not force-push to `main`/`master` unless explicitly requested.
+
+3. **If push fails** (no remote, auth): report the blocker and the exact command the user needs.
+
+4. **Exceptions**: user said not to commit; review-only tasks; unrelated dirty files.
