@@ -60,11 +60,27 @@ def health_check(
 
         s = get_settings()
         out["mail_configured"] = is_mail_configured(s)
+        from app.services.auth_oauth_redirect import (
+            effective_apple_redirect_uri,
+            effective_github_redirect_uri,
+            effective_google_redirect_uri,
+        )
+        from app.services.apple_oauth import is_apple_configured
+        from app.services.github_oauth import is_github_configured
+        from app.services.google_oauth import is_google_configured
+        from app.services.microsoft_oauth import is_microsoft_configured
         from app.services.calendar_oauth_redirect import (
             effective_google_calendar_redirect_uri,
             effective_microsoft_calendar_redirect_uri,
         )
 
+        out["google_oauth_configured"] = is_google_configured()
+        out["github_oauth_configured"] = is_github_configured()
+        out["apple_oauth_configured"] = is_apple_configured()
+        out["microsoft_oauth_configured"] = is_microsoft_configured()
+        out["google_redirect_uri"] = effective_google_redirect_uri(s)
+        out["github_redirect_uri"] = effective_github_redirect_uri(s)
+        out["apple_redirect_uri"] = effective_apple_redirect_uri(s)
         out["google_calendar_configured"] = is_google_calendar_oauth_configured()
         out["microsoft_calendar_configured"] = is_microsoft_calendar_oauth_configured()
         out["google_calendar_redirect_uri"] = effective_google_calendar_redirect_uri(s)

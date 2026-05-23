@@ -21,7 +21,10 @@ def _explicit_env(name: str) -> str:
 
 
 def effective_google_redirect_uri(settings: Settings) -> str:
-    """GOOGLE_REDIRECT_URI when set; otherwise API_URL + auth callback path."""
+    """
+    GOOGLE_REDIRECT_URI when set; otherwise API_URL + auth callback path.
+    Never FRONTEND_URL — Google redirects to the API host.
+    """
     explicit = _explicit_env("GOOGLE_REDIRECT_URI")
     if explicit:
         return _strip_trailing_slash_url(explicit)
@@ -43,6 +46,7 @@ def effective_apple_redirect_uri(settings: Settings) -> str:
 
 
 def dev_auth_redirect_uri_hints() -> dict[str, list[str]]:
+    """URIs to whitelist when testing locally (direct API vs Next.js proxy)."""
     return {
         "google": [
             f"{_DEFAULT_API_BASE}{_GOOGLE_CALLBACK_PATH}",
