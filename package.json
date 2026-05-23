@@ -9,7 +9,8 @@
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "setup": "node scripts/setup.mjs",
-    "push": "git push twin main:cursor/stripe-checkout-app"
+    "sync-keys": "node scripts/sync-stripe-env.mjs",
+    "push": "git push twin HEAD:cursor/stripe-checkout-app"
   },
   "engines": {
     "node": ">=20"
