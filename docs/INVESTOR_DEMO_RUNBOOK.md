@@ -185,7 +185,8 @@ cd backend && pytest tests/test_demo_snapshot.py tests/test_seed_investor_demo.p
 | Mail | `RESEND_API_KEY`, `MAIL_FROM` |
 | Stripe | Skipped in demo — optional `STRIPE_*` |
 
-Checklist: [RAILWAY_PROD_ENV_CHECKLIST.md](./RAILWAY_PROD_ENV_CHECKLIST.md)
+Checklist: [RAILWAY_PROD_ENV_CHECKLIST.md](./RAILWAY_PROD_ENV_CHECKLIST.md)  
+Demo env only: [RAILWAY_DEMO_ENV_CHECKLIST.md](./RAILWAY_DEMO_ENV_CHECKLIST.md)
 
 ## Release / compare
 

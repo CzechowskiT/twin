@@ -20,6 +20,18 @@ Alternatywnie: strona główna https://twin-sooty.vercel.app → **Zaloguj się*
 
 Hasło można zresetować bez Twojej pracy w terminalu — wystarczy prośba do zespołu dev.
 
+### Jednolinijkowiec dla dev (seed na produkcji)
+
+W Railway: **Postgres → Connect → `DATABASE_PUBLIC_URL`**, potem w terminalu (hasło **nie** commituj):
+
+```bash
+export DATABASE_URL='…wklej DATABASE_PUBLIC_URL…'
+export DEMO_USER_PASSWORD='twoje-haslo-12-znakow'
+python3 scripts/seed-investor-demo.py --reset-password
+```
+
+API musi mieć `DEMO_MODE_ENABLED=true` i `DEMO_USER_EMAIL=demo@twin.career` — patrz [RAILWAY_DEMO_ENV_CHECKLIST.md](./RAILWAY_DEMO_ENV_CHECKLIST.md).
+
 ## Dashboard (oferty) zamiast onboardingu
 
 Po zalogowaniu kliknij **Panel** / **Dashboard**. Jeśli widzisz krok **5/5 — CV**:
