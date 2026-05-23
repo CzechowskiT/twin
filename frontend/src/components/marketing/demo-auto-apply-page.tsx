@@ -28,9 +28,13 @@ import {
 } from "@/lib/demo-auto-apply-data";
 import { playDemoStepChime, playDemoSuccessChime } from "@/lib/demo-auto-apply-sound";
 import {
+  activeDemoStepIndex,
+  advanceDemoStepStates,
+  createInitialDemoStepStates,
   DEMO_MATCH_SCORE_START,
   DEMO_SEQUENCE_STEPS,
   DEMO_STEP_MS,
+  jumpToDemoStepStates,
   type DemoPlayPhase,
   type DemoStepState,
 } from "@/lib/demo-auto-apply-sequence";
@@ -59,7 +63,7 @@ export function DemoAutoApplyPage() {
   const [cvText, setCvText] = useState<string>("");
   const [cvError, setCvError] = useState(false);
   const [playPhase, setPlayPhase] = useState<DemoPlayPhase>("idle");
-  const [stepStates, setStepStates] = useState<DemoStepState[]>(() => DEMO_SEQUENCE_STEPS.map(() => "pending"));
+  const [stepStates, setStepStates] = useState<DemoStepState[]>(createInitialDemoStepStates);
   const [animatedScore, setAnimatedScore] = useState(DEMO_MATCH_SCORE_START);
   const [showConfetti, setShowConfetti] = useState(false);
   const [soundOn, setSoundOn] = useState(false);
@@ -69,6 +73,7 @@ export function DemoAutoApplyPage() {
   const [applyTargetError, setApplyTargetError] = useState(false);
   const timersRef = useRef<number[]>([]);
   const scoreRafRef = useRef<number | null>(null);
+  const theaterRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -127,34 +132,28 @@ export function DemoAutoApplyPage() {
     clearTimers();
     setPlayPhase("playing");
     setShowConfetti(false);
-    setStepStates(DEMO_SEQUENCE_STEPS.map(() => "pending"));
     setAnimatedScore(DEMO_MATCH_SCORE_START);
+    const initial = createInitialDemoStepStates();
+    initial[0] = "active";
+    setStepStates(initial);
+    playDemoStepChime(soundOn);
 
     let tAccum = 0;
     DEMO_SEQUENCE_STEPS.forEach((_, idx) => {
-      const startDelay = tAccum;
-      const id1 = window.setTimeout(() => {
-        setStepStates((prev) => {
-          const next = [...prev];
-          for (let j = 0; j < idx; j += 1) next[j] = "done";
-          next[idx] = "active";
-          for (let j = idx + 1; j < next.length; j += 1) next[j] = "pending";
-          return next;
-        });
-        if (idx !== 1) playDemoStepChime(soundOn);
-        if (idx === 1) animateMatchScore(soundOn);
-      }, startDelay);
-      timersRef.current.push(id1);
-
       tAccum += DEMO_STEP_MS[idx] ?? 1500;
-      const id2 = window.setTimeout(() => {
-        setStepStates((prev) => {
-          const next = [...prev];
-          next[idx] = "done";
+      const stepIdx = idx;
+      const id = window.setTimeout(() => {
+        setStepStates(() => {
+          const next = createInitialDemoStepStates();
+          for (let j = 0; j <= stepIdx; j += 1) next[j] = "done";
+          if (stepIdx + 1 < next.length) next[stepIdx + 1] = "active";
           return next;
         });
+        const nextActive = stepIdx + 1;
+        if (nextActive === 1) animateMatchScore(soundOn);
+        else if (nextActive < DEMO_SEQUENCE_STEPS.length) playDemoStepChime(soundOn);
       }, tAccum);
-      timersRef.current.push(id2);
+      timersRef.current.push(id);
     });
 
     const idDone = window.setTimeout(() => {
@@ -170,10 +169,7 @@ export function DemoAutoApplyPage() {
     (idx: number) => {
       clearTimers();
       setShowConfetti(false);
-      const states = DEMO_SEQUENCE_STEPS.map((_, i) =>
-        i < idx ? "done" : i === idx ? "active" : "pending",
-      ) as DemoStepState[];
-      setStepStates(states);
+      setStepStates(jumpToDemoStepStates(idx));
       setAnimatedScore(idx >= 1 ? DEMO_MATCH_SCORE : DEMO_MATCH_SCORE_START);
       setPlayPhase("idle");
     },
@@ -183,29 +179,31 @@ export function DemoAutoApplyPage() {
   const advanceManualStep = useCallback(() => {
     clearTimers();
     setShowConfetti(false);
+    if (playPhase === "playing") setPlayPhase("idle");
+
     setStepStates((prev) => {
-      const next = [...prev];
-      const active = next.indexOf("active");
-      if (active >= 0) {
-        next[active] = "done";
-        if (active + 1 < next.length) next[active + 1] = "active";
-        else setPlayPhase("done");
-        if (active + 1 === 1) animateMatchScore(soundOn);
-        return next;
+      const { states, completed } = advanceDemoStepStates(prev);
+      const active = activeDemoStepIndex(states);
+      if (active === 1) animateMatchScore(soundOn);
+      else if (active > 0) playDemoStepChime(soundOn);
+      if (completed) {
+        setPlayPhase("done");
+        setShowConfetti(true);
+        playDemoSuccessChime(soundOn);
       }
-      const firstP = next.indexOf("pending");
-      if (firstP >= 0) {
-        for (let j = 0; j < firstP; j += 1) next[j] = "done";
-        next[firstP] = "active";
-        setPlayPhase("playing");
-        if (firstP === 1) animateMatchScore(soundOn);
-        return next;
-      }
-      return next;
+      return states;
     });
-  }, [animateMatchScore, clearTimers, soundOn]);
+  }, [animateMatchScore, clearTimers, playPhase, soundOn]);
 
   useEffect(() => () => clearTimers(), [clearTimers]);
+
+  useEffect(() => {
+    const active = activeDemoStepIndex(stepStates);
+    if (active < 0) return;
+    const reduced =
+      typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    theaterRef.current?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "nearest" });
+  }, [stepStates]);
 
   useEffect(() => {
     const token = getToken();
@@ -313,8 +311,8 @@ export function DemoAutoApplyPage() {
             <button
               type="button"
               onClick={advanceManualStep}
-              disabled={playPhase === "playing"}
-              className="section-cta-secondary twin-touch-target min-w-[10rem] px-5 text-sm disabled:opacity-50"
+              className="section-cta-secondary twin-touch-target min-w-[10rem] px-5 text-sm"
+              aria-label={t("demo.nextStep")}
             >
               {t("demo.nextStep")}
             </button>
@@ -412,6 +410,7 @@ export function DemoAutoApplyPage() {
           </div>
 
           <DemoAutoApplyTheater
+            ref={theaterRef}
             playPhase={playPhase}
             stepStates={stepStates}
             animatedScore={animatedScore}

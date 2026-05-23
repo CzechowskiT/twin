@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { forwardRef } from "react";
 
 import { DemoConfettiBurst } from "@/components/marketing/demo-confetti-burst";
 import { useTranslation } from "@/components/language-provider";
@@ -32,19 +33,22 @@ const SCAN_JOBS = [
   { title: "Staff Platform Engineer", board: "pracuj.pl" },
 ] as const;
 
-export function DemoAutoApplyTheater({
-  playPhase,
-  stepStates,
-  animatedScore,
-  showConfetti,
-  onConfettiDone,
-  onJumpToStep,
-  isLoggedIn,
-  canRunLiveApply,
-  realApplying,
-  applyTargetError,
-  onRunRealApply,
-}: DemoAutoApplyTheaterProps) {
+export const DemoAutoApplyTheater = forwardRef<HTMLElement, DemoAutoApplyTheaterProps>(function DemoAutoApplyTheater(
+  {
+    playPhase,
+    stepStates,
+    animatedScore,
+    showConfetti,
+    onConfettiDone,
+    onJumpToStep,
+    isLoggedIn,
+    canRunLiveApply,
+    realApplying,
+    applyTargetError,
+    onRunRealApply,
+  },
+  ref,
+) {
   const { t } = useTranslation();
   const activeIdx = stepStates.findIndex((s) => s === "active");
   const doneCount = stepStates.filter((s) => s === "done").length;
@@ -56,6 +60,7 @@ export function DemoAutoApplyTheater({
 
   return (
     <section
+      ref={ref}
       aria-labelledby="demo-theater-heading"
       className="demo-auto-apply-theater relative overflow-hidden rounded-2xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/95 p-5 shadow-md sm:p-6"
     >
@@ -212,4 +217,4 @@ export function DemoAutoApplyTheater({
       </div>
     </section>
   );
-}
+});

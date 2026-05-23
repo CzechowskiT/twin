@@ -68,14 +68,14 @@ export function verifyDemoStepSequenceLogic(): void {
   if (activeDemoStepIndex(states) !== 1) throw new Error("expected step 1 active");
   states = jumpToDemoStepStates(3);
   if (activeDemoStepIndex(states) !== 3) throw new Error("expected jump to step 3");
+
+  states = createInitialDemoStepStates();
   for (let i = 0; i < DEMO_SEQUENCE_STEPS.length; i += 1) {
     const r = advanceDemoStepStates(states);
     states = r.states;
-    if (i < DEMO_SEQUENCE_STEPS.length - 1 && r.completed) {
-      throw new Error("completed too early");
-    }
-    if (i === DEMO_SEQUENCE_STEPS.length - 1 && !r.completed) {
-      throw new Error("expected completed on last advance");
-    }
+    if (r.completed) throw new Error(`completed early at step ${i}`);
+    if (activeDemoStepIndex(states) !== i) throw new Error(`expected active step ${i}`);
   }
+  const final = advanceDemoStepStates(states);
+  if (!final.completed) throw new Error("expected completed on final advance");
 }

@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:demo-sequence": "npx --yes tsx scripts/verify-demo-sequence.ts",
+    "test:cookie-consent": "npx --yes tsx scripts/cookie-consent-parse.test.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
