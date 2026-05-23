@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 
-/** Mobile-only sticky Register bar after scroll — does not block demo in hero. */
+/** Mobile-only sticky wishlist bar after scroll — primary founding funnel action. */
 export function LandingStickyCta() {
   const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
@@ -29,10 +29,10 @@ export function LandingStickyCta() {
           <p className="truncate text-[11px] text-[var(--twin-muted)]">{t("home.stickyCtaMicro")}</p>
         </div>
         <Link
-          href="/register"
-          className="section-cta-primary marketing-btn-primary-shadow twin-touch-target shrink-0 !min-h-[2.5rem] px-5 text-sm"
+          href="/waitlist"
+          className="twin-header-cta twin-nav-waitlist-pill twin-touch-target shrink-0 !min-h-[2.5rem] px-5 text-sm"
         >
-          {t("home.getStarted")}
+          {t("home.joinWishlist")}
         </Link>
       </div>
     </div>

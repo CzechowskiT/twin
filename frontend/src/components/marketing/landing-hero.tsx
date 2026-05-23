@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useTranslation } from "@/components/language-provider";
+import { FoundingCounterStrip } from "@/components/marketing/founding-counter-strip";
+import { FoundingOfferPreview } from "@/components/marketing/founding-offer-preview";
 import { LandingLiveProof } from "@/components/marketing/landing-live-proof";
 import { ScrollReveal } from "@/components/marketing/scroll-reveal";
 
@@ -24,7 +26,10 @@ export function LandingHero() {
         </p>
         <p className="mt-3 max-w-lg text-sm leading-relaxed text-[var(--twin-muted-strong)] sm:text-base">{t("home.description")}</p>
 
-        <div className="mt-10 flex flex-col gap-4 sm:mt-12">
+        <FoundingOfferPreview />
+        <FoundingCounterStrip className="mt-4" />
+
+        <div className="mt-8 flex flex-col gap-4 sm:mt-10">
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start">
             <div className="flex flex-col gap-2">
               <Link
@@ -33,11 +38,12 @@ export function LandingHero() {
               >
                 {t("home.joinWishlist")}
               </Link>
+              <p className="max-w-sm text-xs font-medium text-[var(--twin-muted-strong)]">{t("home.joinWishlistMicro")}</p>
             </div>
             <div className="flex flex-col gap-2">
               <Link
                 href="/register"
-                className="landing-hero-register-cta section-cta-primary marketing-hero-btn-cta marketing-btn-primary-shadow twin-touch-target w-full max-w-sm transition duration-200 sm:w-auto"
+                className="landing-hero-register-cta section-cta-secondary marketing-hero-btn-cta twin-touch-target w-full max-w-sm transition duration-200 sm:w-auto"
               >
                 {t("home.getStarted")}
               </Link>
