@@ -73,4 +73,3 @@ Minimal production-style integration using **Stripe Checkout Sessions** (hosted 
 - `npm run build` — compile TypeScript to `dist/`
 - `npm start` — run compiled production build
 - `npm run typecheck` — type check without emit
-# stripe-checkout-app
