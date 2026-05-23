@@ -14,6 +14,7 @@
 
 - [ ] `./scripts/verify-investor-demo-ready.sh` → `READY`
 - [ ] `./scripts/ops-refresh-recruiter-inbox.sh` if inbox was used recently
+- [ ] `./scripts/ops-seed-placement-verify.sh` if `verified_placements` is 0 (after API deploy)
 - [ ] Tabs open: Home → Demo → Dashboard → Calendar → Investor metrics → Recruiter inbox (token URL)
 - [ ] Recruiter token from vault (not on slides)
 - [ ] Backup: screenshot of `live_db` snapshot JSON if API flaky
@@ -67,6 +68,8 @@
 | Batch accept one row | “State moves to interview—feeds candidate calendar.” |
 
 **Empty inbox fallback:** `./scripts/ops-refresh-recruiter-inbox.sh`.
+
+**Zero verified placements:** `./scripts/ops-seed-placement-verify.sh` (or talking point: verification machine shipped, first fees post-launch).
 
 ### Investor lane (2.5 min)
 

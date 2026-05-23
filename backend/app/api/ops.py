@@ -12,7 +12,11 @@ from app.config import Settings, get_settings
 from app.core.deps import get_db
 from app.database.models import AutoApplyRun
 from app.schemas.ops import AutoApplyLastRunOut
-from app.services.investor_demo_seed import DEMO_RECRUITER_COMPANY, ensure_recruiter_inbox_demo
+from app.services.investor_demo_seed import (
+    DEMO_RECRUITER_COMPANY,
+    ensure_demo_placement_verified,
+    ensure_recruiter_inbox_demo,
+)
 from app.services.recruiter_inbox import build_recruiter_batch
 from app.utils.slug import slugify_company
 
@@ -59,3 +63,16 @@ def ops_refresh_recruiter_inbox_demo(
         "inbox_after_total": after["total"],
         "inbox_applied": sum(1 for item in after["items"] if item["status"] == "applied"),
     }
+
+
+@router.post("/demo/placement-verify-seed")
+def ops_seed_demo_placement_verified(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+) -> dict:
+    """Mark investor-demo application as placement verified (ops token; no DATABASE_URL CLI)."""
+    _require_ops_admin(settings, authorization)
+    summary = ensure_demo_placement_verified(db)
+    db.commit()
+    return summary

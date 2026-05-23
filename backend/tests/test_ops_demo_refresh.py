@@ -89,3 +89,68 @@ def test_ops_recruiter_inbox_refresh_resets_applied() -> None:
         app.dependency_overrides.pop(get_db, None)
         app.dependency_overrides.pop(get_settings, None)
         db.close()
+
+
+def test_ops_placement_verify_seed_marks_hired() -> None:
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+    db = Session()
+    now = datetime.now(timezone.utc)
+    user = User(
+        email="demo@twin.career",
+        hashed_password="x",
+        gdpr_consent_at=now,
+    )
+    db.add(user)
+    db.flush()
+    cand = Candidate(user_id=user.id, name="Alex", skills="[]", preferred_job_titles="[]")
+    db.add(cand)
+    job = Job(
+        job_board="pracuj",
+        external_id="investor-demo-python-lead",
+        title="Engineer",
+        company="Nova Hiring PL",
+        url="https://example.com/j",
+        is_validated=True,
+    )
+    db.add(job)
+    db.flush()
+    app_row = Application(
+        candidate_id=cand.id,
+        job_id=job.id,
+        status=ApplicationStatus.APPLIED,
+        notes="Investor demo",
+    )
+    db.add(app_row)
+    db.commit()
+
+    def override_db():
+        try:
+            yield db
+        finally:
+            pass
+
+    app.dependency_overrides[get_db] = override_db
+    app.dependency_overrides[get_settings] = lambda: _OpsSettings()
+    try:
+        client = TestClient(app)
+        res = client.post(
+            "/api/v1/ops/demo/placement-verify-seed",
+            headers={"Authorization": "Bearer test-ops-token"},
+        )
+        assert res.status_code == 200
+        body = res.json()
+        assert body["verified"] is True
+        assert body["application_id"] == app_row.id
+        db.refresh(app_row)
+        assert app_row.placement_verified_at is not None
+        assert app_row.status == ApplicationStatus.HIRED
+    finally:
+        app.dependency_overrides.pop(get_db, None)
+        app.dependency_overrides.pop(get_settings, None)
+        db.close()
