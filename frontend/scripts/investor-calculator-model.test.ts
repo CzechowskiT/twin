@@ -79,3 +79,24 @@ run("default scale: negative net with honest placement take", () => {
   assert.ok(r.successFeeRevenue < r.subscriptionRevenue * 2);
   assert.ok(r.placementMrr > 0);
 });
+
+/** Organic scenario @ 100k users — deck sanity (USD model). */
+run("organic @ 100k: MRR/ARR/BEP/net internally consistent", () => {
+  const r = computeInvestorCalculator(INVESTOR_CALCULATOR_DEFAULTS);
+  assert.equal(Math.round(r.mrr), 75_916);
+  assert.equal(Math.round(r.arr), 910_988);
+  assert.equal(Math.round(r.breakEvenUsers), 153_942);
+  assert.equal(Math.round(r.netIncome), -357_412);
+  assert.ok(Math.abs(r.mrr - (r.subscriptionMrr + r.placementMrr)) < 0.02);
+  assert.ok(Math.abs(r.arr - r.totalRevenue) < 0.02);
+  assert.ok(Math.abs(r.margin - (r.netIncome / r.totalRevenue) * 100) < 0.05);
+});
+
+run("optimized scenario is profitable at 100k users", () => {
+  const r = computeInvestorCalculator({
+    ...INVESTOR_CALCULATOR_DEFAULTS,
+    ...patchScenario("optimized"),
+  });
+  assert.ok(r.netIncome > 0);
+  assert.ok(r.breakEvenUsers < INVESTOR_CALCULATOR_DEFAULTS.totalUsers);
+});

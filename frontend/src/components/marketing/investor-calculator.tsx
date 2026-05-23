@@ -8,11 +8,11 @@ import { useTranslation } from "@/components/language-provider";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { MvpLiveStatsStrip } from "@/components/marketing/mvp-live-stats-strip";
 import { Input, Shell } from "@/components/ui";
+import { convertModelUsdToDisplay } from "@/lib/calculator-fx";
 import { numberFormatLocaleForUi } from "@/lib/calculator-currencies";
 import {
   computeInvestorCalculator,
   INVESTOR_CALCULATOR_DEFAULTS,
-  LOCAL_PER_USD,
   patchScenario,
   type InvestorCalculatorInputs,
   type InvestorModelCurrency,
@@ -23,13 +23,9 @@ import { effectiveMonthlySubscriptionUsd, formatPlanPrice } from "@/lib/pricing-
 
 const INVESTOR_CURRENCIES: InvestorModelCurrency[] = ["USD", "EUR", "PLN", "GBP"];
 
-function usdToDisplayAmount(usd: number, currency: InvestorModelCurrency): number {
-  return usd * LOCAL_PER_USD[currency];
-}
-
 function formatModelMoney(usd: number, locale: Locale, currency: InvestorModelCurrency, maximumFractionDigits = 0) {
   const loc = numberFormatLocaleForUi(locale);
-  const amount = usdToDisplayAmount(usd, currency);
+  const amount = convertModelUsdToDisplay(usd, currency);
   try {
     return new Intl.NumberFormat(loc, {
       style: "currency",
