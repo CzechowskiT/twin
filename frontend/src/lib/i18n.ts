@@ -14,10 +14,6 @@ import {
   EMPLOYER_MEDIA_MESSAGES_PL,
 } from "./employer-media-messages";
 import {
-  EMPLOYER_FAQ_MESSAGES_EN,
-  EMPLOYER_FAQ_MESSAGES_PL,
-} from "./employer-faq-messages";
-import {
   EMPLOYER_ABOUT_MESSAGES_EN,
   EMPLOYER_ABOUT_MESSAGES_PL,
 } from "./employer-about-messages";
@@ -132,7 +128,6 @@ export type TranslationKey =
   | `ux.${keyof typeof en.ux}`
   | `employerMedia.${keyof typeof EMPLOYER_MEDIA_MESSAGES_EN}`
   | `jobEmployer.${keyof typeof JOB_EMPLOYER_MESSAGES_EN}`
-  | `jobEmployer.${keyof typeof EMPLOYER_FAQ_MESSAGES_EN}`
   | `employerAbout.${keyof typeof EMPLOYER_ABOUT_MESSAGES_EN}`;
 
 const en = {
@@ -2347,7 +2342,7 @@ const en = {
       "Order of delivery can change; some items may be tier-gated when they ship. Tell us what you would open weekly. It steers the roadmap.",
   },
   employerMedia: EMPLOYER_MEDIA_MESSAGES_EN,
-  jobEmployer: { ...JOB_EMPLOYER_MESSAGES_EN, ...EMPLOYER_FAQ_MESSAGES_EN },
+  jobEmployer: JOB_EMPLOYER_MESSAGES_EN,
   employerAbout: EMPLOYER_ABOUT_MESSAGES_EN,
   ux: {
     flowNavAria: "Your workspace steps",
@@ -4617,7 +4612,7 @@ const pl: MessageTree = {
       "Licznik opiera się na zapisach na liście życzeń po stronie API (BETA_WAITLIST_CAP, domyślnie 1000). „Za darmo na zawsze” dla foundersów to obietnica kampanii — ostateczne zasady w Regulaminie i Polityce prywatności.",
   },
   employerMedia: EMPLOYER_MEDIA_MESSAGES_PL,
-  jobEmployer: { ...JOB_EMPLOYER_MESSAGES_PL, ...EMPLOYER_FAQ_MESSAGES_PL },
+  jobEmployer: JOB_EMPLOYER_MESSAGES_PL,
   employerAbout: EMPLOYER_ABOUT_MESSAGES_PL,
   ux: {
     flowNavAria: "Kroki w Twojej przestrzeni roboczej",
