@@ -116,6 +116,44 @@ def test_respond_decline_stores_note() -> None:
         db.close()
 
 
+def test_respond_recruiter_batch_bulk() -> None:
+    db = _sqlite_session()
+    try:
+        user = User(email="bulk@example.com", hashed_password="x", gdpr_consent_at=datetime.now(timezone.utc))
+        db.add(user)
+        db.flush()
+        cand = Candidate(user_id=user.id, name="Bulk", skills="[]", preferred_job_titles="[]")
+        db.add(cand)
+        job = Job(
+            job_board="pracuj",
+            external_id="r-bulk",
+            title="Engineer",
+            company="Delta Co",
+            url="https://example.com/jb",
+            is_validated=True,
+        )
+        db.add(job)
+        db.flush()
+        apps = [
+            Application(candidate_id=cand.id, job_id=job.id, status=ApplicationStatus.APPLIED),
+            Application(candidate_id=cand.id, job_id=job.id, status=ApplicationStatus.APPLIED),
+        ]
+        db.add_all(apps)
+        db.commit()
+        from app.services.recruiter_inbox import respond_recruiter_batch_bulk
+
+        out = respond_recruiter_batch_bulk(
+            db,
+            company_slug="delta-co",
+            application_ids=[apps[0].id, apps[1].id],
+            action="accept",
+        )
+        assert out["succeeded"] == 2
+        assert out["failed"] == 0
+    finally:
+        db.close()
+
+
 def test_recruiter_api_requires_token(monkeypatch) -> None:
     from app.config import get_settings
 

@@ -53,6 +53,9 @@ export default function RecruiterInboxClient() {
   const [searchQuery, setSearchQuery] = useState("");
   const [declineTargetId, setDeclineTargetId] = useState<number | null>(null);
   const [declineNote, setDeclineNote] = useState("");
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [batchDeclineOpen, setBatchDeclineOpen] = useState(false);
+  const [batchDeclineNote, setBatchDeclineNote] = useState("");
   const autoLoadDone = useRef(false);
 
   const companyOptions = useMemo(
@@ -120,6 +123,7 @@ export default function RecruiterInboxClient() {
       }
       const data = (await res.json()) as { items: BatchRow[] };
       setRows(data.items ?? []);
+      setSelectedIds(new Set());
       setQueueLoaded(true);
     } catch (e) {
       setLoadError(e instanceof Error ? e.message : t("recruiterInbox.loadFailed"));
@@ -148,6 +152,64 @@ export default function RecruiterInboxClient() {
       return hay.includes(q);
     });
   }, [rows, statusFilter, searchQuery]);
+
+  const visibleIds = useMemo(() => filteredRows.map((r) => r.application_id), [filteredRows]);
+  const allVisibleSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedIds.has(id));
+
+  function toggleSelected(id: number) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAllVisible() {
+    setSelectedIds((prev) => {
+      if (allVisibleSelected) {
+        const next = new Set(prev);
+        for (const id of visibleIds) next.delete(id);
+        return next;
+      }
+      const next = new Set(prev);
+      for (const id of visibleIds) next.add(id);
+      return next;
+    });
+  }
+
+  async function respondBatch(action: "accept" | "decline", opts?: { decline_note?: string }) {
+    const tkn = token.trim();
+    const slug = companySlug;
+    const ids = [...selectedIds];
+    if (!tkn || !slug || ids.length === 0) return;
+    setBusyId(`batch-${action}`);
+    setLoadError(null);
+    try {
+      const q = recruiterInboxQuery(tkn, slug);
+      const body: { action: string; application_ids: number[]; decline_note?: string } = {
+        action,
+        application_ids: ids,
+      };
+      if (action === "decline" && opts?.decline_note?.trim()) {
+        body.decline_note = opts.decline_note.trim();
+      }
+      const res = await fetch(`/api/recruiter/inbox/respond-batch?${q}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      setBatchDeclineOpen(false);
+      setBatchDeclineNote("");
+      setSelectedIds(new Set());
+      await load();
+    } catch (e) {
+      setLoadError(e instanceof Error ? e.message : t("recruiterInbox.loadFailed"));
+    } finally {
+      setBusyId(null);
+    }
+  }
 
   async function respond(
     applicationId: number,
@@ -288,6 +350,67 @@ export default function RecruiterInboxClient() {
                 />
               </label>
             </div>
+            {filteredRows.length > 0 ? (
+              <div className="mt-4 flex flex-wrap items-center gap-3 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/60 px-3 py-2">
+                <label className="flex items-center gap-2 text-xs font-medium text-[var(--foreground)]">
+                  <input
+                    type="checkbox"
+                    checked={allVisibleSelected}
+                    onChange={toggleSelectAllVisible}
+                    className="h-4 w-4 rounded border-[var(--twin-border)]"
+                  />
+                  {t("recruiterInbox.selectAllVisible")}
+                </label>
+                <span className="text-xs text-[var(--twin-muted)]">
+                  {t("recruiterInbox.selectedCount").replace("{count}", String(selectedIds.size))}
+                </span>
+                <button
+                  type="button"
+                  className="twin-btn-solid text-xs"
+                  disabled={busyId !== null || selectedIds.size === 0}
+                  onClick={() => void respondBatch("accept")}
+                >
+                  {busyId === "batch-accept" ? t("common.loadingEllipsis") : t("recruiterInbox.batchAccept")}
+                </button>
+                <button
+                  type="button"
+                  className="twin-btn-ghost text-xs"
+                  disabled={busyId !== null || selectedIds.size === 0}
+                  onClick={() => {
+                    setBatchDeclineOpen(true);
+                    setBatchDeclineNote("");
+                  }}
+                >
+                  {t("recruiterInbox.batchDecline")}
+                </button>
+              </div>
+            ) : null}
+            {batchDeclineOpen ? (
+              <div className="mt-3 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/80 p-3">
+                <label className="block text-xs font-medium text-[var(--foreground)]">
+                  {t("recruiterInbox.declineNoteLabel")}
+                  <textarea
+                    className="twin-input mt-1 min-h-[4rem] w-full text-sm"
+                    value={batchDeclineNote}
+                    onChange={(e) => setBatchDeclineNote(e.target.value)}
+                    placeholder={t("recruiterInbox.declineNotePlaceholder")}
+                  />
+                </label>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    className="twin-btn-solid text-xs"
+                    disabled={busyId !== null}
+                    onClick={() => void respondBatch("decline", { decline_note: batchDeclineNote })}
+                  >
+                    {busyId === "batch-decline" ? t("common.loadingEllipsis") : t("recruiterInbox.batchDeclineConfirm")}
+                  </button>
+                  <button type="button" className="twin-btn-ghost text-xs" onClick={() => setBatchDeclineOpen(false)}>
+                    {t("recruiterInbox.declineCancel")}
+                  </button>
+                </div>
+              </div>
+            ) : null}
             {!loading && rows.length === 0 && !loadError ? (
               <p className="twin-muted mt-4 text-sm">{t("recruiterInbox.empty")}</p>
             ) : !loading && filteredRows.length === 0 ? (
@@ -299,6 +422,15 @@ export default function RecruiterInboxClient() {
                     key={r.application_id}
                     className="rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface)] px-4 py-3 text-sm"
                   >
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(r.application_id)}
+                        onChange={() => toggleSelected(r.application_id)}
+                        className="mt-1 h-4 w-4 shrink-0 rounded border-[var(--twin-border)]"
+                        aria-label={t("recruiterInbox.selectRow").replace("{name}", r.candidate_name)}
+                      />
+                      <div className="min-w-0 flex-1">
                     <p className="font-semibold">
                       {r.candidate_name} · {r.job_title}
                     </p>
@@ -365,6 +497,8 @@ export default function RecruiterInboxClient() {
                         </div>
                       </div>
                     ) : null}
+                      </div>
+                    </div>
                   </li>
                 ))}
               </ul>
