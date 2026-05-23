@@ -29,6 +29,18 @@ check ops_admin_configured True
 check celery_task_always_eager False
 check scrape_worker_ready True
 
+jobs=$(echo "$json" | python3 -c "import sys,json; print(json.load(sys.stdin).get('validated_jobs',-1))" 2>/dev/null || echo "-1")
+if [[ "${jobs}" == "-1" ]]; then
+  stats_json=$(curl -fsS "${API%/}/api/v1/public/mvp-stats" 2>/dev/null || echo "{}")
+  jobs=$(echo "$stats_json" | python3 -c "import sys,json; print(json.load(sys.stdin).get('validated_jobs',0))" 2>/dev/null || echo "0")
+fi
+if [[ "${jobs:-0}" -lt 1 ]]; then
+  echo "FAIL: validated_jobs expected >=1 got $jobs"
+  fail=1
+else
+  echo "OK: validated_jobs=$jobs"
+fi
+
 celery_json=$(curl -fsS "${API%/}/api/v1/health/celery-status" 2>/dev/null || echo "{}")
 echo "Celery status:"
 echo "$celery_json" | python3 -m json.tool 2>/dev/null || echo "$celery_json"
