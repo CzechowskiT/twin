@@ -25,6 +25,11 @@ if [[ ! -f "$FRONTEND/.vercel/project.json" ]]; then
 fi
 
 echo "Set NEXT_PUBLIC_DEMO_USER_EMAIL=$FOUNDER_EMAIL (production)"
-printf '%s' "$FOUNDER_EMAIL" | (cd "$FRONTEND" && "${CLI[@]}" env add NEXT_PUBLIC_DEMO_USER_EMAIL production --force)
+(cd "$FRONTEND" && "${CLI[@]}" env rm NEXT_PUBLIC_DEMO_USER_EMAIL production --yes 2>/dev/null || true)
+(cd "$FRONTEND" && "${CLI[@]}" env add NEXT_PUBLIC_DEMO_USER_EMAIL production \
+  --value "$FOUNDER_EMAIL" \
+  --no-sensitive \
+  --yes \
+  --force)
 
 echo "Redeploy: cd frontend && npx vercel --prod"
