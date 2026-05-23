@@ -53,7 +53,7 @@ Autonomous agent run for investor demo readiness.
 |------|--------|------------------|
 | Merge `cursor/data-room-s3-recruiter-inbox` + OAuth branches → scaffold | ✅ done | Merged `cursor/microsoft-railway-env-sync`, `cursor/oauth-sign-in-redirect-uris`, `cursor/oauth-railway-env-sync`; pushed `630e2d2`; `7446595` on scaffold |
 | Railway + Vercel redeploy | ✅ done | Railway env apply triggered redeploy; git push to scaffold triggers GitHub-integrated deploy |
-| `/status` & `health?ops=1` git_commit = HEAD | ✅ done | Prod `git_commit`: `630e2d2` on scaffold — re-check `/status` after Railway catches up) |
+| `/status` & `health?ops=1` git_commit = HEAD | ✅ done | Prod `git_commit`: `630e2d2` on scaffold — re-check `/status` after Railway catches up |
 
 ---
 
