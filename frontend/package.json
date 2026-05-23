@@ -11,7 +11,8 @@
     "test:cookie-consent": "npx --yes tsx scripts/cookie-consent-parse.test.ts",
     "test:pricing-locale": "npx --yes tsx scripts/pricing-locale.test.ts",
     "test:investor-calculator": "npx --yes tsx scripts/investor-calculator-model.test.ts",
-    "test:investor-calculator": "npx --yes tsx scripts/investor-calculator-model.test.ts"
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install chromium"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -25,6 +26,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.52.0",
     "@tailwindcss/postcss": "^4",
     "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^20",
