@@ -3,7 +3,7 @@
 import Link from "next/link";
 
 import { useTranslation } from "@/components/language-provider";
-import { LandingStoryJourney } from "@/components/marketing/landing-story-journey";
+import { HowItWorksPageContent } from "@/components/marketing/how-it-works-page-content";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { MvpLiveStatsStrip } from "@/components/marketing/mvp-live-stats-strip";
@@ -33,7 +33,7 @@ export default function HowItWorksPage() {
         <div className="mt-10">
           <MvpLiveStatsStrip />
         </div>
-        <LandingStoryJourney />
+        <HowItWorksPageContent />
       </MarketingPageSurface>
     </Shell>
   );
