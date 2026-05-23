@@ -35,21 +35,33 @@ const EXPLORE_LABEL_KEYS: Record<string, TranslationKey> = {
   "/for-recruiters": "nav.forRecruiters",
   "/for-companies": "nav.forCompanies",
   "/for-investors": "nav.forInvestors",
+  "/workspace/candidate": "workspace.candidateHome",
+  "/workspace/recruiter": "workspace.recruiterHome",
   "/workspace/investor": "workspace.investorHome",
   "/investor/calculator": "nav.calculatorInvestor",
+  "/investor/metrics": "investorMetrics.title",
   "/faq": "nav.faq",
   "/status": "site.footerStatus",
   "/developers": "site.footerDevelopers",
   "/calculator/b2b": "nav.calculator",
   "/register": "nav.register",
+  "/register/candidate": "site.footerCandidateRegister",
   "/login": "nav.login",
-  "/recruiter/inbox": "nav.forRecruiters",
+  "/login/candidate": "site.footerCandidateLogin",
+  "/login/recruiter": "site.footerRecruiterLogin",
+  "/login/investor": "site.footerInvestorLogin",
+  "/companies/signup": "site.footerCompanySignup",
+  "/recruiter/inbox": "recruiterInbox.title",
   "/contact": "nav.contact",
 };
 
 function exploreLabel(href: string, t: (key: TranslationKey) => string): string {
   const key = EXPLORE_LABEL_KEYS[href];
-  return key ? t(key) : href;
+  if (key) return t(key);
+  if (process.env.NODE_ENV !== "production") {
+    console.warn(`[SiteFooter] Missing explore label for href: ${href}`);
+  }
+  return t("site.footerExplore");
 }
 
 export function SiteFooter() {
