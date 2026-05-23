@@ -274,7 +274,7 @@ export function DemoAutoApplyPage() {
         <div className="marketing-copy-rail space-y-10 sm:space-y-12">
           <header className="demo-hero relative overflow-hidden rounded-3xl border border-[var(--twin-border)]/60 px-5 py-8 sm:px-8 sm:py-10">
             <LandingAmbient />
-            <motion.div className="demo-hero__grid pointer-events-none absolute inset-0" aria-hidden />
+            <div className="demo-hero__grid pointer-events-none absolute inset-0" aria-hidden />
             <div className="relative space-y-4">
               <p className="demo-hero__eyebrow text-[10px] font-semibold uppercase tracking-[0.32em] text-[var(--twin-accent)]">
                 {t("demo.pageEyebrow")}
@@ -297,12 +297,12 @@ export function DemoAutoApplyPage() {
           </aside>
 
           {isLoggedIn ? (
-            <aside
-              className="rounded-2xl border border-[var(--twin-accent)]/35 bg-[var(--twin-accent-muted)]/40 px-4 py-3 text-sm leading-relaxed text-[var(--twin-muted-strong)]"
-              role="status"
-            >
-              <p className="font-semibold text-[var(--foreground)]">{t("demo.liveApplyTitle")}</p>
-              <p className="mt-1">{t("demo.liveApplyBody")}</p>
+            <aside className="demo-live-pill flex flex-wrap items-start gap-3 px-4 py-3 sm:px-5" role="status">
+              <span className="demo-live-pill__dot mt-1.5 shrink-0" aria-hidden />
+              <div className="min-w-0 flex-1 text-sm leading-relaxed">
+                <p className="font-semibold text-[var(--foreground)]">{t("demo.liveApplyTitle")}</p>
+                <p className="mt-1 text-[var(--twin-muted-strong)]">{t("demo.liveApplyBody")}</p>
+              </div>
             </aside>
           ) : null}
 
@@ -334,55 +334,63 @@ export function DemoAutoApplyPage() {
           <div className="grid gap-6 lg:grid-cols-2">
             <section
               aria-labelledby="demo-cv-heading"
-              className={`flex flex-col rounded-2xl border bg-[var(--twin-surface-raised)]/90 p-5 shadow-sm transition-all duration-500 sm:p-6 ${
-                stepStates[2] === "active" ? "demo-theater-glow border-[var(--twin-accent)]/45" : "border-[var(--twin-border)]"
+              className={`demo-glass-panel flex flex-col p-5 transition-all duration-500 sm:p-6 ${
+                stepStates[2] === "active" ? "demo-theater-glow border-[var(--twin-accent)]/45" : ""
               }`}
             >
               <h2 id="demo-cv-heading" className="twin-section-title text-lg">
                 {t("demo.cvPanelTitle")}
               </h2>
-              <dl className="mt-4 space-y-2 text-sm text-[var(--twin-muted-strong)]">
-                <div className="flex flex-wrap gap-2">
-                  <dt className="font-semibold text-[var(--foreground)]">{t("demo.cvSkills")}</dt>
-                  <dd>{skillsLine}</dd>
+              <dl className="mt-4 grid gap-2 text-sm text-[var(--twin-muted-strong)] sm:grid-cols-2">
+                <div className="demo-meta-chip flex flex-col gap-0.5 rounded-lg px-3 py-2">
+                  <dt className="text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">{t("demo.cvSkills")}</dt>
+                  <dd className="text-[var(--foreground)]">{skillsLine}</dd>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  <dt className="font-semibold text-[var(--foreground)]">{t("demo.cvTitles")}</dt>
-                  <dd>{titlesLine}</dd>
+                <div className="demo-meta-chip flex flex-col gap-0.5 rounded-lg px-3 py-2">
+                  <dt className="text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">{t("demo.cvTitles")}</dt>
+                  <dd className="text-[var(--foreground)]">{titlesLine}</dd>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  <dt className="font-semibold text-[var(--foreground)]">{t("demo.cvExperience")}</dt>
-                  <dd>
+                <div className="demo-meta-chip flex flex-col gap-0.5 rounded-lg px-3 py-2">
+                  <dt className="text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">{t("demo.cvExperience")}</dt>
+                  <dd className="text-[var(--foreground)]">
                     {DEMO_MATCH_CANDIDATE.experience_years} {t("demo.cvYears")}
                   </dd>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  <dt className="font-semibold text-[var(--foreground)]">{t("demo.cvSalary")}</dt>
-                  <dd>{DEMO_MATCH_CANDIDATE.desired_salary} PLN</dd>
+                <div className="demo-meta-chip flex flex-col gap-0.5 rounded-lg px-3 py-2">
+                  <dt className="text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">{t("demo.cvSalary")}</dt>
+                  <dd className="text-[var(--foreground)]">{DEMO_MATCH_CANDIDATE.desired_salary} PLN</dd>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  <dt className="font-semibold text-[var(--foreground)]">{t("demo.cvLocation")}</dt>
-                  <dd className="capitalize">{DEMO_MATCH_CANDIDATE.location}</dd>
+                <div className="demo-meta-chip flex flex-col gap-0.5 rounded-lg px-3 py-2 sm:col-span-2">
+                  <dt className="text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">{t("demo.cvLocation")}</dt>
+                  <dd className="capitalize text-[var(--foreground)]">{DEMO_MATCH_CANDIDATE.location}</dd>
                 </div>
               </dl>
               <h3 className="mt-6 text-xs font-bold uppercase tracking-wider text-[var(--twin-muted)]">{t("demo.cvDocument")}</h3>
-              <div className="relative mt-2 max-h-[min(22rem,55vh)] overflow-y-auto rounded-xl border border-[var(--twin-border)] bg-[var(--twin-card)] p-4 font-mono text-xs leading-relaxed text-[var(--twin-muted-strong)]">
-                {cvError ? (
-                  <p className="text-amber-800 dark:text-amber-200">{t("demo.cvFallback")}</p>
-                ) : cvText ? (
-                  <pre className="whitespace-pre-wrap break-words">{cvText}</pre>
-                ) : (
-                  <p className="animate-pulse text-[var(--twin-muted)]">{t("demo.cvLoading")}</p>
-                )}
+              <div className="demo-cv-terminal relative mt-2 max-h-[min(22rem,55vh)] overflow-hidden rounded-xl">
+                <div className="demo-cv-terminal__chrome flex items-center gap-1.5 px-3 py-2" aria-hidden>
+                  <span className="demo-cv-terminal__dot demo-cv-terminal__dot--red" />
+                  <span className="demo-cv-terminal__dot demo-cv-terminal__dot--yellow" />
+                  <span className="demo-cv-terminal__dot demo-cv-terminal__dot--green" />
+                  <span className="ml-2 font-mono text-[10px] text-[var(--twin-muted)]">cv.txt</span>
+                </div>
+                <div className="demo-cv-terminal__body max-h-[min(20rem,50vh)] overflow-y-auto p-4 font-mono text-xs leading-relaxed">
+                  {cvError ? (
+                    <p className="text-amber-300/90">{t("demo.cvFallback")}</p>
+                  ) : cvText ? (
+                    <pre className="whitespace-pre-wrap break-words text-emerald-100/90">{cvText}</pre>
+                  ) : (
+                    <p className="animate-pulse text-[var(--twin-muted)]">{t("demo.cvLoading")}</p>
+                  )}
+                </div>
               </div>
             </section>
 
             <section
               aria-labelledby="demo-job-heading"
-              className={`flex flex-col rounded-2xl border bg-[var(--twin-card)]/80 p-5 shadow-sm transition-all duration-500 sm:p-6 ${
+              className={`demo-glass-panel flex flex-col p-5 transition-all duration-500 sm:p-6 ${
                 stepStates[1] === "active" || stepStates[1] === "done"
                   ? "demo-theater-glow border-[var(--twin-accent)]/45"
-                  : "border-[var(--twin-border)]"
+                  : ""
               }`}
             >
               <h2 id="demo-job-heading" className="twin-section-title text-lg">
@@ -399,10 +407,13 @@ export function DemoAutoApplyPage() {
                 <p className="leading-relaxed text-[var(--twin-muted-strong)]">{DEMO_MATCH_JOB.description}</p>
                 <p className="text-xs leading-relaxed text-[var(--twin-muted)]">{DEMO_MATCH_JOB.requirements}</p>
               </div>
-              <div className="mt-6 flex flex-wrap items-baseline gap-2 rounded-xl border border-[var(--twin-accent)]/35 bg-[var(--twin-accent-muted)]/40 px-4 py-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-[var(--twin-accent)]">{t("demo.matchBadge")}</span>
-                <span className="text-3xl font-semibold tabular-nums text-[var(--foreground)]">{animatedScore}%</span>
-                <span className="text-sm text-[var(--twin-muted-strong)]">{t("demo.matchHint")}</span>
+              <div className="demo-match-panel mt-6 rounded-xl px-4 py-4 sm:px-5">
+                <DemoMatchGauge
+                  score={animatedScore}
+                  size="lg"
+                  label={t("demo.matchBadge")}
+                  hint={t("demo.matchHint")}
+                />
               </div>
             </section>
           </div>

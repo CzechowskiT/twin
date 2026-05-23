@@ -4,6 +4,7 @@ import Link from "next/link";
 import { forwardRef } from "react";
 
 import { DemoConfettiBurst } from "@/components/marketing/demo-confetti-burst";
+import { DemoMatchGauge } from "@/components/marketing/demo-match-gauge";
 import { useTranslation } from "@/components/language-provider";
 import {
   DEMO_JOB_CARD,
@@ -28,9 +29,9 @@ type DemoAutoApplyTheaterProps = {
 };
 
 const SCAN_JOBS = [
-  { title: "Senior Fullstack Developer", board: "pracuj.pl" },
-  { title: "Python Backend Engineer", board: "rocketjobs.pl" },
-  { title: "Staff Platform Engineer", board: "pracuj.pl" },
+  { title: "Senior Fullstack Developer", board: "pracuj.pl", score: 54 },
+  { title: "Python Backend Engineer", board: "rocketjobs.pl", score: 48 },
+  { title: "Staff Platform Engineer", board: "pracuj.pl", score: 62 },
 ] as const;
 
 export const DemoAutoApplyTheater = forwardRef<HTMLElement, DemoAutoApplyTheaterProps>(function DemoAutoApplyTheater(
@@ -62,19 +63,20 @@ export const DemoAutoApplyTheater = forwardRef<HTMLElement, DemoAutoApplyTheater
     <section
       ref={ref}
       aria-labelledby="demo-theater-heading"
-      className="demo-auto-apply-theater relative overflow-hidden rounded-2xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/95 p-5 shadow-md sm:p-6"
+      className="demo-auto-apply-theater demo-glass-panel relative overflow-hidden p-5 sm:p-6"
     >
+      <div className="demo-theater__mesh pointer-events-none absolute inset-0" aria-hidden />
       <DemoConfettiBurst active={showConfetti} onDone={onConfettiDone} />
 
-      <h2 id="demo-theater-heading" className="twin-section-title text-lg sm:text-xl">
+      <h2 id="demo-theater-heading" className="relative twin-section-title text-lg sm:text-xl">
         {t("demo.flowTitle")}
       </h2>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+      <div className="relative mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
         <div className="relative pl-1">
           <div className="demo-theater-rail absolute bottom-2 left-[0.65rem] top-2 w-0.5 rounded-full bg-[var(--twin-border)]/70" aria-hidden>
             <div
-              className="demo-theater-rail-fill absolute left-0 top-0 w-full rounded-full bg-[var(--twin-accent)]"
+              className="demo-theater-rail-fill absolute left-0 top-0 w-full rounded-full bg-gradient-to-b from-[var(--twin-accent)] to-emerald-400"
               style={{ height: `${railProgress}%` }}
             />
           </div>
@@ -88,9 +90,9 @@ export const DemoAutoApplyTheater = forwardRef<HTMLElement, DemoAutoApplyTheater
                     onClick={() => onJumpToStep(idx)}
                     className={`demo-theater-step flex w-full gap-3 rounded-xl border p-3 text-left transition-all duration-500 sm:gap-4 ${
                       state === "active"
-                        ? "demo-theater-step--active border-[var(--twin-accent)]/50 bg-[var(--twin-accent-muted)]/55"
+                        ? "demo-theater-step--active demo-theater-step--live border-[var(--twin-accent)]/50 bg-[var(--twin-accent-muted)]/55"
                         : state === "done"
-                          ? "border-[var(--twin-accent)]/25 bg-[var(--twin-card)]/80 opacity-100"
+                          ? "demo-theater-step--done border-[var(--twin-accent)]/25 bg-[var(--twin-card)]/80 opacity-100"
                           : "border-transparent opacity-50 hover:border-[var(--twin-border)]/60 hover:bg-[var(--twin-card)]/40"
                     }`}
                   >
@@ -146,24 +148,23 @@ export const DemoAutoApplyTheater = forwardRef<HTMLElement, DemoAutoApplyTheater
           )}
 
           <div
-            className={`rounded-xl border px-4 py-3 transition-all duration-500 ${
-              highlightJob
-                ? "demo-theater-glow border-[var(--twin-accent)]/45 bg-[var(--twin-accent-muted)]/35"
-                : "border-[var(--twin-border)] bg-[var(--twin-card)]/60 opacity-70"
+            className={`demo-match-panel rounded-xl px-4 py-4 transition-all duration-500 sm:px-5 ${
+              highlightJob ? "demo-theater-glow" : "opacity-70"
             }`}
           >
             <p className="text-base font-semibold text-[var(--foreground)]">{DEMO_MATCH_JOB.title}</p>
             <p className="mt-1 text-sm text-[var(--twin-muted-strong)]">
               {DEMO_JOB_CARD.company} · {DEMO_JOB_CARD.board}
             </p>
-            <div className="mt-3 flex flex-wrap items-baseline gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-[var(--twin-accent)]">{t("demo.matchBadge")}</span>
-              <span className="text-3xl font-semibold tabular-nums text-[var(--foreground)]">{animatedScore}%</span>
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <DemoMatchGauge score={animatedScore} size="md" label={t("demo.matchBadge")} />
               {animatedScore >= DEMO_MATCH_SCORE ? (
-                <span className="demo-theater-reveal text-xs font-semibold text-[var(--twin-accent)]">{t("demo.matchLocked")}</span>
+                <span className="demo-theater-reveal rounded-full border border-[var(--twin-accent)]/40 bg-[var(--twin-accent-muted)]/50 px-2.5 py-1 text-xs font-semibold text-[var(--twin-accent)]">
+                  {t("demo.matchLocked")}
+                </span>
               ) : null}
             </div>
-          </div>
+          </motion.div>
 
           {highlightCv ? (
             <div className="demo-theater-reveal demo-theater-glow rounded-xl border border-[var(--twin-accent)]/40 bg-[var(--twin-card)] p-4">
