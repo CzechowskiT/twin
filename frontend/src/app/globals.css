@@ -807,10 +807,33 @@ html[data-marketing-surface="studio"] .twin-logo-accent {
 .twin-nav-link {
   color: var(--twin-muted-strong);
   transition: color 0.15s ease;
+  hyphens: none;
+  -webkit-hyphens: none;
+  white-space: nowrap;
+  word-break: keep-all;
+  overflow-wrap: normal;
 }
 
 .twin-nav-link:hover {
   color: var(--twin-link);
+}
+
+/**
+ * App header nav + account chips: body `hyphens: manual` must not split short labels (e.g. PL "Panel").
+ */
+.twin-header-bar nav a,
+.twin-header-bar nav button,
+.twin-header-bar .twin-header-account-link {
+  hyphens: none;
+  -webkit-hyphens: none;
+  white-space: nowrap;
+  word-break: keep-all;
+  overflow-wrap: normal;
+}
+
+.twin-header-bar .twin-header-account-link {
+  min-width: max-content;
+  flex-shrink: 0;
 }
 
 .twin-touch-target {

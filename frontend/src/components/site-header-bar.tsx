@@ -74,7 +74,7 @@ export function SiteHeaderBar({ showPersonaSwitcher }: SiteHeaderBarProps) {
   const calendarClassName = `${headerCtaBase} twin-header-cta--ghost twin-header-cta--calendar`;
   const linkClass = "twin-nav-link whitespace-nowrap";
   const accountOutlineClass =
-    "twin-touch-target inline-grid shrink-0 place-items-center whitespace-nowrap rounded-md border border-[var(--twin-border)] bg-[var(--twin-card)] px-2.5 py-0 text-[11px] font-semibold leading-normal text-[var(--twin-accent)] transition hover:border-[var(--twin-accent)]/50 hover:bg-[var(--twin-accent-muted)] hover:text-[var(--twin-accent-hover)] sm:px-3 sm:text-[12px]";
+    "twin-header-account-link twin-touch-target inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-[var(--twin-border)] bg-[var(--twin-card)] px-2.5 py-0 text-[11px] font-semibold leading-normal text-[var(--twin-accent)] transition hover:border-[var(--twin-accent)]/50 hover:bg-[var(--twin-accent-muted)] hover:text-[var(--twin-accent-hover)] sm:px-3 sm:text-[12px]";
   const dashboardActiveClass =
     "border-[var(--twin-accent)]/50 bg-[var(--twin-accent-muted)] text-[var(--twin-accent-hover)]";
 
@@ -136,7 +136,7 @@ export function SiteHeaderBar({ showPersonaSwitcher }: SiteHeaderBarProps) {
                 key="logout"
                 type="button"
                 onClick={logout}
-                className={`${accountOutlineClass} hidden cursor-pointer md:inline-grid`}
+                className={`${accountOutlineClass} hidden cursor-pointer md:inline-flex`}
               >
                 {t(item.labelKey)}
               </button>
@@ -144,7 +144,7 @@ export function SiteHeaderBar({ showPersonaSwitcher }: SiteHeaderBarProps) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`${accountOutlineClass} hidden md:inline-grid ${
+                className={`${accountOutlineClass} hidden md:inline-flex ${
                   item.href === "/dashboard" && dashboardSectionActive ? dashboardActiveClass : ""
                 }`}
                 aria-current={item.href === "/dashboard" && dashboardSectionActive ? "page" : undefined}
@@ -186,7 +186,7 @@ export function SiteHeaderBar({ showPersonaSwitcher }: SiteHeaderBarProps) {
                   <Link
                     href="/dashboard"
                     onClick={closeMobileMenu}
-                    className={`twin-touch-target mb-2 grid w-full place-items-center rounded-md border border-[var(--twin-border)] bg-[var(--twin-card)] px-3 py-2.5 text-sm font-semibold leading-normal text-[var(--twin-accent)] transition hover:border-[var(--twin-accent)]/50 hover:bg-[var(--twin-accent-muted)] hover:text-[var(--twin-accent-hover)] ${dashboardSectionActive ? dashboardActiveClass : ""}`}
+                    className={`twin-header-account-link twin-touch-target mb-2 inline-flex w-full items-center justify-center rounded-md border border-[var(--twin-border)] bg-[var(--twin-card)] px-3 py-2.5 text-sm font-semibold leading-normal text-[var(--twin-accent)] transition hover:border-[var(--twin-accent)]/50 hover:bg-[var(--twin-accent-muted)] hover:text-[var(--twin-accent-hover)] ${dashboardSectionActive ? dashboardActiveClass : ""}`}
                     aria-current={dashboardSectionActive ? "page" : undefined}
                   >
                     {t("nav.dashboard")}
@@ -201,7 +201,7 @@ export function SiteHeaderBar({ showPersonaSwitcher }: SiteHeaderBarProps) {
                   key={item.href}
                   href={item.href}
                   onClick={closeMobileMenu}
-                  className="twin-touch-target twin-nav-link block rounded px-3 py-2.5 text-sm hover:bg-[var(--twin-accent-muted)]"
+                  className="twin-touch-target twin-nav-link block whitespace-nowrap rounded px-3 py-2.5 text-sm hover:bg-[var(--twin-accent-muted)]"
                 >
                   {item.label}
                 </Link>
@@ -215,7 +215,7 @@ export function SiteHeaderBar({ showPersonaSwitcher }: SiteHeaderBarProps) {
                     key="logout-m"
                     type="button"
                     onClick={logout}
-                    className="twin-touch-target mt-1 grid w-full cursor-pointer place-items-center rounded-md border border-[var(--twin-border)] bg-[var(--twin-card)] px-3 py-2.5 text-sm font-semibold leading-normal text-[var(--twin-accent)] transition hover:border-[var(--twin-accent)]/50 hover:bg-[var(--twin-accent-muted)] hover:text-[var(--twin-accent-hover)]"
+                    className="twin-header-account-link twin-touch-target mt-1 inline-flex w-full cursor-pointer items-center justify-center rounded-md border border-[var(--twin-border)] bg-[var(--twin-card)] px-3 py-2.5 text-sm font-semibold leading-normal text-[var(--twin-accent)] transition hover:border-[var(--twin-accent)]/50 hover:bg-[var(--twin-accent-muted)] hover:text-[var(--twin-accent-hover)]"
                   >
                     {t("dashboard.logout")}
                   </button>
@@ -224,7 +224,7 @@ export function SiteHeaderBar({ showPersonaSwitcher }: SiteHeaderBarProps) {
                     key={item.href}
                     href={item.href}
                     onClick={closeMobileMenu}
-                    className="twin-touch-target twin-nav-link block rounded px-3 py-2.5 text-sm hover:bg-[var(--twin-accent-muted)]"
+                    className="twin-header-account-link twin-touch-target twin-nav-link block whitespace-nowrap rounded px-3 py-2.5 text-sm hover:bg-[var(--twin-accent-muted)]"
                   >
                     {t(item.labelKey)}
                   </Link>
