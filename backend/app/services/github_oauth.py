@@ -6,6 +6,7 @@ import httpx
 
 from app.config import get_settings
 from app.services.auth_oauth_redirect import effective_github_redirect_uri
+from app.services.oauth_env import oauth_secret_usable
 from app.services.oauth_types import OAuthUserProfile
 
 GITHUB_AUTH_URL = "https://github.com/login/oauth/authorize"
@@ -23,7 +24,7 @@ def is_github_configured() -> bool:
     s = get_settings()
     return bool(
         s.github_client_id.strip()
-        and s.github_client_secret.strip()
+        and oauth_secret_usable(s.github_client_secret)
         and effective_github_redirect_uri(s)
     )
 

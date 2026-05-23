@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 
 import { LinkedInLoginSection } from "@/components/linkedin-login-section";
 import { OAuthWebButtons } from "@/components/oauth-web-buttons";
@@ -15,7 +15,8 @@ import { setSessionPersona } from "@/lib/session-persona";
 import type { TranslationKey } from "@/lib/i18n";
 import type { LoginZone } from "@/lib/persona-auth";
 import { LOGIN_PATH, postLoginPath, REGISTER_PATH } from "@/lib/persona-auth";
-import { OAUTH_LOGIN_BUTTONS_ENABLED } from "@/lib/oauth-auth";
+import { hasConfiguredOAuthProvider } from "@/lib/oauth-auth";
+import { useOAuthProviderStatus } from "@/lib/use-oauth-provider-status";
 
 type TokenResponse = { access_token: string };
 
@@ -50,11 +51,30 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
   const oauthUrlError = useMemo(() => {
     const err = searchParams.get("error");
     if (err === "linkedin_not_configured") return t("login.errorLinkedinNotConfigured");
+    if (err === "apple_not_configured") return t("login.errorAppleNotConfigured");
+    if (err === "github_not_configured") return t("login.errorGithubNotConfigured");
     if (err?.endsWith("_not_configured")) return t("login.errorOAuthNotConfigured");
     return null;
   }, [searchParams, t]);
 
+  const { status: oauthStatus, loaded: oauthStatusLoaded } = useOAuthProviderStatus();
+  const showOAuthButtons = hasConfiguredOAuthProvider(oauthStatus);
+
   const displayError = error ?? oauthUrlError;
+
+  useEffect(() => {
+    if (!oauthStatusLoaded) return;
+    const err = searchParams.get("error");
+    if (err !== "apple_not_configured" && err !== "github_not_configured") return;
+    const resolved =
+      (err === "apple_not_configured" && oauthStatus.apple) ||
+      (err === "github_not_configured" && oauthStatus.github);
+    if (!resolved) return;
+    const q = new URLSearchParams(searchParams.toString());
+    q.delete("error");
+    const suffix = q.toString();
+    router.replace(suffix ? `${window.location.pathname}?${suffix}` : window.location.pathname);
+  }, [oauthStatus, oauthStatusLoaded, router, searchParams]);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -122,16 +142,20 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
           {loading ? t("login.signingIn") : t("login.submit")}
         </Button>
       </form>
-      <p className="twin-muted my-4 text-center text-xs uppercase tracking-wide">{t("login.orContinue")}</p>
-      <OAuthWebButtons
-        status={OAUTH_LOGIN_BUTTONS_ENABLED}
-        labels={{
-          google: t("login.oauthGoogle"),
-          github: t("login.oauthGithub"),
-          apple: t("login.oauthApple"),
-          microsoft: t("login.oauthMicrosoft"),
-        }}
-      />
+      {showOAuthButtons ? (
+        <>
+          <p className="twin-muted my-4 text-center text-xs uppercase tracking-wide">{t("login.orContinue")}</p>
+          <OAuthWebButtons
+            status={oauthStatus}
+            labels={{
+              google: t("login.oauthGoogle"),
+              github: t("login.oauthGithub"),
+              apple: t("login.oauthApple"),
+              microsoft: t("login.oauthMicrosoft"),
+            }}
+          />
+        </>
+      ) : null}
       <p className="twin-muted mt-4 text-center text-sm">
         {t("login.noAccount")}{" "}
         <Link href={REGISTER_PATH[zone]} className="twin-link">

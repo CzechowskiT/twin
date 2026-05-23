@@ -13,6 +13,7 @@ from jose import jwt
 
 from app.config import get_settings
 from app.services.auth_oauth_redirect import effective_apple_redirect_uri
+from app.services.oauth_env import oauth_secret_usable
 from app.services.oauth_types import OAuthUserProfile
 
 APPLE_AUTH_URL = "https://appleid.apple.com/auth/authorize"
@@ -31,7 +32,7 @@ def is_apple_configured() -> bool:
         s.apple_client_id.strip()
         and s.apple_team_id.strip()
         and s.apple_key_id.strip()
-        and s.apple_private_key.strip()
+        and oauth_secret_usable(s.apple_private_key)
         and effective_apple_redirect_uri(s)
     )
 
