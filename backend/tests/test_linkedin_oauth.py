@@ -99,7 +99,7 @@ def test_linkedin_login_not_configured(
     mock_settings.return_value.frontend_url = "http://localhost:3000"
     res = client.get("/api/v1/auth/linkedin/login", follow_redirects=False)
     assert res.status_code == 302
-    assert res.headers["location"] == "http://localhost:3000/login?error=linkedin_not_configured"
+    assert res.headers["location"] == "http://localhost:3000/login/candidate?error=linkedin_not_configured"
 
 
 @patch("app.api.auth.build_authorize_url", return_value="https://www.linkedin.com/oauth/v2/authorization?x=1")

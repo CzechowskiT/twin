@@ -37,6 +37,17 @@ def test_google_login_redirect(_mock: MagicMock, _s: MagicMock, _u: MagicMock, c
     assert res.headers["location"].startswith("https://accounts.google.com")
 
 
+@patch("app.api.auth.get_settings")
+@patch("app.api.auth.is_github_configured", return_value=False)
+def test_github_login_not_configured(
+    _cfg: MagicMock, mock_settings: MagicMock, client: TestClient
+) -> None:
+    mock_settings.return_value.frontend_url = "http://localhost:3000"
+    res = client.get("/api/v1/auth/github/login", follow_redirects=False)
+    assert res.status_code == 302
+    assert res.headers["location"] == "http://localhost:3000/login/candidate?error=github_not_configured"
+
+
 @patch("app.api.auth.is_microsoft_configured", return_value=False)
 def test_microsoft_login_not_configured(_mock: MagicMock, client: TestClient) -> None:
     res = client.get("/api/v1/auth/microsoft/login", follow_redirects=False)

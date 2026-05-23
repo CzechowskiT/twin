@@ -125,6 +125,12 @@ def _frontend_login_url(**params: str) -> str:
     return f"{base}/login?{query}" if query else f"{base}/login"
 
 
+def _frontend_oauth_error_url(error: str) -> str:
+    """Misconfigured OAuth: candidate login shows the error instead of the role hub."""
+    base = get_settings().frontend_url.rstrip("/")
+    return f"{base}/login/candidate?{urlencode({'error': error})}"
+
+
 def _web_oauth_configured(provider: WebOAuthProvider) -> bool:
     if provider == WebOAuthProvider.google:
         return is_google_configured()
@@ -520,7 +526,7 @@ def complete_onboarding(
 def linkedin_login() -> RedirectResponse:
     if not is_linkedin_oauth_configured():
         return RedirectResponse(
-            _frontend_login_url(error="linkedin_not_configured"),
+            _frontend_oauth_error_url("linkedin_not_configured"),
             status_code=302,
         )
     state = create_oauth_state()
@@ -562,12 +568,12 @@ def linkedin_callback(
 def web_oauth_login(provider: WebOAuthProvider) -> RedirectResponse:
     slug = provider.value
     if not _web_oauth_configured(provider):
-        return RedirectResponse(_frontend_login_url(error=f"{slug}_not_configured"), status_code=302)
+        return RedirectResponse(_frontend_oauth_error_url(f"{slug}_not_configured"), status_code=302)
     state = create_oauth_state()
     try:
         url = _web_oauth_authorize_url(provider, state)
     except (GoogleOAuthError, GitHubOAuthError, AppleOAuthError, MicrosoftOAuthError):
-        return RedirectResponse(_frontend_login_url(error=f"{slug}_not_configured"), status_code=302)
+        return RedirectResponse(_frontend_oauth_error_url(f"{slug}_not_configured"), status_code=302)
     return RedirectResponse(url, status_code=302)
 
 
