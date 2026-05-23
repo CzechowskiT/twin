@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useTranslation } from "@/components/language-provider";
+import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { Button, Card, Input, Label, Shell } from "@/components/ui";
 import { apiFetch, apiFetchBlob, apiUpload, saveBlobAsFile } from "@/lib/api";
 import { getToken } from "@/lib/auth";
@@ -122,6 +123,23 @@ export default function ProfilePage() {
   const [docsMessage, setDocsMessage] = useState<string | null>(null);
   const [docUploadConsent, setDocUploadConsent] = useState(false);
   const [passwordBusy, setPasswordBusy] = useState(false);
+  const [exportJsonBusy, setExportJsonBusy] = useState(false);
+
+  async function downloadMyDataJson() {
+    const token = getToken();
+    if (!token) return;
+    setExportJsonBusy(true);
+    setError(null);
+    try {
+      const data = await apiFetch<Record<string, unknown>>("/api/v1/candidates/me/export.json", {}, token);
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json;charset=utf-8" });
+      saveBlobAsFile(blob, "twin-my-data.json");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("profile.failed"));
+    } finally {
+      setExportJsonBusy(false);
+    }
+  }
 
   function applyTailoringFromProfile(prof: Profile | null) {
     if (!prof) return;
@@ -504,9 +522,18 @@ export default function ProfilePage() {
 
   return (
     <Shell rail>
+      <div className="mb-4 flex min-w-0 flex-col gap-3 sm:mb-6 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+        <div className="min-w-0 shrink-0">
+          <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">{t("profile.title")}</h1>
+          <p className="twin-muted mt-1 text-sm">{t("profile.subtitle")}</p>
+        </div>
+        <CandidateWorkspaceSubnav
+          ariaLabel={t("profile.title")}
+          exportJsonBusy={exportJsonBusy}
+          onExportJson={() => void downloadMyDataJson()}
+        />
+      </div>
       <Card>
-        <h1 className="mb-2 text-2xl font-semibold">{t("profile.title")}</h1>
-        <p className="twin-muted mb-6 text-sm">{t("profile.subtitle")}</p>
 
         <section className="twin-filter-box mb-6">
           <h2 className="mb-1 text-sm font-semibold text-[var(--foreground)]">
