@@ -12,6 +12,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from jose import jwt
 
 from app.config import get_settings
+from app.services.auth_oauth_redirect import effective_apple_redirect_uri
 from app.services.oauth_types import OAuthUserProfile
 
 APPLE_AUTH_URL = "https://appleid.apple.com/auth/authorize"
@@ -27,11 +28,11 @@ class AppleOAuthError(Exception):
 def is_apple_configured() -> bool:
     s = get_settings()
     return bool(
-        s.apple_client_id
-        and s.apple_team_id
-        and s.apple_key_id
+        s.apple_client_id.strip()
+        and s.apple_team_id.strip()
+        and s.apple_key_id.strip()
         and s.apple_private_key.strip()
-        and s.apple_redirect_uri
+        and effective_apple_redirect_uri(s)
     )
 
 
@@ -39,11 +40,12 @@ def build_apple_authorize_url(state: str) -> str:
     if not is_apple_configured():
         raise AppleOAuthError("Apple login is not configured")
     s = get_settings()
+    redirect_uri = effective_apple_redirect_uri(s)
     params = {
         "response_type": "code",
         "response_mode": "form_post",
         "client_id": s.apple_client_id,
-        "redirect_uri": s.apple_redirect_uri,
+        "redirect_uri": redirect_uri,
         "state": state,
         "scope": "name email",
     }
@@ -100,10 +102,11 @@ def exchange_apple_code_for_profile(code: str, user_json: str | None) -> OAuthUs
     if not is_apple_configured():
         raise AppleOAuthError("Apple login is not configured")
     s = get_settings()
+    redirect_uri = effective_apple_redirect_uri(s)
     data = {
         "grant_type": "authorization_code",
         "code": code,
-        "redirect_uri": s.apple_redirect_uri,
+        "redirect_uri": redirect_uri,
         "client_id": s.apple_client_id,
         "client_secret": _apple_client_secret(),
     }

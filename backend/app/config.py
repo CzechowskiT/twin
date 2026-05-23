@@ -212,25 +212,36 @@ class Settings(BaseSettings):
 
     @field_validator(
         "google_calendar_redirect_uri",
+        "google_redirect_uri",
+        "github_redirect_uri",
+        "apple_redirect_uri",
         "microsoft_calendar_redirect_uri",
         "microsoft_redirect_uri",
         mode="before",
     )
     @classmethod
-    def normalize_calendar_redirect_uri(cls, value: object) -> object:
+    def normalize_oauth_redirect_uri(cls, value: object) -> object:
         if isinstance(value, str) and value.strip():
             return _strip_trailing_slash_url(value)
         return value
 
     @model_validator(mode="after")
-    def resolve_calendar_oauth_redirect_uris(self) -> "Settings":
-        """Derive calendar callbacks from API_URL when env vars are unset (never FRONTEND_URL)."""
+    def resolve_oauth_redirect_uris(self) -> "Settings":
+        """Derive OAuth callbacks from API_URL when env vars are unset (never FRONTEND_URL)."""
+        from app.services.auth_oauth_redirect import (
+            effective_apple_redirect_uri,
+            effective_github_redirect_uri,
+            effective_google_redirect_uri,
+        )
         from app.services.calendar_oauth_redirect import effective_google_calendar_redirect_uri
         from app.services.calendar_oauth_redirect import (
             effective_microsoft_calendar_redirect_uri,
         )
         from app.services.microsoft_oauth import effective_microsoft_redirect_uri
 
+        self.google_redirect_uri = effective_google_redirect_uri(self)
+        self.github_redirect_uri = effective_github_redirect_uri(self)
+        self.apple_redirect_uri = effective_apple_redirect_uri(self)
         self.google_calendar_redirect_uri = effective_google_calendar_redirect_uri(self)
         self.microsoft_calendar_redirect_uri = effective_microsoft_calendar_redirect_uri(self)
         self.microsoft_redirect_uri = effective_microsoft_redirect_uri(self)
