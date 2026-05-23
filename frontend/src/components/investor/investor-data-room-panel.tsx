@@ -119,15 +119,7 @@ export function InvestorDataRoomPanel() {
           <h2 className="text-lg font-semibold">{t("dataRoom.confidentialTitle")}</h2>
           {localDemo ? (
             <Card variant="soft" className="mt-4 p-4">
-              <p className="text-sm leading-relaxed text-amber-900 dark:text-amber-100">{t("dataRoom.demoModeBanner")}</p>
-              <a
-                href="https://github.com/CzechowskiT/twin/blob/main/docs/RAILWAY_PROD_ENV_CHECKLIST.md"
-                className="twin-link mt-2 inline-block text-xs font-medium"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {t("dataRoom.demoModeDocLink")} ↗
-              </a>
+              <p className="text-sm leading-relaxed text-[var(--twin-muted-strong)]">{t("dataRoom.demoModeBanner")}</p>
             </Card>
           ) : null}
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
