@@ -190,9 +190,9 @@ body {
   padding-left: env(safe-area-inset-left, 0);
   padding-right: env(safe-area-inset-right, 0);
   text-rendering: optimizeLegibility;
-  text-align: justify;
-  hyphens: auto;
-  -webkit-hyphens: auto;
+  text-align: start;
+  hyphens: manual;
+  -webkit-hyphens: manual;
 }
 
 /** Keep hero / marketing copy above the fixed cookie bar until the user decides. */
@@ -225,6 +225,34 @@ html[data-cookie-banner="open"] main {
   body {
     text-wrap: pretty;
   }
+}
+
+/**
+ * Marketing + hero: body defaults stay start/left; long-form legal keeps justify in `.twin-prose`.
+ */
+.marketing-journey-host,
+.marketing-section-hero,
+.marketing-section-page,
+.marketing-page-surface,
+.marketing-copy-rail,
+.marketing-hero-rail,
+.marketing-content-rail,
+.marketing-calculator-page,
+.twin-marketing-copy {
+  text-align: start;
+  hyphens: none;
+  -webkit-hyphens: none;
+  text-wrap: pretty;
+}
+
+.marketing-gradient-heading,
+.marketing-section-hero h1,
+.twin-page-intro.twin-section-title {
+  text-wrap: balance;
+  hyphens: none;
+  -webkit-hyphens: none;
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 
 /**
@@ -1529,6 +1557,7 @@ html[data-marketing-surface="studio"] .marketing-gradient-heading {
  * children use `.section-cta-primary` / `.section-cta-secondary` for consistent pairs.
  */
 .marketing-section-hero,
+.marketing-section-page,
 .marketing-section-cta-band,
 .marketing-section-demo-actions {
   --section-cta-primary-bg: #ffffff;
@@ -1551,6 +1580,7 @@ html[data-marketing-surface="studio"] .marketing-gradient-heading {
 }
 
 html[data-marketing-surface="studio"] .marketing-section-hero,
+html[data-marketing-surface="studio"] .marketing-section-page,
 html[data-marketing-surface="studio"] .marketing-section-cta-band,
 html[data-marketing-surface="studio"] .marketing-section-demo-actions {
   --section-cta-primary-fg: #0f172a;
@@ -1561,6 +1591,7 @@ html[data-marketing-surface="studio"] .marketing-section-demo-feed {
 }
 
 html[data-marketing-surface="studio"] .marketing-section-hero .section-cta-secondary,
+html[data-marketing-surface="studio"] .marketing-section-page .section-cta-secondary,
 html[data-marketing-surface="studio"] .marketing-section-cta-band .section-cta-secondary,
 html[data-marketing-surface="studio"] .marketing-section-demo-actions .section-cta-secondary {
   --section-cta-secondary-bg: rgb(15 23 42 / 0.35);

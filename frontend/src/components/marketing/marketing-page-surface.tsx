@@ -13,10 +13,10 @@ type MarketingPageSurfaceProps = {
  * without a heavy bordered “postcard” on the wallpaper.
  */
 export function MarketingPageSurface({ children, wide = false, withCard = true }: MarketingPageSurfaceProps) {
-  const max = wide ? "max-w-5xl" : "max-w-3xl";
+  const max = wide ? "max-w-6xl" : "max-w-3xl";
   return (
-    <section className="bg-[var(--background)] py-10 sm:py-14 md:py-16">
-      <div className={`mx-auto px-4 sm:px-6 ${max}`}>
+    <section className="marketing-section-page py-10 sm:py-14 md:py-16">
+      <div className={`mx-auto w-full px-4 sm:px-6 ${max}`}>
         {withCard ? (
           <div className="marketing-copy-rail py-1 sm:py-2">{children}</div>
         ) : (

@@ -6,6 +6,7 @@ import { Suspense, useEffect, useState } from "react";
 
 import { renderTermsMarkdown } from "@/app/terms/render-terms-markdown";
 import { useTranslation } from "@/components/language-provider";
+import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { Shell } from "@/components/ui";
 import { getJurisdictionHintCached, normalizeLegalRegion, type JurisdictionHint } from "@/lib/jurisdiction-hint";
 import { resolveTermsMarkdown, type ResolvedLegalMarkdown } from "@/lib/legal-documents";
@@ -69,8 +70,9 @@ function TermsInner() {
   const cc = hint?.country_code ?? "—";
 
   return (
-    <Shell rail>
-      <article className="twin-prose max-w-none">
+    <Shell wide>
+      <MarketingPageSurface wide>
+      <article className="twin-prose twin-prose--solid max-w-none">
         <p className="twin-muted mb-4 text-sm leading-relaxed">{t("terms.notLegalAdvice")}</p>
 
         {!hint || !resolved ? (
@@ -114,6 +116,7 @@ function TermsInner() {
           </Link>
         </p>
       </article>
+      </MarketingPageSurface>
     </Shell>
   );
 }
@@ -123,10 +126,12 @@ export default function TermsPage() {
   return (
     <Suspense
       fallback={
-        <Shell rail>
-          <article className="twin-prose max-w-none">
-            <p className="twin-muted text-sm leading-relaxed">{t("legalDoc.detectingRegion")}</p>
-          </article>
+        <Shell wide>
+          <MarketingPageSurface wide>
+            <article className="twin-prose twin-prose--solid max-w-none">
+              <p className="twin-muted text-sm leading-relaxed">{t("legalDoc.detectingRegion")}</p>
+            </article>
+          </MarketingPageSurface>
         </Shell>
       }
     >

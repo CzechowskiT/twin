@@ -18,13 +18,13 @@ export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
       <div className="marketing-copy-rail space-y-14 sm:space-y-16">
         <header className={`space-y-4 text-start ${c.stackedCta ? "marketing-hero-rail" : ""}`}>
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">{c.heroEyebrow}</p>
-          <h1 className="twin-page-intro twin-section-title max-w-4xl text-2xl sm:text-3xl md:text-4xl">{c.heroTitle}</h1>
+          <h1 className="marketing-gradient-heading max-w-4xl text-2xl sm:text-3xl md:text-4xl">{c.heroTitle}</h1>
           <p className="max-w-3xl text-base leading-relaxed text-[var(--twin-muted-strong)] sm:text-lg">{c.heroLead}</p>
           {c.stackedCta ? (
             <div className="marketing-cta-stack pt-2">
               <Link
                 href={c.primaryCta.href}
-                className="marketing-cta-filled-pill marketing-btn-primary-shadow twin-touch-target inline-flex min-h-[2.75rem] w-full items-center justify-center rounded-full bg-[var(--twin-cta)] px-6 text-sm font-semibold text-[var(--twin-on-cta)] transition hover:bg-[var(--twin-cta-hover)] active:scale-[0.98]"
+                className="section-cta-primary marketing-btn-primary-shadow twin-touch-target w-full max-w-md"
               >
                 {c.primaryCta.label}
               </Link>
@@ -47,15 +47,12 @@ export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
             <div className="flex flex-wrap gap-3 pt-2">
               <Link
                 href={c.primaryCta.href}
-                className="marketing-cta-filled-pill marketing-btn-primary-shadow twin-touch-target inline-flex min-h-[2.75rem] items-center justify-center rounded-full bg-[var(--twin-cta)] px-6 text-sm font-semibold text-[var(--twin-on-cta)] transition hover:bg-[var(--twin-cta-hover)] active:scale-[0.98]"
+                className="section-cta-primary marketing-btn-primary-shadow twin-touch-target"
               >
                 {c.primaryCta.label}
               </Link>
               {c.secondaryCta ? (
-                <Link
-                  href={c.secondaryCta.href}
-                  className="twin-touch-target inline-flex min-h-[2.75rem] items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-6 text-sm font-semibold text-[var(--twin-muted-strong)] shadow-sm transition hover:border-[var(--twin-border-hover)] hover:bg-[var(--twin-accent-muted)] active:scale-[0.98]"
-                >
+                <Link href={c.secondaryCta.href} className="section-cta-secondary twin-touch-target">
                   {c.secondaryCta.label}
                 </Link>
               ) : null}
@@ -160,10 +157,8 @@ export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
                 </ul>
                 <Link
                   href={tier.href}
-                  className={`twin-touch-target mt-6 inline-flex min-h-[2.75rem] w-full items-center justify-center rounded-full px-4 text-center text-sm font-semibold transition active:scale-[0.98] ${
-                    tier.highlight
-                      ? "marketing-cta-filled-pill marketing-btn-primary-shadow bg-[var(--twin-cta)] text-[var(--twin-on-cta)] hover:bg-[var(--twin-cta-hover)]"
-                      : "border border-[var(--twin-border)] bg-[var(--twin-card)] text-[var(--twin-muted-strong)] hover:border-[var(--twin-border-hover)]"
+                  className={`twin-touch-target mt-6 w-full ${
+                    tier.highlight ? "section-cta-primary marketing-btn-primary-shadow" : "section-cta-secondary"
                   }`}
                 >
                   {tier.cta}
