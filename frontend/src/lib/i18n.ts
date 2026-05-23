@@ -576,6 +576,8 @@ const en = {
     twinForYourJob: "Twin for your job",
     twinForYourJobHint:
       "Queues the full TWIN board registry (Poland: pracuj.pl, rocketjobs.pl, justjoin.it, praca.pl; then LinkedIn; then global boards such as Indeed, Glassdoor, StepStone, Reed, SEEK, …). Respect SCRAPE_ENABLED_BOARD_IDS on the API to trim the list. On a single Railway API without Redis, scraping runs in-process (no separate worker). With Redis + workers, tasks queue in Celery.",
+    scrapeRegistryHonest:
+      "Honest coverage: {registry} adapters in today’s scrape registry; {roadmapLive} of 50 marquee boards are wired as live adapters (others are planned — volume varies by board policy and rate limits).",
     twinForYourJobRunning: "Twin for your job is running…",
     twinForYourJobRefreshing: "Refreshing your feed…",
     roadmapSummary: "Target job boards & company career sites (roadmap)",
@@ -707,6 +709,9 @@ const en = {
     billingRetry: "Try again",
     billingPlansEmpty: "No plans are available here yet.",
     billingCheckoutError: "That action could not be completed. Please try again in a moment.",
+    billingPaymentsLaunchingTitle: "Payments launching soon",
+    billingPaymentsLaunchingLead:
+      "Card checkout is not live on this server yet. Your free plan still works — join the wishlist for founding access while we wire Stripe on Railway.",
     billingPageLead:
       "Free keeps a tight cap on tracked applications; Premium unlocks unlimited tracking. Auto-apply runs on every plan by default (investor demos); set AUTO_APPLY_REQUIRE_PREMIUM=true on the API to gate it to paid tiers. Checkout runs on Stripe. Which cards, Link, or bank methods appear comes from server configuration; the chips below spell it out.",
     billingCurrentPlan: "Current plan",
@@ -806,6 +811,10 @@ const en = {
       "Active — next run {next}. Total auto-applications: {total}.",
     nightlyAutoApplyStripInactive: "Off — enable to apply to top matches while you sleep.",
     nightlyAutoApplyStripCta: "Settings",
+    nightlyAutoApplyConsentNudgeTitle: "Enable consent to run nightly auto-apply",
+    nightlyAutoApplyConsentNudgeBody:
+      "TWIN only applies while you sleep after explicit GDPR consent. Review limits on the settings page, then turn it on.",
+    nightlyAutoApplyConsentNudgeCta: "Review consent & settings",
     nightlyAutoApplyPlatformSweep: "Last platform sweep",
     nightlyAutoApplyPlatformSweepNone: "No nightly sweep recorded yet",
     workspaceGateTitleRecruiter: "Recruiter workspace",
@@ -840,6 +849,7 @@ const en = {
     calendarStripMicrosoftConnected: "Microsoft Calendar connected as {email}.",
     calendarStripMicrosoftDisconnected: "Microsoft Calendar not connected — connect for corporate Outlook schedules.",
     calendarStripConnectMicrosoft: "Connect Microsoft 365",
+    calendarStripMicrosoftEyebrow: "Microsoft 365 / Outlook",
     calendarProviderGoogle: "Google Calendar",
     calendarProviderMicrosoft: "Microsoft 365",
     calendarNextInterviewTitle: "Next interview",
@@ -892,9 +902,9 @@ const en = {
     calendarLinkAdvancedSummary: "Paste the link yourself",
     calendarCopyLink: "Copy link",
     calendarLinkCopied: "Link copied",
-    calendarMicrosoftSoon: "Coming soon",
+    calendarMicrosoftSoon: "Soon",
     calendarMicrosoftSoonBody:
-      "Microsoft 365 sign-in is rolling out on this environment. Use Google or Add to calendar for now.",
+      "Microsoft 365 sign-in is rolling out on this environment. Use Google Calendar or Add to calendar for now.",
     calendarGoogleSoon: "Not available here yet",
     calendarGoogleSoonBody:
       "Google sign-in is not turned on for this site yet. Use Add to calendar below, or try again later.",
@@ -1038,7 +1048,11 @@ const en = {
       "On the API host (e.g. Railway), set LINKEDIN_CLIENT_ID, LINKEDIN_CLIENT_SECRET, and LINKEDIN_REDIRECT_URI to exactly the production callback URL above (or localhost for dev), then redeploy the API.",
     linkedInSetupDoc: "Full guide: docs/LINKEDIN_KONFIGURACJA_PL.md in the project folder.",
     errorLinkedinNotConfigured:
-      "LinkedIn is not fully configured on the server (missing credentials or redirect URI). Use email or fix Railway env vars.",
+      "LinkedIn sign-in is not available on this site yet. Use email and password below — we will enable LinkedIn when credentials are added.",
+    linkedInUnavailableTitle: "LinkedIn sign-in coming soon",
+    linkedInUnavailableLead:
+      "Use email and password for now. LinkedIn will appear here once the operator enables OAuth on the API.",
+    useEmailLogin: "Use email login",
     errorOAuthNotConfigured:
       "That sign-in provider is not set up on the server yet. Use email or ask an admin.",
     oauthGoogle: "Continue with Google",
@@ -1514,7 +1528,9 @@ const en = {
   },
   referrals: {
     title: "Refer friends",
-    lead: "Share your link — earn when friends subscribe or get hired. Payouts are tracked in your account.",
+    lead: "Share your link — earn when friends subscribe or get hired. On eligible hires, economics mirror our 25% net placement reward model (see candidate pricing). Payouts are tracked in your account.",
+    rewardModelNote:
+      "Referral rewards are separate from the 25% first-salary placement bonus — both are documented in Terms and the investor model.",
     shareTitle: "Your referral link",
     copyLink: "Copy link",
     copied: "Link copied",
@@ -1731,8 +1747,11 @@ const en = {
     uploadSuccess: "Document registered",
     uploadPresignHint: "Use the secure upload link from your confirmation — valid for 15 minutes.",
     uploadFailed: "Could not register document",
+    uploadEnterpriseComing:
+      "Enterprise secure upload is coming soon. We registered your file details — our team will confirm upload steps by email.",
+    uploadEnterpriseToast: "File registered — secure enterprise upload opens with the next production rollout.",
     demoModeBanner:
-      "Demo materials — you can register filenames here; full cloud upload for enterprise diligence goes live with production rollout.",
+      "Preview mode — you can register filenames here. Full encrypted upload for enterprise diligence is rolling out next.",
   },
   recruiterJobs: {
     title: "Post a job",
@@ -2859,6 +2878,8 @@ const pl: MessageTree = {
     twinForYourJob: "Twin for your job",
     twinForYourJobHint:
       "Kolejkuje pełny rejestr TWIN (Polska: pracuj.pl, rocketjobs.pl, justjoin.it, praca.pl; potem LinkedIn; potem globalnie m.in. Indeed, Glassdoor, StepStone, Reed, SEEK). Listę można przyciąć przez SCRAPE_ENABLED_BOARD_IDS na API. Na jednym serwisie Railway bez Redis scraping działa w procesie API (bez osobnego workera). Z Redis + workerami zadania idą do Celery.",
+    scrapeRegistryHonest:
+      "Uczciwie: {registry} adapterów w dzisiejszym rejestrze scrape; {roadmapLive} z 50 portali z marquee ma status „live” (reszta planowana — wolumen zależy od polityki portalu i limitów).",
     twinForYourJobRunning: "Twin for your job: trwa…",
     twinForYourJobRefreshing: "Odświeżanie feedu…",
     roadmapSummary: "Docelowe portale i kariery firm (roadmapa)",
@@ -2990,6 +3011,9 @@ const pl: MessageTree = {
     billingRetry: "Spróbuj ponownie",
     billingPlansEmpty: "Na razie nie ma tu planów do wyświetlenia.",
     billingCheckoutError: "Nie udało się dokończyć tej czynności. Spróbuj ponownie za chwilę.",
+    billingPaymentsLaunchingTitle: "Płatności wkrótce",
+    billingPaymentsLaunchingLead:
+      "Płatność kartą nie jest jeszcze aktywna na tym serwerze. Plan darmowy działa — dołącz do listy founding, gdy podłączymy Stripe w Railway.",
     billingPageLead:
       "Free trzyma limit śledzonych aplikacji; Premium daje nielimit. Auto-apply domyślnie na każdym planie (demo / inwestor); na produkcji możesz ograniczyć do płatnych: AUTO_APPLY_REQUIRE_PREMIUM=true na API. Płatności przez Stripe. Które karty, Link czy przelew zobaczysz na checkoutcie, wynika ze zmiennych na serwerze; poniżej widać, co jest włączone.",
     billingCurrentPlan: "Obecny plan",
@@ -3092,6 +3116,10 @@ const pl: MessageTree = {
     nightlyAutoApplyStripInactive:
       "Wyłączone — włącz, aby aplikować do najlepszych ofert, gdy śpisz.",
     nightlyAutoApplyStripCta: "Ustawienia",
+    nightlyAutoApplyConsentNudgeTitle: "Włącz zgodę na nocne auto-aplikowanie",
+    nightlyAutoApplyConsentNudgeBody:
+      "TWIN aplikuje w nocy tylko po wyraźnej zgodzie RODO. Sprawdź limity w ustawieniach i włącz funkcję.",
+    nightlyAutoApplyConsentNudgeCta: "Zgoda i ustawienia",
     nightlyAutoApplyPlatformSweep: "Ostatni sweep platformy",
     nightlyAutoApplyPlatformSweepNone: "Brak zarejestrowanego nocnego sweepu",
     workspaceGateTitleRecruiter: "Widok rekrutera",
@@ -3126,6 +3154,7 @@ const pl: MessageTree = {
     calendarStripMicrosoftConnected: "Microsoft Calendar: połączono jako {email}.",
     calendarStripMicrosoftDisconnected: "Brak połączenia z Microsoft Calendar — podłącz Outlook służbowy.",
     calendarStripConnectMicrosoft: "Połącz Microsoft 365",
+    calendarStripMicrosoftEyebrow: "Microsoft 365 / Outlook",
     calendarProviderGoogle: "Google Calendar",
     calendarProviderMicrosoft: "Microsoft 365",
     calendarNextInterviewTitle: "Najbliższa rozmowa",
@@ -3326,7 +3355,11 @@ const pl: MessageTree = {
       "Na hoście API (np. Railway) ustaw LINKEDIN_CLIENT_ID, LINKEDIN_CLIENT_SECRET i LINKEDIN_REDIRECT_URI dokładnie na adres callback powyżej (lub localhost w dev), potem redeploy API.",
     linkedInSetupDoc: "Instrukcja: docs/LINKEDIN_KONFIGURACJA_PL.md w folderze projektu.",
     errorLinkedinNotConfigured:
-      "Logowanie przez LinkedIn jest niedostępne. Użyj formularza e-mail poniżej.",
+      "Logowanie przez LinkedIn nie jest jeszcze dostępne na tej stronie. Użyj e-maila i hasła poniżej.",
+    linkedInUnavailableTitle: "Logowanie LinkedIn — wkrótce",
+    linkedInUnavailableLead:
+      "Na razie użyj e-maila i hasła. LinkedIn pojawi się tutaj, gdy operator włączy OAuth na API.",
+    useEmailLogin: "Zaloguj się e-mailem",
     errorOAuthNotConfigured:
       "Ten sposób logowania nie jest jeszcze skonfigurowany na serwerze. Użyj e-mail lub poproś administratora.",
     oauthGoogle: "Kontynuuj z Google",
@@ -3809,7 +3842,9 @@ const pl: MessageTree = {
   },
   referrals: {
     title: "Poleć znajomych",
-    lead: "Udostępnij link — zarabiasz, gdy znajomi subskrybują lub dostaną pracę. Wypłaty w koncie.",
+    lead: "Udostępnij link — zarabiasz, gdy znajomi subskrybują lub dostaną pracę. Przy kwalifikujących się hire ekonomia jest spójna z modelem 25% netto od pierwszej pensji (cennik kandydata). Wypłaty w koncie.",
+    rewardModelNote:
+      "Nagrody za polecenia to osobny program od bonusu 25% za placement — oba opisane w regulaminie i modelu inwestorskim.",
     shareTitle: "Twój link polecający",
     copyLink: "Kopiuj link",
     copied: "Skopiowano",
@@ -4027,8 +4062,12 @@ const pl: MessageTree = {
     uploadSuccess: "Dokument zarejestrowany",
     uploadPresignHint: "Użyj bezpiecznego linku z potwierdzenia — ważny 15 minut.",
     uploadFailed: "Nie udało się zarejestrować dokumentu",
+    uploadEnterpriseComing:
+      "Bezpieczny upload enterprise wkrótce. Zarejestrowaliśmy metadane pliku — potwierdzimy kroki mailem.",
+    uploadEnterpriseToast:
+      "Plik zarejestrowany — szyfrowany upload enterprise włączymy w kolejnym wdrożeniu produkcyjnym.",
     demoModeBanner:
-      "Materiały demo — możesz zarejestrować nazwy plików; pełny upload w chmurze włączymy na produkcji enterprise.",
+      "Tryb podglądu — możesz zarejestrować nazwy plików. Pełny szyfrowany upload dla due diligence enterprise — wkrótce.",
   },
   recruiterJobs: {
     title: "Opublikuj ofertę",

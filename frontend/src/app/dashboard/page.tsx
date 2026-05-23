@@ -29,6 +29,7 @@ import { DashboardTutorial } from "@/components/dashboard/dashboard-tutorial";
 import { FeedbackModal } from "@/components/feedback/feedback-modal";
 import { HelpWidget } from "@/components/help/help-widget";
 import { InvestorRoadmapPanel } from "@/components/investor-roadmap-panel";
+import { ScrapeRegistryCoverageHint } from "@/components/scrape-registry-coverage-hint";
 import { useTranslation } from "@/components/language-provider";
 import { JobFiltersBar } from "@/components/job-filters";
 import { JobEmployerModal } from "@/components/job-employer/job-employer-modal";
@@ -1340,7 +1341,7 @@ export default function DashboardPage() {
                 {dashboardCalendarBundle ? (
                   <div className="mt-3 border-t border-[var(--twin-border)] pt-3">
                     <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
-                      Microsoft 365 / Outlook
+                      {t("dashboard.calendarStripMicrosoftEyebrow")}
                     </p>
                     <p className="twin-muted mt-1 text-xs leading-relaxed">
                       {dashboardCalendarBundle.microsoft.connected
@@ -1614,6 +1615,7 @@ export default function DashboardPage() {
                 </p>
               ) : null}
               <p className="twin-muted mt-3 text-xs leading-relaxed">{t("dashboard.twinForYourJobHint")}</p>
+              <ScrapeRegistryCoverageHint />
               <p className="twin-muted mt-2 text-[11px] leading-relaxed">
                 {t("dashboard.scrapeAllHint")} {t("dashboard.keepApiOpen")}
               </p>

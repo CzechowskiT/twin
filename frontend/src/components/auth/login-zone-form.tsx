@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
 
-import { LinkedInLoginButton } from "@/components/linkedin-login-button";
+import { LinkedInLoginSection } from "@/components/linkedin-login-section";
 import { OAuthWebButtons } from "@/components/oauth-web-buttons";
 import { useTranslation } from "@/components/language-provider";
 import { useMarketingPersona } from "@/components/persona-provider";
@@ -103,10 +103,11 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
         )}
       </p>
       <h1 className="mb-2 mt-1 text-2xl font-semibold">{t(ZONE_TITLE[zone])}</h1>
-      <p className="twin-muted mb-6 text-sm leading-relaxed">{t(ZONE_LEAD[zone])}</p>
-      <form onSubmit={onSubmit}>
-        <Label>{t("login.email")}</Label>
-        <Input name="email" type="email" required autoComplete="email" />
+      <p className="twin-muted mb-4 text-sm leading-relaxed">{t(ZONE_LEAD[zone])}</p>
+      <LinkedInLoginSection emailLoginHref="#login-email" />
+      <form onSubmit={onSubmit} className="mt-4">
+        <Label htmlFor="login-email">{t("login.email")}</Label>
+        <Input id="login-email" name="email" type="email" required autoComplete="email" />
         <Label>{t("login.password")}</Label>
         <Input name="password" type="password" required autoComplete="current-password" />
         <p className="mb-4 text-right text-sm">
@@ -128,7 +129,6 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
           apple: t("login.oauthApple"),
         }}
       />
-      <LinkedInLoginButton label={t("login.linkedIn")} />
       <p className="twin-muted mt-4 text-center text-sm">
         {t("login.noAccount")}{" "}
         <Link href={REGISTER_PATH[zone]} className="twin-link">

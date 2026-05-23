@@ -15,6 +15,7 @@ export default function DashboardReferralsPage() {
         </p>
         <h1 className="twin-page-intro text-2xl font-semibold sm:text-3xl">{t("referrals.title")}</h1>
         <p className="twin-muted max-w-2xl text-sm leading-relaxed">{t("referrals.lead")}</p>
+        <p className="twin-muted max-w-2xl text-xs leading-relaxed">{t("referrals.rewardModelNote")}</p>
       </header>
       <ReferralsDashboard />
     </Shell>

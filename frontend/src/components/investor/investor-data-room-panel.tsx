@@ -133,6 +133,7 @@ export function InvestorDataRoomPanel() {
           <Card variant="soft" className="mt-6 p-5">
             <h3 className="font-semibold">{t("dataRoom.uploadTitle")}</h3>
             <p className="twin-muted mt-2 text-sm leading-relaxed">{t("dataRoom.uploadLead")}</p>
+            <p className="twin-muted mt-2 text-xs leading-relaxed">{t("dataRoom.uploadEnterpriseComing")}</p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <label className="text-sm">
                 <span className="twin-muted text-xs">{t("dataRoom.uploadCategory")}</span>
@@ -185,8 +186,8 @@ export function InvestorDataRoomPanel() {
                     toast.success(t("dataRoom.uploadSuccess"));
                     if (res.upload_url) {
                       toast(t("dataRoom.uploadPresignHint"), { icon: "ℹ️", duration: 8000 });
-                    } else if (res.storage_note) {
-                      toast(res.storage_note, { icon: "ℹ️", duration: 6000 });
+                    } else {
+                      toast(t("dataRoom.uploadEnterpriseToast"), { icon: "ℹ️", duration: 6000 });
                     }
                     setUploadFilename("");
                   })
