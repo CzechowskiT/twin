@@ -5,6 +5,7 @@ from fastapi import APIRouter
 from app.api import (
     auto_apply_settings,
     admin_ops,
+    consent,
     demo,
     ops,
     investor_data_room,
@@ -38,6 +39,7 @@ api_router.include_router(demo.router, prefix="/demo", tags=["Demo"])
 api_router.include_router(public.router, prefix="/public", tags=["Public"])
 api_router.include_router(geo.router, prefix="/geo", tags=["Geo"])
 api_router.include_router(auth.router, prefix="/auth", tags=["Authentication"])
+api_router.include_router(consent.router, prefix="/consent", tags=["Consent"])
 api_router.include_router(linkedin_viral.router, prefix="/linkedin-viral", tags=["LinkedIn viral"])
 api_router.include_router(referrals.router, prefix="/referrals", tags=["Referrals"])
 api_router.include_router(calendar.router, prefix="/calendar", tags=["Calendar"])

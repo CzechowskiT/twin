@@ -1,13 +1,19 @@
 import { safeStorage } from "@/lib/safe-storage";
 
-const STORAGE_KEY = "twin_cookie_consent_v1";
+export const COOKIE_CONSENT_STORAGE_KEY = "twin_cookie_consent_v1";
+export const COOKIE_CONSENT_STORAGE_VERSION = 1;
 
-export type CookieConsentV1 = {
-  v: 1;
+/** Canonical persisted record (localStorage JSON). */
+export type CookieConsentRecord = {
+  version: typeof COOKIE_CONSENT_STORAGE_VERSION;
+  necessary: true;
   analytics: boolean;
   marketing: boolean;
   decidedAt: string;
 };
+
+/** @deprecated Use `CookieConsentRecord`. */
+export type CookieConsentV1 = CookieConsentRecord;
 
 export const COOKIE_CONSENT_EVENT = "twin-cookie-consent";
 export const COOKIE_CONSENT_CLEARED_EVENT = "twin-cookie-consent-cleared";
@@ -16,18 +22,23 @@ function isRecord(v: unknown): v is Record<string, unknown> {
   return v !== null && typeof v === "object";
 }
 
-export function readCookieConsent(): CookieConsentV1 | null {
-  if (typeof window === "undefined") return null;
+function readVersion(parsed: Record<string, unknown>): number | null {
+  if (typeof parsed.version === "number") return parsed.version;
+  if (typeof parsed.v === "number") return parsed.v;
+  return null;
+}
+
+/** Pure JSON parse — used in browser and unit tests. */
+export function parseCookieConsentJson(raw: string): CookieConsentRecord | null {
   try {
-    const raw = safeStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
     const parsed: unknown = JSON.parse(raw);
     if (!isRecord(parsed)) return null;
-    if (parsed.v !== 1) return null;
+    if (readVersion(parsed) !== COOKIE_CONSENT_STORAGE_VERSION) return null;
     if (typeof parsed.analytics !== "boolean" || typeof parsed.marketing !== "boolean") return null;
     if (typeof parsed.decidedAt !== "string") return null;
     return {
-      v: 1,
+      version: COOKIE_CONSENT_STORAGE_VERSION,
+      necessary: true,
       analytics: parsed.analytics,
       marketing: parsed.marketing,
       decidedAt: parsed.decidedAt,
@@ -37,8 +48,29 @@ export function readCookieConsent(): CookieConsentV1 | null {
   }
 }
 
-export function hasCookieConsentDecision(): boolean {
-  return readCookieConsent() !== null;
+export function getCookieConsent(): CookieConsentRecord | null {
+  if (typeof window === "undefined") return null;
+  const raw = safeStorage.getItem(COOKIE_CONSENT_STORAGE_KEY);
+  if (!raw) return null;
+  return parseCookieConsentJson(raw);
+}
+
+/** @deprecated Use `getCookieConsent`. */
+export const readCookieConsent = getCookieConsent;
+
+export function hasDecidedCookieConsent(): boolean {
+  return getCookieConsent() !== null;
+}
+
+/** @deprecated Use `hasDecidedCookieConsent`. */
+export const hasCookieConsentDecision = hasDecidedCookieConsent;
+
+export function analyticsConsentGranted(): boolean {
+  return getCookieConsent()?.analytics === true;
+}
+
+export function marketingConsentGranted(): boolean {
+  return getCookieConsent()?.marketing === true;
 }
 
 /** Show banner site-wide except fleeting OAuth handoff (avoids flash over redirect UI). */
@@ -57,24 +89,31 @@ export function shouldShowCookieBannerOnPath(pathname: string | null): boolean {
   return pathShowsCookieBanner(normalizePathnameForCookieBanner(pathname));
 }
 
-export function writeCookieConsent(choice: { analytics: boolean; marketing: boolean }): void {
-  const record: CookieConsentV1 = {
-    v: 1,
+export function setCookieConsent(choice: { analytics: boolean; marketing: boolean }): CookieConsentRecord {
+  const record: CookieConsentRecord = {
+    version: COOKIE_CONSENT_STORAGE_VERSION,
+    necessary: true,
     analytics: choice.analytics,
     marketing: choice.marketing,
     decidedAt: new Date().toISOString(),
   };
-  safeStorage.setItem(STORAGE_KEY, JSON.stringify(record));
-  window.dispatchEvent(new CustomEvent(COOKIE_CONSENT_EVENT, { detail: record }));
+  safeStorage.setItem(COOKIE_CONSENT_STORAGE_KEY, JSON.stringify(record));
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent(COOKIE_CONSENT_EVENT, { detail: record }));
+  }
+  return record;
 }
+
+/** @deprecated Use `setCookieConsent`. */
+export const writeCookieConsent = setCookieConsent;
 
 export function clearCookieConsent(): void {
   if (typeof window === "undefined") return;
-  safeStorage.removeItem(STORAGE_KEY);
+  safeStorage.removeItem(COOKIE_CONSENT_STORAGE_KEY);
   window.dispatchEvent(new CustomEvent(COOKIE_CONSENT_CLEARED_EVENT));
 }
 
 export function optionalCookiesAllowed(): boolean {
-  const c = readCookieConsent();
+  const c = getCookieConsent();
   return c !== null && (c.analytics || c.marketing);
 }

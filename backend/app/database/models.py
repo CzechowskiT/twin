@@ -452,7 +452,8 @@ class Application(Base):
     candidate_id: Mapped[int] = mapped_column(ForeignKey("candidates.id"), index=True)
     job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id"), index=True)
     status: Mapped[ApplicationStatus] = mapped_column(
-        Enum(ApplicationStatus), default=ApplicationStatus.PENDING
+        Enum(ApplicationStatus, values_callable=lambda x: [e.value for e in x]),
+        default=ApplicationStatus.PENDING,
     )
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     recruiter_feedback_raw: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -492,6 +493,24 @@ class Application(Base):
         back_populates="application",
         cascade="all, delete-orphan",
     )
+
+
+class CookieConsentEvent(Base):
+    """Append-only browser cookie banner decisions (anonymous or linked after login)."""
+
+    __tablename__ = "cookie_consent_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+    visitor_key_hash: Mapped[str] = mapped_column(String(64), index=True)
+    consent_version: Mapped[int] = mapped_column(Integer)
+    choices_json: Mapped[str] = mapped_column(Text)
+    decided_at: Mapped[datetime] = mapped_column(DateTime)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
 class PlacementEvent(Base):

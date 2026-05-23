@@ -1,4 +1,10 @@
-import { COOKIE_CONSENT_EVENT, readCookieConsent, type CookieConsentV1 } from "@/lib/cookie-consent";
+import {
+  COOKIE_CONSENT_EVENT,
+  analyticsConsentGranted,
+  getCookieConsent,
+  marketingConsentGranted,
+  type CookieConsentRecord,
+} from "@/lib/cookie-consent";
 import { safeStorage } from "@/lib/safe-storage";
 
 declare global {
@@ -19,6 +25,11 @@ function plausibleDomain(): string | null {
 function posthogKey(): string | null {
   const k = process.env.NEXT_PUBLIC_POSTHOG_KEY?.trim();
   return k || null;
+}
+
+/** True when optional analytics vendors are configured for this deployment. */
+export function optionalAnalyticsConfigured(): boolean {
+  return Boolean(posthogKey() || plausibleDomain());
 }
 
 function distinctId(): string {
@@ -60,17 +71,23 @@ function capturePosthog(event: string, props?: Record<string, string | number | 
 }
 
 /** Load Plausible script after analytics cookie consent. */
-export function initAnalyticsFromConsent(consent: CookieConsentV1 | null) {
+export function initAnalyticsFromConsent(consent: CookieConsentRecord | null) {
   if (typeof window === "undefined") return;
   if (!consent?.analytics) return;
   const domain = plausibleDomain();
   if (domain) injectPlausible(domain);
 }
 
+/** Future ad / retargeting pixels — gated separately from analytics. */
+export function initMarketingFromConsent(consent: CookieConsentRecord | null) {
+  if (typeof window === "undefined") return;
+  if (!consent?.marketing) return;
+  /* no third-party marketing pixels in MVP */
+}
+
 export function trackEvent(name: string, props?: Record<string, string | number | boolean>) {
   if (typeof window === "undefined") return;
-  const consent = readCookieConsent();
-  if (!consent?.analytics) return;
+  if (!analyticsConsentGranted()) return;
   try {
     window.plausible?.(name, props ? { props } : undefined);
   } catch {
@@ -81,11 +98,17 @@ export function trackEvent(name: string, props?: Record<string, string | number 
 
 export function setupAnalyticsListeners() {
   if (typeof window === "undefined") return () => {};
-  initAnalyticsFromConsent(readCookieConsent());
+  const boot = getCookieConsent();
+  initAnalyticsFromConsent(boot);
+  initMarketingFromConsent(boot);
   const onConsent = (e: Event) => {
-    const detail = (e as CustomEvent<CookieConsentV1>).detail;
-    initAnalyticsFromConsent(detail ?? readCookieConsent());
+    const detail = (e as CustomEvent<CookieConsentRecord>).detail;
+    const next = detail ?? getCookieConsent();
+    initAnalyticsFromConsent(next);
+    initMarketingFromConsent(next);
   };
   window.addEventListener(COOKIE_CONSENT_EVENT, onConsent);
   return () => window.removeEventListener(COOKIE_CONSENT_EVENT, onConsent);
 }
+
+export { analyticsConsentGranted, marketingConsentGranted };
