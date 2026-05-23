@@ -297,7 +297,6 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
             labels={{
               google: t("login.oauthGoogle"),
               github: t("login.oauthGithub"),
-              apple: t("login.oauthApple"),
               microsoft: t("login.oauthMicrosoft"),
             }}
           />

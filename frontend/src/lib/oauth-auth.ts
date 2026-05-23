@@ -40,7 +40,7 @@ function parseHealthOpsOAuthFlags(data: HealthOpsOAuthFlags): OAuthProviderStatu
 }
 
 export function hasConfiguredOAuthProvider(status: OAuthProviderStatus): boolean {
-  return status.google || status.github || status.apple || status.microsoft;
+  return status.google || status.github || status.microsoft;
 }
 
 export async function fetchOAuthProviderStatus(): Promise<OAuthProviderStatus> {
