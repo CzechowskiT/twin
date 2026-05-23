@@ -66,7 +66,6 @@ export function DemoAutoApplyPage() {
   const [stepStates, setStepStates] = useState<DemoStepState[]>(createInitialDemoStepStates);
   const [animatedScore, setAnimatedScore] = useState(DEMO_MATCH_SCORE_START);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [soundOn, setSoundOn] = useState(false);
   const [realApplying, setRealApplying] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [applyTarget, setApplyTarget] = useState<DemoApplyTarget | null>(null);
@@ -102,7 +101,7 @@ export function DemoAutoApplyPage() {
     }
   }, []);
 
-  const animateMatchScore = useCallback((enabled: boolean) => {
+  const animateMatchScore = useCallback(() => {
     if (scoreRafRef.current !== null) cancelAnimationFrame(scoreRafRef.current);
     const reduced =
       typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -122,7 +121,7 @@ export function DemoAutoApplyPage() {
         scoreRafRef.current = requestAnimationFrame(tick);
       } else {
         scoreRafRef.current = null;
-        if (enabled) playDemoStepChime(enabled);
+        playDemoStepChime();
       }
     };
     scoreRafRef.current = requestAnimationFrame(tick);
@@ -136,7 +135,7 @@ export function DemoAutoApplyPage() {
     const initial = createInitialDemoStepStates();
     initial[0] = "active";
     setStepStates(initial);
-    playDemoStepChime(soundOn);
+    playDemoStepChime();
 
     let tAccum = 0;
     DEMO_SEQUENCE_STEPS.forEach((_, idx) => {
@@ -150,8 +149,8 @@ export function DemoAutoApplyPage() {
           return next;
         });
         const nextActive = stepIdx + 1;
-        if (nextActive === 1) animateMatchScore(soundOn);
-        else if (nextActive < DEMO_SEQUENCE_STEPS.length) playDemoStepChime(soundOn);
+        if (nextActive === 1) animateMatchScore();
+        else if (nextActive < DEMO_SEQUENCE_STEPS.length) playDemoStepChime();
       }, tAccum);
       timersRef.current.push(id);
     });
@@ -159,11 +158,11 @@ export function DemoAutoApplyPage() {
     const idDone = window.setTimeout(() => {
       setPlayPhase("done");
       setShowConfetti(true);
-      playDemoSuccessChime(soundOn);
+      playDemoSuccessChime();
       clearTimers();
     }, tAccum + 350);
     timersRef.current.push(idDone);
-  }, [animateMatchScore, clearTimers, soundOn]);
+  }, [animateMatchScore, clearTimers]);
 
   const jumpToStep = useCallback(
     (idx: number) => {
@@ -184,16 +183,16 @@ export function DemoAutoApplyPage() {
     setStepStates((prev) => {
       const { states, completed } = advanceDemoStepStates(prev);
       const active = activeDemoStepIndex(states);
-      if (active === 1) animateMatchScore(soundOn);
-      else if (active > 0) playDemoStepChime(soundOn);
+      if (active === 1) animateMatchScore();
+      else if (active > 0) playDemoStepChime();
       if (completed) {
         setPlayPhase("done");
         setShowConfetti(true);
-        playDemoSuccessChime(soundOn);
+        playDemoSuccessChime();
       }
       return states;
     });
-  }, [animateMatchScore, clearTimers, playPhase, soundOn]);
+  }, [animateMatchScore, clearTimers, playPhase]);
 
   useEffect(() => () => clearTimers(), [clearTimers]);
 
@@ -316,15 +315,6 @@ export function DemoAutoApplyPage() {
             >
               {t("demo.nextStep")}
             </button>
-            <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-4 py-2 text-xs font-medium text-[var(--twin-muted-strong)]">
-              <input
-                type="checkbox"
-                className="h-4 w-4 rounded border-[var(--twin-border)] accent-[var(--twin-accent)]"
-                checked={soundOn}
-                onChange={(e) => setSoundOn(e.target.checked)}
-              />
-              {t("demo.soundToggle")}
-            </label>
             {playPhase === "idle" ? (
               <Link href="/register" className="section-cta-secondary twin-touch-target px-5 text-sm">
                 {t("demo.registerCta")}

@@ -1,4 +1,4 @@
-/** Optional UI ticks for demo beats — off by default; respects reduced motion. */
+/** UI ticks for demo beats; skipped when prefers-reduced-motion. */
 
 let audioCtx: AudioContext | null = null;
 
@@ -13,8 +13,7 @@ function ctx(): AudioContext | null {
   return audioCtx;
 }
 
-export function playDemoStepChime(enabled: boolean): void {
-  if (!enabled) return;
+export function playDemoStepChime(): void {
   const ac = ctx();
   if (!ac) return;
   void ac.resume().then(() => {
@@ -31,8 +30,7 @@ export function playDemoStepChime(enabled: boolean): void {
   });
 }
 
-export function playDemoSuccessChime(enabled: boolean): void {
-  if (!enabled) return;
+export function playDemoSuccessChime(): void {
   const ac = ctx();
   if (!ac) return;
   void ac.resume().then(() => {
