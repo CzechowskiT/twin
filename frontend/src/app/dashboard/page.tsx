@@ -1721,7 +1721,7 @@ export default function DashboardPage() {
                   company,
                   location: location ?? null,
                   url,
-                  initialTab: "overview",
+                  initialTab: "contact",
                 })
               }
               autoApplyJobId={autoApplyingId}
@@ -1933,7 +1933,7 @@ export default function DashboardPage() {
                           company,
                           location: location ?? null,
                           url,
-                          initialTab: "overview",
+                          initialTab: "contact",
                         })
                     : undefined
                 }
@@ -2012,7 +2012,7 @@ export default function DashboardPage() {
         company={employerHubJob?.company ?? ""}
         location={employerHubJob?.location ?? null}
         jobUrl={employerHubJob?.url}
-        initialTab={employerHubJob?.initialTab ?? "overview"}
+        initialTab={employerHubJob?.initialTab ?? "contact"}
         open={employerHubJob !== null}
         onClose={() => setEmployerHubJob(null)}
       />

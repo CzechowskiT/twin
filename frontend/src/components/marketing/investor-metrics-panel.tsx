@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { Card } from "@/components/ui";
-
 type MvpStats = {
   validated_jobs: number;
   registered_users: number;
@@ -30,6 +29,18 @@ function isEarlyStage(stats: MvpStats): boolean {
   return stats.registered_users < EARLY_USER_THRESHOLD || stats.total_applications < EARLY_APP_THRESHOLD;
 }
 
+type IntegrationFlag = "mail" | "stripe" | "google" | "microsoft";
+
+function integrationStatus(
+  key: IntegrationFlag,
+  on: boolean,
+  t: ReturnType<typeof useTranslation>["t"],
+): string {
+  if (on) return `✓ ${t("investorMetrics.flagStatusLive")}`;
+  if (key === "microsoft" || key === "stripe") return t("investorMetrics.flagStatusSoon");
+  return t("investorMetrics.flagStatusPrep");
+}
+
 export function InvestorMetricsPanel() {
   const { t, locale } = useTranslation();
   const [stats, setStats] = useState<MvpStats | null>(null);
@@ -49,8 +60,6 @@ export function InvestorMetricsPanel() {
 
   const loc = locale === "pl" ? "pl-PL" : "en-US";
   const fmt = (n: number) => n.toLocaleString(loc);
-  const flag = (on: boolean) =>
-    on ? "✓" : `— (${t("investorMetrics.flagConfigurable")})`;
 
   if (err) {
     return <p className="twin-muted text-sm">{t("investorMetrics.loadFailed")}</p>;
@@ -100,34 +109,38 @@ export function InvestorMetricsPanel() {
         ))}
       </div>
       {stats.data_room_local_demo && !stats.data_room_s3_enabled ? (
-        <p className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-900 dark:text-amber-200">
+        <p className="rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-2)] px-3 py-2 text-xs leading-relaxed text-[var(--twin-muted-strong)]">
           {t("investorMetrics.dataRoomDemoMode")}
         </p>
       ) : null}
-      <section aria-labelledby="investor-config-flags">
-        <h2 id="investor-config-flags" className="text-xs font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
+      <section aria-labelledby="investor-unit-economics">
+        <h2 id="investor-unit-economics" className="text-xs font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
           {t("investorMetrics.unitEconomicsTitle")}
         </h2>
         <p className="mt-1 text-xs leading-relaxed text-[var(--twin-muted)]">{t("investorMetrics.unitEconomicsLead")}</p>
         <p className="mt-2 text-xs text-[var(--twin-muted-strong)]">{t("investorMetrics.preRevenueNote")}</p>
-        <ul className="twin-muted mt-3 grid gap-1 text-xs sm:grid-cols-2">
+        <h3 className="mt-4 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
+          {t("investorMetrics.readinessTitle")}
+        </h3>
+        <ul className="twin-muted mt-2 grid gap-1 text-xs sm:grid-cols-2">
           <li>
-            {t("investorMetrics.flagMail")}: {flag(stats.mail_configured)}
+            {t("investorMetrics.flagMail")}: {integrationStatus("mail", stats.mail_configured, t)}
           </li>
           <li>
-            {t("investorMetrics.flagStripe")}: {flag(stats.stripe_checkout_ready)}
+            {t("investorMetrics.flagStripe")}: {integrationStatus("stripe", stats.stripe_checkout_ready, t)}
           </li>
           <li>
-            {t("investorMetrics.flagGoogle")}: {flag(stats.google_calendar_configured)}
+            {t("investorMetrics.flagGoogle")}: {integrationStatus("google", stats.google_calendar_configured, t)}
           </li>
           <li>
-            {t("investorMetrics.flagMicrosoft")}: {flag(stats.microsoft_calendar_configured)}
+            {t("investorMetrics.flagMicrosoft")}:{" "}
+            {integrationStatus("microsoft", stats.microsoft_calendar_configured, t)}
           </li>
         </ul>
       </section>
       <p className="twin-muted text-[10px]">
         {t("investorMetrics.updated")}: {new Date(stats.generated_at).toLocaleString(loc)}
-        {stats.database_reachable ? "" : " · DB unreachable"}
+        {stats.database_reachable ? "" : ` · ${t("investorMetrics.dbUnreachable")}`}
       </p>
     </div>
   );
