@@ -1,3 +1,5 @@
+import { clearSessionPersona } from "@/lib/session-persona";
+
 const TOKEN_KEY = "twin_access_token";
 
 /** Browser-agnostic token storage with localStorage → sessionStorage fallback. */
@@ -44,6 +46,7 @@ export function clearToken(): void {
   } catch {
     /* ignore */
   }
+  clearSessionPersona();
 }
 
 export function isStorageAvailable(): boolean {

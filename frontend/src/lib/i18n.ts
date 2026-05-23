@@ -172,6 +172,7 @@ const en = {
     personaRecruiter: "Recruiter",
     personaCompany: "Company",
     personaInvestor: "Investor",
+    logoutToSwitchRole: "Log out to switch role",
   },
   home: {
     tagline: "AI career twin",
@@ -1354,9 +1355,10 @@ const en = {
   workspace: {
     pickerTitle: "Choose your workspace",
     pickerLead:
-      "You are signed in. Pick the context for this session — each lane has its own tools and content.",
-    enterZone: "Enter workspace",
+      "You are signed in to one workspace lane. Use the tools below or log out to enter another role.",
+    enterZone: "Open workspace",
     switchContext: "Switch context",
+    logoutToSwitchHint: "Log out and sign in through the login page for another role.",
     signedInEyebrow: "Signed in",
     backMarketing: "Back to marketing site",
     marketingStory: "Product story (marketing)",
@@ -2494,6 +2496,7 @@ const pl: MessageTree = {
     personaRecruiter: "Rekruter",
     personaCompany: "Firma",
     personaInvestor: "Inwestor",
+    logoutToSwitchRole: "Wyloguj się, aby przełączyć rolę",
   },
   home: {
     tagline: "Bliźniak kariery AI",
@@ -3689,9 +3692,10 @@ const pl: MessageTree = {
   workspace: {
     pickerTitle: "Wybierz strefę pracy",
     pickerLead:
-      "Jesteś zalogowany. Wybierz kontekst na tę sesję — każda strefa ma własne narzędzia i treści.",
+      "Jesteś zalogowany w jednej strefie. Użyj narzędzi poniżej albo wyloguj się, aby wejść w inną rolę.",
     enterZone: "Wejdź do strefy",
     switchContext: "Zmień kontekst",
+    logoutToSwitchHint: "Wyloguj się i zaloguj przez stronę logowania dla innej roli.",
     signedInEyebrow: "Zalogowany",
     backMarketing: "Strona marketingowa",
     marketingStory: "Opis produktu (marketing)",
