@@ -80,6 +80,12 @@ set_var SCRAPE_WORKER_READY "${SCRAPE_WORKER_READY:-true}"
 set_var SCRAPE_BEAT_ENABLED "${SCRAPE_BEAT_ENABLED:-true}"
 set_var AUTO_APPLY_HEADLESS "${AUTO_APPLY_HEADLESS:-true}"
 
+# LinkedIn OAuth (Sign in with LinkedIn — callback on API, not frontend)
+LI_REDIRECT="${LINKEDIN_REDIRECT_URI:-$API_URL/api/v1/auth/linkedin/callback}"
+set_var LINKEDIN_CLIENT_ID "${LINKEDIN_CLIENT_ID:-}"
+set_var LINKEDIN_CLIENT_SECRET "${LINKEDIN_CLIENT_SECRET:-}"
+set_var LINKEDIN_REDIRECT_URI "$LI_REDIRECT"
+
 # Stripe Checkout (run scripts/stripe-bootstrap-test.py first to create price + webhook in test mode)
 set_var STRIPE_SECRET_KEY "${STRIPE_SECRET_KEY:-}"
 set_var STRIPE_WEBHOOK_SECRET "${STRIPE_WEBHOOK_SECRET:-}"

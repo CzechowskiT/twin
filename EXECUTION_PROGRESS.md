@@ -1,7 +1,7 @@
 # TWIN — 100 tasks execution progress
 
 **Branch:** `cursor/phase1-monorepo-scaffold`  
-**Updated:** 2026-05-23
+**Updated:** 2026-05-23 (night autonomous slice)
 
 Legend: `[x]` done this sprint · `[ ]` open · `[~]` partial / docs-only · `[—]` skipped (founder secrets)
 
@@ -49,10 +49,16 @@ Legend: `[x]` done this sprint · `[ ]` open · `[~]` partial / docs-only · `[�
 
 ## Phase 7–12 — Backlog (not in this session)
 
-- [ ] **01–03** Stripe live, LinkedIn OAuth, Microsoft calendar (founder Railway secrets)
-- [ ] **05** Dedicated `twin-worker` service
+- [~] **01** Stripe live — MCP sandbox has prices; Railway still missing `STRIPE_SECRET_KEY`; **`docs/STRIPE_RAILWAY_SETUP.md`** + **`scripts/railway-apply-stripe-env.sh`** added
+- [x] **02** LinkedIn OAuth on prod — applied via Railway CLI 2026-05-23; `linkedin_oauth_configured: true`
+- [—] **03** Microsoft calendar — `MICROSOFT_CLIENT_*` empty in `.env.railway`; skipped
+- [x] **05** Celery worker + beat — service `enthusiastic-encouragement`; `worker_active: true` on prod
+- [x] **07** Health dashboard `/status` — LinkedIn, Celery, beat, recruiter inbox flags (2026-05-23)
+- [x] **44** Recruiter inbox batch accept/decline — multi-select UI + `respond-batch` API
+- [x] **59** Placement verification UI stepper on dashboard applications
+- [x] Investor metrics — `paid_subscribers`, `subscription_mrr_usd` stub when Stripe off
+- [x] WebCal regeneration polish — expiry + HTTPS preview on calendar page
 - [ ] **18** Nightly auto-apply prod verification (02:00 UTC)
-- [ ] **44** Recruiter inbox on prod with live token walkthrough
 - [ ] **52** ATS OAuth live
 - [ ] **76–77** RocketJobs + scrape corpus
 - [ ] **91** Data room S3 bytes
@@ -70,10 +76,23 @@ Legend: `[x]` done this sprint · `[ ]` open · `[~]` partial / docs-only · `[�
 
 ---
 
-## Founder-only blockers (top 5)
+## Evening ops (2026-05-23)
 
-1. Paste **Stripe** live keys + webhooks on Railway API.  
-2. Paste **LinkedIn OAuth** client id/secret + redirect URI on prod.  
-3. Paste **Microsoft Graph** calendar OAuth on Railway API.  
-4. Set **Vercel Production** branch to `cursor/phase1-monorepo-scaffold` and redeploy.  
-5. Create **twin-worker** Railway service (Celery beat + scrape) per `docs/RAILWAY_WORKER_PL.md`.
+| Check | Result |
+|-------|--------|
+| API `git_commit` | `c5ae7b9` (matches scaffold HEAD) |
+| Vercel proxy `git_commit` | `6960c83` → **pending redeploy** after this push |
+| `linkedin_oauth_configured` | **true** (Railway vars set + redeploy) |
+| `stripe_checkout_ready` | **false** (no `STRIPE_*` on Railway; setup doc + apply script shipped) |
+| Celery | `worker_active: true`, beat schedules firing |
+| Demo verify script | **PASS** (`live_db`, 5 top matches in snapshot) |
+| pytest fixes | PDF locale `pl`; seed idempotent expects 7 demo jobs |
+| Audit branch merge | **N/A** — scaffold ahead of `cursor/audit-and-mvp-slices-may23` by `c5ae7b9` |
+
+## Founder-only blockers (remaining)
+
+1. Paste **Stripe** `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET` + price IDs on Railway (test: `price_1TZtVB…` Premium, `price_1TZtVf…` Pro in sandbox).  
+2. Paste **Microsoft Graph** calendar OAuth on Railway API.  
+3. **Vercel** production branch + redeploy (`vercel`/`gh` CLI not on agent host — use dashboard or add token).  
+4. **Demo password** for re-seed: set `INVESTOR_DEMO_PASSWORD` on Railway, then `railway run python3 scripts/seed-investor-demo.py --reset-password`.  
+5. Optional: rename worker service `enthusiastic-encouragement` → `twin-worker`; set **S3** vars for data room bytes on prod.

@@ -134,6 +134,7 @@ export default function DashboardCalendarPage() {
   const [status, setStatus] = useState<CalendarStatus | null>(null);
   const [msStatus, setMsStatus] = useState<MicrosoftCalendarStatus | null>(null);
   const [webcalUrl, setWebcalUrl] = useState<string | null>(null);
+  const [webcalExpiresAt, setWebcalExpiresAt] = useState<string | null>(null);
   const [banner, setBanner] = useState<"connected" | "denied" | "error" | null>(null);
   const [calendarErrorCode, setCalendarErrorCode] = useState<string | null>(null);
   const [actionBusy, setActionBusy] = useState<string | null>(null);
@@ -401,6 +402,7 @@ export default function DashboardCalendarPage() {
     try {
       const out = await mintAndOpenWebcalSubscribe(token);
       setWebcalUrl(out.webcal_url);
+      setWebcalExpiresAt(out.expires_at);
     } catch (e) {
       setActionError(true);
       console.warn("[calendar] webcal subscribe failed", e);
@@ -417,6 +419,7 @@ export default function DashboardCalendarPage() {
     try {
       const out = await mintWebcalFeed(token);
       setWebcalUrl(out.webcal_url);
+      setWebcalExpiresAt(out.expires_at);
       persistWebcalUrl(out.webcal_url);
     } catch (e) {
       setActionError(true);
@@ -437,6 +440,7 @@ export default function DashboardCalendarPage() {
         const out = await mintWebcalFeed(token);
         url = out.webcal_url;
         setWebcalUrl(url);
+        setWebcalExpiresAt(out.expires_at);
         persistWebcalUrl(url);
       }
       await navigator.clipboard.writeText(webcalToHttps(url));
@@ -852,6 +856,27 @@ export default function DashboardCalendarPage() {
               <p className="mt-2 text-sm text-emerald-700 dark:text-emerald-300" role="status">
                 {t("dashboard.calendarLinkCopied")}
               </p>
+            ) : null}
+            {webcalUrl ? (
+              <div className="mt-3 space-y-2">
+                {webcalExpiresAt ? (
+                  <p className="text-xs text-[var(--twin-muted-strong)]">
+                    {t("dashboard.calendarWebcalExpires").replace(
+                      "{when}",
+                      new Date(webcalExpiresAt).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" }),
+                    )}
+                  </p>
+                ) : null}
+                <label className="block text-xs font-medium text-[var(--foreground)]">
+                  {t("dashboard.calendarWebcalPreview")}
+                  <input
+                    readOnly
+                    value={webcalToHttps(webcalUrl)}
+                    className="twin-input mt-1 w-full font-mono text-[11px]"
+                    onFocus={(e) => e.currentTarget.select()}
+                  />
+                </label>
+              </div>
             ) : null}
           </details>
         </Card>

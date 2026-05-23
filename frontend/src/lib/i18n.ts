@@ -550,6 +550,11 @@ const en = {
       "Auto-refresh finished. Current job total in your filters: {n}. If numbers still look stale, reload once (Cmd+Shift+R).",
     placementDeclareHint:
       "First confirm in-app that you accepted an offer or started in this role. This creates an audit trail before we send any work-email link.",
+    placementStepperLabel: "Placement verification progress",
+    placementStepPipeline: "Pipeline",
+    placementStepDeclared: "Declared",
+    placementStepVerify: "Verify",
+    placementStepVerified: "Verified",
     placementDeclareNotePlaceholder:
       "Optional: start date, job title on the contract, or other context (max 2000 characters).",
     placementDeclareSubmit: "Confirm placement — continue to email step",
@@ -938,6 +943,8 @@ const en = {
     calendarWebcalHint:
       "Your interviews stay in sync. Tap Add to calendar — no account password needed.",
     calendarWebcalGenerate: "New subscribe link",
+    calendarWebcalExpires: "Subscribe link valid until {when}",
+    calendarWebcalPreview: "Subscribe URL (HTTPS)",
     calendarWebcalOneClick: "Add to calendar",
     calendarWebcalCopy: "Copy link",
     calendarProviderAppleTitle: "Apple Calendar (iCloud)",
@@ -1473,6 +1480,9 @@ const en = {
       "We are pre-revenue. Use the scenario calculator for upside and sensitivity — illustrative models only, not audited financials.",
     preRevenueNote:
       "Subscriptions and placement fees will run through Stripe when we turn on billing in production.",
+    paidSubscribers: "Paying subscribers",
+    subscriptionMrr: "Subscription MRR (USD)",
+    subscriptionMrrStub: "— (Stripe not live)",
     dbUnreachable: "database temporarily unavailable",
   },
   investorFundraising: {
@@ -1818,6 +1828,12 @@ const en = {
     declineNotePlaceholder: "Why declining — for audit only, not sent to candidate",
     declineConfirm: "Confirm decline",
     declineCancel: "Cancel",
+    selectAllVisible: "Select all visible",
+    selectedCount: "{count} selected",
+    batchAccept: "Accept selected",
+    batchDecline: "Decline selected",
+    batchDeclineConfirm: "Confirm batch decline",
+    selectRow: "Select {name}",
   },
   acceptanceQueue: {
     stripTitle: "Acceptance queue",
@@ -1866,6 +1882,14 @@ const en = {
     home: "Back to home",
     openapi: "OpenAPI schema",
     developers: "Developers & ops docs",
+    linkedin: "LinkedIn OAuth",
+    celeryWorker: "Celery worker",
+    nightlyBeat: "Nightly auto-apply beat",
+    recruiterInbox: "Recruiter inbox",
+    active: "active",
+    inactive: "inactive",
+    scheduled: "scheduled",
+    notScheduled: "not scheduled",
   },
   feedback: {
     title: "Send feedback",
@@ -2872,6 +2896,11 @@ const pl: MessageTree = {
       "Auto-odświeżanie zakończone. Liczba ofert (z filtrami): {n}. Jeśli nadal wygląda na stare, zrób twarde odświeżenie (Cmd+Shift+R).",
     placementDeclareHint:
       "Najpierw potwierdź w aplikacji, że przyjąłeś ofertę lub rozpocząłeś pracę w tej roli. To tworzy ślad audytowy zanim wyślemy link na służbowy mail.",
+    placementStepperLabel: "Postęp weryfikacji placementu",
+    placementStepPipeline: "Pipeline",
+    placementStepDeclared: "Zgłoszone",
+    placementStepVerify: "Weryfikacja",
+    placementStepVerified: "Zweryfikowane",
     placementDeclareNotePlaceholder:
       "Opcjonalnie: data startu, stanowisko z umowy albo inny kontekst (maks. 2000 znaków).",
     placementDeclareSubmit: "Potwierdzam placement — przejdź do maila służbowego",
@@ -3263,6 +3292,8 @@ const pl: MessageTree = {
     calendarWebcalHint:
       "Rozmowy z TWIN są na bieżąco. Naciśnij Dodaj do kalendarza — bez podawania hasła do konta.",
     calendarWebcalGenerate: "Nowy link subskrypcji",
+    calendarWebcalExpires: "Link subskrypcji ważny do {when}",
+    calendarWebcalPreview: "URL subskrypcji (HTTPS)",
     calendarWebcalOneClick: "Dodaj do kalendarza",
     calendarWebcalCopy: "Kopiuj link",
     calendarProviderAppleTitle: "Apple Calendar (iCloud)",
@@ -3807,6 +3838,9 @@ const pl: MessageTree = {
       "Jesteśmy przed przychodem. Kalkulator scenariusza pokazuje wrażliwość i potencjał — modele poglądowe, bez audytowanych finansów.",
     preRevenueNote:
       "Subskrypcje i opłaty placementowe uruchomimy przez Stripe, gdy włączymy rozliczenia na produkcji.",
+    paidSubscribers: "Płacący subskrybenci",
+    subscriptionMrr: "MRR subskrypcji (USD)",
+    subscriptionMrrStub: "— (Stripe nieaktywny)",
     dbUnreachable: "baza tymczasowo niedostępna",
   },
   investorFundraising: {
@@ -4154,6 +4188,12 @@ const pl: MessageTree = {
     declineNotePlaceholder: "Powód odrzucenia — tylko audyt, bez wysyłki do kandydata",
     declineConfirm: "Potwierdź odrzucenie",
     declineCancel: "Anuluj",
+    selectAllVisible: "Zaznacz widoczne",
+    selectedCount: "Zaznaczono: {count}",
+    batchAccept: "Zaakceptuj zaznaczone",
+    batchDecline: "Odrzuć zaznaczone",
+    batchDeclineConfirm: "Potwierdź masowe odrzucenie",
+    selectRow: "Zaznacz {name}",
   },
   acceptanceQueue: {
     stripTitle: "Kolejka akceptacji",
@@ -4202,6 +4242,14 @@ const pl: MessageTree = {
     home: "Strona główna",
     openapi: "Schemat OpenAPI",
     developers: "Developerzy i dokumentacja ops",
+    linkedin: "OAuth LinkedIn",
+    celeryWorker: "Worker Celery",
+    nightlyBeat: "Beat auto-apply (noc)",
+    recruiterInbox: "Skrzynka rekrutera",
+    active: "aktywny",
+    inactive: "nieaktywny",
+    scheduled: "zaplanowany",
+    notScheduled: "brak harmonogramu",
   },
   feedback: {
     title: "Wyślij opinię",

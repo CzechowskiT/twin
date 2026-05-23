@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "@/components/language-provider";
+import { PlacementStateStepper } from "@/components/placement-state-stepper";
 import { applicationStatusKey } from "@/lib/application-status";
 
 export type FeedbackInsights = {
@@ -219,6 +220,7 @@ export function ApplicationsPanel({
               </p>
               {onPlacementDeclare && onPlacementVerifyStart && showPlacementRow(app) ? (
                 <div className="mt-2 max-w-md space-y-2 rounded border border-[var(--twin-accent)]/25 bg-[var(--twin-accent-muted)]/25 p-2 text-xs">
+                  <PlacementStateStepper state={app.placement_state ?? "none"} />
                   {(app.placement_state ?? "none") === "disputed" ? (
                     <>
                       <p className="font-semibold text-amber-700">{t("dashboard.placementDisputed")}</p>

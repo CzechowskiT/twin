@@ -47,3 +47,11 @@ class MvpStatsOut(BaseModel):
     data_room_local_demo: bool = Field(
         description="True when uploads use local API disk (no S3) — investor demo mode.",
     )
+    paid_subscribers: int = Field(
+        ge=0,
+        description="Users with an entitled Stripe subscription status (active, trialing, past_due).",
+    )
+    subscription_mrr_usd: float | None = Field(
+        default=None,
+        description="Estimated monthly subscription MRR from plan tiers; null when Stripe checkout is not configured.",
+    )

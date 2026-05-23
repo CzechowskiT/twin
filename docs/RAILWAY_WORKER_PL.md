@@ -4,6 +4,8 @@ Scraping i zadania w tle **nie działają na samym API** — potrzebujesz osobne
 
 ## 1. Serwis `twin-worker`
 
+**Prod (2026-05-23):** Celery worker + beat działają na serwisie Railway **`enthusiastic-encouragement`** (nie `twin-worker`). Weryfikacja: `GET /api/v1/health/celery-status` → `worker_active: true`, logi: `celery@… ready` + `Beat` scheduler. Opcjonalnie: rename w panelu Railway na `twin-worker` dla czytelności — bez zmiany kodu.
+
 1. Railway → projekt **responsible-success** → **+ New** → **GitHub Repo** → ten sam repo co API.
 2. **Settings → Root Directory:** `backend`
 3. **Settings → Config file:** `deploy/railway-worker.toml`
