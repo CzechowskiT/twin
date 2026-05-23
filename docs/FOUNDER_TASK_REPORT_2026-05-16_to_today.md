@@ -212,4 +212,21 @@ Te rzeczy **agent nie wstawi** bez Twoich kont.
 
 ---
 
-*Wygenerowano: 2026-05-23 — agent Cursor, gałąź `cursor/phase1-monorepo-scaffold`, commit `91530db`.*
+## Updated 23.05 evening (agent)
+
+Autonomiczne domknięcia bez sekretów founder:
+
+- **#22** — `docs/VERCEL_PRODUCTION_BRANCH.md` + link z `docs/DEPLOY.md`; opcjonalnie gałąź **`main`** na GitHub = ten sam commit co scaffold
+- **#15** — logowanie: banner LinkedIn off + link do e-mail (`linkedin-login-section.tsx`)
+- **#41** — billing: „Payments launching soon” / wishlist gdy checkout off
+- **#8** — dashboard: `ScrapeRegistryCoverageHint` (licznik z API + roadmap live)
+- **#52** — strip + ustawienia auto-apply: nudge zgody
+- **#26 / marketing** — `MarketingPageHeader` + CTAs: careers, partners, case-studies, testimonials, companies/signup, compare
+- **#32 / funnel** — home → `/waitlist` (hero, teaser, CTA band)
+- **#67** — smoke Playwright: `frontend/e2e/smoke.spec.ts`
+
+Nadal **founder-only:** #9, #11, klucze LinkedIn/Stripe na Railway (#15/#41 prod), #69 Lever, #68 Authologic live, ręczny Vercel Production branch w panelu.
+
+---
+
+*Wygenerowano: 2026-05-23 — agent Cursor, gałąź `cursor/phase1-monorepo-scaffold`.*
