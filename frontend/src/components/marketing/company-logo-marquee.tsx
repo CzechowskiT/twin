@@ -223,7 +223,7 @@ function BrandMark({
           loading="eager"
           decoding="async"
           referrerPolicy="no-referrer"
-          className="max-h-full max-w-full object-contain object-center contrast-[1.08] brightness-[1.02] transition-[filter,opacity]"
+          className="max-h-full max-w-full object-contain object-center transition-opacity"
           onError={onError}
         />
       </span>
