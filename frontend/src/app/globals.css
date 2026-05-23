@@ -200,6 +200,27 @@ html[data-cookie-banner="open"] main {
   padding-bottom: clamp(11rem, 32vh, 18rem);
 }
 
+@keyframes cookie-consent-banner-in {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cookie-consent-banner-panel {
+  animation: cookie-consent-banner-in 0.28s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cookie-consent-banner-panel {
+    animation: none;
+  }
+}
+
 @supports (text-wrap: pretty) {
   body {
     text-wrap: pretty;
@@ -2096,6 +2117,12 @@ html[data-marketing-surface="studio"] a.landing-hero-demo-cta {
 
 .landing-trust-cue {
   margin-top: -0.5rem;
+}
+
+/** Homepage: marquee sits under eyebrow; no duplicate strip in site chrome. */
+.company-logo-marquee--landing {
+  margin-top: 0.75rem;
+  border-top-width: 0;
 }
 
 .landing-how-timeline {
