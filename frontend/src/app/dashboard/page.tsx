@@ -18,6 +18,7 @@ import {
   LinkedinOptimizerModal,
   SalaryNegotiateModal,
 } from "@/components/career-assistant/career-assistant-modals";
+import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { DashboardCommandCenter } from "@/components/dashboard-command-center";
 import { EmailVerificationBanner } from "@/components/email-verification-banner";
 import { NightlyAutoApplyStrip } from "@/components/nightly-auto-apply-strip";
@@ -89,7 +90,7 @@ type JobItem = {
   salary_max: number | null;
   score?: number | null;
 };
-type JobList = { items: JobItem[]; total: number };
+type JobList = { items: JobItem[]; total: number; search_relaxed?: boolean };
 type MatchItem = {
   job_id: number;
   score: number;
@@ -1252,66 +1253,15 @@ export default function DashboardPage() {
         },
       }}
     >
-      <div className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-start sm:justify-between">
-        <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">
+      <div className="mb-4 flex min-w-0 flex-col gap-3 sm:mb-6 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+        <h1 className="twin-page-intro twin-section-title shrink-0 text-xl sm:text-2xl">
           {t("dashboard.title")}
         </h1>
-        <nav
-          className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-2"
-          aria-label={t("dashboard.title")}
-        >
-          <Link
-            href="/profile"
-            className="twin-link inline-flex min-h-[2.75rem] items-center justify-center px-1 text-sm sm:justify-start sm:text-left"
-          >
-            {t("nav.profile")}
-          </Link>
-          <Link
-            href="/dashboard/career"
-            className="twin-link inline-flex min-h-[2.75rem] items-center justify-center px-1 text-sm sm:justify-start sm:text-left"
-          >
-            {t("dashboard.careerCompassLink")}
-          </Link>
-          <Link
-            href="/dashboard/billing"
-            className="twin-link inline-flex min-h-[2.75rem] items-center justify-center px-1 text-sm sm:justify-start sm:text-left"
-          >
-            {t("dashboard.billingLink")}
-          </Link>
-          <Link
-            href="/dashboard/referrals"
-            className="twin-link inline-flex min-h-[2.75rem] items-center justify-center px-1 text-sm sm:justify-start sm:text-left"
-          >
-            {t("dashboard.referralsLink")}
-          </Link>
-          <Link
-            href="/dashboard/identity"
-            className="twin-link inline-flex min-h-[2.75rem] items-center justify-center px-1 text-sm sm:justify-start sm:text-left"
-          >
-            {t("dashboard.identityLink")}
-          </Link>
-          <Link
-            href="/dashboard/calendar"
-            className="twin-link inline-flex min-h-[2.75rem] items-center justify-center px-1 text-sm sm:justify-start sm:text-left"
-          >
-            {t("dashboard.calendarLink")}
-          </Link>
-          <Link
-            href="/dashboard/settings/auto-apply"
-            className="twin-link inline-flex min-h-[2.75rem] items-center justify-center px-1 text-sm sm:justify-start sm:text-left"
-          >
-            {t("dashboard.nightlyAutoApplyLink")}
-          </Link>
-          <button
-            type="button"
-            className="twin-link inline-flex min-h-[2.75rem] cursor-pointer items-center justify-center border-0 bg-transparent p-0 px-1 text-sm font-[inherit] sm:justify-start sm:text-left disabled:opacity-50"
-            disabled={exportJsonBusy}
-            aria-label={t("dashboard.exportMyDataJsonAria")}
-            onClick={() => void downloadMyDataJson()}
-          >
-            {exportJsonBusy ? "…" : t("dashboard.exportMyDataJson")}
-          </button>
-        </nav>
+        <CandidateWorkspaceSubnav
+          ariaLabel={t("dashboard.title")}
+          exportJsonBusy={exportJsonBusy}
+          onExportJson={() => void downloadMyDataJson()}
+        />
       </div>
 
       <div className="mb-6 rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/50 px-4 py-3 sm:px-5">
@@ -1909,6 +1859,14 @@ export default function DashboardPage() {
           </div>
         ) : (
           <>
+            {jobs.search_relaxed ? (
+              <p
+                className="mb-3 rounded-md border border-amber-500/35 bg-amber-500/10 px-3 py-2 text-sm text-amber-950 dark:text-amber-100"
+                role="status"
+              >
+                {t("dashboard.jobsSearchRelaxedBanner")}
+              </p>
+            ) : null}
             {jobs.total > 0 ? (
               <p className="twin-muted mb-2 text-xs leading-relaxed">
                 {t("dashboard.jobsShowingSummary")

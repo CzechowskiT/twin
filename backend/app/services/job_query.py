@@ -1,9 +1,9 @@
 """Filtered job listing for dashboard."""
 
-from sqlalchemy import or_
 from sqlalchemy.orm import Query, Session
 
 from app.database.models import Job
+from app.services.job_search import apply_min_salary_filter, job_text_token_clause, tokenize_job_search
 
 SORT_NEWEST = "newest"
 SORT_SALARY = "salary"
@@ -20,32 +20,15 @@ def apply_job_filters(
     title_terms: str | None = None,
     sort: str = SORT_NEWEST,
 ) -> Query:
-    if q:
-        term = f"%{q.strip()}%"
-        query = query.filter(
-            or_(
-                Job.title.ilike(term),
-                Job.company.ilike(term),
-                Job.location.ilike(term),
-                Job.description.ilike(term),
-                Job.requirements.ilike(term),
-            )
-        )
+    tokens = tokenize_job_search(q, title_terms)
+    clause = job_text_token_clause(tokens)
+    if clause is not None:
+        query = query.filter(clause)
     if location:
         query = query.filter(Job.location.ilike(f"%{location.strip()}%"))
     if job_board:
         query = query.filter(Job.job_board.ilike(f"%{job_board.strip()}%"))
-    if min_salary is not None and min_salary > 0:
-        query = query.filter(
-            or_(
-                Job.salary_max >= min_salary,
-                Job.salary_min >= min_salary,
-            )
-        )
-    if title_terms and title_terms.strip():
-        parts = [p.strip() for p in title_terms.replace("|", ",").split(",") if p.strip()]
-        if parts:
-            query = query.filter(or_(*(Job.title.ilike(f"%{p}%") for p in parts)))
+    query = apply_min_salary_filter(query, min_salary)
 
     if sort == SORT_SALARY:
         return query.order_by(Job.salary_max.desc().nullslast(), Job.scraped_at.desc())

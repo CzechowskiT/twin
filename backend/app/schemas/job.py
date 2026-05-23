@@ -63,6 +63,10 @@ class ScrapeAllOut(BaseModel):
 class JobListOut(BaseModel):
     items: list[JobOut]
     total: int
+    search_relaxed: bool = Field(
+        default=False,
+        description="True when strict filters returned zero rows and salary threshold was dropped once.",
+    )
 
 
 class JobFiltersOut(BaseModel):

@@ -110,6 +110,30 @@ DEMO_JOBS: list[dict[str, object]] = [
         "url": "https://www.pracuj.pl/praca/api-lead-investor-demo-5",
         "match_score": 93.0,
     },
+    {
+        "external_id": f"{DEMO_JOB_PREFIX}sales-director",
+        "title": "Sales Director — B2B SaaS",
+        "company": "ScalePath PL",
+        "location": "Warsaw · hybrid",
+        "description": "Own enterprise pipeline, coach AEs, and hit net-new ARR targets in Poland.",
+        "requirements": "B2B SaaS sales leadership director enterprise PLN quota",
+        "salary_min": 18000,
+        "salary_max": 28000,
+        "url": "https://www.pracuj.pl/praca/sales-director-investor-demo-6",
+        "match_score": 88.0,
+    },
+    {
+        "external_id": f"{DEMO_JOB_PREFIX}cso",
+        "title": "Chief Revenue Officer",
+        "company": "RevenueForge",
+        "location": "Remote · Poland",
+        "description": "Executive owner of GTM, partnerships, and revenue operations for a hiring platform.",
+        "requirements": "CRO chief revenue officer executive GTM B2B",
+        "salary_min": 25000,
+        "salary_max": 40000,
+        "url": "https://www.pracuj.pl/praca/chief-revenue-officer-investor-demo-7",
+        "match_score": 86.0,
+    },
 ]
 
 

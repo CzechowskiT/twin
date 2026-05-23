@@ -154,7 +154,9 @@ def list_jobs(
     min_salary: Annotated[int | None, Query(ge=0, description="Minimum advertised salary (PLN) when present on the listing.")] = None,
     title_terms: Annotated[
         str | None,
-        Query(description="Comma-separated tokens; job title must contain each token (case-insensitive)."),
+        Query(
+            description="Comma-separated target titles; any token from these or `q` may match title/description (OR).",
+        ),
     ] = None,
     sort: Annotated[str, Query(description=f"Sort order: `{SORT_NEWEST}`, `{SORT_SALARY}`, or `{SORT_COMPANY}`.")] = SORT_NEWEST,
     db: Session = Depends(get_db),
@@ -163,11 +165,15 @@ def list_jobs(
     """Paginated job feed with optional filters and match scores for the authenticated candidate."""
     if sort not in (SORT_NEWEST, SORT_SALARY, SORT_COMPANY):
         sort = SORT_NEWEST
-    query = db.query(Job)
-    if validated_only:
-        query = query.filter(Job.is_validated.is_(True))
+    def validated_jobs_query():
+        base = db.query(Job)
+        if validated_only:
+            base = base.filter(Job.is_validated.is_(True))
+        return base
+
+    search_relaxed = False
     query = apply_job_filters(
-        query,
+        validated_jobs_query(),
         q=q,
         location=location,
         job_board=job_board,
@@ -176,6 +182,18 @@ def list_jobs(
         sort=sort,
     )
     total = query.count()
+    if total == 0 and min_salary is not None and min_salary > 0:
+        search_relaxed = True
+        query = apply_job_filters(
+            validated_jobs_query(),
+            q=q,
+            location=location,
+            job_board=job_board,
+            min_salary=None,
+            title_terms=title_terms,
+            sort=sort,
+        )
+        total = query.count()
     items = query.offset(skip).limit(limit).all()
 
     candidate = db.query(Candidate).filter(Candidate.user_id == _user.id).first()
@@ -189,7 +207,7 @@ def list_jobs(
         raw = float(calculate_match_score(cand_dict, job_to_dict(job)))
         out_items.append(base.model_copy(update={"score": raw}))
 
-    return JobListOut(items=out_items, total=total)
+    return JobListOut(items=out_items, total=total, search_relaxed=search_relaxed)
 
 
 @router.post("/saved/{job_id}")

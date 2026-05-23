@@ -92,6 +92,7 @@ export type TranslationKey =
   | `recruiterJobs.${keyof typeof en.recruiterJobs}`
   | `verifyEmail.${keyof typeof en.verifyEmail}`
   | `investorMetrics.${keyof typeof en.investorMetrics}`
+  | `investorFundraising.${keyof typeof en.investorFundraising}`
   | `placementDemo.${keyof typeof en.placementDemo}`
   | `referrals.${keyof typeof en.referrals}`
   | `atsIntegrations.${keyof typeof en.atsIntegrations}`
@@ -161,6 +162,7 @@ const en = {
     ctaRegisterMicro: "See your matches in ~2 min",
     ctaDemoSecondary: "Watch interactive demo",
     liveCounter: "{count}+ roles scanned on enabled boards",
+    liveCounterUnavailable: "—",
     socialProofJoin: "Join candidates building a calendar of acceptance — not another tab graveyard.",
     socialProofQuote: "“Finally one pipeline instead of twenty tabs.”",
     teaserEyebrow: "Inside your workspace",
@@ -393,17 +395,18 @@ const en = {
     jobsLoadMore: "Load more jobs",
     jobsCorpusNote:
       "The number in the section title is how many validated rows exist in your API database — not “the entire web”. Six-figure corpora require sustained scraping or bulk import on the server; the UI loads up to 200 per request and you can page with “Load more”.",
-    jobsEmptyFilteredTitle: "No roles match your current filters",
+    jobsSearchRelaxedBanner: "We broadened your search to show more matching roles.",
+    jobsEmptyFilteredTitle: "No roles match your keywords yet",
     jobsEmptyFilteredLead:
-      "Widen salary or location, try another board, or clear target title terms (they may be pre-filled from your profile), then tap Apply filters again. If the feed is still empty, listings may not be in the database yet.",
+      "We match listings to the words in Search and target titles (any keyword can hit title or description). Try fewer or broader terms, adjust salary, or clear pre-filled titles from your profile, then apply filters again.",
     noJobs: "No jobs yet. Run Auto scrap above (if enabled) or ask an admin to seed listings.",
     noJobsNoScrapeUi:
       "No jobs in the database yet. Listings appear after data is scraped on the server (admin or backend) or imported. Your profile is for ranking and filters once jobs exist; it does not crawl the web on its own.",
     jobsEmptyMomentum:
       "Loosen filters or clear title terms for a wider scan, then tighten again once real titles start flowing back.",
-    jobsEmptyZeroTitle: "No job listings in the database yet",
+    jobsEmptyZeroTitle: "No listings to show yet",
     jobsEmptyZeroLead:
-      "Complete your profile for matching, subscribe your calendar for interview holds, and ask ops to run a scrape if you are on the allowlist.",
+      "Once jobs are in the feed we rank them to your profile and keywords. Complete your profile, connect your calendar, and check back after the next scrape.",
     jobsEmptyZeroProfileCta: "Complete profile",
     jobsEmptyZeroResetFilters: "Reset filters",
     jobsEmptyZeroScrapeCta: "Queue scrape (ops)",
@@ -809,9 +812,39 @@ const en = {
     calendarInterviewDownloadIcs: "Download .ics (Apple, Outlook…)",
     calendarInterviewCancel: "Mark as cancelled",
     calendarInterviewCancelledBadge: "Cancelled",
-    calendarPageTitle: "Calendars & availability",
+    calendarPageTitle: "Your interview calendar",
     calendarPageLead:
-      "Connect calendars so TWIN can read busy time and place interview holds. Google Calendar is available today via OAuth. Microsoft 365 / Outlook and Apple Calendar (iCloud) are on the roadmap with the same consent, audit, and revoke story.",
+      "Pick how you want TWIN on your calendar. One path is enough — you can add more later.",
+    calendarPathGoogleTitle: "Google Calendar",
+    calendarPathGoogleBody:
+      "Best if you live in Gmail or Google Calendar. TWIN can see when you are busy and add interview slots.",
+    calendarPathMicrosoftTitle: "Microsoft 365",
+    calendarPathMicrosoftBody:
+      "For work Outlook or Microsoft 365. TWIN reads busy time and can place interview holds there.",
+    calendarPathOtherTitle: "Any other calendar",
+    calendarPathOtherBody:
+      "Apple Calendar, Outlook desktop, Fastmail, and more — subscribe to your TWIN interviews with one tap.",
+    calendarAddToCalendar: "Add to calendar",
+    calendarWebcalMacHint:
+      "On Mac, Calendar may ask “Open this link?” — that is normal. Choose Open to finish.",
+    calendarOtherStep1Title: "iPhone or iPad",
+    calendarOtherStep1Body:
+      "Tap Add to calendar above. When your phone asks, tap Subscribe.",
+    calendarOtherStep2Title: "Mac",
+    calendarOtherStep2Body:
+      "Tap Add to calendar. If Calendar asks to open the link, tap Open.",
+    calendarOtherStep3Title: "Outlook",
+    calendarOtherStep3Body:
+      "Tap Add to calendar, or open Calendar → Add calendar → Subscribe from web and paste the copied link.",
+    calendarLinkAdvancedSummary: "Paste the link yourself",
+    calendarCopyLink: "Copy link",
+    calendarLinkCopied: "Link copied",
+    calendarMicrosoftSoon: "Coming soon",
+    calendarMicrosoftSoonBody:
+      "Microsoft 365 sign-in is rolling out on this environment. Use Google or Add to calendar for now.",
+    calendarGoogleSoon: "Not available here yet",
+    calendarGoogleSoonBody:
+      "Google sign-in is not turned on for this site yet. Use Add to calendar below, or try again later.",
     calendarProvidersEyebrow: "Providers",
     calendarStatusLive: "Live",
     calendarStatusPlanned: "Planned",
@@ -821,21 +854,21 @@ const en = {
     calendarProviderMicrosoftTitle: "Microsoft 365 & Outlook",
     calendarProviderMicrosoftBody:
       "Microsoft Graph Calendar for Exchange Online — connect Outlook or Microsoft 365 to read busy time and place interview holds.",
-    calendarConnectMicrosoft: "Connect Microsoft 365 / Outlook",
+    calendarConnectMicrosoft: "Connect Microsoft 365",
     calendarMicrosoftOAuthNotConfigured:
-      "Microsoft Calendar is not wired on this server yet. Add MICROSOFT_CLIENT_ID, MICROSOFT_CLIENT_SECRET, and MICROSOFT_CALENDAR_REDIRECT_URI on the API host (Railway), then redeploy.",
+      "Microsoft 365 sign-in is not available on this site yet. Use Google or Add to calendar for now.",
     calendarMicrosoftSetupWizard:
-      "1) Azure app registration → redirect URI = MICROSOFT_CALENDAR_REDIRECT_URI. 2) API permissions: Calendars.Read, Calendars.ReadWrite, offline_access. 3) Paste client id/secret + tenant into Railway (see checklist). 4) Redeploy API and connect here.",
+      "Microsoft 365 is not available on this site yet.",
     calendarGoogleOAuthNotConfigured:
-      "Google Calendar OAuth is not wired on this server yet. Add GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_CALENDAR_REDIRECT_URI on the API host (Railway), then redeploy.",
+      "Google Calendar sign-in is not available on this site yet. Use Add to calendar below, or try again later.",
     calendarDisconnectMicrosoft: "Disconnect Microsoft",
     calendarMicrosoftConnectedAs: "Microsoft account",
     calendarWebcalTitle: "Subscribe in any calendar app",
     calendarWebcalHint:
-      "Generate a private WebCal link (Apple Calendar, Outlook, Google via URL). Refreshes with your upcoming TWIN interviews.",
-    calendarWebcalGenerate: "Generate subscribe link",
-    calendarWebcalOneClick: "Open in calendar app",
-    calendarWebcalCopy: "Copy WebCal URL",
+      "Your interviews stay in sync. Tap Add to calendar — no account password needed.",
+    calendarWebcalGenerate: "New subscribe link",
+    calendarWebcalOneClick: "Add to calendar",
+    calendarWebcalCopy: "Copy link",
     calendarProviderAppleTitle: "Apple Calendar (iCloud)",
     calendarProviderAppleBody:
       "CalDAV access for iCloud calendars (app-specific passwords or delegated flows where Apple permits automation — roadmap; UX will differ from one-click Google).",
@@ -846,13 +879,12 @@ const en = {
       "Order and timing follow enterprise demand and security review — not a promise of ship dates.",
     calendarConnected: "Connected",
     calendarNotConnected: "Not connected",
-    calendarConnect: "Connect Google Calendar",
+    calendarConnect: "Connect Google",
     calendarDisconnect: "Disconnect",
     calendarGoogleRedirectSetup:
-      "If Google shows “redirect_uri_mismatch”, open Google Cloud Console → APIs & Services → Credentials → your OAuth client (Web) → Authorized redirect URIs → add this exact line (then Save) and click Connect again.",
-    calendarGoogleRedirectCopy: "Copy redirect URI",
-    calendarConfiguredHint:
-      "Today this OAuth client powers Google Calendar only. Add `GOOGLE_CALENDAR_REDIRECT_URI` in Google Cloud Console. Outlook and Apple will use separate Microsoft / Apple consent flows when they ship.",
+      "If Google shows an error about the redirect address, contact support — we will fix it on our side.",
+    calendarGoogleRedirectCopy: "Copy link",
+    calendarConfiguredHint: "",
     calendarFreebusyTitle: "Check availability (next 3 days)",
     calendarFreebusyGo: "Run free/busy",
     calendarBlockTitle: "Place a 45-minute interview block (UTC, test)",
@@ -860,10 +892,10 @@ const en = {
     calendarConnectedAs: "Calendar account",
     calendarErrorGeneric: "That calendar action failed. Try disconnecting and connecting again.",
     calendarErrorMicrosoftDenied: "Microsoft sign-in was cancelled. Try Connect again when ready.",
-    calendarErrorMicrosoftExchange: "Microsoft token exchange failed — check API env vars and redirect URI.",
+    calendarErrorMicrosoftExchange: "Microsoft sign-in did not finish. Try Connect again in a moment.",
     calendarErrorMicrosoftNoRefresh: "Microsoft did not return a refresh token. Re-consent with offline_access.",
     calendarErrorInvalidState: "OAuth session expired. Start Connect again from this page.",
-    calendarMicrosoftEnvChecklist: "Railway production env checklist (Microsoft secrets)",
+    calendarMicrosoftEnvChecklist: "Help centre",
     calendarOAuthDenied: "Google sign-in was cancelled.",
     calendarBackDashboard: "Back to dashboard",
     calendarFreebusyEmpty: "No busy blocks in this window on your primary calendar.",
@@ -1351,6 +1383,67 @@ const en = {
     flagMicrosoft: "Microsoft Calendar",
     updated: "Updated",
     loadFailed: "Could not load metrics",
+    mauProxy: "MAU proxy (registered accounts)",
+    mauProxyHint: "Not audited MAU — registered user count from production DB.",
+    earlyStageBadge: "Early stage",
+    earlyStageNote:
+      "Pilot-shaped traction — counts are real aggregates, not financial KPIs. See /status for system health.",
+    flagConfigurable: "configurable",
+    unitEconomicsTitle: "Unit economics (honest)",
+    unitEconomicsLead:
+      "Pre-scale: illustrative scenario models in the investor calculator only — not GAAP forecasts or audited unit economics.",
+    preRevenueNote: "Pre-revenue MVP — revenue instruments ship with Stripe when enabled in environment.",
+  },
+  investorFundraising: {
+    eyebrow: "For investors",
+    heroTitle: "A short calendar of acceptance — not more inbox noise",
+    heroLead:
+      "TWIN is an autonomous career agent: matching, consent, and async work while you are away → ranked pipeline → accept / decline / reschedule → calendar sync. Phase 1 MVP — Polish boards first, multi-persona platform.",
+    ctaDataRoom: "Open data room",
+    ctaMetrics: "Full metrics dashboard",
+    ctaDeck: "Request deck",
+    ctaDemo: "Product demo",
+    ctaFaq: "Investor FAQ",
+    ctaYc: "YC reviewer path",
+    tractionTitle: "Live traction",
+    tractionLead: "Aggregate counts from GET /api/v1/public/mvp-stats — no personal data, refreshed on load.",
+    builtTitle: "What we built (honest)",
+    builtLead: "Shipped in repo vs next — no slide-deck “complete platform” claims.",
+    builtLiveTitle: "Live today",
+    builtLive1: "Job discovery from enabled boards (pracuj.pl, rocketjobs.pl, registry adapters)",
+    builtLive2: "Profile-aware ranking, application tracking, Celery auto-apply (beta, consent-gated)",
+    builtLive3: "Google Calendar OAuth, WebCal/ICS holds, acceptance queue surfaces",
+    builtLive4: "Placement verification state machine (in-product; see FAQ)",
+    builtLive5: "Investor metrics, scenario calculator, data room metadata + public diligence pack",
+    builtNextTitle: "Next",
+    builtNext1: "Microsoft 365 calendar at scale (Graph OAuth when configured)",
+    builtNext2: "More EU boards and employer ATS webhooks",
+    builtNext3: "Audited financials and cap table materials — on request via data room",
+    securityTitle: "Security & GDPR",
+    securityLead:
+      "Explicit consent at registration; cookie banner with settings; Privacy Policy and Terms. Placement economics avoid manual “did you sign yet?” loops — machine-assisted verification by design.",
+    securityPrivacy: "Privacy Policy",
+    securityCookies: "Cookie settings",
+    securityPlacementFaq: "Placement verification (FAQ)",
+    securityStatus: "System status",
+    dataRoomTitle: "Data room",
+    dataRoomLead:
+      "Public pack: metrics, OpenAPI, status, calculator exports. Cap table and financials require access — sign in to investor workspace or request via contact.",
+    contactTitle: "Deck & diligence",
+    contactLead:
+      "Email with your fund name and checklist. We prefer concrete security and unit-economics questions over generic pitch tours.",
+    contactCta: "Contact",
+    contactMailSubject: "TWIN investor deck request",
+    footerNote: "Numbers on this page are product aggregates unless labeled illustrative.",
+    ycEyebrow: "Y Combinator",
+    ycTitle: "If you are from Y Combinator",
+    ycLead:
+      "Fast path: demo, live metrics, status, and investor FAQ — no account required for public traction.",
+    ycDemo: "Interactive demo",
+    ycStatus: "Production status",
+    ycDevelopers: "API & mvp-stats JSON",
+    ycMetrics: "Metrics on fundraising page",
+    ycBack: "← Full investor page",
   },
   placementDemo: {
     eyebrow: "Trust layer",
@@ -2147,6 +2240,26 @@ const en = {
     growthRoadmapFootnote:
       "Order of delivery can change; some items may be tier-gated when they ship. Tell us what you would open weekly. It steers the roadmap.",
   },
+  ux: {
+    flowNavAria: "Your workspace steps",
+    flowStepDashboard: "Dashboard",
+    flowStepProfile: "Profile",
+    flowStepMatches: "Matches",
+    flowStepActions: "Applications",
+    profileStepEyebrow: "Step 2 · Profile",
+    profileMissingLead: "Add your profile so TWIN can rank jobs for you.",
+    profileIncompleteLead: "Add skills and target job titles so matches can run.",
+    profileIncompleteCta: "Complete profile",
+    jobsEmptyMessage: "No listings match your filters — reset filters or refresh the feed.",
+    jobsEmptyCta: "Reset filters",
+    jobsEmptyNoProfileMessage: "Set up your profile first, then open the job feed.",
+    jobsEmptyNoProfileCta: "Set up profile",
+    matchesEmptyMessage: "No strong matches yet — complete your profile or check back after the next run.",
+    matchesEmptyCta: "Complete profile",
+    apiErrorGeneric: "Something went wrong. Try again in a moment.",
+    apiErrorSession: "Your session expired — sign in again.",
+    apiErrorNetwork: "We could not reach the server. Check your connection and try again.",
+  },
   common: {
     language: "Language",
     switchToPl: "Polski",
@@ -2214,6 +2327,7 @@ const pl: MessageTree = {
     ctaRegisterMicro: "Zobacz dopasowania w ~2 min",
     ctaDemoSecondary: "Obejrzyj demo interaktywne",
     liveCounter: "{count}+ ofert przeskanowanych na włączonych portalach",
+    liveCounterUnavailable: "—",
     socialProofJoin: "Dołącz do kandydatów budujących kalendarz akceptacji — nie kolejny cmentarz kart.",
     socialProofQuote: "„W końcu jedna ścieżka aplikacji zamiast dwudziestu kart.”",
     teaserEyebrow: "W Twojej przestrzeni roboczej",
@@ -2446,17 +2560,18 @@ const pl: MessageTree = {
     jobsLoadMore: "Załaduj więcej ofert",
     jobsCorpusNote:
       "Liczba w nagłówku to tyle zweryfikowanych wierszy w bazie API — nie „cały internet”. Setki tysięcy pozycji wymagają ciągłego scrapingu lub importu na serwerze; UI pobiera do 200 na żądanie, dalej jest „Załaduj więcej”.",
-    jobsEmptyFilteredTitle: "Żadna oferta nie pasuje do obecnych filtrów",
+    jobsSearchRelaxedBanner: "Rozszerzyliśmy wyszukiwanie, aby pokazać więcej pasujących ofert.",
+    jobsEmptyFilteredTitle: "Brak ofert pod Twoje słowa kluczowe",
     jobsEmptyFilteredLead:
-      "Poluzuj widełka wynagrodzenia lub lokalizację, wybierz inny portal albo wyczyść pole docelowych tytułów (może być uzupełnione z profilu), potem ponownie „Zastosuj filtry”. Jeśli nadal pusto, w bazie może jeszcze nie być ogłoszeń.",
+      "Dopasowujemy ogłoszenia do słów z pola Szukaj i docelowych stanowisk (wystarczy trafienie w tytule lub opisie). Spróbuj szerszych haseł, zmień widełki albo wyczyść tytuły z profilu i ponownie zastosuj filtry.",
     noJobs: "Brak ofert. Uruchom Auto scrap powyżej (jeśli włączone) lub poproś administratora o dane.",
     noJobsNoScrapeUi:
       "Brak ofert w bazie. Pojawią się po pobraniu danych na serwerze (scrap przez administratora lub backend) lub imporcie. Profil służy do dopasowania i filtrów, gdy oferty już są; sam z siebie nie przeszukuje internetu.",
     jobsEmptyMomentum:
       "Poluzuj filtry albo wyczyść frazy w tytule dla szerszego skanu, potem zawęź, gdy zaczną wracać realne nazwy stanowisk.",
-    jobsEmptyZeroTitle: "Brak ofert w bazie",
+    jobsEmptyZeroTitle: "Jeszcze brak ofert w feedzie",
     jobsEmptyZeroLead:
-      "Uzupełnij profil pod dopasowanie, podłącz kalendarz na terminy rozmów; scrape uruchamia ops z allowlisty.",
+      "Gdy pojawią się ogłoszenia, dopasujemy je do profilu i słów kluczowych. Uzupełnij profil, podłącz kalendarz i wróć po kolejnym scrapingu.",
     jobsEmptyZeroProfileCta: "Uzupełnij profil",
     jobsEmptyZeroResetFilters: "Resetuj filtry",
     jobsEmptyZeroScrapeCta: "Kolejka scrape (ops)",
@@ -2866,9 +2981,39 @@ const pl: MessageTree = {
     calendarInterviewDownloadIcs: "Pobierz .ics (Apple, Outlook…)",
     calendarInterviewCancel: "Oznacz jako odwołane",
     calendarInterviewCancelledBadge: "Odwołane",
-    calendarPageTitle: "Kalendarze i dostępność",
+    calendarPageTitle: "Twój kalendarz rozmów",
     calendarPageLead:
-      "Podłącz kalendarze, żeby TWIN widział zajętość i mógł stawiać sloty rozmów. Google Calendar działa dziś przez OAuth. Microsoft 365 / Outlook oraz Apple Calendar (iCloud) są w roadmapie z tą samą historią zgody, audytu i odwołania dostępu.",
+      "Wybierz, jak TWIN ma trafić do Twojego kalendarza. Wystarczy jedna droga — resztę możesz dodać później.",
+    calendarPathGoogleTitle: "Google Calendar",
+    calendarPathGoogleBody:
+      "Gdy korzystasz z Gmaila lub Kalendarza Google. TWIN widzi, kiedy jesteś zajęty/a, i może dodać rozmowy.",
+    calendarPathMicrosoftTitle: "Microsoft 365",
+    calendarPathMicrosoftBody:
+      "Dla służbowego Outlooka lub Microsoft 365. TWIN widzi zajętość i może zapisać rozmowy.",
+    calendarPathOtherTitle: "Każdy inny kalendarz",
+    calendarPathOtherBody:
+      "Apple Calendar, Outlook na komputerze, Fastmail i inne — jednym kliknięciem subskrybujesz rozmowy z TWIN.",
+    calendarAddToCalendar: "Dodaj do kalendarza",
+    calendarWebcalMacHint:
+      "Na Macu Kalendarz może zapytać „Otworzyć ten link?” — to normalne. Wybierz Otwórz.",
+    calendarOtherStep1Title: "iPhone lub iPad",
+    calendarOtherStep1Body:
+      "Naciśnij Dodaj do kalendarza wyżej. Gdy telefon zapyta, wybierz Subskrybuj.",
+    calendarOtherStep2Title: "Mac",
+    calendarOtherStep2Body:
+      "Naciśnij Dodaj do kalendarza. Gdy Kalendarz zapyta o link, wybierz Otwórz.",
+    calendarOtherStep3Title: "Outlook",
+    calendarOtherStep3Body:
+      "Naciśnij Dodaj do kalendarza albo w Outlooku: Kalendarz → Dodaj kalendarz → Subskrypcja z sieci i wklej skopiowany link.",
+    calendarLinkAdvancedSummary: "Wklej link samodzielnie",
+    calendarCopyLink: "Kopiuj link",
+    calendarLinkCopied: "Skopiowano link",
+    calendarMicrosoftSoon: "Wkrótce",
+    calendarMicrosoftSoonBody:
+      "Logowanie Microsoft 365 pojawi się na tej wersji serwisu wkrótce. Na razie użyj Google albo Dodaj do kalendarza.",
+    calendarGoogleSoon: "Na razie niedostępne",
+    calendarGoogleSoonBody:
+      "Logowanie Google nie jest jeszcze włączone na tej stronie. Użyj Dodaj do kalendarza poniżej albo wróć później.",
     calendarProvidersEyebrow: "Dostawcy",
     calendarStatusLive: "Aktywny",
     calendarStatusPlanned: "W planie",
@@ -2878,21 +3023,21 @@ const pl: MessageTree = {
     calendarProviderMicrosoftTitle: "Microsoft 365 i Outlook",
     calendarProviderMicrosoftBody:
       "Microsoft Graph Calendar dla Exchange Online — połącz Outlook lub Microsoft 365, żeby widzieć zajętość i stawiać sloty rozmów.",
-    calendarConnectMicrosoft: "Połącz Microsoft 365 / Outlook",
+    calendarConnectMicrosoft: "Połącz Microsoft 365",
     calendarMicrosoftOAuthNotConfigured:
-      "Kalendarz Microsoft nie jest jeszcze podłączony na serwerze. Ustaw MICROSOFT_CLIENT_ID, MICROSOFT_CLIENT_SECRET i MICROSOFT_CALENDAR_REDIRECT_URI na API (Railway) i zrób redeploy.",
+      "Logowanie Microsoft 365 nie jest jeszcze dostępne na tej stronie. Użyj Google albo Dodaj do kalendarza.",
     calendarMicrosoftSetupWizard:
-      "1) Rejestracja aplikacji w Azure → redirect URI = MICROSOFT_CALENDAR_REDIRECT_URI. 2) Uprawnienia: Calendars.Read, Calendars.ReadWrite, offline_access. 3) Wklej id/sekret + tenant na Railway (checklista). 4) Redeploy API i połącz tutaj.",
+      "Microsoft 365 nie jest jeszcze dostępny na tej stronie.",
     calendarGoogleOAuthNotConfigured:
-      "OAuth Google Calendar nie jest jeszcze podłączony na serwerze. Ustaw GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET i GOOGLE_CALENDAR_REDIRECT_URI na API (Railway) i zrób redeploy.",
+      "Logowanie Google Calendar nie jest jeszcze dostępne na tej stronie. Użyj Dodaj do kalendarza poniżej albo wróć później.",
     calendarDisconnectMicrosoft: "Odłącz Microsoft",
     calendarMicrosoftConnectedAs: "Konto Microsoft",
     calendarWebcalTitle: "Subskrypcja w dowolnym kalendarzu",
     calendarWebcalHint:
-      "Wygeneruj prywatny link WebCal (Apple Calendar, Outlook, Google przez URL). Odświeża nadchodzące rozmowy z TWIN.",
-    calendarWebcalGenerate: "Wygeneruj link subskrypcji",
-    calendarWebcalOneClick: "Otwórz w aplikacji kalendarza",
-    calendarWebcalCopy: "Kopiuj URL WebCal",
+      "Rozmowy z TWIN są na bieżąco. Naciśnij Dodaj do kalendarza — bez podawania hasła do konta.",
+    calendarWebcalGenerate: "Nowy link subskrypcji",
+    calendarWebcalOneClick: "Dodaj do kalendarza",
+    calendarWebcalCopy: "Kopiuj link",
     calendarProviderAppleTitle: "Apple Calendar (iCloud)",
     calendarProviderAppleBody:
       "Dostęp CalDAV do kalendarzy iCloud (hasła aplikacji lub delegacja tam, gdzie Apple pozwala na automatyzację — roadmapa; UX inny niż jednoklikowy Google).",
@@ -2903,13 +3048,12 @@ const pl: MessageTree = {
       "Kolejność i terminy wynikają z popytu enterprise i przeglądu bezpieczeństwa — to nie obietnica dat wdrożenia.",
     calendarConnected: "Połączono",
     calendarNotConnected: "Nie połączono",
-    calendarConnect: "Połącz Google Calendar",
+    calendarConnect: "Połącz Google",
     calendarDisconnect: "Odłącz",
     calendarGoogleRedirectSetup:
-      "Jeśli Google pokazuje „redirect_uri_mismatch”, wejdź w Google Cloud Console → APIs & Services → Credentials → Twój klient OAuth (Web) → Authorized redirect URIs → wklej dokładnie ten adres (Zapisz) i kliknij Połącz ponownie.",
-    calendarGoogleRedirectCopy: "Kopiuj adres przekierowania",
-    calendarConfiguredHint:
-      "Dziś ten klient OAuth obsługuje wyłącznie Google Calendar. Dodaj `GOOGLE_CALENDAR_REDIRECT_URI` w Google Cloud Console. Outlook i Apple dostaną osobne przepływy zgody Microsoft / Apple przy wdrożeniu.",
+      "Jeśli Google pokazuje błąd adresu przekierowania, napisz do supportu — poprawimy to po naszej stronie.",
+    calendarGoogleRedirectCopy: "Kopiuj link",
+    calendarConfiguredHint: "",
     calendarFreebusyTitle: "Sprawdź dostępność (następne 3 dni)",
     calendarFreebusyGo: "Uruchom free/busy",
     calendarBlockTitle: "Dodaj 45-min blok „interview” (UTC, test)",
@@ -2917,10 +3061,10 @@ const pl: MessageTree = {
     calendarConnectedAs: "Konto kalendarza",
     calendarErrorGeneric: "Akcja kalendarza nie powiodła się. Spróbuj odłączyć i połączyć ponownie.",
     calendarErrorMicrosoftDenied: "Logowanie Microsoft anulowane. Spróbuj Połącz ponownie.",
-    calendarErrorMicrosoftExchange: "Wymiana tokenu Microsoft nie powiodła się — sprawdź env i redirect URI na API.",
+    calendarErrorMicrosoftExchange: "Logowanie Microsoft nie dokończyło się. Spróbuj Połącz ponownie za chwilę.",
     calendarErrorMicrosoftNoRefresh: "Microsoft nie zwrócił refresh tokena. Ponów zgodę z offline_access.",
     calendarErrorInvalidState: "Sesja OAuth wygasła. Uruchom Połącz ponownie z tej strony.",
-    calendarMicrosoftEnvChecklist: "Checklista env Railway (sekrety Microsoft)",
+    calendarMicrosoftEnvChecklist: "Centrum pomocy",
     calendarOAuthDenied: "Logowanie Google zostało anulowane.",
     calendarBackDashboard: "Wróć do panelu",
     calendarFreebusyEmpty: "Brak zajętości w tym oknie na głównym kalendarzu.",
@@ -3417,6 +3561,67 @@ const pl: MessageTree = {
     flagMicrosoft: "Kalendarz Microsoft",
     updated: "Aktualizacja",
     loadFailed: "Nie udało się załadować metryk",
+    mauProxy: "Proxy MAU (konta zarejestrowane)",
+    mauProxyHint: "To nie audytowany MAU — liczba użytkowników z bazy produkcyjnej.",
+    earlyStageBadge: "Wczesny etap",
+    earlyStageNote:
+      "Trakcja w kształcie pilota — agregaty produktowe, nie KPI finansowe. Zdrowie systemu: /status.",
+    flagConfigurable: "konfigurowalne",
+    unitEconomicsTitle: "Ekonomia jednostkowa (uczciwie)",
+    unitEconomicsLead:
+      "Przed skalą: modele scenariusza w kalkulatorze inwestora — nie prognozy GAAP ani audytowana ekonomia jednostkowa.",
+    preRevenueNote: "MVP przed przychodem — Stripe włącza się, gdy skonfigurowany w środowisku.",
+  },
+  investorFundraising: {
+    eyebrow: "Dla inwestorów",
+    heroTitle: "Krótki kalendarz akceptacji — nie więcej szumu w skrzynce",
+    heroLead:
+      "TWIN to autonomiczny agent kariery: dopasowanie, zgoda i praca asynchroniczna → rankingowany pipeline → akceptuj / odrzuć / przełóż → sync kalendarza. MVP fazy 1 — polskie portale, platforma wielu person.",
+    ctaDataRoom: "Otwórz data room",
+    ctaMetrics: "Pełny panel metryk",
+    ctaDeck: "Poproś o deck",
+    ctaDemo: "Demo produktu",
+    ctaFaq: "FAQ inwestora",
+    ctaYc: "Ścieżka dla YC",
+    tractionTitle: "Trakcja na żywo",
+    tractionLead: "Agregaty z GET /api/v1/public/mvp-stats — bez danych osobowych, odświeżane przy wejściu.",
+    builtTitle: "Co zbudowaliśmy (uczciwie)",
+    builtLead: "W repozytorium vs następne — bez obietnic „kompletnej platformy” ze slajdów.",
+    builtLiveTitle: "Dziś na żywo",
+    builtLive1: "Oferty z włączonych portali (pracuj.pl, rocketjobs.pl, adaptery rejestru)",
+    builtLive2: "Ranking profilu, śledzenie aplikacji, auto-apply Celery (beta, za zgodą)",
+    builtLive3: "OAuth Google Calendar, WebCal/ICS, powierzchnie kolejki akceptacji",
+    builtLive4: "Maszyna stanów weryfikacji placementu (w produkcie; patrz FAQ)",
+    builtLive5: "Metryki inwestora, kalkulator scenariusza, data room + publiczny pakiet diligence",
+    builtNextTitle: "Następne",
+    builtNext1: "Kalendarz Microsoft 365 (Graph OAuth po konfiguracji)",
+    builtNext2: "Więcej portali UE i webhooków ATS pracodawcy",
+    builtNext3: "Sprawozdania i cap table — na żądanie przez data room",
+    securityTitle: "Bezpieczeństwo i RODO",
+    securityLead:
+      "Jawna zgoda przy rejestracji; baner cookies z ustawieniami; polityka prywatności i regulamin. Ekonomia placementu bez ręcznego ping-ponga „podpisałeś już?” — weryfikacja wspomagana maszynowo.",
+    securityPrivacy: "Polityka prywatności",
+    securityCookies: "Ustawienia cookies",
+    securityPlacementFaq: "Weryfikacja placementu (FAQ)",
+    securityStatus: "Status systemu",
+    dataRoomTitle: "Data room",
+    dataRoomLead:
+      "Pakiet publiczny: metryki, OpenAPI, status, eksporty kalkulatora. Cap table i finanse wymagają dostępu — logowanie inwestora lub kontakt.",
+    contactTitle: "Deck i diligence",
+    contactLead:
+      "Napisz z nazwą funduszu i checklistą. Wolimy konkretne pytania o bezpieczeństwo i ekonomię jednostkową niż generyczny pitch.",
+    contactCta: "Kontakt",
+    contactMailSubject: "Prośba o deck inwestorski TWIN",
+    footerNote: "Liczby na tej stronie to agregaty produktowe, o ile nie oznaczono jako ilustracyjne.",
+    ycEyebrow: "Y Combinator",
+    ycTitle: "Jeśli jesteś z Y Combinator",
+    ycLead:
+      "Szybka ścieżka: demo, metryki, status i FAQ — publiczna trakcja bez konta.",
+    ycDemo: "Demo interaktywne",
+    ycStatus: "Status produkcji",
+    ycDevelopers: "API i JSON mvp-stats",
+    ycMetrics: "Metryki na stronie inwestora",
+    ycBack: "← Pełna strona inwestora",
   },
   placementDemo: {
     eyebrow: "Warstwa zaufania",
