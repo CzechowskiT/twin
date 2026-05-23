@@ -2553,6 +2553,10 @@ html[data-marketing-surface="studio"] .marketing-founding-value-strip li {
   }
 }
 
+.marketing-journey-host {
+  overflow-x: clip;
+}
+
 .marketing-journey-host:has(.landing-sticky-cta) {
   padding-bottom: 5.5rem;
 }

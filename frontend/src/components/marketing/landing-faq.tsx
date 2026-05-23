@@ -24,11 +24,11 @@ export function LandingFaq() {
 
   return (
     <section className="border-t border-[var(--twin-border)] py-20 sm:py-24 md:py-28">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+      <div className="marketing-home-rail">
         <ScrollReveal delayMs={40}>
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-muted)]">{t("home.faqEyebrow")}</p>
-          <h2 className="mt-3 max-w-3xl text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-3xl">{t("home.faqTitle")}</h2>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--twin-muted-strong)]">
+          <h2 className="marketing-home-headline mt-3 text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-3xl">{t("home.faqTitle")}</h2>
+          <p className="marketing-home-lede mt-3 text-sm leading-relaxed text-[var(--twin-muted-strong)]">
             {faqCountCopy(t("faq.homeTeaserLead"))}
           </p>
 
