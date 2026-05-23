@@ -21,8 +21,6 @@ def build_admin_metrics(db: Session) -> dict:
     )
     matches_total = db.query(func.count(JobMatch.id)).scalar() or 0
     applications_total = db.query(func.count(Application.id)).scalar() or 0
-    from app.database.models import Application
-
     disputed_placements = (
         db.query(func.count(Application.id)).filter(Application.placement_state == "disputed").scalar() or 0
     )

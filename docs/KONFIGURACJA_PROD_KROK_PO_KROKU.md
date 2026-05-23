@@ -43,6 +43,23 @@ Pełny opis: `docs/PROD_AUTONOMOUS.md`. Jeśli Railway CLI nie jest podlinkowany
 
 - [https://twin-sooty.vercel.app/admin/metrics](https://twin-sooty.vercel.app/admin/metrics) — w polu hasła wklej `OPS_ADMIN_TOKEN` z `.env.railway`, kliknij odśwież. Powinny być liczki, nie „Unauthorized”.
 
+### Demo inwestorskie (Railway API — nazwy zmiennych)
+
+Ustaw na serwisie **API** (Raw Editor lub `./scripts/railway-apply-production-env.sh`):
+
+| Zmienna | Wartość (przykład) |
+|---------|-------------------|
+| `DEMO_MODE_ENABLED` | `true` |
+| `DEMO_USER_EMAIL` | `demo@twin.career` |
+
+Hasło demo ustawiasz tylko przy seedzie (`DEMO_USER_PASSWORD` lokalnie — **nie** commituj). Po seedzie:
+
+```bash
+./scripts/verify-investor-demo-ready.sh
+```
+
+Skrypt sprawdza `/api/v1/health`, `/demo/snapshot` (`source: live_db`), `mvp-stats` (aplikacje + rozmowy ≥ 1).
+
 ## Uwaga bezpieczeństwa
 
 Jeśli ktoś widział Twoje tokeny w czacie lub mailu — po skonfigurowaniu możesz wygenerować nowe:

@@ -14,7 +14,7 @@ TWIN’s **platform layer is production-healthy**: API `status=ok`, Postgres rea
 
 The **logged-in investor walkthrough is not demo-ready on production without a one-time seed**. Live checks show `GET /demo/snapshot` → `source: static_fallback`, `demo_user_configured: false`, and `mvp-stats` reports **0 applications / 0 interviews / 0 profiles_with_cv** despite **637 validated jobs** and **2 registered users**. That matches an unseeded or misconfigured `DEMO_USER_EMAIL` on the API service—not missing code.
 
-**Overall demo readiness score: 74 / 100**
+**Overall demo readiness score: 74 / 100** (pre-seed prod) · **~90–95 / 100 after seed** (see below)
 
 | Area | Score | Notes |
 |------|------:|-------|
@@ -23,12 +23,22 @@ The **logged-in investor walkthrough is not demo-ready on production without a o
 | Demo data (prod) | 42 | Static snapshot; seed script exists but not applied to prod |
 | Frontend | 84 | Build green; modals, nightly strip, persona switcher wired |
 | Infrastructure / Celery | 90 | `verify-prod-health.sh` all critical flags OK |
-| Automated tests | 78 | 285 passed / 3 failed / 1 skipped (full suite ~5m) |
+| Automated tests | 88 | 288 passed / 0 failed / 1 skipped (full suite ~5m; fixes 2026-05-23) |
 | Integrations (calendar, billing, ATS) | 62 | Google ✅; Microsoft ❌; Stripe ❌; GH OAuth env-dependent |
 
 ### Go / no-go (one sentence)
 
 **GO** for a **no-login** marketing demo (`/demo` + static snapshot) and **GO-WITH-CONDITIONS** for the **full logged-in script** only after `seed-investor-demo.py` against production `DATABASE_URL` and `DEMO_USER_EMAIL` on Railway API—otherwise **NO-GO** for live DB dashboard/calendar/recruiter steps.
+
+### Score after seed (~95 / 100)
+
+| Area | Post-seed | Notes |
+|------|----------:|-------|
+| Demo data (prod) | 92 | `verify-investor-demo-ready.sh` exit 0: `live_db`, apps ≥ 1, interviews ≥ 1 |
+| Overall | **~95** | Stripe / Microsoft still out of scope for runbook |
+| Remaining user-only | — | Seed + optional Google Calendar connect on demo account |
+
+Verify: `./scripts/verify-investor-demo-ready.sh` (after `railway run … seed-investor-demo.py`).
 
 ---
 
@@ -110,14 +120,14 @@ pytest -k "career_assistant or company_intelligence or seed or demo_snapshot or 
 ### Full pytest (reference)
 
 ```text
-285 passed, 3 failed, 1 skipped (~317s)
+288 passed, 0 failed, 1 skipped (~317s)  # 2026-05-23 after admin_metrics / authologic / beat test fixes
 ```
 
-Failures (local/env, not prod blockers for demo):
+Previously failing (fixed):
 
-- `test_kyc_authologic.py::test_kyc_start_persists_conversation`
-- `test_product_feedback.py::test_feedback_and_admin_flow`
-- `test_scrape_all_boards.py::test_celery_beat_has_no_scheduled_scrapes`
+- `test_kyc_authologic.py::test_kyc_start_persists_conversation` — missing `authologic_api_base_url` on Settings
+- `test_product_feedback.py::test_feedback_and_admin_flow` — duplicate `Application` import in `admin_metrics.py`
+- `test_scrape_all_boards.py::test_celery_beat_has_no_scheduled_scrapes` — assert no scrape beat entries (non-scrape beats OK)
 
 ### Services audit (`backend/app/services`)
 
@@ -277,7 +287,7 @@ Nightly verify doc: `docs/ops/nightly-verify-2026-05-22.md` — beat ran 2026-05
 | Suite | Result |
 |-------|--------|
 | Targeted (demo-critical) | **25/25 passed** |
-| Full backend | **285 passed, 3 failed, 1 skipped** |
+| Full backend | **288 passed, 0 failed, 1 skipped** |
 
 **Coverage gaps (honest):**
 

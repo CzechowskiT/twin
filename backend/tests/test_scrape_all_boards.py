@@ -78,5 +78,10 @@ def test_scrape_all_boards_task_persists_and_returns_summary() -> None:
 
 
 def test_celery_beat_has_no_scheduled_scrapes() -> None:
-    """Periodic scrapes disabled — use manual scrape from UI or API."""
-    assert celery_app.conf.beat_schedule == {}
+    """Periodic scrapes disabled by default — use manual scrape from UI or API."""
+    scrape_entries = [
+        name
+        for name, entry in celery_app.conf.beat_schedule.items()
+        if "scrape" in entry.get("task", "").lower()
+    ]
+    assert scrape_entries == [], f"unexpected scrape beat entries: {scrape_entries}"

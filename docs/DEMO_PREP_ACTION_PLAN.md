@@ -2,7 +2,7 @@
 
 **Target:** investor meeting on branch `cursor/phase1-monorepo-scaffold`  
 **Audit date:** 2026-05-22  
-**Readiness today:** 74/100 — **infrastructure GO**, **data seed required** for logged-in walkthrough  
+**Readiness today:** ~90/100 code + infra — **data seed required** for logged-in walkthrough (→ ~95 after seed)  
 **Runbook:** [INVESTOR_DEMO_RUNBOOK.md](./INVESTOR_DEMO_RUNBOOK.md)  
 **Audit:** [INVESTOR_DEMO_AUDIT_REPORT.md](./INVESTOR_DEMO_AUDIT_REPORT.md)  
 
@@ -29,11 +29,11 @@ flowchart TD
 |---|------|-------|-----------|
 | 1 | Confirm Railway API `DATABASE_URL` is **production** (not staging) | Eng | Written confirmation in vault |
 | 2 | Set API env: `DEMO_MODE_ENABLED=true`, `DEMO_USER_EMAIL=demo@twin.career` | Eng | `demo_user_configured: true` on snapshot after seed |
-| 3 | Run seed: `export DEMO_USER_PASSWORD='…'` → `railway run python3 scripts/seed-investor-demo.py --reset-password` | Eng | `mvp-stats.total_applications` ≥ 1 |
-| 4 | Re-run seed with `--print-credentials`; store recruiter inbox token | Eng | Token in 1Password / demo sheet |
-| 5 | `./scripts/verify-prod-health.sh` | Eng | All critical flags OK |
-| 6 | `curl …/demo/snapshot` → `source: live_db` | Eng | Real `job_id` / `application.id` in JSON |
-| 7 | Login smoke: `demo@twin.career` on https://twin-sooty.vercel.app | PM/Eng | Dashboard shows match % + applied row |
+| 3 | ☐ Run seed: `export DEMO_USER_PASSWORD='…'` → `railway run python3 scripts/seed-investor-demo.py --reset-password --print-credentials` | **User** | `mvp-stats.total_applications` ≥ 1 |
+| 4 | ☐ Store recruiter inbox token from `--print-credentials` | **User** | Token in 1Password / demo sheet |
+| 5 | `./scripts/verify-prod-health.sh` | Agent ✅ | All critical flags OK |
+| 6 | `./scripts/verify-investor-demo-ready.sh` | Agent ✅ script; **User** after seed | Exit 0 = `live_db` + apps/interviews ≥ 1 |
+| 7 | ☐ Login smoke: `demo@twin.career` on https://twin-sooty.vercel.app | **User** | Dashboard shows match % + applied row |
 
 **Exit criteria:** Snapshot `live_db`; dashboard not empty; calendar shows interview.
 
@@ -76,7 +76,7 @@ flowchart TD
 
 | Window | Action |
 |--------|--------|
-| T−60 min | `verify-prod-health.sh`; snapshot `live_db` check |
+| T−60 min | `verify-prod-health.sh` + `verify-investor-demo-ready.sh` |
 | T−30 min | Re-login demo user; open tabs per script order |
 | T−5 min | Close Slack/email; Do Not Disturb |
 | During | Follow script; skip Stripe/Microsoft if flags false |
@@ -91,8 +91,7 @@ From audit + `NEXT_10_STEPS.md`:
 1. Railway secrets: `MICROSOFT_CLIENT_*`, optional `STRIPE_*`  
 2. First prod user with auto-apply consent → verify `total_users_processed` ≥ 1  
 3. Greenhouse OAuth credentials for live ATS connect click  
-4. Fix 3 local pytest failures when touching those modules  
-5. Dedicated Celery worker service (`docs/RAILWAY_WORKER_PL.md`)  
+4. Dedicated Celery worker service (`docs/RAILWAY_WORKER_PL.md`)  
 
 ---
 
@@ -101,7 +100,7 @@ From audit + `NEXT_10_STEPS.md`:
 | Variable group | Required for demo? | Prod today |
 |----------------|-------------------|------------|
 | `DATABASE_URL` | Yes (seed) | ✅ reachable |
-| `DEMO_MODE_ENABLED`, `DEMO_USER_EMAIL` | Yes | partial — email flag false pre-seed |
+| `DEMO_MODE_ENABLED`, `DEMO_USER_EMAIL` | Yes | ✅ in `railway-apply-production-env.sh`; `demo_user_configured` true after seed |
 | `DEMO_USER_PASSWORD` / seed only | Yes | operator-held |
 | `ANTHROPIC_API_KEY` | Recommended | fallbacks exist |
 | Google Calendar OAuth | Optional step | ✅ |

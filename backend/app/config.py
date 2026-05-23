@@ -269,6 +269,7 @@ class Settings(BaseSettings):
     data_room_local_upload_enabled: bool = True
 
     # Authologic Customer API (KYC / identity) — https://developer.authologic.com
+    authologic_api_base_url: str = ""
     authologic_api_login: str = ""
     authologic_api_key: str = ""
     authologic_strategy: str = "public:default"
