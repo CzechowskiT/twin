@@ -34,7 +34,7 @@ export function DashboardCommandCenter({
   const { t } = useTranslation();
   const name = displayName(email, profileName);
   const welcome = name ? t("dashboard.welcomeBackNamed").replace("{name}", name) : t("dashboard.welcomeBack");
-  const showDemoHero = isDemoUserEmail(email);
+  const showDemoHero = Boolean(email?.trim());
 
   const actions: { href: string; label: string }[] = [
     { href: "/demo", label: t("nav.demo") },
@@ -64,7 +64,7 @@ export function DashboardCommandCenter({
       {showDemoHero ? (
         <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--twin-accent)]/35 bg-[var(--twin-accent-muted)]/35 px-4 py-3">
           <Link href="/demo" className="inline-block">
-            <ButtonCta type="button" className="twin-header-cta--demo-pulse !w-auto">
+            <ButtonCta type="button" className={`!w-auto${isDemoUserEmail(email) ? " twin-header-cta--demo-pulse" : ""}`}>
               {t("nav.demo")}
             </ButtonCta>
           </Link>
