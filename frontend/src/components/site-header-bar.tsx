@@ -113,9 +113,6 @@ export function SiteHeaderBar({ showPersonaSwitcher }: SiteHeaderBarProps) {
               {item.label}
             </Link>
           ))}
-          <span className="hidden text-[var(--twin-muted)] lg:inline" aria-hidden>
-            ·
-          </span>
           {corporateNavMore.map((item) => (
             <Link key={item.href} href={item.href} className={`${linkClass} hidden lg:inline`}>
               {item.label}
