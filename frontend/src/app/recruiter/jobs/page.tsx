@@ -1,14 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 
+import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
-
-const STORAGE_TOKEN = "twin_recruiter_inbox_token";
-const STORAGE_COMPANY = "twin_recruiter_company_slug";
+import {
+  mergeCompanyOptions,
+  readRecruiterInboxSession,
+  recruiterInboxQuery,
+  resolveCompanySlugFromRaw,
+  writeRecruiterInboxSession,
+} from "@/lib/recruiter-inbox";
 
 type JobRow = {
   id: number;
@@ -21,7 +26,7 @@ type JobRow = {
 export default function RecruiterJobsPage() {
   const { t } = useTranslation();
   const [token, setToken] = useState("");
-  const [companySlug, setCompanySlug] = useState("");
+  const [companyRaw, setCompanyRaw] = useState("");
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
@@ -29,20 +34,27 @@ export default function RecruiterJobsPage() {
   const [jobs, setJobs] = useState<JobRow[]>([]);
   const [busy, setBusy] = useState(false);
 
+  const companyOptions = useMemo(
+    () => mergeCompanyOptions(readRecruiterInboxSession().companySlug, companyRaw),
+    [companyRaw],
+  );
+  const knownSlugs = useMemo(() => new Set(companyOptions.map((o) => o.slug)), [companyOptions]);
+  const companySlug = useMemo(
+    () => resolveCompanySlugFromRaw(companyRaw, knownSlugs),
+    [companyRaw, knownSlugs],
+  );
+
   useEffect(() => {
-    try {
-      setToken(sessionStorage.getItem(STORAGE_TOKEN) || "");
-      setCompanySlug(sessionStorage.getItem(STORAGE_COMPANY) || "");
-    } catch {
-      /* ignore */
-    }
+    const session = readRecruiterInboxSession();
+    setToken(session.token);
+    setCompanyRaw(session.companySlug);
   }, []);
 
   const load = useCallback(async () => {
     const tkn = token.trim();
-    const slug = companySlug.trim();
+    const slug = companySlug;
     if (!tkn || !slug) return;
-    const q = new URLSearchParams({ company_slug: slug, token: tkn });
+    const q = recruiterInboxQuery(tkn, slug);
     const res = await fetch(`/api/recruiter/jobs?${q}`, { cache: "no-store" });
     if (!res.ok) return;
     const data = (await res.json()) as { items: JobRow[] };
@@ -56,16 +68,16 @@ export default function RecruiterJobsPage() {
   async function publish(e: React.FormEvent) {
     e.preventDefault();
     const tkn = token.trim();
-    const slug = companySlug.trim();
+    const slug = companySlug;
     if (!tkn || !slug || !title.trim()) {
       toast.error(t("recruiterInbox.missingAuth"));
       return;
     }
     setBusy(true);
     try {
-      sessionStorage.setItem(STORAGE_TOKEN, tkn);
-      sessionStorage.setItem(STORAGE_COMPANY, slug);
-      const q = new URLSearchParams({ company_slug: slug, token: tkn });
+      writeRecruiterInboxSession(tkn, slug);
+      setCompanyRaw(slug);
+      const q = recruiterInboxQuery(tkn, slug);
       const res = await fetch(`/api/recruiter/jobs?${q}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -92,42 +104,36 @@ export default function RecruiterJobsPage() {
       <Card>
         <h1 className="mb-2 text-2xl font-semibold">{t("recruiterJobs.title")}</h1>
         <p className="twin-muted mb-6 text-sm">{t("recruiterJobs.lead")}</p>
-        <div className="mb-4 grid gap-3 sm:grid-cols-2">
+        <RecruiterAccessFields
+          idPrefix="recruiter-jobs"
+          token={token}
+          onTokenChange={setToken}
+          companySlug={companyRaw}
+          onCompanySlugChange={setCompanyRaw}
+          companyOptions={companyOptions}
+        />
+        <form onSubmit={(e) => void publish(e)} className="mt-6 space-y-3">
           <input
-            className="twin-input"
-            placeholder={t("recruiterJobs.tokenPlaceholder")}
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
-          />
-          <input
-            className="twin-input"
-            placeholder={t("recruiterJobs.companyPlaceholder")}
-            value={companySlug}
-            onChange={(e) => setCompanySlug(e.target.value)}
-          />
-        </div>
-        <form onSubmit={(e) => void publish(e)} className="space-y-3">
-          <input
-            className="twin-input w-full"
+            className="twin-input w-full border-2"
             placeholder={t("recruiterJobs.fieldTitle")}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
           />
           <input
-            className="twin-input w-full"
+            className="twin-input w-full border-2"
             placeholder={t("recruiterJobs.fieldLocation")}
             value={location}
             onChange={(e) => setLocation(e.target.value)}
           />
           <textarea
-            className="twin-input min-h-[6rem] w-full"
+            className="twin-input min-h-[6rem] w-full border-2"
             placeholder={t("recruiterJobs.fieldDescription")}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
           <input
-            className="twin-input w-full"
+            className="twin-input w-full border-2"
             placeholder={t("recruiterJobs.fieldUrl")}
             value={url}
             onChange={(e) => setUrl(e.target.value)}

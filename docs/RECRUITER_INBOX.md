@@ -17,7 +17,18 @@ Company tokens embed `company_slug`; global token still requires `company_slug` 
 https://<frontend>/recruiter/inbox?token=<RECRUITER_INBOX_TOKEN>&company_slug=acme-corp
 ```
 
+Alias: `company=` is accepted instead of `company_slug=`. The UI shows company **names**; the API still uses slugs internally.
+
 `company_slug` must match `slugify(company)` on job rows (e.g. `Acme Corp` → `acme-corp`).
+
+### Local investor demo (optional, gitignored env)
+
+Set on the frontend (never commit real tokens):
+
+- `NEXT_PUBLIC_RECRUITER_INBOX_DEMO_TOKEN` — from `scripts/seed-investor-demo.py --print-credentials`
+- `NEXT_PUBLIC_RECRUITER_INBOX_DEMO_COMPANY` — default `nova-hiring-pl`
+
+Opening `/recruiter/inbox` then auto-loads the queue when both are set.
 
 ## API
 

@@ -132,7 +132,8 @@ export type TranslationKey =
   | `ux.${keyof typeof en.ux}`
   | `employerMedia.${keyof typeof EMPLOYER_MEDIA_MESSAGES_EN}`
   | `jobEmployer.${keyof typeof JOB_EMPLOYER_MESSAGES_EN}`
-  | `jobEmployer.${keyof typeof EMPLOYER_FAQ_MESSAGES_EN}`;
+  | `jobEmployer.${keyof typeof EMPLOYER_FAQ_MESSAGES_EN}`
+  | `employerAbout.${keyof typeof EMPLOYER_ABOUT_MESSAGES_EN}`;
 
 const en = {
   nav: {
@@ -2347,6 +2348,7 @@ const en = {
   },
   employerMedia: EMPLOYER_MEDIA_MESSAGES_EN,
   jobEmployer: { ...JOB_EMPLOYER_MESSAGES_EN, ...EMPLOYER_FAQ_MESSAGES_EN },
+  employerAbout: EMPLOYER_ABOUT_MESSAGES_EN,
   ux: {
     flowNavAria: "Your workspace steps",
     flowStepDashboard: "Dashboard",
@@ -4616,6 +4618,7 @@ const pl: MessageTree = {
   },
   employerMedia: EMPLOYER_MEDIA_MESSAGES_PL,
   jobEmployer: { ...JOB_EMPLOYER_MESSAGES_PL, ...EMPLOYER_FAQ_MESSAGES_PL },
+  employerAbout: EMPLOYER_ABOUT_MESSAGES_PL,
   ux: {
     flowNavAria: "Kroki w Twojej przestrzeni roboczej",
     flowStepDashboard: "Panel",
