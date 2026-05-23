@@ -11,11 +11,14 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 
 import { useTranslation } from "@/components/language-provider";
 import { DemoLiveSnapshot } from "@/components/marketing/demo-live-snapshot";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { ButtonCta, Shell } from "@/components/ui";
+import { apiFetch } from "@/lib/api";
+import { getToken } from "@/lib/auth";
 import {
   DEMO_JOB_CARD,
   DEMO_MATCH_CANDIDATE,
@@ -36,11 +39,30 @@ const STEP_MS = [900, 1100, 1000, 1200, 900];
 
 type StepState = "pending" | "active" | "done";
 
+type DemoApplyTarget = {
+  job_id: number;
+  title: string;
+  company: string;
+  job_board: string;
+  external_id: string;
+  url?: string | null;
+};
+
+type AutoApplyResult = {
+  success: boolean;
+  message: string;
+  package_pdf_url?: string | null;
+};
+
 export function DemoAutoApplyPage() {
   const { t } = useTranslation();
   const [cvText, setCvText] = useState<string>("");
   const [cvError, setCvError] = useState(false);
   const [running, setRunning] = useState(false);
+  const [realApplying, setRealApplying] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [applyTarget, setApplyTarget] = useState<DemoApplyTarget | null>(null);
+  const [applyTargetError, setApplyTargetError] = useState(false);
   const [stepStates, setStepStates] = useState<StepState[]>(() => STEP_KEYS.map(() => "pending"));
   const timersRef = useRef<number[]>([]);
 
@@ -138,6 +160,65 @@ export function DemoAutoApplyPage() {
 
   useEffect(() => () => clearTimers(), [clearTimers]);
 
+  useEffect(() => {
+    const token = getToken();
+    setIsLoggedIn(Boolean(token));
+    if (!token) {
+      setApplyTarget(null);
+      setApplyTargetError(false);
+      return;
+    }
+    let cancelled = false;
+    void apiFetch<DemoApplyTarget>("/api/v1/demo/apply-target", {}, token)
+      .then((target) => {
+        if (!cancelled) {
+          setApplyTarget(target);
+          setApplyTargetError(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setApplyTarget(null);
+          setApplyTargetError(true);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const runRealAutoApply = useCallback(async () => {
+    const token = getToken();
+    if (!token || !applyTarget) return;
+    setRealApplying(true);
+    try {
+      const result = await apiFetch<AutoApplyResult>(
+        "/api/v1/applications/auto-apply",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            job_id: applyTarget.job_id,
+            human_acknowledged: true,
+          }),
+        },
+        token,
+      );
+      if (result.success) {
+        toast.success(result.message);
+        if (result.package_pdf_url) {
+          window.open(result.package_pdf_url, "_blank", "noopener,noreferrer");
+        }
+      } else {
+        toast.error(result.message);
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Auto-apply failed");
+    } finally {
+      setRealApplying(false);
+    }
+  }, [applyTarget]);
+
+  const canRunLiveApply = isLoggedIn && applyTarget !== null;
   const skillsLine = DEMO_MATCH_CANDIDATE.skills.join(", ");
   const titlesLine = DEMO_MATCH_CANDIDATE.preferred_job_titles.join(", ");
 
@@ -163,21 +244,23 @@ export function DemoAutoApplyPage() {
             <p className="mt-1 text-amber-900/95">{t("demo.simulationBody")}</p>
           </aside>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <ButtonCta type="button" disabled={running} onClick={runSequence} className="!w-auto min-w-[12rem] px-6">
+          <div className="marketing-section-demo-actions flex flex-wrap items-center gap-3">
+            <ButtonCta
+              type="button"
+              disabled={running}
+              onClick={runSequence}
+              className="section-cta-primary marketing-btn-primary-shadow !w-auto min-w-[12rem] px-6"
+            >
               {running ? t("demo.runningCta") : t("demo.runCta")}
             </ButtonCta>
             <button
               type="button"
               onClick={advanceManualStep}
-              className="twin-touch-target inline-flex min-h-[2.75rem] min-w-[10rem] items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-5 text-sm font-semibold text-[var(--foreground)] transition hover:border-[var(--twin-border-hover)] hover:bg-[var(--twin-accent-muted)] active:scale-[0.98]"
+              className="section-cta-secondary twin-touch-target min-w-[10rem] px-5 text-sm"
             >
               {t("demo.nextStep")}
             </button>
-            <Link
-              href="/register"
-              className="twin-touch-target inline-flex min-h-[2.75rem] items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-5 text-sm font-semibold text-[var(--twin-muted-strong)] transition hover:border-[var(--twin-border-hover)] hover:bg-[var(--twin-accent-muted)] active:scale-[0.98]"
-            >
+            <Link href="/register" className="section-cta-secondary twin-touch-target px-5 text-sm">
               {t("demo.registerCta")}
             </Link>
           </div>

@@ -7,7 +7,7 @@ import { ScrollReveal } from "@/components/marketing/scroll-reveal";
 export function LandingHero() {
   const { t } = useTranslation();
   return (
-    <section className="relative mx-auto flex w-full max-w-6xl flex-col justify-center px-4 pb-12 pt-14 sm:px-6 sm:pb-16 sm:pt-16 md:min-h-[min(92svh,880px)] md:pb-20 md:pt-20">
+    <section className="marketing-section-hero relative mx-auto flex w-full max-w-6xl flex-col justify-center px-4 pb-12 pt-14 sm:px-6 sm:pb-16 sm:pt-16 md:min-h-[min(92svh,880px)] md:pb-20 md:pt-20">
       <ScrollReveal>
         <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-[var(--twin-muted)] sm:text-[11px]">
           {t("home.tagline")}
@@ -23,7 +23,7 @@ export function LandingHero() {
         <div className="mt-10 flex flex-col gap-4 sm:mt-12">
           <Link
             href="/demo"
-            className="landing-hero-demo-cta marketing-hero-btn-cta marketing-btn-primary-shadow twin-touch-target w-full max-w-sm transition duration-200 sm:w-auto"
+            className="landing-hero-demo-cta section-cta-primary marketing-hero-btn-cta marketing-btn-primary-shadow twin-touch-target w-full max-w-sm transition duration-200 sm:w-auto"
           >
             {t("home.ctaDemo")}
           </Link>

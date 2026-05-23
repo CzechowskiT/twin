@@ -1503,6 +1503,135 @@ html[data-marketing-surface="studio"] .marketing-gradient-heading {
   color: transparent;
 }
 
+/**
+ * Section-scoped marketing CTAs — each visual band sets `--section-cta-*` tokens;
+ * children use `.section-cta-primary` / `.section-cta-secondary` for consistent pairs.
+ */
+.marketing-section-hero,
+.marketing-section-cta-band,
+.marketing-section-demo-actions {
+  --section-cta-primary-bg: var(--twin-cta);
+  --section-cta-primary-fg: var(--twin-on-cta);
+  --section-cta-primary-bg-hover: var(--twin-cta-hover);
+  --section-cta-secondary-bg: var(--twin-card);
+  --section-cta-secondary-fg: var(--twin-muted-strong);
+  --section-cta-secondary-border: var(--twin-border);
+  --section-cta-secondary-bg-hover: var(--twin-accent-muted);
+}
+
+.marketing-section-demo-feed {
+  --section-cta-primary-bg: var(--twin-accent);
+  --section-cta-primary-fg: var(--twin-on-accent);
+  --section-cta-primary-bg-hover: var(--twin-accent-hover);
+  --section-cta-secondary-bg: transparent;
+  --section-cta-secondary-fg: var(--twin-accent);
+  --section-cta-secondary-border: var(--twin-border);
+  --section-cta-secondary-bg-hover: var(--twin-accent-muted);
+}
+
+html[data-marketing-surface="studio"] .marketing-section-hero,
+html[data-marketing-surface="studio"] .marketing-section-cta-band,
+html[data-marketing-surface="studio"] .marketing-section-demo-actions {
+  --section-cta-primary-fg: #0f172a;
+}
+
+html[data-marketing-surface="studio"] .marketing-section-demo-feed {
+  --section-cta-primary-fg: #0f172a;
+}
+
+html[data-marketing-surface="studio"] .marketing-section-hero .section-cta-secondary,
+html[data-marketing-surface="studio"] .marketing-section-cta-band .section-cta-secondary,
+html[data-marketing-surface="studio"] .marketing-section-demo-actions .section-cta-secondary {
+  --section-cta-secondary-bg: rgb(15 23 42 / 0.35);
+  --section-cta-secondary-fg: #94a3b8;
+  --section-cta-secondary-border: rgb(148 163 184 / 0.18);
+  --section-cta-secondary-bg-hover: rgb(30 41 59 / 0.55);
+}
+
+a.section-cta-primary,
+button.section-cta-primary,
+.section-cta-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  border-radius: 9999px;
+  border: none;
+  background: var(--section-cta-primary-bg, var(--twin-cta)) !important;
+  padding-inline: 1.75rem;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--section-cta-primary-fg, var(--twin-on-cta)) !important;
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+a.section-cta-primary:hover,
+button.section-cta-primary:hover,
+.section-cta-primary:hover {
+  background: var(--section-cta-primary-bg-hover, var(--twin-cta-hover));
+  color: var(--section-cta-primary-fg, var(--twin-on-cta)) !important;
+}
+
+a.section-cta-primary:active,
+button.section-cta-primary:active,
+.section-cta-primary:active {
+  transform: scale(0.98);
+}
+
+a.section-cta-secondary,
+button.section-cta-secondary,
+.section-cta-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  border-radius: 9999px;
+  border: 1px solid var(--section-cta-secondary-border, var(--twin-border));
+  background: var(--section-cta-secondary-bg, var(--twin-card)) !important;
+  padding-inline: 1.75rem;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--section-cta-secondary-fg, var(--twin-muted-strong)) !important;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.15s ease;
+}
+
+a.section-cta-secondary:hover,
+button.section-cta-secondary:hover,
+.section-cta-secondary:hover {
+  border-color: var(--twin-border-hover);
+  background: var(--section-cta-secondary-bg-hover, var(--twin-accent-muted));
+  color: var(--section-cta-secondary-fg, var(--twin-muted-strong)) !important;
+}
+
+html[data-marketing-surface="studio"] a.section-cta-secondary:hover,
+html[data-marketing-surface="studio"] button.section-cta-secondary:hover,
+html[data-marketing-surface="studio"] .section-cta-secondary:hover {
+  color: #e2e8f0 !important;
+}
+
+a.section-cta-secondary:active,
+button.section-cta-secondary:active,
+.section-cta-secondary:active {
+  transform: scale(0.98);
+}
+
+.marketing-section-hero a.section-cta-primary {
+  min-height: 3rem;
+  padding-inline: 2.25rem;
+  font-size: 15px;
+  font-weight: 600;
+}
+
 .marketing-btn-primary-shadow {
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.55),
@@ -1627,30 +1756,32 @@ html[data-marketing-surface="studio"] a.marketing-hero-btn-twin:hover {
   background: rgb(248 250 252 / 0.06);
 }
 
+/** Hero primary — aliases section tokens (use `section-cta-primary` on new markup). */
 a.marketing-hero-btn-cta {
   display: inline-flex;
   min-height: 3rem;
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  background: var(--twin-cta);
+  background: var(--section-cta-primary-bg, var(--twin-cta));
   padding-left: 2.25rem;
   padding-right: 2.25rem;
   text-align: center;
   font-size: 15px;
   font-weight: 600;
-  color: var(--twin-on-cta) !important;
+  color: var(--section-cta-primary-fg, var(--twin-on-cta)) !important;
   transition:
     background-color 0.2s ease,
     transform 0.15s ease;
 }
 
 html[data-marketing-surface="studio"] a.marketing-hero-btn-cta {
-  color: #0f172a !important;
+  color: var(--section-cta-primary-fg, #0f172a) !important;
 }
 
 a.marketing-hero-btn-cta:hover {
-  background: var(--twin-cta-hover);
+  background: var(--section-cta-primary-bg-hover, var(--twin-cta-hover));
+  color: var(--section-cta-primary-fg, var(--twin-on-cta)) !important;
 }
 
 a.marketing-hero-btn-cta:active {
@@ -1725,11 +1856,13 @@ html[data-marketing-surface="studio"] a.marketing-hero-btn-signin:hover {
  * Next.js `<Link>` → `<a>`. Preflight `a { color: inherit }` + late utility order can leave
  * light `--foreground` on a light `--twin-cta` pill — force label colors (studio uses hex).
  */
-a.marketing-cta-filled-pill {
+a.marketing-cta-filled-pill,
+button.marketing-cta-filled-pill {
   color: var(--twin-on-cta) !important;
 }
 
-html[data-marketing-surface="studio"] a.marketing-cta-filled-pill {
+html[data-marketing-surface="studio"] a.marketing-cta-filled-pill,
+html[data-marketing-surface="studio"] button.marketing-cta-filled-pill {
   color: #0f172a !important;
 }
 

@@ -59,7 +59,7 @@ export function DemoLiveSnapshot({ fullDemoHref }: DemoLiveSnapshotProps = {}) {
 
   return (
     <section
-      className="rounded-2xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/90 p-5 shadow-sm sm:p-6"
+      className="marketing-section-demo-feed rounded-2xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/90 p-5 shadow-sm sm:p-6"
       aria-labelledby="demo-live-feed-heading"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -76,7 +76,7 @@ export function DemoLiveSnapshot({ fullDemoHref }: DemoLiveSnapshotProps = {}) {
         </div>
         <Link
           href={signup}
-          className="twin-touch-target inline-flex min-h-[2.5rem] items-center justify-center rounded-full border border-[var(--twin-border)] px-4 text-sm font-semibold text-[var(--twin-muted-strong)] transition hover:border-[var(--twin-accent)]/40"
+          className="section-cta-primary marketing-btn-primary-shadow twin-touch-target !min-h-[2.5rem] px-5 text-sm"
         >
           {t("demo.signUpToApply" as TranslationKey)}
         </Link>

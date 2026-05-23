@@ -99,7 +99,7 @@ export function ButtonCta({ type = "button", className, ...props }: ButtonHTMLAt
     <button
       type={type}
       {...props}
-      className={`twin-touch-target w-full max-w-full rounded border-0 bg-[var(--twin-cta)] px-4 py-2.5 text-sm font-semibold text-[var(--twin-on-cta)] transition hover:bg-[var(--twin-cta-hover)] hover:text-[var(--twin-on-cta)] disabled:cursor-not-allowed disabled:opacity-50 ${className ?? ""}`}
+      className={`marketing-cta-filled-pill twin-touch-target w-full max-w-full rounded-full border-0 bg-[var(--twin-cta)] px-4 py-2.5 text-sm font-semibold text-[var(--twin-on-cta)] transition hover:bg-[var(--twin-cta-hover)] hover:text-[var(--twin-on-cta)] disabled:cursor-not-allowed disabled:opacity-50 ${className ?? ""}`}
     />
   );
 }
