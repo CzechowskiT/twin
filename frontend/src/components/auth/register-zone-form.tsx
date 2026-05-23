@@ -82,17 +82,17 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
 
   const displayError = error ?? oauthUrlError;
 
-  function selectAllConsentCheckboxes() {
+  const REQUIRED_CONSENT_NAMES = [
+    "gdpr_privacy",
+    "terms_of_service",
+    "job_data_processing",
+    "ai_matching",
+  ] as const;
+
+  function acceptAllRequiredConsents() {
     const root = formRef.current;
     if (!root) return;
-    const names = [
-      "gdpr_privacy",
-      "terms_of_service",
-      "job_data_processing",
-      "ai_matching",
-      "marketing_emails_opt_in",
-    ] as const;
-    for (const name of names) {
+    for (const name of REQUIRED_CONSENT_NAMES) {
       const el = root.querySelector<HTMLInputElement>(`input[type="checkbox"][name="${name}"]`);
       if (el) el.checked = true;
     }
@@ -198,13 +198,14 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
         />
         <p className="twin-muted mb-4 text-xs">{t("register.referredByHint")}</p>
         <LegalRegionNotice />
-        <Button
-          type="button"
-          className="mb-4 border border-[var(--twin-border)] bg-[var(--twin-input-bg)] text-[var(--foreground)] hover:bg-[var(--twin-border)]/30"
-          onClick={selectAllConsentCheckboxes}
-        >
-          {t("register.selectAllConsents")}
-        </Button>
+        <div className="mb-4 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-input-bg)]/60 p-3">
+          <Button type="button" className="w-full sm:!w-auto" onClick={acceptAllRequiredConsents}>
+            {t("register.acceptAll")}
+          </Button>
+          <p className="mt-2 text-xs leading-relaxed text-[var(--twin-muted-strong)]">
+            {t("register.acceptAllHint")}
+          </p>
+        </div>
         <label className="mb-4 flex items-start gap-2 text-sm">
           <input name="gdpr_privacy" type="checkbox" className="mt-1" required />
           <span>
