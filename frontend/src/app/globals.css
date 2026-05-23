@@ -2183,12 +2183,6 @@ a.landing-hero-demo-cta--secondary {
   margin-top: -0.5rem;
 }
 
-/** Homepage: marquee sits under eyebrow; no duplicate strip in site chrome. */
-.company-logo-marquee--landing {
-  margin-top: 0.75rem;
-  border-top-width: 0;
-}
-
 .landing-how-timeline {
   scroll-snap-type: x proximity;
 }

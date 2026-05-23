@@ -273,24 +273,15 @@ function LogoRow({
   );
 }
 
-type MarqueePlacement = "global" | "landing";
-
-const PLACEMENT_CLASS: Record<MarqueePlacement, string> = {
-  global: "company-logo-marquee--global",
-  landing: "company-logo-marquee--landing",
-};
-
 /** Infinite marquee — duplicated strip; marks try SI → jsDelivr SI → favicon → DuckDuckGo → monogram. */
-export function CompanyLogoMarquee({ placement = "global" }: { placement?: MarqueePlacement }) {
+export function CompanyLogoMarquee() {
   const reducedMotion = usePrefersReducedMotion();
   const linkSuffixKey: TranslationKey = "site.marqueeBrandLinkSuffix";
-  const borderClass = placement === "global" ? "border-y" : "border-b";
-  const rootClass = `company-logo-marquee ${PLACEMENT_CLASS[placement]} shrink-0 ${borderClass} border-[var(--twin-border)] bg-[var(--twin-surface)]/90 backdrop-blur-[2px]`;
 
   if (reducedMotion) {
     return (
       <div
-        className={`${rootClass} py-5 sm:py-5`}
+        className="company-logo-marquee shrink-0 border-y border-[var(--twin-border)] bg-[var(--twin-surface)]/90 py-5 backdrop-blur-[2px] sm:py-5"
         role="presentation"
       >
         <div className="company-logo-marquee__viewport overflow-x-auto [-webkit-overflow-scrolling:touch] px-3 sm:px-5">
@@ -304,7 +295,7 @@ export function CompanyLogoMarquee({ placement = "global" }: { placement?: Marqu
 
   return (
     <div
-      className={`${rootClass} py-4 sm:py-5`}
+      className="company-logo-marquee shrink-0 border-y border-[var(--twin-border)] bg-[var(--twin-surface)]/90 py-5 backdrop-blur-[2px] sm:py-5"
       role="presentation"
     >
       <div className="company-logo-marquee__viewport overflow-x-clip px-3 sm:px-5" aria-hidden>

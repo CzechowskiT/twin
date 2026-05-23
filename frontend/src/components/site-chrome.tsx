@@ -11,12 +11,11 @@ import { SiteTopMarquee } from "@/components/site-top-marquee";
 export function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? "";
   const immersive = pathname === "/waitlist" || pathname.startsWith("/waitlist/");
-  const homeSocialProof = pathname === "/";
 
   return (
     <>
       {!immersive ? <RouteAwareBackground /> : null}
-      {!immersive && !homeSocialProof ? <SiteTopMarquee /> : null}
+      {!immersive ? <SiteTopMarquee /> : null}
       {!immersive ? <Header /> : null}
       <main
         className={`relative z-10 flex min-h-0 flex-1 flex-col pb-[env(safe-area-inset-bottom,0)] ${immersive ? "min-h-[100dvh]" : ""}`}
