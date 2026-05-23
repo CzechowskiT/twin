@@ -1,7 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui";
-import type { TranslationKey } from "@/lib/i18n";
+import type { Locale, TranslationKey } from "@/lib/i18n";
+import { formatCandidateListPriceUsd } from "@/lib/pricing-locale";
 
 export type BillingPlanRow = {
   id: string;
@@ -23,6 +24,7 @@ function formatUsdListMonthly(n: number): string {
 
 type BillingPlanTierCardProps = {
   plan: BillingPlanRow;
+  locale: Locale;
   displayName: string;
   busy: string | null;
   footerLabel: string;
@@ -37,6 +39,7 @@ type BillingPlanTierCardProps = {
 
 export function BillingPlanTierCard({
   plan: p,
+  locale,
   displayName,
   busy,
   footerLabel,
@@ -72,7 +75,9 @@ export function BillingPlanTierCard({
       </header>
 
       <div className="twin-billing-plan-card__price">
-        <span className="twin-billing-plan-card__amount">{formatUsdListMonthly(p.monthly_list_price_usd)}</span>
+        <span className="twin-billing-plan-card__amount">
+          {formatCandidateListPriceUsd(p.monthly_list_price_usd, locale)}
+        </span>
         <span className="twin-billing-plan-card__period">{t("dashboard.billingPerMonth")}</span>
       </div>
 

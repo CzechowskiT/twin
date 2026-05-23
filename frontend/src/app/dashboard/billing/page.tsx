@@ -11,6 +11,7 @@ import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
 import type { TranslationKey } from "@/lib/i18n";
+import { CANDIDATE_PLAN_USD } from "@/lib/pricing-locale";
 
 type Me = {
   id: number;
@@ -40,8 +41,8 @@ type PlansPayload = {
 
 const PLAN_PRICE_FALLBACK_USD: Record<string, number> = {
   free: 0,
-  premium: 4.99,
-  pro: 9.99,
+  premium: CANDIDATE_PLAN_USD.premium,
+  pro: CANDIDATE_PLAN_USD.pro,
 };
 
 function planDisplayName(planId: string, fallback: string, t: (key: TranslationKey) => string): string {
@@ -556,6 +557,7 @@ export default function BillingPage() {
                   <BillingPlanTierCard
                     key={p.id}
                     plan={p}
+                    locale={locale}
                     displayName={planDisplayName(p.id, p.name, t)}
                     busy={busy}
                     footerLabel={t(footerKey)}
