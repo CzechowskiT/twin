@@ -617,6 +617,62 @@ html[data-cookie-banner="open"] main {
   color: var(--twin-muted-strong);
 }
 
+/**
+ * Auth role hub: body uses justified + auto hyphens; card copy must stay readable.
+ */
+.twin-auth-zone-hub {
+  text-align: start;
+  hyphens: none;
+  -webkit-hyphens: none;
+  text-wrap: wrap;
+}
+
+.twin-auth-zone-hub__title,
+.twin-auth-zone-hub__lead,
+.twin-auth-zone-hub__card,
+.twin-auth-zone-hub__card-title,
+.twin-auth-zone-hub__card-sub {
+  text-align: start;
+  hyphens: none;
+  -webkit-hyphens: none;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.twin-auth-zone-hub__title {
+  text-wrap: balance;
+}
+
+.twin-auth-zone-hub__lead {
+  text-wrap: pretty;
+}
+
+.twin-auth-zone-hub__card-title {
+  text-wrap: balance;
+}
+
+.twin-auth-zone-hub__card-sub {
+  text-wrap: pretty;
+}
+
+.twin-auth-zone-hub__grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 640px) {
+  .twin-auth-zone-hub__grid {
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+  }
+}
+
+@media (min-width: 1280px) {
+  .twin-auth-zone-hub__grid {
+    grid-template-columns: repeat(4, minmax(220px, 1fr));
+  }
+}
+
 .twin-billing-surface .twin-billing-plan-card__cta {
   margin-top: 1rem;
 }

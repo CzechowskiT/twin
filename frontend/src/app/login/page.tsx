@@ -5,7 +5,7 @@ import { Shell } from "@/components/ui";
 
 export default function LoginPage() {
   return (
-    <Shell rail>
+    <Shell wide>
       <LoginZoneHub />
     </Shell>
   );

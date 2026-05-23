@@ -8,7 +8,7 @@ import { Shell } from "@/components/ui";
 
 export default function RegisterPage() {
   return (
-    <Shell rail>
+    <Shell wide>
       <Suspense fallback={null}>
         <RegisterLegacyZoneRedirect>
           <RegisterZoneHub />
