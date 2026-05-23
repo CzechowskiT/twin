@@ -1,7 +1,7 @@
 # TWIN — 100 tasks execution progress
 
 **Branch:** `cursor/phase1-monorepo-scaffold`  
-**Updated:** 2026-05-23 (evening ops)
+**Updated:** 2026-05-23 (night autonomous slice)
 
 Legend: `[x]` done this sprint · `[ ]` open · `[~]` partial / docs-only · `[—]` skipped (founder secrets)
 
@@ -49,12 +49,16 @@ Legend: `[x]` done this sprint · `[ ]` open · `[~]` partial / docs-only · `[�
 
 ## Phase 7–12 — Backlog (not in this session)
 
-- [~] **01** Stripe live — MCP sandbox has prices; Railway still missing `STRIPE_SECRET_KEY` (founder paste `sk_test_` + run bootstrap)
+- [~] **01** Stripe live — MCP sandbox has prices; Railway still missing `STRIPE_SECRET_KEY`; **`docs/STRIPE_RAILWAY_SETUP.md`** + **`scripts/railway-apply-stripe-env.sh`** added
 - [x] **02** LinkedIn OAuth on prod — applied via Railway CLI 2026-05-23; `linkedin_oauth_configured: true`
 - [—] **03** Microsoft calendar — `MICROSOFT_CLIENT_*` empty in `.env.railway`; skipped
 - [x] **05** Celery worker + beat — service `enthusiastic-encouragement`; `worker_active: true` on prod
+- [x] **07** Health dashboard `/status` — LinkedIn, Celery, beat, recruiter inbox flags (2026-05-23)
+- [x] **44** Recruiter inbox batch accept/decline — multi-select UI + `respond-batch` API
+- [x] **59** Placement verification UI stepper on dashboard applications
+- [x] Investor metrics — `paid_subscribers`, `subscription_mrr_usd` stub when Stripe off
+- [x] WebCal regeneration polish — expiry + HTTPS preview on calendar page
 - [ ] **18** Nightly auto-apply prod verification (02:00 UTC)
-- [ ] **44** Recruiter inbox on prod with live token walkthrough
 - [ ] **52** ATS OAuth live
 - [ ] **76–77** RocketJobs + scrape corpus
 - [ ] **91** Data room S3 bytes
@@ -76,13 +80,14 @@ Legend: `[x]` done this sprint · `[ ]` open · `[~]` partial / docs-only · `[�
 
 | Check | Result |
 |-------|--------|
-| API `git_commit` | `6960c83` (matches scaffold HEAD) |
-| Vercel proxy `git_commit` | `6960c83` (aligned) |
+| API `git_commit` | `c5ae7b9` (matches scaffold HEAD) |
+| Vercel proxy `git_commit` | `6960c83` → **pending redeploy** after this push |
 | `linkedin_oauth_configured` | **true** (Railway vars set + redeploy) |
-| `stripe_checkout_ready` | **false** (no `STRIPE_*` in workspace; MCP account **TWIN sandbox**) |
+| `stripe_checkout_ready` | **false** (no `STRIPE_*` on Railway; setup doc + apply script shipped) |
 | Celery | `worker_active: true`, beat schedules firing |
 | Demo verify script | **PASS** (`live_db`, 5 top matches in snapshot) |
 | pytest fixes | PDF locale `pl`; seed idempotent expects 7 demo jobs |
+| Audit branch merge | **N/A** — scaffold ahead of `cursor/audit-and-mvp-slices-may23` by `c5ae7b9` |
 
 ## Founder-only blockers (remaining)
 

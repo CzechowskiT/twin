@@ -62,6 +62,8 @@ def test_public_mvp_stats_shape_empty(_mock_li: object, _mock_stripe: object, *_
         assert body["database_reachable"] is True
         assert body["data_room_s3_enabled"] is False
         assert body["data_room_local_demo"] is True
+        assert body["paid_subscribers"] == 0
+        assert body["subscription_mrr_usd"] is None
     finally:
         app.dependency_overrides.pop(get_db, None)
         db.close()

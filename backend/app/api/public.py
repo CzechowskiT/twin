@@ -21,6 +21,7 @@ from app.services.mail import is_mail_configured
 from app.api.health import _database_reachable
 from app.services.data_room_upload import object_storage_configured
 from app.services.mvp_public_metrics import count_validated_jobs_public_traction
+from app.services.subscription_public_metrics import count_paid_subscribers, subscription_mrr_usd
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -85,6 +86,7 @@ def mvp_stats(db: Session = Depends(get_db)) -> MvpStatsOut:
         db_ok = _database_reachable(db.get_bind())
     except Exception:
         logger.warning("mvp-stats database_reachable check failed", exc_info=True)
+    stripe_ready = _stripe_checkout_ready(s)
     return MvpStatsOut(
         validated_jobs=v_jobs,
         registered_users=users,
@@ -94,12 +96,14 @@ def mvp_stats(db: Session = Depends(get_db)) -> MvpStatsOut:
         profiles_with_cv=cv_profiles,
         job_boards_in_registry=boards,
         linkedin_oauth_configured=is_linkedin_oauth_configured(),
-        stripe_checkout_ready=_stripe_checkout_ready(s),
+        stripe_checkout_ready=stripe_ready,
         mail_configured=is_mail_configured(s),
         google_calendar_configured=is_google_calendar_oauth_configured(),
         microsoft_calendar_configured=is_microsoft_calendar_oauth_configured(),
         database_reachable=db_ok,
         data_room_s3_enabled=s3_on,
         data_room_local_demo=not s3_on and bool(s.data_room_local_upload_enabled),
+        paid_subscribers=_safe_count(db, "paid_subscribers", lambda: count_paid_subscribers(db)),
+        subscription_mrr_usd=subscription_mrr_usd(db, stripe_checkout_ready=stripe_ready),
         generated_at=datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
     )
