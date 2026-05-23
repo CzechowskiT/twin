@@ -8,6 +8,7 @@ import {
   jaOverlay,
   zhOverlay,
 } from "./overlays";
+import { FAQ_MESSAGES_EN, FAQ_MESSAGES_PL } from "./faq-messages";
 import { SITE_MESSAGES_EN, SITE_MESSAGES_PL } from "./site-messages";
 
 export type Locale = "en" | "pl" | "es" | "it" | "fr" | "de" | "zh" | "ar" | "ja";
@@ -65,6 +66,7 @@ export const LOCALE_STORAGE_KEY = "twin_locale";
 export type TranslationKey =
   | `nav.${keyof typeof en.nav}`
   | `home.${keyof typeof en.home}`
+  | `faq.${keyof typeof FAQ_MESSAGES_EN}`
   | `site.${keyof typeof SITE_MESSAGES_EN}`
   | `calculator.${keyof typeof en.calculator}`
   | `investorCalc.${keyof typeof en.investorCalc}`
@@ -72,6 +74,7 @@ export type TranslationKey =
   | `login.${keyof typeof en.login}`
   | `forgotPassword.${keyof typeof en.forgotPassword}`
   | `resetPassword.${keyof typeof en.resetPassword}`
+  | `changePassword.${keyof typeof en.changePassword}`
   | `register.${keyof typeof en.register}`
   | `authCallback.${keyof typeof en.authCallback}`
   | `consentGdpr.${keyof typeof en.consentGdpr}`
@@ -102,6 +105,7 @@ export type TranslationKey =
   | `terms.${keyof typeof en.terms}`
   | `legalRegion.${keyof typeof en.legalRegion}`
   | `legalDoc.${keyof typeof en.legalDoc}`
+  | `cookie.${keyof typeof en.cookie}`
   | `cookies.${keyof typeof en.cookies}`
   | `common.${keyof typeof en.common}`
   | `persona.${keyof typeof en.persona}`
@@ -148,10 +152,36 @@ const en = {
   },
   home: {
     tagline: "AI career twin",
-    title: "Your pipeline works while you live.",
-    heroHook: "One feed. Ranked matches. Every application in one place.",
-    description: "Boards you enable, consent-first. Try the interactive demo — no login.",
-    getStarted: "Start free",
+    curiosityEyebrow: "See what's inside",
+    title: "Come back to interviews worth taking—not inbox spam.",
+    heroHook: "Ranked matches and a calendar of acceptance sit behind one free account.",
+    description:
+      "TWIN scans boards you enable and surfaces roles worth your time—so after time away you open a short list of slots, not random noise.",
+    getStarted: "Create free account",
+    ctaRegisterMicro: "See your matches in ~2 min",
+    ctaDemoSecondary: "Watch interactive demo",
+    liveCounter: "{count}+ roles scanned on enabled boards",
+    socialProofJoin: "Join candidates building a calendar of acceptance—not another tab graveyard.",
+    socialProofQuote: "“Finally one pipeline instead of twenty tabs.”",
+    teaserEyebrow: "Inside your workspace",
+    teaserTitle: "Your match feed and pipeline—preview",
+    teaserUnlock: "Unlock after signup",
+    teaserCard1Title: "Staff engineer · platform",
+    teaserCard1Meta: "Remote EU · 92% match",
+    teaserCard2Title: "Product lead · B2B SaaS",
+    teaserCard2Meta: "Hybrid · 88% match",
+    teaserCard3Title: "Engineering manager",
+    teaserCard3Meta: "Warsaw · 85% match",
+    insideEyebrow: "What you get inside",
+    insideTitle: "Your pipeline works while you sleep",
+    insideStep1Title: "Ranked feed",
+    insideStep1Line: "Roles scored to your profile—not a firehose of every listing.",
+    insideStep2Title: "Application ledger",
+    insideStep2Line: "Every save and status in one timeline recruiters can trust.",
+    insideStep3Title: "Interview calendar",
+    insideStep3Line: "Slots worth showing up for, synced when you connect calendar.",
+    stickyCtaLabel: "Create free account",
+    stickyCtaMicro: "~2 min to first matches",
     joinWishlist: "Join wishlist",
     logIn: "Sign in",
     scrape: "Discover",
@@ -196,8 +226,9 @@ const en = {
     feature6Title: "Phased autopilot",
     feature6Line: "Auto-apply ships as trust and integrations allow.",
     socialProofEyebrow: "Candidates explore roles at companies like",
-    ctaBandEyebrow: "Ready when you are",
-    ctaBandTitle: "Create a free account or read the full story.",
+    ctaBandEyebrow: "Your matches are waiting",
+    ctaBandTitle: "Create a free account—see ranked roles in minutes, not another week of tabs.",
+    ctaBandMicro: "Free · consent-first · no card for signup",
     focusTitle: "Where do you want the first win?",
     focusSubtitle:
       "Choose a starting lane. Everything still lands in one dashboard; we just open the door where the noise is loudest for you.",
@@ -252,18 +283,6 @@ const en = {
     faqEyebrow: "FAQ",
     faqTitle: "Questions & answers",
     faqPrivacyLink: "Privacy Policy",
-    faq01Q: "What is TWIN today?",
-    faq01A:
-      "Today: one feed from the boards you enable, ranking when you have a profile, and saves plus application status in one place. Next, in public phases: more autopilot (auto-apply and calendar) as integrations and trust catch up.",
-    faq02Q: "Who is it for?",
-    faq02A:
-      "People who already juggle several job sites and scraps of notes and want fewer tabs: one place to scan, compare, and move applications forward without losing context.",
-    faq03Q: "How is this different from using one job board?",
-    faq03A:
-      "Boards remain where postings live; TWIN is the layer that normalizes discovery, match signals, and follow-up in one UX. You still apply on the employer’s flow where required.",
-    faq04Q: "What about my data?",
-    faq04A:
-      "You explicitly consent when you register. We use profile data to rank jobs and run the product. For retention, exports, and GDPR rights, read the policy linked below.",
     audienceEyebrow: "Who it is for",
     audienceDraftBadge: "Draft",
     audienceTitle: "Three distinct product surfaces",
@@ -331,6 +350,7 @@ const en = {
     vacationTestCtaRegister: "Create account",
     vacationTestCtaCalculator: "Open ROI calculator",
   },
+  faq: FAQ_MESSAGES_EN,
   site: SITE_MESSAGES_EN,
   dashboard: {
     title: "Dashboard",
@@ -964,6 +984,21 @@ const en = {
     backToLogin: "Log in",
     failed: "Could not reset password",
   },
+  changePassword: {
+    sectionTitle: "Account password",
+    sectionHint: "Change the password you use to sign in with email.",
+    currentPassword: "Current password",
+    newPassword: "New password",
+    newPasswordConfirm: "Confirm new password",
+    mismatch: "New passwords do not match.",
+    submit: "Update password",
+    saving: "Saving…",
+    success: "Password updated.",
+    failed: "Could not update password",
+    oauthOnlyHint:
+      "This account uses social sign-in only. Use your provider to sign in, or use Forgot password on the log in page if you have added email login.",
+    forgotLink: "Forgot your password?",
+  },
   authCallback: {
     title: "Signing you in",
     signingIn: "Completing sign-in…",
@@ -1007,6 +1042,9 @@ const en = {
   register: {
     hubTitle: "Choose your role",
     hubLead: "One TWIN account — pick how you will use the product, then complete registration for that lane.",
+    hubCuriosity: "See what's inside",
+    hubBenefit: "Ranked matches and your pipeline unlock in ~2 minutes after signup.",
+    hubMicro: "Interviews worth taking—not inbox spam. Free to start.",
     allZones: "All registration options",
     title: "Create account",
     email: "Email",
@@ -1027,7 +1065,9 @@ const en = {
     submit: "Register",
     hasAccount: "Already have an account?",
     login: "Log in",
-    selectAllConsents: "Select all consents",
+    acceptAll: "Accept all",
+    acceptAllHint:
+      "Checks the four required consents below. Optional marketing stays unchecked until you tick it yourself — you can still change any box individually.",
     emailPasswordRequired: "Enter email and password.",
     coreConsentsRequired: "Please accept privacy, terms, job data use, and AI matching to register.",
     failed: "Registration failed",
@@ -1993,12 +2033,15 @@ const en = {
     sourceCoordinates: "Region from device coordinates you allowed.",
     sourceUnknown: "Region could not be detected. General notices apply.",
     refineCta: "Refine with device location",
+    refineCtaHint:
+      "Optional. Your browser will ask for permission — we only use it once to improve region and pricing display.",
     refineBusy: "Requesting location…",
-    refineDenied: "Location permission was not granted. IP-based region stays in use.",
+    refineDenied: "No problem — we'll keep your approximate region from the network.",
+    refineSuccess: "Region updated using your device location.",
     refineUnavailable: "Browser location is not available on this device.",
-    refineError: "Could not refine region. Try again.",
+    refineError: "Could not refine region right now. You can continue with the network estimate.",
     refineUsedNetworkHint:
-      "GPS place lookup did not return a country, so we kept your region from network hints (IP / CDN). You can still continue.",
+      "We could not map GPS to a country, so your network-based region is unchanged. You can still continue.",
     bodyEU_EEA:
       "EU/EEA: you may have GDPR rights (access, erasure, portability, objection) and protections around automated decision-making where applicable. Mandatory consumer laws in your country still apply.",
     bodyUK:
@@ -2031,13 +2074,25 @@ const en = {
     termsBannerSuffix:
       ". The document language follows local practice where we provide a localised file (for example Arabic in the UAE).",
   },
+  cookie: {
+    ariaRegion: "Cookie consent",
+    title: "Cookies on this site",
+    body:
+      "We use essential local storage so TWIN works (sign-in, preferences, security). Optional analytics and marketing cookies stay off unless you accept.",
+    bodyWithAnalytics:
+      "We use essential local storage so TWIN works (sign-in, preferences, security). If you accept, we may load privacy-oriented analytics (e.g. PostHog or Plausible) to understand usage — no ad tracking. You can change this anytime via Cookie settings in the footer.",
+    accept: "Accept cookies",
+    reject: "Reject optional",
+    privacy: "Privacy policy",
+  },
   cookies: {
     ariaRegion: "Cookie consent",
     bannerTitle: "Cookies on this site",
     bannerBody:
-      "We use essential storage for the product to work. You can allow optional analytics and marketing cookies for when we turn those services on, or keep only what’s necessary.",
+      "We use essential storage for sign-in, language, and security. Optional analytics stay off unless you accept.",
     acceptAll: "Accept all",
     essentialOnly: "Essential only",
+    customizeLink: "Privacy policy",
   },
   betaJoin: {
     title: "Join TWIN beta",
@@ -2150,10 +2205,36 @@ const pl: MessageTree = {
   },
   home: {
     tagline: "Bliźniak kariery AI",
-    title: "Pipeline pracuje, kiedy ty żyjesz.",
-    heroHook: "Jeden feed. Dopasowane oferty. Wszystkie aplikacje w jednym miejscu.",
-    description: "Portale, które włączysz, z zgodą od pierwszego dnia. Demo interaktywne — bez logowania.",
-    getStarted: "Start za zero",
+    curiosityEyebrow: "Zobacz, co jest w środku",
+    title: "Wracasz do rozmów wartych czasu—not do spamu w skrzynce.",
+    heroHook: "Dopasowane oferty i kalendarz akceptacji — za jednym darmowym kontem.",
+    description:
+      "TWIN skanuje włączone portale i pokazuje role warte uwagi — po przerwie otwierasz krótką listę slotów, a nie losowy szum.",
+    getStarted: "Załóż darmowe konto",
+    ctaRegisterMicro: "Zobacz dopasowania w ~2 min",
+    ctaDemoSecondary: "Obejrzyj demo interaktywne",
+    liveCounter: "{count}+ ofert przeskanowanych na włączonych portalach",
+    socialProofJoin: "Dołącz do kandydatów budujących kalendarz akceptacji—not kolejny cmentarz kart.",
+    socialProofQuote: "„W końcu jeden pipeline zamiast dwudziestu kart.”",
+    teaserEyebrow: "W Twoim workspace",
+    teaserTitle: "Feed dopasowań i pipeline — podgląd",
+    teaserUnlock: "Odblokuj po rejestracji",
+    teaserCard1Title: "Staff engineer · platforma",
+    teaserCard1Meta: "Remote EU · 92% dopasowania",
+    teaserCard2Title: "Product lead · B2B SaaS",
+    teaserCard2Meta: "Hybrid · 88% dopasowania",
+    teaserCard3Title: "Engineering manager",
+    teaserCard3Meta: "Warszawa · 85% dopasowania",
+    insideEyebrow: "Co dostajesz w środku",
+    insideTitle: "Pipeline pracuje, kiedy śpisz",
+    insideStep1Title: "Rankingowany feed",
+    insideStep1Line: "Oferty pod Twój profil—not zalew każdego ogłoszenia.",
+    insideStep2Title: "Rejestr aplikacji",
+    insideStep2Line: "Każdy zapis i status w jednej osi czasu.",
+    insideStep3Title: "Kalendarz rozmów",
+    insideStep3Line: "Sloty warte przyjścia — z synciem kalendarza, gdy go połączysz.",
+    stickyCtaLabel: "Załóż darmowe konto",
+    stickyCtaMicro: "~2 min do pierwszych dopasowań",
     joinWishlist: "Dołącz do wishlist",
     logIn: "Zaloguj się",
     scrape: "Odkrywaj",
@@ -2198,8 +2279,9 @@ const pl: MessageTree = {
     feature6Title: "Autopilot etapami",
     feature6Line: "Auto-apply, gdy integracje i zaufanie na to pozwolą.",
     socialProofEyebrow: "Kandydaci przeglądają oferty w firmach takich jak",
-    ctaBandEyebrow: "Gotowy, gdy Ty",
-    ctaBandTitle: "Załóż konto za zero albo przeczytaj pełną historię.",
+    ctaBandEyebrow: "Twoje dopasowania czekają",
+    ctaBandTitle: "Załóż darmowe konto — zobacz ranking w minuty, nie kolejny tydzień w kartach.",
+    ctaBandMicro: "Za zero · zgoda od dnia 1 · bez karty przy rejestracji",
     focusTitle: "Gdzie chcesz pierwszy efekt?",
     focusSubtitle:
       "Wybierz tor startowy. Wszystko i tak ląduje w jednym panelu; otwieramy drzwi tam, gdzie masz najwięcej szumu w głowie.",
@@ -2254,18 +2336,6 @@ const pl: MessageTree = {
     faqEyebrow: "FAQ",
     faqTitle: "Pytania i odpowiedzi",
     faqPrivacyLink: "Polityka prywatności",
-    faq01Q: "Czym jest TWIN dziś?",
-    faq01A:
-      "Dziś: jeden feed, ranking przy profilu, statusy aplikacji w jednym UI. Dalej, etapami i na żywo w produkcie: więcej autopilota, w tym auto-aplikacja i kalendarz, gdy integracje i zaufanie na to pozwolą.",
-    faq02Q: "Dla kogo to jest?",
-    faq02A:
-      "Dla osób, które i tak przeszukują kilka portali i notatek i chcą mniej kart: jedno miejsce na przegląd, porównanie i dalsze kroki bez gubienia kontekstu.",
-    faq03Q: "Czym to różni się od jednego portalu pracy?",
-    faq03A:
-      "Portale zostają źródłem ofert; TWIN porządkuje odkrywanie, sygnały dopasowania i follow-up w jednym UX. Tam, gdzie trzeba, nadal aplikujesz w flow pracodawcy.",
-    faq04Q: "Co z moimi danymi?",
-    faq04A:
-      "Wyrażasz zgodę przy rejestracji. Dane profilu służą do rankingu ofert i działania produktu. O retencji, eksporcie i prawach RODO przeczytasz w polityce (link poniżej).",
     audienceEyebrow: "Dla kogo",
     audienceDraftBadge: "Roboczo",
     audienceTitle: "Trzy oddzielne powierzchnie produktu",
@@ -2333,6 +2403,7 @@ const pl: MessageTree = {
     vacationTestCtaRegister: "Załóż konto",
     vacationTestCtaCalculator: "Kalkulator ROI",
   },
+  faq: FAQ_MESSAGES_PL,
   site: SITE_MESSAGES_PL,
   dashboard: {
     title: "Panel",
@@ -2973,6 +3044,21 @@ const pl: MessageTree = {
     backToLogin: "Zaloguj się",
     failed: "Nie udało się zresetować hasła",
   },
+  changePassword: {
+    sectionTitle: "Hasło do konta",
+    sectionHint: "Zmień hasło używane przy logowaniu e-mailem.",
+    currentPassword: "Aktualne hasło",
+    newPassword: "Nowe hasło",
+    newPasswordConfirm: "Potwierdź nowe hasło",
+    mismatch: "Nowe hasła nie są takie same.",
+    submit: "Zmień hasło",
+    saving: "Zapisywanie…",
+    success: "Hasło zostało zmienione.",
+    failed: "Nie udało się zmienić hasła",
+    oauthOnlyHint:
+      "To konto loguje się tylko przez dostawcę społecznościowego. Użyj tego samego przycisku co przy logowaniu.",
+    forgotLink: "Nie pamiętasz hasła?",
+  },
   authCallback: {
     title: "Logowanie",
     signingIn: "Kończenie logowania…",
@@ -3019,6 +3105,9 @@ const pl: MessageTree = {
   register: {
     hubTitle: "Wybierz rolę",
     hubLead: "Jedno konto TWIN — wybierz, jak będziesz korzystać z produktu, a potem dokończ rejestrację w tej strefie.",
+    hubCuriosity: "Zobacz, co jest w środku",
+    hubBenefit: "Dopasowania i pipeline odblokujesz w ~2 minuty po rejestracji.",
+    hubMicro: "Rozmowy warte czasu—not spam. Start za zero.",
     allZones: "Wszystkie opcje rejestracji",
     title: "Utwórz konto",
     email: "E-mail",
@@ -3040,7 +3129,9 @@ const pl: MessageTree = {
     submit: "Zarejestruj się",
     hasAccount: "Masz już konto?",
     login: "Zaloguj się",
-    selectAllConsents: "Zaznacz wszystkie zgody",
+    acceptAll: "Zaakceptuj wszystko",
+    acceptAllHint:
+      "Zaznacza cztery wymagane zgody poniżej. Opcjonalny marketing pozostaje odznaczony, dopóki sam go nie wybierzesz — każde pole możesz zmienić osobno.",
     emailPasswordRequired: "Podaj adres e-mail i hasło.",
     coreConsentsRequired: "Zaakceptuj prywatność, regulamin, wykorzystanie danych ofert oraz dopasowanie AI, aby się zarejestrować.",
     failed: "Rejestracja nie powiodła się",
@@ -3979,12 +4070,15 @@ const pl: MessageTree = {
     sourceCoordinates: "Region z współrzędnych urządzenia po Twojej zgodzie.",
     sourceUnknown: "Nie udało się wykryć regionu. Obowiązują ogólne informacje.",
     refineCta: "Doprecyzuj lokalizacją urządzenia",
+    refineCtaHint:
+      "Opcjonalnie. Przeglądarka poprosi o zgodę — używamy lokalizacji jednorazowo, by doprecyzować region i ceny.",
     refineBusy: "Prośba o lokalizację…",
-    refineDenied: "Brak zgody na lokalizację. Zostaje region z IP.",
+    refineDenied: "W porządku — zostaje przybliżony region z sieci.",
+    refineSuccess: "Zaktualizowano region na podstawie lokalizacji urządzenia.",
     refineUnavailable: "Ta przeglądarka nie udostępnia geolokalizacji.",
-    refineError: "Nie udało się doprecyzować regionu. Spróbuj ponownie.",
+    refineError: "Nie udało się teraz doprecyzować regionu. Możesz kontynuować z estymatą z sieci.",
     refineUsedNetworkHint:
-      "Odwrotne geokodowanie GPS nie zwróciło kraju, więc zostawiamy region z sieci (IP / CDN). Możesz kontynuować.",
+      "Nie udało się przypisać kraju z GPS, więc region z sieci pozostaje bez zmian. Możesz kontynuować.",
     bodyEU_EEA:
       "UE/EOG: mogą przysługiwać Ci prawa RODO (dostęp, usunięcie, przenoszenie, sprzeciw) oraz ochrona przed wyłącznie zautomatyzowanym podejmowaniem decyzji, tam gdzie ma to zastosowanie. Bezwzględnie obowiązujące przepisy konsumenckie w Twoim kraju nadal obowiązują.",
     bodyUK:
@@ -4017,13 +4111,25 @@ const pl: MessageTree = {
     termsBannerSuffix:
       ". Język dokumentu wynika z lokalnej praktyki tam, gdzie udostępniamy plik zlokalizowany (np. arabski w ZEA).",
   },
+  cookie: {
+    ariaRegion: "Zgoda na pliki cookie",
+    title: "Pliki cookie na tej stronie",
+    body:
+      "Używamy niezbędnego local storage, żeby TWIN działał (logowanie, preferencje, bezpieczeństwo). Opcjonalne pliki cookie analityczne i marketingowe pozostają wyłączone, dopóki nie zaakceptujesz.",
+    bodyWithAnalytics:
+      "Używamy niezbędnego local storage, żeby TWIN działał (logowanie, preferencje, bezpieczeństwo). Po akceptacji możemy włączyć prywatnościowe analityki (np. PostHog lub Plausible), żeby rozumieć użycie — bez reklamowego śledzenia. Zmienisz to w stopce w „Ustawienia cookie”.",
+    accept: "Akceptuję pliki cookie",
+    reject: "Tylko niezbędne",
+    privacy: "Polityka prywatności",
+  },
   cookies: {
     ariaRegion: "Zgoda na pliki cookie",
     bannerTitle: "Pliki cookie na tej stronie",
     bannerBody:
-      "Używamy niezbędnego storage, żeby produkt działał. Możesz zezwolić na opcjonalne pliki cookie analityczne i marketingowe na przyszłość albo zostać przy samym minimum.",
-    acceptAll: "Akceptuję wszystkie",
+      "Używamy niezbędnego storage do logowania, języka i bezpieczeństwa. Opcjonalna analityka jest wyłączona, dopóki nie zaakceptujesz.",
+    acceptAll: "Akceptuj wszystkie",
     essentialOnly: "Tylko niezbędne",
+    customizeLink: "Polityka prywatności",
   },
   betaJoin: {
     title: "Dołącz do bety TWIN",

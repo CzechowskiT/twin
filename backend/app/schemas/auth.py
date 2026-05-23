@@ -50,6 +50,11 @@ class ResetPasswordRequest(BaseModel):
     password: str = Field(min_length=8, max_length=128)
 
 
+class ChangePasswordRequest(BaseModel):
+    current_password: str = Field(min_length=1, max_length=128)
+    new_password: str = Field(min_length=8, max_length=128)
+
+
 class VerifyEmailRequest(BaseModel):
     token: str = Field(min_length=1, max_length=512)
 
@@ -122,6 +127,7 @@ class UserOut(BaseModel):
     onboarding_completed_at: datetime | None = None
     email_verified_at: datetime | None = None
     email_verified: bool = False
+    has_password_login: bool = False
 
     model_config = {"from_attributes": True}
 
@@ -155,6 +161,7 @@ class UserOut(BaseModel):
             onboarding_completed_at=getattr(user, "onboarding_completed_at", None),
             email_verified_at=getattr(user, "email_verified_at", None),
             email_verified=getattr(user, "email_verified_at", None) is not None,
+            has_password_login=bool(getattr(user, "hashed_password", None)),
         )
 
 

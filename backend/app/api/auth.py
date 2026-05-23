@@ -19,6 +19,7 @@ from app.database.session import get_db
 from app.limiter import limiter
 from app.schemas.auth import (
     BillingProfileIn,
+    ChangePasswordRequest,
     ForgotPasswordRequest,
     GdprConsentIn,
     NotificationPreferencesIn,
@@ -72,6 +73,7 @@ from app.services.email_verification import (
     resend_verification,
     verify_email_with_token,
 )
+from app.services.password_change import PasswordChangeError, change_user_password
 from app.services.password_reset import request_password_reset, reset_password_with_token
 from app.services.referral_public_token import ensure_user_referral_public_token
 from app.services.signup_referrer import (
@@ -434,6 +436,34 @@ def update_notification_preferences(
     db.commit()
     db.refresh(user)
     return UserOut.from_user(user)
+
+
+@router.patch("/me/password")
+@limiter.limit("10/minute")
+def change_password(
+    request: Request,
+    body: ChangePasswordRequest,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict[str, str]:
+    try:
+        change_user_password(
+            db,
+            user,
+            current_password=body.current_password,
+            new_password=body.new_password,
+        )
+    except PasswordChangeError as exc:
+        detail = {
+            "no_password_login": (
+                "This account uses social sign-in only. Continue with your provider "
+                "or contact support if you need email-and-password access."
+            ),
+            "invalid_current_password": "Current password is incorrect.",
+            "same_password": "New password must be different from the current password.",
+        }.get(exc.code, "Could not update password.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=detail) from exc
+    return {"message": "Password updated."}
 
 
 @router.patch("/me/billing-profile", response_model=UserOut)

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Input, Label, Shell } from "@/components/ui";
 import { apiFetch, apiFetchBlob, apiUpload, saveBlobAsFile } from "@/lib/api";
@@ -69,6 +70,7 @@ type TailorMatchRow = {
 type UserPrefs = {
   marketing_emails_opt_in: boolean;
   profile_documents_processing_consent_at?: string | null;
+  has_password_login?: boolean;
 };
 
 type ProfileDocumentRow = {
@@ -119,6 +121,7 @@ export default function ProfilePage() {
   const [docsBusy, setDocsBusy] = useState(false);
   const [docsMessage, setDocsMessage] = useState<string | null>(null);
   const [docUploadConsent, setDocUploadConsent] = useState(false);
+  const [passwordBusy, setPasswordBusy] = useState(false);
 
   function applyTailoringFromProfile(prof: Profile | null) {
     if (!prof) return;
@@ -403,6 +406,39 @@ export default function ProfilePage() {
     }
   }
 
+  async function onChangePassword(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const token = getToken();
+    if (!token) return;
+    const form = new FormData(e.currentTarget);
+    const newPassword = String(form.get("new_password") || "");
+    const confirm = String(form.get("new_password_confirm") || "");
+    if (newPassword !== confirm) {
+      toast.error(t("changePassword.mismatch"));
+      return;
+    }
+    setPasswordBusy(true);
+    try {
+      await apiFetch(
+        "/api/v1/auth/me/password",
+        {
+          method: "PATCH",
+          body: JSON.stringify({
+            current_password: String(form.get("current_password") || ""),
+            new_password: newPassword,
+          }),
+        },
+        token,
+      );
+      e.currentTarget.reset();
+      toast.success(t("changePassword.success"));
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("changePassword.failed"));
+    } finally {
+      setPasswordBusy(false);
+    }
+  }
+
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const token = getToken();
@@ -471,6 +507,55 @@ export default function ProfilePage() {
       <Card>
         <h1 className="mb-2 text-2xl font-semibold">{t("profile.title")}</h1>
         <p className="twin-muted mb-6 text-sm">{t("profile.subtitle")}</p>
+
+        <section className="twin-filter-box mb-6">
+          <h2 className="mb-1 text-sm font-semibold text-[var(--foreground)]">
+            {t("changePassword.sectionTitle")}
+          </h2>
+          <p className="twin-muted mb-3 text-xs">{t("changePassword.sectionHint")}</p>
+          {userPrefs?.has_password_login === false ? (
+            <p className="text-sm text-[var(--twin-muted-strong)]">{t("changePassword.oauthOnlyHint")}</p>
+          ) : (
+            <form onSubmit={onChangePassword} className="max-w-md space-y-3">
+              <div>
+                <Label htmlFor="current_password">{t("changePassword.currentPassword")}</Label>
+                <Input
+                  id="current_password"
+                  name="current_password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  minLength={1}
+                />
+              </div>
+              <div>
+                <Label htmlFor="new_password">{t("changePassword.newPassword")}</Label>
+                <Input
+                  id="new_password"
+                  name="new_password"
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  minLength={8}
+                />
+              </div>
+              <div>
+                <Label htmlFor="new_password_confirm">{t("changePassword.newPasswordConfirm")}</Label>
+                <Input
+                  id="new_password_confirm"
+                  name="new_password_confirm"
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  minLength={8}
+                />
+              </div>
+              <Button type="submit" disabled={passwordBusy || saving}>
+                {passwordBusy ? t("changePassword.saving") : t("changePassword.submit")}
+              </Button>
+            </form>
+          )}
+        </section>
 
         <section className="twin-filter-box mb-6">
           <h2 className="mb-1 text-sm font-semibold text-[var(--foreground)]">
