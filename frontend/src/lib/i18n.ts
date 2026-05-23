@@ -2297,7 +2297,7 @@ const en = {
   persona: {
     sectionCapabilities: "Capabilities",
     sectionPricing: "Packages & pricing",
-    sectionLogistics: "Operating notes",
+    sectionLogistics: "Good to know",
     talentPoolTitle: "Talent pool preview",
     talentPoolLead:
       "Anonymous profiles only: skills, a validation badge, and match score. No names, emails, or CV text are exposed here.",
@@ -4514,7 +4514,7 @@ const pl: MessageTree = {
   persona: {
     sectionCapabilities: "Możliwości",
     sectionPricing: "Pakiety i cennik",
-    sectionLogistics: "Uwagi operacyjne",
+    sectionLogistics: "Warto wiedzieć",
     talentPoolTitle: "Podgląd puli talentów",
     talentPoolLead:
       "Tylko anonimowe profile: umiejętności, znacznik walidacji i dopasowanie w procentach. Bez imion, e-maili ani treści CV.",
