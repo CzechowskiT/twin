@@ -1083,6 +1083,10 @@ const en = {
     useEmailLogin: "Use email login",
     errorOAuthNotConfigured:
       "That sign-in provider is not set up on the server yet. Use email or ask an admin.",
+    errorAppleNotConfigured:
+      "Sign in with Apple is not enabled yet — use email, Google, or LinkedIn below. Enabling it requires an Apple Developer account (about $99/year); see docs/APPLE_LOGIN_FOUNDER_PL.md.",
+    errorGithubNotConfigured:
+      "Sign in with GitHub is not enabled on this site yet. Use email or another provider below.",
     oauthGoogle: "Continue with Google",
     oauthGithub: "Continue with GitHub",
     oauthApple: "Continue with Apple",
@@ -1133,6 +1137,10 @@ const en = {
     errorLinkedinDenied: "LinkedIn sign-in was cancelled.",
     errorLinkedinNotConfigured:
       "LinkedIn sign-in is not set up on the server yet. Use email below or ask an admin.",
+    errorAppleNotConfigured:
+      "Sign in with Apple is not enabled yet. Use email or another provider on the log in page.",
+    errorGithubNotConfigured:
+      "Sign in with GitHub is not enabled yet. Use email or another provider on the log in page.",
     errorInvalidState: "Sign-in session expired. Please try again.",
     errorLinkedinFailed: "LinkedIn sign-in failed. Check API configuration.",
     errorInactive: "This account is inactive.",
@@ -1204,6 +1212,10 @@ const en = {
       "LinkedIn sign-up is not set up on the server yet. Use the form below or ask an admin.",
     errorOAuthNotConfigured:
       "That sign-up provider is not set up on the server yet. Use the form below or ask an admin.",
+    errorAppleNotConfigured:
+      "Sign up with Apple is not enabled yet — use the form below or Google/LinkedIn. Apple requires a paid Apple Developer account (about $99/year).",
+    errorGithubNotConfigured:
+      "Sign up with GitHub is not enabled on this site yet. Use the form below or another provider.",
     linkedIn: "Sign up with LinkedIn",
     linkedInComingSoon:
       "LinkedIn sign-up is off until the API has Client ID, Secret, and LINKEDIN_REDIRECT_URI (see yellow box). Use the form below.",
@@ -3522,6 +3534,10 @@ const pl: MessageTree = {
     useEmailLogin: "Zaloguj się e-mailem",
     errorOAuthNotConfigured:
       "Ten sposób logowania nie jest jeszcze skonfigurowany na serwerze. Użyj e-mail lub poproś administratora.",
+    errorAppleNotConfigured:
+      "Logowanie przez Apple nie jest jeszcze włączone — użyj e-maila, Google lub LinkedIn poniżej. Włączenie wymaga konta Apple Developer (ok. 99 USD/rok); instrukcja: docs/APPLE_LOGIN_FOUNDER_PL.md.",
+    errorGithubNotConfigured:
+      "Logowanie przez GitHub nie jest jeszcze włączone na tej stronie. Użyj e-maila lub innego dostawcy poniżej.",
     oauthGoogle: "Kontynuuj z Google",
     oauthGithub: "Kontynuuj z GitHub",
     oauthApple: "Kontynuuj z Apple",
@@ -3573,6 +3589,10 @@ const pl: MessageTree = {
     errorLinkedinDenied: "Logowanie przez LinkedIn zostało anulowane.",
     errorLinkedinNotConfigured:
       "Logowanie przez LinkedIn nie jest jeszcze skonfigurowane na serwerze. Użyj e-mail poniżej lub poproś administratora.",
+    errorAppleNotConfigured:
+      "Logowanie przez Apple nie jest jeszcze włączone. Wróć na stronę logowania i użyj e-maila lub innego dostawcy.",
+    errorGithubNotConfigured:
+      "Logowanie przez GitHub nie jest jeszcze włączone. Wróć na stronę logowania i użyj e-maila lub innego dostawcy.",
     errorInvalidState: "Sesja wygasła. Spróbuj ponownie.",
     errorLinkedinFailed:
       "Logowanie przez LinkedIn nie powiodło się. Sprawdź konfigurację API.",
@@ -3648,6 +3668,10 @@ const pl: MessageTree = {
       "Rejestracja przez LinkedIn nie jest jeszcze skonfigurowana na serwerze. Użyj formularza poniżej lub poproś administratora.",
     errorOAuthNotConfigured:
       "Ta metoda rejestracji nie jest jeszcze skonfigurowana na serwerze. Użyj formularza poniżej lub poproś administratora.",
+    errorAppleNotConfigured:
+      "Rejestracja przez Apple nie jest jeszcze włączona — użyj formularza poniżej lub Google/LinkedIn. Wymaga konta Apple Developer (ok. 99 USD/rok).",
+    errorGithubNotConfigured:
+      "Rejestracja przez GitHub nie jest jeszcze włączona. Użyj formularza poniżej lub innej metody.",
     linkedIn: "Zarejestruj się przez LinkedIn",
     linkedInComingSoon:
       "Rejestracja przez LinkedIn jest wyłączona, dopóki API nie ma Client ID, Secret i LINKEDIN_REDIRECT_URI (żółta ramka). Użyj formularza poniżej.",

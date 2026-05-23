@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Apply GitHub OAuth client secret to Railway (production API).
-# Prerequisite: generate a secret at https://github.com/settings/applications/3619706
-# (TWIN app) → "Generate a new client secret" (GitHub may require email verification).
+# Prerequisite: TWIN Production API OAuth app
+# https://github.com/settings/applications/3619797
+# Callback: https://twin-production-bcd9.up.railway.app/api/v1/auth/github/callback
+# → Generate a new client secret (GitHub may require email verification).
 #
 # Usage (do not commit the secret):
 #   GITHUB_CLIENT_SECRET='ghs_…' ./scripts/railway-apply-github-oauth-secret.sh
@@ -12,11 +14,15 @@ cd "$ROOT"
 # shellcheck source=/dev/null
 source "$ROOT/scripts/railway-auth.sh"
 
-CLIENT_ID="${GITHUB_CLIENT_ID:-Ov23lip0Ya1s16GBiWWl}"
+CLIENT_ID="${GITHUB_CLIENT_ID:-}"
 SECRET="${GITHUB_CLIENT_SECRET:-}"
 
+if [[ -z "${CLIENT_ID// }" ]]; then
+  echo "Set GITHUB_CLIENT_ID (OAuth App → Client ID)." >&2
+  exit 1
+fi
 if [[ -z "${SECRET// }" ]]; then
-  echo "Set GITHUB_CLIENT_SECRET (from GitHub → Developer settings → OAuth Apps → TWIN)." >&2
+  echo "Set GITHUB_CLIENT_SECRET (OAuth App → Generate a new client secret)." >&2
   exit 1
 fi
 
