@@ -25,13 +25,12 @@ if str(BACKEND_ROOT) not in sys.path:
 
 from app.database.connection import get_session  # noqa: E402
 from app.database.models import Application, ApplicationStatus, Job  # noqa: E402
-from app.services.investor_demo_seed import DEFAULT_DEMO_EMAIL, run_investor_demo_seed  # noqa: E402
+from app.services.investor_demo_seed import DEFAULT_DEMO_EMAIL, ensure_recruiter_inbox_demo, run_investor_demo_seed  # noqa: E402
 from app.services.placement_verification import (  # noqa: E402
     PLACEMENT_VERIFIED,
     record_placement_event,
 )
 from app.services.recruiter_company_auth import mint_recruiter_company_token  # noqa: E402
-from app.utils.slug import slugify_company  # noqa: E402
 
 
 def _seed_placement_on_application(db, *, application_id: int, user_id: int) -> None:
@@ -65,36 +64,10 @@ def _seed_placement_on_application(db, *, application_id: int, user_id: int) -> 
 
 
 def _seed_recruiter_batch_extras(db, *, candidate_id: int, company: str) -> int:
-    """Extra APPLIED rows for recruiter inbox (same company as primary demo job)."""
-    slug = slugify_company(company)
-    added = 0
-    jobs = (
-        db.query(Job)
-        .filter(Job.company == company, Job.is_validated.is_(True))
-        .limit(5)
-        .all()
-    )
-    for job in jobs[1:3]:
-        exists = (
-            db.query(Application)
-            .filter(Application.candidate_id == candidate_id, Application.job_id == job.id)
-            .first()
-        )
-        if exists:
-            if exists.status not in (ApplicationStatus.APPLIED, ApplicationStatus.INTERVIEW):
-                exists.status = ApplicationStatus.APPLIED
-                db.add(exists)
-            continue
-        db.add(
-            Application(
-                candidate_id=candidate_id,
-                job_id=job.id,
-                status=ApplicationStatus.APPLIED,
-                notes="Investor demo — recruiter batch inbox",
-            ),
-        )
-        added += 1
-    return added
+    """Extra APPLIED rows for recruiter inbox (delegates to shared seed helper)."""
+    del candidate_id  # kept for CLI compatibility; shared helper covers all demo candidates
+    out = ensure_recruiter_inbox_demo(db, company=company)
+    return int(out.get("created", 0)) + int(out.get("reset_to_applied", 0))
 
 
 def main() -> int:

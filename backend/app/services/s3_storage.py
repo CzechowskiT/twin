@@ -41,7 +41,11 @@ class S3BlobStore:
         try:
             self._client = boto3.client(**kwargs)
             self._bucket = bucket
-            self._client.head_bucket(Bucket=bucket)
+            try:
+                self._client.head_bucket(Bucket=bucket)
+            except Exception as exc:
+                # Presigned PUT/GET may still work when HeadBucket is denied (common on R2).
+                logger.warning("S3 head_bucket failed (storage still enabled): %s", exc)
         except Exception as exc:
             logger.warning("S3 init failed: %s", exc)
             self._client = None

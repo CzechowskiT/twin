@@ -111,6 +111,18 @@ set_var STRIPE_PRICE_ID_PRO "${STRIPE_PRICE_ID_PRO:-}"
 set_var DEMO_MODE_ENABLED "${DEMO_MODE_ENABLED:-true}"
 set_var DEMO_USER_EMAIL "${DEMO_USER_EMAIL:-demo@twin.career}"
 
+# Investor data room + auto-apply blobs (S3-compatible: AWS S3, Cloudflare R2, MinIO)
+set_var S3_BUCKET_NAME "${S3_BUCKET_NAME:-}"
+set_var S3_ACCESS_KEY_ID "${S3_ACCESS_KEY_ID:-}"
+set_var S3_SECRET_ACCESS_KEY "${S3_SECRET_ACCESS_KEY:-}"
+set_var S3_ENDPOINT_URL "${S3_ENDPOINT_URL:-}"
+set_var S3_REGION "${S3_REGION:-auto}"
+if [[ -n "${S3_BUCKET_NAME:-}" && -n "${S3_ACCESS_KEY_ID:-}" && -n "${S3_SECRET_ACCESS_KEY:-}" ]]; then
+  set_var DATA_ROOM_LOCAL_UPLOAD_ENABLED "false"
+else
+  set_var DATA_ROOM_LOCAL_UPLOAD_ENABLED "${DATA_ROOM_LOCAL_UPLOAD_ENABLED:-true}"
+fi
+
 set_var OPS_ADMIN_TOKEN "${OPS_ADMIN_TOKEN:-}"
 set_var BETA_ADMIN_TOKEN "${BETA_ADMIN_TOKEN:-${OPS_ADMIN_TOKEN:-}}"
 set_var RECRUITER_INBOX_TOKEN "${RECRUITER_INBOX_TOKEN:-}"

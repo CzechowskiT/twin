@@ -230,7 +230,7 @@ export function InvestorDataRoomPanel() {
           <Card variant="soft" className="mt-6 p-5">
             <h3 className="font-semibold">{t("dataRoom.uploadTitle")}</h3>
             <p className="twin-muted mt-2 text-sm leading-relaxed">{t("dataRoom.uploadLead")}</p>
-            {!s3Enabled ? (
+            {!s3Enabled && localDemo ? (
               <p className="twin-muted mt-2 text-xs leading-relaxed">{t("dataRoom.uploadEnterpriseComing")}</p>
             ) : null}
             <div className="mt-4 grid gap-3 sm:grid-cols-2">

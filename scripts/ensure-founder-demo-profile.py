@@ -39,10 +39,12 @@ from app.database.models import (  # noqa: E402
     User,
 )
 from app.services.investor_demo_seed import (  # noqa: E402
+    DEFAULT_DEMO_EMAIL,
     DEMO_APPLY_JOB_EXTERNAL_ID,
     DEMO_BOARD,
     DEMO_JOB_PREFIX,
     DEMO_JOBS,
+    ensure_recruiter_inbox_demo,
     upsert_demo_jobs,
 )
 
@@ -412,6 +414,7 @@ def main() -> int:
                     job = db.get(Job, app.job_id) or primary
                     summary["interview"] = ensure_interview(db, user, app, job, dry_run=False)
             summary["auto_apply"] = ensure_auto_apply_consent(db, cand, dry_run=False)
+            summary["recruiter_inbox"] = ensure_recruiter_inbox_demo(db)
 
         if not args.dry_run:
             db.commit()

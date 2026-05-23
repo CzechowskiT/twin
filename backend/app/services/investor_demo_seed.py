@@ -29,6 +29,7 @@ DEMO_JOB_PREFIX = "investor-demo-"
 # Primary pracuj investor-demo job used for live apply on /demo (founder walkthrough).
 DEMO_APPLY_JOB_EXTERNAL_ID = f"{DEMO_JOB_PREFIX}python-lead"
 DEFAULT_DEMO_EMAIL = "demo@twin.career"
+DEMO_RECRUITER_COMPANY = "Nova Hiring PL"
 
 CV_TEXT = """\
 Alex Kowalski — Senior Python Engineer
@@ -354,6 +355,75 @@ def upsert_demo_auto_apply(db: Session, candidate: Candidate) -> None:
             stats_json=json.dumps({"demo": True, "source": "seed-investor-demo"}),
         )
         db.add(run)
+
+
+def _is_recruiter_demo_application(app: Application, job: Job) -> bool:
+    ext = (job.external_id or "").strip()
+    if ext.startswith(DEMO_JOB_PREFIX):
+        return True
+    notes = (app.notes or "").lower()
+    return "demo" in notes or "investor demo" in notes
+
+
+def ensure_recruiter_inbox_demo(
+    db: Session,
+    *,
+    company: str = DEMO_RECRUITER_COMPANY,
+) -> dict[str, int | str]:
+    """Reset/create APPLIED rows for recruiter batch inbox (idempotent; safe on prod)."""
+    now = _now()
+    upsert_demo_jobs(db)
+    jobs = list(
+        db.execute(
+            select(Job)
+            .where(Job.company == company, Job.is_validated.is_(True))
+            .order_by(Job.id)
+        ).scalars()
+    )
+    reset = 0
+    created = 0
+    for job in jobs:
+        apps = list(
+            db.execute(select(Application).where(Application.job_id == job.id)).scalars()
+        )
+        for app in apps:
+            if app.status not in (ApplicationStatus.APPLIED, ApplicationStatus.INTERVIEW):
+                continue
+            if app.status == ApplicationStatus.INTERVIEW and _is_recruiter_demo_application(app, job):
+                app.status = ApplicationStatus.APPLIED
+                app.applied_at = app.applied_at or now
+                reset += 1
+    primary = next((j for j in jobs if j.external_id == DEMO_APPLY_JOB_EXTERNAL_ID), jobs[0] if jobs else None)
+    demo_user = db.execute(select(User).where(User.email == demo_email_from_env())).scalar_one_or_none()
+    if demo_user and primary is not None:
+        demo_cand = db.execute(
+            select(Candidate).where(Candidate.user_id == demo_user.id)
+        ).scalar_one_or_none()
+        if demo_cand is not None:
+            row = db.execute(
+                select(Application).where(
+                    Application.candidate_id == demo_cand.id,
+                    Application.job_id == primary.id,
+                )
+            ).scalar_one_or_none()
+            if row is None:
+                db.add(
+                    Application(
+                        candidate_id=demo_cand.id,
+                        job_id=primary.id,
+                        status=ApplicationStatus.APPLIED,
+                        applied_at=now,
+                        notes="Investor demo — recruiter batch inbox",
+                        auto_applied=False,
+                    )
+                )
+                created += 1
+            elif row.status != ApplicationStatus.APPLIED:
+                row.status = ApplicationStatus.APPLIED
+                row.applied_at = row.applied_at or now
+                reset += 1
+    db.flush()
+    return {"company": company, "reset_to_applied": reset, "created": created}
 
 
 def run_investor_demo_seed(
