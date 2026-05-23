@@ -1,14 +1,15 @@
+import { fxUnitsPerUsd } from "@/lib/calculator-fx";
 import { ANNUAL_PREPAY_DISCOUNT, effectiveMonthlySubscriptionUsd } from "@/lib/pricing-locale";
 
 /** ISO codes supported by the investor model (illustrative FX). */
 export type InvestorModelCurrency = "USD" | "EUR" | "PLN" | "GBP";
 
-/** Units of local currency per 1 USD (static illustrative rates). */
+/** Units of local currency per 1 USD — aligned with marketing FX table. */
 export const LOCAL_PER_USD: Record<InvestorModelCurrency, number> = {
-  USD: 1,
-  EUR: 0.92,
-  PLN: 4.05,
-  GBP: 0.79,
+  USD: fxUnitsPerUsd("USD"),
+  EUR: fxUnitsPerUsd("EUR"),
+  PLN: fxUnitsPerUsd("PLN"),
+  GBP: fxUnitsPerUsd("GBP"),
 };
 
 export type InvestorScenario = "current" | "optimized" | "aggressive";
