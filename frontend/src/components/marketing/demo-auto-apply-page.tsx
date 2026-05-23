@@ -14,9 +14,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 import { useTranslation } from "@/components/language-provider";
+import { DemoAutoApplyTheater } from "@/components/marketing/demo-auto-apply-theater";
 import { DemoLiveSnapshot } from "@/components/marketing/demo-live-snapshot";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
-import { ButtonCta, Shell } from "@/components/ui";
+import { Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 import {
@@ -25,19 +26,14 @@ import {
   DEMO_MATCH_JOB,
   DEMO_MATCH_SCORE,
 } from "@/lib/demo-auto-apply-data";
-import type { TranslationKey } from "@/lib/i18n";
-
-const STEP_KEYS = [
-  "demo.stepScanJobs",
-  "demo.stepMatch",
-  "demo.stepTailor",
-  "demo.stepSubmit",
-  "demo.stepCalendar",
-] as const satisfies readonly TranslationKey[];
-
-const STEP_MS = [900, 1100, 1000, 1200, 900];
-
-type StepState = "pending" | "active" | "done";
+import { playDemoStepChime, playDemoSuccessChime } from "@/lib/demo-auto-apply-sound";
+import {
+  DEMO_MATCH_SCORE_START,
+  DEMO_SEQUENCE_STEPS,
+  DEMO_STEP_MS,
+  type DemoPlayPhase,
+  type DemoStepState,
+} from "@/lib/demo-auto-apply-sequence";
 
 type DemoApplyTarget = {
   job_id: number;
@@ -54,17 +50,25 @@ type AutoApplyResult = {
   package_pdf_url?: string | null;
 };
 
+function easeOutCubic(t: number): number {
+  return 1 - (1 - t) ** 3;
+}
+
 export function DemoAutoApplyPage() {
   const { t } = useTranslation();
   const [cvText, setCvText] = useState<string>("");
   const [cvError, setCvError] = useState(false);
-  const [running, setRunning] = useState(false);
+  const [playPhase, setPlayPhase] = useState<DemoPlayPhase>("idle");
+  const [stepStates, setStepStates] = useState<DemoStepState[]>(() => DEMO_SEQUENCE_STEPS.map(() => "pending"));
+  const [animatedScore, setAnimatedScore] = useState(DEMO_MATCH_SCORE_START);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [soundOn, setSoundOn] = useState(false);
   const [realApplying, setRealApplying] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [applyTarget, setApplyTarget] = useState<DemoApplyTarget | null>(null);
   const [applyTargetError, setApplyTargetError] = useState(false);
-  const [stepStates, setStepStates] = useState<StepState[]>(() => STEP_KEYS.map(() => "pending"));
   const timersRef = useRef<number[]>([]);
+  const scoreRafRef = useRef<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -87,15 +91,47 @@ export function DemoAutoApplyPage() {
   const clearTimers = useCallback(() => {
     timersRef.current.forEach((id) => window.clearTimeout(id));
     timersRef.current = [];
+    if (scoreRafRef.current !== null) {
+      cancelAnimationFrame(scoreRafRef.current);
+      scoreRafRef.current = null;
+    }
+  }, []);
+
+  const animateMatchScore = useCallback((enabled: boolean) => {
+    if (scoreRafRef.current !== null) cancelAnimationFrame(scoreRafRef.current);
+    const reduced =
+      typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      setAnimatedScore(DEMO_MATCH_SCORE);
+      return;
+    }
+    const start = performance.now();
+    const from = DEMO_MATCH_SCORE_START;
+    const to = DEMO_MATCH_SCORE;
+    const duration = 1400;
+
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - start) / duration);
+      setAnimatedScore(Math.round(from + (to - from) * easeOutCubic(p)));
+      if (p < 1) {
+        scoreRafRef.current = requestAnimationFrame(tick);
+      } else {
+        scoreRafRef.current = null;
+        if (enabled) playDemoStepChime(enabled);
+      }
+    };
+    scoreRafRef.current = requestAnimationFrame(tick);
   }, []);
 
   const runSequence = useCallback(() => {
     clearTimers();
-    setRunning(true);
-    setStepStates(STEP_KEYS.map(() => "pending"));
+    setPlayPhase("playing");
+    setShowConfetti(false);
+    setStepStates(DEMO_SEQUENCE_STEPS.map(() => "pending"));
+    setAnimatedScore(DEMO_MATCH_SCORE_START);
 
     let tAccum = 0;
-    STEP_KEYS.forEach((_, idx) => {
+    DEMO_SEQUENCE_STEPS.forEach((_, idx) => {
       const startDelay = tAccum;
       const id1 = window.setTimeout(() => {
         setStepStates((prev) => {
@@ -105,10 +141,12 @@ export function DemoAutoApplyPage() {
           for (let j = idx + 1; j < next.length; j += 1) next[j] = "pending";
           return next;
         });
+        if (idx !== 1) playDemoStepChime(soundOn);
+        if (idx === 1) animateMatchScore(soundOn);
       }, startDelay);
       timersRef.current.push(id1);
 
-      tAccum += STEP_MS[idx] ?? 900;
+      tAccum += DEMO_STEP_MS[idx] ?? 1500;
       const id2 = window.setTimeout(() => {
         setStepStates((prev) => {
           const next = [...prev];
@@ -120,43 +158,52 @@ export function DemoAutoApplyPage() {
     });
 
     const idDone = window.setTimeout(() => {
-      setRunning(false);
+      setPlayPhase("done");
+      setShowConfetti(true);
+      playDemoSuccessChime(soundOn);
       clearTimers();
-    }, tAccum + 400);
+    }, tAccum + 350);
     timersRef.current.push(idDone);
-  }, [clearTimers]);
+  }, [animateMatchScore, clearTimers, soundOn]);
 
   const jumpToStep = useCallback(
     (idx: number) => {
       clearTimers();
-      setRunning(false);
-      setStepStates(STEP_KEYS.map((_, i) => (i < idx ? "done" : i === idx ? "active" : "pending")));
+      setShowConfetti(false);
+      const states = DEMO_SEQUENCE_STEPS.map((_, i) =>
+        i < idx ? "done" : i === idx ? "active" : "pending",
+      ) as DemoStepState[];
+      setStepStates(states);
+      setAnimatedScore(idx >= 1 ? DEMO_MATCH_SCORE : DEMO_MATCH_SCORE_START);
+      setPlayPhase("idle");
     },
     [clearTimers],
   );
 
   const advanceManualStep = useCallback(() => {
     clearTimers();
-    setRunning(false);
+    setShowConfetti(false);
     setStepStates((prev) => {
       const next = [...prev];
       const active = next.indexOf("active");
       if (active >= 0) {
         next[active] = "done";
-        if (active + 1 < next.length) {
-          next[active + 1] = "active";
-        }
+        if (active + 1 < next.length) next[active + 1] = "active";
+        else setPlayPhase("done");
+        if (active + 1 === 1) animateMatchScore(soundOn);
         return next;
       }
       const firstP = next.indexOf("pending");
       if (firstP >= 0) {
         for (let j = 0; j < firstP; j += 1) next[j] = "done";
         next[firstP] = "active";
+        setPlayPhase("playing");
+        if (firstP === 1) animateMatchScore(soundOn);
         return next;
       }
       return next;
     });
-  }, [clearTimers]);
+  }, [animateMatchScore, clearTimers, soundOn]);
 
   useEffect(() => () => clearTimers(), [clearTimers]);
 
@@ -196,10 +243,7 @@ export function DemoAutoApplyPage() {
         "/api/v1/applications/auto-apply",
         {
           method: "POST",
-          body: JSON.stringify({
-            job_id: applyTarget.job_id,
-            human_acknowledged: true,
-          }),
+          body: JSON.stringify({ job_id: applyTarget.job_id, human_acknowledged: true }),
         },
         token,
       );
@@ -219,6 +263,9 @@ export function DemoAutoApplyPage() {
   }, [applyTarget]);
 
   const canRunLiveApply = isLoggedIn && applyTarget !== null;
+  const playLabel =
+    playPhase === "playing" ? t("demo.runningCta") : playPhase === "done" ? t("demo.replayCta") : t("demo.runCta");
+
   const skillsLine = DEMO_MATCH_CANDIDATE.skills.join(", ");
   const titlesLine = DEMO_MATCH_CANDIDATE.preferred_job_titles.join(", ");
 
@@ -237,65 +284,50 @@ export function DemoAutoApplyPage() {
           <DemoLiveSnapshot />
 
           <aside
-            className={
-              canRunLiveApply
-                ? "rounded-2xl border border-emerald-200/90 bg-emerald-50/95 px-4 py-3 text-sm leading-relaxed text-emerald-950 shadow-sm dark:border-emerald-800/60 dark:bg-emerald-950/40 dark:text-emerald-100"
-                : "rounded-2xl border border-amber-200/90 bg-amber-50/95 px-4 py-3 text-sm leading-relaxed text-amber-950 shadow-sm dark:border-amber-800/60 dark:bg-amber-950/30 dark:text-amber-100"
-            }
+            className="rounded-2xl border border-amber-200/90 bg-amber-50/95 px-4 py-3 text-sm leading-relaxed text-amber-950 shadow-sm dark:border-amber-500/30 dark:bg-amber-950/40 dark:text-amber-100"
             role="status"
           >
-            <p className="font-semibold">
-              {canRunLiveApply ? t("demo.liveApplyTitle") : t("demo.simulationTitle")}
-            </p>
-            <p className="mt-1 opacity-95">
-              {canRunLiveApply ? t("demo.liveApplyBody") : t("demo.simulationBody")}
-            </p>
-            {isLoggedIn && applyTargetError ? (
-              <p className="mt-2 text-xs font-medium opacity-90">{t("demo.noApplyTarget")}</p>
-            ) : null}
-            {canRunLiveApply && applyTarget ? (
-              <p className="mt-2 text-xs opacity-90">
-                {applyTarget.title} · {applyTarget.company} ({applyTarget.job_board})
-              </p>
-            ) : null}
+            <p className="font-semibold">{t("demo.simulationTitle")}</p>
+            <p className="mt-1 opacity-95">{t("demo.simulationBody")}</p>
           </aside>
 
-          <div className="marketing-section-demo-actions flex flex-wrap items-center gap-3">
-            {canRunLiveApply ? (
-              <ButtonCta
-                type="button"
-                disabled={realApplying}
-                onClick={() => void runRealAutoApply()}
-                className="section-cta-primary marketing-btn-primary-shadow !w-auto min-w-[12rem] px-6"
-              >
-                {realApplying ? t("demo.runningRealCta") : t("demo.runRealCta")}
-              </ButtonCta>
-            ) : null}
-            <ButtonCta
-              type="button"
-              disabled={running || realApplying}
-              onClick={runSequence}
-              className={
-                canRunLiveApply
-                  ? "section-cta-secondary !w-auto min-w-[12rem] px-6"
-                  : "section-cta-primary marketing-btn-primary-shadow !w-auto min-w-[12rem] px-6"
-              }
+          {isLoggedIn ? (
+            <aside
+              className="rounded-2xl border border-[var(--twin-accent)]/35 bg-[var(--twin-accent-muted)]/40 px-4 py-3 text-sm leading-relaxed text-[var(--twin-muted-strong)]"
+              role="status"
             >
-              {running ? t("demo.runningCta") : t("demo.runCta")}
-            </ButtonCta>
+              <p className="font-semibold text-[var(--foreground)]">{t("demo.liveApplyTitle")}</p>
+              <p className="mt-1">{t("demo.liveApplyBody")}</p>
+            </aside>
+          ) : null}
+
+          <div className="marketing-section-demo-actions flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              disabled={playPhase === "playing"}
+              onClick={runSequence}
+              className="section-cta-primary marketing-btn-primary-shadow twin-touch-target !w-auto min-w-[12rem] px-6 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {playLabel}
+            </button>
             <button
               type="button"
               onClick={advanceManualStep}
-              className="section-cta-secondary twin-touch-target min-w-[10rem] px-5 text-sm"
+              disabled={playPhase === "playing"}
+              className="section-cta-secondary twin-touch-target min-w-[10rem] px-5 text-sm disabled:opacity-50"
             >
               {t("demo.nextStep")}
             </button>
-            {!isLoggedIn ? (
-              <Link href="/login/candidate?next=/demo" className="section-cta-secondary twin-touch-target px-5 text-sm">
-                {t("demo.loginForRealCta")}
-              </Link>
-            ) : null}
-            {!isLoggedIn ? (
+            <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-4 py-2 text-xs font-medium text-[var(--twin-muted-strong)]">
+              <input
+                type="checkbox"
+                className="h-4 w-4 rounded border-[var(--twin-border)] accent-[var(--twin-accent)]"
+                checked={soundOn}
+                onChange={(e) => setSoundOn(e.target.checked)}
+              />
+              {t("demo.soundToggle")}
+            </label>
+            {playPhase === "idle" ? (
               <Link href="/register" className="section-cta-secondary twin-touch-target px-5 text-sm">
                 {t("demo.registerCta")}
               </Link>
@@ -306,7 +338,9 @@ export function DemoAutoApplyPage() {
           <div className="grid gap-6 lg:grid-cols-2">
             <section
               aria-labelledby="demo-cv-heading"
-              className="flex flex-col rounded-2xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/90 p-5 shadow-sm transition-shadow duration-300 hover:shadow-md sm:p-6"
+              className={`flex flex-col rounded-2xl border bg-[var(--twin-surface-raised)]/90 p-5 shadow-sm transition-all duration-500 sm:p-6 ${
+                stepStates[2] === "active" ? "demo-theater-glow border-[var(--twin-accent)]/45" : "border-[var(--twin-border)]"
+              }`}
             >
               <h2 id="demo-cv-heading" className="twin-section-title text-lg">
                 {t("demo.cvPanelTitle")}
@@ -349,7 +383,11 @@ export function DemoAutoApplyPage() {
 
             <section
               aria-labelledby="demo-job-heading"
-              className="flex flex-col rounded-2xl border border-[var(--twin-border)] bg-[var(--twin-card)]/80 p-5 shadow-sm transition-shadow duration-300 hover:shadow-md sm:p-6"
+              className={`flex flex-col rounded-2xl border bg-[var(--twin-card)]/80 p-5 shadow-sm transition-all duration-500 sm:p-6 ${
+                stepStates[1] === "active" || stepStates[1] === "done"
+                  ? "demo-theater-glow border-[var(--twin-accent)]/45"
+                  : "border-[var(--twin-border)]"
+              }`}
             >
               <h2 id="demo-job-heading" className="twin-section-title text-lg">
                 {t("demo.jobPanelTitle")}
@@ -367,54 +405,25 @@ export function DemoAutoApplyPage() {
               </div>
               <div className="mt-6 flex flex-wrap items-baseline gap-2 rounded-xl border border-[var(--twin-accent)]/35 bg-[var(--twin-accent-muted)]/40 px-4 py-3">
                 <span className="text-xs font-bold uppercase tracking-wider text-[var(--twin-accent)]">{t("demo.matchBadge")}</span>
-                <span className="text-3xl font-semibold tabular-nums text-[var(--foreground)]">{DEMO_MATCH_SCORE}%</span>
+                <span className="text-3xl font-semibold tabular-nums text-[var(--foreground)]">{animatedScore}%</span>
                 <span className="text-sm text-[var(--twin-muted-strong)]">{t("demo.matchHint")}</span>
               </div>
             </section>
           </div>
 
-          <section aria-labelledby="demo-flow-heading" className="space-y-4">
-            <h2 id="demo-flow-heading" className="twin-section-title text-lg sm:text-xl">
-              {t("demo.flowTitle")}
-            </h2>
-            <ol className="space-y-0">
-              {STEP_KEYS.map((key, idx) => {
-                const state = stepStates[idx] ?? "pending";
-                return (
-                  <li key={key} className={idx === STEP_KEYS.length - 1 ? "" : "pb-5"}>
-                    <button
-                      type="button"
-                      onClick={() => jumpToStep(idx)}
-                      className={`flex w-full gap-3 rounded-xl border border-transparent p-2 text-left transition-all duration-500 ease-out sm:gap-4 ${
-                        state === "pending" ? "opacity-55 hover:border-[var(--twin-border)]/60 hover:bg-[var(--twin-surface-raised)]/50" : "opacity-100"
-                      }`}
-                    >
-                      <span
-                        className={`mt-1.5 h-3 w-3 shrink-0 rounded-full border-2 transition-transform duration-300 ${
-                          state === "done"
-                            ? "scale-100 border-[var(--twin-accent)] bg-[var(--twin-accent)]"
-                            : state === "active"
-                              ? "scale-110 border-[var(--twin-cta)] bg-[var(--twin-cta)] shadow-[0_0_0_4px_rgb(217_119_6_/0.25)]"
-                              : "border-[var(--twin-border)] bg-[var(--twin-card)]"
-                        }`}
-                        aria-hidden
-                      />
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold text-[var(--foreground)]">{t(key)}</p>
-                        <p className="mt-1 text-xs text-[var(--twin-muted)]">
-                          {state === "done"
-                            ? t("demo.stepDone")
-                            : state === "active"
-                              ? t("demo.stepActive")
-                              : t("demo.stepPending")}
-                        </p>
-                      </div>
-                    </button>
-                  </li>
-                );
-              })}
-            </ol>
-          </section>
+          <DemoAutoApplyTheater
+            playPhase={playPhase}
+            stepStates={stepStates}
+            animatedScore={animatedScore}
+            showConfetti={showConfetti}
+            onConfettiDone={() => setShowConfetti(false)}
+            onJumpToStep={jumpToStep}
+            isLoggedIn={isLoggedIn}
+            canRunLiveApply={canRunLiveApply}
+            realApplying={realApplying}
+            applyTargetError={applyTargetError}
+            onRunRealApply={() => void runRealAutoApply()}
+          />
 
           <p className="max-w-3xl text-xs leading-relaxed text-[var(--twin-muted)]">{t("demo.footerNote")}</p>
         </div>
