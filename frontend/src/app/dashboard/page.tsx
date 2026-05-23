@@ -1721,7 +1721,7 @@ export default function DashboardPage() {
                   company,
                   location: location ?? null,
                   url,
-                  initialTab: "contact",
+                  initialTab: "partners",
                 })
               }
               autoApplyJobId={autoApplyingId}

@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { Card } from "@/components/ui";
-import type { TranslationKey } from "@/lib/i18n";
 
 type MvpStats = {
   validated_jobs: number;
