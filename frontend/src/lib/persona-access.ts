@@ -168,6 +168,10 @@ const SESSION_NEUTRAL_PREFIXES = [
   "/auth",
   "/api",
   "/pricing",
+  "/for-candidates",
+  "/for-recruiters",
+  "/for-companies",
+  "/for-investors",
 ];
 
 function isSessionNeutralPath(pathname: string): boolean {
