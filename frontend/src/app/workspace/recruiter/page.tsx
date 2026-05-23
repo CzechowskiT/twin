@@ -21,6 +21,11 @@ export default function WorkspaceRecruiterPage() {
             description: "workspace.toolRecruiterJobs",
           },
           {
+            href: "/recruiter/employer",
+            label: "careerDiscovery.employerHubTitle",
+            description: "workspace.toolRecruiterEmployer",
+          },
+          {
             href: "/recruiter/integrations/ats",
             label: "atsIntegrations.title",
             description: "workspace.toolRecruiterAts",

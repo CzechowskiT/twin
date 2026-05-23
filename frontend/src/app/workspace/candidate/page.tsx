@@ -1,21 +1,32 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-
 import { PersonaWorkspaceGate } from "@/components/persona-workspace-gate";
+import { WorkspaceLaneHome } from "@/components/workspace-lane-home";
 
-/** Candidate lane → main app (dashboard). */
 export default function WorkspaceCandidatePage() {
-  const router = useRouter();
-
-  useEffect(() => {
-    router.replace("/dashboard");
-  }, [router]);
-
   return (
     <PersonaWorkspaceGate allowed={["candidate"]} surface="candidate">
-      <p className="twin-muted p-8 text-sm">…</p>
+      <WorkspaceLaneHome
+        title="workspace.candidateHomeTitle"
+        lead="workspace.candidateHomeLead"
+        tools={[
+          {
+            href: "/workspace/candidate/jobs",
+            label: "careerDiscovery.hubTitle",
+            description: "workspace.toolCandidateJobs",
+          },
+          {
+            href: "/dashboard",
+            label: "nav.dashboard",
+            description: "workspace.toolCandidateDashboard",
+          },
+          {
+            href: "/demo",
+            label: "nav.demo",
+            description: "workspace.toolCandidateDemo",
+          },
+        ]}
+      />
     </PersonaWorkspaceGate>
   );
 }
