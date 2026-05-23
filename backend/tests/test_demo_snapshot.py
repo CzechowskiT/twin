@@ -1,7 +1,5 @@
 """Demo mode snapshot API — 404 when disabled."""
 
-from unittest.mock import patch
-
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -61,8 +59,7 @@ def test_demo_snapshot_static_when_enabled_no_user(monkeypatch) -> None:
         get_settings.cache_clear()
 
 
-@patch("app.services.demo_snapshot.find_top_matches", return_value=[])
-def test_demo_snapshot_live_db(_mock_match: object, monkeypatch) -> None:
+def test_demo_snapshot_live_db(monkeypatch) -> None:
     monkeypatch.setenv("DEMO_MODE_ENABLED", "true")
     monkeypatch.setenv("DEMO_USER_EMAIL", "demo@twin.career")
     get_settings.cache_clear()

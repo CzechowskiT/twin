@@ -28,7 +28,6 @@ from app.schemas.demo import (
     DemoSnapshotOut,
 )
 from app.services.investor_demo_seed import DEMO_JOB_PREFIX, demo_email_from_env
-from app.services.matching_service import find_top_matches
 _STATIC_MATCHES = [
     DemoJobMatchOut(
         title="Senior Python Developer",
@@ -143,8 +142,7 @@ def build_demo_snapshot(db: Session, settings: Settings) -> DemoSnapshotOut:
         }
         for jm, job in match_rows
     ]
-    if not matches_raw:
-        matches_raw = find_top_matches(db, cand, limit=5, min_score=70.0, persist=False)
+    # Never run full-catalog matching here — public /demo must stay fast (prod has 600+ jobs).
     if not matches_raw:
         demo_jobs = (
             db.execute(
