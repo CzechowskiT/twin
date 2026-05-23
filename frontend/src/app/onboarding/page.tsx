@@ -39,20 +39,44 @@ export default function OnboardingPage() {
     if (typeof window !== "undefined") window.localStorage.setItem(STORAGE_KEY, String(step));
   }, [step]);
 
+  const completeOnboarding = useCallback(async (opts?: { celebrate?: boolean }) => {
+    const token = getToken();
+    if (!token) {
+      router.replace("/login/candidate");
+      return false;
+    }
+    await apiFetch("/api/v1/auth/onboarding/complete", { method: "POST" }, token);
+    if (typeof window !== "undefined") window.localStorage.removeItem(STORAGE_KEY);
+    if (opts?.celebrate) {
+      confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
+      toast.success(t("onboardingFlow.doneToast"));
+    }
+    return true;
+  }, [router, t]);
+
   const finish = useCallback(async () => {
     setFinishing(true);
     try {
-      await apiFetch("/api/v1/auth/onboarding/complete", { method: "POST" });
-      if (typeof window !== "undefined") window.localStorage.removeItem(STORAGE_KEY);
-      confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
-      toast.success(t("onboardingFlow.doneToast"));
+      await completeOnboarding({ celebrate: true });
       router.push("/dashboard");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("onboardingFlow.failed"));
     } finally {
       setFinishing(false);
     }
-  }, [router, t]);
+  }, [completeOnboarding, router, t]);
+
+  const skipToDashboard = useCallback(async () => {
+    setFinishing(true);
+    try {
+      await completeOnboarding();
+      router.push("/dashboard");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("onboardingFlow.failed"));
+    } finally {
+      setFinishing(false);
+    }
+  }, [completeOnboarding, router, t]);
 
   const key: StepKey = STEPS[step] ?? "welcome";
   const isLast = step >= STEPS.length - 1;
@@ -102,7 +126,12 @@ export default function OnboardingPage() {
                   {t("onboardingFlow.back")}
                 </button>
               ) : null}
-              <button type="button" className="twin-btn-ghost text-sm" onClick={() => router.push("/dashboard")}>
+              <button
+                type="button"
+                className="twin-btn-ghost text-sm"
+                disabled={finishing}
+                onClick={() => void skipToDashboard()}
+              >
                 {t("onboardingFlow.skip")}
               </button>
             </div>

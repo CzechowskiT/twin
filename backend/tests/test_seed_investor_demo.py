@@ -54,5 +54,8 @@ def test_investor_demo_seed_idempotent() -> None:
         assert db.scalar(select(func.count()).select_from(Application)) == first_apps == 1
         assert db.scalar(select(func.count()).select_from(ScheduledInterview)) == first_iv == 1
         assert db.scalar(select(func.count()).select_from(User).where(User.email == email)) == 1
+        user = db.scalar(select(User).where(User.email == email))
+        assert user is not None
+        assert user.onboarding_completed_at is not None
     finally:
         db.close()

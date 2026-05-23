@@ -170,7 +170,8 @@ def upsert_demo_user(
     user.job_data_processing_consent_at = user.job_data_processing_consent_at or now
     user.ai_matching_consent_at = user.ai_matching_consent_at or now
     user.email_verified_at = user.email_verified_at or now
-    user.onboarding_completed_at = user.onboarding_completed_at or now
+    # Always refresh so re-seed repairs prod accounts stuck in onboarding.
+    user.onboarding_completed_at = now
     user.plan_tier = "free"
     user.subscription_status = None
     db.flush()

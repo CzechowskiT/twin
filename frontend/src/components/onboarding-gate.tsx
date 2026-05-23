@@ -6,8 +6,9 @@ import { useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "@/components/language-provider";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
+import { isDemoUserEmail } from "@/lib/demo-user";
 
-type Me = { onboarding_completed_at?: string | null };
+type Me = { email?: string; onboarding_completed_at?: string | null };
 
 const BYPASS_PREFIXES = ["/onboarding", "/profile", "/login", "/register", "/auth"];
 
@@ -34,8 +35,16 @@ export function OnboardingGate({ children }: { children: ReactNode }) {
       try {
         const me = await apiFetch<Me>("/api/v1/auth/me", {}, token);
         if (!cancelled && !me.onboarding_completed_at) {
-          router.replace("/onboarding");
-          return;
+          if (isDemoUserEmail(me.email)) {
+            try {
+              await apiFetch("/api/v1/auth/onboarding/complete", { method: "POST" }, token);
+            } catch {
+              /* still allow dashboard for demo account */
+            }
+          } else {
+            router.replace("/onboarding");
+            return;
+          }
         }
       } catch {
         /* allow dashboard if /me fails transiently */
