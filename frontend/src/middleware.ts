@@ -14,6 +14,14 @@ export function middleware(request: NextRequest) {
       },
     });
   }
+
+  const { pathname } = request.nextUrl;
+  if (pathname === "/auth/signup" || pathname === "/auth/signup/") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/register";
+    return NextResponse.redirect(url, 308);
+  }
+
   return NextResponse.next();
 }
 
