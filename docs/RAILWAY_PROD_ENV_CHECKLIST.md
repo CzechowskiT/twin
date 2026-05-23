@@ -42,7 +42,13 @@ Optional: `STRIPE_CHECKOUT_PAYMENT_METHOD_TYPES` (default `card,link`).
 
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
-- `GOOGLE_CALENDAR_REDIRECT_URI`
+- `GOOGLE_CALENDAR_REDIRECT_URI` — must match **exactly** what the API sends (no trailing `/`). If unset, API derives from `API_URL` + `/api/v1/calendar/google/callback`.
+- **Production redirect URI (whitelist in Google Cloud Console):**  
+  `https://twin-production-bcd9.up.railway.app/api/v1/calendar/google/callback`
+- **Verify at runtime:** `GET /api/v1/calendar/oauth-config` or `GET /api/v1/health?ops=1` → `google_calendar_redirect_uri`
+- **Local dev (add both if you use Next proxy):**  
+  `http://localhost:8000/api/v1/calendar/google/callback`  
+  `http://localhost:3000/api/v1/calendar/google/callback`
 
 ## Microsoft 365 Calendar OAuth
 

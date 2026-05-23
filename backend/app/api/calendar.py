@@ -21,6 +21,11 @@ from app.services.microsoft_calendar_api import MicrosoftCalendarApiError, delet
 from app.database.session import get_db
 from app.services.calendar_scheduling import find_free_slots_iso, find_next_slot_iso, freebusy_overlaps_slot
 from app.services.google_calendar_api import GoogleCalendarApiError, delete_primary_event, insert_primary_event, query_freebusy
+from app.services.calendar_oauth_redirect import (
+    dev_calendar_redirect_uri_hints,
+    effective_google_calendar_redirect_uri,
+    effective_microsoft_calendar_redirect_uri,
+)
 from app.services.google_calendar_oauth import (
     GoogleCalendarOAuthError,
     build_google_calendar_authorize_url,
@@ -28,6 +33,7 @@ from app.services.google_calendar_oauth import (
     is_google_calendar_oauth_configured,
     refresh_google_calendar_access_token,
 )
+from app.services.microsoft_calendar_oauth import is_microsoft_calendar_oauth_configured
 from app.services.ics_export import interviews_feed_to_ics, scheduled_interview_to_ics
 from app.services.token_crypto import decrypt_secret, encrypt_secret
 
@@ -88,6 +94,22 @@ class CalendarAuthorizeOut(BaseModel):
     authorize_url: str
 
 
+class CalendarOAuthProviderOut(BaseModel):
+    redirect_uri: str
+    oauth_configured: bool
+
+
+class CalendarOAuthConfigOut(BaseModel):
+    """Runtime redirect URIs for Google Cloud / Azure (copy-paste into provider consoles)."""
+
+    google: CalendarOAuthProviderOut
+    microsoft: CalendarOAuthProviderOut
+    dev_redirect_uris: dict[str, list[str]] = Field(
+        default_factory=dev_calendar_redirect_uri_hints,
+        description="Extra URIs when testing via localhost:8000 (API) or localhost:3000 (Next proxy).",
+    )
+
+
 class CalendarFreeBusyIn(BaseModel):
     time_min: str = Field(..., description="RFC3339 instant")
     time_max: str = Field(..., description="RFC3339 instant")
@@ -126,14 +148,29 @@ class InterviewIcsTokenOut(BaseModel):
 _ICS_SHARE_TOKEN_TTL_DAYS = 30
 
 
+@router.get("/oauth-config", response_model=CalendarOAuthConfigOut)
+def calendar_oauth_config() -> CalendarOAuthConfigOut:
+    """Public: exact redirect URIs this API sends to Google/Microsoft (no secrets)."""
+    s = get_settings()
+    return CalendarOAuthConfigOut(
+        google=CalendarOAuthProviderOut(
+            redirect_uri=effective_google_calendar_redirect_uri(s),
+            oauth_configured=is_google_calendar_oauth_configured(),
+        ),
+        microsoft=CalendarOAuthProviderOut(
+            redirect_uri=effective_microsoft_calendar_redirect_uri(s),
+            oauth_configured=is_microsoft_calendar_oauth_configured(),
+        ),
+    )
+
+
 @router.get("/google/status", response_model=CalendarStatusOut)
 def google_calendar_status(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> CalendarStatusOut:
-    s = get_settings()
     oauth_configured = is_google_calendar_oauth_configured()
-    redirect_uri = (s.google_calendar_redirect_uri or "").strip() or None if oauth_configured else None
+    redirect_uri = effective_google_calendar_redirect_uri(get_settings()) if oauth_configured else None
     row = db.query(UserGoogleCalendar).filter(UserGoogleCalendar.user_id == current_user.id).first()
     if not row:
         return CalendarStatusOut(

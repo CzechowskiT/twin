@@ -25,6 +25,7 @@ from app.api.calendar import (
     _to_db_naive_utc,
 )
 from app.config import get_settings
+from app.services.calendar_oauth_redirect import effective_microsoft_calendar_redirect_uri
 from app.core.deps import get_current_user
 from app.core.security import create_access_token, decode_access_token
 from app.database.models import ScheduledInterview, User, UserMicrosoftCalendar
@@ -93,6 +94,7 @@ class MicrosoftCalendarStatusOut(BaseModel):
     connected: bool
     microsoft_email: str | None = None
     oauth_configured: bool = False
+    oauth_redirect_uri: str | None = None
 
 
 class MicrosoftCalendarAuthorizeOut(BaseModel):
@@ -105,13 +107,19 @@ def microsoft_calendar_status(
     db: Session = Depends(get_db),
 ) -> MicrosoftCalendarStatusOut:
     oauth_configured = is_microsoft_calendar_oauth_configured()
+    redirect_uri = effective_microsoft_calendar_redirect_uri(get_settings()) if oauth_configured else None
     row = db.query(UserMicrosoftCalendar).filter(UserMicrosoftCalendar.user_id == current_user.id).first()
     if not row:
-        return MicrosoftCalendarStatusOut(connected=False, oauth_configured=oauth_configured)
+        return MicrosoftCalendarStatusOut(
+            connected=False,
+            oauth_configured=oauth_configured,
+            oauth_redirect_uri=redirect_uri,
+        )
     return MicrosoftCalendarStatusOut(
         connected=True,
         microsoft_email=row.microsoft_email,
         oauth_configured=oauth_configured,
+        oauth_redirect_uri=redirect_uri,
     )
 
 

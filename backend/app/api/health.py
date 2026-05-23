@@ -60,8 +60,15 @@ def health_check(
 
         s = get_settings()
         out["mail_configured"] = is_mail_configured(s)
+        from app.services.calendar_oauth_redirect import (
+            effective_google_calendar_redirect_uri,
+            effective_microsoft_calendar_redirect_uri,
+        )
+
         out["google_calendar_configured"] = is_google_calendar_oauth_configured()
         out["microsoft_calendar_configured"] = is_microsoft_calendar_oauth_configured()
+        out["google_calendar_redirect_uri"] = effective_google_calendar_redirect_uri(s)
+        out["microsoft_calendar_redirect_uri"] = effective_microsoft_calendar_redirect_uri(s)
         out["stripe_checkout_ready"] = _stripe_checkout_ready(s)
         out["scrape_worker_ready"] = scrape_worker_ready(s)
         out["scrape_beat_enabled"] = s.scrape_beat_enabled

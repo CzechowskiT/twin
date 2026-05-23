@@ -209,6 +209,29 @@ class Settings(BaseSettings):
             return _strip_trailing_slash_url(value)
         return value
 
+    @field_validator(
+        "google_calendar_redirect_uri",
+        "microsoft_calendar_redirect_uri",
+        mode="before",
+    )
+    @classmethod
+    def normalize_calendar_redirect_uri(cls, value: object) -> object:
+        if isinstance(value, str) and value.strip():
+            return _strip_trailing_slash_url(value)
+        return value
+
+    @model_validator(mode="after")
+    def resolve_calendar_oauth_redirect_uris(self) -> "Settings":
+        """Derive calendar callbacks from API_URL when env vars are unset (never FRONTEND_URL)."""
+        from app.services.calendar_oauth_redirect import (
+            effective_google_calendar_redirect_uri,
+            effective_microsoft_calendar_redirect_uri,
+        )
+
+        self.google_calendar_redirect_uri = effective_google_calendar_redirect_uri(self)
+        self.microsoft_calendar_redirect_uri = effective_microsoft_calendar_redirect_uri(self)
+        return self
+
     auto_apply_headless: bool = False
     auto_apply_state_dir: str = "data/browser_state"
     auto_apply_default_phone: str = ""

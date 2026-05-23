@@ -6,7 +6,8 @@ from urllib.parse import urlencode
 
 import httpx
 
-from app.config import get_settings
+from app.config import Settings, get_settings
+from app.services.calendar_oauth_redirect import effective_microsoft_calendar_redirect_uri
 
 MS_AUTH_BASE = "https://login.microsoftonline.com"
 MS_GRAPH_ME = "https://graph.microsoft.com/v1.0/me"
@@ -17,12 +18,17 @@ class MicrosoftCalendarOAuthError(Exception):
     """Misconfiguration or token exchange failure."""
 
 
+def _redirect_uri(s: Settings | None = None) -> str:
+    settings = s or get_settings()
+    return effective_microsoft_calendar_redirect_uri(settings)
+
+
 def is_microsoft_calendar_oauth_configured() -> bool:
     s = get_settings()
     return bool(
         s.microsoft_client_id.strip()
         and s.microsoft_client_secret.strip()
-        and s.microsoft_calendar_redirect_uri.strip()
+        and _redirect_uri(s)
     )
 
 
@@ -36,10 +42,11 @@ def build_microsoft_calendar_authorize_url(state: str) -> str:
         raise MicrosoftCalendarOAuthError("Microsoft Calendar OAuth is not configured")
     s = get_settings()
     tenant = _tenant_segment()
+    redirect_uri = _redirect_uri(s)
     params = {
         "client_id": s.microsoft_client_id,
         "response_type": "code",
-        "redirect_uri": s.microsoft_calendar_redirect_uri,
+        "redirect_uri": redirect_uri,
         "response_mode": "query",
         "scope": MS_CALENDAR_SCOPES,
         "state": state,
@@ -57,7 +64,7 @@ def exchange_microsoft_calendar_code(code: str) -> tuple[str, str | None]:
         "client_id": s.microsoft_client_id,
         "client_secret": s.microsoft_client_secret,
         "code": code,
-        "redirect_uri": s.microsoft_calendar_redirect_uri,
+        "redirect_uri": _redirect_uri(s),
         "grant_type": "authorization_code",
         "scope": MS_CALENDAR_SCOPES,
     }

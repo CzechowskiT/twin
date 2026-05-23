@@ -6,7 +6,8 @@ from urllib.parse import urlencode
 
 import httpx
 
-from app.config import get_settings
+from app.config import Settings, get_settings
+from app.services.calendar_oauth_redirect import effective_google_calendar_redirect_uri
 
 GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
 GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
@@ -22,23 +23,25 @@ class GoogleCalendarOAuthError(Exception):
     """Misconfiguration or token exchange failure."""
 
 
+def _redirect_uri(s: Settings | None = None) -> str:
+    settings = s or get_settings()
+    return effective_google_calendar_redirect_uri(settings)
+
+
 def is_google_calendar_oauth_configured() -> bool:
     s = get_settings()
-    return bool(
-        s.google_client_id
-        and s.google_client_secret
-        and s.google_calendar_redirect_uri.strip()
-    )
+    return bool(s.google_client_id and s.google_client_secret and _redirect_uri(s))
 
 
 def build_google_calendar_authorize_url(state: str) -> str:
     if not is_google_calendar_oauth_configured():
         raise GoogleCalendarOAuthError("Google Calendar OAuth is not configured")
     s = get_settings()
+    redirect_uri = _redirect_uri(s)
     params = {
         "response_type": "code",
         "client_id": s.google_client_id,
-        "redirect_uri": s.google_calendar_redirect_uri,
+        "redirect_uri": redirect_uri,
         "state": state,
         "scope": GOOGLE_CALENDAR_SCOPES.strip(),
         "access_type": "offline",
@@ -56,7 +59,7 @@ def exchange_google_calendar_code(code: str) -> tuple[str, str | None]:
     data = {
         "grant_type": "authorization_code",
         "code": code,
-        "redirect_uri": s.google_calendar_redirect_uri,
+        "redirect_uri": _redirect_uri(s),
         "client_id": s.google_client_id,
         "client_secret": s.google_client_secret,
     }
