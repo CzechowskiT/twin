@@ -1,9 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
+import {
+  FAQ_INVESTOR_ANCHOR_ID,
+  faqSectionFromLocation,
+  scrollToFaqAnchor,
+} from "@/lib/faq-anchor";
 import {
   FAQ_SECTIONS,
   faqAnswerKey,
@@ -111,13 +117,50 @@ export function FaqPanel({
   );
 }
 
-/** Section tabs + accordion for /faq. */
+function faqScrollAnchorId(section: FaqSectionId | null, hash: string): string | null {
+  const bareHash = hash.replace(/^#/, "");
+  if (bareHash === FAQ_INVESTOR_ANCHOR_ID) return FAQ_INVESTOR_ANCHOR_ID;
+  if (section) return "faq-sections";
+  return null;
+}
+
+/** Section tabs + accordion for /faq. Honors `?section=` and `#investor-faq`. */
 export function FaqPageSections({ className = "" }: { className?: string }) {
   const { t } = useTranslation();
+  const searchParams = useSearchParams();
   const [active, setActive] = useState<FaqSectionId>("general");
 
+  const applyLocation = useCallback(() => {
+    const sectionParam = searchParams.get("section");
+    const hash = typeof window !== "undefined" ? window.location.hash : "";
+    const fromUrl = faqSectionFromLocation(sectionParam, hash);
+    if (fromUrl) setActive(fromUrl);
+    const anchorId = faqScrollAnchorId(fromUrl, hash);
+    if (!anchorId) return;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => scrollToFaqAnchor(anchorId));
+    });
+  }, [searchParams]);
+
+  useEffect(() => {
+    applyLocation();
+  }, [applyLocation]);
+
+  useEffect(() => {
+    const onHashChange = () => applyLocation();
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, [applyLocation]);
+
+  const selectSection = (sec: FaqSectionId) => {
+    setActive(sec);
+    if (sec === "investors" && typeof window !== "undefined") {
+      window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}#${FAQ_INVESTOR_ANCHOR_ID}`);
+    }
+  };
+
   return (
-    <div className={className}>
+    <div id="faq-sections" className={`scroll-mt-24 ${className}`}>
       <div
         className="flex flex-wrap gap-2 border-b border-[var(--twin-border)] pb-4"
         role="tablist"
@@ -136,14 +179,14 @@ export function FaqPageSections({ className = "" }: { className?: string }) {
                   ? "rounded-full border border-[var(--twin-accent)] bg-[var(--twin-accent-muted)] px-4 py-2 text-sm font-semibold text-[var(--twin-accent)]"
                   : "rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-4 py-2 text-sm font-medium text-[var(--twin-muted-strong)] transition hover:border-[var(--twin-accent)]/40 hover:text-[var(--foreground)]"
               }
-              onClick={() => setActive(sec.id)}
+              onClick={() => selectSection(sec.id)}
             >
               {t(`faq.${faqSectionLabelKey(sec.id)}`)}
             </button>
           );
         })}
       </div>
-      <div className="mt-8" role="tabpanel">
+      <div id={FAQ_INVESTOR_ANCHOR_ID} className="mt-8 scroll-mt-24" role="tabpanel">
         <FaqPanel section={active} layout="stack" />
       </div>
     </div>

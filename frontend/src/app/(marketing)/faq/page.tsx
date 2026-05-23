@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Suspense } from "react";
 
 import { FaqPageSections } from "@/components/marketing/faq-panel";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
@@ -28,7 +29,9 @@ export default function FaqPage() {
           </MarketingPageHeader>
         </ScrollReveal>
         <div className="mt-10">
-          <FaqPageSections />
+          <Suspense fallback={null}>
+            <FaqPageSections />
+          </Suspense>
         </div>
       </MarketingPageSurface>
     </Shell>

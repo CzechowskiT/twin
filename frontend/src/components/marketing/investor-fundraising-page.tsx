@@ -8,6 +8,7 @@ import { InvestorRoadmapPanel } from "@/components/investor-roadmap-panel";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { MvpLiveStatsStrip } from "@/components/marketing/mvp-live-stats-strip";
 import { clearCookieConsent } from "@/lib/cookie-consent";
+import { FAQ_INVESTOR_HREF } from "@/lib/faq-anchor";
 import { Shell } from "@/components/ui";
 
 const DECK_MAIL = "contact@twin.care";
@@ -201,7 +202,7 @@ export function InvestorFundraisingPage({ ycMode = false }: { ycMode?: boolean }
                   <CtaPill href="/investor/data-room" primary>
                     {t("investorFundraising.ctaDataRoom")}
                   </CtaPill>
-                  <CtaPill href="/faq?section=investors">{t("investorFundraising.ctaFaq")}</CtaPill>
+                  <CtaPill href={FAQ_INVESTOR_HREF}>{t("investorFundraising.ctaFaq")}</CtaPill>
                 </div>
               </section>
 

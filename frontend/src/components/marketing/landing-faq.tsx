@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useTranslation } from "@/components/language-provider";
 import { FaqPanel } from "@/components/marketing/faq-panel";
 import { ScrollReveal } from "@/components/marketing/scroll-reveal";
+import { FAQ_INVESTOR_HREF } from "@/lib/faq-anchor";
 import {
   FAQ_SECTIONS,
   FAQ_TOTAL_QUESTIONS,
@@ -35,7 +36,7 @@ export function LandingFaq() {
             {FAQ_SECTIONS.map((sec) => (
               <Link
                 key={sec.id}
-                href="/faq"
+                href={sec.id === "investors" ? FAQ_INVESTOR_HREF : `/faq?section=${sec.id}`}
                 className="rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-3 py-1.5 text-xs font-medium text-[var(--twin-muted-strong)] transition hover:border-[var(--twin-accent)]/40 hover:text-[var(--foreground)] sm:text-sm"
               >
                 {t(`faq.${faqSectionLabelKey(sec.id)}`)}
