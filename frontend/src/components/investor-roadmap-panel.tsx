@@ -8,7 +8,7 @@ export function InvestorRoadmapPanel() {
   return (
     <details className="group mt-4 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] p-3 text-sm open:bg-[var(--twin-card)] sm:p-4">
       <summary className="cursor-pointer list-none font-semibold text-[var(--foreground)] [&::-webkit-details-marker]:hidden">
-        <span className="inline-flex items-center gap-2">
+        <span className="inline-flex min-w-0 flex-wrap items-center gap-2 break-words">
           <span className="inline-block h-2 w-2 rounded-full bg-[var(--twin-accent)]/85" aria-hidden />
           {t("dashboard.roadmapSummary")}
         </span>

@@ -16,7 +16,7 @@ export function ScrapeRegistryCoverageHint() {
 
   const registry = boards ?? 0;
   return (
-    <p className="twin-muted mt-2 text-[11px] leading-relaxed">
+    <p className="twin-muted mt-2 break-words text-[11px] leading-relaxed">
       {t("dashboard.scrapeRegistryHonest")
         .replace("{registry}", String(registry))
         .replace("{roadmapLive}", String(LIVE_ROADMAP_COUNT))}
