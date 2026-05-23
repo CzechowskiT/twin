@@ -40,6 +40,10 @@
   /** App pages with `Shell rail`: two columns without crushing the main pane or stretching to marketing width. */
   --twin-max-width-rail: 52rem;
   --twin-max-width-narrow: 28rem;
+  /** Homepage (`/`) marketing sections — wider rail, readable copy measure inside. */
+  --twin-marketing-home-rail: min(72rem, 92vw);
+  --twin-marketing-home-headline: 56rem;
+  --twin-marketing-home-measure: 42rem;
   /** Sticky left rails (Shell): clears sticky site header; matches `html` scroll-padding. */
   --twin-sticky-chrome-top: 5.5rem;
   --twin-sticky-panel-max-height: calc(
@@ -1750,11 +1754,12 @@ html[data-marketing-surface="studio"] .marketing-section-demo-feed {
 html[data-marketing-surface="studio"] .marketing-section-hero .section-cta-secondary,
 html[data-marketing-surface="studio"] .marketing-section-page .section-cta-secondary,
 html[data-marketing-surface="studio"] .marketing-section-cta-band .section-cta-secondary,
-html[data-marketing-surface="studio"] .marketing-section-demo-actions .section-cta-secondary {
+html[data-marketing-surface="studio"] .marketing-section-demo-actions .section-cta-secondary,
+html[data-marketing-surface="studio"] .landing-register-teaser .section-cta-secondary {
   --section-cta-secondary-bg: rgb(15 23 42 / 0.35);
-  --section-cta-secondary-fg: #94a3b8;
-  --section-cta-secondary-border: rgb(148 163 184 / 0.18);
-  --section-cta-secondary-bg-hover: rgb(30 41 59 / 0.55);
+  --section-cta-secondary-fg: var(--foreground);
+  --section-cta-secondary-border: rgb(52 211 153 / 0.45);
+  --section-cta-secondary-bg-hover: rgb(52 211 153 / 0.14);
 }
 
 a.section-cta-primary,
@@ -1825,7 +1830,8 @@ button.section-cta-secondary:hover,
 html[data-marketing-surface="studio"] a.section-cta-secondary:hover,
 html[data-marketing-surface="studio"] button.section-cta-secondary:hover,
 html[data-marketing-surface="studio"] .section-cta-secondary:hover {
-  color: #e2e8f0 !important;
+  border-color: rgb(52 211 153 / 0.65);
+  color: #ffffff !important;
 }
 
 a.section-cta-secondary:active,
@@ -1867,14 +1873,14 @@ html[data-marketing-surface="studio"] .marketing-btn-primary-shadow {
 .marketing-hero-rail,
 .marketing-content-rail {
   width: 100%;
-  max-width: 48rem;
+  max-width: 56rem;
   text-align: start;
 }
 
 .marketing-cta-stack {
   display: flex;
   width: 100%;
-  max-width: 48rem;
+  max-width: 56rem;
   flex-direction: column;
   align-items: stretch;
   gap: 0.75rem;
@@ -1893,16 +1899,34 @@ html[data-marketing-surface="studio"] .marketing-btn-primary-shadow {
 
 .marketing-calculator-page .marketing-hero-rail,
 .marketing-calculator-page .marketing-content-rail {
-  max-width: 48rem;
+  max-width: 56rem;
 }
 
 .marketing-calculator-page .marketing-cta-stack {
   max-width: 100%;
 }
 
+/** Homepage sections share one outer rail (hero, rewards, FAQ teaser, CTA band). */
+.marketing-home-rail {
+  width: 100%;
+  max-width: var(--twin-marketing-home-rail);
+  margin-inline: auto;
+  padding-inline: max(1rem, var(--twin-page-x));
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.marketing-home-headline {
+  max-width: min(var(--twin-marketing-home-headline), 100%);
+}
+
+.marketing-home-lede {
+  max-width: min(var(--twin-marketing-home-measure), 100%);
+}
+
 /** Hero copy + CTAs: heritage uses green/amber system; studio matches dark mock (outline / white / ghost). */
 .marketing-hero-lede {
-  max-width: 42rem;
+  max-width: 48rem;
   border: none;
   border-radius: 0;
   background: transparent;
@@ -2301,10 +2325,34 @@ a.landing-hero-register-cta {
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: -0.02em;
+  border-color: rgb(52 211 153 / 0.45);
+  color: var(--section-cta-secondary-fg, var(--foreground)) !important;
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.65),
+    inset 0 1px 0 rgb(255 255 255 / 0.08),
     0 0 0 1px rgb(52 211 153 / 0.25),
-    0 20px 48px -16px rgb(52 211 153 / 0.45);
+    0 20px 48px -16px rgb(52 211 153 / 0.25);
+}
+
+html[data-marketing-surface="studio"] a.landing-hero-register-cta {
+  border-color: rgb(52 211 153 / 0.5);
+  color: var(--foreground) !important;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.06),
+    0 0 0 1px rgb(52 211 153 / 0.3),
+    0 20px 48px -16px rgb(52 211 153 / 0.2);
+}
+
+html[data-marketing-surface="studio"] a.landing-hero-register-cta:hover {
+  border-color: rgb(52 211 153 / 0.75);
+  background: rgb(52 211 153 / 0.14) !important;
+  color: #ffffff !important;
+}
+
+/** Secondary hero CTAs must not inherit primary pill label colors from `marketing-hero-btn-cta`. */
+a.section-cta-secondary.marketing-hero-btn-cta,
+button.section-cta-secondary.marketing-hero-btn-cta {
+  background: var(--section-cta-secondary-bg, var(--twin-card)) !important;
+  color: var(--section-cta-secondary-fg, var(--foreground)) !important;
 }
 
 a.landing-hero-demo-cta--secondary {
@@ -2317,7 +2365,15 @@ a.landing-hero-demo-cta--secondary {
 /* Founding funnel preview — visual language aligned with `/waitlist` */
 .marketing-founding-offer {
   margin-top: 1.5rem;
-  max-width: 40rem;
+  max-width: 48rem;
+}
+
+.marketing-section-hero .marketing-founding-offer {
+  max-width: none;
+}
+
+.marketing-section-hero .marketing-founding-offer-sub {
+  max-width: min(42rem, 100%);
 }
 
 .marketing-founding-offer--compact {
@@ -2375,11 +2431,15 @@ html[data-marketing-surface="studio"] .marketing-founding-value-strip li {
 
 .marketing-founding-counter {
   margin-top: 1.25rem;
-  max-width: 28rem;
+  max-width: 36rem;
   padding: 1rem 1.15rem;
   border-radius: 1rem;
   border: 1px solid rgb(139 92 246 / 0.28);
   background: linear-gradient(135deg, rgb(139 92 246 / 0.1), rgb(6 182 212 / 0.06));
+}
+
+.marketing-section-hero .marketing-founding-counter {
+  max-width: none;
 }
 
 .marketing-founding-counter__head {
