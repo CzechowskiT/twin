@@ -2194,6 +2194,31 @@ html[data-marketing-surface="studio"] .twin-roi-enterprise-strip-muted {
   background: rgb(0 0 0 / 0.45);
 }
 
+.login-role-hint-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 0.78);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.login-role-hint-card {
+  width: min(28rem, 100%);
+  margin-bottom: 0;
+  border-radius: 0.75rem;
+  border: 2px solid color-mix(in srgb, var(--twin-accent) 42%, transparent);
+  background: var(--twin-surface-raised);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--twin-accent) 18%, transparent),
+    0 24px 48px rgb(0 0 0 / 0.32),
+    var(--twin-shadow-lg);
+}
+
 .dashboard-tutorial-card,
 .feedback-modal-card {
   width: min(24rem, 100%);

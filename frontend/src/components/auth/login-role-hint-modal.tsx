@@ -66,8 +66,8 @@ export function LoginRoleHintModal({
   if (!open) return null;
 
   return (
-    <div className="dashboard-tutorial-overlay z-[70]" role="presentation">
-      <Card className="w-full max-w-md p-5 sm:p-6">
+    <div className="login-role-hint-overlay" role="presentation">
+      <Card className="login-role-hint-card mb-0 scroll-mt-0 w-full max-w-md p-5 sm:p-6">
         <div
           ref={dialogRef}
           role="dialog"
