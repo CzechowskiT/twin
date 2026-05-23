@@ -17,6 +17,8 @@ type AutoApplySettings = {
   last_run_at: string | null;
   next_run_label: string;
   supported_boards: string;
+  profile_ready: boolean;
+  onboarding_completed: boolean;
 };
 
 type TriggerOut = {
@@ -42,6 +44,9 @@ export default function NightlyAutoApplySettingsPage() {
     try {
       const data = await apiFetch<AutoApplySettings>("/api/v1/auto-apply/settings");
       setSettings(data);
+      if (!data.profile_ready) {
+        setError(t("dashboard.nightlyAutoApplyNeedProfile"));
+      }
     } catch {
       setError(t("dashboard.nightlyAutoApplyNeedProfile"));
     } finally {
@@ -124,7 +129,12 @@ export default function NightlyAutoApplySettingsPage() {
         {loading && <p className="text-sm text-[var(--twin-muted)]">…</p>}
         {error && (
           <Card className="border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-900 dark:text-amber-100">
-            {error}
+            <p>{error}</p>
+            {settings && !settings.profile_ready ? (
+              <Link href="/profile" className="twin-link mt-2 inline-block text-sm">
+                {t("dashboard.jobsEmptyZeroProfileCta")} →
+              </Link>
+            ) : null}
           </Card>
         )}
 
@@ -137,8 +147,9 @@ export default function NightlyAutoApplySettingsPage() {
                   type="checkbox"
                   className="h-5 w-5 accent-[var(--twin-accent)]"
                   checked={settings.is_active}
-                  disabled={saving}
+                  disabled={saving || !settings.profile_ready}
                   onChange={(e) => {
+                    if (!settings.profile_ready) return;
                     if (e.target.checked && !settings.consent_given_at) {
                       setShowConsent(true);
                       return;

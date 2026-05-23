@@ -16,19 +16,23 @@ from app.schemas.auto_apply_settings import (
     AutoApplySettingsPatch,
     AutoApplyTriggerOut,
 )
+from app.services.candidate_readiness import auto_apply_profile_ready
 from app.services.nightly_auto_apply import process_user_nightly_auto_apply, supported_board_ids
 from app.tasks.nightly_auto_apply import nightly_auto_apply_sweep
 
 router = APIRouter()
 
 CONSENT_VERSION = "v1"
+PROFILE_NOT_READY_DETAIL = "Complete your candidate profile and upload a CV first."
 
 
-def _candidate_or_404(db: Session, user_id: int) -> Candidate:
-    row = db.query(Candidate).filter(Candidate.user_id == user_id).first()
-    if not row:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Candidate profile not found")
-    return row
+def _get_candidate(db: Session, user_id: int) -> Candidate | None:
+    return db.query(Candidate).filter(Candidate.user_id == user_id).first()
+
+
+def _require_profile_ready(user: User, candidate: Candidate | None) -> None:
+    if not auto_apply_profile_ready(user, candidate):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=PROFILE_NOT_READY_DETAIL)
 
 
 def _next_run_label() -> str:
@@ -38,8 +42,21 @@ def _next_run_label() -> str:
     return f"{h:02d}:{m:02d} Europe/Warsaw (daily)"
 
 
-def _to_out(consent: AutoApplyConsent | None) -> AutoApplySettingsOut:
+def _to_out(
+    consent: AutoApplyConsent | None,
+    *,
+    user: User,
+    candidate: Candidate | None,
+) -> AutoApplySettingsOut:
     settings = get_settings()
+    ready = auto_apply_profile_ready(user, candidate)
+    onboarding_done = user.onboarding_completed_at is not None
+    base = dict(
+        next_run_label=_next_run_label(),
+        supported_boards=", ".join(sorted(supported_board_ids(settings))),
+        profile_ready=ready,
+        onboarding_completed=onboarding_done,
+    )
     if not consent:
         return AutoApplySettingsOut(
             is_active=False,
@@ -48,8 +65,7 @@ def _to_out(consent: AutoApplyConsent | None) -> AutoApplySettingsOut:
             consent_given_at=None,
             total_applications_submitted=0,
             last_run_at=None,
-            next_run_label=_next_run_label(),
-            supported_boards=", ".join(sorted(supported_board_ids(settings))),
+            **base,
         )
     return AutoApplySettingsOut(
         is_active=bool(consent.is_active),
@@ -58,8 +74,7 @@ def _to_out(consent: AutoApplyConsent | None) -> AutoApplySettingsOut:
         consent_given_at=consent.consent_given_at,
         total_applications_submitted=int(consent.total_applications_submitted or 0),
         last_run_at=consent.last_run_at,
-        next_run_label=_next_run_label(),
-        supported_boards=", ".join(sorted(supported_board_ids(settings))),
+        **base,
     )
 
 
@@ -90,9 +105,11 @@ def get_settings_route(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> AutoApplySettingsOut:
-    candidate = _candidate_or_404(db, user.id)
-    consent = db.query(AutoApplyConsent).filter(AutoApplyConsent.candidate_id == candidate.id).first()
-    return _to_out(consent)
+    candidate = _get_candidate(db, user.id)
+    consent = None
+    if candidate is not None:
+        consent = db.query(AutoApplyConsent).filter(AutoApplyConsent.candidate_id == candidate.id).first()
+    return _to_out(consent, user=user, candidate=candidate)
 
 
 @router.post("/consent", response_model=AutoApplySettingsOut)
@@ -103,7 +120,10 @@ def give_consent(
 ) -> AutoApplySettingsOut:
     if not body.consent_acknowledged:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Consent must be acknowledged")
-    candidate = _candidate_or_404(db, user.id)
+    candidate = _get_candidate(db, user.id)
+    if candidate is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Create your candidate profile first.")
+    _require_profile_ready(user, candidate)
     settings = get_settings()
     now = datetime.now(timezone.utc)
     consent = db.query(AutoApplyConsent).filter(AutoApplyConsent.candidate_id == candidate.id).first()
@@ -126,7 +146,7 @@ def give_consent(
         db.add(consent)
     db.commit()
     db.refresh(consent)
-    return _to_out(consent)
+    return _to_out(consent, user=user, candidate=candidate)
 
 
 @router.patch("/settings", response_model=AutoApplySettingsOut)
@@ -135,7 +155,10 @@ def patch_settings(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> AutoApplySettingsOut:
-    candidate = _candidate_or_404(db, user.id)
+    candidate = _get_candidate(db, user.id)
+    if candidate is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Create your candidate profile first.")
+    _require_profile_ready(user, candidate)
     consent = db.query(AutoApplyConsent).filter(AutoApplyConsent.candidate_id == candidate.id).first()
     if not consent or not consent.consent_given_at:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Enable auto-apply with consent first")
@@ -148,7 +171,7 @@ def patch_settings(
     consent.updated_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(consent)
-    return _to_out(consent)
+    return _to_out(consent, user=user, candidate=candidate)
 
 
 @router.post("/trigger", response_model=AutoApplyTriggerOut)
@@ -157,7 +180,10 @@ def trigger_nightly_for_me(
     user: User = Depends(get_current_user),
 ) -> AutoApplyTriggerOut:
     """Run the same logic as the nightly job for the current user (demo / test)."""
-    candidate = _candidate_or_404(db, user.id)
+    candidate = _get_candidate(db, user.id)
+    if candidate is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Create your candidate profile first.")
+    _require_profile_ready(user, candidate)
     consent = db.query(AutoApplyConsent).filter(AutoApplyConsent.candidate_id == candidate.id).first()
     if not consent or not consent.is_active or not consent.consent_given_at:
         raise HTTPException(

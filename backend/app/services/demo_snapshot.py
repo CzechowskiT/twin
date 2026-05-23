@@ -266,7 +266,11 @@ def _build_demo_snapshot(db: Session, settings: Settings) -> DemoSnapshotOut:
             name=cand.name or "Demo candidate",
             location=cand.location,
             experience_years=int(cand.experience_years or 0),
-            has_cv=bool(cand.cv_text and str(cand.cv_text).strip()),
+            has_cv=bool(
+                (cand.cv_text and str(cand.cv_text).strip())
+                or (cand.resume_path and str(cand.resume_path).strip())
+                or (cand.cv_filename and str(cand.cv_filename).strip())
+            ),
         ),
         top_matches=top_matches or list(_STATIC_MATCHES),
         application=application_out,

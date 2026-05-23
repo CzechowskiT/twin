@@ -14,6 +14,10 @@ class AutoApplySettingsOut(BaseModel):
     last_run_at: datetime | None
     next_run_label: str
     supported_boards: str
+    profile_ready: bool = Field(
+        description="True when onboarding is done and CV, tailoring, or core profile fields exist.",
+    )
+    onboarding_completed: bool = False
 
 
 class AutoApplyConsentIn(BaseModel):

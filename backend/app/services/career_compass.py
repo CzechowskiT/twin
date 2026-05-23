@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from app.services.anthropic_client import get_anthropic_client, is_anthropic_configured
+from app.services.candidate_readiness import candidate_has_cv
 
 _PATH_PROMPT = """You design a gamified, time-bound career path for a candidate to reach their stated ideal job.
 
@@ -523,6 +524,6 @@ def candidate_profile_dict(candidate: Any, skills: list[str], titles: list[str])
         "experience_years": candidate.experience_years,
         "desired_salary": candidate.desired_salary,
         "location": candidate.location,
-        "has_cv": bool(candidate.cv_text),
+        "has_cv": candidate_has_cv(candidate),
         "cv_insights": ins,
     }

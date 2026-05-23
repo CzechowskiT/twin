@@ -1,7 +1,5 @@
 """Auto-apply settings API."""
 
-from datetime import datetime, timezone
-
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -24,10 +22,13 @@ def auto_apply_client():
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
     db = Session()
+    from datetime import datetime, timezone
+
     user = User(email="auto@test.com", hashed_password="x", is_active=True)
+    user.onboarding_completed_at = datetime.now(timezone.utc)
     db.add(user)
     db.commit()
-    candidate = Candidate(user_id=user.id, name="Auto")
+    candidate = Candidate(user_id=user.id, name="Auto", cv_text="Backend engineer CV")
     db.add(candidate)
     db.commit()
     job = Job(
@@ -65,6 +66,29 @@ def test_settings_default(auto_apply_client) -> None:
     body = res.json()
     assert body["is_active"] is False
     assert body["min_score_threshold"] == 90.0
+    assert body["profile_ready"] is True
+    assert body["onboarding_completed"] is True
+
+
+def test_settings_cv_file_only_ready(auto_apply_client) -> None:
+    client, headers, db, candidate, _job = auto_apply_client
+    candidate.cv_text = None
+    candidate.cv_filename = "resume.pdf"
+    candidate.resume_path = "/data/cv/resume.pdf"
+    db.commit()
+    res = client.get("/api/v1/auto-apply/settings", headers=headers)
+    assert res.status_code == 200
+    assert res.json()["profile_ready"] is True
+
+
+def test_settings_not_ready_without_onboarding(auto_apply_client) -> None:
+    client, headers, db, candidate, _job = auto_apply_client
+    user = db.query(User).filter(User.id == candidate.user_id).first()
+    user.onboarding_completed_at = None
+    db.commit()
+    res = client.get("/api/v1/auto-apply/settings", headers=headers)
+    assert res.status_code == 200
+    assert res.json()["profile_ready"] is False
 
 
 def test_consent_and_trigger(auto_apply_client, monkeypatch) -> None:

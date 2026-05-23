@@ -39,6 +39,7 @@ from app.schemas.career_compass import (
 from app.schemas.acceptance_queue import AcceptanceQueueOut, AcceptanceRespondIn
 from app.schemas.match import JobMatchListOut, JobMatchOut
 from app.services.acceptance_queue import build_acceptance_queue, respond_acceptance_item
+from app.services.candidate_readiness import candidate_has_cv
 from app.services.cv_parser import CvParseError
 from app.services.cv_storage import delete_cv_for_candidate, save_cv_for_candidate
 from app.services.cv_tailoring import build_cv_tailoring_blob
@@ -849,7 +850,7 @@ def _to_out(candidate: Candidate) -> CandidateOut:
         location=candidate.location,
         talent_pool_opt_in=bool(candidate.talent_pool_opt_in),
         talent_pool_opt_in_at=candidate.talent_pool_opt_in_at,
-        has_cv=bool(candidate.cv_text),
+        has_cv=candidate_has_cv(candidate),
         cv_filename=candidate.cv_filename,
         cv_uploaded_at=candidate.cv_uploaded_at,
         has_intro_audio=bool(candidate.intro_audio_path),
