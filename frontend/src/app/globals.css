@@ -719,6 +719,15 @@ html[data-cookie-banner="open"] main {
   grid-template-columns: minmax(0, 1fr);
 }
 
+.twin-auth-zone-hub__grid--prompt .twin-auth-zone-hub__card {
+  border-color: rgb(16 185 129 / 0.35);
+  box-shadow: 0 0 0 1px rgb(16 185 129 / 0.12);
+}
+
+.twin-auth-zone-hub__hint {
+  text-wrap: pretty;
+}
+
 @media (min-width: 640px) {
   .twin-auth-zone-hub__grid {
     grid-template-columns: repeat(2, minmax(220px, 1fr));

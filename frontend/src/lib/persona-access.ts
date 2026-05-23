@@ -333,7 +333,7 @@ export function headerAccountLinks(
 ): HeaderAccountLink[] {
   if (!hasSession) {
     return [
-      { href: "/login", labelKey: "nav.login" },
+      { href: "/login?from=login", labelKey: "nav.login" },
       { href: "/register", labelKey: "nav.register" },
     ];
   }
