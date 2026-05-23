@@ -1,11 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useTranslation } from "@/components/language-provider";
-import { FaqPanel } from "@/components/marketing/faq-panel";
+import { FaqPageSections } from "@/components/marketing/faq-panel";
 import { ScrollReveal } from "@/components/marketing/scroll-reveal";
 
-/** Fluently-style numbered Q&A: calm disclosure rows, no extra dependencies. */
+/** Homepage FAQ — same tabs + full section lists as /faq (no teaser). */
 export function LandingFaq() {
   const { t } = useTranslation();
 
@@ -16,13 +15,8 @@ export function LandingFaq() {
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-muted)]">{t("home.faqEyebrow")}</p>
           <h2 className="mt-3 max-w-3xl text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-3xl">{t("home.faqTitle")}</h2>
           <div className="mt-10">
-            <FaqPanel section="general" limit={3} layout="row" />
+            <FaqPageSections />
           </div>
-          <p className="mt-6 text-center text-sm text-[var(--twin-muted)]">
-            <Link href="/faq" className="twin-link font-medium">
-              {t("faq.homeCta")}
-            </Link>
-          </p>
         </ScrollReveal>
       </div>
     </section>

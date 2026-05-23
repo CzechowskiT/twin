@@ -47,7 +47,7 @@ export function useMarketingFaqItems(options?: {
   return useFaqSectionItems(section, options?.limit);
 }
 
-/** Shared FAQ disclosure list (home teaser + /faq sections). */
+/** Shared FAQ disclosure list (marketing sections). */
 export function FaqPanel({
   className = "",
   layout = "stack",
