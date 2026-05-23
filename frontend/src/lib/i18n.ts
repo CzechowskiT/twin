@@ -1439,7 +1439,7 @@ const en = {
     toolInvestorMetrics: "Live traction dashboard",
     toolInvestorMetricsDesc: "Validated jobs, users, applications — public aggregates only.",
     toolInvestorPlacement: "Placement verification timeline",
-    toolInvestorPlacementDesc: "Append-only hire events — investor walkthrough + seeded demo login.",
+    toolInvestorPlacementDesc: "Append-only hire events — trust layer walkthrough with live demo login.",
   },
   developers: {
     title: "Developers & integrators",
@@ -1613,11 +1613,24 @@ const en = {
   placementDemo: {
     eyebrow: "Trust layer",
     title: "Placement verification timeline",
-    lead: "Append-only events — no CS email ping-pong. Candidates declare; work email or employer attestation confirms hire.",
+    lead: "Append-only audit trail — no CS email ping-pong. The candidate declares in-app; a transactional work-email link or employer attestation confirms hire without manual back-and-forth.",
     actor: "Actor",
-    seedNote:
-      "Log in as investor-demo@twin.local (see docs/INVESTOR_DEMO_RUNBOOK.md) and open Applications → placement events on the hired row.",
-    loginDemo: "Sign in to live demo account",
+    timelineAriaLabel: "Placement verification steps",
+    statusDone: "Recorded",
+    actorCandidate: "candidate",
+    actorSystem: "system",
+    eventDeclaredLabel: "Candidate declares hire",
+    eventDeclaredDesc: "Intent and start details captured in the dashboard — server-validated, not browser-only.",
+    eventDeclaredAt: "T+0",
+    eventVerifyEmailLabel: "Work-email verification sent",
+    eventVerifyEmailDesc: "One transactional magic link — proves mailbox control; domain match is a hint, not the only path.",
+    eventVerifyEmailAt: "T+1 min",
+    eventVerifiedLabel: "Placement verified",
+    eventVerifiedDesc: "State moves to billable under contract; retention milestones run on Celery dates, not nag mail.",
+    eventVerifiedAt: "T+2 days",
+    ctaHint:
+      "Sign in with your demo account (see docs/DEMO_LOGIN_FOR_FOUNDER.md), then Dashboard → Applications → Verification history on the hired row.",
+    loginDemo: "Sign in to demo account",
   },
   referrals: {
     title: "Refer friends",
@@ -3875,7 +3888,7 @@ const pl: MessageTree = {
     toolInvestorMetrics: "Panel metryk na żywo",
     toolInvestorMetricsDesc: "Oferty, użytkownicy, aplikacje — tylko agregaty publiczne.",
     toolInvestorPlacement: "Oś czasu placementu",
-    toolInvestorPlacementDesc: "Zdarzenia zatrudnienia — demo inwestora + konto seed.",
+    toolInvestorPlacementDesc: "Zdarzenia zatrudnienia — warstwa zaufania z logowaniem na konto demo.",
   },
   developers: {
     title: "Dla developerów i integratorów",
@@ -4049,10 +4062,23 @@ const pl: MessageTree = {
   placementDemo: {
     eyebrow: "Warstwa zaufania",
     title: "Oś czasu weryfikacji placementu",
-    lead: "Zdarzenia tylko do dopisywania — bez ping-ponga mailowego. Kandydat deklaruje; e-mail służbowy lub atest pracodawcy potwierdza zatrudnienie.",
+    lead: "Ślad audytowy tylko do dopisywania — bez ping-ponga z CS. Kandydat deklaruje w aplikacji; transakcyjny link na służbowy mail lub atest pracodawcy potwierdza zatrudnienie bez ręcznej wymiany maili.",
     actor: "Aktor",
-    seedNote:
-      "Zaloguj się jako investor-demo@twin.local (docs/INVESTOR_DEMO_RUNBOOK.md) i otwórz Aplikacje → zdarzenia placementu przy zatrudnieniu.",
+    timelineAriaLabel: "Kroki weryfikacji placementu",
+    statusDone: "Zapisane",
+    actorCandidate: "kandydat",
+    actorSystem: "system",
+    eventDeclaredLabel: "Kandydat deklaruje zatrudnienie",
+    eventDeclaredDesc: "Intencja i data startu w panelu — walidacja po stronie serwera, nie tylko w przeglądarce.",
+    eventDeclaredAt: "T+0",
+    eventVerifyEmailLabel: "Wysłano weryfikację służbowym mailem",
+    eventVerifyEmailDesc: "Jeden transakcyjny link — potwierdza skrzynkę; dopasowanie domeny to wskazówka, nie jedyna ścieżka.",
+    eventVerifyEmailAt: "T+1 min",
+    eventVerifiedLabel: "Placement zweryfikowany",
+    eventVerifiedDesc: "Stan kwalifikuje do rozliczenia wg umowy; retencja na datach w Celery, bez nachalnych maili.",
+    eventVerifiedAt: "T+2 dni",
+    ctaHint:
+      "Zaloguj się na konto demo (docs/DEMO_LOGIN_FOR_FOUNDER.md), potem Panel → Aplikacje → Historia weryfikacji przy zatrudnionej ofercie.",
     loginDemo: "Zaloguj na konto demo",
   },
   referrals: {

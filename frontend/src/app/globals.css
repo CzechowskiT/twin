@@ -2930,11 +2930,18 @@ a.landing-hero-demo-cta--secondary {
   animation: demo-theater-reveal-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+.placement-verification-step {
+  animation: demo-theater-reveal-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .demo-theater-dot--pulse {
     animation: none;
   }
   .demo-theater-reveal {
+    animation: none;
+  }
+  .placement-verification-step {
     animation: none;
   }
   .demo-theater-rail-fill {
