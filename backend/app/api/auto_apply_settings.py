@@ -192,7 +192,7 @@ def trigger_nightly_for_me(
     if not consent or not consent.is_active or not consent.consent_given_at:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Enable nightly auto-apply with consent before triggering",
+            detail="Enable autonomous applying with consent before triggering",
         )
     settings = get_settings()
     row = process_user_nightly_auto_apply(

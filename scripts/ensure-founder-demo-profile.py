@@ -41,6 +41,7 @@ from app.database.models import (  # noqa: E402
 from app.services.investor_demo_seed import (  # noqa: E402
     DEMO_APPLY_JOB_EXTERNAL_ID,
     DEMO_BOARD,
+    DEMO_JOB_PREFIX,
     DEMO_JOBS,
     upsert_demo_jobs,
 )
@@ -54,6 +55,18 @@ Replace with your real CV in Profile when ready.
 
 DEFAULT_SKILLS = ["python", "fastapi", "postgresql", "celery", "redis"]
 DEFAULT_TITLES = ["Senior Python Developer", "Staff Backend Engineer", "Platform Engineer"]
+
+# Extra pipeline rows for investor demo (idempotent — skips existing job+candidate pairs).
+EXTRA_APPLICATIONS: list[tuple[str, ApplicationStatus, str]] = [
+    (f"{DEMO_JOB_PREFIX}backend-staff", ApplicationStatus.INTERVIEW, "Founder demo — interview stage."),
+    (f"{DEMO_JOB_PREFIX}platform", ApplicationStatus.REJECTED, "Founder demo — rejected (fit mismatch)."),
+    (f"{DEMO_JOB_PREFIX}data-pipeline", ApplicationStatus.PENDING, "Founder demo — saved, not yet applied."),
+]
+
+INTERVIEW_JOB_EXTERNAL_IDS: list[tuple[str, int]] = [
+    (f"{DEMO_JOB_PREFIX}python-lead", 3),
+    (f"{DEMO_JOB_PREFIX}backend-staff", 5),
+]
 
 
 def _now() -> datetime:
@@ -226,6 +239,97 @@ def ensure_interview(
     return f"interview_created:{interview.id}"
 
 
+def ensure_extra_applications(
+    db, candidate: Candidate, jobs: list[Job], *, dry_run: bool
+) -> dict[str, int]:
+    by_ext = {j.external_id: j for j in jobs}
+    created = 0
+    updated = 0
+    for ext_id, status, notes in EXTRA_APPLICATIONS:
+        job = by_ext.get(ext_id)
+        if job is None:
+            continue
+        row = db.execute(
+            select(Application).where(
+                Application.candidate_id == candidate.id,
+                Application.job_id == job.id,
+            )
+        ).scalar_one_or_none()
+        if row is None:
+            created += 1
+            if not dry_run:
+                now = _now()
+                db.add(
+                    Application(
+                        candidate_id=candidate.id,
+                        job_id=job.id,
+                        status=status,
+                        applied_at=now if status != ApplicationStatus.PENDING else None,
+                        notes=notes,
+                        auto_applied=False,
+                    )
+                )
+        elif row.status != status:
+            updated += 1
+            if not dry_run:
+                row.status = status
+                if row.notes is None or not str(row.notes).strip():
+                    row.notes = notes
+    if not dry_run:
+        db.flush()
+    return {"created": created, "updated": updated}
+
+
+def ensure_extra_interviews(
+    db, user: User, candidate: Candidate, jobs: list[Job], *, dry_run: bool
+) -> dict[str, int]:
+    by_ext = {j.external_id: j for j in jobs}
+    created = 0
+    for ext_id, days_ahead in INTERVIEW_JOB_EXTERNAL_IDS:
+        job = by_ext.get(ext_id)
+        if job is None:
+            continue
+        app = db.execute(
+            select(Application).where(
+                Application.candidate_id == candidate.id,
+                Application.job_id == job.id,
+            )
+        ).scalar_one_or_none()
+        if app is None:
+            continue
+        existing = db.execute(
+            select(ScheduledInterview).where(
+                ScheduledInterview.user_id == user.id,
+                ScheduledInterview.application_id == app.id,
+            )
+        ).scalar_one_or_none()
+        if existing is not None:
+            continue
+        created += 1
+        if dry_run:
+            continue
+        start = _now() + timedelta(days=days_ahead)
+        end = start + timedelta(hours=1)
+        db.add(
+            ScheduledInterview(
+                user_id=user.id,
+                application_id=app.id,
+                company_name=job.company,
+                job_title=job.title,
+                interview_start=start,
+                interview_end=end,
+                timezone="Europe/Warsaw",
+                meeting_link="https://meet.google.com/founder-demo-interview",
+                interview_type="video",
+                status="scheduled",
+                calendar_provider="google",
+            )
+        )
+    if not dry_run:
+        db.flush()
+    return {"created": created}
+
+
 def ensure_auto_apply_consent(db, candidate: Candidate, *, dry_run: bool) -> str:
     consent = db.execute(
         select(AutoApplyConsent).where(AutoApplyConsent.candidate_id == candidate.id)
@@ -290,6 +394,12 @@ def main() -> int:
                 summary["matches_added_or_updated"] = ensure_matches(db, cand, jobs, dry_run=False)
                 app_note = ensure_primary_application(db, cand, primary, dry_run=False)
                 summary["application"] = app_note
+                summary["extra_applications"] = ensure_extra_applications(
+                    db, cand, jobs, dry_run=False
+                )
+                summary["extra_interviews"] = ensure_extra_interviews(
+                    db, user, cand, jobs, dry_run=False
+                )
                 if app_note and app_note.startswith("application_created"):
                     app = db.execute(
                         select(Application).where(Application.candidate_id == cand.id)

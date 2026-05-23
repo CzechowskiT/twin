@@ -200,6 +200,7 @@ def process_user_nightly_auto_apply(
                 settings,
                 to_email=user.email,
                 applications_count=result["applications_submitted"],
+                manual_trigger=application_method == METHOD_MANUAL_TRIGGER,
             )
         except Exception:
             logger.exception("nightly summary email failed user_id=%s", user.id)

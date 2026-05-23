@@ -145,7 +145,7 @@ const candidatesEn: PersonaBundle = {
   logisticsTitle: "Good to know",
   logistics: [
     "Some employers still ask you to finish the application on their site — TWIN keeps track for you.",
-    "Nightly auto-apply runs on supported job boards with Premium or Pro, when the board allows it.",
+    "Autonomous applying runs on supported job boards with Premium or Pro, when the board allows it.",
     "Scanned PDF résumés can take a moment to read — you can always edit your profile by hand.",
   ],
   primaryCta: { label: "Start free with TWIN", href: "/register" },
@@ -248,7 +248,7 @@ const candidatesPl: PersonaBundle = {
   logisticsTitle: "Warto wiedzieć",
   logistics: [
     "Niektórzy pracodawcy nadal chcą, żebyś dokończył aplikację na ich stronie — TWIN śledzi to za Ciebie.",
-    "Nocne auto-aplikowanie działa na obsługiwanych portalach z planem Premium/Pro (gdy portal na to pozwala).",
+    "Autonomiczne aplikowanie działa na obsługiwanych portalach z planem Premium/Pro (gdy portal na to pozwala).",
     "Skan CV w PDF? Może chwilę potrwać — profil zawsze możesz poprawić ręcznie.",
   ],
   primaryCta: { label: "Zacznij z TWIN za darmo", href: "/register" },
