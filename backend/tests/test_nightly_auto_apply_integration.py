@@ -12,6 +12,7 @@ from app.automation.types import ApplyOutcome
 from app.database.models import (
     Application,
     AutoApplyConsent,
+    AutoApplyRun,
     Base,
     Candidate,
     Job,
@@ -125,6 +126,12 @@ def test_sweep_dry_run_mocked_session(nightly_db) -> None:
         def query(self, *args, **kwargs):
             return db.query(*args, **kwargs)
 
+        def add(self, obj):
+            return db.add(obj)
+
+        def commit(self):
+            return db.commit()
+
         def close(self) -> None:
             pass
 
@@ -133,3 +140,38 @@ def test_sweep_dry_run_mocked_session(nightly_db) -> None:
 
     assert stats["dry_run"] is True
     assert stats["total_users_processed"] == 1
+
+
+def test_sweep_persists_auto_apply_run(nightly_db) -> None:
+    db, user, consent, job = nightly_db
+    candidate = db.query(Candidate).filter(Candidate.user_id == user.id).first()
+    app_row = Application(candidate_id=candidate.id, job_id=job.id, status="applied")
+
+    class FakeSession:
+        def query(self, *args, **kwargs):
+            return db.query(*args, **kwargs)
+
+        def add(self, obj):
+            return db.add(obj)
+
+        def commit(self):
+            return db.commit()
+
+        def close(self) -> None:
+            pass
+
+    with (
+        patch("app.database.session.SessionLocal", FakeSession),
+        patch("app.services.nightly_auto_apply.find_top_matches"),
+        patch(
+            "app.services.nightly_auto_apply.auto_apply_for_user",
+            return_value=(ApplyOutcome.SUBMITTED, "ok", app_row),
+        ),
+    ):
+        stats = run_nightly_auto_apply_sweep(dry_run=False)
+
+    assert stats["total_users_processed"] == 1
+    run = db.query(AutoApplyRun).order_by(AutoApplyRun.started_at.desc()).first()
+    assert run is not None
+    assert run.total_applications_submitted == 1
+    assert run.finished_at is not None

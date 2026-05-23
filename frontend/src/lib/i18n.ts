@@ -577,6 +577,8 @@ const en = {
     placementVerifiedAt: "Verified on {when}.",
     placementDeclaredAt: "Declaration recorded on {when}.",
     placementVerifyPending: "Check your work inbox for the confirmation link.",
+    placementVerifyInProgress: "Verification in progress — link sent to your work email.",
+    placementResendLink: "Resend link",
     placementVerifyFailed: "Placement verification failed.",
     placementVerifyOkAlert: "Placement verified. Thank you.",
     placementEventsToggle: "Verification history",
@@ -1826,6 +1828,11 @@ const en = {
     uploadEnterpriseToast: "File registered — secure enterprise upload opens with the next production rollout.",
     demoModeBanner:
       "Preview mode — you can register filenames here. Full encrypted upload for enterprise diligence is rolling out next.",
+    s3ModeBanner: "Secure object storage is configured — choose a file to upload directly.",
+    uploadChooseFile: "Choose file",
+    uploadNoFile: "Select a PDF or spreadsheet first.",
+    uploadStored: "File stored securely.",
+    uploadPutFailed: "Could not upload file bytes — try again or contact us.",
   },
   recruiterJobs: {
     title: "Post a job",
@@ -2976,6 +2983,8 @@ const pl: MessageTree = {
     placementVerifiedAt: "Potwierdzono {when}.",
     placementDeclaredAt: "Zapis intencji: {when}.",
     placementVerifyPending: "Sprawdź skrzynkę służbową — link potwierdzający.",
+    placementVerifyInProgress: "Weryfikacja w toku — link wysłany na służbowy email.",
+    placementResendLink: "Wyślij link ponownie",
     placementVerifyFailed: "Weryfikacja placementu nie powiodła się.",
     placementVerifyOkAlert: "Placement potwierdzony. Dziękujemy.",
     placementEventsToggle: "Historia weryfikacji",
@@ -4238,6 +4247,11 @@ const pl: MessageTree = {
       "Plik zarejestrowany — szyfrowany upload enterprise włączymy w kolejnym wdrożeniu produkcyjnym.",
     demoModeBanner:
       "Tryb podglądu — możesz zarejestrować nazwy plików. Pełny szyfrowany upload dla due diligence enterprise — wkrótce.",
+    s3ModeBanner: "Skonfigurowane bezpieczne storage — wybierz plik, aby wgrać go bezpośrednio.",
+    uploadChooseFile: "Wybierz plik",
+    uploadNoFile: "Najpierw wybierz PDF lub arkusz.",
+    uploadStored: "Plik zapisany bezpiecznie.",
+    uploadPutFailed: "Nie udało się wgrać pliku — spróbuj ponownie lub napisz do nas.",
   },
   recruiterJobs: {
     title: "Opublikuj ofertę",

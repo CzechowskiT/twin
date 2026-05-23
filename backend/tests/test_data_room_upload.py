@@ -47,6 +47,32 @@ def test_record_upload_metadata_valid() -> None:
 
 
 @patch("app.services.data_room_upload.get_s3_blob_store")
+def test_prepare_upload_slot_s3_presign(mock_store: MagicMock) -> None:
+    mock_store.return_value.enabled = True
+    mock_store.return_value.presigned_put_url.return_value = "https://s3.example/upload"
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+    db = Session()
+    row, url, mode = dr.prepare_upload_slot(
+        db,
+        user_id=1,
+        category="financials",
+        filename="deck.pdf",
+        content_type="application/pdf",
+        size_bytes=4096,
+    )
+    assert mode == "s3_presigned_put"
+    assert url == "https://s3.example/upload"
+    assert row.status == "pending_upload"
+    db.close()
+
+
+@patch("app.services.data_room_upload.get_s3_blob_store")
 def test_prepare_upload_slot_metadata_only_when_s3_disabled(mock_store: MagicMock) -> None:
     mock_store.return_value.enabled = False
     engine = create_engine(

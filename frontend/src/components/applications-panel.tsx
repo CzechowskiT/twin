@@ -311,6 +311,11 @@ export function ApplicationsPanel({
                           )}
                         </p>
                       ) : null}
+                      {(app.placement_state ?? "none") === "verify_pending" ? (
+                        <p className="font-medium text-[var(--twin-accent-hover)]">
+                          {t("dashboard.placementVerifyInProgress")}
+                        </p>
+                      ) : null}
                       <p className="leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.placementVerifyHint")}</p>
                       <input
                         type="email"
@@ -339,7 +344,9 @@ export function ApplicationsPanel({
                       >
                         {placementFlowBusy?.id === app.id && placementFlowBusy.kind === "verify"
                           ? "…"
-                          : t("dashboard.placementSendLink")}
+                          : (app.placement_state ?? "none") === "verify_pending"
+                            ? t("dashboard.placementResendLink")
+                            : t("dashboard.placementSendLink")}
                       </button>
                       {(app.placement_state ?? "none") === "verify_pending" ? (
                         <p className="text-[var(--twin-muted)]">{t("dashboard.placementVerifyPending")}</p>

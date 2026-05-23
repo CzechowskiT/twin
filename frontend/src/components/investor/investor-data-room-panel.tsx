@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card } from "@/components/ui";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, apiUpload } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 import { getPublicApiBase } from "@/lib/public-api-base";
 import toast from "react-hot-toast";
@@ -18,26 +18,53 @@ const CONFIDENTIAL_KEYS = [
 
 const NDA_STORAGE_KEY = "twin_investor_nda_v1";
 
+const ALLOWED_TYPES = new Set([
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.ms-excel",
+  "text/csv",
+]);
+
+type UploadSlot = {
+  id: number;
+  upload_url?: string | null;
+  storage_mode?: string;
+};
+
+async function sha256Hex(file: File): Promise<string> {
+  const buf = await file.arrayBuffer();
+  const digest = await crypto.subtle.digest("SHA-256", buf);
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
 export function InvestorDataRoomPanel() {
   const { t } = useTranslation();
   const apiBase = getPublicApiBase();
   const statsUrl = apiBase ? `${apiBase}/api/v1/public/mvp-stats` : "/api/v1/public/mvp-stats";
   const openApiUrl = apiBase ? `${apiBase}/openapi.json` : "/api/v1/openapi.json";
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [ndaAccepted, setNdaAccepted] = useState(false);
   const [ndaChecked, setNdaChecked] = useState(false);
   const [uploadCategory, setUploadCategory] = useState("financials");
-  const [uploadFilename, setUploadFilename] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadBusy, setUploadBusy] = useState(false);
   const [localDemo, setLocalDemo] = useState(false);
+  const [s3Enabled, setS3Enabled] = useState(false);
 
   useEffect(() => {
     void fetch(statsUrl, { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
-      .then((body: { data_room_local_demo?: boolean } | null) => {
+      .then((body: { data_room_local_demo?: boolean; data_room_s3_enabled?: boolean } | null) => {
         setLocalDemo(Boolean(body?.data_room_local_demo));
+        setS3Enabled(Boolean(body?.data_room_s3_enabled));
       })
-      .catch(() => setLocalDemo(false));
+      .catch(() => {
+        setLocalDemo(false);
+        setS3Enabled(false);
+      });
   }, [statsUrl]);
 
   useEffect(() => {
@@ -56,6 +83,72 @@ export function InvestorDataRoomPanel() {
     }
     setNdaAccepted(true);
   }, []);
+
+  const uploadDocument = useCallback(async () => {
+    const token = getToken();
+    const file = selectedFile;
+    if (!token) {
+      toast.error(t("dataRoom.uploadFailed"));
+      return;
+    }
+    if (!file) {
+      toast.error(t("dataRoom.uploadNoFile"));
+      return;
+    }
+    const contentType = file.type || "application/pdf";
+    if (!ALLOWED_TYPES.has(contentType)) {
+      toast.error(t("dataRoom.uploadFailed"));
+      return;
+    }
+
+    setUploadBusy(true);
+    try {
+      const checksum = await sha256Hex(file);
+      const slot = await apiFetch<UploadSlot>(
+        "/api/v1/investor/data-room/uploads",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            category: uploadCategory,
+            filename: file.name,
+            content_type: contentType,
+            size_bytes: file.size,
+            checksum_sha256: checksum,
+          }),
+        },
+        token,
+      );
+
+      if (slot.upload_url) {
+        const putRes = await fetch(slot.upload_url, {
+          method: "PUT",
+          headers: { "Content-Type": contentType },
+          body: file,
+        });
+        if (!putRes.ok) {
+          throw new Error("presigned_put_failed");
+        }
+        toast.success(t("dataRoom.uploadStored"));
+      } else if (localDemo && slot.id) {
+        await apiUpload<UploadSlot>(
+          `/api/v1/investor/data-room/uploads/${slot.id}/file`,
+          file,
+          token,
+        );
+        toast.success(t("dataRoom.uploadStored"));
+      } else {
+        toast.success(t("dataRoom.uploadSuccess"));
+        toast(t("dataRoom.uploadEnterpriseToast"), { icon: "ℹ️", duration: 6000 });
+      }
+
+      setSelectedFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    } catch {
+      toast.error(t("dataRoom.uploadPutFailed"));
+    } finally {
+      setUploadBusy(false);
+    }
+  }, [localDemo, selectedFile, t, uploadCategory]);
 
   const packLinks = [
     { href: "/investor/metrics", label: t("dataRoom.packMetrics") },
@@ -117,7 +210,11 @@ export function InvestorDataRoomPanel() {
         <section>
           <p className="twin-muted mb-4 text-xs">{t("dataRoom.ndaAcceptedNote")}</p>
           <h2 className="text-lg font-semibold">{t("dataRoom.confidentialTitle")}</h2>
-          {localDemo ? (
+          {s3Enabled ? (
+            <Card variant="soft" className="mt-4 p-4">
+              <p className="text-sm leading-relaxed text-[var(--twin-muted-strong)]">{t("dataRoom.s3ModeBanner")}</p>
+            </Card>
+          ) : localDemo ? (
             <Card variant="soft" className="mt-4 p-4">
               <p className="text-sm leading-relaxed text-[var(--twin-muted-strong)]">{t("dataRoom.demoModeBanner")}</p>
             </Card>
@@ -133,7 +230,9 @@ export function InvestorDataRoomPanel() {
           <Card variant="soft" className="mt-6 p-5">
             <h3 className="font-semibold">{t("dataRoom.uploadTitle")}</h3>
             <p className="twin-muted mt-2 text-sm leading-relaxed">{t("dataRoom.uploadLead")}</p>
-            <p className="twin-muted mt-2 text-xs leading-relaxed">{t("dataRoom.uploadEnterpriseComing")}</p>
+            {!s3Enabled ? (
+              <p className="twin-muted mt-2 text-xs leading-relaxed">{t("dataRoom.uploadEnterpriseComing")}</p>
+            ) : null}
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <label className="text-sm">
                 <span className="twin-muted text-xs">{t("dataRoom.uploadCategory")}</span>
@@ -149,51 +248,26 @@ export function InvestorDataRoomPanel() {
                 </select>
               </label>
               <label className="text-sm">
-                <span className="twin-muted text-xs">{t("dataRoom.uploadFilename")}</span>
+                <span className="twin-muted text-xs">{t("dataRoom.uploadChooseFile")}</span>
                 <input
-                  className="twin-input mt-1 w-full"
-                  value={uploadFilename}
-                  onChange={(e) => setUploadFilename(e.target.value)}
-                  placeholder="Q1-2026.pdf"
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,.csv,.xlsx,.xls,application/pdf,text/csv"
+                  className="twin-input mt-1 w-full text-sm"
+                  onChange={(e) => setSelectedFile(e.target.files?.[0] ?? null)}
                 />
               </label>
             </div>
+            {selectedFile ? (
+              <p className="twin-muted mt-2 text-xs">
+                {selectedFile.name} · {(selectedFile.size / 1024).toFixed(1)} KB
+              </p>
+            ) : null}
             <Button
               type="button"
               className="mt-4"
-              disabled={uploadBusy || !uploadFilename.trim()}
-              onClick={() => {
-                const token = getToken();
-                if (!token) {
-                  toast.error(t("dataRoom.uploadFailed"));
-                  return;
-                }
-                setUploadBusy(true);
-                void apiFetch<{ storage_note?: string; upload_url?: string | null }>(
-                  "/api/v1/investor/data-room/uploads",
-                  {
-                    method: "POST",
-                    body: JSON.stringify({
-                      category: uploadCategory,
-                      filename: uploadFilename.trim(),
-                      content_type: "application/pdf",
-                      size_bytes: 1024,
-                    }),
-                  },
-                  token,
-                )
-                  .then((res) => {
-                    toast.success(t("dataRoom.uploadSuccess"));
-                    if (res.upload_url) {
-                      toast(t("dataRoom.uploadPresignHint"), { icon: "ℹ️", duration: 8000 });
-                    } else {
-                      toast(t("dataRoom.uploadEnterpriseToast"), { icon: "ℹ️", duration: 6000 });
-                    }
-                    setUploadFilename("");
-                  })
-                  .catch(() => toast.error(t("dataRoom.uploadFailed")))
-                  .finally(() => setUploadBusy(false));
-              }}
+              disabled={uploadBusy || !selectedFile}
+              onClick={() => void uploadDocument()}
             >
               {t("dataRoom.uploadSubmit")}
             </Button>

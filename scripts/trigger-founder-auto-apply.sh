@@ -79,3 +79,10 @@ curl -sS -m 120 -X POST "${API_URL}/api/v1/auto-apply/trigger" \
 echo "== demo snapshot (source) =="
 curl -sS -m 20 "${API_URL}/api/v1/demo/snapshot" | python3 -c \
   "import json,sys; d=json.load(sys.stdin); print('source=', d.get('source'), 'auto_apply=', d.get('auto_apply'))"
+
+echo "== last platform sweep (auto_apply_runs; manual trigger does not write this row) =="
+curl -sS -m 20 "${API_URL}/api/v1/auto-apply/last-sweep" \
+  -H "Authorization: Bearer ${TOKEN}" | python3 -m json.tool
+
+echo "== verify nightly observability (ops token optional) =="
+VERIFY_JWT="${TOKEN}" OPS_ADMIN_TOKEN="${OPS_ADMIN_TOKEN:-}" "${ROOT}/scripts/verify-nightly-auto-apply.sh" || true

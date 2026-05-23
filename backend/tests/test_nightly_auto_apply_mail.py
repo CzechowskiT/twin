@@ -22,6 +22,20 @@ def test_manual_trigger_email_avoids_overnight_wording() -> None:
     assert "overnight" not in kwargs["text_body"].lower()
 
 
+def test_manual_trigger_plural_polish_subject() -> None:
+    settings = Settings(frontend_url="https://example.com")
+    with patch("app.services.nightly_auto_apply_mail.send_generic_email") as mock_send:
+        send_nightly_auto_apply_summary_email(
+            settings,
+            to_email="founder@example.com",
+            applications_count=3,
+            manual_trigger=True,
+        )
+    subject = mock_send.call_args.kwargs["subject"]
+    assert "testowe auto-aplikacje" in subject
+    assert "overnight" not in subject.lower()
+
+
 def test_nightly_email_keeps_overnight_wording() -> None:
     settings = Settings(frontend_url="https://example.com")
     with patch("app.services.nightly_auto_apply_mail.send_generic_email") as mock_send:

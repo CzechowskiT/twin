@@ -5,6 +5,7 @@ import { useTranslation } from "@/components/language-provider";
 const STEPS = ["none", "declared", "verify_pending", "verified"] as const;
 
 function stepIndex(state: string): number {
+  if (state === "disputed") return 2;
   const idx = STEPS.indexOf(state as (typeof STEPS)[number]);
   return idx >= 0 ? idx : 0;
 }

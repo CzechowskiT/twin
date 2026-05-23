@@ -1,8 +1,8 @@
 # TWIN — founder status (live)
 
-**Updated:** 2026-05-23 (autonomous session)  
+**Updated:** 2026-05-23 (autonomous 5-slice session)  
 **Branch:** `cursor/phase1-monorepo-scaffold`  
-**One-liner:** Pracuję — prod API na `c5ae7b9`, LinkedIn + Celery live, Stripe czeka na klucze founder.
+**One-liner:** Prod API `56f5241` — Stripe checkout live, Celery beat + worker OK, demo founder auto-apply, S3 data room czeka na `S3_*`.
 
 ---
 
@@ -10,43 +10,48 @@
 
 | Surface | Status |
 |---------|--------|
-| API deploy | `c5ae7b9` — tests + demo docs |
-| Vercel front | Aligned with scaffold (proxy `git_commit` match) |
+| API deploy | `56f5241` — Microsoft OAuth scripts + autonomous slices |
+| Vercel front | Proxy aligned with scaffold (`/status` → `git_commit`) |
 | Demo verify | **PASS** (`live_db`, top matches) |
 | LinkedIn OAuth | **Live** (`linkedin_oauth_configured: true`) |
-| Celery worker + beat | **Live** (`worker_active: true`) |
-| Stripe checkout | **Off** — brak `STRIPE_*` na Railway |
-| Microsoft Calendar | **Off** — brak credentials |
-| Mail (Resend) | Check `/status` |
+| Stripe checkout | **Live** (`stripe_checkout_ready: true`) |
+| Celery worker + beat | **Live** (`worker_active: true`, nightly beat scheduled) |
+| Google Calendar | **Configured** |
+| Microsoft Calendar | **Configured** (`microsoft_calendar_configured: true`) |
+| Mail (Resend) | **Configured** (`mail_configured: true`) |
+| Data room S3 | **Off** — `data_room_local_demo: true` until `S3_*` on Railway |
+| MRR | `0` paid subscribers (Stripe keys live; no prod subs yet) |
 
-Quick audit: [https://twin-sooty.vercel.app/status](https://twin-sooty.vercel.app/status)
-
----
-
-## Shipped this session (code)
-
-1. **`docs/STRIPE_RAILWAY_SETUP.md`** + **`scripts/railway-apply-stripe-env.sh`** — founder paste Stripe test keys without secrets in git.
-2. **Investor MRR stub** — `paid_subscribers` + `subscription_mrr_usd` on `/api/v1/public/mvp-stats` (null MRR until Stripe live).
-3. **`/status` health dashboard** — LinkedIn, Celery worker, nightly beat, recruiter inbox flags.
-4. **Recruiter inbox batch accept/decline** — multi-select + `POST /recruiter/inbox/respond-batch`.
-5. **Placement verification stepper** — pipeline → declared → verify → verified on dashboard apps.
-6. **WebCal polish** — expiry + HTTPS URL preview on calendar page.
+Quick audit: [https://twin-sooty.vercel.app/status](https://twin-sooty.vercel.app/status)  
+API health: [https://twin-production-bcd9.up.railway.app/api/v1/health](https://twin-production-bcd9.up.railway.app/api/v1/health)
 
 ---
 
-## Founder action (unblocks revenue)
+## Shipped this session (5 slices)
 
-1. Run `python3 scripts/stripe-bootstrap-test.py` with `sk_test_…` → paste into `.env.railway`.
-2. `./scripts/railway-apply-stripe-env.sh` → expect `stripe_checkout_ready: true`.
-3. Optional: Microsoft Graph OAuth (same pattern as LinkedIn).
+1. **Nightly auto-apply** — manual trigger mail (PL test copy) vs overnight EN copy; `scripts/verify-nightly-auto-apply.sh` + trigger script checks `auto_apply_runs` via ops token; pytest for mail + sweep row persistence.
+2. **RocketJobs** — card `data-testid` selectors + expanded HTML fixture (2 offers); parser tests.
+3. **S3 data room** — frontend file picker + presigned PUT when S3 configured; local dev `POST …/file` via `apiUpload`; S3 vs demo banners.
+4. **Placement work-email** — stepper handles `verify_pending` / `disputed`; resend link + in-progress copy; magic-link confirm on `/dashboard?placement_verify=`.
+5. **This doc** — refreshed prod table (Stripe on, Microsoft calendar on).
 
-Full checklist: `docs/STRIPE_RAILWAY_SETUP.md`, `EXECUTION_PROGRESS.md`.
+---
+
+## Founder verify on prod
+
+1. **Auto-apply:** `./scripts/trigger-founder-auto-apply.sh` → test mail (no “overnight”); `./scripts/verify-nightly-auto-apply.sh` with `OPS_ADMIN_TOKEN` after 02:00 Warsaw beat for `auto_apply_runs` row.
+2. **Stripe:** `/status` green; optional checkout test with test card.
+3. **Data room:** `/investor/data-room` — demo upload works locally; set `S3_BUCKET` + keys on Railway for presigned PUT (never commit secrets).
+4. **Placement:** Dashboard → hired/applied app → declare → work email → click magic link → stepper **Verified**.
+5. **RocketJobs:** Celery scrape logs or `python3 backend/scripts/run_scraper.py rocketjobs` locally.
 
 ---
 
 ## Next autonomous slices
 
-- Stripe E2E on prod after keys
-- Nightly auto-apply verification (02:00 UTC row in `auto_apply_runs`)
-- RocketJobs selector stabilization
-- Microsoft 365 calendar OAuth when credentials land
+- S3 data room on Railway (founder env only)
+- RocketJobs in `NIGHTLY_AUTO_APPLY_SUPPORTED_BOARDS` after scrape volume check
+- Stripe E2E paid subscriber on prod
+- Microsoft sign-in OAuth E2E (Entra app registered)
+
+Checklists: `docs/STRIPE_RAILWAY_SETUP.md`, `docs/NIGHTLY_AUTO_APPLY_DEPLOY.md`, `docs/PLACEMENT_VERIFICATION.md`.
