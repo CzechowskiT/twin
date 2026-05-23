@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Stripe Checkout Demo</title>
+    <style>
+      :root {
+        font-family: system-ui, -apple-system, sans-serif;
+        line-height: 1.5;
+        color: #0a2540;
+        background: #f6f9fc;
+      }
+      body {
+        max-width: 32rem;
+        margin: 4rem auto;
+        padding: 0 1rem;
+      }
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+      }
+      p {
+        color: #425466;
+      }
+      label {
+        display: block;
+        margin: 1rem 0 0.25rem;
+        font-weight: 600;
+      }
+      input {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #c4ccd8;
+        border-radius: 6px;
+        box-sizing: border-box;
+      }
+      button {
+        margin-top: 1.25rem;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #fff;
+        background: #635bff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .error {
+        color: #df1b41;
+        margin-top: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Stripe Checkout</h1>
+    <p>One-time payment demo ($20.00 USD per unit). You will be redirected to Stripe-hosted Checkout.</p>
+
+    <label for="quantity">Quantity</label>
+    <input id="quantity" type="number" min="1" value="1" />
+
+    <button id="checkout" type="button">Pay with Stripe</button>
+    <p id="error" class="error" hidden></p>
+
+    <script>
+      const checkoutBtn = document.getElementById("checkout");
+      const quantityInput = document.getElementById("quantity");
+      const errorEl = document.getElementById("error");
+
+      checkoutBtn.addEventListener("click", async () => {
+        errorEl.hidden = true;
+        checkoutBtn.disabled = true;
+
+        try {
+          const res = await fetch("/create-checkout-session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              quantity: Number(quantityInput.value) || 1,
+            }),
+          });
+
+          const data = await res.json();
+          if (!res.ok) {
+            throw new Error(data.error || "Checkout failed");
+          }
+          if (!data.url) {
+            throw new Error("No checkout URL returned");
+          }
+          window.location.href = data.url;
+        } catch (err) {
+          errorEl.textContent = err.message || "Something went wrong";
+          errorEl.hidden = false;
+          checkoutBtn.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>

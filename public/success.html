@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Payment successful</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 32rem;
+        margin: 4rem auto;
+        padding: 0 1rem;
+        color: #0a2540;
+      }
+      a {
+        color: #635bff;
+      }
+      pre {
+        background: #f6f9fc;
+        padding: 1rem;
+        border-radius: 6px;
+        overflow-x: auto;
+        font-size: 0.875rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Thank you!</h1>
+    <p>Your payment was submitted. Session details:</p>
+    <pre id="details">Loading…</pre>
+    <p><a href="/">Back to home</a></p>
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const sessionId = params.get("session_id");
+      const details = document.getElementById("details");
+
+      if (!sessionId) {
+        details.textContent = "No session_id in URL.";
+      } else {
+        fetch(`/checkout-session/${sessionId}`)
+          .then((r) => r.json())
+          .then((data) => {
+            details.textContent = JSON.stringify(data, null, 2);
+          })
+          .catch((err) => {
+            details.textContent = err.message || "Failed to load session";
+          });
+      }
+    </script>
+  </body>
+</html>
