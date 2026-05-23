@@ -85,7 +85,8 @@ export const SITE_MESSAGES_EN = {
     "Sourcers replaced a patchwork of tabs with a single feed and filters, improving hand-off to hiring managers with consistent URLs and timestamps.",
 
   faqPageTitle: "FAQ",
-  faqPageLead: "Straight answers about the live product and the roadmap.",
+  faqPageLead:
+    "Straight answers by persona — what is live in beta, what is phased, and how we aim for a calendar of acceptance instead of inbox spam.",
   faqMoreHome: "Product narrative and visuals also live on the home page.",
 
   footerTagline: "Autonomous career agent",
@@ -223,7 +224,8 @@ export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } 
     "Sourcerzy zamienili wiele kart na jeden feed i filtry, z lepszym przekazaniem do hiring managerów (URL, znaczniki czasu).",
 
   faqPageTitle: "FAQ",
-  faqPageLead: "Krótko o żywym produkcie i roadmapzie.",
+  faqPageLead:
+    "Odpowiedzi wg persony — co jest na żywo w becie, co jest etapowe i jak dążymy do kalendarza akceptacji zamiast spamu w skrzynce.",
   faqMoreHome: "Opowieść produktowa i sekcje wizualne są też na stronie głównej.",
 
   footerTagline: "Autonomiczny agent kariery",

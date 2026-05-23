@@ -16,11 +16,11 @@ export function LandingFaq() {
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-muted)]">{t("home.faqEyebrow")}</p>
           <h2 className="mt-3 max-w-3xl text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-3xl">{t("home.faqTitle")}</h2>
           <div className="mt-10">
-            <FaqPanel includeDataQuestion={false} layout="row" />
+            <FaqPanel section="general" limit={3} layout="row" />
           </div>
           <p className="mt-6 text-center text-sm text-[var(--twin-muted)]">
             <Link href="/faq" className="twin-link font-medium">
-              {t("nav.faq")}
+              {t("faq.homeCta")}
             </Link>
           </p>
         </ScrollReveal>

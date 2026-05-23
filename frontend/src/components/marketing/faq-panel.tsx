@@ -1,40 +1,70 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
+import {
+  FAQ_SECTIONS,
+  faqAnswerKey,
+  faqPairKey,
+  faqSectionLabelKey,
+  type FaqSectionId,
+} from "@/lib/faq-messages";
 
-export function useMarketingFaqItems(includeDataQuestion = true) {
+export type FaqPanelItem = {
+  id: string;
+  q: string;
+  a: string;
+  showPrivacyLink?: boolean;
+};
+
+function useFaqSectionItems(section: FaqSectionId, limit?: number): FaqPanelItem[] {
   const { t } = useTranslation();
+  const meta = FAQ_SECTIONS.find((s) => s.id === section)!;
+  const count = limit != null ? Math.min(limit, meta.count) : meta.count;
+
   return useMemo(() => {
-    const all = [
-      { id: "01", q: t("home.faq01Q"), a: t("home.faq01A") },
-      { id: "02", q: t("home.faq02Q"), a: t("home.faq02A") },
-      { id: "03", q: t("home.faq03Q"), a: t("home.faq03A") },
-      { id: "04", q: t("home.faq04Q"), a: t("home.faq04A") },
-    ] as const;
-    return includeDataQuestion ? [...all] : all.filter((item) => item.id !== "04");
-  }, [t, includeDataQuestion]);
+    const items: FaqPanelItem[] = [];
+    for (let i = 1; i <= count; i += 1) {
+      const num = String(i).padStart(2, "0");
+      items.push({
+        id: `${section.slice(0, 1).toUpperCase()}${num}`,
+        q: t(`faq.${faqPairKey(section, i)}`),
+        a: t(`faq.${faqAnswerKey(section, i)}`),
+        showPrivacyLink: section === "general" && i === 5,
+      });
+    }
+    return items;
+  }, [t, section, count]);
 }
 
-/** Shared FAQ disclosure list (home + /faq). */
+export function useMarketingFaqItems(options?: {
+  section?: FaqSectionId;
+  limit?: number;
+}): FaqPanelItem[] {
+  const section = options?.section ?? "general";
+  return useFaqSectionItems(section, options?.limit);
+}
+
+/** Shared FAQ disclosure list (home teaser + /faq sections). */
 export function FaqPanel({
   className = "",
-  includeDataQuestion = true,
   layout = "stack",
+  section = "general",
+  limit,
 }: {
   className?: string;
-  /** Home omits the data/consent FAQ; full list stays on /faq. */
-  includeDataQuestion?: boolean;
-  /** `row`: three cards in one row from `md` (home); `stack`: single column list (/faq). */
+  /** `row`: cards in one row from `md` (home); `stack`: single column list (/faq). */
   layout?: "stack" | "row";
+  section?: FaqSectionId;
+  limit?: number;
 }) {
   const { t } = useTranslation();
-  const items = useMarketingFaqItems(includeDataQuestion);
+  const items = useFaqSectionItems(section, limit);
   const rowLayout = layout === "row";
 
-  const itemShell = (item: (typeof items)[number]) => (
+  const itemShell = (item: FaqPanelItem) => (
     <details
       key={item.id}
       className={
@@ -57,7 +87,7 @@ export function FaqPanel({
       </summary>
       <div className="border-t border-[var(--twin-border)]/80 px-5 pb-5 pt-3 text-sm leading-relaxed text-[var(--foreground)] sm:px-6 sm:text-[15px]">
         <p>{item.a}</p>
-        {item.id === "04" ? (
+        {item.showPrivacyLink ? (
           <p className="mt-3">
             <Link href="/privacy" className="twin-link font-medium">
               {t("home.faqPrivacyLink")}
@@ -77,6 +107,45 @@ export function FaqPanel({
           {items.map(itemShell)}
         </div>
       )}
+    </div>
+  );
+}
+
+/** Section tabs + accordion for /faq. */
+export function FaqPageSections({ className = "" }: { className?: string }) {
+  const { t } = useTranslation();
+  const [active, setActive] = useState<FaqSectionId>("general");
+
+  return (
+    <div className={className}>
+      <div
+        className="flex flex-wrap gap-2 border-b border-[var(--twin-border)] pb-4"
+        role="tablist"
+        aria-label={t("home.faqTitle")}
+      >
+        {FAQ_SECTIONS.map((sec) => {
+          const selected = active === sec.id;
+          return (
+            <button
+              key={sec.id}
+              type="button"
+              role="tab"
+              aria-selected={selected}
+              className={
+                selected
+                  ? "rounded-full border border-[var(--twin-accent)] bg-[var(--twin-accent-muted)] px-4 py-2 text-sm font-semibold text-[var(--twin-accent)]"
+                  : "rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-4 py-2 text-sm font-medium text-[var(--twin-muted-strong)] transition hover:border-[var(--twin-accent)]/40 hover:text-[var(--foreground)]"
+              }
+              onClick={() => setActive(sec.id)}
+            >
+              {t(`faq.${faqSectionLabelKey(sec.id)}`)}
+            </button>
+          );
+        })}
+      </div>
+      <div className="mt-8" role="tabpanel">
+        <FaqPanel section={active} layout="stack" />
+      </div>
     </div>
   );
 }

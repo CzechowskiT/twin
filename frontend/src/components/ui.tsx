@@ -67,9 +67,18 @@ export function Card({
   );
 }
 
-export function Label({ children }: { children: ReactNode }) {
+export function Label({
+  children,
+  htmlFor,
+}: {
+  children: ReactNode;
+  htmlFor?: string;
+}) {
   return (
-    <label className="mb-1 block text-sm font-semibold text-[var(--twin-muted-strong)]">
+    <label
+      htmlFor={htmlFor}
+      className="mb-1 block text-sm font-semibold text-[var(--twin-muted-strong)]"
+    >
       {children}
     </label>
   );

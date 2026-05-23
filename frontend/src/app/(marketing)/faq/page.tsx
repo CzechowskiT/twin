@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { FaqPanel } from "@/components/marketing/faq-panel";
+import { FaqPageSections } from "@/components/marketing/faq-panel";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { ScrollReveal } from "@/components/marketing/scroll-reveal";
 import { useTranslation } from "@/components/language-provider";
@@ -27,7 +27,7 @@ export default function FaqPage() {
           </p>
         </ScrollReveal>
         <div className="mt-10">
-          <FaqPanel />
+          <FaqPageSections />
         </div>
       </MarketingPageSurface>
     </Shell>
