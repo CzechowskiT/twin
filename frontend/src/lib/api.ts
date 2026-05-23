@@ -8,9 +8,13 @@
  * DNS), we **retry once** via the same-origin proxy so actions like auto-apply still work without
  * manual env surgery on every preview URL.
  * Multipart uploads use the public API origin when set to reduce Vercel function body limits on proxies.
+ *
+ * When the third `token` argument is omitted, the browser reads `twin_access_token` from storage so
+ * modals and forms do not need to thread `getToken()` on every call.
  */
 
 import { getClientApiLocale } from "@/lib/api-locale";
+import { clearToken, getToken } from "@/lib/auth";
 import { getPublicApiBase } from "@/lib/public-api-base";
 
 /** Same-origin relative path (SSR and unauthenticated browser calls). */
@@ -61,12 +65,21 @@ async function parseError(res: Response): Promise<string> {
   return res.statusText ? `${res.status} ${res.statusText}` : `HTTP ${res.status}`;
 }
 
-/** When the server echoes a request id, append it for support correlation (single line for inline UI). */
+const REQUEST_ID_IN_MESSAGE = /\s*request\s*id:\s*[\w-]+/gi;
+
+/** Strip support correlation ids from strings shown to users (toasts, inline errors). */
+export function stripRequestIdFromUserMessage(message: string): string {
+  return message.replace(REQUEST_ID_IN_MESSAGE, "").trim();
+}
+
+/** Log request id for support; never append it to user-facing copy. */
 export function formatApiErrorMessageWithResponseId(message: string, res: Response): string {
-  const trimmed = message.trim();
+  const trimmed = stripRequestIdFromUserMessage(message);
   const rid = res.headers.get("X-Request-ID")?.trim();
-  if (!rid) return trimmed;
-  return `${trimmed} Request ID: ${rid}`;
+  if (rid && typeof console !== "undefined") {
+    console.warn("[TWIN API]", trimmed, { requestId: rid });
+  }
+  return trimmed;
 }
 
 function ensureLocaleHeader(headers: Headers, locale?: string | null): void {
@@ -85,6 +98,55 @@ function ensureTraceHeaders(headers: Headers): void {
   headers.set("X-Request-ID", id);
 }
 
+/** `undefined` → browser storage; `null` → force unauthenticated; string → explicit bearer. */
+function resolveAuthToken(token?: string | null): string | null {
+  if (token === undefined) {
+    return typeof window !== "undefined" ? getToken() : null;
+  }
+  return token;
+}
+
+function isAuthFailureMessage(message: string): boolean {
+  const lower = message.trim().toLowerCase();
+  return (
+    lower.includes("401") ||
+    lower.includes("invalid token") ||
+    lower.includes("inactive user") ||
+    lower.includes("not authenticated") ||
+    lower.includes("could not validate credentials")
+  );
+}
+
+function handleAuthFailure(status: number, message: string): void {
+  if (typeof window === "undefined") return;
+  const authFailure = status === 401 || (status === 403 && isAuthFailureMessage(message)) || isAuthFailureMessage(message);
+  if (!authFailure) return;
+  clearToken();
+  const path = window.location.pathname;
+  if (path === "/login" || path.startsWith("/login/")) return;
+  const next = `${window.location.pathname}${window.location.search}`;
+  const loginUrl = next && next !== "/" ? `/login?next=${encodeURIComponent(next)}` : "/login";
+  window.location.assign(loginUrl);
+}
+
+function applyAuthHeaders(headers: Headers, token?: string | null): boolean {
+  const resolvedToken = resolveAuthToken(token);
+  const hasAuth = Boolean(resolvedToken);
+  if (hasAuth) {
+    const bearer = `Bearer ${resolvedToken}`;
+    headers.set("Authorization", bearer);
+    headers.set("X-Twin-Authorization", bearer);
+  }
+  return hasAuth;
+}
+
+async function throwIfNotOk(res: Response): Promise<void> {
+  if (res.ok) return;
+  const errMsg = formatApiErrorMessageWithResponseId(await parseError(res), res);
+  handleAuthFailure(res.status, errMsg);
+  throw new Error(errMsg);
+}
+
 export type ApiFetchOptions = RequestInit & { locale?: string | null };
 
 export async function apiFetch<T>(
@@ -100,12 +162,7 @@ export async function apiFetch<T>(
   if (method !== "GET" && method !== "HEAD") {
     headers.set("Content-Type", "application/json");
   }
-  const hasAuth = Boolean(token);
-  if (hasAuth) {
-    const bearer = `Bearer ${token}`;
-    headers.set("Authorization", bearer);
-    headers.set("X-Twin-Authorization", bearer);
-  }
+  const hasAuth = applyAuthHeaders(headers, token);
 
   const directOrigin = clientApiOriginForRequest(hasAuth);
   const fetchOpts: RequestInit = {
@@ -124,7 +181,7 @@ export async function apiFetch<T>(
       throw err;
     }
   }
-  if (!res.ok) throw new Error(formatApiErrorMessageWithResponseId(await parseError(res), res));
+  await throwIfNotOk(res);
   if (res.status === 204) return undefined as T;
   try {
     return (await res.json()) as T;
@@ -148,12 +205,7 @@ export async function apiFetchBlob(
   if (method !== "GET" && method !== "HEAD") {
     headers.set("Content-Type", "application/json");
   }
-  const hasAuth = Boolean(token);
-  if (hasAuth) {
-    const bearer = `Bearer ${token}`;
-    headers.set("Authorization", bearer);
-    headers.set("X-Twin-Authorization", bearer);
-  }
+  const hasAuth = applyAuthHeaders(headers, token);
 
   const directOrigin = clientApiOriginForRequest(hasAuth);
   const fetchOpts: RequestInit = {
@@ -172,7 +224,7 @@ export async function apiFetchBlob(
       throw err;
     }
   }
-  if (!res.ok) throw new Error(formatApiErrorMessageWithResponseId(await parseError(res), res));
+  await throwIfNotOk(res);
   try {
     return await res.blob();
   } catch (e) {
@@ -200,12 +252,7 @@ export async function apiUpload<T>(
 ): Promise<T> {
   const headers = new Headers();
   ensureTraceHeaders(headers);
-  const hasAuth = Boolean(token);
-  if (hasAuth) {
-    const bearer = `Bearer ${token}`;
-    headers.set("Authorization", bearer);
-    headers.set("X-Twin-Authorization", bearer);
-  }
+  const hasAuth = applyAuthHeaders(headers, token);
 
   const body = new FormData();
   body.append("file", file);
@@ -233,6 +280,6 @@ export async function apiUpload<T>(
       throw err;
     }
   }
-  if (!res.ok) throw new Error(await parseError(res));
+  await throwIfNotOk(res);
   return res.json() as Promise<T>;
 }
