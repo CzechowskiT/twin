@@ -18,6 +18,10 @@ import {
   EMPLOYER_FAQ_MESSAGES_PL,
 } from "./employer-faq-messages";
 import {
+  EMPLOYER_ABOUT_MESSAGES_EN,
+  EMPLOYER_ABOUT_MESSAGES_PL,
+} from "./employer-about-messages";
+import {
   JOB_EMPLOYER_MESSAGES_EN,
   JOB_EMPLOYER_MESSAGES_PL,
 } from "./job-employer-messages";
@@ -127,7 +131,8 @@ export type TranslationKey =
   | `first1000.${keyof typeof en.first1000}`
   | `ux.${keyof typeof en.ux}`
   | `employerMedia.${keyof typeof EMPLOYER_MEDIA_MESSAGES_EN}`
-  | `jobEmployer.${keyof typeof JOB_EMPLOYER_MESSAGES_EN}`;
+  | `jobEmployer.${keyof typeof JOB_EMPLOYER_MESSAGES_EN}`
+  | `jobEmployer.${keyof typeof EMPLOYER_FAQ_MESSAGES_EN}`;
 
 const en = {
   nav: {
@@ -2341,7 +2346,7 @@ const en = {
       "Order of delivery can change; some items may be tier-gated when they ship. Tell us what you would open weekly. It steers the roadmap.",
   },
   employerMedia: EMPLOYER_MEDIA_MESSAGES_EN,
-  jobEmployer: JOB_EMPLOYER_MESSAGES_EN,
+  jobEmployer: { ...JOB_EMPLOYER_MESSAGES_EN, ...EMPLOYER_FAQ_MESSAGES_EN },
   ux: {
     flowNavAria: "Your workspace steps",
     flowStepDashboard: "Dashboard",

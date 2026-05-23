@@ -8,6 +8,7 @@ import { JobEmployerCaseStudiesTab } from "@/components/job-employer/tabs/job-em
 import { JobEmployerOverviewTab } from "@/components/job-employer/tabs/overview-tab";
 import { JobEmployerPartnersTab } from "@/components/job-employer/tabs/partners-tab";
 import { JobEmployerPricingTab } from "@/components/job-employer/tabs/pricing-tab";
+import { JobEmployerAboutTab } from "@/components/job-employer/tabs/about-tab";
 import { JobEmployerHowItWorksTab } from "@/components/job-employer/tabs/how-it-works-tab";
 import { JobEmployerRolesTab } from "@/components/job-employer/tabs/roles-tab";
 import { JOB_EMPLOYER_TAB_ORDER, type JobEmployerTabId } from "@/lib/job-employer-demo";
@@ -15,6 +16,7 @@ import type { JOB_EMPLOYER_MESSAGES_EN } from "@/lib/job-employer-messages";
 
 const TAB_LABEL_KEYS: Record<JobEmployerTabId, keyof typeof JOB_EMPLOYER_MESSAGES_EN> = {
   overview: "tabOverview",
+  about: "tabAbout",
   howItWorks: "tabHowItWorks",
   media: "tabMedia",
   partners: "tabPartners",
@@ -96,6 +98,7 @@ export function JobEmployerTabs({
         {activeTab === "overview" ? (
           <JobEmployerOverviewTab company={company} jobTitle={jobTitle} location={location} />
         ) : null}
+        {activeTab === "about" ? <JobEmployerAboutTab company={company} /> : null}
         {activeTab === "roles" ? (
           <JobEmployerRolesTab company={company} jobTitle={jobTitle} location={location} />
         ) : null}
