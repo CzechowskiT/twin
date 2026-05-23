@@ -23,6 +23,10 @@ import {
 } from "./job-employer-messages";
 import { SITE_MESSAGES_EN, SITE_MESSAGES_PL } from "./site-messages";
 import {
+  INTEGRATIONS_HUB_MESSAGES_EN,
+  INTEGRATIONS_HUB_MESSAGES_PL,
+} from "./integrations-hub-i18n";
+import {
   CANDIDATE_REWARDS_MESSAGES_EN,
   CANDIDATE_REWARDS_MESSAGES_PL,
 } from "./candidate-rewards-messages";
@@ -113,6 +117,9 @@ export type TranslationKey =
   | `placementDemo.${keyof typeof en.placementDemo}`
   | `referrals.${keyof typeof en.referrals}`
   | `atsIntegrations.${keyof typeof en.atsIntegrations}`
+  | `integrationsHub.${keyof typeof INTEGRATIONS_HUB_MESSAGES_EN}`
+  | `integrationsHub.category.${keyof typeof INTEGRATIONS_HUB_MESSAGES_EN.category}`
+  | `integrationsHub.items.${keyof typeof INTEGRATIONS_HUB_MESSAGES_EN.items}.${"name" | "description"}`
   | `dataRoom.${keyof typeof en.dataRoom}`
   | `careerAssistant.${keyof typeof en.careerAssistant}`
   | `jobBrief.${keyof typeof en.jobBrief}`
@@ -1429,7 +1436,7 @@ const en = {
     toolRecruiterJobs: "Publish employer job listings tied to your company slug.",
     toolRecruiterB2b: "Illustrative fee model for client conversations.",
     toolRecruiterStory: "How TWIN works for recruiting teams (marketing).",
-    toolRecruiterAts: "Greenhouse, Lever, Ashby hire webhooks → verified placement.",
+    toolRecruiterAts: "Pracuj.pl, LinkedIn Hiring, Greenhouse/Lever webhooks → verified placement.",
     toolInvestorDataRoom: "Traction pack + confidential docs on request.",
     toolInvestorCalc: "Five-year scenario model (illustrative, not advice).",
     toolInvestorStory: "Investor lane overview (marketing).",
@@ -1671,8 +1678,8 @@ const en = {
     cashOutNoHistory: "No cash-out requests yet.",
   },
   atsIntegrations: {
-    title: "ATS webhooks",
-    lead: "Confirm hires inside Greenhouse, Lever, or Ashby — TWIN marks placement verified without email ping-pong.",
+    title: "Integrations hub",
+    lead: "Connect Pracuj.pl, LinkedIn Hiring, and global ATS — hire webhooks still live below.",
     webhookUrl: "Webhook URL",
     secretOk: "Secret configured on API",
     secretMissing: "Secret not set on API — configure env before production",
@@ -1696,6 +1703,7 @@ const en = {
     connectOAuth: "Connect {name}",
     oauthDisabledHint: "Enable when Greenhouse/Lever OAuth credentials are configured on the API",
   },
+  integrationsHub: INTEGRATIONS_HUB_MESSAGES_EN,
   careerAssistant: {
     intelEyebrow: "Company intelligence",
     intelLoading: "Researching company and role…",
@@ -3865,7 +3873,7 @@ const pl: MessageTree = {
     toolRecruiterJobs: "Publikuj ogłoszenia pracodawcy powiązane ze slugiem firmy.",
     toolRecruiterB2b: "Ilustracyjny model opłat do rozmów z klientem.",
     toolRecruiterStory: "Jak TWIN działa dla zespołów rekrutacyjnych (marketing).",
-    toolRecruiterAts: "Webhooki Greenhouse, Lever, Ashby → zweryfikowany placement.",
+    toolRecruiterAts: "Pracuj.pl, LinkedIn Hiring, webhooki Greenhouse/Lever → placement.",
     toolInvestorDataRoom: "Pakiet trakcji + dokumenty poufne na żądanie.",
     toolInvestorCalc: "Model pięcioletni (ilustracyjny, nie porada inwestycyjna).",
     toolInvestorStory: "Przegląd ścieżki inwestora (marketing).",
@@ -4107,8 +4115,8 @@ const pl: MessageTree = {
     cashOutNoHistory: "Brak zleceń wypłaty.",
   },
   atsIntegrations: {
-    title: "Webhooki ATS",
-    lead: "Potwierdź zatrudnienia w Greenhouse, Lever lub Ashby — TWIN oznacza placement bez ping-ponga mailowego.",
+    title: "Centrum integracji",
+    lead: "Połącz Pracuj.pl, LinkedIn Hiring i globalne ATS — webhooki poniżej nadal działają.",
     webhookUrl: "URL webhooka",
     secretOk: "Sekret ustawiony na API",
     secretMissing: "Brak sekretu na API — ustaw env przed produkcją",
@@ -4132,6 +4140,7 @@ const pl: MessageTree = {
     connectOAuth: "Połącz {name}",
     oauthDisabledHint: "Aktywne po skonfigurowaniu OAuth Greenhouse/Lever na API",
   },
+  integrationsHub: INTEGRATIONS_HUB_MESSAGES_PL,
   careerAssistant: {
     intelEyebrow: "Inteligencja firmy",
     intelLoading: "Analizuję firmę i rolę…",

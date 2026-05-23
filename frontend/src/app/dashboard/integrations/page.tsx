@@ -4,7 +4,7 @@ import { IntegrationsHubPanel } from "@/components/integrations/integrations-hub
 import { useTranslation } from "@/components/language-provider";
 import { Shell } from "@/components/ui";
 
-export default function RecruiterAtsIntegrationsPage() {
+export default function CandidateIntegrationsPage() {
   const { t } = useTranslation();
 
   return (
@@ -14,13 +14,12 @@ export default function RecruiterAtsIntegrationsPage() {
           {t("integrationsHub.title")}
         </p>
         <h1 className="twin-page-intro text-2xl font-semibold sm:text-3xl">{t("integrationsHub.title")}</h1>
-        <p className="twin-muted max-w-2xl text-sm leading-relaxed">{t("integrationsHub.leadRecruiter")}</p>
+        <p className="twin-muted max-w-2xl text-sm leading-relaxed">{t("integrationsHub.leadCandidate")}</p>
       </header>
       <IntegrationsHubPanel
-        persona="recruiter"
-        showLegacyAts
-        backHref="/workspace/recruiter"
-        backLabelKey="integrationsHub.backRecruiter"
+        persona="candidate"
+        backHref="/dashboard"
+        backLabelKey="integrationsHub.backCandidate"
       />
     </Shell>
   );

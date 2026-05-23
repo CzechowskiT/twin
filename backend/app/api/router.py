@@ -17,11 +17,13 @@ from app.api import (
     calendar_microsoft,
     candidates,
     career_assistant,
+    career_discovery,
     curated_careers,
     geo,
     health,
     feedback,
     integrations_ats,
+    integrations_hub,
     jobs,
     kyc,
     linkedin_viral,
@@ -51,8 +53,12 @@ api_router.include_router(candidates.router, prefix="/candidates", tags=["Candid
 api_router.include_router(
     career_assistant.router, prefix="/career-assistant", tags=["Career assistant"]
 )
+api_router.include_router(
+    career_discovery.router, prefix="/career-discovery", tags=["Career discovery"]
+)
 api_router.include_router(talent_pool.router, prefix="/talent-pool", tags=["Talent pool"])
 api_router.include_router(integrations_ats.router, prefix="/integrations", tags=["Integrations"])
+api_router.include_router(integrations_hub.router, prefix="/integrations", tags=["Integrations"])
 api_router.include_router(jobs.router, prefix="/jobs", tags=["Jobs"])
 api_router.include_router(placement.router, prefix="/placement", tags=["Placement"])
 api_router.include_router(curated_careers.router, prefix="/employers", tags=["Employers"])

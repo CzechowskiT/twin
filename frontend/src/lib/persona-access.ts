@@ -29,6 +29,8 @@ const PATH_IMPLIES_PERSONA: { prefix: string; persona: MarketingPersona }[] = [
   { prefix: "/workspace/investor", persona: "investor" },
   { prefix: "/workspace", persona: "candidate" },
   { prefix: "/recruiter/integrations", persona: "recruiter" },
+  { prefix: "/company/integrations", persona: "company" },
+  { prefix: "/dashboard/integrations", persona: "candidate" },
   { prefix: "/investor", persona: "investor" },
   { prefix: "/login/candidate", persona: "candidate" },
   { prefix: "/login/recruiter", persona: "recruiter" },
@@ -53,6 +55,8 @@ const PREFIX_ALLOWED: { prefix: string; allowed: readonly MarketingPersona[] }[]
   { prefix: "/calculator/b2b", allowed: ["company", "recruiter"] },
   { prefix: "/calculator", allowed: ["recruiter"] },
   { prefix: "/recruiter/integrations", allowed: ["recruiter"] },
+  { prefix: "/company/integrations", allowed: ["company", "recruiter"] },
+  { prefix: "/dashboard/integrations", allowed: ["candidate"] },
   { prefix: "/recruiter", allowed: ["recruiter"] },
   { prefix: "/for-investors", allowed: ["investor"] },
   { prefix: "/for-recruiters", allowed: ["recruiter"] },
@@ -281,12 +285,14 @@ export function headerSessionNavLinks(
     return [
       { href: "/dashboard/calendar", labelKey: "dashboard.calendarLink" },
       { href: "/dashboard", labelKey: "nav.dashboard" },
+      { href: "/dashboard/integrations", labelKey: "integrationsHub.title" },
       { href: "/demo", labelKey: "nav.demo" },
     ];
   }
   if (persona === "recruiter") {
     return [
       { href: "/recruiter/inbox", labelKey: "recruiterInbox.title" },
+      { href: "/recruiter/integrations/ats", labelKey: "integrationsHub.title" },
       { href: "/workspace/recruiter", labelKey: "workspace.recruiterHome" },
     ];
   }
@@ -298,6 +304,7 @@ export function headerSessionNavLinks(
   }
   return [
     { href: "/for-companies", labelKey: "nav.forCompanies" },
+    { href: "/company/integrations", labelKey: "integrationsHub.title" },
     { href: "/calculator/b2b", labelKey: "nav.calculatorB2bForCompanies" },
   ];
 }

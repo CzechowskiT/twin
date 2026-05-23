@@ -94,6 +94,10 @@ def health_check(
             (s.ops_admin_token or "").strip() or (s.beta_admin_token or "").strip()
         )
         out["partner_export_configured"] = bool((s.partner_export_token or "").strip())
+        from app.api.integrations_hub import is_pracuj_integration_configured
+
+        out["pracuj_integration_configured"] = is_pracuj_integration_configured(s)
+        out["linkedin_hiring_oauth_configured"] = bool((s.linkedin_hiring_client_id or "").strip())
     return out
 
 

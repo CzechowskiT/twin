@@ -41,7 +41,7 @@ type AtsSetup = {
   linkage_note: string;
 };
 
-export function AtsIntegrationsPanel() {
+export function AtsIntegrationsPanel({ embedded = false }: { embedded?: boolean }) {
   const { t } = useTranslation();
   const [setup, setSetup] = useState<AtsSetup | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -178,9 +178,11 @@ export function AtsIntegrationsPanel() {
           {t("atsIntegrations.docsLink")}
         </a>
       </Card>
-      <Link href="/workspace/recruiter" className="twin-link text-sm font-medium">
-        ← {t("atsIntegrations.backRecruiter")}
-      </Link>
+      {!embedded ? (
+        <Link href="/workspace/recruiter" className="twin-link text-sm font-medium">
+          ← {t("atsIntegrations.backRecruiter")}
+        </Link>
+      ) : null}
     </div>
   );
 }

@@ -298,6 +298,10 @@ class Settings(BaseSettings):
     lever_oauth_redirect_uri: str = ""
     ashby_webhook_secret: str = ""
 
+    pracuj_partner_api_enabled: str = ""
+    linkedin_hiring_client_id: str = ""
+    linkedin_hiring_client_secret: str = ""
+
     # S3-compatible storage (AWS S3, Cloudflare R2, MinIO). Empty keys = disabled.
     s3_endpoint_url: str = ""
     s3_access_key_id: str = ""
