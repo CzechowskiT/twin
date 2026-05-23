@@ -183,9 +183,9 @@ Można też dopisać: `priorytetyzuj wyżej: 18, 44, 91`.
 
 | Priorytet | Horyzont | Liczba zadań (1–99) |
 |-----------|----------|---------------------|
-| **P0** | następne **2 tygodnie** | **18** |
-| **P1** | **miesiąc 2** (tygodnie 3–6) | **55** |
-| **P2** | **backlog** | **26** (+ pkt 100 informacyjny) |
+| **P0** | następne **2 tygodnie** | **19** |
+| **P1** | **miesiąc 2** (tygodnie 3–6) | **54** |
+| **P2** | **backlog** | **27** (w tym pkt 100 — wpis o wykluczeniach) |
 
 **Balans obszarów (zadania 1–99):**
 
