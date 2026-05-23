@@ -19,19 +19,23 @@ export function LandingCtaBand() {
               <p className="mt-3 text-lg font-semibold tracking-[-0.02em] text-[var(--foreground)] sm:text-xl">
                 {t("home.ctaBandTitle")}
               </p>
+              <p className="mt-2 text-xs text-[var(--twin-muted-strong)]">{t("home.ctaBandMicro")}</p>
             </div>
-            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
+              <div className="flex flex-col gap-1.5">
+                <Link
+                  href="/register"
+                  className="section-cta-primary marketing-btn-primary-shadow twin-touch-target px-7 text-sm"
+                >
+                  {t("home.getStarted")}
+                </Link>
+                <p className="text-center text-[11px] text-[var(--twin-accent)] sm:text-start">{t("home.ctaRegisterMicro")}</p>
+              </div>
               <Link
-                href="/register"
-                className="section-cta-primary marketing-btn-primary-shadow twin-touch-target px-7 text-sm"
+                href="/demo"
+                className="section-cta-secondary twin-touch-target px-7 text-sm text-center"
               >
-                {t("home.getStarted")}
-              </Link>
-              <Link
-                href="/how-it-works"
-                className="section-cta-secondary twin-touch-target px-7 text-sm"
-              >
-                {t("home.howDetailLink")}
+                {t("home.ctaDemoSecondary")}
               </Link>
             </div>
           </BentoSpotlight>

@@ -2097,7 +2097,7 @@ html[data-marketing-surface="studio"] .twin-roi-enterprise-strip-muted {
   }
 }
 
-a.landing-hero-demo-cta {
+a.landing-hero-register-cta {
   min-height: 3.25rem;
   padding-left: 2.5rem;
   padding-right: 2.5rem;
@@ -2110,9 +2110,73 @@ a.landing-hero-demo-cta {
     0 20px 48px -16px rgb(52 211 153 / 0.45);
 }
 
-html[data-marketing-surface="studio"] a.landing-hero-demo-cta {
+html[data-marketing-surface="studio"] a.landing-hero-register-cta {
   background: linear-gradient(135deg, #34d399 0%, #10b981 55%, #059669 100%);
   color: #022c22 !important;
+}
+
+a.landing-hero-demo-cta--secondary {
+  min-height: auto;
+  padding: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+.landing-register-teaser__preview {
+  filter: blur(5px);
+  opacity: 0.92;
+  user-select: none;
+  pointer-events: none;
+}
+
+.landing-register-teaser__overlay {
+  background: linear-gradient(
+    180deg,
+    rgb(var(--twin-surface-rgb, 15 23 20) / 0.55) 0%,
+    rgb(var(--twin-surface-rgb, 15 23 20) / 0.88) 45%,
+    rgb(var(--twin-surface-rgb, 15 23 20) / 0.94) 100%
+  );
+  backdrop-filter: blur(2px);
+}
+
+.landing-inside-step {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.landing-inside-step:hover {
+  border-color: rgb(52 211 153 / 0.35);
+  box-shadow: 0 8px 28px -12px rgb(52 211 153 / 0.2);
+}
+
+.landing-sticky-cta {
+  animation: landing-sticky-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes landing-sticky-in {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.marketing-journey-host:has(.landing-sticky-cta) {
+  padding-bottom: 5.5rem;
+}
+
+@media (min-width: 768px) {
+  .marketing-journey-host:has(.landing-sticky-cta) {
+    padding-bottom: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-sticky-cta {
+    animation: none;
+  }
 }
 
 .landing-trust-cue {

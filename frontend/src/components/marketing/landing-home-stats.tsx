@@ -1,46 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
 import { useTranslation } from "@/components/language-provider";
 import { ScrollReveal } from "@/components/marketing/scroll-reveal";
-
-type MvpStats = {
-  validated_jobs: number;
-  registered_users: number;
-  total_applications: number;
-  job_boards_in_registry: number;
-};
-
-const FALLBACK: MvpStats = {
-  validated_jobs: 12840,
-  registered_users: 420,
-  total_applications: 890,
-  job_boards_in_registry: 24,
-};
+import { useMvpStats } from "@/lib/use-mvp-stats";
 
 export function LandingHomeStats() {
   const { t, locale } = useTranslation();
-  const [data, setData] = useState<MvpStats | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    void (async () => {
-      try {
-        const res = await fetch("/api/v1/public/mvp-stats", { cache: "no-store" });
-        if (!res.ok) return;
-        const json = (await res.json()) as MvpStats;
-        if (!cancelled) setData(json);
-      } catch {
-        /* use fallback */
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const stats = data ?? FALLBACK;
+  const stats = useMvpStats();
   const loc = locale === "pl" ? "pl-PL" : "en-US";
   const fmt = (n: number) => n.toLocaleString(loc);
 

@@ -9,6 +9,9 @@ import { DemoLiveSnapshot } from "@/components/marketing/demo-live-snapshot";
 import { LandingHero } from "@/components/marketing/landing-hero";
 import { LandingHomeStats } from "@/components/marketing/landing-home-stats";
 import { LandingHowItWorks } from "@/components/marketing/landing-how-it-works";
+import { LandingInsideSteps } from "@/components/marketing/landing-inside-steps";
+import { LandingRegisterTeaser } from "@/components/marketing/landing-register-teaser";
+import { LandingStickyCta } from "@/components/marketing/landing-sticky-cta";
 import { LandingTrustCue } from "@/components/marketing/landing-trust-cue";
 import { PageMomentumRail } from "@/components/page-momentum-rail";
 
@@ -21,13 +24,16 @@ export default function Home() {
         <LandingTrustCue />
         <div className="mx-auto w-full max-w-6xl space-y-2 px-4 sm:px-6">
           <LandingHomeStats />
-          <DemoLiveSnapshot />
+          <DemoLiveSnapshot fullDemoHref="/demo" />
         </div>
+        <LandingRegisterTeaser />
+        <LandingInsideSteps />
         <LandingHowItWorks />
         <LandingFeatureGrid />
         <LandingBento />
         <LandingFaq />
         <LandingCtaBand />
+        <LandingStickyCta />
         <PageMomentumRail variant="marketing" />
       </div>
     </div>
