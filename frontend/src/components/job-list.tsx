@@ -1,5 +1,8 @@
 "use client";
 
+import { RemotePercentageLabel } from "@/components/job/RemotePercentageLabel";
+import { SeniorityBadge } from "@/components/job/SeniorityBadge";
+import { TechStackIcons } from "@/components/job/TechStackIcons";
 import { useTranslation } from "@/components/language-provider";
 import { applicationStatusKey } from "@/lib/application-status";
 
@@ -15,6 +18,9 @@ export type JobRow = {
   match_reason?: string | null;
   salary_min?: number | null;
   salary_max?: number | null;
+  tech_stack?: string[];
+  seniority_level?: string | null;
+  remote_percentage?: number | null;
 };
 
 function formatSalary(min?: number | null, max?: number | null): string | null {
@@ -107,6 +113,11 @@ export function JobList({
                   {item.match_reason.trim()}
                 </p>
               ) : null}
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <SeniorityBadge level={item.seniority_level} />
+                <RemotePercentageLabel pct={item.remote_percentage} />
+                <TechStackIcons stack={item.tech_stack ?? []} max={4} />
+              </div>
             </a>
             {showActionRow && (
               <div className="flex flex-wrap gap-2">
