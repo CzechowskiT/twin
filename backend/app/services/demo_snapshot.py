@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from datetime import datetime, timedelta, timezone
 
 from sqlalchemy import select
@@ -28,6 +29,9 @@ from app.schemas.demo import (
     DemoSnapshotOut,
 )
 from app.services.investor_demo_seed import DEMO_JOB_PREFIX, demo_email_from_env
+
+logger = logging.getLogger(__name__)
+
 _STATIC_MATCHES = [
     DemoJobMatchOut(
         title="Senior Python Developer",
@@ -106,6 +110,14 @@ def _static_snapshot(settings: Settings, *, user_found: bool) -> DemoSnapshotOut
 
 def build_demo_snapshot(db: Session, settings: Settings) -> DemoSnapshotOut:
     """Load seeded demo user when present; otherwise return marketing-safe static data."""
+    try:
+        return _build_demo_snapshot(db, settings)
+    except Exception:
+        logger.exception("demo snapshot live build failed; using static fallback")
+        return _static_snapshot(settings, user_found=True)
+
+
+def _build_demo_snapshot(db: Session, settings: Settings) -> DemoSnapshotOut:
     email = (settings.demo_user_email or demo_email_from_env()).strip().lower()
     now = datetime.now(timezone.utc)
     user = (
@@ -133,7 +145,7 @@ def build_demo_snapshot(db: Session, settings: Settings) -> DemoSnapshotOut:
     matches_raw: list[dict[str, object]] = [
         {
             "job_id": job.id,
-            "score": float(jm.score),
+            "score": float(jm.score or 0.0),
             "title": job.title,
             "company": job.company,
             "location": job.location,
@@ -230,9 +242,9 @@ def build_demo_snapshot(db: Session, settings: Settings) -> DemoSnapshotOut:
     if consent is not None:
         auto_out = DemoAutoApplyOut(
             consent_active=bool(consent.is_active),
-            min_score_threshold=float(consent.min_score_threshold),
-            daily_limit=int(consent.daily_limit),
-            total_applications_submitted=int(consent.total_applications_submitted),
+            min_score_threshold=float(consent.min_score_threshold or 85.0),
+            daily_limit=int(consent.daily_limit or 5),
+            total_applications_submitted=int(consent.total_applications_submitted or 0),
             last_run_at=_iso(consent.last_run_at),
         )
 
@@ -242,8 +254,8 @@ def build_demo_snapshot(db: Session, settings: Settings) -> DemoSnapshotOut:
         nightly_out = DemoNightlyRunOut(
             started_at=_iso(nightly.started_at),
             finished_at=_iso(nightly.finished_at),
-            total_users_processed=int(nightly.total_users_processed),
-            total_applications_submitted=int(nightly.total_applications_submitted),
+            total_users_processed=int(nightly.total_users_processed or 0),
+            total_applications_submitted=int(nightly.total_applications_submitted or 0),
         )
 
     return DemoSnapshotOut(
@@ -253,7 +265,7 @@ def build_demo_snapshot(db: Session, settings: Settings) -> DemoSnapshotOut:
         candidate=DemoCandidateOut(
             name=cand.name or "Demo candidate",
             location=cand.location,
-            experience_years=cand.experience_years,
+            experience_years=int(cand.experience_years or 0),
             has_cv=bool(cand.cv_text and str(cand.cv_text).strip()),
         ),
         top_matches=top_matches or list(_STATIC_MATCHES),
