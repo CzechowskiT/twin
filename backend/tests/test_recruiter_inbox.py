@@ -154,6 +154,47 @@ def test_respond_recruiter_batch_bulk() -> None:
         db.close()
 
 
+def test_ensure_recruiter_inbox_demo_resets_interview() -> None:
+    from app.services.investor_demo_seed import ensure_recruiter_inbox_demo
+
+    db = _sqlite_session()
+    try:
+        user = User(
+            email="demo@twin.career",
+            hashed_password="x",
+            gdpr_consent_at=datetime.now(timezone.utc),
+        )
+        db.add(user)
+        db.flush()
+        cand = Candidate(user_id=user.id, name="Alex", skills="[]", preferred_job_titles="[]")
+        db.add(cand)
+        job = Job(
+            job_board="pracuj",
+            external_id="investor-demo-python-lead",
+            title="Engineer",
+            company="Nova Hiring PL",
+            url="https://example.com/j",
+            is_validated=True,
+        )
+        db.add(job)
+        db.flush()
+        app_row = Application(
+            candidate_id=cand.id,
+            job_id=job.id,
+            status=ApplicationStatus.INTERVIEW,
+            notes="Investor demo — recruiter batch inbox",
+        )
+        db.add(app_row)
+        db.commit()
+        out = ensure_recruiter_inbox_demo(db, company="Nova Hiring PL")
+        db.commit()
+        db.refresh(app_row)
+        assert out["reset_to_applied"] == 1
+        assert app_row.status == ApplicationStatus.APPLIED
+    finally:
+        db.close()
+
+
 def test_recruiter_api_requires_token(monkeypatch) -> None:
     from app.config import get_settings
 

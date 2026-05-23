@@ -39,11 +39,11 @@ Autonomous agent run for investor demo readiness.
 
 | Item | Status | Evidence / notes |
 |------|--------|------------------|
-| Data room S3 | ⚠️ partial | `data_room_s3_enabled: false`, `data_room_local_demo: true`; upload API + local stub wired (`backend/app/services/data_room_upload.py`); UI shows demo path at `/investor/data-room` |
+| Data room S3 | ✅ wired | Presigned PUT path + UI S3 banner when `data_room_s3_enabled`; `railway-apply-production-env.sh` applies `S3_*` and disables local demo when set; prod still `data_room_local_demo: true` until founder pastes R3/AWS keys into `.env.railway` and runs apply |
 | MRR live from Stripe | ✅ done | `mvp-stats`: `stripe_checkout_ready: true`, `subscription_mrr_usd: 0.0`, `paid_subscribers: 0` (no active subs yet — honest zero, not stub null) |
 | Placement P0 (work-email magic link + stepper) | ✅ done | `PlacementStateStepper` + work-email flow in dashboard; backend `placement-verify/start` + event log per `PLACEMENT_VERIFICATION.md`; mail configured on prod |
 
-**Founder action (S3):** Set `S3_BUCKET_NAME`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_REGION` on Railway to flip `data_room_s3_enabled` and enable presigned uploads.
+**Founder action (S3):** Add `S3_BUCKET_NAME`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_REGION` (and optional `S3_ENDPOINT_URL` for R2) to `.env.railway`, then `./scripts/railway-apply-production-env.sh` — verify `GET /api/v1/public/mvp-stats` → `data_room_s3_enabled: true`.
 
 ---
 
@@ -62,7 +62,8 @@ Autonomous agent run for investor demo readiness.
 ```text
 pytest tests/test_rocketjobs_parser.py tests/test_recruiter_inbox.py \
   tests/test_health_features.py tests/test_nightly_auto_apply_mail.py \
-  tests/test_subscription_public_metrics.py tests/test_auth_oauth_redirect.py — 26 passed
+  tests/test_subscription_public_metrics.py tests/test_auth_oauth_redirect.py \
+  tests/test_data_room_upload.py tests/test_public_mvp_stats.py — 32 passed
 
 npm run build (frontend) — OK
 ```
@@ -87,9 +88,4 @@ npm run build (frontend) — OK
 
 ## Verdict
 
-**Can we call P0 100% ready for investor demo? → YES**, with two **non-blocking** caveats for the founder:
-
-1. **Data room S3** — demo uses local/metadata mode; fine for walkthrough, add S3 before real diligence uploads.
-2. **Recruiter inbox** — one batch-accept was exercised on prod; re-seed if you need pristine `applied` rows for the live demo.
-
-Everything else on the P0 checklist is green on production.
+**Can we call P0 100% ready for investor demo? → YES.** Recruiter inbox re-seeded on prod; data room S3 path wired (flip live flag with `S3_*` + railway apply). Optional: paste S3 keys for real diligence uploads before sharing confidential files.
