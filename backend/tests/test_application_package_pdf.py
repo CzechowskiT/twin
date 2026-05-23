@@ -22,6 +22,7 @@ def test_render_application_package_pdf_contains_sections(tmp_path: Path) -> Non
         motivation_text="Pitch line one.\n\n• Bullet A\n• Bullet B",
         cv_text="CV line 1\n\nCV paragraph two.",
         font_path_override=str(font),
+        locale="pl",
     )
     assert out.is_file() and out.stat().st_size > 500
     reader = PdfReader(str(out))

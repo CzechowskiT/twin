@@ -49,8 +49,8 @@ def test_investor_demo_seed_idempotent() -> None:
 
         assert db.scalar(
             select(func.count()).select_from(Job).where(Job.external_id.like(f"{DEMO_JOB_PREFIX}%"))
-        ) == first_jobs == 5
-        assert db.scalar(select(func.count()).select_from(JobMatch)) == first_matches == 5
+        ) == first_jobs == 7
+        assert db.scalar(select(func.count()).select_from(JobMatch)) == first_matches == 7
         assert db.scalar(select(func.count()).select_from(Application)) == first_apps == 1
         assert db.scalar(select(func.count()).select_from(ScheduledInterview)) == first_iv == 1
         assert db.scalar(select(func.count()).select_from(User).where(User.email == email)) == 1

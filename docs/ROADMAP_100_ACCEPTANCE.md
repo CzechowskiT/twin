@@ -12,10 +12,10 @@
 ## 1. Produkcja, sekrety i niezawodność deploy
 
 1. [Priorytet: P0] Stripe live na Railway — wklejenie `STRIPE_`* + webhooków, aby `stripe_checkout_ready: true` i płatność kartą na prod (wartość: kandydat kupuje Premium; inwestor widzi realny checkout). *(UX gdy wyłączone: ✅ `946c64e`)*
-2. [Priorytet: P0] LinkedIn OAuth na prod — `LINKEDIN_CLIENT_`* + poprawny redirect URI (wartość: szybsza rejestracja kandydata bez hasła). *(UX gdy wyłączone: ✅ `9188289`; klucze: founder)*
+2. ✅ [Priorytet: P0] LinkedIn OAuth na prod — `LINKEDIN_CLIENT_`* + redirect URI (wartość: szybsza rejestracja). *Prod 2026-05-23: `linkedin_oauth_configured: true`*
 3. [Priorytet: P0] Microsoft 365 / Outlook Calendar — `MICROSOFT_CLIENT_`* na Railway (wartość: kandydaci korporacyjni widzą zajętość i propozycje slotów w Outlook). *(copy „Wkrótce”: ✅ `9188289`; credentials: founder)*
 4. ✅ [Priorytet: P0] Vercel Production branch — ustawienie `cursor/phase1-monorepo-scaffold` + redeploy po każdym krytycznym pushu (wartość: founder i inwestor widzą aktualny front, nie preview). *Dok: `1fbcb1c` · panel Vercel: founder*
-5. [Priorytet: P0] Dedykowany serwis `twin-worker` — Celery beat i scrape poza procesem API (`docs/RAILWAY_WORKER_PL.md`) (wartość: nocny auto-apply i scrape nie padają przy restarcie API).
+5. ✅ [Priorytet: P0] Celery worker + beat poza API — prod: serwis `enthusiastic-encouragement` (`docs/RAILWAY_WORKER_PL.md`) (wartość: beat/scrape przy restarcie API).
 6. [Priorytet: P1] Resend / mail na prod — `RESEND_API_KEY` + weryfikacja resetu hasła i maili transakcyjnych (wartość: samoobsługowe konto bez supportu).
 7. [Priorytet: P1] Health dashboard dla founder — jedna strona `/status` z flagami: mail, Stripe, Microsoft, LinkedIn, beat (wartość: 30 s audytu przed rozmową z inwestorem).
 8. [Priorytet: P2] GitHub Actions — automatyczny smoke po pushu (health + build front) (wartość: mniej regresji bez ręcznego sprawdzania).
