@@ -6,6 +6,7 @@ import { FaqPageSections } from "@/components/marketing/faq-panel";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { ScrollReveal } from "@/components/marketing/scroll-reveal";
 import { useTranslation } from "@/components/language-provider";
+import { FAQ_TOTAL_QUESTIONS } from "@/lib/faq-messages";
 import { Shell } from "@/components/ui";
 
 export default function FaqPage() {
@@ -20,6 +21,9 @@ export default function FaqPage() {
           </p>
           <h1 className="twin-page-intro twin-section-title mt-2 text-2xl sm:text-3xl">{t("site.faqPageTitle")}</h1>
           <p className="mt-3 text-base font-medium leading-relaxed text-[var(--foreground)]">{t("site.faqPageLead")}</p>
+          <p className="mt-2 text-sm text-[var(--twin-muted-strong)]">
+            {t("site.faqPageMeta").replace("{count}", String(FAQ_TOTAL_QUESTIONS))}
+          </p>
           <p className="mt-2 text-sm text-[var(--twin-muted-strong)]">
             <Link href="/" className="twin-link font-medium">
               {t("site.faqMoreHome")}

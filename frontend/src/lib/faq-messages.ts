@@ -1,7 +1,10 @@
 /** Marketing FAQ copy — EN + PL only (other locales fall back to EN). */
 
 export const FAQ_MESSAGES_EN = {
-  homeCta: "Full FAQ by persona — candidates, recruiters, companies, investors",
+  homeTeaserLead:
+    "{count} answers across general, candidates, recruiters, companies, and investors — open the full FAQ for persona tabs.",
+  homeCta: "See all {count} answers",
+  homeCtaHint: "Persona tabs on the full FAQ page",
   sectionGeneral: "General",
   sectionCandidates: "Candidates",
   sectionRecruiters: "Recruiters",
@@ -132,7 +135,10 @@ export const FAQ_MESSAGES_EN = {
 } as const;
 
 export const FAQ_MESSAGES_PL = {
-  homeCta: "Pełne FAQ wg person — kandydaci, rekruterzy, firmy, inwestorzy",
+  homeTeaserLead:
+    "{count} odpowiedzi: ogólne, kandydaci, rekruterzy, firmy, inwestorzy — pełne FAQ z zakładkami person.",
+  homeCta: "Zobacz wszystkie {count} odpowiedzi",
+  homeCtaHint: "Zakładki person na stronie FAQ",
   sectionGeneral: "Ogólne",
   sectionCandidates: "Kandydaci",
   sectionRecruiters: "Rekruterzy",

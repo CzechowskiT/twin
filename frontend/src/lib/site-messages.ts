@@ -87,6 +87,7 @@ export const SITE_MESSAGES_EN = {
   faqPageTitle: "FAQ",
   faqPageLead:
     "Straight answers by persona — what is live in beta, what is phased, and how we aim for a calendar of acceptance instead of inbox spam.",
+  faqPageMeta: "{count} questions · switch persona tabs below",
   faqMoreHome: "Product narrative and visuals also live on the home page.",
 
   footerTagline: "Autonomous career agent",
@@ -226,6 +227,7 @@ export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } 
   faqPageTitle: "FAQ",
   faqPageLead:
     "Odpowiedzi wg persony — co jest na żywo w becie, co jest etapowe i jak dążymy do kalendarza akceptacji zamiast spamu w skrzynce.",
+  faqPageMeta: "{count} pytań · przełącz zakładki person poniżej",
   faqMoreHome: "Opowieść produktowa i sekcje wizualne są też na stronie głównej.",
 
   footerTagline: "Autonomiczny agent kariery",
