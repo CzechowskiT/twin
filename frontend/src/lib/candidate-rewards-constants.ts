@@ -14,3 +14,12 @@ export const REFERRAL_BONUS_HIRED_USD = 100;
 /** Demo-only calendar milestone (not wired to payouts yet). */
 export const INTERVIEW_BOOKED_BONUS_USD = 20;
 export const INTERVIEW_BOOKED_BONUS_MAX_PER_QUARTER = 4;
+
+/** Founding wishlist cap — locked pricing / free Premium window (investor model). */
+export const FOUNDING_COHORT_SIZE = 1000;
+
+/** Illustrative free Premium months per founding member in year-one P&L. */
+export const FOUNDING_FREE_PREMIUM_MONTHS_DEFAULT = 12;
+
+/** Placement cash payout delay (marketing / Terms). */
+export const PLACEMENT_PAYOUT_DELAY_DAYS_DEFAULT = 30;
