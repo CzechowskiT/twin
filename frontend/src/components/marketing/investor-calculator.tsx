@@ -104,14 +104,16 @@ function KpiCard({
   foot?: ReactNode;
 }) {
   return (
-    <div className={`rounded-2xl p-5 text-white shadow-lg ${accentClass}`}>
-      <div className="mb-2 flex items-center gap-2 opacity-95">
-        <span className="shrink-0 opacity-90">{icon}</span>
-        <div className="text-sm">{label}</div>
+    <div className={`min-w-0 overflow-hidden rounded-2xl p-4 text-white shadow-lg sm:p-5 ${accentClass}`}>
+      <div className="mb-2 flex min-w-0 items-start gap-2 opacity-95">
+        <span className="mt-0.5 shrink-0 opacity-90">{icon}</span>
+        <div className="min-w-0 text-sm leading-snug">{label}</div>
       </div>
-      <div className="text-2xl font-bold tabular-nums sm:text-3xl">{value}</div>
-      <div className="mt-1 text-sm opacity-85">{sub}</div>
-      {foot ? <div className="mt-2 border-t border-white/20 pt-2 text-xs opacity-90">{foot}</div> : null}
+      <div className="text-xl font-bold leading-tight tabular-nums tracking-tight sm:text-2xl lg:text-3xl">{value}</div>
+      <div className="mt-1 break-words text-sm leading-snug opacity-85">{sub}</div>
+      {foot ? (
+        <div className="mt-2 break-words border-t border-white/20 pt-2 text-xs leading-snug opacity-90">{foot}</div>
+      ) : null}
     </div>
   );
 }
@@ -131,14 +133,14 @@ function ScenarioButton({
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-xl border-2 p-4 text-left transition ${
+      className={`min-w-0 rounded-xl border-2 p-4 text-left transition ${
         active
           ? "border-[var(--twin-accent)] bg-[var(--twin-accent-muted)] shadow-md"
           : "border-[var(--twin-border)] hover:border-[var(--twin-border-hover)]"
       }`}
     >
       <div className="font-bold text-[var(--foreground)]">{title}</div>
-      <div className="mt-1 text-sm text-[var(--twin-muted-strong)]">{desc}</div>
+      <div className="mt-1 break-words text-sm leading-snug text-[var(--twin-muted-strong)]">{desc}</div>
     </button>
   );
 }
@@ -247,7 +249,7 @@ export function InvestorCalculator() {
 
         <section className="twin-card-panel mb-6 p-5 sm:p-6">
           <h2 className="twin-section-title mb-4 text-lg">{t("investorCalc.quickScenarios")}</h2>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <ScenarioButton
               active={scenario === "current"}
               onClick={() => applyScenario("current")}
@@ -269,7 +271,7 @@ export function InvestorCalculator() {
           </div>
         </section>
 
-        <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        <div className="mb-6 grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <KpiCard
             accentClass="bg-gradient-to-br from-cyan-600 to-teal-700"
             icon={<IconDollar className="h-5 w-5" />}
