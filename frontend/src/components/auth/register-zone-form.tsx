@@ -12,6 +12,7 @@ import { useMarketingPersona } from "@/components/persona-provider";
 import { Button, Card, Input, Label } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { getToken, setToken } from "@/lib/auth";
+import { setSessionPersona } from "@/lib/session-persona";
 import type { TranslationKey } from "@/lib/i18n";
 import { OAUTH_LOGIN_BUTTONS_ENABLED } from "@/lib/oauth-auth";
 import type { LoginZone } from "@/lib/persona-auth";
@@ -149,6 +150,7 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
         }),
       });
       setToken(registered.access_token);
+      setSessionPersona(zone);
       setPersona(zone);
       router.push(safeNext);
     } catch (err) {
