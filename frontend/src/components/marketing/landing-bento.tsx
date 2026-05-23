@@ -10,13 +10,13 @@ import { useTranslation } from "@/components/language-provider";
 function FeatureCard({
   step,
   title,
-  body,
+  line,
   delayMs,
   className = "",
 }: {
   step: string;
   title: string;
-  body: string;
+  line: string;
   delayMs: number;
   className?: string;
 }) {
@@ -27,8 +27,8 @@ function FeatureCard({
           {step}
         </span>
         <h3 className="mt-4 text-lg font-semibold tracking-[-0.02em] text-[var(--foreground)] sm:text-xl">{title}</h3>
-        <p className="mt-3 flex-1 text-sm leading-relaxed text-[var(--twin-muted)] sm:text-[15px]">{body}</p>
-        <div className="mt-8 h-px w-12 bg-gradient-to-r from-[var(--twin-accent)]/95 to-amber-500/80" />
+        <p className="mt-2 flex-1 text-sm leading-snug text-[var(--twin-muted-strong)]">{line}</p>
+        <div className="mt-6 h-px w-12 bg-gradient-to-r from-[var(--twin-accent)]/95 to-emerald-400/60" />
       </BentoSpotlight>
     </ScrollReveal>
   );
@@ -37,9 +37,9 @@ function FeatureCard({
 export function LandingBento() {
   const { t } = useTranslation();
   const features = [
-    { step: "01", title: t("home.scrape"), body: t("home.scrapeDesc") },
-    { step: "02", title: t("home.match"), body: t("home.matchDesc") },
-    { step: "03", title: t("home.track"), body: t("home.trackDesc") },
+    { step: "01", title: t("home.scrape"), line: t("home.scrapeDesc") },
+    { step: "02", title: t("home.match"), line: t("home.matchDesc") },
+    { step: "03", title: t("home.track"), line: t("home.trackDesc") },
   ];
 
   return (
@@ -50,9 +50,7 @@ export function LandingBento() {
           <h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-4xl">
             {t("home.featuresTitle")}
           </h2>
-          <p className="mt-4 max-w-xl text-sm leading-relaxed text-[var(--twin-muted)] sm:text-base">
-            {t("home.featuresSubtitle")}
-          </p>
+          <p className="mt-3 max-w-lg text-sm text-[var(--twin-muted-strong)]">{t("home.featuresSubtitle")}</p>
         </ScrollReveal>
 
         <div className="mt-14 grid auto-rows-fr grid-cols-1 gap-4 md:grid-cols-12 md:gap-5">
@@ -67,13 +65,7 @@ export function LandingBento() {
               <div className="mt-8 flex-1">
                 <PipelinePreview />
               </div>
-              <p className="mt-6 text-xs leading-relaxed text-[var(--twin-muted)]">{t("home.footerHint")}</p>
-              <Link
-                href="/register"
-                className="twin-link mt-3 inline-block text-sm font-semibold text-[var(--twin-link)] underline-offset-2 hover:text-[var(--twin-link-hover)]"
-              >
-                {t("home.getStarted")}
-              </Link>
+              <p className="mt-6 text-xs text-[var(--twin-muted)]">{t("home.footerHint")}</p>
             </BentoSpotlight>
           </ScrollReveal>
 

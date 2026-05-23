@@ -70,14 +70,13 @@ export function DemoLiveSnapshot({ fullDemoHref }: DemoLiveSnapshotProps = {}) {
           <h2 id="demo-live-feed-heading" className="twin-section-title mt-2 text-lg">
             {t("demo.liveTitle" as TranslationKey)}
           </h2>
-          <p className="mt-2 max-w-2xl text-sm text-[var(--twin-muted-strong)]">
-            {t("demo.liveLead" as TranslationKey)}
-            {snapshot.source === "live_db" ? ` ${t("demo.liveSourceDb" as TranslationKey)}` : ""}
-          </p>
+          {snapshot.source === "live_db" ? (
+            <p className="mt-2 text-xs text-[var(--twin-muted)]">{t("demo.liveSourceDb" as TranslationKey)}</p>
+          ) : null}
         </div>
         <Link
           href={signup}
-          className="twin-touch-target inline-flex min-h-[2.75rem] items-center justify-center rounded-full bg-[var(--twin-cta)] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95"
+          className="twin-touch-target inline-flex min-h-[2.5rem] items-center justify-center rounded-full border border-[var(--twin-border)] px-4 text-sm font-semibold text-[var(--twin-muted-strong)] transition hover:border-[var(--twin-accent)]/40"
         >
           {t("demo.signUpToApply" as TranslationKey)}
         </Link>

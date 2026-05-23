@@ -1,32 +1,30 @@
 "use client";
 
-import { LandingAudienceSections } from "@/components/marketing/landing-audience-sections";
+import { LandingAmbient } from "@/components/marketing/landing-ambient";
 import { LandingBento } from "@/components/marketing/landing-bento";
 import { LandingCtaBand } from "@/components/marketing/landing-cta-band";
 import { LandingFaq } from "@/components/marketing/landing-faq";
-import { LandingFocusChips } from "@/components/marketing/landing-focus-chips";
+import { LandingFeatureGrid } from "@/components/marketing/landing-feature-grid";
 import { DemoLiveSnapshot } from "@/components/marketing/demo-live-snapshot";
 import { LandingHero } from "@/components/marketing/landing-hero";
-import { MvpLiveStatsStrip } from "@/components/marketing/mvp-live-stats-strip";
-import { LandingOriginStory } from "@/components/marketing/landing-origin";
-import { LandingStoryJourney } from "@/components/marketing/landing-story-journey";
-import { LandingVacationTest } from "@/components/marketing/landing-vacation-test";
+import { LandingHomeStats } from "@/components/marketing/landing-home-stats";
+import { LandingHowItWorks } from "@/components/marketing/landing-how-it-works";
+import { LandingTrustCue } from "@/components/marketing/landing-trust-cue";
 import { PageMomentumRail } from "@/components/page-momentum-rail";
 
 export default function Home() {
   return (
     <div className="marketing-journey-host relative z-0 flex flex-1 flex-col">
+      <LandingAmbient />
       <div className="relative z-10 flex flex-1 flex-col">
         <LandingHero />
-        <div className="mx-auto w-full max-w-6xl space-y-8 px-4 sm:px-6">
-          <DemoLiveSnapshot fullDemoHref="/demo" />
-          <MvpLiveStatsStrip />
+        <LandingTrustCue />
+        <div className="mx-auto w-full max-w-6xl space-y-2 px-4 sm:px-6">
+          <LandingHomeStats />
+          <DemoLiveSnapshot />
         </div>
-        <LandingVacationTest />
-        <LandingOriginStory />
-        <LandingStoryJourney />
-        <LandingAudienceSections />
-        <LandingFocusChips />
+        <LandingHowItWorks />
+        <LandingFeatureGrid />
         <LandingBento />
         <LandingFaq />
         <LandingCtaBand />
