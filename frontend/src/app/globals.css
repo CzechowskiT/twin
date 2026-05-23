@@ -1444,6 +1444,16 @@ html[data-marketing-surface="studio"] .twin-nav-roi-pill:hover {
   box-shadow: 0 4px 14px rgb(180 83 9 / 0.4);
 }
 
+/** Candidate session Demo pill — always-on amber beside the logo. */
+.twin-nav-demo-pill {
+  flex-shrink: 0;
+  box-shadow: 0 2px 12px rgb(217 119 6 / 0.42);
+}
+
+.twin-nav-demo-pill:hover {
+  box-shadow: 0 4px 16px rgb(180 83 9 / 0.48);
+}
+
 .twin-header-cta--waitlist {
   border-color: rgb(255 255 255 / 0.18);
   background: linear-gradient(135deg, #7c3aed 0%, #0891b2 100%);

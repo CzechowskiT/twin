@@ -184,30 +184,26 @@ export type HeaderSessionProductLink = {
   labelKey: "nav.demo";
 };
 
-/** Logged-in candidate product shortcuts (demo walkthrough + live apply). */
+/** Logged-in candidate product shortcuts in the right rail (calendar lives in the header). */
 export function headerCandidateSessionLinks(
   persona: MarketingPersona,
   hasSession: boolean,
 ): HeaderSessionProductLink[] {
-  if (!hasSession || persona !== "candidate") return [];
-  return [{ href: "/demo", labelKey: "nav.demo" }];
+  void persona;
+  void hasSession;
+  return [];
 }
 
 /**
  * One primary marketing CTA beside the logo.
- * Logged-out: persona-specific growth pill. Logged-in candidates: keep Demo for founder walkthroughs.
+ * Logged-out: persona-specific growth pill. Logged-in candidates: Demo pill is rendered directly in the header.
  */
 export function headerGrowthLinksForPersona(
   persona: MarketingPersona,
   pathname: string,
   hasSession: boolean,
 ): HeaderGrowthLink[] {
-  if (hasSession) {
-    if (persona === "candidate") {
-      return [{ href: "/demo", labelKey: "nav.demo", variant: "candidate" }];
-    }
-    return [];
-  }
+  if (hasSession) return [];
   const path = normalizePath(pathname);
   // Homepage hero carries register + wishlist; header pill surfaces founding list without scrolling.
   if (path === "/" && persona === "candidate") {
@@ -228,6 +224,11 @@ export function headerGrowthLinksForPersona(
 
 export function showCandidateProductNav(persona: MarketingPersona): boolean {
   return persona === "candidate";
+}
+
+/** Logged-in candidate lane: show the always-on Demo pill beside the logo. */
+export function showCandidateDemoNav(persona: MarketingPersona, hasSession: boolean): boolean {
+  return hasSession && persona === "candidate";
 }
 
 export type HeaderAccountLink = { href: string; labelKey: TranslationKey; isLogout?: boolean };
