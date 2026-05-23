@@ -119,6 +119,7 @@ class UserOut(BaseModel):
     email_interview_reminders: bool = False
     profile_documents_processing_consent_at: datetime | None = None
     scrape_ops_configured: bool = False
+    scrape_ops_elevated: bool = False
     can_trigger_scrape: bool = False
     scrape_worker_ready: bool = False
     mail_configured: bool = False

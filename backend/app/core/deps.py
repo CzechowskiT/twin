@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
-from app.core.scrape_ops import scrape_ops_configured, user_has_scrape_ops
+from app.core.scrape_ops import user_can_trigger_scrape
 from app.core.security import decode_access_token
 from app.database.models import User
 from app.database.session import get_db
@@ -26,26 +26,16 @@ def get_current_user(
     return user
 
 
-def require_ops_user(
+def require_scrape_user(
     current_user: User = Depends(get_current_user),
 ) -> User:
-    """Restrict scrape triggers to configured ops user IDs or emails (fail-safe when unset)."""
-    settings = get_settings()
-    if not scrape_ops_configured(settings):
+    """Authenticated users with core GDPR consents may trigger scrape endpoints."""
+    if not user_can_trigger_scrape(current_user, get_settings()):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=(
-                "Scraping operations require ops role. "
-                "On the API host set SCRAPE_OPS_EMAILS to your login email "
-                "(or SCRAPE_OPS_USER_IDS to your numeric user id), then redeploy."
-            ),
-        )
-    if not user_has_scrape_ops(current_user, settings):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=(
-                f"Insufficient permissions. Scraping requires ops role "
-                f"(your user id is {current_user.id}, email {current_user.email})."
+                "Privacy and consent setup incomplete — finish required consents "
+                "before refreshing job listings."
             ),
         )
     return current_user

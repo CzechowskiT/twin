@@ -20,6 +20,9 @@ import {
 } from "@/components/career-assistant/career-assistant-modals";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { DashboardCommandCenter } from "@/components/dashboard-command-center";
+import { EmptyState } from "@/components/ux/empty-state";
+import { ProfileCompletenessHint } from "@/components/ux/profile-completeness-hint";
+import { WorkspaceFlowSteps } from "@/components/ux/workspace-flow-steps";
 import { EmailVerificationBanner } from "@/components/email-verification-banner";
 import { NightlyAutoApplyStrip } from "@/components/nightly-auto-apply-strip";
 import { DashboardTutorial } from "@/components/dashboard/dashboard-tutorial";
@@ -30,7 +33,13 @@ import { useTranslation } from "@/components/language-provider";
 import { JobFiltersBar } from "@/components/job-filters";
 import { JobList } from "@/components/job-list";
 import { Button, ButtonCta, Card, Shell } from "@/components/ui";
-import { apiFetch, apiFetchBlob, isLikelyBrowserNetworkFailureMessage, saveBlobAsFile } from "@/lib/api";
+import {
+  apiFetch,
+  apiFetchBlob,
+  isLikelyBrowserNetworkFailureMessage,
+  saveBlobAsFile,
+  stripRequestIdFromUserMessage,
+} from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
 import { SHOW_SCRAPE_UI } from "@/lib/features";
 import type { TranslationKey } from "@/lib/i18n";
@@ -152,11 +161,11 @@ function dashboardFetchUserMessage(
   if (isLikelyBrowserNetworkFailureMessage(raw)) {
     return networkHint === "scrape" ? t("dashboard.scrapeNetworkError") : t("dashboard.apiNetworkError");
   }
-  if (networkHint === "scrape" && lc.includes("ops role")) {
-    if (lc.includes("scrape_ops_emails") || lc.includes("scrape_ops_user_ids") || lc.includes("configure")) {
-      return t("dashboard.scrapeOpsNotConfigured");
-    }
-    return t("dashboard.scrapeOpsDenied");
+  if (networkHint === "scrape" && (lc.includes("consent") || lc.includes("privacy"))) {
+    return t("dashboard.scrapeConsentRequired");
+  }
+  if (networkHint === "scrape" && (lc.includes("503") || lc.includes("502") || lc.includes("unavailable"))) {
+    return t("dashboard.scrapeUnavailable");
   }
   return raw.trim() || t("dashboard.scrapeFailed");
 }
@@ -1264,12 +1273,8 @@ export default function DashboardPage() {
         />
       </div>
 
-      <div className="mb-6 rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/50 px-4 py-3 sm:px-5">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
-          {t("dashboard.northStarEyebrow")}
-        </p>
-        <p className="mt-2 text-sm leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.northStarLead")}</p>
-      </div>
+      <WorkspaceFlowSteps current="dashboard" className="mb-4 sm:mb-6" />
+      <ProfileCompletenessHint profile={profile} />
 
       {user ? <EmailVerificationBanner /> : null}
       {user ? <NightlyAutoApplyStrip /> : null}
@@ -1281,10 +1286,8 @@ export default function DashboardPage() {
             profileName={profile ? profile.name : undefined}
             hasProfile={hasProfile}
             showScrapeUi={SHOW_SCRAPE_UI}
-            jobsTotal={jobs?.total ?? 0}
-            matchesVisible={visibleMatches.length}
-            applicationsActive={pipelineActiveCount}
           />
+          <p className="twin-muted -mt-2 mb-4 max-w-prose text-sm leading-relaxed">{t("dashboard.northStarLead")}</p>
           <Card variant="soft" className="mb-4">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
               <p className="text-sm font-semibold text-[var(--foreground)]">{t("acceptanceQueue.stripTitle")}</p>
@@ -1581,15 +1584,7 @@ export default function DashboardPage() {
               ) : null}
               {user?.can_trigger_scrape === false ? (
                 <p className="mt-3 text-sm text-amber-700 dark:text-amber-300">
-                  {user.scrape_ops_configured
-                    ? t("dashboard.scrapeOpsDenied")
-                    : t("dashboard.scrapeOpsNotConfigured")}
-                  {user.scrape_ops_configured ? (
-                    <>
-                      {" "}
-                      (id {user.id}, {user.email})
-                    </>
-                  ) : null}
+                  {t("dashboard.scrapeConsentRequired")}
                 </p>
               ) : user?.scrape_worker_ready === false ? (
                 <p className="mt-3 text-sm text-amber-700 dark:text-amber-300">
@@ -1608,13 +1603,17 @@ export default function DashboardPage() {
                 {t("dashboard.scrapeAllHint")} {t("dashboard.keepApiOpen")}
               </p>
               <InvestorRoadmapPanel />
-              {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+              {error ? (
+                <p className="mt-3 text-sm text-red-600" role="alert">
+                  {stripRequestIdFromUserMessage(error)}
+                </p>
+              ) : null}
             </div>
           )}
         </div>
       </Card>
 
-      {hasProfile && (matchesInitialSkeleton || (matches && matches.items.length > 0)) && (
+      {hasProfile && (matchesInitialSkeleton || matches !== null) && (
         <Card id="dashboard-matches" variant="soft">
           {matchesInitialSkeleton ? (
             <div className="space-y-4" aria-busy="true" aria-live="polite">
@@ -1683,18 +1682,26 @@ export default function DashboardPage() {
               </button>
             </div>
           </div>
-          <JobList
-            items={visibleMatches}
-            showScore
-            applicationStatus={displayApplicationStatus}
-            onApply={applyToJob}
-            onAutoApply={autoApplyToJob}
-            onResearch={(id, title, company) => setIntelJob({ id, title, company })}
-            onHiringInsights={(id, title) => setInsightsJob({ id, title })}
-            autoApplyJobId={autoApplyingId}
-            onSave={saveJob}
-            onDismiss={dismissJob}
-          />
+          {visibleMatches.length === 0 ? (
+            <EmptyState
+              message={t("ux.matchesEmptyMessage")}
+              actionLabel={t("ux.matchesEmptyCta")}
+              actionHref="/profile"
+            />
+          ) : (
+            <JobList
+              items={visibleMatches}
+              showScore
+              applicationStatus={displayApplicationStatus}
+              onApply={applyToJob}
+              onAutoApply={autoApplyToJob}
+              onResearch={(id, title, company) => setIntelJob({ id, title, company })}
+              onHiringInsights={(id, title) => setInsightsJob({ id, title })}
+              autoApplyJobId={autoApplyingId}
+              onSave={saveJob}
+              onDismiss={dismissJob}
+            />
+          )}
             </>
           )}
         </Card>
@@ -1910,52 +1917,22 @@ export default function DashboardPage() {
           </>
         )}
         {jobs !== null && (jobs.total === 0 || jobs.items.length === 0) ? (
-          <div className="mt-3 space-y-3 rounded-lg border border-dashed border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/35 p-4 sm:p-5">
-            {jobs.total === 0 && jobFiltersAreDefault(filters) ? (
-              <>
-                <p className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.jobsEmptyZeroTitle")}</p>
-                <p className="twin-muted text-sm leading-relaxed">{t("dashboard.jobsEmptyZeroLead")}</p>
-                <div className="flex flex-wrap gap-2">
-                  <Link href="/profile" className="twin-btn-solid twin-touch-target text-sm">
-                    {t("dashboard.jobsEmptyZeroProfileCta")}
-                  </Link>
-                  {SHOW_SCRAPE_UI && user?.can_trigger_scrape ? (
-                    <button
-                      type="button"
-                      className="twin-btn-secondary text-sm"
-                      disabled={scraping}
-                      onClick={() => void triggerScrapeAll()}
-                    >
-                      {scraping ? t("dashboard.scrapingAll") : t("dashboard.jobsEmptyZeroScrapeCta")}
-                    </button>
-                  ) : null}
-                </div>
-              </>
-            ) : hasProfile ? (
-              <>
-                <p className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.jobsEmptyFilteredTitle")}</p>
-                <p className="twin-muted text-sm leading-relaxed">{t("dashboard.jobsEmptyFilteredLead")}</p>
-                <button
-                  type="button"
-                  className="twin-btn-secondary text-sm"
-                  onClick={() => {
-                    setFilters(defaultJobFilters);
-                    persistJobFilters(defaultJobFilters);
-                  }}
-                >
-                  {t("dashboard.jobsEmptyZeroResetFilters")}
-                </button>
-              </>
+          <div className="mt-3">
+            {!hasProfile ? (
+              <EmptyState
+                message={t("ux.jobsEmptyNoProfileMessage")}
+                actionLabel={t("ux.jobsEmptyNoProfileCta")}
+                actionHref="/profile"
+              />
             ) : (
-              <>
-                <p className="twin-muted text-sm">
-                  {SHOW_SCRAPE_UI ? t("dashboard.noJobs") : t("dashboard.noJobsNoScrapeUi")}
-                </p>
-                <p className="twin-muted text-sm leading-relaxed">{t("dashboard.jobsEmptyMomentum")}</p>
-                <Link href="/profile" className="twin-btn-solid twin-touch-target inline-block text-sm">
-                  {t("dashboard.jobsEmptyZeroProfileCta")}
-                </Link>
-              </>
+              <EmptyState
+                message={t("ux.jobsEmptyMessage")}
+                actionLabel={t("ux.jobsEmptyCta")}
+                onAction={() => {
+                  setFilters(defaultJobFilters);
+                  persistJobFilters(defaultJobFilters);
+                }}
+              />
             )}
           </div>
         ) : null}

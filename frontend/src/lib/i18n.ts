@@ -488,10 +488,10 @@ const en = {
     appFeedbackUpskill: "Upskill actions",
     appFeedbackSummary: "Summary",
     scrapeFailed: "Scrape failed",
-    scrapeOpsNotConfigured:
-      "Scraping is locked on the server until an admin adds your email. In Railway → API service → Variables, add SCRAPE_OPS_EMAILS with the same address you use to log in here, then Redeploy the API. After that, try this button again.",
-    scrapeOpsDenied:
-      "Your account is not on the scrape allowlist yet. Ask whoever runs Railway to add your login email to SCRAPE_OPS_EMAILS (or your user id to SCRAPE_OPS_USER_IDS), then redeploy the API.",
+    scrapeConsentRequired:
+      "Finish privacy and consent setup in your account before refreshing job listings from boards.",
+    scrapeUnavailable:
+      "Job refresh is temporarily unavailable. Try again in a few minutes or contact support if it persists.",
     scrapeWorkerNotReady:
       "Scrape queue is not ready on the server. Either keep CELERY_TASK_ALWAYS_EAGER=true on the API (solo Railway) or deploy a twin-worker service and set SCRAPE_WORKER_READY=true on the API, then redeploy.",
     scrapeNetworkError:
@@ -816,7 +816,23 @@ const en = {
     calendarInterviewCancelledBadge: "Cancelled",
     calendarPageTitle: "Your interview calendar",
     calendarPageLead:
-      "Pick how you want TWIN on your calendar. One path is enough — you can add more later.",
+      "Your week at a glance — meetings from your connected calendar plus TWIN interviews.",
+    calendarPageLeadDisconnected:
+      "Connect Google Calendar to see your real schedule here. You can add Microsoft or a subscribe link later.",
+    calendarConnectHeroTitle: "Connect your calendar",
+    calendarConnectHeroBody:
+      "TWIN reads when you are busy and places interview holds on the calendar you already use.",
+    calendarConnectionSettingsSummary: "Connection settings",
+    calendarViewTitle: "This week",
+    calendarViewLoading: "Loading events…",
+    calendarViewEmpty: "Nothing scheduled this week on your connected calendar.",
+    calendarViewPrevWeek: "Previous",
+    calendarViewNextWeek: "Next",
+    calendarViewToday: "Today",
+    calendarViewTwinBadge: "TWIN interview",
+    calendarViewAllDay: "All day",
+    calendarViewOpenExternal: "Open in calendar app",
+    calendarAdvancedSummary: "Scheduling tools & tests",
     calendarPathGoogleTitle: "Google Calendar",
     calendarPathGoogleBody:
       "Best if you live in Gmail or Google Calendar. TWIN can see when you are busy and add interview slots.",
@@ -2655,10 +2671,10 @@ const pl: MessageTree = {
     appFeedbackUpskill: "Działania rozwojowe",
     appFeedbackSummary: "Podsumowanie",
     scrapeFailed: "Pobieranie nie powiodło się",
-    scrapeOpsNotConfigured:
-      "Pobieranie ofert jest zablokowane, dopóki na serwerze API nie dodasz swojego maila. W Railway → usługa API → Variables wpisz SCRAPE_OPS_EMAILS z tym samym adresem, którym logujesz się tutaj, potem Redeploy API. Potem spróbuj ponownie.",
-    scrapeOpsDenied:
-      "Twoje konto nie jest jeszcze na liście operatorów. Ktoś z dostępem do Railway musi dodać Twój email do SCRAPE_OPS_EMAILS (albo numer id użytkownika do SCRAPE_OPS_USER_IDS) i zrobić redeploy API.",
+    scrapeConsentRequired:
+      "Dokończ ustawienia prywatności i zgód na koncie, zanim odświeżysz oferty z portali.",
+    scrapeUnavailable:
+      "Odświeżanie ofert jest chwilowo niedostępne. Spróbuj za kilka minut lub napisz do supportu, jeśli problem się utrzymuje.",
     scrapeWorkerNotReady:
       "Kolejka scrape nie jest gotowa na serwerze. Zostaw CELERY_TASK_ALWAYS_EAGER=true na API (solo Railway) albo wdroż serwis twin-worker i ustaw SCRAPE_WORKER_READY=true, potem redeploy.",
     scrapeNetworkError:
@@ -2986,7 +3002,23 @@ const pl: MessageTree = {
     calendarInterviewCancelledBadge: "Odwołane",
     calendarPageTitle: "Twój kalendarz rozmów",
     calendarPageLead:
-      "Wybierz, jak TWIN ma trafić do Twojego kalendarza. Wystarczy jedna droga — resztę możesz dodać później.",
+      "Twój tydzień w skrócie — spotkania z podłączonego kalendarza i rozmowy TWIN.",
+    calendarPageLeadDisconnected:
+      "Połącz Kalendarz Google, żeby zobaczyć tu prawdziwy harmonogram. Microsoft lub subskrypcję dodasz później.",
+    calendarConnectHeroTitle: "Połącz kalendarz",
+    calendarConnectHeroBody:
+      "TWIN widzi, kiedy jesteś zajęty/a, i umieszcza rozmowy w kalendarzu, z którego już korzystasz.",
+    calendarConnectionSettingsSummary: "Ustawienia połączenia",
+    calendarViewTitle: "Ten tydzień",
+    calendarViewLoading: "Ładowanie wydarzeń…",
+    calendarViewEmpty: "W tym tygodniu nic nie ma w podłączonym kalendarzu.",
+    calendarViewPrevWeek: "Wstecz",
+    calendarViewNextWeek: "Dalej",
+    calendarViewToday: "Dziś",
+    calendarViewTwinBadge: "Rozmowa TWIN",
+    calendarViewAllDay: "Cały dzień",
+    calendarViewOpenExternal: "Otwórz w kalendarzu",
+    calendarAdvancedSummary: "Planowanie i testy",
     calendarPathGoogleTitle: "Google Calendar",
     calendarPathGoogleBody:
       "Gdy korzystasz z Gmaila lub Kalendarza Google. TWIN widzi, kiedy jesteś zajęty/a, i może dodać rozmowy.",

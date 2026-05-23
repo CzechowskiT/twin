@@ -1,7 +1,23 @@
-"""Who may trigger POST /jobs/scrape/* (ops allowlist from env)."""
+"""Scrape trigger eligibility and optional ops allowlist (elevated limits / monitoring)."""
 
 from app.config import Settings
 from app.database.models import User
+
+
+def core_consents_complete(user: User) -> bool:
+    """Privacy + ToS + job-data + AI matching — same bar as password login."""
+    return bool(
+        user.gdpr_consent_at
+        and user.terms_of_service_accepted_at
+        and user.job_data_processing_consent_at
+        and user.ai_matching_consent_at
+    )
+
+
+def user_can_trigger_scrape(user: User, settings: Settings) -> bool:
+    """Any active user with core consents may queue scrape-all (ops list is not a gate)."""
+    _ = settings  # reserved for future per-tier limits keyed off scrape_ops
+    return bool(user.is_active) and core_consents_complete(user)
 
 
 def parse_scrape_ops_user_ids(raw: str) -> set[int]:

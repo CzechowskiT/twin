@@ -1,5 +1,6 @@
-"""Scrape endpoint authorization (ops users only)."""
+"""Scrape endpoint authorization (authenticated users with core consents)."""
 
+from datetime import datetime, timezone
 from unittest.mock import patch
 
 import pytest
@@ -14,6 +15,20 @@ from app.database.models import Base, User
 from app.database.session import get_db
 from app.main import app
 
+_NOW = datetime.now(timezone.utc)
+
+
+def _user_with_consents(email: str) -> User:
+    return User(
+        email=email,
+        hashed_password="x",
+        is_active=True,
+        gdpr_consent_at=_NOW,
+        terms_of_service_accepted_at=_NOW,
+        job_data_processing_consent_at=_NOW,
+        ai_matching_consent_at=_NOW,
+    )
+
 
 @pytest.fixture
 def scrape_client():
@@ -25,8 +40,8 @@ def scrape_client():
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
     db = Session()
-    regular = User(email="regular@test.com", hashed_password="x", is_active=True)
-    ops = User(email="ops@test.com", hashed_password="x", is_active=True)
+    regular = _user_with_consents("regular@test.com")
+    ops = _user_with_consents("ops@test.com")
     db.add_all([regular, ops])
     db.commit()
     db.refresh(regular)
@@ -45,78 +60,76 @@ def scrape_client():
     db.close()
 
 
-@patch("app.api.jobs.scrape_all_boards_task")
-def test_scrape_all_forbidden_without_ops_role(mock_task, scrape_client, monkeypatch) -> None:
+@patch("app.api.jobs._celery_delay")
+def test_scrape_all_allowed_for_regular_user(mock_delay, scrape_client, monkeypatch) -> None:
     client, regular, ops, _db = scrape_client
     monkeypatch.setenv("SCRAPE_OPS_USER_IDS", str(ops.id))
     get_settings.cache_clear()
+    mock_delay.return_value = type("R", (), {"id": "task-1"})()
     try:
         token = create_access_token(regular.email)
         res = client.post(
             "/api/v1/jobs/scrape/all",
             headers={"Authorization": f"Bearer {token}"},
         )
-        assert res.status_code == 403
-        assert "ops" in res.json()["detail"].lower()
-        mock_task.delay.assert_not_called()
-    finally:
-        get_settings.cache_clear()
-
-
-@patch("app.api.jobs._celery_delay")
-def test_scrape_all_allowed_for_ops_user(mock_delay, scrape_client, monkeypatch) -> None:
-    client, _regular, ops, _db = scrape_client
-    monkeypatch.setenv("SCRAPE_OPS_USER_IDS", str(ops.id))
-    get_settings.cache_clear()
-    mock_delay.return_value = type("R", (), {"id": "task-1"})()
-    try:
-        token = create_access_token(ops.email)
-        res = client.post(
-            "/api/v1/jobs/scrape/all",
-            headers={"Authorization": f"Bearer {token}"},
-        )
         assert res.status_code == 200
         mock_delay.assert_called_once()
     finally:
         get_settings.cache_clear()
 
 
-def test_scrape_forbidden_when_ops_list_empty(scrape_client, monkeypatch) -> None:
+def test_scrape_all_forbidden_without_core_consents(scrape_client, monkeypatch) -> None:
+    client, _regular, _ops, db = scrape_client
+    incomplete = User(email="nocon@test.com", hashed_password="x", is_active=True)
+    db.add(incomplete)
+    db.commit()
+    monkeypatch.setenv("SCRAPE_OPS_USER_IDS", "")
+    get_settings.cache_clear()
+    try:
+        token = create_access_token(incomplete.email)
+        res = client.post(
+            "/api/v1/jobs/scrape/all",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert res.status_code == 403
+        assert "consent" in res.json()["detail"].lower()
+    finally:
+        get_settings.cache_clear()
+
+
+def test_scrape_allowed_when_ops_list_empty(scrape_client, monkeypatch) -> None:
     client, _regular, ops, _db = scrape_client
     monkeypatch.setenv("SCRAPE_OPS_USER_IDS", "")
     monkeypatch.delenv("SCRAPE_OPS_EMAILS", raising=False)
     get_settings.cache_clear()
     try:
         token = create_access_token(ops.email)
-        res = client.post(
-            "/api/v1/jobs/scrape/pracuj",
-            headers={"Authorization": f"Bearer {token}"},
-        )
-        assert res.status_code == 403
+        with patch("app.api.jobs._celery_delay") as mock_delay:
+            mock_delay.return_value = type("R", (), {"id": "task-2"})()
+            res = client.post(
+                "/api/v1/jobs/scrape/pracuj",
+                headers={"Authorization": f"Bearer {token}"},
+            )
+        assert res.status_code == 200
     finally:
         get_settings.cache_clear()
 
 
 @patch("app.api.jobs._celery_delay")
-def test_scrape_allowed_by_ops_email(mock_delay, scrape_client, monkeypatch) -> None:
+def test_scrape_allowed_with_or_without_ops_email(mock_delay, scrape_client, monkeypatch) -> None:
     client, regular, ops, _db = scrape_client
     monkeypatch.setenv("SCRAPE_OPS_USER_IDS", "")
     monkeypatch.setenv("SCRAPE_OPS_EMAILS", ops.email)
     get_settings.cache_clear()
-    mock_delay.return_value = type("R", (), {"id": "task-2"})()
+    mock_delay.return_value = type("R", (), {"id": "task-3"})()
     try:
-        token = create_access_token(ops.email)
-        res = client.post(
-            "/api/v1/jobs/scrape/all",
-            headers={"Authorization": f"Bearer {token}"},
-        )
-        assert res.status_code == 200
-        mock_delay.assert_called_once()
-        token_regular = create_access_token(regular.email)
-        denied = client.post(
-            "/api/v1/jobs/scrape/all",
-            headers={"Authorization": f"Bearer {token_regular}"},
-        )
-        assert denied.status_code == 403
+        for email in (ops.email, regular.email):
+            token = create_access_token(email)
+            res = client.post(
+                "/api/v1/jobs/scrape/all",
+                headers={"Authorization": f"Bearer {token}"},
+            )
+            assert res.status_code == 200
+        assert mock_delay.call_count == 2
     finally:
         get_settings.cache_clear()

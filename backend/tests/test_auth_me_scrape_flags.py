@@ -1,5 +1,6 @@
 """GET /auth/me scrape capability flags."""
 
+from datetime import datetime, timezone
 from unittest.mock import patch
 
 import pytest
@@ -14,6 +15,8 @@ from app.database.models import Base, User
 from app.database.session import get_db
 from app.main import app
 
+_NOW = datetime.now(timezone.utc)
+
 
 @pytest.fixture
 def me_client():
@@ -25,7 +28,15 @@ def me_client():
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
     db = Session()
-    user = User(email="ops@test.com", hashed_password="x", is_active=True)
+    user = User(
+        email="ops@test.com",
+        hashed_password="x",
+        is_active=True,
+        gdpr_consent_at=_NOW,
+        terms_of_service_accepted_at=_NOW,
+        job_data_processing_consent_at=_NOW,
+        ai_matching_consent_at=_NOW,
+    )
     db.add(user)
     db.commit()
     db.refresh(user)
@@ -55,13 +66,14 @@ def test_auth_me_scrape_flags_when_email_allowlisted(me_client, monkeypatch) -> 
         assert res.status_code == 200
         body = res.json()
         assert body["scrape_ops_configured"] is True
+        assert body["scrape_ops_elevated"] is True
         assert body["can_trigger_scrape"] is True
         assert body["scrape_worker_ready"] is True
     finally:
         get_settings.cache_clear()
 
 
-def test_auth_me_scrape_flags_when_unconfigured(me_client, monkeypatch) -> None:
+def test_auth_me_can_trigger_scrape_without_ops_allowlist(me_client, monkeypatch) -> None:
     client, user, _db = me_client
     monkeypatch.delenv("SCRAPE_OPS_EMAILS", raising=False)
     monkeypatch.setenv("SCRAPE_OPS_USER_IDS", "")
@@ -73,7 +85,8 @@ def test_auth_me_scrape_flags_when_unconfigured(me_client, monkeypatch) -> None:
         assert res.status_code == 200
         body = res.json()
         assert body["scrape_ops_configured"] is False
-        assert body["can_trigger_scrape"] is False
+        assert body["scrape_ops_elevated"] is False
+        assert body["can_trigger_scrape"] is True
         assert body["scrape_worker_ready"] is True
         assert body["mail_configured"] is False
         assert body["microsoft_calendar_oauth_configured"] is False
