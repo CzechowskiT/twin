@@ -179,9 +179,10 @@ class Settings(BaseSettings):
     # Separate OAuth redirect for Calendar scopes (add this exact URI in Google Cloud Console).
     google_calendar_redirect_uri: str = "http://localhost:8000/api/v1/calendar/google/callback"
 
-    # Microsoft Graph Calendar (separate redirect from Google; Azure app registration).
+    # Microsoft Entra (Azure app registration) — sign-in + calendar share client id/secret.
     microsoft_client_id: str = ""
     microsoft_client_secret: str = ""
+    microsoft_redirect_uri: str = "http://localhost:8000/api/v1/auth/microsoft/callback"
     microsoft_calendar_redirect_uri: str = "http://localhost:8000/api/v1/calendar/microsoft/callback"
     microsoft_tenant: str = "common"
 
@@ -212,6 +213,7 @@ class Settings(BaseSettings):
     @field_validator(
         "google_calendar_redirect_uri",
         "microsoft_calendar_redirect_uri",
+        "microsoft_redirect_uri",
         mode="before",
     )
     @classmethod
@@ -223,13 +225,15 @@ class Settings(BaseSettings):
     @model_validator(mode="after")
     def resolve_calendar_oauth_redirect_uris(self) -> "Settings":
         """Derive calendar callbacks from API_URL when env vars are unset (never FRONTEND_URL)."""
+        from app.services.calendar_oauth_redirect import effective_google_calendar_redirect_uri
         from app.services.calendar_oauth_redirect import (
-            effective_google_calendar_redirect_uri,
             effective_microsoft_calendar_redirect_uri,
         )
+        from app.services.microsoft_oauth import effective_microsoft_redirect_uri
 
         self.google_calendar_redirect_uri = effective_google_calendar_redirect_uri(self)
         self.microsoft_calendar_redirect_uri = effective_microsoft_calendar_redirect_uri(self)
+        self.microsoft_redirect_uri = effective_microsoft_redirect_uri(self)
         return self
 
     auto_apply_headless: bool = False

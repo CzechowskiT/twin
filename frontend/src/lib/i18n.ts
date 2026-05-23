@@ -1066,6 +1066,7 @@ const en = {
     oauthGoogle: "Continue with Google",
     oauthGithub: "Continue with GitHub",
     oauthApple: "Continue with Apple",
+    oauthMicrosoft: "Continue with Microsoft",
   },
   forgotPassword: {
     title: "Reset password",
@@ -3393,6 +3394,7 @@ const pl: MessageTree = {
     oauthGoogle: "Kontynuuj z Google",
     oauthGithub: "Kontynuuj z GitHub",
     oauthApple: "Kontynuuj z Apple",
+    oauthMicrosoft: "Kontynuuj z Microsoft",
   },
   forgotPassword: {
     title: "Reset hasła",

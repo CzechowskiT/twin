@@ -70,6 +70,12 @@ from app.services.login_rate_limit import enforce_login_rate_limit_per_minute
 from app.services.google_calendar_oauth import is_google_calendar_oauth_configured
 from app.services.mail import is_mail_configured
 from app.services.microsoft_calendar_oauth import is_microsoft_calendar_oauth_configured
+from app.services.microsoft_oauth import (
+    MicrosoftOAuthError,
+    build_microsoft_authorize_url,
+    exchange_microsoft_code_for_profile,
+    is_microsoft_configured,
+)
 from app.services.oauth_state import create_oauth_state, verify_oauth_state
 from app.services.oauth_types import OAuthUserProfile
 from app.services.oauth_user import user_from_oauth
@@ -104,6 +110,7 @@ class WebOAuthProvider(str, Enum):
     google = "google"
     github = "github"
     apple = "apple"
+    microsoft = "microsoft"
 
 
 def _frontend_callback_url(**params: str) -> str:
@@ -125,6 +132,8 @@ def _web_oauth_configured(provider: WebOAuthProvider) -> bool:
         return is_github_configured()
     if provider == WebOAuthProvider.apple:
         return is_apple_configured()
+    if provider == WebOAuthProvider.microsoft:
+        return is_microsoft_configured()
     return False
 
 
@@ -135,6 +144,8 @@ def _web_oauth_authorize_url(provider: WebOAuthProvider, state: str) -> str:
         return build_github_authorize_url(state)
     if provider == WebOAuthProvider.apple:
         return build_apple_authorize_url(state)
+    if provider == WebOAuthProvider.microsoft:
+        return build_microsoft_authorize_url(state)
     raise AssertionError("unsupported web OAuth provider")
 
 
@@ -147,6 +158,8 @@ def _web_oauth_exchange_profile(
         return exchange_github_code_for_profile(code)
     if provider == WebOAuthProvider.apple:
         return exchange_apple_code_for_profile(code, apple_user)
+    if provider == WebOAuthProvider.microsoft:
+        return exchange_microsoft_code_for_profile(code)
     raise AssertionError("unsupported web OAuth provider")
 
 
@@ -553,7 +566,7 @@ def web_oauth_login(provider: WebOAuthProvider) -> RedirectResponse:
     state = create_oauth_state()
     try:
         url = _web_oauth_authorize_url(provider, state)
-    except (GoogleOAuthError, GitHubOAuthError, AppleOAuthError):
+    except (GoogleOAuthError, GitHubOAuthError, AppleOAuthError, MicrosoftOAuthError):
         return RedirectResponse(_frontend_login_url(error=f"{slug}_not_configured"), status_code=302)
     return RedirectResponse(url, status_code=302)
 
@@ -577,7 +590,7 @@ async def web_oauth_callback(
         profile = _web_oauth_exchange_profile(provider, code, apple_user)
         user = user_from_oauth(db, profile)
         profile_created = ensure_candidate_from_oauth_profile(db, user, profile.email, profile.name)
-    except (GoogleOAuthError, GitHubOAuthError, AppleOAuthError):
+    except (GoogleOAuthError, GitHubOAuthError, AppleOAuthError, MicrosoftOAuthError):
         return RedirectResponse(_frontend_callback_url(error=f"{slug}_failed"), status_code=302)
 
     if not user.is_active:
