@@ -184,6 +184,7 @@ export default function BillingPage() {
   const [billingTaxId, setBillingTaxId] = useState("");
   const [billingSaveBusy, setBillingSaveBusy] = useState(false);
   const [billingSaveOk, setBillingSaveOk] = useState(false);
+  const [checkoutUnavailable, setCheckoutUnavailable] = useState(false);
 
   const load = useCallback(async () => {
     const token = getToken();
@@ -263,6 +264,7 @@ export default function BillingPage() {
     if (!token) return;
     setBusy(`checkout-${plan}`);
     setActionError(false);
+    setCheckoutUnavailable(false);
     try {
       const res = await apiFetch<UrlPayload>(
         "/api/v1/billing/checkout-session",
@@ -271,7 +273,15 @@ export default function BillingPage() {
       );
       window.location.href = res.url;
     } catch (e) {
-      setActionError(true);
+      const msg = e instanceof Error ? e.message : String(e);
+      const lc = msg.toLowerCase();
+      const stripeOff =
+        lc.includes("503") ||
+        lc.includes("billing is not configured") ||
+        lc.includes("stripe") ||
+        !(plans?.checkout_configured ?? false);
+      setCheckoutUnavailable(stripeOff);
+      setActionError(!stripeOff);
       console.warn("[billing] checkout-session failed", e);
     } finally {
       setBusy(null);
@@ -356,6 +366,15 @@ export default function BillingPage() {
           {checkoutBanner === "cancel" ? (
             <Card variant="soft" className="!mb-0">
               <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.billingCheckoutCancelled")}</p>
+            </Card>
+          ) : null}
+          {checkoutUnavailable ? (
+            <Card variant="soft" className="!mb-0 border-[var(--twin-accent-muted)]">
+              <p className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.billingPaymentsLaunchingTitle")}</p>
+              <p className="twin-muted mt-2 text-sm leading-relaxed">{t("dashboard.billingPaymentsLaunchingLead")}</p>
+              <Link href="/waitlist" className="twin-link mt-3 inline-block text-sm font-semibold">
+                {t("dashboard.billingCtaJoinWishlist")} →
+              </Link>
             </Card>
           ) : null}
           {actionError ? (
