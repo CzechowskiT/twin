@@ -4,7 +4,7 @@ Autonomous agent run for investor demo readiness.
 **Prod API:** https://twin-production-bcd9.up.railway.app  
 **Prod frontend:** https://twin-sooty.vercel.app  
 **Founder:** czechowski@protonmail.ch  
-**Branch merged & pushed:** `cursor/phase1-monorepo-scaffold` @ `8a8e35a`
+**Branch merged & pushed:** `cursor/phase1-monorepo-scaffold` @ `630e2d2` (includes `7446595` S3 + recruiter inbox via `f011c13`)
 
 ---
 
@@ -51,9 +51,9 @@ Autonomous agent run for investor demo readiness.
 
 | Item | Status | Evidence / notes |
 |------|--------|------------------|
-| Merge OAuth branches → scaffold | ✅ done | Merged `cursor/microsoft-railway-env-sync`, `cursor/oauth-sign-in-redirect-uris`, `cursor/oauth-railway-env-sync`; pushed `8a8e35a` |
+| Merge `cursor/data-room-s3-recruiter-inbox` + OAuth branches → scaffold | ✅ done | Merged `cursor/microsoft-railway-env-sync`, `cursor/oauth-sign-in-redirect-uris`, `cursor/oauth-railway-env-sync`; pushed `630e2d2`; `7446595` on scaffold |
 | Railway + Vercel redeploy | ✅ done | Railway env apply triggered redeploy; git push to scaffold triggers GitHub-integrated deploy |
-| `/status` & `health?ops=1` git_commit = HEAD | ✅ done | Prod `git_commit`: `8a8e35ad6f4c9b4d110d961021eaa79f66fa9c8f` matches local HEAD after deploy |
+| `/status` & `health?ops=1` git_commit = HEAD | ✅ done | Prod `git_commit`: `630e2d2` on scaffold — re-check `/status` after Railway catches up) |
 
 ---
 

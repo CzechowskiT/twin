@@ -79,7 +79,7 @@
 
 ## 6. Rekruter — inbox akceptacji i batch
 
-1. [Priorytet: P0] Inbox rekrutera — batch accept/decline na liście pre-qualified (`docs/RECRUITER_INBOX.md`) na prod z seed demo (wartość: north star po stronie B2B).
+1. ✅ [Priorytet: P0] Inbox rekrutera — batch accept/decline na liście pre-qualified (`docs/RECRUITER_INBOX.md`) na prod z seed demo (wartość: north star po stronie B2B).
 2. ✅ [Priorytet: P1] Filtr inbox — status + wyszukiwanie (wartość: rekruter widzi najpierw najlepszych).
 3. [Priorytet: P1] Akcja „zaproponuj 3 sloty” z inbox — wysyłka propozycji do kandydata (wartość: ścieżka do kalendarza bez maila).
 4. [Priorytet: P1] Powiadomienie e-mail — tylko transakcyjne przy nowym batchu (wartość: brak spamu, jeden mail = jedna decyzja).
@@ -156,7 +156,7 @@
 
 ## 12. Inwestor, compliance, data room, metryki
 
-1. [Priorytet: P0] Data room S3 — upload bajtów gdy `S3_BUCKET_NAME`; nie tylko metadata (`docs` upload stub) (wartość: inwestor pobiera deck i model bez maila). *(copy enterprise, bez żargonu infra: ✅ `9188289`; S3: founder)*
+1. [Priorytet: P0] Data room S3 — upload bajtów gdy `S3_BUCKET_NAME`; nie tylko metadata (`docs` upload stub) (wartość: inwestor pobiera deck i model bez maila). *(copy enterprise, bez żargonu infra: ✅ `9188289`; S3 path wired ✅ `7446595`; live bucket: founder `S3_*` + railway apply)*
 2. [Priorytet: P1] Metryki inwestora — MRR/ARR z prawdziwego Stripe gdy live (wartość: liczby z systemu, nie arkusza).
 3. [Priorytet: P1] Admin metrics — DAU, auto-apply runs, placement verified (wartość: founder widzi traction w jednym miejscu).
 4. [Priorytet: P1] Quantica compliance — domknięcie checklisty (`docs/QUANTICA_COMPLIANCE.md`) (wartość: due diligence bez ostatniej chwili).

@@ -2,7 +2,7 @@
 
 **Updated:** 2026-05-23 (autonomous 5-slice session)  
 **Branch:** `cursor/phase1-monorepo-scaffold`  
-**One-liner:** Prod API `56f5241` — Stripe checkout live, Celery beat + worker OK, demo founder auto-apply, S3 data room czeka na `S3_*`.
+**One-liner:** Scaffold `630e2d2` — S3 data room path wired (`7446595`); recruiter inbox batch ✅; prod S3 flag still off until `S3_*` on Railway.
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Surface | Status |
 |---------|--------|
-| API deploy | `56f5241` — Microsoft OAuth scripts + autonomous slices |
+| API deploy | `630e2d2` — S3 presigned PUT + recruiter inbox seed (`f011c13`/`7446595`) |
 | Vercel front | Proxy aligned with scaffold (`/status` → `git_commit`) |
 | Demo verify | **PASS** (`live_db`, top matches) |
 | LinkedIn OAuth | **Live** (`linkedin_oauth_configured: true`) |
@@ -19,7 +19,7 @@
 | Google Calendar | **Configured** |
 | Microsoft Calendar | **Configured** (`microsoft_calendar_configured: true`) |
 | Mail (Resend) | **Configured** (`mail_configured: true`) |
-| Data room S3 | **Off** — `data_room_local_demo: true` until `S3_*` on Railway |
+| Data room S3 | **Wired in code** — presigned PUT + banners; prod `data_room_local_demo: true` until founder `S3_*` + railway apply |
 | MRR | `0` paid subscribers (Stripe keys live; no prod subs yet) |
 
 Quick audit: [https://twin-sooty.vercel.app/status](https://twin-sooty.vercel.app/status)  
