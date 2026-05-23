@@ -2285,6 +2285,15 @@ html[data-marketing-surface="studio"] .twin-roi-enterprise-strip-muted {
   }
 }
 
+a.landing-hero-wishlist-cta {
+  min-height: 3.25rem;
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
 a.landing-hero-register-cta {
   min-height: 3.25rem;
   padding-left: 2.5rem;

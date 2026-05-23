@@ -6,6 +6,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useTranslation } from "@/components/language-provider";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
+import { WorkspaceFlowSteps } from "@/components/ux/workspace-flow-steps";
 import { Button, Card, Input, Label, Shell } from "@/components/ui";
 import { apiFetch, apiFetchBlob, apiUpload, saveBlobAsFile } from "@/lib/api";
 import { getToken } from "@/lib/auth";
@@ -533,6 +534,7 @@ export default function ProfilePage() {
           onExportJson={() => void downloadMyDataJson()}
         />
       </div>
+      <WorkspaceFlowSteps current="profile" className="mb-4 sm:mb-6" />
       <Card>
 
         <section className="twin-filter-box mb-6">

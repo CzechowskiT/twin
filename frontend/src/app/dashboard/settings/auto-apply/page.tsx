@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
+import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { useTranslation } from "@/components/language-provider";
+import { WorkspaceFlowSteps } from "@/components/ux/workspace-flow-steps";
 import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
@@ -118,11 +120,22 @@ export default function NightlyAutoApplySettingsPage() {
   const nextTime = settings?.next_run_label ?? "02:00";
 
   return (
-    <Shell wide rail>
-      <div className="mx-auto max-w-2xl space-y-6">
-        <h1 className="text-2xl font-bold">{t("dashboard.nightlyAutoApplyTitle")}</h1>
-        <p className="text-sm text-[var(--twin-muted)]">{t("dashboard.nightlyAutoApplyLead")}</p>
-        <Link href="/dashboard" className="twin-link text-sm">
+    <Shell rail>
+      <div className="space-y-6">
+        <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
+              {t("dashboard.nightlyAutoApplyTitle")}
+            </p>
+            <h1 className="twin-page-intro twin-section-title mt-1 text-xl sm:text-2xl">
+              {t("dashboard.nightlyAutoApplyTitle")}
+            </h1>
+            <p className="twin-muted mt-2 max-w-prose text-sm leading-relaxed">{t("dashboard.nightlyAutoApplyLead")}</p>
+          </div>
+          <CandidateWorkspaceSubnav ariaLabel={t("dashboard.nightlyAutoApplyTitle")} />
+        </div>
+        <WorkspaceFlowSteps current="actions" className="mb-2" />
+        <Link href="/dashboard" className="twin-btn-secondary twin-touch-target inline-block !w-auto text-sm">
           ← {t("dashboard.title")}
         </Link>
 

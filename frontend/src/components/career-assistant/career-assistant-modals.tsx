@@ -34,7 +34,7 @@ function ModalShell({
             <p className="text-xs font-medium uppercase tracking-wide text-[var(--twin-accent)]">{eyebrow}</p>
             <h2 className="mt-1 text-lg font-semibold">{title}</h2>
           </div>
-          <button type="button" className="twin-btn-secondary !w-auto shrink-0 px-3 py-1 text-sm" onClick={onClose}>
+          <button type="button" className="twin-btn-ghost !w-auto shrink-0 px-3 py-1 text-sm" onClick={onClose} aria-label="Close">
             ×
           </button>
         </div>
