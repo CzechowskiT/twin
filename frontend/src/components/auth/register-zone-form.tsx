@@ -91,8 +91,7 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
     if (!oauthUrlError) return null;
     if (!oauthStatusLoaded) return oauthUrlError;
     const err = searchParams.get("error");
-    if (err === "apple_not_configured" && !oauthStatus.apple) return null;
-    if (err === "github_not_configured" && !oauthStatus.github) return null;
+    if (err === "apple_not_configured" || err === "github_not_configured") return null;
     return oauthUrlError;
   }, [error, oauthStatus, oauthStatusLoaded, oauthUrlError, searchParams]);
 
@@ -100,10 +99,12 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
     if (!oauthStatusLoaded) return;
     const err = searchParams.get("error");
     if (err !== "apple_not_configured" && err !== "github_not_configured") return;
-    const stale =
+    const shouldClear =
       (err === "apple_not_configured" && !oauthStatus.apple) ||
-      (err === "github_not_configured" && !oauthStatus.github);
-    if (!stale) return;
+      (err === "github_not_configured" && !oauthStatus.github) ||
+      (err === "apple_not_configured" && oauthStatus.apple) ||
+      (err === "github_not_configured" && oauthStatus.github);
+    if (!shouldClear) return;
     const q = new URLSearchParams(searchParams.toString());
     q.delete("error");
     const suffix = q.toString();
