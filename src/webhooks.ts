@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import type Stripe from "stripe";
-import { config } from "./config.js";
-import { stripe } from "./stripe.js";
+import { requireWebhookSecret } from "./config.js";
+import { getStripe } from "./stripe.js";
 
 export async function handleStripeWebhook(
   req: Request,
@@ -22,10 +22,10 @@ export async function handleStripeWebhook(
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(
+    event = getStripe().webhooks.constructEvent(
       req.body,
       signature,
-      config.stripeWebhookSecret,
+      requireWebhookSecret(),
     );
   } catch (err) {
     const message = err instanceof Error ? err.message : "Invalid signature";
@@ -50,7 +50,6 @@ async function processWebhookEvent(event: Stripe.Event): Promise<void> {
       console.log(
         `[webhook] checkout.session.completed id=${session.id} payment_status=${session.payment_status}`,
       );
-      // Fulfill the order: grant access, send email, update your database, etc.
       break;
     }
     case "checkout.session.async_payment_succeeded": {

@@ -1,9 +1,16 @@
 import Stripe from "stripe";
-import { config } from "./config.js";
+import { config, requireStripeSecretKey } from "./config.js";
 
-export const stripe = new Stripe(config.stripeSecretKey, {
-  ...(config.stripeApiVersion
-    ? { apiVersion: config.stripeApiVersion as Stripe.LatestApiVersion }
-    : {}),
-  typescript: true,
-});
+let client: Stripe | undefined;
+
+export function getStripe(): Stripe {
+  if (!client) {
+    client = new Stripe(requireStripeSecretKey(), {
+      ...(config.stripeApiVersion
+        ? { apiVersion: config.stripeApiVersion as Stripe.LatestApiVersion }
+        : {}),
+      typescript: true,
+    });
+  }
+  return client;
+}

@@ -1,6 +1,10 @@
 # Stripe Checkout + Webhooks
 
+**Kod na GitHubie:** https://github.com/CzechowskiT/twin/tree/cursor/stripe-checkout-app
+
 Minimal production-style integration using **Stripe Checkout Sessions** (hosted checkout) and **webhook signature verification**.
+
+**Szybki start:** `npm install && npm run setup && npm run dev` — potem wklej klucze Stripe do `.env` (link wypisze `setup`).
 
 ## Prerequisites
 

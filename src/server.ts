@@ -1,8 +1,8 @@
 import express from "express";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { config } from "./config.js";
-import { stripe } from "./stripe.js";
+import { config, isStripeConfigured } from "./config.js";
+import { getStripe } from "./stripe.js";
 import { handleStripeWebhook } from "./webhooks.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -10,7 +10,6 @@ const publicDir = path.join(__dirname, "..", "public");
 
 const app = express();
 
-// Stripe webhooks require the raw body for signature verification.
 app.post(
   "/webhook",
   express.raw({ type: "application/json" }),
@@ -21,14 +20,27 @@ app.use(express.json());
 app.use(express.static(publicDir));
 
 app.get("/health", (_req, res) => {
-  res.json({ ok: true });
+  res.json({
+    ok: true,
+    stripeConfigured: isStripeConfigured(),
+    appUrl: config.appUrl,
+    keysUrl: config.stripeDashboardKeysUrl,
+  });
 });
 
 app.post("/create-checkout-session", async (req, res) => {
+  if (!isStripeConfigured()) {
+    res.status(503).json({
+      error: "Stripe is not configured. Run: npm run setup",
+      keysUrl: config.stripeDashboardKeysUrl,
+    });
+    return;
+  }
+
   try {
     const quantity = Math.max(1, Number(req.body?.quantity) || 1);
 
-    const session = await stripe.checkout.sessions.create({
+    const session = await getStripe().checkout.sessions.create({
       mode: "payment",
       line_items: [
         {
@@ -58,8 +70,13 @@ app.post("/create-checkout-session", async (req, res) => {
 });
 
 app.get("/checkout-session/:sessionId", async (req, res) => {
+  if (!isStripeConfigured()) {
+    res.status(503).json({ error: "Stripe is not configured. Run: npm run setup" });
+    return;
+  }
+
   try {
-    const session = await stripe.checkout.sessions.retrieve(
+    const session = await getStripe().checkout.sessions.retrieve(
       req.params.sessionId,
     );
     res.json({
@@ -80,4 +97,9 @@ app.listen(config.port, () => {
   console.log(`Stripe checkout app listening on ${config.appUrl}`);
   console.log(`  Checkout UI: ${config.appUrl}/`);
   console.log(`  Webhook URL: ${config.appUrl}/webhook`);
+  if (!isStripeConfigured()) {
+    console.log(
+      `  Stripe keys missing — run: npm run setup → ${config.stripeDashboardKeysUrl}`,
+    );
+  }
 });
