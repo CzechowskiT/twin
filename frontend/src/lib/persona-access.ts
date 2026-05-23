@@ -212,8 +212,8 @@ export function headerAccountLinks(
 ): HeaderAccountLink[] {
   if (!hasSession) {
     return [
-      { href: LOGIN_PATH[persona], labelKey: "nav.login" },
-      { href: REGISTER_PATH[persona], labelKey: "nav.register" },
+      { href: "/login", labelKey: "nav.login" },
+      { href: "/register", labelKey: "nav.register" },
     ];
   }
   if (persona === "candidate") {

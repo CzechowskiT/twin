@@ -867,8 +867,8 @@ const en = {
   },
   login: {
     title: "Log in",
-    hubTitle: "Choose your workspace",
-    hubLead: "Same TWIN account — different tools after sign-in. Pick the lane that matches how you use the product.",
+    hubTitle: "Choose your role",
+    hubLead: "Same TWIN account — different tools after sign-in. Pick the role that matches how you use TWIN.",
     zoneCandidateTitle: "Candidate sign-in",
     zoneCandidateLead: "Dashboard, matches, auto-apply, and interview calendar.",
     zoneRecruiterTitle: "Recruiter sign-in",
@@ -974,6 +974,9 @@ const en = {
       "Separate legal basis from core service and matching. You can turn this off anytime in your profile. We use it sparingly for product news, not cold sales blasts.",
   },
   register: {
+    hubTitle: "Choose your role",
+    hubLead: "One TWIN account — pick how you will use the product, then complete registration for that lane.",
+    allZones: "All registration options",
     title: "Create account",
     email: "Email",
     password: "Password",
@@ -2813,7 +2816,7 @@ const pl: MessageTree = {
   },
   login: {
     title: "Zaloguj się",
-    hubTitle: "Wybierz strefę logowania",
+    hubTitle: "Wybierz rolę",
     hubLead: "To samo konto TWIN — po zalogowaniu inne narzędzia. Wybierz rolę, której dotyczy Twoja praca.",
     zoneCandidateTitle: "Logowanie kandydata",
     zoneCandidateLead: "Panel, dopasowania, auto-apply i kalendarz rozmów.",
@@ -2924,6 +2927,9 @@ const pl: MessageTree = {
       "Osobna podstawa prawna od działania usługi i dopasowania ofert. Wyłączysz to w każdej chwili w profilu. Rzadko: nowości produktowe, bez zimnej sprzedaży.",
   },
   register: {
+    hubTitle: "Wybierz rolę",
+    hubLead: "Jedno konto TWIN — wybierz, jak będziesz korzystać z produktu, a potem dokończ rejestrację w tej strefie.",
+    allZones: "Wszystkie opcje rejestracji",
     title: "Utwórz konto",
     email: "E-mail",
     password: "Hasło",
