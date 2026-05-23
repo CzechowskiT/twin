@@ -1,44 +1,33 @@
-# Vercel production branch
+# Vercel — gałąź produkcyjna
 
-**Project:** [twin](https://vercel.com/twin/twin)  
-**Production URL:** https://twin-sooty.vercel.app  
-**Root directory:** `frontend/`
+**Projekt:** twin-sooty (frontend w `frontend/`)  
+**Gałąź produkcyjna:** `cursor/phase1-monorepo-scaffold` (brak `main` na remote — ta gałąź jest źródłem prawdy dla Phase 1)
 
-## Required settings
+## Ustawienia (jednorazowo)
 
-| Setting | Value |
-|---------|--------|
-| Git repository | `CzechowskiT/twin` (not `CzechowskiD/twin`) |
-| **Production Branch** | `cursor/phase1-monorepo-scaffold` |
-| Preview (optional) | Same branch if you test preview = prod |
+1. [Vercel Dashboard](https://vercel.com) → projekt **twin-sooty** → **Settings** → **Git**.
+2. **Production Branch** = `cursor/phase1-monorepo-scaffold`.
+3. **Root Directory** = `frontend`.
+4. **Environment Variables** (Production + Preview):
+   - `TWIN_API_BASE_URL` lub `NEXT_PUBLIC_API_URL` = URL API Railway (bez końcowego `/`), np. `https://twin-production-bcd9.up.railway.app`
+5. Zapisz i wykonaj **Redeploy** ostatniego zielonego buildu na tej gałęzi.
 
-There is **no `main` branch** on the remote. If Production Branch is `main` or `master`, deploys will fail or never pick up fixes.
+## Po każdym pushu
 
-## Verify after push
+1. Sprawdź **Deployments** — status **Ready** (nie tylko Preview).
+2. Jeśli Production nie podąża za scaffoldem: **Promote to Production** na ostatnim zielonym deployu lub **Redeploy**.
+3. Porównaj wersję na żywo z commitem w GitHub (np. stopka `/status` lub hash w panelu).
 
-```bash
-git fetch origin cursor/phase1-monorepo-scaffold
-git rev-parse --short origin/cursor/phase1-monorepo-scaffold
-```
+## Typowe problemy
 
-In Vercel → **Deployments** → latest **Production** → commit SHA must match the command above.
+| Objaw | Działanie |
+|--------|-----------|
+| Stary front po pushu | Production Branch ≠ scaffold → popraw i redeploy |
+| 502 / brak API | `NEXT_PUBLIC_API_URL` / `TWIN_API_BASE_URL` puste lub złe → popraw env i redeploy |
+| Build czerwony | Lokalnie `cd frontend && npm run build`; napraw TS/importy, push ponownie |
 
-## If deploy stays red
+## Powiązane
 
-1. **Wrong branch** — Settings → Git → Production Branch → `cursor/phase1-monorepo-scaffold` → Redeploy.
-2. **Wrong repo** — Settings → Git → connect `CzechowskiT/twin`.
-3. **Build error** — open failed deployment log; fix locally with `cd frontend && npm run build` and `npx tsc --noEmit`.
-4. **Env vars** — Production needs at least `NEXT_PUBLIC_API_URL` (Railway API). See `docs/DEPLOY.md` and `docs/KONFIGURACJA_PROD_KROK_PO_KROKU.md`.
-5. **Stale green deploy** — Redeploy last successful Production build after branch fix.
-
-## Local build (matches Vercel)
-
-```bash
-cd frontend
-npm run build          # uses `next build` (Turbopack by default in package.json)
-npx tsc --noEmit
-```
-
-If Turbopack fails in CI, use `next build --webpack` per `frontend/package.json`.
-
-See also: [DEPLOY.md](./DEPLOY.md) (deploy truth table).
+- `docs/P0_CHECKLIST.md` — sekcja Vercel  
+- `docs/FOUNDER_TASK_REPORT_2026-05-16_to_today.md` — checklist founder  
+- Railway: ta sama gałąź Git co Vercel

@@ -11,6 +11,7 @@
 | **Production git branch** | `cursor/phase1-monorepo-scaffold` (lub branch jawnie wybrany w Vercel → Production) |
 | **Vercel project** | Root directory: `frontend/` |
 | **Vercel Production URL** | `https://twin-sooty.vercel.app` (lub Twoja domena) |
+| **Vercel Production branch (how-to)** | [VERCEL_PRODUCTION_BRANCH.md](./VERCEL_PRODUCTION_BRANCH.md) |
 | **Railway API** | Root: `backend/` — ten sam branch co frontend |
 | **Verify deploy SHA** | Vercel → Deployments → commit **musi** = `git rev-parse origin/<branch>` |
 
