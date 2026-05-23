@@ -8,10 +8,21 @@ import {
   FollowUpModal,
   InterviewPrepModal,
 } from "@/components/career-assistant/career-assistant-modals";
+import { CalendarWeekView } from "@/components/calendar/calendar-week-view";
+import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { useTranslation } from "@/components/language-provider";
+import { WorkspaceFlowSteps } from "@/components/ux/workspace-flow-steps";
 import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch, apiFetchBlob, saveBlobAsFile } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
+import { calendarProviderLabel } from "@/lib/calendar-provider";
+import {
+  mergeProviderAndTwinEvents,
+  startOfWeekMonday,
+  weekRangeIso,
+  type DisplayCalendarEvent,
+  type ProviderCalendarEvent,
+} from "@/lib/calendar-week";
 import type { TranslationKey } from "@/lib/i18n";
 import {
   mintAndOpenWebcalSubscribe,
@@ -71,6 +82,8 @@ type ScheduledInterview = {
   status: string;
   calendar_event_id: string | null;
 };
+
+type CalendarEventsPayload = { events: ProviderCalendarEvent[] };
 
 function isoToDatetimeLocalValue(iso: string): string {
   const d = new Date(iso);
@@ -145,7 +158,13 @@ export default function DashboardCalendarPage() {
   const [notifPrefsSaveError, setNotifPrefsSaveError] = useState(false);
   const [notifPrefsSaving, setNotifPrefsSaving] = useState<null | keyof AuthMeOut>(null);
   const [webcalLinkCopied, setWebcalLinkCopied] = useState(false);
+  const [weekStart, setWeekStart] = useState(() => startOfWeekMonday(new Date()));
+  const [displayEvents, setDisplayEvents] = useState<DisplayCalendarEvent[]>([]);
+  const [eventsLoading, setEventsLoading] = useState(false);
+  const [eventsLoadError, setEventsLoadError] = useState(false);
   const interviewRefreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const isCalendarConnected = Boolean(status?.connected || msStatus?.connected);
 
   const fetchInterviewRows = useCallback(
     async (token: string) => {
@@ -241,6 +260,39 @@ export default function DashboardCalendarPage() {
       void load();
     });
   }, [load]);
+
+  const fetchCalendarWeekEvents = useCallback(async () => {
+    const prov = status?.connected ? "google" : msStatus?.connected ? "microsoft" : null;
+    if (!prov) {
+      setDisplayEvents([]);
+      return;
+    }
+    const token = getToken();
+    if (!token) return;
+    const { timeMin, timeMax } = weekRangeIso(weekStart);
+    setEventsLoading(true);
+    setEventsLoadError(false);
+    try {
+      const params = new URLSearchParams({ time_min: timeMin, time_max: timeMax });
+      const out = await apiFetch<CalendarEventsPayload>(
+        `/api/v1/calendar/${prov}/events?${params.toString()}`,
+        {},
+        token,
+      );
+      setDisplayEvents(mergeProviderAndTwinEvents(out.events, interviews, weekStart));
+    } catch (e) {
+      setEventsLoadError(true);
+      setDisplayEvents(mergeProviderAndTwinEvents([], interviews, weekStart));
+      console.warn("[calendar] week events fetch failed", e);
+    } finally {
+      setEventsLoading(false);
+    }
+  }, [weekStart, interviews, status?.connected, msStatus?.connected]);
+
+  useEffect(() => {
+    if (loading || !isCalendarConnected) return;
+    void fetchCalendarWeekEvents();
+  }, [loading, isCalendarConnected, fetchCalendarWeekEvents]);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -569,6 +621,7 @@ export default function DashboardCalendarPage() {
       );
       setScheduleNote(t("dashboard.calendarScheduleSaved"));
       await load();
+      void fetchCalendarWeekEvents();
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       if (msg.toLowerCase().includes("not available") || msg.includes("409")) {
@@ -585,18 +638,85 @@ export default function DashboardCalendarPage() {
   const loc = locale === "pl" ? "pl-PL" : "en-US";
 
   return (
-    <Shell wide rail>
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">{t("dashboard.calendarPageTitle")}</h1>
-          <p className="twin-muted mt-2 max-w-2xl text-sm leading-relaxed">{t("dashboard.calendarPageLead")}</p>
+    <Shell rail>
+      <div className="mb-4 flex min-w-0 flex-col gap-3 sm:mb-6 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
+            {t("dashboard.calendarProvidersEyebrow")}
+          </p>
+          <h1 className="twin-page-intro twin-section-title mt-1 text-xl sm:text-2xl">
+            {t("dashboard.calendarPageTitle")}
+          </h1>
+          <p className="twin-muted mt-2 max-w-prose text-sm leading-relaxed">
+            {isCalendarConnected ? t("dashboard.calendarPageLead") : t("dashboard.calendarPageLeadDisconnected")}
+          </p>
         </div>
-        <Link href="/dashboard" className="twin-link twin-touch-target text-sm">
-          {t("dashboard.calendarBackDashboard")}
-        </Link>
+        <CandidateWorkspaceSubnav ariaLabel={t("dashboard.calendarPageTitle")} />
       </div>
+      <WorkspaceFlowSteps current="dashboard" className="mb-4 sm:mb-6" />
+      <Link href="/dashboard" className="twin-btn-secondary twin-touch-target mb-6 inline-block !w-auto text-sm">
+        {t("dashboard.calendarBackDashboard")}
+      </Link>
 
-      <div className="mb-6 flex flex-col gap-4">
+      {banner === "connected" ? (
+        <Card variant="soft" className="mb-4 border-emerald-200/80 bg-emerald-50/90 text-emerald-950 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-50">
+          <p className="text-sm font-medium">{t("dashboard.calendarConnected")}</p>
+        </Card>
+      ) : null}
+      {banner === "denied" ? (
+        <Card variant="soft" className="mb-4">
+          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.calendarOAuthDenied")}</p>
+        </Card>
+      ) : null}
+      {banner === "error" ? (
+        <Card variant="soft" className="mb-4">
+          <p className="text-sm text-[var(--twin-muted-strong)]">{calendarErrorMessage}</p>
+        </Card>
+      ) : null}
+      {actionError ? (
+        <Card variant="soft" className="mb-4">
+          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.calendarErrorGeneric")}</p>
+        </Card>
+      ) : null}
+
+      {loading ? (
+        <p className="mb-6 text-sm text-[var(--twin-muted-strong)]">{t("dashboard.identityLoading")}</p>
+      ) : isCalendarConnected ? (
+        <CalendarWeekView
+          weekStart={weekStart}
+          events={displayEvents}
+          loading={eventsLoading}
+          loadError={eventsLoadError}
+          accountEmail={
+            status?.connected ? status.google_email : msStatus?.microsoft_email ?? null
+          }
+          providerLabel={calendarProviderLabel(activeCalendarProvider(), t)}
+          onPrevWeek={() => setWeekStart((w) => startOfWeekMonday(new Date(w.getTime() - 7 * 24 * 60 * 60 * 1000)))}
+          onNextWeek={() => setWeekStart((w) => startOfWeekMonday(new Date(w.getTime() + 7 * 24 * 60 * 60 * 1000)))}
+          onToday={() => setWeekStart(startOfWeekMonday(new Date()))}
+        />
+      ) : (
+        <Card className="mb-6">
+          <h2 className="text-base font-semibold text-[var(--foreground)]">{t("dashboard.calendarConnectHeroTitle")}</h2>
+          <p className="twin-muted mt-2 max-w-2xl text-sm leading-relaxed">{t("dashboard.calendarConnectHeroBody")}</p>
+          {status?.oauth_configured === false ? (
+            <div className="mt-4 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-2)] px-3 py-3">
+              <p className="text-sm font-medium text-[var(--foreground)]">{t("dashboard.calendarGoogleSoon")}</p>
+              <p className="twin-muted mt-1 text-sm leading-relaxed">{t("dashboard.calendarGoogleSoonBody")}</p>
+            </div>
+          ) : (
+            <Button type="button" className="twin-touch-target mt-4" disabled={Boolean(actionBusy)} onClick={() => void connect()}>
+              {actionBusy === "connect" ? "…" : t("dashboard.calendarConnect")}
+            </Button>
+          )}
+        </Card>
+      )}
+
+      <details className="mb-6 rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/40 px-4 py-3">
+        <summary className="cursor-pointer text-sm font-semibold text-[var(--foreground)]">
+          {t("dashboard.calendarConnectionSettingsSummary")}
+        </summary>
+        <div className="mt-4 flex flex-col gap-4">
         <Card>
           <h2 className="text-base font-semibold text-[var(--foreground)]">{t("dashboard.calendarPathGoogleTitle")}</h2>
           <p className="twin-muted mt-2 max-w-2xl text-sm leading-relaxed">{t("dashboard.calendarPathGoogleBody")}</p>
@@ -734,10 +854,15 @@ export default function DashboardCalendarPage() {
             ) : null}
           </details>
         </Card>
-      </div>
+        </div>
+      </details>
 
-      <Card className="mb-6">
-        <h2 className="text-base font-semibold text-[var(--foreground)]">{t("dashboard.calendarNotifSectionTitle")}</h2>
+      <details className="mb-6 rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/40 px-4 py-3">
+        <summary className="cursor-pointer text-sm font-semibold text-[var(--foreground)]">
+          {t("dashboard.calendarNotifSectionTitle")}
+        </summary>
+        <div className="mt-4">
+        <h2 className="sr-only">{t("dashboard.calendarNotifSectionTitle")}</h2>
         <p className="twin-muted mt-2 max-w-2xl text-sm leading-relaxed">{t("dashboard.calendarNotifSectionLead")}</p>
         {notifPrefsLoadError ? (
           <p className="mt-3 text-sm text-[var(--twin-muted-strong)]" role="alert">
@@ -791,35 +916,17 @@ export default function DashboardCalendarPage() {
             </label>
           </li>
         </ul>
-      </Card>
+        </div>
+      </details>
 
-      {banner === "connected" ? (
-        <Card variant="soft" className="mb-4 border-emerald-200/80 bg-emerald-50/90 text-emerald-950 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-50">
-          <p className="text-sm font-medium">{t("dashboard.calendarConnected")}</p>
-        </Card>
-      ) : null}
-      {banner === "denied" ? (
-        <Card variant="soft" className="mb-4">
-          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.calendarOAuthDenied")}</p>
-        </Card>
-      ) : null}
-      {banner === "error" ? (
-        <Card variant="soft" className="mb-4">
-          <p className="text-sm text-[var(--twin-muted-strong)]">{calendarErrorMessage}</p>
-        </Card>
-      ) : null}
-      {actionError ? (
-        <Card variant="soft" className="mb-4">
-          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.calendarErrorGeneric")}</p>
-        </Card>
-      ) : null}
-
-      {loading ? (
-        <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.identityLoading")}</p>
-      ) : status?.connected || msStatus?.connected ? (
+      {!loading && isCalendarConnected ? (
         <div className="flex flex-col gap-6">
-          <div className="border-t border-[var(--twin-border)] pt-6">
-            <h2 className="text-base font-semibold text-[var(--foreground)]">{t("dashboard.calendarInterviewsTitle")}</h2>
+          <details className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/40 px-4 py-3" open>
+            <summary className="cursor-pointer text-sm font-semibold text-[var(--foreground)]">
+              {t("dashboard.calendarInterviewsTitle")}
+            </summary>
+            <div className="mt-4">
+            <h2 className="sr-only">{t("dashboard.calendarInterviewsTitle")}</h2>
             <label className="mt-2 flex cursor-pointer items-center gap-2 text-sm text-[var(--twin-muted-strong)]">
               <input
                 type="checkbox"
@@ -946,10 +1053,15 @@ export default function DashboardCalendarPage() {
                 ))}
               </ul>
             )}
-          </div>
+            </div>
+          </details>
 
-          <div className="border-t border-[var(--twin-border)] pt-6">
-            <h2 className="text-base font-semibold text-[var(--foreground)]">{t("dashboard.calendarScheduleTitle")}</h2>
+          <details className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/40 px-4 py-3">
+            <summary className="cursor-pointer text-sm font-semibold text-[var(--foreground)]">
+              {t("dashboard.calendarScheduleTitle")}
+            </summary>
+            <div className="mt-4">
+            <h2 className="sr-only">{t("dashboard.calendarScheduleTitle")}</h2>
             <p className="twin-muted mt-2 max-w-2xl text-sm leading-relaxed">{t("dashboard.calendarScheduleHint")}</p>
             <div className="mt-4 flex flex-col gap-3 sm:max-w-xl">
               <label className="block text-sm">
@@ -1048,9 +1160,15 @@ export default function DashboardCalendarPage() {
                 </p>
               ) : null}
             </div>
-          </div>
+            </div>
+          </details>
 
-          <div className="border-t border-[var(--twin-border)] pt-6">
+          <details className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/40 px-4 py-3">
+            <summary className="cursor-pointer text-sm font-semibold text-[var(--foreground)]">
+              {t("dashboard.calendarAdvancedSummary")}
+            </summary>
+            <div className="mt-4 flex flex-col gap-6">
+            <div>
             <h2 className="text-base font-semibold text-[var(--foreground)]">{t("dashboard.calendarFreebusyTitle")}</h2>
             <Button
               type="button"
@@ -1073,9 +1191,9 @@ export default function DashboardCalendarPage() {
                 )}
               </ul>
             ) : null}
-          </div>
+            </div>
 
-          <div className="border-t border-[var(--twin-border)] pt-6">
+            <div>
             <h2 className="text-base font-semibold text-[var(--foreground)]">{t("dashboard.calendarBlockTitle")}</h2>
             <Button
               type="button"
@@ -1092,7 +1210,9 @@ export default function DashboardCalendarPage() {
                 </a>
               </p>
             ) : null}
-          </div>
+            </div>
+            </div>
+          </details>
         </div>
       ) : null}
       <InterviewPrepModal

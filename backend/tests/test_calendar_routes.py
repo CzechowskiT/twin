@@ -35,6 +35,77 @@ def test_calendar_authorize_unauthenticated(client: TestClient) -> None:
     assert res.status_code == 401
 
 
+def test_google_list_events_unauthenticated(client: TestClient) -> None:
+    res = client.get(
+        "/api/v1/calendar/google/events",
+        params={
+            "time_min": "2026-05-01T00:00:00Z",
+            "time_max": "2026-05-08T00:00:00Z",
+        },
+    )
+    assert res.status_code == 401
+
+
+def test_google_list_events_returns_normalized_items(client: TestClient) -> None:
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+    db = Session()
+    u = User(email="events@example.com", hashed_password="x")
+    db.add(u)
+    db.commit()
+    db.refresh(u)
+
+    def override_db():
+        try:
+            yield db
+        finally:
+            pass
+
+    def _user() -> User:
+        x = User(email="events@example.com", hashed_password=None)
+        x.id = u.id
+        return x
+
+    app.dependency_overrides[get_db] = override_db
+    app.dependency_overrides[get_current_user] = _user
+    token = create_access_token(u.email)
+    mock_items = [
+        {
+            "id": "evt-1",
+            "summary": "Standup",
+            "start": {"dateTime": "2026-05-02T09:00:00Z"},
+            "end": {"dateTime": "2026-05-02T09:30:00Z"},
+            "htmlLink": "https://calendar.google.com/event?eid=1",
+        }
+    ]
+    try:
+        with patch("app.api.calendar.list_primary_events", return_value=mock_items):
+            with patch("app.api.calendar._calendar_access_token", return_value="tok"):
+                res = client.get(
+                    "/api/v1/calendar/google/events",
+                    params={
+                        "time_min": "2026-05-01T00:00:00Z",
+                        "time_max": "2026-05-08T00:00:00Z",
+                    },
+                    headers={"Authorization": f"Bearer {token}"},
+                )
+        assert res.status_code == 200
+        body = res.json()
+        assert len(body["events"]) == 1
+        assert body["events"][0]["id"] == "evt-1"
+        assert body["events"][0]["title"] == "Standup"
+        assert body["events"][0]["source"] == "provider"
+    finally:
+        app.dependency_overrides.pop(get_current_user, None)
+        app.dependency_overrides.pop(get_db, None)
+        db.close()
+
+
 def test_interview_ics_unauthenticated(client: TestClient) -> None:
     res = client.get("/api/v1/calendar/interviews/1/ics")
     assert res.status_code == 401

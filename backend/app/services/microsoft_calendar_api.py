@@ -89,6 +89,35 @@ def insert_calendar_event(
         return res.json()
 
 
+def list_calendar_view_events(
+    access_token: str,
+    time_min: str,
+    time_max: str,
+    *,
+    max_results: int = 100,
+) -> list[dict[str, Any]]:
+    """List events via Graph calendarView in [time_min, time_max)."""
+    params: dict[str, str | int] = {
+        "startDateTime": time_min,
+        "endDateTime": time_max,
+        "$top": max(1, min(max_results, 250)),
+        "$orderby": "start/dateTime",
+    }
+    with httpx.Client(timeout=30.0) as client:
+        res = client.get(
+            f"{GRAPH}/me/calendarView",
+            params=params,
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
+        if res.status_code != 200:
+            raise MicrosoftCalendarApiError(res.text or "calendarView failed")
+        data = res.json()
+    items = data.get("value")
+    if not isinstance(items, list):
+        return []
+    return [i for i in items if isinstance(i, dict)]
+
+
 def delete_calendar_event(access_token: str, event_id: str) -> None:
     eid = quote(event_id, safe="")
     with httpx.Client(timeout=30.0) as client:

@@ -11,6 +11,8 @@ from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Session
 
 from app.api.calendar import (
+    CalendarEventOut,
+    CalendarEventsOut,
     CalendarFreeBusyBlock,
     CalendarFreeBusyIn,
     CalendarFreeBusyOut,
@@ -35,6 +37,7 @@ from app.services.microsoft_calendar_api import (
     MicrosoftCalendarApiError,
     delete_calendar_event,
     insert_calendar_event,
+    list_calendar_view_events,
     query_schedule,
     schedule_items_to_busy_blocks,
 )
@@ -190,6 +193,56 @@ def microsoft_calendar_disconnect(
     if row:
         db.delete(row)
         db.commit()
+
+
+def _microsoft_event_to_out(item: dict) -> CalendarEventOut | None:
+    eid = item.get("id")
+    if not eid:
+        return None
+    start = item.get("start") if isinstance(item.get("start"), dict) else {}
+    end = item.get("end") if isinstance(item.get("end"), dict) else {}
+    s_dt = start.get("dateTime") if isinstance(start, dict) else None
+    e_dt = end.get("dateTime") if isinstance(end, dict) else None
+    if not s_dt or not e_dt:
+        return None
+    s_iso = str(s_dt)
+    e_iso = str(e_dt)
+    if not s_iso.endswith("Z"):
+        s_iso = f"{s_iso}Z"
+    if not e_iso.endswith("Z"):
+        e_iso = f"{e_iso}Z"
+    title = str(item.get("subject") or "").strip() or "—"
+    link = item.get("webLink") if isinstance(item.get("webLink"), str) else None
+    return CalendarEventOut(
+        id=str(eid),
+        title=title,
+        start_iso=s_iso,
+        end_iso=e_iso,
+        all_day=False,
+        html_link=link,
+        source="provider",
+    )
+
+
+@router.get("/microsoft/events", response_model=CalendarEventsOut)
+def microsoft_calendar_list_events(
+    time_min: str = Query(..., description="RFC3339 instant"),
+    time_max: str = Query(..., description="RFC3339 instant"),
+    limit: int = Query(100, ge=1, le=250),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> CalendarEventsOut:
+    access = _microsoft_access_token(db, current_user.id)
+    try:
+        raw_items = list_calendar_view_events(access, time_min, time_max, max_results=limit)
+    except MicrosoftCalendarApiError as e:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Microsoft list events failed") from e
+    events: list[CalendarEventOut] = []
+    for item in raw_items:
+        out = _microsoft_event_to_out(item)
+        if out:
+            events.append(out)
+    return CalendarEventsOut(events=events)
 
 
 @router.post("/microsoft/freebusy", response_model=CalendarFreeBusyOut)

@@ -73,6 +73,36 @@ def insert_primary_event(
         return res.json()
 
 
+def list_primary_events(
+    access_token: str,
+    time_min: str,
+    time_max: str,
+    *,
+    max_results: int = 100,
+) -> list[dict[str, Any]]:
+    """List events on the user's primary calendar in [time_min, time_max)."""
+    params: dict[str, str | int] = {
+        "timeMin": time_min,
+        "timeMax": time_max,
+        "singleEvents": "true",
+        "orderBy": "startTime",
+        "maxResults": max(1, min(max_results, 250)),
+    }
+    with httpx.Client(timeout=30.0) as client:
+        res = client.get(
+            f"{CAL_BASE}/calendars/primary/events",
+            params=params,
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
+        if res.status_code != 200:
+            raise GoogleCalendarApiError(res.text or "events list failed")
+        data = res.json()
+    items = data.get("items")
+    if not isinstance(items, list):
+        return []
+    return [i for i in items if isinstance(i, dict)]
+
+
 def delete_primary_event(access_token: str, event_id: str) -> None:
     """Delete an event on the user's primary calendar (best-effort; raises on hard API errors)."""
     eid = quote(event_id, safe="")

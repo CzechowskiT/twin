@@ -20,7 +20,13 @@ from app.database.models import Application, Candidate, ScheduledInterview, User
 from app.services.microsoft_calendar_api import MicrosoftCalendarApiError, delete_calendar_event as delete_microsoft_event
 from app.database.session import get_db
 from app.services.calendar_scheduling import find_free_slots_iso, find_next_slot_iso, freebusy_overlaps_slot
-from app.services.google_calendar_api import GoogleCalendarApiError, delete_primary_event, insert_primary_event, query_freebusy
+from app.services.google_calendar_api import (
+    GoogleCalendarApiError,
+    delete_primary_event,
+    insert_primary_event,
+    list_primary_events,
+    query_freebusy,
+)
 from app.services.calendar_oauth_redirect import (
     dev_calendar_redirect_uri_hints,
     effective_google_calendar_redirect_uri,
@@ -135,6 +141,43 @@ class CalendarCreateEventIn(BaseModel):
 class CalendarCreateEventOut(BaseModel):
     id: str | None = None
     html_link: str | None = None
+
+
+class CalendarEventOut(BaseModel):
+    id: str
+    title: str
+    start_iso: str
+    end_iso: str
+    all_day: bool = False
+    html_link: str | None = None
+    source: str = Field("provider", description="provider | twin")
+
+
+class CalendarEventsOut(BaseModel):
+    events: list[CalendarEventOut]
+
+
+def _google_event_to_out(item: dict) -> CalendarEventOut | None:
+    eid = item.get("id")
+    if not eid:
+        return None
+    start = item.get("start") if isinstance(item.get("start"), dict) else {}
+    end = item.get("end") if isinstance(item.get("end"), dict) else {}
+    all_day = bool(start.get("date"))
+    start_iso = start.get("dateTime") or start.get("date")
+    end_iso = end.get("dateTime") or end.get("date")
+    if not start_iso or not end_iso:
+        return None
+    title = str(item.get("summary") or "").strip() or "—"
+    return CalendarEventOut(
+        id=str(eid),
+        title=title,
+        start_iso=str(start_iso),
+        end_iso=str(end_iso),
+        all_day=all_day,
+        html_link=item.get("htmlLink") if isinstance(item.get("htmlLink"), str) else None,
+        source="provider",
+    )
 
 
 class InterviewIcsTokenOut(BaseModel):
@@ -276,6 +319,27 @@ def google_calendar_freebusy(
         if isinstance(b, dict) and b.get("start") and b.get("end"):
             busy.append(CalendarFreeBusyBlock(start=str(b["start"]), end=str(b["end"])))
     return CalendarFreeBusyOut(busy=busy)
+
+
+@router.get("/google/events", response_model=CalendarEventsOut)
+def google_calendar_list_events(
+    time_min: str = Query(..., description="RFC3339 instant"),
+    time_max: str = Query(..., description="RFC3339 instant"),
+    limit: int = Query(100, ge=1, le=250),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> CalendarEventsOut:
+    access = _calendar_access_token(db, current_user.id)
+    try:
+        raw_items = list_primary_events(access, time_min, time_max, max_results=limit)
+    except GoogleCalendarApiError as e:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Calendar list events failed") from e
+    events: list[CalendarEventOut] = []
+    for item in raw_items:
+        out = _google_event_to_out(item)
+        if out:
+            events.append(out)
+    return CalendarEventsOut(events=events)
 
 
 @router.post("/google/events", response_model=CalendarCreateEventOut)

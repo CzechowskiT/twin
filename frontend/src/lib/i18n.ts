@@ -9,6 +9,10 @@ import {
   zhOverlay,
 } from "./overlays";
 import { FAQ_MESSAGES_EN, FAQ_MESSAGES_PL } from "./faq-messages";
+import {
+  EMPLOYER_MEDIA_MESSAGES_EN,
+  EMPLOYER_MEDIA_MESSAGES_PL,
+} from "./employer-media-messages";
 import { SITE_MESSAGES_EN, SITE_MESSAGES_PL } from "./site-messages";
 
 export type Locale = "en" | "pl" | "es" | "it" | "fr" | "de" | "zh" | "ar" | "ja";
@@ -98,6 +102,7 @@ export type TranslationKey =
   | `atsIntegrations.${keyof typeof en.atsIntegrations}`
   | `dataRoom.${keyof typeof en.dataRoom}`
   | `careerAssistant.${keyof typeof en.careerAssistant}`
+  | `jobBrief.${keyof typeof en.jobBrief}`
   | `marketingHowItWorks.${keyof typeof en.marketingHowItWorks}`
   | `workspace.${keyof typeof en.workspace}`
   | `developers.${keyof typeof en.developers}`
@@ -112,7 +117,8 @@ export type TranslationKey =
   | `persona.${keyof typeof en.persona}`
   | `demo.${keyof typeof en.demo}`
   | `first1000.${keyof typeof en.first1000}`
-  | `ux.${keyof typeof en.ux}`;
+  | `ux.${keyof typeof en.ux}`
+  | `employerMedia.${keyof typeof EMPLOYER_MEDIA_MESSAGES_EN}`;
 
 const en = {
   nav: {
@@ -1610,6 +1616,54 @@ const en = {
     linkedinHeadline: "Headline",
     optimizeLinkedin: "Optimize LinkedIn",
     targetRole: "Target role",
+    researchCompanyBrief: "Role & company brief",
+  },
+  jobBrief: {
+    demoBanner:
+      "Illustrative enterprise brief — fictional demo data for investor and product previews. Not live employer filings.",
+    ratingGlassdoor: "Glassdoor (demo)",
+    ratingCeo: "CEO approval",
+    ratingRecommend: "Would recommend",
+    factIndustry: "Industry",
+    factFounded: "Founded",
+    factEmployees: "Employees",
+    factHq: "HQ",
+    factRevenue: "Revenue",
+    factTicker: "Ticker",
+    chipRoleFamily: "Role family",
+    chipSeniority: "Seniority",
+    chipEmployment: "Employment",
+    chipTeamSize: "Team",
+    chipReportsTo: "Reports to",
+    chipComp: "Comp band",
+    chipEquity: "Equity",
+    chipWorkModel: "Work model",
+    chipVisa: "Visa",
+    chipRelocation: "Relocation",
+    chipTravel: "Travel",
+    sectionRoleEyebrow: "Role",
+    sectionRoleTitle: "What you will do",
+    responsibilities: "Responsibilities",
+    qualifications: "Qualifications",
+    niceToHave: "Nice to have",
+    techStack: "Tech stack",
+    sectionOfficesEyebrow: "Global footprint",
+    sectionOfficesTitle: "Offices worldwide",
+    officeHeadcount: "Team",
+    sectionCultureEyebrow: "Employer brand",
+    sectionCultureTitle: "Culture & DEI",
+    dei: "DEI",
+    sectionBenefitsTitle: "Benefits & perks",
+    sectionProcessEyebrow: "Hiring",
+    sectionProcessTitle: "Interview process",
+    sectionTimelineEyebrow: "TWIN",
+    sectionTimelineTitle: "Application timeline (preview)",
+    sectionSimilarTitle: "Similar roles",
+    similarRolesCta: "View role (demo)",
+    similarRolesDemoHint: "Available when listing is connected to ATS",
+    aiIntelEyebrow: "AI targeting",
+    aiIntelTitle: "Application intelligence (live)",
+    aiIntelLead: "Priorities, language, and cover letter draft tailored to your profile — powered by TWIN when API keys are configured.",
   },
   dataRoom: {
     eyebrow: "Due diligence",
@@ -2258,6 +2312,8 @@ const en = {
     growthRoadmapFootnote:
       "Order of delivery can change; some items may be tier-gated when they ship. Tell us what you would open weekly. It steers the roadmap.",
   },
+  employerMedia: EMPLOYER_MEDIA_MESSAGES_EN,
+  jobEmployer: JOB_EMPLOYER_MESSAGES_EN,
   ux: {
     flowNavAria: "Your workspace steps",
     flowStepDashboard: "Dashboard",
@@ -3805,6 +3861,55 @@ const pl: MessageTree = {
     linkedinHeadline: "Nagłówek",
     optimizeLinkedin: "Optymalizuj LinkedIn",
     targetRole: "Docelowa rola",
+    researchCompanyBrief: "Brief roli i firmy",
+  },
+  jobBrief: {
+    demoBanner:
+      "Ilustracyjny brief enterprise — fikcyjne dane demo do podglądu produktu i inwestorów. To nie są żywe dane pracodawcy.",
+    ratingGlassdoor: "Glassdoor (demo)",
+    ratingCeo: "Akceptacja CEO",
+    ratingRecommend: "Poleciłby znajomemu",
+    factIndustry: "Branża",
+    factFounded: "Założona",
+    factEmployees: "Pracownicy",
+    factHq: "Siedziba",
+    factRevenue: "Przychód",
+    factTicker: "Giełda",
+    chipRoleFamily: "Rodzina ról",
+    chipSeniority: "Poziom",
+    chipEmployment: "Zatrudnienie",
+    chipTeamSize: "Zespół",
+    chipReportsTo: "Raportuje do",
+    chipComp: "Widełki",
+    chipEquity: "Equity",
+    chipWorkModel: "Model pracy",
+    chipVisa: "Wiza",
+    chipRelocation: "Relokacja",
+    chipTravel: "Podróże",
+    sectionRoleEyebrow: "Rola",
+    sectionRoleTitle: "Zakres obowiązków",
+    responsibilities: "Odpowiedzialności",
+    qualifications: "Wymagania",
+    niceToHave: "Mile widziane",
+    techStack: "Stack technologiczny",
+    sectionOfficesEyebrow: "Obecność globalna",
+    sectionOfficesTitle: "Biura na świecie",
+    officeHeadcount: "Zespół",
+    sectionCultureEyebrow: "Employer brand",
+    sectionCultureTitle: "Kultura i DEI",
+    dei: "DEI",
+    sectionBenefitsTitle: "Benefity",
+    sectionProcessEyebrow: "Rekrutacja",
+    sectionProcessTitle: "Proces rozmów",
+    sectionTimelineEyebrow: "TWIN",
+    sectionTimelineTitle: "Timeline aplikacji (podgląd)",
+    sectionSimilarTitle: "Podobne role",
+    similarRolesCta: "Zobacz rolę (demo)",
+    similarRolesDemoHint: "Dostępne po podłączeniu ogłoszenia do ATS",
+    aiIntelEyebrow: "AI pod aplikację",
+    aiIntelTitle: "Inteligencja aplikacyjna (na żywo)",
+    aiIntelLead:
+      "Priorytety, język i szkic listu dopasowane do profilu — z TWIN, gdy skonfigurowane są klucze API.",
   },
   dataRoom: {
     eyebrow: "Due diligence",
@@ -4457,6 +4562,8 @@ const pl: MessageTree = {
     footerLegal:
       "Licznik opiera się na zapisach na liście życzeń po stronie API (BETA_WAITLIST_CAP, domyślnie 1000). „Za darmo na zawsze” dla foundersów to obietnica kampanii — ostateczne zasady w Regulaminie i Polityce prywatności.",
   },
+  employerMedia: EMPLOYER_MEDIA_MESSAGES_PL,
+  jobEmployer: JOB_EMPLOYER_MESSAGES_PL,
   ux: {
     flowNavAria: "Kroki w Twojej przestrzeni roboczej",
     flowStepDashboard: "Panel",
