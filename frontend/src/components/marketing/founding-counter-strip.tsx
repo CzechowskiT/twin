@@ -29,7 +29,7 @@ export function FoundingCounterStrip({ className = "" }: { className?: string })
             <span className="text-[var(--twin-muted)]">{t("home.foundingCounterLoading")}</span>
           ) : (
             <>
-              <AnimatedCounter value={spotsRemaining} />
+              <AnimatedCounter value={spotsRemaining} locale={numberLocale} />
               <span className="marketing-founding-counter__of">
                 {interpolate(t("home.foundingCounterOf"), { cap })}
               </span>

@@ -2,7 +2,15 @@
 
 import { useEffect, useState } from "react";
 
-export function AnimatedCounter({ value, durationMs = 1200 }: { value: number; durationMs?: number }) {
+export function AnimatedCounter({
+  value,
+  durationMs = 1200,
+  locale = "en-US",
+}: {
+  value: number;
+  durationMs?: number;
+  locale?: string;
+}) {
   const [display, setDisplay] = useState(0);
 
   useEffect(() => {
@@ -17,5 +25,5 @@ export function AnimatedCounter({ value, durationMs = 1200 }: { value: number; d
     return () => cancelAnimationFrame(frame);
   }, [value, durationMs]);
 
-  return <>{display.toLocaleString("pl-PL")}</>;
+  return <>{display.toLocaleString(locale)}</>;
 }

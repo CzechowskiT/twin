@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { FoundingOfferPreview } from "@/components/marketing/founding-offer-preview";
 import { AnimatedCounter } from "@/components/waitlist/animated-counter";
 import { WaitlistForm } from "@/components/waitlist/waitlist-form";
 import type { BetaLeaderboardEntry } from "@/lib/beta-api";
@@ -143,13 +144,7 @@ export function WaitlistPageClient() {
             <br />
             {copy.heroLead3}
           </motion.p>
-          <p className="wl-hero-badge">{copy.heroOfferBadge}</p>
-          <p className="wl-hero-offer-sub">{copy.heroOfferSub}</p>
-          <ul className="wl-value-strip" aria-label="Founding offer">
-            {copy.valueStrip.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
+          <FoundingOfferPreview variant="waitlist" />
           {statsError ? (
             <p className="wl-stats-offline" role="status">
               {copy.statsOfflineHint}

@@ -139,7 +139,7 @@ export function CandidateRewardsBand({ variant = "home" }: { variant?: "home" | 
           <Link href="/dashboard/referrals" className="underline underline-offset-4 hover:opacity-90">
             {t("candidateRewards.ctaReferrals")}
           </Link>
-          <Link href="/first-1000" className="underline underline-offset-4 hover:opacity-90">
+          <Link href="/waitlist" className="underline underline-offset-4 hover:opacity-90">
             {t("candidateRewards.ctaFounding")}
           </Link>
           <Link href="/terms" className="underline underline-offset-4 hover:opacity-90">

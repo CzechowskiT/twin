@@ -41,10 +41,16 @@ export function LandingInsideSteps() {
           ))}
         </ol>
 
-        <ScrollReveal delayMs={120} className="mt-8 flex flex-wrap items-center gap-4">
+        <ScrollReveal delayMs={120} className="mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
+          <Link
+            href="/waitlist"
+            className="twin-header-cta twin-nav-waitlist-pill twin-touch-target px-7 text-sm"
+          >
+            {t("home.joinWishlist")}
+          </Link>
           <Link
             href="/register"
-            className="section-cta-primary marketing-btn-primary-shadow twin-touch-target px-7 text-sm"
+            className="section-cta-secondary twin-touch-target px-7 text-sm"
           >
             {t("home.getStarted")}
           </Link>
