@@ -147,16 +147,16 @@ export const FAQ_MESSAGES_PL = {
 
   general01Q: "Czym jest TWIN dziś?",
   general01A:
-    "Agent kariery, który porządkuje chaos kart: agregacja ofert z włączonych portali, ranking przy profilu, śledzenie aplikacji i wczesny autopilot (dopasowanie CV, asystent kariery, nocna auto-aplikacja tam, gdzie portal i zgoda na to pozwalają). North star to krótki kalendarz momentów gotowych do akceptacji — nie więcej spamu w skrzynce.",
+    "Agent kariery, który porządkuje chaos kart: agregacja ofert z włączonych portali, ranking przy profilu, śledzenie aplikacji i wczesny autopilot (dopasowanie CV, asystent kariery, nocna auto-aplikacja tam, gdzie portal i zgoda na to pozwalają). Główny cel to krótki kalendarz momentów gotowych do akceptacji — nie więcej spamu w skrzynce.",
   general02Q: "Dla kogo jest TWIN?",
   general02A:
-    "Cztery ścieżki na jednej platformie z osobnymi powierzchniami: kandydaci, rekruterzy, firmy (programy B2B) i inwestorzy. Wybierz lane przy rejestracji — SKU i rozliczenia zależą od persony.",
+    "Cztery ścieżki na jednej platformie z osobnymi powierzchniami: kandydaci, rekruterzy, firmy (programy B2B) i inwestorzy. Wybierz personę przy rejestracji — plany i rozliczenia zależą od roli.",
   general03Q: "Czym to różni się od jednego portalu?",
   general03A:
-    "Portale zostają źródłem ogłoszeń. TWIN to warstwa odkrywania, sygnałów dopasowania, follow-upu i (gdzie można) automatyzacji w jednym UX. Tam, gdzie trzeba, nadal kończysz flow pracodawcy — nie udajemy, że od dnia pierwszego zastępujemy każdy przycisk ATS.",
+    "Portale zostają źródłem ogłoszeń. TWIN to warstwa odkrywania, sygnałów dopasowania, dalszego kontaktu i (gdzie można) automatyzacji w jednym interfejsie. Tam, gdzie trzeba, nadal kończysz ścieżkę pracodawcy — nie udajemy, że od dnia pierwszego zastępujemy każdy przycisk ATS.",
   general04Q: "Co to jest „kalendarz akceptacji”?",
   general04A:
-    "Po przerwie wracasz do krótkiej listy wartych działania — rozmów i profili do akceptacji lub odrzucenia jednym ruchem — a nie do tysięcy surowych CV ani losowego spamu rekrutacyjnego. Dopasowanie, zgoda, praca asynchroniczna, batch acceptance i eksport/sync kalendarza służą temu celowi.",
+    "Po przerwie wracasz do krótkiej listy wartych działania — rozmów i profili do akceptacji lub odrzucenia jednym ruchem — a nie do tysięcy surowych CV ani losowego spamu rekrutacyjnego. Dopasowanie, zgoda, praca asynchroniczna, akceptacja zbiorcza i eksport lub synchronizacja kalendarza służą temu celowi.",
   general05Q: "Co z prywatnością i RODO?",
   general05A:
     "Wyrażasz zgodę przy rejestracji. Profil napędza ranking i funkcje produktu. Retencja, eksport i Twoje prawa są w Polityce prywatności. Ograniczamy zaskakujący kontakt z pracodawcą; weryfikacja placementu domyślnie jest self-serve w produkcie.",
@@ -167,15 +167,15 @@ export const FAQ_MESSAGES_PL = {
   candidates02Q: "Które portale są obsługiwane?",
   candidates02A:
     "Faza 1: m.in. pracuj.pl, rocketjobs.pl oraz LinkedIn przy konfiguracji. Ty wybierasz źródła; w becie scrapery mogą być na allowliście ops. Kolejne portale, gdy compliance i niezawodność na to pozwalają.",
-  candidates03Q: "Czym jest auto-apply i czy działa?",
+  candidates03Q: "Czym jest auto-aplikacja i czy działa?",
   candidates03A:
-    "Nocna auto-aplikacja tylko po wyraźnej zgodzie i tam, gdzie flow portalu da się bezpiecznie zautomatyzować. Jest w repo z harmonogramem Celery — traktuj jako betę: nie każda oferta jest kwalifikowana. Możesz przeglądać wysyłki i status w pipeline.",
+    "Nocna auto-aplikacja tylko po wyraźnej zgodzie i tam, gdzie ścieżka portalu da się bezpiecznie zautomatyzować. Jest w repozytorium z harmonogramem Celery — traktuj jako betę: nie każda oferta jest kwalifikowana. Możesz przeglądać wysyłki i status w ścieżce aplikacji.",
   candidates04Q: "Czy TWIN dopasuje CV pod rolę?",
   candidates04A:
-    "Tak — Asystent kariery ma optymalizację CV pod ATS dla konkretnej oferty, gdy masz CV w profilu. To szkice do Twojej recenzji; nie podmieniamy master CV bez Twojej decyzji.",
+    "Tak — Asystent kariery ma optymalizację CV pod ATS dla konkretnej oferty, gdy masz CV w profilu. To szkice do Twojej recenzji; nie podmieniamy głównego CV bez Twojej decyzji.",
   candidates05Q: "Co obejmuje Asystent kariery?",
   candidates05A:
-    "Na żywo m.in.: intel o firmie, szkice listów, spojrzenie hiring managera, przygotowanie do rozmowy, negocjacje, follow-upy, sugestie LinkedIn — przy danych profilu i użyciu funkcji. Zakres rośnie; sprawdź etykiety w aplikacji dla swojego buildu.",
+    "Na żywo m.in.: informacje o firmie, szkice listów, spojrzenie hiring managera, przygotowanie do rozmowy, negocjacje, dalszy kontakt, sugestie LinkedIn — przy danych profilu i użyciu funkcji. Zakres rośnie; sprawdź etykiety w aplikacji dla swojej wersji.",
   candidates06Q: "Jak działają kalendarz i holdy na rozmowy?",
   candidates06A:
     "Wdrożone: OAuth Google Calendar (zajętość + zapisy holdów), subskrypcja WebCal, eksporty ICS. Kierunek Microsoft 365 przez Graph z OAuth, gdy API ma credentials. Użytkownicy Apple zwykle subskrybują WebCal/ICS — nie ma jednego „Zaloguj przez Apple Calendar” dla każdej aplikacji.",
@@ -190,42 +190,42 @@ export const FAQ_MESSAGES_PL = {
     "Płatne plany przez Stripe; kampania founderska na liście życzeń może dać darmowy dostęp wg opublikowanych zasad. Po logowaniu sprawdź billing — bez ukrytych opłat w FAQ.",
   candidates10Q: "Czy TWIN zastępuje rekruterów?",
   candidates10A:
-    "Nie. Mniej szumu: kandydat dostaje sensowniejsze ruchy; rekruter — batch acceptance i sygnały pod ATS zamiast zalewu CV. Ludzie nadal decydują o zatrudnieniu; software porządkuje ranking, papierologię i kalendarz.",
+    "Nie. Mniej szumu: kandydat dostaje sensowniejsze ruchy; rekruter — akceptację zbiorczą i sygnały pod ATS zamiast zalewu CV. Ludzie nadal decydują o zatrudnieniu; oprogramowanie porządkuje ranking, papierologię i kalendarz.",
   candidates11Q: "Co zrobić przed włączeniem autopilota?",
   candidates11A:
-    "Uzupełnij profil, wgraj CV, podłącz kalendarz jeśli chcesz holdy, włącz tylko zaufane portale, przeczytaj zgodę auto-apply. Zacznij od zapisów i ręcznych aplikacji, potem włącz nocną auto-aplikację, gdy akceptujesz ślad audytowy.",
+    "Uzupełnij profil, wgraj CV, podłącz kalendarz jeśli chcesz rezerwacje slotów, włącz tylko zaufane portale, przeczytaj zgodę na auto-aplikację. Zacznij od zapisów i ręcznych aplikacji, potem włącz nocną auto-aplikację, gdy akceptujesz ślad audytowy.",
 
-  recruiters01Q: "Czym jest inbox akceptacji rekrutera?",
+  recruiters01Q: "Czym jest skrzynka akceptacji rekrutera?",
   recruiters01A:
-    "Powierzchnia pilota dla slug firmy: krótka kolejka aplikacji do akceptacji na rozmowę lub odrzucenia bez traktowania maila jako systemu. Potrzebujesz tokenu z linku pilota TWIN — to nie publiczny inbox.",
-  recruiters02Q: "Czym batch accept różni się od inboxa ATS?",
+    "Powierzchnia pilota dla identyfikatora firmy: krótka kolejka aplikacji do akceptacji na rozmowę lub odrzucenia bez traktowania maila jako systemu. Potrzebujesz tokenu z linku pilota TWIN — to nie publiczna skrzynka.",
+  recruiters02Q: "Czym akceptacja zbiorcza różni się od skrzynki ATS?",
   recruiters02A:
     "Chodzi o wstępnie kwalifikowane wiersze: akceptuj lub odrzuć na jednym ekranie, żeby przejść do kroków pod kalendarz. Nie maksymalizujemy liczby aplikacji — bar dopasowania jest pierwszy.",
   recruiters03Q: "Czy mogę publikować oferty w TWIN?",
   recruiters03A:
-    "Tak — publikacja ofert pracodawcy w workspace rekrutera pod slug firmy. Oferty łączą się z tym samym dopasowaniem i aplikacjami co scrape, gdy skonfigurowane.",
+    "Tak — publikacja ofert pracodawcy w przestrzeni rekrutera pod identyfikatorem firmy. Oferty łączą się z tym samym dopasowaniem i aplikacjami co pobranie z portali, gdy skonfigurowane.",
   recruiters04Q: "Jakie integracje ATS są dziś?",
   recruiters04A:
-    "Webhooki hire dla Greenhouse, Lever i Ashby po powiązaniu external_ats_id z aplikacją. OAuth Greenhouse/Lever, gdy env API ustawione; inaczej ręczna konfiguracja webhooków. To plumbing integracji — nie pełny zamiennik ATS.",
+    "Webhooki zatrudnienia dla Greenhouse, Lever i Ashby po powiązaniu identyfikatora ATS z aplikacją. OAuth Greenhouse/Lever, gdy API ma ustawione zmienne środowiskowe; inaczej ręczna konfiguracja webhooków. To integracja techniczna — nie pełny zamiennik ATS.",
   recruiters05Q: "Jak powiązać aplikacje z Greenhouse?",
   recruiters05A:
     "Zapisz external_ats_id i external_ats_provider (greenhouse, lever, ashby) na wierszu aplikacji TWIN. Zobacz ATS_WEBHOOKS.md i stronę webhooków ATS w aplikacji.",
-  recruiters06Q: "Jakie etapy pipeline śledzicie?",
+  recruiters06Q: "Jakie etapy ścieżki aplikacji śledzicie?",
   recruiters06A:
-    "Kandydat widzi status w jednym pipeline; rekruter — kolejki akceptacji i atestację. Głębsza synchronizacja etapów ATS to roadmap — dziś skupiamy się na hand-off gotowym do akceptacji.",
+    "Kandydat widzi status w jednej ścieżce; rekruter — kolejki akceptacji i atestację. Głębsza synchronizacja etapów ATS to roadmapa — dziś skupiamy się na przekazaniu gotowym do akceptacji.",
   recruiters07Q: "Jak rozliczane są miejsca rekrutera?",
   recruiters07A:
-    "Miejsca B2B na fakturę (nie checkout Stripe kandydata). Umowa definiuje liczbę miejsc, slug i czy wchodzą webhooki ATS lub linki atestacji.",
+    "Miejsca B2B na fakturę (nie płatność Stripe kandydata). Umowa definiuje liczbę miejsc, identyfikator firmy i czy wchodzą webhooki ATS lub linki atestacji.",
   recruiters08Q: "Czy pracodawca potwierdzi zatrudnienie bez konta TWIN?",
   recruiters08A:
     "Tak — kandydat może udostępnić jednoklikowy link atestacji (nonce, wygasa). Hiring manager potwierdza bez logowania. To wspiera weryfikację maszynową zamiast ping-pongu CS mailem.",
   recruiters09Q: "Co dla rekruterów jest jeszcze przed nami?",
   recruiters09A:
-    "Pełne SSO enterprise, dwukierunkowy sync etapów ATS i dojrzały multi-tenant governance. Piloci powinni liczyć na inbox na token i webhooki ATS przed samoobsługowym marketplace rekruterów.",
+    "Pełne SSO enterprise, dwukierunkową synchronizację etapów ATS i dojrzałe zarządzanie wieloma najemcami. Piloci powinni liczyć na skrzynkę na token i webhooki ATS przed samoobsługowym rynkiem rekruterów.",
 
   companies01Q: "Co firmy kupują w TWIN?",
   companies01A:
-    "Roczne programy B2B: zasięg sourcingu, miejsca rekruterów, opcjonalna weryfikacja przez webhook ATS i ekonomia od zweryfikowanych placementów — nie płatność za surowe CV. SKU pod procurement są oddzielone od subskrypcji kandydata.",
+    "Roczne programy B2B: zasięg sourcingu, miejsca rekruterów, opcjonalna weryfikacja przez webhook ATS i ekonomia od zweryfikowanych zatrudnień — nie płatność za surowe CV. Plany pod zakupy są oddzielone od subskrypcji kandydata.",
   companies02Q: "Jak zwykle wygląda procurement?",
   companies02A:
     "Kwestionariusz bezpieczeństwa, DPA, roczny order form i zdefiniowane slug(i) firmy. Przepływy danych (scraping, AI, kalendarz) w pakietach prawnych; finanse poufne poza publiczną stroną.",
@@ -253,19 +253,19 @@ export const FAQ_MESSAGES_PL = {
     "Stub NDA w sesji przeglądarki odblokowuje podgląd placeholderów; pełny cap table, finanse i legal wymagają podpisanego dostępu przez kontakt. Rejestracja dokumentów działa; upload S3 zależy od env API.",
   investors03Q: "Jakie metryki bez spotkania?",
   investors03A:
-    "Na żywo: dashboard metryk MVP i health systemu. To trakcja beta, nie audytowane finanse — te za poufnym dostępem.",
+    "Na żywo: panel metryk MVP i kondycja systemu. To trakcja beta, nie audytowane finanse — te za poufnym dostępem.",
   investors04Q: "Jak myślicie o ekonomii weryfikacji placementu?",
   investors04A:
-    "Unikamy „CS tennis” marketplace — weryfikacja w produkcie, atestacja i webhooki ATS. Lepsza skalowalność marży niż ręczne pętle mailowe, z wyjątkami tylko tam, gdzie trzeba.",
+    "Unikamy mailowego ping-ponga typowego dla marketplace — weryfikacja w produkcie, atestacja i webhooki ATS. Lepsza skalowalność marży niż ręczne pętle mailowe, z wyjątkami tylko tam, gdzie trzeba.",
   investors05Q: "Co jest obronne względem portali?",
   investors05A:
-    "Normalizacja między portalami, automatyzacja za zgodą, UX akceptacji po obu stronach, wynik w kalendarzu. Portale optymalizują ogłoszenia; TWIN — ścieżkę od discovery do zweryfikowanego placementu z mniejszym szumem.",
+    "Normalizacja między portalami, automatyzacja za zgodą, interfejs akceptacji po obu stronach, wynik w kalendarzu. Portale optymalizują ogłoszenia; TWIN — ścieżkę od odkrycia ofert do zweryfikowanego zatrudnienia z mniejszym szumem.",
   investors06Q: "Jaka faza i uczciwa trakcja?",
   investors06A:
-    "MVP fazy 1: FastAPI, Celery, Postgres, scrapery PL, matching, aplikacje, wczesny auto-apply i kalendarz, wiele person. Trakcja w kształcie pilota — patrz /status, metryki i design partnerów, nie vanity volume.",
+    "MVP fazy 1: FastAPI, Celery, Postgres, scrapery PL, dopasowanie, aplikacje, wczesna auto-aplikacja i kalendarz, wiele person. Trakcja w kształcie pilota — patrz /status, metryki i partnerów wdrożeniowych, nie pusty wolumen.",
   investors07Q: "Jak poprosić o głębszy diligence?",
   investors07A:
-    "Flow w data room lub kontakt z workspace inwestora. Przyjdź z checklistą — wolimy konkretne pytania o security i unit economics niż generyczny pitch deck.",
+    "Proces w data room lub kontakt z przestrzenią inwestora. Przyjdź z checklistą — wolimy konkretne pytania o bezpieczeństwo i ekonomię jednostkową niż generyczny pitch deck.",
 } as const;
 
 export type FaqMessageKey = keyof typeof FAQ_MESSAGES_EN;

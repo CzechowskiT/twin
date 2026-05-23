@@ -12,7 +12,7 @@ import { Shell } from "@/components/ui";
 
 export default function FaqPage() {
   const { t } = useTranslation();
-  const metaLine = t("site.faqPageMeta").replace("{count}", String(FAQ_TOTAL_QUESTIONS));
+  const metaLine = t("site.faqPageMeta", { count: String(FAQ_TOTAL_QUESTIONS) });
 
   return (
     <Shell wide>

@@ -90,7 +90,7 @@ const en: WaitlistNarrative = {
 const pl: WaitlistNarrative = {
   heroOfferBadge: "Pierwsze 1000 — Pro i Enterprise na zawsze · 0 zł",
   heroOfferSub:
-    "Dołącz do grupy, która przepisuje szukanie pracy: jeden rankingowany pipeline, jeden kalendarz rozmów wartych Twojego czasu — bez kolejnego inboxu pełnego szumu.",
+    "Dołącz do grupy, która przepisuje szukanie pracy: jedna rankingowana ścieżka aplikacji, jeden kalendarz rozmów wartych Twojego czasu — bez kolejnej skrzynki pełnej szumu.",
   valueStrip: [
     "Dożywotni najwyższy plan dla founding members",
     "Bez karty · bez ukrytych opłat później",
@@ -115,15 +115,15 @@ const pl: WaitlistNarrative = {
     },
     {
       icon: "📅",
-      title: "Kalendarz, nie inbox wstydu",
-      body: "North star: krótka lista pre-kwalifikowanych slotów — akceptuj, odrzuć, przełóż — dla kandydatów i rekruterów. Momentum bez spamu.",
+      title: "Kalendarz, nie skrzynka wstydu",
+      body: "Główny cel: krótka lista wstępnie zakwalifikowanych slotów — akceptuj, odrzuć, przełóż — dla kandydatów i rekruterów. Tempo bez spamu.",
     },
   ],
   sectionShift: "Zmiana, którą budujemy",
   shiftLead:
     "To nie „kolejny portal z AI”. To warstwa między talentem a zespołami, która nie tonie w szumie.",
   shiftPoints: [
-    "Scrape → match → apply → track → schedule — jedna pętla, jeden dashboard, gdy śpisz.",
+    "Pobierz → dopasuj → aplikuj → śledź → zaplanuj — jedna pętla, jeden panel, gdy śpisz.",
     "Rekruterzy widzą profile już na poziomie — nie góry surowych CV.",
     "Kandydaci wracają z urlopu do rozmów wartych przygotowania — nie ghostingu i zmęczenia portalami.",
   ],
@@ -132,7 +132,7 @@ const pl: WaitlistNarrative = {
   foundingSub:
     "Przy publicznym starcie będą płatne plany. Członkowie wishlisty founding zachowują Pro i Enterprise bez opłat — z jednym aktywnym profilem i zasadami fair-use przy starcie.",
   foundingPerks: [
-    "Dożywotnie Pro i Enterprise: auto-apply, priorytet matchingu, sync kalendarza, pełny agent",
+    "Dożywotnie Pro i Enterprise: auto-aplikacja, priorytetowe dopasowanie, synchronizacja kalendarza, pełny agent",
     "Odznaka founding + wcześniejszy dostęp do nowych funkcji przed GA",
     "Priorytetowa kolejka — zwykle ~14 dni od zapisu dla pierwszej tysiącki",
     "Bez karty dziś · bez paywalla na plan, który zdobyłeś na liście",
@@ -146,7 +146,7 @@ const pl: WaitlistNarrative = {
     },
     {
       q: "Czy to zmieni sposób rekrutacji?",
-      a: "Stawiamy na agentów + zgodę + rankingowany pipeline — nie na ręczny ping-pong mailowy. Wcześni członkowie kształtują produkt, zanim rynek zapełni się klonami.",
+      a: "Stawiamy na agentów, zgodę i rankingowaną ścieżkę aplikacji — nie na ręczny ping-pong mailowy. Wcześni członkowie kształtują produkt, zanim rynek zapełni się klonami.",
     },
   ],
 };

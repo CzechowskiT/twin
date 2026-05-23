@@ -146,7 +146,7 @@ export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } 
   aboutP1:
     "Działamy ponad publicznymi rynkami pracy, zamiast je zastępować. Pracodawcy zachowują swoje ścieżki aplikacji; kandydaci kontrolują, gdzie wysyłają dane.",
   aboutP2:
-    "Faza 1 stawia na jakość danych, profil z wyraźną zgodą (RODO) i spokojny UX pipeline’u. Kolejne fazy dodają m.in. auto-aplikacje i kalendarz na tej samej powierzchni, z większą autonomią pod spodem.",
+    "Faza 1 stawia na jakość danych, profil z wyraźną zgodą (RODO) i spokojny interfejs ścieżki aplikacji. Kolejne fazy dodają m.in. auto-aplikacje i kalendarz na tej samej powierzchni, z większą autonomią pod spodem.",
   aboutValuesTitle: "Na czym nam zależy",
   aboutV1Title: "Czas kandydata",
   aboutV1Body: "Mniej kart, mniej kopiuj-wklej, czytelny status każdej ważnej aplikacji.",
@@ -178,7 +178,7 @@ export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } 
   careersOpenBody:
     "Listy pojawią się tutaj, gdy je opublikujemy. Do tego czasu wyślij krótką notatkę przez Kontakt: co pierwsze poprawiłbyś w software do hiringu.",
   careersPerksTitle: "Dlaczego wcześnie",
-  careersPerk1: "Odpowiedzialność za discovery, matching i pipeline, nie tylko wąskie tickety.",
+  careersPerk1: "Odpowiedzialność za odkrywanie ofert, dopasowanie i ścieżkę aplikacji, nie tylko wąskie zadania.",
   careersPerk2: "Bezpośredni kontakt z integracjami portali i przepływami danych pod RODO.",
   careersPerk3: "Async na piśmie i elastyczny hybrid jako domyślne.",
 
@@ -216,7 +216,7 @@ export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } 
   casesLead: "Scenariusze zanonimizowane, zgodne z tym, co MVP już wspiera lub jawnie buduje.",
   case1Title: "Scale-up SaaS w Europie",
   case1Body:
-    "Ujednolicenie discovery na portalach PL i UE w jednym pipeline; modelowanie kosztów agencji kalkulatorem ROI przed decyzjami zakupowymi.",
+    "Ujednolicenie odkrywania ofert na portalach PL i UE w jednej ścieżce; modelowanie kosztów agencji kalkulatorem ROI przed decyzjami zakupowymi.",
   case2Title: "Hub komercyjny (Warszawa)",
   case2Body:
     "Role sales i GTM w jednym workspace; rekruterzy odzyskali godziny tygodniowo zamiast duplikować wyszukiwania i arkusze statusów.",
@@ -233,7 +233,7 @@ export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } 
   footerTagline: "Autonomiczny agent kariery",
   footerExplore: "Odkrywaj",
   footerHome: "Strona główna",
-  footerWishlist: "Wishlist (wczesny dostęp)",
+  footerWishlist: "Lista founding (wczesny dostęp)",
   footerCompany: "Firma",
   footerLegal: "Prawne",
   footerPrivacy: "Polityka prywatności",
@@ -267,11 +267,11 @@ export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } 
   momentumTip1:
     "Gdy zapiszesz ofertę lub wyślesz aplikację z dopasowań albo feedu, wpisy trafiają do jednej osi czasu. Traktuj to jak prywatny CRM do momentu rozmów.",
   momentumTip2: "Po edycji umiejętności lub docelowych stanowisk odśwież filtry, żeby feed złapał nowy sygnał.",
-  momentumTip3: "Statusy zgodne z rzeczywistością (applied, interview, rejected) utrzymują wiarygodność tygodniowego tempa.",
+  momentumTip3: "Statusy zgodne z rzeczywistością (wysłana, rozmowa, odrzucona) utrzymują wiarygodność tygodniowego tempa.",
   momentumTip4: "Gdy feed jest zbyt szeroki, zacieśnij frazy w tytule; poluzuj, gdy zobaczysz realne nazwy ról.",
   momentumTip5: "Premium zdejmuje limity śledzonych aplikacji, gdy billing jest włączony w Twoim środowisku. Free wystarczy do skupionego szukania.",
   momentumTip6: "Wymagające ogłoszenia otwieraj w nowej karcie; TWIN zapamięta decyzję, żebyś nie czytał tego samego JD po raz kolejny.",
-  momentumCtaWorkspace: "Otwórz workspace",
+  momentumCtaWorkspace: "Otwórz przestrzeń roboczą",
   momentumCtaProfile: "Profil i CV",
   momentumCtaHome: "Strona główna",
   momentumCtaRegister: "Załóż konto",
