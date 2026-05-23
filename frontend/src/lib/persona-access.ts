@@ -168,10 +168,6 @@ const SESSION_NEUTRAL_PREFIXES = [
   "/auth",
   "/api",
   "/pricing",
-  "/for-candidates",
-  "/for-recruiters",
-  "/for-companies",
-  "/for-investors",
 ];
 
 function isSessionNeutralPath(pathname: string): boolean {
@@ -260,11 +256,6 @@ export function headerGrowthLinksForPersona(
   hasSession: boolean,
 ): HeaderGrowthLink[] {
   if (hasSession) return [];
-  const path = normalizePath(pathname);
-  // Homepage hero carries register + wishlist; header pill surfaces founding list without scrolling.
-  if (path === "/" && persona === "candidate") {
-    return [{ href: "/waitlist", labelKey: "nav.waitlist", variant: "company" }];
-  }
   if (isMarketingHubPath(pathname)) return [];
   if (persona === "candidate") {
     return [{ href: "/demo", labelKey: "nav.demo", variant: "candidate" }];
