@@ -2,7 +2,10 @@
 
 import Link from "next/link";
 
+import { useTranslation } from "@/components/language-provider";
+import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
+import { MarketingSectionCtas } from "@/components/marketing/marketing-section-ctas";
 import { Shell } from "@/components/ui";
 
 export type ComparisonPageProps = {
@@ -14,13 +17,20 @@ export type ComparisonPageProps = {
 };
 
 export function ComparisonTwinPage({ title, competitorLabel, lead, competitorBullets, twinBullets }: ComparisonPageProps) {
+  const { t } = useTranslation();
   return (
     <Shell wide>
-      <MarketingPageSurface>
-        <article className="twin-prose twin-prose--solid max-w-none">
-          <h1>{title}</h1>
-          <p className="lead">{lead}</p>
-          <div className="not-prose mt-10 grid gap-6 md:grid-cols-2">
+      <MarketingPageSurface wide>
+        <MarketingPageHeader title={title} lead={lead}>
+          <MarketingSectionCtas
+            primaryHref="/waitlist"
+            primaryLabel={t("home.joinWishlist")}
+            secondaryHref="/for-candidates"
+            secondaryLabel={t("nav.forCandidates")}
+          />
+        </MarketingPageHeader>
+        <article className="twin-prose twin-prose--solid mt-8 max-w-none">
+          <div className="not-prose grid gap-6 md:grid-cols-2">
             <section className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/90 p-5 sm:p-6">
               <h2 className="text-base font-semibold text-[var(--foreground)]">{competitorLabel}</h2>
               <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-relaxed text-[var(--twin-muted-strong)]">
