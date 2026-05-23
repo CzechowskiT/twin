@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 
 import {
+  annualPrepayUsdFromMonthly,
   CANDIDATE_PLAN_USD,
+  formatPlanAnnualPrice,
   formatPlanPrice,
   roundPsychMonthlyLocal,
 } from "../src/lib/pricing-locale";
@@ -24,6 +26,16 @@ run("en pro is $9.99", () => {
   assert.equal(formatPlanPrice("pro", "en"), "$9.99");
 });
 
+run("premium annual prepay is $44.91", () => {
+  assert.equal(annualPrepayUsdFromMonthly(CANDIDATE_PLAN_USD.premium), 44.91);
+  assert.equal(formatPlanAnnualPrice("premium", "en"), "$44.91");
+});
+
+run("pro annual prepay is $89.91", () => {
+  assert.equal(annualPrepayUsdFromMonthly(CANDIDATE_PLAN_USD.pro), 89.91);
+  assert.equal(formatPlanAnnualPrice("pro", "en"), "$89.91");
+});
+
 run("pl premium is psych-rounded PLN", () => {
   const price = formatPlanPrice("premium", "pl");
   assert.match(price, /19,99\s*zł|19,99\s*PLN|zł\s*19,99/i);
@@ -39,4 +51,9 @@ run("pl pro is psych-rounded PLN", () => {
 run("de premium uses EUR", () => {
   const price = formatPlanPrice("premium", "de");
   assert.match(price, /4,99\s*€|€\s*4,99|4,99\s*EUR/i);
+});
+
+run("pl premium annual is psych-rounded PLN", () => {
+  const annual = formatPlanAnnualPrice("premium", "pl");
+  assert.match(annual, /zł|PLN/i);
 });

@@ -118,7 +118,7 @@ const candidatesEn: PersonaBundle = {
       id: "premium",
       name: "Premium",
       price: "$4.99",
-      cadence: "per month",
+      cadence: "per month · annual prepay −25%",
       highlight: true,
       bullets: [
         "Unlimited tracked applications",
@@ -132,7 +132,7 @@ const candidatesEn: PersonaBundle = {
       id: "pro",
       name: "Pro",
       price: "$9.99",
-      cadence: "per month",
+      cadence: "per month · annual prepay −25%",
       bullets: [
         "Everything in Premium",
         "Priority roadmap input & earlier feature flags (as released)",
@@ -221,7 +221,7 @@ const candidatesPl: PersonaBundle = {
       id: "premium",
       name: "Premium",
       price: "19,99 zł",
-      cadence: "miesięcznie",
+      cadence: "miesięcznie · prepay roczny −25%",
       highlight: true,
       bullets: [
         "Nielimitowane śledzone aplikacje",
@@ -235,7 +235,7 @@ const candidatesPl: PersonaBundle = {
       id: "pro",
       name: "Pro",
       price: "39,99 zł",
-      cadence: "miesięcznie",
+      cadence: "miesięcznie · prepay roczny −25%",
       bullets: [
         "Wszystko z Premium",
         "Wcześniejszy dostęp do flag funkcji (gdy pojawią się w release)",

@@ -43,10 +43,17 @@ def _checkout_configured(settings: Settings) -> bool:
     return bool(settings.stripe_secret_key and settings.stripe_price_id_premium)
 
 
+def _annual_list_price_usd(monthly_usd: float) -> float:
+    """25% off 12× monthly annual prepay (pay for 9 months, get 12)."""
+    return round(monthly_usd * 12 * 0.75, 2)
+
+
 @router.get("/plans", response_model=PlansPublicResponse)
 def list_plans(settings: Annotated[Settings, Depends(get_settings)]) -> PlansPublicResponse:
     premium_ready = bool(settings.stripe_price_id_premium)
     pro_ready = bool(settings.stripe_price_id_pro)
+    premium_annual_ready = bool(settings.stripe_price_id_premium_annual)
+    pro_annual_ready = bool(settings.stripe_price_id_pro_annual)
     pm_types = stripe_svc.checkout_payment_method_types(settings)
     pm_note = stripe_svc.checkout_payment_methods_note(pm_types)
     return PlansPublicResponse(
@@ -61,6 +68,8 @@ def list_plans(settings: Annotated[Settings, Depends(get_settings)]) -> PlansPub
                 max_tracked_applications=25,
                 stripe_price_configured=False,
                 monthly_list_price_usd=0.0,
+                annual_list_price_usd=0.0,
+                stripe_annual_price_configured=False,
             ),
             PlanOut(
                 id="premium",
@@ -69,6 +78,8 @@ def list_plans(settings: Annotated[Settings, Depends(get_settings)]) -> PlansPub
                 max_tracked_applications=None,
                 stripe_price_configured=premium_ready,
                 monthly_list_price_usd=4.99,
+                annual_list_price_usd=_annual_list_price_usd(4.99),
+                stripe_annual_price_configured=premium_annual_ready,
             ),
             PlanOut(
                 id="pro",
@@ -77,6 +88,8 @@ def list_plans(settings: Annotated[Settings, Depends(get_settings)]) -> PlansPub
                 max_tracked_applications=None,
                 stripe_price_configured=pro_ready,
                 monthly_list_price_usd=9.99,
+                annual_list_price_usd=_annual_list_price_usd(9.99),
+                stripe_annual_price_configured=pro_annual_ready,
             ),
         ],
     )

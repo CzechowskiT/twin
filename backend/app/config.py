@@ -263,6 +263,8 @@ class Settings(BaseSettings):
     stripe_webhook_secret: str = ""
     stripe_price_id_premium: str = ""
     stripe_price_id_pro: str = ""
+    stripe_price_id_premium_annual: str = ""
+    stripe_price_id_pro_annual: str = ""
     # Comma-separated Stripe Checkout `payment_method_types` for subscriptions (e.g. card,link).
     # `card` includes Apple Pay / Google Pay where Stripe presents wallets; `link` enables Link.
     # Invalid entries are ignored; see docs/STRIPE.md.

@@ -20,6 +20,12 @@ class PlanOut(BaseModel):
         ge=0,
         description="Marketing list price per month in USD for UI; Stripe Checkout uses configured price IDs.",
     )
+    annual_list_price_usd: float = Field(
+        ...,
+        ge=0,
+        description="Annual prepay list price (25% off 12× monthly); Stripe uses annual price IDs when configured.",
+    )
+    stripe_annual_price_configured: bool = False
 
 
 class PlansPublicResponse(BaseModel):

@@ -41,6 +41,20 @@ export const CANDIDATE_PLAN_USD = {
 
 export type CandidatePlanId = keyof typeof CANDIDATE_PLAN_USD;
 
+/** Annual prepay discount vs paying 12× monthly (25% off → pay for 9 months, get 12). */
+export const ANNUAL_PREPAY_DISCOUNT = 0.25;
+
+/** USD annual prepay from monthly list price (e.g. Premium $4.99/mo → $44.91/yr). */
+export function annualPrepayUsdFromMonthly(monthlyUsd: number): number {
+  return Math.round(monthlyUsd * 12 * (1 - ANNUAL_PREPAY_DISCOUNT) * 100) / 100;
+}
+
+/** Effective monthly subscription revenue when a share of payers choose annual prepay. */
+export function effectiveMonthlySubscriptionUsd(monthlyUsd: number, annualPrepayShare: number): number {
+  const share = Math.min(1, Math.max(0, annualPrepayShare));
+  return monthlyUsd * (1 - share * ANNUAL_PREPAY_DISCOUNT);
+}
+
 /**
  * Static illustrative FX: units of local currency per 1 USD (MVP; not live rates).
  * 2025-ish ballparks — PLN ~4.0, EUR ~0.92, GBP ~0.79, JPY ~150, CNY ~7.2, SAR ~3.75.
@@ -88,6 +102,24 @@ export function roundPsychMonthlyLocal(usdMonthly: number, currency: string): nu
   return unit + 1 + 0.99;
 }
 
+function formatCurrencyAmount(
+  amount: number,
+  locale: string,
+  currency: string,
+  fractionDigits: number,
+): string {
+  const loc: Locale = isLocale(locale) ? locale : "en";
+  const nfLocale = numberFormatLocaleForUi(loc);
+  const zeroDecimals = ZERO_DECIMAL_CURRENCIES.has(currency);
+  const digits = zeroDecimals ? 0 : fractionDigits;
+  return new Intl.NumberFormat(nfLocale, {
+    style: "currency",
+    currency,
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  }).format(amount);
+}
+
 export function formatPlanPrice(planId: CandidatePlanId, locale: string): string {
   const loc: Locale = isLocale(locale) ? locale : "en";
   const currency = defaultCurrencyForLocale(loc);
@@ -95,22 +127,40 @@ export function formatPlanPrice(planId: CandidatePlanId, locale: string): string
   const usdMonthly = usdMonthlyForPlan(planId);
 
   if (currency === "USD") {
-    return new Intl.NumberFormat(nfLocale, {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(usdMonthly);
+    return formatCurrencyAmount(usdMonthly, locale, "USD", 2);
   }
 
   const amount = roundPsychMonthlyLocal(usdMonthly, currency);
-  const zeroDecimals = ZERO_DECIMAL_CURRENCIES.has(currency);
-  return new Intl.NumberFormat(nfLocale, {
-    style: "currency",
-    currency,
-    minimumFractionDigits: zeroDecimals ? 0 : 2,
-    maximumFractionDigits: zeroDecimals ? 0 : 2,
-  }).format(amount);
+  return formatCurrencyAmount(amount, locale, currency, 2);
+}
+
+/** Localized annual prepay price for a candidate plan (25% off 12× monthly). */
+export function formatPlanAnnualPrice(planId: CandidatePlanId, locale: string): string {
+  const loc: Locale = isLocale(locale) ? locale : "en";
+  const currency = defaultCurrencyForLocale(loc);
+  const usdAnnual = annualPrepayUsdFromMonthly(usdMonthlyForPlan(planId));
+
+  if (currency === "USD") {
+    return formatCurrencyAmount(usdAnnual, locale, "USD", 2);
+  }
+
+  const monthlyLocal = roundPsychMonthlyLocal(usdMonthlyForPlan(planId), currency);
+  const annualLocal = annualPrepayUsdFromMonthly(monthlyLocal);
+  return formatCurrencyAmount(annualLocal, locale, currency, 2);
+}
+
+/** Localized annual prepay for any monthly USD list price (B2B seats, tiers). */
+export function formatAnnualPrepayFromMonthlyUsd(monthlyUsd: number, locale: string): string {
+  const loc: Locale = isLocale(locale) ? locale : "en";
+  const currency = defaultCurrencyForLocale(loc);
+  const usdAnnual = annualPrepayUsdFromMonthly(monthlyUsd);
+
+  if (currency === "USD") {
+    return formatCurrencyAmount(usdAnnual, locale, "USD", monthlyUsd % 1 === 0 ? 0 : 2);
+  }
+
+  const monthlyLocal = roundPsychMonthlyLocal(monthlyUsd, currency);
+  return formatCurrencyAmount(annualPrepayUsdFromMonthly(monthlyLocal), locale, currency, 2);
 }
 
 /** Format a USD list price from API (billing) for the active UI locale. */

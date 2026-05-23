@@ -1,3 +1,5 @@
+import { ANNUAL_PREPAY_DISCOUNT, effectiveMonthlySubscriptionUsd } from "@/lib/pricing-locale";
+
 /** ISO codes supported by the investor model (illustrative FX). */
 export type InvestorModelCurrency = "USD" | "EUR" | "PLN" | "GBP";
 
@@ -15,8 +17,11 @@ export type InvestorCalculatorInputs = {
   totalUsers: number;
   percentPaying: number;
   subscriptionPrice: number;
+  /** Share of paying users on annual prepay (25% off 12× monthly). */
+  annualPrepayShare: number;
   placementRate: number;
   averageSalary: number;
+  /** Employer success fee as % of monthly salary (default 50% = half a month). */
   successFeePercent: number;
   linkedInIncentivePercent: number;
   linkedInAdoptionRate: number;
@@ -42,13 +47,20 @@ export type InvestorCalculatorInputs = {
   currency: InvestorModelCurrency;
 };
 
+/** Employer pays this share of monthly salary on placement (gross success fee). */
+export const PLACEMENT_EMPLOYER_FEE_PERCENT = 50;
+
+/** TWIN net take when half the employer fee is returned to the candidate (baseline). */
+export const PLACEMENT_NET_TAKE_RATE_PERCENT = 25;
+
 export const INVESTOR_CALCULATOR_DEFAULTS: InvestorCalculatorInputs = {
   totalUsers: 100_000,
   percentPaying: 10,
   subscriptionPrice: 4.99,
+  annualPrepayShare: 0.35,
   placementRate: 5,
   averageSalary: 50_000,
-  successFeePercent: 50,
+  successFeePercent: PLACEMENT_EMPLOYER_FEE_PERCENT,
   linkedInIncentivePercent: 75,
   linkedInAdoptionRate: 60,
   referralBonusPerActivation: 15,
@@ -86,10 +98,17 @@ export type InvestorCalculatorResults = {
   subscriptionRevenue: number;
   successFeeRevenue: number;
   totalRevenue: number;
+  mrr: number;
+  arr: number;
+  subscriptionMrr: number;
+  subscriptionArr: number;
+  placementMrr: number;
+  placementArr: number;
   revenuePerUser: number;
   payingUsers: number;
   placementsPerYear: number;
   avgSuccessFee: number;
+  twinNetPlacementPctOfMonthlySalary: number;
   teamCosts: number;
   totalInfrastructure: number;
   referralCosts: number;
@@ -126,15 +145,27 @@ function referralCostsUsd(i: InvestorCalculatorInputs, totalUsers: number): numb
   return activatedReferrals * i.referralBonusPerActivation + hiredReferrals * i.referralBonusPerHire;
 }
 
+/**
+ * Net placement revenue to TWIN per hire (model USD).
+ * Employer pays successFeePercent of monthly salary; TWIN returns half of that fee to the candidate.
+ * Baseline net to TWIN = 25% of monthly salary (not 50% gross employer fee).
+ * LinkedIn viral placements share more of the employer fee with the candidate.
+ */
 function avgSuccessFeeUsd(i: InvestorCalculatorInputs, placementsPerYear: number): number {
   if (placementsPerYear <= 0) return 0;
   const monthlySalary = i.averageSalary / 12;
-  const successFeeBase = monthlySalary * (i.successFeePercent / 100);
+  const employerFee = monthlySalary * (i.successFeePercent / 100);
+  const twinKeepsDefault = employerFee * 0.5;
   const linkedInPlacements = placementsPerYear * (i.linkedInAdoptionRate / 100);
   const nonLinkedInPlacements = placementsPerYear - linkedInPlacements;
-  const twinKeepsLinkedIn = successFeeBase * (1 - i.linkedInIncentivePercent / 100);
-  const twinKeepsNonLinkedIn = successFeeBase * 0.5;
+  const twinKeepsLinkedIn = employerFee * (1 - i.linkedInIncentivePercent / 100);
+  const twinKeepsNonLinkedIn = twinKeepsDefault;
   return (linkedInPlacements * twinKeepsLinkedIn + nonLinkedInPlacements * twinKeepsNonLinkedIn) / placementsPerYear;
+}
+
+function subscriptionRevenueUsd(i: InvestorCalculatorInputs, payingUsers: number): number {
+  const effectiveMonthly = effectiveMonthlySubscriptionUsd(i.subscriptionPrice, i.annualPrepayShare);
+  return payingUsers * effectiveMonthly * 12;
 }
 
 function buildProjection(
@@ -152,7 +183,7 @@ function buildProjection(
     currentUsers *= 1 + g;
     const yearPayingUsers = currentUsers * (i.percentPaying / 100);
     const yearPlacements = yearPayingUsers * (i.placementRate / 100);
-    const yearSubscriptionRev = yearPayingUsers * i.subscriptionPrice * 12;
+    const yearSubscriptionRev = subscriptionRevenueUsd(i, yearPayingUsers);
     const yearSuccessFeeRev = yearPlacements * avgSuccessFee;
     const yearRevenue = yearSubscriptionRev + yearSuccessFeeRev;
     const yearVarCosts = currentUsers * (infrastructureCostPerUser + referralCostPerUser);
@@ -176,10 +207,19 @@ export function computeInvestorCalculator(i: InvestorCalculatorInputs): Investor
   const payingUsers = i.totalUsers * (i.percentPaying / 100);
   const placementsPerYear = payingUsers * (i.placementRate / 100);
   const avgSuccessFee = avgSuccessFeeUsd(i, placementsPerYear);
+  const monthlySalary = i.averageSalary / 12;
+  const twinNetPlacementPctOfMonthlySalary =
+    monthlySalary > 0 ? (avgSuccessFee / monthlySalary) * 100 : 0;
 
-  const subscriptionRevenue = payingUsers * i.subscriptionPrice * 12;
+  const subscriptionRevenue = subscriptionRevenueUsd(i, payingUsers);
   const successFeeRevenue = placementsPerYear * avgSuccessFee;
   const totalRevenue = subscriptionRevenue + successFeeRevenue;
+  const subscriptionMrr = subscriptionRevenue / 12;
+  const placementArr = successFeeRevenue;
+  const placementMrr = placementArr / 12;
+  const subscriptionArr = subscriptionRevenue;
+  const mrr = subscriptionMrr + placementMrr;
+  const arr = subscriptionArr + placementArr;
   const revenuePerUser = i.totalUsers > 0 ? totalRevenue / i.totalUsers : 0;
 
   const tc = teamCosts(i);
@@ -216,10 +256,17 @@ export function computeInvestorCalculator(i: InvestorCalculatorInputs): Investor
     subscriptionRevenue,
     successFeeRevenue,
     totalRevenue,
+    mrr,
+    arr,
+    subscriptionMrr,
+    subscriptionArr,
+    placementMrr,
+    placementArr,
     revenuePerUser,
     payingUsers,
     placementsPerYear,
     avgSuccessFee,
+    twinNetPlacementPctOfMonthlySalary,
     teamCosts: tc,
     totalInfrastructure,
     referralCosts: refCosts,
@@ -244,12 +291,12 @@ export function patchScenario(
   scenario: InvestorScenario,
 ): Partial<InvestorCalculatorInputs> {
   if (scenario === "optimized") {
-    return { percentPaying: 15, placementRate: 6, subscriptionPrice: 7.99, viralGrowthRate: 15 };
+    return { percentPaying: 15, placementRate: 10, subscriptionPrice: 4.99, viralGrowthRate: 15 };
   }
   if (scenario === "aggressive") {
     return {
       percentPaying: 20,
-      placementRate: 7,
+      placementRate: 20,
       subscriptionPrice: 9.99,
       viralGrowthRate: 20,
       linkedInAdoptionRate: 80,
@@ -265,3 +312,6 @@ export function patchScenario(
     referralRate: 40,
   };
 }
+
+/** Exported for tests — annual prepay discount constant re-export. */
+export { ANNUAL_PREPAY_DISCOUNT };

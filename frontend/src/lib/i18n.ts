@@ -22,6 +22,10 @@ import {
   JOB_EMPLOYER_MESSAGES_PL,
 } from "./job-employer-messages";
 import { SITE_MESSAGES_EN, SITE_MESSAGES_PL } from "./site-messages";
+import {
+  CANDIDATE_REWARDS_MESSAGES_EN,
+  CANDIDATE_REWARDS_MESSAGES_PL,
+} from "./candidate-rewards-messages";
 
 export type Locale = "en" | "pl" | "es" | "it" | "fr" | "de" | "zh" | "ar" | "ja";
 
@@ -78,6 +82,7 @@ export const LOCALE_STORAGE_KEY = "twin_locale";
 export type TranslationKey =
   | `nav.${keyof typeof en.nav}`
   | `home.${keyof typeof en.home}`
+  | `candidateRewards.${keyof typeof CANDIDATE_REWARDS_MESSAGES_EN}`
   | `faq.${keyof typeof FAQ_MESSAGES_EN}`
   | `site.${keyof typeof SITE_MESSAGES_EN}`
   | `calculator.${keyof typeof en.calculator}`
@@ -369,6 +374,7 @@ const en = {
     vacationTestCtaRegister: "Create account",
     vacationTestCtaCalculator: "Open ROI calculator",
   },
+  candidateRewards: CANDIDATE_REWARDS_MESSAGES_EN,
   faq: FAQ_MESSAGES_EN,
   site: SITE_MESSAGES_EN,
   dashboard: {
@@ -753,6 +759,9 @@ const en = {
     billingPmAffirm: "Affirm",
     billingPmGeneric: "Other (Stripe)",
     billingPerMonth: "/ month",
+    billingPerYear: "/ year",
+    billingAnnualPrepay: "Annual prepay",
+    billingThreeMonthsFree: "Pay for 9 months, get 12 (25% off)",
     billingListPricesNote:
       "Prices in USD before tax. Checkout is powered by Stripe; your invoice may show proration or local tax.",
     billingPlanCurrent: "Current plan",
@@ -1843,7 +1852,9 @@ const en = {
     twinBadge: "Aligned incentives",
     costPerHire: "Cost per hire",
     agencyFeeDetail: "{{annual}} × {{pct}}%",
-    twinFeeDetail: "{{monthly}} monthly × 50% (example)",
+    twinFeeDetail: "{{monthly}} monthly × 50% employer fee (example)",
+    twinNetDetail: "{{monthly}} monthly × 25% net to TWIN (half of fee to candidate)",
+    placementTakeRate: "Net to TWIN per placement (example)",
     bonusForCandidate: "Candidate bonus pool (example)",
     bonusAfter: "After 6–12 months (illustrative)",
     retention: "Retention guarantee",
@@ -1887,7 +1898,8 @@ const en = {
     workspaceSeatCount: "Recruiter seats (integrated)",
     workspaceSeatHint: "Illustrative only. Real enterprise quotes depend on ATS vendor, SSO, data residency, and rollout scope.",
     workspaceMonthlyTotal: "Modeled monthly (seats × list)",
-    workspaceAnnualTotal: "Modeled annual (×12)",
+    workspaceAnnualTotal: "Modeled annual prepay (25% off ×12)",
+    workspaceAnnualPrepayNote: "Annual prepay: pay for 9 months, get 12 (illustrative).",
     workspaceScopeTitle: "What “integrated” covers in this model",
     workspaceScope1: "ATS or CRM hand-offs: requisitions, stages, and candidate URLs stay in sync where APIs allow.",
     workspaceScope2:
@@ -1906,7 +1918,7 @@ const en = {
     title: "TWIN investor calculator",
     lead: "Illustrative annual model: subscriptions, success-fee take, team and infra costs, referral incentives, and break-even vs user base — for scenario planning only.",
     disclaimer:
-      "Not disclosed actuals, not investment or tax advice. Amounts in the model are USD; display converts with static illustrative FX.",
+      "Not disclosed actuals, not investment or tax advice. Model amounts are stored in USD; display converts with static illustrative FX for the currency you pick.",
     liveStatsEyebrow: "Product traction",
     liveStatsTitle: "Live aggregates (this deployment)",
     liveStatsLead:
@@ -1926,12 +1938,18 @@ const en = {
     liveStatsOff: "Off",
     liveStatsAsOf: "Snapshot: {ts}",
     quickScenarios: "Quick scenarios",
-    scenarioCurrent: "Current model",
-    scenarioCurrentDesc: "10% paying · 5% placement · $4.99/mo (model USD)",
-    scenarioOptimized: "Optimized",
-    scenarioOptimizedDesc: "15% paying · 6% placement · $7.99/mo · 15% viral growth",
-    scenarioAggressive: "Aggressive growth",
-    scenarioAggressiveDesc: "20% paying · 7% placement · $9.99/mo · 20% viral · higher LinkedIn + referrals",
+    scenarioCurrent: "Organic",
+    scenarioOptimized: "Optimal",
+    scenarioAggressive: "Boosted",
+    scenarioDesc: "{{pay}}% paying · {{place}}% placement · {{price}}/mo",
+    kpiMrr: "MRR (model)",
+    kpiMrrSub: "Subscriptions + placement ÷ 12",
+    kpiArr: "ARR (model)",
+    kpiArrSub: "Annual run-rate at current inputs",
+    kpiSubMrr: "Subs",
+    kpiPlaceMrr: "Placement",
+    kpiSubArr: "Subs",
+    kpiPlaceArr: "Placement",
     kpiBreakEven: "Break-even users",
     kpiBreakEvenSub: "users at contribution cover",
     moreUsers: "Gap to break-even",
@@ -1949,15 +1967,22 @@ const en = {
     yearsShort: "y",
     nowShort: "Now",
     sectionUserRev: "User base & revenue",
-    modelUsdNote: "Inputs are stored in model USD; pick a display currency for labels.",
+    fxNote: "Display currency uses illustrative FX; model inputs stay in USD internally.",
+    annualPrepayShare: "Annual prepay mix",
+    annualPrepayHint:
+      "25% off annual prepay vs 12× monthly (pay for 9 months, get 12). Blends into subscription ARR/MRR above.",
+    placementNetNote:
+      "Employer pays the success-fee % of monthly salary; TWIN returns half of that fee to the candidate — net to TWIN is ~25% of monthly salary before LinkedIn sharing.",
+    ofMonthlySalary: "of monthly salary to TWIN",
     totalUsers: "Total users",
     percentPaying: "% paying subscribers",
     subPrice: "Subscription price",
     placementRate: "Placement rate",
     hiresPerYear: "hires/yr",
     avgSalary: "Average salary",
-    successFee: "Success fee (% of monthly salary)",
-    avgToTwin: "avg to TWIN",
+    employerPlacementFee: "Employer placement fee (% of monthly salary)",
+    placementTakeRate: "Net take rate to TWIN",
+    avgToTwin: "avg net / hire",
     sectionGrowth: "Growth & viral incentives",
     viralGrowth: "Viral user growth / year",
     linkedInProgram: "LinkedIn viral program",
@@ -2621,6 +2646,7 @@ const pl: MessageTree = {
     vacationTestCtaRegister: "Załóż konto",
     vacationTestCtaCalculator: "Kalkulator ROI",
   },
+  candidateRewards: CANDIDATE_REWARDS_MESSAGES_PL,
   faq: FAQ_MESSAGES_PL,
   site: SITE_MESSAGES_PL,
   dashboard: {
@@ -3006,6 +3032,9 @@ const pl: MessageTree = {
     billingPmAffirm: "Affirm",
     billingPmGeneric: "Inna metoda (Stripe)",
     billingPerMonth: "/ miesiąc",
+    billingPerYear: "/ rok",
+    billingAnnualPrepay: "Prepay roczny",
+    billingThreeMonthsFree: "Płacisz za 9 miesięcy, masz 12 (25% taniej)",
     billingListPricesNote:
       "Kwoty w USD przed podatkiem. Checkout przez Stripe; na fakturze mogą pojawić się proration lub lokalny VAT.",
     billingPlanCurrent: "Obecny plan",
@@ -4109,7 +4138,9 @@ const pl: MessageTree = {
     twinBadge: "Spójne incentywy",
     costPerHire: "Koszt per hire",
     agencyFeeDetail: "{{annual}} × {{pct}}%",
-    twinFeeDetail: "{{monthly}} miesięcznie × 50% (przykład)",
+    twinFeeDetail: "{{monthly}} miesięcznie × 50% opłaty od pracodawcy (przykład)",
+    twinNetDetail: "{{monthly}} miesięcznie × 25% netto dla TWIN (połowa opłaty dla kandydata)",
+    placementTakeRate: "Netto dla TWIN na placement (przykład)",
     bonusForCandidate: "Pula bonusu dla kandydata (przykład)",
     bonusAfter: "Po 6–12 miesiącach (ilustracja)",
     retention: "Gwarancja retencji",
@@ -4154,7 +4185,8 @@ const pl: MessageTree = {
     workspaceSeatHint:
       "Wyłącznie ilustracja. Realne oferty enterprise zależą od ATS, SSO, residency danych i zakresu wdrożenia.",
     workspaceMonthlyTotal: "Miesięcznie w modelu (miejsca × cena listowa)",
-    workspaceAnnualTotal: "Rocznie w modelu (×12)",
+    workspaceAnnualTotal: "Roczny prepay w modelu (25% taniej vs ×12)",
+    workspaceAnnualPrepayNote: "Prepay roczny: płacisz za 9 miesięcy, masz 12 (ilustracja).",
     workspaceScopeTitle: "Co oznacza „zintegrowane” w tym modelu",
     workspaceScope1: "ATS lub CRM: rekrutacje, etapy i URL-e kandydatów zsynchronizowane tam, gdzie pozwalają API.",
     workspaceScope2:
@@ -4175,7 +4207,7 @@ const pl: MessageTree = {
     lead:
       "Roczny model ilustracyjny: subskrypcje, część success fee, koszty zespołu i infrastruktury, program poleceń oraz punkt break-even vs baza użytkowników — wyłącznie do scenariuszy.",
     disclaimer:
-      "To nie ujawnione faktyczne dane ani porada inwestycyjna lub podatkowa. Kwoty w modelu są w USD; wyświetlanie używa statycznych kursów ilustracyjnych.",
+      "To nie ujawnione faktyczne dane ani porada inwestycyjna lub podatkowa. Model jest w USD; wyświetlanie przelicza statycznymi kursami ilustracyjnymi na wybraną walutę.",
     liveStatsEyebrow: "Traction produktu",
     liveStatsTitle: "Agregaty na żywo (to środowisko)",
     liveStatsLead:
@@ -4196,12 +4228,18 @@ const pl: MessageTree = {
     liveStatsOff: "Wyłączone",
     liveStatsAsOf: "Migawka: {ts}",
     quickScenarios: "Szybkie scenariusze",
-    scenarioCurrent: "Model bazowy",
-    scenarioCurrentDesc: "10% płaci · 5% placement · 4,99 USD/mies. (model USD)",
-    scenarioOptimized: "Zoptymalizowany",
-    scenarioOptimizedDesc: "15% płaci · 6% placement · 7,99 USD/mies. · 15% wzrostu viral",
-    scenarioAggressive: "Agresywny wzrost",
-    scenarioAggressiveDesc: "20% płaci · 7% placement · 9,99 USD/mies. · 20% viral · wyższy LinkedIn + polecenia",
+    scenarioCurrent: "Organiczny",
+    scenarioOptimized: "Optymalny",
+    scenarioAggressive: "Boosted",
+    scenarioDesc: "{{pay}}% płaci · {{place}}% placement · {{price}}/mies.",
+    kpiMrr: "MRR (model)",
+    kpiMrrSub: "Subskrypcje + placement ÷ 12",
+    kpiArr: "ARR (model)",
+    kpiArrSub: "Roczny run-rate przy bieżących wejściach",
+    kpiSubMrr: "Suby",
+    kpiPlaceMrr: "Placement",
+    kpiSubArr: "Suby",
+    kpiPlaceArr: "Placement",
     kpiBreakEven: "Break-even (użytkownicy)",
     kpiBreakEvenSub: "skala, przy której marża pokrywa stałe",
     moreUsers: "Luka do break-even",
@@ -4219,15 +4257,22 @@ const pl: MessageTree = {
     yearsShort: " lat",
     nowShort: "Teraz",
     sectionUserRev: "Baza użytkowników i przychód",
-    modelUsdNote: "Wartości wejściowe są w USD modelu; wybierz walutę wyświetlania etykiet.",
+    fxNote: "Waluta wyświetlania używa kursów ilustracyjnych; wejścia modelu pozostają w USD.",
+    annualPrepayShare: "Udział prepay rocznego",
+    annualPrepayHint:
+      "25% taniej przy prepay rocznym vs 12× miesięcznie (płacisz za 9 miesięcy, masz 12). Wchodzi w MRR/ARR subskrypcji powyżej.",
+    placementNetNote:
+      "Pracodawca płaci success fee jako % miesięcznego wynagrodzenia; TWIN oddaje połowę tej opłaty kandydatowi — netto dla TWIN to ~25% miesięcznego wynagrodzenia przed programem LinkedIn.",
+    ofMonthlySalary: "mies. wynagrodzenia dla TWIN",
     totalUsers: "Łącznie użytkowników",
     percentPaying: "% płacących subskrybentów",
     subPrice: "Cena subskrypcji",
     placementRate: "Wskaźnik placementów",
     hiresPerYear: "zatrudnień/rok",
     avgSalary: "Średnie wynagrodzenie",
-    successFee: "Success fee (% miesięcznego wynagrodzenia)",
-    avgToTwin: "śr. dla TWIN",
+    employerPlacementFee: "Opłata placement od pracodawcy (% mies. wynagrodzenia)",
+    placementTakeRate: "Netto dla TWIN (take rate)",
+    avgToTwin: "śr. netto / zatrudnienie",
     sectionGrowth: "Wzrost i zachęty viral",
     viralGrowth: "Wzrost użytkowników viral / rok",
     linkedInProgram: "Program viral LinkedIn",

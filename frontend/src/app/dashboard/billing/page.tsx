@@ -30,6 +30,7 @@ type PlanRow = {
   max_tracked_applications: number | null;
   stripe_price_configured: boolean;
   monthly_list_price_usd: number;
+  annual_list_price_usd?: number;
 };
 
 type PlansPayload = {
@@ -90,6 +91,12 @@ function normalizePlansPayload(raw: unknown): PlansPayload {
             : null,
       stripe_price_configured: Boolean(r.stripe_price_configured),
       monthly_list_price_usd: monthly,
+      annual_list_price_usd:
+        typeof r.annual_list_price_usd === "number" && Number.isFinite(r.annual_list_price_usd)
+          ? r.annual_list_price_usd
+          : monthly > 0
+            ? Math.round(monthly * 12 * 0.75 * 100) / 100
+            : 0,
     });
   }
   const pm = o.checkout_payment_methods;

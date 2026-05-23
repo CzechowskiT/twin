@@ -11,6 +11,7 @@ import {
   PRICING_FAQ_ITEMS,
   PRICING_FEATURE_ROWS,
   PRICING_PLANS,
+  formatAnnualPrepayUsd,
   PRICING_TRUST_BADGES,
   REGIONAL_PRICING_NOTES,
   ROLE_PRICING_EXAMPLES,
@@ -108,6 +109,11 @@ export function JobEmployerPricingTab({
               <p className="text-sm text-[var(--twin-muted)]">
                 {plan.eur} · {msg(t, plan.cadenceKey)}
               </p>
+              {plan.monthlyUsd != null ? (
+                <p className="mt-1 text-xs text-[var(--twin-muted-strong)]">
+                  {msg(t, "pricingAnnualPrepayLine").replace("{{annual}}", formatAnnualPrepayUsd(plan.monthlyUsd))}
+                </p>
+              ) : null}
             </Card>
           ))}
         </div>

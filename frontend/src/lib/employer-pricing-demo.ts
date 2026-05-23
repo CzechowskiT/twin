@@ -9,9 +9,24 @@ export type PricingPlan = {
   nameKey: JobEmployerMessageKey;
   usd: string;
   eur: string;
+  /** Monthly list USD (for annual prepay display). Omit when usd is Custom. */
+  monthlyUsd?: number;
   cadenceKey: JobEmployerMessageKey;
   highlight?: boolean;
 };
+
+function annualPrepayUsd(monthlyUsd: number): number {
+  return Math.round(monthlyUsd * 12 * 0.75);
+}
+
+export function formatAnnualPrepayUsd(monthlyUsd: number): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+    minimumFractionDigits: 0,
+  }).format(annualPrepayUsd(monthlyUsd));
+}
 
 export type PricingFeatureRow = {
   id: string;
@@ -59,6 +74,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     nameKey: "pricingPlanStarter",
     usd: "$2,400",
     eur: "€2,200",
+    monthlyUsd: 2400,
     cadenceKey: "pricingPerMonth",
   },
   {
@@ -66,6 +82,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     nameKey: "pricingPlanGrowth",
     usd: "$8,500",
     eur: "€7,800",
+    monthlyUsd: 8500,
     cadenceKey: "pricingPerMonth",
     highlight: true,
   },
@@ -74,6 +91,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     nameKey: "pricingPlanEnterprise",
     usd: "$24,000",
     eur: "€22,000",
+    monthlyUsd: 24000,
     cadenceKey: "pricingPerMonth",
   },
   {

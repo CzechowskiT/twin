@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui";
 import type { Locale, TranslationKey } from "@/lib/i18n";
-import { formatCandidateListPriceUsd } from "@/lib/pricing-locale";
+import { formatAnnualPrepayFromMonthlyUsd, formatCandidateListPriceUsd } from "@/lib/pricing-locale";
 
 export type BillingPlanRow = {
   id: string;
@@ -11,6 +11,7 @@ export type BillingPlanRow = {
   max_tracked_applications: number | null;
   stripe_price_configured: boolean;
   monthly_list_price_usd: number;
+  annual_list_price_usd?: number;
 };
 
 function formatUsdListMonthly(n: number): string {
@@ -80,6 +81,14 @@ export function BillingPlanTierCard({
         </span>
         <span className="twin-billing-plan-card__period">{t("dashboard.billingPerMonth")}</span>
       </div>
+      {p.monthly_list_price_usd > 0 ? (
+        <p className="twin-billing-plan-card__annual text-xs text-[var(--twin-muted-strong)]">
+          <span className="font-medium text-[var(--foreground)]">
+            {formatAnnualPrepayFromMonthlyUsd(p.monthly_list_price_usd, locale)}
+          </span>
+          {t("dashboard.billingPerYear")} · {t("dashboard.billingThreeMonthsFree")}
+        </p>
+      ) : null}
 
       <p className="twin-billing-plan-card__desc">{p.description}</p>
       <p className="twin-billing-plan-card__meta">

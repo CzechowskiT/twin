@@ -19,6 +19,7 @@ import {
   type InvestorScenario,
 } from "@/lib/investor-calculator-model";
 import type { Locale } from "@/lib/i18n";
+import { effectiveMonthlySubscriptionUsd, formatPlanPrice } from "@/lib/pricing-locale";
 
 const INVESTOR_CURRENCIES: InvestorModelCurrency[] = ["USD", "EUR", "PLN", "GBP"];
 
@@ -212,6 +213,25 @@ export function InvestorCalculator() {
   const yearsBe =
     calc.yearsToBreakEven > 0 ? `${calc.yearsToBreakEven.toFixed(1)}${t("investorCalc.yearsShort")}` : calc.netIncome >= 0 ? t("investorCalc.nowShort") : "∞";
 
+  const subPriceLabel =
+    inputs.subscriptionPrice <= 5.5
+      ? formatPlanPrice("premium", locale)
+      : formatPlanPrice("pro", locale);
+
+  const scenarioDesc = (payPct: number, placePct: number, monthlyUsd: number) => {
+    const price =
+      monthlyUsd <= 5.5 ? formatPlanPrice("premium", locale) : formatPlanPrice("pro", locale);
+    return t("investorCalc.scenarioDesc")
+      .replace("{{pay}}", String(payPct))
+      .replace("{{place}}", String(placePct))
+      .replace("{{price}}", price);
+  };
+
+  const effectiveMonthlyUsd = effectiveMonthlySubscriptionUsd(
+    inputs.subscriptionPrice,
+    inputs.annualPrepayShare,
+  );
+
   return (
     <Shell wide rail>
       <MarketingPageSurface wide withCard={false}>
@@ -232,24 +252,40 @@ export function InvestorCalculator() {
               active={scenario === "current"}
               onClick={() => applyScenario("current")}
               title={t("investorCalc.scenarioCurrent")}
-              desc={t("investorCalc.scenarioCurrentDesc")}
+              desc={scenarioDesc(10, 5, 4.99)}
             />
             <ScenarioButton
               active={scenario === "optimized"}
               onClick={() => applyScenario("optimized")}
               title={t("investorCalc.scenarioOptimized")}
-              desc={t("investorCalc.scenarioOptimizedDesc")}
+              desc={scenarioDesc(15, 10, 4.99)}
             />
             <ScenarioButton
               active={scenario === "aggressive"}
               onClick={() => applyScenario("aggressive")}
               title={t("investorCalc.scenarioAggressive")}
-              desc={t("investorCalc.scenarioAggressiveDesc")}
+              desc={scenarioDesc(20, 20, 9.99)}
             />
           </div>
         </section>
 
-        <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          <KpiCard
+            accentClass="bg-gradient-to-br from-cyan-600 to-teal-700"
+            icon={<IconDollar className="h-5 w-5" />}
+            label={t("investorCalc.kpiMrr")}
+            value={money(calc.mrr, 0)}
+            sub={t("investorCalc.kpiMrrSub")}
+            foot={`${t("investorCalc.kpiSubMrr")}: ${money(calc.subscriptionMrr, 0)} · ${t("investorCalc.kpiPlaceMrr")}: ${money(calc.placementMrr, 0)}`}
+          />
+          <KpiCard
+            accentClass="bg-gradient-to-br from-indigo-600 to-blue-800"
+            icon={<IconTrend className="h-5 w-5" />}
+            label={t("investorCalc.kpiArr")}
+            value={money(calc.arr, 0)}
+            sub={t("investorCalc.kpiArrSub")}
+            foot={`${t("investorCalc.kpiSubArr")}: ${money(calc.subscriptionArr, 0)} · ${t("investorCalc.kpiPlaceArr")}: ${money(calc.placementArr, 0)}`}
+          />
           <KpiCard
             accentClass="bg-gradient-to-br from-sky-600 to-blue-700"
             icon={<IconTarget className="h-5 w-5" />}
@@ -317,7 +353,7 @@ export function InvestorCalculator() {
                   </option>
                 ))}
               </select>
-              <p className="mt-2 text-xs text-[var(--twin-muted)]">{t("investorCalc.modelUsdNote")}</p>
+              <p className="mt-2 text-xs text-[var(--twin-muted)]">{t("investorCalc.fxNote")}</p>
             </div>
             <div className="space-y-4">
               <RangeRow
@@ -341,7 +377,7 @@ export function InvestorCalculator() {
                 maxLabel="30%"
               />
               <RangeRow
-                label={`${t("investorCalc.subPrice")}: ${money(inputs.subscriptionPrice, 2)}${t("investorCalc.perMonth")}`}
+                label={`${t("investorCalc.subPrice")}: ${subPriceLabel}${t("investorCalc.perMonth")}`}
                 min={2.99}
                 max={29.99}
                 step={0.5}
@@ -351,14 +387,25 @@ export function InvestorCalculator() {
                 maxLabel={money(29.99, 2)}
               />
               <RangeRow
+                label={`${t("investorCalc.annualPrepayShare")}: ${Math.round(inputs.annualPrepayShare * 100)}%`}
+                min={0}
+                max={100}
+                step={5}
+                value={Math.round(inputs.annualPrepayShare * 100)}
+                onChange={(n) => setInputs({ ...inputs, annualPrepayShare: n / 100 })}
+                minLabel="0%"
+                maxLabel="100%"
+              />
+              <p className="text-xs text-[var(--twin-muted)]">{t("investorCalc.annualPrepayHint")}</p>
+              <RangeRow
                 label={`${t("investorCalc.placementRate")}: ${inputs.placementRate}% (${Math.round(calc.placementsPerYear).toLocaleString(locale)} ${t("investorCalc.hiresPerYear")})`}
                 min={1}
-                max={15}
+                max={20}
                 step={0.5}
                 value={inputs.placementRate}
                 onChange={(n) => setInputs({ ...inputs, placementRate: n })}
                 minLabel="1%"
-                maxLabel="15%"
+                maxLabel="20%"
               />
               <RangeRow
                 label={`${t("investorCalc.avgSalary")}: ${money(inputs.averageSalary, 0)}${t("investorCalc.perYear")}`}
@@ -371,15 +418,24 @@ export function InvestorCalculator() {
                 maxLabel={money(150_000, 0)}
               />
               <RangeRow
-                label={`${t("investorCalc.successFee")}: ${inputs.successFeePercent}% (${t("investorCalc.avgToTwin")} ${money(calc.avgSuccessFee, 0)})`}
-                min={25}
-                max={100}
+                label={`${t("investorCalc.employerPlacementFee")}: ${inputs.successFeePercent}%`}
+                min={40}
+                max={60}
                 step={5}
                 value={inputs.successFeePercent}
                 onChange={(n) => setInputs({ ...inputs, successFeePercent: n })}
-                minLabel="25%"
-                maxLabel="100%"
+                minLabel="40%"
+                maxLabel="60%"
               />
+              <p className="text-sm text-[var(--twin-muted-strong)]">
+                {t("investorCalc.placementTakeRate")}:{" "}
+                <span className="font-semibold text-[var(--foreground)]">
+                  {calc.twinNetPlacementPctOfMonthlySalary.toFixed(1)}% {t("investorCalc.ofMonthlySalary")}
+                </span>
+                {" · "}
+                {t("investorCalc.avgToTwin")} {money(calc.avgSuccessFee, 0)}
+              </p>
+              <p className="text-xs text-[var(--twin-muted)]">{t("investorCalc.placementNetNote")}</p>
             </div>
           </section>
 
@@ -544,7 +600,7 @@ export function InvestorCalculator() {
             rows={[
               {
                 title: t("investorCalc.rowSubscriptions"),
-                detail: `${Math.round(calc.payingUsers).toLocaleString(locale)} × ${money(inputs.subscriptionPrice, 2)} × 12`,
+                detail: `${Math.round(calc.payingUsers).toLocaleString(locale)} × ${money(effectiveMonthlyUsd, 2)} × 12`,
                 value: money(calc.subscriptionRevenue, 0),
                 pct: calc.totalRevenue > 0 ? (calc.subscriptionRevenue / calc.totalRevenue) * 100 : 0,
                 valueClass: "text-sky-700 dark:text-sky-300",
@@ -561,6 +617,14 @@ export function InvestorCalculator() {
             total={money(calc.totalRevenue, 0)}
             foot={
               <>
+                <div className="flex justify-between text-sm">
+                  <span>{t("investorCalc.kpiMrr")}</span>
+                  <span className="font-semibold">{money(calc.mrr, 0)}{t("investorCalc.perMonth")}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span>{t("investorCalc.kpiArr")}</span>
+                  <span className="font-semibold">{money(calc.arr, 0)}{t("investorCalc.perYear")}</span>
+                </div>
                 <div className="flex justify-between text-sm">
                   <span>{t("investorCalc.revPerUser")}</span>
                   <span className="font-semibold">{money(calc.revenuePerUser, 2)}{t("investorCalc.perYear")}</span>
