@@ -295,7 +295,7 @@ export default function NightlyAutoApplySettingsPage() {
             {status && (
               <div className="space-y-2 text-sm text-[var(--twin-muted-strong)]">
                 <p>{status}</p>
-                <Link href="/dashboard/applications" className="twin-link inline-block text-sm">
+                <Link href="/dashboard" className="twin-link inline-block text-sm">
                   {t("dashboard.nightlyAutoApplyTriggerViewApps")}
                 </Link>
               </div>

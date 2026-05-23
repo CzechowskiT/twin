@@ -60,6 +60,41 @@ Po zalogowaniu kliknij **Panel** / **Dashboard**. Jeśli widzisz krok **5/5 — 
 
 Hasło się **nie zmienia**, dopóki dev nie zrobi resetu hasła.
 
+## Test auto-aplikacji („Uruchom teraz (test)”)
+
+Ścieżka w panelu: **https://twin-sooty.vercel.app/dashboard/settings/auto-apply**
+
+### Wymagania (muszą być spełnione)
+
+1. Zalogowany jako `czechowski@protonmail.ch`
+2. Profil uzupełniony (CV tekstowe lub plik — seed founder ustawia placeholder)
+3. **Zgoda RODO** na auto-aplikowanie — checkbox „Włącz auto-aplikowanie nocne” + modal zgody
+4. Przełącznik **włączony** (is_active) — wtedy widać przycisk **„Uruchom teraz (test)”**
+
+### Co robi przycisk
+
+- Woła **`POST /api/v1/auto-apply/trigger`** (synchronicznie w API, **nie** przez Celery)
+- Przetwarza **jedną** najlepszą dopasowaną ofertę powyżej progu wyniku (test, nie pełna nocna partia)
+- Dla ofert **investor-demo** (seed demo) zapisuje aplikację w TWIN **bez** wysyłki na prawdziwy Pracuj.pl
+- Dla **prawdziwych** ofert z scrapera uruchamia Playwright (wymaga Chromium na Railway API)
+
+### Czego oczekiwać po kliknięciu
+
+| Wynik | Komunikat (PL) | Gdzie sprawdzić |
+|-------|----------------|-----------------|
+| Sukces demo | „Gotowe: Demo: aplikacja zapisana w TWIN…” | **Panel** (`/dashboard`) — sekcja Aplikacje, nowy wiersz „applied”, auto-applied |
+| Brak ofert | „Brak kwalifikujących dopasowań…” | Obniż próg wyniku lub poczekaj na nowe dopasowania |
+| Limit dzienny | „Osiągnięto dzienny limit…” | Jutro albo zwiększ limit w ustawieniach |
+| Błąd serwera | Czerwony/żółty komunikat z API | Dev: logi Railway API |
+
+Po sukcesie odświeżą się statystyki: **Ostatnie uruchomienie**, **Łącznie auto-aplikacji**. Link **„Zobacz aplikacje →”** pod komunikatem.
+
+### Nocny harmonogram (02:00 Europe/Warsaw)
+
+Pełny sweep o 02:00 idzie przez **Celery worker** (beat + Redis). Przycisk testowy to ta sama logika co noc, ale **1 oferta** i od razu w odpowiedzi HTTP.
+
+Weryfikacja workera (dev): `GET https://twin-production-bcd9.up.railway.app/api/v1/health/celery-status` → `worker_active: true`.
+
 ## Co powinieneś zobaczyć po zalogowaniu
 
 - **5 dopasowanych ofert** (demo inwestorskie + ranking).
