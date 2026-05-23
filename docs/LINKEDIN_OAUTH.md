@@ -95,3 +95,5 @@ Same server-side redirect flow: `GET /api/v1/auth/{google|github|apple}/login` â
 Account linking uses the `oauth_accounts` table (migration `005_oauth_accounts`). Same email across providers maps to one user; `gdpr_consent_at` is set when linking or creating via OAuth.
 
 Environment variables: see `/.env.example` (`GOOGLE_*`, `GITHUB_*`, `APPLE_*`).
+
+GitHub production secret (one founder step): [GITHUB_OAUTH_PRODUCTION.md](./GITHUB_OAUTH_PRODUCTION.md).

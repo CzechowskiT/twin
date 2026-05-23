@@ -60,16 +60,24 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
   const { status: oauthStatus, loaded: oauthStatusLoaded } = useOAuthProviderStatus();
   const showOAuthButtons = hasConfiguredOAuthProvider(oauthStatus);
 
-  const displayError = error ?? oauthUrlError;
+  const displayError = useMemo(() => {
+    if (error) return error;
+    if (!oauthUrlError) return null;
+    if (!oauthStatusLoaded) return oauthUrlError;
+    const err = searchParams.get("error");
+    if (err === "apple_not_configured" && !oauthStatus.apple) return null;
+    if (err === "github_not_configured" && !oauthStatus.github) return null;
+    return oauthUrlError;
+  }, [error, oauthStatus, oauthStatusLoaded, oauthUrlError, searchParams]);
 
   useEffect(() => {
     if (!oauthStatusLoaded) return;
     const err = searchParams.get("error");
     if (err !== "apple_not_configured" && err !== "github_not_configured") return;
-    const resolved =
-      (err === "apple_not_configured" && oauthStatus.apple) ||
-      (err === "github_not_configured" && oauthStatus.github);
-    if (!resolved) return;
+    const stale =
+      (err === "apple_not_configured" && !oauthStatus.apple) ||
+      (err === "github_not_configured" && !oauthStatus.github);
+    if (!stale) return;
     const q = new URLSearchParams(searchParams.toString());
     q.delete("error");
     const suffix = q.toString();
