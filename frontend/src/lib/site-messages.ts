@@ -84,6 +84,42 @@ export const SITE_MESSAGES_EN = {
   case3Body:
     "Sourcers replaced a patchwork of tabs with a single feed and filters, improving hand-off to hiring managers with consistent URLs and timestamps.",
 
+  testimonialsTitle: "What teams say",
+  testimonialsLead:
+    "TWIN is early; these voices describe the product intent — acceptance-ready scheduling, consent-first automation, and less noise for both sides. Replace with verified customer quotes as pilots graduate.",
+  testimonialsDisclaimer: "Illustrative quotes for the demo — not yet verified customer references.",
+  testimonial1Quote:
+    "I stopped drowning in listings I would never book. TWIN surfaces a short list that actually respects my salary band and city.",
+  testimonial1Name: "Product lead",
+  testimonial1Detail: "Warsaw · B2B SaaS",
+  testimonial2Quote:
+    "The win is not more applications — it is fewer, better moments on the calendar. That is the only metric my team cared about.",
+  testimonial2Name: "Engineering manager",
+  testimonial2Detail: "Remote EU",
+  testimonial3Quote:
+    "We piloted with strict consent settings. Candidates arrived pre-matched; recruiters spent time on conversations, not sifting.",
+  testimonial3Name: "Head of talent",
+  testimonial3Detail: "Scale-up · hybrid",
+  testimonial4Quote:
+    "ICS export and interview holds landed in tools people already use. No forced switch to yet another calendar product.",
+  testimonial4Name: "Operations director",
+  testimonial4Detail: "Kraków",
+
+  companySignupTitle: "Company signup",
+  companySignupLead:
+    "Tell us who you are and what you are hiring for. We route this to the TWIN team — no spam, no agency blitz. You will hear back with next steps for pilots and procurement-friendly onboarding.",
+  companySignupThanks: "Thanks — your request is saved. We will follow up by email shortly.",
+  companySignupCompanyLabel: "Company name",
+  companySignupEmailLabel: "Work email",
+  companySignupContactLabel: "Your name (optional)",
+  companySignupMessageLabel: "Message (optional)",
+  companySignupMessagePlaceholder: "Roles, volume, regions, compliance needs…",
+  companySignupSubmit: "Submit",
+  companySignupSending: "Sending…",
+  companySignupFailed: "Something went wrong.",
+  companySignupBackCompanies: "Back to companies overview",
+  companySignupCompareAgencies: "TWIN vs agencies",
+
   faqPageTitle: "FAQ",
   faqPageLead:
     "Straight answers by persona — what is live in beta, what is phased, and how we aim for a calendar of acceptance instead of inbox spam.",
@@ -228,6 +264,42 @@ export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } 
   case3Title: "Program sourcingu wieloźródłowego",
   case3Body:
     "Sourcerzy zamienili wiele kart na jeden feed i filtry, z lepszym przekazaniem do hiring managerów (URL, znaczniki czasu).",
+
+  testimonialsTitle: "Co mówią zespoły",
+  testimonialsLead:
+    "TWIN jest na wczesnym etapie; te głosy opisują intencję produktu — kalendarz akceptacji, automatyzacja za zgodą i mniej szumu po obu stronach. Zastąpimy je zweryfikowanymi cytatami po pilotach.",
+  testimonialsDisclaimer: "Cytaty ilustracyjne do demo — to jeszcze nie oficjalne referencje klientów.",
+  testimonial1Quote:
+    "Przestałem tonąć w ofertach, na które i tak bym nie poszedł. TWIN pokazuje krótką listę zgodną z widełkami i miastem.",
+  testimonial1Name: "Product lead",
+  testimonial1Detail: "Warszawa · B2B SaaS",
+  testimonial2Quote:
+    "Liczy się nie liczba aplikacji, tylko mniej, lepszych momentów w kalendarzu. Tylko to mierzył zespół.",
+  testimonial2Name: "Engineering manager",
+  testimonial2Detail: "Remote EU",
+  testimonial3Quote:
+    "Pilot ze ścisłymi zgodami: kandydaci przychodzili już dopasowani; rekruterzy rozmawiali zamiast przesiewać.",
+  testimonial3Name: "Head of talent",
+  testimonial3Detail: "Scale-up · hybrid",
+  testimonial4Quote:
+    "Eksport ICS i holdy trafiły do narzędzi, których już używamy. Bez kolejnego kalendarza na siłę.",
+  testimonial4Name: "Operations director",
+  testimonial4Detail: "Kraków",
+
+  companySignupTitle: "Zapis firmy",
+  companySignupLead:
+    "Napisz, kim jesteście i kogo szukacie. Przekażemy to zespołowi TWIN — bez spamu i obdzwonki agencji. Odezwiemy się z kolejnymi krokami pilota i onboardingu pod procurement.",
+  companySignupThanks: "Dziękujemy — zapisaliśmy zgłoszenie. Odezwiemy się e-mailem wkrótce.",
+  companySignupCompanyLabel: "Nazwa firmy",
+  companySignupEmailLabel: "Służbowy e-mail",
+  companySignupContactLabel: "Twoje imię (opcjonalnie)",
+  companySignupMessageLabel: "Wiadomość (opcjonalnie)",
+  companySignupMessagePlaceholder: "Role, wolumen, regiony, wymagania compliance…",
+  companySignupSubmit: "Wyślij",
+  companySignupSending: "Wysyłanie…",
+  companySignupFailed: "Coś poszło nie tak.",
+  companySignupBackCompanies: "Wróć do opisu dla firm",
+  companySignupCompareAgencies: "TWIN vs agencje",
 
   faqPageTitle: "FAQ",
   faqPageLead:

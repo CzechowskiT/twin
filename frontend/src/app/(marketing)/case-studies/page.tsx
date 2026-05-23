@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
@@ -18,10 +19,7 @@ export default function CaseStudiesPage() {
   return (
     <Shell wide>
       <MarketingPageSurface>
-        <article className="twin-prose twin-prose--solid max-w-none">
-          <h1>{t("site.casesTitle")}</h1>
-          <p className="lead">{t("site.casesLead")}</p>
-        </article>
+        <MarketingPageHeader title={t("site.casesTitle")} lead={t("site.casesLead")} />
         <div className="mt-8 space-y-5">
           {cases.map((c) => (
             <Card key={c.title}>

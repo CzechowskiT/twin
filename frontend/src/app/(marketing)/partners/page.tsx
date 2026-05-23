@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
@@ -33,9 +34,8 @@ export default function PartnersPage() {
   return (
     <Shell wide>
       <MarketingPageSurface>
-        <article className="twin-prose twin-prose--solid max-w-none">
-          <h1>{t("site.partnersTitle")}</h1>
-          <p className="lead">{t("site.partnersLead")}</p>
+        <MarketingPageHeader title={t("site.partnersTitle")} lead={t("site.partnersLead")} />
+        <article className="twin-prose twin-prose--solid mt-8 max-w-none">
           <p>{t("site.partnersBody")}</p>
           <p className="text-sm italic text-[var(--twin-muted-strong)]">{t("site.partnersNote")}</p>
           <p className="text-sm text-[var(--twin-muted-strong)]">
