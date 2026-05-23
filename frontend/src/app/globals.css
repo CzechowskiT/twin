@@ -846,6 +846,26 @@ samp {
   max-width: 42rem;
 }
 
+/**
+ * Captions above inputs (modals/forms): keep short PL phrases together (e.g. "Docelowa rola");
+ * block layout only — never flex space-between on the label row.
+ */
+.twin-form-label {
+  display: block;
+  text-align: start;
+  hyphens: none;
+  -webkit-hyphens: none;
+  text-wrap: wrap;
+}
+
+.twin-form-label__caption {
+  display: inline-block;
+  max-width: 100%;
+  text-align: start;
+  hyphens: none;
+  -webkit-hyphens: none;
+}
+
 .twin-empty-state__cta {
   display: inline-block;
   text-decoration: none;

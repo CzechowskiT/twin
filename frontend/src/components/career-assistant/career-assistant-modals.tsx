@@ -422,8 +422,8 @@ export function FollowUpModal({
 
   return (
     <ModalShell open={open} eyebrow={t("careerAssistant.followUpEyebrow")} title={title} onClose={onClose}>
-      <label className="block text-sm">
-        <span className="twin-muted">{t("careerAssistant.followUpNotes")}</span>
+      <label className="twin-form-label text-sm">
+        <span className="twin-form-label__caption twin-muted">{t("careerAssistant.followUpNotes")}</span>
         <textarea
           className="mt-1 w-full rounded-lg border border-[var(--twin-border)] bg-transparent p-2 text-sm"
           rows={3}
@@ -494,8 +494,8 @@ export function LinkedinOptimizerModal({
 
   return (
     <ModalShell open={open} eyebrow={t("careerAssistant.linkedinEyebrow")} title={t("careerAssistant.linkedinTitle")} onClose={onClose}>
-      <label className="block text-sm">
-        <span className="twin-muted">{t("careerAssistant.targetRole")}</span>
+      <label className="twin-form-label text-sm">
+        <span className="twin-form-label__caption twin-muted">{t("careerAssistant.targetRole")}</span>
         <input
           className="mt-1 w-full rounded-lg border border-[var(--twin-border)] bg-transparent p-2"
           value={role}

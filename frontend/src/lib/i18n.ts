@@ -564,6 +564,7 @@ const en = {
     quickGrowthPostOffer: "After you land the role, keep growing",
     quickReferrals: "Refer friends & rewards",
     quickRefreshListings: "Refresh listings",
+    quickMoreActions: "More shortcuts",
     statFeedTitle: "In your feed",
     statFeedCta: "Jump to listings",
     statMatchesTitle: "Strong matches",
@@ -793,7 +794,7 @@ const en = {
     calendarStripConnected: "Google Calendar connected as {email}.",
     calendarStripDisconnected:
       "Google Calendar is not connected. Connect so TWIN can read busy time before proposing interview slots.",
-    calendarStripConnectGoogle: "Connect Google Calendar",
+    calendarStripConnectGoogle: "Connect Google",
     calendarStripCta: "Open calendar settings",
     calendarStripWebcalGenerate: "Subscribe all interviews (WebCal)",
     calendarStripWebcalOneClick: "Open in calendar app",
@@ -2730,6 +2731,7 @@ const pl: MessageTree = {
     quickGrowthPostOffer: "Po starcie w roli: dalej z TWIN",
     quickReferrals: "Polecenia i nagrody",
     quickRefreshListings: "Odśwież listingi",
+    quickMoreActions: "Więcej skrótów",
     statFeedTitle: "W feedzie",
     statFeedCta: "Przejdź do listy",
     statMatchesTitle: "Silne dopasowania",
@@ -2962,7 +2964,7 @@ const pl: MessageTree = {
     calendarStripConnected: "Google Calendar: połączono jako {email}.",
     calendarStripDisconnected:
       "Google Calendar nie jest połączony. Połącz, żeby TWIN widział zajętość przy propozycjach slotów rozmów.",
-    calendarStripConnectGoogle: "Połącz Google Calendar",
+    calendarStripConnectGoogle: "Połącz Google",
     calendarStripCta: "Ustawienia kalendarza",
     calendarStripWebcalGenerate: "Subskrybuj rozmowy (WebCal)",
     calendarStripWebcalOneClick: "Otwórz w aplikacji kalendarza",

@@ -21,6 +21,12 @@ import {
   webcalToHttps,
 } from "@/lib/webcal-subscribe";
 
+type CalendarOAuthConfig = {
+  google: { redirect_uri: string; oauth_configured: boolean };
+  microsoft: { redirect_uri: string; oauth_configured: boolean };
+  dev_redirect_uris?: { google: string[]; microsoft: string[] };
+};
+
 type CalendarStatus = {
   connected: boolean;
   google_email: string | null;
@@ -28,39 +34,11 @@ type CalendarStatus = {
   oauth_redirect_uri?: string | null;
 };
 
-function GoogleRedirectSetupHint({
-  redirectUri,
-  t,
-}: {
-  redirectUri: string;
-  t: (key: TranslationKey) => string;
-}) {
-  return (
-    <div className="mt-3 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-900 dark:text-amber-100">
-      <p className="leading-relaxed">{t("dashboard.calendarGoogleRedirectSetup")}</p>
-      <div className="mt-2 flex flex-wrap gap-2">
-        <input
-          readOnly
-          value={redirectUri}
-          className="twin-input min-w-0 flex-1 font-mono text-xs"
-          aria-label="Google OAuth redirect URI"
-        />
-        <Button
-          type="button"
-          className="twin-btn-secondary twin-touch-target shrink-0"
-          onClick={() => void navigator.clipboard.writeText(redirectUri)}
-        >
-          {t("dashboard.calendarGoogleRedirectCopy")}
-        </Button>
-      </div>
-    </div>
-  );
-}
-
 type MicrosoftCalendarStatus = {
   connected: boolean;
   microsoft_email: string | null;
   oauth_configured?: boolean;
+  oauth_redirect_uri?: string | null;
 };
 
 type AuthorizePayload = { authorize_url: string };
@@ -166,6 +144,7 @@ export default function DashboardCalendarPage() {
   const [notifPrefsLoadError, setNotifPrefsLoadError] = useState(false);
   const [notifPrefsSaveError, setNotifPrefsSaveError] = useState(false);
   const [notifPrefsSaving, setNotifPrefsSaving] = useState<null | keyof AuthMeOut>(null);
+  const [webcalLinkCopied, setWebcalLinkCopied] = useState(false);
   const interviewRefreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchInterviewRows = useCallback(
@@ -212,21 +191,29 @@ export default function DashboardCalendarPage() {
     setActionError(false);
     setNotifPrefsLoadError(false);
     try {
-      const [calRes, msRes, meRes] = await Promise.allSettled([
+      const [calRes, msRes, meRes, oauthCfgRes] = await Promise.allSettled([
         apiFetch<CalendarStatus>("/api/v1/calendar/google/status", {}, token),
         apiFetch<MicrosoftCalendarStatus>("/api/v1/calendar/microsoft/status", {}, token),
         apiFetch<AuthMeOut>("/api/v1/auth/me", {}, token),
+        apiFetch<CalendarOAuthConfig>("/api/v1/calendar/oauth-config", {}),
       ]);
       if (calRes.status === "rejected") {
         throw calRes.reason;
       }
+      const oauthCfg = oauthCfgRes.status === "fulfilled" ? oauthCfgRes.value : null;
       const s = calRes.value;
-      setStatus(s);
-      setMsStatus(
+      setStatus({
+        ...s,
+        oauth_redirect_uri: s.oauth_redirect_uri ?? oauthCfg?.google.redirect_uri ?? null,
+      });
+      const msRaw =
         msRes.status === "fulfilled"
           ? msRes.value
-          : { connected: false, microsoft_email: null, oauth_configured: false },
-      );
+          : { connected: false, microsoft_email: null, oauth_configured: false };
+      setMsStatus({
+        ...msRaw,
+        oauth_redirect_uri: msRaw.oauth_redirect_uri ?? oauthCfg?.microsoft.redirect_uri ?? null,
+      });
       if (meRes.status === "fulfilled") {
         setEmailProductUpdates(Boolean(meRes.value.email_product_updates));
         setEmailInterviewReminders(Boolean(meRes.value.email_interview_reminders));
@@ -372,7 +359,7 @@ export default function DashboardCalendarPage() {
   async function generateWebcalLink() {
     const token = getToken();
     if (!token) return;
-    setActionBusy("webcal");
+    setActionBusy("webcal-regen");
     setActionError(false);
     try {
       const out = await mintWebcalFeed(token);
@@ -381,6 +368,30 @@ export default function DashboardCalendarPage() {
     } catch (e) {
       setActionError(true);
       console.warn("[calendar] webcal mint failed", e);
+    } finally {
+      setActionBusy(null);
+    }
+  }
+
+  async function copyWebcalLink() {
+    const token = getToken();
+    if (!token) return;
+    setActionBusy("webcal-copy");
+    setActionError(false);
+    try {
+      let url = webcalUrl;
+      if (!url) {
+        const out = await mintWebcalFeed(token);
+        url = out.webcal_url;
+        setWebcalUrl(url);
+        persistWebcalUrl(url);
+      }
+      await navigator.clipboard.writeText(webcalToHttps(url));
+      setWebcalLinkCopied(true);
+      window.setTimeout(() => setWebcalLinkCopied(false), 2400);
+    } catch (e) {
+      setActionError(true);
+      console.warn("[calendar] webcal copy failed", e);
     } finally {
       setActionBusy(null);
     }
@@ -585,56 +596,145 @@ export default function DashboardCalendarPage() {
         </Link>
       </div>
 
-      <Card className="mb-6">
-        <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
-          {t("dashboard.calendarProvidersEyebrow")}
-        </p>
-        <ul className="mt-4 grid list-none gap-3 p-0 sm:grid-cols-2 lg:grid-cols-4">
-          <li className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/80 p-4">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.calendarProviderGoogleTitle")}</span>
-              <span className="shrink-0 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-300">
-                {t("dashboard.calendarStatusLive")}
-              </span>
-            </div>
-            <p className="mt-2 text-xs leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.calendarProviderGoogleBody")}</p>
-          </li>
-          <li className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/50 p-4">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.calendarProviderMicrosoftTitle")}</span>
-              <span
-                className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
-                  msStatus?.connected
-                    ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-                    : "bg-amber-500/15 text-amber-800 dark:text-amber-200"
-                }`}
+      <div className="mb-6 flex flex-col gap-4">
+        <Card>
+          <h2 className="text-base font-semibold text-[var(--foreground)]">{t("dashboard.calendarPathGoogleTitle")}</h2>
+          <p className="twin-muted mt-2 max-w-2xl text-sm leading-relaxed">{t("dashboard.calendarPathGoogleBody")}</p>
+          {loading ? (
+            <p className="twin-muted mt-4 text-sm">{t("dashboard.identityLoading")}</p>
+          ) : status?.connected ? (
+            <div className="mt-4">
+              {status.google_email ? (
+                <p className="text-sm text-[var(--foreground)]">
+                  {t("dashboard.calendarConnectedAs")}: {status.google_email}
+                </p>
+              ) : null}
+              <Button
+                type="button"
+                className="twin-btn-secondary twin-touch-target mt-3"
+                disabled={Boolean(actionBusy)}
+                onClick={() => void disconnect()}
               >
-                {msStatus?.connected ? t("dashboard.calendarStatusLive") : t("dashboard.calendarStatusPlanned")}
-              </span>
+                {actionBusy === "disconnect" ? "…" : t("dashboard.calendarDisconnect")}
+              </Button>
             </div>
-            <p className="mt-2 text-xs leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.calendarProviderMicrosoftBody")}</p>
-          </li>
-          <li className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/50 p-4">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.calendarProviderAppleTitle")}</span>
-              <span className="shrink-0 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-800 dark:text-amber-200">
-                {t("dashboard.calendarStatusPlanned")}
-              </span>
+          ) : status?.oauth_configured === false ? (
+            <div className="mt-4 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-2)] px-3 py-3">
+              <p className="text-sm font-medium text-[var(--foreground)]">{t("dashboard.calendarGoogleSoon")}</p>
+              <p className="twin-muted mt-1 text-sm leading-relaxed">{t("dashboard.calendarGoogleSoonBody")}</p>
             </div>
-            <p className="mt-2 text-xs leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.calendarProviderAppleBody")}</p>
-          </li>
-          <li className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/50 p-4">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.calendarProviderOtherTitle")}</span>
-              <span className="shrink-0 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-300">
-                {t("dashboard.calendarStatusLive")}
-              </span>
+          ) : (
+            <Button type="button" className="twin-touch-target mt-4" disabled={Boolean(actionBusy)} onClick={() => void connect()}>
+              {actionBusy === "connect" ? "…" : t("dashboard.calendarConnect")}
+            </Button>
+          )}
+        </Card>
+
+        <Card>
+          <h2 className="text-base font-semibold text-[var(--foreground)]">{t("dashboard.calendarPathMicrosoftTitle")}</h2>
+          <p className="twin-muted mt-2 max-w-2xl text-sm leading-relaxed">{t("dashboard.calendarPathMicrosoftBody")}</p>
+          {loading ? (
+            <p className="twin-muted mt-4 text-sm">{t("dashboard.identityLoading")}</p>
+          ) : msStatus?.connected ? (
+            <div className="mt-4">
+              {msStatus.microsoft_email ? (
+                <p className="text-sm text-[var(--foreground)]">
+                  {t("dashboard.calendarMicrosoftConnectedAs")}: {msStatus.microsoft_email}
+                </p>
+              ) : null}
+              <Button
+                type="button"
+                className="twin-btn-secondary twin-touch-target mt-3"
+                disabled={Boolean(actionBusy)}
+                onClick={() => void disconnectMicrosoft()}
+              >
+                {actionBusy === "ms-disconnect" ? "…" : t("dashboard.calendarDisconnectMicrosoft")}
+              </Button>
             </div>
-            <p className="mt-2 text-xs leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.calendarProviderOtherBody")}</p>
-          </li>
-        </ul>
-        <p className="twin-muted mt-4 text-xs leading-relaxed">{t("dashboard.calendarProvidersFoot")}</p>
-      </Card>
+          ) : msStatus?.oauth_configured === false ? (
+            <div className="mt-4 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-2)] px-3 py-3">
+              <p className="text-sm font-medium text-[var(--foreground)]">{t("dashboard.calendarMicrosoftSoon")}</p>
+              <p className="twin-muted mt-1 text-sm leading-relaxed">{t("dashboard.calendarMicrosoftSoonBody")}</p>
+            </div>
+          ) : (
+            <Button
+              type="button"
+              className="twin-touch-target mt-4"
+              disabled={Boolean(actionBusy)}
+              onClick={() => void connectMicrosoft()}
+            >
+              {actionBusy === "ms-connect" ? "…" : t("dashboard.calendarConnectMicrosoft")}
+            </Button>
+          )}
+        </Card>
+
+        <Card variant="accent">
+          <h2 className="text-base font-semibold text-[var(--foreground)]">{t("dashboard.calendarPathOtherTitle")}</h2>
+          <p className="twin-muted mt-2 max-w-2xl text-sm leading-relaxed">{t("dashboard.calendarPathOtherBody")}</p>
+          <Button
+            type="button"
+            className="twin-touch-target mt-4"
+            disabled={Boolean(actionBusy)}
+            onClick={() => void subscribeWebcalOneClick()}
+          >
+            {actionBusy === "webcal" ? "…" : t("dashboard.calendarAddToCalendar")}
+          </Button>
+          <p className="twin-muted mt-3 text-xs leading-relaxed">{t("dashboard.calendarWebcalMacHint")}</p>
+          <ol className="mt-5 list-none space-y-4 p-0">
+            {(
+              [
+                { icon: "📱", title: "dashboard.calendarOtherStep1Title", body: "dashboard.calendarOtherStep1Body" },
+                { icon: "🍎", title: "dashboard.calendarOtherStep2Title", body: "dashboard.calendarOtherStep2Body" },
+                { icon: "📧", title: "dashboard.calendarOtherStep3Title", body: "dashboard.calendarOtherStep3Body" },
+              ] as const
+            ).map((step, index) => (
+              <li key={step.title} className="flex gap-3">
+                <span
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--twin-surface-raised)] text-base"
+                  aria-hidden
+                >
+                  {step.icon}
+                </span>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[var(--twin-muted)]">
+                    {index + 1}
+                  </p>
+                  <p className="text-sm font-medium text-[var(--foreground)]">{t(step.title)}</p>
+                  <p className="twin-muted mt-0.5 text-sm leading-relaxed">{t(step.body)}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+          <details className="mt-5 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/80 px-3 py-2">
+            <summary className="cursor-pointer text-sm font-medium text-[var(--foreground)]">
+              {t("dashboard.calendarLinkAdvancedSummary")}
+            </summary>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button
+                type="button"
+                className="twin-btn-secondary twin-touch-target"
+                disabled={Boolean(actionBusy)}
+                onClick={() => void copyWebcalLink()}
+              >
+                {actionBusy === "webcal-copy" ? "…" : t("dashboard.calendarCopyLink")}
+              </Button>
+              <Button
+                type="button"
+                className="twin-btn-secondary twin-touch-target"
+                disabled={Boolean(actionBusy)}
+                onClick={() => void generateWebcalLink()}
+              >
+                {actionBusy === "webcal-regen" ? "…" : t("dashboard.calendarWebcalGenerate")}
+              </Button>
+            </div>
+            {webcalLinkCopied ? (
+              <p className="mt-2 text-sm text-emerald-700 dark:text-emerald-300" role="status">
+                {t("dashboard.calendarLinkCopied")}
+              </p>
+            ) : null}
+          </details>
+        </Card>
+      </div>
 
       <Card className="mb-6">
         <h2 className="text-base font-semibold text-[var(--foreground)]">{t("dashboard.calendarNotifSectionTitle")}</h2>
@@ -706,18 +806,6 @@ export default function DashboardCalendarPage() {
       {banner === "error" ? (
         <Card variant="soft" className="mb-4">
           <p className="text-sm text-[var(--twin-muted-strong)]">{calendarErrorMessage}</p>
-          {calendarErrorCode?.startsWith("microsoft") ||
-          calendarErrorCode === "exchange_failed" ||
-          calendarErrorCode === "no_refresh_token" ? (
-            <a
-              href="https://github.com/CzechowskiT/twin/blob/main/docs/RAILWAY_PROD_ENV_CHECKLIST.md"
-              className="twin-link mt-2 inline-block text-sm font-medium"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {t("dashboard.calendarMicrosoftEnvChecklist")} ↗
-            </a>
-          ) : null}
         </Card>
       ) : null}
       {actionError ? (
@@ -726,143 +814,10 @@ export default function DashboardCalendarPage() {
         </Card>
       ) : null}
 
-      <Card variant="accent" className="mb-6">
-        <p className="twin-muted text-xs leading-relaxed">{t("dashboard.calendarConfiguredHint")}</p>
-      </Card>
-
-      <Card className="mb-6">
-        <h2 className="text-base font-semibold text-[var(--foreground)]">{t("dashboard.calendarWebcalTitle")}</h2>
-        <p className="twin-muted mt-2 max-w-2xl text-sm leading-relaxed">{t("dashboard.calendarWebcalHint")}</p>
-        <div className="mt-4 flex flex-col gap-3">
-          <div className="flex flex-wrap gap-2">
-            <Button
-              type="button"
-              className="twin-touch-target"
-              disabled={Boolean(actionBusy)}
-              onClick={() => void subscribeWebcalOneClick()}
-            >
-              {actionBusy === "webcal" ? "…" : t("dashboard.calendarWebcalOneClick")}
-            </Button>
-            <Button
-              type="button"
-              className="twin-btn-secondary twin-touch-target"
-              disabled={Boolean(actionBusy)}
-              onClick={() => void generateWebcalLink()}
-            >
-              {actionBusy === "webcal" ? "…" : t("dashboard.calendarWebcalGenerate")}
-            </Button>
-          </div>
-          {webcalUrl ? (
-            <div className="flex flex-wrap gap-2">
-              <input
-                readOnly
-                value={webcalToHttps(webcalUrl)}
-                className="twin-input min-w-0 flex-1 text-sm"
-                aria-label="WebCal URL"
-              />
-              <Button
-                type="button"
-                className="twin-btn-secondary twin-touch-target shrink-0"
-                onClick={() => void navigator.clipboard.writeText(webcalToHttps(webcalUrl))}
-              >
-                {t("dashboard.calendarWebcalCopy")}
-              </Button>
-            </div>
-          ) : null}
-        </div>
-      </Card>
-
       {loading ? (
         <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.identityLoading")}</p>
       ) : status?.connected || msStatus?.connected ? (
         <div className="flex flex-col gap-6">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-xl border border-[var(--twin-border)] p-4">
-              <p className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.calendarProviderGoogleTitle")}</p>
-              {status?.connected ? (
-                <>
-                  {status.google_email ? (
-                    <p className="twin-muted mt-1 text-sm">
-                      {t("dashboard.calendarConnectedAs")}: {status.google_email}
-                    </p>
-                  ) : null}
-                  <Button
-                    type="button"
-                    className="twin-btn-secondary twin-touch-target mt-3"
-                    disabled={Boolean(actionBusy)}
-                    onClick={() => void disconnect()}
-                  >
-                    {actionBusy === "disconnect" ? "…" : t("dashboard.calendarDisconnect")}
-                  </Button>
-                </>
-              ) : status?.oauth_configured === false ? (
-                <p className="mt-3 text-sm text-amber-700 dark:text-amber-300">
-                  {t("dashboard.calendarGoogleOAuthNotConfigured")}
-                </p>
-              ) : (
-                <>
-                  <Button
-                    type="button"
-                    className="twin-touch-target mt-3"
-                    disabled={Boolean(actionBusy)}
-                    onClick={() => void connect()}
-                  >
-                    {actionBusy === "connect" ? "…" : t("dashboard.calendarConnect")}
-                  </Button>
-                  {status?.oauth_redirect_uri ? (
-                    <GoogleRedirectSetupHint redirectUri={status.oauth_redirect_uri} t={t} />
-                  ) : null}
-                </>
-              )}
-            </div>
-            <div className="rounded-xl border border-[var(--twin-border)] p-4">
-              <p className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.calendarProviderMicrosoftTitle")}</p>
-              {msStatus?.connected ? (
-                <>
-                  {msStatus.microsoft_email ? (
-                    <p className="twin-muted mt-1 text-sm">
-                      {t("dashboard.calendarMicrosoftConnectedAs")}: {msStatus.microsoft_email}
-                    </p>
-                  ) : null}
-                  <Button
-                    type="button"
-                    className="twin-btn-secondary twin-touch-target mt-3"
-                    disabled={Boolean(actionBusy)}
-                    onClick={() => void disconnectMicrosoft()}
-                  >
-                    {actionBusy === "ms-disconnect" ? "…" : t("dashboard.calendarDisconnectMicrosoft")}
-                  </Button>
-                </>
-              ) : msStatus?.oauth_configured === false ? (
-                <div className="mt-3 space-y-2">
-                  <p className="text-sm text-amber-700 dark:text-amber-300">
-                    {t("dashboard.calendarMicrosoftOAuthNotConfigured")}
-                  </p>
-                  <p className="text-xs leading-relaxed text-[var(--twin-muted-strong)]">
-                    {t("dashboard.calendarMicrosoftSetupWizard")}
-                  </p>
-                  <a
-                    href="https://github.com/CzechowskiT/twin/blob/main/docs/RAILWAY_PROD_ENV_CHECKLIST.md"
-                    className="twin-link text-sm font-medium"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {t("dashboard.calendarMicrosoftEnvChecklist")} ↗
-                  </a>
-                </div>
-              ) : (
-                <Button
-                  type="button"
-                  className="twin-touch-target mt-3"
-                  disabled={Boolean(actionBusy)}
-                  onClick={() => void connectMicrosoft()}
-                >
-                  {actionBusy === "ms-connect" ? "…" : t("dashboard.calendarConnectMicrosoft")}
-                </Button>
-              )}
-            </div>
-          </div>
-
           <div className="border-t border-[var(--twin-border)] pt-6">
             <h2 className="text-base font-semibold text-[var(--foreground)]">{t("dashboard.calendarInterviewsTitle")}</h2>
             <label className="mt-2 flex cursor-pointer items-center gap-2 text-sm text-[var(--twin-muted-strong)]">
@@ -1139,44 +1094,7 @@ export default function DashboardCalendarPage() {
             ) : null}
           </div>
         </div>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="rounded-xl border border-[var(--twin-border)] p-4">
-            <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.calendarNotConnected")}</p>
-            {status?.oauth_configured === false ? (
-              <p className="mt-3 text-sm text-amber-700 dark:text-amber-300">
-                {t("dashboard.calendarGoogleOAuthNotConfigured")}
-              </p>
-            ) : (
-              <>
-                <Button type="button" className="twin-touch-target mt-3" disabled={Boolean(actionBusy)} onClick={() => void connect()}>
-                  {actionBusy === "connect" ? "…" : t("dashboard.calendarConnect")}
-                </Button>
-                {status?.oauth_redirect_uri ? (
-                  <GoogleRedirectSetupHint redirectUri={status.oauth_redirect_uri} t={t} />
-                ) : null}
-              </>
-            )}
-          </div>
-          <div className="rounded-xl border border-[var(--twin-border)] p-4">
-            <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.calendarProviderMicrosoftBody")}</p>
-            {msStatus?.oauth_configured === false ? (
-              <p className="mt-3 text-sm text-amber-700 dark:text-amber-300">
-                {t("dashboard.calendarMicrosoftOAuthNotConfigured")}
-              </p>
-            ) : (
-              <Button
-                type="button"
-                className="twin-touch-target mt-3"
-                disabled={Boolean(actionBusy)}
-                onClick={() => void connectMicrosoft()}
-              >
-                {actionBusy === "ms-connect" ? "…" : t("dashboard.calendarConnectMicrosoft")}
-              </Button>
-            )}
-          </div>
-        </div>
-      )}
+      ) : null}
       <InterviewPrepModal
         interviewId={prepInterview?.id ?? null}
         title={prepInterview?.title ?? ""}
