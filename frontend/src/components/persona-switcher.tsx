@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useRef } from "react";
 
 import { useTranslation } from "@/components/language-provider";
@@ -12,6 +12,7 @@ import {
   type MarketingPersona,
 } from "@/lib/marketing-persona";
 import { WORKSPACE_PATH } from "@/lib/persona-auth";
+import { isPersonaPricingPath, pricingHrefForPersona } from "@/lib/pricing-routes";
 import type { TranslationKey } from "@/lib/i18n";
 
 function ChevronIcon({ className }: { className?: string }) {
@@ -39,6 +40,7 @@ const PERSONA_ICON: Record<MarketingPersona, string> = {
 export function PersonaSwitcher({ className }: { className?: string }) {
   const { t } = useTranslation();
   const router = useRouter();
+  const pathname = usePathname();
   const { persona, setPersona } = useMarketingPersona();
   const detailsRef = useRef<HTMLDetailsElement>(null);
 
@@ -49,7 +51,13 @@ export function PersonaSwitcher({ className }: { className?: string }) {
 
   const pick = (next: MarketingPersona) => {
     setPersona(next);
-    router.push(getToken() ? WORKSPACE_PATH[next] : PERSONA_ROUTE[next]);
+    const onPricing = isPersonaPricingPath(pathname);
+    const href = onPricing
+      ? pricingHrefForPersona(next)
+      : getToken()
+        ? WORKSPACE_PATH[next]
+        : PERSONA_ROUTE[next];
+    router.push(href);
     close();
   };
 
