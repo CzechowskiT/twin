@@ -5,6 +5,41 @@ import { PageMomentumRail } from "@/components/page-momentum-rail";
 
 type PageMomentumRailProps = ComponentProps<typeof PageMomentumRail>;
 
+/** Two-column rail + main row (sticky left on `lg+`). Use inside `Shell` with `rail`. */
+export function ShellRailLayout({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={`twin-shell-rail-layout marketing-copy-rail ${className}`.trim()}>{children}</div>
+  );
+}
+
+/** Sticky stats / tips column; pairs with `ShellRailMain`. */
+export function ShellRailAside({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return <div className={`twin-shell-rail-aside ${className}`.trim()}>{children}</div>;
+}
+
+/** Primary pane beside `ShellRailAside` (scrolls with the page). */
+export function ShellRailMain({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return <div className={`twin-shell-rail-main ${className}`.trim()}>{children}</div>;
+}
+
 export function Shell({
   children,
   wide = false,
@@ -24,12 +59,12 @@ export function Shell({
   return (
     <div className={`twin-shell flex min-h-0 min-w-0 flex-1 flex-col ${shellWidthClass}`}>
       {rail ? (
-        <div className="marketing-copy-rail flex w-full min-w-0 flex-1 flex-col gap-6 sm:gap-8 lg:flex-row lg:items-start lg:gap-8">
-          <div className="w-full shrink-0 lg:sticky lg:top-24 lg:w-[min(18rem,92vw)] lg:max-w-xs lg:self-start">
+        <ShellRailLayout>
+          <ShellRailAside>
             <PageMomentumRail variant="app" {...pageMomentumRailProps} />
-          </div>
-          <div className="min-w-0 flex-1">{children}</div>
-        </div>
+          </ShellRailAside>
+          <ShellRailMain>{children}</ShellRailMain>
+        </ShellRailLayout>
       ) : (
         <div className="flex w-full min-w-0 flex-1 flex-col">
           {children}
