@@ -1039,6 +1039,10 @@ const en = {
     hubTitle: "Choose your role",
     hubLead: "Same TWIN account — different tools after sign-in. Pick the role that matches how you use TWIN.",
     selectRoleHint: "Choose a role to sign in",
+    selectRoleModalTitle: "Choose your role first",
+    selectRoleModalMessage:
+      "TWIN has separate sign-in paths for candidates, recruiters, companies, and investors. Pick the role that matches how you use the platform.",
+    selectRoleModalDismiss: "Got it",
     zoneCandidateTitle: "Candidate sign-in",
     zoneCandidateLead: "Dashboard, matches, auto-apply, and interview calendar.",
     zoneRecruiterTitle: "Recruiter sign-in",
@@ -3449,6 +3453,10 @@ const pl: MessageTree = {
     hubTitle: "Wybierz rolę",
     hubLead: "To samo konto TWIN — po zalogowaniu inne narzędzia. Wybierz rolę, której dotyczy Twoja praca.",
     selectRoleHint: "Wybierz rolę, aby się zalogować",
+    selectRoleModalTitle: "Najpierw wybierz rolę",
+    selectRoleModalMessage:
+      "TWIN ma osobne ścieżki logowania dla kandydatów, rekruterów, firm i inwestorów. Wybierz rolę, która odpowiada temu, jak korzystasz z platformy.",
+    selectRoleModalDismiss: "Rozumiem",
     zoneCandidateTitle: "Logowanie kandydata",
     zoneCandidateLead: "Panel, dopasowania, auto-aplikacja i kalendarz rozmów.",
     zoneRecruiterTitle: "Logowanie rekrutera",

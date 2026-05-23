@@ -47,13 +47,11 @@ export function AuthZoneHub({
   hubTitleKey,
   hubLeadKey,
   paths,
-  roleHintKey,
   highlightRoleCards = false,
 }: {
   hubTitleKey: TranslationKey;
   hubLeadKey: TranslationKey;
   paths: Record<LoginZone, string>;
-  roleHintKey?: TranslationKey;
   highlightRoleCards?: boolean;
 }) {
   const { t } = useTranslation();
@@ -78,14 +76,6 @@ export function AuthZoneHub({
       <p className="twin-auth-zone-hub__lead twin-muted mt-3 max-w-2xl text-sm leading-relaxed sm:text-[15px]">
         {t(hubLeadKey)}
       </p>
-      {roleHintKey ? (
-        <div
-          className="twin-auth-zone-hub__hint mt-6 rounded-xl border border-[var(--twin-accent)]/45 bg-[var(--twin-accent-muted)]/55 px-4 py-3 text-sm font-medium text-[var(--foreground)] shadow-[0_0_0_1px_rgb(16_185_129_/_0.08)]"
-          role="status"
-        >
-          {t(roleHintKey)}
-        </div>
-      ) : null}
       <div
         ref={gridRef}
         id="role-cards"
