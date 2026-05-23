@@ -1,8 +1,8 @@
 # TWIN — founder status (live)
 
-**Updated:** 2026-05-23 (autonomous 5-slice session)  
+**Updated:** 2026-05-23 (autonomous P0 completion session)  
 **Branch:** `cursor/phase1-monorepo-scaffold`  
-**One-liner:** Scaffold `630e2d2` — S3 data room path wired (`7446595`); recruiter inbox batch ✅; prod S3 flag still off until `S3_*` on Railway.
+**One-liner:** **17/19 P0 ✅** on prod; S3 bucket ⚠️ founder-only; ATS OAuth ❌ backlog. Secrets: `docs/FOUNDER_SECRETS_WHERE.md`.
 
 ---
 
@@ -10,48 +10,50 @@
 
 | Surface | Status |
 |---------|--------|
-| API deploy | `630e2d2` — S3 presigned PUT + recruiter inbox seed (`f011c13`/`7446595`) |
-| Vercel front | Proxy aligned with scaffold (`/status` → `git_commit`) |
+| API deploy | scaffold HEAD (S3 path + inbox via `f011c13`/`7446595`) |
+| Vercel front | https://twin-sooty.vercel.app/status |
 | Demo verify | **PASS** (`live_db`, top matches) |
-| LinkedIn OAuth | **Live** (`linkedin_oauth_configured: true`) |
-| Stripe checkout | **Live** (`stripe_checkout_ready: true`) |
-| Celery worker + beat | **Live** (`worker_active: true`, nightly beat scheduled) |
-| Google Calendar | **Configured** |
-| Microsoft Calendar | **Configured** (`microsoft_calendar_configured: true`) |
-| Mail (Resend) | **Configured** (`mail_configured: true`) |
-| Data room S3 | **Wired in code** — presigned PUT + banners; prod `data_room_local_demo: true` until founder `S3_*` + railway apply |
-| MRR | `0` paid subscribers (Stripe keys live; no prod subs yet) |
+| LinkedIn OAuth | **Live** |
+| Stripe checkout | **Live** |
+| Celery worker + beat | **Live** (nightly auto-apply scheduled) |
+| Google / Microsoft Calendar | **Configured** |
+| Mail (Resend) | **Configured** |
+| Recruiter inbox | **Live** (batch accept/decline) |
+| validated_jobs | **637** (`/status` + `health?ops=1`) |
+| Data room S3 | **Wired** — prod flag off until founder `S3_*` |
+| MRR | $0 (Stripe live; no paid subs yet) |
+| CI smoke | **`.github/workflows/smoke.yml`** (pytest + build + prod curl) |
 
 Quick audit: [https://twin-sooty.vercel.app/status](https://twin-sooty.vercel.app/status)  
-API health: [https://twin-production-bcd9.up.railway.app/api/v1/health](https://twin-production-bcd9.up.railway.app/api/v1/health)
+API: `curl -s "https://twin-production-bcd9.up.railway.app/api/v1/health?ops=1&db=1"`
 
 ---
 
-## Shipped this session (5 slices)
+## Shipped this session
 
-1. **Nightly auto-apply** — manual trigger mail (PL test copy) vs overnight EN copy; `scripts/verify-nightly-auto-apply.sh` + trigger script checks `auto_apply_runs` via ops token; pytest for mail + sweep row persistence.
-2. **RocketJobs** — card `data-testid` selectors + expanded HTML fixture (2 offers); parser tests.
-3. **S3 data room** — frontend file picker + presigned PUT when S3 configured; local dev `POST …/file` via `apiUpload`; S3 vs demo banners.
-4. **Placement work-email** — stepper handles `verify_pending` / `disputed`; resend link + in-progress copy; magic-link confirm on `/dashboard?placement_verify=`.
-5. **This doc** — refreshed prod table (Stripe on, Microsoft calendar on).
+1. **`validated_jobs`** on `GET /health?ops=1` (+ LinkedIn + S3 flags for curl audit).
+2. **GitHub Actions** smoke workflow (backend pytest subset, frontend build, prod health).
+3. **`docs/FOUNDER_SECRETS_WHERE.md`** — Polish guide: skąd wziąć / gdzie wkleić każdy sekret.
+4. **Roadmap + P0 audit** refreshed (17 ✅ / 1 ⚠️ / 1 ❌).
+5. **verify-prod-health.sh** checks `validated_jobs >= 1`.
 
 ---
 
 ## Founder verify on prod
 
-1. **Auto-apply:** `./scripts/trigger-founder-auto-apply.sh` → test mail (no “overnight”); `./scripts/verify-nightly-auto-apply.sh` with `OPS_ADMIN_TOKEN` after 02:00 Warsaw beat for `auto_apply_runs` row.
-2. **Stripe:** `/status` green; optional checkout test with test card.
-3. **Data room:** `/investor/data-room` — demo upload works locally; set `S3_BUCKET` + keys on Railway for presigned PUT (never commit secrets).
-4. **Placement:** Dashboard → hired/applied app → declare → work email → click magic link → stepper **Verified**.
-5. **RocketJobs:** Celery scrape logs or `python3 backend/scripts/run_scraper.py rocketjobs` locally.
+1. **Status page:** all green except S3 (expected until R2 keys).
+2. **Stripe:** optional checkout with test card `4242…`.
+3. **Data room:** paste R2 keys → `./scripts/railway-apply-production-env.sh` → `data_room_s3_enabled: true`.
+4. **Recruiter inbox:** `/recruiter/inbox?company_slug=nova-hiring-pl` (refresh via ops if needed).
+5. **Secrets doc:** `docs/FOUNDER_SECRETS_WHERE.md` — then message agent **„sekrety w .env.railway, gotowe”**.
 
 ---
 
-## Next autonomous slices
+## Open P0 (founder / backlog)
 
-- S3 data room on Railway (founder env only)
-- RocketJobs in `NIGHTLY_AUTO_APPLY_SUPPORTED_BOARDS` after scrape volume check
-- Stripe E2E paid subscriber on prod
-- Microsoft sign-in OAuth E2E (Entra app registered)
+| Item | Owner |
+|------|-------|
+| S3/R2 live bucket | Founder → `.env.railway` |
+| ATS OAuth (Greenhouse/Lever) | Founder credentials + agent wiring |
 
-Checklists: `docs/STRIPE_RAILWAY_SETUP.md`, `docs/NIGHTLY_AUTO_APPLY_DEPLOY.md`, `docs/PLACEMENT_VERIFICATION.md`.
+Checklists: `docs/FOUNDER_SECRETS_WHERE.md`, `docs/STRIPE_RAILWAY_SETUP.md`, `docs/NIGHTLY_AUTO_APPLY_DEPLOY.md`.
