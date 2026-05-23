@@ -16,7 +16,13 @@ if ! command -v "$AZ" >/dev/null 2>&1; then
 fi
 
 echo "==> Logowanie do Azure (jeśli trzeba)..."
-"$AZ" account show >/dev/null 2>&1 || "$AZ" login --use-device-code
+# Personal Default Directory — skip work tenants blocked by Conditional Access.
+PERSONAL_TENANT="${AZURE_TENANT_ID:-651e0ae6-13dd-47e3-aad6-a007b758410f}"
+if ! "$AZ" account show >/dev/null 2>&1; then
+  echo "    Użyj konta OSOBISTEGO Microsoft (nie Developico)."
+  echo "    Tenant: Default Directory ($PERSONAL_TENANT)"
+  "$AZ" login --use-device-code --allow-no-subscriptions --tenant "$PERSONAL_TENANT"
+fi
 
 echo "==> Tworzenie rejestracji aplikacji: $APP_NAME"
 APP_ID=$("$AZ" ad app create \

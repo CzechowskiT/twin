@@ -11,12 +11,27 @@ Jedna aplikacja Azure obsługuje **logowanie** i **kalendarz Outlook** w TWIN.
 W terminalu Cursora (**nowa zakładka**, nie „read-only”):
 
 ```bash
-/Library/Frameworks/Python.framework/Versions/3.14/bin/az login --use-device-code
+/Library/Frameworks/Python.framework/Versions/3.14/bin/az login --use-device-code --allow-no-subscriptions --tenant 651e0ae6-13dd-47e3-aad6-a007b758410f
 ```
 
-1. Otworzy się strona https://login.microsoft.com/device (albo skopiuj link z terminala).
-2. Wpisz **kod z terminala** (np. `CF3WTAAH7`).
-3. Zaloguj się kontem Microsoft (to samo co do Outlook / Azure).
+**Ważne:** zaloguj się **prywatnym** kontem Microsoft (np. `@outlook.com`, `@hotmail.com`, `@protonmail.ch`).  
+**Nie wybieraj** konta firmowego **Developico** — firma blokuje dostęp (`Conditional Access`).
+
+### Odłączenie Developico od Twojego konta Microsoft (opcjonalnie)
+
+Jeśli przy logowaniu ciągle widzisz **Developico**:
+
+1. Wejdź: https://myaccount.microsoft.com/organizations  
+2. Przy **Developico** wybierz **Opuść organizację** / **Leave organization**  
+3. Potem uruchom w terminalu:
+
+```bash
+cd ~/Projects/twin && ./scripts/azure-personal-only.sh
+```
+
+1. Otwórz https://login.microsoft.com/device
+2. Wpisz **kod z terminala**
+3. Wybierz konto **osobiste** (Default Directory), nie Developico
 
 ### Krok 2 — Uruchom skrypt (reszta robi się sama)
 
