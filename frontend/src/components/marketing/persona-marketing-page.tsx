@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { useTranslation } from "@/components/language-provider";
+import { CandidateRewardsBand } from "@/components/marketing/candidate-rewards-band";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { TalentPoolPreview } from "@/components/marketing/talent-pool-preview";
 import { Shell } from "@/components/ui";
@@ -59,6 +60,8 @@ export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
             </div>
           )}
         </header>
+
+        {persona === "candidates" ? <CandidateRewardsBand variant="persona" /> : null}
 
         <section aria-labelledby="persona-capabilities" className="text-start">
           <h2 id="persona-capabilities" className="twin-section-title text-lg sm:text-xl">

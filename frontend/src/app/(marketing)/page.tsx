@@ -5,6 +5,7 @@ import { LandingCtaBand } from "@/components/marketing/landing-cta-band";
 import { LandingFaq } from "@/components/marketing/landing-faq";
 import { LandingFeatureGrid } from "@/components/marketing/landing-feature-grid";
 import { DemoLiveSnapshot } from "@/components/marketing/demo-live-snapshot";
+import { CandidateRewardsBand } from "@/components/marketing/candidate-rewards-band";
 import { LandingHero } from "@/components/marketing/landing-hero";
 import { LandingHomeStats } from "@/components/marketing/landing-home-stats";
 import { LandingHowItWorks } from "@/components/marketing/landing-how-it-works";
@@ -18,6 +19,7 @@ export default function Home() {
   return (
     <>
         <LandingHero />
+        <CandidateRewardsBand variant="home" />
         <LandingTrustCue />
         <div className="mx-auto w-full max-w-6xl space-y-2 px-4 sm:px-6">
           <LandingHomeStats />
