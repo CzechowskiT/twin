@@ -49,6 +49,10 @@ export default function RecruiterInboxClient() {
   const [queueLoaded, setQueueLoaded] = useState(false);
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [billingCompany, setBillingCompany] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<"all" | "applied" | "interview">("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [declineTargetId, setDeclineTargetId] = useState<number | null>(null);
+  const [declineNote, setDeclineNote] = useState("");
   const autoLoadDone = useRef(false);
 
   const companyOptions = useMemo(
@@ -135,7 +139,21 @@ export default function RecruiterInboxClient() {
     void load();
   }, [hydrated, token, companySlug, load]);
 
-  async function respond(applicationId: number, action: "accept" | "decline") {
+  const filteredRows = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return rows.filter((r) => {
+      if (statusFilter !== "all" && r.status !== statusFilter) return false;
+      if (!q) return true;
+      const hay = `${r.candidate_name} ${r.job_title} ${r.company}`.toLowerCase();
+      return hay.includes(q);
+    });
+  }, [rows, statusFilter, searchQuery]);
+
+  async function respond(
+    applicationId: number,
+    action: "accept" | "decline",
+    opts?: { decline_note?: string },
+  ) {
     const tkn = token.trim();
     const slug = companySlug;
     if (!tkn || !slug) return;
@@ -144,12 +162,18 @@ export default function RecruiterInboxClient() {
     setLoadError(null);
     try {
       const q = recruiterInboxQuery(tkn, slug);
+      const body: { action: string; decline_note?: string } = { action };
+      if (action === "decline" && opts?.decline_note?.trim()) {
+        body.decline_note = opts.decline_note.trim();
+      }
       const res = await fetch(`/api/recruiter/inbox/${applicationId}/respond?${q}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action }),
+        body: JSON.stringify(body),
       });
       if (!res.ok) throw new Error(await res.text());
+      setDeclineTargetId(null);
+      setDeclineNote("");
       await load();
     } catch (e) {
       setLoadError(e instanceof Error ? e.message : t("recruiterInbox.loadFailed"));
@@ -240,11 +264,37 @@ export default function RecruiterInboxClient() {
                 {t("recruiterInbox.changeWorkspace")}
               </button>
             </div>
+            <div className="mt-4 flex flex-wrap items-end gap-3">
+              <label className="flex min-w-[10rem] flex-col gap-1 text-xs">
+                <span className="font-medium text-[var(--foreground)]">{t("recruiterInbox.filterStatusLabel")}</span>
+                <select
+                  className="twin-input text-sm"
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value as "all" | "applied" | "interview")}
+                >
+                  <option value="all">{t("recruiterInbox.filterStatusAll")}</option>
+                  <option value="applied">{t("recruiterInbox.filterStatusApplied")}</option>
+                  <option value="interview">{t("recruiterInbox.filterStatusInterview")}</option>
+                </select>
+              </label>
+              <label className="flex min-w-[12rem] flex-1 flex-col gap-1 text-xs">
+                <span className="sr-only">{t("recruiterInbox.filterSearchPlaceholder")}</span>
+                <input
+                  type="search"
+                  className="twin-input text-sm"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={t("recruiterInbox.filterSearchPlaceholder")}
+                />
+              </label>
+            </div>
             {!loading && rows.length === 0 && !loadError ? (
+              <p className="twin-muted mt-4 text-sm">{t("recruiterInbox.empty")}</p>
+            ) : !loading && filteredRows.length === 0 ? (
               <p className="twin-muted mt-4 text-sm">{t("recruiterInbox.empty")}</p>
             ) : (
               <ul className="mt-4 space-y-3">
-                {rows.map((r) => (
+                {filteredRows.map((r) => (
                   <li
                     key={r.application_id}
                     className="rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface)] px-4 py-3 text-sm"
@@ -270,13 +320,51 @@ export default function RecruiterInboxClient() {
                         type="button"
                         className="twin-btn-ghost text-xs"
                         disabled={busyId !== null}
-                        onClick={() => void respond(r.application_id, "decline")}
+                        onClick={() => {
+                          setDeclineTargetId(r.application_id);
+                          setDeclineNote("");
+                        }}
                       >
-                        {busyId === `${r.application_id}-decline`
-                          ? t("common.loadingEllipsis")
-                          : t("recruiterInbox.decline")}
+                        {t("recruiterInbox.decline")}
                       </button>
                     </div>
+                    {declineTargetId === r.application_id ? (
+                      <div className="mt-3 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/80 p-3">
+                        <label className="block text-xs font-medium text-[var(--foreground)]">
+                          {t("recruiterInbox.declineNoteLabel")}
+                          <textarea
+                            className="twin-input mt-1 min-h-[4rem] w-full text-sm"
+                            value={declineNote}
+                            onChange={(e) => setDeclineNote(e.target.value)}
+                            placeholder={t("recruiterInbox.declineNotePlaceholder")}
+                          />
+                        </label>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          <button
+                            type="button"
+                            className="twin-btn-solid text-xs"
+                            disabled={busyId !== null}
+                            onClick={() =>
+                              void respond(r.application_id, "decline", { decline_note: declineNote })
+                            }
+                          >
+                            {busyId === `${r.application_id}-decline`
+                              ? t("common.loadingEllipsis")
+                              : t("recruiterInbox.declineConfirm")}
+                          </button>
+                          <button
+                            type="button"
+                            className="twin-btn-ghost text-xs"
+                            onClick={() => {
+                              setDeclineTargetId(null);
+                              setDeclineNote("");
+                            }}
+                          >
+                            {t("recruiterInbox.declineCancel")}
+                          </button>
+                        </div>
+                      </div>
+                    ) : null}
                   </li>
                 ))}
               </ul>

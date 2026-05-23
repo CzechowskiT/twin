@@ -18,4 +18,15 @@ test.describe("public smoke", () => {
     await expect(page.getByLabel(/email/i).first()).toBeVisible();
     await expect(page.getByLabel(/password/i).first()).toBeVisible();
   });
+
+  test("demo page loads live snapshot section", async ({ page }) => {
+    await page.goto("/demo");
+    await expect(page.locator("body")).toBeVisible();
+    const res = await page.request.get("/api/v1/demo/snapshot");
+    expect([200, 404]).toContain(res.status());
+    if (res.status() === 200) {
+      const body = (await res.json()) as { demo_mode?: boolean; source?: string };
+      expect(body.demo_mode).toBeTruthy();
+    }
+  });
 });

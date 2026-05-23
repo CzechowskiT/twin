@@ -77,6 +77,45 @@ def test_respond_accept_moves_to_interview() -> None:
         db.close()
 
 
+def test_respond_decline_stores_note() -> None:
+    db = _sqlite_session()
+    try:
+        user = User(email="r3@example.com", hashed_password="x", gdpr_consent_at=datetime.now(timezone.utc))
+        db.add(user)
+        db.flush()
+        cand = Candidate(user_id=user.id, name="C", skills="[]", preferred_job_titles="[]")
+        db.add(cand)
+        job = Job(
+            job_board="pracuj",
+            external_id="r-j3",
+            title="QA",
+            company="Charlie LLC",
+            url="https://example.com/j3",
+            is_validated=True,
+        )
+        db.add(job)
+        db.flush()
+        app_row = Application(
+            candidate_id=cand.id,
+            job_id=job.id,
+            status=ApplicationStatus.APPLIED,
+        )
+        db.add(app_row)
+        db.commit()
+        respond_recruiter_batch(
+            db,
+            company_slug="charlie-llc",
+            application_id=app_row.id,
+            action="decline",
+            decline_note="Not senior enough for this quarter",
+        )
+        db.refresh(app_row)
+        assert app_row.status == ApplicationStatus.REJECTED
+        assert "senior" in (app_row.recruiter_feedback_raw or "")
+    finally:
+        db.close()
+
+
 def test_recruiter_api_requires_token(monkeypatch) -> None:
     from app.config import get_settings
 

@@ -12,6 +12,7 @@ export type JobRow = {
   url: string;
   job_board: string;
   score?: number | null;
+  match_reason?: string | null;
   salary_min?: number | null;
   salary_max?: number | null;
 };
@@ -101,6 +102,11 @@ export function JobList({
                 {salary ? ` · ${salary}` : ""}
                 <span> · {item.job_board}</span>
               </p>
+              {item.match_reason?.trim() ? (
+                <p className="twin-muted mt-1 text-xs leading-relaxed" title={t("dashboard.matchReasonTitle")}>
+                  {item.match_reason.trim()}
+                </p>
+              ) : null}
             </a>
             {showActionRow && (
               <div className="flex flex-wrap gap-2">

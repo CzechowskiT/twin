@@ -509,13 +509,15 @@ def respond_acceptance_queue_item(
 
 @router.get("/me/matches", response_model=JobMatchListOut)
 def get_my_matches(
+    request: Request,
     limit: int = Query(10, ge=1, le=400),
     min_score: float = Query(40.0, ge=0, le=100),
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> JobMatchListOut:
     candidate = _get_candidate_or_404(db, user.id)
-    rows = find_top_matches(db, candidate, limit=limit, min_score=min_score)
+    loc = locale_from_request(request)
+    rows = find_top_matches(db, candidate, limit=limit, min_score=min_score, locale=loc)
     items = [JobMatchOut(**row) for row in rows]
     return JobMatchListOut(items=items, total=len(items))
 

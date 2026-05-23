@@ -11,6 +11,7 @@ class JobMatchOut(BaseModel):
     location: str | None
     url: str
     job_board: str
+    match_reason: str | None = None
 
 
 class JobMatchListOut(BaseModel):

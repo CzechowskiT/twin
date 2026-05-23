@@ -9,6 +9,7 @@ from app.config import get_settings
 from app.database.models import Candidate, Job, JobMatch
 from app.matching.matcher import calculate_match_score
 from app.services.job_matching_v2 import calculate_match_score_v2, calculate_match_score_v2_tfidf
+from app.services.match_reason import build_match_reason
 
 
 def _json_list_field(raw: str | None) -> list[Any]:
@@ -52,6 +53,7 @@ def find_top_matches(
     limit: int = 10,
     min_score: float = 40.0,
     persist: bool = True,
+    locale: str = "en",
 ) -> list[dict[str, Any]]:
     """Return best matching jobs for a candidate, optionally saved to job_matches."""
     cand = candidate_to_dict(candidate)
@@ -86,8 +88,10 @@ def find_top_matches(
     results: list[dict[str, Any]] = []
 
     for score, job in top:
+        jdict = job_to_dict(job)
+        reason = build_match_reason(cand, jdict, score=score, locale=locale)
         if persist:
-            _upsert_match(db, candidate.id, job.id, score)
+            _upsert_match(db, candidate.id, job.id, score, match_reason=reason)
         results.append(
             {
                 "job_id": job.id,
@@ -97,6 +101,7 @@ def find_top_matches(
                 "location": job.location,
                 "url": job.url,
                 "job_board": job.job_board,
+                "match_reason": reason,
             }
         )
 
@@ -110,7 +115,14 @@ def find_top_matches(
     return results
 
 
-def _upsert_match(db: Session, candidate_id: int, job_id: int, score: float) -> None:
+def _upsert_match(
+    db: Session,
+    candidate_id: int,
+    job_id: int,
+    score: float,
+    *,
+    match_reason: str | None = None,
+) -> None:
     row = (
         db.query(JobMatch)
         .filter(JobMatch.candidate_id == candidate_id, JobMatch.job_id == job_id)
@@ -118,5 +130,14 @@ def _upsert_match(db: Session, candidate_id: int, job_id: int, score: float) -> 
     )
     if row:
         row.score = score
+        if match_reason:
+            row.match_reason = match_reason
     else:
-        db.add(JobMatch(candidate_id=candidate_id, job_id=job_id, score=score))
+        db.add(
+            JobMatch(
+                candidate_id=candidate_id,
+                job_id=job_id,
+                score=score,
+                match_reason=match_reason,
+            ),
+        )

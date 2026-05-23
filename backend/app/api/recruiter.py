@@ -36,6 +36,7 @@ def _resolved_company_slug(
 
 class RecruiterRespondIn(BaseModel):
     action: str = Field(..., description="accept | decline")
+    decline_note: str | None = Field(None, max_length=2000, description="Internal note when declining")
 
 
 class RecruiterJobCreateIn(BaseModel):
@@ -81,6 +82,7 @@ def recruiter_inbox_respond(
             company_slug=slug,
             application_id=application_id,
             action=body.action,
+            decline_note=body.decline_note,
         )
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc

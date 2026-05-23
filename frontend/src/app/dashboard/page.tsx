@@ -47,6 +47,7 @@ import { SHOW_SCRAPE_UI } from "@/lib/features";
 import type { JobEmployerTabId } from "@/lib/job-employer-demo";
 import type { TranslationKey } from "@/lib/i18n";
 import { calendarProviderLabel } from "@/lib/calendar-provider";
+import { detectMeetingProvider, meetingProviderLabelKey } from "@/lib/meeting-link";
 import {
   buildJobsQuery,
   defaultJobFilters,
@@ -111,6 +112,7 @@ type MatchItem = {
   location: string | null;
   url: string;
   job_board: string;
+  match_reason?: string | null;
 };
 type MatchList = { items: MatchItem[]; total: number };
 type FilterOptions = { job_boards: string[]; locations: string[] };
@@ -1400,14 +1402,27 @@ export default function DashboardPage() {
                           ) : null}
                         </p>
                         {dashboardCalendarBundle.nextInterview.meeting_link?.trim() ? (
-                          <a
-                            href={dashboardCalendarBundle.nextInterview.meeting_link.trim()}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="twin-link mt-1 inline-block text-xs font-medium"
-                          >
-                            {t("dashboard.calendarNextInterviewJoinLink")}
-                          </a>
+                          <span className="mt-1 flex flex-wrap items-center gap-2">
+                            {(() => {
+                              const prov = detectMeetingProvider(
+                                dashboardCalendarBundle.nextInterview.meeting_link,
+                              );
+                              const labelKey = meetingProviderLabelKey(prov);
+                              return labelKey ? (
+                                <span className="rounded bg-[var(--twin-surface-raised)] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--twin-muted-strong)]">
+                                  {t(labelKey)}
+                                </span>
+                              ) : null;
+                            })()}
+                            <a
+                              href={dashboardCalendarBundle.nextInterview.meeting_link.trim()}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="twin-link text-xs font-medium"
+                            >
+                              {t("dashboard.calendarNextInterviewJoinLink")}
+                            </a>
+                          </span>
                         ) : null}
                         <button
                           type="button"

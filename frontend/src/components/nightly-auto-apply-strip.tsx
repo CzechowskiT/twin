@@ -85,7 +85,10 @@ export function NightlyAutoApplyStrip() {
               <p className="twin-muted mt-1 text-xs">
                 {t("dashboard.nightlyAutoApplyPlatformSweep")}: {new Date(sweep.started_at).toLocaleString()}
                 {sweep.total_applications_submitted > 0
-                  ? ` · ${sweep.total_applications_submitted} apps`
+                  ? ` · ${sweep.total_applications_submitted} applied`
+                  : ""}
+                {sweep.total_applications_failed > 0
+                  ? ` · ${t("dashboard.nightlyAutoApplySweepFailed").replace("{count}", String(sweep.total_applications_failed))}`
                   : ""}
               </p>
             ) : (

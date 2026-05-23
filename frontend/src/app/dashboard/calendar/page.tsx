@@ -24,6 +24,7 @@ import {
   type ProviderCalendarEvent,
 } from "@/lib/calendar-week";
 import type { TranslationKey } from "@/lib/i18n";
+import { detectMeetingProvider, meetingProviderLabelKey } from "@/lib/meeting-link";
 import {
   mintAndOpenWebcalSubscribe,
   mintWebcalFeed,
@@ -962,14 +963,25 @@ export default function DashboardCalendarPage() {
                         {formatInterviewRange(row.interview_start, row.interview_end, loc)}
                       </span>
                       {row.meeting_link?.trim() ? (
-                        <a
-                          href={row.meeting_link.trim()}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="twin-link mt-1 inline-block text-xs font-medium"
-                        >
-                          {t("dashboard.calendarNextInterviewJoinLink")}
-                        </a>
+                        <span className="mt-1 flex flex-wrap items-center gap-2">
+                          {(() => {
+                            const prov = detectMeetingProvider(row.meeting_link);
+                            const labelKey = meetingProviderLabelKey(prov);
+                            return labelKey ? (
+                              <span className="rounded bg-[var(--twin-surface-raised)] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--twin-muted-strong)]">
+                                {t(labelKey)}
+                              </span>
+                            ) : null;
+                          })()}
+                          <a
+                            href={row.meeting_link.trim()}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="twin-link text-xs font-medium"
+                          >
+                            {t("dashboard.calendarNextInterviewJoinLink")}
+                          </a>
+                        </span>
                       ) : null}
                     </div>
                     <div className="flex shrink-0 flex-wrap gap-2 self-start sm:self-center">

@@ -62,6 +62,7 @@ def respond_recruiter_batch(
     company_slug: str,
     application_id: int,
     action: str,
+    decline_note: str | None = None,
 ) -> dict:
     slug = _require_company_slug(company_slug)
     row = (
@@ -80,6 +81,9 @@ def respond_recruiter_batch(
         app.status = ApplicationStatus.INTERVIEW
     elif act == "decline":
         app.status = ApplicationStatus.REJECTED
+        note = (decline_note or "").strip()
+        if note:
+            app.recruiter_feedback_raw = note[:2000]
     else:
         raise ValueError("action must be accept or decline")
     app.updated_at = datetime.now(timezone.utc)

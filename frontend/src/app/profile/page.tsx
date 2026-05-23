@@ -6,6 +6,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useTranslation } from "@/components/language-provider";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
+import { ProfileProgressBar } from "@/components/profile-progress-bar";
 import { WorkspaceFlowSteps } from "@/components/ux/workspace-flow-steps";
 import { Button, Card, Input, Label, Shell } from "@/components/ui";
 import { apiFetch, apiFetchBlob, apiUpload, saveBlobAsFile } from "@/lib/api";
@@ -535,6 +536,20 @@ export default function ProfilePage() {
         />
       </div>
       <WorkspaceFlowSteps current="profile" className="mb-4 sm:mb-6" />
+      {initial ? (
+        <ProfileProgressBar
+          className="mb-4 max-w-md"
+          profile={{
+            name: initial.name,
+            skills: JSON.stringify(initial.skills ?? []),
+            preferred_job_titles: JSON.stringify(initial.preferred_job_titles ?? []),
+            experience_years: initial.experience_years,
+            location: initial.location,
+            cv_filename: initial.cv_filename,
+            cv_text: initial.has_cv ? "1" : null,
+          }}
+        />
+      ) : null}
       <Card>
 
         <section className="twin-filter-box mb-6">
