@@ -187,7 +187,13 @@ export function headerGrowthLinksForPersona(
   pathname: string,
   hasSession: boolean,
 ): HeaderGrowthLink[] {
-  if (hasSession || isMarketingHubPath(pathname)) return [];
+  if (hasSession) return [];
+  const path = normalizePath(pathname);
+  // Homepage hero carries the main demo CTA; still show the orange header pill for discoverability.
+  if (path === "/" && persona === "candidate") {
+    return [{ href: "/demo", labelKey: "nav.demo", variant: "candidate" }];
+  }
+  if (isMarketingHubPath(pathname)) return [];
   if (persona === "candidate") {
     return [{ href: "/demo", labelKey: "nav.demo", variant: "candidate" }];
   }

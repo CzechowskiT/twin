@@ -20,7 +20,13 @@ export function LandingCtaBand() {
                 {t("home.featuresSubtitle")}
               </p>
             </div>
-            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap">
+              <Link
+                href="/demo"
+                className="marketing-cta-filled-pill marketing-btn-primary-shadow twin-touch-target inline-flex min-h-[2.75rem] items-center justify-center rounded-full bg-[var(--twin-cta)] px-7 text-center text-sm font-semibold text-[var(--twin-on-cta)] transition hover:bg-[var(--twin-cta-hover)] active:scale-[0.98]"
+              >
+                {t("home.ctaDemo")}
+              </Link>
               <Link
                 href="/dashboard"
                 className="marketing-accent-filled-pill twin-touch-target inline-flex min-h-[2.75rem] items-center justify-center rounded-full bg-[var(--twin-accent)] px-7 text-center text-sm font-bold tracking-tight text-[var(--twin-on-accent)] shadow-[var(--twin-shadow-md)] transition hover:bg-[var(--twin-accent-hover)] active:scale-[0.98]"
@@ -29,7 +35,7 @@ export function LandingCtaBand() {
               </Link>
               <Link
                 href="/waitlist"
-                className="marketing-cta-filled-pill marketing-btn-primary-shadow twin-touch-target inline-flex min-h-[2.75rem] items-center justify-center rounded-full bg-[var(--twin-cta)] px-7 text-center text-sm font-semibold text-[var(--twin-on-cta)] transition hover:bg-[var(--twin-cta-hover)] active:scale-[0.98]"
+                className="twin-touch-target inline-flex min-h-[2.75rem] items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-7 text-center text-sm font-semibold text-[var(--twin-muted-strong)] transition hover:border-[var(--twin-border-hover)] active:scale-[0.98]"
               >
                 {t("home.joinWishlist")}
               </Link>

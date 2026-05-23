@@ -167,6 +167,8 @@ const en = {
       "For people who would rather bring energy to interviews than to a seventeenth browser tab. Automation arrives in layers: the same interface, more of the boring work handled underneath.",
     footerHint: "Add a profile after sign-up so your twin has something real to judge against.",
     twinForYourJob: "Open my command center",
+    ctaDemo: "Watch demo",
+    ctaDemoHint: "Live match feed and a timed auto-apply walkthrough — no login.",
     focusTitle: "Where do you want the first win?",
     focusSubtitle:
       "Choose a starting lane. Everything still lands in one dashboard; we just open the door where the noise is loudest for you.",
@@ -1849,6 +1851,7 @@ const en = {
     liveSourceDb: "Seeded demo account.",
     signUpToApply: "Sign up to apply",
     liveInterviewHint: "Upcoming interview hold",
+    fullExperienceCta: "Open full auto-apply demo",
     footerNote:
       "GDPR: real accounts require explicit consent at registration. This page uses only fictional data suitable for a public demo.",
   },
@@ -2110,6 +2113,8 @@ const pl: MessageTree = {
       "Dla ludzi, którzy wolą energię na rozmowy niż na siedemnastą kartę w przeglądarce. Automatyzacja wchodzi warstwami: ten sam interfejs, coraz więcej pracy zdejmowanej z barków.",
     footerHint: "Po rejestracji dodaj profil. Wtedy bliźniak ma na czym oprzeć gust, nie zgadywanie.",
     twinForYourJob: "Otwórz mój cockpit",
+    ctaDemo: "Zobacz demo",
+    ctaDemoHint: "Podgląd dopasowań na żywo i symulacja auto-apply — bez logowania.",
     focusTitle: "Gdzie chcesz pierwszy efekt?",
     focusSubtitle:
       "Wybierz tor startowy. Wszystko i tak ląduje w jednym panelu; otwieramy drzwi tam, gdzie masz najwięcej szumu w głowie.",
@@ -3809,6 +3814,7 @@ const pl: MessageTree = {
     liveSourceDb: "Konto demo z seeda.",
     signUpToApply: "Załóż konto, by aplikować",
     liveInterviewHint: "Zaplanowana rozmowa",
+    fullExperienceCta: "Pełne demo auto-apply",
     footerNote:
       "RODO: prawdziwe konta wymagają wyraźnej zgody przy rejestracji. Ta strona używa wyłącznie fikcyjnych danych nadających się do publicznego demo.",
   },

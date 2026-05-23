@@ -27,7 +27,12 @@ type DemoSnapshot = {
   signup_cta_path?: string;
 };
 
-export function DemoLiveSnapshot() {
+type DemoLiveSnapshotProps = {
+  /** When set, show a secondary link to the full /demo simulation page. */
+  fullDemoHref?: string;
+};
+
+export function DemoLiveSnapshot({ fullDemoHref }: DemoLiveSnapshotProps = {}) {
   const { t } = useTranslation();
   const [snapshot, setSnapshot] = useState<DemoSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
@@ -100,6 +105,16 @@ export function DemoLiveSnapshot() {
         <p className="mt-4 text-xs text-[var(--twin-muted)]">
           {t("demo.liveInterviewHint" as TranslationKey)}: {snapshot.scheduled_interview.job_title} @{" "}
           {snapshot.scheduled_interview.company_name}
+        </p>
+      ) : null}
+      {fullDemoHref ? (
+        <p className="mt-4">
+          <Link
+            href={fullDemoHref}
+            className="text-sm font-semibold text-[var(--twin-accent)] underline-offset-4 hover:underline"
+          >
+            {t("demo.fullExperienceCta" as TranslationKey)} →
+          </Link>
         </p>
       ) : null}
     </section>

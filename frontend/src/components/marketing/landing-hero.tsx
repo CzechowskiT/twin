@@ -20,14 +20,14 @@ export function LandingHero() {
         </p>
         <p className="marketing-copy-rail marketing-hero-lede mt-6 sm:mt-8">{t("home.description")}</p>
         <div className="mt-12 flex flex-col gap-3 sm:mt-14 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
-          <Link href="/dashboard" className="marketing-hero-btn-twin twin-touch-target transition duration-200">
-            {t("home.twinForYourJob")}
-          </Link>
           <Link
             href="/demo"
             className="marketing-hero-btn-cta marketing-btn-primary-shadow twin-touch-target transition duration-200"
           >
-            {t("marketingHowItWorks.ctaDemo")}
+            {t("home.ctaDemo")}
+          </Link>
+          <Link href="/dashboard" className="marketing-hero-btn-twin twin-touch-target transition duration-200">
+            {t("home.twinForYourJob")}
           </Link>
           <Link
             href="/waitlist"
@@ -45,6 +45,7 @@ export function LandingHero() {
             {t("home.logIn")}
           </Link>
         </div>
+        <p className="marketing-copy-rail mt-4 max-w-2xl text-sm text-[var(--twin-muted-strong)]">{t("home.ctaDemoHint")}</p>
       </ScrollReveal>
     </section>
   );
