@@ -10,6 +10,7 @@
  */
 
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
