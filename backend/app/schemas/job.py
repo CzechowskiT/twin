@@ -21,6 +21,10 @@ class JobOut(BaseModel):
     hourly_rate_min: int | None = None
     hourly_rate_max: int | None = None
     score: float | None = Field(default=None, description="Match vs current user's profile (0–100); null without profile.")
+    tech_stack: list[str] = Field(default_factory=list)
+    remote_percentage: int | None = None
+    seniority_level: str | None = None
+    culture_tags: list[str] = Field(default_factory=list)
 
     model_config = ConfigDict(
         from_attributes=True,
