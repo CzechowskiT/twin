@@ -1,5 +1,7 @@
 """Tests for strategic vision backend services."""
 
+from unittest.mock import patch
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -14,6 +16,7 @@ from app.services.linkedin_profile_import import (
     build_profile_from_candidate,
     synthesize_profile_deterministic,
 )
+from app.automation.types import ApplyOutcome
 from app.services.opportunity_forecaster import forecast_opportunities, generate_ai_learning_path
 from app.services.skill_matcher import compute_skill_match
 
@@ -127,6 +130,31 @@ def test_opportunity_forecast_api(vision_client) -> None:
     body = res.json()
     assert "perfect" in body
     assert body["summary"]["total_returned"] >= 0
+
+
+def test_forecast_job_id_accepted_by_auto_apply(vision_client) -> None:
+    """Forecast cards use job_id with the same POST /applications/auto-apply as the dashboard."""
+    client, headers, _db, _c = vision_client
+    forecast = client.get("/api/v1/opportunities/forecast", headers=headers).json()
+    job_id = None
+    for band in ("perfect", "near_miss", "stretch"):
+        rows = forecast.get(band) or []
+        if rows:
+            job_id = rows[0]["job_id"]
+            break
+    assert job_id is not None
+
+    with patch(
+        "app.api.applications.auto_apply_for_user",
+        return_value=(ApplyOutcome.SUBMITTED, "Applied from forecast test", None),
+    ):
+        res = client.post(
+            "/api/v1/applications/auto-apply",
+            headers=headers,
+            json={"job_id": job_id, "human_acknowledged": True},
+        )
+    assert res.status_code == 200
+    assert res.json()["success"] is True
 
 
 def test_unified_feed_api(vision_client) -> None:

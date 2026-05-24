@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 
 import { useTranslation } from "@/components/language-provider";
 import { FeaturePaywall } from "@/components/billing/FeaturePaywall";
