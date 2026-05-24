@@ -26,6 +26,10 @@ import {
   CANDIDATE_REWARDS_MESSAGES_EN,
   CANDIDATE_REWARDS_MESSAGES_PL,
 } from "./candidate-rewards-messages";
+import {
+  CAREER_DISCOVERY_MESSAGES_EN,
+  CAREER_DISCOVERY_MESSAGES_PL,
+} from "./career-discovery-messages";
 
 export type Locale = "en" | "pl" | "es" | "it" | "fr" | "de" | "zh" | "ar" | "ja";
 
@@ -116,6 +120,7 @@ export type TranslationKey =
   | `dataRoom.${keyof typeof en.dataRoom}`
   | `careerAssistant.${keyof typeof en.careerAssistant}`
   | `strategic.${keyof typeof en.strategic}`
+  | `careerDiscovery.${keyof typeof CAREER_DISCOVERY_MESSAGES_EN}`
   | `jobBrief.${keyof typeof en.jobBrief}`
   | `marketingHowItWorks.${keyof typeof en.marketingHowItWorks}`
   | `workspace.${keyof typeof en.workspace}`
@@ -390,6 +395,7 @@ const en = {
     vacationTestCtaCalculator: "Open ROI calculator",
   },
   candidateRewards: CANDIDATE_REWARDS_MESSAGES_EN,
+  careerDiscovery: CAREER_DISCOVERY_MESSAGES_EN,
   faq: FAQ_MESSAGES_EN,
   site: SITE_MESSAGES_EN,
   dashboard: {
@@ -1408,6 +1414,13 @@ const en = {
     marketingStory: "Product story (marketing)",
     goMyWorkspace: "Go to my workspace",
     candidateHome: "Candidate home",
+    candidateHomeTitle: "Candidate workspace",
+    candidateHomeLead:
+      "Discovery, dashboard, and demo — ranked toward calendar-ready interviews, not inbox noise.",
+    toolCandidateJobs:
+      "Match score, salary fit, CV gaps, and interview prep on live or mock listings.",
+    toolCandidateDashboard: "Applications, auto-apply, and your ranked pipeline.",
+    toolCandidateDemo: "Walk through acceptance-ready slots without signing up for every board.",
     recruiterHome: "Recruiter home",
     investorHome: "Investor workspace",
     gateTitleCandidate: "Candidate workspace only",
@@ -1437,6 +1450,8 @@ const en = {
     investorHomeLead: "Fund-style scenario model and metrics — separate from Companies procurement pricing.",
     toolRecruiterInbox: "Review pre-qualified candidates for one company slug.",
     toolRecruiterJobs: "Publish employer job listings tied to your company slug.",
+    toolRecruiterEmployer:
+      "Post roles, score candidates, mini-ATS templates — employer MVP slice.",
     toolRecruiterB2b: "Illustrative fee model for client conversations.",
     toolRecruiterStory: "How TWIN works for recruiting teams (marketing).",
     toolRecruiterAts: "Greenhouse, Lever, Ashby hire webhooks → verified placement.",
@@ -2189,6 +2204,8 @@ const en = {
       "25% off annual prepay vs 12× monthly (pay for 9 months, get 12). Blends into subscription ARR/MRR above.",
     placementNetNote:
       "Employer pays the success-fee % of monthly salary; TWIN returns half of that fee to the candidate — net to TWIN is ~25% of monthly salary before LinkedIn sharing.",
+    placementPayoutDelay: "Placement payout delay",
+    placementPayoutDays: "{{n}} days after verified start",
     ofMonthlySalary: "of monthly salary to TWIN",
     totalUsers: "Total users",
     percentPaying: "% paying subscribers",
@@ -2262,6 +2279,10 @@ const en = {
     rowInfra: "Infrastructure",
     perUserYr: "per user / yr",
     rowViral: "Viral / referral",
+    rowReferralActivation: "Referral — activation",
+    rowReferralRetained3m: "Referral — 3-month retention",
+    rowReferralHire: "Referral — hire",
+    rowInterviewBonus: "Interview attendance bonus",
     rowOther: "Other fixed",
     legalOffice: "Legal, office",
     totalCosts: "Total costs",
@@ -2902,6 +2923,7 @@ const pl: MessageTree = {
     vacationTestCtaCalculator: "Kalkulator ROI",
   },
   candidateRewards: CANDIDATE_REWARDS_MESSAGES_PL,
+  careerDiscovery: CAREER_DISCOVERY_MESSAGES_PL,
   faq: FAQ_MESSAGES_PL,
   site: SITE_MESSAGES_PL,
   dashboard: {
@@ -3932,6 +3954,13 @@ const pl: MessageTree = {
     marketingStory: "Opis produktu (marketing)",
     goMyWorkspace: "Przejdź do mojej strefy",
     candidateHome: "Strefa kandydata",
+    candidateHomeTitle: "Strefa kandydata",
+    candidateHomeLead:
+      "Odkrywanie ofert, panel i demo — ranking w stronę rozmów w kalendarzu, nie szumu w skrzynce.",
+    toolCandidateJobs:
+      "Dopasowanie, pensja, luki CV i prep do rozmowy — feed live lub mock.",
+    toolCandidateDashboard: "Aplikacje, auto-aplikacja i rankingowany pipeline.",
+    toolCandidateDemo: "Przejdź ścieżkę slotów gotowych do akceptacji bez logowania na każdy portal.",
     recruiterHome: "Strefa rekrutera",
     investorHome: "Strefa inwestora",
     gateTitleCandidate: "Tylko strefa kandydata",
@@ -3961,6 +3990,8 @@ const pl: MessageTree = {
     investorHomeLead: "Model scenariusza i metryki — oddzielnie od cennika Firm (procurement).",
     toolRecruiterInbox: "Przegląd pre-kwalifikowanych kandydatów dla jednego slug firmy.",
     toolRecruiterJobs: "Publikuj ogłoszenia pracodawcy powiązane ze slugiem firmy.",
+    toolRecruiterEmployer:
+      "Publikacja ról, scoring kandydatów, szablony mini-ATS — wycinek MVP pracodawcy.",
     toolRecruiterB2b: "Ilustracyjny model opłat do rozmów z klientem.",
     toolRecruiterStory: "Jak TWIN działa dla zespołów rekrutacyjnych (marketing).",
     toolRecruiterAts: "Webhooki Greenhouse, Lever, Ashby → zweryfikowany placement.",
@@ -4719,6 +4750,8 @@ const pl: MessageTree = {
       "25% taniej przy prepay rocznym vs 12× miesięcznie (płacisz za 9 miesięcy, masz 12). Wchodzi w MRR/ARR subskrypcji powyżej.",
     placementNetNote:
       "Pracodawca płaci success fee jako % miesięcznego wynagrodzenia; TWIN oddaje połowę tej opłaty kandydatowi — netto dla TWIN to ~25% miesięcznego wynagrodzenia przed programem LinkedIn.",
+    placementPayoutDelay: "Opóźnienie wypłaty placement",
+    placementPayoutDays: "{{n}} dni po zweryfikowanym starcie",
     ofMonthlySalary: "mies. wynagrodzenia dla TWIN",
     totalUsers: "Łącznie użytkowników",
     percentPaying: "% płacących subskrybentów",
@@ -4792,6 +4825,10 @@ const pl: MessageTree = {
     rowInfra: "Infrastruktura",
     perUserYr: "na użytk. / rok",
     rowViral: "Viral / polecenia",
+    rowReferralActivation: "Polecenia — aktywacja",
+    rowReferralRetained3m: "Polecenia — retencja 3 mies.",
+    rowReferralHire: "Polecenia — zatrudnienie",
+    rowInterviewBonus: "Bonus za rozmowę",
     rowOther: "Inne stałe",
     legalOffice: "Prawo, biuro",
     totalCosts: "Koszty łącznie",

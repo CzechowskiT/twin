@@ -31,6 +31,9 @@ export function CandidateWorkspaceSubnav({
       <Link href="/dashboard#dashboard-jobs" className={itemClass}>
         {t("nav.jobs")}
       </Link>
+      <Link href="/workspace/candidate/jobs" className={itemClass}>
+        {t("careerDiscovery.jobsNavLink")}
+      </Link>
       <Link href="/dashboard/career" className={itemClass}>
         {t("dashboard.careerCompassLink")}
       </Link>

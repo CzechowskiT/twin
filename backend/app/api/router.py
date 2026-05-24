@@ -17,6 +17,7 @@ from app.api import (
     calendar_microsoft,
     candidates,
     career_assistant,
+    career_discovery,
     curated_careers,
     gamification,
     geo,
@@ -58,6 +59,9 @@ api_router.include_router(gamification.router, prefix="/gamification", tags=["Ga
 api_router.include_router(interview_coach.router, prefix="/interview-coach", tags=["Interview coach"])
 api_router.include_router(
     career_assistant.router, prefix="/career-assistant", tags=["Career assistant"]
+)
+api_router.include_router(
+    career_discovery.router, prefix="/career-discovery", tags=["Career discovery"]
 )
 api_router.include_router(talent_pool.router, prefix="/talent-pool", tags=["Talent pool"])
 api_router.include_router(integrations_ats.router, prefix="/integrations", tags=["Integrations"])
