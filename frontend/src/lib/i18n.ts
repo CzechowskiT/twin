@@ -1577,6 +1577,13 @@ const en = {
     paidSubscribers: "Paying subscribers",
     subscriptionMrr: "Subscription MRR (USD)",
     subscriptionMrrStub: "— (Stripe not live)",
+    placementRevenueTitle: "Estimated placement revenue",
+    placementRevenueLead:
+      "Illustrative net take from verified placements — scenario model, not audited revenue.",
+    placementRevenueCount: "{count} verified placements",
+    recruitmentPipelineTitle: "Recruitment pipeline",
+    recruitmentPipelineLead:
+      "Product traction while placement fees are still at zero — live aggregates from production.",
     dbUnreachable: "database temporarily unavailable",
   },
   investorFundraising: {
@@ -4109,6 +4116,13 @@ const pl: MessageTree = {
     paidSubscribers: "Płacący subskrybenci",
     subscriptionMrr: "MRR subskrypcji (USD)",
     subscriptionMrrStub: "— (Stripe nieaktywny)",
+    placementRevenueTitle: "Szacowany przychód z placementów",
+    placementRevenueLead:
+      "Poglądowy netto ze zweryfikowanych placementów — model scenariusza, nie audytowany przychód.",
+    placementRevenueCount: "{count} zweryfikowanych placementów",
+    recruitmentPipelineTitle: "Pipeline rekrutacyjny",
+    recruitmentPipelineLead:
+      "Trakcja produktu, gdy opłaty placementowe są jeszcze zerowe — agregaty na żywo z produkcji.",
     dbUnreachable: "baza tymczasowo niedostępna",
   },
   investorFundraising: {
