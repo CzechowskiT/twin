@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 
 import {
+  B2B_FLAT_RATE_DEFAULTS,
   B2B_ROI_DEFAULTS,
+  computeB2bFlatRate,
   computeB2bRoi,
 } from "../src/lib/b2b-roi-calculator-model";
 import { convertDisplayToModelUsd, convertModelUsdToDisplay } from "../src/lib/calculator-fx";
@@ -34,4 +36,12 @@ run("FX display round-trip preserves USD model", () => {
   const usd = 60_000;
   const pln = convertModelUsdToDisplay(usd, "PLN");
   assert.equal(convertDisplayToModelUsd(pln, "PLN"), usd);
+});
+
+run("flat rate matches founder spreadsheet (1000 × 15% × 500 PLN @ 10%)", () => {
+  const r = computeB2bFlatRate(B2B_FLAT_RATE_DEFAULTS);
+  assert.equal(r.vacancies, 150);
+  assert.equal(r.traditionalTotalUsd, 18_750);
+  assert.equal(r.flatRateTotalUsd, 1_875);
+  assert.equal(r.savingsUsd, 16_875);
 });

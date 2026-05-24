@@ -115,6 +115,7 @@ export type TranslationKey =
   | `atsIntegrations.${keyof typeof en.atsIntegrations}`
   | `dataRoom.${keyof typeof en.dataRoom}`
   | `careerAssistant.${keyof typeof en.careerAssistant}`
+  | `careerDiscovery.${Extract<keyof typeof CAREER_DISCOVERY_MESSAGES_EN, string>}`
   | `jobBrief.${keyof typeof en.jobBrief}`
   | `marketingHowItWorks.${keyof typeof en.marketingHowItWorks}`
   | `workspace.${keyof typeof en.workspace}`
@@ -140,6 +141,9 @@ const en = {
     login: "Log in",
     register: "Register",
     profile: "Profile",
+    jobs: "Jobs",
+    applications: "Applications",
+    integrations: "Integrations",
     dashboard: "Dashboard",
     calculator: "B2B ROI calculator",
     calculatorInvestor: "Investor calculator",
@@ -2070,6 +2074,20 @@ const en = {
     linkInvestorModel: "Open the investor scenario calculator →",
     wishlistLead:
       "Early companies can join the founding wishlist for priority access and founding-tier pricing — no card required today.",
+    flatRateTitle: "High-volume vacancy flat rate (illustrative)",
+    flatRateLead:
+      "From founder procurement models: compare publishing spend at a market floor per vacancy with a flat program fee (example: 10% of that budget — not a % of salary).",
+    flatRateHeadcount: "Employee headcount",
+    flatRateRotation: "Annual rotation rate (0–1)",
+    flatRateVacancies: "Open vacancies (optional override)",
+    flatRateVacancyCost: "Market floor cost per vacancy",
+    flatRateRatio: "Flat program fee (% of traditional vacancy spend)",
+    flatRateTraditional: "Traditional vacancy spend",
+    flatRateTwin: "Flat program fee (example)",
+    flatRateSavings: "Modeled savings",
+    flatRateVacanciesDetail: "{{count}} vacancies × {{cost}} floor",
+    flatRateFoot:
+      "Illustrative only. Real enterprise quotes may combine flat vacancy programs with success fees, workspace seats, or annual commits — see /for-companies.",
   },
   investorCalc: {
     title: "TWIN investor calculator",
@@ -2594,6 +2612,9 @@ const pl: MessageTree = {
     login: "Zaloguj się",
     register: "Rejestracja",
     profile: "Profil",
+    jobs: "Oferty",
+    applications: "Aplikacje",
+    integrations: "Integracje",
     dashboard: "Panel",
     calculator: "Kalkulator ROI B2B",
     calculatorInvestor: "Kalkulator inwestora",
@@ -3294,7 +3315,10 @@ const pl: MessageTree = {
     nightlyAutoApplyConsentNudgeCta: "Zgoda i ustawienia",
     nightlyAutoApplyPlatformSweep: "Ostatni sweep platformy",
     nightlyAutoApplyPlatformSweepNone: "Brak zarejestrowanego sweepu harmonogramu",
-    nightlyAutoApplySweepFailed: "{count} nieudanych w ostatnim sweepsie",
+    nightlyAutoApplySweepSubmitted: "{count} wysłanych",
+    nightlyAutoApplySweepPartial: "{submitted} wysłanych · {failed} bez wysyłki ({boards})",
+    nightlyAutoApplySweepFailedOnly: "{count} bez wysyłki ({boards})",
+    nightlyAutoApplySweepSkipped: "{count} pominiętych (cooldown lub blocklist)",
     workspaceGateTitleRecruiter: "Widok rekrutera",
     workspaceGateTitleCompany: "Widok firmy",
     workspaceGateLeadRecruiter:
@@ -3425,6 +3449,8 @@ const pl: MessageTree = {
       "Kolejność i terminy wynikają z popytu enterprise i przeglądu bezpieczeństwa — to nie obietnica dat wdrożenia.",
     calendarConnected: "Połączono",
     calendarNotConnected: "Nie połączono",
+    calendarConnectionsLoading: "Ładowanie…",
+    calendarConnectionsStatusError: "Nie udało się wczytać statusu połączenia. Odśwież stronę lub spróbuj ponownie.",
     calendarConnect: "Połącz Google",
     calendarDisconnect: "Odłącz",
     calendarGoogleRedirectSetup:
@@ -4535,6 +4561,20 @@ const pl: MessageTree = {
     linkInvestorModel: "Otwórz kalkulator scenariuszy inwestorskich →",
     wishlistLead:
       "Firmy z wczesnej fazy mogą dołączyć do listy founding — priorytetowy dostęp i cennik founding, dziś bez karty.",
+    flatRateTitle: "Flat rate przy dużej liczbie wakatów (ilustracja)",
+    flatRateLead:
+      "Model z arkusza założyciela: porównaj wydatki na publikację wakatów (np. 500 PLN / wakat) z opłatą programową jako procent tego budżetu (przykład: 10% — nie % pensji).",
+    flatRateHeadcount: "Liczba pracowników",
+    flatRateRotation: "Roczna rotacja (0–1)",
+    flatRateVacancies: "Liczba wakatów (opcjonalnie, nadpisuje rotację)",
+    flatRateVacancyCost: "Koszt rynkowy za wakat (floor)",
+    flatRateRatio: "Opłata programowa (% budżetu wakatów)",
+    flatRateTraditional: "Tradycyjny koszt wakatów",
+    flatRateTwin: "Opłata flat (przykład)",
+    flatRateSavings: "Modelowane oszczędności",
+    flatRateVacanciesDetail: "{{count}} wakatów × {{cost}} floor",
+    flatRateFoot:
+      "Wyłącznie ilustracja. W umowie możliwa hybryda: flat na publikacje + success fee + program roczny — zob. /for-companies.",
   },
   investorCalc: {
     title: "Kalkulator inwestorski TWIN",

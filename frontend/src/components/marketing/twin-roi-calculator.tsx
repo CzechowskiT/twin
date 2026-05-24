@@ -7,7 +7,9 @@ import { MarketingPageSurface } from "@/components/marketing/marketing-page-surf
 import { useTranslation } from "@/components/language-provider";
 import { Shell } from "@/components/ui";
 import {
+  B2B_FLAT_RATE_DEFAULTS,
   B2B_ROI_DEFAULTS,
+  computeB2bFlatRate,
   computeB2bRoi,
 } from "@/lib/b2b-roi-calculator-model";
 import { convertDisplayToModelUsd, convertModelUsdToDisplay } from "@/lib/calculator-fx";
@@ -83,8 +85,10 @@ export function TwinRoiCalculator() {
   const { t, locale } = useTranslation();
   const [currency, setCurrency] = useState(() => defaultCurrencyForLocale(locale));
   const [inputsUsd, setInputsUsd] = useState(B2B_ROI_DEFAULTS);
+  const [flatInputsUsd, setFlatInputsUsd] = useState(B2B_FLAT_RATE_DEFAULTS);
 
   const calc = useMemo(() => computeB2bRoi(inputsUsd), [inputsUsd]);
+  const flatCalc = useMemo(() => computeB2bFlatRate(flatInputsUsd), [flatInputsUsd]);
 
   const money = (usd: number) => formatMoney(convertModelUsdToDisplay(usd, currency), locale, currency);
 
@@ -381,6 +385,128 @@ export function TwinRoiCalculator() {
             </ul>
           </div>
           <p className="mt-5 text-xs leading-relaxed text-[var(--twin-muted)]">{t("calculator.workspaceFoot")}</p>
+        </section>
+
+        <section
+          id="flat-rate"
+          className="twin-card-panel mb-6 rounded-2xl border border-[var(--twin-border)] p-5 sm:p-8"
+        >
+          <h2 className="twin-section-title mb-2 text-lg sm:text-xl">{t("calculator.flatRateTitle")}</h2>
+          <p className="mb-6 max-w-3xl text-sm leading-relaxed text-[var(--twin-muted-strong)]">
+            {t("calculator.flatRateLead")}
+          </p>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <label className="block">
+              <span className="mb-1.5 block text-sm font-medium text-[var(--twin-muted-strong)]">
+                {t("calculator.flatRateHeadcount")}
+              </span>
+              <input
+                type="number"
+                min={0}
+                value={flatInputsUsd.headcount}
+                onChange={(e) =>
+                  setFlatInputsUsd({ ...flatInputsUsd, headcount: Number(e.target.value) || 0 })
+                }
+                className={inputClass}
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1.5 block text-sm font-medium text-[var(--twin-muted-strong)]">
+                {t("calculator.flatRateRotation")}
+              </span>
+              <input
+                type="number"
+                min={0}
+                max={1}
+                step={0.01}
+                value={flatInputsUsd.rotationRate}
+                onChange={(e) =>
+                  setFlatInputsUsd({ ...flatInputsUsd, rotationRate: Number(e.target.value) || 0 })
+                }
+                className={inputClass}
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1.5 block text-sm font-medium text-[var(--twin-muted-strong)]">
+                {t("calculator.flatRateVacancies")}
+              </span>
+              <input
+                type="number"
+                min={0}
+                placeholder="auto"
+                value={flatInputsUsd.vacancies ?? ""}
+                onChange={(e) => {
+                  const raw = e.target.value;
+                  setFlatInputsUsd({
+                    ...flatInputsUsd,
+                    vacancies: raw === "" ? null : Math.max(0, Number(raw) || 0),
+                  });
+                }}
+                className={inputClass}
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1.5 block text-sm font-medium text-[var(--twin-muted-strong)]">
+                {t("calculator.flatRateVacancyCost")}
+              </span>
+              <input
+                type="number"
+                min={0}
+                value={Math.round(convertModelUsdToDisplay(flatInputsUsd.costPerVacancyUsd, currency))}
+                onChange={(e) =>
+                  setFlatInputsUsd({
+                    ...flatInputsUsd,
+                    costPerVacancyUsd: convertDisplayToModelUsd(Number(e.target.value) || 0, currency),
+                  })
+                }
+                className={inputClass}
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1.5 block text-sm font-medium text-[var(--twin-muted-strong)]">
+                {t("calculator.flatRateRatio")}
+              </span>
+              <input
+                type="number"
+                min={0}
+                max={100}
+                value={Math.round(flatInputsUsd.flatRateRatio * 100)}
+                onChange={(e) =>
+                  setFlatInputsUsd({
+                    ...flatInputsUsd,
+                    flatRateRatio: (Number(e.target.value) || 0) / 100,
+                  })
+                }
+                className={inputClass}
+              />
+            </label>
+          </div>
+          <dl className="mt-8 grid gap-4 sm:grid-cols-3">
+            <div className="twin-card-inset rounded-lg p-4">
+              <dt className="text-sm text-[var(--twin-muted)]">{t("calculator.flatRateTraditional")}</dt>
+              <dd className="mt-1 text-2xl font-bold text-red-700">{money(flatCalc.traditionalTotalUsd)}</dd>
+              <dd className="mt-1 text-xs text-[var(--twin-muted)]">
+                {t("calculator.flatRateVacanciesDetail")
+                  .replace("{{count}}", String(flatCalc.vacancies))
+                  .replace(
+                    "{{cost}}",
+                    money(flatInputsUsd.costPerVacancyUsd),
+                  )}
+              </dd>
+            </div>
+            <div className="twin-card-inset rounded-lg p-4">
+              <dt className="text-sm text-[var(--twin-muted)]">{t("calculator.flatRateTwin")}</dt>
+              <dd className="mt-1 text-2xl font-bold text-[var(--twin-link)]">{money(flatCalc.flatRateTotalUsd)}</dd>
+            </div>
+            <div className="twin-card-inset rounded-lg p-4">
+              <dt className="text-sm text-[var(--twin-muted)]">{t("calculator.flatRateSavings")}</dt>
+              <dd className="mt-1 text-2xl font-bold text-[var(--twin-cta)]">{money(flatCalc.savingsUsd)}</dd>
+              {flatCalc.savingsPercent !== null ? (
+                <dd className="mt-1 text-xs text-[var(--twin-muted)]">{flatCalc.savingsPercent.toFixed(0)}%</dd>
+              ) : null}
+            </div>
+          </dl>
+          <p className="mt-5 text-xs leading-relaxed text-[var(--twin-muted)]">{t("calculator.flatRateFoot")}</p>
         </section>
 
         <section className="twin-card-panel rounded-2xl border border-amber-200/80 bg-gradient-to-b from-amber-50/50 to-[var(--twin-card)] p-5 sm:p-8">
