@@ -2321,7 +2321,7 @@ const en = {
     linkB2b: "Open the B2B agency vs TWIN fee comparison →",
     sliderGuideTitle: "How to read the sliders?",
     sliderGuideLead:
-      "Baseline for the Organic quick scenario. Defaults below match INVESTOR_CALCULATOR_DEFAULTS; picking another scenario overrides some sliders.",
+      "Defaults below match the model on load. Sliders let you stress-test MRR, placement economics, and costs — not a forecast.",
     sliderGuideColSlider: "Slider",
     sliderGuideColWhat: "What it means",
     sliderGuideColDefault: "Default",
@@ -4909,11 +4909,7 @@ const pl: MessageTree = {
     linkB2b: "Otwórz porównanie agencja vs model TWIN (B2B ROI) →",
     sliderGuideTitle: "Jak liczyć suwaki?",
     sliderGuideLead:
-<<<<<<< HEAD
-      "Bazowe założenia scenariusza Organiczny. Domyślne wartości = INVESTOR_CALCULATOR_DEFAULTS; inny scenariusz szybki nadpisuje część suwaków.",
-=======
       "Domyślne wartości poniżej odpowiadają modelowi po załadowaniu. Suwaki służą do testów MRR, ekonomii placement i kosztów — to nie prognoza.",
->>>>>>> 8d4421f (feat(i18n): PL/EN keys for investor slider guide and demo offline banner)
     sliderGuideColSlider: "Suwak",
     sliderGuideColWhat: "Co to jest",
     sliderGuideColDefault: "Domyślnie",
