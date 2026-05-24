@@ -1,5 +1,6 @@
 """Nightly auto-apply consent, settings, and manual trigger."""
 
+import json
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -15,6 +16,7 @@ from app.schemas.auto_apply_settings import (
     AutoApplySettingsOut,
     AutoApplySettingsPatch,
     AutoApplyTriggerOut,
+    SweepBoardStatOut,
 )
 from app.services.candidate_readiness import auto_apply_profile_ready
 from app.services.nightly_auto_apply import (
@@ -28,6 +30,43 @@ router = APIRouter()
 
 CONSENT_VERSION = "v1"
 PROFILE_NOT_READY_DETAIL = "Complete your candidate profile and upload a CV first."
+
+
+def _parse_sweep_stats(stats_json: str | None) -> tuple[int, list[SweepBoardStatOut], bool]:
+    """Extract skipped count, per-board breakdown, and demo-seed flag from persisted sweep JSON."""
+    if not stats_json:
+        return 0, [], False
+    try:
+        payload = json.loads(stats_json)
+    except (json.JSONDecodeError, TypeError):
+        return 0, [], False
+    if not isinstance(payload, dict):
+        return 0, [], False
+    skipped = int(payload.get("total_applications_skipped") or 0)
+    is_demo = bool(payload.get("demo"))
+    boards_raw = payload.get("boards")
+    boards: list[SweepBoardStatOut] = []
+    if isinstance(boards_raw, dict):
+        for board, counts in sorted(boards_raw.items()):
+            if not isinstance(counts, dict):
+                continue
+            boards.append(
+                SweepBoardStatOut(
+                    board=str(board),
+                    submitted=int(counts.get("submitted", 0) or 0),
+                    failed=int(counts.get("failed", 0) or 0),
+                    skipped=int(counts.get("skipped", 0) or 0),
+                )
+            )
+    return skipped, boards, is_demo
+
+
+def _sweep_started_at_utc(dt: datetime | None) -> datetime | None:
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
 
 
 def _get_candidate(db: Session, user_id: int) -> Candidate | None:
@@ -95,12 +134,19 @@ def get_last_platform_sweep(
             finished_at=None,
             total_applications_submitted=0,
             total_applications_failed=0,
+            total_applications_skipped=0,
+            boards=[],
+            is_demo_seed=False,
         )
+    skipped, boards, is_demo = _parse_sweep_stats(row.stats_json)
     return AutoApplyLastSweepOut(
-        started_at=row.started_at,
-        finished_at=row.finished_at,
+        started_at=_sweep_started_at_utc(row.started_at),
+        finished_at=_sweep_started_at_utc(row.finished_at),
         total_applications_submitted=int(row.total_applications_submitted or 0),
         total_applications_failed=int(row.total_applications_failed or 0),
+        total_applications_skipped=skipped,
+        boards=boards,
+        is_demo_seed=is_demo,
     )
 
 

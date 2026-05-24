@@ -346,14 +346,41 @@ def upsert_demo_auto_apply(db: Session, candidate: Candidate) -> None:
         if started.tzinfo is None:
             started = started.replace(tzinfo=timezone.utc)
         stale = (now - started).total_seconds() > 86400
-    if recent is None or stale:
+    if recent is not None and int(recent.total_applications_failed or 0) > 0:
+        sweep_started = now - timedelta(hours=8)
+        sweep_finished = now - timedelta(hours=7, minutes=55)
+        demo_stats = {
+            "demo": True,
+            "source": "seed-investor-demo",
+            "total_applications_skipped": 0,
+            "boards": {
+                "pracuj.pl": {"submitted": 2, "failed": 0, "skipped": 0},
+            },
+        }
+        recent.started_at = sweep_started
+        recent.finished_at = sweep_finished
+        recent.total_users_processed = 1
+        recent.total_applications_submitted = max(int(recent.total_applications_submitted or 0), 2)
+        recent.total_applications_failed = 0
+        recent.stats_json = json.dumps(demo_stats)
+    elif recent is None or stale:
+        sweep_started = now - timedelta(hours=8)
+        sweep_finished = now - timedelta(hours=7, minutes=55)
+        demo_stats = {
+            "demo": True,
+            "source": "seed-investor-demo",
+            "total_applications_skipped": 0,
+            "boards": {
+                "pracuj.pl": {"submitted": 2, "failed": 0, "skipped": 0},
+            },
+        }
         run = AutoApplyRun(
-            started_at=now - timedelta(hours=8),
-            finished_at=now - timedelta(hours=7, minutes=55),
+            started_at=sweep_started,
+            finished_at=sweep_finished,
             total_users_processed=1,
             total_applications_submitted=2,
             total_applications_failed=0,
-            stats_json=json.dumps({"demo": True, "source": "seed-investor-demo"}),
+            stats_json=json.dumps(demo_stats),
         )
         db.add(run)
 
