@@ -17,7 +17,7 @@ This document tracks implementation of the GlobJob/Glimmer → TWIN strategic vi
 **Notes:**
 - LinkedIn OAuth uses OpenID scopes only (`openid profile email`) — no positions/skills API. Import falls back to stored candidate + CV text; optional short-lived token accepted in body.
 - Claude synthesis runs when `ANTHROPIC_API_KEY` is set; otherwise deterministic enrichment via `cv_enrichment`.
-- Learning paths are deterministic MVP; Claude-enhanced paths gated as Premium (`learning_path_ai`).
+- Learning paths: deterministic for all tiers; Claude-enhanced for Premium when `ANTHROPIC_API_KEY` is set (`learning_path_ai` gate)
 
 ## Phase 2: Subscription tiers & paywall
 
@@ -66,7 +66,7 @@ Default `opportunity_type` = `full_time` for existing rows.
 | InterviewCoachPanel | **Shipped** | Job employer modal on dashboard |
 
 **Stubbed / coming soon:**
-- Claude-heavy learning path generation on forecast (without API key: deterministic only)
+- ~~Claude-heavy learning path generation on forecast~~ — **Shipped (Premium + ANTHROPIC_API_KEY)**; deterministic fallback for Free or when key unset
 - LinkedIn full profile scrape (requires partner API scopes)
 - Standby / $1.99 micro-tier Stripe price IDs
 

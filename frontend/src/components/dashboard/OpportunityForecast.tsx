@@ -14,6 +14,8 @@ type ForecastJob = {
   score: number;
   band: string;
   skill_match_percent: number;
+  learning_path?: Array<{ area: string; suggestion: string; impact: string }>;
+  learning_path_source?: string;
 };
 
 type ForecastData = {
@@ -22,6 +24,7 @@ type ForecastData = {
   stretch: ForecastJob[];
   summary: { perfect_count: number; near_miss_count: number; stretch_count: number };
   paywall?: { feature: string; required_tier: string; upgrade_path: string } | null;
+  learning_path_paywall?: { feature: string; required_tier: string; upgrade_path: string } | null;
 };
 
 const BAND_KEYS = {
@@ -63,6 +66,7 @@ export function OpportunityForecast() {
       <h2 className="text-lg font-semibold">{t("strategic.forecastTitle")}</h2>
       <p className="twin-muted text-sm">{t("strategic.forecastBody")}</p>
       <FeaturePaywall paywall={data.paywall} />
+      <FeaturePaywall paywall={data.learning_path_paywall} titleKey="strategic.learningPathPaywallTitle" />
       <div className="grid gap-4 md:grid-cols-3">
         {bands.map((band) => (
           <div key={band} className="rounded-lg border border-[var(--twin-border)] p-3">
@@ -76,6 +80,16 @@ export function OpportunityForecast() {
                   <span className="font-medium">{job.title}</span>
                   <span className="twin-muted"> · {job.company}</span>
                   <span className="ml-1 text-xs text-[var(--twin-accent)]">{Math.round(job.score)}%</span>
+                  {job.learning_path && job.learning_path.length > 0 && band !== "perfect" ? (
+                    <ul className="twin-muted mt-1 space-y-0.5 text-xs">
+                      {job.learning_path.slice(0, 2).map((step, idx) => (
+                        <li key={`${job.job_id}-lp-${idx}`}>
+                          {job.learning_path_source === "claude" ? "✦ " : "• "}
+                          {step.suggestion}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
                 </li>
               ))}
             </ul>
