@@ -7,6 +7,7 @@ import re
 from datetime import datetime, timezone
 from typing import Any
 
+from app.config import get_settings
 from app.services.anthropic_client import get_anthropic_client, is_anthropic_configured
 
 _FEEDBACK_PROMPT = """You help a job candidate preserve and structure feedback from hiring processes (email, call notes, rejection reasons).
@@ -66,7 +67,7 @@ def _parse_with_claude(raw: str) -> dict[str, Any] | None:
     prompt = _FEEDBACK_PROMPT.format(notes=notes)
     try:
         msg = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model=get_settings().anthropic_model,
             max_tokens=2500,
             messages=[{"role": "user", "content": prompt}],
         )

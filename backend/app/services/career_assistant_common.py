@@ -9,6 +9,7 @@ from typing import Any
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.database.models import Application, Candidate, Job, ScheduledInterview
 from app.services.anthropic_client import get_anthropic_client, is_anthropic_configured
 
@@ -94,7 +95,7 @@ def call_claude_json(prompt: str, *, max_tokens: int = 2500) -> dict[str, Any] |
         return None
     try:
         msg = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model=get_settings().anthropic_model,
             max_tokens=max_tokens,
             messages=[{"role": "user", "content": prompt}],
         )

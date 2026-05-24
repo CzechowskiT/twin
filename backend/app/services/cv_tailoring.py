@@ -7,6 +7,7 @@ import re
 from datetime import datetime, timezone
 from typing import Any
 
+from app.config import get_settings
 from app.services.anthropic_client import get_anthropic_client, is_anthropic_configured
 from app.services.request_locale import is_polish_locale, normalize_locale
 
@@ -126,7 +127,7 @@ def _tailor_with_claude(
     )
     try:
         msg = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model=get_settings().anthropic_model,
             max_tokens=2200,
             messages=[{"role": "user", "content": prompt}],
         )
