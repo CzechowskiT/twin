@@ -20,7 +20,7 @@ Pobierz świeże agregaty przed aktualizacją tabeli:
 curl -sS "https://twin-production-bcd9.up.railway.app/api/v1/public/mvp-stats" | jq .
 ```
 
-| Okres | Kandydaci w pilocie | Profile uzupełnione | CV przeanalizowane | Wygenerowane matche | Zaakceptowane aplikacje | Wysłane aplikacje | Zaproszenia na rozmowę | Aktywni po 7 dniach | Płatni użytkownicy | Przychód pilota (PLN / USD) | Verified placements | North star |
+| Okres | Kandydaci founding / pilocie | Profile uzupełnione | CV przeanalizowane | Wygenerowane matche | Zaakceptowane aplikacje | Wysłane aplikacje | Zaproszenia na rozmowę | Aktywni po 7 dniach | Płatni subskrybenci (opcj.) | Przychód subskrypcji (USD) | Verified placements | North star |
 |-------|--------------------:|--------------------:|-------------------:|--------------------:|------------------------:|------------------:|-----------------------:|--------------------:|-------------------:|----------------------------:|--------------------:|-----------:|
 | **Baseline** (2026-05-24, prod) | 3 | — | 2 | — | — | 16 | 3 | — | 0 | 0 | 0 | — |
 | Tydzień 1 | | | | | | | | | | | | |
@@ -32,12 +32,12 @@ curl -sS "https://twin-production-bcd9.up.railway.app/api/v1/public/mvp-stats" |
 
 | Kolumna | Źródło |
 |---------|--------|
-| Kandydaci w pilocie | `registered_users` (3) — jawny pilot, nie MAU |
+| Kandydaci founding / pilocie | `registered_users` (3) — founding free (limit 1000), nie MAU |
 | CV przeanalizowane | `profiles_with_cv` (2) |
 | Wysłane aplikacje | `total_applications` (16) |
 | Zaproszenia na rozmowę | `interviews_scheduled` (3) |
-| Płatni użytkownicy | `paid_subscribers` (0) |
-| Przychód pilota | `subscription_mrr_usd` (0) — placement revenue osobno, gdy będzie |
+| Płatni subskrybenci (opcj.) | `paid_subscribers` (0) — founding wchodzi **za darmo**; subskrypcja opcjonalna później |
+| Przychód subskrypcji (USD) | `subscription_mrr_usd` (0) — **nie** licz przychodu z opłaty founding (brak); placement revenue osobno, gdy będzie |
 | Verified placements | `verified_placements` (0) |
 
 **Do uzupełnienia ręcznie (brak w public JSON):** Profile uzupełnione (np. % pól profilu / gotowość do matchowania), wygenerowane matche, zaakceptowane aplikacje (batch accept), aktywni po 7 dniach. Eksport z workspace / SQL / admin — nie zgaduj.
@@ -112,6 +112,6 @@ curl -sS "https://twin-production-bcd9.up.railway.app/api/v1/public/mvp-stats" |
 ## Powiązane
 
 - [INVESTOR_DEMO_TALKING_POINTS.md](./INVESTOR_DEMO_TALKING_POINTS.md) — odpowiedzi na „3 userów”, „$0 MRR”, „0 placementów”
-- [PILOT_OFFER_COPY_PL.md](./PILOT_OFFER_COPY_PL.md) — copy oferty 7-dniowej (PL/EN), CTA, billing
+- [PILOT_OFFER_COPY_PL.md](./PILOT_OFFER_COPY_PL.md) — copy founding member (PL/EN), CTA, billing opcjonalny później
 - [INVESTOR_FUNDRAISING_PAGE_AUDIT.md](./INVESTOR_FUNDRAISING_PAGE_AUDIT.md) — co jest live na `/for-investors`
 - Public metrics UI: `/investor/metrics` → `GET /api/v1/public/mvp-stats`

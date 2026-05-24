@@ -1,4 +1,4 @@
-# TWIN — Pilot intake (founder copy-paste)
+# TWIN — Founding member intake (founder copy-paste)
 
 Wyślij po rejestracji, jeśli brakuje pól w produkcie. Link do uzupełnienia profilu: **https://twin-sooty.vercel.app/profile**
 
@@ -31,13 +31,16 @@ Wyślij po rejestracji, jeśli brakuje pól w produkcie. Link do uzupełnienia p
 3. **Raportowanie odpowiedzi i rozmów** — founder/support może aktualizować pipeline
 4. **Anonimowy case study** po pilocie (bez imienia firmy bez zgody)
 
-## D. Płatność (founder only)
+## D. Founding slot (founder only)
 
-- **Kwota:** ☐ 49 PLN founding ☐ 99 PLN standard
-- **Data płatności:**
-- **Metoda:** ☐ Stripe ☐ przelew ☐ inne
-- **Koniec pilota (D+7):**
+- **Program:** ☐ founding member (pierwsze 1000, **darmowy dostęp**)
+- **Numer slotu:** ___ / 1000
+- **Data rejestracji / startu (D0):**
+- **Koniec okna pilota (D+7):**
+- **Opcjonalna subskrypcja później:** ☐ zainteresowany ☐ nie teraz ☐ N/A
+
+*Founding members nie płacą przy wejściu — `Payment amount = 0` w trackerze.*
 
 ---
 
-*Po otrzymaniu: wpisz brakujące pola do Notion + opcjonalnie `signup_referred_by_note` w DB.*
+*Po otrzymaniu: wpisz brakujące pola do Notion + opcjonalnie `signup_referred_by_note` = `founding-member:slot:N/1000:YYYY-MM-DD` w DB.*

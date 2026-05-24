@@ -1,7 +1,7 @@
-# Candidate Pilot Intake — 7-day paid TWIN pilot
+# Candidate Founding Member Intake — TWIN Career Agent Pilot
 
-**Cel:** Minimalny intake na start pilota w 24h — bez nowych feature'ów w produkcie.  
-**Beachhead:** mid/senior tech, EU remote — patrz [PILOT_OFFER_COPY_PL.md](./PILOT_OFFER_COPY_PL.md).  
+**Cel:** Minimalny intake na start programu founding w 24h — bez nowych feature'ów w produkcie.  
+**Beachhead:** mid/senior tech, product, data/AI, tech sales — EU remote — patrz [PILOT_OFFER_COPY_PL.md](./PILOT_OFFER_COPY_PL.md).  
 **Metryki tygodniowe:** [PILOT_TRACTION_DASHBOARD.md](./PILOT_TRACTION_DASHBOARD.md).
 
 ---
@@ -29,7 +29,7 @@
 | 17 | Zgoda: apply dopiero po akceptacji | ⚠️ | `/dashboard/settings/auto-apply` → `auto_apply_consents` (`consent_given_at`, `min_score_threshold`, `daily_limit`) | Pilot: **wyłącz auto-apply** do momentu akceptacji matchy w `/dashboard/acceptance`; consent = nightly apply, nie per-oferta |
 | 18 | Zgoda: raportowanie odpowiedzi/rozmów | ⚠️ | `users.email_interview_reminders`; statusy aplikacji + `scheduled_interviews` | **Gap:** brak osobnej zgody „raportuj odpowiedzi”; szablon founder + founder aktualizuje statusy ręcznie/support |
 | 19 | Zgoda: anonimowy case study | ⚠️ | `/profile` → `talent_pool_opt_in` + `talent_pool_opt_in_at` (B2B pool, nie case study) | **Gap:** osobna zgoda w szablonie founder; nie mylić z talent pool |
-| 20 | Status płatności pilota | ⚠️ | `/dashboard/billing` → `users.plan_tier`, `subscription_status`, `subscription_current_period_end`, `subscription_invoice_payment_count` | **Gap:** brak SKU „7 dni / 49 PLN” — Stripe = subskrypcje miesięczne; founder: ręczny tracking + `utm_campaign=pilot7` / notatka `pilot-paid:49PLN:2026-05-24` |
+| 20 | Status founding / dostępu | ⚠️ | Rejestracja + tracker founder; opcjonalnie `/dashboard/billing` → `users.plan_tier`, `subscription_status` (tylko gdy ktoś **później** wykupi subskrypcję) | **Founding = free:** brak opłaty przy wejściu. Founder: `utm_campaign=founding1000` / `founding_member` + notatka `founding-member:slot:N/1000:YYYY-MM-DD` w `signup_referred_by_note`; tracker: `Payment amount = 0` |
 
 **Legenda:** ✅ w produkcie · ⚠️ częściowo / inferowane · ❌ brak
 
@@ -49,12 +49,12 @@
 
 ---
 
-## 2. Checklist founder — nowy kandydat pilota
+## 2. Checklist founder — nowy founding member
 
 ### Przed wysłaniem linku
 
-- [ ] Potwierdź miejsce founding (49 PLN) vs standard (99 PLN) — [PILOT_OFFER_COPY_PL.md](./PILOT_OFFER_COPY_PL.md)
-- [ ] Przygotuj link: `/register/candidate?utm_campaign=pilot7&utm_content=founding49&ref=FOUNDER`
+- [ ] Potwierdź wolny slot founding (≤ 1000) — [PILOT_OFFER_FINAL.md](./PILOT_OFFER_FINAL.md)
+- [ ] Przygotuj link: `/register/candidate?utm_campaign=founding1000&utm_content=founding_member&ref=FOUNDER`
 - [ ] Dołącz [PILOT_INTAKE_FORM_TEMPLATE.md](./PILOT_INTAKE_FORM_TEMPLATE.md) (Notion/email) na pola ❌/⚠️
 
 ### D0 — rejestracja (kandydat, ~15 min)
@@ -69,9 +69,9 @@
 ### D0 — founder (~10 min)
 
 1. Zweryfikuj w DB/admin: `users.email`, `candidates.has_cv`, `onboarding_completed_at`
-2. Zapisz płatność: notatka `users.signup_referred_by_note` = `pilot-paid:49PLN:YYYY-MM-DD` **lub** potwierdzenie Stripe (`plan_tier` + `subscription_status=active`)
+2. Zapisz founding slot: notatka `users.signup_referred_by_note` = `founding-member:slot:N/1000:YYYY-MM-DD` + wiersz w [PILOT_TRACKER.csv](./PILOT_TRACKER.csv) (`Payment amount = 0`, `Payment status = registered` lub `onboarded`)
 3. Wyślij szablon intake na brakujące pola (§1 tabela ❌)
-4. Ustaw datę końca pilota (D+7) w Notion
+4. Ustaw datę końca okna pilota (D+7) w Notion / trackerze
 
 ### D1–D7 — operacje
 
@@ -85,7 +85,7 @@
 
 - [ ] Retrospekcja: north star, cytat (za zgodą) → dashboard cytatów
 - [ ] Case study consent z szablonu — osobno od `talent_pool_opt_in`
-- [ ] Decyzja: subskrypcja `/dashboard/billing` vs koniec
+- [ ] Decyzja: opcjonalna subskrypcja `/dashboard/billing` vs koniec / waitlist na upgrade
 
 ---
 
@@ -107,7 +107,7 @@
 ## 4. Powiązane dokumenty
 
 - [PILOT_TRACTION_DASHBOARD.md](./PILOT_TRACTION_DASHBOARD.md) — tygodniowa tabela + north star
-- [PILOT_OFFER_COPY_PL.md](./PILOT_OFFER_COPY_PL.md) — copy PL/EN, CTA, ceny 49/99 PLN
+- [PILOT_OFFER_COPY_PL.md](./PILOT_OFFER_COPY_PL.md) — copy PL/EN, CTA, founding free (1000)
 - [PILOT_INTAKE_FORM_TEMPLATE.md](./PILOT_INTAKE_FORM_TEMPLATE.md) — formularz founder na luki
 
 ---
@@ -116,6 +116,6 @@
 
 | Priorytet | Zmiana | Effort |
 |-----------|--------|--------|
-| P1 | Stripe Price: one-time 7d pilot 49 PLN → metadata `pilot_expires_at` | 1–2h config |
-| P2 | Pola profilu: `linkedin_url`, `availability_date`, `contract_types[]`, `excluded_industries[]` | mała migracja |
-| P3 | Checkboxy zgód pilota (case study, report responses) — osobne od talent pool | schema + UI |
+| P1 | Pola profilu: `linkedin_url`, `availability_date`, `contract_types[]`, `excluded_industries[]` | mała migracja |
+| P2 | Checkboxy zgód pilota (case study, report responses) — osobne od talent pool | schema + UI |
+| P3 | Opcjonalna subskrypcja post-founding — istniejący Stripe; **bez** one-time pilot SKU | config tylko gdy PMF |

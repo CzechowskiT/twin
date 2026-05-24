@@ -1,10 +1,10 @@
-# Pilot offer copy (PL + EN) — founder / landing / waitlist
+# Founding Member offer copy (PL + EN) — founder / landing / waitlist
 
 **Oferta kanoniczna (krótka, PL):** [PILOT_OFFER_FINAL.md](./PILOT_OFFER_FINAL.md)
 
-**Beachhead:** mid / senior tech, EU (remote-friendly), zmęczeni masowym aplikowaniem — chcą **krótkiego kalendarza rozmów**, nie inboxa ofert.
+**Beachhead:** mid / senior tech, product, data/AI, tech sales — EU (remote-friendly), zmęczeni masowym aplikowaniem — chcą **krótkiego kalendarza rozmów**, nie inboxa ofert.
 
-**Pricing (pilot):** 7 dni · **49 PLN** (early) / **99 PLN** (standard) — jednorazowo lub jako trial przed subskrypcją; doprecyzuj w Stripe przed publikacją.
+**Pricing (founding):** **Darmowy dostęp** dla **pierwszych 1000 founding members** — bez opłaty przy wejściu. Opcjonalna subskrypcja później (Stripe), gdy PMF i checkout live; **nie zmieniaj** logiki billing w kodzie na potrzeby founding.
 
 **No fake testimonials** — sekcja social proof tylko z prawdziwych cytatów z [PILOT_TRACTION_DASHBOARD.md](./PILOT_TRACTION_DASHBOARD.md).
 
@@ -14,21 +14,22 @@
 
 ### Nagłówek
 
-**7 dni pilota: od CV do rozmów na kalendarzu — bez spamu aplikacji.**
+**Founding member: od CV do rozmów na kalendarzu — bez spamu aplikacji.**
 
 ### Podnagłówek
 
-TWIN analizuje Twoje CV, buduje krótką listę dopasowanych ról i prowadzi aplikacje oraz zaproszenia w jednym miejscu. Pilot dla **mid/senior tech w EU** — ograniczona liczba miejsc.
+TWIN analizuje Twoje CV, buduje krótką listę dopasowanych ról i prowadzi aplikacje oraz zaproszenia w jednym miejscu. Program dla **mid/senior tech, product, data/AI i tech sales w EU** — **pierwsze 1000 miejsc founding, darmowo**.
 
-### Oferta (7 dni)
+### Oferta (founding)
 
 | Element | Opis |
 |---------|------|
-| Cena | **49 PLN** (founding pilot) · **99 PLN** (po wyczerpaniu miejsc founding) |
-| Czas | 7 dni pełnego dostępu do ścieżki pilota |
-| Dla kogo | Mid / senior developer, product, data — remote EU |
+| Cena | **0 PLN** (founding member, pierwsze 1000) |
+| Limit | **1000** founding members — potem waitlist / standard |
+| Dla kogo | Mid / senior developer, product, data/AI, tech sales — remote EU |
+| Czas | Early access / ścieżka pilota — ustal z founderem okno D0–D+7 |
 
-### Co jest w pilocie
+### Co jest w programie
 
 - **Analiza CV** — profil pod matching (nie tylko upload pliku).
 - **Shortlist** — wybrane dopasowania zamiast setek losowych ofert.
@@ -39,20 +40,22 @@ TWIN analizuje Twoje CV, buduje krótką listę dopasowanych ról i prowadzi apl
 
 | Kontekst | Tekst CTA | Docelowy URL |
 |----------|-----------|--------------|
-| Główny | **Zacznij 7-dniowy pilot** | `/register/candidate` lub `/waitlist` (jeśli brak miejsc) |
-| Po zalogowaniu | **Opłać pilot w ustawieniach** | `/dashboard/billing` |
-| Brak checkout na env | **Dołącz do listy founding** | `/waitlist` |
+| Główny | **Dołącz jako founding member** | `/register/candidate?utm_campaign=founding1000` |
+| Waitlist | **Dołącz do listy founding** | `/waitlist` |
+| Po wyczerpaniu 1000 | **Dołącz do waitlisty** | `/waitlist` |
+| Po zalogowaniu (opcjonalnie później) | **Upgrade w ustawieniach** | `/dashboard/billing` |
 
-### Stripe / billing (technicznie)
+### Billing (technicznie — bez opłaty founding)
 
-- Checkout: `/dashboard/billing` (gdy `stripe_checkout_ready: true` na prod — sprawdź `mvp-stats`).
+- Founding: **brak płatności przy wejściu** — tracker founder: `Payment amount = 0`, `founding slot N/1000`.
+- Subskrypcja (później): `/dashboard/billing` gdy `stripe_checkout_ready: true` na prod — sprawdź `mvp-stats`.
 - Waitlist / founding bez karty: `/waitlist` — ten sam North Star, inna ścieżka wejścia.
 - Env: `STRIPE_SECRET_KEY` + ceny (`STRIPE_PRICE_*`) — patrz `docs/STRIPE.md`, `docs/STRIPE_RAILWAY_SETUP.md`.
 - **Nie obiecuj** płatności na środowisku, gdzie `stripe_checkout_ready` jest `false`.
 
 ### Mikrocopy (FAQ jedna linia)
 
-„Pilot to nie masowe auto-apply — budujemy **kalendarz rozmów wartych przyjścia**, nie tysiące wysłanych CV.”
+„Founding to nie masowe auto-apply — budujemy **kalendarz rozmów wartych przyjścia**, nie tysiące wysłanych CV. Pierwsza tysiączka wchodzi **za darmo**.”
 
 ---
 
@@ -60,19 +63,20 @@ TWIN analizuje Twoje CV, buduje krótką listę dopasowanych ról i prowadzi apl
 
 ### Headline
 
-**7-day pilot: from CV to interviews on your calendar — without application spam.**
+**Founding member: from CV to interviews on your calendar — without application spam.**
 
 ### Subhead
 
-TWIN analyzes your CV, builds a short list of matched roles, and keeps applications and invites in one workspace. Pilot for **mid/senior tech in the EU** — limited seats.
+TWIN analyzes your CV, builds a short list of matched roles, and keeps applications and invites in one workspace. For **mid/senior tech, product, data/AI, and tech sales in the EU** — **first 1,000 founding members, free**.
 
-### Offer (7 days)
+### Offer (founding)
 
 | Item | Copy |
 |------|------|
-| Price | **49 PLN** (founding pilot) · **99 PLN** (after founding seats) |
-| Duration | 7 days full access to the pilot path |
-| Who | Mid / senior engineers, product, data — remote-friendly EU |
+| Price | **$0 / 0 PLN** (founding member, first 1,000) |
+| Cap | **1,000** founding members — then waitlist / standard |
+| Who | Mid / senior engineers, product, data/AI, tech sales — remote-friendly EU |
+| Duration | Early-access / pilot path — founder sets D0–D+7 window |
 
 ### What's included
 
@@ -85,17 +89,18 @@ TWIN analyzes your CV, builds a short list of matched roles, and keeps applicati
 
 | Context | CTA text | Target |
 |---------|----------|--------|
-| Primary | **Start 7-day pilot** | `/register/candidate` or `/waitlist` |
-| Signed in | **Pay for pilot in billing** | `/dashboard/billing` |
-| Checkout not live | **Join founding waitlist** | `/waitlist` |
+| Primary | **Join as founding member** | `/register/candidate?utm_campaign=founding1000` |
+| Waitlist | **Join founding waitlist** | `/waitlist` |
+| After 1,000 cap | **Join waitlist** | `/waitlist` |
+| Signed in (optional later) | **Upgrade in billing** | `/dashboard/billing` |
 
-### Stripe / billing
+### Billing
 
-Same as PL: `/dashboard/billing` when checkout is live; `/waitlist` otherwise. Verify `GET /api/v1/public/mvp-stats` → `stripe_checkout_ready`.
+Founding = no payment on entry; optional subscription later via `/dashboard/billing` when checkout is live. Verify `GET /api/v1/public/mvp-stats` → `stripe_checkout_ready`.
 
 ### One-line FAQ
 
-“The pilot isn’t spray-and-pray auto-apply — we’re building a **short calendar of interviews worth showing up for**, not thousands of sent résumés.”
+“Founding isn’t spray-and-pray auto-apply — we’re building a **short calendar of interviews worth showing up for**. The first 1,000 members get in **free**.”
 
 ---
 
@@ -103,7 +108,7 @@ Same as PL: `/dashboard/billing` when checkout is live; `/waitlist` otherwise. V
 
 | Powierzchnia | Akcja |
 |--------------|--------|
-| `/waitlist` | Już ma founding offer — dopasuj badge do 49/99 PLN ręcznie w copy waitlist, jeśli chcesz spójność |
+| `/waitlist` | Już ma founding offer (1000, free) — utrzymaj spójność z tym docsem |
 | `/for-candidates` | Opcjonalnie: jeden akapit + link do rejestracji (wymaga i18n) |
 | Deck / Notion | Kopiuj sekcje PL lub EN z tego pliku |
 | Investor | Traction: [PILOT_TRACTION_DASHBOARD.md](./PILOT_TRACTION_DASHBOARD.md) + [INVESTOR_DEMO_TALKING_POINTS.md](./INVESTOR_DEMO_TALKING_POINTS.md) |

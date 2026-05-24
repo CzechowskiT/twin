@@ -1,6 +1,6 @@
-# TWIN Career Agent Pilot
+# TWIN Career Agent — Founding Member Program
 
-**7 dni · 49 PLN · limit: pierwsze 20 osób**
+**Darmowy dostęp · limit: pierwsze 1000 founding members**
 
 **Dla:** mid/senior tech, product, data/AI, tech sales (EU, remote-friendly).
 
@@ -8,7 +8,7 @@
 
 ---
 
-## Co wchodzi w pilot
+## Co wchodzi w program founding
 
 - **CV** — analiza profilu pod matching (upload + profil w TWIN).
 - **Shortlist** — krótka lista dopasowanych ról zamiast setek losowych ofert.
@@ -19,18 +19,21 @@
 
 ## Jak dołączyć
 
-**[Zacznij pilot →](https://twin-sooty.vercel.app/register/candidate?utm_campaign=pilot7)**
+**[Dołącz jako founding member →](https://twin-sooty.vercel.app/register/candidate?utm_campaign=founding1000)**
+
+Alternatywnie: `/waitlist` — ta sama obietnica North Star, bez karty dziś.
 
 Po rejestracji uzupełnij profil i CV; szczegóły intake: [PILOT_CANDIDATE_INTAKE.md](./PILOT_CANDIDATE_INTAKE.md).
 
 ---
 
-## Płatność (49 PLN)
+## Dostęp i płatność
 
-- **Stripe** — gdy checkout jest aktywny: `/dashboard/billing` (sprawdź `stripe_checkout_ready` na prod).
-- **Ręcznie** — przelew lub inna metoda: **49 PLN** jednorazowo; founder zapisuje w trackerze i w notatce konta (`pilot-paid:49PLN:DATA`) — patrz [PILOT_CANDIDATE_INTAKE.md](./PILOT_CANDIDATE_INTAKE.md) § checklist D0.
+- **Founding members (pierwsze 1000)** — **darmowy dostęp** do ścieżki pilota / early access; bez opłaty przy wejściu.
+- **Po wyczerpaniu miejsc founding** — waitlist lub rejestracja standardowa; szczegóły w [PILOT_OFFER_COPY_PL.md](./PILOT_OFFER_COPY_PL.md).
+- **Subskrypcja (opcjonalnie, później)** — po pilocie możliwy plan płatny w `/dashboard/billing`, gdy checkout jest aktywny na prod (`stripe_checkout_ready`). **Nie wymagamy płatności na start founding.**
 
-Pilot nie obejmuje subskrypcji miesięcznej — to 7 dni dostępu do ścieżki pilota przy opłacie founding.
+Founder śledzi slot founding w trackerze (`founding slot N/1000`) — patrz [PILOT_TRACKER_GUIDE.md](./PILOT_TRACKER_GUIDE.md).
 
 ---
 

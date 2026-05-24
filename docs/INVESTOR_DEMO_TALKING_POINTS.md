@@ -13,7 +13,7 @@
 
 ## „$0 MRR?”
 
-„Przychód z placementów = **retention-based** (6–12 miesięcy zatrudnienia). Stripe checkout **działa na prod** — czekamy na PMF przed agresywną monetyzacją subskrypcji. Subskrypcja to akcelerator; placement to główny model unit economics.”
+„**Founding program: pierwsze 1000 członków — darmowy dostęp** — budujemy jakość lejka (rozmowy na kalendarzu), nie przychód z wejścia. Przychód z placementów = **retention-based** (6–12 miesięcy zatrudnienia). Stripe checkout **działa na prod** — subskrypcja opcjonalna **po** PMF; placement to główny model unit economics.”
 
 ---
 
@@ -38,7 +38,7 @@ Gdy `verified_placements === 0`, `/investor/metrics` pokazuje **Pipeline rekruta
 ## Powiązane
 
 - [PILOT_TRACTION_DASHBOARD.md](./PILOT_TRACTION_DASHBOARD.md) — tygodniowa tabela pilota + north star
-- [PILOT_OFFER_COPY_PL.md](./PILOT_OFFER_COPY_PL.md) — copy oferty 7-dniowej (PL/EN)
+- [PILOT_OFFER_COPY_PL.md](./PILOT_OFFER_COPY_PL.md) — copy founding member (PL/EN), pierwsze 1000 za darmo
 - [INVESTOR_DEMO_SCRIPT.md](./INVESTOR_DEMO_SCRIPT.md)
 - [INVESTOR_DEMO_RUNBOOK.md](./INVESTOR_DEMO_RUNBOOK.md)
 - [FOUNDER_STATUS_LIVE.md](./FOUNDER_STATUS_LIVE.md)
