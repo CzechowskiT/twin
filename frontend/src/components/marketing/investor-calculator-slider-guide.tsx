@@ -30,6 +30,7 @@ type SliderRefRow = {
 };
 
 const SLIDER_REF_ROWS: SliderRefRow[] = [
+  { id: "linkedIn", labelKey: "investorCalc.sliderRef_linkedIn", descKey: "investorCalc.sliderDesc_linkedIn" },
   { id: "totalUsers", labelKey: "investorCalc.totalUsers", descKey: "investorCalc.sliderDesc_totalUsers" },
   { id: "percentPaying", labelKey: "investorCalc.percentPaying", descKey: "investorCalc.sliderDesc_percentPaying" },
   { id: "subPrice", labelKey: "investorCalc.subPrice", descKey: "investorCalc.sliderDesc_subPrice" },
@@ -57,7 +58,6 @@ const SLIDER_REF_ROWS: SliderRefRow[] = [
     labelKey: "investorCalc.foundingFreeMonths",
     descKey: "investorCalc.sliderDesc_foundingFreeMonths",
   },
-  { id: "linkedIn", labelKey: "investorCalc.sliderRef_linkedIn", descKey: "investorCalc.sliderDesc_linkedIn" },
   { id: "team", labelKey: "investorCalc.sliderRef_team", descKey: "investorCalc.sliderDesc_team" },
   {
     id: "infraPerUser",
@@ -92,7 +92,20 @@ function infraPerUserUsd() {
   return d.hostingCostPerUser + d.apiCostPerUser + d.servicesCostPerUser;
 }
 
-function formatSliderDefaults(locale: string, perYearSuffix: string): Record<SliderRefRowKey, string> {
+function compactMoney(locale: string, usd: number) {
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "USD",
+    notation: "compact",
+    maximumFractionDigits: 0,
+  }).format(usd);
+}
+
+function formatSliderDefaults(
+  locale: string,
+  perYearSuffix: string,
+  teamPeopleLabel: string,
+): Record<SliderRefRowKey, string> {
   const d = INVESTOR_CALCULATOR_DEFAULTS;
   const n = (v: number) => v.toLocaleString(locale);
   const money = (v: number) =>
@@ -114,10 +127,10 @@ function formatSliderDefaults(locale: string, perYearSuffix: string): Record<Sli
     viralGrowth: `${d.viralGrowthRate}%`,
     foundingCohort: n(d.foundingCohortSize),
     foundingFreeMonths: String(d.foundingFreePremiumMonths),
-    linkedIn: `${d.linkedInAdoptionRate}% · ${d.linkedInIncentivePercent}%`,
-    team: `${teamHeadcount()} · ${money(teamAnnualUsd())}${perYearSuffix}`,
+    linkedIn: `${d.linkedInAdoptionRate}% / ${d.linkedInIncentivePercent}%`,
+    team: `${teamHeadcount()} ${teamPeopleLabel}, ~${compactMoney(locale, teamAnnualUsd())}${perYearSuffix}`,
     infraPerUser: money(infraPerUserUsd()),
-    legalOffice: `${money(d.legalAccounting)} + ${money(d.officeMisc)}`,
+    legalOffice: `${compactMoney(locale, d.legalAccounting)} + ${compactMoney(locale, d.officeMisc)}`,
   };
 }
 
@@ -125,12 +138,12 @@ function formatSliderDefaults(locale: string, perYearSuffix: string): Record<Sli
 export function InvestorCalculatorSliderGuide() {
   const { t, locale } = useTranslation();
   const defaults = useMemo(
-    () => formatSliderDefaults(locale, t("investorCalc.perYear")),
+    () => formatSliderDefaults(locale, t("investorCalc.perYear"), t("investorCalc.sliderDefaultTeamPeople")),
     [locale, t],
   );
 
   return (
-    <details className="twin-card-panel mb-6 group open:shadow-sm">
+    <details open className="twin-card-panel mb-6 group open:shadow-sm">
       <summary className="cursor-pointer list-none px-5 py-4 sm:px-6 [&::-webkit-details-marker]:hidden">
         <span className="flex min-w-0 items-start justify-between gap-3">
           <span>

@@ -2338,8 +2338,9 @@ const en = {
     sliderGuideColSlider: "Slider",
     sliderGuideColWhat: "What it means",
     sliderGuideColDefault: "Default",
-    sliderRef_linkedIn: "LinkedIn viral program",
-    sliderRef_team: "Team (headcount)",
+    sliderRef_linkedIn: "LinkedIn adoption / incentive",
+    sliderDefaultTeamPeople: "people",
+    sliderRef_team: "Team",
     sliderRef_infraPerUser: "Infrastructure per user / year",
     sliderRef_legalOffice: "Legal & office (fixed annual)",
     sliderDesc_totalUsers:
@@ -4939,8 +4940,9 @@ const pl: MessageTree = {
     sliderGuideColSlider: "Suwak",
     sliderGuideColWhat: "Co to jest",
     sliderGuideColDefault: "Domyślnie",
-    sliderRef_linkedIn: "Program viral LinkedIn",
-    sliderRef_team: "Zespół (liczebność)",
+    sliderRef_linkedIn: "LinkedIn — adopcja / incentive",
+    sliderDefaultTeamPeople: "osób",
+    sliderRef_team: "Zespół",
     sliderRef_infraPerUser: "Infrastruktura na użytk. / rok",
     sliderRef_legalOffice: "Księgowość i biuro (rocznie, stałe)",
     sliderDesc_totalUsers:
