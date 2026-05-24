@@ -121,7 +121,7 @@ function formatSliderDefaults(locale: string, perYearSuffix: string): Record<Sli
   };
 }
 
-/** Collapsible slider glossary — defaults always read from INVESTOR_CALCULATOR_DEFAULTS. */
+/** Collapsible slider glossary — defaults always read from INVESTOR_CALCULATOR_DEFAULTS (Organic scenario). */
 export function InvestorCalculatorSliderGuide() {
   const { t, locale } = useTranslation();
   const defaults = useMemo(
