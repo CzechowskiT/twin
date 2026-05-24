@@ -21,10 +21,6 @@ import {
   JOB_EMPLOYER_MESSAGES_EN,
   JOB_EMPLOYER_MESSAGES_PL,
 } from "./job-employer-messages";
-import {
-  JOB_BOARD_MESSAGES_EN,
-  JOB_BOARD_MESSAGES_PL,
-} from "./job-board-i18n";
 import { SITE_MESSAGES_EN, SITE_MESSAGES_PL } from "./site-messages";
 import {
   CANDIDATE_REWARDS_MESSAGES_EN,
