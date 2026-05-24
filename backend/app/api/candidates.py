@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.core.deps import get_current_user
+from app.core.subscription_gates import Feature, feature_allowed, paywall_for_feature
 from app.database.models import Candidate, Job, User, UserProfileDocument
 from app.database.session import get_db
 from app.schemas.candidate import (
@@ -95,12 +96,26 @@ def get_my_profile(
     return _to_out(candidate)
 
 
+def _enforce_profile_edit(user: User) -> None:
+    if feature_allowed(user, Feature.PROFILE_EDIT):
+        return
+    pw = paywall_for_feature(Feature.PROFILE_EDIT)
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail={
+            "message": "Profile is frozen on Standby — upgrade to Standard to edit again.",
+            "paywall": pw,
+        },
+    )
+
+
 @router.put("/me", response_model=CandidateOut)
 def update_profile(
     body: CandidateUpdate,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> CandidateOut:
+    _enforce_profile_edit(user)
     candidate = db.query(Candidate).filter(Candidate.user_id == user.id).first()
     if not candidate:
         if body.talent_pool_opt_in and not body.talent_pool_processing_consent:
@@ -124,6 +139,7 @@ async def upload_cv(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> CvUploadOut:
+    _enforce_profile_edit(user)
     candidate = db.query(Candidate).filter(Candidate.user_id == user.id).first()
     if not candidate:
         raise HTTPException(

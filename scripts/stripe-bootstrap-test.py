@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create Stripe test product/price/webhook for TWIN Premium (prints vars for .env.railway).
+"""Create Stripe test products/prices/webhook for TWIN tiers (prints vars for .env.railway).
 
 Usage:
   export STRIPE_SECRET_KEY=sk_test_...
@@ -51,26 +51,25 @@ def main() -> int:
     ).rstrip("/")
     webhook_url = f"{api_url}/api/v1/billing/webhook"
 
-    prices = stripe.Price.list(active=True, limit=20, type="recurring")
-    premium_price = None
-    for p in prices.auto_paging_iter():
-        if p.get("nickname") == "twin-premium-monthly":
-            premium_price = p.id
-            break
-
-    if not premium_price:
-        product = stripe.Product.create(name="TWIN Premium", metadata={"twin_plan": "premium"})
-        price = stripe.Price.create(
+    def ensure_price(nickname: str, product_name: str, plan: str, unit_amount: int) -> str:
+        for p in stripe.Price.list(active=True, limit=50, type="recurring").auto_paging_iter():
+            if p.get("nickname") == nickname:
+                print(f"Reusing {nickname} {p.id}")
+                return p.id
+        product = stripe.Product.create(name=product_name, metadata={"twin_plan": plan})
+        created = stripe.Price.create(
             product=product.id,
-            unit_amount=499,
+            unit_amount=unit_amount,
             currency="usd",
             recurring={"interval": "month"},
-            nickname="twin-premium-monthly",
+            nickname=nickname,
         )
-        premium_price = price.id
-        print(f"Created price {premium_price}")
-    else:
-        print(f"Reusing price {premium_price}")
+        print(f"Created {nickname} {created.id}")
+        return created.id
+
+    standby_price = ensure_price("twin-standby-monthly", "TWIN Standby", "standby", 99)
+    standard_price = ensure_price("twin-standard-monthly", "TWIN Standard", "standard", 199)
+    premium_price = ensure_price("twin-premium-monthly", "TWIN Premium", "premium", 499)
 
     wh_secret = None
     for ep in stripe.WebhookEndpoint.list(limit=20).data:
@@ -94,6 +93,8 @@ def main() -> int:
     print("\n# Add to .env.railway then: ./scripts/railway-apply-production-env.sh")
     print(f"STRIPE_SECRET_KEY={sk}")
     print(f"STRIPE_WEBHOOK_SECRET={wh_secret}")
+    print(f"STRIPE_PRICE_ID_STANDBY={standby_price}")
+    print(f"STRIPE_PRICE_ID_STANDARD={standard_price}")
     print(f"STRIPE_PRICE_ID_PREMIUM={premium_price}")
     return 0
 

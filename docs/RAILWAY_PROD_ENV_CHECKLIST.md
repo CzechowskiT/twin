@@ -13,7 +13,7 @@ Paste values in Railway → **twin** (API) → Variables → Raw Editor. Do not 
 | `mail_configured` | `RESEND_API_KEY` + `MAIL_FROM`, or `SMTP_HOST` + `SMTP_PORT` + `SMTP_USER` + `SMTP_PASSWORD` + `SMTP_FROM` |
 | `google_calendar_configured` | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_CALENDAR_REDIRECT_URI` |
 | `microsoft_calendar_configured` | `MICROSOFT_CLIENT_ID`, `MICROSOFT_CLIENT_SECRET`, `MICROSOFT_CALENDAR_REDIRECT_URI`, `MICROSOFT_TENANT` |
-| `stripe_checkout_ready` | `STRIPE_SECRET_KEY` + (`STRIPE_PRICE_ID_PREMIUM` or `STRIPE_PRICE_ID_PRO`); production also needs `STRIPE_WEBHOOK_SECRET` when `STRIPE_SECRET_KEY` is set |
+| `stripe_checkout_ready` | `STRIPE_SECRET_KEY` + at least one of `STRIPE_PRICE_STANDBY`, `STRIPE_PRICE_STANDARD`, `STRIPE_PRICE_ID_PREMIUM`, `STRIPE_PRICE_ID_PRO` (aliases `STRIPE_PRICE_ID_STANDBY` / `STRIPE_PRICE_ID_STANDARD` also work); production also needs `STRIPE_WEBHOOK_SECRET` when `STRIPE_SECRET_KEY` is set |
 | `scrape_worker_ready` | `SCRAPE_WORKER_READY`, `CELERY_TASK_ALWAYS_EAGER=false`, `CELERY_BROKER_URL`, worker service with beat |
 | `celery` / nightly beat | `CELERY_BROKER_URL`, `CELERY_RESULT_BACKEND`, `REDIS_URL`, `nightly_auto_apply_beat_enabled` (default on) |
 
@@ -71,8 +71,10 @@ Optional: `STRIPE_CHECKOUT_PAYMENT_METHOD_TYPES` (default `card,link`).
 
 - `STRIPE_SECRET_KEY`
 - `STRIPE_WEBHOOK_SECRET`
-- `STRIPE_PRICE_ID_PREMIUM`
-- `STRIPE_PRICE_ID_PRO`
+- `STRIPE_PRICE_STANDBY` (or `STRIPE_PRICE_ID_STANDBY`) — $0.99/mo Standby
+- `STRIPE_PRICE_STANDARD` (or `STRIPE_PRICE_ID_STANDARD`) — $1.99/mo Standard
+- `STRIPE_PRICE_ID_PREMIUM` — $4.99/mo Premium
+- `STRIPE_PRICE_ID_PRO` — $9.99/mo Pro (optional)
 - `STRIPE_CHECKOUT_PAYMENT_METHOD_TYPES`
 
 ## Ops / recruiter / partner
@@ -146,6 +148,8 @@ Paste into Railway → **twin** (API) → Variables → Raw Editor. Fill values 
 ```
 STRIPE_SECRET_KEY=
 STRIPE_WEBHOOK_SECRET=
+STRIPE_PRICE_STANDBY=
+STRIPE_PRICE_STANDARD=
 STRIPE_PRICE_ID_PREMIUM=
 STRIPE_PRICE_ID_PRO=
 STRIPE_CHECKOUT_PAYMENT_METHOD_TYPES=

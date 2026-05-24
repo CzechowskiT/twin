@@ -52,8 +52,7 @@ export function BillingPlanTierCard({
   isCurrent,
   featured = false,
 }: BillingPlanTierCardProps) {
-  const busyHere =
-    (busy === "checkout-premium" && p.id === "premium") || (busy === "checkout-pro" && p.id === "pro");
+  const busyHere = busy === `checkout-${p.id}`;
 
   return (
     <article

@@ -42,13 +42,24 @@ type PlansPayload = {
 
 const PLAN_PRICE_FALLBACK_USD: Record<string, number> = {
   free: 0,
+  standby: CANDIDATE_PLAN_USD.standby,
+  standard: CANDIDATE_PLAN_USD.standard,
   premium: CANDIDATE_PLAN_USD.premium,
   pro: CANDIDATE_PLAN_USD.pro,
 };
 
+const CHECKOUT_PLAN_IDS = ["standby", "standard", "premium", "pro"] as const;
+type CheckoutPlanId = (typeof CHECKOUT_PLAN_IDS)[number];
+
+function isCheckoutPlanId(id: string): id is CheckoutPlanId {
+  return (CHECKOUT_PLAN_IDS as readonly string[]).includes(id);
+}
+
 function planDisplayName(planId: string, fallback: string, t: (key: TranslationKey) => string): string {
   const names: Record<string, TranslationKey> = {
     free: "dashboard.billingPlanNameFree",
+    standby: "dashboard.billingPlanNameStandby",
+    standard: "dashboard.billingPlanNameStandard",
     premium: "dashboard.billingPlanNamePremium",
     pro: "dashboard.billingPlanNamePro",
   };
@@ -259,7 +270,7 @@ export default function BillingPage() {
     setBillingSaveOk(false);
   }, [me]);
 
-  async function startCheckout(plan: "premium" | "pro") {
+  async function startCheckout(plan: CheckoutPlanId) {
     const token = getToken();
     if (!token) return;
     setBusy(`checkout-${plan}`);
@@ -548,34 +559,42 @@ export default function BillingPage() {
               plans.plans.map((p) => {
                 const tier = (me?.plan_tier ?? "free").toLowerCase();
                 const isCurrent = me != null && tier === p.id;
-                const featured = !paid && p.id === "premium";
+                const featured = !paid && p.id === "standard";
                 const canOpenWorkspace = p.id === "free" && !isCurrent;
                 const canJoinWishlist =
-                  !paid && !plans.checkout_configured && (p.id === "premium" || p.id === "pro");
-                const canCheckoutPremium = !paid && p.id === "premium" && plans.checkout_configured;
-                const canCheckoutPro = !paid && p.id === "pro" && plans.checkout_configured && p.stripe_price_configured;
-                const actionable = canOpenWorkspace || canJoinWishlist || canCheckoutPremium || canCheckoutPro;
+                  !paid &&
+                  !plans.checkout_configured &&
+                  (p.id === "standard" || p.id === "premium" || p.id === "pro");
+                const canCheckout =
+                  !paid &&
+                  isCheckoutPlanId(p.id) &&
+                  plans.checkout_configured &&
+                  p.stripe_price_configured;
+                const actionable = canOpenWorkspace || canJoinWishlist || canCheckout;
                 const disabled = busy !== null || isCurrent || !actionable;
                 let footerKey: TranslationKey = "dashboard.billingPlanCurrent";
                 let statusNote: string | undefined;
                 if (!isCurrent) {
                   if (p.id === "free") footerKey = "dashboard.billingPlanOpenWorkspace";
-                  else if (p.id === "premium") {
+                  else if (isCheckoutPlanId(p.id)) {
+                    const upgradeKeys: Record<CheckoutPlanId, TranslationKey> = {
+                      standby: "dashboard.billingUpgradeStandby",
+                      standard: "dashboard.billingUpgradeStandard",
+                      premium: "dashboard.billingUpgradePremium",
+                      pro: "dashboard.billingUpgradePro",
+                    };
                     if (canJoinWishlist) footerKey = "dashboard.billingCtaJoinWishlist";
-                    else if (plans.checkout_configured) footerKey = "dashboard.billingUpgradePremium";
-                    else {
-                      footerKey = "dashboard.billingCtaUnavailableShort";
-                      statusNote = t("dashboard.billingNotConfigured");
-                    }
-                  } else if (p.id === "pro") {
-                    if (canJoinWishlist) footerKey = "dashboard.billingCtaJoinWishlist";
+                    else if (canCheckout) footerKey = upgradeKeys[p.id];
                     else if (!plans.checkout_configured) {
                       footerKey = "dashboard.billingCtaUnavailableShort";
                       statusNote = t("dashboard.billingNotConfigured");
-                    } else if (!p.stripe_price_configured) {
+                    } else if (p.id === "pro") {
                       footerKey = "dashboard.billingCtaProPendingShort";
                       statusNote = t("dashboard.billingPlanProPending");
-                    } else footerKey = "dashboard.billingUpgradePro";
+                    } else {
+                      footerKey = "dashboard.billingCtaUnavailableShort";
+                      statusNote = t("dashboard.billingMicroTierPending");
+                    }
                   }
                 }
 
@@ -603,8 +622,7 @@ export default function BillingPage() {
                         router.push("/waitlist");
                         return;
                       }
-                      if (canCheckoutPremium) void startCheckout("premium");
-                      if (canCheckoutPro) void startCheckout("pro");
+                      if (canCheckout && isCheckoutPlanId(p.id)) void startCheckout(p.id);
                     }}
                   />
                 );
