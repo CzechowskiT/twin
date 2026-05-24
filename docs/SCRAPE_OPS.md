@@ -44,5 +44,10 @@ Also required for hosted scrape (non-eager):
 2. `GET /api/v1/auth/me` → `can_trigger_scrape: true` when consents + worker ready.
 3. `GET /api/v1/health?ops=1` → `scrape_worker_ready`, `scrape_beat_enabled`, `validated_jobs`.
 4. Public dashboard: [https://your-frontend/status](https://your-frontend/status) — **Validated jobs** counter and **Scrape worker** row.
+5. `./scripts/verify-prod-health.sh` — CI smoke on push to `cursor/phase1-monorepo-scaffold`. Celery worker check **retries up to 5×** (12 s apart) so a Railway redeploy restart does not flake the job; a genuinely stopped worker still fails after ~60 s.
+
+### CI `prod-health` vs worker restart
+
+Push to scaffold triggers **both** GitHub Actions `prod-health` and Railway auto-deploy. During worker restart (`celery worker --beat`), `GET /api/v1/health/celery-status` may briefly return `worker_active: false`, `mode: no_workers` — that is an honest signal, not a false negative. If CI fails with that message **outside** a deploy window, check Railway → worker service logs (`celery@… ready`) and that API + worker share the same `CELERY_BROKER_URL` / `REDIS_URL`.
 
 Allowlisted emails additionally get `scrape_ops_elevated: true` when `SCRAPE_OPS_*` is set.

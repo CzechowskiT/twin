@@ -140,7 +140,7 @@ def celery_status() -> dict[str, str | bool | list[str]]:
         out["mode"] = "eager"
         return out
     try:
-        inspect = celery_app.control.inspect(timeout=2.0)
+        inspect = celery_app.control.inspect(timeout=4.0)
         ping = inspect.ping() if inspect else None
         if ping:
             out["worker_active"] = True

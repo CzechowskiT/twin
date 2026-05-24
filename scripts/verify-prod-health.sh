@@ -41,7 +41,25 @@ else
   echo "OK: validated_jobs=$jobs"
 fi
 
-celery_json=$(curl -fsS "${API%/}/api/v1/health/celery-status" 2>/dev/null || echo "{}")
+CELERY_RETRIES="${VERIFY_CELERY_RETRIES:-5}"
+CELERY_RETRY_SLEEP="${VERIFY_CELERY_RETRY_SLEEP:-12}"
+celery_json="{}"
+worker_active="None"
+celery_mode=""
+celery_err=""
+for attempt in $(seq 1 "$CELERY_RETRIES"); do
+  celery_json=$(curl -fsS "${API%/}/api/v1/health/celery-status" 2>/dev/null || echo "{}")
+  worker_active=$(echo "$celery_json" | python3 -c "import sys,json; print(json.load(sys.stdin).get('worker_active'))" 2>/dev/null || echo "None")
+  celery_mode=$(echo "$celery_json" | python3 -c "import sys,json; print(json.load(sys.stdin).get('mode',''))" 2>/dev/null || echo "")
+  celery_err=$(echo "$celery_json" | python3 -c "import sys,json; print(json.load(sys.stdin).get('error',''))" 2>/dev/null || echo "")
+  if [[ "$worker_active" == "True" ]]; then
+    break
+  fi
+  if [[ "$attempt" -lt "$CELERY_RETRIES" ]]; then
+    echo "WARN: celery worker_active=$worker_active mode=$celery_mode (attempt $attempt/$CELERY_RETRIES); retry in ${CELERY_RETRY_SLEEP}s…"
+    sleep "$CELERY_RETRY_SLEEP"
+  fi
+done
 echo "Celery status:"
 echo "$celery_json" | python3 -m json.tool 2>/dev/null || echo "$celery_json"
 celery_eager=$(echo "$celery_json" | python3 -c "import sys,json; print(json.load(sys.stdin).get('celery_task_always_eager'))" 2>/dev/null || echo "None")
@@ -54,11 +72,8 @@ if [[ "$beat_nightly" != "True" ]]; then
   echo "WARN: beat_schedule_has_nightly=$beat_nightly"
   fail=1
 fi
-worker_active=$(echo "$celery_json" | python3 -c "import sys,json; print(json.load(sys.stdin).get('worker_active'))" 2>/dev/null || echo "None")
-celery_mode=$(echo "$celery_json" | python3 -c "import sys,json; print(json.load(sys.stdin).get('mode',''))" 2>/dev/null || echo "")
-celery_err=$(echo "$celery_json" | python3 -c "import sys,json; print(json.load(sys.stdin).get('error',''))" 2>/dev/null || echo "")
 if [[ "$worker_active" != "True" ]]; then
-  echo "FAIL: celery worker_active=$worker_active mode=$celery_mode error=$celery_err"
+  echo "FAIL: celery worker_active=$worker_active mode=$celery_mode error=$celery_err (after $CELERY_RETRIES attempts)"
   fail=1
 else
   echo "OK: celery worker_active=True"

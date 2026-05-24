@@ -1,8 +1,8 @@
 # TWIN — founder status (live)
 
-**Updated:** 2026-05-24 (status rollup + prod alignment check)  
+**Updated:** 2026-05-24 (prod-health flake fix + partner export)  
 **Branch:** `cursor/phase1-monorepo-scaffold`  
-**One-liner:** **Prod API = scaffold HEAD (`e83e1c7`)**; smoke CI blocked on PAT `workflow` scope; investor audit PNGs `01`–`02` captured.
+**One-liner:** **Prod API = `0ade82b`** (partner export live); Celery worker live; smoke CI retries worker ping during deploy restarts.
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Surface | Status |
 |---------|--------|
-| API deploy | **e83e1c7** (scaffold HEAD; prod `git_commit` matches) |
+| API deploy | **0ade82b** (prod `git_commit` matches scaffold) |
 | Vercel front | https://twin-sooty.vercel.app/status |
 | Demo verify | **PASS** (`live_db`, top matches) — `/demo` shows offline banner when snapshot stale |
 | LinkedIn OAuth | **Live** (`linkedin_oauth_configured: true`) |
@@ -22,7 +22,7 @@
 | validated_jobs | **637** (`/health?ops=1`) |
 | Data room S3 | **Wired** — prod flag off until founder `S3_*` |
 | OpenAPI on prod | **Disabled** (`environment=production` → no `/docs`, `/openapi.json` 404) |
-| CI smoke | **`.github/workflows/smoke.yml`** (pytest + build + prod curl) — verify push with workflow scope |
+| CI smoke | **`.github/workflows/smoke.yml`** — `prod-health` retries Celery ping (5×12 s) during worker restarts |
 | MRR | $0 (Stripe live; no paid subs yet) |
 
 Quick audit: [https://twin-sooty.vercel.app/status](https://twin-sooty.vercel.app/status)  
