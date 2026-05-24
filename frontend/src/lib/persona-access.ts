@@ -20,6 +20,7 @@ const PATH_IMPLIES_PERSONA: { prefix: string; persona: MarketingPersona }[] = [
   { prefix: "/profile", persona: "candidate" },
   { prefix: "/onboarding", persona: "candidate" },
   { prefix: "/for-recruiters", persona: "recruiter" },
+  { prefix: "/recruiter/employer", persona: "recruiter" },
   { prefix: "/recruiter", persona: "recruiter" },
   { prefix: "/for-companies", persona: "company" },
   { prefix: "/for-investors", persona: "investor" },
@@ -42,6 +43,7 @@ const PATH_IMPLIES_PERSONA: { prefix: string; persona: MarketingPersona }[] = [
 
 /** Only these personas may access the path prefix (longest match wins). */
 const PREFIX_ALLOWED: { prefix: string; allowed: readonly MarketingPersona[] }[] = [
+  { prefix: "/dashboard/calendar", allowed: ["candidate", "recruiter", "investor", "company"] },
   { prefix: "/dashboard", allowed: ["candidate"] },
   { prefix: "/profile", allowed: ["candidate"] },
   { prefix: "/onboarding", allowed: ["candidate"] },
@@ -52,6 +54,7 @@ const PREFIX_ALLOWED: { prefix: string; allowed: readonly MarketingPersona[] }[]
   { prefix: "/investor", allowed: ["investor"] },
   { prefix: "/calculator/b2b", allowed: ["company", "recruiter"] },
   { prefix: "/calculator", allowed: ["recruiter"] },
+  { prefix: "/recruiter/employer", allowed: ["recruiter"] },
   { prefix: "/recruiter/integrations", allowed: ["recruiter"] },
   { prefix: "/recruiter", allowed: ["recruiter"] },
   { prefix: "/for-investors", allowed: ["investor"] },
@@ -59,7 +62,7 @@ const PREFIX_ALLOWED: { prefix: string; allowed: readonly MarketingPersona[] }[]
   { prefix: "/for-companies", allowed: ["company"] },
   { prefix: "/for-candidates", allowed: ["candidate"] },
   { prefix: "/companies/signup", allowed: ["company"] },
-  { prefix: "/demo", allowed: ["candidate"] },
+  { prefix: "/demo", allowed: ["candidate", "recruiter", "investor", "company"] },
 ];
 
 const ALWAYS_ALLOWED_PREFIXES = [
@@ -271,35 +274,58 @@ export function headerGrowthLinksForPersona(
 
 export type HeaderSessionNavLink = { href: string; labelKey: TranslationKey };
 
-/** Product shortcuts shown in the header while signed in (persona lane only). */
+const SESSION_PANEL_PREFIXES: Partial<Record<string, readonly string[]>> = {
+  "/workspace/recruiter": ["/workspace/recruiter", "/recruiter"],
+  "/workspace/investor": ["/workspace/investor", "/investor"],
+};
+
+/** Logged-in home for the Panel tab (candidate dashboard vs persona workspace). */
+export function sessionPanelHref(persona: MarketingPersona): string {
+  if (persona === "candidate") return "/dashboard";
+  return WORKSPACE_PATH[persona];
+}
+
+/** Kalendarz | Panel | Demo — same strip for every signed-in persona. */
 export function headerSessionNavLinks(
   persona: MarketingPersona,
   hasSession: boolean,
 ): HeaderSessionNavLink[] {
   if (!hasSession) return [];
-  if (persona === "candidate") {
-    return [
-      { href: "/dashboard/calendar", labelKey: "dashboard.calendarLink" },
-      { href: "/dashboard", labelKey: "nav.dashboard" },
-      { href: "/demo", labelKey: "nav.demo" },
-    ];
-  }
-  if (persona === "recruiter") {
-    return [
-      { href: "/recruiter/inbox", labelKey: "recruiterInbox.title" },
-      { href: "/workspace/recruiter", labelKey: "workspace.recruiterHome" },
-    ];
-  }
-  if (persona === "investor") {
-    return [
-      { href: "/workspace/investor", labelKey: "workspace.investorHome" },
-      { href: "/investor/calculator", labelKey: "nav.calculatorInvestor" },
-    ];
-  }
   return [
-    { href: "/for-companies", labelKey: "nav.forCompanies" },
-    { href: "/calculator/b2b", labelKey: "nav.calculatorB2bForCompanies" },
+    { href: "/dashboard/calendar", labelKey: "dashboard.calendarLink" },
+    { href: sessionPanelHref(persona), labelKey: "nav.dashboard" },
+    { href: "/demo", labelKey: "nav.demo" },
   ];
+}
+
+/** Whether a signed-in header nav item matches the current route (incl. dashboard section hashes). */
+export function isSessionNavLinkActive(
+  pathname: string,
+  locationHash: string,
+  href: string,
+): boolean {
+  const [path, fragment] = href.split("#");
+  const base = path || "/";
+  if (fragment) {
+    return pathname === base && locationHash === `#${fragment}`;
+  }
+  if (base === "/demo") {
+    return pathname === "/demo" || pathname.startsWith("/demo/");
+  }
+  if (base === "/dashboard") {
+    return (
+      pathname === "/dashboard" ||
+      (pathname.startsWith("/dashboard/") && !pathname.startsWith("/dashboard/calendar"))
+    );
+  }
+  if (base === "/dashboard/calendar") {
+    return pathname === "/dashboard/calendar" || pathname.startsWith("/dashboard/calendar/");
+  }
+  const panelPrefixes = SESSION_PANEL_PREFIXES[base];
+  if (panelPrefixes) {
+    return panelPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+  }
+  return pathname === base || pathname.startsWith(`${base}/`);
 }
 
 export function showCorporateNav(hasSession: boolean): boolean {
@@ -311,9 +337,9 @@ export function showCandidateProductNav(persona: MarketingPersona): boolean {
   return persona === "candidate";
 }
 
-/** Logged-in candidate lane: show the always-on Demo pill beside the logo. */
+/** Demo beside the logo — logged-out candidates only; signed-in users get Demo in the center tab strip. */
 export function showCandidateDemoNav(persona: MarketingPersona, hasSession: boolean): boolean {
-  return hasSession && persona === "candidate";
+  return !hasSession && persona === "candidate";
 }
 
 export function logoutRedirectPath(persona: MarketingPersona): string {

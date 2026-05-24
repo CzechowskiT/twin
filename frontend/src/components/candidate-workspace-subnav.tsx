@@ -28,6 +28,9 @@ export function CandidateWorkspaceSubnav({
       <Link href="/profile" className={itemClass}>
         {t("nav.profile")}
       </Link>
+      <Link href="/dashboard#dashboard-jobs" className={itemClass}>
+        {t("nav.jobs")}
+      </Link>
       <Link href="/dashboard/career" className={itemClass}>
         {t("dashboard.careerCompassLink")}
       </Link>

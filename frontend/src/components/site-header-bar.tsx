@@ -11,11 +11,13 @@ import { useMarketingPersona } from "@/components/persona-provider";
 import { apiFetch } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
 import { isDemoUserEmail } from "@/lib/demo-user";
+import { scrollToDashboardHash } from "@/lib/dashboard-anchor";
 import {
   type GrowthCtaVariant,
   headerAccountLinks,
   headerGrowthLinksForPersona,
   headerSessionNavLinks,
+  isSessionNavLinkActive,
   logoutRedirectPath,
   showCandidateDemoNav,
   showCorporateNav,
@@ -42,12 +44,12 @@ export function SiteHeaderBar({ showPersonaBadge }: SiteHeaderBarProps) {
   const mobileMenuRef = useRef<HTMLDetailsElement>(null);
   const [hasSession, setHasSession] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [locationHash, setLocationHash] = useState("");
   const growthLinks = headerGrowthLinksForPersona(persona, pathname, hasSession);
   const sessionNavLinks = headerSessionNavLinks(persona, hasSession);
   const showDemoNav = showCandidateDemoNav(persona, hasSession);
   const showMarketingNav = showCorporateNav(hasSession);
   const accountLinks = headerAccountLinks(persona, hasSession);
-  const calendarActive = pathname === "/dashboard/calendar" || pathname.startsWith("/dashboard/calendar/");
   const demoActive = pathname === "/demo" || pathname.startsWith("/demo/");
   const dashboardSectionActive =
     pathname === "/dashboard" ||
@@ -59,6 +61,13 @@ export function SiteHeaderBar({ showPersonaBadge }: SiteHeaderBarProps) {
     sync();
     window.addEventListener("storage", sync);
     return () => window.removeEventListener("storage", sync);
+  }, [pathname]);
+
+  useEffect(() => {
+    const syncHash = () => setLocationHash(window.location.hash);
+    syncHash();
+    window.addEventListener("hashchange", syncHash);
+    return () => window.removeEventListener("hashchange", syncHash);
   }, [pathname]);
 
   useEffect(() => {
@@ -102,7 +111,6 @@ export function SiteHeaderBar({ showPersonaBadge }: SiteHeaderBarProps) {
   ];
 
   const headerCtaBase = "twin-header-cta twin-touch-target";
-  const calendarClassName = `${headerCtaBase} twin-header-cta--ghost twin-header-cta--calendar`;
   const demoPillClassName = `${headerCtaBase} twin-header-cta--roi twin-nav-roi-pill twin-nav-demo-pill${
     highlightDemoNav ? " twin-header-cta--demo-pulse" : ""
   }`;
@@ -160,30 +168,30 @@ export function SiteHeaderBar({ showPersonaBadge }: SiteHeaderBarProps) {
                   {item.label}
                 </Link>
               ))
-            : sessionNavLinks.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`${linkClass} ${
-                    item.href === "/dashboard/calendar" && calendarActive
-                      ? "text-[var(--twin-accent)]"
-                      : item.href === "/dashboard" && dashboardSectionActive
-                        ? "text-[var(--twin-accent)]"
-                        : item.href === "/demo" && demoActive
-                          ? "text-[var(--twin-accent)]"
-                          : ""
-                  }`}
-                  aria-current={
-                    (item.href === "/dashboard/calendar" && calendarActive) ||
-                    (item.href === "/dashboard" && dashboardSectionActive) ||
-                    (item.href === "/demo" && demoActive)
-                      ? "page"
-                      : undefined
-                  }
-                >
-                  {t(item.labelKey)}
-                </Link>
-              ))}
+            : sessionNavLinks.map((item) => {
+                const active = isSessionNavLinkActive(pathname, locationHash, item.href);
+                const hashNav = item.href.includes("#");
+                return hashNav ? (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    onClick={scrollToDashboardHash}
+                    className={`${linkClass} ${active ? "text-[var(--twin-accent)]" : ""}`}
+                    aria-current={active ? "page" : undefined}
+                  >
+                    {t(item.labelKey)}
+                  </a>
+                ) : (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`${linkClass} ${active ? "text-[var(--twin-accent)]" : ""}`}
+                    aria-current={active ? "page" : undefined}
+                  >
+                    {t(item.labelKey)}
+                  </Link>
+                );
+              })}
           {showMarketingNav
             ? corporateNavMore.map((item) => (
                 <Link key={item.href} href={item.href} className={`${linkClass} hidden lg:inline`}>
@@ -194,15 +202,6 @@ export function SiteHeaderBar({ showPersonaBadge }: SiteHeaderBarProps) {
         </nav>
 
         <div className="ml-auto flex min-w-0 shrink-0 flex-wrap items-center justify-end gap-x-2 gap-y-1">
-          {hasSession && persona === "candidate" ? (
-            <Link
-              href="/dashboard/calendar"
-              className={`${calendarClassName} hidden md:inline-flex ${calendarActive ? "twin-header-cta--active" : ""}`}
-              aria-current={calendarActive ? "page" : undefined}
-            >
-              {t("dashboard.calendarLink")}
-            </Link>
-          ) : null}
           {accountLinks.map((item) =>
             item.isLogout ? (
               <button
@@ -263,16 +262,30 @@ export function SiteHeaderBar({ showPersonaBadge }: SiteHeaderBarProps) {
                   <p className="mt-1 border-t border-[var(--twin-border)] px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
                     {t("nav.ariaProductNav")}
                   </p>
-                  {sessionNavLinks.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={closeMobileMenu}
-                      className="twin-touch-target twin-nav-link block whitespace-nowrap rounded px-3 py-2.5 text-sm hover:bg-[var(--twin-accent-muted)]"
-                    >
-                      {t(item.labelKey)}
-                    </Link>
-                  ))}
+                  {sessionNavLinks.map((item) =>
+                    item.href.includes("#") ? (
+                      <a
+                        key={item.href}
+                        href={item.href}
+                        onClick={(e) => {
+                          scrollToDashboardHash(e);
+                          closeMobileMenu();
+                        }}
+                        className="twin-touch-target twin-nav-link block whitespace-nowrap rounded px-3 py-2.5 text-sm hover:bg-[var(--twin-accent-muted)]"
+                      >
+                        {t(item.labelKey)}
+                      </a>
+                    ) : (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={closeMobileMenu}
+                        className="twin-touch-target twin-nav-link block whitespace-nowrap rounded px-3 py-2.5 text-sm hover:bg-[var(--twin-accent-muted)]"
+                      >
+                        {t(item.labelKey)}
+                      </Link>
+                    ),
+                  )}
                 </>
               ) : null}
               {showMarketingNav ? (
