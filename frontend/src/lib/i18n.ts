@@ -768,7 +768,7 @@ const en = {
     billingNotConfigured: "Paid upgrades are not available on this deployment yet. The free plan still works.",
     billingStripeSoonTitle: "Card checkout isn’t wired on this server yet",
     billingStripeSoonLead:
-      "That’s expected until Stripe keys are on Railway (STRIPE_SECRET_KEY and at least one STRIPE_PRICE_ID_*). Your free plan is fully usable — join the wishlist for founding access, or follow docs/STRIPE.md when you want live checkout.",
+      "That’s expected until Stripe keys are on Railway (STRIPE_SECRET_KEY and at least one price: STRIPE_PRICE_STANDBY, STRIPE_PRICE_STANDARD, or STRIPE_PRICE_ID_PREMIUM). Your free plan is fully usable — join the wishlist for founding access, or follow docs/STRIPE.md when you want live checkout.",
     billingCtaJoinWishlist: "Join wishlist",
     billingCheckoutSuccess: "Thank you. Your subscription should activate within a minute after Stripe confirms payment.",
     billingCheckoutCancelled: "Checkout was cancelled. You can try again whenever you are ready.",
@@ -3290,7 +3290,7 @@ const pl: MessageTree = {
     billingNotConfigured: "Płatne ulepszenia nie są jeszcze włączone w tej instalacji. Plan darmowy działa normalnie.",
     billingStripeSoonTitle: "Płatność kartą nie jest jeszcze podpięta na tym serwerze",
     billingStripeSoonLead:
-      "To normalne, dopóki na Railway nie ma kluczy Stripe (STRIPE_SECRET_KEY i co najmniej jednego STRIPE_PRICE_ID_*). Plan darmowy działa w pełni — dołącz do listy founding na wczesny dostęp albo zobacz docs/STRIPE.md, gdy chcesz płatności na żywo.",
+      "To normalne, dopóki na Railway nie ma kluczy Stripe (STRIPE_SECRET_KEY i co najmniej jednej ceny: STRIPE_PRICE_STANDBY, STRIPE_PRICE_STANDARD lub STRIPE_PRICE_ID_PREMIUM). Plan darmowy działa w pełni — dołącz do listy founding na wczesny dostęp albo zobacz docs/STRIPE.md, gdy chcesz płatności na żywo.",
     billingCtaJoinWishlist: "Dołącz do listy founding",
     billingCheckoutSuccess: "Dziękujemy. Subskrypcja powinna aktywować się w ciągu około minuty po potwierdzeniu płatności przez Stripe.",
     billingCheckoutCancelled: "Płatność anulowana. Możesz spróbować ponownie w dowolnym momencie.",
