@@ -1564,6 +1564,8 @@ const en = {
     unitEconomicsTitle: "Unit economics (transparent)",
     unitEconomicsLead:
       "We are pre-revenue. Use the scenario calculator for upside and sensitivity — illustrative models only, not audited financials.",
+    competitiveMoatLead:
+      "Versus YC HR adjacents (Apriora, Parasale, DianaHR): TWIN owns the full candidate agent — ranked match lanes, consent-first apply, calendar of acceptance, and B2B flat rate or success-fee options — not a point tool or outbound spam.",
     preRevenueNote:
       "Subscriptions and placement fees will run through Stripe when we turn on billing in production.",
     paidSubscribers: "Paying subscribers",
@@ -4051,6 +4053,8 @@ const pl: MessageTree = {
     unitEconomicsTitle: "Ekonomia jednostkowa (transparentnie)",
     unitEconomicsLead:
       "Jesteśmy przed przychodem. Kalkulator scenariusza pokazuje wrażliwość i potencjał — modele poglądowe, bez audytowanych finansów.",
+    competitiveMoatLead:
+      "Względem YC w HR (Apriora, Parasale, DianaHR): TWIN to pełny agent kariery — trzy pasma dopasowania, apply za zgodą, kalendarz akceptacji oraz B2B flat rate lub success fee — nie punktowy bot ani cold outbound.",
     preRevenueNote:
       "Subskrypcje i opłaty placementowe uruchomimy przez Stripe, gdy włączymy rozliczenia na produkcji.",
     paidSubscribers: "Płacący subskrybenci",

@@ -129,6 +129,7 @@ export function InvestorMetricsPanel() {
           {t("investorMetrics.unitEconomicsTitle")}
         </h2>
         <p className="mt-1 text-xs leading-relaxed text-[var(--twin-muted)]">{t("investorMetrics.unitEconomicsLead")}</p>
+        <p className="mt-2 text-xs leading-relaxed text-[var(--twin-muted-strong)]">{t("investorMetrics.competitiveMoatLead")}</p>
         <p className="mt-2 text-xs text-[var(--twin-muted-strong)]">{t("investorMetrics.preRevenueNote")}</p>
         <p className="mt-2 text-sm font-semibold tabular-nums text-[var(--foreground)]">
           {t("investorMetrics.subscriptionMrr")}: {mrrDisplay}
