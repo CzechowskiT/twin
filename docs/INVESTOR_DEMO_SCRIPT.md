@@ -56,7 +56,7 @@ Prod without seed returns `static_fallback`—honest line: *“We’re looking a
 | Show | Say | Fallback |
 |------|-----|----------|
 | `/profile` | “Structured CV drives matching—not just keyword blast.” | Open profile tab if dashboard crowded |
-| `/dashboard` job cards | “Each card is **match %** against this candidate’s skills—ranked pipeline, not inbox volume.” | Empty feed: **stop** and seed prod (audit blocker) |
+| `/dashboard` job cards | “Each card is **match %** plus a **lane**: ready now, near-miss, or stretch—ranked pipeline, not inbox volume.” | Empty feed: **stop** and seed prod (audit blocker) |
 
 **Modals (pick 2–3, don’t exhaust all seven):**
 
@@ -97,6 +97,15 @@ If Claude unavailable: “Deterministic fallback still demonstrates flow; produc
 
 **Ops talking point (optional, technical audience):**  
 `GET /api/v1/ops/auto-apply/last-run` — beat fired, row exists; user count 0 until prod consents (expected).
+
+---
+
+## Step 5b — Companies economics (optional, 3 min)
+
+| Show | Say | Fallback |
+|------|-----|----------|
+| `/for-companies` → **Vacancy flat rate** tier | “Founder spreadsheet: 1k employees, 15% rotation, 500 PLN/vacancy floor → **10%** program fee vs traditional posting spend—not % of salary.” | Open `/calculator/b2b#flat-rate` |
+| B2B calculator flat-rate block | “Procurement can model flat rate beside success-fee ROI in the same session.” | — |
 
 ---
 
