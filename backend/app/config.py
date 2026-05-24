@@ -118,6 +118,8 @@ class Settings(BaseSettings):
         return self
 
     anthropic_api_key: str = ""
+    # Claude Messages API model id (override via ANTHROPIC_MODEL without code changes).
+    anthropic_model: str = "claude-sonnet-4-6"
     cv_upload_dir: str = "data/cvs"
     cv_max_bytes: int = 5 * 1024 * 1024
 

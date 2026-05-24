@@ -5,6 +5,7 @@ import re
 from typing import Any
 
 from app.matching.synonyms import SKILL_ALIASES, SKILL_SYNONYMS
+from app.config import get_settings
 from app.services.anthropic_client import get_anthropic_client, is_anthropic_configured
 
 _ENRICH_PROMPT = """You analyze a job seeker's CV (Polish and/or English). The CV below is plain text extracted from their PDF/DOCX/TXT file — infer everything only from this text.
@@ -186,7 +187,7 @@ def _enrich_with_claude(cv_text: str) -> dict[str, Any] | None:
     snippet = cv_text[:12_000]
     try:
         msg = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model=get_settings().anthropic_model,
             max_tokens=2000,
             messages=[{"role": "user", "content": _ENRICH_PROMPT + snippet}],
         )
