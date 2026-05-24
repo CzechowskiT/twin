@@ -1006,6 +1006,7 @@ const en = {
     calendarOpenGoogle: "Open in Google Calendar",
     calendarInterviewsTitle: "Upcoming interviews",
     calendarInterviewsEmpty: "Nothing on the horizon yet. When TWIN books a slot, it shows up here and in Google Calendar.",
+    calendarInterviewTimezone: "Times in {tz}",
     calendarShowCancelledInterviews: "Show cancelled interviews",
     calendarScheduleTitle: "Schedule an interview",
     calendarScheduleHint:
@@ -1977,6 +1978,10 @@ const en = {
     lead: "A short list of interviews and high-fit roles — accept what is worth your calendar, decline the rest.",
     loading: "Loading…",
     empty: "Nothing waiting right now. Check back after matching runs or when a recruiter proposes a slot.",
+    emptyTitle: "Your acceptance calendar is clear",
+    emptyHint:
+      "TWIN surfaces interview holds and strong matches here — not thousands of raw applications. Run matching from the dashboard or connect a calendar so new slots can land when recruiters propose times.",
+    emptyCta: "Open matches on dashboard",
     back: "Back to dashboard",
     interviewBadge: "Interview",
     matchBadge: "Strong match",
