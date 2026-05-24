@@ -35,7 +35,7 @@
 |-----|---------|
 | `c43873d` | docs: capture investor demo audit screenshots 01-02 on prod. (pre-existing HEAD) |
 | `8fd3910` | feat(investor): show pipeline when placement revenue is zero (Task 3, pre-existing) |
-| *(this run)* | docs: investor demo talking points, deploy checklist, execution report |
+| `facfd04` | docs: investor demo P0 blockers - talking points, deploy checklist, report (this run) |
 
 ---
 
