@@ -54,4 +54,4 @@ API health: [https://twin-production-bcd9.up.railway.app/api/v1/health](https://
 - Stripe E2E paid subscriber on prod
 - Microsoft sign-in OAuth E2E (Entra app registered)
 
-Checklists: `docs/STRIPE_RAILWAY_SETUP.md`, `docs/NIGHTLY_AUTO_APPLY_DEPLOY.md`, `docs/PLACEMENT_VERIFICATION.md`.
+Checklists: [FOUNDER_P0_CHECKLIST.md](./FOUNDER_P0_CHECKLIST.md), [FOUNDER_SECRETS_WHERE.md](./FOUNDER_SECRETS_WHERE.md), [FOUNDER_OPEN_QUESTIONS.md](./FOUNDER_OPEN_QUESTIONS.md), `docs/STRIPE_RAILWAY_SETUP.md`, `docs/NIGHTLY_AUTO_APPLY_DEPLOY.md`, `docs/PLACEMENT_VERIFICATION.md`.
