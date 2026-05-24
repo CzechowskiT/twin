@@ -133,3 +133,110 @@ run("optimized scenario is profitable at 100k users", () => {
   assert.ok(r.netIncome > 0);
   assert.ok(r.breakEvenUsers < INVESTOR_CALCULATOR_DEFAULTS.totalUsers);
 });
+
+/** UI slider range (10k–1M): variable costs scale linearly with users; team/fixed flat. */
+const SLIDER_MIN_USERS = 10_000;
+const SLIDER_MAX_USERS = 1_000_000;
+
+function variableCostsExFixed(r: ReturnType<typeof computeInvestorCalculator>) {
+  return r.totalInfrastructure + r.candidateRewardCosts;
+}
+
+run("slider min/max: variable costs scale ~linearly with users", () => {
+  const atMin = computeInvestorCalculator({
+    ...INVESTOR_CALCULATOR_DEFAULTS,
+    totalUsers: SLIDER_MIN_USERS,
+  });
+  const atMax = computeInvestorCalculator({
+    ...INVESTOR_CALCULATOR_DEFAULTS,
+    totalUsers: SLIDER_MAX_USERS,
+  });
+  assert.equal(atMin.teamCosts, atMax.teamCosts);
+  assert.equal(atMin.fixedCosts, atMax.fixedCosts);
+  const ratio = variableCostsExFixed(atMax) / variableCostsExFixed(atMin);
+  assert.ok(Math.abs(ratio - SLIDER_MAX_USERS / SLIDER_MIN_USERS) < 0.001);
+});
+
+run("slider min/max: founding drag capped at cohort size", () => {
+  const atMin = computeInvestorCalculator({
+    ...INVESTOR_CALCULATOR_DEFAULTS,
+    totalUsers: SLIDER_MIN_USERS,
+  });
+  const atMax = computeInvestorCalculator({
+    ...INVESTOR_CALCULATOR_DEFAULTS,
+    totalUsers: SLIDER_MAX_USERS,
+  });
+  assert.equal(atMin.foundingRevenueDrag, atMax.foundingRevenueDrag);
+  assert.ok(atMin.foundingRevenueDrag > 0);
+});
+
+run("model scales at 100, 1k, 10k, 100k: per-user variable costs constant", () => {
+  const scales = [100, 1_000, 10_000, 100_000];
+  const perUser: number[] = [];
+  for (const totalUsers of scales) {
+    const r = computeInvestorCalculator({
+      ...INVESTOR_CALCULATOR_DEFAULTS,
+      totalUsers,
+    });
+    perUser.push(variableCostsExFixed(r) / totalUsers);
+    assert.ok(Math.abs(r.referralCosts + r.interviewBonusCosts - r.candidateRewardCosts) < 0.01);
+    assert.ok(
+      Math.abs(r.totalCosts - (r.fixedCosts + r.variableCosts)) < 0.01,
+      `cost identity @ ${totalUsers}`,
+    );
+  }
+  const first = perUser[0]!;
+  for (const p of perUser) {
+    assert.ok(Math.abs(p - first) < 0.0001, `per-user variable drift: ${p} vs ${first}`);
+  }
+});
+
+run("team salaries: default headcount × salary = teamCosts", () => {
+  const d = INVESTOR_CALCULATOR_DEFAULTS;
+  const expected =
+    d.seniorEngineers * d.seniorEngineerSalary +
+    d.otherEngineers * d.otherEngineerSalary +
+    d.productManager * d.productManagerSalary +
+    d.otherRoles * d.otherRolesSalary +
+    d.founderSalary;
+  assert.equal(expected, 970_000);
+  const r = computeInvestorCalculator(d);
+  assert.equal(r.teamCosts, expected);
+  assert.equal(
+    r.fixedCosts,
+    expected + d.legalAccounting + d.officeMisc,
+  );
+});
+
+run("referral tiers: funnel math matches breakdown", () => {
+  const d = INVESTOR_CALCULATOR_DEFAULTS;
+  const r = computeInvestorCalculator(d);
+  const { activation, retained3m, hire, total } = r.referralCostBreakdown;
+  const newRefs = d.totalUsers * (d.referralRate / 100) * (d.viralGrowthRate / 100);
+  const activated = newRefs * (d.percentPaying / 100);
+  const retained = activated * (d.referralRetention3mRate / 100);
+  assert.ok(Math.abs(activation - activated * d.referralBonusPerActivation) < 0.02);
+  assert.ok(Math.abs(retained3m - retained * d.referralBonusRetained3m) < 0.02);
+  assert.ok(
+    Math.abs(hire - activated * (d.placementRate / 100) * d.referralBonusPerHire) < 0.02,
+  );
+  assert.ok(Math.abs(total - (activation + retained3m + hire)) < 0.01);
+});
+
+run("interview bonus scales with paying users only", () => {
+  const d = INVESTOR_CALCULATOR_DEFAULTS;
+  const base = computeInvestorCalculator(d);
+  const halfUsers = computeInvestorCalculator({ ...d, totalUsers: d.totalUsers / 2 });
+  assert.ok(Math.abs(halfUsers.interviewBonusCosts - base.interviewBonusCosts / 2) < 0.02);
+  const zeroAdoption = computeInvestorCalculator({ ...d, interviewBonusAdoptionRate: 0 });
+  assert.equal(zeroAdoption.interviewBonusCosts, 0);
+});
+
+run("infrastructure per-user = hosting + api + services", () => {
+  const d = INVESTOR_CALCULATOR_DEFAULTS;
+  const r = computeInvestorCalculator(d);
+  const perUser = d.hostingCostPerUser + d.apiCostPerUser + d.servicesCostPerUser;
+  assert.equal(perUser, 2.4);
+  assert.ok(Math.abs(r.infrastructureCostPerUser - perUser) < 0.0001);
+  assert.ok(Math.abs(r.totalInfrastructure - perUser * d.totalUsers) < 0.01);
+});

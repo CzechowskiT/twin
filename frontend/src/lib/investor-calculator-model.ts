@@ -208,6 +208,10 @@ type ReferralFunnel = {
   hiredReferrals: number;
 };
 
+/**
+ * Referral volume for the model year: new referred users =
+ * totalUsers × referralRate × viralGrowthRate (both as shares, not “% who refer once”).
+ */
 function referralFunnel(i: InvestorCalculatorInputs, totalUsers: number): ReferralFunnel {
   const newReferrals = totalUsers * (i.referralRate / 100) * (i.viralGrowthRate / 100);
   const activatedReferrals = newReferrals * (i.percentPaying / 100);
