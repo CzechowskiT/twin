@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
+import { InvestorCalculatorSliderGuide } from "@/components/marketing/investor-calculator-slider-guide";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { MvpLiveStatsStrip } from "@/components/marketing/mvp-live-stats-strip";
 import { Input, Shell } from "@/components/ui";
@@ -293,6 +294,8 @@ export function InvestorCalculator() {
             />
           </div>
         </section>
+
+        <InvestorCalculatorSliderGuide />
 
         <div className="mb-6 grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <KpiCard
