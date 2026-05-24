@@ -2463,15 +2463,12 @@ const en = {
     liveTitle: "Ranked roles (read-only)",
     liveLead: "When demo mode is on, this list comes from the API — fictional companies only, no login.",
     liveSourceDb: "Seeded demo account.",
-    liveLoading: "Loading live preview…",
-    liveOffline: "Demo offline",
-    liveOfflineHint: "The live preview is temporarily unavailable — try again in a moment.",
-    signUpToApply: "Sign up to apply",
-    liveInterviewHint: "Upcoming interview hold",
     liveLoading: "Loading live rankings…",
     liveOffline: "Live rankings are temporarily unavailable",
     liveOfflineHint:
       "The API snapshot is empty or unreachable. Marketing still works — sign up or open the full demo; ops can refresh seed via scripts/seed-investor-demo.py.",
+    signUpToApply: "Sign up to apply",
+    liveInterviewHint: "Upcoming interview hold",
     fullExperienceCta: "Open full auto-apply demo",
     footerNote:
       "GDPR: real accounts require explicit consent at registration. This page uses only fictional data suitable for a public demo.",
@@ -5064,10 +5061,6 @@ const pl: MessageTree = {
       "Migawka API jest pusta albo niedostępna. Marketing działa dalej — załóż konto lub otwórz pełne demo; ops może odświeżyć seed przez scripts/seed-investor-demo.py.",
     signUpToApply: "Załóż konto, by aplikować",
     liveInterviewHint: "Zaplanowana rozmowa",
-    liveLoading: "Ładowanie rankingu na żywo…",
-    liveOffline: "Ranking na żywo jest chwilowo niedostępny",
-    liveOfflineHint:
-      "Migawka API jest pusta albo niedostępna. Marketing działa dalej — załóż konto lub otwórz pełne demo; ops może odświeżyć seed przez scripts/seed-investor-demo.py.",
     fullExperienceCta: "Pełne demo auto-aplikacji",
     footerNote:
       "RODO: prawdziwe konta wymagają wyraźnej zgody przy rejestracji. Ta strona używa wyłącznie fikcyjnych danych nadających się do publicznego demo.",
