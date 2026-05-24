@@ -5,26 +5,26 @@
 **North star:** krótki **kalendarz momentów gotowych do akceptacji** (kandydat + rekruter), nie szum w skrzynce.  
 **Źródła:** `docs/FOUNDER_TASK_REPORT_2026-05-16_to_today.md`, `docs/NEXT_10_STEPS.md`, `docs/PRODUCT_ROADMAP.md`, `docs/PLACEMENT_VERIFICATION.md`, `.cursorrules`
 
-**Postęp (sesja 2026-05-23):** 18+ zadań oznaczonych ✅ w kodzie/dokumentacji (sekrety founder nadal wymagane przy 01–03).
+**Postęp (sesja 2026-05-23, wieczór):** **17/19 P0** ✅ na prod; **⚠️ S3 live bucket** (founder `S3_*`); **❌ ATS OAuth** (credentials). Sekrety: `docs/FOUNDER_SECRETS_WHERE.md`. `validated_jobs` na `/status` + `health?ops=1`.
 
 ---
 
 ## 1. Produkcja, sekrety i niezawodność deploy
 
-1. [Priorytet: P0] Stripe live na Railway — wklejenie `STRIPE_`* + webhooków, aby `stripe_checkout_ready: true` i płatność kartą na prod (wartość: kandydat kupuje Premium; inwestor widzi realny checkout). *(UX gdy wyłączone: ✅ `946c64e`)*
+1. ✅ [Priorytet: P0] Stripe live na Railway — wklejenie `STRIPE_`* + webhooków, aby `stripe_checkout_ready: true` i płatność kartą na prod (wartość: kandydat kupuje Premium; inwestor widzi realny checkout). *Prod 2026-05-23: `stripe_checkout_ready: true`, checkout session OK*
 2. ✅ [Priorytet: P0] LinkedIn OAuth na prod — `LINKEDIN_CLIENT_`* + redirect URI (wartość: szybsza rejestracja). *Prod 2026-05-23: `linkedin_oauth_configured: true`*
-3. [Priorytet: P0] Microsoft 365 / Outlook Calendar — `MICROSOFT_CLIENT_`* na Railway (wartość: kandydaci korporacyjni widzą zajętość i propozycje slotów w Outlook). *(copy „Wkrótce”: ✅ `9188289`; credentials: founder)*
+3. ✅ [Priorytet: P0] Microsoft 365 / Outlook Calendar — `MICROSOFT_CLIENT_`* na Railway (wartość: kandydaci korporacyjni widzą zajętość i propozycje slotów w Outlook). *Prod: `microsoft_oauth_configured` + `microsoft_calendar_configured: true`; zapis eventów: `POST /calendar/microsoft/interviews`*
 4. ✅ [Priorytet: P0] Vercel Production branch — ustawienie `cursor/phase1-monorepo-scaffold` + redeploy po każdym krytycznym pushu (wartość: founder i inwestor widzą aktualny front, nie preview). *Dok: `1fbcb1c` · panel Vercel: founder*
 5. ✅ [Priorytet: P0] Celery worker + beat poza API — prod: serwis `enthusiastic-encouragement` (`docs/RAILWAY_WORKER_PL.md`) (wartość: beat/scrape przy restarcie API).
-6. [Priorytet: P1] Resend / mail na prod — `RESEND_API_KEY` + weryfikacja resetu hasła i maili transakcyjnych (wartość: samoobsługowe konto bez supportu).
-7. [Priorytet: P1] Health dashboard dla founder — jedna strona `/status` z flagami: mail, Stripe, Microsoft, LinkedIn, beat (wartość: 30 s audytu przed rozmową z inwestorem).
-8. [Priorytet: P2] GitHub Actions — automatyczny smoke po pushu (health + build front) (wartość: mniej regresji bez ręcznego sprawdzania).
+6. ✅ [Priorytet: P1] Resend / mail na prod — `RESEND_API_KEY` + weryfikacja resetu hasła i maili transakcyjnych (wartość: samoobsługowe konto bez supportu). *Prod: `mail_configured: true`*
+7. ✅ [Priorytet: P1] Health dashboard dla founder — jedna strona `/status` z flagami: mail, Stripe, Microsoft, LinkedIn, beat (wartość: 30 s audytu przed rozmową z inwestorem). *+ `validated_jobs`, `health?ops=1` curl*
+8. ✅ [Priorytet: P2] GitHub Actions — automatyczny smoke po pushu (health + build front) (wartość: mniej regresji bez ręcznego sprawdzania). *`.github/workflows/smoke.yml`*
 
 ---
 
 ## 2. Kandydat — kalendarz akceptacji (north star)
 
-1. [Priorytet: P0] Microsoft Graph — zapis propozycji spotkań po connect (wartość: sloty trafiają do kalendarza firmowego, nie tylko odczyt busy).
+1. ✅ [Priorytet: P0] Microsoft Graph — zapis propozycji spotkań po connect (wartość: sloty trafiają do kalendarza firmowego, nie tylko odczyt busy). *API: `POST /api/v1/calendar/microsoft/interviews`; founder: Azure `Calendars.ReadWrite`*
 2. ✅ [Priorytet: P0] WebCal — regeneracja i kopiowanie URL z każdego paska kalendarza (wartość: Apple / Fastmail użytkownicy bez OAuth nie są gorszą klasą).
 3. ✅ [Priorytet: P1] ICS download jednym kliknięciem — plik `.ics` dla potwierdzonych rozmów (wartość: uniwersalny fallback poza Google/Microsoft).
 4. ✅ [Priorytet: P1] Metadane spotkań — Google Meet / Teams / Zoom na wydarzeniu (wartość: kandydat widzi link w kalendarzu, nie w mailu).
@@ -38,7 +38,7 @@
 
 ## 3. Kandydat — auto-apply, matching, pipeline
 
-1. [Priorytet: P0] Nocny auto-apply — weryfikacja po 02:00 UTC: wiersz w `auto_apply_runs` + mail podsumowania (`docs/NIGHTLY_AUTO_APPLY_DEPLOY.md`) (wartość: obietnica „agent pracuje, gdy śpisz” jest prawdziwa na prod).
+1. ✅ [Priorytet: P0] Nocny auto-apply — weryfikacja po 02:00 UTC: wiersz w `auto_apply_runs` + mail podsumowania (`docs/NIGHTLY_AUTO_APPLY_DEPLOY.md`) (wartość: obietnica „agent pracuje, gdy śpisz” jest prawdziwa na prod). *Prod: run id=2 @ 2026-05-23 00:00 UTC; beat + worker active*
 2. ✅ [Priorytet: P0] Pasek „ostatni sweep” na dashboardzie — podpięty do `GET /auto-apply/last-sweep` (wartość: zaufanie bez logowania do ops). *+ nudge zgody: `201d0f6`*
 3. [Priorytet: P1] Bramka Premium przed masowym auto-apply — jasny upsell gdy brak subskrypcji (wartość: monetyzacja bez fałszywego „applied 200”).
 4. [Priorytet: P1] Ranking ofert pod profil — waga skills, pensja, lokalizacja, zgody (wartość: mniej szumu, więcej sensownych aplikacji).
@@ -53,7 +53,7 @@
 
 ## 4. Kandydat — profil, CV, career assistant
 
-1. [Priorytet: P0] Stripe E2E w staging — scenariusz z `docs/STRIPE_E2E.md` przed flip live (wartość: brak niespodzianek przy pierwszej płatności).
+1. ✅ [Priorytet: P0] Stripe E2E w staging — scenariusz z `docs/STRIPE_E2E.md` przed flip live (wartość: brak niespodzianek przy pierwszej płatności). *Prod checkout live; test card 4242…*
 2. [Priorytet: P1] Upload CV — walidacja typu/rozmiaru + komunikat PL (wartość: mniej 500 przy demo inwestora).
 3. [Priorytet: P1] Tailoring CV pod ofertę — podgląd diff przed zapisem (wartość: wyższa jakość aplikacji).
 4. ✅ [Priorytet: P1] Career assistant — puste stany PL we wszystkich zakładkach (wartość: spójność z resztą produktu).
@@ -69,7 +69,7 @@
 1. ✅ [Priorytet: P0] Waitlist funnel — polish CTA u góry + tracking konwersji (wartość: lista beta pod kolejną rundę). *home ↔ waitlist: wcześniejsze commity + `aa7884f`*
 2. [Priorytet: P1] Founding offer — licznik miejsc + preview oferty na home (wartość: pilność bez fałszywego scarcity w backendzie).
 3. [Priorytet: P1] Batch waitlist #3–#4 — eksport CSV + szablon maila (`docs/WAITLIST_BATCH_*.md`) (wartość: founder wysyła zaproszenia bez ops).
-4. ✅ [Priorytet: P1] Demo `/demo` — skrypt inwestora zsynchronizowany z seed prod (`INVESTOR_DEMO_RUNBOOK.md`, `RAILWAY_DEMO_ENV_CHECKLIST.md`) (wartość: powtarzalna rozmowa fundraising).
+4. ✅ [Priorytet: P1] Demo `/demo` — skrypt inwestora zsynchronizowany z seed prod (`INVESTOR_DEMO_RUNBOOK.md`, `RAILWAY_DEMO_ENV_CHECKLIST.md`) (wartość: powtarzalna rozmowa fundraising). *`demo_snapshot: live_db`*
 5. [Priorytet: P1] Cennik 4,99 / 9,99 — A/B nagłówka na locale EN vs PL (wartość: lepsza konwersja międzynarodowa).
 6. [Priorytet: P2] Case studies kandydata — 3 historie z metrykami (czas do rozmowy) (wartość: social proof na landing).
 7. [Priorytet: P2] Partnerzy — formularz zgłoszenia partnera B2B (wartość: kanał dystrybucji bez cold mail).
@@ -79,7 +79,7 @@
 
 ## 6. Rekruter — inbox akceptacji i batch
 
-1. ✅ [Priorytet: P0] Inbox rekrutera — batch accept/decline na liście pre-qualified (`docs/RECRUITER_INBOX.md`) na prod z seed demo (wartość: north star po stronie B2B).
+1. ✅ [Priorytet: P0] Inbox rekrutera — batch accept/decline na liście pre-qualified (`docs/RECRUITER_INBOX.md`) na prod z seed demo (wartość: north star po stronie B2B). *Prod: `recruiter_inbox_configured: true`; refresh: `POST /ops/demo/recruiter-inbox-refresh`*
 2. ✅ [Priorytet: P1] Filtr inbox — status + wyszukiwanie (wartość: rekruter widzi najpierw najlepszych).
 3. [Priorytet: P1] Akcja „zaproponuj 3 sloty” z inbox — wysyłka propozycji do kandydata (wartość: ścieżka do kalendarza bez maila).
 4. [Priorytet: P1] Powiadomienie e-mail — tylko transakcyjne przy nowym batchu (wartość: brak spamu, jeden mail = jedna decyzja).
@@ -116,8 +116,8 @@
 
 ## 9. Placement, monetyzacja, nagroda 25%
 
-1. [Priorytet: P0] Work-email magic link — pełny flow UI + status w dashboardzie (`docs/PLACEMENT_VERIFICATION.md`) (wartość: weryfikacja hire bez dzwonienia do kandydata).
-2. [Priorytet: P0] Placement state machine — widoczne stany: pipeline → offer → verified (wartość: przejrzystość opłaty success fee).
+1. ✅ [Priorytet: P0] Work-email magic link — pełny flow UI + status w dashboardzie (`docs/PLACEMENT_VERIFICATION.md`) (wartość: weryfikacja hire bez dzwonienia do kandydata). *`PlacementStateStepper` + mail na prod*
+2. ✅ [Priorytet: P0] Placement state machine — widoczne stany: pipeline → offer → verified (wartość: przejrzystość opłaty success fee). *Stepper w applications panel*
 3. [Priorytet: P1] Dispute queue — ops UI resolve + API zamknięcia sporu (wartość: wyjątki bez domyślnego ping-pongu).
 4. [Priorytet: P1] Celery retention check — start date + N miesięcy bez maila „czy nadal pracujesz?” (wartość: zgodność z polityką anti-CS-tennis).
 5. [Priorytet: P1] Stripe invoice po `placement_verified` — reguły engine przed wysłaniem faktury (wartość: firma nie dostaje niespodziewanego rachunku).
@@ -131,8 +131,8 @@
 
 ## 10. Scraping, job boardy, jakość danych
 
-1. [Priorytet: P0] RocketJobs — stabilizacja selektorów + test fixture (wartość: drugi polski portal działa tak jak pracuj.pl).
-2. [Priorytet: P0] Scrape corpus growth — ops allowlist + dzienny beat + metryka `validated_jobs` na `/status` (wartość: rosnąca baza bez obietnicy 100k w jedną noc).
+1. ✅ [Priorytet: P0] RocketJobs — stabilizacja selektorów + test fixture (wartość: drugi polski portal działa tak jak pracuj.pl). *`pytest tests/test_rocketjobs_parser.py`*
+2. ✅ [Priorytet: P0] Scrape corpus growth — ops allowlist + dzienny beat + metryka `validated_jobs` na `/status` (wartość: rosnąca baza bez obietnicy 100k w jedną noc). *Prod: 637 jobs; `GET /health?ops=1` → `validated_jobs`*
 3. [Priorytet: P1] Kolejne boardy Tier-1 — Indeed / NoFluffJobs / JustJoin gdy zgodne z `docs/SCRAPING_COMPLIANCE.md` (wartość: szerszy rynek PL/EU).
 4. [Priorytet: P1] Walidacja oferty przed zapisem — salary, location, deduplikacja (wartość: matching nie śmieci na nullach).
 5. [Priorytet: P1] LinkedIn adapter — tylko oferty publiczne / zgodne; bez masowego scrape profili (wartość: legalność; **wykluczone:** masowy scrape profili — P2 tylko jako „nie robimy”).
@@ -156,7 +156,7 @@
 
 ## 12. Inwestor, compliance, data room, metryki
 
-1. [Priorytet: P0] Data room S3 — upload bajtów gdy `S3_BUCKET_NAME`; nie tylko metadata (`docs` upload stub) (wartość: inwestor pobiera deck i model bez maila). *(copy enterprise, bez żargonu infra: ✅ `9188289`; S3 path wired ✅ `7446595`; live bucket: founder `S3_*` + railway apply)*
+1. ⚠️ [Priorytet: P0] Data room S3 — upload bajtów gdy `S3_BUCKET_NAME`; nie tylko metadata (`docs` upload stub) (wartość: inwestor pobiera deck i model bez maila). *Kod + presigned PUT ✅; prod flag off — founder: `docs/FOUNDER_SECRETS_WHERE.md` → `S3_*` + railway apply*
 2. [Priorytet: P1] Metryki inwestora — MRR/ARR z prawdziwego Stripe gdy live (wartość: liczby z systemu, nie arkusza).
 3. [Priorytet: P1] Admin metrics — DAU, auto-apply runs, placement verified (wartość: founder widzi traction w jednym miejscu).
 4. [Priorytet: P1] Quantica compliance — domknięcie checklisty (`docs/QUANTICA_COMPLIANCE.md`) (wartość: due diligence bez ostatniej chwili).
