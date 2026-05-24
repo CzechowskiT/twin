@@ -39,9 +39,14 @@ HTTP 200 does not replace visual capture; use for CI sanity only.
 
 | Asset | Status |
 |-------|--------|
-| `01-demo-live-preview.png` | captured |
-| `02-demo-ranked-roles.png` | captured |
-| `03`–`08` | placeholder — capture before investor send |
+| `01-demo-live-preview.png` | captured (prod, 1440×900, 2026-05-24) |
+| `02-demo-ranked-roles.png` | captured (prod, ranked roles panel) |
+| `03-investor-metrics.png` | **pending** — route redirects to `/workspace/investor` when signed in; capture logged-out or use investor session |
+| `04-investor-calculator.png` | **pending** — same redirect; open `/investor/calculator` with slider guide expanded |
+| `05-investor-calculator-kpis.png` | **pending** |
+| `06-dashboard-pipeline.png` | **pending** — requires candidate login |
+| `07-billing-plans.png` | **pending** — `/dashboard/billing` |
+| `08-jobs-competitive.png` | **pending** — `/workspace/candidate/jobs` |
 
 ## Related
 

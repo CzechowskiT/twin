@@ -1,8 +1,8 @@
 # TWIN — founder status (live)
 
-**Updated:** 2026-05-22 (autonomous status + P0 completion session)  
+**Updated:** 2026-05-24 (status rollup + prod alignment check)  
 **Branch:** `cursor/phase1-monorepo-scaffold`  
-**One-liner:** **17/19 P0 ✅** on prod; S3 bucket ⚠️ founder-only; ATS OAuth ❌ backlog; CI smoke workflow added (push may need PAT `workflow` scope).
+**One-liner:** **Prod API = scaffold HEAD (`e83e1c7`)**; smoke CI blocked on PAT `workflow` scope; investor audit PNGs `01`–`02` captured.
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Surface | Status |
 |---------|--------|
-| API deploy | **5cb9d06** (scaffold HEAD; prod `git_commit` matches) |
+| API deploy | **e83e1c7** (scaffold HEAD; prod `git_commit` matches) |
 | Vercel front | https://twin-sooty.vercel.app/status |
 | Demo verify | **PASS** (`live_db`, top matches) — `/demo` shows offline banner when snapshot stale |
 | LinkedIn OAuth | **Live** (`linkedin_oauth_configured: true`) |
@@ -30,12 +30,19 @@ API: `curl -s "https://twin-production-bcd9.up.railway.app/api/v1/health?ops=1&d
 
 ---
 
-## Shipped this session (2026-05-22)
+## Shipped since 2026-05-22 (scaffold, on prod)
 
-1. **i18n merge conflict** in `sliderGuideLead` (PL/EN) — blocked `npm run build`; resolved user-facing copy without internal constant names.
-2. **GitHub Actions** `smoke.yml` restored from `cursor/ci-smoke-workflow`.
-3. **Frontend build** green; **28 pytest** P0 subset green (incl. OpenAPI prod guard).
-4. **FOUNDER_STATUS_LIVE.md** refreshed with prod/scaffold SHA alignment.
+| Commit | Topic |
+|--------|--------|
+| `34a2289` | Forecast auto-apply toast + API test |
+| `619bb8b` / `6691af8` | Auto-apply buttons on opportunity forecast |
+| `d119c02` | Greenhouse ×8 employers in per-board scrape API |
+| `8fd3910` | Investor metrics pipeline card when placement revenue = 0 |
+| `c5cb1b6` | Calculator slider guide table open by default |
+| `e83e1c7` | Global scrapers (ZipRecruiter parser, honest portal badges) |
+| `062ca63` | Investor audit screenshot README |
+
+**This session (2026-05-24):** prod health script PASS; `npm run build` PASS; pytest subset 21 PASS; audit PNGs `01`–`02` on prod; `smoke.yml` ready locally — **push blocked** (PAT without `workflow` scope).
 
 ---
 
