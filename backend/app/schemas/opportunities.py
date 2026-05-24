@@ -19,6 +19,7 @@ class ForecastJobOut(BaseModel):
     missing_skills: list[str]
     opportunity_type: str
     learning_path: list[dict[str, str]]
+    learning_path_source: str = "deterministic"
 
 
 class OpportunityForecastOut(BaseModel):
@@ -29,6 +30,7 @@ class OpportunityForecastOut(BaseModel):
     scanned_jobs: int
     summary: dict[str, int]
     paywall: dict[str, str] | None = None
+    learning_path_paywall: dict[str, str] | None = None
 
 
 class UnifiedFeedItemOut(BaseModel):

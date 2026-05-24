@@ -10,6 +10,7 @@ from app.core.subscription_gates import Feature, feature_allowed, forecast_limit
 from app.database.models import User
 from app.database.session import get_db
 from app.schemas.opportunities import OpportunityForecastOut, UnifiedFeedItemOut, UnifiedFeedOut
+from app.services.anthropic_client import is_anthropic_configured
 from app.services.career_assistant_common import get_candidate_for_user
 from app.services.opportunity_forecaster import forecast_opportunities
 from app.services.request_locale import locale_from_request
@@ -28,11 +29,21 @@ def get_opportunity_forecast(
     candidate = get_candidate_for_user(db, current_user.id)
     locale = locale_from_request(request)
     limit = forecast_limit_for_user(current_user)
-    data = forecast_opportunities(db, candidate, limit_per_band=limit, locale=locale)
+    ai_paths = feature_allowed(current_user, Feature.LEARNING_PATH_AI) and is_anthropic_configured()
+    data = forecast_opportunities(
+        db,
+        candidate,
+        limit_per_band=limit,
+        locale=locale,
+        use_ai_learning_paths=ai_paths,
+    )
     paywall = None if feature_allowed(current_user, Feature.OPPORTUNITY_FORECAST_FULL) else paywall_for_feature(
         Feature.OPPORTUNITY_FORECAST_FULL
     )
-    return OpportunityForecastOut(paywall=paywall, **data)
+    learning_path_paywall = None
+    if is_anthropic_configured() and not feature_allowed(current_user, Feature.LEARNING_PATH_AI):
+        learning_path_paywall = paywall_for_feature(Feature.LEARNING_PATH_AI)
+    return OpportunityForecastOut(paywall=paywall, learning_path_paywall=learning_path_paywall, **data)
 
 
 @router.get("/unified-feed", response_model=UnifiedFeedOut)
