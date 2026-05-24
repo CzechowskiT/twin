@@ -881,6 +881,11 @@ export default function DashboardCalendarPage() {
                       </span>
                       <span className="twin-muted mt-1 block text-xs">
                         {formatInterviewRange(row.interview_start, row.interview_end, loc)}
+                        {row.timezone?.trim() ? (
+                          <span className="mt-0.5 block text-[10px] uppercase tracking-wide text-[var(--twin-muted)]">
+                            {t("dashboard.calendarInterviewTimezone").replace("{tz}", row.timezone.trim())}
+                          </span>
+                        ) : null}
                       </span>
                       {row.meeting_link?.trim() ? (
                         <span className="mt-1 flex flex-wrap items-center gap-2">

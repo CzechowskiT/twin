@@ -144,7 +144,17 @@ export default function AcceptanceQueuePage() {
         {loading ? <p className="twin-muted text-sm">{t("acceptanceQueue.loading")}</p> : null}
         {err ? <p className="mb-4 text-sm text-red-600">{err}</p> : null}
         {!loading && queue && queue.total === 0 ? (
-          <p className="twin-muted text-sm">{t("acceptanceQueue.empty")}</p>
+          <div
+            className="rounded-xl border border-dashed border-[var(--twin-border)] bg-[var(--twin-surface-2)]/60 px-4 py-5"
+            role="status"
+          >
+            <p className="font-semibold text-[var(--foreground)]">{t("acceptanceQueue.emptyTitle")}</p>
+            <p className="twin-muted mt-2 text-sm leading-relaxed">{t("acceptanceQueue.emptyHint")}</p>
+            <p className="twin-muted mt-2 text-xs leading-relaxed">{t("acceptanceQueue.empty")}</p>
+            <Link href="/dashboard#dashboard-matches" className="twin-link mt-4 inline-block text-sm font-medium">
+              {t("acceptanceQueue.emptyCta")} →
+            </Link>
+          </div>
         ) : (
           <ul className="space-y-3">{listItems}</ul>
         )}

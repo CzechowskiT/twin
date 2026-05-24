@@ -1010,6 +1010,7 @@ const en = {
     calendarOpenGoogle: "Open in Google Calendar",
     calendarInterviewsTitle: "Upcoming interviews",
     calendarInterviewsEmpty: "Nothing on the horizon yet. When TWIN books a slot, it shows up here and in Google Calendar.",
+    calendarInterviewTimezone: "Times in {tz}",
     calendarShowCancelledInterviews: "Show cancelled interviews",
     calendarScheduleTitle: "Schedule an interview",
     calendarScheduleHint:
@@ -1984,6 +1985,10 @@ const en = {
     lead: "A short list of interviews and high-fit roles — accept what is worth your calendar, decline the rest.",
     loading: "Loading…",
     empty: "Nothing waiting right now. Check back after matching runs or when a recruiter proposes a slot.",
+    emptyTitle: "Your acceptance calendar is clear",
+    emptyHint:
+      "TWIN surfaces interview holds and strong matches here — not thousands of raw applications. Run matching from the dashboard or connect a calendar so new slots can land when recruiters propose times.",
+    emptyCta: "Open matches on dashboard",
     back: "Back to dashboard",
     interviewBadge: "Interview",
     matchBadge: "Strong match",
@@ -2458,11 +2463,15 @@ const en = {
     liveTitle: "Ranked roles (read-only)",
     liveLead: "When demo mode is on, this list comes from the API — fictional companies only, no login.",
     liveSourceDb: "Seeded demo account.",
-    signUpToApply: "Sign up to apply",
-    liveInterviewHint: "Upcoming interview hold",
+    liveLoading: "Loading live preview…",
     liveOffline: "Demo offline",
     liveOfflineHint: "The live preview is temporarily unavailable — try again in a moment.",
-    liveLoading: "Loading live preview…",
+    signUpToApply: "Sign up to apply",
+    liveInterviewHint: "Upcoming interview hold",
+    liveLoading: "Loading live rankings…",
+    liveOffline: "Live rankings are temporarily unavailable",
+    liveOfflineHint:
+      "The API snapshot is empty or unreachable. Marketing still works — sign up or open the full demo; ops can refresh seed via scripts/seed-investor-demo.py.",
     fullExperienceCta: "Open full auto-apply demo",
     footerNote:
       "GDPR: real accounts require explicit consent at registration. This page uses only fictional data suitable for a public demo.",
@@ -3578,6 +3587,7 @@ const pl: MessageTree = {
     calendarInterviewsTitle: "Nadchodzące rozmowy",
     calendarInterviewsEmpty:
       "Na razie pusto. Gdy TWIN zarezerwuje slot, pojawi się tu i w Google Calendar.",
+    calendarInterviewTimezone: "Godziny w strefie {tz}",
     calendarShowCancelledInterviews: "Pokaż odwołane rozmowy",
     calendarScheduleTitle: "Zaplanuj rozmowę",
     calendarScheduleHint:
@@ -4562,6 +4572,10 @@ const pl: MessageTree = {
     lead: "Krótka lista rozmów i dopasowań — zaakceptuj to, co warto kalendarza, odrzuć resztę.",
     loading: "Ładowanie…",
     empty: "Na razie nic nie czeka. Wróć po kolejnym dopasowaniu lub propozycji terminu.",
+    emptyTitle: "Kalendarz akceptacji jest na razie pusty",
+    emptyHint:
+      "TWIN pokazuje tu rezerwacje rozmów i silne dopasowania — nie tysiące surowych CV. Uruchom dopasowanie z panelu albo podłącz kalendarz, żeby nowe sloty mogły trafić, gdy rekruter zaproponuje termin.",
+    emptyCta: "Przejdź do dopasowań w panelu",
     back: "Wróć do panelu",
     interviewBadge: "Rozmowa",
     matchBadge: "Silne dopasowanie",
@@ -4898,7 +4912,11 @@ const pl: MessageTree = {
     linkB2b: "Otwórz porównanie agencja vs model TWIN (B2B ROI) →",
     sliderGuideTitle: "Jak liczyć suwaki?",
     sliderGuideLead:
+<<<<<<< HEAD
       "Bazowe założenia scenariusza Organiczny. Domyślne wartości = INVESTOR_CALCULATOR_DEFAULTS; inny scenariusz szybki nadpisuje część suwaków.",
+=======
+      "Domyślne wartości poniżej odpowiadają modelowi po załadowaniu. Suwaki służą do testów MRR, ekonomii placement i kosztów — to nie prognoza.",
+>>>>>>> 8d4421f (feat(i18n): PL/EN keys for investor slider guide and demo offline banner)
     sliderGuideColSlider: "Suwak",
     sliderGuideColWhat: "Co to jest",
     sliderGuideColDefault: "Domyślnie",
@@ -5040,11 +5058,16 @@ const pl: MessageTree = {
     liveTitle: "Ranking ofert (tylko odczyt)",
     liveLead: "Gdy demo mode jest włączone, lista pochodzi z API — fikcyjne firmy, bez logowania.",
     liveSourceDb: "Konto demo z seeda.",
+    liveLoading: "Ładowanie rankingu na żywo…",
+    liveOffline: "Ranking na żywo jest chwilowo niedostępny",
+    liveOfflineHint:
+      "Migawka API jest pusta albo niedostępna. Marketing działa dalej — załóż konto lub otwórz pełne demo; ops może odświeżyć seed przez scripts/seed-investor-demo.py.",
     signUpToApply: "Załóż konto, by aplikować",
     liveInterviewHint: "Zaplanowana rozmowa",
-    liveOffline: "Demo niedostępne",
-    liveOfflineHint: "Podgląd na żywo chwilowo niedostępny — spróbuj za chwilę.",
-    liveLoading: "Ładowanie podglądu…",
+    liveLoading: "Ładowanie rankingu na żywo…",
+    liveOffline: "Ranking na żywo jest chwilowo niedostępny",
+    liveOfflineHint:
+      "Migawka API jest pusta albo niedostępna. Marketing działa dalej — załóż konto lub otwórz pełne demo; ops może odświeżyć seed przez scripts/seed-investor-demo.py.",
     fullExperienceCta: "Pełne demo auto-aplikacji",
     footerNote:
       "RODO: prawdziwe konta wymagają wyraźnej zgody przy rejestracji. Ta strona używa wyłącznie fikcyjnych danych nadających się do publicznego demo.",
