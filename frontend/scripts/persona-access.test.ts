@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   headerSessionNavLinks,
   isSessionNavLinkActive,
+  momentumRailCtas,
   sessionPanelHref,
   sessionPersonaHomeRedirect,
 } from "../src/lib/persona-access";
@@ -55,4 +56,21 @@ test("sessionPersonaHomeRedirect still redirects cross-lane product routes", () 
     sessionPersonaHomeRedirect("/dashboard", "recruiter"),
     "/workspace/recruiter",
   );
+});
+
+test("momentumRailCtas sends recruiters to recruiter workspace, not candidate dashboard", () => {
+  const loggedOut = momentumRailCtas("/for-recruiters", "app", "recruiter", false);
+  assert.equal(loggedOut[0]?.href, "/workspace/recruiter");
+  assert.equal(loggedOut[0]?.labelKey, "site.momentumCtaWorkspace");
+  assert.equal(loggedOut[1]?.href, "/login/recruiter");
+
+  const loggedIn = momentumRailCtas("/for-recruiters", "app", "recruiter", true);
+  assert.equal(loggedIn[0]?.href, "/workspace/recruiter");
+  assert.equal(loggedIn[1]?.href, "/recruiter/inbox");
+});
+
+test("momentumRailCtas keeps candidate dashboard shortcuts on profile", () => {
+  const ctas = momentumRailCtas("/profile", "app", "candidate", true);
+  assert.equal(ctas[0]?.href, "/dashboard");
+  assert.equal(ctas[1]?.href, "/dashboard/billing");
 });

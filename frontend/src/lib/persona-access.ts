@@ -286,6 +286,108 @@ export function sessionPanelHref(persona: MarketingPersona): string {
   return WORKSPACE_PATH[persona];
 }
 
+export type MomentumRailCta = { href: string; labelKey: TranslationKey };
+
+function momentumSecondaryCta(persona: MarketingPersona, hasSession: boolean): MomentumRailCta {
+  if (persona === "candidate") {
+    return { href: "/profile", labelKey: "site.momentumCtaProfile" };
+  }
+  if (persona === "recruiter") {
+    return hasSession
+      ? { href: "/recruiter/inbox", labelKey: "recruiterInbox.title" }
+      : { href: LOGIN_PATH.recruiter, labelKey: "site.momentumCtaLogin" };
+  }
+  if (persona === "investor") {
+    return hasSession
+      ? { href: "/investor/metrics", labelKey: "investorMetrics.title" }
+      : { href: LOGIN_PATH.investor, labelKey: "site.momentumCtaLogin" };
+  }
+  return { href: REGISTER_PATH.company, labelKey: "site.footerCompanySignup" };
+}
+
+function defaultMomentumCtas(persona: MarketingPersona, hasSession: boolean): MomentumRailCta[] {
+  return [
+    { href: sessionPanelHref(persona), labelKey: "site.momentumCtaWorkspace" },
+    momentumSecondaryCta(persona, hasSession),
+  ];
+}
+
+/** Persona-aware shortcuts for the global momentum rail (footer of `Shell`). */
+export function momentumRailCtas(
+  pathname: string,
+  variant: "app" | "marketing",
+  persona: MarketingPersona,
+  hasSession: boolean,
+): MomentumRailCta[] {
+  if (variant === "marketing") {
+    return [
+      { href: "/register", labelKey: "site.momentumCtaRegister" },
+      { href: "/login", labelKey: "site.momentumCtaLogin" },
+      { href: "/faq", labelKey: "site.momentumCtaFaq" },
+    ];
+  }
+  if (pathname.startsWith("/admin")) {
+    return [{ href: "/", labelKey: "site.momentumCtaHome" }];
+  }
+  if (
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/register") ||
+    pathname.startsWith("/forgot-password") ||
+    pathname.startsWith("/reset-password") ||
+    pathname.startsWith("/auth/callback")
+  ) {
+    return [
+      { href: "/faq", labelKey: "site.momentumCtaFaq" },
+      pathname.startsWith("/login")
+        ? { href: "/register", labelKey: "site.momentumCtaRegister" }
+        : { href: "/login", labelKey: "site.momentumCtaLogin" },
+    ];
+  }
+  if (pathname.startsWith("/dashboard/calendar")) {
+    if (persona === "candidate") {
+      return [
+        { href: "/dashboard", labelKey: "site.momentumCtaWorkspace" },
+        { href: "/profile", labelKey: "site.momentumCtaProfile" },
+      ];
+    }
+    return [
+      { href: sessionPanelHref(persona), labelKey: "site.momentumCtaWorkspace" },
+      momentumSecondaryCta(persona, hasSession),
+    ];
+  }
+  if (pathname.startsWith("/dashboard")) {
+    if (persona !== "candidate") {
+      return defaultMomentumCtas(persona, hasSession);
+    }
+    return [
+      { href: "/profile", labelKey: "site.momentumCtaProfile" },
+      { href: "/dashboard/billing", labelKey: "dashboard.billingLink" },
+    ];
+  }
+  if (pathname.startsWith("/profile")) {
+    if (persona !== "candidate") {
+      return defaultMomentumCtas(persona, hasSession);
+    }
+    return [
+      { href: "/dashboard", labelKey: "site.momentumCtaWorkspace" },
+      { href: "/dashboard/billing", labelKey: "dashboard.billingLink" },
+    ];
+  }
+  if (pathname.startsWith("/workspace/recruiter") || pathname.startsWith("/recruiter")) {
+    return [
+      { href: "/recruiter/inbox", labelKey: "recruiterInbox.title" },
+      { href: "/for-recruiters", labelKey: "nav.forRecruiters" },
+    ];
+  }
+  if (pathname.startsWith("/workspace/investor") || pathname.startsWith("/investor")) {
+    return [
+      { href: "/investor/metrics", labelKey: "investorMetrics.title" },
+      { href: "/for-investors", labelKey: "nav.forInvestors" },
+    ];
+  }
+  return defaultMomentumCtas(persona, hasSession);
+}
+
 /** Kalendarz | Panel | Demo — same strip for every signed-in persona. */
 export function headerSessionNavLinks(
   persona: MarketingPersona,
