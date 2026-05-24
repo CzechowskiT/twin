@@ -135,7 +135,7 @@ def auto_apply_for_user(
     if not job:
         return ApplyOutcome.FAILED, _auto_apply_msg(loc, "job_not_found"), None
 
-    if settings.demo_mode_enabled and is_investor_demo_job(job):
+    if is_investor_demo_job(job):
         outcome = ApplyOutcome.FORM_FILLED if not submit else ApplyOutcome.SUBMITTED
         app = _upsert_application(db, candidate.id, job_id, outcome)
         app.auto_applied = True
