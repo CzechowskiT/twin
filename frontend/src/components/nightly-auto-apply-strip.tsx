@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "@/components/language-provider";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
+import { LOCALE_HTML_LANG, type TranslationKey } from "@/lib/i18n";
 
 type Settings = {
   is_active: boolean;
@@ -16,15 +17,71 @@ type Settings = {
   next_run_label: string;
 };
 
+type SweepBoardStat = {
+  board: string;
+  submitted: number;
+  failed: number;
+  skipped: number;
+};
+
 type LastSweep = {
   started_at: string | null;
   finished_at: string | null;
   total_applications_submitted: number;
   total_applications_failed: number;
+  total_applications_skipped: number;
+  boards: SweepBoardStat[];
+  is_demo_seed: boolean;
 };
 
+function formatSweepTime(iso: string, locale: string): string {
+  const date = new Date(iso);
+  const loc = LOCALE_HTML_LANG[locale as keyof typeof LOCALE_HTML_LANG] ?? locale;
+  return date.toLocaleString(loc, {
+    dateStyle: "short",
+    timeStyle: "short",
+    timeZone: locale === "pl" ? "Europe/Warsaw" : undefined,
+  });
+}
+
+function boardLabel(boards: SweepBoardStat[]): string {
+  const names = boards
+    .filter((b) => b.submitted > 0 || b.failed > 0)
+    .map((b) => b.board);
+  return names.length > 0 ? names.join(", ") : "pracuj.pl";
+}
+
+function sweepSummary(
+  sweep: LastSweep,
+  t: (key: TranslationKey) => string,
+): string | null {
+  const submitted = sweep.total_applications_submitted;
+  const failed = sweep.total_applications_failed;
+  const skipped = sweep.total_applications_skipped;
+  const boards = boardLabel(sweep.boards);
+
+  if (submitted === 0 && failed === 0 && skipped === 0) {
+    return null;
+  }
+  if (submitted > 0 && failed > 0) {
+    return t("dashboard.nightlyAutoApplySweepPartial")
+      .replace("{submitted}", String(submitted))
+      .replace("{failed}", String(failed))
+      .replace("{boards}", boards);
+  }
+  if (submitted > 0) {
+    return t("dashboard.nightlyAutoApplySweepSubmitted").replace("{count}", String(submitted));
+  }
+  if (failed > 0) {
+    return t("dashboard.nightlyAutoApplySweepFailedOnly")
+      .replace("{count}", String(failed))
+      .replace("{boards}", boards);
+  }
+  return t("dashboard.nightlyAutoApplySweepSkipped").replace("{count}", String(skipped));
+}
+
 export function NightlyAutoApplyStrip() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [settings, setSettings] = useState<Settings | null>(null);
   const [sweep, setSweep] = useState<LastSweep | null>(null);
 
@@ -42,6 +99,7 @@ export function NightlyAutoApplyStrip() {
   if (!settings) return null;
 
   const needsConsent = settings.profile_ready && !settings.consent_given_at && !settings.is_active;
+  const sweepSummaryText = sweep?.started_at ? sweepSummary(sweep, t) : null;
 
   return (
     <div className="mb-4 space-y-3">
@@ -78,18 +136,13 @@ export function NightlyAutoApplyStrip() {
             {settings.last_run_at ? (
               <p className="twin-muted mt-1 text-xs">
                 {t("dashboard.nightlyAutoApplyStatsLastRun")}:{" "}
-                {new Date(settings.last_run_at).toLocaleString()}
+                {formatSweepTime(settings.last_run_at, locale)}
               </p>
             ) : null}
             {sweep?.started_at ? (
               <p className="twin-muted mt-1 text-xs">
-                {t("dashboard.nightlyAutoApplyPlatformSweep")}: {new Date(sweep.started_at).toLocaleString()}
-                {sweep.total_applications_submitted > 0
-                  ? ` · ${sweep.total_applications_submitted} applied`
-                  : ""}
-                {sweep.total_applications_failed > 0
-                  ? ` · ${t("dashboard.nightlyAutoApplySweepFailed").replace("{count}", String(sweep.total_applications_failed))}`
-                  : ""}
+                {t("dashboard.nightlyAutoApplyPlatformSweep")}: {formatSweepTime(sweep.started_at, locale)}
+                {sweepSummaryText ? ` · ${sweepSummaryText}` : ""}
               </p>
             ) : (
               <p className="twin-muted mt-1 text-xs">{t("dashboard.nightlyAutoApplyPlatformSweepNone")}</p>

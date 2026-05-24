@@ -837,7 +837,10 @@ const en = {
     nightlyAutoApplyConsentNudgeCta: "Review consent & settings",
     nightlyAutoApplyPlatformSweep: "Last platform sweep",
     nightlyAutoApplyPlatformSweepNone: "No scheduled sweep recorded yet",
-    nightlyAutoApplySweepFailed: "{count} failed in last sweep",
+    nightlyAutoApplySweepSubmitted: "{count} submitted",
+    nightlyAutoApplySweepPartial: "{submitted} submitted · {failed} could not complete ({boards})",
+    nightlyAutoApplySweepFailedOnly: "{count} could not complete ({boards})",
+    nightlyAutoApplySweepSkipped: "{count} skipped (cooldown or blocklist)",
     workspaceGateTitleRecruiter: "Recruiter workspace",
     workspaceGateTitleCompany: "Company workspace",
     workspaceGateLeadRecruiter:
@@ -3289,7 +3292,10 @@ const pl: MessageTree = {
     nightlyAutoApplyConsentNudgeCta: "Zgoda i ustawienia",
     nightlyAutoApplyPlatformSweep: "Ostatni sweep platformy",
     nightlyAutoApplyPlatformSweepNone: "Brak zarejestrowanego sweepu harmonogramu",
-    nightlyAutoApplySweepFailed: "{count} nieudanych w ostatnim sweepsie",
+    nightlyAutoApplySweepSubmitted: "{count} wysłanych",
+    nightlyAutoApplySweepPartial: "{submitted} wysłanych · {failed} bez wysyłki ({boards})",
+    nightlyAutoApplySweepFailedOnly: "{count} bez wysyłki ({boards})",
+    nightlyAutoApplySweepSkipped: "{count} pominiętych (cooldown lub blocklist)",
     workspaceGateTitleRecruiter: "Widok rekrutera",
     workspaceGateTitleCompany: "Widok firmy",
     workspaceGateLeadRecruiter:

@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.core.security import create_access_token
-from app.database.models import Application, AutoApplyConsent, Base, Candidate, Job, JobMatch, User
+from app.database.models import Application, AutoApplyConsent, AutoApplyRun, Base, Candidate, Job, JobMatch, User
 from app.database.session import get_db
 from app.main import app
 
@@ -123,3 +123,38 @@ def test_consent_and_trigger(auto_apply_client, monkeypatch) -> None:
     consent = db.query(AutoApplyConsent).filter(AutoApplyConsent.candidate_id == candidate.id).first()
     assert consent is not None
     assert consent.consent_given_at is not None
+
+
+def test_last_sweep_returns_board_breakdown(auto_apply_client) -> None:
+    from datetime import datetime, timezone
+    import json
+
+    client, headers, db, _candidate, _job = auto_apply_client
+    db.add(
+        AutoApplyRun(
+            started_at=datetime(2026, 5, 24, 0, 0, tzinfo=timezone.utc),
+            finished_at=datetime(2026, 5, 24, 0, 5, tzinfo=timezone.utc),
+            total_users_processed=1,
+            total_applications_submitted=2,
+            total_applications_failed=0,
+            stats_json=json.dumps(
+                {
+                    "demo": True,
+                    "total_applications_skipped": 3,
+                    "boards": {"pracuj.pl": {"submitted": 2, "failed": 0, "skipped": 3}},
+                }
+            ),
+        )
+    )
+    db.commit()
+
+    res = client.get("/api/v1/auto-apply/last-sweep", headers=headers)
+    assert res.status_code == 200
+    body = res.json()
+    assert body["total_applications_submitted"] == 2
+    assert body["total_applications_failed"] == 0
+    assert body["total_applications_skipped"] == 3
+    assert body["is_demo_seed"] is True
+    assert body["boards"][0]["board"] == "pracuj.pl"
+    assert body["boards"][0]["skipped"] == 3
+    assert body["started_at"].endswith("+00:00") or body["started_at"].endswith("Z")
