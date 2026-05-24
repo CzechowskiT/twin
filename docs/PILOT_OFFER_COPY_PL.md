@@ -1,5 +1,7 @@
 # Pilot offer copy (PL + EN) — founder / landing / waitlist
 
+**Oferta kanoniczna (krótka, PL):** [PILOT_OFFER_FINAL.md](./PILOT_OFFER_FINAL.md)
+
 **Beachhead:** mid / senior tech, EU (remote-friendly), zmęczeni masowym aplikowaniem — chcą **krótkiego kalendarza rozmów**, nie inboxa ofert.
 
 **Pricing (pilot):** 7 dni · **49 PLN** (early) / **99 PLN** (standard) — jednorazowo lub jako trial przed subskrypcją; doprecyzuj w Stripe przed publikacją.
