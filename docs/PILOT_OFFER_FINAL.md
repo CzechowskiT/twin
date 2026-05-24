@@ -8,6 +8,18 @@
 
 ---
 
+## Founder — live linki
+
+| Co | Link |
+|----|------|
+| **Tracker kandydatów (Sheet)** | [Google Sheet — pilot tracker](https://docs.google.com/spreadsheets/d/1rJ0HbY8s3fFtIWoKwyEkDDBlebBUwXSA-pomThASx2k/edit?resourcekey=&gid=1795656044#gid=1795656044) |
+| **Formularz intake (edycja)** | [Google Form — edycja](https://docs.google.com/forms/d/1r-AfAaMCPMjueAsvN_NnhGovKccwPMEjRQU22YeEA8w/edit) |
+| **Rejestracja TWIN po kwalifikacji** | [Founding register + `utm_source=google_form`](https://twin-sooty.vercel.app/register/candidate?utm_campaign=founding1000&utm_source=google_form) |
+
+Publiczny link do wypełnienia formularza: w Formularzu Google → **Wyślij** → skopiuj link (`viewform` lub `forms.gle`) — szczegóły w [PILOT_TRACKER_GUIDE.md](./PILOT_TRACKER_GUIDE.md).
+
+---
+
 ## Co wchodzi w program founding
 
 - **CV** — analiza profilu pod matching (upload + profil w TWIN).

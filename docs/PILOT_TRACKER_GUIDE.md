@@ -2,20 +2,31 @@
 
 **Plik danych:** [PILOT_TRACKER.csv](./PILOT_TRACKER.csv) — jeden wiersz na kandydata founding / pilota.
 
-**Powiązane:** [PILOT_CANDIDATE_INTAKE.md](./PILOT_CANDIDATE_INTAKE.md) (intake, founding slot, checklist founder) · [PILOT_TRACTION_DASHBOARD.md](./PILOT_TRACTION_DASHBOARD.md) (metryki tygodniowe, north star) · [PILOT_OFFER_FINAL.md](./PILOT_OFFER_FINAL.md) (copy founding free).
+**Powiązane:** [PILOT_CANDIDATE_INTAKE.md](./PILOT_CANDIDATE_INTAKE.md) (intake, founding slot, checklist founder) · [PILOT_TRACTION_DASHBOARD.md](./PILOT_TRACTION_DASHBOARD.md) (metryki tygodniowe, north star).
 
 ---
 
 ## Founder — live linki (operacyjne)
 
-| Co | Link | Uwaga |
-|----|------|--------|
-| **Tracker (Google Sheet)** | [Otwórz arkusz](https://docs.google.com/spreadsheets/d/1rJ0HbY8s3fFtIWoKwyEkDDBlebBUwXSA-pomThASx2k/edit?gid=1795656044) | Jeden wiersz = jeden kandydat; uzupełniaj statusy ręcznie po rejestracji w TWIN |
-| **Formularz zapisu (edycja)** | [Edytuj formularz](https://docs.google.com/forms/d/1r-AfAaMCPMjueAsvN_NnhGovKccwPMEjRQU22YeEA8w/edit) | Tylko dla Ciebie — zmiana pytań |
-| **Formularz zapisu (publiczny)** | [Link do wysyłki](https://docs.google.com/forms/d/1r-AfAaMCPMjueAsvN_NnhGovKccwPMEjRQU22YeEA8w/viewform) | Ten link dajesz kandydatom (LinkedIn, mail) |
-| **Rejestracja TWIN (po kwalifikacji)** | [Founding register](https://twin-sooty.vercel.app/register/candidate?utm_campaign=founding1000&utm_source=google_form) | Wyślij **po** `qualified` w arkuszu |
+| Artefakt | Link | Kto używa |
+|----------|------|-----------|
+| **Tracker (Google Sheet)** | [Otwórz arkusz pilota](https://docs.google.com/spreadsheets/d/1rJ0HbY8s3fFtIWoKwyEkDDBlebBUwXSA-pomThASx2k/edit?resourcekey=&gid=1795656044#gid=1795656044) | Founder — jeden wiersz na kandydata, aktualizacja po każdym etapie |
+| **Formularz intake (edycja)** | [Edytuj formularz Google](https://docs.google.com/forms/d/1r-AfAaMCPMjueAsvN_NnhGovKccwPMEjRQU22YeEA8w/edit) | Founder — pytania, logika, podgląd odpowiedzi |
+| **Rejestracja TWIN (po kwalifikacji)** | [register/candidate — founding1000 + google_form](https://twin-sooty.vercel.app/register/candidate?utm_campaign=founding1000&utm_source=google_form) | Kandydat **qualified** — wstaw w potwierdzeniu formularza, mailu lub DM |
 
-**Flow:** Formularz → nowy wiersz w Sheet → kwalifikujesz → link rejestracji TWIN → uzupełniasz kolumny Registered, CV, rozmowy.
+### Publiczny link do wypełnienia formularza (dla kandydatów)
+
+**Nie udostępniaj linku `/edit`** — to panel founder. Publiczny link bierzesz z UI Formularza Google:
+
+1. Otwórz [formularz (edycja)](https://docs.google.com/forms/d/1r-AfAaMCPMjueAsvN_NnhGovKccwPMEjRQU22YeEA8w/edit).
+2. **Wyślij** (Send) → ikona **linku** → skopiuj URL.
+3. Typowe formaty publicznego linku:
+   - `https://docs.google.com/forms/d/e/1FAIpQLS…/viewform` (długi, stabilny),
+   - `https://forms.gle/…` (skrót — Google generuje go przy kopiowaniu linku z kroku 2; oba prowadzą do tego samego formularza).
+
+Wklej skopiowany link do postów, bio, maili i kampanii (`utm_source` w trackerze: np. `google_form`, `linkedin`, `founder_dm`). Po review odpowiedzi — **qualified** dostaje link rejestracji TWIN z tabeli powyżej.
+
+**Import CSV (opcjonalnie):** jeśli zaczynasz od zera, nadal możesz zaimportować [PILOT_TRACKER.csv](./PILOT_TRACKER.csv) do nowego arkusza; operacyjnie używaj **żywego Sheet** z linku powyżej.
 
 ---
 
