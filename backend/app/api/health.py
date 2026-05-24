@@ -93,7 +93,6 @@ def health_check(
         out["ops_admin_configured"] = bool(
             (s.ops_admin_token or "").strip() or (s.beta_admin_token or "").strip()
         )
-        out["partner_export_configured"] = bool((s.partner_export_token or "").strip())
         from app.services.linkedin_oauth import is_linkedin_oauth_configured
 
         out["linkedin_oauth_configured"] = is_linkedin_oauth_configured()
@@ -107,10 +106,13 @@ def health_check(
         try:
             from app.database.session import SessionLocal
             from app.services.mvp_public_metrics import count_validated_jobs_public_traction
+            from app.services.partner_auth import partner_export_configured
 
             with SessionLocal() as db:
+                out["partner_export_configured"] = partner_export_configured(db, s)
                 out["validated_jobs"] = count_validated_jobs_public_traction(db)
         except Exception:
+            out["partner_export_configured"] = bool((s.partner_export_token or "").strip())
             out["validated_jobs"] = 0
     return out
 

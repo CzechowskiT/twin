@@ -64,3 +64,16 @@ def revoke_partner_api_key(db: Session, *, key_id: int) -> None:
 def partner_has_scope(scopes_csv: str, required: str) -> bool:
     parts = {p.strip().lower() for p in (scopes_csv or "").split(",") if p.strip()}
     return required.lower() in parts or "export" in parts
+
+
+def partner_export_configured(db: Session, settings: Settings) -> bool:
+    """True when legacy env token or at least one active DB key exists."""
+    if (settings.partner_export_token or "").strip():
+        return True
+    return (
+        db.query(PartnerApiKey)
+        .filter(PartnerApiKey.revoked_at.is_(None))
+        .limit(1)
+        .first()
+        is not None
+    )

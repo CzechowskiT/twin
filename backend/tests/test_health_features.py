@@ -49,18 +49,26 @@ def test_health_features_route_removed() -> None:
     assert res.status_code == 404
 
 
+@patch("app.services.partner_auth.partner_export_configured", return_value=True)
 @patch("app.services.mvp_public_metrics.count_validated_jobs_public_traction", return_value=42)
+@patch("app.database.session.SessionLocal")
 @patch("app.services.linkedin_oauth.is_linkedin_oauth_configured", return_value=True)
 @patch("app.services.google_calendar_oauth.is_google_calendar_oauth_configured", return_value=False)
 @patch("app.services.microsoft_calendar_oauth.is_microsoft_calendar_oauth_configured", return_value=False)
 @patch("app.services.mail.is_mail_configured", return_value=True)
 def test_health_ops_includes_mail_and_calendar_flags(
-    _mock_ms: MagicMock,
-    _mock_google: MagicMock,
     _mock_mail: MagicMock,
+    _mock_google: MagicMock,
+    _mock_ms: MagicMock,
     _mock_li: MagicMock,
+    _mock_session_local: MagicMock,
     _mock_jobs: MagicMock,
+    _mock_partner: MagicMock,
 ) -> None:
+    mock_cm = MagicMock()
+    mock_cm.__enter__.return_value = MagicMock()
+    mock_cm.__exit__.return_value = None
+    _mock_session_local.return_value = mock_cm
     client = TestClient(app)
     res = client.get("/api/v1/health?ops=1")
     assert res.status_code == 200
@@ -74,4 +82,5 @@ def test_health_ops_includes_mail_and_calendar_flags(
     assert data.get("celery_task_always_eager") is False
     assert data.get("linkedin_oauth_configured") is True
     assert data.get("validated_jobs") == 42
+    assert data.get("partner_export_configured") is True
     assert data.get("data_room_s3_enabled") is False

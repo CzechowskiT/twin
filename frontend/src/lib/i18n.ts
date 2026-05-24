@@ -2032,6 +2032,8 @@ const en = {
     microsoftCalendar: "Microsoft Calendar OAuth",
     stripe: "Stripe Checkout",
     validatedJobs: "Validated jobs (public count)",
+    scrapeWorkerReady: "Scrape worker ready",
+    partnerExport: "Partner export API",
     scrapeOpsZeroHint:
       "Zero validated jobs usually means scrape worker or ops allowlist is not configured yet — see docs/SCRAPE_OPS.md in the repo and /developers.",
     git: "Deploy commit",
@@ -4631,6 +4633,8 @@ const pl: MessageTree = {
     microsoftCalendar: "OAuth Microsoft Calendar",
     stripe: "Stripe Checkout",
     validatedJobs: "Oferty zwalidowane (licznik publiczny)",
+    scrapeWorkerReady: "Worker scrape gotowy",
+    partnerExport: "Partner export API",
     scrapeOpsZeroHint:
       "Zero ofert zwykle oznacza brak workera scrape lub allowlisty ops — zobacz docs/SCRAPE_OPS.md w repo oraz /developers.",
     git: "Commit deployu",

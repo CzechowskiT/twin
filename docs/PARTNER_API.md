@@ -35,6 +35,32 @@ Authorization: Bearer <ops-token>
 
 CSV columns exclude candidate email (internal IDs only). Increase limit up to 500.
 
-## Railway
+### Example (curl)
 
-No extra service — same API host. Set ops token and mint partner keys after deploy.
+Replace `https://<api-host>` with your Railway API URL (e.g. `https://twin-production-bcd9.up.railway.app`).
+
+```bash
+curl -fsS \
+  -H "X-Twin-Partner-Token: $PARTNER_EXPORT_TOKEN" \
+  "https://<api-host>/api/v1/partner/exports/applications-recent.csv?limit=50" \
+  -o twin-applications-recent.csv
+```
+
+Minted DB keys use the same header; only the token value changes.
+
+Check wiring without downloading data:
+
+```bash
+curl -fsS "https://<api-host>/api/v1/health?ops=1" | jq '.partner_export_configured'
+```
+
+## Railway (founder)
+
+No extra service — same API host.
+
+| Variable | Service | Notes |
+|----------|---------|--------|
+| `PARTNER_EXPORT_TOKEN` | **API** | Optional legacy shared secret (`openssl rand -hex 32`). Prefer minted keys via admin API. |
+| `OPS_ADMIN_TOKEN` | **API** | Required to mint/revoke partner keys (`POST /api/v1/admin/partner-api-keys`). |
+
+Never commit tokens. Generate locally with `scripts/generate-deploy-secrets.sh` or Railway Variables UI.

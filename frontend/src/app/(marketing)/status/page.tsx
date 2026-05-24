@@ -29,6 +29,7 @@ type HealthPayload = {
   stripe_checkout_ready?: boolean;
   scrape_worker_ready?: boolean;
   scrape_beat_enabled?: boolean;
+  partner_export_configured?: boolean;
   recruiter_inbox_configured?: boolean;
   celery?: {
     worker_active?: boolean;
@@ -75,6 +76,8 @@ export default function StatusPage() {
   const linkedinOk = stats?.linkedin_oauth_configured;
   const workerOk = health?.celery?.worker_active;
   const beatOk = health?.scrape_beat_enabled && health?.celery?.beat_schedule_has_nightly;
+  const scrapeReady = health?.scrape_worker_ready;
+  const partnerExportOk = health?.partner_export_configured;
   const inboxOk = health?.recruiter_inbox_configured;
 
   return (
@@ -119,6 +122,11 @@ export default function StatusPage() {
                 ok={!!workerOk}
               />
               <Row
+                label={t("status.scrapeWorkerReady")}
+                value={scrapeReady ? t("status.configured") : t("status.notConfigured")}
+                ok={!!scrapeReady}
+              />
+              <Row
                 label={t("status.nightlyBeat")}
                 value={beatOk ? t("status.scheduled") : t("status.notScheduled")}
                 ok={!!beatOk}
@@ -127,6 +135,11 @@ export default function StatusPage() {
                 label={t("status.recruiterInbox")}
                 value={inboxOk ? t("status.configured") : t("status.notConfigured")}
                 ok={!!inboxOk}
+              />
+              <Row
+                label={t("status.partnerExport")}
+                value={partnerExportOk ? t("status.configured") : t("status.notConfigured")}
+                ok={!!partnerExportOk}
               />
               <Row label={t("status.validatedJobs")} value={String(stats.validated_jobs)} ok={stats.validated_jobs > 0} />
               <Row label={t("status.git")} value={health.git_commit ?? "unknown"} ok />

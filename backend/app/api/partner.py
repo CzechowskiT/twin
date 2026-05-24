@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from app.config import Settings, get_settings
 from app.database.models import Application, Job
 from app.database.session import get_db
-from app.services.partner_auth import partner_has_scope, verify_partner_token
+from app.services.partner_auth import partner_export_configured, partner_has_scope, verify_partner_token
 
 router = APIRouter()
 
@@ -25,7 +25,7 @@ def _require_partner_export(
 ) -> str:
     ok, scopes = verify_partner_token(db, settings, x_twin_partner_token)
     if not ok:
-        if not (settings.partner_export_token or "").strip():
+        if not partner_export_configured(db, settings):
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                 detail="Partner export is not configured.",
