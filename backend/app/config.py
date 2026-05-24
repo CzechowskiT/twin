@@ -4,7 +4,7 @@ from functools import lru_cache
 import os
 from pathlib import Path
 
-from pydantic import AliasChoices, Field, field_validator, model_validator
+from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Repo root .env (make api runs from backend/, so plain ".env" would miss it)
@@ -118,6 +118,8 @@ class Settings(BaseSettings):
         return self
 
     anthropic_api_key: str = ""
+    # Claude Messages API model id (override via ANTHROPIC_MODEL without code changes).
+    anthropic_model: str = "claude-sonnet-4-6"
     cv_upload_dir: str = "data/cvs"
     cv_max_bytes: int = 5 * 1024 * 1024
 
@@ -276,14 +278,6 @@ class Settings(BaseSettings):
     # Stripe (https://dashboard.stripe.com/) — Checkout enables card + Apple Pay + Google Pay where supported
     stripe_secret_key: str = ""
     stripe_webhook_secret: str = ""
-    stripe_price_id_standby: str = Field(
-        default="",
-        validation_alias=AliasChoices("STRIPE_PRICE_ID_STANDBY", "STRIPE_PRICE_STANDBY"),
-    )
-    stripe_price_id_standard: str = Field(
-        default="",
-        validation_alias=AliasChoices("STRIPE_PRICE_ID_STANDARD", "STRIPE_PRICE_STANDARD"),
-    )
     stripe_price_id_premium: str = ""
     stripe_price_id_pro: str = ""
     stripe_price_id_premium_annual: str = ""
