@@ -37,6 +37,8 @@ Gdy `verified_placements === 0`, `/investor/metrics` pokazuje **Pipeline rekruta
 
 ## Powiązane
 
+- [PILOT_TRACTION_DASHBOARD.md](./PILOT_TRACTION_DASHBOARD.md) — tygodniowa tabela pilota + north star
+- [PILOT_OFFER_COPY_PL.md](./PILOT_OFFER_COPY_PL.md) — copy oferty 7-dniowej (PL/EN)
 - [INVESTOR_DEMO_SCRIPT.md](./INVESTOR_DEMO_SCRIPT.md)
 - [INVESTOR_DEMO_RUNBOOK.md](./INVESTOR_DEMO_RUNBOOK.md)
 - [FOUNDER_STATUS_LIVE.md](./FOUNDER_STATUS_LIVE.md)
