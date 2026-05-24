@@ -95,9 +95,11 @@ def test_consent_and_trigger(auto_apply_client, monkeypatch) -> None:
     from unittest.mock import patch
 
     from app.automation.types import ApplyOutcome
+    from app.config import get_settings
 
     client, headers, db, candidate, job = auto_apply_client
     monkeypatch.setenv("NIGHTLY_AUTO_APPLY_COOLDOWN_SECONDS", "0")
+    get_settings.cache_clear()
     res = client.post(
         "/api/v1/auto-apply/consent",
         headers=headers,
