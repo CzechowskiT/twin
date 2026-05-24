@@ -20,6 +20,8 @@ import {
 } from "@/components/career-assistant/career-assistant-modals";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { DashboardCommandCenter } from "@/components/dashboard-command-center";
+import { OpportunityForecast } from "@/components/dashboard/OpportunityForecast";
+import { ProgressDashboard } from "@/components/dashboard/ProgressDashboard";
 import { EmptyState } from "@/components/ux/empty-state";
 import { ProfileCompletenessHint } from "@/components/ux/profile-completeness-hint";
 import { WorkspaceFlowSteps } from "@/components/ux/workspace-flow-steps";
@@ -1305,6 +1307,10 @@ export default function DashboardPage() {
             hasProfile={hasProfile}
             showScrapeUi={SHOW_SCRAPE_UI}
           />
+          <div className="mb-4 grid gap-4 lg:grid-cols-2">
+            <OpportunityForecast />
+            <ProgressDashboard />
+          </div>
           <p className="twin-muted -mt-2 mb-4 max-w-prose text-sm leading-relaxed">{t("dashboard.northStarLead")}</p>
           <Card variant="soft" className="mb-4">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
