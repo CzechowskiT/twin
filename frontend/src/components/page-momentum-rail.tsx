@@ -5,8 +5,11 @@ import { usePathname } from "next/navigation";
 import { useMemo } from "react";
 
 import { useTranslation } from "@/components/language-provider";
+import { useMarketingPersona } from "@/components/persona-provider";
 import { scrollToDashboardHash } from "@/lib/dashboard-anchor";
+import { getToken } from "@/lib/auth";
 import type { TranslationKey } from "@/lib/i18n";
+import { momentumRailCtas } from "@/lib/persona-access";
 
 const TIPS = [
   "site.momentumTip1",
@@ -23,51 +26,6 @@ function tipIndex(pathname: string, offset: number): number {
     h = (h + pathname.charCodeAt(i) * (i + 1)) % 997;
   }
   return h % TIPS.length;
-}
-
-type Cta = { href: string; label: TranslationKey };
-
-function resolveCtas(pathname: string, variant: "app" | "marketing"): Cta[] {
-  if (variant === "marketing") {
-    return [
-      { href: "/register", label: "site.momentumCtaRegister" },
-      { href: "/login", label: "site.momentumCtaLogin" },
-      { href: "/faq", label: "site.momentumCtaFaq" },
-    ];
-  }
-  if (pathname.startsWith("/admin")) {
-    return [{ href: "/", label: "site.momentumCtaHome" }];
-  }
-  if (
-    pathname.startsWith("/login") ||
-    pathname.startsWith("/register") ||
-    pathname.startsWith("/forgot-password") ||
-    pathname.startsWith("/reset-password") ||
-    pathname.startsWith("/auth/callback")
-  ) {
-    return [
-      { href: "/faq", label: "site.momentumCtaFaq" },
-      pathname.startsWith("/login")
-        ? { href: "/register", label: "site.momentumCtaRegister" }
-        : { href: "/login", label: "site.momentumCtaLogin" },
-    ];
-  }
-  if (pathname.startsWith("/dashboard")) {
-    return [
-      { href: "/profile", label: "site.momentumCtaProfile" },
-      { href: "/dashboard/billing", label: "dashboard.billingLink" },
-    ];
-  }
-  if (pathname.startsWith("/profile")) {
-    return [
-      { href: "/dashboard", label: "site.momentumCtaWorkspace" },
-      { href: "/dashboard/billing", label: "dashboard.billingLink" },
-    ];
-  }
-  return [
-    { href: "/dashboard", label: "site.momentumCtaWorkspace" },
-    { href: "/profile", label: "site.momentumCtaProfile" },
-  ];
 }
 
 export type DashboardMomentumStats = {
@@ -184,10 +142,15 @@ export function PageMomentumRail({
 }) {
   const pathname = usePathname() ?? "";
   const { t } = useTranslation();
+  const { persona } = useMarketingPersona();
+  const hasSession = Boolean(getToken());
 
   const primaryTip = useMemo(() => TIPS[tipIndex(pathname, 0)], [pathname]);
   const secondaryTip = useMemo(() => TIPS[tipIndex(pathname, 1)], [pathname]);
-  const ctas = useMemo(() => resolveCtas(pathname, variant), [pathname, variant]);
+  const ctas = useMemo(
+    () => momentumRailCtas(pathname, variant, persona, hasSession),
+    [pathname, variant, persona, hasSession],
+  );
 
   const shell =
     variant === "marketing"
@@ -213,8 +176,8 @@ export function PageMomentumRail({
         ) : null}
         <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2">
           {ctas.map((c) => (
-            <Link key={c.href} href={c.href} className="twin-link text-sm font-medium">
-              {t(c.label)}
+            <Link key={`${c.href}:${c.labelKey}`} href={c.href} className="twin-link text-sm font-medium">
+              {t(c.labelKey)}
             </Link>
           ))}
         </div>
