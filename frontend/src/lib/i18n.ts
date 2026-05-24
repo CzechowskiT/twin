@@ -608,6 +608,7 @@ const en = {
     roadmapPortalsTitle: "50 global job boards",
     roadmapCompaniesTitle: "Top employers (careers pages)",
     roadmapLiveBadge: "Live",
+    roadmapRegistryBadge: "In registry",
     roadmapPlannedBadge: "Planned",
     roadmapFootnote:
       "Today “Twin for your job” ingests implemented sources in the TWIN registry; more portals and employer career-site adapters roll out iteratively behind the same button.",
@@ -3193,6 +3194,7 @@ const pl: MessageTree = {
     roadmapPortalsTitle: "50 globalnych portali pracy",
     roadmapCompaniesTitle: "Najwięksi pracodawcy (strony kariery)",
     roadmapLiveBadge: "Wdrożone",
+    roadmapRegistryBadge: "W rejestrze",
     roadmapPlannedBadge: "W planie",
     roadmapFootnote:
       "Dziś „Twin for your job” pobiera źródła z rejestru TWIN; kolejne portale i adaptery stron kariery firm dojdą iteracyjnie pod tym samym przyciskiem.",

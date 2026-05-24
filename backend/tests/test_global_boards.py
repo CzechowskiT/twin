@@ -7,6 +7,7 @@ from app.scrapers.global_boards import (
     _parse_indeed,
     _parse_indeed_pl,
     _parse_reed,
+    _parse_ziprecruiter,
 )
 from app.scrapers.registry import list_boards, run_scrape
 
@@ -26,6 +27,12 @@ REED_SNIPPET = """
   <a class="job-card__title" href="/jobs/sales-manager/123">Sales Manager</a>
   <span class="job-card__company">Acme Ltd</span>
 </article>
+</body></html>
+"""
+
+ZIPRECRUITER_SNIPPET = """
+<html><body>
+<a href="/jobs/526374682-electrical-commissioning-lead-at-pm-group">Electrical Commissioning Lead</a>
 </body></html>
 """
 
@@ -63,6 +70,15 @@ def test_parse_reed_fixture() -> None:
     assert jobs[0].title == "Sales Manager"
     assert jobs[0].company == "Acme Ltd"
     assert jobs[0].job_board == "reed.co.uk"
+
+
+def test_parse_ziprecruiter_slug_links() -> None:
+    jobs = _parse_ziprecruiter(ZIPRECRUITER_SNIPPET, limit=5)
+    assert len(jobs) == 1
+    assert jobs[0].external_id == "526374682"
+    assert jobs[0].title == "Electrical Commissioning Lead"
+    assert jobs[0].company == "Pm Group"
+    assert "ziprecruiter.com/jobs/526374682" in jobs[0].url
 
 
 def test_parse_indeed_pl_fixture() -> None:

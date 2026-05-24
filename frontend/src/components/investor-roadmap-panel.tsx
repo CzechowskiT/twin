@@ -1,7 +1,28 @@
 "use client";
 
 import { useTranslation } from "@/components/language-provider";
-import { INVESTOR_COMPANIES, INVESTOR_PORTALS, isLivePortal } from "@/lib/investor-roadmap";
+import {
+  INVESTOR_COMPANIES,
+  INVESTOR_PORTALS,
+  portalDeployStatus,
+  type PortalDeployStatus,
+} from "@/lib/investor-roadmap";
+
+function badgeClass(status: PortalDeployStatus): string {
+  if (status === "live") {
+    return "shrink-0 rounded bg-[var(--twin-accent)]/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-[var(--twin-accent-hover)]";
+  }
+  if (status === "registry") {
+    return "shrink-0 rounded bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-amber-700 dark:text-amber-400";
+  }
+  return "shrink-0 rounded bg-[var(--twin-accent-muted)] px-1.5 py-0.5 text-[10px] font-semibold uppercase text-[var(--twin-muted-strong)]";
+}
+
+function badgeKey(status: PortalDeployStatus): "dashboard.roadmapLiveBadge" | "dashboard.roadmapRegistryBadge" | "dashboard.roadmapPlannedBadge" {
+  if (status === "live") return "dashboard.roadmapLiveBadge";
+  if (status === "registry") return "dashboard.roadmapRegistryBadge";
+  return "dashboard.roadmapPlannedBadge";
+}
 
 export function InvestorRoadmapPanel() {
   const { t } = useTranslation();
@@ -19,20 +40,17 @@ export function InvestorRoadmapPanel() {
             {t("dashboard.roadmapPortalsTitle")}
           </p>
           <ul className="max-h-48 space-y-1 overflow-y-auto pr-1 text-xs text-[var(--twin-muted)]">
-            {INVESTOR_PORTALS.map((p) => (
+            {INVESTOR_PORTALS.map((p) => {
+              const status = portalDeployStatus(p.boardId, p.scrapingVerified);
+              return (
               <li key={p.name} className="flex items-start justify-between gap-2">
                 <span className="min-w-0">{p.name}</span>
-                <span
-                  className={
-                    isLivePortal(p.boardId)
-                      ? "shrink-0 rounded bg-[var(--twin-accent)]/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-[var(--twin-accent-hover)]"
-                      : "shrink-0 rounded bg-[var(--twin-accent-muted)] px-1.5 py-0.5 text-[10px] font-semibold uppercase text-[var(--twin-muted-strong)]"
-                  }
-                >
-                  {isLivePortal(p.boardId) ? t("dashboard.roadmapLiveBadge") : t("dashboard.roadmapPlannedBadge")}
+                <span className={badgeClass(status)}>
+                  {t(badgeKey(status))}
                 </span>
               </li>
-            ))}
+            );
+            })}
           </ul>
         </div>
         <div>
@@ -40,20 +58,17 @@ export function InvestorRoadmapPanel() {
             {t("dashboard.roadmapCompaniesTitle")}
           </p>
           <ul className="max-h-48 space-y-1 overflow-y-auto pr-1 text-xs text-[var(--twin-muted)]">
-            {INVESTOR_COMPANIES.map((c) => (
+            {INVESTOR_COMPANIES.map((c) => {
+              const status = portalDeployStatus(c.boardId, c.scrapingVerified);
+              return (
               <li key={`${c.name}-${c.boardId ?? "planned"}`} className="flex items-start justify-between gap-2">
                 <span>{c.name}</span>
-                <span
-                  className={
-                    isLivePortal(c.boardId)
-                      ? "shrink-0 rounded bg-[var(--twin-accent)]/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-[var(--twin-accent-hover)]"
-                      : "shrink-0 rounded bg-[var(--twin-accent-muted)] px-1.5 py-0.5 text-[10px] font-semibold uppercase text-[var(--twin-muted-strong)]"
-                  }
-                >
-                  {isLivePortal(c.boardId) ? t("dashboard.roadmapLiveBadge") : t("dashboard.roadmapPlannedBadge")}
+                <span className={badgeClass(status)}>
+                  {t(badgeKey(status))}
                 </span>
               </li>
-            ))}
+            );
+            })}
           </ul>
         </div>
       </div>

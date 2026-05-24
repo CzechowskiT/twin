@@ -1,6 +1,8 @@
 """Shared Playwright helpers for job board scrapers."""
 
+import re
 from collections.abc import Callable
+from re import Pattern
 from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
@@ -124,6 +126,62 @@ def parse_with_selectors(
             )
         )
     return results
+
+
+def parse_job_links_pattern(
+    html: str,
+    *,
+    job_board: str,
+    base_url: str,
+    href_pattern: Pattern[str],
+    limit: int = 20,
+) -> list:
+    """Collect job links whose href matches ``href_pattern`` (use a capturing group for id)."""
+    from app.scrapers.base import ScrapedJob
+
+    if not html:
+        return []
+
+    soup = BeautifulSoup(html, "html.parser")
+    results: list[ScrapedJob] = []
+    seen: set[str] = set()
+
+    for anchor in soup.find_all("a", href=True):
+        if len(results) >= limit:
+            break
+        href = anchor["href"].strip()
+        match = href_pattern.search(href)
+        if not match:
+            continue
+        url = href if href.startswith("http") else urljoin(base_url, href)
+        external_id = (match.group(1) if match.lastindex else _id_from_url(url))[:100]
+        if external_id in seen:
+            continue
+        title = anchor.get_text(strip=True)
+        if len(title) < 4:
+            continue
+        seen.add(external_id)
+        company = _company_from_job_slug(url) or "Unknown"
+        results.append(
+            ScrapedJob(
+                job_board=job_board,
+                external_id=external_id,
+                title=title[:300],
+                company=company[:200],
+                url=url.split("?")[0],
+            )
+        )
+    return results
+
+
+def _company_from_job_slug(url: str) -> str | None:
+    """Derive employer from slugs like ``/jobs/123-title-at-acme-corp``."""
+    slug = url.rstrip("/").split("/")[-1]
+    if "-at-" not in slug:
+        return None
+    tail = slug.split("-at-", 1)[-1]
+    name = tail.replace("-", " ").strip()
+    return name.title() if len(name) >= 2 else None
 
 
 def parse_job_links(
