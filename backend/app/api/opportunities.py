@@ -6,7 +6,14 @@ from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user
-from app.core.subscription_gates import Feature, feature_allowed, forecast_limit_for_user, paywall_for_feature
+from app.core.subscription_gates import (
+    Feature,
+    active_search_allowed,
+    feature_allowed,
+    forecast_limit_for_user,
+    min_match_score_for_user,
+    paywall_for_feature,
+)
 from app.database.models import User
 from app.database.session import get_db
 from app.schemas.opportunities import OpportunityForecastOut, UnifiedFeedItemOut, UnifiedFeedOut
@@ -55,20 +62,31 @@ def get_unified_feed(
     min_score: float = Query(default=0.0, ge=0.0, le=100.0),
 ) -> UnifiedFeedOut:
     """Jobs + freelance gigs in one feed with optional type filter."""
+    if not active_search_allowed(current_user):
+        return UnifiedFeedOut(
+            items=[],
+            opportunity_type="all",
+            paywall=paywall_for_feature(Feature.ACTIVE_SEARCH),
+        )
     candidate = get_candidate_for_user(db, current_user.id)
     type_filter = opportunity_type if feature_allowed(current_user, Feature.UNIFIED_FEED_FILTERS) else "all"
     paywall = None if feature_allowed(current_user, Feature.UNIFIED_FEED_FILTERS) else paywall_for_feature(
         Feature.UNIFIED_FEED_FILTERS
     )
+    tier_floor = min_match_score_for_user(current_user)
+    effective_min = max(min_score, tier_floor)
     items = unified_opportunity_feed(
         db,
         candidate,
         opportunity_type=type_filter if type_filter != "all" else None,
         limit=limit,
-        min_score=min_score,
+        min_score=effective_min,
     )
+    feed_paywall = None
+    if tier_floor > 0 and not feature_allowed(current_user, Feature.HIGH_MATCH_FEED):
+        feed_paywall = paywall_for_feature(Feature.HIGH_MATCH_FEED)
     return UnifiedFeedOut(
         items=[UnifiedFeedItemOut(**item) for item in items],
         opportunity_type=type_filter,
-        paywall=paywall,
+        paywall=paywall or feed_paywall,
     )

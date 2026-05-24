@@ -101,23 +101,37 @@ def configure_stripe(settings: Settings) -> None:
 
 
 def price_id_for_plan(settings: Settings, plan: str) -> str:
-    if plan == "premium":
-        if not settings.stripe_price_id_premium:
-            raise ValueError("billing_not_configured")
-        return settings.stripe_price_id_premium
-    if plan == "pro":
-        if not settings.stripe_price_id_pro:
-            raise ValueError("pro_not_configured")
-        return settings.stripe_price_id_pro
+    mapping: list[tuple[str, str]] = [
+        ("standby", settings.stripe_price_id_standby),
+        ("standard", settings.stripe_price_id_standard),
+        ("premium", settings.stripe_price_id_premium),
+        ("pro", settings.stripe_price_id_pro),
+    ]
+    for tier, price_id in mapping:
+        if plan == tier:
+            if not price_id:
+                if tier in ("premium", "pro"):
+                    raise ValueError("pro_not_configured" if tier == "pro" else "billing_not_configured")
+                raise ValueError(f"{tier}_not_configured")
+            return price_id
     raise ValueError("unknown_plan")
 
 
 def tier_for_price_id(settings: Settings, price_id: str | None) -> str:
     if not price_id:
         return "premium"
-    if price_id == settings.stripe_price_id_premium:
+    pairs: list[tuple[str, str]] = [
+        ("standby", settings.stripe_price_id_standby),
+        ("standard", settings.stripe_price_id_standard),
+        ("premium", settings.stripe_price_id_premium),
+        ("pro", settings.stripe_price_id_pro),
+    ]
+    for tier, configured in pairs:
+        if configured and price_id == configured:
+            return tier
+    if settings.stripe_price_id_premium_annual and price_id == settings.stripe_price_id_premium_annual:
         return "premium"
-    if settings.stripe_price_id_pro and price_id == settings.stripe_price_id_pro:
+    if settings.stripe_price_id_pro_annual and price_id == settings.stripe_price_id_pro_annual:
         return "pro"
     return "premium"
 

@@ -13,8 +13,10 @@ Other methods (e.g. `ideal`, `sepa_debit`, `paypal`, `amazon_pay`) may be added 
 |----------|---------|
 | `STRIPE_SECRET_KEY` | Secret API key (`sk_live_…` / `sk_test_…`). |
 | `STRIPE_WEBHOOK_SECRET` | Signing secret from the Stripe Dashboard webhook endpoint (`whsec_…`). |
-| `STRIPE_PRICE_ID_PREMIUM` | **Price** ID for the Premium monthly (or yearly) subscription (`price_…`). |
-| `STRIPE_PRICE_ID_PRO` | Optional second paid tier; if empty, “Upgrade to Pro” stays disabled in the UI. |
+| `STRIPE_PRICE_STANDBY` / `STRIPE_PRICE_ID_STANDBY` | **Price** ID for Standby ($0.99/mo) — frozen profile, data retained. |
+| `STRIPE_PRICE_STANDARD` / `STRIPE_PRICE_ID_STANDARD` | **Price** ID for Standard ($1.99/mo) — apply + 80%+ matches. |
+| `STRIPE_PRICE_ID_PREMIUM` | **Price** ID for Premium ($4.99/mo) — full AI, coach, gamification. |
+| `STRIPE_PRICE_ID_PRO` | Optional top tier ($9.99/mo); if empty, Pro checkout stays disabled in the UI. |
 | `STRIPE_CHECKOUT_PAYMENT_METHOD_TYPES` | Optional. Comma-separated Stripe Checkout `payment_method_types` (default `card,link`). |
 | `FRONTEND_URL` | Used for Checkout success/cancel and Customer Portal return URL (no trailing slash). |
 
@@ -42,10 +44,12 @@ Use the endpoint’s **signing secret** as `STRIPE_WEBHOOK_SECRET`.
 
 ## Plan behaviour in the app
 
-| Plan | Tracked applications (non-`rejected`) | Auto-apply |
-|------|--------------------------------------|------------|
-| Free | Up to 25 | Not allowed |
-| Premium / Pro (active / trialing / past_due) | Unlimited | Allowed |
+| Plan | Tracked applications (non-`rejected`) | Apply / search |
+|------|--------------------------------------|----------------|
+| Free | Up to 25 | Preview counts only |
+| Standby | Up to 25 | Data kept; active search paused |
+| Standard | Unlimited | Apply + ~80%+ match feed |
+| Premium / Pro | Unlimited | Full AI + coach + gamification |
 
 `plan_tier` and `subscription_status` on `users` are updated from webhooks; the API treats you as paid only while Stripe reports an entitled subscription status.
 

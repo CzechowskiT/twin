@@ -22,7 +22,15 @@ export function FeaturePaywall({
 }) {
   const { t } = useTranslation();
   if (!paywall) return null;
-  const tierLabel = paywall.required_tier.toUpperCase();
+  const tierKeys: Record<string, TranslationKey> = {
+    free: "dashboard.billingPlanNameFree",
+    standby: "dashboard.billingPlanNameStandby",
+    standard: "dashboard.billingPlanNameStandard",
+    premium: "dashboard.billingPlanNamePremium",
+    pro: "dashboard.billingPlanNamePro",
+  };
+  const tierKey = tierKeys[paywall.required_tier.toLowerCase()];
+  const tierLabel = tierKey ? t(tierKey) : paywall.required_tier;
   return (
     <Card className="border-[var(--twin-accent)]/30 bg-[var(--twin-accent-muted)]/20 p-4">
       <p className="text-sm font-semibold text-[var(--foreground)]">{t(titleKey)}</p>

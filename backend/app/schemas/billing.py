@@ -42,7 +42,7 @@ class PlansPublicResponse(BaseModel):
 
 
 class CheckoutRequest(BaseModel):
-    plan: Literal["premium", "pro"]
+    plan: Literal["standby", "standard", "premium", "pro"]
 
 
 class CheckoutResponse(BaseModel):
