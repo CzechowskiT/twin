@@ -2,7 +2,20 @@
 
 **Plik danych:** [PILOT_TRACKER.csv](./PILOT_TRACKER.csv) — jeden wiersz na kandydata founding / pilota.
 
-**Powiązane:** [PILOT_CANDIDATE_INTAKE.md](./PILOT_CANDIDATE_INTAKE.md) (intake, founding slot, checklist founder) · [PILOT_TRACTION_DASHBOARD.md](./PILOT_TRACTION_DASHBOARD.md) (metryki tygodniowe, north star).
+**Powiązane:** [PILOT_CANDIDATE_INTAKE.md](./PILOT_CANDIDATE_INTAKE.md) (intake, founding slot, checklist founder) · [PILOT_TRACTION_DASHBOARD.md](./PILOT_TRACTION_DASHBOARD.md) (metryki tygodniowe, north star) · [PILOT_OFFER_FINAL.md](./PILOT_OFFER_FINAL.md) (copy founding free).
+
+---
+
+## Founder — live linki (operacyjne)
+
+| Co | Link | Uwaga |
+|----|------|--------|
+| **Tracker (Google Sheet)** | [Otwórz arkusz](https://docs.google.com/spreadsheets/d/1rJ0HbY8s3fFtIWoKwyEkDDBlebBUwXSA-pomThASx2k/edit?gid=1795656044) | Jeden wiersz = jeden kandydat; uzupełniaj statusy ręcznie po rejestracji w TWIN |
+| **Formularz zapisu (edycja)** | [Edytuj formularz](https://docs.google.com/forms/d/1r-AfAaMCPMjueAsvN_NnhGovKccwPMEjRQU22YeEA8w/edit) | Tylko dla Ciebie — zmiana pytań |
+| **Formularz zapisu (publiczny)** | [Link do wysyłki](https://docs.google.com/forms/d/1r-AfAaMCPMjueAsvN_NnhGovKccwPMEjRQU22YeEA8w/viewform) | Ten link dajesz kandydatom (LinkedIn, mail) |
+| **Rejestracja TWIN (po kwalifikacji)** | [Founding register](https://twin-sooty.vercel.app/register/candidate?utm_campaign=founding1000&utm_source=google_form) | Wyślij **po** `qualified` w arkuszu |
+
+**Flow:** Formularz → nowy wiersz w Sheet → kwalifikujesz → link rejestracji TWIN → uzupełniasz kolumny Registered, CV, rozmowy.
 
 ---
 
