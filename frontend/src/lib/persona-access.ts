@@ -285,12 +285,22 @@ export function sessionPanelHref(persona: MarketingPersona): string {
   return WORKSPACE_PATH[persona];
 }
 
-/** Kalendarz | Panel | Demo — same strip for every signed-in persona. */
+/** Signed-in nav links per persona lane. */
 export function headerSessionNavLinks(
   persona: MarketingPersona,
   hasSession: boolean,
 ): HeaderSessionNavLink[] {
   if (!hasSession) return [];
+  if (persona === "candidate") {
+    return [
+      { href: "/dashboard#dashboard-jobs", labelKey: "nav.jobs" },
+      { href: "/dashboard#dashboard-applications", labelKey: "nav.applications" },
+      { href: "/dashboard/calendar", labelKey: "dashboard.calendarLink" },
+      { href: "/dashboard", labelKey: "nav.dashboard" },
+      { href: "/profile", labelKey: "nav.profile" },
+      { href: "/dashboard/calendar#calendar-connections-heading", labelKey: "nav.integrations" },
+    ];
+  }
   return [
     { href: "/dashboard/calendar", labelKey: "dashboard.calendarLink" },
     { href: sessionPanelHref(persona), labelKey: "nav.dashboard" },

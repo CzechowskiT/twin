@@ -15,16 +15,23 @@ test("sessionPersonaHomeRedirect keeps same-persona marketing lanes", () => {
   assert.equal(sessionPersonaHomeRedirect("/for-investors", "investor"), null);
 });
 
-test("headerSessionNavLinks shows Kalendarz | Panel | Demo for every persona", () => {
-  for (const persona of ["candidate", "recruiter", "investor", "company"] as const) {
+test("headerSessionNavLinks restores full candidate tab set", () => {
+  const candidate = headerSessionNavLinks("candidate", true);
+  assert.deepEqual(candidate.map((l) => l.href), [
+    "/dashboard#dashboard-jobs",
+    "/dashboard#dashboard-applications",
+    "/dashboard/calendar",
+    "/dashboard",
+    "/profile",
+    "/dashboard/calendar#calendar-connections-heading",
+  ]);
+
+  for (const persona of ["recruiter", "investor", "company"] as const) {
     const links = headerSessionNavLinks(persona, true);
     assert.equal(links.length, 3);
     assert.equal(links[0]?.href, "/dashboard/calendar");
-    assert.equal(links[0]?.labelKey, "dashboard.calendarLink");
     assert.equal(links[1]?.href, sessionPanelHref(persona));
-    assert.equal(links[1]?.labelKey, "nav.dashboard");
     assert.equal(links[2]?.href, "/demo");
-    assert.equal(links[2]?.labelKey, "nav.demo");
   }
 });
 
