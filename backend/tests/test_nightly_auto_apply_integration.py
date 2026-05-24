@@ -181,6 +181,7 @@ def test_guard_skip_counts_as_skipped_not_failed(nightly_db, monkeypatch) -> Non
     db, user, consent, job = nightly_db
     monkeypatch.setenv("NIGHTLY_AUTO_APPLY_COOLDOWN_SECONDS", "0")
     monkeypatch.setenv("AUTO_APPLY_COMPANY_BLOCKLIST", "acme")
+    get_settings.cache_clear()
 
     with (
         patch("app.services.nightly_auto_apply.find_top_matches"),
