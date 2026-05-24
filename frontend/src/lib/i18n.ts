@@ -2307,6 +2307,46 @@ const en = {
     toBe1: "Need ≈ {{n}} incremental users (~{{p}}% vs current base)",
     toBe2: "~{{y}} years at the viral growth rate above (holding economics constant)",
     linkB2b: "Open the B2B agency vs TWIN fee comparison →",
+    sliderGuideTitle: "How to read the sliders?",
+    sliderGuideLead:
+      "Baseline for the Organic quick scenario. Defaults below match INVESTOR_CALCULATOR_DEFAULTS; picking another scenario overrides some sliders.",
+    sliderGuideColSlider: "Slider",
+    sliderGuideColWhat: "What it means",
+    sliderGuideColDefault: "Default",
+    sliderRef_linkedIn: "LinkedIn viral program",
+    sliderRef_team: "Team (headcount)",
+    sliderRef_infraPerUser: "Infrastructure per user / year",
+    sliderRef_legalOffice: "Legal & office (fixed annual)",
+    sliderDesc_totalUsers:
+      "Registered accounts in the model year — drives paying users, placements, infra, and referral funnel volume.",
+    sliderDesc_percentPaying:
+      "Share of total users on a paid plan (Premium/Pro). Rest stay on free tier in this illustration.",
+    sliderDesc_subPrice:
+      "List monthly subscription before annual prepay blend. Organic scenario uses Premium (~$4.99).",
+    sliderDesc_annualPrepayShare:
+      "Share of paying users on annual prepay (25% off 12× monthly). Blends into effective MRR/ARR.",
+    sliderDesc_placementRate:
+      "Share of paying users with a modeled hire per year — feeds success-fee revenue.",
+    sliderDesc_avgSalary:
+      "Gross annual salary for placement fee math (employer fee is % of monthly salary).",
+    sliderDesc_employerPlacementFee:
+      "Gross employer success fee as % of one month’s salary; half is returned to the candidate in the baseline.",
+    sliderDesc_referralRate:
+      "Share of users who refer at least one new user — scales viral acquisition and referral bonus costs.",
+    sliderDesc_viralGrowth:
+      "Year-over-year user base growth used in the five-year projection (compounded).",
+    sliderDesc_foundingCohort:
+      "Cap of early members with founding perks — reduces subscription ARR via free Premium months.",
+    sliderDesc_foundingFreeMonths:
+      "Months of forgone Premium ARPU per founding member in the model year.",
+    sliderDesc_linkedIn:
+      "Adoption = share of placements via LinkedIn viral path; incentive = candidate share of employer fee on those hires.",
+    sliderDesc_team:
+      "Fully loaded annual payroll (senior/other engineers, PM, other roles, founder) — fixed cost in the model.",
+    sliderDesc_infraPerUser:
+      "Hosting + API (e.g. LLM) + services (email, payments) per user per year — scales with user count.",
+    sliderDesc_legalOffice:
+      "Fixed legal/accounting and office/misc — not scaled per user in this illustration.",
     footerVersion: "TWIN investor calculator v1 · internal scenario tool",
     footerLegal: "Linear growth and static costs are simplifying assumptions; real markets and execution differ.",
   },
@@ -2411,6 +2451,9 @@ const en = {
     liveTitle: "Ranked roles (read-only)",
     liveLead: "When demo mode is on, this list comes from the API — fictional companies only, no login.",
     liveSourceDb: "Seeded demo account.",
+    liveLoading: "Loading live preview…",
+    liveOffline: "Demo offline",
+    liveOfflineHint: "The live preview is temporarily unavailable — try again in a moment.",
     signUpToApply: "Sign up to apply",
     liveInterviewHint: "Upcoming interview hold",
     fullExperienceCta: "Open full auto-apply demo",
@@ -3524,6 +3567,7 @@ const pl: MessageTree = {
     calendarInterviewsTitle: "Nadchodzące rozmowy",
     calendarInterviewsEmpty:
       "Na razie pusto. Gdy TWIN zarezerwuje slot, pojawi się tu i w Google Calendar.",
+    calendarInterviewTimezone: "Godziny w strefie {tz}",
     calendarShowCancelledInterviews: "Pokaż odwołane rozmowy",
     calendarScheduleTitle: "Zaplanuj rozmowę",
     calendarScheduleHint:
@@ -4505,6 +4549,10 @@ const pl: MessageTree = {
     lead: "Krótka lista rozmów i dopasowań — zaakceptuj to, co warto kalendarza, odrzuć resztę.",
     loading: "Ładowanie…",
     empty: "Na razie nic nie czeka. Wróć po kolejnym dopasowaniu lub propozycji terminu.",
+    emptyTitle: "Kalendarz akceptacji jest na razie pusty",
+    emptyHint:
+      "TWIN pokazuje tu rezerwacje rozmów i silne dopasowania — nie tysiące surowych CV. Uruchom dopasowanie z panelu albo podłącz kalendarz, żeby nowe sloty mogły trafić, gdy rekruter zaproponuje termin.",
+    emptyCta: "Przejdź do dopasowań w panelu",
     back: "Wróć do panelu",
     interviewBadge: "Rozmowa",
     matchBadge: "Silne dopasowanie",
@@ -4839,6 +4887,46 @@ const pl: MessageTree = {
     toBe1: "Potrzeba ≈ {{n}} dodatkowych użytkowników (~{{p}}% względem bazy)",
     toBe2: "~{{y}} lat przy powyższym tempie wzrostu viral (przy niezmiennej ekonomice)",
     linkB2b: "Otwórz porównanie agencja vs model TWIN (B2B ROI) →",
+    sliderGuideTitle: "Jak liczyć suwaki?",
+    sliderGuideLead:
+      "Domyślne wartości poniżej odpowiadają modelowi po załadowaniu. Suwaki służą do testów MRR, ekonomii placement i kosztów — to nie prognoza.",
+    sliderGuideColSlider: "Suwak",
+    sliderGuideColWhat: "Co to jest",
+    sliderGuideColDefault: "Domyślnie",
+    sliderRef_linkedIn: "Program viral LinkedIn",
+    sliderRef_team: "Zespół (liczebność)",
+    sliderRef_infraPerUser: "Infrastruktura na użytk. / rok",
+    sliderRef_legalOffice: "Księgowość i biuro (rocznie, stałe)",
+    sliderDesc_totalUsers:
+      "Zarejestrowane konta w roku modelu — skaluje płacących, placementy, infrastrukturę i lejek poleceń.",
+    sliderDesc_percentPaying:
+      "Udział wszystkich użytkowników na płatnym planie (Premium/Pro). Reszta zostaje na free w tej ilustracji.",
+    sliderDesc_subPrice:
+      "Cena miesięczna listowa przed mieszaniem prepay rocznego. Scenariusz organiczny: Premium (~4,99 USD).",
+    sliderDesc_annualPrepayShare:
+      "Udział płacących na prepay rocznym (25% taniej vs 12× miesięcznie). Wchodzi w efektywny MRR/ARR.",
+    sliderDesc_placementRate:
+      "Udział płacących ze zmodelowanym zatrudnieniem w roku — napędza przychód success fee.",
+    sliderDesc_avgSalary:
+      "Roczne wynagrodzenie brutto do liczenia opłaty placement (% miesięcznego wynagrodzenia).",
+    sliderDesc_employerPlacementFee:
+      "Opłata pracodawcy jako % jednego miesiąca wynagrodzenia; w bazie połowa wraca do kandydata.",
+    sliderDesc_referralRate:
+      "Udział użytkowników polecających co najmniej jedną osobę — skaluje wzrost viral i koszty bonusów.",
+    sliderDesc_viralGrowth:
+      "Roczny wzrost bazy użytkowników w projekcji pięcioletniej (składany).",
+    sliderDesc_foundingCohort:
+      "Limit wczesnych członków z benefitami founding — obniża ARR subskrypcji przez miesiące Premium gratis.",
+    sliderDesc_foundingFreeMonths:
+      "Liczba miesięcy utraconego ARPU Premium na członka founding w roku modelu.",
+    sliderDesc_linkedIn:
+      "Adopcja = udział placementów ścieżką LinkedIn; incentive = udział kandydata w opłacie pracodawcy przy tych hire’ach.",
+    sliderDesc_team:
+      "Roczny koszt zespołu (senior/inż., PM, inne role, founder) — koszt stały w modelu.",
+    sliderDesc_infraPerUser:
+      "Hosting + API (np. LLM) + usługi (e-mail, płatności) na użytkownika rocznie — skaluje się z bazą.",
+    sliderDesc_legalOffice:
+      "Stałe księgowość/prawo oraz biuro/różne — bez skalowania per użytkownik w tej ilustracji.",
     footerVersion: "Kalkulator inwestorski TWIN v1 · narzędzie scenariuszowe",
     footerLegal: "Liniowy wzrost i stałe koszty to uproszczenia; realny rynek i wykonanie się różnią.",
   },
@@ -4943,6 +5031,10 @@ const pl: MessageTree = {
     liveTitle: "Ranking ofert (tylko odczyt)",
     liveLead: "Gdy demo mode jest włączone, lista pochodzi z API — fikcyjne firmy, bez logowania.",
     liveSourceDb: "Konto demo z seeda.",
+    liveLoading: "Ładowanie rankingu na żywo…",
+    liveOffline: "Ranking na żywo jest chwilowo niedostępny",
+    liveOfflineHint:
+      "Migawka API jest pusta albo niedostępna. Marketing działa dalej — załóż konto lub otwórz pełne demo; ops może odświeżyć seed przez scripts/seed-investor-demo.py.",
     signUpToApply: "Załóż konto, by aplikować",
     liveInterviewHint: "Zaplanowana rozmowa",
     fullExperienceCta: "Pełne demo auto-aplikacji",
