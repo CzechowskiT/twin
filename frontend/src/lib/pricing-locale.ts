@@ -30,11 +30,15 @@ export function marketingCurrencyForLocale(locale: string): string {
 
 /** Global candidate list prices — USD is source of truth for Stripe + marketing. */
 export const CANDIDATE_PLAN_USD_CENTS = {
+  standby: 99,
+  standard: 199,
   premium: 499,
   pro: 999,
 } as const;
 
 export const CANDIDATE_PLAN_USD = {
+  standby: CANDIDATE_PLAN_USD_CENTS.standby / 100,
+  standard: CANDIDATE_PLAN_USD_CENTS.standard / 100,
   premium: CANDIDATE_PLAN_USD_CENTS.premium / 100,
   pro: CANDIDATE_PLAN_USD_CENTS.pro / 100,
 } as const;
@@ -178,6 +182,12 @@ export function formatCandidateListPriceUsd(usdMonthly: number, locale: string):
     }).format(0);
   }
 
+  if (Math.abs(usdMonthly - CANDIDATE_PLAN_USD.standby) < 0.001) {
+    return formatPlanPrice("standby", locale);
+  }
+  if (Math.abs(usdMonthly - CANDIDATE_PLAN_USD.standard) < 0.001) {
+    return formatPlanPrice("standard", locale);
+  }
   if (Math.abs(usdMonthly - CANDIDATE_PLAN_USD.premium) < 0.001) {
     return formatPlanPrice("premium", locale);
   }
@@ -219,7 +229,7 @@ export function formatMarketingMsrp(amount: number, locale: string): string {
 /** Localize a tier headline price when it maps to a known MSRP tier id. */
 export function localizeTierPrice(tierId: string, price: string, locale: string): string {
   if (NON_NUMERIC_PRICE.has(price.trim())) return price;
-  if (tierId === "premium" || tierId === "pro") {
+  if (tierId === "standby" || tierId === "standard" || tierId === "premium" || tierId === "pro") {
     return formatPlanPrice(tierId, locale);
   }
   const amount = TIER_MSRP_AMOUNT[tierId];

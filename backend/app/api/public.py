@@ -31,7 +31,12 @@ def _stripe_checkout_ready(settings: Settings) -> bool:
     s = settings
     return bool(
         s.stripe_secret_key.strip()
-        and (s.stripe_price_id_premium.strip() or s.stripe_price_id_pro.strip())
+        and (
+            s.stripe_price_id_standby.strip()
+            or s.stripe_price_id_standard.strip()
+            or s.stripe_price_id_premium.strip()
+            or s.stripe_price_id_pro.strip()
+        )
     )
 
 

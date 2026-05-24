@@ -18,6 +18,7 @@ from app.database.session import get_db
 from app.automation.types import ApplyOutcome
 from app.config import get_settings
 from app.core.plans import PlanTier, count_tracked_applications, effective_plan_tier, max_tracked_applications
+from app.core.subscription_gates import Feature, feature_allowed, paywall_for_feature
 from app.schemas.application import (
     ApplicationCreate,
     ApplicationFeedbackInsightsOut,
@@ -402,6 +403,16 @@ def create_application(
         )
         return out
 
+    if not feature_allowed(user, Feature.AUTO_APPLY):
+        pw = paywall_for_feature(Feature.AUTO_APPLY)
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "message": "Tracking applications requires Standard or higher.",
+                "paywall": pw,
+            },
+        )
+
     tier = effective_plan_tier(user)
     cap = max_tracked_applications(tier)
     if cap is not None:
@@ -461,10 +472,14 @@ def auto_apply(
         if replay:
             return AutoApplyOut.model_validate_json(replay[1])
 
-    if settings.auto_apply_require_premium and effective_plan_tier(user) == PlanTier.FREE:
+    if settings.auto_apply_require_premium and not feature_allowed(user, Feature.AUTO_APPLY):
+        pw = paywall_for_feature(Feature.AUTO_APPLY)
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Auto-apply is available on Premium and Pro plans.",
+            detail={
+                "message": "Auto-apply requires Standard or higher.",
+                "paywall": pw,
+            },
         )
     enforce_human_ack_if_required(settings=settings, human_acknowledged=body.human_acknowledged)
     enforce_auto_apply_redis_rate_limit(user_id=user.id, settings=settings)

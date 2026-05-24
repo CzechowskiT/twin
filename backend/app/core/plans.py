@@ -11,6 +11,8 @@ from app.database.models import Application, ApplicationStatus, User
 
 class PlanTier(str, Enum):
     FREE = "free"
+    STANDBY = "standby"
+    STANDARD = "standard"
     PREMIUM = "premium"
     PRO = "pro"
 
@@ -32,7 +34,7 @@ def effective_plan_tier(user: User) -> PlanTier:
 
 def max_tracked_applications(plan: PlanTier) -> int | None:
     """None = unlimited. Rejected rows do not consume a slot."""
-    if plan == PlanTier.FREE:
+    if plan in (PlanTier.FREE, PlanTier.STANDBY):
         return 25
     return None
 

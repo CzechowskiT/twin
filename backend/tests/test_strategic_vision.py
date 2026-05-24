@@ -14,7 +14,7 @@ from app.services.linkedin_profile_import import (
     build_profile_from_candidate,
     synthesize_profile_deterministic,
 )
-from app.services.opportunity_forecaster import forecast_opportunities
+from app.services.opportunity_forecaster import forecast_opportunities, generate_ai_learning_path
 from app.services.skill_matcher import compute_skill_match
 
 
@@ -91,6 +91,33 @@ def test_forecast_opportunities(vision_client) -> None:
     data = forecast_opportunities(db, candidate, limit_per_band=5, locale="en")
     assert "perfect" in data
     assert data["scanned_jobs"] >= 1
+    if data["near_miss"]:
+        assert "learning_path" in data["near_miss"][0]
+        assert data["near_miss"][0]["learning_path_source"] == "deterministic"
+
+
+def test_forecast_ai_learning_paths_flag(vision_client) -> None:
+    _client, _headers, db, candidate = vision_client
+    data = forecast_opportunities(db, candidate, limit_per_band=5, locale="en", use_ai_learning_paths=False)
+    for band in ("near_miss", "stretch"):
+        for entry in data.get(band, []):
+            assert entry.get("learning_path_source") == "deterministic"
+
+
+def test_generate_ai_learning_path_without_api() -> None:
+    assert generate_ai_learning_path(title="Dev", company="Acme", band="near_miss", missing_skills=["go"], locale="en") is None
+
+
+def test_opportunity_forecast_api_includes_learning_path_paywall(vision_client) -> None:
+    client, headers, db, _c = vision_client
+    user = db.query(User).filter(User.email == "vision@test.com").first()
+    user.plan_tier = "free"
+    user.subscription_status = None
+    db.commit()
+    res = client.get("/api/v1/opportunities/forecast", headers=headers)
+    assert res.status_code == 200
+    body = res.json()
+    assert "learning_path_paywall" in body
 
 
 def test_opportunity_forecast_api(vision_client) -> None:

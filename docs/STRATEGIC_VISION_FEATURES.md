@@ -17,15 +17,15 @@ This document tracks implementation of the GlobJob/Glimmer → TWIN strategic vi
 **Notes:**
 - LinkedIn OAuth uses OpenID scopes only (`openid profile email`) — no positions/skills API. Import falls back to stored candidate + CV text; optional short-lived token accepted in body.
 - Claude synthesis runs when `ANTHROPIC_API_KEY` is set; otherwise deterministic enrichment via `cv_enrichment`.
-- Learning paths are deterministic MVP; Claude-enhanced paths gated as Premium (`learning_path_ai`).
+- Learning paths: deterministic for all tiers; Claude-enhanced for Premium when `ANTHROPIC_API_KEY` is set (`learning_path_ai` gate)
 
 ## Phase 2: Subscription tiers & paywall
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Stripe tiers (existing) | **Extended** | Free $0, Premium $4.99, Pro $9.99 — unchanged |
-| `subscription_gates.py` | **Shipped** | `backend/app/core/subscription_gates.py` |
-| FeaturePaywall UI | **Shipped** | `frontend/src/components/billing/FeaturePaywall.tsx` |
+| Stripe tiers | **Shipped** | Free $0, Standby $0.99, Standard $1.99, Premium $4.99, Pro $9.99 |
+| `subscription_gates.py` | **Shipped** | Five-tier gates in `backend/app/core/subscription_gates.py` |
+| FeaturePaywall UI | **Shipped** | Four-tier story + localized tier names in `FeaturePaywall.tsx` |
 
 **Gates (Premium unless noted):**
 - Full forecast (Free: 5 roles/band)
@@ -34,7 +34,7 @@ This document tracks implementation of the GlobJob/Glimmer → TWIN strategic vi
 - Full gamification dashboard
 - LinkedIn AI synthesis: Free (deterministic always; Claude when key set)
 
-Future tiers ($0.99 standby, $1.99) documented for investor roadmap — not wired to Stripe yet.
+Micro-tiers use `STRIPE_PRICE_STANDBY` and `STRIPE_PRICE_STANDARD` (or `STRIPE_PRICE_ID_*` aliases); existing Premium/Pro price IDs map unchanged via webhooks.
 
 ## Phase 3: Gamification
 
@@ -66,9 +66,9 @@ Default `opportunity_type` = `full_time` for existing rows.
 | InterviewCoachPanel | **Shipped** | Job employer modal on dashboard |
 
 **Stubbed / coming soon:**
-- Claude-heavy learning path generation on forecast (without API key: deterministic only)
+- ~~Claude-heavy learning path generation on forecast~~ — **Shipped (Premium + ANTHROPIC_API_KEY)**; deterministic fallback for Free or when key unset
 - LinkedIn full profile scrape (requires partner API scopes)
-- Standby / $1.99 micro-tier Stripe price IDs
+- ~~Standby / $1.99 micro-tier Stripe price IDs~~ — **Shipped** (env-driven price IDs)
 
 ## Investor demo paths
 

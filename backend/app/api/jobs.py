@@ -3,6 +3,7 @@
 import logging
 import threading
 from collections.abc import Callable
+from datetime import datetime, timedelta
 from typing import Annotated
 
 from datetime import datetime, timedelta
@@ -16,7 +17,6 @@ from app.core.deps import get_current_user, require_scrape_user
 from app.core.plans import count_tracked_applications, effective_plan_tier, max_tracked_applications
 from app.database.models import Application, ApplicationStatus, Candidate, Job, SavedJob, User
 from app.database.session import get_db
-from app.matching.matcher import calculate_match_score
 from app.schemas.company_intelligence import CompanyIntelBodyOut, CompanyIntelOut, InsiderLanguageOut
 from app.schemas.job import (
     BoardListOut,
@@ -284,7 +284,7 @@ def one_click_apply(
     user: User = Depends(get_current_user),
     locale: str = Depends(locale_from_request),
 ) -> OneClickApplyOut:
-    """Track application as applied using stored profile — no external form fill."""
+    """Track application as applied using stored profile — opens job URL when new."""
     job = db.query(Job).filter(Job.id == job_id).first()
     if not job:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
@@ -326,7 +326,11 @@ def one_click_apply(
     db.add(app)
     db.commit()
     db.refresh(app)
-    msg = "Application tracked — open the job link when ready." if locale.startswith("en") else "Aplikacja zapisana — otwórz link oferty, gdy będziesz gotowy."
+    msg = (
+        "Application tracked — open the job link when ready."
+        if locale.startswith("en")
+        else "Aplikacja zapisana — otwórz link oferty, gdy będziesz gotowy."
+    )
     return OneClickApplyOut(application_id=app.id, status=app.status.value, message=msg)
 
 
@@ -389,10 +393,9 @@ def get_saved_jobs(
         .order_by(SavedJob.created_at.desc())
         .all()
     )
-    cand_dict = candidate_to_dict(candidate)
     out: list[JobOut] = []
     for job in rows:
-        sc = float(calculate_match_score(cand_dict, job_to_dict(job)))
+        sc = score_for_candidate(job, candidate)
         out.append(job_out(job, score=sc))
     return out
 
