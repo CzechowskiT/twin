@@ -139,6 +139,8 @@ export default function DashboardCalendarPage() {
   const [opsHealth, setOpsHealth] = useState<OpsHealth | null>(null);
   const [webcalUrl, setWebcalUrl] = useState<string | null>(null);
   const [webcalExpiresAt, setWebcalExpiresAt] = useState<string | null>(null);
+  const [googleStatusError, setGoogleStatusError] = useState(false);
+  const [microsoftStatusError, setMicrosoftStatusError] = useState(false);
   const [banner, setBanner] = useState<"connected" | "denied" | "error" | null>(null);
   const [calendarErrorCode, setCalendarErrorCode] = useState<string | null>(null);
   const [actionBusy, setActionBusy] = useState<string | null>(null);
@@ -214,11 +216,14 @@ export default function DashboardCalendarPage() {
   const load = useCallback(async () => {
     const token = getToken();
     if (!token) {
+      setLoading(false);
       router.replace("/login");
       return;
     }
     setLoading(true);
     setActionError(false);
+    setGoogleStatusError(false);
+    setMicrosoftStatusError(false);
     setNotifPrefsLoadError(false);
     try {
       const [calRes, msRes, meRes, oauthCfgRes, opsRes] = await Promise.allSettled([
@@ -228,32 +233,50 @@ export default function DashboardCalendarPage() {
         apiFetch<CalendarOAuthConfig>("/api/v1/calendar/oauth-config", {}),
         fetchOpsHealth(),
       ]);
-      if (calRes.status === "rejected") {
-        throw calRes.reason;
-      }
       const oauthCfgValue = oauthCfgRes.status === "fulfilled" ? oauthCfgRes.value : null;
       setOauthCfg(oauthCfgValue);
       setOpsHealth(opsRes.status === "fulfilled" ? opsRes.value : null);
-      const s = calRes.value;
-      setStatus({
-        ...s,
-        oauth_redirect_uri: s.oauth_redirect_uri ?? oauthCfgValue?.google.redirect_uri ?? null,
-      });
-      const msRaw =
-        msRes.status === "fulfilled"
-          ? msRes.value
-          : { connected: false, microsoft_email: null, oauth_configured: false };
-      setMsStatus({
-        ...msRaw,
-        oauth_redirect_uri: msRaw.oauth_redirect_uri ?? oauthCfgValue?.microsoft.redirect_uri ?? null,
-      });
+
+      if (calRes.status === "fulfilled") {
+        const s = calRes.value;
+        setStatus({
+          ...s,
+          oauth_redirect_uri: s.oauth_redirect_uri ?? oauthCfgValue?.google.redirect_uri ?? null,
+        });
+      } else {
+        setGoogleStatusError(true);
+        setStatus({
+          connected: false,
+          google_email: null,
+          oauth_configured: oauthCfgValue?.google.oauth_configured ?? false,
+          oauth_redirect_uri: oauthCfgValue?.google.redirect_uri ?? null,
+        });
+        console.warn("[calendar] google status failed", calRes.reason);
+      }
+
+      if (msRes.status === "fulfilled") {
+        const msRaw = msRes.value;
+        setMsStatus({
+          ...msRaw,
+          oauth_redirect_uri: msRaw.oauth_redirect_uri ?? oauthCfgValue?.microsoft.redirect_uri ?? null,
+        });
+      } else {
+        setMicrosoftStatusError(true);
+        setMsStatus({
+          connected: false,
+          microsoft_email: null,
+          oauth_configured: oauthCfgValue?.microsoft.oauth_configured ?? false,
+          oauth_redirect_uri: oauthCfgValue?.microsoft.redirect_uri ?? null,
+        });
+        console.warn("[calendar] microsoft status failed", msRes.reason);
+      }
+
       if (meRes.status === "fulfilled") {
         setEmailProductUpdates(Boolean(meRes.value.email_product_updates));
         setEmailInterviewReminders(Boolean(meRes.value.email_interview_reminders));
       } else {
         setNotifPrefsLoadError(true);
       }
-      await fetchInterviewRows(token);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       if (msg.includes("401")) {
@@ -263,10 +286,16 @@ export default function DashboardCalendarPage() {
       }
       setActionError(true);
       setStatus(null);
+      setMsStatus(null);
       setInterviews([]);
     } finally {
       setLoading(false);
     }
+
+    void fetchInterviewRows(token).catch((e) => {
+      console.warn("[calendar] interview list failed", e);
+      setInterviews([]);
+    });
   }, [router, fetchInterviewRows]);
 
   useEffect(() => {
@@ -697,7 +726,7 @@ export default function DashboardCalendarPage() {
       ) : null}
 
       {loading ? (
-        <p className="mb-6 text-sm text-[var(--twin-muted-strong)]">{t("dashboard.identityLoading")}</p>
+        <p className="mb-6 text-sm text-[var(--twin-muted-strong)]">{t("dashboard.calendarConnectionsLoading")}</p>
       ) : isCalendarConnected ? (
         <CalendarWeekView
           weekStart={weekStart}
@@ -721,6 +750,8 @@ export default function DashboardCalendarPage() {
 
       <CalendarConnectionsPanel
         loading={loading}
+        googleStatusError={googleStatusError}
+        microsoftStatusError={microsoftStatusError}
         actionBusy={actionBusy}
         google={{
           connected: Boolean(status?.connected),

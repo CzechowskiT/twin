@@ -837,7 +837,10 @@ const en = {
     nightlyAutoApplyConsentNudgeCta: "Review consent & settings",
     nightlyAutoApplyPlatformSweep: "Last platform sweep",
     nightlyAutoApplyPlatformSweepNone: "No scheduled sweep recorded yet",
-    nightlyAutoApplySweepFailed: "{count} failed in last sweep",
+    nightlyAutoApplySweepSubmitted: "{count} submitted",
+    nightlyAutoApplySweepPartial: "{submitted} submitted · {failed} could not complete ({boards})",
+    nightlyAutoApplySweepFailedOnly: "{count} could not complete ({boards})",
+    nightlyAutoApplySweepSkipped: "{count} skipped (cooldown or blocklist)",
     workspaceGateTitleRecruiter: "Recruiter workspace",
     workspaceGateTitleCompany: "Company workspace",
     workspaceGateLeadRecruiter:
@@ -968,6 +971,8 @@ const en = {
       "Order and timing follow enterprise demand and security review — not a promise of ship dates.",
     calendarConnected: "Connected",
     calendarNotConnected: "Not connected",
+    calendarConnectionsLoading: "Loading…",
+    calendarConnectionsStatusError: "Could not load connection status. Refresh the page or try again.",
     calendarConnect: "Connect Google",
     calendarDisconnect: "Disconnect",
     calendarGoogleRedirectSetup:

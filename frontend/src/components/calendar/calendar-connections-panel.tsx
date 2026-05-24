@@ -28,6 +28,8 @@ type WebcalState = {
 
 export type CalendarConnectionsPanelProps = {
   loading: boolean;
+  googleStatusError?: boolean;
+  microsoftStatusError?: boolean;
   actionBusy: string | null;
   google: ProviderState;
   microsoft: ProviderState;
@@ -67,14 +69,14 @@ function ProviderCardHeader({
   badge: ReactNode;
 }) {
   return (
-    <div className="flex items-start justify-between gap-3">
+    <div className="flex flex-col gap-2">
+      <div className="flex justify-end">{badge}</div>
       <div className="flex min-w-0 items-center gap-3">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]">
           {icon}
         </span>
-        <h3 className="text-base font-semibold text-[var(--foreground)]">{title}</h3>
+        <h3 className="min-w-0 text-base font-semibold leading-snug text-[var(--foreground)]">{title}</h3>
       </div>
-      {badge}
     </div>
   );
 }
@@ -92,6 +94,7 @@ function ProviderCard({
   connectBusyKey,
   disconnectBusyKey,
   loading,
+  statusError,
   actionBusy,
   onConnect,
   onDisconnect,
@@ -108,6 +111,7 @@ function ProviderCard({
   connectBusyKey: string;
   disconnectBusyKey: string;
   loading: boolean;
+  statusError?: boolean;
   actionBusy: string | null;
   onConnect: () => void;
   onDisconnect: () => void;
@@ -128,7 +132,11 @@ function ProviderCard({
         </p>
       ) : null}
       {loading ? (
-        <p className="twin-muted mt-4 text-sm">{t("dashboard.identityLoading")}</p>
+        <p className="twin-muted mt-4 text-sm">{t("dashboard.calendarConnectionsLoading")}</p>
+      ) : statusError ? (
+        <p className="mt-4 text-sm text-[var(--twin-muted-strong)]" role="alert">
+          {t("dashboard.calendarConnectionsStatusError")}
+        </p>
       ) : provider.connected ? (
         <Button
           type="button"
@@ -169,6 +177,8 @@ const OTHER_STEPS: {
 
 export function CalendarConnectionsPanel({
   loading,
+  googleStatusError,
+  microsoftStatusError,
   actionBusy,
   google,
   microsoft,
@@ -209,6 +219,7 @@ export function CalendarConnectionsPanel({
           connectBusyKey="connect"
           disconnectBusyKey="disconnect"
           loading={loading}
+          statusError={googleStatusError}
           actionBusy={actionBusy}
           onConnect={onConnectGoogle}
           onDisconnect={onDisconnectGoogle}
@@ -226,6 +237,7 @@ export function CalendarConnectionsPanel({
           connectBusyKey="ms-connect"
           disconnectBusyKey="ms-disconnect"
           loading={loading}
+          statusError={microsoftStatusError}
           actionBusy={actionBusy}
           onConnect={onConnectMicrosoft}
           onDisconnect={onDisconnectMicrosoft}
