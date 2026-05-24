@@ -148,6 +148,9 @@ LinkedIn/Indeed (scale/noise), Hired/Vettery (quality/cost), Upwork/Fiverr (gig,
 | Three-lane labels in UI | `job-list.tsx` + `match-lane.ts` on dashboard feed |
 | Demo script | Step for three lanes + jobs hub |
 | Freemium / Standby marketing | Persona tier bullets (Standby roadmap) |
+| `STRATEGY_GLOBJOB_GLIMMER_SYNTHESIS_2026-05.md` | May 2026 PL synthesis |
+| `FOUNDER_OPEN_QUESTIONS.md` | Human decisions index |
+| Investor metrics competitive moat | `/investor/metrics` panel copy |
 
 ---
 
