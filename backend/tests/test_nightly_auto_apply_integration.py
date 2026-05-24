@@ -175,3 +175,27 @@ def test_sweep_persists_auto_apply_run(nightly_db) -> None:
     assert run is not None
     assert run.total_applications_submitted == 1
     assert run.finished_at is not None
+
+
+def test_guard_skip_counts_as_skipped_not_failed(nightly_db, monkeypatch) -> None:
+    db, user, consent, job = nightly_db
+    monkeypatch.setenv("NIGHTLY_AUTO_APPLY_COOLDOWN_SECONDS", "0")
+    monkeypatch.setenv("AUTO_APPLY_COMPANY_BLOCKLIST", "acme")
+    get_settings.cache_clear()
+
+    with (
+        patch("app.services.nightly_auto_apply.find_top_matches"),
+        patch("app.services.nightly_auto_apply.auto_apply_for_user") as mock_apply,
+    ):
+        row = process_user_nightly_auto_apply(
+            db,
+            user=user,
+            consent=consent,
+            settings=get_settings(),
+            submit=False,
+        )
+        mock_apply.assert_not_called()
+
+    assert row["applications_submitted"] == 0
+    assert row["applications_failed"] == 0
+    assert row["applications_skipped"] == 1

@@ -37,6 +37,16 @@ class AutoApplyLastSweepOut(BaseModel):
     finished_at: datetime | None
     total_applications_submitted: int
     total_applications_failed: int
+    total_applications_skipped: int = 0
+    boards: list["SweepBoardStatOut"] = Field(default_factory=list)
+    is_demo_seed: bool = False
+
+
+class SweepBoardStatOut(BaseModel):
+    board: str
+    submitted: int = 0
+    failed: int = 0
+    skipped: int = 0
 
 
 class AutoApplyTriggerOut(BaseModel):
