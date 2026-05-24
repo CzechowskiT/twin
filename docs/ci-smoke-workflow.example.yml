@@ -27,6 +27,7 @@ jobs:
       - run: |
           pytest tests/test_health_features.py \
             tests/test_public_mvp_stats.py \
+            tests/test_stripe_tier_mapping.py \
             tests/test_rocketjobs_parser.py \
             tests/test_recruiter_inbox.py \
             tests/test_nightly_auto_apply_mail.py \
