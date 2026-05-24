@@ -5,7 +5,7 @@ import { WorkspaceLaneHome } from "@/components/workspace-lane-home";
 
 export default function WorkspaceRecruiterPage() {
   return (
-    <PersonaWorkspaceGate allowed={["recruiter", "investor"]} surface="recruiter">
+    <PersonaWorkspaceGate allowed={["recruiter"]} surface="recruiter">
       <WorkspaceLaneHome
         title="workspace.recruiterHomeTitle"
         lead="workspace.recruiterHomeLead"

@@ -115,7 +115,6 @@ export type TranslationKey =
   | `atsIntegrations.${keyof typeof en.atsIntegrations}`
   | `dataRoom.${keyof typeof en.dataRoom}`
   | `careerAssistant.${keyof typeof en.careerAssistant}`
-  | `careerDiscovery.${Extract<keyof typeof CAREER_DISCOVERY_MESSAGES_EN, string>}`
   | `jobBrief.${keyof typeof en.jobBrief}`
   | `marketingHowItWorks.${keyof typeof en.marketingHowItWorks}`
   | `workspace.${keyof typeof en.workspace}`
