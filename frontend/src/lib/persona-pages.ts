@@ -108,11 +108,25 @@ const candidatesEn: PersonaBundle = {
       cadence: "forever",
       bullets: [
         "Core pipeline: browse, save, dismiss",
+        "Teaser: role-level offer counts without employer names (apply on paid tiers)",
         "Limited tracked applications (see app for current cap)",
         "Profile + manual apply links",
       ],
       cta: "Create account",
       href: "/register",
+    },
+    {
+      id: "standby",
+      name: "Standby",
+      price: "$0.99",
+      cadence: "per month · roadmap",
+      bullets: [
+        "Frozen profile when you are not actively searching",
+        "No applications while paused — unfreeze anytime",
+        "Keeps your twin ready for the next search wave",
+      ],
+      cta: "Join wishlist for early access",
+      href: "/waitlist",
     },
     {
       id: "premium",
@@ -211,11 +225,25 @@ const candidatesPl: PersonaBundle = {
       cadence: "bezterminowo",
       bullets: [
         "Rdzeń pipeline: przeglądaj, zapisuj, odrzucaj",
+        "Podgląd: liczba ofert dla roli bez nazw firm (aplikowanie na płatnych planach)",
         "Limitowana liczba śledzonych aplikacji (aktualny limit w aplikacji)",
         "Profil + ręczne linki aplikacyjne",
       ],
       cta: "Załóż konto",
       href: "/register",
+    },
+    {
+      id: "standby",
+      name: "Standby",
+      price: "0,99 USD",
+      cadence: "mies. · roadmap",
+      bullets: [
+        "Zamrożony profil, gdy nie szukasz aktywnie",
+        "Bez aplikacji w pauzie — odmrożenie w dowolnym momencie",
+        "Bliźniak gotowy na kolejną falę poszukiwań",
+      ],
+      cta: "Wishlist — wczesny dostęp",
+      href: "/waitlist",
     },
     {
       id: "premium",
