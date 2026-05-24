@@ -18,6 +18,7 @@ def apply_job_filters(
     job_board: str | None = None,
     min_salary: int | None = None,
     title_terms: str | None = None,
+    opportunity_type: str | None = None,
     sort: str = SORT_NEWEST,
 ) -> Query:
     tokens = tokenize_job_search(q, title_terms)
@@ -28,6 +29,8 @@ def apply_job_filters(
         query = query.filter(Job.location.ilike(f"%{location.strip()}%"))
     if job_board:
         query = query.filter(Job.job_board.ilike(f"%{job_board.strip()}%"))
+    if opportunity_type and opportunity_type.strip() and opportunity_type.strip() != "all":
+        query = query.filter(Job.opportunity_type == opportunity_type.strip())
     query = apply_min_salary_filter(query, min_salary)
 
     if sort == SORT_SALARY:

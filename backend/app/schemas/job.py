@@ -16,6 +16,10 @@ class JobOut(BaseModel):
     url: str
     is_validated: bool
     scraped_at: datetime
+    opportunity_type: str = "full_time"
+    project_duration_months: int | None = None
+    hourly_rate_min: int | None = None
+    hourly_rate_max: int | None = None
     score: float | None = Field(default=None, description="Match vs current user's profile (0–100); null without profile.")
 
     model_config = ConfigDict(
