@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import logging
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -17,7 +15,6 @@ from app.services.demo_snapshot import build_demo_snapshot
 from app.services.investor_demo_seed import DEMO_APPLY_JOB_EXTERNAL_ID, DEMO_BOARD
 
 router = APIRouter()
-logger = logging.getLogger(__name__)
 
 
 def _require_demo_mode(settings: Settings = Depends(get_settings)) -> Settings:
@@ -59,11 +56,4 @@ def demo_snapshot(
     settings: Settings = Depends(_require_demo_mode),
 ) -> DemoSnapshotOut:
     """Anonymized feed for marketing /demo — no user email, ids optional, read-only."""
-    try:
-        return build_demo_snapshot(db, settings)
-    except Exception as exc:
-        logger.exception("GET /demo/snapshot failed")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal server error",
-        ) from exc
+    return build_demo_snapshot(db, settings)
