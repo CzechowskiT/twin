@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import { useTranslation } from "@/components/language-provider";
 import type { TranslationKey } from "@/lib/i18n";
 import { Card, Shell } from "@/components/ui";
+import { ProfileImport } from "@/components/onboarding/ProfileImport";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 
@@ -119,6 +120,11 @@ export default function OnboardingPage() {
             <p className="twin-muted mb-6 text-sm leading-relaxed">
               {t(`onboardingFlow.${key}Body` as TranslationKey)}
             </p>
+            {key === "cv" ? (
+              <div className="mb-6">
+                <ProfileImport />
+              </div>
+            ) : null}
             {key !== "welcome" ? profileCta : null}
             <div className="flex flex-wrap gap-3">
               {!isLast ? (

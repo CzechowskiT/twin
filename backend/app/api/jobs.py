@@ -159,6 +159,10 @@ def list_jobs(
         ),
     ] = None,
     sort: Annotated[str, Query(description=f"Sort order: `{SORT_NEWEST}`, `{SORT_SALARY}`, or `{SORT_COMPANY}`.")] = SORT_NEWEST,
+    opportunity_type: Annotated[
+        str | None,
+        Query(description="Filter by opportunity type: full_time, freelance, contract, or all."),
+    ] = None,
     db: Session = Depends(get_db),
     _user: User = Depends(get_current_user),
 ) -> JobListOut:
@@ -179,6 +183,7 @@ def list_jobs(
         job_board=job_board,
         min_salary=min_salary,
         title_terms=title_terms,
+        opportunity_type=opportunity_type,
         sort=sort,
     )
     total = query.count()
@@ -191,6 +196,7 @@ def list_jobs(
             job_board=job_board,
             min_salary=None,
             title_terms=title_terms,
+            opportunity_type=opportunity_type,
             sort=sort,
         )
         total = query.count()
