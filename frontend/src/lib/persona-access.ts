@@ -33,6 +33,7 @@ const PATH_IMPLIES_PERSONA: { prefix: string; persona: MarketingPersona }[] = [
   { prefix: "/investor", persona: "investor" },
   { prefix: "/login/candidate", persona: "candidate" },
   { prefix: "/login/recruiter", persona: "recruiter" },
+  { prefix: "/login/company", persona: "company" },
   { prefix: "/login/investor", persona: "investor" },
   { prefix: "/register/candidate", persona: "candidate" },
   { prefix: "/register/recruiter", persona: "recruiter" },
@@ -389,6 +390,7 @@ export function footerExploreHrefsForPersona(persona: MarketingPersona): string[
       ...common,
       "/for-companies",
       "/calculator/b2b",
+      "/login/company",
       "/companies/signup",
       "/contact",
     ];
