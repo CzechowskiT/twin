@@ -37,6 +37,7 @@ from app.services.skill_matcher import compute_skill_match
 from app.scrapers.registry import GLOBAL_BOARD_SPECS, list_boards
 from app.tasks.scrape_tasks import (
     GLOBAL_BOARD_SCRAPE_TASKS,
+    GREENHOUSE_SCRAPE_TASKS,
     scrape_all_boards_task,
     scrape_justjoin_task,
     scrape_linkedin_sales_task,
@@ -129,7 +130,11 @@ LOCAL_SCRAPE_HANDLERS = {
     "linkedin-sales": scrape_linkedin_sales_task,
 }
 
-PER_BOARD_SCRAPE_HANDLERS = {**LOCAL_SCRAPE_HANDLERS, **GLOBAL_BOARD_SCRAPE_TASKS}
+PER_BOARD_SCRAPE_HANDLERS = {
+    **LOCAL_SCRAPE_HANDLERS,
+    **GLOBAL_BOARD_SCRAPE_TASKS,
+    **GREENHOUSE_SCRAPE_TASKS,
+}
 
 
 @router.get("/boards", response_model=BoardListOut)

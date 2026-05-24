@@ -6,7 +6,7 @@ from app.config import get_settings
 from app.database.session import SessionLocal
 from app.scrapers import justjoin, linkedin, praca, pracuj, rocketjobs
 from app.scrapers.global_boards import GLOBAL_BOARD_SPECS, scrape_global_board
-from app.scrapers.registry import DEFAULT_BOARD_TIMEOUT_SEC, scrape_all_boards
+from app.scrapers.registry import DEFAULT_BOARD_TIMEOUT_SEC, GREENHOUSE_SCRAPERS, run_scrape, scrape_all_boards
 from app.services.job_storage import upsert_jobs
 from app.tasks.celery_app import celery_app
 
@@ -17,6 +17,16 @@ def _scrape_limit() -> int:
 
 def _persist_global_board(board_id: str) -> dict[str, int]:
     jobs = scrape_global_board(board_id, limit=_scrape_limit())
+    db = SessionLocal()
+    try:
+        saved = upsert_jobs(db, jobs)
+    finally:
+        db.close()
+    return {"scraped": len(jobs), "saved": saved}
+
+
+def _persist_registry_board(board_id: str) -> dict[str, int]:
+    jobs = run_scrape(board_id)
     db = SessionLocal()
     try:
         saved = upsert_jobs(db, jobs)
@@ -155,6 +165,27 @@ def _register_global_board_celery_tasks() -> dict[str, Any]:
 
 
 GLOBAL_BOARD_SCRAPE_TASKS: dict[str, Any] = _register_global_board_celery_tasks()
+
+
+def _register_greenhouse_celery_tasks() -> dict[str, Any]:
+    """One Celery task per Greenhouse employer board (gh-* ids in SCRAPE_REGISTRY)."""
+    out: dict[str, Any] = {}
+    for board_id in GREENHOUSE_SCRAPERS:
+        suffix = board_id.replace("-", "_")
+        task_name = f"app.tasks.scrape_tasks.scrape_{suffix}_task"
+
+        def _make_task(bid: str, tname: str) -> Any:
+            @celery_app.task(name=tname)
+            def _board_task() -> dict[str, int]:
+                return _persist_registry_board(bid)
+
+            return _board_task
+
+        out[board_id] = _make_task(board_id, task_name)
+    return out
+
+
+GREENHOUSE_SCRAPE_TASKS: dict[str, Any] = _register_greenhouse_celery_tasks()
 
 
 @celery_app.task(name="app.tasks.scrape_tasks.scrape_all_boards_task")
