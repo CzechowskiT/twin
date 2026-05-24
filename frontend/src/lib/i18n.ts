@@ -1059,8 +1059,10 @@ const en = {
     zoneCandidateLead: "Dashboard, matches, auto-apply, and interview calendar.",
     zoneRecruiterTitle: "Recruiter sign-in",
     zoneRecruiterLead: "Acceptance inbox and B2B ROI tools for client conversations.",
-    zoneCompanyTitle: "Company program",
+    zoneCompanyTitle: "Company sign-in",
     zoneCompanyLead: "Enterprise procurement — annual pricing and B2B ROI are on the Companies lane.",
+    zoneCompanyDemoHint:
+      "Founder demo: sign in with demo@twin.career (password from docs/INVESTOR_DEMO_RUNBOOK.md), then open /for-companies or /calculator/b2b.",
     zoneInvestorTitle: "Investor sign-in",
     zoneInvestorLead: "Fund scenario calculator and traction metrics — not employer procurement.",
     allZones: "All sign-in options",
@@ -3575,8 +3577,10 @@ const pl: MessageTree = {
     zoneCandidateLead: "Panel, dopasowania, auto-aplikacja i kalendarz rozmów.",
     zoneRecruiterTitle: "Logowanie rekrutera",
     zoneRecruiterLead: "Skrzynka akceptacji i kalkulator ROI B2B do rozmów z klientem.",
-    zoneCompanyTitle: "Program firmowy",
+    zoneCompanyTitle: "Logowanie firmy",
     zoneCompanyLead: "Procurement enterprise — cennik roczny i ROI B2B są w sekcji Firmy.",
+    zoneCompanyDemoHint:
+      "Demo założyciela: zaloguj się jako demo@twin.career (hasło w docs/INVESTOR_DEMO_RUNBOOK.md), potem /for-companies lub /calculator/b2b.",
     zoneInvestorTitle: "Logowanie inwestora",
     zoneInvestorLead: "Kalkulator scenariusza i metryki — nie procurement pracodawcy.",
     allZones: "Wszystkie opcje logowania",

@@ -136,6 +136,11 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
       </p>
       <h1 className="mb-2 mt-1 text-2xl font-semibold">{t(ZONE_TITLE[zone])}</h1>
       <p className="twin-muted mb-4 text-sm leading-relaxed">{t(ZONE_LEAD[zone])}</p>
+      {zone === "company" ? (
+        <p className="twin-muted mb-4 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/80 px-3 py-2 text-xs leading-relaxed">
+          {t("login.zoneCompanyDemoHint")}
+        </p>
+      ) : null}
       <LinkedInLoginSection emailLoginHref="#login-email" />
       <form onSubmit={onSubmit} className="mt-4">
         <Label htmlFor="login-email">{t("login.email")}</Label>

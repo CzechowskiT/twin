@@ -54,6 +54,7 @@ const EXPLORE_LABEL_KEYS: Record<string, TranslationKey> = {
   "/login/candidate": "site.footerCandidateLogin",
   "/login/recruiter": "site.footerRecruiterLogin",
   "/login/investor": "site.footerInvestorLogin",
+  "/login/company": "site.footerCompanyLogin",
   "/companies/signup": "site.footerCompanySignup",
   "/recruiter/inbox": "recruiterInbox.title",
   "/contact": "nav.contact",
