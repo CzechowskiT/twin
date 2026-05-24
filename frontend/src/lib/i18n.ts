@@ -115,7 +115,6 @@ export type TranslationKey =
   | `atsIntegrations.${keyof typeof en.atsIntegrations}`
   | `dataRoom.${keyof typeof en.dataRoom}`
   | `careerAssistant.${keyof typeof en.careerAssistant}`
-  | `careerDiscovery.${Extract<keyof typeof CAREER_DISCOVERY_MESSAGES_EN, string>}`
   | `jobBrief.${keyof typeof en.jobBrief}`
   | `marketingHowItWorks.${keyof typeof en.marketingHowItWorks}`
   | `workspace.${keyof typeof en.workspace}`
@@ -843,6 +842,7 @@ const en = {
     nightlyAutoApplyPlatformSweepNone: "No scheduled sweep recorded yet",
     nightlyAutoApplySweepSubmitted: "{count} submitted",
     nightlyAutoApplySweepPartial: "{submitted} submitted · {failed} could not complete ({boards})",
+    nightlyAutoApplySweepFailed: "{count} could not complete",
     nightlyAutoApplySweepFailedOnly: "{count} could not complete ({boards})",
     nightlyAutoApplySweepSkipped: "{count} skipped (cooldown or blocklist)",
     workspaceGateTitleRecruiter: "Recruiter workspace",
@@ -3317,6 +3317,7 @@ const pl: MessageTree = {
     nightlyAutoApplyPlatformSweepNone: "Brak zarejestrowanego sweepu harmonogramu",
     nightlyAutoApplySweepSubmitted: "{count} wysłanych",
     nightlyAutoApplySweepPartial: "{submitted} wysłanych · {failed} bez wysyłki ({boards})",
+    nightlyAutoApplySweepFailed: "{count} bez wysyłki",
     nightlyAutoApplySweepFailedOnly: "{count} bez wysyłki ({boards})",
     nightlyAutoApplySweepSkipped: "{count} pominiętych (cooldown lub blocklist)",
     workspaceGateTitleRecruiter: "Widok rekrutera",
