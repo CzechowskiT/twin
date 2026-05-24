@@ -3,6 +3,8 @@
 **Krótko:** wszystkie klucze produkcyjne trzymasz w pliku **`.env.railway`** w katalogu głównym repozytorium (plik jest w `.gitignore` — **nigdy nie commituj**). Po wklejeniu napisz agentowi: **„sekrety w .env.railway”** — agent uruchomi `./scripts/railway-apply-production-env.sh` i sprawdzi prod.
 
 **Prod API:** https://twin-production-bcd9.up.railway.app  
+**Szybki P0 (kliki):** [FOUNDER_P0_CHECKLIST.md](./FOUNDER_P0_CHECKLIST.md) · **Decyzje:** [FOUNDER_OPEN_QUESTIONS.md](./FOUNDER_OPEN_QUESTIONS.md)
+
 **Szybki audyt:** https://twin-sooty.vercel.app/status
 
 ---

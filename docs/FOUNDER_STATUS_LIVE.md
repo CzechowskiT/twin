@@ -57,3 +57,4 @@ API: `curl -s "https://twin-production-bcd9.up.railway.app/api/v1/health?ops=1&d
 | ATS OAuth (Greenhouse/Lever) | Founder credentials + agent wiring |
 
 Checklists: `docs/FOUNDER_SECRETS_WHERE.md`, `docs/STRIPE_RAILWAY_SETUP.md`, `docs/NIGHTLY_AUTO_APPLY_DEPLOY.md`.
+Checklists: [FOUNDER_P0_CHECKLIST.md](./FOUNDER_P0_CHECKLIST.md), [FOUNDER_SECRETS_WHERE.md](./FOUNDER_SECRETS_WHERE.md), [FOUNDER_OPEN_QUESTIONS.md](./FOUNDER_OPEN_QUESTIONS.md), `docs/STRIPE_RAILWAY_SETUP.md`, `docs/NIGHTLY_AUTO_APPLY_DEPLOY.md`, `docs/PLACEMENT_VERIFICATION.md`.
