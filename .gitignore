@@ -45,3 +45,6 @@ backend/celerybeat-schedule*
 # Alembic (keep versions tracked)
 # migrations are committed
 .cursor/
+
+# Local tooling (gh CLI install, not part of app)
+.tools/
