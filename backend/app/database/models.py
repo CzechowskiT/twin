@@ -1,10 +1,11 @@
 """SQLAlchemy ORM models."""
 
-from datetime import datetime
+from datetime import date, datetime
 from enum import Enum as PyEnum
 
 from sqlalchemy import (
     Boolean,
+    Date,
     DateTime,
     Enum,
     Float,
@@ -272,6 +273,31 @@ class Candidate(Base):
         back_populates="candidate",
         cascade="all, delete-orphan",
     )
+    progress: Mapped["CandidateProgress | None"] = relationship(
+        back_populates="candidate",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
+
+
+class CandidateProgress(Base):
+    """Gamification progress (XP, streaks, badges) — separate from career_compass JSON."""
+
+    __tablename__ = "candidate_progress"
+    __table_args__ = (UniqueConstraint("candidate_id", name="uq_candidate_progress_candidate_id"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(ForeignKey("candidates.id", ondelete="CASCADE"), unique=True)
+    xp_total: Mapped[int] = mapped_column(Integer, default=0)
+    level: Mapped[int] = mapped_column(Integer, default=1)
+    streak_days: Mapped[int] = mapped_column(Integer, default=0)
+    last_active_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    badges_json: Mapped[str] = mapped_column(Text, default="[]")
+    stats_json: Mapped[str] = mapped_column(Text, default="{}")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    candidate: Mapped["Candidate"] = relationship(back_populates="progress")
 
 
 class BetaWaitlist(Base):
@@ -410,6 +436,10 @@ class Job(Base):
     url: Mapped[str] = mapped_column(String(500))
     is_validated: Mapped[bool] = mapped_column(Boolean, default=False)
     scraped_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    opportunity_type: Mapped[str] = mapped_column(String(32), default="full_time")
+    project_duration_months: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    hourly_rate_min: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    hourly_rate_max: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     matches: Mapped[list["JobMatch"]] = relationship(back_populates="job")
     applications: Mapped[list["Application"]] = relationship(back_populates="job")
