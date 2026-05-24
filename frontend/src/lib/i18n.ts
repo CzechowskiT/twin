@@ -21,6 +21,10 @@ import {
   JOB_EMPLOYER_MESSAGES_EN,
   JOB_EMPLOYER_MESSAGES_PL,
 } from "./job-employer-messages";
+import {
+  JOB_BOARD_MESSAGES_EN,
+  JOB_BOARD_MESSAGES_PL,
+} from "./job-board-i18n";
 import { SITE_MESSAGES_EN, SITE_MESSAGES_PL } from "./site-messages";
 import {
   CANDIDATE_REWARDS_MESSAGES_EN,
@@ -134,6 +138,7 @@ export type TranslationKey =
   | `ux.${keyof typeof en.ux}`
   | `employerMedia.${keyof typeof EMPLOYER_MEDIA_MESSAGES_EN}`
   | `jobEmployer.${keyof typeof JOB_EMPLOYER_MESSAGES_EN}`
+  | `jobBoard.${keyof typeof JOB_BOARD_MESSAGES_EN}`
   | `employerAbout.${keyof typeof EMPLOYER_ABOUT_MESSAGES_EN}`;
 
 const en = {
@@ -2610,6 +2615,7 @@ const en = {
   },
   employerMedia: EMPLOYER_MEDIA_MESSAGES_EN,
   jobEmployer: JOB_EMPLOYER_MESSAGES_EN,
+  jobBoard: JOB_BOARD_MESSAGES_EN,
   employerAbout: EMPLOYER_ABOUT_MESSAGES_EN,
   ux: {
     flowNavAria: "Your workspace steps",
@@ -5141,6 +5147,7 @@ const pl: MessageTree = {
   },
   employerMedia: EMPLOYER_MEDIA_MESSAGES_PL,
   jobEmployer: JOB_EMPLOYER_MESSAGES_PL,
+  jobBoard: JOB_BOARD_MESSAGES_PL,
   employerAbout: EMPLOYER_ABOUT_MESSAGES_PL,
   ux: {
     flowNavAria: "Kroki w Twojej przestrzeni roboczej",
