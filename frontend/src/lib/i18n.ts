@@ -26,6 +26,10 @@ import {
   CANDIDATE_REWARDS_MESSAGES_EN,
   CANDIDATE_REWARDS_MESSAGES_PL,
 } from "./candidate-rewards-messages";
+import {
+  JOB_BOARD_MESSAGES_EN,
+  JOB_BOARD_MESSAGES_PL,
+} from "./job-board-i18n";
 
 export type Locale = "en" | "pl" | "es" | "it" | "fr" | "de" | "zh" | "ar" | "ja";
 
@@ -134,7 +138,8 @@ export type TranslationKey =
   | `ux.${keyof typeof en.ux}`
   | `employerMedia.${keyof typeof EMPLOYER_MEDIA_MESSAGES_EN}`
   | `jobEmployer.${keyof typeof JOB_EMPLOYER_MESSAGES_EN}`
-  | `employerAbout.${keyof typeof EMPLOYER_ABOUT_MESSAGES_EN}`;
+  | `employerAbout.${keyof typeof EMPLOYER_ABOUT_MESSAGES_EN}`
+  | `jobBoard.${keyof typeof JOB_BOARD_MESSAGES_EN}`;
 
 const en = {
   nav: {
@@ -2611,6 +2616,7 @@ const en = {
   employerMedia: EMPLOYER_MEDIA_MESSAGES_EN,
   jobEmployer: JOB_EMPLOYER_MESSAGES_EN,
   employerAbout: EMPLOYER_ABOUT_MESSAGES_EN,
+  jobBoard: JOB_BOARD_MESSAGES_EN,
   ux: {
     flowNavAria: "Your workspace steps",
     flowStepDashboard: "Dashboard",
@@ -5142,6 +5148,7 @@ const pl: MessageTree = {
   employerMedia: EMPLOYER_MEDIA_MESSAGES_PL,
   jobEmployer: JOB_EMPLOYER_MESSAGES_PL,
   employerAbout: EMPLOYER_ABOUT_MESSAGES_PL,
+  jobBoard: JOB_BOARD_MESSAGES_PL,
   ux: {
     flowNavAria: "Kroki w Twojej przestrzeni roboczej",
     flowStepDashboard: "Panel",

@@ -104,6 +104,9 @@ type JobItem = {
   salary_min: number | null;
   salary_max: number | null;
   score?: number | null;
+  tech_stack?: string[];
+  seniority_level?: string | null;
+  remote_percentage?: number | null;
 };
 type JobList = { items: JobItem[]; total: number; search_relaxed?: boolean };
 type MatchItem = {

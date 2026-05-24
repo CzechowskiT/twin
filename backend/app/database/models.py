@@ -440,6 +440,13 @@ class Job(Base):
     project_duration_months: Mapped[int | None] = mapped_column(Integer, nullable=True)
     hourly_rate_min: Mapped[int | None] = mapped_column(Integer, nullable=True)
     hourly_rate_max: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    tech_stack: Mapped[str] = mapped_column(Text, default="[]")
+    requirements_must_have: Mapped[str | None] = mapped_column(Text, nullable=True)
+    requirements_nice_to_have: Mapped[str | None] = mapped_column(Text, nullable=True)
+    interview_process_json: Mapped[str] = mapped_column(Text, default="[]")
+    remote_percentage: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    seniority_level: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    culture_tags: Mapped[str] = mapped_column(Text, default="[]")
 
     matches: Mapped[list["JobMatch"]] = relationship(back_populates="job")
     applications: Mapped[list["Application"]] = relationship(back_populates="job")
