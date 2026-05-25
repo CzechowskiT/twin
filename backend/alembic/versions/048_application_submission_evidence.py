@@ -106,18 +106,18 @@ def upgrade() -> None:
             """
             UPDATE applications SET
               submission_status = CASE
-                WHEN application_method = 'auto_apply_demo_simulated' THEN 'application_prepared'
-                WHEN COALESCE(auto_applied, false) IS TRUE AND status = 'applied' THEN 'external_submit_attempted'
-                WHEN status = 'applied' THEN 'manual_action_required'
-                WHEN status = 'pending' THEN 'application_created_in_twin'
-                ELSE 'application_created_in_twin'
+                WHEN application_method = 'auto_apply_demo_simulated' THEN 'application_prepared'::submissionstatus
+                WHEN COALESCE(auto_applied, false) IS TRUE AND status = 'applied' THEN 'external_submit_attempted'::submissionstatus
+                WHEN status = 'applied' THEN 'manual_action_required'::submissionstatus
+                WHEN status = 'pending' THEN 'application_created_in_twin'::submissionstatus
+                ELSE 'application_created_in_twin'::submissionstatus
               END,
               supported_apply_mode = CASE
-                WHEN application_method = 'auto_apply_demo_simulated' THEN 'manual_only'
-                WHEN COALESCE(auto_applied, false) IS TRUE THEN 'verified_auto_apply'
-                ELSE 'manual_only'
+                WHEN application_method = 'auto_apply_demo_simulated' THEN 'manual_only'::supportedapplymode
+                WHEN COALESCE(auto_applied, false) IS TRUE THEN 'verified_auto_apply'::supportedapplymode
+                ELSE 'manual_only'::supportedapplymode
               END,
-              confirmation_type = 'none',
+              confirmation_type = 'none'::confirmationtype,
               requires_manual_action = CASE
                 WHEN application_method = 'auto_apply_demo_simulated' THEN true
                 WHEN status = 'applied' AND COALESCE(auto_applied, false) IS FALSE THEN true
