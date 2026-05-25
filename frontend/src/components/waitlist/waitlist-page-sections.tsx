@@ -133,9 +133,11 @@ export function WaitlistTop200Section({ copy }: { copy: Copy }) {
     <section className="wl-section wl-section--accent" id="top200">
       <WaitlistSectionTitle>{copy.sectionTop200}</WaitlistSectionTitle>
       <WaitlistSectionLead>{copy.top200Lead}</WaitlistSectionLead>
-      <ul className="wl-check-list">
+      <ul className="wl-card-grid wl-card-grid--2">
         {copy.top200Bullets.map((item) => (
-          <li key={item}>{item}</li>
+          <li key={item} className="wl-card wl-card--point">
+            {item}
+          </li>
         ))}
       </ul>
       <div className="wl-rank-preview" aria-hidden>
