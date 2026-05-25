@@ -4,6 +4,7 @@ from typing import Sequence, Union
 
 import sqlalchemy as sa
 from alembic import op
+from sqlalchemy.dialects import postgresql
 
 revision: str = "048_application_submission_evidence"
 down_revision: Union[str, None] = "047_job_competitive_features"
@@ -29,13 +30,37 @@ _CONFIRMATION = (
     "none",
 )
 
+_ENUM_SPECS: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("submissionstatus", _SUBMISSION),
+    ("supportedapplymode", _APPLY_MODE),
+    ("confirmationtype", _CONFIRMATION),
+)
+
+
+def _pg_enum(name: str, values: tuple[str, ...]) -> postgresql.ENUM:
+    return postgresql.ENUM(*values, name=name, create_type=False)
+
+
+def _create_pg_enums() -> None:
+    bind = op.get_bind()
+    for name, values in _ENUM_SPECS:
+        postgresql.ENUM(*values, name=name, create_type=False).create(bind, checkfirst=True)
+
+
+def _drop_pg_enums() -> None:
+    bind = op.get_bind()
+    for name, values in reversed(_ENUM_SPECS):
+        postgresql.ENUM(*values, name=name, create_type=False).drop(bind, checkfirst=True)
+
 
 def upgrade() -> None:
+    _create_pg_enums()
+
     op.add_column(
         "applications",
         sa.Column(
             "submission_status",
-            sa.Enum(*_SUBMISSION, name="submissionstatus"),
+            _pg_enum("submissionstatus", _SUBMISSION),
             nullable=True,
         ),
     )
@@ -43,7 +68,7 @@ def upgrade() -> None:
         "applications",
         sa.Column(
             "supported_apply_mode",
-            sa.Enum(*_APPLY_MODE, name="supportedapplymode"),
+            _pg_enum("supportedapplymode", _APPLY_MODE),
             nullable=True,
         ),
     )
@@ -53,7 +78,7 @@ def upgrade() -> None:
         "applications",
         sa.Column(
             "confirmation_type",
-            sa.Enum(*_CONFIRMATION, name="confirmationtype"),
+            _pg_enum("confirmationtype", _CONFIRMATION),
             nullable=True,
         ),
     )
@@ -120,6 +145,4 @@ def downgrade() -> None:
     op.drop_column("applications", "submit_attempted_at")
     op.drop_column("applications", "supported_apply_mode")
     op.drop_column("applications", "submission_status")
-    op.execute("DROP TYPE IF EXISTS submissionstatus")
-    op.execute("DROP TYPE IF EXISTS supportedapplymode")
-    op.execute("DROP TYPE IF EXISTS confirmationtype")
+    _drop_pg_enums()
