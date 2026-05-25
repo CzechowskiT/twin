@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useTranslation } from "@/components/language-provider";
 import { FoundingCounterStrip } from "@/components/marketing/founding-counter-strip";
 import { FoundingOfferPreview } from "@/components/marketing/founding-offer-preview";
+import { InteractiveDemoCta } from "@/components/marketing/interactive-demo-cta";
 import { LandingLiveProof } from "@/components/marketing/landing-live-proof";
 import { ScrollReveal } from "@/components/marketing/scroll-reveal";
 
@@ -58,24 +59,7 @@ export function LandingHero() {
               <p className="text-xs font-medium text-[var(--twin-accent)]">{t("home.ctaRegisterMicro")}</p>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
-            <Link
-              href="/demo"
-              className="landing-hero-demo-cta landing-hero-demo-cta--secondary inline-flex items-center gap-2 font-semibold"
-            >
-              <span className="landing-hero-demo-cta__icon" aria-hidden>
-                ▶
-              </span>
-              {t("home.ctaDemoSecondary")}
-            </Link>
-            <span className="text-[var(--twin-muted)]" aria-hidden>
-              ·
-            </span>
-            <Link href="/login" className="text-[var(--twin-muted-strong)] hover:text-[var(--foreground)]">
-              {t("home.logIn")}
-            </Link>
-          </div>
-          <p className="marketing-home-lede text-xs text-[var(--twin-muted)]">{t("home.ctaDemoHint")}</p>
+          <InteractiveDemoCta className="mt-1 max-w-xl" />
         </div>
 
         <LandingLiveProof className="marketing-home-lede mt-10 border-t border-[var(--twin-border)]/60 pt-8" />
