@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 
 import { useTranslation } from "@/components/language-provider";
 import { DemoMatchGauge } from "@/components/marketing/demo-match-gauge";
+import { DemoSampleBadge } from "@/components/marketing/demo-sample-badge";
 import { LandingAmbient } from "@/components/marketing/landing-ambient";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { PipelinePreview } from "@/components/marketing/pipeline-preview";
@@ -75,15 +76,6 @@ function scrollToDemoStep(id: string) {
   el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
 }
 
-function DemoBadge() {
-  const { t } = useTranslation();
-  return (
-    <span className="inline-flex shrink-0 items-center rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-900 dark:text-amber-100">
-      {t("demo.syntheticBadge")}
-    </span>
-  );
-}
-
 function DemoSection({
   id,
   step,
@@ -104,7 +96,7 @@ function DemoSection({
     <section id={id} className="demo-walkthrough-section scroll-mt-24 space-y-5" aria-labelledby={`${id}-title`}>
       <div className="flex flex-wrap items-center gap-3">
         <span className="font-mono text-[11px] font-medium text-[var(--twin-accent)]">{step}</span>
-        <DemoBadge />
+        <DemoSampleBadge />
       </div>
       <div>
         <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-muted)]">{t(eyebrowKey)}</p>
@@ -202,7 +194,7 @@ export function DemoProductWalkthrough() {
                 <p className="demo-hero__eyebrow text-[10px] font-semibold uppercase tracking-[0.32em] text-[var(--twin-accent)]">
                   {t("demo.pageEyebrow")}
                 </p>
-                <DemoBadge />
+                <DemoSampleBadge />
               </div>
               <h1 className="marketing-gradient-heading max-w-4xl text-2xl font-semibold leading-tight tracking-[-0.03em] sm:text-3xl md:text-4xl lg:text-[2.65rem]">
                 {t("demo.pageTitle")}

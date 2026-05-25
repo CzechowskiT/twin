@@ -82,7 +82,7 @@ export function JobEmployerCaseStudiesTab({ company }: { company: string }) {
 
   return (
     <div className="space-y-10 pb-2">
-      <p className="rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/60 px-3 py-2 text-xs text-[var(--twin-muted)]">
+      <p className="demo-sample-banner text-xs leading-relaxed">
         {t("jobEmployer.demoDisclaimer")}
       </p>
 

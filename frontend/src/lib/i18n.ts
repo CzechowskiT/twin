@@ -2470,7 +2470,7 @@ const en = {
     pageTitle: "From CV to a calendar worth showing up for",
     pageLead:
       "Nine beats of the TWIN candidate journey — ranking, coverage, feedback, honest statuses, and interview holds. Everything on this page is synthetic and labeled; it does not submit applications or pretend live portal volume.",
-    syntheticBadge: "Demo · synthetic",
+    syntheticBadge: "DEMO · SAMPLE DATA",
     modeGuestTitle: "Guest walkthrough",
     modeGuestBody:
       "Explore the full story without signing in. Create an account or join the founding wishlist when you want your own profile, matches, and calendar.",
@@ -5160,7 +5160,7 @@ const pl: MessageTree = {
     pageTitle: "Od CV do kalendarza, na który warto przyjść",
     pageLead:
       "Dziewięć etapów ścieżki kandydata w TWIN — ranking, zasięg źródeł, feedback, uczciwe statusy i bloki rozmów. Wszystko na tej stronie jest syntetyczne i oznaczone; nie wysyła aplikacji ani nie udaje „50 żywych portali”.",
-    syntheticBadge: "Demo · syntetyczne",
+    syntheticBadge: "DEMO · DANE PRZYKŁADOWE",
     modeGuestTitle: "Przewodnik bez logowania",
     modeGuestBody:
       "Obejrzyj całą historię bez konta. Załóż konto lub dołącz do wishlisty founding, gdy chcesz własny profil, dopasowania i kalendarz.",

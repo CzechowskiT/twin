@@ -212,7 +212,7 @@ export function JobEmployerFaqTab({
         </ul>
       </EmployerTabSection>
 
-      <p className="text-xs text-[var(--twin-muted)]">{t("jobEmployer.demoDisclaimer")}</p>
+      <p className="demo-sample-banner text-xs leading-relaxed">{t("jobEmployer.demoDisclaimer")}</p>
     </div>
   );
 }

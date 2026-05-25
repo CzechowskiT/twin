@@ -50,7 +50,7 @@ export function JobEmployerTabs({
 
   return (
     <div className="flex min-h-0 flex-col gap-4">
-      <p className="rounded-lg border border-[var(--twin-accent)]/30 bg-[var(--twin-accent-muted)]/25 px-3 py-2 text-xs text-[var(--twin-muted-strong)]">
+      <p className="demo-sample-banner text-xs leading-relaxed">
         {t("jobEmployer.demoDisclaimer")}
       </p>
       <div
