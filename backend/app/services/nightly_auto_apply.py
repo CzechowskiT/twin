@@ -195,6 +195,8 @@ def process_user_nightly_auto_apply(
             app.auto_applied = True
             app.application_method = application_method
             db.add(app)
+            # Legacy counter name: counts honest external phases only (attempted or
+            # evidence-backed confirmed), not raw ApplyOutcome.SUBMITTED / status=applied.
             if app.submission_status in (
                 SubmissionStatus.EXTERNAL_SUBMIT_ATTEMPTED,
                 SubmissionStatus.EXTERNAL_SUBMIT_CONFIRMED,

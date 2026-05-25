@@ -96,6 +96,7 @@ def test_consent_and_trigger(auto_apply_client, monkeypatch) -> None:
 
     from app.automation.types import ApplyOutcome
     from app.config import get_settings
+    from app.database.models import SubmissionStatus
 
     client, headers, db, candidate, job = auto_apply_client
     monkeypatch.setenv("NIGHTLY_AUTO_APPLY_COOLDOWN_SECONDS", "0")
@@ -108,7 +109,13 @@ def test_consent_and_trigger(auto_apply_client, monkeypatch) -> None:
     assert res.status_code == 200
     assert res.json()["is_active"] is True
 
-    app_row = Application(candidate_id=candidate.id, job_id=job.id, status="applied")
+    # SUBMITTED without evidence → attempted, not confirmed (P0 truth model).
+    app_row = Application(
+        candidate_id=candidate.id,
+        job_id=job.id,
+        status="applied",
+        submission_status=SubmissionStatus.EXTERNAL_SUBMIT_ATTEMPTED,
+    )
 
     with (
         patch("app.services.nightly_auto_apply.find_top_matches"),

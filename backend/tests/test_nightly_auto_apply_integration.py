@@ -17,6 +17,7 @@ from app.database.models import (
     Candidate,
     Job,
     JobMatch,
+    SubmissionStatus,
     User,
 )
 from app.config import get_settings
@@ -73,7 +74,12 @@ def test_process_user_success_mocked(nightly_db, monkeypatch) -> None:
     candidate = db.query(Candidate).filter(Candidate.user_id == user.id).first()
     monkeypatch.setenv("NIGHTLY_AUTO_APPLY_COOLDOWN_SECONDS", "0")
 
-    app_row = Application(candidate_id=candidate.id, job_id=job.id, status="applied")
+    app_row = Application(
+        candidate_id=candidate.id,
+        job_id=job.id,
+        status="applied",
+        submission_status=SubmissionStatus.EXTERNAL_SUBMIT_ATTEMPTED,
+    )
 
     with (
         patch("app.services.nightly_auto_apply.find_top_matches"),
@@ -145,7 +151,12 @@ def test_sweep_dry_run_mocked_session(nightly_db) -> None:
 def test_sweep_persists_auto_apply_run(nightly_db) -> None:
     db, user, consent, job = nightly_db
     candidate = db.query(Candidate).filter(Candidate.user_id == user.id).first()
-    app_row = Application(candidate_id=candidate.id, job_id=job.id, status="applied")
+    app_row = Application(
+        candidate_id=candidate.id,
+        job_id=job.id,
+        status="applied",
+        submission_status=SubmissionStatus.EXTERNAL_SUBMIT_ATTEMPTED,
+    )
 
     class FakeSession:
         def query(self, *args, **kwargs):
