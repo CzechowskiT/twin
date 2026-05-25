@@ -1,12 +1,20 @@
-/** Dashboard matching quality gate — keep in sync with docs/MATCHING_QUALITY_GATE.md */
+/** Dashboard matching quality — keep in sync with docs/MATCHING_QUALITY_GATE.md */
 
-export const DASHBOARD_MATCH_LIMIT = 50;
-export const DASHBOARD_MATCH_MIN_SCORE = 45;
-export const MAIN_RECOMMENDATION_MIN_SCORE = 40;
+export const DASHBOARD_MATCH_LIMIT = 200;
+export const DASHBOARD_MATCH_MIN_SCORE = 38;
+export const TOP_MATCHES_HIGHLIGHT_COUNT = 20;
+export const MAIN_RECOMMENDATION_MIN_SCORE = 38;
 
 export type MatchQualityLabel = "excellent" | "good" | "possible" | "weak";
 
 export type MatchFeedbackValue = "apply_intent" | "relevant" | "not_relevant" | "not_now";
+
+export type MatchBadgeId =
+  | "direct_employer"
+  | "fresh"
+  | "high_fit"
+  | "remote"
+  | "salary_visible";
 
 export function matchQualityLabel(score: number): MatchQualityLabel {
   if (score >= 80) return "excellent";

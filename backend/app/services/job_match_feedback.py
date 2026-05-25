@@ -40,6 +40,22 @@ def apply_intent_job_ids(db: Session, candidate_id: int) -> set[int]:
     }
 
 
+def relevant_job_ids(db: Session, candidate_id: int) -> set[int]:
+    return {
+        job_id
+        for job_id, value in list_feedback_by_candidate(db, candidate_id).items()
+        if value == "relevant"
+    }
+
+
+def not_now_job_ids(db: Session, candidate_id: int) -> set[int]:
+    return {
+        job_id
+        for job_id, value in list_feedback_by_candidate(db, candidate_id).items()
+        if value == "not_now"
+    }
+
+
 def upsert_feedback(
     db: Session,
     *,

@@ -5,7 +5,7 @@ import { SeniorityBadge } from "@/components/job/SeniorityBadge";
 import { TechStackIcons } from "@/components/job/TechStackIcons";
 import { useTranslation } from "@/components/language-provider";
 import { applicationDisplayStatusKey } from "@/lib/application-status";
-import type { MatchFeedbackValue, MatchQualityLabel } from "@/lib/matching-quality";
+import type { MatchBadgeId, MatchFeedbackValue, MatchQualityLabel } from "@/lib/matching-quality";
 import type { TranslationKey } from "@/lib/i18n";
 
 export type JobRow = {
@@ -16,6 +16,8 @@ export type JobRow = {
   location: string | null;
   url: string;
   job_board: string;
+  source_label?: string | null;
+  badges?: string[];
   score?: number | null;
   quality_label?: MatchQualityLabel | string | null;
   match_reason?: string | null;
@@ -84,6 +86,17 @@ export function JobList({
     return label && map[label] ? map[label] : null;
   };
 
+  const badgeKey = (id: string): TranslationKey | null => {
+    const map: Record<MatchBadgeId, TranslationKey> = {
+      direct_employer: "dashboard.badgeDirectEmployer",
+      fresh: "dashboard.badgeFresh",
+      high_fit: "dashboard.badgeHighFit",
+      remote: "dashboard.badgeRemote",
+      salary_visible: "dashboard.badgeSalaryVisible",
+    };
+    return id in map ? map[id as MatchBadgeId] : null;
+  };
+
   if (!items.length) {
     return <p className="twin-muted text-sm">{t("dashboard.noJobsFiltered")}</p>;
   }
@@ -120,6 +133,18 @@ export function JobList({
                     {t(qualityKey(item.quality_label)! )}
                   </span>
                 ) : null}
+                {(item.badges ?? []).map((badgeId) => {
+                  const key = badgeKey(badgeId);
+                  if (!key) return null;
+                  return (
+                    <span
+                      key={badgeId}
+                      className="shrink-0 rounded border border-[var(--twin-border)] bg-[var(--twin-card)] px-2 py-0.5 text-xs font-medium text-[var(--twin-muted-strong)]"
+                    >
+                      {t(key)}
+                    </span>
+                  );
+                })}
                 {status && (
                   <span className="shrink-0 rounded bg-[var(--twin-accent-muted)] px-2 py-0.5 text-xs font-medium text-[var(--twin-accent)]">
                     {t(applicationDisplayStatusKey(status, { display_status: status }))}
@@ -131,7 +156,7 @@ export function JobList({
                 {item.company}
                 {item.location ? ` · ${item.location}` : ""}
                 {salary ? ` · ${salary}` : ""}
-                <span> · {item.job_board}</span>
+                <span> · {item.source_label?.trim() || item.job_board}</span>
               </p>
               {item.match_reason?.trim() ? (
                 <p className="twin-muted mt-1 text-xs leading-relaxed" title={t("dashboard.matchReasonTitle")}>

@@ -1,6 +1,7 @@
 """Compute job–candidate match scores."""
 
 import json
+from datetime import datetime
 from typing import Any
 
 from sqlalchemy.orm import Session
@@ -9,11 +10,19 @@ from app.config import get_settings
 from app.database.models import Candidate, Job, JobMatch
 from app.matching.matcher import calculate_match_score
 from app.services.job_matching_v2 import calculate_match_score_v2, calculate_match_score_v2_tfidf
-from app.matching.quality_gate import (
-    APPLY_INTENT_SCORE_BOOST,
-    match_quality_label,
+from app.matching.quality_gate import match_quality_label
+from app.matching.ranking import (
+    compute_final_score,
+    dedupe_ranked_jobs,
+    job_display_badges,
+    source_display_label,
 )
-from app.services.job_match_feedback import apply_intent_job_ids, excluded_job_ids
+from app.services.job_match_feedback import (
+    apply_intent_job_ids,
+    excluded_job_ids,
+    not_now_job_ids,
+    relevant_job_ids,
+)
 from app.services.match_reason import build_match_reason
 
 
@@ -82,19 +91,29 @@ def find_top_matches(
         .all()
     )
     skip_jobs = excluded_job_ids(db, candidate.id)
-    boost_jobs = apply_intent_job_ids(db, candidate.id)
+    apply_boost = apply_intent_job_ids(db, candidate.id)
+    relevant_boost = relevant_job_ids(db, candidate.id)
+    not_now_penalty = not_now_job_ids(db, candidate.id)
+    now = datetime.utcnow()
     scored: list[tuple[float, Job]] = []
 
     for job in jobs:
         if job.id in skip_jobs:
             continue
-        score = score_fn(cand, job_to_dict(job))
-        if job.id in boost_jobs:
-            score = min(100.0, score + APPLY_INTENT_SCORE_BOOST)
-        if score >= min_score:
-            scored.append((score, job))
+        fit = score_fn(cand, job_to_dict(job))
+        final = compute_final_score(
+            fit,
+            job,
+            candidate_location=candidate.location,
+            apply_intent_ids=apply_boost,
+            relevant_ids=relevant_boost,
+            not_now_ids=not_now_penalty,
+            now=now,
+        )
+        if final >= min_score:
+            scored.append((final, job))
 
-    scored.sort(key=lambda x: x[0], reverse=True)
+    scored = dedupe_ranked_jobs(scored)
     top = scored[:limit]
     results: list[dict[str, Any]] = []
 
@@ -113,6 +132,8 @@ def find_top_matches(
                 "location": job.location,
                 "url": job.url,
                 "job_board": job.job_board,
+                "source_label": source_display_label(job.job_board),
+                "badges": job_display_badges(job, score, now=now),
                 "match_reason": reason,
             }
         )

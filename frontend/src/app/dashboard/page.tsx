@@ -50,6 +50,7 @@ import {
   dashboardMatchesExportXlsxQuery,
   dashboardMatchesQuery,
   MAIN_RECOMMENDATION_MIN_SCORE,
+  TOP_MATCHES_HIGHLIGHT_COUNT,
   type MatchFeedbackValue,
 } from "@/lib/matching-quality";
 import { SHOW_SCRAPE_UI } from "@/lib/features";
@@ -122,6 +123,8 @@ type MatchItem = {
   location: string | null;
   url: string;
   job_board: string;
+  source_label?: string | null;
+  badges?: string[];
   match_reason?: string | null;
 };
 type MatchList = { items: MatchItem[]; total: number };
@@ -923,6 +926,16 @@ export default function DashboardPage() {
         (job.score ?? 0) >= MAIN_RECOMMENDATION_MIN_SCORE,
     );
   }, [matches?.items, applicationByJobId]);
+
+  const topHighlightMatches = useMemo(
+    () => visibleMatches.slice(0, TOP_MATCHES_HIGHLIGHT_COUNT),
+    [visibleMatches],
+  );
+
+  const moreRecommendationMatches = useMemo(
+    () => visibleMatches.slice(TOP_MATCHES_HIGHLIGHT_COUNT),
+    [visibleMatches],
+  );
 
   async function submitMatchFeedback(jobId: number, value: MatchFeedbackValue) {
     const token = getToken();
@@ -1785,9 +1798,9 @@ export default function DashboardPage() {
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="twin-section-title">
-                {t("dashboard.topMatches")} ({visibleMatches.length})
+                {t("dashboard.rankedFeedTitle")} ({visibleMatches.length})
               </h2>
-              <p className="twin-muted mt-1 text-sm">{t("dashboard.topMatchesLead")}</p>
+              <p className="twin-muted mt-1 text-sm">{t("dashboard.rankedFeedLead")}</p>
             </div>
             <div className="flex flex-wrap gap-2 self-start sm:self-auto sm:shrink-0">
               <button
@@ -1817,33 +1830,83 @@ export default function DashboardPage() {
               actionHref="/profile"
             />
           ) : (
-            <JobList
-              items={visibleMatches}
-              showScore
-              matchFeedbackByJobId={matchFeedbackByJobId}
-              onMatchFeedback={(jobId, value) => void submitMatchFeedback(jobId, value)}
-              matchFeedbackBusyJobId={matchFeedbackBusyJobId}
-              applicationStatus={displayApplicationStatus}
-              onApply={applyToJob}
-              onAutoApply={autoApplyToJob}
-              onResearch={(id, title, company, location) =>
-                setIntelJob({ id, title, company, location: location ?? null })
-              }
-              onHiringInsights={(id, title) => setInsightsJob({ id, title })}
-              onViewEmployer={(id, title, company, url, location) =>
-                setEmployerHubJob({
-                  id,
-                  title,
-                  company,
-                  location: location ?? null,
-                  url,
-                  initialTab: "partners",
-                })
-              }
-              autoApplyJobId={autoApplyingId}
-              onSave={saveJob}
-              onDismiss={dismissJob}
-            />
+            <div className="space-y-8">
+              <section aria-labelledby="dashboard-top-matches-heading">
+                <h3 id="dashboard-top-matches-heading" className="text-base font-semibold text-[var(--foreground)]">
+                  {t("dashboard.topMatchesSection")} ({topHighlightMatches.length})
+                </h3>
+                <p className="twin-muted mt-1 text-sm">{t("dashboard.topMatchesLead")}</p>
+                <div className="mt-3">
+                  <JobList
+                    items={topHighlightMatches}
+                    showScore
+                    matchFeedbackByJobId={matchFeedbackByJobId}
+                    onMatchFeedback={(jobId, value) => void submitMatchFeedback(jobId, value)}
+                    matchFeedbackBusyJobId={matchFeedbackBusyJobId}
+                    applicationStatus={displayApplicationStatus}
+                    onApply={applyToJob}
+                    onAutoApply={autoApplyToJob}
+                    onResearch={(id, title, company, location) =>
+                      setIntelJob({ id, title, company, location: location ?? null })
+                    }
+                    onHiringInsights={(id, title) => setInsightsJob({ id, title })}
+                    onViewEmployer={(id, title, company, url, location) =>
+                      setEmployerHubJob({
+                        id,
+                        title,
+                        company,
+                        location: location ?? null,
+                        url,
+                        initialTab: "partners",
+                      })
+                    }
+                    autoApplyJobId={autoApplyingId}
+                    onSave={saveJob}
+                    onDismiss={dismissJob}
+                  />
+                </div>
+              </section>
+              {moreRecommendationMatches.length > 0 ? (
+                <section aria-labelledby="dashboard-more-matches-heading">
+                  <h3
+                    id="dashboard-more-matches-heading"
+                    className="text-base font-semibold text-[var(--foreground)]"
+                  >
+                    {t("dashboard.moreRecommendationsSection")} ({moreRecommendationMatches.length})
+                  </h3>
+                  <p className="twin-muted mt-1 text-sm">{t("dashboard.moreRecommendationsLead")}</p>
+                  <div className="mt-3">
+                    <JobList
+                      items={moreRecommendationMatches}
+                      showScore
+                      matchFeedbackByJobId={matchFeedbackByJobId}
+                      onMatchFeedback={(jobId, value) => void submitMatchFeedback(jobId, value)}
+                      matchFeedbackBusyJobId={matchFeedbackBusyJobId}
+                      applicationStatus={displayApplicationStatus}
+                      onApply={applyToJob}
+                      onAutoApply={autoApplyToJob}
+                      onResearch={(id, title, company, location) =>
+                        setIntelJob({ id, title, company, location: location ?? null })
+                      }
+                      onHiringInsights={(id, title) => setInsightsJob({ id, title })}
+                      onViewEmployer={(id, title, company, url, location) =>
+                        setEmployerHubJob({
+                          id,
+                          title,
+                          company,
+                          location: location ?? null,
+                          url,
+                          initialTab: "partners",
+                        })
+                      }
+                      autoApplyJobId={autoApplyingId}
+                      onSave={saveJob}
+                      onDismiss={dismissJob}
+                    />
+                  </div>
+                </section>
+              ) : null}
+            </div>
           )}
             </>
           )}

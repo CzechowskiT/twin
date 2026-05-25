@@ -595,8 +595,8 @@ def submit_match_feedback(
 
 @router.get("/me/matches/export.csv")
 def export_my_matches_csv(
-    limit: int = Query(50, ge=1, le=400),
-    min_score: float = Query(45.0, ge=0, le=100),
+    limit: int = Query(200, ge=1, le=400),
+    min_score: float = Query(38.0, ge=0, le=100),
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> Response:
@@ -627,8 +627,8 @@ def export_my_matches_csv(
 
 @router.get("/me/matches/export.xlsx")
 def export_my_matches_xlsx(
-    limit: int = Query(50, ge=1, le=400),
-    min_score: float = Query(45.0, ge=0, le=100),
+    limit: int = Query(200, ge=1, le=400),
+    min_score: float = Query(38.0, ge=0, le=100),
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> Response:

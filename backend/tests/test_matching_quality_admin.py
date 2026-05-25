@@ -78,4 +78,5 @@ def test_matching_quality_admin_ok(mq_admin_client) -> None:
     assert res.status_code == 200
     body = res.json()
     assert body["relevant_count"] >= 1
-    assert body["dashboard_min_score"] == 45.0
+    assert body["dashboard_min_score"] == 38.0
+    assert body["top_200_limit"] == 200

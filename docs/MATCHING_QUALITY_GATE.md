@@ -1,13 +1,14 @@
 # Matching Quality Gate (P0)
 
-Dokument opisuje, jak TWIN dobiera krótką shortlistę ofert po CV, czego **nie** obiecujemy, oraz kiedy można zaprosić 10–20 founding members.
+Dokument opisuje ranking feedu na dashboardzie, feedback per oferta, metryki founderów i bezpieczne obietnice.
 
 ## Jak działa dopasowanie (bez ML)
 
 1. Profil kandydata: umiejętności, tytuły ról, lokalizacja, doświadczenie, widełki (z formularza + sygnały z CV).
-2. Dla zweryfikowanych ofert (`is_validated`) liczony jest **score 0–100** (matcher v1 lub v2 — reguły + overlap tekstu, bez trenowania modelu na użytkownikach).
-3. Dashboard pobiera **limit=50**, **min_score=45** — nie pokazujemy setek słabych trafień.
-4. Sekcja głównych rekomendacji na UI filtruje wyniki **score ≥ 40** (etykiety jakości poniżej).
+2. Dla zweryfikowanych ofert (`is_validated`) liczony jest **candidate_fit** (matcher v1 lub v2).
+3. **final_score** łączy fit + jakość źródła + świeżość + kompletność + priorytet PL + feedback (szczegóły: `docs/MARKET_COVERAGE_AND_TOP_200_RANKING.md`).
+4. Dashboard pobiera **`limit=200`**, **`min_score=38`** — szeroki, posortowany feed; **top 20** wyróżnione w UI.
+5. Ten sam ranking co API — **bez** losowych 220 ofert spoza scoringu.
 
 ## Progi jakości (etykiety)
 
@@ -16,23 +17,16 @@ Dokument opisuje, jak TWIN dobiera krótką shortlistę ofert po CV, czego **nie
 | Excellent | ≥ 80 | Doskonałe dopasowanie |
 | Good | ≥ 60 | Dobre dopasowanie |
 | Possible | ≥ 40 | Możliwe dopasowanie |
-| Weak | &lt; 40 | Słabe (nie w głównej shortliście) |
-
-Copy przy score 40–59 jest stonowane („Możliwe dopasowanie — …”), żeby nie brzmieć jak pewnik.
+| Weak | &lt; 40 | Słabe |
 
 ## Feedback per oferta
 
 Osobna tabela `job_match_feedback` (nie `product_feedback`):
 
-- `apply_intent` — „Chcę aplikować”
-- `relevant` — trafne
-- `not_relevant` — nietrafne
-- `not_now` — nie teraz
-
-**Wpływ na ranking (prosty, bez ML):**
-
-- `not_relevant` → oferta **wykluczona** z `find_top_matches`.
-- `apply_intent` → **+3 pkt** do score (cap 100) przy kolejnym rankingu.
+- `apply_intent` — „Chcę aplikować” (+3)
+- `relevant` — trafne (+2)
+- `not_relevant` — wykluczenie z feedu
+- `not_now` — lekka kara (−2)
 
 API: `GET/POST /api/v1/candidates/me/match-feedback`.
 
@@ -40,16 +34,17 @@ API: `GET/POST /api/v1/candidates/me/match-feedback`.
 
 `GET /api/v1/admin/matching-quality` (Bearer: `OPS_ADMIN_TOKEN` / `BETA_ADMIN_TOKEN`):
 
-- `apply_intent_count`, `relevant_count`, `not_relevant_count`, `not_now_count`
-- `relevant_rate_pct`, `apply_intent_rate_pct`
-- `median_top_10_score`, `empty_match_results_count`
-- `dashboard_min_score` (45)
+- Feedback: `apply_intent_count`, `relevant_count`, `not_relevant_count`, `not_now_count`, rates
+- Ranking: `median_top_10_score`, `median_top_200_score`, `median_top_200_count`, `top_200_limit`
+- Korpus: `total_jobs_by_source`, `fresh_jobs_24h`, `fresh_jobs_7d`, `duplicate_rate_pct`
+- Intent: `apply_intent_in_top_20`, `apply_intent_in_top_200`
+- `dashboard_min_score` (38)
 
 ## Brama skali (founding 10–20)
 
-Przed zaproszeniem kolejnych użytkownów (cel: **nie** 100 na ślepo):
+Przed zaproszeniem kolejnych użytkowników:
 
-- Ręczna próbka: **≥ 3/10** ofert z top shortlisty oznaczone `apply_intent` lub `relevant` (feedback od realnych profili).
+- Ręczna próbka: **≥ 3/10** z top-20 oznaczone `apply_intent` lub `relevant`.
 - Mediana score top-10 persystowanych matchy **≥ 55** (orientacyjnie).
 - `empty_match_results_count` nisko względem profili z CV + tytułami.
 
@@ -57,21 +52,19 @@ Przed zaproszeniem kolejnych użytkownów (cel: **nie** 100 na ślepo):
 
 | Bezpieczne | Nie obiecujemy |
 |------------|----------------|
-| Rekomendowane dopasowania / shortlista | „Idealne” / „perfect” oferty |
-| Pomóż ocenić trafność | „AI wie, co jest dla Ciebie najlepsze” |
-| Score i krótki powód | Gwarancja rozmowy / oferty |
-| Uczymy się z Twojego feedbacku (wykluczenia, lekki boost) | Trening modelu ML na Twoich danych |
+| Do 200 posortowanych rekomendacji | „Idealne” / „perfect” oferty |
+| Top 20 wyróżnione + szerszy feed | 50 portali = wszystkie live w produkcji |
+| Pomóż ocenić trafność | LinkedIn bez limitów / omijanie CAPTCHA |
+| Score, źródło, badge | Gwarancja rozmowy / oferty |
 
-**EN:** Recommended matches, shortlist, help us rate fit — not “perfect jobs” or “the AI knows you best.”
+## Pliki
 
-## Pliki implementacji
-
-- `backend/app/matching/quality_gate.py` — progi
-- `backend/app/services/matching_service.py` — ranking + feedback
-- `backend/app/services/match_reason.py` — ton copy
+- `backend/app/matching/ranking.py` — final_score, dedupe feed, badges
+- `backend/app/matching/quality_gate.py` — progi 200/38/20
+- `backend/app/services/matching_service.py` — ranking + persist
 - `frontend/src/lib/matching-quality.ts` — zapytania dashboardu
-- Migracja: `049_job_match_feedback.py` (nie dotyka `048` submission truth)
+- Migracja feedback: `049_job_match_feedback.py` (nie dotyka `048`)
 
 ## Auto-apply
 
-Nightly auto-apply i progi zgody (`min_score_threshold` ≥ 75) **nie zmieniane** w tym sprincie — osobna ścieżka od dashboard shortlist.
+Nightly auto-apply i progi zgody (`min_score_threshold` ≥ 75) **nie zmieniane** w tym sprincie.
