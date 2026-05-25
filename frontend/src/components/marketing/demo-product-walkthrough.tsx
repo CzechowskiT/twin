@@ -235,6 +235,25 @@ export function DemoProductWalkthrough() {
               <p className="mt-1 text-[var(--twin-muted-strong)]">
                 {isLoggedIn ? t("demo.modeLoggedInBody") : t("demo.modeGuestBody")}
               </p>
+              {isLoggedIn ? (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Link
+                    href="/dashboard"
+                    className="section-cta-primary marketing-btn-primary-shadow twin-touch-target px-4 py-2 text-xs sm:text-sm"
+                  >
+                    {t("demo.modeLoggedInCtaDashboard")}
+                  </Link>
+                  <Link
+                    href="/dashboard#dashboard-matches"
+                    className="section-cta-secondary twin-touch-target px-4 py-2 text-xs sm:text-sm"
+                  >
+                    {t("demo.modeLoggedInCtaMatches")}
+                  </Link>
+                  <Link href="/profile" className="section-cta-secondary twin-touch-target px-4 py-2 text-xs sm:text-sm">
+                    {t("demo.modeLoggedInCtaProfile")}
+                  </Link>
+                </div>
+              ) : null}
             </div>
           </aside>
 

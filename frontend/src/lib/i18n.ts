@@ -2474,9 +2474,12 @@ const en = {
     modeGuestTitle: "Guest walkthrough",
     modeGuestBody:
       "Explore the full story without signing in. Create an account or join the founding wishlist when you want your own profile, matches, and calendar.",
-    modeLoggedInTitle: "Signed in — explore the real product",
+    modeLoggedInTitle: "Product demo — your live recommendations are in the dashboard",
     modeLoggedInBody:
-      "Use the links below to open your dashboard, profile, matches, and calendar. This page still uses fictional job cards for the walkthrough.",
+      "Below we walk through a sample TWIN flow — ranking, feedback, and calendar on demonstration data. Your personal matches, application statuses, and interviews live in the dashboard.",
+    modeLoggedInCtaDashboard: "Go to dashboard",
+    modeLoggedInCtaMatches: "See my matches",
+    modeLoggedInCtaProfile: "Review profile and CV",
     stepNavAria: "Demo sections",
     stepNav1: "Pipeline",
     stepNav2: "Profile",
@@ -5161,9 +5164,12 @@ const pl: MessageTree = {
     modeGuestTitle: "Przewodnik bez logowania",
     modeGuestBody:
       "Obejrzyj całą historię bez konta. Załóż konto lub dołącz do wishlisty founding, gdy chcesz własny profil, dopasowania i kalendarz.",
-    modeLoggedInTitle: "Zalogowany — wejdź w prawdziwy produkt",
+    modeLoggedInTitle: "Demo produktu — Twoje live rekomendacje są w panelu",
     modeLoggedInBody:
-      "Użyj linków poniżej do panelu, profilu, dopasowań i kalendarza. Karty ofert na tej stronie nadal są fikcyjne — to walkthrough, nie Twoje live dane.",
+      "Poniżej pokazujemy przykładowy flow TWIN: ranking, feedback i kalendarz na danych demonstracyjnych. Twoje osobiste dopasowania, statusy i rozmowy prowadzisz w panelu.",
+    modeLoggedInCtaDashboard: "Przejdź do panelu",
+    modeLoggedInCtaMatches: "Zobacz moje dopasowania",
+    modeLoggedInCtaProfile: "Sprawdź profil i CV",
     stepNavAria: "Sekcje demo",
     stepNav1: "Pipeline",
     stepNav2: "Profil",
