@@ -8,8 +8,16 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "cdn.simpleicons.org", pathname: "/**" },
-      { protocol: "https", hostname: "cdn.jsdelivr.net", pathname: "/npm/simple-icons/**" },
+      {
+        protocol: "https",
+        hostname: "cdn.jsdelivr.net",
+        pathname: "/npm/simple-icons@*/icons/**",
+      },
       { protocol: "https", hostname: "www.google.com", pathname: "/s2/**" },
+      { protocol: "https", hostname: "t0.gstatic.com", pathname: "/**" },
+      { protocol: "https", hostname: "t1.gstatic.com", pathname: "/**" },
+      { protocol: "https", hostname: "t2.gstatic.com", pathname: "/**" },
+      { protocol: "https", hostname: "t3.gstatic.com", pathname: "/**" },
       { protocol: "https", hostname: "icons.duckduckgo.com", pathname: "/**" },
       { protocol: "https", hostname: "www.capitalone.com", pathname: "/favicon.ico" },
       { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },

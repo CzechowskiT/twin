@@ -32,7 +32,7 @@ const BRANDS: Brand[] = [
   { slug: "broadcom", name: "Broadcom", domain: "broadcom.com" },
   { slug: "visa", name: "Visa", domain: "visa.com" },
   { slug: "mastercard", name: "Mastercard", domain: "mastercard.com" },
-  { slug: "jpmorgan", name: "JPMorgan Chase", domain: "jpmorganchase.com", altSlugs: ["jpmorganchase"] },
+  { slug: "jpmorgan", name: "JPMorgan Chase", domain: "jpmorganchase.com", altSlugs: ["chase", "jpmorganchase"] },
   { slug: "bankofamerica", name: "Bank of America", domain: "bankofamerica.com" },
   { slug: "citi", name: "Citi", domain: "citi.com", altSlugs: ["citibank"] },
   { slug: "goldmansachs", name: "Goldman Sachs", domain: "goldmansachs.com" },
@@ -97,7 +97,7 @@ const BRANDS: Brand[] = [
   { slug: "northropgrumman", name: "Northrop Grumman", domain: "northropgrumman.com" },
   { slug: "caterpillar", name: "Caterpillar", domain: "caterpillar.com" },
   { slug: "deere", name: "John Deere", domain: "deere.com" },
-  { slug: "generalelectric", name: "GE", domain: "ge.com" },
+  { slug: "generalelectric", name: "GE", domain: "ge.com", altSlugs: ["ge"] },
   { slug: "atandt", name: "AT&T", domain: "att.com" },
   { slug: "verizon", name: "Verizon", domain: "verizon.com" },
   { slug: "comcast", name: "Comcast", domain: "comcast.com" },
@@ -147,8 +147,11 @@ function siUrl(slug: string) {
   return `https://cdn.simpleicons.org/${slug}`;
 }
 
+/** Pinned release — `@16` path 404s on jsDelivr and broke the second fallback for most marks. */
+const SIMPLE_ICONS_JSdelivr = "11.14.0";
+
 function jsdelivrSiUrl(slug: string) {
-  return `https://cdn.jsdelivr.net/npm/simple-icons@16/icons/${slug}.svg`;
+  return `https://cdn.jsdelivr.net/npm/simple-icons@${SIMPLE_ICONS_JSdelivr}/icons/${slug}.svg`;
 }
 
 function googleFaviconUrl(domain: string) {
@@ -161,20 +164,10 @@ function duckduckgoIconUrl(domain: string) {
 
 function brandLogoUrls(brand: Brand): string[] {
   const slugs = [...new Set([brand.slug, ...(brand.altSlugs ?? [])])];
-  const vector = slugs.flatMap((slug) => [siUrl(slug), jsdelivrSiUrl(slug)]);
-  const raster = [googleFaviconUrl(brand.domain), duckduckgoIconUrl(brand.domain)];
+  const vector = slugs.flatMap((slug) => [jsdelivrSiUrl(slug), siUrl(slug)]);
+  const raster = [duckduckgoIconUrl(brand.domain), googleFaviconUrl(brand.domain)];
   const custom = brand.extraUrls ?? [];
   return [...custom, ...vector, ...raster];
-}
-
-function initials(name: string): string {
-  const cleaned = name.replace(/&/g, " ");
-  const parts = cleaned.split(/[\s'-]+/).filter(Boolean);
-  if (parts.length >= 2) {
-    return (parts[0][0] + parts[1][0]).toUpperCase();
-  }
-  const letters = name.replace(/[^A-Za-z]/g, "");
-  return letters.slice(0, 2).toUpperCase() || "Co";
 }
 
 function BrandMark({
@@ -193,41 +186,44 @@ function BrandMark({
   const urls = useMemo(() => brandLogoUrls(brand), [brand]);
 
   const [step, setStep] = useState(0);
+  const [loaded, setLoaded] = useState(false);
 
   const onError = useCallback(() => {
+    setLoaded(false);
     setStep((s) => Math.min(s + 1, urls.length));
   }, [urls.length]);
+
+  const onLoad = useCallback(() => {
+    setLoaded(true);
+  }, []);
+
+  if (step >= urls.length) {
+    return null;
+  }
 
   const href = `https://${brand.domain}/`;
   const a11y = `${brand.name}${linkSuffix}`;
 
   const anchorClass = `${MARK_BOX_CLASS} ${MARK_PLATE_CLASS} relative flex shrink-0 items-center justify-center rounded-lg no-underline transition-[opacity,box-shadow] hover:opacity-90 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--twin-accent)]`;
 
-  const inner =
-    step >= urls.length ? (
-      <span
-        title={a11y}
-        className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--twin-accent-muted)]/80 to-[var(--twin-card)]/80 text-sm font-bold tracking-tight text-[var(--twin-accent-hover)] sm:text-base"
-      >
-        {initials(brand.name)}
-      </span>
-    ) : (
-      <span className="relative flex h-full w-full items-center justify-center px-2 py-1.5 sm:px-2.5">
-        <Image
-          key={`${instanceKey}-${step}`}
-          src={urls[step]}
-          alt=""
-          width={96}
-          height={32}
-          sizes="(min-width: 640px) 128px, 120px"
-          loading="eager"
-          decoding="async"
-          referrerPolicy="no-referrer"
-          className="max-h-full max-w-full object-contain object-center transition-opacity"
-          onError={onError}
-        />
-      </span>
-    );
+  const inner = (
+    <span className="relative flex h-full w-full items-center justify-center px-2 py-1.5 sm:px-2.5">
+      <Image
+        key={`${instanceKey}-${step}`}
+        src={urls[step]}
+        alt=""
+        width={96}
+        height={32}
+        sizes="(min-width: 640px) 128px, 120px"
+        loading="eager"
+        decoding="async"
+        referrerPolicy="no-referrer"
+        className={`max-h-full max-w-full object-contain object-center transition-opacity [filter:brightness(0)_saturate(100%)] ${loaded ? "opacity-90" : "opacity-0"}`}
+        onError={onError}
+        onLoad={onLoad}
+      />
+    </span>
+  );
 
   return (
     <a
