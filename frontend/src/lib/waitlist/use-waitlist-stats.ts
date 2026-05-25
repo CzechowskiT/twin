@@ -5,11 +5,11 @@ import { useEffect, useState } from "react";
 import { betaFetchLeaderboard, betaFetchStats, type BetaLeaderboardEntry, type BetaStats } from "@/lib/beta-api";
 
 const DEMO_LEADERBOARD: BetaLeaderboardEntry[] = [
-  { rank: 1, display_name: "Paweł M.", referrals: 47, reward: "Beta + $1000" },
-  { rank: 2, display_name: "Anna K.", referrals: 39, reward: "Beta + $1000" },
-  { rank: 3, display_name: "Marcin S.", referrals: 31, reward: "Beta + $1000" },
-  { rank: 4, display_name: "Kasia W.", referrals: 28, reward: "Beta + $500" },
-  { rank: 5, display_name: "Tom R.", referrals: 24, reward: "Beta + $500" },
+  { rank: 1, display_name: "Paweł M.", referrals: 47, reward: "Priority founding access" },
+  { rank: 2, display_name: "Anna K.", referrals: 39, reward: "Priority founding access" },
+  { rank: 3, display_name: "Marcin S.", referrals: 31, reward: "Priority founding access" },
+  { rank: 4, display_name: "Kasia W.", referrals: 28, reward: "Priority founding access" },
+  { rank: 5, display_name: "Tom R.", referrals: 24, reward: "Priority founding access" },
 ];
 
 export function useWaitlistStats() {
