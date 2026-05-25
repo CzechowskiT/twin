@@ -291,6 +291,10 @@ class Candidate(Base):
     user: Mapped["User"] = relationship(back_populates="candidate")
     applications: Mapped[list["Application"]] = relationship(back_populates="candidate")
     matches: Mapped[list["JobMatch"]] = relationship(back_populates="candidate")
+    job_match_feedback: Mapped[list["JobMatchFeedback"]] = relationship(
+        back_populates="candidate",
+        cascade="all, delete-orphan",
+    )
     auto_apply_consent: Mapped["AutoApplyConsent | None"] = relationship(
         back_populates="candidate",
         uselist=False,
@@ -506,6 +510,23 @@ class JobMatch(Base):
 
     candidate: Mapped["Candidate"] = relationship(back_populates="matches")
     job: Mapped["Job"] = relationship(back_populates="matches")
+
+
+class JobMatchFeedback(Base):
+    """Candidate feedback on a ranked job (reranking input, not product NPS)."""
+
+    __tablename__ = "job_match_feedback"
+    __table_args__ = (UniqueConstraint("candidate_id", "job_id", name="uq_job_match_feedback"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(ForeignKey("candidates.id", ondelete="CASCADE"), index=True)
+    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id", ondelete="CASCADE"), index=True)
+    feedback_value: Mapped[str] = mapped_column(String(32))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    candidate: Mapped["Candidate"] = relationship(back_populates="job_match_feedback")
+    job: Mapped["Job"] = relationship()
 
 
 class Application(Base):

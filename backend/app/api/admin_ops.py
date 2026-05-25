@@ -9,6 +9,7 @@ from app.config import Settings, get_settings
 from app.core.deps import get_db
 from app.database.models import PartnerApiKey, RecruiterCompanyToken
 from app.services.admin_metrics import build_admin_metrics
+from app.services.matching_quality_metrics import build_matching_quality_metrics
 from app.services.admin_placement_queue import build_placement_dispute_queue
 from app.services.data_quality_metrics import build_data_quality_report
 from app.services.partner_auth import mint_partner_api_key, revoke_partner_api_key
@@ -44,6 +45,17 @@ def admin_metrics(
 ) -> dict:
     _require_ops_admin(settings, authorization)
     return build_admin_metrics(db)
+
+
+@router.get("/matching-quality")
+def admin_matching_quality(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+) -> dict:
+    """Founding-cohort matching quality KPIs (feedback rates, median scores)."""
+    _require_ops_admin(settings, authorization)
+    return build_matching_quality_metrics(db)
 
 
 @router.get("/placement-disputes")

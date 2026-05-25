@@ -13,4 +13,10 @@ def test_build_match_reason_polish_locale() -> None:
 
 def test_build_match_reason_english_fallback() -> None:
     reason = build_match_reason({}, {"title": "Analyst"}, score=55.0, locale="en")
-    assert "Fits because:" in reason
+    assert "Possible fit" in reason
+
+
+def test_build_match_reason_low_score_toned_down() -> None:
+    reason = build_match_reason({}, {"title": "Analyst"}, score=45.0, locale="en")
+    assert "Possible fit" in reason
+    assert "strong profile" not in reason.lower()

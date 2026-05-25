@@ -5,6 +5,8 @@ import { SeniorityBadge } from "@/components/job/SeniorityBadge";
 import { TechStackIcons } from "@/components/job/TechStackIcons";
 import { useTranslation } from "@/components/language-provider";
 import { applicationDisplayStatusKey } from "@/lib/application-status";
+import type { MatchFeedbackValue, MatchQualityLabel } from "@/lib/matching-quality";
+import type { TranslationKey } from "@/lib/i18n";
 
 export type JobRow = {
   id?: number;
@@ -15,6 +17,7 @@ export type JobRow = {
   url: string;
   job_board: string;
   score?: number | null;
+  quality_label?: MatchQualityLabel | string | null;
   match_reason?: string | null;
   salary_min?: number | null;
   salary_max?: number | null;
@@ -44,6 +47,9 @@ export function JobList({
   onSave,
   onDismiss,
   autoApplyJobId,
+  matchFeedbackByJobId,
+  onMatchFeedback,
+  matchFeedbackBusyJobId,
 }: {
   items: JobRow[];
   showScore?: boolean;
@@ -62,8 +68,21 @@ export function JobList({
   onSave?: (jobId: number) => void;
   onDismiss?: (jobId: number) => void;
   autoApplyJobId?: number | null;
+  matchFeedbackByJobId?: Record<number, MatchFeedbackValue>;
+  onMatchFeedback?: (jobId: number, value: MatchFeedbackValue) => void;
+  matchFeedbackBusyJobId?: number | null;
 }) {
   const { t } = useTranslation();
+
+  const qualityKey = (label: string | null | undefined): TranslationKey | null => {
+    const map: Record<string, TranslationKey> = {
+      excellent: "dashboard.matchQualityExcellent",
+      good: "dashboard.matchQualityGood",
+      possible: "dashboard.matchQualityPossible",
+      weak: "dashboard.matchQualityWeak",
+    };
+    return label && map[label] ? map[label] : null;
+  };
 
   if (!items.length) {
     return <p className="twin-muted text-sm">{t("dashboard.noJobsFiltered")}</p>;
@@ -96,6 +115,11 @@ export function JobList({
                     {Math.round(item.score)}%
                   </span>
                 )}
+                {showScore && qualityKey(item.quality_label ?? null) ? (
+                  <span className="shrink-0 rounded bg-[var(--twin-surface-raised)] px-2 py-0.5 text-xs font-medium text-[var(--twin-muted-strong)]">
+                    {t(qualityKey(item.quality_label)! )}
+                  </span>
+                ) : null}
                 {status && (
                   <span className="shrink-0 rounded bg-[var(--twin-accent-muted)] px-2 py-0.5 text-xs font-medium text-[var(--twin-accent)]">
                     {t(applicationDisplayStatusKey(status, { display_status: status }))}
@@ -120,6 +144,39 @@ export function JobList({
                 <TechStackIcons stack={item.tech_stack ?? []} max={4} />
               </div>
             </a>
+            {showScore && onMatchFeedback && jobId > 0 ? (
+              <div
+                className="flex flex-wrap gap-1.5"
+                role="group"
+                aria-label={t("dashboard.matchFeedbackAria").replace("{title}", item.title)}
+              >
+                {(
+                  [
+                    ["apply_intent", "dashboard.matchFeedbackApplyIntent"],
+                    ["relevant", "dashboard.matchFeedbackRelevant"],
+                    ["not_relevant", "dashboard.matchFeedbackNotRelevant"],
+                    ["not_now", "dashboard.matchFeedbackNotNow"],
+                  ] as const
+                ).map(([value, labelKey]) => {
+                  const active = matchFeedbackByJobId?.[jobId] === value;
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      disabled={matchFeedbackBusyJobId === jobId}
+                      onClick={() => onMatchFeedback(jobId, value)}
+                      className={`twin-touch-target rounded-full border px-2.5 py-1 text-xs font-medium ${
+                        active
+                          ? "border-[var(--twin-accent)] bg-[var(--twin-accent-muted)] text-[var(--twin-accent-hover)]"
+                          : "border-[var(--twin-border)] bg-[var(--twin-card)] text-[var(--twin-muted-strong)]"
+                      }`}
+                    >
+                      {t(labelKey)}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
             {showActionRow && (
               <div className="flex flex-wrap gap-2">
                 {onApply && (

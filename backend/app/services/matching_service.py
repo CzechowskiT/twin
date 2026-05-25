@@ -9,6 +9,11 @@ from app.config import get_settings
 from app.database.models import Candidate, Job, JobMatch
 from app.matching.matcher import calculate_match_score
 from app.services.job_matching_v2 import calculate_match_score_v2, calculate_match_score_v2_tfidf
+from app.matching.quality_gate import (
+    APPLY_INTENT_SCORE_BOOST,
+    match_quality_label,
+)
+from app.services.job_match_feedback import apply_intent_job_ids, excluded_job_ids
 from app.services.match_reason import build_match_reason
 
 
@@ -76,10 +81,16 @@ def find_top_matches(
         .limit(scan_limit)
         .all()
     )
+    skip_jobs = excluded_job_ids(db, candidate.id)
+    boost_jobs = apply_intent_job_ids(db, candidate.id)
     scored: list[tuple[float, Job]] = []
 
     for job in jobs:
+        if job.id in skip_jobs:
+            continue
         score = score_fn(cand, job_to_dict(job))
+        if job.id in boost_jobs:
+            score = min(100.0, score + APPLY_INTENT_SCORE_BOOST)
         if score >= min_score:
             scored.append((score, job))
 
@@ -96,6 +107,7 @@ def find_top_matches(
             {
                 "job_id": job.id,
                 "score": score,
+                "quality_label": match_quality_label(score),
                 "title": job.title,
                 "company": job.company,
                 "location": job.location,

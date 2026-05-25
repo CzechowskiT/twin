@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 from app.config import get_settings
 from app.core.deps import get_current_user
 from app.core.subscription_gates import Feature, feature_allowed, paywall_for_feature
-from app.database.models import Candidate, Job, User, UserProfileDocument
+from app.database.models import Candidate, Job, JobMatchFeedback, User, UserProfileDocument
 from app.database.session import get_db
 from app.schemas.candidate import (
     CandidateCreate,
@@ -38,6 +38,11 @@ from app.schemas.career_compass import (
     PathOut,
 )
 from app.schemas.acceptance_queue import AcceptanceQueueOut, AcceptanceRespondIn
+from app.schemas.job_match_feedback import (
+    JobMatchFeedbackIn,
+    JobMatchFeedbackListOut,
+    JobMatchFeedbackOut,
+)
 from app.schemas.match import JobMatchListOut, JobMatchOut
 from app.services.acceptance_queue import build_acceptance_queue, respond_acceptance_item
 from app.services.candidate_readiness import candidate_has_cv
@@ -61,6 +66,7 @@ from app.services.profile_document_storage import (
     validate_profile_document_filename,
     write_profile_document_file,
 )
+from app.services.job_match_feedback import upsert_feedback
 from app.services.matching_service import find_top_matches
 from app.services.user_data_export import build_user_owned_export_payload
 
@@ -538,10 +544,59 @@ def get_my_matches(
     return JobMatchListOut(items=items, total=len(items))
 
 
+@router.get("/me/match-feedback", response_model=JobMatchFeedbackListOut)
+def list_my_match_feedback(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> JobMatchFeedbackListOut:
+    candidate = _get_candidate_or_404(db, user.id)
+    rows = (
+        db.query(JobMatchFeedback)
+        .filter(JobMatchFeedback.candidate_id == candidate.id)
+        .order_by(JobMatchFeedback.updated_at.desc())
+        .all()
+    )
+    items = [
+        JobMatchFeedbackOut(
+            job_id=row.job_id,
+            feedback_value=row.feedback_value,
+            updated_at=row.updated_at,
+        )
+        for row in rows
+    ]
+    return JobMatchFeedbackListOut(items=items)
+
+
+@router.post("/me/match-feedback", response_model=JobMatchFeedbackOut, status_code=201)
+def submit_match_feedback(
+    body: JobMatchFeedbackIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> JobMatchFeedbackOut:
+    candidate = _get_candidate_or_404(db, user.id)
+    job = db.query(Job).filter(Job.id == body.job_id).first()
+    if not job:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Job not found")
+    try:
+        row = upsert_feedback(
+            db,
+            candidate_id=candidate.id,
+            job_id=body.job_id,
+            feedback_value=body.feedback_value,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    return JobMatchFeedbackOut(
+        job_id=row.job_id,
+        feedback_value=row.feedback_value,
+        updated_at=row.updated_at,
+    )
+
+
 @router.get("/me/matches/export.csv")
 def export_my_matches_csv(
-    limit: int = Query(220, ge=1, le=400),
-    min_score: float = Query(15.0, ge=0, le=100),
+    limit: int = Query(50, ge=1, le=400),
+    min_score: float = Query(45.0, ge=0, le=100),
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> Response:
@@ -572,8 +627,8 @@ def export_my_matches_csv(
 
 @router.get("/me/matches/export.xlsx")
 def export_my_matches_xlsx(
-    limit: int = Query(220, ge=1, le=400),
-    min_score: float = Query(15.0, ge=0, le=100),
+    limit: int = Query(50, ge=1, le=400),
+    min_score: float = Query(45.0, ge=0, le=100),
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> Response:

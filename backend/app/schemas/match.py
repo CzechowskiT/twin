@@ -6,6 +6,7 @@ from pydantic import BaseModel
 class JobMatchOut(BaseModel):
     job_id: int
     score: float
+    quality_label: str | None = None
     title: str
     company: str
     location: str | None

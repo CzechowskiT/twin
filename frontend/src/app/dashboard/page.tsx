@@ -45,6 +45,13 @@ import {
   stripRequestIdFromUserMessage,
 } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
+import {
+  dashboardMatchesExportQuery,
+  dashboardMatchesExportXlsxQuery,
+  dashboardMatchesQuery,
+  MAIN_RECOMMENDATION_MIN_SCORE,
+  type MatchFeedbackValue,
+} from "@/lib/matching-quality";
 import { SHOW_SCRAPE_UI } from "@/lib/features";
 import type { JobEmployerTabId } from "@/lib/job-employer-demo";
 import type { TranslationKey } from "@/lib/i18n";
@@ -109,6 +116,7 @@ type JobList = { items: JobItem[]; total: number; search_relaxed?: boolean };
 type MatchItem = {
   job_id: number;
   score: number;
+  quality_label?: string | null;
   title: string;
   company: string;
   location: string | null;
@@ -275,6 +283,8 @@ export default function DashboardPage() {
   const [matchesCsvBusy, setMatchesCsvBusy] = useState(false);
   const [matchesXlsxBusy, setMatchesXlsxBusy] = useState(false);
   const [matchesRefreshing, setMatchesRefreshing] = useState(false);
+  const [matchFeedbackByJobId, setMatchFeedbackByJobId] = useState<Record<number, MatchFeedbackValue>>({});
+  const [matchFeedbackBusyJobId, setMatchFeedbackBusyJobId] = useState<number | null>(null);
   const [exportJsonBusy, setExportJsonBusy] = useState(false);
   const [jobsLoadMoreBusy, setJobsLoadMoreBusy] = useState(false);
   const [dashboardBootstrapping, setDashboardBootstrapping] = useState(true);
@@ -285,7 +295,24 @@ export default function DashboardPage() {
   }, []);
 
   const loadMatches = useCallback(async (token: string) => {
-    return apiFetch<MatchList>("/api/v1/candidates/me/matches?limit=220&min_score=15", {}, token);
+    return apiFetch<MatchList>(dashboardMatchesQuery(), {}, token);
+  }, []);
+
+  const loadMatchFeedback = useCallback(async (token: string) => {
+    try {
+      const data = await apiFetch<{ items: { job_id: number; feedback_value: MatchFeedbackValue }[] }>(
+        "/api/v1/candidates/me/match-feedback",
+        {},
+        token,
+      );
+      const map: Record<number, MatchFeedbackValue> = {};
+      for (const row of data.items ?? []) {
+        map[row.job_id] = row.feedback_value;
+      }
+      setMatchFeedbackByJobId(map);
+    } catch {
+      setMatchFeedbackByJobId({});
+    }
   }, []);
 
   const loadApplications = useCallback(async (token: string) => {
@@ -391,6 +418,7 @@ export default function DashboardPage() {
       opts?: { light?: boolean },
     ): Promise<number> => {
       void loadGoogleCalendarStrip(token);
+      if (hasProfile) void loadMatchFeedback(token);
       if (hasProfile && !opts?.light) setMatchesRefreshing(true);
       let jobsTotal = 0;
       try {
@@ -416,7 +444,15 @@ export default function DashboardPage() {
       }
       return jobsTotal;
     },
-    [loadJobs, loadMatches, loadApplications, loadDevelopmentFocus, loadGoogleCalendarStrip, loadSavedJobIds],
+    [
+      loadJobs,
+      loadMatches,
+      loadMatchFeedback,
+      loadApplications,
+      loadDevelopmentFocus,
+      loadGoogleCalendarStrip,
+      loadSavedJobIds,
+    ],
   );
 
   useEffect(() => {
@@ -881,8 +917,38 @@ export default function DashboardPage() {
 
   const visibleMatches = useMemo(() => {
     const items = matches?.items ?? [];
-    return items.filter((job) => applicationByJobId[job.job_id] !== "rejected");
+    return items.filter(
+      (job) =>
+        applicationByJobId[job.job_id] !== "rejected" &&
+        (job.score ?? 0) >= MAIN_RECOMMENDATION_MIN_SCORE,
+    );
   }, [matches?.items, applicationByJobId]);
+
+  async function submitMatchFeedback(jobId: number, value: MatchFeedbackValue) {
+    const token = getToken();
+    if (!token) return;
+    setMatchFeedbackBusyJobId(jobId);
+    try {
+      await apiFetch(
+        "/api/v1/candidates/me/match-feedback",
+        { method: "POST", body: JSON.stringify({ job_id: jobId, feedback_value: value }) },
+        token,
+      );
+      setMatchFeedbackByJobId((prev) => ({ ...prev, [jobId]: value }));
+      toast.success(t("dashboard.matchFeedbackSaved"));
+      if (value === "not_relevant") {
+        setMatches((prev) =>
+          prev
+            ? { ...prev, items: prev.items.filter((m) => m.job_id !== jobId), total: Math.max(0, prev.total - 1) }
+            : prev,
+        );
+      }
+    } catch (err) {
+      setError(dashboardFetchUserMessage(err, t));
+    } finally {
+      setMatchFeedbackBusyJobId(null);
+    }
+  }
 
   const developmentFocusHasData = useMemo(() => {
     if (!devFocus) return false;
@@ -989,11 +1055,7 @@ export default function DashboardPage() {
     setMatchesCsvBusy(true);
     setError(null);
     try {
-      const blob = await apiFetchBlob(
-        "/api/v1/candidates/me/matches/export.csv?limit=220&min_score=15",
-        {},
-        token,
-      );
+      const blob = await apiFetchBlob(dashboardMatchesExportQuery(), {}, token);
       saveBlobAsFile(blob, "twin-matches.csv");
       toast.success(t("dashboard.matchesCsvDownloadedToast"));
     } catch (err) {
@@ -1009,11 +1071,7 @@ export default function DashboardPage() {
     setMatchesXlsxBusy(true);
     setError(null);
     try {
-      const blob = await apiFetchBlob(
-        "/api/v1/candidates/me/matches/export.xlsx?limit=220&min_score=15",
-        {},
-        token,
-      );
+      const blob = await apiFetchBlob(dashboardMatchesExportXlsxQuery(), {}, token);
       saveBlobAsFile(blob, "twin-matches.xlsx");
     } catch (err) {
       setError(csvExportUserMessage(err, t));
@@ -1725,9 +1783,12 @@ export default function DashboardPage() {
             </div>
           ) : null}
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <h2 className="twin-section-title">
-              {t("dashboard.topMatches")} ({matches?.total ?? 0})
-            </h2>
+            <div>
+              <h2 className="twin-section-title">
+                {t("dashboard.topMatches")} ({visibleMatches.length})
+              </h2>
+              <p className="twin-muted mt-1 text-sm">{t("dashboard.topMatchesLead")}</p>
+            </div>
             <div className="flex flex-wrap gap-2 self-start sm:self-auto sm:shrink-0">
               <button
                 type="button"
@@ -1759,6 +1820,9 @@ export default function DashboardPage() {
             <JobList
               items={visibleMatches}
               showScore
+              matchFeedbackByJobId={matchFeedbackByJobId}
+              onMatchFeedback={(jobId, value) => void submitMatchFeedback(jobId, value)}
+              matchFeedbackBusyJobId={matchFeedbackBusyJobId}
               applicationStatus={displayApplicationStatus}
               onApply={applyToJob}
               onAutoApply={autoApplyToJob}

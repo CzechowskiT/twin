@@ -43,13 +43,22 @@ def build_match_reason(
         parts.append("widełki pensji" if pl else "salary band")
 
     if not parts:
-        if score >= 90:
+        if score >= 80:
             parts.append("wysokie dopasowanie profilu" if pl else "strong profile overlap")
-        elif score >= 75:
+        elif score >= 60:
             parts.append("dobre dopasowanie ogólne" if pl else "solid overall fit")
+        elif score >= 40:
+            parts.append(
+                "częściowe pokrycie profilu — warto ocenić" if pl else "partial profile overlap — worth reviewing"
+            )
         else:
-            parts.append("dopasowanie powyżej progu" if pl else "above your match threshold")
+            parts.append("niskie dopasowanie — sprawdź profil" if pl else "low overlap — check your profile")
 
     joined = ", ".join(parts[:3])
-    prefix = "Pasuje, bo: " if pl else "Fits because: "
+    if score < 60:
+        prefix = (
+            "Możliwe dopasowanie — " if pl else "Possible fit — "
+        ) if score >= 40 else ("Słabe dopasowanie — " if pl else "Weak fit — ")
+    else:
+        prefix = "Pasuje, bo: " if pl else "Fits because: "
     return f"{prefix}{joined}."
