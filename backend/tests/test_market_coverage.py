@@ -121,12 +121,16 @@ def test_upsert_refreshes_scraped_at_for_existing(cov_db) -> None:
 
 
 def test_build_market_coverage_report_keys(cov_db) -> None:
+    from app.scrapers.registry import SCRAPE_REGISTRY
+
     now = datetime.utcnow()
     _job(cov_db, board="pracuj.pl", ext="r1", scraped_at=now)
     report = build_market_coverage_report(cov_db)
     assert report["validated_jobs_total"] >= 1
     assert report["active_validated_jobs"] >= 1
     assert "total_jobs_by_source" in report
+    assert report["registry_adapter_count"] == len(SCRAPE_REGISTRY)
+    assert "pracuj-cities" in report["registry_board_ids"]
 
 
 def test_find_top_matches_respects_active_window(cov_db) -> None:

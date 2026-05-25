@@ -22,6 +22,7 @@ from app.schemas.company_intelligence import CompanyIntelBodyOut, CompanyIntelOu
 from app.schemas.job import (
     BoardListOut,
     BoardScrapeResult,
+    JobFeedStatsOut,
     JobFiltersOut,
     JobListOut,
     JobOut,
@@ -32,6 +33,7 @@ from app.schemas.job_competitive import JobApplyStatsOut, JobDetailOut, OneClick
 from app.services.company_intelligence import research_company_for_job
 from app.services.job_api_enrichment import job_detail_out, job_out, score_for_candidate
 from app.services.job_query import SORT_COMPANY, SORT_NEWEST, SORT_SALARY, apply_job_filters, job_filter_options
+from app.services.market_coverage import build_market_coverage_report
 from app.services.matching_service import candidate_to_dict, job_to_dict
 from app.services.request_locale import locale_from_request
 from app.services.skill_matcher import compute_skill_match
@@ -44,6 +46,7 @@ from app.tasks.scrape_tasks import (
     scrape_linkedin_sales_task,
     scrape_linkedin_task,
     scrape_praca_task,
+    scrape_pracuj_cities_task,
     scrape_pracuj_sales_task,
     scrape_pracuj_task,
     scrape_rocketjobs_roles_task,
@@ -121,6 +124,7 @@ def _celery_delay(task, *args, **kwargs):
 
 LOCAL_SCRAPE_HANDLERS = {
     "pracuj": scrape_pracuj_task,
+    "pracuj-cities": scrape_pracuj_cities_task,
     "rocketjobs": scrape_rocketjobs_task,
     "pracuj-sales": scrape_pracuj_sales_task,
     "rocketjobs-sales": scrape_rocketjobs_sales_task,
@@ -237,6 +241,23 @@ def list_jobs(
         out_items.append(job_out(job, score=sc))
 
     return JobListOut(items=out_items, total=total, search_relaxed=search_relaxed)
+
+
+@router.get("/feed-stats", response_model=JobFeedStatsOut)
+def job_feed_stats(
+    db: Session = Depends(get_db),
+    _user: User = Depends(get_current_user),
+) -> JobFeedStatsOut:
+    """Lightweight active-feed counters (validated + scraped within job_feed_active_days)."""
+    report = build_market_coverage_report(db)
+    return JobFeedStatsOut(
+        active_validated_jobs=int(report["active_validated_jobs"]),
+        validated_jobs_total=int(report["validated_jobs_total"]),
+        job_feed_active_days=int(report["job_feed_active_days"]),
+        fresh_jobs_24h=int(report["fresh_jobs_24h"]),
+        fresh_jobs_7d=int(report["fresh_jobs_7d"]),
+        active_jobs_by_source=dict(report.get("active_jobs_by_source") or {}),
+    )
 
 
 @router.get("/{job_id}", response_model=JobDetailOut)

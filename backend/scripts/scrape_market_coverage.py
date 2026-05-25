@@ -17,6 +17,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.database.session import SessionLocal
+from app.scrapers import compliance
 from app.scrapers.registry import SCRAPE_REGISTRY, scrape_board_ids_ordered
 from app.services.job_storage import upsert_jobs
 from app.services.market_coverage import build_market_coverage_report
@@ -49,15 +50,13 @@ def main() -> int:
     board_ids = scrape_board_ids_ordered()
     print(json.dumps({"mode": "dry-run" if dry_run else "persist", "boards": board_ids}, indent=2))
 
-    from app.scrapers.registry import BoardScrapeOutcome, run_scrape
-
     results: list[dict] = []
-    for board_id in board_ids:
+    for index, board_id in enumerate(board_ids):
         fn = SCRAPE_REGISTRY.get(board_id)
         if not fn:
             continue
         try:
-            jobs = run_scrape(board_id)
+            jobs = fn()
             err = None
         except Exception as exc:
             jobs = []
@@ -76,7 +75,9 @@ def main() -> int:
             "error": err,
         }
         results.append(row)
-        print(json.dumps(row))
+        print(json.dumps(row), flush=True)
+        if index < len(board_ids) - 1:
+            compliance.sleep_between_boards()
 
     db = SessionLocal()
     try:

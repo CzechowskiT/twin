@@ -114,7 +114,7 @@ def _job_from_offer(obj: dict[str, Any]) -> ScrapedJob | None:
     )
 
 
-def scrape_justjoin(limit: int = 50) -> list[ScrapedJob]:
+def scrape_justjoin(limit: int = 2500) -> list[ScrapedJob]:
     raw = _fetch_offers_json_text()
     if not raw.strip():
         return []

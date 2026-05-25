@@ -15,6 +15,10 @@ def _scrape_limit() -> int:
     return max(12, min(200, get_settings().scrape_jobs_per_board))
 
 
+def _justjoin_scrape_limit() -> int:
+    return min(3000, max(400, _scrape_limit() * 12))
+
+
 def _persist_global_board(board_id: str) -> dict[str, int]:
     jobs = scrape_global_board(board_id, limit=_scrape_limit())
     db = SessionLocal()
@@ -49,6 +53,17 @@ def scrape_pracuj_task() -> dict[str, int]:
 @celery_app.task(name="app.tasks.scrape_tasks.scrape_rocketjobs_task")
 def scrape_rocketjobs_task() -> dict[str, int]:
     jobs = rocketjobs.scrape_rocketjobs(limit=_scrape_limit())
+    db = SessionLocal()
+    try:
+        saved = upsert_jobs(db, jobs)
+    finally:
+        db.close()
+    return {"scraped": len(jobs), "saved": saved}
+
+
+@celery_app.task(name="app.tasks.scrape_tasks.scrape_pracuj_cities_task")
+def scrape_pracuj_cities_task() -> dict[str, int]:
+    jobs = pracuj.scrape_pracuj_cities(limit=_scrape_limit())
     db = SessionLocal()
     try:
         saved = upsert_jobs(db, jobs)
@@ -92,7 +107,7 @@ def scrape_rocketjobs_roles_task() -> dict[str, int]:
 
 @celery_app.task(name="app.tasks.scrape_tasks.scrape_justjoin_task")
 def scrape_justjoin_task() -> dict[str, int]:
-    jobs = justjoin.scrape_justjoin(limit=_scrape_limit())
+    jobs = justjoin.scrape_justjoin(limit=_justjoin_scrape_limit())
     db = SessionLocal()
     try:
         saved = upsert_jobs(db, jobs)

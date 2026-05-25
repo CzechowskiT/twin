@@ -154,7 +154,7 @@ def _dismiss_cookie_banner(page) -> None:
 def _scroll_to_load_offers(page) -> None:
     """RocketJobs lazy-loads cards on scroll."""
     page.wait_for_timeout(2_000)
-    for _ in range(5):
+    for _ in range(8):
         page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
         page.wait_for_timeout(1_200)
 

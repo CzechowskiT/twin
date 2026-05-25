@@ -68,6 +68,17 @@ class ScrapeAllOut(BaseModel):
     message: str
 
 
+class JobFeedStatsOut(BaseModel):
+    """Active validated feed counters (dashboard / ops)."""
+
+    active_validated_jobs: int
+    validated_jobs_total: int
+    job_feed_active_days: int
+    fresh_jobs_24h: int
+    fresh_jobs_7d: int
+    active_jobs_by_source: dict[str, int]
+
+
 class JobListOut(BaseModel):
     items: list[JobOut]
     total: int

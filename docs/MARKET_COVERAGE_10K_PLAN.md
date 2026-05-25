@@ -6,12 +6,12 @@ Honest plan for reaching ~10,000 **active** (`is_validated` + `scraped_at` withi
 
 ### 1. SCRAPE_REGISTRY — adapter count
 
-**30** real adapters in `backend/app/scrapers/registry.py`:
+**34** real adapters in `backend/app/scrapers/registry.py`:
 
 | Group | Count | Board ids |
 |-------|------:|-----------|
-| PL-local | 9 | `pracuj`, `pracuj-sales`, `rocketjobs`, `rocketjobs-sales`, `rocketjobs-roles`, `justjoin`, `praca`, `linkedin`, `linkedin-sales` |
-| Greenhouse JSON | 8 | `gh-stripe`, `gh-databricks`, `gh-airbnb`, `gh-duolingo`, `gh-cloudflare`, `gh-robinhood`, `gh-figma`, `gh-anthropic` |
+| PL-local | 10 | `pracuj`, `pracuj-cities`, `pracuj-sales`, `rocketjobs`, `rocketjobs-sales`, `rocketjobs-roles`, `justjoin`, `praca`, `linkedin`, `linkedin-sales` |
+| Greenhouse JSON | 11 | `gh-stripe`, `gh-databricks`, `gh-airbnb`, `gh-duolingo`, `gh-cloudflare`, `gh-robinhood`, `gh-figma`, `gh-anthropic`, `gh-gitlab`, `gh-shopify`, `gh-notion` |
 | Global HTML | 13 | `indeed`, `indeed-pl`, `glassdoor`, `monster`, `ziprecruiter`, `careerbuilder`, `simplyhired`, `jooble`, `reed`, `stepstone`, `seek`, `google-jobs`, `snagajob` |
 
 **Not in registry:** NoFluffJobs, Wellfound, 37+ investor “W PLANIE” portals (`frontend/src/lib/investor-roadmap.ts` — roadmap marquee, not production scrapers).
@@ -20,12 +20,12 @@ Honest plan for reaching ~10,000 **active** (`is_validated` + `scraped_at` withi
 
 | id | Region | Prod safe | Auth | ToS / robots risk | Typical frequency | Volume note |
 |----|--------|-----------|------|-------------------|-------------------|-------------|
-| pracuj, pracuj-sales | PL | Yes | None | Medium HTML | Beat / on demand | **High** — pagination to 35 pages, multi-keyword sales variant |
+| pracuj, pracuj-cities, pracuj-sales | PL | Yes | None | Medium HTML | Beat / on demand | **High** — pagination to 35 pages, 8 cities, multi-keyword sales |
 | rocketjobs ×3 | PL | Yes | None | Medium | Beat / on demand | **High** — 3 keyword profiles |
-| justjoin | PL | Yes | None | Low (public JSON) | Beat / on demand | **High** — reliable API-like JSON |
+| justjoin | PL | Yes | None | Low (public JSON) | Beat / on demand | **High** — up to **3000** offers/run from `/api/offers` |
 | praca | PL | Yes | None | Medium | On demand | Medium |
 | linkedin ×2 | Global | Caution | None (public) | **High** — robots often block | Low cap **25**/run | Low yield |
-| gh-* (8) | Global | Yes | None (public API) | Low | On demand | **Medium** — up to 200/board, employer boards (Stripe, Duolingo, …) |
+| gh-* (11) | Global | Yes | None (public API) | Low | On demand | **Medium** — up to 200/board (Stripe, GitLab, Shopify, …) |
 | indeed, glassdoor, … (13) | Mixed | Caution | None | High anti-bot | Best-effort | **Volatile** — many runs return 0 |
 
 **Compliance:** `scrape_respect_robots_txt=true` by default; no CAPTCHA bypass, no LinkedIn login automation.
@@ -36,7 +36,7 @@ Honest plan for reaching ~10,000 **active** (`is_validated` + `scraped_at` withi
 2. **Greenhouse:** 8 employers × up to 200 jobs each ≈ 1.6k theoretical per full run if all boards full.
 3. **Global HTML:** bonus when smoke tests pass; not dependable for 10k alone.
 
-**Single scrape-all ceiling (theory):** 30 boards × **200** cap ≈ **6,000** raw rows/run — minus duplicates, validation drops, and zero-yield boards.
+**Single scrape-all ceiling (theory):** 34 boards × **200** cap + justjoin up to **3000** ≈ **~9–10k** raw rows/run — minus duplicates, validation drops, and zero-yield global HTML boards.
 
 ### 4. Can 10k be reached?
 
@@ -91,12 +91,13 @@ SELECT COUNT(*) FROM jobs WHERE is_validated = true AND scraped_at >= NOW() - IN
 
 1. **Active feed** — `job_feed_active_days=45`; API default `active_feed_only=true`; matcher scan same window.
 2. **Upsert refresh** — Re-seen `(job_board, external_id)` updates `scraped_at` + `is_validated`.
-3. **Scrape depth** — `scrape_jobs_per_board` default **200**; pracuj up to **35** pages; LinkedIn max **25**/run; PL keyword variants on pracuj-sales / rocketjobs.
-4. **Matcher scan** — `match_jobs_scan_limit` default **15000**.
-5. **Ops** — `scripts/scrape-market-coverage.sh` → `backend/scripts/scrape_market_coverage.py` (`dry-run` / `persist`, `--boards`).
-6. **Admin KPIs** — `GET /api/v1/admin/matching-quality` + `build_market_coverage_report`: `active_validated_jobs`, `fresh_jobs_24h`/`7d`, `total_jobs_by_source`, `active_jobs_by_source`, `per_user_top_200_sample`, scrape caps.
-7. **Dashboard** — `frontend/src/lib/jobs.ts` sends `active_feed_only` + 45-day window; rail **W feedzie** shows count + **10k goal** caption when below target.
-8. **Dedupe / not_relevant** — `feed_dedupe_key` + `excluded_feed_dedupe_keys` intact (commit `31e004f`).
+3. **Scrape depth** — `scrape_jobs_per_board` default **200**; `pracuj-cities` (8 PL locations); pracuj up to **35** pages; justjoin up to **3000**; LinkedIn max **25**/run; +3 Greenhouse boards.
+4. **`GET /api/v1/jobs/feed-stats`** — lightweight `active_validated_jobs` for ops/dashboard checks.
+5. **Matcher scan** — `match_jobs_scan_limit` default **15000**.
+6. **Ops** — `scripts/scrape-market-coverage.sh` → `backend/scripts/scrape_market_coverage.py` (`dry-run` / `persist`, `--boards`, inter-board delay).
+7. **Admin KPIs** — `GET /api/v1/admin/matching-quality` + `build_market_coverage_report`: `active_validated_jobs`, `fresh_jobs_24h`/`7d`, `registry_board_ids`, scrape caps.
+8. **Dashboard** — `frontend/src/lib/jobs.ts` sends `active_feed_only` + 45-day window; rail **W feedzie** = API `total`.
+9. **Dedupe / not_relevant** — `feed_dedupe_key` + `excluded_feed_dedupe_keys` intact (commit `31e004f`).
 
 **Out of scope (per sprint constraints):** P0 submission truth/048, auto-apply, application statuses, prod deploy.
 
@@ -131,14 +132,14 @@ Prod path: `SCRAPE_WORKER_READY=true`, Redis, `SCRAPE_BEAT_ENABLED=true`, tune `
 
 1. **Czy 10k jest osiągalne?** Tak **operacyjnie** (Celery beat + worker, codzienne PL + Greenhouse), nie jednym lokalnym skryptem. Sam kod daje sufit ~6k/ przebieg scrape-all.
 2. **Aktualne liczby w prod** — Agent nie ma `DATABASE_URL` prod; użyj SQL powyżej lub `GET /admin/matching-quality`. Lokalnie testy używają SQLite — nie są licznikiem prod.
-3. **Źródła** — 30 adapterów (9 PL, 8 Greenhouse, 13 global HTML); największy wolumen: pracuj, rocketjobs, justjoin.
-4. **Co zaimplementowano** — Aktywny feed 45 dni, odświeżanie `scraped_at` przy upsercie, cap 200/board, scan 15k, skrypt coverage, KPI admin, frontend `active_feed_only`, cel 10k w railu.
+3. **Źródła** — 34 adaptery (10 PL, 11 Greenhouse, 13 global HTML); największy wolumen: justjoin, pracuj (+ cities/sales), rocketjobs.
+4. **Co zaimplementowano** — `pracuj-cities`, justjoin 3k cap, +3 Greenhouse, `feed-stats`, aktywny feed 45 dni, scan 15k, skrypt coverage z delay, testy feed-stats/scan.
 5. **Jak odpalić scrape** — `./scripts/scrape-market-coverage.sh dry-run|persist` lub POST `scrape/all` + prod beat.
 6. **Fix licznika dashboard** — `total` z API z `active_feed_only=true` (nie all-time validated); **W feedzie** w bocznym railu.
 7. **Top 200 nadal ranking?** Tak — `find_top_matches` + `dedupe_ranked_jobs` + limit 200 + min_score 38; skan na aktywnym korpusie.
 8. **Dedupe** — `feed_dedupe_key` (tytuł+firma+lokalizacja / URL); batch soft-dedupe przy zapisie; `not_relevant` ukrywa rodzeństwo po kluczu.
 9. **Metryki ops** — `matching-quality`: `active_validated_jobs`, `fresh_jobs_24h`, `fresh_jobs_7d`, `total_jobs_by_source`, `active_jobs_by_source`, `match_jobs_scan_limit`, `registry_adapter_count`.
-10. **Testy** — `test_market_coverage.py`, `test_matching_quality_admin.py`, ranking/feedback/scrape-all — **22 passed** w tym sprincie.
+10. **Testy** — `test_market_coverage.py`, `test_match_jobs_scan_limit.py`, `test_job_feed_stats.py`, scrape-all — **11+ passed** w pakiecie coverage.
 11. **Frontend build** — `npm run build` OK.
 12. **Commit** — Branch `cursor/phase1-monorepo-scaffold`; config caps 200/15000 + doc + UI cel 10k.
 13. **Push** — Po commicie na `origin/cursor/phase1-monorepo-scaffold`.

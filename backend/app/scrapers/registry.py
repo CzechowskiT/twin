@@ -26,13 +26,18 @@ def _wrap_global(board_id: str) -> ScrapeFn:
 
 
 # Poland-focused boards (Playwright / HTML)
+def _justjoin_limit() -> int:
+    return min(3000, max(400, _registry_limit() * 12))
+
+
 LOCAL_SCRAPERS: dict[str, ScrapeFn] = {
     "pracuj": lambda: pracuj.scrape_pracuj(limit=_registry_limit()),
+    "pracuj-cities": lambda: pracuj.scrape_pracuj_cities(limit=_registry_limit()),
     "pracuj-sales": lambda: pracuj.scrape_pracuj_sales(limit=_registry_limit()),
     "rocketjobs": lambda: rocketjobs.scrape_rocketjobs(limit=_registry_limit()),
     "rocketjobs-sales": lambda: rocketjobs.scrape_rocketjobs_sales(limit=_registry_limit()),
     "rocketjobs-roles": lambda: rocketjobs.scrape_rocketjobs_roles(limit=_registry_limit()),
-    "justjoin": lambda: justjoin.scrape_justjoin(limit=_registry_limit()),
+    "justjoin": lambda: justjoin.scrape_justjoin(limit=_justjoin_limit()),
     "praca": lambda: praca.scrape_praca(limit=_registry_limit()),
     "linkedin": lambda: linkedin.scrape_linkedin(limit=min(25, _registry_limit())),
     "linkedin-sales": lambda: linkedin.scrape_linkedin_sales(limit=min(25, _registry_limit())),
@@ -48,6 +53,9 @@ _GREENHOUSE_SPECS: tuple[tuple[str, str, str], ...] = (
     ("gh-robinhood", "robinhood", "Robinhood"),
     ("gh-figma", "figma", "Figma"),
     ("gh-anthropic", "anthropic", "Anthropic"),
+    ("gh-gitlab", "gitlab", "GitLab"),
+    ("gh-shopify", "shopify", "Shopify"),
+    ("gh-notion", "notion", "Notion"),
 )
 
 
@@ -75,6 +83,7 @@ DEFAULT_BOARD_TIMEOUT_SEC = 120
 # Scrape-all order: PL sources first, LinkedIn, then every global board id (explicit — same ids as API / filters).
 PRIORITY_BOARD_ORDER: tuple[str, ...] = (
     "pracuj",
+    "pracuj-cities",
     "pracuj-sales",
     "rocketjobs",
     "rocketjobs-sales",
@@ -100,6 +109,7 @@ PRIORITY_BOARD_ORDER: tuple[str, ...] = (
 
 BOARD_LABELS: dict[str, tuple[str, str]] = {
     "pracuj": ("pracuj.pl", "poland"),
+    "pracuj-cities": ("pracuj.pl (major cities)", "poland"),
     "pracuj-sales": ("pracuj.pl (wide roles)", "poland"),
     "rocketjobs": ("rocketjobs.pl", "poland"),
     "rocketjobs-sales": ("rocketjobs.pl (sales)", "poland"),
