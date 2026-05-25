@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from sqlalchemy.orm import Session
 
-from app.database.models import JobMatchFeedback
+from app.database.models import Job, JobMatchFeedback
 from app.matching.quality_gate import FEEDBACK_VALUES
+from app.matching.ranking import feed_dedupe_key
 
 
 def list_feedback_by_candidate(db: Session, candidate_id: int) -> dict[int, str]:
@@ -30,6 +31,15 @@ def excluded_job_ids(db: Session, candidate_id: int) -> set[int]:
         for job_id, value in list_feedback_by_candidate(db, candidate_id).items()
         if value == "not_relevant"
     }
+
+
+def excluded_feed_dedupe_keys(db: Session, candidate_id: int) -> set[str]:
+    """Dedupe keys for not_relevant jobs — suppress sibling listings in the feed."""
+    job_ids = excluded_job_ids(db, candidate_id)
+    if not job_ids:
+        return set()
+    rows = db.query(Job).filter(Job.id.in_(job_ids)).all()
+    return {feed_dedupe_key(job) for job in rows}
 
 
 def apply_intent_job_ids(db: Session, candidate_id: int) -> set[int]:

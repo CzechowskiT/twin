@@ -14,11 +14,13 @@ from app.matching.quality_gate import match_quality_label
 from app.matching.ranking import (
     compute_final_score,
     dedupe_ranked_jobs,
+    feed_dedupe_key,
     job_display_badges,
     source_display_label,
 )
 from app.services.job_match_feedback import (
     apply_intent_job_ids,
+    excluded_feed_dedupe_keys,
     excluded_job_ids,
     not_now_job_ids,
     relevant_job_ids,
@@ -91,6 +93,7 @@ def find_top_matches(
         .all()
     )
     skip_jobs = excluded_job_ids(db, candidate.id)
+    skip_dedupe_keys = excluded_feed_dedupe_keys(db, candidate.id)
     apply_boost = apply_intent_job_ids(db, candidate.id)
     relevant_boost = relevant_job_ids(db, candidate.id)
     not_now_penalty = not_now_job_ids(db, candidate.id)
@@ -99,6 +102,8 @@ def find_top_matches(
 
     for job in jobs:
         if job.id in skip_jobs:
+            continue
+        if skip_dedupe_keys and feed_dedupe_key(job) in skip_dedupe_keys:
             continue
         fit = score_fn(cand, job_to_dict(job))
         final = compute_final_score(

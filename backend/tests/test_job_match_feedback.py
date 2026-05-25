@@ -12,7 +12,12 @@ from app.core.security import create_access_token, hash_password
 from app.database.models import Base, Candidate, Job, JobMatchFeedback, User
 from app.database.session import get_db
 from app.main import app
-from app.services.job_match_feedback import excluded_job_ids, upsert_feedback
+from app.matching.ranking import feed_dedupe_key
+from app.services.job_match_feedback import (
+    excluded_feed_dedupe_keys,
+    excluded_job_ids,
+    upsert_feedback,
+)
 from app.services.matching_service import find_top_matches
 
 
@@ -100,6 +105,64 @@ def test_not_relevant_excluded_from_find_top_matches(jmf_db) -> None:
     assert all(r["job_id"] != job.id for r in rows)
 
 
+def test_not_relevant_suppresses_duplicate_feed_key(jmf_db) -> None:
+    """Sibling listing (other job_id, same role) must not reappear after dedupe."""
+    _, candidate, job = _seed_candidate_job(jmf_db)
+    sibling = Job(
+        job_board="rocketjobs.pl",
+        external_id="jmf-dup",
+        title=job.title,
+        company=job.company,
+        description=job.description,
+        requirements=job.requirements,
+        url="https://example.com/j/jmf-dup",
+        is_validated=True,
+        location=job.location,
+    )
+    jmf_db.add(sibling)
+    jmf_db.commit()
+    jmf_db.refresh(sibling)
+    assert sibling.id != job.id
+    assert feed_dedupe_key(job) == feed_dedupe_key(sibling)
+
+    upsert_feedback(
+        jmf_db,
+        candidate_id=candidate.id,
+        job_id=job.id,
+        feedback_value="not_relevant",
+    )
+    assert feed_dedupe_key(job) in excluded_feed_dedupe_keys(jmf_db, candidate.id)
+
+    rows = find_top_matches(jmf_db, candidate, limit=10, min_score=30.0, persist=False)
+    returned_ids = {r["job_id"] for r in rows}
+    assert job.id not in returned_ids
+    assert sibling.id not in returned_ids
+
+
+def test_apply_intent_still_surfaces_after_relevant_feedback(jmf_db) -> None:
+    _, candidate, job = _seed_candidate_job(jmf_db)
+    upsert_feedback(
+        jmf_db,
+        candidate_id=candidate.id,
+        job_id=job.id,
+        feedback_value="apply_intent",
+    )
+    rows = find_top_matches(jmf_db, candidate, limit=10, min_score=30.0, persist=False)
+    assert any(r["job_id"] == job.id for r in rows)
+
+
+def test_not_now_still_surfaces_with_penalty(jmf_db) -> None:
+    _, candidate, job = _seed_candidate_job(jmf_db)
+    upsert_feedback(
+        jmf_db,
+        candidate_id=candidate.id,
+        job_id=job.id,
+        feedback_value="not_now",
+    )
+    rows = find_top_matches(jmf_db, candidate, limit=10, min_score=30.0, persist=False)
+    assert any(r["job_id"] == job.id for r in rows)
+
+
 def test_match_feedback_api_roundtrip(jmf_client, jmf_db) -> None:
     user, candidate, job = _seed_candidate_job(jmf_db)
     token = create_access_token(user.email)
@@ -118,3 +181,21 @@ def test_match_feedback_api_roundtrip(jmf_client, jmf_db) -> None:
     assert any(i["job_id"] == job.id for i in listed.json()["items"])
     row = jmf_db.query(JobMatchFeedback).filter(JobMatchFeedback.candidate_id == candidate.id).one()
     assert row.feedback_value == "apply_intent"
+
+
+def test_not_relevant_api_then_matches_excludes_job(jmf_client, jmf_db) -> None:
+    user, candidate, job = _seed_candidate_job(jmf_db)
+    token = create_access_token(user.email)
+    post = jmf_client.post(
+        "/api/v1/candidates/me/match-feedback",
+        json={"job_id": job.id, "feedback_value": "not_relevant"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert post.status_code == 201
+    matches = jmf_client.get(
+        "/api/v1/candidates/me/matches?limit=20&min_score=30",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert matches.status_code == 200
+    ids = {item["job_id"] for item in matches.json()["items"]}
+    assert job.id not in ids

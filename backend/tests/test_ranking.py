@@ -71,7 +71,14 @@ def test_apply_intent_boosts_final_score() -> None:
     assert boosted > base
 
 
-def test_not_relevant_excluded_via_service() -> None:
-    from app.services.job_match_feedback import excluded_job_ids
-
-    assert callable(excluded_job_ids)
+def test_not_relevant_sibling_listings_share_feed_dedupe_key() -> None:
+    """Cross-board duplicates must collapse under the same feed_dedupe_key."""
+    marked = _job(id=10, title="Engineer", company="Duolingo", location="Mexico")
+    sibling = _job(
+        id=11,
+        job_board="rocketjobs.pl",
+        title="engineer",
+        company="duolingo",
+        location="mexico",
+    )
+    assert feed_dedupe_key(marked) == feed_dedupe_key(sibling)
