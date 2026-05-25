@@ -249,7 +249,22 @@ def job_feed_stats(
     _user: User = Depends(get_current_user),
 ) -> JobFeedStatsOut:
     """Lightweight active-feed counters (validated + scraped within job_feed_active_days)."""
+    from app.services.market_coverage_status import feed_stale_hours_threshold, market_update_label
+    from app.services.scrape_run_tracking import last_scrape_run_at
+
     report = build_market_coverage_report(db)
+    last_at = last_scrape_run_at()
+    stale = False
+    if last_at:
+        from app.services.market_coverage_status import _parse_run_ts
+        from datetime import datetime, timezone
+
+        last_dt = _parse_run_ts(last_at)
+        if last_dt:
+            hours = (datetime.now(timezone.utc) - last_dt).total_seconds() / 3600.0
+            stale = hours > feed_stale_hours_threshold()
+    elif int(report.get("active_validated_jobs") or 0) == 0:
+        stale = True
     return JobFeedStatsOut(
         active_validated_jobs=int(report["active_validated_jobs"]),
         validated_jobs_total=int(report["validated_jobs_total"]),
@@ -257,6 +272,9 @@ def job_feed_stats(
         fresh_jobs_24h=int(report["fresh_jobs_24h"]),
         fresh_jobs_7d=int(report["fresh_jobs_7d"]),
         active_jobs_by_source=dict(report.get("active_jobs_by_source") or {}),
+        last_scrape_run_at=last_at,
+        feed_stale=stale,
+        market_update_label=market_update_label(last_at),
     )
 
 

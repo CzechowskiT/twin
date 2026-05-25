@@ -30,6 +30,13 @@ def _justjoin_limit() -> int:
     return min(3000, max(400, _registry_limit() * 12))
 
 
+def _linkedin_limit() -> int:
+    from app.config import get_settings
+
+    cap = max(1, min(25, int(get_settings().linkedin_scrape_max_per_run)))
+    return min(cap, _registry_limit())
+
+
 LOCAL_SCRAPERS: dict[str, ScrapeFn] = {
     "pracuj": lambda: pracuj.scrape_pracuj(limit=_registry_limit()),
     "pracuj-cities": lambda: pracuj.scrape_pracuj_cities(limit=_registry_limit()),
@@ -39,8 +46,8 @@ LOCAL_SCRAPERS: dict[str, ScrapeFn] = {
     "rocketjobs-roles": lambda: rocketjobs.scrape_rocketjobs_roles(limit=_registry_limit()),
     "justjoin": lambda: justjoin.scrape_justjoin(limit=_justjoin_limit()),
     "praca": lambda: praca.scrape_praca(limit=_registry_limit()),
-    "linkedin": lambda: linkedin.scrape_linkedin(limit=min(25, _registry_limit())),
-    "linkedin-sales": lambda: linkedin.scrape_linkedin_sales(limit=min(25, _registry_limit())),
+    "linkedin": lambda: linkedin.scrape_linkedin(limit=_linkedin_limit()),
+    "linkedin-sales": lambda: linkedin.scrape_linkedin_sales(limit=_linkedin_limit()),
 }
 
 # Greenhouse JSON boards — public ``/v1/boards/{token}/jobs`` (verified tokens only).
@@ -247,14 +254,19 @@ def _scrape_with_timeout(fn: ScrapeFn, timeout_sec: int) -> tuple[list[ScrapedJo
             return [], f"timed out after {timeout_sec}s"
 
 
-def scrape_all_boards(
+def scrape_boards(
+    board_ids: list[str],
     per_board_timeout_sec: int = DEFAULT_BOARD_TIMEOUT_SEC,
 ) -> list[BoardScrapeOutcome]:
-    """Run every registered board scraper sequentially (one board at a time)."""
+    """Run selected board scrapers sequentially; failures are recorded per board."""
     outcomes: list[BoardScrapeOutcome] = []
-    ordered = scrape_board_ids_ordered()
-    for index, board_id in enumerate(ordered):
-        fn = SCRAPE_REGISTRY[board_id]
+    for index, board_id in enumerate(board_ids):
+        fn = SCRAPE_REGISTRY.get(board_id)
+        if not fn:
+            outcomes.append(
+                BoardScrapeOutcome(board_id=board_id, jobs=[], error="unknown board id")
+            )
+            continue
         error: str | None = None
         jobs: list[ScrapedJob] = []
         try:
@@ -265,6 +277,13 @@ def scrape_all_boards(
         except Exception as exc:
             error = str(exc)
         outcomes.append(BoardScrapeOutcome(board_id=board_id, jobs=jobs, error=error))
-        if index < len(ordered) - 1:
+        if index < len(board_ids) - 1:
             compliance.sleep_between_boards()
     return outcomes
+
+
+def scrape_all_boards(
+    per_board_timeout_sec: int = DEFAULT_BOARD_TIMEOUT_SEC,
+) -> list[BoardScrapeOutcome]:
+    """Run every registered board scraper sequentially (one board at a time)."""
+    return scrape_boards(scrape_board_ids_ordered(), per_board_timeout_sec=per_board_timeout_sec)

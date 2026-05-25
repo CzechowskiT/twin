@@ -41,17 +41,47 @@ celery_app.conf.task_eager_propagates = True
 
 
 def _configure_beat_schedule() -> None:
-    """Optional daily scrape-all when SCRAPE_BEAT_ENABLED=true; placement retention sweep by default."""
+    """Autonomous market scrape windows when SCRAPE_BEAT_ENABLED=true."""
     from celery.schedules import crontab
 
     s = get_settings()
     schedule: dict[str, dict] = {}
     if s.scrape_beat_enabled:
-        hour = min(23, max(0, int(s.scrape_beat_hour_utc)))
-        schedule["scrape-all-boards-daily"] = {
-            "task": "app.tasks.scrape_tasks.scrape_all_boards_task",
-            "schedule": crontab(hour=hour, minute=12),
+        pl_h = min(23, max(0, int(s.scrape_beat_pl_hour_utc)))
+        pl_m = min(59, max(0, int(s.scrape_beat_pl_minute_utc)))
+        gh_h = min(23, max(0, int(s.scrape_beat_greenhouse_hour_utc)))
+        gh_m = min(59, max(0, int(s.scrape_beat_greenhouse_minute_utc)))
+        gl_h = min(23, max(0, int(s.scrape_beat_global_hour_utc)))
+        gl_m = min(59, max(0, int(s.scrape_beat_global_minute_utc)))
+        li_h = min(23, max(0, int(s.scrape_beat_linkedin_hour_utc)))
+        li_m = min(59, max(0, int(s.scrape_beat_linkedin_minute_utc)))
+        schedule["market-scrape-pl-daily"] = {
+            "task": "app.tasks.scrape_tasks.daily_pl_market_scrape_task",
+            "schedule": crontab(hour=pl_h, minute=pl_m),
+            "options": {"expires": 14400},
         }
+        schedule["market-scrape-greenhouse-daily"] = {
+            "task": "app.tasks.scrape_tasks.daily_greenhouse_market_scrape_task",
+            "schedule": crontab(hour=gh_h, minute=gh_m),
+            "options": {"expires": 14400},
+        }
+        schedule["market-scrape-global-html"] = {
+            "task": "app.tasks.scrape_tasks.daily_global_html_market_scrape_task",
+            "schedule": crontab(hour=gl_h, minute=gl_m, day_of_week="1,4"),
+            "options": {"expires": 21600},
+        }
+        schedule["market-scrape-linkedin-daily"] = {
+            "task": "app.tasks.scrape_tasks.daily_linkedin_market_scrape_task",
+            "schedule": crontab(hour=li_h, minute=li_m),
+            "options": {"expires": 7200},
+        }
+        if s.scrape_beat_legacy_scrape_all:
+            hour = min(23, max(0, int(s.scrape_beat_hour_utc)))
+            schedule["scrape-all-boards-daily-legacy"] = {
+                "task": "app.tasks.scrape_tasks.scrape_all_boards_task",
+                "schedule": crontab(hour=hour, minute=12),
+                "options": {"expires": 21600},
+            }
     if s.placement_retention_beat_enabled:
         ph = min(23, max(0, int(s.placement_retention_beat_hour_utc)))
         schedule["placement-retention-sweep-daily"] = {

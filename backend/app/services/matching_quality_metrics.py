@@ -15,6 +15,7 @@ from app.matching.quality_gate import (
 )
 from app.matching.ranking import feed_dedupe_key
 from app.services.market_coverage import build_market_coverage_report
+from app.services.market_coverage_status import build_market_coverage_status
 from app.services.matching_service import find_top_matches
 
 
@@ -164,6 +165,7 @@ def build_matching_quality_metrics(db: Session) -> dict:
     )
 
     coverage = build_market_coverage_report(db)
+    mc_status = build_market_coverage_status(db)
 
     return {
         "top_10_jobs_shown": TOP_MATCHES_HIGHLIGHT_COUNT,
@@ -192,5 +194,11 @@ def build_matching_quality_metrics(db: Session) -> dict:
         "duplicate_rate_pct": duplicate_rate_pct,
         "generated_at": now.isoformat() + "Z",
         **coverage,
+        "market_coverage_target_jobs": mc_status.get("market_coverage_target_jobs"),
+        "progress_to_10k_pct": mc_status.get("progress_to_10k_pct"),
+        "last_scrape_run_at": mc_status.get("last_scrape_run_at"),
+        "feed_stale": mc_status.get("feed_stale"),
+        "market_update_label": mc_status.get("market_update_label"),
+        "warnings": mc_status.get("warnings"),
         "per_user_top_200_sample": per_user_feed,
     }

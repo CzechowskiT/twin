@@ -9,6 +9,7 @@ from app.config import Settings, get_settings
 from app.core.deps import get_db
 from app.database.models import PartnerApiKey, RecruiterCompanyToken
 from app.services.admin_metrics import build_admin_metrics
+from app.services.market_coverage_status import build_market_coverage_status
 from app.services.matching_quality_metrics import build_matching_quality_metrics
 from app.services.admin_placement_queue import build_placement_dispute_queue
 from app.services.data_quality_metrics import build_data_quality_report
@@ -45,6 +46,17 @@ def admin_metrics(
 ) -> dict:
     _require_ops_admin(settings, authorization)
     return build_admin_metrics(db)
+
+
+@router.get("/market-coverage-status")
+def admin_market_coverage_status(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+) -> dict:
+    """Autonomous scrape telemetry + active feed progress toward 10k target."""
+    _require_ops_admin(settings, authorization)
+    return build_market_coverage_status(db)
 
 
 @router.get("/matching-quality")

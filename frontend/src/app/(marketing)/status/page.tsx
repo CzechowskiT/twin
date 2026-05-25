@@ -29,6 +29,10 @@ type HealthPayload = {
   stripe_checkout_ready?: boolean;
   scrape_worker_ready?: boolean;
   scrape_beat_enabled?: boolean;
+  market_coverage_last_scrape_at?: string | null;
+  market_coverage_progress_pct?: number | null;
+  market_coverage_feed_stale?: boolean;
+  market_coverage_ops_hint?: string;
   partner_export_configured?: boolean;
   recruiter_inbox_configured?: boolean;
   celery?: {
@@ -142,6 +146,20 @@ export default function StatusPage() {
                 ok={!!partnerExportOk}
               />
               <Row label={t("status.validatedJobs")} value={String(stats.validated_jobs)} ok={stats.validated_jobs > 0} />
+              <Row
+                label={t("status.marketCoverage")}
+                value={
+                  health.market_coverage_progress_pct != null
+                    ? `${health.market_coverage_progress_pct}% → 10k`
+                    : t("status.unknown")
+                }
+                ok={!health.market_coverage_feed_stale}
+              />
+              <Row
+                label={t("status.marketLastScrape")}
+                value={health.market_coverage_last_scrape_at ?? t("status.unknown")}
+                ok={!health.market_coverage_feed_stale}
+              />
               <Row label={t("status.git")} value={health.git_commit ?? "unknown"} ok />
             </dl>
           ) : null}

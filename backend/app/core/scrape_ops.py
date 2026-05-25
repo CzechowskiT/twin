@@ -15,8 +15,9 @@ def core_consents_complete(user: User) -> bool:
 
 
 def user_can_trigger_scrape(user: User, settings: Settings) -> bool:
-    """Any active user with core consents may queue scrape-all (ops list is not a gate)."""
-    _ = settings  # reserved for future per-tier limits keyed off scrape_ops
+    """Manual scrape-all from dashboard/API — off by default (autonomous beat only)."""
+    if not settings.scrape_user_trigger_enabled:
+        return False
     return bool(user.is_active) and core_consents_complete(user)
 
 

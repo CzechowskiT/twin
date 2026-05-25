@@ -464,6 +464,12 @@ const en = {
     jobs: "Jobs",
     jobsLoading: "Loading jobs…",
     jobsShowingSummary: "Showing {shown} of {total} listings in this feed (filters apply).",
+    marketLastUpdateToday: "Last market update: today (autonomous scrape).",
+    marketLastUpdateYesterday: "Last market update: yesterday.",
+    marketLastUpdateOlder: "Last market update: more than a day ago — feed may refresh overnight.",
+    marketLastUpdateUnknown: "Market listings refresh automatically — first update pending.",
+    marketFeedStale:
+      "Job feed may be stale. Listings refresh on the server overnight; no manual scrape needed.",
     jobsLoadMore: "Load more jobs",
     jobsCorpusNote:
       "The number in the section title is how many validated rows exist in your API database — not “the entire web”. Six-figure corpora require sustained scraping or bulk import on the server; the UI loads up to 200 per request and you can page with “Load more”.",
@@ -2074,6 +2080,9 @@ const en = {
     microsoftCalendar: "Microsoft Calendar OAuth",
     stripe: "Stripe Checkout",
     validatedJobs: "Validated jobs (public count)",
+    marketCoverage: "Market coverage (10k target)",
+    marketLastScrape: "Last autonomous scrape",
+    unknown: "Unknown",
     scrapeWorkerReady: "Scrape worker ready",
     partnerExport: "Partner export API",
     scrapeOpsZeroHint:
@@ -3123,6 +3132,13 @@ const pl: MessageTree = {
     jobs: "Oferty",
     jobsLoading: "Ładowanie ofert…",
     jobsShowingSummary: "W feedzie: {shown} z {total} ofert (działają filtry).",
+    marketLastUpdateToday: "Ostatnia aktualizacja rynku: dziś (automatyczny scraping).",
+    marketLastUpdateYesterday: "Ostatnia aktualizacja rynku: wczoraj.",
+    marketLastUpdateOlder:
+      "Ostatnia aktualizacja rynku: ponad dobę temu — feed odświeży się nocą na serwerze.",
+    marketLastUpdateUnknown: "Oferty odświeżają się automatycznie — pierwszy przebieg w toku.",
+    marketFeedStale:
+      "Feed może być nieaktualny. Odświeżanie odbywa się nocą na serwerze — ręczny scrape nie jest potrzebny.",
     jobsLoadMore: "Załaduj więcej ofert",
     jobsCorpusNote:
       "Liczba w nagłówku to tyle zweryfikowanych wierszy w bazie API — nie „cały internet”. Setki tysięcy pozycji wymagają ciągłego scrapingu lub importu na serwerze; UI pobiera do 200 na żądanie, dalej jest „Załaduj więcej”.",
@@ -4747,6 +4763,9 @@ const pl: MessageTree = {
     microsoftCalendar: "OAuth Microsoft Calendar",
     stripe: "Stripe Checkout",
     validatedJobs: "Oferty zwalidowane (licznik publiczny)",
+    marketCoverage: "Pokrycie rynku (cel 10k)",
+    marketLastScrape: "Ostatni autonomiczny scrape",
+    unknown: "Brak danych",
     scrapeWorkerReady: "Worker scrape gotowy",
     partnerExport: "Partner export API",
     scrapeOpsZeroHint:

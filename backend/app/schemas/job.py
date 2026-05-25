@@ -77,6 +77,9 @@ class JobFeedStatsOut(BaseModel):
     fresh_jobs_24h: int
     fresh_jobs_7d: int
     active_jobs_by_source: dict[str, int]
+    last_scrape_run_at: str | None = None
+    feed_stale: bool = False
+    market_update_label: str | None = None
 
 
 class JobListOut(BaseModel):

@@ -1,8 +1,14 @@
-"""Celery tasks for job board scraping."""
+"""Celery tasks for job board scraping (ingest only — no auto-apply)."""
 
 from typing import Any
 
 from app.config import get_settings
+from app.tasks.market_scrape_batches import (
+    run_daily_global_html,
+    run_daily_greenhouse,
+    run_daily_linkedin,
+    run_daily_pl_core,
+)
 from app.database.session import SessionLocal
 from app.scrapers import justjoin, linkedin, praca, pracuj, rocketjobs
 from app.scrapers.global_boards import GLOBAL_BOARD_SPECS, scrape_global_board
@@ -13,6 +19,10 @@ from app.tasks.celery_app import celery_app
 
 def _scrape_limit() -> int:
     return max(12, min(200, get_settings().scrape_jobs_per_board))
+
+
+def _linkedin_scrape_limit() -> int:
+    return max(1, min(25, int(get_settings().linkedin_scrape_max_per_run), _scrape_limit()))
 
 
 def _justjoin_scrape_limit() -> int:
@@ -130,7 +140,7 @@ def scrape_praca_task() -> dict[str, int]:
 @celery_app.task(name="app.tasks.scrape_tasks.scrape_linkedin_task")
 def scrape_linkedin_task() -> dict[str, int | str]:
     try:
-        jobs = linkedin.scrape_linkedin(limit=_scrape_limit())
+        jobs = linkedin.scrape_linkedin(limit=_linkedin_scrape_limit())
     except linkedin.LinkedInScrapeError as exc:
         return {"scraped": 0, "saved": 0, "error": str(exc)}
     db = SessionLocal()
@@ -144,7 +154,7 @@ def scrape_linkedin_task() -> dict[str, int | str]:
 @celery_app.task(name="app.tasks.scrape_tasks.scrape_linkedin_sales_task")
 def scrape_linkedin_sales_task() -> dict[str, int | str]:
     try:
-        jobs = linkedin.scrape_linkedin_sales(limit=_scrape_limit())
+        jobs = linkedin.scrape_linkedin_sales(limit=_linkedin_scrape_limit())
     except linkedin.LinkedInScrapeError as exc:
         return {"scraped": 0, "saved": 0, "error": str(exc)}
     db = SessionLocal()
@@ -232,3 +242,27 @@ def scrape_all_boards_task(
         db.close()
 
     return {"total_saved": total_saved, "boards": boards, "errors": errors}
+
+
+@celery_app.task(name="app.tasks.scrape_tasks.daily_pl_market_scrape_task")
+def daily_pl_market_scrape_task() -> dict[str, Any]:
+    """PL core boards ~04:00 UTC (06:00 Warsaw winter)."""
+    return run_daily_pl_core()
+
+
+@celery_app.task(name="app.tasks.scrape_tasks.daily_greenhouse_market_scrape_task")
+def daily_greenhouse_market_scrape_task() -> dict[str, Any]:
+    """Greenhouse JSON boards ~05:00 UTC."""
+    return run_daily_greenhouse()
+
+
+@celery_app.task(name="app.tasks.scrape_tasks.daily_global_html_market_scrape_task")
+def daily_global_html_market_scrape_task() -> dict[str, Any]:
+    """Global HTML boards off-peak (Mon/Thu)."""
+    return run_daily_global_html()
+
+
+@celery_app.task(name="app.tasks.scrape_tasks.daily_linkedin_market_scrape_task")
+def daily_linkedin_market_scrape_task() -> dict[str, Any]:
+    """LinkedIn public listings — low cap, skip on robots block."""
+    return run_daily_linkedin()

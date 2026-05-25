@@ -84,3 +84,4 @@ def test_health_ops_includes_mail_and_calendar_flags(
     assert data.get("validated_jobs") == 42
     assert data.get("partner_export_configured") is True
     assert data.get("data_room_s3_enabled") is False
+    assert "market_coverage_ops_hint" in data

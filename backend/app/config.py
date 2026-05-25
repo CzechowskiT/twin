@@ -126,13 +126,36 @@ class Settings(BaseSettings):
     scrape_enabled_board_ids: str = ""
     # Per-board fetch cap for Twin scrape-all (each adapter respects this upper bound).
     scrape_jobs_per_board: int = 200
+    # Active validated jobs target for ops KPIs (default 10k sprint).
+    market_coverage_target_jobs: int = Field(default=10000, validation_alias="MARKET_COVERAGE_TARGET_JOBS")
+    # Max LinkedIn listings per beat run (registry also clamps).
+    linkedin_scrape_max_per_run: int = 25
+    # Comma-separated override for daily beat board list (empty = tiered default).
+    scrape_daily_boards: str = Field(
+        default="",
+        validation_alias=AliasChoices("SCRAPE_DAILY_BOARDS", "scrape_daily_boards"),
+    )
+    # Global HTML boards run every N days on beat (1 = daily, 2 = every other day).
+    scrape_daily_global_interval_days: int = 2
+    # When false, users cannot POST /jobs/scrape/* (autonomous beat only).
+    scrape_user_trigger_enabled: bool = False
     # Dashboard listing + matcher scan: only validated jobs scraped within this many days.
     job_feed_active_days: int = 45
     # When >0, skip persisting listings whose requirements+description are shorter (listing-only rows stay at 0).
     scrape_min_job_body_chars: int = 0
-    # When true, Celery Beat runs scrape-all once per day at scrape_beat_hour_utc (requires celery beat process).
+    # When true, Celery Beat runs autonomous market scrape windows (requires celery beat process).
     scrape_beat_enabled: bool = False
+    # Legacy single scrape-all beat (off by default — use split PL/Greenhouse/global/LinkedIn tasks).
+    scrape_beat_legacy_scrape_all: bool = False
     scrape_beat_hour_utc: int = 5
+    scrape_beat_pl_hour_utc: int = 4
+    scrape_beat_pl_minute_utc: int = 0
+    scrape_beat_greenhouse_hour_utc: int = 5
+    scrape_beat_greenhouse_minute_utc: int = 10
+    scrape_beat_global_hour_utc: int = 3
+    scrape_beat_global_minute_utc: int = 40
+    scrape_beat_linkedin_hour_utc: int = 6
+    scrape_beat_linkedin_minute_utc: int = 20
     # Set SCRAPE_WORKER_READY=true on API when a separate Celery worker service is deployed (non-eager mode).
     scrape_worker_ready: bool = False
     # Daily placement retention sweep on Celery beat (log-only MVP; see placement_tasks).
@@ -150,7 +173,13 @@ class Settings(BaseSettings):
     # When true, honour robots.txt before Playwright fetches (LinkedIn uses Disallow: / for generic bots).
     scrape_respect_robots_txt: bool = True
     # Pause between boards in scrape-all (serial) to reduce burst traffic on third-party sites.
-    scrape_between_boards_sec: float = 1.5
+    scrape_between_boards_sec: float = Field(
+        default=1.5,
+        validation_alias=AliasChoices(
+            "SCRAPE_BETWEEN_BOARDS_SEC",
+            "SCRAPE_DELAY_BETWEEN_BOARDS_SECONDS",
+        ),
+    )
     # --- Ops note (job corpus scale): tens or hundreds of thousands of validated rows are built by sustained
     # Celery ingestion (beat + workers), not one-off migrations. Tune scrape_jobs_per_board,
     # scrape_between_boards_sec, scrape_post_fetch_delay_sec, and match_jobs_scan_limit for polite traffic.

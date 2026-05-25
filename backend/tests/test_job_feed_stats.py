@@ -93,3 +93,7 @@ def test_job_feed_stats_active_window(feed_stats_client) -> None:
     assert data["active_validated_jobs"] == 1
     assert data["validated_jobs_total"] == 2
     assert data["job_feed_active_days"] == 45
+    assert "market_update_label" in data
+    assert "last_scrape_run_at" in data
+    assert "feed_stale" in data
+    assert "market_update_label" in data

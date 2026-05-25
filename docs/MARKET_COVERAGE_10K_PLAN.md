@@ -87,6 +87,23 @@ SELECT COUNT(*) FROM jobs WHERE is_validated = true AND scraped_at >= NOW() - IN
 
 ---
 
+## Autonomous daily engine (2026-05-25)
+
+When `SCRAPE_BEAT_ENABLED=true` on the **Celery beat** process:
+
+| Beat key | UTC (default) | Boards |
+|----------|---------------|--------|
+| `market-scrape-pl-daily` | 04:00 | pracuj, pracuj-cities, pracuj-sales, rocketjobs, rocketjobs-roles, justjoin, praca |
+| `market-scrape-greenhouse-daily` | 05:10 | all `gh-*` Greenhouse adapters |
+| `market-scrape-global-html` | 03:40 Mon+Thu | indeed, glassdoor, … (13 global HTML) |
+| `market-scrape-linkedin-daily` | 06:20 | `linkedin` only, max **25**/run, skip on robots block |
+
+- **Isolation:** scrape tasks only ingest jobs — they do **not** call auto-apply or nightly sweep.
+- **Telemetry:** Redis keys `twin:scrape_run:latest` + history (no migration). Admin: `GET /api/v1/admin/market-coverage-status`.
+- **Dashboard:** `GET /api/v1/jobs/feed-stats` adds `last_scrape_run_at`, `feed_stale`, `market_update_label`. Manual scrape panel is **ops-only** (`scrape_ops_elevated`).
+
+---
+
 ## Phase 2 shipped (P0, safe)
 
 1. **Active feed** — `job_feed_active_days=45`; API default `active_feed_only=true`; matcher scan same window.
@@ -116,6 +133,8 @@ SCRAPE_BOARDS=pracuj,justjoin,rocketjobs ./scripts/scrape-market-coverage.sh per
 ```
 
 Prod path: `SCRAPE_WORKER_READY=true`, Redis, `SCRAPE_BEAT_ENABLED=true`, tune `SCRAPE_JOBS_PER_BOARD` — see `docs/SCRAPE_OPS.md`.
+
+**Autonomous beat (shipped):** four Celery tasks — PL core daily, Greenhouse daily, global HTML Mon/Thu, LinkedIn low cap (skip on robots block). Telemetry: Redis `scrape_run_tracking` + `GET /api/v1/admin/market-coverage-status`. Dashboard shows “updated today/yesterday” via `GET /api/v1/jobs/feed-stats` (`market_update_label`).
 
 ---
 

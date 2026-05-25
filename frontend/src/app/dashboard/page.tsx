@@ -82,6 +82,7 @@ type User = {
   subscription_status?: string | null;
   subscription_current_period_end?: string | null;
   scrape_ops_configured?: boolean;
+  scrape_ops_elevated?: boolean;
   can_trigger_scrape?: boolean;
   scrape_worker_ready?: boolean;
   mail_configured?: boolean;
@@ -114,6 +115,12 @@ type JobItem = {
   score?: number | null;
 };
 type JobList = { items: JobItem[]; total: number; search_relaxed?: boolean };
+type FeedStats = {
+  active_validated_jobs: number;
+  last_scrape_run_at?: string | null;
+  feed_stale?: boolean;
+  market_update_label?: string | null;
+};
 type MatchItem = {
   job_id: number;
   score: number;
@@ -231,6 +238,7 @@ export default function DashboardPage() {
   const [profile, setProfile] = useState<Profile | null | undefined>(undefined);
   const [matches, setMatches] = useState<MatchList | null>(null);
   const [jobs, setJobs] = useState<JobList | null>(null);
+  const [feedStats, setFeedStats] = useState<FeedStats | null>(null);
   const [applications, setApplications] = useState<ApplicationRow[]>([]);
   const [applicationsTotal, setApplicationsTotal] = useState(0);
   const [devFocus, setDevFocus] = useState<DevelopmentFocus | null>(null);
@@ -428,14 +436,16 @@ export default function DashboardPage() {
         if (!hasProfile) {
           setSavedJobIds(new Set());
         }
-        const [jobList, matchList, apps, focus] = await Promise.all([
+        const [jobList, matchList, apps, focus, stats] = await Promise.all([
           loadJobs(token, activeFilters),
           hasProfile ? loadMatches(token) : Promise.resolve(null),
           hasProfile ? loadApplications(token) : Promise.resolve({ items: [] as ApplicationRow[], total: 0 }),
           hasProfile ? loadDevelopmentFocus(token) : Promise.resolve(null),
-          hasProfile ? loadSavedJobIds(token) : Promise.resolve(null),
+          apiFetch<FeedStats>("/api/v1/jobs/feed-stats", {}, token).catch(() => null),
         ]);
+        if (hasProfile) void loadSavedJobIds(token);
         setJobs(jobList);
+        setFeedStats(stats);
         jobsTotal = jobList.total;
         if (matchList) setMatches(matchList);
         setApplications(apps.items);
@@ -1404,7 +1414,7 @@ export default function DashboardPage() {
             email={user.email}
             profileName={profile ? profile.name : undefined}
             hasProfile={hasProfile}
-            showScrapeUi={SHOW_SCRAPE_UI}
+            showScrapeUi={SHOW_SCRAPE_UI && user.scrape_ops_elevated === true}
           />
           <div className="mb-4 grid gap-4 lg:grid-cols-2">
             <OpportunityForecast />
@@ -1696,7 +1706,7 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {SHOW_SCRAPE_UI && (
+          {SHOW_SCRAPE_UI && user?.scrape_ops_elevated === true && (
             <div id="dashboard-scrape" className="twin-card-inset min-w-0 w-full p-4 sm:p-5">
               <p className="break-words text-xs font-bold uppercase tracking-wide text-[var(--twin-muted-strong)] sm:tracking-wider">
                 {t("dashboard.twinScrapePanelTitle")}
@@ -2059,6 +2069,25 @@ export default function DashboardPage() {
           {t("dashboard.jobs")}
           {jobs !== null ? ` (${jobs.total})` : ""}
         </h2>
+        {feedStats ? (
+          <p className="twin-muted mb-2 text-xs leading-relaxed">
+            {feedStats.market_update_label === "today"
+              ? t("dashboard.marketLastUpdateToday")
+              : feedStats.market_update_label === "yesterday"
+                ? t("dashboard.marketLastUpdateYesterday")
+                : feedStats.market_update_label === "older"
+                  ? t("dashboard.marketLastUpdateOlder")
+                  : t("dashboard.marketLastUpdateUnknown")}
+          </p>
+        ) : null}
+        {feedStats?.feed_stale ? (
+          <p
+            className="mb-3 rounded-md border border-amber-500/35 bg-amber-500/10 px-3 py-2 text-sm text-amber-950 dark:text-amber-100"
+            role="status"
+          >
+            {t("dashboard.marketFeedStale")}
+          </p>
+        ) : null}
         <JobFiltersBar
           filters={filters}
           options={filterOptions}

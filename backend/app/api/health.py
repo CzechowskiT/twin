@@ -89,6 +89,25 @@ def health_check(
         out["scrape_worker_ready"] = scrape_worker_ready(s)
         out["scrape_beat_enabled"] = s.scrape_beat_enabled
         out["celery_task_always_eager"] = s.celery_task_always_eager
+        try:
+            from app.services.market_coverage_status import build_market_coverage_status
+            from app.database.session import SessionLocal
+
+            with SessionLocal() as db_sess:
+                mc = build_market_coverage_status(db_sess)
+            out["market_coverage_last_scrape_at"] = mc.get("last_scrape_run_at")
+            out["market_coverage_progress_pct"] = mc.get("progress_to_10k_pct")
+            out["market_coverage_active_validated"] = mc.get("active_validated_jobs")
+            out["market_coverage_feed_stale"] = mc.get("feed_stale")
+            warn = mc.get("warnings") or []
+            out["market_coverage_warnings"] = ",".join(str(w) for w in warn[:8]) if warn else ""
+            out["market_coverage_ops_hint"] = (
+                "Feed stale — check SCRAPE_BEAT_ENABLED + worker beat schedule (docs/SCRAPE_OPS.md)"
+                if mc.get("feed_stale")
+                else "Market scrape beat OK — see GET /admin/market-coverage-status"
+            )
+        except Exception:
+            out["market_coverage_ops_hint"] = "market_coverage_status_unavailable"
         out["recruiter_inbox_configured"] = bool((s.recruiter_inbox_token or "").strip())
         out["ops_admin_configured"] = bool(
             (s.ops_admin_token or "").strip() or (s.beta_admin_token or "").strip()
