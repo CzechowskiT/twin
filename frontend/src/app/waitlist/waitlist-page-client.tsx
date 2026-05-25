@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { FoundingOfferPreview } from "@/components/marketing/founding-offer-preview";
+import { InteractiveDemoCta } from "@/components/marketing/interactive-demo-cta";
 import { AnimatedCounter } from "@/components/waitlist/animated-counter";
 import {
   WaitlistControlSection,
@@ -122,6 +123,7 @@ export function WaitlistPageClient() {
                 <p className="wl-hero-lead wl-hero-lead--accent">{copy.heroLead3}</p>
               </motion.div>
               <FoundingOfferPreview variant="waitlist" />
+              <InteractiveDemoCta variant="waitlist" className="mt-6 max-w-xl" />
             </div>
             <aside className="wl-hero-panel">
               <WaitlistFoundingCounter
