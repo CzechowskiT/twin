@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
 import { useTranslation } from "@/components/language-provider";
 import { InteractiveDemoCta } from "@/components/marketing/interactive-demo-cta";
 import { LandingLiveProof } from "@/components/marketing/landing-live-proof";

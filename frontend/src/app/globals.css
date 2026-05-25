@@ -2411,13 +2411,6 @@ button.section-cta-secondary.marketing-hero-btn-cta {
   color: var(--section-cta-secondary-fg, var(--foreground)) !important;
 }
 
-a.landing-hero-demo-cta--secondary {
-  min-height: auto;
-  padding: 0;
-  box-shadow: none;
-  background: transparent;
-}
-
 /* Founding funnel preview — visual language aligned with `/waitlist` */
 .marketing-founding-offer {
   margin-top: 1.5rem;
@@ -3145,11 +3138,6 @@ html[data-marketing-surface="studio"] .demo-glass-panel {
   opacity: 0.85;
   text-decoration: underline;
   text-underline-offset: 4px;
-}
-
-a.landing-hero-demo-cta--secondary {
-  min-height: auto;
-  box-shadow: none;
 }
 
 .demo-theater-rail-fill {
