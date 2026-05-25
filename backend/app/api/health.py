@@ -33,6 +33,22 @@ def _database_reachable(eng: Engine | None = None) -> bool:
     return True
 
 
+def _health_ops_str(value: object) -> str:
+    """Coerce optional scrape timestamp for ops health JSON (str-only union)."""
+    return value if isinstance(value, str) else ""
+
+
+def _health_ops_int(value: object) -> int:
+    """Coerce corpus counters / progress for ops health JSON (int-only union)."""
+    if isinstance(value, bool):
+        return int(value)
+    if isinstance(value, int):
+        return value
+    if isinstance(value, float):
+        return int(round(value))
+    return 0
+
+
 @router.get("/health")
 def health_check(
     db: bool = Query(False, description="When true, include db_ok from SELECT 1 (no DSN in response)."),
@@ -95,10 +111,10 @@ def health_check(
 
             with SessionLocal() as db_sess:
                 mc = build_market_coverage_status(db_sess)
-            out["market_coverage_last_scrape_at"] = mc.get("last_scrape_run_at")
-            out["market_coverage_progress_pct"] = mc.get("progress_to_10k_pct")
-            out["market_coverage_active_validated"] = mc.get("active_validated_jobs")
-            out["market_coverage_feed_stale"] = mc.get("feed_stale")
+            out["market_coverage_last_scrape_at"] = _health_ops_str(mc.get("last_scrape_run_at"))
+            out["market_coverage_progress_pct"] = _health_ops_int(mc.get("progress_to_10k_pct"))
+            out["market_coverage_active_validated"] = _health_ops_int(mc.get("active_validated_jobs"))
+            out["market_coverage_feed_stale"] = bool(mc.get("feed_stale"))
             warn = mc.get("warnings") or []
             out["market_coverage_warnings"] = ",".join(str(w) for w in warn[:8]) if warn else ""
             out["market_coverage_ops_hint"] = (
