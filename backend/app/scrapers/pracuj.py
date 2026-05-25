@@ -58,7 +58,7 @@ def scrape_pracuj(
     results: list[ScrapedJob] = []
     seen: set[str] = set()
     # Pracuj shows ~20 cards per page; cap pages to stay polite and bounded.
-    max_pages = min(25, max(2, (limit + 18) // 18 + 2))
+    max_pages = min(35, max(2, (limit + 18) // 18 + 2))
     for page in range(1, max_pages + 1):
         if len(results) >= limit:
             break

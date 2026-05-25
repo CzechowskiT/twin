@@ -15,7 +15,7 @@ ScrapeFn = Callable[[], list[ScrapedJob]]
 def _registry_limit() -> int:
     from app.config import get_settings
 
-    return max(12, min(150, get_settings().scrape_jobs_per_board))
+    return max(12, min(200, get_settings().scrape_jobs_per_board))
 
 
 def _wrap_global(board_id: str) -> ScrapeFn:
@@ -34,8 +34,8 @@ LOCAL_SCRAPERS: dict[str, ScrapeFn] = {
     "rocketjobs-roles": lambda: rocketjobs.scrape_rocketjobs_roles(limit=_registry_limit()),
     "justjoin": lambda: justjoin.scrape_justjoin(limit=_registry_limit()),
     "praca": lambda: praca.scrape_praca(limit=_registry_limit()),
-    "linkedin": lambda: linkedin.scrape_linkedin(limit=_registry_limit()),
-    "linkedin-sales": lambda: linkedin.scrape_linkedin_sales(limit=_registry_limit()),
+    "linkedin": lambda: linkedin.scrape_linkedin(limit=min(25, _registry_limit())),
+    "linkedin-sales": lambda: linkedin.scrape_linkedin_sales(limit=min(25, _registry_limit())),
 }
 
 # Greenhouse JSON boards — public ``/v1/boards/{token}/jobs`` (verified tokens only).

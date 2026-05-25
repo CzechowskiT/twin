@@ -14,6 +14,7 @@ from app.matching.quality_gate import (
     TOP_MATCHES_HIGHLIGHT_COUNT,
 )
 from app.matching.ranking import feed_dedupe_key
+from app.services.market_coverage import build_market_coverage_report
 from app.services.matching_service import find_top_matches
 
 
@@ -100,11 +101,12 @@ def build_matching_quality_metrics(db: Session) -> dict:
     apply_intent_top20 = 0
     apply_intent_top200 = 0
     feedback_by_candidate: dict[int, dict[int, str]] = {}
+    per_user_feed: list[dict[str, int | float | None]] = []
 
     for row in db.query(JobMatchFeedback).all():
         feedback_by_candidate.setdefault(row.candidate_id, {})[row.job_id] = row.feedback_value
 
-    for candidate in db.query(Candidate).limit(500).all():
+    for idx, candidate in enumerate(db.query(Candidate).limit(500).all()):
         rows = find_top_matches(
             db,
             candidate,
@@ -114,6 +116,15 @@ def build_matching_quality_metrics(db: Session) -> dict:
         )
         scores = [float(r["score"]) for r in rows]
         top_200_feed_sizes.append(float(len(scores)))
+        if idx < 100:
+            per_user_feed.append(
+                {
+                    "candidate_id": candidate.id,
+                    "user_id": candidate.user_id,
+                    "top_200_count": len(rows),
+                    "top_score": round(float(rows[0]["score"]), 1) if rows else None,
+                }
+            )
         if not scores:
             empty_match_results_count += 1
         else:
@@ -122,10 +133,10 @@ def build_matching_quality_metrics(db: Session) -> dict:
             if med is not None:
                 per_candidate_top200_medians.append(med)
         fb = feedback_by_candidate.get(candidate.id, {})
-        for idx, r in enumerate(rows):
+        for row_idx, r in enumerate(rows):
             if fb.get(r["job_id"]) == "apply_intent":
                 apply_intent_top200 += 1
-                if idx < TOP_MATCHES_HIGHLIGHT_COUNT:
+                if row_idx < TOP_MATCHES_HIGHLIGHT_COUNT:
                     apply_intent_top20 += 1
 
     if top_scores:
@@ -151,6 +162,8 @@ def build_matching_quality_metrics(db: Session) -> dict:
         .scalar()
         or 0
     )
+
+    coverage = build_market_coverage_report(db)
 
     return {
         "top_10_jobs_shown": TOP_MATCHES_HIGHLIGHT_COUNT,
@@ -178,4 +191,6 @@ def build_matching_quality_metrics(db: Session) -> dict:
         "fresh_jobs_7d": fresh_7d_count,
         "duplicate_rate_pct": duplicate_rate_pct,
         "generated_at": now.isoformat() + "Z",
+        **coverage,
+        "per_user_top_200_sample": per_user_feed,
     }

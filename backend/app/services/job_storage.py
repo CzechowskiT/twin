@@ -1,5 +1,7 @@
 """Persist validated scraped jobs with deduplication."""
 
+from datetime import datetime
+
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
@@ -38,8 +40,9 @@ def _prepare_jobs_for_persist(jobs: list[ScrapedJob]) -> list[ScrapedJob]:
 
 
 def upsert_jobs(db: Session, jobs: list[ScrapedJob]) -> int:
-    """Insert new jobs; skip duplicates. Returns count of new rows."""
+    """Insert new jobs; refresh scraped_at on known external ids. Returns count of new rows."""
     saved = 0
+    now = datetime.utcnow()
     for item in _prepare_jobs_for_persist(jobs):
         exists = (
             db.query(Job)
@@ -47,6 +50,24 @@ def upsert_jobs(db: Session, jobs: list[ScrapedJob]) -> int:
             .first()
         )
         if exists:
+            exists.scraped_at = now
+            exists.is_validated = True
+            if item.title:
+                exists.title = item.title
+            if item.company:
+                exists.company = item.company
+            if item.location:
+                exists.location = item.location
+            if item.url:
+                exists.url = item.url
+            if item.salary_min is not None:
+                exists.salary_min = item.salary_min
+            if item.salary_max is not None:
+                exists.salary_max = item.salary_max
+            if item.requirements:
+                exists.requirements = item.requirements
+            if item.description:
+                exists.description = item.description
             continue
         db.add(
             Job(
@@ -61,6 +82,7 @@ def upsert_jobs(db: Session, jobs: list[ScrapedJob]) -> int:
                 description=item.description,
                 url=item.url,
                 is_validated=True,
+                scraped_at=now,
             )
         )
         saved += 1

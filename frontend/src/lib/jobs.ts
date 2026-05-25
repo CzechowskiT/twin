@@ -40,11 +40,16 @@ export type JobsQueryOpts = {
   skip?: number;
 };
 
+/** Default active window aligned with backend ``job_feed_active_days`` (45). */
+export const JOB_FEED_ACTIVE_DAYS = 45;
+
 export function buildJobsQuery(filters: JobFilters, opts?: JobsQueryOpts): string {
   const params = new URLSearchParams();
   const limit = Math.min(JOB_FEED_PAGE_MAX, Math.max(1, opts?.limit ?? JOB_FEED_PAGE_MAX));
   const skip = Math.max(0, opts?.skip ?? 0);
   params.set("limit", String(limit));
+  params.set("active_feed_only", "true");
+  params.set("active_within_days", String(JOB_FEED_ACTIVE_DAYS));
   if (skip > 0) params.set("skip", String(skip));
   if (filters.q.trim()) params.set("q", filters.q.trim());
   if (filters.location.trim()) params.set("location", filters.location.trim());

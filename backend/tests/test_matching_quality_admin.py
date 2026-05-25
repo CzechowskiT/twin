@@ -80,3 +80,5 @@ def test_matching_quality_admin_ok(mq_admin_client) -> None:
     assert body["relevant_count"] >= 1
     assert body["dashboard_min_score"] == 38.0
     assert body["top_200_limit"] == 200
+    assert "active_validated_jobs" in body
+    assert "per_user_top_200_sample" in body

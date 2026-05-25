@@ -25,6 +25,7 @@ from app.services.job_match_feedback import (
     not_now_job_ids,
     relevant_job_ids,
 )
+from app.services.market_coverage import apply_active_feed_filter
 from app.services.match_reason import build_match_reason
 
 
@@ -86,8 +87,7 @@ def find_top_matches(
     else:
         score_fn = calculate_match_score
     jobs = (
-        db.query(Job)
-        .filter(Job.is_validated.is_(True))
+        apply_active_feed_filter(db.query(Job))
         .order_by(Job.scraped_at.desc())
         .limit(scan_limit)
         .all()

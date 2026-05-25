@@ -12,7 +12,7 @@ from app.tasks.celery_app import celery_app
 
 
 def _scrape_limit() -> int:
-    return max(12, min(150, get_settings().scrape_jobs_per_board))
+    return max(12, min(200, get_settings().scrape_jobs_per_board))
 
 
 def _persist_global_board(board_id: str) -> dict[str, int]:

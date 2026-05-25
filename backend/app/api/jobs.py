@@ -177,6 +177,16 @@ def list_jobs(
         str | None,
         Query(description="Filter by opportunity type: full_time, freelance, contract, or all."),
     ] = None,
+    active_feed_only: Annotated[
+        bool,
+        Query(
+            description="When true (default), only listings scraped within job_feed_active_days (45).",
+        ),
+    ] = True,
+    active_within_days: Annotated[
+        int | None,
+        Query(ge=1, le=120, description="Override active window in days (default from settings)."),
+    ] = None,
     db: Session = Depends(get_db),
     _user: User = Depends(get_current_user),
 ) -> JobListOut:
@@ -199,6 +209,8 @@ def list_jobs(
         title_terms=title_terms,
         opportunity_type=opportunity_type,
         sort=sort,
+        active_feed_only=active_feed_only,
+        active_within_days=active_within_days,
     )
     total = query.count()
     if total == 0 and min_salary is not None and min_salary > 0:
@@ -212,6 +224,8 @@ def list_jobs(
             title_terms=title_terms,
             opportunity_type=opportunity_type,
             sort=sort,
+            active_feed_only=active_feed_only,
+            active_within_days=active_within_days,
         )
         total = query.count()
     items = query.offset(skip).limit(limit).all()
