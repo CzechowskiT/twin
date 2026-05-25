@@ -5,6 +5,7 @@ import { useTranslation } from "@/components/language-provider";
 import { trackEvent } from "@/lib/analytics";
 import { BentoSpotlight } from "@/components/marketing/bento-spotlight";
 import { FoundingOfferPreview } from "@/components/marketing/founding-offer-preview";
+import { InteractiveDemoCta } from "@/components/marketing/interactive-demo-cta";
 import { ScrollReveal } from "@/components/marketing/scroll-reveal";
 
 export function LandingCtaBand() {
@@ -26,29 +27,29 @@ export function LandingCtaBand() {
                 <FoundingOfferPreview variant="inline" />
               </div>
             </div>
-            <div className="flex w-full min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start lg:shrink-0 lg:justify-end">
-              <div className="flex flex-col gap-1.5">
-                <Link
-                  href="/waitlist"
-                  className="twin-header-cta twin-nav-waitlist-pill twin-touch-target px-7 text-sm"
-                  onClick={() => trackEvent("waitlist_cta_click", { surface: "home_cta_band" })}
-                >
-                  {t("home.joinWishlist")}
-                </Link>
-                <p className="text-center text-[11px] text-[var(--twin-muted)] sm:text-start">{t("home.joinWishlistMicro")}</p>
+            <div className="flex w-full min-w-0 flex-col gap-5 lg:max-w-md lg:shrink-0">
+              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start">
+                <div className="flex flex-col gap-1.5">
+                  <Link
+                    href="/waitlist"
+                    className="twin-header-cta twin-nav-waitlist-pill twin-touch-target px-7 text-sm"
+                    onClick={() => trackEvent("waitlist_cta_click", { surface: "home_cta_band" })}
+                  >
+                    {t("home.joinWishlist")}
+                  </Link>
+                  <p className="text-center text-[11px] text-[var(--twin-muted)] sm:text-start">{t("home.joinWishlistMicro")}</p>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Link
+                    href="/register"
+                    className="section-cta-primary marketing-btn-primary-shadow twin-touch-target px-7 text-sm text-center"
+                  >
+                    {t("home.getStarted")}
+                  </Link>
+                  <p className="text-center text-[11px] text-[var(--twin-accent)] sm:text-start">{t("home.ctaRegisterMicro")}</p>
+                </div>
               </div>
-              <div className="flex flex-col gap-1.5">
-                <Link
-                  href="/register"
-                  className="section-cta-primary marketing-btn-primary-shadow twin-touch-target px-7 text-sm text-center"
-                >
-                  {t("home.getStarted")}
-                </Link>
-                <p className="text-center text-[11px] text-[var(--twin-accent)] sm:text-start">{t("home.ctaRegisterMicro")}</p>
-              </div>
-              <Link href="/demo" className="section-cta-secondary twin-touch-target self-center px-7 text-sm text-center sm:self-auto">
-                {t("home.ctaDemoSecondary")}
-              </Link>
+              <InteractiveDemoCta showSignIn={false} />
             </div>
           </BentoSpotlight>
         </ScrollReveal>

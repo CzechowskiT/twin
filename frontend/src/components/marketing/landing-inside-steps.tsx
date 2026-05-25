@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { useTranslation } from "@/components/language-provider";
+import { InteractiveDemoCta } from "@/components/marketing/interactive-demo-cta";
 import { ScrollReveal } from "@/components/marketing/scroll-reveal";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -41,22 +42,22 @@ export function LandingInsideSteps() {
           ))}
         </ol>
 
-        <ScrollReveal delayMs={120} className="mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
-          <Link
-            href="/waitlist"
-            className="twin-header-cta twin-nav-waitlist-pill twin-touch-target px-7 text-sm"
-          >
-            {t("home.joinWishlist")}
-          </Link>
-          <Link
-            href="/register"
-            className="section-cta-secondary twin-touch-target px-7 text-sm"
-          >
-            {t("home.getStarted")}
-          </Link>
-          <Link href="/demo" className="text-sm font-medium text-[var(--twin-muted-strong)] hover:text-[var(--foreground)]">
-            {t("home.ctaDemoSecondary")} →
-          </Link>
+        <ScrollReveal delayMs={120} className="mt-8 flex flex-col gap-5">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+            <Link
+              href="/waitlist"
+              className="twin-header-cta twin-nav-waitlist-pill twin-touch-target px-7 text-sm"
+            >
+              {t("home.joinWishlist")}
+            </Link>
+            <Link
+              href="/register"
+              className="section-cta-secondary twin-touch-target px-7 text-sm"
+            >
+              {t("home.getStarted")}
+            </Link>
+          </div>
+          <InteractiveDemoCta className="max-w-xl" showSignIn={false} />
         </ScrollReveal>
       </div>
     </section>

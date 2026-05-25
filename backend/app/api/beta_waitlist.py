@@ -92,10 +92,9 @@ def _display_name(name: str | None, email: str) -> str:
 
 
 def _leaderboard_reward(rank: int) -> str:
-    """Neutral queue perk label — not a cash payout."""
-    if rank <= 10:
-        return "Priority founding access"
-    return "Founding queue boost"
+    """Neutral queue perk label — not a cash payout (EN; matches frontend `WAITLIST_LEADERBOARD_REWARD_EN`)."""
+    _ = rank
+    return "Priority founding access"
 
 
 def _anonym_caption(name: str | None, location: str | None, job_title: str | None) -> str:

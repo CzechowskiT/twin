@@ -2411,13 +2411,6 @@ button.section-cta-secondary.marketing-hero-btn-cta {
   color: var(--section-cta-secondary-fg, var(--foreground)) !important;
 }
 
-a.landing-hero-demo-cta--secondary {
-  min-height: auto;
-  padding: 0;
-  box-shadow: none;
-  background: transparent;
-}
-
 /* Founding funnel preview — visual language aligned with `/waitlist` */
 .marketing-founding-offer {
   margin-top: 1.5rem;
@@ -2920,36 +2913,220 @@ html[data-marketing-surface="studio"] .demo-glass-panel {
   }
 }
 
-.landing-hero-demo-cta {
-  padding: 0.45rem 0.85rem;
-  border-radius: 9999px;
-  border: 1px solid rgb(52 211 153 / 0.28);
-  background: linear-gradient(90deg, rgb(52 211 153 / 0.1), rgb(15 23 42 / 0.35));
-  color: var(--twin-accent);
-  text-decoration: none;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.2s ease;
+/* Interactive demo — tertiary hero card (home, waitlist, register hub) */
+.interactive-demo-cta-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: 100%;
 }
 
-.landing-hero-demo-cta:hover {
+.interactive-demo-cta {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 1rem 1.15rem 1rem 1rem;
+  border-radius: 1.15rem;
+  border: 1px solid rgb(52 211 153 / 0.32);
+  background:
+    linear-gradient(135deg, rgb(52 211 153 / 0.12) 0%, rgb(139 92 246 / 0.06) 48%, rgb(15 23 42 / 0.55) 100%);
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.04) inset,
+    0 12px 40px -16px rgb(0 0 0 / 0.55),
+    0 0 32px rgb(52 211 153 / 0.08);
+  color: var(--foreground);
+  text-decoration: none;
+  overflow: hidden;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+.interactive-demo-cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 38%,
+    rgb(255 255 255 / 0.06) 48%,
+    transparent 58%
+  );
+  transform: translateX(-120%);
+  transition: transform 0.65s ease;
+  pointer-events: none;
+}
+
+.interactive-demo-cta:hover {
   border-color: rgb(52 211 153 / 0.55);
-  box-shadow: 0 0 24px rgb(52 211 153 / 0.2);
-  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 1px rgb(52 211 153 / 0.15) inset,
+    0 16px 48px -12px rgb(0 0 0 / 0.6),
+    0 0 40px rgb(52 211 153 / 0.18);
+  transform: translateY(-2px);
+}
+
+.interactive-demo-cta:hover::before {
+  transform: translateX(120%);
+}
+
+.interactive-demo-cta:focus-visible {
+  outline: 2px solid rgb(52 211 153 / 0.75);
+  outline-offset: 3px;
+}
+
+.interactive-demo-cta__play {
+  position: relative;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+}
+
+.interactive-demo-cta__play-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgb(52 211 153 / 0.45);
+  background: rgb(52 211 153 / 0.14);
+  animation: interactive-demo-play-pulse 2.4s ease-in-out infinite;
+}
+
+.interactive-demo-cta__play-icon {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 50%;
+  background: linear-gradient(145deg, rgb(52 211 153 / 0.35), rgb(6 182 212 / 0.2));
+  color: rgb(167 243 208);
+  box-shadow: 0 0 20px rgb(52 211 153 / 0.35);
+}
+
+.interactive-demo-cta__copy {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.2rem;
+  text-align: left;
+}
+
+.interactive-demo-cta__title {
+  font-size: 1.05rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
   color: var(--foreground);
 }
 
-.landing-hero-demo-cta__icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.25rem;
-  height: 1.25rem;
-  border-radius: 50%;
-  background: rgb(52 211 153 / 0.2);
-  font-size: 0.55rem;
-  line-height: 1;
+.interactive-demo-cta__subtitle {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgb(167 243 208 / 0.95);
+}
+
+.interactive-demo-cta__lead {
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--twin-muted-strong);
+}
+
+.interactive-demo-cta__chevron {
+  flex-shrink: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: rgb(52 211 153 / 0.85);
+  transition: transform 0.2s ease;
+}
+
+.interactive-demo-cta:hover .interactive-demo-cta__chevron {
+  transform: translateX(3px);
+}
+
+.interactive-demo-cta__signin {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--twin-muted);
+}
+
+.interactive-demo-cta__signin-link {
+  font-weight: 500;
+  color: var(--twin-muted-strong);
+  text-decoration: none;
+}
+
+.interactive-demo-cta__signin-link:hover {
+  color: var(--foreground);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.interactive-demo-cta__signin-link:focus-visible {
+  outline: 2px solid rgb(52 211 153 / 0.6);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.interactive-demo-cta-block--waitlist .interactive-demo-cta {
+  border-color: rgb(6 182 212 / 0.35);
+  background:
+    linear-gradient(135deg, rgb(6 182 212 / 0.14) 0%, rgb(139 92 246 / 0.1) 50%, rgb(12 14 24 / 0.85) 100%);
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.05) inset,
+    0 14px 44px -18px rgb(0 0 0 / 0.7),
+    var(--wl-glow-cyan, 0 0 48px rgb(6 182 212 / 0.12));
+}
+
+.interactive-demo-cta-block--waitlist .interactive-demo-cta__play-ring {
+  border-color: rgb(6 182 212 / 0.5);
+  background: rgb(6 182 212 / 0.12);
+}
+
+.interactive-demo-cta-block--waitlist .interactive-demo-cta__play-icon {
+  background: linear-gradient(145deg, rgb(6 182 212 / 0.35), rgb(139 92 246 / 0.2));
+  color: rgb(186 230 253);
+  box-shadow: 0 0 22px rgb(6 182 212 / 0.35);
+}
+
+.interactive-demo-cta-block--waitlist .interactive-demo-cta__subtitle {
+  color: rgb(103 232 249 / 0.95);
+}
+
+.interactive-demo-cta-block--waitlist .interactive-demo-cta__chevron {
+  color: rgb(103 232 249 / 0.9);
+}
+
+@keyframes interactive-demo-play-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.72;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interactive-demo-cta__play-ring {
+    animation: none;
+  }
+
+  .interactive-demo-cta::before {
+    display: none;
+  }
+
+  .interactive-demo-cta:hover {
+    transform: none;
+  }
 }
 
 .demo-full-experience-link {
@@ -2961,11 +3138,6 @@ html[data-marketing-surface="studio"] .demo-glass-panel {
   opacity: 0.85;
   text-decoration: underline;
   text-underline-offset: 4px;
-}
-
-a.landing-hero-demo-cta--secondary {
-  min-height: auto;
-  box-shadow: none;
 }
 
 .demo-theater-rail-fill {
