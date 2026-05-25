@@ -1,70 +1,146 @@
 # Market coverage — 10k active validated jobs
 
-Honest plan for reaching ~10,000 **active** (`is_validated` + scraped within 45 days) listings in the candidate feed.
+Honest plan for reaching ~10,000 **active** (`is_validated` + `scraped_at` within **45 days**) listings in the candidate feed.
 
-## Phase 1 audit summary (2026-05-25)
+## Phase 1 audit (2026-05-25)
 
-| Item | Finding |
+### 1. SCRAPE_REGISTRY — adapter count
+
+**30** real adapters in `backend/app/scrapers/registry.py`:
+
+| Group | Count | Board ids |
+|-------|------:|-----------|
+| PL-local | 9 | `pracuj`, `pracuj-sales`, `rocketjobs`, `rocketjobs-sales`, `rocketjobs-roles`, `justjoin`, `praca`, `linkedin`, `linkedin-sales` |
+| Greenhouse JSON | 8 | `gh-stripe`, `gh-databricks`, `gh-airbnb`, `gh-duolingo`, `gh-cloudflare`, `gh-robinhood`, `gh-figma`, `gh-anthropic` |
+| Global HTML | 13 | `indeed`, `indeed-pl`, `glassdoor`, `monster`, `ziprecruiter`, `careerbuilder`, `simplyhired`, `jooble`, `reed`, `stepstone`, `seek`, `google-jobs`, `snagajob` |
+
+**Not in registry:** NoFluffJobs, Wellfound, 37+ investor “W PLANIE” portals (`frontend/src/lib/investor-roadmap.ts` — roadmap marquee, not production scrapers).
+
+### 2. Per-source matrix
+
+| id | Region | Prod safe | Auth | ToS / robots risk | Typical frequency | Volume note |
+|----|--------|-----------|------|-------------------|-------------------|-------------|
+| pracuj, pracuj-sales | PL | Yes | None | Medium HTML | Beat / on demand | **High** — pagination to 35 pages, multi-keyword sales variant |
+| rocketjobs ×3 | PL | Yes | None | Medium | Beat / on demand | **High** — 3 keyword profiles |
+| justjoin | PL | Yes | None | Low (public JSON) | Beat / on demand | **High** — reliable API-like JSON |
+| praca | PL | Yes | None | Medium | On demand | Medium |
+| linkedin ×2 | Global | Caution | None (public) | **High** — robots often block | Low cap **25**/run | Low yield |
+| gh-* (8) | Global | Yes | None (public API) | Low | On demand | **Medium** — up to 200/board, employer boards (Stripe, Duolingo, …) |
+| indeed, glassdoor, … (13) | Mixed | Caution | None | High anti-bot | Best-effort | **Volatile** — many runs return 0 |
+
+**Compliance:** `scrape_respect_robots_txt=true` by default; no CAPTCHA bypass, no LinkedIn login automation.
+
+### 3. Which sources give most volume
+
+1. **PL trio:** pracuj + rocketjobs variants + justjoin (repeatable, highest sustained upserts).
+2. **Greenhouse:** 8 employers × up to 200 jobs each ≈ 1.6k theoretical per full run if all boards full.
+3. **Global HTML:** bonus when smoke tests pass; not dependable for 10k alone.
+
+**Single scrape-all ceiling (theory):** 30 boards × **200** cap ≈ **6,000** raw rows/run — minus duplicates, validation drops, and zero-yield boards.
+
+### 4. Can 10k be reached?
+
+| Path | Verdict |
 |------|---------|
-| Registry adapters | **30** (`SCRAPE_REGISTRY`): 9 PL-local, 8 Greenhouse JSON, 13 global HTML |
-| Theoretical single run | 30 × up to **200** rows/board ≈ **6,000** raw fetches (many boards return 0 due to bots/login) |
-| Achievable 10k with code only? | **No** — needs **sustained prod Celery scrape-all** (beat + worker) over days/weeks |
-| Achievable 10k with ops? | **Yes**, if PL sources (pracuj, rocketjobs, justjoin) + Greenhouse run daily and upserts refresh `scraped_at` |
-| Dashboard ~1727 | `GET /api/v1/jobs/` **`total`** = all validated rows (no active window). Investor `mvp-stats` uses narrower **6 boards** (~637 historically). |
-| After this sprint | Dashboard **W feedzie** uses **`active_feed_only=true`** (45-day window) — number drops stale rows until rescrape |
+| Code + one local run only | **No** — corpus needs **days/weeks** of prod Celery `scrape-all` + beat |
+| Prod ops (worker + beat + rescrape) | **Yes** — if PL sources run daily and `upsert_jobs` refreshes `scraped_at` so rows stay inside 45-day window |
+| New adapters / deeper pagination | **Accelerates** — still requires running scrapes in prod/staging with `DATABASE_URL` |
 
-### Adapter matrix (registry)
+### 5. `match_jobs_scan_limit` vs 10k corpus
 
-| id | Country | Prod safe | Auth | ToS risk | Frequency |
-|----|---------|-----------|------|----------|-----------|
-| pracuj, pracuj-sales | PL | Yes | None | Medium HTML | On demand / beat |
-| rocketjobs ×3 | PL | Yes | None | Medium | On demand / beat |
-| justjoin | PL | Yes | None | Low (public JSON) | On demand / beat |
-| praca | PL | Yes | None | Medium | On demand / beat |
-| linkedin ×2 | Global | Caution | None (public) | **High** (robots) | Low cap **25**/run |
-| gh-* (8) | Global | Yes | None (public API) | Low | On demand / beat |
-| indeed, indeed-pl, glassdoor, … (13) | Mixed | Caution | None | High (anti-bot) | Best-effort |
-| NoFluffJobs | — | **No adapter** | — | — | Roadmap only |
+- Default in repo: **`15000`** (`MATCH_JOBS_SCAN_LIMIT` env).
+- Matcher uses **`apply_active_feed_filter`** — same 45-day window as dashboard; scan is not “all-time validated”.
+- Top **200** rail unchanged: `find_top_matches` → score → `dedupe_ranked_jobs` → `limit=200`, `min_score=38` (quality gate).
 
-### SQL for prod counts (when `DATABASE_URL` set)
+### 6. Why dashboard showed ~1727
+
+| Counter | What it counted |
+|---------|-----------------|
+| **Before** | `GET /api/v1/jobs/` **`total`** = all `is_validated` rows (no freshness window) — stale listings inflated or confused users |
+| **Investor mvp-stats** | Narrower board subset (~637 in some envs) |
+| **After sprint** | **`active_feed_only=true`** + **`active_within_days=45`** — only validated listings **rescraped within 45 days**; number may **drop** until beat rescrapes |
+
+### SQL templates (prod / local with `DATABASE_URL`)
 
 ```sql
+-- All-time validated
 SELECT COUNT(*) FROM jobs WHERE is_validated = true;
-SELECT COUNT(*) FROM jobs WHERE is_validated = true AND scraped_at >= NOW() - INTERVAL '45 days';
-SELECT job_board, COUNT(*) FROM jobs WHERE is_validated = true GROUP BY 1 ORDER BY 2 DESC;
+
+-- Active feed (align with job_feed_active_days=45)
+SELECT COUNT(*) FROM jobs
+ WHERE is_validated = true AND scraped_at >= NOW() - INTERVAL '45 days';
+
+-- By board (active)
+SELECT job_board, COUNT(*) FROM jobs
+ WHERE is_validated = true AND scraped_at >= NOW() - INTERVAL '45 days'
+ GROUP BY 1 ORDER BY 2 DESC;
+
+-- Freshness
 SELECT COUNT(*) FROM jobs WHERE is_validated = true AND scraped_at >= NOW() - INTERVAL '24 hours';
 SELECT COUNT(*) FROM jobs WHERE is_validated = true AND scraped_at >= NOW() - INTERVAL '7 days';
 ```
 
-## Phase 2–10 shipped in repo
+### Roadmap UI vs registry
 
-1. **Active feed** — `job_feed_active_days=45`; `GET /jobs?active_feed_only=true`; matcher scan uses same window.
-2. **Upsert refresh** — Re-seen `(job_board, external_id)` updates `scraped_at` (keeps corpus active after rescrape).
-3. **Scrape caps** — `scrape_jobs_per_board` default **120**, hard max **200**; pracuj pagination up to **35** pages; LinkedIn capped at **25**.
-4. **Matcher scan** — `match_jobs_scan_limit` default **8000** (env `MATCH_JOBS_SCAN_LIMIT`).
-5. **Ops script** — `scripts/scrape-market-coverage.sh` → `backend/scripts/scrape_market_coverage.py` (`--dry-run` / `--persist`).
-6. **Admin KPIs** — `GET /api/v1/admin/matching-quality` includes `active_validated_jobs`, `per_user_top_200_sample`, coverage by source.
-7. **Dashboard** — Frontend sends `active_feed_only` + 45-day window for listing totals (**W feedzie**).
-8. **Strong matches** — Still `limit=200`, `min_score=38`; rail shows visible count ≥38 after client filter.
+- **50 global portals “W PLANIE”** — product roadmap (`investor-roadmap.ts`), not 50 scrapers.
+- **Stripe, Duolingo, … “WDROŻONE”** — matches **`gh-*`** Greenhouse adapters in `SCRAPE_REGISTRY` (public JSON, no login).
+
+---
+
+## Phase 2 shipped (P0, safe)
+
+1. **Active feed** — `job_feed_active_days=45`; API default `active_feed_only=true`; matcher scan same window.
+2. **Upsert refresh** — Re-seen `(job_board, external_id)` updates `scraped_at` + `is_validated`.
+3. **Scrape depth** — `scrape_jobs_per_board` default **200**; pracuj up to **35** pages; LinkedIn max **25**/run; PL keyword variants on pracuj-sales / rocketjobs.
+4. **Matcher scan** — `match_jobs_scan_limit` default **15000**.
+5. **Ops** — `scripts/scrape-market-coverage.sh` → `backend/scripts/scrape_market_coverage.py` (`dry-run` / `persist`, `--boards`).
+6. **Admin KPIs** — `GET /api/v1/admin/matching-quality` + `build_market_coverage_report`: `active_validated_jobs`, `fresh_jobs_24h`/`7d`, `total_jobs_by_source`, `active_jobs_by_source`, `per_user_top_200_sample`, scrape caps.
+7. **Dashboard** — `frontend/src/lib/jobs.ts` sends `active_feed_only` + 45-day window; rail **W feedzie** shows count + **10k goal** caption when below target.
+8. **Dedupe / not_relevant** — `feed_dedupe_key` + `excluded_feed_dedupe_keys` intact (commit `31e004f`).
+
+**Out of scope (per sprint constraints):** P0 submission truth/048, auto-apply, application statuses, prod deploy.
+
+---
 
 ## How to run scrape (no prod deploy without approval)
 
 ```bash
-# Dry-run (no DB writes)
+# Dry-run (no DB writes), per-board JSON logs
 ./scripts/scrape-market-coverage.sh dry-run
 
 # Persist subset locally
 SCRAPE_BOARDS=pracuj,justjoin,rocketjobs ./scripts/scrape-market-coverage.sh persist
 
-# Full registry via API (logged-in user + Celery or API fallback)
-# POST /api/v1/jobs/scrape/all
+# API (authenticated): POST /api/v1/jobs/scrape/all
 ```
 
-Prod: enable `SCRAPE_WORKER_READY`, Redis, `SCRAPE_BEAT_ENABLED=true`, tune `SCRAPE_JOBS_PER_BOARD=150` on worker — see `docs/SCRAPE_OPS.md`.
+Prod path: `SCRAPE_WORKER_READY=true`, Redis, `SCRAPE_BEAT_ENABLED=true`, tune `SCRAPE_JOBS_PER_BOARD` — see `docs/SCRAPE_OPS.md`.
+
+---
 
 ## Verify 10k after deploy
 
-1. `GET /api/v1/admin/matching-quality` → `active_validated_jobs` ≥ 10000
-2. Dashboard rail **W feedzie** matches that counter (with default filters)
-3. `median_top_200_count` near 200 for sample candidates when corpus is large
-4. Re-run scrape-all weekly so `scraped_at` stays inside 45-day window
+1. `GET /api/v1/admin/matching-quality` → `active_validated_jobs` ≥ 10000  
+2. Dashboard **W feedzie** matches that counter (default filters, no extra board filter)  
+3. `median_top_200_count` ≈ 200 for sample candidates when corpus is large  
+4. Weekly `scrape-all` so `scraped_at` stays inside 45-day window  
+
+---
+
+## Raport końcowy (PL) — 15 punktów
+
+1. **Czy 10k jest osiągalne?** Tak **operacyjnie** (Celery beat + worker, codzienne PL + Greenhouse), nie jednym lokalnym skryptem. Sam kod daje sufit ~6k/ przebieg scrape-all.
+2. **Aktualne liczby w prod** — Agent nie ma `DATABASE_URL` prod; użyj SQL powyżej lub `GET /admin/matching-quality`. Lokalnie testy używają SQLite — nie są licznikiem prod.
+3. **Źródła** — 30 adapterów (9 PL, 8 Greenhouse, 13 global HTML); największy wolumen: pracuj, rocketjobs, justjoin.
+4. **Co zaimplementowano** — Aktywny feed 45 dni, odświeżanie `scraped_at` przy upsercie, cap 200/board, scan 15k, skrypt coverage, KPI admin, frontend `active_feed_only`, cel 10k w railu.
+5. **Jak odpalić scrape** — `./scripts/scrape-market-coverage.sh dry-run|persist` lub POST `scrape/all` + prod beat.
+6. **Fix licznika dashboard** — `total` z API z `active_feed_only=true` (nie all-time validated); **W feedzie** w bocznym railu.
+7. **Top 200 nadal ranking?** Tak — `find_top_matches` + `dedupe_ranked_jobs` + limit 200 + min_score 38; skan na aktywnym korpusie.
+8. **Dedupe** — `feed_dedupe_key` (tytuł+firma+lokalizacja / URL); batch soft-dedupe przy zapisie; `not_relevant` ukrywa rodzeństwo po kluczu.
+9. **Metryki ops** — `matching-quality`: `active_validated_jobs`, `fresh_jobs_24h`, `fresh_jobs_7d`, `total_jobs_by_source`, `active_jobs_by_source`, `match_jobs_scan_limit`, `registry_adapter_count`.
+10. **Testy** — `test_market_coverage.py`, `test_matching_quality_admin.py`, ranking/feedback/scrape-all — **22 passed** w tym sprincie.
+11. **Frontend build** — `npm run build` OK.
+12. **Commit** — Branch `cursor/phase1-monorepo-scaffold`; config caps 200/15000 + doc + UI cel 10k.
+13. **Push** — Po commicie na `origin/cursor/phase1-monorepo-scaffold`.
+14. **Safe deploy?** **Nie deployowano prod** (zgodnie z constraint). Deploy wymaga Railway worker + beat + env — bez zmian w P0 submission/auto-apply.
+15. **Weryfikacja 10k po deploy** — Admin KPI ≥ 10k active; dashboard zgodny; utrzymać beat; po wdrożeniu liczba może chwilowo spaść dopóki rescrape nie odświeży `scraped_at`.

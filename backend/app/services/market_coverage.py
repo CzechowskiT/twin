@@ -9,6 +9,7 @@ from sqlalchemy.orm import Query, Session
 
 from app.config import get_settings
 from app.database.models import Job
+from app.scrapers.registry import SCRAPE_REGISTRY
 
 
 def active_feed_cutoff(*, days: int | None = None, now: datetime | None = None) -> datetime:
@@ -74,5 +75,6 @@ def build_market_coverage_report(db: Session) -> dict:
         "active_jobs_by_source": jobs_by_source(db, active_only=True),
         "scrape_jobs_per_board": settings.scrape_jobs_per_board,
         "match_jobs_scan_limit": settings.match_jobs_scan_limit,
-        "registry_adapter_count": 30,
+        "registry_adapter_count": len(SCRAPE_REGISTRY),
+        "registry_board_ids": sorted(SCRAPE_REGISTRY.keys()),
     }

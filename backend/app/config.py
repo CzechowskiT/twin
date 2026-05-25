@@ -125,7 +125,7 @@ class Settings(BaseSettings):
     # Comma-separated board ids matching scraper registry (empty = all). Controls scrape-all + /jobs/boards list.
     scrape_enabled_board_ids: str = ""
     # Per-board fetch cap for Twin scrape-all (each adapter respects this upper bound).
-    scrape_jobs_per_board: int = 120
+    scrape_jobs_per_board: int = 200
     # Dashboard listing + matcher scan: only validated jobs scraped within this many days.
     job_feed_active_days: int = 45
     # When >0, skip persisting listings whose requirements+description are shorter (listing-only rows stay at 0).
@@ -142,7 +142,7 @@ class Settings(BaseSettings):
     interview_reminder_beat_enabled: bool = True
     interview_reminder_hours_before: int = 24
     # Max jobs considered per find_top_matches scan (newest validated first).
-    match_jobs_scan_limit: int = 8000
+    match_jobs_scan_limit: int = 15000
     # When true, use ``job_matching_v2`` (salary overlap bonus on top of v1 rules).
     match_scoring_v2: bool = False
     # When true (env MATCHING_V2_TFIDF), add a bounded TF–IDF cosine layer on top of v1 or v2 (see matching_service).

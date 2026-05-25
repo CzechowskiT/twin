@@ -9,7 +9,10 @@ import { useMarketingPersona } from "@/components/persona-provider";
 import { scrollToDashboardHash } from "@/lib/dashboard-anchor";
 import { getToken } from "@/lib/auth";
 import type { TranslationKey } from "@/lib/i18n";
+import { JOB_FEED_ACTIVE_DAYS } from "@/lib/jobs";
 import { momentumRailCtas } from "@/lib/persona-access";
+
+const FEED_COVERAGE_TARGET = 10_000;
 
 const TIPS = [
   "site.momentumTip1",
@@ -62,6 +65,13 @@ function DashboardSnapshot({
             {t("dashboard.statFeedTitle")}
           </dt>
           <dd className="mt-0.5 text-2xl font-semibold tabular-nums text-[var(--twin-link)]">{stats.jobsTotal}</dd>
+          {stats.jobsTotal < FEED_COVERAGE_TARGET ? (
+            <p className="twin-muted mt-0.5 text-xs">
+              {t("dashboard.statFeedGoal")
+                .replace("{target}", String(FEED_COVERAGE_TARGET))
+                .replace("{days}", String(JOB_FEED_ACTIVE_DAYS))}
+            </p>
+          ) : null}
           <a href="#dashboard-jobs" onClick={scrollToDashboardHash} className="twin-link mt-1 inline-block text-xs font-medium">
             {t("dashboard.statFeedCta")}
           </a>
