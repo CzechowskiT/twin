@@ -127,7 +127,7 @@ const MARQUEE_SEGMENTS = 2;
 /** Uniform slot — inner inset + `object-contain` keeps wide wordmarks (e.g. Amex) inside the plate. */
 const MARK_BOX_CLASS = "h-10 w-[7.5rem] sm:h-11 sm:w-32";
 
-/** Light plate so dark / monochrome marks stay legible on studio (dark) and light marketing rails. */
+/** Light plate so colorful favicons stay legible on studio (dark) and light marketing rails. */
 const MARK_PLATE_CLASS =
   "border border-zinc-200/90 bg-white shadow-sm ring-1 ring-zinc-950/[0.04] dark:border-zinc-500/40 dark:bg-zinc-100 dark:ring-white/10";
 
@@ -162,12 +162,13 @@ function duckduckgoIconUrl(domain: string) {
   return `https://icons.duckduckgo.com/ip3/${domain}.ico`;
 }
 
+/** Color-first: site/raster favicons before monochrome Simple Icons SVGs. */
 function brandLogoUrls(brand: Brand): string[] {
   const slugs = [...new Set([brand.slug, ...(brand.altSlugs ?? [])])];
-  const vector = slugs.flatMap((slug) => [jsdelivrSiUrl(slug), siUrl(slug)]);
   const raster = [duckduckgoIconUrl(brand.domain), googleFaviconUrl(brand.domain)];
   const custom = brand.extraUrls ?? [];
-  return [...custom, ...vector, ...raster];
+  const vector = slugs.flatMap((slug) => [jsdelivrSiUrl(slug), siUrl(slug)]);
+  return [...custom, ...raster, ...vector];
 }
 
 function BrandMark({
@@ -218,7 +219,7 @@ function BrandMark({
         loading="eager"
         decoding="async"
         referrerPolicy="no-referrer"
-        className={`max-h-full max-w-full object-contain object-center transition-opacity [filter:brightness(0)_saturate(100%)] ${loaded ? "opacity-90" : "opacity-0"}`}
+        className={`max-h-full max-w-full object-contain object-center transition-opacity ${loaded ? "opacity-95" : "opacity-0"}`}
         onError={onError}
         onLoad={onLoad}
       />
@@ -269,7 +270,7 @@ function LogoRow({
   );
 }
 
-/** Infinite marquee — duplicated strip; marks try SI → jsDelivr SI → favicon → DuckDuckGo → monogram. */
+/** Infinite marquee — duplicated strip; marks try favicon CDNs before Simple Icons fallback. */
 export function CompanyLogoMarquee() {
   const reducedMotion = usePrefersReducedMotion();
   const linkSuffixKey: TranslationKey = "site.marqueeBrandLinkSuffix";
