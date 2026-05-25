@@ -107,24 +107,27 @@ def upgrade() -> None:
             UPDATE applications SET
               submission_status = CASE
                 WHEN application_method = 'auto_apply_demo_simulated' THEN 'application_prepared'
-                WHEN auto_applied = 1 AND status = 'applied' THEN 'external_submit_attempted'
+                WHEN COALESCE(auto_applied, false) IS TRUE AND status = 'applied' THEN 'external_submit_attempted'
                 WHEN status = 'applied' THEN 'manual_action_required'
                 WHEN status = 'pending' THEN 'application_created_in_twin'
                 ELSE 'application_created_in_twin'
               END,
               supported_apply_mode = CASE
                 WHEN application_method = 'auto_apply_demo_simulated' THEN 'manual_only'
-                WHEN auto_applied = 1 THEN 'verified_auto_apply'
+                WHEN COALESCE(auto_applied, false) IS TRUE THEN 'verified_auto_apply'
                 ELSE 'manual_only'
               END,
               confirmation_type = 'none',
               requires_manual_action = CASE
-                WHEN application_method = 'auto_apply_demo_simulated' THEN 1
-                WHEN status = 'applied' AND (auto_applied = 0 OR auto_applied IS NULL) THEN 1
-                WHEN status = 'pending' THEN 0
-                ELSE 0
+                WHEN application_method = 'auto_apply_demo_simulated' THEN true
+                WHEN status = 'applied' AND COALESCE(auto_applied, false) IS FALSE THEN true
+                WHEN status = 'pending' THEN false
+                ELSE false
               END,
-              submit_attempted_at = CASE WHEN auto_applied = 1 THEN applied_at ELSE NULL END
+              submit_attempted_at = CASE
+                WHEN COALESCE(auto_applied, false) IS TRUE THEN applied_at
+                ELSE NULL
+              END
             """
         )
     )
