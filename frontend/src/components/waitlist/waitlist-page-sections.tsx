@@ -3,9 +3,87 @@
 import { motion } from "framer-motion";
 
 import { CompanyLogoMarquee } from "@/components/marketing/company-logo-marquee";
+import { AnimatedCounter } from "@/components/waitlist/animated-counter";
+import { useTranslation } from "@/components/language-provider";
+import { LOCALE_HTML_LANG } from "@/lib/i18n";
+import { formatWaitlist } from "@/lib/waitlist-messages";
 import type { WaitlistCopy } from "@/lib/waitlist-messages";
 
 type Copy = WaitlistCopy;
+
+export function WaitlistFoundingCounter({
+  copy,
+  spotsRemaining,
+  cap,
+  total,
+  loading,
+  error,
+  statsLive,
+}: {
+  copy: Copy;
+  spotsRemaining: number;
+  cap: number;
+  total: number;
+  loading: boolean;
+  error: boolean;
+  statsLive: boolean;
+}) {
+  const { locale } = useTranslation();
+  const numberLocale = LOCALE_HTML_LANG[locale];
+  const filled = Math.min(100, Math.round(((cap - spotsRemaining) / Math.max(cap, 1)) * 100));
+
+  return (
+    <motion.article
+      className="wl-founding-counter"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.2 }}
+      aria-label={copy.counterProgressAria}
+    >
+      <p className="wl-founding-counter__eyebrow">{copy.counterEyebrow}</p>
+      <div className="wl-founding-counter__main">
+        {loading ? (
+          <p className="wl-founding-counter__loading">{copy.statsLoadingLabel}</p>
+        ) : (
+          <>
+            <p className="wl-founding-counter__spots">
+              <AnimatedCounter value={spotsRemaining} locale={numberLocale} />
+              <span className="wl-founding-counter__label">{copy.counterRemainingLabel}</span>
+            </p>
+            <p className="wl-founding-counter__of">
+              {formatWaitlist(copy.counterOfCap, { cap })}
+            </p>
+          </>
+        )}
+      </div>
+      <div
+        className="wl-founding-counter__bar"
+        role="progressbar"
+        aria-valuenow={filled}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={copy.counterProgressAria}
+      >
+        <div className="wl-founding-counter__fill" style={{ width: `${filled}%` }} />
+      </div>
+      <div className="wl-founding-counter__meta">
+        {!loading ? (
+          <p className="wl-founding-counter__signed">
+            {formatWaitlist(copy.counterOnList, { signed: total.toLocaleString(numberLocale) })}
+          </p>
+        ) : null}
+        {error ? (
+          <p className="wl-founding-counter__hint wl-founding-counter__hint--warn">{copy.statsOfflineHint}</p>
+        ) : statsLive ? (
+          <p className="wl-founding-counter__hint">
+            <span className="wl-live-dot" aria-hidden />
+            {copy.statsLiveLabel}
+          </p>
+        ) : null}
+      </div>
+    </motion.article>
+  );
+}
 
 export function WaitlistSectionTitle({ children }: { children: React.ReactNode }) {
   return <h2 className="wl-section-title">{children}</h2>;
@@ -39,9 +117,11 @@ export function WaitlistProblemSection({ copy }: { copy: Copy }) {
     <section className="wl-section" id="problem">
       <WaitlistSectionTitle>{copy.sectionProblem}</WaitlistSectionTitle>
       <WaitlistSectionLead>{copy.problemLead}</WaitlistSectionLead>
-      <ul className="wl-shift-list">
+      <ul className="wl-card-grid wl-card-grid--2">
         {copy.problemPoints.map((point) => (
-          <li key={point}>{point}</li>
+          <li key={point} className="wl-card wl-card--point">
+            {point}
+          </li>
         ))}
       </ul>
     </section>
@@ -74,7 +154,7 @@ export function WaitlistWhatTwinSection({ copy }: { copy: Copy }) {
     <section className="wl-section" id="what">
       <WaitlistSectionTitle>{copy.sectionWhatTwin}</WaitlistSectionTitle>
       <WaitlistSectionLead>{copy.whatTwinLead}</WaitlistSectionLead>
-      <div className="wl-pillar-grid">
+      <div className="wl-card-grid wl-card-grid--2">
         {copy.whatTwinItems.map((item) => (
           <article key={item.title} className="wl-card wl-pillar-card">
             <span className="wl-pillar-icon" aria-hidden>
@@ -94,9 +174,11 @@ export function WaitlistRankingSection({ copy }: { copy: Copy }) {
     <section className="wl-section" id="ranking">
       <WaitlistSectionTitle>{copy.sectionRanking}</WaitlistSectionTitle>
       <WaitlistSectionLead>{copy.rankingLead}</WaitlistSectionLead>
-      <ul className="wl-check-list">
+      <ul className="wl-card-grid wl-card-grid--2">
         {copy.rankingBullets.map((item) => (
-          <li key={item}>{item}</li>
+          <li key={item} className="wl-card wl-card--point">
+            {item}
+          </li>
         ))}
       </ul>
     </section>
@@ -145,7 +227,7 @@ export function WaitlistFoundingSection({ copy }: { copy: Copy }) {
   return (
     <section className="wl-section" id="founding">
       <motion.article
-        className="wl-founding-card"
+        className="wl-founding-card wl-founding-card--wide"
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -169,7 +251,7 @@ export function WaitlistHow8Section({ copy }: { copy: Copy }) {
     <section className="wl-section" id="how">
       <WaitlistSectionTitle>{copy.sectionHow8}</WaitlistSectionTitle>
       <WaitlistSectionLead>{copy.how8Lead}</WaitlistSectionLead>
-      <ol className="wl-steps-grid">
+      <ol className="wl-card-grid wl-card-grid--2 wl-card-grid--steps">
         {copy.how8Steps.map((step) => (
           <li key={step.n} className="wl-card wl-step-card">
             <span className="wl-step-n">{step.n}</span>

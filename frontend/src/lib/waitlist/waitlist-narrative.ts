@@ -14,6 +14,11 @@ export type WaitlistNarrative = {
   statsLiveLabel: string;
   statsLoadingLabel: string;
   statsOfflineHint: string;
+  counterEyebrow: string;
+  counterRemainingLabel: string;
+  counterOfCap: string;
+  counterOnList: string;
+  counterProgressAria: string;
   sectionSources: string;
   sourcesLead: string;
   sourceChips: string[];
@@ -72,6 +77,11 @@ const en: WaitlistNarrative = {
   statsLiveLabel: "Live wishlist data",
   statsLoadingLabel: "Connecting to live stats…",
   statsOfflineHint: "Could not reach live stats — numbers may be delayed. Signup still works.",
+  counterEyebrow: "Founding cohort · live scarcity",
+  counterRemainingLabel: "spots left",
+  counterOfCap: "of {cap} founding places",
+  counterOnList: "{signed} on the wishlist",
+  counterProgressAria: "Wishlist fill progress",
   sectionSources: "Sources we aggregate today",
   sourcesLead:
     "TWIN pulls from job boards and employer pages — not a single portal lottery. PL market is a priority; EU remote-friendly roles follow your profile bar.",
@@ -223,6 +233,11 @@ const pl: WaitlistNarrative = {
   statsLiveLabel: "Dane wishlisty na żywo",
   statsLoadingLabel: "Łączenie ze statystykami…",
   statsOfflineHint: "Brak połączenia ze statystykami — liczby mogą być opóźnione. Zapis nadal działa.",
+  counterEyebrow: "Kohorta founding · licznik na żywo",
+  counterRemainingLabel: "wolnych miejsc",
+  counterOfCap: "z {cap} miejsc founding",
+  counterOnList: "{signed} na wishliście",
+  counterProgressAria: "Postęp zapełnienia wishlisty",
   sectionSources: "Źródła, z których zbieramy oferty",
   sourcesLead:
     "TWIN agreguje portale i strony pracodawców — nie jedną loterię ogłoszeń. Rynek PL jest priorytetem; role EU remote zgodnie z Twoim progiem.",

@@ -11,6 +11,7 @@ import {
   WaitlistControlSection,
   WaitlistCoverageSection,
   WaitlistExampleSection,
+  WaitlistFoundingCounter,
   WaitlistFoundingSection,
   WaitlistHow8Section,
   WaitlistProblemSection,
@@ -90,6 +91,8 @@ export function WaitlistPageClient() {
     <motion.div className="wl-root" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <motion.div className="wl-mesh" aria-hidden />
       <motion.div className="wl-grid-bg" aria-hidden />
+      <motion.div className="wl-glow-orb wl-glow-orb--purple" aria-hidden />
+      <motion.div className="wl-glow-orb wl-glow-orb--cyan" aria-hidden />
       <div className="wl-inner">
         <header className="wl-top-bar">
           <Link href="/" className="wl-logo">
@@ -103,33 +106,36 @@ export function WaitlistPageClient() {
           </motion.div>
         </header>
 
-        <section className="wl-hero" id="join">
-          <p className="wl-hero-eyebrow">{copy.heroEyebrow}</p>
-          <motion.h1 className="wl-gradient-text">{typed}</motion.h1>
-          <motion.p className="wl-hero-lead" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }}>
-            {copy.heroLead1}
-            <br />
-            {copy.heroLead2}
-            <br />
-            {copy.heroLead3}
-          </motion.p>
-          <FoundingOfferPreview variant="waitlist" />
-          {statsError ? (
-            <p className="wl-stats-offline" role="status">
-              {copy.statsOfflineHint}
-            </p>
-          ) : statsLoading ? (
-            <p className="wl-stats-live wl-stats-live--loading" role="status" aria-busy="true">
-              <span className="wl-live-dot" aria-hidden />
-              {copy.statsLoadingLabel}
-            </p>
-          ) : statsLive ? (
-            <p className="wl-stats-live" role="status">
-              <span className="wl-live-dot" aria-hidden />
-              {copy.statsLiveLabel}
-            </p>
-          ) : null}
-          <WaitlistForm key={locale} spotsRemaining={spotsRemaining} signupsToday={signupsToday} cap={cap} />
+        <section className="wl-hero wl-hero--cinematic" id="join">
+          <div className="wl-hero-grid">
+            <div className="wl-hero-copy">
+              <p className="wl-hero-eyebrow">{copy.heroEyebrow}</p>
+              <motion.h1 className="wl-gradient-text wl-hero-headline">{typed}</motion.h1>
+              <motion.div
+                className="wl-hero-leads"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.25 }}
+              >
+                <p className="wl-hero-lead">{copy.heroLead1}</p>
+                <p className="wl-hero-lead">{copy.heroLead2}</p>
+                <p className="wl-hero-lead wl-hero-lead--accent">{copy.heroLead3}</p>
+              </motion.div>
+              <FoundingOfferPreview variant="waitlist" />
+            </div>
+            <aside className="wl-hero-panel">
+              <WaitlistFoundingCounter
+                copy={copy}
+                spotsRemaining={spotsRemaining}
+                cap={cap}
+                total={total}
+                loading={statsLoading}
+                error={Boolean(statsError)}
+                statsLive={statsLive}
+              />
+              <WaitlistForm key={locale} spotsRemaining={spotsRemaining} signupsToday={signupsToday} cap={cap} />
+            </aside>
+          </div>
         </section>
 
         <WaitlistSourcesSection copy={copy} />
@@ -182,7 +188,7 @@ export function WaitlistPageClient() {
           ) : null}
         </section>
 
-        <section className="wl-section max-w-2xl mx-auto" id="faq">
+        <section className="wl-section wl-section--faq" id="faq">
           <h2 className="wl-section-title">{copy.sectionFaq}</h2>
           {copy.faq.map((item) => (
             <details key={item.q} className="wl-faq-item">
