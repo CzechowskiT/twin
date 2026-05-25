@@ -20,6 +20,7 @@ from app.services.linkedin_oauth import is_linkedin_oauth_configured
 from app.services.mail import is_mail_configured
 from app.api.health import _database_reachable
 from app.services.data_room_upload import object_storage_configured
+from app.services.application_submission_metrics import mvp_submission_counts
 from app.services.mvp_public_metrics import count_validated_jobs_public_traction
 from app.services.subscription_public_metrics import count_paid_subscribers, subscription_mrr_usd
 
@@ -49,6 +50,23 @@ def _safe_count(db: Session, label: str, fn: object) -> int:
         return 0
 
 
+def _safe_count_dict(db: Session, label: str, fn: object) -> dict[str, int]:
+    try:
+        raw = fn()  # type: ignore[operator]
+        return {k: int(v) for k, v in raw.items()}
+    except Exception:
+        logger.warning("mvp-stats %s count failed", label, exc_info=True)
+        return {
+            "applications_created_in_twin": 0,
+            "applications_prepared": 0,
+            "external_submit_attempted": 0,
+            "external_submit_confirmed": 0,
+            "manual_action_required": 0,
+            "submit_failed": 0,
+            "responses_received": 0,
+        }
+
+
 @router.get("/mvp-stats", response_model=MvpStatsOut)
 def mvp_stats(db: Session = Depends(get_db)) -> MvpStatsOut:
     """Aggregate product metrics for investor surfaces (no personal fields; all counts from DB or env wiring)."""
@@ -73,6 +91,7 @@ def mvp_stats(db: Session = Depends(get_db)) -> MvpStatsOut:
         "interviews_scheduled",
         lambda: db.query(func.count()).select_from(ScheduledInterview).scalar(),
     )
+    submission_metrics = _safe_count_dict(db, "submission_metrics", lambda: mvp_submission_counts(db))
     cv_profiles = _safe_count(
         db,
         "cv_profiles",
@@ -96,6 +115,13 @@ def mvp_stats(db: Session = Depends(get_db)) -> MvpStatsOut:
         validated_jobs=v_jobs,
         registered_users=users,
         total_applications=apps,
+        applications_created_in_twin=submission_metrics["applications_created_in_twin"],
+        applications_prepared=submission_metrics["applications_prepared"],
+        external_submit_attempted=submission_metrics["external_submit_attempted"],
+        external_submit_confirmed=submission_metrics["external_submit_confirmed"],
+        manual_action_required=submission_metrics["manual_action_required"],
+        submit_failed=submission_metrics["submit_failed"],
+        responses_received=submission_metrics["responses_received"],
         verified_placements=verified_placements,
         interviews_scheduled=interviews_scheduled,
         profiles_with_cv=cv_profiles,

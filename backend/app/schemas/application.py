@@ -14,10 +14,30 @@ class ApplicationStatusEnum(str, Enum):
     hired = "hired"
 
 
+class SubmissionStatusEnum(str, Enum):
+    application_created_in_twin = "application_created_in_twin"
+    application_prepared = "application_prepared"
+    external_submit_attempted = "external_submit_attempted"
+    external_submit_confirmed = "external_submit_confirmed"
+    external_submit_failed = "external_submit_failed"
+    manual_action_required = "manual_action_required"
+
+
+class SupportedApplyModeEnum(str, Enum):
+    verified_auto_apply = "verified_auto_apply"
+    assisted_apply = "assisted_apply"
+    manual_only = "manual_only"
+    unsupported = "unsupported"
+
+
 class ApplicationCreate(BaseModel):
     job_id: int
     status: ApplicationStatusEnum = ApplicationStatusEnum.pending
     notes: str | None = Field(default=None, max_length=2000)
+    track_link_opened: bool = Field(
+        default=False,
+        description="User opened job URL — track as manual action required, not external submit.",
+    )
 
 
 class ApplicationUpdate(BaseModel):
@@ -50,6 +70,16 @@ class ApplicationOut(BaseModel):
     id: int
     job_id: int
     status: ApplicationStatusEnum
+    submission_status: SubmissionStatusEnum | None = None
+    display_status: str | None = Field(
+        default=None,
+        description="UI-safe phase (submission_status or pipeline extension like interview_scheduled).",
+    )
+    supported_apply_mode: SupportedApplyModeEnum | None = None
+    requires_manual_action: bool = False
+    submit_attempted_at: datetime | None = None
+    submitted_at: datetime | None = None
+    failure_reason: str | None = None
     notes: str | None
     recruiter_feedback_raw: str | None = None
     feedback_insights: ApplicationFeedbackInsightsOut | None = None
@@ -170,6 +200,7 @@ class AutoApplyOut(BaseModel):
     success: bool
     outcome: str
     message: str
+    submission_status: SubmissionStatusEnum | None = None
     application_id: int | None = None
     # Short-lived HTTPS URL to the tailored package PDF (only when S3 upload succeeded).
     package_pdf_url: str | None = None

@@ -531,7 +531,8 @@ export default function DashboardPage() {
   const applicationByJobId = useMemo(() => {
     const map: Record<number, string> = {};
     for (const app of applications) {
-      map[app.job_id] = app.status;
+      map[app.job_id] =
+        app.display_status ?? app.submission_status ?? app.status;
     }
     return map;
   }, [applications]);
@@ -762,9 +763,36 @@ export default function DashboardPage() {
     }
   }
 
+  async function trackLinkOpened(jobId: number) {
+    const token = getToken();
+    if (!token) return;
+    try {
+      const idem =
+        typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+          ? crypto.randomUUID()
+          : "";
+      const h = new Headers();
+      if (idem) h.set("Idempotency-Key", idem);
+      await apiFetch(
+        "/api/v1/applications/",
+        {
+          method: "POST",
+          body: JSON.stringify({ job_id: jobId, status: "pending", track_link_opened: true }),
+          headers: h,
+        },
+        token,
+      );
+      syncApplicationsFromApi(await loadApplications(token));
+      setDevFocus(await loadDevelopmentFocus(token));
+      toast.success(t("dashboard.applicationTrackedLinkToast"));
+    } catch (err) {
+      setError(dashboardFetchUserMessage(err, t));
+    }
+  }
+
   function applyToJob(jobId: number, url: string) {
     window.open(url, "_blank", "noopener,noreferrer");
-    void setJobApplication(jobId, "applied");
+    void trackLinkOpened(jobId);
   }
 
   function saveJob(jobId: number) {

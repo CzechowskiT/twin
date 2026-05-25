@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "@/components/language-provider";
 import { PlacementStateStepper } from "@/components/placement-state-stepper";
-import { applicationStatusKey } from "@/lib/application-status";
+import { applicationDisplayStatusKey, applicationStatusKey } from "@/lib/application-status";
 
 export type FeedbackInsights = {
   skill_tool_gaps: string[];
@@ -19,6 +19,11 @@ export type ApplicationRow = {
   id: number;
   job_id: number;
   status: string;
+  submission_status?: string | null;
+  display_status?: string | null;
+  supported_apply_mode?: string | null;
+  requires_manual_action?: boolean;
+  failure_reason?: string | null;
   title: string;
   company: string;
   location: string | null;
@@ -59,8 +64,14 @@ function normalizeApplicationSelectStatus(status: string): (typeof STATUSES)[num
 }
 
 function showPlacementRow(app: ApplicationRow): boolean {
+  const sub = (app.submission_status ?? "").trim().toLowerCase();
   const s = app.status.trim().toLowerCase();
-  return s === "applied" || s === "interview" || s === "hired";
+  return (
+    sub === "external_submit_confirmed" ||
+    s === "applied" ||
+    s === "interview" ||
+    s === "hired"
+  );
 }
 
 export function ApplicationsPanel({
@@ -218,6 +229,18 @@ export function ApplicationsPanel({
                 {app.company}
                 {app.location ? ` · ${app.location}` : ""} · {app.job_board}
               </p>
+              <p className="mt-1 text-xs font-medium text-[var(--twin-accent)]">
+                {t("dashboard.submissionPhaseLabel")}:{" "}
+                {t(
+                  applicationDisplayStatusKey(app.status, {
+                    submission_status: app.submission_status,
+                    display_status: app.display_status,
+                  }),
+                )}
+              </p>
+              {app.failure_reason ? (
+                <p className="twin-muted mt-0.5 text-xs">{app.failure_reason}</p>
+              ) : null}
               {onPlacementDeclare && onPlacementVerifyStart && showPlacementRow(app) ? (
                 <div className="mt-2 max-w-md space-y-2 rounded border border-[var(--twin-accent)]/25 bg-[var(--twin-accent-muted)]/25 p-2 text-xs">
                   <PlacementStateStepper state={app.placement_state ?? "none"} />

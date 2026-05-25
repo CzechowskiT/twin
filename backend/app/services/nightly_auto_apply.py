@@ -20,6 +20,7 @@ from app.database.models import (
     Candidate,
     Job,
     JobMatch,
+    SubmissionStatus,
     User,
 )
 from app.services.auto_apply_guards import enforce_company_cooldown, enforce_job_blocklists
@@ -190,14 +191,20 @@ def process_user_nightly_auto_apply(
         )
         _record_event(db, user_id=user.id, job=job, outcome=outcome.value)
 
-        if outcome in (ApplyOutcome.SUBMITTED, ApplyOutcome.FORM_FILLED) and app is not None:
+        if app is not None and outcome not in (ApplyOutcome.FAILED, ApplyOutcome.UNSUPPORTED):
             app.auto_applied = True
             app.application_method = application_method
             db.add(app)
-            result["applications_submitted"] += 1
-            if board_stats is not None:
-                _bump_board_stat(board_stats, job, "submitted")
-            consent.total_applications_submitted = int(consent.total_applications_submitted or 0) + 1
+            if app.submission_status in (
+                SubmissionStatus.EXTERNAL_SUBMIT_ATTEMPTED,
+                SubmissionStatus.EXTERNAL_SUBMIT_CONFIRMED,
+            ):
+                result["applications_submitted"] += 1
+                if board_stats is not None:
+                    _bump_board_stat(board_stats, job, "submitted")
+                consent.total_applications_submitted = int(consent.total_applications_submitted or 0) + 1
+            elif board_stats is not None and app.submission_status == SubmissionStatus.APPLICATION_PREPARED:
+                _bump_board_stat(board_stats, job, "skipped")
         else:
             result["applications_failed"] += 1
             if board_stats is not None:

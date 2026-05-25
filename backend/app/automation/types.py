@@ -19,4 +19,5 @@ class ApplyResult:
 
     @property
     def success(self) -> bool:
-        return self.outcome in (ApplyOutcome.SUBMITTED, ApplyOutcome.FORM_FILLED)
+        """Automation ran without hard failure — not external submission confirmed."""
+        return self.outcome not in (ApplyOutcome.FAILED, ApplyOutcome.UNSUPPORTED)

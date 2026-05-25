@@ -4,7 +4,7 @@ import { RemotePercentageLabel } from "@/components/job/RemotePercentageLabel";
 import { SeniorityBadge } from "@/components/job/SeniorityBadge";
 import { TechStackIcons } from "@/components/job/TechStackIcons";
 import { useTranslation } from "@/components/language-provider";
-import { applicationStatusKey } from "@/lib/application-status";
+import { applicationDisplayStatusKey } from "@/lib/application-status";
 
 export type JobRow = {
   id?: number;
@@ -78,8 +78,9 @@ export function JobList({
         const key = jobId || item.url;
         const salary = formatSalary(item.salary_min, item.salary_max);
         const status = applicationStatus?.[jobId];
+        const confirmed = status === "external_submit_confirmed";
         const showActionRow =
-          hasActions && jobId > 0 && status !== "applied" && status !== "rejected";
+          hasActions && jobId > 0 && !confirmed && status !== "rejected";
 
         return (
           <li key={key} className="twin-job-row flex flex-col gap-2">
@@ -97,7 +98,7 @@ export function JobList({
                 )}
                 {status && (
                   <span className="shrink-0 rounded bg-[var(--twin-accent-muted)] px-2 py-0.5 text-xs font-medium text-[var(--twin-accent)]">
-                    {t(applicationStatusKey(status))}
+                    {t(applicationDisplayStatusKey(status, { display_status: status }))}
                   </span>
                 )}
                 <span className="twin-job-title min-w-0 flex-1">{item.title}</span>

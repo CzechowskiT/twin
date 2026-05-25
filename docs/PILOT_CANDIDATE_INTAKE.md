@@ -77,7 +77,7 @@
 
 1. Kandydat: `/dashboard` — matche; `/dashboard/acceptance` — **akceptuj/odrzuć** matche i trzymaj rozmowy
 2. Apply: ręcznie z dashboardu **lub** auto-apply po explicit consent + progu score
-3. Founder: co 2 dni — status aplikacji (`applications.status`, `applied_at`, `auto_applied`)
+3. Founder: co 2 dni — status aplikacji (`submission_status`, `display_status`, `auto_applied`; patrz [APPLICATION_STATUS_TRUTH_TABLE.md](./APPLICATION_STATUS_TRUTH_TABLE.md) — nie liczyć „Wysłana” bez `external_submit_confirmed`)
 4. Rozmowy: `scheduled_interviews` / kalendarz Google; kandydat potwierdza slot w `/dashboard/acceptance`
 5. Tydzień: wpisz wiersz w [PILOT_TRACTION_DASHBOARD.md](./PILOT_TRACTION_DASHBOARD.md)
 

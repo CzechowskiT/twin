@@ -30,6 +30,32 @@ class ApplicationStatus(str, PyEnum):
     HIRED = "hired"
 
 
+class SubmissionStatus(str, PyEnum):
+    APPLICATION_CREATED_IN_TWIN = "application_created_in_twin"
+    APPLICATION_PREPARED = "application_prepared"
+    EXTERNAL_SUBMIT_ATTEMPTED = "external_submit_attempted"
+    EXTERNAL_SUBMIT_CONFIRMED = "external_submit_confirmed"
+    EXTERNAL_SUBMIT_FAILED = "external_submit_failed"
+    MANUAL_ACTION_REQUIRED = "manual_action_required"
+
+
+class SupportedApplyMode(str, PyEnum):
+    VERIFIED_AUTO_APPLY = "verified_auto_apply"
+    ASSISTED_APPLY = "assisted_apply"
+    MANUAL_ONLY = "manual_only"
+    UNSUPPORTED = "unsupported"
+
+
+class ConfirmationType(str, PyEnum):
+    CONFIRMATION_PAGE = "confirmation_page"
+    CONFIRMATION_EMAIL = "confirmation_email"
+    ATS_APPLICATION_ID = "ats_application_id"
+    SCREENSHOT = "screenshot"
+    MANUAL_USER_CONFIRMATION = "manual_user_confirmation"
+    API_RESPONSE = "api_response"
+    NONE = "none"
+
+
 class ViralClaimStatus(str, PyEnum):
     DRAFT = "draft"
     SUBMITTED = "submitted"
@@ -517,6 +543,30 @@ class Application(Base):
     auto_apply_package_uploaded_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     auto_applied: Mapped[bool] = mapped_column(Boolean, default=False)
     application_method: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    # Honest external submission tracking (see docs/APPLICATION_STATUS_TRUTH_TABLE.md)
+    submission_status: Mapped[SubmissionStatus | None] = mapped_column(
+        Enum(SubmissionStatus, values_callable=lambda x: [e.value for e in x]),
+        nullable=True,
+        index=True,
+    )
+    supported_apply_mode: Mapped[SupportedApplyMode | None] = mapped_column(
+        Enum(SupportedApplyMode, values_callable=lambda x: [e.value for e in x]),
+        nullable=True,
+    )
+    submit_attempted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    submitted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    confirmation_type: Mapped[ConfirmationType | None] = mapped_column(
+        Enum(ConfirmationType, values_callable=lambda x: [e.value for e in x]),
+        nullable=True,
+    )
+    confirmation_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    confirmation_url: Mapped[str | None] = mapped_column(String(2000), nullable=True)
+    confirmation_screenshot_path: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    confirmation_email_detected: Mapped[bool] = mapped_column(Boolean, default=False)
+    external_application_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    failure_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    requires_manual_action: Mapped[bool] = mapped_column(Boolean, default=False)
+    submit_attempt_logs: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     candidate: Mapped["Candidate"] = relationship(back_populates="applications")
     job: Mapped["Job"] = relationship(back_populates="applications")

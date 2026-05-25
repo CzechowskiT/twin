@@ -14,7 +14,8 @@ from sqlalchemy.orm import Session
 from app.config import get_settings
 from app.core.deps import get_current_user, require_scrape_user
 from app.core.plans import count_tracked_applications, effective_plan_tier, max_tracked_applications
-from app.database.models import Application, ApplicationStatus, Candidate, Job, SavedJob, User
+from app.database.models import Application, ApplicationStatus, Candidate, Job, SavedJob, SubmissionStatus, User
+from app.services.application_submission import record_submission_one_click
 from app.database.session import get_db
 from app.matching.matcher import calculate_match_score
 from app.schemas.company_intelligence import CompanyIntelBodyOut, CompanyIntelOut, InsiderLanguageOut
@@ -264,7 +265,10 @@ def get_job_apply_stats(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
     total = (
         db.query(func.count(Application.id))
-        .filter(Application.job_id == job_id, Application.status == ApplicationStatus.APPLIED)
+        .filter(
+            Application.job_id == job_id,
+            Application.submission_status == SubmissionStatus.EXTERNAL_SUBMIT_CONFIRMED,
+        )
         .scalar()
         or 0
     )
@@ -273,8 +277,8 @@ def get_job_apply_stats(
         db.query(func.count(Application.id))
         .filter(
             Application.job_id == job_id,
-            Application.status == ApplicationStatus.APPLIED,
-            Application.applied_at >= week_ago,
+            Application.submission_status == SubmissionStatus.EXTERNAL_SUBMIT_CONFIRMED,
+            Application.submitted_at >= week_ago,
         )
         .scalar()
         or 0
@@ -324,14 +328,19 @@ def one_click_apply(
     app = Application(
         candidate_id=candidate.id,
         job_id=job_id,
-        status=ApplicationStatus.APPLIED,
+        status=ApplicationStatus.PENDING,
         notes="One-click apply via TWIN profile",
-        applied_at=datetime.utcnow(),
+        applied_at=None,
     )
     db.add(app)
+    record_submission_one_click(app, job=job)
     db.commit()
     db.refresh(app)
-    msg = "Application tracked — open the job link when ready." if locale.startswith("en") else "Aplikacja zapisana — otwórz link oferty, gdy będziesz gotowy."
+    msg = (
+        "Application prepared in TWIN — open the job link to submit on the employer site."
+        if locale.startswith("en")
+        else "Aplikacja przygotowana w TWIN — otwórz link oferty, aby wysłać u pracodawcy."
+    )
     return OneClickApplyOut(application_id=app.id, status=app.status.value, message=msg)
 
 
