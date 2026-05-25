@@ -2471,6 +2471,8 @@ const en = {
     pageLead:
       "Nine beats of the TWIN candidate journey — ranking, coverage, feedback, honest statuses, and interview holds. Everything on this page is synthetic and labeled; it does not submit applications or pretend live portal volume.",
     syntheticBadge: "DEMO · SAMPLE DATA",
+    heroSampleNote:
+      "This is a sample demo flow — your live recommendations are in the dashboard.",
     modeGuestTitle: "Guest walkthrough",
     modeGuestBody:
       "Explore the full story without signing in. Create an account or join the founding wishlist when you want your own profile, matches, and calendar.",
@@ -5161,6 +5163,8 @@ const pl: MessageTree = {
     pageLead:
       "Dziewięć etapów ścieżki kandydata w TWIN — ranking, zasięg źródeł, feedback, uczciwe statusy i bloki rozmów. Wszystko na tej stronie jest syntetyczne i oznaczone; nie wysyła aplikacji ani nie udaje „50 żywych portali”.",
     syntheticBadge: "DEMO · DANE PRZYKŁADOWE",
+    heroSampleNote:
+      "To przykładowy scenariusz demo — Twoje live rekomendacje są w panelu.",
     modeGuestTitle: "Przewodnik bez logowania",
     modeGuestBody:
       "Obejrzyj całą historię bez konta. Załóż konto lub dołącz do wishlisty founding, gdy chcesz własny profil, dopasowania i kalendarz.",

@@ -190,11 +190,12 @@ export function DemoProductWalkthrough() {
             <LandingAmbient />
             <div className="demo-hero__grid pointer-events-none absolute inset-0" aria-hidden />
             <div className="relative space-y-5">
-              <div className="flex flex-wrap items-center gap-3">
+              <div className="flex w-full max-w-4xl flex-col items-start gap-2.5 sm:gap-3">
                 <p className="demo-hero__eyebrow text-[10px] font-semibold uppercase tracking-[0.32em] text-[var(--twin-accent)]">
                   {t("demo.pageEyebrow")}
                 </p>
-                <DemoSampleBadge />
+                <DemoSampleBadge variant="hero" />
+                <p className="demo-sample-note">{t("demo.heroSampleNote")}</p>
               </div>
               <h1 className="marketing-gradient-heading max-w-4xl text-2xl font-semibold leading-tight tracking-[-0.03em] sm:text-3xl md:text-4xl lg:text-[2.65rem]">
                 {t("demo.pageTitle")}
