@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 
-import { DemoAutoApplyPage } from "@/components/marketing/demo-auto-apply-page";
+import { DemoProductWalkthrough } from "@/components/marketing/demo-product-walkthrough";
 
 export const metadata: Metadata = {
-  title: "Demo — auto-apply story — TWIN",
+  title: "Demo — product walkthrough — TWIN",
   description:
-    "Interactive walkthrough: synthetic CV and match score. Logged-out users see a timed simulation; signed-in users can run real auto-apply on the seeded investor-demo job.",
+    "Investor and product demo: CV to ranked pipeline, market coverage, top 20 matches, honest application statuses, and calendar north star. Synthetic data — no live submissions on this page.",
 };
 
 export default function DemoPage() {
-  return <DemoAutoApplyPage />;
+  return <DemoProductWalkthrough />;
 }
