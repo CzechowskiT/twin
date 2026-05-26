@@ -24,7 +24,6 @@ import {
   type MatchFeedbackValue,
 } from "@/lib/matching-quality";
 import { SHOW_SCRAPE_UI } from "@/lib/features";
-import type { JobEmployerTabId } from "@/lib/job-employer-demo";
 import { JOB_FEED_PAGE_MAX } from "@/lib/jobs";
 
 import { ApplicationsSection } from "@/components/dashboard/applications-section";
@@ -40,6 +39,7 @@ import { useDashboardApplicationActions } from "@/hooks/dashboard/use-dashboard-
 import { useDashboardCalendarActions } from "@/hooks/dashboard/use-dashboard-calendar-actions";
 import { useDashboardData } from "@/hooks/dashboard/use-dashboard-data";
 import { useDashboardExports } from "@/hooks/dashboard/use-dashboard-exports";
+import { useDashboardModals } from "@/hooks/dashboard/use-dashboard-modals";
 import { useDashboardPolling } from "@/hooks/dashboard/use-dashboard-polling";
 import { useRouter } from "next/navigation";
 
@@ -135,26 +135,10 @@ export default function DashboardPage() {
     refreshDashboardWebcalLink,
   } = calendarActions;
 
+  const modals = useDashboardModals();
+
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [autoApplyingId, setAutoApplyingId] = useState<number | null>(null);
-  const [intelJob, setIntelJob] = useState<{
-    id: number;
-    title: string;
-    company: string;
-    location: string | null;
-  } | null>(null);
-  const [insightsJob, setInsightsJob] = useState<{ id: number; title: string } | null>(null);
-  const [employerHubJob, setEmployerHubJob] = useState<{
-    id: number;
-    title: string;
-    company: string;
-    location: string | null;
-    url?: string;
-    initialTab?: JobEmployerTabId;
-  } | null>(null);
-  const [cvApp, setCvApp] = useState<{ id: number; title: string } | null>(null);
-  const [negotiateApp, setNegotiateApp] = useState<{ id: number; title: string } | null>(null);
-  const [linkedinOpen, setLinkedinOpen] = useState(false);
   const [jobsLoadMoreBusy, setJobsLoadMoreBusy] = useState(false);
 
   async function loadMoreJobs() {
@@ -471,7 +455,7 @@ export default function DashboardPage() {
             jobsTotal: jobs?.total ?? 0,
           })
         }
-        onOpenLinkedinOptimizer={() => setLinkedinOpen(true)}
+        onOpenLinkedinOptimizer={modals.openLinkedin}
       />
 
       {hasProfile && (matchesInitialSkeleton || matches !== null) ? (
@@ -493,11 +477,9 @@ export default function DashboardPage() {
           onAutoApply={autoApplyToJob}
           onSave={saveJob}
           onDismiss={dismissJob}
-          onResearch={(id, title, company, location) =>
-            setIntelJob({ id, title, company, location: location ?? null })
-          }
-          onHiringInsights={(id, title) => setInsightsJob({ id, title })}
-          onViewEmployer={(job) => setEmployerHubJob(job)}
+          onResearch={modals.openIntel}
+          onHiringInsights={modals.openInsights}
+          onViewEmployer={modals.openEmployerHub}
           onDownloadCsv={() => void exports.downloadMatchesCsv()}
           onDownloadXlsx={() => void exports.downloadMatchesXlsx()}
           onApplyPromptDismiss={() => polling.setShowApplyPrompt(false)}
@@ -534,8 +516,8 @@ export default function DashboardPage() {
           onPlacementDispute={filePlacementDispute}
           onPlacementEventsLoad={loadPlacementEvents}
           onOpenAutoApplyPackage={openAutoApplyPackagePdf}
-          onOptimizeCv={(id, title) => setCvApp({ id, title })}
-          onNegotiateSalary={(id, title) => setNegotiateApp({ id, title })}
+          onOptimizeCv={modals.openCv}
+          onNegotiateSalary={modals.openNegotiate}
         />
       ) : null}
 
@@ -567,11 +549,9 @@ export default function DashboardPage() {
         onAutoApply={autoApplyToJob}
         onSave={saveJob}
         onDismiss={dismissJob}
-        onResearch={(id, title, company, location) =>
-          setIntelJob({ id, title, company, location: location ?? null })
-        }
-        onHiringInsights={(id, title) => setInsightsJob({ id, title })}
-        onViewEmployer={(job) => setEmployerHubJob(job)}
+        onResearch={modals.openIntel}
+        onHiringInsights={modals.openInsights}
+        onViewEmployer={modals.openEmployerHub}
       />
 
       <footer className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-[var(--twin-border)] pt-5 text-sm text-[var(--twin-muted-strong)]">
@@ -588,18 +568,18 @@ export default function DashboardPage() {
       <DashboardTutorial onOpenFeedback={() => setFeedbackOpen(true)} />
       <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
       <DashboardModals
-        intelJob={intelJob}
-        onCloseIntel={() => setIntelJob(null)}
-        insightsJob={insightsJob}
-        onCloseInsights={() => setInsightsJob(null)}
-        employerHubJob={employerHubJob}
-        onCloseEmployerHub={() => setEmployerHubJob(null)}
-        cvApp={cvApp}
-        onCloseCv={() => setCvApp(null)}
-        negotiateApp={negotiateApp}
-        onCloseNegotiate={() => setNegotiateApp(null)}
-        linkedinOpen={linkedinOpen}
-        onCloseLinkedin={() => setLinkedinOpen(false)}
+        intelJob={modals.intelJob}
+        onCloseIntel={modals.closeIntel}
+        insightsJob={modals.insightsJob}
+        onCloseInsights={modals.closeInsights}
+        employerHubJob={modals.employerHubJob}
+        onCloseEmployerHub={modals.closeEmployerHub}
+        cvApp={modals.cvApp}
+        onCloseCv={modals.closeCv}
+        negotiateApp={modals.negotiateApp}
+        onCloseNegotiate={modals.closeNegotiate}
+        linkedinOpen={modals.linkedinOpen}
+        onCloseLinkedin={modals.closeLinkedin}
         linkedinDefaultRole={profile?.preferred_job_titles?.[0] ?? ""}
       />
       <HelpWidget />
