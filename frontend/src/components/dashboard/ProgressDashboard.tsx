@@ -29,7 +29,9 @@ export function ProgressDashboard() {
   }, []);
 
   useEffect(() => {
-    void load();
+    queueMicrotask(() => {
+      void load();
+    });
   }, [load]);
 
   if (!data) return null;

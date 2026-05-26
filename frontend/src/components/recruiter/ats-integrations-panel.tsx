@@ -60,14 +60,18 @@ export function AtsIntegrationsPanel() {
   }, [t]);
 
   useEffect(() => {
-    void load();
+    queueMicrotask(() => {
+      void load();
+    });
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
     const oauth = params.get("oauth");
     if (oauth === "connected") {
       toast.success(t("atsIntegrations.oauthConnected"));
       window.history.replaceState({}, "", window.location.pathname);
-      void load();
+      queueMicrotask(() => {
+        void load();
+      });
     } else if (oauth === "denied" || oauth === "error") {
       toast.error(t("atsIntegrations.oauthFailed"));
       window.history.replaceState({}, "", window.location.pathname);
@@ -85,7 +89,7 @@ export function AtsIntegrationsPanel() {
         token,
       );
       if (res.authorize_url) {
-        window.location.href = res.authorize_url;
+        globalThis.location.assign(res.authorize_url);
         return;
       }
       toast(res.message, { icon: "ℹ️" });

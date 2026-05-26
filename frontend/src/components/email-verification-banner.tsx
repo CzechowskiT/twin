@@ -27,7 +27,9 @@ export function EmailVerificationBanner() {
   }, []);
 
   useEffect(() => {
-    void load();
+    queueMicrotask(() => {
+      void load();
+    });
   }, [load]);
 
   async function resend() {

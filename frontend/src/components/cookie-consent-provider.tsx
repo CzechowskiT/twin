@@ -36,7 +36,7 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
   const [consent, setConsent] = useState<CookieConsentRecord | null>(null);
 
   useEffect(() => {
-    setConsent(getCookieConsent());
+    queueMicrotask(() => setConsent(getCookieConsent()));
     const onConsent = (e: Event) => {
       const detail = (e as CustomEvent<CookieConsentRecord>).detail;
       const next = detail ?? getCookieConsent();

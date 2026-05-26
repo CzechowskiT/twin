@@ -69,9 +69,9 @@ export function InvestorDataRoomPanel() {
 
   useEffect(() => {
     try {
-      setNdaAccepted(sessionStorage.getItem(NDA_STORAGE_KEY) === "1");
+      queueMicrotask(() => setNdaAccepted(sessionStorage.getItem(NDA_STORAGE_KEY) === "1"));
     } catch {
-      setNdaAccepted(false);
+      queueMicrotask(() => setNdaAccepted(false));
     }
   }, []);
 

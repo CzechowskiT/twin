@@ -35,7 +35,7 @@ function useTypingHeadline(text: string) {
   const [shown, setShown] = useState("");
   useEffect(() => {
     let i = 0;
-    setShown("");
+    queueMicrotask(() => setShown(""));
     const id = window.setInterval(() => {
       i += 1;
       setShown(text.slice(0, i));

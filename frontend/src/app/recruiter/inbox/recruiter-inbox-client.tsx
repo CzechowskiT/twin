@@ -81,9 +81,11 @@ export default function RecruiterInboxClient() {
     const fromUrl = parseRecruiterInviteSearchParams(searchParams);
     const session = readRecruiterInboxSession();
     const demoEnv = readRecruiterInboxDemoEnv();
-    setToken(fromUrl.token || session.token || demoEnv.token || "");
-    setCompanyRaw(fromUrl.companySlug || session.companySlug || demoEnv.companySlug || "");
-    setHydrated(true);
+    queueMicrotask(() => {
+      setToken(fromUrl.token || session.token || demoEnv.token || "");
+      setCompanyRaw(fromUrl.companySlug || session.companySlug || demoEnv.companySlug || "");
+      setHydrated(true);
+    });
   }, [searchParams]);
 
   useEffect(() => {
@@ -140,7 +142,9 @@ export default function RecruiterInboxClient() {
     const slug = companySlug;
     if (!tkn || !slug) return;
     autoLoadDone.current = true;
-    void load();
+    queueMicrotask(() => {
+      void load();
+    });
   }, [hydrated, token, companySlug, load]);
 
   const filteredRows = useMemo(() => {

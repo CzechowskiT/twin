@@ -94,8 +94,10 @@ export function CvOptimizerModal({
 
   useEffect(() => {
     if (open && applicationId) {
-      setData(null);
-      void load();
+      queueMicrotask(() => {
+        setData(null);
+        void load();
+      });
     }
   }, [open, applicationId, load]);
 
@@ -175,8 +177,10 @@ export function HiringInsightsModal({
 
   useEffect(() => {
     if (!open || !jobId || !getToken()) return;
-    setLoading(true);
-    setInsights(null);
+    queueMicrotask(() => {
+      setLoading(true);
+      setInsights(null);
+    });
     void apiFetch<{
       insights: {
         top_traits: string[];
@@ -246,7 +250,7 @@ export function SalaryNegotiateModal({
 
   useEffect(() => {
     if (!open || !applicationId || !getToken()) return;
-    setLoading(true);
+    queueMicrotask(() => setLoading(true));
     void apiFetch<{ negotiation: typeof data }>(
       `/api/v1/career-assistant/applications/${applicationId}/salary-negotiation`,
       { method: "POST", body: "{}" },
@@ -329,7 +333,7 @@ export function InterviewPrepModal({
 
   useEffect(() => {
     if (!open || !interviewId || !getToken()) return;
-    setLoading(true);
+    queueMicrotask(() => setLoading(true));
     void apiFetch<{ prep: typeof prep }>("/api/v1/career-assistant/interview-prep", {
       method: "POST",
       body: JSON.stringify({ scheduled_interview_id: interviewId }),
@@ -474,7 +478,7 @@ export function LinkedinOptimizerModal({
   } | null>(null);
 
   useEffect(() => {
-    if (open) setRole(defaultRole);
+    if (open) queueMicrotask(() => setRole(defaultRole));
   }, [open, defaultRole]);
 
   const run = () => {

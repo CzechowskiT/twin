@@ -58,7 +58,9 @@ export default function AcceptanceQueuePage() {
   }, [router]);
 
   useEffect(() => {
-    void load();
+    queueMicrotask(() => {
+      void load();
+    });
   }, [load]);
 
   async function respond(kind: string, id: number, action: "accept" | "decline") {

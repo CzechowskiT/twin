@@ -334,7 +334,9 @@ export default function DashboardCalendarPage() {
 
   useEffect(() => {
     if (loading || !isCalendarConnected) return;
-    void fetchCalendarWeekEvents();
+    queueMicrotask(() => {
+      void fetchCalendarWeekEvents();
+    });
   }, [loading, isCalendarConnected, fetchCalendarWeekEvents]);
 
   useEffect(() => {
@@ -432,7 +434,7 @@ export default function DashboardCalendarPage() {
 
   useEffect(() => {
     const stored = readStoredWebcalUrl();
-    if (stored) setWebcalUrl(stored);
+    if (stored) queueMicrotask(() => setWebcalUrl(stored));
   }, []);
 
   async function subscribeWebcalOneClick() {

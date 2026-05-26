@@ -91,10 +91,12 @@ export default function CareerCompassPage() {
       router.replace("/login");
       return;
     }
-    setLoading(true);
-    load()
-      .catch((e) => setError(e instanceof Error ? e.message : "Error"))
-      .finally(() => setLoading(false));
+    queueMicrotask(() => {
+      setLoading(true);
+      void load()
+        .catch((e) => setError(e instanceof Error ? e.message : "Error"))
+        .finally(() => setLoading(false));
+    });
   }, [router, load]);
 
   async function onSubmit(e: FormEvent) {

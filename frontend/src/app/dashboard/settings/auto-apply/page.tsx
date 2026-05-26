@@ -58,7 +58,9 @@ export default function NightlyAutoApplySettingsPage() {
   }, [t]);
 
   useEffect(() => {
-    void load();
+    queueMicrotask(() => {
+      void load();
+    });
   }, [load]);
 
   async function enableWithConsent() {

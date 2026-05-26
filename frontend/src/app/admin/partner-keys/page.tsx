@@ -21,7 +21,7 @@ export default function AdminPartnerKeysPage() {
   useEffect(() => {
     try {
       const s = sessionStorage.getItem(STORAGE_KEY);
-      if (s) setToken(s);
+      if (s) queueMicrotask(() => setToken(s));
     } catch {
       /* ignore */
     }

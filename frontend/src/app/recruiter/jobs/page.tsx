@@ -46,8 +46,10 @@ export default function RecruiterJobsPage() {
 
   useEffect(() => {
     const session = readRecruiterInboxSession();
-    setToken(session.token);
-    setCompanyRaw(session.companySlug);
+    queueMicrotask(() => {
+      setToken(session.token);
+      setCompanyRaw(session.companySlug);
+    });
   }, []);
 
   const load = useCallback(async () => {
@@ -62,7 +64,9 @@ export default function RecruiterJobsPage() {
   }, [token, companySlug]);
 
   useEffect(() => {
-    void load();
+    queueMicrotask(() => {
+      void load();
+    });
   }, [load]);
 
   async function publish(e: React.FormEvent) {

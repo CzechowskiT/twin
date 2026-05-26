@@ -127,33 +127,39 @@ export function ApplicationsPanel({
   const [packagePdfBusyId, setPackagePdfBusyId] = useState<number | null>(null);
 
   useEffect(() => {
-    setDraftById((prev) => {
-      const next = { ...prev };
-      for (const app of items) {
-        const fromApi = app.recruiter_feedback_raw ?? "";
-        if (next[app.id] === undefined) next[app.id] = fromApi;
-      }
-      return next;
+    queueMicrotask(() => {
+      setDraftById((prev) => {
+        const next = { ...prev };
+        for (const app of items) {
+          const fromApi = app.recruiter_feedback_raw ?? "";
+          if (next[app.id] === undefined) next[app.id] = fromApi;
+        }
+        return next;
+      });
     });
   }, [items]);
 
   useEffect(() => {
-    setDeclareNoteById((prev) => {
-      const next = { ...prev };
-      for (const app of items) {
-        const note = app.placement_declaration_note ?? "";
-        if (next[app.id] === undefined && note) next[app.id] = note;
-      }
-      return next;
+    queueMicrotask(() => {
+      setDeclareNoteById((prev) => {
+        const next = { ...prev };
+        for (const app of items) {
+          const note = app.placement_declaration_note ?? "";
+          if (next[app.id] === undefined && note) next[app.id] = note;
+        }
+        return next;
+      });
     });
   }, [items]);
 
   useEffect(() => {
     if (placementEventsInvalidateKey === undefined) return;
-    setPlacementEventsByAppId({});
-    setPlacementEventsErrById({});
-    setPlacementEventsLoadingId(null);
-    setPlacementHistoryOpenId(null);
+    queueMicrotask(() => {
+      setPlacementEventsByAppId({});
+      setPlacementEventsErrById({});
+      setPlacementEventsLoadingId(null);
+      setPlacementHistoryOpenId(null);
+    });
   }, [placementEventsInvalidateKey]);
 
   function draftFor(app: ApplicationRow): string {

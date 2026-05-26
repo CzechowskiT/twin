@@ -31,7 +31,7 @@ export function JobEmployerModal({
   const [activeTab, setActiveTab] = useState<JobEmployerTabId>(initialTab);
 
   useEffect(() => {
-    if (open) setActiveTab(initialTab);
+    if (open) queueMicrotask(() => setActiveTab(initialTab));
   }, [open, initialTab]);
 
   if (!open || !jobId) return null;

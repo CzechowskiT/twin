@@ -265,9 +265,11 @@ export default function BillingPage() {
 
   useEffect(() => {
     if (!me) return;
-    setBillingCompany((me.billing_company_name ?? "").trim());
-    setBillingTaxId((me.billing_tax_id ?? "").trim());
-    setBillingSaveOk(false);
+    queueMicrotask(() => {
+      setBillingCompany((me.billing_company_name ?? "").trim());
+      setBillingTaxId((me.billing_tax_id ?? "").trim());
+      setBillingSaveOk(false);
+    });
   }, [me]);
 
   async function startCheckout(plan: CheckoutPlanId) {
@@ -282,7 +284,7 @@ export default function BillingPage() {
         { method: "POST", body: JSON.stringify({ plan }) },
         token,
       );
-      window.location.href = res.url;
+      globalThis.location.assign(res.url);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       const lc = msg.toLowerCase();
@@ -306,7 +308,7 @@ export default function BillingPage() {
     setActionError(false);
     try {
       const res = await apiFetch<UrlPayload>("/api/v1/billing/portal-session", { method: "POST" }, token);
-      window.location.href = res.url;
+      globalThis.location.assign(res.url);
     } catch (e) {
       setActionError(true);
       console.warn("[billing] portal-session failed", e);

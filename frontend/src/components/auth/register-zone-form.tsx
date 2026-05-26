@@ -17,7 +17,7 @@ import type { TranslationKey } from "@/lib/i18n";
 import { hasConfiguredOAuthProvider } from "@/lib/oauth-auth";
 import { useOAuthProviderStatus } from "@/lib/use-oauth-provider-status";
 import type { LoginZone } from "@/lib/persona-auth";
-import { LOGIN_PATH, postRegisterPath, REGISTER_PATH } from "@/lib/persona-auth";
+import { LOGIN_PATH, postRegisterPath } from "@/lib/persona-auth";
 
 type RegisterSuccessResponse = { access_token: string };
 
@@ -59,7 +59,7 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
     let cancelled = false;
     const token = getToken();
     if (!token) {
-      setSessionPhase("anon");
+      queueMicrotask(() => setSessionPhase("anon"));
       return;
     }
     void (async () => {
@@ -93,7 +93,7 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
     const err = searchParams.get("error");
     if (err === "apple_not_configured" || err === "github_not_configured") return null;
     return oauthUrlError;
-  }, [error, oauthStatus, oauthStatusLoaded, oauthUrlError, searchParams]);
+  }, [error, oauthStatusLoaded, oauthUrlError, searchParams]);
 
   useEffect(() => {
     if (!oauthStatusLoaded) return;

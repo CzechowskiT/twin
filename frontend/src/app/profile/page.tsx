@@ -192,7 +192,8 @@ export default function ProfilePage() {
       router.replace("/login");
       return;
     }
-    Promise.all([
+    queueMicrotask(() => {
+      void Promise.all([
       apiFetch<Profile>("/api/v1/candidates/me", {}, token).catch(() => null),
       apiFetch<UserPrefs>("/api/v1/auth/me", {}, token).catch(() => null),
       loadDocumentsList(token),
@@ -208,6 +209,7 @@ export default function ProfilePage() {
         }
       })
       .finally(() => setLoading(false));
+    });
   }, [router]);
 
   async function reloadProfile() {

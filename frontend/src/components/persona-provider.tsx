@@ -68,9 +68,11 @@ export function PersonaProvider({ children }: { children: ReactNode }) {
 
   useLayoutEffect(() => {
     const hasSession = Boolean(getToken());
-    setSessionLocked(hasSession);
-    const resolved = resolvePersona(pathname, hasSession);
-    setPersonaState((current) => (current === resolved ? current : resolved));
+    queueMicrotask(() => {
+      setSessionLocked(hasSession);
+      const resolved = resolvePersona(pathname, hasSession);
+      setPersonaState((current) => (current === resolved ? current : resolved));
+    });
   }, [pathname]);
 
   useEffect(() => {

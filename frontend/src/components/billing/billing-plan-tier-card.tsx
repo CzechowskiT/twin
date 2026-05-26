@@ -14,15 +14,6 @@ export type BillingPlanRow = {
   annual_list_price_usd?: number;
 };
 
-function formatUsdListMonthly(n: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: n % 1 === 0 ? 0 : 2,
-    maximumFractionDigits: 2,
-  }).format(n);
-}
-
 type BillingPlanTierCardProps = {
   plan: BillingPlanRow;
   locale: Locale;

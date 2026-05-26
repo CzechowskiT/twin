@@ -166,7 +166,7 @@ export function DemoProductWalkthrough() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    setIsLoggedIn(Boolean(getToken()));
+    queueMicrotask(() => setIsLoggedIn(Boolean(getToken())));
   }, []);
 
   const onDemoFeedback = useCallback(

@@ -52,7 +52,9 @@ export function ReferralCashOutForm() {
   }, [t]);
 
   useEffect(() => {
-    void load();
+    queueMicrotask(() => {
+      void load();
+    });
   }, [load]);
 
   const submit = async () => {

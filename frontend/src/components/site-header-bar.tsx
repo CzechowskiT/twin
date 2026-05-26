@@ -64,7 +64,7 @@ export function SiteHeaderBar({ showPersonaBadge }: SiteHeaderBarProps) {
   }, [pathname]);
 
   useEffect(() => {
-    const syncHash = () => setLocationHash(window.location.hash);
+    const syncHash = () => queueMicrotask(() => setLocationHash(window.location.hash));
     syncHash();
     window.addEventListener("hashchange", syncHash);
     return () => window.removeEventListener("hashchange", syncHash);
@@ -73,7 +73,7 @@ export function SiteHeaderBar({ showPersonaBadge }: SiteHeaderBarProps) {
   useEffect(() => {
     const token = getToken();
     if (!token || !hasSession) {
-      setUserEmail(null);
+      queueMicrotask(() => setUserEmail(null));
       return;
     }
     let cancelled = false;

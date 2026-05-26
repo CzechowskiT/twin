@@ -15,9 +15,9 @@ export function DashboardTutorial({ onOpenFeedback }: { onOpenFeedback?: () => v
 
   useEffect(() => {
     try {
-      if (!localStorage.getItem(STORAGE_KEY)) setVisible(true);
+      if (!localStorage.getItem(STORAGE_KEY)) queueMicrotask(() => setVisible(true));
     } catch {
-      setVisible(true);
+      queueMicrotask(() => setVisible(true));
     }
   }, []);
 

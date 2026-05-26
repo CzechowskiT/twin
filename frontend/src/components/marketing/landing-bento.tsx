@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
 import { BentoSpotlight } from "@/components/marketing/bento-spotlight";
 import { PipelinePreview } from "@/components/marketing/pipeline-preview";
 import { ScrollReveal } from "@/components/marketing/scroll-reveal";

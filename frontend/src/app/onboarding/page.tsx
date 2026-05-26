@@ -33,7 +33,7 @@ export default function OnboardingPage() {
 
   useEffect(() => {
     if (!getToken()) router.replace("/login/candidate");
-    else setStep(readStoredStep());
+    else queueMicrotask(() => setStep(readStoredStep()));
   }, [router]);
 
   useEffect(() => {

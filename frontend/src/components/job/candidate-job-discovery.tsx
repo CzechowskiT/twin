@@ -53,7 +53,7 @@ export function CandidateJobDiscovery() {
   useEffect(() => {
     const token = getToken();
     if (!token) {
-      setLoading(false);
+      queueMicrotask(() => setLoading(false));
       return;
     }
     void (async () => {

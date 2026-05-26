@@ -66,7 +66,9 @@ export function OpportunityForecast() {
   }, []);
 
   useEffect(() => {
-    void load();
+    queueMicrotask(() => {
+      void load();
+    });
   }, [load]);
 
   const needsConsent =

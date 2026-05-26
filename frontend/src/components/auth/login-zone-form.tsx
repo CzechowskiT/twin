@@ -14,7 +14,7 @@ import { setToken } from "@/lib/auth";
 import { setSessionPersona } from "@/lib/session-persona";
 import type { TranslationKey } from "@/lib/i18n";
 import type { LoginZone } from "@/lib/persona-auth";
-import { LOGIN_PATH, postLoginPath, REGISTER_PATH } from "@/lib/persona-auth";
+import { postLoginPath, REGISTER_PATH } from "@/lib/persona-auth";
 import { hasConfiguredOAuthProvider } from "@/lib/oauth-auth";
 import { useOAuthProviderStatus } from "@/lib/use-oauth-provider-status";
 
@@ -67,7 +67,7 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
     const err = searchParams.get("error");
     if (err === "apple_not_configured" || err === "github_not_configured") return null;
     return oauthUrlError;
-  }, [error, oauthStatus, oauthStatusLoaded, oauthUrlError, searchParams]);
+  }, [error, oauthStatusLoaded, oauthUrlError, searchParams]);
 
   useEffect(() => {
     if (!oauthStatusLoaded) return;

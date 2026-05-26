@@ -61,7 +61,6 @@ import { detectMeetingProvider, meetingProviderLabelKey } from "@/lib/meeting-li
 import {
   buildJobsQuery,
   defaultJobFilters,
-  jobFiltersAreDefault,
   loadStoredJobFilters,
   persistJobFilters,
   type JobFilters,
@@ -418,7 +417,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const stored = readStoredWebcalUrl();
-    if (stored) setDashboardWebcalUrl(stored);
+    if (stored) queueMicrotask(() => setDashboardWebcalUrl(stored));
   }, []);
 
   const refreshDashboardData = useCallback(
@@ -598,7 +597,7 @@ export default function DashboardPage() {
     const token = getToken();
     if (!token) {
       router.replace("/login");
-      setDashboardBootstrapping(false);
+      queueMicrotask(() => setDashboardBootstrapping(false));
       return;
     }
 
@@ -743,7 +742,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const restored = loadStoredJobFilters();
-    if (restored) setFilters(restored);
+    if (restored) queueMicrotask(() => setFilters(restored));
   }, []);
 
   async function applyFilters() {
