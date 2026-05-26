@@ -276,3 +276,19 @@ Opcjonalnie w Railway Postgres (read-only): `SELECT version_num FROM alembic_ver
 **Founder (5 min):** https://twin-sooty.vercel.app/login/candidate → hasło z 1Password → `/dashboard` → jedna oferta Top 20 → **Nietrafione** / Not relevant → F5 → potwierdź brak tej samej roli/firmy/lokalizacji.
 
 **Prod:** FE https://twin-sooty.vercel.app · API https://twin-production-bcd9.up.railway.app · commit `95c906d`.
+
+---
+
+## FULL GO E2E — candidate smoke passed
+
+- **Data:** 2026-05-26
+- **Środowisko:** https://twin-sooty.vercel.app
+- **Health / API / Celery:** OK
+- **Dashboard kandydata:** OK (ręczny smoke founder)
+- **Logowanie kandydata:** OK
+- **Top 20 / feed:** widoczny
+- **Nietrafione (`not_relevant`) + odświeżenie:** OK — oferta i duplikaty **nie wróciły** na listę
+- **Zakres smoke:** auto-apply **nie** kliknięte; zakazane akcje **nie** wykonane (brak scrape, brak live apply, brak migracji, brak prod seed, brak zmian Railway)
+
+**Werdykt:** **FULL GO E2E** — bramka kandydata zamknięta; infra + ścieżka produktowa kandydata na prod potwierdzona ręcznie przez founder (26.05.2026).
+
