@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import toast from "react-hot-toast";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { DashboardCommandCenter } from "@/components/dashboard-command-center";
 import { OpportunityForecast } from "@/components/dashboard/OpportunityForecast";
@@ -16,13 +15,6 @@ import { FeedbackModal } from "@/components/feedback/feedback-modal";
 import { HelpWidget } from "@/components/help/help-widget";
 import { useTranslation } from "@/components/language-provider";
 import { Shell } from "@/components/ui";
-import { apiFetch } from "@/lib/api";
-import { getToken } from "@/lib/auth";
-import {
-  MAIN_RECOMMENDATION_MIN_SCORE,
-  TOP_MATCHES_HIGHLIGHT_COUNT,
-  type MatchFeedbackValue,
-} from "@/lib/matching-quality";
 import { SHOW_SCRAPE_UI } from "@/lib/features";
 
 import { ApplicationsSection } from "@/components/dashboard/applications-section";
@@ -33,13 +25,13 @@ import { DevelopmentFocusSection } from "@/components/dashboard/development-focu
 import { JobsSection } from "@/components/dashboard/jobs-section";
 import { MatchesSection } from "@/components/dashboard/matches-section";
 import { ProfileScrapePanel } from "@/components/dashboard/profile-scrape-panel";
-import { dashboardFetchUserMessage } from "@/components/dashboard/dashboard-helpers";
 import { useDashboardApplicationActions } from "@/hooks/dashboard/use-dashboard-application-actions";
 import { useDashboardCalendarActions } from "@/hooks/dashboard/use-dashboard-calendar-actions";
 import { useDashboardData } from "@/hooks/dashboard/use-dashboard-data";
 import { useDashboardExports } from "@/hooks/dashboard/use-dashboard-exports";
 import { useDashboardJobApplicationActions } from "@/hooks/dashboard/use-dashboard-job-application-actions";
 import { useDashboardJobListActions } from "@/hooks/dashboard/use-dashboard-job-list-actions";
+import { useDashboardMatchFeedback } from "@/hooks/dashboard/use-dashboard-match-feedback";
 import { useDashboardModals } from "@/hooks/dashboard/use-dashboard-modals";
 import { useDashboardPolling } from "@/hooks/dashboard/use-dashboard-polling";
 import { useRouter } from "next/navigation";
@@ -184,50 +176,20 @@ export default function DashboardPage() {
     trackLinkOpenedRef.current = trackLinkOpened;
   }, [trackLinkOpened]);
 
-  const visibleMatches = useMemo(() => {
-    const items = matches?.items ?? [];
-    return items.filter(
-      (job) =>
-        applicationByJobId[job.job_id] !== "rejected" &&
-        (job.score ?? 0) >= MAIN_RECOMMENDATION_MIN_SCORE,
-    );
-  }, [matches?.items, applicationByJobId]);
-
-  const topHighlightMatches = useMemo(
-    () => visibleMatches.slice(0, TOP_MATCHES_HIGHLIGHT_COUNT),
-    [visibleMatches],
-  );
-
-  const moreRecommendationMatches = useMemo(
-    () => visibleMatches.slice(TOP_MATCHES_HIGHLIGHT_COUNT),
-    [visibleMatches],
-  );
-
-  async function submitMatchFeedback(jobId: number, value: MatchFeedbackValue) {
-    const token = getToken();
-    if (!token) return;
-    setMatchFeedbackBusyJobId(jobId);
-    try {
-      await apiFetch(
-        "/api/v1/candidates/me/match-feedback",
-        { method: "POST", body: JSON.stringify({ job_id: jobId, feedback_value: value }) },
-        token,
-      );
-      setMatchFeedbackByJobId((prev) => ({ ...prev, [jobId]: value }));
-      toast.success(t("dashboard.matchFeedbackSaved"));
-      if (value === "not_relevant") {
-        setMatches((prev) =>
-          prev
-            ? { ...prev, items: prev.items.filter((m) => m.job_id !== jobId), total: Math.max(0, prev.total - 1) }
-            : prev,
-        );
-      }
-    } catch (err) {
-      setError(dashboardFetchUserMessage(err, t));
-    } finally {
-      setMatchFeedbackBusyJobId(null);
-    }
-  }
+  const {
+    submitMatchFeedback,
+    visibleMatches,
+    topHighlightMatches,
+    moreRecommendationMatches,
+  } = useDashboardMatchFeedback({
+    t,
+    setError,
+    matches,
+    setMatches,
+    applicationByJobId,
+    setMatchFeedbackByJobId,
+    setMatchFeedbackBusyJobId,
+  });
 
   const developmentFocusHasData = useMemo(() => {
     if (!devFocus) return false;
