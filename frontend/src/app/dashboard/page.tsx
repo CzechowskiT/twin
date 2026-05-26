@@ -3,12 +3,6 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
-import {
-  type ApplicationRow,
-  type FeedbackBusy,
-  type PlacementEventRow,
-  type PlacementFlowBusy,
-} from "@/components/applications-panel";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { DashboardCommandCenter } from "@/components/dashboard-command-center";
 import { OpportunityForecast } from "@/components/dashboard/OpportunityForecast";
@@ -47,6 +41,7 @@ import { JobsSection } from "@/components/dashboard/jobs-section";
 import { MatchesSection } from "@/components/dashboard/matches-section";
 import { ProfileScrapePanel } from "@/components/dashboard/profile-scrape-panel";
 import { dashboardFetchUserMessage } from "@/components/dashboard/dashboard-helpers";
+import { useDashboardApplicationActions } from "@/hooks/dashboard/use-dashboard-application-actions";
 import { useDashboardData } from "@/hooks/dashboard/use-dashboard-data";
 import { useDashboardExports } from "@/hooks/dashboard/use-dashboard-exports";
 import { useDashboardPolling } from "@/hooks/dashboard/use-dashboard-polling";
@@ -105,9 +100,29 @@ export default function DashboardPage() {
     setError,
     setFilters,
   });
-
-  const [feedbackBusy, setFeedbackBusy] = useState<FeedbackBusy>(null);
-  const [placementFlowBusy, setPlacementFlowBusy] = useState<PlacementFlowBusy>(null);
+  const applicationActions = useDashboardApplicationActions({
+    t,
+    setError,
+    loadApplications,
+    loadDevelopmentFocus,
+    syncApplicationsFromApi,
+    setDevFocus,
+    bumpPlacementEventsInvalidateKey,
+  });
+  const {
+    feedbackBusy,
+    placementFlowBusy,
+    updateApplicationStatus,
+    removeApplication,
+    saveApplicationFeedback,
+    parseApplicationFeedback,
+    openAutoApplyPackagePdf,
+    declarePlacement,
+    issuePlacementEmployerAttest,
+    filePlacementDispute,
+    startPlacementVerify,
+    loadPlacementEvents,
+  } = applicationActions;
 
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [autoApplyingId, setAutoApplyingId] = useState<number | null>(null);
@@ -292,23 +307,6 @@ export default function DashboardPage() {
     }
   }
 
-  async function openAutoApplyPackagePdf(applicationId: number) {
-    const token = getToken();
-    if (!token) return;
-    setError(null);
-    try {
-      const data = await apiFetch<{ url: string }>(
-        `/api/v1/applications/${applicationId}/auto-apply-package-url`,
-        {},
-        token,
-      );
-      window.open(data.url, "_blank", "noopener,noreferrer");
-    } catch (err) {
-      setError(dashboardFetchUserMessage(err, t));
-      toast.error(t("dashboard.autoApplyPackagePdfFailedToast"));
-    }
-  }
-
   const visibleMatches = useMemo(() => {
     const items = matches?.items ?? [];
     return items.filter(
@@ -364,62 +362,6 @@ export default function DashboardPage() {
       devFocus.roles_with_insights.length > 0
     );
   }, [devFocus]);
-
-  async function updateApplicationStatus(id: number, status: string) {
-    const token = getToken();
-    if (!token) return;
-    await apiFetch(
-      `/api/v1/applications/${id}`,
-      { method: "PATCH", body: JSON.stringify({ status }) },
-      token,
-    );
-    syncApplicationsFromApi(await loadApplications(token));
-    setDevFocus(await loadDevelopmentFocus(token));
-  }
-
-  async function removeApplication(id: number) {
-    const token = getToken();
-    if (!token) return;
-    await apiFetch(`/api/v1/applications/${id}`, { method: "DELETE" }, token);
-    syncApplicationsFromApi(await loadApplications(token));
-    setDevFocus(await loadDevelopmentFocus(token));
-  }
-
-  async function saveApplicationFeedback(id: number, raw: string) {
-    const token = getToken();
-    if (!token) return;
-    setFeedbackBusy({ id, kind: "save" });
-    setError(null);
-    try {
-      await apiFetch(
-        `/api/v1/applications/${id}`,
-        { method: "PATCH", body: JSON.stringify({ recruiter_feedback_raw: raw }) },
-        token,
-      );
-      syncApplicationsFromApi(await loadApplications(token));
-      setDevFocus(await loadDevelopmentFocus(token));
-    } catch (err) {
-      setError(dashboardFetchUserMessage(err, t));
-    } finally {
-      setFeedbackBusy(null);
-    }
-  }
-
-  async function parseApplicationFeedback(id: number) {
-    const token = getToken();
-    if (!token) return;
-    setFeedbackBusy({ id, kind: "parse" });
-    setError(null);
-    try {
-      await apiFetch(`/api/v1/applications/${id}/parse-feedback`, { method: "POST", body: "{}" }, token);
-      syncApplicationsFromApi(await loadApplications(token));
-      setDevFocus(await loadDevelopmentFocus(token));
-    } catch (err) {
-      setError(dashboardFetchUserMessage(err, t));
-    } finally {
-      setFeedbackBusy(null);
-    }
-  }
 
   async function connectGoogleCalendarFromDashboard() {
     const token = getToken();
@@ -478,115 +420,6 @@ export default function DashboardPage() {
     } finally {
       setDashboardWebcalBusy(false);
     }
-  }
-
-  async function declarePlacement(applicationId: number, note: string) {
-    const token = getToken();
-    if (!token) return;
-    setPlacementFlowBusy({ id: applicationId, kind: "declare" });
-    setError(null);
-    try {
-      await apiFetch<ApplicationRow>(
-        `/api/v1/applications/${applicationId}/placement-declare`,
-        { method: "POST", body: JSON.stringify({ note: note.trim() || null }) },
-        token,
-      );
-      syncApplicationsFromApi(await loadApplications(token));
-      setDevFocus(await loadDevelopmentFocus(token));
-      bumpPlacementEventsInvalidateKey();
-    } catch (err) {
-      setError(dashboardFetchUserMessage(err, t));
-    } finally {
-      setPlacementFlowBusy(null);
-    }
-  }
-
-  async function issuePlacementEmployerAttest(
-    applicationId: number,
-    employerEmail?: string,
-  ): Promise<string> {
-    const token = getToken();
-    if (!token) throw new Error(t("dashboard.placementEventsNotSignedIn"));
-    setPlacementFlowBusy({ id: applicationId, kind: "employer_attest" });
-    setError(null);
-    try {
-      const out = await apiFetch<{ attest_url: string; mail_sent: boolean }>(
-        `/api/v1/applications/${applicationId}/placement-employer-attest-link`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            ...(employerEmail?.trim() ? { employer_email: employerEmail.trim() } : {}),
-          }),
-        },
-        token,
-      );
-      bumpPlacementEventsInvalidateKey();
-      toast.success(
-        out.mail_sent
-          ? t("dashboard.placementEmployerAttestEmailed")
-          : t("dashboard.placementEmployerAttestCopied"),
-      );
-      return out.attest_url;
-    } catch (err) {
-      setError(dashboardFetchUserMessage(err, t));
-      throw err;
-    } finally {
-      setPlacementFlowBusy(null);
-    }
-  }
-
-  async function filePlacementDispute(applicationId: number, reason: string) {
-    const token = getToken();
-    if (!token) return;
-    setPlacementFlowBusy({ id: applicationId, kind: "dispute" });
-    setError(null);
-    try {
-      await apiFetch<ApplicationRow>(
-        `/api/v1/applications/${applicationId}/placement-dispute`,
-        { method: "POST", body: JSON.stringify({ reason: reason.trim() || null }) },
-        token,
-      );
-      syncApplicationsFromApi(await loadApplications(token));
-      bumpPlacementEventsInvalidateKey();
-      toast.success(t("dashboard.placementDisputed"));
-    } catch (err) {
-      setError(dashboardFetchUserMessage(err, t));
-    } finally {
-      setPlacementFlowBusy(null);
-    }
-  }
-
-  async function startPlacementVerify(applicationId: number, workEmail: string) {
-    const token = getToken();
-    if (!token) return;
-    setPlacementFlowBusy({ id: applicationId, kind: "verify" });
-    setError(null);
-    try {
-      const out = await apiFetch<{ mail_sent: boolean; message: string }>(
-        `/api/v1/applications/${applicationId}/placement-verify/start`,
-        { method: "POST", body: JSON.stringify({ work_email: workEmail }) },
-        token,
-      );
-      syncApplicationsFromApi(await loadApplications(token));
-      setDevFocus(await loadDevelopmentFocus(token));
-      alert(out.message || t("dashboard.placementVerifyPending"));
-      bumpPlacementEventsInvalidateKey();
-    } catch (err) {
-      setError(dashboardFetchUserMessage(err, t));
-    } finally {
-      setPlacementFlowBusy(null);
-    }
-  }
-
-  async function loadPlacementEvents(applicationId: number) {
-    const token = getToken();
-    if (!token) throw new Error(t("dashboard.placementEventsNotSignedIn"));
-    const data = await apiFetch<{ items: PlacementEventRow[]; total: number }>(
-      `/api/v1/applications/${applicationId}/placement-events`,
-      {},
-      token,
-    );
-    return data.items;
   }
 
   const pipelineActiveCount = useMemo(
