@@ -28,6 +28,30 @@ def _require_ops_admin(settings: Settings, authorization: str | None) -> None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid admin token")
 
 
+@router.get("/deploy-health")
+def admin_deploy_health(
+    db: bool = True,
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+) -> dict:
+    """Full deploy audit (redirect URIs, data-room flags) — replaces public health?ops=1 detail."""
+    from app.api.health import _database_reachable, _git_commit_sha
+    from app.services.health_ops import build_health_ops_admin_extensions, build_health_ops_public
+
+    _require_ops_admin(settings, authorization)
+    commit = _git_commit_sha()
+    out: dict = {
+        "status": "ok",
+        "service": "twin-api",
+        "git_commit": commit if commit else "unknown",
+    }
+    if db:
+        out["db_ok"] = _database_reachable()
+    out.update(build_health_ops_public(settings))
+    out.update(build_health_ops_admin_extensions(settings))
+    return out
+
+
 @router.get("/data-quality")
 def admin_data_quality(
     db: Session = Depends(get_db),

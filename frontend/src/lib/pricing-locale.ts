@@ -127,7 +127,6 @@ function formatCurrencyAmount(
 export function formatPlanPrice(planId: CandidatePlanId, locale: string): string {
   const loc: Locale = isLocale(locale) ? locale : "en";
   const currency = defaultCurrencyForLocale(loc);
-  const nfLocale = numberFormatLocaleForUi(loc);
   const usdMonthly = usdMonthlyForPlan(planId);
 
   if (currency === "USD") {

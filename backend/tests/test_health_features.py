@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, patch
 
 from fastapi.testclient import TestClient
 
+from app.config import get_settings
 from app.main import app
 
 
@@ -79,11 +80,13 @@ def test_health_ops_includes_mail_and_calendar_flags(
     assert data.get("stripe_checkout_ready") is False
     assert data.get("scrape_worker_ready") is False
     assert data.get("scrape_beat_enabled") is False
-    assert data.get("celery_task_always_eager") is False
     assert data.get("linkedin_oauth_configured") is True
     assert data.get("validated_jobs") == 42
     assert data.get("partner_export_configured") is True
-    assert data.get("data_room_s3_enabled") is False
+    assert "data_room_s3_enabled" not in data
+    assert "google_redirect_uri" not in data
+    assert "ops_admin_configured" not in data
+    assert "celery_task_always_eager" not in data
     assert "market_coverage_ops_hint" in data
 
 
@@ -130,3 +133,40 @@ def test_health_ops_db_coerces_market_coverage_types(
         assert data.get("market_coverage_feed_stale") is True
         if "db" in query:
             assert data.get("db_ok") is True
+
+
+def test_admin_deploy_health_requires_token(monkeypatch) -> None:
+    monkeypatch.setenv("OPS_ADMIN_TOKEN", "ops-test-token")
+    get_settings.cache_clear()
+    client = TestClient(app)
+    res = client.get("/api/v1/admin/deploy-health")
+    assert res.status_code == 401
+
+
+@patch("app.services.partner_auth.partner_export_configured", return_value=False)
+@patch("app.services.mvp_public_metrics.count_validated_jobs_public_traction", return_value=0)
+@patch("app.database.session.SessionLocal")
+@patch("app.services.market_coverage_status.build_market_coverage_status")
+def test_admin_deploy_health_includes_redirect_uris(
+    _mock_mc: MagicMock,
+    _mock_session_local: MagicMock,
+    _mock_jobs: MagicMock,
+    _mock_partner: MagicMock,
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv("OPS_ADMIN_TOKEN", "ops-test-token")
+    get_settings.cache_clear()
+    mock_cm = MagicMock()
+    mock_cm.__enter__.return_value = MagicMock()
+    mock_cm.__exit__.return_value = None
+    _mock_session_local.return_value = mock_cm
+    _mock_mc.return_value = {"feed_stale": False, "warnings": []}
+    client = TestClient(app)
+    res = client.get(
+        "/api/v1/admin/deploy-health",
+        headers={"Authorization": "Bearer ops-test-token"},
+    )
+    assert res.status_code == 200
+    data = res.json()
+    assert "google_redirect_uri" in data
+    assert data.get("ops_admin_configured") is True
