@@ -4,7 +4,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 FRONTEND="$ROOT/frontend"
-FOUNDER_EMAIL="${FOUNDER_DEMO_EMAIL:-czechowski@protonmail.ch}"
+DEMO_EMAIL="${DEMO_USER_EMAIL:-demo@twin.career}"
 
 ENV_FILE="${VERCEL_ENV_FILE:-$ROOT/.env.railway}"
 export VERCEL_TOKEN="${VERCEL_TOKEN:-$(grep -E '^VERCEL_TOKEN=' "$ENV_FILE" 2>/dev/null | head -1 | cut -d= -f2- || true)}"
@@ -20,14 +20,14 @@ fi
 if [[ ! -f "$FRONTEND/.vercel/project.json" ]]; then
   echo "Vercel project not linked. Manual:" >&2
   echo "  cd frontend && npx vercel env add NEXT_PUBLIC_DEMO_USER_EMAIL production" >&2
-  echo "  Value: $FOUNDER_EMAIL" >&2
+  echo "  Value: $DEMO_EMAIL" >&2
   exit 1
 fi
 
-echo "Set NEXT_PUBLIC_DEMO_USER_EMAIL=$FOUNDER_EMAIL (production)"
+echo "Set NEXT_PUBLIC_DEMO_USER_EMAIL=$DEMO_EMAIL (production)"
 (cd "$FRONTEND" && "${CLI[@]}" env rm NEXT_PUBLIC_DEMO_USER_EMAIL production --yes 2>/dev/null || true)
 (cd "$FRONTEND" && "${CLI[@]}" env add NEXT_PUBLIC_DEMO_USER_EMAIL production \
-  --value "$FOUNDER_EMAIL" \
+  --value "$DEMO_EMAIL" \
   --no-sensitive \
   --yes \
   --force)

@@ -50,6 +50,8 @@ def test_demo_snapshot_static_when_enabled_no_user(monkeypatch) -> None:
         body = res.json()
         assert body["source"] == "static_fallback"
         assert body["demo_mode"] is True
+        assert body["sample_data"] is True
+        assert "sample" in body["data_disclaimer"].lower()
         assert len(body["top_matches"]) >= 3
         assert body["scheduled_interview"]["company_name"]
         assert "email" not in res.text.lower()
@@ -59,7 +61,7 @@ def test_demo_snapshot_static_when_enabled_no_user(monkeypatch) -> None:
         get_settings.cache_clear()
 
 
-def test_demo_snapshot_live_db(monkeypatch) -> None:
+def test_demo_snapshot_demo_seed(monkeypatch) -> None:
     monkeypatch.setenv("DEMO_MODE_ENABLED", "true")
     monkeypatch.setenv("DEMO_USER_EMAIL", "demo@twin.career")
     get_settings.cache_clear()
@@ -100,7 +102,9 @@ def test_demo_snapshot_live_db(monkeypatch) -> None:
         res = client.get("/api/v1/demo/snapshot")
         assert res.status_code == 200
         body = res.json()
-        assert body["source"] == "live_db"
+        assert body["source"] == "demo_seed"
+        assert body["sample_data"] is True
+        assert body["demo_mode"] is True
         assert body["candidate"]["has_cv"] is True
         assert any(m["title"] == "Senior Python Developer" for m in body["top_matches"])
     finally:

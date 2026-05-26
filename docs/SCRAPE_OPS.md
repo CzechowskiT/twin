@@ -1,6 +1,8 @@
 # Scrape operations (production)
 
-**Product default:** listings refresh via **Celery beat** (`market-scrape-pl-daily`, `market-scrape-greenhouse-daily`, `market-scrape-global-html`, `market-scrape-linkedin-daily`). Manual `POST /api/v1/jobs/scrape/*` is **off** unless `SCRAPE_USER_TRIGGER_ENABLED=true` (and dashboard `NEXT_PUBLIC_SHOW_SCRAPE=true`).
+**Product default:** listings refresh via **Celery beat** (`market-scrape-pl-daily`, `market-scrape-greenhouse-daily`, `market-scrape-global-html`). Manual `POST /api/v1/jobs/scrape/*` is **off** unless `SCRAPE_USER_TRIGGER_ENABLED=true` (and dashboard `NEXT_PUBLIC_SHOW_SCRAPE=true`).
+
+**LinkedIn jobs:** **disabled by default** (`LINKEDIN_SCRAPE_ENABLED=false`). LinkedIn’s robots.txt disallows generic crawlers with `SCRAPE_RESPECT_ROBOTS_TXT=true` (default). Do **not** bypass CAPTCHA, auth walls, or anti-bot controls. Permitted paths: **official LinkedIn / hiring APIs** you are entitled to use, **written crawl permission**, or **manual** job entry — not Playwright stealth. To run the optional beat task: `LINKEDIN_SCRAPE_ENABLED=true` **and** explicit ops sign-off (or include `linkedin` in `SCRAPE_ENABLED_BOARD_IDS`).
 
 The optional allowlist tags **ops / elevated** accounts on `/auth/me` for monitoring only — not a scrape gate.
 
@@ -21,7 +23,8 @@ Set on the **API** service unless noted.
 | `SCRAPE_BEAT_PL_HOUR_UTC` | `4` | **worker** | PL core boards (~06:00 Warsaw winter). |
 | `SCRAPE_BEAT_GREENHOUSE_HOUR_UTC` | `5` | **worker** | Greenhouse JSON boards. |
 | `SCRAPE_BEAT_GLOBAL_HOUR_UTC` | `3` | **worker** | Global HTML (Mon + Thu). |
-| `SCRAPE_BEAT_LINKEDIN_HOUR_UTC` | `6` | **worker** | LinkedIn public only, max 25/run. |
+| `LINKEDIN_SCRAPE_ENABLED` | `false` | API + worker | When `true`, schedules `market-scrape-linkedin-daily` (max 25/run). |
+| `SCRAPE_BEAT_LINKEDIN_HOUR_UTC` | `6` | **worker** | Only used when `LINKEDIN_SCRAPE_ENABLED=true`. |
 | `SCRAPE_BEAT_LEGACY_SCRAPE_ALL` | `false` | **worker** | Optional legacy single `scrape-all` task. |
 | `LINKEDIN_SCRAPE_MAX_PER_RUN` | `25` | API + worker | Hard cap per LinkedIn beat run. |
 | `SCRAPE_JOBS_PER_BOARD` | `200` | API + worker | Per-board fetch cap. |

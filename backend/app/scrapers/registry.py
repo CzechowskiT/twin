@@ -87,7 +87,9 @@ SCRAPE_REGISTRY: dict[str, ScrapeFn] = {**LOCAL_SCRAPERS, **GREENHOUSE_SCRAPERS,
 
 DEFAULT_BOARD_TIMEOUT_SEC = 120
 
-# Scrape-all order: PL sources first, LinkedIn, then every global board id (explicit — same ids as API / filters).
+# Scrape-all order: PL sources first, then global boards. LinkedIn omitted (disabled-by-default).
+LINKEDIN_BOARD_IDS: frozenset[str] = frozenset({"linkedin", "linkedin-sales"})
+
 PRIORITY_BOARD_ORDER: tuple[str, ...] = (
     "pracuj",
     "pracuj-cities",
@@ -97,8 +99,6 @@ PRIORITY_BOARD_ORDER: tuple[str, ...] = (
     "rocketjobs-roles",
     "justjoin",
     "praca",
-    "linkedin",
-    "linkedin-sales",
     "indeed-pl",
     "indeed",
     "glassdoor",
@@ -153,6 +153,18 @@ def _board_label(board_id: str) -> tuple[str, str]:
     return (board_id.replace("-", " ").title(), "global")
 
 
+def linkedin_scrape_enabled() -> bool:
+    """True when LinkedIn job scrape is explicitly allowed (env or allowlist)."""
+    from app.config import get_settings
+
+    if get_settings().linkedin_scrape_enabled:
+        return True
+    allow = scrape_allowlist_board_ids()
+    if allow is not None:
+        return bool(allow & LINKEDIN_BOARD_IDS)
+    return False
+
+
 def scrape_allowlist_board_ids() -> frozenset[str] | None:
     """If set (non-empty env with at least one valid id), scrape-all and board list use this subset."""
     from app.config import get_settings
@@ -173,6 +185,8 @@ def scrape_board_ids_ordered() -> list[str]:
     tail = [b for b in all_ids if b not in priority]
     ordered = priority + tail
     if allow is None:
+        if not linkedin_scrape_enabled():
+            ordered = [b for b in ordered if b not in LINKEDIN_BOARD_IDS]
         return ordered
     return [b for b in ordered if b in allow]
 

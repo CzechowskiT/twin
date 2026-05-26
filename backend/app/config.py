@@ -130,6 +130,8 @@ class Settings(BaseSettings):
     market_coverage_target_jobs: int = Field(default=10000, validation_alias="MARKET_COVERAGE_TARGET_JOBS")
     # Max LinkedIn listings per beat run (registry also clamps).
     linkedin_scrape_max_per_run: int = 25
+    # LinkedIn job scrape off by default (robots + ToS); OAuth sign-in is separate.
+    linkedin_scrape_enabled: bool = False
     # Comma-separated override for daily beat board list (empty = tiered default).
     scrape_daily_boards: str = Field(
         default="",

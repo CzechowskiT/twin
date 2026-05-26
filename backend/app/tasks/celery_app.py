@@ -70,11 +70,12 @@ def _configure_beat_schedule() -> None:
             "schedule": crontab(hour=gl_h, minute=gl_m, day_of_week="1,4"),
             "options": {"expires": 21600},
         }
-        schedule["market-scrape-linkedin-daily"] = {
-            "task": "app.tasks.scrape_tasks.daily_linkedin_market_scrape_task",
-            "schedule": crontab(hour=li_h, minute=li_m),
-            "options": {"expires": 7200},
-        }
+        if s.linkedin_scrape_enabled:
+            schedule["market-scrape-linkedin-daily"] = {
+                "task": "app.tasks.scrape_tasks.daily_linkedin_market_scrape_task",
+                "schedule": crontab(hour=li_h, minute=li_m),
+                "options": {"expires": 7200},
+            }
         if s.scrape_beat_legacy_scrape_all:
             hour = min(23, max(0, int(s.scrape_beat_hour_utc)))
             schedule["scrape-all-boards-daily-legacy"] = {

@@ -17,7 +17,9 @@ type DemoJobMatch = {
 
 type DemoSnapshot = {
   demo_mode?: boolean;
+  sample_data?: boolean;
   source?: string;
+  data_disclaimer?: string;
   headline?: string;
   top_matches: DemoJobMatch[];
   application?: { job_title: string; company: string; status: string } | null;
@@ -167,8 +169,10 @@ export function DemoLiveSnapshot({ fullDemoHref }: DemoLiveSnapshotProps = {}) {
 
   return (
     <DemoSnapshotShell signupHref={signup} fullDemoHref={fullDemoHref}>
-      {snapshot.source === "live_db" ? (
-        <p className="mt-2 text-xs text-[var(--twin-muted)]">{t("demo.liveSourceDb" as TranslationKey)}</p>
+      {snapshot.data_disclaimer ? (
+        <p className="mt-2 text-xs leading-relaxed text-[var(--twin-muted)]" role="note">
+          {snapshot.data_disclaimer}
+        </p>
       ) : null}
       <ul className="mt-5 space-y-3">
         {snapshot.top_matches.slice(0, 5).map((row, i) => {

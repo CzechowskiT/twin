@@ -20,6 +20,7 @@ from app.database.models import (
     User,
 )
 from app.schemas.demo import (
+    DEMO_SAMPLE_DISCLAIMER,
     DemoApplicationOut,
     DemoAutoApplyOut,
     DemoCandidateOut,
@@ -74,6 +75,9 @@ def _static_snapshot(settings: Settings, *, user_found: bool) -> DemoSnapshotOut
     end = start + timedelta(hours=1)
     return DemoSnapshotOut(
         source="static_fallback",
+        sample_data=True,
+        demo_mode=True,
+        data_disclaimer=DEMO_SAMPLE_DISCLAIMER,
         generated_at=_iso(now) or "",
         demo_user_configured=user_found,
         candidate=DemoCandidateOut(
@@ -259,7 +263,10 @@ def _build_demo_snapshot(db: Session, settings: Settings) -> DemoSnapshotOut:
         )
 
     return DemoSnapshotOut(
-        source="live_db",
+        source="demo_seed",
+        sample_data=True,
+        demo_mode=True,
+        data_disclaimer=DEMO_SAMPLE_DISCLAIMER,
         generated_at=_iso(now) or "",
         demo_user_configured=True,
         candidate=DemoCandidateOut(

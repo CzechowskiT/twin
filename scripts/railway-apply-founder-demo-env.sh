@@ -7,7 +7,7 @@ cd "$ROOT"
 # shellcheck source=/dev/null
 source "$ROOT/scripts/railway-auth.sh"
 
-FOUNDER_EMAIL="${FOUNDER_DEMO_EMAIL:-czechowski@protonmail.ch}"
+DEMO_EMAIL="${DEMO_USER_EMAIL:-demo@twin.career}"
 
 CLI=(npx --yes @railway/cli@4)
 
@@ -19,8 +19,8 @@ fi
 echo "Set DEMO_MODE_ENABLED=true"
 "${CLI[@]}" variables set DEMO_MODE_ENABLED=true --skip-deploys
 
-echo "Set DEMO_USER_EMAIL=$FOUNDER_EMAIL"
-"${CLI[@]}" variables set "DEMO_USER_EMAIL=$FOUNDER_EMAIL" --skip-deploys
+echo "Set DEMO_USER_EMAIL=$DEMO_EMAIL"
+"${CLI[@]}" variables set "DEMO_USER_EMAIL=$DEMO_EMAIL" --skip-deploys
 
 echo "Redeploying API service…"
 "${CLI[@]}" redeploy --yes

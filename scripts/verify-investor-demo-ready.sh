@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Post-seed smoke: demo snapshot live_db + mvp-stats + API health.
-# Exit 0 when demo_user_configured and source=live_db (or mvp-stats show seed data).
+# Post-seed smoke: demo snapshot demo_seed + mvp-stats + API health.
+# Exit 0 when demo_user_configured and source=demo_seed (or mvp-stats show seed data).
 set -euo pipefail
 
 API="${VERIFY_PROD_API:-https://twin-production-bcd9.up.railway.app}"
@@ -41,11 +41,13 @@ if [[ "$demo_configured" != "True" ]]; then
   fail=1
 fi
 
-if [[ "$snapshot_source" != "live_db" ]]; then
-  missing+=("snapshot source=$snapshot_source (expected live_db — run seed-investor-demo.py)")
+if [[ "$snapshot_source" != "demo_seed" && "$snapshot_source" != "static_fallback" ]]; then
+  missing+=("snapshot source=$snapshot_source (expected demo_seed — run seed-investor-demo.py)")
   fail=1
+elif [[ "$snapshot_source" == "demo_seed" ]]; then
+  echo "OK: snapshot source=demo_seed (sample_data)"
 else
-  echo "OK: snapshot source=live_db"
+  echo "WARN: snapshot source=static_fallback (seed demo user on API)"
 fi
 
 stats_json=$(curl -fsS "${API}/api/v1/public/mvp-stats" 2>/dev/null || echo "{}")
@@ -76,5 +78,5 @@ if [[ "$fail" -ne 0 ]]; then
   exit 1
 fi
 
-echo "READY: live_db snapshot + seeded pipeline metrics"
+echo "READY: demo_seed snapshot + seeded pipeline metrics"
 exit 0

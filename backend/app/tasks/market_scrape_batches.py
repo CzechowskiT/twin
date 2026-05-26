@@ -14,6 +14,7 @@ from app.scrapers.registry import (
     GREENHOUSE_SCRAPERS,
     SCRAPE_REGISTRY,
     _scrape_with_timeout,
+    linkedin_scrape_enabled,
     scrape_board_ids_ordered,
 )
 from app.services.job_storage import upsert_jobs_with_metrics
@@ -118,5 +119,11 @@ def run_daily_global_html() -> dict[str, Any]:
 
 
 def run_daily_linkedin() -> dict[str, Any]:
-    """Low cap; skip gracefully when robots/auth block."""
+    """Low cap; off by default — enable LINKEDIN_SCRAPE_ENABLED or allowlist linkedin*."""
+    if not linkedin_scrape_enabled():
+        return {
+            "run_kind": "linkedin_daily",
+            "skipped": True,
+            "reason": "linkedin scrape disabled (set LINKEDIN_SCRAPE_ENABLED=true or allowlist)",
+        }
     return _run_boards_serial(run_kind="linkedin_daily", board_ids=_ordered_subset(LINKEDIN_BOARD_IDS))
