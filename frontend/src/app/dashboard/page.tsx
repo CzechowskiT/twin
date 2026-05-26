@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { DashboardCommandCenter } from "@/components/dashboard-command-center";
@@ -38,6 +38,7 @@ import { useDashboardApplicationActions } from "@/hooks/dashboard/use-dashboard-
 import { useDashboardCalendarActions } from "@/hooks/dashboard/use-dashboard-calendar-actions";
 import { useDashboardData } from "@/hooks/dashboard/use-dashboard-data";
 import { useDashboardExports } from "@/hooks/dashboard/use-dashboard-exports";
+import { useDashboardJobApplicationActions } from "@/hooks/dashboard/use-dashboard-job-application-actions";
 import { useDashboardJobListActions } from "@/hooks/dashboard/use-dashboard-job-list-actions";
 import { useDashboardModals } from "@/hooks/dashboard/use-dashboard-modals";
 import { useDashboardPolling } from "@/hooks/dashboard/use-dashboard-polling";
@@ -138,36 +139,23 @@ export default function DashboardPage() {
   const modals = useDashboardModals();
 
   const [feedbackOpen, setFeedbackOpen] = useState(false);
-  const [autoApplyingId, setAutoApplyingId] = useState<number | null>(null);
 
-  async function setJobApplication(jobId: number, status: string) {
-    const token = getToken();
-    if (!token) return;
-    try {
-      const idem =
-        typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-          ? crypto.randomUUID()
-          : "";
-      const h = new Headers();
-      if (idem) h.set("Idempotency-Key", idem);
-      await apiFetch(
-        "/api/v1/applications/",
-        {
-          method: "POST",
-          body: JSON.stringify({ job_id: jobId, status }),
-          headers: h,
-        },
-        token,
-      );
-      syncApplicationsFromApi(await loadApplications(token));
-      setDevFocus(await loadDevelopmentFocus(token));
-      if (status === "applied") {
-        toast.success(t("dashboard.applicationTrackedAppliedToast"));
-      }
-    } catch (err) {
-      setError(dashboardFetchUserMessage(err, t));
-    }
-  }
+  const trackLinkOpenedRef = useRef<((jobId: number) => void | Promise<void>) | null>(null);
+
+  const {
+    autoApplyingId,
+    setJobApplication,
+    applyToJob,
+    autoApplyToJob,
+  } = useDashboardJobApplicationActions({
+    t,
+    setError,
+    loadApplications,
+    loadDevelopmentFocus,
+    syncApplicationsFromApi,
+    setDevFocus,
+    trackLinkOpenedRef,
+  });
 
   const {
     jobsLoadMoreBusy,
@@ -192,38 +180,9 @@ export default function DashboardPage() {
     setDevFocus,
   });
 
-  function applyToJob(jobId: number, url: string) {
-    window.open(url, "_blank", "noopener,noreferrer");
-    void trackLinkOpened(jobId);
-  }
-
-  async function autoApplyToJob(jobId: number) {
-    const token = getToken();
-    if (!token) return;
-    setAutoApplyingId(jobId);
-    setError(null);
-    try {
-      const result = await apiFetch<{
-        success: boolean;
-        message: string;
-        package_pdf_url?: string | null;
-      }>(
-        "/api/v1/applications/auto-apply",
-        { method: "POST", body: JSON.stringify({ job_id: jobId, human_acknowledged: true }) },
-        token,
-      );
-      syncApplicationsFromApi(await loadApplications(token));
-      setDevFocus(await loadDevelopmentFocus(token));
-      toast.success(result.message);
-      if (result.package_pdf_url) {
-        window.open(result.package_pdf_url, "_blank", "noopener,noreferrer");
-      }
-    } catch (err) {
-      setError(dashboardFetchUserMessage(err, t));
-    } finally {
-      setAutoApplyingId(null);
-    }
-  }
+  useEffect(() => {
+    trackLinkOpenedRef.current = trackLinkOpened;
+  }, [trackLinkOpened]);
 
   const visibleMatches = useMemo(() => {
     const items = matches?.items ?? [];
