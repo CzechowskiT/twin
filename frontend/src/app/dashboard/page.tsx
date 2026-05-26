@@ -26,11 +26,6 @@ import {
 import { SHOW_SCRAPE_UI } from "@/lib/features";
 import type { JobEmployerTabId } from "@/lib/job-employer-demo";
 import { JOB_FEED_PAGE_MAX } from "@/lib/jobs";
-import {
-  mintAndOpenWebcalSubscribe,
-  mintWebcalFeed,
-  persistWebcalUrl,
-} from "@/lib/webcal-subscribe";
 
 import { ApplicationsSection } from "@/components/dashboard/applications-section";
 import { CareerCompassStrip } from "@/components/dashboard/career-compass-strip";
@@ -42,6 +37,7 @@ import { MatchesSection } from "@/components/dashboard/matches-section";
 import { ProfileScrapePanel } from "@/components/dashboard/profile-scrape-panel";
 import { dashboardFetchUserMessage } from "@/components/dashboard/dashboard-helpers";
 import { useDashboardApplicationActions } from "@/hooks/dashboard/use-dashboard-application-actions";
+import { useDashboardCalendarActions } from "@/hooks/dashboard/use-dashboard-calendar-actions";
 import { useDashboardData } from "@/hooks/dashboard/use-dashboard-data";
 import { useDashboardExports } from "@/hooks/dashboard/use-dashboard-exports";
 import { useDashboardPolling } from "@/hooks/dashboard/use-dashboard-polling";
@@ -123,6 +119,21 @@ export default function DashboardPage() {
     startPlacementVerify,
     loadPlacementEvents,
   } = applicationActions;
+  const calendarActions = useDashboardCalendarActions({
+    t,
+    setError,
+    setDashboardWebcalUrl,
+  });
+  const {
+    calendarConnectBusy,
+    dashboardWebcalBusy,
+    nextInterviewIcsBusy,
+    setNextInterviewIcsBusy,
+    connectGoogleCalendarFromDashboard,
+    connectMicrosoftCalendarFromDashboard,
+    subscribeDashboardWebcalOneClick,
+    refreshDashboardWebcalLink,
+  } = calendarActions;
 
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [autoApplyingId, setAutoApplyingId] = useState<number | null>(null);
@@ -144,9 +155,6 @@ export default function DashboardPage() {
   const [cvApp, setCvApp] = useState<{ id: number; title: string } | null>(null);
   const [negotiateApp, setNegotiateApp] = useState<{ id: number; title: string } | null>(null);
   const [linkedinOpen, setLinkedinOpen] = useState(false);
-  const [nextInterviewIcsBusy, setNextInterviewIcsBusy] = useState(false);
-  const [dashboardWebcalBusy, setDashboardWebcalBusy] = useState(false);
-  const [calendarConnectBusy, setCalendarConnectBusy] = useState<"google" | "microsoft" | null>(null);
   const [jobsLoadMoreBusy, setJobsLoadMoreBusy] = useState(false);
 
   async function loadMoreJobs() {
@@ -362,65 +370,6 @@ export default function DashboardPage() {
       devFocus.roles_with_insights.length > 0
     );
   }, [devFocus]);
-
-  async function connectGoogleCalendarFromDashboard() {
-    const token = getToken();
-    if (!token) return;
-    setCalendarConnectBusy("google");
-    setError(null);
-    try {
-      const res = await apiFetch<{ authorize_url: string }>("/api/v1/calendar/google/authorize", {}, token);
-      window.location.href = res.authorize_url;
-    } catch (err) {
-      setError(dashboardFetchUserMessage(err, t));
-    } finally {
-      setCalendarConnectBusy(null);
-    }
-  }
-
-  async function connectMicrosoftCalendarFromDashboard() {
-    const token = getToken();
-    if (!token) return;
-    setCalendarConnectBusy("microsoft");
-    setError(null);
-    try {
-      const res = await apiFetch<{ authorize_url: string }>("/api/v1/calendar/microsoft/authorize", {}, token);
-      window.location.href = res.authorize_url;
-    } catch (err) {
-      setError(dashboardFetchUserMessage(err, t));
-    } finally {
-      setCalendarConnectBusy(null);
-    }
-  }
-
-  async function subscribeDashboardWebcalOneClick() {
-    const token = getToken();
-    if (!token) return;
-    setDashboardWebcalBusy(true);
-    try {
-      const out = await mintAndOpenWebcalSubscribe(token);
-      setDashboardWebcalUrl(out.webcal_url);
-    } catch (err) {
-      setError(dashboardFetchUserMessage(err, t));
-    } finally {
-      setDashboardWebcalBusy(false);
-    }
-  }
-
-  async function refreshDashboardWebcalLink() {
-    const token = getToken();
-    if (!token) return;
-    setDashboardWebcalBusy(true);
-    try {
-      const out = await mintWebcalFeed(token);
-      setDashboardWebcalUrl(out.webcal_url);
-      persistWebcalUrl(out.webcal_url);
-    } catch (err) {
-      setError(dashboardFetchUserMessage(err, t));
-    } finally {
-      setDashboardWebcalBusy(false);
-    }
-  }
 
   const pipelineActiveCount = useMemo(
     () => applications.filter((a) => a.status !== "rejected").length,
