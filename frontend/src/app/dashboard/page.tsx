@@ -24,7 +24,6 @@ import {
   type MatchFeedbackValue,
 } from "@/lib/matching-quality";
 import { SHOW_SCRAPE_UI } from "@/lib/features";
-import { JOB_FEED_PAGE_MAX } from "@/lib/jobs";
 
 import { ApplicationsSection } from "@/components/dashboard/applications-section";
 import { CareerCompassStrip } from "@/components/dashboard/career-compass-strip";
@@ -39,6 +38,7 @@ import { useDashboardApplicationActions } from "@/hooks/dashboard/use-dashboard-
 import { useDashboardCalendarActions } from "@/hooks/dashboard/use-dashboard-calendar-actions";
 import { useDashboardData } from "@/hooks/dashboard/use-dashboard-data";
 import { useDashboardExports } from "@/hooks/dashboard/use-dashboard-exports";
+import { useDashboardJobListActions } from "@/hooks/dashboard/use-dashboard-job-list-actions";
 import { useDashboardModals } from "@/hooks/dashboard/use-dashboard-modals";
 import { useDashboardPolling } from "@/hooks/dashboard/use-dashboard-polling";
 import { useRouter } from "next/navigation";
@@ -139,37 +139,6 @@ export default function DashboardPage() {
 
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [autoApplyingId, setAutoApplyingId] = useState<number | null>(null);
-  const [jobsLoadMoreBusy, setJobsLoadMoreBusy] = useState(false);
-
-  async function loadMoreJobs() {
-    const token = getToken();
-    if (!token || jobs === null) return;
-    if (jobs.items.length >= jobs.total) return;
-    setJobsLoadMoreBusy(true);
-    setError(null);
-    try {
-      const page = await loadJobs(token, filters, {
-        skip: jobs.items.length,
-        limit: JOB_FEED_PAGE_MAX,
-      });
-      setJobs((prev) => {
-        if (!prev) return page;
-        const seen = new Set(prev.items.map((j) => j.id));
-        const merged = [...prev.items];
-        for (const row of page.items) {
-          if (!seen.has(row.id)) {
-            seen.add(row.id);
-            merged.push(row);
-          }
-        }
-        return { total: page.total, items: merged };
-      });
-    } catch (err) {
-      setError(dashboardFetchUserMessage(err, t));
-    } finally {
-      setJobsLoadMoreBusy(false);
-    }
-  }
 
   async function setJobApplication(jobId: number, status: string) {
     const token = getToken();
@@ -200,75 +169,32 @@ export default function DashboardPage() {
     }
   }
 
-  async function trackLinkOpened(jobId: number) {
-    const token = getToken();
-    if (!token) return;
-    try {
-      const idem =
-        typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-          ? crypto.randomUUID()
-          : "";
-      const h = new Headers();
-      if (idem) h.set("Idempotency-Key", idem);
-      await apiFetch(
-        "/api/v1/applications/",
-        {
-          method: "POST",
-          body: JSON.stringify({ job_id: jobId, status: "pending", track_link_opened: true }),
-          headers: h,
-        },
-        token,
-      );
-      syncApplicationsFromApi(await loadApplications(token));
-      setDevFocus(await loadDevelopmentFocus(token));
-      toast.success(t("dashboard.applicationTrackedLinkToast"));
-    } catch (err) {
-      setError(dashboardFetchUserMessage(err, t));
-    }
-  }
+  const {
+    jobsLoadMoreBusy,
+    loadMoreJobs,
+    trackLinkOpened,
+    saveJob,
+    dismissJob,
+  } = useDashboardJobListActions({
+    t,
+    setError,
+    jobs,
+    setJobs,
+    filters,
+    loadJobs,
+    savedJobIds,
+    setSavedJobIds,
+    applicationByJobId,
+    setJobApplication,
+    loadApplications,
+    loadDevelopmentFocus,
+    syncApplicationsFromApi,
+    setDevFocus,
+  });
 
   function applyToJob(jobId: number, url: string) {
     window.open(url, "_blank", "noopener,noreferrer");
     void trackLinkOpened(jobId);
-  }
-
-  function saveJob(jobId: number) {
-    const token = getToken();
-    if (!token) return;
-    void (async () => {
-      try {
-        await apiFetch(`/api/v1/jobs/saved/${jobId}`, { method: "POST" }, token);
-        setSavedJobIds((prev) => new Set(prev).add(jobId));
-        toast.success(t("dashboard.jobBookmarkedToast"));
-      } catch (err) {
-        setError(dashboardFetchUserMessage(err, t));
-        toast.error(t("dashboard.jobBookmarkFailedToast"));
-      }
-    })();
-  }
-
-  function dismissJob(jobId: number) {
-    const token = getToken();
-    if (!token) return;
-    const statusForJob = applicationByJobId[jobId];
-    if (savedJobIds.has(jobId) && !statusForJob) {
-      void (async () => {
-        try {
-          await apiFetch(`/api/v1/jobs/saved/${jobId}`, { method: "DELETE" }, token);
-          setSavedJobIds((prev) => {
-            const next = new Set(prev);
-            next.delete(jobId);
-            return next;
-          });
-          toast.success(t("dashboard.jobRemovedToast"));
-        } catch (err) {
-          setError(dashboardFetchUserMessage(err, t));
-          toast.error(t("dashboard.jobRemoveFailedToast"));
-        }
-      })();
-      return;
-    }
-    void setJobApplication(jobId, "rejected");
   }
 
   async function autoApplyToJob(jobId: number) {
