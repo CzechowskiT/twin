@@ -229,6 +229,33 @@ Nadal **founder-only:** #9, #11, klucze LinkedIn/Stripe na Railway (#15/#41 prod
 
 ---
 
+## Release QA — 2026-05-26 (agent, gałąź `cursor/phase1-monorepo-scaffold`)
+
+**Commit tip (repo + prod FE `public-health`):** `95c906d` — waitlist founding copy, cinematic hero, demo CTA, match-feedback dedupe (`31e004f`).
+
+| Obszar | Wynik |
+|--------|--------|
+| `npm run build` (frontend) | Zielony lokalnie |
+| API health `?ops=1`, celery, mvp-stats | HTTP 200 |
+| Vercel prod (`twin-sooty`) | Na `95c906d`; redeploy **nie** wymagany |
+| Waitlist HTML | `wl-hero--cinematic`, `wl-founding-counter`; brak copy `$1000` / lifetime free |
+| `/first-1000` | Jedno `<header>` (brak duplikatu) |
+| Migracja `049_job_match_feedback` | Plik + kod + endpointy w repo; **prod DB** nie sprawdzono z agenta (brak prod `DATABASE_URL` lokalnie) |
+| E2E kandydat (login → Top 20 → **Nietrafione** → refresh) | **Nie wykonano** — brak hasła w env agenta; wymaga ręcznego smoke founder |
+
+**Founder — 5 min smoke (jedyna bramka do FULL GO E2E):**
+
+1. https://twin-sooty.vercel.app/login/candidate — `czechowski@protonmail.ch` + Twoje hasło prod (patrz `docs/DEMO_LOGIN_FOR_FOUNDER.md`).
+2. `/dashboard` → sekcja **Top 20** (lub główna lista dopasowań).
+3. Na jednej ofercie kliknij **Nietrafione**; odśwież stronę.
+4. **PASS:** ta sama oferta (lub duplikat tytuł/firma) **nie wraca** na listę.
+
+Opcjonalnie w Railway Postgres (read-only): `SELECT version_num FROM alembic_version` → oczekiwane `049_job_match_feedback` (lub nowsze).
+
+**Werdykt release (26.05):** **WARUNKOWE GO** — infra i marketing OK; pełny GO E2E po powyższym smoke.
+
+---
+
 *Wygenerowano: 2026-05-23 — agent Cursor, gałąź `cursor/phase1-monorepo-scaffold`.*
 
 ---
