@@ -230,3 +230,22 @@ Nadal **founder-only:** #9, #11, klucze LinkedIn/Stripe na Railway (#15/#41 prod
 ---
 
 *Wygenerowano: 2026-05-23 — agent Cursor, gałąź `cursor/phase1-monorepo-scaffold`.*
+
+---
+
+## Final E2E candidate smoke (2026-05-26)
+
+**Werdykt:** **WARUNKOWE GO** — health + public smoke PASS; pełny dashboard E2E wymaga hasła founder (1Password / `docs/DEMO_LOGIN_FOR_FOUNDER.md`), brak `DEMO_USER_PASSWORD` w lokalnym `.env`.
+
+| Obszar | Wynik |
+|--------|--------|
+| Git | `cursor/phase1-monorepo-scaffold` @ `95c906d` (czyste drzewo, zgodne z origin) |
+| API / Celery | `status: ok`, `db_ok: true`, `worker_active: true`, `celery_task_always_eager: false`, `validated_jobs: 652` |
+| Front public | `/`, `/waitlist`, `/demo`, `/status`, `/login/candidate` → 200; waitlist: founding counter + cinematic; demo: badge/sample; brak obietnicy cash/$1000 (disclaimer „nie lifetime paid Pro”) |
+| `/dashboard` bez sesji | redirect → `/login/candidate` (auth guard OK) |
+| Kandydat E2E | **Nie wykonano** — brak hasła w repo/agent env; founder: login → dashboard → Top 20 → **Nietrafione** → refresh (oferta nie wraca) |
+| Zakazy smoke | Bez auto-apply, scrape, seed prod, migracji, zmian Railway/API |
+
+**Founder (5 min):** https://twin-sooty.vercel.app/login/candidate → hasło z 1Password → `/dashboard` → jedna oferta Top 20 → **Nietrafione** / Not relevant → F5 → potwierdź brak tej samej roli/firmy/lokalizacji.
+
+**Prod:** FE https://twin-sooty.vercel.app · API https://twin-production-bcd9.up.railway.app · commit `95c906d`.
