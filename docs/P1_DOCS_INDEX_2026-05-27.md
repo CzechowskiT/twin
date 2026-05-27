@@ -45,6 +45,11 @@ Legend:
 | ✅     | [`P1_CSP_REPORT_URI_WIRING_2026-05-27.md`](./P1_CSP_REPORT_URI_WIRING_2026-05-27.md)                                                         | `Content-Security-Policy-Report-Only` now wires `report-uri /api/v1/csp-report`. Code in `974bd15`. |
 | ✅     | [`P2_BACKEND_USER_RATE_LIMIT_LAYER2_2026-05-27.md`](./P2_BACKEND_USER_RATE_LIMIT_LAYER2_2026-05-27.md)                                       | Layer 2 of authenticated mutation rate-limit (`user_or_ip_key`) on 8 LLM endpoints. Code in `28a50a0`. |
 | ✅     | [`P2_STRIPE_EVENT_DEDUP_HELPERS_2026-05-27.md`](./P2_STRIPE_EVENT_DEDUP_HELPERS_2026-05-27.md)                                               | Service module + model for Stripe webhook dedup; helpers tolerate missing table. Code in `f341e1f`. |
+| ✅     | [`P2_STRIPE_WEBHOOK_DEDUP_WIREUP_2026-05-27.md`](./P2_STRIPE_WEBHOOK_DEDUP_WIREUP_2026-05-27.md)                                             | Handler wire-up in `ff22f3a`; production dedup still needs migration.                              |
+| ✅     | [`P1_UPLOAD_RATE_LIMITS_2026-05-27.md`](./P1_UPLOAD_RATE_LIMITS_2026-05-27.md)                                                               | Beta CV/voice + candidate CV/audio SlowAPI caps. Code in `ff22f3a`.                               |
+| ✅     | [`P1_CSP_ENFORCE_BURNIN_CHECKLIST_2026-05-27.md`](./P1_CSP_ENFORCE_BURNIN_CHECKLIST_2026-05-27.md)                                           | Operator checklist before CSP enforce flip.                                                        |
+| 📐     | [`P2_HTTPONLY_AUTH_ROLLOUT_PLAN_2026-05-27.md`](./P2_HTTPONLY_AUTH_ROLLOUT_PLAN_2026-05-27.md)                                               | httpOnly cookie + CSRF migration slices (design only).                                             |
+| 🗺️     | [`P1_RATE_LIMIT_GAPS_POST_UPLOAD_2026-05-27.md`](./P1_RATE_LIMIT_GAPS_POST_UPLOAD_2026-05-27.md)                                               | Remaining mutation endpoints without backend caps.                                                 |
 
 ### Security — design ready
 
