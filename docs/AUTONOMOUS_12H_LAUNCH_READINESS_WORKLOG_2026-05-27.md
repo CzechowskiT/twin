@@ -54,7 +54,14 @@
 
 ## Commits this session
 
-(Populated as commits land — see `git log` on branch tip.)
+| SHA | Message |
+| --- | ------- |
+| `921fb54` | chore(db): add Alembic 050 stripe webhook events migration (repo only) |
+| `1c731fc` | fix(security): rate-limit authenticated profile and application mutations |
+| `08edc74` | test(security): cover mutation rate limits and Stripe ledger failure path |
+| `0545f36` | docs(release): record 12h autonomous launch readiness session |
+
+**Tip HEAD:** `0545f36`
 
 ---
 
