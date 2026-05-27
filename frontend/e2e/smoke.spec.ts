@@ -67,6 +67,9 @@ test.describe("dashboard smoke (read-only, no live actions)", () => {
     const url = new URL(page.url());
     expect(["/login", "/login/", "/dashboard"]).toContain(url.pathname);
     await expect(page.locator("body")).toBeVisible();
+    // Must not leak ranked pipeline payloads while logged out (Top 20 / scores).
+    const bodyText = await page.locator("body").innerText();
+    expect(bodyText.toLowerCase()).not.toMatch(/final_score|top\s*20\s*matches/);
   });
 
   test("/register/candidate shows email + password inputs (no submit)", async ({ page }) => {

@@ -31,3 +31,14 @@ def test_050_revision_metadata_matches_design() -> None:
     assert mod.down_revision == "049_job_match_feedback"
     assert callable(mod.upgrade)
     assert callable(mod.downgrade)
+
+
+def test_050_downgrade_drops_stripe_webhook_events_table() -> None:
+    """Downgrade must remove the ledger table and indexes (rollback contract)."""
+    mod = _load_migration_module()
+    source = Path(__file__).resolve().parents[1] / "alembic/versions/050_stripe_webhook_events.py"
+    text = source.read_text(encoding="utf-8")
+    assert "drop_table" in text
+    assert "stripe_webhook_events" in text
+    assert "drop_index" in text
+    assert callable(mod.downgrade)
