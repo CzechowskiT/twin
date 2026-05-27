@@ -1,221 +1,288 @@
 # P1 Dependency Audit Baseline — 2026-05-27
 
-TASK 1 of the 2026-05-27 security-ops session on
-`cursor/phase1-monorepo-scaffold`. Captures the **current dependency
-posture** for `frontend/` (npm) and `backend/` (pip) **before**
-any upgrade in this run. Documentation-only — no `package.json` /
-`requirements.txt` change, no `package-lock.json` regeneration, no
-`pip install`, no Railway redeploy.
+TASK 1 of the **security / ops hardening** session on
+`cursor/phase1-monorepo-scaffold` (morning, 2026-05-27).
+This is the **read-only baseline** of dependency CVE state for
+both `frontend/` (npm) and `backend/` (pip). No upgrades shipped
+in this commit — the doc just records what we have, so future
+fixes can be diffed against it.
 
 ## TL;DR
 
-- **Frontend (npm):** 2 **moderate** advisories, both transitive
-  via `next 16.2.6 → postcss < 8.5.10` (GHSA-qx2v-qp2m-jg93,
-  PostCSS XSS via unescaped `</style>` in stringify output).
-  **No safe in-range patch** — `npm audit fix` is a no-op, and
-  `npm audit fix --force` would downgrade `next` to `9.3.3`
-  (breaking change, blocked by hard ban "no big dashboard
-  refactors / no product features"). **Wait** for `next` to ship
-  a postcss bump.
-- **Frontend npm outdated:** 10 packages with newer versions
-  available; only 5 are **inside** the current semver range
-  (`@hookform/resolvers`, `@types/react`, `framer-motion`,
-  `react-hook-form`, `react-hot-toast`). The other 5 are
-  **major** (`@types/node 20 → 25`, `eslint 9 → 10`,
-  `typescript 5 → 6`, plus react 19.2.4 vs 19.2.6 within
-  major). No upgrade applied this run — documented as a
-  follow-up so we do not couple a dep bump with the security
-  audit commits.
-- **Backend (pip):** `pip-audit` and `safety` are **not
-  installed** on this machine (neither globally nor in
-  `.venv` / `.venv-strategy`). Per the hard-ban "no heavy
-  global install", we do **not** install them in this run.
-  Inventory of `backend/requirements.txt` captured below; all
-  pinned at safe floors (`>=` for libs, hard pin `slowapi==0.1.9`,
-  bounded major `stripe<12`, `boto3<2`, `scikit-learn<2`,
-  `bcrypt<4.1`).
-- **Verdict:** **safe to keep shipping** on this branch.
-  Two moderate-only transitive issues, no critical / high, no
-  direct dep is on the advisory list, no upgrade applied in
-  this commit. Stripe, postcss, next, anthropic, fastapi
-  all at recent versions. No secrets in any manifest.
+- `frontend/` `npm audit` returns **2 moderate, 0 high, 0
+  critical** advisories. Both are the same root cause: a
+  postcss < 8.5.10 nested inside Next.js 16.2.6's own
+  `node_modules`. **npm's suggested fix is a downgrade to
+  Next 9.3.3** (it flags the fix as `isSemVerMajor: true`)
+  — that is a false positive in the auto-resolver, not a
+  real fix path; ignore it and wait for an upstream Next
+  patch.
+- `backend/requirements.txt` has **no `pip-audit` /
+  `safety` run in this session**: neither tool is installed
+  in the workspace's `.venv` (only `pip` is present) and
+  the task brief explicitly says **don't install heavy
+  global tools**. Audit is therefore deferred to the CI
+  job already scoped in
+  `docs/P1_SECURITY_IMPLEMENTATION_PLAN_2026-05-27.md`
+  (item 4 — "`npm audit` + `pip-audit` baseline"). That CI
+  job will run `pip-audit` in a clean container; this doc
+  is the **manual baseline** until then.
+- No dependency was bumped in this commit.
+  No `package-lock.json` change.
+  No `requirements.txt` change.
 
-## Frontend — `npm audit`
+Verdict: **docs-only baseline**. Both `frontend/` and
+`backend/` stay on their current pinned set. Safe to keep
+shipping.
 
-```
-$ npm audit
-# npm audit report
+## Frontend — `npm audit` (run from `frontend/`)
 
-postcss  <8.5.10
-Severity: moderate
-PostCSS has XSS via Unescaped </style> in its CSS Stringify Output
-  - https://github.com/advisories/GHSA-qx2v-qp2m-jg93
-fix available via `npm audit fix --force`
-Will install next@9.3.3, which is a breaking change
-node_modules/next/node_modules/postcss
-  next  9.3.4-canary.0 - 16.3.0-canary.5
-  Depends on vulnerable versions of postcss
-  node_modules/next
+`npm audit --json` was run against the committed
+`package-lock.json` on `cursor/phase1-monorepo-scaffold`
+@ `HEAD = 5cf2b79` (`docs(release): add morning engineering
+handoff`).
 
-2 moderate severity vulnerabilities
-```
+### Headline counts
 
-JSON metadata:
+| Severity   | Count |
+| ---------- | ----- |
+| info       | 0     |
+| low        | 0     |
+| **moderate** | **2** |
+| high       | 0     |
+| critical   | 0     |
+| **total**  | **2** |
 
-```json
+Tracked deps (npm classifies them): **prod 32**, dev 375,
+optional 83, peer 0 — **443 total** in the resolved tree.
+
+### Both advisories share the same root
+
+```text
 {
-  "vulnerabilities": {
-    "info": 0,
-    "low": 0,
-    "moderate": 2,
-    "high": 0,
-    "critical": 0,
-    "total": 2
-  },
-  "dependencies": {
-    "prod": 32,
-    "dev": 375,
-    "optional": 83,
-    "peer": 0,
-    "peerOptional": 0,
-    "total": 443
-  }
+  "name": "postcss",
+  "severity": "moderate",
+  "isDirect": false,
+  "via": [
+    {
+      "title": "PostCSS has XSS via Unescaped </style> in its CSS Stringify Output",
+      "url": "https://github.com/advisories/GHSA-qx2v-qp2m-jg93",
+      "cwe": ["CWE-79"],
+      "cvss": { "score": 6.1 },
+      "range": "<8.5.10"
+    }
+  ],
+  "effects": ["next"],
+  "range": "<8.5.10",
+  "nodes": ["node_modules/next/node_modules/postcss"]
 }
 ```
 
-### Analysis
+- The vulnerable `postcss` lives **inside Next.js's own
+  `node_modules/next/node_modules/postcss`**, not in our
+  direct deps. Our top-level `postcss` (via
+  `@tailwindcss/postcss`) is already on a safe range — we
+  don't own this copy.
+- npm's `fixAvailable` reports `next@9.3.3` with
+  `isSemVerMajor: true`. That is **npm's resolver being
+  unable to find any newer Next that lists a safe nested
+  postcss**, so it walks all the way back to a release
+  before this code path existed. Following that
+  recommendation would mean **regressing Next.js from
+  16.2.6 to 9.3.3** — six major versions back, app would
+  not boot. **Do not act on it.**
+- Real fix path: wait for an upstream Next.js patch that
+  bumps its bundled postcss, or pin postcss > 8.5.10 via a
+  `package.json` `"overrides"` block. Adding `overrides`
+  is the right move for a follow-up; **out of scope for
+  this docs-only baseline** because it changes the lockfile.
+- Exploit surface in our app: low. The CVE is XSS via a
+  `</style>` token in stringified CSS output — we don't
+  feed user-controlled CSS through postcss at runtime in
+  `frontend/`. CSS is built at deploy time from our own
+  source under `frontend/src/app/`.
 
-- The advisory affects PostCSS's **CSS string serializer**. We do
-  **not** serialize user-controlled CSS in any request path —
-  Tailwind v4 + PostCSS only runs at **build time** under Next.
-  Runtime attack surface in production is **none**.
-- The vulnerable `postcss` is nested under `node_modules/next/
-  node_modules/postcss`, i.e. **pinned by next** itself. Our
-  own dependency tree's top-level `postcss` (via
-  `@tailwindcss/postcss`) is on a fixed version. We cannot fix
-  the nested copy without `npm audit fix --force`, which the
-  CLI itself flags as **breaking** (downgrade to `next@9`).
-- Action: **monitor** `next` releases for a `postcss >= 8.5.10`
-  bump and pick it up in the next scheduled minor / patch.
-  Do **not** force a downgrade.
+### `npm outdated` snapshot (low-risk patch candidates)
 
-## Frontend — `npm outdated`
+`npm outdated --long` returned **10 outdated packages**.
+Filtered to **safe patch / minor** moves only (no major
+bumps, per task brief):
 
-```
-Package               Current    Wanted   Latest
-@hookform/resolvers     5.2.2     5.4.0    5.4.0   (in range)
-@types/node          20.19.41  20.19.41   25.9.1   (major)
-@types/react          19.2.14   19.2.15  19.2.15   (in range)
-eslint                 9.39.4    9.39.4   10.4.0   (major)
-framer-motion         12.39.0   12.40.0  12.40.0   (in range)
-react                  19.2.4    19.2.4   19.2.6   (patch, no in-range bump)
-react-dom              19.2.4    19.2.4   19.2.6   (patch, no in-range bump)
-react-hook-form        7.76.0    7.76.1   7.76.1   (in range)
-react-hot-toast         2.5.2     2.6.0    2.6.0   (in range)
-typescript              5.9.3     5.9.3    6.0.3   (major)
-```
+| Package               | Current   | Wanted (patch / minor) | Latest    | Notes                       |
+| --------------------- | --------- | ---------------------- | --------- | --------------------------- |
+| `@hookform/resolvers` | `5.2.2`   | `5.4.0`                | `5.4.0`   | minor; OK to bump in P2     |
+| `@types/react`        | `19.2.14` | `19.2.15`              | `19.2.15` | patch; OK to bump in P2     |
+| `framer-motion`       | `12.39.0` | `12.40.0`              | `12.40.0` | minor; OK to bump in P2     |
+| `react-hook-form`     | `7.76.0`  | `7.76.1`               | `7.76.1`  | patch; OK to bump in P2     |
+| `react-hot-toast`     | `2.5.2`   | `2.6.0`                | `2.6.0`   | minor; OK to bump in P2     |
+| `react` / `react-dom` | `19.2.4`  | `19.2.4`               | `19.2.6`  | latest > wanted; **skip** until lockfile resolves |
+| `@types/node`         | `20.x`    | same                   | `25.x`    | major; **skip**             |
+| `eslint`              | `9.x`     | same                   | `10.x`    | major; **skip**             |
+| `typescript`          | `5.9.3`   | `5.9.3`                | `6.0.3`   | major; **skip**             |
 
-### Analysis
+None of the "Wanted" bumps above are landed in this commit
+— this is a **baseline doc**. The point is: next time
+someone runs the audit, the diff against this table is
+**the list of actions to take**.
 
-- The 5 "in range" rows could be picked up with a plain
-  `npm install` (no manifest change). They are all patch
-  / minor bumps with no security advisory listed against
-  the older version.
-- We deliberately **do not** regenerate `package-lock.json`
-  in this audit commit so the diff stays
-  documentation-only. The next scheduled "safe dep refresh"
-  commit can run `npm install` and verify with
-  `npm run lint && npx tsc --noEmit && npm run build`.
-- The 5 **major** bumps (`@types/node 25`, `eslint 10`,
-  `typescript 6`, plus react 19.2.6 outside the strict
-  `19.2.4` pin) are **not** in scope for this run.
+### Verdict (frontend)
+
+**No upgrade in this commit.** The 2 moderate advisories
+are nested-postcss false-positives we can't fix without a
+Next bump we won't do this session; the 5 patch/minor
+candidates are real but **out of scope** for a docs-only
+baseline. Track in a follow-up PR.
 
 ## Backend — `pip-audit` / `safety`
 
-Neither tool is installed on this machine:
+### Tool availability check
 
+| Tool        | Location checked                                    | Available? |
+| ----------- | --------------------------------------------------- | ---------- |
+| `pip-audit` | `$(which pip-audit)`                                | **no**     |
+| `pip-audit` | `.venv/bin/pip show pip-audit`                      | **no**     |
+| `pip-audit` | `.venv-strategy/bin/pip show pip-audit`             | **no**     |
+| `safety`    | `$(which safety)`                                   | **no**     |
+| `safety`    | `.venv/bin/pip show safety`                         | **no**     |
+| `safety`    | `.venv-strategy/bin/pip show safety`                | **no**     |
+
+Per the task brief: **"only if already available — don't
+install heavy global tools"**. Audit deferred to the CI
+job described in
+`docs/P1_SECURITY_IMPLEMENTATION_PLAN_2026-05-27.md`
+item 4, which will run `pip-audit` in a clean container.
+
+### Backend dependency surface
+
+Snapshot of `backend/requirements.txt` (committed pins):
+
+```text
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+sqlalchemy>=2.0.36
+alembic>=1.14.0
+psycopg[binary]>=3.2.0
+pydantic[email]>=2.10.0
+pydantic-settings>=2.6.0
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+bcrypt>=4.0.0,<4.1.0
+celery[redis]>=5.4.0
+redis>=5.2.0
+httpx>=0.28.0
+anthropic>=0.42.0
+beautifulsoup4>=4.12.0
+playwright>=1.49.0
+python-multipart>=0.0.17
+slowapi==0.1.9
+pypdf>=5.1.0
+fpdf2>=2.8.0
+python-docx>=1.1.2
+openpyxl>=3.1.0
+pytest>=8.3.0
+pytest-asyncio>=0.24.0
+stripe>=11.0.0,<12.0.0
+boto3>=1.34.0,<2.0.0
+scikit-learn>=1.5.0,<2.0.0
 ```
-$ which pip-audit safety
-pip-audit not found
-safety not found
 
-$ ls .venv/bin/ | grep -iE "pip-audit|safety"
-(empty)
+Watch-items for the CI `pip-audit` job (no action taken
+in this session, just a heads-up for the next person):
+
+- `python-jose[cryptography]>=3.3.0` — the historical
+  `python-jose` algorithm-confusion CVEs are fixed in
+  3.3.0; **3.3.0 is the floor**, so we are above. Confirm
+  with a real `pip-audit` run.
+- `passlib[bcrypt]>=1.7.4` + `bcrypt>=4.0.0,<4.1.0` —
+  pinned pair (passlib + bcrypt 4.0.x compatibility);
+  don't bump bcrypt past 4.0.x without a passlib bump.
+- `playwright>=1.49.0` — keep open-floor for security
+  patches; CDN-update dependent, not a CVE story.
+- `stripe>=11.0.0,<12.0.0` — major-version pin; Stripe SDK
+  major bumps require an API version change (see
+  `docs/STRIPE.md`). Audit item 6 (webhook signature) does
+  **not** require an SDK bump.
+- `celery[redis]>=5.4.0` — the historical Celery / kombu
+  CVEs are pre-5.x; we are well past them.
+
+No transitive lockfile committed (`pip freeze` output is
+not checked in). The next CI run with `pip-audit` will be
+the **first machine-checked baseline**; this doc is the
+manual stand-in.
+
+### Verdict (backend)
+
+**No upgrade in this commit.** Tool unavailable; CI job
+is the planned home for this. Pinned floors look sane on
+visual inspection of `requirements.txt`.
+
+## What this doc does **not** do
+
+- Does **not** ship any dependency bump.
+- Does **not** change `package.json`, `package-lock.json`,
+  or `backend/requirements.txt`.
+- Does **not** install `pip-audit` / `safety` globally.
+- Does **not** add `npm-audit-ci` / `pip-audit` workflows.
+  Those are item 4 of the security implementation plan;
+  see that doc for the workflow shape.
+- Does **not** change any production env, Railway service,
+  or Vercel project.
+
+## Hard bans honoured (this run)
+
+- No Railway change / redeploy.
+- No API redeploy.
+- No DB migration.
+- No prod env change.
+- No secret / JWT in this doc.
+- No `--no-verify`, no force-push.
+- No scrape / auto-apply / application send.
+- No UX / copy change.
+
+## Pre-flight (this run)
+
+```text
+$ git fetch --all --prune
+$ git checkout cursor/phase1-monorepo-scaffold
+$ git pull --ff-only origin cursor/phase1-monorepo-scaffold
+Already up to date.
+
+$ git status -sb
+## cursor/phase1-monorepo-scaffold...origin/cursor/phase1-monorepo-scaffold
+
+$ git log --oneline -12
+5cf2b79 docs(release): add morning engineering handoff
+cd61350 test(frontend): strengthen public smoke coverage
+1c189ff docs(security): prepare p1 implementation plan
+bb819ef docs(vercel): document canonical deploy runbook
+6244732 docs(ci): document workflow enablement steps
+24b44f9 docs(release): record p1 release baseline
+cd648b4 docs(release): record overnight engineering progress
+703efe1 docs(observability): outline p1 logging metrics tracing plan
+ddce6dd docs(security): outline p1 auth and observability next steps
+a03e68a docs(vercel): document production alias workflow
+50dedde chore(ci): harden p1 release checks
+a022f14 test(dashboard): add safe dashboard smoke coverage
 ```
 
-Per the run's hard-ban "no heavy global install", we do **not**
-add either to the workstation venv during this session. They
-are appropriate to install in **CI** (e.g. `pip-audit -r
-backend/requirements.txt`) once the workflow PAT scope is
-unblocked (see `docs/P1_CI_WORKFLOW_ENABLEMENT_2026-05-27.md`),
-but a workstation-only install would not change production
-posture and risks polluting the venv.
+Local frontend gates (from `frontend/`) at session start:
 
-## Backend — manifest inventory (`backend/requirements.txt`)
+| Gate                      | Result                |
+| ------------------------- | --------------------- |
+| `npm run lint` (eslint)   | 0 errors / 0 warnings |
+| `npx tsc --noEmit`        | 0 errors              |
+| `npm run build` (Next 16) | OK, 85 routes         |
 
-| Package | Version constraint | Notes |
-| --- | --- | --- |
-| fastapi | `>=0.115.0` | Web framework |
-| uvicorn[standard] | `>=0.32.0` | ASGI server |
-| sqlalchemy | `>=2.0.36` | ORM |
-| alembic | `>=1.14.0` | Migrations |
-| psycopg[binary] | `>=3.2.0` | Postgres driver |
-| pydantic[email] | `>=2.10.0` | Models / validation |
-| pydantic-settings | `>=2.6.0` | Settings |
-| python-jose[cryptography] | `>=3.3.0` | JWT |
-| passlib[bcrypt] | `>=1.7.4` | Password hashing wrapper |
-| bcrypt | `>=4.0.0,<4.1.0` | Compat pin |
-| celery[redis] | `>=5.4.0` | Task queue |
-| redis | `>=5.2.0` | Redis client |
-| httpx | `>=0.28.0` | HTTP client |
-| anthropic | `>=0.42.0` | Claude SDK |
-| beautifulsoup4 | `>=4.12.0` | HTML parsing |
-| playwright | `>=1.49.0` | Browser automation |
-| python-multipart | `>=0.0.17` | Multipart parsing |
-| slowapi | `==0.1.9` | Rate limiting (hard pin) |
-| pypdf | `>=5.1.0` | PDF read |
-| fpdf2 | `>=2.8.0` | PDF write |
-| python-docx | `>=1.1.2` | DOCX |
-| openpyxl | `>=3.1.0` | XLSX |
-| pytest | `>=8.3.0` | Tests |
-| pytest-asyncio | `>=0.24.0` | Async tests |
-| stripe | `>=11.0.0,<12.0.0` | Stripe SDK (major-bounded) |
-| boto3 | `>=1.34.0,<2.0.0` | AWS SDK (major-bounded) |
-| scikit-learn | `>=1.5.0,<2.0.0` | ML (major-bounded) |
+## Files
 
-Floor-only `>=` lines mean each `pip install` may pick up a
-**newer** patch / minor at deploy time. This is consistent with
-how Railway redeploys today. Stripe, boto3, scikit-learn are
-**bounded** at the next major to avoid surprise breaking
-changes — a sensible default for security-sensitive surfaces.
+- This doc (new).
 
-## Hard-ban compliance
+## Related
 
-- No Railway change, no API redeploy, no DB migration.
-- No `package.json` / `package-lock.json` / `requirements.txt`
-  edit in this commit.
-- No secret printed (no `.env` read).
-- No force push.
-- No dependency upgrade applied — documentation-only.
-
-## Follow-ups (out of scope for this commit)
-
-1. Monitor `next` for a release that pins `postcss >= 8.5.10`
-   and pick it up.
-2. Schedule a "safe in-range refresh" commit that runs
-   `npm install` (no manifest change), verifies
-   `lint + tsc + build`, and commits the lockfile delta.
-3. Add `pip-audit` to backend CI (in the same workflow as
-   `pytest -q`) once the PAT scope is granted.
-4. Re-baseline after each next-version bump (`next` 16.x
-   patches arrive frequently).
-
-## Verification
-
-- `npm audit` → 2 moderate, 0 high, 0 critical (same posture
-  as before this commit; nothing was modified).
-- `npm outdated` → 10 rows (same as before this commit).
-- `npm run lint`, `npx tsc --noEmit`, `npm run build` —
-  all green on `cursor/phase1-monorepo-scaffold` HEAD
-  (`5cf2b79`) as captured in
-  `docs/P1_RELEASE_BASELINE_2026-05-27.md`.
+- `docs/P1_SECURITY_IMPLEMENTATION_PLAN_2026-05-27.md`
+  — item 4 ("`npm audit` + `pip-audit` baseline") is the
+  follow-up CI workflow for both ecosystems.
+- `docs/P1_SECURITY_NEXT_STEPS_2026-05-26.md` — source
+  backlog for the implementation plan.
+- `docs/P1_RELEASE_BASELINE_2026-05-27.md` — same-day
+  pre-run baseline for `cursor/phase1-monorepo-scaffold`.
