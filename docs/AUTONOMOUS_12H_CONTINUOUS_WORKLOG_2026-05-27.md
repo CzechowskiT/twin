@@ -15,7 +15,10 @@
 | T+0:15 | 12 | WS2 S10: OAuth callback 10/min IP limits + pytest |
 | T+0:20 | 15 | WS2: job save/unsave 30/min user limits |
 | T+0:45 | 28 | WS5/WS3/WS4/WS6/WS9: tests + drill/CSP/deploy docs |
+| T+1:00 | 38 | WS2 R-011/R-012 consent + recruiter limits |
 | Commit 1 | — | `1efd8b1` pushed |
+| Commit 2 | — | `f0dd564` pushed |
+| Commit 3 | — | `67a22dc` pushed |
 
 ---
 
@@ -40,6 +43,14 @@
 | 15 | WS3 | `P1_CSP_ENFORCE_BURNIN_DAILY_LOG` day-1 scaffold | ✅ |
 | 16 | WS9 | `API_DEPLOY_READINESS_SHA` vs prod `39dc076` | ✅ |
 | 17 | WS6 | e2e: unauth `/dashboard` must not show scores / Top 20 leak | ✅ |
+| 18 | WS2 | Cookie consent 30/min IP | ✅ |
+| 19 | WS2 | Recruiter respond 60/min per token | ✅ |
+| 20 | WS2 | `recruiter_token_key` helper | ✅ |
+| 21 | WS2 | `test_consent_recruiter_rate_limits.py` | ✅ |
+| 22 | WS8 | `docs/product/CAREER_INTELLIGENCE_BACKLOG` | ✅ |
+| 23 | WS11 | Risk register R-011/R-012 → 🟡 | ✅ |
+
+**Cumulative micro-tasks (session 2):** 38
 
 ---
 
@@ -48,7 +59,8 @@
 | SHA | Message |
 | --- | ------- |
 | `1efd8b1` | `fix(security): rate-limit OAuth callbacks and job save mutations` |
-| _(pending)_ | `test(security): public surface no-secret bundle + O7/CSP/deploy docs` |
+| `f0dd564` | `test(security): expand public no-secret checks and ops docs` |
+| `67a22dc` | `fix(security): rate-limit cookie consent and recruiter inbox writes` |
 
 ---
 
