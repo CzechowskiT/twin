@@ -27,8 +27,8 @@ the gate to ✅.
 | S1 | CSP report-only is wired, sink is live, burn-in clock started          | `curl -sI https://twin-sooty.vercel.app/ \| grep -i csp`                                       | ✅ shipped   |
 | S2 | CSP enforce-mode has been live for ≥72h with 0 unexpected violations    | Read `docs/P1_CSP_ENFORCEMENT_PLAN_2026-05-27.md` § "Risk gates" — all 4 sub-conditions met     | ❌ not yet   |
 | S3 | Authenticated mutation rate-limit Layer 2 live on LLM endpoints         | `git show 28a50a0 --stat`                                                                       | ✅ shipped   |
-| S4 | Public CV / voice upload endpoints rate-limited                        | Patch from `P1_PUBLIC_ENDPOINT_ABUSE_AUDIT_2026-05-27.md` § "Suggested first commit"             | ❌ design ready |
-| S5 | Stripe `event.id` dedup live (migration + handler patch)                | `alembic upgrade head` + grep for `stripe_events.already_processed` in `app/api/billing.py`     | ❌ design ready |
+| S4 | Public CV / voice upload endpoints rate-limited                        | `docs/P1_UPLOAD_RATE_LIMITS_2026-05-27.md`; `ff22f3a`                                            | ✅ shipped   |
+| S5 | Stripe `event.id` dedup live (migration + handler patch)                | `grep stripe_events` in `billing.py` (`ff22f3a`) + Alembic per dedup skeleton                  | ⚠️ handler ✅; migration ❌ |
 | S6 | Auto-apply sweep gate covered by 10+ tests                              | `pytest tests/test_auto_apply_trigger_sweep_admin_gate.py -q`                                   | ✅ shipped   |
 | S7 | Public health surface frozen by regression tests                        | `pytest tests/test_public_health_regression.py -q`                                              | ✅ shipped   |
 | S8 | No secrets in repo (`.env*` ignored, no API keys in code/docs)          | `gh secret list` + `git grep -E 'sk_(live\|test)\|AKIA'`                                         | ✅ verified one-shot today; re-run before launch |
