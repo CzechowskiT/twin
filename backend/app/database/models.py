@@ -657,6 +657,35 @@ class ApiIdempotency(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
+class StripeWebhookEvent(Base):
+    """Dedup ledger for `POST /api/v1/billing/webhook` deliveries.
+
+    Keyed by Stripe's own globally-unique `event.id`. Insert-then-process
+    pattern: the first POST writes a row with `handler_status="pending"`
+    and runs the handler; replays land on the unique constraint and
+    short-circuit to a `{"received": true, "replayed": true}` response.
+
+    No FK to any other table — the ledger must survive user / candidate
+    deletes (we may need to audit a payment for a churned user).
+    Design: `docs/P2_STRIPE_EVENT_DEDUP_DESIGN_2026-05-27.md`.
+    Helpers (this PR): `app/services/stripe_events.py`. Wire-up into
+    `app/api/billing.py` ships in the follow-up commit alongside the
+    Alembic migration (the table is intentionally **not yet** migrated
+    on prod — see the helper module for the in-prod no-op fallback).
+    """
+
+    __tablename__ = "stripe_webhook_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    event_id: Mapped[str] = mapped_column(String(64), unique=True, index=True, nullable=False)
+    event_type: Mapped[str] = mapped_column(String(80), nullable=False)
+    livemode: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    received_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    processed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    handler_status: Mapped[str] = mapped_column(String(32), default="pending", nullable=False)
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
 class AutoApplyConsent(Base):
     """GDPR-style consent for nightly autonomous applications."""
 
