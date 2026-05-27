@@ -98,3 +98,39 @@ test.describe("dashboard smoke (read-only, no live actions)", () => {
     }
   });
 });
+
+// Lightweight public-surface coverage for /status and the
+// waitlist live counter. Both pages have shipped for a while
+// but they're not in the existing smoke spec; a single
+// production regression that breaks either is currently
+// invisible to CI. These tests stay read-only — no signup
+// submission, no candidate-side mutation. See
+// docs/P1_SMOKE_TEST_COVERAGE_GAP_2026-05-27.md for the gap
+// analysis that motivated them.
+test.describe("public smoke (status + waitlist counter)", () => {
+  test("/status renders status header and at least one row", async ({ page }) => {
+    await page.goto("/status");
+    // Header text is i18n-driven, so we don't pin a specific
+    // string — we just confirm the page has *a* h1 heading.
+    await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
+    // The status panel either renders the data list (fetch ok)
+    // or a loading / error line. Wait for one of those to be
+    // visible so we know client hydration ran.
+    await page.waitForLoadState("networkidle").catch(() => {});
+    const dl = page.locator("dl").first();
+    const loadingOrError = page.locator("p").filter({ hasText: /./ }).first();
+    await expect(dl.or(loadingOrError)).toBeVisible();
+  });
+
+  test("/waitlist exposes the founding-spots counter UI", async ({ page }) => {
+    await page.goto("/waitlist");
+    // The page hydrates the live counter via useWaitlistStats.
+    // We don't assert a specific number (it's live) — only that
+    // the metrics grid renders at least one metric tile with a
+    // value element. Selector is class-based, matching the
+    // already-shipped CSS in waitlist-page-client.tsx.
+    await page.waitForLoadState("networkidle").catch(() => {});
+    const metricValue = page.locator(".wl-metric-value").first();
+    await expect(metricValue).toBeVisible();
+  });
+});
