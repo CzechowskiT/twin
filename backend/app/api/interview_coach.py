@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user
 from app.core.subscription_gates import Feature, feature_allowed, paywall_for_feature
 from app.database.models import Job, User
 from app.database.session import get_db
+from app.limiter import limiter, user_or_ip_key
 from app.schemas.interview_coach import (
     EvaluateAnswerIn,
     EvaluateAnswerOut,
@@ -39,7 +40,9 @@ def _load_job(db: Session, job_id: int) -> Job:
 
 
 @router.post("/generate-questions", response_model=InterviewQuestionsOut)
+@limiter.limit("60/minute", key_func=user_or_ip_key)
 def post_generate_questions(
+    request: Request,
     body: InterviewQuestionsIn,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -58,7 +61,9 @@ def post_generate_questions(
 
 
 @router.post("/evaluate-answer", response_model=EvaluateAnswerOut)
+@limiter.limit("60/minute", key_func=user_or_ip_key)
 def post_evaluate_answer(
+    request: Request,
     body: EvaluateAnswerIn,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),

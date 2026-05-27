@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from app.core.deps import get_current_user
 from app.database.session import get_db
 from app.database.models import Job, OptimizedCv, User
+from app.limiter import limiter, user_or_ip_key
 from app.schemas.career_assistant import (
     AtsCvOptimizeOut,
     CvChangeOut,
@@ -78,6 +79,7 @@ def _ats_out(row: OptimizedCv, application_id: int) -> AtsCvOptimizeOut:
 
 
 @router.post("/applications/{application_id}/ats-cv", response_model=AtsCvOptimizeOut)
+@limiter.limit("60/minute", key_func=user_or_ip_key)
 def post_ats_cv_optimize(
     application_id: int,
     request: Request,
@@ -116,7 +118,9 @@ def get_ats_cv_optimize(
 
 
 @router.post("/interview-prep", response_model=InterviewPrepOut)
+@limiter.limit("60/minute", key_func=user_or_ip_key)
 def post_interview_prep(
+    request: Request,
     body: InterviewPrepIn,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -154,8 +158,10 @@ def post_interview_prep(
 
 
 @router.post("/applications/{application_id}/salary-negotiation", response_model=SalaryNegotiationOut)
+@limiter.limit("60/minute", key_func=user_or_ip_key)
 def post_salary_negotiation(
     application_id: int,
+    request: Request,
     body: SalaryNegotiationIn,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -180,8 +186,10 @@ def post_salary_negotiation(
 
 
 @router.post("/interviews/{interview_id}/follow-up", response_model=FollowUpOut)
+@limiter.limit("60/minute", key_func=user_or_ip_key)
 def post_follow_up_email(
     interview_id: int,
+    request: Request,
     body: FollowUpIn,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -198,8 +206,10 @@ def post_follow_up_email(
 
 
 @router.post("/jobs/{job_id}/hiring-insights", response_model=HiringInsightsOut)
+@limiter.limit("60/minute", key_func=user_or_ip_key)
 def post_hiring_insights(
     job_id: int,
+    request: Request,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> HiringInsightsOut:
@@ -225,7 +235,9 @@ def post_hiring_insights(
 
 
 @router.post("/me/linkedin-optimize", response_model=LinkedinOptimizeOut)
+@limiter.limit("60/minute", key_func=user_or_ip_key)
 def post_linkedin_optimize(
+    request: Request,
     body: LinkedinOptimizeIn,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
