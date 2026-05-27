@@ -117,7 +117,9 @@ def _enforce_profile_edit(user: User) -> None:
 
 
 @router.put("/me", response_model=CandidateOut)
+@limiter.limit("30/minute", key_func=user_or_ip_key)
 def update_profile(
+    request: Request,
     body: CandidateUpdate,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -305,7 +307,9 @@ def list_profile_documents(
 
 
 @router.post("/me/documents", response_model=ProfileDocumentUploadOut)
+@limiter.limit("10/minute", key_func=user_or_ip_key)
 async def upload_profile_document(
+    request: Request,
     file: UploadFile = File(...),
     processing_consent: str = Form(default="false"),
     db: Session = Depends(get_db),
@@ -573,7 +577,9 @@ def list_my_match_feedback(
 
 
 @router.post("/me/match-feedback", response_model=JobMatchFeedbackOut, status_code=201)
+@limiter.limit("60/minute", key_func=user_or_ip_key)
 def submit_match_feedback(
+    request: Request,
     body: JobMatchFeedbackIn,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),

@@ -13,6 +13,7 @@ from openpyxl import Workbook
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user
+from app.limiter import limiter, user_or_ip_key
 from app.database.models import (
     Application,
     ApplicationStatus,
@@ -372,7 +373,9 @@ def _maybe_store_application_create_idem(
 
 
 @router.post("/", response_model=ApplicationOut, status_code=status.HTTP_201_CREATED)
+@limiter.limit("30/minute", key_func=user_or_ip_key)
 def create_application(
+    request: Request,
     body: ApplicationCreate,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -733,7 +736,9 @@ def list_placement_events(
 
 
 @router.patch("/{application_id}", response_model=ApplicationOut)
+@limiter.limit("30/minute", key_func=user_or_ip_key)
 def update_application(
+    request: Request,
     application_id: int,
     body: ApplicationUpdate,
     db: Session = Depends(get_db),
@@ -790,7 +795,9 @@ def parse_application_feedback(
 
 
 @router.delete("/{application_id}", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit("30/minute", key_func=user_or_ip_key)
 def delete_application(
+    request: Request,
     application_id: int,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
