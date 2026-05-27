@@ -173,6 +173,18 @@ def test_webhook_accepts_valid_signature_for_unhandled_event(client: TestClient)
     assert r.json() == {"received": "true"}
 
 
+def test_webhook_rejects_event_without_id(client: TestClient) -> None:
+    """Signed payload missing `id` is rejected before handler dispatch."""
+    payload = json.dumps({"type": "customer.created", "data": {"object": {}}}).encode("utf-8")
+    sig = _sign(payload)
+    r = client.post(
+        "/api/v1/billing/webhook",
+        content=payload,
+        headers={"Content-Type": "application/json", "stripe-signature": sig},
+    )
+    assert r.status_code == 400, r.text
+
+
 def test_webhook_refuses_traffic_when_unconfigured(unconfigured_client: TestClient) -> None:
     """If `stripe_webhook_secret` is not set, endpoint returns 503 (does not silently accept)."""
     r = unconfigured_client.post(
