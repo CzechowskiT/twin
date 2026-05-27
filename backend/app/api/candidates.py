@@ -17,6 +17,7 @@ from app.core.deps import get_current_user
 from app.core.subscription_gates import Feature, feature_allowed, paywall_for_feature
 from app.database.models import Candidate, Job, JobMatchFeedback, User, UserProfileDocument
 from app.database.session import get_db
+from app.limiter import limiter, user_or_ip_key
 from app.schemas.candidate import (
     CandidateCreate,
     CandidateOut,
@@ -139,7 +140,9 @@ def update_profile(
 
 
 @router.post("/me/cv", response_model=CvUploadOut)
+@limiter.limit("20/minute", key_func=user_or_ip_key)
 async def upload_cv(
+    request: Request,
     file: UploadFile = File(...),
     processing_consent: bool = Form(default=False),
     db: Session = Depends(get_db),
@@ -199,7 +202,9 @@ async def upload_cv(
 
 
 @router.post("/me/intro-audio", response_model=IntroAudioUploadOut)
+@limiter.limit("20/minute", key_func=user_or_ip_key)
 async def upload_intro_audio(
+    request: Request,
     file: UploadFile = File(...),
     processing_consent: bool = Form(default=False),
     db: Session = Depends(get_db),

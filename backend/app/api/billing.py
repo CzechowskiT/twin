@@ -24,6 +24,7 @@ from app.schemas.billing import (
     PortalResponse,
 )
 from app.services import stripe_billing as stripe_svc
+from app.services import stripe_events
 
 logger = logging.getLogger(__name__)
 
@@ -245,8 +246,36 @@ async def stripe_webhook(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid signature.") from e
 
     event_d = _stripe_object_to_dict(event)
+    event_id = str(event_d.get("id") or "").strip()
+    if not event_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Event missing id.")
     etype = event_d["type"]
+    livemode = bool(event_d.get("livemode", False))
+
+    if stripe_events.already_processed(db, event_id):
+        return {"received": "true", "replayed": "true"}
+
+    ledger = stripe_events.record_received(
+        db,
+        event_id=event_id,
+        event_type=etype,
+        livemode=livemode,
+    )
+    if ledger is not None and ledger.handler_status in (
+        stripe_events.STATUS_SUCCESS,
+        stripe_events.STATUS_IGNORED,
+    ):
+        return {"received": "true", "replayed": "true"}
+
     obj_d = _stripe_object_to_dict(event_d["data"]["object"])
+    handled_types = frozenset(
+        {
+            "checkout.session.completed",
+            "customer.subscription.updated",
+            "customer.subscription.deleted",
+            "invoice.payment_succeeded",
+        }
+    )
 
     try:
         if etype == "checkout.session.completed":
@@ -257,8 +286,17 @@ async def stripe_webhook(
             stripe_svc.process_subscription_deleted(db, obj_d)
         elif etype == "invoice.payment_succeeded":
             stripe_svc.process_invoice_payment_succeeded(db, obj_d, settings)
-    except Exception:
+        if etype in handled_types:
+            stripe_events.mark_success(db, ledger)
+        else:
+            stripe_events.mark_ignored(db, ledger)
+        if ledger is not None:
+            db.commit()
+    except Exception as exc:
+        stripe_events.mark_failed(db, ledger, str(exc))
+        if ledger is not None:
+            db.commit()
         logger.exception("Stripe webhook handler failed for %s", etype)
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Webhook handler error.")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Webhook handler error.") from exc
 
     return {"received": "true"}

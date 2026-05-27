@@ -384,7 +384,9 @@ def _save_upload(settings: Settings, referral_code: str, kind: str, file: Upload
 
 
 @router.post("/waitlist/{referral_code}/cv", response_model=BetaActionOut)
+@limiter.limit("10/minute")
 async def beta_upload_cv(
+    request: Request,
     referral_code: str,
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
@@ -412,7 +414,9 @@ async def beta_upload_cv(
 
 
 @router.post("/waitlist/{referral_code}/voice", response_model=BetaActionOut)
+@limiter.limit("10/minute")
 async def beta_upload_voice(
+    request: Request,
     referral_code: str,
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
