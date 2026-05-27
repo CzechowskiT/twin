@@ -28,20 +28,20 @@ the gate to ✅.
 | S2 | CSP enforce-mode has been live for ≥72h with 0 unexpected violations    | Read `docs/P1_CSP_ENFORCEMENT_PLAN_2026-05-27.md` § "Risk gates" — all 4 sub-conditions met     | ❌ not yet   |
 | S3 | Authenticated mutation rate-limit Layer 2 live on LLM endpoints         | `git show 28a50a0 --stat`                                                                       | ✅ shipped   |
 | S4 | Public CV / voice upload endpoints rate-limited                        | `docs/P1_UPLOAD_RATE_LIMITS_2026-05-27.md`; `ff22f3a`                                            | ✅ shipped   |
-| S5 | Stripe `event.id` dedup live (migration + handler patch)                | Handler: `billing.py`; migration: `backend/alembic/versions/050_stripe_webhook_events.py` (repo-ready, **not run on prod**) | ⚠️ handler ✅; migration **ready, not run** |
+| S5 | Stripe `event.id` dedup live (migration + handler patch)                | Handler: `billing.py`; migration: `050` — **verify** prod `alembic current` (API start runs `alembic upgrade head`; agent did not manual-migrate) | ⚠️ handler ✅; DB revision **founder verify** |
 | S6 | Auto-apply sweep gate covered by 10+ tests                              | `pytest tests/test_auto_apply_trigger_sweep_admin_gate.py -q`                                   | ✅ shipped   |
 | S7 | Public health surface frozen by regression tests                        | `pytest tests/test_public_health_regression.py -q`                                              | ✅ shipped   |
 | S8 | No secrets in repo (`.env*` ignored, no API keys in code/docs)          | `gh secret list` + `git grep -E 'sk_(live\|test)\|AKIA'`                                         | ✅ verified one-shot today; re-run before launch |
 | S9 | Dependency baseline has no HIGH CVEs                                    | `docs/P1_DEPENDENCY_AUDIT_BASELINE_2026-05-27.md` + `safety check` + `npm audit`                | ✅ baseline; re-run before launch |
-| S10| OAuth callback rate-limit (defence vs provider-quota burn)              | `tests/test_oauth_callback_rate_limits.py`; `auth.py` + calendar + ATS callbacks `@limiter.limit("10/minute")` | ⚠️ code ✅; deploy pending |
-| S10b | Match-feedback / applications / profile mutation caps (Layer 2)        | `tests/test_auth_mutation_rate_limits.py`; deploy memo — **ready, not deployed**                  | ⚠️ code ✅; deploy pending |
+| S10| OAuth callback rate-limit (defence vs provider-quota burn)              | `tests/test_oauth_callback_rate_limits.py`; `1efd8b1` on `auth.py` + calendar + ATS `@limiter.limit("10/minute")` | ✅ shipped (prod `f0dd564`) |
+| S10b | Match-feedback / applications / profile mutation caps (Layer 2)        | `tests/test_auth_mutation_rate_limits.py`; `1c731fc`                                              | ✅ shipped (prod `f0dd564`) |
 
 ### Operational gates
 
 | #  | Gate                                                                   | How to verify                                                                                  | Status today |
 | -- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------ |
 | O1 | Smoke workflow green on the latest 5 production commits                 | `gh run list --workflow smoke.yml --limit 5`                                                    | ✅ today     |
-| O2 | Production health endpoint returns `status=ok` + `db_ok=True`           | `./scripts/verify-prod-health.sh`                                                                | ✅ today     |
+| O2 | Production health endpoint returns `status=ok` + `db_ok=True`           | `./scripts/verify-prod-health.sh` — prod `git_commit=f0dd564` (2026-05-27 cutover session)       | ✅ today     |
 | O3 | Celery worker is active in production (not eager, not zero nodes)       | `curl https://twin-production-bcd9.up.railway.app/api/v1/health/celery-status`                  | ✅ today     |
 | O4 | Stripe webhook endpoint is reachable, signature gate is wired           | `docs/P1_STRIPE_WEBHOOK_AUDIT_2026-05-27.md`                                                    | ✅           |
 | O5 | Calendar provider OAuth: Google + Microsoft live; Apple/iCal docs ready | `docs/CALENDAR_INTEGRATIONS_*.md` (none on the branch yet → see `.cursorrules` calendar section) | ⚠️ partial   |
