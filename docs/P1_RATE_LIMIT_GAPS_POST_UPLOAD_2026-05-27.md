@@ -28,7 +28,8 @@ After this session's Layer 2 extensions:
 
 | Endpoint family | Suggested cap | Notes |
 | --------------- | ------------- | ----- |
-| OAuth callbacks (`/auth/google/callback`, LinkedIn, Microsoft) | 10/min IP | Design only — prevents provider quota burn |
+| OAuth callbacks (`/auth/*/callback`, calendar, Greenhouse ATS) | 10/min IP | **Shipped** — `test_oauth_callback_rate_limits.py` |
+| Job save / unsave (`POST/DELETE /jobs/saved/{id}`) | 30/min user | **Shipped** — `jobs.py` + deploy pending |
 | `POST /auto-apply/trigger` | daily cap inside handler | OK |
 | `POST /candidates/me/cv/tailor` | 10/min user | LLM — consider Layer 2 |
 | Placement declare/dispute | 10/min user | Low volume |

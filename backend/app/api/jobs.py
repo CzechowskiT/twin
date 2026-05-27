@@ -7,12 +7,13 @@ from typing import Annotated
 
 from datetime import datetime, timedelta
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.core.deps import get_current_user, require_scrape_user
+from app.limiter import limiter, user_or_ip_key
 from app.core.plans import count_tracked_applications, effective_plan_tier, max_tracked_applications
 from app.database.models import Application, ApplicationStatus, Candidate, Job, SavedJob, SubmissionStatus, User
 from app.services.application_submission import record_submission_one_click
@@ -398,7 +399,9 @@ def one_click_apply(
 
 
 @router.post("/saved/{job_id}")
+@limiter.limit("30/minute", key_func=user_or_ip_key)
 def save_job(
+    request: Request,
     job_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -422,7 +425,9 @@ def save_job(
 
 
 @router.delete("/saved/{job_id}")
+@limiter.limit("30/minute", key_func=user_or_ip_key)
 def unsave_job(
+    request: Request,
     job_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),

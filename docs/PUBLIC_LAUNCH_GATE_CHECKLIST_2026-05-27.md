@@ -33,7 +33,7 @@ the gate to ✅.
 | S7 | Public health surface frozen by regression tests                        | `pytest tests/test_public_health_regression.py -q`                                              | ✅ shipped   |
 | S8 | No secrets in repo (`.env*` ignored, no API keys in code/docs)          | `gh secret list` + `git grep -E 'sk_(live\|test)\|AKIA'`                                         | ✅ verified one-shot today; re-run before launch |
 | S9 | Dependency baseline has no HIGH CVEs                                    | `docs/P1_DEPENDENCY_AUDIT_BASELINE_2026-05-27.md` + `safety check` + `npm audit`                | ✅ baseline; re-run before launch |
-| S10| OAuth callback rate-limit (defence vs provider-quota burn)              | Patch from `P1_PUBLIC_ENDPOINT_ABUSE_AUDIT_2026-05-27.md` § "LOW"                                | ❌ design only |
+| S10| OAuth callback rate-limit (defence vs provider-quota burn)              | `tests/test_oauth_callback_rate_limits.py`; `auth.py` + calendar + ATS callbacks `@limiter.limit("10/minute")` | ⚠️ code ✅; deploy pending |
 | S10b | Match-feedback / applications / profile mutation caps (Layer 2)        | `tests/test_auth_mutation_rate_limits.py`; deploy memo — **ready, not deployed**                  | ⚠️ code ✅; deploy pending |
 
 ### Operational gates

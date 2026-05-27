@@ -5,11 +5,12 @@ from __future__ import annotations
 import logging
 from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Session
 
+from app.limiter import limiter
 from app.api.calendar import (
     CalendarEventOut,
     CalendarEventsOut,
@@ -142,7 +143,9 @@ def microsoft_calendar_authorize(current_user: User = Depends(get_current_user))
 
 
 @router.get("/microsoft/callback")
+@limiter.limit("10/minute")
 def microsoft_calendar_callback(
+    request: Request,
     code: str | None = None,
     state: str | None = None,
     error: str | None = None,

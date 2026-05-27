@@ -534,7 +534,9 @@ def linkedin_login() -> RedirectResponse:
 
 
 @router.get("/linkedin/callback")
+@limiter.limit("10/minute")
 def linkedin_callback(
+    request: Request,
     code: str | None = None,
     state: str | None = None,
     error: str | None = None,
@@ -578,6 +580,7 @@ def web_oauth_login(provider: WebOAuthProvider) -> RedirectResponse:
 
 
 @router.api_route("/{provider}/callback", methods=["GET", "POST"])
+@limiter.limit("10/minute")
 async def web_oauth_callback(
     request: Request,
     provider: WebOAuthProvider,
