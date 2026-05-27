@@ -4,12 +4,13 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
 from app.database.session import get_db
+from app.limiter import limiter, recruiter_token_key
 from app.services.recruiter_company_auth import resolve_recruiter_access
 from app.services.recruiter_inbox import (
     build_recruiter_batch,
@@ -76,7 +77,9 @@ def recruiter_inbox(
 
 
 @router.post("/inbox/{application_id}/respond")
+@limiter.limit("60/minute", key_func=recruiter_token_key)
 def recruiter_inbox_respond(
+    request: Request,
     application_id: int,
     body: RecruiterRespondIn,
     db: Session = Depends(get_db),
@@ -99,7 +102,9 @@ def recruiter_inbox_respond(
 
 
 @router.post("/inbox/respond-batch")
+@limiter.limit("60/minute", key_func=recruiter_token_key)
 def recruiter_inbox_respond_batch(
+    request: Request,
     body: RecruiterBatchRespondIn,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),

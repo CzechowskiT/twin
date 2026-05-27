@@ -6,13 +6,14 @@ import hashlib
 import json
 from datetime import timezone
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 from app.core.security import decode_access_token
 from app.database.models import CookieConsentEvent, User
 from app.database.session import get_db
+from app.limiter import limiter
 from app.schemas.cookie_consent import CookieConsentIn, CookieConsentOut
 
 router = APIRouter()
@@ -36,7 +37,9 @@ def _hash_visitor(visitor_id: str) -> str:
 
 
 @router.post("/cookies", response_model=CookieConsentOut)
+@limiter.limit("30/minute")
 def record_cookie_consent(
+    request: Request,
     body: CookieConsentIn,
     db: Session = Depends(get_db),
     user: User | None = Depends(_optional_user),

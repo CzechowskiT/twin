@@ -56,3 +56,11 @@ def user_or_ip_key(request: Request) -> str:
             if sub:
                 return f"user:{sub}"
     return get_remote_address(request)
+
+
+def recruiter_token_key(request: Request) -> str:
+    """Rate-limit recruiter inbox writes by token header or query param."""
+    tok = request.headers.get("x-twin-recruiter-token") or request.query_params.get("token")
+    if tok and tok.strip():
+        return f"recruiter:{tok.strip()[:64]}"
+    return get_remote_address(request)
