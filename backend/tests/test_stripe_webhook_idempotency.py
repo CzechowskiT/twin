@@ -151,3 +151,34 @@ def test_unhandled_event_is_marked_ignored(client: tuple[TestClient, sessionmake
         assert row.handler_status == stripe_events.STATUS_IGNORED
     finally:
         db.close()
+
+
+def test_handler_failure_marks_ledger_failed(
+    client: tuple[TestClient, sessionmaker],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """When dispatch raises, ledger row is `failed` and Stripe gets 500."""
+    http, session_local = client
+    event_id = "evt_idempotency_fail_001"
+    payload = _invoice_payload(event_id)
+    sig = _sign(payload)
+    headers = {"Content-Type": "application/json", "stripe-signature": sig}
+
+    def _boom(db, invoice, settings):  # noqa: ANN001
+        raise RuntimeError("simulated handler failure")
+
+    monkeypatch.setattr(
+        "app.api.billing.stripe_svc.process_invoice_payment_succeeded",
+        _boom,
+    )
+
+    r = http.post("/api/v1/billing/webhook", content=payload, headers=headers)
+    assert r.status_code == 500, r.text
+
+    db = session_local()
+    try:
+        row = db.query(StripeWebhookEvent).filter_by(event_id=event_id).one()
+        assert row.handler_status == stripe_events.STATUS_FAILED
+        assert row.error_message is not None
+    finally:
+        db.close()
