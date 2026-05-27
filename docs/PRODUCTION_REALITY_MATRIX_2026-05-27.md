@@ -1,7 +1,8 @@
 # Production reality matrix — 2026-05-27
 
 **Branch:** `cursor/phase1-monorepo-scaffold`
-**Production API SHA (read-only):** `f0dd564`
+**Production API SHA (read-only):** `67a22dc`
+**Vercel / GitHub Production deploy:** `8d34404` (docs-only delta vs API)
 **Frontend:** `https://twin-sooty.vercel.app` (canonical alias on Vercel project `twin`)
 **API:** `https://twin-production-bcd9.up.railway.app`
 
@@ -33,6 +34,7 @@ Legend: **LIVE** = verified on prod this session · **PARTIAL** = shipped but ga
 | Profile / applications mutation limits | `1c731fc` | **LIVE** |
 | OAuth callback rate limits | `1efd8b1` | **LIVE** |
 | Job save/unsave rate limits | `1efd8b1` | **LIVE** |
+| Cookie consent + recruiter inbox rate limits | `67a22dc` | **LIVE** |
 | Recruiter inbox | `recruiter_inbox_configured` | **LIVE** |
 | Partner export | `partner_export_configured` | **LIVE** |
 | Placement verification (machine-assisted) | `PLACEMENT_VERIFICATION.md` | **LIVE** design; pilot-scale |

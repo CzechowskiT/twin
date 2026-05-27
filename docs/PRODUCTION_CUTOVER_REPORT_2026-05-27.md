@@ -1,16 +1,19 @@
 # Production cutover report — 2026-05-27
 
-**Mode:** Production cutover readiness + controlled deploy verification
+**Mode:** Production cutover readiness + controlled deploy verification (session 2)
 **Branch:** `cursor/phase1-monorepo-scaffold`
-**Repo HEAD at commit time:** `f0dd564` (`origin` tip `b0c987d` docs-only)
-**Production API SHA:** `f0dd564` (via `public-health`)
-**Agent deploy actions:** None (git auto-deploy only; HARD BANs respected)
+**Repo HEAD:** `8d34404` (`docs(release): record production cutover status`)
+**Production API SHA:** `67a22dc` (Railway `GET /api/v1/health`, public-health proxy)
+**Production Vercel SHA:** `8d34404` (GitHub `environment=Production` deployment metadata)
+**Agent deploy actions:** None (read-only verification + doc refresh; HARD BANs respected)
 
 ---
 
 ## 1. Executive summary
 
-Production API and the canonical Vercel alias are aligned on runtime SHA **`f0dd564`**, with healthy DB, mail, OAuth (except Apple), calendars, Stripe checkout, and an active Celery worker. Targeted backend security tests (**85 passed**) and frontend build gates are green. **No manual Railway/Vercel deploy was required** in this session; commits `1efd8b1` (OAuth + job-save rate limits) and earlier security runtime landed via git hooks.
+Production API is healthy at **`67a22dc`** (includes cookie-consent + recruiter-inbox rate limits). Canonical Vercel alias **`twin-sooty.vercel.app`** is on project **`twin`** at git deploy **`8d34404`** (docs-only delta vs API; no FE runtime change in those three commits). Targeted backend security tests: **97 passed**. Production route smoke: **all 200**. Playwright public smoke: **14/18** (spec drift; not CI-blocking).
+
+**No manual Railway/Vercel deploy** was required or performed this session — commits `510acf5`…`8d34404` are docs-only; runtime tip for code is **`67a22dc`** on Railway.
 
 **Blockers unchanged for public launch:** CSP enforce burn-in (S2), unverified Alembic `050` on prod (S5), empty backup-restore drill log (O7). **Controlled pilot and investor demo remain GO.**
 
@@ -19,20 +22,18 @@ Production API and the canonical Vercel alias are aligned on runtime SHA **`f0dd
 ## 2. Git state (ETAP 1)
 
 ```text
-git fetch --all --prune
+git fetch origin
 git checkout cursor/phase1-monorepo-scaffold
-git pull --ff-only  → up to date with origin
+git pull origin cursor/phase1-monorepo-scaffold  → up to date
 ```
 
 | Item | Value |
 | ---- | ----- |
 | Branch | `cursor/phase1-monorepo-scaffold` |
-| `git rev-parse HEAD` | `f0dd564` |
-| `origin` tip | `b0c987d` (docs worklog only) |
-| Working tree at session start | Had local WIP; **origin** already contained `1efd8b1` |
-| Recent tip commits | `1efd8b1` OAuth limits · `812a390`…`f0dd564` 12h security/docs |
-
-`git log --oneline -60` — see `docs/API_PRODUCTION_CUTOVER_DECISION_2026-05-27.md` § runtime table.
+| `git rev-parse HEAD` | `8d34404` |
+| `origin` tip | `8d34404` (equal) |
+| Working tree | **Clean** |
+| `git log -60` | See §4 / `docs/API_PRODUCTION_CUTOVER_DECISION_2026-05-27.md` |
 
 ---
 
@@ -40,12 +41,12 @@ git pull --ff-only  → up to date with origin
 
 | Source | SHA | Notes |
 | ------ | --- | ----- |
-| `origin/cursor/phase1-monorepo-scaffold` (runtime) | `f0dd564` | Matches Railway |
-| Railway `GET /api/v1/health` | `f0dd564` | `status=ok` |
-| Railway `GET /api/v1/health?ops=1&db=1` | `f0dd564` | `db_ok=true` |
-| FE proxy `GET /api/public-health` | `f0dd564` | Full ops payload |
-| Vercel `twin-sooty.vercel.app` | Deploy `dpl_2iNLWLiK…` → later auto builds | Project **`twin`** (not `twin-sooty` link drift) |
-| Session start Railway | `812a390` | Auto-advanced during session |
+| `origin/cursor/phase1-monorepo-scaffold` | `8d34404` | Docs tip |
+| Railway `GET /api/v1/health` | `67a22dc` | `status=ok` |
+| Railway `GET /api/v1/health?ops=1&db=1` | `67a22dc` | `db_ok=true` |
+| FE proxy `GET /api/public-health` | `67a22dc` | Full ops payload; `validated_jobs=652` |
+| Vercel `twin-sooty.vercel.app` | `8d34404` | Deploy `dpl_3igEKv2xinSBtsKATW1fQmyEGZn2` (production, Ready) |
+| GitHub Production deployment | `8d34404` | `gh api …/deployments?environment=Production` |
 
 ### Commit / feature / status table
 
@@ -57,9 +58,11 @@ git pull --ff-only  → up to date with origin
 | `ff22f3a` | Stripe dedup handler + upload limits | LIVE RAILWAY |
 | `1c731fc` | Auth mutation rate limits | LIVE RAILWAY |
 | `1efd8b1` | OAuth callback + job save limits | LIVE RAILWAY |
-| `921fb54` | Alembic `050` | NEEDS MIGRATION **verify** (auto on API start) |
+| `67a22dc` | Cookie consent + recruiter inbox rate limits | LIVE RAILWAY |
+| `f0dd564` | Public no-secrets tests + ops docs | LIVE RAILWAY (included in `67a22dc` ancestry) |
+| `921fb54` | Alembic `050` | **FOUNDER VERIFY** (auto on API start in `start-api.sh`) |
 | `dd0b8a2` | Auto-apply sweep gate | LIVE RAILWAY |
-| `812a390`…`b0c987d` | Docs / tests / gates | REPO ONLY (no runtime) |
+| `510acf5`…`8d34404` | Cutover / gate / matrix docs | REPO + VERCEL metadata only |
 
 ---
 
@@ -68,13 +71,13 @@ git pull --ff-only  → up to date with origin
 | Category | Representative commits | Deploy surface |
 | -------- | ------------------------ | -------------- |
 | FE-only / Vercel | `974bd15`, `cd61350`, `b0b4988` | Vercel auto |
-| BE runtime | `28a50a0`, `ff22f3a`, `1c731fc`, `1efd8b1`, `dd0b8a2`, `b7c0622` | Railway auto |
+| BE runtime | `28a50a0`, `ff22f3a`, `1c731fc`, `1efd8b1`, `67a22dc`, `dd0b8a2`, `b7c0622` | Railway auto |
 | Tests | `08edc74`, `62967e9`, `f0dd564`, … | CI only |
-| Docs | `812a390`, `0545f36`, `1e6434d`, … | None |
-| Migrations | `921fb54` | Railway **start-api.sh** |
-| CI / smoke | `59f7d1a`, `d6d0b8b` | GitHub Actions |
+| Docs | `812a390`, `0545f36`, `8d34404`, … | None (Vercel rebuild on push, no runtime delta) |
+| Migrations | `921fb54` | Railway **`start-api.sh`** → `alembic upgrade head` |
+| CI / smoke | `59f7d1a`, `d6d0b8b` | GitHub Actions — green on `67a22dc` |
 | CSP | `0dfc6c9`, `974bd15` | BE + FE |
-| Rate limits | `45e5d6a`…`1efd8b1` | BE |
+| Rate limits | `45e5d6a`…`67a22dc` | BE |
 | Stripe | `f341e1f`, `ff22f3a`, `921fb54` | BE + DB |
 | Dashboard / e2e | `b0b4988`, `ca68076` | Tests / Vercel |
 
@@ -88,15 +91,16 @@ git pull --ff-only  → up to date with origin
 | Beta waitlist contract + upload rate limit | ✅ |
 | Auth mutation rate limits | ✅ |
 | OAuth callback rate limits | ✅ |
+| Consent + recruiter inbox rate limits | ✅ |
 | Auto-apply trigger-sweep gate | ✅ |
 | CSP report + sanitization | ✅ |
 | Public health regression | ✅ |
-| Public API readonly smoke + no-secrets (`f0dd564`) | ✅ |
+| Public API readonly smoke + no-secrets | ✅ |
 | Demo snapshot | ✅ |
-| Auth scrape flags | ✅ |
+| Auth scrape flags (`test_auth_me_scrape_flags.py`) | ✅ |
 | Health + celery status | ✅ |
 
-**Total: 85 passed, 0 failed** (Python 3.14 local). No scrape or live auto-apply tests run.
+**Total: 97 passed, 0 failed** (Python 3.14 local, ~16s). No scrape or live auto-apply tests run.
 
 ---
 
@@ -104,11 +108,11 @@ git pull --ff-only  → up to date with origin
 
 | Gate | Result |
 | ---- | ------ |
-| `npm run lint` | ✅ |
-| `npx tsc --noEmit` | ✅ |
-| `npm run build` | ✅ |
+| `npm run lint` | ⏭️ **Skipped** — HEAD vs Vercel: docs-only delta; prior session green |
+| `npx tsc --noEmit` | ⏭️ Skipped (same) |
+| `npm run build` | ⏭️ Skipped (same) |
 
-**Playwright** (`TWIN_E2E_BASE_URL=https://twin-sooty.vercel.app`): **14 passed / 4 failed** — login password label, dashboard redirect assertion, public-health proxy assertion, robots.txt (spec drift; not CI-blocking). No login credentials used.
+**Playwright** (`TWIN_E2E_BASE_URL=https://twin-sooty.vercel.app`): **14 passed / 4 failed** — login password label, dashboard redirect assertion, public-health proxy assertion (transient/spec), robots.txt sitemap line (spec drift). No login credentials used.
 
 ---
 
@@ -118,15 +122,16 @@ git pull --ff-only  → up to date with origin
 | ---- | ----- |
 | Head | `050_stripe_webhook_events` |
 | File | `backend/alembic/versions/050_stripe_webhook_events.py` |
-| Railway migrate | **`alembic upgrade head` in `start-api.sh`** — no separate Railway release command in `deploy/railway-api.toml` |
+| Railway migrate | **`alembic upgrade head` in `backend/scripts/start-api.sh`** (retry loop, exit on failure, then uvicorn) |
 | Prod revision | **Unverified** — founder must run `alembic current` or SQL |
 | Safe without table | Yes — `stripe_events` helpers no-op |
+| Inference | API container healthy → last start likely ran `upgrade head` successfully; does **not** prove `050` without DB read |
 
 ---
 
 ## 8. Cutover decision doc (ETAP 7)
 
-Created: `docs/API_PRODUCTION_CUTOVER_DECISION_2026-05-27.md`
+Updated: `docs/API_PRODUCTION_CUTOVER_DECISION_2026-05-27.md` (SHAs, tests, verdicts).
 
 ---
 
@@ -135,11 +140,11 @@ Created: `docs/API_PRODUCTION_CUTOVER_DECISION_2026-05-27.md`
 | Action | Outcome |
 | ------ | ------- |
 | Manual deploy | **Not performed** |
-| Auto-deploy | **DONE** — prod advanced `812a390` → `f0dd564` during session |
-| Post-deploy smoke | health, ops health, celery-status, public-health — **all OK** |
-| Rollback | Redeploy prior Railway deployment or revert git push |
+| Auto-deploy | **Already at runtime tip** — `67a22dc` live; `8d34404`…`510acf5` are docs-only |
+| Post-deploy smoke | health, ops health, `/health/celery-status`, public-health — **OK** |
+| Rollback | Redeploy prior Railway deployment SHA or revert git push |
 
-**Verdict:** API production deploy **DONE** (automatic). **BLOCKED:** manual prod migration without founder approval + verification.
+**Verdict:** API production deploy **NOT NEEDED** this session. **BLOCKED:** manual prod migration without founder approval + verification.
 
 ---
 
@@ -148,17 +153,27 @@ Created: `docs/API_PRODUCTION_CUTOVER_DECISION_2026-05-27.md`
 | Check | Result |
 | ----- | ------ |
 | Canonical alias | `twin-sooty.vercel.app` → project **`twin`** |
-| `scripts/check-vercel-canonical-alias.sh` | ⚠️ local `.vercel` links `twin-sooty` (warn-only drift) |
-| Production on HEAD runtime | ✅ (API SHA `f0dd564`) |
-| Route smoke | all listed routes **200** |
+| Production deployment | `dpl_3igEKv2xinSBtsKATW1fQmyEGZn2` @ `8d34404` |
+| `scripts/check-vercel-canonical-alias.sh` | ⚠️ local `.vercel` may link `twin-sooty` (warn-only drift) |
+| Manual promote | **Not performed** — git auto-deploy sufficient |
+| Route smoke | `/`, `/login`, `/register`, `/beta`, `/privacy`, `/terms`, `/api/public-health`, `/robots.txt`, `/sitemap.xml` — **200** |
 
-**Verdict:** Vercel **NOT NEEDED** manual promote; git hook sufficient.
+**Verdict:** Vercel **NOT NEEDED** manual deploy.
 
 ---
 
 ## 11. Production read-only smoke (ETAP 10)
 
-All routes and API endpoints listed in the session prompt returned **200** / `status=ok` with no 500s observed.
+| Probe | HTTP |
+| ----- | ---- |
+| FE `/`, `/login`, `/register`, `/beta`, `/privacy`, `/terms` | 200 |
+| FE `/api/public-health` | 200 `status=ok` `db_ok=true` |
+| FE `/robots.txt`, `/sitemap.xml` | 200 |
+| API `/api/v1/health` | 200 |
+| API `/api/v1/health?ops=1&db=1` | 200 |
+| API `/api/v1/health/celery-status` | 200 `worker_active=true` |
+
+No 500s observed on listed routes.
 
 ---
 
@@ -168,21 +183,21 @@ All routes and API endpoints listed in the session prompt returned **200** / `st
 | ---- | ------ |
 | Full candidate login → apply → calendar | **NOT RUN** — no credentials; no fake PASS |
 | Playwright public smoke | **PARTIAL** — 14/18 pass against prod |
-| Manual founder confirmation | **PENDING** — use `docs/CONTROLLED_PILOT_OPERATING_MANUAL_2026-05-27.md` |
+| Manual founder confirmation | **PENDING** — `docs/CONTROLLED_PILOT_OPERATING_MANUAL_2026-05-27.md` |
 
 ---
 
 ## 13. Launch gate checklist update (ETAP 12)
 
-Updated: `docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md` (S10, S10b, S5 note, O2 timestamp).
+Updated: `docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md` (O2 prod SHA `67a22dc`, S10/S10b prod refs).
 
-Summary: **3 ❌/⚠️ security blockers** for public launch (S2, S5 verify, S10 was ⚠️ → ✅ live for OAuth). **O7** still ⚠️.
+Summary: **Public launch NO-GO** — S2 ❌, S5 ⚠️ founder verify, O7 ⚠️. **Pilot GO.**
 
 ---
 
 ## 14. Production reality matrix (ETAP 13)
 
-Created: `docs/PRODUCTION_REALITY_MATRIX_2026-05-27.md`
+Updated: `docs/PRODUCTION_REALITY_MATRIX_2026-05-27.md` (API SHA `67a22dc`, cookie-consent limits).
 
 ---
 
@@ -193,28 +208,37 @@ Created: `docs/PRODUCTION_REALITY_MATRIX_2026-05-27.md`
 | Controlled pilot | **GO** |
 | Investor / CTO demo | **GO** |
 | Public launch | **NO-GO** |
-| API production deploy | **DONE** (auto, SHA `f0dd564`) |
-| DB migration `050` | **REQUIRED TO VERIFY** — may be auto-applied; not manually run by agent |
-| Send link | **YES PILOT** (canonical URL); **NO** public launch |
+| API production deploy | **NOT NEEDED** (live `67a22dc`; docs-only tip `8d34404`) |
+| DB migration `050` | **REQUIRED TO VERIFY** — not manually run by agent |
+| Send link | **YES PILOT** (`https://twin-sooty.vercel.app`); **NO** public launch |
 
 ### Founder manual actions
 
-1. **Confirm Alembic revision** on prod (`050` vs `049`) — `railway ssh` or SQL.
-2. If `049`: approve maintenance window + runbook `STRIPE_DEDUP_MIGRATION_RUNBOOK` (or rely on next API restart if auto-migrate acceptable).
-3. **CSP enforce:** continue burn-in log `P1_CSP_ENFORCE_BURNIN_DAILY_LOG_2026-05-27.md` — do not flip before 72h gates.
+1. **Confirm Alembic revision** on prod (`050` vs `049`) — `railway ssh` or SQL `SELECT version_num FROM alembic_version`.
+2. If `049`: approve maintenance window + `docs/STRIPE_DEDUP_MIGRATION_RUNBOOK_2026-05-27.md` (or accept auto-migrate on next API restart).
+3. **CSP enforce:** continue `docs/P1_CSP_ENFORCE_BURNIN_DAILY_LOG_2026-05-27.md` — do not flip before 72h gates.
 4. **O7:** execute staging restore drill; append `docs/BACKUP_RESTORE_DRILL_LOG.md`.
 5. **Candidate E2E:** one real pilot account through login → consent → calendar (manual).
-6. Re-run `gh run list --workflow smoke.yml` after any new pushes (e.g. cookie-consent rate limit in flight).
+6. Optional: fix Playwright spec drift (password label, `/login/candidate` redirect, robots sitemap assertion).
 
 ### Hard bans compliance
 
-✅ No live apply/scrape/CAPTCHA bypass · ✅ No secrets in docs commit · ✅ No force-push · ✅ No prod seeding · ✅ No public launch messaging
+✅ No live apply/scrape/CAPTCHA bypass · ✅ No secrets in docs · ✅ No force-push · ✅ No prod seeding · ✅ No public launch messaging
+
+---
+
+## Session log (2026-05-27 ~16:50 CEST)
+
+- Refreshed prod SHAs: Railway `67a22dc`, Vercel/GitHub Production `8d34404`.
+- Ran 97-test security bundle — green.
+- Playwright prod smoke 14/18.
+- No Railway/Vercel CLI deploy.
 
 ---
 
 ## Related
 
+- `docs/API_PRODUCTION_CUTOVER_DECISION_2026-05-27.md`
+- `docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md`
+- `docs/PRODUCTION_REALITY_MATRIX_2026-05-27.md`
 - `docs/FINAL_12H_AUTONOMOUS_LAUNCH_READINESS_REPORT_2026-05-27.md`
-- `docs/API_DEPLOY_DECISION_MEMO_2026-05-27.md`
-- `docs/VERCEL_CANONICAL_DEPLOY_RUNBOOK_2026-05-27.md`
-- `docs/POST_SECURITY_OPS_RELEASE_VERIFICATION_2026-05-27.md`

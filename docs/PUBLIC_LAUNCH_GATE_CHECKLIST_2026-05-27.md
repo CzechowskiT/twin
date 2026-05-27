@@ -33,15 +33,16 @@ the gate to ✅.
 | S7 | Public health surface frozen by regression tests                        | `pytest tests/test_public_health_regression.py -q`                                              | ✅ shipped   |
 | S8 | No secrets in repo (`.env*` ignored, no API keys in code/docs)          | `gh secret list` + `git grep -E 'sk_(live\|test)\|AKIA'`                                         | ✅ verified one-shot today; re-run before launch |
 | S9 | Dependency baseline has no HIGH CVEs                                    | `docs/P1_DEPENDENCY_AUDIT_BASELINE_2026-05-27.md` + `safety check` + `npm audit`                | ✅ baseline; re-run before launch |
-| S10| OAuth callback rate-limit (defence vs provider-quota burn)              | `tests/test_oauth_callback_rate_limits.py`; `1efd8b1` on `auth.py` + calendar + ATS `@limiter.limit("10/minute")` | ✅ shipped (prod `f0dd564`) |
-| S10b | Match-feedback / applications / profile mutation caps (Layer 2)        | `tests/test_auth_mutation_rate_limits.py`; `1c731fc`                                              | ✅ shipped (prod `f0dd564`) |
+| S10| OAuth callback rate-limit (defence vs provider-quota burn)              | `tests/test_oauth_callback_rate_limits.py`; `1efd8b1` on `auth.py` + calendar + ATS `@limiter.limit("10/minute")` | ✅ shipped (prod `67a22dc`) |
+| S10b | Match-feedback / applications / profile mutation caps (Layer 2)        | `tests/test_auth_mutation_rate_limits.py`; `1c731fc`                                              | ✅ shipped (prod `67a22dc`) |
+| S10c | Cookie consent + recruiter inbox write rate limits                      | `tests/test_consent_recruiter_rate_limits.py`; `67a22dc`                                          | ✅ shipped (prod `67a22dc`) |
 
 ### Operational gates
 
 | #  | Gate                                                                   | How to verify                                                                                  | Status today |
 | -- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------ |
 | O1 | Smoke workflow green on the latest 5 production commits                 | `gh run list --workflow smoke.yml --limit 5`                                                    | ✅ today     |
-| O2 | Production health endpoint returns `status=ok` + `db_ok=True`           | `./scripts/verify-prod-health.sh` — prod `git_commit=f0dd564` (2026-05-27 cutover session)       | ✅ today     |
+| O2 | Production health endpoint returns `status=ok` + `db_ok=True`           | `./scripts/verify-prod-health.sh` — prod `git_commit=67a22dc` (2026-05-27 cutover session 2)       | ✅ today     |
 | O3 | Celery worker is active in production (not eager, not zero nodes)       | `curl https://twin-production-bcd9.up.railway.app/api/v1/health/celery-status`                  | ✅ today     |
 | O4 | Stripe webhook endpoint is reachable, signature gate is wired           | `docs/P1_STRIPE_WEBHOOK_AUDIT_2026-05-27.md`                                                    | ✅           |
 | O5 | Calendar provider OAuth: Google + Microsoft live; Apple/iCal docs ready | `docs/CALENDAR_INTEGRATIONS_*.md` (none on the branch yet → see `.cursorrules` calendar section) | ⚠️ partial   |
