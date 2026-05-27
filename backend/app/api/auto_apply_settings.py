@@ -3,13 +3,15 @@
 import json
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.core.deps import get_current_user
+from app.core.scrape_ops import user_has_scrape_ops
 from app.database.models import AutoApplyConsent, AutoApplyRun, Candidate, User
 from app.database.session import get_db
+from app.limiter import limiter
 from app.schemas.auto_apply_settings import (
     AutoApplyConsentIn,
     AutoApplyLastSweepOut,
@@ -274,11 +276,24 @@ def trigger_nightly_for_me(
 
 
 @router.post("/trigger-sweep")
+@limiter.limit("3/minute")
 def trigger_full_sweep(
+    request: Request,
     user: User = Depends(get_current_user),
 ) -> dict:
-    """Enqueue full nightly sweep (ops-style; requires active consent users)."""
+    """Enqueue full nightly sweep — ops only (allowlist via SCRAPE_OPS_*)."""
     settings = get_settings()
+    # Closes a real privilege-escalation surface: without this gate, *any*
+    # authenticated user could enqueue the platform-wide nightly sweep
+    # (every user with active consent) and exhaust the auto-apply worker
+    # budget. Allowlist is reused from the scrape-ops pattern so we don't
+    # invent a fourth admin mechanism alongside `BETA_ADMIN_TOKEN` /
+    # `OPS_ADMIN_TOKEN` / candidate JWTs.
+    if not user_has_scrape_ops(user, settings):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Ops only — your account is not on the auto-apply trigger allowlist.",
+        )
     if settings.celery_task_always_eager:
         return nightly_auto_apply_sweep(dry_run=False)
     async_result = nightly_auto_apply_sweep.delay(dry_run=False)
