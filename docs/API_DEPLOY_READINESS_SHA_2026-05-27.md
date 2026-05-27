@@ -1,8 +1,8 @@
 # API deploy readiness — SHA diff (session 2)
 
 **Branch:** `cursor/phase1-monorepo-scaffold`
-**Repo HEAD:** `1efd8b1` (OAuth + job-save rate limits)
-**Prod `public-health` git_commit (read-only):** `39dc076` (stale — pre-session deploy)
+**Repo HEAD:** `b0c987d` (OAuth, job-save, consent, recruiter limits + tests/docs)
+**Prod `public-health` git_commit (read-only):** `812a390` (partial — still behind `b0c987d`)
 
 ## Runtime deltas not yet live on Railway
 
@@ -12,6 +12,8 @@
 | Stripe dedup handler wire-up | `ff22f3a` | Yes (ledger idle until migration) |
 | OAuth callback 10/min IP | `1efd8b1` | Yes |
 | Job save/unsave 30/min user | `1efd8b1` | Yes |
+| Cookie consent 30/min IP | `67a22dc` | Yes |
+| Recruiter inbox respond 60/min token | `67a22dc` | Yes |
 | Alembic `050_stripe_webhook_events` | `921fb54` | **Migration** after deploy — founder approval |
 
 ## Recommendation
