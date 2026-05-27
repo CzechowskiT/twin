@@ -28,12 +28,13 @@ the gate to ✅.
 | S2 | CSP enforce-mode has been live for ≥72h with 0 unexpected violations    | Read `docs/P1_CSP_ENFORCEMENT_PLAN_2026-05-27.md` § "Risk gates" — all 4 sub-conditions met     | ❌ not yet   |
 | S3 | Authenticated mutation rate-limit Layer 2 live on LLM endpoints         | `git show 28a50a0 --stat`                                                                       | ✅ shipped   |
 | S4 | Public CV / voice upload endpoints rate-limited                        | `docs/P1_UPLOAD_RATE_LIMITS_2026-05-27.md`; `ff22f3a`                                            | ✅ shipped   |
-| S5 | Stripe `event.id` dedup live (migration + handler patch)                | `grep stripe_events` in `billing.py` (`ff22f3a`) + Alembic per dedup skeleton                  | ⚠️ handler ✅; migration ❌ |
+| S5 | Stripe `event.id` dedup live (migration + handler patch)                | Handler: `billing.py`; migration: `backend/alembic/versions/050_stripe_webhook_events.py` (repo-ready, **not run on prod**) | ⚠️ handler ✅; migration **ready, not run** |
 | S6 | Auto-apply sweep gate covered by 10+ tests                              | `pytest tests/test_auto_apply_trigger_sweep_admin_gate.py -q`                                   | ✅ shipped   |
 | S7 | Public health surface frozen by regression tests                        | `pytest tests/test_public_health_regression.py -q`                                              | ✅ shipped   |
 | S8 | No secrets in repo (`.env*` ignored, no API keys in code/docs)          | `gh secret list` + `git grep -E 'sk_(live\|test)\|AKIA'`                                         | ✅ verified one-shot today; re-run before launch |
 | S9 | Dependency baseline has no HIGH CVEs                                    | `docs/P1_DEPENDENCY_AUDIT_BASELINE_2026-05-27.md` + `safety check` + `npm audit`                | ✅ baseline; re-run before launch |
 | S10| OAuth callback rate-limit (defence vs provider-quota burn)              | Patch from `P1_PUBLIC_ENDPOINT_ABUSE_AUDIT_2026-05-27.md` § "LOW"                                | ❌ design only |
+| S10b | Match-feedback / applications / profile mutation caps (Layer 2)        | `tests/test_auth_mutation_rate_limits.py`; deploy memo — **ready, not deployed**                  | ⚠️ code ✅; deploy pending |
 
 ### Operational gates
 
@@ -45,7 +46,7 @@ the gate to ✅.
 | O4 | Stripe webhook endpoint is reachable, signature gate is wired           | `docs/P1_STRIPE_WEBHOOK_AUDIT_2026-05-27.md`                                                    | ✅           |
 | O5 | Calendar provider OAuth: Google + Microsoft live; Apple/iCal docs ready | `docs/CALENDAR_INTEGRATIONS_*.md` (none on the branch yet → see `.cursorrules` calendar section) | ⚠️ partial   |
 | O6 | Canonical Vercel alias points at the right project; drift guard exists  | `bash scripts/check-vercel-canonical-alias.sh`                                                   | ⚠️ drift documented; canonical project is correct |
-| O7 | Backup / restore for Postgres is exercised (last restore test logged)    | `docs/RUNBOOK_DB_RESTORE.md` (not on branch yet → create or borrow Railway snapshot proof)      | ❌ doc gap   |
+| O7 | Backup / restore for Postgres is exercised (last restore test logged)    | `docs/RUNBOOK_DB_RESTORE_2026-05-27.md` (procedure ready; drill log pending)                    | ⚠️ doc ready; drill ❌ |
 | O8 | Incident response runbook exists with named on-call                     | `docs/INCIDENT_RESPONSE_RUNBOOK_2026-05-27.md` (this session, TASK 13)                          | ✅ this session |
 | O9 | Security risk register is current                                       | `docs/SECURITY_RISK_REGISTER_2026-05-27.md` (this session, TASK 14)                             | ✅ this session |
 | O10| Vercel canonical re-link is either fixed or has a documented workaround | `docs/VERCEL_CANONICAL_DEPLOY_RUNBOOK_2026-05-27.md`                                             | ⚠️ workaround documented |

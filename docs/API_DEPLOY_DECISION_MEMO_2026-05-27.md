@@ -116,3 +116,30 @@ of Phase 1 / start of Phase 2.
   today?").
 - `docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md` — O1-O3
   rely on the no-manual-deploy posture this memo documents.
+
+---
+
+## Addendum — 12h launch readiness session (2026-05-27)
+
+### New runtime commits (require Railway auto-deploy when pushed)
+
+| Change | Deploy? | Migration? |
+| ------ | ------- | ---------- |
+| Alembic `050_stripe_webhook_events.py` | No effect until `alembic upgrade` | **Yes — founder approval; NOT run by agent** |
+| Auth mutation rate limits (match-feedback, profile, applications, documents) | **Yes** — SlowAPI decorators on API routes | No |
+
+### Recommendation
+
+1. **Push branch** → let Railway git-deploy pick up rate-limit commits.
+2. **Do NOT** run `050` migration until founder signs gate S5 checklist.
+3. After deploy: `curl https://twin-sooty.vercel.app/api/public-health` → confirm new `git_commit`.
+4. Re-run `pytest tests/test_auth_mutation_rate_limits.py -q` on CI (smoke workflow).
+
+### Verdict
+
+| Action | Today |
+| ------ | ----- |
+| API redeploy for rate limits | **Recommended** after green CI on pushed SHA |
+| Stripe migration on prod | **NO** — ready in repo only |
+| Manual forced redeploy | **NO** |
+
