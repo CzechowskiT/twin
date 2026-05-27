@@ -135,3 +135,169 @@ def test_trigger_sweep_is_rate_limited(sweep_client, monkeypatch) -> None:
 
     assert codes[:3] == [200, 200, 200], codes
     assert codes[3] == 429, codes
+
+
+# --- hardening (long autonomous session 2026-05-27, TASK 3) --------------
+
+
+def test_trigger_sweep_accepts_ops_user_via_id_allowlist(
+    sweep_client, monkeypatch
+) -> None:
+    """ID allowlist works as an alternative to the email allowlist.
+
+    Two-channel allowlist (`SCRAPE_OPS_USER_IDS` AND
+    `SCRAPE_OPS_EMAILS`): the ID channel matters in environments
+    where the email of an ops account changes (rotated to a
+    +alias). Documenting the contract here so a future refactor
+    cannot drop the ID-channel without breaking this test.
+    """
+    client, headers, user = sweep_client
+    monkeypatch.setenv("SCRAPE_OPS_USER_IDS", str(user.id))
+    monkeypatch.setenv("SCRAPE_OPS_EMAILS", "")
+    monkeypatch.setenv("CELERY_TASK_ALWAYS_EAGER", "true")
+    get_settings.cache_clear()
+
+    expected = {"total_users_processed": 0, "total_applications_submitted": 0}
+    with patch(
+        "app.api.auto_apply_settings.nightly_auto_apply_sweep",
+        return_value=expected,
+    ) as mock_sweep:
+        res = client.post("/api/v1/auto-apply/trigger-sweep", headers=headers)
+
+    assert res.status_code == 200, res.text
+    assert res.json() == expected
+    mock_sweep.assert_called_once_with(dry_run=False)
+
+
+def test_trigger_sweep_email_match_is_case_insensitive(
+    sweep_client, monkeypatch
+) -> None:
+    """Email allowlist normalises case so OPS@…/ops@… both match.
+
+    Closes a real configuration-mismatch foot-gun: env vars come
+    from humans and capitalisation drift on `SCRAPE_OPS_EMAILS`
+    would otherwise silently lock the operator out.
+    """
+    client, headers, user = sweep_client
+    monkeypatch.setenv("SCRAPE_OPS_EMAILS", user.email.upper())  # ops user lower-case, env upper-case
+    monkeypatch.setenv("CELERY_TASK_ALWAYS_EAGER", "true")
+    get_settings.cache_clear()
+
+    with patch(
+        "app.api.auto_apply_settings.nightly_auto_apply_sweep",
+        return_value={"ok": True},
+    ):
+        res = client.post("/api/v1/auto-apply/trigger-sweep", headers=headers)
+
+    assert res.status_code == 200, res.text
+
+
+def test_trigger_sweep_rejects_when_allowlist_unset(
+    sweep_client, monkeypatch
+) -> None:
+    """Both env vars empty → no user is on the allowlist, always 403.
+
+    Failure mode this catches: if the gate ever defaults to "allow"
+    when nothing is configured (e.g. someone changes
+    `user_has_scrape_ops` to short-circuit on empty config), every
+    authenticated user could re-acquire the platform-wide sweep.
+    """
+    client, headers, _user = sweep_client
+    monkeypatch.delenv("SCRAPE_OPS_USER_IDS", raising=False)
+    monkeypatch.delenv("SCRAPE_OPS_EMAILS", raising=False)
+    get_settings.cache_clear()
+
+    with patch(
+        "app.api.auto_apply_settings.nightly_auto_apply_sweep"
+    ) as mock_sweep:
+        res = client.post("/api/v1/auto-apply/trigger-sweep", headers=headers)
+
+    assert res.status_code == 403, res.text
+    mock_sweep.assert_not_called()
+    mock_sweep.delay.assert_not_called()
+
+
+def test_trigger_sweep_rejects_inactive_user(sweep_client, monkeypatch) -> None:
+    """Even an allowlisted user must be active.
+
+    The active flag is the kill-switch we'd flip on a leaked /
+    compromised ops account. If `is_active=False` doesn't already
+    win at the auth layer, the gate would be a privilege-
+    escalation vector against the kill-switch.
+    """
+    client, headers, user = sweep_client
+    monkeypatch.setenv("SCRAPE_OPS_EMAILS", user.email)
+    monkeypatch.setenv("CELERY_TASK_ALWAYS_EAGER", "true")
+    get_settings.cache_clear()
+
+    # Flip the user off mid-session.
+    db = next(iter(app.dependency_overrides[get_db]()))
+    target = db.query(User).filter(User.email == user.email).first()
+    assert target is not None
+    target.is_active = False
+    db.commit()
+
+    with patch(
+        "app.api.auto_apply_settings.nightly_auto_apply_sweep"
+    ) as mock_sweep:
+        res = client.post("/api/v1/auto-apply/trigger-sweep", headers=headers)
+
+    assert res.status_code == 401, res.text
+    mock_sweep.assert_not_called()
+    mock_sweep.delay.assert_not_called()
+
+
+def test_trigger_sweep_rejects_token_for_deleted_user(
+    sweep_client, monkeypatch
+) -> None:
+    """A JWT signed for a now-deleted ops user is rejected at auth.
+
+    Closes a subtle bypass: if `get_current_user` returned a
+    placeholder for a missing row, every revoked operator would
+    keep their privileges as long as their JWT was alive.
+    """
+    client, _headers, user = sweep_client
+    monkeypatch.setenv("SCRAPE_OPS_EMAILS", user.email)
+    monkeypatch.setenv("CELERY_TASK_ALWAYS_EAGER", "true")
+    get_settings.cache_clear()
+
+    # Mint a token whose subject does not match any User row.
+    from app.core.security import create_access_token
+
+    ghost_headers = {
+        "Authorization": f"Bearer {create_access_token('does-not-exist@test.com')}"
+    }
+
+    with patch(
+        "app.api.auto_apply_settings.nightly_auto_apply_sweep"
+    ) as mock_sweep:
+        res = client.post(
+            "/api/v1/auto-apply/trigger-sweep", headers=ghost_headers
+        )
+
+    assert res.status_code == 401, res.text
+    mock_sweep.assert_not_called()
+    mock_sweep.delay.assert_not_called()
+
+
+def test_trigger_sweep_does_not_leak_allowlist_in_403(
+    sweep_client, monkeypatch
+) -> None:
+    """403 must not echo email/ID lists in the response body.
+
+    The 403 surface is reachable by any signed-up user — the
+    detail string must not leak allowlist contents, or a
+    credential-stuffing campaign could enumerate ops accounts.
+    """
+    client, headers, _user = sweep_client
+    monkeypatch.setenv("SCRAPE_OPS_USER_IDS", "9999")
+    monkeypatch.setenv("SCRAPE_OPS_EMAILS", "secret-ops@internal.example")
+    get_settings.cache_clear()
+
+    res = client.post("/api/v1/auto-apply/trigger-sweep", headers=headers)
+    assert res.status_code == 403
+    body = res.json()
+    detail = body.get("detail", "")
+    assert "9999" not in detail
+    assert "secret-ops" not in detail.lower()
+    assert "internal.example" not in detail.lower()
