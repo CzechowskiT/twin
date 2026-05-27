@@ -129,6 +129,19 @@ run("frame-ancestors is locked to 'none'", async () => {
   assert.match(csp, /frame-ancestors\s+'none'/);
 });
 
+run("CSP report-uri points at the backend sink", async () => {
+  const groups = await configuredHeaders();
+  const all = groups[0];
+  const csp =
+    pickHeader(all.headers, "Content-Security-Policy-Report-Only")?.value ??
+    pickHeader(all.headers, "Content-Security-Policy")?.value ??
+    "";
+  // The /api/v1 prefix is proxied to the FastAPI csp_report endpoint by
+  // src/app/api/v1/[[...path]]/route.ts. Burn-in only — header stays
+  // Report-Only and the endpoint is no-op-safe (HTTP 204).
+  assert.match(csp, /report-uri\s+\/api\/v1\/csp-report/);
+});
+
 setTimeout(() => {
   if (process.exitCode) process.exit(process.exitCode);
 }, 200);
