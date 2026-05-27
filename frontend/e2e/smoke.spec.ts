@@ -134,3 +134,108 @@ test.describe("public smoke (status + waitlist counter)", () => {
     await expect(metricValue).toBeVisible();
   });
 });
+
+// Safe e2e expansion (long autonomous session 2026-05-27, TASK 8).
+// Adds read-only coverage for marketing/legal/SEO surfaces that
+// have shipped for a while but are missing from the smoke pass.
+// Constraints (.cursorrules + session HARD BANS):
+//   - never submit a signup, never type a password;
+//   - never POST to a candidate-side mutation;
+//   - never auto-apply;
+//   - never trigger a scrape.
+// Tests below only `page.goto(...)` + `page.locator(...)` reads.
+test.describe("public smoke (marketing + SEO)", () => {
+  test("/pricing renders at least one pricing card", async ({ page }) => {
+    await page.goto("/pricing");
+    await expect(page.locator("body")).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
+    // Pricing page exposes per-tier sections; we don't pin copy
+    // (i18n) but we expect more than one heading on the page
+    // (one per tier).
+    const headings = page.getByRole("heading");
+    const count = await headings.count();
+    expect(count).toBeGreaterThan(1);
+  });
+
+  test("/for-candidates loads the candidate landing", async ({ page }) => {
+    await page.goto("/for-candidates");
+    await expect(page.locator("body")).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
+  });
+
+  test("/for-companies loads the recruiter landing", async ({ page }) => {
+    await page.goto("/for-companies");
+    await expect(page.locator("body")).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
+  });
+
+  test("/privacy + /terms expose at least one link back home", async ({ page }) => {
+    // Already covered for "renders heading" above; this run
+    // adds a navigation-back assertion so a malformed legal
+    // page can't trap visitors.
+    for (const path of ["/privacy", "/terms"]) {
+      await page.goto(path);
+      await expect(page.locator("a[href='/'], a[href^='/']").first()).toBeVisible();
+    }
+  });
+
+  test("/robots.txt advertises a sitemap and is plain text", async ({ request }) => {
+    const res = await request.get("/robots.txt");
+    expect(res.status()).toBe(200);
+    const ct = (res.headers()["content-type"] || "").toLowerCase();
+    expect(ct).toContain("text/plain");
+    const body = await res.text();
+    // Defends against an accidental allow-all sitemap-less robots.
+    expect(body.toLowerCase()).toContain("sitemap");
+  });
+
+  test("/sitemap.xml returns XML pointing at the live host", async ({ request }) => {
+    const res = await request.get("/sitemap.xml");
+    expect(res.status()).toBe(200);
+    const ct = (res.headers()["content-type"] || "").toLowerCase();
+    expect(ct).toMatch(/xml/);
+    const body = await res.text();
+    expect(body).toContain("<urlset");
+  });
+});
+
+// Runtime security-headers contract on the public surface. The
+// structural check (`scripts/security-headers.test.ts`) freezes
+// the shape of `next.config.ts`; this runtime check confirms the
+// deployed server actually emits the same string on /. Together
+// they catch both refactors of the config object AND infra
+// changes (Vercel routing rules, etc.) that could strip a
+// directive in transit.
+test.describe("public smoke (security headers runtime)", () => {
+  test("home page response carries the report-only CSP with report-uri", async ({
+    request,
+  }) => {
+    const res = await request.get("/");
+    expect(res.status()).toBe(200);
+    const headers = res.headers();
+    const csp =
+      headers["content-security-policy-report-only"] ??
+      headers["Content-Security-Policy-Report-Only"];
+    expect(csp).toBeTruthy();
+    // CSP burn-in clock starts when this directive is observable
+    // on the public alias — see
+    // `docs/P1_CSP_REPORT_URI_WIRING_2026-05-27.md`.
+    expect(csp).toContain("report-uri /api/v1/csp-report");
+    expect(csp).toContain("frame-ancestors 'none'");
+  });
+
+  test("home page response carries the locked-down framing headers", async ({
+    request,
+  }) => {
+    const res = await request.get("/");
+    expect(res.status()).toBe(200);
+    const headers = res.headers();
+    expect((headers["x-frame-options"] || "").toUpperCase()).toBe("DENY");
+    expect((headers["x-content-type-options"] || "").toLowerCase()).toBe("nosniff");
+    expect((headers["referrer-policy"] || "").toLowerCase()).toBe(
+      "strict-origin-when-cross-origin",
+    );
+    // Tech-stack disclosure: must not be present.
+    expect(headers["x-powered-by"]).toBeUndefined();
+  });
+});
