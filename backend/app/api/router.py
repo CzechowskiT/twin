@@ -6,6 +6,7 @@ from app.api import (
     auto_apply_settings,
     admin_ops,
     consent,
+    csp_reports,
     demo,
     ops,
     investor_data_room,
@@ -39,6 +40,7 @@ from app.api import (
 
 api_router = APIRouter()
 api_router.include_router(health.router, tags=["Health"])
+api_router.include_router(csp_reports.router, tags=["Security"])
 api_router.include_router(demo.router, prefix="/demo", tags=["Demo"])
 api_router.include_router(public.router, prefix="/public", tags=["Public"])
 api_router.include_router(geo.router, prefix="/geo", tags=["Geo"])
