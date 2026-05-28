@@ -25,6 +25,7 @@
   --twin-card: #ffffff;
   --twin-card-solid: #ffffff;
   --twin-surface: #e0ebe5;
+  --twin-surface-muted: #d8e6de;
   --twin-surface-raised: #f5f8f6;
   --twin-border: #aec9bd;
   --twin-border-hover: #7f9b8c;
@@ -71,6 +72,7 @@ html[data-marketing-surface="studio"] {
   --twin-card: rgb(15 23 42 / 0.55);
   --twin-card-solid: rgb(15 23 42 / 0.92);
   --twin-surface: rgb(15 23 42 / 0.45);
+  --twin-surface-muted: rgb(30 41 59 / 0.65);
   --twin-surface-raised: rgb(30 41 59 / 0.88);
   --twin-border: rgb(148 163 184 / 0.22);
   --twin-border-hover: rgb(148 163 184 / 0.42);

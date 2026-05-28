@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "@/components/language-provider";
+import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
@@ -139,10 +140,13 @@ export default function AcceptanceQueuePage() {
   }
 
   return (
-    <Shell>
+    <Shell wide rail>
+      <div className="mb-4 flex min-w-0 flex-col gap-3 sm:mb-6 sm:flex-row sm:items-start sm:justify-between">
+        <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">{t("acceptanceQueue.title")}</h1>
+        <CandidateWorkspaceSubnav ariaLabel={t("acceptanceQueue.title")} />
+      </div>
       <Card>
-        <h1 className="mb-2 text-2xl font-semibold">{t("acceptanceQueue.title")}</h1>
-        <p className="twin-muted mb-6 text-sm leading-relaxed">{t("acceptanceQueue.lead")}</p>
+        <p className="twin-muted mb-4 text-sm leading-relaxed">{t("acceptanceQueue.lead")}</p>
         {loading ? <p className="twin-muted text-sm">{t("acceptanceQueue.loading")}</p> : null}
         {err ? <p className="mb-4 text-sm text-red-600">{err}</p> : null}
         {!loading && queue && queue.total === 0 ? (

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
+import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { useTranslation } from "@/components/language-provider";
 import { BillingPlanTierCard } from "@/components/billing/billing-plan-tier-card";
 import { BillingUpgradeExperience } from "@/components/billing/billing-upgrade-experience";
@@ -353,16 +354,14 @@ export default function BillingPage() {
   const showPortal = paid;
 
   return (
-    <Shell rail>
+    <Shell wide rail>
       <div className="twin-billing-surface">
-        <div className="twin-app-read-pane mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="twin-app-read-pane mb-6 flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0 max-w-2xl">
             <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">{t("dashboard.billingPageTitle")}</h1>
             <p className="twin-muted mt-2 max-w-xl text-sm leading-relaxed">{t("dashboard.billingPageSubtitle")}</p>
           </div>
-          <Link href="/dashboard" className="twin-btn-secondary twin-touch-target inline-block shrink-0 text-center sm:!w-auto">
-            ← {t("dashboard.title")}
-          </Link>
+          <CandidateWorkspaceSubnav ariaLabel={t("dashboard.billingPageTitle")} />
         </div>
 
         <BillingUpgradeExperience

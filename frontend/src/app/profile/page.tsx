@@ -519,14 +519,14 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <Shell rail>
+      <Shell wide rail>
         <p className="twin-muted">{t("profile.loading")}</p>
       </Shell>
     );
   }
 
   return (
-    <Shell rail>
+    <Shell wide rail>
       <div className="mb-4 flex min-w-0 flex-col gap-3 sm:mb-6 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div className="min-w-0 shrink-0">
           <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">{t("profile.title")}</h1>
