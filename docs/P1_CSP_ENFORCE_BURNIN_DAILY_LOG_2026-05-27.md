@@ -1,16 +1,19 @@
 # CSP enforce burn-in — daily operator log
 
 Pairs with `docs/P1_CSP_ENFORCE_BURNIN_CHECKLIST_2026-05-27.md`.
-**Do not flip to enforce** until 72h of clean rows on the preview alias.
+**Do not flip to enforce** until 72h of clean rows on the preview alias and explicit founder sign-off.
 
-| Day (UTC) | Alias checked | Console violations | `csp_reports` new rows | Stripe/analytics blocked? | Sign-off |
-| --------- | ------------- | ------------------ | ---------------------- | ------------------------- | -------- |
-| 2026-05-27 | twin-sooty (prod report-only) | _pending manual_ | _SQL spot-check pending_ | n/a | — |
+## Daily burn-in decision log schema
 
-## Per-route spot check (day 1)
+| Date (UTC) | Source | Observed reports | False positives | Blocking risk | Decision | Next action |
+| ---------- | ------ | ---------------- | --------------- | ------------- | -------- | ----------- |
+| 2026-05-27 | Manual header check (prod alias) | Pending DB sink review | Unknown | Medium (insufficient evidence) | HOLD (report-only) | Collect `csp_reports` sample + route checks |
+| 2026-05-28 | `curl -sI` read-only checks on `/` and `/waitlist` | Header present: `content-security-policy-report-only` with `report-uri /api/v1/csp-report` | None observed in this check | Medium (no 72h clean evidence pack yet) | HOLD (report-only) | Keep daily log cadence; gather DB sink evidence and false-positive triage |
 
-- [ ] `/`
-- [ ] `/waitlist`
+## Per-route spot check
+
+- [x] `/` (2026-05-28 header evidence captured)
+- [x] `/waitlist` (2026-05-28 header evidence captured)
 - [ ] `/demo`
 - [ ] `/login/candidate`
 - [ ] `/register/candidate`
@@ -19,5 +22,6 @@ Pairs with `docs/P1_CSP_ENFORCE_BURNIN_CHECKLIST_2026-05-27.md`.
 
 ## Notes
 
-- Report-only header must include `report-uri /api/v1/csp-report` (runtime test in `frontend/e2e/smoke.spec.ts`).
+- Report-only header includes `report-uri /api/v1/csp-report` on checked routes (`/`, `/waitlist`) as of 2026-05-28.
+- Report sink endpoint documentation: `docs/P1_CSP_REPORT_URI_WIRING_2026-05-27.md` and `docs/P1_CSP_REPORTING_ENDPOINT_2026-05-27.md`.
 - Enforce flip is **docs-only plan** until founder approves — see `docs/P1_CSP_ENFORCEMENT_PLAN_2026-05-27.md`.

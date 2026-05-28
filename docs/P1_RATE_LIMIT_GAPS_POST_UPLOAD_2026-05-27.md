@@ -29,7 +29,7 @@ After this session's Layer 2 extensions:
 | Endpoint family | Suggested cap | Notes |
 | --------------- | ------------- | ----- |
 | OAuth callbacks (`/auth/*/callback`, calendar, Greenhouse ATS) | 10/min IP | **Shipped** — `test_oauth_callback_rate_limits.py` |
-| Job save / unsave (`POST/DELETE /jobs/saved/{id}`) | 30/min user | **Shipped** — `jobs.py` + deploy pending |
+| Job save / unsave (`POST/DELETE /jobs/saved/{id}`) | 30/min user | **Shipped** — `jobs.py`; regression-covered in `tests/test_jobs_saved_rate_limits.py` |
 | Cookie consent (`POST /consent/cookies`) | 30/min IP | **Shipped** — `test_consent_recruiter_rate_limits.py` |
 | Recruiter inbox respond / batch | 60/min token | **Shipped** — `recruiter_token_key` in `limiter.py` |
 | `POST /auto-apply/trigger` | daily cap inside handler | OK |
@@ -38,4 +38,4 @@ After this session's Layer 2 extensions:
 
 Stripe webhook — not rate-limited (Stripe controls delivery); dedup ledger when migration runs.
 
-Tests: `tests/test_auth_mutation_rate_limits.py`
+Tests: `tests/test_auth_mutation_rate_limits.py`, `tests/test_jobs_saved_rate_limits.py`, `tests/test_consent_recruiter_rate_limits.py`

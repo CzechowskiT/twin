@@ -3,7 +3,7 @@
 **Branch:** `cursor/phase1-monorepo-scaffold`
 **Session:** Production cutover readiness session 2 (read-only verification; no manual Railway/Vercel deploy).
 **Verifier:** Release / security / QA pass.
-**Updated:** 2026-05-27 ~16:50 CEST
+**Updated:** 2026-05-28 ~12:45 CEST (read-only refresh)
 
 ---
 
@@ -11,8 +11,8 @@
 
 | Question | Decision |
 | -------- | -------- |
-| Redeploy API manually today? | **No** — production already at runtime tip `67a22dc`; repo tip `8d34404` is docs-only. |
-| Is branch BE runtime live on Railway? | **Yes** — `public-health` reports `git_commit=67a22dc…`, `db_ok=true`, `worker_active=true`. |
+| Redeploy API manually today? | **No** — this checkpoint is read-only; production `public-health` already reports `f165096`. |
+| Is branch BE runtime live on Railway? | **Yes** — `public-health` reports `git_commit=f165096…`, `db_ok=true`, `worker_active=true`. |
 | Run Alembic `050` manually? | **Verify first** — `backend/scripts/start-api.sh` runs `alembic upgrade head` on every API start. Founder must confirm `alembic current`. |
 | Block deploy for missing migration approval? | **No deploy block** for docs-only tip; **S5 launch gate** stays ⚠️ until DB revision verified. |
 | Public launch | **NO-GO** (unchanged — CSP enforce, restore drill, S5 confirmation). |
@@ -36,9 +36,9 @@
 
 | Surface | SHA (short) | Matches repo runtime? |
 | ------- | ----------- | ---------------------- |
-| Railway `public-health` / health | `67a22dc` | ✅ BE runtime tip |
-| `origin/cursor/phase1-monorepo-scaffold` | `8d34404` | ⚠️ docs-only ahead of Railway |
-| Vercel alias + GitHub Production | `8d34404` | ✅ FE deploy metadata (no code delta vs `67a22dc`) |
+| Railway `public-health` / health | `f165096` | ✅ BE runtime tip |
+| `origin/cursor/phase1-monorepo-scaffold` | `f165096` | ✅ no API SHA drift at check time |
+| Vercel alias + GitHub Production | `not asserted` | ⚠️ unauthenticated in this checkpoint; keep unknown |
 
 ---
 
@@ -97,10 +97,10 @@
 
 | Probe | Result |
 | ----- | ------ |
-| `GET /api/v1/health` | 200 `status=ok` `git_commit=67a22dc` |
+| `GET /api/v1/health` | 200 `status=ok` `git_commit=f165096` (via public-health proxy) |
 | `GET /api/v1/health?ops=1&db=1` | 200 `db_ok=true` |
 | `GET /api/v1/health/celery-status` | 200 `worker_active=true` |
-| `GET https://twin-sooty.vercel.app/api/public-health` | 200, `git_commit=67a22dc`, `db_ok=true` |
+| `GET https://twin-sooty.vercel.app/api/public-health` | 200, `git_commit=f165096`, `db_ok=true` |
 | Vercel routes (see cutover report §10) | all **200** |
 
 ---

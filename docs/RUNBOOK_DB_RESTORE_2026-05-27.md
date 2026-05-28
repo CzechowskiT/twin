@@ -13,14 +13,16 @@
 | RPO | ≤ 24h (daily snapshot) | Dashboard screenshot in ops log |
 | RTO | ≤ 2h manual restore | Drill log entry required |
 
-## Restore drill (staging or isolated clone — never prod without approval)
+## Restore drill (staging proof for founder, no production overwrite)
 
-1. Create a **new** Railway Postgres instance from latest snapshot (do not overwrite prod).
-2. Point a **staging** API service at the clone `DATABASE_URL`.
-3. Run `alembic current` — must match prod revision.
-4. Run `./scripts/verify-prod-health.sh` against staging API (adapt URL).
-5. Spot-check: `SELECT COUNT(*) FROM users;` vs known ballpark.
-6. **Log result** in `docs/BACKUP_RESTORE_DRILL_LOG.md` (create entry with date, operator, pass/fail).
+1. In Railway Postgres Backups, pick the latest snapshot and choose **Restore to new database**.
+2. Name target clearly (example: `twin-staging-restore-proof-YYYYMMDD`) and confirm target is **not** production.
+3. Connect staging API service to the new clone `DATABASE_URL` only (never touch production service variables).
+4. In staging API shell run `alembic current`; copy output for evidence.
+5. Check health endpoint for staging service (`/api/v1/health` or `/api/public-health` if proxied) and save response.
+6. Run one SQL sanity query (`SELECT version_num FROM alembic_version;` plus one count like `SELECT COUNT(*) FROM users;`).
+7. **Log result** in `docs/BACKUP_RESTORE_DRILL_LOG.md` with PASS/FAIL and evidence artifacts.
+8. Return staging API env to previous non-restore DB after proof if needed.
 
 ## Production restore (incident only)
 
@@ -36,6 +38,14 @@ See `docs/INCIDENT_RESPONSE_RUNBOOK_2026-05-27.md` § database outage.
 - [ ] Daily backup confirmed in Railway UI
 - [ ] One successful restore drill logged (staging clone)
 - [ ] RPO/RTO row filled in this doc with actual drill timestamps
+
+## Founder-safe evidence checklist (must attach)
+
+- Screenshot of Railway restore target showing a **new clone** (not prod).
+- `alembic current` output or SQL `SELECT version_num FROM alembic_version;`.
+- Health response showing API started and DB reachable.
+- One row-count sanity query output.
+- Explicit GO/NO-GO decision and next action.
 
 ## Hard bans honoured
 

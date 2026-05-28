@@ -3,11 +3,11 @@
 Append-only evidence for `docs/RUNBOOK_DB_RESTORE_2026-05-27.md`.
 **Do not** run or log prod-overwrite restores here without incident ID and explicit approval.
 
-## Drill evidence table
+## Drill evidence table (append-only)
 
 | Date (UTC) | Operator | Backup source | Target env | Result | Restore time | Errors | Screenshot/evidence | GO/NO-GO decision | Notes |
 | ---------- | -------- | ------------- | ---------- | ------ | ------------ | ------ | ------------------- | ----------------- | ----- |
-| _pending_ | founder | latest prod snapshot | staging clone | PENDING | — | — | attach UI screenshot + health output | NO-GO | First drill not yet executed |
+| _pending_ | founder | latest prod snapshot | staging clone | PENDING | — | — | attach restore target screenshot + health output + `alembic current` + SQL sanity query | NO-GO | First drill not yet executed |
 
 ## O7 quick references
 
@@ -25,3 +25,11 @@ Append-only evidence for `docs/RUNBOOK_DB_RESTORE_2026-05-27.md`.
 ```text
 | 2026-MM-DD | founder-name | Railway Postgres backup #12345 | staging clone | PASS | 00:27:30 | none | screenshot link + /health output + SQL result | GO | alembic revision matched expected head; smoke passed |
 ```
+
+## Non-technical founder quick steps
+
+1. Restore latest snapshot to a **new staging clone** (never overwrite prod).
+2. Verify staging API health is green.
+3. Verify migration revision with `alembic current` (or SQL `alembic_version`).
+4. Add one line in this table with evidence links or pasted outputs.
+5. Keep O7 as **NO-GO** until one PASS row exists.
