@@ -331,3 +331,10 @@
   - OAuth + ICS/WebCal portability baseline,
   - safety-preserving autonomous execution boundaries.
 - Verification: markdown/manual review (new section and bullets render correctly).
+
+### WS22 Micro-slice — ST-025 O7 restore drill quick refs
+
+- Added an `O7 quick references` section to `docs/BACKUP_RESTORE_DRILL_LOG.md`
+  with runbook/gate links, canonical health-check URL, and minimum evidence
+  pack requirements for each restore-drill row.
+- Verification: markdown/manual review (checklist and links render correctly).

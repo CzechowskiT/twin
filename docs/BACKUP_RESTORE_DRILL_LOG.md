@@ -9,6 +9,17 @@ Append-only evidence for `docs/RUNBOOK_DB_RESTORE_2026-05-27.md`.
 | ---------- | -------- | ------------- | ---------- | ------ | ------------ | ------ | ------------------- | ----------------- | ----- |
 | _pending_ | founder | latest prod snapshot | staging clone | PENDING | — | — | attach UI screenshot + health output | NO-GO | First drill not yet executed |
 
+## O7 quick references
+
+- Runbook: `docs/RUNBOOK_DB_RESTORE_2026-05-27.md`
+- Gate context: `docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md` (O7)
+- Read-only health check URL: `https://twin-sooty.vercel.app/api/public-health`
+- Minimum evidence pack for each row:
+  1. Railway restore job screenshot (source + target + timestamp),
+  2. post-restore health response payload,
+  3. one SQL sanity query output,
+  4. gate decision (`GO`/`NO-GO`) with operator note.
+
 ## Founder template (copy one row per drill)
 
 ```text
