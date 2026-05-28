@@ -253,3 +253,16 @@
   - `cd frontend && npx tsc --noEmit` ✅
   - `cd frontend && npm run build` ✅
   - `cd frontend && npx playwright test -g "dashboard smoke|demo page loads live snapshot section|login hub loads candidate zone|robots.txt|sitemap.xml"` ✅ (`8 passed`)
+
+### WS15 Micro-slice — ST-007 dedup across worker retry
+
+- Added targeted replay regression in
+  `backend/tests/test_stripe_webhook_idempotency.py`:
+  `test_worker_retry_reprocesses_failed_event_once`.
+- Coverage proves the failed-first delivery path is retried exactly once, then a third
+  duplicate delivery is short-circuited as replayed (`replayed=true`) without re-dispatch.
+- Maintains existing ledger contract assertions by checking terminal `success` state for
+  the Stripe event row.
+- Targeted verification:
+  - `pytest -k worker_retry backend/tests/test_stripe_webhook_idempotency.py -q`
+  - Result: `1 passed, 16 deselected`.

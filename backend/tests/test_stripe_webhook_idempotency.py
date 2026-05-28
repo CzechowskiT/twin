@@ -459,6 +459,48 @@ def test_failed_event_is_retried_and_can_transition_to_success(
         db.close()
 
 
+def test_worker_retry_reprocesses_failed_event_once(
+    client: tuple[TestClient, sessionmaker],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Worker retry path retries failed event once; later replay short-circuits."""
+    http, session_local = client
+    event_id = "evt_idempotency_worker_retry_001"
+    payload = _invoice_payload(event_id)
+    headers = {"Content-Type": "application/json", "stripe-signature": _sign(payload)}
+    attempts: list[str] = []
+
+    def _fail_once_then_pass(db, invoice, settings):  # noqa: ANN001
+        attempts.append("invoice")
+        if len(attempts) == 1:
+            raise RuntimeError("simulated worker first attempt failure")
+        return None
+
+    monkeypatch.setattr(
+        "app.api.billing.stripe_svc.process_invoice_payment_succeeded",
+        _fail_once_then_pass,
+    )
+
+    first = http.post("/api/v1/billing/webhook", content=payload, headers=headers)
+    assert first.status_code == 500, first.text
+
+    retry = http.post("/api/v1/billing/webhook", content=payload, headers=headers)
+    assert retry.status_code == 200, retry.text
+    assert retry.json().get("replayed") is None
+
+    replay_after_recovery = http.post("/api/v1/billing/webhook", content=payload, headers=headers)
+    assert replay_after_recovery.status_code == 200, replay_after_recovery.text
+    assert replay_after_recovery.json().get("replayed") == "true"
+    assert attempts == ["invoice", "invoice"]
+
+    db = session_local()
+    try:
+        row = db.query(StripeWebhookEvent).filter_by(event_id=event_id).one()
+        assert row.handler_status == stripe_events.STATUS_SUCCESS
+    finally:
+        db.close()
+
+
 @pytest.mark.parametrize(
     ("first_created", "replay_created"),
     [
