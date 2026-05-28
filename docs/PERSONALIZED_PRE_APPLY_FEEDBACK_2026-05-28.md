@@ -55,6 +55,71 @@ Notes:
 - This is a contract proposal only; do not present as fully implemented API.
 - `verification_claims` must remain `"none"` when proof requirements are not met.
 
+### Canonical `pre_apply_feedback.v1` contract (test-scaffolded)
+
+Product/API contract design for a future endpoint. **Not live** unless explicitly implemented later. No KYC, no guaranteed interview, no employer-validated claims, no “verified” unless a future evidence-verification workflow exists.
+
+Required top-level keys:
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `version` | string | Must be `pre_apply_feedback.v1` |
+| `job_id` | integer | Target role |
+| `candidate_scope` | string | Scope marker (e.g. `authenticated_self`); prefer over raw PII in payloads |
+| `fit_summary` | string | Short neutral summary |
+| `strengths` | string[] | High-fit reasons |
+| `risks` | string[] | Risk reasons |
+| `missing_requirements` | object[] | Gaps vs role bar |
+| `improvement_suggestions` | object[] | Actionable profile steps |
+| `evidence_notes` | object | Declared vs supported skills; no verification overclaim |
+| `ranking_signals` | object | Deterministic score/feedback fragments |
+| `apply_recommendation` | string | `apply_now` \| `defer` \| `do_not_apply` \| `review_first` |
+| `confidence` | string | `low` \| `medium` \| `high` |
+| `human_review_required` | boolean | True when copy must stay conservative |
+| `forbidden_claims` | string[] | Explicit list of claim types that must not appear in user-facing text |
+
+Example (safe sample — no PII, no overclaim):
+
+```json
+{
+  "version": "pre_apply_feedback.v1",
+  "job_id": 123,
+  "candidate_scope": "authenticated_self",
+  "fit_summary": "Inferred fit from title and skills overlap; evidence partial.",
+  "strengths": ["title_alignment", "skills_overlap"],
+  "risks": ["missing_required_tool"],
+  "missing_requirements": [{"key": "kubernetes", "severity": "high", "required": true}],
+  "improvement_suggestions": [{"type": "evidence", "action": "attach_case_study", "priority": "high"}],
+  "evidence_notes": {
+    "supported_skills": ["python"],
+    "declared_only_skills": ["kubernetes"],
+    "verification_claims": "none",
+    "wording": "supported by provided evidence for python; kubernetes declared by candidate only"
+  },
+  "ranking_signals": {
+    "base_fit": 62.0,
+    "feedback_adjustments": [{"signal": "apply_intent", "delta": 3.0}],
+    "final_score": 74.0
+  },
+  "apply_recommendation": "review_first",
+  "confidence": "medium",
+  "human_review_required": false,
+  "forbidden_claims": [
+    "verified",
+    "certified",
+    "guaranteed",
+    "KYC-approved",
+    "employer-validated",
+    "legally verified",
+    "background-checked",
+    "assured interview",
+    "guaranteed fit"
+  ]
+}
+```
+
+Contract tests live in `backend/tests/test_pre_apply_feedback_contract.py` (scaffolding only; does not prove a production API exists).
+
 ## Required content blocks
 
 ### 1) Why this role is high fit
