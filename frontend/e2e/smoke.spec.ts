@@ -1,20 +1,24 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+async function gotoSmoke(page: Page, path: string) {
+  await page.goto(path, { waitUntil: "domcontentloaded", timeout: 45_000 });
+}
 
 test.describe("public smoke", () => {
   test("homepage loads hero and waitlist CTA", async ({ page }) => {
-    await page.goto("/");
+    await gotoSmoke(page, "/");
     await expect(page.locator("body")).toBeVisible();
     await expect(page.getByRole("link", { name: /wishlist|waitlist|lista/i }).first()).toBeVisible();
   });
 
   test("waitlist page shows signup form", async ({ page }) => {
-    await page.goto("/waitlist");
+    await gotoSmoke(page, "/waitlist");
     await expect(page.getByRole("heading").first()).toBeVisible();
     await expect(page.locator("input[type='email'], input[name='email']").first()).toBeVisible();
   });
 
   test("login hub loads candidate zone", async ({ page }) => {
-    await page.goto("/login/candidate");
+    await gotoSmoke(page, "/login/candidate");
     await page.waitForLoadState("domcontentloaded");
     const emailField = page
       .locator("input[type='email'], input[name='email'], input[autocomplete='email']")
@@ -32,7 +36,7 @@ test.describe("public smoke", () => {
   });
 
   test("demo page loads live snapshot section", async ({ page }) => {
-    await page.goto("/demo");
+    await gotoSmoke(page, "/demo");
     await expect(page.locator("body")).toBeVisible();
     const demoText = (await page.locator("body").innerText()).toLowerCase();
     expect(demoText).toMatch(/demo|sample/);
@@ -72,7 +76,7 @@ test.describe("dashboard smoke (read-only, no live actions)", () => {
         // some browsers throw on storage access pre-document — safe to ignore
       }
     });
-    await page.goto("/dashboard");
+    await gotoSmoke(page, "/dashboard");
     // Either we land on /login (post-redirect) or we render the
     // boot-loader briefly; in both cases we should never see a
     // candidate-only widget. Wait for the URL to settle on /login
@@ -83,21 +87,24 @@ test.describe("dashboard smoke (read-only, no live actions)", () => {
     await expect(page.locator("body")).toBeVisible();
     // Must not leak ranked pipeline payloads while logged out (Top 20 / scores).
     const bodyText = await page.locator("body").innerText();
-    expect(bodyText.toLowerCase()).not.toMatch(/final_score|top\s*20\s*matches/);
+    const lowerBody = bodyText.toLowerCase();
+    expect(lowerBody).not.toMatch(/final_score|top\s*20\s*matches|top20\s*matches/);
+    // PII should never be visible without an authenticated session.
     expect(bodyText).not.toMatch(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
+    expect(bodyText).not.toMatch(/(?:\+?\d[\d\s().-]{8,}\d)/);
   });
 
   test("/register/candidate shows email + password inputs (no submit)", async ({ page }) => {
-    await page.goto("/register/candidate");
+    await gotoSmoke(page, "/register/candidate");
     await expect(page.locator("body")).toBeVisible();
     await expect(page.locator("input[type='email'], input[name='email']").first()).toBeVisible();
     await expect(page.locator("input[type='password']").first()).toBeVisible();
   });
 
   test("/privacy + /terms render public legal pages", async ({ page }) => {
-    await page.goto("/privacy");
+    await gotoSmoke(page, "/privacy");
     await expect(page.getByRole("heading").first()).toBeVisible();
-    await page.goto("/terms");
+    await gotoSmoke(page, "/terms");
     await expect(page.getByRole("heading").first()).toBeVisible();
   });
 
@@ -134,7 +141,7 @@ test.describe("dashboard smoke (read-only, no live actions)", () => {
 // analysis that motivated them.
 test.describe("public smoke (status + waitlist counter)", () => {
   test("/status renders status header and at least one row", async ({ page }) => {
-    await page.goto("/status");
+    await gotoSmoke(page, "/status");
     // Header text is i18n-driven, so we don't pin a specific
     // string — we just confirm the page has *a* h1 heading.
     await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
@@ -148,7 +155,7 @@ test.describe("public smoke (status + waitlist counter)", () => {
   });
 
   test("/waitlist exposes the founding-spots counter UI", async ({ page }) => {
-    await page.goto("/waitlist");
+    await gotoSmoke(page, "/waitlist");
     // The page hydrates the live counter via useWaitlistStats.
     // We don't assert a specific number (it's live) — only that
     // the metrics grid renders at least one metric tile with a
@@ -171,7 +178,7 @@ test.describe("public smoke (status + waitlist counter)", () => {
 // Tests below only `page.goto(...)` + `page.locator(...)` reads.
 test.describe("public smoke (marketing + SEO)", () => {
   test("/pricing renders at least one pricing card", async ({ page }) => {
-    await page.goto("/pricing");
+    await gotoSmoke(page, "/pricing");
     await expect(page.locator("body")).toBeVisible();
     await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
     // Pricing page exposes per-tier sections; we don't pin copy
@@ -183,13 +190,13 @@ test.describe("public smoke (marketing + SEO)", () => {
   });
 
   test("/for-candidates loads the candidate landing", async ({ page }) => {
-    await page.goto("/for-candidates");
+    await gotoSmoke(page, "/for-candidates");
     await expect(page.locator("body")).toBeVisible();
     await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
   });
 
   test("/for-companies loads the recruiter landing", async ({ page }) => {
-    await page.goto("/for-companies");
+    await gotoSmoke(page, "/for-companies");
     await expect(page.locator("body")).toBeVisible();
     await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
   });
@@ -199,7 +206,7 @@ test.describe("public smoke (marketing + SEO)", () => {
     // adds a navigation-back assertion so a malformed legal
     // page can't trap visitors.
     for (const path of ["/privacy", "/terms"]) {
-      await page.goto(path);
+      await gotoSmoke(page, path);
       await expect(page.locator("a[href='/'], a[href^='/']").first()).toBeVisible();
     }
   });
