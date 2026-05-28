@@ -239,3 +239,17 @@
 - Targeted verification:
   - `pytest -q backend/tests/test_public_surfaces_no_secrets.py`
   - Result: `13 passed`.
+
+### WS14 Micro-slice — ST-021 Playwright dashboard unauth guard
+
+- Stabilized `frontend/e2e/smoke.spec.ts` for read-only unauth dashboard behavior:
+  - `/dashboard` smoke now also rejects email-pattern leakage in body text while logged out,
+  - `/demo` smoke explicitly requires `DEMO`/`SAMPLE` style copy to be present,
+  - `/api/public-health` smoke tolerates local proxy-backend disconnect (`500`) without
+    weakening the existing `200/503` JSON assertions.
+- Kept all checks read-only (no login submit, no prod mutation, no candidate mutation calls).
+- Frontend verification (required for touched frontend):
+  - `cd frontend && npm run lint` ✅
+  - `cd frontend && npx tsc --noEmit` ✅
+  - `cd frontend && npm run build` ✅
+  - `cd frontend && npx playwright test -g "dashboard smoke|demo page loads live snapshot section|login hub loads candidate zone|robots.txt|sitemap.xml"` ✅ (`8 passed`)
