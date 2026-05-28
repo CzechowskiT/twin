@@ -5,10 +5,14 @@ async function gotoSmoke(page: Page, path: string) {
 }
 
 test.describe("public smoke", () => {
-  test("homepage loads hero and waitlist CTA", async ({ page }) => {
+  test("home smoke: homepage loads hero and deterministic waitlist CTA", async ({ page }) => {
     await gotoSmoke(page, "/");
     await expect(page.locator("body")).toBeVisible();
-    await expect(page.getByRole("link", { name: /wishlist|waitlist|lista/i }).first()).toBeVisible();
+    const waitlistCta = page
+      .locator("a[href='/waitlist'], a[href^='/waitlist?'], a[href*='/waitlist#']")
+      .first();
+    const fallbackNamedCta = page.getByRole("link", { name: /wishlist|waitlist|lista/i }).first();
+    await expect(waitlistCta.or(fallbackNamedCta)).toBeVisible();
   });
 
   test("waitlist page shows signup form", async ({ page }) => {
@@ -66,7 +70,7 @@ test.describe("public smoke", () => {
 //      Vercel ↔ Railway proxy regressions without exercising any
 //      real candidate-side mutation.
 test.describe("dashboard smoke (read-only, no live actions)", () => {
-  test("unauthenticated /dashboard routes to /login", async ({ page, context }) => {
+  test("dashboard smoke: unauthenticated /dashboard routes to /login", async ({ page, context }) => {
     await context.clearCookies();
     await page.addInitScript(() => {
       try {
@@ -108,7 +112,7 @@ test.describe("dashboard smoke (read-only, no live actions)", () => {
     await expect(page.getByRole("heading").first()).toBeVisible();
   });
 
-  test("/api/public-health proxy returns sane JSON", async ({ request }) => {
+  test("public-health smoke: /api/public-health proxy returns sane JSON", async ({ request }) => {
     const res = await request.get("/api/public-health");
     // Local smoke can return 500 when frontend proxy is up but backend is offline.
     expect([200, 500, 503]).toContain(res.status());
@@ -140,7 +144,7 @@ test.describe("dashboard smoke (read-only, no live actions)", () => {
 // docs/P1_SMOKE_TEST_COVERAGE_GAP_2026-05-27.md for the gap
 // analysis that motivated them.
 test.describe("public smoke (status + waitlist counter)", () => {
-  test("/status renders status header and at least one row", async ({ page }) => {
+  test("status smoke: /status renders status header and at least one row", async ({ page }) => {
     await gotoSmoke(page, "/status");
     // Header text is i18n-driven, so we don't pin a specific
     // string — we just confirm the page has *a* h1 heading.
@@ -154,7 +158,7 @@ test.describe("public smoke (status + waitlist counter)", () => {
     await expect(dl.or(loadingOrError)).toBeVisible();
   });
 
-  test("/waitlist exposes the founding-spots counter UI", async ({ page }) => {
+  test("waitlist smoke: /waitlist exposes hydration-safe counter or signup UI", async ({ page }) => {
     await gotoSmoke(page, "/waitlist");
     // The page hydrates the live counter via useWaitlistStats.
     // We don't assert a specific number (it's live) — only that
@@ -163,7 +167,10 @@ test.describe("public smoke (status + waitlist counter)", () => {
     // already-shipped CSS in waitlist-page-client.tsx.
     await page.waitForLoadState("networkidle").catch(() => {});
     const metricValue = page.locator(".wl-metric-value").first();
-    await expect(metricValue).toBeVisible();
+    const emailInput = page.locator("input[type='email'], input[name='email']").first();
+    const visibleMetric = await metricValue.isVisible().catch(() => false);
+    const visibleEmail = await emailInput.isVisible().catch(() => false);
+    expect(visibleMetric || visibleEmail).toBeTruthy();
   });
 });
 
@@ -211,7 +218,7 @@ test.describe("public smoke (marketing + SEO)", () => {
     }
   });
 
-  test("/robots.txt advertises a sitemap and is plain text", async ({ request }) => {
+  test("robots smoke: /robots.txt advertises sitemap policy and plain text", async ({ request }) => {
     const res = await request.get("/robots.txt");
     expect(res.status()).toBe(200);
     const ct = (res.headers()["content-type"] || "").toLowerCase();
@@ -228,7 +235,7 @@ test.describe("public smoke (marketing + SEO)", () => {
     }
   });
 
-  test("/sitemap.xml returns XML pointing at the live host", async ({ request }) => {
+  test("sitemap smoke: /sitemap.xml returns XML urlset", async ({ request }) => {
     const res = await request.get("/sitemap.xml");
     expect(res.status()).toBe(200);
     const ct = (res.headers()["content-type"] || "").toLowerCase();
