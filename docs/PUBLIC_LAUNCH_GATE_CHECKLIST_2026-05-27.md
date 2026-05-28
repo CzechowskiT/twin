@@ -25,15 +25,15 @@ the gate to ✅.
 | #  | Gate                                                                   | How to verify                                                                                  | Status today |
 | -- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------ |
 | S1 | CSP report-only is wired, sink is live, burn-in clock started          | `curl -sI https://twin-sooty.vercel.app/ \| grep -i csp`                                       | ✅ shipped   |
-| S2 | CSP enforce-mode has been live for ≥72h with 0 unexpected violations    | Read `docs/P1_CSP_ENFORCEMENT_PLAN_2026-05-27.md` § "Risk gates" — all 4 sub-conditions met     | ❌ not yet   |
+| S2 | CSP enforce-mode has been live for ≥72h with 0 unexpected violations    | Read `docs/P1_CSP_ENFORCEMENT_PLAN_2026-05-27.md` § "Risk gates" — all 4 sub-conditions met     | ❌ NOT YET (REPORT-ONLY only; founder must not flip enforce before checklist gates) |
 | S3 | Authenticated mutation rate-limit Layer 2 live on LLM endpoints         | `git show 28a50a0 --stat`                                                                       | ✅ shipped   |
 | S4 | Public CV / voice upload endpoints rate-limited                        | `docs/P1_UPLOAD_RATE_LIMITS_2026-05-27.md`; `ff22f3a`                                            | ✅ shipped   |
-| S5 | Stripe `event.id` dedup live (migration + handler patch)                | Handler: `billing.py`; migration: `050` — **verify** prod `alembic current` (API start runs `alembic upgrade head`; agent did not manual-migrate) | ⚠️ handler ✅; DB revision **founder verify** |
+| S5 | Stripe `event.id` dedup live (migration + handler patch)                | Handler: `billing.py`; migration: `050` — PASS only when prod revision is explicitly confirmed (`alembic current` or SQL `SELECT version_num FROM alembic_version;`) | 🟡 pending Alembic `050` confirmation on prod |
 | S6 | Auto-apply sweep gate covered by 10+ tests                              | `pytest tests/test_auto_apply_trigger_sweep_admin_gate.py -q`                                   | ✅ shipped   |
 | S7 | Public health surface frozen by regression tests                        | `pytest tests/test_public_health_regression.py -q`                                              | ✅ shipped   |
 | S8 | No secrets in repo (`.env*` ignored, no API keys in code/docs)          | `gh secret list` + `git grep -E 'sk_(live\|test)\|AKIA'`                                         | ✅ verified one-shot today; re-run before launch |
 | S9 | Dependency baseline has no HIGH CVEs                                    | `docs/P1_DEPENDENCY_AUDIT_BASELINE_2026-05-27.md` + `safety check` + `npm audit`                | ✅ baseline; re-run before launch |
-| S10| OAuth callback rate-limit (defence vs provider-quota burn)              | `tests/test_oauth_callback_rate_limits.py`; `1efd8b1` on `auth.py` + calendar + ATS `@limiter.limit("10/minute")` | ✅ shipped (prod `67a22dc`) |
+| S10| OAuth callback rate-limit (defence vs provider-quota burn)              | `tests/test_oauth_callback_rate_limits.py`; `1efd8b1` on `auth.py` + calendar + ATS `@limiter.limit("10/minute")` | ✅ code shipped (`67a22dc`); keep yellow until target SHA redeploy if prod SHA drifts |
 | S10b | Match-feedback / applications / profile mutation caps (Layer 2)        | `tests/test_auth_mutation_rate_limits.py`; `1c731fc`                                              | ✅ shipped (prod `67a22dc`) |
 | S10c | Cookie consent + recruiter inbox write rate limits                      | `tests/test_consent_recruiter_rate_limits.py`; `67a22dc`                                          | ✅ shipped (prod `67a22dc`) |
 
@@ -47,7 +47,7 @@ the gate to ✅.
 | O4 | Stripe webhook endpoint is reachable, signature gate is wired           | `docs/P1_STRIPE_WEBHOOK_AUDIT_2026-05-27.md`                                                    | ✅           |
 | O5 | Calendar provider OAuth: Google + Microsoft live; Apple/iCal docs ready | `docs/CALENDAR_INTEGRATIONS_*.md` (none on the branch yet → see `.cursorrules` calendar section) | ⚠️ partial   |
 | O6 | Canonical Vercel alias points at the right project; drift guard exists  | `bash scripts/check-vercel-canonical-alias.sh`                                                   | ⚠️ drift documented; canonical project is correct |
-| O7 | Backup / restore for Postgres is exercised (last restore test logged)    | `docs/RUNBOOK_DB_RESTORE_2026-05-27.md` (procedure ready; drill log pending)                    | ⚠️ doc ready; drill ❌ |
+| O7 | Backup / restore for Postgres is exercised (last restore test logged)    | `docs/RUNBOOK_DB_RESTORE_2026-05-27.md` + `docs/BACKUP_RESTORE_DRILL_LOG.md` evidence row with GO/NO-GO decision | ❌ PENDING drill evidence |
 | O8 | Incident response runbook exists with named on-call                     | `docs/INCIDENT_RESPONSE_RUNBOOK_2026-05-27.md` (this session, TASK 13)                          | ✅ this session |
 | O9 | Security risk register is current                                       | `docs/SECURITY_RISK_REGISTER_2026-05-27.md` (this session, TASK 14)                             | ✅ this session |
 | O10| Vercel canonical re-link is either fixed or has a documented workaround | `docs/VERCEL_CANONICAL_DEPLOY_RUNBOOK_2026-05-27.md`                                             | ⚠️ workaround documented |
@@ -102,6 +102,31 @@ the gate to ✅.
 - It does **not** post launch messaging anywhere.
 - It does **not** edit `.cursorrules`, `frontend/`, or any
   source.
+
+## Founder manual steps (non-technical)
+
+### Alembic `050` confirmation (read-only, no migration)
+
+1. Open Railway project for API database.
+2. Open Postgres service console/shell (**read-only check only**).
+3. Run: `SELECT version_num FROM alembic_version;`
+4. PASS if value is exactly `050_stripe_webhook_events`.
+5. FAIL if value is `049_job_match_feedback` or anything older.
+6. Record result in this checklist and in `docs/PRODUCTION_REALITY_MATRIX_2026-05-27.md`.
+
+Alternative (shell path in Railway service):
+
+1. Open API service shell in Railway.
+2. Run: `alembic current`
+3. PASS if output shows `050_stripe_webhook_events (head)`.
+4. FAIL otherwise.
+
+Warning: this check is non-destructive; do **not** run `alembic upgrade` manually for this gate.
+
+### Candidate E2E manual gate
+
+- Execute `docs/CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md`.
+- Mark gate PASS only after founder fills the result row with evidence.
 
 ## Hard bans honoured
 

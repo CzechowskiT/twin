@@ -1,8 +1,9 @@
 # Production reality matrix — 2026-05-27
 
 **Branch:** `cursor/phase1-monorepo-scaffold`
-**Production API SHA (read-only):** `67a22dc`
-**Vercel / GitHub Production deploy:** `8d34404` (docs-only delta vs API)
+**Branch HEAD (local):** `8a29b78a4e699de1f69122b79460cf82ac09eeae`
+**Production API SHA (read-only):** `67a22dc1fafe8ba9176a5acf15ba4d58ba2a86d5`
+**Vercel production SHA:** `8d34404` (from current production matrix; requires Vercel UI check for refresh)
 **Frontend:** `https://twin-sooty.vercel.app` (canonical alias on Vercel project `twin`)
 **API:** `https://twin-production-bcd9.up.railway.app`
 
@@ -25,11 +26,11 @@ Legend: **LIVE** = verified on prod this session · **PARTIAL** = shipped but ga
 | ICS / WebCal export | product docs | **REPO** / partial |
 | Stripe Checkout | `stripe_checkout_ready` | **LIVE** |
 | Stripe webhook signature | tests + billing route | **LIVE** |
-| Stripe webhook dedup ledger | `050` migration + `billing.py` | **PARTIAL** — verify `alembic current`; helpers degrade if no table |
+| Stripe webhook dedup ledger | `050` migration + `billing.py` | **PARTIAL** — Alembic `050` on prod not yet founder-confirmed |
 | Beta waitlist signup | rate limit + contract tests | **LIVE** |
 | CV / voice upload limits | `ff22f3a` | **LIVE** |
 | CSP report-only + sink | S1 gate, `/api/v1/csp-report` | **LIVE** |
-| CSP enforce | S2 gate | **BLOCKED** — burn-in not complete |
+| CSP enforce | S2 gate | **BLOCKED** — keep REPORT-ONLY, do not flip enforce before burn-in checklist |
 | Layer-2 LLM mutation limits | `28a50a0` | **LIVE** |
 | Profile / applications mutation limits | `1c731fc` | **LIVE** |
 | OAuth callback rate limits | `1efd8b1` | **LIVE** |
@@ -44,8 +45,10 @@ Legend: **LIVE** = verified on prod this session · **PARTIAL** = shipped but ga
 | Data subject export/delete | L6 gate | **PARTIAL** |
 | Celery worker + broker | celery-status + health | **LIVE** |
 | Postgres | `db_ok=true` | **LIVE** |
-| Backup restore drill | O7 gate | **BLOCKED** — runbook only |
+| Backup restore drill | O7 gate | **BLOCKED** — drill evidence still pending in log |
 | Controlled pilot ops | pilot manual + tracker | **LIVE** process |
+| Candidate E2E manual smoke | `docs/CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md` | **PENDING** — founder execution required |
+| Playwright smoke drift points | `frontend/e2e/smoke.spec.ts` targeted assertions | **STABILIZED** locally (4/4 targeted checks pass) |
 | Public launch announcement | gate checklist | **BLOCKED** |
 | Investor demo | `INVESTOR_DEMO_RUNBOOK.md` | **LIVE** stack, curated use |
 | Real CAPTCHA bypass / live mass apply | HARD BAN | **BLOCKED** |
@@ -67,3 +70,4 @@ Legend: **LIVE** = verified on prod this session · **PARTIAL** = shipped but ga
 - `docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md`
 - `docs/PRODUCTION_CUTOVER_REPORT_2026-05-27.md`
 - `docs/API_PRODUCTION_CUTOVER_DECISION_2026-05-27.md`
+- `docs/CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md`
