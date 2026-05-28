@@ -13,6 +13,7 @@ from sqlalchemy.pool import StaticPool
 from app.database.models import Application, ApplicationStatus, Base, Candidate, Job, User
 from app.database.session import get_db
 from app.main import app, create_app
+from app.schemas.public import MvpStatsOut
 
 
 def _sqlite():
@@ -238,3 +239,18 @@ def test_http_500_http_exception_detail_sanitized() -> None:
     assert res.status_code == 500
     assert res.json() == {"detail": "Internal server error"}
     assert "internal-db-secret" not in res.text
+
+
+def test_public_mvp_stats_schema_excludes_admin_and_secret_fields() -> None:
+    schema_keys = set(MvpStatsOut.model_json_schema()["properties"].keys())
+    forbidden_public_schema_keys = {
+        "redirect_uri",
+        "client_secret",
+        "ops_admin_configured",
+        "data_room_s3_enabled",
+        "data_room_local_demo",
+        "token",
+        "secret",
+        "dsn",
+    }
+    assert schema_keys.isdisjoint(forbidden_public_schema_keys)

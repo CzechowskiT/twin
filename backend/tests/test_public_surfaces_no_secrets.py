@@ -5,9 +5,10 @@ from __future__ import annotations
 from unittest.mock import MagicMock, patch
 
 import pytest
+from fastapi import HTTPException
 from fastapi.testclient import TestClient
 
-from app.main import app
+from app.main import app, create_app
 
 FORBIDDEN_SUBSTRINGS = (
     "postgresql://",
@@ -68,6 +69,9 @@ FORBIDDEN_SUBSTRINGS = (
         "/api/v1/billing/plans",
         "/api/v1/public/mvp-stats",
         "/api/v1/demo/snapshot",
+        "/api/public-health",
+        "/robots.txt",
+        "/sitemap.xml",
     ],
 )
 def test_public_get_never_leaks_secrets(path: str) -> None:
@@ -94,3 +98,28 @@ def test_public_get_never_leaks_secrets(path: str) -> None:
         text = res.text
         for needle in FORBIDDEN_SUBSTRINGS:
             assert needle not in text, (path, needle)
+
+
+@pytest.mark.parametrize("path", ["/definitely-missing-public-route", "/api/v1/unknown-public-route"])
+def test_public_404_response_never_leaks_secrets(path: str) -> None:
+    client = TestClient(app)
+    res = client.get(path)
+    assert res.status_code == 404
+    text = res.text
+    for needle in FORBIDDEN_SUBSTRINGS:
+        assert needle not in text, (path, needle)
+
+
+def test_public_500_response_is_sanitized() -> None:
+    probe_app = create_app()
+
+    @probe_app.get("/__public_probe_500")
+    def _public_probe_500() -> None:
+        raise HTTPException(status_code=500, detail="raw-oauth-config-secret")
+
+    client = TestClient(probe_app)
+    res = client.get("/__public_probe_500")
+    assert res.status_code == 500
+    assert res.json() == {"detail": "Internal server error"}
+    for needle in FORBIDDEN_SUBSTRINGS:
+        assert needle not in res.text, needle
