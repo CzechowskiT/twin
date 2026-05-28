@@ -86,7 +86,7 @@ export default function NightlyAutoApplySettingsPage() {
       setShowConsent(false);
       setStatus(t("dashboard.nightlyAutoApplyEnabledHint").replace("{time}", data.next_run_label));
     } catch {
-      setError("Failed to save consent");
+      setError(t("dashboard.nightlyAutoApplyConsentSaveFailed"));
     } finally {
       setSaving(false);
     }
@@ -106,7 +106,7 @@ export default function NightlyAutoApplySettingsPage() {
       });
       setSettings(data);
     } catch {
-      setError("Failed to update settings");
+      setError(t("dashboard.nightlyAutoApplySettingsSaveFailed"));
     } finally {
       setSaving(false);
     }

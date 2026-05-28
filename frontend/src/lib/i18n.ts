@@ -863,7 +863,7 @@ const en = {
     billingPlanUpgradeCta: "Upgrade via Stripe",
     billingPlanIncludedFree: "Included — no card required.",
     billingPlanProPending: "Pro price is not wired to Stripe on this deployment yet.",
-    identityLink: "Identity (KYC)",
+    identityLink: "Identity verification",
     calendarLink: "Calendar",
     nightlyAutoApplyLink: "Application agent",
     nightlyAutoApplyTitle: "Autonomous applying",
@@ -877,22 +877,23 @@ const en = {
     nightlyAutoApplyStatsTotal: "Total auto-applications",
     nightlyAutoApplyStatsLastRun: "Last run",
     nightlyAutoApplyStatsNextRun: "Next scheduled run",
-    nightlyAutoApplyTrigger: "Run now (test)",
-    nightlyAutoApplyTriggerRunning: "Running auto-apply test…",
+    nightlyAutoApplyTrigger: "Run test sweep (staging)",
+    nightlyAutoApplyTriggerRunning: "Running test sweep…",
     nightlyAutoApplyTriggerOk: "Done: {message}",
     nightlyAutoApplyTriggerFail: "Could not run test — enable consent first or complete your profile.",
     nightlyAutoApplyTriggerViewApps: "View applications →",
     nightlyAutoApplyConsentTitle: "Consent for autonomous applications",
     nightlyAutoApplyConsentBody:
       "You authorize TWIN to submit applications on supported job boards using your CV and AI-tailored materials. You can disable this anytime.",
-    nightlyAutoApplyConsentAccept: "I agree — enable auto-apply",
+    nightlyAutoApplyConsentAccept: "I agree — enable scheduled applying",
     nightlyAutoApplyConsentCancel: "Cancel",
     nightlyAutoApplySupportedBoards: "Supported boards",
     nightlyAutoApplyNeedProfile: "Complete your candidate profile and upload a CV first.",
     nightlyAutoApplyStripTitle: "Autonomous applying",
     nightlyAutoApplyStripActive:
-      "Active — next run {next}. Total auto-applications: {total}.",
-    nightlyAutoApplyStripInactive: "Off — enable to apply autonomously to top matches.",
+      "Scheduled — next run {next}. Packages prepared so far: {total}.",
+    nightlyAutoApplyStripInactive:
+      "Off — review consent and limits before scheduling autonomous packages.",
     nightlyAutoApplyStripBlockedReadiness:
       "Blocked until verified readiness is complete — complete the checklist on your dashboard first.",
     nightlyAutoApplyStripLegacyActive:
@@ -910,6 +911,8 @@ const en = {
     nightlyAutoApplySweepPartial: "{submitted} submit attempted · {failed} could not complete ({boards})",
     nightlyAutoApplySweepFailedOnly: "{count} could not complete ({boards})",
     nightlyAutoApplySweepSkipped: "{count} skipped (cooldown or blocklist)",
+    nightlyAutoApplyConsentSaveFailed: "Could not save consent — try again.",
+    nightlyAutoApplySettingsSaveFailed: "Could not update settings — try again.",
     workspaceGateTitleRecruiter: "Recruiter workspace",
     workspaceGateTitleCompany: "Company workspace",
     workspaceGateLeadRecruiter:
@@ -3598,7 +3601,7 @@ const pl: MessageTree = {
     billingPlanUpgradeCta: "Upgrade przez Stripe",
     billingPlanIncludedFree: "W cenie — bez karty.",
     billingPlanProPending: "Cena Pro nie jest jeszcze podpięta pod Stripe na tym środowisku.",
-    identityLink: "Tożsamość (KYC)",
+    identityLink: "Weryfikacja tożsamości",
     calendarLink: "Kalendarz",
     nightlyAutoApplyLink: "Agent aplikacji",
     nightlyAutoApplyTitle: "Autonomiczne aplikowanie",
@@ -3613,23 +3616,23 @@ const pl: MessageTree = {
     nightlyAutoApplyStatsTotal: "Łącznie auto-aplikacji",
     nightlyAutoApplyStatsLastRun: "Ostatnie uruchomienie",
     nightlyAutoApplyStatsNextRun: "Następne uruchomienie",
-    nightlyAutoApplyTrigger: "Uruchom teraz (test)",
-    nightlyAutoApplyTriggerRunning: "Trwa test auto-aplikacji…",
+    nightlyAutoApplyTrigger: "Uruchom test sweep (staging)",
+    nightlyAutoApplyTriggerRunning: "Trwa test sweep…",
     nightlyAutoApplyTriggerOk: "Gotowe: {message}",
     nightlyAutoApplyTriggerFail: "Nie udało się uruchomić testu — włącz zgodę lub uzupełnij profil.",
     nightlyAutoApplyTriggerViewApps: "Zobacz aplikacje →",
     nightlyAutoApplyConsentTitle: "Zgoda na autonomiczne aplikacje",
     nightlyAutoApplyConsentBody:
       "Upoważniasz TWIN do składania aplikacji na obsługiwanych portalach z Twoim CV i materiałami AI. Możesz wyłączyć to w każdej chwili.",
-    nightlyAutoApplyConsentAccept: "Zgadzam się — włącz auto-aplikację",
+    nightlyAutoApplyConsentAccept: "Zgadzam się — włącz harmonogram",
     nightlyAutoApplyConsentCancel: "Anuluj",
     nightlyAutoApplySupportedBoards: "Obsługiwane portale",
     nightlyAutoApplyNeedProfile: "Uzupełnij profil kandydata i wgraj CV.",
     nightlyAutoApplyStripTitle: "Autonomiczne aplikowanie",
     nightlyAutoApplyStripActive:
-      "Włączone — następne uruchomienie {next}. Łącznie auto-aplikacji: {total}.",
+      "Zaplanowane — następne uruchomienie {next}. Przygotowane pakiety: {total}.",
     nightlyAutoApplyStripInactive:
-      "Wyłączone — włącz, aby autonomicznie aplikować do najlepszych ofert.",
+      "Wyłączone — przejrzyj zgodę i limity przed zaplanowaniem autonomicznych pakietów.",
     nightlyAutoApplyStripBlockedReadiness:
       "Zablokowane do czasu ukończenia verified readiness — najpierw uzupełnij checklistę na panelu.",
     nightlyAutoApplyStripLegacyActive:
@@ -3647,6 +3650,8 @@ const pl: MessageTree = {
     nightlyAutoApplySweepPartial: "{submitted} prób wysyłki · {failed} bez wysyłki ({boards})",
     nightlyAutoApplySweepFailedOnly: "{count} bez wysyłki ({boards})",
     nightlyAutoApplySweepSkipped: "{count} pominiętych (cooldown lub blocklist)",
+    nightlyAutoApplyConsentSaveFailed: "Nie udało się zapisać zgody — spróbuj ponownie.",
+    nightlyAutoApplySettingsSaveFailed: "Nie udało się zaktualizować ustawień — spróbuj ponownie.",
     workspaceGateTitleRecruiter: "Widok rekrutera",
     workspaceGateTitleCompany: "Widok firmy",
     workspaceGateLeadRecruiter:
