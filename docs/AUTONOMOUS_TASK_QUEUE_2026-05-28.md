@@ -20,7 +20,7 @@
 - ST-010 | Stripe tests | Add no-secret logging assertion test | LOW | READY | ST-008 | `pytest -k no_secret` | tests
 - ST-011 | Mutation RL | Document unauth mutation inventory delta | LOW | DONE | none | markdown lint/manual | docs
 - ST-012 | Mutation RL | Add test for login mutation throttling | LOW | DONE | ST-011 | `pytest -k login_rate_limit` | tests
-- ST-013 | Mutation RL | Add test for register throttling path | LOW | READY | ST-011 | `pytest -k register_rate_limit` | tests
+- ST-013 | Mutation RL | Add test for register throttling path | LOW | DONE | ST-011 | `pytest -k register_rate_limit backend/tests/test_auth_register_rate_limit.py -q` | tests
 - ST-014 | Mutation RL | Add reset-password mutation RL test | LOW | READY | ST-012 | `pytest -k reset_password` | tests
 - ST-015 | Mutation RL | Add token-refresh mutation RL test | LOW | READY | ST-012 | `pytest -k token_refresh` | tests
 - ST-016 | No-secret regression | Add health endpoint no-secret assertion | LOW | DONE | none | `pytest -k public_health` | tests

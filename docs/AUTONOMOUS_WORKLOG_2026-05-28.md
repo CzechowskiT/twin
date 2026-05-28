@@ -160,3 +160,16 @@
 - Targeted verification:
   - `pytest -k invoice_paid backend/tests/test_stripe_webhook_idempotency.py -q`
   - Result: `1 passed, 15 deselected`.
+
+### WS10 Micro-slice — ST-013 register mutation throttling
+
+- Added dedicated register mutation limiter regression file:
+  `backend/tests/test_auth_register_rate_limit.py`.
+- Coverage asserts `/api/v1/auth/register` returns `429` after five requests per minute
+  and that invalid-consent attempts also consume limiter budget.
+- Test harness uses SQLite dependency override (`create_app` + `get_db` override) and
+  stubs registration side effects (`issue_verification_email`, welcome-task delay) to keep
+  execution deterministic and local-only.
+- Targeted verification:
+  - `pytest -k register_rate_limit backend/tests/test_auth_register_rate_limit.py -q`
+  - Result: `2 passed`.
