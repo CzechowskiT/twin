@@ -29,9 +29,10 @@ Design a delegated-apply path that is constrained, auditable, and evidence-drive
 
 ## Runtime contract for current branch
 
-- `delegated_apply_allowed=false`
-- `can_prepare_application_package` can be true when baseline verification passes.
-- `can_submit_delegated_application=false`
+- Read-only `GET /api/v1/candidates/me/verified-readiness` only (no submit mutation).
+- `delegated_apply_allowed=false` (delegated consent table not migrated).
+- `can_prepare_application_package` true when `verification_status` is `ready_for_review` or `verified_basic`.
+- `can_submit_delegated_application=false` in every state.
 
 ## Migration-required later steps
 

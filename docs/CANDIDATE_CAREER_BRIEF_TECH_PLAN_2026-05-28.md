@@ -12,9 +12,11 @@ Define an incremental implementation path for Career Brief using existing profil
 
 ## What can ship without migration
 
-- Read-only readiness gate checks for brief presence in `profile_signals_json`.
+- Read-only readiness gate checks for brief presence in `profile_signals_json` (`career_compass` dict → `career_brief_present` checklist item).
+- `GET /api/v1/candidates/me/verified-readiness` exposes `career_brief_missing` when compass blob absent.
 - API contract for brief sections in docs and frontend planning.
 - Validation logic in service layer using current JSON blob shape.
+- No brief edit endpoint required for gateway; profile signals update paths remain separate.
 
 ## What requires migration (deferred)
 

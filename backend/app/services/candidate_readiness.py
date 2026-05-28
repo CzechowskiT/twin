@@ -7,6 +7,20 @@ from typing import Any, TypedDict
 
 from app.database.models import Candidate, User
 
+# Terminal statuses where package preparation is allowed (delegated submit still blocked).
+_PREPARE_ALLOWED_STATUSES = frozenset(
+    {"ready_for_review", "verified_basic", "delegated_apply_enabled"}
+)
+
+
+class GatewayChecklist(TypedDict):
+    profile_present: bool
+    cv_present: bool
+    career_brief_present: bool
+    skill_evidence_present: bool
+    consent_general_present: bool
+    consent_storage_present: bool
+
 
 class VerifiedCandidateGateResult(TypedDict):
     verification_status: str
@@ -110,82 +124,137 @@ def gateway_basic_verified(user: User, signals: dict[str, Any]) -> bool:
     return user.identity_verified_at is not None
 
 
-def compute_verified_candidate_gate(user: User, candidate: Candidate) -> VerifiedCandidateGateResult:
-    """Read-only verified-candidate gateway state (no delegated submit)."""
-    signals = _profile_signals(candidate)
+def qualifies_for_ready_for_review(
+    user: User,
+    signals: dict[str, Any],
+    *,
+    has_profile: bool,
+    has_general_consent: bool,
+    has_cv: bool,
+    has_brief: bool,
+    has_evidence: bool,
+) -> bool:
+    """All baseline prerequisites met, account active, not yet basic-verified."""
+    if not user.is_active:
+        return False
+    if gateway_basic_verified(user, signals):
+        return False
+    return (
+        has_profile
+        and has_general_consent
+        and has_cv
+        and has_brief
+        and has_evidence
+    )
+
+
+def resolve_verification_status(
+    user: User,
+    signals: dict[str, Any],
+    *,
+    has_profile: bool,
+    has_general_consent: bool,
+    has_cv: bool,
+    has_brief: bool,
+    has_evidence: bool,
+) -> str:
+    """First failing prerequisite wins; otherwise verified_basic or ready_for_review."""
+    if not has_profile:
+        return "profile_incomplete"
+    if not has_general_consent:
+        return "consent_missing"
+    if not has_cv:
+        return "cv_missing"
+    if not has_brief:
+        return "career_brief_missing"
+    if not has_evidence:
+        return "skill_evidence_missing"
+    if not user.is_active:
+        return "suspended"
+    if gateway_basic_verified(user, signals):
+        return "verified_basic"
+    if qualifies_for_ready_for_review(
+        user,
+        signals,
+        has_profile=has_profile,
+        has_general_consent=has_general_consent,
+        has_cv=has_cv,
+        has_brief=has_brief,
+        has_evidence=has_evidence,
+    ):
+        return "ready_for_review"
+    return "unverified"
+
+
+def build_gateway_checklist(
+    user: User,
+    candidate: Candidate,
+    signals: dict[str, Any],
+) -> GatewayChecklist:
     has_profile = bool((candidate.name or "").strip())
     has_cv = candidate_has_cv(candidate)
-    has_brief = has_career_brief(signals)
-    has_evidence = has_skill_evidence(signals)
     has_general_consent = user.gdpr_consent_at is not None
     has_cv_consent = candidate.cv_processing_consent_at is not None
     has_docs_consent = user.profile_documents_processing_consent_at is not None
-    has_storage_consent = has_cv_consent or has_docs_consent
+    return GatewayChecklist(
+        profile_present=has_profile,
+        cv_present=has_cv,
+        career_brief_present=has_career_brief(signals),
+        skill_evidence_present=has_skill_evidence(signals),
+        consent_general_present=has_general_consent,
+        consent_storage_present=has_cv_consent or has_docs_consent,
+    )
 
-    checklist = {
-        "profile_present": has_profile,
-        "cv_present": has_cv,
-        "career_brief_present": has_brief,
-        "skill_evidence_present": has_evidence,
-        "consent_general_present": has_general_consent,
-        "consent_storage_present": has_storage_consent,
-    }
 
+def build_gateway_gaps(checklist: GatewayChecklist) -> tuple[list[str], list[str]]:
     missing_items: list[str] = []
-    if not has_profile:
+    if not checklist["profile_present"]:
         missing_items.append("profile")
-    if not has_general_consent:
+    if not checklist["consent_general_present"]:
         missing_items.append("consent_general")
-    if not has_storage_consent:
+    if not checklist["consent_storage_present"]:
         missing_items.append("consent_storage")
-    if not has_cv:
+    if not checklist["cv_present"]:
         missing_items.append("cv")
-    if not has_brief:
+    if not checklist["career_brief_present"]:
         missing_items.append("career_brief")
-    if not has_evidence:
+    if not checklist["skill_evidence_present"]:
         missing_items.append("skill_evidence")
 
     blocked_reasons: list[str] = []
-    if not has_general_consent:
+    if not checklist["consent_general_present"]:
         blocked_reasons.append("missing_required_consent")
-    if not has_storage_consent:
+    if not checklist["consent_storage_present"]:
         blocked_reasons.append("missing_storage_consent")
-    if not has_cv:
+    if not checklist["cv_present"]:
         blocked_reasons.append("missing_cv_material")
-    if not has_brief:
+    if not checklist["career_brief_present"]:
         blocked_reasons.append("missing_career_brief")
+    return missing_items, blocked_reasons
 
-    verification_status = "unverified"
-    if not has_profile:
-        verification_status = "profile_incomplete"
-    elif not has_general_consent:
-        verification_status = "consent_missing"
-    elif not has_cv:
-        verification_status = "cv_missing"
-    elif not has_brief:
-        verification_status = "career_brief_missing"
-    elif not has_evidence:
-        verification_status = "skill_evidence_missing"
-    elif not user.is_active:
-        verification_status = "suspended"
-    elif gateway_basic_verified(user, signals):
-        verification_status = "verified_basic"
-    else:
-        verification_status = "ready_for_review"
 
-    delegated_apply_allowed = False
-    can_prepare = verification_status in (
-        "ready_for_review",
-        "verified_basic",
-        "delegated_apply_enabled",
+def compute_verified_candidate_gate(user: User, candidate: Candidate) -> VerifiedCandidateGateResult:
+    """Read-only verified-candidate gateway state (no delegated submit)."""
+    signals = _profile_signals(candidate)
+    checklist = build_gateway_checklist(user, candidate, signals)
+    missing_items, blocked_reasons = build_gateway_gaps(checklist)
+
+    verification_status = resolve_verification_status(
+        user,
+        signals,
+        has_profile=checklist["profile_present"],
+        has_general_consent=checklist["consent_general_present"],
+        has_cv=checklist["cv_present"],
+        has_brief=checklist["career_brief_present"],
+        has_evidence=checklist["skill_evidence_present"],
     )
 
     return VerifiedCandidateGateResult(
         verification_status=verification_status,
-        checklist=checklist,
+        checklist=dict(checklist),
         missing_items=missing_items,
         blocked_reasons=blocked_reasons,
-        delegated_apply_allowed=delegated_apply_allowed,
-        can_prepare_application_package=can_prepare,
+        delegated_apply_allowed=False,
+        can_prepare_application_package=verification_status in _PREPARE_ALLOWED_STATUSES,
         can_submit_delegated_application=False,
     )

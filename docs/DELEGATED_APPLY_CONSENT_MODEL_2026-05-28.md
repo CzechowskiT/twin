@@ -46,6 +46,10 @@ Each delegated submit attempt should reference:
 
 ## Gateway integration (future)
 
+**Today (read-only gate):** `GET /api/v1/candidates/me/verified-readiness` always returns `delegated_apply_allowed=false` and `can_submit_delegated_application=false`. Status may be `ready_for_review` or `verified_basic` without enabling submit.
+
+**After migration:**
+
 - `delegated_apply_allowed=true` only when:
   - `verification_status` in (`verified_basic`, `delegated_apply_enabled`)
   - active `delegated_apply_consents` row exists

@@ -189,6 +189,37 @@ def test_verified_readiness_missing_consent(readiness_client) -> None:
     _assert_delegated_apply_blocked(body)
 
 
+def test_verified_readiness_verified_basic_via_identity_at(readiness_client) -> None:
+    client, headers, db, user, _candidate = readiness_client
+    user.identity_verified_at = datetime.now(timezone.utc)
+    db.add(user)
+    db.commit()
+
+    body = _get_gate(client, headers)
+    assert body["verification_status"] == "verified_basic"
+    _assert_delegated_apply_blocked(body)
+
+
+def test_verified_readiness_storage_consent_gap_lists_missing_item(readiness_client) -> None:
+    """GDPR present but storage consent absent: status may advance; gap stays visible."""
+    client, headers, db, _user, candidate = readiness_client
+    candidate.cv_processing_consent_at = None
+    db.add(candidate)
+    db.commit()
+
+    body = _get_gate(client, headers)
+    assert body["verification_status"] in ("ready_for_review", "verified_basic")
+    assert "consent_storage" in body["missing_items"]
+    assert "missing_storage_consent" in body["blocked_reasons"]
+    _assert_delegated_apply_blocked(body)
+
+
+def test_verified_readiness_get_only_no_submit_route(readiness_client) -> None:
+    client, headers, _db, _user, _candidate = readiness_client
+    post = client.post("/api/v1/candidates/me/verified-readiness", headers=headers, json={})
+    assert post.status_code in (404, 405)
+
+
 def test_verified_readiness_response_never_leaks_secrets(readiness_client) -> None:
     client, headers, _db, _user, _candidate = readiness_client
     res = client.get("/api/v1/candidates/me/verified-readiness", headers=headers)

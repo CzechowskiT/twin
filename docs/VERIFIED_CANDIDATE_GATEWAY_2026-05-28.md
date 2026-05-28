@@ -56,19 +56,38 @@ Logic lives in `app/services/candidate_readiness.py` (`compute_verified_candidat
 
 ### Status transitions (no migration)
 
+Implemented in `resolve_verification_status()` — first failing prerequisite wins:
+
 1. Missing profile → `profile_incomplete`
 2. Missing GDPR consent → `consent_missing`
 3. Missing CV material → `cv_missing`
 4. Missing career compass blob → `career_brief_missing`
 5. Missing `cv_insights` blob → `skill_evidence_missing`
 6. Inactive user → `suspended`
-7. All checklist items present, no verification marker → `ready_for_review`
-8. All checklist items present + `verified_gateway.basic_verified_at` / `review_passed` in `profile_signals_json`, or `user.identity_verified_at` set → `verified_basic`
+7. Baseline complete + verification marker → `verified_basic`
+8. Baseline complete, active, no marker → `ready_for_review` (`qualifies_for_ready_for_review()`)
+
+`verified_basic` markers (any one):
+
+- `profile_signals_json.verified_gateway.basic_verified_at`
+- `profile_signals_json.verified_gateway.review_passed`
+- `users.identity_verified_at` set
+
+### Current vs future delegated consent
+
+| Field | Now (this branch) | After `delegated_apply_consents` migration |
+| --- | --- | --- |
+| `delegated_apply_allowed` | always `false` | `true` only with active delegated consent + `verified_basic` |
+| `can_prepare_application_package` | `true` for `ready_for_review`, `verified_basic` | unchanged baseline |
+| `can_submit_delegated_application` | always `false` | `true` only when guard chain + consent pass |
+| Submit endpoint | none on gateway | separate guarded route (not this slice) |
+
+Storage consent (`consent_storage` in checklist) can remain in `missing_items` / `blocked_reasons` while status is `ready_for_review` if GDPR is present but CV/docs processing consent is not — UI should surface the gap without implying delegated submit is available.
 
 Current behavior is intentionally conservative:
 
-- `delegated_apply_allowed=false` unless explicit delegated consent model is implemented (see `docs/DELEGATED_APPLY_CONSENT_MODEL_2026-05-28.md`).
-- `can_prepare_application_package=true` for `ready_for_review` and `verified_basic`.
+- No application submit route on `/me/verified-readiness` (GET only).
+- `delegated_apply_allowed=false` until `docs/DELEGATED_APPLY_CONSENT_MODEL_2026-05-28.md` ships.
 - `can_submit_delegated_application=false` in all current states.
 
 ### Frontend (planned)
