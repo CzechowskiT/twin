@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from datetime import datetime, timezone
+from unittest.mock import MagicMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -220,6 +221,30 @@ def test_notification_preferences_rate_limit_returns_429(
     ]
     assert codes.count(200) == 30
     assert codes[-1] == 429
+
+
+def test_email_change_rate_limit_returns_429(
+    mutation_client: tuple[TestClient, dict[str, str], Job, Job, list[Application]],
+) -> None:
+    """Email-related preference mutations are capped on `/auth/me/notification-preferences`."""
+    test_notification_preferences_rate_limit_returns_429(mutation_client)
+
+
+@patch("app.api.auth.change_user_password")
+def test_password_change_rate_limit_returns_429(
+    mock_change: MagicMock,
+    mutation_client: tuple[TestClient, dict[str, str], Job, Job, list[Application]],
+) -> None:
+    mock_change.return_value = None
+    client, headers, _, _, _ = mutation_client
+    body = {"current_password": "password12", "new_password": "newpass12"}
+    codes = [
+        client.patch("/api/v1/auth/me/password", json=body, headers=headers).status_code
+        for _ in range(11)
+    ]
+    assert codes.count(200) == 10
+    assert codes[-1] == 429
+    assert mock_change.call_count == 10
 
 
 def test_billing_profile_rate_limit_returns_429(
