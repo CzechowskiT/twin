@@ -153,6 +153,34 @@ def test_unhandled_event_is_marked_ignored(client: tuple[TestClient, sessionmake
         db.close()
 
 
+def test_unhandled_event_replay_short_circuits_dispatch(
+    client: tuple[TestClient, sessionmaker],
+) -> None:
+    """Replayed unhandled event should return `replayed=true` and not re-run dispatch."""
+    http, session_local = client
+    event_id = "evt_idempotency_ignored_002"
+    payload = json.dumps({"id": event_id, "type": "customer.created", "data": {"object": {}}}).encode(
+        "utf-8"
+    )
+    sig = _sign(payload)
+    headers = {"Content-Type": "application/json", "stripe-signature": sig}
+
+    first = http.post("/api/v1/billing/webhook", content=payload, headers=headers)
+    assert first.status_code == 200, first.text
+    assert first.json().get("replayed") is None
+
+    second = http.post("/api/v1/billing/webhook", content=payload, headers=headers)
+    assert second.status_code == 200, second.text
+    assert second.json().get("replayed") == "true"
+
+    db = session_local()
+    try:
+        row = db.query(StripeWebhookEvent).filter_by(event_id=event_id).one()
+        assert row.handler_status == stripe_events.STATUS_IGNORED
+    finally:
+        db.close()
+
+
 def test_handler_failure_marks_ledger_failed(
     client: tuple[TestClient, sessionmaker],
     monkeypatch: pytest.MonkeyPatch,
@@ -180,5 +208,45 @@ def test_handler_failure_marks_ledger_failed(
         row = db.query(StripeWebhookEvent).filter_by(event_id=event_id).one()
         assert row.handler_status == stripe_events.STATUS_FAILED
         assert row.error_message is not None
+    finally:
+        db.close()
+
+
+def test_failed_event_is_retried_and_can_transition_to_success(
+    client: tuple[TestClient, sessionmaker],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """`failed` rows are retried; next successful delivery flips status to `success`."""
+    http, session_local = client
+    event_id = "evt_idempotency_retry_001"
+    payload = _invoice_payload(event_id)
+    sig = _sign(payload)
+    headers = {"Content-Type": "application/json", "stripe-signature": sig}
+    attempts: list[str] = []
+
+    def _fail_once_then_pass(db, invoice, settings):  # noqa: ANN001
+        attempts.append("invoice")
+        if len(attempts) == 1:
+            raise RuntimeError("simulated first failure")
+        return None
+
+    monkeypatch.setattr(
+        "app.api.billing.stripe_svc.process_invoice_payment_succeeded",
+        _fail_once_then_pass,
+    )
+
+    first = http.post("/api/v1/billing/webhook", content=payload, headers=headers)
+    assert first.status_code == 500, first.text
+
+    second = http.post("/api/v1/billing/webhook", content=payload, headers=headers)
+    assert second.status_code == 200, second.text
+    assert second.json().get("replayed") is None
+    assert attempts == ["invoice", "invoice"]
+
+    db = session_local()
+    try:
+        row = db.query(StripeWebhookEvent).filter_by(event_id=event_id).one()
+        assert row.handler_status == stripe_events.STATUS_SUCCESS
+        assert row.processed_at is not None
     finally:
         db.close()
