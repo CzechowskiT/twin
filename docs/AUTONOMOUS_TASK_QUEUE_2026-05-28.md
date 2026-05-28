@@ -22,7 +22,7 @@
 - ST-012 | Mutation RL | Add test for login mutation throttling | LOW | DONE | ST-011 | `pytest -k login_rate_limit` | tests
 - ST-013 | Mutation RL | Add test for register throttling path | LOW | DONE | ST-011 | `pytest -k register_rate_limit backend/tests/test_auth_register_rate_limit.py -q` | tests
 - ST-014 | Mutation RL | Add reset-password mutation RL test | LOW | DONE | ST-012 | `pytest -q backend/tests/test_auth_reset_password_rate_limit.py` | tests
-- ST-015 | Mutation RL | Add token-refresh mutation RL test | LOW | READY | ST-012 | `pytest -k token_refresh` | tests
+- ST-015 | Mutation RL | Add forgot-password mutation RL test | LOW | DONE | ST-012 | `pytest -q backend/tests/test_auth_forgot_password_rate_limit.py` | tests
 - ST-016 | No-secret regression | Add health endpoint no-secret assertion | LOW | DONE | none | `pytest -k public_health` | tests
 - ST-017 | No-secret regression | Add status endpoint no-secret assertion | LOW | READY | ST-016 | `pytest -k status_endpoint` | tests
 - ST-018 | No-secret regression | Add root page no-secret snapshot check | LOW | READY | ST-016 | `pytest -k public_pages` | tests

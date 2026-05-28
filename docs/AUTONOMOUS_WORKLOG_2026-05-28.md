@@ -205,3 +205,21 @@
 - Targeted verification:
   - `pytest -q backend/tests/test_auth_reset_password_rate_limit.py`
   - Result: `3 passed`.
+
+### WS12 Micro-slice — ST-015 mutation RL continuation
+
+- Reviewed auth mutation inventory and confirmed no live token-refresh mutation endpoint
+  exists in current backend route surface.
+- Covered the next safe unauthenticated auth mutation instead:
+  `POST /api/v1/auth/forgot-password` in
+  `backend/tests/test_auth_forgot_password_rate_limit.py`.
+- Added deterministic coverage for:
+  - under-limit success path with generic ack only,
+  - limit exhaustion returning HTTP `429`,
+  - no token/secret leakage in throttled responses,
+  - service call short-circuit once limiter is exhausted.
+- Kept runtime untouched; all mail/token side effects remain stubbed via
+  `patch("app.api.auth.request_password_reset", ...)`.
+- Targeted verification:
+  - `pytest -q backend/tests/test_auth_forgot_password_rate_limit.py`
+  - Result: `2 passed`.
