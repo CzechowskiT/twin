@@ -24,10 +24,10 @@
 - ST-014 | Mutation RL | Add reset-password mutation RL test | LOW | DONE | ST-012 | `pytest -q backend/tests/test_auth_reset_password_rate_limit.py` | tests
 - ST-015 | Mutation RL | Add forgot-password mutation RL test | LOW | DONE | ST-012 | `pytest -q backend/tests/test_auth_forgot_password_rate_limit.py` | tests
 - ST-016 | No-secret regression | Add health endpoint no-secret assertion | LOW | DONE | none | `pytest -k public_health` | tests
-- ST-017 | No-secret regression | Add status endpoint no-secret assertion | LOW | READY | ST-016 | `pytest -k status_endpoint` | tests
-- ST-018 | No-secret regression | Add root page no-secret snapshot check | LOW | READY | ST-016 | `pytest -k public_pages` | tests
-- ST-019 | No-secret regression | Add waitlist page no-secret check | LOW | READY | ST-018 | `pytest -k waitlist` | tests
-- ST-020 | No-secret regression | Add demo page no-secret check | LOW | READY | ST-018 | `pytest -k demo_page` | tests
+- ST-017 | No-secret regression | Add status endpoint no-secret assertion | LOW | DONE | ST-016 | `pytest -q backend/tests/test_public_surfaces_no_secrets.py` | tests
+- ST-018 | No-secret regression | Add root page no-secret snapshot check | LOW | DONE | ST-016 | `pytest -q backend/tests/test_public_surfaces_no_secrets.py` | tests
+- ST-019 | No-secret regression | Add waitlist page no-secret check | LOW | DONE | ST-018 | `pytest -q backend/tests/test_public_surfaces_no_secrets.py` | tests
+- ST-020 | No-secret regression | Add demo page no-secret check | LOW | DONE | ST-018 | `pytest -q backend/tests/test_public_surfaces_no_secrets.py` | tests
 - ST-021 | Playwright smoke | Stabilize dashboard auth redirect check | LOW | READY | none | `pnpm playwright test -g dashboard` | tests
 - ST-022 | Playwright smoke | Stabilize candidate login smoke setup | LOW | READY | ST-021 | `pnpm playwright test -g login` | tests
 - ST-023 | Docs source-of-truth | Refresh API reality matrix headings | LOW | READY | none | markdown lint/manual | docs

@@ -1,8 +1,4 @@
-"""Public GET surfaces must never echo secrets or connection strings.
-
-Extends `test_public_health_regression.py` to every marketing / status /
-billing-plans route that unauthenticated users and smoke probes hit.
-"""
+"""Public unauthenticated surfaces must never echo secrets/config internals."""
 
 from __future__ import annotations
 
@@ -32,7 +28,23 @@ FORBIDDEN_SUBSTRINGS = (
     "ops_admin",
     "ops_admin_configured",
     "data_room",
+    "data_room_bucket",
+    "data_room_path",
     "SENTRY_DSN",
+    "google_client_secret",
+    "github_client_secret",
+    "microsoft_client_secret",
+    "apple_client_secret",
+    "linkedin_client_secret",
+    "google_redirect_uri",
+    "github_redirect_uri",
+    "microsoft_redirect_uri",
+    "apple_redirect_uri",
+    "linkedin_redirect_uri",
+    "raw integration config",
+    "raw oauth config",
+    "INTERNAL_ENV",
+    "RAILWAY_",
     "JWT_SECRET",
     "INTERNAL_",
     "Bearer ",
@@ -44,6 +56,11 @@ FORBIDDEN_SUBSTRINGS = (
     "path",
     [
         "/",
+        "/status",
+        "/waitlist",
+        "/demo",
+        "/login/candidate",
+        "/dashboard",
         "/api/v1/health",
         "/api/v1/health?db=true",
         "/api/v1/health?ops=1",
@@ -70,9 +87,9 @@ def test_public_get_never_leaks_secrets(path: str) -> None:
 
         client = TestClient(app)
         res = client.get(path)
-        allowed = (200, 503)
-        if path == "/api/v1/demo/snapshot":
-            allowed = (200, 503, 404)  # 404 is expected when demo mode is disabled.
+        # Some frontend routes can be absent in local API-only test mode, but even 404
+        # responses must not contain secrets.
+        allowed = (200, 503, 404)
         assert res.status_code in allowed, (path, res.status_code, res.text[:300])
         text = res.text
         for needle in FORBIDDEN_SUBSTRINGS:

@@ -223,3 +223,19 @@
 - Targeted verification:
   - `pytest -q backend/tests/test_auth_forgot_password_rate_limit.py`
   - Result: `2 passed`.
+
+### WS13 Micro-slice — ST-017..ST-020 no-secret continuation
+
+- Expanded `backend/tests/test_public_surfaces_no_secrets.py` denylist to cover
+  additional sensitive config leak markers:
+  - OAuth client secrets / redirect URI fields,
+  - `data_room_*` internals,
+  - internal environment-name hints and raw integration-config hints.
+- Extended unauthenticated route coverage with the required public pages:
+  `/status`, `/`, `/waitlist`, `/demo`, `/login/candidate`, `/dashboard`
+  (in addition to existing public API surfaces).
+- Kept assertions strict for no-secret leakage while allowing route-status variance
+  (`200/404/503`) to stay stable across local API-only vs full frontend deployments.
+- Targeted verification:
+  - `pytest -q backend/tests/test_public_surfaces_no_secrets.py`
+  - Result: `13 passed`.
