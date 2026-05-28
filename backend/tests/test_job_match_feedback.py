@@ -183,6 +183,22 @@ def test_match_feedback_api_roundtrip(jmf_client, jmf_db) -> None:
     assert row.feedback_value == "apply_intent"
 
 
+def test_match_feedback_payload_has_only_contract_fields(jmf_client, jmf_db) -> None:
+    user, _, job = _seed_candidate_job(jmf_db)
+    token = create_access_token(user.email)
+    res = jmf_client.post(
+        "/api/v1/candidates/me/match-feedback",
+        json={"job_id": job.id, "feedback_value": "relevant"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert res.status_code == 201
+    body = res.json()
+    assert set(body.keys()) == {"job_id", "feedback_value", "updated_at"}
+    blob = str(body).lower()
+    for marker in ("secret", "token", "password", "api_key", "dsn"):
+        assert marker not in blob
+
+
 def test_not_relevant_api_then_matches_excludes_job(jmf_client, jmf_db) -> None:
     user, candidate, job = _seed_candidate_job(jmf_db)
     token = create_access_token(user.email)

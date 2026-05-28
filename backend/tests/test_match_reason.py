@@ -20,3 +20,15 @@ def test_build_match_reason_low_score_toned_down() -> None:
     reason = build_match_reason({}, {"title": "Analyst"}, score=45.0, locale="en")
     assert "Possible fit" in reason
     assert "strong profile" not in reason.lower()
+
+
+def test_build_match_reason_never_claims_verified_skill_without_evidence() -> None:
+    reason = build_match_reason(
+        {"skills": ["Cobol"], "preferred_job_titles": ["Engineer"]},
+        {"title": "Engineer", "requirements": "Python", "description": "backend services"},
+        score=61.0,
+        locale="en",
+    )
+    lowered = reason.lower()
+    assert "verified" not in lowered
+    assert "certified" not in lowered
