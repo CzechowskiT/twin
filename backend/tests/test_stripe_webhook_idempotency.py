@@ -202,6 +202,68 @@ def _checkout_session_expired_payload(event_id: str) -> bytes:
     ).encode("utf-8")
 
 
+def _invoice_updated_payload(event_id: str) -> bytes:
+    """`invoice.updated` is unhandled but should still dedup cleanly."""
+    return json.dumps(
+        {
+            "id": event_id,
+            "type": "invoice.updated",
+            "livemode": False,
+            "data": {
+                "object": {
+                    "id": "in_updated_001",
+                    "customer": "cus_test",
+                    "subscription": "sub_test",
+                }
+            },
+        }
+    ).encode("utf-8")
+
+
+def _customer_created_payload(event_id: str) -> bytes:
+    return json.dumps(
+        {
+            "id": event_id,
+            "type": "customer.created",
+            "livemode": False,
+            "data": {"object": {"id": "cus_created_001", "email": "candidate@example.com"}},
+        }
+    ).encode("utf-8")
+
+
+def _customer_updated_payload(event_id: str) -> bytes:
+    return json.dumps(
+        {
+            "id": event_id,
+            "type": "customer.updated",
+            "livemode": False,
+            "data": {"object": {"id": "cus_updated_001", "email": "candidate.updated@example.com"}},
+        }
+    ).encode("utf-8")
+
+
+def _payment_method_attached_payload(event_id: str) -> bytes:
+    return json.dumps(
+        {
+            "id": event_id,
+            "type": "payment_method.attached",
+            "livemode": False,
+            "data": {"object": {"id": "pm_attached_001", "customer": "cus_test"}},
+        }
+    ).encode("utf-8")
+
+
+def _payment_method_detached_payload(event_id: str) -> bytes:
+    return json.dumps(
+        {
+            "id": event_id,
+            "type": "payment_method.detached",
+            "livemode": False,
+            "data": {"object": {"id": "pm_detached_001", "customer": "cus_test"}},
+        }
+    ).encode("utf-8")
+
+
 @pytest.fixture
 def invoice_replay_payloads() -> tuple[str, bytes, bytes]:
     """Canonical replay fixture: same Stripe `event.id`, different payload bodies."""
@@ -551,6 +613,64 @@ def test_checkout_session_expired_replay_is_marked_ignored_and_deduped(
         db.close()
 
 
+@pytest.mark.parametrize(
+    ("event_id", "payload", "event_type"),
+    [
+        (
+            "evt_idempotency_invoice_updated_001",
+            _invoice_updated_payload("evt_idempotency_invoice_updated_001"),
+            "invoice.updated",
+        ),
+        (
+            "evt_idempotency_customer_created_001",
+            _customer_created_payload("evt_idempotency_customer_created_001"),
+            "customer.created",
+        ),
+        (
+            "evt_idempotency_customer_updated_001",
+            _customer_updated_payload("evt_idempotency_customer_updated_001"),
+            "customer.updated",
+        ),
+        (
+            "evt_idempotency_payment_method_attached_001",
+            _payment_method_attached_payload("evt_idempotency_payment_method_attached_001"),
+            "payment_method.attached",
+        ),
+        (
+            "evt_idempotency_payment_method_detached_001",
+            _payment_method_detached_payload("evt_idempotency_payment_method_detached_001"),
+            "payment_method.detached",
+        ),
+    ],
+)
+def test_unhandled_replay_events_are_marked_ignored_and_deduped(
+    client: tuple[TestClient, sessionmaker],
+    event_id: str,
+    payload: bytes,
+    event_type: str,
+) -> None:
+    """Unhandled signed Stripe events dedup on replay and remain ledger-ignored."""
+    http, session_local = client
+    headers = {"Content-Type": "application/json", "stripe-signature": _sign(payload)}
+
+    first = http.post("/api/v1/billing/webhook", content=payload, headers=headers)
+    assert first.status_code == 200, first.text
+    assert first.json().get("replayed") is None
+
+    replay = http.post("/api/v1/billing/webhook", content=payload, headers=headers)
+    assert replay.status_code == 200, replay.text
+    assert replay.json().get("replayed") == "true"
+    assert http._stripe_invoice_calls == []  # type: ignore[attr-defined]
+
+    db = session_local()
+    try:
+        row = db.query(StripeWebhookEvent).filter_by(event_id=event_id).one()
+        assert row.event_type == event_type
+        assert row.handler_status == stripe_events.STATUS_IGNORED
+    finally:
+        db.close()
+
+
 def test_handler_failure_marks_ledger_failed(
     client: tuple[TestClient, sessionmaker],
     monkeypatch: pytest.MonkeyPatch,
@@ -811,3 +931,43 @@ def test_replay_dedup_ignores_malformed_or_timezone_timestamp_hints(
     assert replay.status_code == 200, replay.text
     assert replay.json().get("replayed") == "true"
     assert http._stripe_invoice_calls == ["invoice"]  # type: ignore[attr-defined]
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        json.dumps(
+            {
+                "type": "invoice.payment_succeeded",
+                "livemode": False,
+                "data": {"object": {"customer": "cus_test", "subscription": "sub_test"}},
+            }
+        ).encode("utf-8"),
+        json.dumps(
+            {
+                "id": None,
+                "type": "invoice.payment_succeeded",
+                "livemode": False,
+                "data": {"object": {"customer": "cus_test", "subscription": "sub_test"}},
+            }
+        ).encode("utf-8"),
+    ],
+)
+def test_missing_event_id_is_rejected_before_dedup_ledger_write(
+    client: tuple[TestClient, sessionmaker],
+    payload: bytes,
+) -> None:
+    """Missing/null Stripe `event.id` returns 400 and keeps dedup ledger untouched."""
+    http, session_local = client
+    headers = {"Content-Type": "application/json", "stripe-signature": _sign(payload)}
+
+    response = http.post("/api/v1/billing/webhook", content=payload, headers=headers)
+    assert response.status_code == 400, response.text
+    assert response.json()["detail"] == "Event missing id."
+    assert http._stripe_invoice_calls == []  # type: ignore[attr-defined]
+
+    db = session_local()
+    try:
+        assert db.query(StripeWebhookEvent).count() == 0
+    finally:
+        db.close()
