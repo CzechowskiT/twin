@@ -32,3 +32,15 @@ def test_build_match_reason_never_claims_verified_skill_without_evidence() -> No
     lowered = reason.lower()
     assert "verified" not in lowered
     assert "certified" not in lowered
+
+
+def test_build_match_reason_never_overclaims_evidence_or_outcomes() -> None:
+    reason = build_match_reason(
+        {"skills": ["python"], "preferred_job_titles": ["Backend Engineer"]},
+        {"title": "Backend Engineer", "requirements": "Go", "description": "distributed systems"},
+        score=58.0,
+        locale="en",
+    )
+    lowered = reason.lower()
+    forbidden = ("evidence-backed", "guaranteed", "guarantee", "interview guaranteed", "kyc")
+    assert all(word not in lowered for word in forbidden)
