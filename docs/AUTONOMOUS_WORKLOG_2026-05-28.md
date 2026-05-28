@@ -374,3 +374,20 @@
 - Targeted verification:
   - `pytest -k invoice_finalized_replay backend/tests/test_stripe_webhook_idempotency.py -q`
   - Result: `1 passed, 19 deselected`.
+
+### WS25 Micro-slice — HB-A002 invoice.payment_failed replay dedup
+
+- Added unhandled Stripe event payload helper in
+  `backend/tests/test_stripe_webhook_idempotency.py`:
+  `_invoice_payment_failed_payload(event_id)`.
+- Added regression
+  `test_invoice_payment_failed_replay_is_marked_ignored_and_deduped` to ensure:
+  - first `invoice.payment_failed` delivery is accepted,
+  - replay with same `event.id` returns `replayed=true`,
+  - no business invoice/checkout handler dispatch occurs,
+  - dedup ledger row is stored as `event_type=invoice.payment_failed` and
+    `handler_status=ignored`.
+- Updated queue status: `HB-A002` => `DONE`.
+- Targeted verification:
+  - `pytest -k invoice_payment_failed_replay backend/tests/test_stripe_webhook_idempotency.py -q`
+  - Result: `1 passed, 20 deselected`.

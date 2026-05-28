@@ -165,6 +165,25 @@ def _invoice_finalized_payload(event_id: str) -> bytes:
     ).encode("utf-8")
 
 
+def _invoice_payment_failed_payload(event_id: str) -> bytes:
+    """`invoice.payment_failed` is unhandled but must still dedup on replay."""
+    return json.dumps(
+        {
+            "id": event_id,
+            "type": "invoice.payment_failed",
+            "livemode": False,
+            "data": {
+                "object": {
+                    "id": "in_test_failed_001",
+                    "customer": "cus_test",
+                    "subscription": "sub_test",
+                    "attempt_count": 1,
+                }
+            },
+        }
+    ).encode("utf-8")
+
+
 @pytest.fixture
 def invoice_replay_payloads() -> tuple[str, bytes, bytes]:
     """Canonical replay fixture: same Stripe `event.id`, different payload bodies."""
@@ -455,6 +474,33 @@ def test_invoice_finalized_replay_is_marked_ignored_and_deduped(
     try:
         row = db.query(StripeWebhookEvent).filter_by(event_id=event_id).one()
         assert row.event_type == "invoice.finalized"
+        assert row.handler_status == stripe_events.STATUS_IGNORED
+    finally:
+        db.close()
+
+
+def test_invoice_payment_failed_replay_is_marked_ignored_and_deduped(
+    client: tuple[TestClient, sessionmaker],
+) -> None:
+    """`invoice.payment_failed` replay should return `replayed=true` and stay ignored."""
+    http, session_local = client
+    event_id = "evt_idempotency_invoice_payment_failed_001"
+    payload = _invoice_payment_failed_payload(event_id)
+    headers = {"Content-Type": "application/json", "stripe-signature": _sign(payload)}
+
+    first = http.post("/api/v1/billing/webhook", content=payload, headers=headers)
+    assert first.status_code == 200, first.text
+    assert first.json().get("replayed") is None
+
+    replay = http.post("/api/v1/billing/webhook", content=payload, headers=headers)
+    assert replay.status_code == 200, replay.text
+    assert replay.json().get("replayed") == "true"
+    assert http._stripe_invoice_calls == []  # type: ignore[attr-defined]
+
+    db = session_local()
+    try:
+        row = db.query(StripeWebhookEvent).filter_by(event_id=event_id).one()
+        assert row.event_type == "invoice.payment_failed"
         assert row.handler_status == stripe_events.STATUS_IGNORED
     finally:
         db.close()
