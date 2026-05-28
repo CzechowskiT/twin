@@ -12,6 +12,7 @@ type Settings = {
   is_active: boolean;
   consent_given_at: string | null;
   profile_ready: boolean;
+  verified_readiness_ready: boolean;
   total_applications_submitted: number;
   last_run_at: string | null;
   next_run_label: string;
@@ -99,6 +100,8 @@ export function NightlyAutoApplyStrip() {
   if (!settings) return null;
 
   const needsConsent = settings.profile_ready && !settings.consent_given_at && !settings.is_active;
+  const readinessBlocked = settings.profile_ready && !settings.verified_readiness_ready;
+  const legacyActiveBlocked = settings.is_active && readinessBlocked;
   const sweepSummaryText = sweep?.started_at ? sweepSummary(sweep, t) : null;
 
   return (
@@ -127,11 +130,15 @@ export function NightlyAutoApplyStrip() {
               {t("dashboard.nightlyAutoApplyStripTitle")}
             </p>
             <p className="mt-1 text-sm text-[var(--twin-muted-strong)]">
-              {settings.is_active
-                ? t("dashboard.nightlyAutoApplyStripActive")
-                    .replace("{next}", settings.next_run_label)
-                    .replace("{total}", String(settings.total_applications_submitted))
-                : t("dashboard.nightlyAutoApplyStripInactive")}
+              {legacyActiveBlocked
+                ? t("dashboard.nightlyAutoApplyStripLegacyActive")
+                : readinessBlocked && !settings.is_active
+                  ? t("dashboard.nightlyAutoApplyStripBlockedReadiness")
+                  : settings.is_active
+                    ? t("dashboard.nightlyAutoApplyStripActive")
+                        .replace("{next}", settings.next_run_label)
+                        .replace("{total}", String(settings.total_applications_submitted))
+                    : t("dashboard.nightlyAutoApplyStripInactive")}
             </p>
             {settings.last_run_at ? (
               <p className="twin-muted mt-1 text-xs">

@@ -18,6 +18,10 @@ class AutoApplySettingsOut(BaseModel):
         description="True when onboarding is done and CV, tailoring, or core profile fields exist.",
     )
     onboarding_completed: bool = False
+    verified_readiness_ready: bool = Field(
+        default=False,
+        description="True when verified-readiness gate passes (career brief, evidence, consents).",
+    )
 
 
 class AutoApplyConsentIn(BaseModel):

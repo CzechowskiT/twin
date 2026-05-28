@@ -887,6 +887,12 @@ const en = {
     nightlyAutoApplyStripActive:
       "Active — next run {next}. Total auto-applications: {total}.",
     nightlyAutoApplyStripInactive: "Off — enable to apply autonomously to top matches.",
+    nightlyAutoApplyStripBlockedReadiness:
+      "Blocked until verified readiness is complete — complete the checklist on your dashboard first.",
+    nightlyAutoApplyStripLegacyActive:
+      "Consent on file, but autonomous runs are paused until verified readiness passes.",
+    nightlyAutoApplyNeedVerifiedReadiness:
+      "Complete verified readiness (career brief, skill evidence, and storage consent) before enabling autonomous applying.",
     nightlyAutoApplyStripCta: "Settings",
     nightlyAutoApplyConsentNudgeTitle: "Enable consent for autonomous applying",
     nightlyAutoApplyConsentNudgeBody:
@@ -3611,6 +3617,12 @@ const pl: MessageTree = {
       "Włączone — następne uruchomienie {next}. Łącznie auto-aplikacji: {total}.",
     nightlyAutoApplyStripInactive:
       "Wyłączone — włącz, aby autonomicznie aplikować do najlepszych ofert.",
+    nightlyAutoApplyStripBlockedReadiness:
+      "Zablokowane do czasu ukończenia verified readiness — najpierw uzupełnij checklistę na panelu.",
+    nightlyAutoApplyStripLegacyActive:
+      "Zgoda zapisana, ale autonomiczne uruchomienia są wstrzymane do przejścia verified readiness.",
+    nightlyAutoApplyNeedVerifiedReadiness:
+      "Ukończ verified readiness (career brief, dowody umiejętności i zgoda na przechowywanie), zanim włączysz autonomiczne aplikowanie.",
     nightlyAutoApplyStripCta: "Ustawienia",
     nightlyAutoApplyConsentNudgeTitle: "Włącz zgodę na autonomiczne aplikowanie",
     nightlyAutoApplyConsentNudgeBody:

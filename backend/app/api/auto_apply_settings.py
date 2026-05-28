@@ -20,7 +20,10 @@ from app.schemas.auto_apply_settings import (
     AutoApplyTriggerOut,
     SweepBoardStatOut,
 )
-from app.services.candidate_readiness import auto_apply_profile_ready
+from app.services.candidate_readiness import (
+    auto_apply_profile_ready,
+    autonomous_apply_allowed,
+)
 from app.services.nightly_auto_apply import (
     METHOD_MANUAL_TRIGGER,
     process_user_nightly_auto_apply,
@@ -32,6 +35,9 @@ router = APIRouter()
 
 CONSENT_VERSION = "v1"
 PROFILE_NOT_READY_DETAIL = "Complete your candidate profile and upload a CV first."
+VERIFIED_READINESS_NOT_READY_DETAIL = (
+    "Complete verified readiness (career brief, skill evidence, and consents) before autonomous applying."
+)
 
 
 def _parse_sweep_stats(stats_json: str | None) -> tuple[int, list[SweepBoardStatOut], bool]:
@@ -80,6 +86,15 @@ def _require_profile_ready(user: User, candidate: Candidate | None) -> None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=PROFILE_NOT_READY_DETAIL)
 
 
+def _require_verified_readiness(user: User, candidate: Candidate | None) -> None:
+    _require_profile_ready(user, candidate)
+    if not autonomous_apply_allowed(user, candidate):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=VERIFIED_READINESS_NOT_READY_DETAIL,
+        )
+
+
 def _next_run_label() -> str:
     s = get_settings()
     h = min(23, max(0, int(s.nightly_auto_apply_hour)))
@@ -95,11 +110,13 @@ def _to_out(
 ) -> AutoApplySettingsOut:
     settings = get_settings()
     ready = auto_apply_profile_ready(user, candidate)
+    verified_ready = autonomous_apply_allowed(user, candidate)
     onboarding_done = user.onboarding_completed_at is not None
     base = dict(
         next_run_label=_next_run_label(),
         supported_boards=", ".join(sorted(supported_board_ids(settings))),
         profile_ready=ready,
+        verified_readiness_ready=verified_ready,
         onboarding_completed=onboarding_done,
     )
     if not consent:
@@ -175,7 +192,7 @@ def give_consent(
     candidate = _get_candidate(db, user.id)
     if candidate is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Create your candidate profile first.")
-    _require_profile_ready(user, candidate)
+    _require_verified_readiness(user, candidate)
     settings = get_settings()
     now = datetime.now(timezone.utc)
     consent = db.query(AutoApplyConsent).filter(AutoApplyConsent.candidate_id == candidate.id).first()
@@ -214,6 +231,8 @@ def patch_settings(
     consent = db.query(AutoApplyConsent).filter(AutoApplyConsent.candidate_id == candidate.id).first()
     if not consent or not consent.consent_given_at:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Enable auto-apply with consent first")
+    if body.is_active is True:
+        _require_verified_readiness(user, candidate)
     if body.is_active is not None:
         consent.is_active = body.is_active
     if body.min_score_threshold is not None:
@@ -235,7 +254,7 @@ def trigger_nightly_for_me(
     candidate = _get_candidate(db, user.id)
     if candidate is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Create your candidate profile first.")
-    _require_profile_ready(user, candidate)
+    _require_verified_readiness(user, candidate)
     consent = db.query(AutoApplyConsent).filter(AutoApplyConsent.candidate_id == candidate.id).first()
     if not consent or not consent.is_active or not consent.consent_given_at:
         raise HTTPException(

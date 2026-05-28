@@ -5,6 +5,7 @@ import json
 from app.database.models import Candidate, User
 from app.services.candidate_readiness import (
     auto_apply_profile_ready,
+    autonomous_apply_allowed,
     candidate_has_cv,
     compute_verified_candidate_gate,
     has_cv_file,
@@ -184,3 +185,23 @@ def test_compute_gate_suspended_when_user_inactive() -> None:
     gate = compute_verified_candidate_gate(user, c)
     assert gate["verification_status"] == "suspended"
     assert gate["can_prepare_application_package"] is False
+
+
+def test_autonomous_apply_allowed_requires_full_gateway() -> None:
+    from datetime import datetime, timezone
+    import json
+
+    now = datetime.now(timezone.utc)
+    user = _user()
+    user.gdpr_consent_at = now
+    user.onboarding_completed_at = now
+    c = Candidate(user_id=1, name="Alex", cv_text="CV")
+    assert autonomous_apply_allowed(user, c) is False
+    c.cv_processing_consent_at = now
+    c.profile_signals_json = json.dumps(
+        {
+            "career_compass": {"ideal": {"job_title": "Engineer"}},
+            "cv_insights": {"summary": "ok"},
+        }
+    )
+    assert autonomous_apply_allowed(user, c) is True

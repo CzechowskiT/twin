@@ -12,6 +12,9 @@ _PREPARE_ALLOWED_STATUSES = frozenset(
     {"ready_for_review", "verified_basic", "delegated_apply_enabled"}
 )
 
+# Nightly / manual autonomous apply uses the same bar as package prep, plus no blockers.
+_AUTONOMOUS_APPLY_STATUSES = _PREPARE_ALLOWED_STATUSES
+
 
 class GatewayChecklist(TypedDict):
     profile_present: bool
@@ -231,6 +234,18 @@ def build_gateway_gaps(checklist: GatewayChecklist) -> tuple[list[str], list[str
     if not checklist["career_brief_present"]:
         blocked_reasons.append("missing_career_brief")
     return missing_items, blocked_reasons
+
+
+def autonomous_apply_allowed(user: User, candidate: Candidate | None) -> bool:
+    """True when verified-readiness is complete enough to enable or run autonomous apply."""
+    if not auto_apply_profile_ready(user, candidate):
+        return False
+    if candidate is None:
+        return False
+    gate = compute_verified_candidate_gate(user, candidate)
+    if gate["verification_status"] not in _AUTONOMOUS_APPLY_STATUSES:
+        return False
+    return not gate["blocked_reasons"]
 
 
 def compute_verified_candidate_gate(user: User, candidate: Candidate) -> VerifiedCandidateGateResult:

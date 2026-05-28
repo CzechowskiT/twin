@@ -24,6 +24,7 @@ from app.database.models import (
     User,
 )
 from app.services.auto_apply_guards import enforce_company_cooldown, enforce_job_blocklists
+from app.services.candidate_readiness import autonomous_apply_allowed
 from app.services.auto_apply_service import auto_apply_for_user
 from app.services.matching_service import find_top_matches
 from app.services.nightly_auto_apply_mail import send_nightly_auto_apply_summary_email
@@ -137,6 +138,9 @@ def process_user_nightly_auto_apply(
     candidate = db.query(Candidate).filter(Candidate.user_id == user.id).first()
     if not candidate:
         result["skipped_reason"] = "no_candidate_profile"
+        return result
+    if not autonomous_apply_allowed(user, candidate):
+        result["skipped_reason"] = "verified_readiness_incomplete"
         return result
 
     today_count = count_nightly_applications_today(db, user_id=user.id)

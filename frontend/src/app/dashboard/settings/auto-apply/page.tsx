@@ -20,6 +20,7 @@ type AutoApplySettings = {
   next_run_label: string;
   supported_boards: string;
   profile_ready: boolean;
+  verified_readiness_ready: boolean;
   onboarding_completed: boolean;
 };
 
@@ -49,6 +50,8 @@ export default function NightlyAutoApplySettingsPage() {
       setSettings(data);
       if (!data.profile_ready) {
         setError(t("dashboard.nightlyAutoApplyNeedProfile"));
+      } else if (!data.verified_readiness_ready) {
+        setError(t("dashboard.nightlyAutoApplyNeedVerifiedReadiness"));
       }
     } catch {
       setError(t("dashboard.nightlyAutoApplyNeedProfile"));
@@ -63,8 +66,11 @@ export default function NightlyAutoApplySettingsPage() {
     });
   }, [load]);
 
+  const canEnableAutonomous =
+    settings?.profile_ready === true && settings?.verified_readiness_ready === true;
+
   async function enableWithConsent() {
-    if (!settings) return;
+    if (!settings || !canEnableAutonomous) return;
     setSaving(true);
     setError(null);
     try {
@@ -158,7 +164,7 @@ export default function NightlyAutoApplySettingsPage() {
 
         {settings && (
           <>
-            {!settings.consent_given_at && settings.profile_ready ? (
+            {!settings.consent_given_at && canEnableAutonomous ? (
               <Card variant="soft" className="border-[var(--twin-accent-muted)] p-5">
                 <p className="font-semibold text-[var(--foreground)]">{t("dashboard.nightlyAutoApplyConsentNudgeTitle")}</p>
                 <p className="twin-muted mt-2 text-sm leading-relaxed">{t("dashboard.nightlyAutoApplyConsentNudgeBody")}</p>
@@ -175,9 +181,9 @@ export default function NightlyAutoApplySettingsPage() {
                   type="checkbox"
                   className="h-5 w-5 accent-[var(--twin-accent)]"
                   checked={settings.is_active}
-                  disabled={saving || !settings.profile_ready}
+                  disabled={saving || !canEnableAutonomous}
                   onChange={(e) => {
-                    if (!settings.profile_ready) return;
+                    if (!canEnableAutonomous) return;
                     if (e.target.checked && !settings.consent_given_at) {
                       setShowConsent(true);
                       return;
@@ -281,7 +287,7 @@ export default function NightlyAutoApplySettingsPage() {
               <p className="text-[var(--twin-muted)]">{settings.supported_boards}</p>
             </Card>
 
-            {settings.is_active && settings.consent_given_at && (
+            {settings.is_active && settings.consent_given_at && canEnableAutonomous && (
               <Button
                 type="button"
                 className="twin-btn-secondary w-full"

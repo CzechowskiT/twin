@@ -1,5 +1,8 @@
 """Auto-apply settings API."""
 
+import json
+from datetime import datetime, timezone
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -22,13 +25,27 @@ def auto_apply_client():
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
     db = Session()
-    from datetime import datetime, timezone
-
-    user = User(email="auto@test.com", hashed_password="x", is_active=True)
-    user.onboarding_completed_at = datetime.now(timezone.utc)
+    user = User(
+        email="auto@test.com",
+        hashed_password="x",
+        is_active=True,
+        gdpr_consent_at=datetime.now(timezone.utc),
+        onboarding_completed_at=datetime.now(timezone.utc),
+    )
     db.add(user)
     db.commit()
-    candidate = Candidate(user_id=user.id, name="Auto", cv_text="Backend engineer CV")
+    candidate = Candidate(
+        user_id=user.id,
+        name="Auto",
+        cv_text="Backend engineer CV",
+        cv_processing_consent_at=datetime.now(timezone.utc),
+        profile_signals_json=json.dumps(
+            {
+                "career_compass": {"ideal": {"job_title": "Backend"}},
+                "cv_insights": {"summary": "Python"},
+            }
+        ),
+    )
     db.add(candidate)
     db.commit()
     job = Job(
@@ -67,6 +84,7 @@ def test_settings_default(auto_apply_client) -> None:
     assert body["is_active"] is False
     assert body["min_score_threshold"] == 90.0
     assert body["profile_ready"] is True
+    assert body["verified_readiness_ready"] is True
     assert body["onboarding_completed"] is True
 
 
