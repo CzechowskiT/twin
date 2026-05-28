@@ -35,6 +35,17 @@ North star: **short calendar of acceptance-ready moments** — not inbox noise.
 9. **Recruiter batch acceptance UI** — short list of pre-qualified slots (calendar north star). *Reduce noise toward accept/decline.*
 10. **Mobile-friendly dashboard strip** — calendar + next interview on small viewports. *Candidates check phone, not desktop.*
 
+## Product direction deltas (2026-05-28)
+
+- **Acceptance-ready first:** prioritize features that shorten candidate/recruiter decision cycles
+  into explicit accept/decline/reschedule moments rather than more inbox volume.
+- **Verification over outreach:** prefer machine-assisted placement verification and append-only
+  event evidence; keep manual employer ping-pong as exception flow only.
+- **Calendar portability baseline:** keep OAuth for Google/Microsoft as primary, but treat
+  ICS/WebCal as mandatory fallback so Apple-only candidates are never blocked.
+- **Safety-preserving automation:** continue autonomous backlog slices as read-only/test-first by
+  default, with no live apply/scrape/prod mutation steps in unattended runs.
+
 ## Out of scope for Phase 1 (explicit)
 
 - Manual “did you sign yet?” email campaigns as default workflow

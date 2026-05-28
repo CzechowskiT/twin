@@ -31,7 +31,7 @@
 - ST-021 | Playwright smoke | Stabilize dashboard auth redirect check | LOW | DONE | none | `cd frontend && npx playwright test -g "dashboard smoke"` | tests
 - ST-022 | Playwright smoke | Stabilize candidate login smoke setup | LOW | DONE | ST-021 | `pnpm playwright test -g login` | tests
 - ST-023 | Docs source-of-truth | Refresh API reality matrix headings | LOW | DONE | none | markdown lint/manual | docs
-- ST-024 | Docs source-of-truth | Update product direction deltas | LOW | READY | none | markdown lint/manual | docs
+- ST-024 | Docs source-of-truth | Update product direction deltas | LOW | DONE | none | markdown lint/manual | docs
 - ST-025 | Docs source-of-truth | Update O7 restore drill quick refs | LOW | READY | none | markdown lint/manual | docs
 
 ## Section B — Stripe Tests Backlog (50)

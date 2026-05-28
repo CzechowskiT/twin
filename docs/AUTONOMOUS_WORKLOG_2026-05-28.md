@@ -321,3 +321,13 @@
   - split snapshot metadata / legend / capability sections,
   - updated top snapshot SHA references to the latest known branch + prod API values.
 - Verification: markdown/manual review (headings and section anchors render cleanly).
+
+### WS21 Micro-slice — ST-024 product direction deltas
+
+- Updated `docs/PRODUCT_ROADMAP.md` with a dedicated `2026-05-28` direction-delta section
+  covering:
+  - acceptance-ready calendar moments as top prioritization frame,
+  - machine-assisted placement verification over manual outreach loops,
+  - OAuth + ICS/WebCal portability baseline,
+  - safety-preserving autonomous execution boundaries.
+- Verification: markdown/manual review (new section and bullets render correctly).
