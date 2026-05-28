@@ -220,6 +220,28 @@ def _invoice_updated_payload(event_id: str) -> bytes:
     ).encode("utf-8")
 
 
+def _invoice_voided_payload(event_id: str) -> bytes:
+    return json.dumps(
+        {
+            "id": event_id,
+            "type": "invoice.voided",
+            "livemode": False,
+            "data": {"object": {"id": "in_voided_001", "customer": "cus_test"}},
+        }
+    ).encode("utf-8")
+
+
+def _invoice_marked_uncollectible_payload(event_id: str) -> bytes:
+    return json.dumps(
+        {
+            "id": event_id,
+            "type": "invoice.marked_uncollectible",
+            "livemode": False,
+            "data": {"object": {"id": "in_uncollectible_001", "customer": "cus_test"}},
+        }
+    ).encode("utf-8")
+
+
 def _customer_created_payload(event_id: str) -> bytes:
     return json.dumps(
         {
@@ -620,6 +642,16 @@ def test_checkout_session_expired_replay_is_marked_ignored_and_deduped(
             "evt_idempotency_invoice_updated_001",
             _invoice_updated_payload("evt_idempotency_invoice_updated_001"),
             "invoice.updated",
+        ),
+        (
+            "evt_idempotency_invoice_voided_001",
+            _invoice_voided_payload("evt_idempotency_invoice_voided_001"),
+            "invoice.voided",
+        ),
+        (
+            "evt_idempotency_invoice_uncollectible_001",
+            _invoice_marked_uncollectible_payload("evt_idempotency_invoice_uncollectible_001"),
+            "invoice.marked_uncollectible",
         ),
         (
             "evt_idempotency_customer_created_001",
