@@ -85,6 +85,17 @@ No source change; the inventory is a snapshot, not a fixture.
 | GET    | /api/v1/auth/linkedin/login                     | none |
 | GET    | /api/v1/auth/linkedin/callback                  | OAuth state cookie |
 
+#### Unauth mutation inventory delta (2026-05-28)
+
+The highest-risk unauthenticated auth mutations are now explicitly tracked for
+rate-limit regression coverage:
+
+| Route | Mutation class | RL verification tests |
+| ----- | -------------- | --------------------- |
+| `POST /api/v1/auth/login/json` | credential mutation (unauth) | `backend/tests/test_auth_login_rate_limit.py` |
+| `POST /api/v1/auth/register` | account creation (unauth) | `backend/tests/test_auth_mutation_rate_limits.py` |
+| `POST /api/v1/auth/reset-password` | credential reset (unauth) | `backend/tests/test_auth_reset_password_rate_limit.py` |
+
 ### Beta waitlist (`/api/v1/beta/*`)
 
 | Method | Path                                                              | Auth |

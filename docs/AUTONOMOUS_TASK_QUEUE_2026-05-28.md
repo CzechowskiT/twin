@@ -18,8 +18,8 @@
 - ST-008 | Stripe tests | Add malformed event id test | LOW | READY | ST-001 | `pytest -k malformed_event` | tests
 - ST-009 | Stripe tests | Add missing metadata fallback test | LOW | READY | ST-005 | `pytest -k metadata_fallback` | tests
 - ST-010 | Stripe tests | Add no-secret logging assertion test | LOW | READY | ST-008 | `pytest -k no_secret` | tests
-- ST-011 | Mutation RL | Document unauth mutation inventory delta | LOW | READY | none | markdown lint/manual | docs
-- ST-012 | Mutation RL | Add test for login mutation throttling | LOW | READY | ST-011 | `pytest -k login_rate_limit` | tests
+- ST-011 | Mutation RL | Document unauth mutation inventory delta | LOW | DONE | none | markdown lint/manual | docs
+- ST-012 | Mutation RL | Add test for login mutation throttling | LOW | DONE | ST-011 | `pytest -k login_rate_limit` | tests
 - ST-013 | Mutation RL | Add test for register throttling path | LOW | READY | ST-011 | `pytest -k register_rate_limit` | tests
 - ST-014 | Mutation RL | Add reset-password mutation RL test | LOW | READY | ST-012 | `pytest -k reset_password` | tests
 - ST-015 | Mutation RL | Add token-refresh mutation RL test | LOW | READY | ST-012 | `pytest -k token_refresh` | tests

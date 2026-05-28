@@ -47,3 +47,13 @@
 - Targeted verification:
   - `pytest -k "checkout and stripe_webhook_idempotency" backend/tests/test_stripe_webhook_idempotency.py`
   - Result: `1 passed, 6 deselected`.
+
+### WS3 Micro-slice — ST-011/ST-012 unauth auth mutation RL
+
+- Documented unauthenticated auth mutation inventory delta in
+  `docs/BACKEND_ROUTE_INVENTORY_2026-05-27.md` (login/register/reset coverage map).
+- Added local deterministic 429 regression for repeated failed `/api/v1/auth/login/json`
+  attempts in `backend/tests/test_auth_login_rate_limit.py`.
+- Targeted verification:
+  - `pytest -k login_rate_limit backend/tests/test_auth_login_rate_limit.py`
+  - Result: `2 passed`.
