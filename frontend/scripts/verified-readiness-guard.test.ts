@@ -74,6 +74,10 @@ assert(
 );
 assert(!/\bAuto-apply\b/i.test(jobList), "Job list must not show raw Auto-apply label");
 assert(
+  read(guardLibPath).includes("jobApplyActionsGuardFromReadiness"),
+  "Apply guard helper must exist",
+);
+assert(
   guardLib.includes("can_prepare_application_package"),
   "Apply guard must read can_prepare_application_package from readiness gate",
 );

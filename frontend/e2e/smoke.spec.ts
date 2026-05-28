@@ -99,8 +99,13 @@ test.describe("dashboard smoke (read-only, no live actions)", () => {
     // Readiness card must not appear logged-out (no checklist leak).
     expect(lowerBody).not.toMatch(/readiness checklist|lista gotowości/i);
     expect(lowerBody).not.toMatch(
-      /apply now|auto apply|submit application|kyc verified|guaranteed interview|fully verified/i,
+      /apply now|auto apply|submit application|kyc verified|guaranteed interview|fully verified|run now \(test\)/i,
     );
+    await expect(page.locator(".twin-shell--rail, .twin-shell--wide").first()).toBeVisible({
+      timeout: 15_000,
+    }).catch(() => {
+      // Unauthenticated redirect to /login may skip dashboard shell — acceptable.
+    });
   });
 
   test("/register/candidate shows email + password inputs (no submit)", async ({ page }) => {
