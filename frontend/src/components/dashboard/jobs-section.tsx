@@ -8,6 +8,8 @@ import { EmptyState } from "@/components/ux/empty-state";
 import { defaultJobFilters, persistJobFilters, type JobFilters } from "@/lib/jobs";
 import type { JobEmployerTabId } from "@/lib/job-employer-demo";
 
+import type { JobApplyActionsGuard } from "@/lib/job-apply-actions-guard";
+
 import type {
   DashboardFeedStats,
   DashboardFilterOptions,
@@ -31,6 +33,7 @@ type Props = {
   hasProfile: boolean;
   displayApplicationStatus: Record<number, string>;
   autoApplyingId: number | null;
+  applyActionsGuard: JobApplyActionsGuard;
   jobsLoadMoreBusy: boolean;
   onFiltersChange: (filters: JobFilters) => void;
   onApplyFilters: () => void;
@@ -58,6 +61,7 @@ export function JobsSection({
   hasProfile,
   displayApplicationStatus,
   autoApplyingId,
+  applyActionsGuard,
   jobsLoadMoreBusy,
   onFiltersChange,
   onApplyFilters,
@@ -155,6 +159,7 @@ export function JobsSection({
                   : undefined
               }
               autoApplyJobId={autoApplyingId}
+              applyActionsGuard={applyActionsGuard}
               onSave={hasProfile ? onSave : undefined}
               onDismiss={hasProfile ? onDismiss : undefined}
             />

@@ -5,6 +5,7 @@ import { SeniorityBadge } from "@/components/job/SeniorityBadge";
 import { TechStackIcons } from "@/components/job/TechStackIcons";
 import { useTranslation } from "@/components/language-provider";
 import { applicationDisplayStatusKey } from "@/lib/application-status";
+import type { JobApplyActionsGuard } from "@/lib/job-apply-actions-guard";
 import type { MatchBadgeId, MatchFeedbackValue, MatchQualityLabel } from "@/lib/matching-quality";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -49,6 +50,7 @@ export function JobList({
   onSave,
   onDismiss,
   autoApplyJobId,
+  applyActionsGuard,
   matchFeedbackByJobId,
   onMatchFeedback,
   matchFeedbackBusyJobId,
@@ -70,6 +72,7 @@ export function JobList({
   onSave?: (jobId: number) => void;
   onDismiss?: (jobId: number) => void;
   autoApplyJobId?: number | null;
+  applyActionsGuard?: JobApplyActionsGuard;
   matchFeedbackByJobId?: Record<number, MatchFeedbackValue>;
   onMatchFeedback?: (jobId: number, value: MatchFeedbackValue) => void;
   matchFeedbackBusyJobId?: number | null;
@@ -203,81 +206,106 @@ export function JobList({
               </div>
             ) : null}
             {showActionRow && (
-              <div className="flex flex-wrap gap-2">
-                {onApply && (
-                  <button
-                    type="button"
-                    aria-label={`${t("dashboard.applyJob")}: ${item.title}, ${item.company}`}
-                    onClick={() => onApply(jobId, item.url)}
-                    className="twin-btn-solid twin-touch-target shrink-0 !w-auto px-3 py-1.5 text-xs"
-                  >
-                    {t("dashboard.applyJob")}
-                  </button>
-                )}
-                {onAutoApply && (
-                  <button
-                    type="button"
-                    aria-label={`${t("dashboard.autoApplyJob")}: ${item.title}, ${item.company}`}
-                    disabled={autoApplyJobId === jobId}
-                    onClick={() => onAutoApply(jobId)}
-                    className="twin-btn-secondary twin-touch-target shrink-0 !w-auto border-[var(--twin-cta)] px-3 py-1.5 text-xs font-semibold text-[var(--twin-cta)]"
-                    title={t("dashboard.autoApplyHint")}
-                  >
-                    {autoApplyJobId === jobId ? t("dashboard.autoApplyRunning") : t("dashboard.autoApplyJob")}
-                  </button>
-                )}
-                {onResearch && (
-                  <button
-                    type="button"
-                    aria-label={`${t("careerAssistant.researchCompanyBrief")}: ${item.title}, ${item.company}`}
-                    onClick={() => onResearch(jobId, item.title, item.company, item.location ?? null)}
-                    className="twin-btn-secondary twin-touch-target shrink-0 !w-auto px-3 py-1.5 text-xs"
-                  >
-                    {t("careerAssistant.researchCompanyBrief")}
-                  </button>
-                )}
-                {onHiringInsights && (
-                  <button
-                    type="button"
-                    aria-label={`${t("careerAssistant.hiringInsights")}: ${item.title}`}
-                    onClick={() => onHiringInsights(jobId, item.title)}
-                    className="twin-btn-secondary twin-touch-target shrink-0 !w-auto px-3 py-1.5 text-xs"
-                  >
-                    {t("careerAssistant.hiringInsights")}
-                  </button>
-                )}
-                {onViewEmployer && (
-                  <button
-                    type="button"
-                    aria-label={`${t("jobEmployer.openEmployerHub")}: ${item.company}`}
-                    onClick={() =>
-                      onViewEmployer(jobId, item.title, item.company, item.url, item.location ?? null)
-                    }
-                    className="twin-btn-secondary twin-touch-target shrink-0 !w-auto px-3 py-1.5 text-xs"
-                  >
-                    {t("jobEmployer.openEmployerHub")}
-                  </button>
-                )}
-                {onSave && !status && (
-                  <button
-                    type="button"
-                    aria-label={`${t("dashboard.saveJob")}: ${item.title}, ${item.company}`}
-                    onClick={() => onSave(jobId)}
-                    className="twin-btn-secondary twin-touch-target shrink-0 !w-auto px-3 py-1.5 text-xs"
-                  >
-                    {t("dashboard.saveJob")}
-                  </button>
-                )}
-                {onDismiss && (
-                  <button
-                    type="button"
-                    aria-label={`${t("dashboard.dismissJob")}: ${item.title}, ${item.company}`}
-                    onClick={() => onDismiss(jobId)}
-                    className="twin-btn-secondary twin-touch-target shrink-0 !w-auto px-3 py-1.5 text-xs opacity-80"
-                  >
-                    {t("dashboard.dismissJob")}
-                  </button>
-                )}
+              <div className="twin-job-actions">
+                <div className="twin-job-actions__primary">
+                  {onApply ? (
+                    <button
+                      type="button"
+                      aria-label={`${t("dashboard.applyJob")}: ${item.title}, ${item.company}`}
+                      onClick={() => onApply(jobId, item.url)}
+                      className="twin-btn-solid twin-touch-target shrink-0 !w-auto"
+                    >
+                      {t("dashboard.applyJob")}
+                    </button>
+                  ) : null}
+                  {onAutoApply ? (
+                    <button
+                      type="button"
+                      aria-label={
+                        applyActionsGuard?.canPrepareApplicationPackage
+                          ? `${t("dashboard.prepareApplication")}: ${item.title}, ${item.company}`
+                          : `${t("dashboard.prepareApplicationBlocked")}: ${item.title}, ${item.company}`
+                      }
+                      disabled={
+                        autoApplyJobId === jobId || !applyActionsGuard?.canPrepareApplicationPackage
+                      }
+                      onClick={() => {
+                        if (!applyActionsGuard?.canPrepareApplicationPackage) return;
+                        onAutoApply(jobId);
+                      }}
+                      className={`twin-btn-secondary twin-touch-target shrink-0 !w-auto font-semibold ${
+                        applyActionsGuard?.canPrepareApplicationPackage
+                          ? "border-[var(--twin-cta)] text-[var(--twin-cta)]"
+                          : "twin-btn--blocked"
+                      }`}
+                      title={
+                        applyActionsGuard?.canPrepareApplicationPackage
+                          ? t("dashboard.prepareApplicationHint")
+                          : t("dashboard.prepareApplicationBlocked")
+                      }
+                    >
+                      {autoApplyJobId === jobId
+                        ? t("dashboard.prepareApplicationRunning")
+                        : applyActionsGuard?.canPrepareApplicationPackage
+                          ? t("dashboard.prepareApplication")
+                          : t("dashboard.prepareApplicationBlocked")}
+                    </button>
+                  ) : null}
+                </div>
+                <div className="twin-job-actions__secondary">
+                  {onResearch ? (
+                    <button
+                      type="button"
+                      aria-label={`${t("careerAssistant.researchCompanyBrief")}: ${item.title}, ${item.company}`}
+                      onClick={() => onResearch(jobId, item.title, item.company, item.location ?? null)}
+                      className="twin-btn-secondary twin-touch-target shrink-0 !w-auto"
+                    >
+                      {t("careerAssistant.researchCompanyBrief")}
+                    </button>
+                  ) : null}
+                  {onHiringInsights ? (
+                    <button
+                      type="button"
+                      aria-label={`${t("careerAssistant.hiringInsights")}: ${item.title}`}
+                      onClick={() => onHiringInsights(jobId, item.title)}
+                      className="twin-btn-secondary twin-touch-target shrink-0 !w-auto"
+                    >
+                      {t("careerAssistant.hiringInsights")}
+                    </button>
+                  ) : null}
+                  {onViewEmployer ? (
+                    <button
+                      type="button"
+                      aria-label={`${t("jobEmployer.openEmployerHub")}: ${item.company}`}
+                      onClick={() =>
+                        onViewEmployer(jobId, item.title, item.company, item.url, item.location ?? null)
+                      }
+                      className="twin-btn-secondary twin-touch-target shrink-0 !w-auto"
+                    >
+                      {t("jobEmployer.openEmployerHub")}
+                    </button>
+                  ) : null}
+                  {onSave && !status ? (
+                    <button
+                      type="button"
+                      aria-label={`${t("dashboard.saveJob")}: ${item.title}, ${item.company}`}
+                      onClick={() => onSave(jobId)}
+                      className="twin-btn-secondary twin-touch-target shrink-0 !w-auto"
+                    >
+                      {t("dashboard.saveJob")}
+                    </button>
+                  ) : null}
+                  {onDismiss ? (
+                    <button
+                      type="button"
+                      aria-label={`${t("dashboard.dismissJob")}: ${item.title}, ${item.company}`}
+                      onClick={() => onDismiss(jobId)}
+                      className="twin-btn-secondary twin-touch-target shrink-0 !w-auto opacity-80"
+                    >
+                      {t("dashboard.dismissJob")}
+                    </button>
+                  ) : null}
+                </div>
               </div>
             )}
           </li>

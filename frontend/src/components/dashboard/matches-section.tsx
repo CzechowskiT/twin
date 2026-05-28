@@ -7,6 +7,8 @@ import { EmptyState } from "@/components/ux/empty-state";
 import { TOP_MATCHES_HIGHLIGHT_COUNT, type MatchFeedbackValue } from "@/lib/matching-quality";
 import type { JobEmployerTabId } from "@/lib/job-employer-demo";
 
+import type { JobApplyActionsGuard } from "@/lib/job-apply-actions-guard";
+
 import type { DashboardMatchItem } from "./dashboard-helpers";
 
 type EmployerJob = {
@@ -28,6 +30,7 @@ type Props = {
   matchFeedbackBusyJobId: number | null;
   displayApplicationStatus: Record<number, string>;
   autoApplyingId: number | null;
+  applyActionsGuard: JobApplyActionsGuard;
   matchesCsvBusy: boolean;
   matchesXlsxBusy: boolean;
   showApplyPrompt: boolean;
@@ -61,6 +64,7 @@ export function MatchesSection({
   matchFeedbackBusyJobId,
   displayApplicationStatus,
   autoApplyingId,
+  applyActionsGuard,
   matchesCsvBusy,
   matchesXlsxBusy,
   showApplyPrompt,
@@ -187,6 +191,7 @@ export function MatchesSection({
                       })
                     }
                     autoApplyJobId={autoApplyingId}
+                    applyActionsGuard={applyActionsGuard}
                     onSave={onSave}
                     onDismiss={onDismiss}
                   />
@@ -226,6 +231,7 @@ export function MatchesSection({
                         })
                       }
                       autoApplyJobId={autoApplyingId}
+                    applyActionsGuard={applyActionsGuard}
                       onSave={onSave}
                       onDismiss={onDismiss}
                     />

@@ -9,6 +9,7 @@ import { FeaturePaywall } from "@/components/billing/FeaturePaywall";
 import { Card } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
+import type { JobApplyActionsGuard } from "@/lib/job-apply-actions-guard";
 
 type ForecastJob = {
   job_id: number;
@@ -34,6 +35,7 @@ type AutoApplySettings = {
   is_active: boolean;
   consent_given_at: string | null;
   profile_ready: boolean;
+  verified_readiness_ready?: boolean;
 };
 
 const BAND_KEYS = {
@@ -42,7 +44,11 @@ const BAND_KEYS = {
   stretch: "strategic.forecastStretch",
 } as const;
 
-export function OpportunityForecast() {
+export function OpportunityForecast({
+  applyActionsGuard,
+}: {
+  applyActionsGuard: JobApplyActionsGuard;
+}) {
   const { t } = useTranslation();
   const [data, setData] = useState<ForecastData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -80,6 +86,10 @@ export function OpportunityForecast() {
     const token = getToken();
     if (!token) {
       toast.error(t("strategic.forecastAutoApplyNeedLogin"));
+      return;
+    }
+    if (!applyActionsGuard.canPrepareApplicationPackage) {
+      toast.error(t("dashboard.prepareApplicationBlocked"));
       return;
     }
     if (needsConsent) {
@@ -152,15 +162,31 @@ export function OpportunityForecast() {
                     </div>
                     <button
                       type="button"
-                      aria-label={`${t("strategic.forecastAutoApply")}: ${job.title}, ${job.company}`}
-                      disabled={autoApplyingId === job.job_id}
+                      aria-label={
+                        applyActionsGuard.canPrepareApplicationPackage
+                          ? `${t("strategic.forecastAutoApply")}: ${job.title}, ${job.company}`
+                          : `${t("strategic.forecastAutoApplyBlocked")}: ${job.title}, ${job.company}`
+                      }
+                      disabled={
+                        autoApplyingId === job.job_id || !applyActionsGuard.canPrepareApplicationPackage
+                      }
                       onClick={() => void autoApplyToJob(job.job_id)}
-                      className="twin-btn-secondary twin-touch-target shrink-0 !w-auto border-[var(--twin-cta)] px-2 py-1 text-xs font-semibold text-[var(--twin-cta)]"
-                      title={t("dashboard.autoApplyHint")}
+                      className={`twin-btn-secondary twin-touch-target shrink-0 !w-auto px-2 py-1 text-xs font-semibold ${
+                        applyActionsGuard.canPrepareApplicationPackage
+                          ? "border-[var(--twin-cta)] text-[var(--twin-cta)]"
+                          : "twin-btn--blocked"
+                      }`}
+                      title={
+                        applyActionsGuard.canPrepareApplicationPackage
+                          ? t("dashboard.prepareApplicationHint")
+                          : t("strategic.forecastAutoApplyBlocked")
+                      }
                     >
                       {autoApplyingId === job.job_id
                         ? t("strategic.forecastAutoApplyRunning")
-                        : t("strategic.forecastAutoApply")}
+                        : applyActionsGuard.canPrepareApplicationPackage
+                          ? t("strategic.forecastAutoApply")
+                          : t("strategic.forecastAutoApplyBlocked")}
                     </button>
                   </div>
                   {job.learning_path && job.learning_path.length > 0 && band !== "perfect" ? (
