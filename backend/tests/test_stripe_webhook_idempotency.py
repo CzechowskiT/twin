@@ -1098,3 +1098,171 @@ def test_missing_event_id_is_rejected_before_dedup_ledger_write(
         assert db.query(StripeWebhookEvent).count() == 0
     finally:
         db.close()
+
+
+def test_duplicate_burst_same_event_dispatches_handler_once(
+    client: tuple[TestClient, sessionmaker],
+) -> None:
+    """Burst duplicate deliveries with the same `event.id` must invoke the handler once."""
+    http, session_local = client
+    event_id = "evt_idempotency_burst_001"
+    payload = _invoice_payload(event_id)
+    headers = {"Content-Type": "application/json", "stripe-signature": _sign(payload)}
+
+    first = http.post("/api/v1/billing/webhook", content=payload, headers=headers)
+    assert first.status_code == 200, first.text
+    assert first.json().get("replayed") is None
+
+    for _ in range(4):
+        replay = http.post("/api/v1/billing/webhook", content=payload, headers=headers)
+        assert replay.status_code == 200, replay.text
+        assert replay.json().get("replayed") == "true"
+
+    assert http._stripe_invoice_calls == ["invoice"]  # type: ignore[attr-defined]
+
+    db = session_local()
+    try:
+        assert db.query(StripeWebhookEvent).filter_by(event_id=event_id).count() == 1
+    finally:
+        db.close()
+
+
+def test_replay_payload_drift_ignored(
+    client: tuple[TestClient, sessionmaker],
+    invoice_replay_payloads: tuple[str, bytes, bytes],
+) -> None:
+    """Replay with drifted body but stable `event.id` stays deduped and handler runs once."""
+    http, session_local = client
+    event_id, first_payload, drift_payload = invoice_replay_payloads
+    headers_first = {"Content-Type": "application/json", "stripe-signature": _sign(first_payload)}
+    headers_drift = {"Content-Type": "application/json", "stripe-signature": _sign(drift_payload)}
+
+    first = http.post("/api/v1/billing/webhook", content=first_payload, headers=headers_first)
+    assert first.status_code == 200, first.text
+    assert first.json().get("replayed") is None
+
+    replay = http.post("/api/v1/billing/webhook", content=drift_payload, headers=headers_drift)
+    assert replay.status_code == 200, replay.text
+    assert replay.json().get("replayed") == "true"
+    assert http._stripe_invoice_calls == ["invoice"]  # type: ignore[attr-defined]
+
+    db = session_local()
+    try:
+        row = db.query(StripeWebhookEvent).filter_by(event_id=event_id).one()
+        assert row.handler_status == stripe_events.STATUS_SUCCESS
+    finally:
+        db.close()
+
+
+def test_replay_preserves_first_processed_timestamp(
+    client: tuple[TestClient, sessionmaker],
+) -> None:
+    """Replay must not rewrite `processed_at` when payload timestamps drift."""
+    http, session_local = client
+    event_id = "evt_idempotency_processed_at_001"
+    first_payload = _invoice_payload_with_created(event_id, created_value=1_717_000_100)
+    replay_payload = _invoice_payload_with_created(event_id, created_value=1_717_000_500)
+
+    first = http.post(
+        "/api/v1/billing/webhook",
+        content=first_payload,
+        headers={"Content-Type": "application/json", "stripe-signature": _sign(first_payload)},
+    )
+    assert first.status_code == 200, first.text
+
+    db = session_local()
+    try:
+        row = db.query(StripeWebhookEvent).filter_by(event_id=event_id).one()
+        first_processed_at = row.processed_at
+        assert first_processed_at is not None
+    finally:
+        db.close()
+
+    replay = http.post(
+        "/api/v1/billing/webhook",
+        content=replay_payload,
+        headers={"Content-Type": "application/json", "stripe-signature": _sign(replay_payload)},
+    )
+    assert replay.status_code == 200, replay.text
+    assert replay.json().get("replayed") == "true"
+
+    db = session_local()
+    try:
+        row = db.query(StripeWebhookEvent).filter_by(event_id=event_id).one()
+        assert row.processed_at == first_processed_at
+    finally:
+        db.close()
+
+
+def test_unsupported_event_replay_remains_deduped(
+    client: tuple[TestClient, sessionmaker],
+) -> None:
+    """Rare unsupported signed event types still dedup on replay without handler dispatch."""
+    http, session_local = client
+    event_id = "evt_idempotency_unsupported_portal_001"
+    payload = json.dumps(
+        {
+            "id": event_id,
+            "type": "billing_portal.session.created",
+            "livemode": False,
+            "data": {"object": {"id": "bps_001", "customer": "cus_test"}},
+        }
+    ).encode("utf-8")
+    headers = {"Content-Type": "application/json", "stripe-signature": _sign(payload)}
+
+    first = http.post("/api/v1/billing/webhook", content=payload, headers=headers)
+    assert first.status_code == 200, first.text
+    assert first.json().get("replayed") is None
+
+    replay = http.post("/api/v1/billing/webhook", content=payload, headers=headers)
+    assert replay.status_code == 200, replay.text
+    assert replay.json().get("replayed") == "true"
+    assert http._stripe_invoice_calls == []  # type: ignore[attr-defined]
+
+    db = session_local()
+    try:
+        row = db.query(StripeWebhookEvent).filter_by(event_id=event_id).one()
+        assert row.event_type == "billing_portal.session.created"
+        assert row.handler_status == stripe_events.STATUS_IGNORED
+    finally:
+        db.close()
+
+
+def test_malformed_id_replay_chain_rejection(
+    client: tuple[TestClient, sessionmaker],
+) -> None:
+    """Malformed ids are rejected; valid events in the same chain still dedup normally."""
+    http, session_local = client
+    malformed = json.dumps(
+        {
+            "id": "   ",
+            "type": "invoice.payment_succeeded",
+            "data": {"object": {"customer": "cus_test", "subscription": "sub_test"}},
+        }
+    ).encode("utf-8")
+    malformed_headers = {
+        "Content-Type": "application/json",
+        "stripe-signature": _sign(malformed),
+    }
+    bad = http.post("/api/v1/billing/webhook", content=malformed, headers=malformed_headers)
+    assert bad.status_code == 400, bad.text
+
+    event_id = "evt_idempotency_malformed_chain_001"
+    valid = _invoice_payload(event_id)
+    valid_headers = {"Content-Type": "application/json", "stripe-signature": _sign(valid)}
+    first = http.post("/api/v1/billing/webhook", content=valid, headers=valid_headers)
+    assert first.status_code == 200, first.text
+    replay = http.post("/api/v1/billing/webhook", content=valid, headers=valid_headers)
+    assert replay.status_code == 200, replay.text
+    assert replay.json().get("replayed") == "true"
+
+    bad_again = http.post("/api/v1/billing/webhook", content=malformed, headers=malformed_headers)
+    assert bad_again.status_code == 400, bad_again.text
+    assert http._stripe_invoice_calls == ["invoice"]  # type: ignore[attr-defined]
+
+    db = session_local()
+    try:
+        assert db.query(StripeWebhookEvent).filter_by(event_id=event_id).count() == 1
+        assert db.query(StripeWebhookEvent).count() == 1
+    finally:
+        db.close()

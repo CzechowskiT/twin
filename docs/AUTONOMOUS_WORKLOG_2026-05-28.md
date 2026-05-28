@@ -681,3 +681,16 @@
 - Targeted verification:
   - `pytest -k invoice_upcoming backend/tests/test_stripe_webhook_idempotency.py -q`
   - Result: `1 passed, 34 deselected`.
+
+### WS35 Micro-slice — HB-A015..HB-A019 replay matrix hardening
+
+- Added focused replay regressions in `backend/tests/test_stripe_webhook_idempotency.py`:
+  - `test_duplicate_burst_same_event_dispatches_handler_once` (HB-A015),
+  - `test_replay_payload_drift_ignored` (HB-A016),
+  - `test_replay_preserves_first_processed_timestamp` (HB-A017),
+  - `test_unsupported_event_replay_remains_deduped` (HB-A018),
+  - `test_malformed_id_replay_chain_rejection` (HB-A019).
+- Updated queue status: `HB-A015`..`HB-A019` => `DONE`.
+- Targeted verification:
+  - `pytest -k "duplicate_burst_same_event or replay_payload_drift_ignored or replay_preserves_first_processed or unsupported_event_replay_remains or malformed_id_replay_chain" backend/tests/test_stripe_webhook_idempotency.py -q`
+  - Result: `5 passed, 35 deselected`.

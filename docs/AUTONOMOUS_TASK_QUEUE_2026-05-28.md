@@ -342,11 +342,11 @@
 - HB-A012 | Stripe dedup | Add checkout async payment succeeded replay test | LOW | DONE | HB-A003 | `pytest -k checkout_async_payment_succeeded_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
 - HB-A013 | Stripe dedup | Add subscription trial will end replay test | LOW | DONE | HB-A001 | `pytest -k subscription_trial_will_end_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
 - HB-A014 | Stripe dedup | Add invoice upcoming replay dedup noop test | LOW | DONE | HB-A001 | `pytest -k invoice_upcoming_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
-- HB-A015 | Stripe dedup | Add duplicate burst same-event assertion | LOW | READY | HB-A001 | `pytest -k duplicate_burst_same_event backend/tests/test_stripe_webhook_idempotency.py -q` | tests
-- HB-A016 | Stripe dedup | Add replay with drifted payload ignored test | LOW | READY | HB-A015 | `pytest -k replay_payload_drift_ignored backend/tests/test_stripe_webhook_idempotency.py -q` | tests
-- HB-A017 | Stripe dedup | Add replay preserves first processed timestamp test | LOW | READY | HB-A015 | `pytest -k replay_preserves_first_processed backend/tests/test_stripe_webhook_idempotency.py -q` | tests
-- HB-A018 | Stripe dedup | Add unsupported event replay remains deduped test | LOW | READY | HB-A001 | `pytest -k unsupported_event_replay_dedup backend/tests/test_stripe_webhook_idempotency.py -q` | tests
-- HB-A019 | Stripe dedup | Add malformed id replay chain rejection test | LOW | READY | HB-A001 | `pytest -k malformed_id_replay_chain backend/tests/test_stripe_webhook_idempotency.py -q` | tests
+- HB-A015 | Stripe dedup | Add duplicate burst same-event assertion | LOW | DONE | HB-A001 | `pytest -k duplicate_burst_same_event backend/tests/test_stripe_webhook_idempotency.py -q` | tests
+- HB-A016 | Stripe dedup | Add replay with drifted payload ignored test | LOW | DONE | HB-A015 | `pytest -k replay_payload_drift_ignored backend/tests/test_stripe_webhook_idempotency.py -q` | tests
+- HB-A017 | Stripe dedup | Add replay preserves first processed timestamp test | LOW | DONE | HB-A015 | `pytest -k replay_preserves_first_processed backend/tests/test_stripe_webhook_idempotency.py -q` | tests
+- HB-A018 | Stripe dedup | Add unsupported event replay remains deduped test | LOW | DONE | HB-A001 | `pytest -k unsupported_event_replay_dedup backend/tests/test_stripe_webhook_idempotency.py -q` | tests
+- HB-A019 | Stripe dedup | Add malformed id replay chain rejection test | LOW | DONE | HB-A001 | `pytest -k malformed_id_replay_chain backend/tests/test_stripe_webhook_idempotency.py -q` | tests
 - HB-A020 | Stripe dedup | Add replay dedup docs matrix update | LOW | READY | HB-A015 | markdown lint/manual | docs
 
 ### Category B — Mutation Rate Limits (20)
@@ -456,5 +456,5 @@
 ## Totals
 
 - Total tasks: 400
-- Ready now: 10 (all `LOW` risk, `HB-A015`..`HB-A020`, `HB-B001`..`HB-B002`, `HB-B004`..`HB-B005`)
-- Remaining backlog: 358
+- Ready now: 5 (all `LOW` risk, `HB-A020`, `HB-B001`..`HB-B002`, `HB-B004`..`HB-B005`)
+- Remaining backlog: 353
