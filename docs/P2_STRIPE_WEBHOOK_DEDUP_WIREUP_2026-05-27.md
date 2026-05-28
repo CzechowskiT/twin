@@ -24,6 +24,28 @@ no-op (same as pre-wire-up production).
 | `test_stripe_webhook_idempotency.py` | Handler + ledger integration |
 | `test_stripe_webhook_signature.py` | Signature gate unchanged |
 
+## Replay matrix (2026-05-28)
+
+Local regression coverage in `backend/tests/test_stripe_webhook_idempotency.py`:
+
+| Scenario | Test anchor |
+| -------- | ----------- |
+| Handled invoice/checkout first delivery + replay | `test_duplicate_invoice_event_dispatches_handler_once`, `test_duplicate_checkout_event_dispatches_handler_once` |
+| Unhandled signed events (invoice/checkout/customer/payment_method/subscription) | `test_unhandled_replay_events_are_marked_ignored_and_deduped` |
+| Burst duplicate deliveries (same `event.id`) | `test_duplicate_burst_same_event_dispatches_handler_once` |
+| Payload drift with stable `event.id` | `test_replay_payload_drift_ignored` |
+| `processed_at` stability on replay | `test_replay_preserves_first_processed_timestamp` |
+| Rare unsupported signed event replay | `test_unsupported_event_replay_remains_deduped` |
+| Malformed id before/after valid chain | `test_malformed_id_replay_chain_rejection` |
+| Missing/null/blank `event.id` rejection | `test_missing_event_id_is_rejected_before_dedup_ledger_write`, `test_malformed_event_id_is_rejected_before_dedup_ledger_write` |
+| Worker retry + replay short-circuit | `test_worker_retry_reprocesses_failed_event_once` |
+
+Verification command:
+
+```bash
+cd backend && pytest tests/test_stripe_webhook_idempotency.py -q
+```
+
 ## Founder gate before prod dedup is real
 
 1. Run Alembic skeleton in `docs/P2_STRIPE_EVENT_DEDUP_MIGRATION_SKELETON_2026-05-27.md`.

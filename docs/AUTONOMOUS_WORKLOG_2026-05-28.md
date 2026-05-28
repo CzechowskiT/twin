@@ -694,3 +694,10 @@
 - Targeted verification:
   - `pytest -k "duplicate_burst_same_event or replay_payload_drift_ignored or replay_preserves_first_processed or unsupported_event_replay_remains or malformed_id_replay_chain" backend/tests/test_stripe_webhook_idempotency.py -q`
   - Result: `5 passed, 35 deselected`.
+
+### WS36 Micro-slice — HB-A020 replay dedup docs matrix
+
+- Updated `docs/P2_STRIPE_WEBHOOK_DEDUP_WIREUP_2026-05-27.md` with a replay-matrix table
+  mapping scenarios to test anchors and a single verification command.
+- Updated queue status: `HB-A020` => `DONE`.
+- Verification: markdown/manual review.
