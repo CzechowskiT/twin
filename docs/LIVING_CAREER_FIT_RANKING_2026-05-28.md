@@ -96,6 +96,33 @@ Safeguards:
 - Explanations must avoid unsupported verification claims.
 - Output should remain stable and human-auditable across reruns.
 
+## Forbidden ranking explanation claims
+
+Ranking explanations, badges, and feed copy must **not** include unsupported phrases such as:
+
+- `verified` / `verified fit` / `verified skill`
+- `certified`
+- `guaranteed` / `guarantee`
+- `KYC-approved` / `KYC verified`
+- `employer-validated` / `employer-certified`
+- `legally verified`
+- `background-checked` (as proof of hire readiness)
+- `assured interview`
+- `guaranteed fit` / `perfect match`
+
+Ranking text must not imply employer attestation, identity KYC completion, or delegated apply execution.
+
+### Allowed ranking explanation language
+
+- **Declared by candidate** — profile field overlap without evidence artifact.
+- **Supported by provided evidence** — when evidence metadata exists (see `docs/SKILL_EVIDENCE_LAYER_2026-05-28.md`).
+- **Evidence-backed** — only with attached source; not legally verified.
+- **Inferred fit** — deterministic matcher + composite score components.
+- **Confidence estimate** — score band or quality label (`excellent` / `good` / `possible` / `weak`).
+- **Requires human review** — when policy or weak evidence blocks stronger copy.
+
+Feedback-driven phrases are allowed when factual: e.g. "boosted after apply intent", "hidden after not relevant", "penalized for not now".
+
 ## Current codebase alignment (2026-05-28)
 
 - Existing ranking already applies deterministic feedback adjustments:
@@ -105,3 +132,4 @@ Safeguards:
   - `not_relevant` exclusion + duplicate suppression
 - Existing dedupe strategy (`feed_dedupe_key`) supports cross-board sibling suppression after `not_relevant`.
 - This document extends the policy direction for evidence-aware and decay-aware evolution without introducing live autonomous apply behavior.
+- **Product/contract design only:** evidence-weight multipliers, full decay windows, and rich explanation payloads described here are not all implemented in runtime; live today are feedback boosts/penalties, `not_relevant` exclusion, and dedupe as listed above.

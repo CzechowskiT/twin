@@ -122,8 +122,36 @@ Notes:
 - Avoid absolute guarantees ("you will get interview", "verified expert") unless evidence and policy allow.
 - Keep "why not apply" available to reduce noise and improve acceptance-quality pipeline.
 
+## Forbidden wording / no-overclaim language
+
+Pre-apply feedback copy and payload fields must **not** use unsupported claims, including:
+
+- `verified` (skill, profile, or candidate)
+- `certified`
+- `guaranteed` / `guarantee`
+- `KYC-approved` / `KYC verified`
+- `employer-validated` / `employer-certified`
+- `legally verified`
+- `background-checked` (as a hiring outcome claim)
+- `assured interview` / `interview assured`
+- `guaranteed fit` / `perfect match guaranteed`
+
+This layer is **not** full KYC, **not** employer-certified verification, and **not** delegated auto-apply. Do not imply any of those are live.
+
+### Allowed language (when accurate)
+
+- **Declared by candidate** — skill or attribute the candidate stated without attached proof.
+- **Supported by provided evidence** — artifact or source is linked; still not legal/identity verification.
+- **Evidence-backed** — only when a concrete `evidence_source` is attached; means profile support, not formal certification.
+- **Inferred fit** — overlap from title, skills, location, salary, or scoring heuristics.
+- **Confidence estimate** — bounded, explainable score or bucket (`low` / `medium` / `high`).
+- **Requires human review** — when automation cannot justify stronger wording.
+
+Default for missing proof: use declared / inferred / confidence language; keep `verification_claims` as `"none"` in structured payloads.
+
 ## Current implementation alignment (2026-05-28)
 
 - Existing `match_reason` already provides concise ranking rationale tied to profile overlap.
 - Existing ranking and match-feedback signals support safe explanation expansion without risky automation.
 - This spec defines structured extension points for pre-apply guidance while preserving strict safety constraints.
+- **Product/contract design only:** the full pre-apply feedback payload API and UI are not claimed as fully live in production; today `match_reason` and match-feedback signals are the implemented baseline.
