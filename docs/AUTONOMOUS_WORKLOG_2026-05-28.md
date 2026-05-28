@@ -357,3 +357,20 @@
   - Ready now: `25`
   - Remaining backlog: `375`
 - Verification: markdown/manual review for schema conformity and dependency continuity.
+
+### WS24 Micro-slice — HB-A001 invoice.finalized replay dedup
+
+- Added unhandled Stripe event payload helper in
+  `backend/tests/test_stripe_webhook_idempotency.py`:
+  `_invoice_finalized_payload(event_id)`.
+- Added regression
+  `test_invoice_finalized_replay_is_marked_ignored_and_deduped` to ensure:
+  - first `invoice.finalized` delivery is accepted,
+  - replay with same `event.id` returns `replayed=true`,
+  - no business invoice/checkout handler dispatch occurs,
+  - dedup ledger row is stored as `event_type=invoice.finalized` and
+    `handler_status=ignored`.
+- Updated queue status: `HB-A001` => `DONE`.
+- Targeted verification:
+  - `pytest -k invoice_finalized_replay backend/tests/test_stripe_webhook_idempotency.py -q`
+  - Result: `1 passed, 19 deselected`.

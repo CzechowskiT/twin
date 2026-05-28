@@ -328,7 +328,7 @@
 
 ### Category A — Stripe / Billing / Webhook Dedup (20)
 
-- HB-A001 | Stripe dedup | Add invoice.finalized replay dedup test | LOW | READY | none | `pytest -k invoice_finalized_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
+- HB-A001 | Stripe dedup | Add invoice.finalized replay dedup test | LOW | DONE | none | `pytest -k invoice_finalized_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
 - HB-A002 | Stripe dedup | Add invoice.payment_failed replay dedup test | LOW | READY | HB-A001 | `pytest -k invoice_payment_failed_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
 - HB-A003 | Stripe dedup | Add checkout.session.expired replay dedup test | LOW | READY | HB-A001 | `pytest -k checkout_session_expired_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
 - HB-A004 | Stripe dedup | Add invoice.updated replay dedup test | LOW | READY | HB-A001 | `pytest -k invoice_updated_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
