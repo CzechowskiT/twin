@@ -107,3 +107,14 @@
 - Targeted verification:
   - `pytest backend/tests/test_idempotency_key_naming.py`
   - Result: `11 passed`.
+
+### WS7 Micro-slice — ST-003 webhook replay payload fixture
+
+- Added reusable `invoice_replay_payloads` fixture in
+  `backend/tests/test_stripe_webhook_idempotency.py` for same-`event.id`
+  replay permutations with changed body payload.
+- Refactored replay-drift regression to consume fixture and added
+  `test_invoice_replay_fixture_keeps_same_event_id` for fixture integrity.
+- Targeted verification:
+  - `pytest backend/tests/test_stripe_webhook_idempotency.py`
+  - Result: `8 passed`.

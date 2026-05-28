@@ -100,6 +100,29 @@ def _checkout_payload(event_id: str) -> bytes:
 
 
 @pytest.fixture
+def invoice_replay_payloads() -> tuple[str, bytes, bytes]:
+    """Canonical replay fixture: same Stripe `event.id`, different payload bodies."""
+    event_id = "evt_idempotency_invoice_payload_drift_001"
+    first_payload = _invoice_payload(event_id)
+    replay_payload = json.dumps(
+        {
+            "id": event_id,
+            "type": "invoice.payment_succeeded",
+            "livemode": False,
+            "data": {
+                "object": {
+                    "customer": "cus_test_changed",
+                    "subscription": "sub_test_changed",
+                    "amount_paid": 9999,
+                    "billing_reason": "subscription_cycle",
+                }
+            },
+        }
+    ).encode("utf-8")
+    return event_id, first_payload, replay_payload
+
+
+@pytest.fixture
 def client(monkeypatch: pytest.MonkeyPatch) -> Iterator[tuple[TestClient, sessionmaker]]:
     session_local = _sqlite_session_factory()
     calls: list[str] = []
@@ -169,26 +192,11 @@ def test_duplicate_invoice_event_dispatches_handler_once(
 
 def test_replay_with_same_event_id_but_changed_payload_is_deduped(
     client: tuple[TestClient, sessionmaker],
+    invoice_replay_payloads: tuple[str, bytes, bytes],
 ) -> None:
     """Dedup is keyed by Stripe `event.id` even if payload body drifts on replay."""
     http, session_local = client
-    event_id = "evt_idempotency_invoice_payload_drift_001"
-    first_payload = _invoice_payload(event_id)
-    second_payload = json.dumps(
-        {
-            "id": event_id,
-            "type": "invoice.payment_succeeded",
-            "livemode": False,
-            "data": {
-                "object": {
-                    "customer": "cus_test_changed",
-                    "subscription": "sub_test_changed",
-                    "amount_paid": 9999,
-                    "billing_reason": "subscription_cycle",
-                }
-            },
-        }
-    ).encode("utf-8")
+    event_id, first_payload, second_payload = invoice_replay_payloads
 
     first = http.post(
         "/api/v1/billing/webhook",
@@ -213,6 +221,18 @@ def test_replay_with_same_event_id_but_changed_payload_is_deduped(
         assert row.event_type == "invoice.payment_succeeded"
     finally:
         db.close()
+
+
+def test_invoice_replay_fixture_keeps_same_event_id(
+    invoice_replay_payloads: tuple[str, bytes, bytes],
+) -> None:
+    """Fixture safety: replay payloads must keep `event.id` stable across deliveries."""
+    event_id, first_payload, second_payload = invoice_replay_payloads
+    first = json.loads(first_payload.decode("utf-8"))
+    second = json.loads(second_payload.decode("utf-8"))
+    assert first["id"] == event_id
+    assert second["id"] == event_id
+    assert first != second
 
 
 def test_duplicate_checkout_event_dispatches_handler_once(
