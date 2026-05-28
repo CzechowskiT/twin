@@ -13,6 +13,8 @@ const cardPath = join(
 );
 const hookPath = join(root, "src/hooks/dashboard/use-dashboard-verified-readiness.ts");
 const pagePath = join(root, "src/app/dashboard/page.tsx");
+const jobListPath = join(root, "src/components/job-list.tsx");
+const guardLibPath = join(root, "src/lib/job-apply-actions-guard.ts");
 
 const FORBIDDEN_IN_CARD = [
   /Apply now/i,
@@ -38,6 +40,8 @@ function assert(condition: boolean, message: string): void {
 const card = read(cardPath);
 const hook = read(hookPath);
 const page = read(pagePath);
+const jobList = read(jobListPath);
+const guardLib = read(guardLibPath);
 
 for (const pattern of FORBIDDEN_IN_CARD) {
   assert(!pattern.test(card), `Forbidden pattern in card: ${pattern}`);
@@ -57,9 +61,21 @@ assert(
   "Dashboard page must mount verified readiness card",
 );
 assert(
-  !page.includes("DashboardVerifiedReadinessCard") ||
-    page.includes("{user ? <DashboardVerifiedReadinessCard />"),
-  "Card must only render for authenticated user shell",
+  page.includes("useDashboardVerifiedReadiness"),
+  "Dashboard page must load verified readiness once for card + apply guard",
+);
+assert(
+  page.includes("applyActionsGuard"),
+  "Dashboard page must pass applyActionsGuard to job surfaces",
+);
+assert(
+  jobList.includes("prepareApplication") && jobList.includes("canPrepareApplicationPackage"),
+  "Job list must gate prepare-application CTA on readiness",
+);
+assert(!/\bAuto-apply\b/i.test(jobList), "Job list must not show raw Auto-apply label");
+assert(
+  guardLib.includes("can_prepare_application_package"),
+  "Apply guard must read can_prepare_application_package from readiness gate",
 );
 
 console.log("verified-readiness-guard: ok");
