@@ -220,6 +220,24 @@ def _checkout_async_payment_failed_payload(event_id: str) -> bytes:
     ).encode("utf-8")
 
 
+def _checkout_async_payment_succeeded_payload(event_id: str) -> bytes:
+    """`checkout.session.async_payment_succeeded` is unhandled but must dedup."""
+    return json.dumps(
+        {
+            "id": event_id,
+            "type": "checkout.session.async_payment_succeeded",
+            "livemode": False,
+            "data": {
+                "object": {
+                    "id": "cs_async_succeeded_001",
+                    "customer": "cus_test",
+                    "subscription": "sub_test",
+                }
+            },
+        }
+    ).encode("utf-8")
+
+
 def _invoice_updated_payload(event_id: str) -> bytes:
     """`invoice.updated` is unhandled but should still dedup cleanly."""
     return json.dumps(
@@ -695,6 +713,13 @@ def test_checkout_session_expired_replay_is_marked_ignored_and_deduped(
             "evt_idempotency_checkout_async_payment_failed_001",
             _checkout_async_payment_failed_payload("evt_idempotency_checkout_async_payment_failed_001"),
             "checkout.session.async_payment_failed",
+        ),
+        (
+            "evt_idempotency_checkout_async_payment_succeeded_001",
+            _checkout_async_payment_succeeded_payload(
+                "evt_idempotency_checkout_async_payment_succeeded_001"
+            ),
+            "checkout.session.async_payment_succeeded",
         ),
     ],
 )
