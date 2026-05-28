@@ -173,3 +173,35 @@
 - Targeted verification:
   - `pytest -k register_rate_limit backend/tests/test_auth_register_rate_limit.py -q`
   - Result: `2 passed`.
+
+### WS0 Catch-up Verification — CI/Production sync (run 26564925884)
+
+- Required Actions run check:
+  - `gh run view 26564925884 --json status,conclusion,headSha,displayTitle,url,createdAt,updatedAt`
+  - Result: `status=completed`, `conclusion=success`, `headSha=a469c36a2779ffbdadad9fa5874a05aff2a215e8`
+  - URL: `https://github.com/CzechowskiT/twin/actions/runs/26564925884`
+- Read-only production checks:
+  - `GET /api/public-health` => HTTP `200`
+  - `GET /status` => HTTP `200`
+  - `GET /` => HTTP `200`
+  - `GET /waitlist` => HTTP `200`
+  - `GET /demo` => HTTP `200`
+  - `GET /login/candidate` => HTTP `200`
+  - `GET /dashboard` => HTTP `200`
+- Production SHA catch-up confirmation:
+  - `public-health.git_commit=a469c36a2779ffbdadad9fa5874a05aff2a215e8`
+  - Status: production public-health SHA is caught up to `a469c36`.
+
+### WS11 Micro-slice — ST-014 reset-password mutation RL
+
+- Expanded `backend/tests/test_auth_reset_password_rate_limit.py` from a single 429 check
+  into deterministic edge-coverage aligned with current limiter behavior (`3/minute`):
+  - under-limit invalid token requests keep existing `400 Invalid or expired reset link` semantics,
+  - fourth attempt is throttled with HTTP `429`,
+  - limiter short-circuit prevents extra token reset calls after exhaustion,
+  - response bodies do not echo supplied token/password values.
+- Preserved unauthenticated endpoint contract and avoided external side effects by stubbing
+  `reset_password_with_token` in all cases.
+- Targeted verification:
+  - `pytest -q backend/tests/test_auth_reset_password_rate_limit.py`
+  - Result: `3 passed`.
