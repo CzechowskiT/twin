@@ -81,6 +81,34 @@ def _invoice_payload(event_id: str) -> bytes:
     ).encode("utf-8")
 
 
+def _invoice_payload_with_created(
+    event_id: str,
+    *,
+    created_value: object | None = 1_717_000_000,
+    include_created: bool = True,
+    metadata_timestamp: object | None = None,
+) -> bytes:
+    """Build invoice payload variants to stress timestamp-related replay edges."""
+    obj: dict[str, object] = {
+        "customer": "cus_test",
+        "subscription": "sub_test",
+        "amount_paid": 1000,
+        "billing_reason": "subscription_cycle",
+    }
+    if metadata_timestamp is not None:
+        obj["metadata"] = {"timestamp_hint": metadata_timestamp}
+
+    payload: dict[str, object] = {
+        "id": event_id,
+        "type": "invoice.payment_succeeded",
+        "livemode": False,
+        "data": {"object": obj},
+    }
+    if include_created:
+        payload["created"] = created_value
+    return json.dumps(payload).encode("utf-8")
+
+
 def _checkout_payload(event_id: str) -> bytes:
     return json.dumps(
         {
@@ -383,3 +411,125 @@ def test_failed_event_is_retried_and_can_transition_to_success(
         assert row.processed_at is not None
     finally:
         db.close()
+
+
+@pytest.mark.parametrize(
+    ("first_created", "replay_created"),
+    [
+        (1_717_000_200, 1_717_000_100),  # replay carries earlier timestamp
+        (1_717_000_100, 1_717_000_300),  # replay carries later timestamp
+    ],
+)
+def test_replay_dedup_ignores_created_timestamp_ordering(
+    client: tuple[TestClient, sessionmaker],
+    first_created: int,
+    replay_created: int,
+) -> None:
+    """Dedup does not assume monotonic `created` timestamps; only `event.id` matters."""
+    http, session_local = client
+    event_id = "evt_idempotency_created_ordering_001"
+    first_payload = _invoice_payload_with_created(event_id, created_value=first_created)
+    replay_payload = _invoice_payload_with_created(event_id, created_value=replay_created)
+
+    first = http.post(
+        "/api/v1/billing/webhook",
+        content=first_payload,
+        headers={"Content-Type": "application/json", "stripe-signature": _sign(first_payload)},
+    )
+    assert first.status_code == 200, first.text
+    assert first.json().get("replayed") is None
+
+    replay = http.post(
+        "/api/v1/billing/webhook",
+        content=replay_payload,
+        headers={"Content-Type": "application/json", "stripe-signature": _sign(replay_payload)},
+    )
+    assert replay.status_code == 200, replay.text
+    assert replay.json().get("replayed") == "true"
+    assert http._stripe_invoice_calls == ["invoice"]  # type: ignore[attr-defined]
+
+    db = session_local()
+    try:
+        row = db.query(StripeWebhookEvent).filter_by(event_id=event_id).one()
+        assert row.handler_status == stripe_events.STATUS_SUCCESS
+    finally:
+        db.close()
+
+
+@pytest.mark.parametrize(
+    ("include_created", "created_value"),
+    [
+        (False, None),  # missing created key
+        (True, None),  # explicit null created value
+    ],
+)
+def test_replay_dedup_tolerates_missing_or_null_created_timestamp(
+    client: tuple[TestClient, sessionmaker],
+    include_created: bool,
+    created_value: object | None,
+) -> None:
+    """Stripe payloads lacking a usable `created` timestamp still replay-dedup safely."""
+    http, _ = client
+    event_id = "evt_idempotency_created_missing_001"
+    first_payload = _invoice_payload_with_created(
+        event_id,
+        include_created=include_created,
+        created_value=created_value,
+    )
+    replay_payload = _invoice_payload_with_created(
+        event_id,
+        include_created=True,
+        created_value=1_717_000_111,
+    )
+
+    first = http.post(
+        "/api/v1/billing/webhook",
+        content=first_payload,
+        headers={"Content-Type": "application/json", "stripe-signature": _sign(first_payload)},
+    )
+    assert first.status_code == 200, first.text
+    replay = http.post(
+        "/api/v1/billing/webhook",
+        content=replay_payload,
+        headers={"Content-Type": "application/json", "stripe-signature": _sign(replay_payload)},
+    )
+    assert replay.status_code == 200, replay.text
+    assert replay.json().get("replayed") == "true"
+    assert http._stripe_invoice_calls == ["invoice"]  # type: ignore[attr-defined]
+
+
+@pytest.mark.parametrize(
+    "metadata_timestamp",
+    [
+        "not-a-timestamp",
+        "2026-05-28 10:47:00",  # naive-like datetime string
+        "2026-05-28T10:47:00+02:00",  # timezone-aware string
+    ],
+)
+def test_replay_dedup_ignores_malformed_or_timezone_timestamp_hints(
+    client: tuple[TestClient, sessionmaker],
+    metadata_timestamp: object,
+) -> None:
+    """Timestamp-like metadata shape must not affect replay dedup behavior."""
+    http, _ = client
+    event_id = "evt_idempotency_metadata_timestamp_001"
+    first_payload = _invoice_payload_with_created(event_id, metadata_timestamp=metadata_timestamp)
+    replay_payload = _invoice_payload_with_created(
+        event_id,
+        metadata_timestamp={"nested": "not-parseable"},
+    )
+
+    first = http.post(
+        "/api/v1/billing/webhook",
+        content=first_payload,
+        headers={"Content-Type": "application/json", "stripe-signature": _sign(first_payload)},
+    )
+    assert first.status_code == 200, first.text
+    replay = http.post(
+        "/api/v1/billing/webhook",
+        content=replay_payload,
+        headers={"Content-Type": "application/json", "stripe-signature": _sign(replay_payload)},
+    )
+    assert replay.status_code == 200, replay.text
+    assert replay.json().get("replayed") == "true"
+    assert http._stripe_invoice_calls == ["invoice"]  # type: ignore[attr-defined]

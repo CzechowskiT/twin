@@ -118,3 +118,34 @@
 - Targeted verification:
   - `pytest backend/tests/test_stripe_webhook_idempotency.py`
   - Result: `8 passed`.
+
+### WS0 Catch-up Verification — CI/Production sync (run 26563945468)
+
+- Required Actions run check:
+  - `gh run view 26563945468 --json status,conclusion,headSha,displayTitle,url,createdAt,updatedAt`
+  - Result: `status=completed`, `conclusion=success`, `headSha=5971d2e1842e30528b0c3a944624381ffedd64d5`
+  - URL: `https://github.com/CzechowskiT/twin/actions/runs/26563945468`
+- Read-only production checks:
+  - `GET /api/public-health` => HTTP `200`
+  - `GET /status` => HTTP `200`
+  - `GET /` => HTTP `200`
+  - `GET /waitlist` => HTTP `200`
+  - `GET /demo` => HTTP `200`
+  - `GET /login/candidate` => HTTP `200`
+  - `GET /dashboard` => HTTP `200`
+- Production SHA catch-up confirmation:
+  - `public-health.git_commit=6e74a89f76eb926de0eacfec2d38fb002d428640`
+  - Status: production public-health SHA is caught up to `6e74a89`.
+
+### WS8 Micro-slice — ST-004 dedup timestamp edge cases
+
+- Added deterministic replay timestamp-edge coverage in
+  `backend/tests/test_stripe_webhook_idempotency.py` to prove dedup remains keyed by
+  `event.id` across:
+  - earlier/later `created` replay ordering,
+  - missing or explicit `null` `created`,
+  - malformed timestamp-like metadata and timezone-aware/naive timestamp strings.
+- Added helper fixture `_invoice_payload_with_created(...)` for stable timestamp-variant payload generation.
+- Targeted verification:
+  - `pytest backend/tests/test_stripe_event_dedup_helpers.py backend/tests/test_stripe_webhook_idempotency.py -q`
+  - Result: `23 passed`.
