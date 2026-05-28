@@ -643,3 +643,20 @@
 - Targeted verification:
   - `pytest -k checkout_async_payment_succeeded backend/tests/test_stripe_webhook_idempotency.py -q`
   - Result: `1 passed, 33 deselected`.
+
+### WS33 Micro-slice — HB-A013 subscription trial_will_end replay dedup
+
+- Expanded unhandled replay matrix in
+  `backend/tests/test_stripe_webhook_idempotency.py` with
+  `customer.subscription.trial_will_end`.
+- Added payload helper
+  `_subscription_trial_will_end_payload(event_id)` and included it in
+  `test_unhandled_replay_events_are_marked_ignored_and_deduped`.
+- Coverage confirms first delivery is accepted, replay returns
+  `replayed=true`, handlers are not dispatched, and ledger status remains
+  `ignored` for this event type.
+- Updated queue status:
+  - `HB-A013` => `DONE`
+- Targeted verification:
+  - `pytest -k subscription_trial_will_end backend/tests/test_stripe_webhook_idempotency.py -q`
+  - Result: `1 passed, 34 deselected`.
