@@ -409,6 +409,95 @@
   - `pytest -k checkout_session_expired_replay backend/tests/test_stripe_webhook_idempotency.py -q`
   - Result: `1 passed, 21 deselected`.
 
+### WS27 Micro-slice — Agent 8 investor/CTO due diligence pack (docs-only)
+
+- Created investor/founder/product/pilot narrative documents from repository truth sources:
+  - `docs/INVESTOR_CTO_DUE_DILIGENCE_PACK_2026-05-28.md`
+  - `docs/FOUNDER_STATUS_BRIEF_2026-05-28.md`
+  - `docs/TWIN_PRODUCT_NARRATIVE_2026-05-28.md`
+  - `docs/CONTROLLED_PILOT_INVITE_BRIEF_2026-05-28.md`
+- Explicitly carried forward hard bans:
+  - no public-launch claim while open gates remain,
+  - no fake metrics,
+  - no guaranteed interviews claim,
+  - no secrets/prod/env/deploy/migration actions.
+- Framed current readiness truthfully:
+  - controlled pilot: GO,
+  - investor/CTO diligence: GO with caveats,
+  - public launch: NO-GO pending Alembic `050` prod verification, CSP enforce burn-in, and O7 restore drill evidence.
+- Updated queue with Agent 8 checkpoint tasks:
+  - `docs/AUTONOMOUS_TASK_QUEUE_2026-05-28.md` (A8-001..A8-006).
+- Verification:
+  - markdown/manual review,
+  - `git diff --check` (clean),
+  - post-push smoke workflow list checks performed per requested flow.
+
+### WS27 Micro-slice — Launch gates / production reality / CSP burn-in refresh
+
+- Executed read-only production surface checks:
+  - `GET /api/public-health` => HTTP `200`, `git_commit=f165096...`, `db_ok=true`
+  - `GET /status`, `/`, `/waitlist`, `/demo`, `/login/candidate`, `/dashboard` => all HTTP `200`
+- Captured CSP header evidence on `/` and `/waitlist`:
+  - `content-security-policy-report-only` present
+  - `report-uri /api/v1/csp-report` present
+  - No enforce flip performed.
+- Refreshed launch docs and decision memos in scope:
+  - `docs/PRODUCTION_REALITY_MATRIX_2026-05-27.md`
+  - `docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md`
+  - `docs/API_PRODUCTION_CUTOVER_DECISION_2026-05-27.md`
+  - `docs/P1_CSP_ENFORCE_BURNIN_DAILY_LOG_2026-05-27.md`
+  - `docs/RUNBOOK_DB_RESTORE_2026-05-27.md`
+  - `docs/BACKUP_RESTORE_DRILL_LOG.md`
+- Founder-safe O7 guidance strengthened (staging proof only, evidence checklist, no prod overwrite path).
+- Queue updates:
+  - `HB-F001` => `DONE`
+  - `HB-F002` => `DONE`
+  - `HB-F005` => `DONE`
+
+### WS27 Micro-slice — Agent 4 frontend smoke hardening
+
+- Stabilized `frontend/e2e/smoke.spec.ts` navigation behavior by introducing
+  `gotoSmoke(page, path)` with `waitUntil: "domcontentloaded"` and explicit timeout.
+  This removes intermittent hangs on third-party asset `load` events while preserving
+  route-level smoke assertions.
+- Tightened unauthenticated dashboard guard assertions:
+  - reject both `top 20 matches` and `top20 matches` variants,
+  - reject email and phone-like PII patterns in unauthenticated DOM text.
+- Confirmed public/demo/login/dashboard/robots/sitemap/public-health smoke coverage remains
+  read-only (no credentials, no form submits, no live auto-apply/scrape/mutations).
+- Updated queue statuses:
+  - `PW-004`, `PW-005` => `DONE`
+  - `HB-D001`, `HB-D004`, `HB-D005`, `HB-D007`, `HB-D008` => `DONE`
+- Frontend verification (required for touched frontend):
+  - `cd frontend && npm run lint` ✅
+  - `cd frontend && npx tsc --noEmit` ✅
+  - `cd frontend && npm run build` ✅
+  - `cd frontend && npx playwright test -g "dashboard|demo|login|robots|sitemap|public-health"` ✅ (`8 passed`)
+- Read-only production smoke checks:
+  - `GET https://twin-sooty.vercel.app/{,waitlist,demo,login/candidate,dashboard,status}` => all `200`
+  - `GET https://twin-sooty.vercel.app/api/public-health` => `200`, `status="ok"`,
+    `service="twin-api"`, `git_commit="f165096d9e1e9b8668679da086050fe8fa8f0490"`.
+
+### WS27 Micro-slice — HB-E004/HB-E005/HB-E006 skill-evidence and feedback ranking specs
+
+- Added product architecture docs for candidate intelligence slices:
+  - `docs/SKILL_EVIDENCE_LAYER_2026-05-28.md`
+  - `docs/PERSONALIZED_PRE_APPLY_FEEDBACK_2026-05-28.md`
+  - `docs/LIVING_CAREER_FIT_RANKING_2026-05-28.md`
+- Updated queue statuses:
+  - `HB-E004` => `DONE`
+  - `HB-E005` => `DONE`
+  - `HB-E006` => `DONE`
+- Added safe non-invasive matching tests aligned with existing behavior:
+  - `backend/tests/test_job_match_feedback.py`
+    - verifies match-feedback response payload stays on contract fields and avoids secret-like markers.
+  - `backend/tests/test_match_reason.py`
+    - verifies ranking explanation wording does not claim verified/certified skills without evidence.
+- Safety posture maintained:
+  - no real apply
+  - no live auto-apply
+  - no scrape/deploy/migration/prod mutation
+
 ### WS27 Micro-slice — HB-A004..HB-A008 replay dedup expansion
 
 - Expanded Stripe replay matrix in
@@ -454,3 +543,69 @@
 - Production SHA signal:
   - `public-health.git_commit=f165096d9e1e9b8668679da086050fe8fa8f0490`
   - Status: production API remains behind current branch head (`38ec9a2`) as expected during ongoing branch work.
+
+### WS29 Micro-slice — HB-A009/HB-A010 invoice replay dedup
+
+- Expanded unhandled replay matrix in
+  `backend/tests/test_stripe_webhook_idempotency.py` for:
+  - `invoice.voided`
+  - `invoice.marked_uncollectible`
+- Both scenarios now assert first delivery is accepted, duplicate returns
+  `replayed=true`, handlers are not dispatched, and ledger status remains `ignored`.
+- Updated queue status:
+  - `HB-A009` => `DONE`
+  - `HB-A010` => `DONE`
+- Targeted verification:
+  - `pytest tests/test_stripe_webhook_idempotency.py -q`
+  - Result: `31 passed`.
+
+### WS0 Catch-up Verification — CI status (run ID 26570613643)
+
+- Actions check after latest Stripe test push:
+  - `gh run list --workflow smoke.yml --branch cursor/phase1-monorepo-scaffold --limit 5`
+  - Observed: `26570613643` (`queued` at check time).
+
+### WS29 Micro-slice — Mutation RL/auth-ordering hardening (Agent 2)
+
+- Expanded authenticated mutation RL coverage in
+  `backend/tests/test_auth_mutation_rate_limits.py`:
+  - added `PATCH /api/v1/applications/{id}` 30/min cap regression,
+  - added `DELETE /api/v1/applications/{id}` throttle regression on repeated same-resource deletes,
+  - added explicit unauthenticated ordering assertions (`401`) for
+    `PUT /api/v1/candidates/me`, `PATCH /api/v1/applications/{id}`,
+    and `DELETE /api/v1/applications/{id}`.
+- Added missing saved-jobs RL suite:
+  `backend/tests/test_jobs_saved_rate_limits.py` covering
+  `POST/DELETE /api/v1/jobs/saved/{id}`:
+  - authenticated throttle to `429` after 30/min,
+  - unauthenticated requests remain `401` (no user-bucket lockout behavior).
+- Extended recruiter mutation RL coverage in
+  `backend/tests/test_consent_recruiter_rate_limits.py` with
+  `POST /api/v1/recruiter/inbox/respond-batch` (`60/min`, token-keyed).
+- Updated queue status: `HB-B003` => `DONE`.
+- Targeted verification:
+  - `pytest tests/test_auth_mutation_rate_limits.py tests/test_auth_login_rate_limit.py tests/test_auth_register_rate_limit.py tests/test_auth_reset_password_rate_limit.py tests/test_auth_forgot_password_rate_limit.py tests/test_consent_recruiter_rate_limits.py tests/test_oauth_callback_rate_limits.py tests/test_jobs_saved_rate_limits.py -q`
+  - Result: `31 passed`.
+
+### WS30 Micro-slice — Verified Candidate Gateway docs + readiness gate (Agent 5)
+
+- Added product/architecture docs for:
+  - verified candidate gateway,
+  - candidate career brief,
+  - candidate career brief technical plan,
+  - verified candidate 360,
+  - delegated apply guard plan,
+  - twin product pillars.
+- Added safe read-only endpoint:
+  - `GET /api/v1/candidates/me/verified-readiness`
+  - response includes `verification_status`, `checklist`, `missing_items`,
+    `blocked_reasons`, `delegated_apply_allowed`,
+    `can_prepare_application_package`, `can_submit_delegated_application`.
+- Endpoint behavior intentionally conservative:
+  - `delegated_apply_allowed=false` unless explicit delegated consent model exists,
+  - submit capability remains blocked in this slice.
+- Added tests:
+  - `backend/tests/test_candidate_verified_readiness_gate.py`.
+- Targeted verification:
+  - `pytest -q tests/test_candidate_verified_readiness_gate.py tests/test_candidate_readiness.py`
+  - Result: `6 passed`.

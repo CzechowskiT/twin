@@ -198,8 +198,8 @@
 - PW-001 | Playwright smoke | Stabilize homepage smoke waiting strategy | LOW | BLOCKED | ST-021 | `pnpm playwright test -g homepage` | tests
 - PW-002 | Playwright smoke | Stabilize waitlist smoke selectors | LOW | BLOCKED | PW-001 | `pnpm playwright test -g waitlist` | tests
 - PW-003 | Playwright smoke | Stabilize demo page smoke selectors | LOW | BLOCKED | PW-001 | `pnpm playwright test -g demo` | tests
-- PW-004 | Playwright smoke | Stabilize login page smoke selectors | LOW | BLOCKED | ST-022 | `pnpm playwright test -g login` | tests
-- PW-005 | Playwright smoke | Stabilize dashboard auth gate smoke | LOW | BLOCKED | ST-021 | `pnpm playwright test -g auth-gate` | tests
+- PW-004 | Playwright smoke | Stabilize login page smoke selectors | LOW | DONE | ST-022 | `pnpm playwright test -g login` | tests
+- PW-005 | Playwright smoke | Stabilize dashboard auth gate smoke | LOW | DONE | ST-021 | `pnpm playwright test -g auth-gate` | tests
 - PW-006 | Playwright smoke | Add status page smoke coverage | LOW | BLOCKED | PW-001 | `pnpm playwright test -g status` | tests
 - PW-007 | Playwright smoke | Add public-health api smoke script | LOW | BLOCKED | PW-001 | `pytest -k public_health_smoke` | tests
 - PW-008 | Playwright smoke | Add robust networkidle helper docs | LOW | BLOCKED | PW-001 | markdown lint/manual | docs
@@ -336,8 +336,8 @@
 - HB-A006 | Stripe dedup | Add customer.updated replay dedup test | LOW | DONE | HB-A005 | `pytest tests/test_stripe_webhook_idempotency.py -q` | tests
 - HB-A007 | Stripe dedup | Add payment_method.attached replay dedup test | LOW | DONE | HB-A001 | `pytest tests/test_stripe_webhook_idempotency.py -q` | tests
 - HB-A008 | Stripe dedup | Add payment_method.detached replay dedup test | LOW | DONE | HB-A007 | `pytest tests/test_stripe_webhook_idempotency.py -q` | tests
-- HB-A009 | Stripe dedup | Add invoice.voided replay dedup test | LOW | READY | HB-A001 | `pytest -k invoice_voided_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
-- HB-A010 | Stripe dedup | Add invoice.marked_uncollectible replay test | LOW | READY | HB-A001 | `pytest -k invoice_marked_uncollectible_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
+- HB-A009 | Stripe dedup | Add invoice.voided replay dedup test | LOW | DONE | HB-A001 | `pytest tests/test_stripe_webhook_idempotency.py -q` | tests
+- HB-A010 | Stripe dedup | Add invoice.marked_uncollectible replay test | LOW | DONE | HB-A001 | `pytest tests/test_stripe_webhook_idempotency.py -q` | tests
 - HB-A011 | Stripe dedup | Add checkout async payment failed replay test | LOW | READY | HB-A003 | `pytest -k checkout_async_payment_failed_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
 - HB-A012 | Stripe dedup | Add checkout async payment succeeded replay test | LOW | READY | HB-A003 | `pytest -k checkout_async_payment_succeeded_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
 - HB-A013 | Stripe dedup | Add subscription trial will end replay test | LOW | READY | HB-A001 | `pytest -k subscription_trial_will_end_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
@@ -397,14 +397,14 @@
 
 ### Category D — Frontend / Playwright Public Smoke (15)
 
-- HB-D001 | Playwright smoke | Add unauth dashboard redirect smoke | LOW | BLOCKED | none | `cd frontend && npx playwright test -g "dashboard unauth redirect"` | tests
+- HB-D001 | Playwright smoke | Add unauth dashboard redirect smoke | LOW | DONE | none | `cd frontend && npx playwright test -g "dashboard unauth redirect"` | tests
 - HB-D002 | Playwright smoke | Add home route smoke assertions | LOW | BLOCKED | HB-D001 | `cd frontend && npx playwright test -g "home smoke"` | tests
 - HB-D003 | Playwright smoke | Add waitlist route smoke assertions | LOW | BLOCKED | HB-D001 | `cd frontend && npx playwright test -g "waitlist smoke"` | tests
-- HB-D004 | Playwright smoke | Add demo route smoke assertions | LOW | BLOCKED | HB-D001 | `cd frontend && npx playwright test -g "demo smoke"` | tests
-- HB-D005 | Playwright smoke | Add login candidate route smoke assertions | LOW | BLOCKED | HB-D001 | `cd frontend && npx playwright test -g "login candidate smoke"` | tests
+- HB-D004 | Playwright smoke | Add demo route smoke assertions | LOW | DONE | HB-D001 | `cd frontend && npx playwright test -g "demo smoke"` | tests
+- HB-D005 | Playwright smoke | Add login candidate route smoke assertions | LOW | DONE | HB-D001 | `cd frontend && npx playwright test -g "login candidate smoke"` | tests
 - HB-D006 | Playwright smoke | Add status route smoke assertions | LOW | BLOCKED | HB-D001 | `cd frontend && npx playwright test -g "status smoke"` | tests
-- HB-D007 | Playwright smoke | Add robots route smoke assertions | LOW | BLOCKED | HB-D001 | `cd frontend && npx playwright test -g "robots smoke"` | tests
-- HB-D008 | Playwright smoke | Add sitemap route smoke assertions | LOW | BLOCKED | HB-D001 | `cd frontend && npx playwright test -g "sitemap smoke"` | tests
+- HB-D007 | Playwright smoke | Add robots route smoke assertions | LOW | DONE | HB-D001 | `cd frontend && npx playwright test -g "robots smoke"` | tests
+- HB-D008 | Playwright smoke | Add sitemap route smoke assertions | LOW | DONE | HB-D001 | `cd frontend && npx playwright test -g "sitemap smoke"` | tests
 - HB-D009 | Playwright smoke | Add public routes locale smoke assertions | LOW | BLOCKED | HB-D002 | `cd frontend && npx playwright test -g "public locale smoke"` | tests
 - HB-D010 | Playwright smoke | Add mobile viewport smoke lane | LOW | BLOCKED | HB-D002 | `cd frontend && npx playwright test -g "mobile smoke"` | tests
 - HB-D011 | Playwright smoke | Add tablet viewport smoke lane | LOW | BLOCKED | HB-D002 | `cd frontend && npx playwright test -g "tablet smoke"` | tests
@@ -415,12 +415,12 @@
 
 ### Category E — Verified Candidate Gateway / Career Intelligence (15)
 
-- HB-E001 | Candidate intelligence | Draft verified candidate gateway scope doc | LOW | BLOCKED | none | markdown lint/manual | docs
-- HB-E002 | Candidate intelligence | Draft candidate career brief spec | LOW | BLOCKED | HB-E001 | markdown lint/manual | docs
-- HB-E003 | Candidate intelligence | Draft verified candidate 360 profile spec | LOW | BLOCKED | HB-E001 | markdown lint/manual | docs
-- HB-E004 | Candidate intelligence | Draft skill evidence layer definition | LOW | BLOCKED | HB-E002 | markdown lint/manual | docs
-- HB-E005 | Candidate intelligence | Draft personalized pre-apply feedback spec | LOW | BLOCKED | HB-E002 | markdown lint/manual | docs
-- HB-E006 | Candidate intelligence | Draft living career fit ranking spec | LOW | BLOCKED | HB-E002 | markdown lint/manual | docs
+- HB-E001 | Candidate intelligence | Draft verified candidate gateway scope doc | LOW | DONE | none | markdown lint/manual | docs
+- HB-E002 | Candidate intelligence | Draft candidate career brief spec | LOW | DONE | HB-E001 | markdown lint/manual | docs
+- HB-E003 | Candidate intelligence | Draft verified candidate 360 profile spec | LOW | DONE | HB-E001 | markdown lint/manual | docs
+- HB-E004 | Candidate intelligence | Draft skill evidence layer definition | LOW | DONE | HB-E002 | markdown lint/manual | docs
+- HB-E005 | Candidate intelligence | Draft personalized pre-apply feedback spec | LOW | DONE | HB-E002 | markdown lint/manual | docs
+- HB-E006 | Candidate intelligence | Draft living career fit ranking spec | LOW | DONE | HB-E002 | markdown lint/manual | docs
 - HB-E007 | Candidate intelligence | Draft candidate data provenance notes | LOW | BLOCKED | HB-E001 | markdown lint/manual | docs
 - HB-E008 | Candidate intelligence | Draft recruiter acceptance signal schema | LOW | BLOCKED | HB-E003 | markdown lint/manual | docs
 - HB-E009 | Candidate intelligence | Draft candidate acceptance signal schema | LOW | BLOCKED | HB-E003 | markdown lint/manual | docs
@@ -433,19 +433,28 @@
 
 ### Category F — Release / Docs / Source of Truth (10)
 
-- HB-F001 | Release docs | Refresh production reality matrix baseline | LOW | BLOCKED | none | markdown lint/manual | docs
-- HB-F002 | Release docs | Refresh launch gate evidence checklist | LOW | BLOCKED | HB-F001 | markdown lint/manual | docs
+- HB-F001 | Release docs | Refresh production reality matrix baseline | LOW | DONE | none | markdown lint/manual + read-only prod checks | docs
+- HB-F002 | Release docs | Refresh launch gate evidence checklist | LOW | DONE | HB-F001 | markdown lint/manual + gate truthfulness pass | docs
 - HB-F003 | Release docs | Refresh source-of-truth doc index | LOW | BLOCKED | HB-F001 | markdown lint/manual | docs
 - HB-F004 | Release docs | Refresh CI verification SOP links | LOW | BLOCKED | HB-F001 | markdown lint/manual | docs
-- HB-F005 | Release docs | Refresh prod SHA drift SOP wording | LOW | BLOCKED | HB-F001 | markdown lint/manual | docs
+- HB-F005 | Release docs | Refresh prod SHA drift SOP wording | LOW | DONE | HB-F001 | markdown lint/manual + read-only SHA evidence refresh | docs
 - HB-F006 | Release docs | Refresh queue status notation guide | LOW | BLOCKED | HB-F003 | markdown lint/manual | docs
 - HB-F007 | Release docs | Refresh worklog evidence schema guide | LOW | BLOCKED | HB-F003 | markdown lint/manual | docs
 - HB-F008 | Release docs | Refresh checkpoint handoff template | LOW | BLOCKED | HB-F007 | markdown lint/manual | docs
 - HB-F009 | Release docs | Refresh autonomous resume prompt quality gate | LOW | BLOCKED | HB-F008 | markdown lint/manual | docs
 - HB-F010 | Release docs | Refresh backlog factory anti-pattern notes | LOW | BLOCKED | HB-F006 | markdown lint/manual | docs
 
+## Agent 8 — Investor / CTO Narrative Batch (2026-05-28)
+
+- A8-001 | Investor docs | Create investor CTO due diligence pack | LOW | DONE | none | markdown/manual review | docs
+- A8-002 | Founder docs | Create founder status brief | LOW | DONE | A8-001 | markdown/manual review | docs
+- A8-003 | Product narrative | Create TWIN product narrative | LOW | DONE | A8-001 | markdown/manual review | docs
+- A8-004 | Pilot docs | Create controlled pilot invite brief | LOW | DONE | A8-002 | markdown/manual review | docs
+- A8-005 | Ops docs | Update autonomous queue with Agent 8 checkpoint | LOW | DONE | A8-001 | markdown/manual review | docs
+- A8-006 | Ops docs | Update autonomous worklog with Agent 8 checkpoint | LOW | DONE | A8-005 | markdown/manual review | docs
+
 ## Totals
 
 - Total tasks: 400
-- Ready now: 16 (all `LOW` risk, `HB-A009`..`HB-A020`, `HB-B001`..`HB-B002`, `HB-B004`..`HB-B005`)
-- Remaining backlog: 367
+- Ready now: 14 (all `LOW` risk, `HB-A011`..`HB-A020`, `HB-B001`..`HB-B002`, `HB-B004`..`HB-B005`)
+- Remaining backlog: 362
