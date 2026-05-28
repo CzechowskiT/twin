@@ -609,3 +609,20 @@
 - Targeted verification:
   - `pytest -q tests/test_candidate_verified_readiness_gate.py tests/test_candidate_readiness.py`
   - Result: `6 passed`.
+
+### WS31 Micro-slice — HB-A011 checkout async_payment_failed replay dedup
+
+- Expanded unhandled replay matrix in
+  `backend/tests/test_stripe_webhook_idempotency.py` with
+  `checkout.session.async_payment_failed`.
+- Added payload helper
+  `_checkout_async_payment_failed_payload(event_id)` and included it in
+  `test_unhandled_replay_events_are_marked_ignored_and_deduped`.
+- Coverage now asserts first delivery is accepted, replay returns
+  `replayed=true`, handlers are not dispatched, and ledger status remains
+  `ignored` for this event type as well.
+- Updated queue status:
+  - `HB-A011` => `DONE`
+- Targeted verification:
+  - `pytest -k checkout_async_payment_failed backend/tests/test_stripe_webhook_idempotency.py -q`
+  - Result: `1 passed, 32 deselected`.
