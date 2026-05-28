@@ -333,6 +333,32 @@ def test_unhandled_event_is_marked_ignored(client: tuple[TestClient, sessionmake
         db.close()
 
 
+def test_malformed_event_id_is_rejected_before_dedup_ledger_write(
+    client: tuple[TestClient, sessionmaker],
+) -> None:
+    """Malformed/blank Stripe `event.id` returns 400 and never writes a ledger row."""
+    http, session_local = client
+    payload = json.dumps(
+        {
+            "id": "   ",
+            "type": "invoice.payment_succeeded",
+            "data": {"object": {"customer": "cus_test", "subscription": "sub_test"}},
+        }
+    ).encode("utf-8")
+    headers = {"Content-Type": "application/json", "stripe-signature": _sign(payload)}
+
+    response = http.post("/api/v1/billing/webhook", content=payload, headers=headers)
+    assert response.status_code == 400, response.text
+    assert response.json()["detail"] == "Event missing id."
+    assert http._stripe_invoice_calls == []  # type: ignore[attr-defined]
+
+    db = session_local()
+    try:
+        assert db.query(StripeWebhookEvent).count() == 0
+    finally:
+        db.close()
+
+
 def test_unhandled_event_replay_short_circuits_dispatch(
     client: tuple[TestClient, sessionmaker],
 ) -> None:

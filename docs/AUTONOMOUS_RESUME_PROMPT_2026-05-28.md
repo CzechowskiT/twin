@@ -25,4 +25,4 @@ Immediate steps:
 - Queue doc: `docs/AUTONOMOUS_TASK_QUEUE_2026-05-28.md`
 - Worklog doc: `docs/AUTONOMOUS_WORKLOG_2026-05-28.md`
 - Finalization gate: `docs/AUTONOMOUS_FINALIZATION_GATE_2026-05-28.md`
-- Next dependency-ready task: `ST-008` (`pytest -k malformed_event`)
+- Next dependency-ready task: `ST-009` (`pytest -k metadata_fallback`)

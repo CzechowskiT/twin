@@ -266,3 +266,14 @@
 - Targeted verification:
   - `pytest -k worker_retry backend/tests/test_stripe_webhook_idempotency.py -q`
   - Result: `1 passed, 16 deselected`.
+
+### WS16 Micro-slice — ST-008 malformed event id guard
+
+- Added malformed webhook event-id regression in
+  `backend/tests/test_stripe_webhook_idempotency.py`:
+  `test_malformed_event_id_is_rejected_before_dedup_ledger_write`.
+- Coverage verifies blank/whitespace `event.id` payloads are rejected with HTTP `400`
+  (`Event missing id.`), no handler dispatch occurs, and dedup ledger remains unchanged.
+- Targeted verification:
+  - `pytest -k malformed_event backend/tests/test_stripe_webhook_idempotency.py -q`
+  - Result: `1 passed, 17 deselected`.
