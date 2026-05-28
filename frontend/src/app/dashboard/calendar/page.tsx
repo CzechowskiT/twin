@@ -686,7 +686,7 @@ export default function DashboardCalendarPage() {
   const loc = locale === "pl" ? "pl-PL" : "en-US";
 
   return (
-    <Shell rail>
+    <Shell wide rail>
       <div className="mb-4 flex min-w-0 flex-col gap-3 sm:mb-6 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">

@@ -52,7 +52,7 @@ export function DashboardCalendarStrip({
           {t("acceptanceQueue.stripCta")}
         </Link>
       </div>
-      <div className="dashboard-calendar-strip flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <div className="dashboard-calendar-strip gap-3">
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.calendarStripTitle")}</p>
           <p className="twin-muted mt-1 text-xs leading-relaxed">

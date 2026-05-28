@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { useTranslation } from "@/components/language-provider";
 import { Card } from "@/components/ui";
-import {
-  useDashboardVerifiedReadiness,
-  type VerifiedReadinessGate,
+import type {
+  VerifiedReadinessGate,
+  VerifiedReadinessLoadState,
 } from "@/hooks/dashboard/use-dashboard-verified-readiness";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -174,10 +174,14 @@ function ReadinessBody({ gate }: { gate: VerifiedReadinessGate }) {
   );
 }
 
+type CardProps = {
+  gate: VerifiedReadinessGate | null;
+  loadState: VerifiedReadinessLoadState;
+};
+
 /** Read-only readiness checklist — no apply/submit actions. */
-export function DashboardVerifiedReadinessCard() {
+export function DashboardVerifiedReadinessCard({ gate, loadState }: CardProps) {
   const { t } = useTranslation();
-  const { gate, loadState } = useDashboardVerifiedReadiness();
 
   if (loadState === "idle" || loadState === "loading") return null;
 
@@ -195,7 +199,7 @@ export function DashboardVerifiedReadinessCard() {
   if (!gate) return null;
 
   return (
-    <Card className="mb-4 space-y-2 p-4 sm:mb-6">
+    <Card id="dashboard-readiness" className="mb-4 space-y-2 p-4 sm:mb-6 scroll-mt-24">
       <div>
         <h2 id="verified-readiness-heading" className="text-base font-semibold">
           {t("verifiedReadiness.title")}

@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { jobApplyActionsGuardFromReadiness } from "@/lib/job-apply-actions-guard";
+import { useDashboardVerifiedReadiness } from "@/hooks/dashboard/use-dashboard-verified-readiness";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { DashboardCommandCenter } from "@/components/dashboard-command-center";
 import { OpportunityForecast } from "@/components/dashboard/OpportunityForecast";
@@ -41,6 +43,15 @@ export default function DashboardPage() {
   const router = useRouter();
   const { t } = useTranslation();
   const data = useDashboardData(t);
+  const verifiedReadiness = useDashboardVerifiedReadiness();
+  const applyActionsGuard = useMemo(
+    () =>
+      jobApplyActionsGuardFromReadiness(
+        verifiedReadiness.gate,
+        verifiedReadiness.loadState,
+      ),
+    [verifiedReadiness.gate, verifiedReadiness.loadState],
+  );
   const {
     user,
     profile,
@@ -139,7 +150,7 @@ export default function DashboardPage() {
     autoApplyingId,
     setJobApplication,
     applyToJob,
-    autoApplyToJob,
+    autoApplyToJob: autoApplyToJobRaw,
   } = useDashboardJobApplicationActions({
     t,
     setError,
@@ -176,6 +187,17 @@ export default function DashboardPage() {
   useEffect(() => {
     trackLinkOpenedRef.current = trackLinkOpened;
   }, [trackLinkOpened]);
+
+  const autoApplyToJob = useCallback(
+    (jobId: number) => {
+      if (!applyActionsGuard.canPrepareApplicationPackage) {
+        setError(t("dashboard.prepareApplicationBlocked"));
+        return;
+      }
+      void autoApplyToJobRaw(jobId);
+    },
+    [applyActionsGuard.canPrepareApplicationPackage, autoApplyToJobRaw, setError, t],
+  );
 
   const {
     submitMatchFeedback,
@@ -254,22 +276,31 @@ export default function DashboardPage() {
 
       <WorkspaceFlowSteps current="dashboard" className="mb-4 sm:mb-6" />
       <ProfileCompletenessHint profile={profile} />
-      {user ? <DashboardVerifiedReadinessCard /> : null}
+      {user ? (
+        <DashboardVerifiedReadinessCard
+          gate={verifiedReadiness.gate}
+          loadState={verifiedReadiness.loadState}
+        />
+      ) : null}
 
       {user ? <EmailVerificationBanner /> : null}
       {user ? <NightlyAutoApplyStrip /> : null}
 
       {user ? (
         <>
-          <DashboardCommandCenter
-            email={user.email}
-            profileName={profile ? profile.name : undefined}
-            hasProfile={hasProfile}
-            showScrapeUi={showScrapePanel}
-          />
-          <div className="mb-4 grid gap-4 lg:grid-cols-2">
-            <OpportunityForecast />
-            <ProgressDashboard />
+          <div className="dashboard-hero-grid mb-4 sm:mb-6">
+            <div className="dashboard-hero-grid__welcome">
+              <DashboardCommandCenter
+                email={user.email}
+                profileName={profile ? profile.name : undefined}
+                hasProfile={hasProfile}
+                showScrapeUi={showScrapePanel}
+              />
+            </div>
+            <div className="dashboard-hero-grid__insights">
+              <OpportunityForecast applyActionsGuard={applyActionsGuard} />
+              <ProgressDashboard />
+            </div>
           </div>
           <p className="twin-muted -mt-2 mb-4 max-w-prose text-sm leading-relaxed">{t("dashboard.northStarLead")}</p>
           <DashboardCalendarStrip
@@ -318,6 +349,7 @@ export default function DashboardPage() {
           matchFeedbackBusyJobId={matchFeedbackBusyJobId}
           displayApplicationStatus={displayApplicationStatus}
           autoApplyingId={autoApplyingId}
+          applyActionsGuard={applyActionsGuard}
           matchesCsvBusy={exports.matchesCsvBusy}
           matchesXlsxBusy={exports.matchesXlsxBusy}
           showApplyPrompt={polling.showApplyPrompt}
@@ -389,6 +421,7 @@ export default function DashboardPage() {
         hasProfile={hasProfile}
         displayApplicationStatus={displayApplicationStatus}
         autoApplyingId={autoApplyingId}
+        applyActionsGuard={applyActionsGuard}
         jobsLoadMoreBusy={jobsLoadMoreBusy}
         onFiltersChange={setFilters}
         onApplyFilters={() => void applyJobFilters()}

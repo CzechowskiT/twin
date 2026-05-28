@@ -131,7 +131,7 @@ export default function NightlyAutoApplySettingsPage() {
   const nextTime = settings?.next_run_label ?? "02:00";
 
   return (
-    <Shell rail>
+    <Shell wide rail>
       <div className="space-y-6">
         <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
