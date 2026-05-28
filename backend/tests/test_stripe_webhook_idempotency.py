@@ -71,6 +71,24 @@ def _invoice_payload(event_id: str) -> bytes:
     ).encode("utf-8")
 
 
+def _checkout_payload(event_id: str) -> bytes:
+    return json.dumps(
+        {
+            "id": event_id,
+            "type": "checkout.session.completed",
+            "livemode": False,
+            "data": {
+                "object": {
+                    "id": "cs_test_123",
+                    "customer": "cus_test",
+                    "subscription": "sub_test",
+                    "metadata": {"user_id": "1"},
+                }
+            },
+        }
+    ).encode("utf-8")
+
+
 @pytest.fixture
 def client(monkeypatch: pytest.MonkeyPatch) -> Iterator[tuple[TestClient, sessionmaker]]:
     session_local = _sqlite_session_factory()
@@ -87,9 +105,17 @@ def client(monkeypatch: pytest.MonkeyPatch) -> Iterator[tuple[TestClient, sessio
         calls.append("invoice")
         return None
 
+    def _track_checkout(db, session_data, settings):  # noqa: ANN001
+        calls.append("checkout")
+        return None
+
     monkeypatch.setattr(
         "app.api.billing.stripe_svc.process_invoice_payment_succeeded",
         _track_invoice,
+    )
+    monkeypatch.setattr(
+        "app.api.billing.stripe_svc.process_checkout_completed",
+        _track_checkout,
     )
 
     app = create_app()
@@ -175,6 +201,35 @@ def test_replay_with_same_event_id_but_changed_payload_is_deduped(
         row = db.query(StripeWebhookEvent).filter_by(event_id=event_id).one()
         assert row.handler_status == stripe_events.STATUS_SUCCESS
         assert row.event_type == "invoice.payment_succeeded"
+    finally:
+        db.close()
+
+
+def test_duplicate_checkout_event_dispatches_handler_once(
+    client: tuple[TestClient, sessionmaker],
+) -> None:
+    """Replay of `checkout.session.completed` must not re-enter the handler."""
+    http, session_local = client
+    event_id = "evt_idempotency_checkout_001"
+    payload = _checkout_payload(event_id)
+    sig = _sign(payload)
+    headers = {"Content-Type": "application/json", "stripe-signature": sig}
+
+    first = http.post("/api/v1/billing/webhook", content=payload, headers=headers)
+    assert first.status_code == 200, first.text
+    assert first.json().get("replayed") is None
+
+    second = http.post("/api/v1/billing/webhook", content=payload, headers=headers)
+    assert second.status_code == 200, second.text
+    assert second.json().get("replayed") == "true"
+
+    assert http._stripe_invoice_calls == ["checkout"]  # type: ignore[attr-defined]
+
+    db = session_local()
+    try:
+        row = db.query(StripeWebhookEvent).filter_by(event_id=event_id).one()
+        assert row.handler_status == stripe_events.STATUS_SUCCESS
+        assert row.event_type == "checkout.session.completed"
     finally:
         db.close()
 

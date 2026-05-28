@@ -37,3 +37,13 @@
 - Run preflight sync commands and WS0 checks.
 - Continue WS1..WS9 with small tested slices.
 - Keep appending this worklog after each micro-slice.
+
+### WS2 Micro-slice — ST-006 checkout replay dedup
+
+- Added `checkout.session.completed` replay coverage in
+  `backend/tests/test_stripe_webhook_idempotency.py`.
+- Stubbed checkout handler dispatch and asserted second delivery with same `event.id`
+  returns `replayed=true` and does not re-enter business handler.
+- Targeted verification:
+  - `pytest -k "checkout and stripe_webhook_idempotency" backend/tests/test_stripe_webhook_idempotency.py`
+  - Result: `1 passed, 6 deselected`.

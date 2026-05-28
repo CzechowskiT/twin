@@ -13,7 +13,7 @@
 - ST-003 | Stripe tests | Add webhook payload replay fixture | LOW | READY | ST-001 | `pytest -k webhook_replay` | tests
 - ST-004 | Stripe tests | Parametrize dedup timestamp edge tests | LOW | READY | ST-002 | `pytest -k dedup_timestamp` | tests
 - ST-005 | Stripe tests | Add duplicate invoice.paid test case | LOW | READY | ST-003 | `pytest -k invoice_paid` | tests
-- ST-006 | Stripe tests | Add duplicate checkout.session test case | LOW | READY | ST-003 | `pytest -k checkout_session` | tests
+- ST-006 | Stripe tests | Add duplicate checkout.session test case | LOW | DONE | ST-003 | `pytest -k checkout_session` | tests
 - ST-007 | Stripe tests | Verify dedup across worker retry | LOW | READY | ST-004 | `pytest -k worker_retry` | tests
 - ST-008 | Stripe tests | Add malformed event id test | LOW | READY | ST-001 | `pytest -k malformed_event` | tests
 - ST-009 | Stripe tests | Add missing metadata fallback test | LOW | READY | ST-005 | `pytest -k metadata_fallback` | tests
