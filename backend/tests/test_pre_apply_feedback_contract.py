@@ -137,6 +137,34 @@ def test_invalid_enum_like_values_fail_validation(field: str, bad_value: str) ->
         PreApplyFeedbackV1.model_validate(payload)
 
 
+def test_extra_top_level_field_fails_validation() -> None:
+    payload = build_sample_pre_apply_feedback_v1()
+    payload["verified_skill"] = True
+    with pytest.raises(ValidationError):
+        PreApplyFeedbackV1.model_validate(payload)
+
+
+def test_extra_field_in_evidence_notes_fails_validation() -> None:
+    payload = build_sample_pre_apply_feedback_v1()
+    payload["evidence_notes"]["employer_validated"] = True
+    with pytest.raises(ValidationError):
+        PreApplyFeedbackV1.model_validate(payload)
+
+
+def test_extra_field_in_ranking_signals_fails_validation() -> None:
+    payload = build_sample_pre_apply_feedback_v1()
+    payload["ranking_signals"]["kyc_approved"] = True
+    with pytest.raises(ValidationError):
+        PreApplyFeedbackV1.model_validate(payload)
+
+
+def test_extra_field_in_feedback_adjustment_fails_validation() -> None:
+    payload = build_sample_pre_apply_feedback_v1()
+    payload["ranking_signals"]["feedback_adjustments"][0]["guaranteed"] = True
+    with pytest.raises(ValidationError):
+        PreApplyFeedbackV1.model_validate(payload)
+
+
 def test_sample_payload_has_no_forbidden_phrases_in_user_facing_text() -> None:
     payload = build_sample_pre_apply_feedback_v1()
     blob = _user_facing_blob(payload)
