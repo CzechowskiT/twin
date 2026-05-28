@@ -127,6 +127,25 @@ def _checkout_payload(event_id: str) -> bytes:
     ).encode("utf-8")
 
 
+def _invoice_paid_payload(event_id: str) -> bytes:
+    """`invoice.paid` is currently unhandled but must still dedup on replay."""
+    return json.dumps(
+        {
+            "id": event_id,
+            "type": "invoice.paid",
+            "livemode": False,
+            "data": {
+                "object": {
+                    "id": "in_test_paid_001",
+                    "customer": "cus_test",
+                    "subscription": "sub_test",
+                    "amount_paid": 1000,
+                }
+            },
+        }
+    ).encode("utf-8")
+
+
 @pytest.fixture
 def invoice_replay_payloads() -> tuple[str, bytes, bytes]:
     """Canonical replay fixture: same Stripe `event.id`, different payload bodies."""
@@ -337,6 +356,33 @@ def test_unhandled_event_replay_short_circuits_dispatch(
     db = session_local()
     try:
         row = db.query(StripeWebhookEvent).filter_by(event_id=event_id).one()
+        assert row.handler_status == stripe_events.STATUS_IGNORED
+    finally:
+        db.close()
+
+
+def test_duplicate_invoice_paid_event_is_marked_ignored_and_deduped(
+    client: tuple[TestClient, sessionmaker],
+) -> None:
+    """`invoice.paid` replay should return `replayed=true` and avoid handler dispatch."""
+    http, session_local = client
+    event_id = "evt_idempotency_invoice_paid_001"
+    payload = _invoice_paid_payload(event_id)
+    headers = {"Content-Type": "application/json", "stripe-signature": _sign(payload)}
+
+    first = http.post("/api/v1/billing/webhook", content=payload, headers=headers)
+    assert first.status_code == 200, first.text
+    assert first.json().get("replayed") is None
+
+    second = http.post("/api/v1/billing/webhook", content=payload, headers=headers)
+    assert second.status_code == 200, second.text
+    assert second.json().get("replayed") == "true"
+    assert http._stripe_invoice_calls == []  # type: ignore[attr-defined]
+
+    db = session_local()
+    try:
+        row = db.query(StripeWebhookEvent).filter_by(event_id=event_id).one()
+        assert row.event_type == "invoice.paid"
         assert row.handler_status == stripe_events.STATUS_IGNORED
     finally:
         db.close()

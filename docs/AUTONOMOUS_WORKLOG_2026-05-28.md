@@ -149,3 +149,14 @@
 - Targeted verification:
   - `pytest backend/tests/test_stripe_event_dedup_helpers.py backend/tests/test_stripe_webhook_idempotency.py -q`
   - Result: `23 passed`.
+
+### WS9 Micro-slice — ST-005 duplicate invoice.paid replay case
+
+- Added deterministic `invoice.paid` replay regression in
+  `backend/tests/test_stripe_webhook_idempotency.py`:
+  `test_duplicate_invoice_paid_event_is_marked_ignored_and_deduped`.
+- Coverage asserts first delivery is accepted as unhandled/ignored, replay returns
+  `replayed=true`, and business invoice handlers are not called.
+- Targeted verification:
+  - `pytest -k invoice_paid backend/tests/test_stripe_webhook_idempotency.py -q`
+  - Result: `1 passed, 15 deselected`.

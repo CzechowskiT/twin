@@ -12,7 +12,7 @@
 - ST-002 | Stripe tests | Add idempotency key naming conventions test | LOW | DONE | ST-001 | `pytest backend/tests/test_idempotency_key_naming.py` | tests
 - ST-003 | Stripe tests | Add webhook payload replay fixture | LOW | DONE | ST-001 | `pytest backend/tests/test_stripe_webhook_idempotency.py` | tests
 - ST-004 | Stripe tests | Parametrize dedup timestamp edge tests | LOW | DONE | ST-002 | `pytest backend/tests/test_stripe_event_dedup_helpers.py backend/tests/test_stripe_webhook_idempotency.py -q` | tests
-- ST-005 | Stripe tests | Add duplicate invoice.paid test case | LOW | READY | ST-003 | `pytest -k invoice_paid` | tests
+- ST-005 | Stripe tests | Add duplicate invoice.paid test case | LOW | DONE | ST-003 | `pytest -k invoice_paid backend/tests/test_stripe_webhook_idempotency.py -q` | tests
 - ST-006 | Stripe tests | Add duplicate checkout.session test case | LOW | DONE | ST-003 | `pytest -k checkout_session` | tests
 - ST-007 | Stripe tests | Verify dedup across worker retry | LOW | READY | ST-004 | `pytest -k worker_retry` | tests
 - ST-008 | Stripe tests | Add malformed event id test | LOW | READY | ST-001 | `pytest -k malformed_event` | tests
