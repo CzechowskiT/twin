@@ -20,6 +20,41 @@ For each ranked role, generate a deterministic feedback payload with:
 - `evidence_backed_skill_note`
 - `ranking_explanation`
 
+### Payload schema proposal (HB-E013)
+
+```json
+{
+  "job_id": 123,
+  "version": "pre_apply_feedback.v1",
+  "high_fit_reasons": ["title_alignment", "skills_overlap"],
+  "risk_reasons": ["missing_required_tool"],
+  "missing_requirements": [
+    {"key": "kubernetes", "severity": "high", "required": true}
+  ],
+  "profile_improvements": [
+    {"type": "evidence", "action": "attach_case_study", "priority": "high"}
+  ],
+  "career_repositioning_suggestion": "Consider Senior Backend Engineer roles first.",
+  "why_not_apply": "Missing hard requirement: production Kubernetes ownership.",
+  "role_resilience_note": {"status": "medium", "reason": "fresh_listing_multi_source"},
+  "evidence_backed_skill_note": {
+    "supported_skills": ["python"],
+    "declared_only_skills": ["kubernetes"],
+    "verification_claims": "none"
+  },
+  "ranking_explanation": {
+    "base_fit": 62.0,
+    "feedback_adjustments": [{"signal": "apply_intent", "delta": 3.0}],
+    "final_score": 74.0
+  }
+}
+```
+
+Notes:
+
+- This is a contract proposal only; do not present as fully implemented API.
+- `verification_claims` must remain `"none"` when proof requirements are not met.
+
 ## Required content blocks
 
 ### 1) Why this role is high fit
@@ -72,6 +107,7 @@ For each ranked role, generate a deterministic feedback payload with:
   - source quality/freshness/completeness
   - feedback adjustments (`apply_intent`, `relevant`, `not_now`, `not_relevant` exclusion)
 - Keep explanation deterministic and audit-friendly.
+- Include explicit no-overclaim wording when evidence is partial (`"declared, not verified"` style).
 
 ## Safety and privacy constraints
 

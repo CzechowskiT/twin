@@ -44,12 +44,44 @@ Each evidence-backed skill record should include:
 - `review_status`: `auto_detected | candidate_confirmed | reviewer_confirmed | rejected`.
 - `verification_label`: constrained label that must stay non-verified unless backed.
 
+### Provenance contract (HB-E007)
+
+Each `evidence_sources[]` entry should carry immutable provenance fields:
+
+- `source_id`: stable identifier for evidence artifact.
+- `source_type`: one of `cv | project | certificate | github | case_study | language_test | assessment`.
+- `captured_at`: UTC timestamp when evidence was ingested.
+- `origin`: `candidate_upload | parser_extraction | reviewer_attachment`.
+- `content_hash`: optional checksum for tamper detection.
+- `consent_scope`: reference to consent basis used for processing.
+- `retention_class`: data-retention policy selector.
+- `status`: `active | superseded | withdrawn`.
+
+Provenance records must be append-only. Updates create new versions; they do not rewrite prior evidence facts.
+
+### Acceptance signals contract (HB-E008)
+
+Skill evidence should expose acceptance-oriented signals for ranking and explanation layers:
+
+- `acceptance_signal`: `supports_role | partial_support | weak_support | no_support`.
+- `acceptance_strength`: numeric `0.0-1.0`.
+- `acceptance_reasons`: short machine-readable reason codes.
+- `blocking_gaps`: explicit missing requirements tied to role expectation.
+- `evidence_conflicts`: contradictory evidence flags requiring downgrade/review.
+
 ## Confidence and recency rules
 
 - Confidence increases with multiple independent evidence sources.
 - Confidence decays over time for fast-changing skills.
 - Older artifacts remain usable for context but receive reduced ranking weight.
 - Recency weighting should be explicit, deterministic, and testable.
+
+### Confidence rubric (HB-E009)
+
+- `high` (`>=0.8`): at least two independent active sources, recent evidence, no conflicts.
+- `medium` (`0.5-0.79`): one strong source or two weaker sources, limited conflict.
+- `low` (`<0.5`): declaration-only or stale/contradictory evidence.
+- Unsupported skills default to `low` and cannot be labeled verified.
 
 ## Privacy classes
 
@@ -58,6 +90,13 @@ Each evidence-backed skill record should include:
 - `compliance_restricted`: high-sensitivity data requiring stricter access controls.
 
 Default should be least-privilege (`candidate_private`) until explicit promotion criteria are met.
+
+### Privacy enforcement contract (HB-E010)
+
+- `candidate_private` never appears in recruiter-facing APIs.
+- `recruiter_visible` must exclude raw document payloads and sensitive identifiers.
+- `compliance_restricted` requires explicit policy gate and purpose-limited access.
+- Ranking/explanation layers may consume aggregated signals, not raw sensitive evidence blobs.
 
 ## Ranking effect policy
 

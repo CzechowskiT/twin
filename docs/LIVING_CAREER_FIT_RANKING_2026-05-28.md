@@ -27,6 +27,16 @@ Define a feedback-aware ranking policy that evolves with candidate intent and ev
 
 - Moderate positive signal for refinement without forcing immediate apply behavior.
 
+## Signal taxonomy (HB-E014)
+
+- `intent_signal`: `apply_intent | relevant | not_now | not_relevant`
+- `evidence_signal`: `evidence_high | evidence_medium | evidence_low | evidence_missing`
+- `risk_signal`: `hard_gap | soft_gap | stale_profile | low_data_quality`
+- `resilience_signal`: `high_resilience | medium_resilience | low_resilience | unknown`
+- `policy_signal`: `do_not_apply | compliance_hold | normal`
+
+Each signal type should map to deterministic score deltas or exclusion rules and be explainable in payload output.
+
 ## Do-not-apply rules
 
 - Role-level hard suppression can be driven by:
@@ -64,6 +74,21 @@ Define a feedback-aware ranking policy that evolves with candidate intent and ev
   - `not_now`: faster decay
   - `not_relevant`: durable unless candidate explicitly reopens category
 - Decay windows should be configurable and covered by tests before production use.
+
+### Decay semantics (HB-E015)
+
+Recommended baseline windows:
+
+- `not_now`: half-life 14 days, then gradual neutralization.
+- `apply_intent`: half-life 30 days to preserve near-term intent.
+- `relevant`: half-life 21 days.
+- `not_relevant`: no automatic expiry; only explicit candidate reversal can reopen.
+
+Safeguards:
+
+- Decay must never flip `do_not_apply` policy signals.
+- Decay updates should be idempotent and reproducible for the same reference time.
+- Explanation payload should include active decay factors when applied.
 
 ## Ranking explanation contract
 
