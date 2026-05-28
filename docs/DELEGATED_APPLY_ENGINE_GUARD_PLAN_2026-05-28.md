@@ -35,6 +35,6 @@ Design a delegated-apply path that is constrained, auditable, and evidence-drive
 
 ## Migration-required later steps
 
-- Dedicated delegated-consent model with versioned legal text and revocation.
+- Dedicated delegated-consent model with versioned legal text and revocation (`docs/DELEGATED_APPLY_CONSENT_MODEL_2026-05-28.md`).
 - Event-sourced authorization trail for submit-level decisions.
 - Rule-engine table for do-not-apply policy normalization.
