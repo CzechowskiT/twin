@@ -97,3 +97,13 @@
 - Targeted verification:
   - `pytest backend/tests/test_stripe_webhook_idempotency.py backend/tests/test_stripe_event_dedup_helpers.py`
   - Result: `15 passed`.
+
+### WS6 Micro-slice — ST-002 idempotency key naming conventions
+
+- Added dedicated unit coverage for API idempotency key normalization in
+  `backend/tests/test_idempotency_key_naming.py`.
+- Coverage enforces accepted naming (`[A-Za-z0-9_-]`, trim behavior, 8..128 length)
+  and rejects malformed values (spaces, slash, dot, short/empty/too-long).
+- Targeted verification:
+  - `pytest backend/tests/test_idempotency_key_naming.py`
+  - Result: `11 passed`.
