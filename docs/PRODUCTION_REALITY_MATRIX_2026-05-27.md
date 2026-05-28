@@ -1,13 +1,19 @@
-# Production reality matrix — 2026-05-27
+# Production Reality Matrix — 2026-05-27
 
-**Branch:** `cursor/phase1-monorepo-scaffold`
-**Branch HEAD (local):** `f4e3399e76c7f35811817f4bba44ed8ca53ec013`
-**Production API SHA (read-only):** `76b6df3d0be041418c77b588f59dece16a8b66e2`
-**Vercel production SHA:** `8d34404` (from current production matrix; requires Vercel UI check for refresh)
-**Frontend:** `https://twin-sooty.vercel.app` (canonical alias on Vercel project `twin`)
-**API:** `https://twin-production-bcd9.up.railway.app`
+## Snapshot metadata
 
-Legend: **LIVE** = verified on prod this session · **PARTIAL** = shipped but gated / degraded · **REPO** = code only · **OFF** = disabled or not configured · **BLOCKED** = policy / gate blocks use
+- **Branch:** `cursor/phase1-monorepo-scaffold`
+- **Branch HEAD (local):** `d5e749a`
+- **Production API SHA (read-only):** `a469c36a2779ffbdadad9fa5874a05aff2a215e8`
+- **Vercel production SHA:** `8d34404` (frontend alias; refresh via Vercel project checks)
+- **Frontend:** `https://twin-sooty.vercel.app` (canonical alias on Vercel project `twin`)
+- **API:** `https://twin-production-bcd9.up.railway.app`
+
+## Legend
+
+**LIVE** = verified on prod this session · **PARTIAL** = shipped but gated / degraded · **REPO** = code only · **OFF** = disabled or not configured · **BLOCKED** = policy / gate blocks use
+
+## Capability matrix
 
 | Feature | Evidence | Production |
 | ------- | -------- | ---------- |

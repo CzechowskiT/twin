@@ -313,3 +313,11 @@
 - Targeted verification:
   - `cd frontend && npx playwright test -g login`
   - Result: `2 passed`.
+
+### WS20 Micro-slice — ST-023 API reality matrix headings
+
+- Refreshed `docs/PRODUCTION_REALITY_MATRIX_2026-05-27.md` heading structure:
+  - normalized title casing,
+  - split snapshot metadata / legend / capability sections,
+  - updated top snapshot SHA references to the latest known branch + prod API values.
+- Verification: markdown/manual review (headings and section anchors render cleanly).
