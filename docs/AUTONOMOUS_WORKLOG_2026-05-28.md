@@ -17,6 +17,21 @@
 - No real apply/auto-apply/scrape actions.
 - No force push operations.
 
+### WS0 Evidence Snapshot
+
+- `gh run view 26561993722` => `status=completed`, `conclusion=success`, `headSha=76b6df3`.
+- Recent `smoke.yml` runs on `cursor/phase1-monorepo-scaffold`: latest 10 all `success`.
+- Read-only production checks (frontend canonical alias):
+  - `/api/public-health` HTTP `200` with `git_commit=76b6df3...` and `db_ok=true`.
+  - `/status`, `/`, `/waitlist`, `/demo`, `/login/candidate`, `/dashboard` all HTTP `200`.
+- Result: production public-health SHA is caught up to `76b6df3`.
+
+### WS1/WS9 Micro-slice (docs-only)
+
+- Clarified Alembic migration path in Stripe dedup helper doc:
+  `backend/alembic/versions/050_stripe_webhook_events.py`.
+- Refreshed production reality matrix top-line SHA values and WS0 public-health evidence.
+
 ### Pending Continuation (same session stream)
 
 - Run preflight sync commands and WS0 checks.

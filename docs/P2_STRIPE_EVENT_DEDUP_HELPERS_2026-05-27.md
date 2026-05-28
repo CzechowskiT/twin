@@ -32,7 +32,8 @@ commit.**
 
 ## What does **not** ship in this commit
 
-- The Alembic migration `050_stripe_webhook_events.py` (see the
+- The Alembic migration file at
+  `backend/alembic/versions/050_stripe_webhook_events.py` (see the
   design doc for the sketch — needs a separate, single-purpose
   commit at the right deployment window).
 - The 6-line patch to `app/api/billing.py` that imports the

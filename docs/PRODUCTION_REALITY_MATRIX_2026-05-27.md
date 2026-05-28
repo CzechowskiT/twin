@@ -1,8 +1,8 @@
 # Production reality matrix — 2026-05-27
 
 **Branch:** `cursor/phase1-monorepo-scaffold`
-**Branch HEAD (local):** `8a29b78a4e699de1f69122b79460cf82ac09eeae`
-**Production API SHA (read-only):** `67a22dc1fafe8ba9176a5acf15ba4d58ba2a86d5`
+**Branch HEAD (local):** `f4e3399e76c7f35811817f4bba44ed8ca53ec013`
+**Production API SHA (read-only):** `76b6df3d0be041418c77b588f59dece16a8b66e2`
 **Vercel production SHA:** `8d34404` (from current production matrix; requires Vercel UI check for refresh)
 **Frontend:** `https://twin-sooty.vercel.app` (canonical alias on Vercel project `twin`)
 **API:** `https://twin-production-bcd9.up.railway.app`
@@ -12,7 +12,7 @@ Legend: **LIVE** = verified on prod this session · **PARTIAL** = shipped but ga
 | Feature | Evidence | Production |
 | ------- | -------- | ---------- |
 | Public marketing (`/`, waitlist, first-1000) | HTTP 200 smoke | **LIVE** |
-| Status / public-health proxy | `git_commit`, `db_ok` in JSON | **LIVE** |
+| Status / public-health proxy | `git_commit=76b6df3`, `db_ok=true` in JSON (WS0 check 2026-05-28) | **LIVE** |
 | Candidate login (OAuth + email) | health flags `google_oauth`, `github_oauth` | **LIVE** (Apple OAuth **OFF**) |
 | Dashboard (candidate) | `/dashboard` 200; auth required for data | **LIVE** |
 | Demo snapshot page | `/demo` 200 | **LIVE** |
