@@ -721,3 +721,9 @@
 - Targeted verification:
   - `pytest -k "password_change_rate_limit or email_change_rate_limit" backend/tests/test_auth_mutation_rate_limits.py -q`
   - Result: `2 passed`.
+
+### WS39 Micro-slice — Hard batch queue replenishment (Section H)
+
+- Detected `READY=0` after completing `HB-A014`..`HB-A020` and `HB-B001`/`HB-B002`/`HB-B004`/`HB-B005`.
+- Added 50 new safe tasks in Section H and marked first 15 as `READY` (`HB-H001`..`HB-H015`).
+- Queue totals updated to: total `450`, ready `15`, remaining backlog `435`.
