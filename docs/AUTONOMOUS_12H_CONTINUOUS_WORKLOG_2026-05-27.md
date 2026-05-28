@@ -84,6 +84,37 @@
 
 ---
 
+## Session 4 checkpoint (2026-05-28 UTC)
+
+| Wall clock (UTC) | Micro-tasks (cumul.) | Notes |
+| ---------------- | -------------------: | ----- |
+| T+0:00 | 51 | Session 4 pre-flight (`fetch/pull/status/log`) clean at `72a77af` |
+| T+0:01 | 52 | `gh run view 26561189978`: `completed/success`, `headSha=72a77af`, run URL captured |
+| T+0:03 | 55 | Production read-only probes: `/api/public-health`, `/status`, `/`, `/waitlist`, `/demo`, `/login/candidate`, `/dashboard` all reachable |
+| T+0:04 | 56 | `public-health` reports `git_commit=67a22dc` (not yet caught up to `72a77af`) |
+| T+0:20 | 61 | WS1: added dedup edge tests (payload drift replay, unhandled replay short-circuit, malformed signed payload) |
+| T+0:22 | 62 | Targeted pytest green (`14 passed`) for webhook dedup + signature suites |
+
+### Micro-task log (session 4)
+
+| # | WS | Task | Status |
+| -: | -- | ---- | ------ |
+| 1 | WS0 | Pre-flight git sync + branch verification | ✅ |
+| 2 | WS0 | Inspect smoke run `26561189978` status/conclusion/SHA | ✅ |
+| 3 | WS0 | Confirm smoke result = success for `72a77af` | ✅ |
+| 4 | WS0 | Production read-only endpoint/page verification | ✅ |
+| 5 | WS0 | Confirm production `public-health` SHA catch-up status | ✅ |
+| 6 | WS0 | Append session 4 checkpoint to continuous worklog | ✅ |
+| 7 | WS1 | Add same `event.id` + changed payload replay dedup test | ✅ |
+| 8 | WS1 | Add unhandled signed replay contract test | ✅ |
+| 9 | WS1 | Add malformed signed payload reject test | ✅ |
+| 10 | WS1 | Run focused Stripe webhook pytest suites | ✅ |
+| 11 | WS1 | Verify lints for touched Stripe tests + worklog | ✅ |
+
+**Cumulative micro-tasks (sessions 2+3+4):** 62
+
+---
+
 ## Commits (session 2)
 
 | SHA | Message |

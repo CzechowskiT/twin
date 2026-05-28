@@ -131,6 +131,54 @@ def test_duplicate_invoice_event_dispatches_handler_once(
         db.close()
 
 
+def test_replay_with_same_event_id_but_changed_payload_is_deduped(
+    client: tuple[TestClient, sessionmaker],
+) -> None:
+    """Dedup is keyed by Stripe `event.id` even if payload body drifts on replay."""
+    http, session_local = client
+    event_id = "evt_idempotency_invoice_payload_drift_001"
+    first_payload = _invoice_payload(event_id)
+    second_payload = json.dumps(
+        {
+            "id": event_id,
+            "type": "invoice.payment_succeeded",
+            "livemode": False,
+            "data": {
+                "object": {
+                    "customer": "cus_test_changed",
+                    "subscription": "sub_test_changed",
+                    "amount_paid": 9999,
+                    "billing_reason": "subscription_cycle",
+                }
+            },
+        }
+    ).encode("utf-8")
+
+    first = http.post(
+        "/api/v1/billing/webhook",
+        content=first_payload,
+        headers={"Content-Type": "application/json", "stripe-signature": _sign(first_payload)},
+    )
+    assert first.status_code == 200, first.text
+
+    second = http.post(
+        "/api/v1/billing/webhook",
+        content=second_payload,
+        headers={"Content-Type": "application/json", "stripe-signature": _sign(second_payload)},
+    )
+    assert second.status_code == 200, second.text
+    assert second.json().get("replayed") == "true"
+    assert http._stripe_invoice_calls == ["invoice"]  # type: ignore[attr-defined]
+
+    db = session_local()
+    try:
+        row = db.query(StripeWebhookEvent).filter_by(event_id=event_id).one()
+        assert row.handler_status == stripe_events.STATUS_SUCCESS
+        assert row.event_type == "invoice.payment_succeeded"
+    finally:
+        db.close()
+
+
 def test_unhandled_event_is_marked_ignored(client: tuple[TestClient, sessionmaker]) -> None:
     http, session_local = client
     """Unhandled types still land in the ledger as `ignored` when the table exists."""

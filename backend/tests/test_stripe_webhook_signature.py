@@ -173,6 +173,36 @@ def test_webhook_accepts_valid_signature_for_unhandled_event(client: TestClient)
     assert r.json() == {"received": "true"}
 
 
+def test_webhook_replay_for_unhandled_signed_event_returns_replayed_flag(client: TestClient) -> None:
+    """Second delivery of the same unhandled `event.id` is short-circuited."""
+    payload = json.dumps(
+        {"id": "evt_unhandled_replay_001", "type": "customer.created", "data": {"object": {}}}
+    ).encode("utf-8")
+    sig = _sign(payload)
+    headers = {"Content-Type": "application/json", "stripe-signature": sig}
+
+    first = client.post("/api/v1/billing/webhook", content=payload, headers=headers)
+    assert first.status_code == 200, first.text
+    assert first.json().get("replayed") is None
+
+    second = client.post("/api/v1/billing/webhook", content=payload, headers=headers)
+    assert second.status_code == 200, second.text
+    assert second.json().get("replayed") == "true"
+
+
+def test_webhook_rejects_malformed_signed_payload(client: TestClient) -> None:
+    """Even with a valid signature header, non-JSON payloads are rejected."""
+    payload = b"{not-json"
+    sig = _sign(payload)
+    r = client.post(
+        "/api/v1/billing/webhook",
+        content=payload,
+        headers={"Content-Type": "application/json", "stripe-signature": sig},
+    )
+    assert r.status_code == 400, r.text
+    assert "invalid payload" in str(r.json().get("detail", "")).lower()
+
+
 def test_webhook_rejects_event_without_id(client: TestClient) -> None:
     """Signed payload missing `id` is rejected before handler dispatch."""
     payload = json.dumps({"type": "customer.created", "data": {"object": {}}}).encode("utf-8")
