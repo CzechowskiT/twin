@@ -296,7 +296,8 @@ async def stripe_webhook(
         stripe_events.mark_failed(db, ledger, str(exc))
         if ledger is not None:
             db.commit()
-        logger.exception("Stripe webhook handler failed for %s", etype)
+        # Avoid dumping raw exception tracebacks from third-party payloads into logs.
+        logger.error("Stripe webhook handler failed for %s", etype)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Webhook handler error.") from exc
 
     return {"received": "true"}

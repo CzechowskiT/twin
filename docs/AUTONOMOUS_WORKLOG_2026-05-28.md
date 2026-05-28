@@ -290,3 +290,16 @@
 - Targeted verification:
   - `pytest -k metadata_fallback backend/tests/test_stripe_checkout_metadata_fallback.py backend/tests/test_stripe_webhook_idempotency.py`
   - Result: `1 passed, 18 deselected`.
+
+### WS18 Micro-slice — ST-010 no-secret webhook failure logging
+
+- Hardened webhook error logging in `backend/app/api/billing.py` to avoid
+  traceback emission for handler failures (`logger.error` message only).
+- Added no-secret regression in
+  `backend/tests/test_stripe_webhook_idempotency.py`:
+  `test_handler_failure_logs_do_not_echo_secret_values`.
+- Targeted verification:
+  - `pytest -k no_secret backend/tests/test_stripe_webhook_idempotency.py backend/tests/test_public_surfaces_no_secrets.py`
+  - Result: `13 passed, 19 deselected`.
+  - `pytest -k secret_values backend/tests/test_stripe_webhook_idempotency.py`
+  - Result: `1 passed, 18 deselected`.

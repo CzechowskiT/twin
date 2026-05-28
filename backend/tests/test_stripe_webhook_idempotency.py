@@ -445,6 +445,33 @@ def test_handler_failure_marks_ledger_failed(
         db.close()
 
 
+def test_handler_failure_logs_do_not_echo_secret_values(
+    client: tuple[TestClient, sessionmaker],
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Failure logs should not include raw exception strings that may carry secrets."""
+    http, _ = client
+    payload = _invoice_payload("evt_idempotency_fail_sanitized_001")
+    headers = {"Content-Type": "application/json", "stripe-signature": _sign(payload)}
+    injected_secret = "sk_live_should_never_appear"
+
+    def _boom(db, invoice, settings):  # noqa: ANN001
+        raise RuntimeError(f"boom with secret {injected_secret}")
+
+    monkeypatch.setattr(
+        "app.api.billing.stripe_svc.process_invoice_payment_succeeded",
+        _boom,
+    )
+    caplog.clear()
+    with caplog.at_level("ERROR"):
+        response = http.post("/api/v1/billing/webhook", content=payload, headers=headers)
+    assert response.status_code == 500, response.text
+    logged = "\n".join(record.getMessage() for record in caplog.records)
+    assert "Stripe webhook handler failed for invoice.payment_succeeded" in logged
+    assert injected_secret not in logged
+
+
 def test_failed_event_is_retried_and_can_transition_to_success(
     client: tuple[TestClient, sessionmaker],
     monkeypatch: pytest.MonkeyPatch,
