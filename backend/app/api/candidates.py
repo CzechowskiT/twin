@@ -47,7 +47,7 @@ from app.schemas.job_match_feedback import (
 )
 from app.schemas.match import JobMatchListOut, JobMatchOut
 from app.services.acceptance_queue import build_acceptance_queue, respond_acceptance_item
-from app.services.candidate_readiness import candidate_has_cv
+from app.services.candidate_readiness import candidate_has_cv, compute_verified_candidate_gate
 from app.services.cv_parser import CvParseError
 from app.services.cv_storage import delete_cv_for_candidate, save_cv_for_candidate
 from app.services.cv_tailoring import build_cv_tailoring_blob
@@ -75,88 +75,13 @@ from app.services.user_data_export import build_user_owned_export_payload
 router = APIRouter()
 
 
-def _compute_verified_candidate_gate(user: User, candidate: Candidate) -> CandidateReadinessGateOut:
-    signals = _signals_dict(candidate)
-    has_profile = bool((candidate.name or "").strip())
-    has_cv = candidate_has_cv(candidate)
-    has_career_brief = isinstance(signals.get("career_compass"), dict)
-    has_skill_evidence = isinstance(signals.get("cv_insights"), dict)
-    has_general_consent = user.gdpr_consent_at is not None
-    has_cv_consent = candidate.cv_processing_consent_at is not None
-    has_docs_consent = user.profile_documents_processing_consent_at is not None
-    has_any_storage_consent = has_cv_consent or has_docs_consent
-
-    checklist = {
-        "profile_present": has_profile,
-        "cv_present": has_cv,
-        "career_brief_present": has_career_brief,
-        "skill_evidence_present": has_skill_evidence,
-        "consent_general_present": has_general_consent,
-        "consent_storage_present": has_any_storage_consent,
-    }
-
-    missing_items: list[str] = []
-    if not has_profile:
-        missing_items.append("profile")
-    if not has_general_consent:
-        missing_items.append("consent_general")
-    if not has_any_storage_consent:
-        missing_items.append("consent_storage")
-    if not has_cv:
-        missing_items.append("cv")
-    if not has_career_brief:
-        missing_items.append("career_brief")
-    if not has_skill_evidence:
-        missing_items.append("skill_evidence")
-
-    blocked_reasons: list[str] = []
-    if not has_general_consent:
-        blocked_reasons.append("missing_required_consent")
-    if not has_any_storage_consent:
-        blocked_reasons.append("missing_storage_consent")
-    if not has_cv:
-        blocked_reasons.append("missing_cv_material")
-    if not has_career_brief:
-        blocked_reasons.append("missing_career_brief")
-
-    verification_status = "unverified"
-    if not has_profile:
-        verification_status = "profile_incomplete"
-    elif not has_general_consent:
-        verification_status = "consent_missing"
-    elif not has_cv:
-        verification_status = "cv_missing"
-    elif not has_career_brief:
-        verification_status = "career_brief_missing"
-    elif not has_skill_evidence:
-        verification_status = "skill_evidence_missing"
-    elif not user.is_active:
-        verification_status = "suspended"
-    else:
-        verification_status = "verified_basic"
-
-    delegated_apply_allowed = False
-    can_prepare_application_package = verification_status in ("verified_basic", "delegated_apply_enabled")
-    can_submit_delegated_application = False
-
-    return CandidateReadinessGateOut(
-        verification_status=verification_status,
-        checklist=checklist,
-        missing_items=missing_items,
-        blocked_reasons=blocked_reasons,
-        delegated_apply_allowed=delegated_apply_allowed,
-        can_prepare_application_package=can_prepare_application_package,
-        can_submit_delegated_application=can_submit_delegated_application,
-    )
-
-
 @router.get("/me/verified-readiness", response_model=CandidateReadinessGateOut)
 def get_verified_readiness_gate(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> CandidateReadinessGateOut:
     candidate = _get_candidate_or_404(db, user.id)
-    return _compute_verified_candidate_gate(user, candidate)
+    return CandidateReadinessGateOut(**compute_verified_candidate_gate(user, candidate))
 
 
 @router.post("/", response_model=CandidateOut, status_code=status.HTTP_201_CREATED)
