@@ -66,12 +66,6 @@ class MvpStatsOut(BaseModel):
     database_reachable: bool = Field(
         description="True when the API can run SELECT 1 against the configured database.",
     )
-    data_room_s3_enabled: bool = Field(
-        description="True when S3-compatible object storage is configured for data room blobs.",
-    )
-    data_room_local_demo: bool = Field(
-        description="True when uploads use local API disk (no S3) — investor demo mode.",
-    )
     paid_subscribers: int = Field(
         ge=0,
         description="Users with an entitled Stripe subscription status (active, trialing, past_due).",

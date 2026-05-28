@@ -23,7 +23,7 @@
 - ST-013 | Mutation RL | Add test for register throttling path | LOW | READY | ST-011 | `pytest -k register_rate_limit` | tests
 - ST-014 | Mutation RL | Add reset-password mutation RL test | LOW | READY | ST-012 | `pytest -k reset_password` | tests
 - ST-015 | Mutation RL | Add token-refresh mutation RL test | LOW | READY | ST-012 | `pytest -k token_refresh` | tests
-- ST-016 | No-secret regression | Add health endpoint no-secret assertion | LOW | READY | none | `pytest -k public_health` | tests
+- ST-016 | No-secret regression | Add health endpoint no-secret assertion | LOW | DONE | none | `pytest -k public_health` | tests
 - ST-017 | No-secret regression | Add status endpoint no-secret assertion | LOW | READY | ST-016 | `pytest -k status_endpoint` | tests
 - ST-018 | No-secret regression | Add root page no-secret snapshot check | LOW | READY | ST-016 | `pytest -k public_pages` | tests
 - ST-019 | No-secret regression | Add waitlist page no-secret check | LOW | READY | ST-018 | `pytest -k waitlist` | tests

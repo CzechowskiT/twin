@@ -57,3 +57,13 @@
 - Targeted verification:
   - `pytest -k login_rate_limit backend/tests/test_auth_login_rate_limit.py`
   - Result: `2 passed`.
+
+### WS4 Micro-slice — ST-016 no-secret public health guard
+
+- Expanded no-secret denylist assertions for public surfaces to cover
+  `redirect_uri`, DSN/token/secret markers, `ops_admin_configured`, and data-room config leakage.
+- Regression test surfaced active leakage of `data_room_*` fields on `/api/v1/public/mvp-stats`;
+  removed those fields from the public API schema/response and updated the contract test.
+- Targeted verification:
+  - `pytest -k "public_get_never_leaks_secrets or public_mvp_stats_shape_empty" backend/tests/test_public_surfaces_no_secrets.py backend/tests/test_public_mvp_stats.py`
+  - Result: `9 passed, 5 deselected`.
