@@ -331,11 +331,11 @@
 - HB-A001 | Stripe dedup | Add invoice.finalized replay dedup test | LOW | DONE | none | `pytest -k invoice_finalized_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
 - HB-A002 | Stripe dedup | Add invoice.payment_failed replay dedup test | LOW | DONE | HB-A001 | `pytest -k invoice_payment_failed_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
 - HB-A003 | Stripe dedup | Add checkout.session.expired replay dedup test | LOW | DONE | HB-A001 | `pytest -k checkout_session_expired_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
-- HB-A004 | Stripe dedup | Add invoice.updated replay dedup test | LOW | READY | HB-A001 | `pytest -k invoice_updated_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
-- HB-A005 | Stripe dedup | Add customer.created replay dedup test | LOW | READY | HB-A001 | `pytest -k customer_created_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
-- HB-A006 | Stripe dedup | Add customer.updated replay dedup test | LOW | READY | HB-A005 | `pytest -k customer_updated_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
-- HB-A007 | Stripe dedup | Add payment_method.attached replay dedup test | LOW | READY | HB-A001 | `pytest -k payment_method_attached_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
-- HB-A008 | Stripe dedup | Add payment_method.detached replay dedup test | LOW | READY | HB-A007 | `pytest -k payment_method_detached_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
+- HB-A004 | Stripe dedup | Add invoice.updated replay dedup test | LOW | DONE | HB-A001 | `pytest tests/test_stripe_webhook_idempotency.py -q` | tests
+- HB-A005 | Stripe dedup | Add customer.created replay dedup test | LOW | DONE | HB-A001 | `pytest tests/test_stripe_webhook_idempotency.py -q` | tests
+- HB-A006 | Stripe dedup | Add customer.updated replay dedup test | LOW | DONE | HB-A005 | `pytest tests/test_stripe_webhook_idempotency.py -q` | tests
+- HB-A007 | Stripe dedup | Add payment_method.attached replay dedup test | LOW | DONE | HB-A001 | `pytest tests/test_stripe_webhook_idempotency.py -q` | tests
+- HB-A008 | Stripe dedup | Add payment_method.detached replay dedup test | LOW | DONE | HB-A007 | `pytest tests/test_stripe_webhook_idempotency.py -q` | tests
 - HB-A009 | Stripe dedup | Add invoice.voided replay dedup test | LOW | READY | HB-A001 | `pytest -k invoice_voided_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
 - HB-A010 | Stripe dedup | Add invoice.marked_uncollectible replay test | LOW | READY | HB-A001 | `pytest -k invoice_marked_uncollectible_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
 - HB-A011 | Stripe dedup | Add checkout async payment failed replay test | LOW | READY | HB-A003 | `pytest -k checkout_async_payment_failed_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
@@ -353,7 +353,7 @@
 
 - HB-B001 | Mutation RL | Add RL test for waitlist submit mutation | LOW | READY | none | `pytest -k waitlist_mutation_rate_limit backend/tests -q` | tests
 - HB-B002 | Mutation RL | Add RL test for demo request mutation | LOW | READY | HB-B001 | `pytest -k demo_request_rate_limit backend/tests -q` | tests
-- HB-B003 | Mutation RL | Add RL test for profile patch mutation | LOW | READY | HB-B001 | `pytest -k profile_patch_rate_limit backend/tests -q` | tests
+- HB-B003 | Mutation RL | Add RL test for profile patch mutation | LOW | DONE | HB-B001 | `pytest -k profile_patch_rate_limit backend/tests -q` | tests
 - HB-B004 | Mutation RL | Add RL test for password change mutation | LOW | READY | HB-B001 | `pytest -k password_change_rate_limit backend/tests -q` | tests
 - HB-B005 | Mutation RL | Add RL test for email change mutation | LOW | READY | HB-B001 | `pytest -k email_change_rate_limit backend/tests -q` | tests
 - HB-B006 | Mutation RL | Add RL test for account delete mutation | LOW | BLOCKED | HB-B003 | `pytest -k account_delete_rate_limit backend/tests -q` | tests
@@ -447,5 +447,5 @@
 ## Totals
 
 - Total tasks: 400
-- Ready now: 25 (all `LOW` risk, `HB-A001`..`HB-A020`, `HB-B001`..`HB-B005`)
-- Remaining backlog: 375
+- Ready now: 16 (all `LOW` risk, `HB-A009`..`HB-A020`, `HB-B001`..`HB-B002`, `HB-B004`..`HB-B005`)
+- Remaining backlog: 367

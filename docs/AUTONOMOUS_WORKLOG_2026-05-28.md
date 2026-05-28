@@ -408,3 +408,49 @@
 - Targeted verification:
   - `pytest -k checkout_session_expired_replay backend/tests/test_stripe_webhook_idempotency.py -q`
   - Result: `1 passed, 21 deselected`.
+
+### WS27 Micro-slice — HB-A004..HB-A008 replay dedup expansion
+
+- Expanded Stripe replay matrix in
+  `backend/tests/test_stripe_webhook_idempotency.py` with deterministic dedup
+  checks for:
+  - `invoice.updated`,
+  - `customer.created`,
+  - `customer.updated`,
+  - `payment_method.attached`,
+  - `payment_method.detached`.
+- Added explicit missing-`event.id` coverage (missing key and explicit `null`)
+  to ensure webhook payloads are rejected with HTTP `400` before ledger writes.
+- Updated queue status:
+  - `HB-A004` => `DONE`
+  - `HB-A005` => `DONE`
+  - `HB-A006` => `DONE`
+  - `HB-A007` => `DONE`
+  - `HB-A008` => `DONE`
+- Targeted verification:
+  - `pytest tests/test_stripe_webhook_idempotency.py -q`
+  - Result: `29 passed`.
+
+### WS28 Micro-slice — Migration 050 repo-only contract hardening
+
+- Strengthened `backend/tests/test_stripe_migration_050.py` with a schema
+  contract assertion for:
+  - table create call for `stripe_webhook_events`,
+  - `event_id` uniqueness constraint name,
+  - required indexes (`event_type`, `received_at`).
+- Kept validation repo-only; no production migration execution and no env changes.
+- Targeted verification:
+  - `pytest tests/test_stripe_webhook_idempotency.py tests/test_stripe_event_dedup_helpers.py tests/test_stripe_migration_050.py -q`
+  - Result: `41 passed`.
+
+### WS0 Catch-up Verification — CI/Production sync (run IDs 26569870659, 26569888472)
+
+- Actions check after Stripe pushes:
+  - `gh run list --workflow smoke.yml --branch cursor/phase1-monorepo-scaffold --limit 5`
+  - Observed: `26569870659` (`in_progress` at check time), `26569888472` (`queued` at check time).
+- Read-only production checks:
+  - `GET https://twin-sooty.vercel.app/api/public-health` => HTTP `200`
+  - `GET https://twin-sooty.vercel.app/status` => HTTP `200`
+- Production SHA signal:
+  - `public-health.git_commit=f165096d9e1e9b8668679da086050fe8fa8f0490`
+  - Status: production API remains behind current branch head (`38ec9a2`) as expected during ongoing branch work.
