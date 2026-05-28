@@ -351,11 +351,11 @@
 
 ### Category B — Mutation Rate Limits (20)
 
-- HB-B001 | Mutation RL | Add RL test for waitlist submit mutation | LOW | READY | none | `pytest -k waitlist_mutation_rate_limit backend/tests -q` | tests
-- HB-B002 | Mutation RL | Add RL test for demo request mutation | LOW | READY | HB-B001 | `pytest -k demo_request_rate_limit backend/tests -q` | tests
+- HB-B001 | Mutation RL | Add RL test for waitlist submit mutation | LOW | DONE | none | `pytest -k waitlist_mutation_rate_limit backend/tests -q` | tests
+- HB-B002 | Mutation RL | Add RL test for demo request mutation | LOW | DONE | HB-B001 | `pytest -k demo_request_rate_limit backend/tests -q` | tests
 - HB-B003 | Mutation RL | Add RL test for profile patch mutation | LOW | DONE | HB-B001 | `pytest -k profile_patch_rate_limit backend/tests -q` | tests
-- HB-B004 | Mutation RL | Add RL test for password change mutation | LOW | READY | HB-B001 | `pytest -k password_change_rate_limit backend/tests -q` | tests
-- HB-B005 | Mutation RL | Add RL test for email change mutation | LOW | READY | HB-B001 | `pytest -k email_change_rate_limit backend/tests -q` | tests
+- HB-B004 | Mutation RL | Add RL test for password change mutation | LOW | DONE | HB-B001 | `pytest -k password_change_rate_limit backend/tests -q` | tests
+- HB-B005 | Mutation RL | Add RL test for email change mutation | LOW | DONE | HB-B001 | `pytest -k email_change_rate_limit backend/tests -q` | tests
 - HB-B006 | Mutation RL | Add RL test for account delete mutation | LOW | BLOCKED | HB-B003 | `pytest -k account_delete_rate_limit backend/tests -q` | tests
 - HB-B007 | Mutation RL | Add RL test for resend verification mutation | LOW | BLOCKED | HB-B001 | `pytest -k resend_verification_rate_limit backend/tests -q` | tests
 - HB-B008 | Mutation RL | Add RL test for upload URL mint mutation | LOW | BLOCKED | HB-B003 | `pytest -k upload_url_rate_limit backend/tests -q` | tests
@@ -456,5 +456,5 @@
 ## Totals
 
 - Total tasks: 400
-- Ready now: 4 (all `LOW` risk, `HB-B001`..`HB-B002`, `HB-B004`..`HB-B005`)
-- Remaining backlog: 352
+- Ready now: 0
+- Remaining backlog: 348

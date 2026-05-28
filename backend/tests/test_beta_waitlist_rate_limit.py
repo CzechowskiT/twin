@@ -84,3 +84,33 @@ def test_beta_join_rate_limit_returns_429_after_five(client: TestClient) -> None
         or "limit" in detail.lower()
         or "exceeded" in detail.lower()
     )
+
+
+def test_waitlist_mutation_rate_limit_returns_429_after_five(client: TestClient) -> None:
+    """Public waitlist signup mutation (`POST /api/v1/beta/join`) is IP rate-limited."""
+    test_beta_join_rate_limit_returns_429_after_five(client)
+
+
+def test_demo_request_rate_limit_returns_429_after_five(client: TestClient) -> None:
+    """Demo-funnel signups use the same `/beta/join` mutation bucket (source=demo)."""
+    for i in range(5):
+        payload = _signup_payload(i)
+        payload["source"] = "demo"
+        r = client.post("/api/v1/beta/join", json=payload)
+        assert r.status_code == 200, (i, r.text)
+
+    overflow = _signup_payload(99)
+    overflow["source"] = "demo"
+    r6 = client.post("/api/v1/beta/join", json=overflow)
+    assert r6.status_code == 429
+    body = r6.json()
+    detail = body.get("detail") or body.get("error") or ""
+    if isinstance(detail, list):
+        detail = " ".join(str(x) for x in detail)
+    else:
+        detail = str(detail or "")
+    assert (
+        "rate" in detail.lower()
+        or "limit" in detail.lower()
+        or "exceeded" in detail.lower()
+    )

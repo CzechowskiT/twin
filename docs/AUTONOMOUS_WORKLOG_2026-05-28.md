@@ -701,3 +701,23 @@
   mapping scenarios to test anchors and a single verification command.
 - Updated queue status: `HB-A020` => `DONE`.
 - Verification: markdown/manual review.
+
+### WS37 Micro-slice — HB-B001/HB-B002 waitlist and demo funnel RL
+
+- Extended `backend/tests/test_beta_waitlist_rate_limit.py`:
+  - `test_waitlist_mutation_rate_limit_returns_429_after_five` (HB-B001),
+  - `test_demo_request_rate_limit_returns_429_after_five` with `source=demo` (HB-B002).
+- Updated queue status: `HB-B001`, `HB-B002` => `DONE`.
+- Targeted verification:
+  - `pytest -k "waitlist_mutation_rate_limit or demo_request_rate_limit" backend/tests/test_beta_waitlist_rate_limit.py -q`
+  - Result: `2 passed`.
+
+### WS38 Micro-slice — HB-B004/HB-B005 password and email preference RL
+
+- Extended `backend/tests/test_auth_mutation_rate_limits.py`:
+  - `test_password_change_rate_limit_returns_429` (10/min on `/auth/me/password`),
+  - `test_email_change_rate_limit_returns_429` (alias over notification-preferences bucket).
+- Updated queue status: `HB-B004`, `HB-B005` => `DONE`.
+- Targeted verification:
+  - `pytest -k "password_change_rate_limit or email_change_rate_limit" backend/tests/test_auth_mutation_rate_limits.py -q`
+  - Result: `2 passed`.
