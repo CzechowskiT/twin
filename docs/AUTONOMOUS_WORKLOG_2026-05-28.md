@@ -660,3 +660,24 @@
 - Targeted verification:
   - `pytest -k subscription_trial_will_end backend/tests/test_stripe_webhook_idempotency.py -q`
   - Result: `1 passed, 34 deselected`.
+
+### WS0 Catch-up Verification — CI/Production sync (runs 26571913185, 26571934002, 26571971623)
+
+- Required Actions run checks:
+  - `26571913185` (`e0ac2f0`) => `status=completed`, `conclusion=success`
+  - `26571934002` (`ba74686`) => `status=completed`, `conclusion=success`
+  - `26571971623` (`dd4c29a`) => `status=completed`, `conclusion=success`
+- Read-only production checks:
+  - `GET /api/public-health` => HTTP `200`, `db_ok=true`, `git_commit=dd4c29a...`
+  - `GET /status`, `/`, `/waitlist`, `/demo`, `/login/candidate`, `/dashboard` => all HTTP `200`
+- Production SHA catch-up confirmation:
+  - Status: production public-health SHA is caught up to branch HEAD `dd4c29a`.
+
+### WS34 Micro-slice — HB-A014 invoice.upcoming replay dedup
+
+- Added `_invoice_upcoming_payload(event_id)` and parametrized replay coverage for
+  `invoice.upcoming` in `test_unhandled_replay_events_are_marked_ignored_and_deduped`.
+- Updated queue status: `HB-A014` => `DONE`.
+- Targeted verification:
+  - `pytest -k invoice_upcoming backend/tests/test_stripe_webhook_idempotency.py -q`
+  - Result: `1 passed, 34 deselected`.

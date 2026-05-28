@@ -256,6 +256,25 @@ def _subscription_trial_will_end_payload(event_id: str) -> bytes:
     ).encode("utf-8")
 
 
+def _invoice_upcoming_payload(event_id: str) -> bytes:
+    """`invoice.upcoming` is unhandled but must still dedup on replay."""
+    return json.dumps(
+        {
+            "id": event_id,
+            "type": "invoice.upcoming",
+            "livemode": False,
+            "data": {
+                "object": {
+                    "id": "in_upcoming_001",
+                    "customer": "cus_test",
+                    "subscription": "sub_test",
+                    "amount_due": 1000,
+                }
+            },
+        }
+    ).encode("utf-8")
+
+
 def _invoice_updated_payload(event_id: str) -> bytes:
     """`invoice.updated` is unhandled but should still dedup cleanly."""
     return json.dumps(
@@ -743,6 +762,11 @@ def test_checkout_session_expired_replay_is_marked_ignored_and_deduped(
             "evt_idempotency_subscription_trial_will_end_001",
             _subscription_trial_will_end_payload("evt_idempotency_subscription_trial_will_end_001"),
             "customer.subscription.trial_will_end",
+        ),
+        (
+            "evt_idempotency_invoice_upcoming_001",
+            _invoice_upcoming_payload("evt_idempotency_invoice_upcoming_001"),
+            "invoice.upcoming",
         ),
     ],
 )

@@ -341,7 +341,7 @@
 - HB-A011 | Stripe dedup | Add checkout async payment failed replay test | LOW | DONE | HB-A003 | `pytest -k checkout_async_payment_failed_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
 - HB-A012 | Stripe dedup | Add checkout async payment succeeded replay test | LOW | DONE | HB-A003 | `pytest -k checkout_async_payment_succeeded_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
 - HB-A013 | Stripe dedup | Add subscription trial will end replay test | LOW | DONE | HB-A001 | `pytest -k subscription_trial_will_end_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
-- HB-A014 | Stripe dedup | Add invoice upcoming replay dedup noop test | LOW | READY | HB-A001 | `pytest -k invoice_upcoming_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
+- HB-A014 | Stripe dedup | Add invoice upcoming replay dedup noop test | LOW | DONE | HB-A001 | `pytest -k invoice_upcoming_replay backend/tests/test_stripe_webhook_idempotency.py -q` | tests
 - HB-A015 | Stripe dedup | Add duplicate burst same-event assertion | LOW | READY | HB-A001 | `pytest -k duplicate_burst_same_event backend/tests/test_stripe_webhook_idempotency.py -q` | tests
 - HB-A016 | Stripe dedup | Add replay with drifted payload ignored test | LOW | READY | HB-A015 | `pytest -k replay_payload_drift_ignored backend/tests/test_stripe_webhook_idempotency.py -q` | tests
 - HB-A017 | Stripe dedup | Add replay preserves first processed timestamp test | LOW | READY | HB-A015 | `pytest -k replay_preserves_first_processed backend/tests/test_stripe_webhook_idempotency.py -q` | tests
@@ -456,5 +456,5 @@
 ## Totals
 
 - Total tasks: 400
-- Ready now: 11 (all `LOW` risk, `HB-A014`..`HB-A020`, `HB-B001`..`HB-B002`, `HB-B004`..`HB-B005`)
-- Remaining backlog: 359
+- Ready now: 10 (all `LOW` risk, `HB-A015`..`HB-A020`, `HB-B001`..`HB-B002`, `HB-B004`..`HB-B005`)
+- Remaining backlog: 358
