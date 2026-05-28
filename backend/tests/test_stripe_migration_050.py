@@ -42,3 +42,20 @@ def test_050_downgrade_drops_stripe_webhook_events_table() -> None:
     assert "stripe_webhook_events" in text
     assert "drop_index" in text
     assert callable(mod.downgrade)
+
+
+def test_050_upgrade_contains_expected_dedup_schema_contract() -> None:
+    """Upgrade SQL contract includes dedup primitive + observability indexes."""
+    source = Path(__file__).resolve().parents[1] / "alembic/versions/050_stripe_webhook_events.py"
+    text = source.read_text(encoding="utf-8")
+    expected_tokens = (
+        "create_table(",
+        "\"stripe_webhook_events\"",
+        "sa.Column(\"event_id\", sa.String(length=64), nullable=False)",
+        "sa.Column(\"event_type\", sa.String(length=80), nullable=False)",
+        "sa.UniqueConstraint(\"event_id\", name=\"uq_stripe_webhook_events_event_id\")",
+        "\"ix_stripe_webhook_events_event_type\"",
+        "\"ix_stripe_webhook_events_received_at\"",
+    )
+    for token in expected_tokens:
+        assert token in text
