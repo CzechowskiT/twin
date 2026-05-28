@@ -338,3 +338,22 @@
   with runbook/gate links, canonical health-check URL, and minimum evidence
   pack requirements for each restore-drill row.
 - Verification: markdown/manual review (checklist and links render correctly).
+
+### WS23 Micro-slice — Hard batch queue replenishment
+
+- Detected `READY=0` in `docs/AUTONOMOUS_TASK_QUEUE_2026-05-28.md`; applied hard-batch
+  replenishment policy instead of stopping.
+- Added 100 new safe tasks in Section G across required categories:
+  - Stripe/Billing/Webhook dedup (20),
+  - Mutation rate limits (20),
+  - Public no-secret regression (20),
+  - Frontend/Playwright public smoke (15),
+  - Verified Candidate Gateway/Career Intelligence (15),
+  - Release/docs/source-of-truth (10).
+- Marked first 25 replenishment tasks as `READY`:
+  `HB-A001`..`HB-A020`, `HB-B001`..`HB-B005`.
+- Queue totals updated to:
+  - Total tasks: `400`
+  - Ready now: `25`
+  - Remaining backlog: `375`
+- Verification: markdown/manual review for schema conformity and dependency continuity.
