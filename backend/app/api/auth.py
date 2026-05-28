@@ -396,7 +396,9 @@ def me(user: User = Depends(get_current_user), db: Session = Depends(get_db)) ->
 
 
 @router.post("/gdpr-consent", response_model=UserOut)
+@limiter.limit("30/minute")
 def record_gdpr_consent(
+    request: Request,
     body: GdprConsentIn,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -426,7 +428,9 @@ def record_gdpr_consent(
 
 
 @router.patch("/me/marketing", response_model=UserOut)
+@limiter.limit("30/minute")
 def update_marketing_preference(
+    request: Request,
     body: UserMarketingPreference,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -442,7 +446,9 @@ def update_marketing_preference(
 
 
 @router.patch("/me/notification-preferences", response_model=UserOut)
+@limiter.limit("30/minute")
 def update_notification_preferences(
+    request: Request,
     body: NotificationPreferencesIn,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -492,7 +498,9 @@ def change_password(
 
 
 @router.patch("/me/billing-profile", response_model=UserOut)
+@limiter.limit("30/minute")
 def update_billing_profile(
+    request: Request,
     body: BillingProfileIn,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -510,7 +518,9 @@ def update_billing_profile(
 
 
 @router.post("/onboarding/complete", response_model=UserOut)
+@limiter.limit("30/minute")
 def complete_onboarding(
+    request: Request,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> UserOut:

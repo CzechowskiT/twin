@@ -34,12 +34,14 @@ FORBIDDEN_SUBSTRINGS = (
 @pytest.mark.parametrize(
     "path",
     [
+        "/",
         "/api/v1/health",
         "/api/v1/health?db=true",
         "/api/v1/health?ops=1",
         "/api/v1/beta/stats",
         "/api/v1/billing/plans",
         "/api/v1/public/mvp-stats",
+        "/api/v1/demo/snapshot",
     ],
 )
 def test_public_get_never_leaks_secrets(path: str) -> None:
@@ -59,7 +61,10 @@ def test_public_get_never_leaks_secrets(path: str) -> None:
 
         client = TestClient(app)
         res = client.get(path)
-        assert res.status_code in (200, 503), (path, res.status_code, res.text[:300])
+        allowed = (200, 503)
+        if path == "/api/v1/demo/snapshot":
+            allowed = (200, 503, 404)  # 404 is expected when demo mode is disabled.
+        assert res.status_code in allowed, (path, res.status_code, res.text[:300])
         text = res.text
         for needle in FORBIDDEN_SUBSTRINGS:
             assert needle not in text, (path, needle)

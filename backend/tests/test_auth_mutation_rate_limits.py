@@ -155,3 +155,79 @@ def test_application_create_rate_limit_returns_429(
         codes.append(res.status_code)
     assert codes.count(201) == 30
     assert 429 in codes[30:]
+
+
+def test_marketing_preference_rate_limit_returns_429(
+    mutation_client: tuple[TestClient, dict[str, str], Job, Job],
+) -> None:
+    client, headers, _, _ = mutation_client
+    codes = [
+        client.patch(
+            "/api/v1/auth/me/marketing",
+            json={"marketing_emails_opt_in": i % 2 == 0},
+            headers=headers,
+        ).status_code
+        for i in range(31)
+    ]
+    assert codes.count(200) == 30
+    assert codes[-1] == 429
+
+
+def test_notification_preferences_rate_limit_returns_429(
+    mutation_client: tuple[TestClient, dict[str, str], Job, Job],
+) -> None:
+    client, headers, _, _ = mutation_client
+    codes = [
+        client.patch(
+            "/api/v1/auth/me/notification-preferences",
+            json={"email_interview_reminders": i % 2 == 0},
+            headers=headers,
+        ).status_code
+        for i in range(31)
+    ]
+    assert codes.count(200) == 30
+    assert codes[-1] == 429
+
+
+def test_billing_profile_rate_limit_returns_429(
+    mutation_client: tuple[TestClient, dict[str, str], Job, Job],
+) -> None:
+    client, headers, _, _ = mutation_client
+    codes = [
+        client.patch(
+            "/api/v1/auth/me/billing-profile",
+            json={"billing_company_name": f"Acme {i}"},
+            headers=headers,
+        ).status_code
+        for i in range(31)
+    ]
+    assert codes.count(200) == 30
+    assert codes[-1] == 429
+
+
+def test_onboarding_complete_rate_limit_returns_429(
+    mutation_client: tuple[TestClient, dict[str, str], Job, Job],
+) -> None:
+    client, headers, _, _ = mutation_client
+    codes = [
+        client.post("/api/v1/auth/onboarding/complete", headers=headers).status_code
+        for _ in range(31)
+    ]
+    assert codes.count(200) == 30
+    assert codes[-1] == 429
+
+
+def test_gdpr_consent_rate_limit_returns_429(
+    mutation_client: tuple[TestClient, dict[str, str], Job, Job],
+) -> None:
+    client, headers, _, _ = mutation_client
+    body = {
+        "accept_privacy_policy": True,
+        "accept_terms_of_service": True,
+        "accept_job_data_processing": True,
+        "accept_ai_matching": True,
+        "marketing_emails_opt_in": False,
+    }
+    codes = [client.post("/api/v1/auth/gdpr-consent", json=body, headers=headers).status_code for _ in range(31)]
+    assert codes.count(200) == 30
+    assert codes[-1] == 429

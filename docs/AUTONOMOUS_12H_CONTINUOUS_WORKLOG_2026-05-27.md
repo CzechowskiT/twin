@@ -117,6 +117,36 @@
 
 ---
 
+## Session 4 continuation checkpoint (2026-05-28 UTC)
+
+| Wall clock (UTC) | Micro-tasks (cumul.) | Notes |
+| ---------------- | -------------------: | ----- |
+| T+0:00 | 64 | Continuation pre-flight (`fetch/pull/status/log`) clean at `2cc6057` |
+| T+0:02 | 66 | `gh run view 26561189978` + latest smoke history confirm CI green |
+| T+0:05 | 69 | Production read-only probes green (`/api/public-health`, `/status`, `/`, `/waitlist`, `/demo`, `/login/candidate`, `/dashboard`) |
+| T+0:06 | 70 | `public-health` reports `git_commit=2cc6057` (>= `72a77af`) |
+| T+0:18 | 75 | WS2: add remaining auth mutation limits + 429 regression tests |
+| T+0:24 | 77 | WS5: expand no-secret public surface tests (`/`, `/api/v1/demo/snapshot`) |
+
+### Micro-task log (session 4 continuation)
+
+| # | WS | Task | Status |
+| -: | -- | ---- | ------ |
+| 1 | WS0 | Pre-flight sync and HEAD verification | ✅ |
+| 2 | WS0 | Capture run `26561189978` metadata evidence | ✅ |
+| 3 | WS0 | Review latest `smoke.yml` branch runs (10) | ✅ |
+| 4 | WS0 | Run read-only production probes for required endpoints/pages | ✅ |
+| 5 | WS0 | Confirm production SHA reached/exceeded `72a77af` | ✅ |
+| 6 | WS2 | Add limits on auth mutations (`gdpr-consent`, marketing, notification, billing, onboarding) | ✅ |
+| 7 | WS2 | Add 5 auth mutation 429 regression tests | ✅ |
+| 8 | WS2 | Run focused auth mutation pytest + lint check | ✅ |
+| 9 | WS5 | Extend public no-secret test matrix with root + demo snapshot paths | ✅ |
+| 10 | WS5 | Run focused no-secret/auth mutation pytest bundle | ✅ |
+
+**Cumulative micro-tasks (sessions 2+3+4+continuation):** 77
+
+---
+
 ## Commits (session 2)
 
 | SHA | Message |
