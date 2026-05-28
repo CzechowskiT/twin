@@ -74,3 +74,18 @@ def test_recruiter_inbox_respond_rate_limit_returns_429(rl_client: TestClient) -
     ]
     assert 429 not in codes[:60]
     assert codes[-1] == 429
+
+
+def test_recruiter_inbox_respond_batch_rate_limit_returns_429(rl_client: TestClient) -> None:
+    headers = {"X-Twin-Recruiter-Token": "test-recruiter-token-rate-limit"}
+    body = {"application_ids": [1], "action": "decline"}
+    codes = [
+        rl_client.post(
+            "/api/v1/recruiter/inbox/respond-batch",
+            json=body,
+            headers=headers,
+        ).status_code
+        for _ in range(61)
+    ]
+    assert 429 not in codes[:60]
+    assert codes[-1] == 429

@@ -17,7 +17,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.core.security import create_access_token, hash_password
-from app.database.models import Base, Candidate, Job, User
+from app.database.models import Application, ApplicationStatus, Base, Candidate, Job, User
 from app.database.session import get_db
 from app.limiter import limiter
 from app.main import app
@@ -34,7 +34,7 @@ def _sqlite_db():
 
 
 @pytest.fixture
-def mutation_client() -> Iterator[tuple[TestClient, dict[str, str], Job, Job]]:
+def mutation_client() -> Iterator[tuple[TestClient, dict[str, str], Job, Job, list[Application]]]:
     db = _sqlite_db()
     now = datetime.now(timezone.utc)
     user = User(
@@ -86,6 +86,39 @@ def mutation_client() -> Iterator[tuple[TestClient, dict[str, str], Job, Job]]:
     db.refresh(user)
     db.refresh(job_a)
     db.refresh(job_b)
+    extra_jobs: list[Job] = []
+    for i in range(40):
+        extra_jobs.append(
+            Job(
+                job_board="pracuj",
+                external_id=f"mut-extra-{i}",
+                title=f"Extra Dev {i}",
+                company=f"Extra {i}",
+                description="Python",
+                requirements="Python",
+                url=f"https://example.com/j/mut-extra-{i}",
+                is_validated=True,
+                location="Warszawa",
+            )
+        )
+    db.add_all(extra_jobs)
+    db.commit()
+    for job in extra_jobs:
+        db.refresh(job)
+    extra_apps: list[Application] = []
+    for idx, job in enumerate(extra_jobs[:31]):
+        extra_apps.append(
+            Application(
+                candidate_id=candidate.id,
+                job_id=job.id,
+                status=ApplicationStatus.PENDING,
+                notes=f"seed {idx}",
+            )
+        )
+    db.add_all(extra_apps)
+    db.commit()
+    for app_row in extra_apps:
+        db.refresh(app_row)
 
     def override_db():
         try:
@@ -99,7 +132,7 @@ def mutation_client() -> Iterator[tuple[TestClient, dict[str, str], Job, Job]]:
     headers = {"Authorization": f"Bearer {token}"}
     try:
         with TestClient(app) as client:
-            yield client, headers, job_a, job_b
+            yield client, headers, job_a, job_b, extra_apps
     finally:
         app.dependency_overrides.pop(get_db, None)
         limiter.reset()
@@ -107,10 +140,10 @@ def mutation_client() -> Iterator[tuple[TestClient, dict[str, str], Job, Job]]:
 
 
 def test_match_feedback_rate_limit_returns_429(
-    mutation_client: tuple[TestClient, dict[str, str], Job, Job],
+    mutation_client: tuple[TestClient, dict[str, str], Job, Job, list[Application]],
 ) -> None:
     """POST /candidates/me/match-feedback exhausts the 60/min user bucket."""
-    client, headers, job_a, job_b = mutation_client
+    client, headers, job_a, job_b, _ = mutation_client
     body_a = {"job_id": job_a.id, "feedback_value": "relevant"}
     body_b = {"job_id": job_b.id, "feedback_value": "not_relevant"}
     codes: list[int] = []
@@ -123,9 +156,9 @@ def test_match_feedback_rate_limit_returns_429(
 
 
 def test_profile_update_rate_limit_returns_429(
-    mutation_client: tuple[TestClient, dict[str, str], Job, Job],
+    mutation_client: tuple[TestClient, dict[str, str], Job, Job, list[Application]],
 ) -> None:
-    client, headers, _, _ = mutation_client
+    client, headers, _, _, _ = mutation_client
     body = {
         "name": "Mut",
         "skills": ["python"],
@@ -142,9 +175,9 @@ def test_profile_update_rate_limit_returns_429(
 
 
 def test_application_create_rate_limit_returns_429(
-    mutation_client: tuple[TestClient, dict[str, str], Job, Job],
+    mutation_client: tuple[TestClient, dict[str, str], Job, Job, list[Application]],
 ) -> None:
-    client, headers, job_a, job_b = mutation_client
+    client, headers, job_a, job_b, _ = mutation_client
     codes: list[int] = []
     for job in [job_a, job_b] * 16:  # 32 attempts, alternating jobs
         res = client.post(
@@ -158,9 +191,9 @@ def test_application_create_rate_limit_returns_429(
 
 
 def test_marketing_preference_rate_limit_returns_429(
-    mutation_client: tuple[TestClient, dict[str, str], Job, Job],
+    mutation_client: tuple[TestClient, dict[str, str], Job, Job, list[Application]],
 ) -> None:
-    client, headers, _, _ = mutation_client
+    client, headers, _, _, _ = mutation_client
     codes = [
         client.patch(
             "/api/v1/auth/me/marketing",
@@ -174,9 +207,9 @@ def test_marketing_preference_rate_limit_returns_429(
 
 
 def test_notification_preferences_rate_limit_returns_429(
-    mutation_client: tuple[TestClient, dict[str, str], Job, Job],
+    mutation_client: tuple[TestClient, dict[str, str], Job, Job, list[Application]],
 ) -> None:
-    client, headers, _, _ = mutation_client
+    client, headers, _, _, _ = mutation_client
     codes = [
         client.patch(
             "/api/v1/auth/me/notification-preferences",
@@ -190,9 +223,9 @@ def test_notification_preferences_rate_limit_returns_429(
 
 
 def test_billing_profile_rate_limit_returns_429(
-    mutation_client: tuple[TestClient, dict[str, str], Job, Job],
+    mutation_client: tuple[TestClient, dict[str, str], Job, Job, list[Application]],
 ) -> None:
-    client, headers, _, _ = mutation_client
+    client, headers, _, _, _ = mutation_client
     codes = [
         client.patch(
             "/api/v1/auth/me/billing-profile",
@@ -206,9 +239,9 @@ def test_billing_profile_rate_limit_returns_429(
 
 
 def test_onboarding_complete_rate_limit_returns_429(
-    mutation_client: tuple[TestClient, dict[str, str], Job, Job],
+    mutation_client: tuple[TestClient, dict[str, str], Job, Job, list[Application]],
 ) -> None:
-    client, headers, _, _ = mutation_client
+    client, headers, _, _, _ = mutation_client
     codes = [
         client.post("/api/v1/auth/onboarding/complete", headers=headers).status_code
         for _ in range(31)
@@ -218,9 +251,9 @@ def test_onboarding_complete_rate_limit_returns_429(
 
 
 def test_gdpr_consent_rate_limit_returns_429(
-    mutation_client: tuple[TestClient, dict[str, str], Job, Job],
+    mutation_client: tuple[TestClient, dict[str, str], Job, Job, list[Application]],
 ) -> None:
-    client, headers, _, _ = mutation_client
+    client, headers, _, _, _ = mutation_client
     body = {
         "accept_privacy_policy": True,
         "accept_terms_of_service": True,
@@ -231,3 +264,54 @@ def test_gdpr_consent_rate_limit_returns_429(
     codes = [client.post("/api/v1/auth/gdpr-consent", json=body, headers=headers).status_code for _ in range(31)]
     assert codes.count(200) == 30
     assert codes[-1] == 429
+
+
+def test_application_update_rate_limit_returns_429(
+    mutation_client: tuple[TestClient, dict[str, str], Job, Job, list[Application]],
+) -> None:
+    client, headers, _, _, applications = mutation_client
+    target_id = applications[0].id
+    codes = [
+        client.patch(
+            f"/api/v1/applications/{target_id}",
+            json={"notes": f"update-{i}"},
+            headers=headers,
+        ).status_code
+        for i in range(31)
+    ]
+    assert codes.count(200) == 30, codes
+    assert codes[-1] == 429
+
+
+def test_application_delete_rate_limit_returns_429(
+    mutation_client: tuple[TestClient, dict[str, str], Job, Job, list[Application]],
+) -> None:
+    client, headers, _, _, applications = mutation_client
+    target_id = applications[0].id
+    codes = [
+        client.delete(f"/api/v1/applications/{target_id}", headers=headers).status_code
+        for _ in range(31)
+    ]
+    assert codes[0] == 204, codes
+    assert codes.count(404) == 29, codes
+    assert codes[-1] == 429
+
+
+def test_unauthenticated_mutations_return_401_before_user_throttling(
+    mutation_client: tuple[TestClient, dict[str, str], Job, Job, list[Application]],
+) -> None:
+    client, _, _, _, applications = mutation_client
+    app_id = applications[0].id
+    profile_body = {
+        "name": "NoAuth",
+        "skills": ["python"],
+        "preferred_job_titles": ["Dev"],
+        "experience_years": 4,
+        "location": "Warszawa",
+    }
+    statuses = [
+        client.put("/api/v1/candidates/me", json=profile_body).status_code,
+        client.patch(f"/api/v1/applications/{app_id}", json={"notes": "no-auth"}).status_code,
+        client.delete(f"/api/v1/applications/{app_id}").status_code,
+    ]
+    assert statuses == [401, 401, 401]
