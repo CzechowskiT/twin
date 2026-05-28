@@ -277,3 +277,16 @@
 - Targeted verification:
   - `pytest -k malformed_event backend/tests/test_stripe_webhook_idempotency.py -q`
   - Result: `1 passed, 17 deselected`.
+
+### WS17 Micro-slice — ST-009 checkout metadata fallback
+
+- Added fallback resolution in `backend/app/services/stripe_billing.py` for
+  `checkout.session.completed` when `metadata.user_id` is missing:
+  - tries `customer_details.email` / `customer_email`,
+  - then existing `customer` lookup via `stripe_customer_id`.
+- Added regression coverage in
+  `backend/tests/test_stripe_checkout_metadata_fallback.py` to ensure missing
+  metadata still maps to the correct user and persists `stripe_customer_id`.
+- Targeted verification:
+  - `pytest -k metadata_fallback backend/tests/test_stripe_checkout_metadata_fallback.py backend/tests/test_stripe_webhook_idempotency.py`
+  - Result: `1 passed, 18 deselected`.
