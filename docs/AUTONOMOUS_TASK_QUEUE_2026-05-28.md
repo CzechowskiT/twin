@@ -1,0 +1,331 @@
+# Autonomous Task Queue — 2026-05-28
+
+## Queue Rules
+
+- Required fields per task: `ID | Category | Title | Risk | Status | Dependencies | Verification | Expected Commit Scope`.
+- Status set: `READY`, `BLOCKED`, `DONE`, `IN_PROGRESS`.
+- First 25 tasks are low-risk and marked `READY`.
+
+## Section A — Immediate READY Batch (Low Risk, 25)
+
+- ST-001 | Stripe tests | Add duplicate-event fixture docs | LOW | READY | none | `pytest -k stripe_dedup` | docs+tests
+- ST-002 | Stripe tests | Add idempotency key naming conventions test | LOW | READY | ST-001 | `pytest -k idempotency` | tests
+- ST-003 | Stripe tests | Add webhook payload replay fixture | LOW | READY | ST-001 | `pytest -k webhook_replay` | tests
+- ST-004 | Stripe tests | Parametrize dedup timestamp edge tests | LOW | READY | ST-002 | `pytest -k dedup_timestamp` | tests
+- ST-005 | Stripe tests | Add duplicate invoice.paid test case | LOW | READY | ST-003 | `pytest -k invoice_paid` | tests
+- ST-006 | Stripe tests | Add duplicate checkout.session test case | LOW | READY | ST-003 | `pytest -k checkout_session` | tests
+- ST-007 | Stripe tests | Verify dedup across worker retry | LOW | READY | ST-004 | `pytest -k worker_retry` | tests
+- ST-008 | Stripe tests | Add malformed event id test | LOW | READY | ST-001 | `pytest -k malformed_event` | tests
+- ST-009 | Stripe tests | Add missing metadata fallback test | LOW | READY | ST-005 | `pytest -k metadata_fallback` | tests
+- ST-010 | Stripe tests | Add no-secret logging assertion test | LOW | READY | ST-008 | `pytest -k no_secret` | tests
+- ST-011 | Mutation RL | Document unauth mutation inventory delta | LOW | READY | none | markdown lint/manual | docs
+- ST-012 | Mutation RL | Add test for login mutation throttling | LOW | READY | ST-011 | `pytest -k login_rate_limit` | tests
+- ST-013 | Mutation RL | Add test for register throttling path | LOW | READY | ST-011 | `pytest -k register_rate_limit` | tests
+- ST-014 | Mutation RL | Add reset-password mutation RL test | LOW | READY | ST-012 | `pytest -k reset_password` | tests
+- ST-015 | Mutation RL | Add token-refresh mutation RL test | LOW | READY | ST-012 | `pytest -k token_refresh` | tests
+- ST-016 | No-secret regression | Add health endpoint no-secret assertion | LOW | READY | none | `pytest -k public_health` | tests
+- ST-017 | No-secret regression | Add status endpoint no-secret assertion | LOW | READY | ST-016 | `pytest -k status_endpoint` | tests
+- ST-018 | No-secret regression | Add root page no-secret snapshot check | LOW | READY | ST-016 | `pytest -k public_pages` | tests
+- ST-019 | No-secret regression | Add waitlist page no-secret check | LOW | READY | ST-018 | `pytest -k waitlist` | tests
+- ST-020 | No-secret regression | Add demo page no-secret check | LOW | READY | ST-018 | `pytest -k demo_page` | tests
+- ST-021 | Playwright smoke | Stabilize dashboard auth redirect check | LOW | READY | none | `pnpm playwright test -g dashboard` | tests
+- ST-022 | Playwright smoke | Stabilize candidate login smoke setup | LOW | READY | ST-021 | `pnpm playwright test -g login` | tests
+- ST-023 | Docs source-of-truth | Refresh API reality matrix headings | LOW | READY | none | markdown lint/manual | docs
+- ST-024 | Docs source-of-truth | Update product direction deltas | LOW | READY | none | markdown lint/manual | docs
+- ST-025 | Docs source-of-truth | Update O7 restore drill quick refs | LOW | READY | none | markdown lint/manual | docs
+
+## Section B — Stripe Tests Backlog (50)
+
+- ST-026 | Stripe tests | Add customer.subscription.created dedup test | LOW | BLOCKED | ST-001 | `pytest -k subscription_created` | tests
+- ST-027 | Stripe tests | Add customer.subscription.updated dedup test | LOW | BLOCKED | ST-026 | `pytest -k subscription_updated` | tests
+- ST-028 | Stripe tests | Add customer.subscription.deleted dedup test | LOW | BLOCKED | ST-027 | `pytest -k subscription_deleted` | tests
+- ST-029 | Stripe tests | Add payment_intent.succeeded dedup test | LOW | BLOCKED | ST-001 | `pytest -k payment_intent_succeeded` | tests
+- ST-030 | Stripe tests | Add payment_intent.failed dedup test | LOW | BLOCKED | ST-029 | `pytest -k payment_intent_failed` | tests
+- ST-031 | Stripe tests | Add charge.refunded dedup test | LOW | BLOCKED | ST-029 | `pytest -k charge_refunded` | tests
+- ST-032 | Stripe tests | Add dispute.created dedup test | LOW | BLOCKED | ST-029 | `pytest -k dispute_created` | tests
+- ST-033 | Stripe tests | Add payout.paid dedup test | LOW | BLOCKED | ST-001 | `pytest -k payout_paid` | tests
+- ST-034 | Stripe tests | Add payout.failed dedup test | LOW | BLOCKED | ST-033 | `pytest -k payout_failed` | tests
+- ST-035 | Stripe tests | Add account.updated dedup test | LOW | BLOCKED | ST-001 | `pytest -k account_updated` | tests
+- ST-036 | Stripe tests | Add transfer.created dedup test | LOW | BLOCKED | ST-001 | `pytest -k transfer_created` | tests
+- ST-037 | Stripe tests | Add transfer.reversed dedup test | LOW | BLOCKED | ST-036 | `pytest -k transfer_reversed` | tests
+- ST-038 | Stripe tests | Add connected account webhook dedup | LOW | BLOCKED | ST-035 | `pytest -k connected_account` | tests
+- ST-039 | Stripe tests | Add out-of-order event dedup test | LOW | BLOCKED | ST-004 | `pytest -k out_of_order` | tests
+- ST-040 | Stripe tests | Add same-event different-signature test | LOW | BLOCKED | ST-003 | `pytest -k signature` | tests
+- ST-041 | Stripe tests | Add duplicated request-id test | LOW | BLOCKED | ST-002 | `pytest -k request_id` | tests
+- ST-042 | Stripe tests | Add event storage uniqueness migration test | MEDIUM | BLOCKED | ST-004 | `pytest -k uniqueness_migration` | tests
+- ST-043 | Stripe tests | Add duplicate burst concurrency test | MEDIUM | BLOCKED | ST-007 | `pytest -k concurrency` | tests
+- ST-044 | Stripe tests | Add cross-tenant dedup boundary test | MEDIUM | BLOCKED | ST-035 | `pytest -k tenant_boundary` | tests
+- ST-045 | Stripe tests | Add deleted customer webhook replay test | LOW | BLOCKED | ST-003 | `pytest -k deleted_customer` | tests
+- ST-046 | Stripe tests | Add pending_webhooks mismatch test | LOW | BLOCKED | ST-004 | `pytest -k pending_webhooks` | tests
+- ST-047 | Stripe tests | Add event livemode mismatch test | LOW | BLOCKED | ST-004 | `pytest -k livemode` | tests
+- ST-048 | Stripe tests | Add missing event type fallback test | LOW | BLOCKED | ST-008 | `pytest -k missing_type` | tests
+- ST-049 | Stripe tests | Add invalid object payload test | LOW | BLOCKED | ST-008 | `pytest -k invalid_object` | tests
+- ST-050 | Stripe tests | Add duplicate delivery after 24h test | LOW | BLOCKED | ST-039 | `pytest -k delayed_duplicate` | tests
+- ST-051 | Stripe tests | Add dedup metrics increment assertion | LOW | BLOCKED | ST-007 | `pytest -k dedup_metrics` | tests
+- ST-052 | Stripe tests | Add dedup skip log structure test | LOW | BLOCKED | ST-010 | `pytest -k dedup_log` | tests
+- ST-053 | Stripe tests | Add event parsing strictness tests | LOW | BLOCKED | ST-008 | `pytest -k parsing` | tests
+- ST-054 | Stripe tests | Add webhook secret rotation replay test | LOW | BLOCKED | ST-040 | `pytest -k secret_rotation` | tests
+- ST-055 | Stripe tests | Add unknown account context test | LOW | BLOCKED | ST-038 | `pytest -k unknown_account` | tests
+- ST-056 | Stripe tests | Add deleted event record archival test | LOW | BLOCKED | ST-042 | `pytest -k archival` | tests
+- ST-057 | Stripe tests | Add dedup retention policy test | LOW | BLOCKED | ST-056 | `pytest -k retention` | tests
+- ST-058 | Stripe tests | Add deterministic dedup hash test | LOW | BLOCKED | ST-002 | `pytest -k dedup_hash` | tests
+- ST-059 | Stripe tests | Add duplicate with altered metadata test | LOW | BLOCKED | ST-058 | `pytest -k altered_metadata` | tests
+- ST-060 | Stripe tests | Add duplicate event with null created test | LOW | BLOCKED | ST-008 | `pytest -k null_created` | tests
+- ST-061 | Stripe tests | Add test matrix doc sync pass | LOW | BLOCKED | ST-026 | markdown lint/manual | docs
+- ST-062 | Stripe tests | Add fixture loader performance test | LOW | BLOCKED | ST-003 | `pytest -k fixture_loader` | tests
+- ST-063 | Stripe tests | Add event contract schema snapshot | LOW | BLOCKED | ST-053 | `pytest -k schema_snapshot` | tests
+- ST-064 | Stripe tests | Add retry jitter deterministic test | LOW | BLOCKED | ST-007 | `pytest -k retry_jitter` | tests
+- ST-065 | Stripe tests | Add dead-letter dedup interoperability test | MEDIUM | BLOCKED | ST-043 | `pytest -k dead_letter` | tests
+- ST-066 | Stripe tests | Add settlement event dedup scenario | LOW | BLOCKED | ST-033 | `pytest -k settlement` | tests
+- ST-067 | Stripe tests | Add late-arriving settlement scenario | LOW | BLOCKED | ST-066 | `pytest -k late_settlement` | tests
+- ST-068 | Stripe tests | Add event fanout dedup integration | MEDIUM | BLOCKED | ST-043 | `pytest -k fanout` | tests
+- ST-069 | Stripe tests | Add endpoint timeout retry dedup test | LOW | BLOCKED | ST-064 | `pytest -k timeout_retry` | tests
+- ST-070 | Stripe tests | Add traceback sanitization assertion | LOW | BLOCKED | ST-010 | `pytest -k traceback_sanitize` | tests
+- ST-071 | Stripe tests | Add metrics dashboard doc update | LOW | BLOCKED | ST-051 | markdown lint/manual | docs
+- ST-072 | Stripe tests | Add event source tagging test | LOW | BLOCKED | ST-035 | `pytest -k source_tagging` | tests
+- ST-073 | Stripe tests | Add checksum mismatch rejection test | LOW | BLOCKED | ST-053 | `pytest -k checksum` | tests
+- ST-074 | Stripe tests | Add graceful noop on duplicate unknown | LOW | BLOCKED | ST-048 | `pytest -k noop_unknown` | tests
+- ST-075 | Stripe tests | Add dedup observability runbook notes | LOW | BLOCKED | ST-071 | markdown lint/manual | docs
+
+## Section C — Mutation Rate-Limit Backlog (50)
+
+- RL-001 | Mutation RL | Extend auth mutation inventory table | LOW | BLOCKED | ST-011 | markdown lint/manual | docs
+- RL-002 | Mutation RL | Add candidate profile update RL test | LOW | BLOCKED | RL-001 | `pytest -k profile_update_rl` | tests
+- RL-003 | Mutation RL | Add candidate preference save RL test | LOW | BLOCKED | RL-001 | `pytest -k preference_rl` | tests
+- RL-004 | Mutation RL | Add upload URL issue RL test | LOW | BLOCKED | RL-001 | `pytest -k upload_url_rl` | tests
+- RL-005 | Mutation RL | Add portfolio link mutation RL test | LOW | BLOCKED | RL-001 | `pytest -k portfolio_rl` | tests
+- RL-006 | Mutation RL | Add CV parse trigger mutation RL test | LOW | BLOCKED | RL-004 | `pytest -k cv_parse_rl` | tests
+- RL-007 | Mutation RL | Add magic-link resend RL test | LOW | BLOCKED | ST-012 | `pytest -k magic_link_rl` | tests
+- RL-008 | Mutation RL | Add email change mutation RL test | LOW | BLOCKED | RL-001 | `pytest -k email_change_rl` | tests
+- RL-009 | Mutation RL | Add password change mutation RL test | LOW | BLOCKED | RL-001 | `pytest -k password_change_rl` | tests
+- RL-010 | Mutation RL | Add account delete mutation RL test | LOW | BLOCKED | RL-001 | `pytest -k account_delete_rl` | tests
+- RL-011 | Mutation RL | Add company profile edit RL test | LOW | BLOCKED | RL-001 | `pytest -k company_profile_rl` | tests
+- RL-012 | Mutation RL | Add recruiter seat invite RL test | LOW | BLOCKED | RL-011 | `pytest -k seat_invite_rl` | tests
+- RL-013 | Mutation RL | Add recruiter seat revoke RL test | LOW | BLOCKED | RL-011 | `pytest -k seat_revoke_rl` | tests
+- RL-014 | Mutation RL | Add interview slot create RL test | LOW | BLOCKED | RL-001 | `pytest -k slot_create_rl` | tests
+- RL-015 | Mutation RL | Add interview slot cancel RL test | LOW | BLOCKED | RL-014 | `pytest -k slot_cancel_rl` | tests
+- RL-016 | Mutation RL | Add reschedule request RL test | LOW | BLOCKED | RL-014 | `pytest -k reschedule_rl` | tests
+- RL-017 | Mutation RL | Add waitlist submit RL test | LOW | BLOCKED | ST-019 | `pytest -k waitlist_rl` | tests
+- RL-018 | Mutation RL | Add demo request RL test | LOW | BLOCKED | ST-020 | `pytest -k demo_rl` | tests
+- RL-019 | Mutation RL | Add founder admin mutation RL docs | LOW | BLOCKED | RL-001 | markdown lint/manual | docs
+- RL-020 | Mutation RL | Add integration token rotate RL test | LOW | BLOCKED | RL-019 | `pytest -k token_rotate_rl` | tests
+- RL-021 | Mutation RL | Add integration token revoke RL test | LOW | BLOCKED | RL-020 | `pytest -k token_revoke_rl` | tests
+- RL-022 | Mutation RL | Add API key create RL test | LOW | BLOCKED | RL-019 | `pytest -k api_key_create_rl` | tests
+- RL-023 | Mutation RL | Add API key delete RL test | LOW | BLOCKED | RL-022 | `pytest -k api_key_delete_rl` | tests
+- RL-024 | Mutation RL | Add OAuth connect mutation RL test | LOW | BLOCKED | RL-019 | `pytest -k oauth_connect_rl` | tests
+- RL-025 | Mutation RL | Add OAuth disconnect mutation RL test | LOW | BLOCKED | RL-024 | `pytest -k oauth_disconnect_rl` | tests
+- RL-026 | Mutation RL | Add webhook endpoint create RL test | LOW | BLOCKED | RL-019 | `pytest -k webhook_create_rl` | tests
+- RL-027 | Mutation RL | Add webhook endpoint delete RL test | LOW | BLOCKED | RL-026 | `pytest -k webhook_delete_rl` | tests
+- RL-028 | Mutation RL | Add webhook secret rotate RL test | LOW | BLOCKED | RL-026 | `pytest -k webhook_rotate_rl` | tests
+- RL-029 | Mutation RL | Add abuse threshold tuning docs | LOW | BLOCKED | RL-001 | markdown lint/manual | docs
+- RL-030 | Mutation RL | Add per-route burst allowance tests | LOW | BLOCKED | RL-029 | `pytest -k burst_allowance` | tests
+- RL-031 | Mutation RL | Add sustained load limit tests | LOW | BLOCKED | RL-029 | `pytest -k sustained_limit` | tests
+- RL-032 | Mutation RL | Add RL headers consistency tests | LOW | BLOCKED | RL-030 | `pytest -k rl_headers` | tests
+- RL-033 | Mutation RL | Add RL telemetry log docs | LOW | BLOCKED | RL-029 | markdown lint/manual | docs
+- RL-034 | Mutation RL | Add RL i18n error response tests | LOW | BLOCKED | RL-030 | `pytest -k rl_i18n` | tests
+- RL-035 | Mutation RL | Add anonymous IP bucket tests | LOW | BLOCKED | RL-030 | `pytest -k anon_ip_bucket` | tests
+- RL-036 | Mutation RL | Add authenticated user bucket tests | LOW | BLOCKED | RL-030 | `pytest -k user_bucket` | tests
+- RL-037 | Mutation RL | Add tenant-level bucket tests | LOW | BLOCKED | RL-036 | `pytest -k tenant_bucket` | tests
+- RL-038 | Mutation RL | Add fallback key derivation tests | LOW | BLOCKED | RL-035 | `pytest -k key_derivation` | tests
+- RL-039 | Mutation RL | Add redis outage graceful mode tests | MEDIUM | BLOCKED | RL-036 | `pytest -k redis_outage_rl` | tests
+- RL-040 | Mutation RL | Add retry-after formatting tests | LOW | BLOCKED | RL-032 | `pytest -k retry_after` | tests
+- RL-041 | Mutation RL | Add auth endpoint RL docs refresh | LOW | BLOCKED | RL-001 | markdown lint/manual | docs
+- RL-042 | Mutation RL | Add RL E2E checklist draft | LOW | BLOCKED | RL-041 | markdown lint/manual | docs
+- RL-043 | Mutation RL | Add staff simulation RL scenario tests | LOW | BLOCKED | RL-036 | `pytest -k staff_sim_rl` | tests
+- RL-044 | Mutation RL | Add fixture for abusive actor wave | LOW | BLOCKED | RL-035 | `pytest -k abusive_wave` | tests
+- RL-045 | Mutation RL | Add RL metrics regression test | LOW | BLOCKED | RL-033 | `pytest -k rl_metrics` | tests
+- RL-046 | Mutation RL | Add RL docs source references | LOW | BLOCKED | RL-041 | markdown lint/manual | docs
+- RL-047 | Mutation RL | Add RL lockout UX copy tests | LOW | BLOCKED | RL-034 | `pytest -k lockout_copy` | tests
+- RL-048 | Mutation RL | Add RL dashboard panel docs | LOW | BLOCKED | RL-045 | markdown lint/manual | docs
+- RL-049 | Mutation RL | Add RL smoke test command cheatsheet | LOW | BLOCKED | RL-042 | markdown lint/manual | docs
+- RL-050 | Mutation RL | Add RL rollout gate checklist | LOW | BLOCKED | RL-048 | markdown lint/manual | docs
+
+## Section D — No-Secret Regression Backlog (50)
+
+- NS-001 | No-secret regression | Extend secret leak denylist doc | LOW | BLOCKED | ST-016 | markdown lint/manual | docs
+- NS-002 | No-secret regression | Add API 404 no-secret assertion | LOW | BLOCKED | NS-001 | `pytest -k no_secret_404` | tests
+- NS-003 | No-secret regression | Add API 500 sanitized response test | LOW | BLOCKED | NS-001 | `pytest -k no_secret_500` | tests
+- NS-004 | No-secret regression | Add auth failure no-secret body test | LOW | BLOCKED | NS-001 | `pytest -k auth_fail_secret` | tests
+- NS-005 | No-secret regression | Add upload error no-secret body test | LOW | BLOCKED | NS-001 | `pytest -k upload_error_secret` | tests
+- NS-006 | No-secret regression | Add webhook error no-secret body test | LOW | BLOCKED | NS-001 | `pytest -k webhook_error_secret` | tests
+- NS-007 | No-secret regression | Add Stripe error no-secret body test | LOW | BLOCKED | NS-001 | `pytest -k stripe_error_secret` | tests
+- NS-008 | No-secret regression | Add CV parser error no-secret test | LOW | BLOCKED | NS-001 | `pytest -k parser_error_secret` | tests
+- NS-009 | No-secret regression | Add db timeout no-secret message test | LOW | BLOCKED | NS-001 | `pytest -k db_timeout_secret` | tests
+- NS-010 | No-secret regression | Add public robots no-secret check | LOW | BLOCKED | NS-001 | `pytest -k robots_secret` | tests
+- NS-011 | No-secret regression | Add sitemap no-secret check | LOW | BLOCKED | NS-001 | `pytest -k sitemap_secret` | tests
+- NS-012 | No-secret regression | Add login page no-secret dom check | LOW | BLOCKED | NS-001 | `pnpm test -g no-secret-login` | tests
+- NS-013 | No-secret regression | Add dashboard shell no-secret dom check | LOW | BLOCKED | NS-001 | `pnpm test -g no-secret-dashboard` | tests
+- NS-014 | No-secret regression | Add source map no-secret path test | LOW | BLOCKED | NS-001 | `pnpm test -g source-map-secret` | tests
+- NS-015 | No-secret regression | Add CSP report no-secret payload test | LOW | BLOCKED | NS-001 | `pytest -k csp_report_secret` | tests
+- NS-016 | No-secret regression | Add request-id correlation no-secret test | LOW | BLOCKED | NS-001 | `pytest -k request_id_secret` | tests
+- NS-017 | No-secret regression | Add trace logging redaction test | LOW | BLOCKED | NS-001 | `pytest -k trace_redaction` | tests
+- NS-018 | No-secret regression | Add exception chain redaction test | LOW | BLOCKED | NS-017 | `pytest -k exception_redaction` | tests
+- NS-019 | No-secret regression | Add debug mode guardrail test | LOW | BLOCKED | NS-001 | `pytest -k debug_guard` | tests
+- NS-020 | No-secret regression | Add startup logs redaction test | LOW | BLOCKED | NS-001 | `pytest -k startup_redaction` | tests
+- NS-021 | No-secret regression | Add env var echo prevention tests | LOW | BLOCKED | NS-020 | `pytest -k env_echo` | tests
+- NS-022 | No-secret regression | Add stack trace truncation tests | LOW | BLOCKED | NS-018 | `pytest -k trace_truncation` | tests
+- NS-023 | No-secret regression | Add CLI smoke secret scan docs | LOW | BLOCKED | NS-001 | markdown lint/manual | docs
+- NS-024 | No-secret regression | Add CI secret scan workflow docs | LOW | BLOCKED | NS-023 | markdown lint/manual | docs
+- NS-025 | No-secret regression | Add security response wording tests | LOW | BLOCKED | NS-003 | `pytest -k security_wording` | tests
+- NS-026 | No-secret regression | Add candidate profile no-secret API test | LOW | BLOCKED | NS-001 | `pytest -k profile_secret` | tests
+- NS-027 | No-secret regression | Add recruiter profile no-secret API test | LOW | BLOCKED | NS-001 | `pytest -k recruiter_secret` | tests
+- NS-028 | No-secret regression | Add admin route no-secret API test | LOW | BLOCKED | NS-001 | `pytest -k admin_secret` | tests
+- NS-029 | No-secret regression | Add verification route no-secret test | LOW | BLOCKED | NS-001 | `pytest -k verification_secret` | tests
+- NS-030 | No-secret regression | Add billing route no-secret test | LOW | BLOCKED | NS-001 | `pytest -k billing_secret` | tests
+- NS-031 | No-secret regression | Add error serializer no-secret tests | LOW | BLOCKED | NS-003 | `pytest -k serializer_secret` | tests
+- NS-032 | No-secret regression | Add logger adapter redaction tests | LOW | BLOCKED | NS-017 | `pytest -k logger_adapter` | tests
+- NS-033 | No-secret regression | Add observability event redaction test | LOW | BLOCKED | NS-017 | `pytest -k observability_redaction` | tests
+- NS-034 | No-secret regression | Add webhook payload sanitize docs | LOW | BLOCKED | NS-007 | markdown lint/manual | docs
+- NS-035 | No-secret regression | Add redaction metrics counter tests | LOW | BLOCKED | NS-033 | `pytest -k redaction_metrics` | tests
+- NS-036 | No-secret regression | Add no-secret endpoint matrix docs | LOW | BLOCKED | NS-023 | markdown lint/manual | docs
+- NS-037 | No-secret regression | Add no-secret replay script docs | LOW | BLOCKED | NS-036 | markdown lint/manual | docs
+- NS-038 | No-secret regression | Add frontend hydration no-secret test | LOW | BLOCKED | NS-012 | `pnpm test -g hydration-secret` | tests
+- NS-039 | No-secret regression | Add i18n message no-secret snapshot | LOW | BLOCKED | NS-012 | `pnpm test -g i18n-secret` | tests
+- NS-040 | No-secret regression | Add static export no-secret test | LOW | BLOCKED | NS-014 | `pnpm test -g static-secret` | tests
+- NS-041 | No-secret regression | Add request middleware no-secret test | LOW | BLOCKED | NS-016 | `pytest -k middleware_secret` | tests
+- NS-042 | No-secret regression | Add response middleware no-secret test | LOW | BLOCKED | NS-041 | `pytest -k response_secret` | tests
+- NS-043 | No-secret regression | Add proxy header leak test | LOW | BLOCKED | NS-041 | `pytest -k proxy_header_secret` | tests
+- NS-044 | No-secret regression | Add CDN error page no-secret checks | LOW | BLOCKED | NS-010 | `pnpm test -g cdn-secret` | tests
+- NS-045 | No-secret regression | Add docs security source references | LOW | BLOCKED | NS-036 | markdown lint/manual | docs
+- NS-046 | No-secret regression | Add no-secret regression release gate | LOW | BLOCKED | NS-045 | markdown lint/manual | docs
+- NS-047 | No-secret regression | Add canary error no-secret test | LOW | BLOCKED | NS-003 | `pytest -k canary_secret` | tests
+- NS-048 | No-secret regression | Add regression triage playbook | LOW | BLOCKED | NS-046 | markdown lint/manual | docs
+- NS-049 | No-secret regression | Add no-secret onboarding guide | LOW | BLOCKED | NS-048 | markdown lint/manual | docs
+- NS-050 | No-secret regression | Add no-secret weekly audit template | LOW | BLOCKED | NS-049 | markdown lint/manual | docs
+
+## Section E — Playwright Smoke Backlog (50)
+
+- PW-001 | Playwright smoke | Stabilize homepage smoke waiting strategy | LOW | BLOCKED | ST-021 | `pnpm playwright test -g homepage` | tests
+- PW-002 | Playwright smoke | Stabilize waitlist smoke selectors | LOW | BLOCKED | PW-001 | `pnpm playwright test -g waitlist` | tests
+- PW-003 | Playwright smoke | Stabilize demo page smoke selectors | LOW | BLOCKED | PW-001 | `pnpm playwright test -g demo` | tests
+- PW-004 | Playwright smoke | Stabilize login page smoke selectors | LOW | BLOCKED | ST-022 | `pnpm playwright test -g login` | tests
+- PW-005 | Playwright smoke | Stabilize dashboard auth gate smoke | LOW | BLOCKED | ST-021 | `pnpm playwright test -g auth-gate` | tests
+- PW-006 | Playwright smoke | Add status page smoke coverage | LOW | BLOCKED | PW-001 | `pnpm playwright test -g status` | tests
+- PW-007 | Playwright smoke | Add public-health api smoke script | LOW | BLOCKED | PW-001 | `pytest -k public_health_smoke` | tests
+- PW-008 | Playwright smoke | Add robust networkidle helper docs | LOW | BLOCKED | PW-001 | markdown lint/manual | docs
+- PW-009 | Playwright smoke | Add retry wrapper for flaky route | LOW | BLOCKED | PW-001 | `pnpm playwright test -g flaky-route` | tests
+- PW-010 | Playwright smoke | Add screenshot naming normalization | LOW | BLOCKED | PW-001 | `pnpm playwright test -g screenshot` | tests
+- PW-011 | Playwright smoke | Add locale smoke for public pages | LOW | BLOCKED | PW-001 | `pnpm playwright test -g locale-public` | tests
+- PW-012 | Playwright smoke | Add locale smoke for login page | LOW | BLOCKED | PW-004 | `pnpm playwright test -g locale-login` | tests
+- PW-013 | Playwright smoke | Add locale smoke for dashboard gate | LOW | BLOCKED | PW-005 | `pnpm playwright test -g locale-dashboard` | tests
+- PW-014 | Playwright smoke | Add mobile viewport smoke profile | LOW | BLOCKED | PW-001 | `pnpm playwright test -g mobile` | tests
+- PW-015 | Playwright smoke | Add tablet viewport smoke profile | LOW | BLOCKED | PW-001 | `pnpm playwright test -g tablet` | tests
+- PW-016 | Playwright smoke | Add chromium-only stable lane docs | LOW | BLOCKED | PW-001 | markdown lint/manual | docs
+- PW-017 | Playwright smoke | Add firefox optional lane docs | LOW | BLOCKED | PW-016 | markdown lint/manual | docs
+- PW-018 | Playwright smoke | Add webkit optional lane docs | LOW | BLOCKED | PW-016 | markdown lint/manual | docs
+- PW-019 | Playwright smoke | Add dashboard unauth redirect test | LOW | BLOCKED | PW-005 | `pnpm playwright test -g unauth-redirect` | tests
+- PW-020 | Playwright smoke | Add candidate login success smoke | LOW | BLOCKED | PW-004 | `pnpm playwright test -g candidate-success` | tests
+- PW-021 | Playwright smoke | Add recruiter login success smoke | LOW | BLOCKED | PW-004 | `pnpm playwright test -g recruiter-success` | tests
+- PW-022 | Playwright smoke | Add login failure copy smoke | LOW | BLOCKED | PW-004 | `pnpm playwright test -g login-failure` | tests
+- PW-023 | Playwright smoke | Add CSRF token presence smoke | LOW | BLOCKED | PW-004 | `pnpm playwright test -g csrf` | tests
+- PW-024 | Playwright smoke | Add cookie banner non-blocking smoke | LOW | BLOCKED | PW-001 | `pnpm playwright test -g cookie-banner` | tests
+- PW-025 | Playwright smoke | Add footer links public smoke | LOW | BLOCKED | PW-001 | `pnpm playwright test -g footer-links` | tests
+- PW-026 | Playwright smoke | Add header navigation public smoke | LOW | BLOCKED | PW-001 | `pnpm playwright test -g header-nav` | tests
+- PW-027 | Playwright smoke | Add 404 page public smoke | LOW | BLOCKED | PW-001 | `pnpm playwright test -g 404` | tests
+- PW-028 | Playwright smoke | Add error boundary smoke harness | LOW | BLOCKED | PW-001 | `pnpm playwright test -g error-boundary` | tests
+- PW-029 | Playwright smoke | Add no-console-error smoke check | LOW | BLOCKED | PW-001 | `pnpm playwright test -g console-error` | tests
+- PW-030 | Playwright smoke | Add no-network-failure smoke check | LOW | BLOCKED | PW-001 | `pnpm playwright test -g network-failure` | tests
+- PW-031 | Playwright smoke | Add deterministic test data setup docs | LOW | BLOCKED | PW-020 | markdown lint/manual | docs
+- PW-032 | Playwright smoke | Add playwright timeout policy docs | LOW | BLOCKED | PW-001 | markdown lint/manual | docs
+- PW-033 | Playwright smoke | Add smoke matrix by route docs | LOW | BLOCKED | PW-032 | markdown lint/manual | docs
+- PW-034 | Playwright smoke | Add smoke CI shard strategy docs | LOW | BLOCKED | PW-032 | markdown lint/manual | docs
+- PW-035 | Playwright smoke | Add route-level tag naming cleanup | LOW | BLOCKED | PW-033 | `pnpm playwright test --list` | tests
+- PW-036 | Playwright smoke | Add smoke report artifact docs | LOW | BLOCKED | PW-034 | markdown lint/manual | docs
+- PW-037 | Playwright smoke | Add flaky test quarantine docs | LOW | BLOCKED | PW-034 | markdown lint/manual | docs
+- PW-038 | Playwright smoke | Add nightly smoke minimal lane docs | LOW | BLOCKED | PW-034 | markdown lint/manual | docs
+- PW-039 | Playwright smoke | Add pre-merge smoke minimal lane docs | LOW | BLOCKED | PW-034 | markdown lint/manual | docs
+- PW-040 | Playwright smoke | Add post-merge smoke full lane docs | LOW | BLOCKED | PW-034 | markdown lint/manual | docs
+- PW-041 | Playwright smoke | Add selector data-testid migration notes | LOW | BLOCKED | PW-002 | markdown lint/manual | docs
+- PW-042 | Playwright smoke | Add wait helper package extraction test | LOW | BLOCKED | PW-001 | `pnpm test -g wait-helper` | tests
+- PW-043 | Playwright smoke | Add route health map markdown table | LOW | BLOCKED | PW-033 | markdown lint/manual | docs
+- PW-044 | Playwright smoke | Add screenshot baseline refresh notes | LOW | BLOCKED | PW-010 | markdown lint/manual | docs
+- PW-045 | Playwright smoke | Add dashboard skeleton load smoke | LOW | BLOCKED | PW-005 | `pnpm playwright test -g skeleton` | tests
+- PW-046 | Playwright smoke | Add lazy route hydration smoke | LOW | BLOCKED | PW-045 | `pnpm playwright test -g hydration` | tests
+- PW-047 | Playwright smoke | Add smoke failure triage template | LOW | BLOCKED | PW-037 | markdown lint/manual | docs
+- PW-048 | Playwright smoke | Add smoke runbook quick commands | LOW | BLOCKED | PW-033 | markdown lint/manual | docs
+- PW-049 | Playwright smoke | Add smoke local debug checklist | LOW | BLOCKED | PW-048 | markdown lint/manual | docs
+- PW-050 | Playwright smoke | Add smoke stabilization exit criteria | LOW | BLOCKED | PW-049 | markdown lint/manual | docs
+
+## Section F — Docs / Source-of-Truth Backlog (75)
+
+- DS-001 | Docs source-of-truth | Refresh API deploy reality matrix baseline | LOW | BLOCKED | ST-023 | markdown lint/manual | docs
+- DS-002 | Docs source-of-truth | Refresh product direction one-page delta | LOW | BLOCKED | ST-024 | markdown lint/manual | docs
+- DS-003 | Docs source-of-truth | Update O7 restore drill appendix links | LOW | BLOCKED | ST-025 | markdown lint/manual | docs
+- DS-004 | Docs source-of-truth | Add founder verification path clarifier | LOW | BLOCKED | DS-001 | markdown lint/manual | docs
+- DS-005 | Docs source-of-truth | Update launch gate checklist references | LOW | BLOCKED | DS-001 | markdown lint/manual | docs
+- DS-006 | Docs source-of-truth | Update production reality matrix signals | LOW | BLOCKED | DS-001 | markdown lint/manual | docs
+- DS-007 | Docs source-of-truth | Add API public-health SHA tracking row | LOW | BLOCKED | DS-001 | markdown lint/manual | docs
+- DS-008 | Docs source-of-truth | Add status endpoint criteria clarifier | LOW | BLOCKED | DS-001 | markdown lint/manual | docs
+- DS-009 | Docs source-of-truth | Add root route acceptance criteria | LOW | BLOCKED | DS-001 | markdown lint/manual | docs
+- DS-010 | Docs source-of-truth | Add waitlist route acceptance criteria | LOW | BLOCKED | DS-001 | markdown lint/manual | docs
+- DS-011 | Docs source-of-truth | Add demo route acceptance criteria | LOW | BLOCKED | DS-001 | markdown lint/manual | docs
+- DS-012 | Docs source-of-truth | Add login route acceptance criteria | LOW | BLOCKED | DS-001 | markdown lint/manual | docs
+- DS-013 | Docs source-of-truth | Add dashboard route acceptance criteria | LOW | BLOCKED | DS-001 | markdown lint/manual | docs
+- DS-014 | Docs source-of-truth | Consolidate public route smoke sources | LOW | BLOCKED | DS-009 | markdown lint/manual | docs
+- DS-015 | Docs source-of-truth | Add no-secret regression index doc | LOW | BLOCKED | DS-014 | markdown lint/manual | docs
+- DS-016 | Docs source-of-truth | Add mutation RL source index doc | LOW | BLOCKED | DS-014 | markdown lint/manual | docs
+- DS-017 | Docs source-of-truth | Add Stripe dedup source index doc | LOW | BLOCKED | DS-014 | markdown lint/manual | docs
+- DS-018 | Docs source-of-truth | Add Playwright smoke source index doc | LOW | BLOCKED | DS-014 | markdown lint/manual | docs
+- DS-019 | Docs source-of-truth | Add restore drill source index doc | LOW | BLOCKED | DS-014 | markdown lint/manual | docs
+- DS-020 | Docs source-of-truth | Add source-of-truth ownership table | LOW | BLOCKED | DS-014 | markdown lint/manual | docs
+- DS-021 | Docs source-of-truth | Add doc freshness SLA notes | LOW | BLOCKED | DS-020 | markdown lint/manual | docs
+- DS-022 | Docs source-of-truth | Add doc update checklist template | LOW | BLOCKED | DS-021 | markdown lint/manual | docs
+- DS-023 | Docs source-of-truth | Add doc review cadence table | LOW | BLOCKED | DS-021 | markdown lint/manual | docs
+- DS-024 | Docs source-of-truth | Add doc dependency map graph notes | LOW | BLOCKED | DS-020 | markdown lint/manual | docs
+- DS-025 | Docs source-of-truth | Add doc conflict resolution policy | LOW | BLOCKED | DS-023 | markdown lint/manual | docs
+- DS-026 | Docs source-of-truth | Add canonical route naming conventions | LOW | BLOCKED | DS-014 | markdown lint/manual | docs
+- DS-027 | Docs source-of-truth | Add CI workflow source references | LOW | BLOCKED | DS-020 | markdown lint/manual | docs
+- DS-028 | Docs source-of-truth | Add branch policy references | LOW | BLOCKED | DS-027 | markdown lint/manual | docs
+- DS-029 | Docs source-of-truth | Add release evidence checklist | LOW | BLOCKED | DS-027 | markdown lint/manual | docs
+- DS-030 | Docs source-of-truth | Add checkpoint summary template | LOW | BLOCKED | DS-029 | markdown lint/manual | docs
+- DS-031 | Docs source-of-truth | Add cumulative micro-task counter guide | LOW | BLOCKED | DS-030 | markdown lint/manual | docs
+- DS-032 | Docs source-of-truth | Add gate improvement tracking sheet docs | LOW | BLOCKED | DS-029 | markdown lint/manual | docs
+- DS-033 | Docs source-of-truth | Add prod SHA verification SOP | LOW | BLOCKED | DS-007 | markdown lint/manual | docs
+- DS-034 | Docs source-of-truth | Add actions status verification SOP | LOW | BLOCKED | DS-027 | markdown lint/manual | docs
+- DS-035 | Docs source-of-truth | Add test evidence capture SOP | LOW | BLOCKED | DS-029 | markdown lint/manual | docs
+- DS-036 | Docs source-of-truth | Add commit hygiene checklist | LOW | BLOCKED | DS-029 | markdown lint/manual | docs
+- DS-037 | Docs source-of-truth | Add safe-slice definition examples | LOW | BLOCKED | DS-036 | markdown lint/manual | docs
+- DS-038 | Docs source-of-truth | Add blocker escalation playbook | LOW | BLOCKED | DS-036 | markdown lint/manual | docs
+- DS-039 | Docs source-of-truth | Add branch drift handling SOP | LOW | BLOCKED | DS-034 | markdown lint/manual | docs
+- DS-040 | Docs source-of-truth | Add read-only prod checks SOP | LOW | BLOCKED | DS-033 | markdown lint/manual | docs
+- DS-041 | Docs source-of-truth | Add no-final-report gate reminder | LOW | BLOCKED | DS-030 | markdown lint/manual | docs
+- DS-042 | Docs source-of-truth | Add resume prompt quality checklist | LOW | BLOCKED | DS-030 | markdown lint/manual | docs
+- DS-043 | Docs source-of-truth | Add session handoff consistency rules | LOW | BLOCKED | DS-042 | markdown lint/manual | docs
+- DS-044 | Docs source-of-truth | Add docs lint command quick reference | LOW | BLOCKED | DS-022 | markdown lint/manual | docs
+- DS-045 | Docs source-of-truth | Add markdown style normalization notes | LOW | BLOCKED | DS-044 | markdown lint/manual | docs
+- DS-046 | Docs source-of-truth | Add i18n docs consistency checklist | LOW | BLOCKED | DS-022 | markdown lint/manual | docs
+- DS-047 | Docs source-of-truth | Add security docs cross-link pass | LOW | BLOCKED | DS-015 | markdown lint/manual | docs
+- DS-048 | Docs source-of-truth | Add observability docs cross-link pass | LOW | BLOCKED | DS-027 | markdown lint/manual | docs
+- DS-049 | Docs source-of-truth | Add restore drill incident links | LOW | BLOCKED | DS-003 | markdown lint/manual | docs
+- DS-050 | Docs source-of-truth | Add founder-facing summary extract | LOW | BLOCKED | DS-002 | markdown lint/manual | docs
+- DS-051 | Docs source-of-truth | Add product direction assumptions list | LOW | BLOCKED | DS-002 | markdown lint/manual | docs
+- DS-052 | Docs source-of-truth | Add de-risked next slices table | LOW | BLOCKED | DS-002 | markdown lint/manual | docs
+- DS-053 | Docs source-of-truth | Add API matrix stale-data warning | LOW | BLOCKED | DS-006 | markdown lint/manual | docs
+- DS-054 | Docs source-of-truth | Add API matrix verification cadence | LOW | BLOCKED | DS-006 | markdown lint/manual | docs
+- DS-055 | Docs source-of-truth | Add API matrix source links | LOW | BLOCKED | DS-006 | markdown lint/manual | docs
+- DS-056 | Docs source-of-truth | Add API matrix test mapping notes | LOW | BLOCKED | DS-001 | markdown lint/manual | docs
+- DS-057 | Docs source-of-truth | Add docs changelog section template | LOW | BLOCKED | DS-022 | markdown lint/manual | docs
+- DS-058 | Docs source-of-truth | Add docs QA acceptance checklist | LOW | BLOCKED | DS-022 | markdown lint/manual | docs
+- DS-059 | Docs source-of-truth | Add docs QA command references | LOW | BLOCKED | DS-058 | markdown lint/manual | docs
+- DS-060 | Docs source-of-truth | Add docs release note extraction guide | LOW | BLOCKED | DS-057 | markdown lint/manual | docs
+- DS-061 | Docs source-of-truth | Add docs risk annotation standard | LOW | BLOCKED | DS-057 | markdown lint/manual | docs
+- DS-062 | Docs source-of-truth | Add docs dependency notation standard | LOW | BLOCKED | DS-057 | markdown lint/manual | docs
+- DS-063 | Docs source-of-truth | Add docs status notation standard | LOW | BLOCKED | DS-057 | markdown lint/manual | docs
+- DS-064 | Docs source-of-truth | Add docs verification notation standard | LOW | BLOCKED | DS-057 | markdown lint/manual | docs
+- DS-065 | Docs source-of-truth | Add docs commit scope notation standard | LOW | BLOCKED | DS-057 | markdown lint/manual | docs
+- DS-066 | Docs source-of-truth | Add backlog factory generation policy | LOW | BLOCKED | DS-052 | markdown lint/manual | docs
+- DS-067 | Docs source-of-truth | Add backlog factory category taxonomy | LOW | BLOCKED | DS-066 | markdown lint/manual | docs
+- DS-068 | Docs source-of-truth | Add backlog factory intake checklist | LOW | BLOCKED | DS-066 | markdown lint/manual | docs
+- DS-069 | Docs source-of-truth | Add backlog factory quality gates | LOW | BLOCKED | DS-066 | markdown lint/manual | docs
+- DS-070 | Docs source-of-truth | Add backlog factory anti-patterns list | LOW | BLOCKED | DS-066 | markdown lint/manual | docs
+- DS-071 | Docs source-of-truth | Add worklog entry minimum schema | LOW | BLOCKED | DS-030 | markdown lint/manual | docs
+- DS-072 | Docs source-of-truth | Add worklog evidence wording guide | LOW | BLOCKED | DS-071 | markdown lint/manual | docs
+- DS-073 | Docs source-of-truth | Add checkpoint response contract | LOW | BLOCKED | DS-030 | markdown lint/manual | docs
+- DS-074 | Docs source-of-truth | Add session resume verification checklist | LOW | BLOCKED | DS-042 | markdown lint/manual | docs
+- DS-075 | Docs source-of-truth | Add autonomous system quarterly review note | LOW | BLOCKED | DS-023 | markdown lint/manual | docs
+
+## Totals
+
+- Total tasks: 300
+- Ready now: 25 (all `LOW` risk)
+- Remaining backlog: 275
