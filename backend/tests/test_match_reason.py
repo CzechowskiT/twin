@@ -42,5 +42,13 @@ def test_build_match_reason_never_overclaims_evidence_or_outcomes() -> None:
         locale="en",
     )
     lowered = reason.lower()
-    forbidden = ("evidence-backed", "guaranteed", "guarantee", "interview guaranteed", "kyc")
+    forbidden = (
+        "evidence-backed",
+        "guaranteed",
+        "guarantee",
+        "interview guaranteed",
+        "kyc",
+        "kyc-approved",
+        "employer-validated",
+    )
     assert all(word not in lowered for word in forbidden)

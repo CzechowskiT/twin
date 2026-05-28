@@ -44,6 +44,23 @@ Each evidence-backed skill record should include:
 - `review_status`: `auto_detected | candidate_confirmed | reviewer_confirmed | rejected`.
 - `verification_label`: constrained label that must stay non-verified unless backed.
 
+### Evidence metadata shape (minimal, schema-level)
+
+Required metadata fields for each skill-evidence row:
+
+- `skill_name`
+- `declared_by_candidate`
+- `evidence_type`
+- `evidence_source`
+- `evidence_visibility`
+- `evidence_confidence`
+- `evidence_status`
+- `last_seen_at` / `observed_at`
+- `privacy_class`
+- `allowed_usage`
+
+`allowed_usage` should explicitly gate where evidence can be used, e.g. `ranking_only`, `candidate_feedback`, `recruiter_summary`, `internal_audit`.
+
 ### Provenance contract (HB-E007)
 
 Each `evidence_sources[]` entry should carry immutable provenance fields:
@@ -125,6 +142,9 @@ Do not claim verification without evidence.
 
 - Any UI/API wording that implies "verified skill" must be gated by evidence presence and review state.
 - Unsupported skills remain declared-only and must not be promoted in explanations as verified.
+- This model is not full KYC and not employer-certified verification.
+- "Evidence-backed" means supported by candidate-provided or candidate-declared artifacts; it is not legal/identity certification.
+- Terms like "verified", "KYC-approved", or "employer-validated" are forbidden unless a future dedicated verification provider/review workflow is implemented.
 
 ## Current codebase alignment (2026-05-28)
 
