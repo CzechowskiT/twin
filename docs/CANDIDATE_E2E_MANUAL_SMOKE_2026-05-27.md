@@ -43,5 +43,5 @@ Zakres tylko odczyt/bezpieczne UI. Zero scrape/manual apply/auto-apply.
 
 | Data (UTC) | Operator | Konto testowe | Login | Dashboard | Consent | Kalendarz | Public health | 500 errors | Wynik koncowy | Dowod (screen/link) | Uwagi |
 | ---------- | -------- | ------------- | ----- | --------- | ------- | --------- | ------------- | ---------- | ------------- | ------------------- | ----- |
-| _pending_ | founder | pilot-test | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | _pending_ | Pierwszy manualny smoke jeszcze niewykonany |
+| 2026-05-27 | founder | pilot-test | PASS | PASS | PASS | PASS | PASS | PASS | PASS | Founder manually verified production candidate flow: dashboard Top 20/feed → Not relevant/Nietrafione → refresh → same offer did not return. | No auto-apply clicked. No real application sent. No scrape triggered. |
 

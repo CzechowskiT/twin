@@ -125,8 +125,9 @@ Warning: this check is non-destructive; do **not** run `alembic upgrade` manuall
 
 ### Candidate E2E manual gate
 
-- Execute `docs/CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md`.
-- Mark gate PASS only after founder fills the result row with evidence.
+- Status: **PASS** (founder-verified, 2026-05-27).
+- Evidence: "Founder manually verified production candidate flow: dashboard Top 20/feed → Not relevant/Nietrafione → refresh → same offer did not return."
+- Warning: "No auto-apply clicked. No real application sent. No scrape triggered."
 
 ## Hard bans honoured
 

@@ -47,7 +47,7 @@ Legend: **LIVE** = verified on prod this session · **PARTIAL** = shipped but ga
 | Postgres | `db_ok=true` | **LIVE** |
 | Backup restore drill | O7 gate | **BLOCKED** — drill evidence still pending in log |
 | Controlled pilot ops | pilot manual + tracker | **LIVE** process |
-| Candidate E2E manual smoke | `docs/CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md` | **PENDING** — founder execution required |
+| Candidate E2E manual smoke | `docs/CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md` | **LIVE** — PASS (founder-verified, 2026-05-27); "Founder manually verified production candidate flow: dashboard Top 20/feed → Not relevant/Nietrafione → refresh → same offer did not return." Warning kept: "No auto-apply clicked. No real application sent. No scrape triggered." |
 | Playwright smoke drift points | `frontend/e2e/smoke.spec.ts` targeted assertions | **STABILIZED** locally (4/4 targeted checks pass) |
 | Public launch announcement | gate checklist | **BLOCKED** |
 | Investor demo | `INVESTOR_DEMO_RUNBOOK.md` | **LIVE** stack, curated use |

@@ -94,6 +94,7 @@
 | T+0:04 | 56 | `public-health` reports `git_commit=67a22dc` (not yet caught up to `72a77af`) |
 | T+0:20 | 61 | WS1: added dedup edge tests (payload drift replay, unhandled replay short-circuit, malformed signed payload) |
 | T+0:22 | 62 | Targeted pytest green (`14 passed`) for webhook dedup + signature suites |
+| 2026-05-27 | 63 | Founder candidate manual E2E gate marked PASS; evidence and warning recorded in release docs |
 
 ### Micro-task log (session 4)
 
@@ -110,8 +111,9 @@
 | 9 | WS1 | Add malformed signed payload reject test | ✅ |
 | 10 | WS1 | Run focused Stripe webhook pytest suites | ✅ |
 | 11 | WS1 | Verify lints for touched Stripe tests + worklog | ✅ |
+| 12 | WS11 | Record founder Candidate E2E PASS in release documentation | ✅ |
 
-**Cumulative micro-tasks (sessions 2+3+4):** 62
+**Cumulative micro-tasks (sessions 2+3+4):** 63
 
 ---
 
