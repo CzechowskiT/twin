@@ -136,6 +136,7 @@ export type TranslationKey =
   | `demo.${keyof typeof en.demo}`
   | `first1000.${keyof typeof en.first1000}`
   | `ux.${keyof typeof en.ux}`
+  | `verifiedReadiness.${keyof typeof en.verifiedReadiness}`
   | `employerMedia.${keyof typeof EMPLOYER_MEDIA_MESSAGES_EN}`
   | `jobEmployer.${keyof typeof JOB_EMPLOYER_MESSAGES_EN}`
   | `jobBoard.${keyof typeof JOB_BOARD_MESSAGES_EN}`
@@ -2798,6 +2799,50 @@ const en = {
     apiErrorGeneric: "Something went wrong. Try again in a moment.",
     apiErrorSession: "Your session expired — sign in again.",
     apiErrorNetwork: "We could not reach the server. Check your connection and try again.",
+  },
+  verifiedReadiness: {
+    title: "Readiness checklist",
+    lead:
+      "What TWIN needs before delegated applications could be considered. This is a profile and consent checklist — not legal identity verification.",
+    disclaimer:
+      "Delegated apply is not enabled in this environment. A human review may still be required even when items look complete.",
+    statusLabel: "Status",
+    checklistTitle: "Checklist",
+    missingTitle: "Still needed",
+    loadFailed: "Readiness checklist is temporarily unavailable — the rest of your dashboard still works.",
+    delegatedBlocked:
+      "Delegated applications are blocked here. Complete the items above; submit stays off until the product enables it.",
+    preparePackageNote:
+      "You may be able to prepare an application package for review — submitting on your behalf is still disabled.",
+    statusUnverified: "Not started",
+    statusProfileIncomplete: "Profile incomplete",
+    statusConsentMissing: "Consent missing",
+    statusCvMissing: "CV missing",
+    statusCareerBriefMissing: "Career brief missing",
+    statusSkillEvidenceMissing: "Skill evidence missing",
+    statusReadyForReview: "Ready for review",
+    statusVerifiedBasic: "Baseline verified (review)",
+    statusDelegatedApplyEnabled: "Delegated apply configured (submit still gated)",
+    statusSuspended: "Suspended",
+    statusUnknown: "Status: {status}",
+    checkProfile: "Profile basics",
+    checkCv: "CV material",
+    checkCareerBrief: "Career brief (compass)",
+    checkSkillEvidence: "Skill evidence baseline",
+    checkConsentGeneral: "Required consent",
+    checkConsentStorage: "Storage / CV processing consent",
+    missingProfile: "Complete profile",
+    missingConsentGeneral: "Review consent",
+    missingConsentStorage: "Storage consent",
+    missingCv: "Add CV",
+    missingCareerBrief: "Career compass",
+    missingSkillEvidence: "CV insights / evidence",
+    missingGeneric: "Complete requirement",
+    blockMissingRequiredConsent: "Required consent is missing.",
+    blockMissingStorageConsent: "Storage consent for CV/documents is missing.",
+    blockMissingCvMaterial: "CV material is missing.",
+    blockMissingCareerBrief: "Career brief is missing.",
+    blockGeneric: "A requirement is not met yet.",
   },
   common: {
     language: "Language",
@@ -5493,6 +5538,51 @@ const pl: MessageTree = {
     apiErrorGeneric: "Coś poszło nie tak. Spróbuj za chwilę.",
     apiErrorSession: "Sesja wygasła — zaloguj się ponownie.",
     apiErrorNetwork: "Brak połączenia z serwerem. Sprawdź sieć i spróbuj ponownie.",
+  },
+  verifiedReadiness: {
+    title: "Lista gotowości",
+    lead:
+      "Czego TWIN potrzebuje, zanim rozważymy aplikacje w Twoim imieniu. To checklista profilu i zgód — nie weryfikacja tożsamości prawnej.",
+    disclaimer:
+      "Aplikacje delegowane nie są włączone w tym środowisku. Nawet przy uzupełnionych polach może być potrzebna ręczna weryfikacja.",
+    statusLabel: "Status",
+    checklistTitle: "Checklista",
+    missingTitle: "Do uzupełnienia",
+    loadFailed:
+      "Lista gotowości jest chwilowo niedostępna — reszta panelu działa normalnie.",
+    delegatedBlocked:
+      "Aplikacje delegowane są tutaj zablokowane. Uzupełnij pozycje powyżej — wysyłka pozostaje wyłączona, dopóki produkt tego nie włączy.",
+    preparePackageNote:
+      "Możesz przygotować pakiet aplikacyjny do przeglądu — wysyłka w Twoim imieniu nadal jest wyłączona.",
+    statusUnverified: "Nie rozpoczęto",
+    statusProfileIncomplete: "Profil niekompletny",
+    statusConsentMissing: "Brak zgód",
+    statusCvMissing: "Brak CV",
+    statusCareerBriefMissing: "Brak briefu kariery",
+    statusSkillEvidenceMissing: "Brak dowodów umiejętności",
+    statusReadyForReview: "Gotowe do przeglądu",
+    statusVerifiedBasic: "Zweryfikowany baseline (przegląd)",
+    statusDelegatedApplyEnabled: "Delegowane skonfigurowane (wysyłka nadal zablokowana)",
+    statusSuspended: "Zawieszone",
+    statusUnknown: "Status: {status}",
+    checkProfile: "Podstawy profilu",
+    checkCv: "Materiał CV",
+    checkCareerBrief: "Brief kariery (kompas)",
+    checkSkillEvidence: "Baseline dowodów umiejętności",
+    checkConsentGeneral: "Wymagana zgoda",
+    checkConsentStorage: "Zgoda na przechowywanie / przetwarzanie CV",
+    missingProfile: "Uzupełnij profil",
+    missingConsentGeneral: "Przejrzyj zgody",
+    missingConsentStorage: "Zgoda na przechowanie",
+    missingCv: "Dodaj CV",
+    missingCareerBrief: "Kompas kariery",
+    missingSkillEvidence: "Insights CV / dowody",
+    missingGeneric: "Uzupełnij wymaganie",
+    blockMissingRequiredConsent: "Brakuje wymaganej zgody.",
+    blockMissingStorageConsent: "Brakuje zgody na przechowywanie CV/dokumentów.",
+    blockMissingCvMaterial: "Brakuje materiału CV.",
+    blockMissingCareerBrief: "Brakuje briefu kariery.",
+    blockGeneric: "Wymaganie nie jest jeszcze spełnione.",
   },
   common: {
     language: "Język",

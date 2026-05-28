@@ -24,6 +24,7 @@ import { DashboardModals } from "@/components/dashboard/dashboard-modals";
 import { DevelopmentFocusSection } from "@/components/dashboard/development-focus-section";
 import { JobsSection } from "@/components/dashboard/jobs-section";
 import { MatchesSection } from "@/components/dashboard/matches-section";
+import { DashboardVerifiedReadinessCard } from "@/components/dashboard/dashboard-verified-readiness-card";
 import { ProfileScrapePanel } from "@/components/dashboard/profile-scrape-panel";
 import { useDashboardApplicationActions } from "@/hooks/dashboard/use-dashboard-application-actions";
 import { useDashboardCalendarActions } from "@/hooks/dashboard/use-dashboard-calendar-actions";
@@ -253,6 +254,7 @@ export default function DashboardPage() {
 
       <WorkspaceFlowSteps current="dashboard" className="mb-4 sm:mb-6" />
       <ProfileCompletenessHint profile={profile} />
+      {user ? <DashboardVerifiedReadinessCard /> : null}
 
       {user ? <EmailVerificationBanner /> : null}
       {user ? <NightlyAutoApplyStrip /> : null}

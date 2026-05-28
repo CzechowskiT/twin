@@ -96,6 +96,11 @@ test.describe("dashboard smoke (read-only, no live actions)", () => {
     // PII should never be visible without an authenticated session.
     expect(bodyText).not.toMatch(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
     expect(bodyText).not.toMatch(/(?:\+?\d[\d\s().-]{8,}\d)/);
+    // Readiness card must not appear logged-out (no checklist leak).
+    expect(lowerBody).not.toMatch(/readiness checklist|lista gotowości/i);
+    expect(lowerBody).not.toMatch(
+      /apply now|auto apply|submit application|kyc verified|guaranteed interview|fully verified/i,
+    );
   });
 
   test("/register/candidate shows email + password inputs (no submit)", async ({ page }) => {

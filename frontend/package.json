@@ -10,6 +10,7 @@
     "test:cookie-consent": "npx --yes tsx scripts/cookie-consent-parse.test.ts",
     "test:analytics-consent": "npx --yes tsx scripts/analytics-consent-default-denied.test.ts",
     "test:security-headers": "npx --yes tsx scripts/security-headers.test.ts",
+    "test:verified-readiness-guard": "npx --yes tsx scripts/verified-readiness-guard.test.ts",
     "test:pricing-locale": "npx --yes tsx scripts/pricing-locale.test.ts",
     "test:investor-calculator": "npx --yes tsx scripts/investor-calculator-model.test.ts",
     "test:b2b-roi-calculator": "npx --yes tsx scripts/b2b-roi-calculator-model.test.ts",
