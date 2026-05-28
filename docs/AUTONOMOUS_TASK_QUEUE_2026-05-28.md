@@ -8,7 +8,7 @@
 
 ## Section A — Immediate READY Batch (Low Risk, 25)
 
-- ST-001 | Stripe tests | Add duplicate-event fixture docs | LOW | READY | none | `pytest -k stripe_dedup` | docs+tests
+- ST-001 | Stripe tests | Add duplicate-event fixture docs | LOW | DONE | none | `pytest backend/tests/test_stripe_webhook_idempotency.py backend/tests/test_stripe_event_dedup_helpers.py` | docs+tests
 - ST-002 | Stripe tests | Add idempotency key naming conventions test | LOW | READY | ST-001 | `pytest -k idempotency` | tests
 - ST-003 | Stripe tests | Add webhook payload replay fixture | LOW | READY | ST-001 | `pytest -k webhook_replay` | tests
 - ST-004 | Stripe tests | Parametrize dedup timestamp edge tests | LOW | READY | ST-002 | `pytest -k dedup_timestamp` | tests

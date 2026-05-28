@@ -67,3 +67,33 @@
 - Targeted verification:
   - `pytest -k "public_get_never_leaks_secrets or public_mvp_stats_shape_empty" backend/tests/test_public_surfaces_no_secrets.py backend/tests/test_public_mvp_stats.py`
   - Result: `9 passed, 5 deselected`.
+
+### WS0 Catch-up Verification — CI/Production sync
+
+- Required Actions run check:
+  - `gh run view 26563467176 --json status,conclusion,headSha,displayTitle,url,createdAt,updatedAt`
+  - Result: `status=completed`, `conclusion=success`, `headSha=9bd1076a38fafad409203d86b29f1d1117ce38e9`
+  - URL: `https://github.com/CzechowskiT/twin/actions/runs/26563467176`
+- Read-only production checks:
+  - `GET /api/public-health` => HTTP `200`
+  - `GET /status` => HTTP `200`
+  - `GET /` => HTTP `200`
+  - `GET /waitlist` => HTTP `200`
+  - `GET /demo` => HTTP `200`
+  - `GET /login/candidate` => HTTP `200`
+  - `GET /dashboard` => HTTP `200`
+- Production SHA catch-up confirmation:
+  - `public-health.git_commit=9bd1076a38fafad409203d86b29f1d1117ce38e9`
+  - Status: production public-health SHA is caught up to `9bd1076`.
+
+### WS5 Micro-slice — ST-001 duplicate-event fixture docs
+
+- Added explicit replay fixture matrix documentation to
+  `backend/tests/test_stripe_webhook_idempotency.py` linking covered replay paths
+  (same payload, changed payload, malformed payload, unsupported signed events).
+- Added deterministic ledger conflict behavior coverage in
+  `backend/tests/test_stripe_event_dedup_helpers.py`:
+  `test_record_received_bubbles_non_table_integrity_conflict`.
+- Targeted verification:
+  - `pytest backend/tests/test_stripe_webhook_idempotency.py backend/tests/test_stripe_event_dedup_helpers.py`
+  - Result: `15 passed`.

@@ -3,6 +3,16 @@
 Exercises the ledger when `stripe_webhook_events` exists (SQLite
 `create_all` in tests). Production without migration still degrades
 via `stripe_events` helpers — see `test_stripe_event_dedup_helpers.py`.
+
+Replay fixture matrix for continuation slices:
+
+- duplicate event id, same payload body (`invoice.payment_succeeded`,
+  `checkout.session.completed`);
+- duplicate event id, changed payload body hash (same id, different object);
+- signed unsupported event replay (`customer.created`) is covered in
+  `test_stripe_webhook_signature.py`;
+- malformed signed payload coverage is in
+  `test_stripe_webhook_signature.py`.
 """
 
 from __future__ import annotations

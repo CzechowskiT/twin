@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import pytest
 from sqlalchemy import create_engine, text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
@@ -173,3 +174,22 @@ def test_mark_ignored_is_treated_as_processed(db_session: Session) -> None:
     persisted = db_session.query(StripeWebhookEvent).filter_by(event_id="evt_test_007").one()
     assert persisted.handler_status == stripe_events.STATUS_IGNORED
     assert persisted.processed_at is not None
+
+
+def test_record_received_bubbles_non_table_integrity_conflict(db_session: Session) -> None:
+    """Ledger conflict behavior is explicit: non-table integrity errors are not swallowed."""
+    original_flush = db_session.flush
+
+    def _raise_integrity_error(*args, **kwargs) -> None:  # noqa: ANN002, ANN003
+        raise IntegrityError("INSERT ...", {}, Exception("duplicate key value"))
+
+    db_session.flush = _raise_integrity_error  # type: ignore[method-assign]
+    try:
+        with pytest.raises(IntegrityError):
+            stripe_events.record_received(
+                db_session,
+                event_id="evt_test_conflict_001",
+                event_type="invoice.payment_succeeded",
+            )
+    finally:
+        db_session.flush = original_flush  # type: ignore[method-assign]
