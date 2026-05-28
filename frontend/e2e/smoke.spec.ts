@@ -15,7 +15,11 @@ test.describe("public smoke", () => {
 
   test("login hub loads candidate zone", async ({ page }) => {
     await page.goto("/login/candidate");
-    await expect(page.getByLabel(/email/i).first()).toBeVisible();
+    await page.waitForLoadState("domcontentloaded");
+    const emailField = page
+      .locator("input[type='email'], input[name='email'], input[autocomplete='email']")
+      .first();
+    await expect(emailField).toBeVisible();
     // Login variants can be password-first or provider/magic-link-first.
     // Keep smoke stable by requiring an email field + at least one
     // credential path control (password input or sign-in submit button).

@@ -303,3 +303,13 @@
   - Result: `13 passed, 19 deselected`.
   - `pytest -k secret_values backend/tests/test_stripe_webhook_idempotency.py`
   - Result: `1 passed, 18 deselected`.
+
+### WS19 Micro-slice — ST-022 login smoke stabilization
+
+- Hardened candidate login smoke selector in `frontend/e2e/smoke.spec.ts`:
+  moved from label-only targeting to a deterministic email input fallback set
+  (`type=email`, `name=email`, `autocomplete=email`) plus DOM-ready wait.
+- Kept flow read-only (no credential submit, no mutation calls).
+- Targeted verification:
+  - `cd frontend && npx playwright test -g login`
+  - Result: `2 passed`.
