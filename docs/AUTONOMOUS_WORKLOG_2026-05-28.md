@@ -391,3 +391,20 @@
 - Targeted verification:
   - `pytest -k invoice_payment_failed_replay backend/tests/test_stripe_webhook_idempotency.py -q`
   - Result: `1 passed, 20 deselected`.
+
+### WS26 Micro-slice — HB-A003 checkout.session.expired replay dedup
+
+- Added unhandled Stripe event payload helper in
+  `backend/tests/test_stripe_webhook_idempotency.py`:
+  `_checkout_session_expired_payload(event_id)`.
+- Added regression
+  `test_checkout_session_expired_replay_is_marked_ignored_and_deduped` to ensure:
+  - first `checkout.session.expired` delivery is accepted,
+  - replay with same `event.id` returns `replayed=true`,
+  - no business invoice/checkout handler dispatch occurs,
+  - dedup ledger row is stored as `event_type=checkout.session.expired` and
+    `handler_status=ignored`.
+- Updated queue status: `HB-A003` => `DONE`.
+- Targeted verification:
+  - `pytest -k checkout_session_expired_replay backend/tests/test_stripe_webhook_idempotency.py -q`
+  - Result: `1 passed, 21 deselected`.
