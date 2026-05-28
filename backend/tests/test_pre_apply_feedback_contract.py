@@ -8,6 +8,11 @@ from __future__ import annotations
 import json
 from typing import Any
 
+import pytest
+from pydantic import ValidationError
+
+from app.schemas.pre_apply_feedback import PreApplyFeedbackV1
+
 PRE_APPLY_FEEDBACK_VERSION = "pre_apply_feedback.v1"
 
 REQUIRED_TOP_LEVEL_KEYS = frozenset(
@@ -108,6 +113,28 @@ def test_sample_payload_version_and_enums() -> None:
     assert payload["confidence"] in ALLOWED_CONFIDENCE
     assert payload["apply_recommendation"] in ALLOWED_APPLY_RECOMMENDATION
     assert isinstance(payload["human_review_required"], bool)
+
+
+def test_sample_payload_validates_against_pydantic_schema() -> None:
+    payload = build_sample_pre_apply_feedback_v1()
+    model = PreApplyFeedbackV1.model_validate(payload)
+    assert model.version == PRE_APPLY_FEEDBACK_VERSION
+    assert model.evidence_notes.verification_claims == "none"
+
+
+@pytest.mark.parametrize(
+    ("field", "bad_value"),
+    (
+        ("confidence", "very_high"),
+        ("apply_recommendation", "ship_now"),
+        ("version", "pre_apply_feedback.v2"),
+    ),
+)
+def test_invalid_enum_like_values_fail_validation(field: str, bad_value: str) -> None:
+    payload = build_sample_pre_apply_feedback_v1()
+    payload[field] = bad_value
+    with pytest.raises(ValidationError):
+        PreApplyFeedbackV1.model_validate(payload)
 
 
 def test_sample_payload_has_no_forbidden_phrases_in_user_facing_text() -> None:

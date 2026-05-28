@@ -118,7 +118,7 @@ Example (safe sample — no PII, no overclaim):
 }
 ```
 
-Contract tests live in `backend/tests/test_pre_apply_feedback_contract.py` (scaffolding only; does not prove a production API exists).
+Contract tests live in `backend/tests/test_pre_apply_feedback_contract.py` and schema mirror in `backend/app/schemas/pre_apply_feedback.py` (both scaffolding only; do not prove a production API exists).
 
 ## Required content blocks
 
