@@ -29,9 +29,10 @@ export function CalendarWeekView({
 }: CalendarWeekViewProps) {
   const { t, locale } = useTranslation();
   const loc = locale === "pl" ? "pl-PL" : "en-US";
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const weekEnd = addDays(weekStart, 6);
-  const rangeLabel = `${weekStart.toLocaleDateString(loc, { month: "short", day: "numeric" })} – ${weekEnd.toLocaleDateString(loc, { month: "short", day: "numeric", year: "numeric" })}`;
-  const byDay = eventsByDay(events, weekStart, loc);
+  const rangeLabel = `${weekStart.toLocaleDateString(loc, { month: "short", day: "numeric", timeZone })} – ${weekEnd.toLocaleDateString(loc, { month: "short", day: "numeric", year: "numeric", timeZone })}`;
+  const byDay = eventsByDay(events, weekStart, loc, timeZone);
   const hasAny = events.length > 0;
 
   return (
