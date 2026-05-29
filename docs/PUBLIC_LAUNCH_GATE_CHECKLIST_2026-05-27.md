@@ -147,9 +147,10 @@ Warning: this check is non-destructive; do **not** run `alembic upgrade` manuall
 
 ### O7 backup / restore drill (founder-only)
 
-- Status: **PENDING EVIDENCE** (2026-05-29).
-- Operator review: runbook + PASS criteria updated; **no staging restore executed** (no Railway staging creds in agent session; HARD BAN: no prod restore/mutation).
+- Status: **PENDING EVIDENCE** (2026-05-29 batch 3).
+- Operator review: runbook + PASS criteria updated; **no staging restore executed** (Railway CLI absent in agent session; HARD BAN: no prod restore/mutation).
 - Prod baseline (read-only): `GET /api/public-health` → `db_ok=true`, `git_commit=df15618` (not substitute for restore evidence).
+- Session evidence: `docs/RELEASE_GATE_O7_S2_VERIFICATION_2026-05-29.md`.
 - Flip to ✅ only when `docs/BACKUP_RESTORE_DRILL_LOG.md` has one **PASS** row meeting all criteria in `docs/RUNBOOK_DB_RESTORE_2026-05-27.md` § O7 PASS criteria.
 
 Reference steps: `docs/BACKUP_RESTORE_DRILL_LOG.md` § Founder action checklist.
