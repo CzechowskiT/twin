@@ -2,7 +2,7 @@
 
 **Target:** `https://twin-sooty.vercel.app` (prod alias)  
 **Method:** Playwright viewport script (unauthenticated) + HTTP status + `e2e/smoke.spec.ts` against prod  
-**Auth dashboard subpages:** not fully exercised (no credentials in agent session).
+**Auth dashboard subpages:** not exercised by Playwright (no credentials in agent session). Founder authenticated template **2026-05-29: PENDING** (empty paste — see evidence doc).
 
 ## Viewports
 
@@ -27,11 +27,20 @@ Legend: ✅ = HTTP OK + no document horizontal scroll at viewport.
 
 ## Authenticated routes (founder manual)
 
-| Route | Status | Notes |
-| ----- | ------ | ----- |
-| `/dashboard` | **PENDING** | Requires session; use `docs/CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md` |
-| `/dashboard/*` subpages | **PENDING** | Rail layout — verify at 1440/1280/1024/mobile with real account |
-| `/workspace/candidate/jobs` (logged in) | **PENDING** | Discovery shell — founder visual pass |
+Evidence owner: `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md`. **Do not mark PASS** until founder fills per-route results + viewport notes.
+
+| Route | Responsive (1440/1280/1024/mobile) | Functional / copy | Notes |
+| ----- | ---------------------------------- | ------------------- | ----- |
+| `/dashboard` | **PENDING** | **PENDING** | 2026-05-29 template empty |
+| `/dashboard/billing` | **PENDING** | **PENDING** | |
+| `/dashboard/settings/auto-apply` | **PENDING** | **PENDING** | No Run now / live sweep click |
+| `/dashboard/identity` | **PENDING** | **PENDING** | No KYC overclaim |
+| `/dashboard/career` | **PENDING** | **PENDING** | |
+| `/dashboard/calendar` | **PENDING** | **PENDING** | Integrations + empty week UX |
+| `/workspace/candidate/jobs` (logged in) | **PENDING** | **PENDING** | Discovery shell |
+| `/profile` | **PENDING** | **PENDING** | |
+| Readiness blocks auto-apply when incomplete | — | **PENDING** | Founder safety row |
+| No live delegated/KYC/guaranteed apply copy | — | **PENDING** | Founder safety row |
 
 ## Playwright prod smoke (2026-05-29)
 
@@ -41,4 +50,4 @@ Legend: ✅ = HTTP OK + no document horizontal scroll at viewport.
 ## Verdict
 
 - **Public/unauth responsive:** **PASS** (no h-scroll on checked routes).
-- **Authenticated dashboard responsive:** **PENDING** founder credentials.
+- **Authenticated dashboard responsive + functional:** **PENDING — AWAITING FOUNDER INPUT** (2026-05-29; empty smoke template).

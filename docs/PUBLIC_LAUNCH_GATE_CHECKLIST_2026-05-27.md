@@ -90,8 +90,9 @@ the gate to ✅.
 
 - **Controlled pilot GO:** **YES** (pilot gates remain green; O7 does not block controlled pilot operation).
 - **Investor/CTO demo GO:** **YES** (curated demo remains allowed with explicit no-launch posture).
-- **Public launch GO:** **NO-GO** while any of `S2`, `S5`, `O7`, `S11` blockers or unknowns remain.
+- **Public launch GO:** **NO-GO** while any of `S2`, `S5`, `O7`, `S11`, **P6** blockers or unknowns remain.
 - **S5 prod revision:** **UNKNOWN** — founder SQL handoff was literal `PASTE_RESULT_HERE` (not a revision). Re-run read-only SQL and paste real `version_num` into `docs/ALEMBIC_050_FOUNDER_VERIFICATION_2026-05-29.md` § Evidence log. **Do not** run `alembic upgrade` until revision is known and migration is founder-approved.
+- **P6 founder authenticated smoke:** **PENDING — AWAITING FOUNDER INPUT** (empty paste 2026-05-29; do not invent PASS).
 
 ## What "launch" means in this checklist
 
