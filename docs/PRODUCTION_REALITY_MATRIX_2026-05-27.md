@@ -32,7 +32,7 @@
 | ICS / WebCal export | product docs | **REPO** / partial |
 | Stripe Checkout | `stripe_checkout_ready` | **LIVE** |
 | Stripe webhook signature | tests + billing route | **LIVE** |
-| Stripe webhook dedup ledger | `050` migration + `billing.py` | **PARTIAL** — Alembic `050` on prod not yet founder-confirmed via SQL/`alembic current` evidence |
+| Stripe webhook dedup ledger | `050` migration + `billing.py` | **PARTIAL** — prod `alembic_version` **UNKNOWN** (2026-05-29: founder paste was placeholder `PASTE_RESULT_HERE`; table `stripe_webhook_events` existence not confirmed) |
 | Beta waitlist signup | rate limit + contract tests | **LIVE** |
 | CV / voice upload limits | `ff22f3a` | **LIVE** |
 | CSP report-only + sink | S1 gate, `/api/v1/csp-report` | **LIVE** |
@@ -54,7 +54,8 @@
 | Postgres | `db_ok=true` | **LIVE** |
 | Backup restore drill | O7 gate | **BLOCKED** — drill evidence still pending in `BACKUP_RESTORE_DRILL_LOG.md` |
 | Controlled pilot ops | pilot manual + tracker | **LIVE** process |
-| Candidate E2E manual smoke | `docs/CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md` | **LIVE** — PASS (founder-verified, 2026-05-27); "Founder manually verified production candidate flow: dashboard Top 20/feed → Not relevant/Nietrafione → refresh → same offer did not return." Warning kept: "No auto-apply clicked. No real application sent. No scrape triggered." |
+| Candidate E2E manual smoke | `docs/CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md` | **LIVE** — PASS (founder-verified, 2026-05-27); Top 20 → Nietrafione → refresh regression. Warning: no auto-apply / real apply / scrape. |
+| Founder authenticated route smoke (dashboard subpages, jobs, profile, safety copy) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **PENDING** — template received 2026-05-29 with **no filled route rows**; not PASS |
 | Playwright smoke drift points | `frontend/e2e/smoke.spec.ts` targeted assertions | **STABILIZED** locally (most recent targeted lane green in prior session) |
 | Public launch announcement | gate checklist | **BLOCKED** |
 | Investor demo | `INVESTOR_DEMO_RUNBOOK.md` | **LIVE** stack, curated use |
@@ -79,10 +80,11 @@
 | API runtime SHA | `df15618` visible on `public-health` | **LIVE** |
 | Frontend Vercel SHA | `89ff454` / `dpl_5SK5YWGzzWtQTDULPm2kAx9qrdB9` (founder-known) | **LIVE** (not re-queried via CLI) |
 | Branch HEAD | `89ff454` | **REPO** may be ahead/behind FE deploy — verify before FE-only claims |
-| Stripe dedup migration `050` | Migration in repo; prod `alembic_version` **UNKNOWN** | **NEEDS EVIDENCE** — see `docs/ALEMBIC_050_FOUNDER_VERIFICATION_2026-05-29.md` |
+| Stripe dedup migration `050` | Migration in repo; prod `alembic_version` **UNKNOWN** (placeholder paste, not `050`/`049`) | **NEEDS EVIDENCE** — founder re-paste real `version_num`; if `049` or older → follow `docs/STRIPE_DEDUP_MIGRATION_RUNBOOK_2026-05-27.md` § Founder-approved action plan (no agent-run migration) |
 | CSP mode | `content-security-policy-report-only` on `/` and `/dashboard` (2026-05-29 curl) | **LIVE REPORT-ONLY** |
 | CSP enforce | No enforce header; S2 checklist not met | **BLOCKED BY POLICY** |
 | Delegated / KYC apply | Product gates | **NOT LIVE** |
+| Founder authenticated smoke (2026-05-29) | evidence doc | **NEEDS EVIDENCE** — do not treat empty template as PASS |
 
 ---
 

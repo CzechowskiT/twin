@@ -28,7 +28,7 @@ the gate to ✅.
 | S2 | CSP enforce-mode has been live for ≥72h with 0 unexpected violations    | Read `docs/P1_CSP_ENFORCEMENT_PLAN_2026-05-27.md` § "Risk gates" — all 4 sub-conditions met     | ❌ NOT YET (REPORT-ONLY only; founder must not flip enforce before checklist gates) |
 | S3 | Authenticated mutation rate-limit Layer 2 live on LLM endpoints         | `git show 28a50a0 --stat`                                                                       | ✅ shipped   |
 | S4 | Public CV / voice upload endpoints rate-limited                        | `docs/P1_UPLOAD_RATE_LIMITS_2026-05-27.md`; `ff22f3a`                                            | ✅ shipped   |
-| S5 | Stripe `event.id` dedup live (migration + handler patch)                | Handler: `billing.py`; migration: `050` — PASS only when prod revision is explicitly confirmed (`alembic current` or SQL `SELECT version_num FROM alembic_version;`) | 🟡 pending Alembic `050` confirmation on prod |
+| S5 | Stripe `event.id` dedup live (migration + handler patch)                | Handler: `billing.py`; migration: `050` — PASS only when prod revision is explicitly confirmed (`alembic current` or SQL `SELECT version_num FROM alembic_version;`) | 🟡 **UNKNOWN** — founder handoff returned placeholder `PASTE_RESULT_HERE` (2026-05-29); real `version_num` still required |
 | S6 | Auto-apply sweep gate covered by 10+ tests                              | `pytest tests/test_auto_apply_trigger_sweep_admin_gate.py -q`                                   | ✅ shipped   |
 | S7 | Public health surface frozen by regression tests                        | `pytest tests/test_public_health_regression.py -q`                                              | ✅ shipped   |
 | S8 | No secrets in repo (`.env*` ignored, no API keys in code/docs)          | `gh secret list` + `git grep -E 'sk_(live\|test)\|AKIA'`                                         | ✅ verified one-shot today; re-run before launch |
@@ -74,6 +74,7 @@ the gate to ✅.
 | P3 | Pilot offer copy reviewed                                               | `docs/PILOT_OFFER_FINAL.md`, `PILOT_OFFER_COPY_PL.md`                                            | ✅           |
 | P4 | Pilot pricing model verified                                            | `docs/B2B_*` / pricing docs                                                                      | ✅           |
 | P5 | Pilot kill-switch (`SCRAPE_OPS_*` / feature flags) tested                | `pytest tests/test_auto_apply_trigger_sweep_admin_gate.py -q`                                   | ✅           |
+| P6 | Founder authenticated prod smoke (dashboard subpages, jobs, profile, safety copy) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` — PASS only when every route + safety row has explicit founder PASS | ❌ **PENDING** (2026-05-29: empty template / `PASTE HERE` only) |
 
 ## Decision matrix
 
@@ -85,12 +86,12 @@ the gate to ✅.
 | One ⚠️ partial on L6 (data subject access)                              | Document a manual workflow (`docs/GDPR_MANUAL_DSR.md`) and proceed.                   |
 | Any ❌ on Pilot gates                                                    | Pilot, not public launch — pilot has its own gate set (cf. `PILOT_OFFER_FINAL.md`).   |
 
-## Current gate stance (checkpoint 2026-05-29)
+## Current gate stance (checkpoint 2026-05-29, release gate)
 
 - **Controlled pilot GO:** **YES** (pilot gates remain green; O7 does not block controlled pilot operation).
 - **Investor/CTO demo GO:** **YES** (curated demo remains allowed with explicit no-launch posture).
 - **Public launch GO:** **NO-GO** while any of `S2`, `S5`, `O7`, `S11` blockers or unknowns remain.
-- **S5 prod revision:** **UNKNOWN** — agent read `public-health` (`git_commit=df15618`, `db_ok=true`); founder must run SQL in `docs/ALEMBIC_050_FOUNDER_VERIFICATION_2026-05-29.md`.
+- **S5 prod revision:** **UNKNOWN** — founder SQL handoff was literal `PASTE_RESULT_HERE` (not a revision). Re-run read-only SQL and paste real `version_num` into `docs/ALEMBIC_050_FOUNDER_VERIFICATION_2026-05-29.md` § Evidence log. **Do not** run `alembic upgrade` until revision is known and migration is founder-approved.
 
 ## What "launch" means in this checklist
 
@@ -136,6 +137,12 @@ Warning: this check is non-destructive; do **not** run `alembic upgrade` manuall
 - Status: **PASS** (founder-verified, 2026-05-27).
 - Evidence: "Founder manually verified production candidate flow: dashboard Top 20/feed → Not relevant/Nietrafione → refresh → same offer did not return."
 - Warning: "No auto-apply clicked. No real application sent. No scrape triggered."
+
+### Founder authenticated route smoke (P6)
+
+- Status: **PENDING** (2026-05-29).
+- Evidence: `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` — template received with **no per-route PASS/FAIL**.
+- Flip to ✅ only when founder fills: `/dashboard`, `/dashboard/billing`, `/dashboard/settings/auto-apply`, `/dashboard/identity`, `/dashboard/career`, `/dashboard/calendar`, `/workspace/candidate/jobs`, `/profile`, plus safety rows (readiness block, no Run now, no KYC/delegated live copy).
 
 ## Hard bans honoured
 

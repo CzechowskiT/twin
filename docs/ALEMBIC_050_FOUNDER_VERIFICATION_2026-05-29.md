@@ -2,7 +2,8 @@
 
 **Gate:** S5 in `docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md`  
 **Migration:** `050_stripe_webhook_events` (`backend/alembic/versions/050_stripe_webhook_events.py`)  
-**Agent checkpoint:** 2026-05-29 UTC — **UNKNOWN on prod DB** (no destructive access)
+**Agent checkpoint:** 2026-05-29 UTC (release gate) — **UNKNOWN on prod DB**
+**Founder SQL paste:** `PASTE_RESULT_HERE` (placeholder — **not** a valid `version_num`; S5 cannot be marked PASS)
 
 ## What the agent verified (safe)
 
@@ -45,6 +46,18 @@ alembic current
 | Date (UTC) | Operator | Method | `version_num` | S5 |
 | ---------- | -------- | ------ | ------------- | -- |
 | 2026-05-29 | agent | public-health only | **UNKNOWN** | 🟡 pending founder SQL |
+| 2026-05-29 | founder (gate handoff) | SQL `SELECT version_num FROM alembic_version;` | `PASTE_RESULT_HERE` (placeholder) | 🟡 **UNKNOWN** — re-paste real revision |
+
+### What founder must paste (replace placeholder)
+
+Run on **production Postgres** (read-only):
+
+```sql
+SELECT version_num FROM alembic_version;
+```
+
+Paste **only** the single cell value (examples: `050_stripe_webhook_events`, `049_job_match_feedback`).
+Do **not** paste the template token `PASTE_RESULT_HERE`.
 
 ## If still on `049`
 

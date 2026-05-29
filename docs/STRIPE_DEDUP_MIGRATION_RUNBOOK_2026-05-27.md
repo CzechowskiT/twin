@@ -3,7 +3,24 @@
 **Status:** Migration file **ready in repo** (`050_stripe_webhook_events.py`).
 **NOT run on production** — requires founder approval (gate S5).
 
-**2026-05-29 agent verify:** 52 pytest cases green locally; prod `alembic_version` **not confirmed** (public-health has no revision field). Founder SQL checklist: `docs/ALEMBIC_050_FOUNDER_VERIFICATION_2026-05-29.md`.
+**2026-05-29 release gate:** 52 pytest cases green locally; prod `alembic_version` **UNKNOWN** — founder handoff returned placeholder `PASTE_RESULT_HERE`, not a real revision. **Do not run migration** until read-only SQL confirms revision. Checklist: `docs/ALEMBIC_050_FOUNDER_VERIFICATION_2026-05-29.md`.
+
+## Founder-approved action plan (only if prod is `049` or older)
+
+**Trigger:** `SELECT version_num FROM alembic_version;` returns `049_job_match_feedback` or any revision before `050_stripe_webhook_events`.
+**If revision is still unknown** (empty, ambiguous, or `PASTE_RESULT_HERE`) → stop here; run SQL again; do not migrate.
+
+| Step | Owner | Action |
+| ---- | ----- | ------ |
+| 1 | Founder | Confirm read-only SQL shows `049_job_match_feedback` (or older). Log row in `docs/ALEMBIC_050_FOUNDER_VERIFICATION_2026-05-29.md`. |
+| 2 | Founder | Approve maintenance window (≤5 min); notify that webhook replays are safe forward-only. |
+| 3 | Founder | Railway API shell: `alembic upgrade head` (single step to `050_stripe_webhook_events`). **Agents must not run this.** |
+| 4 | Founder | Verify: `alembic current` → `050_stripe_webhook_events (head)`; optional `SELECT version_num FROM alembic_version;`. |
+| 5 | Founder | Confirm table exists: `SELECT 1 FROM stripe_webhook_events LIMIT 1;` (or `\d stripe_webhook_events` in psql). |
+| 6 | Founder | Stripe test mode: send `invoice.payment_succeeded`; replay same `event.id` → ledger shows dedup / `replayed: true`. |
+| 7 | Founder | Flip gate **S5** in `docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md`; update `docs/PRODUCTION_REALITY_MATRIX_2026-05-27.md` Stripe dedup row to **LIVE**. |
+
+**If prod is already `050_stripe_webhook_events`:** no migration — only evidence logging + gate/docs update (S5 PASS, dedup ledger expected present).
 
 ## Preconditions
 
