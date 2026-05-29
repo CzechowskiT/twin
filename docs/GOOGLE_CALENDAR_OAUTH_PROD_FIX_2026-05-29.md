@@ -13,7 +13,26 @@ No trailing slash. Scheme `https`. Path is on the **API** host, not Vercel.
 
 **Code status (2026-05-29):** Repo resolves the same URI via `effective_google_calendar_redirect_uri()` when `GOOGLE_CALENDAR_REDIRECT_URI` is unset and `API_URL` points at Railway. **Fix is external Google Cloud Console config** unless Railway `API_URL` / env drifts.
 
-**Hard bans for agents:** no prod env change, no secret rotation, no Railway deploy, no OAuth token logs, do not claim fixed until founder confirms Connect succeeds.
+**Hard bans for agents:** no prod env change, no secret rotation, no Railway deploy, no OAuth token logs.
+
+---
+
+## Production smoke — PASS (2026-05-29 UTC)
+
+| Check | Result |
+| ----- | ------ |
+| Authorized JS origin | `https://twin-sooty.vercel.app` — confirmed in Google Cloud Console |
+| Authorized redirect URI | `https://twin-production-bcd9.up.railway.app/api/v1/calendar/google/callback` — byte-exact, no trailing slash |
+| Google Calendar API | Enabled on OAuth project |
+| Test user access | Confirmed (pilot account) |
+| Connect flow | **PASS** — no `redirect_uri_mismatch`; consent completes |
+| Post-connect UI | `/dashboard/calendar` shows Google connected |
+| Real events | Visible on calendar view after reconnect |
+| Fix type | **Google Cloud Console config only** — no code change or deploy required for final fix |
+| Secrets logged | **None** |
+
+**Operator:** founder
+**Evidence cross-ref:** `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` § Google Calendar OAuth prod smoke; `docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md` O5.
 
 ---
 
@@ -71,4 +90,4 @@ After deploy of UX branch, `/dashboard/calendar` maps query params to user-facin
 - `docs/RAILWAY_PROD_ENV_CHECKLIST.md` — `GOOGLE_CALENDAR_REDIRECT_URI` / `API_URL`
 - `backend/app/services/calendar_oauth_redirect.py` — URI resolution
 - `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` — calendar row
-- `docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md` — O5 calendar partial until Google prod connect PASS
+- `docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md` — O5 Google+Microsoft OAuth prod PASS; Apple/iCal still partial

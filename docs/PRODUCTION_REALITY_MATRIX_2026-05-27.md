@@ -26,7 +26,7 @@
 | Scraping (pracuj.pl, rocketjobs.pl) | `scrape_worker_ready`, beat enabled | **LIVE** infra; **BLOCKED** for ops sweep without allowlist |
 | Manual scrape UI | `NEXT_PUBLIC_SHOW_SCRAPE` | **OFF** default |
 | Auto-apply (nightly) | beat + consent models; sweep gate | **PARTIAL** — consent required; no agent-triggered live apply |
-| Calendar Google | `google_calendar_configured` | **LIVE** |
+| Calendar Google | `google_calendar_configured`; founder prod OAuth smoke PASS 2026-05-29 (`docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`) | **LIVE / VERIFIED** — Connect + real events on `/dashboard/calendar` |
 | Calendar Microsoft | `microsoft_calendar_configured` | **LIVE** |
 | Calendar Apple / CalDAV | docs + ICS patterns | **PARTIAL** — no Apple OAuth |
 | ICS / WebCal export | product docs | **REPO** / partial |
@@ -85,7 +85,8 @@
 | CSP enforce | No enforce header; S2 checklist not met | **BLOCKED BY POLICY** |
 | Delegated / KYC apply | Product gates | **NOT LIVE** |
 | O7 restore drill | No PASS row in drill log; staging path is Railway UI only (no repo script) | **PENDING EVIDENCE** — founder action required |
-| Founder authenticated smoke (2026-05-29) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **PARTIAL** — most routes PASS; dashboard forecast layout fix pending FE deploy; Google OAuth Console fix pending |
+| Google Calendar OAuth prod smoke (2026-05-29) | `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md` | **LIVE / VERIFIED** — Console config fix; Connect PASS; real events visible |
+| Founder authenticated smoke (2026-05-29) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **PARTIAL** — most routes PASS; dashboard forecast layout fix pending FE deploy; Google Calendar OAuth **closed** |
 
 ---
 

@@ -24,23 +24,41 @@ PASTE HERE:
 - Any screenshots/issues:
 ```
 
-## Recorded submission (2026-05-29 UTC)
+## Google Calendar OAuth prod smoke (2026-05-29 UTC)
+
+**Gate:** O5 (Google provider) · **Verdict:** **PASS**
+
+| Check | Evidence |
+| ----- | -------- |
+| JS origin | `https://twin-sooty.vercel.app` in Google Cloud Console |
+| Redirect URI | `https://twin-production-bcd9.up.railway.app/api/v1/calendar/google/callback` (exact, no trailing `/`) |
+| `/dashboard/calendar` Connect Google | Completes without `redirect_uri_mismatch` |
+| Post-connect status | Google shows connected |
+| Real events | Visible after reconnect |
+| Fix | Google Cloud Console config only — no code/deploy for final fix |
+| Secrets in evidence | **None** |
+
+**Operator:** founder
+**Detail doc:** `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`
+
+## Recorded submission — full P6 routes (2026-05-29 UTC)
 
 | Field | Value |
 | ----- | ----- |
 | Template received | Yes (structure only) |
-| Route results filled | **No** — all route lines empty |
+| Route results filled | **Partial** — `/dashboard/calendar` Google OAuth PASS (above); other route lines not fully attested in template |
 | Safety checks filled | **No** |
-| Screenshots / issues | **None attached** |
-| Operator attestation | **Not present** |
+| Screenshots / issues | Prior session: most routes PASS; `/dashboard` layout FAIL (FE fix shipped) |
+| Operator attestation | Google Calendar OAuth: **founder PASS** |
 
 ## Verdict
 
 | Check | Status |
 | ----- | ------ |
-| Authenticated route smoke (8 routes + safety copy) | **PENDING — AWAITING FOUNDER INPUT** |
-| May mark PASS on launch gates | **No** — empty template ≠ evidence |
-| Public launch implication | **NO-GO unchanged** (with `S2`, `S5`, `O7`, `S11`, CSP enforce, delegated/KYC) |
+| Google Calendar OAuth prod smoke | **PASS** (2026-05-29) |
+| Authenticated route smoke (8 routes + safety copy) | **PARTIAL** — calendar OAuth closed; full P6 still pending layout redeploy + safety rows |
+| May mark PASS on launch gates (P6) | **No** — partial only |
+| Public launch implication | **NO-GO unchanged** (`S2`, `O7`, `P6` partial, `S11`, delegated/KYC not live) |
 
 ## Founder next actions
 
