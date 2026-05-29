@@ -74,7 +74,7 @@ the gate to ✅.
 | P3 | Pilot offer copy reviewed                                               | `docs/PILOT_OFFER_FINAL.md`, `PILOT_OFFER_COPY_PL.md`                                            | ✅           |
 | P4 | Pilot pricing model verified                                            | `docs/B2B_*` / pricing docs                                                                      | ✅           |
 | P5 | Pilot kill-switch (`SCRAPE_OPS_*` / feature flags) tested                | `pytest tests/test_auto_apply_trigger_sweep_admin_gate.py -q`                                   | ✅           |
-| P6 | Founder authenticated prod smoke (dashboard subpages, jobs, profile, safety copy) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` — PASS when every route + safety row has explicit founder PASS | ⚠️ **PARTIAL** — 7/8 routes + safety copy **PASS** (founder 2026-05-29); `/dashboard` forecast layout fix **deployed** (`3631c45`) — **PENDING founder re-verify** only; Google Calendar **FULL prod smoke PASS** |
+| P6 | Founder authenticated prod smoke (dashboard subpages, jobs, profile, safety copy) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` — PASS when every route + safety row has explicit founder PASS | ✅ **PASS** (founder 2026-05-29) — 8/8 routes + safety copy; `/dashboard` layout PASS (forecast fix, no overlapping blocked CTAs); Google Calendar **FULL prod smoke PASS** |
 
 ## Decision matrix
 
@@ -90,11 +90,11 @@ the gate to ✅.
 
 - **Controlled pilot GO:** **YES** (pilot gates remain green; O7 does not block controlled pilot operation).
 - **Investor/CTO demo GO:** **YES** (curated demo remains allowed with explicit no-launch posture).
-- **Public launch GO:** **NO-GO** while any of `S2`, `O7`, `S11`, **P6** blockers remain (S5 closed 2026-05-29).
+- **Public launch GO:** **NO-GO** while any of `S2`, `O7`, `S11` blockers remain (S5 and **P6** closed 2026-05-29).
 - **O7 backup/restore:** ❌ **PENDING EVIDENCE** — PASS criteria documented; founder must run staging clone drill in Railway (`docs/BACKUP_RESTORE_DRILL_LOG.md` § Founder action checklist). Prod untouched; no agent restore.
 - **S5 prod revision:** ✅ **PASS** — production `version_num = 050_stripe_webhook_events` (read-only SQL, 2026-05-29; evidence in `docs/ALEMBIC_050_FOUNDER_VERIFICATION_2026-05-29.md` § Evidence log). **No migration** needed or run by agent; **no** Railway deploy for this gate.
 - **O5 Google Calendar — FULL prod smoke:** ✅ **PASS** (2026-05-29) — OAuth (Console config); Connect; real events; week day mapping (`Europe/Warsaw`, no +1 shift). Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, fix HEAD `3631c45`; FE-only, no Railway. Evidence: `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`. O5 row stays ⚠️ **partial** until Apple/iCal beyond docs.
-- **P6 founder authenticated smoke:** ⚠️ **PARTIAL** — founder attested 7 routes + safety rows PASS; `/dashboard` layout fix deployed on Vercel `3631c45` — single remaining founder re-verify; Google Calendar **fully closed**.
+- **P6 founder authenticated smoke:** ✅ **PASS** (founder 2026-05-29) — 8/8 routes + safety rows; `/dashboard` layout confirmed post-forecast fix; Google Calendar **fully closed**.
 
 ## What "launch" means in this checklist
 
@@ -155,10 +155,9 @@ Reference steps: `docs/BACKUP_RESTORE_DRILL_LOG.md` § Founder action checklist.
 
 ### Founder authenticated route smoke (P6)
 
-- Status: **PARTIAL** (2026-05-29) — 7/8 routes + safety copy PASS; `/dashboard` forecast layout fix **deployed** — founder must re-verify layout only.
+- Status: ✅ **PASS** (2026-05-29) — founder confirmed 8/8 routes + safety copy; `/dashboard` layout PASS (no overlapping forecast blocked CTAs).
 - Evidence: `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` + `docs/RESPONSIVE_QA_MATRIX_2026-05-29.md`.
-- Automated guards (2026-05-29): `test:verified-readiness-guard`, `test:dashboard-ux-safety`, `test:calendar-week` PASS; Playwright unauth dashboard routes 13/14 PASS (status cookie-banner locator fixed on branch).
-- Flip to ✅ only when founder confirms `/dashboard` layout PASS post-`3631c45` deploy.
+- Automated guards (2026-05-29): `test:verified-readiness-guard`, `test:dashboard-ux-safety`, `test:calendar-week` PASS; Playwright unauth dashboard routes 14/14 PASS on branch.
 
 ## Hard bans honoured
 

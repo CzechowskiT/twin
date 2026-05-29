@@ -29,7 +29,7 @@ Legend: ✅ = HTTP OK + no document horizontal scroll at viewport.
 
 | Route | Responsive (1440/1280/1024/mobile) | Functional / copy | Notes |
 | ----- | ---------------------------------- | ------------------- | ----- |
-| `/dashboard` | **PENDING re-verify** (desktop) — prior FAIL: forecast CTA overlap; fix **deployed** `3631c45` | Blocked prepare copy OK | Founder must confirm full-width forecast section on prod |
+| `/dashboard` | **PASS** | **PASS** | Founder 2026-05-29 — forecast layout correct; no overlapping blocked CTAs; cards readable |
 | `/dashboard/billing` | **PASS** | PASS | Wide layout; subnav visible |
 | `/dashboard/settings/auto-apply` | **PASS** | PASS | No Run now |
 | `/dashboard/identity` | **PASS** | PASS | No KYC overclaim |
@@ -48,4 +48,4 @@ Legend: ✅ = HTTP OK + no document horizontal scroll at viewport.
 ## Verdict
 
 - **Public/unauth responsive:** **PASS** (no h-scroll on checked routes).
-- **Authenticated dashboard responsive:** **PARTIAL** — `/dashboard` **PENDING founder re-verify** after layout fix deploy; other listed routes **PASS**.
+- **Authenticated dashboard responsive:** **PASS** (founder 2026-05-29) — all listed routes including `/dashboard` layout.

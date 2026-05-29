@@ -32,14 +32,14 @@
 | Data (UTC) | Operator | 1–13 | 500? | Uwagi |
 |------------|----------|------|------|-------|
 | 2026-05-27 | founder | PASS (kroki 1–13 + Top 20 feedback) | nie | `docs/CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md` |
-| 2026-05-29 | founder | **PARTIAL** (screenshots) | nie | 7/8 tras PASS + safety PASS; `/dashboard` layout — fix wdrożony (`3631c45`), **czeka re-weryfikacja**; Google Calendar **FULL prod smoke PASS** |
+| 2026-05-29 | founder | **PASS** (authenticated routes + safety) | nie | 8/8 tras PASS + safety PASS; `/dashboard` layout PASS (forecast fix); Google Calendar **FULL prod smoke PASS** |
 
 ## Werdykt (2026-05-29)
 
 - **PASS smoke (13 kroków):** nadal **2026-05-27** (osobny dowód E2E feedbacku) — **nie** przedłużany tym commitem.  
-- **PASS authenticated route smoke:** **CZĘŚCIOWO** — 7/8 tras + safety PASS; `/dashboard` — fix wdrożony, **czeka re-weryfikacja founder**; dowód: `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md`.  
+- **PASS authenticated route smoke:** **TAK** (2026-05-29) — 8/8 tras + safety PASS; `/dashboard` layout PASS (founder); dowód: `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md`.
 - **S5 Alembic `050`:** ✅ na prod.  
 - **Google Calendar FULL prod smoke (krok 6 / O5):** ✅ **PASS** 2026-05-29 — Console config; Connect; prawdziwe wydarzenia; mapowanie dni (`Europe/Warsaw`, bez +1 UTC) po deploy Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH` / HEAD `3631c45` (`docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`).
-- **Nie oznacza public launch GO** — CSP enforce (S2), backup drill (O7), verified-readiness prod (S11), P6 partial, delegated/KYC nie live (`docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md`).
+- **Nie oznacza public launch GO** — CSP enforce (S2), backup drill (O7), verified-readiness prod (S11), delegated/KYC nie live (`docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md`).
 
 Powiązane: [CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md](./CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md) · [FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md](./FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md)

@@ -67,7 +67,7 @@ PASTE HERE:
 | `/dashboard/calendar` | **PASS** | Google FULL prod smoke (OAuth + events + day mapping) |
 | `/workspace/candidate/jobs` | **PASS** | Long scroll OK when logged in |
 | `/profile` | **PASS** | Long profile OK |
-| `/dashboard` | **PENDING re-verify** | Prior FAIL: forecast CTA overlap — fix deployed Vercel `3631c45` / `a445878`; founder must confirm layout |
+| `/dashboard` | **PASS** | Founder 2026-05-29 — layout correct after forecast fix; no overlapping "Blocked until checklist" buttons; forecast cards readable |
 | Readiness blocks auto-apply when incomplete | **PASS** | |
 | No Run now / trigger sweep in UI | **PASS** | |
 | No KYC/legal/delegated apply live copy | **PASS** | |
@@ -75,10 +75,10 @@ PASTE HERE:
 | Field | Value |
 | ----- | ----- |
 | Template received | Yes |
-| Route results filled | **Partial** — 7/8 routes PASS; `/dashboard` layout pending post-fix re-verify |
+| Route results filled | **Yes** — 8/8 routes PASS |
 | Safety checks filled | **Yes** — all three safety rows PASS |
-| Screenshots / issues | Prior `/dashboard` layout FAIL; FE fix shipped and deployed |
-| Operator attestation | Google Calendar OAuth: **founder PASS** |
+| Screenshots / issues | Prior `/dashboard` layout FAIL resolved; founder confirms layout PASS post-deploy |
+| Operator attestation | Founder: **P6 dashboard layout — PASS** (2026-05-29) |
 
 ## Automated guard evidence (2026-05-29, release gate batch)
 
@@ -97,15 +97,18 @@ PASTE HERE:
 | Google Calendar OAuth prod smoke | **PASS** (2026-05-29) |
 | Google Calendar day mapping (Europe/Warsaw week view) | **PASS** (founder re-smoke 2026-05-29) |
 | Google Calendar — full prod smoke (OAuth + events + day mapping) | **PASS** |
-| Authenticated route smoke (8 routes + safety copy) | **PARTIAL** — 7/8 routes + safety **PASS**; `/dashboard` layout **PENDING founder re-verify** after deploy `3631c45` |
-| May mark PASS on launch gates (P6) | **No** — `/dashboard` layout re-verify remains |
-| Public launch implication | **NO-GO unchanged** (`S2`, `O7`, `P6` partial, `S11`, delegated/KYC not live) |
+| Authenticated route smoke (8 routes + safety copy) | **PASS** (founder 2026-05-29) — all routes + safety rows attested |
+| May mark PASS on launch gates (P6) | **Yes** |
+| Public launch implication | **NO-GO unchanged** (`S2`, `O7`, `S11`, delegated/KYC not live) |
 
-## Founder next actions
+## P6 dashboard layout — founder PASS (2026-05-29 UTC)
 
-1. Re-verify `/dashboard` only — forecast section should be full-width without CTA overlap (deploy `3631c45` live).
-2. Mark `/dashboard` **PASS** or **FAIL** in the route table above.
-3. If PASS → notify release gate to flip P6 to ✅.
+| Check | Evidence |
+| ----- | -------- |
+| `/dashboard` layout after forecast fix | **PASS** — layout correct on latest frontend deploy |
+| Opportunity Forecast CTAs | **PASS** — no overlapping "Blocked until checklist" buttons |
+| Forecast cards | **PASS** — readable; dashboard layout acceptable |
+| Operator quote | Founder confirms: **"P6 dashboard layout — PASS"** |
 
 ## Hard bans (this exercise)
 

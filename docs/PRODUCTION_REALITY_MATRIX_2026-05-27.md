@@ -55,7 +55,7 @@
 | Backup restore drill | O7 gate | **BLOCKED / PENDING EVIDENCE** — PASS criteria + founder checklist in `BACKUP_RESTORE_DRILL_LOG.md`; no PASS row yet (2026-05-29 operator; prod read-only health OK) |
 | Controlled pilot ops | pilot manual + tracker | **LIVE** process |
 | Candidate E2E manual smoke | `docs/CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md` | **LIVE** — PASS (founder-verified, 2026-05-27); Top 20 → Nietrafione → refresh regression. Warning: no auto-apply / real apply / scrape. |
-| Founder authenticated route smoke (dashboard subpages, jobs, profile, safety copy) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **PARTIAL** — 7/8 routes + safety PASS; `/dashboard` layout pending founder re-verify post-`3631c45` |
+| Founder authenticated route smoke (dashboard subpages, jobs, profile, safety copy) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **LIVE** — **PASS** (founder 2026-05-29); 8/8 routes + safety copy; `/dashboard` layout PASS |
 | Playwright smoke drift points | `frontend/e2e/smoke.spec.ts` targeted assertions | **STABILIZED** — status cookie-banner locator fix on branch; 13/14 prod lane PASS (2026-05-29) |
 | Public launch announcement | gate checklist | **BLOCKED** |
 | Investor demo | `INVESTOR_DEMO_RUNBOOK.md` | **LIVE** stack, curated use |
@@ -86,7 +86,7 @@
 | Delegated / KYC apply | Product gates | **NOT LIVE** |
 | O7 restore drill | No PASS row in drill log; staging path is Railway UI only (no repo script) | **PENDING EVIDENCE** — founder action required |
 | Google Calendar FULL prod smoke (2026-05-29) | `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md` | **LIVE / VERIFIED** — OAuth + real events + day mapping; Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, HEAD `3631c45`; no Railway |
-| Founder authenticated smoke (2026-05-29) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **PARTIAL** — 7/8 routes + safety PASS; `/dashboard` layout fix deployed — founder re-verify only |
+| Founder authenticated smoke (2026-05-29) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **LIVE / VERIFIED** — P6 **PASS**; 8/8 routes + safety; `/dashboard` layout founder-confirmed |
 | CSP per-route probe (2026-05-29 batch) | `/`, `/dashboard`, `/login/candidate`, `/demo`, `/status` — all report-only | **LIVE REPORT-ONLY** — enforce still blocked (S2) |
 
 ---
