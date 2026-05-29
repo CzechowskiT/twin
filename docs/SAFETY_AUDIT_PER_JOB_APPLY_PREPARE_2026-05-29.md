@@ -30,7 +30,7 @@
 ## Verdict
 
 - **Per-job prepare/apply controls:** **PASS** (default-deny delegated submit; readiness-aligned prepare).
-- **Public launch:** **NO-GO** (unchanged program gates: `S2`, `S5`, `O7`, `S11`, **P6** founder authenticated smoke pending).
+- **Public launch:** **NO-GO** (program gates: `S2`, `O7`, `S11`, **P6** founder authenticated smoke pending; `S5` closed 2026-05-29).
 - **Founder prod UX attestation (auto-apply settings, copy):** **PENDING** — `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` (empty template 2026-05-29); code audit PASS ≠ founder smoke PASS.
 
 ## Tests run

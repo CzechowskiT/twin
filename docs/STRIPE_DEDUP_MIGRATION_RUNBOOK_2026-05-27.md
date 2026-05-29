@@ -1,9 +1,9 @@
 # Stripe dedup migration runbook — 2026-05-27
 
-**Status:** Migration file **ready in repo** (`050_stripe_webhook_events.py`).
-**NOT run on production** — requires founder approval (gate S5).
+**Status:** Migration **`050_stripe_webhook_events` LIVE on production** (gate S5 ✅, 2026-05-29).
+**Prod evidence:** read-only SQL `SELECT version_num FROM alembic_version;` → `050_stripe_webhook_events` (founder/operator, 2026-05-29). Ledger table `stripe_webhook_events` expected.
 
-**2026-05-29 release gate:** 52 pytest cases green locally; prod `alembic_version` **UNKNOWN** — founder handoff returned placeholder `PASTE_RESULT_HERE`, not a real revision. **Do not run migration** until read-only SQL confirms revision. Checklist: `docs/ALEMBIC_050_FOUNDER_VERIFICATION_2026-05-29.md`.
+**2026-05-29 release gate (closed):** 52 pytest cases green locally; prod at `050`. **No migration** needed or run by agent; **no** Railway deploy for this gate. Evidence: `docs/ALEMBIC_050_FOUNDER_VERIFICATION_2026-05-29.md`. Checklist S5: `docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md`.
 
 ## Founder-approved action plan (only if prod is `049` or older)
 

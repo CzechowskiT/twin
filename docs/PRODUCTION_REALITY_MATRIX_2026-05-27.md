@@ -32,7 +32,7 @@
 | ICS / WebCal export | product docs | **REPO** / partial |
 | Stripe Checkout | `stripe_checkout_ready` | **LIVE** |
 | Stripe webhook signature | tests + billing route | **LIVE** |
-| Stripe webhook dedup ledger | `050` migration + `billing.py` | **PARTIAL** — prod `alembic_version` **UNKNOWN** (2026-05-29: founder paste was placeholder `PASTE_RESULT_HERE`; table `stripe_webhook_events` existence not confirmed) |
+| Stripe webhook dedup ledger | `050` migration + `billing.py`; prod SQL `050_stripe_webhook_events` (2026-05-29) | **LIVE / VERIFIED** — Alembic `050` on prod; ledger table `stripe_webhook_events` expected per migration; no agent migration |
 | Beta waitlist signup | rate limit + contract tests | **LIVE** |
 | CV / voice upload limits | `ff22f3a` | **LIVE** |
 | CSP report-only + sink | S1 gate, `/api/v1/csp-report` | **LIVE** |
@@ -80,11 +80,11 @@
 | API runtime SHA | `df15618` visible on `public-health` | **LIVE** |
 | Frontend Vercel SHA | `89ff454` / `dpl_5SK5YWGzzWtQTDULPm2kAx9qrdB9` (founder-known) | **LIVE** (not re-queried via CLI) |
 | Branch HEAD | `89ff454` | **REPO** may be ahead/behind FE deploy — verify before FE-only claims |
-| Stripe dedup migration `050` | Migration in repo; prod `alembic_version` **UNKNOWN** (placeholder paste, not `050`/`049`) | **NEEDS EVIDENCE** — founder re-paste real `version_num`; if `049` or older → follow `docs/STRIPE_DEDUP_MIGRATION_RUNBOOK_2026-05-27.md` § Founder-approved action plan (no agent-run migration) |
+| Stripe dedup migration `050` | Prod `alembic_version` = `050_stripe_webhook_events` (founder/operator read-only SQL, 2026-05-29) | **LIVE / VERIFIED** — S5 PASS; no migration run; if ever rolled back to `049` → runbook § Founder-approved action plan |
 | CSP mode | `content-security-policy-report-only` on `/` and `/dashboard` (2026-05-29 curl) | **LIVE REPORT-ONLY** |
 | CSP enforce | No enforce header; S2 checklist not met | **BLOCKED BY POLICY** |
 | Delegated / KYC apply | Product gates | **NOT LIVE** |
-| Founder authenticated smoke (2026-05-29) | evidence doc | **NEEDS EVIDENCE** — do not treat empty template as PASS |
+| Founder authenticated smoke (2026-05-29) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **PARTIAL** — most routes PASS; dashboard forecast layout fix pending FE deploy; Google OAuth Console fix pending |
 
 ---
 
