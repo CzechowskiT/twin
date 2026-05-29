@@ -92,7 +92,7 @@ the gate to ✅.
 - **Investor/CTO demo GO:** **YES** (curated demo remains allowed with explicit no-launch posture).
 - **Public launch GO:** **NO-GO** while any of `S2`, `O7`, `S11`, **P6** blockers remain (S5 closed 2026-05-29).
 - **S5 prod revision:** ✅ **PASS** — production `version_num = 050_stripe_webhook_events` (read-only SQL, 2026-05-29; evidence in `docs/ALEMBIC_050_FOUNDER_VERIFICATION_2026-05-29.md` § Evidence log). **No migration** needed or run by agent; **no** Railway deploy for this gate.
-- **P6 founder authenticated smoke:** **PENDING — AWAITING FOUNDER INPUT** (empty paste 2026-05-29; do not invent PASS).
+- **P6 founder authenticated smoke:** ⚠️ **PARTIAL** — `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md`; redeploy FE for dashboard forecast layout; Google OAuth Console fix pending.
 
 ## What "launch" means in this checklist
 

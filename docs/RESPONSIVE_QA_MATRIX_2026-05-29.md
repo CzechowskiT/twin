@@ -2,7 +2,7 @@
 
 **Target:** `https://twin-sooty.vercel.app` (prod alias)  
 **Method:** Playwright viewport script (unauthenticated) + HTTP status + `e2e/smoke.spec.ts` against prod  
-**Auth dashboard subpages:** not exercised by Playwright (no credentials in agent session). Founder authenticated template **2026-05-29: PENDING** (empty paste — see evidence doc).
+**Auth dashboard subpages:** founder screenshots 2026-05-29 (`docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md`)
 
 ## Viewports
 
@@ -25,22 +25,20 @@
 
 Legend: ✅ = HTTP OK + no document horizontal scroll at viewport.
 
-## Authenticated routes (founder manual)
-
-Evidence owner: `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md`. **Do not mark PASS** until founder fills per-route results + viewport notes.
+## Authenticated routes (founder manual — 2026-05-29)
 
 | Route | Responsive (1440/1280/1024/mobile) | Functional / copy | Notes |
 | ----- | ---------------------------------- | ------------------- | ----- |
-| `/dashboard` | **PENDING** | **PENDING** | 2026-05-29 template empty |
-| `/dashboard/billing` | **PENDING** | **PENDING** | |
-| `/dashboard/settings/auto-apply` | **PENDING** | **PENDING** | No Run now / live sweep click |
-| `/dashboard/identity` | **PENDING** | **PENDING** | No KYC overclaim |
-| `/dashboard/career` | **PENDING** | **PENDING** | |
-| `/dashboard/calendar` | **PENDING** | **PENDING** | Integrations + empty week UX |
-| `/workspace/candidate/jobs` (logged in) | **PENDING** | **PENDING** | Discovery shell |
-| `/profile` | **PENDING** | **PENDING** | |
-| Readiness blocks auto-apply when incomplete | — | **PENDING** | Founder safety row |
-| No live delegated/KYC/guaranteed apply copy | — | **PENDING** | Founder safety row |
+| `/dashboard` | **FAIL** (desktop) — forecast CTAs overlapped columns in sidebar layout | Blocked prepare copy OK | **Fix shipped** — full-width forecast section; re-verify after FE deploy |
+| `/dashboard/billing` | **PASS** | PASS | Wide layout; subnav visible |
+| `/dashboard/settings/auto-apply` | **PASS** | PASS | No Run now |
+| `/dashboard/identity` | **PASS** | PASS | No KYC overclaim |
+| `/dashboard/career` | **PASS** | PASS | |
+| `/dashboard/calendar` | **PASS** | PASS | Google not connected; Microsoft connected |
+| `/workspace/candidate/jobs` (logged in) | **PASS** | PASS | Long scroll OK |
+| `/profile` | **PASS** | PASS | Long profile OK |
+| Readiness blocks auto-apply when incomplete | — | **PASS** | |
+| No live delegated/KYC/guaranteed apply copy | — | **PASS** | |
 
 ## Playwright prod smoke (2026-05-29)
 
@@ -50,4 +48,4 @@ Evidence owner: `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md`. **Do 
 ## Verdict
 
 - **Public/unauth responsive:** **PASS** (no h-scroll on checked routes).
-- **Authenticated dashboard responsive + functional:** **PENDING — AWAITING FOUNDER INPUT** (2026-05-29; empty smoke template).
+- **Authenticated dashboard responsive:** **PARTIAL** — `/dashboard` forecast layout FAIL on prod until FE redeploy; other listed routes **PASS**.

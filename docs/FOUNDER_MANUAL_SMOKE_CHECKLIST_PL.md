@@ -37,7 +37,8 @@
 ## Werdykt (2026-05-29)
 
 - **PASS smoke (13 kroków):** nadal **2026-05-27** (osobny dowód E2E feedbacku) — **nie** przedłużany tym commitem.  
-- **PASS authenticated route smoke (dashboard podstrony + jobs + profile + copy safety):** **NIE** — puste pola / `PASTE HERE` w szablonie 2026-05-29.  
-- **Nie oznacza public launch GO** — delegated apply, CSP enforce (S2), backup drill (O7), verified-readiness prod (S11) pozostają otwarte; Alembic `050` (S5) ✅ 2026-05-29 (`docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md`).
+- **PASS authenticated route smoke:** **CZĘŚCIOWO** — większość tras PASS; `/dashboard` layout FAIL (naprawa FE); dowód: `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md`.  
+- **S5 Alembic `050`:** ✅ na prod.  
+- **Nie oznacza public launch GO** — CSP enforce (S2), backup drill (O7), verified-readiness prod (S11), Google Calendar OAuth Console, P6 partial (`docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md`).
 
 Powiązane: [CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md](./CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md) · [FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md](./FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md)
