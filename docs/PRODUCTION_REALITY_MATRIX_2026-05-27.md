@@ -52,7 +52,7 @@
 | Data subject export/delete | L6 gate | **PARTIAL** |
 | Celery worker + broker | celery-status + health | **LIVE** |
 | Postgres | `db_ok=true` | **LIVE** |
-| Backup restore drill | O7 gate | **BLOCKED** — drill evidence still pending in `BACKUP_RESTORE_DRILL_LOG.md` |
+| Backup restore drill | O7 gate | **BLOCKED / PENDING EVIDENCE** — PASS criteria + founder checklist in `BACKUP_RESTORE_DRILL_LOG.md`; no PASS row yet (2026-05-29 operator; prod read-only health OK) |
 | Controlled pilot ops | pilot manual + tracker | **LIVE** process |
 | Candidate E2E manual smoke | `docs/CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md` | **LIVE** — PASS (founder-verified, 2026-05-27); Top 20 → Nietrafione → refresh regression. Warning: no auto-apply / real apply / scrape. |
 | Founder authenticated route smoke (dashboard subpages, jobs, profile, safety copy) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **PENDING** — template received 2026-05-29 with **no filled route rows**; not PASS |
@@ -84,6 +84,7 @@
 | CSP mode | `content-security-policy-report-only` on `/` and `/dashboard` (2026-05-29 curl) | **LIVE REPORT-ONLY** |
 | CSP enforce | No enforce header; S2 checklist not met | **BLOCKED BY POLICY** |
 | Delegated / KYC apply | Product gates | **NOT LIVE** |
+| O7 restore drill | No PASS row in drill log; staging path is Railway UI only (no repo script) | **PENDING EVIDENCE** — founder action required |
 | Founder authenticated smoke (2026-05-29) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **PARTIAL** — most routes PASS; dashboard forecast layout fix pending FE deploy; Google OAuth Console fix pending |
 
 ---

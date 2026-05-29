@@ -48,7 +48,7 @@ the gate to ✅.
 | O4 | Stripe webhook endpoint is reachable, signature gate is wired           | `docs/P1_STRIPE_WEBHOOK_AUDIT_2026-05-27.md`                                                    | ✅           |
 | O5 | Calendar provider OAuth: Google + Microsoft live; Apple/iCal docs ready | `docs/CALENDAR_INTEGRATIONS_*.md` (none on the branch yet → see `.cursorrules` calendar section) | ⚠️ partial   |
 | O6 | Canonical Vercel alias points at the right project; drift guard exists  | `bash scripts/check-vercel-canonical-alias.sh`                                                   | ⚠️ drift documented; canonical project is correct |
-| O7 | Backup / restore for Postgres is exercised (last restore test logged)    | `docs/RUNBOOK_DB_RESTORE_2026-05-27.md` + `docs/BACKUP_RESTORE_DRILL_LOG.md` evidence row with GO/NO-GO decision | ❌ PENDING drill evidence |
+| O7 | Backup / restore for Postgres is exercised (last restore test logged)    | `docs/RUNBOOK_DB_RESTORE_2026-05-27.md` § O7 PASS criteria + `docs/BACKUP_RESTORE_DRILL_LOG.md` **PASS** row with GO decision | ❌ **PENDING EVIDENCE** — runbook + founder checklist ready; no staging restore executed (2026-05-29 operator) |
 | O8 | Incident response runbook exists with named on-call                     | `docs/INCIDENT_RESPONSE_RUNBOOK_2026-05-27.md` (this session, TASK 13)                          | ✅ this session |
 | O9 | Security risk register is current                                       | `docs/SECURITY_RISK_REGISTER_2026-05-27.md` (this session, TASK 14)                             | ✅ this session |
 | O10| Vercel canonical re-link is either fixed or has a documented workaround | `docs/VERCEL_CANONICAL_DEPLOY_RUNBOOK_2026-05-27.md`                                             | ⚠️ workaround documented |
@@ -91,6 +91,7 @@ the gate to ✅.
 - **Controlled pilot GO:** **YES** (pilot gates remain green; O7 does not block controlled pilot operation).
 - **Investor/CTO demo GO:** **YES** (curated demo remains allowed with explicit no-launch posture).
 - **Public launch GO:** **NO-GO** while any of `S2`, `O7`, `S11`, **P6** blockers remain (S5 closed 2026-05-29).
+- **O7 backup/restore:** ❌ **PENDING EVIDENCE** — PASS criteria documented; founder must run staging clone drill in Railway (`docs/BACKUP_RESTORE_DRILL_LOG.md` § Founder action checklist). Prod untouched; no agent restore.
 - **S5 prod revision:** ✅ **PASS** — production `version_num = 050_stripe_webhook_events` (read-only SQL, 2026-05-29; evidence in `docs/ALEMBIC_050_FOUNDER_VERIFICATION_2026-05-29.md` § Evidence log). **No migration** needed or run by agent; **no** Railway deploy for this gate.
 - **P6 founder authenticated smoke:** ⚠️ **PARTIAL** — `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md`; redeploy FE for dashboard forecast layout; Google OAuth Console fix pending.
 
@@ -141,6 +142,15 @@ Warning: this check is non-destructive; do **not** run `alembic upgrade` manuall
 - Status: **PASS** (founder-verified, 2026-05-27).
 - Evidence: "Founder manually verified production candidate flow: dashboard Top 20/feed → Not relevant/Nietrafione → refresh → same offer did not return."
 - Warning: "No auto-apply clicked. No real application sent. No scrape triggered."
+
+### O7 backup / restore drill (founder-only)
+
+- Status: **PENDING EVIDENCE** (2026-05-29).
+- Operator review: runbook + PASS criteria updated; **no staging restore executed** (no Railway staging creds in agent session; HARD BAN: no prod restore/mutation).
+- Prod baseline (read-only): `GET /api/public-health` → `db_ok=true`, `git_commit=df15618` (not substitute for restore evidence).
+- Flip to ✅ only when `docs/BACKUP_RESTORE_DRILL_LOG.md` has one **PASS** row meeting all criteria in `docs/RUNBOOK_DB_RESTORE_2026-05-27.md` § O7 PASS criteria.
+
+Reference steps: `docs/BACKUP_RESTORE_DRILL_LOG.md` § Founder action checklist.
 
 ### Founder authenticated route smoke (P6)
 
