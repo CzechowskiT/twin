@@ -28,7 +28,8 @@ No trailing slash. Scheme `https`. Path is on the **API** host, not Vercel.
 | Connect flow | **PASS** — no `redirect_uri_mismatch`; consent completes |
 | Post-connect UI | `/dashboard/calendar` shows Google connected |
 | Real events | Visible on calendar view after reconnect |
-| Fix type | **Google Cloud Console config only** — no code change or deploy required for final fix |
+| Week day mapping (timed + all-day) | **PENDING founder** — FE fix groups by local IANA date (`Europe/Warsaw`); do not mark full calendar PASS until re-smoke |
+| Fix type | OAuth: **Google Cloud Console config only**. Day mapping: **frontend** (`calendar-week` local date keys) — deploy Vercel prod after green tests |
 | Secrets logged | **None** |
 
 **Operator:** founder

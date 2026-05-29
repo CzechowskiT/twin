@@ -93,7 +93,7 @@ the gate to ✅.
 - **Public launch GO:** **NO-GO** while any of `S2`, `O7`, `S11`, **P6** blockers remain (S5 closed 2026-05-29).
 - **O7 backup/restore:** ❌ **PENDING EVIDENCE** — PASS criteria documented; founder must run staging clone drill in Railway (`docs/BACKUP_RESTORE_DRILL_LOG.md` § Founder action checklist). Prod untouched; no agent restore.
 - **S5 prod revision:** ✅ **PASS** — production `version_num = 050_stripe_webhook_events` (read-only SQL, 2026-05-29; evidence in `docs/ALEMBIC_050_FOUNDER_VERIFICATION_2026-05-29.md` § Evidence log). **No migration** needed or run by agent; **no** Railway deploy for this gate.
-- **O5 Google Calendar OAuth prod:** ✅ **PASS** (2026-05-29) — Console config (`JS origin` + redirect URI); Connect succeeds; real events on `/dashboard/calendar`; no code/deploy for fix. Evidence: `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`.
+- **O5 Google Calendar OAuth prod:** ✅ **PASS** (2026-05-29) — Console config (`JS origin` + redirect URI); Connect succeeds; no code/deploy for OAuth fix. Evidence: `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`. **Day mapping:** ⚠️ PENDING founder re-smoke after Vercel deploy (week columns were UTC-shifted; FE fix shipped).
 - **P6 founder authenticated smoke:** ⚠️ **PARTIAL** — `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md`; redeploy FE for dashboard forecast layout; Google Calendar OAuth blocker **closed**.
 
 ## What "launch" means in this checklist

@@ -36,6 +36,7 @@ PASTE HERE:
 | Post-connect status | Google shows connected |
 | Real events | Visible after reconnect |
 | Fix | Google Cloud Console config only — no code/deploy for final fix |
+| **Day mapping (week columns)** | **PENDING** — code fix shipped (local TZ grouping); founder re-smoke on `/dashboard/calendar` after Vercel prod deploy |
 | Secrets in evidence | **None** |
 
 **Operator:** founder
@@ -56,7 +57,8 @@ PASTE HERE:
 | Check | Status |
 | ----- | ------ |
 | Google Calendar OAuth prod smoke | **PASS** (2026-05-29) |
-| Authenticated route smoke (8 routes + safety copy) | **PARTIAL** — calendar OAuth closed; full P6 still pending layout redeploy + safety rows |
+| Google Calendar day mapping (Europe/Warsaw week view) | **PENDING** — await founder re-smoke post-deploy |
+| Authenticated route smoke (8 routes + safety copy) | **PARTIAL** — calendar OAuth closed; day mapping not attested; full P6 still pending layout redeploy + safety rows |
 | May mark PASS on launch gates (P6) | **No** — partial only |
 | Public launch implication | **NO-GO unchanged** (`S2`, `O7`, `P6` partial, `S11`, delegated/KYC not live) |
 
