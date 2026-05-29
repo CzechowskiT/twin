@@ -131,7 +131,7 @@ export function OpportunityForecast({
   const bands: Array<keyof typeof BAND_KEYS> = ["perfect", "near_miss", "stretch"];
 
   return (
-    <Card className="space-y-4 p-4">
+    <Card className="opportunity-forecast space-y-4 p-4 sm:p-5">
       <h2 className="text-lg font-semibold">{t("strategic.forecastTitle")}</h2>
       <p className="twin-muted text-sm">{t("strategic.forecastBody")}</p>
       {needsConsent ? (
@@ -144,22 +144,32 @@ export function OpportunityForecast({
       ) : null}
       <FeaturePaywall paywall={data.paywall} />
       <FeaturePaywall paywall={data.learning_path_paywall} titleKey="strategic.learningPathPaywallTitle" />
-      <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="opportunity-forecast__grid">
         {bands.map((band) => (
-          <div key={band} className="min-w-0 rounded-lg border border-[var(--twin-border)] p-3 sm:p-4">
+          <div key={band} className="opportunity-forecast__band min-w-0 rounded-lg border border-[var(--twin-border)] p-3 sm:p-4">
             <h3 className="text-sm font-semibold">{t(BAND_KEYS[band])}</h3>
             <p className="twin-muted text-xs">
               {String((data[band] as ForecastJob[]).length)} {t("strategic.forecastRoles")}
             </p>
             <ul className="mt-2 space-y-3">
               {(data[band] as ForecastJob[]).slice(0, 5).map((job) => (
-                <li key={job.job_id} className="min-w-0 text-sm">
-                  <div className="flex min-w-0 flex-col gap-2">
-                    <div className="min-w-0">
-                      <span className="font-medium break-words">{job.title}</span>
+                <li key={job.job_id} className="opportunity-forecast__job min-w-0 text-sm">
+                  <div className="opportunity-forecast__job-body min-w-0">
+                    <div className="min-w-0 break-words">
+                      <span className="font-medium">{job.title}</span>
                       <span className="twin-muted"> · {job.company}</span>
                       <span className="ml-1 text-xs text-[var(--twin-accent)]">{Math.round(job.score)}%</span>
                     </div>
+                    {job.learning_path && job.learning_path.length > 0 && band !== "perfect" ? (
+                      <ul className="twin-muted space-y-0.5 text-xs">
+                        {job.learning_path.slice(0, 2).map((step, idx) => (
+                          <li key={`${job.job_id}-lp-${idx}`}>
+                            {job.learning_path_source === "claude" ? "✦ " : "• "}
+                            {step.suggestion}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
                     <button
                       type="button"
                       aria-label={
@@ -171,7 +181,7 @@ export function OpportunityForecast({
                         autoApplyingId === job.job_id || !applyActionsGuard.canPrepareApplicationPackage
                       }
                       onClick={() => void autoApplyToJob(job.job_id)}
-                      className={`twin-btn-secondary twin-touch-target w-full px-3 py-2 text-xs font-semibold leading-snug sm:max-w-full ${
+                      className={`opportunity-forecast__action twin-btn-secondary twin-touch-target px-3 py-2 text-xs font-semibold leading-snug ${
                         applyActionsGuard.canPrepareApplicationPackage
                           ? "border-[var(--twin-cta)] text-[var(--twin-cta)]"
                           : "twin-btn--blocked"
@@ -189,16 +199,6 @@ export function OpportunityForecast({
                           : t("strategic.forecastAutoApplyBlocked")}
                     </button>
                   </div>
-                  {job.learning_path && job.learning_path.length > 0 && band !== "perfect" ? (
-                    <ul className="twin-muted mt-1 space-y-0.5 text-xs">
-                      {job.learning_path.slice(0, 2).map((step, idx) => (
-                        <li key={`${job.job_id}-lp-${idx}`}>
-                          {job.learning_path_source === "claude" ? "✦ " : "• "}
-                          {step.suggestion}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : null}
                 </li>
               ))}
             </ul>

@@ -298,9 +298,11 @@ export default function DashboardPage() {
               />
             </div>
             <div className="dashboard-hero-grid__insights">
-              <OpportunityForecast applyActionsGuard={applyActionsGuard} />
               <ProgressDashboard />
             </div>
+          </div>
+          <div className="mb-4 min-w-0 sm:mb-6">
+            <OpportunityForecast applyActionsGuard={applyActionsGuard} />
           </div>
           <p className="twin-muted -mt-2 mb-4 max-w-prose text-sm leading-relaxed">{t("dashboard.northStarLead")}</p>
           <DashboardCalendarStrip

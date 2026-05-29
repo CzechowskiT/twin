@@ -163,4 +163,9 @@ assert(
 const guardPath = "src/lib/job-apply-actions-guard.ts";
 assert(read(guardPath).includes("can_submit_delegated_application"), "Delegated apply must stay gated");
 
+const forecast = read("src/components/dashboard/OpportunityForecast.tsx");
+assert(forecast.includes("opportunity-forecast__grid"), "Forecast must use dedicated grid class");
+assert(forecast.includes("opportunity-forecast__action"), "Forecast CTAs must use full-width action class");
+assert(forecast.includes("opportunity-forecast__job-body"), "Forecast job rows must stack content before CTA");
+
 console.log("dashboard-ux-safety: ok");

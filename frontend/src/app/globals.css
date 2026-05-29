@@ -1642,6 +1642,49 @@ html[data-marketing-surface="studio"] .twin-header-cta--calendar.twin-header-cta
   background: var(--twin-surface-muted) !important;
 }
 
+/* Opportunity forecast — full-width bands; blocked CTAs never overlap job copy */
+.opportunity-forecast__grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+}
+
+@media (min-width: 48rem) {
+  .opportunity-forecast__grid {
+    grid-template-columns: repeat(2, minmax(12rem, 1fr));
+  }
+}
+
+@media (min-width: 80rem) {
+  .opportunity-forecast__grid {
+    grid-template-columns: repeat(3, minmax(14rem, 1fr));
+  }
+}
+
+.opportunity-forecast__band {
+  min-width: 0;
+}
+
+.opportunity-forecast__job-body {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.opportunity-forecast__action.twin-btn-secondary {
+  position: static;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100%;
+  margin-top: 0.125rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
 .dashboard-hero-grid {
   display: grid;
   gap: 1rem;
