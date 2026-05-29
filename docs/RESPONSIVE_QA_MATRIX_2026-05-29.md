@@ -29,7 +29,7 @@ Legend: ✅ = HTTP OK + no document horizontal scroll at viewport.
 
 | Route | Responsive (1440/1280/1024/mobile) | Functional / copy | Notes |
 | ----- | ---------------------------------- | ------------------- | ----- |
-| `/dashboard` | **FAIL** (desktop) — forecast CTAs overlapped columns in sidebar layout | Blocked prepare copy OK | **Fix shipped** — full-width forecast section; re-verify after FE deploy |
+| `/dashboard` | **PENDING re-verify** (desktop) — prior FAIL: forecast CTA overlap; fix **deployed** `3631c45` | Blocked prepare copy OK | Founder must confirm full-width forecast section on prod |
 | `/dashboard/billing` | **PASS** | PASS | Wide layout; subnav visible |
 | `/dashboard/settings/auto-apply` | **PASS** | PASS | No Run now |
 | `/dashboard/identity` | **PASS** | PASS | No KYC overclaim |
@@ -42,10 +42,10 @@ Legend: ✅ = HTTP OK + no document horizontal scroll at viewport.
 
 ## Playwright prod smoke (2026-05-29)
 
-- **24 passed**, **1 failed** (`/status` strict-mode locator vs cookie-consent title — test hygiene, not layout break).
+- **24 passed**, **1 failed** (`/status` strict-mode locator vs cookie-consent — **fixed on branch** 2026-05-29).
 - Command: `PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app PLAYWRIGHT_SKIP_WEBSERVER=1 npx playwright test e2e/smoke.spec.ts`
 
 ## Verdict
 
 - **Public/unauth responsive:** **PASS** (no h-scroll on checked routes).
-- **Authenticated dashboard responsive:** **PARTIAL** — `/dashboard` forecast layout FAIL on prod until FE redeploy; other listed routes **PASS**.
+- **Authenticated dashboard responsive:** **PARTIAL** — `/dashboard` **PENDING founder re-verify** after layout fix deploy; other listed routes **PASS**.

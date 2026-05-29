@@ -58,13 +58,37 @@ PASTE HERE:
 
 ## Recorded submission — full P6 routes (2026-05-29 UTC)
 
+| Route | Founder verdict | Notes |
+| ----- | --------------- | ----- |
+| `/dashboard/billing` | **PASS** | Wide layout; subnav visible |
+| `/dashboard/settings/auto-apply` | **PASS** | Schedule/test copy; no Run now |
+| `/dashboard/identity` | **PASS** | No KYC overclaim |
+| `/dashboard/career` | **PASS** | Career compass loads |
+| `/dashboard/calendar` | **PASS** | Google FULL prod smoke (OAuth + events + day mapping) |
+| `/workspace/candidate/jobs` | **PASS** | Long scroll OK when logged in |
+| `/profile` | **PASS** | Long profile OK |
+| `/dashboard` | **PENDING re-verify** | Prior FAIL: forecast CTA overlap — fix deployed Vercel `3631c45` / `a445878`; founder must confirm layout |
+| Readiness blocks auto-apply when incomplete | **PASS** | |
+| No Run now / trigger sweep in UI | **PASS** | |
+| No KYC/legal/delegated apply live copy | **PASS** | |
+
 | Field | Value |
 | ----- | ----- |
-| Template received | Yes (structure only) |
-| Route results filled | **Partial** — `/dashboard/calendar` Google OAuth PASS (above); other route lines not fully attested in template |
-| Safety checks filled | **No** |
-| Screenshots / issues | Prior session: most routes PASS; `/dashboard` layout FAIL (FE fix shipped) |
+| Template received | Yes |
+| Route results filled | **Partial** — 7/8 routes PASS; `/dashboard` layout pending post-fix re-verify |
+| Safety checks filled | **Yes** — all three safety rows PASS |
+| Screenshots / issues | Prior `/dashboard` layout FAIL; FE fix shipped and deployed |
 | Operator attestation | Google Calendar OAuth: **founder PASS** |
+
+## Automated guard evidence (2026-05-29, release gate batch)
+
+| Check | Result |
+| ----- | ------ |
+| `npm run test:verified-readiness-guard` | **PASS** |
+| `npm run test:dashboard-ux-safety` | **PASS** |
+| `npm run test:calendar-week` | **PASS** |
+| Playwright unauth (`-g dashboard\|login\|…`) vs prod | **13/14 PASS** — `/status` cookie-banner strict-mode fixed on branch |
+| Backend `test_candidate_verified_readiness_gate.py` | **11 passed** (local) |
 
 ## Verdict
 
@@ -73,17 +97,15 @@ PASTE HERE:
 | Google Calendar OAuth prod smoke | **PASS** (2026-05-29) |
 | Google Calendar day mapping (Europe/Warsaw week view) | **PASS** (founder re-smoke 2026-05-29) |
 | Google Calendar — full prod smoke (OAuth + events + day mapping) | **PASS** |
-| Authenticated route smoke (8 routes + safety copy) | **PARTIAL** — Google Calendar **fully closed**; full P6 still pending `/dashboard` layout redeploy + safety rows |
-| May mark PASS on launch gates (P6) | **No** — partial only |
+| Authenticated route smoke (8 routes + safety copy) | **PARTIAL** — 7/8 routes + safety **PASS**; `/dashboard` layout **PENDING founder re-verify** after deploy `3631c45` |
+| May mark PASS on launch gates (P6) | **No** — `/dashboard` layout re-verify remains |
 | Public launch implication | **NO-GO unchanged** (`S2`, `O7`, `P6` partial, `S11`, delegated/KYC not live) |
 
 ## Founder next actions
 
-1. Log in with pilot test account on https://twin-sooty.vercel.app (credentials outside repo).
-2. Visit each route; note **PASS** / **FAIL** + one-line note per row in the template above.
-3. Confirm auto-apply settings show schedule/test copy only — **do not** click Run now / sweep triggers.
-4. Confirm readiness gate blocks apply when incomplete (screenshot optional).
-5. Paste completed block into this doc (or reply to release gate thread) and re-run docs sync.
+1. Re-verify `/dashboard` only — forecast section should be full-width without CTA overlap (deploy `3631c45` live).
+2. Mark `/dashboard` **PASS** or **FAIL** in the route table above.
+3. If PASS → notify release gate to flip P6 to ✅.
 
 ## Hard bans (this exercise)
 

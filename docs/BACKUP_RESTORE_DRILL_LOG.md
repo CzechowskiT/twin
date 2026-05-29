@@ -10,6 +10,7 @@ Append-only evidence for `docs/RUNBOOK_DB_RESTORE_2026-05-27.md`.
 | _pending_ | founder | latest prod snapshot | staging clone | PENDING | — | — | attach restore target screenshot + health output + `alembic current` + SQL sanity query | NO-GO | First drill not yet executed — use founder checklist below |
 | 2026-05-29 | agent | — | — | PENDING | — | — | Runbook reviewed; no staging restore executed (HARD BAN: no prod DB touch) | NO-GO | O7 remains open until founder staging drill row with PASS |
 | 2026-05-29 | O7 drill operator (agent) | Railway Postgres daily snapshot (prod source, **not** restored over prod) | staging clone `twin-staging-restore-proof-YYYYMMDD` (expected) | **PENDING EVIDENCE** | — | none (drill not executed) | No Railway staging creds in agent session; prod health read-only OK (`db_ok=true`, SHA `df15618`) | **NO-GO** | Prepared evidence path + PASS criteria in runbook; **founder must execute** steps 1–8 in `RUNBOOK_DB_RESTORE_2026-05-27.md` |
+| 2026-05-29 | release gate agent (batch 2) | — | — | **PENDING EVIDENCE** | — | none | Re-confirmed: no staging Railway access; prod untouched; runbook + founder checklist complete | **NO-GO** | O7 unchanged — restore drill requires founder credentials |
 
 ## O7 PASS criteria (summary)
 

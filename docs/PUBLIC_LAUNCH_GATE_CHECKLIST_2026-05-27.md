@@ -36,7 +36,7 @@ the gate to ✅.
 | S10| OAuth callback rate-limit (defence vs provider-quota burn)              | `tests/test_oauth_callback_rate_limits.py`; `1efd8b1` on `auth.py` + calendar + ATS `@limiter.limit("10/minute")` | ✅ code shipped; runtime SHA `f165096` is newer and includes this baseline |
 | S10b | Match-feedback / applications / profile mutation caps (Layer 2) + saved-jobs | `tests/test_auth_mutation_rate_limits.py`, `tests/test_jobs_saved_rate_limits.py`; `1c731fc` + Agent2 follow-up | ✅ code + tests updated on branch; keep runtime SHA verification in O2/O6 flow |
 | S10c | Cookie consent + recruiter inbox write rate limits                      | `tests/test_consent_recruiter_rate_limits.py` (includes `/recruiter/inbox/respond-batch`); `67a22dc` | ✅ code + tests updated on branch; keep runtime SHA verification in O2/O6 flow |
-| S11 | Verified Candidate readiness gate (`/api/v1/candidates/me/verified-readiness`) | `tests/test_candidate_verified_readiness_gate.py` + gateway docs set dated 2026-05-28 | 🟡 repo-ready; production verification pending |
+| S11 | Verified Candidate readiness gate (`/api/v1/candidates/me/verified-readiness`) | `tests/test_candidate_verified_readiness_gate.py` (11 passed local 2026-05-29) + gateway docs set dated 2026-05-28 | 🟡 **repo-ready** — backend tests PASS locally; **production API verification pending founder** |
 
 ### Operational gates
 
@@ -74,7 +74,7 @@ the gate to ✅.
 | P3 | Pilot offer copy reviewed                                               | `docs/PILOT_OFFER_FINAL.md`, `PILOT_OFFER_COPY_PL.md`                                            | ✅           |
 | P4 | Pilot pricing model verified                                            | `docs/B2B_*` / pricing docs                                                                      | ✅           |
 | P5 | Pilot kill-switch (`SCRAPE_OPS_*` / feature flags) tested                | `pytest tests/test_auto_apply_trigger_sweep_admin_gate.py -q`                                   | ✅           |
-| P6 | Founder authenticated prod smoke (dashboard subpages, jobs, profile, safety copy) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` — PASS when every route + safety row has explicit founder PASS | ⚠️ **PARTIAL** — 2026-05-29: most routes PASS; `/dashboard` layout FAIL (fix shipped); Google Calendar **FULL prod smoke PASS** (OAuth + events + day mapping, 2026-05-29) |
+| P6 | Founder authenticated prod smoke (dashboard subpages, jobs, profile, safety copy) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` — PASS when every route + safety row has explicit founder PASS | ⚠️ **PARTIAL** — 7/8 routes + safety copy **PASS** (founder 2026-05-29); `/dashboard` forecast layout fix **deployed** (`3631c45`) — **PENDING founder re-verify** only; Google Calendar **FULL prod smoke PASS** |
 
 ## Decision matrix
 
@@ -94,7 +94,7 @@ the gate to ✅.
 - **O7 backup/restore:** ❌ **PENDING EVIDENCE** — PASS criteria documented; founder must run staging clone drill in Railway (`docs/BACKUP_RESTORE_DRILL_LOG.md` § Founder action checklist). Prod untouched; no agent restore.
 - **S5 prod revision:** ✅ **PASS** — production `version_num = 050_stripe_webhook_events` (read-only SQL, 2026-05-29; evidence in `docs/ALEMBIC_050_FOUNDER_VERIFICATION_2026-05-29.md` § Evidence log). **No migration** needed or run by agent; **no** Railway deploy for this gate.
 - **O5 Google Calendar — FULL prod smoke:** ✅ **PASS** (2026-05-29) — OAuth (Console config); Connect; real events; week day mapping (`Europe/Warsaw`, no +1 shift). Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, fix HEAD `3631c45`; FE-only, no Railway. Evidence: `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`. O5 row stays ⚠️ **partial** until Apple/iCal beyond docs.
-- **P6 founder authenticated smoke:** ⚠️ **PARTIAL** — `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md`; redeploy FE for `/dashboard` forecast layout; Google Calendar **fully closed** (not a P6 blocker).
+- **P6 founder authenticated smoke:** ⚠️ **PARTIAL** — founder attested 7 routes + safety rows PASS; `/dashboard` layout fix deployed on Vercel `3631c45` — single remaining founder re-verify; Google Calendar **fully closed**.
 
 ## What "launch" means in this checklist
 
@@ -155,9 +155,10 @@ Reference steps: `docs/BACKUP_RESTORE_DRILL_LOG.md` § Founder action checklist.
 
 ### Founder authenticated route smoke (P6)
 
-- Status: **PENDING** (2026-05-29).
-- Evidence: `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` — template received with **no per-route PASS/FAIL**.
-- Flip to ✅ only when founder fills: `/dashboard`, `/dashboard/billing`, `/dashboard/settings/auto-apply`, `/dashboard/identity`, `/dashboard/career`, `/dashboard/calendar`, `/workspace/candidate/jobs`, `/profile`, plus safety rows (readiness block, no Run now, no KYC/delegated live copy).
+- Status: **PARTIAL** (2026-05-29) — 7/8 routes + safety copy PASS; `/dashboard` forecast layout fix **deployed** — founder must re-verify layout only.
+- Evidence: `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` + `docs/RESPONSIVE_QA_MATRIX_2026-05-29.md`.
+- Automated guards (2026-05-29): `test:verified-readiness-guard`, `test:dashboard-ux-safety`, `test:calendar-week` PASS; Playwright unauth dashboard routes 13/14 PASS (status cookie-banner locator fixed on branch).
+- Flip to ✅ only when founder confirms `/dashboard` layout PASS post-`3631c45` deploy.
 
 ## Hard bans honoured
 

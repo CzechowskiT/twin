@@ -217,9 +217,11 @@ test.describe("public smoke (status + waitlist counter)", () => {
     // or a loading / error line. Wait for one of those to be
     // visible so we know client hydration ran.
     await page.waitForLoadState("networkidle").catch(() => {});
-    const dl = page.locator("dl").first();
-    const loadingOrError = page.locator("p").filter({ hasText: /./ }).first();
-    await expect(dl.or(loadingOrError)).toBeVisible();
+    // Scope to status card copy — cookie banner also renders <p> and breaks strict .or().
+    const statusDl = page.locator("dl.grid").first();
+    const statusLoading = page.locator("p.twin-muted.text-sm");
+    const statusError = page.locator("p.text-sm.text-red-400");
+    await expect(statusDl.or(statusLoading).or(statusError)).toBeVisible();
   });
 
   test("waitlist smoke: /waitlist exposes hydration-safe counter or signup UI", async ({ page }) => {

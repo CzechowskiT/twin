@@ -45,7 +45,7 @@
 | Recruiter inbox | `recruiter_inbox_configured` | **LIVE** |
 | Partner export | `partner_export_configured` | **LIVE** |
 | Placement verification (machine-assisted) | `PLACEMENT_VERIFICATION.md` | **LIVE** design; pilot-scale |
-| Verified candidate readiness gate (`/api/v1/candidates/me/verified-readiness`) | `docs/VERIFIED_CANDIDATE_GATEWAY_2026-05-28.md` + backend route | **REPO** (not production-verified yet) |
+| Verified candidate readiness gate (`/api/v1/candidates/me/verified-readiness`) | `docs/VERIFIED_CANDIDATE_GATEWAY_2026-05-28.md` + `tests/test_candidate_verified_readiness_gate.py` (11 passed local 2026-05-29) | **REPO** — backend tests PASS; production API call not founder-verified yet |
 | GDPR consent on signup | L1 gate | **LIVE** |
 | Cookie consent (PL/EN) | L2 gate | **LIVE** |
 | Privacy / Terms pages | smoke / routes | **LIVE** |
@@ -55,8 +55,8 @@
 | Backup restore drill | O7 gate | **BLOCKED / PENDING EVIDENCE** — PASS criteria + founder checklist in `BACKUP_RESTORE_DRILL_LOG.md`; no PASS row yet (2026-05-29 operator; prod read-only health OK) |
 | Controlled pilot ops | pilot manual + tracker | **LIVE** process |
 | Candidate E2E manual smoke | `docs/CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md` | **LIVE** — PASS (founder-verified, 2026-05-27); Top 20 → Nietrafione → refresh regression. Warning: no auto-apply / real apply / scrape. |
-| Founder authenticated route smoke (dashboard subpages, jobs, profile, safety copy) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **PENDING** — template received 2026-05-29 with **no filled route rows**; not PASS |
-| Playwright smoke drift points | `frontend/e2e/smoke.spec.ts` targeted assertions | **STABILIZED** locally (most recent targeted lane green in prior session) |
+| Founder authenticated route smoke (dashboard subpages, jobs, profile, safety copy) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **PARTIAL** — 7/8 routes + safety PASS; `/dashboard` layout pending founder re-verify post-`3631c45` |
+| Playwright smoke drift points | `frontend/e2e/smoke.spec.ts` targeted assertions | **STABILIZED** — status cookie-banner locator fix on branch; 13/14 prod lane PASS (2026-05-29) |
 | Public launch announcement | gate checklist | **BLOCKED** |
 | Investor demo | `INVESTOR_DEMO_RUNBOOK.md` | **LIVE** stack, curated use |
 | Real CAPTCHA bypass / live mass apply | HARD BAN | **BLOCKED** |
@@ -86,7 +86,8 @@
 | Delegated / KYC apply | Product gates | **NOT LIVE** |
 | O7 restore drill | No PASS row in drill log; staging path is Railway UI only (no repo script) | **PENDING EVIDENCE** — founder action required |
 | Google Calendar FULL prod smoke (2026-05-29) | `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md` | **LIVE / VERIFIED** — OAuth + real events + day mapping; Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, HEAD `3631c45`; no Railway |
-| Founder authenticated smoke (2026-05-29) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **PARTIAL** — most routes PASS; `/dashboard` layout fix pending; Google Calendar **fully closed** |
+| Founder authenticated smoke (2026-05-29) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **PARTIAL** — 7/8 routes + safety PASS; `/dashboard` layout fix deployed — founder re-verify only |
+| CSP per-route probe (2026-05-29 batch) | `/`, `/dashboard`, `/login/candidate`, `/demo`, `/status` — all report-only | **LIVE REPORT-ONLY** — enforce still blocked (S2) |
 
 ---
 
