@@ -99,7 +99,26 @@ PASTE HERE:
 | Google Calendar — full prod smoke (OAuth + events + day mapping) | **PASS** |
 | Authenticated route smoke (8 routes + safety copy) | **PASS** (founder 2026-05-29) — all routes + safety rows attested |
 | May mark PASS on launch gates (P6) | **Yes** |
-| Public launch implication | **NO-GO unchanged** (`S2`, `O7`, `S11`, delegated/KYC not live) |
+| Public launch implication | **NO-GO unchanged** (`S2`, `O7`, delegated/KYC not live) |
+
+## S11 verified-readiness prod smoke — founder PASS (2026-05-29 UTC)
+
+**Gate:** S11 · **Verdict:** **PASS**
+
+| Check | Evidence |
+| ----- | -------- |
+| Endpoint path | `/api/v1/candidates/me/verified-readiness` |
+| Production host | `https://twin-production-bcd9.up.railway.app` (path only; no tokens) |
+| HTTP status | **200 OK** |
+| Method | Founder/operator browser smoke (logged-in candidate dashboard) |
+| UI | Readiness card visible on `/dashboard` |
+| Date | 2026-05-29 |
+| Secrets in evidence | **None** — screenshot with Bearer token **not** committed |
+
+| Check | Status |
+| ----- | ------ |
+| S11 verified-readiness prod API + dashboard card | **PASS** (founder 2026-05-29) |
+| May mark PASS on launch gates (S11) | **Yes** |
 
 ## P6 dashboard layout — founder PASS (2026-05-29 UTC)
 

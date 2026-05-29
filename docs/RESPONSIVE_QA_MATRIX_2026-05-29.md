@@ -38,6 +38,7 @@ Legend: ✅ = HTTP OK + no document horizontal scroll at viewport.
 | `/workspace/candidate/jobs` (logged in) | **PASS** | PASS | Long scroll OK |
 | `/profile` | **PASS** | PASS | Long profile OK |
 | Readiness blocks auto-apply when incomplete | — | **PASS** | |
+| Verified-readiness card + prod API (`/api/v1/candidates/me/verified-readiness`) | — | **PASS** | Founder 2026-05-29 — HTTP 200 on prod; card visible on `/dashboard` (S11) |
 | No live delegated/KYC/guaranteed apply copy | — | **PASS** | |
 
 ## Playwright prod smoke (2026-05-29)

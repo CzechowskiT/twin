@@ -45,7 +45,7 @@
 | Recruiter inbox | `recruiter_inbox_configured` | **LIVE** |
 | Partner export | `partner_export_configured` | **LIVE** |
 | Placement verification (machine-assisted) | `PLACEMENT_VERIFICATION.md` | **LIVE** design; pilot-scale |
-| Verified candidate readiness gate (`/api/v1/candidates/me/verified-readiness`) | `docs/VERIFIED_CANDIDATE_GATEWAY_2026-05-28.md` + `tests/test_candidate_verified_readiness_gate.py` (11 passed local 2026-05-29) | **REPO** — backend tests PASS; production API call not founder-verified yet |
+| Verified candidate readiness gate (`/api/v1/candidates/me/verified-readiness`) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` § S11 + `tests/test_candidate_verified_readiness_gate.py` | **LIVE / VERIFIED** — prod HTTP 200 (founder browser smoke 2026-05-29); readiness card on `/dashboard` |
 | GDPR consent on signup | L1 gate | **LIVE** |
 | Cookie consent (PL/EN) | L2 gate | **LIVE** |
 | Privacy / Terms pages | smoke / routes | **LIVE** |

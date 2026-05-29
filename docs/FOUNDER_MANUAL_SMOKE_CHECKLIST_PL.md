@@ -40,6 +40,7 @@
 - **PASS authenticated route smoke:** **TAK** (2026-05-29) — 8/8 tras + safety PASS; `/dashboard` layout PASS (founder); dowód: `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md`.
 - **S5 Alembic `050`:** ✅ na prod.  
 - **Google Calendar FULL prod smoke (krok 6 / O5):** ✅ **PASS** 2026-05-29 — Console config; Connect; prawdziwe wydarzenia; mapowanie dni (`Europe/Warsaw`, bez +1 UTC) po deploy Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH` / HEAD `3631c45` (`docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`).
-- **Nie oznacza public launch GO** — CSP enforce (S2), backup drill (O7), verified-readiness prod (S11), delegated/KYC nie live (`docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md`).
+- **S11 verified-readiness prod smoke:** ✅ **PASS** (2026-05-29) — `/api/v1/candidates/me/verified-readiness` HTTP 200 on prod; readiness card visible on `/dashboard`; dowód: `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` § S11.
+- **Nie oznacza public launch GO** — CSP enforce (S2), backup drill (O7), delegated/KYC nie live (`docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md`).
 
 Powiązane: [CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md](./CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md) · [FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md](./FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md)
