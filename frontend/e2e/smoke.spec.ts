@@ -122,6 +122,29 @@ test.describe("dashboard smoke (read-only, no live actions)", () => {
     await expect(page.getByRole("heading").first()).toBeVisible();
   });
 
+  test("candidate jobs: unauthenticated /workspace/candidate/jobs routes toward login", async ({
+    page,
+    context,
+  }) => {
+    await context.clearCookies();
+    await page.addInitScript(() => {
+      try {
+        window.localStorage?.clear();
+        window.sessionStorage?.clear();
+      } catch {
+        // ignore
+      }
+    });
+    await gotoSmoke(page, "/workspace/candidate/jobs");
+    await page.waitForLoadState("networkidle").catch(() => {});
+    const url = new URL(page.url());
+    expect(["/login", "/login/", "/login/candidate", "/workspace/candidate/jobs"]).toContain(url.pathname);
+    const bodyText = (await page.locator("body").innerText()).toLowerCase();
+    expect(bodyText).not.toMatch(
+      /apply now|auto apply|submit application|kyc verified|guaranteed interview|fully verified|run now \(test\)/i,
+    );
+  });
+
   test("public-health smoke: /api/public-health proxy returns sane JSON", async ({ request }) => {
     const res = await request.get("/api/public-health");
     // Local smoke can return 500 when frontend proxy is up but backend is offline.

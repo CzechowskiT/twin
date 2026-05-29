@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
+import { WorkspaceFlowSteps } from "@/components/ux/workspace-flow-steps";
 import { Card, Shell } from "@/components/ui";
 import { useTranslation } from "@/components/language-provider";
 import { JobCard, type CompetitiveJobRow } from "@/components/job/JobCard";
@@ -81,15 +83,21 @@ export function CandidateJobDiscovery() {
   }
 
   return (
-    <Shell>
-      <header className="mb-6">
-        <p className="twin-muted text-xs uppercase tracking-wide">{t("dashboard.jobs")}</p>
-        <h1 className="text-xl font-semibold">{t("jobBoard.discoveryTitle")}</h1>
-        <p className="twin-muted mt-1 max-w-2xl text-sm">{t("jobBoard.discoveryLead")}</p>
-        <Link href="/dashboard" className="twin-muted mt-2 inline-block text-xs underline">
-          {t("dashboard.title")}
-        </Link>
-      </header>
+    <Shell wide rail>
+      <div className="mb-4 flex min-w-0 flex-col gap-3 sm:mb-6 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+        <header className="min-w-0 shrink-0">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
+            {t("dashboard.jobs")}
+          </p>
+          <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">{t("jobBoard.discoveryTitle")}</h1>
+          <p className="twin-muted mt-1 max-w-2xl text-sm leading-relaxed">{t("jobBoard.discoveryLead")}</p>
+          <Link href="/dashboard" className="twin-muted mt-2 inline-block text-xs underline">
+            {t("dashboard.title")}
+          </Link>
+        </header>
+        <CandidateWorkspaceSubnav ariaLabel={t("jobBoard.discoveryTitle")} />
+      </div>
+      <WorkspaceFlowSteps current="matches" className="mb-4 sm:mb-6" />
 
       {error ? <p className="text-sm text-red-500">{error}</p> : null}
       {loading ? <p className="twin-muted text-sm">{t("dashboard.jobsLoading")}</p> : null}

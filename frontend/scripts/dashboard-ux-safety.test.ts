@@ -10,6 +10,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 const COMPONENT_PATHS = [
   "src/components/job-list.tsx",
+  "src/components/job/candidate-job-discovery.tsx",
   "src/components/nightly-auto-apply-strip.tsx",
   "src/components/dashboard/OpportunityForecast.tsx",
   "src/components/dashboard/dashboard-verified-readiness-card.tsx",

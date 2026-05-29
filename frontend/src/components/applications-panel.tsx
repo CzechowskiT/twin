@@ -228,14 +228,19 @@ export function ApplicationsPanel({
             className="twin-card-inset flex flex-col gap-2 p-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between"
           >
             <div className="min-w-0 flex-1">
-              <a href={app.url} target="_blank" rel="noopener noreferrer" className="twin-link font-medium">
+              <a
+                href={app.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="twin-link block text-sm font-semibold leading-snug text-[var(--foreground)]"
+              >
                 {app.title}
               </a>
-              <p className="twin-muted mt-0.5 text-xs">
-                {app.company}
+              <p className="twin-muted mt-0.5 text-xs leading-relaxed">
+                <span className="font-medium text-[var(--twin-muted-strong)]">{app.company}</span>
                 {app.location ? ` · ${app.location}` : ""} · {app.job_board}
               </p>
-              <p className="mt-1 text-xs font-medium text-[var(--twin-accent)]">
+              <p className="mt-1.5 text-xs font-medium text-[var(--twin-accent)]">
                 {t("dashboard.submissionPhaseLabel")}:{" "}
                 {t(
                   applicationDisplayStatusKey(app.status, {
