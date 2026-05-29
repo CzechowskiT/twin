@@ -1,177 +1,118 @@
 # Production database restore incident — 2026-05-29
 
 **Incident ID:** `INC-DB-2026-05-29-001`  
-**Severity:** **S0** (suspected production data rollback / partial data loss)  
-**Status:** **OPEN — recovery decision pending founder**  
-**Operator (reported):** founder  
+**Severity:** **S0** (wrong production Postgres volume temporarily mounted)  
+**Status:** **RESOLVED** — original volume re-mounted; dashboard data recovered (founder-verified + read-only curl)  
+**Operator:** founder  
 **Agent role:** read-only verification + documentation (no deploy, no DB mutation)
 
 ## Summary
 
-Founder likely triggered a **manual Railway Postgres backup restore** on project **`responsible-success` / production** Postgres. UI showed **"Restoring backup…"**. Source backup: **2026-05-25 07:33 UTC** (~120 MB).
+On **2026-05-29**, founder accidentally activated a **wrong restored backup volume** (`postgres-2026-05-25 07:33 UTC`, ~120 MB) on Railway project **`responsible-success` / production** Postgres. The **original `postgres-volume` was unmounted** from `/var/lib/postgresql/data`.
 
-After restore:
+**Impact while wrong volume was active:**
 
-- API health surfaces remain **green** (`status=ok`, `db_ok=true`, Celery worker active).
-- **Founder dashboard shows zeros** (feed/jobs, matches, applications, pipeline).
-- **`GET /api/v1/public/mvp-stats` returns HTTP 500** (read-only check 2026-05-29 UTC) — regression vs prior baseline when endpoint returned 200.
-- **`validated_jobs=652`** still visible on `public-health` / `health?ops=1` — job-corpus aggregate may differ from per-user dashboard rows.
+- API health remained **green** (`status=ok`, `db_ok=true`) but pointed at **stale/wrong data**.
+- Founder dashboard: **zeros** (feed/jobs, matches, applications, pipeline).
+- Google Calendar: **disconnected** / events not visible.
+- `GET /api/v1/public/mvp-stats`: HTTP **500** (agent read-only, pre-recovery).
 
-**Classification:** production data incident — **NOT** gate O7 staging drill. O7 remains **INVALID / FAIL** for this event.
+**Recovery (founder, same day):**
 
-## Founder-reported evidence
+1. Created backup of incorrect state at **2026-05-29 14:09 UTC**.
+2. **Re-mounted original `postgres-volume`** to `/var/lib/postgresql/data`.
+3. Postgres online; Railway deploy successful (no agent deploy/migrations/env changes).
+4. Dashboard recovered (founder visual): **feed 2501**, **matches 200**, **applications 12**, **pipeline 11**; Google Calendar events visible again.
 
-| Field | Value |
-| ----- | ----- |
-| Railway project | `responsible-success` / production |
-| Service | Postgres |
-| Backup restored | Manual backup **2026-05-25 07:33 UTC**, ~120 MB |
-| UI state | "Restoring backup…" observed |
-| Pre-incident (founder) | Dashboard non-zero; `validated_jobs` ~652 on health |
-| Post-incident (founder) | Dashboard **zeros** across feed, matches, applications, pipeline |
+**Classification:** production **incident** — **NOT** gate O7 staging drill. O7 remains **FAIL / PENDING EVIDENCE**.
 
-## Read-only agent verification (2026-05-29 UTC)
+## Timeline
+
+| UTC (approx) | Event |
+| ------------ | ----- |
+| 2026-05-25 07:33 | Source of wrong backup volume (stale snapshot) |
+| 2026-05-29 (AM) | Wrong volume mounted; original `postgres-volume` unmounted |
+| 2026-05-29 | Dashboard zeros; calendar disconnected; health OK but wrong DB |
+| 2026-05-29 14:09 | Backup taken of incorrect state (safety snapshot) |
+| 2026-05-29 14:09+ | Original `postgres-volume` re-mounted; Postgres online |
+| 2026-05-29 (post-recovery) | Agent read-only curl: health green, `mvp-stats` **200**, `market_coverage_active_validated=2501` |
+
+## Read-only agent verification
+
+### Pre-recovery (2026-05-29 UTC, agent)
 
 | Check | Result |
 | ----- | ------ |
-| `GET https://twin-sooty.vercel.app/api/public-health` | `status=ok`, **`db_ok=true`**, `git_commit=df15618`, `validated_jobs=652`, `worker_active=true` |
+| `GET /api/public-health` | `db_ok=true`, `validated_jobs=652` |
+| `GET /api/v1/public/mvp-stats` | HTTP **500** |
+| Founder dashboard | Zeros (founder report) |
+
+### Post-recovery (2026-05-29 UTC, agent)
+
+| Check | Result |
+| ----- | ------ |
+| `GET https://twin-sooty.vercel.app/api/public-health` | `status=ok`, **`db_ok=true`**, `git_commit=df15618`, `validated_jobs=652`, `market_coverage_active_validated=**2501**`, `worker_active=true` |
 | `GET /` (Vercel) | HTTP **200** |
 | `GET /dashboard` (Vercel) | HTTP **200** |
-| `GET https://twin-production-bcd9.up.railway.app/api/v1/health` | `status=ok`, `git_commit=df15618` |
-| `GET …/api/v1/health?ops=1` | `status=ok`, `validated_jobs=652`, `market_coverage_active_validated=1727` |
-| `GET …/api/v1/public/mvp-stats` | HTTP **500** — `{"detail":"Internal server error"}` |
-| `GET …/api/v1/demo/snapshot` | HTTP 200, `source=static_fallback` (not live DB proof) |
+| `GET …/api/v1/health` | `status=ok`, `git_commit=df15618` |
+| `GET …/api/v1/public/mvp-stats` | HTTP **200** — `registered_users=3`, `total_applications=17`, `interviews_scheduled=3`, `profiles_with_cv=2`, `database_reachable=true` |
 
-### Prior baseline (docs, not re-measured on DB)
+### Founder visual recovery (dashboard, post re-mount)
 
-| Metric | Prior reference | Current public signal |
-| ------ | ----------------- | --------------------- |
-| `validated_jobs` | 652 (`public-health`, multiple 2026-05-29 docs) | **652** (unchanged on health) |
-| `registered_users` | 3 (`CTO_PRODUCT_TECH_AUDIT_2026-05-26`, mvp-stats) | **Unknown** — mvp-stats 500 |
-| Dashboard user data | Non-zero (founder smoke 2026-05-29) | **Zeros** (founder report) |
-| Alembic head | `050_stripe_webhook_events` (founder SQL 2026-05-29) | **Unverified post-restore** — founder must re-run read-only SQL |
+| Surface | Count (founder) |
+| ------- | ----------------- |
+| Feed / jobs | **2501** |
+| Matches | **200** |
+| Applications | **12** |
+| Pipeline | **11** |
+| Google Calendar | Events visible again |
 
-**Do not infer exact row loss** without founder read-only SQL on production Postgres.
+*Note:* `mvp-stats.total_applications=17` is an **aggregate across all users**; founder dashboard **12** is per-session scope — both can be true.
 
-## Hypothesis (unconfirmed)
+## Root cause (founder-reported)
 
-1. **In-place restore** of production Postgres to **2026-05-25** snapshot → loss of user/match/application rows created **2026-05-25 → incident time**.
-2. Possible **schema / migration drift** if restored volume predates migration `050` → may explain `mvp-stats` 500 while basic health queries succeed.
-3. Job corpus counts may come from **different query paths** than per-candidate dashboard feed → health can look OK while user-facing data is empty.
+- Wrong backup volume from **2026-05-25** temporarily replaced production data path.
+- Original production volume was **unmounted**, not destroyed.
+- Recovery = **volume re-mount** (Option B from incident playbook), not accept-stale-data (A) or clone-swap (C).
 
-## Railway founder checklist (screenshots required)
+## Recovery actions taken (founder — no agent execution)
 
-Execute in Railway Dashboard — **read-only / evidence only** until recovery option chosen.
+| Step | Action |
+| ---- | ------ |
+| 1 | Backup incorrect DB state **2026-05-29 14:09 UTC** |
+| 2 | Re-mount **`postgres-volume`** → `/var/lib/postgresql/data` |
+| 3 | Confirm Postgres online + deploy success |
+| 4 | Verify dashboard + calendar in browser |
 
-| # | Where | Capture |
-| - | ----- | ------- |
-| 1 | Postgres → **Backups** | List of snapshots; highlight **2026-05-25 07:33 UTC** restore source |
-| 2 | Postgres → **Settings / Restore history** (if shown) | Target: **in-place prod** vs **new database/clone** |
-| 3 | Project → **Activity** | Restore event timestamp (UTC) |
-| 4 | Postgres → **Deployments** | Any redeploy tied to restore |
-| 5 | Postgres → **Volumes** | Current volume ID; created date |
-| 6 | Project → **Recently deleted** | Old volume / service — recoverable? |
-| 7 | API service → **Variables** | Confirm **`DATABASE_URL` unchanged** (do not paste values — screenshot redacted host only) |
-| 8 | Railway **Support** | Open ticket if pre-restore volume recovery needed |
+**Not performed (by design this session):** deploy, migrations, env changes, scrape, apply/auto-apply.
 
-## Safe read-only endpoints (founder / ops)
+## Remaining founder actions (optional hardening)
 
-**No auth required:**
+1. Attach Railway **screenshots** (volumes before/after, activity log) to Evidence log.
+2. Re-run read-only SQL: `alembic_version`, row counts — confirm `050_stripe_webhook_events` still current.
+3. Retain **2026-05-29 14:09 UTC** incorrect-state backup until incident closed in post-mortem.
+4. Execute **O7 staging clone drill** separately — prod incident recovery **does not** close O7.
 
-| URL | Purpose |
-| --- | ------- |
-| `https://twin-sooty.vercel.app/api/public-health` | Ops payload: `db_ok`, `validated_jobs`, Celery |
-| `https://twin-production-bcd9.up.railway.app/api/v1/health` | Minimal API liveness |
-| `https://twin-production-bcd9.up.railway.app/api/v1/health?ops=1` | Extended ops booleans + job counts |
-| `https://twin-production-bcd9.up.railway.app/api/v1/health/celery-status` | Worker/broker snapshot |
-| `https://twin-production-bcd9.up.railway.app/api/v1/public/mvp-stats` | Aggregate DB counts (**currently 500 — incident signal**) |
-| `https://twin-production-bcd9.up.railway.app/api/v1/demo/snapshot` | Demo mode snapshot (may be static fallback) |
-
-**Bearer token required** (`Authorization: Bearer <OPS_ADMIN_TOKEN>` — use Railway/env locally, **never commit**):
-
-| URL | Purpose |
-| --- | ------- |
-| `GET /api/v1/admin/metrics` | Users, matches, applications totals |
-| `GET /api/v1/admin/data-quality` | Data quality KPIs |
-| `GET /api/v1/admin/market-coverage-status` | Scrape corpus coverage |
-| `GET /api/v1/admin/matching-quality` | Match pipeline health |
-| `GET /api/v1/admin/deploy-health` | Deploy + wiring extensions |
-
-**Auth required (founder session — browser or JWT):**
-
-| URL | Purpose |
-| --- | ------- |
-| `GET /api/v1/candidates/me/matches` | Per-user match feed |
-| `GET /api/v1/applications` | Application pipeline |
-| `GET /api/v1/jobs/feed-stats` | Feed stats |
-| `GET /api/v1/candidates/me/verified-readiness` | Readiness gate state |
-
-**Read-only SQL (Postgres shell — founder only):**
-
-```sql
-SELECT version_num FROM alembic_version;
-SELECT COUNT(*) FROM users;
-SELECT COUNT(*) FROM candidates;
-SELECT COUNT(*) FROM job_matches;
-SELECT COUNT(*) FROM applications;
-SELECT COUNT(*) FROM jobs WHERE validated_at IS NOT NULL;
-```
-
-## Recovery options (founder decision — no agent execution)
-
-### Option A — Retain restored DB; rebuild forward (lowest blast radius if loss accepted)
-
-- Accept **2026-05-25** state as current production truth.
-- Document **loss window**: ~2026-05-25 07:33 UTC → restore execution time.
-- Re-run **read-only** SQL sanity + `alembic current`; if behind `050`, plan **founder-approved** migration window (separate incident step).
-- Re-seed **pilot/demo** users per `scripts/seed-investor-demo.py` runbook — **only after explicit approval**.
-- Notify pilot users if personal data (matches, applications, calendar holds) was lost.
-- **Do not** claim O7 PASS.
-
-### Option B — Recover pre-restore volume (Railway / support)
-
-- Check Railway **Recently deleted** volumes and Postgres service history for **pre-restore volume**.
-- Open **Railway Support** ticket: accidental in-place restore; request volume recovery / PITR if plan supports it.
-- **Do not** run another restore without pausing API + worker (see `docs/RUNBOOK_DB_RESTORE_2026-05-27.md` § Production restore).
-- Validate on **clone first** before any prod pointer change.
-
-### Option C — Restore newer snapshot to clone; validate; swap (controlled rollback forward)
-
-- Identify **newest snapshot after 2026-05-25** (if any) in Backups list.
-- **Restore to new database** (never in-place on prod again without incident commander sign-off).
-- Point **temporary staging API clone** at new DB; run SQL sanity + authenticated smoke.
-- If counts match pre-incident expectations, plan **maintenance window** to repoint production `DATABASE_URL` — founder-only, documented timeline.
-- Keep failed/restored volumes until recovery verified.
-
-## Gate / launch verdicts (this incident)
+## Gate / launch verdicts (post-recovery)
 
 | Surface | Verdict |
 | ------- | ------- |
-| O7 backup/restore drill | **FAIL / INVALID** — prod restore ≠ staging drill |
-| Controlled pilot | **HOLD** until recovery path chosen + dashboard non-zero verified |
-| Investor/demo | **HOLD** — do not demo live DB until mvp-stats + founder dashboard green |
-| Public launch | **NO-GO** (unchanged) |
-
-## Immediate founder actions (ordered)
-
-1. **Stop** further restore experiments on production Postgres.
-2. Attach **screenshots** (backup list, restore target, activity log, volumes).
-3. Run **read-only SQL** counts (above) + paste redacted results into this doc § Evidence log.
-4. Run **`alembic current`** in API shell (read-only) — confirm revision vs `050_stripe_webhook_events`.
-5. Call **`GET /api/v1/admin/metrics`** with ops token — compare to pre-incident baseline.
-6. Choose recovery **A / B / C** and record decision below.
-7. If pilot users affected, send **incident comms** per `docs/INCIDENT_RESPONSE_RUNBOOK_2026-05-27.md`.
+| O7 backup/restore drill | **FAIL / PENDING EVIDENCE** — prod incident ≠ staging drill PASS |
+| Controlled pilot | **GO** — read-only health green; founder dashboard non-zero |
+| Investor/demo | **GO** — `mvp-stats` 200; live DB metrics restored (curated demo posture unchanged) |
+| Public launch | **NO-GO** — `S2` (CSP enforce) + **O7 staging drill** still open |
 
 ## Evidence log (append-only)
 
 | UTC | Actor | Action | Result |
 | --- | ----- | ------ | ------ |
-| 2026-05-29 | founder (reported) | Manual Postgres restore from 2026-05-25 backup | Dashboard zeros; health OK |
-| 2026-05-29 | agent (read-only) | Health + mvp-stats curl | `db_ok=true`, `validated_jobs=652`; **mvp-stats 500** |
-| _pending_ | founder | Railway screenshots + SQL counts | — |
-| _pending_ | founder | Recovery option A/B/C decision | — |
+| 2026-05-29 | founder | Wrong volume `postgres-2026-05-25 07:33 UTC` mounted | Dashboard zeros; calendar disconnected |
+| 2026-05-29 | agent (read-only) | Pre-recovery curl | `db_ok=true`; **mvp-stats 500** |
+| 2026-05-29 14:09 | founder | Backup of incorrect state | Safety snapshot before re-mount |
+| 2026-05-29 14:09+ | founder | Re-mount **`postgres-volume`** | Dashboard: feed 2501, matches 200, apps 12, pipeline 11; calendar OK |
+| 2026-05-29 | agent (read-only) | Post-recovery curl | `db_ok=true`, `mvp-stats` **200**, `market_coverage_active_validated=2501` |
 
-## Hard bans honoured (agent session)
+## Hard bans honoured (agent sessions)
 
 - No deploy, Railway restart, migrations, env changes, DB mutation
 - No scrape, apply, auto-apply, calendar mutations

@@ -86,12 +86,12 @@ the gate to ✅.
 | One ⚠️ partial on L6 (data subject access)                              | Document a manual workflow (`docs/GDPR_MANUAL_DSR.md`) and proceed.                   |
 | Any ❌ on Pilot gates                                                    | Pilot, not public launch — pilot has its own gate set (cf. `PILOT_OFFER_FINAL.md`).   |
 
-## Current gate stance (checkpoint 2026-05-29, **post DB incident**)
+## Current gate stance (checkpoint 2026-05-29, **post DB recovery**)
 
-- **Controlled pilot GO:** **HOLD** — suspected prod Postgres rollback (`docs/PRODUCTION_DB_RESTORE_INCIDENT_2026-05-29.md`); resume pilot only after recovery decision + founder dashboard non-zero.
-- **Investor/CTO demo GO:** **HOLD** — `mvp-stats` HTTP 500 on prod; do not demo live DB until recovery verified.
-- **Public launch GO:** **NO-GO** while any of `S2`, `O7` blockers remain **plus** open DB incident.
-- **O7 backup/restore:** ❌ **FAIL / PENDING EVIDENCE** — founder prod restore (2026-05-25 backup) logged as **incident FAIL**, not O7 PASS; staging clone drill still required per `docs/BACKUP_RESTORE_DRILL_LOG.md`.
+- **Controlled pilot GO:** **YES** — prod DB recovered via re-mount original `postgres-volume` (`INC-DB-2026-05-29-001` **RESOLVED**); read-only health green; founder dashboard non-zero (feed 2501, matches 200, apps 12, pipeline 11).
+- **Investor/CTO demo GO:** **YES** — `mvp-stats` HTTP **200** post-recovery; curated demo posture unchanged.
+- **Public launch GO:** **NO-GO** while **`S2`** (CSP enforce) and **`O7`** (staging clone drill PASS) remain open — prod incident recovery **does not** close O7.
+- **O7 backup/restore:** ❌ **FAIL / PENDING EVIDENCE** — prod volume incident logged as **FAIL/RECOVERED**, not O7 PASS; staging clone drill still required per `docs/BACKUP_RESTORE_DRILL_LOG.md`.
 - **S5 prod revision:** ✅ **PASS** — production `version_num = 050_stripe_webhook_events` (read-only SQL, 2026-05-29; evidence in `docs/ALEMBIC_050_FOUNDER_VERIFICATION_2026-05-29.md` § Evidence log). **No migration** needed or run by agent; **no** Railway deploy for this gate.
 - **O5 Google Calendar — FULL prod smoke:** ✅ **PASS** (2026-05-29) — OAuth (Console config); Connect; real events; week day mapping (`Europe/Warsaw`, no +1 shift). Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, fix HEAD `3631c45`; FE-only, no Railway. Evidence: `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`. O5 row stays ⚠️ **partial** until Apple/iCal beyond docs.
 - **P6 founder authenticated smoke:** ✅ **PASS** (founder 2026-05-29) — 8/8 routes + safety rows; `/dashboard` layout confirmed post-forecast fix; Google Calendar **fully closed**.
@@ -147,9 +147,9 @@ Warning: this check is non-destructive; do **not** run `alembic upgrade` manuall
 
 ### O7 backup / restore drill (founder-only)
 
-- Status: **FAIL / PENDING EVIDENCE** (2026-05-29 post-incident).
-- **Production incident:** founder likely restored prod Postgres from **2026-05-25** backup → dashboard zeros; **`mvp-stats` 500**. Documented: `docs/PRODUCTION_DB_RESTORE_INCIDENT_2026-05-29.md`. This **invalidates** O7 PASS for this event.
-- Prod baseline (read-only, not recovery proof): `GET /api/public-health` → `db_ok=true`, `validated_jobs=652`; `GET /api/v1/public/mvp-stats` → **500** (2026-05-29).
+- Status: **FAIL / PENDING EVIDENCE** (2026-05-29 — prod incident **RESOLVED**, O7 unchanged).
+- **Production incident (`INC-DB-2026-05-29-001`):** wrong volume from **2026-05-25** backup mounted → dashboard zeros; **recovered** by re-mount original `postgres-volume` (backup of wrong state **14:09 UTC** first). **`mvp-stats` 200** post-recovery. Documented: `docs/PRODUCTION_DB_RESTORE_INCIDENT_2026-05-29.md`. This **does not** satisfy O7 PASS.
+- Prod baseline (read-only): `GET /api/public-health` → `db_ok=true`, `market_coverage_active_validated=2501`; `GET /api/v1/public/mvp-stats` → **200** (2026-05-29 post-recovery).
 - Flip to ✅ only when `docs/BACKUP_RESTORE_DRILL_LOG.md` has one **PASS** row on a **staging clone** meeting all criteria in `docs/RUNBOOK_DB_RESTORE_2026-05-27.md` § O7 PASS criteria.
 
 Reference steps: `docs/BACKUP_RESTORE_DRILL_LOG.md` § Founder action checklist.
