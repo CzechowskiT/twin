@@ -46,7 +46,7 @@ the gate to ✅.
 | O2 | Production health endpoint returns `status=ok` + `db_ok=True`           | `GET https://twin-sooty.vercel.app/api/public-health` — `git_commit=df15618`, `db_ok=true` (2026-05-29)       | ✅ today     |
 | O3 | Celery worker is active in production (not eager, not zero nodes)       | `curl https://twin-production-bcd9.up.railway.app/api/v1/health/celery-status`                  | ✅ today     |
 | O4 | Stripe webhook endpoint is reachable, signature gate is wired           | `docs/P1_STRIPE_WEBHOOK_AUDIT_2026-05-27.md`                                                    | ✅           |
-| O5 | Calendar provider OAuth: Google + Microsoft live; Apple/iCal docs ready | Google prod smoke PASS 2026-05-29 (`docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`); Microsoft baseline live; Apple/iCal → `.cursorrules` calendar section | ⚠️ **partial** — Google+Microsoft OAuth ✅ prod; Apple/iCal docs only |
+| O5 | Calendar provider OAuth: Google + Microsoft live; Apple/iCal docs ready | Google **FULL prod smoke PASS** 2026-05-29 — OAuth + real events + day mapping (`docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`); Microsoft baseline live; Apple/iCal → `.cursorrules` calendar section | ⚠️ **partial** — Google+Microsoft ✅ prod (Google calendar fully verified); Apple/iCal docs only |
 | O6 | Canonical Vercel alias points at the right project; drift guard exists  | `bash scripts/check-vercel-canonical-alias.sh`                                                   | ⚠️ drift documented; canonical project is correct |
 | O7 | Backup / restore for Postgres is exercised (last restore test logged)    | `docs/RUNBOOK_DB_RESTORE_2026-05-27.md` § O7 PASS criteria + `docs/BACKUP_RESTORE_DRILL_LOG.md` **PASS** row with GO decision | ❌ **PENDING EVIDENCE** — runbook + founder checklist ready; no staging restore executed (2026-05-29 operator) |
 | O8 | Incident response runbook exists with named on-call                     | `docs/INCIDENT_RESPONSE_RUNBOOK_2026-05-27.md` (this session, TASK 13)                          | ✅ this session |
@@ -74,7 +74,7 @@ the gate to ✅.
 | P3 | Pilot offer copy reviewed                                               | `docs/PILOT_OFFER_FINAL.md`, `PILOT_OFFER_COPY_PL.md`                                            | ✅           |
 | P4 | Pilot pricing model verified                                            | `docs/B2B_*` / pricing docs                                                                      | ✅           |
 | P5 | Pilot kill-switch (`SCRAPE_OPS_*` / feature flags) tested                | `pytest tests/test_auto_apply_trigger_sweep_admin_gate.py -q`                                   | ✅           |
-| P6 | Founder authenticated prod smoke (dashboard subpages, jobs, profile, safety copy) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` — PASS when every route + safety row has explicit founder PASS | ⚠️ **PARTIAL** — 2026-05-29: most routes PASS; `/dashboard` layout FAIL (fix shipped); Google Calendar OAuth prod smoke ✅ (Console fix, 2026-05-29) |
+| P6 | Founder authenticated prod smoke (dashboard subpages, jobs, profile, safety copy) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` — PASS when every route + safety row has explicit founder PASS | ⚠️ **PARTIAL** — 2026-05-29: most routes PASS; `/dashboard` layout FAIL (fix shipped); Google Calendar **FULL prod smoke PASS** (OAuth + events + day mapping, 2026-05-29) |
 
 ## Decision matrix
 
@@ -93,8 +93,8 @@ the gate to ✅.
 - **Public launch GO:** **NO-GO** while any of `S2`, `O7`, `S11`, **P6** blockers remain (S5 closed 2026-05-29).
 - **O7 backup/restore:** ❌ **PENDING EVIDENCE** — PASS criteria documented; founder must run staging clone drill in Railway (`docs/BACKUP_RESTORE_DRILL_LOG.md` § Founder action checklist). Prod untouched; no agent restore.
 - **S5 prod revision:** ✅ **PASS** — production `version_num = 050_stripe_webhook_events` (read-only SQL, 2026-05-29; evidence in `docs/ALEMBIC_050_FOUNDER_VERIFICATION_2026-05-29.md` § Evidence log). **No migration** needed or run by agent; **no** Railway deploy for this gate.
-- **O5 Google Calendar OAuth prod:** ✅ **PASS** (2026-05-29) — Console config (`JS origin` + redirect URI); Connect succeeds; no code/deploy for OAuth fix. Evidence: `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`. **Day mapping:** ⚠️ PENDING founder re-smoke after Vercel deploy (week columns were UTC-shifted; FE fix shipped).
-- **P6 founder authenticated smoke:** ⚠️ **PARTIAL** — `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md`; redeploy FE for dashboard forecast layout; Google Calendar OAuth blocker **closed**.
+- **O5 Google Calendar — FULL prod smoke:** ✅ **PASS** (2026-05-29) — OAuth (Console config); Connect; real events; week day mapping (`Europe/Warsaw`, no +1 shift). Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, fix HEAD `3631c45`; FE-only, no Railway. Evidence: `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`. O5 row stays ⚠️ **partial** until Apple/iCal beyond docs.
+- **P6 founder authenticated smoke:** ⚠️ **PARTIAL** — `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md`; redeploy FE for `/dashboard` forecast layout; Google Calendar **fully closed** (not a P6 blocker).
 
 ## What "launch" means in this checklist
 

@@ -34,7 +34,7 @@ Legend: ✅ = HTTP OK + no document horizontal scroll at viewport.
 | `/dashboard/settings/auto-apply` | **PASS** | PASS | No Run now |
 | `/dashboard/identity` | **PASS** | PASS | No KYC overclaim |
 | `/dashboard/career` | **PASS** | PASS | |
-| `/dashboard/calendar` | **PASS** | PASS | Google not connected; Microsoft connected |
+| `/dashboard/calendar` | **PASS** | **PASS** | Google **FULL prod smoke PASS** 2026-05-29 — connected, real events, day mapping OK (`Europe/Warsaw`); Microsoft connected |
 | `/workspace/candidate/jobs` (logged in) | **PASS** | PASS | Long scroll OK |
 | `/profile` | **PASS** | PASS | Long profile OK |
 | Readiness blocks auto-apply when incomplete | — | **PASS** | |

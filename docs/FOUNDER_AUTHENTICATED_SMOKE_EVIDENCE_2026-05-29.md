@@ -36,11 +36,25 @@ PASTE HERE:
 | Post-connect status | Google shows connected |
 | Real events | Visible after reconnect |
 | Fix | Google Cloud Console config only — no code/deploy for final fix |
-| **Day mapping (week columns)** | **PENDING** — code fix shipped (local TZ grouping); founder re-smoke on `/dashboard/calendar` after Vercel prod deploy |
+| **Day mapping (week columns)** | **PASS** (founder re-smoke 2026-05-29) — Mon 2026-05-25 under Monday; all-day 2026-05-27 under Wednesday; no +1 shift |
+| Vercel prod deploy (day-mapping fix) | `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH` |
+| Fix HEAD | `3631c45afea26c60e61dcf9fa31f691b307a2a33` |
+| Calendar mutations | **None** |
 | Secrets in evidence | **None** |
 
 **Operator:** founder
 **Detail doc:** `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`
+
+## Google Calendar — founder re-smoke FULL PROD PASS (2026-05-29 UTC)
+
+| Check | Evidence |
+| ----- | -------- |
+| Google OAuth / Connect | **PASS** |
+| Real events on `/dashboard/calendar` | **PASS** |
+| Week day mapping (`Europe/Warsaw`) | **PASS** — timed Mon 2026-05-25 → Monday column; all-day 2026-05-27 → Wednesday; no UTC +1 shift |
+| Deploy | Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`; fix HEAD `3631c45` |
+| Scope | FE-only; no Railway / env / migration |
+| OAuth tokens logged | **None** |
 
 ## Recorded submission — full P6 routes (2026-05-29 UTC)
 
@@ -57,8 +71,9 @@ PASTE HERE:
 | Check | Status |
 | ----- | ------ |
 | Google Calendar OAuth prod smoke | **PASS** (2026-05-29) |
-| Google Calendar day mapping (Europe/Warsaw week view) | **PENDING** — await founder re-smoke post-deploy |
-| Authenticated route smoke (8 routes + safety copy) | **PARTIAL** — calendar OAuth closed; day mapping not attested; full P6 still pending layout redeploy + safety rows |
+| Google Calendar day mapping (Europe/Warsaw week view) | **PASS** (founder re-smoke 2026-05-29) |
+| Google Calendar — full prod smoke (OAuth + events + day mapping) | **PASS** |
+| Authenticated route smoke (8 routes + safety copy) | **PARTIAL** — Google Calendar **fully closed**; full P6 still pending `/dashboard` layout redeploy + safety rows |
 | May mark PASS on launch gates (P6) | **No** — partial only |
 | Public launch implication | **NO-GO unchanged** (`S2`, `O7`, `P6` partial, `S11`, delegated/KYC not live) |
 

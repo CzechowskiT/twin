@@ -3,9 +3,9 @@
 ## Snapshot metadata
 
 - **Branch:** `cursor/phase1-monorepo-scaffold`
-- **Branch HEAD (local):** `89ff454` (frontend) / API live `df15618`
+- **Branch HEAD (local):** `3631c45` (frontend) / API live `df15618`
 - **Production API SHA (read-only):** `df15618f1e2edec635ab868c03dcf736c463c8be` (`GET /api/public-health`, 2026-05-29 UTC)
-- **Vercel production deployment:** `dpl_5SK5YWGzzWtQTDULPm2kAx9qrdB9` at frontend `89ff454` (founder-known; Vercel CLI not on agent PATH)
+- **Vercel production deployment:** `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH` at frontend `3631c45` (Google Calendar day-mapping fix; founder re-smoke 2026-05-29)
 - **Frontend:** `https://twin-sooty.vercel.app` (canonical alias on Vercel project `twin`)
 - **API:** `https://twin-production-bcd9.up.railway.app`
 
@@ -26,7 +26,7 @@
 | Scraping (pracuj.pl, rocketjobs.pl) | `scrape_worker_ready`, beat enabled | **LIVE** infra; **BLOCKED** for ops sweep without allowlist |
 | Manual scrape UI | `NEXT_PUBLIC_SHOW_SCRAPE` | **OFF** default |
 | Auto-apply (nightly) | beat + consent models; sweep gate | **PARTIAL** — consent required; no agent-triggered live apply |
-| Calendar Google | `google_calendar_configured`; founder prod OAuth smoke PASS 2026-05-29 (`docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`) | **LIVE / VERIFIED** — Connect + real events on `/dashboard/calendar` |
+| Calendar Google | `google_calendar_configured`; founder **FULL prod smoke PASS** 2026-05-29 — OAuth + real events + day mapping (`docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`; Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, HEAD `3631c45`) | **LIVE / VERIFIED** — Connect, real events, local week columns (`Europe/Warsaw`) |
 | Calendar Microsoft | `microsoft_calendar_configured` | **LIVE** |
 | Calendar Apple / CalDAV | docs + ICS patterns | **PARTIAL** — no Apple OAuth |
 | ICS / WebCal export | product docs | **REPO** / partial |
@@ -78,15 +78,15 @@
 | Item | Current state | Decision |
 | ---- | ------------- | -------- |
 | API runtime SHA | `df15618` visible on `public-health` | **LIVE** |
-| Frontend Vercel SHA | `89ff454` / `dpl_5SK5YWGzzWtQTDULPm2kAx9qrdB9` (founder-known) | **LIVE** (not re-queried via CLI) |
-| Branch HEAD | `89ff454` | **REPO** may be ahead/behind FE deploy — verify before FE-only claims |
+| Frontend Vercel SHA | `3631c45` / `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH` (founder re-smoke 2026-05-29) | **LIVE** |
+| Branch HEAD | `3631c45` (calendar day-mapping fix) | **LIVE** on Vercel prod for calendar smoke |
 | Stripe dedup migration `050` | Prod `alembic_version` = `050_stripe_webhook_events` (founder/operator read-only SQL, 2026-05-29) | **LIVE / VERIFIED** — S5 PASS; no migration run; if ever rolled back to `049` → runbook § Founder-approved action plan |
 | CSP mode | `content-security-policy-report-only` on `/` and `/dashboard` (2026-05-29 curl) | **LIVE REPORT-ONLY** |
 | CSP enforce | No enforce header; S2 checklist not met | **BLOCKED BY POLICY** |
 | Delegated / KYC apply | Product gates | **NOT LIVE** |
 | O7 restore drill | No PASS row in drill log; staging path is Railway UI only (no repo script) | **PENDING EVIDENCE** — founder action required |
-| Google Calendar OAuth prod smoke (2026-05-29) | `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md` | **LIVE / VERIFIED** — Console config fix; Connect PASS; real events visible |
-| Founder authenticated smoke (2026-05-29) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **PARTIAL** — most routes PASS; dashboard forecast layout fix pending FE deploy; Google Calendar OAuth **closed** |
+| Google Calendar FULL prod smoke (2026-05-29) | `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md` | **LIVE / VERIFIED** — OAuth + real events + day mapping; Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, HEAD `3631c45`; no Railway |
+| Founder authenticated smoke (2026-05-29) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **PARTIAL** — most routes PASS; `/dashboard` layout fix pending; Google Calendar **fully closed** |
 
 ---
 

@@ -28,12 +28,28 @@ No trailing slash. Scheme `https`. Path is on the **API** host, not Vercel.
 | Connect flow | **PASS** — no `redirect_uri_mismatch`; consent completes |
 | Post-connect UI | `/dashboard/calendar` shows Google connected |
 | Real events | Visible on calendar view after reconnect |
-| Week day mapping (timed + all-day) | **PENDING founder** — FE fix groups by local IANA date (`Europe/Warsaw`); do not mark full calendar PASS until re-smoke |
-| Fix type | OAuth: **Google Cloud Console config only**. Day mapping: **frontend** (`calendar-week` local date keys) — deploy Vercel prod after green tests |
+| Week day mapping (timed + all-day) | **PASS** (founder re-smoke 2026-05-29) — Mon 2026-05-25 under Monday; all-day 2026-05-27 under Wednesday; no +1 day shift (`Europe/Warsaw`) |
+| Fix type | OAuth: **Google Cloud Console config only**. Day mapping: **frontend only** (`calendar-week` local date keys) — Vercel prod `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, fix HEAD `3631c45`; **no Railway** |
+| Calendar mutations during smoke | **None** |
 | Secrets logged | **None** |
 
 **Operator:** founder
 **Evidence cross-ref:** `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` § Google Calendar OAuth prod smoke; `docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md` O5.
+
+---
+
+## Founder re-smoke — FULL PROD PASS (2026-05-29 UTC)
+
+| Check | Result |
+| ----- | ------ |
+| Google OAuth / Connect | **PASS** (already attested) |
+| Real events visible | **PASS** |
+| Week day mapping (timed + all-day) | **PASS** — local IANA date grouping; no UTC +1 shift |
+| Vercel prod deploy | `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH` |
+| Fix HEAD | `3631c45afea26c60e61dcf9fa31f691b307a2a33` |
+| Railway / env / migration | **None** — FE-only fix |
+| OAuth tokens logged | **None** |
+| Calendar mutations | **None** |
 
 ---
 
