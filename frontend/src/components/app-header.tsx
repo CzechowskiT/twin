@@ -2,7 +2,7 @@
 
 import { SiteHeaderBar } from "@/components/site-header-bar";
 
-/** Authenticated app chrome — persona switcher when a session exists. */
+/** Authenticated app chrome — read-only persona badge when a session exists. */
 export function AppHeader() {
-  return <SiteHeaderBar showPersonaSwitcher />;
+  return <SiteHeaderBar showPersonaBadge />;
 }

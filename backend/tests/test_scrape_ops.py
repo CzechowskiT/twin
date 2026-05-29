@@ -41,22 +41,32 @@ def test_scrape_worker_not_ready_without_eager_or_flag() -> None:
     assert scrape_worker_ready(s) is False
 
 
-def test_user_can_trigger_scrape_with_consents() -> None:
+def test_user_cannot_trigger_scrape_when_disabled() -> None:
     user = _consented_user()
-    settings = Settings()
+    settings = Settings(scrape_user_trigger_enabled=False)
+    assert user_can_trigger_scrape(user, settings) is False
+
+
+def test_user_can_trigger_scrape_when_enabled() -> None:
+    user = _consented_user()
+    settings = Settings(scrape_user_trigger_enabled=True)
     assert core_consents_complete(user) is True
     assert user_can_trigger_scrape(user, settings) is True
 
 
 def test_user_can_trigger_scrape_without_ops_allowlist() -> None:
     user = _consented_user()
-    settings = Settings(scrape_ops_emails="", scrape_ops_user_ids="")
+    settings = Settings(scrape_user_trigger_enabled=True, scrape_ops_emails="", scrape_ops_user_ids="")
     assert user_can_trigger_scrape(user, settings) is True
     assert user_has_scrape_ops(user, settings) is False
 
 
 def test_ops_allowlist_does_not_gate_scrape() -> None:
     user = _consented_user()
-    settings = Settings(scrape_ops_emails="other@test.com", scrape_ops_user_ids="")
+    settings = Settings(
+        scrape_user_trigger_enabled=True,
+        scrape_ops_emails="other@test.com",
+        scrape_ops_user_ids="",
+    )
     assert user_has_scrape_ops(user, settings) is False
     assert user_can_trigger_scrape(user, settings) is True

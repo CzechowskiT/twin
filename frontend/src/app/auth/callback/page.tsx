@@ -16,6 +16,8 @@ function authErrorKey(error: string): TranslationKey {
     invalid_state: "authCallback.errorInvalidState",
     inactive: "authCallback.errorInactive",
     linkedin_not_configured: "authCallback.errorLinkedinNotConfigured",
+    apple_not_configured: "authCallback.errorAppleNotConfigured",
+    github_not_configured: "authCallback.errorGithubNotConfigured",
   };
   return map[error] ?? "authCallback.errorUnknown";
 }

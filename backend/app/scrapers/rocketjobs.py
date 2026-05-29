@@ -114,7 +114,10 @@ def _fetch_search_html(keyword: str) -> str:
                 page.goto(url, wait_until=wait_until, timeout=90_000)
                 _dismiss_cookie_banner(page)
                 try:
-                    page.wait_for_selector('a[href*="/oferta-pracy/"]', timeout=12_000)
+                    page.wait_for_selector(
+                        'article[data-testid*="offer"] a[href*="/oferta-pracy/"], a[href*="/oferta-pracy/"]',
+                        timeout=12_000,
+                    )
                 except Exception:
                     pass
                 _scroll_to_load_offers(page)
@@ -151,7 +154,7 @@ def _dismiss_cookie_banner(page) -> None:
 def _scroll_to_load_offers(page) -> None:
     """RocketJobs lazy-loads cards on scroll."""
     page.wait_for_timeout(2_000)
-    for _ in range(5):
+    for _ in range(8):
         page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
         page.wait_for_timeout(1_200)
 
@@ -164,7 +167,15 @@ def _parse_listing_html(html: str, limit: int) -> list[ScrapedJob]:
     results: list[ScrapedJob] = []
     seen: set[str] = set()
 
-    anchors = soup.find_all("a", href=OFFER_HREF_RE)
+    # Prefer card containers (RocketJobs React markup) before generic anchor scan.
+    card_roots = soup.select('article[data-testid*="offer"], article[data-testid*="job"]')
+    anchors: list = []
+    for card in card_roots:
+        link = card.find("a", href=True)
+        if link:
+            anchors.append(link)
+    if not anchors:
+        anchors = soup.find_all("a", href=OFFER_HREF_RE)
     if not anchors:
         anchors = [
             a
@@ -211,6 +222,12 @@ def _title_from_anchor(anchor, href: str) -> str:
     for attr in ("aria-label", "title"):
         label = (anchor.get(attr) or "").strip()
         if label and len(label) >= 4 and label.lower() not in ("oferta", "szczegóły", "zobacz"):
+            if " — " in label:
+                label = label.split(" — ", 1)[0].strip()
+            elif " - " in label and label.count(" - ") == 1:
+                left, right = label.split(" - ", 1)
+                if len(left) >= 4 and len(right) >= 2:
+                    label = left.strip()
             return label
     title_el = anchor.find(["h2", "h3", "h4"])
     if not title_el:

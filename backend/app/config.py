@@ -4,7 +4,7 @@ from functools import lru_cache
 import os
 from pathlib import Path
 
-from pydantic import field_validator, model_validator
+from pydantic import AliasChoices, Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Repo root .env (make api runs from backend/, so plain ".env" would miss it)
@@ -118,18 +118,46 @@ class Settings(BaseSettings):
         return self
 
     anthropic_api_key: str = ""
+    anthropic_model: str = "claude-sonnet-4-6"
     cv_upload_dir: str = "data/cvs"
     cv_max_bytes: int = 5 * 1024 * 1024
 
     # Comma-separated board ids matching scraper registry (empty = all). Controls scrape-all + /jobs/boards list.
     scrape_enabled_board_ids: str = ""
     # Per-board fetch cap for Twin scrape-all (each adapter respects this upper bound).
-    scrape_jobs_per_board: int = 100
+    scrape_jobs_per_board: int = 200
+    # Active validated jobs target for ops KPIs (default 10k sprint).
+    market_coverage_target_jobs: int = Field(default=10000, validation_alias="MARKET_COVERAGE_TARGET_JOBS")
+    # Max LinkedIn listings per beat run (registry also clamps).
+    linkedin_scrape_max_per_run: int = 25
+    # LinkedIn job scrape off by default (robots + ToS); OAuth sign-in is separate.
+    linkedin_scrape_enabled: bool = False
+    # Comma-separated override for daily beat board list (empty = tiered default).
+    scrape_daily_boards: str = Field(
+        default="",
+        validation_alias=AliasChoices("SCRAPE_DAILY_BOARDS", "scrape_daily_boards"),
+    )
+    # Global HTML boards run every N days on beat (1 = daily, 2 = every other day).
+    scrape_daily_global_interval_days: int = 2
+    # When false, users cannot POST /jobs/scrape/* (autonomous beat only).
+    scrape_user_trigger_enabled: bool = False
+    # Dashboard listing + matcher scan: only validated jobs scraped within this many days.
+    job_feed_active_days: int = 45
     # When >0, skip persisting listings whose requirements+description are shorter (listing-only rows stay at 0).
     scrape_min_job_body_chars: int = 0
-    # When true, Celery Beat runs scrape-all once per day at scrape_beat_hour_utc (requires celery beat process).
+    # When true, Celery Beat runs autonomous market scrape windows (requires celery beat process).
     scrape_beat_enabled: bool = False
+    # Legacy single scrape-all beat (off by default — use split PL/Greenhouse/global/LinkedIn tasks).
+    scrape_beat_legacy_scrape_all: bool = False
     scrape_beat_hour_utc: int = 5
+    scrape_beat_pl_hour_utc: int = 4
+    scrape_beat_pl_minute_utc: int = 0
+    scrape_beat_greenhouse_hour_utc: int = 5
+    scrape_beat_greenhouse_minute_utc: int = 10
+    scrape_beat_global_hour_utc: int = 3
+    scrape_beat_global_minute_utc: int = 40
+    scrape_beat_linkedin_hour_utc: int = 6
+    scrape_beat_linkedin_minute_utc: int = 20
     # Set SCRAPE_WORKER_READY=true on API when a separate Celery worker service is deployed (non-eager mode).
     scrape_worker_ready: bool = False
     # Daily placement retention sweep on Celery beat (log-only MVP; see placement_tasks).
@@ -139,7 +167,7 @@ class Settings(BaseSettings):
     interview_reminder_beat_enabled: bool = True
     interview_reminder_hours_before: int = 24
     # Max jobs considered per find_top_matches scan (newest validated first).
-    match_jobs_scan_limit: int = 4000
+    match_jobs_scan_limit: int = 15000
     # When true, use ``job_matching_v2`` (salary overlap bonus on top of v1 rules).
     match_scoring_v2: bool = False
     # When true (env MATCHING_V2_TFIDF), add a bounded TF–IDF cosine layer on top of v1 or v2 (see matching_service).
@@ -147,7 +175,13 @@ class Settings(BaseSettings):
     # When true, honour robots.txt before Playwright fetches (LinkedIn uses Disallow: / for generic bots).
     scrape_respect_robots_txt: bool = True
     # Pause between boards in scrape-all (serial) to reduce burst traffic on third-party sites.
-    scrape_between_boards_sec: float = 1.5
+    scrape_between_boards_sec: float = Field(
+        default=1.5,
+        validation_alias=AliasChoices(
+            "SCRAPE_BETWEEN_BOARDS_SEC",
+            "SCRAPE_DELAY_BETWEEN_BOARDS_SECONDS",
+        ),
+    )
     # --- Ops note (job corpus scale): tens or hundreds of thousands of validated rows are built by sustained
     # Celery ingestion (beat + workers), not one-off migrations. Tune scrape_jobs_per_board,
     # scrape_between_boards_sec, scrape_post_fetch_delay_sec, and match_jobs_scan_limit for polite traffic.
@@ -179,9 +213,10 @@ class Settings(BaseSettings):
     # Separate OAuth redirect for Calendar scopes (add this exact URI in Google Cloud Console).
     google_calendar_redirect_uri: str = "http://localhost:8000/api/v1/calendar/google/callback"
 
-    # Microsoft Graph Calendar (separate redirect from Google; Azure app registration).
+    # Microsoft Entra (Azure app registration) — sign-in + calendar share client id/secret.
     microsoft_client_id: str = ""
     microsoft_client_secret: str = ""
+    microsoft_redirect_uri: str = "http://localhost:8000/api/v1/auth/microsoft/callback"
     microsoft_calendar_redirect_uri: str = "http://localhost:8000/api/v1/calendar/microsoft/callback"
     microsoft_tenant: str = "common"
 
@@ -211,25 +246,39 @@ class Settings(BaseSettings):
 
     @field_validator(
         "google_calendar_redirect_uri",
+        "google_redirect_uri",
+        "github_redirect_uri",
+        "apple_redirect_uri",
         "microsoft_calendar_redirect_uri",
+        "microsoft_redirect_uri",
         mode="before",
     )
     @classmethod
-    def normalize_calendar_redirect_uri(cls, value: object) -> object:
+    def normalize_oauth_redirect_uri(cls, value: object) -> object:
         if isinstance(value, str) and value.strip():
             return _strip_trailing_slash_url(value)
         return value
 
     @model_validator(mode="after")
-    def resolve_calendar_oauth_redirect_uris(self) -> "Settings":
-        """Derive calendar callbacks from API_URL when env vars are unset (never FRONTEND_URL)."""
+    def resolve_oauth_redirect_uris(self) -> "Settings":
+        """Derive OAuth callbacks from API_URL when env vars are unset (never FRONTEND_URL)."""
+        from app.services.auth_oauth_redirect import (
+            effective_apple_redirect_uri,
+            effective_github_redirect_uri,
+            effective_google_redirect_uri,
+        )
+        from app.services.calendar_oauth_redirect import effective_google_calendar_redirect_uri
         from app.services.calendar_oauth_redirect import (
-            effective_google_calendar_redirect_uri,
             effective_microsoft_calendar_redirect_uri,
         )
+        from app.services.microsoft_oauth import effective_microsoft_redirect_uri
 
+        self.google_redirect_uri = effective_google_redirect_uri(self)
+        self.github_redirect_uri = effective_github_redirect_uri(self)
+        self.apple_redirect_uri = effective_apple_redirect_uri(self)
         self.google_calendar_redirect_uri = effective_google_calendar_redirect_uri(self)
         self.microsoft_calendar_redirect_uri = effective_microsoft_calendar_redirect_uri(self)
+        self.microsoft_redirect_uri = effective_microsoft_redirect_uri(self)
         return self
 
     auto_apply_headless: bool = False
@@ -261,6 +310,14 @@ class Settings(BaseSettings):
     # Stripe (https://dashboard.stripe.com/) — Checkout enables card + Apple Pay + Google Pay where supported
     stripe_secret_key: str = ""
     stripe_webhook_secret: str = ""
+    stripe_price_id_standby: str = Field(
+        default="",
+        validation_alias=AliasChoices("STRIPE_PRICE_ID_STANDBY", "STRIPE_PRICE_STANDBY"),
+    )
+    stripe_price_id_standard: str = Field(
+        default="",
+        validation_alias=AliasChoices("STRIPE_PRICE_ID_STANDARD", "STRIPE_PRICE_STANDARD"),
+    )
     stripe_price_id_premium: str = ""
     stripe_price_id_pro: str = ""
     stripe_price_id_premium_annual: str = ""

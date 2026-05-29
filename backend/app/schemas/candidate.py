@@ -120,3 +120,13 @@ class ProfileDocumentsListOut(BaseModel):
 class ProfileDocumentUploadOut(BaseModel):
     document: ProfileDocumentOut
     message: str = "File stored."
+
+
+class CandidateReadinessGateOut(BaseModel):
+    verification_status: str
+    checklist: dict[str, bool]
+    missing_items: list[str] = Field(default_factory=list)
+    blocked_reasons: list[str] = Field(default_factory=list)
+    delegated_apply_allowed: bool = False
+    can_prepare_application_package: bool = False
+    can_submit_delegated_application: bool = False

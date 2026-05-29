@@ -126,6 +126,10 @@ export default function CompanySignupPage() {
             </button>
           </form>
           <p className="mt-10 text-center text-sm text-[var(--twin-muted-strong)]">
+            <Link href="/login/company" className="twin-link font-medium">
+              {t("site.companySignupHaveAccount")}
+            </Link>
+            {" · "}
             <Link href="/for-companies" className="twin-link font-medium">
               {t("site.companySignupBackCompanies")}
             </Link>

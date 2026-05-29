@@ -14,11 +14,17 @@ from sqlalchemy.orm import Session
 from app.automation.apply_engine import run_auto_apply
 from app.automation.types import ApplyOutcome, ApplyResult
 from app.config import get_settings
-from app.database.models import Application, ApplicationStatus, Candidate, Job, User
+from app.database.models import Application, Candidate, Job, User
+from app.services.application_submission import (
+    METHOD_DEMO_SIMULATED,
+    record_submission_created_in_twin,
+    record_submission_from_auto_apply,
+)
 from app.services.application_package_pdf import render_application_package_pdf
 from app.services.cv_parser import CvParseError, extract_cv_text
 from app.services.cv_tailoring import build_motivation_text_for_auto_apply, get_tailoring_pitch_for_job
 from app.services.request_locale import is_polish_locale, normalize_locale
+from app.services.investor_demo_seed import is_investor_demo_job
 from app.services.s3_storage import get_s3_blob_store
 
 logger = logging.getLogger(__name__)
@@ -34,6 +40,10 @@ _AUTO_APPLY_USER_MSG: dict[str, dict[str, str]] = {
             "Auto-apply stopped on the server (e.g. browser error or portal page change). "
             "Use Apply to open the listing in a new tab and finish manually."
         ),
+        "demo_simulated": (
+            "Demo: application saved in TWIN (test listing — not sent to Pracuj.pl). "
+            "Check Applications on your dashboard."
+        ),
     },
     "pl": {
         "no_candidate": "Uzupełnij profil kandydata.",
@@ -44,6 +54,10 @@ _AUTO_APPLY_USER_MSG: dict[str, dict[str, str]] = {
         "server_interrupted": (
             "Auto-apply przerwany na serwerze (np. błąd przeglądarki albo zmiana strony portalu). "
             "Użyj „Aplikuj”, żeby otworzyć ogłoszenie w nowej karcie i dokończyć wysyłkę ręcznie."
+        ),
+        "demo_simulated": (
+            "Demo: aplikacja zapisana w TWIN (oferta testowa — bez wysyłki na Pracuj.pl). "
+            "Sprawdź Aplikacje w panelu."
         ),
     },
 }
@@ -123,6 +137,16 @@ def auto_apply_for_user(
     job = db.query(Job).filter(Job.id == job_id).first()
     if not job:
         return ApplyOutcome.FAILED, _auto_apply_msg(loc, "job_not_found"), None
+
+    if is_investor_demo_job(job):
+        outcome = ApplyOutcome.FORM_FILLED if not submit else ApplyOutcome.SUBMITTED
+        app = _upsert_application(db, candidate.id, job_id, job, outcome, demo_simulated=True)
+        app.auto_applied = True
+        app.application_method = METHOD_DEMO_SIMULATED
+        db.add(app)
+        db.commit()
+        db.refresh(app)
+        return outcome, _auto_apply_msg(loc, "demo_simulated"), app
 
     cv_text = _cv_text_for_apply(candidate)
     if not cv_text:
@@ -215,7 +239,16 @@ def auto_apply_for_user(
             except OSError:
                 logger.warning("Could not remove temp package PDF %s", package_pdf)
 
-    app = _upsert_application(db, candidate.id, job_id, result.outcome)
+    app = _upsert_application(
+        db,
+        candidate.id,
+        job_id,
+        job,
+        result.outcome,
+        submit=submit,
+        failure_reason=result.message if result.outcome == ApplyOutcome.FAILED else None,
+        message=result.message,
+    )
     if pdf_bytes_for_s3 and get_s3_blob_store().enabled:
         store = get_s3_blob_store()
         ts = datetime.utcnow().strftime("%Y%m%d%H%M%S")
@@ -233,7 +266,13 @@ def _upsert_application(
     db: Session,
     candidate_id: int,
     job_id: int,
+    job: Job,
     outcome: ApplyOutcome,
+    *,
+    submit: bool = False,
+    demo_simulated: bool = False,
+    failure_reason: str | None = None,
+    message: str | None = None,
 ) -> Application:
     app = (
         db.query(Application)
@@ -243,14 +282,22 @@ def _upsert_application(
     if not app:
         app = Application(candidate_id=candidate_id, job_id=job_id)
         db.add(app)
+        record_submission_created_in_twin(app)
 
-    if outcome in (ApplyOutcome.SUBMITTED, ApplyOutcome.FORM_FILLED):
-        app.status = ApplicationStatus.APPLIED
-        app.applied_at = app.applied_at or datetime.utcnow()
+    record_submission_from_auto_apply(
+        app,
+        outcome=outcome,
+        submit=submit,
+        job=job,
+        demo_simulated=demo_simulated,
+        failure_reason=failure_reason,
+        message=message,
+    )
+    if not demo_simulated:
         note = "auto-apply"
-        app.notes = f"{app.notes or ''}; {note}".strip("; ").strip()
+        app.notes = f"{app.notes or ''}; {note}".strip("; ").strip() if app.notes else note
+        app.application_method = "auto_apply"
     elif outcome == ApplyOutcome.NEEDS_HUMAN:
-        app.status = ApplicationStatus.PENDING
         suffix = "wymaga weryfikacji CAPTCHA"
         app.notes = f"{app.notes}; {suffix}" if app.notes else suffix
 

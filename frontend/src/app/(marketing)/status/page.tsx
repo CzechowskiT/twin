@@ -14,6 +14,7 @@ type MvpStats = {
   mail_configured: boolean;
   google_calendar_configured: boolean;
   microsoft_calendar_configured: boolean;
+  linkedin_oauth_configured: boolean;
   stripe_checkout_ready: boolean;
   generated_at: string;
 };
@@ -22,6 +23,23 @@ type HealthPayload = {
   status: string;
   db_ok?: boolean;
   git_commit?: string;
+  mail_configured?: boolean;
+  google_calendar_configured?: boolean;
+  microsoft_calendar_configured?: boolean;
+  stripe_checkout_ready?: boolean;
+  scrape_worker_ready?: boolean;
+  scrape_beat_enabled?: boolean;
+  market_coverage_last_scrape_at?: string | null;
+  market_coverage_progress_pct?: number | null;
+  market_coverage_feed_stale?: boolean;
+  market_coverage_ops_hint?: string;
+  partner_export_configured?: boolean;
+  recruiter_inbox_configured?: boolean;
+  celery?: {
+    worker_active?: boolean;
+    nightly_auto_apply_beat_enabled?: boolean;
+    beat_schedule_has_nightly?: boolean;
+  };
 };
 
 export default function StatusPage() {
@@ -55,6 +73,16 @@ export default function StatusPage() {
   }, [t]);
 
   const dbOk = health?.db_ok ?? stats?.database_reachable;
+  const mailOk = health?.mail_configured ?? stats?.mail_configured;
+  const googleOk = health?.google_calendar_configured ?? stats?.google_calendar_configured;
+  const microsoftOk = health?.microsoft_calendar_configured ?? stats?.microsoft_calendar_configured;
+  const stripeOk = health?.stripe_checkout_ready ?? stats?.stripe_checkout_ready;
+  const linkedinOk = stats?.linkedin_oauth_configured;
+  const workerOk = health?.celery?.worker_active;
+  const beatOk = health?.scrape_beat_enabled && health?.celery?.beat_schedule_has_nightly;
+  const scrapeReady = health?.scrape_worker_ready;
+  const partnerExportOk = health?.partner_export_configured;
+  const inboxOk = health?.recruiter_inbox_configured;
 
   return (
     <Shell wide>
@@ -69,25 +97,69 @@ export default function StatusPage() {
               <Row label={t("status.database")} value={dbOk ? t("status.up") : t("status.down")} ok={!!dbOk} />
               <Row
                 label={t("status.mail")}
-                value={stats.mail_configured ? t("status.configured") : t("status.notConfigured")}
-                ok={stats.mail_configured}
+                value={mailOk ? t("status.configured") : t("status.notConfigured")}
+                ok={!!mailOk}
+              />
+              <Row
+                label={t("status.linkedin")}
+                value={linkedinOk ? t("status.configured") : t("status.notConfigured")}
+                ok={!!linkedinOk}
               />
               <Row
                 label={t("status.calendar")}
-                value={stats.google_calendar_configured ? t("status.configured") : t("status.notConfigured")}
-                ok={stats.google_calendar_configured}
+                value={googleOk ? t("status.configured") : t("status.notConfigured")}
+                ok={!!googleOk}
               />
               <Row
                 label={t("status.microsoftCalendar")}
-                value={stats.microsoft_calendar_configured ? t("status.configured") : t("status.notConfigured")}
-                ok={stats.microsoft_calendar_configured}
+                value={microsoftOk ? t("status.configured") : t("status.notConfigured")}
+                ok={!!microsoftOk}
               />
               <Row
                 label={t("status.stripe")}
-                value={stats.stripe_checkout_ready ? t("status.configured") : t("status.notConfigured")}
-                ok={stats.stripe_checkout_ready}
+                value={stripeOk ? t("status.configured") : t("status.notConfigured")}
+                ok={!!stripeOk}
+              />
+              <Row
+                label={t("status.celeryWorker")}
+                value={workerOk ? t("status.active") : t("status.inactive")}
+                ok={!!workerOk}
+              />
+              <Row
+                label={t("status.scrapeWorkerReady")}
+                value={scrapeReady ? t("status.configured") : t("status.notConfigured")}
+                ok={!!scrapeReady}
+              />
+              <Row
+                label={t("status.nightlyBeat")}
+                value={beatOk ? t("status.scheduled") : t("status.notScheduled")}
+                ok={!!beatOk}
+              />
+              <Row
+                label={t("status.recruiterInbox")}
+                value={inboxOk ? t("status.configured") : t("status.notConfigured")}
+                ok={!!inboxOk}
+              />
+              <Row
+                label={t("status.partnerExport")}
+                value={partnerExportOk ? t("status.configured") : t("status.notConfigured")}
+                ok={!!partnerExportOk}
               />
               <Row label={t("status.validatedJobs")} value={String(stats.validated_jobs)} ok={stats.validated_jobs > 0} />
+              <Row
+                label={t("status.marketCoverage")}
+                value={
+                  health.market_coverage_progress_pct != null
+                    ? `${health.market_coverage_progress_pct}% → 10k`
+                    : t("status.unknown")
+                }
+                ok={!health.market_coverage_feed_stale}
+              />
+              <Row
+                label={t("status.marketLastScrape")}
+                value={health.market_coverage_last_scrape_at ?? t("status.unknown")}
+                ok={!health.market_coverage_feed_stale}
+              />
               <Row label={t("status.git")} value={health.git_commit ?? "unknown"} ok />
             </dl>
           ) : null}

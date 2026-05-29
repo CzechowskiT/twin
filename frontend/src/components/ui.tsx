@@ -63,7 +63,7 @@ export function Shell({
           <ShellRailAside>
             <PageMomentumRail variant="app" {...pageMomentumRailProps} />
           </ShellRailAside>
-          <ShellRailMain className="twin-readable-measure">{children}</ShellRailMain>
+          <ShellRailMain>{children}</ShellRailMain>
         </ShellRailLayout>
       ) : (
         <div className="flex w-full min-w-0 flex-1 flex-col">

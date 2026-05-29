@@ -57,7 +57,7 @@ const candidatesEn: PersonaBundle = {
   pillars: [
     {
       title: "Discovery & match",
-      body: "Multi-board feed with filters and match scores tied to skills, titles, CV text, and salary or location signals. Not another siloed search tab.",
+      body: "Multi-board feed with filters and match scores tied to skills, titles, CV text, and salary or location signals — grouped into ready-now, near-miss with upskill paths, and stretch roles when you want interview practice. Not another siloed search tab.",
     },
     {
       title: "Profile & CV intelligence",
@@ -145,7 +145,7 @@ const candidatesEn: PersonaBundle = {
   logisticsTitle: "Good to know",
   logistics: [
     "Some employers still ask you to finish the application on their site — TWIN keeps track for you.",
-    "Nightly auto-apply runs on supported job boards with Premium or Pro, when the board allows it.",
+    "Autonomous applying runs on supported job boards with Premium or Pro, when the board allows it.",
     "Scanned PDF résumés can take a moment to read — you can always edit your profile by hand.",
   ],
   primaryCta: { label: "Start free with TWIN", href: "/register" },
@@ -160,7 +160,7 @@ const candidatesPl: PersonaBundle = {
   pillars: [
     {
       title: "Odkrywanie i dopasowanie",
-      body: "Feed z wielu portali, filtry, scoring od umiejętności, tytułów, tekstu CV oraz płacy i lokalizacji. Bez kolejnego „osobnego tylko wyszukiwarka”.",
+      body: "Feed z wielu portali, filtry i scoring — w trzech pasach: gotowe teraz, blisko z ścieżką doszkolenia i role aspiracyjne (trening rozmów). Bez kolejnego „osobnego tylko wyszukiwarka”.",
     },
     {
       title: "Profil i inteligencja CV",
@@ -248,7 +248,7 @@ const candidatesPl: PersonaBundle = {
   logisticsTitle: "Warto wiedzieć",
   logistics: [
     "Niektórzy pracodawcy nadal chcą, żebyś dokończył aplikację na ich stronie — TWIN śledzi to za Ciebie.",
-    "Nocne auto-aplikowanie działa na obsługiwanych portalach z planem Premium/Pro (gdy portal na to pozwala).",
+    "Autonomiczne aplikowanie działa na obsługiwanych portalach z planem Premium/Pro (gdy portal na to pozwala).",
     "Skan CV w PDF? Może chwilę potrwać — profil zawsze możesz poprawić ręcznie.",
   ],
   primaryCta: { label: "Zacznij z TWIN za darmo", href: "/register" },
@@ -424,6 +424,21 @@ const companiesEn: PersonaBundle = {
   pricingFootnote:
     "Numbers are directional for procurement conversations. Final statements of work define SLAs, data processing roles, and integration scope.",
   tiers: [
+    {
+      id: "flat-rate",
+      name: "Vacancy flat rate",
+      price: "10% of vacancy spend",
+      cadence: "illustrative · high-volume hiring",
+      quotaSummary: "Example: 1,000 FTE × 15% rotation → 150 roles · vs 500 PLN/vacancy floor",
+      bullets: [
+        "Modeled in the B2B ROI calculator (vacancy budget block)",
+        "Alternative to per-hire % of salary for employers with predictable posting volume",
+        "Combine with workspace seats or annual Growth/Scale programs in the SOW",
+        "Placement verification and attestation still apply for fee eligibility",
+      ],
+      cta: "Model flat rate in calculator",
+      href: "/calculator/b2b#flat-rate",
+    },
     {
       id: "growth",
       name: "Growth",
@@ -642,6 +657,21 @@ const companiesPl: PersonaBundle = {
   pricingFootnote:
     "Kwoty orientacyjne pod rozmowy zakupowe. Ostateczne SOW definiują SLA, role DPA i zakres integracji.",
   tiers: [
+    {
+      id: "flat-rate",
+      name: "Flat rate wakatów",
+      price: "10% budżetu publikacji",
+      cadence: "ilustracja · duży wolumen rekrutacji",
+      quotaSummary: "Przykład: 1 000 FTE × 15% rotacji → 150 ról · floor 500 PLN/wakat",
+      bullets: [
+        "Policz w kalkulatorze ROI B2B (sekcja flat rate)",
+        "Alternatywa dla success fee od pensji przy przewidywalnym wolumenie ogłoszeń",
+        "Możliwa hybryda z programem Growth/Scale i miejscami workspace w SOW",
+        "Weryfikacja placementu i atestacja pracodawcy nadal obowiązują przy opłacie",
+      ],
+      cta: "Modeluj flat rate",
+      href: "/calculator/b2b#flat-rate",
+    },
     {
       id: "growth",
       name: "Growth",

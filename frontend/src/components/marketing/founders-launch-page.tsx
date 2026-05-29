@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
-import { LanguageSwitcher } from "@/components/language-switcher";
 import type { TranslationKey } from "@/lib/i18n";
 import { betaFetchStats, type BetaStats } from "@/lib/beta-api";
 
@@ -39,7 +38,9 @@ export function FoundersLaunchPage() {
   }, [t]);
 
   useEffect(() => {
-    void load();
+    queueMicrotask(() => {
+      void load();
+    });
     const id = window.setInterval(() => void load(), POLL_MS);
     return () => window.clearInterval(id);
   }, [load]);
@@ -83,21 +84,6 @@ export function FoundersLaunchPage() {
         }}
         aria-hidden
       />
-
-      <header className="relative z-20 flex items-center justify-between gap-4 px-[var(--twin-page-x)] py-5">
-        <Link href="/" className="text-sm font-semibold tracking-tight text-emerald-300/90 hover:text-emerald-200">
-          TWIN
-        </Link>
-        <div className="flex items-center gap-3">
-          <LanguageSwitcher />
-          <Link
-            href="/login"
-            className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-slate-200 backdrop-blur hover:border-emerald-400/40 hover:text-white"
-          >
-            {t("nav.login")}
-          </Link>
-        </div>
-      </header>
 
       <main className="relative z-10 mx-auto flex max-w-5xl flex-col gap-16 px-[var(--twin-page-x)] pb-24 pt-6 sm:pt-10">
         <section className="text-center sm:text-left">

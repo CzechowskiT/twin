@@ -4,10 +4,10 @@ import Link from "next/link";
 import { useTranslation } from "@/components/language-provider";
 
 const navClass =
-  "twin-workspace-subnav flex min-w-0 max-w-full flex-nowrap items-center gap-x-3 overflow-x-auto overscroll-x-contain text-sm [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-x-4 [&::-webkit-scrollbar]:hidden";
+  "twin-workspace-subnav flex min-w-0 max-w-full flex-wrap items-center gap-x-3 gap-y-2 text-sm sm:gap-x-4";
 
 const itemClass =
-  "twin-link inline-flex shrink-0 items-center whitespace-nowrap px-1 text-sm";
+  "twin-link inline-flex min-h-[2.75rem] items-center whitespace-nowrap px-1 text-sm";
 
 type CandidateWorkspaceSubnavProps = {
   ariaLabel: string;
@@ -27,6 +27,9 @@ export function CandidateWorkspaceSubnav({
     <nav className={navClass} aria-label={ariaLabel}>
       <Link href="/profile" className={itemClass}>
         {t("nav.profile")}
+      </Link>
+      <Link href="/dashboard#dashboard-jobs" className={itemClass}>
+        {t("nav.jobs")}
       </Link>
       <Link href="/dashboard/career" className={itemClass}>
         {t("dashboard.careerCompassLink")}

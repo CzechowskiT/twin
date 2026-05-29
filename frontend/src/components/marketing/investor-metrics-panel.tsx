@@ -20,6 +20,8 @@ type MvpStats = {
   google_calendar_configured: boolean;
   microsoft_calendar_configured: boolean;
   database_reachable: boolean;
+  paid_subscribers: number;
+  subscription_mrr_usd: number | null;
   generated_at: string;
 };
 
@@ -69,6 +71,13 @@ export function InvestorMetricsPanel() {
     return <p className="twin-muted text-sm">{t("common.loading")}</p>;
   }
 
+  const money = (n: number) =>
+    n.toLocaleString(loc, { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+  const mrrDisplay =
+    stats.subscription_mrr_usd != null
+      ? money(stats.subscription_mrr_usd)
+      : t("investorMetrics.subscriptionMrrStub");
+
   const early = isEarlyStage(stats);
 
   const tiles = [
@@ -84,6 +93,7 @@ export function InvestorMetricsPanel() {
     { label: t("investorMetrics.interviews"), value: stats.interviews_scheduled, highlight: false },
     { label: t("investorMetrics.cvProfiles"), value: stats.profiles_with_cv, highlight: false },
     { label: t("investorMetrics.boards"), value: stats.job_boards_in_registry, highlight: false },
+    { label: t("investorMetrics.paidSubscribers"), value: stats.paid_subscribers ?? 0, highlight: false },
   ];
 
   return (
@@ -120,6 +130,9 @@ export function InvestorMetricsPanel() {
         </h2>
         <p className="mt-1 text-xs leading-relaxed text-[var(--twin-muted)]">{t("investorMetrics.unitEconomicsLead")}</p>
         <p className="mt-2 text-xs text-[var(--twin-muted-strong)]">{t("investorMetrics.preRevenueNote")}</p>
+        <p className="mt-2 text-sm font-semibold tabular-nums text-[var(--foreground)]">
+          {t("investorMetrics.subscriptionMrr")}: {mrrDisplay}
+        </p>
         <h3 className="mt-4 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
           {t("investorMetrics.readinessTitle")}
         </h3>

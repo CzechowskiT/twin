@@ -62,6 +62,7 @@ def respond_recruiter_batch(
     company_slug: str,
     application_id: int,
     action: str,
+    decline_note: str | None = None,
 ) -> dict:
     slug = _require_company_slug(company_slug)
     row = (
@@ -80,6 +81,9 @@ def respond_recruiter_batch(
         app.status = ApplicationStatus.INTERVIEW
     elif act == "decline":
         app.status = ApplicationStatus.REJECTED
+        note = (decline_note or "").strip()
+        if note:
+            app.recruiter_feedback_raw = note[:2000]
     else:
         raise ValueError("action must be accept or decline")
     app.updated_at = datetime.now(timezone.utc)
@@ -87,3 +91,42 @@ def respond_recruiter_batch(
     db.commit()
     db.refresh(app)
     return {"application_id": app.id, "status": app.status.value}
+
+
+def respond_recruiter_batch_bulk(
+    db: Session,
+    *,
+    company_slug: str,
+    application_ids: list[int],
+    action: str,
+    decline_note: str | None = None,
+) -> dict:
+    """Apply accept/decline to many applications in one recruiter action."""
+    slug = _require_company_slug(company_slug)
+    if not application_ids:
+        raise ValueError("application_ids must not be empty.")
+    if len(application_ids) > 50:
+        raise ValueError("At most 50 applications per batch.")
+    results: list[dict] = []
+    succeeded = 0
+    for app_id in application_ids:
+        try:
+            row = respond_recruiter_batch(
+                db,
+                company_slug=slug,
+                application_id=app_id,
+                action=action,
+                decline_note=decline_note,
+            )
+            results.append({**row, "ok": True})
+            succeeded += 1
+        except ValueError as exc:
+            results.append({"application_id": app_id, "ok": False, "error": str(exc)})
+    return {
+        "company_slug": slug,
+        "action": action.strip().lower(),
+        "total": len(application_ids),
+        "succeeded": succeeded,
+        "failed": len(application_ids) - succeeded,
+        "results": results,
+    }

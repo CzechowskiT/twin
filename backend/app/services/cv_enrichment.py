@@ -4,6 +4,7 @@ import json
 import re
 from typing import Any
 
+from app.config import get_settings
 from app.matching.synonyms import SKILL_ALIASES, SKILL_SYNONYMS
 from app.services.anthropic_client import get_anthropic_client, is_anthropic_configured
 
@@ -186,7 +187,7 @@ def _enrich_with_claude(cv_text: str) -> dict[str, Any] | None:
     snippet = cv_text[:12_000]
     try:
         msg = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model=get_settings().anthropic_model,
             max_tokens=2000,
             messages=[{"role": "user", "content": _ENRICH_PROMPT + snippet}],
         )

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 
 import { LinkedInLoginSection } from "@/components/linkedin-login-section";
 import { OAuthWebButtons } from "@/components/oauth-web-buttons";
@@ -11,10 +11,12 @@ import { useMarketingPersona } from "@/components/persona-provider";
 import { Button, Card, Input, Label } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { setToken } from "@/lib/auth";
+import { setSessionPersona } from "@/lib/session-persona";
 import type { TranslationKey } from "@/lib/i18n";
 import type { LoginZone } from "@/lib/persona-auth";
-import { LOGIN_PATH, postLoginPath, REGISTER_PATH } from "@/lib/persona-auth";
-import { OAUTH_LOGIN_BUTTONS_ENABLED } from "@/lib/oauth-auth";
+import { postLoginPath, REGISTER_PATH } from "@/lib/persona-auth";
+import { hasConfiguredOAuthProvider } from "@/lib/oauth-auth";
+import { useOAuthProviderStatus } from "@/lib/use-oauth-provider-status";
 
 type TokenResponse = { access_token: string };
 
@@ -49,11 +51,40 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
   const oauthUrlError = useMemo(() => {
     const err = searchParams.get("error");
     if (err === "linkedin_not_configured") return t("login.errorLinkedinNotConfigured");
+    if (err === "apple_not_configured") return t("login.errorAppleNotConfigured");
+    if (err === "github_not_configured") return t("login.errorGithubNotConfigured");
     if (err?.endsWith("_not_configured")) return t("login.errorOAuthNotConfigured");
     return null;
   }, [searchParams, t]);
 
-  const displayError = error ?? oauthUrlError;
+  const { status: oauthStatus, loaded: oauthStatusLoaded } = useOAuthProviderStatus();
+  const showOAuthButtons = hasConfiguredOAuthProvider(oauthStatus);
+
+  const displayError = useMemo(() => {
+    if (error) return error;
+    if (!oauthUrlError) return null;
+    if (!oauthStatusLoaded) return oauthUrlError;
+    const err = searchParams.get("error");
+    if (err === "apple_not_configured" || err === "github_not_configured") return null;
+    return oauthUrlError;
+  }, [error, oauthStatusLoaded, oauthUrlError, searchParams]);
+
+  useEffect(() => {
+    if (!oauthStatusLoaded) return;
+    const err = searchParams.get("error");
+    if (err !== "apple_not_configured" && err !== "github_not_configured") return;
+    // Stale redirect from API before secrets were applied, or provider still off (UI hides the row).
+    const shouldClear =
+      (err === "apple_not_configured" && !oauthStatus.apple) ||
+      (err === "github_not_configured" && !oauthStatus.github) ||
+      (err === "apple_not_configured" && oauthStatus.apple) ||
+      (err === "github_not_configured" && oauthStatus.github);
+    if (!shouldClear) return;
+    const q = new URLSearchParams(searchParams.toString());
+    q.delete("error");
+    const suffix = q.toString();
+    router.replace(suffix ? `${window.location.pathname}?${suffix}` : window.location.pathname);
+  }, [oauthStatus, oauthStatusLoaded, router, searchParams]);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -69,6 +100,7 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
         }),
       });
       setToken(token.access_token);
+      setSessionPersona(zone);
       setPersona(zone);
       router.push(nextPath);
     } catch (err) {
@@ -104,6 +136,11 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
       </p>
       <h1 className="mb-2 mt-1 text-2xl font-semibold">{t(ZONE_TITLE[zone])}</h1>
       <p className="twin-muted mb-4 text-sm leading-relaxed">{t(ZONE_LEAD[zone])}</p>
+      {zone === "company" ? (
+        <p className="twin-muted mb-4 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/80 px-3 py-2 text-xs leading-relaxed">
+          {t("login.zoneCompanyDemoHint")}
+        </p>
+      ) : null}
       <LinkedInLoginSection emailLoginHref="#login-email" />
       <form onSubmit={onSubmit} className="mt-4">
         <Label htmlFor="login-email">{t("login.email")}</Label>
@@ -120,15 +157,19 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
           {loading ? t("login.signingIn") : t("login.submit")}
         </Button>
       </form>
-      <p className="twin-muted my-4 text-center text-xs uppercase tracking-wide">{t("login.orContinue")}</p>
-      <OAuthWebButtons
-        status={OAUTH_LOGIN_BUTTONS_ENABLED}
-        labels={{
-          google: t("login.oauthGoogle"),
-          github: t("login.oauthGithub"),
-          apple: t("login.oauthApple"),
-        }}
-      />
+      {showOAuthButtons ? (
+        <>
+          <p className="twin-muted my-4 text-center text-xs uppercase tracking-wide">{t("login.orContinue")}</p>
+          <OAuthWebButtons
+            status={oauthStatus}
+            labels={{
+              google: t("login.oauthGoogle"),
+              github: t("login.oauthGithub"),
+              microsoft: t("login.oauthMicrosoft"),
+            }}
+          />
+        </>
+      ) : null}
       <p className="twin-muted mt-4 text-center text-sm">
         {t("login.noAccount")}{" "}
         <Link href={REGISTER_PATH[zone]} className="twin-link">

@@ -5,6 +5,8 @@ from urllib.parse import urlencode
 import httpx
 
 from app.config import get_settings
+from app.services.auth_oauth_redirect import effective_github_redirect_uri
+from app.services.oauth_env import oauth_secret_usable
 from app.services.oauth_types import OAuthUserProfile
 
 GITHUB_AUTH_URL = "https://github.com/login/oauth/authorize"
@@ -20,16 +22,21 @@ class GitHubOAuthError(Exception):
 
 def is_github_configured() -> bool:
     s = get_settings()
-    return bool(s.github_client_id and s.github_client_secret and s.github_redirect_uri)
+    return bool(
+        s.github_client_id.strip()
+        and oauth_secret_usable(s.github_client_secret)
+        and effective_github_redirect_uri(s)
+    )
 
 
 def build_github_authorize_url(state: str) -> str:
     if not is_github_configured():
         raise GitHubOAuthError("GitHub login is not configured")
     s = get_settings()
+    redirect_uri = effective_github_redirect_uri(s)
     params = {
         "client_id": s.github_client_id,
-        "redirect_uri": s.github_redirect_uri,
+        "redirect_uri": redirect_uri,
         "state": state,
         "scope": GITHUB_SCOPES,
     }
@@ -58,11 +65,12 @@ def exchange_github_code_for_profile(code: str) -> OAuthUserProfile:
     if not is_github_configured():
         raise GitHubOAuthError("GitHub login is not configured")
     s = get_settings()
+    redirect_uri = effective_github_redirect_uri(s)
     data = {
         "client_id": s.github_client_id,
         "client_secret": s.github_client_secret,
         "code": code,
-        "redirect_uri": s.github_redirect_uri,
+        "redirect_uri": redirect_uri,
     }
     headers = {"Accept": "application/json"}
     with httpx.Client(timeout=30.0) as client:

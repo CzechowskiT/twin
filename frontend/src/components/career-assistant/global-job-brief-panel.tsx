@@ -71,10 +71,7 @@ function BriefHeader({
 }) {
   return (
     <header className="space-y-4">
-      <p
-        className="rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs leading-relaxed text-amber-950 dark:text-amber-100"
-        role="note"
-      >
+      <p className="demo-sample-banner" role="note">
         {t("jobBrief.demoBanner")}
       </p>
       <div className="flex flex-wrap items-start gap-4">

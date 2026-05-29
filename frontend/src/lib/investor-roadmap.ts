@@ -1,79 +1,88 @@
 /**
- * Investor-facing roadmap: live = registry board id exists in TWIN today.
- * One button (“Twin for your job”) runs scrape-all over SCRAPE_ENABLED_BOARD_IDS (or all when unset).
+ * Investor-facing roadmap: live = verified scrape in production conditions;
+ * registry = adapter wired in SCRAPE_REGISTRY but often blocked (bots, login, SPA);
+ * planned = not wired yet.
  */
-export type InvestorPortal = { name: string; boardId?: string };
-export type InvestorCompany = { name: string; boardId?: string };
+export type InvestorPortal = {
+  name: string;
+  boardId?: string;
+  /** True when live smoke tests consistently return listings (see backend global_boards). */
+  scrapingVerified?: boolean;
+};
+export type InvestorCompany = { name: string; boardId?: string; scrapingVerified?: boolean };
 
-const PORTAL_PAIRS: [string, string | undefined][] = [
-  ["Indeed", "indeed"],
-  ["LinkedIn", "linkedin"],
-  ["Glassdoor", "glassdoor"],
-  ["ZipRecruiter", "ziprecruiter"],
-  ["Monster", "monster"],
-  ["CareerBuilder", "careerbuilder"],
-  ["Google for Jobs", "google-jobs"],
-  ["SimplyHired", "simplyhired"],
-  ["Snagajob", "snagajob"],
-  ["LinkUp", undefined],
-  ["Wellfound (AngelList Talent)", undefined],
-  ["Dice", undefined],
-  ["We Work Remotely", undefined],
-  ["Remote.co", undefined],
-  ["FlexJobs", undefined],
-  ["Turing", undefined],
-  ["Toptal", undefined],
-  ["Upwork", undefined],
-  ["Fiverr", undefined],
-  ["eFinancialCareers", undefined],
-  ["BioSpace", undefined],
-  ["Rigzone", undefined],
-  ["Jooble", "jooble"],
-  ["StepStone", "stepstone"],
-  ["Totaljobs", undefined],
-  ["Reed.co.uk", "reed"],
-  ["Welcome to the Jungle", undefined],
-  ["Cadremploi", undefined],
-  ["InfoJobs", undefined],
-  ["Pracuj.pl", "pracuj-sales"],
-  ["Jobindex", undefined],
-  ["Jobbland", undefined],
-  ["HeadHunter (hh.ru)", undefined],
-  ["SEEK", "seek"],
-  ["Naukri", undefined],
-  ["Boss Zhipin", undefined],
-  ["Zhaopin", undefined],
-  ["58.com", undefined],
-  ["Liepin", undefined],
-  ["Jobstreet", undefined],
-  ["JobsDB", undefined],
-  ["Wantedly", undefined],
-  ["Daijob", undefined],
-  ["Computrabajo", undefined],
-  ["OccMundial", undefined],
-  ["Catho", undefined],
-  ["Bayt", undefined],
-  ["GulfTalent", undefined],
-  ["Jobberman", undefined],
-  ["BrighterMonday", undefined],
-  ["Workopolis", undefined],
+export type PortalDeployStatus = "live" | "registry" | "planned";
+
+const PORTAL_PAIRS: [string, string | undefined, boolean | undefined][] = [
+  ["Indeed", "indeed", true],
+  ["LinkedIn", "linkedin", false],
+  ["Glassdoor", "glassdoor", true],
+  ["ZipRecruiter", "ziprecruiter", true],
+  ["Monster", "monster", false],
+  ["CareerBuilder", "careerbuilder", false],
+  ["Google for Jobs", "google-jobs", false],
+  ["SimplyHired", "simplyhired", true],
+  ["Snagajob", "snagajob", false],
+  ["LinkUp", undefined, undefined],
+  ["Wellfound (AngelList Talent)", undefined, undefined],
+  ["Dice", undefined, undefined],
+  ["We Work Remotely", undefined, undefined],
+  ["Remote.co", undefined, undefined],
+  ["FlexJobs", undefined, undefined],
+  ["Turing", undefined, undefined],
+  ["Toptal", undefined, undefined],
+  ["Upwork", undefined, undefined],
+  ["Fiverr", undefined, undefined],
+  ["eFinancialCareers", undefined, undefined],
+  ["BioSpace", undefined, undefined],
+  ["Rigzone", undefined, undefined],
+  ["Jooble", "jooble", false],
+  ["StepStone", "stepstone", false],
+  ["Totaljobs", undefined, undefined],
+  ["Reed.co.uk", "reed", true],
+  ["Welcome to the Jungle", undefined, undefined],
+  ["Cadremploi", undefined, undefined],
+  ["InfoJobs", undefined, undefined],
+  ["Pracuj.pl", "pracuj-sales", true],
+  ["Jobindex", undefined, undefined],
+  ["Jobbland", undefined, undefined],
+  ["HeadHunter (hh.ru)", undefined, undefined],
+  ["SEEK", "seek", false],
+  ["Naukri", undefined, undefined],
+  ["Boss Zhipin", undefined, undefined],
+  ["Zhaopin", undefined, undefined],
+  ["58.com", undefined, undefined],
+  ["Liepin", undefined, undefined],
+  ["Jobstreet", undefined, undefined],
+  ["JobsDB", undefined, undefined],
+  ["Wantedly", undefined, undefined],
+  ["Daijob", undefined, undefined],
+  ["Computrabajo", undefined, undefined],
+  ["OccMundial", undefined, undefined],
+  ["Catho", undefined, undefined],
+  ["Bayt", undefined, undefined],
+  ["GulfTalent", undefined, undefined],
+  ["Jobberman", undefined, undefined],
+  ["BrighterMonday", undefined, undefined],
+  ["Workopolis", undefined, undefined],
 ];
 
-export const INVESTOR_PORTALS: InvestorPortal[] = PORTAL_PAIRS.map(([name, boardId]) => ({
+export const INVESTOR_PORTALS: InvestorPortal[] = PORTAL_PAIRS.map(([name, boardId, scrapingVerified]) => ({
   name,
   boardId,
+  scrapingVerified,
 }));
 
 /** Employers with public Greenhouse JSON boards wired in ``registry.py`` (careers adapter). */
 const INVESTOR_GREENHOUSE_LIVE: InvestorCompany[] = [
-  { name: "Stripe", boardId: "gh-stripe" },
-  { name: "Databricks", boardId: "gh-databricks" },
-  { name: "Airbnb", boardId: "gh-airbnb" },
-  { name: "Duolingo", boardId: "gh-duolingo" },
-  { name: "Cloudflare", boardId: "gh-cloudflare" },
-  { name: "Robinhood", boardId: "gh-robinhood" },
-  { name: "Figma", boardId: "gh-figma" },
-  { name: "Anthropic", boardId: "gh-anthropic" },
+  { name: "Stripe", boardId: "gh-stripe", scrapingVerified: true },
+  { name: "Databricks", boardId: "gh-databricks", scrapingVerified: true },
+  { name: "Airbnb", boardId: "gh-airbnb", scrapingVerified: true },
+  { name: "Duolingo", boardId: "gh-duolingo", scrapingVerified: true },
+  { name: "Cloudflare", boardId: "gh-cloudflare", scrapingVerified: true },
+  { name: "Robinhood", boardId: "gh-robinhood", scrapingVerified: true },
+  { name: "Figma", boardId: "gh-figma", scrapingVerified: true },
+  { name: "Anthropic", boardId: "gh-anthropic", scrapingVerified: true },
 ];
 
 const COMPANY_NAMES = [
@@ -184,6 +193,20 @@ export const INVESTOR_COMPANIES: InvestorCompany[] = [
   ...COMPANY_NAMES.map((name) => ({ name })),
 ];
 
-export function isLivePortal(boardId: string | undefined): boolean {
-  return typeof boardId === "string" && boardId.length > 0;
+export function portalDeployStatus(
+  boardId: string | undefined,
+  scrapingVerified?: boolean,
+): PortalDeployStatus {
+  if (!boardId) return "planned";
+  if (scrapingVerified) return "live";
+  return "registry";
+}
+
+/** @deprecated Use portalDeployStatus — kept for callers that only need the verified subset. */
+export function isLivePortal(boardId: string | undefined, scrapingVerified?: boolean): boolean {
+  return portalDeployStatus(boardId, scrapingVerified) === "live";
+}
+
+export function countVerifiedPortals(): number {
+  return INVESTOR_PORTALS.filter((p) => p.scrapingVerified).length;
 }

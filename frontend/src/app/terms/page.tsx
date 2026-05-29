@@ -22,8 +22,10 @@ function TermsInner() {
 
   useEffect(() => {
     let cancelled = false;
-    setHint(null);
-    setResolved(null);
+    queueMicrotask(() => {
+      setHint(null);
+      setResolved(null);
+    });
     void getJurisdictionHintCached()
       .then((h) => {
         if (cancelled) return;
@@ -48,8 +50,10 @@ function TermsInner() {
   useEffect(() => {
     if (!resolved) return;
     let cancelled = false;
-    setBody(null);
-    setErr(null);
+    queueMicrotask(() => {
+      setBody(null);
+      setErr(null);
+    });
     void fetch(resolved.path, { cache: "no-store" })
       .then((r) => {
         if (!r.ok) throw new Error(String(r.status));

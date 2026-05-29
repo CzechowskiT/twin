@@ -163,8 +163,10 @@ export function CompanyIntelligenceModal({
 
   useEffect(() => {
     if (open && jobId) {
-      setData(null);
-      void load();
+      queueMicrotask(() => {
+        setData(null);
+        void load();
+      });
     }
   }, [open, jobId, load]);
 

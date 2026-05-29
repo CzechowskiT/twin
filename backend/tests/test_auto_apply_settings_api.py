@@ -1,5 +1,8 @@
 """Auto-apply settings API."""
 
+import json
+from datetime import datetime, timezone
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -7,7 +10,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.core.security import create_access_token
-from app.database.models import Application, AutoApplyConsent, Base, Candidate, Job, JobMatch, User
+from app.database.models import Application, AutoApplyConsent, AutoApplyRun, Base, Candidate, Job, JobMatch, User
 from app.database.session import get_db
 from app.main import app
 
@@ -22,13 +25,27 @@ def auto_apply_client():
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
     db = Session()
-    from datetime import datetime, timezone
-
-    user = User(email="auto@test.com", hashed_password="x", is_active=True)
-    user.onboarding_completed_at = datetime.now(timezone.utc)
+    user = User(
+        email="auto@test.com",
+        hashed_password="x",
+        is_active=True,
+        gdpr_consent_at=datetime.now(timezone.utc),
+        onboarding_completed_at=datetime.now(timezone.utc),
+    )
     db.add(user)
     db.commit()
-    candidate = Candidate(user_id=user.id, name="Auto", cv_text="Backend engineer CV")
+    candidate = Candidate(
+        user_id=user.id,
+        name="Auto",
+        cv_text="Backend engineer CV",
+        cv_processing_consent_at=datetime.now(timezone.utc),
+        profile_signals_json=json.dumps(
+            {
+                "career_compass": {"ideal": {"job_title": "Backend"}},
+                "cv_insights": {"summary": "Python"},
+            }
+        ),
+    )
     db.add(candidate)
     db.commit()
     job = Job(
@@ -67,6 +84,7 @@ def test_settings_default(auto_apply_client) -> None:
     assert body["is_active"] is False
     assert body["min_score_threshold"] == 90.0
     assert body["profile_ready"] is True
+    assert body["verified_readiness_ready"] is True
     assert body["onboarding_completed"] is True
 
 
@@ -95,9 +113,12 @@ def test_consent_and_trigger(auto_apply_client, monkeypatch) -> None:
     from unittest.mock import patch
 
     from app.automation.types import ApplyOutcome
+    from app.config import get_settings
+    from app.database.models import SubmissionStatus
 
     client, headers, db, candidate, job = auto_apply_client
     monkeypatch.setenv("NIGHTLY_AUTO_APPLY_COOLDOWN_SECONDS", "0")
+    get_settings.cache_clear()
     res = client.post(
         "/api/v1/auto-apply/consent",
         headers=headers,
@@ -106,7 +127,13 @@ def test_consent_and_trigger(auto_apply_client, monkeypatch) -> None:
     assert res.status_code == 200
     assert res.json()["is_active"] is True
 
-    app_row = Application(candidate_id=candidate.id, job_id=job.id, status="applied")
+    # SUBMITTED without evidence → attempted, not confirmed (P0 truth model).
+    app_row = Application(
+        candidate_id=candidate.id,
+        job_id=job.id,
+        status="applied",
+        submission_status=SubmissionStatus.EXTERNAL_SUBMIT_ATTEMPTED,
+    )
 
     with (
         patch("app.services.nightly_auto_apply.find_top_matches"),
@@ -123,3 +150,38 @@ def test_consent_and_trigger(auto_apply_client, monkeypatch) -> None:
     consent = db.query(AutoApplyConsent).filter(AutoApplyConsent.candidate_id == candidate.id).first()
     assert consent is not None
     assert consent.consent_given_at is not None
+
+
+def test_last_sweep_returns_board_breakdown(auto_apply_client) -> None:
+    from datetime import datetime, timezone
+    import json
+
+    client, headers, db, _candidate, _job = auto_apply_client
+    db.add(
+        AutoApplyRun(
+            started_at=datetime(2026, 5, 24, 0, 0, tzinfo=timezone.utc),
+            finished_at=datetime(2026, 5, 24, 0, 5, tzinfo=timezone.utc),
+            total_users_processed=1,
+            total_applications_submitted=2,
+            total_applications_failed=0,
+            stats_json=json.dumps(
+                {
+                    "demo": True,
+                    "total_applications_skipped": 3,
+                    "boards": {"pracuj.pl": {"submitted": 2, "failed": 0, "skipped": 3}},
+                }
+            ),
+        )
+    )
+    db.commit()
+
+    res = client.get("/api/v1/auto-apply/last-sweep", headers=headers)
+    assert res.status_code == 200
+    body = res.json()
+    assert body["total_applications_submitted"] == 2
+    assert body["total_applications_failed"] == 0
+    assert body["total_applications_skipped"] == 3
+    assert body["is_demo_seed"] is True
+    assert body["boards"][0]["board"] == "pracuj.pl"
+    assert body["boards"][0]["skipped"] == 3
+    assert body["started_at"].endswith("+00:00") or body["started_at"].endswith("Z")

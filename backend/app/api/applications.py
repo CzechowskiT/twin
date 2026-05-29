@@ -13,11 +13,21 @@ from openpyxl import Workbook
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user
-from app.database.models import Application, ApplicationStatus, Candidate, Job, PlacementEvent, User
+from app.limiter import limiter, user_or_ip_key
+from app.database.models import (
+    Application,
+    ApplicationStatus,
+    Candidate,
+    Job,
+    PlacementEvent,
+    SubmissionStatus,
+    User,
+)
 from app.database.session import get_db
 from app.automation.types import ApplyOutcome
 from app.config import get_settings
 from app.core.plans import PlanTier, count_tracked_applications, effective_plan_tier, max_tracked_applications
+from app.core.subscription_gates import Feature, feature_allowed, paywall_for_feature
 from app.schemas.application import (
     ApplicationCreate,
     ApplicationFeedbackInsightsOut,
@@ -25,6 +35,8 @@ from app.schemas.application import (
     ApplicationOut,
     ApplicationStatusEnum,
     ApplicationUpdate,
+    SubmissionStatusEnum,
+    SupportedApplyModeEnum,
     AutoApplyOut,
     AutoApplyPackageUrlOut,
     AutoApplyRequest,
@@ -48,6 +60,12 @@ from app.services.auto_apply_guards import (
     enforce_human_ack_if_required,
     enforce_job_blocklists,
     record_auto_apply_event,
+)
+from app.services.application_submission import (
+    display_submission_status,
+    record_submission_created_in_twin,
+    record_submission_link_opened,
+    record_user_pipeline_status,
 )
 from app.services.auto_apply_service import auto_apply_for_user
 from app.services.request_locale import locale_from_request
@@ -355,7 +373,9 @@ def _maybe_store_application_create_idem(
 
 
 @router.post("/", response_model=ApplicationOut, status_code=status.HTTP_201_CREATED)
+@limiter.limit("30/minute", key_func=user_or_ip_key)
 def create_application(
+    request: Request,
     body: ApplicationCreate,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -386,6 +406,8 @@ def create_application(
         .first()
     )
     if existing:
+        if body.track_link_opened:
+            record_submission_link_opened(existing, job=job)
         out = _apply_application_update(
             existing,
             ApplicationUpdate(status=body.status, notes=body.notes),
@@ -402,6 +424,16 @@ def create_application(
         )
         return out
 
+    if not feature_allowed(user, Feature.AUTO_APPLY):
+        pw = paywall_for_feature(Feature.AUTO_APPLY)
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "message": "Tracking applications requires Standard or higher.",
+                "paywall": pw,
+            },
+        )
+
     tier = effective_plan_tier(user)
     cap = max_tracked_applications(tier)
     if cap is not None:
@@ -415,14 +447,25 @@ def create_application(
                 ),
             )
 
+    if body.track_link_opened:
+        pipeline_status = ApplicationStatus.PENDING
+    else:
+        pipeline_status = _status(body.status)
+
     app = Application(
         candidate_id=candidate.id,
         job_id=body.job_id,
-        status=_status(body.status),
+        status=pipeline_status,
         notes=body.notes,
-        applied_at=datetime.utcnow() if body.status == ApplicationStatusEnum.applied else None,
+        applied_at=None,
     )
     db.add(app)
+    if body.track_link_opened:
+        record_submission_link_opened(app, job=job)
+    else:
+        record_submission_created_in_twin(app)
+        if body.status == ApplicationStatusEnum.applied:
+            record_user_pipeline_status(app, ApplicationStatus.APPLIED)
     db.commit()
     db.refresh(app)
     out = _to_out(app, job)
@@ -461,10 +504,14 @@ def auto_apply(
         if replay:
             return AutoApplyOut.model_validate_json(replay[1])
 
-    if settings.auto_apply_require_premium and effective_plan_tier(user) == PlanTier.FREE:
+    if settings.auto_apply_require_premium and not feature_allowed(user, Feature.AUTO_APPLY):
+        pw = paywall_for_feature(Feature.AUTO_APPLY)
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Auto-apply is available on Premium and Pro plans.",
+            detail={
+                "message": "Auto-apply requires Standard or higher.",
+                "paywall": pw,
+            },
         )
     enforce_human_ack_if_required(settings=settings, human_acknowledged=body.human_acknowledged)
     enforce_auto_apply_redis_rate_limit(user_id=user.id, settings=settings)
@@ -500,11 +547,7 @@ def auto_apply(
     else:
         pkg_url: str | None = None
         pkg_ttl: int | None = None
-        if (
-            outcome in (ApplyOutcome.SUBMITTED, ApplyOutcome.FORM_FILLED)
-            and app is not None
-            and app.auto_apply_package_s3_key
-        ):
+        if app is not None and app.auto_apply_package_s3_key:
             store = get_s3_blob_store()
             if store.enabled:
                 u = store.presigned_get_url(
@@ -513,15 +556,28 @@ def auto_apply(
                 )
                 if u:
                     pkg_url, pkg_ttl = u, _PACKAGE_PRESIGN_DEFAULT_TTL_SEC
+        sub_enum: SubmissionStatusEnum | None = None
+        if app and app.submission_status:
+            sub_enum = SubmissionStatusEnum(app.submission_status.value)
         out = AutoApplyOut(
-            success=outcome in (ApplyOutcome.SUBMITTED, ApplyOutcome.FORM_FILLED),
+            success=outcome not in (ApplyOutcome.FAILED, ApplyOutcome.UNSUPPORTED),
             outcome=outcome.value,
             message=message,
             application_id=app.id if app else None,
             package_pdf_url=pkg_url,
             package_pdf_url_expires_in_seconds=pkg_ttl,
+            submission_status=sub_enum,
         )
-        if out.success and settings.employer_webhook_url.strip():
+        if (
+            out.success
+            and app
+            and app.submission_status
+            in (
+                SubmissionStatus.EXTERNAL_SUBMIT_ATTEMPTED,
+                SubmissionStatus.APPLICATION_PREPARED,
+            )
+            and settings.employer_webhook_url.strip()
+        ):
             background_tasks.add_task(
                 dispatch_auto_apply_webhook,
                 get_settings(),
@@ -680,7 +736,9 @@ def list_placement_events(
 
 
 @router.patch("/{application_id}", response_model=ApplicationOut)
+@limiter.limit("30/minute", key_func=user_or_ip_key)
 def update_application(
+    request: Request,
     application_id: int,
     body: ApplicationUpdate,
     db: Session = Depends(get_db),
@@ -737,7 +795,9 @@ def parse_application_feedback(
 
 
 @router.delete("/{application_id}", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit("30/minute", key_func=user_or_ip_key)
 def delete_application(
+    request: Request,
     application_id: int,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -773,9 +833,7 @@ def _apply_application_update(
 ) -> ApplicationOut:
     patch = body.model_dump(exclude_unset=True)
     if "status" in patch:
-        app.status = _status(ApplicationStatusEnum(patch["status"]))
-        if app.status == ApplicationStatus.APPLIED and not app.applied_at:
-            app.applied_at = datetime.utcnow()
+        record_user_pipeline_status(app, _status(ApplicationStatusEnum(patch["status"])))
         if app.status == ApplicationStatus.HIRED:
             cand = db.query(Candidate).filter(Candidate.id == app.candidate_id).first()
             if cand:
@@ -872,10 +930,23 @@ def _to_out(app: Application, job: Job) -> ApplicationOut:
             insights_out = ApplicationFeedbackInsightsOut.model_validate(ins)
         except Exception:
             insights_out = None
+    sub_out: SubmissionStatusEnum | None = None
+    if app.submission_status:
+        sub_out = SubmissionStatusEnum(app.submission_status.value)
+    mode_out: SupportedApplyModeEnum | None = None
+    if app.supported_apply_mode:
+        mode_out = SupportedApplyModeEnum(app.supported_apply_mode.value)
     return ApplicationOut(
         id=app.id,
         job_id=job.id,
         status=ApplicationStatusEnum(app.status.value),
+        submission_status=sub_out,
+        display_status=display_submission_status(app),
+        supported_apply_mode=mode_out,
+        requires_manual_action=bool(app.requires_manual_action),
+        submit_attempted_at=app.submit_attempted_at,
+        submitted_at=app.submitted_at,
+        failure_reason=app.failure_reason,
         notes=app.notes,
         recruiter_feedback_raw=app.recruiter_feedback_raw,
         feedback_insights=insights_out,

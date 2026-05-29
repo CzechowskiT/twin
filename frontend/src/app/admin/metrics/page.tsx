@@ -28,7 +28,7 @@ export default function AdminMetricsPage() {
   useEffect(() => {
     try {
       const s = sessionStorage.getItem(STORAGE_KEY);
-      if (s) setToken(s);
+      if (s) queueMicrotask(() => setToken(s));
     } catch {
       /* ignore */
     }

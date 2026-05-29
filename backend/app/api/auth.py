@@ -70,6 +70,12 @@ from app.services.login_rate_limit import enforce_login_rate_limit_per_minute
 from app.services.google_calendar_oauth import is_google_calendar_oauth_configured
 from app.services.mail import is_mail_configured
 from app.services.microsoft_calendar_oauth import is_microsoft_calendar_oauth_configured
+from app.services.microsoft_oauth import (
+    MicrosoftOAuthError,
+    build_microsoft_authorize_url,
+    exchange_microsoft_code_for_profile,
+    is_microsoft_configured,
+)
 from app.services.oauth_state import create_oauth_state, verify_oauth_state
 from app.services.oauth_types import OAuthUserProfile
 from app.services.oauth_user import user_from_oauth
@@ -104,6 +110,7 @@ class WebOAuthProvider(str, Enum):
     google = "google"
     github = "github"
     apple = "apple"
+    microsoft = "microsoft"
 
 
 def _frontend_callback_url(**params: str) -> str:
@@ -118,6 +125,12 @@ def _frontend_login_url(**params: str) -> str:
     return f"{base}/login?{query}" if query else f"{base}/login"
 
 
+def _frontend_oauth_error_url(error: str) -> str:
+    """Misconfigured OAuth: candidate login shows the error instead of the role hub."""
+    base = get_settings().frontend_url.rstrip("/")
+    return f"{base}/login/candidate?{urlencode({'error': error})}"
+
+
 def _web_oauth_configured(provider: WebOAuthProvider) -> bool:
     if provider == WebOAuthProvider.google:
         return is_google_configured()
@@ -125,6 +138,8 @@ def _web_oauth_configured(provider: WebOAuthProvider) -> bool:
         return is_github_configured()
     if provider == WebOAuthProvider.apple:
         return is_apple_configured()
+    if provider == WebOAuthProvider.microsoft:
+        return is_microsoft_configured()
     return False
 
 
@@ -135,6 +150,8 @@ def _web_oauth_authorize_url(provider: WebOAuthProvider, state: str) -> str:
         return build_github_authorize_url(state)
     if provider == WebOAuthProvider.apple:
         return build_apple_authorize_url(state)
+    if provider == WebOAuthProvider.microsoft:
+        return build_microsoft_authorize_url(state)
     raise AssertionError("unsupported web OAuth provider")
 
 
@@ -147,6 +164,8 @@ def _web_oauth_exchange_profile(
         return exchange_github_code_for_profile(code)
     if provider == WebOAuthProvider.apple:
         return exchange_apple_code_for_profile(code, apple_user)
+    if provider == WebOAuthProvider.microsoft:
+        return exchange_microsoft_code_for_profile(code)
     raise AssertionError("unsupported web OAuth provider")
 
 
@@ -377,7 +396,9 @@ def me(user: User = Depends(get_current_user), db: Session = Depends(get_db)) ->
 
 
 @router.post("/gdpr-consent", response_model=UserOut)
+@limiter.limit("30/minute")
 def record_gdpr_consent(
+    request: Request,
     body: GdprConsentIn,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -407,7 +428,9 @@ def record_gdpr_consent(
 
 
 @router.patch("/me/marketing", response_model=UserOut)
+@limiter.limit("30/minute")
 def update_marketing_preference(
+    request: Request,
     body: UserMarketingPreference,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -423,7 +446,9 @@ def update_marketing_preference(
 
 
 @router.patch("/me/notification-preferences", response_model=UserOut)
+@limiter.limit("30/minute")
 def update_notification_preferences(
+    request: Request,
     body: NotificationPreferencesIn,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -473,7 +498,9 @@ def change_password(
 
 
 @router.patch("/me/billing-profile", response_model=UserOut)
+@limiter.limit("30/minute")
 def update_billing_profile(
+    request: Request,
     body: BillingProfileIn,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -491,7 +518,9 @@ def update_billing_profile(
 
 
 @router.post("/onboarding/complete", response_model=UserOut)
+@limiter.limit("30/minute")
 def complete_onboarding(
+    request: Request,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> UserOut:
@@ -507,7 +536,7 @@ def complete_onboarding(
 def linkedin_login() -> RedirectResponse:
     if not is_linkedin_oauth_configured():
         return RedirectResponse(
-            _frontend_login_url(error="linkedin_not_configured"),
+            _frontend_oauth_error_url("linkedin_not_configured"),
             status_code=302,
         )
     state = create_oauth_state()
@@ -515,7 +544,9 @@ def linkedin_login() -> RedirectResponse:
 
 
 @router.get("/linkedin/callback")
+@limiter.limit("10/minute")
 def linkedin_callback(
+    request: Request,
     code: str | None = None,
     state: str | None = None,
     error: str | None = None,
@@ -549,16 +580,17 @@ def linkedin_callback(
 def web_oauth_login(provider: WebOAuthProvider) -> RedirectResponse:
     slug = provider.value
     if not _web_oauth_configured(provider):
-        return RedirectResponse(_frontend_login_url(error=f"{slug}_not_configured"), status_code=302)
+        return RedirectResponse(_frontend_oauth_error_url(f"{slug}_not_configured"), status_code=302)
     state = create_oauth_state()
     try:
         url = _web_oauth_authorize_url(provider, state)
-    except (GoogleOAuthError, GitHubOAuthError, AppleOAuthError):
-        return RedirectResponse(_frontend_login_url(error=f"{slug}_not_configured"), status_code=302)
+    except (GoogleOAuthError, GitHubOAuthError, AppleOAuthError, MicrosoftOAuthError):
+        return RedirectResponse(_frontend_oauth_error_url(f"{slug}_not_configured"), status_code=302)
     return RedirectResponse(url, status_code=302)
 
 
 @router.api_route("/{provider}/callback", methods=["GET", "POST"])
+@limiter.limit("10/minute")
 async def web_oauth_callback(
     request: Request,
     provider: WebOAuthProvider,
@@ -577,7 +609,7 @@ async def web_oauth_callback(
         profile = _web_oauth_exchange_profile(provider, code, apple_user)
         user = user_from_oauth(db, profile)
         profile_created = ensure_candidate_from_oauth_profile(db, user, profile.email, profile.name)
-    except (GoogleOAuthError, GitHubOAuthError, AppleOAuthError):
+    except (GoogleOAuthError, GitHubOAuthError, AppleOAuthError, MicrosoftOAuthError):
         return RedirectResponse(_frontend_callback_url(error=f"{slug}_failed"), status_code=302)
 
     if not user.is_active:

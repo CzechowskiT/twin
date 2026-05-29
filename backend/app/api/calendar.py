@@ -8,13 +8,14 @@ import secrets
 from datetime import datetime, timedelta, timezone
 from urllib.parse import urlencode
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from fastapi.responses import RedirectResponse, Response
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.core.deps import get_current_user
+from app.limiter import limiter
 from app.core.security import create_access_token, decode_access_token
 from app.database.models import Application, Candidate, ScheduledInterview, User, UserGoogleCalendar
 from app.services.microsoft_calendar_api import MicrosoftCalendarApiError, delete_calendar_event as delete_microsoft_event
@@ -248,7 +249,9 @@ def google_calendar_authorize(current_user: User = Depends(get_current_user)) ->
 
 
 @router.get("/google/callback")
+@limiter.limit("10/minute")
 def google_calendar_callback(
+    request: Request,
     code: str | None = None,
     state: str | None = None,
     error: str | None = None,

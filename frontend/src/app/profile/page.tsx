@@ -6,11 +6,13 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useTranslation } from "@/components/language-provider";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
+import { ProfileProgressBar } from "@/components/profile-progress-bar";
 import { WorkspaceFlowSteps } from "@/components/ux/workspace-flow-steps";
 import { Button, Card, Input, Label, Shell } from "@/components/ui";
 import { apiFetch, apiFetchBlob, apiUpload, saveBlobAsFile } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 import type { TranslationKey } from "@/lib/i18n";
+import { dashboardMatchesQuery } from "@/lib/matching-quality";
 
 function cvSeniorityTranslationKey(raw: string): TranslationKey | null {
   const s = raw.trim().toLowerCase();
@@ -159,7 +161,7 @@ export default function ProfilePage() {
   async function loadTailorMatches(token: string) {
     try {
       const r = await apiFetch<{ items: TailorMatchRow[] }>(
-        "/api/v1/candidates/me/matches?limit=100&min_score=15",
+        dashboardMatchesQuery(),
         {},
         token,
       );
@@ -190,7 +192,8 @@ export default function ProfilePage() {
       router.replace("/login");
       return;
     }
-    Promise.all([
+    queueMicrotask(() => {
+      void Promise.all([
       apiFetch<Profile>("/api/v1/candidates/me", {}, token).catch(() => null),
       apiFetch<UserPrefs>("/api/v1/auth/me", {}, token).catch(() => null),
       loadDocumentsList(token),
@@ -206,6 +209,7 @@ export default function ProfilePage() {
         }
       })
       .finally(() => setLoading(false));
+    });
   }, [router]);
 
   async function reloadProfile() {
@@ -515,14 +519,14 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <Shell rail>
+      <Shell wide rail>
         <p className="twin-muted">{t("profile.loading")}</p>
       </Shell>
     );
   }
 
   return (
-    <Shell rail>
+    <Shell wide rail>
       <div className="mb-4 flex min-w-0 flex-col gap-3 sm:mb-6 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div className="min-w-0 shrink-0">
           <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">{t("profile.title")}</h1>
@@ -535,6 +539,72 @@ export default function ProfilePage() {
         />
       </div>
       <WorkspaceFlowSteps current="profile" className="mb-4 sm:mb-6" />
+      {initial ? (
+        <ProfileProgressBar
+          className="mb-4 max-w-md"
+          profile={{
+            name: initial.name,
+            skills: JSON.stringify(initial.skills ?? []),
+            preferred_job_titles: JSON.stringify(initial.preferred_job_titles ?? []),
+            experience_years: initial.experience_years,
+            location: initial.location,
+            cv_filename: initial.cv_filename,
+            cv_text: initial.has_cv ? "1" : null,
+          }}
+        />
+      ) : null}
+      {initial ? (
+        <section className="twin-filter-box mb-6 rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/30 p-4">
+          <h2 className="mb-1 text-sm font-semibold text-[var(--foreground)]">{t("profile.cvReviewTitle")}</h2>
+          <p className="twin-muted mb-3 text-xs leading-relaxed">{t("profile.cvReviewLead")}</p>
+          {!initial.skills?.length &&
+          !initial.preferred_job_titles?.length &&
+          !initial.location &&
+          !initial.experience_years ? (
+            <p className="text-sm text-[var(--twin-muted-strong)]">{t("profile.cvReviewEmpty")}</p>
+          ) : (
+            <dl className="grid gap-2 text-sm sm:grid-cols-2">
+              <div>
+                <dt className="font-medium text-[var(--foreground)]">{t("profile.cvReviewSkills")}</dt>
+                <dd className="text-[var(--twin-muted-strong)]">
+                  {initial.skills?.length ? initial.skills.join(", ") : "—"}
+                </dd>
+              </div>
+              <div>
+                <dt className="font-medium text-[var(--foreground)]">{t("profile.cvReviewTitles")}</dt>
+                <dd className="text-[var(--twin-muted-strong)]">
+                  {initial.preferred_job_titles?.length ? initial.preferred_job_titles.join(", ") : "—"}
+                </dd>
+              </div>
+              <div>
+                <dt className="font-medium text-[var(--foreground)]">{t("profile.cvReviewExperience")}</dt>
+                <dd className="text-[var(--twin-muted-strong)]">{initial.experience_years ?? "—"}</dd>
+              </div>
+              <div>
+                <dt className="font-medium text-[var(--foreground)]">{t("profile.cvReviewLocation")}</dt>
+                <dd className="text-[var(--twin-muted-strong)]">{initial.location || "—"}</dd>
+              </div>
+              {initial.cv_insights?.industries && initial.cv_insights.industries.length > 0 ? (
+                <div>
+                  <dt className="font-medium text-[var(--foreground)]">{t("profile.cvReviewIndustries")}</dt>
+                  <dd className="text-[var(--twin-muted-strong)]">{initial.cv_insights.industries.join(", ")}</dd>
+                </div>
+              ) : null}
+              {(() => {
+                const sk = initial.cv_insights?.seniority
+                  ? cvSeniorityTranslationKey(initial.cv_insights.seniority)
+                  : null;
+                return sk ? (
+                  <div>
+                    <dt className="font-medium text-[var(--foreground)]">{t("profile.cvReviewSeniority")}</dt>
+                    <dd className="text-[var(--twin-muted-strong)]">{t(sk)}</dd>
+                  </div>
+                ) : null;
+              })()}
+            </dl>
+          )}
+        </section>
+      ) : null}
       <Card>
 
         <section className="twin-filter-box mb-6">

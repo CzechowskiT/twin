@@ -9,6 +9,8 @@ from app.config import Settings, get_settings
 from app.core.deps import get_db
 from app.database.models import PartnerApiKey, RecruiterCompanyToken
 from app.services.admin_metrics import build_admin_metrics
+from app.services.market_coverage_status import build_market_coverage_status
+from app.services.matching_quality_metrics import build_matching_quality_metrics
 from app.services.admin_placement_queue import build_placement_dispute_queue
 from app.services.data_quality_metrics import build_data_quality_report
 from app.services.partner_auth import mint_partner_api_key, revoke_partner_api_key
@@ -24,6 +26,30 @@ def _require_ops_admin(settings: Settings, authorization: str | None) -> None:
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail="Ops admin token not configured")
     if (authorization or "").strip() != f"Bearer {token}":
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid admin token")
+
+
+@router.get("/deploy-health")
+def admin_deploy_health(
+    db: bool = True,
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+) -> dict:
+    """Full deploy audit (redirect URIs, data-room flags) — replaces public health?ops=1 detail."""
+    from app.api.health import _database_reachable, _git_commit_sha
+    from app.services.health_ops import build_health_ops_admin_extensions, build_health_ops_public
+
+    _require_ops_admin(settings, authorization)
+    commit = _git_commit_sha()
+    out: dict = {
+        "status": "ok",
+        "service": "twin-api",
+        "git_commit": commit if commit else "unknown",
+    }
+    if db:
+        out["db_ok"] = _database_reachable()
+    out.update(build_health_ops_public(settings))
+    out.update(build_health_ops_admin_extensions(settings))
+    return out
 
 
 @router.get("/data-quality")
@@ -44,6 +70,28 @@ def admin_metrics(
 ) -> dict:
     _require_ops_admin(settings, authorization)
     return build_admin_metrics(db)
+
+
+@router.get("/market-coverage-status")
+def admin_market_coverage_status(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+) -> dict:
+    """Autonomous scrape telemetry + active feed progress toward 10k target."""
+    _require_ops_admin(settings, authorization)
+    return build_market_coverage_status(db)
+
+
+@router.get("/matching-quality")
+def admin_matching_quality(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+) -> dict:
+    """Founding-cohort matching quality KPIs (feedback rates, median scores)."""
+    _require_ops_admin(settings, authorization)
+    return build_matching_quality_metrics(db)
 
 
 @router.get("/placement-disputes")

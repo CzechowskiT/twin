@@ -18,6 +18,10 @@ class AutoApplySettingsOut(BaseModel):
         description="True when onboarding is done and CV, tailoring, or core profile fields exist.",
     )
     onboarding_completed: bool = False
+    verified_readiness_ready: bool = Field(
+        default=False,
+        description="True when verified-readiness gate passes (career brief, evidence, consents).",
+    )
 
 
 class AutoApplyConsentIn(BaseModel):
@@ -37,6 +41,16 @@ class AutoApplyLastSweepOut(BaseModel):
     finished_at: datetime | None
     total_applications_submitted: int
     total_applications_failed: int
+    total_applications_skipped: int = 0
+    boards: list["SweepBoardStatOut"] = Field(default_factory=list)
+    is_demo_seed: bool = False
+
+
+class SweepBoardStatOut(BaseModel):
+    board: str
+    submitted: int = 0
+    failed: int = 0
+    skipped: int = 0
 
 
 class AutoApplyTriggerOut(BaseModel):

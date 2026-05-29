@@ -38,6 +38,33 @@ def test_google_login_redirect(_mock: MagicMock, _s: MagicMock, _u: MagicMock, c
 
 
 @patch("app.api.auth.get_settings")
+@patch("app.api.auth.is_github_configured", return_value=False)
+def test_github_login_not_configured(
+    _cfg: MagicMock, mock_settings: MagicMock, client: TestClient
+) -> None:
+    mock_settings.return_value.frontend_url = "http://localhost:3000"
+    res = client.get("/api/v1/auth/github/login", follow_redirects=False)
+    assert res.status_code == 302
+    assert res.headers["location"] == "http://localhost:3000/login/candidate?error=github_not_configured"
+
+
+@patch("app.api.auth.is_microsoft_configured", return_value=False)
+def test_microsoft_login_not_configured(_mock: MagicMock, client: TestClient) -> None:
+    res = client.get("/api/v1/auth/microsoft/login", follow_redirects=False)
+    assert res.status_code == 302
+    assert "error=microsoft_not_configured" in res.headers["location"]
+
+
+@patch("app.api.auth.build_microsoft_authorize_url", return_value="https://login.microsoftonline.com/common/oauth2/v2.0/authorize?x=1")
+@patch("app.api.auth.create_oauth_state", return_value="state-jwt")
+@patch("app.api.auth.is_microsoft_configured", return_value=True)
+def test_microsoft_login_redirect(_cfg: MagicMock, _s: MagicMock, _u: MagicMock, client: TestClient) -> None:
+    res = client.get("/api/v1/auth/microsoft/login", follow_redirects=False)
+    assert res.status_code == 302
+    assert res.headers["location"].startswith("https://login.microsoftonline.com")
+
+
+@patch("app.api.auth.get_settings")
 def test_google_callback_invalid_state(mock_settings: MagicMock, client: TestClient) -> None:
     mock_settings.return_value.frontend_url = "http://localhost:3000"
     res = client.get(

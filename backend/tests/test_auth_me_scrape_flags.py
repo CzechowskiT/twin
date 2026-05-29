@@ -58,6 +58,7 @@ def test_auth_me_scrape_flags_when_email_allowlisted(me_client, monkeypatch) -> 
     client, user, _db = me_client
     monkeypatch.setenv("SCRAPE_OPS_EMAILS", user.email)
     monkeypatch.setenv("SCRAPE_OPS_USER_IDS", "")
+    monkeypatch.setenv("SCRAPE_USER_TRIGGER_ENABLED", "true")
     monkeypatch.setenv("CELERY_TASK_ALWAYS_EAGER", "true")
     get_settings.cache_clear()
     try:
@@ -73,10 +74,11 @@ def test_auth_me_scrape_flags_when_email_allowlisted(me_client, monkeypatch) -> 
         get_settings.cache_clear()
 
 
-def test_auth_me_can_trigger_scrape_without_ops_allowlist(me_client, monkeypatch) -> None:
+def test_auth_me_can_trigger_scrape_false_by_default(me_client, monkeypatch) -> None:
     client, user, _db = me_client
     monkeypatch.delenv("SCRAPE_OPS_EMAILS", raising=False)
     monkeypatch.setenv("SCRAPE_OPS_USER_IDS", "")
+    monkeypatch.setenv("SCRAPE_USER_TRIGGER_ENABLED", "false")
     monkeypatch.setenv("CELERY_TASK_ALWAYS_EAGER", "true")
     get_settings.cache_clear()
     try:
@@ -86,10 +88,27 @@ def test_auth_me_can_trigger_scrape_without_ops_allowlist(me_client, monkeypatch
         body = res.json()
         assert body["scrape_ops_configured"] is False
         assert body["scrape_ops_elevated"] is False
-        assert body["can_trigger_scrape"] is True
+        assert body["can_trigger_scrape"] is False
         assert body["scrape_worker_ready"] is True
         assert body["mail_configured"] is False
         assert body["microsoft_calendar_oauth_configured"] is False
+    finally:
+        get_settings.cache_clear()
+
+
+def test_auth_me_can_trigger_scrape_when_user_trigger_enabled(me_client, monkeypatch) -> None:
+    client, user, _db = me_client
+    monkeypatch.delenv("SCRAPE_OPS_EMAILS", raising=False)
+    monkeypatch.setenv("SCRAPE_OPS_USER_IDS", "")
+    monkeypatch.setenv("SCRAPE_USER_TRIGGER_ENABLED", "true")
+    monkeypatch.setenv("CELERY_TASK_ALWAYS_EAGER", "true")
+    get_settings.cache_clear()
+    try:
+        token = create_access_token(user.email)
+        res = client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {token}"})
+        assert res.status_code == 200
+        body = res.json()
+        assert body["can_trigger_scrape"] is True
     finally:
         get_settings.cache_clear()
 

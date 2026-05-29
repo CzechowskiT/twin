@@ -68,7 +68,9 @@ export function LegalRegionNotice() {
   }, []);
 
   useEffect(() => {
-    setGeoSupported(typeof navigator !== "undefined" && Boolean(navigator.geolocation));
+    queueMicrotask(() => {
+      setGeoSupported(typeof navigator !== "undefined" && Boolean(navigator.geolocation));
+    });
   }, []);
 
   useEffect(() => {

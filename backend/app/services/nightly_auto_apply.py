@@ -20,9 +20,11 @@ from app.database.models import (
     Candidate,
     Job,
     JobMatch,
+    SubmissionStatus,
     User,
 )
 from app.services.auto_apply_guards import enforce_company_cooldown, enforce_job_blocklists
+from app.services.candidate_readiness import autonomous_apply_allowed
 from app.services.auto_apply_service import auto_apply_for_user
 from app.services.matching_service import find_top_matches
 from app.services.nightly_auto_apply_mail import send_nightly_auto_apply_summary_email
@@ -100,6 +102,19 @@ def eligible_matches(
     return out
 
 
+def _board_key(job: Job) -> str:
+    board = (job.job_board or "").strip().lower()
+    if board in ("pracuj", "pracuj.pl") or "pracuj.pl" in (job.url or "").lower():
+        return "pracuj.pl"
+    return board or "unknown"
+
+
+def _bump_board_stat(stats: dict[str, dict[str, int]], job: Job, field: str) -> None:
+    key = _board_key(job)
+    bucket = stats.setdefault(key, {"submitted": 0, "failed": 0, "skipped": 0})
+    bucket[field] = int(bucket.get(field, 0)) + 1
+
+
 def process_user_nightly_auto_apply(
     db: Session,
     *,
@@ -107,17 +122,25 @@ def process_user_nightly_auto_apply(
     consent: AutoApplyConsent,
     settings: Settings,
     submit: bool = True,
+    max_jobs: int | None = None,
+    cooldown_seconds: int | None = None,
+    application_method: str = METHOD_NIGHTLY,
+    board_stats: dict[str, dict[str, int]] | None = None,
 ) -> dict[str, Any]:
     """Apply to top eligible matches for one user."""
     result: dict[str, Any] = {
         "user_id": user.id,
         "applications_submitted": 0,
         "applications_failed": 0,
+        "applications_skipped": 0,
         "skipped_reason": None,
     }
     candidate = db.query(Candidate).filter(Candidate.user_id == user.id).first()
     if not candidate:
         result["skipped_reason"] = "no_candidate_profile"
+        return result
+    if not autonomous_apply_allowed(user, candidate):
+        result["skipped_reason"] = "verified_readiness_incomplete"
         return result
 
     today_count = count_nightly_applications_today(db, user_id=user.id)
@@ -138,7 +161,17 @@ def process_user_nightly_auto_apply(
         result["skipped_reason"] = "no_matches"
         return result
 
-    cooldown = max(0, int(settings.nightly_auto_apply_cooldown_seconds))
+    if max_jobs is not None:
+        matches = matches[: max(0, int(max_jobs))]
+
+    cooldown = max(
+        0,
+        int(
+            cooldown_seconds
+            if cooldown_seconds is not None
+            else settings.nightly_auto_apply_cooldown_seconds
+        ),
+    )
     for match in matches:
         job = match.job
         try:
@@ -146,7 +179,9 @@ def process_user_nightly_auto_apply(
             enforce_company_cooldown(db=db, user_id=user.id, settings=settings, job=job)
         except Exception as exc:
             logger.info("nightly skip user=%s job=%s guards: %s", user.id, job.id, exc)
-            result["applications_failed"] += 1
+            result["applications_skipped"] += 1
+            if board_stats is not None:
+                _bump_board_stat(board_stats, job, "skipped")
             continue
 
         if cooldown > 0:
@@ -160,14 +195,26 @@ def process_user_nightly_auto_apply(
         )
         _record_event(db, user_id=user.id, job=job, outcome=outcome.value)
 
-        if outcome in (ApplyOutcome.SUBMITTED, ApplyOutcome.FORM_FILLED) and app is not None:
+        if app is not None and outcome not in (ApplyOutcome.FAILED, ApplyOutcome.UNSUPPORTED):
             app.auto_applied = True
-            app.application_method = METHOD_NIGHTLY
+            app.application_method = application_method
             db.add(app)
-            result["applications_submitted"] += 1
-            consent.total_applications_submitted = int(consent.total_applications_submitted or 0) + 1
+            # Legacy counter name: counts honest external phases only (attempted or
+            # evidence-backed confirmed), not raw ApplyOutcome.SUBMITTED / status=applied.
+            if app.submission_status in (
+                SubmissionStatus.EXTERNAL_SUBMIT_ATTEMPTED,
+                SubmissionStatus.EXTERNAL_SUBMIT_CONFIRMED,
+            ):
+                result["applications_submitted"] += 1
+                if board_stats is not None:
+                    _bump_board_stat(board_stats, job, "submitted")
+                consent.total_applications_submitted = int(consent.total_applications_submitted or 0) + 1
+            elif board_stats is not None and app.submission_status == SubmissionStatus.APPLICATION_PREPARED:
+                _bump_board_stat(board_stats, job, "skipped")
         else:
             result["applications_failed"] += 1
+            if board_stats is not None:
+                _bump_board_stat(board_stats, job, "failed")
             logger.warning(
                 "nightly auto-apply failed user=%s job=%s outcome=%s msg=%s",
                 user.id,
@@ -187,6 +234,7 @@ def process_user_nightly_auto_apply(
                 settings,
                 to_email=user.email,
                 applications_count=result["applications_submitted"],
+                manual_trigger=application_method == METHOD_MANUAL_TRIGGER,
             )
         except Exception:
             logger.exception("nightly summary email failed user_id=%s", user.id)
@@ -201,13 +249,16 @@ def run_nightly_auto_apply_sweep(*, dry_run: bool = False) -> dict[str, Any]:
     settings = get_settings()
     db = SessionLocal()
     started = datetime.now(timezone.utc)
+    board_stats: dict[str, dict[str, int]] = {}
     stats: dict[str, Any] = {
         "dry_run": dry_run,
         "total_users_processed": 0,
         "total_applications_submitted": 0,
         "total_applications_failed": 0,
+        "total_applications_skipped": 0,
         "users_skipped_rate_limit": 0,
         "users_skipped_no_matches": 0,
+        "boards": board_stats,
         "started_at": started.isoformat(),
         "finished_at": None,
     }
@@ -230,10 +281,17 @@ def run_nightly_auto_apply_sweep(*, dry_run: bool = False) -> dict[str, Any]:
             if dry_run:
                 stats["total_users_processed"] += 1
                 continue
-            row = process_user_nightly_auto_apply(db, user=user, consent=consent, settings=settings)
+            row = process_user_nightly_auto_apply(
+                db,
+                user=user,
+                consent=consent,
+                settings=settings,
+                board_stats=board_stats,
+            )
             stats["total_users_processed"] += 1
             stats["total_applications_submitted"] += int(row.get("applications_submitted", 0))
             stats["total_applications_failed"] += int(row.get("applications_failed", 0))
+            stats["total_applications_skipped"] += int(row.get("applications_skipped", 0))
             reason = row.get("skipped_reason")
             if reason == "rate_limit":
                 stats["users_skipped_rate_limit"] += 1

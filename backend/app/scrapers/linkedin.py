@@ -97,15 +97,10 @@ def _fetch_search_html(keyword: str, location: str) -> str:
             "with explicit contractual clearance — not a default."
         )
 
-    init_js = """
-        Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
-    """
-
     with sync_playwright() as pw:
         browser = pw.chromium.launch(
             headless=settings.linkedin_jobs_browser_headless,
             args=[
-                "--disable-blink-features=AutomationControlled",
                 "--no-sandbox",
                 "--disable-dev-shm-usage",
             ],
@@ -118,7 +113,6 @@ def _fetch_search_html(keyword: str, location: str) -> str:
                 "Accept-Language": "en-US,en;q=0.9,pl;q=0.8",
             },
         )
-        context.add_init_script(init_js)
         page = context.new_page()
         page.goto(url, wait_until="domcontentloaded", timeout=90_000)
         dismiss_cookies(page)

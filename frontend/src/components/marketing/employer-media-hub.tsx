@@ -379,7 +379,7 @@ export function EmployerMediaHub({
 
   return (
     <div className="space-y-6">
-      <p className="rounded-lg border border-[var(--twin-accent)]/40 bg-[var(--twin-accent-muted)]/40 px-4 py-3 text-sm text-[var(--foreground)]">
+      <p className="demo-sample-banner text-sm leading-relaxed">
         {t("employerMedia.demoBanner")}
       </p>
 

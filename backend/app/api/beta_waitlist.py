@@ -9,7 +9,7 @@ import secrets
 from datetime import datetime, timezone
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, Header, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, Header, HTTPException, Request, UploadFile, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy import and_, func, or_
 from sqlalchemy.orm import Session
@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session
 from app.config import Settings, get_settings
 from app.database.models import BetaReferral, BetaWaitlist, Job
 from app.database.session import get_db
+from app.limiter import limiter
 from app.matching.matcher import calculate_match_score
 from app.scrapers.registry import GLOBAL_BOARD_SPECS
 from app.services.beta_waitlist_mail import send_beta_waitlist_welcome_email
@@ -92,11 +93,9 @@ def _display_name(name: str | None, email: str) -> str:
 
 
 def _leaderboard_reward(rank: int) -> str:
-    if rank <= 3:
-        return "Beta + $1000"
-    if rank <= 10:
-        return "Beta + $500"
-    return "Beta + $200"
+    """Neutral queue perk label — not a cash payout (EN; matches frontend `WAITLIST_LEADERBOARD_REWARD_EN`)."""
+    _ = rank
+    return "Priority founding access"
 
 
 def _anonym_caption(name: str | None, location: str | None, job_title: str | None) -> str:
@@ -229,7 +228,13 @@ def beta_match_preview(title: str, db: Session = Depends(get_db)) -> BetaMatchPr
 
 
 @router.post("/join", response_model=BetaJoinOut)
-def beta_join(body: BetaJoinIn, db: Session = Depends(get_db), settings: Settings = Depends(get_settings)) -> BetaJoinOut:
+@limiter.limit("5/minute")
+def beta_join(
+    request: Request,
+    body: BetaJoinIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+) -> BetaJoinOut:
     total = int(db.query(func.count(BetaWaitlist.id)).scalar() or 0)
     if total >= settings.beta_waitlist_cap:
         raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Beta waitlist is full")
@@ -379,7 +384,9 @@ def _save_upload(settings: Settings, referral_code: str, kind: str, file: Upload
 
 
 @router.post("/waitlist/{referral_code}/cv", response_model=BetaActionOut)
+@limiter.limit("10/minute")
 async def beta_upload_cv(
+    request: Request,
     referral_code: str,
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
@@ -407,7 +414,9 @@ async def beta_upload_cv(
 
 
 @router.post("/waitlist/{referral_code}/voice", response_model=BetaActionOut)
+@limiter.limit("10/minute")
 async def beta_upload_voice(
+    request: Request,
     referral_code: str,
     file: UploadFile = File(...),
     db: Session = Depends(get_db),

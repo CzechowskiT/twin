@@ -101,23 +101,37 @@ def configure_stripe(settings: Settings) -> None:
 
 
 def price_id_for_plan(settings: Settings, plan: str) -> str:
-    if plan == "premium":
-        if not settings.stripe_price_id_premium:
-            raise ValueError("billing_not_configured")
-        return settings.stripe_price_id_premium
-    if plan == "pro":
-        if not settings.stripe_price_id_pro:
-            raise ValueError("pro_not_configured")
-        return settings.stripe_price_id_pro
+    mapping: list[tuple[str, str]] = [
+        ("standby", settings.stripe_price_id_standby),
+        ("standard", settings.stripe_price_id_standard),
+        ("premium", settings.stripe_price_id_premium),
+        ("pro", settings.stripe_price_id_pro),
+    ]
+    for tier, price_id in mapping:
+        if plan == tier:
+            if not price_id:
+                if tier in ("premium", "pro"):
+                    raise ValueError("pro_not_configured" if tier == "pro" else "billing_not_configured")
+                raise ValueError(f"{tier}_not_configured")
+            return price_id
     raise ValueError("unknown_plan")
 
 
 def tier_for_price_id(settings: Settings, price_id: str | None) -> str:
     if not price_id:
         return "premium"
-    if price_id == settings.stripe_price_id_premium:
+    pairs: list[tuple[str, str]] = [
+        ("standby", settings.stripe_price_id_standby),
+        ("standard", settings.stripe_price_id_standard),
+        ("premium", settings.stripe_price_id_premium),
+        ("pro", settings.stripe_price_id_pro),
+    ]
+    for tier, configured in pairs:
+        if configured and price_id == configured:
+            return tier
+    if settings.stripe_price_id_premium_annual and price_id == settings.stripe_price_id_premium_annual:
         return "premium"
-    if settings.stripe_price_id_pro and price_id == settings.stripe_price_id_pro:
+    if settings.stripe_price_id_pro_annual and price_id == settings.stripe_price_id_pro_annual:
         return "pro"
     return "premium"
 
@@ -165,13 +179,28 @@ def user_by_stripe_customer(db: Session, customer_id: str | dict | None) -> User
 def process_checkout_completed(db: Session, session: dict[str, Any], settings: Settings) -> None:
     meta = session.get("metadata") or {}
     uid = meta.get("user_id")
-    if not uid:
-        logger.warning("checkout.session.completed missing user_id metadata")
-        return
-    user = db.query(User).filter(User.id == int(uid)).first()
+    user: User | None = None
+    if uid:
+        try:
+            user = db.query(User).filter(User.id == int(uid)).first()
+        except (TypeError, ValueError):
+            logger.warning("checkout.session.completed invalid user_id metadata")
     if not user:
-        logger.warning("checkout user id not found: %s", uid)
+        customer_details = session.get("customer_details")
+        customer_email = ""
+        if isinstance(customer_details, dict):
+            customer_email = str(customer_details.get("email") or "").strip().lower()
+        if not customer_email:
+            customer_email = str(session.get("customer_email") or "").strip().lower()
+        if customer_email:
+            user = db.query(User).filter(User.email == customer_email).first()
+    if not user:
+        user = user_by_stripe_customer(db, session.get("customer"))
+    if not user:
+        logger.warning("checkout.session.completed could not resolve user")
         return
+    if not uid:
+        logger.warning("checkout.session.completed missing user_id metadata; used fallback")
     cust = session.get("customer")
     if isinstance(cust, dict):
         cust = cust.get("id")

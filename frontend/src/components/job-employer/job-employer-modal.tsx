@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { JobEmployerTabs } from "@/components/job-employer/job-employer-tabs";
+import { InterviewCoachPanel } from "@/components/career/InterviewCoachPanel";
 import { Card } from "@/components/ui";
 import type { JobEmployerTabId } from "@/lib/job-employer-demo";
 
@@ -30,7 +31,7 @@ export function JobEmployerModal({
   const [activeTab, setActiveTab] = useState<JobEmployerTabId>(initialTab);
 
   useEffect(() => {
-    if (open) setActiveTab(initialTab);
+    if (open) queueMicrotask(() => setActiveTab(initialTab));
   }, [open, initialTab]);
 
   if (!open || !jobId) return null;
@@ -62,7 +63,7 @@ export function JobEmployerModal({
             ×
           </button>
         </div>
-        <div className="mt-4 min-h-0 flex-1 overflow-hidden">
+        <div className="mt-4 min-h-0 flex-1 overflow-y-auto">
           <JobEmployerTabs
             activeTab={activeTab}
             onTabChange={setActiveTab}
@@ -72,6 +73,9 @@ export function JobEmployerModal({
             jobUrl={jobUrl}
             location={location}
           />
+          <div className="mt-4 border-t border-[var(--twin-border)] pt-4">
+            <InterviewCoachPanel jobId={jobId} />
+          </div>
         </div>
       </Card>
     </div>

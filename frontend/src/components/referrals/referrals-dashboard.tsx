@@ -94,7 +94,9 @@ export function ReferralsDashboard() {
   }, [t, lbWindow]);
 
   useEffect(() => {
-    void load();
+    queueMicrotask(() => {
+      void load();
+    });
   }, [load]);
 
   const copyLink = async () => {

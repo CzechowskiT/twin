@@ -1,10 +1,11 @@
 """SQLAlchemy ORM models."""
 
-from datetime import datetime
+from datetime import date, datetime
 from enum import Enum as PyEnum
 
 from sqlalchemy import (
     Boolean,
+    Date,
     DateTime,
     Enum,
     Float,
@@ -27,6 +28,32 @@ class ApplicationStatus(str, PyEnum):
     INTERVIEW = "interview"
     REJECTED = "rejected"
     HIRED = "hired"
+
+
+class SubmissionStatus(str, PyEnum):
+    APPLICATION_CREATED_IN_TWIN = "application_created_in_twin"
+    APPLICATION_PREPARED = "application_prepared"
+    EXTERNAL_SUBMIT_ATTEMPTED = "external_submit_attempted"
+    EXTERNAL_SUBMIT_CONFIRMED = "external_submit_confirmed"
+    EXTERNAL_SUBMIT_FAILED = "external_submit_failed"
+    MANUAL_ACTION_REQUIRED = "manual_action_required"
+
+
+class SupportedApplyMode(str, PyEnum):
+    VERIFIED_AUTO_APPLY = "verified_auto_apply"
+    ASSISTED_APPLY = "assisted_apply"
+    MANUAL_ONLY = "manual_only"
+    UNSUPPORTED = "unsupported"
+
+
+class ConfirmationType(str, PyEnum):
+    CONFIRMATION_PAGE = "confirmation_page"
+    CONFIRMATION_EMAIL = "confirmation_email"
+    ATS_APPLICATION_ID = "ats_application_id"
+    SCREENSHOT = "screenshot"
+    MANUAL_USER_CONFIRMATION = "manual_user_confirmation"
+    API_RESPONSE = "api_response"
+    NONE = "none"
 
 
 class ViralClaimStatus(str, PyEnum):
@@ -264,6 +291,10 @@ class Candidate(Base):
     user: Mapped["User"] = relationship(back_populates="candidate")
     applications: Mapped[list["Application"]] = relationship(back_populates="candidate")
     matches: Mapped[list["JobMatch"]] = relationship(back_populates="candidate")
+    job_match_feedback: Mapped[list["JobMatchFeedback"]] = relationship(
+        back_populates="candidate",
+        cascade="all, delete-orphan",
+    )
     auto_apply_consent: Mapped["AutoApplyConsent | None"] = relationship(
         back_populates="candidate",
         uselist=False,
@@ -272,6 +303,31 @@ class Candidate(Base):
         back_populates="candidate",
         cascade="all, delete-orphan",
     )
+    progress: Mapped["CandidateProgress | None"] = relationship(
+        back_populates="candidate",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
+
+
+class CandidateProgress(Base):
+    """Gamification progress (XP, streaks, badges) — separate from career_compass JSON."""
+
+    __tablename__ = "candidate_progress"
+    __table_args__ = (UniqueConstraint("candidate_id", name="uq_candidate_progress_candidate_id"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(ForeignKey("candidates.id", ondelete="CASCADE"), unique=True)
+    xp_total: Mapped[int] = mapped_column(Integer, default=0)
+    level: Mapped[int] = mapped_column(Integer, default=1)
+    streak_days: Mapped[int] = mapped_column(Integer, default=0)
+    last_active_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    badges_json: Mapped[str] = mapped_column(Text, default="[]")
+    stats_json: Mapped[str] = mapped_column(Text, default="{}")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    candidate: Mapped["Candidate"] = relationship(back_populates="progress")
 
 
 class BetaWaitlist(Base):
@@ -407,9 +463,20 @@ class Job(Base):
     salary_max: Mapped[int | None] = mapped_column(Integer, nullable=True)
     requirements: Mapped[str | None] = mapped_column(Text, nullable=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    tech_stack: Mapped[str] = mapped_column(Text, default="[]")
+    requirements_must_have: Mapped[str | None] = mapped_column(Text, nullable=True)
+    requirements_nice_to_have: Mapped[str | None] = mapped_column(Text, nullable=True)
+    interview_process_json: Mapped[str] = mapped_column(Text, default="[]")
+    remote_percentage: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    seniority_level: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    culture_tags: Mapped[str] = mapped_column(Text, default="[]")
     url: Mapped[str] = mapped_column(String(500))
     is_validated: Mapped[bool] = mapped_column(Boolean, default=False)
     scraped_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    opportunity_type: Mapped[str] = mapped_column(String(32), default="full_time")
+    project_duration_months: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    hourly_rate_min: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    hourly_rate_max: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     matches: Mapped[list["JobMatch"]] = relationship(back_populates="job")
     applications: Mapped[list["Application"]] = relationship(back_populates="job")
@@ -443,6 +510,23 @@ class JobMatch(Base):
 
     candidate: Mapped["Candidate"] = relationship(back_populates="matches")
     job: Mapped["Job"] = relationship(back_populates="matches")
+
+
+class JobMatchFeedback(Base):
+    """Candidate feedback on a ranked job (reranking input, not product NPS)."""
+
+    __tablename__ = "job_match_feedback"
+    __table_args__ = (UniqueConstraint("candidate_id", "job_id", name="uq_job_match_feedback"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(ForeignKey("candidates.id", ondelete="CASCADE"), index=True)
+    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id", ondelete="CASCADE"), index=True)
+    feedback_value: Mapped[str] = mapped_column(String(32))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    candidate: Mapped["Candidate"] = relationship(back_populates="job_match_feedback")
+    job: Mapped["Job"] = relationship()
 
 
 class Application(Base):
@@ -480,6 +564,30 @@ class Application(Base):
     auto_apply_package_uploaded_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     auto_applied: Mapped[bool] = mapped_column(Boolean, default=False)
     application_method: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    # Honest external submission tracking (see docs/APPLICATION_STATUS_TRUTH_TABLE.md)
+    submission_status: Mapped[SubmissionStatus | None] = mapped_column(
+        Enum(SubmissionStatus, values_callable=lambda x: [e.value for e in x]),
+        nullable=True,
+        index=True,
+    )
+    supported_apply_mode: Mapped[SupportedApplyMode | None] = mapped_column(
+        Enum(SupportedApplyMode, values_callable=lambda x: [e.value for e in x]),
+        nullable=True,
+    )
+    submit_attempted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    submitted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    confirmation_type: Mapped[ConfirmationType | None] = mapped_column(
+        Enum(ConfirmationType, values_callable=lambda x: [e.value for e in x]),
+        nullable=True,
+    )
+    confirmation_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    confirmation_url: Mapped[str | None] = mapped_column(String(2000), nullable=True)
+    confirmation_screenshot_path: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    confirmation_email_detected: Mapped[bool] = mapped_column(Boolean, default=False)
+    external_application_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    failure_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    requires_manual_action: Mapped[bool] = mapped_column(Boolean, default=False)
+    submit_attempt_logs: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     candidate: Mapped["Candidate"] = relationship(back_populates="applications")
     job: Mapped["Job"] = relationship(back_populates="applications")
@@ -547,6 +655,35 @@ class ApiIdempotency(Base):
     response_status: Mapped[int] = mapped_column(Integer, nullable=False)
     response_json: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class StripeWebhookEvent(Base):
+    """Dedup ledger for `POST /api/v1/billing/webhook` deliveries.
+
+    Keyed by Stripe's own globally-unique `event.id`. Insert-then-process
+    pattern: the first POST writes a row with `handler_status="pending"`
+    and runs the handler; replays land on the unique constraint and
+    short-circuit to a `{"received": true, "replayed": true}` response.
+
+    No FK to any other table — the ledger must survive user / candidate
+    deletes (we may need to audit a payment for a churned user).
+    Design: `docs/P2_STRIPE_EVENT_DEDUP_DESIGN_2026-05-27.md`.
+    Helpers (this PR): `app/services/stripe_events.py`. Wire-up into
+    `app/api/billing.py` ships in the follow-up commit alongside the
+    Alembic migration (the table is intentionally **not yet** migrated
+    on prod — see the helper module for the in-prod no-op fallback).
+    """
+
+    __tablename__ = "stripe_webhook_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    event_id: Mapped[str] = mapped_column(String(64), unique=True, index=True, nullable=False)
+    event_type: Mapped[str] = mapped_column(String(80), nullable=False)
+    livemode: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    received_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    processed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    handler_status: Mapped[str] = mapped_column(String(32), default="pending", nullable=False)
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
 
 
 class AutoApplyConsent(Base):

@@ -6,6 +6,9 @@ import { useTranslation } from "@/components/language-provider";
 import { ButtonCta } from "@/components/ui";
 import { scrollToDashboardHash } from "@/lib/dashboard-anchor";
 
+import { DemoSampleBadge } from "@/components/marketing/demo-sample-badge";
+import { isDemoUserEmail } from "@/lib/demo-user";
+
 function displayName(email: string | undefined, profileName: string | undefined): string {
   const trimmed = profileName?.trim();
   if (trimmed) return trimmed;
@@ -32,8 +35,10 @@ export function DashboardCommandCenter({
   const { t } = useTranslation();
   const name = displayName(email, profileName);
   const welcome = name ? t("dashboard.welcomeBackNamed").replace("{name}", name) : t("dashboard.welcomeBack");
+  const showDemoHero = Boolean(email?.trim());
 
   const actions: { href: string; label: string }[] = [
+    { href: "/demo", label: t("nav.demo") },
     { href: "#dashboard-jobs", label: t("dashboard.quickBrowseFeed") },
     { href: "/profile", label: t("dashboard.quickUpdateProfile") },
   ];
@@ -57,6 +62,17 @@ export function DashboardCommandCenter({
       </p>
       <h2 className="twin-page-intro twin-section-title mt-1 text-xl sm:text-2xl">{welcome}</h2>
       <p className="mt-2 max-w-prose text-sm leading-relaxed text-[var(--twin-muted)]">{t("dashboard.welcomePrompt")}</p>
+      {showDemoHero ? (
+        <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--twin-accent)]/35 bg-[var(--twin-accent-muted)]/35 px-4 py-3">
+          {isDemoUserEmail(email) ? <DemoSampleBadge className="self-start" /> : null}
+          <Link href="/demo" className="inline-block shrink-0">
+            <ButtonCta type="button" className={`!w-auto${isDemoUserEmail(email) ? " twin-header-cta--demo-pulse" : ""}`}>
+              {t("nav.demo")}
+            </ButtonCta>
+          </Link>
+          <p className="max-w-md text-xs leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.demoHeroHint")}</p>
+        </div>
+      ) : null}
       <div className="mt-4">
         {primaryHref.startsWith("#") ? (
           <a href={primaryHref} onClick={scrollToDashboardHash} className="inline-block">

@@ -23,12 +23,14 @@ from app.database.models import (
     User,
 )
 from app.services.matching_service import find_top_matches
+from app.services.placement_verification import PLACEMENT_VERIFIED, record_placement_event
 
 DEMO_BOARD = "pracuj"
 DEMO_JOB_PREFIX = "investor-demo-"
 # Primary pracuj investor-demo job used for live apply on /demo (founder walkthrough).
 DEMO_APPLY_JOB_EXTERNAL_ID = f"{DEMO_JOB_PREFIX}python-lead"
 DEFAULT_DEMO_EMAIL = "demo@twin.career"
+DEMO_RECRUITER_COMPANY = "Nova Hiring PL"
 
 CV_TEXT = """\
 Alex Kowalski — Senior Python Engineer
@@ -139,6 +141,14 @@ DEMO_JOBS: list[dict[str, object]] = [
 
 def demo_email_from_env() -> str:
     return (os.environ.get("DEMO_USER_EMAIL") or DEFAULT_DEMO_EMAIL).strip().lower()
+
+
+def is_investor_demo_job(job: Job | None) -> bool:
+    """True for seeded investor-demo rows (synthetic Pracuj URLs — no live portal submit)."""
+    if job is None:
+        return False
+    ext = (job.external_id or "").strip()
+    return ext.startswith(DEMO_JOB_PREFIX)
 
 
 def _now() -> datetime:
@@ -336,16 +346,174 @@ def upsert_demo_auto_apply(db: Session, candidate: Candidate) -> None:
         if started.tzinfo is None:
             started = started.replace(tzinfo=timezone.utc)
         stale = (now - started).total_seconds() > 86400
-    if recent is None or stale:
+    if recent is not None and int(recent.total_applications_failed or 0) > 0:
+        sweep_started = now - timedelta(hours=8)
+        sweep_finished = now - timedelta(hours=7, minutes=55)
+        demo_stats = {
+            "demo": True,
+            "source": "seed-investor-demo",
+            "total_applications_skipped": 0,
+            "boards": {
+                "pracuj.pl": {"submitted": 2, "failed": 0, "skipped": 0},
+            },
+        }
+        recent.started_at = sweep_started
+        recent.finished_at = sweep_finished
+        recent.total_users_processed = 1
+        recent.total_applications_submitted = max(int(recent.total_applications_submitted or 0), 2)
+        recent.total_applications_failed = 0
+        recent.stats_json = json.dumps(demo_stats)
+    elif recent is None or stale:
+        sweep_started = now - timedelta(hours=8)
+        sweep_finished = now - timedelta(hours=7, minutes=55)
+        demo_stats = {
+            "demo": True,
+            "source": "seed-investor-demo",
+            "total_applications_skipped": 0,
+            "boards": {
+                "pracuj.pl": {"submitted": 2, "failed": 0, "skipped": 0},
+            },
+        }
         run = AutoApplyRun(
-            started_at=now - timedelta(hours=8),
-            finished_at=now - timedelta(hours=7, minutes=55),
+            started_at=sweep_started,
+            finished_at=sweep_finished,
             total_users_processed=1,
             total_applications_submitted=2,
             total_applications_failed=0,
-            stats_json=json.dumps({"demo": True, "source": "seed-investor-demo"}),
+            stats_json=json.dumps(demo_stats),
         )
         db.add(run)
+
+
+def _is_recruiter_demo_application(app: Application, job: Job) -> bool:
+    ext = (job.external_id or "").strip()
+    if ext.startswith(DEMO_JOB_PREFIX):
+        return True
+    notes = (app.notes or "").lower()
+    return "demo" in notes or "investor demo" in notes
+
+
+def ensure_recruiter_inbox_demo(
+    db: Session,
+    *,
+    company: str = DEMO_RECRUITER_COMPANY,
+) -> dict[str, int | str]:
+    """Reset/create APPLIED rows for recruiter batch inbox (idempotent; safe on prod)."""
+    now = _now()
+    upsert_demo_jobs(db)
+    jobs = list(
+        db.execute(
+            select(Job)
+            .where(Job.company == company, Job.is_validated.is_(True))
+            .order_by(Job.id)
+        ).scalars()
+    )
+    reset = 0
+    created = 0
+    for job in jobs:
+        apps = list(
+            db.execute(select(Application).where(Application.job_id == job.id)).scalars()
+        )
+        for app in apps:
+            if app.status not in (ApplicationStatus.APPLIED, ApplicationStatus.INTERVIEW):
+                continue
+            if app.status == ApplicationStatus.INTERVIEW and _is_recruiter_demo_application(app, job):
+                app.status = ApplicationStatus.APPLIED
+                app.applied_at = app.applied_at or now
+                reset += 1
+    primary = next((j for j in jobs if j.external_id == DEMO_APPLY_JOB_EXTERNAL_ID), jobs[0] if jobs else None)
+    demo_user = db.execute(select(User).where(User.email == demo_email_from_env())).scalar_one_or_none()
+    if demo_user and primary is not None:
+        demo_cand = db.execute(
+            select(Candidate).where(Candidate.user_id == demo_user.id)
+        ).scalar_one_or_none()
+        if demo_cand is not None:
+            row = db.execute(
+                select(Application).where(
+                    Application.candidate_id == demo_cand.id,
+                    Application.job_id == primary.id,
+                )
+            ).scalar_one_or_none()
+            if row is None:
+                db.add(
+                    Application(
+                        candidate_id=demo_cand.id,
+                        job_id=primary.id,
+                        status=ApplicationStatus.APPLIED,
+                        applied_at=now,
+                        notes="Investor demo — recruiter batch inbox",
+                        auto_applied=False,
+                    )
+                )
+                created += 1
+            elif row.status != ApplicationStatus.APPLIED:
+                row.status = ApplicationStatus.APPLIED
+                row.applied_at = row.applied_at or now
+                reset += 1
+    db.flush()
+    return {"company": company, "reset_to_applied": reset, "created": created}
+
+
+def ensure_demo_placement_verified(db: Session, *, application_id: int | None = None) -> dict[str, int | bool]:
+    """Mark one investor-demo application as placement verified (idempotent; bumps mvp-stats)."""
+    from app.database.models import PlacementEvent
+
+    app: Application | None = None
+    if application_id is not None:
+        app = db.get(Application, application_id)
+    else:
+        demo_user = db.execute(select(User).where(User.email == demo_email_from_env())).scalar_one_or_none()
+        if demo_user is not None:
+            demo_cand = db.execute(
+                select(Candidate).where(Candidate.user_id == demo_user.id)
+            ).scalar_one_or_none()
+            primary = db.execute(
+                select(Job).where(Job.external_id == DEMO_APPLY_JOB_EXTERNAL_ID)
+            ).scalar_one_or_none()
+            if demo_cand is not None and primary is not None:
+                app = db.execute(
+                    select(Application).where(
+                        Application.candidate_id == demo_cand.id,
+                        Application.job_id == primary.id,
+                    )
+                ).scalar_one_or_none()
+    if app is None:
+        return {"application_id": 0, "verified": False, "already_verified": False}
+
+    if app.placement_verified_at is not None and app.placement_state == PLACEMENT_VERIFIED:
+        return {"application_id": app.id, "verified": True, "already_verified": True}
+
+    owner_user_id = db.execute(
+        select(Candidate.user_id).where(Candidate.id == app.candidate_id)
+    ).scalar_one_or_none()
+    event_count = (
+        db.query(PlacementEvent).filter(PlacementEvent.application_id == app.id).count()
+    )
+    if event_count < 1:
+        record_placement_event(
+            db,
+            application_id=app.id,
+            event_type="placement.declared",
+            actor="candidate",
+            detail={"source": "demo_seed"},
+            owner_user_id=owner_user_id,
+        )
+        app.placement_state = "declared"
+    record_placement_event(
+        db,
+        application_id=app.id,
+        event_type="placement.verified",
+        actor="system",
+        detail={"method": "demo_seed"},
+        owner_user_id=owner_user_id,
+    )
+    now = _now()
+    app.placement_verified_at = now
+    app.placement_state = PLACEMENT_VERIFIED
+    app.status = ApplicationStatus.HIRED
+    db.add(app)
+    db.flush()
+    return {"application_id": app.id, "verified": True, "already_verified": False}
 
 
 def run_investor_demo_seed(

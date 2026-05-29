@@ -7,6 +7,7 @@ import re
 from datetime import datetime, timezone
 from typing import Any
 
+from app.config import get_settings
 from app.services.anthropic_client import get_anthropic_client, is_anthropic_configured
 from app.services.candidate_readiness import candidate_has_cv
 
@@ -264,7 +265,7 @@ def _path_with_claude(ideal: dict[str, Any], profile: dict[str, Any], horizon: i
     prompt = _PATH_PROMPT.format(ideal_json=ideal_s, profile_snippet=prof_s)
     try:
         msg = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model=get_settings().anthropic_model,
             max_tokens=3500,
             messages=[{"role": "user", "content": prompt}],
         )

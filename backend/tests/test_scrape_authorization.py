@@ -63,6 +63,7 @@ def scrape_client():
 @patch("app.api.jobs._celery_delay")
 def test_scrape_all_allowed_for_regular_user(mock_delay, scrape_client, monkeypatch) -> None:
     client, regular, ops, _db = scrape_client
+    monkeypatch.setenv("SCRAPE_USER_TRIGGER_ENABLED", "true")
     monkeypatch.setenv("SCRAPE_OPS_USER_IDS", str(ops.id))
     get_settings.cache_clear()
     mock_delay.return_value = type("R", (), {"id": "task-1"})()
@@ -97,8 +98,24 @@ def test_scrape_all_forbidden_without_core_consents(scrape_client, monkeypatch) 
         get_settings.cache_clear()
 
 
+def test_scrape_forbidden_when_user_trigger_disabled(scrape_client, monkeypatch) -> None:
+    client, regular, _ops, _db = scrape_client
+    monkeypatch.setenv("SCRAPE_USER_TRIGGER_ENABLED", "false")
+    get_settings.cache_clear()
+    try:
+        token = create_access_token(regular.email)
+        res = client.post(
+            "/api/v1/jobs/scrape/all",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert res.status_code == 403
+    finally:
+        get_settings.cache_clear()
+
+
 def test_scrape_allowed_when_ops_list_empty(scrape_client, monkeypatch) -> None:
     client, _regular, ops, _db = scrape_client
+    monkeypatch.setenv("SCRAPE_USER_TRIGGER_ENABLED", "true")
     monkeypatch.setenv("SCRAPE_OPS_USER_IDS", "")
     monkeypatch.delenv("SCRAPE_OPS_EMAILS", raising=False)
     get_settings.cache_clear()
@@ -118,6 +135,7 @@ def test_scrape_allowed_when_ops_list_empty(scrape_client, monkeypatch) -> None:
 @patch("app.api.jobs._celery_delay")
 def test_scrape_allowed_with_or_without_ops_email(mock_delay, scrape_client, monkeypatch) -> None:
     client, regular, ops, _db = scrape_client
+    monkeypatch.setenv("SCRAPE_USER_TRIGGER_ENABLED", "true")
     monkeypatch.setenv("SCRAPE_OPS_USER_IDS", "")
     monkeypatch.setenv("SCRAPE_OPS_EMAILS", ops.email)
     get_settings.cache_clear()

@@ -2,9 +2,9 @@
 
 import { useTranslation } from "@/components/language-provider";
 import { useMvpStats } from "@/lib/use-mvp-stats";
-import { INVESTOR_PORTALS, isLivePortal } from "@/lib/investor-roadmap";
+import { countVerifiedPortals } from "@/lib/investor-roadmap";
 
-const LIVE_ROADMAP_COUNT = INVESTOR_PORTALS.filter((p) => isLivePortal(p.boardId)).length;
+const LIVE_ROADMAP_COUNT = countVerifiedPortals();
 
 /** Honest scrape coverage line — registry count from API, roadmap live badges from static map. */
 export function ScrapeRegistryCoverageHint() {
@@ -16,7 +16,7 @@ export function ScrapeRegistryCoverageHint() {
 
   const registry = boards ?? 0;
   return (
-    <p className="twin-muted mt-2 text-[11px] leading-relaxed">
+    <p className="twin-muted mt-2 break-words text-[11px] leading-relaxed">
       {t("dashboard.scrapeRegistryHonest")
         .replace("{registry}", String(registry))
         .replace("{roadmapLive}", String(LIVE_ROADMAP_COUNT))}

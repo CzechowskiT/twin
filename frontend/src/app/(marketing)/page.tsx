@@ -21,7 +21,7 @@ export default function Home() {
         <LandingHero />
         <CandidateRewardsBand variant="home" />
         <LandingTrustCue />
-        <div className="mx-auto w-full max-w-6xl space-y-2 px-4 sm:px-6">
+        <div className="marketing-home-rail space-y-2">
           <LandingHomeStats />
           <DemoLiveSnapshot fullDemoHref="/demo" />
         </div>

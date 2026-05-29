@@ -22,6 +22,18 @@ _PL_SALARY_RANGE = re.compile(
     re.I,
 )
 _PL_SALARY_SINGLE = re.compile(r"(\d[\d\s\u00a0]{2,})\s*(?:zł|PLN)", re.I)
+PRACUJ_MAJOR_CITIES: tuple[str, ...] = (
+    "warszawa",
+    "krakow",
+    "wroclaw",
+    "gdansk",
+    "poznan",
+    "lodz",
+    "katowice",
+    "remote",
+)
+
+
 SALES_SEARCH_TERMS = (
     "sprzedaz",
     "handlowiec",
@@ -58,7 +70,7 @@ def scrape_pracuj(
     results: list[ScrapedJob] = []
     seen: set[str] = set()
     # Pracuj shows ~20 cards per page; cap pages to stay polite and bounded.
-    max_pages = min(25, max(2, (limit + 18) // 18 + 2))
+    max_pages = min(35, max(2, (limit + 18) // 18 + 2))
     for page in range(1, max_pages + 1):
         if len(results) >= limit:
             break
@@ -80,19 +92,40 @@ def scrape_pracuj(
     return [j for j in results if validate_job(j)]
 
 
-def scrape_pracuj_sales(location: str = "warszawa", limit: int = 25) -> list[ScrapedJob]:
-    """Scrape sales / commercial roles from multiple Pracuj.pl searches."""
+def scrape_pracuj_cities(
+    keyword: str = "python",
+    limit: int = 100,
+    *,
+    cities: tuple[str, ...] = PRACUJ_MAJOR_CITIES,
+) -> list[ScrapedJob]:
+    """Paginated Pracuj search across major PL cities (deduped)."""
     results: list[ScrapedJob] = []
     seen: set[str] = set()
+    per_city = max(20, limit // max(1, len(cities)))
+    for location in cities:
+        if len(results) >= limit:
+            break
+        for job in scrape_pracuj(keyword=keyword, location=location, limit=per_city):
+            if job.external_id in seen:
+                continue
+            seen.add(job.external_id)
+            results.append(job)
+            if len(results) >= limit:
+                break
+    return results
+
+
+def scrape_pracuj_sales(location: str = "warszawa", limit: int = 25) -> list[ScrapedJob]:
+    """Scrape sales / commercial roles from multiple Pracuj.pl searches (paginated)."""
+    results: list[ScrapedJob] = []
+    seen: set[str] = set()
+    per_term = max(12, limit // max(1, min(len(SALES_SEARCH_TERMS), 20)))
 
     for keyword in SALES_SEARCH_TERMS:
         if len(results) >= limit:
             break
-        html = _fetch_search_html(keyword, location)
-        for job in _parse_listing_html(html, limit):
+        for job in scrape_pracuj(keyword=keyword, location=location, limit=per_term):
             if job.external_id in seen:
-                continue
-            if not validate_job(job):
                 continue
             seen.add(job.external_id)
             results.append(job)

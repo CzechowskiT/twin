@@ -143,7 +143,7 @@ export function FaqPageSections({ className = "" }: { className?: string }) {
   }, [searchParams]);
 
   useEffect(() => {
-    applyLocation();
+    queueMicrotask(() => applyLocation());
   }, [applyLocation]);
 
   useEffect(() => {

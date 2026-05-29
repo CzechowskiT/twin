@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import { useTranslation } from "@/components/language-provider";
 import type { TranslationKey } from "@/lib/i18n";
 import { Card, Shell } from "@/components/ui";
+import { ProfileImport } from "@/components/onboarding/ProfileImport";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 
@@ -32,7 +33,7 @@ export default function OnboardingPage() {
 
   useEffect(() => {
     if (!getToken()) router.replace("/login/candidate");
-    else setStep(readStoredStep());
+    else queueMicrotask(() => setStep(readStoredStep()));
   }, [router]);
 
   useEffect(() => {
@@ -80,6 +81,7 @@ export default function OnboardingPage() {
 
   const key: StepKey = STEPS[step] ?? "welcome";
   const isLast = step >= STEPS.length - 1;
+  const progressPct = Math.round(((step + 1) / STEPS.length) * 100);
 
   const profileCta = (
     <Link href="/profile" className="twin-btn-solid twin-touch-target mb-4 inline-block text-center">
@@ -99,12 +101,30 @@ export default function OnboardingPage() {
             transition={{ duration: 0.2 }}
           >
             <p className="mb-1 text-xs font-medium uppercase tracking-wide text-[var(--twin-accent)]">
-              {t("onboardingFlow.progressLabel")} {step + 1}/{STEPS.length}
+              {t("onboardingFlow.progressLabel")} {step + 1}/{STEPS.length} ·{" "}
+              {t("onboardingFlow.progressPercent").replace("{pct}", String(progressPct))}
             </p>
+            <div
+              className="mb-4 h-2 overflow-hidden rounded-full bg-[var(--twin-border)]"
+              role="progressbar"
+              aria-valuenow={progressPct}
+              aria-valuemin={0}
+              aria-valuemax={100}
+            >
+              <div
+                className="h-full rounded-full bg-[var(--twin-accent)] transition-[width] duration-300"
+                style={{ width: `${progressPct}%` }}
+              />
+            </div>
             <h1 className="mb-2 text-2xl font-semibold">{t(`onboardingFlow.${key}Title` as TranslationKey)}</h1>
             <p className="twin-muted mb-6 text-sm leading-relaxed">
               {t(`onboardingFlow.${key}Body` as TranslationKey)}
             </p>
+            {key === "cv" ? (
+              <div className="mb-6">
+                <ProfileImport />
+              </div>
+            ) : null}
             {key !== "welcome" ? profileCta : null}
             <div className="flex flex-wrap gap-3">
               {!isLast ? (

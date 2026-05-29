@@ -6,6 +6,7 @@ from app.api import (
     auto_apply_settings,
     admin_ops,
     consent,
+    csp_reports,
     demo,
     ops,
     investor_data_room,
@@ -18,15 +19,19 @@ from app.api import (
     candidates,
     career_assistant,
     curated_careers,
+    gamification,
     geo,
     health,
     feedback,
     integrations_ats,
+    interview_coach,
     jobs,
     kyc,
     linkedin_viral,
+    opportunities,
     partner,
     placement,
+    profile_import,
     public,
     recruiter,
     referrals,
@@ -35,6 +40,7 @@ from app.api import (
 
 api_router = APIRouter()
 api_router.include_router(health.router, tags=["Health"])
+api_router.include_router(csp_reports.router, tags=["Security"])
 api_router.include_router(demo.router, prefix="/demo", tags=["Demo"])
 api_router.include_router(public.router, prefix="/public", tags=["Public"])
 api_router.include_router(geo.router, prefix="/geo", tags=["Geo"])
@@ -48,6 +54,10 @@ api_router.include_router(beta_waitlist.router, prefix="/beta", tags=["Beta wait
 api_router.include_router(billing.router, prefix="/billing", tags=["Billing"])
 api_router.include_router(kyc.router, prefix="/kyc", tags=["KYC"])
 api_router.include_router(candidates.router, prefix="/candidates", tags=["Candidates"])
+api_router.include_router(profile_import.router, prefix="/profile", tags=["Profile import"])
+api_router.include_router(opportunities.router, prefix="/opportunities", tags=["Opportunities"])
+api_router.include_router(gamification.router, prefix="/gamification", tags=["Gamification"])
+api_router.include_router(interview_coach.router, prefix="/interview-coach", tags=["Interview coach"])
 api_router.include_router(
     career_assistant.router, prefix="/career-assistant", tags=["Career assistant"]
 )

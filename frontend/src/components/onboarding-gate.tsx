@@ -26,7 +26,7 @@ export function OnboardingGate({ children }: { children: ReactNode }) {
   useEffect(() => {
     const token = getToken();
     if (!token || shouldBypass(pathname)) {
-      setReady(true);
+      queueMicrotask(() => setReady(true));
       return;
     }
 

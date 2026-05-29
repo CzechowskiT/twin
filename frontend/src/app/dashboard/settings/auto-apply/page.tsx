@@ -20,14 +20,8 @@ type AutoApplySettings = {
   next_run_label: string;
   supported_boards: string;
   profile_ready: boolean;
+  verified_readiness_ready: boolean;
   onboarding_completed: boolean;
-};
-
-type TriggerOut = {
-  applications_submitted: number;
-  applications_failed: number;
-  skipped_reason: string | null;
-  message: string;
 };
 
 export default function NightlyAutoApplySettingsPage() {
@@ -36,7 +30,6 @@ export default function NightlyAutoApplySettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showConsent, setShowConsent] = useState(false);
-  const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -48,6 +41,8 @@ export default function NightlyAutoApplySettingsPage() {
       setSettings(data);
       if (!data.profile_ready) {
         setError(t("dashboard.nightlyAutoApplyNeedProfile"));
+      } else if (!data.verified_readiness_ready) {
+        setError(t("dashboard.nightlyAutoApplyNeedVerifiedReadiness"));
       }
     } catch {
       setError(t("dashboard.nightlyAutoApplyNeedProfile"));
@@ -57,11 +52,16 @@ export default function NightlyAutoApplySettingsPage() {
   }, [t]);
 
   useEffect(() => {
-    void load();
+    queueMicrotask(() => {
+      void load();
+    });
   }, [load]);
 
+  const canEnableAutonomous =
+    settings?.profile_ready === true && settings?.verified_readiness_ready === true;
+
   async function enableWithConsent() {
-    if (!settings) return;
+    if (!settings || !canEnableAutonomous) return;
     setSaving(true);
     setError(null);
     try {
@@ -75,15 +75,15 @@ export default function NightlyAutoApplySettingsPage() {
       });
       setSettings(data);
       setShowConsent(false);
-      setStatus(t("dashboard.nightlyAutoApplyEnabledHint").replace("{time}", data.next_run_label));
     } catch {
-      setError("Failed to save consent");
+      setError(t("dashboard.nightlyAutoApplyConsentSaveFailed"));
     } finally {
       setSaving(false);
     }
   }
 
   async function patch(partial: Partial<AutoApplySettings>) {
+    if (!canEnableAutonomous) return;
     setSaving(true);
     setError(null);
     try {
@@ -97,30 +97,17 @@ export default function NightlyAutoApplySettingsPage() {
       });
       setSettings(data);
     } catch {
-      setError("Failed to update settings");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function runNow() {
-    setSaving(true);
-    setError(null);
-    try {
-      const out = await apiFetch<TriggerOut>("/api/v1/auto-apply/trigger", { method: "POST" });
-      setStatus(t("dashboard.nightlyAutoApplyTriggerOk").replace("{message}", out.message));
-      await load();
-    } catch {
-      setError("Trigger failed — enable consent first");
+      setError(t("dashboard.nightlyAutoApplySettingsSaveFailed"));
     } finally {
       setSaving(false);
     }
   }
 
   const nextTime = settings?.next_run_label ?? "02:00";
+  const toggleChecked = Boolean(canEnableAutonomous && settings?.is_active);
 
   return (
-    <Shell rail>
+    <Shell wide rail>
       <div className="space-y-6">
         <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
@@ -147,13 +134,25 @@ export default function NightlyAutoApplySettingsPage() {
               <Link href="/profile" className="twin-link mt-2 inline-block text-sm">
                 {t("dashboard.jobsEmptyZeroProfileCta")} →
               </Link>
+            ) : settings && !settings.verified_readiness_ready ? (
+              <Link href="/dashboard" className="twin-link mt-2 inline-block text-sm">
+                {t("dashboard.title")} →
+              </Link>
             ) : null}
           </Card>
         )}
 
         {settings && (
           <>
-            {!settings.consent_given_at && settings.profile_ready ? (
+            {!canEnableAutonomous ? (
+              <Card variant="soft" className="border-amber-500/40 bg-amber-500/10 p-4">
+                <p className="text-sm font-semibold text-amber-950 dark:text-amber-100">
+                  {t("dashboard.nightlyAutoApplyBlockedUntilChecklist")}
+                </p>
+              </Card>
+            ) : null}
+
+            {!settings.consent_given_at && canEnableAutonomous ? (
               <Card variant="soft" className="border-[var(--twin-accent-muted)] p-5">
                 <p className="font-semibold text-[var(--foreground)]">{t("dashboard.nightlyAutoApplyConsentNudgeTitle")}</p>
                 <p className="twin-muted mt-2 text-sm leading-relaxed">{t("dashboard.nightlyAutoApplyConsentNudgeBody")}</p>
@@ -164,15 +163,17 @@ export default function NightlyAutoApplySettingsPage() {
             ) : null}
 
             <Card className="space-y-4 p-5">
-              <label className="flex cursor-pointer items-center justify-between gap-4">
+              <label
+                className={`flex items-center justify-between gap-4 ${canEnableAutonomous ? "cursor-pointer" : "cursor-not-allowed opacity-60"}`}
+              >
                 <span className="font-semibold">{t("dashboard.nightlyAutoApplyEnable")}</span>
                 <input
                   type="checkbox"
-                  className="h-5 w-5 accent-[var(--twin-accent)]"
-                  checked={settings.is_active}
-                  disabled={saving || !settings.profile_ready}
+                  className="h-5 w-5 accent-[var(--twin-accent)] disabled:cursor-not-allowed disabled:opacity-40"
+                  checked={toggleChecked}
+                  disabled={saving || !canEnableAutonomous}
                   onChange={(e) => {
-                    if (!settings.profile_ready) return;
+                    if (!canEnableAutonomous) return;
                     if (e.target.checked && !settings.consent_given_at) {
                       setShowConsent(true);
                       return;
@@ -181,14 +182,14 @@ export default function NightlyAutoApplySettingsPage() {
                   }}
                 />
               </label>
-              {settings.is_active && (
+              {toggleChecked ? (
                 <p className="text-xs text-[var(--twin-muted)]">
                   {t("dashboard.nightlyAutoApplyEnabledHint").replace("{time}", nextTime)}
                 </p>
-              )}
+              ) : null}
             </Card>
 
-            {settings.consent_given_at && (
+            {settings.consent_given_at && canEnableAutonomous ? (
               <Card className="space-y-5 p-5">
                 <div>
                   <div className="mb-2 flex justify-between text-sm">
@@ -204,6 +205,7 @@ export default function NightlyAutoApplySettingsPage() {
                     step={5}
                     value={settings.min_score_threshold}
                     className="w-full"
+                    disabled={!canEnableAutonomous}
                     onChange={(e) =>
                       setSettings((s) =>
                         s ? { ...s, min_score_threshold: Number(e.target.value) } : s,
@@ -223,6 +225,7 @@ export default function NightlyAutoApplySettingsPage() {
                     step={1}
                     value={settings.daily_limit}
                     className="w-full"
+                    disabled={!canEnableAutonomous}
                     onChange={(e) =>
                       setSettings((s) => (s ? { ...s, daily_limit: Number(e.target.value) } : s))
                     }
@@ -231,7 +234,7 @@ export default function NightlyAutoApplySettingsPage() {
                 <Button
                   type="button"
                   className="twin-btn-primary w-full"
-                  disabled={saving}
+                  disabled={saving || !canEnableAutonomous}
                   onClick={() =>
                     void patch({
                       min_score_threshold: settings.min_score_threshold,
@@ -242,9 +245,9 @@ export default function NightlyAutoApplySettingsPage() {
                   {t("dashboard.nightlyAutoApplySave")}
                 </Button>
               </Card>
-            )}
+            ) : null}
 
-            {settings.consent_given_at && (
+            {settings.consent_given_at ? (
               <Card className="grid gap-4 p-5 sm:grid-cols-3">
                 <div>
                   <p className="text-xs text-[var(--twin-muted)]">
@@ -269,25 +272,12 @@ export default function NightlyAutoApplySettingsPage() {
                   <p className="text-sm font-semibold">{settings.next_run_label}</p>
                 </div>
               </Card>
-            )}
+            ) : null}
 
             <Card className="p-5 text-sm">
               <p className="mb-1 font-semibold">{t("dashboard.nightlyAutoApplySupportedBoards")}</p>
               <p className="text-[var(--twin-muted)]">{settings.supported_boards}</p>
             </Card>
-
-            {settings.is_active && settings.consent_given_at && (
-              <Button
-                type="button"
-                className="twin-btn-secondary w-full"
-                disabled={saving}
-                onClick={() => void runNow()}
-              >
-                {t("dashboard.nightlyAutoApplyTrigger")}
-              </Button>
-            )}
-
-            {status && <p className="text-sm text-[var(--twin-muted-strong)]">{status}</p>}
           </>
         )}
 

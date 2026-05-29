@@ -1,29 +1,80 @@
 """Nightly auto-apply consent, settings, and manual trigger."""
 
+import json
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.core.deps import get_current_user
+from app.core.scrape_ops import user_has_scrape_ops
 from app.database.models import AutoApplyConsent, AutoApplyRun, Candidate, User
 from app.database.session import get_db
+from app.limiter import limiter
 from app.schemas.auto_apply_settings import (
     AutoApplyConsentIn,
     AutoApplyLastSweepOut,
     AutoApplySettingsOut,
     AutoApplySettingsPatch,
     AutoApplyTriggerOut,
+    SweepBoardStatOut,
 )
-from app.services.candidate_readiness import auto_apply_profile_ready
-from app.services.nightly_auto_apply import process_user_nightly_auto_apply, supported_board_ids
+from app.services.candidate_readiness import (
+    auto_apply_profile_ready,
+    autonomous_apply_allowed,
+)
+from app.services.nightly_auto_apply import (
+    METHOD_MANUAL_TRIGGER,
+    process_user_nightly_auto_apply,
+    supported_board_ids,
+)
 from app.tasks.nightly_auto_apply import nightly_auto_apply_sweep
 
 router = APIRouter()
 
 CONSENT_VERSION = "v1"
 PROFILE_NOT_READY_DETAIL = "Complete your candidate profile and upload a CV first."
+VERIFIED_READINESS_NOT_READY_DETAIL = (
+    "Complete verified readiness (career brief, skill evidence, and consents) before autonomous applying."
+)
+
+
+def _parse_sweep_stats(stats_json: str | None) -> tuple[int, list[SweepBoardStatOut], bool]:
+    """Extract skipped count, per-board breakdown, and demo-seed flag from persisted sweep JSON."""
+    if not stats_json:
+        return 0, [], False
+    try:
+        payload = json.loads(stats_json)
+    except (json.JSONDecodeError, TypeError):
+        return 0, [], False
+    if not isinstance(payload, dict):
+        return 0, [], False
+    skipped = int(payload.get("total_applications_skipped") or 0)
+    is_demo = bool(payload.get("demo"))
+    boards_raw = payload.get("boards")
+    boards: list[SweepBoardStatOut] = []
+    if isinstance(boards_raw, dict):
+        for board, counts in sorted(boards_raw.items()):
+            if not isinstance(counts, dict):
+                continue
+            boards.append(
+                SweepBoardStatOut(
+                    board=str(board),
+                    submitted=int(counts.get("submitted", 0) or 0),
+                    failed=int(counts.get("failed", 0) or 0),
+                    skipped=int(counts.get("skipped", 0) or 0),
+                )
+            )
+    return skipped, boards, is_demo
+
+
+def _sweep_started_at_utc(dt: datetime | None) -> datetime | None:
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
 
 
 def _get_candidate(db: Session, user_id: int) -> Candidate | None:
@@ -33,6 +84,15 @@ def _get_candidate(db: Session, user_id: int) -> Candidate | None:
 def _require_profile_ready(user: User, candidate: Candidate | None) -> None:
     if not auto_apply_profile_ready(user, candidate):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=PROFILE_NOT_READY_DETAIL)
+
+
+def _require_verified_readiness(user: User, candidate: Candidate | None) -> None:
+    _require_profile_ready(user, candidate)
+    if not autonomous_apply_allowed(user, candidate):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=VERIFIED_READINESS_NOT_READY_DETAIL,
+        )
 
 
 def _next_run_label() -> str:
@@ -50,11 +110,13 @@ def _to_out(
 ) -> AutoApplySettingsOut:
     settings = get_settings()
     ready = auto_apply_profile_ready(user, candidate)
+    verified_ready = autonomous_apply_allowed(user, candidate)
     onboarding_done = user.onboarding_completed_at is not None
     base = dict(
         next_run_label=_next_run_label(),
         supported_boards=", ".join(sorted(supported_board_ids(settings))),
         profile_ready=ready,
+        verified_readiness_ready=verified_ready,
         onboarding_completed=onboarding_done,
     )
     if not consent:
@@ -91,12 +153,19 @@ def get_last_platform_sweep(
             finished_at=None,
             total_applications_submitted=0,
             total_applications_failed=0,
+            total_applications_skipped=0,
+            boards=[],
+            is_demo_seed=False,
         )
+    skipped, boards, is_demo = _parse_sweep_stats(row.stats_json)
     return AutoApplyLastSweepOut(
-        started_at=row.started_at,
-        finished_at=row.finished_at,
+        started_at=_sweep_started_at_utc(row.started_at),
+        finished_at=_sweep_started_at_utc(row.finished_at),
         total_applications_submitted=int(row.total_applications_submitted or 0),
         total_applications_failed=int(row.total_applications_failed or 0),
+        total_applications_skipped=skipped,
+        boards=boards,
+        is_demo_seed=is_demo,
     )
 
 
@@ -123,7 +192,7 @@ def give_consent(
     candidate = _get_candidate(db, user.id)
     if candidate is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Create your candidate profile first.")
-    _require_profile_ready(user, candidate)
+    _require_verified_readiness(user, candidate)
     settings = get_settings()
     now = datetime.now(timezone.utc)
     consent = db.query(AutoApplyConsent).filter(AutoApplyConsent.candidate_id == candidate.id).first()
@@ -162,6 +231,8 @@ def patch_settings(
     consent = db.query(AutoApplyConsent).filter(AutoApplyConsent.candidate_id == candidate.id).first()
     if not consent or not consent.consent_given_at:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Enable auto-apply with consent first")
+    if body.is_active is True:
+        _require_verified_readiness(user, candidate)
     if body.is_active is not None:
         consent.is_active = body.is_active
     if body.min_score_threshold is not None:
@@ -183,15 +254,23 @@ def trigger_nightly_for_me(
     candidate = _get_candidate(db, user.id)
     if candidate is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Create your candidate profile first.")
-    _require_profile_ready(user, candidate)
+    _require_verified_readiness(user, candidate)
     consent = db.query(AutoApplyConsent).filter(AutoApplyConsent.candidate_id == candidate.id).first()
     if not consent or not consent.is_active or not consent.consent_given_at:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Enable nightly auto-apply with consent before triggering",
+            detail="Enable autonomous applying with consent before triggering",
         )
     settings = get_settings()
-    row = process_user_nightly_auto_apply(db, user=user, consent=consent, settings=settings)
+    row = process_user_nightly_auto_apply(
+        db,
+        user=user,
+        consent=consent,
+        settings=settings,
+        max_jobs=1,
+        cooldown_seconds=0,
+        application_method=METHOD_MANUAL_TRIGGER,
+    )
     submitted = int(row.get("applications_submitted", 0))
     failed = int(row.get("applications_failed", 0))
     reason = row.get("skipped_reason")
@@ -199,8 +278,12 @@ def trigger_nightly_for_me(
         msg = "Daily auto-apply limit reached for today."
     elif reason == "no_matches":
         msg = "No eligible matches above your score threshold (or already applied)."
+    elif submitted > 0 and failed > 0:
+        msg = f"Submitted {submitted} application(s); {failed} failed."
     elif submitted > 0:
         msg = f"Submitted {submitted} application(s)."
+    elif failed > 0:
+        msg = f"No submissions; {failed} attempt(s) failed (portal, CV, or browser)."
     else:
         msg = "No applications submitted."
     return AutoApplyTriggerOut(
@@ -212,11 +295,24 @@ def trigger_nightly_for_me(
 
 
 @router.post("/trigger-sweep")
+@limiter.limit("3/minute")
 def trigger_full_sweep(
+    request: Request,
     user: User = Depends(get_current_user),
 ) -> dict:
-    """Enqueue full nightly sweep (ops-style; requires active consent users)."""
+    """Enqueue full nightly sweep — ops only (allowlist via SCRAPE_OPS_*)."""
     settings = get_settings()
+    # Closes a real privilege-escalation surface: without this gate, *any*
+    # authenticated user could enqueue the platform-wide nightly sweep
+    # (every user with active consent) and exhaust the auto-apply worker
+    # budget. Allowlist is reused from the scrape-ops pattern so we don't
+    # invent a fourth admin mechanism alongside `BETA_ADMIN_TOKEN` /
+    # `OPS_ADMIN_TOKEN` / candidate JWTs.
+    if not user_has_scrape_ops(user, settings):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Ops only — your account is not on the auto-apply trigger allowlist.",
+        )
     if settings.celery_task_always_eager:
         return nightly_auto_apply_sweep(dry_run=False)
     async_result = nightly_auto_apply_sweep.delay(dry_run=False)

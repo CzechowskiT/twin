@@ -4,14 +4,19 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
 from app.database.session import get_db
+from app.limiter import limiter, recruiter_token_key
 from app.services.recruiter_company_auth import resolve_recruiter_access
-from app.services.recruiter_inbox import build_recruiter_batch, respond_recruiter_batch
+from app.services.recruiter_inbox import (
+    build_recruiter_batch,
+    respond_recruiter_batch,
+    respond_recruiter_batch_bulk,
+)
 from app.services.recruiter_jobs import create_company_job, list_company_jobs
 
 router = APIRouter()
@@ -36,6 +41,13 @@ def _resolved_company_slug(
 
 class RecruiterRespondIn(BaseModel):
     action: str = Field(..., description="accept | decline")
+    decline_note: str | None = Field(None, max_length=2000, description="Internal note when declining")
+
+
+class RecruiterBatchRespondIn(BaseModel):
+    application_ids: list[int] = Field(..., min_length=1, max_length=50)
+    action: str = Field(..., description="accept | decline")
+    decline_note: str | None = Field(None, max_length=2000, description="Shared internal note when declining")
 
 
 class RecruiterJobCreateIn(BaseModel):
@@ -65,7 +77,9 @@ def recruiter_inbox(
 
 
 @router.post("/inbox/{application_id}/respond")
+@limiter.limit("60/minute", key_func=recruiter_token_key)
 def recruiter_inbox_respond(
+    request: Request,
     application_id: int,
     body: RecruiterRespondIn,
     db: Session = Depends(get_db),
@@ -81,6 +95,31 @@ def recruiter_inbox_respond(
             company_slug=slug,
             application_id=application_id,
             action=body.action,
+            decline_note=body.decline_note,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/inbox/respond-batch")
+@limiter.limit("60/minute", key_func=recruiter_token_key)
+def recruiter_inbox_respond_batch(
+    request: Request,
+    body: RecruiterBatchRespondIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return respond_recruiter_batch_bulk(
+            db,
+            company_slug=slug,
+            application_ids=body.application_ids,
+            action=body.action,
+            decline_note=body.decline_note,
         )
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc

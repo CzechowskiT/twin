@@ -12,10 +12,12 @@ import { useMarketingPersona } from "@/components/persona-provider";
 import { Button, Card, Input, Label } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { getToken, setToken } from "@/lib/auth";
+import { setSessionPersona } from "@/lib/session-persona";
 import type { TranslationKey } from "@/lib/i18n";
-import { OAUTH_LOGIN_BUTTONS_ENABLED } from "@/lib/oauth-auth";
+import { hasConfiguredOAuthProvider } from "@/lib/oauth-auth";
+import { useOAuthProviderStatus } from "@/lib/use-oauth-provider-status";
 import type { LoginZone } from "@/lib/persona-auth";
-import { LOGIN_PATH, postRegisterPath, REGISTER_PATH } from "@/lib/persona-auth";
+import { LOGIN_PATH, postRegisterPath } from "@/lib/persona-auth";
 
 type RegisterSuccessResponse = { access_token: string };
 
@@ -44,6 +46,8 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+  const { status: oauthStatus, loaded: oauthStatusLoaded } = useOAuthProviderStatus();
+  const showOAuthButtons = hasConfiguredOAuthProvider(oauthStatus);
 
   const safeNext = useMemo(() => {
     const nextRaw = searchParams.get("next");
@@ -55,7 +59,7 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
     let cancelled = false;
     const token = getToken();
     if (!token) {
-      setSessionPhase("anon");
+      queueMicrotask(() => setSessionPhase("anon"));
       return;
     }
     void (async () => {
@@ -76,11 +80,36 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
   const oauthUrlError = useMemo(() => {
     const err = searchParams.get("error");
     if (err === "linkedin_not_configured") return t("register.errorLinkedinNotConfigured");
+    if (err === "apple_not_configured") return t("register.errorAppleNotConfigured");
+    if (err === "github_not_configured") return t("register.errorGithubNotConfigured");
     if (err?.endsWith("_not_configured")) return t("register.errorOAuthNotConfigured");
     return null;
   }, [searchParams, t]);
 
-  const displayError = error ?? oauthUrlError;
+  const displayError = useMemo(() => {
+    if (error) return error;
+    if (!oauthUrlError) return null;
+    if (!oauthStatusLoaded) return oauthUrlError;
+    const err = searchParams.get("error");
+    if (err === "apple_not_configured" || err === "github_not_configured") return null;
+    return oauthUrlError;
+  }, [error, oauthStatusLoaded, oauthUrlError, searchParams]);
+
+  useEffect(() => {
+    if (!oauthStatusLoaded) return;
+    const err = searchParams.get("error");
+    if (err !== "apple_not_configured" && err !== "github_not_configured") return;
+    const shouldClear =
+      (err === "apple_not_configured" && !oauthStatus.apple) ||
+      (err === "github_not_configured" && !oauthStatus.github) ||
+      (err === "apple_not_configured" && oauthStatus.apple) ||
+      (err === "github_not_configured" && oauthStatus.github);
+    if (!shouldClear) return;
+    const q = new URLSearchParams(searchParams.toString());
+    q.delete("error");
+    const suffix = q.toString();
+    router.replace(suffix ? `${window.location.pathname}?${suffix}` : window.location.pathname);
+  }, [oauthStatus, oauthStatusLoaded, router, searchParams]);
 
   const REQUIRED_CONSENT_NAMES = [
     "gdpr_privacy",
@@ -149,6 +178,7 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
         }),
       });
       setToken(registered.access_token);
+      setSessionPersona(zone);
       setPersona(zone);
       router.push(safeNext);
     } catch (err) {
@@ -258,20 +288,22 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
           {loading ? t("register.creating") : t("register.submit")}
         </Button>
       </form>
-      <>
-        <p className="twin-muted my-4 text-center text-xs uppercase tracking-wide">
-          {t("register.orContinue")}
-        </p>
-        <OAuthWebButtons
-          status={OAUTH_LOGIN_BUTTONS_ENABLED}
-          labels={{
-            google: t("login.oauthGoogle"),
-            github: t("login.oauthGithub"),
-            apple: t("login.oauthApple"),
-          }}
-        />
-        <LinkedInLoginButton label={t("register.linkedIn")} />
-      </>
+      {showOAuthButtons ? (
+        <>
+          <p className="twin-muted my-4 text-center text-xs uppercase tracking-wide">
+            {t("register.orContinue")}
+          </p>
+          <OAuthWebButtons
+            status={oauthStatus}
+            labels={{
+              google: t("login.oauthGoogle"),
+              github: t("login.oauthGithub"),
+              microsoft: t("login.oauthMicrosoft"),
+            }}
+          />
+        </>
+      ) : null}
+      <LinkedInLoginButton label={t("register.linkedIn")} />
       <p className="twin-muted mt-4 text-center text-sm">
         {t("register.hasAccount")}{" "}
         <Link href={LOGIN_PATH[zone]} className="twin-link">

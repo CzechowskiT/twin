@@ -83,7 +83,7 @@ sequenceDiagram
 
 Same server-side redirect flow: `GET /api/v1/auth/{google|github|apple}/login` → provider → callback on the API → JWT → `FRONTEND_URL/auth/callback?token=…`.
 
-- **Per-provider configuration is not exposed over HTTP** (removed `GET /api/v1/auth/oauth/status` to avoid disclosing which env vars are set). The login UI always offers provider rows; if a provider is not configured, `GET /api/v1/auth/{provider}/login` redirects to the frontend with `?error={provider}_not_configured`.
+- **Provider availability (no secrets):** `GET /api/v1/health?ops=1` returns `google_oauth_configured`, `github_oauth_configured`, `apple_oauth_configured`, `microsoft_oauth_configured`. The login/register UI hides GitHub and Apple rows when the flag is false (no dashed placeholders). If someone hits `GET /api/v1/auth/{provider}/login` anyway, the API redirects to the frontend with `?error={provider}_not_configured`.
 - **Redirect URIs** (must match the corresponding `*_REDIRECT_URI` env var exactly):
 
 | Provider | Example redirect URL |
@@ -95,3 +95,5 @@ Same server-side redirect flow: `GET /api/v1/auth/{google|github|apple}/login` �
 Account linking uses the `oauth_accounts` table (migration `005_oauth_accounts`). Same email across providers maps to one user; `gdpr_consent_at` is set when linking or creating via OAuth.
 
 Environment variables: see `/.env.example` (`GOOGLE_*`, `GITHUB_*`, `APPLE_*`).
+
+GitHub production secret (one founder step): [GITHUB_OAUTH_PRODUCTION.md](./GITHUB_OAUTH_PRODUCTION.md).

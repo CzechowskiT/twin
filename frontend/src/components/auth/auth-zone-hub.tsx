@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { useEffect, useRef } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { Card } from "@/components/ui";
@@ -46,12 +47,23 @@ export function AuthZoneHub({
   hubTitleKey,
   hubLeadKey,
   paths,
+  highlightRoleCards = false,
 }: {
   hubTitleKey: TranslationKey;
   hubLeadKey: TranslationKey;
   paths: Record<LoginZone, string>;
+  highlightRoleCards?: boolean;
 }) {
   const { t } = useTranslation();
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!highlightRoleCards || !gridRef.current) return;
+    const id = window.setTimeout(() => {
+      gridRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }, 120);
+    return () => window.clearTimeout(id);
+  }, [highlightRoleCards]);
 
   return (
     <Card className="twin-auth-zone-hub !p-5 sm:!p-8">
@@ -64,7 +76,13 @@ export function AuthZoneHub({
       <p className="twin-auth-zone-hub__lead twin-muted mt-3 max-w-2xl text-sm leading-relaxed sm:text-[15px]">
         {t(hubLeadKey)}
       </p>
-      <div className="twin-auth-zone-hub__grid mt-8">
+      <div
+        ref={gridRef}
+        id="role-cards"
+        className={`twin-auth-zone-hub__grid mt-8${
+          highlightRoleCards ? " twin-auth-zone-hub__grid--prompt" : ""
+        }`}
+      >
         {ZONES.map((zone) => (
           <Link
             key={zone.id}

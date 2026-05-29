@@ -95,6 +95,21 @@ export function JobFiltersBar({
         </label>
         <label className="block">
           <span className="mb-1 block text-xs font-semibold text-[var(--twin-muted-strong)]">
+            {t("strategic.feedTypeAll")}
+          </span>
+          <select
+            value={filters.opportunity_type}
+            onChange={(e) => onChange({ ...filters, opportunity_type: e.target.value })}
+            className="twin-touch-target w-full rounded border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-3 py-2 text-sm"
+          >
+            <option value="all">{t("strategic.feedTypeAll")}</option>
+            <option value="full_time">{t("strategic.feedTypeFullTime")}</option>
+            <option value="freelance">{t("strategic.feedTypeFreelance")}</option>
+            <option value="contract">{t("strategic.feedTypeContract")}</option>
+          </select>
+        </label>
+        <label className="block">
+          <span className="mb-1 block text-xs font-semibold text-[var(--twin-muted-strong)]">
             {t("dashboard.filterSort")}
           </span>
           <select

@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "@/components/language-provider";
-import { applicationStatusKey } from "@/lib/application-status";
+import { PlacementStateStepper } from "@/components/placement-state-stepper";
+import { applicationDisplayStatusKey, applicationStatusKey } from "@/lib/application-status";
 
 export type FeedbackInsights = {
   skill_tool_gaps: string[];
@@ -18,6 +19,11 @@ export type ApplicationRow = {
   id: number;
   job_id: number;
   status: string;
+  submission_status?: string | null;
+  display_status?: string | null;
+  supported_apply_mode?: string | null;
+  requires_manual_action?: boolean;
+  failure_reason?: string | null;
   title: string;
   company: string;
   location: string | null;
@@ -58,8 +64,14 @@ function normalizeApplicationSelectStatus(status: string): (typeof STATUSES)[num
 }
 
 function showPlacementRow(app: ApplicationRow): boolean {
+  const sub = (app.submission_status ?? "").trim().toLowerCase();
   const s = app.status.trim().toLowerCase();
-  return s === "applied" || s === "interview" || s === "hired";
+  return (
+    sub === "external_submit_confirmed" ||
+    s === "applied" ||
+    s === "interview" ||
+    s === "hired"
+  );
 }
 
 export function ApplicationsPanel({
@@ -115,33 +127,39 @@ export function ApplicationsPanel({
   const [packagePdfBusyId, setPackagePdfBusyId] = useState<number | null>(null);
 
   useEffect(() => {
-    setDraftById((prev) => {
-      const next = { ...prev };
-      for (const app of items) {
-        const fromApi = app.recruiter_feedback_raw ?? "";
-        if (next[app.id] === undefined) next[app.id] = fromApi;
-      }
-      return next;
+    queueMicrotask(() => {
+      setDraftById((prev) => {
+        const next = { ...prev };
+        for (const app of items) {
+          const fromApi = app.recruiter_feedback_raw ?? "";
+          if (next[app.id] === undefined) next[app.id] = fromApi;
+        }
+        return next;
+      });
     });
   }, [items]);
 
   useEffect(() => {
-    setDeclareNoteById((prev) => {
-      const next = { ...prev };
-      for (const app of items) {
-        const note = app.placement_declaration_note ?? "";
-        if (next[app.id] === undefined && note) next[app.id] = note;
-      }
-      return next;
+    queueMicrotask(() => {
+      setDeclareNoteById((prev) => {
+        const next = { ...prev };
+        for (const app of items) {
+          const note = app.placement_declaration_note ?? "";
+          if (next[app.id] === undefined && note) next[app.id] = note;
+        }
+        return next;
+      });
     });
   }, [items]);
 
   useEffect(() => {
     if (placementEventsInvalidateKey === undefined) return;
-    setPlacementEventsByAppId({});
-    setPlacementEventsErrById({});
-    setPlacementEventsLoadingId(null);
-    setPlacementHistoryOpenId(null);
+    queueMicrotask(() => {
+      setPlacementEventsByAppId({});
+      setPlacementEventsErrById({});
+      setPlacementEventsLoadingId(null);
+      setPlacementHistoryOpenId(null);
+    });
   }, [placementEventsInvalidateKey]);
 
   function draftFor(app: ApplicationRow): string {
@@ -210,15 +228,33 @@ export function ApplicationsPanel({
             className="twin-card-inset flex flex-col gap-2 p-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between"
           >
             <div className="min-w-0 flex-1">
-              <a href={app.url} target="_blank" rel="noopener noreferrer" className="twin-link font-medium">
+              <a
+                href={app.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="twin-link block text-sm font-semibold leading-snug text-[var(--foreground)]"
+              >
                 {app.title}
               </a>
-              <p className="twin-muted mt-0.5 text-xs">
-                {app.company}
+              <p className="twin-muted mt-0.5 text-xs leading-relaxed">
+                <span className="font-medium text-[var(--twin-muted-strong)]">{app.company}</span>
                 {app.location ? ` · ${app.location}` : ""} · {app.job_board}
               </p>
+              <p className="mt-1.5 text-xs font-medium text-[var(--twin-accent)]">
+                {t("dashboard.submissionPhaseLabel")}:{" "}
+                {t(
+                  applicationDisplayStatusKey(app.status, {
+                    submission_status: app.submission_status,
+                    display_status: app.display_status,
+                  }),
+                )}
+              </p>
+              {app.failure_reason ? (
+                <p className="twin-muted mt-0.5 text-xs">{app.failure_reason}</p>
+              ) : null}
               {onPlacementDeclare && onPlacementVerifyStart && showPlacementRow(app) ? (
                 <div className="mt-2 max-w-md space-y-2 rounded border border-[var(--twin-accent)]/25 bg-[var(--twin-accent-muted)]/25 p-2 text-xs">
+                  <PlacementStateStepper state={app.placement_state ?? "none"} />
                   {(app.placement_state ?? "none") === "disputed" ? (
                     <>
                       <p className="font-semibold text-amber-700">{t("dashboard.placementDisputed")}</p>
@@ -309,6 +345,11 @@ export function ApplicationsPanel({
                           )}
                         </p>
                       ) : null}
+                      {(app.placement_state ?? "none") === "verify_pending" ? (
+                        <p className="font-medium text-[var(--twin-accent-hover)]">
+                          {t("dashboard.placementVerifyInProgress")}
+                        </p>
+                      ) : null}
                       <p className="leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.placementVerifyHint")}</p>
                       <input
                         type="email"
@@ -337,7 +378,9 @@ export function ApplicationsPanel({
                       >
                         {placementFlowBusy?.id === app.id && placementFlowBusy.kind === "verify"
                           ? "…"
-                          : t("dashboard.placementSendLink")}
+                          : (app.placement_state ?? "none") === "verify_pending"
+                            ? t("dashboard.placementResendLink")
+                            : t("dashboard.placementSendLink")}
                       </button>
                       {(app.placement_state ?? "none") === "verify_pending" ? (
                         <p className="text-[var(--twin-muted)]">{t("dashboard.placementVerifyPending")}</p>

@@ -14,15 +14,6 @@ export type BillingPlanRow = {
   annual_list_price_usd?: number;
 };
 
-function formatUsdListMonthly(n: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: n % 1 === 0 ? 0 : 2,
-    maximumFractionDigits: 2,
-  }).format(n);
-}
-
 type BillingPlanTierCardProps = {
   plan: BillingPlanRow;
   locale: Locale;
@@ -52,8 +43,7 @@ export function BillingPlanTierCard({
   isCurrent,
   featured = false,
 }: BillingPlanTierCardProps) {
-  const busyHere =
-    (busy === "checkout-premium" && p.id === "premium") || (busy === "checkout-pro" && p.id === "pro");
+  const busyHere = busy === `checkout-${p.id}`;
 
   return (
     <article

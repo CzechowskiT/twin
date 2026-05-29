@@ -1,11 +1,19 @@
 """Scrapers for major global job boards (best-effort public search)."""
 
+import re
 from dataclasses import dataclass
 from typing import Callable
 from urllib.parse import quote_plus
 
 from app.scrapers.base import ScrapedJob, validate_job
-from app.scrapers.playwright_utils import fetch_html, parse_job_links, parse_with_selectors
+from app.scrapers.playwright_utils import (
+    fetch_html,
+    parse_job_links,
+    parse_job_links_pattern,
+    parse_with_selectors,
+)
+
+_ZIPRECRUITER_JOB_HREF = re.compile(r"/jobs/(\d+)-")
 
 DEFAULT_KEYWORD = "sales"
 DEFAULT_LOCATION = "Warsaw"
@@ -123,18 +131,26 @@ def _ziprecruiter_url(keyword: str, location: str) -> str:
 
 
 def _parse_ziprecruiter(html: str, limit: int) -> list[ScrapedJob]:
-    return parse_with_selectors(
+    base = "https://www.ziprecruiter.com"
+    jobs = parse_with_selectors(
         html,
         job_board="ziprecruiter.com",
-        base_url="https://www.ziprecruiter.com",
+        base_url=base,
         card_selector="article.job_result, div.job_content",
         title_selector="h2, p.job_title",
         company_selector=".hiring_company, .company_name",
         link_selector="a[href*='/jobs/']",
         limit=limit,
-    ) or parse_job_links(
-        html, job_board="ziprecruiter.com", base_url="https://www.ziprecruiter.com",
-        href_contains="/job/", limit=limit,
+    )
+    if jobs:
+        return jobs
+    # Live HTML uses ``/jobs/{id}-{slug}`` (not ``/job/``); geo redirects may use .ie TLD.
+    return parse_job_links_pattern(
+        html,
+        job_board="ziprecruiter.com",
+        base_url=base,
+        href_pattern=_ZIPRECRUITER_JOB_HREF,
+        limit=limit,
     )
 
 

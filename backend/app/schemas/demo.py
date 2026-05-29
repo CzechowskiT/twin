@@ -65,11 +65,18 @@ class DemoApplyTargetOut(BaseModel):
     url: str | None = None
 
 
+DEMO_SAMPLE_DISCLAIMER = (
+    "Sample investor demo data for illustration only — not a live production feed."
+)
+
+
 class DemoSnapshotOut(BaseModel):
     """Anonymized pipeline preview for GET /api/v1/demo/snapshot (no login)."""
 
     demo_mode: bool = True
+    sample_data: bool = True
     source: str
+    data_disclaimer: str = DEMO_SAMPLE_DISCLAIMER
     generated_at: str
     demo_user_configured: bool = False
     candidate: DemoCandidateOut

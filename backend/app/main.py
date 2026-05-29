@@ -39,11 +39,15 @@ async def lifespan(_app: FastAPI):
 
 def create_app() -> FastAPI:
     settings = get_settings()
+    expose_openapi = settings.environment != "production"
     app = FastAPI(
         title="TWIN API",
         description="Autonomous career agent",
         version="0.1.0",
         lifespan=lifespan,
+        docs_url="/docs" if expose_openapi else None,
+        redoc_url=None,
+        openapi_url="/openapi.json" if expose_openapi else None,
     )
     from app.middleware.request_id import add_request_id_middleware
 
@@ -129,17 +133,21 @@ def create_app() -> FastAPI:
     @app.get("/")
     def root() -> dict[str, str]:
         """So the public Railway URL without a path shows something useful."""
-        return {
+        payload: dict[str, str] = {
             "service": "TWIN API",
             "health": "/api/v1/health",
-            "docs": "/docs",
-            "openapi": "/openapi.json",
         }
+        if expose_openapi:
+            payload["docs"] = "/docs"
+            payload["openapi"] = "/openapi.json"
+        return payload
 
-    @app.get("/openapi.json", include_in_schema=False)
-    def openapi_export() -> dict:
-        """Machine-readable OpenAPI schema for integrators and codegen."""
-        return app.openapi()
+    if expose_openapi:
+
+        @app.get("/openapi.json", include_in_schema=False)
+        def openapi_export() -> dict:
+            """Machine-readable OpenAPI schema for integrators and codegen."""
+            return app.openapi()
 
     return app
 

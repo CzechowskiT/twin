@@ -7,6 +7,7 @@ from sqlalchemy import text
 from sqlalchemy.engine import Engine
 
 from app.database.session import engine
+from app.services.health_ops import build_health_ops_admin_extensions, build_health_ops_public
 
 router = APIRouter()
 
@@ -38,11 +39,11 @@ def health_check(
     db: bool = Query(False, description="When true, include db_ok from SELECT 1 (no DSN in response)."),
     ops: bool = Query(
         False,
-        description="When true, include non-secret ops flags (mail/calendar wiring) for deploy checks.",
+        description="When true, include non-secret ops booleans for deploy checks and /status.",
     ),
-) -> dict[str, str | bool]:
+) -> dict[str, str | bool | int]:
     commit = _git_commit_sha()
-    out: dict[str, str | bool] = {
+    out: dict[str, str | bool | int] = {
         "status": "ok",
         "service": "twin-api",
         "git_commit": commit if commit else "unknown",
@@ -51,33 +52,8 @@ def health_check(
         out["db_ok"] = _database_reachable()
     if ops:
         from app.config import get_settings
-        from app.services.google_calendar_oauth import is_google_calendar_oauth_configured
-        from app.services.mail import is_mail_configured
-        from app.services.microsoft_calendar_oauth import is_microsoft_calendar_oauth_configured
 
-        from app.api.public import _stripe_checkout_ready
-        from app.core.scrape_ops import scrape_worker_ready
-
-        s = get_settings()
-        out["mail_configured"] = is_mail_configured(s)
-        from app.services.calendar_oauth_redirect import (
-            effective_google_calendar_redirect_uri,
-            effective_microsoft_calendar_redirect_uri,
-        )
-
-        out["google_calendar_configured"] = is_google_calendar_oauth_configured()
-        out["microsoft_calendar_configured"] = is_microsoft_calendar_oauth_configured()
-        out["google_calendar_redirect_uri"] = effective_google_calendar_redirect_uri(s)
-        out["microsoft_calendar_redirect_uri"] = effective_microsoft_calendar_redirect_uri(s)
-        out["stripe_checkout_ready"] = _stripe_checkout_ready(s)
-        out["scrape_worker_ready"] = scrape_worker_ready(s)
-        out["scrape_beat_enabled"] = s.scrape_beat_enabled
-        out["celery_task_always_eager"] = s.celery_task_always_eager
-        out["recruiter_inbox_configured"] = bool((s.recruiter_inbox_token or "").strip())
-        out["ops_admin_configured"] = bool(
-            (s.ops_admin_token or "").strip() or (s.beta_admin_token or "").strip()
-        )
-        out["partner_export_configured"] = bool((s.partner_export_token or "").strip())
+        out.update(build_health_ops_public(get_settings()))
     return out
 
 
@@ -104,7 +80,7 @@ def celery_status() -> dict[str, str | bool | list[str]]:
         out["mode"] = "eager"
         return out
     try:
-        inspect = celery_app.control.inspect(timeout=2.0)
+        inspect = celery_app.control.inspect(timeout=4.0)
         ping = inspect.ping() if inspect else None
         if ping:
             out["worker_active"] = True

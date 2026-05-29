@@ -25,76 +25,20 @@ if str(BACKEND_ROOT) not in sys.path:
 
 from app.database.connection import get_session  # noqa: E402
 from app.database.models import Application, ApplicationStatus, Job  # noqa: E402
-from app.services.investor_demo_seed import DEFAULT_DEMO_EMAIL, run_investor_demo_seed  # noqa: E402
-from app.services.placement_verification import (  # noqa: E402
-    PLACEMENT_VERIFIED,
-    record_placement_event,
+from app.services.investor_demo_seed import (  # noqa: E402
+    DEFAULT_DEMO_EMAIL,
+    ensure_demo_placement_verified,
+    ensure_recruiter_inbox_demo,
+    run_investor_demo_seed,
 )
 from app.services.recruiter_company_auth import mint_recruiter_company_token  # noqa: E402
-from app.utils.slug import slugify_company  # noqa: E402
-
-
-def _seed_placement_on_application(db, *, application_id: int, user_id: int) -> None:
-    from app.database.models import Application, PlacementEvent
-
-    if db.query(PlacementEvent).filter(PlacementEvent.application_id == application_id).count() >= 2:
-        return
-    app = db.get(Application, application_id)
-    if not app:
-        return
-    record_placement_event(
-        db,
-        application_id=application_id,
-        event_type="placement.declared",
-        actor="candidate",
-        detail={"source": "seed-investor-demo"},
-        owner_user_id=user_id,
-    )
-    app.placement_state = "declared"
-    record_placement_event(
-        db,
-        application_id=application_id,
-        event_type="placement.verified",
-        actor="system",
-        detail={"method": "demo_seed"},
-        owner_user_id=user_id,
-    )
-    app.placement_state = PLACEMENT_VERIFIED
-    app.status = ApplicationStatus.HIRED
-    db.add(app)
 
 
 def _seed_recruiter_batch_extras(db, *, candidate_id: int, company: str) -> int:
-    """Extra APPLIED rows for recruiter inbox (same company as primary demo job)."""
-    slug = slugify_company(company)
-    added = 0
-    jobs = (
-        db.query(Job)
-        .filter(Job.company == company, Job.is_validated.is_(True))
-        .limit(5)
-        .all()
-    )
-    for job in jobs[1:3]:
-        exists = (
-            db.query(Application)
-            .filter(Application.candidate_id == candidate_id, Application.job_id == job.id)
-            .first()
-        )
-        if exists:
-            if exists.status not in (ApplicationStatus.APPLIED, ApplicationStatus.INTERVIEW):
-                exists.status = ApplicationStatus.APPLIED
-                db.add(exists)
-            continue
-        db.add(
-            Application(
-                candidate_id=candidate_id,
-                job_id=job.id,
-                status=ApplicationStatus.APPLIED,
-                notes="Investor demo — recruiter batch inbox",
-            ),
-        )
-        added += 1
-    return added
+    """Extra APPLIED rows for recruiter inbox (delegates to shared seed helper)."""
+    del candidate_id  # kept for CLI compatibility; shared helper covers all demo candidates
+    out = ensure_recruiter_inbox_demo(db, company=company)
+    return int(out.get("created", 0)) + int(out.get("reset_to_applied", 0))
 
 
 def main() -> int:
@@ -125,10 +69,9 @@ def main() -> int:
                 reset_password=args.reset_password,
                 recompute_live_scores=False,
             )
-            _seed_placement_on_application(
+            placement = ensure_demo_placement_verified(
                 db,
                 application_id=int(summary["application_id"]),
-                user_id=int(summary["user_id"]),
             )
             from app.database.models import Job
 
@@ -170,6 +113,7 @@ def main() -> int:
     print(f"  interview_id: {summary['interview_id']}")
     print(f"  jobs: {len(summary['job_ids'])}")
     print(f"  recruiter_batch_extra_apps: {batch_added}")
+    print(f"  placement_verified: {placement.get('verified', False)} (app_id={placement.get('application_id', 0)})")
     print(f"  recruiter_inbox: /recruiter/inbox?company_slug={company_slug}")
     if args.print_credentials and raw_token:
         print(f"  recruiter_token: {raw_token}")

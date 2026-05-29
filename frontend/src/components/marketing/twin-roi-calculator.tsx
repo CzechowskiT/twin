@@ -7,22 +7,29 @@ import { MarketingPageSurface } from "@/components/marketing/marketing-page-surf
 import { useTranslation } from "@/components/language-provider";
 import { Shell } from "@/components/ui";
 import {
+  B2B_FLAT_RATE_DEFAULTS,
+  B2B_ROI_DEFAULTS,
+  computeB2bFlatRate,
+  computeB2bRoi,
+} from "@/lib/b2b-roi-calculator-model";
+import { convertDisplayToModelUsd, convertModelUsdToDisplay } from "@/lib/calculator-fx";
+import {
   defaultCurrencyForLocale,
   listCalculatorCurrencies,
   numberFormatLocaleForUi,
 } from "@/lib/calculator-currencies";
 import type { Locale } from "@/lib/i18n";
 
-function formatMoney(amount: number, locale: Locale, currency: string) {
+function formatMoney(amountDisplay: number, locale: Locale, currency: string) {
   const loc = numberFormatLocaleForUi(locale);
   try {
     return new Intl.NumberFormat(loc, {
       style: "currency",
       currency,
       maximumFractionDigits: 0,
-    }).format(amount);
+    }).format(amountDisplay);
   } catch {
-    return `${Math.round(amount)} ${currency}`;
+    return `${Math.round(amountDisplay)} ${currency}`;
   }
 }
 
@@ -77,41 +84,23 @@ function CurrencySelect({ value, onChange, label, inputClass, locale }: Currency
 export function TwinRoiCalculator() {
   const { t, locale } = useTranslation();
   const [currency, setCurrency] = useState(() => defaultCurrencyForLocale(locale));
-  const [annualSalary, setAnnualSalary] = useState(60_000);
-  const [agencyFeePercent, setAgencyFeePercent] = useState(15);
-  const [numberOfHires, setNumberOfHires] = useState(50);
-  const [hrHoursSaved, setHrHoursSaved] = useState(100);
-  const [hrHourlyRate, setHrHourlyRate] = useState(50);
-  const [recruiterSeats, setRecruiterSeats] = useState(3);
+  const [inputsUsd, setInputsUsd] = useState(B2B_ROI_DEFAULTS);
+  const [flatInputsUsd, setFlatInputsUsd] = useState(B2B_FLAT_RATE_DEFAULTS);
 
-  const monthlySalary = annualSalary / 12;
-  const agencyFee = annualSalary * (agencyFeePercent / 100);
-  const twinEmployerFee = monthlySalary * 0.5;
-  const candidateBonus = twinEmployerFee * 0.5;
-  const twinNetRevenue = twinEmployerFee * 0.5;
+  const calc = useMemo(() => computeB2bRoi(inputsUsd), [inputsUsd]);
+  const flatCalc = useMemo(() => computeB2bFlatRate(flatInputsUsd), [flatInputsUsd]);
 
-  const savingsPerHire = agencyFee - twinEmployerFee;
-  const savingsPercent = useMemo(() => {
-    if (agencyFee <= 0) return null;
-    return ((savingsPerHire / agencyFee) * 100).toFixed(1);
-  }, [agencyFee, savingsPerHire]);
-  const totalSavings = savingsPerHire * numberOfHires;
+  const money = (usd: number) => formatMoney(convertModelUsdToDisplay(usd, currency), locale, currency);
 
-  const integrationFee = 100_000;
-  const timeValueSavings = hrHoursSaved * hrHourlyRate * 12;
-  const costSavings = savingsPerHire * numberOfHires;
-  const totalEnterpriseValue = timeValueSavings + costSavings;
-  const enterpriseROI =
-    integrationFee > 0 ? (((totalEnterpriseValue - integrationFee) / integrationFee) * 100).toFixed(1) : null;
-
-  const workspaceListSeatUsd = 99.99;
-  const workspaceMonthlyUsd = recruiterSeats * workspaceListSeatUsd;
-  const workspaceAnnualUsd = workspaceMonthlyUsd * 12 * 0.75;
+  const onCurrencyChange = (next: string) => {
+    setCurrency(next);
+  };
 
   const inputClass =
     "w-full min-w-0 rounded border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-3 py-2 text-lg font-semibold text-[var(--foreground)] focus:border-[var(--twin-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--twin-accent)]/20 sm:text-xl";
 
-  const money = (amount: number) => formatMoney(amount, locale, currency);
+  const savingsPercent =
+    calc.savingsPercent !== null ? calc.savingsPercent.toFixed(1) : null;
 
   return (
     <Shell wide rail>
@@ -130,7 +119,7 @@ export function TwinRoiCalculator() {
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             <CurrencySelect
               value={currency}
-              onChange={setCurrency}
+              onChange={onCurrencyChange}
               label={t("calculator.currency")}
               inputClass={inputClass}
               locale={locale}
@@ -142,8 +131,13 @@ export function TwinRoiCalculator() {
               <input
                 type="number"
                 min={1}
-                value={annualSalary}
-                onChange={(e) => setAnnualSalary(Number(e.target.value) || 0)}
+                value={Math.round(convertModelUsdToDisplay(inputsUsd.annualSalaryUsd, currency))}
+                onChange={(e) =>
+                  setInputsUsd({
+                    ...inputsUsd,
+                    annualSalaryUsd: convertDisplayToModelUsd(Number(e.target.value) || 0, currency),
+                  })
+                }
                 className={inputClass}
               />
             </label>
@@ -155,8 +149,8 @@ export function TwinRoiCalculator() {
                 type="number"
                 min={0}
                 max={100}
-                value={agencyFeePercent}
-                onChange={(e) => setAgencyFeePercent(Number(e.target.value) || 0)}
+                value={inputsUsd.agencyFeePercent}
+                onChange={(e) => setInputsUsd({ ...inputsUsd, agencyFeePercent: Number(e.target.value) || 0 })}
                 className={inputClass}
               />
             </label>
@@ -167,8 +161,8 @@ export function TwinRoiCalculator() {
               <input
                 type="number"
                 min={0}
-                value={numberOfHires}
-                onChange={(e) => setNumberOfHires(Number(e.target.value) || 0)}
+                value={inputsUsd.numberOfHires}
+                onChange={(e) => setInputsUsd({ ...inputsUsd, numberOfHires: Number(e.target.value) || 0 })}
                 className={inputClass}
               />
             </label>
@@ -179,8 +173,10 @@ export function TwinRoiCalculator() {
               <input
                 type="number"
                 min={0}
-                value={hrHoursSaved}
-                onChange={(e) => setHrHoursSaved(Number(e.target.value) || 0)}
+                value={inputsUsd.hrHoursSavedPerMonth}
+                onChange={(e) =>
+                  setInputsUsd({ ...inputsUsd, hrHoursSavedPerMonth: Number(e.target.value) || 0 })
+                }
                 className={inputClass}
               />
             </label>
@@ -191,8 +187,13 @@ export function TwinRoiCalculator() {
               <input
                 type="number"
                 min={0}
-                value={hrHourlyRate}
-                onChange={(e) => setHrHourlyRate(Number(e.target.value) || 0)}
+                value={Math.round(convertModelUsdToDisplay(inputsUsd.hrHourlyRateUsd, currency))}
+                onChange={(e) =>
+                  setInputsUsd({
+                    ...inputsUsd,
+                    hrHourlyRateUsd: convertDisplayToModelUsd(Number(e.target.value) || 0, currency),
+                  })
+                }
                 className={inputClass}
               />
             </label>
@@ -210,11 +211,11 @@ export function TwinRoiCalculator() {
             <dl className="space-y-4">
               <div>
                 <dt className="text-sm text-[var(--twin-muted)]">{t("calculator.costPerHire")}</dt>
-                <dd className="text-2xl font-bold text-red-700 sm:text-3xl">{money(agencyFee)}</dd>
+                <dd className="text-2xl font-bold text-red-700 sm:text-3xl">{money(calc.agencyFeePerHireUsd)}</dd>
                 <dd className="text-xs text-[var(--twin-muted)]">
                   {t("calculator.agencyFeeDetail")
-                    .replace("{{annual}}", money(annualSalary))
-                    .replace("{{pct}}", String(agencyFeePercent))}
+                    .replace("{{annual}}", money(inputsUsd.annualSalaryUsd))
+                    .replace("{{pct}}", String(inputsUsd.agencyFeePercent))}
                 </dd>
               </div>
               <div className="border-t border-red-200/80 pt-4">
@@ -227,7 +228,9 @@ export function TwinRoiCalculator() {
               </div>
               <div className="border-t border-red-200/80 pt-4">
                 <dt className="text-sm text-[var(--twin-muted)]">{t("calculator.totalAnnualCost")}</dt>
-                <dd className="text-xl font-bold text-red-700">{money(agencyFee * numberOfHires)}</dd>
+                <dd className="text-xl font-bold text-red-700">
+                  {money(calc.agencyFeePerHireUsd * inputsUsd.numberOfHires)}
+                </dd>
               </div>
             </dl>
           </section>
@@ -242,21 +245,21 @@ export function TwinRoiCalculator() {
             <dl className="space-y-4">
               <div>
                 <dt className="text-sm text-[var(--twin-muted)]">{t("calculator.costPerHire")}</dt>
-                <dd className="text-2xl font-bold text-[var(--twin-accent)] sm:text-3xl">{money(twinEmployerFee)}</dd>
+                <dd className="text-2xl font-bold text-[var(--twin-accent)] sm:text-3xl">{money(calc.twinEmployerFeePerHireUsd)}</dd>
                 <dd className="text-xs text-[var(--twin-muted)]">
-                  {t("calculator.twinFeeDetail").replace("{{monthly}}", money(monthlySalary))}
+                  {t("calculator.twinFeeDetail").replace("{{monthly}}", money(calc.monthlySalaryUsd))}
                 </dd>
               </div>
               <div className="border-t border-[var(--twin-border)] pt-4">
                 <dt className="text-sm text-[var(--twin-muted)]">{t("calculator.placementTakeRate")}</dt>
-                <dd className="text-xl font-bold text-[var(--twin-accent-hover)]">{money(twinNetRevenue)}</dd>
+                <dd className="text-xl font-bold text-[var(--twin-accent-hover)]">{money(calc.twinNetRevenuePerHireUsd)}</dd>
                 <dd className="text-xs text-[var(--twin-muted)]">
-                  {t("calculator.twinNetDetail").replace("{{monthly}}", money(monthlySalary))}
+                  {t("calculator.twinNetDetail").replace("{{monthly}}", money(calc.monthlySalaryUsd))}
                 </dd>
               </div>
               <div className="border-t border-[var(--twin-border)] pt-4">
                 <dt className="text-sm text-[var(--twin-muted)]">{t("calculator.bonusForCandidate")}</dt>
-                <dd className="text-xl font-bold text-[var(--twin-accent)]">{money(candidateBonus)}</dd>
+                <dd className="text-xl font-bold text-[var(--twin-accent)]">{money(calc.candidateBonusPerHireUsd)}</dd>
                 <dd className="text-xs text-[var(--twin-muted)]">{t("calculator.bonusAfter")}</dd>
               </div>
               <div className="border-t border-[var(--twin-border)] pt-4">
@@ -265,7 +268,9 @@ export function TwinRoiCalculator() {
               </div>
               <div className="border-t border-[var(--twin-border)] pt-4">
                 <dt className="text-sm text-[var(--twin-muted)]">{t("calculator.totalAnnualCost")}</dt>
-                <dd className="text-xl font-bold text-[var(--twin-accent)]">{money(twinEmployerFee * numberOfHires)}</dd>
+                <dd className="text-xl font-bold text-[var(--twin-accent)]">
+                  {money(calc.twinEmployerFeePerHireUsd * inputsUsd.numberOfHires)}
+                </dd>
               </div>
             </dl>
           </section>
@@ -274,7 +279,7 @@ export function TwinRoiCalculator() {
         <section className="twin-card-panel--accent mb-6 rounded-2xl p-6 text-center sm:p-8">
           <h2 className="text-xl font-semibold text-[var(--foreground)] sm:text-2xl">{t("calculator.savingsTitle")}</h2>
           <p className="mt-2 text-sm text-[var(--twin-muted)]">{t("calculator.savingsPerHire")}</p>
-          <p className="mt-3 text-4xl font-bold tracking-tight text-[var(--twin-link)] sm:text-5xl">{money(savingsPerHire)}</p>
+          <p className="mt-3 text-4xl font-bold tracking-tight text-[var(--twin-link)] sm:text-5xl">{money(calc.savingsPerHireUsd)}</p>
           {savingsPercent !== null ? (
             <p className="mt-4 inline-block rounded-full bg-[var(--twin-cta)] px-5 py-2 text-sm font-semibold text-[var(--twin-on-cta)] shadow-sm">
               {t("calculator.cheaperBy").replace("{{pct}}", savingsPercent)}
@@ -287,7 +292,7 @@ export function TwinRoiCalculator() {
               <div className="text-xs font-medium uppercase tracking-wide text-[var(--twin-muted)]">
                 {t("calculator.savingsAnnual")}
               </div>
-              <div className="mt-1 text-xl font-bold text-[var(--foreground)]">{money(totalSavings)}</div>
+              <div className="mt-1 text-xl font-bold text-[var(--foreground)]">{money(calc.totalSavingsUsd)}</div>
             </div>
             <div className="twin-card-inset rounded-lg p-4">
               <div className="text-xs font-medium uppercase tracking-wide text-[var(--twin-muted)]">
@@ -303,7 +308,7 @@ export function TwinRoiCalculator() {
         <div className="mb-6 grid gap-5 md:grid-cols-2">
           <section className="twin-card-panel rounded-xl border border-[var(--twin-border)] p-5 sm:p-6">
             <h3 className="text-lg font-semibold text-[var(--foreground)]">{t("calculator.candidateCardTitle")}</h3>
-            <p className="mt-3 text-3xl font-bold text-[var(--twin-link)]">{money(candidateBonus)}</p>
+            <p className="mt-3 text-3xl font-bold text-[var(--twin-link)]">{money(calc.candidateBonusPerHireUsd)}</p>
             <p className="mt-1 text-sm text-[var(--twin-muted)]">{t("calculator.candidateCardSub")}</p>
             <ul className="mt-4 space-y-2 border-t border-[var(--twin-border)] pt-4 text-sm text-[var(--twin-muted-strong)]">
               <li>{t("calculator.candidateB1")}</li>
@@ -313,7 +318,7 @@ export function TwinRoiCalculator() {
           </section>
           <section className="twin-card-panel rounded-xl border border-[var(--twin-border)] p-5 sm:p-6">
             <h3 className="text-lg font-semibold text-[var(--foreground)]">{t("calculator.companyCardTitle")}</h3>
-            <p className="mt-3 text-3xl font-bold text-[var(--twin-cta)]">{money(savingsPerHire)}</p>
+            <p className="mt-3 text-3xl font-bold text-[var(--twin-cta)]">{money(calc.savingsPerHireUsd)}</p>
             <p className="mt-1 text-sm text-[var(--twin-muted)]">{t("calculator.companyCardSub")}</p>
             <ul className="mt-4 space-y-2 border-t border-[var(--twin-border)] pt-4 text-sm text-[var(--twin-muted-strong)]">
               <li>{t("calculator.companyB1")}</li>
@@ -342,8 +347,13 @@ export function TwinRoiCalculator() {
                   type="number"
                   min={1}
                   step={1}
-                  value={recruiterSeats}
-                  onChange={(e) => setRecruiterSeats(Math.max(1, Math.floor(Number(e.target.value)) || 1))}
+                  value={inputsUsd.recruiterSeats}
+                  onChange={(e) =>
+                    setInputsUsd({
+                      ...inputsUsd,
+                      recruiterSeats: Math.max(1, Math.floor(Number(e.target.value)) || 1),
+                    })
+                  }
                   className={inputClass}
                 />
               </label>
@@ -354,17 +364,13 @@ export function TwinRoiCalculator() {
                 <div className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
                   {t("calculator.workspaceMonthlyTotal")}
                 </div>
-                <p className="mt-1 text-2xl font-bold text-[var(--twin-link)]">
-                  {money(workspaceMonthlyUsd)}
-                </p>
+                <p className="mt-1 text-2xl font-bold text-[var(--twin-link)]">{money(calc.workspaceMonthlyUsd)}</p>
               </div>
               <div>
                 <div className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
                   {t("calculator.workspaceAnnualTotal")}
                 </div>
-                <p className="mt-1 text-2xl font-bold text-[var(--twin-link)]">
-                  {money(workspaceAnnualUsd)}
-                </p>
+                <p className="mt-1 text-2xl font-bold text-[var(--twin-link)]">{money(calc.workspaceAnnualUsd)}</p>
                 <p className="mt-1 text-xs text-[var(--twin-muted)]">{t("calculator.workspaceAnnualPrepayNote")}</p>
               </div>
             </div>
@@ -381,6 +387,128 @@ export function TwinRoiCalculator() {
           <p className="mt-5 text-xs leading-relaxed text-[var(--twin-muted)]">{t("calculator.workspaceFoot")}</p>
         </section>
 
+        <section
+          id="flat-rate"
+          className="twin-card-panel mb-6 rounded-2xl border border-[var(--twin-border)] p-5 sm:p-8"
+        >
+          <h2 className="twin-section-title mb-2 text-lg sm:text-xl">{t("calculator.flatRateTitle")}</h2>
+          <p className="mb-6 max-w-3xl text-sm leading-relaxed text-[var(--twin-muted-strong)]">
+            {t("calculator.flatRateLead")}
+          </p>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <label className="block">
+              <span className="mb-1.5 block text-sm font-medium text-[var(--twin-muted-strong)]">
+                {t("calculator.flatRateHeadcount")}
+              </span>
+              <input
+                type="number"
+                min={0}
+                value={flatInputsUsd.headcount}
+                onChange={(e) =>
+                  setFlatInputsUsd({ ...flatInputsUsd, headcount: Number(e.target.value) || 0 })
+                }
+                className={inputClass}
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1.5 block text-sm font-medium text-[var(--twin-muted-strong)]">
+                {t("calculator.flatRateRotation")}
+              </span>
+              <input
+                type="number"
+                min={0}
+                max={1}
+                step={0.01}
+                value={flatInputsUsd.rotationRate}
+                onChange={(e) =>
+                  setFlatInputsUsd({ ...flatInputsUsd, rotationRate: Number(e.target.value) || 0 })
+                }
+                className={inputClass}
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1.5 block text-sm font-medium text-[var(--twin-muted-strong)]">
+                {t("calculator.flatRateVacancies")}
+              </span>
+              <input
+                type="number"
+                min={0}
+                placeholder="auto"
+                value={flatInputsUsd.vacancies ?? ""}
+                onChange={(e) => {
+                  const raw = e.target.value;
+                  setFlatInputsUsd({
+                    ...flatInputsUsd,
+                    vacancies: raw === "" ? null : Math.max(0, Number(raw) || 0),
+                  });
+                }}
+                className={inputClass}
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1.5 block text-sm font-medium text-[var(--twin-muted-strong)]">
+                {t("calculator.flatRateVacancyCost")}
+              </span>
+              <input
+                type="number"
+                min={0}
+                value={Math.round(convertModelUsdToDisplay(flatInputsUsd.costPerVacancyUsd, currency))}
+                onChange={(e) =>
+                  setFlatInputsUsd({
+                    ...flatInputsUsd,
+                    costPerVacancyUsd: convertDisplayToModelUsd(Number(e.target.value) || 0, currency),
+                  })
+                }
+                className={inputClass}
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1.5 block text-sm font-medium text-[var(--twin-muted-strong)]">
+                {t("calculator.flatRateRatio")}
+              </span>
+              <input
+                type="number"
+                min={0}
+                max={100}
+                value={Math.round(flatInputsUsd.flatRateRatio * 100)}
+                onChange={(e) =>
+                  setFlatInputsUsd({
+                    ...flatInputsUsd,
+                    flatRateRatio: (Number(e.target.value) || 0) / 100,
+                  })
+                }
+                className={inputClass}
+              />
+            </label>
+          </div>
+          <dl className="mt-8 grid gap-4 sm:grid-cols-3">
+            <div className="twin-card-inset rounded-lg p-4">
+              <dt className="text-sm text-[var(--twin-muted)]">{t("calculator.flatRateTraditional")}</dt>
+              <dd className="mt-1 text-2xl font-bold text-red-700">{money(flatCalc.traditionalTotalUsd)}</dd>
+              <dd className="mt-1 text-xs text-[var(--twin-muted)]">
+                {t("calculator.flatRateVacanciesDetail")
+                  .replace("{{count}}", String(flatCalc.vacancies))
+                  .replace(
+                    "{{cost}}",
+                    money(flatInputsUsd.costPerVacancyUsd),
+                  )}
+              </dd>
+            </div>
+            <div className="twin-card-inset rounded-lg p-4">
+              <dt className="text-sm text-[var(--twin-muted)]">{t("calculator.flatRateTwin")}</dt>
+              <dd className="mt-1 text-2xl font-bold text-[var(--twin-link)]">{money(flatCalc.flatRateTotalUsd)}</dd>
+            </div>
+            <div className="twin-card-inset rounded-lg p-4">
+              <dt className="text-sm text-[var(--twin-muted)]">{t("calculator.flatRateSavings")}</dt>
+              <dd className="mt-1 text-2xl font-bold text-[var(--twin-cta)]">{money(flatCalc.savingsUsd)}</dd>
+              {flatCalc.savingsPercent !== null ? (
+                <dd className="mt-1 text-xs text-[var(--twin-muted)]">{flatCalc.savingsPercent.toFixed(0)}%</dd>
+              ) : null}
+            </div>
+          </dl>
+          <p className="mt-5 text-xs leading-relaxed text-[var(--twin-muted)]">{t("calculator.flatRateFoot")}</p>
+        </section>
+
         <section className="twin-card-panel rounded-2xl border border-amber-200/80 bg-gradient-to-b from-amber-50/50 to-[var(--twin-card)] p-5 sm:p-8">
           <h2 className="twin-section-title mb-6 text-lg sm:text-xl">{t("calculator.enterpriseTitle")}</h2>
           <div className="grid gap-6 md:grid-cols-2">
@@ -391,7 +519,7 @@ export function TwinRoiCalculator() {
               <div className="twin-card-inset rounded-lg p-4">
                 <div className="text-sm text-[var(--twin-muted)]">{t("calculator.integrationFee")}</div>
                 <div className="mt-1 text-2xl font-bold text-red-700">
-                  {money(integrationFee)}
+                  {money(calc.integrationFeeUsd)}
                   <span className="text-base font-medium text-[var(--twin-muted)]">{t("calculator.perYear")}</span>
                 </div>
               </div>
@@ -403,21 +531,21 @@ export function TwinRoiCalculator() {
               <div className="space-y-3">
                 <div className="twin-card-inset rounded-lg p-4">
                   <div className="text-sm text-[var(--twin-muted)]">{t("calculator.timeSavings")}</div>
-                  <div className="mt-1 text-xl font-bold text-[var(--twin-link)]">{money(timeValueSavings)}</div>
+                  <div className="mt-1 text-xl font-bold text-[var(--twin-link)]">{money(calc.timeValueSavingsUsd)}</div>
                   <div className="text-xs text-[var(--twin-muted)]">
                     {t("calculator.timeSavingsSub")
-                      .replace("{{hours}}", String(hrHoursSaved))
-                      .replace("{{rate}}", String(hrHourlyRate))
+                      .replace("{{hours}}", String(inputsUsd.hrHoursSavedPerMonth))
+                      .replace("{{rate}}", String(Math.round(convertModelUsdToDisplay(inputsUsd.hrHourlyRateUsd, currency))))
                       .replace("{{code}}", currency)}
                   </div>
                 </div>
                 <div className="twin-card-inset rounded-lg p-4">
                   <div className="text-sm text-[var(--twin-muted)]">{t("calculator.hireCostSavings")}</div>
-                  <div className="mt-1 text-xl font-bold text-[var(--twin-link)]">{money(costSavings)}</div>
+                  <div className="mt-1 text-xl font-bold text-[var(--twin-link)]">{money(calc.costSavingsUsd)}</div>
                   <div className="text-xs text-[var(--twin-muted)]">
                     {t("calculator.hireCostSavingsSub")
-                      .replace("{{perHire}}", money(savingsPerHire))
-                      .replace("{{hires}}", String(numberOfHires))}
+                      .replace("{{perHire}}", money(calc.savingsPerHireUsd))
+                      .replace("{{hires}}", String(inputsUsd.numberOfHires))}
                   </div>
                 </div>
               </div>
@@ -430,19 +558,21 @@ export function TwinRoiCalculator() {
                 <div className="twin-roi-enterprise-strip-muted text-xs font-medium uppercase tracking-wide">
                   {t("calculator.totalValue")}
                 </div>
-                <div className="mt-1 text-2xl font-bold">{money(totalEnterpriseValue)}</div>
+                <div className="mt-1 text-2xl font-bold">{money(calc.totalEnterpriseValueUsd)}</div>
               </div>
               <div>
                 <div className="twin-roi-enterprise-strip-muted text-xs font-medium uppercase tracking-wide">
                   {t("calculator.netBenefit")}
                 </div>
-                <div className="mt-1 text-2xl font-bold">{money(totalEnterpriseValue - integrationFee)}</div>
+                <div className="mt-1 text-2xl font-bold">{money(calc.netBenefitUsd)}</div>
               </div>
               <div>
                 <div className="twin-roi-enterprise-strip-muted text-xs font-medium uppercase tracking-wide">
                   {t("calculator.roiLabel")}
                 </div>
-                <div className="mt-1 text-2xl font-bold">{enterpriseROI !== null ? `${enterpriseROI}%` : "—"}</div>
+                <div className="mt-1 text-2xl font-bold">
+                  {calc.enterpriseRoiPercent !== null ? `${calc.enterpriseRoiPercent.toFixed(1)}%` : "—"}
+                </div>
               </div>
             </div>
           </div>

@@ -77,17 +77,17 @@ export function CandidateRewardsBand({ variant = "home" }: { variant?: "home" | 
       }`}
       aria-labelledby="candidate-rewards-heading"
     >
-      <div className={variant === "home" ? "mx-auto max-w-6xl px-4 sm:px-6" : ""}>
+      <div className={variant === "home" ? "marketing-home-rail" : ""}>
         <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-on-accent)]/80">
           {t("candidateRewards.eyebrow")}
         </p>
         <h2
           id="candidate-rewards-heading"
-          className="mt-3 max-w-4xl text-xl font-semibold tracking-[-0.03em] sm:text-2xl md:text-3xl"
+          className="marketing-home-headline mt-3 text-xl font-semibold tracking-[-0.03em] sm:text-2xl md:text-3xl"
         >
           {t("candidateRewards.headline")}
         </h2>
-        <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[var(--twin-on-accent)]/90 sm:text-base">
+        <p className="marketing-home-lede mt-3 text-sm leading-relaxed text-[var(--twin-on-accent)]/90 sm:text-base">
           {t("candidateRewards.lead")}
         </p>
 
@@ -128,8 +128,8 @@ export function CandidateRewardsBand({ variant = "home" }: { variant?: "home" | 
           </table>
         </div>
 
-        <p className="mt-4 max-w-3xl text-xs leading-relaxed text-[var(--twin-on-accent)]/80">{t("candidateRewards.mechanicsNote")}</p>
-        <p className="mt-2 max-w-3xl text-xs leading-relaxed text-[var(--twin-on-accent)]/75">{t("candidateRewards.disclaimer")}</p>
+        <p className="marketing-home-lede mt-4 text-xs leading-relaxed text-[var(--twin-on-accent)]/80">{t("candidateRewards.mechanicsNote")}</p>
+        <p className="marketing-home-lede mt-2 text-xs leading-relaxed text-[var(--twin-on-accent)]/75">{t("candidateRewards.disclaimer")}</p>
         <p className="mt-1 text-[11px] text-[var(--twin-on-accent)]/70">{t("candidateRewards.fraudLine")}</p>
 
         <div className="mt-6 flex flex-wrap gap-x-4 gap-y-2 text-sm font-semibold">

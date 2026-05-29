@@ -5,35 +5,49 @@ import threading
 from collections.abc import Callable
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from datetime import datetime, timedelta
+
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, status
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.core.deps import get_current_user, require_scrape_user
-from app.database.models import Candidate, Job, SavedJob, User
+from app.limiter import limiter, user_or_ip_key
+from app.core.plans import count_tracked_applications, effective_plan_tier, max_tracked_applications
+from app.database.models import Application, ApplicationStatus, Candidate, Job, SavedJob, SubmissionStatus, User
+from app.services.application_submission import record_submission_one_click
 from app.database.session import get_db
 from app.matching.matcher import calculate_match_score
 from app.schemas.company_intelligence import CompanyIntelBodyOut, CompanyIntelOut, InsiderLanguageOut
 from app.schemas.job import (
     BoardListOut,
     BoardScrapeResult,
+    JobFeedStatsOut,
     JobFiltersOut,
     JobListOut,
     JobOut,
     ScrapeAllOut,
     ScrapeTaskOut,
 )
+from app.schemas.job_competitive import JobApplyStatsOut, JobDetailOut, OneClickApplyOut, SkillMatchOut
 from app.services.company_intelligence import research_company_for_job
+from app.services.job_api_enrichment import job_detail_out, job_out, score_for_candidate
 from app.services.job_query import SORT_COMPANY, SORT_NEWEST, SORT_SALARY, apply_job_filters, job_filter_options
+from app.services.market_coverage import build_market_coverage_report
 from app.services.matching_service import candidate_to_dict, job_to_dict
+from app.services.request_locale import locale_from_request
+from app.services.skill_matcher import compute_skill_match
 from app.scrapers.registry import GLOBAL_BOARD_SPECS, list_boards
 from app.tasks.scrape_tasks import (
     GLOBAL_BOARD_SCRAPE_TASKS,
+    GREENHOUSE_SCRAPE_TASKS,
     scrape_all_boards_task,
     scrape_justjoin_task,
     scrape_linkedin_sales_task,
     scrape_linkedin_task,
     scrape_praca_task,
+    scrape_pracuj_cities_task,
     scrape_pracuj_sales_task,
     scrape_pracuj_task,
     scrape_rocketjobs_roles_task,
@@ -111,6 +125,7 @@ def _celery_delay(task, *args, **kwargs):
 
 LOCAL_SCRAPE_HANDLERS = {
     "pracuj": scrape_pracuj_task,
+    "pracuj-cities": scrape_pracuj_cities_task,
     "rocketjobs": scrape_rocketjobs_task,
     "pracuj-sales": scrape_pracuj_sales_task,
     "rocketjobs-sales": scrape_rocketjobs_sales_task,
@@ -121,7 +136,11 @@ LOCAL_SCRAPE_HANDLERS = {
     "linkedin-sales": scrape_linkedin_sales_task,
 }
 
-PER_BOARD_SCRAPE_HANDLERS = {**LOCAL_SCRAPE_HANDLERS, **GLOBAL_BOARD_SCRAPE_TASKS}
+PER_BOARD_SCRAPE_HANDLERS = {
+    **LOCAL_SCRAPE_HANDLERS,
+    **GLOBAL_BOARD_SCRAPE_TASKS,
+    **GREENHOUSE_SCRAPE_TASKS,
+}
 
 
 @router.get("/boards", response_model=BoardListOut)
@@ -159,6 +178,20 @@ def list_jobs(
         ),
     ] = None,
     sort: Annotated[str, Query(description=f"Sort order: `{SORT_NEWEST}`, `{SORT_SALARY}`, or `{SORT_COMPANY}`.")] = SORT_NEWEST,
+    opportunity_type: Annotated[
+        str | None,
+        Query(description="Filter by opportunity type: full_time, freelance, contract, or all."),
+    ] = None,
+    active_feed_only: Annotated[
+        bool,
+        Query(
+            description="When true (default), only listings scraped within job_feed_active_days (45).",
+        ),
+    ] = True,
+    active_within_days: Annotated[
+        int | None,
+        Query(ge=1, le=120, description="Override active window in days (default from settings)."),
+    ] = None,
     db: Session = Depends(get_db),
     _user: User = Depends(get_current_user),
 ) -> JobListOut:
@@ -179,7 +212,10 @@ def list_jobs(
         job_board=job_board,
         min_salary=min_salary,
         title_terms=title_terms,
+        opportunity_type=opportunity_type,
         sort=sort,
+        active_feed_only=active_feed_only,
+        active_within_days=active_within_days,
     )
     total = query.count()
     if total == 0 and min_salary is not None and min_salary > 0:
@@ -191,27 +227,181 @@ def list_jobs(
             job_board=job_board,
             min_salary=None,
             title_terms=title_terms,
+            opportunity_type=opportunity_type,
             sort=sort,
+            active_feed_only=active_feed_only,
+            active_within_days=active_within_days,
         )
         total = query.count()
     items = query.offset(skip).limit(limit).all()
 
     candidate = db.query(Candidate).filter(Candidate.user_id == _user.id).first()
-    cand_dict = candidate_to_dict(candidate) if candidate else None
     out_items: list[JobOut] = []
     for job in items:
-        base = JobOut.model_validate(job, from_attributes=True)
-        if cand_dict is None:
-            out_items.append(base)
-            continue
-        raw = float(calculate_match_score(cand_dict, job_to_dict(job)))
-        out_items.append(base.model_copy(update={"score": raw}))
+        sc = score_for_candidate(job, candidate)
+        out_items.append(job_out(job, score=sc))
 
     return JobListOut(items=out_items, total=total, search_relaxed=search_relaxed)
 
 
+@router.get("/feed-stats", response_model=JobFeedStatsOut)
+def job_feed_stats(
+    db: Session = Depends(get_db),
+    _user: User = Depends(get_current_user),
+) -> JobFeedStatsOut:
+    """Lightweight active-feed counters (validated + scraped within job_feed_active_days)."""
+    from app.services.market_coverage_status import feed_stale_hours_threshold, market_update_label
+    from app.services.scrape_run_tracking import last_scrape_run_at
+
+    report = build_market_coverage_report(db)
+    last_at = last_scrape_run_at()
+    stale = False
+    if last_at:
+        from app.services.market_coverage_status import _parse_run_ts
+        from datetime import datetime, timezone
+
+        last_dt = _parse_run_ts(last_at)
+        if last_dt:
+            hours = (datetime.now(timezone.utc) - last_dt).total_seconds() / 3600.0
+            stale = hours > feed_stale_hours_threshold()
+    elif int(report.get("active_validated_jobs") or 0) == 0:
+        stale = True
+    return JobFeedStatsOut(
+        active_validated_jobs=int(report["active_validated_jobs"]),
+        validated_jobs_total=int(report["validated_jobs_total"]),
+        job_feed_active_days=int(report["job_feed_active_days"]),
+        fresh_jobs_24h=int(report["fresh_jobs_24h"]),
+        fresh_jobs_7d=int(report["fresh_jobs_7d"]),
+        active_jobs_by_source=dict(report.get("active_jobs_by_source") or {}),
+        last_scrape_run_at=last_at,
+        feed_stale=stale,
+        market_update_label=market_update_label(last_at),
+    )
+
+
+@router.get("/{job_id}", response_model=JobDetailOut)
+def get_job(
+    job_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> JobDetailOut:
+    job = db.query(Job).filter(Job.id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+    candidate = db.query(Candidate).filter(Candidate.user_id == user.id).first()
+    return job_detail_out(job, score=score_for_candidate(job, candidate))
+
+
+@router.get("/{job_id}/match-score", response_model=SkillMatchOut)
+def get_job_match_score(
+    job_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> SkillMatchOut:
+    job = db.query(Job).filter(Job.id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+    candidate = db.query(Candidate).filter(Candidate.user_id == user.id).first()
+    if not candidate:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Candidate profile required")
+    result = compute_skill_match(candidate_to_dict(candidate), job_to_dict(job))
+    return SkillMatchOut(job_id=job_id, **result)
+
+
+@router.get("/{job_id}/apply-stats", response_model=JobApplyStatsOut)
+def get_job_apply_stats(
+    job_id: int,
+    db: Session = Depends(get_db),
+    _user: User = Depends(get_current_user),
+) -> JobApplyStatsOut:
+    job = db.query(Job).filter(Job.id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+    total = (
+        db.query(func.count(Application.id))
+        .filter(
+            Application.job_id == job_id,
+            Application.submission_status == SubmissionStatus.EXTERNAL_SUBMIT_CONFIRMED,
+        )
+        .scalar()
+        or 0
+    )
+    week_ago = datetime.utcnow() - timedelta(days=7)
+    recent = (
+        db.query(func.count(Application.id))
+        .filter(
+            Application.job_id == job_id,
+            Application.submission_status == SubmissionStatus.EXTERNAL_SUBMIT_CONFIRMED,
+            Application.submitted_at >= week_ago,
+        )
+        .scalar()
+        or 0
+    )
+    return JobApplyStatsOut(job_id=job_id, apply_count=int(total), recent_applies_7d=int(recent))
+
+
+@router.post("/{job_id}/one-click-apply", response_model=OneClickApplyOut)
+def one_click_apply(
+    job_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+    locale: str = Depends(locale_from_request),
+) -> OneClickApplyOut:
+    """Track application as applied using stored profile — no external form fill."""
+    job = db.query(Job).filter(Job.id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+    candidate = db.query(Candidate).filter(Candidate.user_id == user.id).first()
+    if not candidate:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Candidate profile required")
+
+    existing = (
+        db.query(Application)
+        .filter(Application.candidate_id == candidate.id, Application.job_id == job_id)
+        .first()
+    )
+    if existing:
+        msg = "Already tracked for this role." if locale.startswith("en") else "Ta oferta jest już w Twoim pipeline."
+        return OneClickApplyOut(
+            application_id=existing.id,
+            status=existing.status.value,
+            message=msg,
+            already_applied=True,
+        )
+
+    tier = effective_plan_tier(user)
+    cap = max_tracked_applications(tier)
+    if cap is not None and count_tracked_applications(db, candidate.id) >= cap:
+        detail = (
+            f"Free plan supports up to {cap} active tracked applications."
+            if locale.startswith("en")
+            else f"Plan Free: maks. {cap} aktywnych aplikacji."
+        )
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=detail)
+
+    app = Application(
+        candidate_id=candidate.id,
+        job_id=job_id,
+        status=ApplicationStatus.PENDING,
+        notes="One-click apply via TWIN profile",
+        applied_at=None,
+    )
+    db.add(app)
+    record_submission_one_click(app, job=job)
+    db.commit()
+    db.refresh(app)
+    msg = (
+        "Application prepared in TWIN — open the job link to submit on the employer site."
+        if locale.startswith("en")
+        else "Aplikacja przygotowana w TWIN — otwórz link oferty, aby wysłać u pracodawcy."
+    )
+    return OneClickApplyOut(application_id=app.id, status=app.status.value, message=msg)
+
+
 @router.post("/saved/{job_id}")
+@limiter.limit("30/minute", key_func=user_or_ip_key)
 def save_job(
+    request: Request,
     job_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -235,7 +425,9 @@ def save_job(
 
 
 @router.delete("/saved/{job_id}")
+@limiter.limit("30/minute", key_func=user_or_ip_key)
 def unsave_job(
+    request: Request,
     job_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -272,9 +464,8 @@ def get_saved_jobs(
     cand_dict = candidate_to_dict(candidate)
     out: list[JobOut] = []
     for job in rows:
-        base = JobOut.model_validate(job, from_attributes=True)
-        raw = float(calculate_match_score(cand_dict, job_to_dict(job)))
-        out.append(base.model_copy(update={"score": raw}))
+        sc = float(calculate_match_score(cand_dict, job_to_dict(job)))
+        out.append(job_out(job, score=sc))
     return out
 
 

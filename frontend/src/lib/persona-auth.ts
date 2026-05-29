@@ -9,7 +9,7 @@ export type LoginZone = MarketingPersona;
 export const LOGIN_PATH: Record<LoginZone, string> = {
   candidate: "/login/candidate",
   recruiter: "/login/recruiter",
-  company: "/companies/signup",
+  company: "/login/company",
   investor: "/login/investor",
 };
 
@@ -42,6 +42,7 @@ export function loginZoneFromPath(pathname: string): LoginZone | null {
   if (base === "/login/candidate" || base === "/register/candidate") return "candidate";
   if (base === "/login/recruiter" || base === "/register/recruiter") return "recruiter";
   if (base === "/login/investor" || base === "/register/investor") return "investor";
+  if (base === "/login/company") return "company";
   if (base === "/companies/signup") return "company";
   return null;
 }

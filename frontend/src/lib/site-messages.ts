@@ -119,6 +119,7 @@ export const SITE_MESSAGES_EN = {
   companySignupFailed: "Something went wrong.",
   companySignupBackCompanies: "Back to companies overview",
   companySignupCompareAgencies: "TWIN vs agencies",
+  companySignupHaveAccount: "Already have access? Log in",
 
   faqPageTitle: "FAQ",
   faqPageLead:
@@ -140,6 +141,7 @@ export const SITE_MESSAGES_EN = {
   footerCandidateRegister: "Candidate registration",
   footerRecruiterLogin: "Recruiter log in",
   footerInvestorLogin: "Investor log in",
+  footerCompanyLogin: "Company log in",
   footerCompanySignup: "Company program signup",
   footerCookieSettings: "Cookie settings",
   footerRights: "© 2026 TWIN. All rights reserved.",
@@ -300,6 +302,7 @@ export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } 
   companySignupFailed: "Coś poszło nie tak.",
   companySignupBackCompanies: "Wróć do opisu dla firm",
   companySignupCompareAgencies: "TWIN vs agencje",
+  companySignupHaveAccount: "Masz już dostęp? Zaloguj się",
 
   faqPageTitle: "FAQ",
   faqPageLead:
@@ -321,6 +324,7 @@ export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } 
   footerCandidateRegister: "Rejestracja kandydata",
   footerRecruiterLogin: "Logowanie rekrutera",
   footerInvestorLogin: "Logowanie inwestora",
+  footerCompanyLogin: "Logowanie firmy",
   footerCompanySignup: "Rejestracja programu firmowego",
   footerCookieSettings: "Ustawienia plików cookie",
   footerRights: "© 2026 TWIN. Wszelkie prawa zastrzeżone.",

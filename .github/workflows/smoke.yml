@@ -1,0 +1,73 @@
+name: smoke
+
+on:
+
+  push:
+
+    branches:
+
+      - cursor/phase1-monorepo-scaffold
+
+      - main
+
+    paths-ignore:
+
+      - docs/**
+
+      - "**/*.md"
+
+  pull_request:
+
+    paths-ignore:
+
+      - docs/**
+
+      - "**/*.md"
+
+jobs:
+  backend-smoke:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - run: pip install -r requirements.txt
+      - run: |
+          pytest tests/test_health_features.py \
+            tests/test_public_mvp_stats.py \
+            tests/test_stripe_tier_mapping.py \
+            tests/test_rocketjobs_parser.py \
+            tests/test_recruiter_inbox.py \
+            tests/test_nightly_auto_apply_mail.py \
+            tests/test_ops_demo_refresh.py \
+            -q
+
+  frontend-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run build
+
+  prod-health:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/cursor/phase1-monorepo-scaffold'
+    runs-on: ubuntu-latest
+    needs: [backend-smoke, frontend-build]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prod API + frontend smoke
+        run: chmod +x scripts/verify-prod-health.sh && ./scripts/verify-prod-health.sh

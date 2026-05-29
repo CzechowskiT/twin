@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
 from app.core.deps import get_current_user
+from app.limiter import limiter
 from app.database.models import User
 from app.schemas.integrations_ats import (
     AtsConnectOut,
@@ -145,7 +146,9 @@ def ats_oauth_connect(
 
 
 @router.get("/ats/greenhouse/callback")
+@limiter.limit("10/minute")
 def greenhouse_oauth_callback(
+    request: Request,
     code: str | None = Query(default=None),
     state: str | None = Query(default=None),
     error: str | None = Query(default=None),

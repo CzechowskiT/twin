@@ -2,11 +2,14 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Input, Label, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
+
+const MAX_VISIBLE_MILESTONES = 40;
 
 type Ideal = {
   target_role_titles: string[];
@@ -50,9 +53,31 @@ function splitCsv(s: string): string[] {
     .filter(Boolean);
 }
 
+function applyIdealToForm(d: CompassResponse, setters: {
+  setRoles: (v: string) => void;
+  setSalary: (v: string) => void;
+  setFormats: (v: string) => void;
+  setTools: (v: string) => void;
+  setResp: (v: string) => void;
+  setIndustries: (v: string) => void;
+  setLocation: (v: string) => void;
+  setHorizon: (v: string) => void;
+}) {
+  if (!d.ideal) return;
+  setters.setRoles(d.ideal.target_role_titles.join(", "));
+  setters.setSalary(d.ideal.target_salary_gross_monthly_pln != null ? String(d.ideal.target_salary_gross_monthly_pln) : "");
+  setters.setFormats(d.ideal.work_formats.join(", "));
+  setters.setTools(d.ideal.must_have_tools.join(", "));
+  setters.setResp(d.ideal.key_responsibilities || "");
+  setters.setIndustries(d.ideal.industries.join(", "));
+  setters.setLocation(d.ideal.location_preferences || "");
+  setters.setHorizon(String(d.ideal.target_horizon_months || 12));
+}
+
 export default function CareerCompassPage() {
   const router = useRouter();
   const { t } = useTranslation();
+  const loadOnce = useRef(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,23 +92,21 @@ export default function CareerCompassPage() {
   const [horizon, setHorizon] = useState("12");
   const [regenerate, setRegenerate] = useState(true);
   const [toggleBusy, setToggleBusy] = useState<string | null>(null);
+  const [showAllMilestones, setShowAllMilestones] = useState(false);
+
+  const formSetters = useMemo(
+    () => ({ setRoles, setSalary, setFormats, setTools, setResp, setIndustries, setLocation, setHorizon }),
+    [],
+  );
 
   const load = useCallback(async () => {
     const token = getToken();
-    if (!token) return;
+    if (!token) return null;
     const d = await apiFetch<CompassResponse>("/api/v1/candidates/me/career-compass", {}, token);
     setData(d);
-    if (d.ideal) {
-      setRoles(d.ideal.target_role_titles.join(", "));
-      setSalary(d.ideal.target_salary_gross_monthly_pln != null ? String(d.ideal.target_salary_gross_monthly_pln) : "");
-      setFormats(d.ideal.work_formats.join(", "));
-      setTools(d.ideal.must_have_tools.join(", "));
-      setResp(d.ideal.key_responsibilities || "");
-      setIndustries(d.ideal.industries.join(", "));
-      setLocation(d.ideal.location_preferences || "");
-      setHorizon(String(d.ideal.target_horizon_months || 12));
-    }
-  }, []);
+    applyIdealToForm(d, formSetters);
+    return d;
+  }, [formSetters]);
 
   useEffect(() => {
     const token = getToken();
@@ -91,11 +114,36 @@ export default function CareerCompassPage() {
       router.replace("/login");
       return;
     }
-    setLoading(true);
-    load()
-      .catch((e) => setError(e instanceof Error ? e.message : "Error"))
-      .finally(() => setLoading(false));
-  }, [router, load]);
+    if (loadOnce.current) return;
+    loadOnce.current = true;
+    queueMicrotask(() => {
+      void load()
+        .catch((e) => setError(e instanceof Error ? e.message : t("dashboard.identityError")))
+        .finally(() => setLoading(false));
+    });
+  }, [router, load, t]);
+
+  const visiblePhases = useMemo(() => {
+    const phases = data?.path?.phases ?? [];
+    if (showAllMilestones) return phases;
+    let count = 0;
+    const out: Phase[] = [];
+    for (const ph of phases) {
+      const remaining = MAX_VISIBLE_MILESTONES - count;
+      if (remaining <= 0) break;
+      const milestones = ph.milestones.slice(0, remaining);
+      count += milestones.length;
+      out.push({ ...ph, milestones });
+    }
+    return out;
+  }, [data?.path?.phases, showAllMilestones]);
+
+  const totalMilestoneCount = useMemo(
+    () => (data?.path?.phases ?? []).reduce((n, ph) => n + ph.milestones.length, 0),
+    [data?.path?.phases],
+  );
+
+  const milestonesTruncated = !showAllMilestones && totalMilestoneCount > MAX_VISIBLE_MILESTONES;
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -124,6 +172,8 @@ export default function CareerCompassPage() {
         token,
       );
       setData(d);
+      applyIdealToForm(d, formSetters);
+      setShowAllMilestones(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Save failed");
     } finally {
@@ -153,7 +203,7 @@ export default function CareerCompassPage() {
   async function clearCompass() {
     const token = getToken();
     if (!token) return;
-    if (!globalThis.confirm("Clear career compass?")) return;
+    if (!globalThis.confirm(t("dashboard.careerCompassDeleteConfirm"))) return;
     setSaving(true);
     setError(null);
     try {
@@ -167,6 +217,7 @@ export default function CareerCompassPage() {
       setIndustries("");
       setLocation("");
       setHorizon("12");
+      setShowAllMilestones(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Delete failed");
     } finally {
@@ -190,16 +241,18 @@ export default function CareerCompassPage() {
 
   return (
     <Shell wide rail>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <div className="mb-4 flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <h1 className="twin-section-title text-xl sm:text-2xl">{t("dashboard.careerCompassPageTitle")}</h1>
-        <div className="flex flex-wrap gap-3 text-sm">
-          <Link href="/dashboard" className="twin-link">
-            {t("profile.backToDashboard")}
-          </Link>
-          <Link href="/profile" className="twin-link">
-            {t("nav.profile")}
-          </Link>
-        </div>
+        <CandidateWorkspaceSubnav ariaLabel={t("dashboard.careerCompassPageTitle")} />
+      </div>
+
+      <div className="mb-4 flex flex-wrap gap-3 text-sm">
+        <Link href="/dashboard" className="twin-link">
+          {t("profile.backToDashboard")}
+        </Link>
+        <Link href="/profile" className="twin-link">
+          {t("nav.profile")}
+        </Link>
       </div>
 
       <Card variant="soft" className="mb-6">
@@ -224,7 +277,13 @@ export default function CareerCompassPage() {
         ) : null}
       </Card>
 
-      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+      {error ? <p className="mb-4 text-sm text-red-600">{error}</p> : null}
+
+      {!data?.configured && !path ? (
+        <Card variant="soft" className="mb-6">
+          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.careerCompassNotConfigured")}</p>
+        </Card>
+      ) : null}
 
       {snap && data?.configured ? (
         <Card className="mb-6">
@@ -257,11 +316,11 @@ export default function CareerCompassPage() {
         </Card>
       ) : null}
 
-      {path?.phases?.length ? (
+      {visiblePhases.length > 0 ? (
         <Card className="mb-6">
           <h2 className="mb-4 text-sm font-semibold">{t("dashboard.careerCompassPath")}</h2>
           <ol className="space-y-6">
-            {path.phases.map((ph, idx) => (
+            {visiblePhases.map((ph, idx) => (
               <li key={ph.id} className="border-l-2 border-[var(--twin-accent)]/40 pl-4">
                 <p className="font-medium text-[var(--foreground)]">{ph.title}</p>
                 <p className="twin-muted text-xs">
@@ -299,7 +358,7 @@ export default function CareerCompassPage() {
                     </li>
                   ))}
                 </ul>
-                {idx === path.current_phase_index ? (
+                {path && idx === path.current_phase_index ? (
                   <p className="mt-2 text-xs font-medium text-[var(--twin-accent)]">
                     → {t("dashboard.careerCompassCurrentPhase")}
                   </p>
@@ -307,6 +366,15 @@ export default function CareerCompassPage() {
               </li>
             ))}
           </ol>
+          {milestonesTruncated ? (
+            <button
+              type="button"
+              className="twin-link mt-4 text-sm font-semibold"
+              onClick={() => setShowAllMilestones(true)}
+            >
+              {t("dashboard.careerCompassShowAllMilestones").replace("{count}", String(totalMilestoneCount))}
+            </button>
+          ) : null}
         </Card>
       ) : data?.configured ? (
         <p className="twin-muted mb-6 text-sm">{t("dashboard.careerCompassNotConfigured")}</p>
@@ -352,7 +420,12 @@ export default function CareerCompassPage() {
               type="button"
               className="twin-btn-secondary twin-touch-target !w-auto px-4 py-2 text-sm"
               disabled={saving}
-              onClick={() => void load().catch(() => null)}
+              onClick={() => {
+                setLoading(true);
+                void load()
+                  .catch((e) => setError(e instanceof Error ? e.message : "Error"))
+                  .finally(() => setLoading(false));
+              }}
             >
               {t("dashboard.careerCompassReload")}
             </button>

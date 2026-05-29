@@ -6,6 +6,7 @@ export type JobFilters = {
   job_board: string;
   min_salary: string;
   title_terms: string;
+  opportunity_type: string;
   sort: "newest" | "salary" | "company";
 };
 
@@ -15,6 +16,7 @@ export const defaultJobFilters: JobFilters = {
   job_board: "",
   min_salary: "",
   title_terms: "",
+  opportunity_type: "all",
   sort: "newest",
 };
 
@@ -25,6 +27,7 @@ export function jobFiltersAreDefault(filters: JobFilters): boolean {
     !filters.job_board.trim() &&
     !filters.min_salary.trim() &&
     !filters.title_terms.trim() &&
+    (filters.opportunity_type === "all" || !filters.opportunity_type.trim()) &&
     filters.sort === "newest"
   );
 }
@@ -37,17 +40,25 @@ export type JobsQueryOpts = {
   skip?: number;
 };
 
+/** Default active window aligned with backend ``job_feed_active_days`` (45). */
+export const JOB_FEED_ACTIVE_DAYS = 45;
+
 export function buildJobsQuery(filters: JobFilters, opts?: JobsQueryOpts): string {
   const params = new URLSearchParams();
   const limit = Math.min(JOB_FEED_PAGE_MAX, Math.max(1, opts?.limit ?? JOB_FEED_PAGE_MAX));
   const skip = Math.max(0, opts?.skip ?? 0);
   params.set("limit", String(limit));
+  params.set("active_feed_only", "true");
+  params.set("active_within_days", String(JOB_FEED_ACTIVE_DAYS));
   if (skip > 0) params.set("skip", String(skip));
   if (filters.q.trim()) params.set("q", filters.q.trim());
   if (filters.location.trim()) params.set("location", filters.location.trim());
   if (filters.job_board.trim()) params.set("job_board", filters.job_board.trim());
   if (filters.min_salary.trim()) params.set("min_salary", filters.min_salary.trim());
   if (filters.title_terms.trim()) params.set("title_terms", filters.title_terms.trim());
+  if (filters.opportunity_type.trim() && filters.opportunity_type !== "all") {
+    params.set("opportunity_type", filters.opportunity_type.trim());
+  }
   if (filters.sort !== "newest") params.set("sort", filters.sort);
   return `?${params.toString()}`;
 }
@@ -102,6 +113,7 @@ export function loadStoredJobFilters(): JobFilters | null {
       job_board: typeof o.job_board === "string" ? o.job_board : "",
       min_salary: typeof o.min_salary === "string" ? o.min_salary : "",
       title_terms: typeof o.title_terms === "string" ? o.title_terms : "",
+      opportunity_type: typeof o.opportunity_type === "string" ? o.opportunity_type : "all",
       sort: isJobSort(sort) ? sort : "newest",
     };
   } catch {

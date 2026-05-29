@@ -12,6 +12,7 @@ import {
   type ReactNode,
 } from "react";
 
+import { getToken } from "@/lib/auth";
 import {
   isMarketingPersona,
   marketingPersonaFromPath,
@@ -19,11 +20,14 @@ import {
   PERSONA_STORAGE_KEY,
 } from "@/lib/marketing-persona";
 import { marketingPersonaFromPathExtended } from "@/lib/persona-access";
+import { loginZoneFromPath } from "@/lib/persona-auth";
 import { safeStorage } from "@/lib/safe-storage";
+import { getSessionPersona, setSessionPersona } from "@/lib/session-persona";
 
 type PersonaContextValue = {
   persona: MarketingPersona;
   setPersona: (next: MarketingPersona) => void;
+  sessionLocked: boolean;
 };
 
 const PersonaContext = createContext<PersonaContextValue | null>(null);
@@ -34,27 +38,60 @@ function readStoredPersona(): MarketingPersona | null {
   return raw && isMarketingPersona(raw) ? raw : null;
 }
 
+function resolvePersona(pathname: string, hasSession: boolean): MarketingPersona {
+  if (hasSession) {
+    const session = getSessionPersona();
+    if (session) return session;
+    const loginZone = loginZoneFromPath(pathname);
+    if (loginZone) {
+      setSessionPersona(loginZone);
+      return loginZone;
+    }
+    const fromPath =
+      marketingPersonaFromPathExtended(pathname) ?? marketingPersonaFromPath(pathname);
+    if (fromPath) {
+      setSessionPersona(fromPath);
+      return fromPath;
+    }
+    setSessionPersona("candidate");
+    return "candidate";
+  }
+
+  const fromPath = marketingPersonaFromPathExtended(pathname) ?? marketingPersonaFromPath(pathname);
+  return fromPath ?? readStoredPersona() ?? "candidate";
+}
+
 export function PersonaProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  /** Default matches primary product lane; hydrated from path or storage after mount. */
   const [persona, setPersonaState] = useState<MarketingPersona>("candidate");
+  const [sessionLocked, setSessionLocked] = useState(false);
 
   useLayoutEffect(() => {
-    const fromPath = marketingPersonaFromPathExtended(pathname) ?? marketingPersonaFromPath(pathname);
-    const stored = readStoredPersona();
-    const resolved = fromPath ?? stored ?? "candidate";
-    setPersonaState((current) => (current === resolved ? current : resolved));
+    const hasSession = Boolean(getToken());
+    queueMicrotask(() => {
+      setSessionLocked(hasSession);
+      const resolved = resolvePersona(pathname, hasSession);
+      setPersonaState((current) => (current === resolved ? current : resolved));
+    });
   }, [pathname]);
 
   useEffect(() => {
+    if (sessionLocked) return;
     safeStorage.setItem(PERSONA_STORAGE_KEY, persona);
-  }, [persona]);
+  }, [persona, sessionLocked]);
 
-  const setPersona = useCallback((next: MarketingPersona) => {
-    setPersonaState(next);
-  }, []);
+  const setPersona = useCallback(
+    (next: MarketingPersona) => {
+      if (getToken()) return;
+      setPersonaState(next);
+    },
+    [],
+  );
 
-  const value = useMemo(() => ({ persona, setPersona }), [persona, setPersona]);
+  const value = useMemo(
+    () => ({ persona, setPersona, sessionLocked }),
+    [persona, setPersona, sessionLocked],
+  );
 
   return <PersonaContext.Provider value={value}>{children}</PersonaContext.Provider>;
 }

@@ -1,14 +1,26 @@
+import { fxUnitsPerUsd } from "@/lib/calculator-fx";
+import {
+  FOUNDING_COHORT_SIZE,
+  FOUNDING_FREE_PREMIUM_MONTHS_DEFAULT,
+  INTERVIEW_BOOKED_BONUS_MAX_PER_QUARTER,
+  INTERVIEW_BOOKED_BONUS_USD,
+  PLACEMENT_EMPLOYER_FEE_PCT_OF_MONTHLY_SALARY,
+  PLACEMENT_PAYOUT_DELAY_DAYS_DEFAULT,
+  REFERRAL_BONUS_FIRST_PAYMENT_USD,
+  REFERRAL_BONUS_HIRED_USD,
+  REFERRAL_BONUS_RETAINED_3M_USD,
+} from "@/lib/candidate-rewards-constants";
 import { ANNUAL_PREPAY_DISCOUNT, effectiveMonthlySubscriptionUsd } from "@/lib/pricing-locale";
 
 /** ISO codes supported by the investor model (illustrative FX). */
 export type InvestorModelCurrency = "USD" | "EUR" | "PLN" | "GBP";
 
-/** Units of local currency per 1 USD (static illustrative rates). */
+/** Units of local currency per 1 USD — aligned with marketing FX table. */
 export const LOCAL_PER_USD: Record<InvestorModelCurrency, number> = {
-  USD: 1,
-  EUR: 0.92,
-  PLN: 4.05,
-  GBP: 0.79,
+  USD: fxUnitsPerUsd("USD"),
+  EUR: fxUnitsPerUsd("EUR"),
+  PLN: fxUnitsPerUsd("PLN"),
+  GBP: fxUnitsPerUsd("GBP"),
 };
 
 export type InvestorScenario = "current" | "optimized" | "aggressive";
@@ -23,11 +35,25 @@ export type InvestorCalculatorInputs = {
   averageSalary: number;
   /** Employer success fee as % of monthly salary (default 50% = half a month). */
   successFeePercent: number;
+  /** Illustrative delay before placement bonus cash payout (Terms). */
+  placementPayoutDelayDays: number;
   linkedInIncentivePercent: number;
   linkedInAdoptionRate: number;
   referralBonusPerActivation: number;
+  referralBonusRetained3m: number;
   referralBonusPerHire: number;
+  /** Share of activated referrals who reach 3 paid months (retained tier). */
+  referralRetention3mRate: number;
   referralRate: number;
+  foundingCohortSize: number;
+  /** Months of forgone Premium ARPU per founding member in the model year. */
+  foundingFreePremiumMonths: number;
+  interviewBonusUsd: number;
+  interviewBonusMaxPerQuarter: number;
+  /** Share of paying users who earn ≥1 interview slot bonus in the year. */
+  interviewBonusAdoptionRate: number;
+  /** Average confirmed slots per active user per year (capped at max/quarter × 4). */
+  interviewAvgSlotsPerActiveUser: number;
   seniorEngineers: number;
   seniorEngineerSalary: number;
   otherEngineers: number;
@@ -48,7 +74,7 @@ export type InvestorCalculatorInputs = {
 };
 
 /** Employer pays this share of monthly salary on placement (gross success fee). */
-export const PLACEMENT_EMPLOYER_FEE_PERCENT = 50;
+export const PLACEMENT_EMPLOYER_FEE_PERCENT = PLACEMENT_EMPLOYER_FEE_PCT_OF_MONTHLY_SALARY;
 
 /** TWIN net take when half the employer fee is returned to the candidate (baseline). */
 export const PLACEMENT_NET_TAKE_RATE_PERCENT = 25;
@@ -61,11 +87,20 @@ export const INVESTOR_CALCULATOR_DEFAULTS: InvestorCalculatorInputs = {
   placementRate: 5,
   averageSalary: 50_000,
   successFeePercent: PLACEMENT_EMPLOYER_FEE_PERCENT,
+  placementPayoutDelayDays: PLACEMENT_PAYOUT_DELAY_DAYS_DEFAULT,
   linkedInIncentivePercent: 75,
   linkedInAdoptionRate: 60,
-  referralBonusPerActivation: 15,
-  referralBonusPerHire: 100,
+  referralBonusPerActivation: REFERRAL_BONUS_FIRST_PAYMENT_USD,
+  referralBonusRetained3m: REFERRAL_BONUS_RETAINED_3M_USD,
+  referralBonusPerHire: REFERRAL_BONUS_HIRED_USD,
+  referralRetention3mRate: 60,
   referralRate: 40,
+  foundingCohortSize: FOUNDING_COHORT_SIZE,
+  foundingFreePremiumMonths: FOUNDING_FREE_PREMIUM_MONTHS_DEFAULT,
+  interviewBonusUsd: INTERVIEW_BOOKED_BONUS_USD,
+  interviewBonusMaxPerQuarter: INTERVIEW_BOOKED_BONUS_MAX_PER_QUARTER,
+  interviewBonusAdoptionRate: 15,
+  interviewAvgSlotsPerActiveUser: 2,
   seniorEngineers: 2,
   seniorEngineerSalary: 150_000,
   otherEngineers: 2,
@@ -85,6 +120,13 @@ export const INVESTOR_CALCULATOR_DEFAULTS: InvestorCalculatorInputs = {
   currency: "USD",
 };
 
+export type ReferralCostBreakdown = {
+  activation: number;
+  retained3m: number;
+  hire: number;
+  total: number;
+};
+
 export type YearProjection = {
   year: number;
   users: number;
@@ -96,6 +138,8 @@ export type YearProjection = {
 
 export type InvestorCalculatorResults = {
   subscriptionRevenue: number;
+  subscriptionRevenueGross: number;
+  foundingRevenueDrag: number;
   successFeeRevenue: number;
   totalRevenue: number;
   mrr: number;
@@ -112,12 +156,16 @@ export type InvestorCalculatorResults = {
   teamCosts: number;
   totalInfrastructure: number;
   referralCosts: number;
+  referralCostBreakdown: ReferralCostBreakdown;
+  interviewBonusCosts: number;
+  candidateRewardCosts: number;
   fixedCosts: number;
   variableCosts: number;
   totalCosts: number;
   costPerUser: number;
   infrastructureCostPerUser: number;
   referralCostPerUser: number;
+  candidateRewardCostPerUser: number;
   netIncome: number;
   margin: number;
   contributionMargin: number;
@@ -138,11 +186,49 @@ function teamCosts(i: InvestorCalculatorInputs): number {
   );
 }
 
-function referralCostsUsd(i: InvestorCalculatorInputs, totalUsers: number): number {
+function effectiveMonthlyUsd(i: InvestorCalculatorInputs): number {
+  return effectiveMonthlySubscriptionUsd(i.subscriptionPrice, i.annualPrepayShare);
+}
+
+function foundingMembersCount(i: InvestorCalculatorInputs, totalUsers: number): number {
+  return Math.min(i.foundingCohortSize, totalUsers);
+}
+
+/** Forgone subscription ARPU from founding free Premium window (model year). */
+function foundingRevenueDragUsd(i: InvestorCalculatorInputs, totalUsers: number): number {
+  const members = foundingMembersCount(i, totalUsers);
+  const monthsForgone = Math.min(12, Math.max(0, i.foundingFreePremiumMonths));
+  return members * effectiveMonthlyUsd(i) * monthsForgone;
+}
+
+type ReferralFunnel = {
+  newReferrals: number;
+  activatedReferrals: number;
+  retained3mReferrals: number;
+  hiredReferrals: number;
+};
+
+function referralFunnel(i: InvestorCalculatorInputs, totalUsers: number): ReferralFunnel {
   const newReferrals = totalUsers * (i.referralRate / 100) * (i.viralGrowthRate / 100);
   const activatedReferrals = newReferrals * (i.percentPaying / 100);
+  const retained3mReferrals = activatedReferrals * (i.referralRetention3mRate / 100);
   const hiredReferrals = activatedReferrals * (i.placementRate / 100);
-  return activatedReferrals * i.referralBonusPerActivation + hiredReferrals * i.referralBonusPerHire;
+  return { newReferrals, activatedReferrals, retained3mReferrals, hiredReferrals };
+}
+
+function referralCostBreakdownUsd(i: InvestorCalculatorInputs, totalUsers: number): ReferralCostBreakdown {
+  const { activatedReferrals, retained3mReferrals, hiredReferrals } = referralFunnel(i, totalUsers);
+  const activation = activatedReferrals * i.referralBonusPerActivation;
+  const retained3m = retained3mReferrals * i.referralBonusRetained3m;
+  const hire = hiredReferrals * i.referralBonusPerHire;
+  return { activation, retained3m, hire, total: activation + retained3m + hire };
+}
+
+function interviewBonusCostsUsd(i: InvestorCalculatorInputs, payingUsers: number): number {
+  const maxSlotsPerUserPerYear = i.interviewBonusMaxPerQuarter * 4;
+  const slotsPerActive = Math.min(maxSlotsPerUserPerYear, Math.max(0, i.interviewAvgSlotsPerActiveUser));
+  const activeUsers = payingUsers * (i.interviewBonusAdoptionRate / 100);
+  return activeUsers * slotsPerActive * i.interviewBonusUsd;
 }
 
 /**
@@ -163,16 +249,15 @@ function avgSuccessFeeUsd(i: InvestorCalculatorInputs, placementsPerYear: number
   return (linkedInPlacements * twinKeepsLinkedIn + nonLinkedInPlacements * twinKeepsNonLinkedIn) / placementsPerYear;
 }
 
-function subscriptionRevenueUsd(i: InvestorCalculatorInputs, payingUsers: number): number {
-  const effectiveMonthly = effectiveMonthlySubscriptionUsd(i.subscriptionPrice, i.annualPrepayShare);
-  return payingUsers * effectiveMonthly * 12;
+function subscriptionRevenueGrossUsd(i: InvestorCalculatorInputs, payingUsers: number): number {
+  return payingUsers * effectiveMonthlyUsd(i) * 12;
 }
 
 function buildProjection(
   i: InvestorCalculatorInputs,
   fixedCosts: number,
   infrastructureCostPerUser: number,
-  referralCostPerUser: number,
+  candidateRewardCostPerUser: number,
   avgSuccessFee: number,
   growth: number,
 ): YearProjection[] {
@@ -183,10 +268,12 @@ function buildProjection(
     currentUsers *= 1 + g;
     const yearPayingUsers = currentUsers * (i.percentPaying / 100);
     const yearPlacements = yearPayingUsers * (i.placementRate / 100);
-    const yearSubscriptionRev = subscriptionRevenueUsd(i, yearPayingUsers);
+    const yearSubscriptionGross = subscriptionRevenueGrossUsd(i, yearPayingUsers);
+    const yearFoundingDrag = foundingRevenueDragUsd(i, currentUsers);
+    const yearSubscriptionRev = yearSubscriptionGross - yearFoundingDrag;
     const yearSuccessFeeRev = yearPlacements * avgSuccessFee;
     const yearRevenue = yearSubscriptionRev + yearSuccessFeeRev;
-    const yearVarCosts = currentUsers * (infrastructureCostPerUser + referralCostPerUser);
+    const yearVarCosts = currentUsers * (infrastructureCostPerUser + candidateRewardCostPerUser);
     const yearTotalCosts = fixedCosts + yearVarCosts;
     const yearNetIncome = yearRevenue - yearTotalCosts;
     const yearMargin = yearRevenue > 0 ? (yearNetIncome / yearRevenue) * 100 : 0;
@@ -211,7 +298,9 @@ export function computeInvestorCalculator(i: InvestorCalculatorInputs): Investor
   const twinNetPlacementPctOfMonthlySalary =
     monthlySalary > 0 ? (avgSuccessFee / monthlySalary) * 100 : 0;
 
-  const subscriptionRevenue = subscriptionRevenueUsd(i, payingUsers);
+  const subscriptionRevenueGross = subscriptionRevenueGrossUsd(i, payingUsers);
+  const foundingRevenueDrag = foundingRevenueDragUsd(i, i.totalUsers);
+  const subscriptionRevenue = subscriptionRevenueGross - foundingRevenueDrag;
   const successFeeRevenue = placementsPerYear * avgSuccessFee;
   const totalRevenue = subscriptionRevenue + successFeeRevenue;
   const subscriptionMrr = subscriptionRevenue / 12;
@@ -225,17 +314,21 @@ export function computeInvestorCalculator(i: InvestorCalculatorInputs): Investor
   const tc = teamCosts(i);
   const infrastructureCostPerUser = i.hostingCostPerUser + i.apiCostPerUser + i.servicesCostPerUser;
   const totalInfrastructure = infrastructureCostPerUser * i.totalUsers;
-  const refCosts = referralCostsUsd(i, i.totalUsers);
-  const referralCostPerUser = i.totalUsers > 0 ? refCosts / i.totalUsers : 0;
+  const referralCostBreakdown = referralCostBreakdownUsd(i, i.totalUsers);
+  const referralCosts = referralCostBreakdown.total;
+  const interviewBonusCosts = interviewBonusCostsUsd(i, payingUsers);
+  const candidateRewardCosts = referralCosts + interviewBonusCosts;
+  const referralCostPerUser = i.totalUsers > 0 ? candidateRewardCosts / i.totalUsers : 0;
+  const candidateRewardCostPerUser = referralCostPerUser;
 
   const fixedCosts = tc + i.legalAccounting + i.officeMisc;
-  const variableCosts = totalInfrastructure + refCosts;
+  const variableCosts = totalInfrastructure + candidateRewardCosts;
   const totalCosts = fixedCosts + variableCosts;
   const costPerUser = i.totalUsers > 0 ? totalCosts / i.totalUsers : 0;
 
   const netIncome = totalRevenue - totalCosts;
   const margin = totalRevenue > 0 ? (netIncome / totalRevenue) * 100 : 0;
-  const contributionMargin = revenuePerUser - (infrastructureCostPerUser + referralCostPerUser);
+  const contributionMargin = revenuePerUser - (infrastructureCostPerUser + candidateRewardCostPerUser);
 
   const breakEvenUsers =
     contributionMargin > 0 && Number.isFinite(fixedCosts / contributionMargin)
@@ -250,10 +343,19 @@ export function computeInvestorCalculator(i: InvestorCalculatorInputs): Investor
     yearsToBreakEven = Math.log(breakEvenUsers / i.totalUsers) / Math.log(1 + effectiveGrowthRate);
   }
 
-  const projection = buildProjection(i, fixedCosts, infrastructureCostPerUser, referralCostPerUser, avgSuccessFee, i.viralGrowthRate);
+  const projection = buildProjection(
+    i,
+    fixedCosts,
+    infrastructureCostPerUser,
+    candidateRewardCostPerUser,
+    avgSuccessFee,
+    i.viralGrowthRate,
+  );
 
   return {
     subscriptionRevenue,
+    subscriptionRevenueGross,
+    foundingRevenueDrag,
     successFeeRevenue,
     totalRevenue,
     mrr,
@@ -269,13 +371,17 @@ export function computeInvestorCalculator(i: InvestorCalculatorInputs): Investor
     twinNetPlacementPctOfMonthlySalary,
     teamCosts: tc,
     totalInfrastructure,
-    referralCosts: refCosts,
+    referralCosts,
+    referralCostBreakdown,
+    interviewBonusCosts,
+    candidateRewardCosts,
     fixedCosts,
     variableCosts,
     totalCosts,
     costPerUser,
     infrastructureCostPerUser,
     referralCostPerUser,
+    candidateRewardCostPerUser,
     netIncome,
     margin,
     contributionMargin,

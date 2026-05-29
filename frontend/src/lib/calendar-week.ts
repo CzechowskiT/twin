@@ -43,6 +43,36 @@ export function addDays(d: Date, n: number): Date {
   return x;
 }
 
+const DATE_ONLY_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+/** Calendar date YYYY-MM-DD in an IANA zone (host local when `timeZone` omitted). */
+export function toLocalCalendarDateKey(d: Date, timeZone?: string): string {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(d);
+  const y = parts.find((p) => p.type === "year")?.value;
+  const m = parts.find((p) => p.type === "month")?.value;
+  const day = parts.find((p) => p.type === "day")?.value;
+  if (y && m && day) return `${y}-${m}-${day}`;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+/** Day bucket for grouping; date-only all-day uses `start_iso` without UTC midnight parsing. */
+export function eventLocalCalendarDateKey(
+  startIso: string,
+  allDay: boolean,
+  timeZone?: string,
+): string | null {
+  if (allDay && DATE_ONLY_RE.test(startIso)) return startIso;
+  const start = new Date(startIso);
+  if (Number.isNaN(start.getTime())) return null;
+  return toLocalCalendarDateKey(start, timeZone);
+}
+
 export function weekRangeIso(weekStart: Date): { timeMin: string; timeMax: string } {
   const end = addDays(weekStart, 7);
   end.setHours(23, 59, 59, 999);
@@ -105,16 +135,21 @@ export function eventsByDay(
   events: DisplayCalendarEvent[],
   weekStart: Date,
   locale: string,
+  timeZone?: string,
 ): { dayKey: string; label: string; items: DisplayCalendarEvent[] }[] {
   const days: { dayKey: string; label: string; items: DisplayCalendarEvent[] }[] = [];
   for (let i = 0; i < 7; i++) {
     const day = addDays(weekStart, i);
-    const dayKey = day.toISOString().slice(0, 10);
-    const label = day.toLocaleDateString(locale, { weekday: "short", month: "short", day: "numeric" });
+    const dayKey = toLocalCalendarDateKey(day, timeZone);
+    const label = day.toLocaleDateString(locale, {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      timeZone,
+    });
     const items = events.filter((ev) => {
-      const start = new Date(ev.start_iso);
-      if (Number.isNaN(start.getTime())) return false;
-      return start.toISOString().slice(0, 10) === dayKey;
+      const eventKey = eventLocalCalendarDateKey(ev.start_iso, ev.all_day, timeZone);
+      return eventKey === dayKey;
     });
     days.push({ dayKey, label, items });
   }

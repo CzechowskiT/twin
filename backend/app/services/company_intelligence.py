@@ -9,6 +9,7 @@ from typing import Any
 
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.database.models import CompanyIntelligenceCache, Job
 from app.services.anthropic_client import get_anthropic_client, is_anthropic_configured
 
@@ -124,7 +125,7 @@ def _research_with_claude(job: Job) -> dict[str, Any] | None:
     )
     try:
         msg = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model=get_settings().anthropic_model,
             max_tokens=3000,
             temperature=0.3,
             messages=[{"role": "user", "content": prompt}],

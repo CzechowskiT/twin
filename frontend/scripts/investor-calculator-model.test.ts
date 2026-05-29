@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 
 import {
+  REFERRAL_BONUS_FIRST_PAYMENT_USD,
+  REFERRAL_BONUS_HIRED_USD,
+  REFERRAL_BONUS_RETAINED_3M_USD,
+} from "../src/lib/candidate-rewards-constants";
+import {
   ANNUAL_PREPAY_DISCOUNT,
   computeInvestorCalculator,
   INVESTOR_CALCULATOR_DEFAULTS,
@@ -78,4 +83,53 @@ run("default scale: negative net with honest placement take", () => {
   assert.ok(r.successFeeRevenue > 0);
   assert.ok(r.successFeeRevenue < r.subscriptionRevenue * 2);
   assert.ok(r.placementMrr > 0);
+});
+
+run("referral tiers use shared USD constants", () => {
+  assert.equal(INVESTOR_CALCULATOR_DEFAULTS.referralBonusPerActivation, REFERRAL_BONUS_FIRST_PAYMENT_USD);
+  assert.equal(INVESTOR_CALCULATOR_DEFAULTS.referralBonusRetained3m, REFERRAL_BONUS_RETAINED_3M_USD);
+  assert.equal(INVESTOR_CALCULATOR_DEFAULTS.referralBonusPerHire, REFERRAL_BONUS_HIRED_USD);
+});
+
+run("referral cost breakdown sums to total", () => {
+  const r = computeInvestorCalculator(INVESTOR_CALCULATOR_DEFAULTS);
+  const { activation, retained3m, hire, total } = r.referralCostBreakdown;
+  assert.ok(activation > 0);
+  assert.ok(retained3m > 0);
+  assert.ok(hire > 0);
+  assert.ok(Math.abs(total - (activation + retained3m + hire)) < 0.01);
+  assert.equal(r.referralCosts, total);
+});
+
+run("founding drag and interview bonuses affect P&L", () => {
+  const base = computeInvestorCalculator(INVESTOR_CALCULATOR_DEFAULTS);
+  assert.ok(base.foundingRevenueDrag > 0);
+  assert.ok(base.interviewBonusCosts > 0);
+  assert.equal(base.candidateRewardCosts, base.referralCosts + base.interviewBonusCosts);
+  const noFounding = computeInvestorCalculator({
+    ...INVESTOR_CALCULATOR_DEFAULTS,
+    foundingFreePremiumMonths: 0,
+  });
+  assert.ok(noFounding.subscriptionRevenue > base.subscriptionRevenue);
+});
+
+/** Organic scenario @ 100k users — deck sanity (USD model). */
+run("organic @ 100k: MRR/ARR/BEP/net internally consistent", () => {
+  const r = computeInvestorCalculator(INVESTOR_CALCULATOR_DEFAULTS);
+  assert.equal(Math.round(r.mrr), 71_362);
+  assert.equal(Math.round(r.arr), 856_348);
+  assert.equal(Math.round(r.breakEvenUsers), 188_314);
+  assert.equal(Math.round(r.netIncome), -478_352);
+  assert.ok(Math.abs(r.mrr - (r.subscriptionMrr + r.placementMrr)) < 0.02);
+  assert.ok(Math.abs(r.arr - r.totalRevenue) < 0.02);
+  assert.ok(Math.abs(r.margin - (r.netIncome / r.totalRevenue) * 100) < 0.05);
+});
+
+run("optimized scenario is profitable at 100k users", () => {
+  const r = computeInvestorCalculator({
+    ...INVESTOR_CALCULATOR_DEFAULTS,
+    ...patchScenario("optimized"),
+  });
+  assert.ok(r.netIncome > 0);
+  assert.ok(r.breakEvenUsers < INVESTOR_CALCULATOR_DEFAULTS.totalUsers);
 });

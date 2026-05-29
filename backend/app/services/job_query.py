@@ -3,6 +3,7 @@
 from sqlalchemy.orm import Query, Session
 
 from app.database.models import Job
+from app.services.market_coverage import apply_active_feed_filter
 from app.services.job_search import apply_min_salary_filter, job_text_token_clause, tokenize_job_search
 
 SORT_NEWEST = "newest"
@@ -18,8 +19,13 @@ def apply_job_filters(
     job_board: str | None = None,
     min_salary: int | None = None,
     title_terms: str | None = None,
+    opportunity_type: str | None = None,
     sort: str = SORT_NEWEST,
+    active_feed_only: bool = False,
+    active_within_days: int | None = None,
 ) -> Query:
+    if active_feed_only:
+        query = apply_active_feed_filter(query, days=active_within_days)
     tokens = tokenize_job_search(q, title_terms)
     clause = job_text_token_clause(tokens)
     if clause is not None:
@@ -28,6 +34,8 @@ def apply_job_filters(
         query = query.filter(Job.location.ilike(f"%{location.strip()}%"))
     if job_board:
         query = query.filter(Job.job_board.ilike(f"%{job_board.strip()}%"))
+    if opportunity_type and opportunity_type.strip() and opportunity_type.strip() != "all":
+        query = query.filter(Job.opportunity_type == opportunity_type.strip())
     query = apply_min_salary_filter(query, min_salary)
 
     if sort == SORT_SALARY:

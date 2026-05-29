@@ -7,7 +7,7 @@ import {
   PERSONA_ROUTE,
   type MarketingPersona,
 } from "@/lib/marketing-persona";
-import { LOGIN_PATH, REGISTER_PATH } from "@/lib/persona-auth";
+import { LOGIN_PATH, REGISTER_PATH, WORKSPACE_PATH } from "@/lib/persona-auth";
 import type { TranslationKey } from "@/lib/i18n";
 
 export type PersonaAudience = MarketingPersona;
@@ -20,6 +20,7 @@ const PATH_IMPLIES_PERSONA: { prefix: string; persona: MarketingPersona }[] = [
   { prefix: "/profile", persona: "candidate" },
   { prefix: "/onboarding", persona: "candidate" },
   { prefix: "/for-recruiters", persona: "recruiter" },
+  { prefix: "/recruiter/employer", persona: "recruiter" },
   { prefix: "/recruiter", persona: "recruiter" },
   { prefix: "/for-companies", persona: "company" },
   { prefix: "/for-investors", persona: "investor" },
@@ -32,6 +33,7 @@ const PATH_IMPLIES_PERSONA: { prefix: string; persona: MarketingPersona }[] = [
   { prefix: "/investor", persona: "investor" },
   { prefix: "/login/candidate", persona: "candidate" },
   { prefix: "/login/recruiter", persona: "recruiter" },
+  { prefix: "/login/company", persona: "company" },
   { prefix: "/login/investor", persona: "investor" },
   { prefix: "/register/candidate", persona: "candidate" },
   { prefix: "/register/recruiter", persona: "recruiter" },
@@ -42,24 +44,26 @@ const PATH_IMPLIES_PERSONA: { prefix: string; persona: MarketingPersona }[] = [
 
 /** Only these personas may access the path prefix (longest match wins). */
 const PREFIX_ALLOWED: { prefix: string; allowed: readonly MarketingPersona[] }[] = [
+  { prefix: "/dashboard/calendar", allowed: ["candidate", "recruiter", "investor", "company"] },
   { prefix: "/dashboard", allowed: ["candidate"] },
   { prefix: "/profile", allowed: ["candidate"] },
   { prefix: "/onboarding", allowed: ["candidate"] },
   { prefix: "/workspace/candidate", allowed: ["candidate"] },
-  { prefix: "/workspace/recruiter", allowed: ["recruiter", "investor"] },
+  { prefix: "/workspace/recruiter", allowed: ["recruiter"] },
   { prefix: "/workspace/investor", allowed: ["investor"] },
   { prefix: "/workspace", allowed: ["candidate", "recruiter", "company", "investor"] },
   { prefix: "/investor", allowed: ["investor"] },
-  { prefix: "/calculator/b2b", allowed: ["company", "candidate", "recruiter"] },
-  { prefix: "/calculator", allowed: ["company", "recruiter"] },
-  { prefix: "/recruiter/integrations", allowed: ["recruiter", "investor", "company"] },
-  { prefix: "/recruiter", allowed: ["recruiter", "investor"] },
-  { prefix: "/for-investors", allowed: ["investor", "candidate", "recruiter", "company"] },
-  { prefix: "/for-recruiters", allowed: ["recruiter", "candidate", "company", "investor"] },
-  { prefix: "/for-companies", allowed: ["company", "candidate", "recruiter", "investor"] },
-  { prefix: "/for-candidates", allowed: ["candidate", "recruiter", "company", "investor"] },
-  { prefix: "/companies/signup", allowed: ["company", "investor", "recruiter", "candidate"] },
-  { prefix: "/demo", allowed: ["candidate", "recruiter", "company", "investor"] },
+  { prefix: "/calculator/b2b", allowed: ["company", "recruiter"] },
+  { prefix: "/calculator", allowed: ["recruiter"] },
+  { prefix: "/recruiter/employer", allowed: ["recruiter"] },
+  { prefix: "/recruiter/integrations", allowed: ["recruiter"] },
+  { prefix: "/recruiter", allowed: ["recruiter"] },
+  { prefix: "/for-investors", allowed: ["investor"] },
+  { prefix: "/for-recruiters", allowed: ["recruiter"] },
+  { prefix: "/for-companies", allowed: ["company"] },
+  { prefix: "/for-candidates", allowed: ["candidate"] },
+  { prefix: "/companies/signup", allowed: ["company"] },
+  { prefix: "/demo", allowed: ["candidate", "recruiter", "investor", "company"] },
 ];
 
 const ALWAYS_ALLOWED_PREFIXES = [
@@ -70,7 +74,6 @@ const ALWAYS_ALLOWED_PREFIXES = [
   "/login",
   "/register",
   "/waitlist",
-  "/demo",
   "/status",
   "/developers",
   "/privacy",
@@ -87,8 +90,8 @@ const ALWAYS_ALLOWED_PREFIXES = [
   "/consent",
   "/auth",
   "/api",
-  "/workspace",
-  "/investor",
+  "/how-it-works",
+  "/pricing",
 ];
 
 const MARKETING_HUB_PATHS = new Set([
@@ -146,6 +149,59 @@ export function isPathAllowedForPersona(pathname: string, persona: MarketingPers
   return rule.allowed.includes(persona);
 }
 
+/** Legal, auth hub, and shared marketing pages reachable while signed in. */
+const SESSION_NEUTRAL_PREFIXES = [
+  "/privacy",
+  "/terms",
+  "/cookies",
+  "/contact",
+  "/faq",
+  "/status",
+  "/developers",
+  "/about",
+  "/how-it-works",
+  "/waitlist",
+  "/case-studies",
+  "/partners",
+  "/media",
+  "/careers",
+  "/testimonials",
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/auth",
+  "/api",
+  "/pricing",
+];
+
+function isSessionNeutralPath(pathname: string): boolean {
+  const path = normalizePath(pathname);
+  if (path === "/") return true;
+  for (const prefix of SESSION_NEUTRAL_PREFIXES) {
+    if (path === prefix || path.startsWith(`${prefix}/`)) return true;
+  }
+  return false;
+}
+
+/** Strict lane check for authenticated sessions — redirects cross-persona product routes. */
+export function sessionPersonaHomeRedirect(
+  pathname: string,
+  persona: MarketingPersona,
+): string | null {
+  const path = normalizePath(pathname);
+  if (isSessionNeutralPath(path)) return null;
+  if (isPathAllowedForPersona(pathname, persona)) return null;
+  return WORKSPACE_PATH[persona];
+}
+
+export function pricingPathForPersona(persona: MarketingPersona): string {
+  const anchor = "#persona-pricing";
+  if (persona === "recruiter") return `${PERSONA_ROUTE.recruiter}${anchor}`;
+  if (persona === "company") return `${PERSONA_ROUTE.company}${anchor}`;
+  if (persona === "investor") return `${PERSONA_ROUTE.investor}${anchor}`;
+  return `${PERSONA_ROUTE.candidate}${anchor}`;
+}
+
 export function isMarketingHubPath(pathname: string): boolean {
   const path = normalizePath(pathname);
   return MARKETING_HUB_PATHS.has(path);
@@ -179,9 +235,24 @@ export type HeaderGrowthLink = {
   variant: GrowthCtaVariant;
 };
 
+export type HeaderSessionProductLink = {
+  href: string;
+  labelKey: "nav.demo";
+};
+
+/** Logged-in candidate product shortcuts in the right rail (calendar lives in the header). */
+export function headerCandidateSessionLinks(
+  persona: MarketingPersona,
+  hasSession: boolean,
+): HeaderSessionProductLink[] {
+  void persona;
+  void hasSession;
+  return [];
+}
+
 /**
- * One primary marketing CTA beside the logo (logged-out only).
- * Logged-in users use PersonaSwitcher → workspace; no duplicate pills here.
+ * One primary marketing CTA beside the logo.
+ * Logged-out: persona-specific growth pill. Logged-in candidates: Demo pill is rendered directly in the header.
  */
 export function headerGrowthLinksForPersona(
   persona: MarketingPersona,
@@ -189,11 +260,6 @@ export function headerGrowthLinksForPersona(
   hasSession: boolean,
 ): HeaderGrowthLink[] {
   if (hasSession) return [];
-  const path = normalizePath(pathname);
-  // Homepage hero carries register + wishlist; header pill surfaces founding list without scrolling.
-  if (path === "/" && persona === "candidate") {
-    return [{ href: "/waitlist", labelKey: "nav.waitlist", variant: "company" }];
-  }
   if (isMarketingHubPath(pathname)) return [];
   if (persona === "candidate") {
     return [{ href: "/demo", labelKey: "nav.demo", variant: "candidate" }];
@@ -207,8 +273,180 @@ export function headerGrowthLinksForPersona(
   return [{ href: "/for-investors", labelKey: "nav.forInvestors", variant: "investor" }];
 }
 
+export type HeaderSessionNavLink = { href: string; labelKey: TranslationKey };
+
+const SESSION_PANEL_PREFIXES: Partial<Record<string, readonly string[]>> = {
+  "/workspace/recruiter": ["/workspace/recruiter", "/recruiter"],
+  "/workspace/investor": ["/workspace/investor", "/investor"],
+};
+
+/** Logged-in home for the Panel tab (candidate dashboard vs persona workspace). */
+export function sessionPanelHref(persona: MarketingPersona): string {
+  if (persona === "candidate") return "/dashboard";
+  return WORKSPACE_PATH[persona];
+}
+
+export type MomentumRailCta = { href: string; labelKey: TranslationKey };
+
+function momentumSecondaryCta(persona: MarketingPersona, hasSession: boolean): MomentumRailCta {
+  if (persona === "candidate") {
+    return { href: "/profile", labelKey: "site.momentumCtaProfile" };
+  }
+  if (persona === "recruiter") {
+    return hasSession
+      ? { href: "/recruiter/inbox", labelKey: "recruiterInbox.title" }
+      : { href: LOGIN_PATH.recruiter, labelKey: "site.momentumCtaLogin" };
+  }
+  if (persona === "investor") {
+    return hasSession
+      ? { href: "/investor/metrics", labelKey: "investorMetrics.title" }
+      : { href: LOGIN_PATH.investor, labelKey: "site.momentumCtaLogin" };
+  }
+  return { href: REGISTER_PATH.company, labelKey: "site.footerCompanySignup" };
+}
+
+function defaultMomentumCtas(persona: MarketingPersona, hasSession: boolean): MomentumRailCta[] {
+  return [
+    { href: sessionPanelHref(persona), labelKey: "site.momentumCtaWorkspace" },
+    momentumSecondaryCta(persona, hasSession),
+  ];
+}
+
+/** Persona-aware shortcuts for the global momentum rail (footer of `Shell`). */
+export function momentumRailCtas(
+  pathname: string,
+  variant: "app" | "marketing",
+  persona: MarketingPersona,
+  hasSession: boolean,
+): MomentumRailCta[] {
+  if (variant === "marketing") {
+    return [
+      { href: "/register", labelKey: "site.momentumCtaRegister" },
+      { href: "/login", labelKey: "site.momentumCtaLogin" },
+      { href: "/faq", labelKey: "site.momentumCtaFaq" },
+    ];
+  }
+  if (pathname.startsWith("/admin")) {
+    return [{ href: "/", labelKey: "site.momentumCtaHome" }];
+  }
+  if (
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/register") ||
+    pathname.startsWith("/forgot-password") ||
+    pathname.startsWith("/reset-password") ||
+    pathname.startsWith("/auth/callback")
+  ) {
+    return [
+      { href: "/faq", labelKey: "site.momentumCtaFaq" },
+      pathname.startsWith("/login")
+        ? { href: "/register", labelKey: "site.momentumCtaRegister" }
+        : { href: "/login", labelKey: "site.momentumCtaLogin" },
+    ];
+  }
+  if (pathname.startsWith("/dashboard/calendar")) {
+    if (persona === "candidate") {
+      return [
+        { href: "/dashboard", labelKey: "site.momentumCtaWorkspace" },
+        { href: "/profile", labelKey: "site.momentumCtaProfile" },
+      ];
+    }
+    return [
+      { href: sessionPanelHref(persona), labelKey: "site.momentumCtaWorkspace" },
+      momentumSecondaryCta(persona, hasSession),
+    ];
+  }
+  if (pathname.startsWith("/dashboard")) {
+    if (persona !== "candidate") {
+      return defaultMomentumCtas(persona, hasSession);
+    }
+    return [
+      { href: "/profile", labelKey: "site.momentumCtaProfile" },
+      { href: "/dashboard/billing", labelKey: "dashboard.billingLink" },
+    ];
+  }
+  if (pathname.startsWith("/profile")) {
+    if (persona !== "candidate") {
+      return defaultMomentumCtas(persona, hasSession);
+    }
+    return [
+      { href: "/dashboard", labelKey: "site.momentumCtaWorkspace" },
+      { href: "/dashboard/billing", labelKey: "dashboard.billingLink" },
+    ];
+  }
+  if (pathname.startsWith("/workspace/recruiter") || pathname.startsWith("/recruiter")) {
+    return [
+      { href: "/recruiter/inbox", labelKey: "recruiterInbox.title" },
+      { href: "/for-recruiters", labelKey: "nav.forRecruiters" },
+    ];
+  }
+  if (pathname.startsWith("/workspace/investor") || pathname.startsWith("/investor")) {
+    return [
+      { href: "/investor/metrics", labelKey: "investorMetrics.title" },
+      { href: "/for-investors", labelKey: "nav.forInvestors" },
+    ];
+  }
+  return defaultMomentumCtas(persona, hasSession);
+}
+
+/** Kalendarz | Panel | Demo — same strip for every signed-in persona. */
+export function headerSessionNavLinks(
+  persona: MarketingPersona,
+  hasSession: boolean,
+): HeaderSessionNavLink[] {
+  if (!hasSession) return [];
+  return [
+    { href: "/dashboard/calendar", labelKey: "dashboard.calendarLink" },
+    { href: sessionPanelHref(persona), labelKey: "nav.dashboard" },
+    { href: "/demo", labelKey: "nav.demo" },
+  ];
+}
+
+/** Whether a signed-in header nav item matches the current route (incl. dashboard section hashes). */
+export function isSessionNavLinkActive(
+  pathname: string,
+  locationHash: string,
+  href: string,
+): boolean {
+  const [path, fragment] = href.split("#");
+  const base = path || "/";
+  if (fragment) {
+    return pathname === base && locationHash === `#${fragment}`;
+  }
+  if (base === "/demo") {
+    return pathname === "/demo" || pathname.startsWith("/demo/");
+  }
+  if (base === "/dashboard") {
+    return (
+      pathname === "/dashboard" ||
+      (pathname.startsWith("/dashboard/") && !pathname.startsWith("/dashboard/calendar"))
+    );
+  }
+  if (base === "/dashboard/calendar") {
+    return pathname === "/dashboard/calendar" || pathname.startsWith("/dashboard/calendar/");
+  }
+  const panelPrefixes = SESSION_PANEL_PREFIXES[base];
+  if (panelPrefixes) {
+    return panelPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+  }
+  return pathname === base || pathname.startsWith(`${base}/`);
+}
+
+export function showCorporateNav(hasSession: boolean): boolean {
+  return !hasSession;
+}
+
+/** Candidate lane: calendar + dashboard chrome in the header. */
 export function showCandidateProductNav(persona: MarketingPersona): boolean {
   return persona === "candidate";
+}
+
+/** Demo beside the logo — logged-out candidates only; signed-in users get Demo in the center tab strip. */
+export function showCandidateDemoNav(persona: MarketingPersona, hasSession: boolean): boolean {
+  return !hasSession && persona === "candidate";
+}
+
+export function logoutRedirectPath(persona: MarketingPersona): string {
+  return LOGIN_PATH[persona];
 }
 
 export type HeaderAccountLink = { href: string; labelKey: TranslationKey; isLogout?: boolean };
@@ -219,7 +457,7 @@ export function headerAccountLinks(
 ): HeaderAccountLink[] {
   if (!hasSession) {
     return [
-      { href: "/login", labelKey: "nav.login" },
+      { href: "/login?from=login", labelKey: "nav.login" },
       { href: "/register", labelKey: "nav.register" },
     ];
   }
@@ -254,6 +492,7 @@ export function footerExploreHrefsForPersona(persona: MarketingPersona): string[
       ...common,
       "/for-companies",
       "/calculator/b2b",
+      "/login/company",
       "/companies/signup",
       "/contact",
     ];
