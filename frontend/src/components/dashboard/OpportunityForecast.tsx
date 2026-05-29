@@ -144,19 +144,19 @@ export function OpportunityForecast({
       ) : null}
       <FeaturePaywall paywall={data.paywall} />
       <FeaturePaywall paywall={data.learning_path_paywall} titleKey="strategic.learningPathPaywallTitle" />
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {bands.map((band) => (
-          <div key={band} className="rounded-lg border border-[var(--twin-border)] p-3">
+          <div key={band} className="min-w-0 rounded-lg border border-[var(--twin-border)] p-3 sm:p-4">
             <h3 className="text-sm font-semibold">{t(BAND_KEYS[band])}</h3>
             <p className="twin-muted text-xs">
               {String((data[band] as ForecastJob[]).length)} {t("strategic.forecastRoles")}
             </p>
-            <ul className="mt-2 space-y-2">
+            <ul className="mt-2 space-y-3">
               {(data[band] as ForecastJob[]).slice(0, 5).map((job) => (
-                <li key={job.job_id} className="text-sm">
-                  <div className="flex flex-wrap items-start justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <span className="font-medium">{job.title}</span>
+                <li key={job.job_id} className="min-w-0 text-sm">
+                  <div className="flex min-w-0 flex-col gap-2">
+                    <div className="min-w-0">
+                      <span className="font-medium break-words">{job.title}</span>
                       <span className="twin-muted"> · {job.company}</span>
                       <span className="ml-1 text-xs text-[var(--twin-accent)]">{Math.round(job.score)}%</span>
                     </div>
@@ -171,7 +171,7 @@ export function OpportunityForecast({
                         autoApplyingId === job.job_id || !applyActionsGuard.canPrepareApplicationPackage
                       }
                       onClick={() => void autoApplyToJob(job.job_id)}
-                      className={`twin-btn-secondary twin-touch-target shrink-0 !w-auto px-2 py-1 text-xs font-semibold ${
+                      className={`twin-btn-secondary twin-touch-target w-full px-3 py-2 text-xs font-semibold leading-snug sm:max-w-full ${
                         applyActionsGuard.canPrepareApplicationPackage
                           ? "border-[var(--twin-cta)] text-[var(--twin-cta)]"
                           : "twin-btn--blocked"

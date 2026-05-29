@@ -944,7 +944,7 @@ html[data-marketing-surface="studio"] .twin-logo-accent {
 }
 
 /**
- * Candidate workspace subnav (profile / dashboard links): one row, horizontal scroll; no hyphen breaks on long PL labels.
+ * Candidate workspace subnav: wraps on narrow viewports so labels are never clipped.
  */
 .twin-workspace-subnav a,
 .twin-workspace-subnav button {
@@ -953,8 +953,6 @@ html[data-marketing-surface="studio"] .twin-logo-accent {
   white-space: nowrap;
   word-break: keep-all;
   overflow-wrap: normal;
-  flex-shrink: 0;
-  min-height: 2.75rem;
   align-items: center;
   display: inline-flex;
 }

@@ -24,21 +24,12 @@ type AutoApplySettings = {
   onboarding_completed: boolean;
 };
 
-type TriggerOut = {
-  applications_submitted: number;
-  applications_failed: number;
-  skipped_reason: string | null;
-  message: string;
-};
-
 export default function NightlyAutoApplySettingsPage() {
   const { t } = useTranslation();
   const [settings, setSettings] = useState<AutoApplySettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [triggering, setTriggering] = useState(false);
   const [showConsent, setShowConsent] = useState(false);
-  const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -84,7 +75,6 @@ export default function NightlyAutoApplySettingsPage() {
       });
       setSettings(data);
       setShowConsent(false);
-      setStatus(t("dashboard.nightlyAutoApplyEnabledHint").replace("{time}", data.next_run_label));
     } catch {
       setError(t("dashboard.nightlyAutoApplyConsentSaveFailed"));
     } finally {
@@ -93,6 +83,7 @@ export default function NightlyAutoApplySettingsPage() {
   }
 
   async function patch(partial: Partial<AutoApplySettings>) {
+    if (!canEnableAutonomous) return;
     setSaving(true);
     setError(null);
     try {
@@ -112,23 +103,8 @@ export default function NightlyAutoApplySettingsPage() {
     }
   }
 
-  async function runNow() {
-    setTriggering(true);
-    setError(null);
-    setStatus(null);
-    try {
-      const out = await apiFetch<TriggerOut>("/api/v1/auto-apply/trigger", { method: "POST" });
-      setStatus(t("dashboard.nightlyAutoApplyTriggerOk").replace("{message}", out.message));
-      await load();
-    } catch (err) {
-      const detail = err instanceof Error ? err.message : t("dashboard.nightlyAutoApplyTriggerFail");
-      setError(detail || t("dashboard.nightlyAutoApplyTriggerFail"));
-    } finally {
-      setTriggering(false);
-    }
-  }
-
   const nextTime = settings?.next_run_label ?? "02:00";
+  const toggleChecked = Boolean(canEnableAutonomous && settings?.is_active);
 
   return (
     <Shell wide rail>
@@ -158,12 +134,24 @@ export default function NightlyAutoApplySettingsPage() {
               <Link href="/profile" className="twin-link mt-2 inline-block text-sm">
                 {t("dashboard.jobsEmptyZeroProfileCta")} →
               </Link>
+            ) : settings && !settings.verified_readiness_ready ? (
+              <Link href="/dashboard" className="twin-link mt-2 inline-block text-sm">
+                {t("dashboard.title")} →
+              </Link>
             ) : null}
           </Card>
         )}
 
         {settings && (
           <>
+            {!canEnableAutonomous ? (
+              <Card variant="soft" className="border-amber-500/40 bg-amber-500/10 p-4">
+                <p className="text-sm font-semibold text-amber-950 dark:text-amber-100">
+                  {t("dashboard.nightlyAutoApplyBlockedUntilChecklist")}
+                </p>
+              </Card>
+            ) : null}
+
             {!settings.consent_given_at && canEnableAutonomous ? (
               <Card variant="soft" className="border-[var(--twin-accent-muted)] p-5">
                 <p className="font-semibold text-[var(--foreground)]">{t("dashboard.nightlyAutoApplyConsentNudgeTitle")}</p>
@@ -175,12 +163,14 @@ export default function NightlyAutoApplySettingsPage() {
             ) : null}
 
             <Card className="space-y-4 p-5">
-              <label className="flex cursor-pointer items-center justify-between gap-4">
+              <label
+                className={`flex items-center justify-between gap-4 ${canEnableAutonomous ? "cursor-pointer" : "cursor-not-allowed opacity-60"}`}
+              >
                 <span className="font-semibold">{t("dashboard.nightlyAutoApplyEnable")}</span>
                 <input
                   type="checkbox"
-                  className="h-5 w-5 accent-[var(--twin-accent)]"
-                  checked={settings.is_active}
+                  className="h-5 w-5 accent-[var(--twin-accent)] disabled:cursor-not-allowed disabled:opacity-40"
+                  checked={toggleChecked}
                   disabled={saving || !canEnableAutonomous}
                   onChange={(e) => {
                     if (!canEnableAutonomous) return;
@@ -192,14 +182,14 @@ export default function NightlyAutoApplySettingsPage() {
                   }}
                 />
               </label>
-              {settings.is_active && (
+              {toggleChecked ? (
                 <p className="text-xs text-[var(--twin-muted)]">
                   {t("dashboard.nightlyAutoApplyEnabledHint").replace("{time}", nextTime)}
                 </p>
-              )}
+              ) : null}
             </Card>
 
-            {settings.consent_given_at && (
+            {settings.consent_given_at && canEnableAutonomous ? (
               <Card className="space-y-5 p-5">
                 <div>
                   <div className="mb-2 flex justify-between text-sm">
@@ -215,6 +205,7 @@ export default function NightlyAutoApplySettingsPage() {
                     step={5}
                     value={settings.min_score_threshold}
                     className="w-full"
+                    disabled={!canEnableAutonomous}
                     onChange={(e) =>
                       setSettings((s) =>
                         s ? { ...s, min_score_threshold: Number(e.target.value) } : s,
@@ -234,6 +225,7 @@ export default function NightlyAutoApplySettingsPage() {
                     step={1}
                     value={settings.daily_limit}
                     className="w-full"
+                    disabled={!canEnableAutonomous}
                     onChange={(e) =>
                       setSettings((s) => (s ? { ...s, daily_limit: Number(e.target.value) } : s))
                     }
@@ -242,7 +234,7 @@ export default function NightlyAutoApplySettingsPage() {
                 <Button
                   type="button"
                   className="twin-btn-primary w-full"
-                  disabled={saving}
+                  disabled={saving || !canEnableAutonomous}
                   onClick={() =>
                     void patch({
                       min_score_threshold: settings.min_score_threshold,
@@ -253,9 +245,9 @@ export default function NightlyAutoApplySettingsPage() {
                   {t("dashboard.nightlyAutoApplySave")}
                 </Button>
               </Card>
-            )}
+            ) : null}
 
-            {settings.consent_given_at && (
+            {settings.consent_given_at ? (
               <Card className="grid gap-4 p-5 sm:grid-cols-3">
                 <div>
                   <p className="text-xs text-[var(--twin-muted)]">
@@ -280,34 +272,12 @@ export default function NightlyAutoApplySettingsPage() {
                   <p className="text-sm font-semibold">{settings.next_run_label}</p>
                 </div>
               </Card>
-            )}
+            ) : null}
 
             <Card className="p-5 text-sm">
               <p className="mb-1 font-semibold">{t("dashboard.nightlyAutoApplySupportedBoards")}</p>
               <p className="text-[var(--twin-muted)]">{settings.supported_boards}</p>
             </Card>
-
-            {settings.is_active && settings.consent_given_at && canEnableAutonomous && (
-              <Button
-                type="button"
-                className="twin-btn-secondary w-full"
-                disabled={saving || triggering}
-                onClick={() => void runNow()}
-              >
-                {triggering
-                  ? t("dashboard.nightlyAutoApplyTriggerRunning")
-                  : t("dashboard.nightlyAutoApplyTrigger")}
-              </Button>
-            )}
-
-            {status && (
-              <div className="space-y-2 text-sm text-[var(--twin-muted-strong)]">
-                <p>{status}</p>
-                <Link href="/dashboard" className="twin-link inline-block text-sm">
-                  {t("dashboard.nightlyAutoApplyTriggerViewApps")}
-                </Link>
-              </div>
-            )}
           </>
         )}
 

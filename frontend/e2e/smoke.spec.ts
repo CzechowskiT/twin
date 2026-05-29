@@ -122,6 +122,37 @@ test.describe("dashboard smoke (read-only, no live actions)", () => {
     await expect(page.getByRole("heading").first()).toBeVisible();
   });
 
+  const candidateRoutes = [
+    "/dashboard/career",
+    "/dashboard/billing",
+    "/dashboard/identity",
+    "/dashboard/settings/auto-apply",
+    "/dashboard/calendar",
+    "/profile",
+  ] as const;
+
+  for (const route of candidateRoutes) {
+    test(`unauthenticated ${route} does not leak unsafe copy`, async ({ page, context }) => {
+      await context.clearCookies();
+      await page.addInitScript(() => {
+        try {
+          window.localStorage?.clear();
+          window.sessionStorage?.clear();
+        } catch {
+          // ignore
+        }
+      });
+      await gotoSmoke(page, route);
+      await page.waitForLoadState("domcontentloaded").catch(() => {});
+      const bodyText = (await page.locator("body").innerText()).toLowerCase();
+      expect(bodyText).not.toMatch(/authologic_api_|checkout payment rails|twin applies autonomously/i);
+      expect(bodyText).not.toMatch(
+        /apply now|auto apply|submit application|kyc verified|guaranteed interview|fully verified|run now \(test\)/i,
+      );
+      await expect(page.locator("body")).toBeVisible();
+    });
+  }
+
   test("candidate jobs: unauthenticated /workspace/candidate/jobs routes toward login", async ({
     page,
     context,
