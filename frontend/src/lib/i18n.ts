@@ -1059,7 +1059,12 @@ const en = {
     calendarBlockGo: "Create calendar event",
     calendarConnectedAs: "Calendar account",
     calendarErrorGeneric: "That calendar action failed. Try disconnecting and connecting again.",
+    calendarErrorGoogleDenied: "Google sign-in was cancelled. Try Connect again when ready.",
     calendarErrorMicrosoftDenied: "Microsoft sign-in was cancelled. Try Connect again when ready.",
+    calendarErrorExchange:
+      "Calendar sign-in did not finish. If Connect fails again, ask support to verify the Google redirect URI in Cloud Console.",
+    calendarErrorNoRefresh:
+      "The provider did not return a refresh token. Disconnect, then connect again and accept all requested permissions.",
     calendarErrorMicrosoftExchange: "Microsoft sign-in did not finish. Try Connect again in a moment.",
     calendarErrorMicrosoftNoRefresh: "Microsoft did not return a refresh token. Re-consent with offline_access.",
     calendarErrorInvalidState: "OAuth session expired. Start Connect again from this page.",
@@ -3804,7 +3809,12 @@ const pl: MessageTree = {
     calendarBlockGo: "Utwórz wydarzenie",
     calendarConnectedAs: "Konto kalendarza",
     calendarErrorGeneric: "Akcja kalendarza nie powiodła się. Spróbuj odłączyć i połączyć ponownie.",
+    calendarErrorGoogleDenied: "Logowanie Google anulowane. Spróbuj Połącz ponownie.",
     calendarErrorMicrosoftDenied: "Logowanie Microsoft anulowane. Spróbuj Połącz ponownie.",
+    calendarErrorExchange:
+      "Logowanie kalendarza nie dokończyło się. Przy ponownej próbie poproś support o weryfikację redirect URI Google w Cloud Console.",
+    calendarErrorNoRefresh:
+      "Dostawca nie zwrócił refresh tokena. Odłącz kalendarz i połącz ponownie, akceptując wszystkie uprawnienia.",
     calendarErrorMicrosoftExchange: "Logowanie Microsoft nie dokończyło się. Spróbuj Połącz ponownie za chwilę.",
     calendarErrorMicrosoftNoRefresh: "Microsoft nie zwrócił refresh tokena. Ponów zgodę z offline_access.",
     calendarErrorInvalidState: "Sesja OAuth wygasła. Uruchom Połącz ponownie z tej strony.",

@@ -353,9 +353,10 @@ export default function DashboardCalendarPage() {
   const calendarErrorMessage = (() => {
     if (!calendarErrorCode) return null;
     const map: Record<string, TranslationKey> = {
+      google_denied: "dashboard.calendarErrorGoogleDenied",
       microsoft_denied: "dashboard.calendarErrorMicrosoftDenied",
-      exchange_failed: "dashboard.calendarErrorMicrosoftExchange",
-      no_refresh_token: "dashboard.calendarErrorMicrosoftNoRefresh",
+      exchange_failed: "dashboard.calendarErrorExchange",
+      no_refresh_token: "dashboard.calendarErrorNoRefresh",
       invalid_state: "dashboard.calendarErrorInvalidState",
     };
     const key = map[calendarErrorCode];
