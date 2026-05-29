@@ -9,6 +9,7 @@ Pairs with `docs/P1_CSP_ENFORCE_BURNIN_CHECKLIST_2026-05-27.md`.
 | ---------- | ------ | ---------------- | --------------- | ------------- | -------- | ----------- |
 | 2026-05-27 | Manual header check (prod alias) | Pending DB sink review | Unknown | Medium (insufficient evidence) | HOLD (report-only) | Collect `csp_reports` sample + route checks |
 | 2026-05-28 | `curl -sI` read-only checks on `/` and `/waitlist` | Header present: `content-security-policy-report-only` with `report-uri /api/v1/csp-report` | None observed in this check | Medium (no 72h clean evidence pack yet) | HOLD (report-only) | Keep daily log cadence; gather DB sink evidence and false-positive triage |
+| 2026-05-29 | `curl -sI` on `/` and `/dashboard` (prod) | Same report-only CSP + `report-uri`; no `Content-Security-Policy` enforce header | None in header probe | Medium (72h + DB sink still open) | HOLD (report-only) | Do **not** flip enforce; `pytest tests/test_csp_report*.py` 9 passed |
 
 ## Per-route spot check
 
@@ -17,7 +18,7 @@ Pairs with `docs/P1_CSP_ENFORCE_BURNIN_CHECKLIST_2026-05-27.md`.
 - [ ] `/demo`
 - [ ] `/login/candidate`
 - [ ] `/register/candidate`
-- [ ] `/dashboard` (logged-out redirect only)
+- [x] `/dashboard` (2026-05-29 report-only header on prod alias; logged-out)
 - [ ] `/status`
 
 ## Notes

@@ -3,6 +3,8 @@
 **Status:** Migration file **ready in repo** (`050_stripe_webhook_events.py`).
 **NOT run on production** — requires founder approval (gate S5).
 
+**2026-05-29 agent verify:** 52 pytest cases green locally; prod `alembic_version` **not confirmed** (public-health has no revision field). Founder SQL checklist: `docs/ALEMBIC_050_FOUNDER_VERIFICATION_2026-05-29.md`.
+
 ## Preconditions
 
 1. `git rev-parse HEAD` matches the commit containing `050_stripe_webhook_events.py`.

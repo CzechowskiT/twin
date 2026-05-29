@@ -8,6 +8,7 @@ Append-only evidence for `docs/RUNBOOK_DB_RESTORE_2026-05-27.md`.
 | Date (UTC) | Operator | Backup source | Target env | Result | Restore time | Errors | Screenshot/evidence | GO/NO-GO decision | Notes |
 | ---------- | -------- | ------------- | ---------- | ------ | ------------ | ------ | ------------------- | ----------------- | ----- |
 | _pending_ | founder | latest prod snapshot | staging clone | PENDING | — | — | attach restore target screenshot + health output + `alembic current` + SQL sanity query | NO-GO | First drill not yet executed |
+| 2026-05-29 | agent | — | — | PENDING | — | — | Runbook reviewed; no staging restore executed (HARD BAN: no prod DB touch) | NO-GO | O7 remains open until founder staging drill row with PASS |
 
 ## O7 quick references
 

@@ -43,7 +43,7 @@ the gate to ✅.
 | #  | Gate                                                                   | How to verify                                                                                  | Status today |
 | -- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------ |
 | O1 | Smoke workflow green on the latest 5 production commits                 | `gh run list --workflow smoke.yml --limit 5`                                                    | ✅ today     |
-| O2 | Production health endpoint returns `status=ok` + `db_ok=True`           | `GET https://twin-sooty.vercel.app/api/public-health` — `git_commit=f165096`, `db_ok=true` (2026-05-28)       | ✅ today     |
+| O2 | Production health endpoint returns `status=ok` + `db_ok=True`           | `GET https://twin-sooty.vercel.app/api/public-health` — `git_commit=df15618`, `db_ok=true` (2026-05-29)       | ✅ today     |
 | O3 | Celery worker is active in production (not eager, not zero nodes)       | `curl https://twin-production-bcd9.up.railway.app/api/v1/health/celery-status`                  | ✅ today     |
 | O4 | Stripe webhook endpoint is reachable, signature gate is wired           | `docs/P1_STRIPE_WEBHOOK_AUDIT_2026-05-27.md`                                                    | ✅           |
 | O5 | Calendar provider OAuth: Google + Microsoft live; Apple/iCal docs ready | `docs/CALENDAR_INTEGRATIONS_*.md` (none on the branch yet → see `.cursorrules` calendar section) | ⚠️ partial   |
@@ -85,11 +85,12 @@ the gate to ✅.
 | One ⚠️ partial on L6 (data subject access)                              | Document a manual workflow (`docs/GDPR_MANUAL_DSR.md`) and proceed.                   |
 | Any ❌ on Pilot gates                                                    | Pilot, not public launch — pilot has its own gate set (cf. `PILOT_OFFER_FINAL.md`).   |
 
-## Current gate stance (checkpoint 2026-05-28)
+## Current gate stance (checkpoint 2026-05-29)
 
 - **Controlled pilot GO:** **YES** (pilot gates remain green; O7 does not block controlled pilot operation).
 - **Investor/CTO demo GO:** **YES** (curated demo remains allowed with explicit no-launch posture).
-- **Public launch GO:** **NO-GO** while any of `S2`, `S5`, `O7`, `S10` blockers or unknowns remain.
+- **Public launch GO:** **NO-GO** while any of `S2`, `S5`, `O7`, `S11` blockers or unknowns remain.
+- **S5 prod revision:** **UNKNOWN** — agent read `public-health` (`git_commit=df15618`, `db_ok=true`); founder must run SQL in `docs/ALEMBIC_050_FOUNDER_VERIFICATION_2026-05-29.md`.
 
 ## What "launch" means in this checklist
 

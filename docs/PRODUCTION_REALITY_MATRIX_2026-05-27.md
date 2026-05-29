@@ -3,9 +3,9 @@
 ## Snapshot metadata
 
 - **Branch:** `cursor/phase1-monorepo-scaffold`
-- **Branch HEAD (local):** `f165096`
-- **Production API SHA (read-only):** `f165096d9e1e9b8668679da086050fe8fa8f0490` (`GET /api/public-health`, 2026-05-28 UTC)
-- **Vercel production SHA:** `unknown/not asserted` (no authenticated Vercel project read in this checkpoint)
+- **Branch HEAD (local):** `89ff454` (frontend) / API live `df15618`
+- **Production API SHA (read-only):** `df15618f1e2edec635ab868c03dcf736c463c8be` (`GET /api/public-health`, 2026-05-29 UTC)
+- **Vercel production deployment:** `dpl_5SK5YWGzzWtQTDULPm2kAx9qrdB9` at frontend `89ff454` (founder-known; Vercel CLI not on agent PATH)
 - **Frontend:** `https://twin-sooty.vercel.app` (canonical alias on Vercel project `twin`)
 - **API:** `https://twin-production-bcd9.up.railway.app`
 
@@ -18,7 +18,7 @@
 | Feature | Evidence | Production |
 | ------- | -------- | ---------- |
 | Public marketing (`/`, waitlist, first-1000) | HTTP 200 smoke | **LIVE** |
-| Status / public-health proxy | `git_commit=f165096`, `db_ok=true` in JSON (read-only check 2026-05-28) | **LIVE** |
+| Status / public-health proxy | `git_commit=df15618`, `db_ok=true` in JSON (read-only check 2026-05-29) | **LIVE** |
 | Candidate login (OAuth + email) | health flags `google_oauth`, `github_oauth` | **LIVE** (Apple OAuth **OFF**) |
 | Dashboard (candidate) | `/dashboard` 200; auth required for data | **LIVE** |
 | Demo snapshot page | `/demo` 200 | **LIVE** |
@@ -72,16 +72,17 @@
 
 ---
 
-## Repo vs live decision table (2026-05-28 refresh)
+## Repo vs live decision table (2026-05-29 refresh)
 
 | Item | Current state | Decision |
 | ---- | ------------- | -------- |
-| API runtime SHA | `f165096` visible on `public-health` | **LIVE** |
-| Branch docs/head | `f165096` local branch tip | **REPO=LIVE** for API SHA evidence at check time |
-| Vercel commit metadata | Not queried via authenticated Vercel API | **UNKNOWN** (do not assert) |
-| Stripe dedup migration `050` | Migration exists in repo; production revision unverified | **NEEDS EVIDENCE** (not marked live) |
-| CSP mode | `content-security-policy-report-only` header present | **LIVE REPORT-ONLY** |
-| CSP enforce | No enforce header evidence and enforce banned | **BLOCKED BY POLICY** |
+| API runtime SHA | `df15618` visible on `public-health` | **LIVE** |
+| Frontend Vercel SHA | `89ff454` / `dpl_5SK5YWGzzWtQTDULPm2kAx9qrdB9` (founder-known) | **LIVE** (not re-queried via CLI) |
+| Branch HEAD | `89ff454` | **REPO** may be ahead/behind FE deploy — verify before FE-only claims |
+| Stripe dedup migration `050` | Migration in repo; prod `alembic_version` **UNKNOWN** | **NEEDS EVIDENCE** — see `docs/ALEMBIC_050_FOUNDER_VERIFICATION_2026-05-29.md` |
+| CSP mode | `content-security-policy-report-only` on `/` and `/dashboard` (2026-05-29 curl) | **LIVE REPORT-ONLY** |
+| CSP enforce | No enforce header; S2 checklist not met | **BLOCKED BY POLICY** |
+| Delegated / KYC apply | Product gates | **NOT LIVE** |
 
 ---
 
