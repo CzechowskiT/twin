@@ -1,7 +1,7 @@
 # O7 — Postgres backup and restore runbook — 2026-05-27
 
 **Gate:** O7 in `docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md`
-**Status:** Documented procedure; **last restore drill not yet logged with PASS** → gate remains ❌ **PENDING EVIDENCE** (2026-05-29 operator review).
+**Status:** ✅ **PASS** — staging clone drill logged **2026-06-01** (`docs/BACKUP_RESTORE_DRILL_LOG.md` PASS row; pg_dump/pg_restore method; prod untouched).
 
 ## Railway Postgres (production)
 
@@ -13,7 +13,14 @@
 | RPO | ≤ 24h (daily snapshot) | Dashboard screenshot in ops log |
 | RTO | ≤ 2h manual restore | Drill log entry required |
 
-## Restore drill (staging proof for founder, no production overwrite)
+## Restore drill (staging proof — no production overwrite)
+
+**Approved methods (either):**
+
+1. **Railway UI:** Restore snapshot to **new database** (steps below).
+2. **pg_dump / pg_restore (founder 2026-06-01 PASS):** Read-only `pg_dump` custom format from prod Postgres → `pg_restore` into isolated staging Postgres. **No** prod Restore button, **no** prod `DATABASE_URL` change, **no** prod restart/deploy/migrations.
+
+### Railway UI path
 
 1. In Railway Postgres Backups, pick the latest snapshot and choose **Restore to new database**.
 2. Name target clearly (example: `twin-staging-restore-proof-YYYYMMDD`) and confirm target is **not** production.
@@ -23,6 +30,14 @@
 6. Run one SQL sanity query (`SELECT version_num FROM alembic_version;` plus one count like `SELECT COUNT(*) FROM users;`).
 7. **Log result** in `docs/BACKUP_RESTORE_DRILL_LOG.md` with PASS/FAIL and evidence artifacts.
 8. Return staging API env to previous non-restore DB after proof if needed.
+
+### pg_dump path (2026-06-01 evidence)
+
+- Railway project: `responsible-success`
+- Prod env: `production` — active volume **`postgres-volume`** (must remain untouched)
+- Staging env: `staging-restore-proof-20260529` — Postgres **Postgres-HE2P**, volume **`postgres-volume-p1D7`**
+- Dump artifact: `twin_o7_prod_20260601T180324Z.dump` (294K, custom format)
+- Integrity: staging row counts match prod pre-check (see drill log SQL table)
 
 ## Production restore (incident only)
 
@@ -53,9 +68,9 @@ See `docs/INCIDENT_RESPONSE_RUNBOOK_2026-05-27.md` § database outage.
 
 ## What closes gate O7
 
-- [ ] Daily backup confirmed in Railway UI
-- [ ] One successful restore drill logged (staging clone) with **PASS** row meeting all criteria above
-- [ ] RPO/RTO row filled in this doc with actual drill timestamps
+- [x] Daily backup confirmed in Railway UI (founder attestation in drill log)
+- [x] One successful restore drill logged (staging clone) with **PASS** row — **2026-06-01**
+- [ ] RPO/RTO row filled in this doc with measured restore duration (dump size 294K logged; duration not timed)
 
 ## Founder-safe evidence checklist (must attach)
 

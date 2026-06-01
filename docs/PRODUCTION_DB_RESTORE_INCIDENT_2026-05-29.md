@@ -25,7 +25,7 @@ On **2026-05-29**, founder accidentally activated a **wrong restored backup volu
 3. Postgres online; Railway deploy successful (no agent deploy/migrations/env changes).
 4. Dashboard recovered (founder visual): **feed 2501**, **matches 200**, **applications 12**, **pipeline 11**; Google Calendar events visible again.
 
-**Classification:** production **incident** — **NOT** gate O7 staging drill. O7 remains **FAIL / PENDING EVIDENCE**.
+**Classification:** production **incident** — **NOT** gate O7 staging drill. O7 closed separately (**2026-06-01** staging clone PASS — see `docs/BACKUP_RESTORE_DRILL_LOG.md`).
 
 ## Timeline
 
@@ -112,16 +112,16 @@ Founder dashboard (unchanged from recovery): feed **2501**, matches **200**, app
 1. Attach Railway **screenshots** (volumes before/after, activity log) to Evidence log.
 2. Re-run read-only SQL: `alembic_version`, row counts — confirm `050_stripe_webhook_events` still current.
 3. Keep backups **2026-05-25** and **2026-05-29 14:09 UTC** until post-mortem closed (see table above).
-4. Execute **O7 staging clone drill** separately — prod incident recovery **does not** close O7.
+4. ~~Execute **O7 staging clone drill** separately~~ — **done 2026-06-01** (staging PASS; separate from this incident).
 
 ## Gate / launch verdicts (post-recovery stabilization)
 
 | Surface | Verdict |
 | ------- | ------- |
-| O7 backup/restore drill | **FAIL / PENDING EVIDENCE** — prod incident ≠ staging drill PASS |
+| O7 backup/restore drill | ✅ **PASS** (2026-06-01 staging drill — separate from this incident) |
 | Controlled pilot | **GO** — read-only health green; founder dashboard non-zero |
 | Investor/demo | **GO** — `mvp-stats` 200; live DB metrics restored (curated demo posture unchanged) |
-| Public launch | **NO-GO** — `S2` (CSP enforce) + **O7 staging drill** still open |
+| Public launch | **NO-GO** — **`S2`** (CSP enforce) and remaining gates; O7 closed 2026-06-01 |
 
 ## Evidence log (append-only)
 
