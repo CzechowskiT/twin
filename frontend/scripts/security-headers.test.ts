@@ -111,6 +111,7 @@ run("CSP directives are present and explicit", async () => {
     "img-src",
     "font-src",
     "connect-src",
+    "frame-src",
     "frame-ancestors",
     "base-uri",
     "form-action",
@@ -140,6 +141,46 @@ run("CSP report-uri points at the backend sink", async () => {
   // src/app/api/v1/[[...path]]/route.ts. Burn-in only — header stays
   // Report-Only and the endpoint is no-op-safe (HTTP 204).
   assert.match(csp, /report-uri\s+\/api\/v1\/csp-report/);
+});
+
+run("CSP uses narrowed host allowlists (no https: wildcards)", async () => {
+  const groups = await configuredHeaders();
+  const all = groups[0];
+  const csp =
+    pickHeader(all.headers, "Content-Security-Policy-Report-Only")?.value ??
+    pickHeader(all.headers, "Content-Security-Policy")?.value ??
+    "";
+  for (const directive of ["img-src", "font-src", "connect-src"]) {
+    const m = csp.match(new RegExp(`${directive}\\s+([^;]+)`));
+    assert.ok(m, `missing ${directive}`);
+    // Scheme wildcard `https:` (any HTTPS origin) must not remain after narrowing.
+    assert.doesNotMatch(
+      m![1],
+      /(?:^|\s)https:(?:\s|$)/,
+      `${directive} still contains permissive https: wildcard`,
+    );
+  }
+});
+
+run("CSP frame-src allows YouTube nocookie embed", async () => {
+  const groups = await configuredHeaders();
+  const all = groups[0];
+  const csp =
+    pickHeader(all.headers, "Content-Security-Policy-Report-Only")?.value ??
+    pickHeader(all.headers, "Content-Security-Policy")?.value ??
+    "";
+  assert.match(csp, /frame-src\s+https:\/\/www\.youtube-nocookie\.com/);
+});
+
+run("CSP script-src allows Plausible when analytics consent is granted", async () => {
+  const groups = await configuredHeaders();
+  const all = groups[0];
+  const csp =
+    pickHeader(all.headers, "Content-Security-Policy-Report-Only")?.value ??
+    pickHeader(all.headers, "Content-Security-Policy")?.value ??
+    "";
+  assert.match(csp, /script-src[^;]*https:\/\/plausible\.io/);
+  assert.match(csp, /connect-src[^;]*https:\/\/us\.i\.posthog\.com/);
 });
 
 setTimeout(() => {

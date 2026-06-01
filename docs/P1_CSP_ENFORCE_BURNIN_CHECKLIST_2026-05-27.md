@@ -5,8 +5,9 @@ every box below is checked on the **preview alias** for 72h.
 
 ## Preconditions
 
-- [ ] `report-uri /api/v1/csp-report` visible on `/` (FE runtime test in `e2e/smoke.spec.ts`)
-- [ ] Backend sink rate-limited (`60/min`) and sanitization tests green
+- [x] `report-uri /api/v1/csp-report` visible on `/` (FE runtime test in `e2e/smoke.spec.ts`)
+- [x] Backend sink rate-limited (`60/min`) and sanitization tests green
+- [ ] Narrowed report-only CSP deployed to preview alias (`frontend/next.config.ts` 2026-06-01 slice)
 - [ ] No PII in CSP report **log sample** (manual Railway log spot-check — endpoint is storage-free, no DB table)
 
 ## Burn-in (72h preview)

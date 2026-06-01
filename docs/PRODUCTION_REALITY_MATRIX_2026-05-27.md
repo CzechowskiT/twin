@@ -91,7 +91,7 @@
 | Google Calendar FULL prod smoke (2026-05-29) | `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md` | **LIVE / VERIFIED** — OAuth + real events + day mapping; Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, HEAD `3631c45`; no Railway |
 | Founder authenticated smoke (2026-05-29) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **LIVE / VERIFIED** — P6 **PASS**; 8/8 routes + safety; `/dashboard` layout founder-confirmed |
 | CSP per-route probe (2026-05-29 batch) | `/`, `/dashboard`, `/login/candidate`, `/demo`, `/status` — all report-only | **LIVE REPORT-ONLY** — enforce still blocked (S2) |
-| CSP S2 readiness audit (2026-06-01) | 8 routes via `scripts/audit-csp-headers.sh`; `docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md` | **NOT READY** — infra OK; 72h violation triage missing; public launch NO-GO |
+| CSP S2 readiness audit (2026-06-01) | 8 routes via `scripts/audit-csp-headers.sh`; narrowed CSP in repo | **NOT READY** — repo narrowed report-only prepared; prod permissive; 72h triage pending |
 
 ---
 

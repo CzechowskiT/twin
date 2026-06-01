@@ -15,8 +15,8 @@ Public launch remains **NO-GO** until S2 closes and legal gates clear.
 | `report-uri /api/v1/csp-report` | **Present** on all audited routes |
 | Report sink (`POST /api/v1/csp-report`) | **Live** — storage-free, rate-limited, sanitization tested |
 | 72h burn-in violation triage | **MISSING** — no log/DB evidence pack |
-| Directive narrowing (host allowlists) | **NOT DONE** — permissive `https:` wildcards remain |
-| Founder enforce decision | **PENDING** — blocked on burn-in evidence |
+| Directive narrowing (host allowlists) | **PREPARED IN REPO** (2026-06-01) — not on prod until frontend deploy |
+| Founder enforce decision | **PENDING** — blocked on deploy + 72h log triage + DevTools checklist |
 
 ## CSP implementation map
 
@@ -30,19 +30,18 @@ Public launch remains **NO-GO** until S2 closes and legal gates clear.
 
 ### Current policy (report-only, prod alias 2026-06-01)
 
+**Production (live today):** permissive `https:` wildcards — unchanged until next frontend deploy.
+
+**Repo (prepared 2026-06-01):** narrowed host allowlists — see `docs/S2_CSP_EXTERNAL_ORIGIN_INVENTORY_2026-06-01.md`.
+
+Prod header sample (unchanged on live alias until deploy):
+
 ```
 Content-Security-Policy-Report-Only:
-  default-src 'self';
-  script-src 'self' 'unsafe-inline' 'unsafe-eval';
-  style-src 'self' 'unsafe-inline';
-  img-src 'self' data: https:;
-  font-src 'self' data: https:;
-  connect-src 'self' https:;
-  frame-ancestors 'none';
-  base-uri 'self';
-  form-action 'self';
-  report-uri /api/v1/csp-report
+  default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; … img-src 'self' data: https:; … connect-src 'self' https:; … report-uri /api/v1/csp-report
 ```
+
+Repo narrowed policy — full string in `docs/S2_CSP_EXTERNAL_ORIGIN_INVENTORY_2026-06-01.md`.
 
 ### Dev vs prod
 
@@ -181,6 +180,10 @@ No DB/data side-effects from CSP changes.
 
 ## Related docs
 
+- `docs/S2_CSP_EXTERNAL_ORIGIN_INVENTORY_2026-06-01.md`
+- `docs/S2_CSP_RAILWAY_LOG_TRIAGE_PLAN_2026-06-01.md`
+- `docs/S2_CSP_DEVTOOLS_BURNIN_CHECKLIST_2026-06-01.md`
+- `docs/S2_CSP_UNSAFE_INLINE_EVAL_ASSESSMENT_2026-06-01.md`
 - `docs/P1_CSP_ENFORCEMENT_PLAN_2026-05-27.md`
 - `docs/P1_CSP_ENFORCE_BURNIN_CHECKLIST_2026-05-27.md`
 - `docs/P1_CSP_ENFORCE_BURNIN_DAILY_LOG_2026-05-27.md`
