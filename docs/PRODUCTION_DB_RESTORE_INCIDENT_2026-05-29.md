@@ -2,7 +2,8 @@
 
 **Incident ID:** `INC-DB-2026-05-29-001`  
 **Severity:** **S0** (wrong production Postgres volume temporarily mounted)  
-**Status:** **RESOLVED** — original volume re-mounted; dashboard data recovered (founder-verified + read-only curl)  
+**Status:** **RESOLVED** — original volume re-mounted; **post-recovery stabilization check PASSED** (read-only curl)
+**Active volume:** **`postgres-volume`** (original production) mounted at `/var/lib/postgresql/data`
 **Operator:** founder  
 **Agent role:** read-only verification + documentation (no deploy, no DB mutation)
 
@@ -86,14 +87,34 @@ On **2026-05-29**, founder accidentally activated a **wrong restored backup volu
 
 **Not performed (by design this session):** deploy, migrations, env changes, scrape, apply/auto-apply.
 
+## Post-recovery stabilization (read-only)
+
+**Verdict:** **PASSED** — production recovered after volume re-mount; health surfaces green; no agent deploy/migrations/env/DB mutations.
+
+| Check (agent, read-only) | Result |
+| ------------------------ | ------ |
+| `GET /api/public-health` | `status=ok`, **`db_ok=true`**, `validated_jobs=652`, `market_coverage_active_validated=2551`, Celery `worker_active=true` |
+| `GET /api/v1/health` | `status=ok` |
+| `GET /api/v1/public/mvp-stats` | HTTP **200** — `database_reachable=true`, `registered_users=3`, `total_applications=17`, `interviews_scheduled=3` |
+| Frontend `/`, `/dashboard` | HTTP **200** |
+
+Founder dashboard (unchanged from recovery): feed **2501**, matches **200**, applications **12**, pipeline **11**, Google Calendar OK. Corpus metric may drift slightly (2551 vs 2501) as scrape/validation runs — not treated as regression.
+
+### Backup retention (until post-mortem closed)
+
+| Backup | UTC | Retain |
+| ------ | --- | ------ |
+| Wrong-volume source | **2026-05-25 07:33** | **Yes** — do not delete until post-mortem signed off |
+| Incorrect-state safety snapshot | **2026-05-29 14:09** | **Yes** — taken before re-mount; keep for forensics |
+
 ## Remaining founder actions (optional hardening)
 
 1. Attach Railway **screenshots** (volumes before/after, activity log) to Evidence log.
 2. Re-run read-only SQL: `alembic_version`, row counts — confirm `050_stripe_webhook_events` still current.
-3. Retain **2026-05-29 14:09 UTC** incorrect-state backup until incident closed in post-mortem.
+3. Keep backups **2026-05-25** and **2026-05-29 14:09 UTC** until post-mortem closed (see table above).
 4. Execute **O7 staging clone drill** separately — prod incident recovery **does not** close O7.
 
-## Gate / launch verdicts (post-recovery)
+## Gate / launch verdicts (post-recovery stabilization)
 
 | Surface | Verdict |
 | ------- | ------- |
@@ -111,6 +132,7 @@ On **2026-05-29**, founder accidentally activated a **wrong restored backup volu
 | 2026-05-29 14:09 | founder | Backup of incorrect state | Safety snapshot before re-mount |
 | 2026-05-29 14:09+ | founder | Re-mount **`postgres-volume`** | Dashboard: feed 2501, matches 200, apps 12, pipeline 11; calendar OK |
 | 2026-05-29 | agent (read-only) | Post-recovery curl | `db_ok=true`, `mvp-stats` **200**, `market_coverage_active_validated=2501` |
+| 2026-05-29 | agent (read-only) | **Stabilization check** | **PASSED** — `db_ok=true`, `mvp-stats` **200**, corpus **2551**, FE **200**; original `postgres-volume` active |
 
 ## Hard bans honoured (agent sessions)
 

@@ -13,6 +13,7 @@ Append-only evidence for `docs/RUNBOOK_DB_RESTORE_2026-05-27.md`.
 | 2026-05-29 | release gate agent (batch 2) | — | — | **PENDING EVIDENCE** | — | none | Re-confirmed: no staging Railway access; prod untouched; runbook + founder checklist complete | **NO-GO** | O7 unchanged — restore drill requires founder credentials |
 | 2026-05-29 | founder (reported) | Manual backup **2026-05-25 07:33 UTC** (~120 MB) | **production Postgres** (wrong volume mounted; original `postgres-volume` unmounted) | **FAIL / INCIDENT** | unknown | UI "Restoring backup…"; dashboard zeros; calendar disconnected | Pre-recovery: agent curl `mvp-stats` **500** | **NO-GO** | **NOT O7** — `INC-DB-2026-05-29-001`; see incident doc |
 | 2026-05-29 | founder | Backup of incorrect state **14:09 UTC**; re-mount original **`postgres-volume`** | production Postgres (volume rollback) | **RECOVERED** (incident) | — | Dashboard: feed 2501, matches 200, apps 12, pipeline 11; calendar OK | Post-recovery: agent curl `mvp-stats` **200**, `market_coverage_active_validated=2501` | **NO-GO (O7)** | Prod recovery **does not** close O7 — staging clone drill still **PENDING EVIDENCE** |
+| 2026-05-29 | agent (read-only) | Post-recovery **stabilization** check (`INC-DB-2026-05-29-001`) | production Postgres (`postgres-volume` active) | **STABLE** | — | `public-health` ok, `db_ok=true`, `mvp-stats` **200** | Retain backups **2026-05-25** + **2026-05-29 14:09 UTC** until post-mortem closed | **NO-GO (O7)** | Stabilization **≠** O7 PASS; staging clone drill still required |
 
 ## O7 PASS criteria (summary)
 

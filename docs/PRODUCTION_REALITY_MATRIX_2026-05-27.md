@@ -5,7 +5,7 @@
 - **Branch:** `cursor/phase1-monorepo-scaffold`
 - **Branch HEAD (local):** `3631c45` (frontend) / API live `df15618`
 - **Production API SHA (read-only):** `df15618f1e2edec635ab868c03dcf736c463c8be` (`GET /api/public-health`, 2026-05-29 UTC)
-- **DB incident (2026-05-29):** `INC-DB-2026-05-29-001` — **RESOLVED** — wrong volume mounted then original `postgres-volume` re-mounted; post-recovery `mvp-stats` **200**, feed corpus **2501** — see `docs/PRODUCTION_DB_RESTORE_INCIDENT_2026-05-29.md`
+- **DB incident (2026-05-29):** `INC-DB-2026-05-29-001` — **RESOLVED** + **stabilization PASSED** — original `postgres-volume` active; `mvp-stats` **200**, corpus **2551** (read-only curl); retain backups **2026-05-25** + **2026-05-29 14:09 UTC** until post-mortem — see `docs/PRODUCTION_DB_RESTORE_INCIDENT_2026-05-29.md`
 - **Vercel production deployment:** `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH` at frontend `3631c45` (Google Calendar day-mapping fix; founder re-smoke 2026-05-29)
 - **Frontend:** `https://twin-sooty.vercel.app` (canonical alias on Vercel project `twin`)
 - **API:** `https://twin-production-bcd9.up.railway.app`
@@ -52,7 +52,7 @@
 | Privacy / Terms pages | smoke / routes | **LIVE** |
 | Data subject export/delete | L6 gate | **PARTIAL** |
 | Celery worker + broker | celery-status + health | **LIVE** |
-| Postgres | `db_ok=true`; original volume re-mounted | **LIVE / RECOVERED** — `INC-DB-2026-05-29-001` resolved; `market_coverage_active_validated=2501` |
+| Postgres | `db_ok=true`; **`postgres-volume` active** | **LIVE / STABLE** — stabilization passed; `market_coverage_active_validated=2551` (read-only curl) |
 | Backup restore drill | O7 gate | **FAIL / PENDING EVIDENCE** — prod incident recovery ≠ O7 PASS; staging clone drill still required |
 | Controlled pilot ops | pilot manual + tracker | **LIVE** — resume after recovery verified (founder dashboard non-zero) |
 | Candidate E2E manual smoke | `docs/CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md` | **LIVE** — PASS (founder-verified, 2026-05-27); Top 20 → Nietrafione → refresh regression. Warning: no auto-apply / real apply / scrape. |
@@ -86,7 +86,7 @@
 | CSP enforce | No enforce header; S2 checklist not met | **BLOCKED BY POLICY** |
 | Delegated / KYC apply | Product gates | **NOT LIVE** |
 | O7 restore drill | Prod incident RECOVERED; no staging PASS row | **FAIL / PENDING EVIDENCE** — staging clone drill still required |
-| DB prod restore incident | `docs/PRODUCTION_DB_RESTORE_INCIDENT_2026-05-29.md` | **RESOLVED** — volume re-mount 2026-05-29; backup of wrong state 14:09 UTC retained |
+| DB prod restore incident | `docs/PRODUCTION_DB_RESTORE_INCIDENT_2026-05-29.md` | **RESOLVED / STABLE** — re-mount original volume; retain backups **2026-05-25** + **14:09 UTC** until post-mortem |
 | Google Calendar FULL prod smoke (2026-05-29) | `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md` | **LIVE / VERIFIED** — OAuth + real events + day mapping; Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, HEAD `3631c45`; no Railway |
 | Founder authenticated smoke (2026-05-29) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **LIVE / VERIFIED** — P6 **PASS**; 8/8 routes + safety; `/dashboard` layout founder-confirmed |
 | CSP per-route probe (2026-05-29 batch) | `/`, `/dashboard`, `/login/candidate`, `/demo`, `/status` — all report-only | **LIVE REPORT-ONLY** — enforce still blocked (S2) |
