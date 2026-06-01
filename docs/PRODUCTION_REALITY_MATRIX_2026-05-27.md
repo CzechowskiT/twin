@@ -2,8 +2,8 @@
 
 ## Snapshot metadata
 
-- **Branch:** `cursor/phase1-monorepo-scaffold`
-- **Branch HEAD (local):** `3631c45` (frontend) / API live `df15618`
+- **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01` (audit) / prod unchanged
+- **Branch HEAD (local):** `141d176` (audit branch) / API live `df15618`
 - **Production API SHA (read-only):** `df15618f1e2edec635ab868c03dcf736c463c8be` (`GET /api/public-health`, 2026-05-29 UTC)
 - **DB incident (2026-05-29):** `INC-DB-2026-05-29-001` — **RESOLVED** + stabilization PASSED — see `docs/PRODUCTION_DB_RESTORE_INCIDENT_2026-05-29.md`
 - **O7 staging drill (2026-06-01):** ✅ **PASS** — pg_dump/pg_restore to `staging-restore-proof-20260529`; prod **`postgres-volume`** untouched — see `docs/BACKUP_RESTORE_DRILL_LOG.md`
@@ -91,6 +91,7 @@
 | Google Calendar FULL prod smoke (2026-05-29) | `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md` | **LIVE / VERIFIED** — OAuth + real events + day mapping; Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, HEAD `3631c45`; no Railway |
 | Founder authenticated smoke (2026-05-29) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **LIVE / VERIFIED** — P6 **PASS**; 8/8 routes + safety; `/dashboard` layout founder-confirmed |
 | CSP per-route probe (2026-05-29 batch) | `/`, `/dashboard`, `/login/candidate`, `/demo`, `/status` — all report-only | **LIVE REPORT-ONLY** — enforce still blocked (S2) |
+| CSP S2 readiness audit (2026-06-01) | 8 routes via `scripts/audit-csp-headers.sh`; `docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md` | **NOT READY** — infra OK; 72h violation triage missing; public launch NO-GO |
 
 ---
 
