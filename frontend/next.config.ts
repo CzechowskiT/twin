@@ -1,5 +1,24 @@
 import type { NextConfig } from "next";
 
+/**
+ * Narrowed report-only CSP for S2 burn-in (2026-06-01).
+ * Host allowlists from `docs/S2_CSP_EXTERNAL_ORIGIN_INVENTORY_2026-06-01.md`.
+ * Stays `Content-Security-Policy-Report-Only` — no enforce flip in this slice.
+ * Prod keeps prior header until the next frontend deploy.
+ */
+const CSP_REPORT_ONLY =
+  "default-src 'self'; " +
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://plausible.io; " +
+  "style-src 'self' 'unsafe-inline'; " +
+  "img-src 'self' data: blob: https://images.unsplash.com https://cdn.simpleicons.org https://cdn.jsdelivr.net https://www.google.com https://t0.gstatic.com https://t1.gstatic.com https://t2.gstatic.com https://t3.gstatic.com https://icons.duckduckgo.com https://www.capitalone.com; " +
+  "font-src 'self' data:; " +
+  "connect-src 'self' https://plausible.io https://us.i.posthog.com; " +
+  "frame-src https://www.youtube-nocookie.com; " +
+  "frame-ancestors 'none'; " +
+  "base-uri 'self'; " +
+  "form-action 'self'; " +
+  "report-uri /api/v1/csp-report";
+
 const securityHeaders = [
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -10,8 +29,7 @@ const securityHeaders = [
   },
   {
     key: "Content-Security-Policy-Report-Only",
-    value:
-      "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data: https:; connect-src 'self' https:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; report-uri /api/v1/csp-report",
+    value: CSP_REPORT_ONLY,
   },
 ];
 

@@ -11,7 +11,8 @@ Pairs with `docs/P1_CSP_ENFORCE_BURNIN_CHECKLIST_2026-05-27.md`.
 | 2026-05-28 | `curl -sI` read-only checks on `/` and `/waitlist` | Header present: `content-security-policy-report-only` with `report-uri /api/v1/csp-report` | None observed in this check | Medium (no 72h clean evidence pack yet) | HOLD (report-only) | Keep daily log cadence; gather DB sink evidence and false-positive triage |
 | 2026-05-29 | `curl -sI` on `/` and `/dashboard` (prod) | Same report-only CSP + `report-uri`; no `Content-Security-Policy` enforce header | None in header probe | Medium (72h + DB sink still open) | HOLD (report-only) | Do **not** flip enforce; `pytest tests/test_csp_report*.py` 9 passed |
 | 2026-05-29 (batch 2) | `curl -sI` on `/`, `/dashboard`, `/login/candidate`, `/demo`, `/status` (prod alias) | All HTTP 200; `content-security-policy-report-only` on every route; **no** enforce `Content-Security-Policy` header | None in header probe | Medium (72h clean window + DB sink triage still open) | HOLD (report-only) | Complete per-route spot check; keep enforce blocked per S2 checklist |
-| 2026-05-29 (batch 3) | `curl -sI` on `/`, `/dashboard`, `/login/candidate`, `/register/candidate`, `/demo`, `/status` (`twin-sooty.vercel.app`) | All HTTP 200; report-only + `report-uri /api/v1/csp-report`; no enforce header | None in header probe | Medium (72h + `csp_reports` triage still open) | HOLD (report-only) | `pytest` CSP 9 passed; see `docs/RELEASE_GATE_O7_S2_VERIFICATION_2026-05-29.md` |
+| 2026-06-01 | `scripts/audit-csp-headers.sh` + manual `curl -sI` on 8 routes (prod alias) | All HTTP 200; report-only + `report-uri`; prod still permissive `https:` wildcards | None in header probe | Medium | HOLD (report-only) | See `docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md` |
+| 2026-06-01 (batch 2) | Narrowed CSP prepared in repo (`frontend/next.config.ts`); prod still permissive | Repo: explicit hosts + `frame-src`; prod unchanged until deploy | None in header probe | Medium | HOLD (report-only) | Deploy narrowed report-only to preview → start 72h log triage |
 
 ## Per-route spot check
 
@@ -19,9 +20,11 @@ Pairs with `docs/P1_CSP_ENFORCE_BURNIN_CHECKLIST_2026-05-27.md`.
 - [x] `/waitlist` (2026-05-28 header evidence captured)
 - [x] `/demo` (2026-05-29 report-only header on prod alias)
 - [x] `/login/candidate` (2026-05-29 report-only header on prod alias)
-- [x] `/register/candidate` (2026-05-29 batch 3 report-only header on prod alias)
+- [x] `/register/candidate` (2026-06-01 report-only header on prod alias)
 - [x] `/dashboard` (2026-05-29 report-only header on prod alias; logged-out)
 - [x] `/status` (2026-05-29 report-only header on prod alias)
+- [x] `/dashboard/calendar` (2026-06-01 report-only header on prod alias; logged-out)
+- [x] `/api/public-health` (2026-06-01 report-only header on prod alias)
 
 ## Notes
 

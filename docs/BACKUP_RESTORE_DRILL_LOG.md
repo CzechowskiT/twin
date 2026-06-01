@@ -11,7 +11,20 @@ Append-only evidence for `docs/RUNBOOK_DB_RESTORE_2026-05-27.md`.
 | 2026-05-29 | agent | — | — | PENDING | — | — | Runbook reviewed; no staging restore executed (HARD BAN: no prod DB touch) | NO-GO | O7 remains open until founder staging drill row with PASS |
 | 2026-05-29 | O7 drill operator (agent) | Railway Postgres daily snapshot (prod source, **not** restored over prod) | staging clone `twin-staging-restore-proof-YYYYMMDD` (expected) | **PENDING EVIDENCE** | — | none (drill not executed) | No Railway staging creds in agent session; prod health read-only OK (`db_ok=true`, SHA `df15618`) | **NO-GO** | Prepared evidence path + PASS criteria in runbook; **founder must execute** steps 1–8 in `RUNBOOK_DB_RESTORE_2026-05-27.md` |
 | 2026-05-29 | release gate agent (batch 2) | — | — | **PENDING EVIDENCE** | — | none | Re-confirmed: no staging Railway access; prod untouched; runbook + founder checklist complete | **NO-GO** | O7 unchanged — restore drill requires founder credentials |
-| 2026-05-29 | release gate owner (batch 3) | — (not selected) | — (clone not created) | **PENDING EVIDENCE** | — | Railway CLI absent in agent env | Read-only prod health `db_ok=true` (`git_commit=df15618`); evidence pack in `docs/RELEASE_GATE_O7_S2_VERIFICATION_2026-05-29.md` | **NO-GO** | Founder: Postgres → Backups → restore **new** DB `twin-staging-restore-proof-YYYYMMDD` → staging API only → `alembic current` + SQL sanity → **PASS** row |
+| 2026-05-29 | founder (reported) | Manual backup **2026-05-25 07:33 UTC** (~120 MB) | **production Postgres** (wrong volume mounted; original `postgres-volume` unmounted) | **FAIL / INCIDENT** | unknown | UI "Restoring backup…"; dashboard zeros; calendar disconnected | Pre-recovery: agent curl `mvp-stats` **500** | **NO-GO** | **NOT O7** — `INC-DB-2026-05-29-001`; see incident doc |
+| 2026-05-29 | founder | Backup of incorrect state **14:09 UTC**; re-mount original **`postgres-volume`** | production Postgres (volume rollback) | **RECOVERED** (incident) | — | Dashboard: feed 2501, matches 200, apps 12, pipeline 11; calendar OK | Post-recovery: agent curl `mvp-stats` **200**, `market_coverage_active_validated=2501` | **NO-GO (O7)** | Prod recovery **does not** close O7 — staging clone drill still **PENDING EVIDENCE** |
+| 2026-05-29 | agent (read-only) | Post-recovery **stabilization** check (`INC-DB-2026-05-29-001`) | production Postgres (`postgres-volume` active) | **STABLE** | — | `public-health` ok, `db_ok=true`, `mvp-stats` **200** | Retain backups **2026-05-25** + **2026-05-29 14:09 UTC** until post-mortem closed | **NO-GO (O7)** | Stabilization **≠** O7 PASS; staging clone drill still required |
+| 2026-06-01 | founder | Read-only **pg_dump** prod Postgres → `twin_o7_prod_20260601T180324Z.dump` (294K, custom format) | **staging clone** — env `staging-restore-proof-20260529`, Postgres **Postgres-HE2P**, volume **`postgres-volume-p1D7`** (isolated; **not** production) | **PASS** | not timed | none | SQL sanity (counts only): alembic `050_stripe_webhook_events`; users **3**, candidates **3**, job_matches **1091**, applications **17** — staging matches prod pre-check; post-drill prod `public-health`: `status=ok`, `db_ok=true`, corpus **2551** | **GO** | Method: pg_dump (read-only prod) → pg_restore staging via DATABASE_PUBLIC_URL; **no** prod Restore button, **no** prod DATABASE_URL change, **no** prod restart/deploy/migrations; prod volume **`postgres-volume`** untouched; separate from `INC-DB-2026-05-29-001` |
+
+## O7 staging drill SQL evidence (2026-06-01, counts only)
+
+| Check | Prod (pre-check, read-only) | Staging (post-restore) |
+| ----- | --------------------------- | ---------------------- |
+| `alembic_version` | `050_stripe_webhook_events` | `050_stripe_webhook_events` |
+| `users` | 3 | 3 |
+| `candidates` | 3 | 3 |
+| `job_matches` | 1091 | 1091 |
+| `applications` | 17 | 17 |
 
 ## O7 PASS criteria (summary)
 

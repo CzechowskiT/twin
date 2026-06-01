@@ -25,7 +25,7 @@ the gate to ✅.
 | #  | Gate                                                                   | How to verify                                                                                  | Status today |
 | -- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------ |
 | S1 | CSP report-only is wired, sink is live, burn-in clock started          | `curl -sI https://twin-sooty.vercel.app/ \| grep -i csp`                                       | ✅ shipped   |
-| S2 | CSP enforce-mode has been live for ≥72h with 0 unexpected violations    | Read `docs/P1_CSP_ENFORCEMENT_PLAN_2026-05-27.md` § "Risk gates" — all 4 sub-conditions met     | ❌ NOT YET (REPORT-ONLY only; founder must not flip enforce before checklist gates) |
+| S2 | CSP enforce-mode has been live for ≥72h with 0 unexpected violations    | Read `docs/P1_CSP_ENFORCEMENT_PLAN_2026-05-27.md` § "Risk gates"; audit `docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md`; narrowed report-only in repo — **deploy + 72h triage still required** | ❌ **NOT READY** (2026-06-01) — repo narrowed CSP prepared; prod permissive; no 72h evidence |
 | S3 | Authenticated mutation rate-limit Layer 2 live on LLM endpoints         | `git show 28a50a0 --stat`                                                                       | ✅ shipped   |
 | S4 | Public CV / voice upload endpoints rate-limited                        | `docs/P1_UPLOAD_RATE_LIMITS_2026-05-27.md`; `ff22f3a`                                            | ✅ shipped   |
 | S5 | Stripe `event.id` dedup live (migration + handler patch)                | Handler: `billing.py`; migration: `050` — prod SQL `SELECT version_num FROM alembic_version;` → `050_stripe_webhook_events` (founder/operator read-only, 2026-05-29) | ✅ **PASS** — prod at `050`; ledger `stripe_webhook_events` expected; **no agent migration** |
@@ -48,7 +48,7 @@ the gate to ✅.
 | O4 | Stripe webhook endpoint is reachable, signature gate is wired           | `docs/P1_STRIPE_WEBHOOK_AUDIT_2026-05-27.md`                                                    | ✅           |
 | O5 | Calendar provider OAuth: Google + Microsoft live; Apple/iCal docs ready | Google **FULL prod smoke PASS** 2026-05-29 — OAuth + real events + day mapping (`docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`); Microsoft baseline live; Apple/iCal → `.cursorrules` calendar section | ⚠️ **partial** — Google+Microsoft ✅ prod (Google calendar fully verified); Apple/iCal docs only |
 | O6 | Canonical Vercel alias points at the right project; drift guard exists  | `bash scripts/check-vercel-canonical-alias.sh`                                                   | ⚠️ drift documented; canonical project is correct |
-| O7 | Backup / restore for Postgres is exercised (last restore test logged)    | `docs/RUNBOOK_DB_RESTORE_2026-05-27.md` § O7 PASS criteria + `docs/BACKUP_RESTORE_DRILL_LOG.md` **PASS** row with GO decision | ❌ **PENDING EVIDENCE** — runbook + founder checklist ready; no staging restore executed (2026-05-29 operator) |
+| O7 | Backup / restore for Postgres is exercised (last restore test logged)    | `docs/RUNBOOK_DB_RESTORE_2026-05-27.md` § O7 PASS criteria + `docs/BACKUP_RESTORE_DRILL_LOG.md` **PASS** row with GO decision | ✅ **PASS** (2026-06-01) — staging clone `staging-restore-proof-20260529` via pg_dump/pg_restore; prod **`postgres-volume`** untouched; separate from `INC-DB-2026-05-29-001` |
 | O8 | Incident response runbook exists with named on-call                     | `docs/INCIDENT_RESPONSE_RUNBOOK_2026-05-27.md` (this session, TASK 13)                          | ✅ this session |
 | O9 | Security risk register is current                                       | `docs/SECURITY_RISK_REGISTER_2026-05-27.md` (this session, TASK 14)                             | ✅ this session |
 | O10| Vercel canonical re-link is either fixed or has a documented workaround | `docs/VERCEL_CANONICAL_DEPLOY_RUNBOOK_2026-05-27.md`                                             | ⚠️ workaround documented |
@@ -86,12 +86,15 @@ the gate to ✅.
 | One ⚠️ partial on L6 (data subject access)                              | Document a manual workflow (`docs/GDPR_MANUAL_DSR.md`) and proceed.                   |
 | Any ❌ on Pilot gates                                                    | Pilot, not public launch — pilot has its own gate set (cf. `PILOT_OFFER_FINAL.md`).   |
 
-## Current gate stance (checkpoint 2026-05-29, release gate)
+## Current gate stance (checkpoint 2026-06-01, **O7 PASS**, **S2 audit complete**)
 
-- **Controlled pilot GO:** **YES** (pilot gates remain green; O7 does not block controlled pilot operation).
-- **Investor/CTO demo GO:** **YES** (curated demo remains allowed with explicit no-launch posture).
-- **Public launch GO:** **NO-GO** while any of `S2`, `O7` blockers remain (S5, **P6**, and **S11** closed 2026-05-29).
-- **O7 backup/restore:** ❌ **PENDING EVIDENCE** — PASS criteria documented; founder must run staging clone drill in Railway (`docs/BACKUP_RESTORE_DRILL_LOG.md` § Founder action checklist). Prod untouched; no agent restore.
+- **S2 CSP enforce burn-in:** ❌ **NOT READY** (2026-06-01) — narrowed report-only **prepared in repo**; prod still permissive until deploy; 72h log triage + DevTools checklist pending. Docs: `docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md`, `docs/S2_CSP_RAILWAY_LOG_TRIAGE_PLAN_2026-06-01.md`, `docs/S2_CSP_DEVTOOLS_BURNIN_CHECKLIST_2026-06-01.md`. **Do not flip enforce.**
+
+- **O7 backup/restore:** ✅ **PASS** (2026-06-01) — staging clone drill via read-only pg_dump → pg_restore; evidence in `docs/BACKUP_RESTORE_DRILL_LOG.md`; prod **`postgres-volume`** untouched.
+- **Post-recovery stabilization (`INC-DB-2026-05-29-001`):** **RESOLVED** — separate from O7; retain incident backups until post-mortem closed.
+- **Controlled pilot GO:** **YES** — prod health green (`public-health` `db_ok=true`).
+- **Investor/CTO demo GO:** **YES** — curated demo posture unchanged.
+- **Public launch GO:** **NO-GO** — **`S2`** (CSP enforce ≥72h burn-in) and any remaining ❌ gates; O7 alone does not unlock public launch.
 - **S5 prod revision:** ✅ **PASS** — production `version_num = 050_stripe_webhook_events` (read-only SQL, 2026-05-29; evidence in `docs/ALEMBIC_050_FOUNDER_VERIFICATION_2026-05-29.md` § Evidence log). **No migration** needed or run by agent; **no** Railway deploy for this gate.
 - **O5 Google Calendar — FULL prod smoke:** ✅ **PASS** (2026-05-29) — OAuth (Console config); Connect; real events; week day mapping (`Europe/Warsaw`, no +1 shift). Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, fix HEAD `3631c45`; FE-only, no Railway. Evidence: `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`. O5 row stays ⚠️ **partial** until Apple/iCal beyond docs.
 - **P6 founder authenticated smoke:** ✅ **PASS** (founder 2026-05-29) — 8/8 routes + safety rows; `/dashboard` layout confirmed post-forecast fix; Google Calendar **fully closed**.
@@ -147,13 +150,11 @@ Warning: this check is non-destructive; do **not** run `alembic upgrade` manuall
 
 ### O7 backup / restore drill (founder-only)
 
-- Status: **PENDING EVIDENCE** (2026-05-29 batch 3).
-- Operator review: runbook + PASS criteria updated; **no staging restore executed** (Railway CLI absent in agent session; HARD BAN: no prod restore/mutation).
-- Prod baseline (read-only): `GET /api/public-health` → `db_ok=true`, `git_commit=df15618` (not substitute for restore evidence).
-- Session evidence: `docs/RELEASE_GATE_O7_S2_VERIFICATION_2026-05-29.md`.
-- Flip to ✅ only when `docs/BACKUP_RESTORE_DRILL_LOG.md` has one **PASS** row meeting all criteria in `docs/RUNBOOK_DB_RESTORE_2026-05-27.md` § O7 PASS criteria.
-
-Reference steps: `docs/BACKUP_RESTORE_DRILL_LOG.md` § Founder action checklist.
+- Status: ✅ **PASS** (2026-06-01).
+- **Staging drill:** read-only pg_dump prod → pg_restore isolated staging env `staging-restore-proof-20260529` (Postgres-HE2P / volume `postgres-volume-p1D7`). Dump `twin_o7_prod_20260601T180324Z.dump` (294K). SQL counts match prod pre-check. **No** prod Restore button, **no** prod DATABASE_URL change.
+- **Production incident (`INC-DB-2026-05-29-001`):** separate event — volume re-mount recovery; does **not** substitute for O7 (now closed via staging drill).
+- Prod post-drill (read-only): `GET /api/public-health` → `status=ok`, `db_ok=true`, `market_coverage_active_validated=2551` (2026-06-01 agent curl).
+- Evidence: `docs/BACKUP_RESTORE_DRILL_LOG.md` PASS row + `docs/RUNBOOK_DB_RESTORE_2026-05-27.md`.
 
 ### Founder authenticated route smoke (P6)
 
