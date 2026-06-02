@@ -3,8 +3,9 @@
 ## Snapshot metadata
 
 - **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01` (audit) / prod unchanged
-- **Branch HEAD (local):** `141d176` (audit branch) / API live `df15618`
-- **Production API SHA (read-only):** `df15618f1e2edec635ab868c03dcf736c463c8be` (`GET /api/public-health`, 2026-05-29 UTC)
+- **Branch HEAD (local):** `c67f0c8` (audit branch, 2026-06-02) / API live `df15618`
+- **Production API SHA (read-only):** `df15618f1e2edec635ab868c03dcf736c463c8be` (`GET /api/public-health`, re-confirmed 2026-06-02 UTC)
+- **Launch readiness matrix:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md`
 - **DB incident (2026-05-29):** `INC-DB-2026-05-29-001` — **RESOLVED** + stabilization PASSED — see `docs/PRODUCTION_DB_RESTORE_INCIDENT_2026-05-29.md`
 - **O7 staging drill (2026-06-01):** ✅ **PASS** — pg_dump/pg_restore to `staging-restore-proof-20260529`; prod **`postgres-volume`** untouched — see `docs/BACKUP_RESTORE_DRILL_LOG.md`
 - **Vercel production deployment:** `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH` at frontend `3631c45` (Google Calendar day-mapping fix; founder re-smoke 2026-05-29)
@@ -27,7 +28,7 @@
 | Job corpus / matching | `validated_jobs`, market coverage in health | **LIVE** (coverage ⚠️ below target) |
 | Scraping (pracuj.pl, rocketjobs.pl) | `scrape_worker_ready`, beat enabled | **LIVE** infra; **BLOCKED** for ops sweep without allowlist |
 | Manual scrape UI | `NEXT_PUBLIC_SHOW_SCRAPE` | **OFF** default |
-| Auto-apply (nightly) | beat + consent models; sweep gate | **PARTIAL** — consent required; no agent-triggered live apply |
+| Auto-apply (nightly) | beat + consent models; sweep gate; audit 2026-06-02 | **PARTIAL / PAUSED** — consent + verified-readiness gates; delegated submit **NOT LIVE**; no agent-triggered live apply in launch window |
 | Calendar Google | `google_calendar_configured`; founder **FULL prod smoke PASS** 2026-05-29 — OAuth + real events + day mapping (`docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`; Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, HEAD `3631c45`) | **LIVE / VERIFIED** — Connect, real events, local week columns (`Europe/Warsaw`) |
 | Calendar Microsoft | `microsoft_calendar_configured` | **LIVE** |
 | Calendar Apple / CalDAV | docs + ICS patterns | **PARTIAL** — no Apple OAuth |
@@ -59,7 +60,7 @@
 | Candidate E2E manual smoke | `docs/CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md` | **LIVE** — PASS (founder-verified, 2026-05-27); Top 20 → Nietrafione → refresh regression. Warning: no auto-apply / real apply / scrape. |
 | Founder authenticated route smoke (dashboard subpages, jobs, profile, safety copy) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **LIVE** — **PASS** (founder 2026-05-29); 8/8 routes + safety copy; `/dashboard` layout PASS |
 | Playwright smoke drift points | `frontend/e2e/smoke.spec.ts` targeted assertions | **STABILIZED** — status cookie-banner locator fix on branch; 13/14 prod lane PASS (2026-05-29) |
-| Public launch announcement | gate checklist | **BLOCKED** |
+| Public launch announcement | gate checklist + `PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02` | **BLOCKED** — **NO-GO** (S2 burn-in IN PROGRESS) |
 | Investor demo | `INVESTOR_DEMO_RUNBOOK.md` | **LIVE** stack, curated use |
 | Real CAPTCHA bypass / live mass apply | HARD BAN | **BLOCKED** |
 
