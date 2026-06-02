@@ -8,6 +8,7 @@
 - **Launch readiness matrix:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md`
 - **Auto-apply safety audit:** `docs/AUTO_APPLY_DELEGATED_APPLY_SAFETY_AUDIT_2026-06-02.md` (2026-06-02)
 - **Post-merge sanity:** `docs/POST_MERGE_AUTO_APPLY_SANITY_2026-06-02.md` (2026-06-02)
+- **Ops pause plan:** `docs/AUTO_APPLY_PRODUCTION_OPS_PAUSE_PLAN_2026-06-02.md` (2026-06-02)
 - **DB incident (2026-05-29):** `INC-DB-2026-05-29-001` — **RESOLVED** + stabilization PASSED — see `docs/PRODUCTION_DB_RESTORE_INCIDENT_2026-05-29.md`
 - **O7 staging drill (2026-06-01):** ✅ **PASS** — pg_dump/pg_restore to `staging-restore-proof-20260529`; prod **`postgres-volume`** untouched — see `docs/BACKUP_RESTORE_DRILL_LOG.md`
 - **Vercel production deployment:** `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH` at frontend `3631c45` (Google Calendar day-mapping fix; founder re-smoke 2026-05-29)
@@ -30,7 +31,7 @@
 | Job corpus / matching | `validated_jobs`, market coverage in health | **LIVE** (coverage ⚠️ below target) |
 | Scraping (pracuj.pl, rocketjobs.pl) | `scrape_worker_ready`, beat enabled | **LIVE** infra; **BLOCKED** for ops sweep without allowlist |
 | Manual scrape UI | `NEXT_PUBLIC_SHOW_SCRAPE` | **OFF** default |
-| Auto-apply (nightly) | beat + consent; `AUTO_APPLY_DELEGATED_APPLY_SAFETY_AUDIT_2026-06-02` | **PARTIAL / PAUSED** — nightly gated; delegated **NOT LIVE**; per-job API gap GAP-01; trigger-sweep ops-only |
+| Auto-apply (nightly) | beat **ON** on prod health; pause plan Option B | **PARTIAL / PAUSED** — server gates live; founder env pause **pending** (GAP-03/04) |
 | Delegated apply | gateway hard-false; no consent migration | **NOT LIVE** |
 | Per-job prepare (`POST /applications/auto-apply`) | `enforce_autonomous_apply_allowed()` (403) | **LIVE** infra — FE + server gated |
 | Manual trigger (`POST /auto-apply/trigger`) | Ops allowlist only | **OPS ONLY** — not candidate-facing |

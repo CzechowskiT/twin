@@ -155,8 +155,8 @@
 | -- | -------- | ------- | ----------------- |
 | GAP-01 | **HIGH** | `POST /applications/auto-apply` lacked server readiness gate | ✅ **CLOSED** — `enforce_autonomous_apply_allowed()` in `applications.py` |
 | GAP-02 | **HIGH** | `POST /auto-apply/trigger` callable by any ready user | ✅ **CLOSED** — ops allowlist only (`user_has_scrape_ops`) |
-| GAP-03 | **MEDIUM** | Nightly beat enabled by default while launch **PAUSED** | ⚠️ **OPEN (ops)** — set `NIGHTLY_AUTO_APPLY_BEAT_ENABLED=false` on Railway for full pause; code default unchanged |
-| GAP-04 | **MEDIUM** | `auto_apply_submit=True` default | ⚠️ **OPEN (ops)** — pilot: set `AUTO_APPLY_SUBMIT=false` on prod if prepare-only |
+| GAP-03 | **MEDIUM** | Nightly beat enabled by default while launch **PAUSED** | ⚠️ **OPEN (ops)** — prod health shows `nightly_auto_apply_beat_enabled: true`; plan: `docs/AUTO_APPLY_PRODUCTION_OPS_PAUSE_PLAN_2026-06-02.md` **Option B** |
+| GAP-04 | **MEDIUM** | `auto_apply_submit=True` default | ⚠️ **OPEN (ops)** — same plan: `AUTO_APPLY_SUBMIT=false` on API (Option B) |
 | GAP-05 | **LOW** | Dead i18n keys `nightlyAutoApplyTrigger*` | ⚠️ open |
 | GAP-06 | **LOW** | Premium gate off by default | ⚠️ open |
 
@@ -173,7 +173,7 @@
 | -------- | -------------------- |
 | Public launch | **NO-GO** — do not enable mass auto-apply marketing |
 | Delegated apply comms | **NOT LIVE** — only “prepare package” / manual tracker honesty |
-| Auto-apply ops | **PAUSED** — no founder trigger-sweep in launch window; verify beat flag |
+| Auto-apply ops | **PAUSED** — execute `docs/AUTO_APPLY_PRODUCTION_OPS_PAUSE_PLAN_2026-06-02.md` Option B when approved (env not changed by agent) |
 | Before widening apply | GAP-01/02 closed; confirm GAP-03/04 env on prod; re-run pytest bundle |
 | S2 / KYC | Do **not** claim S2 PASS or KYC live — out of scope; separate gates |
 
