@@ -3,7 +3,8 @@
 **Auditor:** TWIN Auto-Apply / Delegated Apply Safety Auditor  
 **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01`  
 **Branch HEAD (audit start):** `389e325`  
-**Remediation (2026-06-02):** `fix(safety): hard-gate autonomous apply endpoints` — GAP-01/02 closed in code  
+**Remediation (2026-06-02):** `e764e68` `fix(safety): hard-gate autonomous apply endpoints` — GAP-01/02 closed in code
+**Post-merge (2026-06-02):** PR #21 → `6382a91`; prod `public-health.git_commit=6382a91` — fix **LIVE** — see `docs/POST_MERGE_AUTO_APPLY_SANITY_2026-06-02.md`
 **Mode:** Read-only code/docs + local tests + sanitized prod `public-health` curl  
 **Hard bans honoured:** no deploy, prod mutation, scrape, apply, trigger-sweep, secrets, delegated-live or public-launch GO claims
 
@@ -178,13 +179,21 @@
 
 ### Prod health snapshot (sanitized curl)
 
+**Pre-deploy audit (2026-06-02 AM):** `git_commit=df15618…`
+**Post-merge check (2026-06-02 PM):** `git_commit=6382a91…` (includes `e764e68` via PR #21)
+
 ```json
 {
   "status": "ok",
   "db_ok": true,
   "validated_jobs": 652,
   "market_coverage_active_validated": 2579,
-  "git_commit": "df15618f1e2e..."
+  "git_commit": "6382a9188826...",
+  "celery": {
+    "worker_active": true,
+    "broker_configured": true,
+    "nightly_auto_apply_beat_enabled": true
+  }
 }
 ```
 

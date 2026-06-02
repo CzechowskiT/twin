@@ -88,7 +88,8 @@ the gate to ✅.
 
 ## Current gate stance (checkpoint 2026-06-02, **O7 PASS**, **S2 burn-in restarted**)
 
-**Latest audit:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` (branch `chore/s2-csp-burnin-readiness-2026-06-01`, read-only curl + local tests; no deploy).
+**Latest audit:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md`
+**Post-merge sanity (2026-06-02):** `docs/POST_MERGE_AUTO_APPLY_SANITY_2026-06-02.md` — PR #21 merged; prod `git_commit=6382a91` (includes `e764e68` hard gates **LIVE**); public-health OK; auto-apply **PAUSED** policy unchanged.
 
 - **S2 CSP enforce burn-in:** ❌ **NOT READY** — prior window **RESET** after `connect-src` gap; fix **deployed** (Railway API in report-only `connect-src`); **new** 72h window **IN PROGRESS** (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`). Founder post-fix: public-health OK, Railway API health OK, dashboard OK, **no fresh** `csp_report` for prod API host. Report-only only; enforce off. **Do not flip enforce** until full 72h evidence + founder sign-off. Auditor re-confirmed 8-route CSP-RO + no enforce header (2026-06-02).
 

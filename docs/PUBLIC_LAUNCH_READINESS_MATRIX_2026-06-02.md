@@ -126,7 +126,7 @@
 
 | Check | Evidence | Status |
 | ----- | -------- | ------ |
-| Public health proxy | `status=ok`, `git_commit=df15618…`, `db_ok=true` | ✅ LIVE |
+| Public health proxy | `status=ok`, `git_commit=6382a91…` (post-merge PR #21), `db_ok=true` | ✅ LIVE |
 | API health | `GET /api/v1/health?ops=1` → `status=ok`, `scrape_worker_ready=true` | ✅ LIVE |
 | CSP report sink | Storage-free `POST /api/v1/csp-report`; tests pass | ✅ LIVE |
 | S7 public-health regression | `pytest tests/test_public_health_regression.py` — passed in bundle | ✅ PASS |
@@ -177,7 +177,7 @@
 ### Risks (accepted for pilot, not public)
 
 - CSP `unsafe-inline` / `unsafe-eval` remain (separate hardening track).
-- Repo HEAD (`c67f0c8`) ahead of prod API SHA (`df15618`) — docs-only branch; no deploy this session.
+- Prod API SHA `6382a91` includes auto-apply safety fix `e764e68` (post-merge 2026-06-02); nightly beat still **enabled** in health — **PAUSED** is policy/env (GAP-03).
 - Metric / corpus scale below “marketplace” narrative — honest pilot ceiling.
 
 ---
@@ -193,9 +193,11 @@
   "validated_jobs": 652,
   "market_coverage_active_validated": 2579,
   "stripe_checkout_ready": true,
-  "git_commit": "df15618f1e2e..."
+  "git_commit": "6382a9188826..."
 }
 ```
+
+**Post-merge sanity:** `docs/POST_MERGE_AUTO_APPLY_SANITY_2026-06-02.md`
 
 **Headers (all 8 audited routes):** HTTP 200 · CSP-RO yes · CSP enforce **no** · HSTS yes · `X-Frame-Options: DENY` · `report-uri` present · narrowed `connect-src` includes Railway API host.
 

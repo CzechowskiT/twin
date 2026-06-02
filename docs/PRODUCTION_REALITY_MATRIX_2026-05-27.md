@@ -4,9 +4,10 @@
 
 - **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01` (audit) / prod unchanged
 - **Branch HEAD (local):** `c67f0c8` (audit branch, 2026-06-02) / API live `df15618`
-- **Production API SHA (read-only):** `df15618f1e2edec635ab868c03dcf736c463c8be` (`GET /api/public-health`, re-confirmed 2026-06-02 UTC)
+- **Production API SHA (read-only):** `6382a918882664df0076d996ca65c08e9138536a` (`GET /api/public-health`, post-merge 2026-06-02 — PR #21; includes `e764e68` safety fix)
 - **Launch readiness matrix:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md`
 - **Auto-apply safety audit:** `docs/AUTO_APPLY_DELEGATED_APPLY_SAFETY_AUDIT_2026-06-02.md` (2026-06-02)
+- **Post-merge sanity:** `docs/POST_MERGE_AUTO_APPLY_SANITY_2026-06-02.md` (2026-06-02)
 - **DB incident (2026-05-29):** `INC-DB-2026-05-29-001` — **RESOLVED** + stabilization PASSED — see `docs/PRODUCTION_DB_RESTORE_INCIDENT_2026-05-29.md`
 - **O7 staging drill (2026-06-01):** ✅ **PASS** — pg_dump/pg_restore to `staging-restore-proof-20260529`; prod **`postgres-volume`** untouched — see `docs/BACKUP_RESTORE_DRILL_LOG.md`
 - **Vercel production deployment:** `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH` at frontend `3631c45` (Google Calendar day-mapping fix; founder re-smoke 2026-05-29)
@@ -84,7 +85,7 @@
 
 | Item | Current state | Decision |
 | ---- | ------------- | -------- |
-| API runtime SHA | `df15618` visible on `public-health` | **LIVE** |
+| API runtime SHA | `6382a91` on `public-health` (merge PR #21; contains `e764e68`) | **LIVE** |
 | Frontend Vercel SHA | `3631c45` / `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH` (founder re-smoke 2026-05-29) | **LIVE** |
 | Branch HEAD | `3631c45` (calendar day-mapping fix) | **LIVE** on Vercel prod for calendar smoke |
 | Stripe dedup migration `050` | Prod `alembic_version` = `050_stripe_webhook_events` (founder/operator read-only SQL, 2026-05-29) | **LIVE / VERIFIED** — S5 PASS; no migration run; if ever rolled back to `049` → runbook § Founder-approved action plan |
