@@ -90,6 +90,26 @@ From `GET /api/public-health` (via FE alias), captured at burn-in restart (`2026
 
 **Next manual checkpoint (UTC):** `2026-06-02T18:18:33Z` (~4h after start) — Railway `csp_report` log triage + note any new `blocked-uri`.
 
+## Manual checkpoint (2026-06-02)
+
+**Checkpoint UTC:** `2026-06-02T14:42:07Z` (~24m after burn-in start `2026-06-02T14:18:33Z`)
+
+**Source:** Founder dashboard smoke + route spot check + Railway log triage (`csp_report`)
+
+| Check | Result |
+| --- | --- |
+| Dashboard smoke | **OK** |
+| Routes (no white screen / breaking errors) | Dashboard, Jobs, Profile, Calendar, Demo — **OK** |
+| Railway `csp_report` after `2026-06-02T14:18:33Z` | **No fresh entries** |
+| Historical violations | Jun 1 2026 `connect-src` / Railway API — **known, fixed** |
+| Enforce header | **Absent** (unchanged) |
+| Decision | **CONTINUE** 72h burn-in — report-only HOLD |
+| S2 status | **NOT READY** |
+| S2 PASS | **NO** |
+| Public launch | **NO-GO** |
+
+**Next manual checkpoint (UTC):** `2026-06-02T18:18:33Z` (~4h after start) — Railway `csp_report` log triage + route/DevTools cadence per checklist.
+
 ## Manual checkpoint cadence
 
 - **Window end review:** `2026-06-05T14:18:33Z` — full 72h evidence pack before any enforce decision.
