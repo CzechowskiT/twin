@@ -6,6 +6,7 @@
 - **Branch HEAD (local):** `c67f0c8` (audit branch, 2026-06-02) / API live `df15618`
 - **Production API SHA (read-only):** `df15618f1e2edec635ab868c03dcf736c463c8be` (`GET /api/public-health`, re-confirmed 2026-06-02 UTC)
 - **Launch readiness matrix:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md`
+- **Auto-apply safety audit:** `docs/AUTO_APPLY_DELEGATED_APPLY_SAFETY_AUDIT_2026-06-02.md` (2026-06-02)
 - **DB incident (2026-05-29):** `INC-DB-2026-05-29-001` — **RESOLVED** + stabilization PASSED — see `docs/PRODUCTION_DB_RESTORE_INCIDENT_2026-05-29.md`
 - **O7 staging drill (2026-06-01):** ✅ **PASS** — pg_dump/pg_restore to `staging-restore-proof-20260529`; prod **`postgres-volume`** untouched — see `docs/BACKUP_RESTORE_DRILL_LOG.md`
 - **Vercel production deployment:** `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH` at frontend `3631c45` (Google Calendar day-mapping fix; founder re-smoke 2026-05-29)
@@ -28,7 +29,9 @@
 | Job corpus / matching | `validated_jobs`, market coverage in health | **LIVE** (coverage ⚠️ below target) |
 | Scraping (pracuj.pl, rocketjobs.pl) | `scrape_worker_ready`, beat enabled | **LIVE** infra; **BLOCKED** for ops sweep without allowlist |
 | Manual scrape UI | `NEXT_PUBLIC_SHOW_SCRAPE` | **OFF** default |
-| Auto-apply (nightly) | beat + consent models; sweep gate; audit 2026-06-02 | **PARTIAL / PAUSED** — consent + verified-readiness gates; delegated submit **NOT LIVE**; no agent-triggered live apply in launch window |
+| Auto-apply (nightly) | beat + consent; `AUTO_APPLY_DELEGATED_APPLY_SAFETY_AUDIT_2026-06-02` | **PARTIAL / PAUSED** — nightly gated; delegated **NOT LIVE**; per-job API gap GAP-01; trigger-sweep ops-only |
+| Delegated apply | gateway hard-false; no consent migration | **NOT LIVE** |
+| Per-job prepare (`POST /applications/auto-apply`) | Playwright path; FE guard on dashboard | **LIVE** infra — FE gated; server readiness gate **missing** (HIGH) |
 | Calendar Google | `google_calendar_configured`; founder **FULL prod smoke PASS** 2026-05-29 — OAuth + real events + day mapping (`docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`; Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, HEAD `3631c45`) | **LIVE / VERIFIED** — Connect, real events, local week columns (`Europe/Warsaw`) |
 | Calendar Microsoft | `microsoft_calendar_configured` | **LIVE** |
 | Calendar Apple / CalDAV | docs + ICS patterns | **PARTIAL** — no Apple OAuth |
