@@ -14,6 +14,8 @@ CSP must remain **Report-Only** — console shows violations as warnings, pages 
 
 ## Routes (each browser)
 
+Core S2 routes (must be checked in every browser): `/`, `/dashboard`, `/login/candidate`, `/register/candidate`, `/demo`, `/status`, `/dashboard/calendar`, `/api/public-health`.
+
 | Route | Console clean? | Network anomalies? | CSP reports POSTed? | Notes |
 | ----- | -------------- | ------------------ | ------------------- | ----- |
 | `/` | | | | Home + logo marquee |
@@ -25,6 +27,7 @@ CSP must remain **Report-Only** — console shows violations as warnings, pages 
 | `/demo` | | | | |
 | `/status` | | | | |
 | `/dashboard/calendar` | | | | Calendar UI shell |
+| `/api/public-health` | | | | Read-only health JSON via FE proxy |
 | `/first-1000` | | | | YouTube embed if env set |
 | `/pricing` | | | | |
 | `/for-candidates` | | | | |

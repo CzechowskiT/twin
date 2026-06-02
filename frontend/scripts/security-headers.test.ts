@@ -183,6 +183,19 @@ run("CSP script-src allows Plausible when analytics consent is granted", async (
   assert.match(csp, /connect-src[^;]*https:\/\/us\.i\.posthog\.com/);
 });
 
+run("CSP connect-src allows production Railway API host", async () => {
+  const groups = await configuredHeaders();
+  const all = groups[0];
+  const csp =
+    pickHeader(all.headers, "Content-Security-Policy-Report-Only")?.value ??
+    pickHeader(all.headers, "Content-Security-Policy")?.value ??
+    "";
+  assert.match(
+    csp,
+    /connect-src[^;]*https:\/\/twin-production-bcd9\.up\.railway\.app/,
+  );
+});
+
 setTimeout(() => {
   if (process.exitCode) process.exit(process.exitCode);
 }, 200);
