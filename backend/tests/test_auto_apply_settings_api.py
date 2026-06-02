@@ -117,7 +117,10 @@ def test_consent_and_trigger(auto_apply_client, monkeypatch) -> None:
     from app.database.models import SubmissionStatus
 
     client, headers, db, candidate, job = auto_apply_client
+    user = db.query(User).filter(User.id == candidate.user_id).first()
     monkeypatch.setenv("NIGHTLY_AUTO_APPLY_COOLDOWN_SECONDS", "0")
+    monkeypatch.setenv("SCRAPE_OPS_USER_IDS", str(user.id))
+    monkeypatch.setenv("SCRAPE_OPS_EMAILS", "")
     get_settings.cache_clear()
     res = client.post(
         "/api/v1/auto-apply/consent",

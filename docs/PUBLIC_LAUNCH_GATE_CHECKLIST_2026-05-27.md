@@ -25,7 +25,7 @@ the gate to ✅.
 | #  | Gate                                                                   | How to verify                                                                                  | Status today |
 | -- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------ |
 | S1 | CSP report-only is wired, sink is live, burn-in clock started          | `curl -sI https://twin-sooty.vercel.app/ \| grep -i csp`                                       | ✅ shipped   |
-| S2 | CSP enforce-mode has been live for ≥72h with 0 unexpected violations    | Read `docs/P1_CSP_ENFORCEMENT_PLAN_2026-05-27.md` § "Risk gates"; audit `docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md`; narrowed report-only + Railway `connect-src` fix in repo — **deploy + restart 72h still required** | ❌ **NOT READY** (2026-06-02) — burn-in **RESET** after `connect-src` gap (`twin-production-bcd9.up.railway.app`); fix in repo; enforce off |
+| S2 | CSP enforce-mode has been live for ≥72h with 0 unexpected violations    | Read `docs/P1_CSP_ENFORCEMENT_PLAN_2026-05-27.md` § "Risk gates"; audit `docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md`; `docs/S2_CSP_BURNIN_WINDOW_2026-06-01.md` | ❌ **NOT READY** (2026-06-02) — prior window **RESET**; `connect-src` fix **deployed**; **new** 72h burn-in `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; report-only only; enforce off |
 | S3 | Authenticated mutation rate-limit Layer 2 live on LLM endpoints         | `git show 28a50a0 --stat`                                                                       | ✅ shipped   |
 | S4 | Public CV / voice upload endpoints rate-limited                        | `docs/P1_UPLOAD_RATE_LIMITS_2026-05-27.md`; `ff22f3a`                                            | ✅ shipped   |
 | S5 | Stripe `event.id` dedup live (migration + handler patch)                | Handler: `billing.py`; migration: `050` — prod SQL `SELECT version_num FROM alembic_version;` → `050_stripe_webhook_events` (founder/operator read-only, 2026-05-29) | ✅ **PASS** — prod at `050`; ledger `stripe_webhook_events` expected; **no agent migration** |
@@ -43,7 +43,7 @@ the gate to ✅.
 | #  | Gate                                                                   | How to verify                                                                                  | Status today |
 | -- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------ |
 | O1 | Smoke workflow green on the latest 5 production commits                 | `gh run list --workflow smoke.yml --limit 5`                                                    | ✅ today     |
-| O2 | Production health endpoint returns `status=ok` + `db_ok=True`           | `GET https://twin-sooty.vercel.app/api/public-health` — `git_commit=df15618`, `db_ok=true` (2026-05-29)       | ✅ today     |
+| O2 | Production health endpoint returns `status=ok` + `db_ok=True`           | `GET https://twin-sooty.vercel.app/api/public-health` — `git_commit=df15618`, `db_ok=true` (re-confirmed 2026-06-02 audit) | ✅ today     |
 | O3 | Celery worker is active in production (not eager, not zero nodes)       | `curl https://twin-production-bcd9.up.railway.app/api/v1/health/celery-status`                  | ✅ today     |
 | O4 | Stripe webhook endpoint is reachable, signature gate is wired           | `docs/P1_STRIPE_WEBHOOK_AUDIT_2026-05-27.md`                                                    | ✅           |
 | O5 | Calendar provider OAuth: Google + Microsoft live; Apple/iCal docs ready | Google **FULL prod smoke PASS** 2026-05-29 — OAuth + real events + day mapping (`docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`); Microsoft baseline live; Apple/iCal → `.cursorrules` calendar section | ⚠️ **partial** — Google+Microsoft ✅ prod (Google calendar fully verified); Apple/iCal docs only |
@@ -86,15 +86,18 @@ the gate to ✅.
 | One ⚠️ partial on L6 (data subject access)                              | Document a manual workflow (`docs/GDPR_MANUAL_DSR.md`) and proceed.                   |
 | Any ❌ on Pilot gates                                                    | Pilot, not public launch — pilot has its own gate set (cf. `PILOT_OFFER_FINAL.md`).   |
 
-## Current gate stance (checkpoint 2026-06-01, **O7 PASS**, **S2 audit complete**)
+## Current gate stance (checkpoint 2026-06-02, **O7 PASS**, **S2 burn-in restarted**)
 
-- **S2 CSP enforce burn-in:** ❌ **NOT READY** (2026-06-02) — prior window **RESET** after founder Railway `connect-src` violations (`blocked-uri` = prod API host on `/dashboard`); repo fix adds Railway to report-only `connect-src`; **restart 72h only after frontend deploy**. Enforce still off. **Do not flip enforce.**
+**Latest audit:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` (branch `chore/s2-csp-burnin-readiness-2026-06-01`, read-only curl + local tests; no deploy).
+
+- **S2 CSP enforce burn-in:** ❌ **NOT READY** — prior window **RESET** after `connect-src` gap; fix **deployed** (Railway API in report-only `connect-src`); **new** 72h window **IN PROGRESS** (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`). Founder post-fix: public-health OK, Railway API health OK, dashboard OK, **no fresh** `csp_report` for prod API host. Report-only only; enforce off. **Do not flip enforce** until full 72h evidence + founder sign-off. Auditor re-confirmed 8-route CSP-RO + no enforce header (2026-06-02).
 
 - **O7 backup/restore:** ✅ **PASS** (2026-06-01) — staging clone drill via read-only pg_dump → pg_restore; evidence in `docs/BACKUP_RESTORE_DRILL_LOG.md`; prod **`postgres-volume`** untouched.
 - **Post-recovery stabilization (`INC-DB-2026-05-29-001`):** **RESOLVED** — separate from O7; retain incident backups until post-mortem closed.
-- **Controlled pilot GO:** **YES** — prod health green (`public-health` `db_ok=true`).
+- **Controlled pilot GO:** **YES** — prod health green (`public-health` `db_ok=true`, `validated_jobs=652`, `market_coverage_active_validated=2579` per 2026-06-02 audit curl).
 - **Investor/CTO demo GO:** **YES** — curated demo posture unchanged.
 - **Public launch GO:** **NO-GO** — **`S2`** (CSP enforce ≥72h burn-in) and any remaining ❌ gates; O7 alone does not unlock public launch.
+- **Auto-apply / delegated apply:** **PAUSED** / **NOT LIVE** — see `docs/AUTO_APPLY_DELEGATED_APPLY_SAFETY_AUDIT_2026-06-02.md`; server gates **GAP-01/02 closed** (`autonomous_apply_policy.py`); `POST /auto-apply/trigger` ops-only; founder: `NIGHTLY_AUTO_APPLY_BEAT_ENABLED=false` + optional `AUTO_APPLY_SUBMIT=false` on prod for full pause (GAP-03/04).
 - **S5 prod revision:** ✅ **PASS** — production `version_num = 050_stripe_webhook_events` (read-only SQL, 2026-05-29; evidence in `docs/ALEMBIC_050_FOUNDER_VERIFICATION_2026-05-29.md` § Evidence log). **No migration** needed or run by agent; **no** Railway deploy for this gate.
 - **O5 Google Calendar — FULL prod smoke:** ✅ **PASS** (2026-05-29) — OAuth (Console config); Connect; real events; week day mapping (`Europe/Warsaw`, no +1 shift). Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, fix HEAD `3631c45`; FE-only, no Railway. Evidence: `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`. O5 row stays ⚠️ **partial** until Apple/iCal beyond docs.
 - **P6 founder authenticated smoke:** ✅ **PASS** (founder 2026-05-29) — 8/8 routes + safety rows; `/dashboard` layout confirmed post-forecast fix; Google Calendar **fully closed**.

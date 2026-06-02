@@ -1,5 +1,13 @@
 # Nightly auto-apply — deploy checklist (agent runbook)
 
+## Launch pause (public NO-GO window)
+
+When auto-apply is **PAUSED** for public launch but code remains deployed:
+
+- Set **`NIGHTLY_AUTO_APPLY_BEAT_ENABLED=false`** on Railway API/worker env to stop scheduled sweeps (GAP-03).
+- Optional: **`AUTO_APPLY_SUBMIT=false`** so per-job `POST /applications/auto-apply` prepares packages without portal submit (GAP-04).
+- Per-user **`POST /auto-apply/trigger`** is **ops allowlist only** (not candidate accounts) — see `autonomous_apply_policy.py`.
+
 Merged to `cursor/phase1-monorepo-scaffold` (commits through `9933fd3`).
 
 ## After merge (one-time)

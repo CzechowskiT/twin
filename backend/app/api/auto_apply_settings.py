@@ -20,6 +20,12 @@ from app.schemas.auto_apply_settings import (
     AutoApplyTriggerOut,
     SweepBoardStatOut,
 )
+from app.services.autonomous_apply_policy import (
+    PROFILE_NOT_READY_DETAIL,
+    VERIFIED_READINESS_NOT_READY_DETAIL,
+    MANUAL_TRIGGER_OPS_ONLY_DETAIL,
+    enforce_autonomous_apply_allowed,
+)
 from app.services.candidate_readiness import (
     auto_apply_profile_ready,
     autonomous_apply_allowed,
@@ -34,10 +40,6 @@ from app.tasks.nightly_auto_apply import nightly_auto_apply_sweep
 router = APIRouter()
 
 CONSENT_VERSION = "v1"
-PROFILE_NOT_READY_DETAIL = "Complete your candidate profile and upload a CV first."
-VERIFIED_READINESS_NOT_READY_DETAIL = (
-    "Complete verified readiness (career brief, skill evidence, and consents) before autonomous applying."
-)
 
 
 def _parse_sweep_stats(stats_json: str | None) -> tuple[int, list[SweepBoardStatOut], bool]:
@@ -87,12 +89,11 @@ def _require_profile_ready(user: User, candidate: Candidate | None) -> None:
 
 
 def _require_verified_readiness(user: User, candidate: Candidate | None) -> None:
-    _require_profile_ready(user, candidate)
-    if not autonomous_apply_allowed(user, candidate):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=VERIFIED_READINESS_NOT_READY_DETAIL,
-        )
+    enforce_autonomous_apply_allowed(
+        user,
+        candidate,
+        status_code=status.HTTP_400_BAD_REQUEST,
+    )
 
 
 def _next_run_label() -> str:
@@ -250,10 +251,14 @@ def trigger_nightly_for_me(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> AutoApplyTriggerOut:
-    """Run the same logic as the nightly job for the current user (demo / test)."""
+    """Run nightly logic for one user — ops allowlist only (staging / support)."""
+    settings = get_settings()
+    if not user_has_scrape_ops(user, settings):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=MANUAL_TRIGGER_OPS_ONLY_DETAIL,
+        )
     candidate = _get_candidate(db, user.id)
-    if candidate is None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Create your candidate profile first.")
     _require_verified_readiness(user, candidate)
     consent = db.query(AutoApplyConsent).filter(AutoApplyConsent.candidate_id == candidate.id).first()
     if not consent or not consent.is_active or not consent.consent_given_at:
@@ -261,7 +266,6 @@ def trigger_nightly_for_me(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Enable autonomous applying with consent before triggering",
         )
-    settings = get_settings()
     row = process_user_nightly_auto_apply(
         db,
         user=user,
