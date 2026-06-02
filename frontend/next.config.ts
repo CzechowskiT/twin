@@ -12,7 +12,7 @@ const CSP_REPORT_ONLY =
   "style-src 'self' 'unsafe-inline'; " +
   "img-src 'self' data: blob: https://images.unsplash.com https://cdn.simpleicons.org https://cdn.jsdelivr.net https://www.google.com https://t0.gstatic.com https://t1.gstatic.com https://t2.gstatic.com https://t3.gstatic.com https://icons.duckduckgo.com https://www.capitalone.com; " +
   "font-src 'self' data:; " +
-  "connect-src 'self' https://plausible.io https://us.i.posthog.com; " +
+  "connect-src 'self' https://twin-production-bcd9.up.railway.app https://plausible.io https://us.i.posthog.com; " +
   "frame-src https://www.youtube-nocookie.com; " +
   "frame-ancestors 'none'; " +
   "base-uri 'self'; " +

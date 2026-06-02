@@ -24,7 +24,8 @@ Used to build the **narrowed report-only** CSP in `frontend/next.config.ts`.
 | Blob previews / downloads | `img-src` | `blob:` | `frontend/src/lib/api.ts:238`, admin beta export | Partial | `createObjectURL` for file save |
 | Inline favicons / placeholders | `img-src` | `data:` | Tailwind / UI | Yes | |
 | Founders manifesto video | `frame-src` | `https://www.youtube-nocookie.com` | `frontend/src/components/marketing/founders-launch-page.tsx:154` | If `NEXT_PUBLIC_LAUNCH_MANIFESTO_YOUTUBE_ID` set | Route: `/first-1000` |
-| API (all authenticated + public) | `connect-src` | `'self'` | `frontend/src/app/api/v1/[[...path]]/route.ts` | Yes | Vercel proxy → Railway |
+| API (Vercel proxy) | `connect-src` | `'self'` | `frontend/src/app/api/v1/[[...path]]/route.ts` | Yes | Unauthenticated / no `NEXT_PUBLIC_API_URL` |
+| API (direct Railway) | `connect-src` | `https://twin-production-bcd9.up.railway.app` | `frontend/src/lib/api.ts` when `NEXT_PUBLIC_API_URL` set | Yes (prod) | Authenticated browser calls bypass proxy |
 | Stripe Checkout | — | — | Server redirect only | No CSP | No `js.stripe.com` in browser |
 | OAuth (Google/Microsoft/GitHub/Apple) | — | — | Backend `Location:` redirects | No CSP | Not in-page fetch |
 | LinkedIn / GitHub footer links | — | — | `site-footer.tsx`, `beta/page.tsx` | No CSP | Navigation (`<a>` / `window.open`), not embeds |
@@ -38,7 +39,7 @@ Used to build the **narrowed report-only** CSP in `frontend/next.config.ts`.
 | -------- | ------------- | ------------------------- |
 | PostHog EU (`eu.i.posthog.com`) needed? | Blocked analytics | Only `us.i.posthog.com` in code; add if env switches region |
 | Plausible custom domain? | Blocked analytics | Prod uses `plausible.io` script URL only |
-| Direct Railway API bypass? | Blocked API calls | All traffic via `/api/v1` proxy today |
+| Direct Railway API bypass? | Blocked API calls | **Resolved 2026-06-02** — `connect-src` includes prod Railway host when `NEXT_PUBLIC_API_URL` is set |
 | `unsafe-eval` required in prod build? | Console violations / future enforce break | Report-only 72h will confirm; nonce slice is separate PR |
 | Additional favicon hosts from job board logos? | img-src violations | Job cards use `'self'` / placeholders; no arbitrary external img grep hit |
 | YouTube iframe without env var? | None | iframe omitted when `videoId` unset; `frame-src` still allowlisted |
@@ -59,7 +60,7 @@ Content-Security-Policy-Report-Only:
           https://icons.duckduckgo.com
           https://www.capitalone.com;
   font-src 'self' data:;
-  connect-src 'self' https://plausible.io https://us.i.posthog.com;
+  connect-src 'self' https://twin-production-bcd9.up.railway.app https://plausible.io https://us.i.posthog.com;
   frame-src https://www.youtube-nocookie.com;
   frame-ancestors 'none';
   base-uri 'self';

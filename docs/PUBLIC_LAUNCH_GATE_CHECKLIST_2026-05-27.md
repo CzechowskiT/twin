@@ -25,7 +25,7 @@ the gate to ✅.
 | #  | Gate                                                                   | How to verify                                                                                  | Status today |
 | -- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------ |
 | S1 | CSP report-only is wired, sink is live, burn-in clock started          | `curl -sI https://twin-sooty.vercel.app/ \| grep -i csp`                                       | ✅ shipped   |
-| S2 | CSP enforce-mode has been live for ≥72h with 0 unexpected violations    | Read `docs/P1_CSP_ENFORCEMENT_PLAN_2026-05-27.md` § "Risk gates"; audit `docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md`; narrowed report-only in repo — **deploy + 72h triage still required** | ❌ **NOT READY** (2026-06-01) — repo narrowed CSP prepared; prod permissive; no 72h evidence |
+| S2 | CSP enforce-mode has been live for ≥72h with 0 unexpected violations    | Read `docs/P1_CSP_ENFORCEMENT_PLAN_2026-05-27.md` § "Risk gates"; audit `docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md`; narrowed report-only + Railway `connect-src` fix in repo — **deploy + restart 72h still required** | ❌ **NOT READY** (2026-06-02) — burn-in **RESET** after `connect-src` gap (`twin-production-bcd9.up.railway.app`); fix in repo; enforce off |
 | S3 | Authenticated mutation rate-limit Layer 2 live on LLM endpoints         | `git show 28a50a0 --stat`                                                                       | ✅ shipped   |
 | S4 | Public CV / voice upload endpoints rate-limited                        | `docs/P1_UPLOAD_RATE_LIMITS_2026-05-27.md`; `ff22f3a`                                            | ✅ shipped   |
 | S5 | Stripe `event.id` dedup live (migration + handler patch)                | Handler: `billing.py`; migration: `050` — prod SQL `SELECT version_num FROM alembic_version;` → `050_stripe_webhook_events` (founder/operator read-only, 2026-05-29) | ✅ **PASS** — prod at `050`; ledger `stripe_webhook_events` expected; **no agent migration** |
@@ -88,7 +88,7 @@ the gate to ✅.
 
 ## Current gate stance (checkpoint 2026-06-01, **O7 PASS**, **S2 audit complete**)
 
-- **S2 CSP enforce burn-in:** ❌ **NOT READY** (2026-06-02) — burn-in window **STARTED** in report-only mode (`docs/S2_CSP_BURNIN_WINDOW_2026-06-01.md`), enforce still off, 72h log triage + DevTools checklist pending founder review. **Do not flip enforce.**
+- **S2 CSP enforce burn-in:** ❌ **NOT READY** (2026-06-02) — prior window **RESET** after founder Railway `connect-src` violations (`blocked-uri` = prod API host on `/dashboard`); repo fix adds Railway to report-only `connect-src`; **restart 72h only after frontend deploy**. Enforce still off. **Do not flip enforce.**
 
 - **O7 backup/restore:** ✅ **PASS** (2026-06-01) — staging clone drill via read-only pg_dump → pg_restore; evidence in `docs/BACKUP_RESTORE_DRILL_LOG.md`; prod **`postgres-volume`** untouched.
 - **Post-recovery stabilization (`INC-DB-2026-05-29-001`):** **RESOLVED** — separate from O7; retain incident backups until post-mortem closed.

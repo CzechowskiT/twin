@@ -2,14 +2,22 @@
 
 ## Window metadata
 
-- Burn-in start UTC: `2026-06-02T07:06:17Z`
-- 72h target end UTC: `2026-06-05T07:06:17Z`
+- Burn-in start UTC: `2026-06-02T07:06:17Z` (prior window — **RESET**)
+- 72h target end UTC: `2026-06-05T07:06:17Z` (invalid until redeploy + clock restart)
 - Production URL: `https://twin-sooty.vercel.app`
 - CSP mode: `Content-Security-Policy-Report-Only` (RO)
 - Narrowed CSP on prod: **LIVE** (explicit allowlists, no broad `https:` wildcards)
-- S2 status: **STARTED**
+- S2 status: **BLOCKED** (connect-src gap — fix in repo, deploy pending)
 - S2 PASS: **NO**
 - Public launch: **NO-GO**
+
+## Burn-in reset (2026-06-02)
+
+**Finding (founder Railway logs, ~2026-06-01 20:52–20:53 CEST):** `connect-src` report-only violations on `/dashboard` (`document-uri`: `https://twin-sooty.vercel.app/dashboard`). `blocked-uri` host: `https://twin-production-bcd9.up.railway.app` (calendar, jobs, applications, opportunities, auto-apply, gamification, etc.). Disposition: report-only — not an outage; expected when prod sets `NEXT_PUBLIC_API_URL` and authenticated fetches hit Railway directly.
+
+**Fix (repo):** Add `https://twin-production-bcd9.up.railway.app` to narrowed `connect-src` in `frontend/next.config.ts` (report-only unchanged; no wildcards).
+
+**Clock:** Prior 72h window **RESET**. Restart burn-in only after frontend deploy with this header and a fresh `scripts/audit-csp-headers.sh` + founder sign-off on clean `connect-src` cadence.
 
 ## Header audit (read-only, no auth/cookies)
 
