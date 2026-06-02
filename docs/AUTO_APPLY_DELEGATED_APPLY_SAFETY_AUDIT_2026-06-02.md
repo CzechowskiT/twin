@@ -3,6 +3,7 @@
 **Auditor:** TWIN Auto-Apply / Delegated Apply Safety Auditor  
 **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01`  
 **Branch HEAD (audit start):** `389e325`  
+**Remediation (2026-06-02):** `fix(safety): hard-gate autonomous apply endpoints` — GAP-01/02 closed in code  
 **Mode:** Read-only code/docs + local tests + sanitized prod `public-health` curl  
 **Hard bans honoured:** no deploy, prod mutation, scrape, apply, trigger-sweep, secrets, delegated-live or public-launch GO claims
 
@@ -28,9 +29,9 @@
 | GET | `/api/v1/auto-apply/last-sweep` | JWT | No | Observability only |
 | POST | `/api/v1/auto-apply/consent` | JWT | Yes (consent row) | `_require_verified_readiness` |
 | PATCH | `/api/v1/auto-apply/settings` | JWT | Yes (consent prefs) | Profile ready; activate requires verified readiness |
-| POST | `/api/v1/auto-apply/trigger` | JWT | **Yes** (up to 1 job) | Verified readiness + active consent; `max_jobs=1` |
+| POST | `/api/v1/auto-apply/trigger` | JWT | **Yes** (up to 1 job) | **Ops allowlist** + verified readiness + consent |
 | POST | `/api/v1/auto-apply/trigger-sweep` | JWT | **Yes** (platform sweep) | **Ops allowlist only** (`SCRAPE_OPS_*`) |
-| POST | `/api/v1/applications/auto-apply` | JWT | **Yes** (Playwright path) | Premium optional; rate limits; blocklists; **no** `autonomous_apply_allowed()` |
+| POST | `/api/v1/applications/auto-apply` | JWT | **Yes** (Playwright path) | **`enforce_autonomous_apply_allowed()`** → 403; then rate limits / blocklists |
 | POST | `/api/v1/applications` | JWT | Yes (tracker) | Manual status — not autonomous submit |
 | GET | `/api/v1/candidates/me/verified-readiness` | JWT | No | Gateway read-only |
 | GET | `/api/v1/ops/auto-apply/last-run` | Ops token | No | Ops observability |
@@ -60,7 +61,7 @@
 | Prepare package | `can_prepare_application_package` when status in `_PREPARE_ALLOWED_STATUSES` | `canPrepareApplicationPackage` on job cards / forecast |
 | Nightly skip reason | `verified_readiness_incomplete` | Strip shows `nightlyAutoApplyStripBlockedReadiness` |
 
-**Gap:** `POST /applications/auto-apply` does **not** call `autonomous_apply_allowed()` — see § I.
+**Remediation:** Shared policy in `app/services/autonomous_apply_policy.py`; both per-job and consent paths call `enforce_autonomous_apply_allowed()`.
 
 ---
 
@@ -149,16 +150,19 @@
 
 ### Gap register
 
-| ID | Severity | Finding | Recommendation |
-| -- | -------- | ------- | -------------- |
-| GAP-01 | **HIGH** | `POST /applications/auto-apply` lacks `autonomous_apply_allowed()` server-side | Add same gate as nightly/consent before launch widen |
-| GAP-02 | **HIGH** | `POST /auto-apply/trigger` can submit 1 application per call (no UI, API live) | Keep UI absent; ops policy; consider feature flag off on prod until launch |
-| GAP-03 | **MEDIUM** | Nightly beat enabled by default while launch stance **PAUSED** | Founder: confirm `NIGHTLY_AUTO_APPLY_BEAT_ENABLED=false` on prod if full pause intended |
-| GAP-04 | **MEDIUM** | `auto_apply_submit=True` default | Set `false` on prod pilot or require `submit=false` in API clients |
-| GAP-05 | **LOW** | Dead i18n keys `nightlyAutoApplyTrigger*` | Remove or wire only on staging alias |
-| GAP-06 | **LOW** | Premium gate off by default for per-job auto-apply | Enable `auto_apply_require_premium` before monetized mass use |
+| ID | Severity | Finding | Status (post-fix) |
+| -- | -------- | ------- | ----------------- |
+| GAP-01 | **HIGH** | `POST /applications/auto-apply` lacked server readiness gate | ✅ **CLOSED** — `enforce_autonomous_apply_allowed()` in `applications.py` |
+| GAP-02 | **HIGH** | `POST /auto-apply/trigger` callable by any ready user | ✅ **CLOSED** — ops allowlist only (`user_has_scrape_ops`) |
+| GAP-03 | **MEDIUM** | Nightly beat enabled by default while launch **PAUSED** | ⚠️ **OPEN (ops)** — set `NIGHTLY_AUTO_APPLY_BEAT_ENABLED=false` on Railway for full pause; code default unchanged |
+| GAP-04 | **MEDIUM** | `auto_apply_submit=True` default | ⚠️ **OPEN (ops)** — pilot: set `AUTO_APPLY_SUBMIT=false` on prod if prepare-only |
+| GAP-05 | **LOW** | Dead i18n keys `nightlyAutoApplyTrigger*` | ⚠️ open |
+| GAP-06 | **LOW** | Premium gate off by default | ⚠️ open |
 
-**No BLOCKER** found for “delegated apply accidentally live” — flags are hard-false.
+**Policy module:** `backend/app/services/autonomous_apply_policy.py`  
+**Tests:** `tests/test_applications_auto_apply_readiness_gate.py`, updated autonomous/settings tests.
+
+**No BLOCKER** for delegated apply live — flags remain hard-false.
 
 ---
 
@@ -169,7 +173,7 @@
 | Public launch | **NO-GO** — do not enable mass auto-apply marketing |
 | Delegated apply comms | **NOT LIVE** — only “prepare package” / manual tracker honesty |
 | Auto-apply ops | **PAUSED** — no founder trigger-sweep in launch window; verify beat flag |
-| Before widening apply | Close GAP-01; re-run this audit + `test_autonomous_applying_readiness_gate.py` |
+| Before widening apply | GAP-01/02 closed; confirm GAP-03/04 env on prod; re-run pytest bundle |
 | S2 / KYC | Do **not** claim S2 PASS or KYC live — out of scope; separate gates |
 
 ### Prod health snapshot (sanitized curl)

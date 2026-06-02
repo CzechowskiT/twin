@@ -67,6 +67,10 @@ from app.services.application_submission import (
     record_submission_link_opened,
     record_user_pipeline_status,
 )
+from app.services.autonomous_apply_policy import (
+    candidate_for_user,
+    enforce_autonomous_apply_allowed,
+)
 from app.services.auto_apply_service import auto_apply_for_user
 from app.services.request_locale import locale_from_request
 from app.services.employer_webhook import dispatch_auto_apply_webhook
@@ -513,6 +517,10 @@ def auto_apply(
                 "paywall": pw,
             },
         )
+
+    candidate = candidate_for_user(db, user.id)
+    enforce_autonomous_apply_allowed(user, candidate)
+
     enforce_human_ack_if_required(settings=settings, human_acknowledged=body.human_acknowledged)
     enforce_auto_apply_redis_rate_limit(user_id=user.id, settings=settings)
 

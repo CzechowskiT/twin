@@ -1,5 +1,7 @@
 """Tests for strategic vision backend services."""
 
+import json
+from datetime import datetime, timezone
 from unittest.mock import patch
 
 import pytest
@@ -31,7 +33,15 @@ def vision_client():
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
     db = Session()
-    user = User(email="vision@test.com", hashed_password="x", is_active=True, plan_tier="premium", subscription_status="active")
+    user = User(
+        email="vision@test.com",
+        hashed_password="x",
+        is_active=True,
+        plan_tier="premium",
+        subscription_status="active",
+        gdpr_consent_at=datetime.now(timezone.utc),
+        onboarding_completed_at=datetime.now(timezone.utc),
+    )
     db.add(user)
     db.commit()
     candidate = Candidate(
@@ -40,6 +50,13 @@ def vision_client():
         skills='["python", "fastapi", "postgresql"]',
         experience_years=5,
         cv_text="Senior Python engineer with FastAPI and PostgreSQL experience.",
+        cv_processing_consent_at=datetime.now(timezone.utc),
+        profile_signals_json=json.dumps(
+            {
+                "career_compass": {"ideal": {"job_title": "Python Developer"}},
+                "cv_insights": {"summary": "Senior Python engineer"},
+            }
+        ),
     )
     db.add(candidate)
     db.commit()

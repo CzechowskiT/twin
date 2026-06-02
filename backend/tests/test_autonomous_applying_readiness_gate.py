@@ -120,8 +120,13 @@ def test_patch_enable_blocked_without_verified_readiness(gate_client) -> None:
     assert "verified readiness" in res.json().get("detail", "").lower()
 
 
-def test_trigger_blocked_without_verified_readiness(gate_client) -> None:
-    client, headers, db, _user, candidate = gate_client
+def test_trigger_blocked_without_verified_readiness(gate_client, monkeypatch) -> None:
+    from app.config import get_settings
+
+    client, headers, db, user, candidate = gate_client
+    monkeypatch.setenv("SCRAPE_OPS_USER_IDS", str(user.id))
+    monkeypatch.setenv("SCRAPE_OPS_EMAILS", "")
+    get_settings.cache_clear()
     consent = AutoApplyConsent(
         candidate_id=candidate.id,
         is_active=True,
@@ -136,6 +141,30 @@ def test_trigger_blocked_without_verified_readiness(gate_client) -> None:
     res = client.post("/api/v1/auto-apply/trigger", headers=headers)
     assert res.status_code == 400
     assert "verified readiness" in res.json().get("detail", "").lower()
+
+
+def test_trigger_ops_only_even_when_readiness_complete(gate_client, monkeypatch) -> None:
+    from app.config import get_settings
+
+    client, headers, db, user, candidate = gate_client
+    monkeypatch.setenv("SCRAPE_OPS_USER_IDS", "")
+    monkeypatch.setenv("SCRAPE_OPS_EMAILS", "")
+    get_settings.cache_clear()
+    consent = AutoApplyConsent(
+        candidate_id=candidate.id,
+        is_active=True,
+        consent_given_at=datetime.now(timezone.utc),
+        consent_text_version="v1",
+        min_score_threshold=90.0,
+        daily_limit=5,
+    )
+    db.add(consent)
+    db.commit()
+    with patch("app.api.auto_apply_settings.process_user_nightly_auto_apply") as mock_proc:
+        res = client.post("/api/v1/auto-apply/trigger", headers=headers)
+    assert res.status_code == 403
+    assert "ops only" in res.json().get("detail", "").lower()
+    mock_proc.assert_not_called()
 
 
 def test_trigger_sweep_still_ops_gated(gate_client, monkeypatch) -> None:

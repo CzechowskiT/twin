@@ -81,9 +81,11 @@
 | **Safety audit** | `docs/AUTO_APPLY_DELEGATED_APPLY_SAFETY_AUDIT_2026-06-02.md` (read-only 2026-06-02) | ✅ documented |
 | **Operational stance** | Public launch audit policy — no agent-triggered live apply, no sweep, no scrape ops | **PAUSED** |
 | Delegated submit | `delegated_apply_allowed=false`, `can_submit_delegated_application=false` in `candidate_readiness.py` | **NOT LIVE** |
-| Autonomous apply gate | `autonomous_apply_allowed()` on consent/nightly; **gap:** `POST /applications/auto-apply` lacks server gate (GAP-01 HIGH) | ⚠️ mostly gated |
-| Ops trigger-sweep | `POST /auto-apply/trigger-sweep` — `user_has_scrape_ops` allowlist only (`auto_apply_settings.py`) | ✅ ops-only |
-| Per-user `POST /auto-apply/trigger` | API live (`max_jobs=1`); **no UI** on settings page | ⚠️ API only (GAP-02 HIGH) |
+| Autonomous apply gate | `autonomous_apply_policy.enforce_autonomous_apply_allowed()` on per-job + consent paths | ✅ **CLOSED** (GAP-01) |
+| Ops trigger-sweep | `POST /auto-apply/trigger-sweep` — ops allowlist | ✅ ops-only |
+| Per-user `POST /auto-apply/trigger` | **Ops allowlist only**; no candidate UI | ✅ **CLOSED** (GAP-02) |
+| Nightly beat env (GAP-03) | Doc: `NIGHTLY_AUTO_APPLY_BEAT_ENABLED=false` on prod for full **PAUSED** | ⚠️ founder env |
+| `AUTO_APPLY_SUBMIT` (GAP-04) | Doc: `false` on prod for prepare-only pilot | ⚠️ founder env |
 | UI safety | `test:dashboard-ux-safety` + `test:verified-readiness-guard` — 2026-06-02 PASS | ✅ PASS |
 | S6 sweep tests | `test_auto_apply_trigger_sweep_admin_gate.py` + autonomous readiness — 47 passed bundle | ✅ PASS |
 | Nightly beat infra | Celery schedule exists; founder may disable beat for full **PAUSED** (GAP-03) | ⚠️ infra LIVE; **policy PAUSED** |

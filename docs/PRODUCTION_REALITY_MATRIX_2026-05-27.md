@@ -31,7 +31,8 @@
 | Manual scrape UI | `NEXT_PUBLIC_SHOW_SCRAPE` | **OFF** default |
 | Auto-apply (nightly) | beat + consent; `AUTO_APPLY_DELEGATED_APPLY_SAFETY_AUDIT_2026-06-02` | **PARTIAL / PAUSED** — nightly gated; delegated **NOT LIVE**; per-job API gap GAP-01; trigger-sweep ops-only |
 | Delegated apply | gateway hard-false; no consent migration | **NOT LIVE** |
-| Per-job prepare (`POST /applications/auto-apply`) | Playwright path; FE guard on dashboard | **LIVE** infra — FE gated; server readiness gate **missing** (HIGH) |
+| Per-job prepare (`POST /applications/auto-apply`) | `enforce_autonomous_apply_allowed()` (403) | **LIVE** infra — FE + server gated |
+| Manual trigger (`POST /auto-apply/trigger`) | Ops allowlist only | **OPS ONLY** — not candidate-facing |
 | Calendar Google | `google_calendar_configured`; founder **FULL prod smoke PASS** 2026-05-29 — OAuth + real events + day mapping (`docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`; Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, HEAD `3631c45`) | **LIVE / VERIFIED** — Connect, real events, local week columns (`Europe/Warsaw`) |
 | Calendar Microsoft | `microsoft_calendar_configured` | **LIVE** |
 | Calendar Apple / CalDAV | docs + ICS patterns | **PARTIAL** — no Apple OAuth |
