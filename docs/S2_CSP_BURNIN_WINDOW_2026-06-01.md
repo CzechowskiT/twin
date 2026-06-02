@@ -111,6 +111,25 @@ From `GET /api/public-health` (via FE alias), captured at burn-in restart (`2026
 
 **Next manual checkpoint (UTC):** `2026-06-02T18:18:33Z` (~4h after start) — Railway `csp_report` log triage + route/DevTools cadence per checklist.
 
+## Manual checkpoint — clean (2026-06-02)
+
+**Checkpoint UTC:** `2026-06-02T15:42:41Z` (~84m after burn-in start `2026-06-02T14:18:33Z`)
+
+**Source:** Founder Railway log triage — service `production/twin`, deployment `37096ecc` (search: `csp_report`)
+
+| Check | Result |
+| --- | --- |
+| Railway `csp_report` search | **No logs found** / **no fresh CSP reports** after window start |
+| Dashboard | **OK** (founder) |
+| Auto-apply | **PAUSED** — `NIGHTLY_AUTO_APPLY_BEAT_ENABLED=false` (prior evidence; unchanged) |
+| Enforce header | **Absent** (unchanged) |
+| Decision | **CONTINUE** 72h burn-in — report-only HOLD |
+| S2 status | **NOT READY** |
+| S2 PASS | **NO** |
+| Public launch | **NO-GO** |
+
+**Next manual checkpoint (UTC):** `2026-06-02T18:18:33Z` (~4h after start) — Railway `csp_report` log triage + route/DevTools cadence per checklist.
+
 ## Manual checkpoint cadence
 
 - **Window end review:** `2026-06-05T14:18:33Z` — full 72h evidence pack before any enforce decision.

@@ -86,12 +86,12 @@ the gate to ✅.
 | One ⚠️ partial on L6 (data subject access)                              | Document a manual workflow (`docs/GDPR_MANUAL_DSR.md`) and proceed.                   |
 | Any ❌ on Pilot gates                                                    | Pilot, not public launch — pilot has its own gate set (cf. `PILOT_OFFER_FINAL.md`).   |
 
-## Current gate stance (checkpoint 2026-06-02, **O7 PASS**, **S2 burn-in restarted**)
+## Current gate stance (checkpoint 2026-06-02 `15:42:41Z`, **O7 PASS**, **S2 burn-in in progress**)
 
 **Latest audit:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md`
 **Post-merge sanity (2026-06-02):** `docs/POST_MERGE_AUTO_APPLY_SANITY_2026-06-02.md` — PR #21 merged; prod `git_commit=6382a91` (includes `e764e68` hard gates **LIVE**); public-health OK; auto-apply **PAUSED** policy unchanged.
 
-- **S2 CSP enforce burn-in:** ❌ **NOT READY** — prior window **RESET** after `connect-src` gap; fix **deployed** (Railway API in report-only `connect-src`); **new** 72h window **IN PROGRESS** (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`). Founder post-fix: public-health OK, Railway API health OK, dashboard OK, **no fresh** `csp_report` for prod API host. Report-only only; enforce off. **Do not flip enforce** until full 72h evidence + founder sign-off. Auditor re-confirmed 8-route CSP-RO + no enforce header (2026-06-02).
+- **S2 CSP enforce burn-in:** ❌ **NOT READY** — prior window **RESET** after `connect-src` gap; fix **deployed** (Railway API in report-only `connect-src`); **new** 72h window **IN PROGRESS** (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`). **Clean checkpoint `2026-06-02T15:42:41Z`:** Founder Railway `production/twin` deployment `37096ecc`; search `csp_report` — **no logs found** / no fresh reports; dashboard OK; auto-apply paused (`nightly_auto_apply_beat_enabled=false` per prior evidence). Decision: **CONTINUE** report-only HOLD. Report-only only; enforce off. **Do not flip enforce** until full 72h evidence + founder sign-off. Next cadence: `2026-06-02T18:18:33Z`.
 
 - **O7 backup/restore:** ✅ **PASS** (2026-06-01) — staging clone drill via read-only pg_dump → pg_restore; evidence in `docs/BACKUP_RESTORE_DRILL_LOG.md`; prod **`postgres-volume`** untouched.
 - **Post-recovery stabilization (`INC-DB-2026-05-29-001`):** **RESOLVED** — separate from O7; retain incident backups until post-mortem closed.
