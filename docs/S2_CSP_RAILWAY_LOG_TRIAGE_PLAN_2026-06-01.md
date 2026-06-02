@@ -42,8 +42,18 @@ Use Railway log search (plain text):
 | Connect blocks | `csp_report violation` + `connect-src` |
 | Frame blocks | `csp_report violation` + `frame-src` |
 | Specific host | `csp_report violation` + `blocked-uri` substring (e.g. `posthog`, `plausible`) |
+| Inline/eval signal | `csp_report violation` + `inline` / `unsafe-eval` |
+| Unexpected third-party | `csp_report violation` + `blocked-uri` not on allowlist |
 
 Export: copy log excerpts to `docs/evidence/S2_CSP_BURNIN_LOG_<start>_<end>.md` (create folder at triage time; do not commit secrets).
+
+### Triage cadence (required)
+
+| Cadence | Action | Output artifact |
+| --- | --- | --- |
+| Every 4h | Query `csp_report violation` and classify new `blocked-uri` values | Hourly/4h row update in burn-in evidence file |
+| Daily (UTC 00:00) | Summarize counts by directive (`script-src`, `img-src`, `connect-src`, `frame-src`) | Daily summary section + open issues list |
+| Window end (72h) | Final triage rollup and founder-ready verdict (`STARTED/HOLD`) | Final evidence pack + checklist sign-off |
 
 ### Counting template
 

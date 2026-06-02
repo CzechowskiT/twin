@@ -88,7 +88,7 @@ the gate to ✅.
 
 ## Current gate stance (checkpoint 2026-06-01, **O7 PASS**, **S2 audit complete**)
 
-- **S2 CSP enforce burn-in:** ❌ **NOT READY** (2026-06-01) — narrowed report-only **prepared in repo**; prod still permissive until deploy; 72h log triage + DevTools checklist pending. Docs: `docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md`, `docs/S2_CSP_RAILWAY_LOG_TRIAGE_PLAN_2026-06-01.md`, `docs/S2_CSP_DEVTOOLS_BURNIN_CHECKLIST_2026-06-01.md`. **Do not flip enforce.**
+- **S2 CSP enforce burn-in:** ❌ **NOT READY** (2026-06-02) — burn-in window **STARTED** in report-only mode (`docs/S2_CSP_BURNIN_WINDOW_2026-06-01.md`), enforce still off, 72h log triage + DevTools checklist pending founder review. **Do not flip enforce.**
 
 - **O7 backup/restore:** ✅ **PASS** (2026-06-01) — staging clone drill via read-only pg_dump → pg_restore; evidence in `docs/BACKUP_RESTORE_DRILL_LOG.md`; prod **`postgres-volume`** untouched.
 - **Post-recovery stabilization (`INC-DB-2026-05-29-001`):** **RESOLVED** — separate from O7; retain incident backups until post-mortem closed.
