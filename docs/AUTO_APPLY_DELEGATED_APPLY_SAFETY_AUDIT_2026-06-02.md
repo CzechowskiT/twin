@@ -16,7 +16,7 @@
 | --------- | ------ |
 | **Delegated apply** | **NOT LIVE** — `delegated_apply_allowed=false`, `can_submit_delegated_application=false` always (`candidate_readiness.py`) |
 | **Auto-apply (operational)** | **PAUSED** for public launch — infra + API paths exist; founder/policy hold; audit made **no** prod triggers |
-| **Nightly Celery sweep** | **INFRA LIVE** (`nightly_auto_apply_beat_enabled` default `True`) — gated by consent + `autonomous_apply_allowed()` per user |
+| **Nightly Celery sweep** | **PAUSED (ops)** — prod `nightly_auto_apply_beat_enabled=false` (2026-06-02); task guard + consent gates if invoked |
 | **Platform trigger-sweep** | **OPS ONLY** — `user_has_scrape_ops` + 403 for normal users (tests) |
 | **Public launch** | **NO-GO** (unchanged — S2 CSP + program gates) |
 
@@ -155,8 +155,8 @@
 | -- | -------- | ------- | ----------------- |
 | GAP-01 | **HIGH** | `POST /applications/auto-apply` lacked server readiness gate | ✅ **CLOSED** — `enforce_autonomous_apply_allowed()` in `applications.py` |
 | GAP-02 | **HIGH** | `POST /auto-apply/trigger` callable by any ready user | ✅ **CLOSED** — ops allowlist only (`user_has_scrape_ops`) |
-| GAP-03 | **MEDIUM** | Nightly beat enabled by default while launch **PAUSED** | ⚠️ **OPEN (ops)** — prod health shows `nightly_auto_apply_beat_enabled: true`; plan: `docs/AUTO_APPLY_PRODUCTION_OPS_PAUSE_PLAN_2026-06-02.md` **Option B** |
-| GAP-04 | **MEDIUM** | `auto_apply_submit=True` default | ⚠️ **OPEN (ops)** — same plan: `AUTO_APPLY_SUBMIT=false` on API (Option B) |
+| GAP-03 | **MEDIUM** | Nightly beat on prod while **PAUSED** | ✅ **CLOSED (ops)** — founder set `NIGHTLY_AUTO_APPLY_BEAT_ENABLED=false`; health `false` / `beat_schedule_has_nightly=false` |
+| GAP-04 | **MEDIUM** | `auto_apply_submit=True` on prod | ⚠️ **OPEN (optional)** — Option B partial; set `AUTO_APPLY_SUBMIT=false` on API if prepare-only required |
 | GAP-05 | **LOW** | Dead i18n keys `nightlyAutoApplyTrigger*` | ⚠️ open |
 | GAP-06 | **LOW** | Premium gate off by default | ⚠️ open |
 
@@ -192,7 +192,7 @@
   "celery": {
     "worker_active": true,
     "broker_configured": true,
-    "nightly_auto_apply_beat_enabled": true
+    "nightly_auto_apply_beat_enabled": false
   }
 }
 ```

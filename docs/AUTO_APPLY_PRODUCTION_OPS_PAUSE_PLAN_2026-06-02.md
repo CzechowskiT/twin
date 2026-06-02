@@ -8,11 +8,13 @@
 
 **Hard bans (planner session):** no env changes, deploy, Railway restart, migrations, prod DB mutation, scrape/apply/sweep, secrets, S2 PASS, public launch GO.
 
+**Applied (founder, 2026-06-02):** **Option B partial** — `NIGHTLY_AUTO_APPLY_BEAT_ENABLED=false` on Railway prod. `AUTO_APPLY_SUBMIT` **not** changed (GAP-04 remains optional). **S2 burn-in clock unchanged** (CSP report-only only; no fresh `csp_report` after restart).
+
 ---
 
 ## 1. Current production state (read-only evidence)
 
-**Source:** `GET https://twin-sooty.vercel.app/api/public-health` (2026-06-02 planner session)
+**Source:** `GET https://twin-sooty.vercel.app/api/public-health` (2026-06-02 evidence recorder session)
 
 | Signal | Value |
 | ------ | ----- |
@@ -23,13 +25,13 @@
 | `scrape_worker_ready` | `true` |
 | `celery.worker_active` | `true` |
 | `celery.broker_configured` | `true` |
-| **`celery.nightly_auto_apply_beat_enabled`** | **`true`** ← GAP-03 |
-| `celery.beat_schedule_has_nightly` | `true` |
+| **`celery.nightly_auto_apply_beat_enabled`** | **`false`** ← GAP-03 **CLOSED (ops)** |
+| `celery.beat_schedule_has_nightly` | **`false`** |
 | `celery.celery_task_always_eager` | `false` |
 
-**Code defaults** (`backend/app/config.py`): `nightly_auto_apply_beat_enabled=True`, `auto_apply_submit=True`.
+**Code defaults** (`backend/app/config.py`): unchanged — `nightly_auto_apply_beat_enabled=True`, `auto_apply_submit=True` in repo.
 
-**Inferred:** Nightly beat is **scheduled** on prod (02:00 Europe/Warsaw per `nightly_auto_apply_hour/minute`). Per-job Playwright path can **submit** to portals when called and gates pass.
+**Inferred:** Nightly scheduled sweep **disabled** on prod. Per-job `POST /applications/auto-apply` may still **submit** when called (`AUTO_APPLY_SUBMIT` still default on prod unless founder sets GAP-04). Server gates (`e764e68`) remain live.
 
 **Already enforced in code (no env required):**
 
@@ -178,6 +180,22 @@ To restore pre-pause behaviour (only when launch gates allow):
 | `AUTO_APPLY_SUBMIT` | `true` |
 
 Apply on **Worker + API**, redeploy, re-run `public-health` curl. Reconfirm consent volume and S2 status before re-enabling.
+
+---
+
+## 8. Applied evidence log (founder)
+
+| Check | Result |
+| ----- | ------ |
+| Railway `NIGHTLY_AUTO_APPLY_BEAT_ENABLED=false` | ✅ Applied (founder) |
+| Railway `AUTO_APPLY_SUBMIT=false` | ☐ Not applied — GAP-04 **optional open** |
+| `public-health` after change | `nightly_auto_apply_beat_enabled=false`, `beat_schedule_has_nightly=false` |
+| Dashboard | **OK** (founder) |
+| CSP | Report-only unchanged; **no fresh** `csp_report` after S2 restart (founder) — **do not reset** 72h window |
+| DB / apply / sweep | No mutation or prod apply tests (founder + agent) |
+| Auto-apply stance | **PAUSED** |
+| Public launch | **NO-GO** |
+| S2 | **NOT READY** — burn-in continues (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`) |
 
 ---
 

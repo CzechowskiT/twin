@@ -31,7 +31,7 @@
 | Job corpus / matching | `validated_jobs`, market coverage in health | **LIVE** (coverage ⚠️ below target) |
 | Scraping (pracuj.pl, rocketjobs.pl) | `scrape_worker_ready`, beat enabled | **LIVE** infra; **BLOCKED** for ops sweep without allowlist |
 | Manual scrape UI | `NEXT_PUBLIC_SHOW_SCRAPE` | **OFF** default |
-| Auto-apply (nightly) | beat **ON** on prod health; pause plan Option B | **PARTIAL / PAUSED** — server gates live; founder env pause **pending** (GAP-03/04) |
+| Auto-apply (nightly) | `nightly_auto_apply_beat_enabled=false` on prod (2026-06-02) | **PAUSED (ops)** — GAP-03 closed; GAP-04 optional; server gates live |
 | Delegated apply | gateway hard-false; no consent migration | **NOT LIVE** |
 | Per-job prepare (`POST /applications/auto-apply`) | `enforce_autonomous_apply_allowed()` (403) | **LIVE** infra — FE + server gated |
 | Manual trigger (`POST /auto-apply/trigger`) | Ops allowlist only | **OPS ONLY** — not candidate-facing |

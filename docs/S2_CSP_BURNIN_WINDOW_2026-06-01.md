@@ -12,6 +12,7 @@
 - S2 status: **IN PROGRESS** — 72h evidence window running; **NOT READY** for enforce / S2 PASS
 - S2 PASS: **NO**
 - Public launch: **NO-GO**
+- Auto-apply ops pause (2026-06-02): founder `NIGHTLY_AUTO_APPLY_BEAT_ENABLED=false` — **does not reset** this burn-in clock (CSP headers unchanged; `csp_report` clean per founder)
 
 ## Burn-in reset (2026-06-02)
 

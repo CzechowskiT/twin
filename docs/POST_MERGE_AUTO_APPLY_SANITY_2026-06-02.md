@@ -34,7 +34,7 @@
 | `scrape_worker_ready` | `true` |
 | `celery.worker_active` | `true` |
 | `celery.broker_configured` | `true` |
-| `celery.nightly_auto_apply_beat_enabled` | `true` |
+| `celery.nightly_auto_apply_beat_enabled` | `false` (post–Option B partial, 2026-06-02) |
 | `stripe_checkout_ready` | `true` |
 
 ### Is `e764e68` live on prod?
@@ -54,16 +54,16 @@
 | Signal | Status |
 | ------ | ------ |
 | Dashboard | **OK** (founder-reported) |
-| Auto-apply operational stance | **PAUSED** (policy; beat still enabled in health) |
+| Auto-apply operational stance | **PAUSED** (policy; nightly beat **off** in health after founder env) |
 | CSP `csp_report` after S2 restart | **No fresh violations** (founder-reported) |
 | S2 burn-in | **IN PROGRESS** → `2026-06-05T14:18:33Z` — **NOT READY** |
 | Public launch | **NO-GO** |
 | Delegated apply | **NOT LIVE** |
 
-### Optional founder env (GAP-03/04 — still open)
+### Founder env (2026-06-02)
 
-- `NIGHTLY_AUTO_APPLY_BEAT_ENABLED=false` — full nightly pause while launch **PAUSED**
-- `AUTO_APPLY_SUBMIT=false` — prepare-only per-job path
+- ✅ `NIGHTLY_AUTO_APPLY_BEAT_ENABLED=false` — applied; GAP-03 **closed (ops)**
+- ☐ `AUTO_APPLY_SUBMIT=false` — **not** applied; GAP-04 **optional open**
 
 ---
 

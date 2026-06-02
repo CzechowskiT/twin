@@ -84,11 +84,11 @@
 | Autonomous apply gate | `autonomous_apply_policy.enforce_autonomous_apply_allowed()` on per-job + consent paths | ✅ **CLOSED** (GAP-01) |
 | Ops trigger-sweep | `POST /auto-apply/trigger-sweep` — ops allowlist | ✅ ops-only |
 | Per-user `POST /auto-apply/trigger` | **Ops allowlist only**; no candidate UI | ✅ **CLOSED** (GAP-02) |
-| Nightly beat env (GAP-03) | Prod **ON** (`celery.nightly_auto_apply_beat_enabled: true`); pause plan Option B | ⚠️ founder ops — `docs/AUTO_APPLY_PRODUCTION_OPS_PAUSE_PLAN_2026-06-02.md` |
-| `AUTO_APPLY_SUBMIT` (GAP-04) | Code default **true**; pause plan Option B sets `false` on API | ⚠️ founder ops |
+| Nightly beat env (GAP-03) | Prod **`false`** (founder 2026-06-02); evidence in pause plan §8 | ✅ **CLOSED (ops)** |
+| `AUTO_APPLY_SUBMIT` (GAP-04) | Not set on prod (Option B partial) | ⚠️ **optional open** |
 | UI safety | `test:dashboard-ux-safety` + `test:verified-readiness-guard` — 2026-06-02 PASS | ✅ PASS |
 | S6 sweep tests | `test_auto_apply_trigger_sweep_admin_gate.py` + autonomous readiness — 47 passed bundle | ✅ PASS |
-| Nightly beat infra | Celery schedule exists; founder may disable beat for full **PAUSED** (GAP-03) | ⚠️ infra LIVE; **policy PAUSED** |
+| Nightly beat infra | Beat **disabled** on prod health; worker still active | ✅ **PAUSED (ops)** |
 
 **Repo grep (read-only):** No audit session calls to `trigger-sweep`, `nightly_auto_apply_sweep`, or live `auto_apply_for_user` on prod.
 
@@ -177,7 +177,7 @@
 ### Risks (accepted for pilot, not public)
 
 - CSP `unsafe-inline` / `unsafe-eval` remain (separate hardening track).
-- Prod API SHA `6382a91` includes auto-apply safety fix `e764e68` (post-merge 2026-06-02); nightly beat still **enabled** in health — **PAUSED** is policy/env (GAP-03).
+- Prod API SHA `6382a91` includes `e764e68`; nightly beat **disabled** in health (GAP-03 closed ops 2026-06-02). S2 burn-in **unchanged** — no clock reset.
 - Metric / corpus scale below “marketplace” narrative — honest pilot ceiling.
 
 ---
