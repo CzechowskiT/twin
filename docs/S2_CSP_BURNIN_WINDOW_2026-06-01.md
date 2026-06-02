@@ -72,9 +72,26 @@ From `GET /api/public-health` (via FE alias), captured at burn-in restart (`2026
 - 5) Founder demo dry-run evidence on the same alias with pass/fail notes and any CSP anomalies.
 - 6) Founder sign-off line (HOLD report-only / approve enforce PR) after reviewing logs + DevTools pack.
 
+## Early checkpoint (2026-06-02)
+
+**Checkpoint UTC:** `2026-06-02T14:32:09Z` (~14m after burn-in restart `2026-06-02T14:18:33Z`)
+
+**Source:** Founder early Railway log triage (search: `csp_report`)
+
+| Finding | Detail |
+| --- | --- |
+| Fresh `csp_report` after restart | **None** |
+| Historical violations | Jun 1 2026 20:52–20:53 CEST — `connect-src` / Railway API host (`twin-production-bcd9.up.railway.app`); **fixed** in `24146f9` deploy |
+| Enforce header | **Absent** (unchanged) |
+| Decision | **CONTINUE** 72h burn-in — report-only HOLD |
+| S2 status | **NOT READY** |
+| S2 PASS | **NO** |
+| Public launch | **NO-GO** |
+
+**Next manual checkpoint (UTC):** `2026-06-02T18:18:33Z` (~4h after start) — Railway `csp_report` log triage + note any new `blocked-uri`.
+
 ## Manual checkpoint cadence
 
-- **Next manual checkpoint (UTC):** `2026-06-02T18:18:33Z` (~4h after start) — Railway `csp_report` log triage + note any new `blocked-uri`.
 - **Window end review:** `2026-06-05T14:18:33Z` — full 72h evidence pack before any enforce decision.
 
 ## Guardrails
