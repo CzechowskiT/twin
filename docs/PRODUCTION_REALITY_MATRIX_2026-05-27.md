@@ -38,7 +38,7 @@
 | Beta waitlist signup | rate limit + contract tests | **LIVE** |
 | CV / voice upload limits | `ff22f3a` | **LIVE** |
 | CSP report-only + sink | S1 gate, `/api/v1/csp-report` | **LIVE** |
-| CSP enforce | S2 gate | **BLOCKED** — keep REPORT-ONLY, do not flip enforce before burn-in checklist |
+| CSP enforce | S2 gate; 72h burn-in `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z` | **BLOCKED** — REPORT-ONLY; burn-in in progress; do not flip enforce before evidence pack |
 | Layer-2 LLM mutation limits | `28a50a0` | **LIVE** |
 | Profile / applications mutation limits | `1c731fc` | **LIVE** |
 | OAuth callback rate limits | `1efd8b1` | **LIVE** |
@@ -91,8 +91,8 @@
 | Google Calendar FULL prod smoke (2026-05-29) | `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md` | **LIVE / VERIFIED** — OAuth + real events + day mapping; Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, HEAD `3631c45`; no Railway |
 | Founder authenticated smoke (2026-05-29) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **LIVE / VERIFIED** — P6 **PASS**; 8/8 routes + safety; `/dashboard` layout founder-confirmed |
 | CSP per-route probe (2026-05-29 batch) | `/`, `/dashboard`, `/login/candidate`, `/demo`, `/status` — all report-only | **LIVE REPORT-ONLY** — enforce still blocked (S2) |
-| CSP S2 burn-in window (2026-06-02) | `docs/S2_CSP_BURNIN_WINDOW_2026-06-01.md` + 8-route header audit | **RESET / BLOCKED** — `connect-src` gap on direct Railway API; fix in repo; restart 72h after FE deploy; enforce off |
-| CSP `connect-src` Railway host (2026-06-02) | Founder logs: `blocked-uri` `twin-production-bcd9.up.railway.app` on `/dashboard` | **FIX IN REPO** — report-only allowlist; deploy pending; not an outage |
+| CSP S2 burn-in window (2026-06-02) | `docs/S2_CSP_BURNIN_WINDOW_2026-06-01.md` — restart `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z` | **IN PROGRESS** — prior window RESET; post-fix founder checks green; S2 PASS **NO**; enforce off |
+| CSP `connect-src` Railway host (2026-06-02) | `frontend/next.config.ts`; founder logs: no fresh violations for `twin-production-bcd9.up.railway.app` after deploy | **LIVE / DEPLOYED** — report-only allowlist; not an outage |
 
 ---
 
