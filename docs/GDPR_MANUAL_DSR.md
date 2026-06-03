@@ -4,7 +4,7 @@
 
 **Scope:** Controlled **pilot** and pre–public-launch operations. Not legal advice — align with `frontend/public/legal/privacy-*.md` and counsel.
 
-**Related:** `GET /api/v1/candidates/me/export.json` · application CSV/XLSX · `docs/COOKIE_CONSENT.md` · `docs/PLACEMENT_VERIFICATION.md` (placement rows may survive anonymised audit needs).
+**Related:** `GET /api/v1/candidates/me/export.json` · application CSV/XLSX · `docs/COOKIE_CONSENT.md` · `docs/PLACEMENT_VERIFICATION.md` (placement rows may survive anonymised audit needs) · `docs/L6_DSR_PRIVACY_AUDIT_2026-06-03.md` · release-gate evidence sessions (e.g. S2 founder Railway checkpoint `2026-06-03T12:23:52Z` in `docs/S2_CSP_BURNIN_WINDOW_2026-06-01.md` — **does not** substitute for L6 waiver sign-off below).
 
 ---
 
@@ -137,10 +137,10 @@ For **controlled pilot** and optional **public launch** while self-service delet
 | Waiver document | `docs/GDPR_MANUAL_DSR.md` (this file) |
 | Audit reference | `docs/L6_DSR_PRIVACY_AUDIT_2026-06-03.md` |
 | Gate row | `PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md` **L6** |
-| Founder sign-off (name / UTC) | _Pending_ |
+| Founder sign-off (name / UTC) | _Pending_ — **not signed** in S2 Railway checkpoint session `2026-06-03T12:23:52Z` |
 | Public launch unlocked by waiver alone? | **No** — S2 and other blockers still apply |
 
-**Without founder sign-off:** L6 remains **partial** → **public launch NO-GO** per launch matrix.
+**Without founder sign-off:** L6 remains **partial** → **public launch NO-GO** per launch matrix (`docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` § G).
 
 ---
 

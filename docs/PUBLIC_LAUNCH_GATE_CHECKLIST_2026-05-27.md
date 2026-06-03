@@ -86,13 +86,13 @@ the gate to ✅.
 | One ⚠️ partial on L6 (data subject access)                              | Document a manual workflow (`docs/GDPR_MANUAL_DSR.md`) and proceed.                   |
 | Any ❌ on Pilot gates                                                    | Pilot, not public launch — pilot has its own gate set (cf. `PILOT_OFFER_FINAL.md`).   |
 
-## Current gate stance (checkpoint 2026-06-03 `11:31:01Z`, **O7 PASS**, **S2 burn-in in progress**)
+## Current gate stance (checkpoint 2026-06-03 `12:23:52Z`, **O7 PASS**, **S2 burn-in in progress**)
 
 **Latest audit:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` (refreshed 2026-06-03)
 **Post-merge sanity (2026-06-02):** `docs/POST_MERGE_AUTO_APPLY_SANITY_2026-06-02.md` — PR #21 merged; prod `git_commit=6382a91` (includes `e764e68` hard gates **LIVE**); public-health OK; auto-apply **PAUSED** policy unchanged.
 
-- **S2 CSP enforce burn-in:** ❌ **NOT READY** — window **IN PROGRESS** (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; **~21h 12m elapsed** at `11:31:01Z`). Checkpoint `11:31:01Z`: 8-route header audit PASS; 9 routes HTTP 200; health OK; pytest **29 passed**; Railway UI **pending** (no fake counts). Decision: **CONTINUE** (caveat: Railway confirmation pending). Next founder: `2026-06-03T14:18:33Z`.
-- **L6 DSR:** ⚠️ **partial** — export **LIVE**; delete manual via `docs/GDPR_MANUAL_DSR.md`; **founder waiver sign-off pending** for launch-phase acceptance.
+- **S2 CSP enforce burn-in:** ❌ **NOT READY** — window **IN PROGRESS** (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; **~22h 5m elapsed / ~31%** at `12:23:52Z`). Founder Railway checkpoint: search `csp_report` from window start → **no fresh entries**; agent corroboration: 8-route header audit PASS; health OK. Decision: **CONTINUE** (report-only HOLD). Next founder Railway: `2026-06-03T18:18:33Z`; DevTools Chrome still in progress.
+- **L6 DSR:** ⚠️ **partial** — export **LIVE**; delete manual via `docs/GDPR_MANUAL_DSR.md`; **founder waiver sign-off pending** (not signed in this checkpoint session).
 - **O5 Calendar:** ⚠️ **partial** — Google+Microsoft **LIVE**; Apple/iCal ICS fallback documented in matrix § O5; waiver optional for pilot.
 
 - **O7 backup/restore:** ✅ **PASS** (2026-06-01) — staging clone drill via read-only pg_dump → pg_restore; evidence in `docs/BACKUP_RESTORE_DRILL_LOG.md`; prod **`postgres-volume`** untouched.

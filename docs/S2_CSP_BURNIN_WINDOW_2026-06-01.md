@@ -168,7 +168,7 @@ From `GET /api/public-health` (via FE alias), captured at burn-in restart (`2026
 | 8-route CSP-RO + no enforce | **PASS** — `audit-csp-headers.sh` 0 failures |
 | Public-health | `status=ok`, `db_ok=true`, `celery.nightly_auto_apply_beat_enabled=false`, `celery.worker_active=true`, `git_commit=6382a91…` |
 | `validated_jobs` / `market_coverage_active_validated` | `652` / `2634` |
-| Railway `csp_report` (founder UI) | **PENDING founder confirmation** — agent has **no Railway CLI/API**; procedure below |
+| Railway `csp_report` (founder UI) | **Confirmed none** through `2026-06-03T12:23:52Z` — see § Founder Railway checkpoint (`2026-06-03`) |
 | DevTools Chrome | **IN PROGRESS** — see `docs/S2_CSP_DEVTOOLS_BURNIN_CHECKLIST_2026-06-01.md` § Chrome |
 | Enforce header | **Absent** (unchanged) |
 | Decision (agent-side) | **CONTINUE** report-only HOLD — no agent-observed CSP violations; **not** sufficient for S2 PASS without founder Railway rollup |
@@ -208,7 +208,7 @@ From `GET /api/public-health` (via FE alias), captured at burn-in restart (`2026
 | CSP-RO headers (8 audited routes) | **PASS** — enforce absent |
 | Marketing/legal routes | `/privacy`, `/terms` **200** + CSP-RO per audit script pattern |
 | Public-health | `status=ok`, `db_ok=true`, `nightly_auto_apply_beat_enabled=false`, `worker_active=true` |
-| Railway `csp_report` | **PENDING founder UI confirmation** — agent has no Railway CLI; **no log counts recorded** |
+| Railway `csp_report` | **Founder-confirmed none** through `2026-06-03T12:23:52Z` (search `csp_report` from window start) |
 | Agent-observed CSP violations | **None** (header probe only) |
 | Decision | **CONTINUE** report-only HOLD — **caveat:** Railway UI confirmation still required before S2 PASS |
 | S2 status / PASS / public launch | **NOT READY** / **NO** / **NO-GO** |
@@ -217,9 +217,35 @@ From `GET /api/public-health` (via FE alias), captured at burn-in restart (`2026
 
 | Search UTC | `csp_report violation` count | New blocked-uri post-restart | Founder decision |
 | ---------- | ------------------------------ | ---------------------------- | ---------------- |
-| _pending_ | _none / ___  | _none / list_ | CONTINUE / HOLD |
+| `2026-06-03T12:23:52Z` | **none** (no fresh entries since window start) | **none** | **CONTINUE** |
 
-**Next founder cadence (UTC):** `2026-06-03T14:18:33Z` · **Next agent read-only cadence:** `2026-06-03T18:18:33Z` (optional).
+**Next founder cadence (UTC):** `2026-06-03T18:18:33Z` · **Next agent read-only cadence:** `2026-06-03T18:18:33Z` (optional).
+
+## Founder Railway checkpoint (2026-06-03)
+
+**Checkpoint UTC:** `2026-06-03T12:23:52Z` (~22h 5m after burn-in start `2026-06-02T14:18:33Z`; **~49h 55m** remaining until `2026-06-05T14:18:33Z`; **~31%** elapsed)
+
+**Source:** Founder Railway UI — service `production/twin` → **Logs** → search `csp_report` (time filter from `2026-06-02T14:18:33Z`)
+
+| Field | Founder entry |
+| --- | --- |
+| Type | founder Railway UI |
+| Search | `csp_report` |
+| Fresh entries after window start | **No** — brak świeżych wpisów od `2026-06-02T14:18:33Z` |
+| New `blocked-uri` hosts (post-restart) | **none** |
+| Matches historical `connect-src` Railway API (pre-fix)? | no (no new reports) |
+| Dashboard / routes smoke | not re-run this checkpoint (prior checkpoints OK) |
+| Enforce header | **Absent** (unchanged) |
+| Decision | **CONTINUE** 72h burn-in — report-only HOLD |
+| S2 status | **NOT READY** |
+| S2 PASS | **NO** |
+| Public launch | **NO-GO** |
+
+**Agent read-only corroboration (same session):** `bash scripts/audit-csp-headers.sh` — 0 failures · `GET /api/public-health` → `status=ok`, `db_ok=true`, `nightly_auto_apply_beat_enabled=false`, `git_commit=6382a91…`
+
+**Clears PENDING:** § Founder-directed checkpoint (`2026-06-03T11:16:42Z`) and § Autonomous gate checkpoint (`2026-06-03T11:31:01Z`) — Railway `csp_report` count now **founder-confirmed none** for interval through this checkpoint.
+
+**Next founder Railway cadence (UTC):** `2026-06-03T18:18:33Z` (~28h after start) · window end `2026-06-05T14:18:33Z`.
 
 ## Manual checkpoint cadence
 

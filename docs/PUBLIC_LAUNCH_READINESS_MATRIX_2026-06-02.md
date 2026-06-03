@@ -3,7 +3,7 @@
 **Auditor:** TWIN Release Gate Owner (read-only shift)
 **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01`
 **Branch HEAD:** `9011040` (prior) → updated by 2026-06-03 shift commits
-**Audit UTC:** `2026-06-03T08:00:23Z` (~17h 42m into burn-in; **~54h 18m** until `2026-06-05T14:18:33Z`)
+**Audit UTC:** `2026-06-03T12:23:52Z` (~22h 5m / **~31%** into burn-in; **~49h 55m** until `2026-06-05T14:18:33Z`)
 **Production (unchanged by this audit):** FE `https://twin-sooty.vercel.app` · API `https://twin-production-bcd9.up.railway.app`
 
 **Verdict:** **Public launch NO-GO** · **Pilot / investor demo GO** · **S2 NOT READY** · **Auto-apply PAUSED** (operational + product gates)
@@ -17,8 +17,8 @@
 | S1 CSP report-only + `report-uri` wired | 8-route `curl -sI` 2026-06-02 — all HTTP 200, `content-security-policy-report-only` present, `report-uri /api/v1/csp-report` | ✅ PASS |
 | CSP enforce header absent | No `content-security-policy:` (enforce) on `/`, `/dashboard`, `/login/candidate`, `/register/candidate`, `/demo`, `/status`, `/dashboard/calendar`, `/api/public-health` | ✅ (expected) |
 | Narrowed policy on prod | Explicit `connect-src` includes `https://twin-production-bcd9.up.railway.app`; no broad `https:` wildcards | ✅ LIVE |
-| S2 72h burn-in | Window `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; agent checkpoint `2026-06-03T08:00:23Z` — header audit PASS; Railway logs founder-only | ❌ **NOT READY** — IN PROGRESS (~24% elapsed) |
-| S2 violation triage pack | Railway log rollup for full 72h (founder backfill for missed 4h cadence) + DevTools multi-browser + founder sign-off | ❌ MISSING |
+| S2 72h burn-in | Window `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; founder Railway `2026-06-03T12:23:52Z` — search `csp_report` **no fresh entries** since start; agent header audit PASS | ❌ **NOT READY** — IN PROGRESS (~31% elapsed) |
+| S2 violation triage pack | Partial founder evidence through `12:23:52Z`; full 72h rollup + DevTools multi-browser + founder enforce sign-off still required | ⚠️ **IN PROGRESS** |
 | S3–S4, S6–S10c mutation/upload limits | Gate checklist + repo tests | ✅ shipped (code) |
 | S5 Stripe dedup `050` | Founder read-only SQL 2026-05-29 | ✅ PASS |
 | S8–S9 secrets / deps baseline | Re-run before launch per checklist | ⚠️ re-verify |
@@ -116,7 +116,7 @@
 | L3 Privacy / Terms | `/privacy`, `/terms` HTTP 200 (2026-06-03 curl) | ✅ |
 | L4 Scraping compliance | `docs/SCRAPING_COMPLIANCE.md` | ✅ |
 | L5 Auto-apply consent model | DB + API tests | ✅ |
-| L6 DSR export/delete | Audit + `docs/GDPR_MANUAL_DSR.md` runbook (2026-06-03); waiver sign-off **pending** | ⚠️ **partial** |
+| L6 DSR export/delete | Audit + `docs/GDPR_MANUAL_DSR.md` runbook (2026-06-03); waiver sign-off **pending** — not signed in S2 checkpoint session `2026-06-03T12:23:52Z` | ⚠️ **partial** |
 | L7 Placement verification | `docs/PLACEMENT_VERIFICATION.md` | ✅ design |
 | Legal claims in this doc | Only pointers to existing legal docs | ✅ honoured |
 
@@ -133,9 +133,9 @@
 - No `delete-account` (or equivalent) route under `/api/v1/auth/me` or `/api/v1/candidates/me` in repo
 - **R-019** in `docs/SECURITY_RISK_REGISTER_2026-05-27.md` remains open
 - Erasure: **manual** per `docs/GDPR_MANUAL_DSR.md` (identity verify → staging-tested delete checklist → Stripe cancel)
-- **Founder waiver** (manual DSR accepted for launch phase): **pending** — see runbook § Launch waiver
+- **Founder waiver** (manual DSR accepted for launch phase): **pending** — see runbook § Launch waiver; **not signed** during S2 founder Railway checkpoint `2026-06-03T12:23:52Z`
 
-**Launch impact:** L6 **partial** until waiver signed **or** self-service delete ships → **public launch NO-GO** (with S2, O5, GAP-04). **Pilot/demo GO** if runbook + waiver followed.
+**Launch impact:** L6 **partial** until waiver signed **or** self-service delete ships → **public launch NO-GO** (with S2, O5, GAP-04). **Pilot/demo GO** with runbook; waiver still required for launch-phase L6 acceptance.
 
 ---
 
@@ -200,7 +200,7 @@
 
 ### Primary blockers (ordered)
 
-1. **S2** — Complete 72h CSP report-only burn-in (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`); founder Railway `csp_report` rollup (incl. backfill for missed 4h cadence) + DevTools pack; founder enforce sign-off.
+1. **S2** — Complete 72h CSP report-only burn-in (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`); founder Railway `csp_report` **clean through `2026-06-03T12:23:52Z`**; remaining: full window rollup + DevTools pack + founder enforce sign-off at window end.
 2. **O5 partial** — Apple/iCal beyond documentation (non-blocking for pilot).
 3. **L6 partial** — DSR export/delete manual workflow if launching before full automation.
 4. **GAP-04** — `AUTO_APPLY_SUBMIT` unset on prod (optional ops knob; document waiver or close before public launch if policy requires).

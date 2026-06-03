@@ -2,7 +2,7 @@
 
 **Auditor:** TWIN Release Gate Coordinator (docs only; **no code/env changes**)
 **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01`
-**Audit UTC:** `2026-06-03T11:16:42Z`
+**Audit UTC:** `2026-06-03T11:16:42Z` (refreshed `2026-06-03T12:23:52Z` — S2 founder Railway checkpoint session; **no L6 waiver sign-off** in that session)
 **Gate:** `PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md` row **L6** (data subject access export / delete)
 
 ## Verdict
@@ -12,7 +12,7 @@
 | **Access / portability (export)** | **LIVE (partial self-service)** | Machine-readable JSON + application exports |
 | **Erasure (account delete)** | **NOT LIVE (self-service)** | No authenticated delete-account API found in repo |
 | **Manual DSR workflow** | **DOCUMENTED** | `docs/GDPR_MANUAL_DSR.md` (2026-06-03) — export + erasure SLAs; founder waiver line **pending** |
-| **L6 gate for public launch** | **⚠️ partial** | Export LIVE; erasure manual; **waiver sign-off pending** OR self-service delete before full L6 PASS |
+| **L6 gate for public launch** | **⚠️ partial** | Export LIVE; erasure manual via `docs/GDPR_MANUAL_DSR.md`; **waiver sign-off pending** (founder did not sign in S2 checkpoint `2026-06-03T12:23:52Z`) OR self-service delete before full L6 PASS |
 
 ## Export — what ships today
 
