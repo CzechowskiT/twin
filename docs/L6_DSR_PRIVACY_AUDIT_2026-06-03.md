@@ -11,8 +11,8 @@
 | ---------- | ------ | ----- |
 | **Access / portability (export)** | **LIVE (partial self-service)** | Machine-readable JSON + application exports |
 | **Erasure (account delete)** | **NOT LIVE (self-service)** | No authenticated delete-account API found in repo |
-| **Manual DSR workflow** | **REQUIRED for erasure** | Privacy copy + operator contact until delete ships |
-| **L6 gate for public launch** | **⚠️ partial** | Blocks **public launch NO-GO** with S2; acceptable for **pilot** with documented manual erasure |
+| **Manual DSR workflow** | **DOCUMENTED** | `docs/GDPR_MANUAL_DSR.md` (2026-06-03) — export + erasure SLAs; founder waiver line **pending** |
+| **L6 gate for public launch** | **⚠️ partial** | Export LIVE; erasure manual; **waiver sign-off pending** OR self-service delete before full L6 PASS |
 
 ## Export — what ships today
 
@@ -37,7 +37,7 @@
 
 **Privacy / terms copy:** EU/EEA and UAE privacy markdown under `frontend/public/legal/` describe erasure rights and **contact the operator** — aligns with manual workflow until API ships.
 
-**Checklist reference:** Gate doc suggests `docs/GDPR_MANUAL_DSR.md` for partial L6 — **file not present in repo**; manual workflow should be documented before public launch (operator runbook or new doc).
+**Checklist reference:** `docs/GDPR_MANUAL_DSR.md` — operator runbook for pilot/public-launch phase. **Founder sign-off** on waiver block required to treat L6 as acceptable-with-waiver (S2 still blocks public GO).
 
 ## Related legal / consent (L1–L5, context)
 
@@ -50,9 +50,9 @@
 
 ## Recommendations (docs-only; no implementation today)
 
-1. **Pilot:** Document operator steps for erasure requests (email → verify identity → DB delete/anonymise + Stripe cancel) in `docs/GDPR_MANUAL_DSR.md` or ops runbook.
-2. **Public launch:** Ship self-service delete (or signed admin workflow with SLA) and close **R-019** before removing L6 from blocker list.
-3. **Evidence:** Founder smoke — download JSON from dashboard once per locale; file ticket if export missing fields required by policy.
+1. **Pilot:** Follow `docs/GDPR_MANUAL_DSR.md`; founder signs waiver table when accepting manual erasure for controlled launch phase.
+2. **Public launch:** Ship self-service delete and close **R-019**, **or** signed waiver + proven ops SLA evidence.
+3. **Evidence:** Founder smoke — download JSON from dashboard once per locale; one erasure drill on staging per runbook § Erasure.
 
 ## Hard bans honoured
 
