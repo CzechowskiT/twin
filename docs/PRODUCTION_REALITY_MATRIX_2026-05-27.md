@@ -3,10 +3,12 @@
 ## Snapshot metadata
 
 - **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01` (audit) / prod unchanged
-- **Branch HEAD (local):** `c67f0c8` (audit branch, 2026-06-02) / API live `df15618`
-- **Production API SHA (read-only):** `df15618f1e2edec635ab868c03dcf736c463c8be` (`GET /api/public-health`, re-confirmed 2026-06-02 UTC)
+- **Branch HEAD (local):** `9011040`+ (audit branch, 2026-06-03 shift) / API live `6382a91`
+- **Production API SHA (read-only):** `6382a918882664df0076d996ca65c08e9138536a` (`GET /api/public-health`, post-merge 2026-06-02 — PR #21; includes `e764e68` safety fix)
 - **Launch readiness matrix:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md`
 - **Auto-apply safety audit:** `docs/AUTO_APPLY_DELEGATED_APPLY_SAFETY_AUDIT_2026-06-02.md` (2026-06-02)
+- **Post-merge sanity:** `docs/POST_MERGE_AUTO_APPLY_SANITY_2026-06-02.md` (2026-06-02)
+- **Ops pause plan:** `docs/AUTO_APPLY_PRODUCTION_OPS_PAUSE_PLAN_2026-06-02.md` (2026-06-02)
 - **DB incident (2026-05-29):** `INC-DB-2026-05-29-001` — **RESOLVED** + stabilization PASSED — see `docs/PRODUCTION_DB_RESTORE_INCIDENT_2026-05-29.md`
 - **O7 staging drill (2026-06-01):** ✅ **PASS** — pg_dump/pg_restore to `staging-restore-proof-20260529`; prod **`postgres-volume`** untouched — see `docs/BACKUP_RESTORE_DRILL_LOG.md`
 - **Vercel production deployment:** `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH` at frontend `3631c45` (Google Calendar day-mapping fix; founder re-smoke 2026-05-29)
@@ -29,14 +31,14 @@
 | Job corpus / matching | `validated_jobs`, market coverage in health | **LIVE** (coverage ⚠️ below target) |
 | Scraping (pracuj.pl, rocketjobs.pl) | `scrape_worker_ready`, beat enabled | **LIVE** infra; **BLOCKED** for ops sweep without allowlist |
 | Manual scrape UI | `NEXT_PUBLIC_SHOW_SCRAPE` | **OFF** default |
-| Auto-apply (nightly) | beat + consent; `AUTO_APPLY_DELEGATED_APPLY_SAFETY_AUDIT_2026-06-02` | **PARTIAL / PAUSED** — nightly gated; delegated **NOT LIVE**; per-job API gap GAP-01; trigger-sweep ops-only |
+| Auto-apply (nightly) | `nightly_auto_apply_beat_enabled=false` on prod (2026-06-02) | **PAUSED (ops)** — GAP-03 closed; GAP-04 optional; server gates live |
 | Delegated apply | gateway hard-false; no consent migration | **NOT LIVE** |
 | Per-job prepare (`POST /applications/auto-apply`) | `enforce_autonomous_apply_allowed()` (403) | **LIVE** infra — FE + server gated |
 | Manual trigger (`POST /auto-apply/trigger`) | Ops allowlist only | **OPS ONLY** — not candidate-facing |
 | Calendar Google | `google_calendar_configured`; founder **FULL prod smoke PASS** 2026-05-29 — OAuth + real events + day mapping (`docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`; Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, HEAD `3631c45`) | **LIVE / VERIFIED** — Connect, real events, local week columns (`Europe/Warsaw`) |
 | Calendar Microsoft | `microsoft_calendar_configured` | **LIVE** |
-| Calendar Apple / CalDAV | docs + ICS patterns | **PARTIAL** — no Apple OAuth |
-| ICS / WebCal export | product docs | **REPO** / partial |
+| Calendar Apple / CalDAV | ICS/WebCal partial; no Apple OAuth | **PARTIAL** — O5 founder waiver `2026-06-03T13:19:53Z` |
+| ICS / WebCal export | product docs + dashboard patterns | **PARTIAL** — acceptable for pilot with disclosure |
 | Stripe Checkout | `stripe_checkout_ready` | **LIVE** |
 | Stripe webhook signature | tests + billing route | **LIVE** |
 | Stripe webhook dedup ledger | `050` migration + `billing.py`; prod SQL `050_stripe_webhook_events` (2026-05-29) | **LIVE / VERIFIED** — Alembic `050` on prod; ledger table `stripe_webhook_events` expected per migration; no agent migration |
@@ -56,7 +58,7 @@
 | GDPR consent on signup | L1 gate | **LIVE** |
 | Cookie consent (PL/EN) | L2 gate | **LIVE** |
 | Privacy / Terms pages | smoke / routes | **LIVE** |
-| Data subject export/delete | L6 gate | **PARTIAL** |
+| Data subject export/delete | L6 gate — export LIVE; erasure manual; waiver `2026-06-03T13:19:53Z` | **PARTIAL-WAIVER** — pilot OK; self-service delete future |
 | Celery worker + broker | celery-status + health | **LIVE** |
 | Postgres | `db_ok=true`; **`postgres-volume` active** | **LIVE / STABLE** — stabilization passed; `market_coverage_active_validated=2551` (read-only curl) |
 | Backup restore drill | O7 gate | **LIVE / PASS** — staging clone drill 2026-06-01; pg_dump/pg_restore; prod untouched |
@@ -64,7 +66,7 @@
 | Candidate E2E manual smoke | `docs/CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md` | **LIVE** — PASS (founder-verified, 2026-05-27); Top 20 → Nietrafione → refresh regression. Warning: no auto-apply / real apply / scrape. |
 | Founder authenticated route smoke (dashboard subpages, jobs, profile, safety copy) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **LIVE** — **PASS** (founder 2026-05-29); 8/8 routes + safety copy; `/dashboard` layout PASS |
 | Playwright smoke drift points | `frontend/e2e/smoke.spec.ts` targeted assertions | **STABILIZED** — status cookie-banner locator fix on branch; 13/14 prod lane PASS (2026-05-29) |
-| Public launch announcement | gate checklist + `PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02` | **BLOCKED** — **NO-GO** (S2 burn-in IN PROGRESS) |
+| Public launch announcement | gate checklist + launch matrix | **BLOCKED** — **NO-GO** (S2 primary; L6/O5 waivers pilot-only; GAP-04 optional) |
 | Investor demo | `INVESTOR_DEMO_RUNBOOK.md` | **LIVE** stack, curated use |
 | Real CAPTCHA bypass / live mass apply | HARD BAN | **BLOCKED** |
 
@@ -84,7 +86,7 @@
 
 | Item | Current state | Decision |
 | ---- | ------------- | -------- |
-| API runtime SHA | `df15618` visible on `public-health` | **LIVE** |
+| API runtime SHA | `6382a91` on `public-health` (merge PR #21; contains `e764e68`) | **LIVE** |
 | Frontend Vercel SHA | `3631c45` / `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH` (founder re-smoke 2026-05-29) | **LIVE** |
 | Branch HEAD | `3631c45` (calendar day-mapping fix) | **LIVE** on Vercel prod for calendar smoke |
 | Stripe dedup migration `050` | Prod `alembic_version` = `050_stripe_webhook_events` (founder/operator read-only SQL, 2026-05-29) | **LIVE / VERIFIED** — S5 PASS; no migration run; if ever rolled back to `049` → runbook § Founder-approved action plan |
@@ -96,7 +98,11 @@
 | Google Calendar FULL prod smoke (2026-05-29) | `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md` | **LIVE / VERIFIED** — OAuth + real events + day mapping; Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, HEAD `3631c45`; no Railway |
 | Founder authenticated smoke (2026-05-29) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **LIVE / VERIFIED** — P6 **PASS**; 8/8 routes + safety; `/dashboard` layout founder-confirmed |
 | CSP per-route probe (2026-05-29 batch) | `/`, `/dashboard`, `/login/candidate`, `/demo`, `/status` — all report-only | **LIVE REPORT-ONLY** — enforce still blocked (S2) |
-| CSP S2 burn-in window (2026-06-02) | `docs/S2_CSP_BURNIN_WINDOW_2026-06-01.md` — restart `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z` | **IN PROGRESS** — prior window RESET; post-fix founder checks green; S2 PASS **NO**; enforce off |
+| CSP S2 burn-in window (2026-06-02) | `docs/S2_CSP_BURNIN_WINDOW_2026-06-01.md` — `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z` (~23h 11m / ~32% elapsed at `2026-06-03T13:29:36Z`) | **IN PROGRESS** — S2 PASS **NO**; enforce off |
+| CSP founder combined checkpoint (2026-06-03 `13:29:36Z`) | Railway `csp_report` — **no fresh entries** since start; Chrome DevTools core routes — **no CSP violations**; Safari/Firefox **PENDING** | **CONTINUE** — report-only HOLD |
+| CSP founder Railway checkpoint (2026-06-03 `12:23:52Z`) | Founder UI search `csp_report` from window start — **no fresh entries** (historical; superseded by combined row) | **CONTINUE** (historical) |
+| CSP agent checkpoint (2026-06-03 `08:00:23Z`) | `audit-csp-headers.sh` + public-health + local CSP tests; Railway logs founder-only | **CONTINUE** (historical) — superseded by founder Railway row above |
+| CSP clean checkpoint (2026-06-02 `15:42:41Z`) | Founder Railway `production/twin` deployment `37096ecc`; search `csp_report` — no logs / no fresh reports; dashboard OK | **CONTINUE** (historical) — through `2026-06-02` founder evidence |
 | CSP `connect-src` Railway host (2026-06-02) | `frontend/next.config.ts`; founder logs: no fresh violations for `twin-production-bcd9.up.railway.app` after deploy | **LIVE / DEPLOYED** — report-only allowlist; not an outage |
 
 ---

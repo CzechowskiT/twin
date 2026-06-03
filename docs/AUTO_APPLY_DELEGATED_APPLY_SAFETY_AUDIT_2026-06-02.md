@@ -3,7 +3,8 @@
 **Auditor:** TWIN Auto-Apply / Delegated Apply Safety Auditor  
 **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01`  
 **Branch HEAD (audit start):** `389e325`  
-**Remediation (2026-06-02):** `fix(safety): hard-gate autonomous apply endpoints` — GAP-01/02 closed in code  
+**Remediation (2026-06-02):** `e764e68` `fix(safety): hard-gate autonomous apply endpoints` — GAP-01/02 closed in code
+**Post-merge (2026-06-02):** PR #21 → `6382a91`; prod `public-health.git_commit=6382a91` — fix **LIVE** — see `docs/POST_MERGE_AUTO_APPLY_SANITY_2026-06-02.md`
 **Mode:** Read-only code/docs + local tests + sanitized prod `public-health` curl  
 **Hard bans honoured:** no deploy, prod mutation, scrape, apply, trigger-sweep, secrets, delegated-live or public-launch GO claims
 
@@ -15,7 +16,7 @@
 | --------- | ------ |
 | **Delegated apply** | **NOT LIVE** — `delegated_apply_allowed=false`, `can_submit_delegated_application=false` always (`candidate_readiness.py`) |
 | **Auto-apply (operational)** | **PAUSED** for public launch — infra + API paths exist; founder/policy hold; audit made **no** prod triggers |
-| **Nightly Celery sweep** | **INFRA LIVE** (`nightly_auto_apply_beat_enabled` default `True`) — gated by consent + `autonomous_apply_allowed()` per user |
+| **Nightly Celery sweep** | **PAUSED (ops)** — prod `nightly_auto_apply_beat_enabled=false` (2026-06-02); task guard + consent gates if invoked |
 | **Platform trigger-sweep** | **OPS ONLY** — `user_has_scrape_ops` + 403 for normal users (tests) |
 | **Public launch** | **NO-GO** (unchanged — S2 CSP + program gates) |
 
@@ -154,8 +155,8 @@
 | -- | -------- | ------- | ----------------- |
 | GAP-01 | **HIGH** | `POST /applications/auto-apply` lacked server readiness gate | ✅ **CLOSED** — `enforce_autonomous_apply_allowed()` in `applications.py` |
 | GAP-02 | **HIGH** | `POST /auto-apply/trigger` callable by any ready user | ✅ **CLOSED** — ops allowlist only (`user_has_scrape_ops`) |
-| GAP-03 | **MEDIUM** | Nightly beat enabled by default while launch **PAUSED** | ⚠️ **OPEN (ops)** — set `NIGHTLY_AUTO_APPLY_BEAT_ENABLED=false` on Railway for full pause; code default unchanged |
-| GAP-04 | **MEDIUM** | `auto_apply_submit=True` default | ⚠️ **OPEN (ops)** — pilot: set `AUTO_APPLY_SUBMIT=false` on prod if prepare-only |
+| GAP-03 | **MEDIUM** | Nightly beat on prod while **PAUSED** | ✅ **CLOSED (ops)** — founder set `NIGHTLY_AUTO_APPLY_BEAT_ENABLED=false`; health `false` / `beat_schedule_has_nightly=false` |
+| GAP-04 | **MEDIUM** | `auto_apply_submit=True` on prod | ⚠️ **OPEN (optional)** — Option B partial; set `AUTO_APPLY_SUBMIT=false` on API if prepare-only required |
 | GAP-05 | **LOW** | Dead i18n keys `nightlyAutoApplyTrigger*` | ⚠️ open |
 | GAP-06 | **LOW** | Premium gate off by default | ⚠️ open |
 
@@ -172,11 +173,14 @@
 | -------- | -------------------- |
 | Public launch | **NO-GO** — do not enable mass auto-apply marketing |
 | Delegated apply comms | **NOT LIVE** — only “prepare package” / manual tracker honesty |
-| Auto-apply ops | **PAUSED** — no founder trigger-sweep in launch window; verify beat flag |
+| Auto-apply ops | **PAUSED** — execute `docs/AUTO_APPLY_PRODUCTION_OPS_PAUSE_PLAN_2026-06-02.md` Option B when approved (env not changed by agent) |
 | Before widening apply | GAP-01/02 closed; confirm GAP-03/04 env on prod; re-run pytest bundle |
 | S2 / KYC | Do **not** claim S2 PASS or KYC live — out of scope; separate gates |
 
 ### Prod health snapshot (sanitized curl)
+
+**Pre-deploy audit (2026-06-02 AM):** `git_commit=df15618…`
+**Post-merge check (2026-06-02 PM):** `git_commit=6382a91…` (includes `e764e68` via PR #21)
 
 ```json
 {
@@ -184,7 +188,12 @@
   "db_ok": true,
   "validated_jobs": 652,
   "market_coverage_active_validated": 2579,
-  "git_commit": "df15618f1e2e..."
+  "git_commit": "6382a9188826...",
+  "celery": {
+    "worker_active": true,
+    "broker_configured": true,
+    "nightly_auto_apply_beat_enabled": false
+  }
 }
 ```
 

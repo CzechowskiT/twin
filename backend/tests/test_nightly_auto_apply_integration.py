@@ -1,5 +1,6 @@
 """Nightly auto-apply with in-memory DB and mocked browser apply."""
 
+import json
 from datetime import datetime, timezone
 from unittest.mock import patch
 
@@ -27,6 +28,13 @@ from app.services.nightly_auto_apply import (
 )
 
 
+def _verified_readiness_signals() -> dict:
+    return {
+        "career_compass": {"ideal": {"job_title": "Backend Engineer"}},
+        "cv_insights": {"summary": "Strong Python profile"},
+    }
+
+
 @pytest.fixture
 def nightly_db():
     engine = create_engine(
@@ -37,16 +45,29 @@ def nightly_db():
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
     db = Session()
-    user = User(email="nightly@test.com", hashed_password="x", is_active=True)
+    user = User(
+        email="nightly@test.com",
+        hashed_password="x",
+        is_active=True,
+        gdpr_consent_at=datetime.now(timezone.utc),
+        onboarding_completed_at=datetime.now(timezone.utc),
+    )
     db.add(user)
     db.commit()
-    candidate = Candidate(user_id=user.id, name="Test")
+    candidate = Candidate(
+        user_id=user.id,
+        name="Test",
+        cv_text="CV",
+        cv_processing_consent_at=datetime.now(timezone.utc),
+        profile_signals_json=json.dumps(_verified_readiness_signals()),
+    )
     db.add(candidate)
     db.commit()
     consent = AutoApplyConsent(
         candidate_id=candidate.id,
         is_active=True,
         consent_given_at=datetime.now(timezone.utc),
+        consent_text_version="v1",
         min_score_threshold=90.0,
         daily_limit=10,
     )
@@ -193,20 +214,22 @@ def test_guard_skip_counts_as_skipped_not_failed(nightly_db, monkeypatch) -> Non
     monkeypatch.setenv("NIGHTLY_AUTO_APPLY_COOLDOWN_SECONDS", "0")
     monkeypatch.setenv("AUTO_APPLY_COMPANY_BLOCKLIST", "acme")
     get_settings.cache_clear()
+    try:
+        with (
+            patch("app.services.nightly_auto_apply.find_top_matches"),
+            patch("app.services.nightly_auto_apply.auto_apply_for_user") as mock_apply,
+        ):
+            row = process_user_nightly_auto_apply(
+                db,
+                user=user,
+                consent=consent,
+                settings=get_settings(),
+                submit=False,
+            )
+            mock_apply.assert_not_called()
 
-    with (
-        patch("app.services.nightly_auto_apply.find_top_matches"),
-        patch("app.services.nightly_auto_apply.auto_apply_for_user") as mock_apply,
-    ):
-        row = process_user_nightly_auto_apply(
-            db,
-            user=user,
-            consent=consent,
-            settings=get_settings(),
-            submit=False,
-        )
-        mock_apply.assert_not_called()
-
-    assert row["applications_submitted"] == 0
-    assert row["applications_failed"] == 0
-    assert row["applications_skipped"] == 1
+        assert row["applications_submitted"] == 0
+        assert row["applications_failed"] == 0
+        assert row["applications_skipped"] == 1
+    finally:
+        get_settings.cache_clear()

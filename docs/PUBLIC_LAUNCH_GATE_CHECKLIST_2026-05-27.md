@@ -46,7 +46,7 @@ the gate to ✅.
 | O2 | Production health endpoint returns `status=ok` + `db_ok=True`           | `GET https://twin-sooty.vercel.app/api/public-health` — `git_commit=df15618`, `db_ok=true` (re-confirmed 2026-06-02 audit) | ✅ today     |
 | O3 | Celery worker is active in production (not eager, not zero nodes)       | `curl https://twin-production-bcd9.up.railway.app/api/v1/health/celery-status`                  | ✅ today     |
 | O4 | Stripe webhook endpoint is reachable, signature gate is wired           | `docs/P1_STRIPE_WEBHOOK_AUDIT_2026-05-27.md`                                                    | ✅           |
-| O5 | Calendar provider OAuth: Google + Microsoft live; Apple/iCal docs ready | Google **FULL prod smoke PASS** 2026-05-29 — OAuth + real events + day mapping (`docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`); Microsoft baseline live; Apple/iCal → `.cursorrules` calendar section | ⚠️ **partial** — Google+Microsoft ✅ prod (Google calendar fully verified); Apple/iCal docs only |
+| O5 | Calendar provider OAuth: Google + Microsoft live; Apple/iCal docs ready | Google **FULL prod smoke PASS** 2026-05-29; Microsoft **LIVE**; Apple/iCal/WebCal/ICS **partial** — founder waiver **signed** `2026-06-03T13:19:53Z` (copy must not overpromise Apple) | ⚠️ **partial-with-waiver** — non-blocking for controlled pilot |
 | O6 | Canonical Vercel alias points at the right project; drift guard exists  | `bash scripts/check-vercel-canonical-alias.sh`                                                   | ⚠️ drift documented; canonical project is correct |
 | O7 | Backup / restore for Postgres is exercised (last restore test logged)    | `docs/RUNBOOK_DB_RESTORE_2026-05-27.md` § O7 PASS criteria + `docs/BACKUP_RESTORE_DRILL_LOG.md` **PASS** row with GO decision | ✅ **PASS** (2026-06-01) — staging clone `staging-restore-proof-20260529` via pg_dump/pg_restore; prod **`postgres-volume`** untouched; separate from `INC-DB-2026-05-29-001` |
 | O8 | Incident response runbook exists with named on-call                     | `docs/INCIDENT_RESPONSE_RUNBOOK_2026-05-27.md` (this session, TASK 13)                          | ✅ this session |
@@ -62,7 +62,7 @@ the gate to ✅.
 | L3 | Privacy + Terms pages reachable and pass smoke                          | `playwright test e2e/smoke.spec.ts -g "/privacy + /terms"`                                       | ✅           |
 | L4 | Scraping compliance terms applied on `pracuj.pl` / `rocketjobs.pl`     | `docs/SCRAPING_COMPLIANCE.md`                                                                    | ✅           |
 | L5 | Auto-apply consent required + auditable                                 | `app/database/models.py` `AutoApplyConsent` + `tests/test_auto_apply_settings_api.py`             | ✅           |
-| L6 | Data subject access (export / delete) exists                            | `app/api/auth.py` `/me` + admin path (TBD if not present)                                       | ⚠️ partial   |
+| L6 | Data subject access (export / delete) exists                            | Export: `GET /api/v1/candidates/me/export.json` + CSV/XLSX; manual erasure: `docs/GDPR_MANUAL_DSR.md`; founder waiver **signed** `2026-06-03T13:19:53Z` | ⚠️ **partial-with-waiver** — pilot OK; self-service delete future |
 | L7 | Placement verification is self-serve / machine-assisted (no CS tennis) | `docs/PLACEMENT_VERIFICATION.md`                                                                  | ✅           |
 
 ### Pilot readiness gates
@@ -86,18 +86,21 @@ the gate to ✅.
 | One ⚠️ partial on L6 (data subject access)                              | Document a manual workflow (`docs/GDPR_MANUAL_DSR.md`) and proceed.                   |
 | Any ❌ on Pilot gates                                                    | Pilot, not public launch — pilot has its own gate set (cf. `PILOT_OFFER_FINAL.md`).   |
 
-## Current gate stance (checkpoint 2026-06-02, **O7 PASS**, **S2 burn-in restarted**)
+## Current gate stance (checkpoint 2026-06-03 `13:29:36Z`, **O7 PASS**, **S2 burn-in in progress**, **L6 + O5 waivers signed**)
 
-**Latest audit:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` (branch `chore/s2-csp-burnin-readiness-2026-06-01`, read-only curl + local tests; no deploy).
+**Latest audit:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` (refreshed 2026-06-03)
+**Post-merge sanity (2026-06-02):** `docs/POST_MERGE_AUTO_APPLY_SANITY_2026-06-02.md` — PR #21 merged; prod `git_commit=6382a91` (includes `e764e68` hard gates **LIVE**); public-health OK; auto-apply **PAUSED** policy unchanged.
 
-- **S2 CSP enforce burn-in:** ❌ **NOT READY** — prior window **RESET** after `connect-src` gap; fix **deployed** (Railway API in report-only `connect-src`); **new** 72h window **IN PROGRESS** (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`). Founder post-fix: public-health OK, Railway API health OK, dashboard OK, **no fresh** `csp_report` for prod API host. Report-only only; enforce off. **Do not flip enforce** until full 72h evidence + founder sign-off. Auditor re-confirmed 8-route CSP-RO + no enforce header (2026-06-02).
+- **S2 CSP enforce burn-in:** ❌ **NOT READY** — window **IN PROGRESS** (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; **~23h 11m elapsed / ~32%** at `13:29:36Z`). Founder combined checkpoint: Railway `csp_report` → **no fresh entries** since start; Chrome DevTools core routes → **no CSP violations**; `/api/v1/jobs/saved` **422** non-CSP. Decision: **CONTINUE** (report-only HOLD). Safari + Firefox DevTools **PENDING**. Next founder Railway: `2026-06-03T18:18:33Z`.
+- **L6 DSR:** ⚠️ **partial-with-waiver** — export **LIVE**; delete manual via `docs/GDPR_MANUAL_DSR.md`; founder waiver **signed** `2026-06-03T13:19:53Z` — acceptable for controlled pilot; self-service delete remains future work.
+- **O5 Calendar:** ⚠️ **partial-with-waiver** — Google **PASS** + Microsoft **LIVE**; Apple/iCal/WebCal/ICS partial; founder waiver **signed** `2026-06-03T13:19:53Z` — non-blocking for controlled pilot if copy does not overpromise Apple.
 
 - **O7 backup/restore:** ✅ **PASS** (2026-06-01) — staging clone drill via read-only pg_dump → pg_restore; evidence in `docs/BACKUP_RESTORE_DRILL_LOG.md`; prod **`postgres-volume`** untouched.
 - **Post-recovery stabilization (`INC-DB-2026-05-29-001`):** **RESOLVED** — separate from O7; retain incident backups until post-mortem closed.
 - **Controlled pilot GO:** **YES** — prod health green (`public-health` `db_ok=true`, `validated_jobs=652`, `market_coverage_active_validated=2579` per 2026-06-02 audit curl).
 - **Investor/CTO demo GO:** **YES** — curated demo posture unchanged.
-- **Public launch GO:** **NO-GO** — **`S2`** (CSP enforce ≥72h burn-in) and any remaining ❌ gates; O7 alone does not unlock public launch.
-- **Auto-apply / delegated apply:** **PAUSED** / **NOT LIVE** — see `docs/AUTO_APPLY_DELEGATED_APPLY_SAFETY_AUDIT_2026-06-02.md`; server gates **GAP-01/02 closed** (`autonomous_apply_policy.py`); `POST /auto-apply/trigger` ops-only; founder: `NIGHTLY_AUTO_APPLY_BEAT_ENABLED=false` + optional `AUTO_APPLY_SUBMIT=false` on prod for full pause (GAP-03/04).
+- **Public launch GO:** **NO-GO** — primary blocker **S2** (72h burn-in incomplete); **L6** / **O5** waivers signed for pilot only — do not unlock uncontrolled public launch; **GAP-04** optional open.
+- **Auto-apply / delegated apply:** **PAUSED** / **NOT LIVE** — gates live (`e764e68` / `6382a91`); **GAP-03 CLOSED (ops)** — founder `NIGHTLY_AUTO_APPLY_BEAT_ENABLED=false`, health confirms `nightly_auto_apply_beat_enabled=false`; **GAP-04 optional open** (`AUTO_APPLY_SUBMIT` not set). Evidence: `docs/AUTO_APPLY_PRODUCTION_OPS_PAUSE_PLAN_2026-06-02.md` §8. **S2 burn-in continues** — NOT READY, no clock reset (CSP unchanged, clean `csp_report`).
 - **S5 prod revision:** ✅ **PASS** — production `version_num = 050_stripe_webhook_events` (read-only SQL, 2026-05-29; evidence in `docs/ALEMBIC_050_FOUNDER_VERIFICATION_2026-05-29.md` § Evidence log). **No migration** needed or run by agent; **no** Railway deploy for this gate.
 - **O5 Google Calendar — FULL prod smoke:** ✅ **PASS** (2026-05-29) — OAuth (Console config); Connect; real events; week day mapping (`Europe/Warsaw`, no +1 shift). Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, fix HEAD `3631c45`; FE-only, no Railway. Evidence: `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`. O5 row stays ⚠️ **partial** until Apple/iCal beyond docs.
 - **P6 founder authenticated smoke:** ✅ **PASS** (founder 2026-05-29) — 8/8 routes + safety rows; `/dashboard` layout confirmed post-forecast fix; Google Calendar **fully closed**.
