@@ -155,6 +155,48 @@ From `GET /api/public-health` (via FE alias), captured at burn-in restart (`2026
 
 **Next agent checkpoint (suggested UTC):** `2026-06-03T14:18:33Z` (~24h after start) — repeat header audit + test bundle if shift continues.
 
+## Founder-directed checkpoint — cadence + Railway template (2026-06-03)
+
+**Checkpoint UTC:** `2026-06-03T11:16:42Z` (~20h 58m after burn-in start `2026-06-02T14:18:33Z`; **~51h 2m** remaining until `2026-06-05T14:18:33Z`)
+
+**Founder direction (2026-06-03):** Production OK · DB OK · auto-apply **PAUSED** · nightly beat **OFF** · S2 **CONTINUE / NOT READY** · pilot/demo **GO** · public launch **NO-GO** · **no code/env changes today**
+
+**Source (agent, read-only):** `bash scripts/audit-csp-headers.sh` · `GET /api/public-health` (sanitized)
+
+| Check | Result |
+| --- | --- |
+| 8-route CSP-RO + no enforce | **PASS** — `audit-csp-headers.sh` 0 failures |
+| Public-health | `status=ok`, `db_ok=true`, `celery.nightly_auto_apply_beat_enabled=false`, `celery.worker_active=true`, `git_commit=6382a91…` |
+| `validated_jobs` / `market_coverage_active_validated` | `652` / `2634` |
+| Railway `csp_report` (founder UI) | **PENDING founder confirmation** — agent has **no Railway CLI/API**; procedure below |
+| DevTools Chrome | **IN PROGRESS** — see `docs/S2_CSP_DEVTOOLS_BURNIN_CHECKLIST_2026-06-01.md` § Chrome |
+| Enforce header | **Absent** (unchanged) |
+| Decision (agent-side) | **CONTINUE** report-only HOLD — no agent-observed CSP violations; **not** sufficient for S2 PASS without founder Railway rollup |
+| S2 status | **NOT READY** |
+| S2 PASS | **NO** |
+| Public launch | **NO-GO** |
+
+### Railway `csp_report` search — founder procedure (manual UI)
+
+1. Railway → project → service **`production/twin`** (API) → **Logs** (read-only).
+2. Time filter: from **`2026-06-02T14:18:33Z`** (burn-in restart) through checkpoint time.
+3. Search: `csp_report violation` (plain text).
+4. Optional filters: `connect-src`, `script-src`, `blocked-uri` + host substring per `docs/S2_CSP_RAILWAY_LOG_TRIAGE_PLAN_2026-06-01.md`.
+5. Record in the table below; attach excerpts to `docs/evidence/S2_CSP_BURNIN_LOG_<start>_<end>.md` (local only; no secrets in git).
+
+**Founder fill-in template (copy row after UI search):**
+
+| Field | Founder entry |
+| --- | --- |
+| Search UTC | |
+| Log lines matching `csp_report violation` | count: ___ / none |
+| New `blocked-uri` hosts (post-restart) | list or **none** |
+| Matches historical `connect-src` Railway API (pre-fix)? | yes / no |
+| Dashboard / routes smoke | OK / issues (non-CSP) |
+| Decision | CONTINUE / HOLD / investigate |
+
+**Next founder Railway cadence (UTC):** `2026-06-03T14:18:33Z` (~24h after start) · window end `2026-06-05T14:18:33Z`.
+
 ## Manual checkpoint cadence
 
 - **Window end review:** `2026-06-05T14:18:33Z` — full 72h evidence pack before any enforce decision.

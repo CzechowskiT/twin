@@ -86,12 +86,13 @@ the gate to ✅.
 | One ⚠️ partial on L6 (data subject access)                              | Document a manual workflow (`docs/GDPR_MANUAL_DSR.md`) and proceed.                   |
 | Any ❌ on Pilot gates                                                    | Pilot, not public launch — pilot has its own gate set (cf. `PILOT_OFFER_FINAL.md`).   |
 
-## Current gate stance (checkpoint 2026-06-03 `08:00:23Z`, **O7 PASS**, **S2 burn-in in progress**)
+## Current gate stance (checkpoint 2026-06-03 `11:16:42Z`, **O7 PASS**, **S2 burn-in in progress**)
 
 **Latest audit:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` (refreshed 2026-06-03)
 **Post-merge sanity (2026-06-02):** `docs/POST_MERGE_AUTO_APPLY_SANITY_2026-06-02.md` — PR #21 merged; prod `git_commit=6382a91` (includes `e764e68` hard gates **LIVE**); public-health OK; auto-apply **PAUSED** policy unchanged.
 
-- **S2 CSP enforce burn-in:** ❌ **NOT READY** — 72h window **IN PROGRESS** (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; **~17h 42m elapsed**, **~54h 18m remaining**). **Agent checkpoint `2026-06-03T08:00:23Z`:** `audit-csp-headers.sh` PASS (8 routes, enforce absent); public-health OK; `nightly_auto_apply_beat_enabled=false`; local CSP + security-header tests green. **Founder Railway `csp_report`:** not agent-accessible — backfill missed 4h cadence (`18:18`, `22:18`, `02:18`, `06:18` UTC) before window end. Prior founder clean checkpoint `2026-06-02T15:42:41Z` still valid for pre-03 period. Decision: **CONTINUE** report-only HOLD; enforce off; no S2 PASS. Next founder cadence: `2026-06-03T10:18:33Z`.
+- **S2 CSP enforce burn-in:** ❌ **NOT READY** — 72h window **IN PROGRESS** (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; **~20h 58m elapsed** at `11:16:42Z`, **~51h 2m remaining**). **Agent checkpoint `2026-06-03T11:16:42Z`:** headers PASS; public-health OK; nightly **false**. **Founder Railway `csp_report`:** UI search + fill-in template in `docs/S2_CSP_BURNIN_WINDOW_2026-06-01.md` — **pending founder confirmation**. Chrome DevTools **in progress** (`docs/S2_CSP_DEVTOOLS_BURNIN_CHECKLIST_2026-06-01.md`). Decision: **CONTINUE** report-only HOLD; enforce off; no S2 PASS. Next founder cadence: `2026-06-03T14:18:33Z`.
+- **L6 DSR:** ⚠️ **partial** — read-only audit `docs/L6_DSR_PRIVACY_AUDIT_2026-06-03.md`: JSON/CSV export **LIVE**; self-service delete **NOT LIVE**.
 
 - **O7 backup/restore:** ✅ **PASS** (2026-06-01) — staging clone drill via read-only pg_dump → pg_restore; evidence in `docs/BACKUP_RESTORE_DRILL_LOG.md`; prod **`postgres-volume`** untouched.
 - **Post-recovery stabilization (`INC-DB-2026-05-29-001`):** **RESOLVED** — separate from O7; retain incident backups until post-mortem closed.

@@ -103,9 +103,25 @@
 | L3 Privacy / Terms | `/privacy`, `/terms` HTTP 200 (2026-06-02 curl) | ✅ |
 | L4 Scraping compliance | `docs/SCRAPING_COMPLIANCE.md` | ✅ |
 | L5 Auto-apply consent model | DB + API tests | ✅ |
-| L6 DSR export/delete | Partial — manual workflow option per checklist | ⚠️ partial |
+| L6 DSR export/delete | Read-only audit `docs/L6_DSR_PRIVACY_AUDIT_2026-06-03.md` (2026-06-03) | ⚠️ **partial** |
 | L7 Placement verification | `docs/PLACEMENT_VERIFICATION.md` | ✅ design |
 | Legal claims in this doc | Only pointers to existing legal docs | ✅ honoured |
+
+### L6 audit notes (2026-06-03, read-only)
+
+**Export — LIVE (self-service):**
+
+- `GET /api/v1/candidates/me/export.json` — GDPR-style JSON (`twin-my-data.json`); tested in `test_candidates_me_export_json.py`
+- `GET /api/v1/applications/me/export.{csv,xlsx}` — application portability
+- Dashboard + profile UI download (`exportMyDataJson` i18n)
+
+**Delete / erasure — NOT LIVE (self-service):**
+
+- No `delete-account` (or equivalent) route under `/api/v1/auth/me` or `/api/v1/candidates/me` in repo
+- **R-019** in `docs/SECURITY_RISK_REGISTER_2026-05-27.md` remains open
+- Erasure today: **manual operator workflow** per privacy notices; `docs/GDPR_MANUAL_DSR.md` referenced in gate checklist but **not yet in repo**
+
+**Launch impact:** L6 stays **partial** → contributes to **public launch NO-GO** (with S2, O5, GAP-04). **Pilot/demo GO** unchanged if manual erasure runbook is followed per founder policy.
 
 ---
 
