@@ -10,6 +10,8 @@ import {
   advanceLogoFallbackStep,
   brandLogoUrls,
   companyInitials,
+  FAVICON_INITIALS_ONLY_DOMAINS,
+  shouldUseInitialsOnlyLogo,
   type Brand,
 } from "../src/lib/brand-logo-urls";
 
@@ -44,6 +46,30 @@ function testBrandLogoUrlsOrder() {
   assert.equal(new Set(urls).size, urls.length);
 }
 
+function testStableBrandRemoteUrlsGoogleFirst() {
+  const brand: Brand = { slug: "apple", name: "Apple", domain: "apple.com" };
+  const urls = brandLogoUrls(brand);
+  assert.ok(urls.length > 0);
+  const googleIdx = urls.findIndex((u) => u.includes("google.com/s2/favicons"));
+  const ddgIdx = urls.findIndex((u) => u.includes("duckduckgo.com"));
+  assert.ok(googleIdx >= 0);
+  assert.ok(ddgIdx >= 0);
+  assert.ok(googleIdx < ddgIdx);
+}
+
+function testBlocklistedDomainsInitialsOnly() {
+  for (const domain of FAVICON_INITIALS_ONLY_DOMAINS) {
+    assert.ok(shouldUseInitialsOnlyLogo(domain));
+    const urls = brandLogoUrls({
+      slug: domain.replace(".com", ""),
+      name: domain,
+      domain,
+    });
+    assert.equal(urls.length, 0, domain);
+    assert.ok(!urls.some((u) => u.includes("duckduckgo.com")), domain);
+  }
+}
+
 function testMarqueeUsesSafeLogoNotNextImage() {
   const marquee = readFileSync(
     join(root, "src/components/marketing/company-logo-marquee.tsx"),
@@ -63,6 +89,8 @@ function main() {
   testCompanyInitials();
   testAdvanceLogoFallbackStep();
   testBrandLogoUrlsOrder();
+  testStableBrandRemoteUrlsGoogleFirst();
+  testBlocklistedDomainsInitialsOnly();
   testMarqueeUsesSafeLogoNotNextImage();
   console.log("safe-company-logo.test.ts: OK");
 }
