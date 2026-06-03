@@ -86,18 +86,18 @@ the gate to ✅.
 | One ⚠️ partial on L6 (data subject access)                              | Document a manual workflow (`docs/GDPR_MANUAL_DSR.md`) and proceed.                   |
 | Any ❌ on Pilot gates                                                    | Pilot, not public launch — pilot has its own gate set (cf. `PILOT_OFFER_FINAL.md`).   |
 
-## Current gate stance (checkpoint 2026-06-02 `15:42:41Z`, **O7 PASS**, **S2 burn-in in progress**)
+## Current gate stance (checkpoint 2026-06-03 `08:00:23Z`, **O7 PASS**, **S2 burn-in in progress**)
 
-**Latest audit:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md`
+**Latest audit:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` (refreshed 2026-06-03)
 **Post-merge sanity (2026-06-02):** `docs/POST_MERGE_AUTO_APPLY_SANITY_2026-06-02.md` — PR #21 merged; prod `git_commit=6382a91` (includes `e764e68` hard gates **LIVE**); public-health OK; auto-apply **PAUSED** policy unchanged.
 
-- **S2 CSP enforce burn-in:** ❌ **NOT READY** — prior window **RESET** after `connect-src` gap; fix **deployed** (Railway API in report-only `connect-src`); **new** 72h window **IN PROGRESS** (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`). **Clean checkpoint `2026-06-02T15:42:41Z`:** Founder Railway `production/twin` deployment `37096ecc`; search `csp_report` — **no logs found** / no fresh reports; dashboard OK; auto-apply paused (`nightly_auto_apply_beat_enabled=false` per prior evidence). Decision: **CONTINUE** report-only HOLD. Report-only only; enforce off. **Do not flip enforce** until full 72h evidence + founder sign-off. Next cadence: `2026-06-02T18:18:33Z`.
+- **S2 CSP enforce burn-in:** ❌ **NOT READY** — 72h window **IN PROGRESS** (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; **~17h 42m elapsed**, **~54h 18m remaining**). **Agent checkpoint `2026-06-03T08:00:23Z`:** `audit-csp-headers.sh` PASS (8 routes, enforce absent); public-health OK; `nightly_auto_apply_beat_enabled=false`; local CSP + security-header tests green. **Founder Railway `csp_report`:** not agent-accessible — backfill missed 4h cadence (`18:18`, `22:18`, `02:18`, `06:18` UTC) before window end. Prior founder clean checkpoint `2026-06-02T15:42:41Z` still valid for pre-03 period. Decision: **CONTINUE** report-only HOLD; enforce off; no S2 PASS. Next founder cadence: `2026-06-03T10:18:33Z`.
 
 - **O7 backup/restore:** ✅ **PASS** (2026-06-01) — staging clone drill via read-only pg_dump → pg_restore; evidence in `docs/BACKUP_RESTORE_DRILL_LOG.md`; prod **`postgres-volume`** untouched.
 - **Post-recovery stabilization (`INC-DB-2026-05-29-001`):** **RESOLVED** — separate from O7; retain incident backups until post-mortem closed.
 - **Controlled pilot GO:** **YES** — prod health green (`public-health` `db_ok=true`, `validated_jobs=652`, `market_coverage_active_validated=2579` per 2026-06-02 audit curl).
 - **Investor/CTO demo GO:** **YES** — curated demo posture unchanged.
-- **Public launch GO:** **NO-GO** — **`S2`** (CSP enforce ≥72h burn-in) and any remaining ❌ gates; O7 alone does not unlock public launch.
+- **Public launch GO:** **NO-GO** — blockers **S2**, **L6** (partial DSR), **O5** (partial Apple/iCal), **GAP-04** (optional `AUTO_APPLY_SUBMIT` waiver); O7 alone does not unlock public launch.
 - **Auto-apply / delegated apply:** **PAUSED** / **NOT LIVE** — gates live (`e764e68` / `6382a91`); **GAP-03 CLOSED (ops)** — founder `NIGHTLY_AUTO_APPLY_BEAT_ENABLED=false`, health confirms `nightly_auto_apply_beat_enabled=false`; **GAP-04 optional open** (`AUTO_APPLY_SUBMIT` not set). Evidence: `docs/AUTO_APPLY_PRODUCTION_OPS_PAUSE_PLAN_2026-06-02.md` §8. **S2 burn-in continues** — NOT READY, no clock reset (CSP unchanged, clean `csp_report`).
 - **S5 prod revision:** ✅ **PASS** — production `version_num = 050_stripe_webhook_events` (read-only SQL, 2026-05-29; evidence in `docs/ALEMBIC_050_FOUNDER_VERIFICATION_2026-05-29.md` § Evidence log). **No migration** needed or run by agent; **no** Railway deploy for this gate.
 - **O5 Google Calendar — FULL prod smoke:** ✅ **PASS** (2026-05-29) — OAuth (Console config); Connect; real events; week day mapping (`Europe/Warsaw`, no +1 shift). Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, fix HEAD `3631c45`; FE-only, no Railway. Evidence: `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`. O5 row stays ⚠️ **partial** until Apple/iCal beyond docs.

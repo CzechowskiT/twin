@@ -3,7 +3,7 @@
 ## Snapshot metadata
 
 - **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01` (audit) / prod unchanged
-- **Branch HEAD (local):** `396f24b` (audit branch, 2026-06-02) / API live `df15618`
+- **Branch HEAD (local):** `9011040`+ (audit branch, 2026-06-03 shift) / API live `6382a91`
 - **Production API SHA (read-only):** `6382a918882664df0076d996ca65c08e9138536a` (`GET /api/public-health`, post-merge 2026-06-02 — PR #21; includes `e764e68` safety fix)
 - **Launch readiness matrix:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md`
 - **Auto-apply safety audit:** `docs/AUTO_APPLY_DELEGATED_APPLY_SAFETY_AUDIT_2026-06-02.md` (2026-06-02)
@@ -66,7 +66,7 @@
 | Candidate E2E manual smoke | `docs/CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md` | **LIVE** — PASS (founder-verified, 2026-05-27); Top 20 → Nietrafione → refresh regression. Warning: no auto-apply / real apply / scrape. |
 | Founder authenticated route smoke (dashboard subpages, jobs, profile, safety copy) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **LIVE** — **PASS** (founder 2026-05-29); 8/8 routes + safety copy; `/dashboard` layout PASS |
 | Playwright smoke drift points | `frontend/e2e/smoke.spec.ts` targeted assertions | **STABILIZED** — status cookie-banner locator fix on branch; 13/14 prod lane PASS (2026-05-29) |
-| Public launch announcement | gate checklist + `PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02` | **BLOCKED** — **NO-GO** (S2 burn-in IN PROGRESS) |
+| Public launch announcement | gate checklist + `PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02` | **BLOCKED** — **NO-GO** (S2, L6, O5 partial, GAP-04) |
 | Investor demo | `INVESTOR_DEMO_RUNBOOK.md` | **LIVE** stack, curated use |
 | Real CAPTCHA bypass / live mass apply | HARD BAN | **BLOCKED** |
 
@@ -98,8 +98,9 @@
 | Google Calendar FULL prod smoke (2026-05-29) | `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md` | **LIVE / VERIFIED** — OAuth + real events + day mapping; Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, HEAD `3631c45`; no Railway |
 | Founder authenticated smoke (2026-05-29) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **LIVE / VERIFIED** — P6 **PASS**; 8/8 routes + safety; `/dashboard` layout founder-confirmed |
 | CSP per-route probe (2026-05-29 batch) | `/`, `/dashboard`, `/login/candidate`, `/demo`, `/status` — all report-only | **LIVE REPORT-ONLY** — enforce still blocked (S2) |
-| CSP S2 burn-in window (2026-06-02) | `docs/S2_CSP_BURNIN_WINDOW_2026-06-01.md` — restart `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z` | **IN PROGRESS** — prior window RESET; post-fix founder checks green; S2 PASS **NO**; enforce off |
-| CSP clean checkpoint (2026-06-02 `15:42:41Z`) | Founder Railway `production/twin` deployment `37096ecc`; search `csp_report` — no logs / no fresh reports; dashboard OK | **CONTINUE** — report-only HOLD; S2 **NOT READY**; public launch **NO-GO** |
+| CSP S2 burn-in window (2026-06-02) | `docs/S2_CSP_BURNIN_WINDOW_2026-06-01.md` — `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z` (~17h 42m elapsed at 2026-06-03 audit) | **IN PROGRESS** — S2 PASS **NO**; enforce off |
+| CSP agent checkpoint (2026-06-03 `08:00:23Z`) | `audit-csp-headers.sh` + public-health + local CSP tests; Railway logs founder-only | **CONTINUE** — report-only HOLD; founder backfill `csp_report` for missed 4h cadence |
+| CSP clean checkpoint (2026-06-02 `15:42:41Z`) | Founder Railway `production/twin` deployment `37096ecc`; search `csp_report` — no logs / no fresh reports; dashboard OK | **CONTINUE** (historical) — through `2026-06-02` founder evidence |
 | CSP `connect-src` Railway host (2026-06-02) | `frontend/next.config.ts`; founder logs: no fresh violations for `twin-production-bcd9.up.railway.app` after deploy | **LIVE / DEPLOYED** — report-only allowlist; not an outage |
 
 ---

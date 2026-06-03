@@ -1,9 +1,9 @@
 # Public launch readiness matrix — 2026-06-02
 
-**Auditor:** TWIN Public Launch Readiness Auditor (read-only session)  
-**Branch:** `chore/s2-csp-burnin-readiness-2026-06-01`  
-**Branch HEAD:** `c67f0c8` (`docs(security): record S2 CSP burn-in manual checkpoint`)  
-**Audit UTC:** `2026-06-02` (session after burn-in restart `2026-06-02T14:18:33Z`)  
+**Auditor:** TWIN Release Gate Owner (read-only shift)
+**Branch:** `chore/s2-csp-burnin-readiness-2026-06-01`
+**Branch HEAD:** `9011040` (prior) → updated by 2026-06-03 shift commits
+**Audit UTC:** `2026-06-03T08:00:23Z` (~17h 42m into burn-in; **~54h 18m** until `2026-06-05T14:18:33Z`)
 **Production (unchanged by this audit):** FE `https://twin-sooty.vercel.app` · API `https://twin-production-bcd9.up.railway.app`
 
 **Verdict:** **Public launch NO-GO** · **Pilot / investor demo GO** · **S2 NOT READY** · **Auto-apply PAUSED** (operational + product gates)
@@ -17,8 +17,8 @@
 | S1 CSP report-only + `report-uri` wired | 8-route `curl -sI` 2026-06-02 — all HTTP 200, `content-security-policy-report-only` present, `report-uri /api/v1/csp-report` | ✅ PASS |
 | CSP enforce header absent | No `content-security-policy:` (enforce) on `/`, `/dashboard`, `/login/candidate`, `/register/candidate`, `/demo`, `/status`, `/dashboard/calendar`, `/api/public-health` | ✅ (expected) |
 | Narrowed policy on prod | Explicit `connect-src` includes `https://twin-production-bcd9.up.railway.app`; no broad `https:` wildcards | ✅ LIVE |
-| S2 72h burn-in | Window `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; prior window RESET after `connect-src` gap — `docs/S2_CSP_BURNIN_WINDOW_2026-06-01.md` | ❌ **NOT READY** — IN PROGRESS |
-| S2 violation triage pack | Railway log rollup for full 72h + DevTools multi-browser checklist + founder sign-off | ❌ MISSING |
+| S2 72h burn-in | Window `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; agent checkpoint `2026-06-03T08:00:23Z` — header audit PASS; Railway logs founder-only | ❌ **NOT READY** — IN PROGRESS (~24% elapsed) |
+| S2 violation triage pack | Railway log rollup for full 72h (founder backfill for missed 4h cadence) + DevTools multi-browser + founder sign-off | ❌ MISSING |
 | S3–S4, S6–S10c mutation/upload limits | Gate checklist + repo tests | ✅ shipped (code) |
 | S5 Stripe dedup `050` | Founder read-only SQL 2026-05-29 | ✅ PASS |
 | S8–S9 secrets / deps baseline | Re-run before launch per checklist | ⚠️ re-verify |
@@ -85,7 +85,7 @@
 | Ops trigger-sweep | `POST /auto-apply/trigger-sweep` — ops allowlist | ✅ ops-only |
 | Per-user `POST /auto-apply/trigger` | **Ops allowlist only**; no candidate UI | ✅ **CLOSED** (GAP-02) |
 | Nightly beat env (GAP-03) | Prod **`false`** (founder 2026-06-02); evidence in pause plan §8 | ✅ **CLOSED (ops)** |
-| `AUTO_APPLY_SUBMIT` (GAP-04) | Not set on prod (Option B partial) | ⚠️ **optional open** |
+| `AUTO_APPLY_SUBMIT` (GAP-04) | Not set on prod (Option B partial) | ⚠️ **optional open** — listed as launch blocker until explicit founder waiver |
 | UI safety | `test:dashboard-ux-safety` + `test:verified-readiness-guard` — 2026-06-02 PASS | ✅ PASS |
 | S6 sweep tests | `test_auto_apply_trigger_sweep_admin_gate.py` + autonomous readiness — 47 passed bundle | ✅ PASS |
 | Nightly beat infra | Beat **disabled** on prod health; worker still active | ✅ **PAUSED (ops)** |
@@ -140,8 +140,8 @@
 
 | Check | Evidence | Status |
 | ----- | -------- | ------ |
-| Validated jobs | `652` (public-health 2026-06-02) | ✅ LIVE |
-| Market coverage active validated | `2579` | ✅ LIVE (below long-term target per matrix) |
+| Validated jobs | `652` (public-health 2026-06-03) | ✅ LIVE |
+| Market coverage active validated | `2634` (2026-06-03) | ✅ LIVE (below long-term target per matrix) |
 | Matching quality gate | `docs/MATCHING_QUALITY_GATE.md` | ✅ REPO |
 | Scrape ops | Infra ready; **BLOCKED** without allowlist for ops sweep | ⚠️ policy |
 
@@ -170,9 +170,10 @@
 
 ### Primary blockers (ordered)
 
-1. **S2** — Complete 72h CSP report-only burn-in (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`); Railway triage + DevTools pack; founder enforce sign-off.
+1. **S2** — Complete 72h CSP report-only burn-in (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`); founder Railway `csp_report` rollup (incl. backfill for missed 4h cadence) + DevTools pack; founder enforce sign-off.
 2. **O5 partial** — Apple/iCal beyond documentation (non-blocking for pilot).
 3. **L6 partial** — DSR export/delete manual workflow if launching before full automation.
+4. **GAP-04** — `AUTO_APPLY_SUBMIT` unset on prod (optional ops knob; document waiver or close before public launch if policy requires).
 
 ### Risks (accepted for pilot, not public)
 
@@ -182,7 +183,7 @@
 
 ---
 
-## Production curl snapshot (sanitized, 2026-06-02)
+## Production curl snapshot (sanitized, 2026-06-03)
 
 **`GET /api/public-health` (via FE):**
 
@@ -191,7 +192,8 @@
   "status": "ok",
   "db_ok": true,
   "validated_jobs": 652,
-  "market_coverage_active_validated": 2579,
+  "market_coverage_active_validated": 2634,
+  "nightly_auto_apply_beat_enabled": false,
   "stripe_checkout_ready": true,
   "git_commit": "6382a9188826..."
 }
@@ -203,25 +205,26 @@
 
 ---
 
-## Safe tests run (local, 2026-06-02)
+## Safe tests run (local, 2026-06-03)
 
 | Command | Result |
 | ------- | ------ |
-| `pytest tests/test_csp_report*.py tests/test_candidate_verified_readiness_gate.py tests/test_public_health_regression.py -q` | **29 passed** |
+| `pytest tests/test_csp_report*.py -q` | **9 passed** |
+| `pytest -k "auto_apply or autonomous or readiness or sweep" -q` | **78 passed** |
 | `npm run test:security-headers` | ok |
 | `npm run test:verified-readiness-guard` | ok |
+| `npm run test:dashboard-ux-safety` | ok |
 | `npm run lint` | ok |
-| `npx tsc --noEmit` | ok |
 | `npm run build` | ok |
 
 ---
 
-## Hard bans honoured (this audit)
+## Hard bans honoured (2026-06-03 shift)
 
-- ✅ No deploy · no CSP enforce flip · no Railway restart  
-- ✅ No migrations · no prod DB mutation · no env changes  
-- ✅ No scrape · no apply · no trigger-sweep · no secrets in output  
-- ✅ Docs-only commits from this session  
+- ✅ No deploy · no CSP enforce flip · no Railway restart
+- ✅ No migrations · no prod DB mutation · no env changes
+- ✅ No scrape · no apply · no trigger-sweep · no secrets in output
+- ✅ No S2 PASS · no public launch GO · no `.vercel` / `.env` in commits
 
 ---
 
