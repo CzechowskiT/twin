@@ -1,21 +1,11 @@
 "use client";
 
-import Image from "next/image";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
+import { SafeCompanyLogo } from "@/components/marketing/safe-company-logo";
 import type { TranslationKey } from "@/lib/i18n";
-
-/** Corporate domain for favicon fallbacks when Simple Icons slug fails. */
-type Brand = {
-  slug: string;
-  name: string;
-  domain: string;
-  /** Extra Simple Icons slug attempts before leaving SI CDN. */
-  altSlugs?: string[];
-  /** Known-good raster URLs when SI / favicon CDNs miss (e.g. Capital One). */
-  extraUrls?: string[];
-};
+import { brandLogoUrls, type Brand } from "@/lib/brand-logo-urls";
 
 /**
  * Fortune 500–heavy mix. Each row has a working SI slug when possible + raster fallbacks.
@@ -143,42 +133,12 @@ function usePrefersReducedMotion(): boolean {
   return reduced;
 }
 
-function siUrl(slug: string) {
-  return `https://cdn.simpleicons.org/${slug}`;
-}
-
-/** Pinned release — `@16` path 404s on jsDelivr and broke the second fallback for most marks. */
-const SIMPLE_ICONS_JSdelivr = "11.14.0";
-
-function jsdelivrSiUrl(slug: string) {
-  return `https://cdn.jsdelivr.net/npm/simple-icons@${SIMPLE_ICONS_JSdelivr}/icons/${slug}.svg`;
-}
-
-function googleFaviconUrl(domain: string) {
-  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=128`;
-}
-
-function duckduckgoIconUrl(domain: string) {
-  return `https://icons.duckduckgo.com/ip3/${domain}.ico`;
-}
-
-/** Color-first: site/raster favicons before monochrome Simple Icons SVGs. */
-function brandLogoUrls(brand: Brand): string[] {
-  const slugs = [...new Set([brand.slug, ...(brand.altSlugs ?? [])])];
-  const raster = [duckduckgoIconUrl(brand.domain), googleFaviconUrl(brand.domain)];
-  const custom = brand.extraUrls ?? [];
-  const vector = slugs.flatMap((slug) => [jsdelivrSiUrl(slug), siUrl(slug)]);
-  return [...custom, ...raster, ...vector];
-}
-
 function BrandMark({
   brand,
-  instanceKey,
   linkSuffix,
   tabIndex,
 }: {
   brand: Brand;
-  instanceKey: string;
   /** Appended to `brand.name` for `aria-label` / `title` (locale-aware). */
   linkSuffix: string;
   /** Omit from tab order when this mark sits in a visually duplicated marquee strip. */
@@ -186,45 +146,10 @@ function BrandMark({
 }) {
   const urls = useMemo(() => brandLogoUrls(brand), [brand]);
 
-  const [step, setStep] = useState(0);
-  const [loaded, setLoaded] = useState(false);
-
-  const onError = useCallback(() => {
-    setLoaded(false);
-    setStep((s) => Math.min(s + 1, urls.length));
-  }, [urls.length]);
-
-  const onLoad = useCallback(() => {
-    setLoaded(true);
-  }, []);
-
-  if (step >= urls.length) {
-    return null;
-  }
-
   const href = `https://${brand.domain}/`;
   const a11y = `${brand.name}${linkSuffix}`;
 
   const anchorClass = `${MARK_BOX_CLASS} ${MARK_PLATE_CLASS} relative flex shrink-0 items-center justify-center rounded-lg no-underline transition-[opacity,box-shadow] hover:opacity-90 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--twin-accent)]`;
-
-  const inner = (
-    <span className="relative flex h-full w-full items-center justify-center px-2 py-1.5 sm:px-2.5">
-      <Image
-        key={`${instanceKey}-${step}`}
-        src={urls[step]}
-        alt=""
-        width={96}
-        height={32}
-        sizes="(min-width: 640px) 128px, 120px"
-        loading="eager"
-        decoding="async"
-        referrerPolicy="no-referrer"
-        className={`max-h-full max-w-full object-contain object-center transition-opacity ${loaded ? "opacity-95" : "opacity-0"}`}
-        onError={onError}
-        onLoad={onLoad}
-      />
-    </span>
-  );
 
   return (
     <a
@@ -236,7 +161,13 @@ function BrandMark({
       title={a11y}
       className={anchorClass}
     >
-      {inner}
+      <span className="relative flex h-full w-full items-center justify-center px-2 py-1.5 sm:px-2.5">
+        <SafeCompanyLogo
+          name={brand.name}
+          urls={urls}
+          loading="eager"
+        />
+      </span>
     </a>
   );
 }
@@ -261,7 +192,6 @@ function LogoRow({
         <BrandMark
           key={`${segmentIndex}-${brand.slug}`}
           brand={brand}
-          instanceKey={`${segmentIndex}-${brand.slug}`}
           linkSuffix={linkSuffix}
           tabIndex={ariaHidden ? -1 : undefined}
         />

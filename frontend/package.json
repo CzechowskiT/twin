@@ -10,6 +10,7 @@
     "test:cookie-consent": "npx --yes tsx scripts/cookie-consent-parse.test.ts",
     "test:analytics-consent": "npx --yes tsx scripts/analytics-consent-default-denied.test.ts",
     "test:security-headers": "npx --yes tsx scripts/security-headers.test.ts",
+    "test:safe-company-logo": "npx --yes tsx scripts/safe-company-logo.test.ts",
     "test:verified-readiness-guard": "npx --yes tsx scripts/verified-readiness-guard.test.ts",
     "test:dashboard-ux-safety": "npx --yes tsx scripts/dashboard-ux-safety.test.ts",
     "test:calendar-week": "npx --yes tsx scripts/calendar-week-timezone.test.ts",

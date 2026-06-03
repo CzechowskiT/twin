@@ -289,7 +289,7 @@ From `GET /api/public-health` (via FE alias), captured at burn-in restart (`2026
 
 **Likely cause (read-only triage):** Marquee loads ~80 brands × fallback chain (DuckDuckGo → Google favicons → jsDelivr/Simple Icons) through `/_next/image`; some slugs/domains 404/502 at origin; optimizer returns 400/404/502. `images.remotePatterns` in `frontend/next.config.ts` already allowlist these hostnames — not a CSP `img-src` gap.
 
-**Follow-up:** Separate image/logo fallback hardening before broad public launch if Console noise or broken marks matter for marketing polish; **not** required to continue S2 CSP burn-in.
+**Follow-up (shipped on branch, CSP unchanged):** `SafeCompanyLogo` — native `<img>` (no `/_next/image` proxy), capped `onError` fallback chain, initials placeholder; tests `npm run test:safe-company-logo`. **S2 burn-in: CONTINUE** (no clock reset). **Public launch: NO-GO** until founder post-deploy DevTools smoke on `/` confirms no red `/_next/image` spam.
 
 ## Gate closure session note (2026-06-03)
 

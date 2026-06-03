@@ -40,9 +40,9 @@ CSP must remain **Report-Only** — console shows violations as warnings, pages 
 | Observation | CSP triage? |
 | --- | --- |
 | `GET /api/v1/jobs/saved` → **422** without a CSP Console line | **No** — API/auth/validation; not an S2 burn-in blocker |
-| Red Console `GET /_next/image?url=…` for external logo hosts (`icons.duckduckgo.com`, `www.google.com/s2/favicons`, `cdn.simpleicons.org`, …) → **400** / **404** / **502**; **no** Console line containing “Content Security Policy”, “Refused to connect/load”, “violates the following directive”, or `blocked-uri` | **No** — Next.js image optimizer / upstream favicon CDN failures on marketing logo marquee (`frontend/src/components/marketing/company-logo-marquee.tsx`); **not** an S2 reset or CSP failure; track as separate image/logo fallback UX issue before broad public launch if needed |
+| Red Console `GET /_next/image?url=…` for external logo hosts (`icons.duckduckgo.com`, `www.google.com/s2/favicons`, `cdn.simpleicons.org`, …) → **400** / **404** / **502**; **no** Console line containing “Content Security Policy”, “Refused to connect/load”, “violates the following directive”, or `blocked-uri` | **No** — Next.js image optimizer / upstream favicon CDN failures on marketing logo marquee (`frontend/src/components/marketing/company-logo-marquee.tsx`); **not** an S2 reset or CSP failure; **fix shipped** on branch (`SafeCompanyLogo` + plain `<img>` + initials fallback — **post-deploy founder browser smoke required** to confirm Console clean) |
 
-**Chrome CSP verdict (unchanged):** founder pass at `2026-06-03T13:29:36Z` (`ece6588`) — **no CSP violations** on core routes; image-proxy Console noise is **orthogonal** to CSP burn-in PASS.
+**Chrome CSP verdict (unchanged):** founder pass at `2026-06-03T13:29:36Z` (`ece6588`) — **no CSP violations** on core routes; pre-fix image-proxy Console noise was **orthogonal** to CSP burn-in PASS. **S2 burn-in: CONTINUE** (no clock reset).
 
 ## Safari (desktop) — manual checklist (PENDING)
 
@@ -160,4 +160,4 @@ Pair with 72h Railway triage (`docs/S2_CSP_RAILWAY_LOG_TRIAGE_PLAN_2026-06-01.md
 
 Until Railway 72h rollup **and** multi-browser DevTools (Safari + Firefox minimum) complete: **S2 NOT READY**, public launch **NO-GO**.
 
-**Follow-up (non-CSP, post-burn-in or parallel track):** tighten company-logo marquee fallbacks / reduce optimizer noise when external favicon or Simple Icons URLs 404 or 502 — see `company-logo-marquee.tsx` + `frontend/next.config.ts` `images.remotePatterns` (allowlist already includes these hosts; failures are upstream or optimizer-side, not missing `img-src` CSP entries).
+**Follow-up (non-CSP):** `fix(frontend): add safe fallback for external company logos` — `SafeCompanyLogo` (`frontend/src/components/marketing/safe-company-logo.tsx`) bypasses `/_next/image`; initials placeholder when all URLs fail; `npm run test:safe-company-logo`. **CSP unchanged.** **Public launch: NO-GO** until post-fix founder DevTools smoke on `/` (incognito, extensions off). S2 burn-in **CONTINUE**.
