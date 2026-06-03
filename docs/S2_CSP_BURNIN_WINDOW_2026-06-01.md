@@ -247,6 +247,17 @@ From `GET /api/public-health` (via FE alias), captured at burn-in restart (`2026
 
 **Next founder Railway cadence (UTC):** `2026-06-03T18:18:33Z` (~28h after start) · window end `2026-06-05T14:18:33Z`.
 
+## Gate closure session note (2026-06-03)
+
+**Session UTC:** `2026-06-03T13:19:53Z` (~23h 1m elapsed; **~32%** of 72h window)
+
+| Item | Status |
+| --- | --- |
+| New founder Railway `csp_report` evidence | **None this session** — prior checkpoint `12:23:52Z` still authoritative |
+| S2 PASS | **NO** — burn-in continues until `2026-06-05T14:18:33Z` + full evidence pack + founder enforce sign-off |
+| Enforce PR | **Not prepared** — hard ban |
+| Public launch | **NO-GO** |
+
 ## Manual checkpoint cadence
 
 - **Window end review:** `2026-06-05T14:18:33Z` — full 72h evidence pack before any enforce decision.

@@ -37,8 +37,8 @@
 | Manual trigger (`POST /auto-apply/trigger`) | Ops allowlist only | **OPS ONLY** — not candidate-facing |
 | Calendar Google | `google_calendar_configured`; founder **FULL prod smoke PASS** 2026-05-29 — OAuth + real events + day mapping (`docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`; Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, HEAD `3631c45`) | **LIVE / VERIFIED** — Connect, real events, local week columns (`Europe/Warsaw`) |
 | Calendar Microsoft | `microsoft_calendar_configured` | **LIVE** |
-| Calendar Apple / CalDAV | docs + ICS patterns | **PARTIAL** — no Apple OAuth |
-| ICS / WebCal export | product docs | **REPO** / partial |
+| Calendar Apple / CalDAV | ICS/WebCal partial; no Apple OAuth | **PARTIAL** — O5 founder waiver `2026-06-03T13:19:53Z` |
+| ICS / WebCal export | product docs + dashboard patterns | **PARTIAL** — acceptable for pilot with disclosure |
 | Stripe Checkout | `stripe_checkout_ready` | **LIVE** |
 | Stripe webhook signature | tests + billing route | **LIVE** |
 | Stripe webhook dedup ledger | `050` migration + `billing.py`; prod SQL `050_stripe_webhook_events` (2026-05-29) | **LIVE / VERIFIED** — Alembic `050` on prod; ledger table `stripe_webhook_events` expected per migration; no agent migration |
@@ -58,7 +58,7 @@
 | GDPR consent on signup | L1 gate | **LIVE** |
 | Cookie consent (PL/EN) | L2 gate | **LIVE** |
 | Privacy / Terms pages | smoke / routes | **LIVE** |
-| Data subject export/delete | L6 gate | **PARTIAL** |
+| Data subject export/delete | L6 gate — export LIVE; erasure manual; waiver `2026-06-03T13:19:53Z` | **PARTIAL-WAIVER** — pilot OK; self-service delete future |
 | Celery worker + broker | celery-status + health | **LIVE** |
 | Postgres | `db_ok=true`; **`postgres-volume` active** | **LIVE / STABLE** — stabilization passed; `market_coverage_active_validated=2551` (read-only curl) |
 | Backup restore drill | O7 gate | **LIVE / PASS** — staging clone drill 2026-06-01; pg_dump/pg_restore; prod untouched |
@@ -66,7 +66,7 @@
 | Candidate E2E manual smoke | `docs/CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md` | **LIVE** — PASS (founder-verified, 2026-05-27); Top 20 → Nietrafione → refresh regression. Warning: no auto-apply / real apply / scrape. |
 | Founder authenticated route smoke (dashboard subpages, jobs, profile, safety copy) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **LIVE** — **PASS** (founder 2026-05-29); 8/8 routes + safety copy; `/dashboard` layout PASS |
 | Playwright smoke drift points | `frontend/e2e/smoke.spec.ts` targeted assertions | **STABILIZED** — status cookie-banner locator fix on branch; 13/14 prod lane PASS (2026-05-29) |
-| Public launch announcement | gate checklist + `PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02` | **BLOCKED** — **NO-GO** (S2, L6, O5 partial, GAP-04) |
+| Public launch announcement | gate checklist + launch matrix | **BLOCKED** — **NO-GO** (S2 primary; L6/O5 waivers pilot-only; GAP-04 optional) |
 | Investor demo | `INVESTOR_DEMO_RUNBOOK.md` | **LIVE** stack, curated use |
 | Real CAPTCHA bypass / live mass apply | HARD BAN | **BLOCKED** |
 

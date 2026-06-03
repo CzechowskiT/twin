@@ -3,7 +3,7 @@
 **Auditor:** TWIN Release Gate Owner (read-only shift)
 **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01`
 **Branch HEAD:** `9011040` (prior) → updated by 2026-06-03 shift commits
-**Audit UTC:** `2026-06-03T12:23:52Z` (~22h 5m / **~31%** into burn-in; **~49h 55m** until `2026-06-05T14:18:33Z`)
+**Audit UTC:** `2026-06-03T13:19:53Z` (~23h 1m / **~32%** into burn-in; **~48h 59m** until `2026-06-05T14:18:33Z`; L6 + O5 founder waivers signed this session)
 **Production (unchanged by this audit):** FE `https://twin-sooty.vercel.app` · API `https://twin-production-bcd9.up.railway.app`
 
 **Verdict:** **Public launch NO-GO** · **Pilot / investor demo GO** · **S2 NOT READY** · **Auto-apply PAUSED** (operational + product gates)
@@ -59,21 +59,30 @@
 | ----- | -------- | ------ |
 | Google Calendar FULL prod smoke | `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md` — OAuth, events, `Europe/Warsaw` week mapping | ✅ PASS |
 | Microsoft Graph | `microsoft_calendar_configured` on health surface | ✅ LIVE |
-| Apple / CalDAV / ICS | Docs + partial patterns per `.cursorrules` | ⚠️ PARTIAL |
-| O5 gate row | Partial until Apple/iCal beyond docs | ⚠️ partial |
+| Apple / CalDAV / ICS | ICS/WebCal partial; no Apple Calendar OAuth | ⚠️ PARTIAL (waiver signed) |
+| O5 gate row | Google ✅ · Microsoft ✅ · Apple/iCal partial — founder waiver `2026-06-03T13:19:53Z` | ⚠️ **partial-with-waiver** — non-blocking for controlled pilot |
 
-### O5 — Apple / iCal limitation (2026-06-03, docs only)
+### O5 — Calendar providers (2026-06-03)
 
-**Known limitation:** No Apple Calendar OAuth equivalent to Google/Microsoft. Apple users rely on **ICS download / WebCal subscribe** and/or CalDAV where product scope allows (see `.cursorrules` calendar section).
+| Provider | Status | Notes |
+| -------- | ------ | ----- |
+| **Google Calendar** | ✅ **PASS** | FULL prod smoke — OAuth, events, `Europe/Warsaw` mapping (`docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`) |
+| **Microsoft Graph** | ✅ **LIVE** | `microsoft_calendar_configured` on health surface |
+| **Apple / iCal / WebCal / ICS** | ⚠️ **PARTIAL** | No Apple Calendar OAuth; users rely on **ICS download / WebCal subscribe** (and CalDAV where scoped) per `.cursorrules` |
 
-| Option | Pilot | Public launch |
-| ------ | ----- | --------------- |
-| **Document + disclose** | ✅ Acceptable — privacy/terms and dashboard copy set expectations | Required minimum |
-| **ICS/WebCal export for interview holds** | Ship or document fallback URL pattern | Recommended before broad marketing to Apple-only users |
-| **Full CalDAV write** | Future — not blocking pilot/demo | Founder waiver or implementation before O5 → ✅ |
-| **Founder waiver** | “Google + Microsoft LIVE; Apple via ICS subscribe” — sign-off line in launch gate doc | Does **not** alone unlock public GO if S2/L6 open |
+**Known limitation:** No Apple Calendar OAuth equivalent to Google/Microsoft. Product copy must **not** claim full Apple Calendar integration unless verified.
 
-**Verdict:** O5 stays **partial** — **non-blocking for controlled pilot**; blocking for **full public launch** narrative unless waiver + ICS path verified in founder smoke.
+### O5 — Founder waiver (2026-06-03)
+
+> Founder accepts O5 Apple/iCal partial status as a known limitation for controlled pilot / limited launch readiness.
+
+| Field | Value |
+| ----- | ----- |
+| Signed | Tomasz Czechowski |
+| UTC | `2026-06-03T13:19:53Z` |
+| Condition | Product copy must not claim full Apple Calendar integration unless verified |
+
+**Verdict:** O5 stays **partial-with-waiver** — **non-blocking for controlled pilot / limited launch readiness**; still listed for **full public launch** narrative until ICS/WebCal path verified in founder smoke or implementation ships. Does **not** alone unlock public GO (S2 remains primary blocker).
 
 ---
 
@@ -116,7 +125,7 @@
 | L3 Privacy / Terms | `/privacy`, `/terms` HTTP 200 (2026-06-03 curl) | ✅ |
 | L4 Scraping compliance | `docs/SCRAPING_COMPLIANCE.md` | ✅ |
 | L5 Auto-apply consent model | DB + API tests | ✅ |
-| L6 DSR export/delete | Audit + `docs/GDPR_MANUAL_DSR.md` runbook (2026-06-03); waiver sign-off **pending** — not signed in S2 checkpoint session `2026-06-03T12:23:52Z` | ⚠️ **partial** |
+| L6 DSR export/delete | Export LIVE; erasure manual via `docs/GDPR_MANUAL_DSR.md`; founder waiver **signed** `2026-06-03T13:19:53Z` | ⚠️ **partial-with-waiver** (pilot OK; not full self-service) |
 | L7 Placement verification | `docs/PLACEMENT_VERIFICATION.md` | ✅ design |
 | Legal claims in this doc | Only pointers to existing legal docs | ✅ honoured |
 
@@ -133,9 +142,9 @@
 - No `delete-account` (or equivalent) route under `/api/v1/auth/me` or `/api/v1/candidates/me` in repo
 - **R-019** in `docs/SECURITY_RISK_REGISTER_2026-05-27.md` remains open
 - Erasure: **manual** per `docs/GDPR_MANUAL_DSR.md` (identity verify → staging-tested delete checklist → Stripe cancel)
-- **Founder waiver** (manual DSR accepted for launch phase): **pending** — see runbook § Launch waiver; **not signed** during S2 founder Railway checkpoint `2026-06-03T12:23:52Z`
+- **Founder waiver** (manual DSR accepted for launch phase): **signed** `2026-06-03T13:19:53Z` — Tomasz Czechowski; see runbook § Launch waiver
 
-**Launch impact:** L6 **partial** until waiver signed **or** self-service delete ships → **public launch NO-GO** (with S2, O5, GAP-04). **Pilot/demo GO** with runbook; waiver still required for launch-phase L6 acceptance.
+**Launch impact:** L6 **partial-with-waiver** — manual process accepted for controlled pilot / limited launch readiness; self-service delete remains future work → **public launch NO-GO** (S2 primary; O5 partial; GAP-04 optional). **Pilot/demo GO** with runbook + signed waiver.
 
 ---
 
@@ -201,9 +210,8 @@
 ### Primary blockers (ordered)
 
 1. **S2** — Complete 72h CSP report-only burn-in (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`); founder Railway `csp_report` **clean through `2026-06-03T12:23:52Z`**; remaining: full window rollup + DevTools pack + founder enforce sign-off at window end.
-2. **O5 partial** — Apple/iCal beyond documentation (non-blocking for pilot).
-3. **L6 partial** — DSR export/delete manual workflow if launching before full automation.
-4. **GAP-04** — `AUTO_APPLY_SUBMIT` unset on prod (optional ops knob; document waiver or close before public launch if policy requires).
+2. **GAP-04** — `AUTO_APPLY_SUBMIT` unset on prod (optional ops knob; document waiver or close before public launch if policy requires).
+3. **L6 / O5 (full public launch only)** — Waivers signed `2026-06-03T13:19:53Z` for controlled pilot; **not** substitutes for uncontrolled public launch (self-service delete; Apple/iCal verification for broad marketing).
 
 ### Risks (accepted for pilot, not public)
 
@@ -249,7 +257,7 @@
 
 ---
 
-## Hard bans honoured (2026-06-03 shift)
+## Hard bans honoured (2026-06-03 gate-closure session `13:19:53Z`)
 
 - ✅ No deploy · no CSP enforce flip · no Railway restart
 - ✅ No migrations · no prod DB mutation · no env changes

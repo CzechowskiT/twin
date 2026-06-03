@@ -2,7 +2,7 @@
 
 **Auditor:** TWIN Release Gate Coordinator (docs only; **no code/env changes**)
 **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01`
-**Audit UTC:** `2026-06-03T11:16:42Z` (refreshed `2026-06-03T12:23:52Z` — S2 founder Railway checkpoint session; **no L6 waiver sign-off** in that session)
+**Audit UTC:** `2026-06-03T11:16:42Z` (refreshed `2026-06-03T12:23:52Z` — S2 founder Railway checkpoint; L6 waiver signed `2026-06-03T13:19:53Z`)
 **Gate:** `PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md` row **L6** (data subject access export / delete)
 
 ## Verdict
@@ -11,8 +11,9 @@
 | ---------- | ------ | ----- |
 | **Access / portability (export)** | **LIVE (partial self-service)** | Machine-readable JSON + application exports |
 | **Erasure (account delete)** | **NOT LIVE (self-service)** | No authenticated delete-account API found in repo |
-| **Manual DSR workflow** | **DOCUMENTED** | `docs/GDPR_MANUAL_DSR.md` (2026-06-03) — export + erasure SLAs; founder waiver line **pending** |
-| **L6 gate for public launch** | **⚠️ partial** | Export LIVE; erasure manual via `docs/GDPR_MANUAL_DSR.md`; **waiver sign-off pending** (founder did not sign in S2 checkpoint `2026-06-03T12:23:52Z`) OR self-service delete before full L6 PASS |
+| **Manual DSR workflow** | **ACCEPTED (waiver signed)** | `docs/GDPR_MANUAL_DSR.md` — export + erasure SLAs; founder sign-off `2026-06-03T13:19:53Z` (Tomasz Czechowski) |
+| **L6 gate for public launch** | **⚠️ partial-with-waiver** | Export LIVE; erasure manual via runbook; waiver signed for pilot/limited readiness — **not** full L6 PASS until self-service delete ships |
+| **L6 gate for controlled pilot** | **✅ acceptable** | Manual process accepted; self-service delete remains future work |
 
 ## Export — what ships today
 
@@ -37,7 +38,7 @@
 
 **Privacy / terms copy:** EU/EEA and UAE privacy markdown under `frontend/public/legal/` describe erasure rights and **contact the operator** — aligns with manual workflow until API ships.
 
-**Checklist reference:** `docs/GDPR_MANUAL_DSR.md` — operator runbook for pilot/public-launch phase. **Founder sign-off** on waiver block required to treat L6 as acceptable-with-waiver (S2 still blocks public GO).
+**Checklist reference:** `docs/GDPR_MANUAL_DSR.md` — operator runbook for pilot/public-launch phase. **Founder sign-off** `2026-06-03T13:19:53Z` — L6 acceptable-with-waiver for controlled pilot / limited launch readiness (S2 still blocks public GO).
 
 ## Related legal / consent (L1–L5, context)
 
@@ -50,8 +51,8 @@
 
 ## Recommendations (docs-only; no implementation today)
 
-1. **Pilot:** Follow `docs/GDPR_MANUAL_DSR.md`; founder signs waiver table when accepting manual erasure for controlled launch phase.
-2. **Public launch:** Ship self-service delete and close **R-019**, **or** signed waiver + proven ops SLA evidence.
+1. **Pilot:** Follow `docs/GDPR_MANUAL_DSR.md` — waiver **signed** `2026-06-03T13:19:53Z`.
+2. **Full public launch:** Ship self-service delete and close **R-019** (waiver does not substitute for full L6 PASS on uncontrolled signup).
 3. **Evidence:** Founder smoke — download JSON from dashboard once per locale; one erasure drill on staging per runbook § Erasure.
 
 ## Hard bans honoured
