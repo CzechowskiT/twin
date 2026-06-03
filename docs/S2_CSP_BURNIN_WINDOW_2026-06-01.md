@@ -130,6 +130,31 @@ From `GET /api/public-health` (via FE alias), captured at burn-in restart (`2026
 
 **Next manual checkpoint (UTC):** `2026-06-02T18:18:33Z` (~4h after start) — Railway `csp_report` log triage + route/DevTools cadence per checklist.
 
+## Agent checkpoint — header audit + tests (2026-06-03)
+
+**Checkpoint UTC:** `2026-06-03T08:00:23Z` (~17h 42m after burn-in start `2026-06-02T14:18:33Z`; **~54h 18m** remaining until `2026-06-05T14:18:33Z`)
+
+**Source:** Release-gate shift (read-only prod; no deploy). `bash scripts/audit-csp-headers.sh` (8 routes) · `GET /api/public-health` · local `pytest tests/test_csp_report*.py` (9 passed) · `npm run test:security-headers` (ok)
+
+| Check | Result |
+| --- | --- |
+| 8-route CSP-RO + no enforce | **PASS** — `audit-csp-headers.sh` 0 failures |
+| Public-health | `status=ok`, `db_ok=true`, `nightly_auto_apply_beat_enabled=false`, `git_commit=6382a91…` |
+| `validated_jobs` / `market_coverage_active_validated` | `652` / `2634` (2026-06-03 curl) |
+| Railway `csp_report` after window start | **Not available to agent** — founder manual triage required (see missed cadence below) |
+| DevTools multi-browser matrix | **Incomplete** — not claimable via curl/tests alone |
+| Enforce header | **Absent** (unchanged) |
+| Decision | **CONTINUE** 72h burn-in — report-only HOLD |
+| S2 status | **NOT READY** |
+| S2 PASS | **NO** |
+| Public launch | **NO-GO** |
+
+**Missed founder 4h cadence (UTC, no agent log access):** `2026-06-02T18:18:33Z`, `2026-06-02T22:18:33Z`, `2026-06-03T02:18:33Z`, `2026-06-03T06:18:33Z` — backfill Railway search `csp_report` for each interval or one combined rollup before window end.
+
+**Next manual checkpoint (UTC):** `2026-06-03T10:18:33Z` (~20h after start) — Railway `csp_report` triage + DevTools cadence per checklist.
+
+**Next agent checkpoint (suggested UTC):** `2026-06-03T14:18:33Z` (~24h after start) — repeat header audit + test bundle if shift continues.
+
 ## Manual checkpoint cadence
 
 - **Window end review:** `2026-06-05T14:18:33Z` — full 72h evidence pack before any enforce decision.

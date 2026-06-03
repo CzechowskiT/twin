@@ -12,22 +12,24 @@ CSP must remain **Report-Only** — console shows violations as warnings, pages 
 - [ ] Mobile Safari (iOS) or responsive mode
 - [ ] Mobile Chrome (Android) or responsive mode
 
+**Automation note (2026-06-03):** `scripts/audit-csp-headers.sh` + `npm run test:security-headers` verify CSP-RO headers and narrowed allowlists on core routes — **not** a substitute for per-browser DevTools console/network checks below.
+
 ## Routes (each browser)
 
 Core S2 routes (must be checked in every browser): `/`, `/dashboard`, `/login/candidate`, `/register/candidate`, `/demo`, `/status`, `/dashboard/calendar`, `/api/public-health`.
 
 | Route | Console clean? | Network anomalies? | CSP reports POSTed? | Notes |
 | ----- | -------------- | ------------------ | ------------------- | ----- |
-| `/` | | | | Home + logo marquee |
-| `/dashboard` | | | | Logged-out OK; repeat logged-in |
-| `/login/candidate` | | | | OAuth buttons |
-| `/register/candidate` | | | | GDPR consent |
+| `/` | n/a (curl) | n/a | n/a | **Header audit PASS** 2026-06-03 — DevTools pending |
+| `/dashboard` | n/a (curl) | n/a | n/a | **Header audit PASS** 2026-06-03 — repeat logged-in in DevTools |
+| `/login/candidate` | n/a (curl) | n/a | n/a | **Header audit PASS** 2026-06-03 |
+| `/register/candidate` | n/a (curl) | n/a | n/a | **Header audit PASS** 2026-06-03 |
 | `/register/candidate` (logged-in path if applicable) | | | | |
 | `/waitlist` | | | | |
-| `/demo` | | | | |
-| `/status` | | | | |
-| `/dashboard/calendar` | | | | Calendar UI shell |
-| `/api/public-health` | | | | Read-only health JSON via FE proxy |
+| `/demo` | n/a (curl) | n/a | n/a | **Header audit PASS** 2026-06-03 |
+| `/status` | n/a (curl) | n/a | n/a | **Header audit PASS** 2026-06-03 |
+| `/dashboard/calendar` | n/a (curl) | n/a | n/a | **Header audit PASS** 2026-06-03 — calendar UI DevTools pending |
+| `/api/public-health` | n/a (curl) | n/a | n/a | **Header audit PASS** 2026-06-03 — JSON `status=ok` 2026-06-03 |
 | `/first-1000` | | | | YouTube embed if env set |
 | `/pricing` | | | | |
 | `/for-candidates` | | | | |
