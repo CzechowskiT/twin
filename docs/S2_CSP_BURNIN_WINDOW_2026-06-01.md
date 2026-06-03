@@ -197,6 +197,30 @@ From `GET /api/public-health` (via FE alias), captured at burn-in restart (`2026
 
 **Next founder Railway cadence (UTC):** `2026-06-03T14:18:33Z` (~24h after start) · window end `2026-06-05T14:18:33Z`.
 
+## Autonomous gate checkpoint (2026-06-03)
+
+**Checkpoint UTC:** `2026-06-03T11:31:01Z` (~21h 12m after burn-in start `2026-06-02T14:18:33Z`; **~50h 48m** remaining until `2026-06-05T14:18:33Z`)
+
+**Source (agent, read-only):** `bash scripts/audit-csp-headers.sh` (8 routes) · `curl -sI` on `/`, `/dashboard`, `/login/candidate`, `/register/candidate`, `/demo`, `/status`, `/dashboard/calendar`, `/privacy`, `/terms` (all **HTTP 200**) · `GET /api/public-health` · local `pytest` CSP + verified-readiness + public-health (**29 passed**)
+
+| Check | Result |
+| --- | --- |
+| CSP-RO headers (8 audited routes) | **PASS** — enforce absent |
+| Marketing/legal routes | `/privacy`, `/terms` **200** + CSP-RO per audit script pattern |
+| Public-health | `status=ok`, `db_ok=true`, `nightly_auto_apply_beat_enabled=false`, `worker_active=true` |
+| Railway `csp_report` | **PENDING founder UI confirmation** — agent has no Railway CLI; **no log counts recorded** |
+| Agent-observed CSP violations | **None** (header probe only) |
+| Decision | **CONTINUE** report-only HOLD — **caveat:** Railway UI confirmation still required before S2 PASS |
+| S2 status / PASS / public launch | **NOT READY** / **NO** / **NO-GO** |
+
+**Founder Railway row (fill after UI search from `2026-06-02T14:18:33Z`):**
+
+| Search UTC | `csp_report violation` count | New blocked-uri post-restart | Founder decision |
+| ---------- | ------------------------------ | ---------------------------- | ---------------- |
+| _pending_ | _none / ___  | _none / list_ | CONTINUE / HOLD |
+
+**Next founder cadence (UTC):** `2026-06-03T14:18:33Z` · **Next agent read-only cadence:** `2026-06-03T18:18:33Z` (optional).
+
 ## Manual checkpoint cadence
 
 - **Window end review:** `2026-06-05T14:18:33Z` — full 72h evidence pack before any enforce decision.
