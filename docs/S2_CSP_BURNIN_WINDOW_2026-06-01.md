@@ -269,6 +269,28 @@ From `GET /api/public-health` (via FE alias), captured at burn-in restart (`2026
 
 **Next founder Railway cadence (UTC):** `2026-06-03T18:18:33Z` (~28h after start) · window end `2026-06-05T14:18:33Z`.
 
+## Founder DevTools — non-CSP image proxy (2026-06-03)
+
+**Source:** Founder Chrome DevTools on `https://twin-sooty.vercel.app` (same burn-in alias; **post** Chrome CSP pass `2026-06-03T13:29:36Z` / `ece6588`)
+
+| Field | Entry |
+| --- | --- |
+| Console signal | Red `GET` failures for `/_next/image?url=…` (encoded external URLs) |
+| Example upstream hosts | `https://icons.duckduckgo.com/…`, `https://www.google.com/s2/favicons?…`, `https://cdn.simpleicons.org/…` |
+| HTTP statuses observed | **400** Bad Request · **404** Not Found · **502** Bad Gateway |
+| CSP Console message | **None** — no “Content Security Policy”, “Refused to connect/load”, “violates the following directive”, or `blocked-uri` CSP error |
+| Classification | **Non-CSP** app/UX — Next.js image optimizer proxying marketing logo marquee sources (`frontend/src/components/marketing/company-logo-marquee.tsx` multi-tier `brandLogoUrls` → `next/image`); upstream favicon/SI CDN misses or optimizer errors |
+| S2 burn-in clock | **No reset** — orthogonal to Railway `connect-src` fix and CSP-RO burn-in |
+| Chrome CSP pass | **Unchanged** — core routes still **no CSP violations** at `13:29:36Z` |
+| Decision | **CONTINUE** 72h burn-in — report-only HOLD |
+| S2 status | **NOT READY** |
+| S2 PASS | **NO** |
+| Public launch | **NO-GO** |
+
+**Likely cause (read-only triage):** Marquee loads ~80 brands × fallback chain (DuckDuckGo → Google favicons → jsDelivr/Simple Icons) through `/_next/image`; some slugs/domains 404/502 at origin; optimizer returns 400/404/502. `images.remotePatterns` in `frontend/next.config.ts` already allowlist these hostnames — not a CSP `img-src` gap.
+
+**Follow-up:** Separate image/logo fallback hardening before broad public launch if Console noise or broken marks matter for marketing polish; **not** required to continue S2 CSP burn-in.
+
 ## Gate closure session note (2026-06-03)
 
 **Session UTC:** `2026-06-03T13:19:53Z` (~23h 1m elapsed; **~32%** of 72h window)
