@@ -62,6 +62,19 @@
 | Apple / CalDAV / ICS | Docs + partial patterns per `.cursorrules` | ⚠️ PARTIAL |
 | O5 gate row | Partial until Apple/iCal beyond docs | ⚠️ partial |
 
+### O5 — Apple / iCal limitation (2026-06-03, docs only)
+
+**Known limitation:** No Apple Calendar OAuth equivalent to Google/Microsoft. Apple users rely on **ICS download / WebCal subscribe** and/or CalDAV where product scope allows (see `.cursorrules` calendar section).
+
+| Option | Pilot | Public launch |
+| ------ | ----- | --------------- |
+| **Document + disclose** | ✅ Acceptable — privacy/terms and dashboard copy set expectations | Required minimum |
+| **ICS/WebCal export for interview holds** | Ship or document fallback URL pattern | Recommended before broad marketing to Apple-only users |
+| **Full CalDAV write** | Future — not blocking pilot/demo | Founder waiver or implementation before O5 → ✅ |
+| **Founder waiver** | “Google + Microsoft LIVE; Apple via ICS subscribe” — sign-off line in launch gate doc | Does **not** alone unlock public GO if S2/L6 open |
+
+**Verdict:** O5 stays **partial** — **non-blocking for controlled pilot**; blocking for **full public launch** narrative unless waiver + ICS path verified in founder smoke.
+
 ---
 
 ## E — Billing
@@ -100,10 +113,10 @@
 | ----- | -------- | ------ |
 | L1 GDPR signup consent | Register flow + API | ✅ |
 | L2 Cookie consent PL/EN | `docs/COOKIE_CONSENT.md` | ✅ |
-| L3 Privacy / Terms | `/privacy`, `/terms` HTTP 200 (2026-06-02 curl) | ✅ |
+| L3 Privacy / Terms | `/privacy`, `/terms` HTTP 200 (2026-06-03 curl) | ✅ |
 | L4 Scraping compliance | `docs/SCRAPING_COMPLIANCE.md` | ✅ |
 | L5 Auto-apply consent model | DB + API tests | ✅ |
-| L6 DSR export/delete | Read-only audit `docs/L6_DSR_PRIVACY_AUDIT_2026-06-03.md` (2026-06-03) | ⚠️ **partial** |
+| L6 DSR export/delete | Audit + `docs/GDPR_MANUAL_DSR.md` runbook (2026-06-03); waiver sign-off **pending** | ⚠️ **partial** |
 | L7 Placement verification | `docs/PLACEMENT_VERIFICATION.md` | ✅ design |
 | Legal claims in this doc | Only pointers to existing legal docs | ✅ honoured |
 
@@ -119,9 +132,10 @@
 
 - No `delete-account` (or equivalent) route under `/api/v1/auth/me` or `/api/v1/candidates/me` in repo
 - **R-019** in `docs/SECURITY_RISK_REGISTER_2026-05-27.md` remains open
-- Erasure today: **manual operator workflow** per privacy notices; `docs/GDPR_MANUAL_DSR.md` referenced in gate checklist but **not yet in repo**
+- Erasure: **manual** per `docs/GDPR_MANUAL_DSR.md` (identity verify → staging-tested delete checklist → Stripe cancel)
+- **Founder waiver** (manual DSR accepted for launch phase): **pending** — see runbook § Launch waiver
 
-**Launch impact:** L6 stays **partial** → contributes to **public launch NO-GO** (with S2, O5, GAP-04). **Pilot/demo GO** unchanged if manual erasure runbook is followed per founder policy.
+**Launch impact:** L6 **partial** until waiver signed **or** self-service delete ships → **public launch NO-GO** (with S2, O5, GAP-04). **Pilot/demo GO** if runbook + waiver followed.
 
 ---
 
