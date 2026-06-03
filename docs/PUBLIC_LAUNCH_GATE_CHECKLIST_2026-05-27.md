@@ -86,12 +86,12 @@ the gate to ✅.
 | One ⚠️ partial on L6 (data subject access)                              | Document a manual workflow (`docs/GDPR_MANUAL_DSR.md`) and proceed.                   |
 | Any ❌ on Pilot gates                                                    | Pilot, not public launch — pilot has its own gate set (cf. `PILOT_OFFER_FINAL.md`).   |
 
-## Current gate stance (checkpoint 2026-06-03 `13:19:53Z`, **O7 PASS**, **S2 burn-in in progress**, **L6 + O5 waivers signed**)
+## Current gate stance (checkpoint 2026-06-03 `13:29:36Z`, **O7 PASS**, **S2 burn-in in progress**, **L6 + O5 waivers signed**)
 
 **Latest audit:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` (refreshed 2026-06-03)
 **Post-merge sanity (2026-06-02):** `docs/POST_MERGE_AUTO_APPLY_SANITY_2026-06-02.md` — PR #21 merged; prod `git_commit=6382a91` (includes `e764e68` hard gates **LIVE**); public-health OK; auto-apply **PAUSED** policy unchanged.
 
-- **S2 CSP enforce burn-in:** ❌ **NOT READY** — window **IN PROGRESS** (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; **~22h 5m elapsed / ~31%** at `12:23:52Z`). Founder Railway checkpoint: search `csp_report` from window start → **no fresh entries**; agent corroboration: 8-route header audit PASS; health OK. Decision: **CONTINUE** (report-only HOLD). Next founder Railway: `2026-06-03T18:18:33Z`; DevTools Chrome still in progress.
+- **S2 CSP enforce burn-in:** ❌ **NOT READY** — window **IN PROGRESS** (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; **~23h 11m elapsed / ~32%** at `13:29:36Z`). Founder combined checkpoint: Railway `csp_report` → **no fresh entries** since start; Chrome DevTools core routes → **no CSP violations**; `/api/v1/jobs/saved` **422** non-CSP. Decision: **CONTINUE** (report-only HOLD). Safari + Firefox DevTools **PENDING**. Next founder Railway: `2026-06-03T18:18:33Z`.
 - **L6 DSR:** ⚠️ **partial-with-waiver** — export **LIVE**; delete manual via `docs/GDPR_MANUAL_DSR.md`; founder waiver **signed** `2026-06-03T13:19:53Z` — acceptable for controlled pilot; self-service delete remains future work.
 - **O5 Calendar:** ⚠️ **partial-with-waiver** — Google **PASS** + Microsoft **LIVE**; Apple/iCal/WebCal/ICS partial; founder waiver **signed** `2026-06-03T13:19:53Z` — non-blocking for controlled pilot if copy does not overpromise Apple.
 

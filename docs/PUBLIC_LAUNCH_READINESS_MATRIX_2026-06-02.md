@@ -3,7 +3,7 @@
 **Auditor:** TWIN Release Gate Owner (read-only shift)
 **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01`
 **Branch HEAD:** `9011040` (prior) → updated by 2026-06-03 shift commits
-**Audit UTC:** `2026-06-03T13:19:53Z` (~23h 1m / **~32%** into burn-in; **~48h 59m** until `2026-06-05T14:18:33Z`; L6 + O5 founder waivers signed this session)
+**Audit UTC:** `2026-06-03T13:29:36Z` (~23h 11m / **~32%** into burn-in; **~48h 49m** until `2026-06-05T14:18:33Z`; L6 + O5 founder waivers signed `13:19:53Z`)
 **Production (unchanged by this audit):** FE `https://twin-sooty.vercel.app` · API `https://twin-production-bcd9.up.railway.app`
 
 **Verdict:** **Public launch NO-GO** · **Pilot / investor demo GO** · **S2 NOT READY** · **Auto-apply PAUSED** (operational + product gates)
@@ -17,8 +17,8 @@
 | S1 CSP report-only + `report-uri` wired | 8-route `curl -sI` 2026-06-02 — all HTTP 200, `content-security-policy-report-only` present, `report-uri /api/v1/csp-report` | ✅ PASS |
 | CSP enforce header absent | No `content-security-policy:` (enforce) on `/`, `/dashboard`, `/login/candidate`, `/register/candidate`, `/demo`, `/status`, `/dashboard/calendar`, `/api/public-health` | ✅ (expected) |
 | Narrowed policy on prod | Explicit `connect-src` includes `https://twin-production-bcd9.up.railway.app`; no broad `https:` wildcards | ✅ LIVE |
-| S2 72h burn-in | Window `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; founder Railway `2026-06-03T12:23:52Z` — search `csp_report` **no fresh entries** since start; agent header audit PASS | ❌ **NOT READY** — IN PROGRESS (~31% elapsed) |
-| S2 violation triage pack | Partial founder evidence through `12:23:52Z`; full 72h rollup + DevTools multi-browser + founder enforce sign-off still required | ⚠️ **IN PROGRESS** |
+| S2 72h burn-in | Window `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; founder combined `2026-06-03T13:29:36Z` — Railway `csp_report` **no fresh entries** since start; Chrome DevTools core routes **no CSP violations** | ❌ **NOT READY** — IN PROGRESS (~32% elapsed) |
+| S2 violation triage pack | Railway clean + Chrome DevTools **PASS** at `13:29:36Z`; Safari + Firefox **PENDING**; full 72h rollup + founder enforce sign-off at window end still required | ⚠️ **IN PROGRESS** |
 | S3–S4, S6–S10c mutation/upload limits | Gate checklist + repo tests | ✅ shipped (code) |
 | S5 Stripe dedup `050` | Founder read-only SQL 2026-05-29 | ✅ PASS |
 | S8–S9 secrets / deps baseline | Re-run before launch per checklist | ⚠️ re-verify |
@@ -209,7 +209,7 @@
 
 ### Primary blockers (ordered)
 
-1. **S2** — Complete 72h CSP report-only burn-in (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`); founder Railway `csp_report` **clean through `2026-06-03T12:23:52Z`**; remaining: full window rollup + DevTools pack + founder enforce sign-off at window end.
+1. **S2** — Complete 72h CSP report-only burn-in (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`); founder Railway **clean through `2026-06-03T13:29:36Z`**; Chrome DevTools **PASS**; remaining: Safari + Firefox DevTools, full window rollup, founder enforce sign-off (HOLD vs enforce) at window end.
 2. **GAP-04** — `AUTO_APPLY_SUBMIT` unset on prod (optional ops knob; document waiver or close before public launch if policy requires).
 3. **L6 / O5 (full public launch only)** — Waivers signed `2026-06-03T13:19:53Z` for controlled pilot; **not** substitutes for uncontrolled public launch (self-service delete; Apple/iCal verification for broad marketing).
 

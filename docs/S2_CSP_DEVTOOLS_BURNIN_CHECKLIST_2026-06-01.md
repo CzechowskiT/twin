@@ -8,21 +8,98 @@ CSP must remain **Report-Only** — console shows violations as warnings, pages 
 
 ## Browsers
 
-- [ ] Chrome (desktop) — **IN PROGRESS** (founder manual Console pass; agent pre-checks **partial PASS** 2026-06-03)
-- [ ] Safari (desktop)
-- [ ] Firefox (desktop)
-- [ ] Mobile Safari (iOS) or responsive mode
-- [ ] Mobile Chrome (Android) or responsive mode
+- [x] Chrome (desktop) — **PASS** (founder DevTools `2026-06-03T13:29:36Z`; routes below)
+- [ ] Safari (desktop) — **PENDING**
+- [ ] Firefox (desktop) — **PENDING**
+- [ ] Mobile Safari (iOS) or responsive mode — **PENDING**
+- [ ] Mobile Chrome (Android) or responsive mode — **PENDING**
 
 **Automation note:** `scripts/audit-csp-headers.sh` + `npm run test:security-headers` verify CSP-RO headers and narrowed allowlists — **not** a substitute for per-browser DevTools console/network checks.
 
-## Chrome (desktop) — founder pass 2026-06-03
+## Chrome (desktop) — founder PASS 2026-06-03
+
+**Checkpoint UTC:** `2026-06-03T13:29:36Z`
 
 **Profile:** incognito/private, extensions **disabled**.
 
-**Routes (in order):** `/` → `/login/candidate` → `/register/candidate` → `/dashboard` (logged-out, then logged-in) → `/dashboard/calendar` → `/demo` → `/status` → `/api/public-health` (Network only).
+**Routes checked:** `/` → `/login/candidate` → `/register/candidate` → `/dashboard` → `/dashboard/calendar` → `/demo` → `/status` → `/api/public-health` (Network).
 
-### Out of scope for CSP burn-in
+| Route | Console CSP clean? | Notes |
+| ----- | ------------------ | ----- |
+| `/` | ✅ PASS | No CSP violations |
+| `/login/candidate` | ✅ PASS | No CSP violations |
+| `/register/candidate` | ✅ PASS | No CSP violations |
+| `/dashboard` | ✅ PASS | No CSP violations |
+| `/dashboard/calendar` | ✅ PASS | No CSP violations |
+| `/demo` | ✅ PASS | No CSP violations |
+| `/status` | ✅ PASS | No CSP violations |
+| `/api/public-health` | ✅ PASS (Network) | JSON OK; no Console CSP expected |
+
+**Non-CSP observation (out of scope for burn-in blocker):**
+
+| Observation | CSP triage? |
+| --- | --- |
+| `GET /api/v1/jobs/saved` → **422** without a CSP Console line | **No** — API/auth/validation; not an S2 burn-in blocker |
+
+## Safari (desktop) — manual checklist (PENDING)
+
+**Status:** **PENDING** — complete before window end `2026-06-05T14:18:33Z`.
+
+**Profile:** Private Window; disable content blockers / extensions for the test pass (or note extension noise in evidence).
+
+**Routes (in order):** `/` → `/login/candidate` → `/register/candidate` → `/dashboard` (logged-out, then logged-in if possible) → `/dashboard/calendar` → `/demo` → `/status` → `/api/public-health` (Network tab only).
+
+### Pass criteria (each route)
+
+1. DevTools → **Console** — filter “Content Security Policy” / “CSP”; expect **no** unexpected violations on TWIN-required hosts.
+2. **Network** — filter `csp-report`; `POST /api/v1/csp-report` → **204** only when violations occur (ideally none this pass).
+3. Hard refresh with cache disabled.
+4. Page renders without white screen / broken fonts or images attributable to CSP.
+5. Record browser version + screenshot or Console export (no tokens/cookies).
+
+| Route | Console clean? | Network anomalies? | PASS? |
+| ----- | -------------- | ------------------ | ----- |
+| `/` | pending | pending | [ ] |
+| `/login/candidate` | pending | pending | [ ] |
+| `/register/candidate` | pending | pending | [ ] |
+| `/dashboard` | pending | pending | [ ] |
+| `/dashboard/calendar` | pending | pending | [ ] |
+| `/demo` | pending | pending | [ ] |
+| `/status` | pending | pending | [ ] |
+| `/api/public-health` | n/a (Network) | pending | [ ] |
+
+**Non-CSP:** `GET /api/v1/jobs/saved` → **422** without Console CSP is **not** a burn-in failure (same as Chrome `2026-06-03`).
+
+## Firefox (desktop) — manual checklist (PENDING)
+
+**Status:** **PENDING** — complete before window end `2026-06-05T14:18:33Z`.
+
+**Profile:** Private Browsing; extensions disabled.
+
+**Routes (in order):** same as Safari — `/` → `/login/candidate` → `/register/candidate` → `/dashboard` → `/dashboard/calendar` → `/demo` → `/status` → `/api/public-health` (Network).
+
+### Pass criteria (each route)
+
+1. **Console** — filter CSP; no unexpected violations on required hosts.
+2. **Network** — `csp-report` filter; correlate any `POST /api/v1/csp-report` with Railway `csp_report violation` if present.
+3. Hard refresh (disable cache).
+4. Functional page load (no CSP-induced breakage).
+5. Record Firefox version + evidence (no secrets).
+
+| Route | Console clean? | Network anomalies? | PASS? |
+| ----- | -------------- | ------------------ | ----- |
+| `/` | pending | pending | [ ] |
+| `/login/candidate` | pending | pending | [ ] |
+| `/register/candidate` | pending | pending | [ ] |
+| `/dashboard` | pending | pending | [ ] |
+| `/dashboard/calendar` | pending | pending | [ ] |
+| `/demo` | pending | pending | [ ] |
+| `/status` | pending | pending | [ ] |
+| `/api/public-health` | n/a (Network) | pending | [ ] |
+
+**Non-CSP:** `/api/v1/jobs/saved` **422** without Console CSP — **not** a burn-in blocker.
+
+## Out of scope for CSP burn-in
 
 | Observation | CSP triage? |
 | --- | --- |
@@ -30,31 +107,24 @@ CSP must remain **Report-Only** — console shows violations as warnings, pages 
 | Network failure with no **Content-Security-Policy** message in Console | **No** |
 | `POST /api/v1/csp-report` → **204** with matching Console `blocked-uri` | **Yes** — correlate with Railway `csp_report violation` |
 
-## Routes (each browser)
+## Routes (each browser) — master table
 
 Core S2 routes (must be checked in every browser): `/`, `/dashboard`, `/login/candidate`, `/register/candidate`, `/demo`, `/status`, `/dashboard/calendar`, `/api/public-health`.
 
-| Route | Agent pre-check (2026-06-03) | Console clean? | Network anomalies? | CSP reports POSTed? | Notes |
-| ----- | ---------------------------- | -------------- | ------------------ | ------------------- | ----- |
-| `/` | **partial PASS** — HTTP 200, CSP-RO | pending Chrome | pending | pending | Home + logo marquee |
-| `/dashboard` | **partial PASS** — HTTP 200, CSP-RO | pending | pending | pending | Repeat **logged-in** in Chrome |
-| `/login/candidate` | **partial PASS** — HTTP 200, CSP-RO | pending | pending | pending | OAuth buttons |
-| `/register/candidate` | **partial PASS** — HTTP 200, CSP-RO | pending | pending | pending | GDPR consent |
-| `/register/candidate` (logged-in) | n/a | pending | pending | pending | If applicable |
-| `/waitlist` | not audited | pending | pending | pending | |
-| `/demo` | **partial PASS** — HTTP 200, CSP-RO | pending | pending | pending | |
-| `/status` | **partial PASS** — HTTP 200, CSP-RO | pending | pending | pending | |
-| `/dashboard/calendar` | **partial PASS** — HTTP 200, CSP-RO | pending | pending | pending | Calendar shell; logged-in DevTools |
-| `/api/public-health` | **partial PASS** — HTTP 200, JSON `ok` | n/a | n/a | n/a | No Console CSP expected on JSON |
-| `/privacy` | **partial PASS** — HTTP 200 | pending | pending | pending | Legal surface |
-| `/terms` | **partial PASS** — HTTP 200 | pending | pending | pending | Legal surface |
-| `/first-1000` | not audited | pending | pending | pending | YouTube embed if env set |
-| `/pricing` | not audited | pending | pending | pending | |
-| `/for-candidates` | not audited | pending | pending | pending | |
-| `/for-companies` | not audited | pending | pending | pending | |
-| `/recruiter/inbox` | not audited | pending | pending | pending | If accessible |
+| Route | Chrome (`13:29:36Z`) | Safari | Firefox | Notes |
+| ----- | -------------------- | ------ | ------- | ----- |
+| `/` | ✅ PASS | PENDING | PENDING | Home + logo marquee |
+| `/dashboard` | ✅ PASS | PENDING | PENDING | Repeat logged-in when possible |
+| `/login/candidate` | ✅ PASS | PENDING | PENDING | OAuth buttons |
+| `/register/candidate` | ✅ PASS | PENDING | PENDING | GDPR consent |
+| `/demo` | ✅ PASS | PENDING | PENDING | |
+| `/status` | ✅ PASS | PENDING | PENDING | |
+| `/dashboard/calendar` | ✅ PASS | PENDING | PENDING | Calendar shell |
+| `/api/public-health` | ✅ PASS (Network) | PENDING | PENDING | No Console CSP on JSON |
+| `/privacy` | not in Chrome S2 pass | optional | optional | Legal surface |
+| `/terms` | not in Chrome S2 pass | optional | optional | Legal surface |
 
-**Agent pre-check legend:** HTTP 200 + `audit-csp-headers.sh` CSP-RO on route (or health JSON OK). **Does not** close Chrome row — founder must still complete Console/Network columns.
+**Agent pre-check legend (historical):** HTTP 200 + `audit-csp-headers.sh` CSP-RO does **not** close Safari/Firefox rows.
 
 ## Per-route procedure
 
@@ -84,4 +154,4 @@ Walk `docs/INVESTOR_DEMO_RUNBOOK.md` on the same alias:
 
 Pair with 72h Railway triage (`docs/S2_CSP_RAILWAY_LOG_TRIAGE_PLAN_2026-06-01.md`).
 
-Until both complete: **S2 NOT READY**, public launch **NO-GO**.
+Until Railway 72h rollup **and** multi-browser DevTools (Safari + Firefox minimum) complete: **S2 NOT READY**, public launch **NO-GO**.

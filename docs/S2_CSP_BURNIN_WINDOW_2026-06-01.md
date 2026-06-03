@@ -247,6 +247,28 @@ From `GET /api/public-health` (via FE alias), captured at burn-in restart (`2026
 
 **Next founder Railway cadence (UTC):** `2026-06-03T18:18:33Z` (~28h after start) · window end `2026-06-05T14:18:33Z`.
 
+## Founder combined checkpoint — Railway + Chrome DevTools (2026-06-03)
+
+**Checkpoint UTC:** `2026-06-03T13:29:36Z` (~23h 11m after burn-in start `2026-06-02T14:18:33Z`; **~48h 49m** remaining until `2026-06-05T14:18:33Z`; **~32%** elapsed)
+
+**Source:** Founder Railway UI + Chrome DevTools S2 pass (new session evidence — distinct from Railway-only row `2026-06-03T12:23:52Z`)
+
+| Check | Result |
+| --- | --- |
+| Type | founder Railway UI + Chrome DevTools checkpoint |
+| Burn-in start | `2026-06-02T14:18:33Z` (unchanged) |
+| Railway search | `csp_report` — **no fresh entries** since window start |
+| Chrome DevTools routes | `/`, `/login/candidate`, `/register/candidate`, `/dashboard`, `/dashboard/calendar`, `/demo`, `/status`, `/api/public-health` — **no CSP violations** |
+| `/api/v1/jobs/saved` | **422** — no CSP line in Console; **non-CSP** (API/auth/validation) |
+| Safari / Firefox DevTools | **PENDING** — see `docs/S2_CSP_DEVTOOLS_BURNIN_CHECKLIST_2026-06-01.md` |
+| Enforce header | **Absent** (unchanged) |
+| Decision | **CONTINUE** 72h burn-in — report-only HOLD |
+| S2 status | **NOT READY** |
+| S2 PASS | **NO** |
+| Public launch | **NO-GO** |
+
+**Next founder Railway cadence (UTC):** `2026-06-03T18:18:33Z` (~28h after start) · window end `2026-06-05T14:18:33Z`.
+
 ## Gate closure session note (2026-06-03)
 
 **Session UTC:** `2026-06-03T13:19:53Z` (~23h 1m elapsed; **~32%** of 72h window)
