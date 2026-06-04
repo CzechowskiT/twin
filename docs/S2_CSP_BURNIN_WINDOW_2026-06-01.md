@@ -289,7 +289,7 @@ From `GET /api/public-health` (via FE alias), captured at burn-in restart (`2026
 
 **Likely cause (read-only triage):** Marquee loads ~80 brands × fallback chain (DuckDuckGo → Google favicons → jsDelivr/Simple Icons) through `/_next/image`; some slugs/domains 404/502 at origin; optimizer returns 400/404/502. `images.remotePatterns` in `frontend/next.config.ts` already allowlist these hostnames — not a CSP `img-src` gap.
 
-**Follow-up (shipped on branch, CSP unchanged):** `SafeCompanyLogo` — native `<img>` (no `/_next/image` proxy), capped `onError` fallback chain, initials placeholder; tests `npm run test:safe-company-logo`. **S2 burn-in: CONTINUE** (no clock reset). **Public launch: NO-GO** until founder post-deploy DevTools smoke on `/` confirms no red `/_next/image` spam.
+**Follow-up (shipped on branch, CSP unchanged):** (1) `SafeCompanyLogo` — native `<img>` (no `/_next/image` proxy), capped `onError` fallback chain, initials placeholder. (2) `FAVICON_INITIALS_ONLY_DOMAINS` — skip remote fetch for DuckDuckGo-404 domains (`homedepot.com`, `chevron.com`, `servicenow.com`, `humana.com`, `cvs.com`); Google favicon before DuckDuckGo for remaining brands. Tests `npm run test:safe-company-logo`. **S2 burn-in: CONTINUE** (no clock reset). **Public launch: NO-GO** until founder post-deploy DevTools smoke on `/`: no `/_next/image` spam; no red direct `icons.duckduckgo.com` 404 for skiplisted domains.
 
 ## Gate closure session note (2026-06-03)
 

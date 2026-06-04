@@ -19,7 +19,7 @@
 | Narrowed policy on prod | Explicit `connect-src` includes `https://twin-production-bcd9.up.railway.app`; no broad `https:` wildcards | ✅ LIVE |
 | S2 72h burn-in | Window `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; founder combined `2026-06-03T13:29:36Z` — Railway `csp_report` **no fresh entries** since start; Chrome DevTools core routes **no CSP violations** | ❌ **NOT READY** — IN PROGRESS (~32% elapsed) |
 | S2 violation triage pack | Railway clean + Chrome DevTools **PASS** at `13:29:36Z` (`ece6588`); Safari + Firefox **PENDING**; full 72h rollup + founder enforce sign-off at window end still required | ⚠️ **IN PROGRESS** |
-| DevTools `/_next/image` 400/404/502 (logo hosts) | Founder `2026-06-03` triage: **non-CSP**; fix on branch — `SafeCompanyLogo` (plain `<img>`, initials fallback); **post-deploy founder smoke on `/` required** | ⚠️ **fix shipped** — verify Console; **not** S2 blocker |
+| DevTools logo Console noise (`/_next/image` + direct favicon 404) | Founder `2026-06-03` triage: **non-CSP**; fix chain — `SafeCompanyLogo` then `FAVICON_INITIALS_ONLY_DOMAINS` in `brand-logo-urls.ts`; **post-deploy founder smoke on `/` required** | ⚠️ **fix shipped** — verify Console; **not** S2 blocker |
 | S3–S4, S6–S10c mutation/upload limits | Gate checklist + repo tests | ✅ shipped (code) |
 | S5 Stripe dedup `050` | Founder read-only SQL 2026-05-29 | ✅ PASS |
 | S8–S9 secrets / deps baseline | Re-run before launch per checklist | ⚠️ re-verify |
@@ -158,7 +158,7 @@
 | Verified-readiness card | S11 prod smoke | ✅ PASS |
 | No delegated/KYC live copy | Founder evidence doc | ✅ PASS |
 | Frontend guards | `test:verified-readiness-guard`, `test:dashboard-ux-safety` | ✅ PASS |
-| Marketing logo marquee (`/` home) | Non-CSP UX; fix `SafeCompanyLogo` + `brand-logo-urls.ts`; **founder post-deploy smoke** on `/` to confirm no `/_next/image` noise | ⚠️ **fix shipped** — smoke pending; pilot OK |
+| Marketing logo marquee (`/` home) | Non-CSP UX; `SafeCompanyLogo` + DuckDuckGo skiplist / Google-first raster in `brand-logo-urls.ts`; **founder post-deploy smoke** on `/` (no `/_next/image`, no DDG 404 for blocklisted domains) | ⚠️ **fix shipped** — smoke pending; pilot OK |
 | `eslint` / `tsc` / `build` | Local 2026-06-02 — all green | ✅ PASS |
 
 ---

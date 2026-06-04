@@ -28,10 +28,29 @@ export function duckduckgoIconUrl(domain: string) {
   return `https://icons.duckduckgo.com/ip3/${domain}.ico`;
 }
 
-/** Color-first: site/raster favicons before monochrome Simple Icons SVGs. */
+/**
+ * DuckDuckGo ip3 favicons 404 predictably for these domains (founder smoke 2026-06-03).
+ * Skip remote fetch — marquee shows initials only (no Console 404 noise).
+ */
+export const FAVICON_INITIALS_ONLY_DOMAINS = new Set([
+  "homedepot.com",
+  "chevron.com",
+  "servicenow.com",
+  "humana.com",
+  "cvs.com",
+]);
+
+export function shouldUseInitialsOnlyLogo(domain: string): boolean {
+  return FAVICON_INITIALS_ONLY_DOMAINS.has(domain.trim().toLowerCase());
+}
+
+/** Color-first: Google favicon before DuckDuckGo; SI vectors last. */
 export function brandLogoUrls(brand: Brand): string[] {
+  if (shouldUseInitialsOnlyLogo(brand.domain)) {
+    return [];
+  }
   const slugs = [...new Set([brand.slug, ...(brand.altSlugs ?? [])])];
-  const raster = [duckduckgoIconUrl(brand.domain), googleFaviconUrl(brand.domain)];
+  const raster = [googleFaviconUrl(brand.domain), duckduckgoIconUrl(brand.domain)];
   const custom = brand.extraUrls ?? [];
   const vector = slugs.flatMap((slug) => [jsdelivrSiUrl(slug), siUrl(slug)]);
   return [...custom, ...raster, ...vector];
