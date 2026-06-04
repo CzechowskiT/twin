@@ -11,11 +11,21 @@ import {
   brandLogoUrls,
   companyInitials,
   FAVICON_INITIALS_ONLY_DOMAINS,
+  isStableMarqueeSiSlug,
+  MARQUEE_STABLE_SI_SLUGS,
   shouldUseInitialsOnlyLogo,
   type Brand,
 } from "../src/lib/brand-logo-urls";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+
+const RASTER_FAVICON_RE = /google\.com\/s2\/favicons|gstatic\.com|duckduckgo\.com/;
+
+function assertNoRasterFaviconUrls(urls: readonly string[], label: string) {
+  for (const url of urls) {
+    assert.doesNotMatch(url, RASTER_FAVICON_RE, `${label}: ${url}`);
+  }
+}
 
 function testCompanyInitials() {
   assert.equal(companyInitials("Apple"), "AP");
@@ -40,21 +50,30 @@ function testBrandLogoUrlsOrder() {
   };
   const urls = brandLogoUrls(brand);
   assert.ok(urls[0]?.includes("example.com/custom"));
-  assert.ok(urls.some((u) => u.includes("duckduckgo.com")));
-  assert.ok(urls.some((u) => u.includes("google.com/s2/favicons")));
   assert.ok(urls.some((u) => u.includes("cdn.simpleicons.org/capitalone")));
+  assertNoRasterFaviconUrls(urls, "capitalone");
   assert.equal(new Set(urls).size, urls.length);
 }
 
-function testStableBrandRemoteUrlsGoogleFirst() {
+function testAllowlistedStableGetsSiOnly() {
   const brand: Brand = { slug: "apple", name: "Apple", domain: "apple.com" };
   const urls = brandLogoUrls(brand);
   assert.ok(urls.length > 0);
-  const googleIdx = urls.findIndex((u) => u.includes("google.com/s2/favicons"));
-  const ddgIdx = urls.findIndex((u) => u.includes("duckduckgo.com"));
-  assert.ok(googleIdx >= 0);
-  assert.ok(ddgIdx >= 0);
-  assert.ok(googleIdx < ddgIdx);
+  assert.ok(isStableMarqueeSiSlug("apple"));
+  assert.ok(urls.some((u) => u.includes("cdn.simpleicons.org/apple")));
+  assert.ok(urls.some((u) => u.includes("cdn.jsdelivr.net")));
+  assertNoRasterFaviconUrls(urls, "apple");
+}
+
+function testUncertainDomainsNoRasterFavicons() {
+  const brand: Brand = {
+    slug: "notonmarqueeallowlist",
+    name: "Uncertain Corp",
+    domain: "uncertain.example",
+  };
+  const urls = brandLogoUrls(brand);
+  assert.equal(urls.length, 0);
+  assertNoRasterFaviconUrls(urls, "uncertain");
 }
 
 function testBlocklistedDomainsInitialsOnly() {
@@ -66,8 +85,16 @@ function testBlocklistedDomainsInitialsOnly() {
       domain,
     });
     assert.equal(urls.length, 0, domain);
-    assert.ok(!urls.some((u) => u.includes("duckduckgo.com")), domain);
+    assertNoRasterFaviconUrls(urls, domain);
   }
+}
+
+function testInitialsOnlyDomainsExcludedFromStableSlugs() {
+  assert.ok(!MARQUEE_STABLE_SI_SLUGS.has("homedepot"));
+  assert.ok(!MARQUEE_STABLE_SI_SLUGS.has("chevron"));
+  assert.ok(!MARQUEE_STABLE_SI_SLUGS.has("servicenow"));
+  assert.ok(!MARQUEE_STABLE_SI_SLUGS.has("humana"));
+  assert.ok(!MARQUEE_STABLE_SI_SLUGS.has("cvs"));
 }
 
 function testMarqueeUsesSafeLogoNotNextImage() {
@@ -89,8 +116,10 @@ function main() {
   testCompanyInitials();
   testAdvanceLogoFallbackStep();
   testBrandLogoUrlsOrder();
-  testStableBrandRemoteUrlsGoogleFirst();
+  testAllowlistedStableGetsSiOnly();
+  testUncertainDomainsNoRasterFavicons();
   testBlocklistedDomainsInitialsOnly();
+  testInitialsOnlyDomainsExcludedFromStableSlugs();
   testMarqueeUsesSafeLogoNotNextImage();
   console.log("safe-company-logo.test.ts: OK");
 }

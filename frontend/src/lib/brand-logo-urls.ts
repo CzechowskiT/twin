@@ -20,10 +20,12 @@ export function jsdelivrSiUrl(slug: string) {
   return `https://cdn.jsdelivr.net/npm/simple-icons@${SIMPLE_ICONS_JSdelivr}/icons/${slug}.svg`;
 }
 
+/** @deprecated Marquee no longer uses Google favicon (gstatic faviconV2 404 noise). */
 export function googleFaviconUrl(domain: string) {
   return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=128`;
 }
 
+/** @deprecated Marquee no longer uses DuckDuckGo ip3 (predictable 404 on several domains). */
 export function duckduckgoIconUrl(domain: string) {
   return `https://icons.duckduckgo.com/ip3/${domain}.ico`;
 }
@@ -44,16 +46,121 @@ export function shouldUseInitialsOnlyLogo(domain: string): boolean {
   return FAVICON_INITIALS_ONLY_DOMAINS.has(domain.trim().toLowerCase());
 }
 
-/** Color-first: Google favicon before DuckDuckGo; SI vectors last. */
+/**
+ * Simple Icons slugs verified for the Fortune-500 marquee (primary + alt).
+ * No Google/gstatic or DuckDuckGo raster hops — SI vectors and `extraUrls` only.
+ */
+export const MARQUEE_STABLE_SI_SLUGS = new Set([
+  "abbvie",
+  "accenture",
+  "adidas",
+  "adobe",
+  "amazon",
+  "americanairlines",
+  "americanexpress",
+  "amd",
+  "apple",
+  "atandt",
+  "bankofamerica",
+  "bmw",
+  "boeing",
+  "broadcom",
+  "capitalone",
+  "caterpillar",
+  "chase",
+  "cisco",
+  "citi",
+  "citibank",
+  "cocacola",
+  "comcast",
+  "costco",
+  "deere",
+  "delta",
+  "deloitte",
+  "disney",
+  "ey",
+  "exxonmobil",
+  "fedex",
+  "ford",
+  "generalelectric",
+  "generalmotors",
+  "ge",
+  "goldmansachs",
+  "google",
+  "honda",
+  "ibm",
+  "intel",
+  "intuit",
+  "jnj",
+  "johnsonandjohnson",
+  "jpmorgan",
+  "jpmorganchase",
+  "kpmg",
+  "lockheedmartin",
+  "lowes",
+  "mastercard",
+  "mcdonalds",
+  "mercedes",
+  "merck",
+  "meta",
+  "metlife",
+  "microsoft",
+  "moderna",
+  "morganstanley",
+  "nestle",
+  "netflix",
+  "nike",
+  "northropgrumman",
+  "novartis",
+  "nvidia",
+  "oracle",
+  "paypal",
+  "pepsi",
+  "pfizer",
+  "philips",
+  "pwc",
+  "rtx",
+  "salesforce",
+  "samsung",
+  "shell",
+  "siemens",
+  "starbucks",
+  "target",
+  "tesla",
+  "tmobile",
+  "toyota",
+  "uber",
+  "unilever",
+  "unitedairlines",
+  "unitedhealthcare",
+  "unitedhealthgroup",
+  "unitedparcelsservice",
+  "ups",
+  "verizon",
+  "visa",
+  "volkswagen",
+  "walgreens",
+  "walmart",
+  "wellsfargo",
+]);
+
+export function isStableMarqueeSiSlug(slug: string): boolean {
+  return MARQUEE_STABLE_SI_SLUGS.has(slug.trim().toLowerCase());
+}
+
+/** SI vectors and verified `extraUrls` only — no Google/gstatic or DuckDuckGo raster. */
 export function brandLogoUrls(brand: Brand): string[] {
   if (shouldUseInitialsOnlyLogo(brand.domain)) {
     return [];
   }
   const slugs = [...new Set([brand.slug, ...(brand.altSlugs ?? [])])];
-  const raster = [googleFaviconUrl(brand.domain), duckduckgoIconUrl(brand.domain)];
+  const stableSlugs = slugs.filter(isStableMarqueeSiSlug);
   const custom = brand.extraUrls ?? [];
-  const vector = slugs.flatMap((slug) => [jsdelivrSiUrl(slug), siUrl(slug)]);
-  return [...custom, ...raster, ...vector];
+  if (stableSlugs.length === 0 && custom.length === 0) {
+    return [];
+  }
+  const vector = stableSlugs.flatMap((slug) => [jsdelivrSiUrl(slug), siUrl(slug)]);
+  return [...custom, ...vector];
 }
 
 /** Two-letter plate label when every remote logo URL fails. */
