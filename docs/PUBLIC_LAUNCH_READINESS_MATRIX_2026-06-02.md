@@ -19,7 +19,7 @@
 | Narrowed policy on prod | Explicit `connect-src` includes `https://twin-production-bcd9.up.railway.app`; no broad `https:` wildcards | ✅ LIVE |
 | S2 72h burn-in | Window `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; founder `2026-06-04T08:47:35Z` — Railway `csp_report` **no fresh entries** since start; Chrome/Safari/Firefox DevTools core routes **no CSP violations** | ❌ **NOT READY** — IN PROGRESS (~59% elapsed) |
 | S2 violation triage pack | Railway clean + Chrome (`13:29:36Z`) + Safari + Firefox (`08:47:35Z`) DevTools **PASS**; full 72h rollup + founder enforce sign-off at window end still required | ⚠️ **IN PROGRESS** |
-| DevTools logo Console noise (`/_next/image` + favicon 404 / gstatic faviconV2) | PR **#24** (`18e6ce4`); Chrome Console clean `08:39:36Z`; empty plates → **`6d08742`** layered initials; post-`6d08742` founder: Console still clean but **too many initials plates** → **`dc4e906`** SI allowlist trim; **`MARQUEE_BRAND_LOGO_MAP`** + logos-first order; **2026-06-04 urgent:** founder screenshot — marquee showed **only initials** (BO/GS/WF/…) though SI URLs valid; root cause **`SafeCompanyLogo` gated visibility on `onLoad`** (cross-origin SVG often never fires); fix: show `<img>` when `src` set + **`/logos/marquee/*.svg`** self-hosted first hop; **post-deploy founder visual smoke** | ⚠️ **FIX SHIPPED** (non-CSP); **not** S2 blocker |
+| DevTools logo Console noise (`/_next/image` + favicon 404 / gstatic faviconV2) | PR **#24** (`18e6ce4`); Chrome Console clean `08:39:36Z`; empty plates → **`6d08742`**; SI allowlist + **`MARQUEE_BRAND_LOGO_MAP`**; **`SafeCompanyLogo` onLoad** fix; **2026-06-04:** logos visible but **all black** — `siUrlOnWhite` `/000000` + black local SVG first hop; fix: **`cdn.simpleicons.org/{slug}`** brand colors first (no `/000000`); **post-deploy founder visual smoke** | ⚠️ **FIX SHIPPED** (non-CSP); **not** S2 blocker |
 | S3–S4, S6–S10c mutation/upload limits | Gate checklist + repo tests | ✅ shipped (code) |
 | S5 Stripe dedup `050` | Founder read-only SQL 2026-05-29 | ✅ PASS |
 | S8–S9 secrets / deps baseline | Re-run before launch per checklist | ⚠️ re-verify |
@@ -158,7 +158,7 @@
 | Verified-readiness card | S11 prod smoke | ✅ PASS |
 | No delegated/KYC live copy | Founder evidence doc | ✅ PASS |
 | Frontend guards | `test:verified-readiness-guard`, `test:dashboard-ux-safety` | ✅ PASS |
-| Marketing logo marquee (`/` home) | Console clean; **`MARQUEE_BRAND_LOGO_MAP`** resolves domain keys before marquee `slug` (e.g. `jpmorganchase.com` → `chase`); jsDelivr brand SVG + SI CDN `/000000` fallback for white plates; **59** logos / remainder initials; logos-first sort in marquee; **post-deploy** founder `/` visual smoke | ⚠️ **FIX SHIPPED** — verify after deploy |
+| Marketing logo marquee (`/` home) | Console clean; **`MARQUEE_BRAND_LOGO_MAP`**; **`cdn.simpleicons.org/{slug}`** brand colors first (no `/000000`); jsDelivr pinned fallback; **59** logos / remainder initials; logos-first sort; **post-deploy** founder `/` colored-logo smoke | ⚠️ **FIX SHIPPED** — verify after deploy |
 | `eslint` / `tsc` / `build` | Local 2026-06-02 — all green | ✅ PASS |
 
 ---
