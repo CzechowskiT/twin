@@ -91,6 +91,34 @@ export function jsdelivrSiUrl(slug: string) {
   return `https://cdn.jsdelivr.net/npm/simple-icons@${SIMPLE_ICONS_JSdelivr}/icons/${slug}.svg`;
 }
 
+/** Self-hosted SI copies — first hop so marquee works if CDN is slow or blocked. */
+export const MARQUEE_LOCAL_LOGO_SLUGS = new Set([
+  "adidas",
+  "amazon",
+  "americanexpress",
+  "apple",
+  "bankofamerica",
+  "chase",
+  "goldmansachs",
+  "google",
+  "mastercard",
+  "microsoft",
+  "nike",
+  "shell",
+  "starbucks",
+  "target",
+  "walmart",
+  "wellsfargo",
+]);
+
+export function localMarqueeLogoUrl(slug: string) {
+  return `/logos/marquee/${slug.trim().toLowerCase()}.svg`;
+}
+
+export function isMarqueeLocalLogoSlug(slug: string): boolean {
+  return MARQUEE_LOCAL_LOGO_SLUGS.has(slug.trim().toLowerCase());
+}
+
 /**
  * DuckDuckGo ip3 favicons 404 predictably for these domains (founder smoke 2026-06-03).
  * Skip remote fetch — marquee shows initials only (no Console 404 noise).
@@ -209,11 +237,15 @@ export function brandLogoUrls(brand: Brand): string[] {
   if (stableSlugs.length === 0 && custom.length === 0) {
     return [];
   }
-  // jsDelivr ships brand-colored SVGs; SI CDN `/000000` fallback for light marks on white plates.
-  const vector = stableSlugs.flatMap((slug) => [
-    jsdelivrSiUrl(slug),
-    siUrlOnWhite(slug),
-  ]);
+  // Local SVG first (deterministic), then jsDelivr color marks, then dark SI CDN for light glyphs.
+  const vector = stableSlugs.flatMap((slug) => {
+    const hops: string[] = [];
+    if (isMarqueeLocalLogoSlug(slug)) {
+      hops.push(localMarqueeLogoUrl(slug));
+    }
+    hops.push(jsdelivrSiUrl(slug), siUrlOnWhite(slug));
+    return hops;
+  });
   return [...custom, ...vector];
 }
 

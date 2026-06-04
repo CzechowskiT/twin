@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 import {
   advanceLogoFallbackStep,
@@ -20,8 +20,9 @@ const INITIALS_CLASS =
 
 /**
  * External company marks without Next.js image optimizer — avoids noisy
- * `/_next/image` 400/404/502 when favicon CDNs fail. Initials stay visible
- * until a logo image loads; never an empty white plate.
+ * `/_next/image` 400/404/502 when favicon CDNs fail. Initials only when every
+ * URL fails (or none configured); do not gate logo opacity on `onLoad` — cross-
+ * origin SVG often never fires load in production while still painting.
  */
 export function SafeCompanyLogo({
   name,
@@ -31,15 +32,9 @@ export function SafeCompanyLogo({
   loading = "eager",
 }: SafeCompanyLogoProps) {
   const [step, setStep] = useState(0);
-  const [loaded, setLoaded] = useState(false);
   const [exhausted, setExhausted] = useState(urls.length === 0);
 
-  useEffect(() => {
-    setLoaded(false);
-  }, [step]);
-
   const onError = useCallback(() => {
-    setLoaded(false);
     const next = advanceLogoFallbackStep(step, urls.length);
     if (next === null) {
       setExhausted(true);
@@ -48,20 +43,16 @@ export function SafeCompanyLogo({
     setStep(next);
   }, [step, urls.length]);
 
-  const onLoad = useCallback(() => {
-    setLoaded(true);
-  }, []);
-
   const initials = companyInitials(name);
   const src = exhausted ? undefined : urls[step];
-  const showImage = Boolean(src) && loaded;
+  const showInitials = !src;
 
   return (
     <span
       className={`relative flex h-full w-full items-center justify-center ${className}`}
     >
       <span
-        className={`${INITIALS_CLASS} ${showImage ? "opacity-0" : "opacity-100"}`}
+        className={`${INITIALS_CLASS} ${showInitials ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         aria-hidden
       >
         {initials}
@@ -76,9 +67,8 @@ export function SafeCompanyLogo({
           loading={loading}
           decoding="async"
           referrerPolicy="no-referrer"
-          className={`relative z-10 max-h-full max-w-full object-contain object-center transition-opacity ${showImage ? "opacity-95" : "opacity-0"} ${imgClassName}`}
+          className={`relative z-10 max-h-full max-w-full object-contain object-center opacity-95 ${imgClassName}`}
           onError={onError}
-          onLoad={onLoad}
         />
       ) : null}
     </span>
