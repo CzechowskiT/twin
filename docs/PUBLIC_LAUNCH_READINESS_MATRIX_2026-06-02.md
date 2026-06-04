@@ -19,7 +19,7 @@
 | Narrowed policy on prod | Explicit `connect-src` includes `https://twin-production-bcd9.up.railway.app`; no broad `https:` wildcards | ✅ LIVE |
 | S2 72h burn-in | Window `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; founder `2026-06-04T08:47:35Z` — Railway `csp_report` **no fresh entries** since start; Chrome/Safari/Firefox DevTools core routes **no CSP violations** | ❌ **NOT READY** — IN PROGRESS (~59% elapsed) |
 | S2 violation triage pack | Railway clean + Chrome (`13:29:36Z`) + Safari + Firefox (`08:47:35Z`) DevTools **PASS**; full 72h rollup + founder enforce sign-off at window end still required | ⚠️ **IN PROGRESS** |
-| DevTools logo Console noise (`/_next/image` + favicon 404 / gstatic faviconV2) | PR **#24** (`18e6ce4`); Chrome Console clean `08:39:36Z`; empty plates → **`6d08742`** layered initials; post-`6d08742` founder: Console still clean but **too many initials plates** → **`MARQUEE_STABLE_SI_SLUGS` trimmed** to 59 verified SI slugs (`chase`, `johndeere`, …); Safari/Firefox PASS `08:47:35Z`; **post-deploy visual smoke** | ⚠️ **FIX SHIPPED** (non-CSP); **not** S2 blocker |
+| DevTools logo Console noise (`/_next/image` + favicon 404 / gstatic faviconV2) | PR **#24** (`18e6ce4`); Chrome Console clean `08:39:36Z`; empty plates → **`6d08742`** layered initials; post-`6d08742` founder: Console still clean but **too many initials plates** → **`dc4e906`** SI allowlist trim; follow-up **`MARQUEE_BRAND_LOGO_MAP`** (domain → verified slug) + dark `cdn.simpleicons.org/{slug}/000000` on white plates + logos-first marquee order; **59** SI marks / **30** no-SI + **5** blocklist initials; Safari/Firefox PASS `08:47:35Z`; **post-deploy founder visual smoke** | ⚠️ **FIX SHIPPED** (non-CSP); **not** S2 blocker |
 | S3–S4, S6–S10c mutation/upload limits | Gate checklist + repo tests | ✅ shipped (code) |
 | S5 Stripe dedup `050` | Founder read-only SQL 2026-05-29 | ✅ PASS |
 | S8–S9 secrets / deps baseline | Re-run before launch per checklist | ⚠️ re-verify |
@@ -158,7 +158,7 @@
 | Verified-readiness card | S11 prod smoke | ✅ PASS |
 | No delegated/KYC live copy | Founder evidence doc | ✅ PASS |
 | Frontend guards | `test:verified-readiness-guard`, `test:dashboard-ux-safety` | ✅ PASS |
-| Marketing logo marquee (`/` home) | Console clean post-`6d08742`; **59** brands with verified SI vectors (jsDelivr + `cdn.simpleicons.org` only); **30** without SI + **5** favicon blocklist → initials; allowlist phantom slugs removed; Safari/Firefox **`08:47:35Z`** PASS; **post-deploy** visual smoke on `/` | ⚠️ **FIX SHIPPED** — verify after deploy |
+| Marketing logo marquee (`/` home) | Console clean; **`MARQUEE_BRAND_LOGO_MAP`** resolves domain keys before marquee `slug` (e.g. `jpmorganchase.com` → `chase`); jsDelivr brand SVG + SI CDN `/000000` fallback for white plates; **59** logos / remainder initials; logos-first sort in marquee; **post-deploy** founder `/` visual smoke | ⚠️ **FIX SHIPPED** — verify after deploy |
 | `eslint` / `tsc` / `build` | Local 2026-06-02 — all green | ✅ PASS |
 
 ---
@@ -217,7 +217,7 @@
 
 ### Risks (accepted for pilot, not public)
 
-- **Marketing logo marquee:** Pre-fix noise was **non-CSP**; PR **#24** + `6d08742` (layered initials, Console clean); follow-up **`MARQUEE_STABLE_SI_SLUGS`** curated to slugs that exist at `simple-icons@11.14.0` (drops phantom `jpmorgan`/`citi`/… 404 hops); **~59 real logos** / remainder initials; Safari/Firefox **`08:47:35Z`** **PASS** — **S2 burn-in unchanged** (CONTINUE, no clock reset). **Public launch: NO-GO.**
+- **Marketing logo marquee:** Pre-fix noise was **non-CSP**; PR **#24** + `6d08742` (layered initials, Console clean); **`dc4e906`** trimmed phantom SI slugs; explicit **`MARQUEE_BRAND_LOGO_MAP`** + dark SI CDN URLs + logos-first order for launch-grade mix on `/`; **~59 real logos** / remainder initials; Safari/Firefox **`08:47:35Z`** **PASS** — **S2 burn-in unchanged** (CONTINUE, no clock reset). **Public launch: NO-GO.**
 - CSP `unsafe-inline` / `unsafe-eval` remain (separate hardening track).
 - Prod API SHA `6382a91` includes `e764e68`; nightly beat **disabled** in health (GAP-03 closed ops 2026-06-02). S2 burn-in **unchanged** — no clock reset.
 - Metric / corpus scale below “marketplace” narrative — honest pilot ceiling.
