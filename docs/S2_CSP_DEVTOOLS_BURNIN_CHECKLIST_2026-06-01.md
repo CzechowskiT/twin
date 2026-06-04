@@ -77,6 +77,8 @@ CSP must remain **Report-Only** — console shows violations as warnings, pages 
 
 **Founder smoke (post mapping deploy):** Chrome Incognito, extensions off, `https://twin-sooty.vercel.app/` → hard refresh `/` → Console: no red `/_next/image`, `duckduckgo`, `google.com/s2`, `gstatic`, CSP lines → marquee: **SI marks lead the loop**; initials on blocklisted/no-SI brands only; **no empty white plates**.
 
+**Urgent visual (founder screenshot 2026-06-04):** Marquee showed **only initials** on white plates (BO, GS, WF, AE, WA, TA, CO, MC, ST, NI, AD, SH) — no brand glyphs. **Root cause:** `SafeCompanyLogo` kept `<img>` at `opacity-0` until `onLoad`; cross-origin SVG from jsDelivr/SI CDN often never fires `onLoad` while still painting, so initials stayed visible. **Fix (non-CSP):** show logo when `src` is set; initials only after fallback exhausted; prepend self-hosted `/logos/marquee/{slug}.svg` for founder-visible brands. **Post-deploy:** hard refresh `/` → real logos for BO/GS/WF/AE/WA/TA/MC/ST/NI/AD/SH; CO (Costco) may stay initials (no SI slug). **S2: CONTINUE.** **S2 PASS: NO.**
+
 ## Safari (desktop) — founder PASS 2026-06-04
 
 **Checkpoint UTC:** `2026-06-04T08:47:35Z`
