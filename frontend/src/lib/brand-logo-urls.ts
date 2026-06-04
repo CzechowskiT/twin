@@ -20,16 +20,6 @@ export function jsdelivrSiUrl(slug: string) {
   return `https://cdn.jsdelivr.net/npm/simple-icons@${SIMPLE_ICONS_JSdelivr}/icons/${slug}.svg`;
 }
 
-/** @deprecated Marquee no longer uses Google favicon (gstatic faviconV2 404 noise). */
-export function googleFaviconUrl(domain: string) {
-  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=128`;
-}
-
-/** @deprecated Marquee no longer uses DuckDuckGo ip3 (predictable 404 on several domains). */
-export function duckduckgoIconUrl(domain: string) {
-  return `https://icons.duckduckgo.com/ip3/${domain}.ico`;
-}
-
 /**
  * DuckDuckGo ip3 favicons 404 predictably for these domains (founder smoke 2026-06-03).
  * Skip remote fetch — marquee shows initials only (no Console 404 noise).

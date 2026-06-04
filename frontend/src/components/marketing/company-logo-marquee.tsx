@@ -143,20 +143,17 @@ function BrandMark({
 }) {
   const urls = useMemo(() => brandLogoUrls(brand), [brand]);
 
-  const href = `https://${brand.domain}/`;
   const a11y = `${brand.name}${linkSuffix}`;
 
-  const anchorClass = `${MARK_BOX_CLASS} ${MARK_PLATE_CLASS} relative flex shrink-0 items-center justify-center rounded-lg no-underline transition-[opacity,box-shadow] hover:opacity-90 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--twin-accent)]`;
+  const plateClass = `${MARK_BOX_CLASS} ${MARK_PLATE_CLASS} relative flex shrink-0 items-center justify-center rounded-lg transition-[opacity,box-shadow]`;
 
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
+    <span
+      role="img"
       tabIndex={tabIndex}
       aria-label={a11y}
       title={a11y}
-      className={anchorClass}
+      className={plateClass}
     >
       <span className="relative flex h-full w-full items-center justify-center px-2 py-1.5 sm:px-2.5">
         <SafeCompanyLogo
@@ -165,7 +162,7 @@ function BrandMark({
           loading="eager"
         />
       </span>
-    </a>
+    </span>
   );
 }
 
@@ -197,7 +194,7 @@ function LogoRow({
   );
 }
 
-/** Infinite marquee — duplicated strip; marks try favicon CDNs before Simple Icons fallback. */
+/** Infinite marquee — duplicated strip; decorative marks only (no outbound hrefs). */
 export function CompanyLogoMarquee() {
   const reducedMotion = usePrefersReducedMotion();
   const linkSuffixKey: TranslationKey = "site.marqueeBrandLinkSuffix";

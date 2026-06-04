@@ -19,7 +19,8 @@ import {
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-const RASTER_FAVICON_RE = /google\.com\/s2\/favicons|gstatic\.com|duckduckgo\.com/;
+const RASTER_FAVICON_RE =
+  /google\.com\/s2\/favicons|gstatic\.com|faviconV2|duckduckgo\.com/;
 
 function assertNoRasterFaviconUrls(urls: readonly string[], label: string) {
   for (const url of urls) {
@@ -97,6 +98,13 @@ function testInitialsOnlyDomainsExcludedFromStableSlugs() {
   assert.ok(!MARQUEE_STABLE_SI_SLUGS.has("cvs"));
 }
 
+function testBrandLogoUrlsSourceHasNoRasterHelpers() {
+  const src = readFileSync(join(root, "src/lib/brand-logo-urls.ts"), "utf8");
+  assert.doesNotMatch(src, /function\s+googleFaviconUrl/);
+  assert.doesNotMatch(src, /function\s+duckduckgoIconUrl/);
+  assert.doesNotMatch(src, RASTER_FAVICON_RE);
+}
+
 function testMarqueeUsesSafeLogoNotNextImage() {
   const marquee = readFileSync(
     join(root, "src/components/marketing/company-logo-marquee.tsx"),
@@ -108,8 +116,27 @@ function testMarqueeUsesSafeLogoNotNextImage() {
   );
   assert.doesNotMatch(marquee, /from\s+["']next\/image["']/);
   assert.match(marquee, /SafeCompanyLogo/);
+  assert.doesNotMatch(marquee, /href=\{`https:\/\//);
+  assert.doesNotMatch(marquee, /target="_blank"/);
   assert.match(safe, /<img/);
   assert.doesNotMatch(safe, /from\s+["']next\/image["']/);
+}
+
+function testAllMarqueeBrandsAvoidRasterUrls() {
+  const marquee = readFileSync(
+    join(root, "src/components/marketing/company-logo-marquee.tsx"),
+    "utf8",
+  );
+  const blocks = [
+    ...marquee.matchAll(
+      /\{\s*slug:\s*"([^"]+)"[^}]*name:\s*"([^"]+)"[^}]*domain:\s*"([^"]+)"/g,
+    ),
+  ];
+  assert.ok(blocks.length >= 80, "expected Fortune-500 marquee brands");
+  for (const [, slug, name, domain] of blocks) {
+    const urls = brandLogoUrls({ slug, name, domain });
+    assertNoRasterFaviconUrls(urls, `${slug}/${domain}`);
+  }
 }
 
 function main() {
@@ -120,7 +147,9 @@ function main() {
   testUncertainDomainsNoRasterFavicons();
   testBlocklistedDomainsInitialsOnly();
   testInitialsOnlyDomainsExcludedFromStableSlugs();
+  testBrandLogoUrlsSourceHasNoRasterHelpers();
   testMarqueeUsesSafeLogoNotNextImage();
+  testAllMarqueeBrandsAvoidRasterUrls();
   console.log("safe-company-logo.test.ts: OK");
 }
 
