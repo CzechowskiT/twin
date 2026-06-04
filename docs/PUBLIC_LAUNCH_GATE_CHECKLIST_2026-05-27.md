@@ -50,6 +50,7 @@ the gate to ✅.
 | O6 | Canonical Vercel alias points at the right project; drift guard exists  | `bash scripts/check-vercel-canonical-alias.sh`                                                   | ⚠️ drift documented; canonical project is correct |
 | O7 | Backup / restore for Postgres is exercised (last restore test logged)    | `docs/RUNBOOK_DB_RESTORE_2026-05-27.md` § O7 PASS criteria + `docs/BACKUP_RESTORE_DRILL_LOG.md` **PASS** row with GO decision | ✅ **PASS** (2026-06-01) — staging clone `staging-restore-proof-20260529` via pg_dump/pg_restore; prod **`postgres-volume`** untouched; separate from `INC-DB-2026-05-29-001` |
 | O8 | Incident response runbook exists with named on-call                     | `docs/INCIDENT_RESPONSE_RUNBOOK_2026-05-27.md` (this session, TASK 13)                          | ✅ this session |
+| O8b | Launch-day monitoring & rollback runbook (pilot/demo days)              | `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` — T-60/T-30/T-15, monitoring cadence, rollback **docs only** | ✅ **NEW** (2026-06-04) |
 | O9 | Security risk register is current                                       | `docs/SECURITY_RISK_REGISTER_2026-05-27.md` (this session, TASK 14)                             | ✅ this session |
 | O10| Vercel canonical re-link is either fixed or has a documented workaround | `docs/VERCEL_CANONICAL_DEPLOY_RUNBOOK_2026-05-27.md`                                             | ⚠️ workaround documented |
 
@@ -86,7 +87,9 @@ the gate to ✅.
 | One ⚠️ partial on L6 (data subject access)                              | Document a manual workflow (`docs/GDPR_MANUAL_DSR.md`) and proceed.                   |
 | Any ❌ on Pilot gates                                                    | Pilot, not public launch — pilot has its own gate set (cf. `PILOT_OFFER_FINAL.md`).   |
 
-## Current gate stance (checkpoint 2026-06-04 `10:34:36Z`, **O7 PASS**, **S2 burn-in in progress**, **L6 + O5 waivers signed**, **final logo smoke PASS**, **Railway ~48h cadence clean**)
+## Current gate stance (checkpoint 2026-06-04, **O7 PASS**, **O8b launch-day runbook**, **S2 burn-in in progress**, **L6 + O5 waivers signed**, **final logo smoke PASS**, **Railway ~48h cadence clean**)
+
+**Launch-day runbook:** `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` — records **public NO-GO**, **pilot/demo GO**, **auto-apply PAUSED**; CSP enforce **OFF** until `2026-06-05T14:18:33Z` rollup + founder sign-off.
 
 **Latest audit:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` (refreshed 2026-06-04 `10:34:36Z`)  
 **Copy & claims:** `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md` — founding BLOCKER reduced (`1a2eba4`); **MEDIUM** calendar (`billingEngagementPillar2Body`) + compare pages + `/first-1000` headline **fixed** EN/PL; public launch still **NO-GO** (S2, ops); **no** change to S2/L6/O5 gate rows.
@@ -195,5 +198,7 @@ Warning: this check is non-destructive; do **not** run `alembic upgrade` manuall
   the pilot operating manual referenced by P1.
 - `docs/INCIDENT_RESPONSE_RUNBOOK_2026-05-27.md` — incident
   runbook referenced by O8.
+- `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` —
+  launch-day monitoring / rollback (O8b).
 - `docs/SECURITY_RISK_REGISTER_2026-05-27.md` — security
   risk register referenced by O9.

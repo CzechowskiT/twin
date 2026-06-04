@@ -3,7 +3,7 @@
 **Auditor:** TWIN Release Gate Owner (read-only shift)
 **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01`
 **Branch HEAD:** `9011040` (prior) → updated by 2026-06-03 shift commits; copy audit 2026-06-04
-**Audit UTC:** `2026-06-04T10:34:36Z` (gate) · **copy audit** `2026-06-04` — `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md` (~44h 16m / **~61%** into burn-in; **~27h 44m** until `2026-06-05T14:18:33Z`; L6 + O5 founder waivers signed `2026-06-03T13:19:53Z`; Safari/Firefox DevTools PASS `2026-06-04T08:47:35Z`; **final logo smoke PASS** `2026-06-04T10:29:29Z`; **Railway ~48h cadence clean** `2026-06-04T10:34:36Z` after deploy chain `472a6d3` → `bcd23cd` → `4a7c57d`)
+**Audit UTC:** `2026-06-04T10:34:36Z` (gate) · **launch-day runbook** `2026-06-04` — `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` · **copy audit** `2026-06-04` — `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md` (~44h 16m / **~61%** into burn-in; **~27h 44m** until `2026-06-05T14:18:33Z`; L6 + O5 founder waivers signed `2026-06-03T13:19:53Z`; Safari/Firefox DevTools PASS `2026-06-04T08:47:35Z`; **final logo smoke PASS** `2026-06-04T10:29:29Z`; **Railway ~48h cadence clean** `2026-06-04T10:34:36Z` after deploy chain `472a6d3` → `bcd23cd` → `4a7c57d`)
 **Production (unchanged by this audit):** FE `https://twin-sooty.vercel.app` · API `https://twin-production-bcd9.up.railway.app`
 
 **Verdict:** **Public launch NO-GO** · **Pilot / investor demo GO** · **S2 NOT READY** · **Auto-apply PAUSED** (operational + product gates)
@@ -171,7 +171,8 @@
 | API health | `GET /api/v1/health?ops=1` → `status=ok`, `scrape_worker_ready=true` | ✅ LIVE |
 | CSP report sink | Storage-free `POST /api/v1/csp-report`; tests pass | ✅ LIVE |
 | S7 public-health regression | `pytest tests/test_public_health_regression.py` — passed in bundle | ✅ PASS |
-| O8 incident runbook | Doc exists | ✅ |
+| O8 incident runbook | `docs/INCIDENT_RESPONSE_RUNBOOK_2026-05-27.md` | ✅ |
+| Launch-day monitoring / rollback | `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` — T-60/T-30/T-15, 15m/1h/24h cadence, S0–S3, CSP + auto-apply + DSR playbooks | ✅ **NEW** (2026-06-04) |
 | O9 risk register | Doc exists | ✅ |
 | P1 observability plan | Full log pipeline for CSP burn-in still founder-led | ⚠️ S2 dependency |
 
@@ -278,8 +279,17 @@
 
 ---
 
+## Launch-day runbook (2026-06-04)
+
+- **Doc:** `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md`
+- **Verdict recorded:** **Public launch NO-GO** · **Controlled pilot / investor demo GO** · **Auto-apply PAUSED** · **Delegated NOT LIVE** · **CSP report-only** (enforce OFF until S2 rollup `2026-06-05T14:18:33Z`)
+- **Use when:** Founder runs pilot onboarding, demo, or pre-public rehearsal — not a substitute for S2 PASS or public announcement.
+
+---
+
 ## Related docs
 
+- `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md`
 - `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md`
 - `docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md`
 - `docs/PRODUCTION_REALITY_MATRIX_2026-05-27.md`
