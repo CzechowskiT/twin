@@ -33,10 +33,7 @@ const BRANDS: Brand[] = [
     slug: "capitalone",
     name: "Capital One",
     domain: "capitalone.com",
-    extraUrls: [
-      "https://www.capitalone.com/favicon.ico",
-      "https://icons.duckduckgo.com/ip3/capitalone.com.ico",
-    ],
+    extraUrls: ["https://www.capitalone.com/favicon.ico"],
   },
   { slug: "walmart", name: "Walmart", domain: "walmart.com" },
   { slug: "costco", name: "Costco", domain: "costco.com" },
