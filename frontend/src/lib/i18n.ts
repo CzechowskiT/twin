@@ -188,7 +188,8 @@ const en = {
     tagline: "AI career twin",
     curiosityEyebrow: "See what's inside",
     title: "Come back to interviews worth taking — not inbox spam.",
-    heroHook: "Founding wishlist locks lifetime Pro for the first 1,000 — or open a free account to preview matches today.",
+    heroHook:
+      "Founding wishlist reserves early-access cohort benefits for the first 1,000 — founding terms, fair-use, and launch Terms apply (see /first-1000). Or open a free account to preview matches today.",
     description:
       "TWIN scans boards you enable and surfaces roles worth your time—so after time away you open a short list of slots, not random noise.",
     getStarted: "Create free account",
@@ -211,7 +212,7 @@ const en = {
     teaserCard3Title: "Engineering manager",
     teaserCard3Meta: "Warsaw · 85% match",
     insideEyebrow: "What you get inside",
-    insideTitle: "Your pipeline works while you sleep",
+    insideTitle: "Your pipeline can work while you sleep — when automation you enable is available",
     insideStep1Title: "Ranked feed",
     insideStep1Line: "Roles scored to your profile — not a firehose of every listing.",
     insideStep2Title: "Application ledger",
@@ -219,9 +220,9 @@ const en = {
     insideStep3Title: "Interview calendar",
     insideStep3Line: "Slots worth showing up for, synced when you connect calendar.",
     stickyCtaLabel: "Join founding wishlist",
-    stickyCtaMicro: "Lifetime Pro · email only",
+    stickyCtaMicro: "Founding early access · email only · Terms apply",
     joinWishlist: "Join founding wishlist",
-    joinWishlistMicro: "First 1,000 · lifetime Pro & Enterprise · no card",
+    joinWishlistMicro: "First 1,000 · founding cohort benefits · no card · Terms apply",
     foundingCounterAria: "Founding wishlist spots remaining",
     foundingCounterEyebrow: "Founding spots left",
     foundingCounterOf: "of {cap}",
@@ -229,8 +230,10 @@ const en = {
     foundingCounterLive: "Live waitlist data",
     foundingCounterOffline: "Live count delayed — signup on the next page still works.",
     ctaBandWishlistEyebrow: "Founding thousand",
-    ctaBandWishlistTitle: "Lock lifetime Pro & Enterprise before public launch pricing.",
-    ctaBandWishlistMicro: "Same offer as the wishlist page — email first, profile later.",
+    ctaBandWishlistTitle:
+      "Reserve founding early access before public launch pricing — benefits subject to Terms.",
+    ctaBandWishlistMicro:
+      "Same founding offer as /first-1000 & wishlist — email first; founding terms & fair-use apply.",
     logIn: "Sign in",
     scrape: "Discover",
     scrapeDesc: "Aggregate listings from boards you turn on.",
@@ -2624,7 +2627,7 @@ const en = {
       "Optional: set NEXT_PUBLIC_LAUNCH_MANIFESTO_YOUTUBE_ID in deploy to show a nocookie embed here.",
     ctaEyebrow: "Two doors · the same moment",
     ctaLead:
-      "Wishlist = founder spot + zero fees forever if you land under the cap. Full account = the product now, standard plans later.",
+      "Wishlist = founder spot + founding cohort benefits if you land under the cap — subject to fair-use and launch Terms (not a guarantee of lifetime paid Pro). Full account = the product now, standard plans later.",
     ctaFinePrint:
       "Wishlist drives the global counter. Full account signup is a separate path when you want to jump straight into the dashboard.",
     soldOutBody:
@@ -2934,7 +2937,8 @@ const pl: MessageTree = {
     tagline: "Bliźniak kariery AI",
     curiosityEyebrow: "Zobacz, co jest w środku",
     title: "Wracasz do rozmów wartych czasu — nie do spamu w skrzynce.",
-    heroHook: "Wishlista founding blokuje Pro na zawsze dla pierwszej tysiątki — albo załóż darmowe konto i zobacz dopasowania dziś.",
+    heroHook:
+      "Wishlista founding rezerwuje benefity kohorty early access dla pierwszej tysiącki — obowiązują warunki founding, fair-use i Regulamin startu (szczegóły: /first-1000). Albo załóż darmowe konto i zobacz dopasowania dziś.",
     description:
       "TWIN skanuje włączone portale i pokazuje role warte uwagi — po przerwie otwierasz krótką listę slotów, a nie losowy szum.",
     getStarted: "Załóż darmowe konto",
@@ -2957,7 +2961,7 @@ const pl: MessageTree = {
     teaserCard3Title: "Engineering manager",
     teaserCard3Meta: "Warszawa · 85% dopasowania",
     insideEyebrow: "Co dostajesz w środku",
-    insideTitle: "Ścieżka aplikacji pracuje, kiedy śpisz",
+    insideTitle: "Ścieżka aplikacji może działać, kiedy śpisz — gdy włączona automatyzacja jest dostępna",
     insideStep1Title: "Rankingowany feed",
     insideStep1Line: "Oferty pod Twój profil — nie zalew każdego ogłoszenia.",
     insideStep2Title: "Rejestr aplikacji",
@@ -2965,9 +2969,9 @@ const pl: MessageTree = {
     insideStep3Title: "Kalendarz rozmów",
     insideStep3Line: "Sloty warte przyjścia — z synciem kalendarza, gdy go połączysz.",
     stickyCtaLabel: "Dołącz do wishlisty founding",
-    stickyCtaMicro: "Pro na zawsze · sam e-mail",
+    stickyCtaMicro: "Founding early access · sam e-mail · wg Regulaminu",
     joinWishlist: "Dołącz do wishlisty founding",
-    joinWishlistMicro: "Pierwsze 1000 · Pro i Enterprise na zawsze · bez karty",
+    joinWishlistMicro: "Pierwsze 1000 · benefity kohorty founding · bez karty · wg Regulaminu",
     foundingCounterAria: "Pozostałe miejsca na wishliście founding",
     foundingCounterEyebrow: "Pozostało miejsc founding",
     foundingCounterOf: "z {cap}",
@@ -2975,8 +2979,10 @@ const pl: MessageTree = {
     foundingCounterLive: "Dane na żywo z listy",
     foundingCounterOffline: "Licznik może być opóźniony — zapis na kolejnej stronie działa.",
     ctaBandWishlistEyebrow: "Founding thousand",
-    ctaBandWishlistTitle: "Zablokuj dożywotnie Pro i Enterprise przed płatnym startem.",
-    ctaBandWishlistMicro: "Ta sama oferta co na stronie wishlisty — najpierw e-mail, profil później.",
+    ctaBandWishlistTitle:
+      "Zarezerwuj founding early access przed publicznym cennikiem — benefity wg Regulaminu.",
+    ctaBandWishlistMicro:
+      "Ta sama oferta founding co na /first-1000 i wishliście — najpierw e-mail; obowiązują warunki founding i fair-use.",
     logIn: "Zaloguj się",
     scrape: "Odkrywaj",
     scrapeDesc: "Oferty z portali, które włączysz.",
@@ -5552,7 +5558,7 @@ const pl: MessageTree = {
       "Opcjonalnie: ustaw NEXT_PUBLIC_LAUNCH_MANIFESTO_YOUTUBE_ID w deployu, żeby tu wkleić film (embed nocookie).",
     ctaEyebrow: "Dwie bramy — ten sam moment",
     ctaLead:
-      "Lista życzeń = miejsce founderskie + zero opłat na zawsze, jeśli zmieścisz się w limicie. Pełne konto = produkt dziś, standardowe plany później.",
+      "Lista życzeń = miejsce founderskie + benefity kohorty, jeśli zmieścisz się w limicie — wg fair-use i warunków startu (to nie gwarancja dożywotniego płatnego Pro). Pełne konto = produkt dziś, standardowe plany później.",
     ctaFinePrint:
       "Lista życzeń rusza globalny licznik. Pełna rejestracja konta to osobna ścieżka — gdy chcesz od razu wejść w panel.",
     soldOutBody:

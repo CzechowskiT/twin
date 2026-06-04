@@ -5,7 +5,7 @@
 **Audit UTC:** `2026-06-04` (S2 burn-in through `2026-06-05T14:18:33Z`)  
 **Product reality:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md`, `.cursorrules`
 
-**Verdict:** **Public launch NO-GO** · **Pilot / demo GO** · Copy has **3 BLOCKER-class marketing rows** (lifetime founding, implied live autopilot) plus **documented waivers** for L6/O5. Dashboard and verified-readiness surfaces are **mostly aligned** with paused auto-apply and blocked delegated submit.
+**Verdict:** **Public launch NO-GO** · **Pilot / demo GO** · Homepage founding **BLOCKER reduced** (2026-06-04 copy fix) — qualified early-access language + Terms/first-1000 pointers; **MEDIUM** remains on calendar strip + competitive pages. **No** S2 PASS or public GO from this audit.
 
 ---
 
@@ -13,15 +13,15 @@
 
 | Area | Finding |
 | ---- | ------- |
-| Homepage / founding CTAs | **BLOCKER** — “lifetime Pro” / lock language without same-page Terms tie-in as `/first-1000` fine print |
-| Auto-apply / delegated | Dashboard + job list **OK**; billing lead and persona logistics **overclaimed** → **fixed** in this session (LOW) |
-| Calendar (O5) | Google/Microsoft **live**; Apple = ICS/WebCal + CalDAV roadmap — copy mostly **discloses**; one calendar strip line is **MEDIUM** |
+| Homepage / founding CTAs | **was BLOCKER** → **reduced** — unconditional “lifetime Pro” / lock language **revised** in `i18n` EN/PL (`home.heroHook`, `stickyCtaMicro`, `joinWishlistMicro`, `ctaBandWishlistTitle`, `insideTitle`; `first1000.ctaLead` qualified) |
+| Auto-apply / delegated | Dashboard + job list **OK**; billing lead and persona logistics **overclaimed** → **fixed** 2026-06-04 (LOW) |
+| Calendar (O5) | Google/Microsoft **live**; Apple = ICS/WebCal + CalDAV roadmap — copy mostly **discloses**; `calendarAudienceLine` **MEDIUM** (unchanged) |
 | GDPR / L6 | Export **live**; self-service delete **not live** — privacy MVP page **discloses**; no “delete account” button |
 | KYC | Page exists; **not live** for delegated apply — readiness card **OK** |
 | S2 / launch gates | Unchanged — **no** copy audit may mark S2 PASS or public GO |
 
-**Fixes shipped (copy-only):** `billingPageLead` (EN/PL), `persona-pages.ts` logistics (EN).  
-**Documented, not edited (severity):** homepage lifetime strings, `first-1000` “zero fees forever”, vacation storyboard autopilot tone.
+**Fixes shipped (copy-only):** `billingPageLead` (EN/PL), `persona-pages.ts` logistics (EN); **2026-06-04 follow-up:** homepage + `first1000.ctaLead` founding qualifiers (EN/PL).  
+**Remaining (severity):** `calendarAudienceLine` Apple parity; marketing compare pages spot-check; legal sign-off on founding campaign wording.
 
 ---
 
@@ -29,14 +29,14 @@
 
 | Surface / file | Claim / copy | Risk | Current reality | Action | Severity |
 | -------------- | ------------ | ---- | --------------- | ------ | -------- |
-| `frontend/src/lib/i18n.ts` · `home.heroHook` | “Founding wishlist locks **lifetime Pro** for the first 1,000” | Implies guaranteed lifetime paid tier | Founding = wishlist cap + campaign; Terms govern; not lifetime $0 unless in signed Terms (`waitlist-narrative` disclaims) | **revise** — soften to “founding early access” + link Terms | **BLOCKER** (public launch) |
-| `i18n` · `home.stickyCtaMicro` | “**Lifetime Pro** · email only” | Same | Same | **revise** | **BLOCKER** |
-| `i18n` · `home.joinWishlistMicro` | “lifetime Pro & **Enterprise** · no card” | Same + enterprise SKU | Stripe/recruiter SKUs separate; founding ≠ Enterprise contract | **revise** | **HIGH** |
-| `i18n` · `home.ctaBandWishlistTitle` | “**Lock lifetime** Pro & Enterprise” | Urgency + lifetime | Same | **revise** | **BLOCKER** |
-| `i18n` · `home.insideTitle` | “Your pipeline works **while you sleep**” | Implies nightly auto-apply live | Nightly beat **OFF** on prod; autonomous paths **gated/paused** | **disclose** — “when automation is enabled” or storyboard qualifier | **MEDIUM** |
+| `frontend/src/lib/i18n.ts` · `home.heroHook` | ~~“locks **lifetime Pro**”~~ → founding early access + Terms/`/first-1000` | Was guaranteed lifetime paid tier | Founding = wishlist cap + campaign; Terms govern | **fixed** 2026-06-04 | **LOW** (legal spot-check) |
+| `i18n` · `home.stickyCtaMicro` | ~~“**Lifetime Pro**”~~ → founding early access · Terms apply | Same | Same | **fixed** 2026-06-04 | **LOW** |
+| `i18n` · `home.joinWishlistMicro` | ~~“lifetime Pro & Enterprise”~~ → founding cohort benefits | Same + enterprise SKU | Stripe/recruiter SKUs separate | **fixed** 2026-06-04 | **LOW** |
+| `i18n` · `home.ctaBandWishlistTitle` | ~~“**Lock lifetime** Pro & Enterprise”~~ → reserve founding early access | Urgency + lifetime | Same | **fixed** 2026-06-04 | **LOW** |
+| `i18n` · `home.insideTitle` | ~~works while you sleep~~ → **can** work when automation enabled | Implied nightly auto-apply live | Nightly beat **OFF** on prod | **fixed** 2026-06-04 | **LOW** |
 | `i18n` · `home.vacationScene*` | Sarah offline; TWIN queues interviews | Storyboard autopilot | Demo narrative; disclaimer on scene 3 **OK** | **OK** (with disclaimer) | **LOW** |
 | `i18n` · `home.howStep4Line` / `feature6Line` | Auto-apply rolls out in **phases** | Accurate if read literally | Prod **PAUSED** | **OK** | **LOW** |
-| `i18n` · `first1000.ctaLead` | “**zero fees forever** if you land under the cap” | Strong lifetime $0 | `first1000.footerLegal` mitigates on same page | **revise** on homepage parity or **disclose** inline | **HIGH** |
+| `i18n` · `first1000.ctaLead` | ~~“**zero fees forever**”~~ → founding cohort benefits + not lifetime paid Pro guarantee | Strong lifetime $0 | `first1000.footerLegal` on same page | **fixed** 2026-06-04 | **LOW** |
 | `frontend/src/lib/waitlist-messages.ts` + `waitlist-narrative.ts` | Founding 1,000, auto-apply FAQ, fair-use | Mostly conservative | Matches pilot stance; lifetime FAQ **disclaims** | **OK** | **LOW** |
 | `i18n` · `billingPageLead` (was) | “**Auto-apply runs on every plan by default**” | States live autopilot | Prod **PAUSED**; prepare package only; delegated **NOT LIVE** | **revise** — **fixed** 2026-06-04 | **HIGH** |
 | `frontend/src/lib/persona-pages.ts` · logistics | “**Autonomous applying runs** on supported boards with Premium or Pro” | Live autonomous apply | **NOT LIVE** / nightly **OFF** | **revise** — **fixed** 2026-06-04 | **HIGH** |
@@ -63,7 +63,7 @@
 ### Homepage & founding (`/`, `/first-1000`, `/waitlist`)
 
 - **Strengths:** Phased autopilot language (`howStep4`, `feature6`, `focusFootnote`); vacation disclaimer.
-- **Gaps:** Hero and sticky CTAs use **lifetime Pro** without the `first1000.footerLegal` / `waitlist-narrative` disclaimer on the same viewport — **public launch BLOCKER** until legal/marketing align strings with Terms.
+- **2026-06-04 fix:** Hero, sticky, CTA band, and `joinWishlistMicro` now use founding early-access + Terms/fair-use qualifiers (EN/PL), aligned with `/first-1000` `footerLegal` tone. Legal/marketing spot-check still advised before uncontrolled public launch.
 
 ### Dashboard & auto-apply (`/dashboard`, `/dashboard/settings/auto-apply`)
 
@@ -91,6 +91,7 @@
 | ---- | ------ |
 | `frontend/src/lib/i18n.ts` | `billingPageLead` EN + PL — auto-apply **phased/paused on production**; prepare-only default |
 | `frontend/src/lib/persona-pages.ts` | EN logistics — autonomous apply **phased**, not “runs” today |
+| `frontend/src/lib/i18n.ts` | **2026-06-04:** `home.heroHook`, `stickyCtaMicro`, `joinWishlistMicro`, `ctaBandWishlistTitle`/`Micro`, `insideTitle`, `first1000.ctaLead` — EN + PL founding qualifiers (no unconditional lifetime Pro) |
 
 ---
 

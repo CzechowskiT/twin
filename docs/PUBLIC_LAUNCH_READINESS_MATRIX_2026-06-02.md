@@ -156,7 +156,7 @@
 | P6 founder authenticated smoke | 8/8 routes + safety copy 2026-05-29 | ✅ PASS |
 | Dashboard layout / forecast | Founder-confirmed post-fix | ✅ PASS |
 | Verified-readiness card | S11 prod smoke | ✅ PASS |
-| No delegated/KYC live copy | Founder evidence doc; **copy audit 2026-06-04** — dashboard/verified-readiness **OK**; homepage **lifetime Pro** strings remain **BLOCKER** for public launch (see claims audit) | ⚠️ **partial** — pilot OK; public marketing revise pending |
+| No delegated/KYC live copy | Founder evidence doc; **copy audit 2026-06-04** — dashboard/verified-readiness **OK**; homepage founding **lifetime Pro BLOCKER reduced** (qualified `i18n` EN/PL); public launch still **NO-GO** (S2/ops) | ⚠️ **partial** — pilot OK; legal spot-check + remaining MEDIUM copy |
 | Frontend guards | `test:verified-readiness-guard`, `test:dashboard-ux-safety` | ✅ PASS |
 | Marketing logo marquee (`/` home) | Console clean; **`MARQUEE_BRAND_LOGO_MAP`**; colored SI when live; **`SI_CDN_UNAVAILABLE_SLUGS`** + jsDelivr + `/logos/marquee/`; **`SafeCompanyLogo`** no broken `<img>`; every slot logo or initials; **post-deploy** founder `/` smoke | ⚠️ **FIX SHIPPED** — verify after deploy |
 | `eslint` / `tsc` / `build` | Local 2026-06-02 — all green | ✅ PASS |
@@ -272,8 +272,8 @@
 ## Copy & claims audit (2026-06-04)
 
 - **Doc:** `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md`
-- **Verdict:** Public launch marketing still **NO-GO** on founding “lifetime Pro” hero/sticky CTAs; dashboard auto-apply/delegated copy **aligned**; billing + persona logistics **revised** (paused/phased).
-- **BLOCKER rows (marketing):** `home.heroHook`, `stickyCtaMicro`, `ctaBandWishlistTitle` — revise before uncontrolled launch.
+- **Verdict:** Public launch still **NO-GO** (S2 burn-in, ops gates — not copy alone). Founding “lifetime Pro” hero/sticky/CTA band **revised** 2026-06-04; dashboard auto-apply/delegated copy **aligned**; billing + persona logistics **revised** (paused/phased).
+- **Marketing copy:** `home.heroHook`, `stickyCtaMicro`, `ctaBandWishlistTitle`, `joinWishlistMicro`, `insideTitle`, `first1000.ctaLead` — **fixed** EN/PL; **MEDIUM** remains (`calendarAudienceLine`, compare pages).
 - **Waivers unchanged:** L6 manual DSR · O5 Apple/iCal partial — signed `2026-06-03T13:19:53Z`.
 
 ---
