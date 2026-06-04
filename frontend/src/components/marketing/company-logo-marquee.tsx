@@ -7,11 +7,8 @@ import { SafeCompanyLogo } from "@/components/marketing/safe-company-logo";
 import type { TranslationKey } from "@/lib/i18n";
 import { brandLogoUrls, type Brand } from "@/lib/brand-logo-urls";
 
-/**
- * Fortune 500–heavy mix. Each row has a working SI slug when possible + raster fallbacks.
- * (Simple Icons: https://simpleicons.org/ — CDN: cdn.simpleicons.org)
- */
-const BRANDS: Brand[] = [
+/** Fortune 500–heavy mix; domain keys map to verified SI slugs in `MARQUEE_BRAND_LOGO_MAP`. */
+const MARQUEE_BRAND_ENTRIES: Brand[] = [
   { slug: "apple", name: "Apple", domain: "apple.com" },
   { slug: "microsoft", name: "Microsoft", domain: "microsoft.com" },
   { slug: "google", name: "Google", domain: "google.com" },
@@ -102,6 +99,12 @@ const BRANDS: Brand[] = [
   { slug: "abbvie", name: "AbbVie", domain: "abbvie.com" },
   { slug: "moderna", name: "Moderna", domain: "modernatx.com" },
 ];
+
+/** Logos-first order so the visible marquee loop leads with SI marks, not finance initials. */
+const BRANDS: Brand[] = [...MARQUEE_BRAND_ENTRIES].sort((a, b) => {
+  const score = (brand: Brand) => (brandLogoUrls(brand).length > 0 ? 1 : 0);
+  return score(b) - score(a);
+});
 
 /** Two identical strips; CSS animates -50% for a gapless loop. */
 const MARQUEE_SEGMENTS = 2;

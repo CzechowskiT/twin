@@ -12,7 +12,10 @@ import {
   companyInitials,
   FAVICON_INITIALS_ONLY_DOMAINS,
   isStableMarqueeSiSlug,
+  MARQUEE_BRAND_LOGO_MAP,
   MARQUEE_STABLE_SI_SLUGS,
+  MARQUEE_VERIFIED_SI_SLUGS,
+  resolveMarqueeLogoSlugs,
   shouldUseInitialsOnlyLogo,
   type Brand,
 } from "../src/lib/brand-logo-urls";
@@ -26,6 +29,18 @@ function assertNoRasterFaviconUrls(urls: readonly string[], label: string) {
   for (const url of urls) {
     assert.doesNotMatch(url, RASTER_FAVICON_RE, `${label}: ${url}`);
   }
+}
+
+function parseMarqueeBrands(): Array<{ slug: string; name: string; domain: string }> {
+  const marquee = readFileSync(
+    join(root, "src/components/marketing/company-logo-marquee.tsx"),
+    "utf8",
+  );
+  return [
+    ...marquee.matchAll(
+      /\{\s*slug:\s*"([^"]+)"[^}]*name:\s*"([^"]+)"[^}]*domain:\s*"([^"]+)"/g,
+    ),
+  ].map(([, slug, name, domain]) => ({ slug, name, domain }));
 }
 
 function testCompanyInitials() {
@@ -49,43 +64,35 @@ function testAdvanceLogoFallbackStep() {
 
 function testBrandLogoUrlsOrder() {
   const brand: Brand = {
-    slug: "chase",
+    slug: "jpmorgan",
     name: "JPMorgan Chase",
     domain: "jpmorganchase.com",
     extraUrls: ["https://example.com/custom.ico"],
   };
   const urls = brandLogoUrls(brand);
   assert.ok(urls[0]?.includes("example.com/custom"));
-  assert.ok(urls.some((u) => u.includes("cdn.simpleicons.org/chase")));
-  assert.ok(urls.some((u) => u.includes("cdn.jsdelivr.net/npm/simple-icons@")));
+  assert.ok(urls.some((u) => u.includes("cdn.simpleicons.org/chase/000000")));
+  assert.ok(urls.some((u) => u.includes("cdn.jsdelivr.net/npm/simple-icons@11.14.0/icons/chase")));
   assertNoRasterFaviconUrls(urls, "chase");
   assert.equal(new Set(urls).size, urls.length);
 }
 
-const MIN_MARQUEE_STABLE_LOGO_BRANDS = 30;
+const MIN_MARQUEE_STABLE_LOGO_BRANDS = 40;
 
 function assertSiCdnUrlsOnly(urls: readonly string[], label: string) {
   for (const url of urls) {
     assert.match(
       url,
-      /^https:\/\/(cdn\.jsdelivr\.net\/npm\/simple-icons@|cdn\.simpleicons\.org\/)/,
+      /^https:\/\/(cdn\.jsdelivr\.net\/npm\/simple-icons@11\.14\.0\/icons\/|cdn\.simpleicons\.org\/)/,
       `${label}: ${url}`,
     );
   }
 }
 
 function testMarqueeStableLogoCoverage() {
-  const marquee = readFileSync(
-    join(root, "src/components/marketing/company-logo-marquee.tsx"),
-    "utf8",
-  );
-  const blocks = [
-    ...marquee.matchAll(
-      /\{\s*slug:\s*"([^"]+)"[^}]*name:\s*"([^"]+)"[^}]*domain:\s*"([^"]+)"/g,
-    ),
-  ];
+  const blocks = parseMarqueeBrands();
   let withStableUrls = 0;
-  for (const [, slug, name, domain] of blocks) {
+  for (const { slug, name, domain } of blocks) {
     const urls = brandLogoUrls({ slug, name, domain });
     if (urls.length > 0) {
       withStableUrls += 1;
@@ -96,6 +103,69 @@ function testMarqueeStableLogoCoverage() {
     withStableUrls >= MIN_MARQUEE_STABLE_LOGO_BRANDS,
     `expected >= ${MIN_MARQUEE_STABLE_LOGO_BRANDS} marquee brands with SI URLs, got ${withStableUrls}`,
   );
+}
+
+function testMarqueeBrandLogoMapKeys() {
+  const blocks = parseMarqueeBrands();
+  for (const { slug, name, domain } of blocks) {
+    const mapped = MARQUEE_BRAND_LOGO_MAP[domain];
+    const resolved = resolveMarqueeLogoSlugs({ slug, name, domain });
+    if (mapped) {
+      assert.ok(
+        isStableMarqueeSiSlug(mapped),
+        `map target must be verified: ${domain} -> ${mapped}`,
+      );
+      assert.ok(
+        resolved.includes(mapped),
+        `resolve must include map slug for ${domain}`,
+      );
+    }
+  }
+}
+
+function testVerifiedFixtureMatchesAllowlist() {
+  for (const slug of MARQUEE_VERIFIED_SI_SLUGS) {
+    assert.ok(
+      isStableMarqueeSiSlug(slug),
+      `MARQUEE_VERIFIED_SI_SLUGS must ⊆ MARQUEE_STABLE_SI_SLUGS: ${slug}`,
+    );
+  }
+  for (const slug of Object.values(MARQUEE_BRAND_LOGO_MAP)) {
+    assert.ok(MARQUEE_VERIFIED_SI_SLUGS.includes(slug), `map slug in fixture: ${slug}`);
+  }
+}
+
+function testSmokeBrandsProduceUrlsWhenMapped() {
+  const smoke: Array<{ domain: string; slug: string; expectUrl: boolean }> = [
+    { domain: "americanexpress.com", slug: "americanexpress", expectUrl: true },
+    { domain: "mastercard.com", slug: "mastercard", expectUrl: true },
+    { domain: "intel.com", slug: "intel", expectUrl: true },
+    { domain: "toyota.com", slug: "toyota", expectUrl: true },
+    { domain: "bmw.com", slug: "bmw", expectUrl: true },
+    { domain: "volkswagen.com", slug: "volkswagen", expectUrl: true },
+    { domain: "shell.com", slug: "shell", expectUrl: true },
+    { domain: "tesla.com", slug: "tesla", expectUrl: true },
+    { domain: "adidas.com", slug: "adidas", expectUrl: true },
+    { domain: "ups.com", slug: "ups", expectUrl: true },
+    { domain: "fedex.com", slug: "fedex", expectUrl: true },
+    { domain: "target.com", slug: "target", expectUrl: true },
+    { domain: "coca-cola.com", slug: "cocacola", expectUrl: true },
+    { domain: "pfizer.com", slug: "pfizer", expectUrl: false },
+    { domain: "pepsi.com", slug: "pepsi", expectUrl: false },
+  ];
+  for (const { domain, slug, expectUrl } of smoke) {
+    const urls = brandLogoUrls({ slug, name: slug, domain });
+    if (expectUrl) {
+      assert.ok(urls.length > 0, `smoke brand should have URLs: ${domain}`);
+      assertSiCdnUrlsOnly(urls, domain);
+      assert.ok(
+        urls.some((u) => u.includes("/000000")),
+        `dark SI fallback for white plate: ${domain}`,
+      );
+    } else {
+      assert.equal(urls.length, 0, `no SI at 11.14.0: ${domain}`);
+    }
+  }
 }
 
 function testWellsFargoUsesStableSiWhenPresent() {
@@ -114,7 +184,7 @@ function testAllowlistedStableGetsSiOnly() {
   const urls = brandLogoUrls(brand);
   assert.ok(urls.length > 0);
   assert.ok(isStableMarqueeSiSlug("apple"));
-  assert.ok(urls.some((u) => u.includes("cdn.simpleicons.org/apple")));
+  assert.ok(urls.some((u) => u.includes("cdn.simpleicons.org/apple/000000")));
   assert.ok(urls.some((u) => u.includes("cdn.jsdelivr.net")));
   assertNoRasterFaviconUrls(urls, "apple");
 }
@@ -161,7 +231,10 @@ function testPhantomSlugsNotInStableAllowlist() {
     "deere",
     "ge",
     "jnj",
-    "unitedhealthgroup",
+    "morganstanley",
+    "pepsi",
+    "pfizer",
+    "lowes",
     "unitedparcelsservice",
   ]) {
     assert.ok(
@@ -200,16 +273,8 @@ function testNoBannedLogoUrlPatterns() {
 }
 
 function testAllMarqueeBrandsHaveNonEmptyInitials() {
-  const marquee = readFileSync(
-    join(root, "src/components/marketing/company-logo-marquee.tsx"),
-    "utf8",
-  );
-  const blocks = [
-    ...marquee.matchAll(
-      /\{\s*slug:\s*"([^"]+)"[^}]*name:\s*"([^"]+)"[^}]*domain:\s*"([^"]+)"/g,
-    ),
-  ];
-  for (const [, , name] of blocks) {
+  const blocks = parseMarqueeBrands();
+  for (const { name } of blocks) {
     const initials = companyInitials(name);
     assert.ok(initials.length > 0, `initials for ${name}`);
     assert.notEqual(initials, "?", `meaningful initials for ${name}`);
@@ -234,20 +299,21 @@ function testMarqueeUsesSafeLogoNotNextImage() {
 }
 
 function testAllMarqueeBrandsAvoidRasterUrls() {
+  const blocks = parseMarqueeBrands();
+  assert.ok(blocks.length >= 80, "expected Fortune-500 marquee brands");
+  for (const { slug, name, domain } of blocks) {
+    const urls = brandLogoUrls({ slug, name, domain });
+    assertNoRasterFaviconUrls(urls, `${slug}/${domain}`);
+  }
+}
+
+function testMarqueeSortsLogosFirst() {
   const marquee = readFileSync(
     join(root, "src/components/marketing/company-logo-marquee.tsx"),
     "utf8",
   );
-  const blocks = [
-    ...marquee.matchAll(
-      /\{\s*slug:\s*"([^"]+)"[^}]*name:\s*"([^"]+)"[^}]*domain:\s*"([^"]+)"/g,
-    ),
-  ];
-  assert.ok(blocks.length >= 80, "expected Fortune-500 marquee brands");
-  for (const [, slug, name, domain] of blocks) {
-    const urls = brandLogoUrls({ slug, name, domain });
-    assertNoRasterFaviconUrls(urls, `${slug}/${domain}`);
-  }
+  assert.match(marquee, /MARQUEE_BRAND_ENTRIES/);
+  assert.match(marquee, /score\(b\) - score\(a\)/);
 }
 
 function main() {
@@ -267,6 +333,10 @@ function main() {
   testMarqueeStableLogoCoverage();
   testWellsFargoUsesStableSiWhenPresent();
   testPhantomSlugsNotInStableAllowlist();
+  testMarqueeBrandLogoMapKeys();
+  testVerifiedFixtureMatchesAllowlist();
+  testSmokeBrandsProduceUrlsWhenMapped();
+  testMarqueeSortsLogosFirst();
   console.log("safe-company-logo.test.ts: OK");
 }
 

@@ -12,8 +12,79 @@ export type Brand = {
 /** Pinned release — `@16` path 404s on jsDelivr and broke the second fallback for most marks. */
 const SIMPLE_ICONS_JSdelivr = "11.14.0";
 
+/**
+ * Marquee stable key (domain) → verified Simple Icons slug at `simple-icons@11.14.0`.
+ * Checked before `brand.slug` so marquee rows can keep readable slugs (e.g. `citi`) while
+ * only verified slugs hit the CDN.
+ */
+export const MARQUEE_BRAND_LOGO_MAP: Record<string, string> = {
+  "aa.com": "americanairlines",
+  "abbvie.com": "abbvie",
+  "accenture.com": "accenture",
+  "adidas.com": "adidas",
+  "adobe.com": "adobe",
+  "amazon.com": "amazon",
+  "americanexpress.com": "americanexpress",
+  "amd.com": "amd",
+  "apple.com": "apple",
+  "att.com": "atandt",
+  "bankofamerica.com": "bankofamerica",
+  "bmw.com": "bmw",
+  "boeing.com": "boeing",
+  "broadcom.com": "broadcom",
+  "caterpillar.com": "caterpillar",
+  "cisco.com": "cisco",
+  "coca-cola.com": "cocacola",
+  "deere.com": "johndeere",
+  "delta.com": "delta",
+  "fedex.com": "fedex",
+  "ford.com": "ford",
+  "ge.com": "generalelectric",
+  "gm.com": "generalmotors",
+  "goldmansachs.com": "goldmansachs",
+  "google.com": "google",
+  "honda.com": "honda",
+  "ibm.com": "ibm",
+  "intel.com": "intel",
+  "intuit.com": "intuit",
+  "jpmorganchase.com": "chase",
+  "mastercard.com": "mastercard",
+  "mcdonalds.com": "mcdonalds",
+  "mercedes-benz.com": "mercedes",
+  "meta.com": "meta",
+  "microsoft.com": "microsoft",
+  "netflix.com": "netflix",
+  "nike.com": "nike",
+  "nvidia.com": "nvidia",
+  "oracle.com": "oracle",
+  "paypal.com": "paypal",
+  "salesforce.com": "salesforce",
+  "samsung.com": "samsung",
+  "shell.com": "shell",
+  "siemens.com": "siemens",
+  "starbucks.com": "starbucks",
+  "target.com": "target",
+  "tesla.com": "tesla",
+  "t-mobile.com": "tmobile",
+  "toyota.com": "toyota",
+  "uber.com": "uber",
+  "unilever.com": "unilever",
+  "united.com": "unitedairlines",
+  "ups.com": "ups",
+  "verizon.com": "verizon",
+  "visa.com": "visa",
+  "volkswagen.com": "volkswagen",
+  "walmart.com": "walmart",
+  "wellsfargo.com": "wellsfargo",
+};
+
 export function siUrl(slug: string) {
   return `https://cdn.simpleicons.org/${slug}`;
+}
+
+/** Dark mark on white marquee plates — `cdn.simpleicons.org/{slug}/{hex}` per SI CDN docs. */
+export function siUrlOnWhite(slug: string) {
+  return `https://cdn.simpleicons.org/${slug}/000000`;
 }
 
 export function jsdelivrSiUrl(slug: string) {
@@ -102,8 +173,30 @@ export const MARQUEE_STABLE_SI_SLUGS = new Set([
   "wellsfargo",
 ]);
 
+/** Fixture: slugs in `MARQUEE_BRAND_LOGO_MAP` values plus `MARQUEE_STABLE_SI_SLUGS` (tests). */
+export const MARQUEE_VERIFIED_SI_SLUGS = [
+  ...new Set([
+    ...Object.values(MARQUEE_BRAND_LOGO_MAP),
+    ...MARQUEE_STABLE_SI_SLUGS,
+  ]),
+].sort();
+
 export function isStableMarqueeSiSlug(slug: string): boolean {
   return MARQUEE_STABLE_SI_SLUGS.has(slug.trim().toLowerCase());
+}
+
+/** Resolved SI slugs for a marquee brand — explicit domain map first, then slug / altSlugs. */
+export function resolveMarqueeLogoSlugs(brand: Brand): string[] {
+  const domain = brand.domain.trim().toLowerCase();
+  const mapped = MARQUEE_BRAND_LOGO_MAP[domain];
+  const candidates = [
+    ...(mapped ? [mapped] : []),
+    brand.slug,
+    ...(brand.altSlugs ?? []),
+  ];
+  return [...new Set(candidates.map((s) => s.trim().toLowerCase()))].filter(
+    isStableMarqueeSiSlug,
+  );
 }
 
 /** SI vectors and verified `extraUrls` only — no Google/gstatic or DuckDuckGo raster. */
@@ -111,13 +204,16 @@ export function brandLogoUrls(brand: Brand): string[] {
   if (shouldUseInitialsOnlyLogo(brand.domain)) {
     return [];
   }
-  const slugs = [...new Set([brand.slug, ...(brand.altSlugs ?? [])])];
-  const stableSlugs = slugs.filter(isStableMarqueeSiSlug);
+  const stableSlugs = resolveMarqueeLogoSlugs(brand);
   const custom = brand.extraUrls ?? [];
   if (stableSlugs.length === 0 && custom.length === 0) {
     return [];
   }
-  const vector = stableSlugs.flatMap((slug) => [jsdelivrSiUrl(slug), siUrl(slug)]);
+  // jsDelivr ships brand-colored SVGs; SI CDN `/000000` fallback for light marks on white plates.
+  const vector = stableSlugs.flatMap((slug) => [
+    jsdelivrSiUrl(slug),
+    siUrlOnWhite(slug),
+  ]);
   return [...custom, ...vector];
 }
 
