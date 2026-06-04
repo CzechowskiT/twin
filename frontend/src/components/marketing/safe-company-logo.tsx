@@ -21,8 +21,8 @@ const INITIALS_CLASS =
 /**
  * External company marks without Next.js image optimizer — avoids noisy
  * `/_next/image` 400/404/502 when favicon CDNs fail. Initials only when every
- * URL fails (or none configured); do not gate logo opacity on `onLoad` — cross-
- * origin SVG often never fires load in production while still painting.
+ * URL fails (or none configured). On `onError`, unmount the broken `<img>`
+ * immediately so the browser never shows the torn-photo glyph.
  */
 export function SafeCompanyLogo({
   name,
@@ -33,8 +33,10 @@ export function SafeCompanyLogo({
 }: SafeCompanyLogoProps) {
   const [step, setStep] = useState(0);
   const [exhausted, setExhausted] = useState(urls.length === 0);
+  const [errorAtStep, setErrorAtStep] = useState(-1);
 
   const onError = useCallback(() => {
+    setErrorAtStep(step);
     const next = advanceLogoFallbackStep(step, urls.length);
     if (next === null) {
       setExhausted(true);
@@ -45,7 +47,9 @@ export function SafeCompanyLogo({
 
   const initials = companyInitials(name);
   const src = exhausted ? undefined : urls[step];
-  const showInitials = !src;
+  const imgBroken = errorAtStep === step;
+  const showImg = Boolean(src) && !imgBroken;
+  const showInitials = !showImg;
 
   return (
     <span
@@ -57,9 +61,10 @@ export function SafeCompanyLogo({
       >
         {initials}
       </span>
-      {src ? (
+      {showImg && src ? (
         // eslint-disable-next-line @next/next/no-img-element -- external favicons; skip /_next/image proxy
         <img
+          key={src}
           src={src}
           alt=""
           width={96}

@@ -81,6 +81,8 @@ CSP must remain **Report-Only** — console shows violations as warnings, pages 
 
 **Follow-up (founder post-472a6d3):** Logos visible (Visa, Mastercard, Chase, BofA, Goldman, Target, Coca-Cola, McDonald's, Starbucks, Nike, …) but **all monochrome black** on white plates. **Root cause:** self-hosted `/logos/marquee/*.svg` (single-path black) loaded first + `siUrlOnWhite` (`cdn.simpleicons.org/{slug}/000000`). **Fix (non-CSP):** `brandLogoUrls` → `cdn.simpleicons.org/{slug}` (official brand hex) first, then pinned jsDelivr; removed `/000000` and black-only local first hop. **Post-deploy:** hard refresh `/` → colored marks (e.g. Starbucks green, Mastercard red, Shell yellow). **S2: CONTINUE.** **S2 PASS: NO.** **Public launch: NO-GO.**
 
+**Follow-up (founder screenshot 2026-06-04, 5th plate):** Colored BofA/GS/WF/AmEx then **browser broken-image glyph** (Walmart — `cdn.simpleicons.org/walmart` **404**). **Fix (non-CSP):** `SI_CDN_UNAVAILABLE_SLUGS` skips dead SI CDN hops; `slugVectorUrls` adds jsDelivr + `/logos/marquee/{slug}.svg` local fallback; `SafeCompanyLogo` unmounts `<img>` on `onError` (`imgBroken`) so initials show until next URL — **never** torn-photo icon. **Post-deploy:** hard refresh `/` → Walmart + all mapped marquee slots show colored logo or initials. **S2: CONTINUE.** **S2 PASS: NO.**
+
 ## Safari (desktop) — founder PASS 2026-06-04
 
 **Checkpoint UTC:** `2026-06-04T08:47:35Z`
