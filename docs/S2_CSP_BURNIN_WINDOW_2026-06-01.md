@@ -366,6 +366,27 @@ From `GET /api/public-health` (via FE alias), captured at burn-in restart (`2026
 
 **Next founder cadence (UTC):** Railway `csp_report` triage `2026-06-04T14:18:33Z` (~48h after start) · window end rollup `2026-06-05T14:18:33Z` · enforce decision **HOLD** until full 72h evidence pack + founder sign-off (`docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md`).
 
+## Founder Railway cadence checkpoint (~48h) (2026-06-04)
+
+**Checkpoint UTC:** `2026-06-04T10:34:36Z` (~44h 16m after burn-in start `2026-06-02T14:18:33Z`; **~27h 44m** remaining until `2026-06-05T14:18:33Z`; **~61%** elapsed)
+
+**Source:** Founder Railway UI — service `production/twin` → **Logs** → search `csp_report` (time filter from `2026-06-02T14:18:33Z`)
+
+| Field | Founder entry |
+| --- | --- |
+| Type | founder Railway UI — **cadence** (~48h; distinct from combined DevTools row `08:47:35Z` and logo smoke `10:29:29Z`) |
+| Search | `csp_report` |
+| Fresh entries after window start | **No** — brak świeżych wpisów od `2026-06-02T14:18:33Z` |
+| New `blocked-uri` hosts (post-restart) | **none** |
+| Enforce header | **Absent** (unchanged) |
+| Logo smoke (`10:29:29Z`) | **PASS** (unchanged; non-CSP) |
+| Decision | **CONTINUE** 72h burn-in — report-only HOLD |
+| S2 status | **NOT READY** |
+| S2 PASS | **NO** |
+| Public launch | **NO-GO** |
+
+**Next founder cadence (UTC):** Window end rollup `2026-06-05T14:18:33Z` · enforce decision **HOLD** until full 72h evidence pack + founder sign-off.
+
 ## Gate closure session note (2026-06-03)
 
 **Session UTC:** `2026-06-03T13:19:53Z` (~23h 1m elapsed; **~32%** of 72h window)

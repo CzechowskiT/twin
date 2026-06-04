@@ -3,7 +3,7 @@
 **Auditor:** TWIN Release Gate Owner (read-only shift)
 **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01`
 **Branch HEAD:** `9011040` (prior) → updated by 2026-06-03 shift commits
-**Audit UTC:** `2026-06-04T10:29:29Z` (~44h 11m / **~61%** into burn-in; **~27h 49m** until `2026-06-05T14:18:33Z`; L6 + O5 founder waivers signed `2026-06-03T13:19:53Z`; Safari/Firefox DevTools PASS `2026-06-04T08:47:35Z`; **final logo smoke PASS** `2026-06-04T10:29:29Z` after deploy chain `472a6d3` → `bcd23cd` → `4a7c57d`)
+**Audit UTC:** `2026-06-04T10:34:36Z` (~44h 16m / **~61%** into burn-in; **~27h 44m** until `2026-06-05T14:18:33Z`; L6 + O5 founder waivers signed `2026-06-03T13:19:53Z`; Safari/Firefox DevTools PASS `2026-06-04T08:47:35Z`; **final logo smoke PASS** `2026-06-04T10:29:29Z`; **Railway ~48h cadence clean** `2026-06-04T10:34:36Z` after deploy chain `472a6d3` → `bcd23cd` → `4a7c57d`)
 **Production (unchanged by this audit):** FE `https://twin-sooty.vercel.app` · API `https://twin-production-bcd9.up.railway.app`
 
 **Verdict:** **Public launch NO-GO** · **Pilot / investor demo GO** · **S2 NOT READY** · **Auto-apply PAUSED** (operational + product gates)
@@ -17,7 +17,7 @@
 | S1 CSP report-only + `report-uri` wired | 8-route `curl -sI` 2026-06-02 — all HTTP 200, `content-security-policy-report-only` present, `report-uri /api/v1/csp-report` | ✅ PASS |
 | CSP enforce header absent | No `content-security-policy:` (enforce) on `/`, `/dashboard`, `/login/candidate`, `/register/candidate`, `/demo`, `/status`, `/dashboard/calendar`, `/api/public-health` | ✅ (expected) |
 | Narrowed policy on prod | Explicit `connect-src` includes `https://twin-production-bcd9.up.railway.app`; no broad `https:` wildcards | ✅ LIVE |
-| S2 72h burn-in | Window `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; founder `2026-06-04T08:47:35Z` — Railway `csp_report` **no fresh entries** since start; Chrome/Safari/Firefox DevTools core routes **no CSP violations** | ❌ **NOT READY** — IN PROGRESS (~59% elapsed) |
+| S2 72h burn-in | Window `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; founder Railway cadence `2026-06-04T10:34:36Z` — `csp_report` **no fresh entries** since start; Chrome/Safari/Firefox DevTools **no CSP violations** (`08:47:35Z`) | ❌ **NOT READY** — IN PROGRESS (~61% elapsed) |
 | S2 violation triage pack | Railway clean + Chrome (`13:29:36Z`) + Safari + Firefox (`08:47:35Z`) DevTools **PASS**; full 72h rollup + founder enforce sign-off at window end still required | ⚠️ **IN PROGRESS** |
 | DevTools logo Console noise (`/_next/image` + favicon 404 / gstatic faviconV2) | PR **#24** (`18e6ce4`); fix chain through **`4a7c57d`**; founder **final logo smoke PASS** `2026-06-04T10:29:29Z` — colorful logos, readable initials, no white plates / broken-image icons, no red `/_next/image` / DDG / Google S2 / gstatic, **no CSP violations**; **not** S2 blocker | ✅ **PASS** (non-CSP); **S2 CONTINUE** |
 | S3–S4, S6–S10c mutation/upload limits | Gate checklist + repo tests | ✅ shipped (code) |
@@ -211,13 +211,13 @@
 
 ### Primary blockers (ordered)
 
-1. **S2** — Complete 72h CSP report-only burn-in (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`); founder Railway **clean through `2026-06-04T08:47:35Z`**; Chrome/Safari/Firefox DevTools **PASS**; **final logo smoke PASS** `2026-06-04T10:29:29Z`; remaining: full window rollup, founder enforce sign-off (**HOLD** vs enforce) at window end, optional mobile DevTools.
+1. **S2** — Complete 72h CSP report-only burn-in (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`); founder Railway **clean through `2026-06-04T10:34:36Z`** (~48h cadence); Chrome/Safari/Firefox DevTools **PASS**; **final logo smoke PASS** `2026-06-04T10:29:29Z`; remaining: full window rollup, founder enforce sign-off (**HOLD** vs enforce) at window end, optional mobile DevTools.
 2. **GAP-04** — `AUTO_APPLY_SUBMIT` unset on prod (optional ops knob; document waiver or close before public launch if policy requires).
 3. **L6 / O5 (full public launch only)** — Waivers signed `2026-06-03T13:19:53Z` for controlled pilot; **not** substitutes for uncontrolled public launch (self-service delete; Apple/iCal verification for broad marketing).
 
 ### Risks (accepted for pilot, not public)
 
-- **Marketing logo marquee:** Pre-fix noise was **non-CSP**; deploy chain **`472a6d3` → `bcd23cd` → `4a7c57d`**; founder **final smoke PASS** `2026-06-04T10:29:29Z` (colorful logos, initials where needed, no white plates / broken images, Console clean). Safari/Firefox **`08:47:35Z`** **PASS** — **S2 burn-in unchanged** (CONTINUE, no clock reset). **Public launch: NO-GO.**
+- **Marketing logo marquee:** Pre-fix noise was **non-CSP**; deploy chain **`472a6d3` → `bcd23cd` → `4a7c57d`**; founder **final smoke PASS** `2026-06-04T10:29:29Z` (colorful logos, initials where needed, no white plates / broken images, Console clean). Safari/Firefox **`08:47:35Z`** **PASS**; Railway ~48h cadence **`10:34:36Z`** clean — **S2 burn-in unchanged** (CONTINUE, no clock reset). **Public launch: NO-GO.**
 - CSP `unsafe-inline` / `unsafe-eval` remain (separate hardening track).
 - Prod API SHA `6382a91` includes `e764e68`; nightly beat **disabled** in health (GAP-03 closed ops 2026-06-02). S2 burn-in **unchanged** — no clock reset.
 - Metric / corpus scale below “marketplace” narrative — honest pilot ceiling.

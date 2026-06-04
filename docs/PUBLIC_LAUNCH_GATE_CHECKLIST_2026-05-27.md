@@ -86,13 +86,13 @@ the gate to ✅.
 | One ⚠️ partial on L6 (data subject access)                              | Document a manual workflow (`docs/GDPR_MANUAL_DSR.md`) and proceed.                   |
 | Any ❌ on Pilot gates                                                    | Pilot, not public launch — pilot has its own gate set (cf. `PILOT_OFFER_FINAL.md`).   |
 
-## Current gate stance (checkpoint 2026-06-04 `10:29:29Z`, **O7 PASS**, **S2 burn-in in progress**, **L6 + O5 waivers signed**, **final logo smoke PASS**)
+## Current gate stance (checkpoint 2026-06-04 `10:34:36Z`, **O7 PASS**, **S2 burn-in in progress**, **L6 + O5 waivers signed**, **final logo smoke PASS**, **Railway ~48h cadence clean**)
 
-**Latest audit:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` (refreshed 2026-06-04 `10:29:29Z`)
+**Latest audit:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` (refreshed 2026-06-04 `10:34:36Z`)
 **Post-merge sanity (2026-06-02):** `docs/POST_MERGE_AUTO_APPLY_SANITY_2026-06-02.md` — PR #21 merged; prod `git_commit=6382a91` (includes `e764e68` hard gates **LIVE**); public-health OK; auto-apply **PAUSED** policy unchanged.
 **Logo smoke (2026-06-04):** Deploy chain `472a6d3` → `bcd23cd` → `4a7c57d` on prod alias; founder **final smoke PASS** `2026-06-04T10:29:29Z` — Chrome Incognito `/`: homepage **OK**; colorful brand logos + readable initials; **no** empty white plates or broken-image icons; **no** red `/_next/image` / DuckDuckGo / Google S2 / gstatic; **no CSP violations**; Safari + Firefox DevTools **`08:47:35Z`** — core routes + logo smoke **PASS**. **S2 CONTINUE** (no clock reset; CSP unchanged).
 
-- **S2 CSP enforce burn-in:** ❌ **NOT READY** — window **IN PROGRESS** (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; **~44h 11m elapsed / ~61%** at `10:29:29Z`). Founder checkpoints: Railway `csp_report` **no fresh entries** since start (`08:47:35Z`); Chrome/Safari/Firefox DevTools core routes **no CSP violations**; **final logo smoke PASS** (`10:29:29Z`); `/api/v1/jobs/saved` **422** non-CSP. Decision: **CONTINUE** (report-only **HOLD**). **S2 PASS: NO.** **Public launch: NO-GO.** Next Railway cadence `2026-06-04T14:18:33Z`; window end rollup `2026-06-05T14:18:33Z`; enforce **HOLD** until 72h pack + founder sign-off.
+- **S2 CSP enforce burn-in:** ❌ **NOT READY** — window **IN PROGRESS** (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; **~44h 16m elapsed / ~61%** at `10:34:36Z`). Founder checkpoints: Railway `csp_report` **no fresh entries** since start (`10:34:36Z` ~48h cadence; prior `08:47:35Z` combined); Chrome/Safari/Firefox DevTools core routes **no CSP violations**; **final logo smoke PASS** (`10:29:29Z`); `/api/v1/jobs/saved` **422** non-CSP. Decision: **CONTINUE** (report-only **HOLD**). **S2 PASS: NO.** **Public launch: NO-GO.** Next rollup window end `2026-06-05T14:18:33Z`; enforce **HOLD** until 72h pack + founder sign-off.
 - **L6 DSR:** ⚠️ **partial-with-waiver** — export **LIVE**; delete manual via `docs/GDPR_MANUAL_DSR.md`; founder waiver **signed** `2026-06-03T13:19:53Z` — acceptable for controlled pilot; self-service delete remains future work.
 - **O5 Calendar:** ⚠️ **partial-with-waiver** — Google **PASS** + Microsoft **LIVE**; Apple/iCal/WebCal/ICS partial; founder waiver **signed** `2026-06-03T13:19:53Z` — non-blocking for controlled pilot if copy does not overpromise Apple.
 
