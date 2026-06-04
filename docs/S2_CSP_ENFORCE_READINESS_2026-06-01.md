@@ -169,6 +169,23 @@ No DB/data side-effects from CSP changes.
 - **Public launch:** **NO-GO** — unchanged
 - **Controlled pilot / demo:** Unaffected by this audit (separate gates)
 
+## Founder checkpoint — multi-browser DevTools + Railway (2026-06-04)
+
+**Checkpoint UTC:** `2026-06-04T08:47:35Z` (~42h 29m into burn-in; **~59%** elapsed)
+
+| Check | Result |
+| ----- | ------ |
+| Safari DevTools (core S2 routes + `/` logo) | **PASS** — no CSP violations |
+| Firefox DevTools (core S2 routes + `/` logo) | **PASS** — no CSP violations |
+| Railway `csp_report` since `2026-06-02T14:18:33Z` | **No fresh entries** |
+| Chrome empty white logo plates | **Found** — non-CSP UX; **fixed** in repo (layered initials); post-deploy smoke required |
+| Enforce | **OFF** (unchanged) |
+| Decision | **CONTINUE** |
+| S2 PASS | **NO** |
+| Public launch | **NO-GO** |
+
+Full route tables: `docs/S2_CSP_DEVTOOLS_BURNIN_CHECKLIST_2026-06-01.md`.
+
 ## Hard bans honoured (this audit session)
 
 - ✅ No Vercel/Railway deploy or restart

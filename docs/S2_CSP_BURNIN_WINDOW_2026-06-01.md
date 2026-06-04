@@ -318,6 +318,28 @@ From `GET /api/public-health` (via FE alias), captured at burn-in restart (`2026
 
 **Next founder cadence (UTC):** Railway `csp_report` triage `2026-06-04T14:18:33Z` (~48h after start) · Safari + Firefox DevTools per checklist · window end `2026-06-05T14:18:33Z`.
 
+## Founder combined checkpoint — Safari + Firefox DevTools + Railway (2026-06-04)
+
+**Checkpoint UTC:** `2026-06-04T08:47:35Z` (~42h 29m after burn-in start `2026-06-02T14:18:33Z`; **~29h 31m** remaining until `2026-06-05T14:18:33Z`; **~59%** elapsed)
+
+**Source:** Founder Safari DevTools + Firefox DevTools + Railway `csp_report` triage on `https://twin-sooty.vercel.app`
+
+| Check | Result |
+| --- | --- |
+| Safari DevTools routes | `/`, `/login/candidate`, `/register/candidate`, `/dashboard`, `/dashboard/calendar`, `/demo`, `/status`, `/api/public-health` — **no CSP violations** |
+| Safari logo smoke (`/`) | No red favicon/`/_next/image` errors; initials OK |
+| Firefox DevTools routes | Same core routes — **no CSP violations** |
+| Firefox logo smoke (`/`) | No red favicon/`/_next/image` errors; initials OK |
+| Railway `csp_report` after window start | **No fresh entries** since `2026-06-02T14:18:33Z` (last seen `2026-06-02T14:18:33Z` boundary) |
+| Chrome empty white logo plates (founder `2026-06-04`) | **Found** — initials hidden during `opacity-0` image load; **fixed** in repo (`SafeCompanyLogo` layered initials); **post-deploy smoke required** |
+| Enforce header | **Absent** (unchanged) |
+| Decision | **CONTINUE** 72h burn-in — report-only HOLD |
+| S2 status | **NOT READY** |
+| S2 PASS | **NO** |
+| Public launch | **NO-GO** |
+
+**Next founder cadence (UTC):** Window end rollup `2026-06-05T14:18:33Z` · post-deploy `/` initials smoke after fix deploy · optional mobile DevTools.
+
 ## Gate closure session note (2026-06-03)
 
 **Session UTC:** `2026-06-03T13:19:53Z` (~23h 1m elapsed; **~32%** of 72h window)

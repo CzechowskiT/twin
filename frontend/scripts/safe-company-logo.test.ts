@@ -32,6 +32,12 @@ function testCompanyInitials() {
   assert.equal(companyInitials("Apple"), "AP");
   assert.equal(companyInitials("JPMorgan Chase"), "JC");
   assert.equal(companyInitials("  Meta  "), "ME");
+  assert.equal(companyInitials("RTX"), "RTX");
+  assert.equal(companyInitials("Chevron"), "CH");
+  assert.equal(companyInitials("Home Depot"), "HD");
+  assert.equal(companyInitials("CVS"), "CVS");
+  assert.equal(companyInitials("Wells Fargo"), "WF");
+  assert.equal(companyInitials("GE"), "GE");
 }
 
 function testAdvanceLogoFallbackStep() {
@@ -105,6 +111,44 @@ function testBrandLogoUrlsSourceHasNoRasterHelpers() {
   assert.doesNotMatch(src, RASTER_FAVICON_RE);
 }
 
+function testSafeLogoRendersInitialsLayer() {
+  const safe = readFileSync(
+    join(root, "src/components/marketing/safe-company-logo.tsx"),
+    "utf8",
+  );
+  assert.match(safe, /companyInitials\(name\)/);
+  assert.match(safe, /INITIALS_CLASS/);
+  assert.match(safe, /showImage \? "opacity-0" : "opacity-100"/);
+  assert.doesNotMatch(safe, /if \(exhausted\)/);
+}
+
+function testNoBannedLogoUrlPatterns() {
+  const src = readFileSync(join(root, "src/lib/brand-logo-urls.ts"), "utf8");
+  assert.doesNotMatch(src, /\/_next\/image/);
+  const marquee = readFileSync(
+    join(root, "src/components/marketing/company-logo-marquee.tsx"),
+    "utf8",
+  );
+  assert.doesNotMatch(marquee, /\/_next\/image/);
+}
+
+function testAllMarqueeBrandsHaveNonEmptyInitials() {
+  const marquee = readFileSync(
+    join(root, "src/components/marketing/company-logo-marquee.tsx"),
+    "utf8",
+  );
+  const blocks = [
+    ...marquee.matchAll(
+      /\{\s*slug:\s*"([^"]+)"[^}]*name:\s*"([^"]+)"[^}]*domain:\s*"([^"]+)"/g,
+    ),
+  ];
+  for (const [, , name] of blocks) {
+    const initials = companyInitials(name);
+    assert.ok(initials.length > 0, `initials for ${name}`);
+    assert.notEqual(initials, "?", `meaningful initials for ${name}`);
+  }
+}
+
 function testMarqueeUsesSafeLogoNotNextImage() {
   const marquee = readFileSync(
     join(root, "src/components/marketing/company-logo-marquee.tsx"),
@@ -148,6 +192,9 @@ function main() {
   testBlocklistedDomainsInitialsOnly();
   testInitialsOnlyDomainsExcludedFromStableSlugs();
   testBrandLogoUrlsSourceHasNoRasterHelpers();
+  testSafeLogoRendersInitialsLayer();
+  testNoBannedLogoUrlPatterns();
+  testAllMarqueeBrandsHaveNonEmptyInitials();
   testMarqueeUsesSafeLogoNotNextImage();
   testAllMarqueeBrandsAvoidRasterUrls();
   console.log("safe-company-logo.test.ts: OK");
