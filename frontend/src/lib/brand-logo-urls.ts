@@ -78,20 +78,16 @@ export const MARQUEE_BRAND_LOGO_MAP: Record<string, string> = {
   "wellsfargo.com": "wellsfargo",
 };
 
+/** Official Simple Icons brand color (no `/hex` suffix). */
 export function siUrl(slug: string) {
   return `https://cdn.simpleicons.org/${slug}`;
-}
-
-/** Dark mark on white marquee plates — `cdn.simpleicons.org/{slug}/{hex}` per SI CDN docs. */
-export function siUrlOnWhite(slug: string) {
-  return `https://cdn.simpleicons.org/${slug}/000000`;
 }
 
 export function jsdelivrSiUrl(slug: string) {
   return `https://cdn.jsdelivr.net/npm/simple-icons@${SIMPLE_ICONS_JSdelivr}/icons/${slug}.svg`;
 }
 
-/** Self-hosted SI copies — first hop so marquee works if CDN is slow or blocked. */
+/** Self-hosted SI copies (colored exports only — not used until filled with brand hex). */
 export const MARQUEE_LOCAL_LOGO_SLUGS = new Set([
   "adidas",
   "amazon",
@@ -237,15 +233,8 @@ export function brandLogoUrls(brand: Brand): string[] {
   if (stableSlugs.length === 0 && custom.length === 0) {
     return [];
   }
-  // Local SVG first (deterministic), then jsDelivr color marks, then dark SI CDN for light glyphs.
-  const vector = stableSlugs.flatMap((slug) => {
-    const hops: string[] = [];
-    if (isMarqueeLocalLogoSlug(slug)) {
-      hops.push(localMarqueeLogoUrl(slug));
-    }
-    hops.push(jsdelivrSiUrl(slug), siUrlOnWhite(slug));
-    return hops;
-  });
+  // Brand-colored SI CDN first, then pinned jsDelivr SVG (no forced-black hex suffix).
+  const vector = stableSlugs.flatMap((slug) => [siUrl(slug), jsdelivrSiUrl(slug)]);
   return [...custom, ...vector];
 }
 

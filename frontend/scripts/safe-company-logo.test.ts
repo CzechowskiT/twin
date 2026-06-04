@@ -11,9 +11,7 @@ import {
   brandLogoUrls,
   companyInitials,
   FAVICON_INITIALS_ONLY_DOMAINS,
-  isMarqueeLocalLogoSlug,
   isStableMarqueeSiSlug,
-  localMarqueeLogoUrl,
   MARQUEE_BRAND_LOGO_MAP,
   MARQUEE_LOCAL_LOGO_SLUGS,
   MARQUEE_STABLE_SI_SLUGS,
@@ -31,6 +29,13 @@ const RASTER_FAVICON_RE =
 function assertNoRasterFaviconUrls(urls: readonly string[], label: string) {
   for (const url of urls) {
     assert.doesNotMatch(url, RASTER_FAVICON_RE, `${label}: ${url}`);
+  }
+}
+
+function assertNoForcedBlackLogoUrls(urls: readonly string[], label: string) {
+  for (const url of urls) {
+    assert.ok(!url.endsWith("/000000"), `${label}: forced black: ${url}`);
+    assert.ok(!url.includes("/000000"), `${label}: forced black: ${url}`);
   }
 }
 
@@ -74,8 +79,9 @@ function testBrandLogoUrlsOrder() {
   };
   const urls = brandLogoUrls(brand);
   assert.ok(urls[0]?.includes("example.com/custom"));
-  assert.ok(urls.some((u) => u.includes("cdn.simpleicons.org/chase/000000")));
+  assert.ok(urls.some((u) => u === "https://cdn.simpleicons.org/chase"));
   assert.ok(urls.some((u) => u.includes("cdn.jsdelivr.net/npm/simple-icons@11.14.0/icons/chase")));
+  assertNoForcedBlackLogoUrls(urls, "chase");
   assertNoRasterFaviconUrls(urls, "chase");
   assert.equal(new Set(urls).size, urls.length);
 }
@@ -83,11 +89,12 @@ function testBrandLogoUrlsOrder() {
 const MIN_MARQUEE_STABLE_LOGO_BRANDS = 40;
 
 const ALLOWED_LOGO_URL =
-  /^(https:\/\/cdn\.jsdelivr\.net\/npm\/simple-icons@11\.14\.0\/icons\/[a-z0-9-]+\.svg|https:\/\/cdn\.simpleicons\.org\/[a-z0-9-]+(\/000000)?|\/logos\/marquee\/[a-z0-9-]+\.svg)$/;
+  /^(https:\/\/cdn\.jsdelivr\.net\/npm\/simple-icons@11\.14\.0\/icons\/[a-z0-9-]+\.svg|https:\/\/cdn\.simpleicons\.org\/[a-z0-9-]+)$/;
 
 function assertAllowedLogoUrls(urls: readonly string[], label: string) {
   for (const url of urls) {
     assert.match(url, ALLOWED_LOGO_URL, `${label}: ${url}`);
+    assertNoForcedBlackLogoUrls([url], label);
   }
 }
 
@@ -168,16 +175,17 @@ function testSmokeBrandsProduceUrlsWhenMapped() {
       assert.ok(urls.length > 0, `smoke brand should have URLs: ${domain}`);
       assertAllowedLogoUrls(urls, domain);
       assert.ok(
-        urls.some((u) => u.includes("/000000")),
-        `dark SI fallback for white plate: ${domain}`,
+        urls[0]?.startsWith("https://cdn.simpleicons.org/"),
+        `brand-colored SI CDN first: ${domain}`,
       );
+      assertNoForcedBlackLogoUrls(urls, domain);
     } else {
       assert.equal(urls.length, 0, `no SI at 11.14.0: ${domain}`);
     }
   }
 }
 
-function testFounderScreenshotBrandsPreferLocalFirst() {
+function testFounderScreenshotBrandsPreferColoredSiFirst() {
   const founder: Array<{ domain: string; slug: string }> = [
     { domain: "bankofamerica.com", slug: "bankofamerica" },
     { domain: "goldmansachs.com", slug: "goldmansachs" },
@@ -192,9 +200,9 @@ function testFounderScreenshotBrandsPreferLocalFirst() {
     { domain: "shell.com", slug: "shell" },
   ];
   for (const { domain, slug } of founder) {
-    assert.ok(isMarqueeLocalLogoSlug(slug), `local asset expected: ${slug}`);
     const urls = brandLogoUrls({ slug, name: slug, domain });
-    assert.equal(urls[0], localMarqueeLogoUrl(slug), `local first: ${domain}`);
+    assert.equal(urls[0], `https://cdn.simpleicons.org/${slug}`, `colored SI first: ${domain}`);
+    assertNoForcedBlackLogoUrls(urls, domain);
   }
 }
 
@@ -214,8 +222,9 @@ function testAllowlistedStableGetsSiOnly() {
   const urls = brandLogoUrls(brand);
   assert.ok(urls.length > 0);
   assert.ok(isStableMarqueeSiSlug("apple"));
-  assert.ok(urls.some((u) => u.includes("cdn.simpleicons.org/apple/000000")));
+  assert.ok(urls.some((u) => u === "https://cdn.simpleicons.org/apple"));
   assert.ok(urls.some((u) => u.includes("cdn.jsdelivr.net")));
+  assertNoForcedBlackLogoUrls(urls, "apple");
   assertNoRasterFaviconUrls(urls, "apple");
 }
 
@@ -278,6 +287,8 @@ function testBrandLogoUrlsSourceHasNoRasterHelpers() {
   const src = readFileSync(join(root, "src/lib/brand-logo-urls.ts"), "utf8");
   assert.doesNotMatch(src, /function\s+googleFaviconUrl/);
   assert.doesNotMatch(src, /function\s+duckduckgoIconUrl/);
+  assert.doesNotMatch(src, /siUrlOnWhite/);
+  assert.doesNotMatch(src, /simpleicons\.org\/\$\{slug\}\/000000/);
   assert.doesNotMatch(src, RASTER_FAVICON_RE);
 }
 
@@ -375,7 +386,7 @@ function main() {
   testMarqueeBrandLogoMapKeys();
   testVerifiedFixtureMatchesAllowlist();
   testSmokeBrandsProduceUrlsWhenMapped();
-  testFounderScreenshotBrandsPreferLocalFirst();
+  testFounderScreenshotBrandsPreferColoredSiFirst();
   testLocalMarqueeSlugsSubsetOfStable();
   testMarqueeSortsLogosFirst();
   console.log("safe-company-logo.test.ts: OK");

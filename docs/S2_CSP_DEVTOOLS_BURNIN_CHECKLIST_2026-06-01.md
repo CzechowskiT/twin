@@ -79,6 +79,8 @@ CSP must remain **Report-Only** — console shows violations as warnings, pages 
 
 **Urgent visual (founder screenshot 2026-06-04):** Marquee showed **only initials** on white plates (BO, GS, WF, AE, WA, TA, CO, MC, ST, NI, AD, SH) — no brand glyphs. **Root cause:** `SafeCompanyLogo` kept `<img>` at `opacity-0` until `onLoad`; cross-origin SVG from jsDelivr/SI CDN often never fires `onLoad` while still painting, so initials stayed visible. **Fix (non-CSP):** show logo when `src` is set; initials only after fallback exhausted; prepend self-hosted `/logos/marquee/{slug}.svg` for founder-visible brands. **Post-deploy:** hard refresh `/` → real logos for BO/GS/WF/AE/WA/TA/MC/ST/NI/AD/SH; CO (Costco) may stay initials (no SI slug). **S2: CONTINUE.** **S2 PASS: NO.**
 
+**Follow-up (founder post-472a6d3):** Logos visible (Visa, Mastercard, Chase, BofA, Goldman, Target, Coca-Cola, McDonald's, Starbucks, Nike, …) but **all monochrome black** on white plates. **Root cause:** self-hosted `/logos/marquee/*.svg` (single-path black) loaded first + `siUrlOnWhite` (`cdn.simpleicons.org/{slug}/000000`). **Fix (non-CSP):** `brandLogoUrls` → `cdn.simpleicons.org/{slug}` (official brand hex) first, then pinned jsDelivr; removed `/000000` and black-only local first hop. **Post-deploy:** hard refresh `/` → colored marks (e.g. Starbucks green, Mastercard red, Shell yellow). **S2: CONTINUE.** **S2 PASS: NO.** **Public launch: NO-GO.**
+
 ## Safari (desktop) — founder PASS 2026-06-04
 
 **Checkpoint UTC:** `2026-06-04T08:47:35Z`
