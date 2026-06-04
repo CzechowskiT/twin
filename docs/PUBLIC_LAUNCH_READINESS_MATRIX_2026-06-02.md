@@ -272,8 +272,8 @@
 ## Copy & claims audit (2026-06-04)
 
 - **Doc:** `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md`
-- **Verdict:** Public launch still **NO-GO** (S2 burn-in, ops gates — not copy alone). Founding “lifetime Pro” hero/sticky/CTA band **revised** 2026-06-04; dashboard auto-apply/delegated copy **aligned**; billing + persona logistics **revised** (paused/phased).
-- **Marketing copy:** `home.heroHook`, `stickyCtaMicro`, `ctaBandWishlistTitle`, `joinWishlistMicro`, `insideTitle`, `first1000.ctaLead` — **fixed** EN/PL; **MEDIUM** remains (`calendarAudienceLine`, compare pages).
+- **Verdict:** Public launch still **NO-GO** (S2 burn-in, ops gates — not copy alone). Founding “lifetime Pro” hero/sticky/CTA band **revised** (`1a2eba4`); remaining **MEDIUM** risks **fixed** — `billingEngagementPillar2Body` (calendar Apple vs OAuth), `compare.*` routes, `/first-1000` headline/subline, persona candidate pillars.
+- **Marketing copy:** Homepage + founding + compare + billing calendar strip — **aligned** EN/PL to prod reality (auto-apply **PAUSED**, delegated **NOT LIVE**, Apple **ICS/WebCal**).
 - **Waivers unchanged:** L6 manual DSR · O5 Apple/iCal partial — signed `2026-06-03T13:19:53Z`.
 
 ---

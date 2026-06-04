@@ -1,11 +1,11 @@
 # Public launch copy & claims audit — 2026-06-04
 
-**Auditor:** TWIN Public Launch Copy & Claims Auditor (read-only ops; copy-only fixes allowed)  
+**Auditor:** TWIN Remaining Launch Copy Risk Auditor (copy-only; no deploy/ops)  
 **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01`  
 **Audit UTC:** `2026-06-04` (S2 burn-in through `2026-06-05T14:18:33Z`)  
 **Product reality:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md`, `.cursorrules`
 
-**Verdict:** **Public launch NO-GO** · **Pilot / demo GO** · Homepage founding **BLOCKER reduced** (2026-06-04 copy fix) — qualified early-access language + Terms/first-1000 pointers; **MEDIUM** remains on calendar strip + competitive pages. **No** S2 PASS or public GO from this audit.
+**Verdict:** **Public launch NO-GO** · **Pilot / demo GO** · Founding homepage **BLOCKER reduced** (`1a2eba4` + this session). **MEDIUM** calendar + compare risks **fixed** in i18n EN/PL. **No** S2 PASS or public GO from this audit.
 
 ---
 
@@ -13,15 +13,16 @@
 
 | Area | Finding |
 | ---- | ------- |
-| Homepage / founding CTAs | **was BLOCKER** → **reduced** — unconditional “lifetime Pro” / lock language **revised** in `i18n` EN/PL (`home.heroHook`, `stickyCtaMicro`, `joinWishlistMicro`, `ctaBandWishlistTitle`, `insideTitle`; `first1000.ctaLead` qualified) |
-| Auto-apply / delegated | Dashboard + job list **OK**; billing lead and persona logistics **overclaimed** → **fixed** 2026-06-04 (LOW) |
-| Calendar (O5) | Google/Microsoft **live**; Apple = ICS/WebCal + CalDAV roadmap — copy mostly **discloses**; `calendarAudienceLine` **MEDIUM** (unchanged) |
-| GDPR / L6 | Export **live**; self-service delete **not live** — privacy MVP page **discloses**; no “delete account” button |
+| Homepage / founding CTAs | **was BLOCKER** → **LOW** — `1a2eba4` qualified hero/sticky/CTA; this session qualified `/first-1000` headline/subline/soldOut (no unconditional “Forever” / live apply) |
+| Auto-apply / delegated | Dashboard + job list **OK**; billing lead and persona logistics **fixed** prior; compare + persona pillar copy **fixed** this session |
+| Calendar (O5) | Google/Microsoft **live**; Apple = ICS/WebCal — `dashboard.billingEngagementPillar2Body` **fixed** (was `calendarAudienceLine` in prior audit) |
+| Compare pages | `/compare/*` moved to `compare.*` i18n; phased/paused + calendar paths disclosed; shared disclaimer |
+| GDPR / L6 | Export **live**; self-service delete **not live** — privacy MVP **OK** |
 | KYC | Page exists; **not live** for delegated apply — readiness card **OK** |
 | S2 / launch gates | Unchanged — **no** copy audit may mark S2 PASS or public GO |
 
-**Fixes shipped (copy-only):** `billingPageLead` (EN/PL), `persona-pages.ts` logistics (EN); **2026-06-04 follow-up:** homepage + `first1000.ctaLead` founding qualifiers (EN/PL).  
-**Remaining (severity):** `calendarAudienceLine` Apple parity; marketing compare pages spot-check; legal sign-off on founding campaign wording.
+**Fixes this session:** `billingEngagementPillar2Body` EN/PL; `compare.*` EN/PL + four compare routes; `first1000.headline`/`subline`/`soldOutBody` EN/PL; `persona-pages` candidate EN/PL pillars/tiers/logistics.  
+**Remaining (severity):** legal/marketing sign-off on founding campaign tone (`first1000.footerLegal` still references campaign “free forever” with Terms pointer — **LOW**).
 
 ---
 
@@ -29,31 +30,18 @@
 
 | Surface / file | Claim / copy | Risk | Current reality | Action | Severity |
 | -------------- | ------------ | ---- | --------------- | ------ | -------- |
-| `frontend/src/lib/i18n.ts` · `home.heroHook` | ~~“locks **lifetime Pro**”~~ → founding early access + Terms/`/first-1000` | Was guaranteed lifetime paid tier | Founding = wishlist cap + campaign; Terms govern | **fixed** 2026-06-04 | **LOW** (legal spot-check) |
-| `i18n` · `home.stickyCtaMicro` | ~~“**Lifetime Pro**”~~ → founding early access · Terms apply | Same | Same | **fixed** 2026-06-04 | **LOW** |
-| `i18n` · `home.joinWishlistMicro` | ~~“lifetime Pro & Enterprise”~~ → founding cohort benefits | Same + enterprise SKU | Stripe/recruiter SKUs separate | **fixed** 2026-06-04 | **LOW** |
-| `i18n` · `home.ctaBandWishlistTitle` | ~~“**Lock lifetime** Pro & Enterprise”~~ → reserve founding early access | Urgency + lifetime | Same | **fixed** 2026-06-04 | **LOW** |
-| `i18n` · `home.insideTitle` | ~~works while you sleep~~ → **can** work when automation enabled | Implied nightly auto-apply live | Nightly beat **OFF** on prod | **fixed** 2026-06-04 | **LOW** |
-| `i18n` · `home.vacationScene*` | Sarah offline; TWIN queues interviews | Storyboard autopilot | Demo narrative; disclaimer on scene 3 **OK** | **OK** (with disclaimer) | **LOW** |
-| `i18n` · `home.howStep4Line` / `feature6Line` | Auto-apply rolls out in **phases** | Accurate if read literally | Prod **PAUSED** | **OK** | **LOW** |
-| `i18n` · `first1000.ctaLead` | ~~“**zero fees forever**”~~ → founding cohort benefits + not lifetime paid Pro guarantee | Strong lifetime $0 | `first1000.footerLegal` on same page | **fixed** 2026-06-04 | **LOW** |
-| `frontend/src/lib/waitlist-messages.ts` + `waitlist-narrative.ts` | Founding 1,000, auto-apply FAQ, fair-use | Mostly conservative | Matches pilot stance; lifetime FAQ **disclaims** | **OK** | **LOW** |
-| `i18n` · `billingPageLead` (was) | “**Auto-apply runs on every plan by default**” | States live autopilot | Prod **PAUSED**; prepare package only; delegated **NOT LIVE** | **revise** — **fixed** 2026-06-04 | **HIGH** |
-| `frontend/src/lib/persona-pages.ts` · logistics | “**Autonomous applying runs** on supported boards with Premium or Pro” | Live autonomous apply | **NOT LIVE** / nightly **OFF** | **revise** — **fixed** 2026-06-04 | **HIGH** |
-| `i18n` · `dashboard.autoApplyHint` | Does not submit until delegated enabled | Accurate | Server 403 + `delegated_apply_allowed=false` | **OK** | **LOW** |
-| `i18n` · `dashboard.nightlyAutoApplyLead` | Delegated apply **not live in production** | Accurate | Matches matrix F | **OK** | **LOW** |
-| `i18n` · `dashboard.nightlyAutoApplyStripLegacyActive` | Consent on file; runs **paused** | Accurate | Ops pause + readiness gate | **OK** | **LOW** |
-| `i18n` · `verifiedReadiness.*` | Delegated blocked; not legal KYC | Accurate | S11 smoke; no live KYC apply | **OK** | **LOW** |
-| `frontend/src/app/dashboard/identity/page.tsx` | KYC / Authologic flow | User may think KYC unlocks apply | Identity optional; **not** delegated apply | **OK** if i18n stays non-promissory | **MEDIUM** |
-| `i18n` · `calendarStripWebcalHint` | WebCal + Google subscribe | Accurate for ICS path | O5 partial **OK** with WebCal | **OK** | **LOW** |
-| `i18n` · `calendarProviderAppleBody` | CalDAV / roadmap; not one-click Google | Accurate | No Apple OAuth | **OK** | **LOW** |
-| `i18n` · `calendarAudienceLine` (≈751) | “**Apple, Google, and Outlook** see the same truth” | Full Apple OAuth | Apple via **ICS/WebCal** only | **revise** — “subscribe via ICS/WebCal” | **MEDIUM** |
-| `i18n` · `privacy.rightsBody` | Deletion via contact; account delete **coming** | Accurate | L6 manual DSR + waiver | **OK** | **LOW** |
-| `frontend/public/legal/privacy-*.md` | Erasure rights; delete when no longer needed | Legal generality | No self-service API | **OK** (operator runbook) | **LOW** |
-| `i18n` · `demo.*` | Synthetic / no live submissions | Accurate | Demo lane | **OK** | **LOW** |
-| `job-employer-partners-messages.ts` | “Integration **marketplace** (demo statuses)” | Could imply live marketplace | Demo-only ATS copy | **OK** | **LOW** |
-| `verified-readiness-guard.test.ts` | Forbids KYC verified / guaranteed interview in card | Guardrail | CI static test | **OK** | **LOW** |
-| Marketing compare pages | Competitive claims | Varies | Spot-check before press | **disclose** per page | **MEDIUM** |
+| `i18n` · `home.heroHook` | Founding early access + Terms | Was lifetime Pro lock | Founding cohort + Terms | **fixed** `1a2eba4` | **LOW** |
+| `i18n` · `first1000.headline` | ~~“free. Forever”~~ → founding spots + benefits | Unconditional lifetime | Terms govern | **fixed** 2026-06-04 | **LOW** |
+| `i18n` · `first1000.subline` | ~~“agent that applies”~~ → ranks/tracks/phased prepare | Live delegated apply | Prod **PAUSED** | **fixed** 2026-06-04 | **LOW** |
+| `i18n` · `first1000.ctaLead` | Founding cohort; not lifetime paid Pro guarantee | Strong $0 tier | `footerLegal` | **fixed** `1a2eba4` | **LOW** |
+| `i18n` · `billingPageLead` | Phased/paused autonomous apply | Live autopilot | **PAUSED** | **fixed** 2026-06-04 | **LOW** |
+| `persona-pages` · logistics | Phased prepare-only until delegated | “Runs” today | **NOT LIVE** | **fixed** prior + PL 2026-06-04 | **LOW** |
+| `i18n` · `billingEngagementPillar2Body` | ~~Apple/Google/Outlook same truth~~ → OAuth + ICS/WebCal paths | Apple OAuth parity | Apple **ICS/WebCal** only | **fixed** 2026-06-04 | **was MEDIUM** |
+| `i18n` · `compare.*` + `/compare/*` | ~~Autonomous/live apply~~ → phased, prepare-only, disclaimer | Delegated **NOT LIVE** | Prod pause | **fixed** 2026-06-04 | **was MEDIUM** |
+| `i18n` · `dashboard.autoApplyHint` / nightly strip | Delegated not live; paused | Accurate | Matrix F | **OK** | **LOW** |
+| `i18n` · `calendarProviderAppleBody` | CalDAV roadmap | Accurate | No Apple OAuth | **OK** | **LOW** |
+| `verified-readiness-guard.test.ts` | Forbids KYC verified / guaranteed interview | Guardrail | CI | **OK** | **LOW** |
+| Marketing compare pages | Competitive claims | Overclaim | Spot-check | **fixed** 2026-06-04 | **LOW** |
 | `docs/PUBLIC_LAUNCH_*` matrices | NO-GO / PAUSED / waivers | Accurate | This audit | **OK** | **LOW** |
 
 ---
@@ -62,26 +50,21 @@
 
 ### Homepage & founding (`/`, `/first-1000`, `/waitlist`)
 
-- **Strengths:** Phased autopilot language (`howStep4`, `feature6`, `focusFootnote`); vacation disclaimer.
-- **2026-06-04 fix:** Hero, sticky, CTA band, and `joinWishlistMicro` now use founding early-access + Terms/fair-use qualifiers (EN/PL), aligned with `/first-1000` `footerLegal` tone. Legal/marketing spot-check still advised before uncontrolled public launch.
+- **2026-06-04 (1a2eba4):** Hero, sticky, CTA band qualified.
+- **2026-06-04 (this session):** `/first-1000` headline/subline no longer promise “Forever” free tier or live apply; soldOut copy aligned.
 
-### Dashboard & auto-apply (`/dashboard`, `/dashboard/settings/auto-apply`)
+### Compare (`/compare/linkedin`, `agencies`, `moonhub`, `dover`)
 
-- Prepare-application CTA gated; copy states delegated **not live**.
-- Nightly settings UI exists; prod beat **disabled** — strip copy reflects pause.
+- All copy in `compare.*` i18n EN/PL; shared `compare.disclaimer` on `ComparisonTwinPage`.
+- No delegated-live, guaranteed interviews, KYC-live, or full Apple OAuth claims.
 
-### Calendar (`/dashboard/calendar`)
+### Calendar (`/dashboard/calendar`, billing engagement)
 
-- Google + Microsoft OAuth **live**; WebCal/ICS **partial** (O5 waiver).
-- Avoid “Sign in with Apple Calendar” parity claims; current Apple body is **roadmap-safe**.
+- `billingEngagementPillar2Body` distinguishes Google/Microsoft OAuth vs Apple ICS/WebCal.
 
-### Privacy / DSR (`/privacy`, export in dashboard)
+### Dashboard & auto-apply
 
-- Export **live**; erasure **manual** (`docs/GDPR_MANUAL_DSR.md`) — MVP privacy page states delete feature **coming**.
-
-### Demo (`/demo`)
-
-- Labeled synthetic; aligned with pilot/demo **GO**.
+- Unchanged accurate gated copy from prior audit.
 
 ---
 
@@ -89,9 +72,10 @@
 
 | File | Change |
 | ---- | ------ |
-| `frontend/src/lib/i18n.ts` | `billingPageLead` EN + PL — auto-apply **phased/paused on production**; prepare-only default |
-| `frontend/src/lib/persona-pages.ts` | EN logistics — autonomous apply **phased**, not “runs” today |
-| `frontend/src/lib/i18n.ts` | **2026-06-04:** `home.heroHook`, `stickyCtaMicro`, `joinWishlistMicro`, `ctaBandWishlistTitle`/`Micro`, `insideTitle`, `first1000.ctaLead` — EN + PL founding qualifiers (no unconditional lifetime Pro) |
+| `frontend/src/lib/i18n.ts` | `billingEngagementPillar2Body` EN/PL; `compare.*` EN/PL; `first1000` headline/subline/soldOut EN/PL |
+| `frontend/src/app/(marketing)/compare/*/page.tsx` | Use `t("compare.*")` |
+| `frontend/src/components/marketing/comparison-page.tsx` | `compare.disclaimer` footnote |
+| `frontend/src/lib/persona-pages.ts` | Candidate EN/PL pillars, Premium bullet, PL logistics |
 
 ---
 
@@ -101,7 +85,7 @@
 | ------- | ------ |
 | `cd backend && pytest tests/test_csp_report.py tests/test_csp_report_sanitization.py -q` | **9 passed** |
 | `cd frontend && npm run lint` | **ok** |
-| `cd frontend && npx tsc --noEmit` | **ok** (via `next build` TS step) |
+| `cd frontend && npx tsc --noEmit` | **ok** |
 | `cd frontend && npm run build` | **ok** |
 
 ---

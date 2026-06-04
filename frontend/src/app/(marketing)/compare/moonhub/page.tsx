@@ -1,23 +1,21 @@
 "use client";
 
+import { useTranslation } from "@/components/language-provider";
 import { ComparisonTwinPage } from "@/components/marketing/comparison-page";
 
 export default function CompareMoonhubPage() {
+  const { t } = useTranslation();
   return (
     <ComparisonTwinPage
-      title="TWIN vs Moonhub"
-      competitorLabel="Typical AI sourcing assistant"
-      lead="Moonhub-style tools accelerate outbound search. TWIN is built around consent, ranked acceptance-ready moments, and calendar outcomes — not raw volume in your inbox."
+      title={t("compare.moonhubTitle")}
+      competitorLabel={t("compare.moonhubCompetitorLabel")}
+      lead={t("compare.moonhubLead")}
       competitorBullets={[
-        "Optimises for sequences and list building across many profiles.",
-        "Recruiter stays in the loop for every send and follow-up.",
-        "Success is often measured as activity and replies, not scheduled interviews.",
+        t("compare.moonhubCompetitor1"),
+        t("compare.moonhubCompetitor2"),
+        t("compare.moonhubCompetitor3"),
       ]}
-      twinBullets={[
-        "Autonomous pipeline toward slots worth showing up for — accept, decline, reschedule.",
-        "Matching and consent upfront so async work does not flood hiring managers.",
-        "Calendar export and interview holds as first-class, including shared ICS where configured.",
-      ]}
+      twinBullets={[t("compare.moonhubTwin1"), t("compare.moonhubTwin2"), t("compare.moonhubTwin3")]}
     />
   );
 }

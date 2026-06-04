@@ -134,6 +134,7 @@ export type TranslationKey =
   | `common.${keyof typeof en.common}`
   | `persona.${keyof typeof en.persona}`
   | `demo.${keyof typeof en.demo}`
+  | `compare.${keyof typeof en.compare}`
   | `first1000.${keyof typeof en.first1000}`
   | `ux.${keyof typeof en.ux}`
   | `verifiedReadiness.${keyof typeof en.verifiedReadiness}`
@@ -751,7 +752,7 @@ const en = {
       "Live listings scored to your profile — you open the feed when you are ready, not when anxiety pings you.",
     billingEngagementPillar2Title: "Interview holds",
     billingEngagementPillar2Body:
-      "Calendar-aware slots and ICS exports so Apple, Google, and Outlook see the same truth.",
+      "Interview holds on your calendar: Google and Microsoft via OAuth; Apple and others subscribe via ICS/WebCal — same slots, different connection paths.",
     billingEngagementPillar3Title: "Tracked momentum",
     billingEngagementPillar3Body:
       "Every application status in one workspace — rejections do not eat your cap, progress does.",
@@ -2608,11 +2609,59 @@ const en = {
     footerNote:
       "GDPR: real accounts require explicit consent at registration. This page uses only fictional data labeled as demo/synthetic — no live submissions here.",
   },
+  compare: {
+    disclaimer:
+      "Illustrative comparison only. Auto-apply and delegated submit are phased and paused on production today. Calendar: Google/Microsoft OAuth; Apple via ICS/WebCal subscribe.",
+    linkedinTitle: "TWIN vs LinkedIn",
+    linkedinCompetitorLabel: "LinkedIn (jobs + InMail ecosystem)",
+    linkedinLead:
+      "LinkedIn is the town square for careers. TWIN is the career twin for ranked matches and phased automation — prepare packages today; delegated apply is not live on production.",
+    linkedinCompetitor1: "Broad reach; candidates and recruiters self-serve in the same noisy feed.",
+    linkedinCompetitor2: "Premium features centre on visibility and messaging credits.",
+    linkedinCompetitor3: "No single ranked pipeline with GDPR-first consent semantics end to end.",
+    linkedinTwin1: "Focused on your bar, your consent, and ranked opportunities — not infinite scroll.",
+    linkedinTwin2:
+      "Phased auto-apply where boards and policy allow — prepare-only on production until delegated apply ships.",
+    linkedinTwin3:
+      "Interview scheduling, ICS/WebCal, and Google/Microsoft calendar OAuth on the roadmap you see in-product.",
+    agenciesTitle: "TWIN vs recruitment agencies",
+    agenciesCompetitorLabel: "Traditional agencies",
+    agenciesLead:
+      "Agencies earn on placement and relationship. TWIN is software-first: machine-assisted matching, in-product verification paths, and async work toward interviews — without turning your hiring process into forwarded CV threads.",
+    agenciesCompetitor1: "Success fees and retainers aligned to human sourcers and account managers.",
+    agenciesCompetitor2: "Quality varies by desk; speed often trades off against candidate experience.",
+    agenciesCompetitor3: "Heavy email and phone coordination for scheduling and feedback.",
+    agenciesTwin1: "Transparent pipeline in the product; ranked matches instead of mystery slates.",
+    agenciesTwin2:
+      "Phased automation for repetitive application flows where boards permit it (prepare-only on production today).",
+    agenciesTwin3: "Roadmap toward self-serve placement verification instead of default ping-pong.",
+    moonhubTitle: "TWIN vs Moonhub",
+    moonhubCompetitorLabel: "Typical AI sourcing assistant",
+    moonhubLead:
+      "Moonhub-style tools accelerate outbound search. TWIN is built around consent, ranked acceptance-ready moments, and calendar outcomes — not raw volume in your inbox.",
+    moonhubCompetitor1: "Optimises for sequences and list building across many profiles.",
+    moonhubCompetitor2: "Recruiter stays in the loop for every send and follow-up.",
+    moonhubCompetitor3: "Success is often measured as activity and replies, not scheduled interviews.",
+    moonhubTwin1: "Pipeline toward slots worth showing up for — accept, decline, reschedule (phased automation).",
+    moonhubTwin2: "Matching and consent upfront so async work does not flood hiring managers.",
+    moonhubTwin3: "Calendar export and interview holds: Google/Microsoft OAuth plus ICS/WebCal where configured.",
+    doverTitle: "TWIN vs Dover",
+    doverCompetitorLabel: "Dover-style outbound recruiting stack",
+    doverLead:
+      "Dover-class products excel at orchestrated outbound and sequences for hiring teams. TWIN starts from the candidate side: ranked discovery and tracked applications with a north star of acceptance-ready calendar items.",
+    doverCompetitor1: "Employer-centric workflows and integrations for recruiting orgs.",
+    doverCompetitor2: "Heavy on outbound campaigns and team coordination.",
+    doverCompetitor3: "Less emphasis on candidate-owned career control with explicit consent.",
+    doverTwin1:
+      "Candidate-first twin: progress when automation you enable is available — consent boundaries; delegated apply not live on production.",
+    doverTwin2: "Polish and EU board adapters (e.g. pracuj.pl, rocketjobs.pl) as part of the MVP arc.",
+    doverTwin3: "Designed for verification-friendly placement economics, not manual CS tennis.",
+  },
   first1000: {
     kicker: "Founder circle · live",
-    headline: "1,000 people get TWIN free. Forever. Then we launch loud.",
+    headline: "1,000 founding spots — early access benefits, then we launch loud.",
     subline:
-      "No gimmicks, no “trial then we bill your card”: if you’re wishlisted inside the first thousand when the counter hits zero, access stays free. We’re building a career agent that applies, tracks status, and fights tab chaos — this page is a public promise.",
+      "No gimmicks, no “trial then we bill your card”: if you’re wishlisted inside the first thousand when the counter hits zero, founding benefits apply per launch Terms. We’re building a career agent that ranks, tracks, and prepares applications in phases — not a promise of live delegated apply today.",
     counterEyebrow: "Spots left",
     counterCaption:
       "Every real wishlist signup lowers the counter. When it hits zero, the founder offer closes and we flip the public switch.",
@@ -2631,7 +2680,7 @@ const en = {
     ctaFinePrint:
       "Wishlist drives the global counter. Full account signup is a separate path when you want to jump straight into the dashboard.",
     soldOutBody:
-      "All 1,000 founder spots are closed — thank you. You can still create a full account in the public product; free‑forever founders access is no longer available.",
+      "All 1,000 founder spots are closed — thank you. You can still create a full account in the public product; the founding cohort offer is no longer available.",
     ctaWishlist: "Claim a founder spot",
     ctaOpenProduct: "Wishlist full — open the product",
     ctaRegister: "Create full account",
@@ -3502,7 +3551,7 @@ const pl: MessageTree = {
       "Oferty na żywo oceniane pod Twój profil — otwierasz feed, kiedy jesteś gotowy, nie kiedy lęk Cię szturcha.",
     billingEngagementPillar2Title: "Sloty rozmów",
     billingEngagementPillar2Body:
-      "Kalendarz i eksport ICS — Apple, Google i Outlook widzą tę samą prawdę.",
+      "Sloty rozmów w kalendarzu: Google i Microsoft przez OAuth; Apple i inne przez ICS/WebCal — te same terminy, inne ścieżki podłączenia.",
     billingEngagementPillar3Title: "Śledzony postęp",
     billingEngagementPillar3Body:
       "Status każdej aplikacji w jednym workspace — odrzucenia nie zjadają limitu, liczy się ruch do przodu.",
@@ -5539,11 +5588,58 @@ const pl: MessageTree = {
     growthRoadmapFootnote:
       "Kolejność wdrożeń może się zmieniać; część funkcji może być powiązana z planem po starcie. Napisz, co otwierałbyś co tydzień: to ustawia roadmapę.",
   },
+  compare: {
+    disclaimer:
+      "Porównanie poglądowe. Auto-apply i delegated submit są fazowe i wstrzymane na produkcji. Kalendarz: OAuth Google/Microsoft; Apple przez ICS/WebCal.",
+    linkedinTitle: "TWIN vs LinkedIn",
+    linkedinCompetitorLabel: "LinkedIn (oferty + ekosystem InMail)",
+    linkedinLead:
+      "LinkedIn to plac targowy kariery. TWIN to bliźniak pod ranking i automatyzację fazową — dziś pakiety prepare-only; delegated apply nie jest na produkcji.",
+    linkedinCompetitor1: "Szeroki zasięg; kandydaci i rekruterzy w tym samym hałaśliwym feedzie.",
+    linkedinCompetitor2: "Premium skupia się na widoczności i kredytach wiadomości.",
+    linkedinCompetitor3: "Brak jednej ścieżki z rankingiem i semantyką zgód RODO end-to-end.",
+    linkedinTwin1: "Twój próg, Twoja zgoda, rankingowane oferty — nie nieskończony scroll.",
+    linkedinTwin2:
+      "Auto-apply fazowe, gdzie portal i polityka pozwalają — na produkcji prepare-only do czasu delegated apply.",
+    linkedinTwin3: "Planowanie rozmów, ICS/WebCal oraz OAuth Google/Microsoft — jak w produkcie na roadmapzie.",
+    agenciesTitle: "TWIN vs agencje rekrutacyjne",
+    agenciesCompetitorLabel: "Tradycyjne agencje",
+    agenciesLead:
+      "Agencje zarabiają na placement i relacji. TWIN to software-first: dopasowanie wspomagane maszynowo, weryfikacja w produkcie i praca asynchroniczna pod rozmowy — bez wątków „prześlij CV”.",
+    agenciesCompetitor1: "Success fee i retainer pod ludzkich sourcerów i account managerów.",
+    agenciesCompetitor2: "Jakość zależy od biurka; tempo często kosztem doświadczenia kandydata.",
+    agenciesCompetitor3: "Dużo maili i telefonów przy planowaniu i feedbacku.",
+    agenciesTwin1: "Przejrzysty pipeline w produkcie; ranking zamiast tajemniczych slate’ów.",
+    agenciesTwin2:
+      "Automatyzacja fazowa powtarzalnych flow tam, gdzie portale pozwalają (dziś prepare-only na produkcji).",
+    agenciesTwin3: "Roadmapa self-serve weryfikacji placement zamiast domyślnego ping-ponga.",
+    moonhubTitle: "TWIN vs Moonhub",
+    moonhubCompetitorLabel: "Typowy asystent sourcingu AI",
+    moonhubLead:
+      "Narzędzia w stylu Moonhub przyspieszają outbound. TWIN buduje się wokół zgody, rankingowanych momentów pod akceptację i kalendarza — nie zalewu skrzynki.",
+    moonhubCompetitor1: "Optymalizacja sekwencji i list pod wiele profili.",
+    moonhubCompetitor2: "Rekruter w pętli przy każdym wysłaniu i follow-upie.",
+    moonhubCompetitor3: "Sukces często mierzony aktywnością i odpowiedziami, nie umówionymi rozmowami.",
+    moonhubTwin1: "Pipeline pod sloty warte przyjścia — akceptuj, odrzuć, przełóż (automatyzacja fazowa).",
+    moonhubTwin2: "Dopasowanie i zgoda z góry, żeby async nie zalał hiring managerów.",
+    moonhubTwin3: "Eksport kalendarza i holdy: OAuth Google/Microsoft plus ICS/WebCal tam, gdzie skonfigurowane.",
+    doverTitle: "TWIN vs Dover",
+    doverCompetitorLabel: "Stack outbound w stylu Dover",
+    doverLead:
+      "Produkty klasy Dover świetnie orkiestrują outbound dla zespołów hiringowych. TWIN zaczyna od kandydata: rankingowane odkrywanie i śledzone aplikacje z north star = sloty pod akceptację.",
+    doverCompetitor1: "Workflow pracodawcy i integracje dla org rekrutacyjnych.",
+    doverCompetitor2: "Nacisk na kampanie outbound i koordynację zespołu.",
+    doverCompetitor3: "Mniej kontroli kandydata z jawną zgodą.",
+    doverTwin1:
+      "Bliźniak kandydata: postęp, gdy włączona automatyzacja jest dostępna — granice zgody; delegated apply nie na produkcji.",
+    doverTwin2: "Adaptery PL/EU (np. pracuj.pl, rocketjobs.pl) w łuku MVP.",
+    doverTwin3: "Ekonomia placement pod weryfikację w produkcie, nie ręczny CS tennis.",
+  },
   first1000: {
     kicker: "Krąg founderski · na żywo",
-    headline: "1000 osób dostaje TWIN za darmo. Na zawsze. Potem start na cały głos.",
+    headline: "1000 miejsc founding — benefity early access, potem start na cały głos.",
     subline:
-      "Bez trików i bez „trial, a potem kasujemy kartę”: jeśli jesteś na liście życzeń wśród pierwszego tysiąca, gdy licznik dojdzie do zera, dostęp zostaje bezpłatny. Budujemy agenta kariery, który aplikuje, pilnuje statusów i walczy z chaosem kart — ta strona to publiczna obietnica.",
+      "Bez trików i bez „trial, a potem kasujemy kartę”: jeśli jesteś na liście życzeń wśród pierwszego tysiąca, gdy licznik dojdzie do zera, obowiązują benefity wg warunków startu. Budujemy agenta kariery, który rankuje, śledzi i przygotowuje aplikacje falami — to nie obietnica live delegated apply dziś.",
     counterEyebrow: "Wolne miejsca",
     counterCaption:
       "Każda prawdziwa rejestracja na liście życzeń obniża licznik. Gdy spadnie do zera, oferta founderska się zamyka i odpalamy publiczny start.",
@@ -5562,7 +5658,7 @@ const pl: MessageTree = {
     ctaFinePrint:
       "Lista życzeń rusza globalny licznik. Pełna rejestracja konta to osobna ścieżka — gdy chcesz od razu wejść w panel.",
     soldOutBody:
-      "Tysiąc founderskich miejsc jest zamknięty — dziękujemy. Nadal możesz założyć pełne konto w publicznym produkcie; darmowe „na zawsze” dla foundersów jest już niedostępne.",
+      "Tysiąc founderskich miejsc jest zamknięty — dziękujemy. Nadal możesz założyć pełne konto w publicznym produkcie; oferta kohorty founding jest już niedostępna.",
     ctaWishlist: "Zajmij founderskie miejsce",
     ctaOpenProduct: "Lista pełna — wejdź w produkt",
     ctaRegister: "Załóż pełne konto",

@@ -24,7 +24,7 @@
 
 | Feature | Evidence | Production |
 | ------- | -------- | ---------- |
-| Public marketing (`/`, waitlist, first-1000) | HTTP 200 smoke; **final logo smoke PASS** **`2026-06-04T10:29:29Z`**; **copy fix 2026-06-04** — founding hero/sticky/CTA qualified EN/PL (no unconditional lifetime Pro); public launch still **NO-GO** (S2/ops — claims audit) | **LIVE** (pilot); **NO-GO** uncontrolled public (gates, not homepage copy alone) |
+| Public marketing (`/`, waitlist, first-1000, `/compare/*`) | HTTP 200 smoke; **final logo smoke PASS** **`2026-06-04T10:29:29Z`**; **copy fixes 2026-06-04** — founding qualified (`1a2eba4` + first-1000 headline); calendar strip + compare i18n aligned (OAuth vs ICS/WebCal; phased auto-apply); public launch still **NO-GO** (S2/ops) | **LIVE** (pilot); **NO-GO** uncontrolled public (gates, not copy alone) |
 | Status / public-health proxy | `git_commit=df15618`, `db_ok=true` in JSON (read-only check 2026-05-29) | **LIVE** |
 | Candidate login (OAuth + email) | health flags `google_oauth`, `github_oauth` | **LIVE** (Apple OAuth **OFF**) |
 | Dashboard (candidate) | `/dashboard` 200; auth required for data | **LIVE** |

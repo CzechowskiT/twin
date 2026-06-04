@@ -48,6 +48,9 @@ export function ComparisonTwinPage({ title, competitorLabel, lead, competitorBul
               </ul>
             </section>
           </div>
+          <p className="mt-8 text-center text-xs leading-relaxed text-[var(--twin-muted)]">
+            {t("compare.disclaimer")}
+          </p>
           <p className="mt-10 text-center text-sm text-[var(--twin-muted-strong)]">
             <Link href="/companies/signup" className="twin-link font-medium">
               Company signup

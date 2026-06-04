@@ -1,23 +1,21 @@
 "use client";
 
+import { useTranslation } from "@/components/language-provider";
 import { ComparisonTwinPage } from "@/components/marketing/comparison-page";
 
 export default function CompareDoverPage() {
+  const { t } = useTranslation();
   return (
     <ComparisonTwinPage
-      title="TWIN vs Dover"
-      competitorLabel="Dover-style outbound recruiting stack"
-      lead="Dover-class products excel at orchestrated outbound and sequences for hiring teams. TWIN starts from the candidate side: autonomous discovery and applications with a north star of acceptance-ready calendar items."
+      title={t("compare.doverTitle")}
+      competitorLabel={t("compare.doverCompetitorLabel")}
+      lead={t("compare.doverLead")}
       competitorBullets={[
-        "Employer-centric workflows and integrations for recruiting orgs.",
-        "Heavy on outbound campaigns and team coordination.",
-        "Less emphasis on candidate-owned autonomous career control.",
+        t("compare.doverCompetitor1"),
+        t("compare.doverCompetitor2"),
+        t("compare.doverCompetitor3"),
       ]}
-      twinBullets={[
-        "Candidate-first agent: sleep-time progress with explicit consent boundaries.",
-        "Polish and EU board adapters (e.g. pracuj.pl, rocketjobs.pl) as part of the MVP arc.",
-        "Designed for verification-friendly placement economics, not manual CS tennis.",
-      ]}
+      twinBullets={[t("compare.doverTwin1"), t("compare.doverTwin2"), t("compare.doverTwin3")]}
     />
   );
 }
