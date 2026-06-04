@@ -19,7 +19,7 @@
 | Narrowed policy on prod | Explicit `connect-src` includes `https://twin-production-bcd9.up.railway.app`; no broad `https:` wildcards | ✅ LIVE |
 | S2 72h burn-in | Window `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; founder combined `2026-06-03T13:29:36Z` — Railway `csp_report` **no fresh entries** since start; Chrome DevTools core routes **no CSP violations** | ❌ **NOT READY** — IN PROGRESS (~32% elapsed) |
 | S2 violation triage pack | Railway clean + Chrome DevTools **PASS** at `13:29:36Z` (`ece6588`); Safari + Firefox **PENDING**; full 72h rollup + founder enforce sign-off at window end still required | ⚠️ **IN PROGRESS** |
-| DevTools logo Console noise (`/_next/image` + favicon 404 / gstatic faviconV2) | Founder `2026-06-03` triage: **non-CSP**; fix chain — `SafeCompanyLogo` → `FAVICON_INITIALS_ONLY_DOMAINS` → `MARQUEE_STABLE_SI_SLUGS` (no Google/gstatic/DDG raster); **post-deploy founder smoke on `/` required** | ⚠️ **fix shipped** — verify Console; **not** S2 blocker |
+| DevTools logo Console noise (`/_next/image` + favicon 404 / gstatic faviconV2) | Founder `2026-06-03` triage: **non-CSP**; fix chain — `SafeCompanyLogo` → initials skiplist → SI-only URLs (raster helpers removed) → decorative marquee (no outbound `href`, avoids Chrome gstatic prefetch); **post-deploy founder smoke on `/` required** | ⚠️ **fix shipped** — verify Console; **not** S2 blocker |
 | S3–S4, S6–S10c mutation/upload limits | Gate checklist + repo tests | ✅ shipped (code) |
 | S5 Stripe dedup `050` | Founder read-only SQL 2026-05-29 | ✅ PASS |
 | S8–S9 secrets / deps baseline | Re-run before launch per checklist | ⚠️ re-verify |
@@ -158,7 +158,7 @@
 | Verified-readiness card | S11 prod smoke | ✅ PASS |
 | No delegated/KYC live copy | Founder evidence doc | ✅ PASS |
 | Frontend guards | `test:verified-readiness-guard`, `test:dashboard-ux-safety` | ✅ PASS |
-| Marketing logo marquee (`/` home) | Non-CSP UX; `SafeCompanyLogo` + `MARQUEE_STABLE_SI_SLUGS` / initials skiplist (no Google/gstatic/DDG raster); **founder post-deploy smoke** on `/` | ⚠️ **fix shipped** — smoke pending; pilot OK |
+| Marketing logo marquee (`/` home) | Non-CSP UX; `SafeCompanyLogo` + SI-only URLs + initials skiplist + decorative plates (no outbound `href` / raster helpers); **founder post-deploy smoke** on `/` | ⚠️ **fix shipped** — smoke pending; pilot OK |
 | `eslint` / `tsc` / `build` | Local 2026-06-02 — all green | ✅ PASS |
 
 ---
@@ -217,7 +217,7 @@
 
 ### Risks (accepted for pilot, not public)
 
-- **Marketing logo marquee:** Pre-fix `/_next/image` / gstatic faviconV2 noise classified **non-CSP**; branch fix uses direct `<img>`, SI allowlist, initials skiplist (no Google/gstatic/DDG raster) — founder post-deploy DevTools smoke on `/` still required; **S2 burn-in unchanged**.
+- **Marketing logo marquee:** Pre-fix `/_next/image` / gstatic faviconV2 noise classified **non-CSP**; branch fix uses direct `<img>`, SI-only URLs, initials skiplist, decorative plates without outbound links (no app-generated or Chrome-prefetched gstatic) — founder post-deploy DevTools smoke on `/` still required; **S2 burn-in unchanged**.
 - CSP `unsafe-inline` / `unsafe-eval` remain (separate hardening track).
 - Prod API SHA `6382a91` includes `e764e68`; nightly beat **disabled** in health (GAP-03 closed ops 2026-06-02). S2 burn-in **unchanged** — no clock reset.
 - Metric / corpus scale below “marketplace” narrative — honest pilot ceiling.
