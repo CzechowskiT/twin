@@ -11,13 +11,17 @@ import {
   brandLogoUrls,
   companyInitials,
   FAVICON_INITIALS_ONLY_DOMAINS,
+  isMarqueeLocalLogoSlug,
   isStableMarqueeSiSlug,
+  localMarqueeLogoUrl,
   MARQUEE_BRAND_LOGO_MAP,
   MARQUEE_LOCAL_LOGO_SLUGS,
   MARQUEE_STABLE_SI_SLUGS,
   MARQUEE_VERIFIED_SI_SLUGS,
   resolveMarqueeLogoSlugs,
   shouldUseInitialsOnlyLogo,
+  SI_CDN_UNAVAILABLE_SLUGS,
+  slugVectorUrls,
   type Brand,
 } from "../src/lib/brand-logo-urls";
 
@@ -89,7 +93,7 @@ function testBrandLogoUrlsOrder() {
 const MIN_MARQUEE_STABLE_LOGO_BRANDS = 40;
 
 const ALLOWED_LOGO_URL =
-  /^(https:\/\/cdn\.jsdelivr\.net\/npm\/simple-icons@11\.14\.0\/icons\/[a-z0-9-]+\.svg|https:\/\/cdn\.simpleicons\.org\/[a-z0-9-]+)$/;
+  /^(https:\/\/cdn\.jsdelivr\.net\/npm\/simple-icons@11\.14\.0\/icons\/[a-z0-9-]+\.svg|https:\/\/cdn\.simpleicons\.org\/[a-z0-9-]+|\/logos\/marquee\/[a-z0-9-]+\.svg)$/;
 
 function assertAllowedLogoUrls(urls: readonly string[], label: string) {
   for (const url of urls) {
@@ -174,10 +178,12 @@ function testSmokeBrandsProduceUrlsWhenMapped() {
     if (expectUrl) {
       assert.ok(urls.length > 0, `smoke brand should have URLs: ${domain}`);
       assertAllowedLogoUrls(urls, domain);
-      assert.ok(
-        urls[0]?.startsWith("https://cdn.simpleicons.org/"),
-        `brand-colored SI CDN first: ${domain}`,
-      );
+      if (!SI_CDN_UNAVAILABLE_SLUGS.has(slug)) {
+        assert.ok(
+          urls[0]?.startsWith("https://cdn.simpleicons.org/"),
+          `brand-colored SI CDN first: ${domain}`,
+        );
+      }
       assertNoForcedBlackLogoUrls(urls, domain);
     } else {
       assert.equal(urls.length, 0, `no SI at 11.14.0: ${domain}`);
@@ -201,8 +207,52 @@ function testFounderScreenshotBrandsPreferColoredSiFirst() {
   ];
   for (const { domain, slug } of founder) {
     const urls = brandLogoUrls({ slug, name: slug, domain });
-    assert.equal(urls[0], `https://cdn.simpleicons.org/${slug}`, `colored SI first: ${domain}`);
+    assert.ok(urls.length > 0, `founder brand must have logo URLs: ${domain}`);
+    if (!SI_CDN_UNAVAILABLE_SLUGS.has(slug)) {
+      assert.equal(urls[0], `https://cdn.simpleicons.org/${slug}`, `colored SI first: ${domain}`);
+    }
     assertNoForcedBlackLogoUrls(urls, domain);
+  }
+}
+
+function testWalmartSkipsBrokenSiCdnAndHasFallbacks() {
+  const urls = brandLogoUrls({ slug: "walmart", name: "Walmart", domain: "walmart.com" });
+  assert.ok(urls.length >= 2, "walmart needs jsDelivr + local fallback");
+  assert.ok(!urls.includes("https://cdn.simpleicons.org/walmart"), "SI CDN 404 skipped");
+  assert.ok(
+    urls[0]?.includes("cdn.jsdelivr.net/npm/simple-icons@11.14.0/icons/walmart"),
+    "jsDelivr first for walmart",
+  );
+  assert.ok(urls.includes("/logos/marquee/walmart.svg"), "local colored SVG last hop");
+  assert.equal(companyInitials("Walmart"), "WA");
+}
+
+function testSlugVectorUrlsOrder() {
+  assert.deepEqual(slugVectorUrls("target"), [
+    "https://cdn.simpleicons.org/target",
+    "https://cdn.jsdelivr.net/npm/simple-icons@11.14.0/icons/target.svg",
+    "/logos/marquee/target.svg",
+  ]);
+  assert.deepEqual(slugVectorUrls("walmart"), [
+    "https://cdn.jsdelivr.net/npm/simple-icons@11.14.0/icons/walmart.svg",
+    "/logos/marquee/walmart.svg",
+  ]);
+}
+
+function testEveryMarqueeBrandHasLogoOrInitialsFallback() {
+  const blocks = parseMarqueeBrands();
+  for (const { name, domain } of blocks) {
+    const urls = brandLogoUrls({ slug: "x", name, domain });
+    const initials = companyInitials(name);
+    assert.ok(initials.length > 0 && initials !== "?", `initials: ${name}`);
+    if (shouldUseInitialsOnlyLogo(domain)) {
+      assert.equal(urls.length, 0, `initials-only domain: ${domain}`);
+      continue;
+    }
+    if (MARQUEE_BRAND_LOGO_MAP[domain]) {
+      assert.ok(urls.length > 0, `mapped domain needs logo URLs: ${domain}`);
+      assertAllowedLogoUrls(urls, domain);
+    }
   }
 }
 
@@ -300,10 +350,22 @@ function testSafeLogoRendersInitialsLayer() {
   assert.match(safe, /companyInitials\(name\)/);
   assert.match(safe, /INITIALS_CLASS/);
   assert.match(safe, /showInitials \? "opacity-100" : "opacity-0/);
-  assert.match(safe, /<img[\s\S]*src=\{src\}/);
+  assert.match(safe, /showImg && src/);
+  assert.match(safe, /setErrorAtStep\(step\)/);
+  assert.match(safe, /errorAtStep === step/);
+  assert.match(safe, /key=\{src\}/);
   assert.doesNotMatch(safe, /\bonLoad=/);
   assert.doesNotMatch(safe, /setLoaded/);
-  assert.doesNotMatch(safe, /showImage/);
+}
+
+function testLocalMarqueeLogoFilesExist() {
+  for (const slug of MARQUEE_LOCAL_LOGO_SLUGS) {
+    assert.ok(isMarqueeLocalLogoSlug(slug));
+    const path = join(root, "public", "logos", "marquee", `${slug}.svg`);
+    const svg = readFileSync(path, "utf8");
+    assert.ok(svg.includes("<svg"), `local marquee svg: ${slug}`);
+    assert.equal(localMarqueeLogoUrl(slug), `/logos/marquee/${slug}.svg`);
+  }
 }
 
 function testLocalMarqueeSlugsSubsetOfStable() {
@@ -387,7 +449,11 @@ function main() {
   testVerifiedFixtureMatchesAllowlist();
   testSmokeBrandsProduceUrlsWhenMapped();
   testFounderScreenshotBrandsPreferColoredSiFirst();
+  testWalmartSkipsBrokenSiCdnAndHasFallbacks();
+  testSlugVectorUrlsOrder();
+  testEveryMarqueeBrandHasLogoOrInitialsFallback();
   testLocalMarqueeSlugsSubsetOfStable();
+  testLocalMarqueeLogoFilesExist();
   testMarqueeSortsLogosFirst();
   console.log("safe-company-logo.test.ts: OK");
 }

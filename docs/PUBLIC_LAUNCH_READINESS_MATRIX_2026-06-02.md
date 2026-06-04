@@ -158,7 +158,7 @@
 | Verified-readiness card | S11 prod smoke | ✅ PASS |
 | No delegated/KYC live copy | Founder evidence doc | ✅ PASS |
 | Frontend guards | `test:verified-readiness-guard`, `test:dashboard-ux-safety` | ✅ PASS |
-| Marketing logo marquee (`/` home) | Console clean; **`MARQUEE_BRAND_LOGO_MAP`**; **`cdn.simpleicons.org/{slug}`** brand colors first (no `/000000`); jsDelivr pinned fallback; **59** logos / remainder initials; logos-first sort; **post-deploy** founder `/` colored-logo smoke | ⚠️ **FIX SHIPPED** — verify after deploy |
+| Marketing logo marquee (`/` home) | Console clean; **`MARQUEE_BRAND_LOGO_MAP`**; colored SI when live; **`SI_CDN_UNAVAILABLE_SLUGS`** + jsDelivr + `/logos/marquee/`; **`SafeCompanyLogo`** no broken `<img>`; every slot logo or initials; **post-deploy** founder `/` smoke | ⚠️ **FIX SHIPPED** — verify after deploy |
 | `eslint` / `tsc` / `build` | Local 2026-06-02 — all green | ✅ PASS |
 
 ---

@@ -116,6 +116,36 @@ export function isMarqueeLocalLogoSlug(slug: string): boolean {
 }
 
 /**
+ * `cdn.simpleicons.org/{slug}` 404s at pinned `simple-icons@11.14.0` (verified 2026-06-04).
+ * Skip SI CDN so SafeCompanyLogo never paints a broken `<img>` before jsDelivr/local.
+ */
+export const SI_CDN_UNAVAILABLE_SLUGS = new Set([
+  "adobe",
+  "amazon",
+  "ibm",
+  "mercedes",
+  "microsoft",
+  "oracle",
+  "salesforce",
+  "tmobile",
+  "walmart",
+]);
+
+/** Colored SI (when live), pinned jsDelivr, then self-hosted marquee SVG. */
+export function slugVectorUrls(slug: string): string[] {
+  const s = slug.trim().toLowerCase();
+  const urls: string[] = [];
+  if (!SI_CDN_UNAVAILABLE_SLUGS.has(s)) {
+    urls.push(siUrl(s));
+  }
+  urls.push(jsdelivrSiUrl(s));
+  if (isMarqueeLocalLogoSlug(s)) {
+    urls.push(localMarqueeLogoUrl(s));
+  }
+  return urls;
+}
+
+/**
  * DuckDuckGo ip3 favicons 404 predictably for these domains (founder smoke 2026-06-03).
  * Skip remote fetch — marquee shows initials only (no Console 404 noise).
  */
@@ -233,8 +263,7 @@ export function brandLogoUrls(brand: Brand): string[] {
   if (stableSlugs.length === 0 && custom.length === 0) {
     return [];
   }
-  // Brand-colored SI CDN first, then pinned jsDelivr SVG (no forced-black hex suffix).
-  const vector = stableSlugs.flatMap((slug) => [siUrl(slug), jsdelivrSiUrl(slug)]);
+  const vector = stableSlugs.flatMap((slug) => slugVectorUrls(slug));
   return [...custom, ...vector];
 }
 
