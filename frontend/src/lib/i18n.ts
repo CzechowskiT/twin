@@ -789,7 +789,7 @@ const en = {
     billingPaymentsLaunchingLead:
       "Card checkout is not live on this server yet. Your free plan still works — join the wishlist for founding access while we wire Stripe on Railway.",
     billingPageLead:
-      "Free keeps a tight cap on tracked applications; Premium unlocks unlimited tracking. Auto-apply runs on every plan by default (investor demos); set AUTO_APPLY_REQUIRE_PREMIUM=true on the API to gate it to paid tiers. Checkout runs on Stripe. Which cards, Link, or bank methods appear comes from server configuration; the chips below spell it out.",
+      "Free keeps a tight cap on tracked applications; Premium unlocks unlimited tracking. Autonomous apply is phased and paused on production today — you can prepare application packages for review; delegated submit stays off until the product enables it. Checkout runs on Stripe. Which cards, Link, or bank methods appear comes from server configuration; the chips below spell it out.",
     billingCurrentPlan: "Current plan",
     billingSubscriptionStatus: "Subscription status",
     billingPeriodEnds: "Current period ends",
@@ -3537,7 +3537,7 @@ const pl: MessageTree = {
     billingPaymentsLaunchingLead:
       "Płatność kartą nie jest jeszcze aktywna na tym serwerze. Plan darmowy działa — dołącz do listy founding, gdy podłączymy Stripe w Railway.",
     billingPageLead:
-      "Free trzyma limit śledzonych aplikacji; Premium daje nielimit. Auto-apply domyślnie na każdym planie (demo / inwestor); na produkcji możesz ograniczyć do płatnych: AUTO_APPLY_REQUIRE_PREMIUM=true na API. Płatności przez Stripe. Które karty, Link czy przelew zobaczysz na checkoutcie, wynika ze zmiennych na serwerze; poniżej widać, co jest włączone.",
+      "Free trzyma limit śledzonych aplikacji; Premium daje nielimit. Autonomiczne aplikowanie jest fazowane i na produkcji dziś wstrzymane — możesz przygotować pakiety do przeglądu; delegowane wysyłanie pozostaje wyłączone, dopóki produkt tego nie włączy. Płatności przez Stripe. Które karty, Link czy przelew zobaczysz na checkoutcie, wynika ze zmiennych na serwerze; poniżej widać, co jest włączone.",
     billingCurrentPlan: "Obecny plan",
     billingSubscriptionStatus: "Status subskrypcji",
     billingPeriodEnds: "Koniec bieżącego okresu",

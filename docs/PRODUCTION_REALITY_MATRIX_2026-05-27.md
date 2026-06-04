@@ -9,6 +9,7 @@
 - **Auto-apply safety audit:** `docs/AUTO_APPLY_DELEGATED_APPLY_SAFETY_AUDIT_2026-06-02.md` (2026-06-02)
 - **Post-merge sanity:** `docs/POST_MERGE_AUTO_APPLY_SANITY_2026-06-02.md` (2026-06-02)
 - **Ops pause plan:** `docs/AUTO_APPLY_PRODUCTION_OPS_PAUSE_PLAN_2026-06-02.md` (2026-06-02)
+- **Copy & claims audit:** `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md` (2026-06-04)
 - **DB incident (2026-05-29):** `INC-DB-2026-05-29-001` — **RESOLVED** + stabilization PASSED — see `docs/PRODUCTION_DB_RESTORE_INCIDENT_2026-05-29.md`
 - **O7 staging drill (2026-06-01):** ✅ **PASS** — pg_dump/pg_restore to `staging-restore-proof-20260529`; prod **`postgres-volume`** untouched — see `docs/BACKUP_RESTORE_DRILL_LOG.md`
 - **Vercel production deployment:** `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH` at frontend `3631c45` (Google Calendar day-mapping fix; founder re-smoke 2026-05-29)
@@ -23,7 +24,7 @@
 
 | Feature | Evidence | Production |
 | ------- | -------- | ---------- |
-| Public marketing (`/`, waitlist, first-1000) | HTTP 200 smoke; **final logo smoke PASS** founder Chrome Incognito **`2026-06-04T10:29:29Z`** after deploy chain `472a6d3` → `bcd23cd` → `4a7c57d` — colorful logos, no broken images, clean Console | **LIVE** |
+| Public marketing (`/`, waitlist, first-1000) | HTTP 200 smoke; **final logo smoke PASS** founder Chrome Incognito **`2026-06-04T10:29:29Z`** after deploy chain `472a6d3` → `bcd23cd` → `4a7c57d` — colorful logos, no broken images, clean Console; **copy audit 2026-06-04** — founding “lifetime Pro” hero CTAs **overclaim** for public launch (see claims audit) | **LIVE** (pilot); **BLOCKED** uncontrolled public until copy revise |
 | Status / public-health proxy | `git_commit=df15618`, `db_ok=true` in JSON (read-only check 2026-05-29) | **LIVE** |
 | Candidate login (OAuth + email) | health flags `google_oauth`, `github_oauth` | **LIVE** (Apple OAuth **OFF**) |
 | Dashboard (candidate) | `/dashboard` 200; auth required for data | **LIVE** |

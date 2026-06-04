@@ -88,7 +88,8 @@ the gate to ✅.
 
 ## Current gate stance (checkpoint 2026-06-04 `10:34:36Z`, **O7 PASS**, **S2 burn-in in progress**, **L6 + O5 waivers signed**, **final logo smoke PASS**, **Railway ~48h cadence clean**)
 
-**Latest audit:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` (refreshed 2026-06-04 `10:34:36Z`)
+**Latest audit:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` (refreshed 2026-06-04 `10:34:36Z`)  
+**Copy & claims:** `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md` — homepage **lifetime Pro** CTAs **BLOCKER** for public launch; dashboard/billing persona fixes shipped; **no** change to S2/L6/O5 gate rows.
 **Post-merge sanity (2026-06-02):** `docs/POST_MERGE_AUTO_APPLY_SANITY_2026-06-02.md` — PR #21 merged; prod `git_commit=6382a91` (includes `e764e68` hard gates **LIVE**); public-health OK; auto-apply **PAUSED** policy unchanged.
 **Logo smoke (2026-06-04):** Deploy chain `472a6d3` → `bcd23cd` → `4a7c57d` on prod alias; founder **final smoke PASS** `2026-06-04T10:29:29Z` — Chrome Incognito `/`: homepage **OK**; colorful brand logos + readable initials; **no** empty white plates or broken-image icons; **no** red `/_next/image` / DuckDuckGo / Google S2 / gstatic; **no CSP violations**; Safari + Firefox DevTools **`08:47:35Z`** — core routes + logo smoke **PASS**. **S2 CONTINUE** (no clock reset; CSP unchanged).
 

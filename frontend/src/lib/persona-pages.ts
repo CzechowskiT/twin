@@ -145,7 +145,7 @@ const candidatesEn: PersonaBundle = {
   logisticsTitle: "Good to know",
   logistics: [
     "Some employers still ask you to finish the application on their site — TWIN keeps track for you.",
-    "Autonomous applying runs on supported job boards with Premium or Pro, when the board allows it.",
+    "Autonomous applying is rolling out in phases on supported boards (Premium or Pro when enabled) — production stays prepare-only until delegated apply ships.",
     "Scanned PDF résumés can take a moment to read — you can always edit your profile by hand.",
   ],
   primaryCta: { label: "Start free with TWIN", href: "/register" },

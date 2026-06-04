@@ -2,8 +2,8 @@
 
 **Auditor:** TWIN Release Gate Owner (read-only shift)
 **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01`
-**Branch HEAD:** `9011040` (prior) → updated by 2026-06-03 shift commits
-**Audit UTC:** `2026-06-04T10:34:36Z` (~44h 16m / **~61%** into burn-in; **~27h 44m** until `2026-06-05T14:18:33Z`; L6 + O5 founder waivers signed `2026-06-03T13:19:53Z`; Safari/Firefox DevTools PASS `2026-06-04T08:47:35Z`; **final logo smoke PASS** `2026-06-04T10:29:29Z`; **Railway ~48h cadence clean** `2026-06-04T10:34:36Z` after deploy chain `472a6d3` → `bcd23cd` → `4a7c57d`)
+**Branch HEAD:** `9011040` (prior) → updated by 2026-06-03 shift commits; copy audit 2026-06-04
+**Audit UTC:** `2026-06-04T10:34:36Z` (gate) · **copy audit** `2026-06-04` — `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md` (~44h 16m / **~61%** into burn-in; **~27h 44m** until `2026-06-05T14:18:33Z`; L6 + O5 founder waivers signed `2026-06-03T13:19:53Z`; Safari/Firefox DevTools PASS `2026-06-04T08:47:35Z`; **final logo smoke PASS** `2026-06-04T10:29:29Z`; **Railway ~48h cadence clean** `2026-06-04T10:34:36Z` after deploy chain `472a6d3` → `bcd23cd` → `4a7c57d`)
 **Production (unchanged by this audit):** FE `https://twin-sooty.vercel.app` · API `https://twin-production-bcd9.up.railway.app`
 
 **Verdict:** **Public launch NO-GO** · **Pilot / investor demo GO** · **S2 NOT READY** · **Auto-apply PAUSED** (operational + product gates)
@@ -156,7 +156,7 @@
 | P6 founder authenticated smoke | 8/8 routes + safety copy 2026-05-29 | ✅ PASS |
 | Dashboard layout / forecast | Founder-confirmed post-fix | ✅ PASS |
 | Verified-readiness card | S11 prod smoke | ✅ PASS |
-| No delegated/KYC live copy | Founder evidence doc | ✅ PASS |
+| No delegated/KYC live copy | Founder evidence doc; **copy audit 2026-06-04** — dashboard/verified-readiness **OK**; homepage **lifetime Pro** strings remain **BLOCKER** for public launch (see claims audit) | ⚠️ **partial** — pilot OK; public marketing revise pending |
 | Frontend guards | `test:verified-readiness-guard`, `test:dashboard-ux-safety` | ✅ PASS |
 | Marketing logo marquee (`/` home) | Console clean; **`MARQUEE_BRAND_LOGO_MAP`**; colored SI when live; **`SI_CDN_UNAVAILABLE_SLUGS`** + jsDelivr + `/logos/marquee/`; **`SafeCompanyLogo`** no broken `<img>`; every slot logo or initials; **post-deploy** founder `/` smoke | ⚠️ **FIX SHIPPED** — verify after deploy |
 | `eslint` / `tsc` / `build` | Local 2026-06-02 — all green | ✅ PASS |
@@ -269,8 +269,18 @@
 
 ---
 
+## Copy & claims audit (2026-06-04)
+
+- **Doc:** `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md`
+- **Verdict:** Public launch marketing still **NO-GO** on founding “lifetime Pro” hero/sticky CTAs; dashboard auto-apply/delegated copy **aligned**; billing + persona logistics **revised** (paused/phased).
+- **BLOCKER rows (marketing):** `home.heroHook`, `stickyCtaMicro`, `ctaBandWishlistTitle` — revise before uncontrolled launch.
+- **Waivers unchanged:** L6 manual DSR · O5 Apple/iCal partial — signed `2026-06-03T13:19:53Z`.
+
+---
+
 ## Related docs
 
+- `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md`
 - `docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md`
 - `docs/PRODUCTION_REALITY_MATRIX_2026-05-27.md`
 - `docs/S2_CSP_BURNIN_WINDOW_2026-06-01.md`
