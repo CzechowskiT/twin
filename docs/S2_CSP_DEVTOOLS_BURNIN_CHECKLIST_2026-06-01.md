@@ -9,8 +9,8 @@ CSP must remain **Report-Only** — console shows violations as warnings, pages 
 ## Browsers
 
 - [x] Chrome (desktop) — **PASS** (founder DevTools `2026-06-03T13:29:36Z`; routes below)
-- [ ] Safari (desktop) — **PENDING**
-- [ ] Firefox (desktop) — **PENDING**
+- [x] Safari (desktop) — **PASS** (founder DevTools `2026-06-04T08:47:35Z`; routes below)
+- [x] Firefox (desktop) — **PASS** (founder DevTools `2026-06-04T08:47:35Z`; routes below)
 - [ ] Mobile Safari (iOS) or responsive mode — **PENDING**
 - [ ] Mobile Chrome (Android) or responsive mode — **PENDING**
 
@@ -45,9 +45,39 @@ CSP must remain **Report-Only** — console shows violations as warnings, pages 
 
 **Chrome CSP verdict (unchanged):** founder pass at `2026-06-03T13:29:36Z` (`ece6588`) — **no CSP violations** on core routes; pre-fix image-proxy Console noise was **orthogonal** to CSP burn-in PASS. **S2 burn-in: CONTINUE** (no clock reset).
 
-## Safari (desktop) — manual checklist (PENDING)
+## Chrome (desktop) — founder logo smoke post PR #24 (2026-06-04)
 
-**Status:** **PENDING** — complete before window end `2026-06-05T14:18:33Z`.
+**Checkpoint UTC:** `2026-06-04T08:39:36Z`
+
+**Context:** PR **#24** merged; logo cleanup chain deployed on `https://twin-sooty.vercel.app` (`18e6ce4` — `SafeCompanyLogo`, SI/`extraUrls` only, raster favicon helpers removed). **CSP unchanged** (report-only HOLD).
+
+**Profile:** Chrome **Incognito**, extensions **disabled**.
+
+**Route:** `/` (homepage + company logo marquee).
+
+| Check | Result |
+| ----- | ------ |
+| Homepage renders | ✅ **OK** |
+| Red `GET /_next/image?url=…` (logo hosts) | ✅ **None** |
+| Red `GET https://icons.duckduckgo.com/ip3/…` | ✅ **None** |
+| Red `GET https://www.google.com/s2/favicons…` | ✅ **None** |
+| Red `GET https://t*.gstatic.com/faviconV2…` | ✅ **None** |
+| Fallback initials (blocklisted / failed remote) | ✅ **Working** |
+| Console CSP violations | ✅ **None** |
+| Classification | **Non-CSP UX fixed** — does **not** reset S2 clock |
+| Decision | **CONTINUE** |
+
+**S2 burn-in:** **CONTINUE** (no clock reset). **S2 PASS:** **NO**. **Public launch:** **NO-GO** until `2026-06-05T14:18:33Z` 72h rollup + founder sign-off.
+
+**Follow-up (founder Chrome `2026-06-04`):** No red favicon/`/_next/image` Console errors, but many marquee plates showed **empty white boxes** (initials hidden behind `opacity-0` loading images). **Fixed** in repo — layered visible initials until logo loads; **post-deploy smoke required**.
+
+**Next:** Post-deploy `/` logo marquee smoke (visible initials on blocklisted/failed marks; no empty plates).
+
+## Safari (desktop) — founder PASS 2026-06-04
+
+**Checkpoint UTC:** `2026-06-04T08:47:35Z`
+
+**Status:** **PASS** — core S2 routes; logo marquee spot-check on `/`.
 
 **Profile:** Private Window; disable content blockers / extensions for the test pass (or note extension noise in evidence).
 
@@ -63,20 +93,26 @@ CSP must remain **Report-Only** — console shows violations as warnings, pages 
 
 | Route | Console clean? | Network anomalies? | PASS? |
 | ----- | -------------- | ------------------ | ----- |
-| `/` | pending | pending | [ ] |
-| `/login/candidate` | pending | pending | [ ] |
-| `/register/candidate` | pending | pending | [ ] |
-| `/dashboard` | pending | pending | [ ] |
-| `/dashboard/calendar` | pending | pending | [ ] |
-| `/demo` | pending | pending | [ ] |
-| `/status` | pending | pending | [ ] |
-| `/api/public-health` | n/a (Network) | pending | [ ] |
+| `/` | ✅ clean | none | [x] |
+| `/login/candidate` | ✅ clean | none | [x] |
+| `/register/candidate` | ✅ clean | none | [x] |
+| `/dashboard` | ✅ clean | none | [x] |
+| `/dashboard/calendar` | ✅ clean | none | [x] |
+| `/demo` | ✅ clean | none | [x] |
+| `/status` | ✅ clean | none | [x] |
+| `/api/public-health` | n/a (Network) | none | [x] |
+
+**Logo smoke (`/`):** No CSP violations; no red favicon/`/_next/image` errors; initials OK.
+
+**Decision:** **CONTINUE** · **S2 PASS:** **NO** · **Public launch:** **NO-GO**
 
 **Non-CSP:** `GET /api/v1/jobs/saved` → **422** without Console CSP is **not** a burn-in failure (same as Chrome `2026-06-03`).
 
-## Firefox (desktop) — manual checklist (PENDING)
+## Firefox (desktop) — founder PASS 2026-06-04
 
-**Status:** **PENDING** — complete before window end `2026-06-05T14:18:33Z`.
+**Checkpoint UTC:** `2026-06-04T08:47:35Z`
+
+**Status:** **PASS** — core S2 routes; logo marquee spot-check on `/`.
 
 **Profile:** Private Browsing; extensions disabled.
 
@@ -92,14 +128,18 @@ CSP must remain **Report-Only** — console shows violations as warnings, pages 
 
 | Route | Console clean? | Network anomalies? | PASS? |
 | ----- | -------------- | ------------------ | ----- |
-| `/` | pending | pending | [ ] |
-| `/login/candidate` | pending | pending | [ ] |
-| `/register/candidate` | pending | pending | [ ] |
-| `/dashboard` | pending | pending | [ ] |
-| `/dashboard/calendar` | pending | pending | [ ] |
-| `/demo` | pending | pending | [ ] |
-| `/status` | pending | pending | [ ] |
-| `/api/public-health` | n/a (Network) | pending | [ ] |
+| `/` | ✅ clean | none | [x] |
+| `/login/candidate` | ✅ clean | none | [x] |
+| `/register/candidate` | ✅ clean | none | [x] |
+| `/dashboard` | ✅ clean | none | [x] |
+| `/dashboard/calendar` | ✅ clean | none | [x] |
+| `/demo` | ✅ clean | none | [x] |
+| `/status` | ✅ clean | none | [x] |
+| `/api/public-health` | n/a (Network) | none | [x] |
+
+**Logo smoke (`/`):** No CSP violations; no red favicon/`/_next/image` errors; initials OK.
+
+**Decision:** **CONTINUE** · **S2 PASS:** **NO** · **Public launch:** **NO-GO**
 
 **Non-CSP:** `/api/v1/jobs/saved` **422** without Console CSP — **not** a burn-in blocker.
 
@@ -116,16 +156,16 @@ CSP must remain **Report-Only** — console shows violations as warnings, pages 
 
 Core S2 routes (must be checked in every browser): `/`, `/dashboard`, `/login/candidate`, `/register/candidate`, `/demo`, `/status`, `/dashboard/calendar`, `/api/public-health`.
 
-| Route | Chrome (`13:29:36Z`) | Safari | Firefox | Notes |
-| ----- | -------------------- | ------ | ------- | ----- |
-| `/` | ✅ PASS | PENDING | PENDING | Home + logo marquee |
-| `/dashboard` | ✅ PASS | PENDING | PENDING | Repeat logged-in when possible |
-| `/login/candidate` | ✅ PASS | PENDING | PENDING | OAuth buttons |
-| `/register/candidate` | ✅ PASS | PENDING | PENDING | GDPR consent |
-| `/demo` | ✅ PASS | PENDING | PENDING | |
-| `/status` | ✅ PASS | PENDING | PENDING | |
-| `/dashboard/calendar` | ✅ PASS | PENDING | PENDING | Calendar shell |
-| `/api/public-health` | ✅ PASS (Network) | PENDING | PENDING | No Console CSP on JSON |
+| Route | Chrome (`13:29:36Z`) | Safari (`08:47:35Z`) | Firefox (`08:47:35Z`) | Notes |
+| ----- | -------------------- | -------------------- | ------------------- | ----- |
+| `/` | ✅ PASS | ✅ PASS | ✅ PASS | Home + logo marquee |
+| `/dashboard` | ✅ PASS | ✅ PASS | ✅ PASS | Repeat logged-in when possible |
+| `/login/candidate` | ✅ PASS | ✅ PASS | ✅ PASS | OAuth buttons |
+| `/register/candidate` | ✅ PASS | ✅ PASS | ✅ PASS | GDPR consent |
+| `/demo` | ✅ PASS | ✅ PASS | ✅ PASS | |
+| `/status` | ✅ PASS | ✅ PASS | ✅ PASS | |
+| `/dashboard/calendar` | ✅ PASS | ✅ PASS | ✅ PASS | Calendar shell |
+| `/api/public-health` | ✅ PASS (Network) | ✅ PASS (Network) | ✅ PASS (Network) | No Console CSP on JSON |
 | `/privacy` | not in Chrome S2 pass | optional | optional | Legal surface |
 | `/terms` | not in Chrome S2 pass | optional | optional | Legal surface |
 
@@ -161,4 +201,4 @@ Pair with 72h Railway triage (`docs/S2_CSP_RAILWAY_LOG_TRIAGE_PLAN_2026-06-01.md
 
 Until Railway 72h rollup **and** multi-browser DevTools (Safari + Firefox minimum) complete: **S2 NOT READY**, public launch **NO-GO**.
 
-**Follow-up (non-CSP):** (1) `fix(frontend): add safe fallback for external company logos` — `SafeCompanyLogo` bypasses `/_next/image`. (2) `fix(frontend): suppress noisy external favicon failures` — `FAVICON_INITIALS_ONLY_DOMAINS` + Google-before-DuckDuckGo raster order in `brand-logo-urls.ts`; `npm run test:safe-company-logo`. **CSP unchanged.** **S2 burn-in: CONTINUE** (no clock reset). **Public launch: NO-GO** until post-deploy founder DevTools smoke on `/` (incognito, extensions off): no `/_next/image` logo spam; filter Network for `icons.duckduckgo.com` — expect no red 404 for blocklisted domains.
+**Follow-up (non-CSP):** Logo fix chain shipped (PR **#24**, `18e6ce4`). Founder post-deploy smoke **`2026-06-04T08:39:36Z`** on `/` — Console clean; Chrome UX gap: **empty white logo plates** → **initials layer fix** (repo, post-deploy smoke). Safari + Firefox DevTools **`2026-06-04T08:47:35Z`** — **PASS** (core routes + `/` logo; no CSP violations). **CSP unchanged.** **S2 burn-in: CONTINUE** (no clock reset). **S2 PASS: NO.** **Public launch: NO-GO** until `2026-06-05T14:18:33Z` 72h rollup + founder enforce sign-off. **Remaining:** mobile browsers (optional), post-deploy initials smoke.

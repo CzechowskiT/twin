@@ -289,7 +289,56 @@ From `GET /api/public-health` (via FE alias), captured at burn-in restart (`2026
 
 **Likely cause (read-only triage):** Marquee loads ~80 brands × fallback chain (DuckDuckGo → Google favicons → jsDelivr/Simple Icons) through `/_next/image`; some slugs/domains 404/502 at origin; optimizer returns 400/404/502. `images.remotePatterns` in `frontend/next.config.ts` already allowlist these hostnames — not a CSP `img-src` gap.
 
-**Follow-up (shipped on branch, CSP unchanged):** (1) `SafeCompanyLogo` — native `<img>` (no `/_next/image` proxy), capped `onError` fallback chain, initials placeholder. (2) `FAVICON_INITIALS_ONLY_DOMAINS` — skip remote fetch for blocklisted domains (`homedepot.com`, `chevron.com`, `servicenow.com`, `humana.com`, `cvs.com`). (3) `MARQUEE_STABLE_SI_SLUGS` — SI vectors + verified `extraUrls` only; raster favicon helpers **deleted** from `brand-logo-urls.ts`. (4) Marquee plates are decorative `role="img"` spans (**no** outbound `href`) so Chrome does not prefetch `t*.gstatic.com/faviconV2` for link targets. Tests `npm run test:safe-company-logo`. **S2 burn-in: CONTINUE** (no clock reset). **Public launch: NO-GO** until founder post-deploy DevTools smoke on `/`: no `/_next/image` spam; no gstatic/DDG favicon 404 noise.
+**Follow-up (shipped on branch, CSP unchanged):** (1) `SafeCompanyLogo` — native `<img>` (no `/_next/image` proxy), capped `onError` fallback chain, initials placeholder. (2) `FAVICON_INITIALS_ONLY_DOMAINS` — skip remote fetch for blocklisted domains (`homedepot.com`, `chevron.com`, `servicenow.com`, `humana.com`, `cvs.com`). (3) `MARQUEE_STABLE_SI_SLUGS` — SI vectors + verified `extraUrls` only; raster favicon helpers **deleted** from `brand-logo-urls.ts`. (4) Marquee plates are decorative `role="img"` spans (**no** outbound `href`) so Chrome does not prefetch `t*.gstatic.com/faviconV2` for link targets. Tests `npm run test:safe-company-logo`. **Deployed:** PR **#24** merged (`18e6ce4` chain). **S2 burn-in: CONTINUE** (no clock reset). **Public launch: NO-GO** until 72h rollup + founder sign-off.
+
+## Founder non-CSP logo smoke — post PR #24 (2026-06-04)
+
+**Checkpoint UTC:** `2026-06-04T08:39:36Z` (~42h 21m after burn-in start `2026-06-02T14:18:33Z`; **~29h 39m** remaining until `2026-06-05T14:18:33Z`; **~59%** elapsed)
+
+**Source:** Founder Chrome **Incognito** DevTools on `https://twin-sooty.vercel.app/` after PR **#24** merge/deploy (logo cleanup `18e6ce4` chain).
+
+| Check | Result |
+| --- | --- |
+| Deploy | PR **#24** merged — favicon/logo cleanup **LIVE** on prod alias |
+| Route | `/` homepage + logo marquee |
+| `/_next/image` red errors | **None** |
+| `icons.duckduckgo.com/ip3` red errors | **None** |
+| `google.com/s2/favicons` red errors | **None** |
+| `t*.gstatic.com/faviconV2` red errors | **None** |
+| Fallback initials | **Working** |
+| Console CSP violations | **None** |
+| Classification | **Non-CSP UX fixed** |
+| CSP policy / burn-in clock | **Unchanged** — **no reset** |
+| Chrome CSP pass (`2026-06-03T13:29:36Z`) | **Unchanged** |
+| Safari / Firefox DevTools | **PENDING** |
+| Decision | **CONTINUE** 72h burn-in — report-only HOLD |
+| S2 status | **NOT READY** |
+| S2 PASS | **NO** |
+| Public launch | **NO-GO** |
+
+**Next founder cadence (UTC):** Railway `csp_report` triage `2026-06-04T14:18:33Z` (~48h after start) · Safari + Firefox DevTools per checklist · window end `2026-06-05T14:18:33Z`.
+
+## Founder combined checkpoint — Safari + Firefox DevTools + Railway (2026-06-04)
+
+**Checkpoint UTC:** `2026-06-04T08:47:35Z` (~42h 29m after burn-in start `2026-06-02T14:18:33Z`; **~29h 31m** remaining until `2026-06-05T14:18:33Z`; **~59%** elapsed)
+
+**Source:** Founder Safari DevTools + Firefox DevTools + Railway `csp_report` triage on `https://twin-sooty.vercel.app`
+
+| Check | Result |
+| --- | --- |
+| Safari DevTools routes | `/`, `/login/candidate`, `/register/candidate`, `/dashboard`, `/dashboard/calendar`, `/demo`, `/status`, `/api/public-health` — **no CSP violations** |
+| Safari logo smoke (`/`) | No red favicon/`/_next/image` errors; initials OK |
+| Firefox DevTools routes | Same core routes — **no CSP violations** |
+| Firefox logo smoke (`/`) | No red favicon/`/_next/image` errors; initials OK |
+| Railway `csp_report` after window start | **No fresh entries** since `2026-06-02T14:18:33Z` (last seen `2026-06-02T14:18:33Z` boundary) |
+| Chrome empty white logo plates (founder `2026-06-04`) | **Found** — initials hidden during `opacity-0` image load; **fixed** in repo (`SafeCompanyLogo` layered initials); **post-deploy smoke required** |
+| Enforce header | **Absent** (unchanged) |
+| Decision | **CONTINUE** 72h burn-in — report-only HOLD |
+| S2 status | **NOT READY** |
+| S2 PASS | **NO** |
+| Public launch | **NO-GO** |
+
+**Next founder cadence (UTC):** Window end rollup `2026-06-05T14:18:33Z` · post-deploy `/` initials smoke after fix deploy · optional mobile DevTools.
 
 ## Gate closure session note (2026-06-03)
 

@@ -3,7 +3,7 @@
 **Auditor:** TWIN Release Gate Owner (read-only shift)
 **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01`
 **Branch HEAD:** `9011040` (prior) → updated by 2026-06-03 shift commits
-**Audit UTC:** `2026-06-03T13:29:36Z` (~23h 11m / **~32%** into burn-in; **~48h 49m** until `2026-06-05T14:18:33Z`; L6 + O5 founder waivers signed `13:19:53Z`)
+**Audit UTC:** `2026-06-04T08:47:35Z` (~42h 29m / **~59%** into burn-in; **~29h 31m** until `2026-06-05T14:18:33Z`; L6 + O5 founder waivers signed `2026-06-03T13:19:53Z`; Safari/Firefox DevTools PASS `2026-06-04T08:47:35Z`; logo initials fix shipped same session)
 **Production (unchanged by this audit):** FE `https://twin-sooty.vercel.app` · API `https://twin-production-bcd9.up.railway.app`
 
 **Verdict:** **Public launch NO-GO** · **Pilot / investor demo GO** · **S2 NOT READY** · **Auto-apply PAUSED** (operational + product gates)
@@ -17,9 +17,9 @@
 | S1 CSP report-only + `report-uri` wired | 8-route `curl -sI` 2026-06-02 — all HTTP 200, `content-security-policy-report-only` present, `report-uri /api/v1/csp-report` | ✅ PASS |
 | CSP enforce header absent | No `content-security-policy:` (enforce) on `/`, `/dashboard`, `/login/candidate`, `/register/candidate`, `/demo`, `/status`, `/dashboard/calendar`, `/api/public-health` | ✅ (expected) |
 | Narrowed policy on prod | Explicit `connect-src` includes `https://twin-production-bcd9.up.railway.app`; no broad `https:` wildcards | ✅ LIVE |
-| S2 72h burn-in | Window `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; founder combined `2026-06-03T13:29:36Z` — Railway `csp_report` **no fresh entries** since start; Chrome DevTools core routes **no CSP violations** | ❌ **NOT READY** — IN PROGRESS (~32% elapsed) |
-| S2 violation triage pack | Railway clean + Chrome DevTools **PASS** at `13:29:36Z` (`ece6588`); Safari + Firefox **PENDING**; full 72h rollup + founder enforce sign-off at window end still required | ⚠️ **IN PROGRESS** |
-| DevTools logo Console noise (`/_next/image` + favicon 404 / gstatic faviconV2) | Founder `2026-06-03` triage: **non-CSP**; fix chain — `SafeCompanyLogo` → initials skiplist → SI-only URLs (raster helpers removed) → decorative marquee (no outbound `href`, avoids Chrome gstatic prefetch); **post-deploy founder smoke on `/` required** | ⚠️ **fix shipped** — verify Console; **not** S2 blocker |
+| S2 72h burn-in | Window `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; founder `2026-06-04T08:47:35Z` — Railway `csp_report` **no fresh entries** since start; Chrome/Safari/Firefox DevTools core routes **no CSP violations** | ❌ **NOT READY** — IN PROGRESS (~59% elapsed) |
+| S2 violation triage pack | Railway clean + Chrome (`13:29:36Z`) + Safari + Firefox (`08:47:35Z`) DevTools **PASS**; full 72h rollup + founder enforce sign-off at window end still required | ⚠️ **IN PROGRESS** |
+| DevTools logo Console noise (`/_next/image` + favicon 404 / gstatic faviconV2) | PR **#24** (`18e6ce4`); Chrome Console clean `08:39:36Z`; **empty white plates** found → **initials layer fix** (repo); Safari/Firefox logo smoke **PASS** `08:47:35Z`; **post-deploy smoke** after fix | ⚠️ **FIX SHIPPED** (post-deploy verify); **not** S2 blocker |
 | S3–S4, S6–S10c mutation/upload limits | Gate checklist + repo tests | ✅ shipped (code) |
 | S5 Stripe dedup `050` | Founder read-only SQL 2026-05-29 | ✅ PASS |
 | S8–S9 secrets / deps baseline | Re-run before launch per checklist | ⚠️ re-verify |
@@ -158,7 +158,7 @@
 | Verified-readiness card | S11 prod smoke | ✅ PASS |
 | No delegated/KYC live copy | Founder evidence doc | ✅ PASS |
 | Frontend guards | `test:verified-readiness-guard`, `test:dashboard-ux-safety` | ✅ PASS |
-| Marketing logo marquee (`/` home) | Non-CSP UX; `SafeCompanyLogo` + SI-only URLs + initials skiplist + decorative plates (no outbound `href` / raster helpers); **founder post-deploy smoke** on `/` | ⚠️ **fix shipped** — smoke pending; pilot OK |
+| Marketing logo marquee (`/` home) | PR **#24** / `18e6ce4`; Chrome Console clean `08:39:36Z`; empty white plates → **initials layer fix** (repo); Safari/Firefox **`08:47:35Z`** logo smoke **PASS**; **post-deploy** initials smoke | ⚠️ **FIX SHIPPED** — verify after deploy |
 | `eslint` / `tsc` / `build` | Local 2026-06-02 — all green | ✅ PASS |
 
 ---
@@ -211,13 +211,13 @@
 
 ### Primary blockers (ordered)
 
-1. **S2** — Complete 72h CSP report-only burn-in (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`); founder Railway **clean through `2026-06-03T13:29:36Z`**; Chrome DevTools **PASS**; remaining: Safari + Firefox DevTools, full window rollup, founder enforce sign-off (HOLD vs enforce) at window end.
+1. **S2** — Complete 72h CSP report-only burn-in (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`); founder Railway **clean through `2026-06-04T08:47:35Z`**; Chrome/Safari/Firefox DevTools **PASS**; remaining: full window rollup, founder enforce sign-off (HOLD vs enforce) at window end, post-deploy logo initials smoke.
 2. **GAP-04** — `AUTO_APPLY_SUBMIT` unset on prod (optional ops knob; document waiver or close before public launch if policy requires).
 3. **L6 / O5 (full public launch only)** — Waivers signed `2026-06-03T13:19:53Z` for controlled pilot; **not** substitutes for uncontrolled public launch (self-service delete; Apple/iCal verification for broad marketing).
 
 ### Risks (accepted for pilot, not public)
 
-- **Marketing logo marquee:** Pre-fix `/_next/image` / gstatic faviconV2 noise classified **non-CSP**; branch fix uses direct `<img>`, SI-only URLs, initials skiplist, decorative plates without outbound links (no app-generated or Chrome-prefetched gstatic) — founder post-deploy DevTools smoke on `/` still required; **S2 burn-in unchanged**.
+- **Marketing logo marquee:** Pre-fix noise was **non-CSP**; PR **#24** deployed; Chrome Console clean `08:39:36Z`; empty white plates → **initials layer fix**; Safari/Firefox DevTools **`08:47:35Z`** **PASS** — **S2 burn-in unchanged** (CONTINUE, no clock reset).
 - CSP `unsafe-inline` / `unsafe-eval` remain (separate hardening track).
 - Prod API SHA `6382a91` includes `e764e68`; nightly beat **disabled** in health (GAP-03 closed ops 2026-06-02). S2 burn-in **unchanged** — no clock reset.
 - Metric / corpus scale below “marketplace” narrative — honest pilot ceiling.

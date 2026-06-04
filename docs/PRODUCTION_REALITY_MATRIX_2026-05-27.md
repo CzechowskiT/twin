@@ -23,7 +23,7 @@
 
 | Feature | Evidence | Production |
 | ------- | -------- | ---------- |
-| Public marketing (`/`, waitlist, first-1000) | HTTP 200 smoke | **LIVE** |
+| Public marketing (`/`, waitlist, first-1000) | HTTP 200 smoke; logo marquee founder Chrome Incognito **`2026-06-04T08:39:36Z`** post PR **#24** (`18e6ce4`) — clean Console on `/` | **LIVE** |
 | Status / public-health proxy | `git_commit=df15618`, `db_ok=true` in JSON (read-only check 2026-05-29) | **LIVE** |
 | Candidate login (OAuth + email) | health flags `google_oauth`, `github_oauth` | **LIVE** (Apple OAuth **OFF**) |
 | Dashboard (candidate) | `/dashboard` 200; auth required for data | **LIVE** |
@@ -98,8 +98,9 @@
 | Google Calendar FULL prod smoke (2026-05-29) | `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md` | **LIVE / VERIFIED** — OAuth + real events + day mapping; Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, HEAD `3631c45`; no Railway |
 | Founder authenticated smoke (2026-05-29) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **LIVE / VERIFIED** — P6 **PASS**; 8/8 routes + safety; `/dashboard` layout founder-confirmed |
 | CSP per-route probe (2026-05-29 batch) | `/`, `/dashboard`, `/login/candidate`, `/demo`, `/status` — all report-only | **LIVE REPORT-ONLY** — enforce still blocked (S2) |
-| CSP S2 burn-in window (2026-06-02) | `docs/S2_CSP_BURNIN_WINDOW_2026-06-01.md` — `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z` (~23h 11m / ~32% elapsed at `2026-06-03T13:29:36Z`) | **IN PROGRESS** — S2 PASS **NO**; enforce off |
-| CSP founder combined checkpoint (2026-06-03 `13:29:36Z`) | Railway `csp_report` — **no fresh entries** since start; Chrome DevTools core routes — **no CSP violations**; Safari/Firefox **PENDING** | **CONTINUE** — report-only HOLD |
+| CSP S2 burn-in window (2026-06-02) | `docs/S2_CSP_BURNIN_WINDOW_2026-06-01.md` — `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z` (~42h 29m / ~59% elapsed at `2026-06-04T08:47:35Z`) | **IN PROGRESS** — S2 PASS **NO**; enforce off |
+| CSP founder combined checkpoint (2026-06-04 `08:47:35Z`) | Railway `csp_report` — **no fresh entries** since start; Chrome/Safari/Firefox DevTools core routes — **no CSP violations** | **CONTINUE** — report-only HOLD |
+| Marketing logo marquee (non-CSP, 2026-06-04) | PR **#24** / `18e6ce4`; Chrome Console clean; empty white plates → **initials layer fix** (repo); Safari/Firefox logo smoke **PASS** `08:47:35Z`; post-deploy verify | **FIX SHIPPED** — post-deploy smoke |
 | CSP founder Railway checkpoint (2026-06-03 `12:23:52Z`) | Founder UI search `csp_report` from window start — **no fresh entries** (historical; superseded by combined row) | **CONTINUE** (historical) |
 | CSP agent checkpoint (2026-06-03 `08:00:23Z`) | `audit-csp-headers.sh` + public-health + local CSP tests; Railway logs founder-only | **CONTINUE** (historical) — superseded by founder Railway row above |
 | CSP clean checkpoint (2026-06-02 `15:42:41Z`) | Founder Railway `production/twin` deployment `37096ecc`; search `csp_report` — no logs / no fresh reports; dashboard OK | **CONTINUE** (historical) — through `2026-06-02` founder evidence |

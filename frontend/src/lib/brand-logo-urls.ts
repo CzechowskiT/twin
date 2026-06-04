@@ -153,7 +153,7 @@ export function brandLogoUrls(brand: Brand): string[] {
   return [...custom, ...vector];
 }
 
-/** Two-letter plate label when every remote logo URL fails. */
+/** Plate label when remote logos are skipped or every URL fails (never empty). */
 export function companyInitials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   if (parts.length >= 2) {
@@ -161,7 +161,11 @@ export function companyInitials(name: string): string {
     const b = parts[1]?.[0] ?? "";
     return `${a}${b}`.toUpperCase() || "?";
   }
-  const word = parts[0] ?? "?";
+  const word = (parts[0] ?? name.trim()).replace(/[''.]/g, "");
+  if (!word) return "?";
+  if (word.length <= 3) {
+    return word.toUpperCase();
+  }
   return word.slice(0, 2).toUpperCase();
 }
 
