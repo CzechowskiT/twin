@@ -49,17 +49,64 @@ function testAdvanceLogoFallbackStep() {
 
 function testBrandLogoUrlsOrder() {
   const brand: Brand = {
-    slug: "capitalone",
-    name: "Capital One",
-    domain: "capitalone.com",
-    altSlugs: ["chase"],
+    slug: "chase",
+    name: "JPMorgan Chase",
+    domain: "jpmorganchase.com",
     extraUrls: ["https://example.com/custom.ico"],
   };
   const urls = brandLogoUrls(brand);
   assert.ok(urls[0]?.includes("example.com/custom"));
-  assert.ok(urls.some((u) => u.includes("cdn.simpleicons.org/capitalone")));
-  assertNoRasterFaviconUrls(urls, "capitalone");
+  assert.ok(urls.some((u) => u.includes("cdn.simpleicons.org/chase")));
+  assert.ok(urls.some((u) => u.includes("cdn.jsdelivr.net/npm/simple-icons@")));
+  assertNoRasterFaviconUrls(urls, "chase");
   assert.equal(new Set(urls).size, urls.length);
+}
+
+const MIN_MARQUEE_STABLE_LOGO_BRANDS = 30;
+
+function assertSiCdnUrlsOnly(urls: readonly string[], label: string) {
+  for (const url of urls) {
+    assert.match(
+      url,
+      /^https:\/\/(cdn\.jsdelivr\.net\/npm\/simple-icons@|cdn\.simpleicons\.org\/)/,
+      `${label}: ${url}`,
+    );
+  }
+}
+
+function testMarqueeStableLogoCoverage() {
+  const marquee = readFileSync(
+    join(root, "src/components/marketing/company-logo-marquee.tsx"),
+    "utf8",
+  );
+  const blocks = [
+    ...marquee.matchAll(
+      /\{\s*slug:\s*"([^"]+)"[^}]*name:\s*"([^"]+)"[^}]*domain:\s*"([^"]+)"/g,
+    ),
+  ];
+  let withStableUrls = 0;
+  for (const [, slug, name, domain] of blocks) {
+    const urls = brandLogoUrls({ slug, name, domain });
+    if (urls.length > 0) {
+      withStableUrls += 1;
+      assertSiCdnUrlsOnly(urls, `${slug}/${domain}`);
+    }
+  }
+  assert.ok(
+    withStableUrls >= MIN_MARQUEE_STABLE_LOGO_BRANDS,
+    `expected >= ${MIN_MARQUEE_STABLE_LOGO_BRANDS} marquee brands with SI URLs, got ${withStableUrls}`,
+  );
+}
+
+function testWellsFargoUsesStableSiWhenPresent() {
+  if (!isStableMarqueeSiSlug("wellsfargo")) return;
+  const urls = brandLogoUrls({
+    slug: "wellsfargo",
+    name: "Wells Fargo",
+    domain: "wellsfargo.com",
+  });
+  assert.ok(urls.length > 0);
+  assertSiCdnUrlsOnly(urls, "wellsfargo");
 }
 
 function testAllowlistedStableGetsSiOnly() {
@@ -102,6 +149,26 @@ function testInitialsOnlyDomainsExcludedFromStableSlugs() {
   assert.ok(!MARQUEE_STABLE_SI_SLUGS.has("servicenow"));
   assert.ok(!MARQUEE_STABLE_SI_SLUGS.has("humana"));
   assert.ok(!MARQUEE_STABLE_SI_SLUGS.has("cvs"));
+}
+
+function testPhantomSlugsNotInStableAllowlist() {
+  for (const phantom of [
+    "jpmorgan",
+    "jpmorganchase",
+    "citi",
+    "citibank",
+    "capitalone",
+    "deere",
+    "ge",
+    "jnj",
+    "unitedhealthgroup",
+    "unitedparcelsservice",
+  ]) {
+    assert.ok(
+      !MARQUEE_STABLE_SI_SLUGS.has(phantom),
+      `phantom slug must not be allowlisted: ${phantom}`,
+    );
+  }
 }
 
 function testBrandLogoUrlsSourceHasNoRasterHelpers() {
@@ -197,6 +264,9 @@ function main() {
   testAllMarqueeBrandsHaveNonEmptyInitials();
   testMarqueeUsesSafeLogoNotNextImage();
   testAllMarqueeBrandsAvoidRasterUrls();
+  testMarqueeStableLogoCoverage();
+  testWellsFargoUsesStableSiWhenPresent();
+  testPhantomSlugsNotInStableAllowlist();
   console.log("safe-company-logo.test.ts: OK");
 }
 

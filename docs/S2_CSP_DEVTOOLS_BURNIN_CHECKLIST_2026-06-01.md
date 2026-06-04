@@ -69,9 +69,11 @@ CSP must remain **Report-Only** — console shows violations as warnings, pages 
 
 **S2 burn-in:** **CONTINUE** (no clock reset). **S2 PASS:** **NO**. **Public launch:** **NO-GO** until `2026-06-05T14:18:33Z` 72h rollup + founder sign-off.
 
-**Follow-up (founder Chrome `2026-06-04`):** No red favicon/`/_next/image` Console errors, but many marquee plates showed **empty white boxes** (initials hidden behind `opacity-0` loading images). **Fixed** in repo — layered visible initials until logo loads; **post-deploy smoke required**.
+**Follow-up (founder Chrome `2026-06-04`):** No red favicon/`/_next/image` Console errors, but many marquee plates showed **empty white boxes** (initials hidden behind `opacity-0` loading images). **Fixed** in **`6d08742`** — layered visible initials until logo loads; Console clean post-deploy.
 
-**Next:** Post-deploy `/` logo marquee smoke (visible initials on blocklisted/failed marks; no empty plates).
+**Follow-up (founder post-`6d08742`):** Console still clean (no `/_next/image`, DuckDuckGo, Google/gstatic), but **too many initials-only white plates** — not premium for public launch. **Fix (repo, non-CSP):** `MARQUEE_STABLE_SI_SLUGS` trimmed to slugs that exist at `simple-icons@11.14.0`; marquee primary fixes (`chase` for JPMorgan, `johndeere` for Deere); **59** brands get SI vectors only; **30** brands without SI + **5** blocklisted domains → initials. **S2: CONTINUE** (no clock reset). **S2 PASS: NO.** **Public launch: NO-GO.**
+
+**Founder smoke (post allowlist trim deploy):** Chrome Incognito, extensions off, `https://twin-sooty.vercel.app/` → hard refresh `/` → Console: no red `/_next/image`, `duckduckgo`, `google.com/s2`, `gstatic`, CSP lines → marquee: mix of **color SI marks** and **initials** on blocklisted/no-SI brands; **no empty white plates**.
 
 ## Safari (desktop) — founder PASS 2026-06-04
 

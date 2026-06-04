@@ -289,7 +289,7 @@ From `GET /api/public-health` (via FE alias), captured at burn-in restart (`2026
 
 **Likely cause (read-only triage):** Marquee loads ~80 brands × fallback chain (DuckDuckGo → Google favicons → jsDelivr/Simple Icons) through `/_next/image`; some slugs/domains 404/502 at origin; optimizer returns 400/404/502. `images.remotePatterns` in `frontend/next.config.ts` already allowlist these hostnames — not a CSP `img-src` gap.
 
-**Follow-up (shipped on branch, CSP unchanged):** (1) `SafeCompanyLogo` — native `<img>` (no `/_next/image` proxy), capped `onError` fallback chain, initials placeholder. (2) `FAVICON_INITIALS_ONLY_DOMAINS` — skip remote fetch for blocklisted domains (`homedepot.com`, `chevron.com`, `servicenow.com`, `humana.com`, `cvs.com`). (3) `MARQUEE_STABLE_SI_SLUGS` — SI vectors + verified `extraUrls` only; raster favicon helpers **deleted** from `brand-logo-urls.ts`. (4) Marquee plates are decorative `role="img"` spans (**no** outbound `href`) so Chrome does not prefetch `t*.gstatic.com/faviconV2` for link targets. Tests `npm run test:safe-company-logo`. **Deployed:** PR **#24** merged (`18e6ce4` chain). **S2 burn-in: CONTINUE** (no clock reset). **Public launch: NO-GO** until 72h rollup + founder sign-off.
+**Follow-up (shipped on branch, CSP unchanged):** (1) `SafeCompanyLogo` — native `<img>` (no `/_next/image` proxy), capped `onError` fallback chain, initials placeholder. (2) `FAVICON_INITIALS_ONLY_DOMAINS` — skip remote fetch for blocklisted domains (`homedepot.com`, `chevron.com`, `servicenow.com`, `humana.com`, `cvs.com`). (3) `MARQUEE_STABLE_SI_SLUGS` — SI vectors only (jsDelivr + `cdn.simpleicons.org`); raster favicon helpers **deleted** from `brand-logo-urls.ts`. (4) Marquee plates are decorative `role="img"` spans (**no** outbound `href`) so Chrome does not prefetch `t*.gstatic.com/faviconV2` for link targets. Tests `npm run test:safe-company-logo`. **Deployed:** PR **#24** merged (`18e6ce4` chain); **`6d08742`** layered initials (Console clean, too many initials plates). **2026-06-04 allowlist trim:** phantom SI slugs removed; primary slug fixes (`chase`, `johndeere`); **59** marquee brands with stable SI URLs; remainder initials-only. **S2 burn-in: CONTINUE** (no clock reset). **Public launch: NO-GO** until 72h rollup + founder sign-off.
 
 ## Founder non-CSP logo smoke — post PR #24 (2026-06-04)
 
@@ -331,7 +331,8 @@ From `GET /api/public-health` (via FE alias), captured at burn-in restart (`2026
 | Firefox DevTools routes | Same core routes — **no CSP violations** |
 | Firefox logo smoke (`/`) | No red favicon/`/_next/image` errors; initials OK |
 | Railway `csp_report` after window start | **No fresh entries** since `2026-06-02T14:18:33Z` (last seen `2026-06-02T14:18:33Z` boundary) |
-| Chrome empty white logo plates (founder `2026-06-04`) | **Found** — initials hidden during `opacity-0` image load; **fixed** in repo (`SafeCompanyLogo` layered initials); **post-deploy smoke required** |
+| Chrome empty white logo plates (founder `2026-06-04`) | **Found** — fixed in **`6d08742`** (`SafeCompanyLogo` layered initials); Console clean post-deploy |
+| Chrome too many initials-only plates (founder post-`6d08742`) | **Found** — phantom `MARQUEE_STABLE_SI_SLUGS` (404 SI hops); **trimmed** to 59 verified slugs + `chase`/`johndeere` primary fixes; **post-deploy visual smoke required** |
 | Enforce header | **Absent** (unchanged) |
 | Decision | **CONTINUE** 72h burn-in — report-only HOLD |
 | S2 status | **NOT READY** |
