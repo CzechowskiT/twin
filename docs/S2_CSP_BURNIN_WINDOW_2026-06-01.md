@@ -342,6 +342,30 @@ From `GET /api/public-health` (via FE alias), captured at burn-in restart (`2026
 
 **Next founder cadence (UTC):** Window end rollup `2026-06-05T14:18:33Z` · post-deploy `/` initials smoke after fix deploy · optional mobile DevTools.
 
+## Founder final logo smoke — post deploy chain (2026-06-04)
+
+**Checkpoint UTC:** `2026-06-04T10:29:29Z` (~44h 11m after burn-in start `2026-06-02T14:18:33Z`; **~27h 49m** remaining until `2026-06-05T14:18:33Z`; **~61%** elapsed)
+
+**Source:** Founder Chrome **Incognito** DevTools on `https://twin-sooty.vercel.app/` after latest deploy (`472a6d3` → `bcd23cd` → `4a7c57d`).
+
+| Check | Result |
+| --- | --- |
+| Route | `/` homepage + logo marquee |
+| Homepage | ✅ **OK** |
+| Colorful brand logos + readable initials | ✅ **PASS** |
+| Empty white plates / broken-image icons | ✅ **None** |
+| `/_next/image` red errors | ✅ **None** |
+| DuckDuckGo / Google S2 / `gstatic` favicon red errors | ✅ **None** |
+| Console CSP violations | ✅ **None** |
+| CSP policy / burn-in clock | **Unchanged** — **no reset** |
+| Classification | **Non-CSP UX** — launch-grade marquee visual |
+| Decision | **CONTINUE** 72h burn-in — report-only **HOLD** |
+| S2 status | **NOT READY** |
+| S2 PASS | **NO** |
+| Public launch | **NO-GO** |
+
+**Next founder cadence (UTC):** Railway `csp_report` triage `2026-06-04T14:18:33Z` (~48h after start) · window end rollup `2026-06-05T14:18:33Z` · enforce decision **HOLD** until full 72h evidence pack + founder sign-off (`docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md`).
+
 ## Gate closure session note (2026-06-03)
 
 **Session UTC:** `2026-06-03T13:19:53Z` (~23h 1m elapsed; **~32%** of 72h window)

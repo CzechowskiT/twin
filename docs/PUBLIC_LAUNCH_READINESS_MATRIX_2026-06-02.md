@@ -3,7 +3,7 @@
 **Auditor:** TWIN Release Gate Owner (read-only shift)
 **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01`
 **Branch HEAD:** `9011040` (prior) → updated by 2026-06-03 shift commits
-**Audit UTC:** `2026-06-04T09:25:00Z` (~43h 7m / **~60%** into burn-in; **~28h 53m** until `2026-06-05T14:18:33Z`; L6 + O5 founder waivers signed `2026-06-03T13:19:53Z`; Safari/Firefox DevTools PASS `2026-06-04T08:47:35Z`; logo marquee SI allowlist trim shipped after `6d08742` deploy)
+**Audit UTC:** `2026-06-04T10:29:29Z` (~44h 11m / **~61%** into burn-in; **~27h 49m** until `2026-06-05T14:18:33Z`; L6 + O5 founder waivers signed `2026-06-03T13:19:53Z`; Safari/Firefox DevTools PASS `2026-06-04T08:47:35Z`; **final logo smoke PASS** `2026-06-04T10:29:29Z` after deploy chain `472a6d3` → `bcd23cd` → `4a7c57d`)
 **Production (unchanged by this audit):** FE `https://twin-sooty.vercel.app` · API `https://twin-production-bcd9.up.railway.app`
 
 **Verdict:** **Public launch NO-GO** · **Pilot / investor demo GO** · **S2 NOT READY** · **Auto-apply PAUSED** (operational + product gates)
@@ -19,7 +19,7 @@
 | Narrowed policy on prod | Explicit `connect-src` includes `https://twin-production-bcd9.up.railway.app`; no broad `https:` wildcards | ✅ LIVE |
 | S2 72h burn-in | Window `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; founder `2026-06-04T08:47:35Z` — Railway `csp_report` **no fresh entries** since start; Chrome/Safari/Firefox DevTools core routes **no CSP violations** | ❌ **NOT READY** — IN PROGRESS (~59% elapsed) |
 | S2 violation triage pack | Railway clean + Chrome (`13:29:36Z`) + Safari + Firefox (`08:47:35Z`) DevTools **PASS**; full 72h rollup + founder enforce sign-off at window end still required | ⚠️ **IN PROGRESS** |
-| DevTools logo Console noise (`/_next/image` + favicon 404 / gstatic faviconV2) | PR **#24** (`18e6ce4`); Chrome Console clean `08:39:36Z`; empty plates → **`6d08742`**; SI allowlist + **`MARQUEE_BRAND_LOGO_MAP`**; **`SafeCompanyLogo` onLoad** fix; **2026-06-04:** logos visible but **all black** — `siUrlOnWhite` `/000000` + black local SVG first hop; fix: **`cdn.simpleicons.org/{slug}`** brand colors first (no `/000000`); **post-deploy founder visual smoke** | ⚠️ **FIX SHIPPED** (non-CSP); **not** S2 blocker |
+| DevTools logo Console noise (`/_next/image` + favicon 404 / gstatic faviconV2) | PR **#24** (`18e6ce4`); fix chain through **`4a7c57d`**; founder **final logo smoke PASS** `2026-06-04T10:29:29Z` — colorful logos, readable initials, no white plates / broken-image icons, no red `/_next/image` / DDG / Google S2 / gstatic, **no CSP violations**; **not** S2 blocker | ✅ **PASS** (non-CSP); **S2 CONTINUE** |
 | S3–S4, S6–S10c mutation/upload limits | Gate checklist + repo tests | ✅ shipped (code) |
 | S5 Stripe dedup `050` | Founder read-only SQL 2026-05-29 | ✅ PASS |
 | S8–S9 secrets / deps baseline | Re-run before launch per checklist | ⚠️ re-verify |
@@ -211,13 +211,13 @@
 
 ### Primary blockers (ordered)
 
-1. **S2** — Complete 72h CSP report-only burn-in (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`); founder Railway **clean through `2026-06-04T08:47:35Z`**; Chrome/Safari/Firefox DevTools **PASS**; remaining: full window rollup, founder enforce sign-off (HOLD vs enforce) at window end, post-deploy logo initials smoke.
+1. **S2** — Complete 72h CSP report-only burn-in (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`); founder Railway **clean through `2026-06-04T08:47:35Z`**; Chrome/Safari/Firefox DevTools **PASS**; **final logo smoke PASS** `2026-06-04T10:29:29Z`; remaining: full window rollup, founder enforce sign-off (**HOLD** vs enforce) at window end, optional mobile DevTools.
 2. **GAP-04** — `AUTO_APPLY_SUBMIT` unset on prod (optional ops knob; document waiver or close before public launch if policy requires).
 3. **L6 / O5 (full public launch only)** — Waivers signed `2026-06-03T13:19:53Z` for controlled pilot; **not** substitutes for uncontrolled public launch (self-service delete; Apple/iCal verification for broad marketing).
 
 ### Risks (accepted for pilot, not public)
 
-- **Marketing logo marquee:** Pre-fix noise was **non-CSP**; PR **#24** + `6d08742` (layered initials, Console clean); **`dc4e906`** trimmed phantom SI slugs; explicit **`MARQUEE_BRAND_LOGO_MAP`** + dark SI CDN URLs + logos-first order for launch-grade mix on `/`; **~59 real logos** / remainder initials; Safari/Firefox **`08:47:35Z`** **PASS** — **S2 burn-in unchanged** (CONTINUE, no clock reset). **Public launch: NO-GO.**
+- **Marketing logo marquee:** Pre-fix noise was **non-CSP**; deploy chain **`472a6d3` → `bcd23cd` → `4a7c57d`**; founder **final smoke PASS** `2026-06-04T10:29:29Z` (colorful logos, initials where needed, no white plates / broken images, Console clean). Safari/Firefox **`08:47:35Z`** **PASS** — **S2 burn-in unchanged** (CONTINUE, no clock reset). **Public launch: NO-GO.**
 - CSP `unsafe-inline` / `unsafe-eval` remain (separate hardening track).
 - Prod API SHA `6382a91` includes `e764e68`; nightly beat **disabled** in health (GAP-03 closed ops 2026-06-02). S2 burn-in **unchanged** — no clock reset.
 - Metric / corpus scale below “marketplace” narrative — honest pilot ceiling.

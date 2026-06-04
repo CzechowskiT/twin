@@ -83,6 +83,33 @@ CSP must remain **Report-Only** — console shows violations as warnings, pages 
 
 **Follow-up (founder screenshot 2026-06-04, 5th plate):** Colored BofA/GS/WF/AmEx then **browser broken-image glyph** (Walmart — `cdn.simpleicons.org/walmart` **404**). **Fix (non-CSP):** `SI_CDN_UNAVAILABLE_SLUGS` skips dead SI CDN hops; `slugVectorUrls` adds jsDelivr + `/logos/marquee/{slug}.svg` local fallback; `SafeCompanyLogo` unmounts `<img>` on `onError` (`imgBroken`) so initials show until next URL — **never** torn-photo icon. **Post-deploy:** hard refresh `/` → Walmart + all mapped marquee slots show colored logo or initials. **S2: CONTINUE.** **S2 PASS: NO.**
 
+## Chrome (desktop) — founder final logo smoke PASS (2026-06-04)
+
+**Checkpoint UTC:** `2026-06-04T10:29:29Z`
+
+**Context:** Latest non-CSP deploy chain on prod alias — `472a6d3` (visible logos) → `bcd23cd` (brand colors) → `4a7c57d` (every slot logo or initials). **CSP unchanged** (report-only HOLD). **S2 burn-in clock: no reset.**
+
+**Profile:** Chrome **Incognito**, extensions **disabled**.
+
+**Route:** `/` (homepage + company logo marquee).
+
+| Check | Result |
+| ----- | ------ |
+| Homepage renders | ✅ **OK** |
+| Marquee — colorful brand logos | ✅ **PASS** |
+| Marquee — readable initials where needed | ✅ **PASS** |
+| Empty white plates | ✅ **None** |
+| Broken-image / torn-photo icons | ✅ **None** |
+| Red `GET /_next/image?url=…` | ✅ **None** |
+| Red DuckDuckGo / Google S2 / `gstatic` favicon errors | ✅ **None** |
+| Console CSP violations | ✅ **None** |
+| Classification | **Non-CSP UX** — does **not** reset S2 clock |
+| Decision | **CONTINUE** |
+
+**S2 burn-in:** **CONTINUE** (report-only HOLD). **S2 status:** **NOT READY**. **S2 PASS:** **NO**. **Public launch:** **NO-GO** until `2026-06-05T14:18:33Z` 72h rollup + founder sign-off (HOLD vs enforce).
+
+**Next founder cadence (UTC):** Railway `csp_report` triage `2026-06-04T14:18:33Z` (~48h after start) · window end rollup `2026-06-05T14:18:33Z` · optional mobile DevTools.
+
 ## Safari (desktop) — founder PASS 2026-06-04
 
 **Checkpoint UTC:** `2026-06-04T08:47:35Z`
