@@ -86,12 +86,13 @@ the gate to ✅.
 | One ⚠️ partial on L6 (data subject access)                              | Document a manual workflow (`docs/GDPR_MANUAL_DSR.md`) and proceed.                   |
 | Any ❌ on Pilot gates                                                    | Pilot, not public launch — pilot has its own gate set (cf. `PILOT_OFFER_FINAL.md`).   |
 
-## Current gate stance (checkpoint 2026-06-03 `13:29:36Z`, **O7 PASS**, **S2 burn-in in progress**, **L6 + O5 waivers signed**)
+## Current gate stance (checkpoint 2026-06-04 `08:39:36Z`, **O7 PASS**, **S2 burn-in in progress**, **L6 + O5 waivers signed**, **logo smoke PASS**)
 
-**Latest audit:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` (refreshed 2026-06-03)
+**Latest audit:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` (refreshed 2026-06-04)
 **Post-merge sanity (2026-06-02):** `docs/POST_MERGE_AUTO_APPLY_SANITY_2026-06-02.md` — PR #21 merged; prod `git_commit=6382a91` (includes `e764e68` hard gates **LIVE**); public-health OK; auto-apply **PAUSED** policy unchanged.
+**Logo smoke (2026-06-04):** PR **#24** deployed (`18e6ce4`); founder Chrome Incognito `/` — no `/_next/image` / DDG / Google S2 / gstatic faviconV2 red errors; initials OK; **no CSP violations**; **non-CSP UX fixed**; **S2 CONTINUE** (no clock reset).
 
-- **S2 CSP enforce burn-in:** ❌ **NOT READY** — window **IN PROGRESS** (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; **~23h 11m elapsed / ~32%** at `13:29:36Z`). Founder combined checkpoint: Railway `csp_report` → **no fresh entries** since start; Chrome DevTools core routes → **no CSP violations**; `/api/v1/jobs/saved` **422** non-CSP. Decision: **CONTINUE** (report-only HOLD). Safari + Firefox DevTools **PENDING**. Next founder Railway: `2026-06-03T18:18:33Z`.
+- **S2 CSP enforce burn-in:** ❌ **NOT READY** — window **IN PROGRESS** (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`; **~42h 21m elapsed / ~59%** at `08:39:36Z`). Founder combined checkpoint (`2026-06-03T13:29:36Z`): Railway `csp_report` → **no fresh entries** since start; Chrome DevTools core routes → **no CSP violations**; `/api/v1/jobs/saved` **422** non-CSP. Decision: **CONTINUE** (report-only HOLD). Safari + Firefox DevTools **PENDING**. Next founder Railway: `2026-06-04T14:18:33Z`.
 - **L6 DSR:** ⚠️ **partial-with-waiver** — export **LIVE**; delete manual via `docs/GDPR_MANUAL_DSR.md`; founder waiver **signed** `2026-06-03T13:19:53Z` — acceptable for controlled pilot; self-service delete remains future work.
 - **O5 Calendar:** ⚠️ **partial-with-waiver** — Google **PASS** + Microsoft **LIVE**; Apple/iCal/WebCal/ICS partial; founder waiver **signed** `2026-06-03T13:19:53Z` — non-blocking for controlled pilot if copy does not overpromise Apple.
 

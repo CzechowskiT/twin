@@ -45,6 +45,32 @@ CSP must remain **Report-Only** — console shows violations as warnings, pages 
 
 **Chrome CSP verdict (unchanged):** founder pass at `2026-06-03T13:29:36Z` (`ece6588`) — **no CSP violations** on core routes; pre-fix image-proxy Console noise was **orthogonal** to CSP burn-in PASS. **S2 burn-in: CONTINUE** (no clock reset).
 
+## Chrome (desktop) — founder logo smoke post PR #24 (2026-06-04)
+
+**Checkpoint UTC:** `2026-06-04T08:39:36Z`
+
+**Context:** PR **#24** merged; logo cleanup chain deployed on `https://twin-sooty.vercel.app` (`18e6ce4` — `SafeCompanyLogo`, SI/`extraUrls` only, raster favicon helpers removed). **CSP unchanged** (report-only HOLD).
+
+**Profile:** Chrome **Incognito**, extensions **disabled**.
+
+**Route:** `/` (homepage + company logo marquee).
+
+| Check | Result |
+| ----- | ------ |
+| Homepage renders | ✅ **OK** |
+| Red `GET /_next/image?url=…` (logo hosts) | ✅ **None** |
+| Red `GET https://icons.duckduckgo.com/ip3/…` | ✅ **None** |
+| Red `GET https://www.google.com/s2/favicons…` | ✅ **None** |
+| Red `GET https://t*.gstatic.com/faviconV2…` | ✅ **None** |
+| Fallback initials (blocklisted / failed remote) | ✅ **Working** |
+| Console CSP violations | ✅ **None** |
+| Classification | **Non-CSP UX fixed** — does **not** reset S2 clock |
+| Decision | **CONTINUE** |
+
+**S2 burn-in:** **CONTINUE** (no clock reset). **S2 PASS:** **NO**. **Public launch:** **NO-GO** until `2026-06-05T14:18:33Z` 72h rollup + founder sign-off.
+
+**Next:** Safari + Firefox DevTools on same alias (core S2 routes + `/` logo marquee spot-check).
+
 ## Safari (desktop) — manual checklist (PENDING)
 
 **Status:** **PENDING** — complete before window end `2026-06-05T14:18:33Z`.
@@ -161,4 +187,4 @@ Pair with 72h Railway triage (`docs/S2_CSP_RAILWAY_LOG_TRIAGE_PLAN_2026-06-01.md
 
 Until Railway 72h rollup **and** multi-browser DevTools (Safari + Firefox minimum) complete: **S2 NOT READY**, public launch **NO-GO**.
 
-**Follow-up (non-CSP):** (1) `fix(frontend): add safe fallback for external company logos` — `SafeCompanyLogo` bypasses `/_next/image`. (2) `fix(frontend): suppress noisy external favicon failures` — `FAVICON_INITIALS_ONLY_DOMAINS` + Google-before-DuckDuckGo raster order in `brand-logo-urls.ts`; `npm run test:safe-company-logo`. **CSP unchanged.** **S2 burn-in: CONTINUE** (no clock reset). **Public launch: NO-GO** until post-deploy founder DevTools smoke on `/` (incognito, extensions off): no `/_next/image` logo spam; filter Network for `icons.duckduckgo.com` — expect no red 404 for blocklisted domains.
+**Follow-up (non-CSP):** Logo fix chain shipped (PR **#24**, `18e6ce4`). Founder post-deploy smoke **`2026-06-04T08:39:36Z`** on `/` — **PASS** (see § Chrome logo smoke post PR #24). **CSP unchanged.** **S2 burn-in: CONTINUE** (no clock reset). **Public launch: NO-GO** until 72h rollup + founder sign-off. **Next browsers:** Safari, Firefox.
