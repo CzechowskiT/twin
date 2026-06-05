@@ -7,6 +7,8 @@
 Public launch remains **NO-GO** (founder limited-launch decision pending).
 **24h monitoring:** Railway `csp_report` cadence through `2026-06-06T16:20:13Z`.
 
+**24h post-enforce founder checkpoint (2026-06-06):** Railway `csp_report` — **brak świeżych wpisów**; core routes OK. **Decision: CONTINUE** (no rollback).
+
 ## Executive summary
 
 | Area | Status |

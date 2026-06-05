@@ -18,6 +18,7 @@ from app.services.recruiter_inbox import (
     respond_recruiter_batch_bulk,
 )
 from app.services.recruiter_jobs import create_company_job, list_company_jobs
+from app.services.request_locale import locale_from_request
 
 router = APIRouter()
 
@@ -61,6 +62,7 @@ class RecruiterJobCreateIn(BaseModel):
 
 @router.get("/inbox")
 def recruiter_inbox(
+    request: Request,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
@@ -71,7 +73,12 @@ def recruiter_inbox(
     """Pre-qualified applications for one employer (batch accept/decline in UI)."""
     slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
     try:
-        return build_recruiter_batch(db, company_slug=slug, limit=limit)
+        return build_recruiter_batch(
+            db,
+            company_slug=slug,
+            limit=limit,
+            locale=locale_from_request(request),
+        )
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 

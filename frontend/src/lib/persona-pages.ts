@@ -256,48 +256,52 @@ const candidatesPl: PersonaBundle = {
 };
 
 const recruitersEn: PersonaBundle = {
-  heroEyebrow: "Recruiter & sourcer workspace",
-  heroTitle: "Evidence-first sourcing without candidate PII leaks",
+  heroEyebrow: "Recruiter pilot workspace",
+  heroTitle: "Pre-qualified queue — not a CV firehose",
   heroLead:
-    "A different SKU: multi-seat watchlists on boards you license, exportable hiring-manager packets with timestamps, and audit-friendly geography presets. This is not the consumer auto-apply product.",
+    "Live today: token-gated acceptance inbox with match scores and evidence-based reasons, batch accept/decline, and employer job POST. Pilot uses invite access codes — SSO and anonymized talent-pool browse are on the roadmap, not live yet.",
   pillars: [
     {
-      title: "Board-aware watchlists",
-      body: "Curate role families per client, attach source URLs, and freeze snapshots for compliance, kept apart from individual candidate accounts.",
+      title: "Acceptance inbox (live)",
+      body: "Short queue of applications TWIN already matched to your roles. Each row shows a match score, up to three rule-based reasons, and accept/decline — recruiter decision always required.",
     },
     {
-      title: "Handoff packets",
-      body: "Generate concise PDF or Markdown summaries (role, last verified date, salary band signals, sourcer notes) built for hiring-manager inboxes, not consumer dashboards.",
+      title: "Match transparency (live)",
+      body: "Deterministic ranking from profile overlap (skills, title, location, salary band). No black-box LLM on inbox rows — AI-assisted sorting only; you decide who gets an interview slot.",
     },
     {
-      title: "Governance presets",
-      body: "Per-workspace rules: allowed geos, excluded boards, retention windows for exports. API access is staged on higher tiers for ATS partners.",
+      title: "Employer jobs + placement (pilot)",
+      body: "Post roles via recruiter API; placement verification uses one-click employer attestation. Watchlists, HM packets, and governance presets are marketing roadmap — contact us for pilot scope.",
     },
   ],
-  pricingTitle: "Recruiter seat packs (invoice)",
+  pricingTitle: "Recruiter pilot (invite-only)",
   pricingLead:
-    "Billed monthly per active seat; onboarding call included. Candidate self-serve checkout does not apply here, so agreements stay manual during MVP.",
+    "Named pilot partners get token inbox access and onboarding call. Seat packs and invoice billing are contractual — self-serve checkout does not apply during MVP.",
   pricingFootnote:
-    "Seat limits and API SLAs are contractual. RocketJobs/Pracuj data usage still respects each board’s terms. TWIN surfaces links, not scraped redistribution for recruiters without entitlement.",
+    "Pilot inbox shows candidate names for application review (not the anonymized B2B talent pool). Auto-apply is paused on production; delegated submit is not live.",
   tiers: [
     {
-      id: "sourcer",
-      name: "Sourcer",
-      price: "149 PLN",
-      cadence: "per seat / month",
-      bullets: ["1 seat", "Up to 50 shortlist packets / month", "Email support (48h)"],
-      cta: "Book sourcer pack",
+      id: "pilot",
+      name: "Pilot inbox",
+      price: "Invite",
+      cadence: "token access",
+      bullets: [
+        "Batch accept/decline inbox",
+        "Match score + reasons on each row",
+        "Post jobs via recruiter API",
+      ],
+      cta: "Request pilot access",
       href: "/contact",
     },
     {
       id: "talent",
-      name: "Talent team",
+      name: "Talent team (roadmap)",
       price: "399 PLN",
       cadence: "per month (5 seats)",
       highlight: true,
       bullets: [
-        "Shared watchlists + templates",
-        "200 packets / month",
+        "Shared watchlists + templates (not shipped)",
+        "HM handoff packets (not shipped)",
         "Quarterly governance review call",
       ],
       cta: "Talk to sales",
@@ -305,11 +309,11 @@ const recruitersEn: PersonaBundle = {
     },
     {
       id: "rpo",
-      name: "RPO desk",
+      name: "RPO desk (roadmap)",
       price: "990 PLN",
       cadence: "per month (15 seats)",
       bullets: [
-        "Includes API roadmap slot for ATS export",
+        "ATS export API slot (scaffold only today)",
         "Dedicated Slack / email bridge",
         "Custom retention policy per client BU",
       ],
@@ -317,59 +321,63 @@ const recruitersEn: PersonaBundle = {
       href: "/contact",
     },
   ],
-  logisticsTitle: "What recruiters do NOT get here",
+  logisticsTitle: "What is live vs roadmap",
   logistics: [
-    "No bulk download of candidate CVs from TWIN consumer accounts; different legal basis.",
-    "No promise of auto-apply into third-party ATS without integration work.",
-    "Recruiter features roll out on a separate roadmap from the candidate mobile/web MVP.",
+    "Live: `/recruiter/inbox` (token), match scores, batch respond, `/recruiter/jobs` POST.",
+    "Roadmap / not shipped: watchlists, HM packets, governance presets, employer SSO.",
+    "Talent pool browse for recruiters is anonymized by design — separate from inbox application review.",
   ],
-  primaryCta: { label: "Contact recruiter sales", href: "/contact" },
-  secondaryCta: { label: "Partner integrations", href: "/partners" },
+  primaryCta: { label: "Open recruiter inbox", href: "/recruiter/inbox" },
+  secondaryCta: { label: "Contact pilot onboarding", href: "/contact" },
 };
 
 const recruitersPl: PersonaBundle = {
-  heroEyebrow: "Przestrzeń rekrutera i sourcera",
-  heroTitle: "Sourcing oparty o dowody, bez wycieku PII kandydatów",
+  heroEyebrow: "Pilotażowa przestrzeń rekrutera",
+  heroTitle: "Pre-kwalifikowana kolejka — nie góra CV",
   heroLead:
-    "Odrębny produkt: wielostanowiskowe listy obserwowanych ofert na portalach, które licencjonujesz, eksportowalne paczki dla hiring managera ze znacznikami czasu i presetami geografii. To nie jest konsumencki auto-apply.",
+    "Dziś na żywo: skrzynka akceptacji z kodem dostępu, wyniki dopasowania z uzasadnieniami, masowe akceptuj/odrzuć oraz POST ogłoszeń. Pilotaż na zaproszenie — SSO i anonimowa pula talentów to roadmapa, nie produkcja.",
   pillars: [
     {
-      title: "Listy per portal",
-      body: "Rodziny stanowisk per klient, URL źródeł, „zamrożone” snapshoty pod compliance, oddzielone od kont kandydata.",
+      title: "Skrzynka akceptacji (live)",
+      body: "Krótka kolejka aplikacji dopasowanych do Twoich ról. Każdy wiersz: wynik dopasowania, do trzech regułowych powodów, akceptuj/odrzuć — decyzja rekrutera zawsze wymagana.",
     },
     {
-      title: "Paczki przekazania",
-      body: "PDF lub Markdown: rola, data weryfikacji, widełki płacowe, notatki sourcera, pod inbox HM, nie pod dashboard konsumenta.",
+      title: "Transparentność dopasowania (live)",
+      body: "Deterministyczny ranking z nakładki profilu (umiejętności, tytuł, lokalizacja, widełki). Bez black-box LLM w skrzynce — sortowanie wspomagane AI; Ty decydujesz o slocie na rozmowę.",
     },
     {
-      title: "Presety zgodności",
-      body: "Reguły workspace: dozwolone GEO, wykluczone portale, retencja eksportów. API na wyższych tierach pod partnerów ATS.",
+      title: "Ogłoszenia + placement (pilotaż)",
+      body: "Publikacja ról przez API rekrutera; weryfikacja placementu przez attestację pracodawcy. Watchlisty, paczki HM i presety zgodności to roadmapa marketingowa — skontaktuj się w sprawie pilotażu.",
     },
   ],
-  pricingTitle: "Pakiety miejsc dla rekruterów (faktura)",
+  pricingTitle: "Pilotaż rekrutera (tylko zaproszenie)",
   pricingLead:
-    "Miesięcznie za aktywne miejsce, wdrożenie z rozmową startową. Self-serve Stripe kandydata tu nie działa, więc umowy są ręczne w MVP.",
+    "Partnerzy pilotażowi dostają token do skrzynki i rozmowę wdrożeniową. Pakiety miejsc i faktura są umowne — self-serve Stripe kandydata tu nie działa.",
   pricingFootnote:
-    "Limity miejsc i SLA API są umowne. Dane z RocketJobs i Pracuj wciąż tylko zgodnie z regulaminem portalu; TWIN podaje linki, nie redystrybucję bez uprawnień.",
+    "Skrzynka pilotażowa pokazuje imiona kandydatów przy przeglądzie aplikacji (nie anonimowa pula B2B). Auto-apply wstrzymane na produkcji; delegated submit wyłączony.",
   tiers: [
     {
-      id: "sourcer",
-      name: "Sourcer",
-      price: "149 PLN",
-      cadence: "miejsce / miesiąc",
-      bullets: ["1 miejsce", "Do 50 paczek shortlist / mies.", "Support mail (48h)"],
-      cta: "Umów pakiet sourcer",
+      id: "pilot",
+      name: "Skrzynka pilotażowa",
+      price: "Zaproszenie",
+      cadence: "dostęp tokenem",
+      bullets: [
+        "Masowe akceptuj/odrzuć w skrzynce",
+        "Wynik dopasowania + powody w wierszu",
+        "Publikacja ogłoszeń przez API",
+      ],
+      cta: "Poproś o dostęp pilotażowy",
       href: "/contact",
     },
     {
       id: "talent",
-      name: "Zespół talentów",
+      name: "Zespół talentów (roadmapa)",
       price: "399 PLN",
       cadence: "miesięcznie (5 miejsc)",
       highlight: true,
       bullets: [
-        "Wspólne watchlisty + szablony",
-        "200 paczek / mies.",
+        "Wspólne watchlisty + szablony (nieshipowane)",
+        "Paczki HM (nieshipowane)",
         "Kwartalny przegląd polityk",
       ],
       cta: "Rozmowa sprzedażowa",
@@ -377,11 +385,11 @@ const recruitersPl: PersonaBundle = {
     },
     {
       id: "rpo",
-      name: "Biurko RPO",
+      name: "Biurko RPO (roadmapa)",
       price: "990 PLN",
       cadence: "miesięcznie (15 miejsc)",
       bullets: [
-        "Slot na roadmapę API pod eksport ATS",
+        "Slot API ATS (dziś tylko scaffold)",
         "Dedykowany kanał Slack / mail",
         "Retencja eksportów per BU klienta",
       ],
@@ -389,14 +397,14 @@ const recruitersPl: PersonaBundle = {
       href: "/contact",
     },
   ],
-  logisticsTitle: "Czego rekruter NIE dostaje w tej linii",
+  logisticsTitle: "Co jest live, a co roadmapą",
   logistics: [
-    "Brak masowego pobierania CV z kont konsumenckich TWIN; inna podstawa prawna.",
-    "Brak obietnicy auto-apply do ATS bez integracji.",
-    "Funkcje rekrutera mają osobny roadmap od MVP kandydata.",
+    "Live: `/recruiter/inbox` (token), wyniki dopasowania, batch respond, POST `/recruiter/jobs`.",
+    "Roadmapa / nieshipowane: watchlisty, paczki HM, presety zgodności, SSO pracodawcy.",
+    "Przegląd puli talentów dla rekruterów jest anonimizowany — osobno od przeglądu aplikacji w skrzynce.",
   ],
-  primaryCta: { label: "Kontakt: sprzedaż dla rekruterów", href: "/contact" },
-  secondaryCta: { label: "Integracje partnerskie", href: "/partners" },
+  primaryCta: { label: "Otwórz skrzynkę rekrutera", href: "/recruiter/inbox" },
+  secondaryCta: { label: "Kontakt: onboarding pilotażu", href: "/contact" },
 };
 
 const companiesEn: PersonaBundle = {
