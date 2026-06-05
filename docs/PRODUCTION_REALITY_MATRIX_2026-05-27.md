@@ -48,7 +48,7 @@
 | Beta waitlist signup | rate limit + contract tests | **LIVE** |
 | CV / voice upload limits | `ff22f3a` | **LIVE** |
 | CSP report-only + sink | S1 gate, `/api/v1/csp-report` | **LIVE** |
-| CSP enforce | S2 gate; 72h burn-in `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z` | **BLOCKED** — REPORT-ONLY; burn-in in progress; do not flip enforce before evidence pack |
+| CSP enforce | S2 gate; 72h burn-in **COMPLETE** `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z` | **READY FOR FOUNDER DECISION** — REPORT-ONLY; enforce not flipped |
 | Layer-2 LLM mutation limits | `28a50a0` | **LIVE** |
 | Profile / applications mutation limits | `1c731fc` | **LIVE** |
 | OAuth callback rate limits | `1efd8b1` | **LIVE** |
@@ -103,14 +103,33 @@
 | Google Calendar FULL prod smoke (2026-05-29) | `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md` | **LIVE / VERIFIED** — OAuth + real events + day mapping; Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, HEAD `3631c45`; no Railway |
 | Founder authenticated smoke (2026-05-29) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **LIVE / VERIFIED** — P6 **PASS**; 8/8 routes + safety; `/dashboard` layout founder-confirmed |
 | CSP per-route probe (2026-05-29 batch) | `/`, `/dashboard`, `/login/candidate`, `/demo`, `/status` — all report-only | **LIVE REPORT-ONLY** — enforce still blocked (S2) |
-| CSP S2 burn-in window (2026-06-02) | `docs/S2_CSP_BURNIN_WINDOW_2026-06-01.md` — `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z` (~44h 16m / ~61% elapsed at `2026-06-04T10:34:36Z`) | **IN PROGRESS** — S2 PASS **NO**; enforce off |
-| CSP founder Railway cadence (~48h, 2026-06-04 `10:34:36Z`) | Founder UI search `csp_report` from window start — **no fresh entries** since `2026-06-02T14:18:33Z` | **CONTINUE** — report-only HOLD |
+| CSP S2 burn-in window (2026-06-02) | `docs/S2_CSP_BURNIN_WINDOW_2026-06-01.md` — **COMPLETE** at `2026-06-05T14:18:33Z` | **READY FOR FOUNDER DECISION** — S2 PASS **NO**; enforce off |
+| CSP founder Railway final (2026-06-05 rollup) | Founder UI search `csp_report` from window start — **no fresh entries** | **CLEAN** — Recommendation **A** (enforce PR) or **B** (HOLD) |
 | CSP founder combined checkpoint (2026-06-04 `08:47:35Z`) | Railway `csp_report` — **no fresh entries** since start; Chrome/Safari/Firefox DevTools core routes — **no CSP violations** | **CONTINUE** (historical combined) — report-only HOLD |
 | Marketing logo marquee (non-CSP, 2026-06-04) | Deploy chain `472a6d3` → `bcd23cd` → `4a7c57d`; founder **final logo smoke PASS** `10:29:29Z` — colorful logos + initials, no white plates / broken images, Console clean; Safari/Firefox **PASS** `08:47:35Z` | **VERIFIED** — non-CSP; S2 unchanged |
 | CSP founder Railway checkpoint (2026-06-03 `12:23:52Z`) | Founder UI search `csp_report` from window start — **no fresh entries** (historical; superseded by combined row) | **CONTINUE** (historical) |
 | CSP agent checkpoint (2026-06-03 `08:00:23Z`) | `audit-csp-headers.sh` + public-health + local CSP tests; Railway logs founder-only | **CONTINUE** (historical) — superseded by founder Railway row above |
 | CSP clean checkpoint (2026-06-02 `15:42:41Z`) | Founder Railway `production/twin` deployment `37096ecc`; search `csp_report` — no logs / no fresh reports; dashboard OK | **CONTINUE** (historical) — through `2026-06-02` founder evidence |
 | CSP `connect-src` Railway host (2026-06-02) | `frontend/next.config.ts`; founder logs: no fresh violations for `twin-production-bcd9.up.railway.app` after deploy | **LIVE / DEPLOYED** — report-only allowlist; not an outage |
+
+---
+
+## Final 72h S2 rollup — 2026-06-05T14:18:33Z
+
+**Rollup recorded UTC:** `2026-06-05T15:52:51Z` · **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01` · **HEAD:** `effef83` · **Prod API SHA:** `46d8280…` (public-health)
+
+| Signal | Value |
+| ------ | ----- |
+| Burn-in window | **72h complete** |
+| CSP mode | Report-only (enforce absent) |
+| Railway `csp_report` | **No fresh entries** |
+| Public-health | `status=ok` · `db_ok=true` · `validated_jobs=652` · `market_coverage_active_validated=2725` |
+| Auto-apply | **PAUSED** (`nightly_auto_apply_beat_enabled=false`) |
+| Scrape worker | **Ready** (`scrape_worker_ready=true`) |
+| DevTools | Chrome / Safari / Firefox — **PASS** |
+| Logo smoke | **PASS** |
+
+**Verdict:** **READY FOR FOUNDER DECISION** · **Recommendation A** (enforce PR) · **Public launch: NO-GO** · **S2 PASS: NO**
 
 ---
 

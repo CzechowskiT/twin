@@ -238,4 +238,22 @@ Pair with 72h Railway triage (`docs/S2_CSP_RAILWAY_LOG_TRIAGE_PLAN_2026-06-01.md
 
 Until Railway 72h rollup **and** multi-browser DevTools (Safari + Firefox minimum) complete: **S2 NOT READY**, public launch **NO-GO**.
 
-**Follow-up (non-CSP):** Logo fix chain shipped (PR **#24**, `18e6ce4`). Founder post-deploy smoke **`2026-06-04T08:39:36Z`** on `/` — Console clean; Chrome UX gap: **empty white logo plates** → **initials layer fix** (repo, post-deploy smoke). Safari + Firefox DevTools **`2026-06-04T08:47:35Z`** — **PASS** (core routes + `/` logo; no CSP violations). **CSP unchanged.** **S2 burn-in: CONTINUE** (no clock reset). **S2 PASS: NO.** **Public launch: NO-GO** until `2026-06-05T14:18:33Z` 72h rollup + founder enforce sign-off. **Remaining:** mobile browsers (optional), post-deploy initials smoke.
+**Follow-up (non-CSP):** Logo fix chain shipped (PR **#24**, `18e6ce4`). Founder post-deploy smoke **`2026-06-04T08:39:36Z`** on `/` — Console clean; Chrome UX gap: **empty white logo plates** → **initials layer fix** (repo, post-deploy smoke). Safari + Firefox DevTools **`2026-06-04T08:47:35Z`** — **PASS** (core routes + `/` logo; no CSP violations). **CSP unchanged.** **Final 72h rollup `2026-06-05T14:18:33Z`:** evidence pack **complete** → **READY FOR FOUNDER DECISION** (Recommendation **A**: approve separate enforce PR). **S2 PASS: NO.** **Public launch: NO-GO.** **Remaining (optional):** mobile browsers.
+
+## Final 72h S2 rollup — 2026-06-05T14:18:33Z
+
+**Rollup recorded UTC:** `2026-06-05T15:52:51Z` · **Window elapsed:** ~**73h 34m** (72h window **complete**)
+
+| Browser | Status | Evidence |
+| ------- | ------ | -------- |
+| Chrome (desktop) | ✅ **PASS** | `2026-06-03T13:29:36Z` core routes; logo smokes through `2026-06-04T10:29:29Z` |
+| Safari (desktop) | ✅ **PASS** | `2026-06-04T08:47:35Z` core routes + `/` logo |
+| Firefox (desktop) | ✅ **PASS** | `2026-06-04T08:47:35Z` core routes + `/` logo |
+| Mobile Safari / Chrome | ⚪ **Optional** | Not required for rollup |
+
+| Non-CSP observation | Classification |
+| --- | --- |
+| `GET /api/v1/jobs/saved` → **422** | **Non-CSP** — not burn-in blocker |
+| Logo marquee (pre-fix `/_next/image` noise) | **Fixed** — final smoke **PASS** `2026-06-04T10:29:29Z` |
+
+**Verdict:** Multi-browser DevTools evidence **sufficient** for founder decision. **READY FOR FOUNDER DECISION** · **Recommendation A** (enforce PR) vs **B** (HOLD report-only). **NOT S2 PASS.** **Public launch: NO-GO.**
