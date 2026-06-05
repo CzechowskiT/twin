@@ -1,23 +1,21 @@
 "use client";
 
+import { useTranslation } from "@/components/language-provider";
 import { ComparisonTwinPage } from "@/components/marketing/comparison-page";
 
 export default function CompareAgenciesPage() {
+  const { t } = useTranslation();
   return (
     <ComparisonTwinPage
-      title="TWIN vs recruitment agencies"
-      competitorLabel="Traditional agencies"
-      lead="Agencies earn on placement and relationship. TWIN is software-first: machine-assisted matching, in-product verification paths, and async work toward interviews — without turning your hiring process into forwarded CV threads."
+      title={t("compare.agenciesTitle")}
+      competitorLabel={t("compare.agenciesCompetitorLabel")}
+      lead={t("compare.agenciesLead")}
       competitorBullets={[
-        "Success fees and retainers aligned to human sourcers and account managers.",
-        "Quality varies by desk; speed often trades off against candidate experience.",
-        "Heavy email and phone coordination for scheduling and feedback.",
+        t("compare.agenciesCompetitor1"),
+        t("compare.agenciesCompetitor2"),
+        t("compare.agenciesCompetitor3"),
       ]}
-      twinBullets={[
-        "Transparent pipeline in the product; ranked matches instead of mystery slates.",
-        "Automation for repetitive application flows where boards permit it.",
-        "Roadmap toward self-serve placement verification instead of default ping-pong.",
-      ]}
+      twinBullets={[t("compare.agenciesTwin1"), t("compare.agenciesTwin2"), t("compare.agenciesTwin3")]}
     />
   );
 }

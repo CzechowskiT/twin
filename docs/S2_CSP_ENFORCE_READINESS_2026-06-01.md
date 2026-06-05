@@ -2,10 +2,10 @@
 
 **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01`
 **Auditor role:** TWIN CSP S2 burn-in / enforce readiness auditor
-**Verdict:** **NOT READY** — infrastructure and tests pass; **72h violation triage evidence is missing**
+**Verdict:** **READY FOR FOUNDER DECISION** — 72h report-only burn-in evidence pack **complete** (window end `2026-06-05T14:18:33Z`); enforce flip **not executed**; founder sign-off pending.
 
-Public launch remains **NO-GO** until S2 closes and legal gates clear.
-**Do NOT flip enforce. Do NOT deploy enforce.**
+Public launch remains **NO-GO** until enforce flip (if approved) + remaining legal/ops gates clear.
+**Do NOT flip enforce without founder approval. Do NOT deploy enforce in this rollup session.**
 
 ## Executive summary
 
@@ -14,9 +14,9 @@ Public launch remains **NO-GO** until S2 closes and legal gates clear.
 | Prod CSP mode | **Report-only** on all audited routes (no enforce header) |
 | `report-uri /api/v1/csp-report` | **Present** on all audited routes |
 | Report sink (`POST /api/v1/csp-report`) | **Live** — storage-free, rate-limited, sanitization tested |
-| 72h burn-in violation triage | **MISSING** — no log/DB evidence pack |
+| 72h burn-in violation triage | **COMPLETE** — Railway clean full window; DevTools PASS; see § Final 72h rollup |
 | Directive narrowing (host allowlists) | **PREPARED IN REPO** (2026-06-01) — not on prod until frontend deploy |
-| Founder enforce decision | **PENDING** — blocked on deploy + 72h log triage + DevTools checklist |
+| Founder enforce decision | **PENDING** — evidence pack ready; choose Recommendation **A** (approve enforce PR) or **B** (HOLD report-only) |
 
 ## CSP implementation map
 
@@ -165,9 +165,46 @@ No DB/data side-effects from CSP changes.
 
 ## Public launch stance
 
-- **S2:** ❌ NOT READY (this audit)
+- **S2:** ⚠️ **READY FOR FOUNDER DECISION** (72h evidence complete; not S2 PASS until enforce approved + post-enforce smoke)
 - **Public launch:** **NO-GO** — unchanged
 - **Controlled pilot / demo:** Unaffected by this audit (separate gates)
+
+## Final 72h S2 rollup — 2026-06-05T14:18:33Z
+
+**Rollup recorded UTC:** `2026-06-05T15:52:51Z` · **Branch HEAD:** `effef83`
+
+| Gate | Evidence | Status |
+| ---- | -------- | ------ |
+| 72h report-only window | `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z` | ✅ **COMPLETE** |
+| Railway `csp_report` triage | Founder UI — **no fresh entries** since start | ✅ **CLEAN** |
+| Header audit (8 routes) | CSP-RO + `report-uri`; enforce absent | ✅ **PASS** |
+| DevTools (Chrome/Safari/Firefox) | Core S2 routes — **no CSP violations** | ✅ **PASS** |
+| Logo / homepage smoke | Final PASS `2026-06-04T10:29:29Z` | ✅ **PASS** (non-CSP) |
+| Public-health | `status=ok`, `db_ok=true` | ✅ **PASS** |
+| Auto-apply | `nightly_auto_apply_beat_enabled=false` | ✅ **PAUSED** (ops) |
+| CSP sink tests | `pytest tests/test_csp_report*.py` — **9 passed** | ✅ **PASS** |
+
+**Recommendation A (recommended):** Founder approves **separate enforce PR** — rename `Content-Security-Policy-Report-Only` → `Content-Security-Policy` in `frontend/next.config.ts`; deploy frontend only; run post-enforce smoke checklist § Post-enforce smoke.
+
+**Recommendation B:** **HOLD** report-only — defer enforce; no evidence-based clock reset.
+
+**Verdict:** **READY FOR FOUNDER DECISION** · **NOT S2 PASS** · **NOT public launch GO** · **No enforce flip in this session.**
+
+## Enforce PR prepared — 2026-06-05 (Recommendation A)
+
+**Branch:** `chore/s2-csp-enforce-pr-2026-06-05` · **Base:** `cursor/phase1-monorepo-scaffold` · **Source:** rollup `9074150`
+
+| Item | Status |
+| ---- | ------ |
+| Code change | Header key `Content-Security-Policy-Report-Only` → `Content-Security-Policy` in `frontend/next.config.ts` (policy string unchanged) |
+| Tests / audit script | Updated for enforce-mode expectations |
+| PR body | `docs/PR_S2_CSP_ENFORCE_BODY_2026-06-05.md` |
+| Merged / deployed | **NO** — founder approval required |
+| Prod CSP mode | **Report-only** until merge + frontend deploy |
+| S2 PASS | **NO** |
+| Public launch | **NO-GO** |
+
+**Next (founder):** Review PR → merge → deploy frontend only → post-enforce smoke § Post-enforce smoke.
 
 ## Founder checkpoint — multi-browser DevTools + Railway (2026-06-04)
 

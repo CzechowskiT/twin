@@ -9,6 +9,9 @@
 - **Auto-apply safety audit:** `docs/AUTO_APPLY_DELEGATED_APPLY_SAFETY_AUDIT_2026-06-02.md` (2026-06-02)
 - **Post-merge sanity:** `docs/POST_MERGE_AUTO_APPLY_SANITY_2026-06-02.md` (2026-06-02)
 - **Ops pause plan:** `docs/AUTO_APPLY_PRODUCTION_OPS_PAUSE_PLAN_2026-06-02.md` (2026-06-02)
+- **Copy & claims audit:** `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md` (2026-06-04)
+- **Launch-day monitoring / rollback:** `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` (2026-06-04)
+- **Recruiter alignment audit:** `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md` (2026-06-04)
 - **DB incident (2026-05-29):** `INC-DB-2026-05-29-001` — **RESOLVED** + stabilization PASSED — see `docs/PRODUCTION_DB_RESTORE_INCIDENT_2026-05-29.md`
 - **O7 staging drill (2026-06-01):** ✅ **PASS** — pg_dump/pg_restore to `staging-restore-proof-20260529`; prod **`postgres-volume`** untouched — see `docs/BACKUP_RESTORE_DRILL_LOG.md`
 - **Vercel production deployment:** `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH` at frontend `3631c45` (Google Calendar day-mapping fix; founder re-smoke 2026-05-29)
@@ -23,7 +26,7 @@
 
 | Feature | Evidence | Production |
 | ------- | -------- | ---------- |
-| Public marketing (`/`, waitlist, first-1000) | HTTP 200 smoke; logo marquee founder Chrome Incognito **`2026-06-04T08:39:36Z`** post PR **#24** (`18e6ce4`) — clean Console on `/` | **LIVE** |
+| Public marketing (`/`, waitlist, first-1000, `/compare/*`) | HTTP 200 smoke; **final logo smoke PASS** **`2026-06-04T10:29:29Z`**; **copy fixes 2026-06-04** — founding qualified (`1a2eba4` + first-1000 headline); calendar strip + compare i18n aligned (OAuth vs ICS/WebCal; phased auto-apply); public launch still **NO-GO** (S2/ops) | **LIVE** (pilot); **NO-GO** uncontrolled public (gates, not copy alone) |
 | Status / public-health proxy | `git_commit=df15618`, `db_ok=true` in JSON (read-only check 2026-05-29) | **LIVE** |
 | Candidate login (OAuth + email) | health flags `google_oauth`, `github_oauth` | **LIVE** (Apple OAuth **OFF**) |
 | Dashboard (candidate) | `/dashboard` 200; auth required for data | **LIVE** |
@@ -45,13 +48,14 @@
 | Beta waitlist signup | rate limit + contract tests | **LIVE** |
 | CV / voice upload limits | `ff22f3a` | **LIVE** |
 | CSP report-only + sink | S1 gate, `/api/v1/csp-report` | **LIVE** |
-| CSP enforce | S2 gate; 72h burn-in `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z` | **BLOCKED** — REPORT-ONLY; burn-in in progress; do not flip enforce before evidence pack |
+| CSP enforce | S2 gate; 72h burn-in **COMPLETE** `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z` | **READY FOR FOUNDER DECISION** — REPORT-ONLY; enforce not flipped |
 | Layer-2 LLM mutation limits | `28a50a0` | **LIVE** |
 | Profile / applications mutation limits | `1c731fc` | **LIVE** |
 | OAuth callback rate limits | `1efd8b1` | **LIVE** |
 | Job save/unsave rate limits | `1efd8b1` | **LIVE** |
 | Cookie consent + recruiter inbox rate limits | `67a22dc` | **LIVE** |
-| Recruiter inbox | `recruiter_inbox_configured` | **LIVE** |
+| Recruiter inbox | `recruiter_inbox_configured`; token auth; batch accept/decline — audit `2026-06-04` **C) recruiter-supporting**, not two-sided | **LIVE** (pilot) |
+| Recruiter marketing SKU (watchlists, HM packets, seat packs) | `persona-pages.ts` recruiters bundle | **REPO / MARKETING** — not evidenced as shipped app beyond inbox/jobs |
 | Partner export | `partner_export_configured` | **LIVE** |
 | Placement verification (machine-assisted) | `PLACEMENT_VERIFICATION.md` | **LIVE** design; pilot-scale |
 | Verified candidate readiness gate (`/api/v1/candidates/me/verified-readiness`) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` § S11 + `tests/test_candidate_verified_readiness_gate.py` | **LIVE / VERIFIED** — prod HTTP 200 (founder browser smoke 2026-05-29); readiness card on `/dashboard` |
@@ -67,6 +71,7 @@
 | Founder authenticated route smoke (dashboard subpages, jobs, profile, safety copy) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **LIVE** — **PASS** (founder 2026-05-29); 8/8 routes + safety copy; `/dashboard` layout PASS |
 | Playwright smoke drift points | `frontend/e2e/smoke.spec.ts` targeted assertions | **STABILIZED** — status cookie-banner locator fix on branch; 13/14 prod lane PASS (2026-05-29) |
 | Public launch announcement | gate checklist + launch matrix | **BLOCKED** — **NO-GO** (S2 primary; L6/O5 waivers pilot-only; GAP-04 optional) |
+| Launch-day monitoring / rollback | `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` | **LIVE** (docs) — pilot/demo GO with monitoring; public **NO-GO**; auto-apply **PAUSED** |
 | Investor demo | `INVESTOR_DEMO_RUNBOOK.md` | **LIVE** stack, curated use |
 | Real CAPTCHA bypass / live mass apply | HARD BAN | **BLOCKED** |
 
@@ -98,9 +103,10 @@
 | Google Calendar FULL prod smoke (2026-05-29) | `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md` | **LIVE / VERIFIED** — OAuth + real events + day mapping; Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, HEAD `3631c45`; no Railway |
 | Founder authenticated smoke (2026-05-29) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **LIVE / VERIFIED** — P6 **PASS**; 8/8 routes + safety; `/dashboard` layout founder-confirmed |
 | CSP per-route probe (2026-05-29 batch) | `/`, `/dashboard`, `/login/candidate`, `/demo`, `/status` — all report-only | **LIVE REPORT-ONLY** — enforce still blocked (S2) |
-| CSP S2 burn-in window (2026-06-02) | `docs/S2_CSP_BURNIN_WINDOW_2026-06-01.md` — `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z` (~42h 29m / ~59% elapsed at `2026-06-04T08:47:35Z`) | **IN PROGRESS** — S2 PASS **NO**; enforce off |
-| CSP founder combined checkpoint (2026-06-04 `08:47:35Z`) | Railway `csp_report` — **no fresh entries** since start; Chrome/Safari/Firefox DevTools core routes — **no CSP violations** | **CONTINUE** — report-only HOLD |
-| Marketing logo marquee (non-CSP, 2026-06-04) | PR **#24** / `18e6ce4`; Chrome Console clean; empty white plates → **initials layer fix** (repo); Safari/Firefox logo smoke **PASS** `08:47:35Z`; post-deploy verify | **FIX SHIPPED** — post-deploy smoke |
+| CSP S2 burn-in window (2026-06-02) | `docs/S2_CSP_BURNIN_WINDOW_2026-06-01.md` — **COMPLETE** at `2026-06-05T14:18:33Z` | **READY FOR FOUNDER DECISION** — S2 PASS **NO**; enforce off |
+| CSP founder Railway final (2026-06-05 rollup) | Founder UI search `csp_report` from window start — **no fresh entries** | **CLEAN** — Recommendation **A** (enforce PR) or **B** (HOLD) |
+| CSP founder combined checkpoint (2026-06-04 `08:47:35Z`) | Railway `csp_report` — **no fresh entries** since start; Chrome/Safari/Firefox DevTools core routes — **no CSP violations** | **CONTINUE** (historical combined) — report-only HOLD |
+| Marketing logo marquee (non-CSP, 2026-06-04) | Deploy chain `472a6d3` → `bcd23cd` → `4a7c57d`; founder **final logo smoke PASS** `10:29:29Z` — colorful logos + initials, no white plates / broken images, Console clean; Safari/Firefox **PASS** `08:47:35Z` | **VERIFIED** — non-CSP; S2 unchanged |
 | CSP founder Railway checkpoint (2026-06-03 `12:23:52Z`) | Founder UI search `csp_report` from window start — **no fresh entries** (historical; superseded by combined row) | **CONTINUE** (historical) |
 | CSP agent checkpoint (2026-06-03 `08:00:23Z`) | `audit-csp-headers.sh` + public-health + local CSP tests; Railway logs founder-only | **CONTINUE** (historical) — superseded by founder Railway row above |
 | CSP clean checkpoint (2026-06-02 `15:42:41Z`) | Founder Railway `production/twin` deployment `37096ecc`; search `csp_report` — no logs / no fresh reports; dashboard OK | **CONTINUE** (historical) — through `2026-06-02` founder evidence |
@@ -108,8 +114,29 @@
 
 ---
 
+## Final 72h S2 rollup — 2026-06-05T14:18:33Z
+
+**Rollup recorded UTC:** `2026-06-05T15:52:51Z` · **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01` · **HEAD:** `effef83` · **Prod API SHA:** `46d8280…` (public-health)
+
+| Signal | Value |
+| ------ | ----- |
+| Burn-in window | **72h complete** |
+| CSP mode | Report-only (enforce absent) |
+| Railway `csp_report` | **No fresh entries** |
+| Public-health | `status=ok` · `db_ok=true` · `validated_jobs=652` · `market_coverage_active_validated=2725` |
+| Auto-apply | **PAUSED** (`nightly_auto_apply_beat_enabled=false`) |
+| Scrape worker | **Ready** (`scrape_worker_ready=true`) |
+| DevTools | Chrome / Safari / Firefox — **PASS** |
+| Logo smoke | **PASS** |
+
+**Verdict:** **READY FOR FOUNDER DECISION** · **Recommendation A** (enforce PR) · **Public launch: NO-GO** · **S2 PASS: NO**
+
+---
+
 ## Related
 
+- `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md`
+- `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md`
 - `docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md`
 - `docs/PRODUCTION_CUTOVER_REPORT_2026-05-27.md`
 - `docs/API_PRODUCTION_CUTOVER_DECISION_2026-05-27.md`

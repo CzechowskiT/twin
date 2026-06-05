@@ -9,8 +9,8 @@
 - CSP mode: `Content-Security-Policy-Report-Only` (RO) — **enforce absent** on all audited routes
 - Narrowed CSP on prod: **LIVE** (explicit allowlists, no broad `https:` wildcards)
 - `connect-src` Railway API host: **DEPLOYED** (`https://twin-production-bcd9.up.railway.app` in `frontend/next.config.ts`)
-- S2 status: **IN PROGRESS** — 72h evidence window running; **NOT READY** for enforce / S2 PASS
-- S2 PASS: **NO**
+- S2 status: **READY FOR FOUNDER DECISION** — 72h window **complete**; evidence pack assembled; enforce flip **not executed**
+- S2 PASS: **NO** (founder enforce sign-off pending)
 - Public launch: **NO-GO**
 - Auto-apply ops pause (2026-06-02): founder `NIGHTLY_AUTO_APPLY_BEAT_ENABLED=false` — **does not reset** this burn-in clock (CSP headers unchanged; `csp_report` clean per founder)
 
@@ -342,6 +342,51 @@ From `GET /api/public-health` (via FE alias), captured at burn-in restart (`2026
 
 **Next founder cadence (UTC):** Window end rollup `2026-06-05T14:18:33Z` · post-deploy `/` initials smoke after fix deploy · optional mobile DevTools.
 
+## Founder final logo smoke — post deploy chain (2026-06-04)
+
+**Checkpoint UTC:** `2026-06-04T10:29:29Z` (~44h 11m after burn-in start `2026-06-02T14:18:33Z`; **~27h 49m** remaining until `2026-06-05T14:18:33Z`; **~61%** elapsed)
+
+**Source:** Founder Chrome **Incognito** DevTools on `https://twin-sooty.vercel.app/` after latest deploy (`472a6d3` → `bcd23cd` → `4a7c57d`).
+
+| Check | Result |
+| --- | --- |
+| Route | `/` homepage + logo marquee |
+| Homepage | ✅ **OK** |
+| Colorful brand logos + readable initials | ✅ **PASS** |
+| Empty white plates / broken-image icons | ✅ **None** |
+| `/_next/image` red errors | ✅ **None** |
+| DuckDuckGo / Google S2 / `gstatic` favicon red errors | ✅ **None** |
+| Console CSP violations | ✅ **None** |
+| CSP policy / burn-in clock | **Unchanged** — **no reset** |
+| Classification | **Non-CSP UX** — launch-grade marquee visual |
+| Decision | **CONTINUE** 72h burn-in — report-only **HOLD** |
+| S2 status | **NOT READY** |
+| S2 PASS | **NO** |
+| Public launch | **NO-GO** |
+
+**Next founder cadence (UTC):** Railway `csp_report` triage `2026-06-04T14:18:33Z` (~48h after start) · window end rollup `2026-06-05T14:18:33Z` · enforce decision **HOLD** until full 72h evidence pack + founder sign-off (`docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md`).
+
+## Founder Railway cadence checkpoint (~48h) (2026-06-04)
+
+**Checkpoint UTC:** `2026-06-04T10:34:36Z` (~44h 16m after burn-in start `2026-06-02T14:18:33Z`; **~27h 44m** remaining until `2026-06-05T14:18:33Z`; **~61%** elapsed)
+
+**Source:** Founder Railway UI — service `production/twin` → **Logs** → search `csp_report` (time filter from `2026-06-02T14:18:33Z`)
+
+| Field | Founder entry |
+| --- | --- |
+| Type | founder Railway UI — **cadence** (~48h; distinct from combined DevTools row `08:47:35Z` and logo smoke `10:29:29Z`) |
+| Search | `csp_report` |
+| Fresh entries after window start | **No** — brak świeżych wpisów od `2026-06-02T14:18:33Z` |
+| New `blocked-uri` hosts (post-restart) | **none** |
+| Enforce header | **Absent** (unchanged) |
+| Logo smoke (`10:29:29Z`) | **PASS** (unchanged; non-CSP) |
+| Decision | **CONTINUE** 72h burn-in — report-only HOLD |
+| S2 status | **NOT READY** |
+| S2 PASS | **NO** |
+| Public launch | **NO-GO** |
+
+**Next founder cadence (UTC):** Window end rollup `2026-06-05T14:18:33Z` · enforce decision **HOLD** until full 72h evidence pack + founder sign-off.
+
 ## Gate closure session note (2026-06-03)
 
 **Session UTC:** `2026-06-03T13:19:53Z` (~23h 1m elapsed; **~32%** of 72h window)
@@ -356,6 +401,49 @@ From `GET /api/public-health` (via FE alias), captured at burn-in restart (`2026
 ## Manual checkpoint cadence
 
 - **Window end review:** `2026-06-05T14:18:33Z` — full 72h evidence pack before any enforce decision.
+
+## Final 72h S2 rollup — 2026-06-05T14:18:33Z
+
+**Rollup recorded UTC:** `2026-06-05T15:52:51Z` (~**73h 34m** after burn-in start; **72h window complete**)
+**Branch:** `chore/s2-csp-burnin-readiness-2026-06-01` · **HEAD:** `effef83`
+**Coordinator:** TWIN S2 CSP Final 72h Rollup (read-only; no deploy / no enforce flip)
+
+| Evidence item | Result |
+| --- | --- |
+| Window | `2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z` (**72h 0m**) |
+| Railway `csp_report` (founder UI) | **No fresh entries** since window start — brak świeżych wpisów od `2026-06-02T14:18:33Z`; **Decision: CONTINUE** (final confirmation; **NOT PENDING**) |
+| 8-route header audit | **PASS** — CSP-RO yes · enforce **absent** · `report-uri` yes (`bash scripts/audit-csp-headers.sh`, 0 failures) |
+| Public-health | `status=ok` · `db_ok=true` · `git_commit=46d8280…` · `validated_jobs=652` · `market_coverage_active_validated=2725` · `scrape_worker_ready=true` · `nightly_auto_apply_beat_enabled=false` |
+| Chrome DevTools | **PASS** — no CSP violations (`2026-06-03T13:29:36Z` + logo smokes through `2026-06-04T10:29:29Z`) |
+| Safari DevTools | **PASS** — no CSP violations (`2026-06-04T08:47:35Z`) |
+| Firefox DevTools | **PASS** — no CSP violations (`2026-06-04T08:47:35Z`) |
+| `/api/v1/jobs/saved` **422** | **Non-CSP** — API/auth/validation; not burn-in blocker |
+| Logo / homepage smoke | **PASS** — final smoke `2026-06-04T10:29:29Z`; colorful logos + initials; Console clean |
+| Auto-apply | **PAUSED** — `nightly_auto_apply_beat_enabled=false`; burn-in clock **unchanged** |
+| Mobile DevTools | **Optional** — not required for this rollup |
+| CSP pytest | **9 passed** (`backend/tests/test_csp_report*.py`) |
+
+**Decision rules applied:** No fresh `csp_report` + headers clean + health OK + multi-browser DevTools PASS → **READY FOR FOUNDER DECISION** (not S2 PASS; not public launch GO).
+
+| Recommendation | Action |
+| --- | --- |
+| **A (recommended)** | Founder reviews evidence pack → approve **separate enforce PR** (header rename only + deploy + post-enforce smoke per `docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md`) |
+| **B** | **HOLD** report-only — defer enforce; no clock reset required |
+
+**Verdict:** **READY FOR FOUNDER DECISION** · **Recommendation A** · **S2 PASS: NO** · **Public launch: NO-GO** · **Enforce flip: NOT executed on prod** (hard ban honoured)
+
+## Enforce PR prepared — 2026-06-05
+
+**Branch:** `chore/s2-csp-enforce-pr-2026-06-05` · **PR body:** `docs/PR_S2_CSP_ENFORCE_BODY_2026-06-05.md`
+
+| Item | Status |
+| --- | --- |
+| 72h burn-in | ✅ Complete (`9074150` rollup) |
+| Enforce code in repo (this branch) | ✅ Header rename only; same policy string |
+| Prod alias CSP mode | **Report-only** until merge + deploy |
+| Merge / deploy | **PENDING founder** |
+
+**Hard bans honoured:** No prod deploy · no merge · no S2 PASS claim.
 
 ## Guardrails
 

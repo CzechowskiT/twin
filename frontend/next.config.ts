@@ -1,12 +1,12 @@
 import type { NextConfig } from "next";
 
 /**
- * Narrowed report-only CSP for S2 burn-in (2026-06-01).
+ * Narrowed CSP for S2 enforce (2026-06-05).
  * Host allowlists from `docs/S2_CSP_EXTERNAL_ORIGIN_INVENTORY_2026-06-01.md`.
- * Stays `Content-Security-Policy-Report-Only` — no enforce flip in this slice.
- * Prod keeps prior header until the next frontend deploy.
+ * Enforce flip: `Content-Security-Policy` (same policy string as burn-in RO).
+ * Prod keeps report-only until this branch is merged and frontend redeployed.
  */
-const CSP_REPORT_ONLY =
+const CSP_POLICY =
   "default-src 'self'; " +
   "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://plausible.io; " +
   "style-src 'self' 'unsafe-inline'; " +
@@ -28,8 +28,8 @@ const securityHeaders = [
     value: "camera=(), microphone=(), geolocation=(), interest-cohort=()",
   },
   {
-    key: "Content-Security-Policy-Report-Only",
-    value: CSP_REPORT_ONLY,
+    key: "Content-Security-Policy",
+    value: CSP_POLICY,
   },
 ];
 

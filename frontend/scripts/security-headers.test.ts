@@ -86,23 +86,21 @@ run("Permissions-Policy disables camera/mic/geo/interest-cohort", async () => {
   assert.match(v, /interest-cohort=\(\)/);
 });
 
-run("CSP is currently in report-only mode (P1 baseline)", async () => {
+run("CSP is in enforce mode after S2 burn-in", async () => {
   const groups = await configuredHeaders();
   const all = groups[0];
-  // P1: we ship `Content-Security-Policy-Report-Only`. Enforce flip happens
-  // in a later slice (see docs/P1_CSP_ENFORCEMENT_PLAN_2026-05-27.md).
   const reportOnly = pickHeader(all.headers, "Content-Security-Policy-Report-Only");
   const enforce = pickHeader(all.headers, "Content-Security-Policy");
-  assert.ok(reportOnly, "expected CSP Report-Only to be configured in P1");
-  assert.ok(!enforce, "did not expect an enforce-mode CSP yet (P1 baseline)");
+  assert.ok(enforce, "expected enforce-mode CSP after S2 72h burn-in");
+  assert.ok(!reportOnly, "did not expect report-only CSP alongside enforce");
 });
 
 run("CSP directives are present and explicit", async () => {
   const groups = await configuredHeaders();
   const all = groups[0];
   const csp =
-    pickHeader(all.headers, "Content-Security-Policy-Report-Only")?.value ??
     pickHeader(all.headers, "Content-Security-Policy")?.value ??
+    pickHeader(all.headers, "Content-Security-Policy-Report-Only")?.value ??
     "";
   for (const d of [
     "default-src",
@@ -124,8 +122,8 @@ run("frame-ancestors is locked to 'none'", async () => {
   const groups = await configuredHeaders();
   const all = groups[0];
   const csp =
-    pickHeader(all.headers, "Content-Security-Policy-Report-Only")?.value ??
     pickHeader(all.headers, "Content-Security-Policy")?.value ??
+    pickHeader(all.headers, "Content-Security-Policy-Report-Only")?.value ??
     "";
   assert.match(csp, /frame-ancestors\s+'none'/);
 });
@@ -134,12 +132,12 @@ run("CSP report-uri points at the backend sink", async () => {
   const groups = await configuredHeaders();
   const all = groups[0];
   const csp =
-    pickHeader(all.headers, "Content-Security-Policy-Report-Only")?.value ??
     pickHeader(all.headers, "Content-Security-Policy")?.value ??
+    pickHeader(all.headers, "Content-Security-Policy-Report-Only")?.value ??
     "";
   // The /api/v1 prefix is proxied to the FastAPI csp_report endpoint by
-  // src/app/api/v1/[[...path]]/route.ts. Burn-in only — header stays
-  // Report-Only and the endpoint is no-op-safe (HTTP 204).
+  // src/app/api/v1/[[...path]]/route.ts. Enforce mode keeps report-uri
+  // for residual violation telemetry; endpoint is no-op-safe (HTTP 204).
   assert.match(csp, /report-uri\s+\/api\/v1\/csp-report/);
 });
 
@@ -147,8 +145,8 @@ run("CSP uses narrowed host allowlists (no https: wildcards)", async () => {
   const groups = await configuredHeaders();
   const all = groups[0];
   const csp =
-    pickHeader(all.headers, "Content-Security-Policy-Report-Only")?.value ??
     pickHeader(all.headers, "Content-Security-Policy")?.value ??
+    pickHeader(all.headers, "Content-Security-Policy-Report-Only")?.value ??
     "";
   for (const directive of ["img-src", "font-src", "connect-src"]) {
     const m = csp.match(new RegExp(`${directive}\\s+([^;]+)`));
@@ -166,8 +164,8 @@ run("CSP frame-src allows YouTube nocookie embed", async () => {
   const groups = await configuredHeaders();
   const all = groups[0];
   const csp =
-    pickHeader(all.headers, "Content-Security-Policy-Report-Only")?.value ??
     pickHeader(all.headers, "Content-Security-Policy")?.value ??
+    pickHeader(all.headers, "Content-Security-Policy-Report-Only")?.value ??
     "";
   assert.match(csp, /frame-src\s+https:\/\/www\.youtube-nocookie\.com/);
 });
@@ -176,8 +174,8 @@ run("CSP script-src allows Plausible when analytics consent is granted", async (
   const groups = await configuredHeaders();
   const all = groups[0];
   const csp =
-    pickHeader(all.headers, "Content-Security-Policy-Report-Only")?.value ??
     pickHeader(all.headers, "Content-Security-Policy")?.value ??
+    pickHeader(all.headers, "Content-Security-Policy-Report-Only")?.value ??
     "";
   assert.match(csp, /script-src[^;]*https:\/\/plausible\.io/);
   assert.match(csp, /connect-src[^;]*https:\/\/us\.i\.posthog\.com/);
@@ -187,8 +185,8 @@ run("CSP connect-src allows production Railway API host", async () => {
   const groups = await configuredHeaders();
   const all = groups[0];
   const csp =
-    pickHeader(all.headers, "Content-Security-Policy-Report-Only")?.value ??
     pickHeader(all.headers, "Content-Security-Policy")?.value ??
+    pickHeader(all.headers, "Content-Security-Policy-Report-Only")?.value ??
     "";
   assert.match(
     csp,

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Read-only CSP header audit for TWIN production (or any FE base URL).
 # No auth, no cookies, no deploy side-effects. Exits non-zero when required
-# security headers are missing or enforce-mode CSP is present.
+# security headers are missing or report-only CSP is still present.
 #
 # Usage:
 #   bash scripts/audit-csp-headers.sh
@@ -68,7 +68,7 @@ for path in "${ROUTES[@]}"; do
   [[ "$csp_ro$csp_e" == *"report-uri"* ]] && uri_flag="yes"
   [[ -n "$hsts" ]] && hsts_flag="yes"
 
-  if [[ "$ro_flag" != "yes" || "$en_flag" == "yes" || "$uri_flag" != "yes" ]]; then
+  if [[ "$ro_flag" == "yes" || "$en_flag" != "yes" || "$uri_flag" != "yes" ]]; then
     failures=$((failures + 1))
   fi
 
@@ -85,7 +85,7 @@ done
 
 echo
 echo "Base URL: $FE"
-echo "Failures: $failures route(s) missing report-only CSP or carrying enforce CSP"
+echo "Failures: $failures route(s) missing enforce CSP or still carrying report-only CSP"
 
 if [[ "$failures" -gt 0 ]]; then
   exit 1

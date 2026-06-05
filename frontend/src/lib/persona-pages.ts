@@ -53,7 +53,7 @@ const candidatesEn: PersonaBundle = {
   heroEyebrow: "Candidate workspace",
   heroTitle: "Let the boring career admin run in the background",
   heroLead:
-    "One aggressive feed, profile-aware scores, CV smarts, and tracked applications for people who would rather stay in flow than live in job-tab hell. Auto-apply unlocks where boards and your plan allow.",
+    "One aggressive feed, profile-aware scores, CV smarts, and tracked applications for people who would rather stay in flow than live in job-tab hell. Phased auto-apply unlocks where boards, your plan, and production gates allow.",
   pillars: [
     {
       title: "Discovery & match",
@@ -65,7 +65,7 @@ const candidatesEn: PersonaBundle = {
     },
     {
       title: "Applications & consent",
-      body: "Statuses for pending, applied, rejected; manual apply opens the employer flow; auto-apply runs only on supported boards and paid tiers. GDPR-first consent at registration.",
+      body: "Statuses for pending, applied, rejected; manual apply opens the employer flow; phased auto-apply prepares packages on supported boards and paid tiers — delegated submit stays off on production until enabled. GDPR-first consent at registration.",
     },
   ],
   growthLane: {
@@ -122,7 +122,7 @@ const candidatesEn: PersonaBundle = {
       highlight: true,
       bullets: [
         "Unlimited tracked applications",
-        "Auto-apply where boards + automation support it",
+        "Phased auto-apply where boards + automation support it (prepare-only on production today)",
         "Full CV intelligence when Anthropic is configured on the API",
       ],
       cta: "Upgrade after sign-in",
@@ -145,7 +145,7 @@ const candidatesEn: PersonaBundle = {
   logisticsTitle: "Good to know",
   logistics: [
     "Some employers still ask you to finish the application on their site — TWIN keeps track for you.",
-    "Autonomous applying runs on supported job boards with Premium or Pro, when the board allows it.",
+    "Autonomous applying is rolling out in phases on supported boards (Premium or Pro when enabled) — production stays prepare-only until delegated apply ships.",
     "Scanned PDF résumés can take a moment to read — you can always edit your profile by hand.",
   ],
   primaryCta: { label: "Start free with TWIN", href: "/register" },
@@ -156,7 +156,7 @@ const candidatesPl: PersonaBundle = {
   heroEyebrow: "Przestrzeń dla kandydata",
   heroTitle: "Nudny admin kariery niech leci w tle",
   heroLead:
-    "Jeden czytelny feed, scoring pod profil, inteligencja CV i śledzenie aplikacji dla ludzi, którzy wolą flow niż piekło tabów. Auto-apply tam, gdzie portal i plan pozwalają.",
+    "Jeden czytelny feed, scoring pod profil, inteligencja CV i śledzenie aplikacji dla ludzi, którzy wolą flow niż piekło tabów. Auto-apply fazowe tam, gdzie portal, plan i bramki produkcji pozwalają.",
   pillars: [
     {
       title: "Odkrywanie i dopasowanie",
@@ -168,7 +168,7 @@ const candidatesPl: PersonaBundle = {
     },
     {
       title: "Aplikacje i zgoda",
-      body: "Statusy pending/applied/rejected; ręczne „Aplikuj” otwiera flow pracodawcy; auto-apply tylko na obsługiwanych portalach i płatnych planach. RODO od rejestracji.",
+      body: "Statusy pending/applied/rejected; ręczne „Aplikuj” otwiera flow pracodawcy; auto-apply fazowe przygotowuje pakiety na obsługiwanych portalach i płatnych planach — delegated submit wyłączony na produkcji, dopóki produkt tego nie włączy. RODO od rejestracji.",
     },
   ],
   growthLane: {
@@ -225,7 +225,7 @@ const candidatesPl: PersonaBundle = {
       highlight: true,
       bullets: [
         "Nielimitowane śledzone aplikacje",
-        "Auto-apply tam, gdzie portal i automatyzacja to umożliwiają",
+        "Auto-apply fazowe tam, gdzie portal i automatyzacja to umożliwiają (dziś prepare-only na produkcji)",
         "Pełna inteligencja CV przy skonfigurowanym Anthropic po stronie API",
       ],
       cta: "Ulepsz po zalogowaniu",
@@ -248,7 +248,7 @@ const candidatesPl: PersonaBundle = {
   logisticsTitle: "Warto wiedzieć",
   logistics: [
     "Niektórzy pracodawcy nadal chcą, żebyś dokończył aplikację na ich stronie — TWIN śledzi to za Ciebie.",
-    "Autonomiczne aplikowanie działa na obsługiwanych portalach z planem Premium/Pro (gdy portal na to pozwala).",
+    "Autonomiczne aplikowanie wchodzi falami na obsługiwanych portalach (Premium/Pro, gdy włączone) — produkcja zostaje prepare-only, dopóki nie włączymy delegated apply.",
     "Skan CV w PDF? Może chwilę potrwać — profil zawsze możesz poprawić ręcznie.",
   ],
   primaryCta: { label: "Zacznij z TWIN za darmo", href: "/register" },
