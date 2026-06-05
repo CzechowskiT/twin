@@ -93,6 +93,7 @@ the gate to ✅.
 
 **Latest audit:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` (refreshed 2026-06-04 `10:34:36Z`)  
 **Copy & claims:** `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md` — founding BLOCKER reduced (`1a2eba4`); **MEDIUM** calendar (`billingEngagementPillar2Body`) + compare pages + `/first-1000` headline **fixed** EN/PL; public launch still **NO-GO** (S2, ops); **no** change to S2/L6/O5 gate rows.
+**Recruiter alignment:** `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md` — **C) candidate-first recruiter-supporting**; inbox pilot **LIVE**; auto-apply **PAUSED** reduces spam objection; **no** public GO or two-sided marketplace claim; recruiter SKU marketing vs shipped product gap documented.
 **Post-merge sanity (2026-06-02):** `docs/POST_MERGE_AUTO_APPLY_SANITY_2026-06-02.md` — PR #21 merged; prod `git_commit=6382a91` (includes `e764e68` hard gates **LIVE**); public-health OK; auto-apply **PAUSED** policy unchanged.
 **Logo smoke (2026-06-04):** Deploy chain `472a6d3` → `bcd23cd` → `4a7c57d` on prod alias; founder **final smoke PASS** `2026-06-04T10:29:29Z` — Chrome Incognito `/`: homepage **OK**; colorful brand logos + readable initials; **no** empty white plates or broken-image icons; **no** red `/_next/image` / DuckDuckGo / Google S2 / gstatic; **no CSP violations**; Safari + Firefox DevTools **`08:47:35Z`** — core routes + logo smoke **PASS**. **S2 CONTINUE** (no clock reset; CSP unchanged).
 
@@ -200,5 +201,7 @@ Warning: this check is non-destructive; do **not** run `alembic upgrade` manuall
   runbook referenced by O8.
 - `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` —
   launch-day monitoring / rollback (O8b).
+- `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md` —
+  recruiter alignment verdict (pilot messaging; not a launch gate flip).
 - `docs/SECURITY_RISK_REGISTER_2026-05-27.md` — security
   risk register referenced by O9.

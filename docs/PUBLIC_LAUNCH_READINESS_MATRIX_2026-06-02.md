@@ -287,8 +287,19 @@
 
 ---
 
+## M — Recruiter alignment (2026-06-04)
+
+- **Doc:** `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md`
+- **Verdict:** **C) candidate-first, recruiter-supporting** — not **D) two-sided**; not recruiter-hostile
+- **Evidence:** Recruiter inbox + batch accept/decline **LIVE** (token pilot); auto-apply **PAUSED** + delegated **NOT LIVE**; marketing recruiter SKU (watchlists/HM packets) **mostly not shipped**
+- **Launch impact:** **No change** to public **NO-GO** or pilot **GO**; recruiter sales must not claim unshipped SKU; inbox PII + match explainability gaps flagged for 0–30d roadmap
+- **Pilot/demo:** Safe to demo inbox with honest pilot framing per audit §13–14
+
+---
+
 ## Related docs
 
+- `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md`
 - `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md`
 - `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md`
 - `docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md`

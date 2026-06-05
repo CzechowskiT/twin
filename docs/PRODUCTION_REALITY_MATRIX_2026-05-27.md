@@ -11,6 +11,7 @@
 - **Ops pause plan:** `docs/AUTO_APPLY_PRODUCTION_OPS_PAUSE_PLAN_2026-06-02.md` (2026-06-02)
 - **Copy & claims audit:** `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md` (2026-06-04)
 - **Launch-day monitoring / rollback:** `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` (2026-06-04)
+- **Recruiter alignment audit:** `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md` (2026-06-04)
 - **DB incident (2026-05-29):** `INC-DB-2026-05-29-001` — **RESOLVED** + stabilization PASSED — see `docs/PRODUCTION_DB_RESTORE_INCIDENT_2026-05-29.md`
 - **O7 staging drill (2026-06-01):** ✅ **PASS** — pg_dump/pg_restore to `staging-restore-proof-20260529`; prod **`postgres-volume`** untouched — see `docs/BACKUP_RESTORE_DRILL_LOG.md`
 - **Vercel production deployment:** `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH` at frontend `3631c45` (Google Calendar day-mapping fix; founder re-smoke 2026-05-29)
@@ -53,7 +54,8 @@
 | OAuth callback rate limits | `1efd8b1` | **LIVE** |
 | Job save/unsave rate limits | `1efd8b1` | **LIVE** |
 | Cookie consent + recruiter inbox rate limits | `67a22dc` | **LIVE** |
-| Recruiter inbox | `recruiter_inbox_configured` | **LIVE** |
+| Recruiter inbox | `recruiter_inbox_configured`; token auth; batch accept/decline — audit `2026-06-04` **C) recruiter-supporting**, not two-sided | **LIVE** (pilot) |
+| Recruiter marketing SKU (watchlists, HM packets, seat packs) | `persona-pages.ts` recruiters bundle | **REPO / MARKETING** — not evidenced as shipped app beyond inbox/jobs |
 | Partner export | `partner_export_configured` | **LIVE** |
 | Placement verification (machine-assisted) | `PLACEMENT_VERIFICATION.md` | **LIVE** design; pilot-scale |
 | Verified candidate readiness gate (`/api/v1/candidates/me/verified-readiness`) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` § S11 + `tests/test_candidate_verified_readiness_gate.py` | **LIVE / VERIFIED** — prod HTTP 200 (founder browser smoke 2026-05-29); readiness card on `/dashboard` |
@@ -114,6 +116,7 @@
 
 ## Related
 
+- `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md`
 - `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md`
 - `docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md`
 - `docs/PRODUCTION_CUTOVER_REPORT_2026-05-27.md`
