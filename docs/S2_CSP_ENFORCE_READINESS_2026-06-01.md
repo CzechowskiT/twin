@@ -190,6 +190,22 @@ No DB/data side-effects from CSP changes.
 
 **Verdict:** **READY FOR FOUNDER DECISION** · **NOT S2 PASS** · **NOT public launch GO** · **No enforce flip in this session.**
 
+## Enforce PR prepared — 2026-06-05 (Recommendation A)
+
+**Branch:** `chore/s2-csp-enforce-pr-2026-06-05` · **Base:** `cursor/phase1-monorepo-scaffold` · **Source:** rollup `9074150`
+
+| Item | Status |
+| ---- | ------ |
+| Code change | Header key `Content-Security-Policy-Report-Only` → `Content-Security-Policy` in `frontend/next.config.ts` (policy string unchanged) |
+| Tests / audit script | Updated for enforce-mode expectations |
+| PR body | `docs/PR_S2_CSP_ENFORCE_BODY_2026-06-05.md` |
+| Merged / deployed | **NO** — founder approval required |
+| Prod CSP mode | **Report-only** until merge + frontend deploy |
+| S2 PASS | **NO** |
+| Public launch | **NO-GO** |
+
+**Next (founder):** Review PR → merge → deploy frontend only → post-enforce smoke § Post-enforce smoke.
+
 ## Founder checkpoint — multi-browser DevTools + Railway (2026-06-04)
 
 **Checkpoint UTC:** `2026-06-04T08:47:35Z` (~42h 29m into burn-in; **~59%** elapsed)

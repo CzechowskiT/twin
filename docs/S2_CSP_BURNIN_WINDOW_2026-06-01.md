@@ -430,9 +430,20 @@ From `GET /api/public-health` (via FE alias), captured at burn-in restart (`2026
 | **A (recommended)** | Founder reviews evidence pack → approve **separate enforce PR** (header rename only + deploy + post-enforce smoke per `docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md`) |
 | **B** | **HOLD** report-only — defer enforce; no clock reset required |
 
-**Verdict:** **READY FOR FOUNDER DECISION** · **Recommendation A** · **S2 PASS: NO** · **Public launch: NO-GO** · **Enforce flip: NOT executed** (hard ban honoured)
+**Verdict:** **READY FOR FOUNDER DECISION** · **Recommendation A** · **S2 PASS: NO** · **Public launch: NO-GO** · **Enforce flip: NOT executed on prod** (hard ban honoured)
 
-**Hard bans honoured:** No deploy · no CSP enforce · no Railway restart · no env/DB/migrations · no scrape/apply/sweep · no secrets · no public GO · no delegated live · no KYC/legal live.
+## Enforce PR prepared — 2026-06-05
+
+**Branch:** `chore/s2-csp-enforce-pr-2026-06-05` · **PR body:** `docs/PR_S2_CSP_ENFORCE_BODY_2026-06-05.md`
+
+| Item | Status |
+| --- | --- |
+| 72h burn-in | ✅ Complete (`9074150` rollup) |
+| Enforce code in repo (this branch) | ✅ Header rename only; same policy string |
+| Prod alias CSP mode | **Report-only** until merge + deploy |
+| Merge / deploy | **PENDING founder** |
+
+**Hard bans honoured:** No prod deploy · no merge · no S2 PASS claim.
 
 ## Guardrails
 

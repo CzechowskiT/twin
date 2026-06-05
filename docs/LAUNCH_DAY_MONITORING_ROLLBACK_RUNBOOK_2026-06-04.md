@@ -18,7 +18,7 @@
 | --------- | -------------- | ------------------------ |
 | **Audience** | ≤20 named pilot users (`docs/PILOT_TRACKER.csv`); curated investor/CTO demo | Public announcement (LinkedIn, X, PressOn); uncontrolled signup spike |
 | **Stack** | Same prod FE + API URLs above | Staging-only shortcuts; “demo” DB |
-| **CSP** | Report-only burn-in; enforce **OFF** until S2 rollup + founder sign-off | Flip `Content-Security-Policy` enforce before `2026-06-05T14:18:33Z` review |
+| **CSP** | Report-only on prod until enforce PR merged + deployed; enforce PR **prepared** (`chore/s2-csp-enforce-pr-2026-06-05`) | Flip live without founder merge/deploy approval |
 | **Auto-apply** | Server gates live; nightly beat **disabled**; no mass autonomous apply | Nightly sweep on; `AUTO_APPLY_SUBMIT` enable without founder approval; ops trigger-sweep without allowlist |
 | **Delegated / KYC apply** | Documented **NOT LIVE** | Any copy or config implying live delegated submit |
 | **Legal** | L6 export self-service; erasure manual (`docs/GDPR_MANUAL_DSR.md`); L6 + O5 waivers signed `2026-06-03T13:19:53Z` | Self-service delete; full Apple Calendar OAuth claims |

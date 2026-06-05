@@ -319,19 +319,16 @@ test.describe("public smoke (marketing + SEO)", () => {
 // changes (Vercel routing rules, etc.) that could strip a
 // directive in transit.
 test.describe("public smoke (security headers runtime)", () => {
-  test("home page response carries the report-only CSP with report-uri", async ({
+  test("home page response carries enforce CSP with report-uri", async ({
     request,
   }) => {
     const res = await request.get("/");
     expect(res.status()).toBe(200);
     const headers = res.headers();
     const csp =
-      headers["content-security-policy-report-only"] ??
-      headers["Content-Security-Policy-Report-Only"];
+      headers["content-security-policy"] ??
+      headers["Content-Security-Policy"];
     expect(csp).toBeTruthy();
-    // CSP burn-in clock starts when this directive is observable
-    // on the public alias — see
-    // `docs/P1_CSP_REPORT_URI_WIRING_2026-05-27.md`.
     expect(csp).toContain("report-uri /api/v1/csp-report");
     expect(csp).toContain("frame-ancestors 'none'");
   });
