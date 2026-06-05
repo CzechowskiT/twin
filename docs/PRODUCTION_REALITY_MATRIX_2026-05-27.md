@@ -54,7 +54,7 @@
 | OAuth callback rate limits | `1efd8b1` | **LIVE** |
 | Job save/unsave rate limits | `1efd8b1` | **LIVE** |
 | Cookie consent + recruiter inbox rate limits | `67a22dc` | **LIVE** |
-| Recruiter inbox | `recruiter_inbox_configured`; token auth; batch accept/decline — audit `2026-06-04` **C) recruiter-supporting**, not two-sided | **LIVE** (pilot) |
+| Recruiter inbox | `recruiter_inbox_configured`; token auth; batch accept/decline; **match_score + reasons on rows (2026-06-06)** — audit **C) recruiter-supporting** | **LIVE** (pilot) |
 | Recruiter marketing SKU (watchlists, HM packets, seat packs) | `persona-pages.ts` recruiters bundle | **REPO / MARKETING** — not evidenced as shipped app beyond inbox/jobs |
 | Partner export | `partner_export_configured` | **LIVE** |
 | Placement verification (machine-assisted) | `PLACEMENT_VERIFICATION.md` | **LIVE** design; pilot-scale |

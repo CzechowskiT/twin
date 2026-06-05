@@ -93,7 +93,7 @@ the gate to ✅.
 
 **Latest audit:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` (post-enforce smoke `2026-06-05T16:20:13Z`)
 **Copy & claims:** `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md` — founding BLOCKER reduced (`1a2eba4`); **MEDIUM** calendar (`billingEngagementPillar2Body`) + compare pages + `/first-1000` headline **fixed** EN/PL; public launch still **NO-GO** (S2 enforce not flipped; ops gates).
-**Recruiter alignment:** `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md` — **C) candidate-first recruiter-supporting**; inbox pilot **LIVE**; auto-apply **PAUSED** reduces spam objection; **no** public GO or two-sided marketplace claim; recruiter SKU marketing vs shipped product gap documented.
+**Recruiter alignment:** `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md` — **C) candidate-first recruiter-supporting**; inbox pilot **LIVE** with match score + reasons (**2026-06-06**); auto-apply **PAUSED**; **no** public GO or two-sided marketplace claim; `/for-recruiters` aligned to pilot reality.
 **Post-merge sanity (2026-06-02):** `docs/POST_MERGE_AUTO_APPLY_SANITY_2026-06-02.md` — PR #21 merged; prod API live; public-health OK; auto-apply **PAUSED** policy unchanged.
 **Logo smoke (2026-06-04):** Founder **final smoke PASS** `2026-06-04T10:29:29Z` — Chrome/Safari/Firefox DevTools **PASS**; Console clean; **no CSP violations**.
 
@@ -243,7 +243,7 @@ Warning: this check is non-destructive; do **not** run `alembic upgrade` manuall
 | Auto-apply | **PAUSED** |
 | Delegated apply | **NOT LIVE** |
 | L6 / O5 | Waivers signed `2026-06-03T13:19:53Z` |
-| Recruiter audit | Verdict **C** (candidate-first, recruiter-supporting) |
+| Recruiter audit | Verdict **C**; inbox match reasons **shipped 2026-06-06** (`docs/RECRUITER_DEMO_PATH_2026-06-06.md`) |
 
 **Decision:** S2 post-enforce smoke **PASS**
 

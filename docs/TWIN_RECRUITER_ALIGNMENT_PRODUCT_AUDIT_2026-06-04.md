@@ -121,7 +121,9 @@ Copy positions inbox as anti-spam:
       "A short queue of candidates TWIN already matched to your roles. You accept who gets an interview slot or decline in one click — no CV spam, no email ping-pong.",
 ```
 
-**Gap:** Inbox returns **candidate_name** — conflicts with talent-pool anonymization promise elsewhere.
+**PII policy (documented 2026-06-06):** Inbox = `application_review` — candidate **name OK** for employer reviewing an application. B2B talent pool = `talent_pool_anonymized` — no name/email/phone/CV text. See `docs/RECRUITER_DEMO_PATH_2026-06-06.md` § PII policy.
+
+**Gap:** Inbox returns **candidate_name** — intentional for application review; differs from talent-pool anonymization elsewhere.
 
 ### Talent pool anonymization (candidate opt-in)
 
@@ -199,7 +201,7 @@ const recruitersEn: PersonaBundle = {
    recruiter's bar.
 ```
 
-**Gap:** Score not exposed in recruiter inbox API response today.
+**Gap (resolved 2026-06-06):** Inbox API now returns `match_score`, `match_score_label`, `match_reasons[]`, `human_decision_required`, `pii_context`. See `backend/app/services/recruiter_match_explanations.py` and `docs/RECRUITER_DEMO_PATH_2026-06-06.md`.
 
 ### Placement verification — design, machine-assisted
 
@@ -353,7 +355,7 @@ flowchart LR
 | # | Gap | Severity | Evidenced |
 | - | --- | -------- | --------- |
 | G-R01 | Recruiter inbox shows **candidate_name** vs talent-pool anonymization | HIGH | `recruiter_inbox.py` |
-| G-R02 | No **match_score / explain** on inbox rows | HIGH | API response shape |
+| G-R02 | No **match_score / explain** on inbox rows | HIGH | **Resolved 2026-06-06** — inbox API + UI |
 | G-R03 | Marketing recruiter SKU (watchlists, packets) **not shipped** | HIGH | `persona-pages.ts` vs routes |
 | G-R04 | Token auth only — no employer SSO / RBAC | MEDIUM | `recruiter.py` header |
 | G-R05 | Two-sided **calendar** (recruiter propose slot) not evidenced | MEDIUM | Candidate acceptance queue only |
@@ -370,7 +372,7 @@ flowchart LR
 | Horizon | Recruiter-alignment deliverables |
 | ------- | -------------------------------- |
 | **Now (pilot)** | Keep auto-apply **PAUSED**; demo inbox + jobs with honest copy; use pilot manual spam playbook |
-| **0–30d** | Add inbox row: `match_score`, top 3 match reasons (read-only from matcher); document token rotation |
+| **0–30d** | ~~Add inbox row: `match_score`, top 3 match reasons~~ **Done 2026-06-06**; document token rotation |
 | **0–30d** | Align inbox PII: anonymize until accept OR disclose in recruiter invite |
 | **30–60d** | Ship minimal **recruiter match receipt** PDF/email on accept |
 | **30–60d** | Close GAP-04 / auto-apply policy doc with **employer-facing** pause + threshold defaults |
@@ -463,7 +465,7 @@ Reference: `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md`
 
 ### Days 0–30
 
-- [ ] Inbox API: add `match_score` + `match_reasons[]` (read-only).
+- [x] Inbox API: add `match_score` + `match_reasons[]` (read-only). **2026-06-06**
 - [ ] Recruiter invite brief updated with PII policy (`CONTROLLED_PILOT_INVITE_BRIEF`).
 - [ ] Homepage recruiter CTA → `/for-recruiters` + `/contact` (verify links in smoke).
 - [ ] Founder demo script: 2 min recruiter inbox path.
@@ -499,7 +501,7 @@ Reference: `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md`
 
 ## 19 — Build next list (recruiter alignment priority)
 
-1. **Inbox match receipt** — score + reasons on each row (backend + UI).
+1. **Inbox match receipt** — score + reasons on each row (backend + UI). **Shipped 2026-06-06**
 2. **PII policy alignment** — anonymize inbox or document pilot exception.
 3. **Recruiter demo seed** — stable inbox data (`investor_demo_seed.py` path exists).
 4. **Talent pool recruiter browse** — minimal list API (anonymized).
@@ -534,7 +536,7 @@ Reference: `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md`
 | 2 | Candidate–recruiter fairness | **3** | Consent gates; inbox batch; but candidate-led scrape | Recruiter-proposed slots | Balanced marketplace policy |
 | 3 | Copy / messaging alignment | **4** | June 2026 copy audit; dual-audience | De-scope unshipped recruiter pillars | Radical honesty + proof links |
 | 4 | Auto-apply safety (recruiter impact) | **4** | PAUSED + hard gates | Employer-visible pause | Board-partner allowlists |
-| 5 | Matching transparency | **2** | Scores on candidate UI; not inbox | Expose reasons to recruiters | Explainable ranking API |
+| 5 | Matching transparency | **3** | Scores on candidate UI + **recruiter inbox reasons** | Talent pool browse for recruiters | Explainable ranking API |
 | 6 | Privacy / PII (recruiter-facing) | **3** | Talent pool anonymized; inbox names | Anonymize inbox | GDPR-minimized profiles |
 | 7 | Human-in-the-loop | **4** | Accept/decline; consent; PAUSED apply | Recruiter threshold prefs | Mandatory review queues |
 | 8 | Two-sided liquidity | **1** | Candidate-heavy corpus | B2B partner jobs in corpus | LinkedIn network effects |
@@ -552,9 +554,9 @@ Reference: `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md`
 | Objection | Addressed? | Evidence | Missing |
 | --------- | ---------- | -------- | ------- |
 | “Auto-apply bots spam our jobs” | ✅ **Yes (today)** | PAUSED; `enforce_autonomous_apply_allowed`; copy disclaimers | Re-enable risk; employer notification product |
-| “Unqualified flood of applicants” | ⚠️ **Partial** | Matcher thresholds; consent `min_score`; pilot manual | Recruiter-visible score on inbox |
+| “Unqualified flood of applicants” | ⚠️ **Partial** | Matcher thresholds; consent `min_score`; **inbox match_score + reasons (2026-06-06)** | Recruiter threshold prefs in product |
 | “Candidates bypass recruiters” | ⚠️ **Partial** | TWIN is candidate-side; applies to **employer boards** | Partner model where recruiter is client |
-| “Black-box AI matching” | ⚠️ **Partial** | Rule-based matcher documented | Recruiter explainability UI |
+| “Black-box AI matching” | ⚠️ **Partial** | Rule-based matcher + **inbox reason strings** | Recruiter model card / LLM disclosure |
 | “GDPR / privacy violations” | ⚠️ **Partial** | Consent flags; talent pool anonymization copy | Inbox exposes names; no recruiter DPA portal evidenced |
 | “Fake credentials / AI hallucination” | ⚠️ **Partial** | Verified gateway; no KYC live | Skill evidence not employer-verified |
 | “No human recruiter in the loop” | ✅ **Yes (pilot inbox)** | Batch accept/decline | Auto-apply path when on bypasses employer until apply lands |

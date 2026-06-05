@@ -266,9 +266,9 @@
 | Auto-apply | **PAUSED** |
 | Delegated apply | **NOT LIVE** |
 | L6 / O5 | Waivers signed `2026-06-03T13:19:53Z` |
-| Recruiter audit | Verdict **C** (candidate-first, recruiter-supporting) |
+| Recruiter audit | Verdict **C** (candidate-first, recruiter-supporting); inbox match reasons **shipped 2026-06-06** |
 
-**Decision:** S2 post-enforce smoke **PASS**
+**Decision:** S2 post-enforce smoke **PASS** · 24h CSP monitor **CONTINUE** (2026-06-06: brak świeżych `csp_report`)
 
 ### 24h post-enforce monitoring (founder cadence)
 

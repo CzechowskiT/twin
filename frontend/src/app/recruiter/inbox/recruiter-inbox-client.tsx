@@ -8,6 +8,7 @@ import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-f
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
+import { getClientApiLocale } from "@/lib/api-locale";
 import { getToken } from "@/lib/auth";
 import {
   RECRUITER_DEMO_COMPANY_SLUG,
@@ -29,6 +30,11 @@ type BatchRow = {
   status: string;
   applied_at: string | null;
   updated_at: string | null;
+  match_score?: number | null;
+  match_score_label?: string | null;
+  match_reasons?: string[] | null;
+  human_decision_required?: boolean;
+  pii_context?: string | null;
 };
 
 type AuthMeBilling = {
@@ -118,7 +124,10 @@ export default function RecruiterInboxClient() {
     setCompanyRaw(slug);
     try {
       const q = recruiterInboxQuery(tkn, slug);
-      const res = await fetch(`/api/recruiter/inbox?${q}`, { cache: "no-store" });
+      const res = await fetch(`/api/recruiter/inbox?${q}`, {
+        cache: "no-store",
+        headers: { "X-Locale": getClientApiLocale() ?? "en" },
+      });
       if (!res.ok) {
         const body = await res.text();
         throw new Error(body || t("recruiterInbox.loadFailed"));
@@ -266,6 +275,15 @@ export default function RecruiterInboxClient() {
   const showAuthError = submitAttempted && authError;
   const companyLabel = companySlug ? companySlugToLabel(companySlug) : "";
 
+  function matchScoreLabelKey(label: string | null | undefined): string {
+    const key = (label ?? "").trim().toLowerCase();
+    if (key === "excellent") return t("recruiterInbox.matchScoreExcellent");
+    if (key === "good") return t("recruiterInbox.matchScoreGood");
+    if (key === "possible") return t("recruiterInbox.matchScorePossible");
+    if (key === "weak") return t("recruiterInbox.matchScoreWeak");
+    return t("recruiterInbox.matchScoreUnknown");
+  }
+
   return (
     <Shell wide>
       <Card>
@@ -330,6 +348,7 @@ export default function RecruiterInboxClient() {
                 {t("recruiterInbox.changeWorkspace")}
               </button>
             </div>
+            <p className="twin-muted mt-2 text-xs leading-relaxed">{t("recruiterInbox.humanDecisionNote")}</p>
             <div className="mt-4 flex flex-wrap items-end gap-3">
               <label className="flex min-w-[10rem] flex-col gap-1 text-xs">
                 <span className="font-medium text-[var(--foreground)]">{t("recruiterInbox.filterStatusLabel")}</span>
@@ -438,6 +457,23 @@ export default function RecruiterInboxClient() {
                     <p className="font-semibold">
                       {r.candidate_name} · {r.job_title}
                     </p>
+                    {typeof r.match_score === "number" ? (
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <span className="inline-flex items-center rounded-full bg-[var(--twin-surface-2)] px-2 py-0.5 text-xs font-semibold text-[var(--foreground)]">
+                          {t("recruiterInbox.matchScoreBadge").replace("{score}", String(Math.round(r.match_score)))}
+                        </span>
+                        <span className="text-xs text-[var(--twin-muted)]">
+                          {matchScoreLabelKey(r.match_score_label)}
+                        </span>
+                      </div>
+                    ) : null}
+                    {r.match_reasons && r.match_reasons.length > 0 ? (
+                      <ul className="mt-2 list-inside list-disc space-y-0.5 text-xs text-[var(--foreground)]">
+                        {r.match_reasons.map((reason) => (
+                          <li key={reason}>{reason}</li>
+                        ))}
+                      </ul>
+                    ) : null}
                     <p className="twin-muted mt-1 text-xs">
                       {r.company} · {r.status} · #{r.application_id}
                     </p>

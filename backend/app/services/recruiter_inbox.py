@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 
 from app.database.models import Application, ApplicationStatus, Candidate, Job
+from app.services.recruiter_match_explanations import build_recruiter_match_summary
 from app.utils.slug import slugify_company
 
 
@@ -22,6 +23,7 @@ def build_recruiter_batch(
     *,
     company_slug: str,
     limit: int = 25,
+    locale: str = "en",
 ) -> dict:
     """Applications for jobs matching company slug — applied/interview only."""
     slug = _require_company_slug(company_slug)
@@ -40,17 +42,17 @@ def build_recruiter_batch(
     for app, job, cand in rows:
         if slugify_company(job.company) != slug:
             continue
-        items.append(
-            {
-                "application_id": app.id,
-                "job_title": job.title,
-                "company": job.company,
-                "candidate_name": (cand.name or "").strip() or "Candidate",
-                "status": app.status.value,
-                "applied_at": app.applied_at.isoformat() if app.applied_at else None,
-                "updated_at": app.updated_at.isoformat() if app.updated_at else None,
-            },
-        )
+        item = {
+            "application_id": app.id,
+            "job_title": job.title,
+            "company": job.company,
+            "candidate_name": (cand.name or "").strip() or "Candidate",
+            "status": app.status.value,
+            "applied_at": app.applied_at.isoformat() if app.applied_at else None,
+            "updated_at": app.updated_at.isoformat() if app.updated_at else None,
+        }
+        item.update(build_recruiter_match_summary(db, cand, job, locale=locale))
+        items.append(item)
         if len(items) >= limit:
             break
     return {"company_slug": slug, "items": items, "total": len(items)}
