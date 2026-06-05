@@ -2,21 +2,22 @@
 
 **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01`
 **Auditor role:** TWIN CSP S2 burn-in / enforce readiness auditor
-**Verdict:** **READY FOR FOUNDER DECISION** — 72h report-only burn-in evidence pack **complete** (window end `2026-06-05T14:18:33Z`); enforce flip **not executed**; founder sign-off pending.
+**Verdict:** **S2 PASS** — enforce PR merged + deployed (`6862999`); post-enforce smoke **PASS** (`2026-06-05T16:20:13Z`).
 
-Public launch remains **NO-GO** until enforce flip (if approved) + remaining legal/ops gates clear.
-**Do NOT flip enforce without founder approval. Do NOT deploy enforce in this rollup session.**
+Public launch remains **NO-GO** (founder limited-launch decision pending).
+**24h monitoring:** Railway `csp_report` cadence through `2026-06-06T16:20:13Z`.
 
 ## Executive summary
 
 | Area | Status |
 | ---- | ------ |
-| Prod CSP mode | **Report-only** on all audited routes (no enforce header) |
+| Prod CSP mode | **Enforce** on all audited routes (`Content-Security-Policy` present; Report-Only absent) |
 | `report-uri /api/v1/csp-report` | **Present** on all audited routes |
 | Report sink (`POST /api/v1/csp-report`) | **Live** — storage-free, rate-limited, sanitization tested |
 | 72h burn-in violation triage | **COMPLETE** — Railway clean full window; DevTools PASS; see § Final 72h rollup |
-| Directive narrowing (host allowlists) | **PREPARED IN REPO** (2026-06-01) — not on prod until frontend deploy |
-| Founder enforce decision | **PENDING** — evidence pack ready; choose Recommendation **A** (approve enforce PR) or **B** (HOLD report-only) |
+| Post-enforce smoke | **PASS** — founder Chrome Incognito `2026-06-05T16:20:13Z`; see § Post-enforce smoke — S2 PASS |
+| Directive narrowing (host allowlists) | **LIVE** on prod since enforce deploy |
+| Founder enforce decision | **EXECUTED** — PR #32 @ `6862999` merged + Vercel deployed |
 
 ## CSP implementation map
 
@@ -163,11 +164,39 @@ No DB/data side-effects from CSP changes.
 6. Cookie consent → Plausible/PostHog load without console CSP errors
 7. `GET /api/public-health` → `status=ok`
 
+## Post-enforce smoke — S2 PASS
+
+**Checkpoint UTC:** `2026-06-05T16:20:13Z`
+**Enforce deploy:** PR #32 @ `6862999` (`chore/s2-csp-enforce-pr-2026-06-05`) — merged + Vercel deployed
+**Burn-in rollup source:** `9074150` (`chore/s2-csp-burnin-readiness-2026-06-01`)
+**Producer:** Founder manual smoke (Chrome Incognito)
+
+| Field | Value |
+| --- | --- |
+| Chrome Incognito routes | `/`, `/login/candidate`, `/register/candidate`, `/dashboard`, `/dashboard/calendar`, `/demo`, `/status`, `/api/public-health` — **OK**, brak CSP violations |
+| Headers | `Content-Security-Policy` **present**; `Content-Security-Policy-Report-Only` **absent** |
+| Homepage/logo smoke | **OK** |
+| Railway `csp_report` post-enforce | **Brak świeżych wpisów** |
+| CSP enforce | **ON** (prod) |
+| S2 PASS | **YES** |
+| Public launch | **NO-GO** (founder limited-launch decision pending) |
+| Pilot / demo | **GO** |
+| Auto-apply | **PAUSED** |
+| Delegated apply | **NOT LIVE** |
+| L6 / O5 | Waivers signed `2026-06-03T13:19:53Z` |
+| Recruiter audit | Verdict **C** (candidate-first, recruiter-supporting) |
+
+**Decision:** S2 post-enforce smoke **PASS**
+
+### 24h post-enforce monitoring (founder cadence)
+
+Monitor Railway `csp_report` for **24h** after enforce deploy (`2026-06-05T16:20:13Z` → `2026-06-06T16:20:13Z`). Triage any fresh `blocked-uri` per `docs/S2_CSP_RAILWAY_LOG_TRIAGE_PLAN_2026-06-01.md`. Rollback trigger: broken pages or report spike — revert to Report-Only per § Rollback plan above. **Public launch remains NO-GO** until founder limited-launch decision.
+
 ## Public launch stance
 
-- **S2:** ⚠️ **READY FOR FOUNDER DECISION** (72h evidence complete; not S2 PASS until enforce approved + post-enforce smoke)
-- **Public launch:** **NO-GO** — unchanged
-- **Controlled pilot / demo:** Unaffected by this audit (separate gates)
+- **S2:** ✅ **PASS** — enforce live; post-enforce smoke **PASS** (`2026-06-05T16:20:13Z`); **24h monitoring** active
+- **Public launch:** **NO-GO** — founder limited-launch decision pending (L6/O5 waivers pilot-only; GAP-04 optional open)
+- **Controlled pilot / demo:** **GO** (separate gates)
 
 ## Final 72h S2 rollup — 2026-06-05T14:18:33Z
 
@@ -199,12 +228,12 @@ No DB/data side-effects from CSP changes.
 | Code change | Header key `Content-Security-Policy-Report-Only` → `Content-Security-Policy` in `frontend/next.config.ts` (policy string unchanged) |
 | Tests / audit script | Updated for enforce-mode expectations |
 | PR body | `docs/PR_S2_CSP_ENFORCE_BODY_2026-06-05.md` |
-| Merged / deployed | **NO** — founder approval required |
-| Prod CSP mode | **Report-only** until merge + frontend deploy |
-| S2 PASS | **NO** |
-| Public launch | **NO-GO** |
+| Merged / deployed | **YES** — PR #32 @ `6862999`; Vercel deployed |
+| Prod CSP mode | **Enforce** (`Content-Security-Policy` present; Report-Only absent) |
+| S2 PASS | **YES** — post-enforce smoke `2026-06-05T16:20:13Z` |
+| Public launch | **NO-GO** (founder limited-launch decision pending) |
 
-**Next (founder):** Review PR → merge → deploy frontend only → post-enforce smoke § Post-enforce smoke.
+**Completed (founder):** Review PR → merge → deploy frontend → post-enforce smoke § Post-enforce smoke — S2 PASS.
 
 ## Founder checkpoint — multi-browser DevTools + Railway (2026-06-04)
 

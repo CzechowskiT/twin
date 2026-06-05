@@ -25,7 +25,7 @@ the gate to ✅.
 | #  | Gate                                                                   | How to verify                                                                                  | Status today |
 | -- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------ |
 | S1 | CSP report-only is wired, sink is live, burn-in clock started          | `curl -sI https://twin-sooty.vercel.app/ \| grep -i csp`                                       | ✅ shipped   |
-| S2 | CSP enforce-mode has been live for ≥72h with 0 unexpected violations    | Read `docs/P1_CSP_ENFORCEMENT_PLAN_2026-05-27.md` § "Risk gates"; audit `docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md`; `docs/S2_CSP_BURNIN_WINDOW_2026-06-01.md` | ⚠️ **READY FOR FOUNDER DECISION** (2026-06-05) — 72h report-only window **COMPLETE** (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`); Railway clean; DevTools PASS; **NOT S2 PASS**; enforce off; founder sign-off pending |
+| S2 | CSP enforce-mode has been live for ≥72h with 0 unexpected violations    | Read `docs/P1_CSP_ENFORCEMENT_PLAN_2026-05-27.md` § "Risk gates"; audit `docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md`; `docs/S2_CSP_BURNIN_WINDOW_2026-06-01.md` | ✅ **PASS** (2026-06-05) — 72h report-only window **COMPLETE**; enforce PR #32 @ `6862999` merged + deployed; post-enforce smoke **PASS** `2026-06-05T16:20:13Z`; Railway clean post-deploy; **24h monitoring** through `2026-06-06T16:20:13Z` |
 | S3 | Authenticated mutation rate-limit Layer 2 live on LLM endpoints         | `git show 28a50a0 --stat`                                                                       | ✅ shipped   |
 | S4 | Public CV / voice upload endpoints rate-limited                        | `docs/P1_UPLOAD_RATE_LIMITS_2026-05-27.md`; `ff22f3a`                                            | ✅ shipped   |
 | S5 | Stripe `event.id` dedup live (migration + handler patch)                | Handler: `billing.py`; migration: `050` — prod SQL `SELECT version_num FROM alembic_version;` → `050_stripe_webhook_events` (founder/operator read-only, 2026-05-29) | ✅ **PASS** — prod at `050`; ledger `stripe_webhook_events` expected; **no agent migration** |
@@ -87,17 +87,17 @@ the gate to ✅.
 | One ⚠️ partial on L6 (data subject access)                              | Document a manual workflow (`docs/GDPR_MANUAL_DSR.md`) and proceed.                   |
 | Any ❌ on Pilot gates                                                    | Pilot, not public launch — pilot has its own gate set (cf. `PILOT_OFFER_FINAL.md`).   |
 
-## Current gate stance (checkpoint 2026-06-05 final 72h S2 rollup, **O7 PASS**, **O8b launch-day runbook**, **S2 READY FOR FOUNDER DECISION**, **L6 + O5 waivers signed**, **final logo smoke PASS**, **Railway clean full window**)
+## Current gate stance (checkpoint 2026-06-05 post-enforce smoke **S2 PASS**, **O7 PASS**, **O8b launch-day runbook**, **L6 + O5 waivers signed**, **final logo smoke PASS**, **Railway clean post-enforce**)
 
-**Launch-day runbook:** `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` — records **public NO-GO**, **pilot/demo GO**, **auto-apply PAUSED**; CSP enforce **OFF** until founder approves enforce PR (Recommendation **A**) or chooses HOLD (**B**).
+**Launch-day runbook:** `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` — records **public NO-GO**, **pilot/demo GO**, **auto-apply PAUSED**; CSP enforce **ON**; S2 **PASS** `2026-06-05T16:20:13Z`; **24h monitoring** through `2026-06-06T16:20:13Z`.
 
-**Latest audit:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` (final 72h rollup `2026-06-05T15:52:51Z`)
+**Latest audit:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` (post-enforce smoke `2026-06-05T16:20:13Z`)
 **Copy & claims:** `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md` — founding BLOCKER reduced (`1a2eba4`); **MEDIUM** calendar (`billingEngagementPillar2Body`) + compare pages + `/first-1000` headline **fixed** EN/PL; public launch still **NO-GO** (S2 enforce not flipped; ops gates).
 **Recruiter alignment:** `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md` — **C) candidate-first recruiter-supporting**; inbox pilot **LIVE**; auto-apply **PAUSED** reduces spam objection; **no** public GO or two-sided marketplace claim; recruiter SKU marketing vs shipped product gap documented.
 **Post-merge sanity (2026-06-02):** `docs/POST_MERGE_AUTO_APPLY_SANITY_2026-06-02.md` — PR #21 merged; prod API live; public-health OK; auto-apply **PAUSED** policy unchanged.
 **Logo smoke (2026-06-04):** Founder **final smoke PASS** `2026-06-04T10:29:29Z` — Chrome/Safari/Firefox DevTools **PASS**; Console clean; **no CSP violations**.
 
-- **S2 CSP enforce burn-in:** ⚠️ **READY FOR FOUNDER DECISION** — 72h window **COMPLETE** (`2026-06-02T14:18:33Z` → `2026-06-05T14:18:33Z`). Railway `csp_report` **no fresh entries** full window (founder UI final confirmation); Chrome/Safari/Firefox DevTools **PASS**; logo smoke **PASS**; `/api/v1/jobs/saved` **422** non-CSP. **Recommendation A:** approve separate enforce PR. **Recommendation B:** HOLD report-only. **S2 PASS: NO.** **Public launch: NO-GO.**
+- **S2 CSP enforce burn-in:** ✅ **PASS** — 72h report-only window **COMPLETE**; enforce PR #32 @ `6862999` merged + deployed; post-enforce smoke **PASS** `2026-06-05T16:20:13Z`; Railway **brak świeżych wpisów** post-enforce; Chrome Incognito routes OK; **24h monitoring** through `2026-06-06T16:20:13Z`. **Public launch: NO-GO** (founder limited-launch decision pending).
 - **L6 DSR:** ⚠️ **partial-with-waiver** — export **LIVE**; delete manual via `docs/GDPR_MANUAL_DSR.md`; founder waiver **signed** `2026-06-03T13:19:53Z` — acceptable for controlled pilot; self-service delete remains future work.
 - **O5 Calendar:** ⚠️ **partial-with-waiver** — Google **PASS** + Microsoft **LIVE**; Apple/iCal/WebCal/ICS partial; founder waiver **signed** `2026-06-03T13:19:53Z` — non-blocking for controlled pilot if copy does not overpromise Apple.
 
@@ -105,7 +105,7 @@ the gate to ✅.
 - **Post-recovery stabilization (`INC-DB-2026-05-29-001`):** **RESOLVED** — separate from O7; retain incident backups until post-mortem closed.
 - **Controlled pilot GO:** **YES** — prod health green (`public-health` `db_ok=true`, `validated_jobs=652`, `market_coverage_active_validated=2579` per 2026-06-02 audit curl).
 - **Investor/CTO demo GO:** **YES** — curated demo posture unchanged.
-- **Public launch GO:** **NO-GO** — **S2** evidence complete → **READY FOR FOUNDER DECISION** (enforce not flipped); **L6** / **O5** waivers signed for pilot only — do not unlock uncontrolled public launch; **GAP-04** optional open.
+- **Public launch GO:** **NO-GO** — **S2 PASS** recorded; founder **limited-launch decision pending**; **L6** / **O5** waivers signed for pilot only — do not unlock uncontrolled public launch; **GAP-04** optional open.
 - **Auto-apply / delegated apply:** **PAUSED** / **NOT LIVE** — **GAP-03 CLOSED (ops)** — `nightly_auto_apply_beat_enabled=false` on prod health; **GAP-04 optional open** (`AUTO_APPLY_SUBMIT` not set). Evidence: `docs/AUTO_APPLY_PRODUCTION_OPS_PAUSE_PLAN_2026-06-02.md` §8.
 - **S5 prod revision:** ✅ **PASS** — production `version_num = 050_stripe_webhook_events` (read-only SQL, 2026-05-29; evidence in `docs/ALEMBIC_050_FOUNDER_VERIFICATION_2026-05-29.md` § Evidence log). **No migration** needed or run by agent; **no** Railway deploy for this gate.
 - **O5 Google Calendar — FULL prod smoke:** ✅ **PASS** (2026-05-29) — OAuth (Console config); Connect; real events; week day mapping (`Europe/Warsaw`, no +1 shift). Vercel `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH`, fix HEAD `3631c45`; FE-only, no Railway. Evidence: `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md`. O5 row stays ⚠️ **partial** until Apple/iCal beyond docs.
@@ -221,4 +221,32 @@ Warning: this check is non-destructive; do **not** run `alembic upgrade` manuall
 **Recommendation A:** Founder approves separate enforce PR (prepare on branch; deploy only after explicit sign-off).
 **Recommendation B:** HOLD report-only.
 
-**Hard bans honoured:** No deploy · no enforce flip · no prod mutations.
+**Hard bans honoured:** No deploy · enforce deployed by founder · post-enforce smoke recorded · no public launch GO.
+
+## Post-enforce smoke — S2 PASS
+
+**Checkpoint UTC:** `2026-06-05T16:20:13Z`
+**Enforce deploy:** PR #32 @ `6862999` (`chore/s2-csp-enforce-pr-2026-06-05`) — merged + Vercel deployed
+**Burn-in rollup source:** `9074150` (`chore/s2-csp-burnin-readiness-2026-06-01`)
+**Producer:** Founder manual smoke (Chrome Incognito)
+
+| Field | Value |
+| --- | --- |
+| Chrome Incognito routes | `/`, `/login/candidate`, `/register/candidate`, `/dashboard`, `/dashboard/calendar`, `/demo`, `/status`, `/api/public-health` — **OK**, brak CSP violations |
+| Headers | `Content-Security-Policy` **present**; `Content-Security-Policy-Report-Only` **absent** |
+| Homepage/logo smoke | **OK** |
+| Railway `csp_report` post-enforce | **Brak świeżych wpisów** |
+| CSP enforce | **ON** (prod) |
+| S2 PASS | **YES** |
+| Public launch | **NO-GO** (founder limited-launch decision pending) |
+| Pilot / demo | **GO** |
+| Auto-apply | **PAUSED** |
+| Delegated apply | **NOT LIVE** |
+| L6 / O5 | Waivers signed `2026-06-03T13:19:53Z` |
+| Recruiter audit | Verdict **C** (candidate-first, recruiter-supporting) |
+
+**Decision:** S2 post-enforce smoke **PASS**
+
+### 24h post-enforce monitoring (founder cadence)
+
+Monitor Railway `csp_report` for **24h** after enforce deploy (`2026-06-05T16:20:13Z` → `2026-06-06T16:20:13Z`). Triage per `docs/S2_CSP_RAILWAY_LOG_TRIAGE_PLAN_2026-06-01.md`. Rollback per `docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md` § Rollback plan.

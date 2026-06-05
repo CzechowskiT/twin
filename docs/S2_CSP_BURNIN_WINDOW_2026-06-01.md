@@ -6,11 +6,11 @@
 - 72h target end UTC: `2026-06-05T14:18:33Z`
 - Prior window start UTC: `2026-06-02T07:06:17Z` → **RESET** (invalid; see § Burn-in reset)
 - Production URL: `https://twin-sooty.vercel.app`
-- CSP mode: `Content-Security-Policy-Report-Only` (RO) — **enforce absent** on all audited routes
+- CSP mode: `Content-Security-Policy` (enforce) — **ON** on prod since enforce deploy; Report-Only **absent**
 - Narrowed CSP on prod: **LIVE** (explicit allowlists, no broad `https:` wildcards)
 - `connect-src` Railway API host: **DEPLOYED** (`https://twin-production-bcd9.up.railway.app` in `frontend/next.config.ts`)
-- S2 status: **READY FOR FOUNDER DECISION** — 72h window **complete**; evidence pack assembled; enforce flip **not executed**
-- S2 PASS: **NO** (founder enforce sign-off pending)
+- S2 status: **PASS** — 72h report-only window **complete**; enforce PR merged + deployed; post-enforce smoke **PASS**
+- S2 PASS: **YES** (`2026-06-05T16:20:13Z` founder post-enforce smoke)
 - Public launch: **NO-GO**
 - Auto-apply ops pause (2026-06-02): founder `NIGHTLY_AUTO_APPLY_BEAT_ENABLED=false` — **does not reset** this burn-in clock (CSP headers unchanged; `csp_report` clean per founder)
 
@@ -443,10 +443,38 @@ From `GET /api/public-health` (via FE alias), captured at burn-in restart (`2026
 | Prod alias CSP mode | **Report-only** until merge + deploy |
 | Merge / deploy | **PENDING founder** |
 
-**Hard bans honoured:** No prod deploy · no merge · no S2 PASS claim.
+**Hard bans honoured (pre-deploy):** No prod deploy · no merge · no S2 PASS claim until post-enforce smoke.
+
+## Post-enforce smoke — S2 PASS
+
+**Checkpoint UTC:** `2026-06-05T16:20:13Z`
+**Enforce deploy:** PR #32 @ `6862999` (`chore/s2-csp-enforce-pr-2026-06-05`) — merged + Vercel deployed
+**Burn-in rollup source:** `9074150` (`chore/s2-csp-burnin-readiness-2026-06-01`)
+**Producer:** Founder manual smoke (Chrome Incognito)
+
+| Field | Value |
+| --- | --- |
+| Chrome Incognito routes | `/`, `/login/candidate`, `/register/candidate`, `/dashboard`, `/dashboard/calendar`, `/demo`, `/status`, `/api/public-health` — **OK**, brak CSP violations |
+| Headers | `Content-Security-Policy` **present**; `Content-Security-Policy-Report-Only` **absent** |
+| Homepage/logo smoke | **OK** |
+| Railway `csp_report` post-enforce | **Brak świeżych wpisów** |
+| CSP enforce | **ON** (prod) |
+| S2 PASS | **YES** |
+| Public launch | **NO-GO** (founder limited-launch decision pending) |
+| Pilot / demo | **GO** |
+| Auto-apply | **PAUSED** |
+| Delegated apply | **NOT LIVE** |
+| L6 / O5 | Waivers signed `2026-06-03T13:19:53Z` |
+| Recruiter audit | Verdict **C** (candidate-first, recruiter-supporting) |
+
+**Decision:** S2 post-enforce smoke **PASS**
+
+### 24h post-enforce monitoring (founder cadence)
+
+Monitor Railway `csp_report` for **24h** after enforce deploy (`2026-06-05T16:20:13Z` → `2026-06-06T16:20:13Z`). Triage any fresh `blocked-uri` per `docs/S2_CSP_RAILWAY_LOG_TRIAGE_PLAN_2026-06-01.md`. Rollback trigger: broken pages or report spike — revert to Report-Only per `docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md` § Rollback plan. **Public launch remains NO-GO** until founder limited-launch decision.
 
 ## Guardrails
 
-- Do **not** enable enforce mode in this window.
-- Do **not** claim S2 PASS during this window.
-- Public launch remains **NO-GO** until founder decision after full 72h evidence review.
+- Enforce mode **live** on prod since `6862999` deploy — post-enforce smoke **PASS** (`2026-06-05T16:20:13Z`).
+- S2 PASS recorded — **24h monitoring** cadence active through `2026-06-06T16:20:13Z`.
+- Public launch remains **NO-GO** (founder limited-launch decision pending).

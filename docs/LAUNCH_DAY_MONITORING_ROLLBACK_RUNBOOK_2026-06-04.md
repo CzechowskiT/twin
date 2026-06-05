@@ -6,7 +6,9 @@
 **Doc UTC:** `2026-06-04`  
 **Production (unchanged by this doc):** FE `https://twin-sooty.vercel.app` · API `https://twin-production-bcd9.up.railway.app` · Railway project **twin-production**
 
-**Verdict at authoring:** **Public launch NO-GO** · **Controlled pilot / investor demo GO** · **S2 NOT READY** (72h burn-in until `2026-06-05T14:18:33Z`) · **Auto-apply PAUSED** · **Delegated apply NOT LIVE**
+**Verdict at authoring:** **Public launch NO-GO** · **Controlled pilot / investor demo GO** · **S2 PASS** (post-enforce smoke `2026-06-05T16:20:13Z`) · **Auto-apply PAUSED** · **Delegated apply NOT LIVE**
+
+**Post-enforce update UTC:** `2026-06-05T16:20:13Z` — enforce PR #32 @ `6862999` merged + deployed; **24h monitoring** through `2026-06-06T16:20:13Z`
 
 **This document describes what to watch and how to decide — it does not execute deploys, env changes, CSP enforce, migrations, or apply/scrape operations.**
 
@@ -18,7 +20,7 @@
 | --------- | -------------- | ------------------------ |
 | **Audience** | ≤20 named pilot users (`docs/PILOT_TRACKER.csv`); curated investor/CTO demo | Public announcement (LinkedIn, X, PressOn); uncontrolled signup spike |
 | **Stack** | Same prod FE + API URLs above | Staging-only shortcuts; “demo” DB |
-| **CSP** | Report-only on prod until enforce PR merged + deployed; enforce PR **prepared** (`chore/s2-csp-enforce-pr-2026-06-05`) | Flip live without founder merge/deploy approval |
+| **CSP** | Enforce **ON** on prod since PR #32 @ `6862999`; post-enforce smoke **PASS** `2026-06-05T16:20:13Z`; **24h monitoring** active | Rollback to Report-Only per `docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md` § Rollback plan |
 | **Auto-apply** | Server gates live; nightly beat **disabled**; no mass autonomous apply | Nightly sweep on; `AUTO_APPLY_SUBMIT` enable without founder approval; ops trigger-sweep without allowlist |
 | **Delegated / KYC apply** | Documented **NOT LIVE** | Any copy or config implying live delegated submit |
 | **Legal** | L6 export self-service; erasure manual (`docs/GDPR_MANUAL_DSR.md`); L6 + O5 waivers signed `2026-06-03T13:19:53Z` | Self-service delete; full Apple Calendar OAuth claims |
@@ -58,8 +60,8 @@ All times relative to **first pilot user session** or **investor demo start** (w
 | 1 | Public health | `curl -fsS https://twin-sooty.vercel.app/api/public-health \| jq '{status,db_ok,nightly_auto_apply_beat_enabled,git_commit}'` | `status=ok`, `db_ok=true`, `nightly_auto_apply_beat_enabled=false` |
 | 2 | API health | `curl -fsS 'https://twin-production-bcd9.up.railway.app/api/v1/health?ops=1' \| jq .status` | `ok` |
 | 3 | FE reachability | `curl -sI https://twin-sooty.vercel.app/ \| head -1` | HTTP `200` |
-| 4 | CSP mode | `curl -sI https://twin-sooty.vercel.app/ \| grep -i content-security-policy` | **Report-Only** present; **no** enforce header |
-| 5 | S2 window | `docs/S2_CSP_BURNIN_WINDOW_2026-06-01.md` | If before `2026-06-05T14:18:33Z`: enforce **HOLD** |
+| 4 | CSP mode | `curl -sI https://twin-sooty.vercel.app/ \| grep -i content-security-policy` | **Enforce** present (`Content-Security-Policy`); **no** Report-Only header |
+| 5 | S2 window | `docs/S2_CSP_BURNIN_WINDOW_2026-06-01.md` | **S2 PASS** — post-enforce smoke `2026-06-05T16:20:13Z`; **24h monitoring** through `2026-06-06T16:20:13Z` |
 | 6 | Gate matrix | `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` § L | Public **NO-GO** acknowledged; pilot **GO** only if intentional |
 | 7 | Copy audit | `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md` | No BLOCKER claims on routes you will show |
 | 8 | Incident runbook | `docs/INCIDENT_RESPONSE_RUNBOOK_2026-05-27.md` | Open and reachable |
@@ -247,7 +249,7 @@ cd frontend && npm run test:security-headers
 
 ### Internal (founder scratch)
 
-- **All-clear (pilot):** *"Pilot stack green at &lt;UTC&gt;. Health ok, auto-apply paused, CSP report-only. Session GO for named pilots only."*
+- **All-clear (pilot):** *"Pilot stack green at &lt;UTC&gt;. Health ok, auto-apply paused, CSP enforce ON (S2 PASS). Session GO for named pilots only."*
 - **Hold:** *"Holding pilot onboarding from &lt;UTC&gt; due to &lt;symptom&gt;. ETA update &lt;UTC+30m&gt;."*
 
 ### Pilot user DM (S1)
@@ -266,7 +268,7 @@ cd frontend && npm run test:security-headers
 
 - LinkedIn / X / press “we're live for everyone”
 - Copy implying delegated apply, live KYC, or full Apple Calendar OAuth
-- “CSP fully hardened” before S2 PASS
+- “CSP fully hardened” before S2 PASS — **S2 PASS recorded** `2026-06-05T16:20:13Z`; public launch still **NO-GO**
 
 ---
 
@@ -282,8 +284,8 @@ Copy into `docs/LAUNCH_DAY_EVIDENCE_<YYYY-MM-DD>.md` or a spreadsheet.
 | | T-15 | founder pilot GO | | | Explicit **not** public GO |
 | | +15m | health stable | | | |
 | | +1h | auth/dashboard | | | |
-| | +24h | S2 burn-in status | | | CONTINUE / triage / window end |
-| | +24h | public launch verdict | | | Expected: **NO-GO** until S2 |
+| | +24h | S2 post-enforce monitoring | | | Railway `csp_report` triage through `2026-06-06T16:20:13Z` |
+| | +24h | public launch verdict | | | Expected: **NO-GO** until founder limited-launch decision |
 | | | incident ID | | | Link post-mortem if any |
 
 ---
@@ -294,8 +296,8 @@ Run at end of launch day or before any **public** announcement.
 
 | # | Question | Required for **public** GO | Today (2026-06-04) |
 | - | -------- | -------------------------- | ------------------- |
-| 1 | S2 — 72h burn-in complete + founder sign-off? | ✅ | ❌ IN PROGRESS (~61% at `10:34:36Z`) |
-| 2 | CSP enforce intentionally live ≥72h with 0 unexpected violations? | ✅ | ❌ enforce OFF |
+| 1 | S2 — 72h burn-in complete + post-enforce smoke PASS? | ✅ | ✅ **PASS** (`2026-06-05T16:20:13Z`) |
+| 2 | CSP enforce intentionally live with 0 unexpected violations? | ✅ | ✅ enforce **ON**; Railway clean post-deploy; **24h monitoring** active |
 | 3 | `public-health` ok + `db_ok`? | ✅ | ✅ |
 | 4 | Auto-apply paused; delegated NOT LIVE? | ✅ | ✅ PAUSED |
 | 5 | L6 self-service delete or accepted waiver for **public**? | ✅ full or explicit public waiver | ⚠️ pilot waiver only |
@@ -313,14 +315,42 @@ Run at end of launch day or before any **public** announcement.
 | **Investor / CTO demo** | **GO** (curated) |
 | **Auto-apply / delegated** | **PAUSED / NOT LIVE** |
 
-**Next mandatory milestone:** S2 rollup at `2026-06-05T14:18:33Z` → founder **HOLD RO** vs enforce decision per `docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md`.
+**Next mandatory milestone:** **24h post-enforce monitoring** through `2026-06-06T16:20:13Z` → founder limited-launch decision (public **NO-GO** until explicit GO).
+
+## Post-enforce smoke — S2 PASS
+
+**Checkpoint UTC:** `2026-06-05T16:20:13Z`
+**Enforce deploy:** PR #32 @ `6862999` (`chore/s2-csp-enforce-pr-2026-06-05`) — merged + Vercel deployed
+**Burn-in rollup source:** `9074150` (`chore/s2-csp-burnin-readiness-2026-06-01`)
+**Producer:** Founder manual smoke (Chrome Incognito)
+
+| Field | Value |
+| --- | --- |
+| Chrome Incognito routes | `/`, `/login/candidate`, `/register/candidate`, `/dashboard`, `/dashboard/calendar`, `/demo`, `/status`, `/api/public-health` — **OK**, brak CSP violations |
+| Headers | `Content-Security-Policy` **present**; `Content-Security-Policy-Report-Only` **absent** |
+| Homepage/logo smoke | **OK** |
+| Railway `csp_report` post-enforce | **Brak świeżych wpisów** |
+| CSP enforce | **ON** (prod) |
+| S2 PASS | **YES** |
+| Public launch | **NO-GO** (founder limited-launch decision pending) |
+| Pilot / demo | **GO** |
+| Auto-apply | **PAUSED** |
+| Delegated apply | **NOT LIVE** |
+| L6 / O5 | Waivers signed `2026-06-03T13:19:53Z` |
+| Recruiter audit | Verdict **C** (candidate-first, recruiter-supporting) |
+
+**Decision:** S2 post-enforce smoke **PASS**
+
+### 24h post-enforce monitoring (founder cadence)
+
+Monitor Railway `csp_report` for **24h** after enforce deploy (`2026-06-05T16:20:13Z` → `2026-06-06T16:20:13Z`). Triage per `docs/S2_CSP_RAILWAY_LOG_TRIAGE_PLAN_2026-06-01.md`. Rollback: revert to Report-Only per `docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md` § Rollback plan.
 
 ---
 
 ## M — Hard bans honoured (agent / automation)
 
 - ✅ Docs only — no code, env, deploy, DB, migrations, Railway restart
-- ✅ No CSP enforce flip · no S2 PASS · no public launch GO
+- ✅ No CSP enforce flip · **S2 PASS recorded** · no public launch GO
 - ✅ No scrape · no apply · no trigger-sweep · no secrets in docs
 - ✅ No delegated live · no KYC/legal “go live” beyond existing waivers
 - ✅ No `.vercel/` or `.env` in commits
