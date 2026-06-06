@@ -24,6 +24,7 @@
 **Column hints:**
 
 - **First queue load** — UTC timestamp when recruiter successfully loaded `/recruiter/inbox` (empty queue counts as PASS).
+- **Calendar nav** — Recruiter header **Kalendarz** opens `/recruiter/calendar` (roadmap placeholder). Candidate `/dashboard/calendar` hidden from recruiter nav; direct hits redirect — no login loop (fix `2026-06-06`).
 - **First decision** — UTC timestamp of first accept or decline.
 - **Notes** — match score disputes, product gaps, objection themes (no PII in notes).
 

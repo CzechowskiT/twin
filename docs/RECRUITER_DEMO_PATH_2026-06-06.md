@@ -36,6 +36,9 @@ Show **calendar-of-acceptance** from the recruiter side: pre-qualified rows with
 5. **Optional: post job** — `/recruiter/jobs`  
    Same token + company slug; POST creates employer listing for future matches.
 
+5b. **Calendar tab (honest)** — `/recruiter/calendar`  
+   Header **Kalendarz** lands here — **roadmap placeholder**, not live sync. Do **not** demo candidate `/dashboard/calendar` for recruiters. Links to inbox, jobs, `/for-recruiters`.
+
 6. **Close with north star**  
    “TWIN ranks before they hit your inbox; you accept who gets a calendar slot.”
 

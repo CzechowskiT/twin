@@ -44,7 +44,8 @@ const PATH_IMPLIES_PERSONA: { prefix: string; persona: MarketingPersona }[] = [
 
 /** Only these personas may access the path prefix (longest match wins). */
 const PREFIX_ALLOWED: { prefix: string; allowed: readonly MarketingPersona[] }[] = [
-  { prefix: "/dashboard/calendar", allowed: ["candidate", "recruiter", "investor", "company"] },
+  { prefix: "/dashboard/calendar", allowed: ["candidate"] },
+  { prefix: "/recruiter/calendar", allowed: ["recruiter"] },
   { prefix: "/dashboard", allowed: ["candidate"] },
   { prefix: "/profile", allowed: ["candidate"] },
   { prefix: "/onboarding", allowed: ["candidate"] },
@@ -190,8 +191,17 @@ export function sessionPersonaHomeRedirect(
 ): string | null {
   const path = normalizePath(pathname);
   if (isSessionNeutralPath(path)) return null;
+  if (persona === "recruiter" && path.startsWith("/dashboard/calendar")) {
+    return "/recruiter/calendar";
+  }
   if (isPathAllowedForPersona(pathname, persona)) return null;
   return WORKSPACE_PATH[persona];
+}
+
+/** Header + momentum calendar tab — candidate live calendar vs recruiter roadmap placeholder. */
+export function calendarNavHref(persona: MarketingPersona): string {
+  if (persona === "recruiter") return "/recruiter/calendar";
+  return "/dashboard/calendar";
 }
 
 export function pricingPathForPersona(persona: MarketingPersona): string {
@@ -343,16 +353,16 @@ export function momentumRailCtas(
         : { href: "/login", labelKey: "site.momentumCtaLogin" },
     ];
   }
-  if (pathname.startsWith("/dashboard/calendar")) {
-    if (persona === "candidate") {
-      return [
-        { href: "/dashboard", labelKey: "site.momentumCtaWorkspace" },
-        { href: "/profile", labelKey: "site.momentumCtaProfile" },
-      ];
-    }
+  if (pathname.startsWith("/recruiter/calendar")) {
     return [
-      { href: sessionPanelHref(persona), labelKey: "site.momentumCtaWorkspace" },
-      momentumSecondaryCta(persona, hasSession),
+      { href: "/recruiter/inbox", labelKey: "recruiterInbox.title" },
+      { href: "/recruiter/jobs", labelKey: "recruiterJobs.title" },
+    ];
+  }
+  if (pathname.startsWith("/dashboard/calendar")) {
+    return [
+      { href: "/dashboard", labelKey: "site.momentumCtaWorkspace" },
+      { href: "/profile", labelKey: "site.momentumCtaProfile" },
     ];
   }
   if (pathname.startsWith("/dashboard")) {
@@ -388,14 +398,14 @@ export function momentumRailCtas(
   return defaultMomentumCtas(persona, hasSession);
 }
 
-/** Kalendarz | Panel | Demo — same strip for every signed-in persona. */
+/** Kalendarz | Panel | Demo — calendar href is persona-aware (recruiter → roadmap placeholder). */
 export function headerSessionNavLinks(
   persona: MarketingPersona,
   hasSession: boolean,
 ): HeaderSessionNavLink[] {
   if (!hasSession) return [];
   return [
-    { href: "/dashboard/calendar", labelKey: "dashboard.calendarLink" },
+    { href: calendarNavHref(persona), labelKey: "dashboard.calendarLink" },
     { href: sessionPanelHref(persona), labelKey: "nav.dashboard" },
     { href: "/demo", labelKey: "nav.demo" },
   ];
@@ -423,6 +433,9 @@ export function isSessionNavLinkActive(
   }
   if (base === "/dashboard/calendar") {
     return pathname === "/dashboard/calendar" || pathname.startsWith("/dashboard/calendar/");
+  }
+  if (base === "/recruiter/calendar") {
+    return pathname === "/recruiter/calendar" || pathname.startsWith("/recruiter/calendar/");
   }
   const panelPrefixes = SESSION_PANEL_PREFIXES[base];
   if (panelPrefixes) {

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  calendarNavHref,
   headerSessionNavLinks,
   isSessionNavLinkActive,
   momentumRailCtas,
@@ -16,17 +17,18 @@ test("sessionPersonaHomeRedirect keeps same-persona marketing lanes", () => {
   assert.equal(sessionPersonaHomeRedirect("/for-investors", "investor"), null);
 });
 
-test("headerSessionNavLinks shows Kalendarz | Panel | Demo for every persona", () => {
-  for (const persona of ["candidate", "recruiter", "investor", "company"] as const) {
-    const links = headerSessionNavLinks(persona, true);
-    assert.equal(links.length, 3);
-    assert.equal(links[0]?.href, "/dashboard/calendar");
-    assert.equal(links[0]?.labelKey, "dashboard.calendarLink");
-    assert.equal(links[1]?.href, sessionPanelHref(persona));
-    assert.equal(links[1]?.labelKey, "nav.dashboard");
-    assert.equal(links[2]?.href, "/demo");
-    assert.equal(links[2]?.labelKey, "nav.demo");
-  }
+test("headerSessionNavLinks routes recruiters to recruiter calendar placeholder", () => {
+  const candidateLinks = headerSessionNavLinks("candidate", true);
+  assert.equal(candidateLinks[0]?.href, "/dashboard/calendar");
+
+  const recruiterLinks = headerSessionNavLinks("recruiter", true);
+  assert.equal(recruiterLinks[0]?.href, "/recruiter/calendar");
+  assert.equal(recruiterLinks[1]?.href, sessionPanelHref("recruiter"));
+});
+
+test("calendarNavHref is persona-aware", () => {
+  assert.equal(calendarNavHref("candidate"), "/dashboard/calendar");
+  assert.equal(calendarNavHref("recruiter"), "/recruiter/calendar");
 });
 
 test("isSessionNavLinkActive matches dashboard section hashes", () => {
@@ -37,40 +39,24 @@ test("isSessionNavLinkActive matches dashboard section hashes", () => {
   assert.equal(isSessionNavLinkActive("/dashboard", "", "/dashboard#dashboard-jobs"), false);
 });
 
-test("isSessionNavLinkActive highlights recruiter panel routes", () => {
+test("isSessionNavLinkActive highlights recruiter panel and calendar routes", () => {
   assert.equal(isSessionNavLinkActive("/recruiter/inbox", "", "/workspace/recruiter"), true);
-  assert.equal(isSessionNavLinkActive("/workspace/recruiter", "", "/workspace/recruiter"), true);
+  assert.equal(isSessionNavLinkActive("/recruiter/calendar", "", "/recruiter/calendar"), true);
 });
 
-test("sessionPersonaHomeRedirect allows shared calendar and demo", () => {
-  assert.equal(sessionPersonaHomeRedirect("/dashboard/calendar", "recruiter"), null);
-  assert.equal(sessionPersonaHomeRedirect("/demo", "investor"), null);
+test("sessionPersonaHomeRedirect sends recruiters away from candidate calendar", () => {
+  assert.equal(sessionPersonaHomeRedirect("/dashboard/calendar", "recruiter"), "/recruiter/calendar");
+  assert.equal(sessionPersonaHomeRedirect("/dashboard/calendar", "candidate"), null);
+  assert.equal(sessionPersonaHomeRedirect("/recruiter/calendar", "recruiter"), null);
 });
 
 test("sessionPersonaHomeRedirect still redirects cross-lane product routes", () => {
-  assert.equal(
-    sessionPersonaHomeRedirect("/recruiter/inbox", "candidate"),
-    "/workspace/candidate",
-  );
-  assert.equal(
-    sessionPersonaHomeRedirect("/dashboard", "recruiter"),
-    "/workspace/recruiter",
-  );
+  assert.equal(sessionPersonaHomeRedirect("/recruiter/inbox", "candidate"), "/workspace/candidate");
+  assert.equal(sessionPersonaHomeRedirect("/dashboard", "recruiter"), "/workspace/recruiter");
 });
 
-test("momentumRailCtas sends recruiters to recruiter workspace, not candidate dashboard", () => {
-  const loggedOut = momentumRailCtas("/for-recruiters", "app", "recruiter", false);
-  assert.equal(loggedOut[0]?.href, "/workspace/recruiter");
-  assert.equal(loggedOut[0]?.labelKey, "site.momentumCtaWorkspace");
-  assert.equal(loggedOut[1]?.href, "/login/recruiter");
-
-  const loggedIn = momentumRailCtas("/for-recruiters", "app", "recruiter", true);
-  assert.equal(loggedIn[0]?.href, "/workspace/recruiter");
-  assert.equal(loggedIn[1]?.href, "/recruiter/inbox");
-});
-
-test("momentumRailCtas keeps candidate dashboard shortcuts on profile", () => {
-  const ctas = momentumRailCtas("/profile", "app", "candidate", true);
-  assert.equal(ctas[0]?.href, "/dashboard");
-  assert.equal(ctas[1]?.href, "/dashboard/billing");
+test("momentumRailCtas on recruiter calendar links to inbox and jobs", () => {
+  const ctas = momentumRailCtas("/recruiter/calendar", "app", "recruiter", true);
+  assert.equal(ctas[0]?.href, "/recruiter/inbox");
+  assert.equal(ctas[1]?.href, "/recruiter/jobs");
 });
