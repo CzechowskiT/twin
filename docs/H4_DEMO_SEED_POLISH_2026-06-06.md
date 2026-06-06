@@ -186,4 +186,8 @@ python3 scripts/ensure-recruiter-inbox-demo.py
 
 ## 9 — Next (H5)
 
-**H4 complete.** Founder GO for **3–5 named recruiters** — use `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` and `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md`. Launch stance unchanged: public **NO-GO** · auto-apply **PAUSED** · delegated **NOT LIVE**.
+**H4 complete.** **H5 Founder Demo Dry Run Pack** shipped (`docs/H5_FOUNDER_DEMO_DRY_RUN_PACK_2026-06-06.md` + `docs/H5_FOUNDER_DEMO_DRY_RUN_CHECKLIST_2026-06-06.md`) — founder runs private dry run **before** any external invite.
+
+**Gate order:** dry run PASS (rubric ≥4.0) → founder H5 decision (GO / GO SMALL / ITERATE / HOLD) → **then** `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` + `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md`.
+
+Launch stance unchanged: public **NO-GO** · auto-apply **PAUSED** · delegated **NOT LIVE** · external invites deferred until explicit **H5 GO**.

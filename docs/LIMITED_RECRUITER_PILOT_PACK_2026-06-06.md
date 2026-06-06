@@ -18,7 +18,7 @@ TWIN invites **3–5 named recruiters** into a **limited, founder-led pilot** to
 
 Production recruiter inbox smoke **R1–R5 PASS** (R1–R4 `2026-06-06T16:07:18Z`; **R5 Match Receipt** `2026-06-06T16:38:40Z`). This is **not** public launch, **not** a two-sided marketplace claim, and **not** permission to enable auto-apply or delegated submit.
 
-**Founder decision required:** **H1–H4 complete 2026-06-06** (`docs/PII_CONSENT_RECEIPT_AUDIT_2026-06-06.md`, `docs/H4_DEMO_SEED_POLISH_2026-06-06.md`); H4 final visual smoke **CLEAN PASS** `2026-06-06T17:36:25Z`. **H5 founder GO** for 3–5 named recruiters — then use `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` and track outcomes in `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md`. External invitations deferred until H5 GO.
+**Founder decision required:** **H1–H4 complete 2026-06-06** (`docs/PII_CONSENT_RECEIPT_AUDIT_2026-06-06.md`, `docs/H4_DEMO_SEED_POLISH_2026-06-06.md`); H4 final visual smoke **CLEAN PASS** `2026-06-06T17:36:25Z`. **H5 dry run pack shipped** (`docs/H5_FOUNDER_DEMO_DRY_RUN_PACK_2026-06-06.md`) — founder completes private dry run **before** any external invite. **H5 founder GO** for 3–5 named recruiters only after dry run PASS (rubric ≥4.0) — then use `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` and track outcomes in `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md`. External invitations deferred until H5 GO.
 
 ---
 
@@ -246,6 +246,8 @@ Capture verbatim objections into tracker for synthesis — especially PII, ATS, 
 | `docs/CONTROLLED_PILOT_OPERATING_MANUAL_2026-05-27.md` | Daily ops + kill-switches |
 | `docs/CONTROLLED_PILOT_INVITE_BRIEF_2026-05-28.md` | General pilot invite guardrails |
 | `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` | Demo-day monitoring |
+| `docs/H5_FOUNDER_DEMO_DRY_RUN_PACK_2026-06-06.md` | Pre-invite founder dry run (20–30 min) |
+| `docs/H5_FOUNDER_DEMO_DRY_RUN_CHECKLIST_2026-06-06.md` | Dry run tick-box + decision log |
 | `docs/PLACEMENT_VERIFICATION.md` | Fee / verification design |
 
 ---
@@ -255,7 +257,7 @@ Capture verbatim objections into tracker for synthesis — especially PII, ATS, 
 | Field | Value |
 | ----- | ----- |
 | **Public launch** | **NO-GO** |
-| **Controlled recruiter pilot** | **READY FOR FOUNDER DECISION** — H4 **CLEAN PASS**; founder **defers external invitations** until **H5 GO** |
+| **Controlled recruiter pilot** | **READY FOR FOUNDER DRY RUN** — H4 **CLEAN PASS**; H5 pack **shipped**; founder **defers external invitations** until **H5 GO** after dry run PASS |
 | **S2 CSP** | **PASS** (post-enforce `2026-06-05T16:20:13Z`; enforce ON; 24h monitor complete `2026-06-06T16:20:13Z`) |
 | **Recruiter inbox R1–R4** | **PASS** `2026-06-06T16:07:18Z` |
 | **Recruiter Match Receipt (R5)** | **PASS** `2026-06-06T16:38:40Z` — Nova Hiring PL; all review-card sections visible |
@@ -271,9 +273,10 @@ Capture verbatim objections into tracker for synthesis — especially PII, ATS, 
 2. ~~Candidate-side consent receipt~~ ✅ **2026-06-06** (dashboard applications panel)
 3. ~~Recruiter-side data visibility explanation~~ ✅ **2026-06-06** (inbox note + API metadata)
 4. ~~Demo seed polish~~ ✅ **2026-06-06** — H4 final visual smoke **CLEAN PASS** `2026-06-06T17:36:25Z`
-5. **H5 — Founder GO** for 3–5 named recruiters — **next**
+5. ~~H5 dry run pack~~ ✅ **2026-06-06** — `docs/H5_FOUNDER_DEMO_DRY_RUN_PACK_2026-06-06.md` + checklist
+6. **H5 — Founder dry run PASS** → **H5 GO** for 3–5 named recruiters — **next**
 
-**Next founder action:** Sign H5 pilot GO → fill tracker row 1 → send first invite → schedule onboarding call.
+**Next founder action:** Run dry run per H5 pack → score rubric → sign H5 decision → fill tracker row 1 → send first invite → schedule onboarding call.
 
 ---
 
