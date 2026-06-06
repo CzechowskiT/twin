@@ -14,6 +14,36 @@ from app.services.matching_service import candidate_to_dict, job_to_dict
 PII_CONTEXT_APPLICATION_REVIEW = "application_review"
 PII_CONTEXT_TALENT_POOL = "talent_pool_anonymized"
 
+# Inbox rows must never expose these keys (regression guard for tests).
+INBOX_FORBIDDEN_PII_KEYS = frozenset({"email", "phone", "cv_text", "cv_raw", "phone_number"})
+
+
+def _build_data_visibility_metadata(*, locale: str = "en") -> dict[str, Any]:
+    """Deterministic PII scope for recruiter inbox rows — no DB reads."""
+    pl = locale.lower().startswith("pl")
+    return {
+        "data_visibility_context": PII_CONTEXT_APPLICATION_REVIEW,
+        "data_visibility_summary": (
+            "Przegląd aplikacji — widać imię i dopasowanie profilu; bez e-maila, telefonu i pełnego CV."
+            if pl
+            else "Application review — name and profile match visible; no email, phone, or full CV text."
+        ),
+        "candidate_data_visible": [
+            "name",
+            "profile_skills",
+            "profile_location",
+            "profile_experience",
+            "match_score",
+            "match_reasons",
+        ],
+        "candidate_data_hidden": [
+            "email",
+            "phone",
+            "cv_raw_text",
+        ],
+        "consent_receipt_available": True,
+    }
+
 
 def _norm_list(raw: Any) -> list[str]:
     if isinstance(raw, list):
@@ -339,7 +369,7 @@ def build_recruiter_match_summary(
         calculate_match_score(cand, jdict)
     )
 
-    return {
+    out: dict[str, Any] = {
         "match_score": round(score, 2),
         "match_score_label": match_quality_label(score),
         "match_reasons": _build_recruiter_match_reasons(cand, jdict, score=score, locale=locale),
@@ -347,3 +377,5 @@ def build_recruiter_match_summary(
         "pii_context": PII_CONTEXT_APPLICATION_REVIEW,
         "review_card": _build_recruiter_review_card(cand, jdict, score=score, locale=locale),
     }
+    out.update(_build_data_visibility_metadata(locale=locale))
+    return out

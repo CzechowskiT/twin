@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 
 from app.database.models import Application, ApplicationStatus, Candidate, Job, JobMatch, User
 from app.services.recruiter_match_explanations import (
+    INBOX_FORBIDDEN_PII_KEYS,
     PII_CONTEXT_APPLICATION_REVIEW,
     build_recruiter_match_summary,
 )
@@ -53,6 +54,10 @@ def test_build_recruiter_match_summary_includes_score_and_reasons() -> None:
         assert isinstance(card["what_to_verify"], list)
         assert isinstance(card["red_flags"], list)
         assert isinstance(card["disclaimer"], str) and card["disclaimer"]
+        assert summary["data_visibility_context"] == PII_CONTEXT_APPLICATION_REVIEW
+        assert summary["consent_receipt_available"] is True
+        assert "email" in summary["candidate_data_hidden"]
+        assert "name" in summary["candidate_data_visible"]
     finally:
         db.close()
 
@@ -139,6 +144,12 @@ def test_build_recruiter_batch_includes_match_fields() -> None:
         assert "review_card" in row
         assert row["review_card"]["human_decision_required"] is True
         assert row["review_card"]["data_confidence"] in {"high", "medium", "low", "unknown"}
+        assert row["data_visibility_context"] == PII_CONTEXT_APPLICATION_REVIEW
+        assert row["consent_receipt_available"] is True
+        serialized = str(row).lower()
+        for forbidden in INBOX_FORBIDDEN_PII_KEYS:
+            assert forbidden not in row, f"inbox row must not expose {forbidden}"
+        assert "@" not in serialized or "example.com" not in serialized
     finally:
         db.close()
 

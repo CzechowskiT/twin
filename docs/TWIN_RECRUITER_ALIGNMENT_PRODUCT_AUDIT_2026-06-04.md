@@ -504,9 +504,9 @@ Reference: `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md`
 ## 19 — Build next list (recruiter alignment priority)
 
 1. **Inbox match receipt** — score + reasons + **review_card** on each row (backend + UI). **Shipped + prod smoke PASS 2026-06-06** (`2026-06-06T16:38:40Z`)
-2. **PII / consent receipt alignment** — recruiter-visible consent scope matches inbox data (before named outbound).
-3. **Candidate-side consent receipt** — candidate sees what was shared with employer.
-4. **Recruiter-side data visibility explanation** — in-product copy for application-review PII context.
+2. **PII / consent receipt alignment** — recruiter-visible consent scope matches inbox data (before named outbound). **Shipped 2026-06-06** — `docs/PII_CONSENT_RECEIPT_AUDIT_2026-06-06.md`
+3. **Candidate-side consent receipt** — candidate sees what was shared with employer. **Shipped 2026-06-06** — dashboard applications panel
+4. **Recruiter-side data visibility explanation** — in-product copy for application-review PII context. **Shipped 2026-06-06** — inbox note + API metadata
 5. **Recruiter demo seed polish** — stable Nova Hiring PL queue (`investor_demo_seed.py` path exists).
 6. **Founder decision on 3–5 named recruiters** — after 1–5.
 7. **Talent pool recruiter browse** — minimal list API (anonymized).
@@ -529,7 +529,7 @@ Reference: `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md`
 
 **Strategic moat vs LinkedIn:** not breadth of network — **consent-first ranked pipeline toward acceptance-ready calendar items** with **machine-assisted placement verification** instead of CS tennis. That story is **credible in docs and partial code**; it becomes **investable** when recruiter inbox + match receipts + one verified placement fee close in pilot.
 
-**Immediate founder action:** Match Receipt **PASS** on prod (`2026-06-06T16:38:40Z`). Complete pre-pilot hardening (PII/consent receipts, data-visibility copy, demo seed) before **3–5 named recruiters** on token inbox; instrument accept/decline rates in tracker; defer public launch and recruiter SKU marketing scale.
+**Immediate founder action:** Match Receipt **PASS** on prod (`2026-06-06T16:38:40Z`). H1–H3 PII/consent hardening **shipped 2026-06-06**. Complete **demo seed polish (H4)** before **3–5 named recruiters** on token inbox; instrument accept/decline rates in tracker; defer public launch and recruiter SKU marketing scale.
 
 ---
 

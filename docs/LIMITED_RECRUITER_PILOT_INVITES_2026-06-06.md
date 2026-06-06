@@ -37,7 +37,7 @@ Czego nie obiecujemy:
 • Auto-apply ani delegated submit na produkcji (wstrzymane / wyłączone)
 • Watchlist, paczek HM, SSO — to roadmapa, nie produkt dziś
 
-Ważne (PII): w skrzynce widać imię kandydata w kontekście przeglądu aplikacji — to świadoma polityka pilotażu.
+Ważne (PII): w skrzynce widać imię kandydata w kontekście przeglądu aplikacji — to świadoma polityka pilotażu. E-mail, telefon i pełne CV nie są w skrzynce. Szczegóły: `docs/PII_DATA_VISIBILITY_POLICY_2026-06-06.md`.
 
 Następny krok: 15-min rozmowa + kod dostępu mailem osobno dla {company}.
 Termin: {founder_calendar_link}
@@ -76,7 +76,7 @@ What we do not promise:
 • Auto-apply or delegated submit on production (paused / not live)
 • Watchlists, HM packets, SSO — roadmap, not shipped product
 
-PII note: inbox rows show candidate names for application review — explicit pilot policy.
+PII note: inbox rows show candidate names for application review — explicit pilot policy. Email, phone, and full CV text are not shown in the inbox. See `docs/PII_DATA_VISIBILITY_POLICY_2026-06-06.md`.
 
 Next step: 15-min call + access code sent separately for {company}.
 Book here: {founder_calendar_link}

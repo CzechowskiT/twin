@@ -543,6 +543,21 @@ const en = {
     appsSearchLabel: "Search",
     appsSearchPlaceholder: "Title, company, notes…",
     appsFilterEmpty: "No applications match these filters.",
+    consentReceiptTitle: "Data shared / consent receipt",
+    consentReceiptBody:
+      "For {company}, TWIN shared application-review data in the recruiter inbox: your display name, profile fields used for matching (skills, location, experience), and match score. Email, phone, and full CV text are not shared in the inbox — complete those on the employer site if required.",
+    consentReceiptEmployerFallback: "this employer",
+    consentReceiptVisibleLabel: "Shared with recruiter inbox",
+    consentReceiptVisibleName: "Display name",
+    consentReceiptVisibleProfile: "Profile fields used for matching (skills, location, experience)",
+    consentReceiptVisibleMatch: "Match score and up to three match reasons",
+    consentReceiptHiddenLabel: "Not shared in recruiter inbox",
+    consentReceiptHiddenEmail: "Email address",
+    consentReceiptHiddenPhone: "Phone number",
+    consentReceiptHiddenCv: "Full CV text (raw file contents)",
+    consentReceiptBasis:
+      "Consent basis: job-data processing and AI-assisted matching you accepted at registration (see Privacy Policy).",
+    consentReceiptNotLegal: "Informational summary only — not legal advice.",
     noApplications: "No tracked applications yet. Use Save or Apply on a job.",
     appsEmptyMomentum:
       "Every saved role gets a timestamp you can trust when recruiters ping you weeks later. Start from Top matches or the job feed below.",
@@ -2103,6 +2118,9 @@ const en = {
     reviewDataConfidenceLow: "Low — sparse overlap or incomplete profile",
     reviewDataConfidenceUnknown: "Unknown — insufficient structured data",
     reviewNoneListed: "None listed",
+    dataVisibilityNote:
+      "Application review context: candidate names and profile match data are visible so you can decide on interview slots. Email, phone, and full CV text are not shown in this inbox.",
+    dataVisibilityContextLabel: "Data visibility",
   },
   acceptanceQueue: {
     stripTitle: "Acceptance queue",
@@ -3371,6 +3389,21 @@ const pl: MessageTree = {
     appsSearchLabel: "Szukaj",
     appsSearchPlaceholder: "Tytuł, firma, notatki…",
     appsFilterEmpty: "Żadna aplikacja nie pasuje do filtrów.",
+    consentReceiptTitle: "Udostępnione dane / potwierdzenie zgody",
+    consentReceiptBody:
+      "Dla {company} TWIN udostępnił w skrzynce rekrutera dane do przeglądu aplikacji: imię i nazwisko, pola profilu użyte do dopasowania (umiejętności, lokalizacja, doświadczenie) oraz wynik dopasowania. E-mail, telefon i pełny tekst CV nie są udostępniane w skrzynce — uzupełnij je u pracodawcy, jeśli wymaga.",
+    consentReceiptEmployerFallback: "tego pracodawcy",
+    consentReceiptVisibleLabel: "Udostępnione w skrzynce rekrutera",
+    consentReceiptVisibleName: "Imię i nazwisko",
+    consentReceiptVisibleProfile: "Pola profilu do dopasowania (umiejętności, lokalizacja, doświadczenie)",
+    consentReceiptVisibleMatch: "Wynik dopasowania i do trzech powodów dopasowania",
+    consentReceiptHiddenLabel: "Nieudostępniane w skrzynce rekrutera",
+    consentReceiptHiddenEmail: "Adres e-mail",
+    consentReceiptHiddenPhone: "Numer telefonu",
+    consentReceiptHiddenCv: "Pełny tekst CV (surowa treść pliku)",
+    consentReceiptBasis:
+      "Podstawa zgody: przetwarzanie danych ofert i dopasowanie wspomagane AI, które zaakceptowałeś/aś przy rejestracji (zob. Polityka prywatności).",
+    consentReceiptNotLegal: "Wyłącznie informacja — to nie jest porada prawna.",
     noApplications: "Brak śledzonych aplikacji. Użyj Zapisz lub Aplikuj przy ofercie.",
     appsEmptyMomentum:
       "Każda zapisana rola ma znacznik czasu, któremu zaufasz, gdy rekruter odezwie się po tygodniach. Zacznij od Najlepszych dopasowań albo feedu ofert poniżej.",
@@ -4945,6 +4978,9 @@ const pl: MessageTree = {
     reviewDataConfidenceLow: "Niska — słabe nakładanie lub niepełny profil",
     reviewDataConfidenceUnknown: "Nieznana — niewystarczające dane strukturalne",
     reviewNoneListed: "Brak pozycji",
+    dataVisibilityNote:
+      "Kontekst przeglądu aplikacji: widać imiona kandydatów i dane dopasowania profilu, abyś mógł/mogła zdecydować o slotach na rozmowę. E-mail, telefon i pełny tekst CV nie są pokazywane w tej skrzynce.",
+    dataVisibilityContextLabel: "Widoczność danych",
   },
   acceptanceQueue: {
     stripTitle: "Kolejka akceptacji",
@@ -5824,6 +5860,8 @@ const de = messagesFromEnOverlay(deOverlay);
 const zh = messagesFromEnOverlay(zhOverlay);
 const ar = messagesFromEnOverlay(arOverlay);
 const ja = messagesFromEnOverlay(jaOverlay);
+
+export { en };
 
 export const dictionaries: Record<Locale, typeof en> = {
   en,
