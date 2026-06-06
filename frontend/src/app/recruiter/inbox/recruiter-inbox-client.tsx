@@ -23,6 +23,11 @@ import {
   writeRecruiterInboxSession,
 } from "@/lib/recruiter-inbox";
 import {
+  isRecruiterInboxActionable,
+  recruiterInboxDecisionBadge,
+  recruiterInboxMatchesStatusFilter,
+} from "@/lib/recruiter-inbox-decision";
+import {
   parseRecruiterInboxErrorDetail,
   recruiterInboxErrorMessageKey,
   type RecruiterInboxErrorMessageKey,
@@ -181,15 +186,23 @@ export default function RecruiterInboxClient() {
   const filteredRows = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return rows.filter((r) => {
-      if (statusFilter !== "all" && r.status !== statusFilter) return false;
+      if (!recruiterInboxMatchesStatusFilter(r.status, statusFilter)) return false;
       if (!q) return true;
       const hay = `${r.candidate_name} ${r.job_title} ${r.company}`.toLowerCase();
       return hay.includes(q);
     });
   }, [rows, statusFilter, searchQuery]);
 
-  const visibleIds = useMemo(() => filteredRows.map((r) => r.application_id), [filteredRows]);
-  const allVisibleSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedIds.has(id));
+  const actionableVisibleIds = useMemo(
+    () =>
+      filteredRows
+        .filter((r) => isRecruiterInboxActionable(r.status))
+        .map((r) => r.application_id),
+    [filteredRows],
+  );
+
+  const allVisibleSelected =
+    actionableVisibleIds.length > 0 && actionableVisibleIds.every((id) => selectedIds.has(id));
 
   function toggleSelected(id: number) {
     setSelectedIds((prev) => {
@@ -204,13 +217,43 @@ export default function RecruiterInboxClient() {
     setSelectedIds((prev) => {
       if (allVisibleSelected) {
         const next = new Set(prev);
-        for (const id of visibleIds) next.delete(id);
+        for (const id of actionableVisibleIds) next.delete(id);
         return next;
       }
       const next = new Set(prev);
-      for (const id of visibleIds) next.add(id);
+      for (const id of actionableVisibleIds) next.add(id);
       return next;
     });
+  }
+
+  function patchRowStatus(applicationId: number, status: string) {
+    setRows((prev) =>
+      prev.map((row) => (row.application_id === applicationId ? { ...row, status } : row)),
+    );
+    setSelectedIds((prev) => {
+      if (!prev.has(applicationId)) return prev;
+      const next = new Set(prev);
+      next.delete(applicationId);
+      return next;
+    });
+  }
+
+  function patchRowsFromBatchResults(
+    results: Array<{ application_id?: number; status?: string; ok?: boolean }>,
+  ) {
+    setRows((prev) => {
+      const byId = new Map(
+        results
+          .filter((r) => r.ok && r.application_id != null && r.status)
+          .map((r) => [r.application_id as number, r.status as string]),
+      );
+      if (byId.size === 0) return prev;
+      return prev.map((row) => {
+        const nextStatus = byId.get(row.application_id);
+        return nextStatus ? { ...row, status: nextStatus } : row;
+      });
+    });
+    setSelectedIds(new Set());
   }
 
   async function respondBatch(action: "accept" | "decline", opts?: { decline_note?: string }) {
@@ -238,9 +281,12 @@ export default function RecruiterInboxClient() {
         setLoadError(formatInboxLoadError(await res.text(), res.status));
         return;
       }
+      const data = (await res.json()) as {
+        results?: Array<{ application_id?: number; status?: string; ok?: boolean }>;
+      };
+      patchRowsFromBatchResults(data.results ?? []);
       setBatchDeclineOpen(false);
       setBatchDeclineNote("");
-      setSelectedIds(new Set());
       await load();
     } catch (e) {
       const networkFailure =
@@ -277,6 +323,8 @@ export default function RecruiterInboxClient() {
         setLoadError(formatInboxLoadError(await res.text(), res.status));
         return;
       }
+      const data = (await res.json()) as { status?: string };
+      if (data.status) patchRowStatus(applicationId, data.status);
       setDeclineTargetId(null);
       setDeclineNote("");
       await load();
@@ -306,6 +354,13 @@ export default function RecruiterInboxClient() {
 
   const showAuthError = submitAttempted && authError;
   const companyLabel = companySlug ? companySlugToLabel(companySlug) : "";
+
+  function decisionBadgeLabel(status: string): string | null {
+    const badge = recruiterInboxDecisionBadge(status);
+    if (badge === "accepted") return t("recruiterInbox.statusAcceptedInterview");
+    if (badge === "declined") return t("recruiterInbox.statusDeclined");
+    return null;
+  }
 
   function matchScoreLabelKey(label: string | null | undefined): string {
     const key = (label ?? "").trim().toLowerCase();
@@ -405,7 +460,7 @@ export default function RecruiterInboxClient() {
                 />
               </label>
             </div>
-            {filteredRows.length > 0 ? (
+            {actionableVisibleIds.length > 0 ? (
               <div className="mt-4 flex flex-wrap items-center gap-3 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/60 px-3 py-2">
                 <label className="flex items-center gap-2 text-xs font-medium text-[var(--foreground)]">
                   <input
@@ -472,20 +527,43 @@ export default function RecruiterInboxClient() {
               <p className="twin-muted mt-4 text-sm">{t("recruiterInbox.empty")}</p>
             ) : (
               <ul className="mt-4 space-y-3">
-                {filteredRows.map((r) => (
+                {filteredRows.map((r) => {
+                  const actionable = isRecruiterInboxActionable(r.status);
+                  const badgeLabel = decisionBadgeLabel(r.status);
+                  return (
                   <li
                     key={r.application_id}
                     className="rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface)] px-4 py-3 text-sm"
                   >
                     <div className="flex items-start gap-3">
-                      <input
-                        type="checkbox"
-                        checked={selectedIds.has(r.application_id)}
-                        onChange={() => toggleSelected(r.application_id)}
-                        className="mt-1 h-4 w-4 shrink-0 rounded border-[var(--twin-border)]"
-                        aria-label={t("recruiterInbox.selectRow").replace("{name}", r.candidate_name)}
-                      />
+                      {actionable ? (
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.has(r.application_id)}
+                          onChange={() => toggleSelected(r.application_id)}
+                          className="mt-1 h-4 w-4 shrink-0 rounded border-[var(--twin-border)]"
+                          aria-label={t("recruiterInbox.selectRow").replace("{name}", r.candidate_name)}
+                        />
+                      ) : (
+                        <span className="mt-1 w-4 shrink-0" aria-hidden />
+                      )}
                       <div className="min-w-0 flex-1">
+                    {badgeLabel ? (
+                      <div className="mb-2 flex flex-wrap items-center gap-2">
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
+                            recruiterInboxDecisionBadge(r.status) === "accepted"
+                              ? "bg-emerald-500/15 text-emerald-800 dark:text-emerald-200"
+                              : "bg-[var(--twin-surface-2)] text-[var(--twin-muted)]"
+                          }`}
+                        >
+                          {badgeLabel}
+                        </span>
+                        <span className="text-xs text-[var(--twin-muted)]">
+                          {t("recruiterInbox.decisionSaved")}
+                        </span>
+                      </div>
+                    ) : null}
                     <p className="font-semibold">
                       {r.candidate_name} · {r.job_title}
                     </p>
@@ -507,8 +585,9 @@ export default function RecruiterInboxClient() {
                       </ul>
                     ) : null}
                     <p className="twin-muted mt-1 text-xs">
-                      {r.company} · {r.status} · #{r.application_id}
+                      {r.company} · #{r.application_id}
                     </p>
+                    {actionable ? (
                     <div className="mt-3 flex flex-wrap gap-2">
                       <button
                         type="button"
@@ -532,7 +611,8 @@ export default function RecruiterInboxClient() {
                         {t("recruiterInbox.decline")}
                       </button>
                     </div>
-                    {declineTargetId === r.application_id ? (
+                    ) : null}
+                    {actionable && declineTargetId === r.application_id ? (
                       <div className="mt-3 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/80 p-3">
                         <label className="block text-xs font-medium text-[var(--foreground)]">
                           {t("recruiterInbox.declineNoteLabel")}
@@ -572,7 +652,8 @@ export default function RecruiterInboxClient() {
                       </div>
                     </div>
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             )}
           </>

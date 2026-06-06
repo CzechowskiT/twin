@@ -2084,6 +2084,9 @@ const en = {
     matchScorePossible: "Possible fit",
     matchScoreWeak: "Weak fit",
     matchScoreUnknown: "Match score",
+    statusAcceptedInterview: "Accepted for interview",
+    statusDeclined: "Declined",
+    decisionSaved: "Decision saved",
   },
   acceptanceQueue: {
     stripTitle: "Acceptance queue",
@@ -4907,6 +4910,9 @@ const pl: MessageTree = {
     matchScorePossible: "Możliwe dopasowanie",
     matchScoreWeak: "Słabe dopasowanie",
     matchScoreUnknown: "Wynik dopasowania",
+    statusAcceptedInterview: "Zaakceptowany na rozmowę",
+    statusDeclined: "Odrzucony",
+    decisionSaved: "Decyzja zapisana",
   },
   acceptanceQueue: {
     stripTitle: "Kolejka akceptacji",
