@@ -81,6 +81,31 @@ Documented in audit `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md` 
 
 ---
 
+## Production recruiter inbox smoke prerequisites
+
+Before demoing `/recruiter/inbox` on **production** (Vercel + Railway), verify all of the following — otherwise users see friendly **“inbox not available”** copy, not raw config errors:
+
+| Prerequisite | Where | Smoke check |
+| ------------ | ----- | ----------- |
+| `RECRUITER_INBOX_TOKEN` set on **Vercel** (frontend server routes) | Vercel project env | Load queue with valid pilot code → not HTTP 503 `recruiter_inbox_unavailable` |
+| Same token on **Railway** (FastAPI) | Railway service env | `GET /health` → `recruiter_inbox_configured: true` |
+| `NEXT_PUBLIC_API_URL` / upstream base configured on Vercel | Vercel env | Proxy reaches Railway; not 503 unavailable |
+| Demo company seeded (`nova-hiring-pl` or pilot slug) | Railway Postgres | Queue loads (may be empty — that is OK) |
+| Optional: `NEXT_PUBLIC_RECRUITER_INBOX_DEMO_*` for founder-only previews | Vercel env | Pre-fills access form; not required for named pilots |
+
+**User-visible error mapping (EN/PL via i18n):**
+
+| Condition | API `detail` | UI message |
+| --------- | ------------ | ---------- |
+| Token/env not configured | `recruiter_inbox_unavailable` | Inbox not available in this environment |
+| Wrong access code | `recruiter_inbox_invalid_token` | Access code did not match |
+| Empty queue (valid auth) | *(200, `items: []`)* | “No applications waiting…” |
+| Browser/network failure | *(no JSON)* | Network error — retry |
+
+Never expose env var names (`RECRUITER_INBOX_TOKEN`, etc.) in API responses or UI.
+
+---
+
 ## Related
 
 - `backend/app/services/recruiter_match_explanations.py` — deterministic reasons  

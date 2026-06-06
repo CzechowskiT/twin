@@ -1,35 +1,17 @@
 import { NextResponse } from "next/server";
 
+import { recruiterInboxProxyGate } from "@/lib/recruiter-inbox-api-route";
 import { getUpstreamApiBase } from "@/lib/public-api-base";
 
 export const dynamic = "force-dynamic";
 
-function recruiterToken(req: Request): string | null {
-  const header = req.headers.get("x-twin-recruiter-token")?.trim();
-  if (header) return header;
-  const url = new URL(req.url);
-  return url.searchParams.get("token")?.trim() || null;
-}
-
 export async function POST(req: Request) {
-  const serverToken = process.env.RECRUITER_INBOX_TOKEN?.trim();
-  if (!serverToken) {
-    return NextResponse.json({ detail: "RECRUITER_INBOX_TOKEN is not set" }, { status: 503 });
-  }
-  const supplied = recruiterToken(req);
-  if (supplied !== serverToken) {
-    return NextResponse.json({ detail: "Unauthorized" }, { status: 401 });
-  }
+  const gate = recruiterInboxProxyGate(req);
+  if (gate) return gate;
   const base = getUpstreamApiBase();
-  if (!base) {
-    return NextResponse.json({ detail: "API base URL not configured" }, { status: 503 });
-  }
+  const serverToken = process.env.RECRUITER_INBOX_TOKEN?.trim() ?? "";
   const url = new URL(req.url);
-  const company = url.searchParams.get("company_slug")?.trim();
-  if (!company) {
-    return NextResponse.json({ detail: "company_slug is required" }, { status: 400 });
-  }
-  const upstreamUrl = `${base.replace(/\/$/, "")}/api/v1/recruiter/inbox/respond-batch?${url.searchParams.toString()}`;
+  const upstreamUrl = `${base!.replace(/\/$/, "")}/api/v1/recruiter/inbox/respond-batch?${url.searchParams.toString()}`;
   const body = await req.text();
   const upstream = await fetch(upstreamUrl, {
     method: "POST",

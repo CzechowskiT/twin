@@ -1,10 +1,40 @@
+from collections.abc import Iterator
 from datetime import datetime, timezone
-from fastapi.testclient import TestClient
 
-from app.database.models import Application, ApplicationStatus, Candidate, Job, User
+import pytest
+from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
+
+from app.database.models import Application, ApplicationStatus, Base, Candidate, Job, User
+from app.database.session import get_db
 from app.main import app
 from app.services.recruiter_inbox import build_recruiter_batch, respond_recruiter_batch
 from tests.test_auth_integration import _sqlite_session
+
+
+@pytest.fixture
+def recruiter_api_client() -> Iterator[TestClient]:
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    Base.metadata.create_all(engine)
+    session_local = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+
+    def override_db():
+        db = session_local()
+        try:
+            yield db
+        finally:
+            db.close()
+
+    app.dependency_overrides[get_db] = override_db
+    client = TestClient(app)
+    yield client
+    app.dependency_overrides.pop(get_db, None)
 
 
 def test_build_recruiter_batch_filters_company() -> None:
@@ -195,14 +225,40 @@ def test_ensure_recruiter_inbox_demo_resets_interview() -> None:
         db.close()
 
 
-def test_recruiter_api_requires_token(monkeypatch) -> None:
+def test_recruiter_api_requires_token(monkeypatch, recruiter_api_client: TestClient) -> None:
     from app.config import get_settings
 
     monkeypatch.setenv("RECRUITER_INBOX_TOKEN", "secret")
     get_settings.cache_clear()
-    client = TestClient(app)
     try:
-        res = client.get("/api/v1/recruiter/inbox?company_slug=acme-corp")
+        res = recruiter_api_client.get("/api/v1/recruiter/inbox?company_slug=acme-corp")
         assert res.status_code == 401
+        assert res.json()["detail"] == "recruiter_inbox_invalid_token"
+        res2 = recruiter_api_client.get(
+            "/api/v1/recruiter/inbox?company_slug=acme-corp",
+            headers={"X-Twin-Recruiter-Token": "wrong"},
+        )
+        assert res2.status_code == 401
+        assert res2.json()["detail"] == "recruiter_inbox_invalid_token"
+        assert "RECRUITER_INBOX_TOKEN" not in res2.text
+    finally:
+        get_settings.cache_clear()
+
+
+def test_recruiter_api_unavailable_when_not_configured(
+    monkeypatch, recruiter_api_client: TestClient
+) -> None:
+    from app.config import get_settings
+
+    monkeypatch.delenv("RECRUITER_INBOX_TOKEN", raising=False)
+    get_settings.cache_clear()
+    try:
+        res = recruiter_api_client.get(
+            "/api/v1/recruiter/inbox?company_slug=acme-corp",
+            headers={"X-Twin-Recruiter-Token": "any"},
+        )
+        assert res.status_code == 503
+        assert res.json()["detail"] == "recruiter_inbox_unavailable"
+        assert "RECRUITER_INBOX_TOKEN" not in res.text
     finally:
         get_settings.cache_clear()

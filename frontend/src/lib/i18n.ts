@@ -2050,6 +2050,10 @@ const en = {
     empty: "No applications waiting for this company right now.",
     missingAuth: "Enter your access code and choose a company (from your TWIN invite).",
     loadFailed: "Could not load the queue — check your access code and company, then try again.",
+    errorUnavailable:
+      "Recruiter inbox is not available in this environment yet. Contact TWIN for pilot access.",
+    errorInvalidToken: "Access code did not match — check your TWIN invite and try again.",
+    errorNetwork: "Network error — check your connection and try again.",
     accept: "Accept for interview",
     decline: "Decline",
     back: "For recruiters",
@@ -4869,6 +4873,10 @@ const pl: MessageTree = {
     empty: "Brak aplikacji oczekujących u tej firmy.",
     missingAuth: "Podaj kod dostępu i wybierz firmę (z zaproszenia TWIN).",
     loadFailed: "Nie udało się załadować kolejki — sprawdź kod i firmę, potem spróbuj ponownie.",
+    errorUnavailable:
+      "Skrzynka rekrutera nie jest jeszcze dostępna w tym środowisku. Skontaktuj się z TWIN w sprawie dostępu pilotażowego.",
+    errorInvalidToken: "Kod dostępu się nie zgadza — sprawdź zaproszenie TWIN i spróbuj ponownie.",
+    errorNetwork: "Błąd sieci — sprawdź połączenie i spróbuj ponownie.",
     accept: "Zaakceptuj na rozmowę",
     decline: "Odrzuć",
     back: "Dla rekruterów",
