@@ -38,6 +38,10 @@ import {
   reviewCardSectionItems,
   type RecruiterReviewCard,
 } from "@/lib/recruiter-review-card";
+import {
+  recruiterDataVisibilitySummary,
+  type RecruiterDataVisibility,
+} from "@/lib/recruiter-data-visibility";
 
 type BatchRow = {
   application_id: number;
@@ -52,6 +56,11 @@ type BatchRow = {
   match_reasons?: string[] | null;
   human_decision_required?: boolean;
   pii_context?: string | null;
+  data_visibility_context?: string | null;
+  data_visibility_summary?: string | null;
+  candidate_data_visible?: string[] | null;
+  candidate_data_hidden?: string[] | null;
+  consent_receipt_available?: boolean;
   review_card?: RecruiterReviewCard | null;
 };
 
@@ -467,6 +476,12 @@ export default function RecruiterInboxClient() {
               </button>
             </div>
             <p className="twin-muted mt-2 text-xs leading-relaxed">{t("recruiterInbox.humanDecisionNote")}</p>
+            <p className="mt-2 rounded-lg border border-[var(--twin-border)]/60 bg-[var(--twin-surface-2)]/40 px-3 py-2 text-xs leading-relaxed text-[var(--twin-muted-strong)]">
+              {filteredRows[0]
+                ? recruiterDataVisibilitySummary(filteredRows[0] as RecruiterDataVisibility) ??
+                  t("recruiterInbox.dataVisibilityNote")
+                : t("recruiterInbox.dataVisibilityNote")}
+            </p>
             <div className="mt-4 flex flex-wrap items-end gap-3">
               <label className="flex min-w-[10rem] flex-col gap-1 text-xs">
                 <span className="font-medium text-[var(--foreground)]">{t("recruiterInbox.filterStatusLabel")}</span>

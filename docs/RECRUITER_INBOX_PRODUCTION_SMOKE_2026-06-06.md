@@ -94,7 +94,7 @@ Run **without** pasting access codes into this doc.
 3. Click **Load queue**.
 4. **PASS if:** banner *“AI-assisted ranking. Recruiter decision required.”* (or PL equivalent); queue panel loads.
 5. **Empty queue PASS:** copy *“No applications waiting…”* / *“Brak aplikacji…”* — still HTTP 200 path.
-6. If rows exist: confirm **match %** badge, up to **3 reasons**, candidate name visible (`pii_context: application_review`).
+6. If rows exist: confirm **match %** badge, up to **3 reasons**, candidate name visible (`pii_context: application_review`), **data visibility note** under queue header, optional API `data_visibility_summary`.
 7. **Accept** one row → badge **Accepted for interview** / **Zaakceptowany na rozmowę** + **Decision saved**; accept/decline buttons **hidden** (not stale accept).
 8. **Decline** another (optional note) → badge **Declined** / **Odrzucony**; buttons hidden. **Applied** filter hides decided rows; **All statuses** shows badges.
 9. Optional: `/recruiter/jobs` — same access pattern; POST creates listing (do not spam prod).
@@ -136,7 +136,7 @@ Run **without** pasting access codes into this doc.
 | No CSP errors | **yes** |
 | **Decision** | **PASS** |
 
-**Founder stance:** Recruiter Match Receipt **PASS** on production. Controlled pilot/demo remains **READY FOR FOUNDER DECISION** technically; founder **intentionally defers external recruiter invitations** until PII/consent receipt alignment, candidate-side consent receipt, recruiter data-visibility copy, and demo seed polish (see `docs/RECRUITER_TRUST_ROADMAP_2026-06-06.md` Phase 2).
+**Founder stance:** Recruiter Match Receipt **PASS** on production. H1–H3 PII/consent alignment **shipped 2026-06-06**. Controlled pilot/demo remains **READY FOR FOUNDER DECISION** technically; founder **intentionally defers external recruiter invitations** until **H4 demo seed polish** (see `docs/RECRUITER_TRUST_ROADMAP_2026-06-06.md` Phase 2).
 
 ---
 

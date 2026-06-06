@@ -87,13 +87,13 @@ Source: `backend/app/services/recruiter_match_explanations.py` → wired via `bu
 
 ### Phase 2 — Pre-pilot hardening (next — before named recruiter outbound)
 
-| # | Item | Goal |
-| - | ---- | ---- |
-| 1 | **PII / consent receipt alignment** | Recruiter-visible consent scope matches what inbox shows |
-| 2 | **Candidate-side consent receipt** | Candidate sees what was shared with employer on apply/match |
-| 3 | **Recruiter-side data visibility explanation** | In-product copy for what data TWIN holds and why names appear |
-| 4 | **Demo seed polish** | Stable Nova Hiring PL queue for repeatable founder/demo path |
-| 5 | **Founder decision on 3–5 named recruiters** | Only after 1–4 — then tracker + invites |
+| # | Item | Goal | Status |
+| - | ---- | ---- | ------ |
+| 1 | **PII / consent receipt alignment** | Recruiter-visible consent scope matches what inbox shows | ✅ **2026-06-06** — see `docs/PII_DATA_VISIBILITY_POLICY_2026-06-06.md` |
+| 2 | **Candidate-side consent receipt** | Candidate sees what was shared with employer on apply/match | ✅ **2026-06-06** — dashboard applications panel |
+| 3 | **Recruiter-side data visibility explanation** | In-product copy for what data TWIN holds and why names appear | ✅ **2026-06-06** — inbox note + API metadata |
+| 4 | **Demo seed polish** | Stable Nova Hiring PL queue for repeatable founder/demo path | ☐ Next |
+| 5 | **Founder decision on 3–5 named recruiters** | Only after 1–4 — then tracker + invites | ☐ Blocked on H4 |
 
 ### Phase 3 — Post-pilot trust (after cohort)
 

@@ -61,6 +61,11 @@ Sets recruiter inbox token + demo company **Nova Hiring PL**.
 | `review_card` | Nested object — sections A–H (why, matched, gaps, verify, confidence, flags, human decision, disclaimer) |
 | `human_decision_required` | Always `true` |
 | `pii_context` | `application_review` (inbox) vs `talent_pool_anonymized` (B2B pool) |
+| `data_visibility_context` | Same as `pii_context` for inbox rows |
+| `data_visibility_summary` | Locale-aware one-line PII scope (PL/EN via `X-Locale`) |
+| `candidate_data_visible[]` | Field keys shared in inbox (e.g. `name`, `match_score`) |
+| `candidate_data_hidden[]` | Field keys withheld (e.g. `email`, `phone`, `cv_raw_text`) |
+| `consent_receipt_available` | `true` — candidate dashboard shows matching receipt |
 
 ---
 
@@ -68,7 +73,7 @@ Sets recruiter inbox token + demo company **Nova Hiring PL**.
 
 | Surface | Candidate name | Email / phone / CV text |
 | ------- | -------------- | ------------------------ |
-| **Recruiter inbox** (application review) | **Shown** — employer reviewing submitted application | Not in inbox API today |
+| **Recruiter inbox** (application review) | **Shown** — employer reviewing submitted application | Not in inbox API — policy `docs/PII_DATA_VISIBILITY_POLICY_2026-06-06.md` |
 | **B2B talent pool** (opt-in browse, roadmap) | **Hidden** — skills + badge + score only | Never shown |
 
 Documented in audit `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md` § G-R01; pilot waiver until anonymized pre-accept cards ship.

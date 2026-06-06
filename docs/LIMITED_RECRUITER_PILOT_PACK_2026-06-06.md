@@ -18,7 +18,7 @@ TWIN invites **3–5 named recruiters** into a **limited, founder-led pilot** to
 
 Production recruiter inbox smoke **R1–R5 PASS** (R1–R4 `2026-06-06T16:07:18Z`; **R5 Match Receipt** `2026-06-06T16:38:40Z`). This is **not** public launch, **not** a two-sided marketplace claim, and **not** permission to enable auto-apply or delegated submit.
 
-**Founder decision required:** Approve outbound to named recruiters **only after** pre-pilot hardening (PII/consent receipt alignment, candidate-side consent receipt, recruiter data-visibility copy, demo seed polish) — then use `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` and track outcomes in `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md`.
+**Founder decision required:** Approve outbound to named recruiters **only after** pre-pilot hardening — **H1–H3 shipped 2026-06-06** (`docs/PII_CONSENT_RECEIPT_AUDIT_2026-06-06.md`); remaining **H4 demo seed polish** — then use `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` and track outcomes in `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md`.
 
 ---
 
@@ -85,8 +85,10 @@ Always pair candidate-side automation language with: *“Phased prepare-only on 
 
 | Surface | Candidate name | Email / phone / CV text |
 | ------- | -------------- | ------------------------ |
-| **Recruiter inbox** (`pii_context: application_review`) | **Shown** — employer reviewing submitted application | Not in inbox API today |
+| **Recruiter inbox** (`pii_context: application_review`) | **Shown** — employer reviewing submitted application | Not in inbox API — see `data_visibility_*` metadata |
 | **B2B talent pool** (`pii_context: talent_pool_anonymized`) | **Hidden** — skills + badge + score only | Never shown |
+
+**Policy docs:** `docs/PII_DATA_VISIBILITY_POLICY_2026-06-06.md` · `docs/PII_CONSENT_RECEIPT_AUDIT_2026-06-06.md`
 
 **Pilot disclosure (include in every invite):** Inbox rows show **candidate names** for application review — this differs from the anonymized talent-pool design. Do not screenshot queue rows into public channels. Rotate access if a code leaks (founder-only ops — see `docs/CONTROLLED_PILOT_OPERATING_MANUAL_2026-05-27.md`).
 
@@ -265,10 +267,10 @@ Capture verbatim objections into tracker for synthesis — especially PII, ATS, 
 
 **Next recommended hardening (before outbound):**
 
-1. PII / consent receipt alignment
-2. Candidate-side consent receipt
-3. Recruiter-side data visibility explanation
-4. Demo seed polish
+1. ~~PII / consent receipt alignment~~ ✅ **2026-06-06**
+2. ~~Candidate-side consent receipt~~ ✅ **2026-06-06** (dashboard applications panel)
+3. ~~Recruiter-side data visibility explanation~~ ✅ **2026-06-06** (inbox note + API metadata)
+4. Demo seed polish — **next slice**
 5. Founder decision on 3–5 named recruiters
 
 **Next founder action:** Complete hardening 1–4 → sign pilot GO → fill tracker row 1 → send first invite → schedule onboarding call.
