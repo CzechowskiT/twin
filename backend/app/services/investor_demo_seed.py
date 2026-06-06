@@ -488,14 +488,22 @@ def canonical_recruiter_demo_names() -> frozenset[str]:
 
 
 def _is_synthetic_recruiter_demo_user(email: str) -> bool:
-    """True for inbox-only @twin.career demo accounts — never real pilot users."""
-    normalized = email.strip().lower()
-    if not normalized.endswith(f"@{DEMO_RECRUITER_EMAIL_DOMAIN}"):
-        return False
-    if normalized == demo_email_from_env():
-        return True
-    local = normalized.split("@", 1)[0]
-    return local.endswith("-nova-demo") or local == "demo"
+    """True for @twin.career accounts (demo/inbox-only — not external pilot emails)."""
+    return email.strip().lower().endswith(f"@{DEMO_RECRUITER_EMAIL_DOMAIN}")
+
+
+def _should_prune_non_canonical_demo_row(
+    app: Application,
+    job: Job,
+    user: User,
+) -> bool:
+    """Nova Hiring PL demo scope only — never prune rows for external pilot emails on scraped jobs."""
+    ext = (job.external_id or "").strip()
+    is_demo_app = _is_recruiter_demo_application(app, job)
+    is_synthetic = _is_synthetic_recruiter_demo_user(user.email)
+    if ext.startswith(DEMO_JOB_PREFIX):
+        return is_synthetic or is_demo_app
+    return is_synthetic and is_demo_app
 
 
 def prune_non_canonical_recruiter_demo_rows(
@@ -528,9 +536,7 @@ def prune_non_canonical_recruiter_demo_rows(
         name = (cand.name or "").strip()
         if name in canonical:
             continue
-        if not _is_synthetic_recruiter_demo_user(user.email):
-            continue
-        if not _is_recruiter_demo_application(app, job):
+        if not _should_prune_non_canonical_demo_row(app, job, user):
             continue
         match_row = db.execute(
             select(JobMatch).where(

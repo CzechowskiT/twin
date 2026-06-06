@@ -80,7 +80,7 @@ def test_ensure_recruiter_inbox_demo_prunes_legacy_non_canonical_rows() -> None:
         upsert_recruiter_demo_queue(db, company="Nova Hiring PL")
         job = db.query(Job).filter(Job.external_id == "investor-demo-python-lead").one()
         legacy_user = User(
-            email="legacy-nova-demo@twin.career",
+            email="legacy@twin.career",
             hashed_password=hash_password("synthetic-recruiter-demo-inbox-only"),
             gdpr_consent_at=datetime.now(timezone.utc),
         )
