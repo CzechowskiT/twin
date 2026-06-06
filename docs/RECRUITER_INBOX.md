@@ -40,6 +40,8 @@ Opening `/recruiter/inbox` then auto-loads the queue when both are set.
 - **accept** → application status `interview`
 - **decline** → `rejected`
 
+Inbox rows include `match_score`, `match_score_label`, `match_reasons[]`, and nested **`review_card`** (deterministic, locale via `X-Locale`). See `docs/RECRUITER_TRUST_ROADMAP_2026-06-06.md`.
+
 ## Next (post-pilot)
 
 Per-company tokens, employer SSO, calendar slot proposals on accept.

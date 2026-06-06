@@ -16,7 +16,7 @@ Controlled pilot is **GO**. Public launch is **NO-GO**. Limited recruiter pilot 
 
 Invite a limited, named cohort into a monitored pilot to validate **calendar-of-acceptance** workflows under real usage constraints, without public-scale messaging.
 
-**Recruiter-specific:** Validate **pre-qualified inbox** (match score + reasons, accept/decline) — see `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md`.
+**Recruiter-specific:** Validate **pre-qualified inbox** (match score + reasons + **review card**, accept/decline) — see `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` and `docs/RECRUITER_TRUST_ROADMAP_2026-06-06.md`.
 
 ## What we can honestly offer now
 

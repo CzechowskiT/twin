@@ -50,9 +50,9 @@ Outside TWIN, someone returns from time off to **random interview spam** or **th
 | Surface | Status | Recruiter-visible behaviour |
 | ------- | ------ | --------------------------- |
 | **Marketing** `/for-recruiters` | LIVE | Pilot inbox, match transparency, jobs POST marked live; watchlists / HM packets marked roadmap |
-| **Acceptance inbox** `/recruiter/inbox` | LIVE (token pilot) | Queue load; match % badge + label; up to 3 rule-based reasons; batch accept/decline; status badges; banner *“AI-assisted ranking. Recruiter decision required.”* |
+| **Acceptance inbox** `/recruiter/inbox` | LIVE (token pilot) | Queue load; match % badge + label; up to 3 rule-based reasons; **expandable review card (A–H)**; batch accept/decline; status badges; banner *“AI-assisted ranking. Recruiter decision required.”* |
 | **Employer jobs** `/recruiter/jobs` | LIVE (pilot) | POST creates employer listing for future matches |
-| **Match transparency** | LIVE (2026-06-06) | Deterministic reasons (skills, title, location, salary band) — not black-box LLM on inbox rows |
+| **Match transparency** | LIVE (2026-06-06) | Deterministic reasons + **`review_card`** (gaps, verify checklist, data confidence) — not black-box LLM on inbox rows |
 | **Human-in-the-loop** | LIVE | Accept → *Accepted for interview* / *Zaakceptowany na rozmowę*; decline → *Declined* / *Odrzucony*; no stale accept CTA on decided rows |
 | **Rate limits** | LIVE | Inbox write caps (abuse protection) |
 | **Production smoke** | PASS | R1–R4 `2026-06-06T16:07:18Z` — see `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` |
@@ -146,7 +146,7 @@ Always pair candidate-side automation language with: *“Phased prepare-only on 
 | --------- | ------------- | ------------- | -------- |
 | “Auto-apply bots will spam our jobs” | “Auto-apply is **paused** on production; server returns 403 if re-enabled without gates. Pilot inbox is human accept/decline only.” | „Auto-apply jest **wstrzymane** na produkcji; serwer zwraca 403 bez bramek. W pilocie tylko akceptuj/odrzuć.” | `autonomous_apply_policy.py`; pause plan docs |
 | “Unqualified flood” | “Each row shows **match score + up to 3 reasons**. Tell us your bar; we tune thresholds. Low score = escalate to founder.” | „Każdy wiersz ma **wynik + do 3 powodów**. Podaj próg; dostroimy. Niski wynik = eskalacja do foundera.” | Inbox API 2026-06-06 |
-| “Black-box AI” | “Inbox ranking is **rule-based** (skills, title, location, salary). Banner says AI-**assisted**, not AI-decided.” | „Ranking w skrzynce jest **regułowy**. Baner: wspomagany AI, nie decyzja AI.” | `recruiter_match_explanations.py` |
+| “Black-box AI” | “Inbox ranking is **rule-based** (skills, title, location, salary). **Review card** explains gaps and what to verify. Banner says AI-**assisted**, not AI-decided.” | „Ranking w skrzynce jest **regułowy**. **Karta oceny** pokazuje luki i co zweryfikować. Baner: wspomagany AI, nie decyzja AI.” | `recruiter_match_explanations.py` |
 | “GDPR / names visible” | “Inbox = **application review** — names shown by pilot policy. Talent pool browse (roadmap) is anonymized. DPA on request.” | „Skrzynka = **przegląd aplikacji** — imiona w polityce pilotażu. Pula talentów (roadmapa) anonimowa. DPA na życzenie.” | PII table §6; audit G-R01 |
 | “Can't integrate ATS” | “Webhook scaffold exists; **not production-verified** yet. Pilot is inbox-first.” | „Szkielet webhooka istnieje; **bez prod weryfikacji**. Pilotaż = skrzynka first.” | `integrations_ats.py` |
 | “Replaces recruiters” | “TWIN is **candidate-first, recruiter-supporting** — you keep every accept/decline. We don't claim to replace LinkedIn or your desk.” | „TWIN jest **kandydat-first, wspiera rekrutera** — Ty zostawiasz każdą decyzję. Nie zastępujemy LinkedIn ani Twojego biurka.” | Audit verdict C |

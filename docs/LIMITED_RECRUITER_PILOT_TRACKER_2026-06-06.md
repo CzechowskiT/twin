@@ -44,7 +44,7 @@ Score each dimension **1–5** at synthesis. Composite guides expand / hold / wi
 | # | Dimension | 1 (poor) | 3 (acceptable) | 5 (strong) | Score | Evidence |
 | - | --------- | -------- | -------------- | ---------- | ----- | -------- |
 | R1 | **Activation** | Never loaded queue | Loaded; delayed first decision | Load + decision within 7 days | | |
-| R2 | **Signal trust** | “Reasons feel random” | Mixed trust; some useful rows | Reasons align with recruiter bar | | |
+| R2 | **Signal trust** | “Reasons feel random” | Mixed trust; some useful rows | Reasons + **review card** align with recruiter bar | | |
 | R3 | **Noise rate** | Repeated spam reports | One tune resolved | No spam reports post-tune | | |
 | R4 | **Honesty fit** | Felt misled vs invite | Mostly matched disclaimers | Product = invite promise | | |
 | R5 | **Workflow fit** | Won't use again | Occasional use | Weekly habit | | |
@@ -123,6 +123,7 @@ Expand limited recruiter pilot beyond 5 **only if all** are true:
 
 - `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md`
 - `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md`
+- `docs/RECRUITER_TRUST_ROADMAP_2026-06-06.md`
 - `docs/PILOT_TRACKER.csv` — candidate pilot (separate cohort)
 - `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md`
 

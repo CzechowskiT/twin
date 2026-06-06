@@ -32,6 +32,12 @@ import {
   recruiterInboxErrorMessageKey,
   type RecruiterInboxErrorMessageKey,
 } from "@/lib/recruiter-inbox-errors";
+import {
+  REVIEW_CARD_SECTIONS,
+  reviewCardDataConfidenceKey,
+  reviewCardSectionItems,
+  type RecruiterReviewCard,
+} from "@/lib/recruiter-review-card";
 
 type BatchRow = {
   application_id: number;
@@ -46,6 +52,7 @@ type BatchRow = {
   match_reasons?: string[] | null;
   human_decision_required?: boolean;
   pii_context?: string | null;
+  review_card?: RecruiterReviewCard | null;
 };
 
 type AuthMeBilling = {
@@ -73,6 +80,7 @@ export default function RecruiterInboxClient() {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [batchDeclineOpen, setBatchDeclineOpen] = useState(false);
   const [batchDeclineNote, setBatchDeclineNote] = useState("");
+  const [expandedReviewCards, setExpandedReviewCards] = useState<Set<number>>(new Set());
   const autoLoadDone = useRef(false);
 
   const companyOptions = useMemo(
@@ -371,6 +379,29 @@ export default function RecruiterInboxClient() {
     return t("recruiterInbox.matchScoreUnknown");
   }
 
+  function reviewCardSectionLabel(section: (typeof REVIEW_CARD_SECTIONS)[number]): string {
+    const map = {
+      whyThisCandidate: "recruiterInbox.reviewWhyThisCandidate",
+      requirementsMatched: "recruiterInbox.reviewRequirementsMatched",
+      uncertainOrMissing: "recruiterInbox.reviewUncertainOrMissing",
+      whatToVerify: "recruiterInbox.reviewWhatToVerify",
+      dataConfidence: "recruiterInbox.reviewDataConfidence",
+      redFlags: "recruiterInbox.reviewRedFlags",
+      humanDecision: "recruiterInbox.reviewHumanDecision",
+      disclaimer: "recruiterInbox.reviewDisclaimer",
+    } as const;
+    return t(map[section]);
+  }
+
+  function toggleReviewCard(applicationId: number) {
+    setExpandedReviewCards((prev) => {
+      const next = new Set(prev);
+      if (next.has(applicationId)) next.delete(applicationId);
+      else next.add(applicationId);
+      return next;
+    });
+  }
+
   return (
     <Shell wide>
       <Card>
@@ -583,6 +614,90 @@ export default function RecruiterInboxClient() {
                           <li key={reason}>{reason}</li>
                         ))}
                       </ul>
+                    ) : null}
+                    {r.review_card ? (
+                      <div className="mt-3">
+                        <button
+                          type="button"
+                          className="twin-link text-xs font-medium"
+                          aria-expanded={expandedReviewCards.has(r.application_id)}
+                          onClick={() => toggleReviewCard(r.application_id)}
+                        >
+                          {expandedReviewCards.has(r.application_id)
+                            ? t("recruiterInbox.hideReviewCard")
+                            : t("recruiterInbox.showReviewCard")}
+                        </button>
+                        {expandedReviewCards.has(r.application_id) ? (
+                          <div className="mt-2 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/50 p-3">
+                            <p className="text-xs font-semibold text-[var(--foreground)]">
+                              {t("recruiterInbox.reviewCardTitle")}
+                            </p>
+                            <dl className="mt-2 space-y-3">
+                              {REVIEW_CARD_SECTIONS.map((section) => {
+                                const items = reviewCardSectionItems(r.review_card as RecruiterReviewCard, section);
+                                if (section === "humanDecision") {
+                                  return (
+                                    <div key={section}>
+                                      <dt className="text-xs font-medium text-[var(--foreground)]">
+                                        {reviewCardSectionLabel(section)}
+                                      </dt>
+                                      <dd className="mt-1 text-xs text-[var(--foreground)]">
+                                        {t("recruiterInbox.humanDecisionNote")}
+                                      </dd>
+                                    </div>
+                                  );
+                                }
+                                if (section === "dataConfidence") {
+                                  return (
+                                    <div key={section}>
+                                      <dt className="text-xs font-medium text-[var(--foreground)]">
+                                        {reviewCardSectionLabel(section)}
+                                      </dt>
+                                      <dd className="mt-1 text-xs text-[var(--foreground)]">
+                                        {t(
+                                          `recruiterInbox.${reviewCardDataConfidenceKey(items[0])}`,
+                                        )}
+                                      </dd>
+                                    </div>
+                                  );
+                                }
+                                if (section === "whyThisCandidate" || section === "disclaimer") {
+                                  return (
+                                    <div key={section}>
+                                      <dt className="text-xs font-medium text-[var(--foreground)]">
+                                        {reviewCardSectionLabel(section)}
+                                      </dt>
+                                      <dd className="mt-1 text-xs leading-relaxed text-[var(--foreground)]">
+                                        {items[0] ?? t("recruiterInbox.reviewNoneListed")}
+                                      </dd>
+                                    </div>
+                                  );
+                                }
+                                return (
+                                  <div key={section}>
+                                    <dt className="text-xs font-medium text-[var(--foreground)]">
+                                      {reviewCardSectionLabel(section)}
+                                    </dt>
+                                    <dd className="mt-1">
+                                      {items.length > 0 ? (
+                                        <ul className="list-inside list-disc space-y-0.5 text-xs text-[var(--foreground)]">
+                                          {items.map((item) => (
+                                            <li key={`${section}-${item}`}>{item}</li>
+                                          ))}
+                                        </ul>
+                                      ) : (
+                                        <p className="text-xs text-[var(--twin-muted)]">
+                                          {t("recruiterInbox.reviewNoneListed")}
+                                        </p>
+                                      )}
+                                    </dd>
+                                  </div>
+                                );
+                              })}
+                            </dl>
+                          </div>
+                        ) : null}
+                      </div>
                     ) : null}
                     <p className="twin-muted mt-1 text-xs">
                       {r.company} · #{r.application_id}

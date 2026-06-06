@@ -54,7 +54,7 @@
 | OAuth callback rate limits | `1efd8b1` | **LIVE** |
 | Job save/unsave rate limits | `1efd8b1` | **LIVE** |
 | Cookie consent + recruiter inbox rate limits | `67a22dc` | **LIVE** |
-| Recruiter inbox | Token auth; batch accept/decline; **match_score + reasons (2026-06-06)**; **decision UX (2026-06-06)** — status badges, hide accept on `interview`/`rejected`; **production smoke R1–R4 PASS** `2026-06-06T16:07:18Z` (`docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md`) — Nova Hiring PL queue; Alex Kowalski decided row; no CSP/raw JSON — audit **C) recruiter-supporting** | **LIVE / VERIFIED** — controlled recruiter pilot/demo **READY FOR FOUNDER DECISION**; public launch **NO-GO** |
+| Recruiter inbox | Token auth; batch accept/decline; **match_score + reasons + review_card (2026-06-06)**; **decision UX (2026-06-06)** — status badges, hide accept on `interview`/`rejected`; **production smoke R1–R4 PASS** `2026-06-06T16:07:18Z` (`docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md`) — Nova Hiring PL queue; Alex Kowalski decided row; no CSP/raw JSON — audit **C) recruiter-supporting** | **LIVE / VERIFIED** — controlled recruiter pilot/demo **READY FOR FOUNDER DECISION**; public launch **NO-GO** |
 | Recruiter marketing SKU (watchlists, HM packets, seat packs) | `persona-pages.ts` recruiters bundle | **REPO / MARKETING** — not evidenced as shipped app beyond inbox/jobs |
 | Partner export | `partner_export_configured` | **LIVE** |
 | Placement verification (machine-assisted) | `PLACEMENT_VERIFICATION.md` | **LIVE** design; pilot-scale |
