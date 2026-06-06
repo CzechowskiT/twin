@@ -22,6 +22,10 @@ from app.services.request_locale import locale_from_request
 
 router = APIRouter()
 
+RECRUITER_INBOX_UNAVAILABLE = "recruiter_inbox_unavailable"
+RECRUITER_INBOX_INVALID_TOKEN = "recruiter_inbox_invalid_token"
+RECRUITER_INBOX_COMPANY_REQUIRED = "recruiter_inbox_company_required"
+
 
 def _resolved_company_slug(
     db: Session,
@@ -30,14 +34,22 @@ def _resolved_company_slug(
     company_slug_query: str | None,
 ) -> str:
     ok, slug = resolve_recruiter_access(db, settings, raw_token, company_slug_query)
-    if not ok:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid recruiter token.")
-    if not slug:
+    if ok:
+        if not slug:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=RECRUITER_INBOX_COMPANY_REQUIRED,
+            )
+        return slug
+    if not (settings.recruiter_inbox_token or "").strip():
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="company_slug is required with the global recruiter token.",
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=RECRUITER_INBOX_UNAVAILABLE,
         )
-    return slug
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail=RECRUITER_INBOX_INVALID_TOKEN,
+    )
 
 
 class RecruiterRespondIn(BaseModel):

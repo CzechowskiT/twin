@@ -345,7 +345,7 @@ Monitor Railway `csp_report` for **24h** after enforce deploy (`2026-06-05T16:20
 - **Verdict:** **C) candidate-first, recruiter-supporting** — not **D) two-sided**; not recruiter-hostile
 - **Evidence:** Recruiter inbox + batch accept/decline **LIVE** (token pilot); auto-apply **PAUSED** + delegated **NOT LIVE**; marketing recruiter SKU (watchlists/HM packets) **mostly not shipped**
 - **Launch impact:** **No change** to public **NO-GO** or pilot **GO**; recruiter sales must not claim unshipped SKU; inbox PII + match explainability gaps flagged for 0–30d roadmap
-- **Pilot/demo:** Safe to demo inbox with honest pilot framing per audit §13–14
+- **Pilot/demo:** Safe to demo inbox with honest pilot framing per audit §13–14; verify **production smoke prerequisites** (`docs/RECRUITER_DEMO_PATH_2026-06-06.md` § Production recruiter inbox smoke prerequisites) before live recruiter demos
 
 ---
 

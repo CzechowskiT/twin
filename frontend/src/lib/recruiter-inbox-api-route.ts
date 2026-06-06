@@ -1,0 +1,45 @@
+import { NextResponse } from "next/server";
+
+import { getUpstreamApiBase } from "@/lib/public-api-base";
+import { RECRUITER_INBOX_ERROR } from "@/lib/recruiter-inbox-errors";
+
+export function recruiterTokenFromRequest(req: Request): string | null {
+  const header = req.headers.get("x-twin-recruiter-token")?.trim();
+  if (header) return header;
+  const url = new URL(req.url);
+  return url.searchParams.get("token")?.trim() || null;
+}
+
+/** Shared gate for `/api/recruiter/*` — returns safe error codes only. */
+export function recruiterInboxProxyGate(req: Request): NextResponse | null {
+  const serverToken = process.env.RECRUITER_INBOX_TOKEN?.trim();
+  if (!serverToken) {
+    return NextResponse.json(
+      { detail: RECRUITER_INBOX_ERROR.unavailable },
+      { status: 503 },
+    );
+  }
+  const supplied = recruiterTokenFromRequest(req);
+  if (supplied !== serverToken) {
+    return NextResponse.json(
+      { detail: RECRUITER_INBOX_ERROR.invalidToken },
+      { status: 401 },
+    );
+  }
+  const base = getUpstreamApiBase();
+  if (!base) {
+    return NextResponse.json(
+      { detail: RECRUITER_INBOX_ERROR.unavailable },
+      { status: 503 },
+    );
+  }
+  const url = new URL(req.url);
+  const company = url.searchParams.get("company_slug")?.trim();
+  if (!company) {
+    return NextResponse.json(
+      { detail: RECRUITER_INBOX_ERROR.companyRequired },
+      { status: 400 },
+    );
+  }
+  return null;
+}

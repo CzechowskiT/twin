@@ -8,6 +8,7 @@ import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-f
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
+import { isLikelyBrowserNetworkFailureMessage } from "@/lib/api";
 import { getClientApiLocale } from "@/lib/api-locale";
 import { getToken } from "@/lib/auth";
 import {
@@ -21,6 +22,11 @@ import {
   resolveCompanySlugFromRaw,
   writeRecruiterInboxSession,
 } from "@/lib/recruiter-inbox";
+import {
+  parseRecruiterInboxErrorDetail,
+  recruiterInboxErrorMessageKey,
+  type RecruiterInboxErrorMessageKey,
+} from "@/lib/recruiter-inbox-errors";
 
 type BatchRow = {
   application_id: number;
@@ -83,6 +89,17 @@ export default function RecruiterInboxClient() {
     [companyRaw, knownSlugs],
   );
 
+  const inboxErrorText = useCallback(
+    (key: RecruiterInboxErrorMessageKey) => t(`recruiterInbox.${key}`),
+    [t],
+  );
+
+  const formatInboxLoadError = useCallback(
+    (body: string, status: number, networkFailure = false) =>
+      inboxErrorText(recruiterInboxErrorMessageKey(parseRecruiterInboxErrorDetail(body), status, networkFailure)),
+    [inboxErrorText],
+  );
+
   useEffect(() => {
     const fromUrl = parseRecruiterInviteSearchParams(searchParams);
     const session = readRecruiterInboxSession();
@@ -130,20 +147,25 @@ export default function RecruiterInboxClient() {
       });
       if (!res.ok) {
         const body = await res.text();
-        throw new Error(body || t("recruiterInbox.loadFailed"));
+        setLoadError(formatInboxLoadError(body, res.status));
+        setRows([]);
+        setQueueLoaded(false);
+        return;
       }
       const data = (await res.json()) as { items: BatchRow[] };
       setRows(data.items ?? []);
       setSelectedIds(new Set());
       setQueueLoaded(true);
     } catch (e) {
-      setLoadError(e instanceof Error ? e.message : t("recruiterInbox.loadFailed"));
+      const networkFailure =
+        e instanceof Error && isLikelyBrowserNetworkFailureMessage(e.message);
+      setLoadError(formatInboxLoadError("", 0, networkFailure));
       setRows([]);
       setQueueLoaded(false);
     } finally {
       setLoading(false);
     }
-  }, [token, companySlug, t]);
+  }, [token, companySlug, t, formatInboxLoadError]);
 
   useEffect(() => {
     if (!hydrated || autoLoadDone.current) return;
@@ -212,13 +234,18 @@ export default function RecruiterInboxClient() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      if (!res.ok) throw new Error(await res.text());
+      if (!res.ok) {
+        setLoadError(formatInboxLoadError(await res.text(), res.status));
+        return;
+      }
       setBatchDeclineOpen(false);
       setBatchDeclineNote("");
       setSelectedIds(new Set());
       await load();
     } catch (e) {
-      setLoadError(e instanceof Error ? e.message : t("recruiterInbox.loadFailed"));
+      const networkFailure =
+        e instanceof Error && isLikelyBrowserNetworkFailureMessage(e.message);
+      setLoadError(formatInboxLoadError("", 0, networkFailure));
     } finally {
       setBusyId(null);
     }
@@ -246,12 +273,17 @@ export default function RecruiterInboxClient() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      if (!res.ok) throw new Error(await res.text());
+      if (!res.ok) {
+        setLoadError(formatInboxLoadError(await res.text(), res.status));
+        return;
+      }
       setDeclineTargetId(null);
       setDeclineNote("");
       await load();
     } catch (e) {
-      setLoadError(e instanceof Error ? e.message : t("recruiterInbox.loadFailed"));
+      const networkFailure =
+        e instanceof Error && isLikelyBrowserNetworkFailureMessage(e.message);
+      setLoadError(formatInboxLoadError("", 0, networkFailure));
     } finally {
       setBusyId(null);
     }
