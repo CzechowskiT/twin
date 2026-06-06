@@ -18,6 +18,7 @@ Recruiters should **trust the queue before they trust automation**. Every inbox 
 
 | Layer | Deliverable | Notes |
 | ----- | ----------- | ----- |
+| **Frontend** | Recruiter calendar nav guard + `/recruiter/calendar` placeholder | Header **Kalendarz** → roadmap page (PL/EN); no candidate `/dashboard/calendar` login loop; candidate calendar unchanged |
 | **Backend** | `review_card` nested object on inbox rows | Deterministic, locale via `X-Locale`; no schema change |
 | **Frontend** | Expandable **Show review card** / **Pokaż kartę oceny** | Sections A–H; accept/decline UX unchanged |
 | **Tests** | `test_recruiter_match_explanations.py`, inbox batch, frontend review-card script | CSP suite unchanged (no CSP edits) |

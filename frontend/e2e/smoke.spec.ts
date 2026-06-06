@@ -153,6 +153,33 @@ test.describe("dashboard smoke (read-only, no live actions)", () => {
     });
   }
 
+  const recruiterRoutes = ["/recruiter/inbox", "/recruiter/jobs", "/recruiter/calendar"] as const;
+
+  for (const route of recruiterRoutes) {
+    test(`unauthenticated ${route} does not leak unsafe copy`, async ({ page, context }) => {
+      await context.clearCookies();
+      await page.addInitScript(() => {
+        try {
+          window.localStorage?.clear();
+          window.sessionStorage?.clear();
+        } catch {
+          // ignore
+        }
+      });
+      await gotoSmoke(page, route);
+      await page.waitForLoadState("domcontentloaded").catch(() => {});
+      const bodyText = (await page.locator("body").innerText()).toLowerCase();
+      expect(bodyText).not.toMatch(/authologic_api_|checkout payment rails|twin applies autonomously/i);
+      expect(bodyText).not.toMatch(
+        /apply now|auto apply|submit application|kyc verified|guaranteed interview|fully verified|run now \(test\)/i,
+      );
+      if (route === "/recruiter/calendar") {
+        expect(bodyText).not.toMatch(/google calendar connected|microsoft calendar connected/i);
+      }
+      await expect(page.locator("body")).toBeVisible();
+    });
+  }
+
   test("candidate jobs: unauthenticated /workspace/candidate/jobs routes toward login", async ({
     page,
     context,

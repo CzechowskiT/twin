@@ -27,7 +27,7 @@ Production recruiter inbox smoke **R1–R5 PASS** (R1–R4 `2026-06-06T16:07:18Z
 | Dimension | In scope | Out of scope |
 | --------- | -------- | ------------ |
 | **Cohort size** | 3–5 **named** recruiters (founder-selected) | Open LinkedIn campaign; uncontrolled signup |
-| **Product surfaces** | `/for-recruiters`, `/recruiter/inbox`, `/recruiter/jobs` (POST) | Watchlists, HM packets, employer SSO, talent-pool browse |
+| **Product surfaces** | `/for-recruiters`, `/recruiter/inbox`, `/recruiter/jobs` (POST), `/recruiter/calendar` (roadmap placeholder) | Watchlists, HM packets, employer SSO, talent-pool browse, **live recruiter calendar sync** |
 | **Auth model** | Invite-only **access code** + company slug (per partner) | Self-serve recruiter checkout; seat packs without contract |
 | **Languages** | PL + EN (UI + founder talk track) | Full i18n beyond shipped strings |
 | **Duration** | 4–6 weeks initial window; extend by founder decision | Indefinite “production GA” promise |
@@ -52,6 +52,7 @@ Outside TWIN, someone returns from time off to **random interview spam** or **th
 | **Marketing** `/for-recruiters` | LIVE | Pilot inbox, match transparency, jobs POST marked live; watchlists / HM packets marked roadmap |
 | **Acceptance inbox** `/recruiter/inbox` | LIVE (token pilot) | Queue load; match % badge + label; up to 3 rule-based reasons; **expandable review card (A–H)**; batch accept/decline; status badges; banner *“AI-assisted ranking. Recruiter decision required.”* |
 | **Employer jobs** `/recruiter/jobs` | LIVE (pilot) | POST creates employer listing for future matches |
+| **Recruiter calendar** `/recruiter/calendar` | **ROADMAP placeholder** (2026-06-06 nav fix) | Friendly PL/EN “not live” page; header **Kalendarz** no longer sends recruiters to candidate `/dashboard/calendar` (login loop fix) |
 | **Match transparency** | LIVE (2026-06-06) | Deterministic reasons + **`review_card`** (gaps, verify checklist, data confidence) — not black-box LLM on inbox rows |
 | **Human-in-the-loop** | LIVE | Accept → *Accepted for interview* / *Zaakceptowany na rozmowę*; decline → *Declined* / *Odrzucony*; no stale accept CTA on decided rows |
 | **Rate limits** | LIVE | Inbox write caps (abuse protection) |
@@ -69,6 +70,7 @@ Outside TWIN, someone returns from time off to **random interview spam** or **th
 | Auto-apply “while you sleep” on production | **PAUSED** — prepare-only posture; server gates live |
 | Delegated submit / KYC verified candidates | **NOT LIVE** |
 | Recruiter watchlists, HM packets, governance presets | **Marketing roadmap** — not shipped app |
+| Recruiter calendar / propose-slot sync (Google, Microsoft, ICS) | **NOT LIVE** — `/recruiter/calendar` placeholder only; candidate `/dashboard/calendar` unchanged |
 | Two-sided marketplace / liquidity at scale | **Not evidenced** — candidate-led corpus |
 | Employer SSO / RBAC | **Token pilot only** |
 | Anonymized B2B talent pool browse for recruiters | **Design + candidate opt-in copy** — no recruiter browse UI evidenced |

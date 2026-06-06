@@ -21,6 +21,11 @@ export default function WorkspaceRecruiterPage() {
             description: "workspace.toolRecruiterJobs",
           },
           {
+            href: "/recruiter/calendar",
+            label: "recruiterCalendar.title",
+            description: "workspace.toolRecruiterCalendar",
+          },
+          {
             href: "/recruiter/integrations/ats",
             label: "atsIntegrations.title",
             description: "workspace.toolRecruiterAts",

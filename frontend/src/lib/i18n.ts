@@ -111,6 +111,7 @@ export type TranslationKey =
   | `acceptanceQueue.${keyof typeof en.acceptanceQueue}`
   | `recruiterInbox.${keyof typeof en.recruiterInbox}`
   | `recruiterJobs.${keyof typeof en.recruiterJobs}`
+  | `recruiterCalendar.${keyof typeof en.recruiterCalendar}`
   | `verifyEmail.${keyof typeof en.verifyEmail}`
   | `investorMetrics.${keyof typeof en.investorMetrics}`
   | `investorFundraising.${keyof typeof en.investorFundraising}`
@@ -1546,6 +1547,7 @@ const en = {
     investorHomeLead: "Fund-style scenario model and metrics — separate from Companies procurement pricing.",
     toolRecruiterInbox: "Review pre-qualified candidates for one company slug.",
     toolRecruiterJobs: "Publish employer job listings tied to your company slug.",
+    toolRecruiterCalendar: "Roadmap placeholder — recruiter calendar sync is not live yet.",
     toolRecruiterB2b: "Illustrative fee model for client conversations.",
     toolRecruiterStory: "How TWIN works for recruiting teams (marketing).",
     toolRecruiterAts: "Greenhouse, Lever, Ashby hire webhooks → verified placement.",
@@ -2122,6 +2124,23 @@ const en = {
       "Application review context: candidate names and profile match data are visible so you can decide on interview slots. Email, phone, and full CV text are not shown in this inbox.",
     dataVisibilityContextLabel: "Data visibility",
   },
+  recruiterCalendar: {
+    eyebrow: "Roadmap",
+    title: "Recruiter calendar",
+    lead:
+      "TWIN’s north star is a short calendar of acceptance-ready interviews — for candidates and recruiters. The recruiter-side calendar view is not live in this pilot yet.",
+    notLiveTitle: "Not live in this environment",
+    notLiveBody:
+      "Google and Microsoft calendar sync on this page is for candidates only today. Recruiter propose-slot, team holds, and Outlook/Teams integration are on the roadmap — not shipped.",
+    roadmapItem1: "Acceptance inbox and match review card — live today.",
+    roadmapItem2: "Recruiter-proposed interview slots + calendar sync — roadmap.",
+    roadmapItem3: "Employer SSO and ATS webhooks — pilot scope only.",
+    pilotHint:
+      "Use the acceptance inbox to decide who gets an interview slot. Calendar export for recruiters will follow once pilot feedback is clear.",
+    linkInboxDesc: "Pre-qualified queue with match score and human accept/decline.",
+    linkJobsDesc: "Post roles so future matches can enter your queue.",
+    linkStoryDesc: "What is live vs roadmap for the recruiter pilot.",
+  },
   acceptanceQueue: {
     stripTitle: "Acceptance queue",
     stripCta: "Review slots",
@@ -2528,6 +2547,7 @@ const en = {
     titleProfile: "Profile · TWIN",
     titleDashboard: "Dashboard · TWIN",
     titleDashboardCalendar: "Calendars · TWIN",
+    titleRecruiterCalendar: "Recruiter calendar · TWIN",
     titlePrivacy: "Privacy · TWIN",
     titleTerms: "Terms of Service · TWIN",
     titleForgotPassword: "Forgot password · TWIN",
@@ -4404,6 +4424,7 @@ const pl: MessageTree = {
     investorHomeLead: "Model scenariusza i metryki — oddzielnie od cennika Firm (procurement).",
     toolRecruiterInbox: "Przegląd pre-kwalifikowanych kandydatów dla jednego slug firmy.",
     toolRecruiterJobs: "Publikuj ogłoszenia pracodawcy powiązane ze slugiem firmy.",
+    toolRecruiterCalendar: "Placeholder roadmapy — sync kalendarza rekrutera nie jest jeszcze live.",
     toolRecruiterB2b: "Ilustracyjny model opłat do rozmów z klientem.",
     toolRecruiterStory: "Jak TWIN działa dla zespołów rekrutacyjnych (marketing).",
     toolRecruiterAts: "Webhooki Greenhouse, Lever, Ashby → zweryfikowany placement.",
@@ -4982,6 +5003,23 @@ const pl: MessageTree = {
       "Kontekst przeglądu aplikacji: widać imiona kandydatów i dane dopasowania profilu, abyś mógł/mogła zdecydować o slotach na rozmowę. E-mail, telefon i pełny tekst CV nie są pokazywane w tej skrzynce.",
     dataVisibilityContextLabel: "Widoczność danych",
   },
+  recruiterCalendar: {
+    eyebrow: "Roadmapa",
+    title: "Kalendarz rekrutera",
+    lead:
+      "North star TWIN to krótki kalendarz rozmów gotowych do akceptacji — dla kandydatów i rekruterów. Widok kalendarza po stronie rekrutera nie jest jeszcze live w tym pilotażu.",
+    notLiveTitle: "Nie jest live w tym środowisku",
+    notLiveBody:
+      "Synchronizacja Google i Microsoft na tej stronie dotyczy dziś tylko kandydatów. Propozycje slotów przez rekrutera, holdy zespołowe i integracja Outlook/Teams to roadmapa — nieshipowane.",
+    roadmapItem1: "Skrzynka akceptacji i karta oceny — live dziś.",
+    roadmapItem2: "Sloty proponowane przez rekrutera + sync kalendarza — roadmapa.",
+    roadmapItem3: "SSO pracodawcy i webhooki ATS — tylko zakres pilotażu.",
+    pilotHint:
+      "Użyj skrzynki akceptacji, aby zdecydować, kto dostaje slot na rozmowę. Eksport kalendarza dla rekruterów pojawi się po zebraniu feedbacku z pilotażu.",
+    linkInboxDesc: "Kolejka pre-kwalifikowana z wynikiem dopasowania i akceptuj/odrzuć.",
+    linkJobsDesc: "Publikuj role, aby przyszłe dopasowania trafiały do kolejki.",
+    linkStoryDesc: "Co jest live, a co roadmapą w pilotażu rekrutera.",
+  },
   acceptanceQueue: {
     stripTitle: "Kolejka akceptacji",
     stripCta: "Przejrzyj sloty",
@@ -5392,6 +5430,7 @@ const pl: MessageTree = {
     titleProfile: "Profil · TWIN",
     titleDashboard: "Panel · TWIN",
     titleDashboardCalendar: "Kalendarze · TWIN",
+    titleRecruiterCalendar: "Kalendarz rekrutera · TWIN",
     titlePrivacy: "Prywatność · TWIN",
     titleTerms: "Regulamin · TWIN",
     titleForgotPassword: "Reset hasła · TWIN",
