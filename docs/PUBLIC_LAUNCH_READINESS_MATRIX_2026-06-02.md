@@ -349,9 +349,23 @@ Monitor Railway `csp_report` for **24h** after enforce deploy (`2026-06-05T16:20
 
 ---
 
+## N — Limited recruiter pilot pack (2026-06-06)
+
+- **Doc:** `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md`
+- **Tracker:** `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md`
+- **Invites:** `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md`
+- **Scope:** 3–5 **named** recruiters; invite-only token inbox; PL+EN talk track + 5–7 min demo script
+- **Verdict:** **PACK READY** — **READY FOR FOUNDER DECISION**; cohort **0/3–5** invited
+- **Launch impact:** **No change** to public **NO-GO**; does **not** enable auto-apply, delegated submit, or public recruiter GTM
+
+---
+
 ## Related docs
 
 - `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md`
+- `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md`
+- `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md`
+- `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md`
 - `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md`
 - `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md`
 - `docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md`

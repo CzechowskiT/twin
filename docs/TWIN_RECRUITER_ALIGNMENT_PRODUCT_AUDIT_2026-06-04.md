@@ -466,7 +466,7 @@ Reference: `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md`
 ### Days 0–30
 
 - [x] Inbox API: add `match_score` + `match_reasons[]` (read-only). **2026-06-06**
-- [ ] Recruiter invite brief updated with PII policy (`CONTROLLED_PILOT_INVITE_BRIEF`).
+- [x] Recruiter invite brief updated with PII policy (`CONTROLLED_PILOT_INVITE_BRIEF` + `LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md`). **2026-06-06**
 - [ ] Homepage recruiter CTA → `/for-recruiters` + `/contact` (verify links in smoke).
 - [ ] Founder demo script: 2 min recruiter inbox path.
 

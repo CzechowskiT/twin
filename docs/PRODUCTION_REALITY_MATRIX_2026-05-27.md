@@ -67,6 +67,7 @@
 | Postgres | `db_ok=true`; **`postgres-volume` active** | **LIVE / STABLE** — stabilization passed; `market_coverage_active_validated=2551` (read-only curl) |
 | Backup restore drill | O7 gate | **LIVE / PASS** — staging clone drill 2026-06-01; pg_dump/pg_restore; prod untouched |
 | Controlled pilot ops | pilot manual + tracker | **LIVE** — resume after recovery verified (founder dashboard non-zero) |
+| Limited recruiter pilot pack (3–5 named) | `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md` + tracker + invites; R1–R4 PASS | **READY FOR FOUNDER DECISION** — pack complete; cohort not yet invited; public **NO-GO** |
 | Candidate E2E manual smoke | `docs/CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md` | **LIVE** — PASS (founder-verified, 2026-05-27); Top 20 → Nietrafione → refresh regression. Warning: no auto-apply / real apply / scrape. |
 | Founder authenticated route smoke (dashboard subpages, jobs, profile, safety copy) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **LIVE** — **PASS** (founder 2026-05-29); 8/8 routes + safety copy; `/dashboard` layout PASS |
 | Playwright smoke drift points | `frontend/e2e/smoke.spec.ts` targeted assertions | **STABILIZED** — status cookie-banner locator fix on branch; 13/14 prod lane PASS (2026-05-29) |
@@ -136,6 +137,9 @@
 ## Related
 
 - `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` — R1–R4 PASS `2026-06-06T16:07:18Z` · recruiter demo queue PASS
+- `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md` — 3–5 named recruiter pilot pack (docs only)
+- `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md` — cohort tracker + rubric
+- `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` — PL/EN outbound templates
 - `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md`
 - `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md`
 - `docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md`

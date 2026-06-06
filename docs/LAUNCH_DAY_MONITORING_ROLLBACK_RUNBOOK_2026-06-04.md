@@ -20,7 +20,7 @@
 
 | Dimension | In scope today | Out of scope (hard ban) |
 | --------- | -------------- | ------------------------ |
-| **Audience** | ≤20 named pilot users (`docs/PILOT_TRACKER.csv`); curated investor/CTO demo | Public announcement (LinkedIn, X, PressOn); uncontrolled signup spike |
+| **Audience** | ≤20 named pilot users (`docs/PILOT_TRACKER.csv`); **3–5 named recruiters** (`docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md`); curated investor/CTO demo | Public announcement (LinkedIn, X, PressOn); uncontrolled signup spike |
 | **Stack** | Same prod FE + API URLs above | Staging-only shortcuts; “demo” DB |
 | **CSP** | Enforce **ON** on prod since PR #32 @ `6862999`; post-enforce smoke **PASS** `2026-06-05T16:20:13Z`; **24h monitoring** active | Rollback to Report-Only per `docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md` § Rollback plan |
 | **Auto-apply** | Server gates live; nightly beat **disabled**; no mass autonomous apply | Nightly sweep on; `AUTO_APPLY_SUBMIT` enable without founder approval; ops trigger-sweep without allowlist |
@@ -74,7 +74,7 @@ All times relative to **first pilot user session** or **investor demo start** (w
 
 | # | Check | Pass criterion |
 | - | ----- | -------------- |
-| 11 | Pilot roster | `docs/PILOT_TRACKER.csv` — today's users named | No unknown email invites |
+| 11 | Pilot roster | `docs/PILOT_TRACKER.csv` — today's users named; recruiter cohort `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md` if onboarding recruiters | No unknown email invites |
 | 12 | Auto-apply stance | `docs/AUTO_APPLY_PRODUCTION_OPS_PAUSE_PLAN_2026-06-02.md` §1 | Beat disabled; delegated false in code |
 | 13 | Calendar smoke (if demo includes calendar) | `docs/GOOGLE_CALENDAR_OAUTH_PROD_FIX_2026-05-29.md` | Google path known-good; Apple = ICS/WebCal only |
 | 14 | DSR path | `docs/GDPR_MANUAL_DSR.md` | Erasure = manual; export self-service OK |
@@ -394,6 +394,9 @@ Monitor Railway `csp_report` for **24h** after enforce deploy (`2026-06-05T16:20
 | `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md` | Marketing claim safety |
 | `docs/INCIDENT_RESPONSE_RUNBOOK_2026-05-27.md` | S0–S3 incident procedures |
 | `docs/CONTROLLED_PILOT_OPERATING_MANUAL_2026-05-27.md` | Daily pilot rhythm |
+| `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md` | 3–5 named recruiter pilot — talk track + demo |
+| `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md` | Recruiter cohort tracker |
+| `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` | Outbound templates (no secrets) |
 | `docs/S2_CSP_BURNIN_WINDOW_2026-06-01.md` | Active burn-in window |
 | `docs/AUTO_APPLY_PRODUCTION_OPS_PAUSE_PLAN_2026-06-02.md` | Pause options |
 | `docs/GDPR_MANUAL_DSR.md` | Manual erasure |

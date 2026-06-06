@@ -113,5 +113,8 @@ Never expose configuration key names in API responses or UI.
 
 - `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` — config readiness + founder smoke (R1–R4 PASS `2026-06-06T16:07:18Z`)
 - `backend/app/services/recruiter_match_explanations.py` — deterministic reasons  
-- `docs/CONTROLLED_PILOT_OPERATING_MANUAL_2026-05-27.md` — spam playbook (now can cite inbox `match_score`)  
+- `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md` — limited recruiter pilot pack (3–5 named)
+- `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md` — cohort tracker + rubric
+- `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` — PL/EN outbound templates
+- `docs/CONTROLLED_PILOT_OPERATING_MANUAL_2026-05-27.md` — spam playbook (now can cite inbox `match_score`)
 - `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md`
