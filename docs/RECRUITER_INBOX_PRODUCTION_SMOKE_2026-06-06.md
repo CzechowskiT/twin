@@ -153,11 +153,13 @@ No prod curl with tokens in agent session.
 
 ## Related
 
-- `docs/RECRUITER_DEMO_PATH_2026-06-06.md` — 2–3 min investor demo script  
-- `docs/RECRUITER_INBOX.md` — product + API overview (operator env names — not for public copy)  
-- `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md` — verdict **C)** recruiter-supporting  
-- `docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md` — public **NO-GO**  
-- `docs/PRODUCTION_REALITY_MATRIX_2026-05-27.md` — capability row  
+- `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md` — full pilot pack (talk track, objections, onboarding)
+- `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` — outbound templates
+- `docs/RECRUITER_DEMO_PATH_2026-06-06.md` — 2–3 min investor demo script
+- `docs/RECRUITER_INBOX.md` — product + API overview (operator env names — not for public copy)
+- `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md` — verdict **C)** recruiter-supporting
+- `docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md` — public **NO-GO**
+- `docs/PRODUCTION_REALITY_MATRIX_2026-05-27.md` — capability row
 - `frontend/src/lib/recruiter-inbox-errors.ts` — stable error codes  
 - `frontend/src/lib/recruiter-inbox-api-route.ts` — shared `/api/recruiter/*` gate
 
