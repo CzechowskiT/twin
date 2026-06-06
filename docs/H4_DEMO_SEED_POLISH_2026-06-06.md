@@ -91,6 +91,24 @@ python3 scripts/ensure-recruiter-inbox-demo.py
 
 ---
 
+## 10 — Production seed run (founder-approved)
+
+| Item | Value |
+| ---- | ----- |
+| UTC | `2026-06-06T17:09:24Z` |
+| Command | `bash scripts/ops-refresh-recruiter-inbox.sh "Nova Hiring PL"` |
+| Scope | Nova Hiring PL only · synthetic demo candidates · `ensure_recruiter_inbox_demo` via ops API |
+| Pre-seed health | `GET /api/public-health` **200** · `db_ok: true` · `recruiter_inbox_configured: true` |
+| Post-seed health | `GET /api/public-health` **200** · unchanged |
+| Ops summary | `queue_size: 5` · `inbox_applied: 3` · `inbox_before_total: 2` · `inbox_after_total: 6` · `created: 8` · `updated: 1` |
+| Canonical queue verified | **Partial** — ops metrics match H4 pattern (5 specs, 3 applied); `inbox_after_total: 6` suggests one legacy Nova Hiring PL row — **founder visual smoke required** for all five names + statuses |
+| Railway restart | **No** |
+| Secrets in output/docs | **None** |
+
+**Hard bans confirmed:** no migration · no env changes · no scrape/apply/sweep · no accept/decline after seed · no real users · public **NO-GO** · auto-apply **PAUSED** · delegated **NOT LIVE**
+
+---
+
 ## 7 — Related docs updated
 
 - `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md`

@@ -239,3 +239,22 @@ No prod curl with tokens in agent session.
 | `npm run lint` + `tsc --noEmit` | **PASS** |
 
 **Hard bans confirmed:** no env/secrets, DB migrations, CSP policy changes, auth weakening, auto-apply/delegated enablement, public GO, or production mutations with tokens in this lane.
+
+---
+
+# H4 production demo seed — ops refresh (2026-06-06)
+
+**UTC:** `2026-06-06T17:09:24Z`  
+**Command:** `bash scripts/ops-refresh-recruiter-inbox.sh "Nova Hiring PL"` (scoped ops endpoint — no full investor seed, no password reset)  
+**Founder approval:** confirmed before run
+
+| Check | Result | Notes |
+| ----- | ------ | ----- |
+| Pre/post `GET /api/public-health` | **200** | `db_ok: true` · `recruiter_inbox_configured: true` |
+| Ops `queue_size` | **5** | Canonical H4 spec count |
+| Ops `inbox_applied` | **3** | Matches Marta / Piotr / Ewa applied rows |
+| Ops `inbox_after_total` | **6** | Possible legacy row — founder confirm filter **All statuses** shows exactly five canonical names |
+| Name/status API verify | **Deferred** | Local ops token OK; recruiter inbox token in repo copy stale vs prod — use founder pilot code in UI |
+| Accept/decline after seed | **Not run** | Per operator scope |
+
+**Founder visual smoke required:** load `/recruiter/inbox?company_slug=nova-hiring-pl` and confirm Alex (excellent, interview), Marta (good, applied), Piotr (possible, applied), Ewa (weak, applied), Jan (good, rejected). See `docs/H4_DEMO_SEED_POLISH_2026-06-06.md` §10.
