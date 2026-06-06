@@ -1,8 +1,9 @@
 # Recruiter demo path — 2026-06-06
 
-**Branch:** `chore/recruiter-alignment-inbox-match-reasons-2026-06-06`  
-**Audience:** Founder / investor / named pilot recruiter (2–3 min)  
+**Branch:** `cursor/phase1-monorepo-scaffold`
+**Audience:** Founder / investor / named pilot recruiter (2–3 min)
 **Launch stance:** Public **NO-GO** · pilot **GO** · auto-apply **PAUSED** · delegated **NOT LIVE**
+**Production smoke:** `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` — access UX ✅ **PASS** · queue ⏳ **PENDING** (pilot token not on prod)
 
 ---
 
@@ -83,31 +84,33 @@ Documented in audit `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md` 
 
 ## Production recruiter inbox smoke prerequisites
 
-Before demoing `/recruiter/inbox` on **production** (Vercel + Railway), verify all of the following — otherwise users see friendly **“inbox not available”** copy, not raw config errors:
+**Full checklist + founder steps:** `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md`
 
-| Prerequisite | Where | Smoke check |
-| ------------ | ----- | ----------- |
-| `RECRUITER_INBOX_TOKEN` set on **Vercel** (frontend server routes) | Vercel project env | Load queue with valid pilot code → not HTTP 503 `recruiter_inbox_unavailable` |
-| Same token on **Railway** (FastAPI) | Railway service env | `GET /health` → `recruiter_inbox_configured: true` |
-| `NEXT_PUBLIC_API_URL` / upstream base configured on Vercel | Vercel env | Proxy reaches Railway; not 503 unavailable |
-| Demo company seeded (`nova-hiring-pl` or pilot slug) | Railway Postgres | Queue loads (may be empty — that is OK) |
-| Optional: `NEXT_PUBLIC_RECRUITER_INBOX_DEMO_*` for founder-only previews | Vercel env | Pre-fills access form; not required for named pilots |
+| Smoke | Status (2026-06-06) |
+| ----- | ------------------- |
+| **R1 Access UX** — friendly PL/EN unavailable copy; no raw JSON | ✅ **PASS** (founder) |
+| **R2 Config** — pilot token on frontend + API; `recruiter_inbox_configured: true` | ⏳ **PENDING** |
+| **R3 Queue** — load queue with valid pilot code | ⏳ **PENDING** (blocked on R2) |
+| **R4 Accept / decline** | ⏳ **PENDING** (blocked on R3) |
+
+Before a live prod demo, complete config checklist **C1–C4** in the smoke doc — otherwise users see friendly **“inbox not available”** copy (expected until R2 passes), not raw config errors.
 
 **User-visible error mapping (EN/PL via i18n):**
 
 | Condition | API `detail` | UI message |
 | --------- | ------------ | ---------- |
-| Token/env not configured | `recruiter_inbox_unavailable` | Inbox not available in this environment |
+| Pilot token not configured | `recruiter_inbox_unavailable` | Inbox not available in this environment |
 | Wrong access code | `recruiter_inbox_invalid_token` | Access code did not match |
 | Empty queue (valid auth) | *(200, `items: []`)* | “No applications waiting…” |
 | Browser/network failure | *(no JSON)* | Network error — retry |
 
-Never expose env var names (`RECRUITER_INBOX_TOKEN`, etc.) in API responses or UI.
+Never expose configuration key names in API responses or UI.
 
 ---
 
 ## Related
 
+- `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` — config readiness + founder smoke (access UX PASS, queue pending)
 - `backend/app/services/recruiter_match_explanations.py` — deterministic reasons  
 - `docs/CONTROLLED_PILOT_OPERATING_MANUAL_2026-05-27.md` — spam playbook (now can cite inbox `match_score`)  
 - `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md`

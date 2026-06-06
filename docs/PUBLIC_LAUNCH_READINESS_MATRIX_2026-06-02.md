@@ -266,7 +266,7 @@
 | Auto-apply | **PAUSED** |
 | Delegated apply | **NOT LIVE** |
 | L6 / O5 | Waivers signed `2026-06-03T13:19:53Z` |
-| Recruiter audit | Verdict **C** (candidate-first, recruiter-supporting); inbox match reasons **shipped 2026-06-06** |
+| Recruiter audit | Verdict **C**; match reasons **shipped 2026-06-06**; **access UX PASS** · **queue smoke PENDING** (`docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md`) |
 
 **Decision:** S2 post-enforce smoke **PASS** · 24h CSP monitor **CONTINUE** (2026-06-06: brak świeżych `csp_report`)
 
@@ -345,7 +345,7 @@ Monitor Railway `csp_report` for **24h** after enforce deploy (`2026-06-05T16:20
 - **Verdict:** **C) candidate-first, recruiter-supporting** — not **D) two-sided**; not recruiter-hostile
 - **Evidence:** Recruiter inbox + batch accept/decline **LIVE** (token pilot); auto-apply **PAUSED** + delegated **NOT LIVE**; marketing recruiter SKU (watchlists/HM packets) **mostly not shipped**
 - **Launch impact:** **No change** to public **NO-GO** or pilot **GO**; recruiter sales must not claim unshipped SKU; inbox PII + match explainability gaps flagged for 0–30d roadmap
-- **Pilot/demo:** Safe to demo inbox with honest pilot framing per audit §13–14; verify **production smoke prerequisites** (`docs/RECRUITER_DEMO_PATH_2026-06-06.md` § Production recruiter inbox smoke prerequisites) before live recruiter demos
+- **Pilot/demo:** Safe to demo inbox **script** with honest pilot framing per audit §13–14; **production smoke** `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` — **access UX PASS** (2026-06-06); **queue smoke PENDING** until pilot token configured on prod; full live queue demo **not** until **R2–R4** green
 
 ---
 

@@ -54,7 +54,7 @@
 | OAuth callback rate limits | `1efd8b1` | **LIVE** |
 | Job save/unsave rate limits | `1efd8b1` | **LIVE** |
 | Cookie consent + recruiter inbox rate limits | `67a22dc` | **LIVE** |
-| Recruiter inbox | `recruiter_inbox_configured`; token auth; batch accept/decline; **match_score + reasons on rows (2026-06-06)**; **safe access errors (no env names in UI, 2026-06-06)** — audit **C) recruiter-supporting** | **LIVE** (pilot) |
+| Recruiter inbox | Token auth; batch accept/decline; **match_score + reasons (2026-06-06)**; **access UX smoke PASS** — friendly PL/EN errors, no raw JSON (`docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` **R1**); **queue smoke PENDING** — pilot token not on prod (`recruiter_inbox_configured` false until configured) — audit **C) recruiter-supporting** | **PARTIAL** — access UX **LIVE**; full queue demo **blocked** on config |
 | Recruiter marketing SKU (watchlists, HM packets, seat packs) | `persona-pages.ts` recruiters bundle | **REPO / MARKETING** — not evidenced as shipped app beyond inbox/jobs |
 | Partner export | `partner_export_configured` | **LIVE** |
 | Placement verification (machine-assisted) | `PLACEMENT_VERIFICATION.md` | **LIVE** design; pilot-scale |
@@ -135,6 +135,7 @@
 
 ## Related
 
+- `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` — access UX PASS · queue smoke PENDING
 - `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md`
 - `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md`
 - `docs/PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md`
