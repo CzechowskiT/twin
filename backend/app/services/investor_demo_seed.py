@@ -31,6 +31,9 @@ DEMO_JOB_PREFIX = "investor-demo-"
 DEMO_APPLY_JOB_EXTERNAL_ID = f"{DEMO_JOB_PREFIX}python-lead"
 DEFAULT_DEMO_EMAIL = "demo@twin.career"
 DEMO_RECRUITER_COMPANY = "Nova Hiring PL"
+DEMO_RECRUITER_EMAIL_DOMAIN = "twin.career"
+# Synthetic inbox-only accounts — not for login; recruiter demo queue only.
+_DEMO_RECRUITER_PLACEHOLDER_PASSWORD = "synthetic-recruiter-demo-inbox-only"
 
 CV_TEXT = """\
 Alex Kowalski — Senior Python Engineer
@@ -47,6 +50,92 @@ Experience:
 Education: MSc Computer Science, Warsaw University of Technology.
 Languages: Polish (native), English (C1).
 """
+
+RECRUITER_DEMO_QUEUE_SPECS: list[dict[str, object]] = [
+    {
+        "key": "alex",
+        "use_main_demo_user": True,
+        "name": "Alex Kowalski (demo)",
+        "skills": ["python", "fastapi", "postgresql", "celery", "redis", "docker", "pytest"],
+        "preferred_job_titles": ["Senior Python Developer", "Staff Backend Engineer"],
+        "experience_years": 8,
+        "desired_salary": 28000,
+        "location": "Warsaw",
+        "cv_text": CV_TEXT,
+        "match_score": 96.0,
+        "expected_label": "excellent",
+        "status": ApplicationStatus.INTERVIEW,
+        "notes": "Investor demo — recruiter batch inbox (accepted for interview)",
+    },
+    {
+        "key": "marta",
+        "email": f"marta-nova-demo@{DEMO_RECRUITER_EMAIL_DOMAIN}",
+        "name": "Marta Nowak (demo)",
+        "skills": ["python", "fastapi", "postgresql", "docker", "pytest", "sqlalchemy"],
+        "preferred_job_titles": ["Senior Python Developer", "Backend Engineer"],
+        "experience_years": 6,
+        "desired_salary": None,
+        "location": "Warsaw",
+        "cv_text": (
+            "Marta Nowak — Backend Engineer\n"
+            "6 years Python/FastAPI; PostgreSQL and Docker in production.\n"
+            "Salary expectations not listed on profile (verify in screen)."
+        ),
+        "match_score": 74.0,
+        "expected_label": "good",
+        "status": ApplicationStatus.APPLIED,
+        "notes": "Investor demo — recruiter batch inbox (salary missing)",
+    },
+    {
+        "key": "piotr",
+        "email": f"piotr-nova-demo@{DEMO_RECRUITER_EMAIL_DOMAIN}",
+        "name": "Piotr Zieliński (demo)",
+        "skills": ["python", "django", "postgresql", "javascript"],
+        "preferred_job_titles": ["Python Developer"],
+        "experience_years": 4,
+        "desired_salary": 25000,
+        "location": "Kraków",
+        "cv_text": (
+            "Piotr Zieliński — Python Developer\n"
+            "4 years Django/PostgreSQL; limited FastAPI/Celery exposure."
+        ),
+        "match_score": 52.0,
+        "expected_label": "possible",
+        "status": ApplicationStatus.APPLIED,
+        "notes": "Investor demo — recruiter batch inbox (seniority gaps)",
+    },
+    {
+        "key": "ewa",
+        "email": f"ewa-nova-demo@{DEMO_RECRUITER_EMAIL_DOMAIN}",
+        "name": "Ewa Wiśniewska (demo)",
+        "skills": [],
+        "preferred_job_titles": [],
+        "experience_years": 2,
+        "desired_salary": None,
+        "location": "",
+        "cv_text": "",
+        "match_score": 32.0,
+        "expected_label": "weak",
+        "status": ApplicationStatus.APPLIED,
+        "notes": "Investor demo — recruiter batch inbox (incomplete profile)",
+    },
+    {
+        "key": "jan",
+        "email": f"jan-nova-demo@{DEMO_RECRUITER_EMAIL_DOMAIN}",
+        "name": "Jan Kaczor (demo)",
+        "skills": ["python", "fastapi", "redis"],
+        "preferred_job_titles": ["Python Developer"],
+        "experience_years": 5,
+        "desired_salary": 30000,
+        "location": "Warsaw",
+        "cv_text": "Jan Kaczor — Python backend; solid overlap but declined in prior demo.",
+        "match_score": 68.0,
+        "expected_label": "good",
+        "status": ApplicationStatus.REJECTED,
+        "recruiter_feedback": "Not senior enough for this quarter — demo decline row",
+        "notes": "Investor demo — recruiter batch inbox (declined)",
+    },
+]
 
 DEMO_JOBS: list[dict[str, object]] = [
     {
@@ -393,65 +482,156 @@ def _is_recruiter_demo_application(app: Application, job: Job) -> bool:
     return "demo" in notes or "investor demo" in notes
 
 
+def _upsert_recruiter_demo_user(db: Session, *, email: str) -> User:
+    """Synthetic recruiter-demo user — inbox seed only, not for candidate login."""
+    now = _now()
+    user = db.execute(select(User).where(User.email == email)).scalar_one_or_none()
+    if user is None:
+        user = User(
+            email=email,
+            hashed_password=hash_password(_DEMO_RECRUITER_PLACEHOLDER_PASSWORD),
+            is_active=True,
+        )
+        db.add(user)
+    user.gdpr_consent_at = user.gdpr_consent_at or now
+    user.terms_of_service_accepted_at = user.terms_of_service_accepted_at or now
+    user.job_data_processing_consent_at = user.job_data_processing_consent_at or now
+    user.ai_matching_consent_at = user.ai_matching_consent_at or now
+    db.flush()
+    return user
+
+
+def _upsert_recruiter_demo_candidate(db: Session, user: User, spec: dict[str, object]) -> Candidate:
+    """Upsert one Nova Hiring PL recruiter-demo candidate profile."""
+    now = _now()
+    cand = db.execute(select(Candidate).where(Candidate.user_id == user.id)).scalar_one_or_none()
+    if cand is None:
+        cand = Candidate(user_id=user.id, name=str(spec["name"]))
+        db.add(cand)
+    cand.name = str(spec["name"])
+    skills = spec.get("skills") or []
+    titles = spec.get("preferred_job_titles") or []
+    cand.skills = json.dumps(list(skills))
+    cand.preferred_job_titles = json.dumps(list(titles))
+    cand.experience_years = int(spec.get("experience_years") or 0)
+    desired = spec.get("desired_salary")
+    cand.desired_salary = int(desired) if desired is not None else None
+    cand.location = str(spec.get("location") or "")
+    cv_text = str(spec.get("cv_text") or "")
+    cand.cv_text = cv_text or None
+    cand.cv_filename = "investor-demo-recruiter-cv.txt" if cv_text else None
+    cand.cv_uploaded_at = now if cv_text else None
+    db.flush()
+    return cand
+
+
+def upsert_recruiter_demo_queue(
+    db: Session,
+    *,
+    company: str = DEMO_RECRUITER_COMPANY,
+) -> dict[str, int | str | list[str]]:
+    """Idempotent Nova Hiring PL recruiter inbox queue with varied match levels."""
+    now = _now()
+    upsert_demo_jobs(db)
+    primary = db.execute(
+        select(Job).where(Job.external_id == DEMO_APPLY_JOB_EXTERNAL_ID)
+    ).scalar_one_or_none()
+    if primary is None or primary.company != company:
+        jobs = list(
+            db.execute(
+                select(Job).where(Job.company == company, Job.is_validated.is_(True)).order_by(Job.id)
+            ).scalars()
+        )
+        primary = jobs[0] if jobs else None
+    if primary is None:
+        return {"company": company, "created": 0, "updated": 0, "candidate_keys": []}
+
+    created = 0
+    updated = 0
+    keys: list[str] = []
+    for spec in RECRUITER_DEMO_QUEUE_SPECS:
+        key = str(spec["key"])
+        keys.append(key)
+        if spec.get("use_main_demo_user"):
+            user = db.execute(select(User).where(User.email == demo_email_from_env())).scalar_one_or_none()
+            if user is None:
+                continue
+        else:
+            email = str(spec.get("email") or f"{key}-nova-demo@{DEMO_RECRUITER_EMAIL_DOMAIN}")
+            user = _upsert_recruiter_demo_user(db, email=email.lower())
+        cand = _upsert_recruiter_demo_candidate(db, user, spec)
+        score = float(spec.get("match_score", 70.0))
+        match_row = db.execute(
+            select(JobMatch).where(
+                JobMatch.candidate_id == cand.id,
+                JobMatch.job_id == primary.id,
+            )
+        ).scalar_one_or_none()
+        if match_row is None:
+            db.add(JobMatch(candidate_id=cand.id, job_id=primary.id, score=score))
+            created += 1
+        else:
+            match_row.score = score
+            updated += 1
+
+        target_status = spec["status"]
+        if not isinstance(target_status, ApplicationStatus):
+            target_status = ApplicationStatus(str(target_status))
+        app = db.execute(
+            select(Application).where(
+                Application.candidate_id == cand.id,
+                Application.job_id == primary.id,
+            )
+        ).scalar_one_or_none()
+        if app is None:
+            app = Application(
+                candidate_id=cand.id,
+                job_id=primary.id,
+                status=target_status,
+                applied_at=now,
+                notes=str(spec.get("notes") or "Investor demo — recruiter batch inbox"),
+                auto_applied=False,
+            )
+            db.add(app)
+            created += 1
+        else:
+            if app.status != target_status:
+                updated += 1
+            app.status = target_status
+            app.applied_at = app.applied_at or now
+            app.notes = str(spec.get("notes") or app.notes or "Investor demo — recruiter batch inbox")
+            app.auto_applied = False
+            feedback = str(spec.get("recruiter_feedback") or "").strip()
+            if feedback and target_status == ApplicationStatus.REJECTED:
+                app.recruiter_feedback_raw = feedback[:2000]
+            elif target_status != ApplicationStatus.REJECTED:
+                app.recruiter_feedback_raw = None
+    db.flush()
+    return {
+        "company": company,
+        "created": created,
+        "updated": updated,
+        "candidate_keys": keys,
+        "queue_size": len(keys),
+    }
+
+
 def ensure_recruiter_inbox_demo(
     db: Session,
     *,
     company: str = DEMO_RECRUITER_COMPANY,
 ) -> dict[str, int | str]:
-    """Reset/create APPLIED rows for recruiter batch inbox (idempotent; safe on prod)."""
-    now = _now()
-    upsert_demo_jobs(db)
-    jobs = list(
-        db.execute(
-            select(Job)
-            .where(Job.company == company, Job.is_validated.is_(True))
-            .order_by(Job.id)
-        ).scalars()
-    )
-    reset = 0
-    created = 0
-    for job in jobs:
-        apps = list(
-            db.execute(select(Application).where(Application.job_id == job.id)).scalars()
-        )
-        for app in apps:
-            if app.status not in (ApplicationStatus.APPLIED, ApplicationStatus.INTERVIEW):
-                continue
-            if app.status == ApplicationStatus.INTERVIEW and _is_recruiter_demo_application(app, job):
-                app.status = ApplicationStatus.APPLIED
-                app.applied_at = app.applied_at or now
-                reset += 1
-    primary = next((j for j in jobs if j.external_id == DEMO_APPLY_JOB_EXTERNAL_ID), jobs[0] if jobs else None)
-    demo_user = db.execute(select(User).where(User.email == demo_email_from_env())).scalar_one_or_none()
-    if demo_user and primary is not None:
-        demo_cand = db.execute(
-            select(Candidate).where(Candidate.user_id == demo_user.id)
-        ).scalar_one_or_none()
-        if demo_cand is not None:
-            row = db.execute(
-                select(Application).where(
-                    Application.candidate_id == demo_cand.id,
-                    Application.job_id == primary.id,
-                )
-            ).scalar_one_or_none()
-            if row is None:
-                db.add(
-                    Application(
-                        candidate_id=demo_cand.id,
-                        job_id=primary.id,
-                        status=ApplicationStatus.APPLIED,
-                        applied_at=now,
-                        notes="Investor demo — recruiter batch inbox",
-                        auto_applied=False,
-                    )
-                )
-                created += 1
-            elif row.status != ApplicationStatus.APPLIED:
-                row.status = ApplicationStatus.APPLIED
-                row.applied_at = row.applied_at or now
-                reset += 1
-    db.flush()
-    return {"company": company, "reset_to_applied": reset, "created": created}
+    """Restore canonical recruiter demo queue (idempotent; safe on prod)."""
+    summary = upsert_recruiter_demo_queue(db, company=company)
+    created = int(summary.get("created", 0))
+    updated = int(summary.get("updated", 0))
+    return {
+        "company": company,
+        "reset_to_applied": 0,
+        "created": created,
+        "updated": updated,
+        "queue_size": int(summary.get("queue_size", 0)),
+    }
 
 
 def ensure_demo_placement_verified(db: Session, *, application_id: int | None = None) -> dict[str, int | bool]:

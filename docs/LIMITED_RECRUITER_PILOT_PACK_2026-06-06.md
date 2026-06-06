@@ -18,7 +18,7 @@ TWIN invites **3–5 named recruiters** into a **limited, founder-led pilot** to
 
 Production recruiter inbox smoke **R1–R5 PASS** (R1–R4 `2026-06-06T16:07:18Z`; **R5 Match Receipt** `2026-06-06T16:38:40Z`). This is **not** public launch, **not** a two-sided marketplace claim, and **not** permission to enable auto-apply or delegated submit.
 
-**Founder decision required:** Approve outbound to named recruiters **only after** pre-pilot hardening — **H1–H3 shipped 2026-06-06** (`docs/PII_CONSENT_RECEIPT_AUDIT_2026-06-06.md`); remaining **H4 demo seed polish** — then use `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` and track outcomes in `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md`.
+**Founder decision required:** Approve outbound to named recruiters **only after** pre-pilot hardening — **H1–H4 shipped 2026-06-06** (`docs/PII_CONSENT_RECEIPT_AUDIT_2026-06-06.md`, `docs/H4_DEMO_SEED_POLISH_2026-06-06.md`); **H5 founder GO** for 3–5 named recruiters — then use `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` and track outcomes in `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md`. Prod queue refresh still requires founder-approved Railway seed (no auto prod mutation).
 
 ---
 

@@ -221,8 +221,14 @@ def test_respond_recruiter_batch_bulk() -> None:
         db.close()
 
 
-def test_ensure_recruiter_inbox_demo_resets_interview() -> None:
-    from app.services.investor_demo_seed import ensure_recruiter_inbox_demo
+def test_ensure_recruiter_inbox_demo_restores_canonical_queue() -> None:
+    from app.matching.quality_gate import match_quality_label
+    from app.services.investor_demo_seed import (
+        RECRUITER_DEMO_QUEUE_SPECS,
+        ensure_recruiter_inbox_demo,
+        upsert_demo_jobs,
+    )
+    from app.services.recruiter_inbox import build_recruiter_batch
 
     db = _sqlite_session()
     try:
@@ -235,29 +241,35 @@ def test_ensure_recruiter_inbox_demo_resets_interview() -> None:
         db.flush()
         cand = Candidate(user_id=user.id, name="Alex", skills="[]", preferred_job_titles="[]")
         db.add(cand)
-        job = Job(
-            job_board="pracuj",
-            external_id="investor-demo-python-lead",
-            title="Engineer",
-            company="Nova Hiring PL",
-            url="https://example.com/j",
-            is_validated=True,
+        upsert_demo_jobs(db)
+        job = db.query(Job).filter(Job.external_id == "investor-demo-python-lead").one()
+        db.add(
+            Application(
+                candidate_id=cand.id,
+                job_id=job.id,
+                status=ApplicationStatus.APPLIED,
+                notes="Investor demo — recruiter batch inbox",
+            )
         )
-        db.add(job)
-        db.flush()
-        app_row = Application(
-            candidate_id=cand.id,
-            job_id=job.id,
-            status=ApplicationStatus.INTERVIEW,
-            notes="Investor demo — recruiter batch inbox",
-        )
-        db.add(app_row)
         db.commit()
         out = ensure_recruiter_inbox_demo(db, company="Nova Hiring PL")
         db.commit()
-        db.refresh(app_row)
-        assert out["reset_to_applied"] == 1
-        assert app_row.status == ApplicationStatus.APPLIED
+        assert out["queue_size"] == len(RECRUITER_DEMO_QUEUE_SPECS)
+        batch = build_recruiter_batch(db, company_slug="nova-hiring-pl", locale="en")
+        assert batch["total"] == len(RECRUITER_DEMO_QUEUE_SPECS)
+        by_name = {row["candidate_name"]: row for row in batch["items"]}
+        assert by_name["Alex Kowalski (demo)"]["status"] == "interview"
+        assert by_name["Alex Kowalski (demo)"]["match_score_label"] == "excellent"
+        assert by_name["Marta Nowak (demo)"]["status"] == "applied"
+        assert by_name["Marta Nowak (demo)"]["match_score_label"] == "good"
+        assert by_name["Piotr Zieliński (demo)"]["match_score_label"] == "possible"
+        assert by_name["Ewa Wiśniewska (demo)"]["match_score_label"] == "weak"
+        assert by_name["Jan Kaczor (demo)"]["status"] == "rejected"
+        for row in batch["items"]:
+            card = row["review_card"]
+            assert card["human_decision_required"] is True
+            assert card["disclaimer"]
+            assert row["match_score_label"] == match_quality_label(row["match_score"])
     finally:
         db.close()
 

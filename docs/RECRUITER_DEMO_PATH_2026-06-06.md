@@ -49,6 +49,8 @@ cd backend && python3 ../scripts/seed-investor-demo.py --print-credentials
 
 Sets recruiter inbox token + demo company **Nova Hiring PL**.
 
+**H4 queue (2026-06-06):** After seed, **5 synthetic rows** on `nova-hiring-pl` — Alex (excellent, interview), Marta (good, salary missing), Piotr (possible, seniority gaps), Ewa (weak, incomplete), Jan (good, rejected). See `docs/H4_DEMO_SEED_POLISH_2026-06-06.md`. Prod requires founder-approved Railway seed.
+
 ---
 
 ## API shape (inbox row)

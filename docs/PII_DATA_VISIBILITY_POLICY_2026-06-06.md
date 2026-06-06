@@ -44,7 +44,7 @@ B2B pool preview for employers browsing **opted-in** candidates who are not nece
 
 ### `recruiter_demo` (LIVE — Nova Hiring PL seed)
 
-Same rules as `application_review`. Demo queue uses seeded candidates; **do not screenshot** queue rows into public channels.
+Same rules as `application_review`. Demo queue uses **five synthetic** seeded candidates (H4 — `docs/H4_DEMO_SEED_POLISH_2026-06-06.md`); names are fictional `*(demo)` labels. **Do not screenshot** queue rows into public channels.
 
 ---
 
