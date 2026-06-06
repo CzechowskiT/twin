@@ -136,7 +136,7 @@ Run **without** pasting access codes into this doc.
 | No CSP errors | **yes** |
 | **Decision** | **PASS** |
 
-**Founder stance:** Recruiter Match Receipt **PASS** on production. H1–H4 shipped 2026-06-06 (`docs/H4_DEMO_SEED_POLISH_2026-06-06.md`). **Prod queue still shows pre-H4 data until founder runs seed on Railway.** Controlled pilot/demo **READY FOR FOUNDER DECISION**; founder **defers external recruiter invitations** until **H5 GO** + prod seed verify.
+**Founder stance:** Recruiter Match Receipt **PASS** on production. H1–H4 shipped 2026-06-06 (`docs/H4_DEMO_SEED_POLISH_2026-06-06.md`). Prod seed + cleanup **DONE**; H4 final visual smoke **CLEAN PASS** `2026-06-06T17:36:25Z` (§ H4 final visual smoke below). Controlled pilot/demo **READY FOR FOUNDER DECISION**; founder **defers external recruiter invitations** until **H5 GO**.
 
 ---
 
@@ -150,7 +150,7 @@ Run **without** pasting access codes into this doc.
 | **R4 Decision** | Accept + decline mutate visible state; no stale accept on `interview` rows | ✅ **PASS** — Alex Kowalski decided row; pending row CTAs intact |
 | **R5 Match Receipt** | Review card sections A–H visible; accept/decline unchanged; no CSP | ✅ **PASS** (`2026-06-06T16:38:40Z`) — Nova Hiring PL |
 
-**Pilot demo GO:** **YES** — R1–R5 **PASS**; H4 code shipped; **re-smoke R3 after founder prod seed** for 5-row queue. Founder **defers external invitations** until H5.
+**Pilot demo GO:** **YES** — R1–R5 **PASS**; H4 **CLEAN PASS** (`2026-06-06T17:36:25Z`) — 5 canonical rows verified in UI. Founder **defers external invitations** until H5.
 **Public launch:** **NO-GO** regardless of inbox smoke.
 
 ---
@@ -257,7 +257,33 @@ No prod curl with tokens in agent session.
 | Name/status API verify | **PASS (ops)** | `inbox_after_names` — five canonical demo names only |
 | Accept/decline after seed | **Not run** | Per operator scope |
 
-**Founder visual smoke required:** load `/recruiter/inbox?company_slug=nova-hiring-pl` and confirm Alex (excellent, interview), Marta (good, applied), Piotr (possible, applied), Ewa (weak, applied), Jan (good, rejected). Ops cleanup `2026-06-06T17:27:20Z` verified five canonical names — UI status badges optional founder confirm.
+**Founder visual smoke:** ✅ **CLEAN PASS** `2026-06-06T17:36:25Z` — see § H4 final visual smoke below.
+
+---
+
+# H4 final visual smoke — CLEAN PASS (2026-06-06)
+
+**Route:** `https://twin-sooty.vercel.app/recruiter/inbox?company_slug=nova-hiring-pl`
+**Checkpoint UTC:** `2026-06-06T17:36:25Z`
+**Producer:** Founder manual smoke
+
+| Check | Result |
+| ----- | ------ |
+| Queue loaded | **yes** |
+| Rows count | **5** |
+| Alex Kowalski (demo) — interview | **yes** |
+| Marta Nowak (demo) — applied | **yes** |
+| Piotr Zieliński (demo) — applied | **yes** |
+| Ewa Wiśniewska (demo) — applied | **yes** |
+| Jan Kaczor (demo) — rejected | **yes** |
+| Extra legacy row | **no** |
+| Review card works | **yes** |
+| PII visibility note works | **yes** |
+| **Decision** | **CLEAN PASS** |
+
+**Product reality preserved:** S2 CSP **PASS** enforce ON · R1–R5 **PASS** · H4 **CLEAN PASS** · 5 canonical rows · legacy cleanup **DONE** · PII/consent **DONE** · public **NO-GO** · auto-apply **PAUSED** · delegated **NOT LIVE** · external invites deferred until **H5 founder GO**
+
+**Next:** H5 — founder decision on 3–5 named recruiters (`docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md`)
 
 ---
 

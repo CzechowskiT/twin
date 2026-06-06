@@ -3,7 +3,7 @@
 **Branch:** `cursor/phase1-monorepo-scaffold`
 **Audience:** Founder / investor / named pilot recruiter (2–3 min)
 **Launch stance:** Public **NO-GO** · pilot **GO** · auto-apply **PAUSED** · delegated **NOT LIVE**
-**Production smoke:** `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` — R1–R4 ✅ **PASS** (`2026-06-06T16:07:18Z`); **R5 Match Receipt** ✅ **PASS** (`2026-06-06T16:38:40Z`); recruiter demo queue **PASS**
+**Production smoke:** `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` — R1–R4 ✅ **PASS** (`2026-06-06T16:07:18Z`); **R5 Match Receipt** ✅ **PASS** (`2026-06-06T16:38:40Z`); **H4 final visual smoke** ✅ **CLEAN PASS** (`2026-06-06T17:36:25Z`) — 5 canonical rows on Nova Hiring PL
 
 ---
 
@@ -104,7 +104,7 @@ Documented in audit `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md` 
 | **R4 Accept / decline** | ✅ **PASS** — Alex Kowalski: *Zaakceptowany na rozmowę* + *Decyzja zapisana*; no stale accept; pending row Zaakceptuj/Odrzuć |
 | **R5 Match Receipt / Review Card** | ✅ **PASS** (`2026-06-06T16:38:40Z`) — Nova Hiring PL; all sections A–H visible; accept/decline unchanged; no CSP errors |
 
-**Founder checkpoint UTC:** `2026-06-06T16:38:40Z` (Match Receipt) · `2026-06-06T16:07:18Z` (R1–R4) · **Recruiter demo queue PASS** · **Match Receipt PASS** · controlled pilot/demo **READY FOR FOUNDER DECISION** (founder **defers external invitations** until hardening) · public launch **NO-GO**
+**Founder checkpoint UTC:** `2026-06-06T17:36:25Z` (H4 final visual smoke **CLEAN PASS**) · `2026-06-06T16:38:40Z` (Match Receipt) · `2026-06-06T16:07:18Z` (R1–R4) · **H4 complete** — 5 canonical rows, no legacy row, review card + PII note verified · controlled pilot/demo **READY FOR FOUNDER DECISION** (founder **defers external invitations** until **H5 GO**) · public launch **NO-GO**
 
 **User-visible error mapping (EN/PL via i18n):**
 

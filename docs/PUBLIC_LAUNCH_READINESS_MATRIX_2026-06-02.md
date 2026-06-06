@@ -3,12 +3,12 @@
 **Auditor:** TWIN Release Gate Owner (read-only shift)
 **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01`
 **Branch HEAD:** `9011040` (prior) → updated by 2026-06-03 shift commits; copy audit 2026-06-04
-**Audit UTC:** `2026-06-06T16:38:40Z` (R5 Match Receipt smoke) · `2026-06-06T16:07:18Z` (R1–R4) · `2026-06-05T16:20:13Z` (S2 post-enforce) · prior gate `2026-06-04T10:34:36Z` · **launch-day runbook** `2026-06-04` — `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` · **copy audit** `2026-06-04` — `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md`
+**Audit UTC:** `2026-06-06T17:36:25Z` (H4 final visual smoke **CLEAN PASS**) · `2026-06-06T16:38:40Z` (R5 Match Receipt smoke) · `2026-06-06T16:07:18Z` (R1–R4) · `2026-06-05T16:20:13Z` (S2 post-enforce) · prior gate `2026-06-04T10:34:36Z` · **launch-day runbook** `2026-06-04` — `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` · **copy audit** `2026-06-04` — `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md`
 **Production (unchanged by this audit):** FE `https://twin-sooty.vercel.app` · API `https://twin-production-bcd9.up.railway.app`
 
 **Verdict:** **Public launch NO-GO**
 **Safe-lane merge (2026-06-06):** PR [#38](https://github.com/CzechowskiT/twin/pull/38) — PII/consent receipt alignment · commit `2cc18db` · automated curl smoke `2026-06-06T16:52:28Z`–`16:53:45Z` · **does not change launch NO-GO**.
- · **Controlled recruiter pilot/demo READY FOR FOUNDER DECISION** (founder **defers external invitations** until hardening) · **S2 PASS** (post-enforce smoke `2026-06-05T16:20:13Z`) · **R1–R5 PASS** (R5 Match Receipt `2026-06-06T16:38:40Z`) · **Auto-apply PAUSED** (operational + product gates)
+ · **Controlled recruiter pilot/demo READY FOR FOUNDER DECISION** (founder **defers external invitations** until **H5 GO**) · **S2 PASS** (post-enforce smoke `2026-06-05T16:20:13Z`) · **R1–R5 PASS** · **H4 CLEAN PASS** (`2026-06-06T17:36:25Z`) · **Auto-apply PAUSED** (operational + product gates)
 
 ---
 
@@ -347,7 +347,7 @@ Monitor Railway `csp_report` for **24h** after enforce deploy (`2026-06-05T16:20
 - **Verdict:** **C) candidate-first, recruiter-supporting** — not **D) two-sided**; not recruiter-hostile
 - **Evidence:** Recruiter inbox + batch accept/decline **LIVE** (token pilot); auto-apply **PAUSED** + delegated **NOT LIVE**; marketing recruiter SKU (watchlists/HM packets) **mostly not shipped**
 - **Launch impact:** **No change** to public **NO-GO** or pilot **GO**; recruiter sales must not claim unshipped SKU; inbox PII + match explainability **review_card shipped + R5 smoke PASS 2026-06-06**; **H1–H3 PII alignment shipped 2026-06-06** (`docs/PII_CONSENT_RECEIPT_AUDIT_2026-06-06.md`)
-- **Pilot/demo:** **R1–R5 PASS** (R5 Match Receipt `2026-06-06T16:38:40Z`) — Nova Hiring PL queue **5 canonical rows** after cleanup `2026-06-06T17:27:20Z`; controlled recruiter pilot/demo **READY FOR FOUNDER DECISION** (founder **defers external invitations** until hardening); public launch **NO-GO**
+- **Pilot/demo:** **R1–R5 PASS** · **H4 CLEAN PASS** (`2026-06-06T17:36:25Z`) — Nova Hiring PL queue **5 canonical rows** verified in UI; legacy cleanup **DONE**; PII/consent **DONE**; controlled recruiter pilot/demo **READY FOR FOUNDER DECISION** (founder **defers external invitations** until **H5 GO**); public launch **NO-GO**
 
 ---
 
@@ -357,7 +357,7 @@ Monitor Railway `csp_report` for **24h** after enforce deploy (`2026-06-05T16:20
 - **Tracker:** `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md`
 - **Invites:** `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md`
 - **Scope:** 3–5 **named** recruiters; invite-only token inbox; PL+EN talk track + 5–7 min demo script
-- **Verdict:** **PACK READY** — **READY FOR FOUNDER DECISION** (founder **defers external invitations** until hardening); cohort **0/3–5** invited
+- **Verdict:** **PACK READY** — H4 **CLEAN PASS**; **READY FOR FOUNDER DECISION** (founder **defers external invitations** until **H5 GO**); cohort **0/3–5** invited
 - **Launch impact:** **No change** to public **NO-GO**; does **not** enable auto-apply, delegated submit, or public recruiter GTM
 
 ---

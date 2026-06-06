@@ -18,7 +18,7 @@ TWIN invites **3–5 named recruiters** into a **limited, founder-led pilot** to
 
 Production recruiter inbox smoke **R1–R5 PASS** (R1–R4 `2026-06-06T16:07:18Z`; **R5 Match Receipt** `2026-06-06T16:38:40Z`). This is **not** public launch, **not** a two-sided marketplace claim, and **not** permission to enable auto-apply or delegated submit.
 
-**Founder decision required:** Approve outbound to named recruiters **only after** pre-pilot hardening — **H1–H4 shipped 2026-06-06** (`docs/PII_CONSENT_RECEIPT_AUDIT_2026-06-06.md`, `docs/H4_DEMO_SEED_POLISH_2026-06-06.md`); **H5 founder GO** for 3–5 named recruiters — then use `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` and track outcomes in `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md`. Prod queue refresh still requires founder-approved Railway seed (no auto prod mutation).
+**Founder decision required:** **H1–H4 complete 2026-06-06** (`docs/PII_CONSENT_RECEIPT_AUDIT_2026-06-06.md`, `docs/H4_DEMO_SEED_POLISH_2026-06-06.md`); H4 final visual smoke **CLEAN PASS** `2026-06-06T17:36:25Z`. **H5 founder GO** for 3–5 named recruiters — then use `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` and track outcomes in `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md`. External invitations deferred until H5 GO.
 
 ---
 
@@ -255,7 +255,7 @@ Capture verbatim objections into tracker for synthesis — especially PII, ATS, 
 | Field | Value |
 | ----- | ----- |
 | **Public launch** | **NO-GO** |
-| **Controlled recruiter pilot** | **READY FOR FOUNDER DECISION** — founder **defers external invitations** until hardening |
+| **Controlled recruiter pilot** | **READY FOR FOUNDER DECISION** — H4 **CLEAN PASS**; founder **defers external invitations** until **H5 GO** |
 | **S2 CSP** | **PASS** (post-enforce `2026-06-05T16:20:13Z`; enforce ON; 24h monitor complete `2026-06-06T16:20:13Z`) |
 | **Recruiter inbox R1–R4** | **PASS** `2026-06-06T16:07:18Z` |
 | **Recruiter Match Receipt (R5)** | **PASS** `2026-06-06T16:38:40Z` — Nova Hiring PL; all review-card sections visible |
@@ -265,15 +265,15 @@ Capture verbatim objections into tracker for synthesis — especially PII, ATS, 
 | **Cohort invited** | **0 / 3–5** (tracker empty — awaiting hardening + founder GO) |
 | **This pack** | **COMPLETE** — docs only; no prod mutations |
 
-**Next recommended hardening (before outbound):**
+**Pre-pilot hardening (complete):**
 
 1. ~~PII / consent receipt alignment~~ ✅ **2026-06-06**
 2. ~~Candidate-side consent receipt~~ ✅ **2026-06-06** (dashboard applications panel)
 3. ~~Recruiter-side data visibility explanation~~ ✅ **2026-06-06** (inbox note + API metadata)
-4. Demo seed polish — **next slice**
-5. Founder decision on 3–5 named recruiters
+4. ~~Demo seed polish~~ ✅ **2026-06-06** — H4 final visual smoke **CLEAN PASS** `2026-06-06T17:36:25Z`
+5. **H5 — Founder GO** for 3–5 named recruiters — **next**
 
-**Next founder action:** Complete hardening 1–4 → sign pilot GO → fill tracker row 1 → send first invite → schedule onboarding call.
+**Next founder action:** Sign H5 pilot GO → fill tracker row 1 → send first invite → schedule onboarding call.
 
 ---
 

@@ -101,7 +101,7 @@ python3 scripts/ensure-recruiter-inbox-demo.py
 | Pre-seed health | `GET /api/public-health` **200** · `db_ok: true` · `recruiter_inbox_configured: true` |
 | Post-seed health | `GET /api/public-health` **200** · unchanged |
 | Ops summary | `queue_size: 5` · `inbox_applied: 3` · `inbox_before_total: 2` · `inbox_after_total: 6` · `created: 8` · `updated: 1` |
-| Canonical queue verified | **Partial** — ops metrics match H4 pattern (5 specs, 3 applied); `inbox_after_total: 6` suggests one legacy Nova Hiring PL row — **founder visual smoke required** for all five names + statuses |
+| Canonical queue verified | ✅ **Complete** — ops metrics match H4 pattern; legacy row removed §11; founder visual smoke **CLEAN PASS** §12 |
 | Railway restart | **No** |
 | Secrets in output/docs | **None** |
 
@@ -123,7 +123,7 @@ python3 scripts/ensure-recruiter-inbox-demo.py
 | Legacy removed | **Yes** — `removed_names: ["Tomasz Czechowski"]` |
 | Canonical 5 | **Yes** — Alex / Marta / Piotr / Ewa / Jan |
 | Pre/post health | `GET /api/public-health` **200** · `GET /recruiter/inbox` **200** · CSP unchanged |
-| Founder visual smoke | **Recommended** — confirm statuses in UI (ops names verified) |
+| Founder visual smoke | ✅ **CLEAN PASS** — `2026-06-06T17:36:25Z` (see §12) |
 | Railway restart | **No** |
 | Secrets in output/docs | **None** |
 
@@ -159,6 +159,31 @@ python3 scripts/ensure-recruiter-inbox-demo.py
 
 ---
 
+## 12 — H4 final visual smoke (founder)
+
+**Route:** `https://twin-sooty.vercel.app/recruiter/inbox?company_slug=nova-hiring-pl`
+**Checkpoint UTC:** `2026-06-06T17:36:25Z`
+**Decision:** **CLEAN PASS**
+
+| Check | Result |
+| ----- | ------ |
+| Queue loaded | **yes** |
+| Rows count | **5** |
+| Alex Kowalski (demo) — interview | **yes** |
+| Marta Nowak (demo) — applied | **yes** |
+| Piotr Zieliński (demo) — applied | **yes** |
+| Ewa Wiśniewska (demo) — applied | **yes** |
+| Jan Kaczor (demo) — rejected | **yes** |
+| Extra legacy row | **no** |
+| Review card works | **yes** |
+| PII visibility note works | **yes** |
+
+**Product reality preserved:** S2 CSP **PASS** enforce ON · R1–R5 **PASS** · H4 **CLEAN PASS** · 5 canonical rows · legacy cleanup **DONE** · PII/consent **DONE** · public **NO-GO** · auto-apply **PAUSED** · delegated **NOT LIVE** · external invites deferred until **H5 founder GO**
+
+**Hard bans confirmed:** docs only · no deploy/env/DB/migrations · no secrets · no public GO · no auto-apply/delegated enable
+
+---
+
 ## 9 — Next (H5)
 
-Founder GO for **3–5 named recruiters** after prod seed verification — use `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md`.
+**H4 complete.** Founder GO for **3–5 named recruiters** — use `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` and `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md`. Launch stance unchanged: public **NO-GO** · auto-apply **PAUSED** · delegated **NOT LIVE**.
