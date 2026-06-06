@@ -104,7 +104,7 @@ Documented in audit `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md` 
 | **R4 Accept / decline** | ✅ **PASS** — Alex Kowalski: *Zaakceptowany na rozmowę* + *Decyzja zapisana*; no stale accept; pending row Zaakceptuj/Odrzuć |
 | **R5 Match Receipt / Review Card** | ✅ **PASS** (`2026-06-06T16:38:40Z`) — Nova Hiring PL; all sections A–H visible; accept/decline unchanged; no CSP errors |
 
-**Founder checkpoint UTC:** `2026-06-06T17:36:25Z` (H4 final visual smoke **CLEAN PASS**) · `2026-06-06T16:38:40Z` (Match Receipt) · `2026-06-06T16:07:18Z` (R1–R4) · **H4 complete** — 5 canonical rows, no legacy row, review card + PII note verified · controlled pilot/demo **READY FOR FOUNDER DECISION** (founder **defers external invitations** until **H5 GO**) · public launch **NO-GO**
+**Founder checkpoint UTC:** `2026-06-06T17:36:25Z` (H4 final visual smoke **CLEAN PASS**) · `2026-06-06T16:38:40Z` (Match Receipt) · `2026-06-06T16:07:18Z` (R1–R4) · **H4 complete** — 5 canonical rows, no legacy row, review card + PII note verified · **H5 dry run pack** `docs/H5_FOUNDER_DEMO_DRY_RUN_PACK_2026-06-06.md` (20–30 min agenda + screen path A–M) · controlled pilot/demo **READY FOR FOUNDER DRY RUN** (founder **defers external invitations** until **H5 GO** after dry run PASS) · public launch **NO-GO**
 
 **User-visible error mapping (EN/PL via i18n):**
 
@@ -121,6 +121,8 @@ Never expose configuration key names in API responses or UI.
 
 ## Related
 
+- `docs/H5_FOUNDER_DEMO_DRY_RUN_PACK_2026-06-06.md` — full 20–30 min founder dry run (talk track PL/EN, objections, rubric)
+- `docs/H5_FOUNDER_DEMO_DRY_RUN_CHECKLIST_2026-06-06.md` — tick-box pre/live/post demo + decision log
 - `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` — config readiness + founder smoke (R1–R4 PASS `2026-06-06T16:07:18Z`)
 - `backend/app/services/recruiter_match_explanations.py` — deterministic reasons + `review_card`  
 - `docs/RECRUITER_TRUST_ROADMAP_2026-06-06.md` — trust & explainability roadmap

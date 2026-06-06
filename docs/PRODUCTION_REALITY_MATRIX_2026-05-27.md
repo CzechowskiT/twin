@@ -54,7 +54,7 @@
 | OAuth callback rate limits | `1efd8b1` | **LIVE** |
 | Job save/unsave rate limits | `1efd8b1` | **LIVE** |
 | Cookie consent + recruiter inbox rate limits | `67a22dc` | **LIVE** |
-| Recruiter inbox | Token auth; batch accept/decline; **match_score + reasons + review_card (2026-06-06)**; **decision UX (2026-06-06)** — status badges, hide accept on `interview`/`rejected`; **production smoke R1–R5 PASS**; **H4 final visual smoke CLEAN PASS** `2026-06-06T17:36:25Z` — Nova Hiring PL **5 canonical rows**, no legacy row, review card + PII note verified (`docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md`, `docs/H4_DEMO_SEED_POLISH_2026-06-06.md`) — audit **C) recruiter-supporting** | **LIVE / VERIFIED** — H4 **complete**; controlled recruiter pilot/demo **READY FOR FOUNDER DECISION** (founder **defers external invitations** until **H5 GO**); public launch **NO-GO** |
+| Recruiter inbox | Token auth; batch accept/decline; **match_score + reasons + review_card (2026-06-06)**; **decision UX (2026-06-06)** — status badges, hide accept on `interview`/`rejected`; **production smoke R1–R5 PASS**; **H4 final visual smoke CLEAN PASS** `2026-06-06T17:36:25Z` — Nova Hiring PL **5 canonical rows**, no legacy row, review card + PII note verified (`docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md`, `docs/H4_DEMO_SEED_POLISH_2026-06-06.md`); **H5 dry run pack** (`docs/H5_FOUNDER_DEMO_DRY_RUN_PACK_2026-06-06.md`) — audit **C) recruiter-supporting** | **LIVE / VERIFIED** — H4 **complete**; H5 pack **shipped**; controlled recruiter pilot/demo **READY FOR FOUNDER DRY RUN** (founder **defers external invitations** until **H5 GO** after dry run PASS); public launch **NO-GO** |
 | Recruiter marketing SKU (watchlists, HM packets, seat packs) | `persona-pages.ts` recruiters bundle | **REPO / MARKETING** — not evidenced as shipped app beyond inbox/jobs |
 | Partner export | `partner_export_configured` | **LIVE** |
 | Placement verification (machine-assisted) | `PLACEMENT_VERIFICATION.md` | **LIVE** design; pilot-scale |
@@ -67,7 +67,7 @@
 | Postgres | `db_ok=true`; **`postgres-volume` active** | **LIVE / STABLE** — stabilization passed; `market_coverage_active_validated=2551` (read-only curl) |
 | Backup restore drill | O7 gate | **LIVE / PASS** — staging clone drill 2026-06-01; pg_dump/pg_restore; prod untouched |
 | Controlled pilot ops | pilot manual + tracker | **LIVE** — resume after recovery verified (founder dashboard non-zero) |
-| Limited recruiter pilot pack (3–5 named) | `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md` + tracker + invites; R1–R5 PASS; H4 **CLEAN PASS** `2026-06-06T17:36:25Z` | **READY FOR FOUNDER DECISION** — H4 **complete**; founder **defers external invitations** until **H5 GO**; cohort not yet invited; public **NO-GO** |
+| Limited recruiter pilot pack (3–5 named) | `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md` + tracker + invites; R1–R5 PASS; H4 **CLEAN PASS** `2026-06-06T17:36:25Z`; H5 dry run pack | **READY FOR FOUNDER DRY RUN** — H4 **complete**; H5 pack **shipped**; founder **defers external invitations** until **H5 GO** after dry run PASS; cohort not yet invited; public **NO-GO** |
 | Candidate E2E manual smoke | `docs/CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md` | **LIVE** — PASS (founder-verified, 2026-05-27); Top 20 → Nietrafione → refresh regression. Warning: no auto-apply / real apply / scrape. |
 | Founder authenticated route smoke (dashboard subpages, jobs, profile, safety copy) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` | **LIVE** — **PASS** (founder 2026-05-29); 8/8 routes + safety copy; `/dashboard` layout PASS |
 | Playwright smoke drift points | `frontend/e2e/smoke.spec.ts` targeted assertions | **STABILIZED** — status cookie-banner locator fix on branch; 13/14 prod lane PASS (2026-05-29) |
@@ -139,6 +139,7 @@
 - `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` — R1–R5 PASS · H4 final visual smoke **CLEAN PASS** `2026-06-06T17:36:25Z`
 - `docs/H4_DEMO_SEED_POLISH_2026-06-06.md` — H4 complete; 5 canonical Nova Hiring PL rows
 - `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md` — 3–5 named recruiter pilot pack (docs only)
+- `docs/H5_FOUNDER_DEMO_DRY_RUN_PACK_2026-06-06.md` — pre-invite founder dry run (docs only)
 - `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md` — cohort tracker + rubric
 - `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` — PL/EN outbound templates
 - `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md`

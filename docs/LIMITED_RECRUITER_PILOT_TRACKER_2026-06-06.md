@@ -3,7 +3,7 @@
 **Owner:** Founder  
 **Pack:** `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md`  
 **Cohort target:** 3–5 named recruiters  
-**Launch stance:** Public **NO-GO** · pilot **READY FOR FOUNDER DECISION** (founder **defers external invitations** until **H5 GO**) · R1–R5 **PASS** · H4 **CLEAN PASS** (`2026-06-06T17:36:25Z`) · auto-apply **PAUSED** · delegated **NOT LIVE**
+**Launch stance:** Public **NO-GO** · pilot **READY FOR FOUNDER DRY RUN** (founder **defers external invitations** until **H5 GO** after dry run PASS) · R1–R5 **PASS** · H4 **CLEAN PASS** (`2026-06-06T17:36:25Z`) · H5 pack **shipped** · auto-apply **PAUSED** · delegated **NOT LIVE**
 
 **Rules:** No access codes, tokens, or secrets in this doc. Company slugs only when non-sensitive. Update weekly during active pilot.
 
@@ -75,7 +75,8 @@ Score each dimension **1–5** at synthesis. Composite guides expand / hold / wi
 | `2026-06-06T17:27:20Z` | — | `h4_prod_queue_cleanup` | Ops refresh pruned legacy Tomasz Czechowski — Nova Hiring PL inbox **5 rows** canonical | Agent |
 | `2026-06-06T17:09:24Z` | — | `h4_prod_seed_ran` | Ops refresh Nova Hiring PL — `queue_size: 5`, `inbox_applied: 3` (initial seed; legacy row removed in cleanup) | Agent |
 | `2026-06-06T17:36:25Z` | — | `h4_final_visual_smoke_pass` | H4 final visual smoke **CLEAN PASS** — Nova Hiring PL; 5 canonical rows; no legacy row; review card + PII note verified | Founder |
-| `2026-06-06` | — | `pilot_go_pending` | R1–R5 PASS; H1–H4 **complete**; founder **defers external invitations** until **H5 GO** (3–5 named recruiters) | Founder |
+| `2026-06-06` | — | `h5_dry_run_pack_shipped` | H5 Founder Demo Dry Run Pack + checklist — docs only; pre-invite gate | Agent |
+| `2026-06-06` | — | `pilot_go_pending` | R1–R5 PASS; H1–H4 **complete**; H5 pack shipped; founder **defers external invitations** until **H5 GO** after dry run PASS | Founder |
 
 ---
 
@@ -132,12 +133,16 @@ Expand limited recruiter pilot beyond 5 **only if all** are true:
 | H2 | Candidate-side consent receipt | ✅ | Dashboard applications panel — collapsible receipt (no DB) |
 | H3 | Recruiter-side data visibility explanation | ✅ | Inbox PL/EN note + API `data_visibility_summary` |
 | H4 | Demo seed polish | ✅ | Code shipped; prod seed + cleanup `2026-06-06T17:27:20Z`; founder visual smoke **CLEAN PASS** `2026-06-06T17:36:25Z` — 5 canonical rows in UI |
-| H5 | Founder GO for 3–5 named recruiters | ☐ | **Next** — H4 complete; use `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` |
+| H5a | Founder demo dry run pack | ✅ | `docs/H5_FOUNDER_DEMO_DRY_RUN_PACK_2026-06-06.md` + checklist |
+| H5b | Founder dry run PASS (rubric ≥4.0) | ☐ | **Next** — run dry run; log in checklist decision log |
+| H5c | Founder GO for 3–5 named recruiters | ☐ | After H5b PASS; use `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` |
 
 ---
 
 ## Related
 
+- `docs/H5_FOUNDER_DEMO_DRY_RUN_PACK_2026-06-06.md`
+- `docs/H5_FOUNDER_DEMO_DRY_RUN_CHECKLIST_2026-06-06.md`
 - `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md`
 - `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md`
 - `docs/RECRUITER_TRUST_ROADMAP_2026-06-06.md`
