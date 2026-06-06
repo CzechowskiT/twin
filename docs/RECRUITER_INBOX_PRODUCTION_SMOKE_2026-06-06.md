@@ -23,7 +23,7 @@ Confirm production is **configured** for recruiter inbox demos and that **founde
 | **Access UX** | Friendly unavailable / invalid-token copy (EN + PL); no raw JSON; no configuration key names in UI or API `detail` | ✅ **PASS** | Founder smoke after deploy; `recruiter_inbox_unavailable` → i18n `errorUnavailable` |
 | **Queue load** | Valid pilot code + company → HTTP 200 queue (rows or empty state) | ⏳ **PENDING** | Prod shows unavailable copy — pilot inbox token **not configured on frontend** (and/or API) |
 | **Match transparency** | Rows expose `match_score`, `match_score_label`, `match_reasons[]` when queue loads | ⏳ **PENDING** | Blocked on queue smoke |
-| **Human decision** | Accept / decline updates row status | ⏳ **PENDING** | Blocked on queue smoke |
+| **Human decision** | Accept / decline updates row status; decided rows show badge (no stale accept button) | ✅ **PASS** (repo UX `2026-06-06`) | Prod verify after R3; local guards + founder re-smoke |
 | **S2 CSP enforce** | Post-enforce smoke PASS `2026-06-05T16:20:13Z` | ✅ **PASS** | Unchanged by inbox work |
 | **Public launch** | Uncontrolled announcement | **NO-GO** | Gate matrices unchanged |
 
@@ -94,8 +94,8 @@ Run **without** pasting access codes into this doc.
 4. **PASS if:** banner *“AI-assisted ranking. Recruiter decision required.”* (or PL equivalent); queue panel loads.
 5. **Empty queue PASS:** copy *“No applications waiting…”* / *“Brak aplikacji…”* — still HTTP 200 path.
 6. If rows exist: confirm **match %** badge, up to **3 reasons**, candidate name visible (`pii_context: application_review`).
-7. **Accept** one row → status moves toward `interview` (or row leaves applied filter).
-8. **Decline** another (optional note) → status `rejected` or equivalent.
+7. **Accept** one row → badge **Accepted for interview** / **Zaakceptowany na rozmowę** + **Decision saved**; accept/decline buttons **hidden** (not stale accept).
+8. **Decline** another (optional note) → badge **Declined** / **Odrzucony**; buttons hidden. **Applied** filter hides decided rows; **All statuses** shows badges.
 9. Optional: `/recruiter/jobs` — same access pattern; POST creates listing (do not spam prod).
 
 | Field | Value |
@@ -115,7 +115,7 @@ Run **without** pasting access codes into this doc.
 | **R1 Access UX** | Friendly i18n errors; no raw JSON; no config key leakage | ✅ **PASS** |
 | **R2 Config** | `recruiter_inbox_configured: true` on health; frontend gate allows proxy | ⏳ **FAIL** (token missing on prod) |
 | **R3 Queue** | 200 queue or empty state with valid code | ⏳ **PENDING** (after R2) |
-| **R4 Decision** | Accept + decline mutate visible state | ⏳ **PENDING** (after R3) |
+| **R4 Decision** | Accept + decline mutate visible state; no stale accept on `interview` rows | ✅ **PASS** (repo UX fix `2026-06-06`; prod re-smoke after R3) |
 
 **Pilot demo GO:** Access UX yes · full inbox demo **no** until R2–R4 pass.  
 **Public launch:** **NO-GO** regardless of inbox smoke.
@@ -126,7 +126,8 @@ Run **without** pasting access codes into this doc.
 
 | Command | Purpose |
 | ------- | ------- |
-| `cd backend && pytest tests/test_recruiter_inbox.py -q` | API error codes; no token name in 503/401 bodies |
+| `cd backend && pytest tests/test_recruiter_inbox.py -q` | API error codes; rejected in batch; no token name in 503/401 bodies |
+| `cd frontend && npm run test:recruiter-inbox-decision` | Decision badge + button visibility by status |
 | `cd backend && pytest tests/test_consent_recruiter_rate_limits.py -q` | Inbox write rate limits |
 | `cd backend && pytest tests/test_csp_report*.py -q` | CSP sink regression |
 

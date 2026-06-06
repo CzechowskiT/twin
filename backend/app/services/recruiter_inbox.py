@@ -25,14 +25,21 @@ def build_recruiter_batch(
     limit: int = 25,
     locale: str = "en",
 ) -> dict:
-    """Applications for jobs matching company slug — applied/interview only."""
+    """Applications for jobs matching company slug — applied, interview, rejected (decision history)."""
     slug = _require_company_slug(company_slug)
     rows = (
         db.query(Application, Job, Candidate)
         .join(Job, Application.job_id == Job.id)
         .join(Candidate, Application.candidate_id == Candidate.id)
         .filter(
-            Application.status.in_((ApplicationStatus.APPLIED, ApplicationStatus.INTERVIEW)),
+            Application.status.in_(
+                (
+                    ApplicationStatus.PENDING,
+                    ApplicationStatus.APPLIED,
+                    ApplicationStatus.INTERVIEW,
+                    ApplicationStatus.REJECTED,
+                )
+            ),
         )
         .order_by(Application.updated_at.desc())
         .limit(200)

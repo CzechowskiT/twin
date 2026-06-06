@@ -28,8 +28,9 @@ Show **calendar-of-acceptance** from the recruiter side: pre-qualified rows with
    - **Candidate name visible** — `pii_context: application_review` (see PII policy below).
 
 4. **Human-in-the-loop**  
-   - **Accept for interview** on one row → status `interview`.  
-   - **Decline** another (optional internal note) → status `rejected`.
+   - **Accept for interview** on one row → badge *Accepted for interview* / *Zaakceptowany na rozmowę*; accept button **gone** (no stale CTA).  
+   - **Decline** another (optional internal note) → badge *Declined* / *Odrzucony*.  
+   - **Applied** filter = only rows awaiting decision; **All statuses** shows decided rows with badges.
 
 5. **Optional: post job** — `/recruiter/jobs`  
    Same token + company slug; POST creates employer listing for future matches.
@@ -91,7 +92,7 @@ Documented in audit `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md` 
 | **R1 Access UX** — friendly PL/EN unavailable copy; no raw JSON | ✅ **PASS** (founder) |
 | **R2 Config** — pilot token on frontend + API; `recruiter_inbox_configured: true` | ⏳ **PENDING** |
 | **R3 Queue** — load queue with valid pilot code | ⏳ **PENDING** (blocked on R2) |
-| **R4 Accept / decline** | ⏳ **PENDING** (blocked on R3) |
+| **R4 Accept / decline** | ✅ **PASS** (repo UX `2026-06-06` — badges, no stale accept; prod after R3) |
 
 Before a live prod demo, complete config checklist **C1–C4** in the smoke doc — otherwise users see friendly **“inbox not available”** copy (expected until R2 passes), not raw config errors.
 
