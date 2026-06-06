@@ -347,7 +347,7 @@ Monitor Railway `csp_report` for **24h** after enforce deploy (`2026-06-05T16:20
 - **Verdict:** **C) candidate-first, recruiter-supporting** — not **D) two-sided**; not recruiter-hostile
 - **Evidence:** Recruiter inbox + batch accept/decline **LIVE** (token pilot); auto-apply **PAUSED** + delegated **NOT LIVE**; marketing recruiter SKU (watchlists/HM packets) **mostly not shipped**
 - **Launch impact:** **No change** to public **NO-GO** or pilot **GO**; recruiter sales must not claim unshipped SKU; inbox PII + match explainability **review_card shipped + R5 smoke PASS 2026-06-06**; **H1–H3 PII alignment shipped 2026-06-06** (`docs/PII_CONSENT_RECEIPT_AUDIT_2026-06-06.md`)
-- **Pilot/demo:** **R1–R5 PASS** (R5 Match Receipt `2026-06-06T16:38:40Z`) — Nova Hiring PL queue; all review-card sections visible; accept/decline unchanged; no CSP (`docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md`); controlled recruiter pilot/demo **READY FOR FOUNDER DECISION** (founder **defers external invitations** until hardening); public launch **NO-GO**
+- **Pilot/demo:** **R1–R5 PASS** (R5 Match Receipt `2026-06-06T16:38:40Z`) — Nova Hiring PL queue **5 canonical rows** after cleanup `2026-06-06T17:27:20Z`; controlled recruiter pilot/demo **READY FOR FOUNDER DECISION** (founder **defers external invitations** until hardening); public launch **NO-GO**
 
 ---
 

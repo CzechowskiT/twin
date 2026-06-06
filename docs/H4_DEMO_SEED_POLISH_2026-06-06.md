@@ -109,6 +109,28 @@ python3 scripts/ensure-recruiter-inbox-demo.py
 
 ---
 
+## 11 — Production queue cleanup (legacy row removal)
+
+| Item | Value |
+| ---- | ----- |
+| UTC | `2026-06-06T17:27:20Z` |
+| Code PRs | [#40](https://github.com/CzechowskiT/twin/pull/40) (prune helper) · [#41](https://github.com/CzechowskiT/twin/pull/41) (broaden scope + name metrics) |
+| Merge HEAD | `0044864c014405ce6b7e78a5ee524ea315b818c0` |
+| Command | `bash scripts/ops-refresh-recruiter-inbox.sh "Nova Hiring PL"` |
+| Queue before | **6** rows — canonical 5 + legacy **Tomasz Czechowski** |
+| Queue after | **5** rows — canonical names only |
+| Ops metrics | `queue_size: 5` · `inbox_applied: 3` · `inbox_interview: 1` · `inbox_rejected: 1` · `pruned: 1` |
+| Legacy removed | **Yes** — `removed_names: ["Tomasz Czechowski"]` |
+| Canonical 5 | **Yes** — Alex / Marta / Piotr / Ewa / Jan |
+| Pre/post health | `GET /api/public-health` **200** · `GET /recruiter/inbox` **200** · CSP unchanged |
+| Founder visual smoke | **Recommended** — confirm statuses in UI (ops names verified) |
+| Railway restart | **No** |
+| Secrets in output/docs | **None** |
+
+**Hard bans confirmed:** Nova Hiring PL synthetic demo only · no real users · no migration · no env · no accept/decline after cleanup · public **NO-GO**
+
+---
+
 ## 7 — Related docs updated
 
 - `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md`

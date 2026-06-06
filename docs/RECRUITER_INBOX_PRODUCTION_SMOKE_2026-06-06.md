@@ -253,8 +253,28 @@ No prod curl with tokens in agent session.
 | Pre/post `GET /api/public-health` | **200** | `db_ok: true` · `recruiter_inbox_configured: true` |
 | Ops `queue_size` | **5** | Canonical H4 spec count |
 | Ops `inbox_applied` | **3** | Matches Marta / Piotr / Ewa applied rows |
-| Ops `inbox_after_total` | **6** | Possible legacy row — founder confirm filter **All statuses** shows exactly five canonical names |
-| Name/status API verify | **Deferred** | Local ops token OK; recruiter inbox token in repo copy stale vs prod — use founder pilot code in UI |
+| Ops `inbox_after_total` | **5** | Legacy **Tomasz Czechowski** pruned `2026-06-06T17:27:20Z` — see § H4 cleanup below |
+| Name/status API verify | **PASS (ops)** | `inbox_after_names` — five canonical demo names only |
 | Accept/decline after seed | **Not run** | Per operator scope |
 
-**Founder visual smoke required:** load `/recruiter/inbox?company_slug=nova-hiring-pl` and confirm Alex (excellent, interview), Marta (good, applied), Piotr (possible, applied), Ewa (weak, applied), Jan (good, rejected). See `docs/H4_DEMO_SEED_POLISH_2026-06-06.md` §10.
+**Founder visual smoke required:** load `/recruiter/inbox?company_slug=nova-hiring-pl` and confirm Alex (excellent, interview), Marta (good, applied), Piotr (possible, applied), Ewa (weak, applied), Jan (good, rejected). Ops cleanup `2026-06-06T17:27:20Z` verified five canonical names — UI status badges optional founder confirm.
+
+---
+
+# H4 production queue cleanup — legacy row removal (2026-06-06)
+
+**UTC:** `2026-06-06T17:27:20Z`  
+**Command:** `bash scripts/ops-refresh-recruiter-inbox.sh "Nova Hiring PL"`  
+**Code:** PR [#40](https://github.com/CzechowskiT/twin/pull/40) + [#41](https://github.com/CzechowskiT/twin/pull/41) · merge `0044864`
+
+| Check | Result | Notes |
+| ----- | ------ | ----- |
+| Pre/post `GET /api/public-health` | **200** | `db_ok: true` · `recruiter_inbox_configured: true` |
+| Pre/post `GET /recruiter/inbox` | **200** | CSP header present |
+| Ops `inbox_before_total` | **6** | Included legacy **Tomasz Czechowski** |
+| Ops `inbox_after_total` | **5** | Canonical queue only |
+| Ops `pruned` | **1** | `removed_names: ["Tomasz Czechowski"]` |
+| Ops status mix | **PASS** | `inbox_applied: 3` · `inbox_interview: 1` · `inbox_rejected: 1` |
+| Accept/decline after cleanup | **Not run** | Per operator scope |
+
+**Launch stance:** public **NO-GO** · pilot **READY** · auto-apply **PAUSED** · delegated **NOT LIVE**

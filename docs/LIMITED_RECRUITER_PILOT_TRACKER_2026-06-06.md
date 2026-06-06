@@ -72,7 +72,8 @@ Score each dimension **1–5** at synthesis. Composite guides expand / hold / wi
 | --- | ----------- | -------- | --------- | ----- |
 | `2026-06-06T16:38:40Z` | — | `match_receipt_pass` | R5 Match Receipt founder smoke **PASS** — Nova Hiring PL; all review-card sections visible; accept/decline unchanged; no CSP | Founder |
 | `2026-06-06` | — | `h4_demo_seed_shipped` | H4 demo seed polish shipped — 5 synthetic Nova Hiring PL rows (code); prod seed pending founder approval | Agent |
-| `2026-06-06T17:09:24Z` | — | `h4_prod_seed_ran` | Ops refresh Nova Hiring PL — `queue_size: 5`, `inbox_applied: 3`; founder visual verify names pending | Agent |
+| `2026-06-06T17:27:20Z` | — | `h4_prod_queue_cleanup` | Ops refresh pruned legacy Tomasz Czechowski — Nova Hiring PL inbox **5 rows** canonical | Agent |
+| `2026-06-06T17:09:24Z` | — | `h4_prod_seed_ran` | Ops refresh Nova Hiring PL — `queue_size: 5`, `inbox_applied: 3` (initial seed; legacy row removed in cleanup) | Agent |
 | `2026-06-06` | — | `pilot_go_pending` | R1–R5 PASS; H1–H4 shipped; founder **defers external invitations** until H5 GO + prod seed verify | Founder |
 
 ---
@@ -129,7 +130,7 @@ Expand limited recruiter pilot beyond 5 **only if all** are true:
 | H1 | PII / consent receipt alignment | ✅ | `docs/PII_CONSENT_RECEIPT_AUDIT_2026-06-06.md`; inbox `data_visibility_*` API |
 | H2 | Candidate-side consent receipt | ✅ | Dashboard applications panel — collapsible receipt (no DB) |
 | H3 | Recruiter-side data visibility explanation | ✅ | Inbox PL/EN note + API `data_visibility_summary` |
-| H4 | Demo seed polish | ✅ | Code shipped; **prod seed ran** `2026-06-06T17:09:24Z` — ops refresh; founder visual name verify pending |
+| H4 | Demo seed polish | ✅ | Code shipped; prod seed + **cleanup** `2026-06-06T17:27:20Z` — **5 canonical rows** verified via ops |
 | H5 | Founder GO for 3–5 named recruiters | ☐ | After H4 prod seed founder visual verify |
 
 ---
