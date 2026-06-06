@@ -71,7 +71,8 @@ Score each dimension **1–5** at synthesis. Composite guides expand / hold / wi
 | UTC | Recruiter # | Decision | Rationale | Owner |
 | --- | ----------- | -------- | --------- | ----- |
 | `2026-06-06T16:38:40Z` | — | `match_receipt_pass` | R5 Match Receipt founder smoke **PASS** — Nova Hiring PL; all review-card sections visible; accept/decline unchanged; no CSP | Founder |
-| `2026-06-06` | — | `pilot_go_pending` | R1–R5 PASS; H1–H3 PII alignment shipped; founder **defers external invitations** until H4 demo seed | Founder |
+| `2026-06-06` | — | `h4_demo_seed_shipped` | H4 demo seed polish shipped — 5 synthetic Nova Hiring PL rows (code); prod seed pending founder approval | Agent |
+| `2026-06-06` | — | `pilot_go_pending` | R1–R5 PASS; H1–H4 shipped; founder **defers external invitations** until H5 GO + prod seed verify | Founder |
 
 ---
 
@@ -127,8 +128,8 @@ Expand limited recruiter pilot beyond 5 **only if all** are true:
 | H1 | PII / consent receipt alignment | ✅ | `docs/PII_CONSENT_RECEIPT_AUDIT_2026-06-06.md`; inbox `data_visibility_*` API |
 | H2 | Candidate-side consent receipt | ✅ | Dashboard applications panel — collapsible receipt (no DB) |
 | H3 | Recruiter-side data visibility explanation | ✅ | Inbox PL/EN note + API `data_visibility_summary` |
-| H4 | Demo seed polish | ☐ | Stable Nova Hiring PL queue for demos |
-| H5 | Founder GO for 3–5 named recruiters | ☐ | After H1–H4 |
+| H4 | Demo seed polish | ✅ | `docs/H4_DEMO_SEED_POLISH_2026-06-06.md` — 5 synthetic candidates; prod seed = founder approval |
+| H5 | Founder GO for 3–5 named recruiters | ☐ | After H4 prod seed verify |
 
 ---
 

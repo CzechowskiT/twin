@@ -21,7 +21,7 @@
 | **Future ATS webhook** | `future_ats` | TBD — employer contract | TBD | TBD | TBD | TBD | TBD | TBD | B2B DPA + webhook scope | 📐 NOT LIVE | H if over-shared |
 | **Future delegated apply** | `future_delegated` | Employer submit flow | May appear on employer form | May appear | Package PDF when enabled | Profile | N/A | N/A | Extra consent gate | ⏸ NOT LIVE (paused) | H |
 | **Future talent pool browse (recruiter)** | `anonymized_talent_pool` | **Hidden** | Hidden | Hidden | Hidden | Hidden | **OK** | Hidden | Pool opt-in only | 📐 NOT LIVE | L |
-| **Demo Nova Hiring PL** | `recruiter_demo` | **Shown** (seed) | Hidden in API | Hidden | Hidden | Profile overlap | **OK** | **OK** | Demo seed + pilot waiver | ⚠️ Needs seed polish (H4) | M — demo screenshots |
+| **Demo Nova Hiring PL** | `recruiter_demo` | **Shown** (seed) | Hidden in API | Hidden | Hidden | Profile overlap | **OK** | **OK** | Demo seed + pilot waiver | ✅ H4 shipped — 5 synthetic rows | M — demo screenshots |
 
 ---
 
@@ -44,7 +44,7 @@ See **`docs/PII_DATA_VISIBILITY_POLICY_2026-06-06.md`** for canonical rules and 
 | Recruiter inbox visibility note (PL/EN) | ✅ Shipped |
 | Candidate consent receipt on applications panel | ✅ Shipped (static copy, no DB) |
 | Audit + policy docs | ✅ This file + policy doc |
-| Demo seed polish (Nova Hiring PL) | ☐ Next hardening slice |
+| Demo seed polish (Nova Hiring PL) | ✅ `docs/H4_DEMO_SEED_POLISH_2026-06-06.md` |
 
 ---
 

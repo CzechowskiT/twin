@@ -136,7 +136,7 @@ Run **without** pasting access codes into this doc.
 | No CSP errors | **yes** |
 | **Decision** | **PASS** |
 
-**Founder stance:** Recruiter Match Receipt **PASS** on production. H1–H3 PII/consent alignment **shipped 2026-06-06**. Controlled pilot/demo remains **READY FOR FOUNDER DECISION** technically; founder **intentionally defers external recruiter invitations** until **H4 demo seed polish** (see `docs/RECRUITER_TRUST_ROADMAP_2026-06-06.md` Phase 2).
+**Founder stance:** Recruiter Match Receipt **PASS** on production. H1–H4 shipped 2026-06-06 (`docs/H4_DEMO_SEED_POLISH_2026-06-06.md`). **Prod queue still shows pre-H4 data until founder runs seed on Railway.** Controlled pilot/demo **READY FOR FOUNDER DECISION**; founder **defers external recruiter invitations** until **H5 GO** + prod seed verify.
 
 ---
 
@@ -150,7 +150,7 @@ Run **without** pasting access codes into this doc.
 | **R4 Decision** | Accept + decline mutate visible state; no stale accept on `interview` rows | ✅ **PASS** — Alex Kowalski decided row; pending row CTAs intact |
 | **R5 Match Receipt** | Review card sections A–H visible; accept/decline unchanged; no CSP | ✅ **PASS** (`2026-06-06T16:38:40Z`) — Nova Hiring PL |
 
-**Pilot demo GO:** **YES** — R1–R5 **PASS**; controlled recruiter pilot/demo **READY FOR FOUNDER DECISION** (founder **defers external invitations** until hardening).
+**Pilot demo GO:** **YES** — R1–R5 **PASS**; H4 code shipped; **re-smoke R3 after founder prod seed** for 5-row queue. Founder **defers external invitations** until H5.
 **Public launch:** **NO-GO** regardless of inbox smoke.
 
 ---
