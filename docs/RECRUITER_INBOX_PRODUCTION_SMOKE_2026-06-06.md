@@ -23,6 +23,7 @@ Confirm production is **configured** for recruiter inbox demos and that **founde
 | **Access UX** | Friendly unavailable / invalid-token copy (EN + PL); no raw JSON; no configuration key names in UI or API `detail` | ✅ **PASS** | Founder smoke after deploy; `recruiter_inbox_unavailable` → i18n `errorUnavailable` |
 | **Queue load** | Valid pilot code + company → HTTP 200 queue (rows or empty state) | ✅ **PASS** | Founder smoke `2026-06-06T16:07:18Z` — Nova Hiring PL (`nova-hiring-pl`); queue panel loads |
 | **Match transparency** | Rows expose `match_score`, `match_score_label`, `match_reasons[]`, **`review_card`** when queue loads | ✅ **PASS** | Founder smoke — match % badge + reasons + review card toggle on rows |
+| **Match Receipt / Review Card (R5)** | Expandable card sections A–H visible on prod; accept/decline UX unchanged; no CSP errors | ✅ **PASS** | Founder smoke `2026-06-06T16:38:40Z` — Nova Hiring PL; verbatim evidence § R5 below |
 | **Human decision** | Accept / decline updates row status; decided rows show badge (no stale accept button) | ✅ **PASS** | Founder smoke — Alex Kowalski: *Zaakceptowany na rozmowę* + *Decyzja zapisana*; accept button **gone**; pending row still shows Zaakceptuj/Odrzuć |
 | **S2 CSP enforce** | Post-enforce smoke PASS `2026-06-05T16:20:13Z` | ✅ **PASS** | Inbox route — no CSP violations in DevTools |
 | **Public launch** | Uncontrolled announcement | **NO-GO** | Gate matrices unchanged |
@@ -113,6 +114,32 @@ Run **without** pasting access codes into this doc.
 
 ---
 
+## Founder manual smoke — Match Receipt / Review Card (R5 PASS)
+
+**Precondition:** R1–R4 **PASS**. Route: `https://twin-sooty.vercel.app/recruiter/inbox` · company **Nova Hiring PL**.
+
+| Field | Value |
+| ----- | ----- |
+| Checkpoint UTC | `2026-06-06T16:38:40Z` |
+| Route | `https://twin-sooty.vercel.app/recruiter/inbox` |
+| Company | Nova Hiring PL |
+| Queue load | **PASS** |
+| Review card visible | **yes** |
+| Why this candidate visible | **yes** |
+| Requirements matched visible | **yes** |
+| Uncertain/missing visible | **yes** |
+| What to verify visible | **yes** |
+| Data confidence visible | **yes** |
+| Red flags/missing evidence visible | **yes** |
+| Human decision disclaimer visible | **yes** |
+| Accept/decline unchanged | **yes** |
+| No CSP errors | **yes** |
+| **Decision** | **PASS** |
+
+**Founder stance:** Recruiter Match Receipt **PASS** on production. Controlled pilot/demo remains **READY FOR FOUNDER DECISION** technically; founder **intentionally defers external recruiter invitations** until PII/consent receipt alignment, candidate-side consent receipt, recruiter data-visibility copy, and demo seed polish (see `docs/RECRUITER_TRUST_ROADMAP_2026-06-06.md` Phase 2).
+
+---
+
 ## Pass / fail summary
 
 | Smoke | PASS when | Today |
@@ -121,8 +148,9 @@ Run **without** pasting access codes into this doc.
 | **R2 Config** | `recruiter_inbox_configured: true` on health; frontend gate allows proxy | ✅ **PASS** (`2026-06-06T16:07:18Z`) |
 | **R3 Queue** | 200 queue or empty state with valid code | ✅ **PASS** — Nova Hiring PL queue loads |
 | **R4 Decision** | Accept + decline mutate visible state; no stale accept on `interview` rows | ✅ **PASS** — Alex Kowalski decided row; pending row CTAs intact |
+| **R5 Match Receipt** | Review card sections A–H visible; accept/decline unchanged; no CSP | ✅ **PASS** (`2026-06-06T16:38:40Z`) — Nova Hiring PL |
 
-**Pilot demo GO:** **YES** — R1–R4 **PASS**; controlled recruiter pilot/demo **READY FOR FOUNDER DECISION**.
+**Pilot demo GO:** **YES** — R1–R5 **PASS**; controlled recruiter pilot/demo **READY FOR FOUNDER DECISION** (founder **defers external invitations** until hardening).
 **Public launch:** **NO-GO** regardless of inbox smoke.
 
 ---

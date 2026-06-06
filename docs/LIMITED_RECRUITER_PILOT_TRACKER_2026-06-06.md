@@ -3,7 +3,7 @@
 **Owner:** Founder  
 **Pack:** `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md`  
 **Cohort target:** 3–5 named recruiters  
-**Launch stance:** Public **NO-GO** · pilot **READY FOR FOUNDER DECISION** · R1–R4 **PASS** · auto-apply **PAUSED** · delegated **NOT LIVE**
+**Launch stance:** Public **NO-GO** · pilot **READY FOR FOUNDER DECISION** (founder **defers external invitations** until hardening) · R1–R5 **PASS** · auto-apply **PAUSED** · delegated **NOT LIVE**
 
 **Rules:** No access codes, tokens, or secrets in this doc. Company slugs only when non-sensitive. Update weekly during active pilot.
 
@@ -70,7 +70,8 @@ Score each dimension **1–5** at synthesis. Composite guides expand / hold / wi
 
 | UTC | Recruiter # | Decision | Rationale | Owner |
 | --- | ----------- | -------- | --------- | ----- |
-| `2026-06-06` | — | `pilot_go_pending` | R1–R4 PASS; pack complete; awaiting founder outbound GO | Founder |
+| `2026-06-06T16:38:40Z` | — | `match_receipt_pass` | R5 Match Receipt founder smoke **PASS** — Nova Hiring PL; all review-card sections visible; accept/decline unchanged; no CSP | Founder |
+| `2026-06-06` | — | `pilot_go_pending` | R1–R5 PASS; pack complete; founder **defers external invitations** until PII/consent hardening (see trust roadmap Phase 2) | Founder |
 
 ---
 
@@ -116,6 +117,18 @@ Expand limited recruiter pilot beyond 5 **only if all** are true:
 | E6 | Founder capacity for onboarding (+1 recruiter ≈ 2h first month) | Founder sign-off |
 
 **Do not expand if:** any recruiter reports PII leak from token mishandling until rotation verified; or CSP/auto-apply incident open on launch runbook.
+
+---
+
+## Pre-pilot hardening checklist (before first invite)
+
+| # | Item | Status | Notes |
+| - | ---- | ------ | ----- |
+| H1 | PII / consent receipt alignment | ☐ | Recruiter-visible scope matches inbox data |
+| H2 | Candidate-side consent receipt | ☐ | Candidate sees what was shared with employer |
+| H3 | Recruiter-side data visibility explanation | ☐ | In-product copy for names / application review context |
+| H4 | Demo seed polish | ☐ | Stable Nova Hiring PL queue for demos |
+| H5 | Founder GO for 3–5 named recruiters | ☐ | After H1–H4 |
 
 ---
 

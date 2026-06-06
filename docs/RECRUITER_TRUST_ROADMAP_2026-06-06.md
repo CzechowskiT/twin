@@ -1,9 +1,8 @@
 # Recruiter Trust & Explainability Roadmap — 2026-06-06
 
 **Owner:** TWIN Recruiter Trust & Explainability  
-**Branch:** `chore/recruiter-match-receipt-card-2026-06-06`  
-**Base:** `cursor/phase1-monorepo-scaffold`  
-**Launch stance:** Public **NO-GO** · controlled recruiter pilot **READY FOR FOUNDER DECISION** · auto-apply **PAUSED** · delegated **NOT LIVE**
+**Branch:** `cursor/phase1-monorepo-scaffold`
+**Launch stance:** Public **NO-GO** · controlled recruiter pilot/demo **READY FOR FOUNDER DECISION** (founder **defers external recruiter invitations** until hardening below) · auto-apply **PAUSED** · delegated **NOT LIVE**
 
 **Hard bans:** No deploy, env, DB migration, secrets, public GO, auto-apply/delegated enable, CSP changes, LLM on inbox rows, personality claims.
 
@@ -58,12 +57,45 @@ Source: `backend/app/services/recruiter_match_explanations.py` → wired via `bu
 - Match % badge + label + up to 3 `match_reasons`
 - Production smoke R1–R4 PASS
 
-### Phase 1 — Candidate review card (this PR)
+### Phase 1 — Candidate review card (shipped + smoke PASS 2026-06-06)
 
 - Full `review_card` object + expandable UI
 - Pilot demo step: expand card on one row before accept/decline
+- **Founder production smoke — Match Receipt / Review Card:** ✅ **PASS** (`2026-06-06T16:38:40Z`) — see evidence block below
 
-### Phase 2 — Post-pilot trust (next)
+#### Founder smoke evidence — Match Receipt (verbatim)
+
+| Field | Value |
+| ----- | ----- |
+| **Route** | `https://twin-sooty.vercel.app/recruiter/inbox` |
+| **Company** | Nova Hiring PL |
+| **Checkpoint UTC** | `2026-06-06T16:38:40Z` |
+| Queue load | **PASS** |
+| Review card visible | **yes** |
+| Why this candidate visible | **yes** |
+| Requirements matched visible | **yes** |
+| Uncertain/missing visible | **yes** |
+| What to verify visible | **yes** |
+| Data confidence visible | **yes** |
+| Red flags/missing evidence visible | **yes** |
+| Human decision disclaimer visible | **yes** |
+| Accept/decline unchanged | **yes** |
+| No CSP errors | **yes** |
+| **Decision** | **PASS** |
+
+**Product reality preserved:** S2 CSP **PASS** (enforce ON) · recruiter inbox R1–R4 **PASS** · Recruiter Match Receipt **PASS** · auto-apply **PAUSED** · delegated apply **NOT LIVE** · public launch **NO-GO** · controlled pilot/demo technically **READY FOR FOUNDER DECISION** — founder **intentionally defers external recruiter invitations** until hardening complete.
+
+### Phase 2 — Pre-pilot hardening (next — before named recruiter outbound)
+
+| # | Item | Goal |
+| - | ---- | ---- |
+| 1 | **PII / consent receipt alignment** | Recruiter-visible consent scope matches what inbox shows |
+| 2 | **Candidate-side consent receipt** | Candidate sees what was shared with employer on apply/match |
+| 3 | **Recruiter-side data visibility explanation** | In-product copy for what data TWIN holds and why names appear |
+| 4 | **Demo seed polish** | Stable Nova Hiring PL queue for repeatable founder/demo path |
+| 5 | **Founder decision on 3–5 named recruiters** | Only after 1–4 — then tracker + invites |
+
+### Phase 3 — Post-pilot trust (after cohort)
 
 | Item | Goal | Dependency |
 | ---- | ---- | ---------- |
@@ -73,7 +105,7 @@ Source: `backend/app/services/recruiter_match_explanations.py` → wired via `bu
 | **HM packet export** | PDF/ICS bundle on accept | Calendar + placement docs |
 | **Per-company audit trail** | Append-only decision events | Existing application model |
 
-### Phase 3 — Enterprise trust
+### Phase 4 — Enterprise trust
 
 - Employer SSO + RBAC
 - ATS webhook verification for placement economics

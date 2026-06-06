@@ -76,7 +76,7 @@ the gate to ✅.
 | P4 | Pilot pricing model verified                                            | `docs/B2B_*` / pricing docs                                                                      | ✅           |
 | P5 | Pilot kill-switch (`SCRAPE_OPS_*` / feature flags) tested                | `pytest tests/test_auto_apply_trigger_sweep_admin_gate.py -q`                                   | ✅           |
 | P6 | Founder authenticated prod smoke (dashboard subpages, jobs, profile, safety copy) | `docs/FOUNDER_AUTHENTICATED_SMOKE_EVIDENCE_2026-05-29.md` — PASS when every route + safety row has explicit founder PASS | ✅ **PASS** (founder 2026-05-29) — 8/8 routes + safety copy; `/dashboard` layout PASS (forecast fix, no overlapping blocked CTAs); Google Calendar **FULL prod smoke PASS** |
-| P7 | Limited recruiter pilot pack (3–5 named recruiters) | `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md` + tracker + invites; R1–R4 PASS `2026-06-06T16:07:18Z` | ✅ **PACK READY** — **READY FOR FOUNDER DECISION**; cohort **0/3–5** invited; public **NO-GO** unchanged |
+| P7 | Limited recruiter pilot pack (3–5 named recruiters) | `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md` + tracker + invites; R1–R5 PASS (R5 Match Receipt `2026-06-06T16:38:40Z`) | ✅ **PACK READY** — **READY FOR FOUNDER DECISION** (founder **defers external invitations** until hardening); cohort **0/3–5** invited; public **NO-GO** unchanged |
 
 ## Decision matrix
 
@@ -94,7 +94,7 @@ the gate to ✅.
 
 **Latest audit:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` (post-enforce smoke `2026-06-05T16:20:13Z`)
 **Copy & claims:** `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md` — founding BLOCKER reduced (`1a2eba4`); **MEDIUM** calendar (`billingEngagementPillar2Body`) + compare pages + `/first-1000` headline **fixed** EN/PL; public launch still **NO-GO** (S2 enforce not flipped; ops gates).
-**Recruiter alignment:** `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md` — **C) candidate-first recruiter-supporting**; inbox match score + reasons + **review_card** + **decision UX** shipped (**2026-06-06**); trust roadmap `docs/RECRUITER_TRUST_ROADMAP_2026-06-06.md`; **production smoke** `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` — **R1–R4 PASS** `2026-06-06T16:07:18Z`; recruiter demo queue **PASS**; controlled pilot/demo **READY FOR FOUNDER DECISION**; auto-apply **PAUSED**; **no** public GO or two-sided marketplace claim; `/for-recruiters` aligned to pilot reality.
+**Recruiter alignment:** `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md` — **C) candidate-first recruiter-supporting**; inbox match score + reasons + **review_card** + **decision UX** shipped (**2026-06-06**); trust roadmap `docs/RECRUITER_TRUST_ROADMAP_2026-06-06.md`; **production smoke** `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` — **R1–R5 PASS** (R5 Match Receipt `2026-06-06T16:38:40Z`); recruiter demo queue **PASS**; controlled pilot/demo **READY FOR FOUNDER DECISION** (founder **defers external invitations** until hardening); auto-apply **PAUSED**; **no** public GO or two-sided marketplace claim; `/for-recruiters` aligned to pilot reality.
 **Limited recruiter pilot pack:** `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md` — P7 **PACK READY**; outbound templates `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md`; tracker `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md` — founder GO pending for 3–5 named recruiters.
 **Post-merge sanity (2026-06-02):** `docs/POST_MERGE_AUTO_APPLY_SANITY_2026-06-02.md` — PR #21 merged; prod API live; public-health OK; auto-apply **PAUSED** policy unchanged.
 **Logo smoke (2026-06-04):** Founder **final smoke PASS** `2026-06-04T10:29:29Z` — Chrome/Safari/Firefox DevTools **PASS**; Console clean; **no CSP violations**.
@@ -247,7 +247,7 @@ Warning: this check is non-destructive; do **not** run `alembic upgrade` manuall
 | Auto-apply | **PAUSED** |
 | Delegated apply | **NOT LIVE** |
 | L6 / O5 | Waivers signed `2026-06-03T13:19:53Z` |
-| Recruiter audit | Verdict **C**; inbox match reasons + decision UX **shipped 2026-06-06**; **R1–R4 PASS** `2026-06-06T16:07:18Z` · recruiter demo queue **PASS** (`docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md`) |
+| Recruiter audit | Verdict **C**; inbox match reasons + **review_card** + decision UX **shipped 2026-06-06**; **R1–R5 PASS** (R5 Match Receipt `2026-06-06T16:38:40Z`) · recruiter demo queue **PASS** (`docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md`) |
 
 **Decision:** S2 post-enforce smoke **PASS**
 

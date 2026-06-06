@@ -6,7 +6,7 @@
 **Audience:** Founder, named pilot recruiters (3–5), internal GTM  
 **Doc UTC:** `2026-06-06`
 
-**Launch stance:** Public **NO-GO** · controlled recruiter pilot **READY FOR FOUNDER DECISION** · S2 **PASS** · R1–R4 **PASS** (`2026-06-06T16:07:18Z`) · auto-apply **PAUSED** · delegated **NOT LIVE** · audit verdict **C)** candidate-first, recruiter-supporting
+**Launch stance:** Public **NO-GO** · controlled recruiter pilot **READY FOR FOUNDER DECISION** (founder **defers external invitations** until hardening) · S2 **PASS** · R1–R5 **PASS** (R5 Match Receipt `2026-06-06T16:38:40Z`) · auto-apply **PAUSED** · delegated **NOT LIVE** · audit verdict **C)** candidate-first, recruiter-supporting
 
 **Hard bans in this pack:** No deploy, env, DB, migrations, secrets, tokens, public GO, auto-apply/delegated enable, recruiter-replacement language, CSP changes.
 
@@ -16,9 +16,9 @@
 
 TWIN invites **3–5 named recruiters** into a **limited, founder-led pilot** to validate the **calendar-of-acceptance** north star from the employer side: a **short queue of pre-qualified applications** with **match score + rule-based reasons**, explicit **accept / decline**, and **no CV firehose**.
 
-Production recruiter inbox smoke **R1–R4 PASS** (`2026-06-06T16:07:18Z`). This is **not** public launch, **not** a two-sided marketplace claim, and **not** permission to enable auto-apply or delegated submit.
+Production recruiter inbox smoke **R1–R5 PASS** (R1–R4 `2026-06-06T16:07:18Z`; **R5 Match Receipt** `2026-06-06T16:38:40Z`). This is **not** public launch, **not** a two-sided marketplace claim, and **not** permission to enable auto-apply or delegated submit.
 
-**Founder decision required:** Approve outbound to named recruiters using `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` and track outcomes in `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md`.
+**Founder decision required:** Approve outbound to named recruiters **only after** pre-pilot hardening (PII/consent receipt alignment, candidate-side consent receipt, recruiter data-visibility copy, demo seed polish) — then use `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` and track outcomes in `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md`.
 
 ---
 
@@ -55,7 +55,7 @@ Outside TWIN, someone returns from time off to **random interview spam** or **th
 | **Match transparency** | LIVE (2026-06-06) | Deterministic reasons + **`review_card`** (gaps, verify checklist, data confidence) — not black-box LLM on inbox rows |
 | **Human-in-the-loop** | LIVE | Accept → *Accepted for interview* / *Zaakceptowany na rozmowę*; decline → *Declined* / *Odrzucony*; no stale accept CTA on decided rows |
 | **Rate limits** | LIVE | Inbox write caps (abuse protection) |
-| **Production smoke** | PASS | R1–R4 `2026-06-06T16:07:18Z` — see `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` |
+| **Production smoke** | PASS | R1–R4 `2026-06-06T16:07:18Z` · **R5 Match Receipt** `2026-06-06T16:38:40Z` — see `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` |
 
 **Demo company (investor path only):** Nova Hiring PL — use only when founder explicitly runs demo; named pilots get **their own** company slug + access code via secure channel (not in this doc).
 
@@ -253,16 +253,25 @@ Capture verbatim objections into tracker for synthesis — especially PII, ATS, 
 | Field | Value |
 | ----- | ----- |
 | **Public launch** | **NO-GO** |
-| **Controlled recruiter pilot** | **READY FOR FOUNDER DECISION** |
-| **S2 CSP** | **PASS** (post-enforce `2026-06-05T16:20:13Z`; 24h monitor complete `2026-06-06T16:20:13Z`) |
+| **Controlled recruiter pilot** | **READY FOR FOUNDER DECISION** — founder **defers external invitations** until hardening |
+| **S2 CSP** | **PASS** (post-enforce `2026-06-05T16:20:13Z`; enforce ON; 24h monitor complete `2026-06-06T16:20:13Z`) |
 | **Recruiter inbox R1–R4** | **PASS** `2026-06-06T16:07:18Z` |
+| **Recruiter Match Receipt (R5)** | **PASS** `2026-06-06T16:38:40Z` — Nova Hiring PL; all review-card sections visible |
 | **Auto-apply** | **PAUSED** |
 | **Delegated apply** | **NOT LIVE** |
 | **Audit verdict** | **C)** candidate-first, recruiter-supporting |
-| **Cohort invited** | **0 / 3–5** (tracker empty — awaiting founder GO) |
+| **Cohort invited** | **0 / 3–5** (tracker empty — awaiting hardening + founder GO) |
 | **This pack** | **COMPLETE** — docs only; no prod mutations |
 
-**Next founder action:** Sign pilot GO → fill tracker row 1 → send first invite → schedule onboarding call.
+**Next recommended hardening (before outbound):**
+
+1. PII / consent receipt alignment
+2. Candidate-side consent receipt
+3. Recruiter-side data visibility explanation
+4. Demo seed polish
+5. Founder decision on 3–5 named recruiters
+
+**Next founder action:** Complete hardening 1–4 → sign pilot GO → fill tracker row 1 → send first invite → schedule onboarding call.
 
 ---
 

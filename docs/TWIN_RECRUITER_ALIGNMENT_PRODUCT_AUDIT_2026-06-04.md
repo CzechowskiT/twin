@@ -203,6 +203,8 @@ const recruitersEn: PersonaBundle = {
 
 **Gap (resolved 2026-06-06):** Inbox API now returns `match_score`, `match_score_label`, `match_reasons[]`, **`review_card`**, `human_decision_required`, `pii_context`. See `backend/app/services/recruiter_match_explanations.py`, `docs/RECRUITER_TRUST_ROADMAP_2026-06-06.md`, and `docs/RECRUITER_DEMO_PATH_2026-06-06.md`.
 
+**Founder production smoke — Match Receipt (R5 PASS `2026-06-06T16:38:40Z`):** Route `https://twin-sooty.vercel.app/recruiter/inbox` · company **Nova Hiring PL** · queue load **PASS** · review card + sections A–H visible (why this candidate, requirements matched, uncertain/missing, what to verify, data confidence, red flags, human decision disclaimer) · accept/decline unchanged · no CSP errors · **Decision PASS**. Full verbatim table: `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` § R5.
+
 ### Placement verification — design, machine-assisted
 
 `docs/PLACEMENT_VERIFICATION.md` — anti “CS tennis”; employer one-click attestation; ATS webhooks.
@@ -501,14 +503,17 @@ Reference: `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md`
 
 ## 19 — Build next list (recruiter alignment priority)
 
-1. **Inbox match receipt** — score + reasons on each row (backend + UI). **Shipped 2026-06-06**
-2. **PII policy alignment** — anonymize inbox or document pilot exception.
-3. **Recruiter demo seed** — stable inbox data (`investor_demo_seed.py` path exists).
-4. **Talent pool recruiter browse** — minimal list API (anonymized).
-5. **Employer attestation** — prod smoke in pilot runbook.
-6. **ATS webhook** — one vendor production-verified.
-7. **Auto-apply employer playbook** — doc + product hooks before re-enable.
-8. **Recruiter SSO PRD** — replace token pilot.
+1. **Inbox match receipt** — score + reasons + **review_card** on each row (backend + UI). **Shipped + prod smoke PASS 2026-06-06** (`2026-06-06T16:38:40Z`)
+2. **PII / consent receipt alignment** — recruiter-visible consent scope matches inbox data (before named outbound).
+3. **Candidate-side consent receipt** — candidate sees what was shared with employer.
+4. **Recruiter-side data visibility explanation** — in-product copy for application-review PII context.
+5. **Recruiter demo seed polish** — stable Nova Hiring PL queue (`investor_demo_seed.py` path exists).
+6. **Founder decision on 3–5 named recruiters** — after 1–5.
+7. **Talent pool recruiter browse** — minimal list API (anonymized).
+8. **Employer attestation** — prod smoke in pilot runbook.
+9. **ATS webhook** — one vendor production-verified.
+10. **Auto-apply employer playbook** — doc + product hooks before re-enable.
+11. **Recruiter SSO PRD** — replace token pilot.
 
 ---
 
@@ -524,7 +529,7 @@ Reference: `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md`
 
 **Strategic moat vs LinkedIn:** not breadth of network — **consent-first ranked pipeline toward acceptance-ready calendar items** with **machine-assisted placement verification** instead of CS tennis. That story is **credible in docs and partial code**; it becomes **investable** when recruiter inbox + match receipts + one verified placement fee close in pilot.
 
-**Immediate founder action:** Use pilot GO to put **5 named recruiters** on token inbox with spam playbook; instrument accept/decline rates; defer public launch and recruiter SKU marketing scale until S2 closes and inbox transparency ships.
+**Immediate founder action:** Match Receipt **PASS** on prod (`2026-06-06T16:38:40Z`). Complete pre-pilot hardening (PII/consent receipts, data-visibility copy, demo seed) before **3–5 named recruiters** on token inbox; instrument accept/decline rates in tracker; defer public launch and recruiter SKU marketing scale.
 
 ---
 
@@ -536,7 +541,7 @@ Reference: `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md`
 | 2 | Candidate–recruiter fairness | **3** | Consent gates; inbox batch; but candidate-led scrape | Recruiter-proposed slots | Balanced marketplace policy |
 | 3 | Copy / messaging alignment | **4** | June 2026 copy audit; dual-audience | De-scope unshipped recruiter pillars | Radical honesty + proof links |
 | 4 | Auto-apply safety (recruiter impact) | **4** | PAUSED + hard gates | Employer-visible pause | Board-partner allowlists |
-| 5 | Matching transparency | **3** | Scores on candidate UI + **recruiter inbox reasons** | Talent pool browse for recruiters | Explainable ranking API |
+| 5 | Matching transparency | **4** | Scores on candidate UI + **recruiter inbox reasons + review_card** (R5 smoke PASS) | Talent pool browse for recruiters | Explainable ranking API |
 | 6 | Privacy / PII (recruiter-facing) | **3** | Talent pool anonymized; inbox names | Anonymize inbox | GDPR-minimized profiles |
 | 7 | Human-in-the-loop | **4** | Accept/decline; consent; PAUSED apply | Recruiter threshold prefs | Mandatory review queues |
 | 8 | Two-sided liquidity | **1** | Candidate-heavy corpus | B2B partner jobs in corpus | LinkedIn network effects |
