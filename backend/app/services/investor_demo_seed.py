@@ -482,6 +482,72 @@ def _is_recruiter_demo_application(app: Application, job: Job) -> bool:
     return "demo" in notes or "investor demo" in notes
 
 
+def canonical_recruiter_demo_names() -> frozenset[str]:
+    """Display names for the fixed Nova Hiring PL recruiter demo queue."""
+    return frozenset(str(spec["name"]) for spec in RECRUITER_DEMO_QUEUE_SPECS)
+
+
+def _is_synthetic_recruiter_demo_user(email: str) -> bool:
+    """True for inbox-only @twin.career demo accounts — never real pilot users."""
+    normalized = email.strip().lower()
+    if not normalized.endswith(f"@{DEMO_RECRUITER_EMAIL_DOMAIN}"):
+        return False
+    if normalized == demo_email_from_env():
+        return True
+    local = normalized.split("@", 1)[0]
+    return local.endswith("-nova-demo") or local == "demo"
+
+
+def prune_non_canonical_recruiter_demo_rows(
+    db: Session,
+    *,
+    company: str = DEMO_RECRUITER_COMPANY,
+) -> dict[str, int | list[str]]:
+    """Drop Nova Hiring PL inbox rows outside the canonical 5 demo names (synthetic only)."""
+    if company != DEMO_RECRUITER_COMPANY:
+        return {"pruned": 0, "removed_names": []}
+
+    canonical = canonical_recruiter_demo_names()
+    removed_names: list[str] = []
+    pruned = 0
+    job_ids = list(
+        db.execute(select(Job.id).where(Job.company == company)).scalars()
+    )
+    if not job_ids:
+        return {"pruned": 0, "removed_names": []}
+
+    rows = (
+        db.query(Application, Job, Candidate, User)
+        .join(Job, Application.job_id == Job.id)
+        .join(Candidate, Application.candidate_id == Candidate.id)
+        .join(User, Candidate.user_id == User.id)
+        .filter(Application.job_id.in_(job_ids))
+        .all()
+    )
+    for app, job, cand, user in rows:
+        name = (cand.name or "").strip()
+        if name in canonical:
+            continue
+        if not _is_synthetic_recruiter_demo_user(user.email):
+            continue
+        if not _is_recruiter_demo_application(app, job):
+            continue
+        match_row = db.execute(
+            select(JobMatch).where(
+                JobMatch.candidate_id == cand.id,
+                JobMatch.job_id == job.id,
+            )
+        ).scalar_one_or_none()
+        if match_row is not None:
+            db.delete(match_row)
+        db.delete(app)
+        pruned += 1
+        if name and name not in removed_names:
+            removed_names.append(name)
+    db.flush()
+    return {"pruned": pruned, "removed_names": removed_names}
+
+
 def _upsert_recruiter_demo_user(db: Session, *, email: str) -> User:
     """Synthetic recruiter-demo user — inbox seed only, not for candidate login."""
     now = _now()
@@ -620,9 +686,10 @@ def ensure_recruiter_inbox_demo(
     db: Session,
     *,
     company: str = DEMO_RECRUITER_COMPANY,
-) -> dict[str, int | str]:
+) -> dict[str, int | str | list[str]]:
     """Restore canonical recruiter demo queue (idempotent; safe on prod)."""
     summary = upsert_recruiter_demo_queue(db, company=company)
+    pruned_summary = prune_non_canonical_recruiter_demo_rows(db, company=company)
     created = int(summary.get("created", 0))
     updated = int(summary.get("updated", 0))
     return {
@@ -631,6 +698,8 @@ def ensure_recruiter_inbox_demo(
         "created": created,
         "updated": updated,
         "queue_size": int(summary.get("queue_size", 0)),
+        "pruned": int(pruned_summary.get("pruned", 0)),
+        "removed_names": list(pruned_summary.get("removed_names") or []),
     }
 
 

@@ -62,6 +62,8 @@ def ops_refresh_recruiter_inbox_demo(
         "inbox_before_total": before["total"],
         "inbox_after_total": after["total"],
         "inbox_applied": sum(1 for item in after["items"] if item["status"] == "applied"),
+        "inbox_interview": sum(1 for item in after["items"] if item["status"] == "interview"),
+        "inbox_rejected": sum(1 for item in after["items"] if item["status"] == "rejected"),
     }
 
 
