@@ -201,3 +201,41 @@ No prod curl with tokens in agent session.
 - ✅ No secrets or access codes in this doc  
 - ✅ No public launch GO · auto-apply stays **PAUSED** · delegated **NOT LIVE**  
 - ✅ No CSP changes
+
+---
+
+# Post-merge automated smoke — PR #38 (2026-06-06)
+
+**Merge commit:** `2cc18db5b7eae2bd35723f544dec0151f398d5a1` · **UTC:** `2026-06-06T16:52:20Z` (squash merge)  
+**Branch after merge:** `cursor/phase1-monorepo-scaffold` @ `2cc18db`  
+**PR:** https://github.com/CzechowskiT/twin/pull/38 — PII and consent receipt alignment for recruiter pilot  
+**Launch stance:** Public **NO-GO** · pilot **READY FOR FOUNDER DECISION** · auto-apply **PAUSED** · delegated **NOT LIVE**
+
+## Vercel production deploy
+
+| Check | UTC | Result |
+| ----- | --- | ------ |
+| GitHub commit status (Vercel) | `2026-06-06T16:53:45Z` | **success** (deploy from `2cc18db`) |
+| Prior production SHA (GitHub deployments) | `2026-06-06T16:41:02Z` | `3021920` |
+
+## Safe HTTP smoke (non-mutating, no tokens)
+
+| Route | UTC | HTTP | CSP header | Notes |
+| ----- | --- | ---- | ---------- | ----- |
+| `https://twin-sooty.vercel.app/recruiter/inbox` | `2026-06-06T16:52:28Z` | **200** | present (`content-security-policy`, `report-uri /api/v1/csp-report`) | `x-matched-path: /recruiter/inbox` |
+| `https://twin-sooty.vercel.app/` | `2026-06-06T16:52:29Z` | **200** | present | homepage OK |
+| `https://twin-sooty.vercel.app/api/public-health` | `2026-06-06T16:52:41Z` | **200** | present | JSON health OK |
+| `https://twin-production-bcd9.up.railway.app/api/v1/health` | `2026-06-06T16:52:35Z` | **200** | n/a | `{"status":"ok","service":"twin-api",...}` (pre-Railway redeploy of merge) |
+
+**Founder visual smoke (optional):** Confirm consent receipt on candidate dashboard and recruiter inbox visibility note copy after Vercel prod deploy — not covered by curl-only checks.
+
+## Local tests (pre-merge gate)
+
+| Suite | Result |
+| ----- | ------ |
+| `pytest` recruiter inbox + match explanations + CSP report (21 tests) | **PASS** |
+| `npm run test:pii-data-visibility` (5 tests) | **PASS** |
+| `npm run test:recruiter-inbox-decision` (3 tests) | **PASS** |
+| `npm run lint` + `tsc --noEmit` | **PASS** |
+
+**Hard bans confirmed:** no env/secrets, DB migrations, CSP policy changes, auth weakening, auto-apply/delegated enablement, public GO, or production mutations with tokens in this lane.

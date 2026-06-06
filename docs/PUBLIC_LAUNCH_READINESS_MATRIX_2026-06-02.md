@@ -6,7 +6,9 @@
 **Audit UTC:** `2026-06-06T16:38:40Z` (R5 Match Receipt smoke) · `2026-06-06T16:07:18Z` (R1–R4) · `2026-06-05T16:20:13Z` (S2 post-enforce) · prior gate `2026-06-04T10:34:36Z` · **launch-day runbook** `2026-06-04` — `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` · **copy audit** `2026-06-04` — `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md`
 **Production (unchanged by this audit):** FE `https://twin-sooty.vercel.app` · API `https://twin-production-bcd9.up.railway.app`
 
-**Verdict:** **Public launch NO-GO** · **Controlled recruiter pilot/demo READY FOR FOUNDER DECISION** (founder **defers external invitations** until hardening) · **S2 PASS** (post-enforce smoke `2026-06-05T16:20:13Z`) · **R1–R5 PASS** (R5 Match Receipt `2026-06-06T16:38:40Z`) · **Auto-apply PAUSED** (operational + product gates)
+**Verdict:** **Public launch NO-GO**
+**Safe-lane merge (2026-06-06):** PR [#38](https://github.com/CzechowskiT/twin/pull/38) — PII/consent receipt alignment · commit `2cc18db` · automated curl smoke `2026-06-06T16:52:28Z`–`16:53:45Z` · **does not change launch NO-GO**.
+ · **Controlled recruiter pilot/demo READY FOR FOUNDER DECISION** (founder **defers external invitations** until hardening) · **S2 PASS** (post-enforce smoke `2026-06-05T16:20:13Z`) · **R1–R5 PASS** (R5 Match Receipt `2026-06-06T16:38:40Z`) · **Auto-apply PAUSED** (operational + product gates)
 
 ---
 

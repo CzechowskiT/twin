@@ -117,3 +117,9 @@ cd frontend && npm run test:pii-data-visibility && npm run test:recruiter-inbox-
 - `docs/PII_CONSENT_RECEIPT_AUDIT_2026-06-06.md`
 - `docs/RECRUITER_TRUST_ROADMAP_2026-06-06.md`
 - `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md` §6
+
+---
+
+## Merge record (safe lane)
+
+**PR #38** merged to `cursor/phase1-monorepo-scaffold` as **`2cc18db`** (`2026-06-06T16:52:20Z` UTC). Automated post-merge smoke: `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` § Post-merge automated smoke — PR #38. Launch stance unchanged: public **NO-GO**, pilot **READY FOR FOUNDER DECISION**.
