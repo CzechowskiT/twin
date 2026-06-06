@@ -3,7 +3,7 @@
 **Branch:** `cursor/phase1-monorepo-scaffold`
 **Audience:** Founder / investor / named pilot recruiter (2–3 min)
 **Launch stance:** Public **NO-GO** · pilot **GO** · auto-apply **PAUSED** · delegated **NOT LIVE**
-**Production smoke:** `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` — access UX ✅ **PASS** · queue ⏳ **PENDING** (pilot token not on prod)
+**Production smoke:** `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` — R1–R4 ✅ **PASS** (`2026-06-06T16:07:18Z`); recruiter demo queue **PASS**
 
 ---
 
@@ -90,11 +90,11 @@ Documented in audit `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md` 
 | Smoke | Status (2026-06-06) |
 | ----- | ------------------- |
 | **R1 Access UX** — friendly PL/EN unavailable copy; no raw JSON | ✅ **PASS** (founder) |
-| **R2 Config** — pilot token on frontend + API; `recruiter_inbox_configured: true` | ⏳ **PENDING** |
-| **R3 Queue** — load queue with valid pilot code | ⏳ **PENDING** (blocked on R2) |
-| **R4 Accept / decline** | ✅ **PASS** (repo UX `2026-06-06` — badges, no stale accept; prod after R3) |
+| **R2 Config** — pilot token on frontend + API; `recruiter_inbox_configured: true` | ✅ **PASS** (`2026-06-06T16:07:18Z`) |
+| **R3 Queue** — load queue with valid pilot code | ✅ **PASS** — Nova Hiring PL; match score + reasons visible |
+| **R4 Accept / decline** | ✅ **PASS** — Alex Kowalski: *Zaakceptowany na rozmowę* + *Decyzja zapisana*; no stale accept; pending row Zaakceptuj/Odrzuć |
 
-Before a live prod demo, complete config checklist **C1–C4** in the smoke doc — otherwise users see friendly **“inbox not available”** copy (expected until R2 passes), not raw config errors.
+**Founder checkpoint UTC:** `2026-06-06T16:07:18Z` · **Recruiter demo queue PASS** · controlled pilot/demo **READY FOR FOUNDER DECISION** · public launch **NO-GO**
 
 **User-visible error mapping (EN/PL via i18n):**
 
@@ -111,7 +111,7 @@ Never expose configuration key names in API responses or UI.
 
 ## Related
 
-- `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` — config readiness + founder smoke (access UX PASS, queue pending)
+- `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` — config readiness + founder smoke (R1–R4 PASS `2026-06-06T16:07:18Z`)
 - `backend/app/services/recruiter_match_explanations.py` — deterministic reasons  
 - `docs/CONTROLLED_PILOT_OPERATING_MANUAL_2026-05-27.md` — spam playbook (now can cite inbox `match_score`)  
 - `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md`

@@ -21,10 +21,10 @@ Confirm production is **configured** for recruiter inbox demos and that **founde
 | Layer | Check | Status | Evidence |
 | ----- | ----- | ------ | -------- |
 | **Access UX** | Friendly unavailable / invalid-token copy (EN + PL); no raw JSON; no configuration key names in UI or API `detail` | ✅ **PASS** | Founder smoke after deploy; `recruiter_inbox_unavailable` → i18n `errorUnavailable` |
-| **Queue load** | Valid pilot code + company → HTTP 200 queue (rows or empty state) | ⏳ **PENDING** | Prod shows unavailable copy — pilot inbox token **not configured on frontend** (and/or API) |
-| **Match transparency** | Rows expose `match_score`, `match_score_label`, `match_reasons[]` when queue loads | ⏳ **PENDING** | Blocked on queue smoke |
-| **Human decision** | Accept / decline updates row status; decided rows show badge (no stale accept button) | ✅ **PASS** (repo UX `2026-06-06`) | Prod verify after R3; local guards + founder re-smoke |
-| **S2 CSP enforce** | Post-enforce smoke PASS `2026-06-05T16:20:13Z` | ✅ **PASS** | Unchanged by inbox work |
+| **Queue load** | Valid pilot code + company → HTTP 200 queue (rows or empty state) | ✅ **PASS** | Founder smoke `2026-06-06T16:07:18Z` — Nova Hiring PL (`nova-hiring-pl`); queue panel loads |
+| **Match transparency** | Rows expose `match_score`, `match_score_label`, `match_reasons[]` when queue loads | ✅ **PASS** | Founder smoke — match % badge + reasons visible on rows |
+| **Human decision** | Accept / decline updates row status; decided rows show badge (no stale accept button) | ✅ **PASS** | Founder smoke — Alex Kowalski: *Zaakceptowany na rozmowę* + *Decyzja zapisana*; accept button **gone**; pending row still shows Zaakceptuj/Odrzuć |
+| **S2 CSP enforce** | Post-enforce smoke PASS `2026-06-05T16:20:13Z` | ✅ **PASS** | Inbox route — no CSP violations in DevTools |
 | **Public launch** | Uncontrolled announcement | **NO-GO** | Gate matrices unchanged |
 
 ---
@@ -42,7 +42,7 @@ Complete **before** founder queue smoke. Use platform consoles and `docs/FOUNDER
 | C5 | Optional founder preview prefill | Vercel public build-time vars | Access form pre-filled on `/recruiter/inbox` only — **not** required for named pilots | Founder convenience |
 | C6 | Latest inbox UX deploy on Vercel | Vercel deployments | `/recruiter/inbox` serves access form + i18n errors (not legacy raw JSON) | Access UX |
 
-**Current gap (2026-06-06):** C1 (and likely C2) — queue smoke **blocked** until operator configures pilot token on both sides. Access UX (C6) already **PASS**.
+**Config status (2026-06-06):** C1–C4 **green** — founder queue smoke **PASS** `2026-06-06T16:07:18Z`. Access UX (C6) **PASS**.
 
 ---
 
@@ -84,7 +84,7 @@ Run **without** pasting access codes into this doc.
 
 ---
 
-## Founder manual smoke — queue (PENDING until C1–C2 green)
+## Founder manual smoke — queue (PASS)
 
 **Precondition:** C1–C4 checklist **green**. Obtain pilot access code via `scripts/seed-investor-demo.py --print-credentials` **locally** — do not commit output.
 
@@ -100,11 +100,16 @@ Run **without** pasting access codes into this doc.
 
 | Field | Value |
 | ----- | ----- |
-| Checkpoint UTC | *(pending)* |
-| Queue load | ⏳ **PENDING** |
-| Match score + reasons | ⏳ **PENDING** |
-| Accept / decline | ⏳ **PENDING** |
-| Notes | Blocked: pilot token not on prod frontend |
+| Checkpoint UTC | `2026-06-06T16:07:18Z` |
+| Company | Nova Hiring PL (`nova-hiring-pl`) |
+| Queue load | ✅ **PASS** |
+| Match score + reasons | ✅ **PASS** |
+| Human decision note | ✅ **PASS** — banner visible |
+| Accept / decline (R4) | ✅ **PASS** — Alex Kowalski: *Zaakceptowany na rozmowę* + *Decyzja zapisana*; **no** accept button on decided row |
+| Pending row CTAs | ✅ **PASS** — Zaakceptuj/Odrzuć still on awaiting rows |
+| Raw JSON / env leakage | ✅ **NO** |
+| CSP violations | ✅ **NO** |
+| Recruiter demo queue | ✅ **PASS** |
 
 ---
 
@@ -113,11 +118,11 @@ Run **without** pasting access codes into this doc.
 | Smoke | PASS when | Today |
 | ----- | --------- | ----- |
 | **R1 Access UX** | Friendly i18n errors; no raw JSON; no config key leakage | ✅ **PASS** |
-| **R2 Config** | `recruiter_inbox_configured: true` on health; frontend gate allows proxy | ⏳ **FAIL** (token missing on prod) |
-| **R3 Queue** | 200 queue or empty state with valid code | ⏳ **PENDING** (after R2) |
-| **R4 Decision** | Accept + decline mutate visible state; no stale accept on `interview` rows | ✅ **PASS** (repo UX fix `2026-06-06`; prod re-smoke after R3) |
+| **R2 Config** | `recruiter_inbox_configured: true` on health; frontend gate allows proxy | ✅ **PASS** (`2026-06-06T16:07:18Z`) |
+| **R3 Queue** | 200 queue or empty state with valid code | ✅ **PASS** — Nova Hiring PL queue loads |
+| **R4 Decision** | Accept + decline mutate visible state; no stale accept on `interview` rows | ✅ **PASS** — Alex Kowalski decided row; pending row CTAs intact |
 
-**Pilot demo GO:** Access UX yes · full inbox demo **no** until R2–R4 pass.  
+**Pilot demo GO:** **YES** — R1–R4 **PASS**; controlled recruiter pilot/demo **READY FOR FOUNDER DECISION**.
 **Public launch:** **NO-GO** regardless of inbox smoke.
 
 ---

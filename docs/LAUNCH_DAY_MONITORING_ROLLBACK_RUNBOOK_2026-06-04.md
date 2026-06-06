@@ -6,9 +6,11 @@
 **Doc UTC:** `2026-06-04`  
 **Production (unchanged by this doc):** FE `https://twin-sooty.vercel.app` · API `https://twin-production-bcd9.up.railway.app` · Railway project **twin-production**
 
-**Verdict at authoring:** **Public launch NO-GO** · **Controlled pilot / investor demo GO** · **S2 PASS** (post-enforce smoke `2026-06-05T16:20:13Z`) · **Auto-apply PAUSED** · **Delegated apply NOT LIVE**
+**Verdict at authoring:** **Public launch NO-GO** · **Controlled recruiter pilot/demo READY FOR FOUNDER DECISION** · **S2 PASS** (post-enforce smoke `2026-06-05T16:20:13Z`) · **R1–R4 PASS** (`2026-06-06T16:07:18Z`) · **Auto-apply PAUSED** · **Delegated apply NOT LIVE**
 
-**Post-enforce update UTC:** `2026-06-05T16:20:13Z` — enforce PR #32 @ `6862999` merged + deployed; **24h monitoring** through `2026-06-06T16:20:13Z`
+**Post-enforce update UTC:** `2026-06-05T16:20:13Z` — enforce PR #32 @ `6862999` merged + deployed; **24h monitoring COMPLETE** `2026-06-06T16:20:13Z`
+
+**Recruiter inbox update UTC:** `2026-06-06T16:07:18Z` — R1–R4 PASS; Nova Hiring PL queue; decision UX verified on prod
 
 **This document describes what to watch and how to decide — it does not execute deploys, env changes, CSP enforce, migrations, or apply/scrape operations.**
 
@@ -312,10 +314,11 @@ Run at end of launch day or before any **public** announcement.
 | -------- | ------- |
 | **Public launch** | **NO-GO** |
 | **Controlled pilot** | **GO** (with § C–D monitoring) |
+| **Controlled recruiter pilot/demo** | **READY FOR FOUNDER DECISION** (R1–R4 PASS `2026-06-06T16:07:18Z`) |
 | **Investor / CTO demo** | **GO** (curated) |
 | **Auto-apply / delegated** | **PAUSED / NOT LIVE** |
 
-**Next mandatory milestone:** **24h post-enforce monitoring** through `2026-06-06T16:20:13Z` → founder limited-launch decision (public **NO-GO** until explicit GO).
+**Next mandatory milestone:** Founder **limited-launch decision** (public **NO-GO** until explicit GO); recruiter inbox R1–R4 **PASS** — controlled pilot/demo **READY FOR FOUNDER DECISION** (`2026-06-06T16:07:18Z`).
 
 ## Post-enforce smoke — S2 PASS
 
@@ -337,13 +340,37 @@ Run at end of launch day or before any **public** announcement.
 | Auto-apply | **PAUSED** |
 | Delegated apply | **NOT LIVE** |
 | L6 / O5 | Waivers signed `2026-06-03T13:19:53Z` |
-| Recruiter audit | Verdict **C** (candidate-first, recruiter-supporting) |
+| Recruiter audit | Verdict **C**; **R1–R4 PASS** `2026-06-06T16:07:18Z` · recruiter demo queue **PASS** (`docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md`) |
 
-**Decision:** S2 post-enforce smoke **PASS**
+**Decision:** S2 post-enforce smoke **PASS** · 24h CSP monitor **COMPLETE** · recruiter inbox **READY FOR FOUNDER DECISION**
 
 ### 24h post-enforce monitoring (founder cadence)
 
-Monitor Railway `csp_report` for **24h** after enforce deploy (`2026-06-05T16:20:13Z` → `2026-06-06T16:20:13Z`). Triage per `docs/S2_CSP_RAILWAY_LOG_TRIAGE_PLAN_2026-06-01.md`. Rollback: revert to Report-Only per `docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md` § Rollback plan.
+Monitor Railway `csp_report` for **24h** after enforce deploy (`2026-06-05T16:20:13Z` → `2026-06-06T16:20:13Z`). **COMPLETE** — brak świeżych `csp_report`. Triage per `docs/S2_CSP_RAILWAY_LOG_TRIAGE_PLAN_2026-06-01.md`. Rollback: revert to Report-Only per `docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md` § Rollback plan.
+
+## Recruiter inbox smoke — R1–R4 PASS
+
+**Checkpoint UTC:** `2026-06-06T16:07:18Z`
+**Producer:** Founder manual smoke (Chrome/Safari)
+**Source:** `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md`
+
+| Smoke | Result |
+| ----- | ------ |
+| **R1 Access UX** | ✅ **PASS** — friendly PL/EN copy; no raw JSON |
+| **R2 Config** | ✅ **PASS** — pilot token configured; queue proxy works |
+| **R3 Queue** | ✅ **PASS** — Nova Hiring PL (`nova-hiring-pl`); match score + reasons visible |
+| **R4 Decision** | ✅ **PASS** — Alex Kowalski: *Zaakceptowany na rozmowę* + *Decyzja zapisana*; no accept button; pending row Zaakceptuj/Odrzuć |
+
+| Field | Value |
+| ----- | ----- |
+| Route | `/recruiter/inbox` |
+| Raw JSON / env leakage | **NO** |
+| CSP violations | **NO** |
+| Recruiter demo queue | ✅ **PASS** |
+| Public launch | **NO-GO** |
+| Controlled recruiter pilot/demo | **READY FOR FOUNDER DECISION** |
+| Auto-apply | **PAUSED** |
+| Delegated apply | **NOT LIVE** |
 
 ---
 

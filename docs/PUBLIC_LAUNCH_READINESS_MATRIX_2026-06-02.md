@@ -3,10 +3,10 @@
 **Auditor:** TWIN Release Gate Owner (read-only shift)
 **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01`
 **Branch HEAD:** `9011040` (prior) → updated by 2026-06-03 shift commits; copy audit 2026-06-04
-**Audit UTC:** `2026-06-05T16:20:13Z` (post-enforce smoke S2 PASS) · prior gate `2026-06-04T10:34:36Z` · **launch-day runbook** `2026-06-04` — `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` · **copy audit** `2026-06-04` — `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md`
+**Audit UTC:** `2026-06-06T16:07:18Z` (recruiter inbox R1–R4 PASS) · `2026-06-05T16:20:13Z` (post-enforce smoke S2 PASS) · prior gate `2026-06-04T10:34:36Z` · **launch-day runbook** `2026-06-04` — `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` · **copy audit** `2026-06-04` — `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md`
 **Production (unchanged by this audit):** FE `https://twin-sooty.vercel.app` · API `https://twin-production-bcd9.up.railway.app`
 
-**Verdict:** **Public launch NO-GO** · **Pilot / investor demo GO** · **S2 PASS** (post-enforce smoke `2026-06-05T16:20:13Z`) · **Auto-apply PAUSED** (operational + product gates)
+**Verdict:** **Public launch NO-GO** · **Controlled recruiter pilot/demo READY FOR FOUNDER DECISION** · **S2 PASS** (post-enforce smoke `2026-06-05T16:20:13Z`) · **R1–R4 PASS** (`2026-06-06T16:07:18Z`) · **Auto-apply PAUSED** (operational + product gates)
 
 ---
 
@@ -266,9 +266,9 @@
 | Auto-apply | **PAUSED** |
 | Delegated apply | **NOT LIVE** |
 | L6 / O5 | Waivers signed `2026-06-03T13:19:53Z` |
-| Recruiter audit | Verdict **C**; match reasons **shipped 2026-06-06**; **R4 decision UX PASS** (repo); **access UX PASS** · **queue smoke PENDING** (`docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md`) |
+| Recruiter audit | Verdict **C**; match reasons + decision UX **shipped 2026-06-06**; **R1–R4 PASS** `2026-06-06T16:07:18Z` · recruiter demo queue **PASS** (`docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md`) |
 
-**Decision:** S2 post-enforce smoke **PASS** · 24h CSP monitor **CONTINUE** (2026-06-06: brak świeżych `csp_report`)
+**Decision:** S2 post-enforce smoke **PASS** · 24h CSP monitor **COMPLETE** (`2026-06-06T16:20:13Z`) · recruiter inbox R1–R4 **PASS**
 
 ### 24h post-enforce monitoring (founder cadence)
 
@@ -345,7 +345,7 @@ Monitor Railway `csp_report` for **24h** after enforce deploy (`2026-06-05T16:20
 - **Verdict:** **C) candidate-first, recruiter-supporting** — not **D) two-sided**; not recruiter-hostile
 - **Evidence:** Recruiter inbox + batch accept/decline **LIVE** (token pilot); auto-apply **PAUSED** + delegated **NOT LIVE**; marketing recruiter SKU (watchlists/HM packets) **mostly not shipped**
 - **Launch impact:** **No change** to public **NO-GO** or pilot **GO**; recruiter sales must not claim unshipped SKU; inbox PII + match explainability gaps flagged for 0–30d roadmap
-- **Pilot/demo:** Safe to demo inbox **script** with honest pilot framing per audit §13–14; **production smoke** `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` — **access UX PASS** + **R4 decision UX PASS** (repo, 2026-06-06); **queue smoke PENDING** until pilot token configured on prod; full live queue demo **not** until **R2–R3** green on prod
+- **Pilot/demo:** **R1–R4 PASS** `2026-06-06T16:07:18Z` — Nova Hiring PL queue; match score + reasons; Alex Kowalski decided row; no CSP/raw JSON (`docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md`); controlled recruiter pilot/demo **READY FOR FOUNDER DECISION**; public launch **NO-GO**
 
 ---
 
