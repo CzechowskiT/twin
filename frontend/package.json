@@ -18,6 +18,7 @@
     "test:investor-calculator": "npx --yes tsx scripts/investor-calculator-model.test.ts",
     "test:b2b-roi-calculator": "npx --yes tsx scripts/b2b-roi-calculator-model.test.ts",
     "test:recruiter-inbox-decision": "npx --yes tsx scripts/recruiter-inbox-decision.test.ts",
+    "test:recruiter-review-card": "npx --yes tsx scripts/recruiter-review-card.test.ts",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install chromium"
   },

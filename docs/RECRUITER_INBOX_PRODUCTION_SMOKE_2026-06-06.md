@@ -22,7 +22,7 @@ Confirm production is **configured** for recruiter inbox demos and that **founde
 | ----- | ----- | ------ | -------- |
 | **Access UX** | Friendly unavailable / invalid-token copy (EN + PL); no raw JSON; no configuration key names in UI or API `detail` | ✅ **PASS** | Founder smoke after deploy; `recruiter_inbox_unavailable` → i18n `errorUnavailable` |
 | **Queue load** | Valid pilot code + company → HTTP 200 queue (rows or empty state) | ✅ **PASS** | Founder smoke `2026-06-06T16:07:18Z` — Nova Hiring PL (`nova-hiring-pl`); queue panel loads |
-| **Match transparency** | Rows expose `match_score`, `match_score_label`, `match_reasons[]` when queue loads | ✅ **PASS** | Founder smoke — match % badge + reasons visible on rows |
+| **Match transparency** | Rows expose `match_score`, `match_score_label`, `match_reasons[]`, **`review_card`** when queue loads | ✅ **PASS** | Founder smoke — match % badge + reasons + review card toggle on rows |
 | **Human decision** | Accept / decline updates row status; decided rows show badge (no stale accept button) | ✅ **PASS** | Founder smoke — Alex Kowalski: *Zaakceptowany na rozmowę* + *Decyzja zapisana*; accept button **gone**; pending row still shows Zaakceptuj/Odrzuć |
 | **S2 CSP enforce** | Post-enforce smoke PASS `2026-06-05T16:20:13Z` | ✅ **PASS** | Inbox route — no CSP violations in DevTools |
 | **Public launch** | Uncontrolled announcement | **NO-GO** | Gate matrices unchanged |

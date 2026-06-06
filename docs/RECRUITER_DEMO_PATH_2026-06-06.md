@@ -25,6 +25,7 @@ Show **calendar-of-acceptance** from the recruiter side: pre-qualified rows with
 3. **Inspect one row**  
    - **Match %** badge + label (excellent / good / possible / weak).  
    - Up to **3 rule-based reasons** (skills overlap, title, location, etc.).  
+   - **Show review card** / **Pokaż kartę oceny** → walk sections A–H (why, matched, gaps, verify, confidence, flags, human decision, disclaimer).  
    - **Candidate name visible** — `pii_context: application_review` (see PII policy below).
 
 4. **Human-in-the-loop**  
@@ -57,6 +58,7 @@ Sets recruiter inbox token + demo company **Nova Hiring PL**.
 | `match_score` | 0–100, persisted `job_matches` or live rule-based calc |
 | `match_score_label` | `excellent` \| `good` \| `possible` \| `weak` |
 | `match_reasons[]` | Max 3 evidence strings (locale via `X-Locale`) |
+| `review_card` | Nested object — sections A–H (why, matched, gaps, verify, confidence, flags, human decision, disclaimer) |
 | `human_decision_required` | Always `true` |
 | `pii_context` | `application_review` (inbox) vs `talent_pool_anonymized` (B2B pool) |
 
@@ -112,7 +114,8 @@ Never expose configuration key names in API responses or UI.
 ## Related
 
 - `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` — config readiness + founder smoke (R1–R4 PASS `2026-06-06T16:07:18Z`)
-- `backend/app/services/recruiter_match_explanations.py` — deterministic reasons  
+- `backend/app/services/recruiter_match_explanations.py` — deterministic reasons + `review_card`  
+- `docs/RECRUITER_TRUST_ROADMAP_2026-06-06.md` — trust & explainability roadmap
 - `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md` — limited recruiter pilot pack (3–5 named)
 - `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md` — cohort tracker + rubric
 - `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` — PL/EN outbound templates

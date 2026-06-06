@@ -201,7 +201,7 @@ const recruitersEn: PersonaBundle = {
    recruiter's bar.
 ```
 
-**Gap (resolved 2026-06-06):** Inbox API now returns `match_score`, `match_score_label`, `match_reasons[]`, `human_decision_required`, `pii_context`. See `backend/app/services/recruiter_match_explanations.py` and `docs/RECRUITER_DEMO_PATH_2026-06-06.md`.
+**Gap (resolved 2026-06-06):** Inbox API now returns `match_score`, `match_score_label`, `match_reasons[]`, **`review_card`**, `human_decision_required`, `pii_context`. See `backend/app/services/recruiter_match_explanations.py`, `docs/RECRUITER_TRUST_ROADMAP_2026-06-06.md`, and `docs/RECRUITER_DEMO_PATH_2026-06-06.md`.
 
 ### Placement verification — design, machine-assisted
 

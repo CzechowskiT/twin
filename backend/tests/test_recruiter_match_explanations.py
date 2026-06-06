@@ -44,6 +44,15 @@ def test_build_recruiter_match_summary_includes_score_and_reasons() -> None:
         assert 1 <= len(summary["match_reasons"]) <= 3
         assert summary["human_decision_required"] is True
         assert summary["pii_context"] == PII_CONTEXT_APPLICATION_REVIEW
+        card = summary["review_card"]
+        assert card["human_decision_required"] is True
+        assert card["data_confidence"] in {"high", "medium", "low", "unknown"}
+        assert isinstance(card["why_this_candidate"], str) and card["why_this_candidate"]
+        assert isinstance(card["requirements_matched"], list)
+        assert isinstance(card["uncertain_or_missing"], list)
+        assert isinstance(card["what_to_verify"], list)
+        assert isinstance(card["red_flags"], list)
+        assert isinstance(card["disclaimer"], str) and card["disclaimer"]
     finally:
         db.close()
 
@@ -76,6 +85,8 @@ def test_build_recruiter_match_summary_uses_persisted_job_match() -> None:
         assert summary["match_score"] == 88.5
         assert summary["match_score_label"] == "excellent"
         assert len(summary["match_reasons"]) <= 3
+        assert summary["review_card"]["data_confidence"] in {"high", "medium", "low", "unknown"}
+        assert summary["review_card"]["human_decision_required"] is True
     finally:
         db.close()
 
@@ -125,5 +136,41 @@ def test_build_recruiter_batch_includes_match_fields() -> None:
         assert isinstance(row["match_reasons"], list)
         assert row["human_decision_required"] is True
         assert row["pii_context"] == PII_CONTEXT_APPLICATION_REVIEW
+        assert "review_card" in row
+        assert row["review_card"]["human_decision_required"] is True
+        assert row["review_card"]["data_confidence"] in {"high", "medium", "low", "unknown"}
+    finally:
+        db.close()
+
+
+def test_review_card_locale_pl_and_sparse_profile() -> None:
+    db = _sqlite_session()
+    try:
+        user = User(
+            email="sparse@example.com",
+            hashed_password="x",
+            gdpr_consent_at=datetime.now(timezone.utc),
+        )
+        db.add(user)
+        db.flush()
+        cand = Candidate(user_id=user.id, name="Sparse", skills="[]", preferred_job_titles="[]")
+        db.add(cand)
+        job = Job(
+            job_board="pracuj",
+            external_id="rm-sparse",
+            title="Senior Architect",
+            company="Sparse Co",
+            url="https://example.com/sp",
+            requirements="Kubernetes Terraform",
+            is_validated=True,
+        )
+        db.add(job)
+        db.flush()
+        card_en = build_recruiter_match_summary(db, cand, job, locale="en")["review_card"]
+        card_pl = build_recruiter_match_summary(db, cand, job, locale="pl")["review_card"]
+        assert card_en["disclaimer"] != card_pl["disclaimer"]
+        assert any("skills" in s.lower() or "umiejętności" in s.lower() for s in card_en["uncertain_or_missing"] + card_pl["uncertain_or_missing"])
+        assert card_en["data_confidence"] in {"low", "unknown"}
+        assert card_en["red_flags"]
     finally:
         db.close()
