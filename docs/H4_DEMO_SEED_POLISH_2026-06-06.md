@@ -103,6 +103,22 @@ python3 scripts/ensure-recruiter-inbox-demo.py
 
 ---
 
-## 8 — Next (H5)
+## 8 — Safe-lane evidence (post-merge)
+
+| Item | Value |
+| ---- | ----- |
+| PR | https://github.com/CzechowskiT/twin/pull/39 |
+| Auto-merged | **Yes** (`2026-06-06`) |
+| Merge HEAD | `db5373b2ad741abe16942b502a730bfbfe1a8868` |
+| CI | backend-smoke ✅ · frontend-build ✅ · Vercel ✅ |
+| Prod smoke `GET /` | **200** |
+| Prod smoke `GET /recruiter/inbox` | **200** |
+| Prod smoke `GET /api/public-health` | **200** · `recruiter_inbox_configured: true` |
+| CSP | Unchanged (no new script sources) |
+| Railway API commit at smoke | `2cc18db` (pre-H4 deploy — backend deploy separate) |
+
+---
+
+## 9 — Next (H5)
 
 Founder GO for **3–5 named recruiters** after prod seed verification — use `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md`.
