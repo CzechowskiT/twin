@@ -6,6 +6,7 @@
 - **Branch HEAD (local):** `9011040`+ (audit branch, 2026-06-03 shift) / API live `6382a91`
 - **Production API SHA (read-only):** `6382a918882664df0076d996ca65c08e9138536a` (`GET /api/public-health`, post-merge 2026-06-02 — PR #21; includes `e764e68` safety fix)
 - **Launch readiness matrix:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md`
+- **CTO co-founder audit (2026-06-07):** `docs/CTO_COFUNDER_DUE_DILIGENCE_AUDIT_2026-06-07.md` — launch stance **unchanged** (public **NO-GO**)
 - **Auto-apply safety audit:** `docs/AUTO_APPLY_DELEGATED_APPLY_SAFETY_AUDIT_2026-06-02.md` (2026-06-02)
 - **Post-merge sanity:** `docs/POST_MERGE_AUTO_APPLY_SANITY_2026-06-02.md` (2026-06-02)
 - **Ops pause plan:** `docs/AUTO_APPLY_PRODUCTION_OPS_PAUSE_PLAN_2026-06-02.md` (2026-06-02)
@@ -138,6 +139,9 @@
 
 ## Related
 
+- `docs/CTO_COFUNDER_DUE_DILIGENCE_AUDIT_2026-06-07.md` — co-founder due diligence (20 sections)
+- `docs/CTO_COFUNDER_BRIEFING_2026-06-07.md` — executive briefing
+- `docs/CTO_COFUNDER_EVIDENCE_INDEX_2026-06-07.md` — evidence index
 - `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` — R1–R5 PASS · H4 final visual smoke **CLEAN PASS** `2026-06-06T17:36:25Z`
 - `docs/H4_DEMO_SEED_POLISH_2026-06-06.md` — H4 complete; 5 canonical Nova Hiring PL rows
 - `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md` — 3–5 named recruiter pilot pack (docs only)
