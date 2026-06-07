@@ -3,7 +3,7 @@
 **Owner:** Founder  
 **Pack:** `docs/H5_FOUNDER_DEMO_DRY_RUN_PACK_2026-06-06.md`  
 **Route:** `https://twin-sooty.vercel.app/recruiter/inbox?company_slug=nova-hiring-pl`  
-**Launch stance:** Public **NO-GO** · auto-apply **PAUSED** · delegated **NOT LIVE** · external invites **deferred** until H5 GO
+**Launch stance:** Public **NO-GO** · auto-apply **PAUSED** · delegated **NOT LIVE** · external invites **deferred** until H5 GO · candidate transparency panel **polished 2026-06-07** (`docs/CANDIDATE_APPLICATION_TRANSPARENCY_2026-06-07.md`)
 
 **Rules:** No access codes in this doc. No prod mutations during dry run.
 

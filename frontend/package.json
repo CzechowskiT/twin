@@ -20,6 +20,7 @@
     "test:recruiter-inbox-decision": "npx --yes tsx scripts/recruiter-inbox-decision.test.ts",
     "test:recruiter-review-card": "npx --yes tsx scripts/recruiter-review-card.test.ts",
     "test:pii-data-visibility": "npx --yes tsx scripts/pii-data-visibility.test.ts",
+    "test:candidate-transparency": "npx --yes tsx scripts/candidate-transparency.test.ts",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install chromium"
   },

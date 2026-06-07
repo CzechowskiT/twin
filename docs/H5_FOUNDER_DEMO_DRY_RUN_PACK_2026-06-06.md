@@ -29,7 +29,7 @@ This pack prepares the founder to run a **private, repeatable 20–30 minute rec
 
 **H5 decision is separate:** Completing this dry run and scoring **GO** or **GO SMALL** is a prerequisite for the founder to sign **H5 GO** and use `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md`. Until then, external invites remain deferred.
 
-**Product reality preserved:** S2 CSP **PASS** enforce ON · R1–R5 **PASS** · H4 **CLEAN PASS** · 5 canonical Nova Hiring PL rows · PII/consent **DONE** · public **NO-GO** · auto-apply **PAUSED** · delegated **NOT LIVE**.
+**Product reality preserved:** S2 CSP **PASS** enforce ON · R1–R5 **PASS** · H4 **CLEAN PASS** · 5 canonical Nova Hiring PL rows · PII/consent **DONE** · candidate transparency panel **polished 2026-06-07** · public **NO-GO** · auto-apply **PAUSED** · delegated **NOT LIVE**.
 
 ---
 
@@ -275,7 +275,7 @@ Complete **within 30 minutes** of dry run. Use `docs/H5_FOUNDER_DEMO_DRY_RUN_CHE
 | “Who is responsible for errors?” | “Recruiter owns accept/decline. TWIN provides rule-based ranking and explanations — not hiring outcomes. Mis-rank → tell us the score; we tune thresholds.” | Match score + reasons; decline flow | TWIN liable for hiring decisions; legal certification |
 | “What about GDPR/consent?” | “Candidates consent at registration; inbox is **application_review** — names shown by pilot policy. Email/phone/CV not in inbox API. DPA on request — **not legal advice**.” | PII visibility note; `data_visibility_summary` | Full GDPR certification; lawyer-approved guarantee |
 | “What about bias?” | “Inbox uses **rule-based** overlap (skills, title, location, salary signals) — no personality model. Sparse profiles get **low confidence**, not inflated scores.” | Ewa weak row; data confidence field | Bias-free certification; automated fairness audit |
-| “Can candidates see what is shared?” | “Yes — **consent receipt** on candidate dashboard shows matching scope. Inbox shares name + match metadata for application review, not full CV export to recruiter inbox.” | Mention candidate dashboard receipt (no live nav required) | Candidates see recruiter internal notes |
+| “Can candidates see what is shared?” | “Yes — **transparency panel** on candidate dashboard (`What TWIN shows to the recruiter`) explains application_review scope, what is hidden by default, that TWIN does not decide, and auto-apply/delegated apply are not live.” | Mention candidate dashboard panel (no live nav required) | Candidates see recruiter internal notes |
 | “Can AI assess personality?” | “**No.** No personality, culture-fit, or psychometric inference in inbox. Only profile overlap and explicit gaps.” | Review card disclaimer (section H) | Culture fit AI; video analysis |
 | “Can hiring managers override AI?” | “HM is not a separate AI layer — **recruiter/HM is the decision-maker.** Accept/decline is the override. No auto-booking.” | Accept/decline on pending row (explain only in dry run) | HM packet workflow shipped |
 | “Does this violate EU AI Act?” | “We position inbox as **decision support**, not autonomous hiring. **We do not claim AI Act compliance or certification** — happy to discuss approach under NDA with your counsel.” | Human decision disclaimer | “AI Act compliant/certified” |
@@ -466,6 +466,7 @@ After dry run scoring, founder selects **one** path:
 | `docs/RECRUITER_DEMO_PATH_2026-06-06.md` | Compressed 2–3 min path |
 | `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md` | Full pilot pack (post-H5) |
 | `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` | Outbound templates (**after H5 GO only**) |
+| `docs/CANDIDATE_APPLICATION_TRANSPARENCY_2026-06-07.md` | Candidate-side panel copy + verification |
 | `docs/PII_DATA_VISIBILITY_POLICY_2026-06-06.md` | PII boundaries |
 
 ---

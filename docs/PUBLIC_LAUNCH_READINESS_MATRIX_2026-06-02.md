@@ -8,6 +8,7 @@
 
 **Verdict:** **Public launch NO-GO**
 **Safe-lane merge (2026-06-06):** PR [#38](https://github.com/CzechowskiT/twin/pull/38) — PII/consent receipt alignment · commit `2cc18db` · automated curl smoke `2026-06-06T16:52:28Z`–`16:53:45Z` · **does not change launch NO-GO**.
+**Safe-lane merge (2026-06-07):** Candidate application transparency polish — structured panel PL/EN, `rejected` status, automation pause copy · see `docs/CANDIDATE_APPLICATION_TRANSPARENCY_2026-06-07.md` · **does not change launch NO-GO**.
  · **Controlled recruiter pilot/demo READY FOR FOUNDER DRY RUN** (H5 pack shipped; founder **defers external invitations** until **H5 GO** after dry run PASS) · **S2 PASS** (post-enforce smoke `2026-06-05T16:20:13Z`) · **R1–R5 PASS** · **H4 CLEAN PASS** (`2026-06-06T17:36:25Z`) · **Auto-apply PAUSED** (operational + product gates)
 
 ---
@@ -348,7 +349,7 @@ Monitor Railway `csp_report` for **24h** after enforce deploy (`2026-06-05T16:20
 - **Verdict:** **C) candidate-first, recruiter-supporting** — not **D) two-sided**; not recruiter-hostile
 - **Evidence:** Recruiter inbox + batch accept/decline **LIVE** (token pilot); auto-apply **PAUSED** + delegated **NOT LIVE**; marketing recruiter SKU (watchlists/HM packets) **mostly not shipped**
 - **Launch impact:** **No change** to public **NO-GO** or pilot **GO**; recruiter sales must not claim unshipped SKU; inbox PII + match explainability **review_card shipped + R5 smoke PASS 2026-06-06**; **H1–H3 PII alignment shipped 2026-06-06** (`docs/PII_CONSENT_RECEIPT_AUDIT_2026-06-06.md`)
-- **Pilot/demo:** **R1–R5 PASS** · **H4 CLEAN PASS** (`2026-06-06T17:36:25Z`) — Nova Hiring PL queue **5 canonical rows** verified in UI; legacy cleanup **DONE**; PII/consent **DONE**; **H5 dry run pack** shipped (`docs/H5_FOUNDER_DEMO_DRY_RUN_PACK_2026-06-06.md`); controlled recruiter pilot/demo **READY FOR FOUNDER DRY RUN** (founder **defers external invitations** until **H5 GO** after dry run PASS); public launch **NO-GO**
+- **Pilot/demo:** **R1–R5 PASS** · **H4 CLEAN PASS** (`2026-06-06T17:36:25Z`) — Nova Hiring PL queue **5 canonical rows** verified in UI; legacy cleanup **DONE**; PII/consent **DONE**; **candidate transparency panel polished 2026-06-07** (`docs/CANDIDATE_APPLICATION_TRANSPARENCY_2026-06-07.md`); **H5 dry run pack** shipped (`docs/H5_FOUNDER_DEMO_DRY_RUN_PACK_2026-06-06.md`); controlled recruiter pilot/demo **READY FOR FOUNDER DRY RUN** (founder **defers external invitations** until **H5 GO** after dry run PASS); public launch **NO-GO**
 
 ---
 
