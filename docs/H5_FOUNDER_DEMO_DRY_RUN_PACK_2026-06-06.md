@@ -6,7 +6,7 @@
 **Audience:** Founder (private dry run before any external recruiter conversation)  
 **Doc UTC:** `2026-06-06`
 
-**Launch stance:** Public **NO-GO** · controlled recruiter pilot **H5b PASS** (`2026-06-07T07:03:13Z`) · **H5c pack created** (`2026-06-07`) · default **HOLD** · auto-apply **PAUSED** · delegated **NOT LIVE** · recruiter calendar placeholder **NOT LIVE** · external invitations **deferred** until explicit founder **GO SMALL 1/2** · invitations sent **no**
+**Launch stance:** Public **NO-GO** · controlled recruiter pilot **H5b PASS** (`2026-06-07T07:03:13Z`) · **H5c pack created** · **H5d pack created** (`2026-06-07`) · default **HOLD** · auto-apply **PAUSED** · delegated **NOT LIVE** · recruiter calendar placeholder **NOT LIVE** · external invitations **deferred** until H5d slot-1 selected + explicit founder **GO SMALL 1/2** · invitations sent **no**
 
 **Hard bans in this pack:** No deploy, env, DB, migrations, secrets, tokens, public GO, auto-apply/delegated enable, invitation sending, CSP changes, recruiter-replacement language.
 
@@ -47,7 +47,7 @@ This pack prepares the founder to run a **private, repeatable 20–30 minute rec
 
 **Founder:** „wszystko pass jedziemy dalej”
 
-**Gate record:** **H5b PASS** · **H5c pack created** `2026-06-07` · default **HOLD** · external invites **not sent** until explicit **GO SMALL 1/2**
+**Gate record:** **H5b PASS** · **H5c pack created** · **H5d pack created** `2026-06-07` · default **HOLD** · external invites **not sent** until H5d slot-1 selected + explicit **GO SMALL 1/2**
 
 ---
 

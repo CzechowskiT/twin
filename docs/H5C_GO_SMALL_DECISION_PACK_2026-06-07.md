@@ -6,7 +6,7 @@
 **Audience:** Founder (private decision before any external recruiter invite)  
 **Doc UTC:** `2026-06-07`
 
-**Launch stance:** Public **NO-GO** · controlled recruiter pilot **H5b PASS** (`2026-06-07T07:03:13Z`) · **H5c pack created** · default decision **HOLD** · auto-apply **PAUSED** · delegated **NOT LIVE** · recruiter calendar placeholder **NOT LIVE** · external invitations **not sent**
+**Launch stance:** Public **NO-GO** · controlled recruiter pilot **H5b PASS** (`2026-06-07T07:03:13Z`) · **H5c pack created** · **H5d pack created** · default decision **HOLD** · auto-apply **PAUSED** · delegated **NOT LIVE** · recruiter calendar placeholder **NOT LIVE** · external invitations **not sent**
 
 **Hard bans in this pack:** No deploy, env, DB, migrations, secrets, tokens, public GO, auto-apply/delegated enable, recruiter-replacement language, CSP/auth changes, **no invitation sending**, **no external messages**, **no pilot-started claims**.
 
@@ -20,7 +20,7 @@ This pack **does not send invites**. It records decision options, guardrails, an
 
 **Prerequisites met:** H1–H5b complete · R1–R5 PASS · H4 **CLEAN PASS** · S2 CSP **PASS** · candidate transparency polished `2026-06-07`.
 
-**Default recommendation:** **HOLD** until founder names slot 1 and completes §5 pre-send checklist. If already comfortable with one trusted reviewer, **GO SMALL 1** is the lowest-risk invite path.
+**Default recommendation:** **HOLD** until founder scores 3–5 possible slot-1 names in `docs/H5D_SLOT1_REVIEWER_SHORTLIST_PACK_2026-06-07.md` §6 and completes §5 pre-send checklist. If one candidate scores **≥4.2**, **GO SMALL 1** is the lowest-risk invite path.
 
 ---
 
@@ -180,7 +180,7 @@ Primary questions for GO SMALL reviewers (week 1–4):
 | **Delegated apply** | **NOT LIVE** |
 | **Recruiter calendar** | **NOT LIVE** — placeholder only |
 | **External recruiter invites** | **Not sent** — deferred until explicit **GO SMALL 1/2** sign-off |
-| **Next founder action** | Name slot-1 reviewer · complete §5 · sign **GO SMALL 1** in §9 · then use invites pack |
+| **Next founder action** | Supply **3–5 possible names** for H5d §6 scoring → select slot 1 → complete §5 · sign **GO SMALL 1** in §9 · then use invites pack |
 
 ---
 
@@ -195,6 +195,7 @@ Primary questions for GO SMALL reviewers (week 1–4):
 | `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` | Outbound templates (**after H5c GO SMALL only**) |
 | `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` | R1–R5 evidence |
 | `docs/CANDIDATE_APPLICATION_TRANSPARENCY_2026-06-07.md` | Candidate-side panel |
+| `docs/H5D_SLOT1_REVIEWER_SHORTLIST_PACK_2026-06-07.md` | Slot-1 shortlist + scoring (before GO SMALL 1) |
 
 ---
 

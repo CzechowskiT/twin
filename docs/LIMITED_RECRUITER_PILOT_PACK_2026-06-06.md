@@ -6,7 +6,7 @@
 **Audience:** Founder, named pilot recruiters (3–5), internal GTM  
 **Doc UTC:** `2026-06-06` · **calendar nav smoke:** `2026-06-07T06:32:51Z` (PR [#43](https://github.com/CzechowskiT/twin/pull/43) · HEAD `2fa2746`)
 
-**Launch stance:** Public **NO-GO** · controlled recruiter pilot **H5b PASS** (`2026-06-07T07:03:13Z`) · **H5c pack created** (`2026-06-07`) · default **HOLD** · founder **defers external invitations** until explicit **GO SMALL 1/2** · S2 **PASS** · R1–R5 **PASS** (R5 Match Receipt `2026-06-06T16:38:40Z`) · **R6 calendar placeholder HTTP PASS** (`2026-06-07T06:32:51Z`) · auto-apply **PAUSED** · delegated **NOT LIVE** · recruiter calendar **NOT LIVE** · invitations sent **no** · audit verdict **C)** candidate-first, recruiter-supporting
+**Launch stance:** Public **NO-GO** · controlled recruiter pilot **H5b PASS** (`2026-06-07T07:03:13Z`) · **H5c pack created** · **H5d pack created** (`2026-06-07`) · default **HOLD** · founder **defers external invitations** until H5d slot-1 selected + explicit **GO SMALL 1/2** · S2 **PASS** · R1–R5 **PASS** (R5 Match Receipt `2026-06-06T16:38:40Z`) · **R6 calendar placeholder HTTP PASS** (`2026-06-07T06:32:51Z`) · auto-apply **PAUSED** · delegated **NOT LIVE** · recruiter calendar **NOT LIVE** · invitations sent **no** · audit verdict **C)** candidate-first, recruiter-supporting
 
 **Hard bans in this pack:** No deploy, env, DB, migrations, secrets, tokens, public GO, auto-apply/delegated enable, recruiter-replacement language, CSP changes.
 
@@ -18,7 +18,7 @@ TWIN invites **3–5 named recruiters** into a **limited, founder-led pilot** to
 
 Production recruiter inbox smoke **R1–R5 PASS** (R1–R4 `2026-06-06T16:07:18Z`; **R5 Match Receipt** `2026-06-06T16:38:40Z`). This is **not** public launch, **not** a two-sided marketplace claim, and **not** permission to enable auto-apply or delegated submit.
 
-**Founder decision required:** **H1–H5b complete** — H4 **CLEAN PASS** `2026-06-06T17:36:25Z`; **H5b founder dry run PASS** `2026-06-07T07:03:13Z`. **H5c GO SMALL decision pack** (`docs/H5C_GO_SMALL_DECISION_PACK_2026-06-07.md`) — default **HOLD**; founder signs **GO SMALL 1/2** before any external invite. Then use `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` and track outcomes in `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md`. External invitations **not sent** until explicit GO SMALL.
+**Founder decision required:** **H1–H5b complete** — H4 **CLEAN PASS** `2026-06-06T17:36:25Z`; **H5b founder dry run PASS** `2026-06-07T07:03:13Z`. **H5c GO SMALL decision pack** — default **HOLD**; **H5d slot-1 shortlist pack** — founder supplies 3–5 possible names for scoring before GO SMALL 1. Then use invites pack and tracker. External invitations **not sent** until H5d slot-1 selected + explicit GO SMALL.
 
 ---
 
@@ -260,7 +260,7 @@ Capture verbatim objections into tracker for synthesis — especially PII, ATS, 
 | Field | Value |
 | ----- | ----- |
 | **Public launch** | **NO-GO** |
-| **Controlled recruiter pilot** | **H5b PASS** · **H5c pack created** `2026-06-07` — default **HOLD**; founder **defers external invitations** until explicit **GO SMALL 1/2** |
+| **Controlled recruiter pilot** | **H5b PASS** · **H5c pack created** · **H5d pack created** `2026-06-07` — default **HOLD**; founder **defers external invitations** until H5d slot-1 selected + explicit **GO SMALL 1/2** |
 | **S2 CSP** | **PASS** (post-enforce `2026-06-05T16:20:13Z`; enforce ON; 24h monitor complete `2026-06-06T16:20:13Z`) |
 | **Recruiter inbox R1–R4** | **PASS** `2026-06-06T16:07:18Z` |
 | **Recruiter Match Receipt (R5)** | **PASS** `2026-06-06T16:38:40Z` — Nova Hiring PL; all review-card sections visible |
@@ -279,8 +279,9 @@ Capture verbatim objections into tracker for synthesis — especially PII, ATS, 
 5. ~~H5 dry run pack~~ ✅ **2026-06-06** — `docs/H5_FOUNDER_DEMO_DRY_RUN_PACK_2026-06-06.md` + checklist
 6. ~~H5 — Founder dry run PASS~~ ✅ **2026-06-07T07:03:13Z**
 7. **H5c — GO SMALL decision pack** ✅ **2026-06-07** — default **HOLD**; external invites **not sent**
+8. **H5d — Slot-1 reviewer shortlist pack** ✅ **2026-06-07** — default **HOLD**; no slot-1 selected; founder to supply 3–5 possible names for scoring
 
-**Next founder action:** Review H5c pack → name slot-1 reviewer → sign **GO SMALL 1** → fill tracker row 1 → send first invite via invites pack → schedule onboarding call.
+**Next founder action:** Score 3–5 possible names in H5d §6 → select slot 1 → sign **GO SMALL 1** in H5c → fill tracker row 1 → send first invite via invites pack → schedule onboarding call.
 
 ---
 
