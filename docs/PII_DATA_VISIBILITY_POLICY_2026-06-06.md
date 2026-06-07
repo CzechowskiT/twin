@@ -129,3 +129,5 @@ cd frontend && npm run test:candidate-transparency && npm run test:pii-data-visi
 ## Merge record (safe lane)
 
 **PR #38** merged to `cursor/phase1-monorepo-scaffold` as **`2cc18db`** (`2026-06-06T16:52:20Z` UTC). Automated post-merge smoke: `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` § Post-merge automated smoke — PR #38. Launch stance unchanged: public **NO-GO**, pilot **READY FOR FOUNDER DECISION**.
+
+**H5 founder dry run PASS** recorded `2026-06-07T07:03:13Z` UTC — recruiter data visibility / consent explanation **PASS**; candidate transparency mentioned **PASS**; **H5b PASS**; next gate **H5c GO SMALL**; external invites **not sent** until explicit GO SMALL. Product reality: S2 CSP **PASS** enforce ON · R1–R5 **PASS** · H4 **CLEAN PASS** · 5 rows · calendar placeholder **NOT LIVE** · auto-apply **PAUSED** · delegated **NOT LIVE**.

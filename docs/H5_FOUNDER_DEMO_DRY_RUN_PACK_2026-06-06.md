@@ -6,7 +6,7 @@
 **Audience:** Founder (private dry run before any external recruiter conversation)  
 **Doc UTC:** `2026-06-06`
 
-**Launch stance:** Public **NO-GO** · controlled recruiter pilot **READY FOR FOUNDER DRY RUN** · auto-apply **PAUSED** · delegated **NOT LIVE** · external invitations **deferred** until explicit founder **H5 GO**
+**Launch stance:** Public **NO-GO** · controlled recruiter pilot **H5b PASS** (`2026-06-07T07:03:13Z`) · auto-apply **PAUSED** · delegated **NOT LIVE** · recruiter calendar placeholder **NOT LIVE** · external invitations **deferred** until explicit founder **H5c GO SMALL**
 
 **Hard bans in this pack:** No deploy, env, DB, migrations, secrets, tokens, public GO, auto-apply/delegated enable, invitation sending, CSP changes, recruiter-replacement language.
 
@@ -29,7 +29,25 @@ This pack prepares the founder to run a **private, repeatable 20–30 minute rec
 
 **H5 decision is separate:** Completing this dry run and scoring **GO** or **GO SMALL** is a prerequisite for the founder to sign **H5 GO** and use `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md`. Until then, external invites remain deferred.
 
-**Product reality preserved:** S2 CSP **PASS** enforce ON · R1–R5 **PASS** · H4 **CLEAN PASS** · 5 canonical Nova Hiring PL rows · PII/consent **DONE** · candidate transparency panel **polished 2026-06-07** · public **NO-GO** · auto-apply **PAUSED** · delegated **NOT LIVE**.
+**Product reality preserved:** S2 CSP **PASS** enforce ON · R1–R5 **PASS** · H4 **CLEAN PASS** · 5 canonical Nova Hiring PL rows · PII/consent **DONE** · candidate transparency panel **polished 2026-06-07** · calendar placeholder **NOT LIVE** · public **NO-GO** · auto-apply **PAUSED** · delegated **NOT LIVE**.
+
+---
+
+## 1b — Founder dry run evidence (`2026-06-07T07:03:13Z` UTC)
+
+**H5 Founder Dry Run PASS:**
+
+- Queue loaded: **PASS**
+- Rows count: **5**
+- Candidate review card works: **PASS**
+- Recruiter data visibility / consent explanation: **PASS**
+- Candidate transparency mentioned: **PASS**
+- No blocking issues observed
+- **Decision: PASS**
+
+**Founder:** „wszystko pass jedziemy dalej”
+
+**Gate record:** **H5b PASS** · **Next gate:** **H5c GO SMALL** decision · external invites **not sent** until explicit GO SMALL
 
 ---
 
@@ -448,11 +466,13 @@ After dry run scoring, founder selects **one** path:
 | **Recruiter inbox R1–R5** | **PASS** — R5 `2026-06-06T16:38:40Z` |
 | **H4 demo seed** | **CLEAN PASS** — `2026-06-06T17:36:25Z`; 5 canonical rows |
 | **H5 dry run pack** | **CREATED** — this doc + checklist `2026-06-06` |
+| **H5b founder dry run** | **PASS** — `2026-06-07T07:03:13Z`; queue 5 rows; review card; PII/consent; candidate transparency; no blocking issues |
 | **Public launch** | **NO-GO** |
 | **Auto-apply** | **PAUSED** |
 | **Delegated apply** | **NOT LIVE** |
-| **External recruiter invites** | **Deferred** until explicit founder **H5 GO** after dry run PASS |
-| **Next gate** | Founder completes dry run → scores rubric → H5 decision A–D |
+| **Recruiter calendar** | **NOT LIVE** — placeholder only (`/recruiter/calendar`) |
+| **External recruiter invites** | **Deferred** until explicit founder **H5c GO SMALL** |
+| **Next gate** | **H5c GO SMALL** decision (1–2 trusted reviewers) — **no invites sent** until sign-off |
 
 ---
 

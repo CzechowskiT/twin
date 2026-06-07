@@ -59,7 +59,27 @@ Recruiter-side note: `recruiterInbox.dataVisibilityNote` (PL/EN i18n) + API `dat
 | Auto-apply | **PAUSED** |
 | Delegated apply | **NOT LIVE** |
 | Public launch | **NO-GO** |
-| External recruiter invitations | Deferred (founder decision) |
+| External recruiter invitations | Deferred until explicit **H5c GO SMALL** (founder decision) |
+
+---
+
+## H5 founder dry run evidence (`2026-06-07T07:03:13Z` UTC)
+
+**H5 Founder Dry Run PASS:**
+
+- Queue loaded: **PASS**
+- Rows count: **5**
+- Candidate review card works: **PASS**
+- Recruiter data visibility / consent explanation: **PASS**
+- Candidate transparency mentioned: **PASS**
+- No blocking issues observed
+- **Decision: PASS**
+
+**Founder:** „wszystko pass jedziemy dalej”
+
+**Gate record:** **H5b PASS** · **Next gate:** **H5c GO SMALL** · external invites **not sent** until explicit GO SMALL
+
+**Product reality preserved:** S2 CSP **PASS** enforce ON · R1–R5 **PASS** · H4 **CLEAN PASS** · calendar placeholder **NOT LIVE** · public **NO-GO** · auto-apply **PAUSED** · delegated **NOT LIVE**
 
 ---
 
@@ -117,4 +137,4 @@ npm run build
 
 ## Launch stance
 
-Public launch **NO-GO**. Recruiter pilot **founder-decision only**. Auto-apply **PAUSED**. Delegated apply **NOT LIVE**.
+Public launch **NO-GO**. Recruiter pilot **H5b PASS** (`2026-06-07T07:03:13Z`) — next gate **H5c GO SMALL**. Auto-apply **PAUSED**. Delegated apply **NOT LIVE**. Recruiter calendar placeholder **NOT LIVE**. External invites **not sent** until explicit GO SMALL.

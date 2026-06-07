@@ -21,7 +21,27 @@
 | **Future ATS webhook** | `future_ats` | TBD — employer contract | TBD | TBD | TBD | TBD | TBD | TBD | B2B DPA + webhook scope | 📐 NOT LIVE | H if over-shared |
 | **Future delegated apply** | `future_delegated` | Employer submit flow | May appear on employer form | May appear | Package PDF when enabled | Profile | N/A | N/A | Extra consent gate | ⏸ NOT LIVE (paused) | H |
 | **Future talent pool browse (recruiter)** | `anonymized_talent_pool` | **Hidden** | Hidden | Hidden | Hidden | Hidden | **OK** | Hidden | Pool opt-in only | 📐 NOT LIVE | L |
-| **Demo Nova Hiring PL** | `recruiter_demo` | **Shown** (seed) | Hidden in API | Hidden | Hidden | Profile overlap | **OK** | **OK** | Demo seed + pilot waiver | ✅ H4 shipped — 5 synthetic rows | M — demo screenshots |
+| **Demo Nova Hiring PL** | `recruiter_demo` | **Shown** (seed) | Hidden in API | Hidden | Hidden | Profile overlap | **OK** | **OK** | Demo seed + pilot waiver | ✅ H4 shipped — 5 synthetic rows; **H5b dry run PASS** `2026-06-07T07:03:13Z` | M — demo screenshots |
+
+---
+
+## H5 founder dry run evidence (`2026-06-07T07:03:13Z` UTC)
+
+**H5 Founder Dry Run PASS:**
+
+- Queue loaded: **PASS**
+- Rows count: **5**
+- Candidate review card works: **PASS**
+- Recruiter data visibility / consent explanation: **PASS**
+- Candidate transparency mentioned: **PASS**
+- No blocking issues observed
+- **Decision: PASS**
+
+**Founder:** „wszystko pass jedziemy dalej”
+
+**Gate record:** **H5b PASS** · **Next gate:** **H5c GO SMALL** · external invites **not sent** until explicit GO SMALL
+
+**Product reality preserved:** S2 CSP **PASS** enforce ON · R1–R5 **PASS** · H4 **CLEAN PASS** · PII/consent **DONE** · candidate transparency **DONE** · calendar placeholder **NOT LIVE** · public **NO-GO** · auto-apply **PAUSED** · delegated **NOT LIVE**
 
 ---
 
@@ -45,6 +65,7 @@ See **`docs/PII_DATA_VISIBILITY_POLICY_2026-06-06.md`** for canonical rules and 
 | Candidate transparency panel on applications (`CandidateApplicationTransparencyPanel`) | ✅ Shipped 2026-06-06; **polished 2026-06-07** — structured PL/EN copy, `rejected` status, automation pause |
 | Audit + policy docs | ✅ This file + policy doc |
 | Demo seed polish (Nova Hiring PL) | ✅ `docs/H4_DEMO_SEED_POLISH_2026-06-06.md` |
+| H5b founder dry run (PII/consent + transparency) | ✅ **PASS** `2026-06-07T07:03:13Z` — see § H5 founder dry run evidence |
 
 ---
 
