@@ -3,7 +3,7 @@
 **Owner:** Founder  
 **Pack:** `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md`  
 **Cohort target:** 3–5 named recruiters  
-**Launch stance:** Public **NO-GO** · pilot **READY FOR FOUNDER DRY RUN** (founder **defers external invitations** until **H5 GO** after dry run PASS) · R1–R5 **PASS** · H4 **CLEAN PASS** (`2026-06-06T17:36:25Z`) · H5 pack **shipped** · auto-apply **PAUSED** · delegated **NOT LIVE**
+**Launch stance:** Public **NO-GO** · pilot **READY FOR FOUNDER DRY RUN** (founder **defers external invitations** until **H5 GO** after dry run PASS) · R1–R5 **PASS** · **R6 calendar placeholder HTTP PASS** (`2026-06-07T06:32:51Z`, PR #43) · H4 **CLEAN PASS** (`2026-06-06T17:36:25Z`) · H5 pack **shipped** · auto-apply **PAUSED** · delegated **NOT LIVE** · recruiter calendar **NOT LIVE**
 
 **Rules:** No access codes, tokens, or secrets in this doc. Company slugs only when non-sensitive. Update weekly during active pilot.
 
@@ -24,7 +24,7 @@
 **Column hints:**
 
 - **First queue load** — UTC timestamp when recruiter successfully loaded `/recruiter/inbox` (empty queue counts as PASS).
-- **Calendar nav** — Recruiter header **Kalendarz** opens `/recruiter/calendar` (roadmap placeholder). Candidate `/dashboard/calendar` hidden from recruiter nav; direct hits redirect — no login loop (fix `2026-06-06`).
+- **Calendar nav** — Recruiter header **Kalendarz** opens `/recruiter/calendar` (roadmap placeholder, PR #43 `2fa2746`). Candidate `/dashboard/calendar` hidden from recruiter nav; direct hits redirect — no login loop. Prod HTTP smoke **PASS** `2026-06-07T06:32:51Z` (200 on `/recruiter/calendar`, `/recruiter/inbox`, `/recruiter/jobs`). Unauthenticated browser hits `PersonaWorkspaceGate` → login (expected).
 - **First decision** — UTC timestamp of first accept or decline.
 - **Notes** — match score disputes, product gaps, objection themes (no PII in notes).
 

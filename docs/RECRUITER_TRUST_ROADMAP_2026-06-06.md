@@ -1,8 +1,8 @@
 # Recruiter Trust & Explainability Roadmap — 2026-06-06
 
 **Owner:** TWIN Recruiter Trust & Explainability  
-**Branch:** `cursor/phase1-monorepo-scaffold`
-**Launch stance:** Public **NO-GO** · controlled recruiter pilot/demo **READY FOR FOUNDER DECISION** (founder **defers external recruiter invitations** until hardening below) · auto-apply **PAUSED** · delegated **NOT LIVE**
+**Branch:** `cursor/phase1-monorepo-scaffold` · **HEAD:** `2fa2746` (PR [#43](https://github.com/CzechowskiT/twin/pull/43))
+**Launch stance:** Public **NO-GO** · controlled recruiter pilot/demo **READY FOR FOUNDER DECISION** (founder **defers external recruiter invitations** until hardening below) · auto-apply **PAUSED** · delegated **NOT LIVE** · recruiter calendar **NOT LIVE**
 
 **Hard bans:** No deploy, env, DB migration, secrets, public GO, auto-apply/delegated enable, CSP changes, LLM on inbox rows, personality claims.
 
@@ -18,7 +18,7 @@ Recruiters should **trust the queue before they trust automation**. Every inbox 
 
 | Layer | Deliverable | Notes |
 | ----- | ----------- | ----- |
-| **Frontend** | Recruiter calendar nav guard + `/recruiter/calendar` placeholder | Header **Kalendarz** → roadmap page (PL/EN); no candidate `/dashboard/calendar` login loop; candidate calendar unchanged |
+| **Frontend** | Recruiter calendar nav guard + `/recruiter/calendar` placeholder | Header **Kalendarz** → `/recruiter/calendar` (PR #43); PL/EN **not live** copy; no candidate `/dashboard/calendar` login loop; candidate calendar unchanged; prod HTTP smoke **PASS** `2026-06-07T06:32:51Z` |
 | **Backend** | `review_card` nested object on inbox rows | Deterministic, locale via `X-Locale`; no schema change |
 | **Frontend** | Expandable **Show review card** / **Pokaż kartę oceny** | Sections A–H; accept/decline UX unchanged |
 | **Tests** | `test_recruiter_match_explanations.py`, inbox batch, frontend review-card script | CSP suite unchanged (no CSP edits) |
@@ -132,8 +132,19 @@ After loading queue (`docs/RECRUITER_DEMO_PATH_2026-06-06.md`):
 cd backend && pytest tests/test_recruiter_match_explanations.py tests/test_recruiter_inbox.py tests/test_csp_report.py tests/test_csp_report_sanitization.py -q
 
 # Frontend
-cd frontend && npm run test:recruiter-inbox-decision && npm run test:recruiter-review-card && npm run lint && npx tsc --noEmit && npm run build
+cd frontend && npm run test:recruiter-inbox-decision && npm run test:recruiter-review-card && npm run lint && npx tsc --noEmit && npm run build && npx tsx scripts/persona-access.test.ts
 ```
+
+### Production smoke — recruiter calendar placeholder (`2026-06-07T06:32:51Z`)
+
+| Route | HTTP | CSP enforce | Notes |
+| ----- | ---- | ----------- | ----- |
+| `/recruiter/calendar` | **200** | ✅ | Roadmap placeholder; title **Recruiter calendar · TWIN**; **NOT LIVE** copy in repo i18n |
+| `/recruiter/inbox` | **200** | ✅ | Pilot inbox (token) |
+| `/recruiter/jobs` | **200** | ✅ | Employer jobs POST |
+| `/dashboard/calendar` | **200** | ✅ | Candidate-only calendar — unaffected by PR #43 |
+
+**Limitation:** Unauthenticated browser visits hit `PersonaWorkspaceGate` → `/login/recruiter`; visual placeholder copy requires recruiter session. No live recruiter calendar sync claimed.
 
 ---
 

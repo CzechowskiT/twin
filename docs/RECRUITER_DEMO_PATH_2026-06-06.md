@@ -1,8 +1,8 @@
 # Recruiter demo path — 2026-06-06
 
-**Branch:** `cursor/phase1-monorepo-scaffold`
+**Branch:** `cursor/phase1-monorepo-scaffold` · **HEAD:** `2fa2746` (PR [#43](https://github.com/CzechowskiT/twin/pull/43) merged — recruiter calendar nav fix)
 **Audience:** Founder / investor / named pilot recruiter (2–3 min)
-**Launch stance:** Public **NO-GO** · pilot **GO** · auto-apply **PAUSED** · delegated **NOT LIVE**
+**Launch stance:** Public **NO-GO** · pilot **GO** · auto-apply **PAUSED** · delegated **NOT LIVE** · recruiter calendar **NOT LIVE** (placeholder only)
 **Production smoke:** `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` — R1–R4 ✅ **PASS** (`2026-06-06T16:07:18Z`); **R5 Match Receipt** ✅ **PASS** (`2026-06-06T16:38:40Z`); **H4 final visual smoke** ✅ **CLEAN PASS** (`2026-06-06T17:36:25Z`) — 5 canonical rows on Nova Hiring PL
 
 ---
@@ -37,7 +37,7 @@ Show **calendar-of-acceptance** from the recruiter side: pre-qualified rows with
    Same token + company slug; POST creates employer listing for future matches.
 
 5b. **Calendar tab (honest)** — `/recruiter/calendar`  
-   Header **Kalendarz** lands here — **roadmap placeholder**, not live sync. Do **not** demo candidate `/dashboard/calendar` for recruiters. Links to inbox, jobs, `/for-recruiters`.
+   Header **Kalendarz** lands here — **roadmap placeholder**, not live sync. Do **not** demo candidate `/dashboard/calendar` for recruiters. Links to inbox, jobs, `/for-recruiters`. Copy includes **“Not live in this environment”** (EN) / **“Nie jest live w tym środowisku”** (PL) — no Google/Microsoft sync claims on this page.
 
 6. **Close with north star**  
    “TWIN ranks before they hit your inbox; you accept who gets a calendar slot.”
@@ -108,6 +108,18 @@ Documented in audit `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md` 
 | **R5 Match Receipt / Review Card** | ✅ **PASS** (`2026-06-06T16:38:40Z`) — Nova Hiring PL; all sections A–H visible; accept/decline unchanged; no CSP errors |
 
 **Founder checkpoint UTC:** `2026-06-06T17:36:25Z` (H4 final visual smoke **CLEAN PASS**) · `2026-06-06T16:38:40Z` (Match Receipt) · `2026-06-06T16:07:18Z` (R1–R4) · **H4 complete** — 5 canonical rows, no legacy row, review card + PII note verified · **H5 dry run pack** `docs/H5_FOUNDER_DEMO_DRY_RUN_PACK_2026-06-06.md` (20–30 min agenda + screen path A–M) · controlled pilot/demo **READY FOR FOUNDER DRY RUN** (founder **defers external invitations** until **H5 GO** after dry run PASS) · public launch **NO-GO**
+
+### R6 — Recruiter calendar placeholder smoke (safe-lane, `2026-06-07T06:32:51Z`)
+
+| Check | Result |
+| ----- | ------ |
+| **PR #43 merged** (`2fa2746`) — nav → `/recruiter/calendar` not `/dashboard/calendar` | ✅ **CODE PASS** — `headerSessionNavLinks` + `calendarNavHref` persona-aware; `persona-access.test.ts` 8/8 |
+| **Placeholder route** `/recruiter/calendar` | ✅ **HTTP 200** (non-500) · CSP enforce present · document title **Recruiter calendar · TWIN** on prod |
+| **Inbox / jobs** `/recruiter/inbox`, `/recruiter/jobs` | ✅ **HTTP 200** (non-500) |
+| **Candidate calendar** `/dashboard/calendar` | ✅ **HTTP 200** — candidate-only; recruiter redirect in code (`sessionPersonaHomeRedirect`) |
+| **NOT LIVE copy** | ✅ **CODE PASS** — `recruiterCalendar.notLiveTitle` / `notLiveBody`; no live sync claims |
+| **Browser (no token)** | ⚠️ **GATED** — `PersonaWorkspaceGate` redirects unauthenticated users to `/login/recruiter`; placeholder body requires recruiter session for visual PASS |
+| **Limitations** | Recruiter calendar sync **NOT LIVE**; propose-slot / team holds **roadmap**; demo uses inbox for decisions |
 
 **User-visible error mapping (EN/PL via i18n):**
 

@@ -3,7 +3,7 @@
 **Auditor:** TWIN Release Gate Owner (read-only shift)
 **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01`
 **Branch HEAD:** `9011040` (prior) → updated by 2026-06-03 shift commits; copy audit 2026-06-04
-**Audit UTC:** `2026-06-06T17:36:25Z` (H4 final visual smoke **CLEAN PASS**) · `2026-06-06T16:38:40Z` (R5 Match Receipt smoke) · `2026-06-06T16:07:18Z` (R1–R4) · `2026-06-05T16:20:13Z` (S2 post-enforce) · prior gate `2026-06-04T10:34:36Z` · **launch-day runbook** `2026-06-04` — `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` · **copy audit** `2026-06-04` — `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md`
+**Audit UTC:** `2026-06-07T06:32:51Z` (R6 recruiter calendar placeholder HTTP smoke · PR #43 `2fa2746`) · `2026-06-06T17:36:25Z` (H4 final visual smoke **CLEAN PASS**) · `2026-06-06T16:38:40Z` (R5 Match Receipt smoke) · `2026-06-06T16:07:18Z` (R1–R4) · `2026-06-05T16:20:13Z` (S2 post-enforce) · prior gate `2026-06-04T10:34:36Z` · **launch-day runbook** `2026-06-04` — `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` · **copy audit** `2026-06-04` — `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md`
 **Production (unchanged by this audit):** FE `https://twin-sooty.vercel.app` · API `https://twin-production-bcd9.up.railway.app`
 
 **Verdict:** **Public launch NO-GO**
@@ -64,6 +64,7 @@
 | Microsoft Graph | `microsoft_calendar_configured` on health surface | ✅ LIVE |
 | Apple / CalDAV / ICS | ICS/WebCal partial; no Apple Calendar OAuth | ⚠️ PARTIAL (waiver signed) |
 | O5 gate row | Google ✅ · Microsoft ✅ · Apple/iCal partial — founder waiver `2026-06-03T13:19:53Z` | ⚠️ **partial-with-waiver** — non-blocking for controlled pilot |
+| Recruiter calendar `/recruiter/calendar` | PR [#43](https://github.com/CzechowskiT/twin/pull/43) `2fa2746` — nav fix + placeholder; HTTP 200 smoke `2026-06-07T06:32:51Z`; `persona-access.test.ts` 8/8; **NOT LIVE** copy (no sync claims) | ✅ **PASS** (placeholder) — **NOT LIVE** for recruiter sync; candidate `/dashboard/calendar` unchanged |
 
 ### O5 — Calendar providers (2026-06-03)
 

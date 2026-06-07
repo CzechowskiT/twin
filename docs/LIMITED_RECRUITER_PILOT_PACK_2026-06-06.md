@@ -4,9 +4,9 @@
 **Branch:** `chore/limited-recruiter-pilot-pack-2026-06-06`  
 **Base:** `cursor/phase1-monorepo-scaffold`  
 **Audience:** Founder, named pilot recruiters (3–5), internal GTM  
-**Doc UTC:** `2026-06-06`
+**Doc UTC:** `2026-06-06` · **calendar nav smoke:** `2026-06-07T06:32:51Z` (PR [#43](https://github.com/CzechowskiT/twin/pull/43) · HEAD `2fa2746`)
 
-**Launch stance:** Public **NO-GO** · controlled recruiter pilot **READY FOR FOUNDER DECISION** (founder **defers external invitations** until hardening) · S2 **PASS** · R1–R5 **PASS** (R5 Match Receipt `2026-06-06T16:38:40Z`) · auto-apply **PAUSED** · delegated **NOT LIVE** · audit verdict **C)** candidate-first, recruiter-supporting
+**Launch stance:** Public **NO-GO** · controlled recruiter pilot **READY FOR FOUNDER DECISION** (founder **defers external invitations** until hardening) · S2 **PASS** · R1–R5 **PASS** (R5 Match Receipt `2026-06-06T16:38:40Z`) · **R6 calendar placeholder HTTP PASS** (`2026-06-07T06:32:51Z`) · auto-apply **PAUSED** · delegated **NOT LIVE** · recruiter calendar **NOT LIVE** · audit verdict **C)** candidate-first, recruiter-supporting
 
 **Hard bans in this pack:** No deploy, env, DB, migrations, secrets, tokens, public GO, auto-apply/delegated enable, recruiter-replacement language, CSP changes.
 
@@ -52,7 +52,7 @@ Outside TWIN, someone returns from time off to **random interview spam** or **th
 | **Marketing** `/for-recruiters` | LIVE | Pilot inbox, match transparency, jobs POST marked live; watchlists / HM packets marked roadmap |
 | **Acceptance inbox** `/recruiter/inbox` | LIVE (token pilot) | Queue load; match % badge + label; up to 3 rule-based reasons; **expandable review card (A–H)**; batch accept/decline; status badges; banner *“AI-assisted ranking. Recruiter decision required.”* |
 | **Employer jobs** `/recruiter/jobs` | LIVE (pilot) | POST creates employer listing for future matches |
-| **Recruiter calendar** `/recruiter/calendar` | **ROADMAP placeholder** (2026-06-06 nav fix) | Friendly PL/EN “not live” page; header **Kalendarz** no longer sends recruiters to candidate `/dashboard/calendar` (login loop fix) |
+| **Recruiter calendar** `/recruiter/calendar` | **ROADMAP placeholder** (PR #43 `2fa2746` · smoke `2026-06-07T06:32:51Z`) | Friendly PL/EN “not live” page; header **Kalendarz** → `/recruiter/calendar` (not `/dashboard/calendar`); HTTP **200** on prod; gated behind recruiter session for full UI |
 | **Match transparency** | LIVE (2026-06-06) | Deterministic reasons + **`review_card`** (gaps, verify checklist, data confidence) — not black-box LLM on inbox rows |
 | **Human-in-the-loop** | LIVE | Accept → *Accepted for interview* / *Zaakceptowany na rozmowę*; decline → *Declined* / *Odrzucony*; no stale accept CTA on decided rows |
 | **Rate limits** | LIVE | Inbox write caps (abuse protection) |
