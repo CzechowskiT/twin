@@ -3,7 +3,7 @@
 **Owner:** Founder  
 **Pack:** `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md`  
 **Cohort target:** 3–5 named recruiters  
-**Launch stance:** Public **NO-GO** · pilot **H5b PASS** (`2026-06-07T07:03:13Z`) · **H5c pack created** (`2026-06-07`) · default **HOLD** · founder **defers external invitations** until explicit **GO SMALL 1/2** · R1–R5 **PASS** · **R6 calendar placeholder HTTP PASS** (`2026-06-07T06:32:51Z`, PR #43) · H4 **CLEAN PASS** (`2026-06-06T17:36:25Z`) · auto-apply **PAUSED** · delegated **NOT LIVE** · recruiter calendar **NOT LIVE** · invitations sent **no**
+**Launch stance:** Public **NO-GO** · pilot **H5b PASS** (`2026-06-07T07:03:13Z`) · **H5c pack created** · **H5d pack created** (`2026-06-07`) · default **HOLD** · founder **defers external invitations** until H5d slot-1 selected + explicit **GO SMALL 1/2** · R1–R5 **PASS** · **R6 calendar placeholder HTTP PASS** (`2026-06-07T06:32:51Z`, PR #43) · H4 **CLEAN PASS** (`2026-06-06T17:36:25Z`) · auto-apply **PAUSED** · delegated **NOT LIVE** · recruiter calendar **NOT LIVE** · invitations sent **no**
 
 **Rules:** No access codes, tokens, or secrets in this doc. Company slugs only when non-sensitive. Update weekly during active pilot.
 
@@ -80,6 +80,7 @@ Score each dimension **1–5** at synthesis. Composite guides expand / hold / wi
 | `2026-06-06` | — | `pilot_go_pending` | R1–R5 PASS; H1–H4 **complete**; H5 pack shipped; founder **defers external invitations** until **H5 GO** after dry run PASS | Founder |
 | `2026-06-07T07:03:13Z` | — | `h5b_pass` | Founder dry run PASS — queue 5 rows, review card, PII/consent, candidate transparency | Founder |
 | `2026-06-07` | — | `h5c_pack_created` | H5c GO SMALL decision pack created — docs only; default **HOLD**; external invitations **not sent** | Agent |
+| `2026-06-07` | — | `h5d_pack_created` | H5d slot-1 reviewer shortlist pack created — docs only; default **HOLD**; no slot-1 selected; external invitations **not sent** | Agent |
 
 ---
 
@@ -139,6 +140,7 @@ Expand limited recruiter pilot beyond 5 **only if all** are true:
 | H5a | Founder demo dry run pack | ✅ | `docs/H5_FOUNDER_DEMO_DRY_RUN_PACK_2026-06-06.md` + checklist |
 | H5b | Founder dry run PASS (rubric ≥4.0) | ✅ | **PASS** `2026-06-07T07:03:13Z` — `docs/H5_FOUNDER_DEMO_DRY_RUN_CHECKLIST_2026-06-06.md` |
 | H5c | Founder GO SMALL decision (1–2 trusted reviewers) | ☐ | **Default HOLD** — `docs/H5C_GO_SMALL_DECISION_PACK_2026-06-07.md`; use invites pack only after explicit GO SMALL 1/2 |
+| H5d | Slot-1 reviewer shortlist + scoring | ☐ | **Default HOLD** — `docs/H5D_SLOT1_REVIEWER_SHORTLIST_PACK_2026-06-07.md`; founder to supply 3–5 possible names for scoring |
 
 ---
 
@@ -147,6 +149,7 @@ Expand limited recruiter pilot beyond 5 **only if all** are true:
 - `docs/H5_FOUNDER_DEMO_DRY_RUN_PACK_2026-06-06.md`
 - `docs/H5_FOUNDER_DEMO_DRY_RUN_CHECKLIST_2026-06-06.md`
 - `docs/H5C_GO_SMALL_DECISION_PACK_2026-06-07.md`
+- `docs/H5D_SLOT1_REVIEWER_SHORTLIST_PACK_2026-06-07.md`
 - `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md`
 - `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md`
 - `docs/RECRUITER_TRUST_ROADMAP_2026-06-06.md`
