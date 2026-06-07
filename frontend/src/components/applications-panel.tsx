@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "@/components/language-provider";
-import { ApplicationConsentReceipt } from "@/components/dashboard/application-consent-receipt";
+import { CandidateApplicationTransparencyPanel } from "@/components/dashboard/candidate-application-transparency-panel";
 import { PlacementStateStepper } from "@/components/placement-state-stepper";
 import { applicationDisplayStatusKey, applicationStatusKey } from "@/lib/application-status";
 
@@ -253,7 +253,7 @@ export function ApplicationsPanel({
               {app.failure_reason ? (
                 <p className="twin-muted mt-0.5 text-xs">{app.failure_reason}</p>
               ) : null}
-              <ApplicationConsentReceipt company={app.company} status={app.status} />
+              <CandidateApplicationTransparencyPanel status={app.status} />
               {onPlacementDeclare && onPlacementVerifyStart && showPlacementRow(app) ? (
                 <div className="mt-2 max-w-md space-y-2 rounded border border-[var(--twin-accent)]/25 bg-[var(--twin-accent-muted)]/25 p-2 text-xs">
                   <PlacementStateStepper state={app.placement_state ?? "none"} />

@@ -8,11 +8,11 @@ import {
 } from "../src/lib/recruiter-data-visibility";
 import { en } from "../src/lib/i18n";
 
-test("consent receipt shown for applied, pending, interview only", () => {
+test("transparency panel shown for applied, pending, interview, rejected", () => {
   assert.equal(showConsentReceipt("applied"), true);
   assert.equal(showConsentReceipt("pending"), true);
   assert.equal(showConsentReceipt("interview"), true);
-  assert.equal(showConsentReceipt("rejected"), false);
+  assert.equal(showConsentReceipt("rejected"), true);
   assert.equal(showConsentReceipt("hired"), false);
 });
 
@@ -34,11 +34,18 @@ test("recruiter visibility context falls back to pii_context", () => {
   assert.equal(recruiterDataVisibilityContext({ pii_context: "application_review" }), "application_review");
 });
 
-test("candidate consent receipt copy does not claim delegated apply or full CV share", () => {
-  const body = en.dashboard.consentReceiptBody.toLowerCase();
-  assert.match(body, /employer site|employer's site/);
-  assert.doesNotMatch(body, /delegated submit|auto-submit/);
-  assert.doesNotMatch(en.dashboard.consentReceiptHiddenCv.toLowerCase(), /shared in inbox/);
+test("candidate transparency copy does not claim delegated apply live or AI decides", () => {
+  const copy = [
+    en.dashboard.applicationTransparencyImportant,
+    en.dashboard.applicationTransparencyAutomation,
+  ]
+    .join(" ")
+    .toLowerCase();
+  assert.match(copy, /does not make hiring decisions/);
+  assert.match(copy, /auto-apply is paused/);
+  assert.match(copy, /delegated apply is not live/);
+  assert.doesNotMatch(copy, /delegated apply is live/);
+  assert.doesNotMatch(copy, /ai decides/);
 });
 
 test("recruiter inbox visibility note does not claim anonymized inbox", () => {

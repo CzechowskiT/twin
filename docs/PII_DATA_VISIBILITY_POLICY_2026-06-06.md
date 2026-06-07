@@ -60,11 +60,17 @@ When/if enabled: application package may include CV PDF for employer submission.
 
 ---
 
-## 2 — Candidate-side consent receipt
+## 2 — Candidate-side transparency panel
 
-When a candidate has an application in `pending`, `applied`, or `interview` status, the dashboard **applications panel** shows a collapsible **Data shared / consent receipt** summarizing what TWIN shares with the employer inbox vs what stays hidden.
+When a candidate has an application in `pending`, `applied`, `interview`, or **rejected** status, the dashboard **applications panel** shows a collapsible **“What TWIN shows to the recruiter”** panel (`CandidateApplicationTransparencyPanel`) summarizing:
 
-No new DB table — copy is static and aligned with this policy.
+- **Context:** `application_review`
+- **We show:** name, status, match score/reasons, AI-assisted review card, role-assessment signals
+- **Not shown by default:** phone, email, full CV, exact address, sensitive attributes
+- **Important:** TWIN does not make hiring decisions
+- **Automation:** auto-apply **PAUSED**; delegated apply **NOT LIVE**
+
+No new DB table — copy is static and aligned with this policy. See **`docs/CANDIDATE_APPLICATION_TRANSPARENCY_2026-06-07.md`**.
 
 ---
 
@@ -107,7 +113,7 @@ Product, sales, demo, and docs **must not** claim:
 
 ```bash
 cd backend && pytest tests/test_recruiter_match_explanations.py -q
-cd frontend && npm run test:pii-data-visibility && npm run test:recruiter-inbox-decision && npm run lint && npx tsc --noEmit
+cd frontend && npm run test:candidate-transparency && npm run test:pii-data-visibility && npm run test:recruiter-inbox-decision && npm run lint && npx tsc --noEmit
 ```
 
 ---
