@@ -88,6 +88,11 @@ the gate to ✅.
 | One ⚠️ partial on L6 (data subject access)                              | Document a manual workflow (`docs/GDPR_MANUAL_DSR.md`) and proceed.                   |
 | Any ❌ on Pilot gates                                                    | Pilot, not public launch — pilot has its own gate set (cf. `PILOT_OFFER_FINAL.md`).   |
 
+## CTO co-founder audit (2026-06-07)
+
+- **Doc:** `docs/CTO_COFUNDER_DUE_DILIGENCE_AUDIT_2026-06-07.md` (+ briefing + evidence index)
+- **Launch stance:** **unchanged** — public **NO-GO**; pilot/demo **GO**; auto-apply **PAUSED**; delegated **NOT LIVE**; external recruiter invites **0**; H5c/H5d **HOLD**
+
 ## Current gate stance (checkpoint 2026-06-05 post-enforce smoke **S2 PASS**, **O7 PASS**, **O8b launch-day runbook**, **L6 + O5 waivers signed**, **final logo smoke PASS**, **Railway clean post-enforce**)
 
 **Launch-day runbook:** `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` — records **public NO-GO**, **pilot/demo GO**, **auto-apply PAUSED**; CSP enforce **ON**; S2 **PASS** `2026-06-05T16:20:13Z`; **24h monitoring** through `2026-06-06T16:20:13Z`.
@@ -194,6 +199,9 @@ Warning: this check is non-destructive; do **not** run `alembic upgrade` manuall
 
 ## Related
 
+- `docs/CTO_COFUNDER_DUE_DILIGENCE_AUDIT_2026-06-07.md` — co-founder due diligence audit (launch stance unchanged)
+- `docs/CTO_COFUNDER_BRIEFING_2026-06-07.md` — executive briefing
+- `docs/CTO_COFUNDER_EVIDENCE_INDEX_2026-06-07.md` — evidence map
 - `docs/P1_DOCS_INDEX_2026-05-27.md` — entry-point map for
   every gate doc.
 - `docs/PILOT_OFFER_FINAL.md` — pilot vs launch boundary.
