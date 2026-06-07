@@ -6,7 +6,7 @@
 **Audience:** Founder (private dry run before any external recruiter conversation)  
 **Doc UTC:** `2026-06-06`
 
-**Launch stance:** Public **NO-GO** · controlled recruiter pilot **H5b PASS** (`2026-06-07T07:03:13Z`) · auto-apply **PAUSED** · delegated **NOT LIVE** · recruiter calendar placeholder **NOT LIVE** · external invitations **deferred** until explicit founder **H5c GO SMALL**
+**Launch stance:** Public **NO-GO** · controlled recruiter pilot **H5b PASS** (`2026-06-07T07:03:13Z`) · **H5c pack created** (`2026-06-07`) · default **HOLD** · auto-apply **PAUSED** · delegated **NOT LIVE** · recruiter calendar placeholder **NOT LIVE** · external invitations **deferred** until explicit founder **GO SMALL 1/2** · invitations sent **no**
 
 **Hard bans in this pack:** No deploy, env, DB, migrations, secrets, tokens, public GO, auto-apply/delegated enable, invitation sending, CSP changes, recruiter-replacement language.
 
@@ -47,7 +47,7 @@ This pack prepares the founder to run a **private, repeatable 20–30 minute rec
 
 **Founder:** „wszystko pass jedziemy dalej”
 
-**Gate record:** **H5b PASS** · **Next gate:** **H5c GO SMALL** decision · external invites **not sent** until explicit GO SMALL
+**Gate record:** **H5b PASS** · **H5c pack created** `2026-06-07` · default **HOLD** · external invites **not sent** until explicit **GO SMALL 1/2**
 
 ---
 
@@ -471,8 +471,9 @@ After dry run scoring, founder selects **one** path:
 | **Auto-apply** | **PAUSED** |
 | **Delegated apply** | **NOT LIVE** |
 | **Recruiter calendar** | **NOT LIVE** — placeholder only (`/recruiter/calendar`) |
-| **External recruiter invites** | **Deferred** until explicit founder **H5c GO SMALL** |
-| **Next gate** | **H5c GO SMALL** decision (1–2 trusted reviewers) — **no invites sent** until sign-off |
+| **External recruiter invites** | **Not sent** — deferred until explicit founder **GO SMALL 1/2** sign-off |
+| **H5c decision pack** | **CREATED** `2026-06-07` — default **HOLD** |
+| **Next gate** | Founder signs **GO SMALL 1/2** in H5c pack — **no invites sent** until sign-off |
 
 ---
 
@@ -484,8 +485,9 @@ After dry run scoring, founder selects **one** path:
 | `docs/H4_DEMO_SEED_POLISH_2026-06-06.md` | Canonical queue evidence |
 | `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` | R1–R5 smoke |
 | `docs/RECRUITER_DEMO_PATH_2026-06-06.md` | Compressed 2–3 min path |
-| `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md` | Full pilot pack (post-H5) |
-| `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` | Outbound templates (**after H5 GO only**) |
+| `docs/H5C_GO_SMALL_DECISION_PACK_2026-06-07.md` | H5c GO SMALL decision gate (1–2 reviewers) |
+| `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md` | Full pilot pack (post-H5c GO SMALL) |
+| `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` | Outbound templates (**after H5c GO SMALL 1/2 only**) |
 | `docs/CANDIDATE_APPLICATION_TRANSPARENCY_2026-06-07.md` | Candidate-side panel copy + verification |
 | `docs/PII_DATA_VISIBILITY_POLICY_2026-06-06.md` | PII boundaries |
 

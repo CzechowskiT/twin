@@ -6,7 +6,7 @@
 
 **Rules:** Replace `{name}`, `{company}`, `{founder_calendar_link}` before send. Deliver **access code + company slug** only via secure channel (encrypted email or call) — **never** in this doc or public LinkedIn DM.
 
-**Launch stance:** Public **NO-GO** · named pilot only · auto-apply **PAUSED** · delegated **NOT LIVE**
+**Launch stance:** Public **NO-GO** · named pilot only · **H5c pack created** (`2026-06-07`) · default **HOLD** · use templates **only after explicit GO SMALL 1/2** · auto-apply **PAUSED** · delegated **NOT LIVE** · invitations sent **no**
 
 ---
 
@@ -214,7 +214,7 @@ Tomasz
 
 | # | Check |
 | - | ----- |
-| 1 | Founder signed **pilot GO** in tracker decision log |
+| 1 | Founder signed **H5c GO SMALL 1/2** in `docs/H5C_GO_SMALL_DECISION_PACK_2026-06-07.md` decision log (not default HOLD) |
 | 2 | R1–R4 smoke still PASS (spot-check within 7 days of send) |
 | 3 | Access code ready for separate secure message |
 | 4 | No watchlist/HM packet/SSO language in custom edits |
@@ -225,6 +225,7 @@ Tomasz
 
 ## Related
 
+- `docs/H5C_GO_SMALL_DECISION_PACK_2026-06-07.md` — GO SMALL decision gate (before first send)
 - `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md` — talk track + objections
 - `docs/CONTROLLED_PILOT_INVITE_BRIEF_2026-05-28.md` — general pilot guardrails
 - `docs/RECRUITER_DEMO_PATH_2026-06-06.md`
