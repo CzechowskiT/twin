@@ -3,7 +3,7 @@
 **Owner:** Founder  
 **Pack:** `docs/H5_FOUNDER_DEMO_DRY_RUN_PACK_2026-06-06.md`  
 **Route:** `https://twin-sooty.vercel.app/recruiter/inbox?company_slug=nova-hiring-pl`  
-**Launch stance:** Public **NO-GO** · auto-apply **PAUSED** · delegated **NOT LIVE** · external invites **deferred** until explicit **H5c GO SMALL** · candidate transparency panel **polished 2026-06-07** (`docs/CANDIDATE_APPLICATION_TRANSPARENCY_2026-06-07.md`) · recruiter calendar placeholder **NOT LIVE**
+**Launch stance:** Public **NO-GO** · auto-apply **PAUSED** · delegated **NOT LIVE** · **H5c pack created** (`2026-06-07`) · default **HOLD** · external invites **deferred** until explicit **GO SMALL 1/2** · candidate transparency panel **polished 2026-06-07** (`docs/CANDIDATE_APPLICATION_TRANSPARENCY_2026-06-07.md`) · recruiter calendar placeholder **NOT LIVE** · invitations sent **no**
 
 **Rules:** No access codes in this doc. No prod mutations during dry run.
 
@@ -23,7 +23,7 @@
 
 **Founder:** „wszystko pass jedziemy dalej”
 
-**Gate record:** **H5b PASS** · **Next gate:** **H5c GO SMALL** decision · external invites **not sent** until explicit GO SMALL
+**Gate record:** **H5b PASS** · **H5c pack created** `2026-06-07` · default **HOLD** · external invites **not sent** until explicit **GO SMALL 1/2**
 
 **Product reality preserved:** S2 CSP **PASS** enforce ON · R1–R5 **PASS** · H4 **CLEAN PASS** · 5 rows · PII/consent **DONE** · candidate transparency **DONE** · calendar placeholder **NOT LIVE** · public **NO-GO** · auto-apply **PAUSED** · delegated **NOT LIVE**
 
@@ -178,7 +178,8 @@
 | --- | -------- | --------- | ----- |
 | `2026-06-06` | `h5_pack_created` | H5 Founder Demo Dry Run Pack + checklist shipped — docs only | Agent |
 | `2026-06-07T07:03:13Z` | **`h5b_pass`** | Founder dry run PASS — queue 5 rows, review card, PII/consent, candidate transparency; no blocking issues; „wszystko pass jedziemy dalej” | Founder |
-| | **`h5c_go_small`** *(pending)* | Next gate — founder GO SMALL decision for 1–2 trusted reviewers; **no invites sent** until explicit sign-off | Founder |
+| `2026-06-07` | `h5c_pack_created` | H5c GO SMALL decision pack created — docs only; default **HOLD**; external invitations **not sent** | Agent |
+| | **`h5c_go_small`** *(pending)* | Founder signs **GO SMALL 1/2** when ready — **no invites sent** until explicit sign-off | Founder |
 
 **H5 decision options (after dry run):**
 
@@ -236,7 +237,8 @@
 - `docs/H5_FOUNDER_DEMO_DRY_RUN_PACK_2026-06-06.md` — full pack
 - `docs/H4_DEMO_SEED_POLISH_2026-06-06.md` — queue spec
 - `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` — R1–R5
-- `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md` — post-H5 cohort
+- `docs/H5C_GO_SMALL_DECISION_PACK_2026-06-07.md` — H5c decision gate
+- `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md` — post-H5c cohort
 
 ---
 

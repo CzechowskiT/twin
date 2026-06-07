@@ -3,7 +3,7 @@
 **Owner:** Founder  
 **Pack:** `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md`  
 **Cohort target:** 3–5 named recruiters  
-**Launch stance:** Public **NO-GO** · pilot **READY FOR FOUNDER DRY RUN** (founder **defers external invitations** until **H5 GO** after dry run PASS) · R1–R5 **PASS** · **R6 calendar placeholder HTTP PASS** (`2026-06-07T06:32:51Z`, PR #43) · H4 **CLEAN PASS** (`2026-06-06T17:36:25Z`) · H5 pack **shipped** · auto-apply **PAUSED** · delegated **NOT LIVE** · recruiter calendar **NOT LIVE**
+**Launch stance:** Public **NO-GO** · pilot **H5b PASS** (`2026-06-07T07:03:13Z`) · **H5c pack created** (`2026-06-07`) · default **HOLD** · founder **defers external invitations** until explicit **GO SMALL 1/2** · R1–R5 **PASS** · **R6 calendar placeholder HTTP PASS** (`2026-06-07T06:32:51Z`, PR #43) · H4 **CLEAN PASS** (`2026-06-06T17:36:25Z`) · auto-apply **PAUSED** · delegated **NOT LIVE** · recruiter calendar **NOT LIVE** · invitations sent **no**
 
 **Rules:** No access codes, tokens, or secrets in this doc. Company slugs only when non-sensitive. Update weekly during active pilot.
 
@@ -78,6 +78,8 @@ Score each dimension **1–5** at synthesis. Composite guides expand / hold / wi
 | `2026-06-06T17:36:25Z` | — | `h4_final_visual_smoke_pass` | H4 final visual smoke **CLEAN PASS** — Nova Hiring PL; 5 canonical rows; no legacy row; review card + PII note verified | Founder |
 | `2026-06-06` | — | `h5_dry_run_pack_shipped` | H5 Founder Demo Dry Run Pack + checklist — docs only; pre-invite gate | Agent |
 | `2026-06-06` | — | `pilot_go_pending` | R1–R5 PASS; H1–H4 **complete**; H5 pack shipped; founder **defers external invitations** until **H5 GO** after dry run PASS | Founder |
+| `2026-06-07T07:03:13Z` | — | `h5b_pass` | Founder dry run PASS — queue 5 rows, review card, PII/consent, candidate transparency | Founder |
+| `2026-06-07` | — | `h5c_pack_created` | H5c GO SMALL decision pack created — docs only; default **HOLD**; external invitations **not sent** | Agent |
 
 ---
 
@@ -135,8 +137,8 @@ Expand limited recruiter pilot beyond 5 **only if all** are true:
 | H3 | Recruiter-side data visibility explanation | ✅ | Inbox PL/EN note + API `data_visibility_summary` |
 | H4 | Demo seed polish | ✅ | Code shipped; prod seed + cleanup `2026-06-06T17:27:20Z`; founder visual smoke **CLEAN PASS** `2026-06-06T17:36:25Z` — 5 canonical rows in UI |
 | H5a | Founder demo dry run pack | ✅ | `docs/H5_FOUNDER_DEMO_DRY_RUN_PACK_2026-06-06.md` + checklist |
-| H5b | Founder dry run PASS (rubric ≥4.0) | ☐ | **Next** — run dry run; log in checklist decision log |
-| H5c | Founder GO for 3–5 named recruiters | ☐ | After H5b PASS; use `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` |
+| H5b | Founder dry run PASS (rubric ≥4.0) | ✅ | **PASS** `2026-06-07T07:03:13Z` — `docs/H5_FOUNDER_DEMO_DRY_RUN_CHECKLIST_2026-06-06.md` |
+| H5c | Founder GO SMALL decision (1–2 trusted reviewers) | ☐ | **Default HOLD** — `docs/H5C_GO_SMALL_DECISION_PACK_2026-06-07.md`; use invites pack only after explicit GO SMALL 1/2 |
 
 ---
 
@@ -144,6 +146,7 @@ Expand limited recruiter pilot beyond 5 **only if all** are true:
 
 - `docs/H5_FOUNDER_DEMO_DRY_RUN_PACK_2026-06-06.md`
 - `docs/H5_FOUNDER_DEMO_DRY_RUN_CHECKLIST_2026-06-06.md`
+- `docs/H5C_GO_SMALL_DECISION_PACK_2026-06-07.md`
 - `docs/LIMITED_RECRUITER_PILOT_PACK_2026-06-06.md`
 - `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md`
 - `docs/RECRUITER_TRUST_ROADMAP_2026-06-06.md`
