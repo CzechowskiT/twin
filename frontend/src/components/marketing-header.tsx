@@ -2,7 +2,7 @@
 
 import { SiteHeaderBar } from "@/components/site-header-bar";
 
-/** Public marketing chrome — no persona dropdown on the landing experience. */
+/** Public marketing chrome — persona lane picker before sign-in. */
 export function MarketingHeader() {
-  return <SiteHeaderBar showPersonaBadge={false} />;
+  return <SiteHeaderBar showPersonaSwitcher showPersonaBadge={false} />;
 }
