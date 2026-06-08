@@ -12,6 +12,7 @@
 **Safe-lane merge (2026-06-06):** PR [#38](https://github.com/CzechowskiT/twin/pull/38) — PII/consent receipt alignment · commit `2cc18db` · automated curl smoke `2026-06-06T16:52:28Z`–`16:53:45Z` · **does not change launch NO-GO**.
 **Safe-lane merge (2026-06-07):** Candidate application transparency polish — structured panel PL/EN, `rejected` status, automation pause copy · see `docs/CANDIDATE_APPLICATION_TRANSPARENCY_2026-06-07.md` · **does not change launch NO-GO**.
 **Safe-lane merge (2026-06-07):** Homepage persona nav + `/demo` 8-step interactive simulation · `docs/INTERACTIVE_DEMO_WALKTHROUGH_2026-06-07.md` · `test:homepage-nav` + `test:interactive-demo` · **does not change launch NO-GO**.
+**Safe-lane merge (2026-06-07):** Auth role-choice-first — header Zaloguj→`/login`, Rejestracja→`/register`; hubs before persona forms · `docs/AUTH_ROLE_CHOICE_FIRST_2026-06-07.md` · `test:auth-role-choice` + `test:homepage-nav` · **does not change launch NO-GO**.
  · **Controlled recruiter pilot H5b PASS** (`2026-06-07T07:03:13Z`) · **H5c pack created** · **H5d pack created** (`2026-06-07`) · default **HOLD** · founder **defers external invitations** until H5d slot-1 selected + explicit **GO SMALL 1/2** · invitations sent **no** · **S2 PASS** (post-enforce smoke `2026-06-05T16:20:13Z`) · **R1–R5 PASS** · **H4 CLEAN PASS** (`2026-06-06T17:36:25Z`) · recruiter calendar placeholder **NOT LIVE** · **Auto-apply PAUSED** (operational + product gates)
 
 ---
@@ -53,6 +54,7 @@
 | Check | Evidence | Status |
 | ----- | -------- | ------ |
 | Candidate OAuth (Google/GitHub) | Public-health flags; login routes 200 | ✅ LIVE |
+| Auth entry role-choice-first | `/login` + `/register` hubs; header unified; deep links `/login/*` `/register/*` · `docs/AUTH_ROLE_CHOICE_FIRST_2026-06-07.md` | ✅ **LIVE** (2026-06-07) |
 | Apple OAuth | Documented OFF | ⚠️ by design |
 | OAuth callback rate limits | S10 gate — code shipped | ✅ LIVE |
 | Layer-2 LLM mutation limits | S3 gate | ✅ LIVE |
