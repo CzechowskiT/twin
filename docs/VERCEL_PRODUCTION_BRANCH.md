@@ -1,11 +1,14 @@
 # Vercel — gałąź produkcyjna
 
-**Projekt:** twin-sooty (frontend w `frontend/`)  
+**Projekt Vercel (produkcja):** **`twin`** (aliasy: `twin-sooty.vercel.app`, `twin-society.vercel.app`)  
+**Root:** `frontend/`  
 **Gałąź produkcyjna:** `cursor/phase1-monorepo-scaffold` (brak `main` na remote — ta gałąź jest źródłem prawdy dla Phase 1)
+
+> Uwaga: lokalny `frontend/.vercel/project.json` może wskazywać starszy projekt `twin-sooty` — **nie** jest to produkcja na żywo. Zob. `docs/VERCEL_PROJECT_ALIAS_RUNBOOK_2026-05-26.md`.
 
 ## Ustawienia (jednorazowo)
 
-1. [Vercel Dashboard](https://vercel.com) → projekt **twin-sooty** → **Settings** → **Git**.
+1. [Vercel Dashboard](https://vercel.com) → projekt **`twin`** → **Settings** → **Git**.
 2. **Production Branch** = `cursor/phase1-monorepo-scaffold`.
 3. **Root Directory** = `frontend`.
 4. **Environment Variables** (Production + Preview):

@@ -13,6 +13,10 @@ project or chase a phantom deploy.
 ## TL;DR
 
 - **Canonical public alias:** `https://twin-sooty.vercel.app`.
+- **Founder / legacy alias (same production):** `https://twin-society.vercel.app`
+  — must stay on Vercel project **`twin`** (added 2026-06-08). If it returns
+  `DEPLOYMENT_NOT_FOUND`, re-add: `cd frontend && npx vercel domains add twin-society.vercel.app`
+  (project `twin`, not the stale `twin-sooty` link in `frontend/.vercel/project.json`).
 - **Vercel project that owns the alias:** `twin` (org-root
   project, root directory `frontend`, production branch
   `cursor/phase1-monorepo-scaffold`).

@@ -31,3 +31,33 @@ echo
 
 echo "Compare Vercel Production deployment commit SHA to the git SHA above."
 echo "Billing smoke: open ${FRONTEND_URL%/}/dashboard/billing and search DOM for twin-billing-surface"
+echo
+
+check_marketing_header() {
+  local base="$1"
+  local html
+  html=$(curl -fsSL "${base%/}/" 2>/dev/null || true)
+  if [[ -z "$html" ]]; then
+    echo "FAIL: ${base}/ unreachable"
+    return 1
+  fi
+  if [[ "$html" != *"twin-persona-switcher"* ]]; then
+    echo "FAIL: ${base}/ missing logged-out persona switcher (twin-persona-switcher)"
+    return 1
+  fi
+  if [[ "$html" != *"twin-header-account-link"* ]]; then
+    echo "FAIL: ${base}/ missing header login/register links"
+    return 1
+  fi
+  echo "OK: ${base}/ marketing header (persona switcher + account links)"
+  return 0
+}
+
+header_fail=0
+for alias in "$FRONTEND_URL" "https://twin-society.vercel.app"; do
+  check_marketing_header "$alias" || header_fail=1
+done
+if [[ "$header_fail" -ne 0 ]]; then
+  echo "HINT: twin-society must be on Vercel project twin — see docs/VERCEL_PROJECT_ALIAS_RUNBOOK_2026-05-26.md"
+  exit 1
+fi
