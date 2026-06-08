@@ -13,7 +13,7 @@ export const FAQ_MESSAGES_EN = {
 
   general01Q: "What is TWIN today?",
   general01A:
-    "A career agent that reduces tab chaos: aggregated job discovery from boards you enable, profile-aware ranking, application tracking, and early autopilot pieces (CV tailoring, career assistant, nightly auto-apply where boards and consent allow). The north star is a short calendar of acceptance-ready moments — not more inbox spam.",
+    "A career agent that reduces tab chaos: aggregated job discovery from boards you enable, profile-aware ranking, application tracking, and early phased automation (prepare-only on production today — CV tailoring, career assistant, nightly auto-apply where boards and consent allow). The north star is a short calendar of acceptance-ready moments — not more inbox spam.",
   general02Q: "Who is TWIN for?",
   general02A:
     "Four lanes share one platform with separate surfaces: candidates hunting roles, recruiters running acceptance workflows, companies buying B2B programs, and investors reviewing traction. Pick the lane that matches how you sign up — SKUs and billing differ by persona.",
@@ -57,9 +57,9 @@ export const FAQ_MESSAGES_EN = {
   candidates10Q: "Is TWIN replacing recruiters?",
   candidates10A:
     "No. TWIN reduces noise on both sides: candidates get fewer, better-fit motions; recruiters get batch acceptance and ATS-friendly signals instead of blind CV floods. Humans still decide hires; software handles ranking, paperwork, and scheduling hygiene.",
-  candidates11Q: "What should I do before relying on autopilot?",
+  candidates11Q: "What should I do before relying on phased automation?",
   candidates11A:
-    "Complete your profile, upload a CV, connect calendar if you want holds, enable only boards you trust, and read auto-apply consent carefully. Start with saves and manual applies, then turn on nightly auto-apply when you are comfortable with the audit trail.",
+    "Complete your profile, upload a CV, connect calendar if you want holds, enable only boards you trust, and read auto-apply consent carefully. Start with saves and manual applies. Auto-apply is paused on production today — prepare packages first; delegated submit stays off until the product enables it.",
 
   recruiters01Q: "What is the recruiter acceptance inbox?",
   recruiters01A:
@@ -162,7 +162,7 @@ export const FAQ_MESSAGES_PL = {
 
   general01Q: "Czym jest TWIN dziś?",
   general01A:
-    "Agent kariery, który porządkuje chaos kart: agregacja ofert z włączonych portali, ranking przy profilu, śledzenie aplikacji i wczesny autopilot (dopasowanie CV, asystent kariery, nocna auto-aplikacja tam, gdzie portal i zgoda na to pozwalają). Główny cel to krótki kalendarz momentów gotowych do akceptacji — nie więcej spamu w skrzynce.",
+    "Agent kariery, który porządkuje chaos kart: agregacja ofert z włączonych portali, ranking przy profilu, śledzenie aplikacji i wczesna automatyzacja fazowa (prepare-only na produkcji dziś — dopasowanie CV, asystent kariery, nocna auto-aplikacja tam, gdzie portal i zgoda na to pozwalają). Główny cel to krótki kalendarz momentów gotowych do akceptacji — nie więcej spamu w skrzynce.",
   general02Q: "Dla kogo jest TWIN?",
   general02A:
     "Cztery ścieżki na jednej platformie z osobnymi powierzchniami: kandydaci, rekruterzy, firmy (programy B2B) i inwestorzy. Wybierz personę przy rejestracji — plany i rozliczenia zależą od roli.",
@@ -206,9 +206,9 @@ export const FAQ_MESSAGES_PL = {
   candidates10Q: "Czy TWIN zastępuje rekruterów?",
   candidates10A:
     "Nie. Mniej szumu: kandydat dostaje sensowniejsze ruchy; rekruter — akceptację zbiorczą i sygnały pod ATS zamiast zalewu CV. Ludzie nadal decydują o zatrudnieniu; oprogramowanie porządkuje ranking, papierologię i kalendarz.",
-  candidates11Q: "Co zrobić przed włączeniem autopilota?",
+  candidates11Q: "Co zrobić przed poleganiem na automatyzacji fazowej?",
   candidates11A:
-    "Uzupełnij profil, wgraj CV, podłącz kalendarz jeśli chcesz rezerwacje slotów, włącz tylko zaufane portale, przeczytaj zgodę na auto-aplikację. Zacznij od zapisów i ręcznych aplikacji, potem włącz nocną auto-aplikację, gdy akceptujesz ślad audytowy.",
+    "Uzupełnij profil, wgraj CV, podłącz kalendarz jeśli chcesz rezerwacje, włącz tylko zaufane portale i przeczytaj zgodę auto-apply. Zacznij od zapisów i ręcznych aplikacji. Auto-apply jest wstrzymane na produkcji dziś — najpierw pakiety prepare-only; delegated submit wyłączony, dopóki produkt tego nie włączy.",
 
   recruiters01Q: "Czym jest skrzynka akceptacji rekrutera?",
   recruiters01A:

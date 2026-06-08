@@ -1,0 +1,88 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import test from "node:test";
+
+import { en, dictionaries } from "../src/lib/i18n";
+
+const pl = dictionaries.pl;
+const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+
+const FORBIDDEN_PATTERNS: RegExp[] = [
+  /\bAI decides\b/i,
+  /\bAI hires\b/i,
+  /\bwe decide\b/i,
+  /\bperfect match\b/i,
+  /\bauto-apply is live\b/i,
+  /\bdelegated apply is live\b/i,
+  /\bapplies automatically\b/i,
+  /\bguaranteed interview\b/i,
+  /\bthousands of users\b/i,
+];
+
+const TRUST_SURFACES = [
+  "src/lib/i18n.ts",
+  "src/lib/persona-pages.ts",
+  "src/lib/faq-messages.ts",
+  "src/components/marketing/landing-trust-cue.tsx",
+] as const;
+
+function readSurface(relativePath: string): string {
+  return readFileSync(join(root, relativePath), "utf8");
+}
+
+function dashboardTrustCopy(locale: typeof en): string {
+  const d = locale.dashboard;
+  return [
+    d.northStarLead,
+    d.applicationTransparencyImportant,
+    d.applicationTransparencyAutomation,
+    d.autoApplyHint,
+    d.todayNbaReasonMatches,
+  ].join("\n");
+}
+
+function recruiterTrustCopy(locale: typeof en): string {
+  const r = locale.recruiterInbox;
+  return [r.lead, r.humanDecisionNote, r.decisionConsoleSubcopy, r.reviewDisclaimer].join("\n");
+}
+
+function homeTrustCopy(locale: typeof en): string {
+  const h = locale.home;
+  return [h.feature6Title, h.feature6Line, h.focusFootnote, h.focusChipAuto, h.vacationScene4Body].join("\n");
+}
+
+test("trust surfaces contain no forbidden live-automation or AI-decides claims", () => {
+  for (const relativePath of TRUST_SURFACES) {
+    const src = readSurface(relativePath);
+    for (const pattern of FORBIDDEN_PATTERNS) {
+      assert.doesNotMatch(src, pattern, `${pattern} in ${relativePath}`);
+    }
+  }
+});
+
+test("autopilot mentions in i18n home include phased or paused context", () => {
+  for (const locale of [en, pl]) {
+    const copy = homeTrustCopy(locale).toLowerCase();
+    if (!copy.includes("autopilot") && !copy.includes("auto-aplik")) continue;
+    assert.match(
+      copy,
+      /phased|paused|prepare-only|not live|wstrzym|etapami|fazow/,
+      "autopilot copy must include phased/paused context",
+    );
+  }
+});
+
+test("dashboard and recruiter trust copy state automation pause and human decision", () => {
+  for (const locale of [en, pl]) {
+    const dash = dashboardTrustCopy(locale).toLowerCase();
+    assert.match(dash, /auto-apply.*paused|auto-apply jest wstrzymane/);
+    assert.match(dash, /delegated apply.*not live|delegated apply nie jest live/);
+    assert.match(dash, /does not make hiring|nie podejmuje decyzji rekrutacyjnej/);
+
+    const recruiter = recruiterTrustCopy(locale).toLowerCase();
+    assert.match(recruiter, /recruiter decision|decyzja rekrutera/);
+    assert.doesNotMatch(recruiter, /ai decides/);
+  }
+});

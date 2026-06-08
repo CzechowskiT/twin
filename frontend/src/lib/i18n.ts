@@ -277,8 +277,8 @@ const en = {
     feature4Line: "One timeline for every status change.",
     feature5Title: "Consent & GDPR",
     feature5Line: "Explicit opt-in; exports when you need them.",
-    feature6Title: "Phased autopilot",
-    feature6Line: "Auto-apply ships as trust and integrations allow.",
+    feature6Title: "Phased automation (paused today)",
+    feature6Line: "Prepare application packages for review — auto-apply stays paused on production until gates allow.",
     socialProofEyebrow: "Candidates explore roles at companies like",
     ctaBandEyebrow: "Your matches are waiting",
     ctaBandTitle: "Create a free account—see ranked roles in minutes, not another week of tabs.",
@@ -293,7 +293,7 @@ const en = {
     focusChipAuto: "Auto-apply (rolling out in phases)",
     focusCta: "Create account",
     focusFootnote:
-      "Today’s MVP is aggregated listings, scoring once your profile exists, and one home for saves and statuses. Heavier autopilot ships in public phases. No black-box promises: receipts in the product.",
+      "Today’s MVP is aggregated listings, scoring once your profile exists, and one home for saves and statuses. More automation ships in public phases (prepare-only on production today). No black-box promises: receipts in the product.",
     originEyebrow: "Where we came from",
     originTitle: "Why this exists",
     originLead:
@@ -383,7 +383,7 @@ const en = {
     vacationScene4Stamp: "A few weeks later",
     vacationScene4Title: "TWIN keeps working while you take time off.",
     vacationScene4Body:
-      "You get one feed, ranking tied to your profile, applications on your terms, and a paper trail in one workspace. Deeper autopilot arrives where boards and consent allow. No black-box promises.",
+      "You get one feed, ranking tied to your profile, applications on your terms, and a paper trail in one workspace. More phased automation arrives where boards and consent allow — prepare-only on production today. No black-box promises.",
     vacationScene4CtaRegister: "Start free",
     vacationScene4CtaAnchor: "The Vacation Test",
     vacationTestEyebrow: "The Vacation Test",
@@ -3227,8 +3227,8 @@ const pl: MessageTree = {
     feature4Line: "Jedna oś czasu dla każdego statusu.",
     feature5Title: "Zgoda i RODO",
     feature5Line: "Wyraźna zgoda; eksporty na żądanie.",
-    feature6Title: "Autopilot etapami",
-    feature6Line: "Auto-aplikacja, gdy integracje i zaufanie na to pozwolą.",
+    feature6Title: "Automatyzacja fazowa (wstrzymana dziś)",
+    feature6Line: "Przygotowuj pakiety aplikacji do przeglądu — auto-apply wstrzymane na produkcji, dopóki bramki na to pozwolą.",
     socialProofEyebrow: "Kandydaci przeglądają oferty w firmach takich jak",
     ctaBandEyebrow: "Twoje dopasowania czekają",
     ctaBandTitle: "Załóż darmowe konto — zobacz ranking w minuty, nie kolejny tydzień w kartach.",
@@ -3243,7 +3243,7 @@ const pl: MessageTree = {
     focusChipAuto: "Auto-aplikacja (wdrażana etapami)",
     focusCta: "Zakładam konto",
     focusFootnote:
-      "Dziś MVP to agregacja, scoring po profilu, jedno miejsce na zapis i statusy. Cięższy autopilot wchodzi publicznie, z faktami w produkcie, nie z pustych obietnic.",
+      "Dziś MVP to agregacja, scoring po profilu, jedno miejsce na zapis i statusy. Więcej automatyzacji wchodzi publicznie fazami (prepare-only na produkcji dziś). Bez czarnej skrzynki — dowody w produkcie.",
     originEyebrow: "Skąd się to wzięło",
     originTitle: "Dlaczego to powstało",
     originLead:
@@ -3333,7 +3333,7 @@ const pl: MessageTree = {
     vacationScene4Stamp: "Kilka tygodni później",
     vacationScene4Title: "TWIN pracuje, kiedy ty odpoczywasz.",
     vacationScene4Body:
-      "Masz jeden feed, ranking pod profil, aplikacje pod swoją kontrolą i ślad w jednym miejscu. Głębszy autopilot dochodzi tam, gdzie portale i zgoda na to pozwalają. Bez czarnej skrzynki i bez pustych sloganów.",
+      "Masz jeden feed, ranking pod profil, aplikacje pod swoją kontrolą i ślad w jednym miejscu. Więcej automatyzacji fazowej dochodzi tam, gdzie portale i zgoda na to pozwalają — prepare-only na produkcji dziś. Bez czarnej skrzynki i bez pustych sloganów.",
     vacationScene4CtaRegister: "Start za darmo",
     vacationScene4CtaAnchor: "Test urlopowy",
     vacationTestEyebrow: "Test urlopowy",
