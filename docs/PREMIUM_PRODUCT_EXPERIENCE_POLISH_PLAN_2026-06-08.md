@@ -138,11 +138,11 @@ RecruiterInboxClient
 
 | Area | Current | Premium target |
 | ---- | ------- | -------------- |
-| Page header | Functional title + filters | **Decision console** header with queue context + segment counts |
-| Segments | Status filter tabs | Visual segments: **Needs review / In progress / Closed** (mapped to existing statuses) |
-| Card hierarchy | Dense row layout | Clear primary line (role + candidate), secondary (match + reasons), tertiary (review card) |
-| Review card | Expandable sections | Polished review card with confidence chip + section labels |
-| Behavior | Accept/decline API | **Preserve verbatim** — UI-only polish |
+| Page header | ~~Functional title + filters~~ | **Decision console** header with dynamic awaiting-decision count + AI-assisted subcopy ✅ |
+| Segments | ~~Status filter tabs~~ | Visual segments: **Strong fit / Good fit / Needs verification / Decided** ✅ |
+| Card hierarchy | ~~Dense row layout~~ | Name → score/label/status → evidence/missing/confidence chips → review card → actions ✅ |
+| Review card | Expandable sections | Polished due-diligence grid + confidence chip ✅ |
+| Behavior | Accept/decline API | **Preserve verbatim** — UI-only polish ✅ |
 
 ### Test anchors (must keep passing)
 
@@ -432,6 +432,7 @@ pytest tests/test_csp_report*.py -q
 | `frontend/src/components/dashboard/candidate-application-transparency-panel.tsx` | PII transparency |
 | `frontend/src/app/recruiter/inbox/recruiter-inbox-client.tsx` | Recruiter inbox |
 | `frontend/src/lib/recruiter-inbox-decision.ts` | Decision badges + filters |
+| `frontend/src/lib/recruiter-inbox-segments.ts` | Decision console segments + counts |
 | `frontend/src/lib/recruiter-review-card.ts` | Review card sections |
 | `frontend/src/lib/i18n.ts` | PL/EN copy source of truth |
 | `frontend/src/components/ux/empty-state.tsx` | Base empty state |
@@ -445,7 +446,10 @@ pytest tests/test_csp_report*.py -q
 | Slice | Status | PR |
 | ----- | ------ | -- |
 | 0 | **DONE** | [#52](https://github.com/CzechowskiT/twin/pull/52) |
-| 1 | **IN PROGRESS** | TBD |
-| 2–7 | Pending | — |
+| 1 | **DONE** | [#53](https://github.com/CzechowskiT/twin/pull/53) |
+| 2 | **DONE** | [#54](https://github.com/CzechowskiT/twin/pull/54) |
+| 3 | **DONE** | [#55](https://github.com/CzechowskiT/twin/pull/55) |
+| 4 | **IN PR** | — |
+| 5–7 | Pending | — |
 
 *Updated by operator as slices land.*

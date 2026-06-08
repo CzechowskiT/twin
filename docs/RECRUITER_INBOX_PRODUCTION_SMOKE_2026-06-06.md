@@ -14,6 +14,8 @@ Confirm production is **configured** for recruiter inbox demos and that **founde
 
 **North star check:** Does the recruiter return to a **short queue of pre-qualified rows** (match score + reasons) with **accept / decline**, not raw JSON or env leakage?
 
+**Slice 4 (2026-06-08):** Inbox UI upgraded to **decision console** — dynamic awaiting-decision header, segment tabs (Strong fit / Good fit / Needs verification / Decided), evidence chips, polished review card grid. **Accept/decline API unchanged.** Re-smoke after deploy: segment counts, no accept on interview/rejected rows.
+
 ---
 
 ## Production status snapshot (2026-06-06)

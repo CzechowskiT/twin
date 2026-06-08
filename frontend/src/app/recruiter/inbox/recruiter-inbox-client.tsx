@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
 import { useTranslation } from "@/components/language-provider";
+import type { TranslationKey } from "@/lib/i18n";
 import { Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { isLikelyBrowserNetworkFailureMessage } from "@/lib/api";
@@ -25,8 +26,15 @@ import {
 import {
   isRecruiterInboxActionable,
   recruiterInboxDecisionBadge,
-  recruiterInboxMatchesStatusFilter,
 } from "@/lib/recruiter-inbox-decision";
+import {
+  RECRUITER_INBOX_SEGMENTS,
+  recruiterInboxAwaitingDecisionCount,
+  recruiterInboxMatchesSegmentFilter,
+  recruiterInboxSegmentCounts,
+  recruiterInboxStatusLabelKey,
+  type RecruiterInboxSegment,
+} from "@/lib/recruiter-inbox-segments";
 import {
   parseRecruiterInboxErrorDetail,
   recruiterInboxErrorMessageKey,
@@ -82,7 +90,7 @@ export default function RecruiterInboxClient() {
   const [queueLoaded, setQueueLoaded] = useState(false);
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [billingCompany, setBillingCompany] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<"all" | "applied" | "interview">("all");
+  const [segmentFilter, setSegmentFilter] = useState<RecruiterInboxSegment>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [declineTargetId, setDeclineTargetId] = useState<number | null>(null);
   const [declineNote, setDeclineNote] = useState("");
@@ -203,12 +211,15 @@ export default function RecruiterInboxClient() {
   const filteredRows = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return rows.filter((r) => {
-      if (!recruiterInboxMatchesStatusFilter(r.status, statusFilter)) return false;
+      if (!recruiterInboxMatchesSegmentFilter(r, segmentFilter)) return false;
       if (!q) return true;
       const hay = `${r.candidate_name} ${r.job_title} ${r.company}`.toLowerCase();
       return hay.includes(q);
     });
-  }, [rows, statusFilter, searchQuery]);
+  }, [rows, segmentFilter, searchQuery]);
+
+  const awaitingDecisionCount = useMemo(() => recruiterInboxAwaitingDecisionCount(rows), [rows]);
+  const segmentCounts = useMemo(() => recruiterInboxSegmentCounts(rows), [rows]);
 
   const actionableVisibleIds = useMemo(
     () =>
@@ -379,6 +390,45 @@ export default function RecruiterInboxClient() {
     return null;
   }
 
+  function segmentLabel(segment: RecruiterInboxSegment): string {
+    const map = {
+      all: "recruiterInbox.segmentAll",
+      strong_fit: "recruiterInbox.segmentStrongFit",
+      good_fit: "recruiterInbox.segmentGoodFit",
+      needs_verification: "recruiterInbox.segmentNeedsVerification",
+      decided: "recruiterInbox.segmentDecided",
+    } as const;
+    return t(map[segment]);
+  }
+
+  function decisionConsoleHeader(count: number): string {
+    const key = count === 1 ? "recruiterInbox.decisionConsoleHeaderOne" : "recruiterInbox.decisionConsoleHeader";
+    return t(key).replace("{count}", String(count));
+  }
+
+  function rowEvidenceChips(row: BatchRow): string[] {
+    const fromReasons = (row.match_reasons ?? []).slice(0, 2);
+    const fromReview = (row.review_card?.requirements_matched ?? []).slice(0, 2);
+    const merged = [...fromReasons];
+    for (const item of fromReview) {
+      if (!merged.includes(item) && merged.length < 3) merged.push(item);
+    }
+    return merged;
+  }
+
+  function rowMissingChip(row: BatchRow): string | null {
+    const missing = row.review_card?.uncertain_or_missing ?? [];
+    if (missing.length === 0) return null;
+    if (missing.length === 1) return missing[0];
+    return `${missing[0]} (+${missing.length - 1})`;
+  }
+
+  function rowConfidenceKey(row: BatchRow): TranslationKey | null {
+    const confidence = row.review_card?.data_confidence;
+    if (!confidence) return null;
+    return `recruiterInbox.${reviewCardDataConfidenceKey(confidence)}`;
+  }
+
   function matchScoreLabelKey(label: string | null | undefined): string {
     const key = (label ?? "").trim().toLowerCase();
     if (key === "excellent") return t("recruiterInbox.matchScoreExcellent");
@@ -467,45 +517,70 @@ export default function RecruiterInboxClient() {
 
         {queueLoaded ? (
           <>
-            <div className="mt-6 flex flex-wrap items-center justify-between gap-2 border-t border-[var(--twin-border)] pt-6">
-              <p className="text-sm font-semibold text-[var(--foreground)]">
-                {t("recruiterInbox.queueTitle").replace("{company}", companyLabel || companySlug)}
-              </p>
-              <button type="button" className="twin-link text-xs font-medium" onClick={resetWorkspace}>
-                {t("recruiterInbox.changeWorkspace")}
-              </button>
+            <div className="mt-6 border-t border-[var(--twin-border)] pt-6">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[var(--twin-muted-strong)]">
+                    {t("recruiterInbox.decisionConsoleTitle")}
+                  </p>
+                  <h2 className="mt-1 text-xl font-semibold text-[var(--foreground)]">
+                    {decisionConsoleHeader(awaitingDecisionCount)}
+                  </h2>
+                  <p className="twin-muted mt-2 max-w-2xl text-sm leading-relaxed">
+                    {t("recruiterInbox.decisionConsoleSubcopy")}
+                  </p>
+                  <p className="twin-muted mt-1 text-xs">
+                    {t("recruiterInbox.queueTitle").replace("{company}", companyLabel || companySlug)}
+                  </p>
+                </div>
+                <button type="button" className="twin-link text-xs font-medium" onClick={resetWorkspace}>
+                  {t("recruiterInbox.changeWorkspace")}
+                </button>
+              </div>
             </div>
-            <p className="twin-muted mt-2 text-xs leading-relaxed">{t("recruiterInbox.humanDecisionNote")}</p>
-            <p className="mt-2 rounded-lg border border-[var(--twin-border)]/60 bg-[var(--twin-surface-2)]/40 px-3 py-2 text-xs leading-relaxed text-[var(--twin-muted-strong)]">
+            <p className="mt-3 rounded-lg border border-[var(--twin-border)]/60 bg-[var(--twin-surface-2)]/40 px-3 py-2 text-xs leading-relaxed text-[var(--twin-muted-strong)]">
               {filteredRows[0]
                 ? recruiterDataVisibilitySummary(filteredRows[0] as RecruiterDataVisibility) ??
                   t("recruiterInbox.dataVisibilityNote")
                 : t("recruiterInbox.dataVisibilityNote")}
             </p>
-            <div className="mt-4 flex flex-wrap items-end gap-3">
-              <label className="flex min-w-[10rem] flex-col gap-1 text-xs">
-                <span className="font-medium text-[var(--foreground)]">{t("recruiterInbox.filterStatusLabel")}</span>
-                <select
-                  className="twin-input text-sm"
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value as "all" | "applied" | "interview")}
-                >
-                  <option value="all">{t("recruiterInbox.filterStatusAll")}</option>
-                  <option value="applied">{t("recruiterInbox.filterStatusApplied")}</option>
-                  <option value="interview">{t("recruiterInbox.filterStatusInterview")}</option>
-                </select>
-              </label>
-              <label className="flex min-w-[12rem] flex-1 flex-col gap-1 text-xs">
-                <span className="sr-only">{t("recruiterInbox.filterSearchPlaceholder")}</span>
-                <input
-                  type="search"
-                  className="twin-input text-sm"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={t("recruiterInbox.filterSearchPlaceholder")}
-                />
-              </label>
+            <div
+              className="mt-4 flex flex-wrap gap-2"
+              role="tablist"
+              aria-label={t("recruiterInbox.filterStatusLabel")}
+            >
+              {(["all", ...RECRUITER_INBOX_SEGMENTS] as RecruiterInboxSegment[]).map((segment) => {
+                const count = segment === "all" ? rows.length : segmentCounts[segment];
+                const active = segmentFilter === segment;
+                return (
+                  <button
+                    key={segment}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                      active
+                        ? "border-[var(--twin-accent)] bg-[var(--twin-accent)]/10 text-[var(--foreground)]"
+                        : "border-[var(--twin-border)] bg-[var(--twin-surface)] text-[var(--twin-muted)] hover:text-[var(--foreground)]"
+                    }`}
+                    onClick={() => setSegmentFilter(segment)}
+                  >
+                    {segmentLabel(segment)}
+                    <span className="ml-1.5 tabular-nums opacity-70">{count}</span>
+                  </button>
+                );
+              })}
             </div>
+            <label className="mt-4 flex min-w-[12rem] flex-col gap-1 text-xs">
+              <span className="sr-only">{t("recruiterInbox.filterSearchPlaceholder")}</span>
+              <input
+                type="search"
+                className="twin-input text-sm"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t("recruiterInbox.filterSearchPlaceholder")}
+              />
+            </label>
             {actionableVisibleIds.length > 0 ? (
               <div className="mt-4 flex flex-wrap items-center gap-3 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/60 px-3 py-2">
                 <label className="flex items-center gap-2 text-xs font-medium text-[var(--foreground)]">
@@ -576,10 +651,14 @@ export default function RecruiterInboxClient() {
                 {filteredRows.map((r) => {
                   const actionable = isRecruiterInboxActionable(r.status);
                   const badgeLabel = decisionBadgeLabel(r.status);
+                  const statusKey = recruiterInboxStatusLabelKey(r.status);
+                  const evidenceChips = rowEvidenceChips(r);
+                  const missingChip = rowMissingChip(r);
+                  const confidenceKey = rowConfidenceKey(r);
                   return (
                   <li
                     key={r.application_id}
-                    className="rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface)] px-4 py-3 text-sm"
+                    className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface)] px-4 py-4 text-sm shadow-sm"
                   >
                     <div className="flex items-start gap-3">
                       {actionable ? (
@@ -587,48 +666,81 @@ export default function RecruiterInboxClient() {
                           type="checkbox"
                           checked={selectedIds.has(r.application_id)}
                           onChange={() => toggleSelected(r.application_id)}
-                          className="mt-1 h-4 w-4 shrink-0 rounded border-[var(--twin-border)]"
+                          className="mt-1.5 h-4 w-4 shrink-0 rounded border-[var(--twin-border)]"
                           aria-label={t("recruiterInbox.selectRow").replace("{name}", r.candidate_name)}
                         />
                       ) : (
-                        <span className="mt-1 w-4 shrink-0" aria-hidden />
+                        <span className="mt-1.5 w-4 shrink-0" aria-hidden />
                       )}
                       <div className="min-w-0 flex-1">
-                    {badgeLabel ? (
-                      <div className="mb-2 flex flex-wrap items-center gap-2">
-                        <span
-                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
-                            recruiterInboxDecisionBadge(r.status) === "accepted"
-                              ? "bg-emerald-500/15 text-emerald-800 dark:text-emerald-200"
-                              : "bg-[var(--twin-surface-2)] text-[var(--twin-muted)]"
-                          }`}
-                        >
-                          {badgeLabel}
-                        </span>
-                        <span className="text-xs text-[var(--twin-muted)]">
-                          {t("recruiterInbox.decisionSaved")}
-                        </span>
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <div>
+                        <p className="text-base font-semibold text-[var(--foreground)]">{r.candidate_name}</p>
+                        <p className="twin-muted mt-0.5 text-xs">
+                          {t("recruiterInbox.cardMetaLine")
+                            .replace("{job}", r.job_title)
+                            .replace("{company}", r.company)
+                            .replace("{id}", String(r.application_id))}
+                        </p>
                       </div>
-                    ) : null}
-                    <p className="font-semibold">
-                      {r.candidate_name} · {r.job_title}
-                    </p>
-                    {typeof r.match_score === "number" ? (
-                      <div className="mt-2 flex flex-wrap items-center gap-2">
-                        <span className="inline-flex items-center rounded-full bg-[var(--twin-surface-2)] px-2 py-0.5 text-xs font-semibold text-[var(--foreground)]">
-                          {t("recruiterInbox.matchScoreBadge").replace("{score}", String(Math.round(r.match_score)))}
-                        </span>
-                        <span className="text-xs text-[var(--twin-muted)]">
-                          {matchScoreLabelKey(r.match_score_label)}
-                        </span>
+                      <div className="flex flex-wrap items-center justify-end gap-1.5">
+                        {typeof r.match_score === "number" ? (
+                          <span className="inline-flex items-center rounded-full bg-[var(--twin-accent)]/15 px-2.5 py-0.5 text-xs font-semibold text-[var(--foreground)]">
+                            {t("recruiterInbox.matchScoreBadge").replace("{score}", String(Math.round(r.match_score)))}
+                          </span>
+                        ) : null}
+                        {badgeLabel ? (
+                          <span
+                            className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
+                              recruiterInboxDecisionBadge(r.status) === "accepted"
+                                ? "bg-emerald-500/15 text-emerald-800 dark:text-emerald-200"
+                                : "bg-[var(--twin-surface-2)] text-[var(--twin-muted)]"
+                            }`}
+                          >
+                            {badgeLabel}
+                          </span>
+                        ) : statusKey ? (
+                          <span className="inline-flex items-center rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-900 dark:text-amber-100">
+                            {t(`recruiterInbox.${statusKey}` as TranslationKey)}
+                          </span>
+                        ) : null}
                       </div>
+                    </div>
+                    {r.match_score_label || typeof r.match_score === "number" ? (
+                      <p className="mt-2 text-xs font-medium text-[var(--twin-muted-strong)]">
+                        {matchScoreLabelKey(r.match_score_label)}
+                      </p>
                     ) : null}
-                    {r.match_reasons && r.match_reasons.length > 0 ? (
-                      <ul className="mt-2 list-inside list-disc space-y-0.5 text-xs text-[var(--foreground)]">
-                        {r.match_reasons.map((reason) => (
-                          <li key={reason}>{reason}</li>
+                    {evidenceChips.length > 0 || missingChip || confidenceKey ? (
+                      <div className="mt-3 flex flex-wrap gap-1.5">
+                        {evidenceChips.map((chip) => (
+                          <span
+                            key={`evidence-${r.application_id}-${chip}`}
+                            className="inline-flex max-w-full items-center rounded-md border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 text-[0.6875rem] leading-snug text-emerald-900 dark:text-emerald-100"
+                            title={chip}
+                          >
+                            <span className="mr-1 font-semibold">{t("recruiterInbox.evidenceChipPrefix")}:</span>
+                            <span className="truncate">{chip}</span>
+                          </span>
                         ))}
-                      </ul>
+                        {missingChip ? (
+                          <span
+                            className="inline-flex max-w-full items-center rounded-md border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[0.6875rem] leading-snug text-amber-900 dark:text-amber-100"
+                            title={missingChip}
+                          >
+                            <span className="mr-1 font-semibold">{t("recruiterInbox.missingChipPrefix")}:</span>
+                            <span className="truncate">{missingChip}</span>
+                          </span>
+                        ) : null}
+                        {confidenceKey ? (
+                          <span className="inline-flex items-center rounded-md border border-[var(--twin-border)] bg-[var(--twin-surface-2)] px-2 py-0.5 text-[0.6875rem] leading-snug text-[var(--foreground)]">
+                            {t(confidenceKey)}
+                          </span>
+                        ) : null}
+                      </div>
+                    ) : null}
+                    {badgeLabel ? (
+                      <p className="twin-muted mt-2 text-xs">{t("recruiterInbox.decisionSaved")}</p>
                     ) : null}
                     {r.review_card ? (
                       <div className="mt-3">
@@ -643,17 +755,24 @@ export default function RecruiterInboxClient() {
                             : t("recruiterInbox.showReviewCard")}
                         </button>
                         {expandedReviewCards.has(r.application_id) ? (
-                          <div className="mt-2 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/50 p-3">
-                            <p className="text-xs font-semibold text-[var(--foreground)]">
-                              {t("recruiterInbox.reviewCardTitle")}
-                            </p>
-                            <dl className="mt-2 space-y-3">
+                          <div className="mt-2 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/60 p-4">
+                            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--twin-border)]/60 pb-2">
+                              <p className="text-xs font-semibold text-[var(--foreground)]">
+                                {t("recruiterInbox.reviewCardDueDiligence")}
+                              </p>
+                              {confidenceKey ? (
+                                <span className="rounded-full bg-[var(--twin-surface)] px-2 py-0.5 text-[0.6875rem] font-medium text-[var(--foreground)]">
+                                  {t(confidenceKey)}
+                                </span>
+                              ) : null}
+                            </div>
+                            <dl className="mt-3 grid gap-3 sm:grid-cols-2">
                               {REVIEW_CARD_SECTIONS.map((section) => {
                                 const items = reviewCardSectionItems(r.review_card as RecruiterReviewCard, section);
                                 if (section === "humanDecision") {
                                   return (
-                                    <div key={section}>
-                                      <dt className="text-xs font-medium text-[var(--foreground)]">
+                                    <div key={section} className="sm:col-span-2 rounded-md border border-[var(--twin-border)]/50 bg-[var(--twin-surface)]/80 p-2.5">
+                                      <dt className="text-[0.6875rem] font-semibold uppercase tracking-wide text-[var(--twin-muted-strong)]">
                                         {reviewCardSectionLabel(section)}
                                       </dt>
                                       <dd className="mt-1 text-xs text-[var(--foreground)]">
@@ -662,24 +781,11 @@ export default function RecruiterInboxClient() {
                                     </div>
                                   );
                                 }
-                                if (section === "dataConfidence") {
-                                  return (
-                                    <div key={section}>
-                                      <dt className="text-xs font-medium text-[var(--foreground)]">
-                                        {reviewCardSectionLabel(section)}
-                                      </dt>
-                                      <dd className="mt-1 text-xs text-[var(--foreground)]">
-                                        {t(
-                                          `recruiterInbox.${reviewCardDataConfidenceKey(items[0])}`,
-                                        )}
-                                      </dd>
-                                    </div>
-                                  );
-                                }
+                                if (section === "dataConfidence") return null;
                                 if (section === "whyThisCandidate" || section === "disclaimer") {
                                   return (
-                                    <div key={section}>
-                                      <dt className="text-xs font-medium text-[var(--foreground)]">
+                                    <div key={section} className="sm:col-span-2 rounded-md border border-[var(--twin-border)]/50 bg-[var(--twin-surface)]/80 p-2.5">
+                                      <dt className="text-[0.6875rem] font-semibold uppercase tracking-wide text-[var(--twin-muted-strong)]">
                                         {reviewCardSectionLabel(section)}
                                       </dt>
                                       <dd className="mt-1 text-xs leading-relaxed text-[var(--foreground)]">
@@ -689,15 +795,17 @@ export default function RecruiterInboxClient() {
                                   );
                                 }
                                 return (
-                                  <div key={section}>
-                                    <dt className="text-xs font-medium text-[var(--foreground)]">
+                                  <div key={section} className="rounded-md border border-[var(--twin-border)]/50 bg-[var(--twin-surface)]/80 p-2.5">
+                                    <dt className="text-[0.6875rem] font-semibold uppercase tracking-wide text-[var(--twin-muted-strong)]">
                                       {reviewCardSectionLabel(section)}
                                     </dt>
                                     <dd className="mt-1">
                                       {items.length > 0 ? (
-                                        <ul className="list-inside list-disc space-y-0.5 text-xs text-[var(--foreground)]">
+                                        <ul className="space-y-0.5 text-xs text-[var(--foreground)]">
                                           {items.map((item) => (
-                                            <li key={`${section}-${item}`}>{item}</li>
+                                            <li key={`${section}-${item}`} className="leading-snug">
+                                              {item}
+                                            </li>
                                           ))}
                                         </ul>
                                       ) : (
@@ -714,11 +822,8 @@ export default function RecruiterInboxClient() {
                         ) : null}
                       </div>
                     ) : null}
-                    <p className="twin-muted mt-1 text-xs">
-                      {r.company} · #{r.application_id}
-                    </p>
                     {actionable ? (
-                    <div className="mt-3 flex flex-wrap gap-2">
+                    <div className="mt-4 flex flex-wrap gap-2 border-t border-[var(--twin-border)]/60 pt-3">
                       <button
                         type="button"
                         className="twin-btn-solid text-xs"
