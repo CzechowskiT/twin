@@ -464,9 +464,10 @@ export function headerMarketingLaneLinks(): HeaderMarketingLaneLink[] {
   ];
 }
 
-/** Persona-aware login entry for marketing header (one click per lane). */
+/** Unified login hub — role choice before persona-specific forms. */
 export function headerMarketingLoginHref(persona: MarketingPersona): string {
-  return LOGIN_PATH[persona];
+  void persona;
+  return "/login";
 }
 
 /** Flat persona lane nav replaces corporate hub links on public marketing chrome. */
@@ -485,7 +486,8 @@ export function showCandidateDemoNav(persona: MarketingPersona, hasSession: bool
 }
 
 export function logoutRedirectPath(persona: MarketingPersona): string {
-  return LOGIN_PATH[persona];
+  void persona;
+  return "/login";
 }
 
 export type HeaderAccountLink = { href: string; labelKey: TranslationKey; isLogout?: boolean };

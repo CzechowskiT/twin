@@ -36,18 +36,20 @@ test("marketing lane links expose candidate, recruiter, company, and demo", () =
   ]);
 });
 
-test("marketing login hrefs are one-click per persona", () => {
-  assert.equal(headerMarketingLoginHref("candidate"), "/login/candidate");
-  assert.equal(headerMarketingLoginHref("recruiter"), "/login/recruiter");
-  assert.equal(headerMarketingLoginHref("company"), "/login/company");
+test("marketing login href points to role-choice hub", () => {
+  assert.equal(headerMarketingLoginHref("candidate"), "/login");
+  assert.equal(headerMarketingLoginHref("recruiter"), "/login");
+  assert.equal(headerMarketingLoginHref("company"), "/login");
 });
 
-test("logged-out marketing chrome shows persona nav and persona login", () => {
+test("logged-out marketing chrome shows persona nav and unified login", () => {
   assert.equal(showMarketingPersonaNav(false, true), true);
   assert.equal(showMarketingPersonaNav(true, true), false);
   const accounts = headerAccountLinks("candidate", false, { marketingChrome: true });
-  assert.equal(accounts[0]?.href, "/login/candidate");
+  assert.equal(accounts[0]?.href, "/login");
   assert.equal(accounts[0]?.labelKey, "nav.login");
+  assert.equal(accounts[1]?.href, "/register");
+  assert.equal(accounts[1]?.labelKey, "nav.register");
 });
 
 test("logged-in account links unify to panel and logout", () => {

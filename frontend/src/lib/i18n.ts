@@ -1296,7 +1296,7 @@ const en = {
       "Separate legal basis from core service and matching. You can turn this off anytime in your profile. We use it sparingly for product news, not cold sales blasts.",
   },
   register: {
-    hubTitle: "Choose your role",
+    hubTitle: "Choose how you want to start",
     hubLead: "One TWIN account — pick how you will use the product, then complete registration for that lane.",
     hubCuriosity: "See what's inside",
     hubBenefit: "Ranked matches and your pipeline unlock in ~2 minutes after signup.",
@@ -4211,7 +4211,7 @@ const pl: MessageTree = {
       "Osobna podstawa prawna od działania usługi i dopasowania ofert. Wyłączysz to w każdej chwili w profilu. Rzadko: nowości produktowe, bez zimnej sprzedaży.",
   },
   register: {
-    hubTitle: "Wybierz rolę",
+    hubTitle: "Wybierz, jak chcesz zacząć",
     hubLead: "Jedno konto TWIN — wybierz, jak będziesz korzystać z produktu, a potem dokończ rejestrację w tej strefie.",
     hubCuriosity: "Zobacz, co jest w środku",
     hubBenefit: "Dopasowania i ścieżkę aplikacji odblokujesz w ~2 minuty po rejestracji.",
