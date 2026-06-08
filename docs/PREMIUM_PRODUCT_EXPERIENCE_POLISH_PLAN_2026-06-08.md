@@ -385,14 +385,14 @@ pytest tests/test_csp_report*.py -q
 
 ### Success criteria (program complete)
 
-- [ ] Candidate dashboard answers “**what should I do today?**” in &lt;5 seconds
-- [ ] Matches grouped by **confidence**, not flat score sort only
-- [ ] Application transparency readable as **privacy control panel**
-- [ ] Recruiter inbox feels like **decision console**, not raw table
-- [ ] Trust language grep clean (PL/EN)
-- [ ] Guided empty states on candidate + recruiter zero-data paths
-- [ ] `docs/FOUNDER_PREMIUM_PRODUCT_QA_CHECKLIST_2026-06-08.md` delivered (Slice 7)
-- [ ] Launch matrices updated with safe-lane notes; **public NO-GO unchanged**
+- [x] Candidate dashboard answers “**what should I do today?**” in &lt;5 seconds
+- [x] Matches grouped by **confidence**, not flat score sort only
+- [x] Application transparency readable as **privacy control panel**
+- [x] Recruiter inbox feels like **decision console**, not raw table
+- [x] Trust language grep clean (PL/EN)
+- [x] Guided empty states on candidate + recruiter zero-data paths
+- [x] `docs/FOUNDER_PREMIUM_PRODUCT_QA_CHECKLIST_2026-06-08.md` delivered (Slice 7)
+- [x] Launch matrices updated with safe-lane notes; **public NO-GO unchanged**
 
 ### Stop conditions (report in Polish, await founder)
 
@@ -436,6 +436,8 @@ pytest tests/test_csp_report*.py -q
 | `frontend/src/lib/recruiter-review-card.ts` | Review card sections |
 | `frontend/src/lib/i18n.ts` | PL/EN copy source of truth |
 | `frontend/src/components/ux/empty-state.tsx` | Base empty state |
+| `frontend/src/components/ux/guided-empty-state.tsx` | Premium guided empty states |
+| `docs/FOUNDER_PREMIUM_PRODUCT_QA_CHECKLIST_2026-06-08.md` | Founder QA checklist + rubric |
 | `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` | Launch stance matrix |
 | `docs/CANDIDATE_APPLICATION_TRANSPARENCY_2026-06-07.md` | Transparency baseline |
 
@@ -451,7 +453,7 @@ pytest tests/test_csp_report*.py -q
 | 3 | **DONE** | [#55](https://github.com/CzechowskiT/twin/pull/55) |
 | 4 | **DONE** | [#56](https://github.com/CzechowskiT/twin/pull/56) |
 | 5 | **DONE** | [#57](https://github.com/CzechowskiT/twin/pull/57) |
-| 6 | **IN PR** | — |
-| 7 | Pending | — |
+| 6 | **DONE** | [#58](https://github.com/CzechowskiT/twin/pull/58) |
+| 7 | **DONE** | *(docs commit)* |
 
-*Updated by operator as slices land.*
+*Program complete 2026-06-08.*
