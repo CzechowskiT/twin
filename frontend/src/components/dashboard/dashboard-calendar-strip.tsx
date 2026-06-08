@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card } from "@/components/ui";
+import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
 import { calendarProviderLabel } from "@/lib/calendar-provider";
 import { detectMeetingProvider, meetingProviderLabelKey } from "@/lib/meeting-link";
 import { apiFetchBlob, saveBlobAsFile } from "@/lib/api";
@@ -102,6 +103,27 @@ export function DashboardCalendarStrip({
                   {calendarConnectBusy === "microsoft" ? "…" : t("dashboard.calendarStripConnectMicrosoft")}
                 </Button>
               ) : null}
+            </div>
+          ) : null}
+          {bundle && !bundle.google.connected && !bundle.microsoft.connected ? (
+            <div className="mt-3">
+              <GuidedEmptyState
+                title={t("ux.guidedEmptyCalendarTitle")}
+                message={t("ux.guidedEmptyCalendarMessage")}
+                steps={[
+                  t("ux.guidedEmptyCalendarStep1"),
+                  t("ux.guidedEmptyCalendarStep2"),
+                  t("ux.guidedEmptyCalendarStep3"),
+                ]}
+                actionLabel={t("ux.guidedEmptyCalendarCta")}
+                onAction={
+                  bundle.google.oauth_configured
+                    ? onConnectGoogle
+                    : bundle.microsoft.oauth_configured
+                      ? onConnectMicrosoft
+                      : undefined
+                }
+              />
             </div>
           ) : null}
           {bundle && (bundle.nextInterview || bundle.google.connected || bundle.microsoft.connected) ? (

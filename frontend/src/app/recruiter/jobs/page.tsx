@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
+import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
 import {
   mergeCompanyOptions,
   readRecruiterInboxSession,
@@ -118,6 +119,7 @@ export default function RecruiterJobsPage() {
         />
         <form onSubmit={(e) => void publish(e)} className="mt-6 space-y-3">
           <input
+            id="recruiter-job-title"
             className="twin-input w-full border-2"
             placeholder={t("recruiterJobs.fieldTitle")}
             value={title}
@@ -148,7 +150,21 @@ export default function RecruiterJobsPage() {
         </form>
         <h2 className="mt-8 text-lg font-semibold">{t("recruiterJobs.listTitle")}</h2>
         {jobs.length === 0 ? (
-          <p className="twin-muted mt-2 text-sm">{t("recruiterJobs.empty")}</p>
+          <div className="mt-3">
+            <GuidedEmptyState
+              title={t("ux.guidedEmptyRecruiterJobsTitle")}
+              message={t("ux.guidedEmptyRecruiterJobsMessage")}
+              steps={[
+                t("ux.guidedEmptyRecruiterJobsStep1"),
+                t("ux.guidedEmptyRecruiterJobsStep2"),
+                t("ux.guidedEmptyRecruiterJobsStep3"),
+              ]}
+              actionLabel={t("ux.guidedEmptyRecruiterJobsCta")}
+              onAction={() => {
+                document.getElementById("recruiter-job-title")?.focus();
+              }}
+            />
+          </div>
         ) : (
           <ul className="mt-3 space-y-2">
             {jobs.map((j) => (

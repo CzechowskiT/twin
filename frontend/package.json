@@ -25,6 +25,7 @@
     "test:candidate-transparency": "npx --yes tsx scripts/candidate-transparency.test.ts",
     "test:homepage-nav": "npx --yes tsx scripts/homepage-nav.test.ts",
     "test:trust-language-guard": "npx --yes tsx scripts/trust-language-guard.test.ts",
+    "test:guided-empty-state": "npx --yes tsx scripts/guided-empty-state.test.ts",
     "test:auth-role-choice": "npx --yes tsx scripts/auth-role-choice.test.ts",
     "test:interactive-demo": "npx --yes tsx scripts/interactive-demo.test.ts",
     "test:e2e": "playwright test",
