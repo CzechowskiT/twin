@@ -19,7 +19,7 @@
     "test:pricing-locale": "npx --yes tsx scripts/pricing-locale.test.ts",
     "test:investor-calculator": "npx --yes tsx scripts/investor-calculator-model.test.ts",
     "test:b2b-roi-calculator": "npx --yes tsx scripts/b2b-roi-calculator-model.test.ts",
-    "test:recruiter-inbox-decision": "npx --yes tsx scripts/recruiter-inbox-decision.test.ts",
+    "test:recruiter-inbox-decision": "npx --yes tsx scripts/recruiter-inbox-decision.test.ts && npx --yes tsx scripts/recruiter-inbox-segments.test.ts",
     "test:recruiter-review-card": "npx --yes tsx scripts/recruiter-review-card.test.ts",
     "test:pii-data-visibility": "npx --yes tsx scripts/pii-data-visibility.test.ts",
     "test:candidate-transparency": "npx --yes tsx scripts/candidate-transparency.test.ts",

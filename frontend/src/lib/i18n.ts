@@ -2160,6 +2160,21 @@ const en = {
     dataVisibilityNote:
       "Application review context: candidate names and profile match data are visible so you can decide on interview slots. Email, phone, and full CV text are not shown in this inbox.",
     dataVisibilityContextLabel: "Data visibility",
+    decisionConsoleTitle: "Decision console",
+    decisionConsoleHeader: "{count} candidates awaiting your decision",
+    decisionConsoleHeaderOne: "1 candidate awaiting your decision",
+    decisionConsoleSubcopy:
+      "AI-assisted ranking surfaces evidence — you accept or decline who gets an interview slot.",
+    segmentAll: "All",
+    segmentStrongFit: "Strong fit",
+    segmentGoodFit: "Good fit",
+    segmentNeedsVerification: "Needs verification",
+    segmentDecided: "Decided",
+    statusAwaitingDecision: "Awaiting decision",
+    evidenceChipPrefix: "Evidence",
+    missingChipPrefix: "Missing",
+    reviewCardDueDiligence: "Due diligence review",
+    cardMetaLine: "{job} · {company} · #{id}",
   },
   recruiterCalendar: {
     eyebrow: "Roadmap",
@@ -5110,6 +5125,21 @@ const pl: MessageTree = {
     dataVisibilityNote:
       "Kontekst przeglądu aplikacji: widać imiona kandydatów i dane dopasowania profilu, abyś mógł/mogła zdecydować o slotach na rozmowę. E-mail, telefon i pełny tekst CV nie są pokazywane w tej skrzynce.",
     dataVisibilityContextLabel: "Widoczność danych",
+    decisionConsoleTitle: "Konsola decyzji",
+    decisionConsoleHeader: "{count} kandydatów czeka na decyzję",
+    decisionConsoleHeaderOne: "1 kandydat czeka na decyzję",
+    decisionConsoleSubcopy:
+      "Ranking wspomagany AI pokazuje dowody — Ty akceptujesz lub odrzucasz, kto dostaje slot na rozmowę.",
+    segmentAll: "Wszyscy",
+    segmentStrongFit: "Silne dopasowanie",
+    segmentGoodFit: "Dobre dopasowanie",
+    segmentNeedsVerification: "Wymaga weryfikacji",
+    segmentDecided: "Zdecydowane",
+    statusAwaitingDecision: "Oczekuje decyzji",
+    evidenceChipPrefix: "Dowód",
+    missingChipPrefix: "Brak",
+    reviewCardDueDiligence: "Przegląd due diligence",
+    cardMetaLine: "{job} · {company} · #{id}",
   },
   recruiterCalendar: {
     eyebrow: "Roadmapa",
