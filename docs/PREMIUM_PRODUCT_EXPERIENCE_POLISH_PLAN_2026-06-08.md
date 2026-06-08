@@ -449,7 +449,8 @@ pytest tests/test_csp_report*.py -q
 | 1 | **DONE** | [#53](https://github.com/CzechowskiT/twin/pull/53) |
 | 2 | **DONE** | [#54](https://github.com/CzechowskiT/twin/pull/54) |
 | 3 | **DONE** | [#55](https://github.com/CzechowskiT/twin/pull/55) |
-| 4 | **IN PR** | — |
-| 5–7 | Pending | — |
+| 4 | **DONE** | [#56](https://github.com/CzechowskiT/twin/pull/56) |
+| 5 | **IN PR** | — |
+| 6–7 | Pending | — |
 
 *Updated by operator as slices land.*
