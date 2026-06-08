@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useTranslation } from "@/components/language-provider";
 import { PersonaBadge } from "@/components/persona-badge";
+import { PersonaSwitcher } from "@/components/persona-switcher";
 import { useMarketingPersona } from "@/components/persona-provider";
 import { apiFetch } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
@@ -31,12 +32,14 @@ function growthCtaClass(variant: GrowthCtaVariant, base: string): string {
 }
 
 type SiteHeaderBarProps = {
+  /** Logged-out lane picker on marketing chrome. */
+  showPersonaSwitcher?: boolean;
   /** Read-only persona badge for authenticated app chrome — never on public marketing. */
   showPersonaBadge: boolean;
 };
 
-/** Shared top bar: logo, nav, account actions, optional persona badge. */
-export function SiteHeaderBar({ showPersonaBadge }: SiteHeaderBarProps) {
+/** Shared top bar: logo, nav, account actions, optional persona controls. */
+export function SiteHeaderBar({ showPersonaSwitcher = false, showPersonaBadge }: SiteHeaderBarProps) {
   const { t } = useTranslation();
   const { persona } = useMarketingPersona();
   const pathname = usePathname();
@@ -202,6 +205,7 @@ export function SiteHeaderBar({ showPersonaBadge }: SiteHeaderBarProps) {
         </nav>
 
         <div className="ml-auto flex min-w-0 shrink-0 flex-wrap items-center justify-end gap-x-2 gap-y-1">
+          {showPersonaSwitcher && !hasSession ? <PersonaSwitcher /> : null}
           {accountLinks.map((item) =>
             item.isLogout ? (
               <button
@@ -216,7 +220,9 @@ export function SiteHeaderBar({ showPersonaBadge }: SiteHeaderBarProps) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`${accountOutlineClass} hidden md:inline-flex ${
+                className={`${accountOutlineClass} ${
+                  hasSession ? "hidden md:inline-flex" : "inline-flex"
+                } ${
                   item.href === "/dashboard" && dashboardSectionActive ? dashboardActiveClass : ""
                 }`}
                 aria-current={item.href === "/dashboard" && dashboardSectionActive ? "page" : undefined}
