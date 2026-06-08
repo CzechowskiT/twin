@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 
-import { DemoProductWalkthrough } from "@/components/marketing/demo-product-walkthrough";
+import { InteractiveDemoWalkthrough } from "@/components/marketing/interactive-demo-walkthrough";
 
 export const metadata: Metadata = {
-  title: "Demo — product walkthrough — TWIN",
+  title: "Demo — interactive walkthrough — TWIN",
   description:
-    "Investor and product demo: CV to ranked pipeline, market coverage, top 20 matches, honest application statuses, and calendar north star. Synthetic data — no live submissions on this page.",
+    "Eight-step interactive simulation: profile, job scan, ranked matches, transparency, recruiter review, accept/decline, calendar hold, and next steps. Synthetic data only — no live submissions.",
 };
 
 export default function DemoPage() {
-  return <DemoProductWalkthrough />;
+  return <InteractiveDemoWalkthrough />;
 }

@@ -31,7 +31,8 @@
 | Status / public-health proxy | `git_commit=df15618`, `db_ok=true` in JSON (read-only check 2026-05-29) | **LIVE** |
 | Candidate login (OAuth + email) | health flags `google_oauth`, `github_oauth` | **LIVE** (Apple OAuth **OFF**) |
 | Dashboard (candidate) | `/dashboard` 200; auth required for data | **LIVE** |
-| Demo snapshot page | `/demo` 200 | **LIVE** |
+| Demo interactive walkthrough | `/demo` — 8-step simulation PL/EN; `interactive-demo.test.ts`; `docs/INTERACTIVE_DEMO_WALKTHROUGH_2026-06-07.md` | **LIVE** (pilot) — synthetic only; calendar step **simulation** |
+| Homepage marketing nav | Flat Kandydat/Rekruter/Firmy/Demo + persona login; `homepage-nav.test.ts` | **LIVE** (2026-06-07) |
 | Job corpus / matching | `validated_jobs`, market coverage in health | **LIVE** (coverage ⚠️ below target) |
 | Scraping (pracuj.pl, rocketjobs.pl) | `scrape_worker_ready`, beat enabled | **LIVE** infra; **BLOCKED** for ops sweep without allowlist |
 | Manual scrape UI | `NEXT_PUBLIC_SHOW_SCRAPE` | **OFF** default |

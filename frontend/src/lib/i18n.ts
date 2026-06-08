@@ -135,6 +135,7 @@ export type TranslationKey =
   | `common.${keyof typeof en.common}`
   | `persona.${keyof typeof en.persona}`
   | `demo.${keyof typeof en.demo}`
+  | `interactiveDemo.${keyof typeof en.interactiveDemo}`
   | `compare.${keyof typeof en.compare}`
   | `first1000.${keyof typeof en.first1000}`
   | `ux.${keyof typeof en.ux}`
@@ -197,7 +198,7 @@ const en = {
     getStarted: "Create free account",
     ctaRegisterMicro: "See your matches in ~2 min",
     ctaDemoSecondary: "Watch interactive demo",
-    ctaDemoCardSubtitle: "9-step product walkthrough · no account required",
+    ctaDemoCardSubtitle: "8-step interactive walkthrough · no account required",
     ctaDemoCardLead: "See how ranking, feedback and calendar flow together",
     logInPrompt: "Already have an account?",
     liveCounter: "{count}+ roles scanned on enabled boards",
@@ -2683,6 +2684,41 @@ const en = {
     footerNote:
       "GDPR: real accounts require explicit consent at registration. This page uses only fictional data labeled as demo/synthetic — no live submissions here.",
   },
+  interactiveDemo: {
+    pageEyebrow: "Interactive simulation",
+    pageTitle: "Walk through TWIN — profile to calendar, step by step",
+    pageLead:
+      "Eight beats on synthetic data: profile signal, market scan, ranked matches, transparency, recruiter review, accept or decline, calendar hold, then your next move. Nothing on this page submits applications or uses live accounts.",
+    simulationLabel: "SIMULATION · SAMPLE DATA ONLY — not your live dashboard",
+    progressAria: "Walkthrough progress",
+    autoplay: "Autoplay steps",
+    back: "Back",
+    next: "Next",
+    step1Title: "Profile from CV",
+    step1Lead: "Skills, titles, and boundaries become structured signals recruiters can trust.",
+    step2Title: "Job scan",
+    step2Lead: "Boards and employer pages feed the matcher — honest adapter counts, not marketing fiction.",
+    step3Title: "Ranked matches",
+    step3Lead: "High final_score roles surface first; the wider pipeline stays available up to 200.",
+    step4Title: "Transparency",
+    step4Lead: "Every score and status is explainable — no black-box “magic match” claims.",
+    step5Title: "Recruiter inbox & review card",
+    step5Lead: "Recruiters see match context and a structured review card — human decision required.",
+    step6Title: "Accept or decline",
+    step6Lead: "One-click accept schedules the next beat; decline keeps noise out of the calendar.",
+    step7Title: "Calendar hold (simulation)",
+    step7Lead: "Interview holds land on your calendar — simulation only on this page, not a live booking.",
+    step8Title: "Your next step",
+    step8Lead: "Create an account, join the founding wishlist, or explore candidate lanes when ready.",
+    profileHint: "Upload a CV and tune matching boundaries in the real product — consent-first.",
+    transparencyBody:
+      "Match scores cite posting overlap and profile fields. Application states stay evidence-backed: prepared, manual, attempted, confirmed — never a fake “submitted” checkbox.",
+    calendarSimulation:
+      "Simulation only — Google Calendar sync is live for candidates in the product; this hold is fictional demo data.",
+    decisionToast: "Demo only — “{action}” would update the recruiter pipeline.",
+    acceptedOutcome: "Accepted for interview (demo) — calendar hold appears in the next step.",
+    declinedOutcome: "Declined (demo) — candidate stays out of the acceptance calendar.",
+  },
   compare: {
     disclaimer:
       "Illustrative comparison only. Auto-apply and delegated submit are phased and paused on production today. Calendar: Google/Microsoft OAuth; Apple via ICS/WebCal subscribe.",
@@ -3067,7 +3103,7 @@ const pl: MessageTree = {
     getStarted: "Załóż darmowe konto",
     ctaRegisterMicro: "Zobacz dopasowania w ~2 min",
     ctaDemoSecondary: "Obejrzyj interaktywne demo",
-    ctaDemoCardSubtitle: "9-etapowy walkthrough produktu · bez konta",
+    ctaDemoCardSubtitle: "8-etapowy interaktywny walkthrough · bez konta",
     ctaDemoCardLead: "Zobacz ranking, feedback i kalendarz w jednym flow",
     logInPrompt: "Masz konto?",
     liveCounter: "{count}+ ofert przeskanowanych na włączonych portalach",
@@ -5571,6 +5607,41 @@ const pl: MessageTree = {
     fullExperienceCta: "Pełny przewodnik po produkcie",
     footerNote:
       "RODO: prawdziwe konta wymagają wyraźnej zgody przy rejestracji. Ta strona używa wyłącznie fikcyjnych danych oznaczonych jako demo/syntetyczne — bez live wysyłek tutaj.",
+  },
+  interactiveDemo: {
+    pageEyebrow: "Interaktywna symulacja",
+    pageTitle: "Przejdź TWIN krok po kroku — od profilu do kalendarza",
+    pageLead:
+      "Osiem etapów na danych syntetycznych: sygnał profilu, skan rynku, ranking, transparentność, karta rekrutera, akceptuj/odrzuć, hold w kalendarzu, potem Twój następny krok. Nic na tej stronie nie wysyła aplikacji ani nie używa live kont.",
+    simulationLabel: "SYMULACJA · TYLKO PRÓBKA — to nie Twój live panel",
+    progressAria: "Postęp walkthrough",
+    autoplay: "Autoodtwarzanie kroków",
+    back: "Wstecz",
+    next: "Dalej",
+    step1Title: "Profil z CV",
+    step1Lead: "Umiejętności, stanowiska i granice stają się sygnałami, którym rekruterzy mogą zaufać.",
+    step2Title: "Skan ofert",
+    step2Lead: "Portale i strony pracodawców zasilają matcher — uczciwe liczby adapterów, nie marketingowa fikcja.",
+    step3Title: "Ranking dopasowań",
+    step3Lead: "Role z wysokim final_score na górze; szerszy pipeline do 200 pozostaje dostępny.",
+    step4Title: "Transparentność",
+    step4Lead: "Każdy wynik i status jest wyjaśnialny — bez czarnej skrzynki „magicznego dopasowania”.",
+    step5Title: "Skrzynka rekrutera i karta review",
+    step5Lead: "Rekruter widzi kontekst dopasowania i strukturalną kartę — decyzja człowieka wymagana.",
+    step6Title: "Akceptuj lub odrzuć",
+    step6Lead: "Akceptacja jednym kliknięciem prowadzi do kolejnego etapu; odrzucenie trzyma szum z kalendarza.",
+    step7Title: "Hold w kalendarzu (symulacja)",
+    step7Lead: "Holdy rozmów lądują w kalendarzu — tu tylko symulacja, nie live rezerwacja.",
+    step8Title: "Twój następny krok",
+    step8Lead: "Załóż konto, dołącz do wishlisty founding albo odkryj ścieżkę kandydata, gdy będziesz gotowy.",
+    profileHint: "W produkcie wgraj CV i dostosuj granice dopasowania — zgodnie z RODO.",
+    transparencyBody:
+      "Wyniki dopasowania cytują overlap z ogłoszeniem i pola profilu. Statusy aplikacji są oparte na dowodach: prepared, manual, attempted, confirmed — nigdy fałszywe „wysłane”.",
+    calendarSimulation:
+      "Tylko symulacja — sync Google Calendar jest live dla kandydatów w produkcie; ten hold to fikcyjne demo.",
+    decisionToast: "Tylko demo — „{action}” zaktualizowałoby pipeline rekrutera.",
+    acceptedOutcome: "Zaakceptowano do rozmowy (demo) — hold pojawi się w następnym kroku.",
+    declinedOutcome: "Odrzucono (demo) — kandydat nie trafia do kalendarza akceptacji.",
   },
   privacy: {
     title: "Polityka prywatności (MVP)",
