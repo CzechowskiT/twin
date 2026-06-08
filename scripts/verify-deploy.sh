@@ -41,15 +41,18 @@ check_marketing_header() {
     echo "FAIL: ${base}/ unreachable"
     return 1
   fi
-  if [[ "$html" != *"twin-persona-switcher"* ]]; then
-    echo "FAIL: ${base}/ missing logged-out persona switcher (twin-persona-switcher)"
+  if [[ "$html" != *"twin-header-bar"* ]]; then
+    echo "FAIL: ${base}/ missing marketing header shell (twin-header-bar)"
     return 1
   fi
   if [[ "$html" != *"twin-header-account-link"* ]]; then
     echo "FAIL: ${base}/ missing header login/register links"
     return 1
   fi
-  echo "OK: ${base}/ marketing header (persona switcher + account links)"
+  if [[ "$html" == *"twin-persona-switcher"* ]]; then
+    echo "WARN: ${base}/ still serves legacy persona dropdown — deploy may be stale"
+  fi
+  echo "OK: ${base}/ marketing header shell + account links"
   return 0
 }
 
@@ -61,3 +64,12 @@ if [[ "$header_fail" -ne 0 ]]; then
   echo "HINT: twin-society must be on Vercel project twin — see docs/VERCEL_PROJECT_ALIAS_RUNBOOK_2026-05-26.md"
   exit 1
 fi
+
+echo
+echo "Demo walkthrough smoke:"
+demo_code=$(curl -sS -o /dev/null -w "%{http_code}" "${FRONTEND_URL%/}/demo")
+if [[ "$demo_code" != "200" ]]; then
+  echo "FAIL: ${FRONTEND_URL%/}/demo HTTP $demo_code"
+  exit 1
+fi
+echo "OK: /demo HTTP 200"
