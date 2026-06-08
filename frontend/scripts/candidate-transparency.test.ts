@@ -67,13 +67,22 @@ test("component uses i18n keys for all sections", () => {
   const keys = [
     "applicationTransparencyTitle",
     "applicationTransparencyContext",
-    "applicationTransparencyWeShowLabel",
+    "applicationTransparencySharedColumn",
+    "applicationTransparencyNotSharedColumn",
+    "applicationTransparencyHumanDecisionTitle",
     "applicationTransparencyImportant",
     "applicationTransparencyAutomation",
   ];
   for (const key of keys) {
     assert.match(src, new RegExp(`dashboard\\.${key}`), `missing i18n key dashboard.${key}`);
   }
+});
+
+test("premium panel uses two-column shared/not-shared layout", () => {
+  const src = panelSource();
+  assert.match(src, /sm:grid-cols-2/);
+  assert.match(src, /SHARED_KEYS/);
+  assert.match(src, /NOT_SHARED_KEYS/);
 });
 
 test("EN copy includes hiring decision disclaimer and automation pause", () => {
