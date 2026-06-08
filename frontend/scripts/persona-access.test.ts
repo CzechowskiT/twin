@@ -3,11 +3,14 @@ import test from "node:test";
 
 import {
   calendarNavHref,
+  headerAccountLinks,
+  headerMarketingLaneLinks,
   headerSessionNavLinks,
   isSessionNavLinkActive,
   momentumRailCtas,
   sessionPanelHref,
   sessionPersonaHomeRedirect,
+  showMarketingPersonaNav,
 } from "../src/lib/persona-access";
 
 test("sessionPersonaHomeRedirect keeps same-persona marketing lanes", () => {
@@ -59,4 +62,16 @@ test("momentumRailCtas on recruiter calendar links to inbox and jobs", () => {
   const ctas = momentumRailCtas("/recruiter/calendar", "app", "recruiter", true);
   assert.equal(ctas[0]?.href, "/recruiter/inbox");
   assert.equal(ctas[1]?.href, "/recruiter/jobs");
+});
+
+test("headerAccountLinks for logged-in users show panel and logout only", () => {
+  const recruiter = headerAccountLinks("recruiter", true);
+  assert.equal(recruiter[0]?.href, sessionPanelHref("recruiter"));
+  assert.equal(recruiter[0]?.labelKey, "nav.dashboard");
+  assert.equal(recruiter[1]?.isLogout, true);
+});
+
+test("marketing persona nav is logged-out marketing chrome only", () => {
+  assert.equal(showMarketingPersonaNav(false, true), true);
+  assert.equal(headerMarketingLaneLinks().some((l) => l.href === "/demo"), true);
 });

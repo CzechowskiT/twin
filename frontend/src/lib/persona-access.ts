@@ -448,6 +448,32 @@ export function showCorporateNav(hasSession: boolean): boolean {
   return !hasSession;
 }
 
+export type HeaderMarketingLaneLink = {
+  href: string;
+  labelKey: TranslationKey;
+  persona?: MarketingPersona;
+};
+
+/** Logged-out marketing chrome: Kandydat · Rekruter · Firmy · Demo (flat links, not a dropdown). */
+export function headerMarketingLaneLinks(): HeaderMarketingLaneLink[] {
+  return [
+    { href: PERSONA_ROUTE.candidate, labelKey: "nav.personaCandidate", persona: "candidate" },
+    { href: PERSONA_ROUTE.recruiter, labelKey: "nav.personaRecruiter", persona: "recruiter" },
+    { href: PERSONA_ROUTE.company, labelKey: "nav.personaCompany", persona: "company" },
+    { href: "/demo", labelKey: "nav.demo" },
+  ];
+}
+
+/** Persona-aware login entry for marketing header (one click per lane). */
+export function headerMarketingLoginHref(persona: MarketingPersona): string {
+  return LOGIN_PATH[persona];
+}
+
+/** Flat persona lane nav replaces corporate hub links on public marketing chrome. */
+export function showMarketingPersonaNav(hasSession: boolean, marketingChrome: boolean): boolean {
+  return marketingChrome && !hasSession;
+}
+
 /** Candidate lane: calendar + dashboard chrome in the header. */
 export function showCandidateProductNav(persona: MarketingPersona): boolean {
   return persona === "candidate";
@@ -467,34 +493,20 @@ export type HeaderAccountLink = { href: string; labelKey: TranslationKey; isLogo
 export function headerAccountLinks(
   persona: MarketingPersona,
   hasSession: boolean,
+  opts?: { marketingChrome?: boolean },
 ): HeaderAccountLink[] {
   if (!hasSession) {
+    const loginHref = opts?.marketingChrome
+      ? headerMarketingLoginHref(persona)
+      : "/login?from=login";
     return [
-      { href: "/login?from=login", labelKey: "nav.login" },
+      { href: loginHref, labelKey: "nav.login" },
       { href: "/register", labelKey: "nav.register" },
     ];
   }
-  if (persona === "candidate") {
-    return [
-      { href: "/dashboard", labelKey: "nav.dashboard" },
-      { href: "#", labelKey: "dashboard.logout", isLogout: true },
-    ];
-  }
-  if (persona === "recruiter") {
-    return [
-      { href: "/recruiter/inbox", labelKey: "recruiterInbox.title" },
-      { href: "#", labelKey: "dashboard.logout", isLogout: true },
-    ];
-  }
-  if (persona === "investor") {
-    return [
-      { href: "/workspace/investor", labelKey: "workspace.investorHome" },
-      { href: "#", labelKey: "dashboard.logout", isLogout: true },
-    ];
-  }
   return [
-    { href: "/for-companies", labelKey: "nav.forCompanies" },
-    { href: "/contact", labelKey: "nav.contact" },
+    { href: sessionPanelHref(persona), labelKey: "nav.dashboard" },
+    { href: "#", labelKey: "dashboard.logout", isLogout: true },
   ];
 }
 

@@ -1,5 +1,7 @@
 /** Synthetic demo payloads — fictional companies, labeled in UI as demo/synthetic. */
 
+import type { RecruiterReviewCard } from "@/lib/recruiter-review-card";
+
 export const DEMO_WALKTHROUGH_BADGE = "demo" as const;
 
 export const DEMO_MARKET_ACTIVE_COUNT = 30;
@@ -114,4 +116,24 @@ export const DEMO_CV_META = {
   experienceYears: 7,
   salaryPln: "18 000 – 24 000",
   location: "Warszawa",
+};
+
+/** Synthetic recruiter review card for interactive demo step 5. */
+export const DEMO_REVIEW_CARD: RecruiterReviewCard = {
+  why_this_candidate:
+    "Strong Python/FastAPI overlap with posting; hybrid Warsaw fits employer location policy.",
+  requirements_matched: ["Python 5+ yrs", "FastAPI or Django", "PostgreSQL", "PL work authorization"],
+  uncertain_or_missing: ["No public portfolio link in demo CV", "Salary floor not confirmed"],
+  what_to_verify: ["Confirm notice period", "Validate hybrid cadence with hiring manager"],
+  data_confidence: "medium",
+  red_flags: [],
+  human_decision_required: true,
+  disclaimer: "Rule-based guidance on synthetic data — recruiter decides accept or decline.",
+};
+
+export const DEMO_INBOX_CANDIDATE = {
+  name: "Alex K. (demo)",
+  title: "Senior Fullstack Developer",
+  company: "SynthRail Logistics SA",
+  matchScore: 94,
 };

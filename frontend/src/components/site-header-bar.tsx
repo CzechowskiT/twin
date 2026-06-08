@@ -7,7 +7,6 @@ import { useEffect, useRef, useState } from "react";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useTranslation } from "@/components/language-provider";
 import { PersonaBadge } from "@/components/persona-badge";
-import { PersonaSwitcher } from "@/components/persona-switcher";
 import { useMarketingPersona } from "@/components/persona-provider";
 import { apiFetch } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
@@ -17,11 +16,13 @@ import {
   type GrowthCtaVariant,
   headerAccountLinks,
   headerGrowthLinksForPersona,
+  headerMarketingLaneLinks,
   headerSessionNavLinks,
   isSessionNavLinkActive,
   logoutRedirectPath,
   showCandidateDemoNav,
   showCorporateNav,
+  showMarketingPersonaNav,
 } from "@/lib/persona-access";
 
 function growthCtaClass(variant: GrowthCtaVariant, base: string): string {
@@ -32,14 +33,14 @@ function growthCtaClass(variant: GrowthCtaVariant, base: string): string {
 }
 
 type SiteHeaderBarProps = {
-  /** Logged-out lane picker on marketing chrome. */
-  showPersonaSwitcher?: boolean;
+  /** Flat Kandydat/Rekruter/Firmy/Demo links on public marketing chrome. */
+  showMarketingPersonaNav?: boolean;
   /** Read-only persona badge for authenticated app chrome — never on public marketing. */
   showPersonaBadge: boolean;
 };
 
 /** Shared top bar: logo, nav, account actions, optional persona controls. */
-export function SiteHeaderBar({ showPersonaSwitcher = false, showPersonaBadge }: SiteHeaderBarProps) {
+export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false, showPersonaBadge }: SiteHeaderBarProps) {
   const { t } = useTranslation();
   const { persona } = useMarketingPersona();
   const pathname = usePathname();
@@ -51,8 +52,10 @@ export function SiteHeaderBar({ showPersonaSwitcher = false, showPersonaBadge }:
   const growthLinks = headerGrowthLinksForPersona(persona, pathname, hasSession);
   const sessionNavLinks = headerSessionNavLinks(persona, hasSession);
   const showDemoNav = showCandidateDemoNav(persona, hasSession);
-  const showMarketingNav = showCorporateNav(hasSession);
-  const accountLinks = headerAccountLinks(persona, hasSession);
+  const personaLaneNav = showMarketingPersonaNav(hasSession, marketingChrome);
+  const marketingLaneLinks = headerMarketingLaneLinks();
+  const showMarketingNav = showCorporateNav(hasSession) && !personaLaneNav;
+  const accountLinks = headerAccountLinks(persona, hasSession, { marketingChrome: personaLaneNav });
   const demoActive = pathname === "/demo" || pathname.startsWith("/demo/");
   const dashboardSectionActive =
     pathname === "/dashboard" ||
@@ -165,7 +168,24 @@ export function SiteHeaderBar({ showPersonaSwitcher = false, showPersonaBadge }:
           className="order-3 hidden min-w-0 flex-1 basis-full flex-nowrap items-center justify-center gap-x-3 overflow-x-auto overscroll-x-contain text-[12px] font-medium [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-x-4 sm:text-[13px] md:order-none md:flex md:basis-auto lg:gap-x-5 lg:text-sm [&::-webkit-scrollbar]:hidden"
           aria-label={t("nav.ariaSiteNav")}
         >
-          {showMarketingNav
+          {personaLaneNav
+            ? marketingLaneLinks.map((item) => {
+                const active =
+                  item.href === "/demo"
+                    ? demoActive
+                    : pathname === item.href || pathname.startsWith(`${item.href}/`);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`${linkClass} ${active ? "text-[var(--twin-accent)]" : ""}`}
+                    aria-current={active ? "page" : undefined}
+                  >
+                    {t(item.labelKey)}
+                  </Link>
+                );
+              })
+            : showMarketingNav
             ? corporateNavPrimary.map((item) => (
                 <Link key={item.href} href={item.href} className={linkClass}>
                   {item.label}
@@ -205,7 +225,6 @@ export function SiteHeaderBar({ showPersonaSwitcher = false, showPersonaBadge }:
         </nav>
 
         <div className="ml-auto flex min-w-0 shrink-0 flex-wrap items-center justify-end gap-x-2 gap-y-1">
-          {showPersonaSwitcher && !hasSession ? <PersonaSwitcher /> : null}
           {accountLinks.map((item) =>
             item.isLogout ? (
               <button
@@ -294,7 +313,23 @@ export function SiteHeaderBar({ showPersonaSwitcher = false, showPersonaBadge }:
                   )}
                 </>
               ) : null}
-              {showMarketingNav ? (
+              {personaLaneNav ? (
+                <>
+                  <p className="mt-1 border-t border-[var(--twin-border)] px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
+                    {t("nav.ariaPersonaNav")}
+                  </p>
+                  {marketingLaneLinks.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={closeMobileMenu}
+                      className="twin-touch-target twin-nav-link block whitespace-nowrap rounded px-3 py-2.5 text-sm hover:bg-[var(--twin-accent-muted)]"
+                    >
+                      {t(item.labelKey)}
+                    </Link>
+                  ))}
+                </>
+              ) : showMarketingNav ? (
                 <>
                   <p className="mt-1 border-t border-[var(--twin-border)] px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
                     {t("site.footerCompany")}

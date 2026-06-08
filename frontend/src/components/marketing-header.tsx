@@ -2,7 +2,7 @@
 
 import { SiteHeaderBar } from "@/components/site-header-bar";
 
-/** Public marketing chrome — persona lane picker before sign-in. */
+/** Public marketing chrome — flat persona lanes + login before sign-in. */
 export function MarketingHeader() {
-  return <SiteHeaderBar showPersonaSwitcher showPersonaBadge={false} />;
+  return <SiteHeaderBar showMarketingPersonaNav showPersonaBadge={false} />;
 }

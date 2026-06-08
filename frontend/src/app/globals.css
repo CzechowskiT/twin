@@ -3246,6 +3246,96 @@ html[data-marketing-surface="studio"] .demo-glass-panel {
   }
 }
 
+.interactive-demo-simulation-pill {
+  display: inline-flex;
+  max-width: 100%;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--twin-accent) 35%, var(--twin-border));
+  background: color-mix(in srgb, var(--twin-accent-muted) 55%, transparent);
+  padding: 0.35rem 0.85rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--twin-accent);
+}
+
+.interactive-demo-progress-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--twin-border);
+  background: var(--twin-card);
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.interactive-demo-progress-dot.is-active {
+  transform: scale(1.25);
+  border-color: var(--twin-accent);
+  background: var(--twin-accent);
+}
+
+.interactive-demo-progress-dot.is-done {
+  border-color: color-mix(in srgb, var(--twin-accent) 50%, var(--twin-border));
+  background: color-mix(in srgb, var(--twin-accent-muted) 80%, var(--twin-card));
+}
+
+.interactive-demo-step-enter {
+  animation: interactive-demo-step-in 0.45s ease both;
+}
+
+.interactive-demo-scan-chip {
+  animation: interactive-demo-chip-pulse 2.8s ease-in-out infinite;
+}
+
+.interactive-demo-match-row {
+  animation: interactive-demo-row-rise 0.5s ease both;
+}
+
+@keyframes interactive-demo-step-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes interactive-demo-chip-pulse {
+  0%,
+  100% {
+    border-color: var(--twin-border);
+  }
+  50% {
+    border-color: color-mix(in srgb, var(--twin-accent) 45%, var(--twin-border));
+  }
+}
+
+@keyframes interactive-demo-row-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interactive-demo-step-enter,
+  .interactive-demo-scan-chip,
+  .interactive-demo-match-row {
+    animation: none;
+  }
+
+  .interactive-demo-progress-dot {
+    transition: none;
+  }
+}
+
 .demo-full-experience-link {
   text-decoration: none;
   transition: opacity 0.2s ease;
