@@ -444,7 +444,8 @@ pytest tests/test_csp_report*.py -q
 
 | Slice | Status | PR |
 | ----- | ------ | -- |
-| 0 | **IN PROGRESS** | TBD |
-| 1–7 | Pending | — |
+| 0 | **DONE** | [#52](https://github.com/CzechowskiT/twin/pull/52) |
+| 1 | **IN PROGRESS** | TBD |
+| 2–7 | Pending | — |
 
 *Updated by operator as slices land.*

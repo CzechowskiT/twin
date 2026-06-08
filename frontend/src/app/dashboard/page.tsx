@@ -17,6 +17,7 @@ import { FeedbackModal } from "@/components/feedback/feedback-modal";
 import { HelpWidget } from "@/components/help/help-widget";
 import { useTranslation } from "@/components/language-provider";
 import { Shell } from "@/components/ui";
+import { isCalendarConnected } from "@/lib/dashboard-next-best-action";
 import { SHOW_SCRAPE_UI } from "@/lib/features";
 
 import { ApplicationsSection } from "@/components/dashboard/applications-section";
@@ -225,12 +226,31 @@ export default function DashboardPage() {
     );
   }, [devFocus]);
 
+  const hasProfile = profile !== null && profile !== undefined;
+
   const pipelineActiveCount = useMemo(
     () => applications.filter((a) => a.status !== "rejected").length,
     [applications],
   );
 
-  const hasProfile = profile !== null && profile !== undefined;
+  const todayContext = useMemo(
+    () => ({
+      hasProfile,
+      visibleMatchesCount: hasProfile ? visibleMatches.length : 0,
+      pipelineActiveCount: hasProfile ? pipelineActiveCount : 0,
+      calendarConnected: isCalendarConnected(
+        dashboardCalendarBundle?.google?.connected,
+        dashboardCalendarBundle?.microsoft?.connected,
+      ),
+    }),
+    [
+      hasProfile,
+      visibleMatches.length,
+      pipelineActiveCount,
+      dashboardCalendarBundle?.google?.connected,
+      dashboardCalendarBundle?.microsoft?.connected,
+    ],
+  );
   const matchesInitialSkeleton = hasProfile && matches === null && matchesRefreshing;
   const showScrapePanel = SHOW_SCRAPE_UI && user?.scrape_ops_elevated === true;
 
@@ -295,6 +315,7 @@ export default function DashboardPage() {
                 profileName={profile ? profile.name : undefined}
                 hasProfile={hasProfile}
                 showScrapeUi={showScrapePanel}
+                todayContext={todayContext}
               />
             </div>
             <div className="dashboard-hero-grid__insights">
