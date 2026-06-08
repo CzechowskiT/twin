@@ -1,10 +1,17 @@
 "use client";
 
+import { useMemo } from "react";
+
 import { useTranslation } from "@/components/language-provider";
 import { JobList } from "@/components/job-list";
 import { Card } from "@/components/ui";
 import { EmptyState } from "@/components/ux/empty-state";
+import {
+  groupMatchesByConfidence,
+  type MatchConfidenceGroupId,
+} from "@/lib/match-quality-groups";
 import { TOP_MATCHES_HIGHLIGHT_COUNT, type MatchFeedbackValue } from "@/lib/matching-quality";
+import type { TranslationKey } from "@/lib/i18n";
 import type { JobEmployerTabId } from "@/lib/job-employer-demo";
 
 import type { JobApplyActionsGuard } from "@/lib/job-apply-actions-guard";
@@ -48,11 +55,29 @@ type Props = {
   onApplyPromptOpenFirst: () => void;
 };
 
+const GROUP_META: Record<
+  MatchConfidenceGroupId,
+  { titleKey: TranslationKey; leadKey: TranslationKey; chipKey: TranslationKey }
+> = {
+  strong_fit: {
+    titleKey: "dashboard.matchGroupStrongFit",
+    leadKey: "dashboard.matchGroupStrongFitLead",
+    chipKey: "dashboard.matchGroupConfidenceHigh",
+  },
+  worth_reviewing: {
+    titleKey: "dashboard.matchGroupWorthReviewing",
+    leadKey: "dashboard.matchGroupWorthReviewingLead",
+    chipKey: "dashboard.matchGroupReviewCarefully",
+  },
+  low_confidence: {
+    titleKey: "dashboard.matchGroupLowConfidence",
+    leadKey: "dashboard.matchGroupLowConfidenceLead",
+    chipKey: "dashboard.matchGroupUncertainty",
+  },
+};
+
 /**
- * Ranked-feed section: skeleton on initial load, then the "apply now?"
- * prompt + top highlight matches + secondary "more recommendations" group.
- * Feedback / apply / save / dismiss handlers are all owned by the parent
- * page so the "Nietrafione" feedback flow is preserved verbatim.
+ * Ranked-feed section grouped by match confidence: Strong fit / Worth reviewing / Low confidence.
  */
 export function MatchesSection({
   matches,
@@ -81,9 +106,41 @@ export function MatchesSection({
   onApplyPromptDismiss,
   onApplyPromptOpenFirst,
 }: Props) {
+  void topHighlightMatches;
+  void moreRecommendationMatches;
   const { t } = useTranslation();
+  const confidenceGroups = useMemo(
+    () => groupMatchesByConfidence(visibleMatches),
+    [visibleMatches],
+  );
 
   if (!matchesInitialSkeleton && matches === null) return null;
+
+  const jobListProps = {
+    showScore: true as const,
+    matchFeedbackByJobId,
+    onMatchFeedback: (jobId: number, value: MatchFeedbackValue) => onSubmitFeedback(jobId, value),
+    matchFeedbackBusyJobId,
+    applicationStatus: displayApplicationStatus,
+    onApply,
+    onAutoApply,
+    onResearch: (id: number, title: string, company: string, location: string | null) =>
+      onResearch(id, title, company, location ?? null),
+    onHiringInsights: (id: number, title: string) => onHiringInsights(id, title),
+    onViewEmployer: (id: number, title: string, company: string, url: string, location: string | null) =>
+      onViewEmployer({
+        id,
+        title,
+        company,
+        location: location ?? null,
+        url,
+        initialTab: "partners",
+      }),
+    autoApplyJobId: autoApplyingId,
+    applyActionsGuard,
+    onSave,
+    onDismiss,
+  };
 
   return (
     <Card id="dashboard-matches" variant="soft">
@@ -130,7 +187,7 @@ export function MatchesSection({
               <h2 className="twin-section-title">
                 {t("dashboard.rankedFeedTitle")} ({visibleMatches.length})
               </h2>
-              <p className="twin-muted mt-1 text-sm">{t("dashboard.rankedFeedLead")}</p>
+              <p className="twin-muted mt-1 text-sm">{t("dashboard.rankedFeedLeadGrouped")}</p>
             </div>
             <div className="flex flex-wrap gap-2 self-start sm:self-auto sm:shrink-0">
               <button
@@ -161,83 +218,34 @@ export function MatchesSection({
             />
           ) : (
             <div className="space-y-8">
-              <section aria-labelledby="dashboard-top-matches-heading">
-                <h3 id="dashboard-top-matches-heading" className="text-base font-semibold text-[var(--foreground)]">
-                  {t("dashboard.topMatchesSection")} ({topHighlightMatches.length})
-                </h3>
-                <p className="twin-muted mt-1 text-sm">{t("dashboard.topMatchesLead")}</p>
-                <div className="mt-3">
-                  <JobList
-                    items={topHighlightMatches}
-                    showScore
-                    matchFeedbackByJobId={matchFeedbackByJobId}
-                    onMatchFeedback={(jobId, value) => onSubmitFeedback(jobId, value)}
-                    matchFeedbackBusyJobId={matchFeedbackBusyJobId}
-                    applicationStatus={displayApplicationStatus}
-                    onApply={onApply}
-                    onAutoApply={onAutoApply}
-                    onResearch={(id, title, company, location) =>
-                      onResearch(id, title, company, location ?? null)
-                    }
-                    onHiringInsights={(id, title) => onHiringInsights(id, title)}
-                    onViewEmployer={(id, title, company, url, location) =>
-                      onViewEmployer({
-                        id,
-                        title,
-                        company,
-                        location: location ?? null,
-                        url,
-                        initialTab: "partners",
-                      })
-                    }
-                    autoApplyJobId={autoApplyingId}
-                    applyActionsGuard={applyActionsGuard}
-                    onSave={onSave}
-                    onDismiss={onDismiss}
-                  />
-                </div>
-              </section>
-              {moreRecommendationMatches.length > 0 ? (
-                <section aria-labelledby="dashboard-more-matches-heading">
-                  <h3
-                    id="dashboard-more-matches-heading"
-                    className="text-base font-semibold text-[var(--foreground)]"
-                  >
-                    {t("dashboard.moreRecommendationsSection")} ({moreRecommendationMatches.length})
-                  </h3>
-                  <p className="twin-muted mt-1 text-sm">{t("dashboard.moreRecommendationsLead")}</p>
-                  <div className="mt-3">
-                    <JobList
-                      items={moreRecommendationMatches}
-                      showScore
-                      matchFeedbackByJobId={matchFeedbackByJobId}
-                      onMatchFeedback={(jobId, value) => onSubmitFeedback(jobId, value)}
-                      matchFeedbackBusyJobId={matchFeedbackBusyJobId}
-                      applicationStatus={displayApplicationStatus}
-                      onApply={onApply}
-                      onAutoApply={onAutoApply}
-                      onResearch={(id, title, company, location) =>
-                        onResearch(id, title, company, location ?? null)
-                      }
-                      onHiringInsights={(id, title) => onHiringInsights(id, title)}
-                      onViewEmployer={(id, title, company, url, location) =>
-                        onViewEmployer({
-                          id,
-                          title,
-                          company,
-                          location: location ?? null,
-                          url,
-                          initialTab: "partners",
-                        })
-                      }
-                      autoApplyJobId={autoApplyingId}
-                    applyActionsGuard={applyActionsGuard}
-                      onSave={onSave}
-                      onDismiss={onDismiss}
-                    />
-                  </div>
-                </section>
-              ) : null}
+              {confidenceGroups.map((group) => {
+                const meta = GROUP_META[group.id];
+                const headingId = `dashboard-match-group-${group.id}`;
+                return (
+                  <section key={group.id} aria-labelledby={headingId}>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 id={headingId} className="text-base font-semibold text-[var(--foreground)]">
+                        {t(meta.titleKey)} ({group.items.length})
+                      </h3>
+                      <span
+                        className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${
+                          group.id === "strong_fit"
+                            ? "border border-[var(--twin-accent)]/50 bg-[var(--twin-accent-muted)]/40 text-[var(--twin-accent-hover)]"
+                            : group.id === "worth_reviewing"
+                              ? "border border-[var(--twin-border)] bg-[var(--twin-surface-2)] text-[var(--twin-muted-strong)]"
+                              : "border border-dashed border-[var(--twin-border)] text-[var(--twin-muted)]"
+                        }`}
+                      >
+                        {t(meta.chipKey)}
+                      </span>
+                    </div>
+                    <p className="twin-muted mt-1 text-sm">{t(meta.leadKey)}</p>
+                    <div className="mt-3">
+                      <JobList items={group.items} {...jobListProps} />
+                    </div>
+                  </section>
+                );
+              })}
             </div>
           )}
         </>
