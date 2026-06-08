@@ -8,6 +8,7 @@ import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-f
 import { useTranslation } from "@/components/language-provider";
 import type { TranslationKey } from "@/lib/i18n";
 import { Card, Shell } from "@/components/ui";
+import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
 import { apiFetch } from "@/lib/api";
 import { isLikelyBrowserNetworkFailureMessage } from "@/lib/api";
 import { getClientApiLocale } from "@/lib/api-locale";
@@ -469,12 +470,18 @@ export default function RecruiterInboxClient() {
         <p className="mb-6 text-sm leading-relaxed text-[var(--foreground)]">{t("recruiterInbox.helperInvite")}</p>
 
         {!queueLoaded ? (
-          <div
-            className="mb-6 rounded-lg border border-dashed border-[var(--twin-border)] bg-[var(--twin-surface)]/60 px-4 py-4"
-            role="status"
-          >
-            <p className="text-sm font-semibold text-[var(--foreground)]">{t("recruiterInbox.emptyStateTitle")}</p>
-            <p className="twin-muted mt-2 text-sm leading-relaxed">{t("recruiterInbox.emptyStateBody")}</p>
+          <div className="mb-6">
+            <GuidedEmptyState
+              title={t("recruiterInbox.emptyStateTitle")}
+              message={t("recruiterInbox.emptyStateBody")}
+              steps={[
+                t("ux.guidedEmptyInboxStep1"),
+                t("ux.guidedEmptyInboxStep2"),
+                t("ux.guidedEmptyInboxStep3"),
+              ]}
+              actionLabel={t("recruiterInbox.load")}
+              onAction={() => void load()}
+            />
           </div>
         ) : null}
 
@@ -645,7 +652,17 @@ export default function RecruiterInboxClient() {
             {!loading && rows.length === 0 && !loadError ? (
               <p className="twin-muted mt-4 text-sm">{t("recruiterInbox.empty")}</p>
             ) : !loading && filteredRows.length === 0 ? (
-              <p className="twin-muted mt-4 text-sm">{t("recruiterInbox.empty")}</p>
+              <GuidedEmptyState
+                className="mt-4"
+                title={t("ux.guidedEmptyInboxFilterTitle")}
+                message={t("ux.guidedEmptyInboxFilterMessage")}
+                steps={[]}
+                actionLabel={t("ux.guidedEmptyInboxFilterCta")}
+                onAction={() => {
+                  setSegmentFilter("all");
+                  setSearchQuery("");
+                }}
+              />
             ) : (
               <ul className="mt-4 space-y-3">
                 {filteredRows.map((r) => {

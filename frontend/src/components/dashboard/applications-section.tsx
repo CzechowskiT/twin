@@ -9,6 +9,7 @@ import {
 } from "@/components/applications-panel";
 import { useTranslation } from "@/components/language-provider";
 import { Card } from "@/components/ui";
+import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
 
 type Props = {
   applications: ApplicationRow[];
@@ -98,6 +99,19 @@ export function ApplicationsSection({
           </button>
         </div>
       </div>
+      {applicationsTotal === 0 ? (
+        <GuidedEmptyState
+          title={t("ux.guidedEmptyApplicationsTitle")}
+          message={t("ux.guidedEmptyApplicationsMessage")}
+          steps={[
+            t("ux.guidedEmptyApplicationsStep1"),
+            t("ux.guidedEmptyApplicationsStep2"),
+            t("ux.guidedEmptyApplicationsStep3"),
+          ]}
+          actionLabel={t("ux.guidedEmptyApplicationsCta")}
+          actionHref="#dashboard-matches"
+        />
+      ) : (
       <ApplicationsPanel
         items={applications}
         onStatusChange={onStatusChange}
@@ -116,6 +130,7 @@ export function ApplicationsSection({
         onOptimizeCv={onOptimizeCv}
         onNegotiateSalary={onNegotiateSalary}
       />
+      )}
     </Card>
   );
 }

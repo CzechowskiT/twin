@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { useTranslation } from "@/components/language-provider";
 import { JobList } from "@/components/job-list";
 import { Card } from "@/components/ui";
-import { EmptyState } from "@/components/ux/empty-state";
+import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
 import {
   groupMatchesByConfidence,
   type MatchConfidenceGroupId,
@@ -211,8 +211,14 @@ export function MatchesSection({
             </div>
           </div>
           {visibleMatches.length === 0 ? (
-            <EmptyState
+            <GuidedEmptyState
+              title={t("ux.guidedEmptyMatchesTitle")}
               message={t("ux.matchesEmptyMessage")}
+              steps={[
+                t("ux.guidedEmptyMatchesStep1"),
+                t("ux.guidedEmptyMatchesStep2"),
+                t("ux.guidedEmptyMatchesStep3"),
+              ]}
               actionLabel={t("ux.matchesEmptyCta")}
               actionHref="/profile"
             />
