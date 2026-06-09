@@ -1,45 +1,112 @@
-/**
- * Guard against English leakage on rendered `/` and `/waitlist` copy.
- */
 import assert from "node:assert/strict";
 import test from "node:test";
 
+import type { Locale } from "../src/lib/i18n";
 import {
-  collectRenderedHomepageCopy,
-  DE_EXPECTED_MARKERS,
-  ENGLISH_LEAK_PHRASES,
-  ES_EXPECTED_MARKERS,
-} from "../src/lib/marketing/rendered-homepage-copy";
+  EXACT_BAD_EXAMPLES,
+  LOCALE_SIGNATURES,
+  NON_EN_LOCALES,
+  collectRenderedDemoStrings,
+  collectRenderedHomeStrings,
+  collectRenderedHubStrings,
+  collectWaitlistStrings,
+  equalsEnglish,
+  forbiddenHits,
+  matchesExactBadExample,
+} from "./i18n-rendered-surfaces";
 
-const GUARD_LOCALES = ["es", "de", "fr", "it", "zh", "ar", "ja"] as const;
+const TARGET_LOCALES = NON_EN_LOCALES.filter((l) => l !== "pl") as Locale[];
 
-test("non-EN rendered homepage/waitlist copy contains no founder-reported English leaks", () => {
+function assertNoForbidden(locale: Locale, rows: { key: string; value: string }[]) {
   const offenders: string[] = [];
-  for (const locale of GUARD_LOCALES) {
-    const copy = collectRenderedHomepageCopy(locale);
-    for (const leak of ENGLISH_LEAK_PHRASES) {
-      if (copy.includes(leak)) {
-        offenders.push(`${locale}: "${leak}"`);
-      }
+  for (const { key, value } of rows) {
+    if (!value.trim()) continue;
+    const hits = forbiddenHits(value, locale);
+    if (hits.length) offenders.push(`${key}: ${hits.join(",")}`);
+    for (const bad of EXACT_BAD_EXAMPLES[locale] ?? []) {
+      if (matchesExactBadExample(value, bad)) offenders.push(`${key}: exact ${String(bad)}`);
     }
   }
+  assert.equal(offenders.length, 0, `${locale} forbidden leakage:\n${offenders.slice(0, 12).join("\n")}`);
+}
+
+function assertNotEnglish(locale: Locale, rows: { key: string; value: string }[]) {
+  const offenders = rows
+    .filter(({ key, value }) => value.trim() && equalsEnglish(key, locale))
+    .map(({ key }) => key);
   assert.equal(
     offenders.length,
     0,
-    `English leakage on home/waitlist (${offenders.length}): ${offenders.slice(0, 8).join("; ")}`,
+    `${locale} still English on rendered keys: ${offenders.slice(0, 12).join(", ")}`,
   );
-});
+}
 
-test("Spanish rendered copy includes expected localized markers", () => {
-  const copy = collectRenderedHomepageCopy("es");
-  for (const marker of ES_EXPECTED_MARKERS) {
-    assert.ok(copy.includes(marker), `ES missing expected marker: "${marker}"`);
+test("homepage rendered keys — no EN marketing leakage (es–ja)", () => {
+  for (const locale of TARGET_LOCALES) {
+    const rows = collectRenderedHomeStrings(locale);
+    assertNoForbidden(locale, rows);
+    assertNotEnglish(locale, rows);
   }
 });
 
-test("German rendered copy includes expected localized markers", () => {
-  const copy = collectRenderedHomepageCopy("de");
-  for (const marker of DE_EXPECTED_MARKERS) {
-    assert.ok(copy.includes(marker), `DE missing expected marker: "${marker}"`);
+test("exact bad examples from PR #65 report must not appear", () => {
+  assert.match(
+    collectRenderedHomeStrings("es").find((r) => r.key === "home.curiosityEyebrow")?.value ?? "",
+    /Mira qué hay dentro/i,
+  );
+  assert.match(
+    collectRenderedHomeStrings("es").find((r) => r.key === "home.joinWishlist")?.value ?? "",
+    /lista fundadora/i,
+  );
+  assert.match(
+    collectRenderedHomeStrings("de").find((r) => r.key === "home.joinWishlist")?.value ?? "",
+    /Gründerliste/i,
+  );
+  for (const locale of TARGET_LOCALES) {
+    for (const row of [
+      ...collectRenderedHomeStrings(locale),
+      ...collectRenderedHubStrings(locale),
+      ...collectRenderedDemoStrings(locale),
+      ...collectWaitlistStrings(locale),
+    ]) {
+      for (const bad of EXACT_BAD_EXAMPLES[locale] ?? []) {
+        assert.ok(
+          !matchesExactBadExample(row.value, bad),
+          `${locale} ${row.key} still has ${String(bad)}`,
+        );
+      }
+    }
+  }
+});
+
+test("login/register hubs and demo CTAs — localized, no EN leakage", () => {
+  for (const locale of TARGET_LOCALES) {
+    const rows = [...collectRenderedHubStrings(locale), ...collectRenderedDemoStrings(locale)];
+    assertNoForbidden(locale, rows);
+    assertNotEnglish(locale, rows);
+  }
+});
+
+test("waitlist rendered copy — no cross-locale EN marketing tokens", () => {
+  for (const locale of TARGET_LOCALES) {
+    assertNoForbidden(locale, collectWaitlistStrings(locale));
+  }
+});
+
+test("wrong-locale signature strings do not leak into other locales", () => {
+  for (const [owner, patterns] of Object.entries(LOCALE_SIGNATURES)) {
+    for (const locale of TARGET_LOCALES) {
+      if (locale === owner) continue;
+      const blob = [
+        ...collectRenderedHomeStrings(locale),
+        ...collectRenderedHubStrings(locale),
+        ...collectWaitlistStrings(locale),
+      ]
+        .map((r) => r.value)
+        .join("\n");
+      for (const pattern of patterns ?? []) {
+        assert.doesNotMatch(blob, pattern, `${locale} leaked ${owner} signature ${pattern}`);
+      }
+    }
   }
 });

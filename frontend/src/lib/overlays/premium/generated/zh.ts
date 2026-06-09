@@ -1,31 +1,5 @@
 /** Premium product overlay — zh (generated). */
 export const premiumZhOverlay: Record<string, unknown> = {
-  "authRoles": {
-    "candidateTitle": "候选人",
-    "candidateTools": "演示 · 仪表板 · 匹配",
-    "recruiterTitle": "招聘人员",
-    "recruiterTools": "收件箱 · B2B ROI 计算器",
-    "companyTitle": "企业",
-    "companyTools": "企业版 · B2B 计算器",
-    "investorTitle": "投资者",
-    "investorTools": "情景计算器 · 指标",
-    "enterZone": "打开工作区"
-  },
-  "workspace": {
-    "enterZone": "打开工作区",
-    "zoneCandidateTitle": "候选人",
-    "zoneCandidateLead": "求职、自动投递、日历与申请。",
-    "zoneCandidateTools": "演示 · 仪表板 · 匹配",
-    "zoneRecruiterTitle": "招聘人员",
-    "zoneRecruiterLead": "接受收件箱与客户 ROI 对话。",
-    "zoneRecruiterTools": "收件箱 · B2B ROI 计算器",
-    "zoneCompanyTitle": "企业",
-    "zoneCompanyLead": "年度计划、B2B ROI、DPA 与企业采购。",
-    "zoneCompanyTools": "企业版 · B2B 计算器",
-    "zoneInvestorTitle": "投资者",
-    "zoneInvestorLead": "登录后的情景计算器与牵引指标。",
-    "zoneInvestorTools": "情景计算器 · 指标"
-  },
   "dashboard": {
     "applicationTransparencyAutomation": "自动投递已暂停。委托投递尚未上线。",
     "applicationTransparencyAutomationLabel": "自动化状态：",

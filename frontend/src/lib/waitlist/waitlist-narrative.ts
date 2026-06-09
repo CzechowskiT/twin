@@ -1,13 +1,4 @@
 import type { Locale } from "@/lib/i18n";
-import {
-  arWaitlistNarrative,
-  deWaitlistNarrative,
-  esWaitlistNarrative,
-  frWaitlistNarrative,
-  itWaitlistNarrative,
-  jaWaitlistNarrative,
-  zhWaitlistNarrative,
-} from "./waitlist-narrative-locales";
 
 export type WaitlistPillar = { icon: string; title: string; body: string };
 
@@ -385,14 +376,178 @@ const pl: WaitlistNarrative = {
   ],
 };
 
+const es: WaitlistNarrative = {
+  ...en,
+  heroEyebrow: "Lista fundadora · primeros 1.000",
+  heroOfferBadge: "Cohorte fundadora — acceso anticipado gratuito, uso razonable al lanzamiento",
+  heroOfferSub:
+    "Ruta: lista fundadora → invitación → registro → CV → perfil → hasta 200 roles clasificados. Un agente, un panel, entrevistas que valen la pena.",
+  valueStrip: [
+    "Primeros 1.000 fundadores — sin tarjeta hoy",
+    "Pipeline clasificado hasta 200 ofertas · top 20 destacado",
+    "~30 adaptadores activos hoy · 50+ en la hoja de ruta",
+  ],
+  statsLiveLabel: "Datos de lista en vivo",
+  counterEyebrow: "Cohorte fundadora · escasez en vivo",
+  counterOfCap: "de {cap} plazas fundadoras",
+  counterOnList: "{signed} en la lista",
+  sectionFounding: "Miembros fundadores",
+  foundingHeadline: "Primeros 1.000 — acceso fundador gratuito, uso razonable al lanzamiento",
+  foundingSub:
+    "Los planes de pago pueden llegar tras el lanzamiento público. La lista fundadora entra sin tarjeta hoy — un perfil activo y uso razonable antes de cualquier facturación.",
+  how8Lead: "Lista hoy → entrevistas en tu calendario cuando tu perfil esté activo.",
+  how8Steps: [
+    { n: "1", title: "Únete a la lista fundadora", body: "Email + consentimiento — entras en la cola de fundadores." },
+    { n: "2", title: "Invitación fundadora", body: "Cuando abra tu hueco, correo con los siguientes pasos." },
+    { n: "3", title: "Registro", body: "Crea tu cuenta TWIN (consentimiento RGPD al registrarte)." },
+    { n: "4", title: "Sube CV", body: "Analizamos y validamos campos del perfil para el matching." },
+    { n: "5", title: "Define tu barra", body: "Rol, nivel, salario mínimo, ubicaciones — tus reglas." },
+    { n: "6", title: "Ve empleos clasificados", body: "Top 20 + hasta 200 con final_score y feedback." },
+    { n: "7", title: "Aplica con honestidad", body: "Autoaplicación en rutas soportadas; manual donde el portal lo exija." },
+    { n: "8", title: "Calendario de entrevistas", body: "Acepta, rechaza o reprograma — exporta/sincroniza donde esté disponible." },
+  ],
+};
+
+const de: WaitlistNarrative = {
+  ...en,
+  heroEyebrow: "Gründerliste · erste 1.000",
+  heroOfferBadge: "Gründerkohorte — kostenloser früher Zugang, Fair-Use beim Start",
+  heroOfferSub:
+    "Weg: Gründerliste → Einladung → Registrierung → CV → Profil → bis zu 200 gerankte Rollen. Ein Agent, ein Dashboard, Interviews die sich lohnen.",
+  valueStrip: [
+    "Erste 1.000 Gründer — heute keine Karte",
+    "Gerankte Pipeline bis 200 Jobs · Top 20 hervorgehoben",
+    "~30 aktive Adapter heute · 50+ in der Roadmap",
+  ],
+  statsLiveLabel: "Live-Listen-Daten",
+  counterEyebrow: "Gründerkohorte · Live-Knappheit",
+  counterOfCap: "von {cap} Gründerplätzen",
+  counterOnList: "{signed} auf der Gründerliste",
+  sectionFounding: "Gründungsmitglieder",
+  foundingHeadline: "Erste 1.000 — kostenloser Gründerzugang, Fair-Use beim Go-Live",
+  foundingSub:
+    "Bezahlte Pläne können nach dem öffentlichen Start kommen. Gründerliste heute ohne Karte — ein aktives Profil und Fair-Use, bevor Billing startet.",
+  how8Lead: "Gründerliste heute → Interviews im Kalender, wenn dein Profil live ist.",
+  how8Steps: [
+    { n: "1", title: "Zur Gründerliste anmelden", body: "E-Mail + Einwilligung — du bist in der Gründer-Queue." },
+    { n: "2", title: "Gründereinladung", body: "Bei freiem Slot: E-Mail mit den nächsten Schritten." },
+    { n: "3", title: "Registrierung", body: "TWIN-Konto anlegen (DSGVO-Einwilligung bei /register)." },
+    { n: "4", title: "CV hochladen", body: "Wir parsen und validieren Profilfelder fürs Matching." },
+    { n: "5", title: "Deine Bar setzen", body: "Rolle, Level, Gehaltsuntergrenze, Standorte — deine Regeln." },
+    { n: "6", title: "Gerankte Jobs sehen", body: "Top 20 + bis 200 mit final_score und Feedback." },
+    { n: "7", title: "Ehrlich bewerben", body: "Auto-Apply auf unterstützten Wegen; manuell wo Portale es verlangen." },
+    { n: "8", title: "Interview-Kalender", body: "Annehmen, ablehnen, verschieben — Export/Sync wo verfügbar." },
+  ],
+};
+
+const fr: WaitlistNarrative = {
+  ...en,
+  heroEyebrow: "Liste des fondateurs · 1 000 premiers",
+  heroOfferBadge: "Cohorte fondatrice — accès anticipé gratuit, fair-use au lancement",
+  heroOfferSub:
+    "Parcours : liste des fondateurs → invitation → inscription → CV → profil → jusqu'à 200 rôles classés. Un agent, un tableau de bord, des entretiens qui valent le coup.",
+  valueStrip: [
+    "1 000 premiers fondateurs — sans carte aujourd'hui",
+    "Pipeline classé jusqu'à 200 offres · top 20 en premier",
+    "~30 adaptateurs actifs aujourd'hui · 50+ au roadmap",
+  ],
+  statsLiveLabel: "Données de liste en direct",
+  counterEyebrow: "Cohorte fondatrice · rareté en direct",
+  counterOfCap: "sur {cap} places fondatrices",
+  counterOnList: "{signed} sur la liste",
+  sectionFounding: "Membres fondateurs",
+  foundingHeadline: "1 000 premiers — accès fondateur gratuit, fair-use au lancement",
+  foundingSub:
+    "Des offres payantes peuvent suivre le lancement public. La liste des fondateurs s'ouvre sans carte — un profil actif et fair-use avant toute facturation.",
+  how8Lead: "Liste aujourd'hui → entretiens sur votre calendrier quand le profil est actif.",
+};
+
+const it: WaitlistNarrative = {
+  ...en,
+  heroEyebrow: "Lista dei fondatori · primi 1.000",
+  heroOfferBadge: "Cohort fondatrice — accesso anticipato gratuito, fair-use al lancio",
+  heroOfferSub:
+    "Percorso: lista dei fondatori → invito → registrazione → CV → profilo → fino a 200 ruoli classificati. Un agente, una dashboard, colloqui che valgono il tempo.",
+  valueStrip: [
+    "Primi 1.000 fondatori — nessuna carta oggi",
+    "Pipeline classificata fino a 200 offerte · top 20 in evidenza",
+    "~30 adapter attivi oggi · 50+ in roadmap",
+  ],
+  statsLiveLabel: "Dati lista in diretta",
+  counterEyebrow: "Cohort fondatrice · scarsità live",
+  sectionFounding: "Membri fondatori",
+  foundingHeadline: "Primi 1.000 — accesso fondatore gratuito, fair-use al go-live",
+  foundingSub:
+    "Piani a pagamento possono arrivare dopo il lancio pubblico. La lista dei fondatori è senza carta oggi — un profilo attivo e fair-use prima del billing.",
+  how8Lead: "Lista oggi → colloqui nel calendario quando il profilo è attivo.",
+};
+
+const zh: WaitlistNarrative = {
+  ...en,
+  heroEyebrow: "创始候补 · 前 1,000 名",
+  heroOfferBadge: "创始队列 — 免费提前访问，上线时合理使用",
+  heroOfferSub:
+    "路径：创始候补 → 邀请 → 注册 → 简历 → 档案 → 最多 200 个排序职位。一个代理，一个面板，值得赴约的面试。",
+  valueStrip: [
+    "前 1,000 创始成员 — 今天无需信用卡",
+    "最多 200 个排序职位管道 · 先看前 20",
+    "约 30 个活跃适配器 · 路线图 50+",
+  ],
+  statsLiveLabel: "候补实时数据",
+  counterEyebrow: "创始队列 · 实时稀缺",
+  sectionFounding: "创始成员",
+  foundingHeadline: "前 1,000 名 — 免费创始访问，上线合理使用",
+  foundingSub: "公开启动后可能有付费计划。创始候补今天无需信用卡 — 一个活跃档案，计费前合理使用。",
+  how8Lead: "今日候补 → 档案上线后日历上的面试。",
+};
+
+const ja: WaitlistNarrative = {
+  ...en,
+  heroEyebrow: "創設者リスト · 先着1,000名",
+  heroOfferBadge: "創設コホート — 無料の早期アクセス、ローンチ時フェアユース",
+  heroOfferSub:
+    "流れ：創設者リスト → 招待 → 登録 → CV → プロフィール → 最大200件のランキング求人。1つのエージェント、1つのダッシュボード、赴く価値のある面接。",
+  valueStrip: [
+    "先着1,000 創設メンバー — 今日はカード不要",
+    "最大200件のランキングパイプライン · まずトップ20",
+    "約30のアクティブアダプター · ロードマップ50+",
+  ],
+  statsLiveLabel: "リストのライブデータ",
+  counterEyebrow: "創設コホート · ライブ希少性",
+  sectionFounding: "創設メンバー",
+  foundingHeadline: "先着1,000 — 無料の創設アクセス、ゴーライブ時フェアユース",
+  foundingSub: "公開ローンチ後に有料プランが来る可能性があります。創設者リストは今日カード不要 — 課金前に1つのアクティブプロフィールとフェアユース。",
+  how8Lead: "今日リスト登録 → プロフィールが稼働したらカレンダーに面接。",
+};
+
+const ar: WaitlistNarrative = {
+  ...en,
+  heroEyebrow: "قائمة المؤسسين · أول 1,000",
+  heroOfferBadge: "مجموعة المؤسسين — وصول مبكر مجاني، استخدام عادل عند الإطلاق",
+  heroOfferSub:
+    "المسار: قائمة المؤسسين → دعوة → تسجيل → سيرة → ملف → حتى 200 وظيفة مرتبة. وكيل واحد، لوحة واحدة، مقابلات تستحق الحضور.",
+  valueStrip: [
+    "أول 1,000 مؤسس — بدون بطاقة اليوم",
+    "خط أنابيب مرتب حتى 200 وظيفة · أفضل 20 أولاً",
+    "~30 محولاً نشطاً اليوم · 50+ في خارطة الطريق",
+  ],
+  statsLiveLabel: "بيانات القائمة المباشرة",
+  counterEyebrow: "مجموعة المؤسسين · ندرة مباشرة",
+  sectionFounding: "أعضاء المؤسسون",
+  foundingHeadline: "أول 1,000 — وصول مؤسس مجاني، استخدام عادل عند الإطلاق",
+  foundingSub:
+    "قد تأتي خطط مدفوعة بعد الإطلاق العام. قائمة المؤسسين بدون بطاقة اليوم — ملف نشط واحد واستخدام عادل قبل أي فوترة.",
+  how8Lead: "القائمة اليوم → مقابلات في تقويمك عندما يصبح ملفك نشطاً.",
+};
+
 export const WAITLIST_NARRATIVE: Record<Locale, WaitlistNarrative> = {
   en,
   pl,
-  es: esWaitlistNarrative,
-  fr: frWaitlistNarrative,
-  de: deWaitlistNarrative,
-  it: itWaitlistNarrative,
-  zh: zhWaitlistNarrative,
-  ja: jaWaitlistNarrative,
-  ar: arWaitlistNarrative,
+  es,
+  fr,
+  de,
+  it,
+  zh,
+  ja,
+  ar,
 };

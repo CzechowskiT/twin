@@ -8,6 +8,7 @@ import {
   jaOverlay,
   zhOverlay,
 } from "./overlays";
+import { MARKETING_HOME_OVERLAYS } from "./overlays/marketing-home";
 import {
   premiumArOverlay,
   premiumDeOverlay,
@@ -39,7 +40,6 @@ import {
   CANDIDATE_REWARDS_MESSAGES_EN,
   CANDIDATE_REWARDS_MESSAGES_PL,
 } from "./candidate-rewards-messages";
-import { RENDERED_HOMEPAGE_OVERLAYS } from "./marketing/rendered-homepage-overlays";
 
 export type Locale = "en" | "pl" | "es" | "it" | "fr" | "de" | "zh" | "ar" | "ja";
 
@@ -6159,23 +6159,22 @@ function messagesFromEnOverlay(overlay: Record<string, unknown>): typeof en {
 }
 
 function localeFromOverlays(
+  locale: Locale,
   baseOverlay: Record<string, unknown>,
   premiumOverlay: Record<string, unknown>,
-  renderedOverlay?: Record<string, unknown>,
 ): typeof en {
-  const merged = renderedOverlay
-    ? mergeDeep(mergeDeep(baseOverlay, premiumOverlay), renderedOverlay)
-    : mergeDeep(baseOverlay, premiumOverlay);
-  return messagesFromEnOverlay(merged);
+  const withPremium = mergeDeep(baseOverlay, premiumOverlay);
+  const marketingHome = MARKETING_HOME_OVERLAYS[locale] ?? {};
+  return messagesFromEnOverlay(mergeDeep(withPremium, marketingHome));
 }
 
-const es = localeFromOverlays(esOverlay, premiumEsOverlay, RENDERED_HOMEPAGE_OVERLAYS.es);
-const it = localeFromOverlays(itOverlay, premiumItOverlay, RENDERED_HOMEPAGE_OVERLAYS.it);
-const fr = localeFromOverlays(frOverlay, premiumFrOverlay, RENDERED_HOMEPAGE_OVERLAYS.fr);
-const de = localeFromOverlays(deOverlay, premiumDeOverlay, RENDERED_HOMEPAGE_OVERLAYS.de);
-const zh = localeFromOverlays(zhOverlay, premiumZhOverlay, RENDERED_HOMEPAGE_OVERLAYS.zh);
-const ar = localeFromOverlays(arOverlay, premiumArOverlay, RENDERED_HOMEPAGE_OVERLAYS.ar);
-const ja = localeFromOverlays(jaOverlay, premiumJaOverlay, RENDERED_HOMEPAGE_OVERLAYS.ja);
+const es = localeFromOverlays("es", esOverlay, premiumEsOverlay);
+const it = localeFromOverlays("it", itOverlay, premiumItOverlay);
+const fr = localeFromOverlays("fr", frOverlay, premiumFrOverlay);
+const de = localeFromOverlays("de", deOverlay, premiumDeOverlay);
+const zh = localeFromOverlays("zh", zhOverlay, premiumZhOverlay);
+const ar = localeFromOverlays("ar", arOverlay, premiumArOverlay);
+const ja = localeFromOverlays("ja", jaOverlay, premiumJaOverlay);
 
 export { en };
 

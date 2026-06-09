@@ -1,31 +1,5 @@
 /** Premium product overlay — fr (generated). */
 export const premiumFrOverlay: Record<string, unknown> = {
-  "authRoles": {
-    "candidateTitle": "Candidat",
-    "candidateTools": "Démo · Tableau de bord · Correspondances",
-    "recruiterTitle": "Recruteur",
-    "recruiterTools": "Boîte de réception · Calculateur ROI B2B",
-    "companyTitle": "Entreprises",
-    "companyTools": "Pour les entreprises · Calculateur B2B",
-    "investorTitle": "Investisseur",
-    "investorTools": "Calculateur de scénarios · Métriques",
-    "enterZone": "Ouvrir l'espace de travail"
-  },
-  "workspace": {
-    "enterZone": "Ouvrir l'espace de travail",
-    "zoneCandidateTitle": "Candidat",
-    "zoneCandidateLead": "Recherche d'emploi, auto-candidature, calendrier et candidatures.",
-    "zoneCandidateTools": "Démo · Tableau de bord · Correspondances",
-    "zoneRecruiterTitle": "Recruteur",
-    "zoneRecruiterLead": "Boîte d'acceptation et conversations ROI client.",
-    "zoneRecruiterTools": "Boîte de réception · Calculateur ROI B2B",
-    "zoneCompanyTitle": "Entreprises",
-    "zoneCompanyLead": "Programmes annuels, ROI B2B, DPA et procurement enterprise.",
-    "zoneCompanyTools": "Pour les entreprises · Calculateur B2B",
-    "zoneInvestorTitle": "Investisseur",
-    "zoneInvestorLead": "Calculateur de scénarios et métriques de traction après connexion.",
-    "zoneInvestorTools": "Calculateur de scénarios · Métriques"
-  },
   "dashboard": {
     "applicationTransparencyAutomation": "La candidature automatique est en pause. La candidature déléguée n’est pas active.",
     "applicationTransparencyAutomationLabel": "Statut d'automatisation :",

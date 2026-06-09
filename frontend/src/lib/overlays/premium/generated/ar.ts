@@ -1,31 +1,5 @@
 /** Premium product overlay — ar (generated). */
 export const premiumArOverlay: Record<string, unknown> = {
-  "authRoles": {
-    "candidateTitle": "مرشح",
-    "candidateTools": "تجريبي · لوحة التحكم · المطابقات",
-    "recruiterTitle": "موظف توظيف",
-    "recruiterTools": "صندوق الوارد · حاسبة عائد B2B",
-    "companyTitle": "شركات",
-    "companyTools": "للشركات · حاسبة B2B",
-    "investorTitle": "مستثمر",
-    "investorTools": "حاسبة السيناريوهات · المؤشرات",
-    "enterZone": "فتح مساحة العمل"
-  },
-  "workspace": {
-    "enterZone": "فتح مساحة العمل",
-    "zoneCandidateTitle": "مرشح",
-    "zoneCandidateLead": "البحث عن عمل، التقديم التلقائي، التقويم والطلبات.",
-    "zoneCandidateTools": "تجريبي · لوحة التحكم · المطابقات",
-    "zoneRecruiterTitle": "موظف توظيف",
-    "zoneRecruiterLead": "صندوق القبول ومحادثات عائد الاستثمار مع العملاء.",
-    "zoneRecruiterTools": "صندوق الوارد · حاسبة عائد B2B",
-    "zoneCompanyTitle": "شركات",
-    "zoneCompanyLead": "برامج سنوية، عائد B2B، DPA ومشتريات المؤسسات.",
-    "zoneCompanyTools": "للشركات · حاسبة B2B",
-    "zoneInvestorTitle": "مستثمر",
-    "zoneInvestorLead": "حاسبة السيناريوهات ومؤشرات الجذب بعد تسجيل الدخول.",
-    "zoneInvestorTools": "حاسبة السيناريوهات · المؤشرات"
-  },
   "dashboard": {
     "applicationTransparencyAutomation": "التقديم التلقائي متوقف. التقديم المفوَّض غير مفعّل.",
     "applicationTransparencyAutomationLabel": "حالة الأتمتة:",

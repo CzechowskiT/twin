@@ -1,31 +1,5 @@
 /** Premium product overlay — it (generated). */
 export const premiumItOverlay: Record<string, unknown> = {
-  "authRoles": {
-    "candidateTitle": "Candidato",
-    "candidateTools": "Demo · Dashboard · Corrispondenze",
-    "recruiterTitle": "Seleccionatore",
-    "recruiterTools": "Inbox · Calcolatore ROI B2B",
-    "companyTitle": "Aziende",
-    "companyTools": "Per aziende · Calcolatore B2B",
-    "investorTitle": "Investitore",
-    "investorTools": "Calcolatore scenari · Metriche",
-    "enterZone": "Apri workspace"
-  },
-  "workspace": {
-    "enterZone": "Apri workspace",
-    "zoneCandidateTitle": "Candidato",
-    "zoneCandidateLead": "Ricerca lavoro, auto-candidatura, calendario e candidature.",
-    "zoneCandidateTools": "Demo · Dashboard · Corrispondenze",
-    "zoneRecruiterTitle": "Seleccionatore",
-    "zoneRecruiterLead": "Inbox di accettazione e conversazioni ROI con i clienti.",
-    "zoneRecruiterTools": "Inbox · Calcolatore ROI B2B",
-    "zoneCompanyTitle": "Aziende",
-    "zoneCompanyLead": "Programmi annuali, ROI B2B, DPA e procurement enterprise.",
-    "zoneCompanyTools": "Per aziende · Calcolatore B2B",
-    "zoneInvestorTitle": "Investitore",
-    "zoneInvestorLead": "Calcolatore scenari e metriche di trazione dopo l'accesso.",
-    "zoneInvestorTools": "Calcolatore scenari · Metriche"
-  },
   "dashboard": {
     "applicationTransparencyAutomation": "L’auto-candidatura è in pausa. La candidatura delegata non è attiva.",
     "applicationTransparencyAutomationLabel": "Stato dell'automazione:",
