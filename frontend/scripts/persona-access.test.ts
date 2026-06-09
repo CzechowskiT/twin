@@ -3,6 +3,8 @@ import test from "node:test";
 
 import {
   calendarNavHref,
+  CANDIDATE_CALENDAR_HREF,
+  candidateCalendarHref,
   headerAccountLinks,
   headerMarketingLaneLinks,
   headerSessionNavLinks,
@@ -22,11 +24,16 @@ test("sessionPersonaHomeRedirect keeps same-persona marketing lanes", () => {
 
 test("headerSessionNavLinks routes recruiters to recruiter calendar placeholder", () => {
   const candidateLinks = headerSessionNavLinks("candidate", true);
-  assert.equal(candidateLinks[0]?.href, "/dashboard/calendar");
+  assert.equal(candidateLinks[0]?.href, candidateCalendarHref());
 
   const recruiterLinks = headerSessionNavLinks("recruiter", true);
   assert.equal(recruiterLinks[0]?.href, "/recruiter/calendar");
   assert.equal(recruiterLinks[1]?.href, sessionPanelHref("recruiter"));
+});
+
+test("candidate calendar href constant matches nav", () => {
+  assert.equal(CANDIDATE_CALENDAR_HREF, "/dashboard/calendar");
+  assert.equal(calendarNavHref("candidate"), CANDIDATE_CALENDAR_HREF);
 });
 
 test("calendarNavHref is persona-aware", () => {

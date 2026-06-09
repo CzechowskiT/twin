@@ -27,6 +27,7 @@
     "test:trust-language-guard": "npx --yes tsx scripts/trust-language-guard.test.ts",
     "test:guided-empty-state": "npx --yes tsx scripts/guided-empty-state.test.ts",
     "test:auth-role-choice": "npx --yes tsx scripts/auth-role-choice.test.ts",
+    "test:candidate-calendar-routing": "npx --yes tsx scripts/candidate-calendar-routing.test.ts && npx --yes tsx scripts/persona-access.test.ts",
     "test:interactive-demo": "npx --yes tsx scripts/interactive-demo.test.ts",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install chromium"

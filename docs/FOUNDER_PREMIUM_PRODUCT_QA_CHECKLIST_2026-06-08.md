@@ -47,8 +47,9 @@
 | 1.1 | `/dashboard` hero | Eyebrow “Today” / “Dziś”; 2–3 mission cards from real state |
 | 1.2 | Primary CTA | Single deterministic action (profile → matches → calendar → pipeline) |
 | 1.3 | Readiness chip | Email/profile/matches readiness visible without invented metrics |
+| 1.4 | Header **Kalendarz** (logged-in candidate) | Stays authenticated → `/dashboard/calendar` — no logout/login loop |
 
-**Score §1:** ___ / 6
+**Score §1:** ___ / 8
 
 ---
 

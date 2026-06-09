@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useTranslation } from "@/components/language-provider";
+import { candidateCalendarHref } from "@/lib/persona-access";
 
 const navClass =
   "twin-workspace-subnav flex min-w-0 max-w-full flex-wrap items-center gap-x-3 gap-y-2 text-sm sm:gap-x-4";
@@ -43,7 +44,7 @@ export function CandidateWorkspaceSubnav({
       <Link href="/dashboard/identity" className={itemClass}>
         {t("dashboard.identityLink")}
       </Link>
-      <Link href="/dashboard/calendar" className={itemClass}>
+      <Link href={candidateCalendarHref()} className={itemClass}>
         {t("dashboard.calendarLink")}
       </Link>
       <Link href="/dashboard/settings/auto-apply" className={itemClass}>

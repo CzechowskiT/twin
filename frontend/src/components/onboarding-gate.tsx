@@ -10,7 +10,7 @@ import { isDemoUserEmail } from "@/lib/demo-user";
 
 type Me = { email?: string; onboarding_completed_at?: string | null };
 
-const BYPASS_PREFIXES = ["/onboarding", "/profile", "/login", "/register", "/auth"];
+const BYPASS_PREFIXES = ["/onboarding", "/profile", "/login", "/register", "/auth", "/dashboard/calendar"];
 
 function shouldBypass(pathname: string): boolean {
   return BYPASS_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));

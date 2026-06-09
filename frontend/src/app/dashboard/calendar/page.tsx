@@ -15,7 +15,9 @@ import { useTranslation } from "@/components/language-provider";
 import { WorkspaceFlowSteps } from "@/components/ux/workspace-flow-steps";
 import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch, apiFetchBlob, saveBlobAsFile } from "@/lib/api";
-import { clearToken, getToken } from "@/lib/auth";
+import { getToken } from "@/lib/auth";
+import { candidateCalendarHref } from "@/lib/persona-access";
+import { LOGIN_PATH } from "@/lib/persona-auth";
 import { calendarProviderLabel } from "@/lib/calendar-provider";
 import { fetchOpsHealth, type OpsHealth } from "@/lib/ops-health";
 import {
@@ -217,7 +219,8 @@ export default function DashboardCalendarPage() {
     const token = getToken();
     if (!token) {
       setLoading(false);
-      router.replace("/login");
+      const next = encodeURIComponent(candidateCalendarHref());
+      router.replace(`${LOGIN_PATH.candidate}?next=${next}`);
       return;
     }
     setLoading(true);
@@ -277,13 +280,7 @@ export default function DashboardCalendarPage() {
       } else {
         setNotifPrefsLoadError(true);
       }
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      if (msg.includes("401")) {
-        clearToken();
-        router.replace("/login");
-        return;
-      }
+    } catch {
       setActionError(true);
       setStatus(null);
       setMsStatus(null);

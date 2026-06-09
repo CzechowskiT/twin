@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
+import { candidateCalendarHref } from "@/lib/persona-access";
 import { calendarProviderLabel } from "@/lib/calendar-provider";
 import { detectMeetingProvider, meetingProviderLabelKey } from "@/lib/meeting-link";
 import { apiFetchBlob, saveBlobAsFile } from "@/lib/api";
@@ -248,7 +249,7 @@ export function DashboardCalendarStrip({
             <p className="twin-muted text-[11px] leading-snug">{t("dashboard.calendarStripWebcalHint")}</p>
           )}
           <Link
-            href="/dashboard/calendar"
+            href={candidateCalendarHref()}
             className="twin-btn-secondary twin-touch-target text-center text-sm sm:text-left"
           >
             {t("dashboard.calendarStripCta")}

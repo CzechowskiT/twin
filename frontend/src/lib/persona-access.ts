@@ -12,10 +12,14 @@ import type { TranslationKey } from "@/lib/i18n";
 
 export type PersonaAudience = MarketingPersona;
 
+/** Canonical candidate calendar route — all candidate entry points must use this. */
+export const CANDIDATE_CALENDAR_HREF = "/dashboard/calendar";
+
 /** Routes that imply this persona when visited (syncs PersonaProvider). */
 const PATH_IMPLIES_PERSONA: { prefix: string; persona: MarketingPersona }[] = [
   { prefix: "/for-candidates", persona: "candidate" },
   { prefix: "/dashboard/referrals", persona: "candidate" },
+  { prefix: CANDIDATE_CALENDAR_HREF, persona: "candidate" },
   { prefix: "/dashboard", persona: "candidate" },
   { prefix: "/profile", persona: "candidate" },
   { prefix: "/onboarding", persona: "candidate" },
@@ -44,7 +48,7 @@ const PATH_IMPLIES_PERSONA: { prefix: string; persona: MarketingPersona }[] = [
 
 /** Only these personas may access the path prefix (longest match wins). */
 const PREFIX_ALLOWED: { prefix: string; allowed: readonly MarketingPersona[] }[] = [
-  { prefix: "/dashboard/calendar", allowed: ["candidate"] },
+  { prefix: CANDIDATE_CALENDAR_HREF, allowed: ["candidate"] },
   { prefix: "/recruiter/calendar", allowed: ["recruiter"] },
   { prefix: "/dashboard", allowed: ["candidate"] },
   { prefix: "/profile", allowed: ["candidate"] },
@@ -191,7 +195,7 @@ export function sessionPersonaHomeRedirect(
 ): string | null {
   const path = normalizePath(pathname);
   if (isSessionNeutralPath(path)) return null;
-  if (persona === "recruiter" && path.startsWith("/dashboard/calendar")) {
+  if (persona === "recruiter" && path.startsWith(CANDIDATE_CALENDAR_HREF)) {
     return "/recruiter/calendar";
   }
   if (isPathAllowedForPersona(pathname, persona)) return null;
@@ -201,7 +205,22 @@ export function sessionPersonaHomeRedirect(
 /** Header + momentum calendar tab — candidate live calendar vs recruiter roadmap placeholder. */
 export function calendarNavHref(persona: MarketingPersona): string {
   if (persona === "recruiter") return "/recruiter/calendar";
-  return "/dashboard/calendar";
+  return candidateCalendarHref();
+}
+
+/** Single canonical href for all candidate calendar entry points. */
+export function candidateCalendarHref(): string {
+  return CANDIDATE_CALENDAR_HREF;
+}
+
+/**
+ * When a route allows exactly one persona, the path locks the session lane on navigation.
+ * Keeps header calendar links and guards aligned for candidate calendar.
+ */
+export function sessionPersonaLockedByPath(pathname: string): MarketingPersona | null {
+  const rule = longestAllowedRule(normalizePath(pathname));
+  if (!rule || rule.allowed.length !== 1) return null;
+  return rule.allowed[0] ?? null;
 }
 
 export function pricingPathForPersona(persona: MarketingPersona): string {
@@ -359,7 +378,7 @@ export function momentumRailCtas(
       { href: "/recruiter/jobs", labelKey: "recruiterJobs.title" },
     ];
   }
-  if (pathname.startsWith("/dashboard/calendar")) {
+  if (pathname.startsWith(CANDIDATE_CALENDAR_HREF)) {
     return [
       { href: "/dashboard", labelKey: "site.momentumCtaWorkspace" },
       { href: "/profile", labelKey: "site.momentumCtaProfile" },
@@ -431,8 +450,8 @@ export function isSessionNavLinkActive(
       (pathname.startsWith("/dashboard/") && !pathname.startsWith("/dashboard/calendar"))
     );
   }
-  if (base === "/dashboard/calendar") {
-    return pathname === "/dashboard/calendar" || pathname.startsWith("/dashboard/calendar/");
+  if (base === CANDIDATE_CALENDAR_HREF) {
+    return pathname === CANDIDATE_CALENDAR_HREF || pathname.startsWith(`${CANDIDATE_CALENDAR_HREF}/`);
   }
   if (base === "/recruiter/calendar") {
     return pathname === "/recruiter/calendar" || pathname.startsWith("/recruiter/calendar/");

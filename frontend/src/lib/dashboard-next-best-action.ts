@@ -1,4 +1,5 @@
 import type { TranslationKey } from "@/lib/i18n";
+import { candidateCalendarHref } from "@/lib/persona-access";
 
 /** Inputs for deterministic today / next-best-action — no invented analytics. */
 export type DashboardTodayContext = {
@@ -41,7 +42,7 @@ export function resolveNextBestAction(ctx: DashboardTodayContext): NextBestActio
   }
   if (!ctx.calendarConnected) {
     return {
-      primaryHref: "/dashboard/calendar",
+      primaryHref: candidateCalendarHref(),
       primaryLabelKey: "dashboard.todayNbaConnectCalendar",
       reasonKey: "dashboard.todayNbaReasonCalendar",
     };
