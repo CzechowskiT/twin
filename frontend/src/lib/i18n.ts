@@ -102,6 +102,7 @@ export type TranslationKey =
   | `calculator.${keyof typeof en.calculator}`
   | `investorCalc.${keyof typeof en.investorCalc}`
   | `dashboard.${keyof typeof en.dashboard}`
+  | `authRoles.${keyof typeof en.authRoles}`
   | `login.${keyof typeof en.login}`
   | `forgotPassword.${keyof typeof en.forgotPassword}`
   | `resetPassword.${keyof typeof en.resetPassword}`
@@ -1291,6 +1292,17 @@ const en = {
     oauthOnlyHint:
       "This account uses social sign-in only. Use your provider to sign in, or use Forgot password on the log in page if you have added email login.",
     forgotLink: "Forgot your password?",
+  },
+  authRoles: {
+    candidateTitle: "Candidate",
+    candidateTools: "Demo · Dashboard · Matches",
+    recruiterTitle: "Recruiter",
+    recruiterTools: "Inbox · B2B ROI calculator",
+    companyTitle: "Companies",
+    companyTools: "For companies · B2B calculator",
+    investorTitle: "Investor",
+    investorTools: "Scenario calculator · Metrics",
+    enterZone: "Open workspace",
   },
   authCallback: {
     title: "Signing you in",
@@ -4279,6 +4291,17 @@ const pl: MessageTree = {
       "To konto loguje się tylko przez dostawcę społecznościowego. Użyj tego samego przycisku co przy logowaniu.",
     forgotLink: "Nie pamiętasz hasła?",
   },
+  authRoles: {
+    candidateTitle: "Kandydat",
+    candidateTools: "Demo · Panel · Dopasowania",
+    recruiterTitle: "Rekruter",
+    recruiterTools: "Skrzynka akceptacji · Kalkulator ROI B2B",
+    companyTitle: "Firmy",
+    companyTools: "Dla firm · Kalkulator B2B",
+    investorTitle: "Inwestor",
+    investorTools: "Kalkulator scenariusza · Metryki",
+    enterZone: "Wejdź do strefy",
+  },
   authCallback: {
     title: "Logowanie",
     signingIn: "Kończenie logowania…",
@@ -6140,9 +6163,9 @@ function localeFromOverlays(
   baseOverlay: Record<string, unknown>,
   premiumOverlay: Record<string, unknown>,
 ): typeof en {
+  const withPremium = mergeDeep(baseOverlay, premiumOverlay);
   const marketingHome = MARKETING_HOME_OVERLAYS[locale] ?? {};
-  const withMarketing = mergeDeep(baseOverlay, marketingHome);
-  return messagesFromEnOverlay(mergeDeep(withMarketing, premiumOverlay));
+  return messagesFromEnOverlay(mergeDeep(withPremium, marketingHome));
 }
 
 const es = localeFromOverlays("es", esOverlay, premiumEsOverlay);
