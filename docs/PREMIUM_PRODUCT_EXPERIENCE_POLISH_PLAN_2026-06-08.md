@@ -337,6 +337,7 @@ Use existing `t()` keys; 3-step max; no gamification rewards.
 | **5** | `chore/product-trust-language-polish-2026-06-08` | chore | chore(product): trust language | grep guard ✅ |
 | **6** | `feat/premium-empty-states-onboarding-2026-06-08` | feat | feat(product): guided empty states | same |
 | **7** | `docs/final-premium-product-qa-pack-2026-06-08` | docs | docs(product): founder QA checklist | docs-only ✅ |
+| **8** | `fix/full-i18n-translation-coverage-2026-06-08` | fix | fix(i18n): premium surfaces all locales | `test:i18n-coverage` |
 
 **Per-slice workflow:** checkout scaffold → pull → branch → implement → `npm run lint` → `npx tsc --noEmit` → `npm run build` → relevant `npm run test:*` → optional `pytest tests/test_csp_report*.py` → `git diff --check` → commit → push → `gh pr create` → auto-merge if green → wait deploy → smoke `twin-sooty.vercel.app` routes → update matrices → next slice.
 
@@ -435,6 +436,8 @@ pytest tests/test_csp_report*.py -q
 | `frontend/src/lib/recruiter-inbox-segments.ts` | Decision console segments + counts |
 | `frontend/src/lib/recruiter-review-card.ts` | Review card sections |
 | `frontend/src/lib/i18n.ts` | PL/EN copy source of truth |
+| `docs/I18N_FULL_TRANSLATION_COVERAGE_2026-06-08.md` | Premium surfaces · all 9 locales |
+| `frontend/src/lib/overlays/premium/` | Generated premium overlays (es–ja) |
 | `frontend/src/components/ux/empty-state.tsx` | Base empty state |
 | `frontend/src/components/ux/guided-empty-state.tsx` | Premium guided empty states |
 | `docs/FOUNDER_PREMIUM_PRODUCT_QA_CHECKLIST_2026-06-08.md` | Founder QA checklist + rubric |

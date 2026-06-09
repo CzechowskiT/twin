@@ -4,7 +4,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
-import { en, dictionaries } from "../src/lib/i18n";
+import { en, dictionaries, LOCALES } from "../src/lib/i18n";
 
 const pl = dictionaries.pl;
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -71,6 +71,15 @@ test("autopilot mentions in i18n home include phased or paused context", () => {
       /phased|paused|prepare-only|not live|wstrzym|etapami|fazow/,
       "autopilot copy must include phased/paused context",
     );
+  }
+});
+
+test("i18n dictionaries contain no forbidden live-automation or AI-decides claims", () => {
+  for (const locale of LOCALES) {
+    const blob = JSON.stringify(dictionaries[locale]);
+    for (const pattern of FORBIDDEN_PATTERNS) {
+      assert.doesNotMatch(blob, pattern, `${pattern} in dictionaries.${locale}`);
+    }
   }
 });
 
