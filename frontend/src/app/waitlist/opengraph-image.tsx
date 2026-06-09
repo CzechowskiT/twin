@@ -1,8 +1,10 @@
 import { ImageResponse } from "next/og";
 import { headers } from "next/headers";
 
-import { WAITLIST_MESSAGES } from "@/lib/waitlist-messages";
-import { localeFromAcceptLanguage } from "@/lib/waitlist/locale-from-request";
+import {
+  WAITLIST_OG_COPY,
+  ogLocaleFromAcceptLanguage,
+} from "@/lib/og/waitlist-og-copy";
 
 export const runtime = "edge";
 export const alt = "TWIN — Wishlist";
@@ -11,8 +13,8 @@ export const contentType = "image/png";
 
 export default async function Image() {
   const hdrs = await headers();
-  const locale = localeFromAcceptLanguage(hdrs.get("accept-language"));
-  const copy = WAITLIST_MESSAGES[locale];
+  const locale = ogLocaleFromAcceptLanguage(hdrs.get("accept-language"));
+  const copy = WAITLIST_OG_COPY[locale];
   const title = copy.metaTitle.length > 72 ? `${copy.metaTitle.slice(0, 69)}…` : copy.metaTitle;
   const description =
     copy.metaDescription.length > 140 ? `${copy.metaDescription.slice(0, 137)}…` : copy.metaDescription;

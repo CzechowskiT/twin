@@ -38,6 +38,7 @@
 - **Premium product overlays:** `frontend/src/lib/overlays/premium/generated/*.ts` merged at dictionary build time
 - **Safe fallback:** `getNestedValue` / `translate()` return the key path only when a value is missing (should not occur after coverage tests)
 - **Regenerate premium overlays:** `npx tsx scripts/generate-premium-overlays.ts [locale]`
+- **Edge OG routes (exception):** `opengraph-image` / `twitter-image` use `frontend/src/lib/og/*` only — **not** `i18n.ts` or premium overlays (Vercel 1 MB Edge limit). See `docs/OPENGRAPH_EDGE_BUNDLE_SIZE_FIX_2026-06-08.md`.
 
 ## Tests
 
@@ -46,6 +47,7 @@
 | `npm run test:i18n-coverage` | Recursive key parity vs `en`, no empty strings, premium keys ≠ English for non-`en` |
 | `npm run test:i18n-premium-product` | Premium route wiring + PL/ES sample keys |
 | `npm run test:trust-language-guard` | Forbidden claims in source surfaces **and** all locale dictionaries |
+| `npm run test:og-bundle-guard` | OG image routes must not import full i18n / waitlist-messages / overlays |
 
 ## Copy safety
 
