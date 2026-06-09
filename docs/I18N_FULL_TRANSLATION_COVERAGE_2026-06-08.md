@@ -30,6 +30,7 @@
 - Recruiter calendar placeholder (`recruiterCalendar.*`)
 - Persona talent pool preview (`persona.*`)
 - Homepage phased automation cue (`home.feature6*`)
+- **Rendered homepage + waitlist (2026-06-09):** `home.*` rendered keys, `candidateRewards.*`, FAQ home teaser, `WAITLIST_NARRATIVE` for es–ja — see `docs/RENDERED_HOMEPAGE_ZERO_ENGLISH_LEAKAGE_FIX_2026-06-09.md`
 
 ## Implementation
 
@@ -48,6 +49,7 @@
 | `npm run test:i18n-coverage` | Recursive key parity vs `en`, no empty strings, premium keys ≠ English for non-`en` |
 | `npm run test:i18n-premium-product` | Premium route wiring + PL/ES sample keys |
 | `npm run test:i18n-visual-copy-guard` | Role hub `authRoles.*` parity; German English-leak guard |
+| `npm run test:i18n-rendered-homepage-guard` | Rendered `/` + `/waitlist` EN leak phrases; ES/DE marker smoke |
 | `npm run test:trust-language-guard` | Forbidden claims in source surfaces **and** all locale dictionaries |
 | `npm run test:og-bundle-guard` | OG image routes must not import full i18n / waitlist-messages / overlays |
 
@@ -69,6 +71,7 @@ After merge, run visual founder smoke on:
 - `/recruiter/inbox` (decision console segments)
 - `/recruiter/calendar` (not-live placeholder)
 - `/login` / `/register` (role hubs — verify **DE** cards: Kandidat, Unternehmen, Arbeitsbereich öffnen; see `docs/ZERO_ENGLISH_LEAKAGE_I18N_FIX_2026-06-09.md`)
+- `/` + `/waitlist` (locale **ES** or **DE** — no founder-reported EN phrases; see `docs/RENDERED_HOMEPAGE_ZERO_ENGLISH_LEAKAGE_FIX_2026-06-09.md`)
 
 See `docs/FOUNDER_PREMIUM_PRODUCT_QA_CHECKLIST_2026-06-08.md`.
 
@@ -79,3 +82,4 @@ See `docs/FOUNDER_PREMIUM_PRODUCT_QA_CHECKLIST_2026-06-08.md`.
 - `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` — launch gates
 - `docs/DE_I18N_PREMIUM_TRANSLATION_FIX_2026-06-08.md` — German premium copy fix
 - `docs/ZERO_ENGLISH_LEAKAGE_I18N_FIX_2026-06-09.md` — role hub English leakage fix
+- `docs/RENDERED_HOMEPAGE_ZERO_ENGLISH_LEAKAGE_FIX_2026-06-09.md` — homepage/waitlist rendered copy
