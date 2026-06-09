@@ -10,7 +10,7 @@
 
 ## How to use this checklist
 
-1. Run in **PL** and **EN** on production (or latest Vercel preview after merge). Spot-check **ES** and **DE** on `/demo`, `/dashboard`, `/recruiter/inbox` for non-English premium copy (DE: *KI-gestütztes Ranking*, *Fehlende Daten*, *Passungsscore* — see `docs/DE_I18N_PREMIUM_TRANSLATION_FIX_2026-06-08.md` and `docs/I18N_FULL_TRANSLATION_COVERAGE_2026-06-08.md`).
+1. Run in **PL** and **EN** on production (or latest Vercel preview after merge). Spot-check **DE** on `/login` and `/register` (role cards: Kandidat, Unternehmen, Arbeitsbereich öffnen — no English “Candidate”, “Companies”, “Open workspace”). Spot-check **DE** on `/demo`, `/dashboard`, `/recruiter/inbox` for premium copy (*KI-gestütztes Ranking*, etc. — see `docs/DE_I18N_PREMIUM_TRANSLATION_FIX_2026-06-08.md`). Spot-check **ES** on the same routes (see `docs/I18N_FULL_TRANSLATION_COVERAGE_2026-06-08.md`).
 2. Score each section **0–2** using the rubric below.
 3. **Pass bar:** ≥ **14/18** total with **no 0** on Hard bans (§0).
 4. File blockers in Polish if any Hard ban fails — do not send external invites until resolved.

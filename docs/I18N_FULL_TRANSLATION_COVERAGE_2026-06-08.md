@@ -1,6 +1,6 @@
 # Full i18n translation coverage — 2026-06-08
 
-**Branch:** `fix/de-premium-i18n-coverage-2026-06-08` (DE premium polish) · base `fix/full-i18n-translation-coverage-2026-06-08`  
+**Branch:** `fix/zero-english-leakage-i18n-2026-06-09` · DE curated overlay via `build-de-premium-overlay.ts`  
 **Owner:** TWIN Full i18n Translation Coverage Owner  
 **Launch stance:** Public **NO-GO** preserved · auto-apply **PAUSED** · delegated **NOT LIVE**
 
@@ -26,7 +26,7 @@
 - Application transparency panel (`dashboard.applicationTransparency*`)
 - Recruiter decision console + inbox segments (`recruiterInbox.*`)
 - Guided empty states (`ux.guidedEmpty*`)
-- Homepage nav + auth role hubs (`nav.*`, `login.*`, `register.*`)
+- Homepage nav + auth role hubs (`nav.*`, `login.*`, `register.*`, **`authRoles.*`**)
 - Recruiter calendar placeholder (`recruiterCalendar.*`)
 - Persona talent pool preview (`persona.*`)
 - Homepage phased automation cue (`home.feature6*`)
@@ -47,6 +47,7 @@
 | ------ | ------- |
 | `npm run test:i18n-coverage` | Recursive key parity vs `en`, no empty strings, premium keys ≠ English for non-`en` |
 | `npm run test:i18n-premium-product` | Premium route wiring + PL/ES sample keys |
+| `npm run test:i18n-visual-copy-guard` | Role hub `authRoles.*` parity; German English-leak guard |
 | `npm run test:trust-language-guard` | Forbidden claims in source surfaces **and** all locale dictionaries |
 | `npm run test:og-bundle-guard` | OG image routes must not import full i18n / waitlist-messages / overlays |
 
@@ -67,7 +68,7 @@ After merge, run visual founder smoke on:
 - `/dashboard` (NBA, match groups, transparency, guided empty states)
 - `/recruiter/inbox` (decision console segments)
 - `/recruiter/calendar` (not-live placeholder)
-- `/login` / `/register` (role hubs)
+- `/login` / `/register` (role hubs — verify **DE** cards: Kandidat, Unternehmen, Arbeitsbereich öffnen; see `docs/ZERO_ENGLISH_LEAKAGE_I18N_FIX_2026-06-09.md`)
 
 See `docs/FOUNDER_PREMIUM_PRODUCT_QA_CHECKLIST_2026-06-08.md`.
 
@@ -77,3 +78,4 @@ See `docs/FOUNDER_PREMIUM_PRODUCT_QA_CHECKLIST_2026-06-08.md`.
 - `docs/PREMIUM_PRODUCT_EXPERIENCE_POLISH_PLAN_2026-06-08.md` — slice map
 - `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` — launch gates
 - `docs/DE_I18N_PREMIUM_TRANSLATION_FIX_2026-06-08.md` — German premium copy fix
+- `docs/ZERO_ENGLISH_LEAKAGE_I18N_FIX_2026-06-09.md` — role hub English leakage fix

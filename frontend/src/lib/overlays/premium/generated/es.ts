@@ -1,5 +1,31 @@
 /** Premium product overlay — es (generated). */
 export const premiumEsOverlay: Record<string, unknown> = {
+  "authRoles": {
+    "candidateTitle": "Candidato",
+    "candidateTools": "Demo · Panel · Coincidencias",
+    "recruiterTitle": "Reclutador",
+    "recruiterTools": "Bandeja · Calculadora ROI B2B",
+    "companyTitle": "Empresas",
+    "companyTools": "Para empresas · Calculadora B2B",
+    "investorTitle": "Inversor",
+    "investorTools": "Calculadora de escenarios · Métricas",
+    "enterZone": "Abrir espacio de trabajo"
+  },
+  "workspace": {
+    "enterZone": "Abrir espacio de trabajo",
+    "zoneCandidateTitle": "Candidato",
+    "zoneCandidateLead": "Búsqueda de empleo, auto-aplicación, calendario y candidaturas.",
+    "zoneCandidateTools": "Demo · Panel · Coincidencias",
+    "zoneRecruiterTitle": "Reclutador",
+    "zoneRecruiterLead": "Bandeja de aceptación y conversaciones de ROI con clientes.",
+    "zoneRecruiterTools": "Bandeja · Calculadora ROI B2B",
+    "zoneCompanyTitle": "Empresas",
+    "zoneCompanyLead": "Programas anuales, ROI B2B, DPA y procurement enterprise.",
+    "zoneCompanyTools": "Para empresas · Calculadora B2B",
+    "zoneInvestorTitle": "Inversor",
+    "zoneInvestorLead": "Calculadora de escenarios y métricas de tracción tras el acceso.",
+    "zoneInvestorTools": "Calculadora de escenarios · Métricas"
+  },
   "dashboard": {
     "applicationTransparencyAutomation": "La autoaplicación está en pausa. La aplicación delegada no está activa.",
     "applicationTransparencyAutomationLabel": "Estado de automatización:",
