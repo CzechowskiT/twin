@@ -8,6 +8,7 @@ import {
   jaOverlay,
   zhOverlay,
 } from "./overlays";
+import { MARKETING_HOME_OVERLAYS } from "./overlays/marketing-home";
 import {
   premiumArOverlay,
   premiumDeOverlay,
@@ -6135,19 +6136,22 @@ function messagesFromEnOverlay(overlay: Record<string, unknown>): typeof en {
 }
 
 function localeFromOverlays(
+  locale: Locale,
   baseOverlay: Record<string, unknown>,
   premiumOverlay: Record<string, unknown>,
 ): typeof en {
-  return messagesFromEnOverlay(mergeDeep(baseOverlay, premiumOverlay));
+  const marketingHome = MARKETING_HOME_OVERLAYS[locale] ?? {};
+  const withMarketing = mergeDeep(baseOverlay, marketingHome);
+  return messagesFromEnOverlay(mergeDeep(withMarketing, premiumOverlay));
 }
 
-const es = localeFromOverlays(esOverlay, premiumEsOverlay);
-const it = localeFromOverlays(itOverlay, premiumItOverlay);
-const fr = localeFromOverlays(frOverlay, premiumFrOverlay);
-const de = localeFromOverlays(deOverlay, premiumDeOverlay);
-const zh = localeFromOverlays(zhOverlay, premiumZhOverlay);
-const ar = localeFromOverlays(arOverlay, premiumArOverlay);
-const ja = localeFromOverlays(jaOverlay, premiumJaOverlay);
+const es = localeFromOverlays("es", esOverlay, premiumEsOverlay);
+const it = localeFromOverlays("it", itOverlay, premiumItOverlay);
+const fr = localeFromOverlays("fr", frOverlay, premiumFrOverlay);
+const de = localeFromOverlays("de", deOverlay, premiumDeOverlay);
+const zh = localeFromOverlays("zh", zhOverlay, premiumZhOverlay);
+const ar = localeFromOverlays("ar", arOverlay, premiumArOverlay);
+const ja = localeFromOverlays("ja", jaOverlay, premiumJaOverlay);
 
 export { en };
 

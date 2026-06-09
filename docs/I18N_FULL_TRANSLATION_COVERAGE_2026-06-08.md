@@ -45,6 +45,9 @@
 | ------ | ------- |
 | `npm run test:i18n-coverage` | Recursive key parity vs `en`, no empty strings, premium keys ≠ English for non-`en` |
 | `npm run test:i18n-premium-product` | Premium route wiring + PL/ES sample keys |
+| `npm run test:i18n-rendered-homepage-guard` | Rendered `/`, hubs, `/demo`, `/waitlist` — no EN marketing leakage |
+| `npm run test:i18n-visual-copy-guard` | Marketing/auth/waitlist components route copy through i18n |
+| `npm run test:og-bundle-guard` | Static OG bundles unchanged; waitlist OG locale-aware |
 | `npm run test:trust-language-guard` | Forbidden claims in source surfaces **and** all locale dictionaries |
 
 ## Copy safety
