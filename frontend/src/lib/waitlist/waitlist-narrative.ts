@@ -1,4 +1,13 @@
 import type { Locale } from "@/lib/i18n";
+import {
+  arWaitlistNarrative,
+  deWaitlistNarrative,
+  esWaitlistNarrative,
+  frWaitlistNarrative,
+  itWaitlistNarrative,
+  jaWaitlistNarrative,
+  zhWaitlistNarrative,
+} from "./waitlist-narrative-locales";
 
 export type WaitlistPillar = { icon: string; title: string; body: string };
 
@@ -379,11 +388,11 @@ const pl: WaitlistNarrative = {
 export const WAITLIST_NARRATIVE: Record<Locale, WaitlistNarrative> = {
   en,
   pl,
-  es: en,
-  fr: en,
-  de: en,
-  it: en,
-  zh: en,
-  ja: en,
-  ar: en,
+  es: esWaitlistNarrative,
+  fr: frWaitlistNarrative,
+  de: deWaitlistNarrative,
+  it: itWaitlistNarrative,
+  zh: zhWaitlistNarrative,
+  ja: jaWaitlistNarrative,
+  ar: arWaitlistNarrative,
 };

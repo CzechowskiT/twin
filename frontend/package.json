@@ -28,6 +28,7 @@
     "test:i18n-coverage": "npx --yes tsx scripts/i18n-coverage.test.ts",
     "test:i18n-premium-product": "npx --yes tsx scripts/i18n-premium-product.test.ts",
     "test:i18n-visual-copy-guard": "npx --yes tsx scripts/i18n-visual-copy-guard.test.ts",
+    "test:i18n-rendered-homepage-guard": "npx --yes tsx scripts/i18n-rendered-homepage-guard.test.ts",
     "test:og-bundle-guard": "npx --yes tsx scripts/og-bundle-guard.test.ts",
     "generate:premium-overlays": "python3 scripts/generate-premium-overlays.py",
     "build:de-premium-overlay": "npx --yes tsx scripts/build-de-premium-overlay.ts",

@@ -39,6 +39,7 @@ import {
   CANDIDATE_REWARDS_MESSAGES_EN,
   CANDIDATE_REWARDS_MESSAGES_PL,
 } from "./candidate-rewards-messages";
+import { RENDERED_HOMEPAGE_OVERLAYS } from "./marketing/rendered-homepage-overlays";
 
 export type Locale = "en" | "pl" | "es" | "it" | "fr" | "de" | "zh" | "ar" | "ja";
 
@@ -6160,17 +6161,21 @@ function messagesFromEnOverlay(overlay: Record<string, unknown>): typeof en {
 function localeFromOverlays(
   baseOverlay: Record<string, unknown>,
   premiumOverlay: Record<string, unknown>,
+  renderedOverlay?: Record<string, unknown>,
 ): typeof en {
-  return messagesFromEnOverlay(mergeDeep(baseOverlay, premiumOverlay));
+  const merged = renderedOverlay
+    ? mergeDeep(mergeDeep(baseOverlay, premiumOverlay), renderedOverlay)
+    : mergeDeep(baseOverlay, premiumOverlay);
+  return messagesFromEnOverlay(merged);
 }
 
-const es = localeFromOverlays(esOverlay, premiumEsOverlay);
-const it = localeFromOverlays(itOverlay, premiumItOverlay);
-const fr = localeFromOverlays(frOverlay, premiumFrOverlay);
-const de = localeFromOverlays(deOverlay, premiumDeOverlay);
-const zh = localeFromOverlays(zhOverlay, premiumZhOverlay);
-const ar = localeFromOverlays(arOverlay, premiumArOverlay);
-const ja = localeFromOverlays(jaOverlay, premiumJaOverlay);
+const es = localeFromOverlays(esOverlay, premiumEsOverlay, RENDERED_HOMEPAGE_OVERLAYS.es);
+const it = localeFromOverlays(itOverlay, premiumItOverlay, RENDERED_HOMEPAGE_OVERLAYS.it);
+const fr = localeFromOverlays(frOverlay, premiumFrOverlay, RENDERED_HOMEPAGE_OVERLAYS.fr);
+const de = localeFromOverlays(deOverlay, premiumDeOverlay, RENDERED_HOMEPAGE_OVERLAYS.de);
+const zh = localeFromOverlays(zhOverlay, premiumZhOverlay, RENDERED_HOMEPAGE_OVERLAYS.zh);
+const ar = localeFromOverlays(arOverlay, premiumArOverlay, RENDERED_HOMEPAGE_OVERLAYS.ar);
+const ja = localeFromOverlays(jaOverlay, premiumJaOverlay, RENDERED_HOMEPAGE_OVERLAYS.ja);
 
 export { en };
 

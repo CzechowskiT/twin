@@ -68,5 +68,6 @@ On https://twin-sooty.vercel.app with locale **DE**:
 ## Related docs
 
 - `docs/I18N_FULL_TRANSLATION_COVERAGE_2026-06-08.md` — updated with `authRoles` + visual guard
+- `docs/RENDERED_HOMEPAGE_ZERO_ENGLISH_LEAKAGE_FIX_2026-06-09.md` — homepage/waitlist rendered copy (follow-up slice)
 - `docs/FOUNDER_PREMIUM_PRODUCT_QA_CHECKLIST_2026-06-08.md` — DE role-hub spot-check added
 - `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md` — safe-lane merge note
