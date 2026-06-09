@@ -11,6 +11,7 @@
 - **Post-merge sanity:** `docs/POST_MERGE_AUTO_APPLY_SANITY_2026-06-02.md` (2026-06-02)
 - **Ops pause plan:** `docs/AUTO_APPLY_PRODUCTION_OPS_PAUSE_PLAN_2026-06-02.md` (2026-06-02)
 - **Copy & claims audit:** `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md` (2026-06-04)
+- **OG Edge bundle fix (2026-06-08):** `docs/OPENGRAPH_EDGE_BUNDLE_SIZE_FIX_2026-06-08.md` — `waitlist/opengraph-image` decoupled from full i18n (Vercel 1 MB Edge limit)
 - **Launch-day monitoring / rollback:** `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` (2026-06-04)
 - **Recruiter alignment audit:** `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md` (2026-06-04)
 - **DB incident (2026-05-29):** `INC-DB-2026-05-29-001` — **RESOLVED** + stabilization PASSED — see `docs/PRODUCTION_DB_RESTORE_INCIDENT_2026-05-29.md`
