@@ -26,7 +26,7 @@
 - Application transparency panel (`dashboard.applicationTransparency*`)
 - Recruiter decision console + inbox segments (`recruiterInbox.*`)
 - Guided empty states (`ux.guidedEmpty*`)
-- Homepage nav + auth role hubs (`nav.*`, `login.*`, `register.*`)
+- Homepage nav + auth role hubs (`nav.*`, `login.*`, `register.*`, **`authRoles.*`**)
 - Recruiter calendar placeholder (`recruiterCalendar.*`)
 - Persona talent pool preview (`persona.*`)
 - Homepage phased automation cue (`home.feature6*`)
@@ -45,6 +45,7 @@
 | ------ | ------- |
 | `npm run test:i18n-coverage` | Recursive key parity vs `en`, no empty strings, premium keys ≠ English for non-`en` |
 | `npm run test:i18n-premium-product` | Premium route wiring + PL/ES sample keys |
+| `npm run test:i18n-visual-copy-guard` | Role hub `authRoles.*` parity; German English-leak guard |
 | `npm run test:trust-language-guard` | Forbidden claims in source surfaces **and** all locale dictionaries |
 
 ## Copy safety
@@ -64,7 +65,7 @@ After merge, run visual founder smoke on:
 - `/dashboard` (NBA, match groups, transparency, guided empty states)
 - `/recruiter/inbox` (decision console segments)
 - `/recruiter/calendar` (not-live placeholder)
-- `/login` / `/register` (role hubs)
+- `/login` / `/register` (role hubs — verify **DE** cards: Kandidat, Unternehmen, Arbeitsbereich öffnen; see `docs/ZERO_ENGLISH_LEAKAGE_I18N_FIX_2026-06-09.md`)
 
 See `docs/FOUNDER_PREMIUM_PRODUCT_QA_CHECKLIST_2026-06-08.md`.
 

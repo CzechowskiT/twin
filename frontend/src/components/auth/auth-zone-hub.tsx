@@ -19,26 +19,26 @@ type ZoneConfig = {
 const ZONES: ZoneConfig[] = [
   {
     id: "candidate",
-    titleKey: "workspace.zoneCandidateTitle",
-    subtitleKey: "workspace.zoneCandidateTools",
+    titleKey: "authRoles.candidateTitle",
+    subtitleKey: "authRoles.candidateTools",
     icon: <IconCandidate />,
   },
   {
     id: "recruiter",
-    titleKey: "workspace.zoneRecruiterTitle",
-    subtitleKey: "workspace.zoneRecruiterTools",
+    titleKey: "authRoles.recruiterTitle",
+    subtitleKey: "authRoles.recruiterTools",
     icon: <IconRecruiter />,
   },
   {
     id: "company",
-    titleKey: "workspace.zoneCompanyTitle",
-    subtitleKey: "workspace.zoneCompanyTools",
+    titleKey: "authRoles.companyTitle",
+    subtitleKey: "authRoles.companyTools",
     icon: <IconCompany />,
   },
   {
     id: "investor",
-    titleKey: "workspace.zoneInvestorTitle",
-    subtitleKey: "workspace.zoneInvestorTools",
+    titleKey: "authRoles.investorTitle",
+    subtitleKey: "authRoles.investorTools",
     icon: <IconInvestor />,
   },
 ];
@@ -103,7 +103,7 @@ export function AuthZoneHub({
               {t(zone.subtitleKey)}
             </span>
             <span className="mt-auto pt-4 text-xs font-semibold text-[var(--twin-accent)] opacity-80 transition group-hover:opacity-100">
-              {t("workspace.enterZone")} →
+              {t("authRoles.enterZone")} →
             </span>
           </Link>
         ))}

@@ -1,5 +1,31 @@
 /** Premium product overlay — ja (generated). */
 export const premiumJaOverlay: Record<string, unknown> = {
+  "authRoles": {
+    "candidateTitle": "候補者",
+    "candidateTools": "デモ · ダッシュボード · マッチ",
+    "recruiterTitle": "リクルーター",
+    "recruiterTools": "受信トレイ · B2B ROI 計算",
+    "companyTitle": "企業",
+    "companyTools": "企業向け · B2B 計算",
+    "investorTitle": "投資家",
+    "investorTools": "シナリオ計算 · メトリクス",
+    "enterZone": "ワークスペースを開く"
+  },
+  "workspace": {
+    "enterZone": "ワークスペースを開く",
+    "zoneCandidateTitle": "候補者",
+    "zoneCandidateLead": "求人検索、自動応募、カレンダー、応募管理。",
+    "zoneCandidateTools": "デモ · ダッシュボード · マッチ",
+    "zoneRecruiterTitle": "リクルーター",
+    "zoneRecruiterLead": "承認受信トレイとクライアント ROI の会話。",
+    "zoneRecruiterTools": "受信トレイ · B2B ROI 計算",
+    "zoneCompanyTitle": "企業",
+    "zoneCompanyLead": "年間プログラム、B2B ROI、DPA、エンタープライズ調達。",
+    "zoneCompanyTools": "企業向け · B2B 計算",
+    "zoneInvestorTitle": "投資家",
+    "zoneInvestorLead": "ログイン後のシナリオ計算とトラクションメトリクス。",
+    "zoneInvestorTools": "シナリオ計算 · メトリクス"
+  },
   "dashboard": {
     "applicationTransparencyAutomation": "自動応募は一時停止中です。委任応募は未稼働です。",
     "applicationTransparencyAutomationLabel": "自動化ステータス:",

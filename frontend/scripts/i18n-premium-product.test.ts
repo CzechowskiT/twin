@@ -28,6 +28,8 @@ const REQUIRED_KEYS = [
   "recruiterCalendar.notLiveTitle",
   "login.hubTitle",
   "register.hubTitle",
+  "authRoles.candidateTitle",
+  "authRoles.enterZone",
 ] as const;
 
 test("premium surfaces route copy through t() — no raw string literals for titles", () => {

@@ -21,6 +21,7 @@
 **Safe-lane merge (2026-06-08):** Premium guided empty states (Slice 6) · candidate + recruiter onboarding steps · **does not change launch NO-GO**.
 **Safe-lane merge (2026-06-08):** Founder premium product QA checklist (Slice 7) · scoring rubric + handoff · **does not change launch NO-GO**.
 **Safe-lane merge (2026-06-07):** Auth role-choice-first — header Zaloguj→`/login`, Rejestracja→`/register`; hubs before persona forms · `docs/AUTH_ROLE_CHOICE_FIRST_2026-06-07.md` · `test:auth-role-choice` + `test:homepage-nav` · **does not change launch NO-GO**.
+**Safe-lane merge (2026-06-09):** Zero English leakage — role hub `authRoles.*` i18n for all 9 locales · `docs/ZERO_ENGLISH_LEAKAGE_I18N_FIX_2026-06-09.md` · `test:i18n-visual-copy-guard` · **does not change launch NO-GO**.
  · **Controlled recruiter pilot H5b PASS** (`2026-06-07T07:03:13Z`) · **H5c pack created** · **H5d pack created** (`2026-06-07`) · default **HOLD** · founder **defers external invitations** until H5d slot-1 selected + explicit **GO SMALL 1/2** · invitations sent **no** · **S2 PASS** (post-enforce smoke `2026-06-05T16:20:13Z`) · **R1–R5 PASS** · **H4 CLEAN PASS** (`2026-06-06T17:36:25Z`) · recruiter calendar placeholder **NOT LIVE** · **Auto-apply PAUSED** (operational + product gates)
 
 ---

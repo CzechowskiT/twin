@@ -1,5 +1,31 @@
 /** Premium product overlay — de (generated). */
 export const premiumDeOverlay: Record<string, unknown> = {
+  "authRoles": {
+    "candidateTitle": "Kandidat",
+    "candidateTools": "Demo · Dashboard · Treffer",
+    "recruiterTitle": "Personalvermittler",
+    "recruiterTools": "Posteingang · B2B-ROI-Rechner",
+    "companyTitle": "Unternehmen",
+    "companyTools": "Für Unternehmen · B2B-Rechner",
+    "investorTitle": "Anleger",
+    "investorTools": "Szenario-Rechner · Kennzahlen",
+    "enterZone": "Arbeitsbereich öffnen"
+  },
+  "workspace": {
+    "enterZone": "Arbeitsbereich öffnen",
+    "zoneCandidateTitle": "Kandidat",
+    "zoneCandidateLead": "Jobsuche, Auto-Apply, Kalender und Bewerbungen.",
+    "zoneCandidateTools": "Demo · Dashboard · Treffer",
+    "zoneRecruiterTitle": "Personalvermittler",
+    "zoneRecruiterLead": "Akzeptanz-Posteingang und ROI-Gespräche mit Kunden.",
+    "zoneRecruiterTools": "Posteingang · B2B-ROI-Rechner",
+    "zoneCompanyTitle": "Unternehmen",
+    "zoneCompanyLead": "Jahresprogramme, B2B-ROI, DPA und Enterprise-Beschaffung.",
+    "zoneCompanyTools": "Für Unternehmen · B2B-Rechner",
+    "zoneInvestorTitle": "Anleger",
+    "zoneInvestorLead": "Szenario-Rechner und Traktionskennzahlen nach der Anmeldung.",
+    "zoneInvestorTools": "Szenario-Rechner · Kennzahlen"
+  },
   "dashboard": {
     "applicationTransparencyAutomation": "Auto-Apply ist pausiert. Delegierte Bewerbung ist nicht live.",
     "applicationTransparencyAutomationLabel": "Automatisierungsstatus:",
