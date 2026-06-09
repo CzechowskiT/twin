@@ -14,6 +14,7 @@ import { isDemoUserEmail } from "@/lib/demo-user";
 import { scrollToDashboardHash } from "@/lib/dashboard-anchor";
 import {
   type GrowthCtaVariant,
+  CANDIDATE_CALENDAR_HREF,
   headerAccountLinks,
   headerGrowthLinksForPersona,
   headerMarketingLaneLinks,
@@ -59,7 +60,7 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
   const demoActive = pathname === "/demo" || pathname.startsWith("/demo/");
   const dashboardSectionActive =
     pathname === "/dashboard" ||
-    (pathname.startsWith("/dashboard/") && !pathname.startsWith("/dashboard/calendar"));
+    (pathname.startsWith("/dashboard/") && !pathname.startsWith(CANDIDATE_CALENDAR_HREF));
   const highlightDemoNav = isDemoUserEmail(userEmail);
 
   useEffect(() => {

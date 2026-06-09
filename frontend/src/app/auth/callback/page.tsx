@@ -5,7 +5,9 @@ import { Suspense, useEffect, useState } from "react";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { setToken } from "@/lib/auth";
+import { marketingPersonaFromPathExtended } from "@/lib/persona-access";
 import type { TranslationKey } from "@/lib/i18n";
+import { setSessionPersona } from "@/lib/session-persona";
 
 function authErrorKey(error: string): TranslationKey {
   if (error === "linkedin_denied") return "authCallback.errorLinkedinDenied";
@@ -36,6 +38,8 @@ function AuthCallbackContent() {
       setToken(token);
       const next = searchParams.get("next");
       const path = next?.startsWith("/") ? next : "/dashboard";
+      const persona = marketingPersonaFromPathExtended(path) ?? "candidate";
+      setSessionPersona(persona);
       queueMicrotask(() => {
         router.replace(path);
       });

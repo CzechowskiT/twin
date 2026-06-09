@@ -19,7 +19,7 @@ import {
   type MarketingPersona,
   PERSONA_STORAGE_KEY,
 } from "@/lib/marketing-persona";
-import { marketingPersonaFromPathExtended } from "@/lib/persona-access";
+import { marketingPersonaFromPathExtended, sessionPersonaLockedByPath } from "@/lib/persona-access";
 import { loginZoneFromPath } from "@/lib/persona-auth";
 import { safeStorage } from "@/lib/safe-storage";
 import { getSessionPersona, setSessionPersona } from "@/lib/session-persona";
@@ -40,6 +40,12 @@ function readStoredPersona(): MarketingPersona | null {
 
 function resolvePersona(pathname: string, hasSession: boolean): MarketingPersona {
   if (hasSession) {
+    const pathLocked = sessionPersonaLockedByPath(pathname);
+    if (pathLocked) {
+      const session = getSessionPersona();
+      if (session !== pathLocked) setSessionPersona(pathLocked);
+      return pathLocked;
+    }
     const session = getSessionPersona();
     if (session) return session;
     const loginZone = loginZoneFromPath(pathname);

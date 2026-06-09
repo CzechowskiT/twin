@@ -13,6 +13,7 @@ import { PipelinePreview } from "@/components/marketing/pipeline-preview";
 import { ScrollReveal } from "@/components/marketing/scroll-reveal";
 import { Shell } from "@/components/ui";
 import { getToken } from "@/lib/auth";
+import { candidateCalendarHref } from "@/lib/persona-access";
 import {
   DEMO_APPLICATION_STATUSES,
   DEMO_CALENDAR_SLOT,
@@ -435,7 +436,7 @@ export function DemoProductWalkthrough() {
               </p>
               <p className="mt-3 text-xs leading-relaxed text-[var(--twin-muted)]">{t("demo.calendarHint")}</p>
               {isLoggedIn ? (
-                <Link href="/dashboard/calendar" className="mt-4 inline-flex text-sm font-semibold text-[var(--twin-accent)]">
+                <Link href={candidateCalendarHref()} className="mt-4 inline-flex text-sm font-semibold text-[var(--twin-accent)]">
                   {t("demo.ctaCalendar")} →
                 </Link>
               ) : null}
