@@ -8,6 +8,15 @@ import {
   jaOverlay,
   zhOverlay,
 } from "./overlays";
+import {
+  premiumArOverlay,
+  premiumDeOverlay,
+  premiumEsOverlay,
+  premiumFrOverlay,
+  premiumItOverlay,
+  premiumJaOverlay,
+  premiumZhOverlay,
+} from "./overlays/premium";
 import { FAQ_MESSAGES_EN, FAQ_MESSAGES_PL } from "./faq-messages";
 import {
   EMPLOYER_MEDIA_MESSAGES_EN,
@@ -1109,7 +1118,8 @@ const en = {
     calendarGoogleRedirectSetup:
       "If Google shows an error about the redirect address, contact support — we will fix it on our side.",
     calendarGoogleRedirectCopy: "Copy link",
-    calendarConfiguredHint: "",
+    calendarConfiguredHint:
+      "Calendar connected — interview holds can sync where OAuth write access is enabled.",
     calendarFreebusyTitle: "Check availability (next 3 days)",
     calendarFreebusyGo: "Run free/busy",
     calendarBlockTitle: "Place a 45-minute interview block (UTC, test)",
@@ -4092,7 +4102,8 @@ const pl: MessageTree = {
     calendarGoogleRedirectSetup:
       "Jeśli Google pokazuje błąd adresu przekierowania, napisz do supportu — poprawimy to po naszej stronie.",
     calendarGoogleRedirectCopy: "Kopiuj link",
-    calendarConfiguredHint: "",
+    calendarConfiguredHint:
+      "Kalendarz podłączony — rezerwacje rozmów mogą się synchronizować tam, gdzie OAuth ma zapis.",
     calendarFreebusyTitle: "Sprawdź dostępność (następne 3 dni)",
     calendarFreebusyGo: "Uruchom free/busy",
     calendarBlockTitle: "Dodaj 45-min blok „interview” (UTC, test)",
@@ -6123,13 +6134,20 @@ function messagesFromEnOverlay(overlay: Record<string, unknown>): typeof en {
   ) as typeof en;
 }
 
-const es = messagesFromEnOverlay(esOverlay);
-const it = messagesFromEnOverlay(itOverlay);
-const fr = messagesFromEnOverlay(frOverlay);
-const de = messagesFromEnOverlay(deOverlay);
-const zh = messagesFromEnOverlay(zhOverlay);
-const ar = messagesFromEnOverlay(arOverlay);
-const ja = messagesFromEnOverlay(jaOverlay);
+function localeFromOverlays(
+  baseOverlay: Record<string, unknown>,
+  premiumOverlay: Record<string, unknown>,
+): typeof en {
+  return messagesFromEnOverlay(mergeDeep(baseOverlay, premiumOverlay));
+}
+
+const es = localeFromOverlays(esOverlay, premiumEsOverlay);
+const it = localeFromOverlays(itOverlay, premiumItOverlay);
+const fr = localeFromOverlays(frOverlay, premiumFrOverlay);
+const de = localeFromOverlays(deOverlay, premiumDeOverlay);
+const zh = localeFromOverlays(zhOverlay, premiumZhOverlay);
+const ar = localeFromOverlays(arOverlay, premiumArOverlay);
+const ja = localeFromOverlays(jaOverlay, premiumJaOverlay);
 
 export { en };
 
