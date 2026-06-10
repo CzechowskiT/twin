@@ -35,6 +35,7 @@
     "test:auth-role-choice": "npx --yes tsx scripts/auth-role-choice.test.ts",
     "test:candidate-calendar-routing": "npx --yes tsx scripts/candidate-calendar-routing.test.ts && npx --yes tsx scripts/persona-access.test.ts",
     "test:candidate-calendar-post-load-auth": "npx --yes tsx scripts/candidate-calendar-post-load-auth.test.ts",
+    "test:candidate-calendar-integration-health": "npx --yes tsx scripts/candidate-calendar-integration-health.test.ts",
     "test:interactive-demo": "npx --yes tsx scripts/interactive-demo.test.ts",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install chromium"

@@ -12,10 +12,14 @@ import {
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card } from "@/components/ui";
 import type { TranslationKey } from "@/lib/i18n";
+import type { ProviderHealth } from "@/lib/calendar-provider-health";
+import { providerBadgeHealth } from "@/lib/calendar-provider-health";
 import { webcalToHttps } from "@/lib/webcal-subscribe";
 
 type ProviderState = {
   connected: boolean;
+  health?: ProviderHealth;
+  message?: string | null;
   email: string | null;
   oauthConfigured: boolean;
 };
@@ -44,17 +48,34 @@ export type CalendarConnectionsPanelProps = {
   onGenerateWebcalLink: () => void;
 };
 
-function StatusBadge({ connected }: { connected: boolean }) {
+function StatusBadge({ provider }: { provider: ProviderState }) {
   const { t } = useTranslation();
+  const badge = providerBadgeHealth({
+    connected: provider.connected,
+    health: provider.health ?? (provider.connected ? "ok" : "unknown"),
+    message: provider.message ?? null,
+    provider: "google",
+    email: provider.email,
+  });
+  const labelKey: TranslationKey =
+    badge === "connected"
+      ? "dashboard.calendarConnected"
+      : badge === "reconnect_required"
+        ? "dashboard.calendarReconnectRequired"
+        : badge === "integration_error"
+          ? "dashboard.calendarIntegrationError"
+          : "dashboard.calendarNotConnected";
+  const tone =
+    badge === "connected"
+      ? "bg-emerald-500/15 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300"
+      : badge === "reconnect_required"
+        ? "bg-amber-500/15 text-amber-800 dark:bg-amber-400/15 dark:text-amber-200"
+        : badge === "integration_error"
+          ? "bg-red-500/15 text-red-700 dark:bg-red-400/15 dark:text-red-300"
+          : "bg-[var(--twin-surface-raised)] text-[var(--twin-muted-strong)]";
   return (
-    <span
-      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
-        connected
-          ? "bg-emerald-500/15 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300"
-          : "bg-[var(--twin-surface-raised)] text-[var(--twin-muted-strong)]"
-      }`}
-    >
-      {connected ? t("dashboard.calendarConnected") : t("dashboard.calendarNotConnected")}
+    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${tone}`}>
+      {t(labelKey)}
     </span>
   );
 }
@@ -89,6 +110,7 @@ function ProviderCard({
   connectLabelKey,
   disconnectLabelKey,
   connectedAsKey,
+  reconnectHintKey,
   soonTitleKey,
   soonBodyKey,
   connectBusyKey,
@@ -106,6 +128,7 @@ function ProviderCard({
   connectLabelKey: TranslationKey;
   disconnectLabelKey: TranslationKey;
   connectedAsKey: TranslationKey;
+  reconnectHintKey: TranslationKey;
   soonTitleKey: TranslationKey;
   soonBodyKey: TranslationKey;
   connectBusyKey: string;
@@ -123,12 +146,17 @@ function ProviderCard({
 
   return (
     <Card className="!mb-0 flex h-full flex-col border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/60">
-      <ProviderCardHeader icon={icon} title={t(titleKey)} badge={<StatusBadge connected={provider.connected} />} />
+      <ProviderCardHeader icon={icon} title={t(titleKey)} badge={<StatusBadge provider={provider} />} />
       <p className="twin-muted mt-2 flex-1 text-sm leading-relaxed">{t(bodyKey)}</p>
       {provider.connected && provider.email ? (
         <p className="mt-3 text-sm text-[var(--foreground)]">
           <span className="text-[var(--twin-muted-strong)]">{t(connectedAsKey)}:</span>{" "}
           <span className="font-medium">{provider.email}</span>
+        </p>
+      ) : null}
+      {provider.health === "reconnect_required" ? (
+        <p className="mt-3 text-sm text-amber-800 dark:text-amber-200" role="alert">
+          {t(reconnectHintKey)}
         </p>
       ) : null}
       {loading ? (
@@ -137,6 +165,15 @@ function ProviderCard({
         <p className="mt-4 text-sm text-[var(--twin-muted-strong)]" role="alert">
           {t("dashboard.calendarConnectionsStatusError")}
         </p>
+      ) : provider.connected && provider.health === "reconnect_required" ? (
+        <Button
+          type="button"
+          className="twin-touch-target mt-4 !w-auto self-start"
+          disabled={anyBusy}
+          onClick={onConnect}
+        >
+          {connectBusy ? "…" : t(connectLabelKey)}
+        </Button>
       ) : provider.connected ? (
         <Button
           type="button"
@@ -214,6 +251,7 @@ export function CalendarConnectionsPanel({
           connectLabelKey="dashboard.calendarConnect"
           disconnectLabelKey="dashboard.calendarDisconnect"
           connectedAsKey="dashboard.calendarConnectedAs"
+          reconnectHintKey="dashboard.calendarProviderGoogleReconnect"
           soonTitleKey="dashboard.calendarGoogleSoon"
           soonBodyKey="dashboard.calendarGoogleSoonBody"
           connectBusyKey="connect"
@@ -232,6 +270,7 @@ export function CalendarConnectionsPanel({
           connectLabelKey="dashboard.calendarConnectMicrosoft"
           disconnectLabelKey="dashboard.calendarDisconnectMicrosoft"
           connectedAsKey="dashboard.calendarMicrosoftConnectedAs"
+          reconnectHintKey="dashboard.calendarProviderMicrosoftReconnect"
           soonTitleKey="dashboard.calendarMicrosoftSoon"
           soonBodyKey="dashboard.calendarMicrosoftSoonBody"
           connectBusyKey="ms-connect"

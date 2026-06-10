@@ -85,6 +85,7 @@
 | O5 gate row | Google ✅ · Microsoft ✅ · Apple/iCal partial — founder waiver `2026-06-03T13:19:53Z` | ⚠️ **partial-with-waiver** — non-blocking for controlled pilot |
 | Recruiter calendar `/recruiter/calendar` | PR [#43](https://github.com/CzechowskiT/twin/pull/43) `2fa2746` — nav fix + placeholder; HTTP 200 smoke `2026-06-07T06:32:51Z`; `persona-access.test.ts` 8/8; **NOT LIVE** copy (no sync claims) | ✅ **PASS** (placeholder) — **NOT LIVE** for recruiter sync; candidate `/dashboard/calendar` unchanged |
 | Candidate calendar post-load session | `fix/candidate-calendar-post-load-logout-2026-06-10` — provider OAuth/integration errors must not `clearToken`; `test:candidate-calendar-post-load-auth` (`docs/CANDIDATE_CALENDAR_POST_LOAD_LOGOUT_FIX_2026-06-10.md`) | ✅ **PASS** (candidate) — stay logged in when calendar not connected or provider token stale |
+| Candidate calendar integration health | `fix/candidate-calendar-integration-health-2026-06-10` — provider `health` on status; per-provider week load + reconnect badges; `test:candidate-calendar-integration-health` (`docs/CANDIDATE_CALENDAR_INTEGRATION_HEALTH_FIX_2026-06-10.md`) | ✅ **PASS** (candidate) — no false **POŁĄCZONO** on stale tokens; partial provider failure |
 
 ### O5 — Calendar providers (2026-06-03)
 

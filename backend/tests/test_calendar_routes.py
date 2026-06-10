@@ -486,3 +486,136 @@ def test_microsoft_calendar_status_reports_oauth_configured(_mock: MagicMock, cl
     finally:
         app.dependency_overrides.pop(get_current_user, None)
         app.dependency_overrides.pop(get_db, None)
+
+
+def _calendar_user_override(user_id: int, email: str):
+    def _user() -> User:
+        u = User(email=email, hashed_password=None)
+        u.id = user_id
+        return u
+
+    return _user
+
+
+@patch("app.api.calendar.is_google_calendar_oauth_configured", return_value=True)
+@patch("app.api.calendar.probe_google_calendar_health")
+def test_google_status_health_ok_when_refresh_succeeds(
+    mock_probe: MagicMock, _mock_oauth: MagicMock, client: TestClient
+) -> None:
+    mock_probe.return_value = (True, "ok", None, "founder@gmail.com")
+    app.dependency_overrides[get_current_user] = _calendar_user_override(10, "founder@gmail.com")
+    app.dependency_overrides[get_db] = _sqlite_calendar_session
+    try:
+        res = client.get("/api/v1/calendar/google/status")
+        assert res.status_code == 200
+        data = res.json()
+        assert data["connected"] is True
+        assert data["health"] == "ok"
+        assert data["provider"] == "google"
+    finally:
+        app.dependency_overrides.pop(get_current_user, None)
+        app.dependency_overrides.pop(get_db, None)
+
+
+@patch("app.api.calendar.is_google_calendar_oauth_configured", return_value=True)
+@patch("app.api.calendar.probe_google_calendar_health")
+def test_google_status_reconnect_required_when_refresh_fails(
+    mock_probe: MagicMock, _mock_oauth: MagicMock, client: TestClient
+) -> None:
+    mock_probe.return_value = (
+        True,
+        "reconnect_required",
+        "Calendar token expired or revoked; reconnect Google Calendar.",
+        "founder@gmail.com",
+    )
+    app.dependency_overrides[get_current_user] = _calendar_user_override(11, "founder@gmail.com")
+    app.dependency_overrides[get_db] = _sqlite_calendar_session
+    try:
+        res = client.get("/api/v1/calendar/google/status")
+        assert res.status_code == 200
+        data = res.json()
+        assert data["connected"] is True
+        assert data["health"] == "reconnect_required"
+        assert "reconnect Google Calendar" in (data.get("message") or "")
+    finally:
+        app.dependency_overrides.pop(get_current_user, None)
+        app.dependency_overrides.pop(get_db, None)
+
+
+@patch("app.api.calendar_microsoft.is_microsoft_calendar_oauth_configured", return_value=True)
+@patch("app.api.calendar_microsoft.probe_microsoft_calendar_health")
+def test_microsoft_status_disconnected_without_row(
+    mock_probe: MagicMock, _mock_oauth: MagicMock, client: TestClient
+) -> None:
+    mock_probe.return_value = (False, "unknown", None, None)
+    app.dependency_overrides[get_current_user] = _calendar_user_override(12, "ms@twin.test")
+    app.dependency_overrides[get_db] = _sqlite_calendar_session
+    try:
+        res = client.get("/api/v1/calendar/microsoft/status")
+        assert res.status_code == 200
+        data = res.json()
+        assert data["connected"] is False
+        assert data["health"] == "unknown"
+    finally:
+        app.dependency_overrides.pop(get_current_user, None)
+        app.dependency_overrides.pop(get_db, None)
+
+
+@patch("app.api.calendar._calendar_access_token")
+def test_expired_google_token_returns_integration_error_not_app_auth(
+    mock_access: MagicMock, client: TestClient
+) -> None:
+    from fastapi import HTTPException
+
+    mock_access.side_effect = HTTPException(
+        status_code=428,
+        detail="Calendar token expired or revoked; reconnect Google Calendar.",
+    )
+    app.dependency_overrides[get_current_user] = _calendar_user_override(13, "founder@gmail.com")
+    app.dependency_overrides[get_db] = _sqlite_calendar_session
+    token = create_access_token("founder@gmail.com")
+    try:
+        res = client.get(
+            "/api/v1/calendar/google/events",
+            params={"time_min": "2026-06-01T00:00:00Z", "time_max": "2026-06-08T00:00:00Z"},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert res.status_code == 428
+        assert "reconnect Google Calendar" in res.json()["detail"]
+    finally:
+        app.dependency_overrides.pop(get_current_user, None)
+        app.dependency_overrides.pop(get_db, None)
+
+
+@patch("app.api.calendar_microsoft._microsoft_access_token")
+def test_expired_microsoft_token_returns_integration_error_not_app_auth(
+    mock_access: MagicMock, client: TestClient
+) -> None:
+    from fastapi import HTTPException
+
+    mock_access.side_effect = HTTPException(
+        status_code=428,
+        detail="Microsoft token expired or revoked; reconnect Microsoft Calendar.",
+    )
+    app.dependency_overrides[get_current_user] = _calendar_user_override(14, "ms@twin.test")
+    app.dependency_overrides[get_db] = _sqlite_calendar_session
+    token = create_access_token("ms@twin.test")
+    try:
+        res = client.get(
+            "/api/v1/calendar/microsoft/events",
+            params={"time_min": "2026-06-01T00:00:00Z", "time_max": "2026-06-08T00:00:00Z"},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert res.status_code == 428
+        assert "reconnect Microsoft Calendar" in res.json()["detail"]
+    finally:
+        app.dependency_overrides.pop(get_current_user, None)
+        app.dependency_overrides.pop(get_db, None)
+
+
+def test_calendar_events_unauthenticated_still_returns_app_auth_401(client: TestClient) -> None:
+    res = client.get(
+        "/api/v1/calendar/google/events",
+        params={"time_min": "2026-06-01T00:00:00Z", "time_max": "2026-06-08T00:00:00Z"},
+    )
+    assert res.status_code == 401

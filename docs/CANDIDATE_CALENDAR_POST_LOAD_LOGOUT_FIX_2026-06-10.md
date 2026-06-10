@@ -57,6 +57,8 @@ Backend (optional): `pytest backend/tests/test_calendar_routes.py -q`
 | ----- | ------ |
 | Logged-in candidate → header **Kalendarz** | `/dashboard/calendar`, session intact ≥5s |
 | Calendar not connected | Connect hero + connections panel; no redirect to login |
-| Expired Google/Microsoft token (connected row) | Week/events error state or reconnect; **no** logout |
+| Expired Google/Microsoft token (connected row) | Reconnect badge + partial/empty UI; **no** logout; see [`CANDIDATE_CALENDAR_INTEGRATION_HEALTH_FIX_2026-06-10.md`](./CANDIDATE_CALENDAR_INTEGRATION_HEALTH_FIX_2026-06-10.md) |
+
+**Follow-up (integration health):** Status endpoints now probe token refresh (`health: ok | reconnect_required`). Frontend loads events per healthy provider; stale tokens show **WYMAGA PONOWNEGO POŁĄCZENIA**, not false **POŁĄCZONO**.
 
 **Launch stance:** Public **NO-GO** · auto-apply **PAUSED** · delegated **NOT LIVE** · recruiter calendar **NOT LIVE**.
