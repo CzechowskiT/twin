@@ -184,7 +184,7 @@ export default function DashboardCalendarPage() {
   const fetchInterviewRows = useCallback(
     async (token: string) => {
       const q = showCancelledInterviews ? "?include_cancelled=true" : "";
-      const rows = await apiFetch<ScheduledInterview[]>(`/api/v1/calendar/google/interviews${q}`, {}, token);
+      const rows = await apiFetch<ScheduledInterview[]>(`/api/v1/calendar/me/interviews${q}`, {}, token);
       setInterviews(rows);
     },
     [showCancelledInterviews],
@@ -316,7 +316,7 @@ export default function DashboardCalendarPage() {
       const params = new URLSearchParams({ time_min: timeMin, time_max: timeMax });
       const out = await apiFetch<CalendarEventsPayload>(
         `/api/v1/calendar/${prov}/events?${params.toString()}`,
-        {},
+        { preserveSessionOnUnauthorized: true },
         token,
       );
       setDisplayEvents(mergeProviderAndTwinEvents(out.events, interviews, weekStart));
