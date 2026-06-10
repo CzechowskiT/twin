@@ -28,6 +28,44 @@ export const RENDERED_HOME_KEYS = [
   "home.howTitle",
   "home.featureGridTitle",
   "home.feature6Title",
+  "home.liveCounter",
+  "home.socialProofJoin",
+  "home.socialProofQuote",
+  "home.statsAria",
+  "home.statJobs",
+  "home.statUsers",
+  "home.statApps",
+  "home.statBoards",
+  "home.teaserTitle",
+  "home.teaserUnlock",
+  "home.faqEyebrow",
+  "home.faqTitle",
+] as const;
+
+export const RENDERED_REWARDS_KEYS = [
+  "candidateRewards.eyebrow",
+  "candidateRewards.headline",
+  "candidateRewards.lead",
+  "candidateRewards.colTrigger",
+  "candidateRewards.colReward",
+  "candidateRewards.colTiming",
+  "candidateRewards.placementTitle",
+  "candidateRewards.referralTitle",
+  "candidateRewards.foundingTitle",
+  "candidateRewards.interviewTitle",
+  "candidateRewards.ctaTerms",
+  "candidateRewards.ctaPrivacy",
+  "candidateRewards.ctaRegister",
+] as const;
+
+export const RENDERED_FAQ_KEYS = [
+  "faq.homeTeaserLead",
+  "faq.homeCta",
+  "faq.homeCtaHint",
+  "faq.sectionGeneral",
+  "faq.sectionCandidates",
+  "faq.general01Q",
+  "faq.general01A",
 ] as const;
 
 export const RENDERED_LOGIN_HUB_KEYS = [
@@ -92,6 +130,13 @@ export const FORBIDDEN_EN_MARKETING: ForbiddenRule[] = [
   { pattern: /Join founding wishlist/i, label: "Join founding wishlist" },
   { pattern: /Founding-Wishlist/i, label: "Founding-Wishlist" },
   { pattern: /What you get inside/i, label: "What you get inside" },
+  { pattern: /Earn on outcomes/i, label: "Earn on outcomes" },
+  { pattern: /roles scanned on enabled boards/i, label: "roles scanned" },
+  { pattern: /\bTrigger\b/, label: "Trigger" },
+  { pattern: /\bWhen paid\b/i, label: "When paid" },
+  { pattern: /Finally one pipeline instead of twenty tabs/i, label: "socialProofQuote EN" },
+  { pattern: /Validated jobs/i, label: "statJobs EN" },
+  { pattern: /Questions & answers/i, label: "faqTitle EN" },
 ];
 
 export const EXACT_BAD_EXAMPLES: Partial<Record<Locale, (string | RegExp)[]>> = {
@@ -126,7 +171,8 @@ export function getString(obj: unknown, path: string): string | undefined {
 
 export function collectRenderedHomeStrings(locale: Locale): { key: string; value: string }[] {
   const dict = dictionaries[locale];
-  return RENDERED_HOME_KEYS.map((key) => ({ key, value: getString(dict, key) ?? "" }));
+  const keys = [...RENDERED_HOME_KEYS, ...RENDERED_REWARDS_KEYS, ...RENDERED_FAQ_KEYS];
+  return keys.map((key) => ({ key, value: getString(dict, key) ?? "" }));
 }
 
 export function collectRenderedHubStrings(locale: Locale): { key: string; value: string }[] {

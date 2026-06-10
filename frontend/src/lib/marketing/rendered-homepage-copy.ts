@@ -133,19 +133,29 @@ export const ENGLISH_LEAK_PHRASES = [
   "Your pipeline can work while you sleep",
   "Earn on outcomes",
   "We pay you for landing",
+  "roles scanned on enabled boards",
+  "Trigger",
+  "When paid",
+  "Finally one pipeline instead of twenty tabs",
+  "Validated jobs",
+  "Questions & answers",
 ] as const;
 
 /** Expected localized markers (ES / DE smoke). */
 export const ES_EXPECTED_MARKERS = [
   "Mira qué hay dentro",
-  "Únete a la wishlist founding",
-  "Cohorte founding",
+  "Únete a la lista fundadora",
+  "roles escaneados",
+  "Gana por resultados",
+  "Disparador",
 ] as const;
 
 export const DE_EXPECTED_MARKERS = [
-  "Sieh, was drin ist",
-  "Founding-Wishlist beitreten",
-  "Founding-Kohorte",
+  "Sieh dir an, was drin ist",
+  "Zur Gründerliste anmelden",
+  "Rollen auf aktivierten Börsen gescannt",
+  "Verdiene an Ergebnissen",
+  "Belohnung",
 ] as const;
 
 function flattenWaitlistCopy(locale: Locale): string {

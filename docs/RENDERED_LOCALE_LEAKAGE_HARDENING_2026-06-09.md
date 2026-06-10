@@ -16,7 +16,7 @@ Non-EN/PL locales showed English marketing tokens on rendered surfaces:
 
 ### Marketing home overlays (`frontend/src/lib/overlays/marketing-home.ts`)
 
-Merged per locale for `/` hero, inside steps, CTAs, stats, feature grid:
+Merged per locale for `/` hero, inside steps, CTAs, stats, feature grid. **Follow-up (2026-06-09):** `marketing-home-below-fold.ts` adds rewards band, live counter, social proof, FAQ teaser — see `docs/HOMEPAGE_BELOW_FOLD_I18N_LEAKAGE_FIX_2026-06-09.md`.
 
 - **ES:** e.g. `Mira qué hay dentro`, `Únete a la lista fundadora`
 - **DE:** e.g. `Zur Gründerliste anmelden`, `Gründerkohorte — kostenloser früher Zugang…`
@@ -42,11 +42,11 @@ Merged per locale for `/` hero, inside steps, CTAs, stats, feature grid:
 
 | Script | Purpose |
 | ------ | ------- |
-| `npm run test:i18n-rendered-homepage-guard` | Rendered keys on `/`, hubs, `/demo`, `/waitlist`; forbidden EN tokens; PR #65 exact bad examples; cross-locale signature leakage |
+| `npm run test:i18n-rendered-homepage-guard` | Rendered keys on `/` (hero + below-fold: stats, rewards, FAQ teaser), hubs, `/demo`, `/waitlist`; forbidden EN tokens; PR #65 exact bad examples; ES/DE below-fold markers; cross-locale signature leakage |
 | `npm run test:i18n-visual-copy-guard` | Marketing/auth/waitlist components use `t()` / `useWaitlistCopy()` / hub keys — no hardcoded EN CTAs |
-| `npm run test:og-bundle-guard` | `/first-1000`, `/beta` OG stay static EN; `/waitlist` OG uses `WAITLIST_MESSAGES` only |
+| `npm run test:og-bundle-guard` | `/first-1000`, `/beta` OG stay static EN; `/waitlist` OG uses minimal `WAITLIST_OG_COPY` only (en/pl) |
 
-Forbidden tokens (non-EN, tight allowlist): `wishlist`, `founding`, `early access`, `See what's inside`, `Join founding wishlist`, `Founding-Wishlist`.  
+Forbidden tokens (non-EN, tight allowlist): `wishlist`, `founding`, `early access`, `See what's inside`, `Join founding wishlist`, `Founding-Wishlist`, `Earn on outcomes`, `roles scanned`, `Trigger`, `When paid`, EN social-proof quote, `Validated jobs`.  
 **PL** exempt from `wishlist`/`founding` bans (product loanwords). Allowlist: TWIN, B2B, ROI, Demo, FAQ, GDPR, etc.
 
 Shared surface list: `frontend/scripts/i18n-rendered-surfaces.ts`.
@@ -59,7 +59,7 @@ Shared surface list: `frontend/scripts/i18n-rendered-surfaces.ts`.
 
 After deploy, spot-check:
 
-- `/` in ES/DE — hero, inside steps, sticky CTA
+- `/` in ES/DE — hero, inside steps, sticky CTA, **below-fold** rewards band + live counter + stats
 - `/waitlist` in FR/IT — founding offer strip, form submit
 - `/login`, `/register` — hub curiosity line
 - `/demo` — wishlist CTA in guest mode

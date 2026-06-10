@@ -3,6 +3,8 @@
  * Merged at dictionary build — prevents English leakage on `/` CTAs and inside steps.
  */
 import type { Locale } from "../i18n";
+import { MARKETING_HOME_BELOW_FOLD } from "./marketing-home-below-fold";
+import { mergeDeep } from "../merge-messages";
 
 type MarketingHomeOverlay = Record<string, unknown>;
 
@@ -374,12 +376,18 @@ const ar: MarketingHomeOverlay = {
   },
 };
 
+function withBelowFold(locale: Locale, overlay: MarketingHomeOverlay): MarketingHomeOverlay {
+  const below = MARKETING_HOME_BELOW_FOLD[locale];
+  if (!below) return overlay;
+  return mergeDeep(overlay, below) as MarketingHomeOverlay;
+}
+
 export const MARKETING_HOME_OVERLAYS: Partial<Record<Locale, MarketingHomeOverlay>> = {
-  es,
-  de,
-  fr,
-  it,
-  zh,
-  ja,
-  ar,
+  es: withBelowFold("es", es),
+  de: withBelowFold("de", de),
+  fr: withBelowFold("fr", fr),
+  it: withBelowFold("it", it),
+  zh: withBelowFold("zh", zh),
+  ja: withBelowFold("ja", ja),
+  ar: withBelowFold("ar", ar),
 };
