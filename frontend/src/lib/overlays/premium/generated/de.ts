@@ -24,6 +24,8 @@ export const premiumDeOverlay: Record<string, unknown> = {
     "applicationTransparencyWeShowRoleInfo": "Informationen, die zur Beurteilung dieser Bewerbung für diese Stelle erforderlich sind",
     "applicationTransparencyWeShowStatus": "Bewerbungsstatus",
     "calendarConfiguredHint": "Kalender verbunden — Interview-Termine können synchronisiert werden, wo OAuth-Schreibzugriff aktiv ist.",
+    "calendarConnectedSuccessTitle": "Kalender verbunden",
+    "calendarConnectedSuccessBody": "Deine Termine sind jetzt in TWIN sichtbar.",
     "matchQualityExcellent": "Hervorragende Passform",
     "matchQualityGood": "Gute Passform",
     "matchQualityPossible": "Mögliche Passform",

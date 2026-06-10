@@ -24,6 +24,8 @@ export const premiumEsOverlay: Record<string, unknown> = {
     "applicationTransparencyWeShowRoleInfo": "Información necesaria para evaluar esta solicitud para este puesto.",
     "applicationTransparencyWeShowStatus": "Estado de la solicitud",
     "calendarConfiguredHint": "Calendario conectado: las reservas de entrevistas pueden sincronizarse donde OAuth permita escritura.",
+    "calendarConnectedSuccessTitle": "Calendario conectado",
+    "calendarConnectedSuccessBody": "Tus eventos ya son visibles en TWIN.",
     "matchQualityExcellent": "Excelente ajuste",
     "matchQualityGood": "Buen ajuste",
     "matchQualityPossible": "Posible ajuste",

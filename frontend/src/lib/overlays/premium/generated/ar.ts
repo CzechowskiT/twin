@@ -24,6 +24,8 @@ export const premiumArOverlay: Record<string, unknown> = {
     "applicationTransparencyWeShowRoleInfo": "المعلومات اللازمة لتقييم هذا الطلب لهذا الدور",
     "applicationTransparencyWeShowStatus": "حالة التطبيق",
     "calendarConfiguredHint": "تم ربط التقويم — يمكن مزامنة حجوزات المقابلات حيث يُفعَّل وصول الكتابة عبر OAuth.",
+    "calendarConnectedSuccessTitle": "تم ربط التقويم",
+    "calendarConnectedSuccessBody": "أحداثك أصبحت مرئية الآن في TWIN.",
     "matchQualityExcellent": "تناسب ممتاز",
     "matchQualityGood": "مناسبا جيدا",
     "matchQualityPossible": "تناسب ممكن",

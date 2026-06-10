@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   FollowUpModal,
   InterviewPrepModal,
 } from "@/components/career-assistant/career-assistant-modals";
+import { CalendarConnectedSuccessAlert } from "@/components/calendar/calendar-connected-success-alert";
 import { CalendarConnectionsPanel } from "@/components/calendar/calendar-connections-panel";
 import { CalendarWeekView } from "@/components/calendar/calendar-week-view";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
@@ -151,6 +152,7 @@ async function cancelInterviewRequest(interviewId: number): Promise<void> {
 export default function DashboardCalendarPage() {
   const { t, locale } = useTranslation();
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState<CalendarStatus | null>(null);
@@ -410,6 +412,19 @@ export default function DashboardCalendarPage() {
       else if (err) setBanner("error");
     });
   }, [searchParams]);
+
+  useEffect(() => {
+    if (banner !== "connected") return;
+    const timer = window.setTimeout(() => {
+      setBanner(null);
+      const params = new URLSearchParams(searchParams.toString());
+      if (!params.has("calendar_connected")) return;
+      params.delete("calendar_connected");
+      const qs = params.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    }, 7000);
+    return () => window.clearTimeout(timer);
+  }, [banner, pathname, router, searchParams]);
 
   const calendarErrorMessage = (() => {
     if (!calendarErrorCode) return null;
@@ -766,11 +781,7 @@ export default function DashboardCalendarPage() {
         {t("dashboard.calendarBackDashboard")}
       </Link>
 
-      {banner === "connected" ? (
-        <Card variant="soft" className="mb-4 border-emerald-200/80 bg-emerald-50/90 text-emerald-950 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-50">
-          <p className="text-sm font-medium">{t("dashboard.calendarConnected")}</p>
-        </Card>
-      ) : null}
+      {banner === "connected" ? <CalendarConnectedSuccessAlert /> : null}
       {banner === "denied" ? (
         <Card variant="soft" className="mb-4">
           <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.calendarOAuthDenied")}</p>

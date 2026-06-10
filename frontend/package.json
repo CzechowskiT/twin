@@ -19,7 +19,7 @@
     "test:pricing-locale": "npx --yes tsx scripts/pricing-locale.test.ts",
     "test:investor-calculator": "npx --yes tsx scripts/investor-calculator-model.test.ts",
     "test:b2b-roi-calculator": "npx --yes tsx scripts/b2b-roi-calculator-model.test.ts",
-    "test:recruiter-inbox-decision": "npx --yes tsx scripts/recruiter-inbox-decision.test.ts && npx --yes tsx scripts/recruiter-inbox-segments.test.ts",
+    "test:recruiter-inbox-decision": "npx --yes tsx scripts/recruiter-inbox-decision.test.ts && npx --yes tsx scripts/recruiter-inbox-segments.test.ts && npx --yes tsx scripts/recruiter-inbox-visual.test.ts",
     "test:recruiter-review-card": "npx --yes tsx scripts/recruiter-review-card.test.ts",
     "test:pii-data-visibility": "npx --yes tsx scripts/pii-data-visibility.test.ts",
     "test:candidate-transparency": "npx --yes tsx scripts/candidate-transparency.test.ts",
@@ -36,6 +36,7 @@
     "test:candidate-calendar-routing": "npx --yes tsx scripts/candidate-calendar-routing.test.ts && npx --yes tsx scripts/persona-access.test.ts",
     "test:candidate-calendar-post-load-auth": "npx --yes tsx scripts/candidate-calendar-post-load-auth.test.ts",
     "test:candidate-calendar-integration-health": "npx --yes tsx scripts/candidate-calendar-integration-health.test.ts",
+    "test:candidate-calendar-success-alert": "npx --yes tsx scripts/candidate-calendar-success-alert.test.ts",
     "test:interactive-demo": "npx --yes tsx scripts/interactive-demo.test.ts",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install chromium"

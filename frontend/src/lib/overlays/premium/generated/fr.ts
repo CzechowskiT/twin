@@ -24,6 +24,8 @@ export const premiumFrOverlay: Record<string, unknown> = {
     "applicationTransparencyWeShowRoleInfo": "Informations nécessaires pour évaluer cette candidature pour ce poste",
     "applicationTransparencyWeShowStatus": "Statut de la demande",
     "calendarConfiguredHint": "Calendrier connecté — les créneaux d’entretien peuvent se synchroniser lorsque l’OAuth autorise l’écriture.",
+    "calendarConnectedSuccessTitle": "Calendrier connecté",
+    "calendarConnectedSuccessBody": "Vos événements sont maintenant visibles dans TWIN.",
     "matchQualityExcellent": "Excellent ajustement",
     "matchQualityGood": "Bon ajustement",
     "matchQualityPossible": "Ajustement possible",

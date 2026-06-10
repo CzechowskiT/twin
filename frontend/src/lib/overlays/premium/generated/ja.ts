@@ -24,6 +24,8 @@ export const premiumJaOverlay: Record<string, unknown> = {
     "applicationTransparencyWeShowRoleInfo": "この役割に対するこのアプリケーションを評価するために必要な情報",
     "applicationTransparencyWeShowStatus": "申請状況",
     "calendarConfiguredHint": "カレンダー接続済み — OAuth の書き込みが有効な場合、面接ホールドを同期できます。",
+    "calendarConnectedSuccessTitle": "カレンダーを接続しました",
+    "calendarConnectedSuccessBody": "イベントが TWIN に表示されるようになりました。",
     "matchQualityExcellent": "優れたフィット感",
     "matchQualityGood": "フィット感が良い",
     "matchQualityPossible": "適合可能性",
