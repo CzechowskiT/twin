@@ -25,10 +25,12 @@ test("beta OG metadata remains static English bundle", () => {
   assert.doesNotMatch(src, /dictionaries\[/);
 });
 
-test("waitlist OG image route exists and uses locale-aware waitlist messages only", () => {
+test("waitlist OG image route exists and uses minimal OG copy bundle only", () => {
   const image = read("src/app/waitlist/opengraph-image.tsx");
   const layout = read("src/app/waitlist/layout.tsx");
-  assert.match(image, /WAITLIST_MESSAGES/);
+  assert.match(image, /WAITLIST_OG_COPY/);
+  assert.doesNotMatch(image, /MARKETING_HOME_OVERLAYS/);
+  assert.doesNotMatch(image, /dictionaries\[/);
   assert.match(layout, /openGraph/);
   assert.match(layout, /\/waitlist\/opengraph-image/);
   assert.doesNotMatch(layout, /MARKETING_HOME_OVERLAYS/);

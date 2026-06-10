@@ -30,11 +30,13 @@
 - Recruiter calendar placeholder (`recruiterCalendar.*`)
 - Persona talent pool preview (`persona.*`)
 - Homepage phased automation cue (`home.feature6*`)
+- Homepage below-fold (`home.liveCounter`, stats, social proof, `candidateRewards.*`, FAQ teaser on `/`) — `marketing-home-below-fold.ts` (2026-06-09)
 
 ## Implementation
 
 - **Source:** `frontend/src/lib/i18n.ts` (`en`, `pl`)
 - **Locale overlays:** `frontend/src/lib/overlays/{es,it,fr,de,zh,ar,ja}.ts`
+- **Marketing home below-fold:** `frontend/src/lib/overlays/marketing-home-below-fold.ts` merged via `marketing-home.ts`
 - **Premium product overlays:** `frontend/src/lib/overlays/premium/generated/*.ts` merged at dictionary build time
 - **Safe fallback:** `getNestedValue` / `translate()` return the key path only when a value is missing (should not occur after coverage tests)
 - **Regenerate premium overlays:** `npx tsx scripts/generate-premium-overlays.ts [locale]`
@@ -45,9 +47,9 @@
 | ------ | ------- |
 | `npm run test:i18n-coverage` | Recursive key parity vs `en`, no empty strings, premium keys ≠ English for non-`en` |
 | `npm run test:i18n-premium-product` | Premium route wiring + PL/ES sample keys |
-| `npm run test:i18n-rendered-homepage-guard` | Rendered `/`, hubs, `/demo`, `/waitlist` — no EN marketing leakage |
+| `npm run test:i18n-rendered-homepage-guard` | Rendered `/` (hero + below-fold rewards/stats/FAQ), hubs, `/demo`, `/waitlist` — no EN marketing leakage |
 | `npm run test:i18n-visual-copy-guard` | Marketing/auth/waitlist components route copy through i18n |
-| `npm run test:og-bundle-guard` | Static OG bundles unchanged; waitlist OG locale-aware |
+| `npm run test:og-bundle-guard` | Static OG bundles unchanged; waitlist OG uses minimal `WAITLIST_OG_COPY` (en/pl) |
 | `npm run test:trust-language-guard` | Forbidden claims in source surfaces **and** all locale dictionaries |
 
 ## Copy safety

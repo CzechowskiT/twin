@@ -62,6 +62,30 @@ test("exact bad examples from PR #65 report must not appear", () => {
     collectRenderedHomeStrings("de").find((r) => r.key === "home.joinWishlist")?.value ?? "",
     /Gründerliste/i,
   );
+  assert.match(
+    collectRenderedHomeStrings("es").find((r) => r.key === "home.liveCounter")?.value ?? "",
+    /roles escaneados/i,
+  );
+  assert.match(
+    collectRenderedHomeStrings("de").find((r) => r.key === "home.liveCounter")?.value ?? "",
+    /Rollen auf aktivierten Börsen gescannt/i,
+  );
+  assert.match(
+    collectRenderedHomeStrings("es").find((r) => r.key === "candidateRewards.eyebrow")?.value ?? "",
+    /Gana por resultados/i,
+  );
+  assert.match(
+    collectRenderedHomeStrings("de").find((r) => r.key === "candidateRewards.eyebrow")?.value ?? "",
+    /Verdiene an Ergebnissen/i,
+  );
+  assert.match(
+    collectRenderedHomeStrings("es").find((r) => r.key === "candidateRewards.colTrigger")?.value ?? "",
+    /Disparador/i,
+  );
+  assert.match(
+    collectRenderedHomeStrings("de").find((r) => r.key === "candidateRewards.colReward")?.value ?? "",
+    /Belohnung/i,
+  );
   for (const locale of TARGET_LOCALES) {
     for (const row of [
       ...collectRenderedHomeStrings(locale),
