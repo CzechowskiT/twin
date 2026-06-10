@@ -2,6 +2,7 @@
 
 import { useTranslation } from "@/components/language-provider";
 import { Card } from "@/components/ui";
+import type { CalendarProvider } from "@/lib/calendar-week";
 import { addDays, eventsByDay, formatEventTimeRange, type DisplayCalendarEvent } from "@/lib/calendar-week";
 
 type CalendarWeekViewProps = {
@@ -9,6 +10,10 @@ type CalendarWeekViewProps = {
   events: DisplayCalendarEvent[];
   loading: boolean;
   loadError: boolean;
+  showEmptyWeek: boolean;
+  showReconnectPanel: boolean;
+  showPartialWarning: boolean;
+  failedProviders: CalendarProvider[];
   accountEmail: string | null;
   providerLabel: string;
   onPrevWeek: () => void;
@@ -21,6 +26,10 @@ export function CalendarWeekView({
   events,
   loading,
   loadError,
+  showEmptyWeek,
+  showReconnectPanel,
+  showPartialWarning,
+  failedProviders,
   accountEmail,
   providerLabel,
   onPrevWeek,
@@ -47,6 +56,7 @@ export function CalendarWeekView({
           ) : (
             <p className="twin-muted mt-1 text-sm">{providerLabel}</p>
           )}
+          <p className="twin-muted mt-1 text-xs leading-relaxed">{t("dashboard.calendarViewDataHint")}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button type="button" className="twin-btn-secondary twin-touch-target text-sm" onClick={onPrevWeek}>
@@ -66,13 +76,29 @@ export function CalendarWeekView({
 
       {loading ? (
         <p className="twin-muted mt-4 text-sm">{t("dashboard.calendarViewLoading")}</p>
+      ) : showReconnectPanel ? (
+        <div className="mt-4 rounded-lg border border-amber-300/80 bg-amber-50/90 px-4 py-3 dark:border-amber-900/50 dark:bg-amber-950/30">
+          <p className="text-sm font-semibold text-amber-950 dark:text-amber-100">
+            {t("dashboard.calendarAllProvidersReconnectTitle")}
+          </p>
+          <p className="mt-1 text-sm text-amber-900 dark:text-amber-100/90">{t("dashboard.calendarAllProvidersReconnectBody")}</p>
+        </div>
       ) : loadError ? (
         <p className="mt-4 text-sm text-red-600 dark:text-red-400" role="alert">
           {t("dashboard.calendarErrorGeneric")}
         </p>
-      ) : !hasAny ? (
+      ) : showPartialWarning ? (
+        <p className="mt-4 text-sm text-amber-800 dark:text-amber-200" role="status">
+          {t("dashboard.calendarPartialFailure")}
+          {failedProviders.length > 0 ? ` (${failedProviders.join(", ")})` : null}
+        </p>
+      ) : null}
+
+      {!loading && !showReconnectPanel && !loadError && showEmptyWeek && !hasAny ? (
         <p className="twin-muted mt-4 text-sm leading-relaxed">{t("dashboard.calendarViewEmpty")}</p>
-      ) : (
+      ) : null}
+
+      {!loading && !showReconnectPanel && !loadError && hasAny ? (
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {byDay.map((day) => (
             <div
@@ -96,7 +122,7 @@ export function CalendarWeekView({
             </div>
           ))}
         </div>
-      )}
+      ) : null}
     </Card>
   );
 }

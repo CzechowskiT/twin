@@ -49,6 +49,7 @@ from app.services.microsoft_calendar_oauth import (
     is_microsoft_calendar_oauth_configured,
     refresh_microsoft_calendar_access_token,
 )
+from app.services.calendar_provider_health import probe_microsoft_calendar_health
 from app.services.token_crypto import decrypt_secret, encrypt_secret
 
 router = APIRouter()
@@ -83,7 +84,7 @@ def _microsoft_access_token(db: Session, user_id: int) -> str:
         return refresh_microsoft_calendar_access_token(plain)
     except MicrosoftCalendarOAuthError as e:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_428_PRECONDITION_REQUIRED,
             detail="Microsoft token expired or revoked; reconnect Microsoft Calendar.",
         ) from e
 
@@ -96,6 +97,12 @@ def _ms_busy_as_google_fb(access_token: str, time_min: str, time_max: str, tz: s
 
 class MicrosoftCalendarStatusOut(BaseModel):
     connected: bool
+    health: str = Field(
+        "unknown",
+        description="ok | reconnect_required | error | unknown",
+    )
+    message: str | None = None
+    provider: str = Field("microsoft", description="google | microsoft")
     microsoft_email: str | None = None
     oauth_configured: bool = False
     oauth_redirect_uri: str | None = None
@@ -112,16 +119,21 @@ def microsoft_calendar_status(
 ) -> MicrosoftCalendarStatusOut:
     oauth_configured = is_microsoft_calendar_oauth_configured()
     redirect_uri = effective_microsoft_calendar_redirect_uri(get_settings()) if oauth_configured else None
-    row = db.query(UserMicrosoftCalendar).filter(UserMicrosoftCalendar.user_id == current_user.id).first()
-    if not row:
+    has_row, health, message, microsoft_email = probe_microsoft_calendar_health(db, current_user.id)
+    if not has_row:
         return MicrosoftCalendarStatusOut(
             connected=False,
+            health="unknown",
+            provider="microsoft",
             oauth_configured=oauth_configured,
             oauth_redirect_uri=redirect_uri,
         )
     return MicrosoftCalendarStatusOut(
         connected=True,
-        microsoft_email=row.microsoft_email,
+        health=health,
+        message=message,
+        provider="microsoft",
+        microsoft_email=microsoft_email,
         oauth_configured=oauth_configured,
         oauth_redirect_uri=redirect_uri,
     )

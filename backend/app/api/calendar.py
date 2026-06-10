@@ -42,6 +42,7 @@ from app.services.google_calendar_oauth import (
 )
 from app.services.microsoft_calendar_oauth import is_microsoft_calendar_oauth_configured
 from app.services.ics_export import interviews_feed_to_ics, scheduled_interview_to_ics
+from app.services.calendar_provider_health import probe_google_calendar_health
 from app.services.token_crypto import decrypt_secret, encrypt_secret
 
 router = APIRouter()
@@ -84,13 +85,19 @@ def _calendar_access_token(db: Session, user_id: int) -> str:
         return refresh_google_calendar_access_token(plain)
     except GoogleCalendarOAuthError as e:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_428_PRECONDITION_REQUIRED,
             detail="Calendar token expired or revoked; reconnect Google Calendar.",
         ) from e
 
 
 class CalendarStatusOut(BaseModel):
     connected: bool
+    health: str = Field(
+        "unknown",
+        description="ok | reconnect_required | error | unknown",
+    )
+    message: str | None = None
+    provider: str = Field("google", description="google | microsoft")
     google_email: str | None = None
     oauth_configured: bool = False
     # Exact URI to whitelist in Google Cloud Console (fixes redirect_uri_mismatch).
@@ -215,16 +222,21 @@ def google_calendar_status(
 ) -> CalendarStatusOut:
     oauth_configured = is_google_calendar_oauth_configured()
     redirect_uri = effective_google_calendar_redirect_uri(get_settings()) if oauth_configured else None
-    row = db.query(UserGoogleCalendar).filter(UserGoogleCalendar.user_id == current_user.id).first()
-    if not row:
+    has_row, health, message, google_email = probe_google_calendar_health(db, current_user.id)
+    if not has_row:
         return CalendarStatusOut(
             connected=False,
+            health="unknown",
+            provider="google",
             oauth_configured=oauth_configured,
             oauth_redirect_uri=redirect_uri,
         )
     return CalendarStatusOut(
         connected=True,
-        google_email=row.google_email,
+        health=health,
+        message=message,
+        provider="google",
+        google_email=google_email,
         oauth_configured=oauth_configured,
         oauth_redirect_uri=redirect_uri,
     )

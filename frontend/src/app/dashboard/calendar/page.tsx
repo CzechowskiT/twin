@@ -19,6 +19,18 @@ import { getToken } from "@/lib/auth";
 import { candidateCalendarHref } from "@/lib/persona-access";
 import { LOGIN_PATH } from "@/lib/persona-auth";
 import { calendarProviderLabel } from "@/lib/calendar-provider";
+import {
+  aggregateWeekEventOutcomes,
+  hasAnyConnectedProvider,
+  hasAnyHealthyProvider,
+  healthyProvidersToFetch,
+  parseProviderIntegrationError,
+  preferredActiveProvider,
+  providerNeedsReconnect,
+  statusSnapshotFromApi,
+  type CalendarProviderStatusSnapshot,
+  type ProviderWeekFetchOutcome,
+} from "@/lib/calendar-provider-health";
 import { fetchOpsHealth, type OpsHealth } from "@/lib/ops-health";
 import {
   mergeProviderAndTwinEvents,
@@ -45,6 +57,9 @@ type CalendarOAuthConfig = {
 
 type CalendarStatus = {
   connected: boolean;
+  health?: string;
+  message?: string | null;
+  provider?: string;
   google_email: string | null;
   oauth_configured?: boolean;
   oauth_redirect_uri?: string | null;
@@ -52,6 +67,9 @@ type CalendarStatus = {
 
 type MicrosoftCalendarStatus = {
   connected: boolean;
+  health?: string;
+  message?: string | null;
+  provider?: string;
   microsoft_email: string | null;
   oauth_configured?: boolean;
   oauth_redirect_uri?: string | null;
@@ -172,9 +190,21 @@ export default function DashboardCalendarPage() {
   const [displayEvents, setDisplayEvents] = useState<DisplayCalendarEvent[]>([]);
   const [eventsLoading, setEventsLoading] = useState(false);
   const [eventsLoadError, setEventsLoadError] = useState(false);
+  const [weekShowEmpty, setWeekShowEmpty] = useState(false);
+  const [weekShowReconnectPanel, setWeekShowReconnectPanel] = useState(false);
+  const [weekShowPartialWarning, setWeekShowPartialWarning] = useState(false);
+  const [weekFailedProviders, setWeekFailedProviders] = useState<Array<"google" | "microsoft">>([]);
   const interviewRefreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const isCalendarConnected = Boolean(status?.connected || msStatus?.connected);
+  const googleSnapshot: CalendarProviderStatusSnapshot | null = status
+    ? statusSnapshotFromApi("google", status)
+    : null;
+  const microsoftSnapshot: CalendarProviderStatusSnapshot | null = msStatus
+    ? statusSnapshotFromApi("microsoft", msStatus)
+    : null;
+
+  const isCalendarConnected = hasAnyConnectedProvider(googleSnapshot, microsoftSnapshot);
+  const isCalendarUsable = hasAnyHealthyProvider(googleSnapshot, microsoftSnapshot);
 
   const googleOAuthConfigured =
     status?.oauth_configured ?? oauthCfg?.google.oauth_configured ?? opsHealth?.google_calendar_configured ?? false;
@@ -302,9 +332,16 @@ export default function DashboardCalendarPage() {
   }, [load]);
 
   const fetchCalendarWeekEvents = useCallback(async () => {
-    const prov = status?.connected ? "google" : msStatus?.connected ? "microsoft" : null;
-    if (!prov) {
-      setDisplayEvents([]);
+    const providers = healthyProvidersToFetch(googleSnapshot, microsoftSnapshot);
+    if (!providers.length) {
+      setDisplayEvents(mergeProviderAndTwinEvents([], interviews, weekStart));
+      setEventsLoadError(false);
+      setWeekShowEmpty(false);
+      setWeekShowReconnectPanel(
+        Boolean(providerNeedsReconnect(googleSnapshot) || providerNeedsReconnect(microsoftSnapshot)),
+      );
+      setWeekShowPartialWarning(false);
+      setWeekFailedProviders([]);
       return;
     }
     const token = getToken();
@@ -312,14 +349,41 @@ export default function DashboardCalendarPage() {
     const { timeMin, timeMax } = weekRangeIso(weekStart);
     setEventsLoading(true);
     setEventsLoadError(false);
+    setWeekShowReconnectPanel(false);
+    setWeekShowPartialWarning(false);
+    setWeekShowEmpty(false);
+    setWeekFailedProviders([]);
     try {
       const params = new URLSearchParams({ time_min: timeMin, time_max: timeMax });
-      const out = await apiFetch<CalendarEventsPayload>(
-        `/api/v1/calendar/${prov}/events?${params.toString()}`,
-        { preserveSessionOnUnauthorized: true },
-        token,
+      const outcomes = await Promise.all(
+        providers.map(async (provider): Promise<ProviderWeekFetchOutcome> => {
+          try {
+            const out = await apiFetch<CalendarEventsPayload>(
+              `/api/v1/calendar/${provider}/events?${params.toString()}`,
+              { preserveSessionOnUnauthorized: true },
+              token,
+            );
+            return { provider, events: out.events, failed: false, reconnectRequired: false, message: null };
+          } catch (e) {
+            const msg = e instanceof Error ? e.message : String(e);
+            const parsed = parseProviderIntegrationError(msg);
+            return {
+              provider,
+              events: [],
+              failed: true,
+              reconnectRequired: parsed.reconnectRequired,
+              message: msg,
+            };
+          }
+        }),
       );
-      setDisplayEvents(mergeProviderAndTwinEvents(out.events, interviews, weekStart));
+      const aggregate = aggregateWeekEventOutcomes(outcomes, googleSnapshot, microsoftSnapshot);
+      setDisplayEvents(mergeProviderAndTwinEvents(aggregate.events, interviews, weekStart));
+      setWeekShowEmpty(aggregate.showEmptyWeek);
+      setWeekShowReconnectPanel(aggregate.showReconnectPanel);
+      setWeekShowPartialWarning(aggregate.showPartialWarning);
+      setWeekFailedProviders(aggregate.failedProviders);
+      setEventsLoadError(aggregate.allHealthyProvidersFailed && !aggregate.showReconnectPanel);
     } catch (e) {
       setEventsLoadError(true);
       setDisplayEvents(mergeProviderAndTwinEvents([], interviews, weekStart));
@@ -327,7 +391,7 @@ export default function DashboardCalendarPage() {
     } finally {
       setEventsLoading(false);
     }
-  }, [weekStart, interviews, status?.connected, msStatus?.connected]);
+  }, [weekStart, interviews, googleSnapshot, microsoftSnapshot]);
 
   useEffect(() => {
     if (loading || !isCalendarConnected) return;
@@ -518,9 +582,7 @@ export default function DashboardCalendarPage() {
   }
 
   function activeCalendarProvider(): "google" | "microsoft" | null {
-    if (status?.connected) return "google";
-    if (msStatus?.connected) return "microsoft";
-    return null;
+    return preferredActiveProvider(googleSnapshot, microsoftSnapshot);
   }
 
   async function runFreeBusy() {
@@ -733,8 +795,16 @@ export default function DashboardCalendarPage() {
           events={displayEvents}
           loading={eventsLoading}
           loadError={eventsLoadError}
+          showEmptyWeek={weekShowEmpty}
+          showReconnectPanel={weekShowReconnectPanel}
+          showPartialWarning={weekShowPartialWarning}
+          failedProviders={weekFailedProviders}
           accountEmail={
-            status?.connected ? status.google_email : msStatus?.microsoft_email ?? null
+            googleSnapshot?.connected && googleSnapshot.health === "ok"
+              ? googleSnapshot.email
+              : microsoftSnapshot?.connected && microsoftSnapshot.health === "ok"
+                ? microsoftSnapshot.email
+                : status?.google_email ?? msStatus?.microsoft_email ?? null
           }
           providerLabel={calendarProviderLabel(activeCalendarProvider(), t)}
           onPrevWeek={() => setWeekStart((w) => startOfWeekMonday(new Date(w.getTime() - 7 * 24 * 60 * 60 * 1000)))}
@@ -755,11 +825,15 @@ export default function DashboardCalendarPage() {
         actionBusy={actionBusy}
         google={{
           connected: Boolean(status?.connected),
+          health: googleSnapshot?.health,
+          message: googleSnapshot?.message ?? null,
           email: status?.google_email ?? null,
           oauthConfigured: googleOAuthConfigured,
         }}
         microsoft={{
           connected: Boolean(msStatus?.connected),
+          health: microsoftSnapshot?.health,
+          message: microsoftSnapshot?.message ?? null,
           email: msStatus?.microsoft_email ?? null,
           oauthConfigured: microsoftOAuthConfigured,
         }}
@@ -840,7 +914,7 @@ export default function DashboardCalendarPage() {
         </div>
       </details>
 
-      {!loading && isCalendarConnected ? (
+      {!loading && isCalendarUsable ? (
         <div className="flex flex-col gap-6">
           <details className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/40 px-4 py-3" open>
             <summary className="cursor-pointer text-sm font-semibold text-[var(--foreground)]">

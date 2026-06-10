@@ -1039,7 +1039,7 @@ const en = {
     calendarConnectionSettingsSummary: "Connection settings",
     calendarViewTitle: "This week",
     calendarViewLoading: "Loading events…",
-    calendarViewEmpty: "Nothing scheduled this week on your connected calendar.",
+    calendarViewEmpty: "No events this week.",
     calendarViewPrevWeek: "Previous",
     calendarViewNextWeek: "Next",
     calendarViewToday: "Today",
@@ -1113,6 +1113,16 @@ const en = {
       "Order and timing follow enterprise demand and security review — not a promise of ship dates.",
     calendarConnected: "Connected",
     calendarNotConnected: "Not connected",
+    calendarReconnectRequired: "Reconnect required",
+    calendarIntegrationError: "Integration error",
+    calendarProviderGoogleReconnect: "Google Calendar access expired. Disconnect and connect Google again.",
+    calendarProviderMicrosoftReconnect: "Microsoft 365 access expired. Disconnect and connect Microsoft again.",
+    calendarPartialFailure: "Some connected calendars could not load. Events below may be incomplete.",
+    calendarAllProvidersReconnectTitle: "Reconnect your calendar",
+    calendarAllProvidersReconnectBody:
+      "Your Google or Microsoft connection needs to be refreshed. Disconnect and connect again below — your TWIN account stays signed in.",
+    calendarViewDataHint:
+      "Shows event titles and times from connected calendars plus TWIN interview holds for this week.",
     calendarConnectionsLoading: "Loading…",
     calendarConnectionsStatusError: "Could not load connection status. Refresh the page or try again.",
     calendarConnect: "Connect Google",
@@ -4034,7 +4044,7 @@ const pl: MessageTree = {
     calendarConnectionSettingsSummary: "Ustawienia połączenia",
     calendarViewTitle: "Ten tydzień",
     calendarViewLoading: "Ładowanie wydarzeń…",
-    calendarViewEmpty: "W tym tygodniu nic nie ma w podłączonym kalendarzu.",
+    calendarViewEmpty: "Brak wydarzeń w tym tygodniu.",
     calendarViewPrevWeek: "Wstecz",
     calendarViewNextWeek: "Dalej",
     calendarViewToday: "Dziś",
@@ -4108,6 +4118,19 @@ const pl: MessageTree = {
       "Kolejność i terminy wynikają z popytu enterprise i przeglądu bezpieczeństwa — to nie obietnica dat wdrożenia.",
     calendarConnected: "Połączono",
     calendarNotConnected: "Nie połączono",
+    calendarReconnectRequired: "Wymaga ponownego połączenia",
+    calendarIntegrationError: "Błąd integracji",
+    calendarProviderGoogleReconnect:
+      "Dostęp do Google Calendar wygasł. Odłącz i połącz Google ponownie.",
+    calendarProviderMicrosoftReconnect:
+      "Dostęp do Microsoft 365 wygasł. Odłącz i połącz Microsoft ponownie.",
+    calendarPartialFailure:
+      "Nie udało się wczytać części podłączonych kalendarzy. Poniższe wydarzenia mogą być niepełne.",
+    calendarAllProvidersReconnectTitle: "Połącz kalendarz ponownie",
+    calendarAllProvidersReconnectBody:
+      "Połączenie Google lub Microsoft wymaga odświeżenia. Odłącz i połącz ponownie poniżej — konto TWIN pozostaje zalogowane.",
+    calendarViewDataHint:
+      "Pokazuje tytuły i godziny z podłączonych kalendarzy oraz rezerwacje rozmów TWIN w tym tygodniu.",
     calendarConnectionsLoading: "Ładowanie…",
     calendarConnectionsStatusError: "Nie udało się wczytać statusu połączenia. Odśwież stronę lub spróbuj ponownie.",
     calendarConnect: "Połącz Google",
