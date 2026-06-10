@@ -17,7 +17,8 @@ export function extractPremiumTree(source: StringTree): Record<string, unknown> 
         key.startsWith("matchQuality") ||
         key.startsWith("applicationTransparency") ||
         key.startsWith("todayNba") ||
-        key === "calendarConfiguredHint"
+        key === "calendarConfiguredHint" ||
+        key.startsWith("calendarConnectedSuccess")
       ) {
         dashboardPremium[key] = value;
       }

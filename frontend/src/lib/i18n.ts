@@ -1112,6 +1112,8 @@ const en = {
     calendarProvidersFoot:
       "Order and timing follow enterprise demand and security review — not a promise of ship dates.",
     calendarConnected: "Connected",
+    calendarConnectedSuccessTitle: "Calendar connected",
+    calendarConnectedSuccessBody: "Your events are now visible in TWIN.",
     calendarNotConnected: "Not connected",
     calendarReconnectRequired: "Reconnect required",
     calendarIntegrationError: "Integration error",
@@ -4117,6 +4119,8 @@ const pl: MessageTree = {
     calendarProvidersFoot:
       "Kolejność i terminy wynikają z popytu enterprise i przeglądu bezpieczeństwa — to nie obietnica dat wdrożenia.",
     calendarConnected: "Połączono",
+    calendarConnectedSuccessTitle: "Kalendarz połączony",
+    calendarConnectedSuccessBody: "Twoje wydarzenia są teraz widoczne w TWIN.",
     calendarNotConnected: "Nie połączono",
     calendarReconnectRequired: "Wymaga ponownego połączenia",
     calendarIntegrationError: "Błąd integracji",

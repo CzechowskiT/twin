@@ -48,6 +48,7 @@
 | 1.2 | Primary CTA | Single deterministic action (profile → matches → calendar → pipeline) |
 | 1.3 | Readiness chip | Email/profile/matches readiness visible without invented metrics |
 | 1.4 | Header **Kalendarz** (logged-in candidate) | Stays authenticated → `/dashboard/calendar` ≥5s — no logout/login loop; stale provider shows **WYMAGA PONOWNEGO POŁĄCZENIA**, not false **POŁĄCZONO** (`docs/CANDIDATE_CALENDAR_INTEGRATION_HEALTH_FIX_2026-06-10.md`) |
+| 1.5 | Calendar OAuth return (`?calendar_connected=1`) | Success banner readable on dark: **Kalendarz połączony** + body copy; auto-dismiss ~7s (`docs/CANDIDATE_CALENDAR_SUCCESS_ALERT_POLISH_2026-06-10.md`) |
 
 **Score §1:** ___ / 8
 

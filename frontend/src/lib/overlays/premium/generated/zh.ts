@@ -24,6 +24,8 @@ export const premiumZhOverlay: Record<string, unknown> = {
     "applicationTransparencyWeShowRoleInfo": "评估此应用程序是否适合此角色所需的信息",
     "applicationTransparencyWeShowStatus": "申请状态",
     "calendarConfiguredHint": "日历已连接 — 在 OAuth 写入权限已启用时可同步面试预留时段。",
+    "calendarConnectedSuccessTitle": "日历已连接",
+    "calendarConnectedSuccessBody": "你的日程现在在 TWIN 中可见。",
     "matchQualityExcellent": "非常合身",
     "matchQualityGood": "很合身",
     "matchQualityPossible": "可能适合",

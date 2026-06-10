@@ -1,8 +1,17 @@
 # Candidate calendar integration health fix — 2026-06-10
 
-**Branch:** `fix/candidate-calendar-integration-health-2026-06-10`  
+**Branch:** `fix/candidate-calendar-integration-health-2026-06-10` (PR #69)  
 **Follows:** `docs/CANDIDATE_CALENDAR_POST_LOAD_LOGOUT_FIX_2026-06-10.md` (PR #68 — session no longer cleared on calendar errors)  
 **Symptom:** Logged-in candidate on `/dashboard/calendar` sees **POŁĄCZONO** for Google and Microsoft, but weekly events do not load; generic error *„Akcja kalendarza nie powiodła się…”*.
+
+---
+
+## Related fixes (same week)
+
+| Doc | Issue | Status |
+| --- | ----- | ------ |
+| `CANDIDATE_CALENDAR_POST_LOAD_LOGOUT_FIX_2026-06-10.md` | Session cleared when provider token expired | Fixed — preserve session on calendar integration 401/400 |
+| `CANDIDATE_CALENDAR_SUCCESS_ALERT_POLISH_2026-06-10.md` | Success banner unreadable after `?calendar_connected=1` | Fixed — high-contrast emerald alert + PL/EN copy (PR #70) |
 
 ---
 
@@ -19,7 +28,7 @@
 
 ---
 
-## Fix
+## Fix — provider health (PR #69)
 
 ### Backend contract
 
@@ -48,6 +57,17 @@ Shared probe: `backend/app/services/calendar_provider_health.py`.
 | `calendar-week-view.tsx` | Empty week, reconnect panel, partial warning — not generic error only |
 | `i18n.ts` | PL/EN copy for badges, reconnect, partial failure, empty week |
 
+---
+
+## Fix — success alert (PR #70)
+
+After Google/Microsoft OAuth redirect to `/dashboard/calendar?calendar_connected=1`:
+
+- Dedicated `CalendarConnectedSuccessAlert` with emerald border, translucent overlay, check icon
+- Copy: **Kalendarz połączony** / **Calendar connected** + body about events visible in TWIN
+- Auto-dismiss ~7s; `router.replace` strips `calendar_connected` query param
+- Error/denied banners unchanged
+
 **Launch stance:** unchanged — public **NO-GO**, auto-apply **PAUSED**, no env/DB/CSP/auth weakening.
 
 ---
@@ -57,6 +77,7 @@ Shared probe: `backend/app/services/calendar_provider_health.py`.
 ```bash
 cd frontend
 npm run test:candidate-calendar-integration-health
+npm run test:candidate-calendar-success-alert
 npm run test:candidate-calendar-post-load-auth
 npm run test:candidate-calendar-routing
 npm run test:trust-language-guard
@@ -74,7 +95,8 @@ pytest backend/tests/test_calendar_routes.py -q
 2. If Google token stale: badge **WYMAGA PONOWNEGO POŁĄCZENIA** on Google; Microsoft events still load if healthy.  
 3. If both stale: reconnect panel with provider guidance; TWIN stays signed in.  
 4. If both healthy, no events: **Brak wydarzeń w tym tygodniu** — not failure banner.  
-5. Reconnect: Disconnect → Connect on affected provider(s).
+5. Reconnect: Disconnect → Connect on affected provider(s).  
+6. After OAuth return with `?calendar_connected=1`: success banner readable on dark theme; auto-dismiss ~7s.
 
 ---
 
