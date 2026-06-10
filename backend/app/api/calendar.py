@@ -84,7 +84,7 @@ def _calendar_access_token(db: Session, user_id: int) -> str:
         return refresh_google_calendar_access_token(plain)
     except GoogleCalendarOAuthError as e:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="Calendar token expired or revoked; reconnect Google Calendar.",
         ) from e
 

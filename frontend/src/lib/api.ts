@@ -117,10 +117,45 @@ function isAuthFailureMessage(message: string): boolean {
   );
 }
 
-function handleAuthFailure(status: number, message: string): void {
+/** Provider OAuth token issues on calendar routes — not a TWIN session failure. */
+export function isCalendarIntegrationFailure(status: number, message: string, apiPath?: string): boolean {
+  const path = apiPath?.trim() ?? "";
+  if (!path.includes("/api/v1/calendar/")) return false;
+  const lower = message.trim().toLowerCase();
+  if (
+    lower.includes("reconnect google calendar") ||
+    lower.includes("reconnect microsoft calendar") ||
+    lower.includes("calendar token expired") ||
+    lower.includes("microsoft token expired")
+  ) {
+    return true;
+  }
+  if (status === 400 && (lower.includes("google calendar is not connected") || lower.includes("microsoft calendar is not connected"))) {
+    return true;
+  }
+  return false;
+}
+
+/** True when the API error should clear the TWIN session and redirect to login. */
+export function shouldClearSessionOnApiError(
+  status: number,
+  message: string,
+  apiPath?: string,
+  options?: Pick<ApiFetchOptions, "preserveSessionOnUnauthorized">,
+): boolean {
+  if (options?.preserveSessionOnUnauthorized) return false;
+  if (isCalendarIntegrationFailure(status, message, apiPath)) return false;
+  return status === 401 || (status === 403 && isAuthFailureMessage(message)) || isAuthFailureMessage(message);
+}
+
+function handleAuthFailure(
+  status: number,
+  message: string,
+  apiPath?: string,
+  options?: Pick<ApiFetchOptions, "preserveSessionOnUnauthorized">,
+): void {
   if (typeof window === "undefined") return;
-  const authFailure = status === 401 || (status === 403 && isAuthFailureMessage(message)) || isAuthFailureMessage(message);
-  if (!authFailure) return;
+  if (!shouldClearSessionOnApiError(status, message, apiPath, options)) return;
   clearToken();
   const path = window.location.pathname;
   if (path === "/login" || path.startsWith("/login/")) return;
@@ -140,14 +175,18 @@ function applyAuthHeaders(headers: Headers, token?: string | null): boolean {
   return hasAuth;
 }
 
-async function throwIfNotOk(res: Response): Promise<void> {
+async function throwIfNotOk(res: Response, apiPath: string, options?: Pick<ApiFetchOptions, "preserveSessionOnUnauthorized">): Promise<void> {
   if (res.ok) return;
   const errMsg = formatApiErrorMessageWithResponseId(await parseError(res), res);
-  handleAuthFailure(res.status, errMsg);
+  handleAuthFailure(res.status, errMsg, apiPath, options);
   throw new Error(errMsg);
 }
 
-export type ApiFetchOptions = RequestInit & { locale?: string | null };
+export type ApiFetchOptions = RequestInit & {
+  locale?: string | null;
+  /** Calendar/provider errors must not clear the TWIN JWT (see isCalendarIntegrationFailure). */
+  preserveSessionOnUnauthorized?: boolean;
+};
 
 export async function apiFetch<T>(
   path: string,
@@ -181,7 +220,7 @@ export async function apiFetch<T>(
       throw err;
     }
   }
-  await throwIfNotOk(res);
+  await throwIfNotOk(res, path, options);
   if (res.status === 204) return undefined as T;
   try {
     return (await res.json()) as T;
@@ -224,7 +263,7 @@ export async function apiFetchBlob(
       throw err;
     }
   }
-  await throwIfNotOk(res);
+  await throwIfNotOk(res, path, options);
   try {
     return await res.blob();
   } catch (e) {
@@ -280,6 +319,6 @@ export async function apiUpload<T>(
       throw err;
     }
   }
-  await throwIfNotOk(res);
+  await throwIfNotOk(res, path);
   return res.json() as Promise<T>;
 }

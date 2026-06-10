@@ -83,7 +83,7 @@ def _microsoft_access_token(db: Session, user_id: int) -> str:
         return refresh_microsoft_calendar_access_token(plain)
     except MicrosoftCalendarOAuthError as e:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="Microsoft token expired or revoked; reconnect Microsoft Calendar.",
         ) from e
 

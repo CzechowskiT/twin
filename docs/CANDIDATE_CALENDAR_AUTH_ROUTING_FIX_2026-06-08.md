@@ -27,7 +27,9 @@ Recruiter **Kalendarz** → `/recruiter/calendar` (NOT LIVE placeholder) is **un
 | Calendar page | Remove local `clearToken`; unauthenticated → `/login/candidate?next=…` |
 | Entry points | Subnav, calendar strip, NBA, demo walkthrough → `candidateCalendarHref()` |
 
-**Auth/CSP/env:** No weakening. Global JWT handling in `api.ts` unchanged.
+**Auth/CSP/env:** No weakening. Global JWT handling in `api.ts` unchanged for app auth (`Invalid token`, `Inactive user`).
+
+**Follow-up (2026-06-10):** Post-load logout when provider OAuth token expired — see [`CANDIDATE_CALENDAR_POST_LOAD_LOGOUT_FIX_2026-06-10.md`](./CANDIDATE_CALENDAR_POST_LOAD_LOGOUT_FIX_2026-06-10.md). Calendar integration **401/400** no longer calls `clearToken()`.
 
 ---
 
@@ -36,6 +38,7 @@ Recruiter **Kalendarz** → `/recruiter/calendar` (NOT LIVE placeholder) is **un
 ```bash
 cd frontend
 npm run test:candidate-calendar-routing   # new + persona-access
+npm run test:candidate-calendar-post-load-auth
 npm run test:homepage-nav
 npm run test:auth-role-choice
 npm run test:trust-language-guard
