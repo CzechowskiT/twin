@@ -123,7 +123,7 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
   }`;
   const linkClass = "twin-nav-link whitespace-nowrap";
   const accountOutlineClass =
-    "twin-header-account-link twin-touch-target inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-[var(--twin-border)] bg-[var(--twin-card)] px-2.5 py-0 text-[11px] font-semibold leading-normal text-[var(--twin-accent)] transition hover:border-[var(--twin-accent)]/50 hover:bg-[var(--twin-accent-muted)] hover:text-[var(--twin-accent-hover)] sm:px-3 sm:text-[12px]";
+    "twin-header-account-link twin-touch-target inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-[var(--twin-border)] bg-[var(--twin-card)] px-2.5 py-0 text-[12px] font-semibold leading-normal text-[var(--twin-accent)] transition hover:border-[var(--twin-accent)]/50 hover:bg-[var(--twin-accent-muted)] hover:text-[var(--twin-accent-hover)] sm:px-3 sm:text-[13px]";
   const dashboardActiveClass =
     "border-[var(--twin-accent)]/50 bg-[var(--twin-accent-muted)] text-[var(--twin-accent-hover)]";
 
@@ -166,7 +166,7 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
         </div>
 
         <nav
-          className="order-3 hidden min-w-0 flex-1 basis-full flex-nowrap items-center justify-center gap-x-3 overflow-x-auto overscroll-x-contain text-[12px] font-medium [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-x-4 sm:text-[13px] md:order-none md:flex md:basis-auto lg:gap-x-5 lg:text-sm [&::-webkit-scrollbar]:hidden"
+          className="order-3 hidden min-w-0 flex-1 basis-full flex-nowrap items-center justify-center gap-x-3 overflow-x-auto overscroll-x-contain text-[13px] font-medium [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-x-4 sm:text-sm md:order-none md:flex md:basis-auto lg:gap-x-5 lg:text-[0.9375rem] [&::-webkit-scrollbar]:hidden"
           aria-label={t("nav.ariaSiteNav")}
         >
           {personaLaneNav

@@ -110,7 +110,7 @@ const BRANDS: Brand[] = [...MARQUEE_BRAND_ENTRIES].sort((a, b) => {
 const MARQUEE_SEGMENTS = 2;
 
 /** Uniform slot — inner inset + `object-contain` keeps wide wordmarks (e.g. Amex) inside the plate. */
-const MARK_BOX_CLASS = "h-10 w-[7.5rem] sm:h-11 sm:w-32";
+const MARK_BOX_CLASS = "h-9 w-[6.75rem] sm:h-10 sm:w-[7.5rem]";
 
 /** Light plate so colorful favicons stay legible on studio (dark) and light marketing rails. */
 const MARK_PLATE_CLASS =
@@ -153,7 +153,7 @@ function BrandMark({
       title={a11y}
       className={plateClass}
     >
-      <span className="relative flex h-full w-full items-center justify-center px-2 py-1.5 sm:px-2.5">
+      <span className="relative flex h-full w-full items-center justify-center px-1.5 py-1 sm:px-2">
         <SafeCompanyLogo
           name={brand.name}
           urls={urls}
@@ -177,7 +177,7 @@ function LogoRow({
   const linkSuffix = t(linkSuffixKey);
   return (
     <div
-      className="marketing-marquee-segment inline-flex shrink-0 items-center gap-x-5 sm:gap-x-6"
+      className="marketing-marquee-segment inline-flex shrink-0 items-center gap-x-4 sm:gap-x-5"
       aria-hidden={ariaHidden}
     >
       {BRANDS.map((brand) => (
@@ -200,7 +200,7 @@ export function CompanyLogoMarquee() {
   if (reducedMotion) {
     return (
       <div
-        className="company-logo-marquee shrink-0 border-y border-[var(--twin-border)] bg-[var(--twin-surface)]/90 py-5 backdrop-blur-[2px] sm:py-5"
+        className="company-logo-marquee shrink-0 border-y border-[var(--twin-border)] bg-[var(--twin-surface)]/90 py-3.5 backdrop-blur-[2px] sm:py-4"
         role="presentation"
       >
         <div className="company-logo-marquee__viewport overflow-x-auto [-webkit-overflow-scrolling:touch] px-3 sm:px-5">
@@ -214,7 +214,7 @@ export function CompanyLogoMarquee() {
 
   return (
     <div
-      className="company-logo-marquee shrink-0 border-y border-[var(--twin-border)] bg-[var(--twin-surface)]/90 py-5 backdrop-blur-[2px] sm:py-5"
+      className="company-logo-marquee shrink-0 border-y border-[var(--twin-border)] bg-[var(--twin-surface)]/90 py-3.5 backdrop-blur-[2px] sm:py-4"
       role="presentation"
     >
       <div className="company-logo-marquee__viewport overflow-x-clip px-3 sm:px-5" aria-hidden>
