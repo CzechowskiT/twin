@@ -34,6 +34,7 @@
     "test:company-billing-plan-usage-readiness": "npx --yes tsx scripts/company-billing-plan-usage-readiness.test.ts",
     "test:candidate-transparency": "npx --yes tsx scripts/candidate-transparency.test.ts",
     "test:candidate-application-timeline-crm": "npx --yes tsx scripts/candidate-application-timeline-crm.test.ts",
+    "test:candidate-profile-evidence-vault": "npx --yes tsx scripts/candidate-profile-evidence-vault.test.ts",
     "test:homepage-nav": "npx --yes tsx scripts/homepage-nav.test.ts",
     "test:trust-language-guard": "npx --yes tsx scripts/trust-language-guard.test.ts",
     "test:i18n-coverage": "npx --yes tsx scripts/i18n-coverage.test.ts",
@@ -64,7 +65,8 @@
     "test:recruiter-pipeline-mvp": "npx --yes tsx scripts/recruiter-pipeline-mvp.test.ts",
     "test:recruiter-analytics-mvp": "npx --yes tsx scripts/recruiter-analytics-mvp.test.ts",
     "test:recruiter-integrations-readiness-mvp": "npx --yes tsx scripts/recruiter-integrations-readiness-mvp.test.ts",
-    "test:investor-data-room-request-access": "npx --yes tsx scripts/investor-data-room-request-access.test.ts"
+    "test:investor-data-room-request-access": "npx --yes tsx scripts/investor-data-room-request-access.test.ts",
+    "test:candidate-profile-evidence-vault": "npx --yes tsx scripts/candidate-profile-evidence-vault.test.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
