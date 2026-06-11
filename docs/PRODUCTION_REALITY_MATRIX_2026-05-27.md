@@ -13,6 +13,7 @@
 - **Copy & claims audit:** `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md` (2026-06-04)
 - **OG Edge bundle fix (2026-06-08):** `docs/OPENGRAPH_EDGE_BUNDLE_SIZE_FIX_2026-06-08.md` — `waitlist/opengraph-image` decoupled from full i18n (Vercel 1 MB Edge limit)
 - **Rendered homepage i18n (2026-06-09):** `docs/RENDERED_HOMEPAGE_ZERO_ENGLISH_LEAKAGE_FIX_2026-06-09.md` — ES/DE homepage + waitlist copy; OG routes unchanged
+- **Investor metrics reality dashboard (2026-06-11):** `docs/INVESTOR_METRICS_REALITY_DASHBOARD_2026-06-11.md`
 - **Global chrome i18n (2026-06-11):** `docs/GLOBAL_CHROME_ZERO_ENGLISH_LEAKAGE_FIX_2026-06-11.md` — footer + momentum rail for es–ja; OG routes unchanged
 - **Launch-day monitoring / rollback:** `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` (2026-06-04)
 - **Recruiter alignment audit:** `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md` (2026-06-04)
@@ -86,6 +87,7 @@
 | Playwright smoke drift points | `frontend/e2e/smoke.spec.ts` targeted assertions | **STABILIZED** — status cookie-banner locator fix on branch; 13/14 prod lane PASS (2026-05-29) |
 | Public launch announcement | gate checklist + launch matrix | **BLOCKED** — **NO-GO** (S2 primary; L6/O5 waivers pilot-only; GAP-04 optional) |
 | Launch-day monitoring / rollback | `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` | **LIVE** (docs) — pilot/demo GO with monitoring; public **NO-GO**; auto-apply **PAUSED** |
+| Investor metrics reality dashboard | `/investor/metrics` | **LIVE** investor gate — **NO-GO** unchanged |
 | Investor demo | `INVESTOR_DEMO_RUNBOOK.md` | **LIVE** stack, curated use |
 | Investor room (`/investor`, `/for-investors`) | `docs/INVESTOR_ROOM_MVP_2026-06-11.md` — honest executive view; live/demo/not-live tiers; NO-GO banner; `test:investor-room-mvp` | **LIVE** (pilot) — public marketing; no fake traction; public launch **NO-GO** |
 | Real CAPTCHA bypass / live mass apply | HARD BAN | **BLOCKED** |
