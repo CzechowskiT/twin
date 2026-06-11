@@ -1620,6 +1620,9 @@ const en = {
     gateTitleInvestor: "Investor workspace only",
     gateLeadInvestor:
       "Scenario calculator and metrics live in the investor lane — not employer pricing. Switch context to continue.",
+    gateTitleCompany: "Company workspace only",
+    gateLeadCompany:
+      "Hiring dashboard and employer tools live in the company lane. Switch context or open the company home.",
     zoneCandidateTitle: "Candidate",
     zoneCandidateLead: "Job search, auto-apply, calendar, and applications.",
     zoneCandidateTools: "Demo · Dashboard · Matches",
@@ -1653,6 +1656,8 @@ const en = {
     toolInvestorMetricsDesc: "Validated jobs, users, applications — public aggregates only.",
     toolInvestorPlacement: "Placement verification timeline",
     toolInvestorPlacementDesc: "Append-only hire events — investor walkthrough + seeded demo login.",
+    toolInvestorRoadmap: "Roadmap & founder updates",
+    toolInvestorRoadmapDesc: "Honest now/next/later, risks, and validation milestones from production matrices.",
   },
   developers: {
     title: "Developers & integrators",
@@ -5239,6 +5244,8 @@ const pl: MessageTree = {
     toolInvestorMetricsDesc: "Oferty, użytkownicy, aplikacje — tylko agregaty publiczne.",
     toolInvestorPlacement: "Oś czasu placementu",
     toolInvestorPlacementDesc: "Zdarzenia zatrudnienia — demo inwestora + konto seed.",
+    toolInvestorRoadmap: "Roadmapa i aktualizacje founderów",
+    toolInvestorRoadmapDesc: "Uczciwe teraz/następne/później, ryzyka i kamienie walidacji z macierzy produkcyjnych.",
   },
   developers: {
     title: "Dla developerów i integratorów",
@@ -7347,12 +7354,12 @@ function localeFromOverlays(
     mergeDeep(
       mergeDeep(
         mergeDeep(
-          mergeDeep(mergeDeep(withPremium, marketingHome), siteChrome), { faq: faqOverlay }),
-          messageDraftsOverlay,
+          mergeDeep(mergeDeep(withPremium, marketingHome), siteChrome),
+          { faq: faqOverlay },
         ),
-        investorRoomOverlay,
+        messageDraftsOverlay,
       ),
-      investorDataRoomOverlay,
+      mergeDeep(investorRoomOverlay, investorDataRoomOverlay),
     ),
   );
 }
