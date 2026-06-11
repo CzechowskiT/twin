@@ -123,6 +123,7 @@ export type TranslationKey =
   | `placementEmployer.${keyof typeof en.placementEmployer}`
   | `acceptanceQueue.${keyof typeof en.acceptanceQueue}`
   | `recruiterInbox.${keyof typeof en.recruiterInbox}`
+  | `recruiterMessageDrafts.${keyof typeof en.recruiterMessageDrafts}`
   | `recruiterJobs.${keyof typeof en.recruiterJobs}`
   | `recruiterCalendar.${keyof typeof en.recruiterCalendar}`
   | `verifyEmail.${keyof typeof en.verifyEmail}`
@@ -2228,6 +2229,46 @@ const en = {
     missingChipPrefix: "Missing",
     reviewCardDueDiligence: "Due diligence review",
     cardMetaLine: "{job} · {company} · #{id}",
+    prepareMessage: "Prepare message",
+  },
+  recruiterMessageDrafts: {
+    prepareMessage: "Prepare message",
+    notSentBanner: "Draft only. TWIN did not send this message.",
+    twinNoSendDisclaimer: "TWIN does not send this message on your behalf",
+    panelTitle: "Message draft",
+    panelLead: "Draft for {name} · {role}",
+    close: "Close",
+    templateLabel: "Template",
+    templateInvitation: "Invite to conversation",
+    templateMissingInfo: "Request missing info",
+    templateAvailability: "Clarify availability",
+    templateHoldFollowUp: "Follow-up",
+    subjectLabel: "Subject",
+    bodyLabel: "Message",
+    editBeforeSendHint: "Edit before you send",
+    copy: "Copy draft",
+    copied: "Copied",
+    contactStatusTitle: "Contact status (manual)",
+    contactStatusHint: "Track outreach yourself — TWIN does not send or sync email.",
+    markContacted: "Mark as contacted",
+    moveToContact: "Move to to-contact",
+    markInvited: "Mark as invited",
+    phaseToContact: "To contact",
+    phaseContacted: "Contacted",
+    phaseInvited: "Invited",
+    defaultRecruiterName: "Recruiting team",
+    invitationSubject: "Next step for {role} at {company}",
+    invitationBody:
+      "Hi{candidateName},\\n\\nThank you for your interest in the {role} role at {company}. We would like to continue the conversation and share next steps.\\n\\nCould you reply with a few times that work for a short call this week?\\n\\nBest,\\n{recruiterName}",
+    missingInfoSubject: "Quick follow-up — {role} at {company}",
+    missingInfoBody:
+      "Hi{candidateName},\\n\\nWe are reviewing your profile for {role} at {company}. Before we schedule a conversation, could you share any updates on your availability and work authorization for this role?\\n\\nBest,\\n{recruiterName}",
+    availabilitySubject: "Availability check — {role} at {company}",
+    availabilityBody:
+      "Hi{candidateName},\\n\\nFor the {role} opportunity at {company}, could you share your availability for a 30-minute conversation over the next two weeks?\\n\\nBest,\\n{recruiterName}",
+    holdFollowUpSubject: "Following up — {role} at {company}",
+    holdFollowUpBody:
+      "Hi{candidateName},\\n\\nChecking in on the {role} process at {company}. Let us know if you are still interested and when a brief call might work.\\n\\nBest,\\n{recruiterName}",
   },
   recruiterCalendar: {
     eyebrow: "Roadmap",
@@ -5265,6 +5306,46 @@ const pl: MessageTree = {
     missingChipPrefix: "Brak",
     reviewCardDueDiligence: "Przegląd due diligence",
     cardMetaLine: "{job} · {company} · #{id}",
+    prepareMessage: "Przygotuj wiadomość",
+  },
+  recruiterMessageDrafts: {
+    prepareMessage: "Przygotuj wiadomość",
+    notSentBanner: "Szkic wiadomości — nie wysłano automatycznie",
+    twinNoSendDisclaimer: "TWIN nie wysyła tej wiadomości samodzielnie",
+    panelTitle: "Szkic wiadomości",
+    panelLead: "Szkic dla {name} · {role}",
+    close: "Zamknij",
+    templateLabel: "Szablon",
+    templateInvitation: "Zaproszenie do rozmowy",
+    templateMissingInfo: "Prośba o brakujące informacje",
+    templateAvailability: "Doprecyzowanie dostępności",
+    templateHoldFollowUp: "Follow-up",
+    subjectLabel: "Temat",
+    bodyLabel: "Treść",
+    editBeforeSendHint: "Edytuj przed wysłaniem",
+    copy: "Skopiuj",
+    copied: "Skopiowano",
+    contactStatusTitle: "Status kontaktu (ręcznie)",
+    contactStatusHint: "Śledź kontakt samodzielnie — TWIN nie wysyła ani nie synchronizuje e-maili.",
+    markContacted: "Oznacz jako skontaktowany",
+    moveToContact: "Przenieś do do kontaktu",
+    markInvited: "Oznacz jako zaproszony",
+    phaseToContact: "Do kontaktu",
+    phaseContacted: "Skontaktowany",
+    phaseInvited: "Zaproszony",
+    defaultRecruiterName: "Zespół rekrutacji",
+    invitationSubject: "Kolejny krok — {role} w {company}",
+    invitationBody:
+      "Cześć{candidateName},\\n\\nDziękujemy za zainteresowanie rolą {role} w {company}. Chcielibyśmy kontynuować rozmowę i przekazać kolejne kroki.\\n\\nCzy możesz/możesz podać kilka terminów na krótką rozmowę w tym tygodniu?\\n\\nPozdrawiam,\\n{recruiterName}",
+    missingInfoSubject: "Krótkie doprecyzowanie — {role} w {company}",
+    missingInfoBody:
+      "Cześć{candidateName},\\n\\nPrzeglądamy Twój profil pod kątem roli {role} w {company}. Zanim umówimy rozmowę, czy możesz/możesz podać aktualną dostępność i informację o możliwości podjęcia pracy w tej roli?\\n\\nPozdrawiam,\\n{recruiterName}",
+    availabilitySubject: "Dostępność — {role} w {company}",
+    availabilityBody:
+      "Cześć{candidateName},\\n\\nW sprawie roli {role} w {company} — czy możesz/możesz podać dostępność na 30-minutową rozmowę w ciągu najbliższych dwóch tygodni?\\n\\nPozdrawiam,\\n{recruiterName}",
+    holdFollowUpSubject: "Ponowny kontakt — {role} w {company}",
+    holdFollowUpBody:
+      "Cześć{candidateName},\\n\\nWracam w sprawie procesu na rolę {role} w {company}. Daj znać, czy nadal jesteś zainteresowany/a i kiedy pasowałaby krótka rozmowa.\\n\\nPozdrawiam,\\n{recruiterName}",
   },
   recruiterCalendar: {
     eyebrow: "Roadmapa",
@@ -6241,7 +6322,7 @@ const zh = localeFromOverlays("zh", zhOverlay, premiumZhOverlay);
 const ar = localeFromOverlays("ar", arOverlay, premiumArOverlay);
 const ja = localeFromOverlays("ja", jaOverlay, premiumJaOverlay);
 
-export { en };
+export { en, pl };
 
 export const dictionaries: Record<Locale, typeof en> = {
   en,

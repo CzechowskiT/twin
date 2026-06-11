@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
 import { RecruiterDecisionRail } from "@/components/recruiter/recruiter-decision-rail";
+import { RecruiterMessageDraftPanel } from "@/components/recruiter/recruiter-message-draft-panel";
 import {
   RecruiterSignalList,
   type RecruiterSignalItem,
@@ -67,6 +68,11 @@ import {
   recruiterInboxMatchScoreTone,
   recruiterInboxSegmentTabFocusClass,
 } from "@/lib/recruiter-inbox-visual";
+import {
+  isRecruiterMessageDraftEligible,
+  RECRUITER_MESSAGE_DRAFT_VISUAL_MARKERS,
+  type RecruiterMessageDraftRow,
+} from "@/lib/recruiter-message-drafts";
 
 type BatchRow = {
   application_id: number;
@@ -115,6 +121,7 @@ export default function RecruiterInboxClient() {
   const [batchDeclineOpen, setBatchDeclineOpen] = useState(false);
   const [batchDeclineNote, setBatchDeclineNote] = useState("");
   const [expandedReviewCards, setExpandedReviewCards] = useState<Set<number>>(new Set());
+  const [draftTargetRow, setDraftTargetRow] = useState<RecruiterMessageDraftRow | null>(null);
   const [accessExpanded, setAccessExpanded] = useState(false);
   const autoLoadDone = useRef(false);
 
@@ -784,6 +791,7 @@ export default function RecruiterInboxClient() {
               <ul className="mt-5 space-y-4">
                 {filteredRows.map((r) => {
                   const actionable = isRecruiterInboxActionable(r.status);
+                  const draftEligible = isRecruiterMessageDraftEligible(r.status);
                   const badgeLabel = decisionBadgeLabel(r.status);
                   const statusKey = recruiterInboxStatusLabelKey(r.status);
                   const evidencePreview = rowEvidencePreview(r);
@@ -1009,6 +1017,24 @@ export default function RecruiterInboxClient() {
                                     </div>
                                   </div>
                                 ) : null}
+                                {draftEligible ? (
+                                  <button
+                                    type="button"
+                                    className={`${RECRUITER_MESSAGE_DRAFT_VISUAL_MARKERS.prepareButton} twin-btn-ghost w-full text-sm`}
+                                    onClick={() =>
+                                      setDraftTargetRow({
+                                        application_id: r.application_id,
+                                        job_title: r.job_title,
+                                        company: r.company,
+                                        candidate_name: r.candidate_name,
+                                        status: r.status,
+                                        match_score: r.match_score,
+                                      })
+                                    }
+                                  >
+                                    {t("recruiterInbox.prepareMessage")}
+                                  </button>
+                                ) : null}
                               </>
                             }
                           />
@@ -1032,6 +1058,14 @@ export default function RecruiterInboxClient() {
           </Link>
         </div>
       </Card>
+      {draftTargetRow ? (
+        <RecruiterMessageDraftPanel
+          key={draftTargetRow.application_id}
+          open
+          row={draftTargetRow}
+          onClose={() => setDraftTargetRow(null)}
+        />
+      ) : null}
     </Shell>
   );
 }
