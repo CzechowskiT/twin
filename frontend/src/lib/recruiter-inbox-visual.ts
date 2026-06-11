@@ -50,9 +50,9 @@ export function recruiterInboxCandidateCardClass(): string {
   return `${RECRUITER_INBOX_VISUAL_MARKERS.candidateCard} rounded-2xl border border-[var(--twin-border)]/80 bg-[var(--twin-surface)]/95 px-5 py-5 text-base shadow-sm backdrop-blur-sm sm:px-6 sm:py-6`;
 }
 
-/** Right decision rail — elegant panel, not a heavy dark sidebar. */
+/** Right decision rail — light panel; color accents live on children. */
 export function recruiterInboxDecisionRailClass(): string {
-  return `${RECRUITER_INBOX_VISUAL_MARKERS.decisionRail} flex w-full shrink-0 flex-col gap-3 rounded-xl border border-[var(--twin-border)]/70 bg-[var(--twin-surface-2)]/40 p-4 lg:w-56 xl:w-64`;
+  return `${RECRUITER_INBOX_VISUAL_MARKERS.decisionRail} flex w-full shrink-0 flex-col gap-2.5 rounded-xl border border-[var(--twin-border)]/45 bg-[var(--twin-surface-2)]/20 p-3.5 lg:w-56 xl:w-64`;
 }
 
 /** Section headings on candidate cards — sentence case, readable size. */
@@ -62,31 +62,37 @@ export function recruiterInboxSectionLabelClass(): string {
 
 function matchScoreToneTextClass(tone: RecruiterInboxMatchScoreTone): string {
   if (tone === "unknown") {
-    return "text-[var(--twin-muted-strong)] dark:text-slate-200";
+    return "text-slate-600 dark:text-slate-200";
   }
-  // Tone is conveyed by card border; label stays high-contrast on dark.
-  return "text-slate-700 dark:text-slate-100";
+  // Tone color only on card border/bg — never on label text.
+  return "text-slate-800 dark:text-white";
+}
+
+function matchScoreCardAccentClass(tone: RecruiterInboxMatchScoreTone): { border: string; bg: string } {
+  switch (tone) {
+    case "high":
+      return { border: "border-emerald-400/30", bg: "bg-emerald-400/8 dark:bg-emerald-400/10" };
+    case "medium":
+      return { border: "border-cyan-400/30", bg: "bg-cyan-400/8 dark:bg-cyan-400/10" };
+    case "low":
+      return { border: "border-amber-400/35", bg: "bg-amber-400/10 dark:bg-amber-400/12" };
+    default:
+      return { border: "border-[var(--twin-border)]/60", bg: "bg-[var(--twin-surface)]/35" };
+  }
 }
 
 /** Match score card shell — label + value + tone as separate readable elements. */
 export function recruiterInboxMatchScoreCardClass(tone: RecruiterInboxMatchScoreTone): string {
-  const border =
-    tone === "high"
-      ? "border-emerald-400/35"
-      : tone === "medium"
-        ? "border-cyan-400/35"
-        : tone === "low"
-          ? "border-amber-400/40"
-          : "border-[var(--twin-border)]";
-  return `${RECRUITER_INBOX_VISUAL_MARKERS.matchScoreCard} rounded-xl border ${border} bg-[var(--twin-surface)]/60 px-4 py-3`;
+  const { border, bg } = matchScoreCardAccentClass(tone);
+  return `${RECRUITER_INBOX_VISUAL_MARKERS.matchScoreCard} rounded-xl border ${border} ${bg} px-3.5 py-2.5`;
 }
 
 export function recruiterInboxMatchScoreLabelClass(): string {
-  return `${RECRUITER_INBOX_VISUAL_MARKERS.matchScoreLabel} text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-200`;
+  return `${RECRUITER_INBOX_VISUAL_MARKERS.matchScoreLabel} text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300`;
 }
 
 export function recruiterInboxMatchScoreValueClass(): string {
-  return `${RECRUITER_INBOX_VISUAL_MARKERS.matchScoreValue} text-3xl font-bold tabular-nums leading-none tracking-tight text-[var(--foreground)]`;
+  return `${RECRUITER_INBOX_VISUAL_MARKERS.matchScoreValue} text-3xl font-bold tabular-nums leading-none tracking-tight text-slate-900 dark:text-white`;
 }
 
 export function recruiterInboxMatchScoreToneClass(tone: RecruiterInboxMatchScoreTone): string {
@@ -114,16 +120,16 @@ export function recruiterInboxMatchScoreBadgeClass(
   }
 }
 
-/** Awaiting-decision and similar status pills — near-white text; tone via border/bg. */
+/** Awaiting-decision and similar status pills — white/near-white text; tone via border/bg. */
 export function recruiterInboxStatusBadgeClass(variant: "awaiting" | "accepted" | "declined"): string {
-  const base = `${RECRUITER_INBOX_VISUAL_MARKERS.statusBadge} inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold text-slate-900 dark:text-white`;
+  const base = `${RECRUITER_INBOX_VISUAL_MARKERS.statusBadge} inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold text-slate-900 dark:text-slate-100`;
   switch (variant) {
     case "awaiting":
-      return `${base} border-cyan-500/50 bg-cyan-400/15 dark:border-cyan-400/65 dark:bg-cyan-500/25`;
+      return `${base} border-cyan-500/40 bg-cyan-400/10 dark:border-cyan-400/50 dark:bg-cyan-500/18`;
     case "accepted":
-      return `${base} border-emerald-500/50 bg-emerald-400/15 dark:border-emerald-400/65 dark:bg-emerald-500/25`;
+      return `${base} border-emerald-500/40 bg-emerald-400/10 dark:border-emerald-400/50 dark:bg-emerald-500/18`;
     case "declined":
-      return `${base} border-rose-400/45 bg-rose-400/12 dark:border-rose-400/55 dark:bg-rose-500/20 dark:text-slate-100`;
+      return `${base} border-rose-400/40 bg-rose-400/10 dark:border-rose-400/50 dark:bg-rose-500/16`;
     default:
       return base;
   }
@@ -167,18 +173,18 @@ export function recruiterInboxChipMoreClass(): string {
   return `${RECRUITER_INBOX_VISUAL_MARKERS.chipMore} inline-flex items-center rounded-lg border border-dashed border-[var(--twin-border)] bg-[var(--twin-surface-2)]/80 px-3 py-1.5 text-sm font-medium text-[var(--twin-muted-strong)]`;
 }
 
-/** Review CTA — near-white label; cyan/teal accent on border/bg/chevron only. */
+/** Review CTA — white/near-white label; cyan accent on border/bg/chevron only. */
 export function recruiterInboxReviewCardCtaClass(): string {
-  return `${RECRUITER_INBOX_VISUAL_MARKERS.reviewCardCta} ${FOCUS_RING} flex w-full items-center justify-between gap-2 rounded-xl border border-cyan-500/55 bg-cyan-400/10 px-4 py-2.5 text-sm font-semibold text-slate-900 shadow-sm transition-colors hover:border-cyan-400/75 hover:bg-cyan-400/18 dark:border-cyan-400/70 dark:bg-cyan-500/20 dark:text-slate-100 dark:hover:border-cyan-400/85 dark:hover:bg-cyan-500/28`;
+  return `${RECRUITER_INBOX_VISUAL_MARKERS.reviewCardCta} ${FOCUS_RING} flex w-full items-center justify-between gap-2 rounded-xl border border-cyan-500/45 bg-cyan-400/8 px-3.5 py-2 text-sm font-semibold text-slate-900 transition-colors hover:border-cyan-400/60 hover:bg-cyan-400/14 dark:border-cyan-400/55 dark:bg-cyan-500/14 dark:text-white dark:hover:border-cyan-400/70 dark:hover:bg-cyan-500/22`;
 }
 
-/** Chevron icon accent for review CTA — color on icon, not label text. */
+/** Chevron icon accent for review CTA — white or cyan on dark, never the label. */
 export function recruiterInboxReviewCardCtaIconClass(): string {
-  return "h-4 w-4 shrink-0 text-cyan-600 transition-transform dark:text-cyan-400";
+  return "h-4 w-4 shrink-0 text-cyan-600 transition-transform dark:text-cyan-300";
 }
 
 export function recruiterInboxDeclineButtonClass(): string {
-  return `${RECRUITER_INBOX_VISUAL_MARKERS.declineButton} ${DECLINE_FOCUS_RING} rounded-lg border border-rose-500/55 bg-rose-400/15 px-3.5 py-2 text-sm font-semibold text-rose-950 transition-colors hover:border-rose-400/75 hover:bg-rose-400/25 dark:border-rose-400/70 dark:bg-rose-500/28 dark:text-white dark:hover:border-rose-400/85 dark:hover:bg-rose-500/38`;
+  return `${RECRUITER_INBOX_VISUAL_MARKERS.declineButton} ${DECLINE_FOCUS_RING} rounded-lg border border-rose-500/45 bg-rose-400/10 px-3.5 py-2 text-sm font-semibold text-rose-950 transition-colors hover:border-rose-400/60 hover:bg-rose-400/18 dark:border-rose-400/55 dark:bg-rose-500/18 dark:text-white dark:hover:border-rose-400/70 dark:hover:bg-rose-500/26`;
 }
 
 export function recruiterInboxSegmentTabFocusClass(): string {

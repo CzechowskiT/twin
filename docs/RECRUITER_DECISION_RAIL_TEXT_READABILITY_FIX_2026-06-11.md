@@ -1,7 +1,8 @@
 # Recruiter decision rail text readability — 2026-06-11
 
 **Branch:** `fix/recruiter-decision-rail-text-readability-2026-06-11`  
-**Follows:** PR #74 (premium card redesign — structure OK, text too muted on dark)
+**Follows:** PR #74 (premium card redesign — structure OK, text too muted on dark)  
+**Superseded by:** `fix/recruiter-decision-rail-final-readability-2026-06-11` — see `docs/RECRUITER_DECISION_RAIL_FINAL_READABILITY_FIX_2026-06-11.md` (PR #75 follow-up)
 
 ---
 
