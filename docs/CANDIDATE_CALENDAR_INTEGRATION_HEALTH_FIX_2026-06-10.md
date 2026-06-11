@@ -95,11 +95,25 @@ pytest backend/tests/test_calendar_routes.py -q
 2. If Google token stale: badge **WYMAGA PONOWNEGO POŁĄCZENIA** on Google; Microsoft events still load if healthy.  
 3. If both stale: reconnect panel with provider guidance; TWIN stays signed in.  
 4. If both healthy, no events: **Brak wydarzeń w tym tygodniu** — not failure banner.  
-5. Reconnect: Disconnect → Connect on affected provider(s).  
-6. After OAuth return with `?calendar_connected=1`: success banner readable on dark theme; auto-dismiss ~7s.
+5. Reconnect: **Connect** on affected provider(s) — disconnect is optional, not required.  
+6. After OAuth return with `?calendar_connected=1`: success banner readable on dark theme; auto-dismiss ~7s; page reloads status to clear stale reconnect state.
+
+---
+
+## Follow-up — reconnect loop (2026-06-11)
+
+See **`docs/CANDIDATE_GOOGLE_CALENDAR_RECONNECT_LOOP_FIX_2026-06-11.md`**.
+
+| Change | Why |
+| ------ | --- |
+| Access token cache + expiry on provider rows | Stop refreshing Google on every status/events call |
+| Events: 401 → force refresh → single retry | Stay connected when refresh token is valid |
+| OAuth callback preserves existing refresh | Re-consent often omits new refresh from Google |
+| `health: temporary_error` + Retry (503/429) | Transient provider errors must not force reconnect |
+| Status payload: `can_reconnect`, `can_retry` | Frontend shows Connect vs Retry without token exposure |
 
 ---
 
 ## Remaining founder action
 
-Reconnect any provider showing **WYMAGA PONOWNEGO POŁĄCZENIA** (Google and/or Microsoft) via the connections panel.
+Reconnect any provider showing **WYMAGA PONOWNEGO POŁĄCZENIA** (Google and/or Microsoft) via **Connect** on the connections panel — TWIN session stays signed in.

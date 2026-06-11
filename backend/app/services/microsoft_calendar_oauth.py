@@ -95,25 +95,36 @@ def exchange_microsoft_calendar_code(code: str) -> tuple[str, str | None]:
     return str(refresh_token), email
 
 
-def refresh_microsoft_calendar_access_token(refresh_token_plain: str) -> str:
+def refresh_microsoft_calendar_tokens(refresh_token_plain: str):
+    from app.services.google_calendar_oauth import GoogleTokenRefreshResult
+
     s = get_settings()
     tenant = _tenant_segment()
-    data = {
-        "client_id": s.microsoft_client_id,
-        "client_secret": s.microsoft_client_secret,
-        "refresh_token": refresh_token_plain,
-        "grant_type": "refresh_token",
-        "scope": MS_CALENDAR_SCOPES,
-    }
     with httpx.Client(timeout=30.0) as client:
         token_res = client.post(
             f"{MS_AUTH_BASE}/{tenant}/oauth2/v2.0/token",
-            data=data,
+            data={
+                "client_id": s.microsoft_client_id,
+                "client_secret": s.microsoft_client_secret,
+                "refresh_token": refresh_token_plain,
+                "grant_type": "refresh_token",
+                "scope": MS_CALENDAR_SCOPES,
+            },
             headers={"Content-Type": "application/x-www-form-urlencoded"},
         )
         if token_res.status_code != 200:
-            raise MicrosoftCalendarOAuthError("Could not refresh Microsoft access token")
-        access = token_res.json().get("access_token")
+            raise MicrosoftCalendarOAuthError(f"Could not refresh Microsoft access token: {token_res.text}")
+        body = token_res.json()
+        access = body.get("access_token")
         if not access:
             raise MicrosoftCalendarOAuthError("Microsoft refresh did not return an access token")
-        return str(access)
+        refresh = body.get("refresh_token")
+        return GoogleTokenRefreshResult(
+            access_token=str(access),
+            expires_in=int(body.get("expires_in") or 3600),
+            refresh_token=str(refresh) if refresh else None,
+        )
+
+
+def refresh_microsoft_calendar_access_token(refresh_token_plain: str) -> str:
+    return refresh_microsoft_calendar_tokens(refresh_token_plain).access_token

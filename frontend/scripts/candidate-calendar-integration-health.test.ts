@@ -59,8 +59,8 @@ test("scenario 1: Google ok + Microsoft ok → both healthy, calendar can load",
   assert.equal(providerBadgeHealth(microsoftOk), "connected");
   const aggregate = aggregateWeekEventOutcomes(
     [
-      { provider: "google", events: [{ id: "1", title: "A", start_iso: "2026-06-10T09:00:00Z", end_iso: "2026-06-10T10:00:00Z", all_day: false, html_link: null, source: "provider" }], failed: false, reconnectRequired: false, message: null },
-      { provider: "microsoft", events: [], failed: false, reconnectRequired: false, message: null },
+      { provider: "google", events: [{ id: "1", title: "A", start_iso: "2026-06-10T09:00:00Z", end_iso: "2026-06-10T10:00:00Z", all_day: false, html_link: null, source: "provider" }], failed: false, reconnectRequired: false, temporaryError: false, message: null },
+      { provider: "microsoft", events: [], failed: false, reconnectRequired: false, temporaryError: false, message: null },
     ],
     googleOk,
     microsoftOk,
@@ -75,7 +75,7 @@ test("scenario 2: Google reconnect_required + Microsoft ok → partial path, no 
   assert.deepEqual(healthyProvidersToFetch(googleReconnect, microsoftOk), ["microsoft"]);
   assert.equal(providerBadgeHealth(googleReconnect), "reconnect_required");
   const aggregate = aggregateWeekEventOutcomes(
-    [{ provider: "microsoft", events: [], failed: false, reconnectRequired: false, message: null }],
+    [{ provider: "microsoft", events: [], failed: false, reconnectRequired: false, temporaryError: false, message: null }],
     googleReconnect,
     microsoftOk,
   );
@@ -86,7 +86,7 @@ test("scenario 2: Google reconnect_required + Microsoft ok → partial path, no 
 
 test("scenario 3: Google ok + Microsoft reconnect_required → partial warning", () => {
   const aggregate = aggregateWeekEventOutcomes(
-    [{ provider: "google", events: [], failed: false, reconnectRequired: false, message: null }],
+    [{ provider: "google", events: [], failed: false, reconnectRequired: false, temporaryError: false, message: null }],
     googleOk,
     microsoftReconnect,
   );
@@ -105,8 +105,8 @@ test("scenario 4: both reconnect_required → page-level reconnect guidance", ()
 test("scenario 5: both ok but no events → empty week, not error", () => {
   const aggregate = aggregateWeekEventOutcomes(
     [
-      { provider: "google", events: [], failed: false, reconnectRequired: false, message: null },
-      { provider: "microsoft", events: [], failed: false, reconnectRequired: false, message: null },
+      { provider: "google", events: [], failed: false, reconnectRequired: false, temporaryError: false, message: null },
+      { provider: "microsoft", events: [], failed: false, reconnectRequired: false, temporaryError: false, message: null },
     ],
     googleOk,
     microsoftOk,
@@ -150,6 +150,7 @@ test("scenario 8: healthy provider events fail → reconnect panel, not generic 
         events: [],
         failed: true,
         reconnectRequired: false,
+        temporaryError: false,
         message: "502 Calendar list events failed",
       },
     ],

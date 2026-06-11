@@ -1,67 +1,78 @@
-"""Probe Google/Microsoft calendar OAuth rows for integration health (no live API calls beyond token refresh)."""
+"""Probe Google/Microsoft calendar OAuth rows for integration health."""
 
 from __future__ import annotations
 
-from typing import Literal
-
 from sqlalchemy.orm import Session
 
-from app.database.models import UserGoogleCalendar, UserMicrosoftCalendar
-from app.services.google_calendar_oauth import GoogleCalendarOAuthError, refresh_google_calendar_access_token
-from app.services.microsoft_calendar_oauth import MicrosoftCalendarOAuthError, refresh_microsoft_calendar_access_token
-from app.services.token_crypto import decrypt_secret
-
-CalendarProviderHealth = Literal["ok", "reconnect_required", "error", "unknown"]
-
-GOOGLE_RECONNECT_MSG = "Calendar token expired or revoked; reconnect Google Calendar."
-MICROSOFT_RECONNECT_MSG = "Microsoft token expired or revoked; reconnect Microsoft Calendar."
+from app.services.calendar_oauth_credentials import (
+    CalendarProviderStatusPayload,
+    GOOGLE_RECONNECT_MSG,
+    MICROSOFT_RECONNECT_MSG,
+    CalendarTokenResolutionError,
+    access_token_still_valid,
+    get_best_google_row,
+    get_best_microsoft_row,
+    provider_status_payload,
+    resolve_google_access_token,
+    resolve_microsoft_access_token,
+)
 
 
 def calendar_upstream_auth_failure(exc: Exception) -> bool:
-    """True when Google/Microsoft Calendar API rejected the access token or scopes."""
     text = str(exc).lower()
-    markers = (
-        '"code": 401',
-        '"code": 403',
-        "invalid_grant",
-        "invalid_credentials",
-        "autherror",
-        "insufficient permission",
-        "insufficientauthentication",
-        "unauthorized",
-    )
-    return any(m in text for m in markers)
+    return any(m in text for m in ('"code": 401', '"code": 403', "invalid_grant", "unauthorized"))
 
 
-def probe_google_calendar_health(db: Session, user_id: int) -> tuple[bool, CalendarProviderHealth, str | None, str | None]:
-    """Return (connected_row, health, message, google_email)."""
-    row = db.query(UserGoogleCalendar).filter(UserGoogleCalendar.user_id == user_id).first()
+def probe_google_calendar_health(db: Session, user_id: int) -> CalendarProviderStatusPayload:
+    row = get_best_google_row(db, user_id)
     if not row:
-        return False, "unknown", None, None
-    email = row.google_email
+        return provider_status_payload(
+            provider="google", connected=False, status="not_connected", health="unknown",
+            message=None, code=None, email=None,
+        )
+    if not row.refresh_token_encrypted:
+        return provider_status_payload(
+            provider="google", connected=True, status="reconnect_required", health="reconnect_required",
+            message=GOOGLE_RECONNECT_MSG, code="missing_refresh_token", email=row.google_email,
+        )
+    if access_token_still_valid(row):
+        return provider_status_payload(
+            provider="google", connected=True, status="connected", health="ok",
+            message=None, code=None, email=row.google_email,
+        )
     try:
-        plain = decrypt_secret(row.refresh_token_encrypted)
-        refresh_google_calendar_access_token(plain)
-        return True, "ok", None, email
-    except GoogleCalendarOAuthError:
-        return True, "reconnect_required", GOOGLE_RECONNECT_MSG, email
-    except Exception:
-        return True, "error", "Google Calendar connection error.", email
+        resolve_google_access_token(db, row)
+        return provider_status_payload(
+            provider="google", connected=True, status="connected", health="ok",
+            message=None, code=None, email=row.google_email,
+        )
+    except CalendarTokenResolutionError as exc:
+        return provider_status_payload(
+            provider="google", connected=True, status=exc.status, health=exc.health,
+            message=exc.message, code=exc.code, email=row.google_email,
+        )
 
 
-def probe_microsoft_calendar_health(
-    db: Session, user_id: int
-) -> tuple[bool, CalendarProviderHealth, str | None, str | None]:
-    """Return (connected_row, health, message, microsoft_email)."""
-    row = db.query(UserMicrosoftCalendar).filter(UserMicrosoftCalendar.user_id == user_id).first()
+def probe_microsoft_calendar_health(db: Session, user_id: int) -> CalendarProviderStatusPayload:
+    row = get_best_microsoft_row(db, user_id)
     if not row:
-        return False, "unknown", None, None
-    email = row.microsoft_email
+        return provider_status_payload(
+            provider="microsoft", connected=False, status="not_connected", health="unknown",
+            message=None, code=None, email=None,
+        )
+    if access_token_still_valid(row):
+        return provider_status_payload(
+            provider="microsoft", connected=True, status="connected", health="ok",
+            message=None, code=None, email=row.microsoft_email,
+        )
     try:
-        plain = decrypt_secret(row.refresh_token_encrypted)
-        refresh_microsoft_calendar_access_token(plain)
-        return True, "ok", None, email
-    except MicrosoftCalendarOAuthError:
-        return True, "reconnect_required", MICROSOFT_RECONNECT_MSG, email
-    except Exception:
-        return True, "error", "Microsoft Calendar connection error.", email
+        resolve_microsoft_access_token(db, row)
+        return provider_status_payload(
+            provider="microsoft", connected=True, status="connected", health="ok",
+            message=None, code=None, email=row.microsoft_email,
+        )
+    except CalendarTokenResolutionError as exc:
+        return provider_status_payload(
+            provider="microsoft", connected=True, status=exc.status, health=exc.health,
+            message=exc.message, code=exc.code, email=row.microsoft_email,
+        )

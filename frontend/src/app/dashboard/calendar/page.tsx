@@ -371,7 +371,7 @@ export default function DashboardCalendarPage() {
               { preserveSessionOnUnauthorized: true },
               token,
             );
-            return { provider, events: out.events, failed: false, reconnectRequired: false, message: null };
+            return { provider, events: out.events, failed: false, reconnectRequired: false, temporaryError: false, message: null };
           } catch (e) {
             const msg = e instanceof Error ? e.message : String(e);
             const parsed = parseProviderIntegrationError(msg);
@@ -380,6 +380,7 @@ export default function DashboardCalendarPage() {
               events: [],
               failed: true,
               reconnectRequired: parsed.reconnectRequired,
+              temporaryError: parsed.temporaryError,
               message: msg,
             };
           }
@@ -413,11 +414,13 @@ export default function DashboardCalendarPage() {
       const c = searchParams.get("calendar_connected");
       const err = searchParams.get("calendar_error");
       setCalendarErrorCode(err);
-      if (c === "1" || c === "microsoft") setBanner("connected");
-      else if (err === "google_denied" || err === "microsoft_denied") setBanner("denied");
+      if (c === "1" || c === "microsoft") {
+        setBanner("connected");
+        void load();
+      } else if (err === "google_denied" || err === "microsoft_denied") setBanner("denied");
       else if (err) setBanner("error");
     });
-  }, [searchParams]);
+  }, [searchParams, load]);
 
   useEffect(() => {
     if (banner !== "connected") return;
@@ -867,6 +870,7 @@ export default function DashboardCalendarPage() {
         onSubscribeWebcal={() => void subscribeWebcalOneClick()}
         onCopyWebcalLink={() => void copyWebcalLink()}
         onGenerateWebcalLink={() => void generateWebcalLink()}
+        onRetryCalendarEvents={() => void fetchCalendarWeekEvents()}
       />
 
       <details className="mb-6 rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/40 px-4 py-3">

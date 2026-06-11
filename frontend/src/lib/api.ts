@@ -131,6 +131,7 @@ export function isCalendarIntegrationFailure(status: number, message: string, ap
     return true;
   }
   if (status === 428) return true;
+  if (status === 503) return true;
   if (status === 400 && (lower.includes("google calendar is not connected") || lower.includes("microsoft calendar is not connected"))) {
     return true;
   }

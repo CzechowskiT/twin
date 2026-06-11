@@ -1130,13 +1130,16 @@ const en = {
     calendarConnectedSuccessBody: "Your events are now visible in TWIN.",
     calendarNotConnected: "Not connected",
     calendarReconnectRequired: "Reconnect required",
+    calendarTemporaryError: "Temporary error",
+    calendarTemporaryErrorHint: "Google or Microsoft is temporarily unavailable. Try again in a moment.",
+    calendarRetryEvents: "Retry loading events",
     calendarIntegrationError: "Integration error",
-    calendarProviderGoogleReconnect: "Google Calendar access expired. Disconnect and connect Google again.",
-    calendarProviderMicrosoftReconnect: "Microsoft 365 access expired. Disconnect and connect Microsoft again.",
+    calendarProviderGoogleReconnect: "Google Calendar access expired. Connect Google again — no need to disconnect first.",
+    calendarProviderMicrosoftReconnect: "Microsoft 365 access expired. Connect Microsoft again — no need to disconnect first.",
     calendarPartialFailure: "Some connected calendars could not load. Events below may be incomplete.",
     calendarAllProvidersReconnectTitle: "Reconnect your calendar",
     calendarAllProvidersReconnectBody:
-      "Your Google or Microsoft connection needs to be refreshed. Disconnect and connect again below — your TWIN account stays signed in.",
+      "Your Google or Microsoft connection needs to be refreshed. Use Connect below — your TWIN account stays signed in.",
     calendarViewDataHint:
       "Shows event titles and times from connected calendars plus TWIN interview holds for this week.",
     calendarConnectionsLoading: "Loading…",
@@ -4666,6 +4669,10 @@ const pl: MessageTree = {
     calendarConnectedSuccessBody: "Twoje wydarzenia są teraz widoczne w TWIN.",
     calendarNotConnected: "Nie połączono",
     calendarReconnectRequired: "Wymaga ponownego połączenia",
+    calendarTemporaryError: "Tymczasowy błąd",
+    calendarTemporaryErrorHint:
+      "Google lub Microsoft jest chwilowo niedostępny. Spróbuj ponownie za chwilę.",
+    calendarRetryEvents: "Ponów wczytywanie wydarzeń",
     calendarIntegrationError: "Błąd integracji",
     calendarProviderGoogleReconnect:
       "Dostęp do Google Calendar wygasł. Odłącz i połącz Google ponownie.",

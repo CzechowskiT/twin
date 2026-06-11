@@ -38,12 +38,23 @@ from app.services.google_calendar_oauth import (
     build_google_calendar_authorize_url,
     exchange_google_calendar_code,
     is_google_calendar_oauth_configured,
-    refresh_google_calendar_access_token,
 )
 from app.services.microsoft_calendar_oauth import is_microsoft_calendar_oauth_configured
 from app.services.ics_export import interviews_feed_to_ics, scheduled_interview_to_ics
-from app.services.calendar_provider_health import GOOGLE_RECONNECT_MSG, calendar_upstream_auth_failure, probe_google_calendar_health
-from app.services.token_crypto import decrypt_secret, encrypt_secret
+from app.services.calendar_oauth_credentials import (
+    CalendarTokenResolutionError,
+    GOOGLE_RECONNECT_MSG,
+    MICROSOFT_RECONNECT_MSG,
+    calendar_upstream_transient,
+    get_best_google_row,
+    resolve_google_access_token,
+    store_google_tokens_from_exchange,
+)
+from app.services.calendar_provider_health import (
+    calendar_upstream_auth_failure,
+    probe_google_calendar_health,
+)
+from app.services.token_crypto import encrypt_secret
 
 router = APIRouter()
 
@@ -73,34 +84,49 @@ def _parse_calendar_oauth_user_id(state: str) -> int | None:
         return None
 
 
-def _calendar_access_token(db: Session, user_id: int) -> str:
-    row = db.query(UserGoogleCalendar).filter(UserGoogleCalendar.user_id == user_id).first()
+def _calendar_access_token(db: Session, user_id: int, *, force_refresh: bool = False) -> str:
+    row = get_best_google_row(db, user_id)
     if not row:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Google Calendar is not connected",
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Google Calendar is not connected")
     try:
-        plain = decrypt_secret(row.refresh_token_encrypted)
-        return refresh_google_calendar_access_token(plain)
-    except GoogleCalendarOAuthError as e:
-        raise HTTPException(
-            status_code=status.HTTP_428_PRECONDITION_REQUIRED,
-            detail="Calendar token expired or revoked; reconnect Google Calendar.",
-        ) from e
+        return resolve_google_access_token(db, row, force_refresh=force_refresh).token
+    except CalendarTokenResolutionError as exc:
+        if exc.status == "temporary_error":
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=exc.message) from exc
+        raise HTTPException(status_code=status.HTTP_428_PRECONDITION_REQUIRED, detail=exc.message or GOOGLE_RECONNECT_MSG) from exc
+
+
+def _list_google_events_with_retry(db: Session, user_id: int, time_min: str, time_max: str, *, limit: int) -> list[dict]:
+    access = _calendar_access_token(db, user_id)
+    try:
+        return list_primary_events(access, time_min, time_max, max_results=limit)
+    except GoogleCalendarApiError as exc:
+        if not calendar_upstream_auth_failure(exc):
+            if calendar_upstream_transient(exc):
+                raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Calendar provider temporarily unavailable; try again shortly.") from exc
+            raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Calendar list events failed") from exc
+        access = _calendar_access_token(db, user_id, force_refresh=True)
+        try:
+            return list_primary_events(access, time_min, time_max, max_results=limit)
+        except GoogleCalendarApiError as retry_exc:
+            if calendar_upstream_auth_failure(retry_exc):
+                raise HTTPException(status_code=status.HTTP_428_PRECONDITION_REQUIRED, detail=GOOGLE_RECONNECT_MSG) from retry_exc
+            if calendar_upstream_transient(retry_exc):
+                raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Calendar provider temporarily unavailable; try again shortly.") from retry_exc
+            raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Calendar list events failed") from retry_exc
 
 
 class CalendarStatusOut(BaseModel):
     connected: bool
-    health: str = Field(
-        "unknown",
-        description="ok | reconnect_required | error | unknown",
-    )
+    status: str = Field("unknown")
+    health: str = Field("unknown")
     message: str | None = None
-    provider: str = Field("google", description="google | microsoft")
+    code: str | None = None
+    can_reconnect: bool = False
+    can_retry: bool = False
+    provider: str = Field("google")
     google_email: str | None = None
     oauth_configured: bool = False
-    # Exact URI to whitelist in Google Cloud Console (fixes redirect_uri_mismatch).
     oauth_redirect_uri: str | None = None
 
 
@@ -222,21 +248,17 @@ def google_calendar_status(
 ) -> CalendarStatusOut:
     oauth_configured = is_google_calendar_oauth_configured()
     redirect_uri = effective_google_calendar_redirect_uri(get_settings()) if oauth_configured else None
-    has_row, health, message, google_email = probe_google_calendar_health(db, current_user.id)
-    if not has_row:
-        return CalendarStatusOut(
-            connected=False,
-            health="unknown",
-            provider="google",
-            oauth_configured=oauth_configured,
-            oauth_redirect_uri=redirect_uri,
-        )
+    probe = probe_google_calendar_health(db, current_user.id)
     return CalendarStatusOut(
-        connected=True,
-        health=health,
-        message=message,
-        provider="google",
-        google_email=google_email,
+        connected=probe.connected,
+        status=probe.status,
+        health=probe.health,
+        message=probe.message,
+        code=probe.code,
+        can_reconnect=probe.can_reconnect,
+        can_retry=probe.can_retry,
+        provider=probe.provider,
+        google_email=probe.email,
         oauth_configured=oauth_configured,
         oauth_redirect_uri=redirect_uri,
     )
@@ -278,30 +300,24 @@ def google_calendar_callback(
     if not user:
         return RedirectResponse(_frontend_calendar_redirect(calendar_error="invalid_state"), status_code=302)
     try:
-        refresh_plain, google_email = exchange_google_calendar_code(code)
+        exchanged = exchange_google_calendar_code(code)
     except GoogleCalendarOAuthError:
         return RedirectResponse(_frontend_calendar_redirect(calendar_error="exchange_failed"), status_code=302)
-    if not refresh_plain:
-        return RedirectResponse(_frontend_calendar_redirect(calendar_error="no_refresh_token"), status_code=302)
-
-    enc = encrypt_secret(refresh_plain)
     now = datetime.utcnow()
-    row = db.query(UserGoogleCalendar).filter(UserGoogleCalendar.user_id == user_id).first()
+    row = get_best_google_row(db, user_id)
     if row:
-        row.refresh_token_encrypted = enc
-        row.google_email = google_email
+        if not exchanged.refresh_token and not row.refresh_token_encrypted:
+            return RedirectResponse(_frontend_calendar_redirect(calendar_error="no_refresh_token"), status_code=302)
+        row.google_email = exchanged.email
         row.updated_at = now
+        store_google_tokens_from_exchange(db, row, access_token=exchanged.access_token, expires_in=exchanged.expires_in, refresh_token=exchanged.refresh_token)
     else:
-        db.add(
-            UserGoogleCalendar(
-                user_id=user_id,
-                refresh_token_encrypted=enc,
-                google_email=google_email,
-                created_at=now,
-                updated_at=now,
-            )
-        )
-    db.commit()
+        if not exchanged.refresh_token:
+            return RedirectResponse(_frontend_calendar_redirect(calendar_error="no_refresh_token"), status_code=302)
+        new_row = UserGoogleCalendar(user_id=user_id, refresh_token_encrypted=encrypt_secret(exchanged.refresh_token), google_email=exchanged.email, created_at=now, updated_at=now)
+        db.add(new_row)
+        db.commit()
+        store_google_tokens_from_exchange(db, new_row, access_token=exchanged.access_token, expires_in=exchanged.expires_in, refresh_token=None)
     return RedirectResponse(_frontend_calendar_redirect(calendar_connected="1"), status_code=302)
 
 
@@ -310,7 +326,7 @@ def google_calendar_disconnect(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> None:
-    row = db.query(UserGoogleCalendar).filter(UserGoogleCalendar.user_id == current_user.id).first()
+    row = get_best_google_row(db, current_user.id)
     if row:
         db.delete(row)
         db.commit()
@@ -344,16 +360,7 @@ def google_calendar_list_events(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> CalendarEventsOut:
-    access = _calendar_access_token(db, current_user.id)
-    try:
-        raw_items = list_primary_events(access, time_min, time_max, max_results=limit)
-    except GoogleCalendarApiError as e:
-        if calendar_upstream_auth_failure(e):
-            raise HTTPException(
-                status_code=status.HTTP_428_PRECONDITION_REQUIRED,
-                detail=GOOGLE_RECONNECT_MSG,
-            ) from e
-        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Calendar list events failed") from e
+    raw_items = _list_google_events_with_retry(db, current_user.id, time_min, time_max, limit=limit)
     events: list[CalendarEventOut] = []
     for item in raw_items:
         out = _google_event_to_out(item)
