@@ -5,6 +5,7 @@ from fastapi import APIRouter
 from app.api import (
     auto_apply_settings,
     admin_ops,
+    company,
     consent,
     csp_reports,
     demo,
