@@ -183,9 +183,13 @@ export default function CandidateEvidenceClient() {
             <p className="twin-muted mt-2 text-xs">
               {t("candidateEvidence.added")} {new Date(item.created_at).toLocaleString(loc)}
             </p>
-            <Button variant="ghost" className="mt-2 text-xs" onClick={() => void removeItem(item.id)}>
+            <button
+              type="button"
+              className="twin-link mt-2 cursor-pointer border-0 bg-transparent p-0 text-xs font-medium"
+              onClick={() => void removeItem(item.id)}
+            >
               {t("candidateEvidence.remove")}
-            </Button>
+            </button>
           </Card>
         ))}
       </ul>
