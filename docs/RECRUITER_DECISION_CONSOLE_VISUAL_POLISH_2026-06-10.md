@@ -32,7 +32,8 @@ Recruiter inbox worked functionally but read like an internal admin panel:
 
 **Launch stance:** unchanged — public **NO-GO**, auto-apply **PAUSED**, recruiter calendar **NOT LIVE**, external invites **0**.
 
-**Follow-up:** `docs/RECRUITER_INBOX_CONTRAST_READABILITY_FIX_2026-06-10.md` — contrast/readability + PL chip localization.
+**Follow-up:** `docs/RECRUITER_INBOX_CONTRAST_READABILITY_FIX_2026-06-10.md` — contrast/readability + PL chip localization.  
+**Follow-up:** `docs/RECRUITER_INBOX_READABILITY_LAYOUT_POLISH_2026-06-10.md` — two-zone layout, chip noise reduction, scanability.
 
 ---
 

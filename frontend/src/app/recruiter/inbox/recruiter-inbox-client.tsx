@@ -51,15 +51,20 @@ import {
   recruiterDataVisibilitySummary,
   type RecruiterDataVisibility,
 } from "@/lib/recruiter-data-visibility";
-import { localizeRecruiterInboxChipText } from "@/lib/recruiter-inbox-chip-copy";
+import {
+  localizeRecruiterInboxChipText,
+  shortRecruiterInboxChipText,
+} from "@/lib/recruiter-inbox-chip-copy";
 import {
   RECRUITER_INBOX_VISUAL_MARKERS,
+  recruiterInboxChipMoreClass,
   recruiterInboxDeclineButtonClass,
   recruiterInboxEvidenceChipClass,
   recruiterInboxMatchScoreBadgeClass,
   recruiterInboxMatchScoreTone,
   recruiterInboxNeutralChipClass,
   recruiterInboxReviewCardCtaClass,
+  recruiterInboxSectionLabelClass,
   recruiterInboxSegmentTabFocusClass,
   recruiterInboxStatusBadgeClass,
   recruiterInboxWarningChipClass,
@@ -427,21 +432,31 @@ export default function RecruiterInboxClient() {
     return localizeRecruiterInboxChipText(text, locale);
   }
 
-  function rowEvidenceChips(row: BatchRow): string[] {
-    const fromReasons = (row.match_reasons ?? []).slice(0, 2);
-    const fromReview = (row.review_card?.requirements_matched ?? []).slice(0, 2);
-    const merged = [...fromReasons];
-    for (const item of fromReview) {
-      if (!merged.includes(item) && merged.length < 3) merged.push(item);
-    }
-    return merged.map((chip) => localizeChip(chip));
+  function shortChip(text: string): string {
+    return shortRecruiterInboxChipText(text, locale);
   }
 
-  function rowMissingChip(row: BatchRow): string | null {
-    const missing = row.review_card?.uncertain_or_missing ?? [];
-    if (missing.length === 0) return null;
-    if (missing.length === 1) return localizeChip(missing[0]);
-    return `${localizeChip(missing[0])} (+${missing.length - 1})`;
+  function chipMoreLabel(count: number): string {
+    return t("recruiterInbox.chipMoreCount").replace("{count}", String(count));
+  }
+
+  function rowEvidencePreview(row: BatchRow): { visible: string[]; moreCount: number } {
+    const merged: string[] = [];
+    for (const item of row.match_reasons ?? []) {
+      if (!merged.includes(item)) merged.push(item);
+    }
+    for (const item of row.review_card?.requirements_matched ?? []) {
+      if (!merged.includes(item)) merged.push(item);
+    }
+    const localized = merged.map((chip) => shortChip(chip));
+    return { visible: localized.slice(0, 2), moreCount: Math.max(0, localized.length - 2) };
+  }
+
+  function rowVerificationPreview(row: BatchRow): { visible: string[]; moreCount: number } {
+    const chips = (row.review_card?.uncertain_or_missing ?? []).map((item) => shortChip(item));
+    const confidenceKey = rowConfidenceKey(row);
+    if (confidenceKey) chips.push(t(confidenceKey));
+    return { visible: chips.slice(0, 2), moreCount: Math.max(0, chips.length - 2) };
   }
 
   function rowConfidenceKey(row: BatchRow): TranslationKey | null {
@@ -770,132 +785,104 @@ export default function RecruiterInboxClient() {
                   const actionable = isRecruiterInboxActionable(r.status);
                   const badgeLabel = decisionBadgeLabel(r.status);
                   const statusKey = recruiterInboxStatusLabelKey(r.status);
-                  const evidenceChips = rowEvidenceChips(r);
-                  const missingChip = rowMissingChip(r);
+                  const evidencePreview = rowEvidencePreview(r);
+                  const verificationPreview = rowVerificationPreview(r);
                   const confidenceKey = rowConfidenceKey(r);
                   const scoreTone = recruiterInboxMatchScoreTone(r.match_score, r.match_score_label);
                   const reviewExpanded = expandedReviewCards.has(r.application_id);
                   return (
                   <li
                     key={r.application_id}
-                    className="rounded-2xl border border-[var(--twin-border)] bg-[var(--twin-surface)] px-4 py-5 text-sm shadow-sm sm:px-5"
+                    className="rounded-2xl border border-[var(--twin-border)] bg-[var(--twin-surface)] px-5 py-6 text-base shadow-sm sm:px-6 sm:py-7"
                   >
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-3 sm:gap-4">
                       {actionable ? (
                         <input
                           type="checkbox"
                           checked={selectedIds.has(r.application_id)}
                           onChange={() => toggleSelected(r.application_id)}
-                          className="mt-2 h-4 w-4 shrink-0 rounded border-[var(--twin-border)]"
+                          className="mt-2.5 h-4 w-4 shrink-0 rounded border-[var(--twin-border)]"
                           aria-label={t("recruiterInbox.selectRow").replace("{name}", r.candidate_name)}
                         />
                       ) : (
-                        <span className="mt-2 w-4 shrink-0" aria-hidden />
+                        <span className="mt-2.5 w-4 shrink-0" aria-hidden />
                       )}
                       <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-start justify-between gap-3">
-                          <div className="min-w-0 flex-1">
-                            <p className="text-lg font-bold text-[var(--foreground)]">{r.candidate_name}</p>
-                            <p className="twin-muted mt-0.5 text-xs sm:text-sm">
-                              {t("recruiterInbox.cardMetaLine")
-                                .replace("{job}", r.job_title)
-                                .replace("{company}", r.company)
-                                .replace("{id}", String(r.application_id))}
-                            </p>
-                          </div>
-                          <div className="flex flex-wrap items-center justify-end gap-2">
-                            {typeof r.match_score === "number" ? (
-                              <span className={recruiterInboxMatchScoreBadgeClass(scoreTone)}>
-                                {t("recruiterInbox.matchScoreBadge").replace("{score}", String(Math.round(r.match_score)))}
-                              </span>
+                        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:gap-8">
+                          <div
+                            className={`${RECRUITER_INBOX_VISUAL_MARKERS.contentZone} min-w-0 flex-1 space-y-4`}
+                          >
+                            <div>
+                              <p className="text-xl font-bold tracking-tight text-[var(--foreground)] sm:text-2xl">
+                                {r.candidate_name}
+                              </p>
+                              <p className="twin-muted mt-1 text-sm leading-relaxed sm:text-base">
+                                {t("recruiterInbox.cardMetaLine")
+                                  .replace("{job}", r.job_title)
+                                  .replace("{company}", r.company)
+                                  .replace("{id}", String(r.application_id))}
+                              </p>
+                              {r.match_score_label || typeof r.match_score === "number" ? (
+                                <p className="mt-2 text-base font-medium text-[var(--twin-muted-strong)]">
+                                  {matchScoreLabelKey(r.match_score_label)}
+                                </p>
+                              ) : null}
+                            </div>
+                            {evidencePreview.visible.length > 0 ? (
+                              <div>
+                                <p className={recruiterInboxSectionLabelClass()}>
+                                  {t("recruiterInbox.cardWhyReview")}
+                                </p>
+                                <div className="mt-2.5 flex flex-wrap gap-2">
+                                  {evidencePreview.visible.map((chip) => (
+                                    <span
+                                      key={`evidence-${r.application_id}-${chip}`}
+                                      className={recruiterInboxEvidenceChipClass()}
+                                      title={chip}
+                                    >
+                                      {chip}
+                                    </span>
+                                  ))}
+                                  {evidencePreview.moreCount > 0 ? (
+                                    <span className={recruiterInboxChipMoreClass()}>
+                                      {chipMoreLabel(evidencePreview.moreCount)}
+                                    </span>
+                                  ) : null}
+                                </div>
+                              </div>
+                            ) : null}
+                            {verificationPreview.visible.length > 0 ? (
+                              <div>
+                                <p className={recruiterInboxSectionLabelClass()}>
+                                  {t("recruiterInbox.cardNeedsVerification")}
+                                </p>
+                                <div className="mt-2.5 flex flex-wrap gap-2">
+                                  {verificationPreview.visible.map((chip, index) => (
+                                    <span
+                                      key={`verify-${r.application_id}-${chip}-${index}`}
+                                      className={
+                                        confidenceKey && chip === t(confidenceKey)
+                                          ? recruiterInboxNeutralChipClass()
+                                          : recruiterInboxWarningChipClass()
+                                      }
+                                      title={chip}
+                                    >
+                                      {chip}
+                                    </span>
+                                  ))}
+                                  {verificationPreview.moreCount > 0 ? (
+                                    <span className={recruiterInboxChipMoreClass()}>
+                                      {chipMoreLabel(verificationPreview.moreCount)}
+                                    </span>
+                                  ) : null}
+                                </div>
+                              </div>
                             ) : null}
                             {badgeLabel ? (
-                              <span
-                                className={recruiterInboxStatusBadgeClass(
-                                  recruiterInboxDecisionBadge(r.status) === "accepted" ? "accepted" : "declined",
-                                )}
-                              >
-                                {badgeLabel}
-                              </span>
-                            ) : statusKey ? (
-                              <span className={recruiterInboxStatusBadgeClass("awaiting")}>
-                                {t(`recruiterInbox.${statusKey}` as TranslationKey)}
-                              </span>
+                              <p className="twin-muted text-sm">{t("recruiterInbox.decisionSaved")}</p>
                             ) : null}
-                          </div>
-                        </div>
-                        {r.match_score_label || typeof r.match_score === "number" ? (
-                          <p className="mt-2 text-sm font-medium text-[var(--twin-muted-strong)]">
-                            {matchScoreLabelKey(r.match_score_label)}
-                          </p>
-                        ) : null}
-                        {evidenceChips.length > 0 ? (
-                          <div className="mt-4">
-                            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--twin-muted-strong)]">
-                              {t("recruiterInbox.cardWhyReview")}
-                            </p>
-                            <div className="mt-2 flex flex-wrap gap-2">
-                              {evidenceChips.map((chip) => (
-                                <span
-                                  key={`evidence-${r.application_id}-${chip}`}
-                                  className={recruiterInboxEvidenceChipClass()}
-                                  title={chip}
-                                >
-                                  {chip}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        ) : null}
-                        {missingChip || confidenceKey ? (
-                          <div className="mt-3">
-                            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--twin-muted-strong)]">
-                              {t("recruiterInbox.cardNeedsVerification")}
-                            </p>
-                            <div className="mt-2 flex flex-wrap gap-2">
-                              {missingChip ? (
-                                <span
-                                  className={recruiterInboxWarningChipClass()}
-                                  title={missingChip}
-                                >
-                                  {missingChip}
-                                </span>
-                              ) : null}
-                              {confidenceKey ? (
-                                <span className={recruiterInboxNeutralChipClass()}>
-                                  {t(confidenceKey)}
-                                </span>
-                              ) : null}
-                            </div>
-                          </div>
-                        ) : null}
-                        {badgeLabel ? (
-                          <p className="twin-muted mt-3 text-xs">{t("recruiterInbox.decisionSaved")}</p>
-                        ) : null}
-                        {r.review_card ? (
-                          <div className="mt-4">
-                            <button
-                              type="button"
-                              className={recruiterInboxReviewCardCtaClass()}
-                              aria-expanded={reviewExpanded}
-                              onClick={() => toggleReviewCard(r.application_id)}
-                            >
-                              {reviewExpanded
-                                ? t("recruiterInbox.hideReviewCardExpanded")
-                                : t("recruiterInbox.openReviewCard")}
-                              <svg
-                                className={`h-4 w-4 shrink-0 transition-transform ${reviewExpanded ? "rotate-180" : ""}`}
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                aria-hidden="true"
-                              >
-                                <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-                              </svg>
-                            </button>
-                            {reviewExpanded ? (
-                          <div className="mt-2 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/60 p-4">
+                            {reviewExpanded && r.review_card ? (
+                          <div className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/60 p-4 sm:p-5">
                             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--twin-border)]/60 pb-2">
                               <p className="text-xs font-semibold text-[var(--foreground)]">
                                 {t("recruiterInbox.reviewCardDueDiligence")}
@@ -959,71 +946,117 @@ export default function RecruiterInboxClient() {
                               })}
                             </dl>
                           </div>
-                        ) : null}
-                      </div>
-                    ) : null}
-                    {actionable ? (
-                    <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-[var(--twin-border)]/60 pt-4">
-                      <button
-                        type="button"
-                        className={`${RECRUITER_INBOX_VISUAL_MARKERS.acceptButton} twin-btn-solid text-sm`}
-                        disabled={busyId !== null}
-                        onClick={() => void respond(r.application_id, "accept")}
-                      >
-                        {busyId === `${r.application_id}-accept`
-                          ? t("common.loadingEllipsis")
-                          : t("recruiterInbox.accept")}
-                      </button>
-                      <button
-                        type="button"
-                        className={recruiterInboxDeclineButtonClass()}
-                        disabled={busyId !== null}
-                        onClick={() => {
-                          setDeclineTargetId(r.application_id);
-                          setDeclineNote("");
-                        }}
-                      >
-                        {t("recruiterInbox.decline")}
-                      </button>
-                    </div>
-                    ) : null}
-                    {actionable && declineTargetId === r.application_id ? (
-                      <div className="mt-3 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/80 p-3">
-                        <label className="block text-xs font-medium text-[var(--foreground)]">
-                          {t("recruiterInbox.declineNoteLabel")}
-                          <textarea
-                            className="twin-input mt-1 min-h-[4rem] w-full text-sm"
-                            value={declineNote}
-                            onChange={(e) => setDeclineNote(e.target.value)}
-                            placeholder={t("recruiterInbox.declineNotePlaceholder")}
-                          />
-                        </label>
-                        <div className="mt-2 flex flex-wrap gap-2">
-                          <button
-                            type="button"
-                            className="twin-btn-solid text-xs"
-                            disabled={busyId !== null}
-                            onClick={() =>
-                              void respond(r.application_id, "decline", { decline_note: declineNote })
-                            }
+                            ) : null}
+                          </div>
+                          <div
+                            className={`${RECRUITER_INBOX_VISUAL_MARKERS.actionZone} flex w-full shrink-0 flex-col gap-3 border-t border-[var(--twin-border)]/60 pt-4 lg:w-56 lg:border-t-0 lg:pt-0 xl:w-64`}
                           >
-                            {busyId === `${r.application_id}-decline`
-                              ? t("common.loadingEllipsis")
-                              : t("recruiterInbox.declineConfirm")}
-                          </button>
-                          <button
-                            type="button"
-                            className="twin-btn-ghost text-xs"
-                            onClick={() => {
-                              setDeclineTargetId(null);
-                              setDeclineNote("");
-                            }}
-                          >
-                            {t("recruiterInbox.declineCancel")}
-                          </button>
+                            {typeof r.match_score === "number" ? (
+                              <span className={recruiterInboxMatchScoreBadgeClass(scoreTone, { dominant: true })}>
+                                {t("recruiterInbox.matchScoreBadge").replace("{score}", String(Math.round(r.match_score)))}
+                              </span>
+                            ) : null}
+                            {badgeLabel ? (
+                              <span
+                                className={`${recruiterInboxStatusBadgeClass(
+                                  recruiterInboxDecisionBadge(r.status) === "accepted" ? "accepted" : "declined",
+                                )} w-full justify-center`}
+                              >
+                                {badgeLabel}
+                              </span>
+                            ) : statusKey ? (
+                              <span className={`${recruiterInboxStatusBadgeClass("awaiting")} w-full justify-center`}>
+                                {t(`recruiterInbox.${statusKey}` as TranslationKey)}
+                              </span>
+                            ) : null}
+                            {r.review_card ? (
+                              <button
+                                type="button"
+                                className={recruiterInboxReviewCardCtaClass()}
+                                aria-expanded={reviewExpanded}
+                                onClick={() => toggleReviewCard(r.application_id)}
+                              >
+                                <span>
+                                  {reviewExpanded
+                                    ? t("recruiterInbox.hideReviewCardExpanded")
+                                    : t("recruiterInbox.openReviewCard")}
+                                </span>
+                                <svg
+                                  className={`h-5 w-5 shrink-0 transition-transform ${reviewExpanded ? "rotate-180" : ""}`}
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  aria-hidden="true"
+                                >
+                                  <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                              </button>
+                            ) : null}
+                            {actionable ? (
+                              <div className="flex flex-col gap-2">
+                                <button
+                                  type="button"
+                                  className={`${RECRUITER_INBOX_VISUAL_MARKERS.acceptButton} twin-btn-solid w-full text-sm`}
+                                  disabled={busyId !== null}
+                                  onClick={() => void respond(r.application_id, "accept")}
+                                >
+                                  {busyId === `${r.application_id}-accept`
+                                    ? t("common.loadingEllipsis")
+                                    : t("recruiterInbox.accept")}
+                                </button>
+                                <button
+                                  type="button"
+                                  className={`${recruiterInboxDeclineButtonClass()} w-full`}
+                                  disabled={busyId !== null}
+                                  onClick={() => {
+                                    setDeclineTargetId(r.application_id);
+                                    setDeclineNote("");
+                                  }}
+                                >
+                                  {t("recruiterInbox.decline")}
+                                </button>
+                              </div>
+                            ) : null}
+                            {actionable && declineTargetId === r.application_id ? (
+                              <div className="rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/80 p-3">
+                                <label className="block text-sm font-medium text-[var(--foreground)]">
+                                  {t("recruiterInbox.declineNoteLabel")}
+                                  <textarea
+                                    className="twin-input mt-1 min-h-[4rem] w-full text-sm"
+                                    value={declineNote}
+                                    onChange={(e) => setDeclineNote(e.target.value)}
+                                    placeholder={t("recruiterInbox.declineNotePlaceholder")}
+                                  />
+                                </label>
+                                <div className="mt-2 flex flex-col gap-2">
+                                  <button
+                                    type="button"
+                                    className="twin-btn-solid w-full text-sm"
+                                    disabled={busyId !== null}
+                                    onClick={() =>
+                                      void respond(r.application_id, "decline", { decline_note: declineNote })
+                                    }
+                                  >
+                                    {busyId === `${r.application_id}-decline`
+                                      ? t("common.loadingEllipsis")
+                                      : t("recruiterInbox.declineConfirm")}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="twin-btn-ghost w-full text-sm"
+                                    onClick={() => {
+                                      setDeclineTargetId(null);
+                                      setDeclineNote("");
+                                    }}
+                                  >
+                                    {t("recruiterInbox.declineCancel")}
+                                  </button>
+                                </div>
+                              </div>
+                            ) : null}
+                          </div>
                         </div>
-                      </div>
-                    ) : null}
                       </div>
                     </div>
                   </li>

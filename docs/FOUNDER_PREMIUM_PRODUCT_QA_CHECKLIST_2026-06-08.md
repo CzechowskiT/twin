@@ -89,6 +89,7 @@
 | 4.5 | Decided rows | Interview/rejected show badge only — no accept |
 | 4.6 | Access strip | Collapsed after queue load — decision console is visual focus |
 | 4.7 | Contrast (dark theme) | Match/status badges, chips, review CTA, decline readable without zoom (`docs/RECRUITER_INBOX_CONTRAST_READABILITY_FIX_2026-06-10.md`) |
+| 4.8 | Layout & scanability | Two-zone cards, dominant match score, ≤2 chips + overflow, sentence-case labels (`docs/RECRUITER_INBOX_READABILITY_LAYOUT_POLISH_2026-06-10.md`) |
 | 4.8 | PL chip copy | Known demo reasons localized — no obvious English leakage in PL UI |
 
 **Score §4:** ___ / 10 (cap 6 for rubric: average × 6/10)
