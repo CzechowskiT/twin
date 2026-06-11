@@ -1,36 +1,50 @@
-# Recruiter decision rail — final readability fix — 2026-06-11
+# Recruiter decision rail — forced contrast fix — 2026-06-11
 
-**Branch:** `fix/recruiter-decision-rail-final-readability-2026-06-11`  
-**Follows:** PR #75 rejection — rail text still looked disabled on production dark theme
+**Branch:** `fix/recruiter-decision-rail-forced-contrast-2026-06-11`  
+**Follows:** PR #76 — rail text still unreadable on production screenshot
 
 ---
 
-## Problem
+## Root cause
 
-Founder screenshot review: active rail copy still read as low-contrast / disabled:
+TWIN production runs **`MARKETING_SURFACE = "studio"`** (`src/lib/marketing-surface.ts`). Dark tokens apply via:
 
-- **Dopasowanie** / **32%** / **Słabe dopasowanie** — muted label and tone-colored text
-- **Oczekuje decyzji** — cyan wash with tinted label
-- **Zobacz kartę oceny** — cyan text on cyan bg
-- **Odrzuć** — rose-100 looked like a ghost button
+```html
+<html data-marketing-surface="studio">
+```
+
+and `html[data-marketing-surface="studio"] { --foreground: #f8fafc; … }` in `globals.css`.
+
+PR #76 used Tailwind **`dark:text-white`** / **`dark:text-slate-100`** fallbacks. Tailwind `dark:` variants require **`.dark` on `<html>`** or **`prefers-color-scheme: dark`** — neither is set. Studio mode only flips **CSS variables**, so the **light-mode** classes won:
+
+| Element | Applied (broken) | Intended |
+| ------- | ---------------- | -------- |
+| Słabe dopasowanie | `text-slate-800` | light text |
+| Oczekuje decyzji | `text-slate-900` | light text |
+| Zobacz kartę oceny | `text-slate-900` | light text |
+| Odrzuć | `text-rose-950` | light text |
+
+Only **Zaakceptuj** (`twin-btn-solid`) stayed readable because it uses `--twin-on-accent`, not `dark:`.
 
 ---
 
 ## Fix (visual tokens only)
 
-| Element | Change |
-| ------- | ------ |
-| Match label (`Dopasowanie`) | `dark:text-slate-300` |
-| Match value (`32%`) | `dark:text-white` |
-| Match tone (`Słabe dopasowanie`) | `dark:text-white` — amber/cyan/emerald **border + bg only** |
-| Status pill | `dark:text-slate-100`; cyan border/bg accent |
-| Review CTA | `dark:text-white`; cyan border/bg; chevron `dark:text-cyan-300` |
-| Decline | `dark:text-white`; rose border/bg — active, not disabled |
-| Rail shell | Lighter fill (`surface-2/20`), slimmer border/padding |
+Use **`text-[var(--foreground)]`** and **`text-[var(--twin-muted-strong)]`** — these follow studio/heritage without `dark:`.
 
-**Files:** `recruiter-inbox-visual.ts`, `recruiter-match-score-card.tsx` (unchanged API), `recruiter-decision-rail.tsx` (unchanged API), `recruiter-decision-rail-readability.test.ts`
+| Element | Text | Accent (border/bg only) |
+| ------- | ---- | ----------------------- |
+| Match label | `--twin-muted-strong` | — |
+| Match value | `--foreground` | — |
+| Match tone | `--foreground` | amber/cyan/emerald card border + bg |
+| Status pill | `--foreground` | cyan/emerald/rose border + bg |
+| Review CTA | `--foreground` | cyan border + bg; chevron `text-cyan-300` |
+| Decline | `--foreground` | rose border + bg |
+| Rail shell | — | lighter `surface-raised/25`, `p-3`, `gap-2` |
 
-**Unchanged:** layout, accept/decline behavior, PII, review card, i18n strings, backend.
+**Files:** `recruiter-inbox-visual.ts`, `recruiter-decision-rail-readability.test.ts`, `recruiter-inbox-visual.test.ts`
+
+**Unchanged:** components API, accept/decline behavior, PII, review card, i18n, backend.
 
 ---
 
@@ -48,6 +62,8 @@ npm run test:pii-data-visibility
 npm run test:trust-language-guard
 npm run lint && npx tsc --noEmit && npm run build
 ```
+
+New guards: forbid `text-amber-900`, `text-cyan-700`, `text-slate-900`, etc. on rail tokens; forbid `dark:text-*` as sole readable-text strategy.
 
 ---
 
