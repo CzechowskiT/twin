@@ -1,0 +1,130 @@
+/** Italian supplemental FAQ (82 keys) — generated source for seed-faq-locale-overlays.ts */
+export const supplementalIt: Record<string, string> = {
+  general04Q: "Cos'è il «calendario di accettazione»?",
+  general04A:
+    "Dopo un'assenza dovresti tornare a una lista breve su cui agire — colloqui e profili da accettare o rifiutare in un gesto — non migliaia di CV grezzi o spam casuale. Matching, consenso, lavoro asincrono, accettazione batch e export/sync calendario servono questo risultato.",
+  general05Q: "E privacy e GDPR?",
+  general05A:
+    "Dai consenso esplicito alla registrazione. I dati del profilo alimentano ranking e funzioni prodotto. Conservazione, export e diritti sono nella Privacy Policy. Riduciamo contatti a sorpresa dall'employer; la verifica placement è self-serve in prodotto per default.",
+
+  candidates01Q: "Come funziona il matching delle offerte?",
+  candidates01A:
+    "Oggi: le offerte dai portali attivi sono salvate, deduplicate e classificate sui segnali del profilo (skill, preferenze, storico). Le spiegazioni migliorano per fasi pubbliche — l'obiettivo è meno falsi positivi, non massimo volume.",
+  candidates02Q: "Quali job board sono supportati?",
+  candidates02A:
+    "Fase 1: portali polacchi come pracuj.pl e rocketjobs.pl, più LinkedIn se configurato. Scegli le fonti; in beta gli scraper possono essere su allowlist ops. Altri portali quando compliance e affidabilità lo consentono.",
+  candidates03Q: "Cos'è l'auto-apply — ed è live?",
+  candidates03A:
+    "L'auto-apply notturna solo dopo consenso esplicito e dove il flusso del portale è automatizzabile in sicurezza. È nel repo con scheduling Celery — trattala come beta: non ogni annuncio è idoneo. Puoi rivedere invii e stato nella pipeline.",
+  candidates04Q: "TWIN può adattare il CV a una posizione?",
+  candidates04A:
+    "Sì — Career Assistant include ottimizzazione CV orientata ATS per un lavoro specifico quando hai un CV nel profilo. Output da rivedere; non sostituiamo il CV master senza la tua scelta.",
+  candidates05Q: "Cosa include il Career Assistant?",
+  candidates05A:
+    "Oggi: intel su azienda, bozze cover letter, insight hiring manager, prep colloquio, brief negoziazione, email di follow-up e suggerimenti LinkedIn — con dati profilo e uso esplicito. Le funzioni evolvono; vedi etichette in-app.",
+  candidates06Q: "Come funzionano calendario e hold colloquio?",
+  candidates06A:
+    "Disponibile: OAuth Google Calendar (occupato + hold dove configurato), link WebCal e export ICS. Microsoft 365 via Graph con OAuth quando le credenziali API sono impostate. Utenti Apple di solito usano WebCal/ICS — non c'è un unico «Accedi con Apple Calendar».",
+  candidates07Q: "Cos'è la coda di accettazione candidato?",
+  candidates07A:
+    "Lista breve nel dashboard di hold e match forti da tenere, riprogrammare o rifiutare — calendario intenzionale. Integra slot proposti dal recruiter; non è una seconda inbox spam.",
+  candidates08Q: "Come funziona la verifica placement per i candidati?",
+  candidates08A:
+    "Autodichiarazione in-app, magic link email lavoro opzionale e link attestazione employer one-click — non loop email «hai firmato?». Macchina stati e billing completi sono a fasi; vedi docs/PLACEMENT_VERIFICATION.md.",
+  candidates09Q: "Quanto costa per i candidati?",
+  candidates09A:
+    "Checkout candidato con Stripe per piani a pagamento; campagne lista fondatori possono dare accesso gratuito per coorti early. Controlla billing dopo login — niente fee nascoste in FAQ.",
+  candidates10Q: "TWIN sostituisce i recruiter?",
+  candidates10A:
+    "No. Meno rumore: candidati con mosse più pertinenti; recruiter con accettazione batch e segnali ATS invece di flood CV. Le persone decidono le assunzioni; il software gestisce ranking, burocrazia e igiene calendario.",
+  candidates11Q: "Cosa fare prima di affidarsi all'automazione a fasi?",
+  candidates11A:
+    "Completa profilo, carica CV, collega calendario se vuoi hold, attiva solo portali fidati e leggi il consenso auto-apply. Inizia con salvataggi e apply manuali. Auto-apply è in pausa in produzione oggi — prima pacchetti prepare-only.",
+
+  recruiters01Q: "Cos'è la inbox di accettazione per i recruiter?",
+  recruiters01A:
+    "Superficie pilota per slug azienda: coda breve di candidature da accettare a colloquio o rifiutare senza usare l'email come sistema. Serve token recruiter dal link pilota TWIN — non inbox pubblica aperta.",
+  recruiters02Q: "In cosa differisce l'accettazione batch da una inbox ATS normale?",
+  recruiters02A:
+    "Accettazione batch su righe pre-qualificate: accetta o passa in un schermo, verso passi pronti per il calendario. Non massimizziamo il volume grezzo — qualità e barra di match prima.",
+  recruiters03Q: "Posso pubblicare offerte su TWIN?",
+  recruiters03A:
+    "Sì — pubblicazione offerte employer per workspace recruiter legati a uno slug. Le offerte alimentano matching e applicazioni come i job scrapati dove configurato.",
+  recruiters04Q: "Quali integrazioni ATS esistono oggi?",
+  recruiters04A:
+    "Webhook hire per Greenhouse, Lever e Ashby segnano placement verificati con external_ats_id collegato. Pulsanti OAuth Greenhouse/Lever se le env API sono impostate; altrimenti webhook manuali. Integrazione tecnica — non sostituto ATS completo.",
+  recruiters05Q: "Come collegare le applicazioni a Greenhouse?",
+  recruiters05A:
+    "Salva external_ats_id e external_ats_provider (greenhouse, lever, ashby) sulla riga applicazione TWIN per riconciliare eventi hire. Vedi ATS_WEBHOOKS.md e la pagina webhook ATS in-app.",
+  recruiters06Q: "Quali stadi pipeline traccia TWIN?",
+  recruiters06A:
+    "I candidati vedono stato in una pipeline; i recruiter code orientate all'accettazione e flussi attestazione. Sync profonda stadi ATS è roadmap — oggi focus su hand-off pronti all'accettazione.",
+  recruiters07Q: "Come si fatturano i posti recruiter?",
+  recruiters07A:
+    "Posti B2B su fattura (non checkout Stripe candidato). Il contratto definisce posti, slug azienda e inclusione webhook ATS o link attestazione.",
+  recruiters08Q: "L'employer può confermare l'assunzione senza account TWIN?",
+  recruiters08A:
+    "Sì — il candidato può condividere URL attestazione employer one-click (nonce, scade) così l'hiring manager conferma senza login. Verifica assistita da macchina invece di ping-pong email CS.",
+  recruiters09Q: "Cosa non è ancora live per i recruiter?",
+  recruiters09A:
+    "SSO enterprise completo, sync bidirezionale profonda stadi ATS e governance multi-tenant rifinita sono in hardening. I piloti dovrebbero aspettarsi inbox su token e hook ATS webhook-first.",
+
+  companies01Q: "Cosa acquistano le aziende da TWIN?",
+  companies01A:
+    "Programmi B2B annuali: copertura sourcing, posti recruiter, verifica webhook ATS opzionale ed economia placement su assunzioni verificate — non pay-per-CV spam. SKU procurement separati dalle subscription candidato.",
+  companies02Q: "Come si avvia di solito il procurement?",
+  companies02A:
+    "Percorso standard: questionario sicurezza, DPA, order form annuale e slug azienda definiti. Flussi dati (scraping, AI, calendario) nei pack legali; finanze riservate fuori dal sito pubblico.",
+  companies03Q: "Come verificate il placement per le fee?",
+  companies03A:
+    "Default: dichiarazione candidato self-serve, prova email lavoro opzionale, attestazione employer o webhook hire ATS — eventi append-only, senza team che insegue «firmato?». Dispute in coda eccezioni, non ping-pong manuale.",
+  companies04Q: "Il nostro ATS può essere fonte di verità?",
+  companies04A:
+    "Per conferma assunzione sì — webhook Greenhouse, Lever o Ashby sono il profilo preferito se contrattualizzato. TWIN mostra ancora discovery e match ai candidati; l'ATS può guidare il ciclo requisition.",
+  companies05Q: "Quali dati escono dal nostro perimetro?",
+  companies05A:
+    "Profili candidati, eventi applicazione e metadati calendario opzionali che autorizzi. Click attestazione employer registrano conferma senza account TWIN completi. Subprocessor e regioni in Privacy Policy e DPA B2B.",
+  companies06Q: "Contattate dipendenti o candidati a sorpresa?",
+  companies06A:
+    "Niente campagne outbound a sorpresa verso l'employer. Email transazionale solo in flussi con consenso (magic link, richieste attestazione avviate dal candidato). Marketing alla forza lavoro non è default B2B.",
+  companies07Q: "Cosa c'è sulla roadmap enterprise?",
+  companies07A:
+    "Calendario Microsoft su scala, SSO più ricco, HRIS oltre webhook ATS ed eleggibilità fattura automatica legata alla macchina stati placement. Spediamo quando l'auditabilità è chiara — non quando uno slide dice «sistema completo».",
+
+  investors01Q: "Dove si trova la data room per investitori?",
+  investors01A:
+    "Workspace investitore dopo login: pack trazione pubblico (dashboard metriche, JSON MVP, OpenAPI, status, export calcolatore) più placeholder per cap table e finanze audit. Richiedi accesso per download riservati.",
+  investors02Q: "C'è un NDA prima dei materiali riservati?",
+  investors02A:
+    "Uno stub NDA in sessione browser sblocca placeholder anteprima oggi; cap table, finanze e legal completi richiedono accesso firmato via contatto. Registrazione documenti attiva; upload S3 presigned dipende da env API.",
+  investors03Q: "Quali metriche senza un meeting?",
+  investors03A:
+    "Metriche MVP live e dashboard investitori (job validati, segnali salute sistema, uso prodotto dove strumentato). Numeri beta, non finanze audit — quelle dietro accesso riservato.",
+  investors04Q: "Come pensate all'economia della verifica placement?",
+  investors04A:
+    "Evitiamo il «ping-pong CS» da marketplace — verifica in prodotto assistita da macchina con attestazione employer e webhook ATS opzionali. Scala il margine lordo meglio dei loop email manuali, con eccezioni solo dove serve.",
+  investors05Q: "Cosa è difendibile vs i job board?",
+  investors05A:
+    "Normalizzazione cross-board, automazione con consenso, UX orientata all'accettazione su entrambi i lati ed esiti sincronizzati al calendario. I board ottimizzano annunci; TWIN ottimizza il percorso da discovery a placement verificato con meno rumore.",
+  investors06Q: "Fase attuale e trazione onesta?",
+  investors06A:
+    "MVP fase 1: FastAPI + Celery + Postgres, scraper portali PL, matching, applicazioni, auto-apply e calendario early, superfici multi-persona. Trazione da pilota — valida su /status, metriche e design partner, non volume vanità.",
+  investors07Q: "Come richiedere una call di diligence più profonda?",
+  investors07A:
+    "Usa i flussi richiesta accesso riservato nella data room o contatti nello workspace investitore. Porta la checklist — preferiamo domande concrete su sicurezza ed economia unitaria a tour deck generici.",
+  investors08Q: "Sono un angel — che diluizione e cap table aspettarmi?",
+  investors08A:
+    "Pre-round istituzionale: nessun cap table pubblico sul sito marketing. Materiali riservati e termini round dopo NDA e fit reciproco. Trazione e profondità prodotto ispezionabili senza meeting via metriche live e demo.",
+  investors09Q: "Siamo VC — qual è il wedge Polonia + UE?",
+  investors09A:
+    "Fase 1 su portali polacchi (pracuj.pl, rocketjobs.pl) con ruoli remote UE nel feed, consenso GDPR-first e UX calendario accettazione in EN e PL. Espansione adapter-driven (registro portali + compliance), non clone board mono-paese.",
+  investors10Q: "Siamo PE — ci sono ricavi e finanze audit?",
+  investors10A:
+    "Risposta onesta: trazione MVP early, non ricavi scala PE né bilanci audit sul sito pubblico. Programmi enterprise ed economia verifica placement sono la storia margine che costruiamo; finanze in diligence riservata quando appropriato.",
+  investors11Q: "Posso vedere unit economics prima di un partner meeting?",
+  investors11A:
+    "Sì — il calcolatore scenario investitore è illustrativo (sensibilità success fee, costi team, infra). Modello diligence, non forecast né offerta. Aggregati uso live su /investor/metrics con etichetta beta.",
+  investors12Q: "Cosa dovrebbero aprire prima i partner YC?",
+  investors12A:
+    "Inizia da /for-investors/yc: demo interattiva, JSON metriche MVP, dashboard metriche e sign-in workspace per export. Preferiamo domande prodotto concrete a walk deck generico.",
+};

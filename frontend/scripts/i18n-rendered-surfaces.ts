@@ -25,6 +25,7 @@ export const RENDERED_HOME_KEYS = [
   "home.ctaBandWishlistMicro",
   "home.ctaDemoSecondary",
   "home.getStarted",
+  "home.ctaRegisterMicro",
   "home.howTitle",
   "home.featureGridTitle",
   "home.feature6Title",
@@ -66,6 +67,14 @@ export const RENDERED_FAQ_KEYS = [
   "faq.sectionCandidates",
   "faq.general01Q",
   "faq.general01A",
+  "faq.candidates01Q",
+  "faq.candidates01A",
+  "faq.recruiters01Q",
+  "faq.recruiters01A",
+  "faq.companies01Q",
+  "faq.companies01A",
+  "faq.investors01Q",
+  "faq.investors01A",
 ] as const;
 
 export const RENDERED_LOGIN_HUB_KEYS = [
@@ -137,13 +146,26 @@ export const FORBIDDEN_EN_MARKETING: ForbiddenRule[] = [
   { pattern: /Finally one pipeline instead of twenty tabs/i, label: "socialProofQuote EN" },
   { pattern: /Validated jobs/i, label: "statJobs EN" },
   { pattern: /Questions & answers/i, label: "faqTitle EN" },
+  { pattern: /See your matches in ~2 min/i, label: "ctaRegisterMicro EN" },
+  { pattern: /How does job matching work\?/i, label: "candidates01Q EN" },
+  { pattern: /What is the recruiter acceptance inbox\?/i, label: "recruiters01Q EN" },
+  { pattern: /What do companies buy from TWIN\?/i, label: "companies01Q EN" },
+  { pattern: /Where is the investor data room\?/i, label: "investors01Q EN" },
 ];
 
 export const EXACT_BAD_EXAMPLES: Partial<Record<Locale, (string | RegExp)[]>> = {
   es: ["See what's inside", "Join founding wishlist", "Join wishlist", /\bwishlist\b/i, /\bfounding\b/i],
   de: ["Founding-Wishlist", "Early Access", "See what's inside", "Join founding wishlist"],
   fr: ["Wishlist →", "founding queue", "early access gratuit"],
-  it: ["wishlist founding", "early access gratuito"],
+  it: [
+    "wishlist founding",
+    "early access gratuito",
+    "See your matches in ~2 min",
+    "How does job matching work?",
+    "What is the recruiter acceptance inbox?",
+    "What do companies buy from TWIN?",
+    "Where is the investor data room?",
+  ],
   zh: ["founding 候补", "Wishlist"],
   ja: ["founding ウェイトリスト", "Wishlist"],
   ar: ["Wishlist", "founding"],
