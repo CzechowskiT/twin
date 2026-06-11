@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from app.api.recruiter import _resolved_company_slug
 from app.config import Settings, get_settings
 from app.database.session import get_db
+from app.services.company_hiring_dashboard import build_company_hiring_dashboard
 from app.services.company_pipeline_quality import build_company_pipeline_quality
 from app.services.company_roles import (
     create_company_role,
@@ -48,6 +49,29 @@ class CompanyRolePatchIn(BaseModel):
     nice_to_have_skills: list[str] | None = None
     salary_min: int | None = None
     salary_max: int | None = None
+
+
+@router.get("/hiring-dashboard")
+def company_hiring_dashboard(
+    request: Request,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    """Executive hiring snapshot — roles, pipeline segments, team tokens (no PII)."""
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return build_company_hiring_dashboard(
+            db,
+            settings,
+            company_slug=slug,
+            raw_token=x_twin_recruiter_token or token,
+            locale=locale_from_request(request),
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
 
 @router.get("/pipeline-quality")

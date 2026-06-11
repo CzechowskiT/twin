@@ -129,10 +129,12 @@ export type TranslationKey =
   | `recruiterAudit.${keyof typeof en.recruiterAudit}`
   | `recruiterMessageDrafts.${keyof typeof en.recruiterMessageDrafts}`
   | `companyJobs.${keyof typeof en.companyJobs}`
+  | `companyHiring.${keyof typeof en.companyHiring}`
   | `recruiterSearch.${keyof typeof en.recruiterSearch}`
   | `recruiterJobs.${keyof typeof en.recruiterJobs}`
   | `recruiterCalendar.${keyof typeof en.recruiterCalendar}`
   | `companyPipeline.${keyof typeof en.companyPipeline}`
+  | `companyHiring.${keyof typeof en.companyHiring}`
   | `companyTeam.${keyof typeof en.companyTeam}`
   | `recruiterScheduling.${keyof typeof en.recruiterScheduling}`
   | `recruiterPipeline.${keyof typeof en.recruiterPipeline}`
@@ -2642,6 +2644,31 @@ eyebrow: "Product roadmap",
     linkInboxDesc: "Pre-qualified queue with match score and human accept/decline.",
     linkJobsDesc: "Post roles so future matches can enter your queue.",
     linkStoryDesc: "What is live vs roadmap for the recruiter pilot.",
+  },
+  companyHiring: {
+    eyebrow: "Company workspace",
+    title: "Hiring dashboard",
+    lead:
+      "Executive snapshot of roles, pipeline segments, and team access for your TWIN workspace — pilot data only, no revenue or hire-velocity claims.",
+    navDashboard: "Hiring dashboard",
+    load: "Load dashboard",
+    loading: "Loading dashboard…",
+    workspaceLine: "Workspace · {company}",
+    metricRolesTotal: "Roles defined",
+    metricRolesActive: "Active roles",
+    metricApplications: "Applications tracked",
+    metricTeamTokens: "Team access tokens",
+    metricTeamTokensHint: "Labeled pilot tokens — invites and RBAC are not live yet.",
+    pipelineTitle: "Pipeline segments",
+    pipelineLead: "Same segment counts as the pipeline quality view — no time-to-hire or conversion metrics.",
+    readinessTitle: "Pilot readiness",
+    readinessBody: "Honest status for this workspace — billing and public launch remain gated.",
+    readinessBilling: "Employer billing and self-serve checkout are NOT LIVE.",
+    readinessLaunch: "Public launch remains NO-GO — controlled recruiter pilot only.",
+    emptyTitle: "Load your hiring dashboard",
+    emptyBody: "Enter your pilot access code and company slug to see the executive snapshot.",
+    emptyStep1: "Use the access code from your TWIN invite email.",
+    emptyStep2: "Pick the company slug tied to your workspace.",
   },
   companyPipeline: {
     eyebrow: "Company workspace",
@@ -6232,6 +6259,31 @@ const pl: MessageTree = {
     linkInboxDesc: "Kolejka pre-kwalifikowana z wynikiem dopasowania i akceptuj/odrzuć.",
     linkJobsDesc: "Publikuj role, aby przyszłe dopasowania trafiały do kolejki.",
     linkStoryDesc: "Co jest live, a co roadmapą w pilotażu rekrutera.",
+  },
+  companyHiring: {
+    eyebrow: "Workspace firmy",
+    title: "Panel rekrutacyjny",
+    lead:
+      "Executive snapshot ról, segmentów pipeline i dostępu zespołu w workspace TWIN — tylko dane pilotażowe, bez przychodu ani metryk prędkości zatrudnień.",
+    navDashboard: "Panel rekrutacyjny",
+    load: "Załaduj panel",
+    loading: "Ładowanie panelu…",
+    workspaceLine: "Workspace · {company}",
+    metricRolesTotal: "Zdefiniowane role",
+    metricRolesActive: "Aktywne role",
+    metricApplications: "Śledzone aplikacje",
+    metricTeamTokens: "Tokeny dostępu zespołu",
+    metricTeamTokensHint: "Oznaczone tokeny pilotażowe — zaproszenia i RBAC nie są jeszcze live.",
+    pipelineTitle: "Segmenty pipeline",
+    pipelineLead: "Te same liczby co w widoku jakości pipeline — bez time-to-hire ani konwersji.",
+    readinessTitle: "Gotowość pilotażowa",
+    readinessBody: "Uczciwy status workspace — billing i publiczny launch pozostają zablokowane.",
+    readinessBilling: "Billing pracodawcy i self-serve checkout NIE SĄ LIVE.",
+    readinessLaunch: "Publiczny launch pozostaje NO-GO — tylko kontrolowany pilot rekrutera.",
+    emptyTitle: "Załaduj panel rekrutacyjny",
+    emptyBody: "Wpisz kod dostępu pilotażowego i slug firmy, aby zobaczyć executive snapshot.",
+    emptyStep1: "Użyj kodu dostępu z maila zaproszenia TWIN.",
+    emptyStep2: "Wybierz slug firmy powiązany z workspace.",
   },
   companyPipeline: {
     eyebrow: "Workspace firmy",
