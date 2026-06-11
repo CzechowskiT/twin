@@ -74,6 +74,18 @@ test("ES global chrome — founder-reported strings localized", () => {
   assert.match(byKey["nav.contact"] ?? "", /Contacto/i);
 });
 
+test("PL momentum rail — no English loanwords in authenticated sidebar copy", () => {
+  const rows = collectRenderedGlobalChromeStrings("pl");
+  const byKey = Object.fromEntries(rows.map((r) => [r.key, r.value]));
+  const tips = [byKey["site.momentumLead"], byKey["site.momentumTip1"], byKey["site.momentumTip6"]].join(" ");
+  assert.doesNotMatch(tips, /\bjob hunt/i);
+  assert.doesNotMatch(tips, /\bCRM\b/i);
+  assert.doesNotMatch(tips, /\bJD\b/i);
+  assert.doesNotMatch(tips, /\bbilling\b/i);
+  assert.doesNotMatch(tips, /\bfeed\b/i);
+  assert.match(byKey["site.momentumEyebrow"] ?? "", /Utrzymaj tempo/i);
+});
+
 test("DE global chrome — founder-reported strings localized", () => {
   const rows = collectRenderedGlobalChromeStrings("de");
   const byKey = Object.fromEntries(rows.map((r) => [r.key, r.value]));

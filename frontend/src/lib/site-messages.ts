@@ -349,14 +349,18 @@ export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } 
 
   momentumAria: "Podpowiedzi i skróty",
   momentumEyebrow: "Utrzymaj tempo",
-  momentumLead: "Małe nawyki wygrywają z „job huntem” raz w tygodniu.",
+  momentumLead: "Małe nawyki wygrywają z jednorazowym, heroicz szukaniem pracy raz w tygodniu.",
   momentumTip1:
-    "Gdy zapiszesz ofertę lub wyślesz aplikację z dopasowań albo feedu, wpisy trafiają do jednej osi czasu. Traktuj to jak prywatny CRM do momentu rozmów.",
-  momentumTip2: "Po edycji umiejętności lub docelowych stanowisk odśwież filtry, żeby feed złapał nowy sygnał.",
+    "Gdy zapiszesz ofertę lub wyślesz aplikację z dopasowań albo strumienia ofert, wpisy trafiają do jednej osi czasu. Traktuj to jak prywatny rejestr aplikacji do momentu rozmów.",
+  momentumTip2:
+    "Po edycji umiejętności lub docelowych stanowisk odśwież filtry, żeby strumień ofert złapał nowy sygnał.",
   momentumTip3: "Statusy zgodne z rzeczywistością (wysłana, rozmowa, odrzucona) utrzymują wiarygodność tygodniowego tempa.",
-  momentumTip4: "Gdy feed jest zbyt szeroki, zacieśnij frazy w tytule; poluzuj, gdy zobaczysz realne nazwy ról.",
-  momentumTip5: "Premium zdejmuje limity śledzonych aplikacji, gdy billing jest włączony w Twoim środowisku. Free wystarczy do skupionego szukania.",
-  momentumTip6: "Wymagające ogłoszenia otwieraj w nowej karcie; TWIN zapamięta decyzję, żebyś nie czytał tego samego JD po raz kolejny.",
+  momentumTip4:
+    "Gdy strumień ofert jest zbyt szeroki, zacieśnij frazy w tytule; poluzuj, gdy zobaczysz realne nazwy ról.",
+  momentumTip5:
+    "Premium zdejmuje limity śledzonych aplikacji, gdy rozliczenia są włączone w Twoim środowisku. Wersja bezpłatna wystarczy do skupionego szukania.",
+  momentumTip6:
+    "Wymagające ogłoszenia otwieraj w nowej karcie; TWIN zapamięta decyzję, żebyś nie czytał tego samego opisu stanowiska po raz kolejny.",
   momentumCtaWorkspace: "Otwórz przestrzeń roboczą",
   momentumCtaProfile: "Profil i CV",
   momentumCtaHome: "Strona główna",

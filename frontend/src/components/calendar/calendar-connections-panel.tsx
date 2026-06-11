@@ -52,7 +52,7 @@ function StatusBadge({ provider }: { provider: ProviderState }) {
   const { t } = useTranslation();
   const badge = providerBadgeHealth({
     connected: provider.connected,
-    health: provider.health ?? (provider.connected ? "ok" : "unknown"),
+    health: provider.health ?? "unknown",
     message: provider.message ?? null,
     provider: "google",
     email: provider.email,

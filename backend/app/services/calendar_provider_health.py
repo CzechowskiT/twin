@@ -13,8 +13,24 @@ from app.services.token_crypto import decrypt_secret
 
 CalendarProviderHealth = Literal["ok", "reconnect_required", "error", "unknown"]
 
-_GOOGLE_RECONNECT_MSG = "Calendar token expired or revoked; reconnect Google Calendar."
-_MICROSOFT_RECONNECT_MSG = "Microsoft token expired or revoked; reconnect Microsoft Calendar."
+GOOGLE_RECONNECT_MSG = "Calendar token expired or revoked; reconnect Google Calendar."
+MICROSOFT_RECONNECT_MSG = "Microsoft token expired or revoked; reconnect Microsoft Calendar."
+
+
+def calendar_upstream_auth_failure(exc: Exception) -> bool:
+    """True when Google/Microsoft Calendar API rejected the access token or scopes."""
+    text = str(exc).lower()
+    markers = (
+        '"code": 401',
+        '"code": 403',
+        "invalid_grant",
+        "invalid_credentials",
+        "autherror",
+        "insufficient permission",
+        "insufficientauthentication",
+        "unauthorized",
+    )
+    return any(m in text for m in markers)
 
 
 def probe_google_calendar_health(db: Session, user_id: int) -> tuple[bool, CalendarProviderHealth, str | None, str | None]:
@@ -28,7 +44,7 @@ def probe_google_calendar_health(db: Session, user_id: int) -> tuple[bool, Calen
         refresh_google_calendar_access_token(plain)
         return True, "ok", None, email
     except GoogleCalendarOAuthError:
-        return True, "reconnect_required", _GOOGLE_RECONNECT_MSG, email
+        return True, "reconnect_required", GOOGLE_RECONNECT_MSG, email
     except Exception:
         return True, "error", "Google Calendar connection error.", email
 
@@ -46,6 +62,6 @@ def probe_microsoft_calendar_health(
         refresh_microsoft_calendar_access_token(plain)
         return True, "ok", None, email
     except MicrosoftCalendarOAuthError:
-        return True, "reconnect_required", _MICROSOFT_RECONNECT_MSG, email
+        return True, "reconnect_required", MICROSOFT_RECONNECT_MSG, email
     except Exception:
         return True, "error", "Microsoft Calendar connection error.", email

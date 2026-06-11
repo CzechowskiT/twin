@@ -42,7 +42,7 @@ from app.services.google_calendar_oauth import (
 )
 from app.services.microsoft_calendar_oauth import is_microsoft_calendar_oauth_configured
 from app.services.ics_export import interviews_feed_to_ics, scheduled_interview_to_ics
-from app.services.calendar_provider_health import probe_google_calendar_health
+from app.services.calendar_provider_health import GOOGLE_RECONNECT_MSG, calendar_upstream_auth_failure, probe_google_calendar_health
 from app.services.token_crypto import decrypt_secret, encrypt_secret
 
 router = APIRouter()
@@ -348,6 +348,11 @@ def google_calendar_list_events(
     try:
         raw_items = list_primary_events(access, time_min, time_max, max_results=limit)
     except GoogleCalendarApiError as e:
+        if calendar_upstream_auth_failure(e):
+            raise HTTPException(
+                status_code=status.HTTP_428_PRECONDITION_REQUIRED,
+                detail=GOOGLE_RECONNECT_MSG,
+            ) from e
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Calendar list events failed") from e
     events: list[CalendarEventOut] = []
     for item in raw_items:

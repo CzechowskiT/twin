@@ -57,17 +57,17 @@ const chromeSiteEs: SiteChromeOverlay["site"] = {
   momentumEyebrow: "Mantén el impulso",
   momentumLead: "Los pequeños rituales ganan a las grandes búsquedas semanales de empleo.",
   momentumTip1:
-    "Cuando guardas o aplicas desde coincidencias o el feed, las candidaturas van a una línea de tiempo. Trátala como tu CRM privado hasta que lleguen entrevistas.",
+    "Cuando guardas o aplicas desde coincidencias o el flujo de ofertas, las candidaturas van a una línea de tiempo. Trátala como tu registro privado de solicitudes hasta que lleguen entrevistas.",
   momentumTip2:
-    "Actualiza los filtros tras editar habilidades o títulos objetivo para que el feed capte la nueva señal.",
+    "Actualiza los filtros tras editar habilidades o títulos objetivo para que el flujo de ofertas capte la nueva señal.",
   momentumTip3:
     "Estados que reflejan la realidad (enviada, entrevista, rechazada) mantienen creíbles los gráficos semanales.",
   momentumTip4:
-    "Si el feed es demasiado amplio, ajusta términos del título; amplía cuando veas roles que realmente quieres.",
+    "Si el flujo de ofertas es demasiado amplio, ajusta términos del título; amplía cuando veas roles que realmente quieres.",
   momentumTip5:
-    "Premium levanta límites de candidaturas rastreadas cuando el billing está activo en tu entorno. Gratis sigue siendo sólido para búsquedas enfocadas.",
+    "Premium levanta límites de candidaturas rastreadas cuando la facturación está activa en tu entorno. La versión gratuita sigue siendo sólida para búsquedas enfocadas.",
   momentumTip6:
-    "Abre ofertas complicadas en una pestaña nueva; deja que TWIN recuerde tu decisión para no releer el mismo JD.",
+    "Abre ofertas complicadas en una pestaña nueva; deja que TWIN recuerde tu decisión para no releer la misma descripción del puesto.",
   momentumCtaWorkspace: "Abrir espacio de trabajo",
   momentumCtaProfile: "Perfil y CV",
   momentumCtaHome: "Historia del producto",
@@ -124,15 +124,15 @@ const chromeSiteDe: SiteChromeOverlay["site"] = {
   momentumEyebrow: "Schwung beibehalten",
   momentumLead: "Kleine Routinen schlagen heroische Jobsuche einmal pro Woche.",
   momentumTip1:
-    "Wenn Sie aus Matches oder dem Feed speichern oder bewerben, landen Bewerbungen in einer Timeline. Behandeln Sie sie als privates CRM bis Interviews kommen.",
+    "Wenn Sie aus Matches oder dem Stellenstrom speichern oder bewerben, landen Bewerbungen in einer Timeline. Behandeln Sie sie als privates Bewerbungsregister bis Interviews kommen.",
   momentumTip2:
-    "Aktualisieren Sie Filter nach Skills oder Zieltiteln, damit der Feed das neue Signal aufnimmt.",
+    "Aktualisieren Sie Filter nach Skills oder Zieltiteln, damit der Stellenstrom das neue Signal aufnimmt.",
   momentumTip3:
     "Realistische Status (beworben, Interview, abgelehnt) halten wöchentliche Momentum-Charts glaubwürdig.",
   momentumTip4:
-    "Ist der Feed zu breit, Titelbegriffe enger setzen; wieder weiten, wenn passende Rollen erscheinen.",
+    "Ist der Stellenstrom zu breit, Titelbegriffe enger setzen; wieder weiten, wenn passende Rollen erscheinen.",
   momentumTip5:
-    "Premium hebt Limits für verfolgte Bewerbungen, wenn Billing in Ihrer Umgebung aktiv ist. Free reicht für fokussierte Suche.",
+    "Premium hebt Limits für verfolgte Bewerbungen, wenn die Abrechnung in Ihrer Umgebung aktiv ist. Die kostenlose Version reicht für fokussierte Suche.",
   momentumTip6:
     "Öffnen Sie knifflige Stellen in einem neuen Tab; TWIN merkt sich Ihre Entscheidung, damit Sie dieselbe Stellenbeschreibung nicht erneut lesen.",
   momentumCtaWorkspace: "Workspace öffnen",
@@ -191,15 +191,15 @@ const chromeSiteFr: SiteChromeOverlay["site"] = {
   momentumEyebrow: "Gardez l'élan",
   momentumLead: "Les petits rituels battent les grandes chasses à l'emploi hebdomadaires.",
   momentumTip1:
-    "Quand vous enregistrez ou postulez depuis les matchs ou le fil, les candidatures arrivent sur une timeline. Traitez-la comme votre CRM privé jusqu'aux entretiens.",
+    "Quand vous enregistrez ou postulez depuis les matchs ou le flux d'offres, les candidatures arrivent sur une chronologie. Traitez-la comme votre registre privé de candidatures jusqu'aux entretiens.",
   momentumTip2:
-    "Rafraîchissez les filtres après avoir modifié compétences ou titres cibles pour que le fil capte le nouveau signal.",
+    "Rafraîchissez les filtres après avoir modifié compétences ou titres cibles pour que le flux d'offres capte le nouveau signal.",
   momentumTip3:
     "Des statuts réalistes (postulé, entretien, refusé) gardent des graphiques hebdomadaires crédibles.",
   momentumTip4:
-    "Si le fil est trop large, resserrez les termes de titre ; élargissez quand vous voyez les rôles voulus.",
+    "Si le flux d'offres est trop large, resserrez les termes de titre ; élargissez quand vous voyez les rôles voulus.",
   momentumTip5:
-    "Premium lève les plafonds de candidatures suivies quand la facturation est active dans votre environnement. Gratuit reste solide pour une recherche ciblée.",
+    "Premium lève les plafonds de candidatures suivies quand la facturation est active dans votre environnement. La version gratuite reste solide pour une recherche ciblée.",
   momentumTip6:
     "Ouvrez les offres délicates dans un nouvel onglet ; TWIN retient votre décision pour ne pas relire la même fiche de poste.",
   momentumCtaWorkspace: "Ouvrir l'espace de travail",
@@ -258,17 +258,17 @@ const chromeSiteIt: SiteChromeOverlay["site"] = {
   momentumEyebrow: "Mantieni lo slancio",
   momentumLead: "Piccoli rituali battono la grande caccia al lavoro settimanale.",
   momentumTip1:
-    "Quando salvi o candidi da match o feed, le applicazioni finiscono in una timeline. Trattala come CRM privato fino agli colloqui.",
+    "Quando salvi o candidi da match o flusso offerte, le candidature finiscono in una cronologia. Trattala come registro privato delle candidature fino ai colloqui.",
   momentumTip2:
-    "Aggiorna i filtri dopo aver modificato competenze o titoli target così il feed coglie il nuovo segnale.",
+    "Aggiorna i filtri dopo aver modificato competenze o titoli target così il flusso offerte coglie il nuovo segnale.",
   momentumTip3:
     "Stati realistici (inviata, colloquio, rifiutata) rendono credibili i grafici settimanali.",
   momentumTip4:
-    "Se il feed è troppo ampio, restringi i termini del titolo; allarga quando vedi ruoli desiderati.",
+    "Se il flusso offerte è troppo ampio, restringi i termini del titolo; allarga quando vedi ruoli desiderati.",
   momentumTip5:
-    "Premium alza i limiti sulle candidature tracciate quando il billing è attivo nel tuo ambiente. Gratis resta solido per ricerche mirate.",
+    "Premium alza i limiti sulle candidature tracciate quando la fatturazione è attiva nel tuo ambiente. La versione gratuita resta solida per ricerche mirate.",
   momentumTip6:
-    "Apri annunci difficili in una nuova scheda; TWIN ricorda la decisione così non rileggi lo stesso JD.",
+    "Apri annunci difficili in una nuova scheda; TWIN ricorda la decisione così non rileggi la stessa descrizione del ruolo.",
   momentumCtaWorkspace: "Apri workspace",
   momentumCtaProfile: "Profilo e CV",
   momentumCtaHome: "Storia prodotto",
@@ -325,12 +325,12 @@ const chromeSiteZh: SiteChromeOverlay["site"] = {
   momentumEyebrow: "保持动力",
   momentumLead: "小习惯胜过每周一次的英雄式求职。",
   momentumTip1:
-    "从匹配或信息流保存或申请时，申请会进入一条时间线。在面试出现前，把它当作私人 CRM。",
-  momentumTip2: "编辑技能或目标职位后刷新筛选，让信息流捕捉新信号。",
+    "从匹配或职位流保存或申请时，申请会进入一条时间线。在面试出现前，把它当作私人申请记录。",
+  momentumTip2: "编辑技能或目标职位后刷新筛选，让职位流捕捉新信号。",
   momentumTip3: "符合实际的状态（已申请、面试、拒绝）让每周动力图表更可信。",
-  momentumTip4: "若信息流过宽，收紧职位关键词；看到想要的职位后再放宽。",
-  momentumTip5: "环境中启用计费时，Premium 提高跟踪申请上限。免费版仍适合专注搜索。",
-  momentumTip6: "在新标签页打开棘手职位；TWIN 会记住你的决定，避免重复阅读同一 JD。",
+  momentumTip4: "若职位流过宽，收紧职位关键词；看到想要的职位后再放宽。",
+  momentumTip5: "环境中启用计费时，高级版提高跟踪申请上限。免费版仍适合专注搜索。",
+  momentumTip6: "在新标签页打开棘手职位；TWIN 会记住你的决定，避免重复阅读同一份职位描述。",
   momentumCtaWorkspace: "打开工作区",
   momentumCtaProfile: "个人资料与简历",
   momentumCtaHome: "产品故事",
@@ -387,11 +387,11 @@ const chromeSiteAr: SiteChromeOverlay["site"] = {
   momentumEyebrow: "حافظ على الزخم",
   momentumLead: "الطقوس الصغيرة تتفوق على مطاردة الوظائف البطولية مرة في الأسبوع.",
   momentumTip1:
-    "عند الحفظ أو التقديم من التطابقات أو الخلاصة، تنتقل الطلبات إلى خط زمني واحد. اعتبره CRM خاصًا حتى تظهر المقابلات.",
-  momentumTip2: "حدّث المرشحات بعد تعديل المهارات أو المسميات المستهدفة ليلتقط الخلاصة الإشارة الجديدة.",
+    "عند الحفظ أو التقديم من التطابقات أو تدفق الوظائف، تنتقل الطلبات إلى خط زمني واحد. اعتبره سجل طلبات خاصًا حتى تظهر المقابلات.",
+  momentumTip2: "حدّث المرشحات بعد تعديل المهارات أو المسميات المستهدفة ليلتقط تدفق الوظائف الإشارة الجديدة.",
   momentumTip3: "حالات واقعية (مُقدَّم، مقابلة، مرفوض) تجعل مخططات الزخم الأسبوعية موثوقة.",
-  momentumTip4: "إذا كان الخلاصة واسعًا جدًا، ضيّق عبارات المسمى؛ وسّع عندما ترى أدوارًا تريدها فعلًا.",
-  momentumTip5: "Premium يرفع حدود الطلبات المتتبعة عند تفعيل الفوترة في بيئتك. المجاني يبقى قويًا للبحث المركّز.",
+  momentumTip4: "إذا كان تدفق الوظائف واسعًا جدًا، ضيّق عبارات المسمى؛ وسّع عندما ترى أدوارًا تريدها فعلًا.",
+  momentumTip5: "الإصدار المميز يرفع حدود الطلبات المتتبعة عند تفعيل الفوترة في بيئتك. المجاني يبقى قويًا للبحث المركّز.",
   momentumTip6: "افتح الإعلانات الصعبة في تبويب جديد؛ TWIN يتذكر قرارك حتى لا تعيد قراءة نفس الوصف.",
   momentumCtaWorkspace: "افتح مساحة العمل",
   momentumCtaProfile: "الملف والسيرة",
@@ -449,12 +449,12 @@ const chromeSiteJa: SiteChromeOverlay["site"] = {
   momentumEyebrow: "勢いを保つ",
   momentumLead: "小さな習慣が、週に一度の英雄的行動より勝つ。",
   momentumTip1:
-    "マッチやフィードから保存・応募すると、応募は1本のタイムラインに集まります。面接が来るまでプライベートCRMとして扱ってください。",
-  momentumTip2: "スキルや目標職種を編集したらフィルターを更新し、新しいシグナルを拾わせます。",
+    "マッチや求人ストリームから保存・応募すると、応募は1本のタイムラインに集まります。面接が来るまで私用の応募記録として扱ってください。",
+  momentumTip2: "スキルや目標職種を編集したらフィルターを更新し、求人ストリームが新しいシグナルを拾えるようにします。",
   momentumTip3: "現実的なステータス（応募済み、面接、不採用）で週次の勢いグラフが信頼できます。",
-  momentumTip4: "フィードが広すぎるときはタイトル語を絞り、欲しい職種が見えたら広げます。",
-  momentumTip5: "環境で課金が有効なら Premium が追跡応募の上限を上げます。無料でも集中検索には十分です。",
-  momentumTip6: "難しい求人は新しいタブで開き、TWIN に判断を覚えさせて同じJDを読み直さないようにします。",
+  momentumTip4: "求人ストリームが広すぎるときはタイトル語を絞り、欲しい職種が見えたら広げます。",
+  momentumTip5: "環境で課金が有効なら有料版が追跡応募の上限を上げます。無料版でも集中検索には十分です。",
+  momentumTip6: "難しい求人は新しいタブで開き、TWIN に判断を覚えさせて同じ職務記述を読み直さないようにします。",
   momentumCtaWorkspace: "ワークスペースを開く",
   momentumCtaProfile: "プロフィールとCV",
   momentumCtaHome: "プロダクトストーリー",
