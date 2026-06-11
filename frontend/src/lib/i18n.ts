@@ -9,6 +9,7 @@ import {
   zhOverlay,
 } from "./overlays";
 import { MARKETING_HOME_OVERLAYS } from "./overlays/marketing-home";
+import { SITE_CHROME_OVERLAYS } from "./overlays/site-chrome";
 import {
   premiumArOverlay,
   premiumDeOverlay,
@@ -6224,7 +6225,8 @@ function localeFromOverlays(
 ): typeof en {
   const withPremium = mergeDeep(baseOverlay, premiumOverlay);
   const marketingHome = MARKETING_HOME_OVERLAYS[locale] ?? {};
-  return messagesFromEnOverlay(mergeDeep(withPremium, marketingHome));
+  const siteChrome = SITE_CHROME_OVERLAYS[locale] ?? {};
+  return messagesFromEnOverlay(mergeDeep(mergeDeep(withPremium, marketingHome), siteChrome));
 }
 
 const es = localeFromOverlays("es", esOverlay, premiumEsOverlay);
