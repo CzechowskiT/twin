@@ -130,11 +130,11 @@ export type TranslationKey =
   | `recruiterMessageDrafts.${keyof typeof en.recruiterMessageDrafts}`
   | `companyJobs.${keyof typeof en.companyJobs}`
   | `companyHiring.${keyof typeof en.companyHiring}`
+  | `companyBilling.${keyof typeof en.companyBilling}`
   | `recruiterSearch.${keyof typeof en.recruiterSearch}`
   | `recruiterJobs.${keyof typeof en.recruiterJobs}`
   | `recruiterCalendar.${keyof typeof en.recruiterCalendar}`
   | `companyPipeline.${keyof typeof en.companyPipeline}`
-  | `companyHiring.${keyof typeof en.companyHiring}`
   | `companyTeam.${keyof typeof en.companyTeam}`
   | `recruiterScheduling.${keyof typeof en.recruiterScheduling}`
   | `recruiterPipeline.${keyof typeof en.recruiterPipeline}`
@@ -2669,6 +2669,56 @@ eyebrow: "Product roadmap",
     emptyBody: "Enter your pilot access code and company slug to see the executive snapshot.",
     emptyStep1: "Use the access code from your TWIN invite email.",
     emptyStep2: "Pick the company slug tied to your workspace.",
+  },
+  companyBilling: {
+    eyebrow: "Company workspace",
+    title: "Plan & usage",
+    lead:
+      "Honest pilot plan status and workspace counters from TWIN data — no invoices, payment activation, or revenue claims.",
+    navBilling: "Plan & usage",
+    billingNotLiveTitle: "Billing is not live",
+    billingNotLiveBody:
+      "Self-serve employer billing and seat checkout are not enabled. This page is transparency only — contact us for pilot access.",
+    workspaceLine: "Workspace · {company}",
+    planTitle: "Current plan",
+    plan_demo: "Demo workspace",
+    plan_pilot: "Pilot access",
+    plan_free: "No active plan",
+    planBody_demo:
+      "You are viewing a seeded demo workspace for investors. Counters come from demo data — not a paid subscription.",
+    planBody_pilot:
+      "Your company has pilot recruiter access via TWIN tokens. Billing and seat limits are not enforced in product yet.",
+    planBody_free:
+      "No pilot token for this company slug. Request workspace access — still no self-serve billing.",
+    usageTitle: "Workspace usage",
+    usageLead: "Counters from your slug when data exists — not industry benchmarks or revenue.",
+    usageRoles: "Open roles",
+    usageReviewed: "Reviewed candidates",
+    usageSeats: "Team access tokens",
+    integrationsTitle: "Integration readiness",
+    integrationsLead: "What is live vs planned for employer integrations — honest pilot scope.",
+    integration_acceptance_inbox: "Acceptance inbox & review card",
+    integration_ats_webhooks: "ATS webhooks",
+    integration_employer_calendar: "Recruiter calendar sync",
+    integration_employer_billing: "Self-serve billing & seats",
+    integrationStatus_live: "Live",
+    integrationStatus_pilot: "Pilot",
+    integrationStatus_planned: "Planned",
+    integrationStatus_not_live: "Not live",
+    ctaTitle: "Request pilot or contact us",
+    ctaBody:
+      "During pilot we onboard companies manually. No checkout — tell us your hiring bar and we configure access.",
+    ctaPilot: "For companies",
+    ctaContact: "Contact founders",
+    scopeNote:
+      "This page does not show invoices, MRR, paid seats, or placement revenue — only workspace readiness and usage counters.",
+    loading: "Loading plan & usage…",
+    loadCta: "Load plan & usage",
+    emptyTitle: "Load workspace plan",
+    emptyBody: "Enter pilot credentials to see plan status, counters, and integration readiness.",
+    emptyStep1: "Use the access code from your TWIN pilot invite.",
+    emptyStep2: "Pick your company slug (demo: Nova Hiring PL).",
+    emptyStep3: "Review plan label, counters, and integrations — billing stays not live.",
   },
   companyPipeline: {
     eyebrow: "Company workspace",
@@ -6284,6 +6334,56 @@ const pl: MessageTree = {
     emptyBody: "Wpisz kod dostępu pilotażowego i slug firmy, aby zobaczyć executive snapshot.",
     emptyStep1: "Użyj kodu dostępu z maila zaproszenia TWIN.",
     emptyStep2: "Wybierz slug firmy powiązany z workspace.",
+  },
+  companyBilling: {
+    eyebrow: "Workspace firmy",
+    title: "Plan i zużycie",
+    lead:
+      "Uczciwy status planu pilotażowego i liczniki workspace z danych TWIN — bez faktur, aktywacji płatności i twierdzeń o przychodzie.",
+    navBilling: "Plan i zużycie",
+    billingNotLiveTitle: "Rozliczenia nie są live",
+    billingNotLiveBody:
+      "Samodzielne rozliczenia pracodawcy i checkout miejsc nie są włączone. Ta strona to tylko transparentność — napisz do nas o pilotaż.",
+    workspaceLine: "Workspace · {company}",
+    planTitle: "Aktualny plan",
+    plan_demo: "Workspace demo",
+    plan_pilot: "Dostęp pilotażowy",
+    plan_free: "Brak aktywnego planu",
+    planBody_demo:
+      "Przeglądasz zaseedowany workspace demo dla inwestorów. Liczniki pochodzą z danych demo — to nie jest płatna subskrypcja.",
+    planBody_pilot:
+      "Twoja firma ma pilotażowy dostęp rekrutera przez tokeny TWIN. Rozliczenia i limity miejsc nie są jeszcze egzekwowane w produkcie.",
+    planBody_free:
+      "Brak tokena pilotażowego dla tego slug firmy. Poproś o dostęp do workspace — nadal bez samodzielnego billingu.",
+    usageTitle: "Zużycie workspace",
+    usageLead: "Liczniki ze slug, gdy dane istnieją — nie benchmarki branżowe ani przychód.",
+    usageRoles: "Otwarte role",
+    usageReviewed: "Kandydaci po przeglądzie",
+    usageSeats: "Tokeny dostępu zespołu",
+    integrationsTitle: "Gotowość integracji",
+    integrationsLead: "Co jest live, a co planowane dla integracji pracodawcy — uczciwy zakres pilotażu.",
+    integration_acceptance_inbox: "Skrzynka akceptacji i karta oceny",
+    integration_ats_webhooks: "Webhooki ATS",
+    integration_employer_calendar: "Sync kalendarza rekrutera",
+    integration_employer_billing: "Samodzielne rozliczenia i miejsca",
+    integrationStatus_live: "Live",
+    integrationStatus_pilot: "Pilotaż",
+    integrationStatus_planned: "Planowane",
+    integrationStatus_not_live: "Nie live",
+    ctaTitle: "Poproś o pilotaż lub napisz do nas",
+    ctaBody:
+      "Podczas pilotażu wdrażamy firmy ręcznie. Bez checkout — opowiedz o swoim progu rekrutacyjnym, a skonfigurujemy dostęp.",
+    ctaPilot: "Dla firm",
+    ctaContact: "Napisz do founderów",
+    scopeNote:
+      "Ta strona nie pokazuje faktur, MRR, opłaconych miejsc ani przychodu z placement — tylko gotowość workspace i liczniki zużycia.",
+    loading: "Ładowanie planu i zużycia…",
+    loadCta: "Załaduj plan i zużycie",
+    emptyTitle: "Załaduj plan workspace",
+    emptyBody: "Wpisz dane pilotażowe, aby zobaczyć status planu, liczniki i gotowość integracji.",
+    emptyStep1: "Użyj kodu dostępu z zaproszenia pilotażowego TWIN.",
+    emptyStep2: "Wybierz slug firmy (demo: Nova Hiring PL).",
+    emptyStep3: "Sprawdź etykietę planu, liczniki i integracje — billing pozostaje nie live.",
   },
   companyPipeline: {
     eyebrow: "Workspace firmy",

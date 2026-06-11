@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from app.api.recruiter import _resolved_company_slug
 from app.config import Settings, get_settings
 from app.database.session import get_db
+from app.services.company_billing_readiness import build_company_plan_usage
 from app.services.company_hiring_dashboard import build_company_hiring_dashboard
 from app.services.company_pipeline_quality import build_company_pipeline_quality
 from app.services.company_roles import (
@@ -69,6 +70,26 @@ def company_hiring_dashboard(
             company_slug=slug,
             raw_token=x_twin_recruiter_token or token,
             locale=locale_from_request(request),
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.get("/plan-usage")
+def company_plan_usage(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return build_company_plan_usage(
+            db,
+            company_slug=slug,
+            settings=settings,
+            raw_token=x_twin_recruiter_token or token,
         )
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
