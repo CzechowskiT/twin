@@ -16,6 +16,43 @@ from app.database.models import Base, ScheduledInterview, User
 from app.database.session import get_db
 from app.main import app
 from app.services.google_calendar_api import GoogleCalendarApiError
+from app.services.calendar_oauth_credentials import provider_status_payload
+
+
+def _google_probe_ok(email: str = "founder@gmail.com"):
+    return provider_status_payload(
+        provider="google",
+        connected=True,
+        status="connected",
+        health="ok",
+        message=None,
+        code=None,
+        email=email,
+    )
+
+
+def _google_probe_reconnect(email: str = "founder@gmail.com"):
+    return provider_status_payload(
+        provider="google",
+        connected=True,
+        status="reconnect_required",
+        health="reconnect_required",
+        message="Calendar token expired or revoked; reconnect Google Calendar.",
+        code="invalid_grant",
+        email=email,
+    )
+
+
+def _microsoft_probe_disconnected():
+    return provider_status_payload(
+        provider="microsoft",
+        connected=False,
+        status="not_connected",
+        health="unknown",
+        message=None,
+        code=None,
+        email=None,
+    )
 
 
 @pytest.fixture
@@ -502,7 +539,7 @@ def _calendar_user_override(user_id: int, email: str):
 def test_google_status_health_ok_when_refresh_succeeds(
     mock_probe: MagicMock, _mock_oauth: MagicMock, client: TestClient
 ) -> None:
-    mock_probe.return_value = (True, "ok", None, "founder@gmail.com")
+    mock_probe.return_value = _google_probe_ok()
     app.dependency_overrides[get_current_user] = _calendar_user_override(10, "founder@gmail.com")
     app.dependency_overrides[get_db] = _sqlite_calendar_session
     try:
@@ -522,12 +559,7 @@ def test_google_status_health_ok_when_refresh_succeeds(
 def test_google_status_reconnect_required_when_refresh_fails(
     mock_probe: MagicMock, _mock_oauth: MagicMock, client: TestClient
 ) -> None:
-    mock_probe.return_value = (
-        True,
-        "reconnect_required",
-        "Calendar token expired or revoked; reconnect Google Calendar.",
-        "founder@gmail.com",
-    )
+    mock_probe.return_value = _google_probe_reconnect()
     app.dependency_overrides[get_current_user] = _calendar_user_override(11, "founder@gmail.com")
     app.dependency_overrides[get_db] = _sqlite_calendar_session
     try:
@@ -547,7 +579,7 @@ def test_google_status_reconnect_required_when_refresh_fails(
 def test_microsoft_status_disconnected_without_row(
     mock_probe: MagicMock, _mock_oauth: MagicMock, client: TestClient
 ) -> None:
-    mock_probe.return_value = (False, "unknown", None, None)
+    mock_probe.return_value = _microsoft_probe_disconnected()
     app.dependency_overrides[get_current_user] = _calendar_user_override(12, "ms@twin.test")
     app.dependency_overrides[get_db] = _sqlite_calendar_session
     try:

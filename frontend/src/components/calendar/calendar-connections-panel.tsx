@@ -46,6 +46,7 @@ export type CalendarConnectionsPanelProps = {
   onSubscribeWebcal: () => void;
   onCopyWebcalLink: () => void;
   onGenerateWebcalLink: () => void;
+  onRetryCalendarEvents?: () => void;
 };
 
 function StatusBadge({ provider }: { provider: ProviderState }) {
@@ -62,17 +63,21 @@ function StatusBadge({ provider }: { provider: ProviderState }) {
       ? "dashboard.calendarConnected"
       : badge === "reconnect_required"
         ? "dashboard.calendarReconnectRequired"
-        : badge === "integration_error"
-          ? "dashboard.calendarIntegrationError"
-          : "dashboard.calendarNotConnected";
+        : badge === "temporary_error"
+          ? "dashboard.calendarTemporaryError"
+          : badge === "integration_error"
+            ? "dashboard.calendarIntegrationError"
+            : "dashboard.calendarNotConnected";
   const tone =
     badge === "connected"
       ? "bg-emerald-500/15 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300"
       : badge === "reconnect_required"
         ? "bg-amber-500/15 text-amber-800 dark:bg-amber-400/15 dark:text-amber-200"
-        : badge === "integration_error"
-          ? "bg-red-500/15 text-red-700 dark:bg-red-400/15 dark:text-red-300"
-          : "bg-[var(--twin-surface-raised)] text-[var(--twin-muted-strong)]";
+        : badge === "temporary_error"
+          ? "bg-sky-500/15 text-sky-800 dark:bg-sky-400/15 dark:text-sky-200"
+          : badge === "integration_error"
+            ? "bg-red-500/15 text-red-700 dark:bg-red-400/15 dark:text-red-300"
+            : "bg-[var(--twin-surface-raised)] text-[var(--twin-muted-strong)]";
   return (
     <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${tone}`}>
       {t(labelKey)}
@@ -120,6 +125,7 @@ function ProviderCard({
   actionBusy,
   onConnect,
   onDisconnect,
+  onRetryEvents,
 }: {
   icon: ReactNode;
   titleKey: TranslationKey;
@@ -138,6 +144,7 @@ function ProviderCard({
   actionBusy: string | null;
   onConnect: () => void;
   onDisconnect: () => void;
+  onRetryEvents?: () => void;
 }) {
   const { t } = useTranslation();
   const connectBusy = actionBusy === connectBusyKey;
@@ -159,6 +166,11 @@ function ProviderCard({
           {t(reconnectHintKey)}
         </p>
       ) : null}
+      {provider.health === "temporary_error" ? (
+        <p className="mt-3 text-sm text-sky-800 dark:text-sky-200" role="alert">
+          {t("dashboard.calendarTemporaryErrorHint")}
+        </p>
+      ) : null}
       {loading ? (
         <p className="twin-muted mt-4 text-sm">{t("dashboard.calendarConnectionsLoading")}</p>
       ) : statusError ? (
@@ -173,6 +185,15 @@ function ProviderCard({
           onClick={onConnect}
         >
           {connectBusy ? "…" : t(connectLabelKey)}
+        </Button>
+      ) : provider.connected && provider.health === "temporary_error" && onRetryEvents ? (
+        <Button
+          type="button"
+          className="twin-touch-target mt-4 !w-auto self-start"
+          disabled={anyBusy}
+          onClick={onRetryEvents}
+        >
+          {t("dashboard.calendarRetryEvents")}
         </Button>
       ) : provider.connected ? (
         <Button
@@ -228,6 +249,7 @@ export function CalendarConnectionsPanel({
   onSubscribeWebcal,
   onCopyWebcalLink,
   onGenerateWebcalLink,
+  onRetryCalendarEvents,
 }: CalendarConnectionsPanelProps) {
   const { t } = useTranslation();
 
@@ -261,6 +283,7 @@ export function CalendarConnectionsPanel({
           actionBusy={actionBusy}
           onConnect={onConnectGoogle}
           onDisconnect={onDisconnectGoogle}
+          onRetryEvents={onRetryCalendarEvents}
         />
         <ProviderCard
           icon={<MicrosoftCalendarIcon className="h-5 w-5" />}
@@ -280,6 +303,7 @@ export function CalendarConnectionsPanel({
           actionBusy={actionBusy}
           onConnect={onConnectMicrosoft}
           onDisconnect={onDisconnectMicrosoft}
+          onRetryEvents={onRetryCalendarEvents}
         />
       </div>
 

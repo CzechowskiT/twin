@@ -41,17 +41,18 @@ from app.services.google_calendar_oauth import (
 )
 from app.services.microsoft_calendar_oauth import is_microsoft_calendar_oauth_configured
 from app.services.ics_export import interviews_feed_to_ics, scheduled_interview_to_ics
-from app.services.calendar_provider_health import (
-    GOOGLE_RECONNECT_MSG,
-    calendar_upstream_auth_failure,
-    probe_google_calendar_health,
-)
 from app.services.calendar_oauth_credentials import (
     CalendarTokenResolutionError,
+    GOOGLE_RECONNECT_MSG,
+    MICROSOFT_RECONNECT_MSG,
     calendar_upstream_transient,
     get_best_google_row,
     resolve_google_access_token,
     store_google_tokens_from_exchange,
+)
+from app.services.calendar_provider_health import (
+    calendar_upstream_auth_failure,
+    probe_google_calendar_health,
 )
 from app.services.token_crypto import encrypt_secret
 

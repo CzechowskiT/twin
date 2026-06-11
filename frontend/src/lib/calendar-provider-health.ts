@@ -2,7 +2,7 @@
 
 import type { CalendarProvider, ProviderCalendarEvent } from "@/lib/calendar-week";
 
-export type ProviderHealth = "ok" | "reconnect_required" | "error" | "unknown";
+export type ProviderHealth = "ok" | "reconnect_required" | "temporary_error" | "error" | "unknown";
 
 export type CalendarProviderStatusSnapshot = {
   connected: boolean;
@@ -10,6 +10,8 @@ export type CalendarProviderStatusSnapshot = {
   message: string | null;
   provider: CalendarProvider;
   email: string | null;
+  canReconnect?: boolean;
+  canRetry?: boolean;
 };
 
 export type ProviderWeekFetchOutcome = {
@@ -17,6 +19,7 @@ export type ProviderWeekFetchOutcome = {
   events: ProviderCalendarEvent[];
   failed: boolean;
   reconnectRequired: boolean;
+  temporaryError: boolean;
   message: string | null;
 };
 
@@ -42,10 +45,11 @@ export function providerNeedsReconnect(status: CalendarProviderStatusSnapshot | 
 
 export function providerBadgeHealth(
   status: CalendarProviderStatusSnapshot | null | undefined,
-): "connected" | "reconnect_required" | "not_connected" | "integration_error" {
+): "connected" | "reconnect_required" | "temporary_error" | "not_connected" | "integration_error" {
   if (!status?.connected) return "not_connected";
   if (status.health === "ok") return "connected";
   if (status.health === "reconnect_required") return "reconnect_required";
+  if (status.health === "temporary_error") return "temporary_error";
   if (status.health === "error") return "integration_error";
   return "not_connected";
 }
@@ -76,20 +80,29 @@ export function hasAnyHealthyProvider(
 
 export function parseProviderIntegrationError(message: string): {
   reconnectRequired: boolean;
+  temporaryError: boolean;
   failed: boolean;
 } {
   const lower = message.trim().toLowerCase();
+  const temporaryError =
+    lower.includes("temporarily unavailable") ||
+    lower.includes("try again shortly") ||
+    lower.includes('"code": 429') ||
+    lower.includes('"code": 503') ||
+    lower.includes("503") ||
+    lower.includes("429");
   const reconnectRequired =
-    lower.includes("reconnect google calendar") ||
-    lower.includes("reconnect microsoft calendar") ||
-    lower.includes("calendar token expired") ||
-    lower.includes("microsoft token expired") ||
-    lower.includes("insufficient") ||
-    lower.includes("invalid_grant") ||
-    lower.includes("invalid_credentials") ||
-    (lower.includes("calendar list events failed") && (lower.includes("401") || lower.includes("403"))) ||
-    (lower.includes("microsoft list events failed") && (lower.includes("401") || lower.includes("403")));
-  return { reconnectRequired, failed: true };
+    !temporaryError &&
+    (lower.includes("reconnect google calendar") ||
+      lower.includes("reconnect microsoft calendar") ||
+      lower.includes("calendar token expired") ||
+      lower.includes("microsoft token expired") ||
+      lower.includes("insufficient") ||
+      lower.includes("invalid_grant") ||
+      lower.includes("invalid_credentials") ||
+      (lower.includes("calendar list events failed") && (lower.includes("401") || lower.includes("403"))) ||
+      (lower.includes("microsoft list events failed") && (lower.includes("401") || lower.includes("403"))));
+  return { reconnectRequired, temporaryError, failed: true };
 }
 
 /** Connected row exists but token probe or events fetch is not usable. */
@@ -97,7 +110,12 @@ export function providerNeedsAttention(
   status: CalendarProviderStatusSnapshot | null | undefined,
 ): boolean {
   if (!status?.connected) return false;
-  return status.health === "reconnect_required" || status.health === "error" || status.health === "unknown";
+  return (
+    status.health === "reconnect_required" ||
+    status.health === "temporary_error" ||
+    status.health === "error" ||
+    status.health === "unknown"
+  );
 }
 
 export function aggregateWeekEventOutcomes(
@@ -130,14 +148,16 @@ export function aggregateWeekEventOutcomes(
   const otherProviderStale =
     (isProviderHealthy(google) && providerNeedsReconnect(microsoft)) ||
     (isProviderHealthy(microsoft) && providerNeedsReconnect(google));
+  const needsGuidance = (snap: CalendarProviderStatusSnapshot | null | undefined) =>
+    Boolean(snap?.connected && snap.health !== "temporary_error" && snap.health !== "ok" && providerNeedsAttention(snap));
   const showReconnectPanel =
     !anyProviderLoaded &&
     (reconnectProviders.length > 0 ||
       allHealthyProvidersFailed ||
       providerNeedsReconnect(google) ||
       providerNeedsReconnect(microsoft) ||
-      providerNeedsAttention(google) ||
-      providerNeedsAttention(microsoft));
+      needsGuidance(google) ||
+      needsGuidance(microsoft));
   const showPartialWarning =
     anyProviderLoaded && (failedProviders.length > 0 || otherProviderStale);
   const showEmptyWeek = anyProviderLoaded && events.length === 0 && failedProviders.length === 0;
@@ -174,12 +194,15 @@ export function statusSnapshotFromApi(
     message?: string | null;
     google_email?: string | null;
     microsoft_email?: string | null;
+    can_reconnect?: boolean;
+    can_retry?: boolean;
   },
 ): CalendarProviderStatusSnapshot {
   const healthRaw = raw.health ?? "unknown";
   const health: ProviderHealth =
     healthRaw === "ok" ||
     healthRaw === "reconnect_required" ||
+    healthRaw === "temporary_error" ||
     healthRaw === "error" ||
     healthRaw === "unknown"
       ? healthRaw
@@ -190,5 +213,7 @@ export function statusSnapshotFromApi(
     message: raw.message ?? null,
     provider,
     email: provider === "google" ? raw.google_email ?? null : raw.microsoft_email ?? null,
+    canReconnect: raw.can_reconnect,
+    canRetry: raw.can_retry,
   };
 }

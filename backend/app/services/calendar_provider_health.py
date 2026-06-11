@@ -5,9 +5,9 @@ from __future__ import annotations
 from sqlalchemy.orm import Session
 
 from app.services.calendar_oauth_credentials import (
+    CalendarProviderStatusPayload,
     GOOGLE_RECONNECT_MSG,
     MICROSOFT_RECONNECT_MSG,
-    CalendarProviderStatusPayload,
     CalendarTokenResolutionError,
     access_token_still_valid,
     get_best_google_row,

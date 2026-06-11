@@ -24,7 +24,7 @@ On `/dashboard/calendar`, Google Calendar repeatedly showed **WYMAGA PONOWNEGO P
 - Status payload: `status`, `health`, `code`, `can_reconnect`, `can_retry` (no token exposure).
 - `GET /google/events` — 401 → force refresh → single retry; 429/503 → `503 temporary_error`.
 - OAuth callback — keep existing refresh when Google returns none on re-auth.
-- Alembic `055_calendar_access_token_cache`.
+- Alembic `052_calendar_access_token_cache`.
 
 ### Frontend (follow-up in same PR when merged)
 

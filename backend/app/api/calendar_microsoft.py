@@ -42,19 +42,25 @@ from app.services.microsoft_calendar_api import (
     query_schedule,
     schedule_items_to_busy_blocks,
 )
+from app.services.calendar_oauth_credentials import (
+    CalendarTokenResolutionError,
+    GOOGLE_RECONNECT_MSG,
+    MICROSOFT_RECONNECT_MSG,
+    calendar_upstream_transient,
+    get_best_microsoft_row,
+    resolve_microsoft_access_token,
+)
+from app.services.calendar_provider_health import (
+    calendar_upstream_auth_failure,
+    probe_microsoft_calendar_health,
+)
 from app.services.microsoft_calendar_oauth import (
     MicrosoftCalendarOAuthError,
     build_microsoft_calendar_authorize_url,
     exchange_microsoft_calendar_code,
     is_microsoft_calendar_oauth_configured,
-    refresh_microsoft_calendar_access_token,
 )
-from app.services.calendar_provider_health import (
-    MICROSOFT_RECONNECT_MSG,
-    calendar_upstream_auth_failure,
-    probe_microsoft_calendar_health,
-)
-from app.services.token_crypto import decrypt_secret, encrypt_secret
+from app.services.token_crypto import encrypt_secret
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -76,21 +82,51 @@ def _parse_ms_oauth_user_id(state: str) -> int | None:
         return None
 
 
-def _microsoft_access_token(db: Session, user_id: int) -> str:
-    row = db.query(UserMicrosoftCalendar).filter(UserMicrosoftCalendar.user_id == user_id).first()
+def _microsoft_access_token(db: Session, user_id: int, *, force_refresh: bool = False) -> str:
+    row = get_best_microsoft_row(db, user_id)
     if not row:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Microsoft Calendar is not connected",
         )
     try:
-        plain = decrypt_secret(row.refresh_token_encrypted)
-        return refresh_microsoft_calendar_access_token(plain)
-    except MicrosoftCalendarOAuthError as e:
+        return resolve_microsoft_access_token(db, row, force_refresh=force_refresh).token
+    except CalendarTokenResolutionError as exc:
+        if exc.status == "temporary_error":
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=exc.message) from exc
         raise HTTPException(
             status_code=status.HTTP_428_PRECONDITION_REQUIRED,
-            detail="Microsoft token expired or revoked; reconnect Microsoft Calendar.",
-        ) from e
+            detail=exc.message or MICROSOFT_RECONNECT_MSG,
+        ) from exc
+
+
+def _list_microsoft_events_with_retry(db: Session, user_id: int, time_min: str, time_max: str, *, limit: int) -> list[dict]:
+    access = _microsoft_access_token(db, user_id)
+    try:
+        return list_calendar_view_events(access, time_min, time_max, max_results=limit)
+    except MicrosoftCalendarApiError as exc:
+        if not calendar_upstream_auth_failure(exc):
+            if calendar_upstream_transient(exc):
+                raise HTTPException(
+                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                    detail="Calendar provider temporarily unavailable; try again shortly.",
+                ) from exc
+            raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Microsoft list events failed") from exc
+        access = _microsoft_access_token(db, user_id, force_refresh=True)
+        try:
+            return list_calendar_view_events(access, time_min, time_max, max_results=limit)
+        except MicrosoftCalendarApiError as retry_exc:
+            if calendar_upstream_auth_failure(retry_exc):
+                raise HTTPException(
+                    status_code=status.HTTP_428_PRECONDITION_REQUIRED,
+                    detail=MICROSOFT_RECONNECT_MSG,
+                ) from retry_exc
+            if calendar_upstream_transient(retry_exc):
+                raise HTTPException(
+                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                    detail="Calendar provider temporarily unavailable; try again shortly.",
+                ) from retry_exc
+            raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Microsoft list events failed") from retry_exc
 
 
 def _ms_busy_as_google_fb(access_token: str, time_min: str, time_max: str, tz: str) -> dict:
@@ -101,11 +137,15 @@ def _ms_busy_as_google_fb(access_token: str, time_min: str, time_max: str, tz: s
 
 class MicrosoftCalendarStatusOut(BaseModel):
     connected: bool
+    status: str = Field("unknown")
     health: str = Field(
         "unknown",
-        description="ok | reconnect_required | error | unknown",
+        description="ok | reconnect_required | temporary_error | error | unknown",
     )
     message: str | None = None
+    code: str | None = None
+    can_reconnect: bool = False
+    can_retry: bool = False
     provider: str = Field("microsoft", description="google | microsoft")
     microsoft_email: str | None = None
     oauth_configured: bool = False
@@ -123,21 +163,17 @@ def microsoft_calendar_status(
 ) -> MicrosoftCalendarStatusOut:
     oauth_configured = is_microsoft_calendar_oauth_configured()
     redirect_uri = effective_microsoft_calendar_redirect_uri(get_settings()) if oauth_configured else None
-    has_row, health, message, microsoft_email = probe_microsoft_calendar_health(db, current_user.id)
-    if not has_row:
-        return MicrosoftCalendarStatusOut(
-            connected=False,
-            health="unknown",
-            provider="microsoft",
-            oauth_configured=oauth_configured,
-            oauth_redirect_uri=redirect_uri,
-        )
+    probe = probe_microsoft_calendar_health(db, current_user.id)
     return MicrosoftCalendarStatusOut(
-        connected=True,
-        health=health,
-        message=message,
-        provider="microsoft",
-        microsoft_email=microsoft_email,
+        connected=probe.connected,
+        status=probe.status,
+        health=probe.health,
+        message=probe.message,
+        code=probe.code,
+        can_reconnect=probe.can_reconnect,
+        can_retry=probe.can_retry,
+        provider=probe.provider,
+        microsoft_email=probe.email,
         oauth_configured=oauth_configured,
         oauth_redirect_uri=redirect_uri,
     )
@@ -179,27 +215,31 @@ def microsoft_calendar_callback(
         refresh_plain, ms_email = exchange_microsoft_calendar_code(code)
     except MicrosoftCalendarOAuthError:
         return RedirectResponse(_frontend_calendar_redirect(calendar_error="exchange_failed"), status_code=302)
-    if not refresh_plain:
-        return RedirectResponse(_frontend_calendar_redirect(calendar_error="no_refresh_token"), status_code=302)
 
-    enc = encrypt_secret(refresh_plain)
     now = datetime.utcnow()
-    row = db.query(UserMicrosoftCalendar).filter(UserMicrosoftCalendar.user_id == user_id).first()
+    row = get_best_microsoft_row(db, user_id)
     if row:
-        row.refresh_token_encrypted = enc
+        if refresh_plain:
+            row.refresh_token_encrypted = encrypt_secret(refresh_plain)
+        elif not row.refresh_token_encrypted:
+            return RedirectResponse(_frontend_calendar_redirect(calendar_error="no_refresh_token"), status_code=302)
         row.microsoft_email = ms_email
         row.updated_at = now
+        db.add(row)
+        db.commit()
     else:
+        if not refresh_plain:
+            return RedirectResponse(_frontend_calendar_redirect(calendar_error="no_refresh_token"), status_code=302)
         db.add(
             UserMicrosoftCalendar(
                 user_id=user_id,
-                refresh_token_encrypted=enc,
+                refresh_token_encrypted=encrypt_secret(refresh_plain),
                 microsoft_email=ms_email,
                 created_at=now,
                 updated_at=now,
             )
         )
-    db.commit()
+        db.commit()
     return RedirectResponse(_frontend_calendar_redirect(calendar_connected="microsoft"), status_code=302)
 
 
@@ -251,16 +291,7 @@ def microsoft_calendar_list_events(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> CalendarEventsOut:
-    access = _microsoft_access_token(db, current_user.id)
-    try:
-        raw_items = list_calendar_view_events(access, time_min, time_max, max_results=limit)
-    except MicrosoftCalendarApiError as e:
-        if calendar_upstream_auth_failure(e):
-            raise HTTPException(
-                status_code=status.HTTP_428_PRECONDITION_REQUIRED,
-                detail=MICROSOFT_RECONNECT_MSG,
-            ) from e
-        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Microsoft list events failed") from e
+    raw_items = _list_microsoft_events_with_retry(db, current_user.id, time_min, time_max, limit=limit)
     events: list[CalendarEventOut] = []
     for item in raw_items:
         out = _microsoft_event_to_out(item)
