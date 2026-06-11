@@ -12,6 +12,11 @@ from app.config import Settings, get_settings
 from app.database.session import get_db
 from app.limiter import limiter, recruiter_token_key
 from app.services.recruiter_company_auth import resolve_recruiter_access
+from app.services.recruiter_audit_trail import (
+    RECRUITER_CLIENT_AUDIT_ACTION_TYPES,
+    list_recruiter_audit_events,
+    log_recruiter_audit_event,
+)
 from app.services.recruiter_inbox import (
     build_recruiter_batch,
     respond_recruiter_batch,
@@ -119,6 +124,58 @@ def recruiter_inbox_respond(
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
+
+
+
+class RecruiterAuditLogIn(BaseModel):
+    action_type: str = Field(..., max_length=64)
+    meta: dict[str, str] | None = Field(None, description="Optional non-PII metadata")
+
+
+@router.get("/inbox/{application_id}/audit")
+def recruiter_inbox_audit_list(
+    application_id: int,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+    limit: int = Query(50, ge=1, le=100),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return list_recruiter_audit_events(
+            db, application_id=application_id, company_slug=slug, limit=limit,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/inbox/{application_id}/audit", status_code=status.HTTP_201_CREATED)
+@limiter.limit("120/minute", key_func=recruiter_token_key)
+def recruiter_inbox_audit_log(
+    request: Request,
+    application_id: int,
+    body: RecruiterAuditLogIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    if body.action_type.strip() not in RECRUITER_CLIENT_AUDIT_ACTION_TYPES:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="audit_action_not_allowed")
+    try:
+        return log_recruiter_audit_event(
+            db,
+            application_id=application_id,
+            company_slug=slug,
+            action_type=body.action_type,
+            meta=body.meta,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
 @router.post("/inbox/respond-batch")
 @limiter.limit("60/minute", key_func=recruiter_token_key)

@@ -46,7 +46,8 @@
     "test:interactive-demo": "npx --yes tsx scripts/interactive-demo.test.ts",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install chromium",
-    "test:recruiter-candidate-message-drafts": "npx --yes tsx scripts/recruiter-candidate-message-drafts.test.ts"
+    "test:recruiter-candidate-message-drafts": "npx --yes tsx scripts/recruiter-candidate-message-drafts.test.ts",
+    "test:recruiter-audit-trail-mvp": "npx --yes tsx scripts/recruiter-audit-trail-mvp.test.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
