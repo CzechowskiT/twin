@@ -51,10 +51,18 @@ import {
   recruiterDataVisibilitySummary,
   type RecruiterDataVisibility,
 } from "@/lib/recruiter-data-visibility";
+import { localizeRecruiterInboxChipText } from "@/lib/recruiter-inbox-chip-copy";
 import {
   RECRUITER_INBOX_VISUAL_MARKERS,
+  recruiterInboxDeclineButtonClass,
+  recruiterInboxEvidenceChipClass,
   recruiterInboxMatchScoreBadgeClass,
   recruiterInboxMatchScoreTone,
+  recruiterInboxNeutralChipClass,
+  recruiterInboxReviewCardCtaClass,
+  recruiterInboxSegmentTabFocusClass,
+  recruiterInboxStatusBadgeClass,
+  recruiterInboxWarningChipClass,
 } from "@/lib/recruiter-inbox-visual";
 
 type BatchRow = {
@@ -83,7 +91,7 @@ type AuthMeBilling = {
 };
 
 export default function RecruiterInboxClient() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const searchParams = useSearchParams();
   const [token, setToken] = useState("");
   const [companyRaw, setCompanyRaw] = useState("");
@@ -415,6 +423,10 @@ export default function RecruiterInboxClient() {
     return t(key).replace("{count}", String(count));
   }
 
+  function localizeChip(text: string): string {
+    return localizeRecruiterInboxChipText(text, locale);
+  }
+
   function rowEvidenceChips(row: BatchRow): string[] {
     const fromReasons = (row.match_reasons ?? []).slice(0, 2);
     const fromReview = (row.review_card?.requirements_matched ?? []).slice(0, 2);
@@ -422,14 +434,14 @@ export default function RecruiterInboxClient() {
     for (const item of fromReview) {
       if (!merged.includes(item) && merged.length < 3) merged.push(item);
     }
-    return merged;
+    return merged.map((chip) => localizeChip(chip));
   }
 
   function rowMissingChip(row: BatchRow): string | null {
     const missing = row.review_card?.uncertain_or_missing ?? [];
     if (missing.length === 0) return null;
-    if (missing.length === 1) return missing[0];
-    return `${missing[0]} (+${missing.length - 1})`;
+    if (missing.length === 1) return localizeChip(missing[0]);
+    return `${localizeChip(missing[0])} (+${missing.length - 1})`;
   }
 
   function rowConfidenceKey(row: BatchRow): TranslationKey | null {
@@ -652,7 +664,7 @@ export default function RecruiterInboxClient() {
                     type="button"
                     role="tab"
                     aria-selected={active}
-                    className={`${RECRUITER_INBOX_VISUAL_MARKERS.segmentTab} rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors ${
+                    className={`${RECRUITER_INBOX_VISUAL_MARKERS.segmentTab} ${recruiterInboxSegmentTabFocusClass()} rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors ${
                       active
                         ? "border-[var(--twin-accent)] bg-[var(--twin-accent)]/15 text-[var(--foreground)] shadow-sm"
                         : "border-[var(--twin-border)] bg-[var(--twin-surface)] text-[var(--twin-muted)] hover:border-[var(--twin-accent)]/30 hover:text-[var(--foreground)]"
@@ -799,16 +811,14 @@ export default function RecruiterInboxClient() {
                             ) : null}
                             {badgeLabel ? (
                               <span
-                                className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${
-                                  recruiterInboxDecisionBadge(r.status) === "accepted"
-                                    ? "bg-emerald-500/15 text-emerald-800 dark:text-emerald-200"
-                                    : "bg-[var(--twin-surface-2)] text-[var(--twin-muted)]"
-                                }`}
+                                className={recruiterInboxStatusBadgeClass(
+                                  recruiterInboxDecisionBadge(r.status) === "accepted" ? "accepted" : "declined",
+                                )}
                               >
                                 {badgeLabel}
                               </span>
                             ) : statusKey ? (
-                              <span className="inline-flex items-center rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-900 dark:text-amber-100">
+                              <span className={recruiterInboxStatusBadgeClass("awaiting")}>
                                 {t(`recruiterInbox.${statusKey}` as TranslationKey)}
                               </span>
                             ) : null}
@@ -828,7 +838,7 @@ export default function RecruiterInboxClient() {
                               {evidenceChips.map((chip) => (
                                 <span
                                   key={`evidence-${r.application_id}-${chip}`}
-                                  className="inline-flex max-w-full items-center rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-xs leading-snug text-emerald-900 dark:text-emerald-100"
+                                  className={recruiterInboxEvidenceChipClass()}
                                   title={chip}
                                 >
                                   {chip}
@@ -845,14 +855,14 @@ export default function RecruiterInboxClient() {
                             <div className="mt-2 flex flex-wrap gap-2">
                               {missingChip ? (
                                 <span
-                                  className="inline-flex max-w-full items-center rounded-lg border border-amber-500/35 bg-amber-500/10 px-2.5 py-1 text-xs leading-snug text-amber-900 dark:text-amber-100"
+                                  className={recruiterInboxWarningChipClass()}
                                   title={missingChip}
                                 >
                                   {missingChip}
                                 </span>
                               ) : null}
                               {confidenceKey ? (
-                                <span className="inline-flex items-center rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-2)] px-2.5 py-1 text-xs leading-snug text-[var(--foreground)]">
+                                <span className={recruiterInboxNeutralChipClass()}>
                                   {t(confidenceKey)}
                                 </span>
                               ) : null}
@@ -866,7 +876,7 @@ export default function RecruiterInboxClient() {
                           <div className="mt-4">
                             <button
                               type="button"
-                              className={`${RECRUITER_INBOX_VISUAL_MARKERS.reviewCardCta} inline-flex items-center gap-1.5 rounded-lg border border-[var(--twin-accent)]/35 bg-[var(--twin-accent)]/10 px-3 py-2 text-sm font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--twin-accent)]/18`}
+                              className={recruiterInboxReviewCardCtaClass()}
                               aria-expanded={reviewExpanded}
                               onClick={() => toggleReviewCard(r.application_id)}
                             >
@@ -919,7 +929,7 @@ export default function RecruiterInboxClient() {
                                         {reviewCardSectionLabel(section)}
                                       </dt>
                                       <dd className="mt-1 text-xs leading-relaxed text-[var(--foreground)]">
-                                        {items[0] ?? t("recruiterInbox.reviewNoneListed")}
+                                        {items[0] ? localizeChip(items[0]) : t("recruiterInbox.reviewNoneListed")}
                                       </dd>
                                     </div>
                                   );
@@ -934,7 +944,7 @@ export default function RecruiterInboxClient() {
                                         <ul className="space-y-0.5 text-xs text-[var(--foreground)]">
                                           {items.map((item) => (
                                             <li key={`${section}-${item}`} className="leading-snug">
-                                              {item}
+                                              {localizeChip(item)}
                                             </li>
                                           ))}
                                         </ul>
@@ -966,7 +976,7 @@ export default function RecruiterInboxClient() {
                       </button>
                       <button
                         type="button"
-                        className="twin-btn-ghost text-sm text-red-600 hover:text-red-700 dark:text-red-400"
+                        className={recruiterInboxDeclineButtonClass()}
                         disabled={busyId !== null}
                         onClick={() => {
                           setDeclineTargetId(r.application_id);

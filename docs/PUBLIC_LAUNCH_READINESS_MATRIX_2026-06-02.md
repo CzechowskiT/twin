@@ -18,6 +18,8 @@
 **Safe-lane merge (2026-06-08):** Candidate application transparency premium panel (Slice 3) · two-column shared/not shared · **does not change launch NO-GO**.
 **Safe-lane merge (2026-06-10):** Recruiter decision console **visual polish** — wider hierarchy, stat cards, match score badges, review card CTA · accept/decline unchanged · **does not change launch NO-GO**.
 
+**Safe-lane merge (2026-06-10):** Recruiter inbox **contrast/readability** — badges, chips, CTA, decline visibility; PL chip localization · **does not change launch NO-GO**.
+
 **Safe-lane merge (2026-06-08):** Recruiter decision console inbox (Slice 4) · segment tabs + evidence chips · accept/decline API unchanged · **does not change launch NO-GO**.
 **Safe-lane merge (2026-06-08):** Product trust language polish (Slice 5) · unified phased/paused automation copy · `test:trust-language-guard` · **does not change launch NO-GO**.
 **Safe-lane merge (2026-06-08):** Premium guided empty states (Slice 6) · candidate + recruiter onboarding steps · **does not change launch NO-GO**.
