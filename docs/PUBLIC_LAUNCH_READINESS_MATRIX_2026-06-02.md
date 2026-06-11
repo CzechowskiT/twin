@@ -28,6 +28,8 @@
 
 **Safe-lane merge (2026-06-11):** Investor metrics **reality dashboard** — `/investor/metrics` · `test:investor-metrics-reality-dashboard` · **does not change launch NO-GO**.
 
+**Safe-lane merge (2026-06-11):** Recruiter **manual scheduling + pipeline** — prepare-invite panel, copy invite, mark invited/scheduled, ATS-lite pipeline with scheduled slot badge; **no** outbound email, **no** recruiter calendar sync · `docs/RECRUITER_SCHEDULING_MVP_MANUAL_2026-06-11.md` · **REPO** · recruiter calendar sync **NOT LIVE** · **does not change launch NO-GO**.
+
 **Docs-only (2026-06-11):** H5c GO SMALL 1 prep pack · `docs/H5C_GO_SMALL_1_PREP_PACK_2026-06-11.md` — **ready for controlled Slot-1 recruiter visual/product review** · **does not change public launch NO-GO** · external invitations **not sent** · H5c/H5d **HOLD**.
 
 **Safe-lane merge (2026-06-10):** Recruiter inbox **readability/layout** — two-zone cards, chip caps, dominant match score, sentence-case labels · **does not change launch NO-GO**.
@@ -102,6 +104,8 @@
 | Microsoft Graph | `microsoft_calendar_configured` on health surface | ✅ LIVE |
 | Apple / CalDAV / ICS | ICS/WebCal partial; no Apple Calendar OAuth | ⚠️ PARTIAL (waiver signed) |
 | O5 gate row | Google ✅ · Microsoft ✅ · Apple/iCal partial — founder waiver `2026-06-03T13:19:53Z` | ⚠️ **partial-with-waiver** — non-blocking for controlled pilot |
+| Recruiter manual scheduling | `docs/RECRUITER_SCHEDULING_MVP_MANUAL_2026-06-11.md` — inbox prepare-invite; manual slot + meeting link; copy invite; mark invited/scheduled; `test:recruiter-scheduling-mvp` | ⚠️ **REPO** — manual workflow only; **no** email send; recruiter calendar sync **NOT LIVE** |
+| Recruiter pipeline `/recruiter/pipeline` | `docs/RECRUITER_SCHEDULING_MVP_MANUAL_2026-06-11.md` — ATS-lite stages; scheduled badge; `test:recruiter-pipeline-mvp` | ⚠️ **REPO** — list + transitions; no external ATS |
 | Recruiter calendar `/recruiter/calendar` | PR [#43](https://github.com/CzechowskiT/twin/pull/43) `2fa2746` — nav fix + placeholder; HTTP 200 smoke `2026-06-07T06:32:51Z`; `persona-access.test.ts` 8/8; **NOT LIVE** copy (no sync claims) | ✅ **PASS** (placeholder) — **NOT LIVE** for recruiter sync; candidate `/dashboard/calendar` unchanged |
 | Candidate calendar post-load session | `fix/candidate-calendar-post-load-logout-2026-06-10` — provider OAuth/integration errors must not `clearToken`; `test:candidate-calendar-post-load-auth` (`docs/CANDIDATE_CALENDAR_POST_LOAD_LOGOUT_FIX_2026-06-10.md`) | ✅ **PASS** (candidate) — stay logged in when calendar not connected or provider token stale |
 | Candidate calendar integration health | `fix/candidate-calendar-integration-health-2026-06-10` — provider `health` on status; per-provider week load + reconnect badges; `test:candidate-calendar-integration-health` (`docs/CANDIDATE_CALENDAR_INTEGRATION_HEALTH_FIX_2026-06-10.md`) | ✅ **PASS** (candidate) — no false **POŁĄCZONO** on stale tokens; partial provider failure |

@@ -30,6 +30,18 @@ class ApplicationStatus(str, PyEnum):
     HIRED = "hired"
 
 
+class RecruiterPipelineStatus(str, PyEnum):
+    """ATS-lite recruiter stage — separate from candidate Application.status."""
+
+    NEW = "new"
+    REVIEW = "review"
+    ACCEPTED = "accepted"
+    TO_CONTACT = "to_contact"
+    INVITED = "invited"
+    REJECTED = "rejected"
+    ON_HOLD = "on_hold"
+
+
 class SubmissionStatus(str, PyEnum):
     APPLICATION_CREATED_IN_TWIN = "application_created_in_twin"
     APPLICATION_PREPARED = "application_prepared"
@@ -590,6 +602,11 @@ class Application(Base):
     failure_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     requires_manual_action: Mapped[bool] = mapped_column(Boolean, default=False)
     submit_attempt_logs: Mapped[str | None] = mapped_column(Text, nullable=True)
+    recruiter_pipeline_status: Mapped[str | None] = mapped_column(String(32), nullable=True, index=True)
+    recruiter_scheduling_status: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    recruiter_manual_slot_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    recruiter_manual_slot_duration_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    recruiter_manual_meeting_link: Mapped[str | None] = mapped_column(String(2000), nullable=True)
 
     candidate: Mapped["Candidate"] = relationship(back_populates="applications")
     job: Mapped["Job"] = relationship(back_populates="applications")
