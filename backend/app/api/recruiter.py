@@ -17,6 +17,7 @@ from app.services.recruiter_audit_trail import (
     list_recruiter_audit_events,
     log_recruiter_audit_event,
 )
+from app.services.recruiter_candidate_search import build_recruiter_candidate_search
 from app.services.recruiter_inbox import (
     build_recruiter_batch,
     respond_recruiter_batch,
@@ -196,6 +197,52 @@ def recruiter_inbox_respond_batch(
             application_ids=body.application_ids,
             action=body.action,
             decline_note=body.decline_note,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.get("/search")
+def recruiter_candidate_search(
+    request: Request,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+    limit: int = Query(50, ge=1, le=100),
+    q: str | None = Query(None, max_length=200),
+    name: str | None = Query(None, max_length=120),
+    role_title: str | None = Query(None, max_length=200),
+    skills: str | None = Query(None, max_length=300),
+    location: str | None = Query(None, max_length=120),
+    min_score: float | None = Query(None, ge=0, le=100),
+    max_score: float | None = Query(None, ge=0, le=100),
+    status: str | None = Query(None, max_length=32),
+    pipeline_status: str | None = Query(None, max_length=32),
+    data_confidence: str | None = Query(None, max_length=32),
+    missing_data: bool | None = Query(None),
+    availability: str | None = Query(None, max_length=32),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return build_recruiter_candidate_search(
+            db,
+            company_slug=slug,
+            limit=limit,
+            locale=locale_from_request(request),
+            q=q,
+            name=name,
+            role_title=role_title,
+            skills=skills,
+            location=location,
+            min_score=min_score,
+            max_score=max_score,
+            status=status,
+            pipeline_status=pipeline_status,
+            data_confidence=data_confidence,
+            missing_data=missing_data,
+            availability=availability,
         )
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
