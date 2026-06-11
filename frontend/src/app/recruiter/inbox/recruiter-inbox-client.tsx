@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
 import { RecruiterAuditTrailPanel, postRecruiterAuditEvent } from "@/components/recruiter/recruiter-audit-trail-panel";
 import { RecruiterDecisionRail } from "@/components/recruiter/recruiter-decision-rail";
+import { RecruiterScorecardPanel } from "@/components/recruiter/recruiter-scorecard-panel";
 import { RecruiterSchedulingPanel } from "@/components/recruiter/recruiter-scheduling-panel";
 import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspace-nav";
 import { RecruiterMessageDraftPanel } from "@/components/recruiter/recruiter-message-draft-panel";
@@ -976,6 +977,11 @@ export default function RecruiterInboxClient() {
                               token={token}
                               companySlug={companySlug}
                               refreshKey={auditRefreshKey}
+                            />
+                            <RecruiterScorecardPanel
+                              applicationId={r.application_id}
+                              token={token}
+                              companySlug={companySlug}
                             />
                           </div>
                             ) : null}

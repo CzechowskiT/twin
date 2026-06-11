@@ -725,6 +725,30 @@ class RecruiterAuditEvent(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
+class RecruiterApplicationScorecard(Base):
+    """Internal recruiter scorecard per application — not copied to audit trail."""
+
+    __tablename__ = "recruiter_application_scorecards"
+    __table_args__ = (
+        UniqueConstraint("application_id", "company_slug", name="uq_recruiter_scorecard_app_company"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    application_id: Mapped[int] = mapped_column(
+        ForeignKey("applications.id", ondelete="CASCADE"),
+        index=True,
+    )
+    company_slug: Mapped[str] = mapped_column(String(80), index=True)
+    rating: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
+
+
 class AutoApplyConsent(Base):
     """GDPR-style consent for nightly autonomous applications."""
 

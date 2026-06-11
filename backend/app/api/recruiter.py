@@ -24,6 +24,7 @@ from app.services.recruiter_inbox import (
     respond_recruiter_batch_bulk,
 )
 from app.services.recruiter_pipeline import build_recruiter_pipeline, transition_recruiter_pipeline
+from app.services.recruiter_scorecards import get_recruiter_scorecard, upsert_recruiter_scorecard
 from app.services.recruiter_scheduling import save_recruiter_manual_schedule
 from app.services.recruiter_jobs import create_company_job, list_company_jobs
 from app.services.request_locale import locale_from_request
@@ -145,6 +146,52 @@ def recruiter_inbox_respond(
 class RecruiterAuditLogIn(BaseModel):
     action_type: str = Field(..., max_length=64)
     meta: dict[str, str] | None = Field(None, description="Optional non-PII metadata")
+
+
+class RecruiterScorecardIn(BaseModel):
+    rating: int | None = Field(default=None, ge=1, le=5)
+    note: str | None = Field(default=None, max_length=2000)
+
+
+@router.get("/inbox/{application_id}/scorecard")
+def recruiter_inbox_scorecard_get(
+    application_id: int,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return get_recruiter_scorecard(db, application_id=application_id, company_slug=slug)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.put("/inbox/{application_id}/scorecard")
+@limiter.limit("60/minute", key_func=recruiter_token_key)
+def recruiter_inbox_scorecard_upsert(
+    request: Request,
+    application_id: int,
+    body: RecruiterScorecardIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return upsert_recruiter_scorecard(
+            db,
+            application_id=application_id,
+            company_slug=slug,
+            rating=body.rating,
+            note=body.note,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
 
 @router.get("/inbox/{application_id}/audit")
