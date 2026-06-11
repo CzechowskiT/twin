@@ -23,7 +23,6 @@ function read(relativePath: string): string {
 const LIST_PAGE = "src/app/company/roles/page.tsx";
 const FORM = "src/components/company/company-role-form.tsx";
 const NAV = "src/components/company/company-workspace-nav.tsx";
-const LIB = "src/lib/company-jobs-roles.ts";
 const API_LIST = "src/app/api/company/roles/route.ts";
 const API_DETAIL = "src/app/api/company/roles/[roleId]/route.ts";
 const CHECKLIST = "src/components/company/company-role-quality-checklist.tsx";
