@@ -75,5 +75,6 @@ api_router.include_router(feedback.router, prefix="/feedback", tags=["Feedback"]
 api_router.include_router(admin_ops.router, prefix="/admin", tags=["Admin"])
 api_router.include_router(ops.router, prefix="/ops", tags=["Ops"])
 api_router.include_router(investor_data_room.router, prefix="/investor", tags=["Investor"])
+api_router.include_router(company.router, prefix="/company", tags=["Company"])
 api_router.include_router(recruiter.router, prefix="/recruiter", tags=["Recruiter"])
 api_router.include_router(company.router, prefix="/company", tags=["Company"])

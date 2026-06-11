@@ -1,4 +1,4 @@
-"""Company workspace API — internal roles and pipeline quality aggregates."""
+"""Company workspace API — roles, pipeline quality, and team readiness."""
 
 from __future__ import annotations
 
@@ -18,6 +18,7 @@ from app.services.company_roles import (
     list_company_roles,
     update_company_role,
 )
+from app.services.company_team import build_company_team_readiness
 from app.services.request_locale import locale_from_request
 
 router = APIRouter()
@@ -68,6 +69,23 @@ def company_pipeline_quality(
         )
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.get("/team")
+def company_team_readiness(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    return build_company_team_readiness(
+        db,
+        settings,
+        company_slug=slug,
+        raw_token=x_twin_recruiter_token or token,
+    )
 
 
 @router.get("/roles")
