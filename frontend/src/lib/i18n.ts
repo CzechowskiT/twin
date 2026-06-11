@@ -125,6 +125,7 @@ export type TranslationKey =
   | `status.${keyof typeof en.status}`
   | `placementEmployer.${keyof typeof en.placementEmployer}`
   | `candidateTimeline.${keyof typeof en.candidateTimeline}`
+  | `candidateInterviewPrep.${keyof typeof en.candidateInterviewPrep}`
   | `acceptanceQueue.${keyof typeof en.acceptanceQueue}`
   | `recruiterInbox.${keyof typeof en.recruiterInbox}`
   | `recruiterAudit.${keyof typeof en.recruiterAudit}`
@@ -2948,6 +2949,19 @@ eyebrow: "Product roadmap",
     updated: "Updated",
     scopeNote:
       "This view shows your TWIN pipeline only — not emails or messages from outside the product.",
+    backDashboard: "Back to dashboard",
+  },
+  candidateInterviewPrep: {
+    eyebrow: "Candidate workspace",
+    title: "Interview prep",
+    lead:
+      "Prepare for confirmed slots from your calendar — career assistant prompts, not automated coaching spam.",
+    howTitle: "How to prep in TWIN today",
+    step1: "Connect your calendar and review confirmed interview holds.",
+    step2: "Open a scheduled role from your dashboard matches or applications timeline.",
+    step3: "Use career assistant modals for role-specific talking points (beta).",
+    ctaCalendar: "Open calendar",
+    scopeNote: "Dedicated AI interview coach routes remain beta — no fake ‘guaranteed offer’ claims.",
     backDashboard: "Back to dashboard",
   },
   acceptanceQueue: {
@@ -6673,6 +6687,19 @@ const pl: MessageTree = {
     updated: "Zaktualizowano",
     scopeNote:
       "Ten widok pokazuje tylko pipeline TWIN — bez maili ani wiadomości spoza produktu.",
+    backDashboard: "Wróć do dashboardu",
+  },
+  candidateInterviewPrep: {
+    eyebrow: "Przestrzeń kandydata",
+    title: "Przygotowanie do rozmowy",
+    lead:
+      "Przygotuj się do potwierdzonych slotów z kalendarza — podpowiedzi career assistant, bez spamu coachingowego.",
+    howTitle: "Jak przygotować się w TWIN dziś",
+    step1: "Podłącz kalendarz i przejrzyj potwierdzone holdy rozmów.",
+    step2: "Otwórz zaplanowaną rolę z dopasowań lub osi aplikacji.",
+    step3: "Użyj modali career assistant do talking points pod rolę (beta).",
+    ctaCalendar: "Otwórz kalendarz",
+    scopeNote: "Dedykowane trasy AI interview coach pozostają w beta — bez obietnic ‘gwarantowanej oferty’.",
     backDashboard: "Wróć do dashboardu",
   },
   acceptanceQueue: {

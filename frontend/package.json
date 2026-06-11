@@ -34,6 +34,7 @@
     "test:company-billing-plan-usage-readiness": "npx --yes tsx scripts/company-billing-plan-usage-readiness.test.ts",
     "test:candidate-transparency": "npx --yes tsx scripts/candidate-transparency.test.ts",
     "test:candidate-application-timeline-crm": "npx --yes tsx scripts/candidate-application-timeline-crm.test.ts",
+    "test:candidate-interview-prep-mvp": "npx --yes tsx scripts/candidate-interview-prep-mvp.test.ts,
     "test:homepage-nav": "npx --yes tsx scripts/homepage-nav.test.ts",
     "test:trust-language-guard": "npx --yes tsx scripts/trust-language-guard.test.ts",
     "test:i18n-coverage": "npx --yes tsx scripts/i18n-coverage.test.ts",
