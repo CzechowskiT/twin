@@ -208,6 +208,7 @@ Primary questions for slot-1 reviewer (week 1–4) — align with H5c §7 and tr
 | UTC | Decision | Slot-1 | Rationale | Owner |
 | --- | -------- | ------ | --------- | ----- |
 | `2026-06-07` | **`hold`** (default) | **none selected** | H5d slot-1 reviewer shortlist pack created — docs only; H5b PASS preserved; H5c HOLD preserved; external invitations **not sent**; founder to supply 3–5 possible names for §6 scoring | Founder |
+| `2026-06-11` | **`hold`** (unchanged) | **none selected** | H5c GO SMALL 1 prep pack created — Slot-1 visual review **READY**; §6 table still empty; external invitations **not sent**; see `docs/H5C_GO_SMALL_1_PREP_PACK_2026-06-11.md` | Founder |
 
 **Decision codes:** `hold` · `select_slot_1` · `defer_candidate` · `widen_search` · `cohort_pause`
 
@@ -230,7 +231,7 @@ Primary questions for slot-1 reviewer (week 1–4) — align with H5c §7 and tr
 | **Delegated apply** | **NOT LIVE** |
 | **Recruiter calendar** | **NOT LIVE** — placeholder only |
 | **External recruiter invites** | **Not sent** — deferred until H5d slot-1 selected + H5c **GO SMALL 1** sign-off |
-| **Next founder action** | Supply **3–5 possible names** for §6 scoring → select slot 1 if ≥4.2 → complete §8 → sign **GO SMALL 1** in H5c §9 → tracker row 1 → invites pack |
+| **Next founder action** | Run `docs/H5C_GO_SMALL_1_PREP_PACK_2026-06-11.md` §2 smoke → Slot-1 visual review → supply **3–5 possible names** for §6 scoring → select slot 1 if ≥4.2 → complete §8 → sign **GO SMALL 1** in H5c §9 → tracker row 1 → invites pack |
 
 ---
 
@@ -245,6 +246,7 @@ Primary questions for slot-1 reviewer (week 1–4) — align with H5c §7 and tr
 | `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md` | Cohort + metrics |
 | `docs/LIMITED_RECRUITER_PILOT_INVITES_2026-06-06.md` | Outbound templates (**after H5c GO SMALL only**) |
 | `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` | R1–R5 evidence |
+| `docs/H5C_GO_SMALL_1_PREP_PACK_2026-06-11.md` | Slot-1 visual review prep — demo script, talk track, feedback capture |
 
 ---
 
