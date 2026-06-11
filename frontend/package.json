@@ -29,7 +29,7 @@
     "test:recruiter-review-card": "npx --yes tsx scripts/recruiter-review-card.test.ts",
     "test:recruiter-candidate-search-mvp": "npx --yes tsx scripts/recruiter-candidate-search-mvp.test.ts",
     "test:company-pipeline-quality-metrics": "npx --yes tsx scripts/company-pipeline-quality-metrics.test.ts",
-    "test:pii-data-visibility": "npx --yes tsx scripts/pii-data-visibility.test.ts",
+    "test:company-hiring-dashboard-mvp": "npx --yes tsx scripts/company-hiring-dashboard-mvp.test.ts",
     "test:candidate-transparency": "npx --yes tsx scripts/candidate-transparency.test.ts",
     "test:homepage-nav": "npx --yes tsx scripts/homepage-nav.test.ts",
     "test:trust-language-guard": "npx --yes tsx scripts/trust-language-guard.test.ts",
