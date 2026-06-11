@@ -124,6 +124,7 @@ export type TranslationKey =
   | `feedback.${keyof typeof en.feedback}`
   | `status.${keyof typeof en.status}`
   | `placementEmployer.${keyof typeof en.placementEmployer}`
+  | `candidateTimeline.${keyof typeof en.candidateTimeline}`
   | `acceptanceQueue.${keyof typeof en.acceptanceQueue}`
   | `recruiterInbox.${keyof typeof en.recruiterInbox}`
   | `recruiterAudit.${keyof typeof en.recruiterAudit}`
@@ -139,6 +140,7 @@ export type TranslationKey =
   | `companyTeam.${keyof typeof en.companyTeam}`
   | `recruiterScheduling.${keyof typeof en.recruiterScheduling}`
   | `recruiterPipeline.${keyof typeof en.recruiterPipeline}`
+  | `recruiterAnalytics.${keyof typeof en.recruiterAnalytics}`
   | `recruiterIntegrations.${keyof typeof en.recruiterIntegrations}`
   | `verifyEmail.${keyof typeof en.verifyEmail}`
   | `investorMetrics.${keyof typeof en.investorMetrics}`
@@ -2846,6 +2848,21 @@ eyebrow: "Product roadmap",
     role_viewer_perm2: "Export anonymized summaries",
     role_viewer_perm3: "No accept/decline or token actions",
   },
+  recruiterAnalytics: {
+    title: "Recruiter analytics",
+    navLink: "Analytics",
+    lead: "Read-only workspace counters from applications and audit events — no revenue or hire-velocity claims.",
+    load: "Load analytics",
+    loading: "Loading analytics…",
+    windowDays: "Last {days} days",
+    metricApplications: "Applications tracked",
+    metricAuditEvents: "Audit events",
+    metricDecisions: "Decisions logged",
+    metricReviews: "Reviews opened",
+    notLiveNote: "Recruiter calendar sync and export remain NOT LIVE — pilot metrics only.",
+    emptyTitle: "Load recruiter analytics",
+    emptyBody: "Enter pilot access code and company slug to see workspace counters.",
+  },
   recruiterIntegrations: {
     eyebrow: "Recruiter workspace",
     title: "Integrations readiness",
@@ -2920,6 +2937,18 @@ eyebrow: "Product roadmap",
     nextActionInvited: "Await candidate response",
     nextActionRejected: "Archive or reopen",
     nextActionOnHold: "Resume or reject",
+  },
+  candidateTimeline: {
+    eyebrow: "Candidate workspace",
+    title: "Application timeline",
+    lead:
+      "Your tracked applications in one ledger — status phases from TWIN data, not a generic CRM import.",
+    loading: "Loading applications…",
+    empty: "No tracked applications yet. Save or apply to roles from your dashboard to build your timeline.",
+    updated: "Updated",
+    scopeNote:
+      "This view shows your TWIN pipeline only — not emails or messages from outside the product.",
+    backDashboard: "Back to dashboard",
   },
   acceptanceQueue: {
     stripTitle: "Acceptance queue",
@@ -6544,6 +6573,21 @@ const pl: MessageTree = {
     role_viewer_perm2: "Eksport zanonimizowanych podsumowań",
     role_viewer_perm3: "Bez akceptacji/odrzuceń i tokenów",
   },
+  recruiterAnalytics: {
+    title: "Analityka rekrutera",
+    navLink: "Analityka",
+    lead: "Liczniki workspace tylko do odczytu z aplikacji i zdarzeń audytu — bez przychodu ani metryk prędkości zatrudnień.",
+    load: "Załaduj analitykę",
+    loading: "Ładowanie analityki…",
+    windowDays: "Ostatnie {days} dni",
+    metricApplications: "Śledzone aplikacje",
+    metricAuditEvents: "Zdarzenia audytu",
+    metricDecisions: "Zalogowane decyzje",
+    metricReviews: "Otwarte review",
+    notLiveNote: "Sync kalendarza rekrutera i eksport pozostają NOT LIVE — tylko metryki pilotażowe.",
+    emptyTitle: "Załaduj analitykę rekrutera",
+    emptyBody: "Wpisz kod dostępu pilotażowego i slug firmy, aby zobaczyć liczniki workspace.",
+  },
   recruiterIntegrations: {
     eyebrow: "Przestrzeń rekrutera",
     title: "Gotowość integracji",
@@ -6618,6 +6662,18 @@ const pl: MessageTree = {
     nextActionInvited: "Czekaj na odpowiedź kandydata",
     nextActionRejected: "Archiwizuj lub wznów",
     nextActionOnHold: "Wznów lub odrzuć",
+  },
+  candidateTimeline: {
+    eyebrow: "Przestrzeń kandydata",
+    title: "Oś czasu aplikacji",
+    lead:
+      "Twoje śledzone aplikacje w jednym rejestrze — fazy statusu z danych TWIN, bez importu z zewnętrznego CRM.",
+    loading: "Ładowanie aplikacji…",
+    empty: "Brak śledzonych aplikacji. Zapisuj lub aplikuj na role z dashboardu, aby zbudować oś czasu.",
+    updated: "Zaktualizowano",
+    scopeNote:
+      "Ten widok pokazuje tylko pipeline TWIN — bez maili ani wiadomości spoza produktu.",
+    backDashboard: "Wróć do dashboardu",
   },
   acceptanceQueue: {
     stripTitle: "Kolejka akceptacji",

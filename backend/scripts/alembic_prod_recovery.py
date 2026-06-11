@@ -93,8 +93,17 @@ def recover_alembic_version(database_url: str) -> None:
             _stamp(conn, OLD_RENAME_WHEN_CALENDAR_READY[current], current)
 
 
+def _normalize_database_url(url: str) -> str:
+    """Railway often provides postgres:// — SQLAlchemy needs psycopg driver."""
+    if url.startswith("postgres://"):
+        return "postgresql+psycopg://" + url[len("postgres://") :]
+    if url.startswith("postgresql://") and "+psycopg" not in url:
+        return "postgresql+psycopg://" + url[len("postgresql://") :]
+    return url
+
+
 def main() -> int:
-    url = os.environ.get("DATABASE_URL", "").strip()
+    url = _normalize_database_url(os.environ.get("DATABASE_URL", "").strip())
     if not url:
         return 0
     try:
