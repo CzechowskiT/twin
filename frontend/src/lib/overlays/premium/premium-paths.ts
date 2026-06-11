@@ -8,6 +8,7 @@ export const PREMIUM_I18N_PREFIXES = [
   "dashboard.applicationTransparency",
   "dashboard.todayNba",
   "recruiterInbox.",
+  "recruiterMessageDrafts.",
   "recruiterCalendar.",
   "demo.",
   "interactiveDemo.",

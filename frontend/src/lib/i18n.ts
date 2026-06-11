@@ -20,6 +20,7 @@ import {
   premiumJaOverlay,
   premiumZhOverlay,
 } from "./overlays/premium";
+import { RECRUITER_MESSAGE_DRAFTS_OVERLAYS } from "./overlays/premium/recruiter-message-drafts-overlays";
 import { FAQ_MESSAGES_EN, FAQ_MESSAGES_PL } from "./faq-messages";
 import {
   EMPLOYER_MEDIA_MESSAGES_EN,
@@ -6309,8 +6310,12 @@ function localeFromOverlays(
   const marketingHome = MARKETING_HOME_OVERLAYS[locale] ?? {};
   const siteChrome = SITE_CHROME_OVERLAYS[locale] ?? {};
   const faqOverlay = FAQ_LOCALE_OVERLAYS[locale] ?? {};
+  const messageDraftsOverlay = RECRUITER_MESSAGE_DRAFTS_OVERLAYS[locale] ?? {};
   return messagesFromEnOverlay(
-    mergeDeep(mergeDeep(mergeDeep(withPremium, marketingHome), siteChrome), { faq: faqOverlay }),
+    mergeDeep(
+      mergeDeep(mergeDeep(mergeDeep(withPremium, marketingHome), siteChrome), { faq: faqOverlay }),
+      messageDraftsOverlay,
+    ),
   );
 }
 

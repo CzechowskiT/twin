@@ -5,7 +5,6 @@ import { fileURLToPath } from "node:url";
 import test from "node:test";
 
 import {
-  RECRUITER_MESSAGE_DRAFT_VISUAL_MARKERS,
   buildRecruiterMessageDraftContext,
   isRecruiterMessageDraftEligible,
   recruiterMessageDraftIsSafe,
