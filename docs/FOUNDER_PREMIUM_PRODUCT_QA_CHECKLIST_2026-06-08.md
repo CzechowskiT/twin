@@ -88,7 +88,7 @@
 | 4.4 | Review card | **Otwórz kartę oceny** CTA (chevron button); accept/decline + batch unchanged |
 | 4.5 | Decided rows | Interview/rejected show badge only — no accept |
 | 4.6 | Access strip | Collapsed after queue load — decision console is visual focus |
-| 4.7 | Contrast (dark theme) | Match/status badges, chips, review CTA, decline readable without zoom (`docs/RECRUITER_INBOX_CONTRAST_READABILITY_FIX_2026-06-10.md`) |
+| 4.7 | Contrast (dark theme) | Match/status badges, chips, review CTA, decline readable without zoom (`docs/RECRUITER_INBOX_CONTRAST_READABILITY_FIX_2026-06-10.md`, `docs/RECRUITER_DECISION_RAIL_TEXT_READABILITY_FIX_2026-06-11.md`) |
 | 4.8 | Layout & scanability | Decision rail, match score card (label/%/tone), signal rows ≤2 + overflow, review CTA (`docs/RECRUITER_INBOX_PREMIUM_CARD_REDESIGN_2026-06-11.md`) |
 | 4.8 | PL chip copy | Known demo reasons localized — no obvious English leakage in PL UI |
 

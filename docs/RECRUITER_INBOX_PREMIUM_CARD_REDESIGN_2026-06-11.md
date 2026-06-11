@@ -19,13 +19,18 @@ PR #73 improved contrast and layout but still read like patched admin UI — hea
 | Layout | Content (left) + **decision rail** (right) — elegant panel, not heavy sidebar |
 | Match score | **RecruiterMatchScoreCard** — label (`Dopasowanie`) + large `%` + tone (`Dobre`); subtle emerald/cyan/amber |
 | Signals | **RecruiterSignalList** — ✓ positive / ! verification rows; max 2 + `+N więcej w karcie oceny` |
-| Review CTA | **Zobacz kartę oceny** — light secondary, cyan/teal border, chevron, focus ring |
-| Actions | Confident primary accept + visible decline; decided rows calm (badge only, no accept) |
+| Review CTA | **Zobacz kartę oceny** — near-white text on dark; cyan/teal on border/bg/chevron (not label) |
+| Status badges | **Oczekuje decyzji** etc. — white/slate-100 text; tone via border/background only |
+| Decline | Light rose/white text, stronger border/bg — readable, not disabled-looking |
+| Match score | Label/tone high-contrast (`slate-200`/`slate-100` on dark); tone color on card border |
+| Focus | Strong cyan/rose `focus-visible` rings on review CTA and decline |
 | i18n | `matchScoreCardLabel`, `reviewCardCtaShort`, `chipOverflowInReviewCard` (PL+EN) |
 
 **Components:** `recruiter-match-score-card.tsx`, `recruiter-signal-list.tsx`, `recruiter-decision-rail.tsx`
 
-**Files:** `recruiter-inbox-client.tsx`, `recruiter-inbox-visual.ts`, `recruiter-inbox-chip-copy.ts`, `i18n.ts`, `recruiter-inbox-premium-card-ui.test.ts`
+**Follow-up (PR #74+):** `fix/recruiter-decision-rail-text-readability-2026-06-11` — decision rail text contrast on dark (status, review CTA, decline). See `docs/RECRUITER_DECISION_RAIL_TEXT_READABILITY_FIX_2026-06-11.md`.
+
+**Files:** `recruiter-inbox-client.tsx`, `recruiter-inbox-visual.ts`, `recruiter-inbox-chip-copy.ts`, `i18n.ts`, `recruiter-inbox-premium-card-ui.test.ts`, `recruiter-decision-rail-readability.test.ts`
 
 **Hard bans respected:** no backend/DB/auth/CSP changes; accept/decline behavior unchanged; PII hidden; review card + warnings retained; no fake data.
 
@@ -37,6 +42,7 @@ PR #73 improved contrast and layout but still read like patched admin UI — hea
 
 ```bash
 cd frontend
+npm run test:recruiter-decision-rail-readability
 npm run test:recruiter-inbox-premium-card-ui
 npm run test:recruiter-inbox-readability-layout
 npm run test:recruiter-inbox-visual
