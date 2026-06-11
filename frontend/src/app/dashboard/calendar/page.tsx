@@ -23,7 +23,9 @@ import { calendarProviderLabel } from "@/lib/calendar-provider";
 import {
   aggregateWeekEventOutcomes,
   CALENDAR_FETCH_TIMEOUT_MS,
+  debugCalendarLog,
   displayHealthForProvider,
+  eventsPhaseFromFlags,
   hasAnyConnectedProvider,
   hasAnyHealthyProvider,
   healthyProvidersToFetch,
@@ -34,6 +36,7 @@ import {
   providerStatusBootstrapComplete,
   statusSnapshotFromApi,
   type CalendarProviderStatusSnapshot,
+  type EventsPhase,
   type ProviderStatusPhase,
   type ProviderWeekFetchOutcome,
 } from "@/lib/calendar-provider-health";
@@ -206,6 +209,9 @@ export default function DashboardCalendarPage() {
   const [weekFetchOutcomes, setWeekFetchOutcomes] = useState<ProviderWeekFetchOutcome[]>([]);
   const interviewRefreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const calendarConnectedQueryRef = useRef<string | null>(null);
+  const loadRequestIdRef = useRef(0);
+  const eventsRequestIdRef = useRef(0);
+  const [eventsPhase, setEventsPhase] = useState<EventsPhase>("idle");
 
   const statusBootstrapComplete = providerStatusBootstrapComplete(googleStatusPhase, microsoftStatusPhase);
 
@@ -271,6 +277,9 @@ export default function DashboardCalendarPage() {
       router.replace(`${LOGIN_PATH.candidate}?next=${next}`);
       return;
     }
+    const requestId = ++loadRequestIdRef.current;
+    const isStale = () => requestId !== loadRequestIdRef.current;
+
     setLoading(true);
     setGoogleStatusPhase("loading");
     setMicrosoftStatusPhase("loading");
@@ -278,6 +287,35 @@ export default function DashboardCalendarPage() {
     setGoogleStatusError(false);
     setMicrosoftStatusError(false);
     setNotifPrefsLoadError(false);
+    debugCalendarLog("load_start", { requestId });
+
+    const applyGoogleFailure = (timedOut: boolean) => {
+      setGoogleStatusError(!timedOut);
+      setStatus((prev) => {
+        if (prev?.connected) {
+          return { ...prev, health: "temporary_error", message: prev.message ?? null };
+        }
+        return {
+          connected: false,
+          health: timedOut ? "temporary_error" : undefined,
+          google_email: null,
+        };
+      });
+    };
+
+    const applyMicrosoftFailure = (timedOut: boolean) => {
+      setMicrosoftStatusError(!timedOut);
+      setMsStatus((prev) => {
+        if (prev?.connected) {
+          return { ...prev, health: "temporary_error", message: prev.message ?? null };
+        }
+        return {
+          connected: false,
+          health: timedOut ? "temporary_error" : undefined,
+          microsoft_email: null,
+        };
+      });
+    };
 
     const loadGoogleStatus = async (): Promise<ProviderStatusPhase> => {
       try {
@@ -286,17 +324,20 @@ export default function DashboardCalendarPage() {
           { preserveSessionOnUnauthorized: true, timeoutMs: CALENDAR_FETCH_TIMEOUT_MS },
           token,
         );
-        setStatus(s);
-        setGoogleStatusError(false);
+        if (!isStale()) {
+          setStatus(s);
+          setGoogleStatusError(false);
+          setGoogleStatusPhase("ready");
+          debugCalendarLog("google_status_ready", { requestId });
+        }
         return "ready";
       } catch (e) {
         const timedOut = isFetchTimeoutError(e);
-        setGoogleStatusError(true);
-        setStatus({
-          connected: false,
-          health: timedOut ? "temporary_error" : undefined,
-          google_email: null,
-        });
+        if (!isStale()) {
+          applyGoogleFailure(timedOut);
+          setGoogleStatusPhase(timedOut ? "timeout" : "error");
+          debugCalendarLog("google_status_terminal", { requestId, timedOut });
+        }
         console.warn("[calendar] google status failed", e);
         return timedOut ? "timeout" : "error";
       }
@@ -309,36 +350,43 @@ export default function DashboardCalendarPage() {
           { preserveSessionOnUnauthorized: true, timeoutMs: CALENDAR_FETCH_TIMEOUT_MS },
           token,
         );
-        setMsStatus(msRaw);
-        setMicrosoftStatusError(false);
+        if (!isStale()) {
+          setMsStatus(msRaw);
+          setMicrosoftStatusError(false);
+          setMicrosoftStatusPhase("ready");
+          debugCalendarLog("microsoft_status_ready", { requestId });
+        }
         return "ready";
       } catch (e) {
         const timedOut = isFetchTimeoutError(e);
-        setMicrosoftStatusError(true);
-        setMsStatus({
-          connected: false,
-          health: timedOut ? "temporary_error" : undefined,
-          microsoft_email: null,
-        });
+        if (!isStale()) {
+          applyMicrosoftFailure(timedOut);
+          setMicrosoftStatusPhase(timedOut ? "timeout" : "error");
+          debugCalendarLog("microsoft_status_terminal", { requestId, timedOut });
+        }
         console.warn("[calendar] microsoft status failed", e);
         return timedOut ? "timeout" : "error";
       }
     };
 
-    const [oauthCfgRes, opsRes, meRes, googlePhase, microsoftPhase] = await Promise.all([
+    const statusPromise = Promise.all([loadGoogleStatus(), loadMicrosoftStatus()]);
+
+    const [oauthCfgRes, opsRes, meRes] = await Promise.all([
       apiFetch<CalendarOAuthConfig>("/api/v1/calendar/oauth-config", { timeoutMs: CALENDAR_FETCH_TIMEOUT_MS }).catch(
         () => null,
       ),
-      fetchOpsHealth().catch(() => null),
-      apiFetch<AuthMeOut>("/api/v1/auth/me", {}, token).catch(() => null),
-      loadGoogleStatus(),
-      loadMicrosoftStatus(),
+      fetchOpsHealth(CALENDAR_FETCH_TIMEOUT_MS).catch(() => null),
+      apiFetch<AuthMeOut>("/api/v1/auth/me", { timeoutMs: CALENDAR_FETCH_TIMEOUT_MS }, token).catch(() => null),
+      statusPromise,
     ]);
+
+    if (isStale()) {
+      debugCalendarLog("load_stale_discarded", { requestId });
+      return;
+    }
 
     setOauthCfg(oauthCfgRes);
     setOpsHealth(opsRes);
-    setGoogleStatusPhase(googlePhase);
-    setMicrosoftStatusPhase(microsoftPhase);
 
     if (oauthCfgRes) {
       setStatus((prev) =>
@@ -369,6 +417,7 @@ export default function DashboardCalendarPage() {
     }
 
     setLoading(false);
+    debugCalendarLog("load_complete", { requestId });
 
     void fetchInterviewRows(token).catch((e) => {
       console.warn("[calendar] interview list failed", e);
@@ -387,6 +436,7 @@ export default function DashboardCalendarPage() {
     if (!providers.length) {
       setDisplayEvents(mergeProviderAndTwinEvents([], interviews, weekStart));
       setEventsLoadError(false);
+      setEventsPhase("idle");
       setWeekShowEmpty(false);
       setWeekShowReconnectPanel(
         Boolean(
@@ -399,18 +449,23 @@ export default function DashboardCalendarPage() {
       setWeekShowPartialWarning(false);
       setWeekFailedProviders([]);
       setWeekFetchOutcomes([]);
+      debugCalendarLog("events_skip_not_connected");
       return;
     }
     const token = getToken();
     if (!token) return;
+    const requestId = ++eventsRequestIdRef.current;
+    const isStale = () => requestId !== eventsRequestIdRef.current;
     const { timeMin, timeMax } = weekRangeIso(weekStart);
     setEventsLoading(true);
+    setEventsPhase("loading_events");
     setEventsLoadError(false);
     setWeekShowReconnectPanel(false);
     setWeekShowPartialWarning(false);
     setWeekShowEmpty(false);
     setWeekFailedProviders([]);
     setWeekFetchOutcomes([]);
+    debugCalendarLog("events_fetch_start", { requestId, providers: providers.join(",") });
     try {
       const params = new URLSearchParams({ time_min: timeMin, time_max: timeMax });
       const outcomes = await Promise.all(
@@ -436,6 +491,10 @@ export default function DashboardCalendarPage() {
           }
         }),
       );
+      if (isStale()) {
+        debugCalendarLog("events_stale_discarded", { requestId });
+        return;
+      }
       const aggregate = aggregateWeekEventOutcomes(outcomes, googleSnapshot, microsoftSnapshot);
       setWeekFetchOutcomes(outcomes);
       setDisplayEvents(mergeProviderAndTwinEvents(aggregate.events, interviews, weekStart));
@@ -444,12 +503,32 @@ export default function DashboardCalendarPage() {
       setWeekShowPartialWarning(aggregate.showPartialWarning);
       setWeekFailedProviders(aggregate.failedProviders);
       setEventsLoadError(aggregate.allHealthyProvidersFailed && !aggregate.showReconnectPanel);
+      setEventsPhase(
+        eventsPhaseFromFlags({
+          loading: false,
+          loadError: aggregate.allHealthyProvidersFailed && !aggregate.showReconnectPanel,
+          showReconnectPanel: aggregate.showReconnectPanel,
+          showEmptyWeek: aggregate.showEmptyWeek,
+          hasEvents: aggregate.events.length > 0,
+          anyTemporaryFailure: outcomes.some((o) => o.temporaryError),
+        }),
+      );
+      debugCalendarLog("events_fetch_complete", {
+        requestId,
+        reconnect: aggregate.showReconnectPanel,
+        empty: aggregate.showEmptyWeek,
+      });
     } catch (e) {
-      setEventsLoadError(true);
-      setDisplayEvents(mergeProviderAndTwinEvents([], interviews, weekStart));
+      if (!isStale()) {
+        setEventsLoadError(true);
+        setEventsPhase("temporary_error");
+        setDisplayEvents(mergeProviderAndTwinEvents([], interviews, weekStart));
+      }
       console.warn("[calendar] week events fetch failed", e);
     } finally {
-      setEventsLoading(false);
+      if (!isStale()) {
+        setEventsLoading(false);
+      }
     }
   }, [weekStart, interviews, googleSnapshot, microsoftSnapshot]);
 

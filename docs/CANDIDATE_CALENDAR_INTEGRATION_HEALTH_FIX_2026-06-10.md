@@ -13,6 +13,7 @@
 | `CANDIDATE_CALENDAR_POST_LOAD_LOGOUT_FIX_2026-06-10.md` | Session cleared when provider token expired | Fixed — preserve session on calendar integration 401/400 |
 | `CANDIDATE_CALENDAR_SUCCESS_ALERT_POLISH_2026-06-10.md` | Success banner unreadable after `?calendar_connected=1` | Fixed — high-contrast emerald alert + PL/EN copy (PR #70) |
 | `CANDIDATE_CALENDAR_LOADING_STATE_TIMEOUT_FIX_2026-06-11.md` | Indefinite **Ładowanie…** when status/events hang | Fixed — 9s per-provider timeout + terminal retry/connect UI |
+| `CANDIDATE_CALENDAR_P0_ROOT_CAUSE_FIX_2026-06-11.md` | Phases stuck on `"loading"` while `auth/me`/ops health hung | Fixed — immediate phase updates + ancillary timeouts + stale guards |
 
 ---
 

@@ -5,7 +5,65 @@ import type { CalendarProvider, ProviderCalendarEvent } from "@/lib/calendar-wee
 /** Max wait for provider status / week events before showing retry UI (never infinite loading). */
 export const CALENDAR_FETCH_TIMEOUT_MS = 9000;
 
+/** Per-provider status bootstrap phase (maps to UI badge + card body). */
 export type ProviderStatusPhase = "loading" | "ready" | "timeout" | "error";
+
+/** Explicit provider terminal/readout for card body derivation. */
+export type ProviderPhase =
+  | "idle"
+  | "loading_status"
+  | "not_connected"
+  | "connected"
+  | "reconnect_required"
+  | "temporary_error"
+  | "timeout";
+
+/** Week events fetch lifecycle — never blocks provider status terminal state. */
+export type EventsPhase =
+  | "idle"
+  | "loading_events"
+  | "loaded"
+  | "empty"
+  | "temporary_error"
+  | "timeout"
+  | "reconnect_required";
+
+export function providerPhaseFromStatus(
+  statusPhase: ProviderStatusPhase,
+  provider: Pick<CalendarProviderStatusSnapshot, "connected" | "health">,
+): ProviderPhase {
+  if (statusPhase === "loading") return "loading_status";
+  if (statusPhase === "timeout") return "timeout";
+  if (statusPhase === "error") return "temporary_error";
+  if (!provider.connected) return "not_connected";
+  if (provider.health === "reconnect_required") return "reconnect_required";
+  if (provider.health === "temporary_error") return "temporary_error";
+  if (provider.health === "ok") return "connected";
+  return "not_connected";
+}
+
+export function eventsPhaseFromFlags(flags: {
+  loading: boolean;
+  loadError: boolean;
+  showReconnectPanel: boolean;
+  showEmptyWeek: boolean;
+  hasEvents: boolean;
+  anyTemporaryFailure: boolean;
+}): EventsPhase {
+  if (flags.loading) return "loading_events";
+  if (flags.showReconnectPanel) return "reconnect_required";
+  if (flags.loadError || flags.anyTemporaryFailure) return "temporary_error";
+  if (flags.showEmptyWeek || !flags.hasEvents) return flags.hasEvents ? "loaded" : "empty";
+  return "loaded";
+}
+
+/** Production-safe calendar state transitions (no PII). Guard with NEXT_PUBLIC_DEBUG_CALENDAR=true. */
+export function debugCalendarLog(event: string, detail?: Record<string, string | boolean | number>): void {
+  if (typeof process === "undefined" || process.env.NEXT_PUBLIC_DEBUG_CALENDAR !== "true") return;
+  if (typeof console !== "undefined") {
+    console.info("[calendar-debug]", event, detail ?? {});
+  }
+}
 
 export type ProviderHealth = "ok" | "reconnect_required" | "temporary_error" | "error" | "unknown";
 
@@ -97,7 +155,11 @@ export function parseProviderIntegrationError(message: string): {
     lower.includes("try again shortly") ||
     lower.includes('"code": 429') ||
     lower.includes('"code": 503') ||
+    lower.includes('"code": 502') ||
+    lower.includes('"code": 504') ||
     lower.includes("503") ||
+    lower.includes("502") ||
+    lower.includes("504") ||
     lower.includes("429");
   const reconnectRequired =
     !temporaryError &&
