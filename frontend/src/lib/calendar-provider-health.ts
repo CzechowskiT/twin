@@ -57,12 +57,35 @@ export function eventsPhaseFromFlags(flags: {
   return "loaded";
 }
 
+/** Internal diagnostics for calendar ops — no tokens, emails, or PII. */
+export type CalendarOperationDiagnostic = {
+  provider: CalendarProvider;
+  operation: "status" | "events_read" | "action_write" | "oauth";
+  errorCode: string | null;
+  httpStatus: number | null;
+  isAuthFailure: boolean;
+  isTemporary: boolean;
+  requiresReconnect: boolean;
+};
+
 /** Production-safe calendar state transitions (no PII). Guard with NEXT_PUBLIC_DEBUG_CALENDAR=true. */
 export function debugCalendarLog(event: string, detail?: Record<string, string | boolean | number>): void {
   if (typeof process === "undefined" || process.env.NEXT_PUBLIC_DEBUG_CALENDAR !== "true") return;
   if (typeof console !== "undefined") {
     console.info("[calendar-debug]", event, detail ?? {});
   }
+}
+
+export function logCalendarOperationDiagnostic(diag: CalendarOperationDiagnostic): void {
+  debugCalendarLog("operation_diagnostic", {
+    provider: diag.provider,
+    operation: diag.operation,
+    errorCode: diag.errorCode ?? "none",
+    httpStatus: diag.httpStatus ?? 0,
+    isAuthFailure: diag.isAuthFailure,
+    isTemporary: diag.isTemporary,
+    requiresReconnect: diag.requiresReconnect,
+  });
 }
 
 export type ProviderHealth = "ok" | "reconnect_required" | "temporary_error" | "error" | "unknown";
@@ -175,6 +198,37 @@ export function parseProviderIntegrationError(message: string): {
   return { reconnectRequired, temporaryError, failed: true };
 }
 
+export function diagnosticFromErrorMessage(
+  provider: CalendarProvider,
+  operation: CalendarOperationDiagnostic["operation"],
+  message: string,
+): CalendarOperationDiagnostic {
+  const parsed = parseProviderIntegrationError(message);
+  const lower = message.toLowerCase();
+  const httpMatch = lower.match(/\b(401|403|428|429|502|503|504)\b/);
+  return {
+    provider,
+    operation,
+    errorCode: parsed.reconnectRequired ? "auth_failure" : parsed.temporaryError ? "temporary" : "provider_error",
+    httpStatus: httpMatch ? Number(httpMatch[1]) : null,
+    isAuthFailure: parsed.reconnectRequired,
+    isTemporary: parsed.temporaryError,
+    requiresReconnect: parsed.reconnectRequired,
+  };
+}
+
+export function isMicrosoftUnsupportedAccountMessage(message: string | null | undefined): boolean {
+  if (!message) return false;
+  const lower = message.toLowerCase();
+  return (
+    lower.includes("mailboxnotenabledforrestapi") ||
+    lower.includes("personal microsoft account") ||
+    lower.includes("consumer account") ||
+    lower.includes("not a work or school account") ||
+    lower.includes("unsupported microsoft")
+  );
+}
+
 /** Connected row exists but token probe or events fetch is not usable. */
 export function providerNeedsAttention(
   status: CalendarProviderStatusSnapshot | null | undefined,
@@ -256,27 +310,47 @@ export function preferredActiveProvider(
   return null;
 }
 
-/** Prefer week events fetch outcome over stale status probe for badge/UI consistency. */
-export function healthAfterWeekFetch(
+/**
+ * Provider card badge health: connection status from /status endpoint only.
+ * Events read failures (502/timeout) must NOT downgrade a connected card to integration error.
+ * Only auth failures from events read may escalate to reconnect_required on that provider.
+ */
+export function connectionHealthForProviderCard(
   snapshot: CalendarProviderStatusSnapshot | null | undefined,
   outcome: ProviderWeekFetchOutcome | undefined,
-): ProviderHealth {
-  if (!snapshot?.connected) return snapshot?.health ?? "unknown";
-  if (outcome?.failed) {
-    if (outcome.reconnectRequired) return "reconnect_required";
-    if (outcome.temporaryError) return "temporary_error";
-    return "error";
+): ProviderHealth | undefined {
+  if (!snapshot) return undefined;
+  if (!snapshot.connected) return snapshot.health;
+  if (snapshot.health === "reconnect_required" || snapshot.health === "temporary_error" || snapshot.health === "error") {
+    return snapshot.health;
   }
+  if (outcome?.failed && outcome.reconnectRequired) return "reconnect_required";
   return snapshot.health;
 }
 
-export function displayHealthForProvider(
+export function connectionHealthForProvider(
   snapshot: CalendarProviderStatusSnapshot | null | undefined,
   outcomes: ProviderWeekFetchOutcome[],
 ): ProviderHealth | undefined {
   if (!snapshot) return undefined;
   const outcome = outcomes.find((o) => o.provider === snapshot.provider);
-  return healthAfterWeekFetch(snapshot, outcome);
+  return connectionHealthForProviderCard(snapshot, outcome);
+}
+
+/** @deprecated Use connectionHealthForProviderCard — events must not set integration_error on cards. */
+export function healthAfterWeekFetch(
+  snapshot: CalendarProviderStatusSnapshot | null | undefined,
+  outcome: ProviderWeekFetchOutcome | undefined,
+): ProviderHealth {
+  return connectionHealthForProviderCard(snapshot, outcome) ?? "unknown";
+}
+
+/** @deprecated Use connectionHealthForProvider */
+export function displayHealthForProvider(
+  snapshot: CalendarProviderStatusSnapshot | null | undefined,
+  outcomes: ProviderWeekFetchOutcome[],
+): ProviderHealth | undefined {
+  return connectionHealthForProvider(snapshot, outcomes);
 }
 
 export function providerStatusBootstrapComplete(

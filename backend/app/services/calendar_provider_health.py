@@ -23,6 +23,19 @@ def calendar_upstream_auth_failure(exc: Exception) -> bool:
     return any(m in text for m in ('"code": 401', '"code": 403', "invalid_grant", "unauthorized"))
 
 
+def microsoft_unsupported_account_failure(exc: Exception) -> bool:
+    text = str(exc).lower()
+    return any(
+        m in text
+        for m in (
+            "mailboxnotenabledforrestapi",
+            "mailbox not enabled for rest api",
+            "unsupported microsoft",
+            "personal microsoft account",
+        )
+    )
+
+
 def probe_google_calendar_health(db: Session, user_id: int) -> CalendarProviderStatusPayload:
     row = get_best_google_row(db, user_id)
     if not row:
