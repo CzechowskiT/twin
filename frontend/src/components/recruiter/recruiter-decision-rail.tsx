@@ -5,6 +5,7 @@ import {
   RECRUITER_INBOX_VISUAL_MARKERS,
   recruiterInboxDecisionRailClass,
   recruiterInboxReviewCardCtaClass,
+  recruiterInboxReviewCardCtaIconClass,
   recruiterInboxStatusBadgeClass,
   type RecruiterInboxMatchScoreTone,
 } from "@/lib/recruiter-inbox-visual";
@@ -46,7 +47,7 @@ export function RecruiterDecisionRail({ matchScore, statusBadge, reviewCard, act
         >
           <span>{reviewCard.expanded ? reviewCard.closeLabel : reviewCard.openLabel}</span>
           <svg
-            className={`h-4 w-4 shrink-0 transition-transform ${reviewCard.expanded ? "rotate-180" : ""}`}
+            className={`${recruiterInboxReviewCardCtaIconClass()} ${reviewCard.expanded ? "rotate-180" : ""}`}
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"

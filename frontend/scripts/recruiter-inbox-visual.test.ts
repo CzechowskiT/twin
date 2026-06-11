@@ -45,14 +45,16 @@ test("match score card classes use subtle tone borders without heavy blobs", () 
 
 test("status, signal rows, review CTA and decline styles use readable dark-theme tokens", () => {
   assert.match(recruiterInboxStatusBadgeClass("awaiting"), /recruiter-inbox-status-badge/);
-  assert.match(recruiterInboxStatusBadgeClass("awaiting"), /dark:text-cyan-50/);
+  assert.match(recruiterInboxStatusBadgeClass("awaiting"), /dark:text-white/);
   assert.match(recruiterInboxEvidenceChipClass(), /recruiter-inbox-evidence-chip/);
   assert.match(recruiterInboxWarningChipClass(), /recruiter-inbox-warning-chip/);
   assert.match(recruiterInboxReviewCardCtaClass(), /recruiter-inbox-review-card-cta/);
-  assert.match(recruiterInboxReviewCardCtaClass(), /border-cyan-400/);
-  assert.match(recruiterInboxReviewCardCtaClass(), /focus-visible:ring/);
+  assert.match(recruiterInboxReviewCardCtaClass(), /border-cyan-/);
+  assert.match(recruiterInboxReviewCardCtaClass(), /dark:text-slate-100/);
+  assert.match(recruiterInboxReviewCardCtaClass(), /focus-visible:ring-cyan-/);
   assert.match(recruiterInboxDeclineButtonClass(), /recruiter-inbox-decline-btn/);
-  assert.match(recruiterInboxDeclineButtonClass(), /dark:text-rose-100/);
+  assert.match(recruiterInboxDeclineButtonClass(), /dark:text-white/);
+  assert.match(recruiterInboxDeclineButtonClass(), /focus-visible:ring-rose-/);
 });
 
 test("decision console exposes premium visual markers and review card CTA copy", () => {
