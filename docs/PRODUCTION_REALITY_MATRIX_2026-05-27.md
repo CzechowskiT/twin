@@ -86,6 +86,7 @@
 | Public launch announcement | gate checklist + launch matrix | **BLOCKED** — **NO-GO** (S2 primary; L6/O5 waivers pilot-only; GAP-04 optional) |
 | Launch-day monitoring / rollback | `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` | **LIVE** (docs) — pilot/demo GO with monitoring; public **NO-GO**; auto-apply **PAUSED** |
 | Investor demo | `INVESTOR_DEMO_RUNBOOK.md` | **LIVE** stack, curated use |
+| Investor room (`/investor`, `/for-investors`) | `docs/INVESTOR_ROOM_MVP_2026-06-11.md` — honest executive view; live/demo/not-live tiers; NO-GO banner; `test:investor-room-mvp` | **LIVE** (pilot) — public marketing; no fake traction; public launch **NO-GO** |
 | Real CAPTCHA bypass / live mass apply | HARD BAN | **BLOCKED** |
 
 ---

@@ -36,7 +36,7 @@ export default function WorkspaceInvestorPage() {
             description: "workspace.toolInvestorCalc",
           },
           {
-            href: "/for-investors",
+            href: "/investor",
             label: "nav.forInvestors",
             description: "workspace.toolInvestorStory",
           },
