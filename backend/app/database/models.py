@@ -688,6 +688,22 @@ class StripeWebhookEvent(Base):
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
 
 
+class RecruiterAuditEvent(Base):
+    """Append-only recruiter-side action log (no decline notes or candidate PII)."""
+
+    __tablename__ = "recruiter_audit_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    application_id: Mapped[int] = mapped_column(
+        ForeignKey("applications.id", ondelete="CASCADE"),
+        index=True,
+    )
+    company_slug: Mapped[str] = mapped_column(String(80), index=True)
+    action_type: Mapped[str] = mapped_column(String(64))
+    meta_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
 class AutoApplyConsent(Base):
     """GDPR-style consent for nightly autonomous applications."""
 

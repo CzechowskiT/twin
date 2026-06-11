@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
+import { RecruiterAuditTrailPanel, postRecruiterAuditEvent } from "@/components/recruiter/recruiter-audit-trail-panel";
 import { RecruiterDecisionRail } from "@/components/recruiter/recruiter-decision-rail";
 import { RecruiterMessageDraftPanel } from "@/components/recruiter/recruiter-message-draft-panel";
 import {
@@ -121,6 +122,7 @@ export default function RecruiterInboxClient() {
   const [batchDeclineOpen, setBatchDeclineOpen] = useState(false);
   const [batchDeclineNote, setBatchDeclineNote] = useState("");
   const [expandedReviewCards, setExpandedReviewCards] = useState<Set<number>>(new Set());
+  const [auditRefreshKey, setAuditRefreshKey] = useState(0);
   const [draftTargetRow, setDraftTargetRow] = useState<RecruiterMessageDraftRow | null>(null);
   const [accessExpanded, setAccessExpanded] = useState(false);
   const autoLoadDone = useRef(false);
@@ -341,6 +343,7 @@ export default function RecruiterInboxClient() {
       patchRowsFromBatchResults(data.results ?? []);
       setBatchDeclineOpen(false);
       setBatchDeclineNote("");
+      setAuditRefreshKey((k) => k + 1);
       await load();
     } catch (e) {
       const networkFailure =
@@ -381,6 +384,7 @@ export default function RecruiterInboxClient() {
       if (data.status) patchRowStatus(applicationId, data.status);
       setDeclineTargetId(null);
       setDeclineNote("");
+      setAuditRefreshKey((k) => k + 1);
       await load();
     } catch (e) {
       const networkFailure =
@@ -499,8 +503,20 @@ export default function RecruiterInboxClient() {
   function toggleReviewCard(applicationId: number) {
     setExpandedReviewCards((prev) => {
       const next = new Set(prev);
+      const opening = !next.has(applicationId);
       if (next.has(applicationId)) next.delete(applicationId);
       else next.add(applicationId);
+      if (opening) {
+        void postRecruiterAuditEvent({
+          applicationId,
+          token,
+          companySlug,
+          actionType: "review_opened",
+          meta: { source: "review_card" },
+        }).then((ok) => {
+          if (ok) setAuditRefreshKey((k) => k + 1);
+        });
+      }
       return next;
     });
   }
@@ -913,6 +929,13 @@ export default function RecruiterInboxClient() {
                                 );
                               })}
                             </dl>
+                            <RecruiterAuditTrailPanel
+                              key={`audit-${r.application_id}-${auditRefreshKey}`}
+                              applicationId={r.application_id}
+                              token={token}
+                              companySlug={companySlug}
+                              refreshKey={auditRefreshKey}
+                            />
                           </div>
                             ) : null}
                           </div>

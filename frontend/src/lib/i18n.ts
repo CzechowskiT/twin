@@ -125,6 +125,7 @@ export type TranslationKey =
   | `placementEmployer.${keyof typeof en.placementEmployer}`
   | `acceptanceQueue.${keyof typeof en.acceptanceQueue}`
   | `recruiterInbox.${keyof typeof en.recruiterInbox}`
+  | `recruiterAudit.${keyof typeof en.recruiterAudit}`
   | `recruiterMessageDrafts.${keyof typeof en.recruiterMessageDrafts}`
   | `companyJobs.${keyof typeof en.companyJobs}`
   | `recruiterSearch.${keyof typeof en.recruiterSearch}`
@@ -2476,6 +2477,19 @@ eyebrow: "Product roadmap",
     reviewCardDueDiligence: "Due diligence review",
     cardMetaLine: "{job} · {company} · #{id}",
     prepareMessage: "Prepare message",
+  },
+  recruiterAudit: {
+    title: "Action history",
+    trustNote:
+      "Audit trail records recruiter actions. AI does not make hiring decisions.",
+    panelAria: "Recruiter action history",
+    loading: "Loading action history…",
+    loadFailed: "Could not load action history.",
+    empty: "No recruiter actions recorded yet for this application.",
+    actionDecisionAccept: "Interview accepted",
+    actionDecisionDecline: "Application declined",
+    actionReviewOpened: "Review card opened",
+    actionUnknown: "Recruiter action",
   },
   recruiterMessageDrafts: {
     prepareMessage: "Prepare message",
@@ -5891,6 +5905,19 @@ eyebrow: "Roadmapa produktu",
     reviewCardDueDiligence: "Przegląd due diligence",
     cardMetaLine: "{job} · {company} · #{id}",
     prepareMessage: "Przygotuj wiadomość",
+  },
+  recruiterAudit: {
+    title: "Historia działań",
+    trustNote:
+      "Ślad audytu rejestruje działania rekrutera. AI nie podejmuje decyzji rekrutacyjnych.",
+    panelAria: "Historia działań rekrutera",
+    loading: "Ładowanie historii…",
+    loadFailed: "Nie udało się wczytać historii działań.",
+    empty: "Brak zarejestrowanych działań rekrutera dla tej aplikacji.",
+    actionDecisionAccept: "Zaakceptowano na rozmowę",
+    actionDecisionDecline: "Odrzucono aplikację",
+    actionReviewOpened: "Otwarto kartę przeglądu",
+    actionUnknown: "Działanie rekrutera",
   },
   recruiterMessageDrafts: {
     prepareMessage: "Przygotuj wiadomość",

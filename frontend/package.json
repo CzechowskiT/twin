@@ -50,6 +50,7 @@
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install chromium",
     "test:recruiter-candidate-message-drafts": "npx --yes tsx scripts/recruiter-candidate-message-drafts.test.ts",
+    "test:recruiter-audit-trail-mvp": "npx --yes tsx scripts/recruiter-audit-trail-mvp.test.ts",
     "test:company-jobs-roles-management-mvp": "npx --yes tsx scripts/company-jobs-roles-management-mvp.test.ts",
     "test:investor-metrics-reality-dashboard": "npx --yes tsx scripts/investor-metrics-reality-dashboard.test.ts"
   },
