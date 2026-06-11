@@ -127,6 +127,7 @@ export type TranslationKey =
   | `acceptanceQueue.${keyof typeof en.acceptanceQueue}`
   | `recruiterInbox.${keyof typeof en.recruiterInbox}`
   | `recruiterAudit.${keyof typeof en.recruiterAudit}`
+  | `recruiterScorecard.${keyof typeof en.recruiterScorecard}`
   | `recruiterMessageDrafts.${keyof typeof en.recruiterMessageDrafts}`
   | `companyJobs.${keyof typeof en.companyJobs}`
   | `companyHiring.${keyof typeof en.companyHiring}`
@@ -2535,6 +2536,20 @@ eyebrow: "Product roadmap",
     actionDecisionDecline: "Application declined",
     actionReviewOpened: "Review card opened",
     actionUnknown: "Recruiter action",
+  },
+  recruiterScorecard: {
+    title: "Internal scorecard",
+    lead: "Private recruiter notes for this application — not shared with the candidate and not in the audit trail.",
+    panelAria: "Recruiter scorecard",
+    ratingLabel: "Fit rating (1–5)",
+    ratingUnset: "Not rated",
+    noteLabel: "Internal note",
+    notePlaceholder: "Interview feedback, bar assessment, follow-up…",
+    save: "Save scorecard",
+    saving: "Saving…",
+    saved: "Saved",
+    error: "Could not save scorecard.",
+    scopeNote: "Scorecard notes stay inside your recruiter workspace — never auto-sent to candidates.",
   },
   recruiterMessageDrafts: {
     prepareMessage: "Prepare message",
@@ -6150,6 +6165,20 @@ const pl: MessageTree = {
     actionDecisionDecline: "Odrzucono aplikację",
     actionReviewOpened: "Otwarto kartę przeglądu",
     actionUnknown: "Działanie rekrutera",
+  },
+  recruiterScorecard: {
+    title: "Wewnętrzna ocena",
+    lead: "Prywatne notatki rekrutera dla tej aplikacji — nie udostępniane kandydatowi i poza śladem audytu.",
+    panelAria: "Ocena rekrutera",
+    ratingLabel: "Ocena dopasowania (1–5)",
+    ratingUnset: "Bez oceny",
+    noteLabel: "Notatka wewnętrzna",
+    notePlaceholder: "Feedback z rozmowy, ocena progu, follow-up…",
+    save: "Zapisz ocenę",
+    saving: "Zapisywanie…",
+    saved: "Zapisano",
+    error: "Nie udało się zapisać oceny.",
+    scopeNote: "Notatki scorecard pozostają w workspace rekrutera — nigdy nie wysyłane automatycznie do kandydatów.",
   },
   recruiterMessageDrafts: {
     prepareMessage: "Przygotuj wiadomość",
