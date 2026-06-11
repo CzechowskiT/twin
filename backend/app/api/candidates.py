@@ -31,6 +31,16 @@ from app.schemas.candidate import (
     ProfileDocumentsListOut,
     ProfileDocumentUploadOut,
 )
+from app.schemas.candidate_evidence import (
+    CandidateEvidenceItemIn,
+    CandidateEvidenceItemOut,
+    CandidateEvidenceListOut,
+)
+from app.services.candidate_evidence_vault import (
+    create_candidate_evidence_item,
+    delete_candidate_evidence_item,
+    list_candidate_evidence_items,
+)
 from app.schemas.career_compass import (
     CareerCompassOut,
     CareerCompassPreviewOut,
@@ -439,6 +449,58 @@ def delete_profile_document(
     delete_profile_document_file(doc.storage_path)
     db.delete(doc)
     db.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.get("/me/evidence", response_model=CandidateEvidenceListOut)
+def list_my_evidence_items(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> CandidateEvidenceListOut:
+    candidate = _get_candidate_or_404(db, user.id)
+    payload = list_candidate_evidence_items(db, candidate_id=candidate.id)
+    return CandidateEvidenceListOut(
+        items=[CandidateEvidenceItemOut.model_validate(i) for i in payload["items"]],
+        total=payload["total"],
+    )
+
+
+@router.post("/me/evidence", response_model=CandidateEvidenceItemOut, status_code=status.HTTP_201_CREATED)
+@limiter.limit("30/minute", key_func=user_or_ip_key)
+def create_my_evidence_item(
+    request: Request,
+    body: CandidateEvidenceItemIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> CandidateEvidenceItemOut:
+    candidate = _get_candidate_or_404(db, user.id)
+    try:
+        row = create_candidate_evidence_item(
+            db,
+            candidate_id=candidate.id,
+            skill_name=body.skill_name,
+            evidence_type=body.evidence_type,
+            title=body.title,
+            note=body.note,
+            source_url=body.source_url,
+            privacy_class=body.privacy_class,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    return CandidateEvidenceItemOut.model_validate(row)
+
+
+@router.delete("/me/evidence/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_my_evidence_item(
+    item_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> Response:
+    candidate = _get_candidate_or_404(db, user.id)
+    try:
+        delete_candidate_evidence_item(db, candidate_id=candidate.id, item_id=item_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 

@@ -125,6 +125,7 @@ export type TranslationKey =
   | `status.${keyof typeof en.status}`
   | `placementEmployer.${keyof typeof en.placementEmployer}`
   | `candidateTimeline.${keyof typeof en.candidateTimeline}`
+  | `candidateEvidence.${keyof typeof en.candidateEvidence}`
   | `acceptanceQueue.${keyof typeof en.acceptanceQueue}`
   | `recruiterInbox.${keyof typeof en.recruiterInbox}`
   | `recruiterAudit.${keyof typeof en.recruiterAudit}`
@@ -2948,6 +2949,35 @@ eyebrow: "Product roadmap",
     updated: "Updated",
     scopeNote:
       "This view shows your TWIN pipeline only — not emails or messages from outside the product.",
+    backDashboard: "Back to dashboard",
+  },
+  candidateEvidence: {
+    eyebrow: "Candidate workspace",
+    title: "Evidence vault",
+    lead:
+      "Skill evidence you attach to your profile — self-declared artifacts with provenance, never labeled verified without proof.",
+    loading: "Loading evidence…",
+    empty: "No skill evidence yet. Add projects, certificates, or links that support your declared skills.",
+    addTitle: "Add evidence",
+    addCta: "Save evidence",
+    saving: "Saving…",
+    fieldSkill: "Skill",
+    fieldType: "Evidence type",
+    fieldTitle: "Title (optional)",
+    fieldNote: "Note (optional)",
+    fieldUrl: "Source URL (optional)",
+    added: "Added",
+    sourceLink: "View source",
+    remove: "Remove",
+    type_cv: "CV / resume",
+    type_project: "Project",
+    type_certificate: "Certificate",
+    type_github: "GitHub",
+    type_case_study: "Case study",
+    type_language_test: "Language test",
+    type_assessment: "Assessment",
+    scopeNote:
+      "Evidence is candidate-provided and never shown as verified to recruiters without explicit review — not recruiter scorecards.",
     backDashboard: "Back to dashboard",
   },
   acceptanceQueue: {
@@ -6673,6 +6703,35 @@ const pl: MessageTree = {
     updated: "Zaktualizowano",
     scopeNote:
       "Ten widok pokazuje tylko pipeline TWIN — bez maili ani wiadomości spoza produktu.",
+    backDashboard: "Wróć do dashboardu",
+  },
+  candidateEvidence: {
+    eyebrow: "Przestrzeń kandydata",
+    title: "Skarbiec dowodów",
+    lead:
+      "Dowody umiejętności przypięte do profilu — samodzielnie dodane artefakty z pochodzeniem, nigdy bez dowodu nie oznaczane jako zweryfikowane.",
+    loading: "Ładowanie dowodów…",
+    empty: "Brak dowodów umiejętności. Dodaj projekty, certyfikaty lub linki wspierające deklarowane skilli.",
+    addTitle: "Dodaj dowód",
+    addCta: "Zapisz dowód",
+    saving: "Zapisywanie…",
+    fieldSkill: "Umiejętność",
+    fieldType: "Typ dowodu",
+    fieldTitle: "Tytuł (opcjonalnie)",
+    fieldNote: "Notatka (opcjonalnie)",
+    fieldUrl: "URL źródła (opcjonalnie)",
+    added: "Dodano",
+    sourceLink: "Zobacz źródło",
+    remove: "Usuń",
+    type_cv: "CV",
+    type_project: "Projekt",
+    type_certificate: "Certyfikat",
+    type_github: "GitHub",
+    type_case_study: "Case study",
+    type_language_test: "Test językowy",
+    type_assessment: "Assessment",
+    scopeNote:
+      "Dowody pochodzą od kandydata i nie są pokazywane rekruterom jako zweryfikowane bez jawnej recenzji — to nie scorecardy rekrutera.",
     backDashboard: "Wróć do dashboardu",
   },
   acceptanceQueue: {
