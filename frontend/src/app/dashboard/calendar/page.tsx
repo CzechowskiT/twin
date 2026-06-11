@@ -22,6 +22,7 @@ import { LOGIN_PATH } from "@/lib/persona-auth";
 import { calendarProviderLabel } from "@/lib/calendar-provider";
 import {
   aggregateWeekEventOutcomes,
+  displayHealthForProvider,
   hasAnyConnectedProvider,
   hasAnyHealthyProvider,
   healthyProvidersToFetch,
@@ -197,6 +198,7 @@ export default function DashboardCalendarPage() {
   const [weekShowReconnectPanel, setWeekShowReconnectPanel] = useState(false);
   const [weekShowPartialWarning, setWeekShowPartialWarning] = useState(false);
   const [weekFailedProviders, setWeekFailedProviders] = useState<Array<"google" | "microsoft">>([]);
+  const [weekFetchOutcomes, setWeekFetchOutcomes] = useState<ProviderWeekFetchOutcome[]>([]);
   const interviewRefreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const googleSnapshot: CalendarProviderStatusSnapshot | null = status
@@ -205,6 +207,9 @@ export default function DashboardCalendarPage() {
   const microsoftSnapshot: CalendarProviderStatusSnapshot | null = msStatus
     ? statusSnapshotFromApi("microsoft", msStatus)
     : null;
+
+  const googleDisplayHealth = displayHealthForProvider(googleSnapshot, weekFetchOutcomes);
+  const microsoftDisplayHealth = displayHealthForProvider(microsoftSnapshot, weekFetchOutcomes);
 
   const isCalendarConnected = hasAnyConnectedProvider(googleSnapshot, microsoftSnapshot);
   const isCalendarUsable = hasAnyHealthyProvider(googleSnapshot, microsoftSnapshot);
@@ -350,6 +355,7 @@ export default function DashboardCalendarPage() {
       );
       setWeekShowPartialWarning(false);
       setWeekFailedProviders([]);
+      setWeekFetchOutcomes([]);
       return;
     }
     const token = getToken();
@@ -361,6 +367,7 @@ export default function DashboardCalendarPage() {
     setWeekShowPartialWarning(false);
     setWeekShowEmpty(false);
     setWeekFailedProviders([]);
+    setWeekFetchOutcomes([]);
     try {
       const params = new URLSearchParams({ time_min: timeMin, time_max: timeMax });
       const outcomes = await Promise.all(
@@ -387,6 +394,7 @@ export default function DashboardCalendarPage() {
         }),
       );
       const aggregate = aggregateWeekEventOutcomes(outcomes, googleSnapshot, microsoftSnapshot);
+      setWeekFetchOutcomes(outcomes);
       setDisplayEvents(mergeProviderAndTwinEvents(aggregate.events, interviews, weekStart));
       setWeekShowEmpty(aggregate.showEmptyWeek);
       setWeekShowReconnectPanel(aggregate.showReconnectPanel);
@@ -828,9 +836,9 @@ export default function DashboardCalendarPage() {
           showPartialWarning={weekShowPartialWarning}
           failedProviders={weekFailedProviders}
           accountEmail={
-            googleSnapshot?.connected && googleSnapshot.health === "ok"
+            googleSnapshot?.connected && googleDisplayHealth === "ok"
               ? googleSnapshot.email
-              : microsoftSnapshot?.connected && microsoftSnapshot.health === "ok"
+              : microsoftSnapshot?.connected && microsoftDisplayHealth === "ok"
                 ? microsoftSnapshot.email
                 : status?.google_email ?? msStatus?.microsoft_email ?? null
           }
@@ -853,14 +861,14 @@ export default function DashboardCalendarPage() {
         actionBusy={actionBusy}
         google={{
           connected: Boolean(status?.connected),
-          health: googleSnapshot?.health,
+          health: googleDisplayHealth ?? googleSnapshot?.health,
           message: googleSnapshot?.message ?? null,
           email: status?.google_email ?? null,
           oauthConfigured: googleOAuthConfigured,
         }}
         microsoft={{
           connected: Boolean(msStatus?.connected),
-          health: microsoftSnapshot?.health,
+          health: microsoftDisplayHealth ?? microsoftSnapshot?.health,
           message: microsoftSnapshot?.message ?? null,
           email: msStatus?.microsoft_email ?? null,
           oauthConfigured: microsoftOAuthConfigured,

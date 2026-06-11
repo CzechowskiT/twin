@@ -6,7 +6,9 @@ import test from "node:test";
 
 import {
   aggregateWeekEventOutcomes,
+  displayHealthForProvider,
   hasAnyHealthyProvider,
+  healthAfterWeekFetch,
   healthyProvidersToFetch,
   isProviderHealthy,
   parseProviderIntegrationError,
@@ -142,7 +144,7 @@ test("scenario 7: generic app auth invalid → still redirects to login", () => 
   assert.equal(shouldClearSessionOnApiError(401, "Inactive user", "/api/v1/calendar/me/interviews"), true);
 });
 
-test("scenario 8: healthy provider events fail → reconnect panel, not generic error", () => {
+test("scenario 8: healthy provider events fail with 502 → generic error path, not reconnect panel", () => {
   const aggregate = aggregateWeekEventOutcomes(
     [
       {
@@ -157,8 +159,36 @@ test("scenario 8: healthy provider events fail → reconnect panel, not generic 
     googleOk,
     null,
   );
-  assert.equal(aggregate.showReconnectPanel, true);
+  assert.equal(aggregate.showReconnectPanel, false);
   assert.equal(aggregate.allHealthyProvidersFailed, true);
+});
+
+test("scenario 10: status ok but events reconnect → panel and merged badge health", () => {
+  const outcomes = [
+    {
+      provider: "google" as const,
+      events: [],
+      failed: true,
+      reconnectRequired: true,
+      temporaryError: false,
+      message: "428 reconnect Google Calendar",
+    },
+    {
+      provider: "microsoft" as const,
+      events: [],
+      failed: true,
+      reconnectRequired: true,
+      temporaryError: false,
+      message: "428 reconnect Microsoft Calendar",
+    },
+  ];
+  const aggregate = aggregateWeekEventOutcomes(outcomes, googleOk, microsoftOk);
+  assert.equal(aggregate.showReconnectPanel, true);
+  assert.equal(healthAfterWeekFetch(googleOk, outcomes[0]), "reconnect_required");
+  assert.equal(
+    providerBadgeHealth({ ...googleOk, health: displayHealthForProvider(googleOk, outcomes) }),
+    "reconnect_required",
+  );
 });
 
 test("scenario 9: connected unknown health → attention + reconnect guidance", () => {

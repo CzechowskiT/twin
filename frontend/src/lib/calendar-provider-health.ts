@@ -150,10 +150,10 @@ export function aggregateWeekEventOutcomes(
     (isProviderHealthy(microsoft) && providerNeedsReconnect(google));
   const needsGuidance = (snap: CalendarProviderStatusSnapshot | null | undefined) =>
     Boolean(snap?.connected && snap.health !== "temporary_error" && snap.health !== "ok" && providerNeedsAttention(snap));
+  // Full reconnect banner only for auth/reconnect — not generic 502/503 event failures.
   const showReconnectPanel =
     !anyProviderLoaded &&
     (reconnectProviders.length > 0 ||
-      allHealthyProvidersFailed ||
       providerNeedsReconnect(google) ||
       providerNeedsReconnect(microsoft) ||
       needsGuidance(google) ||
@@ -184,6 +184,29 @@ export function preferredActiveProvider(
   if (google?.connected) return "google";
   if (microsoft?.connected) return "microsoft";
   return null;
+}
+
+/** Prefer week events fetch outcome over stale status probe for badge/UI consistency. */
+export function healthAfterWeekFetch(
+  snapshot: CalendarProviderStatusSnapshot | null | undefined,
+  outcome: ProviderWeekFetchOutcome | undefined,
+): ProviderHealth {
+  if (!snapshot?.connected) return snapshot?.health ?? "unknown";
+  if (outcome?.failed) {
+    if (outcome.reconnectRequired) return "reconnect_required";
+    if (outcome.temporaryError) return "temporary_error";
+    return "error";
+  }
+  return snapshot.health;
+}
+
+export function displayHealthForProvider(
+  snapshot: CalendarProviderStatusSnapshot | null | undefined,
+  outcomes: ProviderWeekFetchOutcome[],
+): ProviderHealth | undefined {
+  if (!snapshot) return undefined;
+  const outcome = outcomes.find((o) => o.provider === snapshot.provider);
+  return healthAfterWeekFetch(snapshot, outcome);
 }
 
 export function statusSnapshotFromApi(
