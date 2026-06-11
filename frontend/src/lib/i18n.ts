@@ -6370,7 +6370,10 @@ const pl: MessageTree = {
     integrationStatus_pilot: "Pilotaż",
     integrationStatus_planned: "Planowane",
     integrationStatus_not_live: "Nie live",
-    ctaPilot: "Lista firm",
+    ctaTitle: "Poproś o pilotaż lub napisz do nas",
+    ctaBody:
+      "Podczas pilotażu wdrażamy firmy ręcznie. Bez checkout — opowiedz o swoim progu rekrutacyjnym, a skonfigurujemy dostęp.",
+    ctaPilot: "Dla firm",
     ctaContact: "Napisz do founderów",
     scopeNote:
       "Ta strona nie pokazuje faktur, MRR, opłaconych miejsc ani przychodu z placement — tylko gotowość workspace i liczniki zużycia.",
