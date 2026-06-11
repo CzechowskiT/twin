@@ -7,6 +7,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
 import { RecruiterAuditTrailPanel, postRecruiterAuditEvent } from "@/components/recruiter/recruiter-audit-trail-panel";
 import { RecruiterDecisionRail } from "@/components/recruiter/recruiter-decision-rail";
+import { RecruiterSchedulingPanel } from "@/components/recruiter/recruiter-scheduling-panel";
+import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspace-nav";
 import { RecruiterMessageDraftPanel } from "@/components/recruiter/recruiter-message-draft-panel";
 import {
   RecruiterSignalList,
@@ -74,6 +76,13 @@ import {
   RECRUITER_MESSAGE_DRAFT_VISUAL_MARKERS,
   type RecruiterMessageDraftRow,
 } from "@/lib/recruiter-message-drafts";
+import {
+  isRecruiterSchedulingEligible,
+  RECRUITER_SCHEDULING_VISUAL_MARKERS,
+  type RecruiterManualSlotInput,
+  type RecruiterSchedulingRow,
+  type RecruiterSchedulingStatus,
+} from "@/lib/recruiter-scheduling";
 
 type BatchRow = {
   application_id: number;
@@ -94,6 +103,11 @@ type BatchRow = {
   candidate_data_hidden?: string[] | null;
   consent_receipt_available?: boolean;
   review_card?: RecruiterReviewCard | null;
+  pipeline_status?: string | null;
+  scheduling_status?: string | null;
+  manual_slot_at?: string | null;
+  manual_slot_duration_minutes?: number | null;
+  manual_meeting_link?: string | null;
 };
 
 type AuthMeBilling = {
@@ -124,6 +138,7 @@ export default function RecruiterInboxClient() {
   const [expandedReviewCards, setExpandedReviewCards] = useState<Set<number>>(new Set());
   const [auditRefreshKey, setAuditRefreshKey] = useState(0);
   const [draftTargetRow, setDraftTargetRow] = useState<RecruiterMessageDraftRow | null>(null);
+  const [schedulingTargetRow, setSchedulingTargetRow] = useState<RecruiterSchedulingRow | null>(null);
   const [accessExpanded, setAccessExpanded] = useState(false);
   const autoLoadDone = useRef(false);
 
@@ -500,6 +515,30 @@ export default function RecruiterInboxClient() {
     return t(map[section]);
   }
 
+
+  const saveSchedule = useCallback(
+    async (applicationId: number, slot: RecruiterManualSlotInput, status: RecruiterSchedulingStatus) => {
+      const tkn = token.trim();
+      const slug = companySlug;
+      if (!tkn || !slug) throw new Error("missing auth");
+      const q = recruiterInboxQuery(tkn, slug);
+      const res = await fetch(`/api/recruiter/inbox/${applicationId}/schedule?${q}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Locale": getClientApiLocale() ?? "en" },
+        body: JSON.stringify({
+          slot_date: slot.slotDate,
+          slot_time: slot.slotTime,
+          duration_minutes: slot.durationMinutes,
+          meeting_link: slot.meetingLink || null,
+          scheduling_status: status,
+        }),
+      });
+      if (!res.ok) throw new Error("save failed");
+      await load();
+    },
+    [token, companySlug, load],
+  );
+
   function toggleReviewCard(applicationId: number) {
     setExpandedReviewCards((prev) => {
       const next = new Set(prev);
@@ -642,6 +681,7 @@ export default function RecruiterInboxClient() {
 
         {queueLoaded ? (
           <>
+            <RecruiterWorkspaceNav />
             <div
               className={`${RECRUITER_INBOX_VISUAL_MARKERS.decisionConsoleHeader} rounded-2xl border border-[var(--twin-border)] bg-gradient-to-br from-[var(--twin-surface)] to-[var(--twin-surface-2)]/80 p-5 shadow-sm sm:p-6`}
             >
@@ -808,6 +848,7 @@ export default function RecruiterInboxClient() {
                 {filteredRows.map((r) => {
                   const actionable = isRecruiterInboxActionable(r.status);
                   const draftEligible = isRecruiterMessageDraftEligible(r.status);
+                  const schedulingEligible = isRecruiterSchedulingEligible(r);
                   const badgeLabel = decisionBadgeLabel(r.status);
                   const statusKey = recruiterInboxStatusLabelKey(r.status);
                   const evidencePreview = rowEvidencePreview(r);
@@ -1040,6 +1081,28 @@ export default function RecruiterInboxClient() {
                                     </div>
                                   </div>
                                 ) : null}
+                                {schedulingEligible ? (
+                                  <button
+                                    type="button"
+                                    className={`${RECRUITER_SCHEDULING_VISUAL_MARKERS.prepareButton} twin-btn-ghost w-full text-sm`}
+                                    onClick={() =>
+                                      setSchedulingTargetRow({
+                                        application_id: r.application_id,
+                                        job_title: r.job_title,
+                                        company: r.company,
+                                        candidate_name: r.candidate_name,
+                                        status: r.status,
+                                        pipeline_status: r.pipeline_status,
+                                        scheduling_status: r.scheduling_status,
+                                        manual_slot_at: r.manual_slot_at,
+                                        manual_slot_duration_minutes: r.manual_slot_duration_minutes,
+                                        manual_meeting_link: r.manual_meeting_link,
+                                      })
+                                    }
+                                  >
+                                    {t("recruiterScheduling.prepareInviteAction")}
+                                  </button>
+                                ) : null}
                                 {draftEligible ? (
                                   <button
                                     type="button"
@@ -1081,6 +1144,26 @@ export default function RecruiterInboxClient() {
           </Link>
         </div>
       </Card>
+      {schedulingTargetRow ? (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center">
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface)] p-4 shadow-xl">
+            <RecruiterSchedulingPanel
+              row={schedulingTargetRow}
+              busy={busyId !== null}
+              onSave={async (slot, status) => {
+                setBusyId(`${schedulingTargetRow.application_id}-schedule`);
+                try {
+                  await saveSchedule(schedulingTargetRow.application_id, slot, status);
+                  setSchedulingTargetRow(null);
+                } finally {
+                  setBusyId(null);
+                }
+              }}
+              onClose={() => setSchedulingTargetRow(null)}
+            />
+          </div>
+        </div>
+      ) : null}
       {draftTargetRow ? (
         <RecruiterMessageDraftPanel
           key={draftTargetRow.application_id}

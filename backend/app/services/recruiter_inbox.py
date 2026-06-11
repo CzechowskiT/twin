@@ -9,6 +9,8 @@ from sqlalchemy.orm import Session
 from app.database.models import Application, ApplicationStatus, Candidate, Job
 from app.services.recruiter_audit_trail import log_recruiter_audit_event
 from app.services.recruiter_match_explanations import build_recruiter_match_summary
+from app.services.recruiter_pipeline import sync_pipeline_on_inbox_accept, sync_pipeline_on_inbox_decline
+from app.services.recruiter_scheduling import scheduling_fields_for_inbox_item
 from app.utils.slug import slugify_company
 
 
@@ -56,10 +58,12 @@ def build_recruiter_batch(
             "company": job.company,
             "candidate_name": (cand.name or "").strip() or "Candidate",
             "status": app.status.value,
+            "pipeline_status": (app.recruiter_pipeline_status or "").strip().lower() or None,
             "applied_at": app.applied_at.isoformat() if app.applied_at else None,
             "updated_at": app.updated_at.isoformat() if app.updated_at else None,
         }
         item.update(build_recruiter_match_summary(db, cand, job, locale=locale))
+        item.update(scheduling_fields_for_inbox_item(app))
         items.append(item)
         if len(items) >= limit:
             break
@@ -90,8 +94,10 @@ def respond_recruiter_batch(
     status_before = app.status.value
     if act == "accept":
         app.status = ApplicationStatus.INTERVIEW
+        sync_pipeline_on_inbox_accept(app)
     elif act == "decline":
         app.status = ApplicationStatus.REJECTED
+        sync_pipeline_on_inbox_decline(app)
         note = (decline_note or "").strip()
         if note:
             app.recruiter_feedback_raw = note[:2000]

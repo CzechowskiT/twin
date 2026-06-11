@@ -23,6 +23,8 @@ from app.services.recruiter_inbox import (
     respond_recruiter_batch,
     respond_recruiter_batch_bulk,
 )
+from app.services.recruiter_pipeline import build_recruiter_pipeline, transition_recruiter_pipeline
+from app.services.recruiter_scheduling import save_recruiter_manual_schedule
 from app.services.recruiter_jobs import create_company_job, list_company_jobs
 from app.services.request_locale import locale_from_request
 
@@ -68,6 +70,18 @@ class RecruiterBatchRespondIn(BaseModel):
     action: str = Field(..., description="accept | decline")
     decline_note: str | None = Field(None, max_length=2000, description="Shared internal note when declining")
 
+
+
+class RecruiterScheduleIn(BaseModel):
+    slot_date: str = Field(..., min_length=8, max_length=10)
+    slot_time: str = Field(..., min_length=4, max_length=8)
+    duration_minutes: int | None = Field(None, ge=15, le=480)
+    meeting_link: str | None = Field(None, max_length=2000)
+    scheduling_status: str = Field(..., description="invited | interview_scheduled")
+
+
+class RecruiterPipelineTransitionIn(BaseModel):
+    action: str = Field(..., description="to_contact | mark_invited | on_hold | reject | reopen")
 
 class RecruiterJobCreateIn(BaseModel):
     title: str = Field(..., min_length=2, max_length=300)
@@ -246,6 +260,83 @@ def recruiter_candidate_search(
         )
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/inbox/{application_id}/schedule")
+@limiter.limit("60/minute", key_func=recruiter_token_key)
+def recruiter_inbox_schedule(
+    request: Request,
+    application_id: int,
+    body: RecruiterScheduleIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return save_recruiter_manual_schedule(
+            db,
+            company_slug=slug,
+            application_id=application_id,
+            slot_date=body.slot_date,
+            slot_time=body.slot_time,
+            duration_minutes=body.duration_minutes,
+            meeting_link=body.meeting_link,
+            scheduling_status=body.scheduling_status,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.get("/pipeline")
+def recruiter_pipeline_list(
+    request: Request,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+    status: str | None = Query(None, max_length=32),
+    limit: int = Query(50, ge=1, le=100),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return build_recruiter_pipeline(
+            db,
+            company_slug=slug,
+            limit=limit,
+            locale=locale_from_request(request),
+            status_filter=status,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/pipeline/{application_id}/transition")
+@limiter.limit("60/minute", key_func=recruiter_token_key)
+def recruiter_pipeline_transition(
+    request: Request,
+    application_id: int,
+    body: RecruiterPipelineTransitionIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return transition_recruiter_pipeline(
+            db,
+            company_slug=slug,
+            application_id=application_id,
+            action=body.action,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
 
 
 @router.get("/jobs")

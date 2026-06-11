@@ -11,6 +11,8 @@ export const PREMIUM_I18N_PREFIXES = [
   "recruiterMessageDrafts.",
   "recruiterSearch.",
   "recruiterCalendar.",
+  "recruiterScheduling.",
+  "recruiterPipeline.",
   "demo.",
   "interactiveDemo.",
   "persona.",
