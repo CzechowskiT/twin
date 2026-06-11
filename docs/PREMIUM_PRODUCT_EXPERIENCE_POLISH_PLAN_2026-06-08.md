@@ -390,6 +390,7 @@ pytest tests/test_csp_report*.py -q
 - [x] Matches grouped by **confidence**, not flat score sort only
 - [x] Application transparency readable as **privacy control panel**
 - [x] Recruiter inbox feels like **decision console**, not raw table
+- [x] **Visual polish (2026-06-10):** premium header, stat cards, match score badges, review card CTA — `docs/RECRUITER_DECISION_CONSOLE_VISUAL_POLISH_2026-06-10.md`
 - [x] Trust language grep clean (PL/EN)
 - [x] Guided empty states on candidate + recruiter zero-data paths
 - [x] `docs/FOUNDER_PREMIUM_PRODUCT_QA_CHECKLIST_2026-06-08.md` delivered (Slice 7)

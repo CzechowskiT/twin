@@ -82,11 +82,12 @@
 
 | # | `/recruiter/inbox` | Check |
 | - | ------------------ | ----- |
-| 4.1 | Header | Dynamic “{n} candidates awaiting your decision” + AI-assisted subcopy |
-| 4.2 | Segments | Strong fit / Good fit / Needs verification / Decided tabs with counts |
-| 4.3 | Card hierarchy | Name, score, label, status, evidence/missing/confidence chips |
-| 4.4 | Review card | Due diligence grid expands; accept/decline + batch unchanged |
+| 4.1 | Header | Dynamic “{n} candidates awaiting your decision” + stat mini-cards + trust line (`docs/RECRUITER_DECISION_CONSOLE_VISUAL_POLISH_2026-06-10.md`) |
+| 4.2 | Segments | Strong fit / Good fit / Needs verification / Decided — large tabs with counts |
+| 4.3 | Card hierarchy | Prominent match score badge; **Dlaczego warto sprawdzić** / **Do weryfikacji** sections |
+| 4.4 | Review card | **Otwórz kartę oceny** CTA (chevron button); accept/decline + batch unchanged |
 | 4.5 | Decided rows | Interview/rejected show badge only — no accept |
+| 4.6 | Access strip | Collapsed after queue load — decision console is visual focus |
 
 **Score §4:** ___ / 10 (cap 6 for rubric: average × 6/10)
 
