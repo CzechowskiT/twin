@@ -1,22 +1,24 @@
-"""Company workspace API — internal roles for recruiter queues."""
+"""Company workspace API — internal roles and pipeline quality aggregates."""
 
 from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.api.recruiter import _resolved_company_slug
 from app.config import Settings, get_settings
 from app.database.session import get_db
+from app.services.company_pipeline_quality import build_company_pipeline_quality
 from app.services.company_roles import (
     create_company_role,
     get_company_role,
     list_company_roles,
     update_company_role,
 )
+from app.services.request_locale import locale_from_request
 
 router = APIRouter()
 
@@ -45,6 +47,27 @@ class CompanyRolePatchIn(BaseModel):
     nice_to_have_skills: list[str] | None = None
     salary_min: int | None = None
     salary_max: int | None = None
+
+
+@router.get("/pipeline-quality")
+def company_pipeline_quality(
+    request: Request,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    """Per-role pipeline segments and quality signals for one employer workspace."""
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return build_company_pipeline_quality(
+            db,
+            company_slug=slug,
+            locale=locale_from_request(request),
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
 
 @router.get("/roles")
