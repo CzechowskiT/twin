@@ -12,7 +12,7 @@ export default function WorkspaceInvestorPage() {
         tools={[
           {
             href: "/investor/data-room",
-            label: "dataRoom.title",
+            label: "investorDataRoom.title",
             description: "workspace.toolInvestorDataRoom",
           },
           {
