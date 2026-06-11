@@ -310,7 +310,7 @@ def google_calendar_disconnect(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> None:
-    row = db.query(UserGoogleCalendar).filter(UserGoogleCalendar.user_id == current_user.id).first()
+    row = get_best_google_row(db, current_user.id)
     if row:
         db.delete(row)
         db.commit()
@@ -344,16 +344,13 @@ def google_calendar_list_events(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> CalendarEventsOut:
-    access = _calendar_access_token(db, current_user.id)
-    try:
-        raw_items = list_primary_events(access, time_min, time_max, max_results=limit)
-    except GoogleCalendarApiError as e:
-        if calendar_upstream_auth_failure(e):
-            raise HTTPException(
-                status_code=status.HTTP_428_PRECONDITION_REQUIRED,
-                detail=GOOGLE_RECONNECT_MSG,
-            ) from e
-        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Calendar list events failed") from e
+    raw_items = _list_google_events_with_retry(
+        db,
+        current_user.id,
+        time_min,
+        time_max,
+        limit=limit,
+    )
     events: list[CalendarEventOut] = []
     for item in raw_items:
         out = _google_event_to_out(item)
