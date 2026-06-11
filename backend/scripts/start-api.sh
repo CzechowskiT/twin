@@ -17,6 +17,11 @@ python -c "
 import sqlalchemy, os
 url = os.environ.get('DATABASE_URL', '')
 if url:
+    # Normalize to psycopg v3 driver, matching app/config.py logic
+    if url.startswith('postgres://'):
+        url = 'postgresql+psycopg://' + url[len('postgres://'):]
+    elif url.startswith('postgresql://') and '+psycopg' not in url:
+        url = 'postgresql+psycopg://' + url[len('postgresql://'):]
     engine = sqlalchemy.create_engine(url)
     old_to_new = {
         '052_recruiter_audit_events': '053_recruiter_audit_events',
