@@ -38,6 +38,7 @@ export function extractPremiumTree(source: StringTree): Record<string, unknown> 
     register: source.register,
     dashboard: dashboardPremium,
     recruiterInbox: source.recruiterInbox,
+    recruiterSearch: source.recruiterSearch,
     recruiterCalendar: source.recruiterCalendar,
     demo: source.demo,
     interactiveDemo: source.interactiveDemo,
