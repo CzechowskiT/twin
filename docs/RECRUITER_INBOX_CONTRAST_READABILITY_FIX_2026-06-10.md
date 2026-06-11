@@ -36,6 +36,8 @@ Unknown freeform strings pass through unchanged.
 
 **Launch stance:** unchanged — public **NO-GO**, auto-apply **PAUSED**, PII rules unchanged.
 
+**Follow-up:** `docs/RECRUITER_INBOX_READABILITY_LAYOUT_POLISH_2026-06-10.md` — two-zone card layout, chip caps, dominant match score, sentence-case section labels.
+
 ---
 
 ## Tests

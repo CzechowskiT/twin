@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { localizeRecruiterInboxChipText } from "../src/lib/recruiter-inbox-chip-copy";
+import {
+  localizeRecruiterInboxChipText,
+  shortRecruiterInboxChipText,
+} from "../src/lib/recruiter-inbox-chip-copy";
 
 test("known English demo reasons localize to Polish", () => {
   assert.equal(
@@ -38,4 +41,15 @@ test("English locale leaves known strings unchanged", () => {
 test("unknown freeform strings pass through in PL", () => {
   const custom = "Custom recruiter note from ATS";
   assert.equal(localizeRecruiterInboxChipText(custom, "pl"), custom);
+});
+
+test("short chip labels compact inbox preview copy", () => {
+  assert.equal(
+    shortRecruiterInboxChipText("No skills list on profile", "en"),
+    "No skills list",
+  );
+  assert.equal(
+    shortRecruiterInboxChipText("No skills list on profile", "pl"),
+    "Brak umiejętności",
+  );
 });
