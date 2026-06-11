@@ -112,6 +112,14 @@ export const RENDERED_FAQ_KEYS = [
   "general02A",
   "general03Q",
   "general03A",
+  "candidates01Q",
+  "candidates01A",
+  "recruiters01Q",
+  "recruiters01A",
+  "companies01Q",
+  "companies01A",
+  "investors01Q",
+  "investors01A",
 ] as const;
 
 /** Founder-reported English phrases that must not appear on localized home/waitlist. */
@@ -139,6 +147,11 @@ export const ENGLISH_LEAK_PHRASES = [
   "Finally one pipeline instead of twenty tabs",
   "Validated jobs",
   "Questions & answers",
+  "See your matches in ~2 min",
+  "How does job matching work?",
+  "What is the recruiter acceptance inbox?",
+  "What do companies buy from TWIN?",
+  "Where is the investor data room?",
 ] as const;
 
 /** Expected localized markers (ES / DE smoke). */

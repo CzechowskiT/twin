@@ -41,6 +41,28 @@ function assertNotEnglish(locale: Locale, rows: { key: string; value: string }[]
   );
 }
 
+test("hero subtext and FAQ persona preview — localized for IT (founder report)", () => {
+  const rows = collectRenderedHomeStrings("it");
+  assert.match(rows.find((r) => r.key === "home.ctaRegisterMicro")?.value ?? "", /~2 min/i);
+  assert.doesNotMatch(
+    rows.find((r) => r.key === "home.ctaRegisterMicro")?.value ?? "",
+    /See your matches/i,
+  );
+  assert.match(
+    rows.find((r) => r.key === "faq.candidates01Q")?.value ?? "",
+    /matching delle offerte/i,
+  );
+  assert.match(
+    rows.find((r) => r.key === "faq.recruiters01Q")?.value ?? "",
+    /inbox di accettazione/i,
+  );
+  assert.match(rows.find((r) => r.key === "faq.companies01Q")?.value ?? "", /acquistano le aziende/i);
+  assert.match(
+    rows.find((r) => r.key === "faq.investors01Q")?.value ?? "",
+    /data room per investitori/i,
+  );
+});
+
 test("homepage rendered keys — no EN marketing leakage (es–ja)", () => {
   for (const locale of TARGET_LOCALES) {
     const rows = collectRenderedHomeStrings(locale);

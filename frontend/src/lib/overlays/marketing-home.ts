@@ -268,6 +268,8 @@ const fr: MarketingHomeOverlay = {
 
 const it: MarketingHomeOverlay = {
   home: {
+    getStarted: "Inizia gratis",
+    ctaRegisterMicro: "Vedi i tuoi match in ~2 min",
     curiosityEyebrow: "Guarda cosa c'è dentro",
     joinWishlist: "Unisciti alla lista dei fondatori",
     joinWishlistMicro: "Primi 1.000 · vantaggi della cohorte iniziale · nessuna carta · si applicano i Termini",
@@ -297,6 +299,8 @@ const it: MarketingHomeOverlay = {
 
 const zh: MarketingHomeOverlay = {
   home: {
+    getStarted: "免费开始",
+    ctaRegisterMicro: "约 2 分钟内查看匹配",
     curiosityEyebrow: "看看里面有什么",
     joinWishlist: "加入创始候补名单",
     joinWishlistMicro: "前 1,000 名 · 创始队列权益 · 无需信用卡 · 适用条款",
@@ -324,6 +328,8 @@ const zh: MarketingHomeOverlay = {
 
 const ja: MarketingHomeOverlay = {
   home: {
+    getStarted: "無料で始める",
+    ctaRegisterMicro: "約2分でマッチを確認",
     curiosityEyebrow: "中身を見る",
     joinWishlist: "創設者リストに参加",
     joinWishlistMicro: "先着1,000名 · 創設コホート特典 · カード不要 · 規約が適用",
@@ -351,6 +357,8 @@ const ja: MarketingHomeOverlay = {
 
 const ar: MarketingHomeOverlay = {
   home: {
+    getStarted: "ابدأ مجاناً",
+    ctaRegisterMicro: "شاهد تطابقاتك في ~2 دقيقة",
     curiosityEyebrow: "اكتشف ما بالداخل",
     joinWishlist: "انضم إلى قائمة المؤسسين",
     joinWishlistMicro: "أول 1,000 · مزايا مجموعة المؤسسين · بدون بطاقة · تنطبق الشروط",
