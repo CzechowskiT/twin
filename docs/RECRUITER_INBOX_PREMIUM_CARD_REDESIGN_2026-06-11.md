@@ -22,13 +22,13 @@ PR #73 improved contrast and layout but still read like patched admin UI — hea
 | Review CTA | **Zobacz kartę oceny** — near-white text on dark; cyan/teal on border/bg/chevron (not label) |
 | Status badges | **Oczekuje decyzji** etc. — white/slate-100 text; tone via border/background only |
 | Decline | Light rose/white text, stronger border/bg — readable, not disabled-looking |
-| Match score | Label/tone high-contrast (`slate-200`/`slate-100` on dark); tone color on card border |
+| Match score | Label `slate-300`, value `white`, tone `white` on dark; amber/cyan/emerald on border/bg only |
 | Focus | Strong cyan/rose `focus-visible` rings on review CTA and decline |
 | i18n | `matchScoreCardLabel`, `reviewCardCtaShort`, `chipOverflowInReviewCard` (PL+EN) |
 
 **Components:** `recruiter-match-score-card.tsx`, `recruiter-signal-list.tsx`, `recruiter-decision-rail.tsx`
 
-**Follow-up (PR #74+):** `fix/recruiter-decision-rail-text-readability-2026-06-11` — decision rail text contrast on dark (status, review CTA, decline). See `docs/RECRUITER_DECISION_RAIL_TEXT_READABILITY_FIX_2026-06-11.md`.
+**Follow-up (PR #74+):** decision rail text contrast on dark — `docs/RECRUITER_DECISION_RAIL_TEXT_READABILITY_FIX_2026-06-11.md`, then **final pass** `fix/recruiter-decision-rail-final-readability-2026-06-11` (`docs/RECRUITER_DECISION_RAIL_FINAL_READABILITY_FIX_2026-06-11.md`) after PR #75 screenshot rejection.
 
 **Files:** `recruiter-inbox-client.tsx`, `recruiter-inbox-visual.ts`, `recruiter-inbox-chip-copy.ts`, `i18n.ts`, `recruiter-inbox-premium-card-ui.test.ts`, `recruiter-decision-rail-readability.test.ts`
 
