@@ -21,6 +21,7 @@ import {
   premiumJaOverlay,
   premiumZhOverlay,
 } from "./overlays/premium";
+import { INVESTOR_DATA_ROOM_OVERLAYS } from "./overlays/premium/investor-data-room-overlays";
 import { RECRUITER_MESSAGE_DRAFTS_OVERLAYS } from "./overlays/premium/recruiter-message-drafts-overlays";
 import { FAQ_MESSAGES_EN, FAQ_MESSAGES_PL } from "./faq-messages";
 import {
@@ -144,6 +145,7 @@ export type TranslationKey =
   | `referrals.${keyof typeof en.referrals}`
   | `atsIntegrations.${keyof typeof en.atsIntegrations}`
   | `dataRoom.${keyof typeof en.dataRoom}`
+  | `investorDataRoom.${keyof typeof en.investorDataRoom}`
   | `careerAssistant.${keyof typeof en.careerAssistant}`
   | `strategic.${keyof typeof en.strategic}`
   | `jobBrief.${keyof typeof en.jobBrief}`
@@ -1651,8 +1653,6 @@ const en = {
     toolInvestorMetricsDesc: "Validated jobs, users, applications — public aggregates only.",
     toolInvestorPlacement: "Placement verification timeline",
     toolInvestorPlacementDesc: "Append-only hire events — investor walkthrough + seeded demo login.",
-    toolInvestorRoadmap: "Roadmap & founder updates",
-    toolInvestorRoadmapDesc: "Honest now/next/later, risks, and validation milestones from production matrices.",
   },
   developers: {
     title: "Developers & integrators",
@@ -2294,6 +2294,38 @@ eyebrow: "Product roadmap",
     uploadNoFile: "Select a PDF or spreadsheet first.",
     uploadStored: "File stored securely.",
     uploadPutFailed: "Could not upload file bytes — try again or contact us.",
+  },
+  investorDataRoom: {
+    eyebrow: "Due diligence",
+    title: "Investor data room",
+    lead: "Public GitHub docs, live product surfaces you can verify, and confidential placeholders — request access for cap table and audited financials.",
+    transparencyTitle: "Transparency before hype",
+    transparencyBody: "No invented traction numbers and no hidden links to sensitive files on this page. Public materials are linked; cap table and financials require a signed NDA and founder confirmation.",
+    publicDocsTitle: "Public documents (repository)",
+    publicDocsLead: "Auditable Markdown on GitHub — not opaque downloads.",
+    docDueDiligencePack: "CTO / investor due diligence pack",
+    docDemoRunbook: "Investor demo runbook",
+    docPlacementVerification: "Placement verification design",
+    docQaTop10: "Investor top-10 Q&A",
+    liveSurfacesTitle: "Live surfaces",
+    liveSurfacesLead: "Metrics and status you can verify yourself — not static screenshots.",
+    liveMetrics: "Metrics dashboard",
+    liveStatus: "System status",
+    liveCalculator: "Scenario calculator",
+    liveOpenApi: "OpenAPI schema",
+    confidentialTitle: "Confidential (on request)",
+    confidentialLead: "Placeholders without URLs — access follows review of your request.",
+    confidentialCap: "Cap table & dilution",
+    confidentialFin: "Financial statements",
+    confidentialLegal: "Legal & compliance pack",
+    confidentialPlaceholderNote: "Available after signed access — no direct link on this page.",
+    founderTitle: "Founder contact",
+    founderLead: "Email with your fund, stage, and diligence timeline; we reply with next steps.",
+    requestAccessCta: "Request access by email",
+    contactFormCta: "Contact form",
+    backInvestor: "Investor workspace",
+    mailtoSubject: "TWIN — investor data room access request",
+    mailtoBody: "Hi TWIN team,\\n\\nI would like access to the confidential data room.\\n\\nFund / organization:\\nStage & check size:\\nDiligence timeline:\\n\\nThanks,",
   },
 
   companyJobs: {
@@ -3198,6 +3230,7 @@ eyebrow: "Product roadmap",
     titleForCompanies: "Companies · TWIN",
     titleForInvestors: "Investor room · TWIN",
     titleInvestorRoom: "Investor room · TWIN",
+    titleCompanyDashboard: "Company hiring dashboard · TWIN",
     titleDemo: "Demo · TWIN",
   },
   demo: {
@@ -5170,6 +5203,9 @@ const pl: MessageTree = {
     gateTitleInvestor: "Tylko strefa inwestora",
     gateLeadInvestor:
       "Kalkulator scenariusza i metryki są w strefie inwestora — nie cennik pracodawcy. Zmień kontekst, aby kontynuować.",
+    gateTitleCompany: "Tylko strefa firmy",
+    gateLeadCompany:
+      "Panel rekrutacji i narzędzia pracodawcy są w strefie firmy. Zmień kontekst lub otwórz stronę główną firmy.",
     zoneCandidateTitle: "Kandydat",
     zoneCandidateLead: "Szukanie pracy, auto-aplikacja, kalendarz i aplikacje.",
     zoneCandidateTools: "Demo · Panel · Dopasowania",
@@ -5203,8 +5239,6 @@ const pl: MessageTree = {
     toolInvestorMetricsDesc: "Oferty, użytkownicy, aplikacje — tylko agregaty publiczne.",
     toolInvestorPlacement: "Oś czasu placementu",
     toolInvestorPlacementDesc: "Zdarzenia zatrudnienia — demo inwestora + konto seed.",
-    toolInvestorRoadmap: "Roadmapa i aktualizacje founderów",
-    toolInvestorRoadmapDesc: "Uczciwe teraz/następne/później, ryzyka i kamienie walidacji z macierzy produkcyjnych.",
   },
   developers: {
     title: "Dla developerów i integratorów",
@@ -5402,7 +5436,7 @@ const pl: MessageTree = {
     ycBack: "← Pełna strona inwestora",
   },
   investorRoadmap: {
-eyebrow: "Roadmapa produktu",
+    eyebrow: "Roadmapa produktu",
     title: "Roadmapa i aktualizacje founderów",
     lead: "Uczciwe teraz / następne / później z macierzy produkcyjnych — bez dat ze slajdów i bez wymyślonej trakcji.",
     launchStanceLabel: "Stan launchu",
@@ -5848,6 +5882,38 @@ eyebrow: "Roadmapa produktu",
     uploadNoFile: "Najpierw wybierz PDF lub arkusz.",
     uploadStored: "Plik zapisany bezpiecznie.",
     uploadPutFailed: "Nie udało się wgrać pliku — spróbuj ponownie lub napisz do nas.",
+  },
+  investorDataRoom: {
+    eyebrow: "Due diligence",
+    title: "Data room inwestora",
+    lead: "Publiczne docs na GitHubie, live produkt do weryfikacji i placeholdery poufne — poproś o dostęp do cap table i audytów.",
+    transparencyTitle: "Transparentność przed narracją",
+    transparencyBody: "Bez wymyślonych liczb i bez ukrytych linków do wrażliwych plików na tej stronie. Publiczne materiały są podlinkowane; cap table i finanse wymagają NDA i potwierdzenia founderów.",
+    publicDocsTitle: "Dokumenty publiczne (repozytorium)",
+    publicDocsLead: "Markdown do audytu na GitHubie — nie nieprzejrzyste pobrania.",
+    docDueDiligencePack: "Pakiet due diligence CTO / inwestor",
+    docDemoRunbook: "Runbook demo inwestora",
+    docPlacementVerification: "Weryfikacja placementu",
+    docQaTop10: "Top 10 Q&A inwestorów",
+    liveSurfacesTitle: "Powierzchnie live",
+    liveSurfacesLead: "Metryki i status do samodzielnej weryfikacji — nie statyczne screeny.",
+    liveMetrics: "Panel metryk",
+    liveStatus: "Status systemu",
+    liveCalculator: "Kalkulator scenariuszy",
+    liveOpenApi: "Schemat OpenAPI",
+    confidentialTitle: "Poufne (na żądanie)",
+    confidentialLead: "Placeholdery bez URL — dostęp po weryfikacji prośby.",
+    confidentialCap: "Cap table i rozwodnienie",
+    confidentialFin: "Sprawozdania finansowe",
+    confidentialLegal: "Pakiet prawny i compliance",
+    confidentialPlaceholderNote: "Po podpisanym dostępie — bez bezpośredniego linku tutaj.",
+    founderTitle: "Kontakt do founderów",
+    founderLead: "Napisz z funduszem, etapem i harmonogramem DD — odpowiemy z kolejnymi krokami.",
+    requestAccessCta: "Poproś o dostęp mailem",
+    contactFormCta: "Formularz kontaktowy",
+    backInvestor: "Przestrzeń inwestora",
+    mailtoSubject: "TWIN — prośba o dostęp do data room",
+    mailtoBody: "Cześć zespole TWIN,\\n\\nProszę o dostęp do poufnego data room.\\n\\nFundusz / organizacja:\\nEtap i ticket:\\nHarmonogram DD:\\n\\nDzięki,",
   },
 
   companyJobs: {
@@ -6756,6 +6822,7 @@ eyebrow: "Roadmapa produktu",
     titleForCompanies: "Firmy · TWIN",
     titleForInvestors: "Sala inwestora · TWIN",
     titleInvestorRoom: "Sala inwestora · TWIN",
+    titleCompanyDashboard: "Panel rekrutacji firmy · TWIN",
     titleDemo: "Demo · TWIN",
   },
   demo: {
@@ -7275,13 +7342,17 @@ function localeFromOverlays(
   const faqOverlay = FAQ_LOCALE_OVERLAYS[locale] ?? {};
   const messageDraftsOverlay = RECRUITER_MESSAGE_DRAFTS_OVERLAYS[locale] ?? {};
   const investorRoomOverlay = INVESTOR_ROOM_OVERLAYS[locale] ?? {};
+  const investorDataRoomOverlay = INVESTOR_DATA_ROOM_OVERLAYS[locale as keyof typeof INVESTOR_DATA_ROOM_OVERLAYS] ?? {};
   return messagesFromEnOverlay(
     mergeDeep(
       mergeDeep(
-        mergeDeep(mergeDeep(mergeDeep(withPremium, marketingHome), siteChrome), { faq: faqOverlay }),
-        messageDraftsOverlay,
+        mergeDeep(
+          mergeDeep(mergeDeep(withPremium, marketingHome), siteChrome), { faq: faqOverlay }),
+          messageDraftsOverlay,
+        ),
+        investorRoomOverlay,
       ),
-      investorRoomOverlay,
+      investorDataRoomOverlay,
     ),
   );
 }

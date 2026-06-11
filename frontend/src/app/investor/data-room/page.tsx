@@ -13,10 +13,12 @@ export default function InvestorDataRoomPage() {
       <Shell wide>
         <header className="mb-8 space-y-2">
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
-            {t("dataRoom.eyebrow")}
+            {t("investorDataRoom.eyebrow")}
           </p>
-          <h1 className="twin-page-intro text-2xl font-semibold sm:text-3xl">{t("dataRoom.title")}</h1>
-          <p className="twin-muted max-w-2xl text-sm leading-relaxed">{t("dataRoom.lead")}</p>
+          <h1 className="twin-page-intro text-2xl font-semibold sm:text-3xl">
+            {t("investorDataRoom.title")}
+          </h1>
+          <p className="twin-muted max-w-2xl text-sm leading-relaxed">{t("investorDataRoom.lead")}</p>
         </header>
         <InvestorDataRoomPanel />
       </Shell>
