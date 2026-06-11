@@ -63,3 +63,7 @@ npm run test:candidate-calendar-integration-health
 - No TWIN session clear on provider failure  
 - No disconnect-before-reconnect  
 - No fake connected state  
+
+## Follow-up P0 (2026-06-11)
+
+PR #117 timeout alone was insufficient: **`auth/me` and ops health blocked `Promise.all`**, leaving provider phases on `"loading"`. See `docs/CANDIDATE_CALENDAR_P0_ROOT_CAUSE_FIX_2026-06-11.md` — immediate phase commit, ancillary timeouts, stale guards, `error` badge fix; `test:candidate-calendar-p0-root-cause`.

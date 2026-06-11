@@ -60,6 +60,11 @@ def probe_microsoft_calendar_health(db: Session, user_id: int) -> CalendarProvid
             provider="microsoft", connected=False, status="not_connected", health="unknown",
             message=None, code=None, email=None,
         )
+    if not row.refresh_token_encrypted:
+        return provider_status_payload(
+            provider="microsoft", connected=True, status="reconnect_required", health="reconnect_required",
+            message=MICROSOFT_RECONNECT_MSG, code="missing_refresh_token", email=row.microsoft_email,
+        )
     if access_token_still_valid(row):
         return provider_status_payload(
             provider="microsoft", connected=True, status="connected", health="ok",

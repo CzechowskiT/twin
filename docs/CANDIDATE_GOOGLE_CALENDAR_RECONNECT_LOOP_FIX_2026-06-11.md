@@ -57,6 +57,8 @@ cd frontend && npm run test:candidate-google-calendar-stability
 
 **Follow-up (2026-06-11):** `docs/CANDIDATE_CALENDAR_LOADING_STATE_TIMEOUT_FIX_2026-06-11.md` — 9s client timeout so status/events never leave page on **Ładowanie…** indefinitely.
 
+**P0 root-cause (2026-06-11):** `docs/CANDIDATE_CALENDAR_P0_ROOT_CAUSE_FIX_2026-06-11.md` — `auth/me` + ops health unblocked provider phases; badge/body `error` phase aligned.
+
 ## Hard bans
 
 - Never `clearToken()` / logout on calendar `401`/`428`/`503`.  
