@@ -2,6 +2,7 @@
 
 **Audience:** Founder / operator (pre–Slot-1 review, pre–candidate outreach)  
 **Production:** https://twin-sooty.vercel.app · API https://twin-production-bcd9.up.railway.app  
+**Prod `git_commit` (2026-06-11):** `e48bff1` (`db_ok=true`) — scaffold `adfcac0`; redeploy before strict SHA parity checks  
 **Launch stance (preserved):** Public **NO-GO** · auto-apply **PAUSED** · delegated **NOT LIVE** · recruiter calendar **NOT LIVE** · external invites **0** · H5c/H5d **HOLD**
 
 **Program:** Premium Product Experience Polish Slices 0–7 (PRs [#52](https://github.com/CzechowskiT/twin/pull/52)–[#58](https://github.com/CzechowskiT/twin/pull/58))

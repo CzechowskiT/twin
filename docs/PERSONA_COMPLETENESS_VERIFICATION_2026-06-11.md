@@ -2,8 +2,8 @@
 
 **Owner:** TWIN Persona Completeness Verification Owner  
 **Audit branch:** `audit/persona-completeness-verification-2026-06-11`  
-**Scaffold HEAD (verified):** `cd4b698` — merge PR #85 (investor roadmap) on `cursor/phase1-monorepo-scaffold`  
-**Production API git_commit (2026-06-11T16:37Z):** `474df8869ae861e93f1f48b8ea1d4c36bae48b18` — **2 commits behind scaffold**  
+**Scaffold HEAD (post-audit 2026-06-11):** `adfcac0` — PRs #94–#113 merged on `cursor/phase1-monorepo-scaffold`; Alembic head `057`  
+**Production API git_commit (2026-06-11 closure):** `e48bff14b56a159ebcde0773667e617cb763a772` — **1 commit behind scaffold** (`adfcac0` empty redeploy trigger)  
 **Production FE:** https://twin-sooty.vercel.app · **API:** https://twin-production-bcd9.up.railway.app  
 **Method:** `git ls-tree` on committed scaffold (not dirty working tree); route grep; test scripts; production `curl` smoke; forbidden-claims grep.  
 **Scope:** Candidate · Recruiter · Company · Investor personas — code, routes, tests, docs, production.
@@ -14,12 +14,12 @@
 
 ## 1 — Executive summary
 
-| Persona | Verdict | Production | Scaffold (`cd4b698`) | Demo-ready? |
+| Persona | Verdict | Production | Scaffold (`adfcac0`) | Demo-ready? |
 | ------- | ------- | ---------- | -------------------- | ----------- |
-| **Candidate** | **PARTIAL** | Core dashboard + calendar + transparency **LIVE** at `474df88` | Same + polish slices 0–7; no dedicated timeline/evidence routes | **Yes** for 5–10 warm outreach (§1+§2 founder QA) — not mass GTM |
-| **Recruiter** | **PARTIAL** | Inbox decision console **LIVE**; calendar placeholder **NOT LIVE** | + message drafts (inbox panel); no pipeline/search/analytics/scheduling/audit/scorecards | **Yes** for Slot-1 visual review (H5c pack) — inbox only |
-| **Company** | **FAIL** | No `/company/*` workspace routes (404) | No committed company workspace — WIP exists only on unmerged/local branches | **No** — cannot demo company hiring dashboard |
-| **Investor** | **PARTIAL** | Calculator, metrics, data-room **LIVE**; roadmap page returns HTTP 200 (likely newer FE deploy vs API commit lag) | + `/investor/roadmap` committed PR #85 | **Yes** for doc-backed metrics narrative — no traction claims |
+| **Candidate** | **PARTIAL+** | Dashboard + calendar + transparency **LIVE**; `/dashboard/applications`, `/dashboard/evidence`, `/dashboard/interview-prep` **HTTP 200** on prod FE | PRs #109, #111, #112 merged; migration `057` | **Yes** for 5–10 warm outreach after founder QA — not mass GTM |
+| **Recruiter** | **PARTIAL+** | Inbox **LIVE**; `/recruiter/pipeline`, `/recruiter/search`, `/recruiter/analytics` **HTTP 200**; calendar placeholder **NOT LIVE** | PRs #84, #93, #94, #104, #106, #107 merged | **Yes** for Slot-1 + expanded pilot demo (inbox + pipeline/search) — calendar sync still **NOT LIVE** |
+| **Company** | **PARTIAL** | `/company/dashboard`, `/company/roles`, `/company/pipeline`, `/company/billing`, `/company/team` **HTTP 200** on prod FE | PRs #89–#92, #102, #103 merged | **Yes** for controlled company workspace demo — not full GTM |
+| **Investor** | **PARTIAL+** | Calculator, metrics, data-room, roadmap **LIVE**; data-room request-access (#95) on scaffold | PRs #85, #90, #95 merged | **Yes** for doc-backed metrics narrative — no traction claims |
 
 ### Launch & demo stance
 
@@ -29,15 +29,15 @@
 | **Controlled recruiter pilot (H5b)** | Prior **PASS** — inbox path |
 | **H5c Slot-1 visual review** | **READY** (inbox on prod) — default **HOLD**, no invites sent |
 | **5–10 candidate warm outreach** | **READY** after founder runs premium QA checklist on prod |
-| **Full four-persona demo** | **NOT READY** — Company FAIL; Recruiter expansion not merged |
+| **Full four-persona demo** | **READY (controlled)** — all four personas have merged MVP routes; recruiter calendar sync and public launch remain **NOT LIVE** |
 
-### Top blockers
+### Top blockers (post-audit 2026-06-11)
 
-1. **Company persona:** zero merged routes/API/UI — largest gap vs founder intent.
-2. **Recruiter expansion slices** (pipeline, search, analytics, scheduling, audit, scorecards): exist as WIP/unmerged branches and dirty trees — **not on scaffold, not on production**.
-3. **Production deploy lag:** API reports `474df88`; scaffold at `cd4b698` (message drafts + investor roadmap not yet on API health surface).
-4. **`test:i18n-coverage` FAIL** on scaffold — **120** missing overlay keys (message drafts + roadmap additions).
-5. **Branch hygiene:** 17/18 named `feature/*-2026-06-11` branches are empty pointers at scaffold — work lives in WIP trees, not reviewable PRs.
+1. **Production deploy lag:** API `git_commit=e48bff1`; scaffold `adfcac0` — founder redeploy pending.
+2. **O7 re-drill:** 2026-06-11 entry **NOT DONE / BLOCKED** — see `docs/O7_RESTORE_DRILL_RUNBOOK_2026-06-11.md`.
+3. **`test:i18n-coverage` debt** — missing overlay keys after bulk merges; blocks confident locale rollout.
+4. **Recruiter calendar sync** — still placeholder **NOT LIVE**; do not demo as shipped.
+5. **Public launch** — **NO-GO** unchanged; auto-apply **PAUSED**; external invites **0**.
 
 ---
 

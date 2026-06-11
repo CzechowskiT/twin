@@ -4,11 +4,11 @@
 **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01`
 **Branch HEAD:** `9011040` (prior) → updated by 2026-06-03 shift commits; copy audit 2026-06-04
 **Audit UTC:** `2026-06-07T07:03:13Z` (H5b founder dry run **PASS**) · `2026-06-07T06:32:51Z` (R6 recruiter calendar placeholder HTTP smoke · PR #43 `2fa2746`) · `2026-06-06T17:36:25Z` (H4 final visual smoke **CLEAN PASS**) · `2026-06-06T16:38:40Z` (R5 Match Receipt smoke) · `2026-06-06T16:07:18Z` (R1–R4) · `2026-06-05T16:20:13Z` (S2 post-enforce) · prior gate `2026-06-04T10:34:36Z` · **launch-day runbook** `2026-06-04` — `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` · **copy audit** `2026-06-04` — `docs/PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md`
-**Production (unchanged by this audit):** FE `https://twin-sooty.vercel.app` · API `https://twin-production-bcd9.up.railway.app`
+**Production (2026-06-11 post-audit):** FE `https://twin-sooty.vercel.app` · API `https://twin-production-bcd9.up.railway.app` · `git_commit=e48bff1`, `db_ok=true` · scaffold HEAD `adfcac0` (founder redeploy pending)
 
 **CTO co-founder audit (2026-06-07):** `docs/CTO_COFUNDER_DUE_DILIGENCE_AUDIT_2026-06-07.md` — docs-only; **launch stance unchanged** (public **NO-GO**).
 
-**Verdict:** **Public launch NO-GO**
+**Verdict:** **Public launch NO-GO** (unchanged after post-audit closure 2026-06-11 — PRs #94–#113 merged; O7 re-drill pending; no launch GO)
 **Safe-lane merge (2026-06-06):** PR [#38](https://github.com/CzechowskiT/twin/pull/38) — PII/consent receipt alignment · commit `2cc18db` · automated curl smoke `2026-06-06T16:52:28Z`–`16:53:45Z` · **does not change launch NO-GO**.
 **Safe-lane merge (2026-06-07):** Candidate application transparency polish — structured panel PL/EN, `rejected` status, automation pause copy · see `docs/CANDIDATE_APPLICATION_TRANSPARENCY_2026-06-07.md` · **does not change launch NO-GO**.
 **Safe-lane merge (2026-06-07):** Homepage persona nav + `/demo` 8-step interactive simulation · `docs/INTERACTIVE_DEMO_WALKTHROUGH_2026-06-07.md` · `test:homepage-nav` + `test:interactive-demo` · **does not change launch NO-GO**.
