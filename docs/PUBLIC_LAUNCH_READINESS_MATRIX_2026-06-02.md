@@ -20,6 +20,8 @@
 
 **Safe-lane merge (2026-06-11):** Recruiter inbox **premium card redesign** — decision rail, match score card, signal rows, review CTA · **does not change launch NO-GO**.
 
+**Docs-only (2026-06-11):** H5c GO SMALL 1 prep pack · `docs/H5C_GO_SMALL_1_PREP_PACK_2026-06-11.md` — **ready for controlled Slot-1 recruiter visual/product review** · **does not change public launch NO-GO** · external invitations **not sent** · H5c/H5d **HOLD**.
+
 **Safe-lane merge (2026-06-10):** Recruiter inbox **readability/layout** — two-zone cards, chip caps, dominant match score, sentence-case labels · **does not change launch NO-GO**.
 
 **Safe-lane merge (2026-06-10):** Recruiter inbox **contrast/readability** — badges, chips, CTA, decline visibility; PL chip localization · **does not change launch NO-GO**.
@@ -239,6 +241,7 @@
 | -------- | ------- | --------- |
 | **Public launch** (LinkedIn / PressOn / uncontrolled signup) | **NO-GO** | **S2 PASS** recorded; founder **limited-launch decision pending**; L6/O5/GAP-04 gates unchanged |
 | **Controlled pilot** | **GO** | Prod health green; P1 manual + tracker; per-account watch |
+| **Controlled Slot-1 recruiter visual review** | **READY** | H5b PASS; §4 visual PASS (founder `2026-06-11`); prep pack `docs/H5C_GO_SMALL_1_PREP_PACK_2026-06-11.md` — **not** external invite until H5c **GO SMALL 1** |
 | **Investor / CTO demo** | **GO** | Curated dataset; same stack |
 | **Auto-apply / delegated apply** | **PAUSED / NOT LIVE** | Product gates + audit hard ban; no mass autonomous apply for launch |
 

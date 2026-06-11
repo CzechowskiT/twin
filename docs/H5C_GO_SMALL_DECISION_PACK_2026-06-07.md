@@ -158,6 +158,7 @@ Primary questions for GO SMALL reviewers (week 1–4):
 | UTC | Decision | Cohort | Rationale | Owner |
 | --- | -------- | ------ | --------- | ----- |
 | `2026-06-07` | **`hold`** (default) | **0 / 3–5** invited | H5c GO SMALL decision pack created — docs only; H5b PASS preserved; external invitations **not sent**; founder to sign GO SMALL 1/2 when ready | Founder |
+| `2026-06-11` | **`hold`** (unchanged) | **0 / 3–5** invited | H5c GO SMALL 1 prep pack created — Slot-1 visual review **READY**; recruiter inbox visual PASS (founder PR #77); external invitations **not sent**; see `docs/H5C_GO_SMALL_1_PREP_PACK_2026-06-11.md` | Founder |
 
 **Decision codes:** `hold` · `go_small_1` · `go_small_2` · `iterate` · `cohort_pause`
 
@@ -180,7 +181,7 @@ Primary questions for GO SMALL reviewers (week 1–4):
 | **Delegated apply** | **NOT LIVE** |
 | **Recruiter calendar** | **NOT LIVE** — placeholder only |
 | **External recruiter invites** | **Not sent** — deferred until explicit **GO SMALL 1/2** sign-off |
-| **Next founder action** | Supply **3–5 possible names** for H5d §6 scoring → select slot 1 → complete §5 · sign **GO SMALL 1** in §9 · then use invites pack |
+| **Next founder action** | Run `docs/H5C_GO_SMALL_1_PREP_PACK_2026-06-11.md` §2 smoke → Slot-1 visual review → supply **3–5 possible names** for H5d §6 scoring → select slot 1 → complete §5 · sign **GO SMALL 1** in §9 · then use invites pack |
 
 ---
 
@@ -196,6 +197,7 @@ Primary questions for GO SMALL reviewers (week 1–4):
 | `docs/RECRUITER_INBOX_PRODUCTION_SMOKE_2026-06-06.md` | R1–R5 evidence |
 | `docs/CANDIDATE_APPLICATION_TRANSPARENCY_2026-06-07.md` | Candidate-side panel |
 | `docs/H5D_SLOT1_REVIEWER_SHORTLIST_PACK_2026-06-07.md` | Slot-1 shortlist + scoring (before GO SMALL 1) |
+| `docs/H5C_GO_SMALL_1_PREP_PACK_2026-06-11.md` | Slot-1 visual review prep — demo script, talk track, feedback capture |
 
 ---
 

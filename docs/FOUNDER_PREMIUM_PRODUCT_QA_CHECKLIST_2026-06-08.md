@@ -185,6 +185,19 @@ curl -sS -o /dev/null -w "%{http_code}\n" https://twin-sooty.vercel.app/api/publ
 ### Slot-1 recruiter visual review — ready?
 **After §4 smoke PASS on production inbox with Nova Hiring PL queue:** Yes for **visual review** — not for external invite until founder **GO SMALL 1/2**.
 
+**§4 recruiter inbox visual — founder PASS:** `2026-06-11` — founder confirmed **„ok jest ok”** after PR #77 (premium card redesign + decision rail readability). Evidence: `docs/RECRUITER_INBOX_PREMIUM_CARD_REDESIGN_2026-06-11.md`, `docs/RECRUITER_DECISION_RAIL_TEXT_READABILITY_FIX_2026-06-11.md`.
+
+### Slot-1 final decision (founder — empty)
+| Field | Value |
+| ----- | ----- |
+| **Slot-1 reviewer selected** | |
+| **H5d composite score** | |
+| **Visual review conducted UTC** | |
+| **H5c decision** | `hold` *(default)* |
+| **GO SMALL 1 sign-off UTC** | |
+
+Prep pack: `docs/H5C_GO_SMALL_1_PREP_PACK_2026-06-11.md`
+
 ### 5–10 candidate outreach — ready?
 **After §1+§2 PASS with real profile on production dashboard:** Yes for **named warm outreach** (5–10) — not mass GTM. Verify profile → matches → transparency in one session first.
 
