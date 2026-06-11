@@ -69,32 +69,31 @@ export function CandidateRewardsBand({ variant = "home" }: { variant?: "home" | 
 
   const sectionId = variant === "persona" ? "candidate-rewards" : undefined;
 
+  const sectionClass =
+    variant === "home"
+      ? "candidate-rewards-band scroll-mt-24 border-t border-[var(--twin-border)]/60 py-10 sm:py-12"
+      : "candidate-rewards-band scroll-mt-24 rounded-2xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/90 py-8 sm:py-10";
+
   return (
-    <section
-      id={sectionId}
-      className={`candidate-rewards-band scroll-mt-24 border-y border-[var(--twin-accent)] bg-[var(--twin-accent)] text-[var(--twin-on-accent)] ${
-        variant === "home" ? "py-10 sm:py-12" : "rounded-2xl py-8 sm:py-10"
-      }`}
-      aria-labelledby="candidate-rewards-heading"
-    >
+    <section id={sectionId} className={sectionClass} aria-labelledby="candidate-rewards-heading">
       <div className={variant === "home" ? "marketing-home-rail" : ""}>
-        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-on-accent)]/80">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-muted)]">
           {t("candidateRewards.eyebrow")}
         </p>
         <h2
           id="candidate-rewards-heading"
-          className="marketing-home-headline mt-3 text-xl font-semibold tracking-[-0.03em] sm:text-2xl md:text-3xl"
+          className="marketing-home-headline mt-3 text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-3xl"
         >
           {t("candidateRewards.headline")}
         </h2>
-        <p className="marketing-home-lede mt-3 text-sm leading-relaxed text-[var(--twin-on-accent)]/90 sm:text-base">
+        <p className="marketing-home-lede mt-3 text-sm leading-relaxed text-[var(--twin-muted-strong)] sm:text-base">
           {t("candidateRewards.lead")}
         </p>
 
-        <div className="mt-8 overflow-x-auto rounded-xl border border-[var(--twin-on-accent)]/20 bg-[var(--twin-on-accent)]/10">
+        <div className="mt-8 overflow-x-auto rounded-2xl border border-[var(--twin-border)]/70 bg-[var(--twin-card)]/40 backdrop-blur-sm">
           <table className="w-full min-w-[32rem] border-collapse text-start text-sm">
             <thead>
-              <tr className="border-b border-[var(--twin-on-accent)]/20 text-[11px] font-semibold uppercase tracking-wider text-[var(--twin-on-accent)]/75">
+              <tr className="border-b border-[var(--twin-border)]/60 text-[11px] font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
                 <th scope="col" className="px-4 py-3 sm:px-5">
                   {t("candidateRewards.colTrigger")}
                 </th>
@@ -108,18 +107,18 @@ export function CandidateRewardsBand({ variant = "home" }: { variant?: "home" | 
             </thead>
             <tbody>
               {rows.map((row) => (
-                <tr key={row.title} className="border-b border-[var(--twin-on-accent)]/15 last:border-0">
+                <tr key={row.title} className="border-b border-[var(--twin-border)]/40 last:border-0">
                   <td className="align-top px-4 py-4 sm:px-5">
-                    <p className="font-semibold text-[var(--twin-on-accent)]">{row.title}</p>
-                    <p className="mt-1.5 text-xs leading-relaxed text-[var(--twin-on-accent)]/85 sm:text-sm">
+                    <p className="font-semibold text-[var(--foreground)]">{row.title}</p>
+                    <p className="mt-1.5 text-xs leading-relaxed text-[var(--twin-muted-strong)] sm:text-sm">
                       {row.trigger}
                     </p>
                   </td>
-                  <td className="align-top px-4 py-4 text-xs leading-relaxed text-[var(--twin-on-accent)]/90 sm:px-5 sm:text-sm">
+                  <td className="align-top px-4 py-4 text-xs leading-relaxed text-[var(--twin-muted-strong)] sm:px-5 sm:text-sm">
                     {row.reward}
-                    <p className="mt-2 text-[11px] text-[var(--twin-on-accent)]/70 sm:hidden">{row.timing}</p>
+                    <p className="mt-2 text-[11px] text-[var(--twin-muted)] sm:hidden">{row.timing}</p>
                   </td>
-                  <td className="hidden align-top px-4 py-4 text-xs leading-relaxed text-[var(--twin-on-accent)]/80 sm:table-cell sm:px-5 sm:text-sm">
+                  <td className="hidden align-top px-4 py-4 text-xs leading-relaxed text-[var(--twin-muted)] sm:table-cell sm:px-5 sm:text-sm">
                     {row.timing}
                   </td>
                 </tr>
@@ -128,24 +127,28 @@ export function CandidateRewardsBand({ variant = "home" }: { variant?: "home" | 
           </table>
         </div>
 
-        <p className="marketing-home-lede mt-4 text-xs leading-relaxed text-[var(--twin-on-accent)]/80">{t("candidateRewards.mechanicsNote")}</p>
-        <p className="marketing-home-lede mt-2 text-xs leading-relaxed text-[var(--twin-on-accent)]/75">{t("candidateRewards.disclaimer")}</p>
-        <p className="mt-1 text-[11px] text-[var(--twin-on-accent)]/70">{t("candidateRewards.fraudLine")}</p>
+        <p className="marketing-home-lede mt-4 text-xs leading-relaxed text-[var(--twin-muted)]">
+          {t("candidateRewards.mechanicsNote")}
+        </p>
+        <p className="marketing-home-lede mt-2 text-xs leading-relaxed text-[var(--twin-muted)]">
+          {t("candidateRewards.disclaimer")}
+        </p>
+        <p className="mt-1 text-[11px] text-[var(--twin-muted)]">{t("candidateRewards.fraudLine")}</p>
 
         <div className="mt-6 flex flex-wrap gap-x-4 gap-y-2 text-sm font-semibold">
-          <Link href="/register/candidate" className="underline underline-offset-4 hover:opacity-90">
+          <Link href="/register/candidate" className="twin-link">
             {t("candidateRewards.ctaRegister")}
           </Link>
-          <Link href="/dashboard/referrals" className="underline underline-offset-4 hover:opacity-90">
+          <Link href="/dashboard/referrals" className="twin-link">
             {t("candidateRewards.ctaReferrals")}
           </Link>
-          <Link href="/waitlist" className="underline underline-offset-4 hover:opacity-90">
+          <Link href="/waitlist" className="twin-link">
             {t("candidateRewards.ctaFounding")}
           </Link>
-          <Link href="/terms" className="underline underline-offset-4 hover:opacity-90">
+          <Link href="/terms" className="twin-link">
             {t("candidateRewards.ctaTerms")}
           </Link>
-          <Link href="/privacy" className="underline underline-offset-4 hover:opacity-90">
+          <Link href="/privacy" className="twin-link">
             {t("candidateRewards.ctaPrivacy")}
           </Link>
         </div>
