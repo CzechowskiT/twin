@@ -26,6 +26,7 @@ const PATH_IMPLIES_PERSONA: { prefix: string; persona: MarketingPersona }[] = [
   { prefix: "/for-recruiters", persona: "recruiter" },
   { prefix: "/recruiter/employer", persona: "recruiter" },
   { prefix: "/recruiter", persona: "recruiter" },
+  { prefix: "/company", persona: "company" },
   { prefix: "/for-companies", persona: "company" },
   { prefix: "/for-investors", persona: "investor" },
   { prefix: "/companies/signup", persona: "company" },
@@ -57,14 +58,20 @@ const PREFIX_ALLOWED: { prefix: string; allowed: readonly MarketingPersona[] }[]
   { prefix: "/workspace/recruiter", allowed: ["recruiter"] },
   { prefix: "/workspace/investor", allowed: ["investor"] },
   { prefix: "/workspace", allowed: ["candidate", "recruiter", "company", "investor"] },
-  { prefix: "/investor", allowed: ["investor"] },
+  { prefix: "/investor/roadmap", allowed: ["investor"] },
+  { prefix: "/investor/placement", allowed: ["investor"] },
+  { prefix: "/investor/data-room", allowed: ["investor"] },
+  { prefix: "/investor/metrics", allowed: ["investor"] },
+  { prefix: "/investor/calculator", allowed: ["investor"] },
+  { prefix: "/investor", allowed: ["candidate", "recruiter", "company", "investor"] },
+  { prefix: "/for-investors", allowed: ["candidate", "recruiter", "company", "investor"] },
   { prefix: "/calculator/b2b", allowed: ["company", "recruiter"] },
   { prefix: "/calculator", allowed: ["recruiter"] },
   { prefix: "/recruiter/employer", allowed: ["recruiter"] },
   { prefix: "/recruiter/integrations", allowed: ["recruiter"] },
   { prefix: "/recruiter", allowed: ["recruiter"] },
-  { prefix: "/for-investors", allowed: ["investor"] },
   { prefix: "/for-recruiters", allowed: ["recruiter"] },
+  { prefix: "/company", allowed: ["company", "recruiter"] },
   { prefix: "/for-companies", allowed: ["company"] },
   { prefix: "/for-candidates", allowed: ["candidate"] },
   { prefix: "/companies/signup", allowed: ["company"] },
@@ -177,6 +184,8 @@ const SESSION_NEUTRAL_PREFIXES = [
   "/auth",
   "/api",
   "/pricing",
+  "/investor",
+  "/for-investors",
 ];
 
 function isSessionNeutralPath(pathname: string): boolean {
@@ -299,7 +308,7 @@ export function headerGrowthLinksForPersona(
   if (persona === "company") {
     return [{ href: "/for-companies", labelKey: "nav.forCompanies", variant: "company" }];
   }
-  return [{ href: "/for-investors", labelKey: "nav.forInvestors", variant: "investor" }];
+  return [{ href: "/investor", labelKey: "nav.forInvestors", variant: "investor" }];
 }
 
 export type HeaderSessionNavLink = { href: string; labelKey: TranslationKey };

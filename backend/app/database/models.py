@@ -477,6 +477,8 @@ class Job(Base):
     project_duration_months: Mapped[int | None] = mapped_column(Integer, nullable=True)
     hourly_rate_min: Mapped[int | None] = mapped_column(Integer, nullable=True)
     hourly_rate_max: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    role_status: Mapped[str | None] = mapped_column(String(16), nullable=True, default="draft")
+    work_mode: Mapped[str | None] = mapped_column(String(16), nullable=True)
 
     matches: Mapped[list["JobMatch"]] = relationship(back_populates="job")
     applications: Mapped[list["Application"]] = relationship(back_populates="job")
