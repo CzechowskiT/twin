@@ -125,6 +125,7 @@ export type TranslationKey =
   | `status.${keyof typeof en.status}`
   | `placementEmployer.${keyof typeof en.placementEmployer}`
   | `candidateTimeline.${keyof typeof en.candidateTimeline}`
+  | `candidateInterviewPrep.${keyof typeof en.candidateInterviewPrep}`
   | `candidateEvidence.${keyof typeof en.candidateEvidence}`
   | `acceptanceQueue.${keyof typeof en.acceptanceQueue}`
   | `recruiterInbox.${keyof typeof en.recruiterInbox}`
@@ -2951,6 +2952,27 @@ eyebrow: "Product roadmap",
       "This view shows your TWIN pipeline only — not emails or messages from outside the product.",
     backDashboard: "Back to dashboard",
   },
+  candidateInterviewPrep: {
+    eyebrow: "Candidate workspace",
+    title: "Interview prep",
+    lead:
+      "Generate a role-specific prep pack from your tracked applications — powered by career assistant, not generic coaching spam.",
+    selectTitle: "Choose an application",
+    fieldApplication: "Tracked role",
+    loading: "Loading applications…",
+    empty: "No tracked applications yet. Apply or save roles from your dashboard first.",
+    generateCta: "Generate prep pack",
+    generating: "Generating…",
+    prepFailed: "Could not generate prep pack.",
+    packTitle: "Your prep pack",
+    sectionExpect: "Questions to expect",
+    sectionAsk: "Questions to ask",
+    sectionStar: "STAR story prompts",
+    sectionChecklist: "Day-of checklist",
+    ctaCalendar: "Open calendar for interview holds",
+    scopeNote: "Prep uses your CV and job posting — fallback content when AI is unavailable. No guaranteed-offer claims.",
+    backDashboard: "Back to dashboard",
+  },
   candidateEvidence: {
     eyebrow: "Candidate workspace",
     title: "Evidence vault",
@@ -2980,6 +3002,7 @@ eyebrow: "Product roadmap",
       "Evidence is candidate-provided and never shown as verified to recruiters without explicit review — not recruiter scorecards.",
     backDashboard: "Back to dashboard",
   },
+
   acceptanceQueue: {
     stripTitle: "Acceptance queue",
     stripCta: "Review slots",
@@ -6705,6 +6728,27 @@ const pl: MessageTree = {
       "Ten widok pokazuje tylko pipeline TWIN — bez maili ani wiadomości spoza produktu.",
     backDashboard: "Wróć do dashboardu",
   },
+  candidateInterviewPrep: {
+    eyebrow: "Przestrzeń kandydata",
+    title: "Przygotowanie do rozmowy",
+    lead:
+      "Wygeneruj pakiet prep pod śledzoną aplikację — career assistant, bez generycznego coachingu.",
+    selectTitle: "Wybierz aplikację",
+    fieldApplication: "Śledzona rola",
+    loading: "Ładowanie aplikacji…",
+    empty: "Brak śledzonych aplikacji. Najpierw aplikuj lub zapisuj role z dashboardu.",
+    generateCta: "Wygeneruj pakiet prep",
+    generating: "Generowanie…",
+    prepFailed: "Nie udało się wygenerować pakietu prep.",
+    packTitle: "Twój pakiet prep",
+    sectionExpect: "Pytania do oczekiwania",
+    sectionAsk: "Pytania do zadania",
+    sectionStar: "Prompty historii STAR",
+    sectionChecklist: "Checklist na dzień rozmowy",
+    ctaCalendar: "Otwórz kalendarz z holdami rozmów",
+    scopeNote: "Prep używa CV i ogłoszenia — treść zapasowa gdy AI niedostępne. Bez obietnic gwarantowanej oferty.",
+    backDashboard: "Wróć do dashboardu",
+  },
   candidateEvidence: {
     eyebrow: "Przestrzeń kandydata",
     title: "Skarbiec dowodów",
@@ -6734,6 +6778,7 @@ const pl: MessageTree = {
       "Dowody pochodzą od kandydata i nie są pokazywane rekruterom jako zweryfikowane bez jawnej recenzji — to nie scorecardy rekrutera.",
     backDashboard: "Wróć do dashboardu",
   },
+
   acceptanceQueue: {
     stripTitle: "Kolejka akceptacji",
     stripCta: "Przejrzyj sloty",
