@@ -11,6 +11,7 @@ const TABS: { href: string; labelKey: TranslationKey }[] = [
   { href: "/recruiter/pipeline", labelKey: "recruiterPipeline.title" },
   { href: "/recruiter/jobs", labelKey: "recruiterJobs.title" },
   { href: "/recruiter/calendar", labelKey: "recruiterCalendar.title" },
+  { href: "/recruiter/integrations", labelKey: "recruiterIntegrations.navLink" },
 ];
 
 export function RecruiterWorkspaceNav() {
