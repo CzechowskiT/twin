@@ -188,14 +188,43 @@ export type ApiFetchOptions = RequestInit & {
   locale?: string | null;
   /** Calendar/provider errors must not clear the TWIN JWT (see isCalendarIntegrationFailure). */
   preserveSessionOnUnauthorized?: boolean;
+  /** Abort the request after this many milliseconds (browser fetch only). */
+  timeoutMs?: number;
 };
+
+/** True when apiFetch aborted due to timeoutMs. */
+export function isFetchTimeoutError(err: unknown): boolean {
+  if (!(err instanceof Error)) return false;
+  if (err.name === "AbortError") return true;
+  const lower = err.message.toLowerCase();
+  return lower.includes("timed out") || lower.includes("timeout");
+}
+
+function mergeAbortSignals(
+  userSignal: AbortSignal | null | undefined,
+  timeoutSignal: AbortSignal,
+): AbortSignal {
+  if (!userSignal) return timeoutSignal;
+  if (typeof AbortSignal.any === "function") {
+    return AbortSignal.any([userSignal, timeoutSignal]);
+  }
+  const controller = new AbortController();
+  const abort = () => controller.abort();
+  if (userSignal.aborted) {
+    abort();
+    return controller.signal;
+  }
+  userSignal.addEventListener("abort", abort, { once: true });
+  timeoutSignal.addEventListener("abort", abort, { once: true });
+  return controller.signal;
+}
 
 export async function apiFetch<T>(
   path: string,
   options: ApiFetchOptions = {},
   token?: string | null,
 ): Promise<T> {
-  const { locale: localeOverride, ...fetchOptions } = options;
+  const { locale: localeOverride, timeoutMs, ...fetchOptions } = options;
   const headers = new Headers(fetchOptions.headers);
   ensureLocaleHeader(headers, localeOverride);
   ensureTraceHeaders(headers);
@@ -206,21 +235,37 @@ export async function apiFetch<T>(
   const hasAuth = applyAuthHeaders(headers, token);
 
   const directOrigin = clientApiOriginForRequest(hasAuth);
+  let timeoutController: AbortController | undefined;
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  if (timeoutMs != null && timeoutMs > 0) {
+    timeoutController = new AbortController();
+    timeoutId = setTimeout(() => timeoutController?.abort(), timeoutMs);
+  }
+  const signal = timeoutController
+    ? mergeAbortSignals(fetchOptions.signal, timeoutController.signal)
+    : fetchOptions.signal;
+
   const fetchOpts: RequestInit = {
     ...fetchOptions,
     cache: fetchOptions.cache ?? "no-store",
     headers,
+    signal,
   };
 
   let res: Response;
   try {
     res = await fetch(`${directOrigin}${path}`, fetchOpts);
   } catch (err) {
+    if (timeoutController?.signal.aborted && isFetchTimeoutError(err)) {
+      throw new Error("Request timed out");
+    }
     if (hasAuth && directOrigin && isLikelyBrowserNetworkFailure(err)) {
       res = await fetch(`${API_URL}${path}`, fetchOpts);
     } else {
       throw err;
     }
+  } finally {
+    if (timeoutId != null) clearTimeout(timeoutId);
   }
   await throwIfNotOk(res, path, options);
   if (res.status === 204) return undefined as T;

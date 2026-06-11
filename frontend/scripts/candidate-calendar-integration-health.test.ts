@@ -186,7 +186,7 @@ test("scenario 10: status ok but events reconnect → panel and merged badge hea
   assert.equal(aggregate.showReconnectPanel, true);
   assert.equal(healthAfterWeekFetch(googleOk, outcomes[0]), "reconnect_required");
   assert.equal(
-    providerBadgeHealth({ ...googleOk, health: displayHealthForProvider(googleOk, outcomes) }),
+    providerBadgeHealth({ ...googleOk, health: displayHealthForProvider(googleOk, outcomes) ?? "ok" }),
     "reconnect_required",
   );
 });

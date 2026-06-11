@@ -12,7 +12,7 @@ import {
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card } from "@/components/ui";
 import type { TranslationKey } from "@/lib/i18n";
-import type { ProviderHealth } from "@/lib/calendar-provider-health";
+import type { ProviderHealth, ProviderStatusPhase } from "@/lib/calendar-provider-health";
 import { providerBadgeHealth } from "@/lib/calendar-provider-health";
 import { webcalToHttps } from "@/lib/webcal-subscribe";
 
@@ -31,7 +31,8 @@ type WebcalState = {
 };
 
 export type CalendarConnectionsPanelProps = {
-  loading: boolean;
+  googleStatusPhase: ProviderStatusPhase;
+  microsoftStatusPhase: ProviderStatusPhase;
   googleStatusError?: boolean;
   microsoftStatusError?: boolean;
   actionBusy: string | null;
@@ -50,8 +51,28 @@ export type CalendarConnectionsPanelProps = {
   onRetryCalendarStatus?: () => void;
 };
 
-function StatusBadge({ provider }: { provider: ProviderState }) {
+function StatusBadge({
+  provider,
+  statusPhase,
+}: {
+  provider: ProviderState;
+  statusPhase: ProviderStatusPhase;
+}) {
   const { t } = useTranslation();
+  if (statusPhase === "loading") {
+    return (
+      <span className="inline-flex items-center rounded-full bg-[var(--twin-surface-raised)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[var(--twin-muted-strong)]">
+        {t("dashboard.calendarStatusLoading")}
+      </span>
+    );
+  }
+  if (statusPhase === "timeout") {
+    return (
+      <span className="inline-flex items-center rounded-full bg-sky-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-sky-800 dark:bg-sky-400/15 dark:text-sky-200">
+        {t("dashboard.calendarTemporaryError")}
+      </span>
+    );
+  }
   const badge = providerBadgeHealth({
     connected: provider.connected,
     health: provider.health ?? "unknown",
@@ -121,13 +142,14 @@ function ProviderCard({
   soonBodyKey,
   connectBusyKey,
   disconnectBusyKey,
-  loading,
+  statusPhase,
   statusError,
   actionBusy,
   onConnect,
   onDisconnect,
   onRetryEvents,
   onRetryStatus,
+  connectLabelKeyOverride,
 }: {
   icon: ReactNode;
   titleKey: TranslationKey;
@@ -141,22 +163,24 @@ function ProviderCard({
   soonBodyKey: TranslationKey;
   connectBusyKey: string;
   disconnectBusyKey: string;
-  loading: boolean;
+  statusPhase: ProviderStatusPhase;
   statusError?: boolean;
   actionBusy: string | null;
   onConnect: () => void;
   onDisconnect: () => void;
   onRetryEvents?: () => void;
   onRetryStatus?: () => void;
+  connectLabelKeyOverride?: TranslationKey;
 }) {
   const { t } = useTranslation();
   const connectBusy = actionBusy === connectBusyKey;
   const disconnectBusy = actionBusy === disconnectBusyKey;
   const anyBusy = Boolean(actionBusy);
+  const connectLabel = connectLabelKeyOverride ?? connectLabelKey;
 
   return (
     <Card className="!mb-0 flex h-full flex-col border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/60">
-      <ProviderCardHeader icon={icon} title={t(titleKey)} badge={<StatusBadge provider={provider} />} />
+      <ProviderCardHeader icon={icon} title={t(titleKey)} badge={<StatusBadge provider={provider} statusPhase={statusPhase} />} />
       <p className="twin-muted mt-2 flex-1 text-sm leading-relaxed">{t(bodyKey)}</p>
       {provider.connected && provider.email ? (
         <p className="mt-3 text-sm text-[var(--foreground)]">
@@ -164,22 +188,65 @@ function ProviderCard({
           <span className="font-medium">{provider.email}</span>
         </p>
       ) : null}
-      {provider.health === "reconnect_required" ? (
+      {provider.health === "reconnect_required" && statusPhase === "ready" ? (
         <p className="mt-3 text-sm text-amber-800 dark:text-amber-200" role="alert">
           {t(reconnectHintKey)}
         </p>
       ) : null}
-      {provider.health === "temporary_error" ? (
+      {provider.health === "temporary_error" && statusPhase === "ready" ? (
         <p className="mt-3 text-sm text-sky-800 dark:text-sky-200" role="alert">
           {t("dashboard.calendarTemporaryErrorHint")}
         </p>
       ) : null}
-      {loading ? (
-        <p className="twin-muted mt-4 text-sm">{t("dashboard.calendarConnectionsLoading")}</p>
+      {statusPhase === "loading" ? (
+        <p className="twin-muted mt-4 text-sm">{t("dashboard.calendarStatusLoading")}</p>
+      ) : statusPhase === "timeout" ? (
+        <>
+          <p className="mt-4 text-sm text-[var(--twin-muted-strong)]" role="alert">
+            {t("dashboard.calendarStatusTimeout")}
+          </p>
+          <p className="twin-muted mt-2 text-sm leading-relaxed">{t("dashboard.calendarStatusTimeoutHint")}</p>
+          <p className="twin-muted mt-2 text-xs leading-relaxed">{t("dashboard.calendarSessionSafeHint")}</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button
+              type="button"
+              className="twin-touch-target !w-auto self-start"
+              disabled={anyBusy}
+              onClick={() => {
+                onRetryStatus?.();
+                onRetryEvents?.();
+              }}
+            >
+              {t("dashboard.calendarRetry")}
+            </Button>
+            {!provider.connected && provider.oauthConfigured ? (
+              <Button
+                type="button"
+                className="twin-btn-secondary twin-touch-target !w-auto self-start"
+                disabled={anyBusy}
+                onClick={onConnect}
+              >
+                {connectBusy ? "…" : t(connectLabel)}
+              </Button>
+            ) : null}
+          </div>
+        </>
       ) : statusError ? (
-        <p className="mt-4 text-sm text-[var(--twin-muted-strong)]" role="alert">
-          {t("dashboard.calendarConnectionsStatusError")}
-        </p>
+        <>
+          <p className="mt-4 text-sm text-[var(--twin-muted-strong)]" role="alert">
+            {t("dashboard.calendarConnectionsStatusError")}
+          </p>
+          <Button
+            type="button"
+            className="twin-touch-target mt-4 !w-auto self-start"
+            disabled={anyBusy}
+            onClick={() => {
+              onRetryStatus?.();
+            }}
+          >
+            {t("dashboard.calendarRetry")}
+          </Button>
+        </>
       ) : provider.connected && provider.health === "reconnect_required" ? (
         <Button
           type="button"
@@ -187,7 +254,7 @@ function ProviderCard({
           disabled={anyBusy}
           onClick={onConnect}
         >
-          {connectBusy ? "…" : t(connectLabelKey)}
+          {connectBusy ? "…" : t("dashboard.calendarReconnect")}
         </Button>
       ) : provider.connected && provider.health === "temporary_error" && (onRetryEvents || onRetryStatus) ? (
         <Button
@@ -199,7 +266,7 @@ function ProviderCard({
             onRetryEvents?.();
           }}
         >
-          {t("dashboard.calendarRetryEvents")}
+          {t("dashboard.calendarRetry")}
         </Button>
       ) : provider.connected ? (
         <Button
@@ -222,7 +289,7 @@ function ProviderCard({
           disabled={anyBusy}
           onClick={onConnect}
         >
-          {connectBusy ? "…" : t(connectLabelKey)}
+          {connectBusy ? "…" : t(connectLabel)}
         </Button>
       )}
     </Card>
@@ -240,7 +307,8 @@ const OTHER_STEPS: {
 ];
 
 export function CalendarConnectionsPanel({
-  loading,
+  googleStatusPhase,
+  microsoftStatusPhase,
   googleStatusError,
   microsoftStatusError,
   actionBusy,
@@ -285,9 +353,10 @@ export function CalendarConnectionsPanel({
           soonBodyKey="dashboard.calendarGoogleSoonBody"
           connectBusyKey="connect"
           disconnectBusyKey="disconnect"
-          loading={loading}
+          statusPhase={googleStatusPhase}
           statusError={googleStatusError}
           actionBusy={actionBusy}
+          connectLabelKeyOverride="dashboard.calendarConnectGoogle"
           onConnect={onConnectGoogle}
           onDisconnect={onDisconnectGoogle}
           onRetryEvents={onRetryCalendarEvents}
@@ -306,9 +375,10 @@ export function CalendarConnectionsPanel({
           soonBodyKey="dashboard.calendarMicrosoftSoonBody"
           connectBusyKey="ms-connect"
           disconnectBusyKey="ms-disconnect"
-          loading={loading}
+          statusPhase={microsoftStatusPhase}
           statusError={microsoftStatusError}
           actionBusy={actionBusy}
+          connectLabelKeyOverride="dashboard.calendarConnectMicrosoft365"
           onConnect={onConnectMicrosoft}
           onDisconnect={onDisconnectMicrosoft}
           onRetryEvents={onRetryCalendarEvents}

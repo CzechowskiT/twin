@@ -116,6 +116,13 @@ def access_token_still_valid(row: _CalendarRow) -> bool:
 
 def _classify_oauth_failure(exc: Exception, *, provider: CalendarProviderKind) -> CalendarTokenResolutionError:
     text = str(exc).lower()
+    if any(m in text for m in ("timeout", "timed out", "connect timeout", "read timeout")):
+        return CalendarTokenResolutionError(
+            status="temporary_error",
+            health="temporary_error",
+            message="Calendar provider temporarily unavailable; try again shortly.",
+            code="provider_timeout",
+        )
     if any(m in text for m in ("429", "500", "502", "503", "rate limit", "temporarily unavailable")):
         return CalendarTokenResolutionError(
             status="temporary_error",
