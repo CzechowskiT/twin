@@ -2,7 +2,8 @@
 
 **Program:** TWIN multi-persona MVP (candidate, recruiter, company, investor)
 **Base branch:** `cursor/phase1-monorepo-scaffold`
-**Scaffold HEAD (2026-06-11):** `cd4b698` — includes merged investor roadmap + recruiter message drafts
+**Scaffold HEAD (2026-06-11 post-audit):** `adfcac0` — PRs **#94–#113 merged** (except #98/#105 closed); Alembic head **`057_candidate_evidence_items`**
+**Production API `git_commit` (2026-06-11):** `e48bff1` — 1 commit behind scaffold; founder redeploy pending
 **Archive branch:** `wip/multi-persona-mvp-local-snapshot-2026-06-11` @ `1c35bce`
 **Recovery docs branch:** `docs/multi-persona-workstream-recovery-2026-06-11`
 
@@ -20,7 +21,7 @@ The multi-persona MVP program was orchestrated in parallel across 20 conceptual 
 - Documented Alembic linearization strategy (scaffold head `050`, no duplicate `051`).
 - Defined safe rebuild order and hot-file protection rules.
 
-**Next action:** Rebuild **one workstream at a time** — one branch, one PR, one CI pass, one smoke — starting with **Investor Room MVP** (frontend-only, no migration risk).
+**Post-audit status (2026-06-11):** Recovery rebuild **largely complete** — PRs #84–#113 delivered persona MVPs to scaffold. **Next action:** founder prod redeploy to `adfcac0`; O7 re-drill; i18n-coverage debt; no new mega-PRs.
 
 **Launch stance preserved:**
 
@@ -50,38 +51,38 @@ The multi-persona MVP program was orchestrated in parallel across 20 conceptual 
 | # | Workstream | Branch | Ahead | PR | Scaffold | WIP/stash | Migration | Hot | Status | Next action |
 |---|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|---|---|
 | **Candidate** |
-| 1 | Profile / evidence vault | yes | 0 | none | no | yes (45, 37) | yes (`055` planned) | yes | WIP ARCHIVED | Rebuild Phase 3 after recruiter core |
-| 2 | Timeline / career CRM | yes | 0 | none | no | yes (35) | unlikely | yes | WIP ARCHIVED | Rebuild Phase 3 |
-| 3 | Interview prep | yes | 0 | none | no | yes (37) | unlikely | yes | WIP ARCHIVED | Rebuild Phase 3 |
+| 1 | Profile / evidence vault | yes | merged | **MERGED** (#111) | **yes** | archive ref only | yes (`057`) | yes | **MERGED** | Verify prod redeploy + i18n |
+| 2 | Timeline / career CRM | yes | merged | **MERGED** (#109) | **yes** | archive ref only | unlikely | yes | **MERGED** | Verify `/dashboard/applications` on prod |
+| 3 | Interview prep | yes | merged | **MERGED** (#112) | **yes** | archive ref only | unlikely | yes | **MERGED** | Verify `/dashboard/interview-prep` |
 | **Recruiter** |
-| 4 | Audit trail | yes (clean) | 0 | none | no | yes (11, 42, 45, archive) | yes (`051` planned) | yes | WIP ARCHIVED | Rebuild Phase 2 first backend |
-| 5 | Pipeline | yes | 0 | none | no | yes (45, 36, 46) | yes (`052` planned) | yes | WIP ARCHIVED | Rebuild after audit trail |
-| 6 | Notes / scorecards | yes | 0 | none | no | yes (33, 45) | yes (`053` planned) | yes | WIP ARCHIVED | Rebuild after pipeline |
-| 7 | Message drafts | yes | merged | **MERGED** (#83) | **yes** | stash overlap | no | yes | **PARTIAL ON SCAFFOLD** | Verify i18n completeness only |
-| 8 | Manual scheduling | yes | 0 | none | no | yes (0, 12, 28, 45) | yes (`054` planned) | yes | WIP ARCHIVED | Rebuild Phase 2 |
-| 9 | Candidate search | yes | 1 | **OPEN** | partial | yes (45, 41) | unlikely | yes | PARTIAL ON SCAFFOLD | Finish/rebase open PR or rebuild |
-| 10 | Analytics | yes | 0 | none | no | yes (45) | unlikely | yes | WIP ARCHIVED | Rebuild Phase 5 |
-| 11 | Integrations readiness | yes | 0 | none | no | yes (31, 45) | unlikely | yes | WIP ARCHIVED | Rebuild Phase 5 |
+| 4 | Audit trail | yes | merged | **MERGED** (#94) | **yes** | archive ref only | yes (`053`) | yes | **MERGED** | Pilot scope; launch NO-GO |
+| 5 | Pipeline | yes | merged | **MERGED** (#93) | **yes** | archive ref only | yes (`054`) | yes | **MERGED** | `/recruiter/pipeline` on scaffold |
+| 6 | Notes / scorecards | yes | merged | **MERGED** (#104) | **yes** | archive ref only | yes (`056`) | yes | **MERGED** | Inbox integration verify |
+| 7 | Message drafts | yes | merged | **MERGED** (#83) | **yes** | stash overlap | no | yes | **MERGED** | Verify i18n completeness |
+| 8 | Manual scheduling | yes | merged | **MERGED** (#93) | **yes** | archive ref only | yes (`055`) | yes | **MERGED** | No outbound email; calendar NOT LIVE |
+| 9 | Candidate search | yes | merged | **MERGED** (#84) | **yes** | archive ref only | unlikely | yes | **MERGED** | Workspace pool only |
+| 10 | Analytics | yes | merged | **MERGED** (#107) | **yes** | archive ref only | unlikely | yes | **MERGED** | `/recruiter/analytics` |
+| 11 | Integrations readiness | yes | merged | **MERGED** (#106) | **yes** | archive ref only | unlikely | yes | **MERGED** | Hub + ATS stub |
 | **Company** |
-| 12 | Hiring dashboard | yes | 0 | none | no | yes (16, 17, archive) | unlikely | yes | WIP ARCHIVED | Rebuild Phase 1 (#5) |
-| 13 | Jobs / roles management | yes | 0 | none | no | yes (13, 18, 37) | TBD | yes | WIP ARCHIVED | Rebuild Phase 4 |
-| 14 | Team / permissions | yes | 0 | none | no | yes (7, 9, 20, 21) | TBD | yes | WIP ARCHIVED | Rebuild Phase 4 |
-| 15 | Pipeline quality metrics | yes | 0 | none | no | yes (10, 27, 35, archive) | unlikely | yes | WIP ARCHIVED | Rebuild Phase 4 |
-| 16 | Billing / plan / usage readiness | yes | 0 | none | no | yes (4, 16, 32, archive) | TBD | yes | WIP ARCHIVED | Rebuild Phase 4 |
+| 12 | Hiring dashboard | yes | merged | **MERGED** (#102) | **yes** | archive ref only | unlikely | yes | **MERGED** | `/company/dashboard` |
+| 13 | Jobs / roles management | yes | merged | **MERGED** (#89) | **yes** | archive ref only | yes (`051`) | yes | **MERGED** | `/company/roles` |
+| 14 | Team / permissions | yes | merged | **MERGED** (#92) | **yes** | archive ref only | TBD | yes | **MERGED** | `/company/team` |
+| 15 | Pipeline quality metrics | yes | merged | **MERGED** (#91) | **yes** | archive ref only | unlikely | yes | **MERGED** | `/company/pipeline` |
+| 16 | Billing / plan / usage readiness | yes | merged | **MERGED** (#103) | **yes** | archive ref only | TBD | yes | **MERGED** | `/company/billing` |
 | **Investor** |
-| 17 | Investor room | yes | 0 | none | partial (pages exist) | yes (1, 19, 30) | no | yes | **READY TO REBUILD** | **First clean implementation PR** |
-| 18 | Metrics / reality dashboard | yes | 2 | **OPEN** | no | yes | no | yes | PARTIAL ON SCAFFOLD | Rebase open PR or rebuild Phase 1 |
-| 19 | Roadmap / founder updates | yes | 0 | **MERGED** (#85) | **yes** | stash 34, 39 | no | yes | **PARTIAL ON SCAFFOLD** | Done — verify only |
-| 20 | Data room / request access | yes | 0 | none | partial | yes (22, 25, 30) | unlikely | yes | WIP ARCHIVED | Rebuild Phase 1 (#4) |
+| 17 | Investor room | yes | merged | **MERGED** (#90) | **yes** | archive ref only | no | yes | **MERGED** | `/investor` honest status |
+| 18 | Metrics / reality dashboard | yes | merged | **MERGED** (prior) | **yes** | archive ref only | no | yes | **MERGED** | `/investor/metrics` |
+| 19 | Roadmap / founder updates | yes | merged | **MERGED** (#85) | **yes** | stash 34, 39 | no | yes | **MERGED** | Verify only |
+| 20 | Data room / request access | yes | merged | **MERGED** (#95) | **yes** | archive ref only | unlikely | yes | **MERGED** | Request-access flow |
 
 **Summary counts:**
 
 | Status | Count |
 |---|---|
 | NOT STARTED (branch only) | 0 |
-| WIP ARCHIVED | 15 |
-| PARTIAL ON SCAFFOLD | 4 (message drafts, roadmap, candidate search PR, metrics PR) |
-| READY TO REBUILD | 1 (investor room — first target) |
+| WIP ARCHIVED | 0 (delivered slices removed — archive `wip/multi-persona-mvp-local-snapshot-2026-06-11` reference only) |
+| MERGED on scaffold | 20 |
+| PARTIAL / ops follow-up | prod redeploy lag (`e48bff1` vs `adfcac0`); i18n-coverage debt |
 
 ---
 

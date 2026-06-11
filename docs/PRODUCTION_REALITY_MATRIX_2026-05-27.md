@@ -4,7 +4,7 @@
 
 - **Branch:** `chore/s2-csp-burnin-readiness-2026-06-01` (audit) / prod unchanged
 - **Branch HEAD (local):** `9011040`+ (audit branch, 2026-06-03 shift) / API live `6382a91`
-- **Production API SHA (read-only):** `6382a918882664df0076d996ca65c08e9138536a` (`GET /api/public-health`, post-merge 2026-06-02 — PR #21; includes `e764e68` safety fix)
+- **Production API SHA (read-only, 2026-06-11 post-audit):** `e48bff14b56a159ebcde0773667e617cb763a772` (`GET /api/public-health` + Railway health; `db_ok=true`) — scaffold HEAD `adfcac0` (1 commit ahead; founder redeploy pending)
 - **Launch readiness matrix:** `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md`
 - **CTO co-founder audit (2026-06-07):** `docs/CTO_COFUNDER_DUE_DILIGENCE_AUDIT_2026-06-07.md` — launch stance **unchanged** (public **NO-GO**)
 - **Auto-apply safety audit:** `docs/AUTO_APPLY_DELEGATED_APPLY_SAFETY_AUDIT_2026-06-02.md` (2026-06-02)
@@ -19,6 +19,7 @@
 - **Recruiter alignment audit:** `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md` (2026-06-04)
 - **DB incident (2026-05-29):** `INC-DB-2026-05-29-001` — **RESOLVED** + stabilization PASSED — see `docs/PRODUCTION_DB_RESTORE_INCIDENT_2026-05-29.md`
 - **O7 staging drill (2026-06-01):** ✅ **PASS** — pg_dump/pg_restore to `staging-restore-proof-20260529`; prod **`postgres-volume`** untouched — see `docs/BACKUP_RESTORE_DRILL_LOG.md`
+- **Post-audit closure (2026-06-11):** PRs #94–#113 merged; Railway recovery (#108, #110); Alembic head `057`; O7 re-drill **NOT DONE / BLOCKED** — `docs/O7_RESTORE_DRILL_RUNBOOK_2026-06-11.md`; launch **NO-GO** unchanged
 - **Vercel production deployment:** `dpl_GrfAmEbCbvQyR7NdokQJ31gzoWMH` at frontend `3631c45` (Google Calendar day-mapping fix; founder re-smoke 2026-05-29)
 - **Frontend:** `https://twin-sooty.vercel.app` (canonical alias on Vercel project `twin`)
 - **API:** `https://twin-production-bcd9.up.railway.app`
