@@ -43,3 +43,13 @@ export function recruiterInboxProxyGate(req: Request): NextResponse | null {
   }
   return null;
 }
+
+/** Forward client locale to Railway so match reasons / review card copy respect UI language. */
+export function recruiterInboxUpstreamHeaders(req: Request): HeadersInit {
+  const headers: Record<string, string> = {};
+  const serverToken = process.env.RECRUITER_INBOX_TOKEN?.trim();
+  if (serverToken) headers["X-Twin-Recruiter-Token"] = serverToken;
+  const locale = req.headers.get("x-locale")?.trim();
+  if (locale) headers["X-Locale"] = locale;
+  return headers;
+}
