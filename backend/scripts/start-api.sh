@@ -11,27 +11,9 @@ if [ -n "${RAILWAY_ENVIRONMENT:-}" ] && [ -z "${CELERY_TASK_ALWAYS_EAGER:-}" ]; 
   fi
 fi
 
-# Fix stale alembic_version after PR #97 renumbered migration revisions.
-# The DB may still reference old IDs that no longer exist in the codebase.
-python -c "
-import sqlalchemy, os
-url = os.environ.get('DATABASE_URL', '')
-if url:
-    engine = sqlalchemy.create_engine(url)
-    old_to_new = {
-        '052_recruiter_audit_events': '053_recruiter_audit_events',
-        '053_recruiter_pipeline_status': '054_recruiter_pipeline_status',
-        '054_recruiter_manual_scheduling': '055_recruiter_manual_scheduling',
-    }
-    with engine.connect() as conn:
-        result = conn.execute(sqlalchemy.text('SELECT version_num FROM alembic_version'))
-        row = result.fetchone()
-        if row and row[0] in old_to_new:
-            new_rev = old_to_new[row[0]]
-            conn.execute(sqlalchemy.text('UPDATE alembic_version SET version_num = :new WHERE version_num = :old'), {'new': new_rev, 'old': row[0]})
-            conn.commit()
-            print(f'Stamped alembic_version: {row[0]} -> {new_rev}')
-" 2>&1 || echo "Warning: alembic version stamp check failed (non-fatal)" >&2
+# PR #97/#101: prod may stamp past 052_calendar without applying it — rewind safely, then upgrade.
+python scripts/alembic_prod_recovery.py 2>&1 \
+  || echo "Warning: alembic prod recovery failed (non-fatal)" >&2
 
 # Railway: Postgres may not accept connections for a few seconds after the container starts.
 i=1

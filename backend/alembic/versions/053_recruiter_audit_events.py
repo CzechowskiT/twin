@@ -17,6 +17,9 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    bind = op.get_bind()
+    if bind.dialect.has_table(bind, "recruiter_audit_events"):
+        return
     op.create_table(
         "recruiter_audit_events",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),

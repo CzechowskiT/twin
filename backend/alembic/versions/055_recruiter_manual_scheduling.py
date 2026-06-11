@@ -12,10 +12,24 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    op.add_column("applications", sa.Column("recruiter_scheduling_status", sa.String(32), nullable=True))
-    op.add_column("applications", sa.Column("recruiter_manual_slot_at", sa.DateTime(), nullable=True))
-    op.add_column("applications", sa.Column("recruiter_manual_slot_duration_minutes", sa.Integer(), nullable=True))
-    op.add_column("applications", sa.Column("recruiter_manual_meeting_link", sa.String(2000), nullable=True))
+    bind = op.get_bind()
+    insp = sa.inspect(bind)
+    cols = {c["name"] for c in insp.get_columns("applications")}
+    additions = (
+        ("recruiter_scheduling_status", sa.Column("recruiter_scheduling_status", sa.String(32), nullable=True)),
+        ("recruiter_manual_slot_at", sa.Column("recruiter_manual_slot_at", sa.DateTime(), nullable=True)),
+        (
+            "recruiter_manual_slot_duration_minutes",
+            sa.Column("recruiter_manual_slot_duration_minutes", sa.Integer(), nullable=True),
+        ),
+        (
+            "recruiter_manual_meeting_link",
+            sa.Column("recruiter_manual_meeting_link", sa.String(2000), nullable=True),
+        ),
+    )
+    for name, column in additions:
+        if name not in cols:
+            op.add_column("applications", column)
 
 
 def downgrade() -> None:

@@ -416,11 +416,18 @@ export default function DashboardCalendarPage() {
       setCalendarErrorCode(err);
       if (c === "1" || c === "microsoft") {
         setBanner("connected");
-        void load();
+        setWeekShowReconnectPanel(false);
+        setWeekShowPartialWarning(false);
+        setGoogleStatusError(false);
+        setMicrosoftStatusError(false);
+        void (async () => {
+          await load();
+          await fetchCalendarWeekEvents();
+        })();
       } else if (err === "google_denied" || err === "microsoft_denied") setBanner("denied");
       else if (err) setBanner("error");
     });
-  }, [searchParams, load]);
+  }, [searchParams, load, fetchCalendarWeekEvents]);
 
   useEffect(() => {
     if (banner !== "connected") return;
@@ -429,6 +436,7 @@ export default function DashboardCalendarPage() {
       const params = new URLSearchParams(searchParams.toString());
       if (!params.has("calendar_connected")) return;
       params.delete("calendar_connected");
+      params.delete("calendar_error");
       const qs = params.toString();
       router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
     }, 7000);
@@ -871,6 +879,12 @@ export default function DashboardCalendarPage() {
         onCopyWebcalLink={() => void copyWebcalLink()}
         onGenerateWebcalLink={() => void generateWebcalLink()}
         onRetryCalendarEvents={() => void fetchCalendarWeekEvents()}
+        onRetryCalendarStatus={() => {
+          void (async () => {
+            await load();
+            await fetchCalendarWeekEvents();
+          })();
+        }}
       />
 
       <details className="mb-6 rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/40 px-4 py-3">

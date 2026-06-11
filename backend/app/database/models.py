@@ -319,6 +319,10 @@ class Candidate(Base):
         back_populates="candidate",
         cascade="all, delete-orphan",
     )
+    evidence_items: Mapped[list["CandidateEvidenceItem"]] = relationship(
+        back_populates="candidate",
+        cascade="all, delete-orphan",
+    )
     progress: Mapped["CandidateProgress | None"] = relationship(
         back_populates="candidate",
         uselist=False,
@@ -723,6 +727,32 @@ class RecruiterAuditEvent(Base):
     action_type: Mapped[str] = mapped_column(String(64))
     meta_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateEvidenceItem(Base):
+    """Skill evidence artifact linked to a candidate profile vault."""
+
+    __tablename__ = "candidate_evidence_items"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"),
+        index=True,
+    )
+    skill_name: Mapped[str] = mapped_column(String(120))
+    evidence_type: Mapped[str] = mapped_column(String(40))
+    title: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    source_url: Mapped[str | None] = mapped_column(String(2000), nullable=True)
+    privacy_class: Mapped[str] = mapped_column(String(40), default="candidate_private")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
+
+    candidate: Mapped["Candidate"] = relationship(back_populates="evidence_items")
 
 
 class RecruiterApplicationScorecard(Base):
