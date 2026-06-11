@@ -12,6 +12,16 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    conn = op.get_bind()
+    table_exists = conn.execute(
+        sa.text(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = 'public' AND table_name = 'candidate_evidence_items' "
+            "LIMIT 1"
+        )
+    ).fetchone()
+    if table_exists:
+        return
     op.create_table(
         "candidate_evidence_items",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
