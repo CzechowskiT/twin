@@ -12,16 +12,22 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    op.add_column(
-        "applications",
-        sa.Column("recruiter_pipeline_status", sa.String(32), nullable=True),
-    )
-    op.create_index(
-        "ix_applications_recruiter_pipeline_status",
-        "applications",
-        ["recruiter_pipeline_status"],
-        unique=False,
-    )
+    bind = op.get_bind()
+    insp = sa.inspect(bind)
+    cols = {c["name"] for c in insp.get_columns("applications")}
+    if "recruiter_pipeline_status" not in cols:
+        op.add_column(
+            "applications",
+            sa.Column("recruiter_pipeline_status", sa.String(32), nullable=True),
+        )
+    indexes = {idx["name"] for idx in insp.get_indexes("applications")}
+    if "ix_applications_recruiter_pipeline_status" not in indexes:
+        op.create_index(
+            "ix_applications_recruiter_pipeline_status",
+            "applications",
+            ["recruiter_pipeline_status"],
+            unique=False,
+        )
 
 
 def downgrade() -> None:

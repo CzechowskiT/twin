@@ -12,9 +12,14 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    bind = op.get_bind()
+    insp = sa.inspect(bind)
     for table in ("user_google_calendar", "user_microsoft_calendar"):
-        op.add_column(table, sa.Column("access_token_encrypted", sa.Text(), nullable=True))
-        op.add_column(table, sa.Column("access_token_expires_at", sa.DateTime(), nullable=True))
+        cols = {c["name"] for c in insp.get_columns(table)}
+        if "access_token_encrypted" not in cols:
+            op.add_column(table, sa.Column("access_token_encrypted", sa.Text(), nullable=True))
+        if "access_token_expires_at" not in cols:
+            op.add_column(table, sa.Column("access_token_expires_at", sa.DateTime(), nullable=True))
 
 
 def downgrade() -> None:
