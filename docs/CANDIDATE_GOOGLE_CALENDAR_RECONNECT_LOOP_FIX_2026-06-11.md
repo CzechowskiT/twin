@@ -55,6 +55,8 @@ cd frontend && npm run test:candidate-google-calendar-stability
 4. Connect Google (no disconnect) → success banner, events load.  
 5. Microsoft connected + Google bad → Microsoft events still visible.
 
+**Follow-up (2026-06-11):** `docs/CANDIDATE_CALENDAR_LOADING_STATE_TIMEOUT_FIX_2026-06-11.md` — 9s client timeout so status/events never leave page on **Ładowanie…** indefinitely.
+
 ## Hard bans
 
 - Never `clearToken()` / logout on calendar `401`/`428`/`503`.  

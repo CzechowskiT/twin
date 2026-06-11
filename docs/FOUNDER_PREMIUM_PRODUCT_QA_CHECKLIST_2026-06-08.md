@@ -48,7 +48,7 @@
 | 1.1 | `/dashboard` hero | Eyebrow “Today” / “Dziś”; 2–3 mission cards from real state |
 | 1.2 | Primary CTA | Single deterministic action (profile → matches → calendar → pipeline) |
 | 1.3 | Readiness chip | Email/profile/matches readiness visible without invented metrics |
-| 1.4 | Header **Kalendarz** (logged-in candidate) | Stays authenticated → `/dashboard/calendar` ≥5s — no logout/login loop; stale provider shows **WYMAGA PONOWNEGO POŁĄCZENIA**, not false **POŁĄCZONO**; transient Google → **Błąd tymczasowy** + Retry, not reconnect loop (`docs/CANDIDATE_GOOGLE_CALENDAR_RECONNECT_LOOP_FIX_2026-06-11.md`) |
+| 1.4 | Header **Kalendarz** (logged-in candidate) | Stays authenticated → `/dashboard/calendar` ≥5s — no logout/login loop; stale provider shows **WYMAGA PONOWNEGO POŁĄCZENIA**, not false **POŁĄCZONO**; transient Google → **Błąd tymczasowy** + Retry, not reconnect loop (`docs/CANDIDATE_GOOGLE_CALENDAR_RECONNECT_LOOP_FIX_2026-06-11.md`); hung status resolves ≤9s with **Ładowanie statusu…** → retry/connect (`docs/CANDIDATE_CALENDAR_LOADING_STATE_TIMEOUT_FIX_2026-06-11.md`) |
 | 1.5 | Calendar OAuth return (`?calendar_connected=1`) | Success banner readable on dark: **Kalendarz połączony** + body copy; auto-dismiss ~7s; status reload clears stale reconnect (`docs/CANDIDATE_CALENDAR_SUCCESS_ALERT_POLISH_2026-06-10.md`) |
 
 **Score §1:** ___ / 8

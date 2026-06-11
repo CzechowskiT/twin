@@ -1143,6 +1143,14 @@ const en = {
     calendarTemporaryError: "Temporary error",
     calendarTemporaryErrorHint: "Google or Microsoft is temporarily unavailable. Try again in a moment.",
     calendarRetryEvents: "Retry loading events",
+    calendarRetry: "Try again",
+    calendarReconnect: "Reconnect",
+    calendarStatusLoading: "Loading status…",
+    calendarStatusTimeout: "Could not fetch calendar status",
+    calendarStatusTimeoutHint: "There may be a temporary network or provider issue. Try again in a moment.",
+    calendarSessionSafeHint: "TWIN will not sign you out when a calendar provider fails.",
+    calendarConnectGoogle: "Connect Google Calendar",
+    calendarConnectMicrosoft365: "Connect Microsoft 365",
     calendarIntegrationError: "Integration error",
     calendarProviderGoogleReconnect: "Google Calendar access expired. Connect Google again — no need to disconnect first.",
     calendarProviderMicrosoftReconnect: "Microsoft 365 access expired. Connect Microsoft again — no need to disconnect first.",
@@ -4905,16 +4913,25 @@ const pl: MessageTree = {
     calendarTemporaryErrorHint:
       "Google lub Microsoft jest chwilowo niedostępny. Spróbuj ponownie za chwilę.",
     calendarRetryEvents: "Ponów wczytywanie wydarzeń",
+    calendarRetry: "Spróbuj ponownie",
+    calendarReconnect: "Połącz ponownie",
+    calendarStatusLoading: "Ładowanie statusu…",
+    calendarStatusTimeout: "Nie udało się pobrać statusu kalendarza",
+    calendarStatusTimeoutHint:
+      "Możliwy chwilowy problem z siecią lub dostawcą. Spróbuj ponownie za chwilę.",
+    calendarSessionSafeHint: "TWIN nie wyloguje Cię, gdy integracja kalendarza nie zadziała.",
+    calendarConnectGoogle: "Połącz Google Calendar",
+    calendarConnectMicrosoft365: "Połącz Microsoft 365",
     calendarIntegrationError: "Błąd integracji",
     calendarProviderGoogleReconnect:
-      "Dostęp do Google Calendar wygasł. Odłącz i połącz Google ponownie.",
+      "Dostęp do Google Calendar wygasł. Połącz Google ponownie — bez wcześniejszego odłączania.",
     calendarProviderMicrosoftReconnect:
-      "Dostęp do Microsoft 365 wygasł. Odłącz i połącz Microsoft ponownie.",
+      "Dostęp do Microsoft 365 wygasł. Połącz Microsoft ponownie — bez wcześniejszego odłączania.",
     calendarPartialFailure:
       "Nie udało się wczytać części podłączonych kalendarzy. Poniższe wydarzenia mogą być niepełne.",
     calendarAllProvidersReconnectTitle: "Połącz kalendarz ponownie",
     calendarAllProvidersReconnectBody:
-      "Połączenie Google lub Microsoft wymaga odświeżenia. Odłącz i połącz ponownie poniżej — konto TWIN pozostaje zalogowane.",
+      "Połączenie Google lub Microsoft wymaga odświeżenia. Użyj Połącz ponownie poniżej — konto TWIN pozostaje zalogowane.",
     calendarViewDataHint:
       "Pokazuje tytuły i godziny z podłączonych kalendarzy oraz rezerwacje rozmów TWIN w tym tygodniu.",
     calendarConnectionsLoading: "Ładowanie…",

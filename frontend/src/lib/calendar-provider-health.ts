@@ -2,6 +2,11 @@
 
 import type { CalendarProvider, ProviderCalendarEvent } from "@/lib/calendar-week";
 
+/** Max wait for provider status / week events before showing retry UI (never infinite loading). */
+export const CALENDAR_FETCH_TIMEOUT_MS = 9000;
+
+export type ProviderStatusPhase = "loading" | "ready" | "timeout" | "error";
+
 export type ProviderHealth = "ok" | "reconnect_required" | "temporary_error" | "error" | "unknown";
 
 export type CalendarProviderStatusSnapshot = {
@@ -85,6 +90,9 @@ export function parseProviderIntegrationError(message: string): {
 } {
   const lower = message.trim().toLowerCase();
   const temporaryError =
+    lower.includes("timed out") ||
+    lower.includes("timeout") ||
+    lower.includes("abort") ||
     lower.includes("temporarily unavailable") ||
     lower.includes("try again shortly") ||
     lower.includes('"code": 429') ||
@@ -207,6 +215,27 @@ export function displayHealthForProvider(
   if (!snapshot) return undefined;
   const outcome = outcomes.find((o) => o.provider === snapshot.provider);
   return healthAfterWeekFetch(snapshot, outcome);
+}
+
+export function providerStatusBootstrapComplete(
+  googlePhase: ProviderStatusPhase,
+  microsoftPhase: ProviderStatusPhase,
+): boolean {
+  return googlePhase !== "loading" && microsoftPhase !== "loading";
+}
+
+/** Provider card body must not show indefinite loading when badge is terminal not_connected. */
+export function providerCardShowsConnectAction(
+  phase: ProviderStatusPhase,
+  provider: Pick<CalendarProviderStatusSnapshot, "connected" | "health">,
+  oauthConfigured: boolean,
+): boolean {
+  if (phase === "loading") return false;
+  if (phase === "timeout" || phase === "error") return oauthConfigured;
+  if (provider.connected && provider.health === "reconnect_required") return true;
+  if (provider.connected && provider.health === "temporary_error") return false;
+  if (provider.connected) return false;
+  return oauthConfigured;
 }
 
 export function statusSnapshotFromApi(

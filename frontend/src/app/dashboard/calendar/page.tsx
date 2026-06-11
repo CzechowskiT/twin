@@ -15,13 +15,14 @@ import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subna
 import { useTranslation } from "@/components/language-provider";
 import { WorkspaceFlowSteps } from "@/components/ux/workspace-flow-steps";
 import { Button, Card, Shell } from "@/components/ui";
-import { apiFetch, apiFetchBlob, saveBlobAsFile } from "@/lib/api";
+import { apiFetch, apiFetchBlob, isFetchTimeoutError, saveBlobAsFile } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 import { candidateCalendarHref } from "@/lib/persona-access";
 import { LOGIN_PATH } from "@/lib/persona-auth";
 import { calendarProviderLabel } from "@/lib/calendar-provider";
 import {
   aggregateWeekEventOutcomes,
+  CALENDAR_FETCH_TIMEOUT_MS,
   displayHealthForProvider,
   hasAnyConnectedProvider,
   hasAnyHealthyProvider,
@@ -30,8 +31,10 @@ import {
   preferredActiveProvider,
   providerNeedsAttention,
   providerNeedsReconnect,
+  providerStatusBootstrapComplete,
   statusSnapshotFromApi,
   type CalendarProviderStatusSnapshot,
+  type ProviderStatusPhase,
   type ProviderWeekFetchOutcome,
 } from "@/lib/calendar-provider-health";
 import { fetchOpsHealth, type OpsHealth } from "@/lib/ops-health";
@@ -157,6 +160,8 @@ export default function DashboardCalendarPage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
+  const [googleStatusPhase, setGoogleStatusPhase] = useState<ProviderStatusPhase>("loading");
+  const [microsoftStatusPhase, setMicrosoftStatusPhase] = useState<ProviderStatusPhase>("loading");
   const [status, setStatus] = useState<CalendarStatus | null>(null);
   const [msStatus, setMsStatus] = useState<MicrosoftCalendarStatus | null>(null);
   const [oauthCfg, setOauthCfg] = useState<CalendarOAuthConfig | null>(null);
@@ -200,6 +205,9 @@ export default function DashboardCalendarPage() {
   const [weekFailedProviders, setWeekFailedProviders] = useState<Array<"google" | "microsoft">>([]);
   const [weekFetchOutcomes, setWeekFetchOutcomes] = useState<ProviderWeekFetchOutcome[]>([]);
   const interviewRefreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const calendarConnectedQueryRef = useRef<string | null>(null);
+
+  const statusBootstrapComplete = providerStatusBootstrapComplete(googleStatusPhase, microsoftStatusPhase);
 
   const googleSnapshot: CalendarProviderStatusSnapshot | null = status
     ? statusSnapshotFromApi("google", status)
@@ -257,75 +265,110 @@ export default function DashboardCalendarPage() {
     const token = getToken();
     if (!token) {
       setLoading(false);
+      setGoogleStatusPhase("ready");
+      setMicrosoftStatusPhase("ready");
       const next = encodeURIComponent(candidateCalendarHref());
       router.replace(`${LOGIN_PATH.candidate}?next=${next}`);
       return;
     }
     setLoading(true);
+    setGoogleStatusPhase("loading");
+    setMicrosoftStatusPhase("loading");
     setActionError(false);
     setGoogleStatusError(false);
     setMicrosoftStatusError(false);
     setNotifPrefsLoadError(false);
-    try {
-      const [calRes, msRes, meRes, oauthCfgRes, opsRes] = await Promise.allSettled([
-        apiFetch<CalendarStatus>("/api/v1/calendar/google/status", {}, token),
-        apiFetch<MicrosoftCalendarStatus>("/api/v1/calendar/microsoft/status", {}, token),
-        apiFetch<AuthMeOut>("/api/v1/auth/me", {}, token),
-        apiFetch<CalendarOAuthConfig>("/api/v1/calendar/oauth-config", {}),
-        fetchOpsHealth(),
-      ]);
-      const oauthCfgValue = oauthCfgRes.status === "fulfilled" ? oauthCfgRes.value : null;
-      setOauthCfg(oauthCfgValue);
-      setOpsHealth(opsRes.status === "fulfilled" ? opsRes.value : null);
 
-      if (calRes.status === "fulfilled") {
-        const s = calRes.value;
-        setStatus({
-          ...s,
-          oauth_redirect_uri: s.oauth_redirect_uri ?? oauthCfgValue?.google.redirect_uri ?? null,
-        });
-      } else {
+    const loadGoogleStatus = async (): Promise<ProviderStatusPhase> => {
+      try {
+        const s = await apiFetch<CalendarStatus>(
+          "/api/v1/calendar/google/status",
+          { preserveSessionOnUnauthorized: true, timeoutMs: CALENDAR_FETCH_TIMEOUT_MS },
+          token,
+        );
+        setStatus(s);
+        setGoogleStatusError(false);
+        return "ready";
+      } catch (e) {
+        const timedOut = isFetchTimeoutError(e);
         setGoogleStatusError(true);
         setStatus({
           connected: false,
+          health: timedOut ? "temporary_error" : undefined,
           google_email: null,
-          oauth_configured: oauthCfgValue?.google.oauth_configured ?? false,
-          oauth_redirect_uri: oauthCfgValue?.google.redirect_uri ?? null,
         });
-        console.warn("[calendar] google status failed", calRes.reason);
+        console.warn("[calendar] google status failed", e);
+        return timedOut ? "timeout" : "error";
       }
+    };
 
-      if (msRes.status === "fulfilled") {
-        const msRaw = msRes.value;
-        setMsStatus({
-          ...msRaw,
-          oauth_redirect_uri: msRaw.oauth_redirect_uri ?? oauthCfgValue?.microsoft.redirect_uri ?? null,
-        });
-      } else {
+    const loadMicrosoftStatus = async (): Promise<ProviderStatusPhase> => {
+      try {
+        const msRaw = await apiFetch<MicrosoftCalendarStatus>(
+          "/api/v1/calendar/microsoft/status",
+          { preserveSessionOnUnauthorized: true, timeoutMs: CALENDAR_FETCH_TIMEOUT_MS },
+          token,
+        );
+        setMsStatus(msRaw);
+        setMicrosoftStatusError(false);
+        return "ready";
+      } catch (e) {
+        const timedOut = isFetchTimeoutError(e);
         setMicrosoftStatusError(true);
         setMsStatus({
           connected: false,
+          health: timedOut ? "temporary_error" : undefined,
           microsoft_email: null,
-          oauth_configured: oauthCfgValue?.microsoft.oauth_configured ?? false,
-          oauth_redirect_uri: oauthCfgValue?.microsoft.redirect_uri ?? null,
         });
-        console.warn("[calendar] microsoft status failed", msRes.reason);
+        console.warn("[calendar] microsoft status failed", e);
+        return timedOut ? "timeout" : "error";
       }
+    };
 
-      if (meRes.status === "fulfilled") {
-        setEmailProductUpdates(Boolean(meRes.value.email_product_updates));
-        setEmailInterviewReminders(Boolean(meRes.value.email_interview_reminders));
-      } else {
-        setNotifPrefsLoadError(true);
-      }
-    } catch {
-      setActionError(true);
-      setStatus(null);
-      setMsStatus(null);
-      setInterviews([]);
-    } finally {
-      setLoading(false);
+    const [oauthCfgRes, opsRes, meRes, googlePhase, microsoftPhase] = await Promise.all([
+      apiFetch<CalendarOAuthConfig>("/api/v1/calendar/oauth-config", { timeoutMs: CALENDAR_FETCH_TIMEOUT_MS }).catch(
+        () => null,
+      ),
+      fetchOpsHealth().catch(() => null),
+      apiFetch<AuthMeOut>("/api/v1/auth/me", {}, token).catch(() => null),
+      loadGoogleStatus(),
+      loadMicrosoftStatus(),
+    ]);
+
+    setOauthCfg(oauthCfgRes);
+    setOpsHealth(opsRes);
+    setGoogleStatusPhase(googlePhase);
+    setMicrosoftStatusPhase(microsoftPhase);
+
+    if (oauthCfgRes) {
+      setStatus((prev) =>
+        prev
+          ? {
+              ...prev,
+              oauth_configured: prev.oauth_configured ?? oauthCfgRes.google.oauth_configured,
+              oauth_redirect_uri: prev.oauth_redirect_uri ?? oauthCfgRes.google.redirect_uri ?? null,
+            }
+          : prev,
+      );
+      setMsStatus((prev) =>
+        prev
+          ? {
+              ...prev,
+              oauth_configured: prev.oauth_configured ?? oauthCfgRes.microsoft.oauth_configured,
+              oauth_redirect_uri: prev.oauth_redirect_uri ?? oauthCfgRes.microsoft.redirect_uri ?? null,
+            }
+          : prev,
+      );
     }
+
+    if (meRes) {
+      setEmailProductUpdates(Boolean(meRes.email_product_updates));
+      setEmailInterviewReminders(Boolean(meRes.email_interview_reminders));
+    } else {
+      setNotifPrefsLoadError(true);
+    }
+
+    setLoading(false);
 
     void fetchInterviewRows(token).catch((e) => {
       console.warn("[calendar] interview list failed", e);
@@ -375,7 +418,7 @@ export default function DashboardCalendarPage() {
           try {
             const out = await apiFetch<CalendarEventsPayload>(
               `/api/v1/calendar/${provider}/events?${params.toString()}`,
-              { preserveSessionOnUnauthorized: true },
+              { preserveSessionOnUnauthorized: true, timeoutMs: CALENDAR_FETCH_TIMEOUT_MS },
               token,
             );
             return { provider, events: out.events, failed: false, reconnectRequired: false, temporaryError: false, message: null };
@@ -411,11 +454,11 @@ export default function DashboardCalendarPage() {
   }, [weekStart, interviews, googleSnapshot, microsoftSnapshot]);
 
   useEffect(() => {
-    if (loading || !isCalendarConnected) return;
+    if (!statusBootstrapComplete || !isCalendarConnected) return;
     queueMicrotask(() => {
       void fetchCalendarWeekEvents();
     });
-  }, [loading, isCalendarConnected, fetchCalendarWeekEvents]);
+  }, [statusBootstrapComplete, isCalendarConnected, fetchCalendarWeekEvents]);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -423,6 +466,9 @@ export default function DashboardCalendarPage() {
       const err = searchParams.get("calendar_error");
       setCalendarErrorCode(err);
       if (c === "1" || c === "microsoft") {
+        const queryKey = searchParams.toString();
+        if (calendarConnectedQueryRef.current === queryKey) return;
+        calendarConnectedQueryRef.current = queryKey;
         setBanner("connected");
         setWeekShowReconnectPanel(false);
         setWeekShowPartialWarning(false);
@@ -823,8 +869,8 @@ export default function DashboardCalendarPage() {
         </Card>
       ) : null}
 
-      {loading ? (
-        <p className="mb-6 text-sm text-[var(--twin-muted-strong)]">{t("dashboard.calendarConnectionsLoading")}</p>
+      {loading && !statusBootstrapComplete ? (
+        <p className="mb-6 text-sm text-[var(--twin-muted-strong)]">{t("dashboard.calendarStatusLoading")}</p>
       ) : isCalendarConnected ? (
         <CalendarWeekView
           weekStart={weekStart}
@@ -855,7 +901,8 @@ export default function DashboardCalendarPage() {
       )}
 
       <CalendarConnectionsPanel
-        loading={loading}
+        googleStatusPhase={googleStatusPhase}
+        microsoftStatusPhase={microsoftStatusPhase}
         googleStatusError={googleStatusError}
         microsoftStatusError={microsoftStatusError}
         actionBusy={actionBusy}
@@ -957,7 +1004,7 @@ export default function DashboardCalendarPage() {
         </div>
       </details>
 
-      {!loading && isCalendarUsable ? (
+      {!statusBootstrapComplete ? null : !loading && isCalendarUsable ? (
         <div className="flex flex-col gap-6">
           <details className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/40 px-4 py-3" open>
             <summary className="cursor-pointer text-sm font-semibold text-[var(--foreground)]">
