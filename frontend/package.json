@@ -19,6 +19,7 @@
     "test:pricing-locale": "npx --yes tsx scripts/pricing-locale.test.ts",
     "test:investor-calculator": "npx --yes tsx scripts/investor-calculator-model.test.ts",
     "test:b2b-roi-calculator": "npx --yes tsx scripts/b2b-roi-calculator-model.test.ts",
+    "test:recruiter-inbox-premium-card-ui": "npx --yes tsx scripts/recruiter-inbox-premium-card-ui.test.ts",
     "test:recruiter-inbox-readability-layout": "npx --yes tsx scripts/recruiter-inbox-readability-layout.test.ts",
     "test:recruiter-inbox-visual": "npx --yes tsx scripts/recruiter-inbox-visual.test.ts && npx --yes tsx scripts/recruiter-inbox-chip-copy.test.ts",
     "test:recruiter-inbox-decision": "npx --yes tsx scripts/recruiter-inbox-decision.test.ts && npx --yes tsx scripts/recruiter-inbox-segments.test.ts && npm run test:recruiter-inbox-visual",

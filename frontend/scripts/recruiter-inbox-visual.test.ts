@@ -31,24 +31,25 @@ test("match score tone maps labels and scores for decision-grade badges", () => 
   assert.equal(recruiterInboxMatchScoreTone(null, null), "unknown");
 });
 
-test("match score badge classes use high-contrast palette on dark theme", () => {
+test("match score card classes use subtle tone borders without heavy blobs", () => {
+  const visualSrc = readFileSync(join(root, "src/lib/recruiter-inbox-visual.ts"), "utf8");
+  assert.match(visualSrc, /recruiterInboxMatchScoreCardClass/);
+  assert.match(visualSrc, /recruiterInboxMatchScoreLabelClass/);
+  assert.match(visualSrc, /recruiterInboxMatchScoreValueClass/);
+  assert.match(visualSrc, /recruiterInboxMatchScoreToneClass/);
   for (const tone of ["high", "medium", "low"] as const) {
     const cls = recruiterInboxMatchScoreBadgeClass(tone);
     assert.match(cls, /border-/);
-    assert.match(cls, /dark:text-/);
-    assert.doesNotMatch(cls, /opacity-0|text-transparent/);
   }
-  assert.match(recruiterInboxMatchScoreBadgeClass("low"), /dark:text-amber-50/);
 });
 
-test("status, chip, review CTA and decline styles use readable dark-theme tokens", () => {
+test("status, signal rows, review CTA and decline styles use readable dark-theme tokens", () => {
   assert.match(recruiterInboxStatusBadgeClass("awaiting"), /recruiter-inbox-status-badge/);
-  assert.match(recruiterInboxStatusBadgeClass("awaiting"), /dark:text-sky-50/);
+  assert.match(recruiterInboxStatusBadgeClass("awaiting"), /dark:text-cyan-50/);
   assert.match(recruiterInboxEvidenceChipClass(), /recruiter-inbox-evidence-chip/);
-  assert.match(recruiterInboxEvidenceChipClass(), /dark:text-emerald-50/);
   assert.match(recruiterInboxWarningChipClass(), /recruiter-inbox-warning-chip/);
-  assert.match(recruiterInboxWarningChipClass(), /dark:text-amber-50/);
   assert.match(recruiterInboxReviewCardCtaClass(), /recruiter-inbox-review-card-cta/);
+  assert.match(recruiterInboxReviewCardCtaClass(), /border-cyan-400/);
   assert.match(recruiterInboxReviewCardCtaClass(), /focus-visible:ring/);
   assert.match(recruiterInboxDeclineButtonClass(), /recruiter-inbox-decline-btn/);
   assert.match(recruiterInboxDeclineButtonClass(), /dark:text-rose-100/);
@@ -57,24 +58,25 @@ test("status, chip, review CTA and decline styles use readable dark-theme tokens
 test("decision console exposes premium visual markers and review card CTA copy", () => {
   assert.match(clientSrc, /RECRUITER_INBOX_VISUAL_MARKERS\.decisionConsoleHeader/);
   assert.match(clientSrc, /RECRUITER_INBOX_VISUAL_MARKERS\.segmentTab/);
-  assert.match(clientSrc, /recruiterInboxMatchScoreBadgeClass/);
-  assert.match(clientSrc, /recruiterInboxStatusBadgeClass/);
-  assert.match(clientSrc, /recruiterInboxReviewCardCtaClass/);
+  assert.match(clientSrc, /RecruiterDecisionRail/);
+  assert.match(clientSrc, /RecruiterSignalList/);
   assert.match(clientSrc, /recruiterInboxDeclineButtonClass/);
   assert.match(clientSrc, /localizeRecruiterInboxChipText/);
-  assert.match(clientSrc, /recruiterInbox\.openReviewCard/);
+  assert.match(clientSrc, /recruiterInbox\.reviewCardCtaShort/);
   assert.match(clientSrc, /recruiterInbox\.cardWhyReview/);
   assert.equal(RECRUITER_INBOX_VISUAL_MARKERS.decisionConsoleHeader, "recruiter-inbox-decision-header");
+  assert.equal(RECRUITER_INBOX_VISUAL_MARKERS.decisionRail, "recruiter-inbox-decision-rail");
 });
 
 test("inbox API proxy forwards X-Locale for localized chip copy", () => {
   assert.match(apiRouteSrc, /recruiterInboxUpstreamHeaders/);
 });
 
-test("PL and EN include open review card and sharper decision console subcopy", () => {
+test("PL and EN include review card CTA and sharper decision console subcopy", () => {
   for (const loc of ["en", "pl"] as const) {
     const inbox = dictionaries[loc].recruiterInbox;
-    assert.ok(inbox.openReviewCard.trim());
+    assert.ok(inbox.reviewCardCtaShort.trim());
+    assert.ok(inbox.chipOverflowInReviewCard.trim());
     assert.ok(inbox.cardWhyReview.trim());
     assert.match(inbox.decisionConsoleTrustLine.toLowerCase(), /ai|ranking/);
     assert.match(inbox.decisionConsoleSubcopy.toLowerCase(), /review|oceny|signals|sygnał/);

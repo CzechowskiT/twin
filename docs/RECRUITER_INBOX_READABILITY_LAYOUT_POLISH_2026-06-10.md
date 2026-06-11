@@ -36,6 +36,8 @@
 
 **Launch stance:** unchanged — public **NO-GO**, auto-apply **PAUSED**.
 
+**Superseded by:** `docs/RECRUITER_INBOX_PREMIUM_CARD_REDESIGN_2026-06-11.md` — decision rail, match score card, signal rows (PR #73 visual rejected).
+
 ---
 
 ## Tests
