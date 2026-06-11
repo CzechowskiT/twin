@@ -36,6 +36,7 @@
 **Safe-lane merge (2026-06-09):** Zero English leakage — role hub `authRoles.*` i18n for all 9 locales · `docs/ZERO_ENGLISH_LEAKAGE_I18N_FIX_2026-06-09.md` · `test:i18n-visual-copy-guard` · **does not change launch NO-GO**.
 **Safe-lane merge (2026-06-09):** Rendered homepage/waitlist i18n — `home.*`, rewards band, waitlist narrative for es–ja · `docs/RENDERED_HOMEPAGE_ZERO_ENGLISH_LEAKAGE_FIX_2026-06-09.md` · `test:i18n-rendered-homepage-guard` · OG routes unchanged · **does not change launch NO-GO**.
 **Safe-lane merge (2026-06-09):** Homepage below-fold i18n — live counter, stats, rewards table, FAQ teaser for es–ja · `docs/HOMEPAGE_BELOW_FOLD_I18N_LEAKAGE_FIX_2026-06-09.md` · `test:i18n-rendered-homepage-guard` (extended) · OG minimal bundle unchanged · **does not change launch NO-GO**.
+**Safe-lane merge (2026-06-11):** Global chrome i18n — footer, momentum rail, marketing nav labels for es–ja · `docs/GLOBAL_CHROME_ZERO_ENGLISH_LEAKAGE_FIX_2026-06-11.md` · `test:i18n-global-chrome-guard` · OG unchanged · **does not change launch NO-GO**.
  · **Controlled recruiter pilot H5b PASS** (`2026-06-07T07:03:13Z`) · **H5c pack created** · **H5d pack created** (`2026-06-07`) · default **HOLD** · founder **defers external invitations** until H5d slot-1 selected + explicit **GO SMALL 1/2** · invitations sent **no** · **S2 PASS** (post-enforce smoke `2026-06-05T16:20:13Z`) · **R1–R5 PASS** · **H4 CLEAN PASS** (`2026-06-06T17:36:25Z`) · recruiter calendar placeholder **NOT LIVE** · **Auto-apply PAUSED** (operational + product gates)
 
 ---

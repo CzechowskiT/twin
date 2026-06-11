@@ -221,3 +221,97 @@ export function equalsEnglish(path: string, locale: Locale): boolean {
   const localeValue = getString(dictionaries[locale], path);
   return Boolean(enValue && localeValue && enValue === localeValue);
 }
+
+/** Footer, momentum rail, and marketing chrome nav labels rendered on public routes. */
+export const RENDERED_GLOBAL_CHROME_KEYS = [
+  "site.footerTagline",
+  "site.footerExplore",
+  "site.footerHome",
+  "site.footerWishlist",
+  "site.footerCompany",
+  "site.footerLegal",
+  "site.footerPrivacy",
+  "site.footerTerms",
+  "site.footerStatus",
+  "site.footerDevelopers",
+  "site.footerCookieSettings",
+  "site.footerRights",
+  "site.footerSocial",
+  "site.momentumEyebrow",
+  "site.momentumLead",
+  "site.momentumTip1",
+  "site.momentumTip6",
+  "site.momentumCtaRegister",
+  "site.momentumCtaLogin",
+  "site.momentumCtaFaq",
+  "nav.about",
+  "nav.cases",
+  "nav.careers",
+  "nav.contact",
+  "nav.faq",
+  "nav.media",
+  "nav.partners",
+  "nav.forCandidates",
+  "nav.forRecruiters",
+  "nav.forCompanies",
+  "nav.forInvestors",
+  "nav.demo",
+  "nav.waitlist",
+  "nav.howItWorks",
+  "nav.pricing",
+] as const;
+
+/** English chrome tokens banned on non-EN locales (footer/support/momentum). */
+export const FORBIDDEN_EN_CHROME: ForbiddenRule[] = [
+  { pattern: /Keep momentum/i, label: "Keep momentum" },
+  { pattern: /Small rituals beat/i, label: "Small rituals beat" },
+  { pattern: /Autonomous career agent/i, label: "Autonomous career agent" },
+  { pattern: /\bCreate account\b/i, label: "Create account" },
+  { pattern: /\bLog in\b/i, label: "Log in" },
+  { pattern: /Wishlist \(early access\)/i, label: "Wishlist (early access)" },
+  { pattern: /\bPrivacy Policy\b/i, label: "Privacy Policy" },
+  { pattern: /\bTerms of Service\b/i, label: "Terms of Service" },
+  { pattern: /\bSystem status\b/i, label: "System status" },
+  { pattern: /\bCookie settings\b/i, label: "Cookie settings" },
+  { pattern: /\bCase studies\b/i, label: "Case studies" },
+  { pattern: /\bWhen you save or apply\b/i, label: "When you save or apply" },
+  { pattern: /Open tricky listings/i, label: "Open tricky listings" },
+  { pattern: /\bAll rights reserved\b/i, label: "All rights reserved" },
+];
+
+export const CHROME_EXACT_BAD_EXAMPLES: Partial<Record<Locale, (string | RegExp)[]>> = {
+  es: [
+    "Autonomous career agent",
+    "Keep momentum",
+    "Create account",
+    "Log in",
+    "Wishlist (early access)",
+    "Privacy Policy",
+    "Terms of Service",
+    "System status",
+    "Cookie settings",
+    "Case studies",
+  ],
+  de: [
+    "Autonomous career agent",
+    "Keep momentum",
+    "Create account",
+    "Log in",
+    "Wishlist (early access)",
+    "Privacy Policy",
+    "Terms of Service",
+    "System status",
+    "Cookie settings",
+    "Case studies",
+  ],
+};
+
+export function collectRenderedGlobalChromeStrings(locale: Locale): { key: string; value: string }[] {
+  const dict = dictionaries[locale];
+  return RENDERED_GLOBAL_CHROME_KEYS.map((key) => ({ key, value: getString(dict, key) ?? "" }));
+}
+
+export function chromeForbiddenHits(value: string, locale: Locale): string[] {
+  if (locale === "en") return [];
+  return FORBIDDEN_EN_CHROME.filter((rule) => rule.pattern.test(value)).map((r) => r.label);
+}

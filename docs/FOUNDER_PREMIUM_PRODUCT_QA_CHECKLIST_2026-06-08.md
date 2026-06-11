@@ -10,7 +10,7 @@
 
 ## How to use this checklist
 
-1. Run in **PL** and **EN** on production (or latest Vercel preview after merge). Spot-check **ES** on `/demo`, `/dashboard`, `/recruiter/inbox` for non-English premium copy (see `docs/I18N_FULL_TRANSLATION_COVERAGE_2026-06-08.md`).
+1. Run in **PL** and **EN** on production (or latest Vercel preview after merge). Spot-check **ES** and **DE** on `/` (footer + momentum rail), `/demo`, `/login`, `/register` for localized chrome (see `docs/GLOBAL_CHROME_ZERO_ENGLISH_LEAKAGE_FIX_2026-06-11.md`); spot-check **ES** on `/dashboard`, `/recruiter/inbox` for non-English premium copy (see `docs/I18N_FULL_TRANSLATION_COVERAGE_2026-06-08.md`).
 2. Score each section **0–2** using the rubric below.
 3. **Pass bar:** ≥ **14/18** total with **no 0** on Hard bans (§0).
 4. File blockers in Polish if any Hard ban fails — do not send external invites until resolved.

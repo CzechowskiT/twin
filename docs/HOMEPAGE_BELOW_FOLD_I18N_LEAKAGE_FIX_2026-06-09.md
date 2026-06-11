@@ -59,5 +59,6 @@ Root cause: `MARKETING_HOME_OVERLAYS` covered hero/inside/CTAs/stats labels but 
 ## Related docs
 
 - `docs/RENDERED_LOCALE_LEAKAGE_HARDENING_2026-06-09.md`
+- `docs/GLOBAL_CHROME_ZERO_ENGLISH_LEAKAGE_FIX_2026-06-11.md` (footer + momentum rail below this fold)
 - `docs/I18N.md`
 - `docs/I18N_FULL_TRANSLATION_COVERAGE_2026-06-08.md`

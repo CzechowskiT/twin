@@ -42,6 +42,7 @@ Merged per locale for `/` hero, inside steps, CTAs, stats, feature grid. **Follo
 
 | Script | Purpose |
 | ------ | ------- |
+| `npm run test:i18n-global-chrome-guard` | Footer, momentum rail, marketing nav chrome (`site.*`, `nav.*`); forbidden EN tokens; ES/DE positive assertions — see `docs/GLOBAL_CHROME_ZERO_ENGLISH_LEAKAGE_FIX_2026-06-11.md` |
 | `npm run test:i18n-rendered-homepage-guard` | Rendered keys on `/` (hero + below-fold: stats, rewards, FAQ teaser), hubs, `/demo`, `/waitlist`; forbidden EN tokens; PR #65 exact bad examples; ES/DE below-fold markers; cross-locale signature leakage |
 | `npm run test:i18n-visual-copy-guard` | Marketing/auth/waitlist components use `t()` / `useWaitlistCopy()` / hub keys — no hardcoded EN CTAs |
 | `npm run test:og-bundle-guard` | `/first-1000`, `/beta` OG stay static EN; `/waitlist` OG uses minimal `WAITLIST_OG_COPY` only (en/pl) |
