@@ -12,6 +12,10 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 test("interview prep route exists", () => {
   assert.equal(CANDIDATE_INTERVIEW_PREP_ROUTE, "/dashboard/interview-prep");
   assert.match(readFileSync(join(root, "src/app/dashboard/interview-prep/page.tsx"), "utf8"), /CandidateInterviewPrepClient/);
+  assert.match(
+    readFileSync(join(root, "src/app/dashboard/interview-prep/candidate-interview-prep-client.tsx"), "utf8"),
+    /career-assistant\/interview-prep/,
+  );
 });
 
 test("candidateInterviewPrep keys for all locales", () => {
