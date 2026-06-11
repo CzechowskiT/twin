@@ -66,6 +66,7 @@ const PREFIX_ALLOWED: { prefix: string; allowed: readonly MarketingPersona[] }[]
   { prefix: "/investor/calculator", allowed: ["investor"] },
   { prefix: "/investor", allowed: ["candidate", "recruiter", "company", "investor"] },
   { prefix: "/for-investors", allowed: ["candidate", "recruiter", "company", "investor"] },
+  { prefix: "/company", allowed: ["company", "recruiter"] },
   { prefix: "/calculator/b2b", allowed: ["company", "recruiter"] },
   { prefix: "/calculator", allowed: ["recruiter"] },
   { prefix: "/recruiter/employer", allowed: ["recruiter"] },
