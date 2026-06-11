@@ -562,6 +562,31 @@ def test_microsoft_status_disconnected_without_row(
 
 
 @patch("app.api.calendar._calendar_access_token")
+@patch("app.api.calendar.list_primary_events")
+def test_google_list_events_upstream_auth_failure_returns_428(
+    mock_list: MagicMock, mock_access: MagicMock, client: TestClient
+) -> None:
+    from app.services.google_calendar_api import GoogleCalendarApiError
+
+    mock_access.return_value = "tok"
+    mock_list.side_effect = GoogleCalendarApiError('{"error": {"code": 401, "message": "Invalid Credentials"}}')
+    app.dependency_overrides[get_current_user] = _calendar_user_override(15, "founder@gmail.com")
+    app.dependency_overrides[get_db] = _sqlite_calendar_session
+    token = create_access_token("founder@gmail.com")
+    try:
+        res = client.get(
+            "/api/v1/calendar/google/events",
+            params={"time_min": "2026-06-01T00:00:00Z", "time_max": "2026-06-08T00:00:00Z"},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        assert res.status_code == 428
+        assert "reconnect Google Calendar" in res.json()["detail"]
+    finally:
+        app.dependency_overrides.pop(get_current_user, None)
+        app.dependency_overrides.pop(get_db, None)
+
+
+@patch("app.api.calendar._calendar_access_token")
 def test_expired_google_token_returns_integration_error_not_app_auth(
     mock_access: MagicMock, client: TestClient
 ) -> None:

@@ -83,8 +83,21 @@ export function parseProviderIntegrationError(message: string): {
     lower.includes("reconnect google calendar") ||
     lower.includes("reconnect microsoft calendar") ||
     lower.includes("calendar token expired") ||
-    lower.includes("microsoft token expired");
+    lower.includes("microsoft token expired") ||
+    lower.includes("insufficient") ||
+    lower.includes("invalid_grant") ||
+    lower.includes("invalid_credentials") ||
+    (lower.includes("calendar list events failed") && (lower.includes("401") || lower.includes("403"))) ||
+    (lower.includes("microsoft list events failed") && (lower.includes("401") || lower.includes("403")));
   return { reconnectRequired, failed: true };
+}
+
+/** Connected row exists but token probe or events fetch is not usable. */
+export function providerNeedsAttention(
+  status: CalendarProviderStatusSnapshot | null | undefined,
+): boolean {
+  if (!status?.connected) return false;
+  return status.health === "reconnect_required" || status.health === "error" || status.health === "unknown";
 }
 
 export function aggregateWeekEventOutcomes(
@@ -120,8 +133,11 @@ export function aggregateWeekEventOutcomes(
   const showReconnectPanel =
     !anyProviderLoaded &&
     (reconnectProviders.length > 0 ||
+      allHealthyProvidersFailed ||
       providerNeedsReconnect(google) ||
-      providerNeedsReconnect(microsoft));
+      providerNeedsReconnect(microsoft) ||
+      providerNeedsAttention(google) ||
+      providerNeedsAttention(microsoft));
   const showPartialWarning =
     anyProviderLoaded && (failedProviders.length > 0 || otherProviderStale);
   const showEmptyWeek = anyProviderLoaded && events.length === 0 && failedProviders.length === 0;

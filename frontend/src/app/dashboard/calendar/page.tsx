@@ -27,6 +27,7 @@ import {
   healthyProvidersToFetch,
   parseProviderIntegrationError,
   preferredActiveProvider,
+  providerNeedsAttention,
   providerNeedsReconnect,
   statusSnapshotFromApi,
   type CalendarProviderStatusSnapshot,
@@ -340,7 +341,12 @@ export default function DashboardCalendarPage() {
       setEventsLoadError(false);
       setWeekShowEmpty(false);
       setWeekShowReconnectPanel(
-        Boolean(providerNeedsReconnect(googleSnapshot) || providerNeedsReconnect(microsoftSnapshot)),
+        Boolean(
+          providerNeedsReconnect(googleSnapshot) ||
+            providerNeedsReconnect(microsoftSnapshot) ||
+            providerNeedsAttention(googleSnapshot) ||
+            providerNeedsAttention(microsoftSnapshot),
+        ),
       );
       setWeekShowPartialWarning(false);
       setWeekFailedProviders([]);

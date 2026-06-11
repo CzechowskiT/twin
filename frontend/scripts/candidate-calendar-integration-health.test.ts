@@ -12,6 +12,7 @@ import {
   parseProviderIntegrationError,
   preferredActiveProvider,
   providerBadgeHealth,
+  providerNeedsAttention,
   providerNeedsReconnect,
   statusSnapshotFromApi,
   type CalendarProviderStatusSnapshot,
@@ -139,6 +140,43 @@ test("scenario 6: calendar event fetch integration error → token not cleared",
 test("scenario 7: generic app auth invalid → still redirects to login", () => {
   assert.equal(shouldClearSessionOnApiError(401, "Invalid token", "/api/v1/auth/me"), true);
   assert.equal(shouldClearSessionOnApiError(401, "Inactive user", "/api/v1/calendar/me/interviews"), true);
+});
+
+test("scenario 8: healthy provider events fail → reconnect panel, not generic error", () => {
+  const aggregate = aggregateWeekEventOutcomes(
+    [
+      {
+        provider: "google",
+        events: [],
+        failed: true,
+        reconnectRequired: false,
+        message: "502 Calendar list events failed",
+      },
+    ],
+    googleOk,
+    null,
+  );
+  assert.equal(aggregate.showReconnectPanel, true);
+  assert.equal(aggregate.allHealthyProvidersFailed, true);
+});
+
+test("scenario 9: connected unknown health → attention + reconnect guidance", () => {
+  const googleUnknown: CalendarProviderStatusSnapshot = {
+    connected: true,
+    health: "unknown",
+    message: null,
+    provider: "google",
+    email: "a@gmail.com",
+  };
+  assert.equal(providerNeedsAttention(googleUnknown), true);
+  assert.equal(providerBadgeHealth(googleUnknown), "not_connected");
+  const aggregate = aggregateWeekEventOutcomes([], googleUnknown, null);
+  assert.equal(aggregate.showReconnectPanel, true);
+});
+
+test("parseProviderIntegrationError detects upstream auth failures in list events", () => {
+  const parsed = parseProviderIntegrationError('401 {"error":"invalid_grant"} Calendar list events failed');
+  assert.equal(parsed.reconnectRequired, true);
 });
 
 test("status API maps health fields for frontend badges", () => {
