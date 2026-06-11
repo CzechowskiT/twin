@@ -26,6 +26,11 @@ export default function WorkspaceInvestorPage() {
             description: "workspace.toolInvestorPlacement",
           },
           {
+            href: "/investor/roadmap",
+            label: "investorRoadmap.title",
+            description: "workspace.toolInvestorRoadmap",
+          },
+          {
             href: "/investor/calculator",
             label: "nav.calculatorInvestor",
             description: "workspace.toolInvestorCalc",
