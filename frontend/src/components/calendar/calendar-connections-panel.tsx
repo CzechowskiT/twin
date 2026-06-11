@@ -47,6 +47,7 @@ export type CalendarConnectionsPanelProps = {
   onCopyWebcalLink: () => void;
   onGenerateWebcalLink: () => void;
   onRetryCalendarEvents?: () => void;
+  onRetryCalendarStatus?: () => void;
 };
 
 function StatusBadge({ provider }: { provider: ProviderState }) {
@@ -126,6 +127,7 @@ function ProviderCard({
   onConnect,
   onDisconnect,
   onRetryEvents,
+  onRetryStatus,
 }: {
   icon: ReactNode;
   titleKey: TranslationKey;
@@ -145,6 +147,7 @@ function ProviderCard({
   onConnect: () => void;
   onDisconnect: () => void;
   onRetryEvents?: () => void;
+  onRetryStatus?: () => void;
 }) {
   const { t } = useTranslation();
   const connectBusy = actionBusy === connectBusyKey;
@@ -186,12 +189,15 @@ function ProviderCard({
         >
           {connectBusy ? "…" : t(connectLabelKey)}
         </Button>
-      ) : provider.connected && provider.health === "temporary_error" && onRetryEvents ? (
+      ) : provider.connected && provider.health === "temporary_error" && (onRetryEvents || onRetryStatus) ? (
         <Button
           type="button"
           className="twin-touch-target mt-4 !w-auto self-start"
           disabled={anyBusy}
-          onClick={onRetryEvents}
+          onClick={() => {
+            onRetryStatus?.();
+            onRetryEvents?.();
+          }}
         >
           {t("dashboard.calendarRetryEvents")}
         </Button>
@@ -250,6 +256,7 @@ export function CalendarConnectionsPanel({
   onCopyWebcalLink,
   onGenerateWebcalLink,
   onRetryCalendarEvents,
+  onRetryCalendarStatus,
 }: CalendarConnectionsPanelProps) {
   const { t } = useTranslation();
 
@@ -284,6 +291,7 @@ export function CalendarConnectionsPanel({
           onConnect={onConnectGoogle}
           onDisconnect={onDisconnectGoogle}
           onRetryEvents={onRetryCalendarEvents}
+          onRetryStatus={onRetryCalendarStatus}
         />
         <ProviderCard
           icon={<MicrosoftCalendarIcon className="h-5 w-5" />}
@@ -304,6 +312,7 @@ export function CalendarConnectionsPanel({
           onConnect={onConnectMicrosoft}
           onDisconnect={onDisconnectMicrosoft}
           onRetryEvents={onRetryCalendarEvents}
+          onRetryStatus={onRetryCalendarStatus}
         />
       </div>
 
