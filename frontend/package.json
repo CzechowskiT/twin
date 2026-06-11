@@ -27,6 +27,7 @@
     "test:recruiter-inbox-visual": "npx --yes tsx scripts/recruiter-inbox-visual.test.ts && npx --yes tsx scripts/recruiter-inbox-chip-copy.test.ts",
     "test:recruiter-inbox-decision": "npx --yes tsx scripts/recruiter-inbox-decision.test.ts && npx --yes tsx scripts/recruiter-inbox-segments.test.ts && npm run test:recruiter-inbox-visual",
     "test:recruiter-review-card": "npx --yes tsx scripts/recruiter-review-card.test.ts",
+    "test:recruiter-candidate-search-mvp": "npx --yes tsx scripts/recruiter-candidate-search-mvp.test.ts",
     "test:pii-data-visibility": "npx --yes tsx scripts/pii-data-visibility.test.ts",
     "test:candidate-transparency": "npx --yes tsx scripts/candidate-transparency.test.ts",
     "test:homepage-nav": "npx --yes tsx scripts/homepage-nav.test.ts",
