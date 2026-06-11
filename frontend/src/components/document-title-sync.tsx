@@ -50,6 +50,8 @@ function titleKeyForPath(path: string): TranslationKey {
     "/for-recruiters": "meta.titleForRecruiters",
     "/for-companies": "meta.titleForCompanies",
     "/demo": "meta.titleDemo",
+    "/investor": "meta.titleInvestorRoom",
+    "/for-investors": "meta.titleForInvestors",
   };
   return map[path] ?? "meta.titleHome";
 }

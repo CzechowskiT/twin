@@ -22,6 +22,8 @@
 
 **Safe-lane merge (2026-06-11):** Recruiter **candidate message drafts** — 4 templates, copy-to-clipboard, local contact phase after accept; no email send, no hidden PII · `docs/RECRUITER_CANDIDATE_MESSAGE_DRAFTS_MVP_2026-06-11.md` · **does not change launch NO-GO**.
 
+**Safe-lane merge (2026-06-11):** **Investor room MVP** — `/investor` honest executive view (thesis, personas, demo map, live/demo/not-live status, roadmap, risks, founder CTA) · `docs/INVESTOR_ROOM_MVP_2026-06-11.md` · `test:investor-room-mvp` · **does not change launch NO-GO**.
+
 **Docs-only (2026-06-11):** H5c GO SMALL 1 prep pack · `docs/H5C_GO_SMALL_1_PREP_PACK_2026-06-11.md` — **ready for controlled Slot-1 recruiter visual/product review** · **does not change public launch NO-GO** · external invitations **not sent** · H5c/H5d **HOLD**.
 
 **Safe-lane merge (2026-06-10):** Recruiter inbox **readability/layout** — two-zone cards, chip caps, dominant match score, sentence-case labels · **does not change launch NO-GO**.

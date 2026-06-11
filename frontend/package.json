@@ -19,6 +19,7 @@
     "test:pricing-locale": "npx --yes tsx scripts/pricing-locale.test.ts",
     "test:investor-calculator": "npx --yes tsx scripts/investor-calculator-model.test.ts",
     "test:investor-roadmap-founder-updates": "npx --yes tsx scripts/investor-roadmap-founder-updates.test.ts",
+    "test:investor-room-mvp": "npx --yes tsx scripts/investor-room-mvp.test.ts",
     "test:b2b-roi-calculator": "npx --yes tsx scripts/b2b-roi-calculator-model.test.ts",
     "test:recruiter-inbox-premium-card-ui": "npx --yes tsx scripts/recruiter-inbox-premium-card-ui.test.ts",
     "test:recruiter-decision-rail-readability": "npx --yes tsx scripts/recruiter-decision-rail-readability.test.ts",
