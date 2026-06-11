@@ -21,6 +21,7 @@ KNOWN_REVISIONS = frozenset(
         "054_recruiter_pipeline_status",
         "055_recruiter_manual_scheduling",
         "056_recruiter_application_scorecards",
+        "057_candidate_evidence_items",
     }
 )
 
