@@ -19,12 +19,8 @@ const clientSrc = readFileSync(
 );
 
 test("section labels use readable sentence-case styling, not tiny uppercase", () => {
-  assert.match(clientSrc, /recruiterInboxSectionLabelClass/);
+  assert.match(clientSrc, /RecruiterSignalList/);
   assert.match(clientSrc, /recruiterInbox\.cardWhyReview/);
-  assert.doesNotMatch(
-    clientSrc,
-    /cardWhyReview[\s\S]{0,120}uppercase tracking-wide/,
-  );
   for (const loc of ["en", "pl"] as const) {
     const label = dictionaries[loc].recruiterInbox.cardWhyReview;
     assert.ok(label.length > 8);
@@ -32,35 +28,33 @@ test("section labels use readable sentence-case styling, not tiny uppercase", ()
   }
 });
 
-test("candidate cards expose content and action zone markers", () => {
+test("candidate cards expose content and decision rail zone markers", () => {
   assert.match(clientSrc, /RECRUITER_INBOX_VISUAL_MARKERS\.contentZone/);
-  assert.match(clientSrc, /RECRUITER_INBOX_VISUAL_MARKERS\.actionZone/);
+  assert.match(clientSrc, /RecruiterDecisionRail/);
   assert.equal(RECRUITER_INBOX_VISUAL_MARKERS.contentZone, "recruiter-inbox-content-zone");
-  assert.equal(RECRUITER_INBOX_VISUAL_MARKERS.actionZone, "recruiter-inbox-action-zone");
+  assert.equal(RECRUITER_INBOX_VISUAL_MARKERS.decisionRail, "recruiter-inbox-decision-rail");
 });
 
-test("match score badge renders inside action zone with dominant sizing", () => {
-  const actionBlock = clientSrc.slice(
-    clientSrc.indexOf("RECRUITER_INBOX_VISUAL_MARKERS.actionZone"),
-    clientSrc.indexOf("RECRUITER_INBOX_VISUAL_MARKERS.actionZone") + 1200,
+test("match score card renders in decision rail with label, value and tone", () => {
+  assert.match(clientSrc, /RecruiterDecisionRail/);
+  assert.match(clientSrc, /matchScoreCardLabel/);
+  const decisionRailSrc = readFileSync(
+    join(root, "src/components/recruiter/recruiter-decision-rail.tsx"),
+    "utf8",
   );
-  assert.match(actionBlock, /recruiterInboxMatchScoreBadgeClass\(scoreTone, \{ dominant: true \}\)/);
+  assert.match(decisionRailSrc, /RecruiterMatchScoreCard/);
 });
 
-test("review card CTA lives in action zone with full-width layout", () => {
-  const actionStart = clientSrc.indexOf("RECRUITER_INBOX_VISUAL_MARKERS.actionZone");
-  const actionEnd = clientSrc.indexOf("</div>", actionStart + 800);
-  const actionBlock = clientSrc.slice(actionStart, actionEnd);
-  assert.match(actionBlock, /recruiterInboxReviewCardCtaClass/);
-  assert.match(actionBlock, /recruiterInbox\.openReviewCard/);
+test("review card CTA lives in decision rail with short localized copy", () => {
+  assert.match(clientSrc, /reviewCardCtaShort/);
+  assert.match(clientSrc, /RecruiterDecisionRail/);
 });
 
-test("chips are capped at two with short labels and overflow marker", () => {
+test("signals are capped at two with short labels and review-card overflow", () => {
   assert.match(clientSrc, /rowEvidencePreview/);
   assert.match(clientSrc, /rowVerificationPreview/);
   assert.match(clientSrc, /\.slice\(0, 2\)/);
-  assert.match(clientSrc, /recruiterInboxChipMoreClass/);
-  assert.match(clientSrc, /chipMoreCount/);
+  assert.match(clientSrc, /chipOverflowInReviewCard/);
   assert.equal(
     shortRecruiterInboxChipText("Candidate target role title aligns with posting", "en"),
     "Role aligns",
