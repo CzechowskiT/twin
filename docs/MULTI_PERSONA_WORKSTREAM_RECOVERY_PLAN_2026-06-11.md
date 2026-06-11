@@ -103,17 +103,19 @@ One branch → one PR → CI green → production smoke → **then** next workst
 
 | Order | Workstream | Migration revision |
 |---|---|---|
-| 6 | Recruiter Audit Trail | `051_recruiter_audit_events` |
-| 7 | Recruiter Pipeline | `052_recruiter_pipeline_status` |
-| 8 | Recruiter Notes / Scorecards | `053_recruiter_application_scorecards` |
+| — | Company role fields | `051_company_role_fields` (merged) |
+| — | Calendar access token cache | `052_calendar_access_token_cache` (merged) |
+| 6 | Recruiter Audit Trail | `053_recruiter_audit_events` (merged) |
+| 7 | Recruiter Pipeline | `054_recruiter_pipeline_status` (merged) |
+| 8 | Recruiter Notes / Scorecards | `056_recruiter_application_scorecards` (planned) |
 | 9 | Recruiter Message Drafts | verify merged — no new migration |
-| 10 | Recruiter Manual Scheduling | `054_recruiter_manual_scheduling` |
+| 10 | Recruiter Manual Scheduling | `055_recruiter_manual_scheduling` (merged) |
 
 ### Phase 3 — candidate core
 
 | Order | Workstream | Migration revision |
 |---|---|---|
-| 11 | Candidate Profile / Evidence Vault | `055_candidate_evidence_items` |
+| 11 | Candidate Profile / Evidence Vault | `057_candidate_evidence_items` (planned) |
 | 12 | Candidate Timeline / Career CRM | TBD |
 | 13 | Candidate Interview Prep | TBD |
 

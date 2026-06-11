@@ -33,7 +33,7 @@ Manual interview scheduling for **accepted / to_contact** candidates in the recr
 }
 ```
 
-Statuses: `invited` | `interview_scheduled`. Persists on `applications` (migration `052_recruiter_manual_scheduling`).
+Statuses: `invited` | `interview_scheduled`. Persists on `applications` (migration `055_recruiter_manual_scheduling`).
 
 ## Hard bans (unchanged)
 

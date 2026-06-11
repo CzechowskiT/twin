@@ -4,7 +4,7 @@
 Append-only log of recruiter-side actions on an application — trust and compliance without storing decline notes or candidate PII in the audit ledger.
 
 ## Shipped scope
-- **DB:** `recruiter_audit_events` (Alembic `051_recruiter_audit_events`, `down_revision = 050_stripe_webhook_events`)
+- **DB:** `recruiter_audit_events` (Alembic `053_recruiter_audit_events`, `down_revision = 052_calendar_access_token_cache`)
 - **Auto-logged:** accept → `decision_accept`, decline → `decision_decline` (via `recruiter_inbox.respond_recruiter_batch`)
 - **Client-logged:** review card expand → `review_opened` (POST allowed types only)
 - **API:** `GET/POST /api/v1/recruiter/inbox/{application_id}/audit` (same recruiter token + company slug as inbox)
