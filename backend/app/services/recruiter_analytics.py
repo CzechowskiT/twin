@@ -1,4 +1,4 @@
-"""Recruiter analytics — read-only workspace aggregates (no fake traction)."""
+"""Recruiter workspace analytics — read-only aggregates, no PII."""
 
 from __future__ import annotations
 
@@ -7,78 +7,51 @@ from datetime import datetime, timedelta, timezone
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from app.database.models import Application, ApplicationStatus, Job, RecruiterAuditEvent, RecruiterPipelineStatus
+from app.database.models import Application, ApplicationStatus, Job, RecruiterAuditEvent
 from app.services.recruiter_inbox import _require_company_slug
-from app.utils.slug import slugify_company
 
 
-def build_recruiter_analytics(db: Session, *, company_slug: str) -> dict:
+def build_recruiter_analytics(db: Session, *, company_slug: str, days: int = 7) -> dict:
     slug = _require_company_slug(company_slug)
-    since = datetime.now(timezone.utc) - timedelta(days=7)
+    since = datetime.now(timezone.utc) - timedelta(days=max(1, min(days, 30)))
 
-    rows = (
+    apps = (
         db.query(Application, Job)
         .join(Job, Application.job_id == Job.id)
-        .filter(
-            Application.status.in_(
-                (
-                    ApplicationStatus.PENDING,
-                    ApplicationStatus.APPLIED,
-                    ApplicationStatus.INTERVIEW,
-                    ApplicationStatus.REJECTED,
-                )
-            ),
-        )
+        .filter(Job.job_board == "employer", Job.external_id.like(f"{slug}-%"))
         .all()
     )
-    apps = [(a, j) for a, j in rows if slugify_company(j.company) == slug]
 
-    in_review = sum(1 for a, _ in apps if a.status == ApplicationStatus.APPLIED)
-    accepted = sum(1 for a, _ in apps if a.status == ApplicationStatus.INTERVIEW)
-    rejected = sum(1 for a, _ in apps if a.status == ApplicationStatus.REJECTED)
+    status_counts: dict[str, int] = {}
+    for app, _job in apps:
+        key = app.status.value if hasattr(app.status, "value") else str(app.status)
+        status_counts[key] = status_counts.get(key, 0) + 1
 
-    pipeline_counts: dict[str, int] = {s.value: 0 for s in RecruiterPipelineStatus}
-    for app, _ in apps:
-        ps = (app.recruiter_pipeline_status or "").strip()
-        if ps in pipeline_counts:
-            pipeline_counts[ps] += 1
-
-    audit_events = (
-        db.query(func.count(RecruiterAuditEvent.id))
+    audit_q = (
+        db.query(RecruiterAuditEvent.action_type, func.count(RecruiterAuditEvent.id))
         .filter(
             RecruiterAuditEvent.company_slug == slug,
             RecruiterAuditEvent.created_at >= since,
         )
-        .scalar()
+        .group_by(RecruiterAuditEvent.action_type)
     )
-    decisions = (
-        db.query(func.count(RecruiterAuditEvent.id))
-        .filter(
-            RecruiterAuditEvent.company_slug == slug,
-            RecruiterAuditEvent.created_at >= since,
-            RecruiterAuditEvent.action_type.in_(("decision_accept", "decision_decline")),
-        )
-        .scalar()
-    )
+    audit_counts = {row[0]: int(row[1]) for row in audit_q.all()}
+
+    decisions = audit_counts.get("decision_accept", 0) + audit_counts.get("decision_decline", 0)
 
     return {
         "company_slug": slug,
         "source": "workspace",
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "window_days": 7,
-        "inbox": {
-            "in_review": in_review,
-            "accepted": accepted,
-            "rejected": rejected,
-            "total_tracked": len(apps),
-        },
-        "pipeline_stages": pipeline_counts,
-        "activity": {
-            "audit_events_7d": int(audit_events or 0),
-            "decisions_logged_7d": int(decisions or 0),
-        },
+        "window_days": days,
+        "applications_total": len(apps),
+        "applications_by_status": status_counts,
+        "audit_events_total": sum(audit_counts.values()),
+        "audit_decisions": decisions,
+        "audit_reviews_opened": audit_counts.get("review_opened", 0),
+        "calendar_sync_live": False,
         "readiness": {
-            "export_live": False,
-            "bi_live": False,
+            "public_launch": False,
+            "analytics_export": False,
         },
     }

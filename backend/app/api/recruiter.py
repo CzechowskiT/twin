@@ -12,12 +12,12 @@ from app.config import Settings, get_settings
 from app.database.session import get_db
 from app.limiter import limiter, recruiter_token_key
 from app.services.recruiter_company_auth import resolve_recruiter_access
+from app.services.recruiter_analytics import build_recruiter_analytics
 from app.services.recruiter_audit_trail import (
     RECRUITER_CLIENT_AUDIT_ACTION_TYPES,
     list_recruiter_audit_events,
     log_recruiter_audit_event,
 )
-from app.services.recruiter_analytics import build_recruiter_analytics
 from app.services.recruiter_candidate_search import build_recruiter_candidate_search
 from app.services.recruiter_inbox import (
     build_recruiter_batch,
@@ -25,6 +25,7 @@ from app.services.recruiter_inbox import (
     respond_recruiter_batch_bulk,
 )
 from app.services.recruiter_pipeline import build_recruiter_pipeline, transition_recruiter_pipeline
+from app.services.recruiter_scorecards import get_recruiter_scorecard, upsert_recruiter_scorecard
 from app.services.recruiter_scheduling import save_recruiter_manual_schedule
 from app.services.recruiter_jobs import create_company_job, list_company_jobs
 from app.services.request_locale import locale_from_request
@@ -148,6 +149,52 @@ class RecruiterAuditLogIn(BaseModel):
     meta: dict[str, str] | None = Field(None, description="Optional non-PII metadata")
 
 
+class RecruiterScorecardIn(BaseModel):
+    rating: int | None = Field(default=None, ge=1, le=5)
+    note: str | None = Field(default=None, max_length=2000)
+
+
+@router.get("/inbox/{application_id}/scorecard")
+def recruiter_inbox_scorecard_get(
+    application_id: int,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return get_recruiter_scorecard(db, application_id=application_id, company_slug=slug)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.put("/inbox/{application_id}/scorecard")
+@limiter.limit("60/minute", key_func=recruiter_token_key)
+def recruiter_inbox_scorecard_upsert(
+    request: Request,
+    application_id: int,
+    body: RecruiterScorecardIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return upsert_recruiter_scorecard(
+            db,
+            application_id=application_id,
+            company_slug=slug,
+            rating=body.rating,
+            note=body.note,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
 @router.get("/inbox/{application_id}/audit")
 def recruiter_inbox_audit_list(
     application_id: int,
@@ -213,36 +260,6 @@ def recruiter_inbox_respond_batch(
             action=body.action,
             decline_note=body.decline_note,
         )
-    except ValueError as exc:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
-
-
-@router.get("/analytics")
-def recruiter_analytics(
-    db: Session = Depends(get_db),
-    settings: Settings = Depends(get_settings),
-    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
-    company_slug: str | None = Query(None, max_length=80),
-) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
-    try:
-        return build_recruiter_analytics(db, company_slug=slug)
-    except ValueError as exc:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
-
-
-@router.get("/analytics")
-def recruiter_analytics(
-    db: Session = Depends(get_db),
-    settings: Settings = Depends(get_settings),
-    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
-    company_slug: str | None = Query(None, max_length=80),
-) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
-    try:
-        return build_recruiter_analytics(db, company_slug=slug)
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
@@ -317,6 +334,22 @@ def recruiter_inbox_schedule(
             meeting_link=body.meeting_link,
             scheduling_status=body.scheduling_status,
         )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.get("/analytics")
+def recruiter_analytics(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+    days: int = Query(7, ge=1, le=30),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return build_recruiter_analytics(db, company_slug=slug, days=days)
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 

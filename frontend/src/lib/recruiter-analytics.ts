@@ -1,25 +1,21 @@
-/** Recruiter analytics payload types — workspace-scoped, no PII. */
+/** Recruiter analytics — workspace read-only aggregates. */
 
 export type RecruiterAnalyticsPayload = {
   company_slug: string;
   source: string;
   generated_at: string;
   window_days: number;
-  inbox: {
-    in_review: number;
-    accepted: number;
-    rejected: number;
-    total_tracked: number;
-  };
-  pipeline_stages: Record<string, number>;
-  activity: {
-    audit_events_7d: number;
-    decisions_logged_7d: number;
-  };
-  readiness: {
-    export_live: boolean;
-    bi_live: boolean;
-  };
+  applications_total: number;
+  applications_by_status: Record<string, number>;
+  audit_events_total: number;
+  audit_decisions: number;
+  audit_reviews_opened: number;
+  calendar_sync_live: boolean;
+  readiness: { public_launch: boolean; analytics_export: boolean };
 };
 
 export const RECRUITER_ANALYTICS_ROUTE = "/recruiter/analytics";
+
+export function isRecruiterAnalyticsWorkspaceScoped(p: RecruiterAnalyticsPayload): boolean {
+  return p.source === "workspace" && Boolean(p.company_slug?.trim());
+}
