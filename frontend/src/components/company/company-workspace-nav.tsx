@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { useTranslation } from "@/components/language-provider";
+import type { TranslationKey } from "@/lib/i18n";
 import { COMPANY_ROLES_ROUTE } from "@/lib/company-jobs-roles";
 import { COMPANY_TEAM_ROUTE } from "@/lib/company-team-permissions";
 
@@ -39,7 +40,7 @@ export function CompanyWorkspaceNav() {
                 : "rounded-full px-3 py-1.5 text-sm text-[var(--twin-muted-strong)] hover:bg-[var(--twin-surface-soft)]"
             }
           >
-            {t(`${item.ns}.${item.key}`)}
+            {t(`${item.ns}.${item.key}` as TranslationKey)}
           </Link>
         );
       })}

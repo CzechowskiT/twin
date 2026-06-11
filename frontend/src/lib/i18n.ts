@@ -4669,6 +4669,10 @@ const pl: MessageTree = {
     calendarConnectedSuccessBody: "Twoje wydarzenia są teraz widoczne w TWIN.",
     calendarNotConnected: "Nie połączono",
     calendarReconnectRequired: "Wymaga ponownego połączenia",
+    calendarTemporaryError: "Tymczasowy błąd",
+    calendarTemporaryErrorHint:
+      "Google lub Microsoft jest chwilowo niedostępny. Spróbuj ponownie za chwilę.",
+    calendarRetryEvents: "Ponów wczytywanie wydarzeń",
     calendarIntegrationError: "Błąd integracji",
     calendarProviderGoogleReconnect:
       "Dostęp do Google Calendar wygasł. Odłącz i połącz Google ponownie.",
