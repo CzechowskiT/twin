@@ -12,6 +12,7 @@ from app.config import Settings, get_settings
 from app.database.session import get_db
 from app.limiter import limiter, recruiter_token_key
 from app.services.recruiter_company_auth import resolve_recruiter_access
+from app.services.recruiter_analytics import build_recruiter_analytics
 from app.services.recruiter_audit_trail import (
     RECRUITER_CLIENT_AUDIT_ACTION_TYPES,
     list_recruiter_audit_events,
@@ -333,6 +334,22 @@ def recruiter_inbox_schedule(
             meeting_link=body.meeting_link,
             scheduling_status=body.scheduling_status,
         )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.get("/analytics")
+def recruiter_analytics(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+    days: int = Query(7, ge=1, le=30),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return build_recruiter_analytics(db, company_slug=slug, days=days)
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 

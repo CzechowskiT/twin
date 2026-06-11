@@ -9,6 +9,7 @@ import type { TranslationKey } from "@/lib/i18n";
 const TABS: { href: string; labelKey: TranslationKey }[] = [
   { href: "/recruiter/inbox", labelKey: "recruiterInbox.title" },
   { href: "/recruiter/pipeline", labelKey: "recruiterPipeline.title" },
+  { href: "/recruiter/analytics", labelKey: "recruiterAnalytics.title" },
   { href: "/recruiter/jobs", labelKey: "recruiterJobs.title" },
   { href: "/recruiter/calendar", labelKey: "recruiterCalendar.title" },
   { href: "/recruiter/integrations", labelKey: "recruiterIntegrations.navLink" },

@@ -61,6 +61,7 @@
     "test:company-team-permissions-mvp": "npx --yes tsx scripts/company-team-permissions-mvp.test.ts",
     "test:recruiter-scheduling-mvp": "npx --yes tsx scripts/recruiter-scheduling-mvp.test.ts",
     "test:recruiter-pipeline-mvp": "npx --yes tsx scripts/recruiter-pipeline-mvp.test.ts",
+    "test:recruiter-analytics-mvp": "npx --yes tsx scripts/recruiter-analytics-mvp.test.ts",
     "test:recruiter-integrations-readiness-mvp": "npx --yes tsx scripts/recruiter-integrations-readiness-mvp.test.ts",
     "test:investor-data-room-request-access": "npx --yes tsx scripts/investor-data-room-request-access.test.ts"
   },
