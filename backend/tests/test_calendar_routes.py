@@ -502,7 +502,14 @@ def _calendar_user_override(user_id: int, email: str):
 def test_google_status_health_ok_when_refresh_succeeds(
     mock_probe: MagicMock, _mock_oauth: MagicMock, client: TestClient
 ) -> None:
-    mock_probe.return_value = (True, "ok", None, "founder@gmail.com")
+    from app.services.calendar_oauth_credentials import CalendarProviderStatusPayload
+
+    mock_probe.return_value = CalendarProviderStatusPayload(
+        connected=True,
+        health="ok",
+        message=None,
+        email="founder@gmail.com",
+    )
     app.dependency_overrides[get_current_user] = _calendar_user_override(10, "founder@gmail.com")
     app.dependency_overrides[get_db] = _sqlite_calendar_session
     try:
@@ -522,11 +529,14 @@ def test_google_status_health_ok_when_refresh_succeeds(
 def test_google_status_reconnect_required_when_refresh_fails(
     mock_probe: MagicMock, _mock_oauth: MagicMock, client: TestClient
 ) -> None:
-    mock_probe.return_value = (
-        True,
-        "reconnect_required",
-        "Calendar token expired or revoked; reconnect Google Calendar.",
-        "founder@gmail.com",
+    from app.services.calendar_oauth_credentials import CalendarProviderStatusPayload
+
+    mock_probe.return_value = CalendarProviderStatusPayload(
+        connected=True,
+        health="reconnect_required",
+        message="Calendar token expired or revoked; reconnect Google Calendar.",
+        email="founder@gmail.com",
+        can_reconnect=True,
     )
     app.dependency_overrides[get_current_user] = _calendar_user_override(11, "founder@gmail.com")
     app.dependency_overrides[get_db] = _sqlite_calendar_session
@@ -547,7 +557,14 @@ def test_google_status_reconnect_required_when_refresh_fails(
 def test_microsoft_status_disconnected_without_row(
     mock_probe: MagicMock, _mock_oauth: MagicMock, client: TestClient
 ) -> None:
-    mock_probe.return_value = (False, "unknown", None, None)
+    from app.services.calendar_oauth_credentials import CalendarProviderStatusPayload
+
+    mock_probe.return_value = CalendarProviderStatusPayload(
+        connected=False,
+        health="unknown",
+        message=None,
+        email=None,
+    )
     app.dependency_overrides[get_current_user] = _calendar_user_override(12, "ms@twin.test")
     app.dependency_overrides[get_db] = _sqlite_calendar_session
     try:

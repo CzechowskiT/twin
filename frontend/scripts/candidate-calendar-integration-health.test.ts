@@ -25,6 +25,8 @@ const googleOk: CalendarProviderStatusSnapshot = {
   message: null,
   provider: "google",
   email: "a@gmail.com",
+  canReconnect: false,
+  canRetry: false,
 };
 
 const googleReconnect: CalendarProviderStatusSnapshot = {
@@ -33,6 +35,8 @@ const googleReconnect: CalendarProviderStatusSnapshot = {
   message: "Calendar token expired or revoked; reconnect Google Calendar.",
   provider: "google",
   email: "a@gmail.com",
+  canReconnect: true,
+  canRetry: false,
 };
 
 const microsoftOk: CalendarProviderStatusSnapshot = {
@@ -41,6 +45,8 @@ const microsoftOk: CalendarProviderStatusSnapshot = {
   message: null,
   provider: "microsoft",
   email: "b@outlook.com",
+  canReconnect: false,
+  canRetry: false,
 };
 
 const microsoftReconnect: CalendarProviderStatusSnapshot = {

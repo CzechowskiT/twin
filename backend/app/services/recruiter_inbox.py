@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 
 from app.database.models import Application, ApplicationStatus, Candidate, Job
+from app.services.recruiter_audit_trail import log_recruiter_audit_event
 from app.services.recruiter_match_explanations import build_recruiter_match_summary
 from app.utils.slug import slugify_company
 
@@ -86,6 +87,7 @@ def respond_recruiter_batch(
     if slugify_company(job.company) != slug:
         raise ValueError("Application does not belong to this company.")
     act = action.strip().lower()
+    status_before = app.status.value
     if act == "accept":
         app.status = ApplicationStatus.INTERVIEW
     elif act == "decline":
@@ -99,6 +101,18 @@ def respond_recruiter_batch(
     db.add(app)
     db.commit()
     db.refresh(app)
+    audit_action = "decision_accept" if act == "accept" else "decision_decline"
+    log_recruiter_audit_event(
+        db,
+        application_id=app.id,
+        company_slug=slug,
+        action_type=audit_action,
+        meta={
+            "status_before": status_before,
+            "status_after": app.status.value,
+            "source": "inbox_respond",
+        },
+    )
     return {"application_id": app.id, "status": app.status.value}
 
 

@@ -5,6 +5,7 @@ from fastapi import APIRouter
 from app.api import (
     auto_apply_settings,
     admin_ops,
+    company,
     consent,
     csp_reports,
     demo,
@@ -17,6 +18,7 @@ from app.api import (
     calendar,
     calendar_microsoft,
     candidates,
+    company,
     career_assistant,
     curated_careers,
     gamification,
@@ -74,3 +76,5 @@ api_router.include_router(admin_ops.router, prefix="/admin", tags=["Admin"])
 api_router.include_router(ops.router, prefix="/ops", tags=["Ops"])
 api_router.include_router(investor_data_room.router, prefix="/investor", tags=["Investor"])
 api_router.include_router(recruiter.router, prefix="/recruiter", tags=["Recruiter"])
+api_router.include_router(company.router, prefix="/company", tags=["Company"])
+api_router.include_router(company.router, prefix="/company", tags=["Company"])
