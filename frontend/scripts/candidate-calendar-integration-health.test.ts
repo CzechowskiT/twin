@@ -6,6 +6,7 @@ import test from "node:test";
 
 import {
   aggregateWeekEventOutcomes,
+  connectionHealthForProvider,
   displayHealthForProvider,
   hasAnyHealthyProvider,
   healthAfterWeekFetch,
@@ -144,23 +145,22 @@ test("scenario 7: generic app auth invalid → still redirects to login", () => 
   assert.equal(shouldClearSessionOnApiError(401, "Inactive user", "/api/v1/calendar/me/interviews"), true);
 });
 
-test("scenario 8: healthy provider events fail with 502 → generic error path, not reconnect panel", () => {
-  const aggregate = aggregateWeekEventOutcomes(
-    [
-      {
-        provider: "google",
-        events: [],
-        failed: true,
-        reconnectRequired: false,
-        temporaryError: false,
-        message: "502 Calendar list events failed",
-      },
-    ],
-    googleOk,
-    null,
-  );
+test("scenario 8: healthy provider events fail with 502 → week error only, card stays connected", () => {
+  const outcomes = [
+    {
+      provider: "google" as const,
+      events: [],
+      failed: true,
+      reconnectRequired: false,
+      temporaryError: true,
+      message: "502 Calendar list events failed",
+    },
+  ];
+  const aggregate = aggregateWeekEventOutcomes(outcomes, googleOk, null);
   assert.equal(aggregate.showReconnectPanel, false);
   assert.equal(aggregate.allHealthyProvidersFailed, true);
+  assert.equal(connectionHealthForProvider(googleOk, outcomes), "ok");
+  assert.equal(providerBadgeHealth({ ...googleOk, health: "ok" }), "connected");
 });
 
 test("scenario 10: status ok but events reconnect → panel and merged badge health", () => {

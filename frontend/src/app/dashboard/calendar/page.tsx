@@ -23,9 +23,11 @@ import { calendarProviderLabel } from "@/lib/calendar-provider";
 import {
   aggregateWeekEventOutcomes,
   CALENDAR_FETCH_TIMEOUT_MS,
+  connectionHealthForProvider,
   debugCalendarLog,
-  displayHealthForProvider,
+  diagnosticFromErrorMessage,
   eventsPhaseFromFlags,
+  logCalendarOperationDiagnostic,
   hasAnyConnectedProvider,
   hasAnyHealthyProvider,
   healthyProvidersToFetch,
@@ -222,8 +224,8 @@ export default function DashboardCalendarPage() {
     ? statusSnapshotFromApi("microsoft", msStatus)
     : null;
 
-  const googleDisplayHealth = displayHealthForProvider(googleSnapshot, weekFetchOutcomes);
-  const microsoftDisplayHealth = displayHealthForProvider(microsoftSnapshot, weekFetchOutcomes);
+  const googleDisplayHealth = connectionHealthForProvider(googleSnapshot, weekFetchOutcomes);
+  const microsoftDisplayHealth = connectionHealthForProvider(microsoftSnapshot, weekFetchOutcomes);
 
   const isCalendarConnected = hasAnyConnectedProvider(googleSnapshot, microsoftSnapshot);
   const isCalendarUsable = hasAnyHealthyProvider(googleSnapshot, microsoftSnapshot);
@@ -480,6 +482,7 @@ export default function DashboardCalendarPage() {
           } catch (e) {
             const msg = e instanceof Error ? e.message : String(e);
             const parsed = parseProviderIntegrationError(msg);
+            logCalendarOperationDiagnostic(diagnosticFromErrorMessage(provider, "events_read", msg));
             return {
               provider,
               events: [],
@@ -944,7 +947,7 @@ export default function DashboardCalendarPage() {
       ) : null}
       {actionError ? (
         <Card variant="soft" className="mb-4">
-          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.calendarErrorGeneric")}</p>
+          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.calendarActionFailedRetry")}</p>
         </Card>
       ) : null}
 
@@ -956,10 +959,14 @@ export default function DashboardCalendarPage() {
           events={displayEvents}
           loading={eventsLoading}
           loadError={eventsLoadError}
+          eventsPhase={eventsPhase}
           showEmptyWeek={weekShowEmpty}
           showReconnectPanel={weekShowReconnectPanel}
           showPartialWarning={weekShowPartialWarning}
           failedProviders={weekFailedProviders}
+          onRetryEvents={() => {
+            void fetchCalendarWeekEvents();
+          }}
           accountEmail={
             googleSnapshot?.connected && googleDisplayHealth === "ok"
               ? googleSnapshot.email

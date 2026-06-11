@@ -1174,7 +1174,16 @@ const en = {
     calendarBlockTitle: "Place a 45-minute interview block (UTC, test)",
     calendarBlockGo: "Create calendar event",
     calendarConnectedAs: "Calendar account",
-    calendarErrorGeneric: "That calendar action failed. Try disconnecting and connecting again.",
+    calendarActionFailedRetry:
+      "That calendar step did not complete. Your accounts stay connected — try again in a moment.",
+    calendarEventsReadError: "Could not load this week's events right now.",
+    calendarEventsReadRetryHint:
+      "Your Google and Microsoft connections are still active. Retry below or use the WebCal feed while we catch up.",
+    calendarConnectionProbeError:
+      "We could not verify this calendar connection. Retry below or reconnect only if prompted on this card.",
+    calendarMicrosoftUnsupportedAccount:
+      "This Microsoft sign-in may be a personal mailbox without calendar API access. Use a work or school Microsoft 365 account, or rely on WebCal for interview holds.",
+    calendarErrorGeneric: "Something went wrong with calendar sign-in. Try Connect again from this page.",
     calendarErrorGoogleDenied: "Google sign-in was cancelled. Try Connect again when ready.",
     calendarErrorMicrosoftDenied: "Microsoft sign-in was cancelled. Try Connect again when ready.",
     calendarErrorExchange:
@@ -4948,7 +4957,16 @@ const pl: MessageTree = {
     calendarBlockTitle: "Dodaj 45-min blok „interview” (UTC, test)",
     calendarBlockGo: "Utwórz wydarzenie",
     calendarConnectedAs: "Konto kalendarza",
-    calendarErrorGeneric: "Akcja kalendarza nie powiodła się. Spróbuj odłączyć i połączyć ponownie.",
+    calendarActionFailedRetry:
+      "Ten krok kalendarza się nie udał. Konta pozostają połączone — spróbuj ponownie za chwilę.",
+    calendarEventsReadError: "Nie udało się teraz wczytać wydarzeń z tego tygodnia.",
+    calendarEventsReadRetryHint:
+      "Połączenia Google i Microsoft nadal są aktywne. Ponów poniżej lub użyj kanału WebCal na czas problemu.",
+    calendarConnectionProbeError:
+      "Nie udało się zweryfikować tego połączenia kalendarza. Ponów poniżej lub połącz ponownie tylko gdy karta tego wymaga.",
+    calendarMicrosoftUnsupportedAccount:
+      "To konto Microsoft może być skrzynką osobistą bez dostępu do API kalendarza. Użyj konta Microsoft 365 (praca/szkoła) albo WebCal na rezerwacje rozmów.",
+    calendarErrorGeneric: "Coś poszło nie tak przy logowaniu kalendarza. Spróbuj Połącz ponownie z tej strony.",
     calendarErrorGoogleDenied: "Logowanie Google anulowane. Spróbuj Połącz ponownie.",
     calendarErrorMicrosoftDenied: "Logowanie Microsoft anulowane. Spróbuj Połącz ponownie.",
     calendarErrorExchange:

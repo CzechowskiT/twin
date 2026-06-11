@@ -52,6 +52,7 @@
     "test:candidate-calendar-integration-health": "npx --yes tsx scripts/candidate-calendar-integration-health.test.ts",
     "test:candidate-calendar-loading-state": "npx --yes tsx scripts/candidate-calendar-loading-state.test.ts",
     "test:candidate-calendar-p0-root-cause": "npx --yes tsx scripts/candidate-calendar-p0-root-cause.test.ts",
+    "test:candidate-calendar-incident": "npx --yes tsx scripts/candidate-calendar-incident.test.ts",
     "test:candidate-google-calendar-stability": "npx --yes tsx scripts/candidate-google-calendar-stability.test.ts",
     "test:candidate-calendar-success-alert": "npx --yes tsx scripts/candidate-calendar-success-alert.test.ts",
     "test:interactive-demo": "npx --yes tsx scripts/interactive-demo.test.ts",

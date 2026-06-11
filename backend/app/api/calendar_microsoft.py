@@ -52,6 +52,7 @@ from app.services.calendar_oauth_credentials import (
 )
 from app.services.calendar_provider_health import (
     calendar_upstream_auth_failure,
+    microsoft_unsupported_account_failure,
     probe_microsoft_calendar_health,
 )
 from app.services.microsoft_calendar_oauth import (
@@ -105,6 +106,11 @@ def _list_microsoft_events_with_retry(db: Session, user_id: int, time_min: str, 
     try:
         return list_calendar_view_events(access, time_min, time_max, max_results=limit)
     except MicrosoftCalendarApiError as exc:
+        if microsoft_unsupported_account_failure(exc):
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Unsupported Microsoft personal account for calendar API; use Microsoft 365 work or school.",
+            ) from exc
         if not calendar_upstream_auth_failure(exc):
             if calendar_upstream_transient(exc):
                 raise HTTPException(
@@ -116,6 +122,11 @@ def _list_microsoft_events_with_retry(db: Session, user_id: int, time_min: str, 
         try:
             return list_calendar_view_events(access, time_min, time_max, max_results=limit)
         except MicrosoftCalendarApiError as retry_exc:
+            if microsoft_unsupported_account_failure(retry_exc):
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="Unsupported Microsoft personal account for calendar API; use Microsoft 365 work or school.",
+                ) from retry_exc
             if calendar_upstream_auth_failure(retry_exc):
                 raise HTTPException(
                     status_code=status.HTTP_428_PRECONDITION_REQUIRED,

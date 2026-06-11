@@ -2,14 +2,17 @@
 
 import { useTranslation } from "@/components/language-provider";
 import { Card } from "@/components/ui";
+import { Button } from "@/components/ui";
 import type { CalendarProvider } from "@/lib/calendar-week";
 import { addDays, eventsByDay, formatEventTimeRange, type DisplayCalendarEvent } from "@/lib/calendar-week";
+import type { EventsPhase } from "@/lib/calendar-provider-health";
 
 type CalendarWeekViewProps = {
   weekStart: Date;
   events: DisplayCalendarEvent[];
   loading: boolean;
   loadError: boolean;
+  eventsPhase?: EventsPhase;
   showEmptyWeek: boolean;
   showReconnectPanel: boolean;
   showPartialWarning: boolean;
@@ -19,6 +22,7 @@ type CalendarWeekViewProps = {
   onPrevWeek: () => void;
   onNextWeek: () => void;
   onToday: () => void;
+  onRetryEvents?: () => void;
 };
 
 export function CalendarWeekView({
@@ -26,6 +30,7 @@ export function CalendarWeekView({
   events,
   loading,
   loadError,
+  eventsPhase,
   showEmptyWeek,
   showReconnectPanel,
   showPartialWarning,
@@ -35,6 +40,7 @@ export function CalendarWeekView({
   onPrevWeek,
   onNextWeek,
   onToday,
+  onRetryEvents,
 }: CalendarWeekViewProps) {
   const { t, locale } = useTranslation();
   const loc = locale === "pl" ? "pl-PL" : "en-US";
@@ -83,10 +89,18 @@ export function CalendarWeekView({
           </p>
           <p className="mt-1 text-sm text-amber-900 dark:text-amber-100/90">{t("dashboard.calendarAllProvidersReconnectBody")}</p>
         </div>
-      ) : loadError ? (
-        <p className="mt-4 text-sm text-red-600 dark:text-red-400" role="alert">
-          {t("dashboard.calendarErrorGeneric")}
-        </p>
+      ) : loadError || eventsPhase === "temporary_error" || eventsPhase === "timeout" ? (
+        <div className="mt-4 rounded-lg border border-sky-300/80 bg-sky-50/90 px-4 py-3 dark:border-sky-900/50 dark:bg-sky-950/30">
+          <p className="text-sm font-medium text-sky-950 dark:text-sky-100" role="alert">
+            {t("dashboard.calendarEventsReadError")}
+          </p>
+          <p className="mt-1 text-sm text-sky-900 dark:text-sky-100/90">{t("dashboard.calendarEventsReadRetryHint")}</p>
+          {onRetryEvents ? (
+            <Button type="button" className="twin-touch-target mt-3 !w-auto self-start" onClick={onRetryEvents}>
+              {t("dashboard.calendarRetryEvents")}
+            </Button>
+          ) : null}
+        </div>
       ) : showPartialWarning ? (
         <p className="mt-4 text-sm text-amber-800 dark:text-amber-200" role="status">
           {t("dashboard.calendarPartialFailure")}

@@ -13,7 +13,7 @@ import { useTranslation } from "@/components/language-provider";
 import { Button, Card } from "@/components/ui";
 import type { TranslationKey } from "@/lib/i18n";
 import type { ProviderHealth, ProviderStatusPhase } from "@/lib/calendar-provider-health";
-import { providerBadgeHealth } from "@/lib/calendar-provider-health";
+import { isMicrosoftUnsupportedAccountMessage, providerBadgeHealth } from "@/lib/calendar-provider-health";
 import { webcalToHttps } from "@/lib/webcal-subscribe";
 
 type ProviderState = {
@@ -205,6 +205,16 @@ function ProviderCard({
           {t("dashboard.calendarTemporaryErrorHint")}
         </p>
       ) : null}
+      {provider.health === "error" && statusPhase === "ready" && isMicrosoftUnsupportedAccountMessage(provider.message) ? (
+        <p className="mt-3 text-sm text-amber-800 dark:text-amber-200" role="alert">
+          {t("dashboard.calendarMicrosoftUnsupportedAccount")}
+        </p>
+      ) : null}
+      {provider.health === "error" && statusPhase === "ready" && !isMicrosoftUnsupportedAccountMessage(provider.message) ? (
+        <p className="mt-3 text-sm text-red-800 dark:text-red-200" role="alert">
+          {t("dashboard.calendarConnectionProbeError")}
+        </p>
+      ) : null}
       {statusPhase === "loading" ? (
         <p className="twin-muted mt-4 text-sm">{t("dashboard.calendarStatusLoading")}</p>
       ) : statusPhase === "timeout" ? (
@@ -275,6 +285,30 @@ function ProviderCard({
         >
           {t("dashboard.calendarRetry")}
         </Button>
+      ) : provider.connected && provider.health === "error" ? (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {(onRetryEvents || onRetryStatus) ? (
+            <Button
+              type="button"
+              className="twin-touch-target !w-auto self-start"
+              disabled={anyBusy}
+              onClick={() => {
+                onRetryStatus?.();
+                onRetryEvents?.();
+              }}
+            >
+              {t("dashboard.calendarRetry")}
+            </Button>
+          ) : null}
+          <Button
+            type="button"
+            className="twin-btn-secondary twin-touch-target !w-auto self-start"
+            disabled={anyBusy}
+            onClick={onDisconnect}
+          >
+            {disconnectBusy ? "…" : t(disconnectLabelKey)}
+          </Button>
+        </div>
       ) : provider.connected ? (
         <Button
           type="button"
