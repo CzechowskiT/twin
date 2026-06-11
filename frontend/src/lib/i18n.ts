@@ -138,6 +138,7 @@ export type TranslationKey =
   | `companyTeam.${keyof typeof en.companyTeam}`
   | `recruiterScheduling.${keyof typeof en.recruiterScheduling}`
   | `recruiterPipeline.${keyof typeof en.recruiterPipeline}`
+  | `recruiterIntegrations.${keyof typeof en.recruiterIntegrations}`
   | `verifyEmail.${keyof typeof en.verifyEmail}`
   | `investorMetrics.${keyof typeof en.investorMetrics}`
   | `investorFundraising.${keyof typeof en.investorFundraising}`
@@ -2779,6 +2780,25 @@ eyebrow: "Product roadmap",
     role_viewer_perm1: "View aggregate pipeline metrics",
     role_viewer_perm2: "Export anonymized summaries",
     role_viewer_perm3: "No accept/decline or token actions",
+  },
+  recruiterIntegrations: {
+    eyebrow: "Recruiter workspace",
+    title: "Integrations readiness",
+    navLink: "Integrations",
+    lead:
+      "Honest pilot scope for recruiter tooling — what is live today vs planned. No fake “all connected” claims.",
+    item_acceptance_inbox: "Acceptance inbox & review card",
+    item_ats_oauth: "ATS OAuth connections (stub)",
+    item_calendar_sync: "Recruiter calendar sync",
+    item_teams_meet: "Microsoft Teams meeting links",
+    item_greenhouse_webhook: "Greenhouse placement webhooks",
+    item_lever_webhook: "Lever placement webhooks",
+    status_live: "Live",
+    status_pilot: "Pilot",
+    status_planned: "Planned",
+    status_not_live: "Not live",
+    scopeNote:
+      "Recruiter calendar sync and employer billing remain NOT LIVE — see roadmap docs before demoing external sync.",
   },
   recruiterScheduling: {
     trustLabel: "Manual scheduling. TWIN does not sync recruiter calendar yet.",
@@ -6394,6 +6414,25 @@ const pl: MessageTree = {
     role_viewer_perm1: "Agregaty pipeline",
     role_viewer_perm2: "Eksport zanonimizowanych podsumowań",
     role_viewer_perm3: "Bez akceptacji/odrzuceń i tokenów",
+  },
+  recruiterIntegrations: {
+    eyebrow: "Przestrzeń rekrutera",
+    title: "Gotowość integracji",
+    navLink: "Integracje",
+    lead:
+      "Uczciwy zakres pilotażu narzędzi rekrutera — co jest live dziś vs planowane. Bez fałszywych „wszystko podpięte”.",
+    item_acceptance_inbox: "Skrzynka akceptacji i karta oceny",
+    item_ats_oauth: "Połączenia ATS OAuth (stub)",
+    item_calendar_sync: "Sync kalendarza rekrutera",
+    item_teams_meet: "Linki Microsoft Teams",
+    item_greenhouse_webhook: "Webhooki placement Greenhouse",
+    item_lever_webhook: "Webhooki placement Lever",
+    status_live: "Live",
+    status_pilot: "Pilotaż",
+    status_planned: "Planowane",
+    status_not_live: "Nie live",
+    scopeNote:
+      "Sync kalendarza rekrutera i billing pracodawcy pozostają NOT LIVE — sprawdź roadmapę przed demo zewnętrznego sync.",
   },
   recruiterScheduling: {
     trustLabel: "Ręczne planowanie. TWIN nie synchronizuje jeszcze kalendarza rekrutera.",
