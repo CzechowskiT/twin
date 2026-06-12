@@ -1313,6 +1313,10 @@ const en = {
     oauthGithub: "Continue with GitHub",
     oauthApple: "Continue with Apple",
     oauthMicrosoft: "Continue with Microsoft",
+    showAllLoginOptions: "Show all sign-in options",
+    hideLoginOptions: "Hide sign-in options",
+    oauthUnavailable: "Not available on this site yet",
+    oauthStatusLoading: "Loading sign-in options…",
   },
   forgotPassword: {
     title: "Reset password",
@@ -5100,6 +5104,10 @@ const pl: MessageTree = {
     errorGithubNotConfigured:
       "Logowanie przez GitHub nie jest jeszcze włączone na tej stronie. Użyj e-maila lub innego dostawcy poniżej.",
     oauthGoogle: "Kontynuuj z Google",
+    showAllLoginOptions: "Pokaż wszystkie opcje logowania",
+    hideLoginOptions: "Ukryj opcje logowania",
+    oauthUnavailable: "Niedostępne na tej stronie",
+    oauthStatusLoading: "Ładowanie opcji logowania…",
     oauthGithub: "Kontynuuj z GitHub",
     oauthApple: "Kontynuuj z Apple",
     oauthMicrosoft: "Kontynuuj z Microsoft",

@@ -14,7 +14,6 @@ import { apiFetch } from "@/lib/api";
 import { getToken, setToken } from "@/lib/auth";
 import { setSessionPersona } from "@/lib/session-persona";
 import type { TranslationKey } from "@/lib/i18n";
-import { hasConfiguredOAuthProvider } from "@/lib/oauth-auth";
 import { useOAuthProviderStatus } from "@/lib/use-oauth-provider-status";
 import type { LoginZone } from "@/lib/persona-auth";
 import { LOGIN_PATH, postRegisterPath } from "@/lib/persona-auth";
@@ -47,7 +46,6 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
   const [loading, setLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const { status: oauthStatus, loaded: oauthStatusLoaded } = useOAuthProviderStatus();
-  const showOAuthButtons = hasConfiguredOAuthProvider(oauthStatus);
 
   const safeNext = useMemo(() => {
     const nextRaw = searchParams.get("next");
@@ -288,21 +286,24 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
           {loading ? t("register.creating") : t("register.submit")}
         </Button>
       </form>
-      {showOAuthButtons ? (
-        <>
-          <p className="twin-muted my-4 text-center text-xs uppercase tracking-wide">
-            {t("register.orContinue")}
-          </p>
-          <OAuthWebButtons
-            status={oauthStatus}
-            labels={{
-              google: t("login.oauthGoogle"),
-              github: t("login.oauthGithub"),
-              microsoft: t("login.oauthMicrosoft"),
-            }}
-          />
-        </>
-      ) : null}
+      <p className="twin-muted my-4 text-center text-xs uppercase tracking-wide">
+        {t("register.orContinue")}
+      </p>
+      {!oauthStatusLoaded ? (
+        <p className="twin-muted mb-2 text-center text-xs" aria-live="polite">
+          {t("login.oauthStatusLoading")}
+        </p>
+      ) : (
+        <OAuthWebButtons
+          status={oauthStatus}
+          unavailableLabel={t("login.oauthUnavailable")}
+          labels={{
+            google: t("login.oauthGoogle"),
+            github: t("login.oauthGithub"),
+            microsoft: t("login.oauthMicrosoft"),
+          }}
+        />
+      )}
       <LinkedInLoginButton label={t("register.linkedIn")} />
       <p className="twin-muted mt-4 text-center text-sm">
         {t("register.hasAccount")}{" "}

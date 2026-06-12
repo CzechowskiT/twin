@@ -63,7 +63,10 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
   }, [searchParams, t]);
 
   const { status: oauthStatus, loaded: oauthStatusLoaded } = useOAuthProviderStatus();
-  const showOAuthButtons = hasConfiguredOAuthProvider(oauthStatus);
+  const anyOAuthConfigured = hasConfiguredOAuthProvider(oauthStatus);
+  const [userAltLoginExpanded, setUserAltLoginExpanded] = useState<boolean | null>(null);
+  const altLoginExpanded =
+    userAltLoginExpanded ?? (!oauthStatusLoaded || anyOAuthConfigured);
 
   const displayError = useMemo(() => {
     if (error) return error;
@@ -159,19 +162,43 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
           {loading ? t("login.signingIn") : t("login.submit")}
         </Button>
       </form>
-      {showOAuthButtons ? (
+      {!altLoginExpanded ? (
+        <button
+          type="button"
+          className="twin-link mt-4 w-full text-center text-sm font-semibold"
+          onClick={() => setUserAltLoginExpanded(true)}
+        >
+          {t("login.showAllLoginOptions")}
+        </button>
+      ) : (
         <>
           <p className="twin-muted my-4 text-center text-xs uppercase tracking-wide">{t("login.orContinue")}</p>
-          <OAuthWebButtons
-            status={oauthStatus}
-            labels={{
-              google: t("login.oauthGoogle"),
-              github: t("login.oauthGithub"),
-              microsoft: t("login.oauthMicrosoft"),
-            }}
-          />
+          {!oauthStatusLoaded ? (
+            <p className="twin-muted mb-2 text-center text-xs" aria-live="polite">
+              {t("login.oauthStatusLoading")}
+            </p>
+          ) : (
+            <OAuthWebButtons
+              status={oauthStatus}
+              unavailableLabel={t("login.oauthUnavailable")}
+              labels={{
+                google: t("login.oauthGoogle"),
+                github: t("login.oauthGithub"),
+                microsoft: t("login.oauthMicrosoft"),
+              }}
+            />
+          )}
+          {oauthStatusLoaded && !anyOAuthConfigured ? (
+            <button
+              type="button"
+              className="twin-link mt-2 w-full text-center text-xs"
+              onClick={() => setUserAltLoginExpanded(false)}
+            >
+              {t("login.hideLoginOptions")}
+            </button>
+          ) : null}
         </>
-      ) : null}
+      )}
       <p className="twin-muted mt-4 text-center text-sm">
         {t("login.noAccount")}{" "}
         <Link href={REGISTER_PATH[zone]} className="twin-link">

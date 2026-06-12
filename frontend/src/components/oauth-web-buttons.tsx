@@ -22,6 +22,7 @@ type Labels = Record<OAuthWebProvider, string>;
 type OAuthWebButtonsProps = {
   status: OAuthProviderStatus;
   labels: Labels;
+  unavailableLabel: string;
 };
 
 const PROVIDER_CONFIG: Record<
@@ -33,7 +34,7 @@ const PROVIDER_CONFIG: Record<
   microsoft: { path: "microsoft", icon: MicrosoftIcon },
 };
 
-export function OAuthWebButtons({ status, labels }: OAuthWebButtonsProps) {
+export function OAuthWebButtons({ status, labels, unavailableLabel }: OAuthWebButtonsProps) {
   return (
     <>
       {OAUTH_WEB_PROVIDERS.map((provider) => {
@@ -44,6 +45,7 @@ export function OAuthWebButtons({ status, labels }: OAuthWebButtonsProps) {
             configured={status[provider]}
             href={`${API_URL}/api/v1/auth/${path}/login`}
             label={labels[provider]}
+            unavailableLabel={unavailableLabel}
             icon={<Icon />}
           />
         );
@@ -52,19 +54,30 @@ export function OAuthWebButtons({ status, labels }: OAuthWebButtonsProps) {
   );
 }
 
+const ROW_DISABLED =
+  "twin-touch-target mb-2 flex w-full cursor-not-allowed items-center justify-center gap-3 rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm font-semibold text-neutral-400 opacity-80";
+
 function Row({
   configured,
   href,
   label,
+  unavailableLabel,
   icon,
 }: {
   configured: boolean;
   href: string;
   label: string;
+  unavailableLabel: string;
   icon: ReactNode;
 }) {
   if (!configured) {
-    return null;
+    return (
+      <div className={ROW_DISABLED} aria-disabled="true" title={unavailableLabel}>
+        <span className={ICON_WRAP}>{icon}</span>
+        <span className="min-w-0 leading-snug">{label}</span>
+        <span className="sr-only">{unavailableLabel}</span>
+      </div>
+    );
   }
   return (
     <a href={href} className={ROW_ENABLED}>
