@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { useTranslation } from "@/components/language-provider";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
+import { WorkspaceModuleGrid } from "@/components/workspace/workspace-module-grid";
 import { FAQ_INVESTOR_HREF } from "@/lib/faq-anchor";
 import {
   INVESTOR_ROOM_DEMO_MAP,
@@ -24,6 +25,7 @@ import {
   investorRoomStatusTitleKey,
   type InvestorRoomStatusTier,
 } from "@/lib/investor-room";
+import { INVESTOR_PUBLIC_PREVIEW_MODULES, INVESTOR_WORKSPACE_MODULES } from "@/lib/investor-workspace-modules";
 import { Shell } from "@/components/ui";
 
 const DECK_MAIL = "contact@twin.care";
@@ -115,6 +117,22 @@ export function InvestorRoomPage() {
             <h2 className="text-sm font-semibold uppercase tracking-wide text-rose-200">{t("investorRoom.launchStanceTitle")}</h2>
             <p className="mt-2 max-w-4xl text-sm leading-relaxed text-rose-100/90">{t("investorRoom.launchStanceBody")}</p>
           </div>
+
+          <section
+            className="rounded-2xl border border-[var(--twin-border)] bg-[var(--twin-card)]/80 p-6 shadow-sm backdrop-blur-sm sm:p-8"
+            data-testid="investor-gated-preview"
+          >
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
+              {t("workspaceModules.investorPreviewEyebrow")}
+            </p>
+            <h2 className="twin-section-title mt-2 text-xl sm:text-2xl">{t("workspaceModules.investorHubTitle")}</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[var(--twin-muted-strong)]">
+              {t("workspaceModules.investorPreviewLead")}
+            </p>
+            <div className="mt-6">
+              <WorkspaceModuleGrid modules={[...INVESTOR_PUBLIC_PREVIEW_MODULES, ...INVESTOR_WORKSPACE_MODULES.slice(0, 3)]} />
+            </div>
+          </section>
 
           <div className="grid gap-6 md:grid-cols-2">
             <SectionCard title={t("investorRoom.problemTitle")}>

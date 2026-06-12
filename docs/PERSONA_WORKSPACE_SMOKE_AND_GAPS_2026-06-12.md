@@ -2,6 +2,7 @@
 
 **Owner:** TWIN Persona Workspace Smoke and Gap Owner  
 **Closure branch:** `fix/persona-audit-p0-p1-closure-2026-06-12`  
+**Navigation UX branch:** `fix/persona-workspace-navigation-premium-ux-2026-06-12` — see `docs/PERSONA_WORKSPACE_NAVIGATION_PREMIUM_UX_2026-06-12.md`
 **Audit branch (baseline):** `audit/persona-workspace-smoke-and-gaps-2026-06-12`  
 **Base:** `cursor/phase1-monorepo-scaffold`  
 **Production FE:** https://twin-sooty.vercel.app  
@@ -48,6 +49,8 @@
 | `/company/integrations` | 200 (post-deploy) | **PASS** — readiness stub |
 | `/recruiter/scorecard` | 404 | **NOT FOUND** — use inbox |
 | `/recruiter/scheduling` | 404 | **NOT FOUND** — use inbox |
+| `/recruiter` | 200 | **PASS** — module hub (2026-06-12 nav UX) |
+| `/workspace/recruiter/integrations` | redirect | **PASS** — → `/recruiter/integrations` |
 
 ---
 

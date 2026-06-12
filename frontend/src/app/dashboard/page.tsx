@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { jobApplyActionsGuardFromReadiness } from "@/lib/job-apply-actions-guard";
 import { useDashboardVerifiedReadiness } from "@/hooks/dashboard/use-dashboard-verified-readiness";
+import { CandidateModuleNav } from "@/components/dashboard/candidate-module-nav";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { DashboardCommandCenter } from "@/components/dashboard-command-center";
 import { OpportunityForecast } from "@/components/dashboard/OpportunityForecast";
@@ -295,6 +296,7 @@ export default function DashboardPage() {
       </div>
 
       <WorkspaceFlowSteps current="dashboard" className="mb-4 sm:mb-6" />
+      <CandidateModuleNav />
       <ProfileCompletenessHint profile={profile} />
       {user ? (
         <DashboardVerifiedReadinessCard

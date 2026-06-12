@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { CompanyWorkspaceNav } from "@/components/company/company-workspace-nav";
+import { WorkspaceModuleGrid } from "@/components/workspace/workspace-module-grid";
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
 import { useTranslation } from "@/components/language-provider";
 import type { TranslationKey } from "@/lib/i18n";
@@ -20,6 +21,7 @@ import {
   companySlugToLabel,
   writeRecruiterInboxSession,
 } from "@/lib/recruiter-inbox";
+import { COMPANY_WORKSPACE_MODULES } from "@/lib/company-workspace-modules";
 
 function MetricCard({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
@@ -100,6 +102,17 @@ export default function CompanyDashboardClient() {
         <h1 className="twin-page-intro text-2xl font-semibold sm:text-3xl">{t("companyHiring.title")}</h1>
         <p className="twin-muted max-w-2xl text-sm leading-relaxed">{t("companyHiring.lead")}</p>
       </header>
+
+      <section className="mb-8" data-testid="company-module-grid">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
+          {t("workspaceModules.hubEyebrow")}
+        </p>
+        <h2 className="mt-1 text-lg font-semibold text-[var(--foreground)]">{t("workspaceModules.companyHubTitle")}</h2>
+        <p className="twin-muted mt-2 max-w-3xl text-sm leading-relaxed">{t("workspaceModules.companyHubLead")}</p>
+        <div className="mt-4">
+          <WorkspaceModuleGrid modules={COMPANY_WORKSPACE_MODULES} />
+        </div>
+      </section>
 
       <Card variant="soft" className="mb-6 border-[var(--twin-border)]/80 p-4">
         <RecruiterAccessFields

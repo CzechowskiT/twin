@@ -24,7 +24,8 @@ cd frontend && npm run test:trust-language-guard && npm run test:i18n-coverage
 ## 1 — Candidate
 
 **Login:** `/login/candidate`  
-**Workspace home:** `/workspace/candidate` or `/dashboard`
+**Workspace home:** `/workspace/candidate` or `/dashboard`  
+**Module grid (2026-06-12):** `/dashboard` → `CandidateModuleNav` — expand all modules; auto-apply card → `#auto-apply-readiness`
 
 | # | Route | PASS | PARTIAL | FAIL |
 | - | ----- | ---- | ------- | ---- |
@@ -44,7 +45,8 @@ cd frontend && npm run test:trust-language-guard && npm run test:i18n-coverage
 ## 2 — Recruiter
 
 **Login:** `/login/recruiter`  
-**Workspace home:** `/workspace/recruiter` or `/recruiter/inbox`
+**Workspace home:** `/recruiter` (hub) or `/recruiter/inbox`  
+**Hub smoke (2026-06-12):** `/recruiter` → module grid; calendar badge **NOT LIVE**; analytics discoverable
 
 | # | Route | PASS | PARTIAL | FAIL |
 | - | ----- | ---- | ------- | ---- |

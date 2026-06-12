@@ -7,6 +7,8 @@
 
 **Authenticated persona smoke (2026-06-12):** Per-persona PASS/PARTIAL/FAIL routes and calendar **#124** prod gate → `docs/FOUNDER_AUTHENTICATED_PERSONA_SMOKE_RUNBOOK_2026-06-12.md`. Week events on `/dashboard/calendar` score **PASS** only when founder confirms events resolve (no hung **Ładowanie wydarzeń…**) — CI alone is **PARTIAL**.
 
+**Workspace module navigation (2026-06-12):** Module grids on `/dashboard`, `/recruiter`, `/company/dashboard`, `/workspace/investor`; public `/investor` gated preview → `docs/PERSONA_WORKSPACE_NAVIGATION_PREMIUM_UX_2026-06-12.md`.
+
 **Program:** Premium Product Experience Polish Slices 0–7 (PRs [#52](https://github.com/CzechowskiT/twin/pull/52)–[#58](https://github.com/CzechowskiT/twin/pull/58))
 
 ---
