@@ -1278,6 +1278,10 @@ const en = {
     noAccount: "No account?",
     register: "Register",
     failed: "Login failed",
+    invalidCredentials: "Incorrect email or password.",
+    rateLimited: "Too many login attempts. Try again shortly.",
+    temporarilyUnavailable: "Could not sign in. Try again shortly.",
+    malformedResponse: "Could not sign in — unexpected server response. Try again shortly.",
     configMissingApi:
       "The website cannot reach the API. On Vercel, set TWIN_API_BASE_URL (server-only) or NEXT_PUBLIC_API_URL to your Railway API URL (https://… without trailing slash), then redeploy the frontend.",
     orContinue: "or continue with",
@@ -5063,6 +5067,11 @@ const pl: MessageTree = {
     noAccount: "Nie masz konta?",
     register: "Zarejestruj się",
     failed: "Logowanie nie powiodło się",
+    invalidCredentials: "Nieprawidłowy e-mail lub hasło.",
+    rateLimited: "Zbyt wiele prób logowania. Spróbuj ponownie za chwilę.",
+    temporarilyUnavailable: "Nie udało się zalogować. Spróbuj ponownie za chwilę.",
+    malformedResponse:
+      "Nie udało się zalogować — nieoczekiwana odpowiedź serwera. Spróbuj ponownie za chwilę.",
     configMissingApi:
       "Strona nie łączy się z API. Na Vercelu ustaw TWIN_API_BASE_URL (tylko serwer) albo NEXT_PUBLIC_API_URL na adres API z Railway (https://… bez ukośnika na końcu) i zrób redeploy frontu.",
     orContinue: "lub kontynuuj przez",

@@ -27,6 +27,7 @@ async function proxy(req: NextRequest, pathSegments: string[]): Promise<NextResp
 
   const sub = pathSegments.length ? pathSegments.join("/") : "";
   const longRunning = sub.includes("jobs/scrape") || sub.includes("applications/auto-apply");
+  const authRoute = sub.startsWith("auth/");
   const target = new URL(`/api/v1/${sub}`, base);
   req.nextUrl.searchParams.forEach((v, k) => {
     target.searchParams.set(k, v);
@@ -59,7 +60,9 @@ async function proxy(req: NextRequest, pathSegments: string[]): Promise<NextResp
       // Default "follow" would chase OAuth 302 to LinkedIn and return HTML instead of passing Location to the browser.
       redirect: "manual",
       cache: "no-store",
-      signal: AbortSignal.timeout(longRunning ? 180_000 : 45_000),
+      signal: AbortSignal.timeout(
+        longRunning ? 180_000 : authRoute ? 12_000 : 45_000,
+      ),
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "fetch failed";
