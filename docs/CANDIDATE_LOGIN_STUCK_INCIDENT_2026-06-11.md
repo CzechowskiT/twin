@@ -2,8 +2,9 @@
 
 **Severity:** P0 — founder blocked from candidate sign-in  
 **Route:** https://twin-sooty.vercel.app/login/candidate  
-**Branch:** `fix/p0-candidate-login-stuck-2026-06-11`  
-**Owner:** TWIN agent (auth/login)
+**Branch:** `fix/p0-candidate-login-stuck-2026-06-11` → superseded by `fix/p0-auth-login-and-options-2026-06-11`  
+**Owner:** TWIN agent (auth/login)  
+**Companion:** `docs/AUTH_LOGIN_AND_OPTIONS_INCIDENT_2026-06-11.md` (OAuth visibility + same upstream outage)
 
 ---
 
@@ -114,7 +115,7 @@ npm run build
 
 **Pre-fix production smoke:** **FAIL** — steps 1–3 blocked by Railway upstream timeout; UI stuck on loading.
 
-**Post-fix production smoke:** **PENDING DEPLOY** — re-run after merge + Vercel promote.
+**Post-fix production smoke (2026-06-11 evening):** Password UX **PARTIAL PASS** on prod — dummy submit shows English *Could not sign in. Try again shortly.* within ~10s (PR #120 live); valid login **FAIL** while Railway times out. Login options fix **PENDING** — see `AUTH_LOGIN_AND_OPTIONS_INCIDENT_2026-06-11.md`.
 
 ---
 

@@ -23,7 +23,10 @@ export function LinkedInLoginSection({ emailLoginHref }: LinkedInLoginSectionPro
     let cancelled = false;
     void (async () => {
       try {
-        const res = await fetch("/api/v1/public/mvp-stats", { cache: "no-store" });
+        const res = await fetch("/api/v1/public/mvp-stats", {
+          cache: "no-store",
+          signal: AbortSignal.timeout(10_000),
+        });
         if (!res.ok) return;
         const json = (await res.json()) as MvpOAuthFlags;
         if (!cancelled) setConfigured(Boolean(json.linkedin_oauth_configured));

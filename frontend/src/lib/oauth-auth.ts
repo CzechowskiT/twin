@@ -43,9 +43,15 @@ export function hasConfiguredOAuthProvider(status: OAuthProviderStatus): boolean
   return status.google || status.github || status.microsoft;
 }
 
+/** Same window as login password POST — OAuth flags must not block the form indefinitely. */
+export const OAUTH_STATUS_FETCH_TIMEOUT_MS = 10_000;
+
 export async function fetchOAuthProviderStatus(): Promise<OAuthProviderStatus> {
   try {
-    const res = await fetch("/api/v1/health?ops=1", { cache: "no-store" });
+    const res = await fetch("/api/v1/health?ops=1", {
+      cache: "no-store",
+      signal: AbortSignal.timeout(OAUTH_STATUS_FETCH_TIMEOUT_MS),
+    });
     if (!res.ok) return OAUTH_LOGIN_BUTTONS_INITIAL;
     const data = (await res.json()) as HealthOpsOAuthFlags;
     return parseHealthOpsOAuthFlags(data);
