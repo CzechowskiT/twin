@@ -5,6 +5,8 @@
 **Prod `git_commit` (2026-06-11):** `e48bff1` (`db_ok=true`) — scaffold `adfcac0`; redeploy before strict SHA parity checks  
 **Launch stance (preserved):** Public **NO-GO** · auto-apply **PAUSED** · delegated **NOT LIVE** · recruiter calendar **NOT LIVE** · external invites **0** · H5c/H5d **HOLD**
 
+**Authenticated persona smoke (2026-06-12):** Per-persona PASS/PARTIAL/FAIL routes and calendar **#124** prod gate → `docs/FOUNDER_AUTHENTICATED_PERSONA_SMOKE_RUNBOOK_2026-06-12.md`. Week events on `/dashboard/calendar` score **PASS** only when founder confirms events resolve (no hung **Ładowanie wydarzeń…**) — CI alone is **PARTIAL**.
+
 **Program:** Premium Product Experience Polish Slices 0–7 (PRs [#52](https://github.com/CzechowskiT/twin/pull/52)–[#58](https://github.com/CzechowskiT/twin/pull/58))
 
 ---
@@ -48,7 +50,7 @@
 | 1.1 | `/dashboard` hero | Eyebrow “Today” / “Dziś”; 2–3 mission cards from real state |
 | 1.2 | Primary CTA | Single deterministic action (profile → matches → calendar → pipeline) |
 | 1.3 | Readiness chip | Email/profile/matches readiness visible without invented metrics |
-| 1.4 | Header **Kalendarz** (logged-in candidate) | Stays authenticated → `/dashboard/calendar` ≥5s — no logout/login loop; stale provider shows **WYMAGA PONOWNEGO POŁĄCZENIA**, not false **POŁĄCZONO**; transient Google → **Błąd tymczasowy** + Retry, not reconnect loop (`docs/CANDIDATE_GOOGLE_CALENDAR_RECONNECT_LOOP_FIX_2026-06-11.md`); hung status resolves ≤9s with **Ładowanie statusu…** → retry/connect (`docs/CANDIDATE_CALENDAR_LOADING_STATE_TIMEOUT_FIX_2026-06-11.md`); **P0:** provider phases must not wait on `auth/me` (`docs/CANDIDATE_CALENDAR_P0_ROOT_CAUSE_FIX_2026-06-11.md`) |
+| 1.4 | Header **Kalendarz** (logged-in candidate) | Stays authenticated → `/dashboard/calendar` ≥5s — no logout/login loop; stale provider shows **WYMAGA PONOWNEGO POŁĄCZENIA**, not false **POŁĄCZONO**; transient Google → **Błąd tymczasowy** + Retry, not reconnect loop (`docs/CANDIDATE_GOOGLE_CALENDAR_RECONNECT_LOOP_FIX_2026-06-11.md`); hung status resolves ≤9s with **Ładowanie statusu…** → retry/connect (`docs/CANDIDATE_CALENDAR_LOADING_STATE_TIMEOUT_FIX_2026-06-11.md`); **P0 #124:** week events must finish loading (no stuck **Ładowanie wydarzeń…**) — prod **PASS** only after founder sign-off (`docs/FOUNDER_AUTHENTICATED_PERSONA_SMOKE_RUNBOOK_2026-06-12.md` §5); provider phases must not wait on `auth/me` (`docs/CANDIDATE_CALENDAR_P0_ROOT_CAUSE_FIX_2026-06-11.md`) |
 | 1.4b | `/login/candidate` email login | Submit returns **error or redirect within 10s** — never infinite **Logowanie…**; invalid creds → **Nieprawidłowy e-mail lub hasło.**; upstream down → **Nie udało się zalogować…**; **normal browser with stale token** must match incognito (`docs/AUTH_BROWSER_STATE_AND_OAUTH_OPTIONS_INCIDENT_2026-06-12.md`) |
 | 1.4c | `/login/candidate` login options | Google/GitHub/Microsoft **clickable** when `public-health` OAuth flags true; expand **Pokaż wszystkie opcje logowania**; not grey dead while API healthy (`docs/AUTH_BROWSER_STATE_AND_OAUTH_OPTIONS_INCIDENT_2026-06-12.md`) |
 | 1.5 | Calendar OAuth return (`?calendar_connected=1`) | Success banner readable on dark: **Kalendarz połączony** + body copy; auto-dismiss ~7s; status reload clears stale reconnect (`docs/CANDIDATE_CALENDAR_SUCCESS_ALERT_POLISH_2026-06-10.md`) |

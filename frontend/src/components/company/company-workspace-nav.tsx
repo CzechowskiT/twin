@@ -8,10 +8,12 @@ import type { TranslationKey } from "@/lib/i18n";
 import { COMPANY_ROLES_ROUTE } from "@/lib/company-jobs-roles";
 import { COMPANY_BILLING_ROUTE } from "@/lib/company-billing-readiness";
 import { COMPANY_HIRING_ROUTE } from "@/lib/company-hiring-dashboard";
+import { COMPANY_INTEGRATIONS_ROUTE } from "@/lib/company-integrations-readiness";
 import { COMPANY_TEAM_ROUTE } from "@/lib/company-team-permissions";
 
 const NAV = [
   { href: COMPANY_HIRING_ROUTE, ns: "companyHiring" as const, key: "navDashboard" },
+  { href: COMPANY_INTEGRATIONS_ROUTE, ns: "companyIntegrations" as const, key: "navLink" },
   { href: COMPANY_BILLING_ROUTE, ns: "companyBilling" as const, key: "navBilling" },
   { href: COMPANY_ROLES_ROUTE, ns: "companyJobs" as const, key: "navRoles" },
   { href: "/company/pipeline", ns: "companyPipeline" as const, key: "navLink" },

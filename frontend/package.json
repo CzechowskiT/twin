@@ -72,6 +72,8 @@
     "test:recruiter-pipeline-mvp": "npx --yes tsx scripts/recruiter-pipeline-mvp.test.ts",
     "test:recruiter-analytics-mvp": "npx --yes tsx scripts/recruiter-analytics-mvp.test.ts",
     "test:recruiter-integrations-readiness-mvp": "npx --yes tsx scripts/recruiter-integrations-readiness-mvp.test.ts",
+    "test:company-integrations-readiness-mvp": "npx --yes tsx scripts/company-integrations-readiness-mvp.test.ts",
+    "test:persona-workspace-gate-auth": "npx --yes tsx scripts/persona-workspace-gate-auth.test.ts",
     "test:investor-data-room-request-access": "npx --yes tsx scripts/investor-data-room-request-access.test.ts",
     "test:candidate-profile-evidence-vault": "npx --yes tsx scripts/candidate-profile-evidence-vault.test.ts"
   },

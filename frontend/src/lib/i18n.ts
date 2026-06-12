@@ -144,6 +144,7 @@ export type TranslationKey =
   | `recruiterPipeline.${keyof typeof en.recruiterPipeline}`
   | `recruiterAnalytics.${keyof typeof en.recruiterAnalytics}`
   | `recruiterIntegrations.${keyof typeof en.recruiterIntegrations}`
+  | `companyIntegrations.${keyof typeof en.companyIntegrations}`
   | `verifyEmail.${keyof typeof en.verifyEmail}`
   | `investorMetrics.${keyof typeof en.investorMetrics}`
   | `investorFundraising.${keyof typeof en.investorFundraising}`
@@ -1656,6 +1657,11 @@ const en = {
     gateTitleCompany: "Company workspace only",
     gateLeadCompany:
       "Hiring dashboard and employer tools live in the company lane. Switch context or open the company home.",
+    authRequiredTitle: "Sign in required",
+    authRequiredLead:
+      "This workspace is available after you sign in with the matching role. You will be redirected to the correct login page.",
+    authRequiredCta: "Go to sign in",
+    authRedirecting: "Redirecting to sign in…",
     zoneCandidateTitle: "Candidate",
     zoneCandidateLead: "Job search, auto-apply, calendar, and applications.",
     zoneCandidateTools: "Demo · Dashboard · Matches",
@@ -2908,6 +2914,25 @@ eyebrow: "Product roadmap",
     status_not_live: "Not live",
     scopeNote:
       "Recruiter calendar sync and employer billing remain NOT LIVE — see roadmap docs before demoing external sync.",
+  },
+  companyIntegrations: {
+    eyebrow: "Company workspace",
+    title: "Integrations readiness",
+    navLink: "Integrations",
+    lead:
+      "Honest pilot scope for employer tooling — what is live today vs planned. No fake “all connected” claims.",
+    item_acceptance_inbox: "Acceptance inbox & review card",
+    item_ats_webhooks: "ATS webhooks",
+    item_employer_calendar: "Recruiter calendar sync",
+    item_employer_billing: "Self-serve billing & seats",
+    item_team_tokens: "Team access tokens",
+    item_greenhouse_webhook: "Greenhouse placement webhooks",
+    status_live: "Live",
+    status_pilot: "Pilot",
+    status_planned: "Planned",
+    status_not_live: "Not live",
+    scopeNote:
+      "Employer billing, ATS webhooks, and recruiter calendar sync remain NOT LIVE — manual pilot onboarding only.",
   },
   recruiterScheduling: {
     trustLabel: "Manual scheduling. TWIN does not sync recruiter calendar yet.",
@@ -5457,6 +5482,11 @@ const pl: MessageTree = {
     gateTitleCompany: "Tylko strefa firmy",
     gateLeadCompany:
       "Panel rekrutacji i narzędzia pracodawcy są w strefie firmy. Zmień kontekst lub otwórz stronę główną firmy.",
+    authRequiredTitle: "Wymagane logowanie",
+    authRequiredLead:
+      "Ta strefa jest dostępna po zalogowaniu w odpowiedniej roli. Za chwilę przekierujemy Cię na właściwą stronę logowania.",
+    authRequiredCta: "Przejdź do logowania",
+    authRedirecting: "Przekierowanie do logowania…",
     zoneCandidateTitle: "Kandydat",
     zoneCandidateLead: "Szukanie pracy, auto-aplikacja, kalendarz i aplikacje.",
     zoneCandidateTools: "Demo · Panel · Dopasowania",
@@ -6711,6 +6741,25 @@ const pl: MessageTree = {
     status_not_live: "Nie live",
     scopeNote:
       "Sync kalendarza rekrutera i billing pracodawcy pozostają NOT LIVE — sprawdź roadmapę przed demo zewnętrznego sync.",
+  },
+  companyIntegrations: {
+    eyebrow: "Workspace firmy",
+    title: "Gotowość integracji",
+    navLink: "Integracje",
+    lead:
+      "Uczciwy zakres pilotażu narzędzi pracodawcy — co jest live dziś vs planowane. Bez fałszywych „wszystko podpięte”.",
+    item_acceptance_inbox: "Skrzynka akceptacji i karta oceny",
+    item_ats_webhooks: "Webhooki ATS",
+    item_employer_calendar: "Sync kalendarza rekrutera",
+    item_employer_billing: "Samodzielne rozliczenia i miejsca",
+    item_team_tokens: "Tokeny dostępu zespołu",
+    item_greenhouse_webhook: "Webhooki placement Greenhouse",
+    status_live: "Live",
+    status_pilot: "Pilotaż",
+    status_planned: "Planowane",
+    status_not_live: "Nie live",
+    scopeNote:
+      "Billing pracodawcy, webhooki ATS i sync kalendarza rekrutera pozostają NOT LIVE — tylko ręczny onboarding pilotażowy.",
   },
   recruiterScheduling: {
     trustLabel: "Ręczne planowanie. TWIN nie synchronizuje jeszcze kalendarza rekrutera.",
