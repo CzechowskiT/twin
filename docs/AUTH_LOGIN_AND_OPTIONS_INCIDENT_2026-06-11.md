@@ -88,7 +88,8 @@ npm run build
 | 5 | Founder manual login | Redirect `/dashboard` when Railway healthy |
 
 **Pre-fix production:** password UX **PARTIAL PASS** (timeout error, not infinite hang); login options **FAIL**; Railway **FAIL**.  
-**Post-fix production:** **PENDING DEPLOY**.
+**Post-fix production:** **PARTIAL** — PR #121 deployed; founder still reports normal-browser vs incognito split (2026-06-12).  
+**Follow-up:** `docs/AUTH_BROWSER_STATE_AND_OAUTH_OPTIONS_INCIDENT_2026-06-12.md` — stale `twin_access_token` + OAuth public-health fallback.
 
 ---
 

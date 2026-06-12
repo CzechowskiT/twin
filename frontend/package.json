@@ -49,6 +49,7 @@
     "test:auth-role-choice": "npx --yes tsx scripts/auth-role-choice.test.ts",
     "test:auth-login-stuck-regression": "npx --yes tsx scripts/auth-login-stuck-regression.test.ts",
     "test:auth-login-options-and-password": "npx --yes tsx scripts/auth-login-options-and-password.test.ts",
+    "test:auth-normal-browser-regression": "npx --yes tsx scripts/auth-normal-browser-regression.test.ts",
     "test:candidate-calendar-routing": "npx --yes tsx scripts/candidate-calendar-routing.test.ts && npx --yes tsx scripts/persona-access.test.ts",
     "test:candidate-calendar-post-load-auth": "npx --yes tsx scripts/candidate-calendar-post-load-auth.test.ts",
     "test:candidate-calendar-integration-health": "npx --yes tsx scripts/candidate-calendar-integration-health.test.ts",

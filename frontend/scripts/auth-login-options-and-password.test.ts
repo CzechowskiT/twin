@@ -39,12 +39,13 @@ test("3: show-all-login-options expand control exists", () => {
 
 test("4: OAuth rows render when unconfigured (disabled, not hidden)", () => {
   assert.match(oauthButtonsSrc, /aria-disabled="true"/);
-  assert.doesNotMatch(oauthButtonsSrc, /if \(!configured\) \{\s*return null/);
+  assert.match(oauthButtonsSrc, /availability\.available/);
 });
 
-test("5: OAuth status fetch has 10s timeout", () => {
+test("5: OAuth status fetch has 10s timeout and public-health fallback", () => {
   assert.equal(OAUTH_STATUS_FETCH_TIMEOUT_MS, 10_000);
   assert.match(oauthAuthSrc, /AbortSignal\.timeout\(OAUTH_STATUS_FETCH_TIMEOUT_MS\)/);
+  assert.match(oauthAuthSrc, /\/api\/public-health/);
 });
 
 test("6: LinkedIn section fetch has 10s timeout", () => {

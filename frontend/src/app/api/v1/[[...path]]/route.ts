@@ -28,6 +28,9 @@ async function proxy(req: NextRequest, pathSegments: string[]): Promise<NextResp
   const sub = pathSegments.length ? pathSegments.join("/") : "";
   const longRunning = sub.includes("jobs/scrape") || sub.includes("applications/auto-apply");
   const authRoute = sub.startsWith("auth/");
+  const credentialExchange =
+    req.method === "POST" &&
+    (sub === "auth/login" || sub === "auth/login/json" || sub === "auth/register");
   const target = new URL(`/api/v1/${sub}`, base);
   req.nextUrl.searchParams.forEach((v, k) => {
     target.searchParams.set(k, v);
@@ -43,8 +46,13 @@ async function proxy(req: NextRequest, pathSegments: string[]): Promise<NextResp
     req.headers.get("Authorization") ??
     req.headers.get("x-twin-authorization") ??
     req.headers.get("X-Twin-Authorization");
-  if (bearer) {
+  if (bearer && !credentialExchange) {
     headers.set("Authorization", bearer);
+  } else if (credentialExchange) {
+    headers.delete("authorization");
+    headers.delete("Authorization");
+    headers.delete("x-twin-authorization");
+    headers.delete("X-Twin-Authorization");
   }
   headers.set("accept-encoding", "identity");
 

@@ -10,10 +10,11 @@ import { useTranslation } from "@/components/language-provider";
 import { useMarketingPersona } from "@/components/persona-provider";
 import { Button, Card, Input, Label } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
-import { setToken } from "@/lib/auth";
+import { clearToken, prepareForCredentialLogin, setToken } from "@/lib/auth";
 import {
   LOGIN_REQUEST_TIMEOUT_MS,
   parseLoginAccessToken,
+  resolveLoginDiagnosticCode,
   resolveLoginErrorKey,
 } from "@/lib/login-error";
 import { setSessionPersona } from "@/lib/session-persona";
@@ -62,7 +63,8 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
     return null;
   }, [searchParams, t]);
 
-  const { status: oauthStatus, loaded: oauthStatusLoaded } = useOAuthProviderStatus();
+  const { status: oauthStatus, availabilities: oauthAvailabilities, loaded: oauthStatusLoaded } =
+    useOAuthProviderStatus();
   const anyOAuthConfigured = hasConfiguredOAuthProvider(oauthStatus);
   const [userAltLoginExpanded, setUserAltLoginExpanded] = useState<boolean | null>(null);
   const altLoginExpanded =
@@ -76,6 +78,10 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
     if (err === "apple_not_configured" || err === "github_not_configured") return null;
     return oauthUrlError;
   }, [error, oauthStatusLoaded, oauthUrlError, searchParams]);
+
+  useEffect(() => {
+    prepareForCredentialLogin();
+  }, []);
 
   useEffect(() => {
     if (!oauthStatusLoaded) return;
@@ -98,16 +104,22 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
     e.preventDefault();
     setError(null);
     const form = new FormData(e.currentTarget);
+    prepareForCredentialLogin();
     setLoading(true);
     try {
-      const payload = await apiFetch<TokenResponse>("/api/v1/auth/login/json", {
-        method: "POST",
-        timeoutMs: LOGIN_REQUEST_TIMEOUT_MS,
-        body: JSON.stringify({
-          email: form.get("email"),
-          password: form.get("password"),
-        }),
-      });
+      const payload = await apiFetch<TokenResponse>(
+        "/api/v1/auth/login/json",
+        {
+          method: "POST",
+          timeoutMs: LOGIN_REQUEST_TIMEOUT_MS,
+          preserveSessionOnUnauthorized: true,
+          body: JSON.stringify({
+            email: form.get("email"),
+            password: form.get("password"),
+          }),
+        },
+        null,
+      );
       const accessToken = parseLoginAccessToken(payload);
       if (!accessToken) {
         setError(t("login.malformedResponse"));
@@ -119,6 +131,11 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
       router.push(nextPath);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "";
+      clearToken();
+      const diagnostic = resolveLoginDiagnosticCode(err, msg);
+      if (typeof console !== "undefined") {
+        console.warn("[TWIN login]", diagnostic);
+      }
       setError(t(resolveLoginErrorKey(err, msg)));
     } finally {
       setLoading(false);
@@ -179,8 +196,9 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
             </p>
           ) : (
             <OAuthWebButtons
-              status={oauthStatus}
+              availabilities={oauthAvailabilities}
               unavailableLabel={t("login.oauthUnavailable")}
+              loadingLabel={t("login.oauthStatusLoading")}
               labels={{
                 google: t("login.oauthGoogle"),
                 github: t("login.oauthGithub"),

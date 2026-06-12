@@ -52,3 +52,36 @@ export function clearToken(): void {
 export function isStorageAvailable(): boolean {
   return getStorage() !== null;
 }
+
+/** Decode JWT payload without verification — used only to detect expired/malformed session blobs. */
+function decodeJwtPayload(token: string): Record<string, unknown> | null {
+  const parts = token.split(".");
+  if (parts.length < 2) return null;
+  try {
+    const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), "=");
+    const json = atob(padded);
+    return JSON.parse(json) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
+/** True when stored token is missing, malformed, or past `exp` (with 30s skew). */
+export function isStoredTokenStale(token: string | null): boolean {
+  if (!token?.trim()) return false;
+  const payload = decodeJwtPayload(token.trim());
+  if (!payload) return true;
+  const exp = payload.exp;
+  if (typeof exp !== "number") return false;
+  const nowSec = Math.floor(Date.now() / 1000);
+  return exp <= nowSec + 30;
+}
+
+/** Drop expired/malformed JWT before password/OAuth credential exchange (keeps locale keys). */
+export function prepareForCredentialLogin(): void {
+  const token = getToken();
+  if (token && isStoredTokenStale(token)) {
+    clearToken();
+  }
+}

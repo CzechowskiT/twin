@@ -89,7 +89,8 @@
 | ----- | -------- | ------ |
 | Candidate OAuth (Google/GitHub) | Public-health flags; login routes 200 | ✅ LIVE |
 | Candidate email login UX (no infinite loading) | `fix/p0-auth-login-and-options-2026-06-11` — 10s timeout, PL errors, auth proxy 12s · `docs/CANDIDATE_LOGIN_STUCK_INCIDENT_2026-06-11.md` · `test:auth-login-stuck-regression` | ⚠️ **PARTIAL LIVE** — prod dummy login errors ≤10s; valid login blocked by Railway |
-| Candidate login options visible | `fix/p0-auth-login-and-options-2026-06-11` — OAuth rows disabled-not-hidden, expand PL copy, health/mvp-stats 10s · `docs/AUTH_LOGIN_AND_OPTIONS_INCIDENT_2026-06-11.md` · `test:auth-login-options-and-password` | ⏳ **PENDING deploy** — pre-fix prod **FAIL** (no OAuth rows; LinkedIn …) |
+| Candidate login options visible | `fix/p0-auth-browser-state-oauth-options-2026-06-12` — `AuthProviderAvailability` + `public-health` fallback; clickable when configured · `docs/AUTH_BROWSER_STATE_AND_OAUTH_OPTIONS_INCIDENT_2026-06-12.md` · `test:auth-normal-browser-regression` | ⏳ **PENDING deploy** — prod `55b3835` grey OAuth when health?ops=1 misses |
+| Normal-browser password login | Stale JWT must not attach to `POST /auth/login/json`; proxy strips Authorization · same incident doc · `test:auth-normal-browser-regression` | ⏳ **PENDING deploy** — incognito OK; normal browser **FAIL** pre-fix |
 | Auth entry role-choice-first | `/login` + `/register` hubs; header unified; deep links `/login/*` `/register/*` · `docs/AUTH_ROLE_CHOICE_FIRST_2026-06-07.md` | ✅ **LIVE** (2026-06-07) |
 | Apple OAuth | Documented OFF | ⚠️ by design |
 | OAuth callback rate limits | S10 gate — code shipped | ✅ LIVE |
