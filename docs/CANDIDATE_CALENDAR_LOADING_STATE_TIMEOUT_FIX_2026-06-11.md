@@ -9,6 +9,8 @@ On `/dashboard/calendar`, the page could stay on **Ładowanie…** indefinitely:
 
 PR #116 fixed reconnect banner vs badge mismatch; loading UX remained broken when status or events fetches hung.
 
+**Follow-up (2026-06-12):** Provider **status** loading was fixed here; week **events** panel could still hang on „Ładowanie wydarzeń…” — see `docs/CANDIDATE_CALENDAR_WEEK_EVENTS_LOADING_FIX_2026-06-12.md`.
+
 ## Root cause
 
 | # | Cause |
