@@ -65,8 +65,12 @@ def build_health_ops_public(s: Settings) -> dict[str, Any]:
         # Avoid heavy market_coverage_report COUNTs on the public health path — use Redis scrape snapshot only.
         last_at = last_scrape_run_at()
         latest = get_latest_run()
+        active = int(out.get("validated_jobs") or 0)
+        target = max(1000, int(s.market_coverage_target_jobs))
         mc: dict[str, Any] = {
             "last_scrape_run_at": last_at,
+            "progress_to_10k_pct": round(min(100.0, 100.0 * active / target), 1) if target else None,
+            "active_validated_jobs": active,
             "feed_stale": False,
             "warnings": list(latest.get("warnings") or [])[:8] if latest else [],
         }
