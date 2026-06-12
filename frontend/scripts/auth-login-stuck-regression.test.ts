@@ -81,3 +81,8 @@ test("9: auth proxy uses shorter upstream timeout than long-running routes", () 
   assert.match(proxySrc, /authRoute/);
   assert.match(proxySrc, /authRoute \? 12_000/);
 });
+
+test("10: credential exchange strips Authorization on proxy", () => {
+  assert.match(proxySrc, /credentialExchange/);
+  assert.match(proxySrc, /headers\.delete\("authorization"\)/);
+});

@@ -98,8 +98,15 @@ function ensureTraceHeaders(headers: Headers): void {
   headers.set("X-Request-ID", id);
 }
 
+/** Password/register must never attach a stale session — always same-origin proxy. */
+export function isCredentialExchangePath(path: string): boolean {
+  const base = path.split("?")[0] ?? path;
+  return /\/api\/v1\/auth\/(login(?:\/json)?|register)$/.test(base);
+}
+
 /** `undefined` → browser storage; `null` → force unauthenticated; string → explicit bearer. */
-function resolveAuthToken(token?: string | null): string | null {
+function resolveAuthToken(path: string, token?: string | null): string | null {
+  if (isCredentialExchangePath(path)) return null;
   if (token === undefined) {
     return typeof window !== "undefined" ? getToken() : null;
   }
@@ -166,8 +173,8 @@ function handleAuthFailure(
   window.location.assign(loginUrl);
 }
 
-function applyAuthHeaders(headers: Headers, token?: string | null): boolean {
-  const resolvedToken = resolveAuthToken(token);
+function applyAuthHeaders(headers: Headers, path: string, token?: string | null): boolean {
+  const resolvedToken = resolveAuthToken(path, token);
   const hasAuth = Boolean(resolvedToken);
   if (hasAuth) {
     const bearer = `Bearer ${resolvedToken}`;
@@ -232,7 +239,7 @@ export async function apiFetch<T>(
   if (method !== "GET" && method !== "HEAD") {
     headers.set("Content-Type", "application/json");
   }
-  const hasAuth = applyAuthHeaders(headers, token);
+  const hasAuth = applyAuthHeaders(headers, path, token);
 
   const directOrigin = clientApiOriginForRequest(hasAuth);
   let timeoutController: AbortController | undefined;
@@ -291,7 +298,7 @@ export async function apiFetchBlob(
   if (method !== "GET" && method !== "HEAD") {
     headers.set("Content-Type", "application/json");
   }
-  const hasAuth = applyAuthHeaders(headers, token);
+  const hasAuth = applyAuthHeaders(headers, path, token);
 
   const directOrigin = clientApiOriginForRequest(hasAuth);
   const fetchOpts: RequestInit = {
@@ -338,7 +345,7 @@ export async function apiUpload<T>(
 ): Promise<T> {
   const headers = new Headers();
   ensureTraceHeaders(headers);
-  const hasAuth = applyAuthHeaders(headers, token);
+  const hasAuth = applyAuthHeaders(headers, path, token);
 
   const body = new FormData();
   body.append("file", file);

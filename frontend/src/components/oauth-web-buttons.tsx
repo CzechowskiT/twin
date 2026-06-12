@@ -2,8 +2,7 @@
 
 import type { ReactNode } from "react";
 
-import { API_URL } from "@/lib/api";
-import type { OAuthProviderStatus } from "@/lib/oauth-auth";
+import type { AuthProviderAvailability, OAuthWebProvider } from "@/lib/oauth-auth";
 
 /** Light “Sign in with …” rows: white surface + neutral chrome (brand marks keep official colors). */
 const ROW_ENABLED =
@@ -15,37 +14,54 @@ const ICON_WRAP =
 /** Web OAuth rows on login/register (LinkedIn is a separate component). Apple omitted until Developer program. */
 export const OAUTH_WEB_PROVIDERS = ["google", "github", "microsoft"] as const;
 
-export type OAuthWebProvider = (typeof OAUTH_WEB_PROVIDERS)[number];
+export type { OAuthWebProvider };
 
 type Labels = Record<OAuthWebProvider, string>;
 
 type OAuthWebButtonsProps = {
-  status: OAuthProviderStatus;
+  availabilities: AuthProviderAvailability[];
   labels: Labels;
   unavailableLabel: string;
+  loadingLabel: string;
 };
 
 const PROVIDER_CONFIG: Record<
   OAuthWebProvider,
-  { path: string; icon: () => ReactNode }
+  { icon: () => ReactNode }
 > = {
-  google: { path: "google", icon: GoogleIcon },
-  github: { path: "github", icon: GitHubIcon },
-  microsoft: { path: "microsoft", icon: MicrosoftIcon },
+  google: { icon: GoogleIcon },
+  github: { icon: GitHubIcon },
+  microsoft: { icon: MicrosoftIcon },
 };
 
-export function OAuthWebButtons({ status, labels, unavailableLabel }: OAuthWebButtonsProps) {
+export function OAuthWebButtons({
+  availabilities,
+  labels,
+  unavailableLabel,
+  loadingLabel,
+}: OAuthWebButtonsProps) {
+  const byProvider = new Map(availabilities.map((row) => [row.provider, row]));
+
   return (
     <>
       {OAUTH_WEB_PROVIDERS.map((provider) => {
-        const { path, icon: Icon } = PROVIDER_CONFIG[provider];
+        const row = byProvider.get(provider);
+        const { icon: Icon } = PROVIDER_CONFIG[provider];
         return (
           <Row
             key={provider}
-            configured={status[provider]}
-            href={`${API_URL}/api/v1/auth/${path}/login`}
+            availability={
+              row ?? {
+                provider,
+                configured: false,
+                available: false,
+                loading: true,
+                reason: "loading",
+              }
+            }
             label={labels[provider]}
             unavailableLabel={unavailableLabel}
+            loadingLabel={loadingLabel}
             icon={<Icon />}
           />
         );
@@ -57,33 +73,54 @@ export function OAuthWebButtons({ status, labels, unavailableLabel }: OAuthWebBu
 const ROW_DISABLED =
   "twin-touch-target mb-2 flex w-full cursor-not-allowed items-center justify-center gap-3 rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm font-semibold text-neutral-400 opacity-80";
 
+const ROW_LOADING =
+  "twin-touch-target mb-2 flex w-full cursor-wait items-center justify-center gap-3 rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm font-semibold text-neutral-500";
+
 function Row({
-  configured,
-  href,
+  availability,
   label,
   unavailableLabel,
+  loadingLabel,
   icon,
 }: {
-  configured: boolean;
-  href: string;
+  availability: AuthProviderAvailability;
   label: string;
   unavailableLabel: string;
+  loadingLabel: string;
   icon: ReactNode;
 }) {
-  if (!configured) {
+  if (availability.loading) {
     return (
-      <div className={ROW_DISABLED} aria-disabled="true" title={unavailableLabel}>
+      <div className={ROW_LOADING} aria-busy="true" aria-disabled="true">
         <span className={ICON_WRAP}>{icon}</span>
         <span className="min-w-0 leading-snug">{label}</span>
-        <span className="sr-only">{unavailableLabel}</span>
+        <span className="sr-only">{loadingLabel}</span>
       </div>
     );
   }
+
+  const active = availability.available && Boolean(availability.href);
+  if (active && availability.href) {
+    return (
+      <a href={availability.href} className={ROW_ENABLED}>
+        <span className={ICON_WRAP}>{icon}</span>
+        <span className="min-w-0 leading-snug">{label}</span>
+      </a>
+    );
+  }
+
+  const disabledReason = availability.reason ?? "not_configured";
+  const title =
+    disabledReason === "not_configured" || disabledReason === "provider_disabled"
+      ? unavailableLabel
+      : loadingLabel;
+
   return (
-    <a href={href} className={ROW_ENABLED}>
+    <div className={ROW_DISABLED} aria-disabled="true" title={title}>
       <span className={ICON_WRAP}>{icon}</span>
       <span className="min-w-0 leading-snug">{label}</span>
-    </a>
+      <span className="sr-only">{title}</span>
+    </div>
   );
 }
 

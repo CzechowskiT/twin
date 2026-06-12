@@ -4,7 +4,8 @@
 **Route:** https://twin-sooty.vercel.app/login/candidate  
 **Branch:** `fix/p0-candidate-login-stuck-2026-06-11` → superseded by `fix/p0-auth-login-and-options-2026-06-11`  
 **Owner:** TWIN agent (auth/login)  
-**Companion:** `docs/AUTH_LOGIN_AND_OPTIONS_INCIDENT_2026-06-11.md` (OAuth visibility + same upstream outage)
+**Companion:** `docs/AUTH_LOGIN_AND_OPTIONS_INCIDENT_2026-06-11.md` (OAuth visibility + same upstream outage)  
+**Follow-up (2026-06-12):** `docs/AUTH_BROWSER_STATE_AND_OAUTH_OPTIONS_INCIDENT_2026-06-12.md` — stale localStorage token sent on login POST in normal browser
 
 ---
 

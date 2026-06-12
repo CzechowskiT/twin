@@ -45,7 +45,11 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const { status: oauthStatus, loaded: oauthStatusLoaded } = useOAuthProviderStatus();
+  const {
+    status: oauthStatus,
+    availabilities: oauthAvailabilities,
+    loaded: oauthStatusLoaded,
+  } = useOAuthProviderStatus();
 
   const safeNext = useMemo(() => {
     const nextRaw = searchParams.get("next");
@@ -161,9 +165,12 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
     setLoading(true);
     try {
       const referredRaw = String(form.get("referred_by_note") ?? "").trim();
-      const registered = await apiFetch<RegisterSuccessResponse>("/api/v1/auth/register", {
-        method: "POST",
-        body: JSON.stringify({
+      const registered = await apiFetch<RegisterSuccessResponse>(
+        "/api/v1/auth/register",
+        {
+          method: "POST",
+          preserveSessionOnUnauthorized: true,
+          body: JSON.stringify({
           email,
           password,
           gdpr_consent: true,
@@ -174,7 +181,9 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
           ...attributionFromUrl,
           ...(referredRaw ? { referred_by_note: referredRaw.slice(0, 500) } : {}),
         }),
-      });
+        },
+        null,
+      );
       setToken(registered.access_token);
       setSessionPersona(zone);
       setPersona(zone);
@@ -295,8 +304,9 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
         </p>
       ) : (
         <OAuthWebButtons
-          status={oauthStatus}
+          availabilities={oauthAvailabilities}
           unavailableLabel={t("login.oauthUnavailable")}
+          loadingLabel={t("login.oauthStatusLoading")}
           labels={{
             google: t("login.oauthGoogle"),
             github: t("login.oauthGithub"),

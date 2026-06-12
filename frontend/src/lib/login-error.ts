@@ -8,6 +8,13 @@ import type { TranslationKey } from "@/lib/i18n";
 /** Browser login must fail fast — never leave “Logowanie…” spinning on a hung proxy/upstream. */
 export const LOGIN_REQUEST_TIMEOUT_MS = 10_000;
 
+/** Support/diagnostic codes for login failures (never shown with passwords). */
+export type LoginDiagnosticCode =
+  | "AUTH_TIMEOUT"
+  | "AUTH_INVALID_CREDENTIALS"
+  | "AUTH_BAD_RESPONSE"
+  | "AUTH_RATE_LIMITED";
+
 export type LoginErrorTranslationKey =
   | "login.invalidCredentials"
   | "login.rateLimited"
@@ -17,6 +24,18 @@ export type LoginErrorTranslationKey =
 
 function normalizeApiMessage(raw: string): string {
   return stripRequestIdFromUserMessage(raw).trim();
+}
+
+/** Map API / network failures to user-safe login copy (no passwords, no raw stack traces). */
+export function resolveLoginDiagnosticCode(err: unknown, apiMessage?: string): LoginDiagnosticCode {
+  const key = resolveLoginErrorKey(err, apiMessage);
+  if (key === "login.invalidCredentials") return "AUTH_INVALID_CREDENTIALS";
+  if (key === "login.rateLimited") return "AUTH_RATE_LIMITED";
+  if (key === "login.malformedResponse") return "AUTH_BAD_RESPONSE";
+  if (key === "login.temporarilyUnavailable" && isFetchTimeoutError(err)) return "AUTH_TIMEOUT";
+  const msg = (apiMessage ?? (err instanceof Error ? err.message : "")).toLowerCase();
+  if (msg.includes("timed out") || msg.includes("timeout")) return "AUTH_TIMEOUT";
+  return "AUTH_BAD_RESPONSE";
 }
 
 /** Map API / network failures to user-safe login copy (no passwords, no raw stack traces). */
