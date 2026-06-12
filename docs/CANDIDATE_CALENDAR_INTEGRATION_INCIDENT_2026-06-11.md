@@ -123,3 +123,7 @@ Hard bans confirmed: no reconnect loop · no session clear · no fake connected 
 
 **Pre-deploy verdict:** **FAIL** (founder state still on old deploy; trace blocked by 429)  
 **Expected post-deploy:** **DEGRADED BUT SAFE** if events upstream flaky; **PASS** if both providers return events
+
+## Follow-up — week events loading hang (2026-06-12)
+
+After integration-incident fixes, founder reports provider cards **POŁĄCZONO** but week panel stuck on **„Ładowanie wydarzeń…”**. Root cause: `useEffect` refetch loop from unstable snapshot deps + stale requests skipping `eventsLoading=false`. See `docs/CANDIDATE_CALENDAR_WEEK_EVENTS_LOADING_FIX_2026-06-12.md`.

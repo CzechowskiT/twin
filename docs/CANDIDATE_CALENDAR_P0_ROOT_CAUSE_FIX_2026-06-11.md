@@ -39,6 +39,7 @@ After PR #116 (reconnect banner) and PR #117 (loading timeout), founder QA still
   - `auth/me` + `fetchOpsHealth(CALENDAR_FETCH_TIMEOUT_MS)` bounded.
   - Preserve `connected: true` on transient status failure (502/504/timeout).
   - Explicit `EventsPhase` tracking via `eventsPhaseFromFlags`.
+  - **Follow-up 2026-06-12:** week events `useEffect` loop + `eventsLoading` stale guard — `docs/CANDIDATE_CALENDAR_WEEK_EVENTS_LOADING_FIX_2026-06-12.md`.
   - Optional `debugCalendarLog` when `NEXT_PUBLIC_DEBUG_CALENDAR=true`.
 - **`calendar-connections-panel.tsx`** — `error` phase badge → temporary error (not false not_connected).
 - **`calendar-provider-health.ts`** — `ProviderPhase`, `EventsPhase`, `502`/`504` → `temporary_error`.

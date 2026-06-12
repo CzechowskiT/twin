@@ -114,6 +114,7 @@
 | Candidate calendar integration health | `fix/candidate-calendar-integration-health-2026-06-10` — provider `health` on status; per-provider week load + reconnect badges; `test:candidate-calendar-integration-health` (`docs/CANDIDATE_CALENDAR_INTEGRATION_HEALTH_FIX_2026-06-10.md`) | ✅ **PASS** (candidate) — no false **POŁĄCZONO** on stale tokens; partial provider failure |
 | Candidate calendar loading state timeout | `fix/candidate-calendar-loading-state-timeout-2026-06-11` — 9s client timeout; per-provider bootstrap; `test:candidate-calendar-loading-state` (`docs/CANDIDATE_CALENDAR_LOADING_STATE_TIMEOUT_FIX_2026-06-11.md`) | ✅ **PASS** (candidate) — status/events resolve to retry/connect, never infinite loading |
 | Candidate calendar P0 root-cause | `fix/p0-candidate-calendar-root-cause-2026-06-11` — unblock provider phases from `auth/me`/ops health; stale guards; `test:candidate-calendar-p0-root-cause` (`docs/CANDIDATE_CALENDAR_P0_ROOT_CAUSE_FIX_2026-06-11.md`) | ⚠️ **PENDING prod smoke** — founder re-verify post-deploy |
+| Candidate calendar week events loading | `fix/p0-candidate-calendar-week-events-loading-2026-06-12` — deterministic week panel phases; no infinite „Ładowanie wydarzeń…”; `test:candidate-calendar-week-events-loading` (`docs/CANDIDATE_CALENDAR_WEEK_EVENTS_LOADING_FIX_2026-06-12.md`) | ⚠️ **FAIL pre-fix** — **PENDING prod smoke** post-deploy |
 
 ### O5 — Calendar providers (2026-06-03)
 

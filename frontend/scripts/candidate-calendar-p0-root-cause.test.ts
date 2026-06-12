@@ -63,9 +63,11 @@ test("3: connected status + events hang → provider stays connected, events tem
       showReconnectPanel: false,
       showEmptyWeek: false,
       hasEvents: false,
+      showPartialWarning: false,
       anyTemporaryFailure: true,
+      anyTimeout: false,
     }),
-    "temporary_error",
+    "error",
   );
 });
 
@@ -92,7 +94,9 @@ test("4: events reconnect_required → consistent reconnect panel", () => {
       showReconnectPanel: true,
       showEmptyWeek: false,
       hasEvents: false,
+      showPartialWarning: false,
       anyTemporaryFailure: false,
+      anyTimeout: false,
     }),
     "reconnect_required",
   );
