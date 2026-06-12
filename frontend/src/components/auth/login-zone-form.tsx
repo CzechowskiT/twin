@@ -11,6 +11,11 @@ import { useMarketingPersona } from "@/components/persona-provider";
 import { Button, Card, Input, Label } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { setToken } from "@/lib/auth";
+import {
+  LOGIN_REQUEST_TIMEOUT_MS,
+  parseLoginAccessToken,
+  resolveLoginErrorKey,
+} from "@/lib/login-error";
 import { setSessionPersona } from "@/lib/session-persona";
 import type { TranslationKey } from "@/lib/i18n";
 import type { LoginZone } from "@/lib/persona-auth";
@@ -92,29 +97,26 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
     const form = new FormData(e.currentTarget);
     setLoading(true);
     try {
-      const token = await apiFetch<TokenResponse>("/api/v1/auth/login/json", {
+      const payload = await apiFetch<TokenResponse>("/api/v1/auth/login/json", {
         method: "POST",
+        timeoutMs: LOGIN_REQUEST_TIMEOUT_MS,
         body: JSON.stringify({
           email: form.get("email"),
           password: form.get("password"),
         }),
       });
-      setToken(token.access_token);
+      const accessToken = parseLoginAccessToken(payload);
+      if (!accessToken) {
+        setError(t("login.malformedResponse"));
+        return;
+      }
+      setToken(accessToken);
       setSessionPersona(zone);
       setPersona(zone);
       router.push(nextPath);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "";
-      if (
-        msg.includes("Missing API base URL") ||
-        msg.includes("TWIN_API_BASE_URL") ||
-        msg.includes("NEXT_PUBLIC_API_URL") ||
-        msg.includes("Cannot reach API")
-      ) {
-        setError(t("login.configMissingApi"));
-      } else {
-        setError(msg || t("login.failed"));
-      }
+      setError(t(resolveLoginErrorKey(err, msg)));
     } finally {
       setLoading(false);
     }

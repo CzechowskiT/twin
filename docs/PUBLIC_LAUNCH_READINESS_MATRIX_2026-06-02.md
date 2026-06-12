@@ -88,6 +88,7 @@
 | Check | Evidence | Status |
 | ----- | -------- | ------ |
 | Candidate OAuth (Google/GitHub) | Public-health flags; login routes 200 | ✅ LIVE |
+| Candidate email login UX (no infinite loading) | `fix/p0-candidate-login-stuck-2026-06-11` — 10s timeout, PL errors, auth proxy 12s · `docs/CANDIDATE_LOGIN_STUCK_INCIDENT_2026-06-11.md` · `test:auth-login-stuck-regression` | ⏳ **PENDING deploy** — pre-fix prod **FAIL** (Railway upstream timeout + UI hang) |
 | Auth entry role-choice-first | `/login` + `/register` hubs; header unified; deep links `/login/*` `/register/*` · `docs/AUTH_ROLE_CHOICE_FIRST_2026-06-07.md` | ✅ **LIVE** (2026-06-07) |
 | Apple OAuth | Documented OFF | ⚠️ by design |
 | OAuth callback rate limits | S10 gate — code shipped | ✅ LIVE |

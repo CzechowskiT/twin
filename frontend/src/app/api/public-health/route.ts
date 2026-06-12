@@ -11,10 +11,27 @@ export async function GET() {
     return NextResponse.json({ detail: "API base URL not configured" }, { status: 503 });
   }
   const root = base.replace(/\/$/, "");
-  const [healthRes, celeryRes] = await Promise.all([
-    fetch(`${root}/api/v1/health?db=1&ops=1`, { cache: "no-store" }),
-    fetch(`${root}/api/v1/health/celery-status`, { cache: "no-store" }),
-  ]);
+  const upstreamTimeoutMs = 12_000;
+  let healthRes: Response;
+  let celeryRes: Response;
+  try {
+    [healthRes, celeryRes] = await Promise.all([
+      fetch(`${root}/api/v1/health?db=1&ops=1`, {
+        cache: "no-store",
+        signal: AbortSignal.timeout(upstreamTimeoutMs),
+      }),
+      fetch(`${root}/api/v1/health/celery-status`, {
+        cache: "no-store",
+        signal: AbortSignal.timeout(upstreamTimeoutMs),
+      }),
+    ]);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "fetch failed";
+    return NextResponse.json(
+      { detail: `Cannot reach API (${msg}).`, status: "degraded", db_ok: false },
+      { status: 502 },
+    );
+  }
   if (!healthRes.ok) {
     const body = await healthRes.text();
     return new NextResponse(body, {

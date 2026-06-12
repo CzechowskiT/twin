@@ -47,6 +47,7 @@
     "generate:premium-overlays": "python3 scripts/generate-premium-overlays.py",
     "test:guided-empty-state": "npx --yes tsx scripts/guided-empty-state.test.ts",
     "test:auth-role-choice": "npx --yes tsx scripts/auth-role-choice.test.ts",
+    "test:auth-login-stuck-regression": "npx --yes tsx scripts/auth-login-stuck-regression.test.ts",
     "test:candidate-calendar-routing": "npx --yes tsx scripts/candidate-calendar-routing.test.ts && npx --yes tsx scripts/persona-access.test.ts",
     "test:candidate-calendar-post-load-auth": "npx --yes tsx scripts/candidate-calendar-post-load-auth.test.ts",
     "test:candidate-calendar-integration-health": "npx --yes tsx scripts/candidate-calendar-integration-health.test.ts",
