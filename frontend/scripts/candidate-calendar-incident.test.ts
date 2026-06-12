@@ -78,7 +78,7 @@ test("2: events 502 on Google only — Google card stays connected, not integrat
   assert.equal(aggregate.showReconnectPanel, false);
 });
 
-test("3: both events 502 — week temporary_error, cards stay connected", () => {
+test("3: both events 502 — week error, cards stay connected", () => {
   const outcomes = [
     {
       provider: "google" as const,
@@ -109,9 +109,11 @@ test("3: both events 502 — week temporary_error, cards stay connected", () => 
       showReconnectPanel: false,
       showEmptyWeek: false,
       hasEvents: false,
+      showPartialWarning: false,
       anyTemporaryFailure: true,
+      anyTimeout: false,
     }),
-    "temporary_error",
+    "error",
   );
 });
 
@@ -134,7 +136,7 @@ test("4: events auth failure on Microsoft only — Microsoft card reconnect, Goo
 
 test("5: week panel uses events-read copy, not disconnect/reconnect loop", () => {
   assert.match(weekSrc, /calendarEventsReadError/);
-  assert.match(weekSrc, /calendarEventsReadRetryHint/);
+  assert.match(weekSrc, /calendarEventsReadSessionSafeHint/);
   assert.doesNotMatch(weekSrc, /calendarErrorGeneric/);
   assert.doesNotMatch(i18nSrc, /Spróbuj odłączyć i połączyć ponownie/);
   assert.doesNotMatch(i18nSrc, /Try disconnecting and connecting again/);

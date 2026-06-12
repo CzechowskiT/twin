@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   FollowUpModal,
@@ -38,9 +38,9 @@ import {
   providerStatusBootstrapComplete,
   statusSnapshotFromApi,
   type CalendarProviderStatusSnapshot,
-  type EventsPhase,
   type ProviderStatusPhase,
   type ProviderWeekFetchOutcome,
+  type WeekEventsPhase,
 } from "@/lib/calendar-provider-health";
 import { fetchOpsHealth, type OpsHealth } from "@/lib/ops-health";
 import {
@@ -213,16 +213,22 @@ export default function DashboardCalendarPage() {
   const calendarConnectedQueryRef = useRef<string | null>(null);
   const loadRequestIdRef = useRef(0);
   const eventsRequestIdRef = useRef(0);
-  const [eventsPhase, setEventsPhase] = useState<EventsPhase>("idle");
+  const [eventsPhase, setEventsPhase] = useState<WeekEventsPhase>("idle");
 
   const statusBootstrapComplete = providerStatusBootstrapComplete(googleStatusPhase, microsoftStatusPhase);
 
-  const googleSnapshot: CalendarProviderStatusSnapshot | null = status
-    ? statusSnapshotFromApi("google", status)
-    : null;
-  const microsoftSnapshot: CalendarProviderStatusSnapshot | null = msStatus
-    ? statusSnapshotFromApi("microsoft", msStatus)
-    : null;
+  const googleSnapshot: CalendarProviderStatusSnapshot | null = useMemo(
+    () => (status ? statusSnapshotFromApi("google", status) : null),
+    [status],
+  );
+  const microsoftSnapshot: CalendarProviderStatusSnapshot | null = useMemo(
+    () => (msStatus ? statusSnapshotFromApi("microsoft", msStatus) : null),
+    [msStatus],
+  );
+  const googleSnapshotRef = useRef(googleSnapshot);
+  const microsoftSnapshotRef = useRef(microsoftSnapshot);
+  googleSnapshotRef.current = googleSnapshot;
+  microsoftSnapshotRef.current = microsoftSnapshot;
 
   const googleDisplayHealth = connectionHealthForProvider(googleSnapshot, weekFetchOutcomes);
   const microsoftDisplayHealth = connectionHealthForProvider(microsoftSnapshot, weekFetchOutcomes);
@@ -238,7 +244,11 @@ export default function DashboardCalendarPage() {
   const fetchInterviewRows = useCallback(
     async (token: string) => {
       const q = showCancelledInterviews ? "?include_cancelled=true" : "";
-      const rows = await apiFetch<ScheduledInterview[]>(`/api/v1/calendar/me/interviews${q}`, {}, token);
+      const rows = await apiFetch<ScheduledInterview[]>(
+        `/api/v1/calendar/me/interviews${q}`,
+        { preserveSessionOnUnauthorized: true, timeoutMs: CALENDAR_FETCH_TIMEOUT_MS },
+        token,
+      );
       setInterviews(rows);
     },
     [showCancelledInterviews],
@@ -434,7 +444,9 @@ export default function DashboardCalendarPage() {
   }, [load]);
 
   const fetchCalendarWeekEvents = useCallback(async () => {
-    const providers = healthyProvidersToFetch(googleSnapshot, microsoftSnapshot);
+    const googleSnap = googleSnapshotRef.current;
+    const microsoftSnap = microsoftSnapshotRef.current;
+    const providers = healthyProvidersToFetch(googleSnap, microsoftSnap);
     if (!providers.length) {
       setDisplayEvents(mergeProviderAndTwinEvents([], interviews, weekStart));
       setEventsLoadError(false);
@@ -442,25 +454,26 @@ export default function DashboardCalendarPage() {
       setWeekShowEmpty(false);
       setWeekShowReconnectPanel(
         Boolean(
-          providerNeedsReconnect(googleSnapshot) ||
-            providerNeedsReconnect(microsoftSnapshot) ||
-            providerNeedsAttention(googleSnapshot) ||
-            providerNeedsAttention(microsoftSnapshot),
+          providerNeedsReconnect(googleSnap) ||
+            providerNeedsReconnect(microsoftSnap) ||
+            providerNeedsAttention(googleSnap) ||
+            providerNeedsAttention(microsoftSnap),
         ),
       );
       setWeekShowPartialWarning(false);
       setWeekFailedProviders([]);
       setWeekFetchOutcomes([]);
+      setEventsLoading(false);
       debugCalendarLog("events_skip_not_connected");
       return;
     }
     const token = getToken();
     if (!token) return;
     const requestId = ++eventsRequestIdRef.current;
-    const isStale = () => requestId !== eventsRequestIdRef.current;
+    const isLatest = () => requestId === eventsRequestIdRef.current;
     const { timeMin, timeMax } = weekRangeIso(weekStart);
     setEventsLoading(true);
-    setEventsPhase("loading_events");
+    setEventsPhase("loading");
     setEventsLoadError(false);
     setWeekShowReconnectPanel(false);
     setWeekShowPartialWarning(false);
@@ -470,7 +483,7 @@ export default function DashboardCalendarPage() {
     debugCalendarLog("events_fetch_start", { requestId, providers: providers.join(",") });
     try {
       const params = new URLSearchParams({ time_min: timeMin, time_max: timeMax });
-      const outcomes = await Promise.all(
+      const settled = await Promise.allSettled(
         providers.map(async (provider): Promise<ProviderWeekFetchOutcome> => {
           try {
             const out = await apiFetch<CalendarEventsPayload>(
@@ -478,9 +491,18 @@ export default function DashboardCalendarPage() {
               { preserveSessionOnUnauthorized: true, timeoutMs: CALENDAR_FETCH_TIMEOUT_MS },
               token,
             );
-            return { provider, events: out.events, failed: false, reconnectRequired: false, temporaryError: false, message: null };
+            return {
+              provider,
+              events: out.events,
+              failed: false,
+              reconnectRequired: false,
+              temporaryError: false,
+              timedOut: false,
+              message: null,
+            };
           } catch (e) {
             const msg = e instanceof Error ? e.message : String(e);
+            const timedOut = isFetchTimeoutError(e);
             const parsed = parseProviderIntegrationError(msg);
             logCalendarOperationDiagnostic(diagnosticFromErrorMessage(provider, "events_read", msg));
             return {
@@ -488,32 +510,52 @@ export default function DashboardCalendarPage() {
               events: [],
               failed: true,
               reconnectRequired: parsed.reconnectRequired,
-              temporaryError: parsed.temporaryError,
+              temporaryError: timedOut || parsed.temporaryError,
+              timedOut,
               message: msg,
             };
           }
         }),
       );
-      if (isStale()) {
+      const outcomes: ProviderWeekFetchOutcome[] = settled.map((result, index) => {
+        if (result.status === "fulfilled") return result.value;
+        const provider = providers[index] ?? "google";
+        const msg = result.reason instanceof Error ? result.reason.message : String(result.reason);
+        return {
+          provider,
+          events: [],
+          failed: true,
+          reconnectRequired: false,
+          temporaryError: true,
+          timedOut: isFetchTimeoutError(result.reason),
+          message: msg,
+        };
+      });
+      if (!isLatest()) {
         debugCalendarLog("events_stale_discarded", { requestId });
         return;
       }
-      const aggregate = aggregateWeekEventOutcomes(outcomes, googleSnapshot, microsoftSnapshot);
+      const aggregate = aggregateWeekEventOutcomes(outcomes, googleSnap, microsoftSnap);
+      const loadError = aggregate.allHealthyProvidersFailed && !aggregate.showReconnectPanel;
+      const anyTimeout = outcomes.some((o) => o.timedOut);
+      const anyTemporaryFailure = outcomes.some((o) => o.temporaryError);
       setWeekFetchOutcomes(outcomes);
       setDisplayEvents(mergeProviderAndTwinEvents(aggregate.events, interviews, weekStart));
       setWeekShowEmpty(aggregate.showEmptyWeek);
       setWeekShowReconnectPanel(aggregate.showReconnectPanel);
       setWeekShowPartialWarning(aggregate.showPartialWarning);
       setWeekFailedProviders(aggregate.failedProviders);
-      setEventsLoadError(aggregate.allHealthyProvidersFailed && !aggregate.showReconnectPanel);
+      setEventsLoadError(loadError);
       setEventsPhase(
         eventsPhaseFromFlags({
           loading: false,
-          loadError: aggregate.allHealthyProvidersFailed && !aggregate.showReconnectPanel,
+          loadError,
           showReconnectPanel: aggregate.showReconnectPanel,
           showEmptyWeek: aggregate.showEmptyWeek,
           hasEvents: aggregate.events.length > 0,
-          anyTemporaryFailure: outcomes.some((o) => o.temporaryError),
+          showPartialWarning: aggregate.showPartialWarning,
+          anyTemporaryFailure,
+          anyTimeout,
         }),
       );
       debugCalendarLog("events_fetch_complete", {
@@ -522,18 +564,19 @@ export default function DashboardCalendarPage() {
         empty: aggregate.showEmptyWeek,
       });
     } catch (e) {
-      if (!isStale()) {
+      if (isLatest()) {
+        const timedOut = isFetchTimeoutError(e);
         setEventsLoadError(true);
-        setEventsPhase("temporary_error");
+        setEventsPhase(timedOut ? "timeout" : "error");
         setDisplayEvents(mergeProviderAndTwinEvents([], interviews, weekStart));
       }
       console.warn("[calendar] week events fetch failed", e);
     } finally {
-      if (!isStale()) {
+      if (isLatest()) {
         setEventsLoading(false);
       }
     }
-  }, [weekStart, interviews, googleSnapshot, microsoftSnapshot]);
+  }, [weekStart, interviews]);
 
   useEffect(() => {
     if (!statusBootstrapComplete || !isCalendarConnected) return;

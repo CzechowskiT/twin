@@ -73,6 +73,9 @@ def insert_primary_event(
         return res.json()
 
 
+CALENDAR_EVENTS_HTTP_TIMEOUT = 9.0
+
+
 def list_primary_events(
     access_token: str,
     time_min: str,
@@ -88,7 +91,7 @@ def list_primary_events(
         "orderBy": "startTime",
         "maxResults": max(1, min(max_results, 250)),
     }
-    with httpx.Client(timeout=30.0) as client:
+    with httpx.Client(timeout=CALENDAR_EVENTS_HTTP_TIMEOUT) as client:
         res = client.get(
             f"{CAL_BASE}/calendars/primary/events",
             params=params,
