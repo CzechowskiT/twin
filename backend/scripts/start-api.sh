@@ -30,4 +30,5 @@ while [ "$i" -le 30 ]; do
   i=$((i + 1))
 done
 
-exec uvicorn app.main:app --host 0.0.0.0 --port "${PORT:-8000}"
+# Two workers: calendar/oauth sync must not starve /health on a single event loop.
+exec uvicorn app.main:app --host 0.0.0.0 --port "${PORT:-8000}" --workers 2

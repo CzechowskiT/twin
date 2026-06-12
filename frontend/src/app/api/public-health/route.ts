@@ -11,20 +11,19 @@ export async function GET() {
     return NextResponse.json({ detail: "API base URL not configured" }, { status: 503 });
   }
   const root = base.replace(/\/$/, "");
-  const upstreamTimeoutMs = 12_000;
+  const healthTimeoutMs = 10_000;
+  const celeryTimeoutMs = 4_000;
   let healthRes: Response;
   let celeryRes: Response;
   try {
-    [healthRes, celeryRes] = await Promise.all([
-      fetch(`${root}/api/v1/health?db=1&ops=1`, {
-        cache: "no-store",
-        signal: AbortSignal.timeout(upstreamTimeoutMs),
-      }),
-      fetch(`${root}/api/v1/health/celery-status`, {
-        cache: "no-store",
-        signal: AbortSignal.timeout(upstreamTimeoutMs),
-      }),
-    ]);
+    healthRes = await fetch(`${root}/api/v1/health?db=1&ops=1`, {
+      cache: "no-store",
+      signal: AbortSignal.timeout(healthTimeoutMs),
+    });
+    celeryRes = await fetch(`${root}/api/v1/health/celery-status`, {
+      cache: "no-store",
+      signal: AbortSignal.timeout(celeryTimeoutMs),
+    }).catch(() => new Response(null, { status: 504 }));
   } catch (err) {
     const msg = err instanceof Error ? err.message : "fetch failed";
     return NextResponse.json(
