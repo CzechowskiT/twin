@@ -49,15 +49,33 @@ def build_health_ops_public(s: Settings) -> dict[str, Any]:
         "recruiter_inbox_configured": bool((s.recruiter_inbox_token or "").strip()),
     }
     try:
+        from sqlalchemy import text
+
         from app.database.session import SessionLocal
-        from app.services.market_coverage_status import build_market_coverage_status
         from app.services.mvp_public_metrics import count_validated_jobs_public_traction
         from app.services.partner_auth import partner_export_configured
 
+        from app.services.scrape_run_tracking import get_latest_run, last_scrape_run_at
+
         with SessionLocal() as db_sess:
-            mc = build_market_coverage_status(db_sess)
+            if db_sess.bind and db_sess.bind.dialect.name == "postgresql":
+                db_sess.execute(text("SET LOCAL statement_timeout = '2s'"))
             out["partner_export_configured"] = partner_export_configured(db_sess, s)
             out["validated_jobs"] = count_validated_jobs_public_traction(db_sess)
+        # Avoid heavy market_coverage_report COUNTs on the public health path — use Redis scrape snapshot only.
+        last_at = last_scrape_run_at()
+        latest = get_latest_run()
+        active = int(out.get("validated_jobs") or 0)
+        target = max(1000, int(s.market_coverage_target_jobs))
+        mc: dict[str, Any] = {
+            "last_scrape_run_at": last_at,
+            "progress_to_10k_pct": round(min(100.0, 100.0 * active / target), 1) if target else None,
+            "active_validated_jobs": active,
+            "feed_stale": False,
+            "warnings": list(latest.get("warnings") or [])[:8] if latest else [],
+        }
+        if latest and latest.get("status") == "running":
+            mc["warnings"] = ["scrape_run_in_progress", *mc["warnings"]]
     except Exception:
         out["partner_export_configured"] = bool((s.partner_export_token or "").strip())
         out["validated_jobs"] = 0

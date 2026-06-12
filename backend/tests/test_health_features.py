@@ -91,9 +91,10 @@ def test_health_ops_includes_mail_and_calendar_flags(
 
 
 @patch("app.api.health._database_reachable", return_value=True)
-@patch("app.services.market_coverage_status.build_market_coverage_status")
+@patch("app.services.scrape_run_tracking.get_latest_run")
+@patch("app.services.scrape_run_tracking.last_scrape_run_at", return_value=None)
 @patch("app.services.partner_auth.partner_export_configured", return_value=False)
-@patch("app.services.mvp_public_metrics.count_validated_jobs_public_traction", return_value=0)
+@patch("app.services.mvp_public_metrics.count_validated_jobs_public_traction", return_value=1270)
 @patch("app.database.session.SessionLocal")
 @patch("app.services.linkedin_oauth.is_linkedin_oauth_configured", return_value=False)
 @patch("app.services.google_calendar_oauth.is_google_calendar_oauth_configured", return_value=False)
@@ -107,7 +108,8 @@ def test_health_ops_db_coerces_market_coverage_types(
     _mock_session_local: MagicMock,
     _mock_jobs: MagicMock,
     _mock_partner: MagicMock,
-    _mock_mc: MagicMock,
+    _mock_last_scrape: MagicMock,
+    _mock_latest_run: MagicMock,
     _mock_db: MagicMock,
 ) -> None:
     """Regression: null last_scrape_at and float progress must not 500 on response validation."""
@@ -115,11 +117,8 @@ def test_health_ops_db_coerces_market_coverage_types(
     mock_cm.__enter__.return_value = MagicMock()
     mock_cm.__exit__.return_value = None
     _mock_session_local.return_value = mock_cm
-    _mock_mc.return_value = {
-        "last_scrape_run_at": None,
-        "progress_to_10k_pct": 12.7,
-        "active_validated_jobs": 1270,
-        "feed_stale": True,
+    _mock_latest_run.return_value = {
+        "status": "ok",
         "warnings": ["feed_stale_no_recent_scrape"],
     }
     client = TestClient(app)
@@ -130,7 +129,7 @@ def test_health_ops_db_coerces_market_coverage_types(
         assert data.get("market_coverage_last_scrape_at") == ""
         assert data.get("market_coverage_progress_pct") == 13
         assert data.get("market_coverage_active_validated") == 1270
-        assert data.get("market_coverage_feed_stale") is True
+        assert data.get("market_coverage_feed_stale") is False
         if "db" in query:
             assert data.get("db_ok") is True
 

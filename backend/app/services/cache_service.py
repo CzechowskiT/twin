@@ -19,7 +19,12 @@ class CacheService:
             import redis
 
             s = get_settings()
-            client = redis.Redis.from_url(s.redis_url, decode_responses=True, socket_connect_timeout=1.5)
+            client = redis.Redis.from_url(
+                s.redis_url,
+                decode_responses=True,
+                socket_connect_timeout=1.5,
+                socket_timeout=2.0,
+            )
             client.ping()
             self._redis = client
             logger.info("CacheService using Redis")

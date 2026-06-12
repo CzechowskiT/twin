@@ -1,0 +1,12 @@
+# Railway API service config (monorepo: set Service → Root Directory = backend).
+# Duplicate of deploy/railway-api.toml so GitHub deploys work when config path is unset.
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+watchPatterns = ["**"]
+
+[deploy]
+healthcheckPath = "/api/v1/health"
+healthcheckTimeout = 120
+restartPolicyType = "ON_FAILURE"
