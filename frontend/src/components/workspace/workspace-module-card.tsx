@@ -23,7 +23,7 @@ export function WorkspaceModuleCard({ module: mod }: { module: WorkspaceModuleDe
       {mod.hintKey ? (
         <p className="twin-muted mt-2 text-xs leading-relaxed opacity-90">{t(mod.hintKey)}</p>
       ) : null}
-      <span className="twin-btn-primary twin-touch-target mt-4 inline-flex w-full items-center justify-center text-sm">
+      <span className="twin-btn-primary twin-touch-target mt-4 inline-flex w-full items-center justify-center text-sm text-[var(--twin-on-cta)] group-hover:text-[var(--twin-on-cta)]">
         {t(mod.ctaKey)}
       </span>
     </>

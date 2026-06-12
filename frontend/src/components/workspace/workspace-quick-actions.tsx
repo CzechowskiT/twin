@@ -24,7 +24,7 @@ export function WorkspaceQuickActions({ actions }: { actions: readonly Workspace
         <Link
           key={action.href}
           href={action.href}
-          className="rounded-full border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] px-3 py-1.5 text-sm font-medium text-[var(--twin-muted-strong)] transition hover:border-[var(--twin-accent)]/45 hover:bg-[var(--twin-accent-muted)]/35 hover:text-[var(--foreground)]"
+          className="rounded-full border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] px-3 py-1.5 text-sm font-medium text-[var(--twin-muted-strong)] transition hover:border-[var(--twin-accent)]/45 hover:bg-[var(--twin-accent-muted)]/35 hover:text-[var(--twin-accent)]"
         >
           {t(action.labelKey)}
         </Link>
