@@ -15,7 +15,7 @@ import { LOGIN_PATH, WORKSPACE_PATH } from "@/lib/persona-auth";
 import { logoutRedirectPath } from "@/lib/persona-access";
 
 const SURFACE_COPY: Record<
-  "candidate" | "recruiter" | "investor",
+  "candidate" | "recruiter" | "investor" | "company",
   { title: TranslationKey; lead: TranslationKey }
 > = {
   candidate: {
@@ -29,6 +29,10 @@ const SURFACE_COPY: Record<
   investor: {
     title: "workspace.gateTitleInvestor",
     lead: "workspace.gateLeadInvestor",
+  },
+  company: {
+    title: "workspace.gateTitleCompany",
+    lead: "workspace.gateLeadCompany",
   },
 };
 
@@ -48,7 +52,7 @@ export function PersonaWorkspaceGate({
   children,
 }: {
   allowed: readonly MarketingPersona[];
-  surface: "candidate" | "recruiter" | "investor";
+  surface: "candidate" | "recruiter" | "investor" | "company";
   children: ReactNode;
 }) {
   const { t } = useTranslation();
@@ -56,18 +60,38 @@ export function PersonaWorkspaceGate({
   const router = useRouter();
   const copy = SURFACE_COPY[surface];
   const loginZone = allowed[0] ?? "candidate";
+  const loginPath = LOGIN_PATH[loginZone];
+  const hasToken = getToken();
 
   useEffect(() => {
-    if (!getToken()) {
-      router.replace(LOGIN_PATH[loginZone]);
+    if (!hasToken) {
+      router.replace(loginPath);
       return;
     }
     if (!allowed.includes(persona)) {
       router.replace(WORKSPACE_PATH[persona]);
     }
-  }, [allowed, loginZone, persona, router]);
+  }, [allowed, hasToken, loginPath, persona, router]);
 
-  if (!getToken()) return null;
+  if (!hasToken) {
+    return (
+      <Shell wide>
+        <Card variant="soft" className="p-6 sm:p-8">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
+            {t("workspace.authRequiredTitle")}
+          </p>
+          <h1 className="twin-section-title mt-2 text-xl sm:text-2xl">{t(copy.title)}</h1>
+          <p className="twin-muted mt-4 text-sm leading-relaxed">{t("workspace.authRequiredLead")}</p>
+          <p className="twin-muted mt-2 text-xs">{t("workspace.authRedirecting")}</p>
+          <div className="mt-8">
+            <Link href={loginPath} className="twin-btn-primary twin-touch-target">
+              {t("workspace.authRequiredCta")}
+            </Link>
+          </div>
+        </Card>
+      </Shell>
+    );
+  }
 
   if (allowed.includes(persona)) {
     return <>{children}</>;

@@ -100,7 +100,7 @@ const fr: DraftOverlay = {
     close: "Fermer",
     templateLabel: "Modèle",
     subjectLabel: "Objet",
-    bodyLabel: "Message",
+    bodyLabel: "Corps du message",
     copied: "Copié dans le presse-papiers",
     templateInvitation: "Invitation au premier échange",
     templateMissingInfo: "Demande d'informations manquantes",
