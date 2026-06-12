@@ -22,6 +22,7 @@ type OAuthWebButtonsProps = {
   availabilities: AuthProviderAvailability[];
   labels: Labels;
   unavailableLabel: string;
+  disabledReasonLabel: string;
   loadingLabel: string;
 };
 
@@ -38,6 +39,7 @@ export function OAuthWebButtons({
   availabilities,
   labels,
   unavailableLabel,
+  disabledReasonLabel,
   loadingLabel,
 }: OAuthWebButtonsProps) {
   const byProvider = new Map(availabilities.map((row) => [row.provider, row]));
@@ -61,6 +63,7 @@ export function OAuthWebButtons({
             }
             label={labels[provider]}
             unavailableLabel={unavailableLabel}
+            disabledReasonLabel={disabledReasonLabel}
             loadingLabel={loadingLabel}
             icon={<Icon />}
           />
@@ -80,12 +83,14 @@ function Row({
   availability,
   label,
   unavailableLabel,
+  disabledReasonLabel,
   loadingLabel,
   icon,
 }: {
   availability: AuthProviderAvailability;
   label: string;
   unavailableLabel: string;
+  disabledReasonLabel: string;
   loadingLabel: string;
   icon: ReactNode;
 }) {
@@ -110,16 +115,18 @@ function Row({
   }
 
   const disabledReason = availability.reason ?? "not_configured";
-  const title =
+  const reasonText =
     disabledReason === "not_configured" || disabledReason === "provider_disabled"
-      ? unavailableLabel
-      : loadingLabel;
+      ? disabledReasonLabel
+      : unavailableLabel;
 
   return (
-    <div className={ROW_DISABLED} aria-disabled="true" title={title}>
+    <div className={ROW_DISABLED} aria-disabled="true" title={reasonText}>
       <span className={ICON_WRAP}>{icon}</span>
-      <span className="min-w-0 leading-snug">{label}</span>
-      <span className="sr-only">{title}</span>
+      <span className="flex min-w-0 flex-col items-start leading-snug">
+        <span>{label}</span>
+        <span className="text-xs font-normal text-neutral-400">{reasonText}</span>
+      </span>
     </div>
   );
 }

@@ -198,6 +198,7 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
             <OAuthWebButtons
               availabilities={oauthAvailabilities}
               unavailableLabel={t("login.oauthUnavailable")}
+              disabledReasonLabel={t("login.oauthDisabledReason")}
               loadingLabel={t("login.oauthStatusLoading")}
               labels={{
                 google: t("login.oauthGoogle"),

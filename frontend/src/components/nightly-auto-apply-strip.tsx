@@ -105,7 +105,7 @@ export function NightlyAutoApplyStrip() {
   const sweepSummaryText = sweep?.started_at ? sweepSummary(sweep, t) : null;
 
   return (
-    <div className="mb-4 space-y-3">
+    <div id="auto-apply-readiness" className="mb-4 scroll-mt-24 space-y-3">
       {needsConsent ? (
         <div
           className="rounded-xl border border-[var(--twin-accent-muted)] bg-[var(--twin-accent-muted)]/25 px-4 py-3 sm:px-5"

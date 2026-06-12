@@ -18,6 +18,8 @@
 **Safe-lane merge (2026-06-08):** Candidate application transparency premium panel (Slice 3) · two-column shared/not shared · **does not change launch NO-GO**.
 **Safe-lane merge (2026-06-10):** Recruiter decision console **visual polish** — wider hierarchy, stat cards, match score badges, review card CTA · accept/decline unchanged · **does not change launch NO-GO**.
 
+**Safe-lane merge (2026-06-12):** Persona workspace **navigation & premium UX** — module grids (candidate/recruiter/company/investor), `/recruiter` hub, integrations redirect, login OAuth polish · `docs/PERSONA_WORKSPACE_NAVIGATION_PREMIUM_UX_2026-06-12.md` · `test:persona-dashboard-navigation` + `test:workspace-premium-empty-states` + `test:auth-login-options-ux` · **does not change launch NO-GO**.
+
 **Safe-lane merge (2026-06-11):** Recruiter inbox **premium card redesign** — decision rail, match score card, signal rows, review CTA · **does not change launch NO-GO**.
 
 **Safe-lane merge (2026-06-11):** Recruiter **candidate message drafts** — 4 templates, copy-to-clipboard, local contact phase after accept; no email send, no hidden PII · `docs/RECRUITER_CANDIDATE_MESSAGE_DRAFTS_MVP_2026-06-11.md` · **does not change launch NO-GO**.

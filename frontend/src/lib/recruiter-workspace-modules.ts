@@ -1,0 +1,93 @@
+import { RECRUITER_INTEGRATIONS_ROUTE } from "@/lib/recruiter-integrations-readiness";
+import type { WorkspaceModuleDef } from "@/lib/workspace-module-status";
+
+/** Recruiter hub module cards — calendar sync explicitly NOT LIVE. */
+export const RECRUITER_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
+  {
+    id: "inbox",
+    href: "/recruiter/inbox",
+    titleKey: "workspaceModules.recruiterInboxTitle",
+    valuePropKey: "workspaceModules.recruiterInboxValue",
+    ctaKey: "workspaceModules.recruiterInboxCta",
+    status: "live",
+  },
+  {
+    id: "pipeline",
+    href: "/recruiter/pipeline",
+    titleKey: "workspaceModules.recruiterPipelineTitle",
+    valuePropKey: "workspaceModules.recruiterPipelineValue",
+    ctaKey: "workspaceModules.recruiterPipelineCta",
+    status: "live",
+  },
+  {
+    id: "search",
+    href: "/recruiter/search",
+    titleKey: "workspaceModules.recruiterSearchTitle",
+    valuePropKey: "workspaceModules.recruiterSearchValue",
+    ctaKey: "workspaceModules.recruiterSearchCta",
+    status: "live",
+  },
+  {
+    id: "analytics",
+    href: "/recruiter/analytics",
+    titleKey: "workspaceModules.recruiterAnalyticsTitle",
+    valuePropKey: "workspaceModules.recruiterAnalyticsValue",
+    ctaKey: "workspaceModules.recruiterAnalyticsCta",
+    status: "pilot",
+  },
+  {
+    id: "integrations",
+    href: RECRUITER_INTEGRATIONS_ROUTE,
+    titleKey: "workspaceModules.recruiterIntegrationsTitle",
+    valuePropKey: "workspaceModules.recruiterIntegrationsValue",
+    hintKey: "workspaceModules.recruiterIntegrationsHint",
+    ctaKey: "workspaceModules.recruiterIntegrationsCta",
+    status: "pilot",
+  },
+  {
+    id: "calendar",
+    href: "/recruiter/calendar",
+    titleKey: "workspaceModules.recruiterCalendarTitle",
+    valuePropKey: "workspaceModules.recruiterCalendarValue",
+    hintKey: "workspaceModules.recruiterCalendarHint",
+    ctaKey: "workspaceModules.recruiterCalendarCta",
+    status: "not_live",
+  },
+  {
+    id: "notes_scorecards",
+    href: "/recruiter/inbox",
+    titleKey: "workspaceModules.recruiterNotesTitle",
+    valuePropKey: "workspaceModules.recruiterNotesValue",
+    hintKey: "workspaceModules.recruiterNotesHint",
+    ctaKey: "workspaceModules.recruiterNotesCta",
+    status: "live",
+  },
+  {
+    id: "scheduling",
+    href: "/recruiter/inbox",
+    titleKey: "workspaceModules.recruiterSchedulingTitle",
+    valuePropKey: "workspaceModules.recruiterSchedulingValue",
+    hintKey: "workspaceModules.recruiterSchedulingHint",
+    ctaKey: "workspaceModules.recruiterSchedulingCta",
+    status: "pilot",
+  },
+  {
+    id: "audit",
+    href: "/recruiter/inbox",
+    titleKey: "workspaceModules.recruiterAuditTitle",
+    valuePropKey: "workspaceModules.recruiterAuditValue",
+    hintKey: "workspaceModules.recruiterAuditHint",
+    ctaKey: "workspaceModules.recruiterAuditCta",
+    status: "pilot",
+  },
+  {
+    id: "jobs",
+    href: "/recruiter/jobs",
+    titleKey: "workspaceModules.recruiterJobsTitle",
+    valuePropKey: "workspaceModules.recruiterJobsValue",
+    ctaKey: "workspaceModules.recruiterJobsCta",
+    status: "live",
+  },
+];
+
+export const RECRUITER_HUB_ROUTE = "/recruiter";
