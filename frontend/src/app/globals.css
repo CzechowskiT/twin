@@ -1183,14 +1183,19 @@ html[data-marketing-surface="studio"] .twin-app-read-pane {
   padding: 0.75rem 1.5rem;
   font-size: 0.9375rem;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--twin-on-cta);
   box-shadow: var(--twin-shadow);
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .twin-btn-primary:hover {
   background: var(--twin-cta-hover);
-  color: #ffffff;
+  color: var(--twin-on-cta);
+}
+
+.twin-btn-primary:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .twin-btn-secondary {
@@ -2244,6 +2249,25 @@ button.marketing-cta-filled-pill {
 
 html[data-marketing-surface="studio"] a.marketing-cta-filled-pill,
 html[data-marketing-surface="studio"] button.marketing-cta-filled-pill {
+  color: #0f172a !important;
+}
+
+/** Workspace / app primary buttons — same `a { color: inherit }` pitfall on light studio CTA pills. */
+a .twin-btn-primary,
+button.twin-btn-primary,
+.twin-btn-primary {
+  color: var(--twin-on-cta);
+}
+
+html[data-marketing-surface="studio"] a .twin-btn-primary,
+html[data-marketing-surface="studio"] button.twin-btn-primary,
+html[data-marketing-surface="studio"] .twin-btn-primary {
+  color: #0f172a !important;
+}
+
+html[data-marketing-surface="studio"] a .twin-btn-primary:hover,
+html[data-marketing-surface="studio"] button.twin-btn-primary:hover,
+html[data-marketing-surface="studio"] .twin-btn-primary:hover {
   color: #0f172a !important;
 }
 
