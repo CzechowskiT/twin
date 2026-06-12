@@ -89,6 +89,9 @@ def insert_calendar_event(
         return res.json()
 
 
+CALENDAR_EVENTS_HTTP_TIMEOUT = 9.0
+
+
 def list_calendar_view_events(
     access_token: str,
     time_min: str,
@@ -103,7 +106,7 @@ def list_calendar_view_events(
         "$top": max(1, min(max_results, 250)),
         "$orderby": "start/dateTime",
     }
-    with httpx.Client(timeout=30.0) as client:
+    with httpx.Client(timeout=CALENDAR_EVENTS_HTTP_TIMEOUT) as client:
         res = client.get(
             f"{GRAPH}/me/calendarView",
             params=params,

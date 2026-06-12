@@ -19,14 +19,18 @@ export type ProviderPhase =
   | "timeout";
 
 /** Week events fetch lifecycle — never blocks provider status terminal state. */
-export type EventsPhase =
+export type WeekEventsPhase =
   | "idle"
-  | "loading_events"
+  | "loading"
   | "loaded"
   | "empty"
-  | "temporary_error"
+  | "partial_error"
+  | "error"
   | "timeout"
   | "reconnect_required";
+
+/** @deprecated Prefer WeekEventsPhase */
+export type EventsPhase = WeekEventsPhase;
 
 export function providerPhaseFromStatus(
   statusPhase: ProviderStatusPhase,
@@ -48,11 +52,15 @@ export function eventsPhaseFromFlags(flags: {
   showReconnectPanel: boolean;
   showEmptyWeek: boolean;
   hasEvents: boolean;
+  showPartialWarning: boolean;
   anyTemporaryFailure: boolean;
-}): EventsPhase {
-  if (flags.loading) return "loading_events";
+  anyTimeout: boolean;
+}): WeekEventsPhase {
+  if (flags.loading) return "loading";
   if (flags.showReconnectPanel) return "reconnect_required";
-  if (flags.loadError || flags.anyTemporaryFailure) return "temporary_error";
+  if (flags.showPartialWarning) return "partial_error";
+  if (flags.anyTimeout && flags.loadError && !flags.hasEvents) return "timeout";
+  if (flags.loadError || flags.anyTemporaryFailure) return "error";
   if (flags.showEmptyWeek || !flags.hasEvents) return flags.hasEvents ? "loaded" : "empty";
   return "loaded";
 }
@@ -106,6 +114,7 @@ export type ProviderWeekFetchOutcome = {
   failed: boolean;
   reconnectRequired: boolean;
   temporaryError: boolean;
+  timedOut?: boolean;
   message: string | null;
 };
 

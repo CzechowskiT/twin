@@ -1154,7 +1154,7 @@ const en = {
     calendarIntegrationError: "Integration error",
     calendarProviderGoogleReconnect: "Google Calendar access expired. Connect Google again — no need to disconnect first.",
     calendarProviderMicrosoftReconnect: "Microsoft 365 access expired. Connect Microsoft again — no need to disconnect first.",
-    calendarPartialFailure: "Some connected calendars could not load. Events below may be incomplete.",
+    calendarPartialFailure: "Could not load some events. Try again.",
     calendarAllProvidersReconnectTitle: "Reconnect your calendar",
     calendarAllProvidersReconnectBody:
       "Your Google or Microsoft connection needs to be refreshed. Use Connect below — your TWIN account stays signed in.",
@@ -1176,7 +1176,10 @@ const en = {
     calendarConnectedAs: "Calendar account",
     calendarActionFailedRetry:
       "That calendar step did not complete. Your accounts stay connected — try again in a moment.",
-    calendarEventsReadError: "Could not load this week's events right now.",
+    calendarEventsReadError: "Could not load calendar events.",
+    calendarEventsReadTimeout: "Loading events is taking too long.",
+    calendarEventsReadSessionSafeHint:
+      "Calendar connections are still active. This is an events read issue, not a sign-in problem.",
     calendarEventsReadRetryHint:
       "Your Google and Microsoft connections are still active. Retry below or use the WebCal feed while we catch up.",
     calendarConnectionProbeError:
@@ -4944,8 +4947,7 @@ const pl: MessageTree = {
       "Dostęp do Google Calendar wygasł. Połącz Google ponownie — bez wcześniejszego odłączania.",
     calendarProviderMicrosoftReconnect:
       "Dostęp do Microsoft 365 wygasł. Połącz Microsoft ponownie — bez wcześniejszego odłączania.",
-    calendarPartialFailure:
-      "Nie udało się wczytać części podłączonych kalendarzy. Poniższe wydarzenia mogą być niepełne.",
+    calendarPartialFailure: "Nie udało się wczytać części wydarzeń. Spróbuj ponownie.",
     calendarAllProvidersReconnectTitle: "Połącz kalendarz ponownie",
     calendarAllProvidersReconnectBody:
       "Połączenie Google lub Microsoft wymaga odświeżenia. Użyj Połącz ponownie poniżej — konto TWIN pozostaje zalogowane.",
@@ -4967,7 +4969,10 @@ const pl: MessageTree = {
     calendarConnectedAs: "Konto kalendarza",
     calendarActionFailedRetry:
       "Ten krok kalendarza się nie udał. Konta pozostają połączone — spróbuj ponownie za chwilę.",
-    calendarEventsReadError: "Nie udało się teraz wczytać wydarzeń z tego tygodnia.",
+    calendarEventsReadError: "Nie udało się wczytać wydarzeń z kalendarza.",
+    calendarEventsReadTimeout: "Ładowanie wydarzeń trwa zbyt długo.",
+    calendarEventsReadSessionSafeHint:
+      "Połączenia z kalendarzami są aktywne. Problem dotyczy odczytu wydarzeń, nie logowania.",
     calendarEventsReadRetryHint:
       "Połączenia Google i Microsoft nadal są aktywne. Ponów poniżej lub użyj kanału WebCal na czas problemu.",
     calendarConnectionProbeError:

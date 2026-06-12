@@ -5,14 +5,14 @@ import { Card } from "@/components/ui";
 import { Button } from "@/components/ui";
 import type { CalendarProvider } from "@/lib/calendar-week";
 import { addDays, eventsByDay, formatEventTimeRange, type DisplayCalendarEvent } from "@/lib/calendar-week";
-import type { EventsPhase } from "@/lib/calendar-provider-health";
+import type { WeekEventsPhase } from "@/lib/calendar-provider-health";
 
 type CalendarWeekViewProps = {
   weekStart: Date;
   events: DisplayCalendarEvent[];
   loading: boolean;
   loadError: boolean;
-  eventsPhase?: EventsPhase;
+  eventsPhase?: WeekEventsPhase;
   showEmptyWeek: boolean;
   showReconnectPanel: boolean;
   showPartialWarning: boolean;
@@ -82,37 +82,55 @@ export function CalendarWeekView({
 
       {loading ? (
         <p className="twin-muted mt-4 text-sm">{t("dashboard.calendarViewLoading")}</p>
-      ) : showReconnectPanel ? (
+      ) : showReconnectPanel || eventsPhase === "reconnect_required" ? (
         <div className="mt-4 rounded-lg border border-amber-300/80 bg-amber-50/90 px-4 py-3 dark:border-amber-900/50 dark:bg-amber-950/30">
           <p className="text-sm font-semibold text-amber-950 dark:text-amber-100">
             {t("dashboard.calendarAllProvidersReconnectTitle")}
           </p>
           <p className="mt-1 text-sm text-amber-900 dark:text-amber-100/90">{t("dashboard.calendarAllProvidersReconnectBody")}</p>
         </div>
-      ) : loadError || eventsPhase === "temporary_error" || eventsPhase === "timeout" ? (
+      ) : eventsPhase === "timeout" ? (
+        <div className="mt-4 rounded-lg border border-sky-300/80 bg-sky-50/90 px-4 py-3 dark:border-sky-900/50 dark:bg-sky-950/30">
+          <p className="text-sm font-medium text-sky-950 dark:text-sky-100" role="alert">
+            {t("dashboard.calendarEventsReadTimeout")}
+          </p>
+          {onRetryEvents ? (
+            <Button type="button" className="twin-touch-target mt-3 !w-auto self-start" onClick={onRetryEvents}>
+              {t("dashboard.calendarRetry")}
+            </Button>
+          ) : null}
+        </div>
+      ) : loadError || eventsPhase === "error" ? (
         <div className="mt-4 rounded-lg border border-sky-300/80 bg-sky-50/90 px-4 py-3 dark:border-sky-900/50 dark:bg-sky-950/30">
           <p className="text-sm font-medium text-sky-950 dark:text-sky-100" role="alert">
             {t("dashboard.calendarEventsReadError")}
           </p>
-          <p className="mt-1 text-sm text-sky-900 dark:text-sky-100/90">{t("dashboard.calendarEventsReadRetryHint")}</p>
+          <p className="mt-1 text-sm text-sky-900 dark:text-sky-100/90">{t("dashboard.calendarEventsReadSessionSafeHint")}</p>
           {onRetryEvents ? (
             <Button type="button" className="twin-touch-target mt-3 !w-auto self-start" onClick={onRetryEvents}>
-              {t("dashboard.calendarRetryEvents")}
+              {t("dashboard.calendarRetry")}
             </Button>
           ) : null}
         </div>
-      ) : showPartialWarning ? (
-        <p className="mt-4 text-sm text-amber-800 dark:text-amber-200" role="status">
-          {t("dashboard.calendarPartialFailure")}
-          {failedProviders.length > 0 ? ` (${failedProviders.join(", ")})` : null}
-        </p>
+      ) : showPartialWarning || eventsPhase === "partial_error" ? (
+        <div className="mt-4 rounded-lg border border-amber-300/60 bg-amber-50/70 px-4 py-3 dark:border-amber-900/40 dark:bg-amber-950/20">
+          <p className="text-sm text-amber-900 dark:text-amber-100" role="status">
+            {t("dashboard.calendarPartialFailure")}
+            {failedProviders.length > 0 ? ` (${failedProviders.join(", ")})` : null}
+          </p>
+          {onRetryEvents ? (
+            <Button type="button" className="twin-touch-target mt-3 !w-auto self-start" onClick={onRetryEvents}>
+              {t("dashboard.calendarRetry")}
+            </Button>
+          ) : null}
+        </div>
       ) : null}
 
-      {!loading && !showReconnectPanel && !loadError && showEmptyWeek && !hasAny ? (
+      {!loading && !showReconnectPanel && eventsPhase !== "error" && eventsPhase !== "timeout" && !loadError && showEmptyWeek && !hasAny ? (
         <p className="twin-muted mt-4 text-sm leading-relaxed">{t("dashboard.calendarViewEmpty")}</p>
       ) : null}
 
-      {!loading && !showReconnectPanel && !loadError && hasAny ? (
+      {!loading && !showReconnectPanel && eventsPhase !== "reconnect_required" && eventsPhase !== "error" && eventsPhase !== "timeout" && !loadError && hasAny ? (
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {byDay.map((day) => (
             <div
