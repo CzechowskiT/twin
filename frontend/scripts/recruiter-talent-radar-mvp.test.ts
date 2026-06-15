@@ -86,10 +86,10 @@ test("10 no automatic-send CTA", () => {
   assert.doesNotMatch(client, /send.*email|auto.*send|wyslij.*wiadom/i);
 });
 
-test("11 outreach draft is draft-only", () => {
+test("11 outreach draft opens modal (copy-only)", () => {
   const client = readSrc("src/app/recruiter/talent-radar/recruiter-talent-radar-client.tsx");
-  assert.match(client, /RECRUITER_TALENT_RADAR_MARKERS\.draftPanel/);
-  assert.match(en.recruiterTalentRadar.draftNotSent.toLowerCase(), /not sent|nie wysłano/i);
+  assert.match(client, /TalentRadarDraftModal/);
+  assert.match(en.recruiterTalentRadar.draftDisclaimer.toLowerCase(), /not sent|did not send/i);
   const draft = buildOutreachDraftText(
     {
       id: "1",
@@ -109,7 +109,7 @@ test("11 outreach draft is draft-only", () => {
     "Engineer",
     "en",
   );
-  assert.match(draft, /NOT SENT/i);
+  assert.match(draft, /\[name\]|\[Personalization/i);
 });
 
 test("12 no hidden PII in sample row guard", () => {

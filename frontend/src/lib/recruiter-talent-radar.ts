@@ -156,39 +156,34 @@ export function buildOutreachDraftText(
   locale: string,
 ): string {
   const pl = locale.toLowerCase().startsWith("pl");
-  const why = candidate.why_surfaced.slice(0, 2).join("; ");
+  const role = roleTitle || candidate.job_title || (pl ? "Twoja otwarta rola" : "Your open role");
+  const signals = candidate.why_surfaced.slice(0, 2).join(pl ? "; " : "; ");
   if (pl) {
     return [
-      `Szkic wiadomości (NIE WYSŁANO) — ${candidate.display_name}`,
+      `Cześć [imię],`,
       "",
-      `Kontekst roli: ${roleTitle || "Twoja otwarta rola"}`,
-      `Dlaczego kontakt: ${why}`,
+      `Piszę w kontekście roli ${role}. Na podstawie wcześniejszego kontekstu w TWIN widzę, że możesz pasować do tej rozmowy, szczególnie ze względu na: ${signals || "wcześniejszy kontekst w workspace"}.`,
       "",
-      "Cześć [imię],",
+      "Nie zakładam, że to właściwy moment — chciałem tylko sprawdzić, czy temat może być dla Ciebie interesujący.",
       "",
-      "Piszę w kontekście roli, którą prowadzę. Na podstawie wcześniejszego kontekstu w TWIN wygląda na to, że możesz pasować — chętnie porozmawiam, jeśli jesteś otwarty/a.",
+      "[Tu dodaj własną personalizację przed wysłaniem.]",
       "",
-      "[Miejsce na personalizację]",
+      "Jeśli nie chcesz otrzymywać takich wiadomości, daj znać — uszanuję to.",
       "",
-      "Jeśli teraz nie jest dobry moment — daj znać, bez problemu.",
-      "",
-      "— [Twoje imię]",
+      "[Twoje imię]",
     ].join("\n");
   }
   return [
-    `Message draft (NOT SENT) — ${candidate.display_name}`,
-    "",
-    `Role context: ${roleTitle || "Your open role"}`,
-    `Why reaching out: ${why}`,
-    "",
     "Hi [name],",
     "",
-    "I'm reaching out about a role I'm hiring for. Based on prior context in TWIN, you may be a fit — happy to chat if you're open.",
+    `I'm reaching out about the role ${role}. Based on prior context in TWIN, you may be a fit for this conversation, especially given: ${signals || "prior workspace context"}.`,
     "",
-    "[Personalization placeholder]",
+    "I'm not assuming the timing is right — I wanted to check whether the topic might interest you.",
     "",
-    "If the timing isn't right, no worries — just let me know.",
+    "[Add your own personalization before sending.]",
     "",
-    "— [Your name]",
+    "If you prefer not to receive messages like this, let me know — I will respect that.",
+    "",
+    "[Your name]",
   ].join("\n");
 }

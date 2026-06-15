@@ -40,6 +40,7 @@ export function TalentRadarCandidateGroups({
   onDismiss,
   onSnooze,
   onReviewCardOpen,
+  preparingDraftAppId,
 }: {
   rows: TalentRadarCandidate[];
   roleTitle: string;
@@ -48,6 +49,7 @@ export function TalentRadarCandidateGroups({
   onDismiss: (row: TalentRadarCandidate) => void;
   onSnooze: (row: TalentRadarCandidate) => void;
   onReviewCardOpen?: (row: TalentRadarCandidate) => void;
+  preparingDraftAppId?: number | null;
 }) {
   const { t } = useTranslation();
   const buckets = groupTalentRadarCandidates(rows);
@@ -77,6 +79,10 @@ export function TalentRadarCandidateGroups({
                   <TalentRadarCandidateCard
                     row={row}
                     roleTitle={roleTitle}
+                    draftPreparing={
+                      preparingDraftAppId != null &&
+                      preparingDraftAppId === Number(row.application_id ?? row.id)
+                    }
                     onDraft={() => onDraft(row)}
                     onShortlist={() => onShortlist(row)}
                     onDismiss={() => onDismiss(row)}

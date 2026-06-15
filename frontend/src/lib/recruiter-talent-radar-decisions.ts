@@ -52,6 +52,9 @@ export const TALENT_RADAR_DECISION_MARKERS = {
   decisionFilter: "recruiter-talent-radar-decision-filter",
   snoozeModal: "recruiter-talent-radar-snooze-modal",
   dismissModal: "recruiter-talent-radar-dismiss-modal",
+  draftModal: "recruiter-talent-radar-draft-modal",
+  draftCopyButton: "recruiter-talent-radar-draft-copy",
+  draftAuditWarning: "recruiter-talent-radar-draft-audit-warning",
   decisionToast: "recruiter-talent-radar-decision-toast",
 } as const;
 
@@ -94,4 +97,35 @@ export function matchesDecisionFilter(
   const state = effectiveDecisionState(decision);
   if (filter === "active") return state === "active";
   return state === filter;
+}
+
+export function showsDraftPreparedBadge(
+  decision: TalentRadarLatestDecision | null | undefined,
+): boolean {
+  if (!decision || decision.action_type !== "draft_prepared") return false;
+  return effectiveDecisionState(decision) === "active";
+}
+
+export function buildDraftPreparedDecisionBody(
+  row: {
+    id: string;
+    application_id?: number;
+    score: number;
+    fit_label: string;
+  },
+  jobId: string,
+): PostTalentRadarDecisionBody {
+  const meta: Record<string, string> = {
+    source: "talent_radar",
+    candidate_id: String(row.id),
+    radar_score_snapshot: String(row.score),
+    radar_fit_label_snapshot: row.fit_label,
+  };
+  const jid = jobId.trim();
+  if (jid) meta.job_id = jid;
+  return {
+    application_id: Number(row.application_id ?? row.id),
+    action_type: "draft_prepared",
+    meta,
+  };
 }
