@@ -19,6 +19,7 @@ from app.services.recruiter_audit_trail import (
     log_recruiter_audit_event,
 )
 from app.services.recruiter_candidate_search import build_recruiter_candidate_search
+from app.services.recruiter_talent_radar import build_recruiter_talent_radar
 from app.services.recruiter_inbox import (
     build_recruiter_batch,
     respond_recruiter_batch,
@@ -305,6 +306,36 @@ def recruiter_candidate_search(
             data_confidence=data_confidence,
             missing_data=missing_data,
             availability=availability,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.get("/talent-radar")
+def recruiter_talent_radar(
+    request: Request,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+    role_id: int | None = Query(None, ge=1),
+    segment: str | None = Query(None, max_length=48),
+    timing_window: str | None = Query(None, max_length=48),
+    signal_type: str | None = Query(None, max_length=48),
+    limit: int = Query(10, ge=1, le=10),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return build_recruiter_talent_radar(
+            db,
+            company_slug=slug,
+            locale=locale_from_request(request),
+            role_id=role_id,
+            segment=segment,
+            timing_window=timing_window,
+            signal_type=signal_type,
+            limit=limit,
         )
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc

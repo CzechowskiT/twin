@@ -28,6 +28,8 @@
 
 **Safe-lane merge (2026-06-11):** Recruiter **candidate pool search** MVP — `/recruiter/search`; workspace-scoped filters + review card links · `docs/RECRUITER_CANDIDATE_SEARCH_MVP_2026-06-11.md` · `test:recruiter-candidate-search-mvp` · **no external sourcing** · **does not change launch NO-GO**.
 
+**Safe-lane merge (2026-06-12):** Recruiter **Talent Radar** MVP — `/recruiter/talent-radar`; internal-context resurfacing + explainability · `docs/RECRUITER_TALENT_RADAR_MVP_2026-06-12.md` · `test:recruiter-talent-radar-mvp` · **no auto outreach** · **does not change launch NO-GO**.
+
 **Safe-lane merge (2026-06-11):** Investor metrics **reality dashboard** — `/investor/metrics` · `test:investor-metrics-reality-dashboard` · **does not change launch NO-GO**.
 
 **Safe-lane merge (2026-06-11):** Recruiter **manual scheduling + pipeline** — prepare-invite panel, copy invite, mark invited/scheduled, ATS-lite pipeline with scheduled slot badge; **no** outbound email, **no** recruiter calendar sync · `docs/RECRUITER_SCHEDULING_MVP_MANUAL_2026-06-11.md` · **REPO** · recruiter calendar sync **NOT LIVE** · **does not change launch NO-GO**.

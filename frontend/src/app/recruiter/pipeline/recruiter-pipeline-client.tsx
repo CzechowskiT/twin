@@ -80,6 +80,11 @@ export function RecruiterPipelineClient() {
         <p className="mt-3 text-xs font-medium text-amber-700 dark:text-amber-400">
           {t("recruiterScheduling.trustLabel")}
         </p>
+        <p className="mt-2 text-sm">
+          <Link href="/recruiter/talent-radar" className="font-medium text-[var(--twin-accent)] underline">
+            {t("recruiterTalentRadar.navLink")}
+          </Link>
+        </p>
 
         <RecruiterAccessFields
           token={token}

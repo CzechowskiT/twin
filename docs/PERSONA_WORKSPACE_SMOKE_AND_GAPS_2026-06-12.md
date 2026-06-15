@@ -170,6 +170,7 @@ Od `PERSONA_COMPLETENESS_VERIFICATION_2026-06-11`: trasy które wtedy zwracały 
 | `/recruiter/inbox` | 200 | Pusta powłoka | **PARTIAL** | Decision console — **founder manual smoke** (H5b PASS historycznie) |
 | `/recruiter/pipeline` | 200 | Pusta powłoka | **PARTIAL** | `test:recruiter-pipeline-mvp` PASS |
 | `/recruiter/search` | 200 | Pusta powłoka | **PARTIAL** | `test:recruiter-candidate-search-mvp` PASS |
+| `/recruiter/talent-radar` | 200 | Pusta powłoka | **PARTIAL** | `test:recruiter-talent-radar-mvp` PASS |
 | `/recruiter/analytics` | 200 | Pusta powłoka | **PARTIAL** | `test:recruiter-analytics-mvp` PASS |
 | `/recruiter/integrations` | 200 | Pusta powłoka | **PARTIAL** | Readiness panel |
 | `/recruiter/integrations/ats` | 200 | — | **PARTIAL** | ATS stub |
@@ -305,6 +306,7 @@ Legenda status: **L**=LIVE · **Pl**=placeholder/partial · **NL**=NOT LIVE · *
 | Recruiter | Inbox console | `/recruiter/inbox` | Pa | inbox-decision PASS | G | Manual smoke H5b | P0 |
 | Recruiter | Pipeline board | `/recruiter/pipeline` | Pa | pipeline-mvp PASS | G | Manual smoke | P1 |
 | Recruiter | Candidate search | `/recruiter/search` | Pa | search-mvp PASS | G | Manual smoke | P2 |
+| Recruiter | Talent Radar | `/recruiter/talent-radar` | Pa | talent-radar-mvp PASS | G | Manual smoke | P2 |
 | Recruiter | Analytics | `/recruiter/analytics` | Pa | analytics-mvp PASS | G | Manual smoke | P2 |
 | Recruiter | Integrations readiness | `/recruiter/integrations` | Pa | integrations-mvp PASS | Pl | ATS stub only | P2 |
 | Recruiter | Calendar sync | `/recruiter/calendar` | Pa | persona-access | NL | **NOT LIVE** — OK per ban | P3 |
