@@ -568,6 +568,11 @@ export default function RecruiterInboxClient() {
           <>
             <h1 className="mb-2 text-2xl font-semibold">{t("recruiterInbox.title")}</h1>
             <p className="twin-muted mb-2 text-sm leading-relaxed">{t("recruiterInbox.lead")}</p>
+            <p className="mb-2 text-sm">
+              <Link href="/recruiter/talent-radar" className="font-medium text-[var(--twin-accent)] underline">
+                {t("recruiterTalentRadar.navLink")}
+              </Link>
+            </p>
             <p className="mb-6 text-sm leading-relaxed text-[var(--foreground)]">{t("recruiterInbox.helperInvite")}</p>
             <div className="mb-6">
               <GuidedEmptyState

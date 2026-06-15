@@ -39,7 +39,8 @@ Status tiers: **Live / Pilot / Planned / Not live / Needs setup / Paused**
 | Route | Status | Notes |
 | ----- | ------ | ----- |
 | `/dashboard` | **LIVE** | `CandidateModuleNav` module grid |
-| `/recruiter` | **LIVE** | Canonical recruiter hub |
+| `/recruiter` | **LIVE** | Canonical recruiter hub (includes Talent Radar pilot tile) |
+| `/recruiter/talent-radar` | **PILOT** | Sourcing Memory Agent — explainable internal resurfacing |
 | `/workspace/recruiter` | **REDIRECT** | → `/recruiter` |
 | `/workspace/recruiter/integrations` | **REDIRECT** | → `/recruiter/integrations` |
 | `/company/dashboard` | **LIVE** | Company module grid |

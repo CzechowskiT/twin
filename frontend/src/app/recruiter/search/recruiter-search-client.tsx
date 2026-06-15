@@ -193,6 +193,11 @@ export default function RecruiterSearchClient() {
             {isDemo ? (
               <p className="mt-2 text-xs font-medium text-[var(--twin-accent)]">{t("recruiterSearch.demoPoolLabel")}</p>
             ) : null}
+            <p className="mt-3 text-sm">
+              <Link href="/recruiter/talent-radar" className="font-medium text-[var(--twin-accent)] underline">
+                {t("recruiterTalentRadar.navLink")}
+              </Link>
+            </p>
           </Card>
 
           <div className="mt-6">
