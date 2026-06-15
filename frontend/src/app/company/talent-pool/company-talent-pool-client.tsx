@@ -16,6 +16,7 @@ import {
   COMPANY_TALENT_POOL_MARKERS,
   COMPANY_TALENT_POOL_ROUTE,
   type CompanyTalentPoolPayload,
+  type CompanyTalentPoolReadinessState,
 } from "@/lib/company-talent-pool";
 import {
   RECRUITER_DEMO_COMPANY_SLUG,
@@ -55,6 +56,9 @@ const EXEC_SUMMARY_LABEL_KEYS: Record<(typeof EXEC_SUMMARY_KEYS)[number], Transl
 const QUALITY_DIM_KEYS = [
   "missingRoleTitle",
   "missingSkills",
+  "missingLocation",
+  "missingSeniority",
+  "lowEvidence",
   "missingConsent",
   "staleRecords",
   "duplicates",
@@ -63,9 +67,28 @@ const QUALITY_DIM_KEYS = [
 const QUALITY_DIM_LABEL_KEYS: Record<(typeof QUALITY_DIM_KEYS)[number], TranslationKey> = {
   missingRoleTitle: "companyTalentPool.qualityMissingRoleTitle",
   missingSkills: "companyTalentPool.qualityMissingSkills",
+  missingLocation: "companyTalentPool.qualityMissingLocation",
+  missingSeniority: "companyTalentPool.qualityMissingSeniority",
+  lowEvidence: "companyTalentPool.qualityLowEvidence",
   missingConsent: "companyTalentPool.qualityMissingConsent",
   staleRecords: "companyTalentPool.qualityStaleRecords",
   duplicates: "companyTalentPool.qualityDuplicates",
+};
+
+const READINESS_STATE_KEYS: CompanyTalentPoolReadinessState[] = [
+  "ready",
+  "needs_enrichment",
+  "duplicate_review",
+  "consent_required",
+  "stale",
+];
+
+const READINESS_LABEL_KEYS: Record<CompanyTalentPoolReadinessState, TranslationKey> = {
+  ready: "companyTalentPool.readinessReady",
+  needs_enrichment: "companyTalentPool.readinessNeedsEnrichment",
+  duplicate_review: "companyTalentPool.readinessDuplicateReview",
+  consent_required: "companyTalentPool.readinessConsentRequired",
+  stale: "companyTalentPool.readinessStale",
 };
 
 const SOURCE_KEYS = [
@@ -120,6 +143,9 @@ function dimensionValue(
   const map = {
     missingRoleTitle: d.missing_role_title ?? 0,
     missingSkills: d.missing_skills ?? 0,
+    missingLocation: d.missing_location ?? 0,
+    missingSeniority: d.missing_seniority ?? 0,
+    lowEvidence: d.low_evidence ?? 0,
     missingConsent: d.missing_consent ?? 0,
     staleRecords: d.stale_records ?? 0,
     duplicates: d.duplicates ?? 0,
@@ -316,7 +342,7 @@ export default function CompanyTalentPoolClient() {
           >
             <h3 className="text-sm font-semibold">{t("companyTalentPool.dataQualityTitle")}</h3>
             <p className="twin-muted mt-1 text-xs">{t("companyTalentPool.dataQualityBody")}</p>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {QUALITY_DIM_KEYS.map((key) => (
                 <MetricCard
                   key={key}
@@ -336,6 +362,129 @@ export default function CompanyTalentPoolClient() {
               </ul>
             ) : (
               <p className="twin-muted mt-4 text-sm">{t("companyTalentPool.noQualityWarnings")}</p>
+            )}
+          </Card>
+
+          <Card
+            variant="soft"
+            className="border-[var(--twin-border)]/80 p-5"
+            data-testid={COMPANY_TALENT_POOL_MARKERS.roleSkillCoverage}
+          >
+            <h3 className="text-sm font-semibold">{t("companyTalentPool.roleCoverageTitle")}</h3>
+            <p className="twin-muted mt-1 text-xs">{t("companyTalentPool.roleCoverageBody")}</p>
+            <div className="mt-4 grid gap-6 lg:grid-cols-2">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
+                  {t("companyTalentPool.topRolesTitle")}
+                </p>
+                <ul className="mt-2 space-y-1 text-sm">
+                  {payload.role_skill_coverage.top_roles.map((role) => (
+                    <li key={role.title} className="flex justify-between border-b border-[var(--twin-border)]/40 py-1">
+                      <span>{role.title}</span>
+                      <span className="twin-muted tabular-nums">{fmt(role.count)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
+                  {t("companyTalentPool.skillCoverageTitle")}
+                </p>
+                <ul className="mt-2 flex flex-wrap gap-2">
+                  {payload.role_skill_coverage.top_skills.map((skill) => (
+                    <span
+                      key={skill.skill}
+                      className="rounded-full border border-[var(--twin-border)] bg-[var(--twin-surface-soft)] px-2 py-0.5 text-xs"
+                    >
+                      {skill.skill} · {fmt(skill.count)}
+                    </span>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            {payload.role_skill_coverage.weak_coverage.length > 0 ? (
+              <div className="mt-4">
+                <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
+                  {t("companyTalentPool.weakCoverageTitle")}
+                </p>
+                <ul className="mt-2 space-y-2 text-sm">
+                  {payload.role_skill_coverage.weak_coverage.map((row) => (
+                    <li key={row.role_title} className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3">
+                      <div className="flex flex-wrap items-baseline justify-between gap-2">
+                        <span className="font-medium">{row.role_title}</span>
+                        <span className="twin-muted text-xs tabular-nums">
+                          {fmt(row.candidate_count)} · {row.coverage_warning}
+                        </span>
+                      </div>
+                      {row.job_id ? (
+                        <Link
+                          href={`/recruiter/talent-radar?role_id=${row.job_id}`}
+                          className="twin-link mt-2 inline-block text-xs"
+                          data-testid={COMPANY_TALENT_POOL_MARKERS.radarLink}
+                        >
+                          {t("companyTalentPool.openRoleRadar")}
+                        </Link>
+                      ) : null}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {payload.role_skill_coverage.suggested_actions.length > 0 ? (
+              <ul className="mt-4 flex flex-wrap gap-3 text-sm">
+                {payload.role_skill_coverage.suggested_actions.map((action) => (
+                  <li key={action.code}>
+                    <Link href={action.href} className="twin-link font-medium">
+                      {action.code === "ask_recruiter_review"
+                        ? t("companyTalentPool.askRecruiterReview")
+                        : action.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </Card>
+
+          <Card
+            variant="soft"
+            className="border-[var(--twin-border)]/80 p-5"
+            data-testid={COMPANY_TALENT_POOL_MARKERS.readinessPanel}
+          >
+            <h3 className="text-sm font-semibold">{t("companyTalentPool.readinessTitle")}</h3>
+            <p className="twin-muted mt-1 text-xs">{t("companyTalentPool.readinessBody")}</p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {READINESS_STATE_KEYS.map((state) => (
+                <span
+                  key={state}
+                  className="rounded-full border border-[var(--twin-border)] bg-[var(--twin-surface-soft)] px-2 py-0.5 text-xs"
+                >
+                  {t(READINESS_LABEL_KEYS[state])}: {fmt(payload.readiness.counts[state] ?? 0)}
+                </span>
+              ))}
+            </div>
+            {payload.readiness.candidates.length > 0 ? (
+              <ul className="mt-4 divide-y divide-[var(--twin-border)]/60">
+                {payload.readiness.candidates.map((candidate) => (
+                  <li key={candidate.id} className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm">
+                    <div>
+                      <p className="font-medium">{candidate.display_name}</p>
+                      <p className="twin-muted text-xs">
+                        {candidate.job_title || t("companyTalentPool.noJobTitle")}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-full border border-[var(--twin-border)] px-2 py-0.5 text-xs">
+                        {t(READINESS_LABEL_KEYS[candidate.readiness_state])}
+                      </span>
+                      <Link href={candidate.radar_href} className="twin-link text-xs">
+                        {t("companyTalentPool.openRoleRadar")}
+                      </Link>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="twin-muted mt-4 text-sm">{t("companyTalentPool.readinessEmpty")}</p>
             )}
           </Card>
 

@@ -23,7 +23,9 @@ Same pilot gate as other `/company/*` routes: `RECRUITER_INBOX_TOKEN` + `company
 ## Response (summary)
 
 - `executive_summary` — 6 cards: known, imported, radar-ready, data gaps, duplicates, active/planned sources
-- `data_quality.dimensions` — missing role/title, skills, consent link, stale, duplicates
+- `data_quality.dimensions` — missing role/title, skills, **location**, **seniority**, **low evidence**, consent link, stale, duplicates
+- `role_skill_coverage` — top roles, top skills, weak coverage roles, suggested actions (import, enrich, ask recruiter review)
+- `readiness` — counts + candidate list with states: **Ready**, **Needs enrichment**, **Duplicate review**, **Consent required**, **Stale**; each row includes role-aware `radar_href` when matched to company job
 - `source_coverage` — applications, inbox, scorecards, notes, import pool, ATS connectors (planned)
 - `items` — safe display (display_name, job_title, skills) — **no email/phone**
 
@@ -31,11 +33,21 @@ Same pilot gate as other `/company/*` routes: `RECRUITER_INBOX_TOKEN` + `company
 
 Pilot · Internal data first · No automatic outreach · Recruiter review required · ATS sync planned
 
+## Panels
+
+1. Executive summary (6 metrics)
+2. Data quality dimensions (8 categories)
+3. Role & skill coverage (top roles/skills, weak coverage, suggested actions)
+4. Candidate readiness list (5 states, Talent Radar deep links)
+5. Source coverage
+6. Recent records / empty state
+
 ## CTAs
 
 - Recruiter CSV import (`/recruiter/talent-pool/import`) — company view links, does not import directly
 - Integrations readiness (`/company/integrations`)
 - Pipeline overview (`/company/pipeline`)
+- Talent Radar (`/recruiter/talent-radar?role_id=…` when role matched)
 
 ## Hard bans (unchanged)
 
@@ -48,8 +60,8 @@ Pilot · Internal data first · No automatic outreach · Recruiter review requir
 ## Tests
 
 ```bash
-cd frontend && npm run test:company-talent-pool-view-mvp
-cd backend && pytest tests/test_company_talent_pool.py -q
+cd frontend && npm run test:company-talent-pool-view-mvp   # 15 assertions
+cd backend && pytest tests/test_company_talent_pool.py tests/test_company_talent_pool_view.py -q
 ```
 
 ## Links from
@@ -63,3 +75,8 @@ cd backend && pytest tests/test_company_talent_pool.py -q
 - `docs/RECRUITER_TALENT_POOL_IMPORT_MVP_2026-06-15.md`
 - `docs/PRODUCTION_REALITY_MATRIX_2026-05-27.md`
 - `docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-06-02.md`
+
+## PR history
+
+- **#138** — initial MVP (executive summary, basic quality, source coverage, records list)
+- **fix/company-talent-pool-view-gaps-2026-06-15** — role/skill coverage, readiness states, expanded quality dimensions
