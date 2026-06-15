@@ -49,6 +49,8 @@ const EMPTY_SUMMARY = {
   newRadarDecisions: 0,
   lowCoverageRoles: 0,
   draftsPreparedNotSent: 0,
+  uniqueCandidateCount: 0,
+  draftDecisionCount: 0,
 };
 
 export default function RecruiterTalentRadarDigestClient() {
@@ -123,6 +125,7 @@ export default function RecruiterTalentRadarDigestClient() {
 
   const summary = payload?.summary ?? EMPTY_SUMMARY;
   const sections = payload?.sections;
+  const sectionMeta = payload?.sectionMeta;
   const hasContent = payload ? digestHasContent(payload) : false;
   const warnings = payload?.dataQualityWarnings ?? [];
 
@@ -241,40 +244,52 @@ export default function RecruiterTalentRadarDigestClient() {
               ) : (
                 <div className="space-y-10">
                   <TalentRadarDigestSection
+                    sectionId="reviewFirst"
                     kind="candidates"
                     titleKey="recruiterTalentRadarDigest.sectionReviewFirst"
                     emptyKey="recruiterTalentRadarDigest.sectionReviewFirstEmpty"
                     items={sections?.reviewFirst ?? []}
+                    meta={sectionMeta?.reviewFirst}
                   />
                   <TalentRadarDigestSection
+                    sectionId="returningFromSnooze"
                     kind="candidates"
                     titleKey="recruiterTalentRadarDigest.sectionReturningSnooze"
                     emptyKey="recruiterTalentRadarDigest.sectionReturningSnoozeEmpty"
                     items={sections?.returningFromSnooze ?? []}
+                    meta={sectionMeta?.returningFromSnooze}
                   />
                   <TalentRadarDigestSection
+                    sectionId="shortlistedWithoutFollowUp"
                     kind="candidates"
                     titleKey="recruiterTalentRadarDigest.sectionShortlistNoFollowUp"
                     emptyKey="recruiterTalentRadarDigest.sectionShortlistNoFollowUpEmpty"
                     items={sections?.shortlistedWithoutFollowUp ?? []}
+                    meta={sectionMeta?.shortlistedWithoutFollowUp}
                   />
                   <TalentRadarDigestSection
+                    sectionId="dismissedPatterns"
                     kind="dismissed"
                     titleKey="recruiterTalentRadarDigest.sectionDismissedPatterns"
                     emptyKey="recruiterTalentRadarDigest.sectionDismissedPatternsEmpty"
                     items={sections?.dismissedPatterns ?? []}
+                    meta={sectionMeta?.dismissedPatterns}
                   />
                   <TalentRadarDigestSection
+                    sectionId="lowCoverageRoles"
                     kind="roles"
                     titleKey="recruiterTalentRadarDigest.sectionLowCoverageRoles"
                     emptyKey="recruiterTalentRadarDigest.sectionLowCoverageRolesEmpty"
                     items={sections?.lowCoverageRoles ?? []}
+                    meta={sectionMeta?.lowCoverageRoles}
                   />
                   <TalentRadarDigestSection
+                    sectionId="draftsPrepared"
                     kind="candidates"
                     titleKey="recruiterTalentRadarDigest.sectionDraftsPrepared"
                     emptyKey="recruiterTalentRadarDigest.sectionDraftsPreparedEmpty"
                     items={sections?.draftsPrepared ?? []}
+                    meta={sectionMeta?.draftsPrepared}
                     showNotSent
                   />
                 </div>

@@ -27,11 +27,12 @@ export function TalentRadarDigestCopyButton({ payload }: { payload: TalentRadarD
   return (
     <button
       type="button"
-      className="twin-btn-outline text-sm"
+      className={copied ? "twin-btn-outline text-sm" : "twin-btn-solid text-sm"}
       data-testid={RECRUITER_TALENT_RADAR_DIGEST_MARKERS.copyButton}
+      aria-live="polite"
       onClick={() => void handleCopy()}
     >
-      {copied ? t("recruiterTalentRadarDigest.summaryCopied") : t("recruiterTalentRadarDigest.copySummary")}
+      {copied ? t("recruiterTalentRadarDigest.summaryCopiedShort") : t("recruiterTalentRadarDigest.copySummary")}
     </button>
   );
 }

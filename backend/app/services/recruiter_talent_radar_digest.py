@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections import Counter
+from collections import Counter, defaultdict
 from datetime import datetime, timedelta, timezone
 from typing import Any, Literal
 
@@ -27,6 +27,7 @@ from app.utils.slug import slugify_company
 DigestPeriod = Literal["7d", "30d", "week"]
 FOLLOW_UP_THRESHOLD_DAYS = 3
 SNOOZE_RETURN_WINDOW_DAYS = 7
+MAX_SECTION_ITEMS = 5
 SHORTLIST_FOLLOW_UP_ACTIONS = frozenset(
     {"draft_prepared", "review_card_opened", "dismissed", "snoozed"}
 )
@@ -48,6 +49,15 @@ DISMISS_REASON_LABELS_PL = {
 
 def _utc_now() -> datetime:
     return datetime.now(timezone.utc)
+
+
+def _aware(dt: datetime | str | None) -> datetime | None:
+    if not dt:
+        return None
+    if isinstance(dt, str):
+        parsed = datetime.fromisoformat(dt.replace("Z", "+00:00"))
+        return parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)
+    return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
 
 
 def _parse_period(period: str | None) -> tuple[datetime, datetime, str]:
@@ -76,10 +86,61 @@ def _period_label_text(label_key: str, locale: str) -> str:
 
 
 def _in_period(dt: datetime | None, start: datetime, end: datetime) -> bool:
-    if not dt:
+    aware = _aware(dt)
+    if not aware:
         return False
-    aware = dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
     return start <= aware <= end
+
+
+def _dedupe_key(item: dict[str, Any]) -> str:
+    app_id = item.get("applicationId")
+    if app_id:
+        return f"app:{app_id}"
+    candidate_id = item.get("candidateId")
+    job_id = item.get("jobId")
+    if candidate_id and job_id:
+        return f"cj:{candidate_id}:{job_id}"
+    if candidate_id:
+        return f"c:{candidate_id}"
+    name = str(item.get("displayName") or "").strip().lower()
+    role = str(item.get("roleTitle") or "").strip().lower()
+    return f"nr:{name}:{role}"
+
+
+def _dedupe_candidates(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    seen: dict[str, dict[str, Any]] = {}
+    for item in items:
+        key = _dedupe_key(item)
+        if key not in seen:
+            seen[key] = item
+    return list(seen.values())
+
+
+def _limit_section(items: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], dict[str, int]]:
+    total = len(items)
+    shown = items[:MAX_SECTION_ITEMS]
+    more = max(0, total - len(shown))
+    return shown, {
+        "totalCount": total,
+        "shownCount": len(shown),
+        "moreInRadarCount": more,
+    }
+
+
+def _draft_aggregate_label(count: int, *, locale: str) -> str:
+    pl = locale.lower().startswith("pl")
+    if pl:
+        if count == 1:
+            return "1 szkic przygotowany — nie wysłany"
+        return f"{count} szkiców przygotowanych — żaden nie wysłany"
+    if count == 1:
+        return "1 draft prepared — not sent"
+    return f"{count} drafts prepared — none sent"
+
+
+def _iso(dt: datetime | None) -> str | None:
+    aware = _aware(dt)
+    return aware.isoformat() if aware else None
 
 
 def _to_digest_candidate(
@@ -99,9 +160,11 @@ def _to_digest_candidate(
             "reason": meta.get("dismiss_reason_code"),
             "snoozeUntil": decision.get("snooze_until"),
         }
+    job_id = row.get("job_id")
     out: dict[str, Any] = {
-        "candidateId": str(row.get("id") or row.get("application_id")),
+        "candidateId": str(row.get("candidate_id") or row.get("id") or row.get("application_id")),
         "applicationId": str(row.get("application_id") or row.get("id")),
+        "jobId": str(job_id) if job_id else None,
         "displayName": row.get("display_name") or ("Kandydat" if locale.lower().startswith("pl") else "Candidate"),
         "headline": row.get("headline"),
         "roleTitle": row.get("job_title"),
@@ -111,7 +174,11 @@ def _to_digest_candidate(
         "latestDecision": latest_payload,
         "recommendedNextAction": recommended or row.get("recommended_next_action") or "open_review_card",
         "dataConfidence": row.get("data_confidence"),
+        "decisionCount": 1,
     }
+    if latest_payload and latest_payload.get("createdAt"):
+        out["latestDecisionAt"] = latest_payload["createdAt"]
+        out["firstDecisionAt"] = latest_payload["createdAt"]
     for forbidden in INBOX_FORBIDDEN_PII_KEYS:
         out.pop(forbidden, None)
     return out
@@ -134,10 +201,7 @@ def _decisions_in_period(
     )
     out: list[dict[str, Any]] = []
     for row in rows:
-        created = row.created_at
-        if created and created.tzinfo is None:
-            created = created.replace(tzinfo=timezone.utc)
-        if not _in_period(created, start, end):
+        if not _in_period(row.created_at, start, end):
             continue
         out.append(_serialize_decision(row))
     return out
@@ -171,12 +235,89 @@ def _later_actions_after(
     )
     out: list[dict] = []
     for row in rows:
-        created = row.created_at
-        if created and created.tzinfo is None:
-            created = created.replace(tzinfo=timezone.utc)
+        created = _aware(row.created_at)
         if created and created > after:
             out.append(_serialize_decision(row))
     return out
+
+
+def _aggregate_drafts_prepared(
+    draft_decisions: list[dict[str, Any]],
+    suggestions: list[dict[str, Any]],
+    *,
+    locale: str,
+) -> list[dict[str, Any]]:
+    pl = locale.lower().startswith("pl")
+    groups: dict[str, list[tuple[dict[str, Any], dict[str, Any]]]] = defaultdict(list)
+
+    for decision in draft_decisions:
+        app_id = int(decision.get("application_id") or 0)
+        sug = next((s for s in suggestions if int(s.get("application_id") or 0) == app_id), None)
+        if sug:
+            base = _to_digest_candidate(
+                sug,
+                locale=locale,
+                latest_decision=decision,
+                recommended="review_draft_not_sent",
+            )
+        else:
+            base = {
+                "candidateId": str(app_id),
+                "applicationId": str(app_id),
+                "displayName": "Kandydat" if pl else "Candidate",
+                "latestDecision": {
+                    "actionType": "draft_prepared",
+                    "createdAt": decision.get("created_at"),
+                },
+                "recommendedNextAction": "review_draft_not_sent",
+                "whyNow": [],
+                "decisionCount": 1,
+            }
+        groups[_dedupe_key(base)].append((base, decision))
+
+    aggregated: list[dict[str, Any]] = []
+    for entries in groups.values():
+        decisions = [d for _, d in entries]
+        base = entries[0][0]
+        timestamps = sorted(_aware(d.get("created_at")) for d in decisions if d.get("created_at"))
+        timestamps = [t for t in timestamps if t]
+        draft_count = len(decisions)
+        first_at = timestamps[0] if timestamps else None
+        latest_at = timestamps[-1] if timestamps else None
+        item = dict(base)
+        item.update(
+            {
+                "status": "not_sent",
+                "draftCount": draft_count,
+                "decisionCount": draft_count,
+                "firstDraftPreparedAt": _iso(first_at),
+                "latestDraftPreparedAt": _iso(latest_at),
+                "firstDecisionAt": _iso(first_at),
+                "latestDecisionAt": _iso(latest_at),
+                "aggregateLabel": _draft_aggregate_label(draft_count, locale=locale),
+                "recommendedNextAction": "review_draft_not_sent",
+            }
+        )
+        if latest_at:
+            item["latestDecision"] = {
+                "actionType": "draft_prepared",
+                "createdAt": _iso(latest_at),
+            }
+        aggregated.append(item)
+
+    aggregated.sort(
+        key=lambda x: x.get("latestDraftPreparedAt") or "",
+        reverse=True,
+    )
+    return aggregated
+
+
+def _unique_candidate_count(*section_lists: list[dict[str, Any]]) -> int:
+    keys: set[str] = set()
+    for items in section_lists:
+        for item in items:
+            keys.add(_dedupe_key(item))
+    return len(keys)
 
 
 def _build_narrative(
@@ -188,18 +329,22 @@ def _build_narrative(
     review = summary.get("candidatesToReview", 0)
     snooze = summary.get("returningFromSnooze", 0)
     shortlist = summary.get("shortlistedWithoutFollowUp", 0)
-    drafts = summary.get("draftsPreparedNotSent", 0)
+    drafts = summary.get("draftDecisionCount", 0)
+    draft_candidates = summary.get("draftsPreparedNotSent", 0)
+    unique = summary.get("uniqueCandidateCount", 0)
     if pl:
         return (
-            f"W tym okresie Radar Talentów wskazał {review} kandydatów do sprawdzenia. "
-            f"{snooze} osób wraca po snooze, a {shortlist} z shortlisty nie ma jeszcze follow-upu. "
-            f"Przygotowano {drafts} szkiców — żaden nie został wysłany. "
+            f"W tym okresie Radar Talentów wskazał {review} unikalnych kandydatów do sprawdzenia "
+            f"({unique} osób łącznie we wszystkich kolejkach akcji). "
+            f"{snooze} wraca po snooze, a {shortlist} z shortlisty nie ma jeszcze follow-upu. "
+            f"Przygotowano {drafts} szkiców dla {draft_candidates} kandydatów — żaden nie został wysłany. "
             "TWIN nie wysłał żadnej wiadomości — decyzje i kontakt pozostają po stronie rekrutera."
         )
     return (
-        f"In this period Talent Radar flagged {review} candidates to review. "
+        f"In this period Talent Radar flagged {review} unique candidates to review "
+        f"({unique} people total across action queues). "
         f"{snooze} are returning from snooze and {shortlist} shortlisted candidates lack follow-up. "
-        f"{drafts} drafts were prepared — none were sent. "
+        f"{drafts} drafts were prepared for {draft_candidates} candidates — none were sent. "
         "TWIN did not send any message — contact decisions remain with the recruiter."
     )
 
@@ -233,7 +378,7 @@ def build_recruiter_talent_radar_digest(
     period_decisions = _decisions_in_period(db, company_slug=slug, start=start, end=end)
     new_decision_count = len(period_decisions)
 
-    review_first: list[dict] = []
+    review_first_raw: list[dict] = []
     for row in suggestions:
         score = float(row.get("score") or 0)
         app_id = int(row.get("application_id") or 0)
@@ -246,9 +391,12 @@ def build_recruiter_talent_radar_digest(
             continue
         if confidence == "low" and len(row.get("missing_data") or []) >= 3:
             continue
-        review_first.append(_to_digest_candidate(row, locale=locale, latest_decision=decision))
+        review_first_raw.append(
+            _to_digest_candidate(row, locale=locale, latest_decision=decision, recommended="open_review_card")
+        )
+    review_first = _dedupe_candidates(review_first_raw)
 
-    returning_from_snooze: list[dict] = []
+    returning_from_snooze_raw: list[dict] = []
     snooze_cutoff = now + timedelta(days=SNOOZE_RETURN_WINDOW_DAYS)
     snoozed_apps = (
         db.query(RecruiterTalentRadarDecision)
@@ -269,15 +417,13 @@ def build_recruiter_talent_radar_digest(
         state = _effective_decision_state(serialized, now=now)
         if state != "snoozed":
             continue
-        until = row.snooze_until
-        if until and until.tzinfo is None:
-            until = until.replace(tzinfo=timezone.utc)
+        until = _aware(row.snooze_until)
         if until and until > snooze_cutoff:
             continue
         seen_snooze.add(app_id)
         sug = next((s for s in suggestions if int(s.get("application_id") or 0) == app_id), None)
         if sug:
-            returning_from_snooze.append(
+            returning_from_snooze_raw.append(
                 _to_digest_candidate(
                     sug,
                     locale=locale,
@@ -293,10 +439,11 @@ def build_recruiter_talent_radar_digest(
                 .first()
             )
             if app_job and slugify_company(app_job[1].company) == slug:
-                returning_from_snooze.append(
+                returning_from_snooze_raw.append(
                     {
                         "candidateId": str(app_id),
                         "applicationId": str(app_id),
+                        "jobId": str(app_job[1].id),
                         "displayName": "Kandydat" if pl else "Candidate",
                         "roleTitle": app_job[1].title,
                         "latestDecision": {
@@ -306,10 +453,12 @@ def build_recruiter_talent_radar_digest(
                         },
                         "recommendedNextAction": "open_review_card",
                         "whyNow": [],
+                        "decisionCount": 1,
                     }
                 )
+    returning_from_snooze = _dedupe_candidates(returning_from_snooze_raw)
 
-    shortlisted_without_follow_up: list[dict] = []
+    shortlisted_without_follow_up_raw: list[dict] = []
     shortlist_rows = (
         db.query(RecruiterTalentRadarDecision)
         .filter(
@@ -326,9 +475,7 @@ def build_recruiter_talent_radar_digest(
         app_id = row.application_id
         if app_id in seen_shortlist:
             continue
-        created = row.created_at
-        if created and created.tzinfo is None:
-            created = created.replace(tzinfo=timezone.utc)
+        created = _aware(row.created_at)
         if not created or created > follow_threshold:
             continue
         latest = _latest_decision_per_app(db, company_slug=slug, application_ids=[app_id]).get(app_id)
@@ -340,7 +487,7 @@ def build_recruiter_talent_radar_digest(
         seen_shortlist.add(app_id)
         sug = next((s for s in suggestions if int(s.get("application_id") or 0) == app_id), None)
         if sug:
-            shortlisted_without_follow_up.append(
+            shortlisted_without_follow_up_raw.append(
                 _to_digest_candidate(
                     sug,
                     locale=locale,
@@ -348,6 +495,7 @@ def build_recruiter_talent_radar_digest(
                     recommended="prepare_outreach_draft",
                 )
             )
+    shortlisted_without_follow_up = _dedupe_candidates(shortlisted_without_follow_up_raw)
 
     dismissed_patterns: list[dict] = []
     if include_dismissed_summary:
@@ -365,6 +513,8 @@ def build_recruiter_talent_radar_digest(
                     "reasonCode": code,
                     "label": labels.get(code, code),
                     "count": count,
+                    "decisionCount": count,
+                    "recommendedNextAction": "review_dismiss_patterns",
                 }
             )
 
@@ -412,31 +562,27 @@ def build_recruiter_talent_radar_digest(
                 "candidateCount": len(rows_for_job),
                 "coverageWarning": warning,
                 "recommendedNextAction": "refine_role_criteria",
+                "decisionCount": dismissed_for_role,
             }
         )
 
-    drafts_prepared: list[dict] = []
-    for d in period_decisions:
-        if d.get("action_type") != "draft_prepared":
-            continue
-        app_id = int(d.get("application_id") or 0)
-        sug = next((s for s in suggestions if int(s.get("application_id") or 0) == app_id), None)
-        if sug:
-            item = _to_digest_candidate(sug, locale=locale, latest_decision=d, recommended="open_review_card")
-        else:
-            item = {
-                "candidateId": str(app_id),
-                "applicationId": str(app_id),
-                "displayName": "Kandydat" if pl else "Candidate",
-                "latestDecision": {
-                    "actionType": "draft_prepared",
-                    "createdAt": d.get("created_at"),
-                },
-                "recommendedNextAction": "open_review_card",
-                "whyNow": [],
-            }
-        item["status"] = "not_sent"
-        drafts_prepared.append(item)
+    draft_decisions = [d for d in period_decisions if d.get("action_type") == "draft_prepared"]
+    drafts_prepared = _aggregate_drafts_prepared(draft_decisions, suggestions, locale=locale)
+    draft_decision_count = len(draft_decisions)
+
+    unique_count = _unique_candidate_count(
+        review_first,
+        returning_from_snooze,
+        shortlisted_without_follow_up,
+        drafts_prepared,
+    )
+
+    review_shown, review_meta = _limit_section(review_first)
+    snooze_shown, snooze_meta = _limit_section(returning_from_snooze)
+    shortlist_shown, shortlist_meta = _limit_section(shortlisted_without_follow_up)
+    dismissed_shown, dismissed_meta = _limit_section(dismissed_patterns)
+    roles_shown, roles_meta = _limit_section(low_coverage_roles)
+    drafts_shown, drafts_meta = _limit_section(drafts_prepared)
 
     summary = {
         "candidatesToReview": len(review_first),
@@ -445,6 +591,8 @@ def build_recruiter_talent_radar_digest(
         "newRadarDecisions": new_decision_count,
         "lowCoverageRoles": len(low_coverage_roles),
         "draftsPreparedNotSent": len(drafts_prepared),
+        "draftDecisionCount": draft_decision_count,
+        "uniqueCandidateCount": unique_count,
     }
 
     warnings = list(radar.get("data_quality_warnings") or [])
@@ -463,12 +611,20 @@ def build_recruiter_talent_radar_digest(
         },
         "summary": summary,
         "sections": {
-            "reviewFirst": review_first[:15],
-            "returningFromSnooze": returning_from_snooze[:15],
-            "shortlistedWithoutFollowUp": shortlisted_without_follow_up[:15],
-            "dismissedPatterns": dismissed_patterns,
-            "lowCoverageRoles": low_coverage_roles[:10],
-            "draftsPrepared": drafts_prepared[:15],
+            "reviewFirst": review_shown,
+            "returningFromSnooze": snooze_shown,
+            "shortlistedWithoutFollowUp": shortlist_shown,
+            "dismissedPatterns": dismissed_shown,
+            "lowCoverageRoles": roles_shown,
+            "draftsPrepared": drafts_shown,
+        },
+        "sectionMeta": {
+            "reviewFirst": review_meta,
+            "returningFromSnooze": snooze_meta,
+            "shortlistedWithoutFollowUp": shortlist_meta,
+            "dismissedPatterns": dismissed_meta,
+            "lowCoverageRoles": roles_meta,
+            "draftsPrepared": drafts_meta,
         },
         "narrative": _build_narrative(summary=summary, locale=locale),
         "dataQualityWarnings": warnings,
