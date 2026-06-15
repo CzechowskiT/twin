@@ -17,6 +17,7 @@ Core narrative (PL): *Zacznij od kandydatów, których TWIN już zna — zanim r
 | Explainability | Why surfaced, why now, evidence, risks, missing data |
 | Filters | Role/job, segment, timing window, signal type |
 | Human next steps | Review card, shortlist, draft-only outreach, snooze, dismiss |
+| Decision cockpit UX | Summary stats panel, fit bands (80/60/40), grouped review queues, scannable cards with expandable details |
 | Pilot honesty | Demo pool label, data quality warnings, no external sourcing claims |
 
 ## What it does NOT do (hard bans)
@@ -70,8 +71,20 @@ Outreach draft panel is **copy-only** — not sent by TWIN.
 
 ```bash
 cd frontend && npm run test:recruiter-talent-radar-mvp
+cd frontend && npm run test:recruiter-talent-radar-premium-ux
 cd ../backend && pytest tests/test_recruiter_talent_radar.py -q
 ```
+
+### Premium UX cockpit (2026-06-15)
+
+| Surface | Detail |
+| ------- | ------ |
+| Summary panel | Candidates, strong matches, needs verification, low confidence + no-auto-outreach note |
+| Fit bands | Strong 80–100, Good 60–79, Possible 40–59, Low 0–39 (visual badges) |
+| Groups | Review first / Possible match / Needs verification / Low confidence |
+| Cards | Header + 2× why surfaced + 1–2× why now + chips; expandable evidence/risks |
+| CTA hierarchy | Primary: open review card; secondary: draft / shortlist / snooze / dismiss |
+| Filters | Premium toolbar with helper text |
 
 ## Launch stance
 

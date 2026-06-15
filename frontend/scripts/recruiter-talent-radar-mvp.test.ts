@@ -50,25 +50,33 @@ test("3 talent radar has pilot status on hub", () => {
 
 test("4 candidate cards and empty state markers in client", () => {
   const client = readSrc("src/app/recruiter/talent-radar/recruiter-talent-radar-client.tsx");
-  assert.match(client, /RECRUITER_TALENT_RADAR_MARKERS\.candidateCard/);
+  const card = readSrc("src/components/recruiter/talent-radar/talent-radar-candidate-card.tsx");
+  assert.match(card, /RECRUITER_TALENT_RADAR_MARKERS\.candidateCard/);
   assert.match(client, /RECRUITER_TALENT_RADAR_MARKERS\.emptyState/);
+  assert.match(client, /TalentRadarCandidateGroups/);
 });
 
-test("5-7 explainability sections rendered in client", () => {
+test("5-7 explainability sections rendered in candidate card", () => {
   const client = readSrc("src/app/recruiter/talent-radar/recruiter-talent-radar-client.tsx");
-  assert.match(client, /whySurfaced/);
-  assert.match(client, /whyNow/);
-  assert.match(client, /risks/);
-  assert.match(client, /missingData/);
+  const card = readSrc("src/components/recruiter/talent-radar/talent-radar-candidate-card.tsx");
+  assert.match(card, /whySurfaced/);
+  assert.match(card, /whyNow/);
+  assert.match(card, /risks/);
+  assert.match(card, /missingData/);
+  assert.match(client, /TalentRadarCandidateGroups/);
 });
 
 test("8 data confidence shown", () => {
-  assert.match(readSrc("src/app/recruiter/talent-radar/recruiter-talent-radar-client.tsx"), /dataConfidence/);
+  assert.match(
+    readSrc("src/components/recruiter/talent-radar/talent-radar-candidate-card.tsx"),
+    /dataConfidence/,
+  );
 });
 
 test("9 human decision disclaimer visible", () => {
   const client = readSrc("src/app/recruiter/talent-radar/recruiter-talent-radar-client.tsx");
-  assert.match(client, /humanDecisionRequired/);
+  const card = readSrc("src/components/recruiter/talent-radar/talent-radar-candidate-card.tsx");
+  assert.match(card, /humanDecisionRequired/);
   assert.match(client, /RECRUITER_TALENT_RADAR_MARKERS\.disclaimer/);
   assert.match(en.recruiterTalentRadar.disclaimer.toLowerCase(), /recruiter decides/);
 });
@@ -119,7 +127,7 @@ test("13-14 no fake traction or forbidden AI language", () => {
 
 test("15 filters render without crash markers", () => {
   assert.match(readSrc("src/app/recruiter/talent-radar/recruiter-talent-radar-client.tsx"), /filtersPanel/);
-  assert.match(readSrc("src/app/recruiter/talent-radar/recruiter-talent-radar-client.tsx"), /filterSegment/);
+  assert.match(readSrc("src/components/recruiter/talent-radar/talent-radar-filter-toolbar.tsx"), /filterSegment/);
 });
 
 test("16 premium empty state copy", () => {

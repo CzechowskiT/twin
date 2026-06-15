@@ -29,6 +29,7 @@
     "test:recruiter-review-card": "npx --yes tsx scripts/recruiter-review-card.test.ts",
     "test:recruiter-candidate-search-mvp": "npx --yes tsx scripts/recruiter-candidate-search-mvp.test.ts",
     "test:recruiter-talent-radar-mvp": "npx --yes tsx scripts/recruiter-talent-radar-mvp.test.ts",
+    "test:recruiter-talent-radar-premium-ux": "npx --yes tsx scripts/recruiter-talent-radar-premium-ux.test.ts",
     "test:company-pipeline-quality-metrics": "npx --yes tsx scripts/company-pipeline-quality-metrics.test.ts",
     "test:company-hiring-dashboard-mvp": "npx --yes tsx scripts/company-hiring-dashboard-mvp.test.ts",
     "test:company-billing-readiness-mvp": "npx --yes tsx scripts/company-billing-readiness-mvp.test.ts",
