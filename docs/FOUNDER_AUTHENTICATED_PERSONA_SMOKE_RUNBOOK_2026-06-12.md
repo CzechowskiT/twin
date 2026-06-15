@@ -52,7 +52,7 @@ cd frontend && npm run test:trust-language-guard && npm run test:i18n-coverage
 | R2 | `/recruiter/inbox` | Queue + segments + accept/decline | Demo seed only | Empty with no copy, PII leak |
 | R3 | `/recruiter/pipeline` | Board stages from API | Empty honest | Fake pipeline counts |
 | R4 | `/recruiter/search` | Filters + results or empty | Demo pool only | External sourcing implied live |
-| R4b | `/recruiter/talent-radar` | Summary panel + grouped cards or premium empty; **Prepare draft** opens modal (not sent, copy-only) | Pilot / internal data only; fit bands visible | Auto outreach or “AI picks best” implied; draft CTA does nothing |
+| R4b | `/recruiter/talent-radar` | Summary panel + grouped premium cards or empty; **Prepare draft** opens solid modal (`bg-slate-950/85`, copy-only badge, no bleed-through) | Pilot / internal data only; fit bands + trust footer | Auto outreach or “AI picks best” implied; draft CTA does nothing |
 | R5 | `/recruiter/analytics` | Charts from workspace data | Sparse data | Market-wide fake traction |
 | R6 | `/recruiter/integrations` | Readiness rows; no “all connected” | ATS stub only | Fake live badges |
 | R7 | `/recruiter/calendar` | **NOT LIVE** placeholder only | — | OAuth sync implied live |

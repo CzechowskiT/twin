@@ -50,7 +50,7 @@ import {
   type TalentRadarLatestDecision,
   type TalentRadarSnoozeDays,
 } from "@/lib/recruiter-talent-radar-decisions";
-import { computeTalentRadarSummaryStats } from "@/lib/recruiter-talent-radar-visual";
+import { computeTalentRadarSummaryStats, TALENT_RADAR_VISUAL_MARKERS } from "@/lib/recruiter-talent-radar-visual";
 import { getClientApiLocale } from "@/lib/api-locale";
 
 type RoleOption = { id: number; title: string };
@@ -283,8 +283,8 @@ export default function RecruiterTalentRadarClient() {
     <Shell wide>
       <RecruiterWorkspaceNav />
       <div className={RECRUITER_TALENT_RADAR_MARKERS.page} data-testid={RECRUITER_TALENT_RADAR_MARKERS.page}>
-        <div className="mx-auto max-w-5xl">
-          <div data-testid={RECRUITER_TALENT_RADAR_MARKERS.hero}>
+        <div className="mx-auto max-w-5xl px-1 pb-12 pt-2 sm:px-2">
+          <div className="space-y-6" data-testid={RECRUITER_TALENT_RADAR_MARKERS.hero}>
             <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
               {t("recruiterTalentRadar.eyebrow")}
             </p>
@@ -307,7 +307,7 @@ export default function RecruiterTalentRadarClient() {
             ))}
           </div>
 
-          <Card variant="soft" className="mt-6 border-[var(--twin-accent)]/20 p-4 sm:p-5">
+          <Card variant="soft" className="border-[var(--twin-accent)]/20 p-5 sm:p-6">
             <p className="text-sm font-semibold text-[var(--foreground)]">{t("recruiterTalentRadar.scopeTitle")}</p>
             <p className="twin-muted mt-1 text-sm leading-relaxed">{t("recruiterTalentRadar.scopeBody")}</p>
             {isDemo ? (
@@ -336,7 +336,7 @@ export default function RecruiterTalentRadarClient() {
           </div>
 
           {loaded ? (
-            <div className="mt-8 space-y-6" data-testid={RECRUITER_TALENT_RADAR_MARKERS.filtersPanel}>
+            <div className="mt-10 space-y-8" data-testid={RECRUITER_TALENT_RADAR_MARKERS.filtersPanel}>
               <TalentRadarFilterToolbar filters={filters} roles={roles} onChange={updateFilter} />
               <TalentRadarDecisionFilterBar value={decisionFilter} onChange={setDecisionFilter} />
               {visibleRows.length > 0 ? (
@@ -379,7 +379,7 @@ export default function RecruiterTalentRadarClient() {
           ) : null}
 
           {visibleRows.length > 0 ? (
-            <div className="mt-8">
+            <div className="mt-10">
               <TalentRadarCandidateGroups
                 rows={visibleRows}
                 roleTitle={roleTitle}
@@ -404,13 +404,20 @@ export default function RecruiterTalentRadarClient() {
           ) : null}
 
           <p
-            className="mt-8 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] p-4 text-sm leading-relaxed text-[var(--twin-muted-strong)]"
+            className="mt-10 rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] p-5 text-sm leading-relaxed text-[var(--twin-muted-strong)]"
             data-testid={RECRUITER_TALENT_RADAR_MARKERS.disclaimer}
           >
             {disclaimer || t("recruiterTalentRadar.disclaimer")}
           </p>
 
-          <p className="twin-muted mt-6 text-xs">
+          <p
+            className="mt-4 rounded-xl border border-[var(--twin-border)]/70 bg-[var(--twin-surface)]/80 p-4 text-xs leading-relaxed text-[var(--twin-muted-strong)]"
+            data-testid={TALENT_RADAR_VISUAL_MARKERS.trustFooter}
+          >
+            {t("recruiterTalentRadar.trustFooter")}
+          </p>
+
+          <p className="twin-muted mt-8 text-xs">
             {t("recruiterTalentRadar.contextLinks")}{" "}
             <Link href="/recruiter/search" className="underline">
               {t("recruiterSearch.title")}
