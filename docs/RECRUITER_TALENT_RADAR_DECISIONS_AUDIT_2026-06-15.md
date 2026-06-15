@@ -34,6 +34,7 @@ Talent Radar actions are now persisted in `recruiter_talent_radar_decisions` and
 | `POST` | `/api/v1/recruiter/talent-radar/decisions` | Record a decision |
 | `GET` | `/api/v1/recruiter/talent-radar/decisions` | List latest decisions (optional `decision_filter`, `application_id`) |
 | `GET` | `/api/v1/recruiter/talent-radar` | Each suggestion includes `latest_decision` |
+| `GET` | `/api/v1/recruiter/talent-radar/digest` | Weekly digest summary (2026-06-15) — dashboard only, no email |
 
 Auth: same recruiter token + `company_slug` as inbox.
 
@@ -62,6 +63,7 @@ Auth: same recruiter token + `company_slug` as inbox.
   - **Visual polish** (2026-06-15): `bg-slate-950/85` + `backdrop-blur-md` overlay; solid modal panel; copy-only badge; grouped card chips; nested details panel; trust footer
   - Optimistic UI + toast confirmations
   - Badges on candidate cards
+- **Weekly digest** (2026-06-15): `/recruiter/talent-radar/digest` — aggregates decisions + radar signals; copy-only summary; see `docs/RECRUITER_TALENT_RADAR_WEEKLY_DIGEST_2026-06-15.md`
 - **i18n:** PL + EN under `recruiterTalentRadar.*` and `recruiterAudit.actionRadar*`
 
 ## Audit trail
@@ -75,6 +77,7 @@ Radar actions append to `recruiter_audit_events` via `log_recruiter_audit_event`
 | Frontend decisions (15 cases) | `npm run test:recruiter-talent-radar-decisions` |
 | Frontend draft action (14 cases) | `npm run test:recruiter-talent-radar-draft-action` |
 | Frontend visual polish (12 cases) | `npm run test:recruiter-talent-radar-visual-polish` |
+| Frontend weekly digest (17 cases) | `npm run test:recruiter-talent-radar-weekly-digest` |
 | Frontend radar MVP | `npm run test:recruiter-talent-radar-mvp` |
 | Backend decisions | `pytest tests/test_recruiter_talent_radar_decisions.py -q` |
 | Backend audit trail | `pytest tests/test_recruiter_audit_trail.py -q` |
