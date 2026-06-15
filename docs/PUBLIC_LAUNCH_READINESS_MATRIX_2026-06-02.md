@@ -34,6 +34,8 @@
 
 **Safe-lane merge (2026-06-15):** Recruiter **Talent Pool Import** — `/recruiter/talent-pool`; CSV paste structured internal pool · `docs/RECRUITER_TALENT_POOL_IMPORT_MVP_2026-06-15.md` · `test:recruiter-talent-pool-import-mvp` · **no live ATS sync / external sourcing** · **does not change launch NO-GO**.
 
+**Safe-lane merge (2026-06-15):** Company **Talent Pool View** — `/company/talent-pool`; organizational talent memory · `docs/COMPANY_TALENT_POOL_VIEW_MVP_2026-06-15.md` · `test:company-talent-pool-view-mvp` · **no PII / auto outreach / live ATS** · **does not change launch NO-GO**.
+
 **Safe-lane merge (2026-06-11):** Investor metrics **reality dashboard** — `/investor/metrics` · `test:investor-metrics-reality-dashboard` · **does not change launch NO-GO**.
 
 **Safe-lane merge (2026-06-11):** Recruiter **manual scheduling + pipeline** — prepare-invite panel, copy invite, mark invited/scheduled, ATS-lite pipeline with scheduled slot badge; **no** outbound email, **no** recruiter calendar sync · `docs/RECRUITER_SCHEDULING_MVP_MANUAL_2026-06-11.md` · **REPO** · recruiter calendar sync **NOT LIVE** · **does not change launch NO-GO**.

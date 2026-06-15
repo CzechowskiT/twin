@@ -47,6 +47,7 @@ Status tiers: **Live / Pilot / Planned / Not live / Needs setup / Paused**
 | `/workspace/recruiter` | **REDIRECT** | → `/recruiter` |
 | `/workspace/recruiter/integrations` | **REDIRECT** | → `/recruiter/integrations` |
 | `/company/dashboard` | **LIVE** | Company module grid |
+| `/company/talent-pool` | **PILOT** | Organizational talent memory — internal data quality, no live ATS |
 | `/workspace/investor` | **LIVE** | Investor module hub (gated) |
 | `/investor` | **LIVE** | Public room + gated tools preview |
 

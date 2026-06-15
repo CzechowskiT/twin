@@ -10,6 +10,7 @@ import { COMPANY_BILLING_ROUTE } from "@/lib/company-billing-readiness";
 import { COMPANY_HIRING_ROUTE } from "@/lib/company-hiring-dashboard";
 import { COMPANY_INTEGRATIONS_ROUTE } from "@/lib/company-integrations-readiness";
 import { COMPANY_TEAM_ROUTE } from "@/lib/company-team-permissions";
+import { COMPANY_TALENT_POOL_ROUTE } from "@/lib/company-talent-pool";
 
 const NAV = [
   { href: COMPANY_HIRING_ROUTE, ns: "companyHiring" as const, key: "navDashboard" },
@@ -17,6 +18,7 @@ const NAV = [
   { href: COMPANY_BILLING_ROUTE, ns: "companyBilling" as const, key: "navBilling" },
   { href: COMPANY_ROLES_ROUTE, ns: "companyJobs" as const, key: "navRoles" },
   { href: "/company/pipeline", ns: "companyPipeline" as const, key: "navLink" },
+  { href: COMPANY_TALENT_POOL_ROUTE, ns: "companyTalentPool" as const, key: "navLink" },
   { href: COMPANY_TEAM_ROUTE, ns: "companyTeam" as const, key: "navTeam" },
   { href: "/calculator/b2b", ns: "companyTeam" as const, key: "navCalculator" },
   { href: "/recruiter/inbox", ns: "companyJobs" as const, key: "navInbox" },

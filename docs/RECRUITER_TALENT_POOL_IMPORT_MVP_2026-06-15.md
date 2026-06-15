@@ -64,6 +64,7 @@ cd frontend && npm run build && npx tsc --noEmit
 
 ## Related docs
 
+- `docs/COMPANY_TALENT_POOL_VIEW_MVP_2026-06-15.md` — company-facing talent memory at `/company/talent-pool`
 - `docs/RECRUITER_TALENT_RADAR_MVP_2026-06-12.md`
 - `docs/RECRUITER_TALENT_RADAR_DECISIONS_AUDIT_2026-06-15.md`
 - `docs/RECRUITER_TALENT_RADAR_WEEKLY_DIGEST_2026-06-15.md`

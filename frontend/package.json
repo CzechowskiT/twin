@@ -38,6 +38,7 @@
     "test:recruiter-talent-pool-import-mvp": "npx --yes tsx scripts/recruiter-talent-pool-import-mvp.test.ts",
     "test:company-pipeline-quality-metrics": "npx --yes tsx scripts/company-pipeline-quality-metrics.test.ts",
     "test:company-hiring-dashboard-mvp": "npx --yes tsx scripts/company-hiring-dashboard-mvp.test.ts",
+    "test:company-talent-pool-view-mvp": "npx --yes tsx scripts/company-talent-pool-view-mvp.test.ts",
     "test:company-billing-readiness-mvp": "npx --yes tsx scripts/company-billing-readiness-mvp.test.ts",
     "test:company-billing-plan-usage-readiness": "npx --yes tsx scripts/company-billing-plan-usage-readiness.test.ts",
     "test:candidate-transparency": "npx --yes tsx scripts/candidate-transparency.test.ts",
