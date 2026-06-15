@@ -97,3 +97,7 @@ Radar actions append to `recruiter_audit_events` via `log_recruiter_audit_event`
 5. Prepare draft → modal opens (title includes “nie wysłano” / “not sent”), **copy-only badge**, strong overlay (no card bleed-through), copy primary / review secondary / close tertiary; badge **Szkic przygotowany — nie wysłano** on success; audit row `draft_prepared` with radar snapshots (no message body). On audit failure: local draft + warning.
 6. Open review card → audit row logged
 7. Confirm no send-email CTA anywhere on radar page
+
+## Talent pool import integration (2026-06-15)
+
+Imported internal pool records surface in Talent Radar via segment/signal `imported_internal_pool` with source chip **Talent pool**. Import audit events are separate from radar decision audit (`talent_pool_*` on import batch). See `docs/RECRUITER_TALENT_POOL_IMPORT_MVP_2026-06-15.md`.

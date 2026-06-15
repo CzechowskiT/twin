@@ -440,6 +440,10 @@ export default function RecruiterTalentRadarClient() {
             <Link href="/recruiter/inbox" className="underline">
               {t("recruiterInbox.title")}
             </Link>
+            {" · "}
+            <Link href="/recruiter/talent-pool" className="underline">
+              {t("recruiterTalentPool.title")}
+            </Link>
           </p>
         </div>
       </div>

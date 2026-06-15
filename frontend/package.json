@@ -35,6 +35,7 @@
     "test:recruiter-talent-radar-visual-polish": "npx --yes tsx scripts/recruiter-talent-radar-visual-polish.test.ts",
     "test:recruiter-talent-radar-weekly-digest": "npx --yes tsx scripts/recruiter-talent-radar-weekly-digest.test.ts",
     "test:recruiter-talent-radar-weekly-digest-premium": "npx --yes tsx scripts/recruiter-talent-radar-weekly-digest-premium.test.ts",
+    "test:recruiter-talent-pool-import-mvp": "npx --yes tsx scripts/recruiter-talent-pool-import-mvp.test.ts",
     "test:company-pipeline-quality-metrics": "npx --yes tsx scripts/company-pipeline-quality-metrics.test.ts",
     "test:company-hiring-dashboard-mvp": "npx --yes tsx scripts/company-hiring-dashboard-mvp.test.ts",
     "test:company-billing-readiness-mvp": "npx --yes tsx scripts/company-billing-readiness-mvp.test.ts",

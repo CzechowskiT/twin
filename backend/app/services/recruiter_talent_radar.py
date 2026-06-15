@@ -24,6 +24,7 @@ from app.services.recruiter_inbox import _require_company_slug
 from app.services.recruiter_jobs import list_company_jobs
 from app.services.recruiter_match_explanations import INBOX_FORBIDDEN_PII_KEYS
 from app.services.recruiter_talent_radar_decisions import latest_decisions_by_application
+from app.services.recruiter_talent_pool import list_talent_pool_records_for_radar
 from app.utils.slug import slugify_company
 
 FitLabel = Literal["strong", "good", "possible", "weak"]
@@ -256,6 +257,102 @@ def _compute_radar_row(
         "job_title": job.title,
         "days_since_contact": days_idle,
         "skill_overlap": overlap,
+        "source": "workspace_application",
+        "source_signals": ["workspace"],
+    }
+
+
+def _compute_pool_radar_row(
+    rec,
+    *,
+    locale: str,
+    role_job: Job | None,
+) -> dict[str, Any]:
+    import json
+
+    pl = locale.lower().startswith("pl")
+    skills: list[str] = []
+    if rec.skills_json:
+        try:
+            loaded = json.loads(rec.skills_json)
+            if isinstance(loaded, list):
+                skills = [str(s) for s in loaded[:12]]
+        except json.JSONDecodeError:
+            skills = []
+    quality: dict[str, Any] = {}
+    if rec.data_quality_json:
+        try:
+            loaded = json.loads(rec.data_quality_json)
+            if isinstance(loaded, dict):
+                quality = loaded
+        except json.JSONDecodeError:
+            quality = {}
+    level = str(quality.get("level") or "medium")
+    confidence: DataConfidence = level if level in ("high", "medium", "low") else "medium"  # type: ignore[assignment]
+    score = float(quality.get("score") or 55)
+    if role_job and rec.job_title:
+        req = f"{role_job.requirements or ''} {role_job.description or ''}".lower()
+        overlap = [s for s in skills if s.lower() in req][:5]
+        if overlap:
+            score += min(15, len(overlap) * 4)
+    score = max(0.0, min(100.0, score))
+    warnings = quality.get("warnings") or []
+    why_surfaced = [
+        "Import z wewnętrznego talent pool" if pl else "Imported from internal talent pool",
+    ]
+    if skills:
+        why_surfaced.append(
+            f"Umiejętności: {', '.join(skills[:3])}" if pl else f"Skills: {', '.join(skills[:3])}"
+        )
+    if rec.job_title:
+        why_surfaced.append(rec.job_title)
+    why_now = [
+        "Świeży rekord z importu CSV — zweryfikuj przed kontaktem"
+        if pl
+        else "Fresh CSV import record — verify before contact"
+    ]
+    risks: list[str] = []
+    if warnings:
+        risks.append(
+            f"Ostrzeżenia jakości: {', '.join(str(w) for w in warnings[:3])}"
+            if pl
+            else f"Data quality warnings: {', '.join(str(w) for w in warnings[:3])}"
+        )
+    if confidence != "high":
+        risks.append("Niska pewność danych importu" if pl else "Low import data confidence")
+    if not risks:
+        risks.append("Wymaga ludzkiej oceny przed kontaktem" if pl else "Requires human review before contact")
+    missing = [str(w) for w in warnings[:5]]
+    status = _radar_status(
+        score=score,
+        confidence=confidence,
+        days_idle=None,
+        uncertain=missing,
+        pipeline=(rec.pipeline_status or "review"),
+    )
+    return {
+        "id": f"pool-{rec.id}",
+        "application_id": rec.application_id,
+        "display_name": rec.display_name,
+        "headline": rec.job_title or (skills[0].title() if skills else None),
+        "fit_label": _fit_label(score),
+        "score": round(score, 1),
+        "status": status,
+        "why_surfaced": why_surfaced,
+        "why_now": why_now,
+        "evidence": why_surfaced[:3],
+        "risks": risks,
+        "missing_data": missing,
+        "last_interaction": rec.created_at.isoformat() if rec.created_at else None,
+        "recommended_next_action": "verify_data",
+        "data_confidence": confidence,
+        "human_decision_required": True,
+        "pipeline_status": rec.pipeline_status or "review",
+        "job_title": rec.job_title,
+        "days_since_contact": None,
+        "skill_overlap": skills[:5],
+        "source": "imported_internal_pool",
+        "source_signals": ["imported_internal_pool", "talent_pool"],
     }
 
 
@@ -277,6 +374,8 @@ def _matches_segment(row: dict[str, Any], segment: str | None) -> bool:
         return row.get("data_confidence") == "high"
     if seg == "possible_gaps":
         return bool(row.get("missing_data"))
+    if seg == "imported_internal_pool":
+        return row.get("source") == "imported_internal_pool"
     return True
 
 
@@ -314,6 +413,8 @@ def _matches_signal(row: dict[str, Any], signal: str | None) -> bool:
         return bool(row.get("headline"))
     if sig == "needs_verification":
         return row.get("status") in ("needs_verification", "not_enough_evidence", "stale_data")
+    if sig == "imported_internal_pool":
+        return row.get("source") == "imported_internal_pool"
     return True
 
 
@@ -364,6 +465,22 @@ def build_recruiter_talent_radar(
         row = _compute_radar_row(
             db, app, job, cand, sc, locale=locale, role_job=role_job
         )
+        if not _matches_segment(row, segment):
+            continue
+        if not _matches_timing(row, timing_window):
+            continue
+        if not _matches_signal(row, signal_type):
+            continue
+        for forbidden in INBOX_FORBIDDEN_PII_KEYS:
+            row.pop(forbidden, None)
+        suggestions.append(row)
+
+    pool_records = list_talent_pool_records_for_radar(db, company_slug=slug, limit=100)
+    linked_app_ids = {int(s.get("application_id") or 0) for s in suggestions if s.get("application_id")}
+    for rec in pool_records:
+        if rec.application_id and rec.application_id in linked_app_ids:
+            continue
+        row = _compute_pool_radar_row(rec, locale=locale, role_job=role_job)
         if not _matches_segment(row, segment):
             continue
         if not _matches_timing(row, timing_window):

@@ -25,6 +25,11 @@ from app.services.recruiter_talent_radar_decisions import (
     log_recruiter_talent_radar_decision,
 )
 from app.services.recruiter_talent_radar_digest import build_recruiter_talent_radar_digest
+from app.services.recruiter_talent_pool import build_recruiter_talent_pool
+from app.services.recruiter_talent_pool_import import (
+    commit_talent_pool_import,
+    preview_talent_pool_import,
+)
 from app.services.recruiter_inbox import (
     build_recruiter_batch,
     respond_recruiter_batch,
@@ -564,6 +569,82 @@ def recruiter_jobs_create(
             url=body.url,
             salary_min=body.salary_min,
             salary_max=body.salary_max,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+class RecruiterTalentPoolImportPreviewIn(BaseModel):
+    csv_text: str = Field(..., min_length=1, max_length=512_000)
+    import_source: str = Field("csv_paste", max_length=64)
+
+
+class RecruiterTalentPoolImportCommitIn(BaseModel):
+    import_id: int = Field(..., ge=1)
+
+
+@router.get("/talent-pool")
+def recruiter_talent_pool_list(
+    request: Request,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+    limit: int = Query(50, ge=1, le=100),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return build_recruiter_talent_pool(
+            db,
+            company_slug=slug,
+            locale=locale_from_request(request),
+            limit=limit,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/talent-pool/import/preview")
+@limiter.limit("30/minute", key_func=recruiter_token_key)
+def recruiter_talent_pool_import_preview(
+    request: Request,
+    body: RecruiterTalentPoolImportPreviewIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return preview_talent_pool_import(
+            db,
+            company_slug=slug,
+            csv_text=body.csv_text,
+            import_source=body.import_source,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/talent-pool/import/commit")
+@limiter.limit("20/minute", key_func=recruiter_token_key)
+def recruiter_talent_pool_import_commit(
+    request: Request,
+    body: RecruiterTalentPoolImportCommitIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return commit_talent_pool_import(
+            db,
+            company_slug=slug,
+            import_id=body.import_id,
         )
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc

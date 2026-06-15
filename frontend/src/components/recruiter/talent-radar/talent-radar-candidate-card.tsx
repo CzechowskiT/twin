@@ -129,6 +129,11 @@ export function TalentRadarCandidateCard({
           <span className="rounded-full border border-[var(--twin-border)] px-2 py-0.5 text-[10px] font-medium text-[var(--twin-muted-strong)]">
             {t(statusLabelKey(row.status))}
           </span>
+          {row.source === "imported_internal_pool" || row.source_signals?.includes("talent_pool") ? (
+            <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-300">
+              {t("recruiterTalentRadar.chipTalentPoolSource")}
+            </span>
+          ) : null}
         </div>
       </div>
 

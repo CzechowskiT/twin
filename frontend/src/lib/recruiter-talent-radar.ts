@@ -32,6 +32,7 @@ export const TALENT_RADAR_SEGMENTS = [
   "inactive_stale",
   "high_evidence_quality",
   "possible_gaps",
+  "imported_internal_pool",
 ] as const;
 
 export const TALENT_RADAR_TIMING = [
@@ -52,6 +53,7 @@ export const TALENT_RADAR_SIGNALS = [
   "location_fit",
   "seniority_fit",
   "needs_verification",
+  "imported_internal_pool",
 ] as const;
 
 export type TalentRadarFitLabel = "strong" | "good" | "possible" | "weak";
@@ -87,6 +89,8 @@ export type TalentRadarCandidate = {
   data_confidence: TalentRadarDataConfidence;
   human_decision_required: true;
   job_title?: string;
+  source?: string;
+  source_signals?: string[];
   latest_decision?: TalentRadarLatestDecision | null;
 };
 

@@ -54,6 +54,8 @@ cd frontend && npm run test:trust-language-guard && npm run test:i18n-coverage
 | R4 | `/recruiter/search` | Filters + results or empty | Demo pool only | External sourcing implied live |
 | R4b | `/recruiter/talent-radar` | Summary panel + grouped premium cards or empty; **Prepare draft** opens solid modal (`bg-slate-950/85`, copy-only badge, no bleed-through) | Pilot / internal data only; fit bands + trust footer | Auto outreach or “AI picks best” implied; draft CTA does nothing |
 | R4c | `/recruiter/talent-radar/digest` | Unique-candidate summary + deduplicated sections (max 5); **Kopiuj podsumowanie** / **Skopiowano** only (no send) | Pilot; period selector; trust chips; +X więcej w Radarze | Email send or auto outreach implied |
+| R4d | `/recruiter/talent-pool` | Summary + quality + source coverage or empty; link to import | Pilot; CSV internal pool only | Live ATS sync or external sourcing implied |
+| R4e | `/recruiter/talent-pool/import` | CSV paste → preview → commit | Duplicate detection; no email/phone columns | Auto outreach or live sync implied |
 | R5 | `/recruiter/analytics` | Charts from workspace data | Sparse data | Market-wide fake traction |
 | R6 | `/recruiter/integrations` | Readiness rows; no “all connected” | ATS stub only | Fake live badges |
 | R7 | `/recruiter/calendar` | **NOT LIVE** placeholder only | — | OAuth sync implied live |

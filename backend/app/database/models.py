@@ -796,6 +796,52 @@ class RecruiterApplicationScorecard(Base):
     )
 
 
+class RecruiterTalentPoolImport(Base):
+    """Batch import of structured internal talent pool records (CSV paste MVP)."""
+
+    __tablename__ = "recruiter_talent_pool_imports"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    company_slug: Mapped[str] = mapped_column(String(80), index=True)
+    import_source: Mapped[str] = mapped_column(String(64))
+    status: Mapped[str] = mapped_column(String(32), default="preview")
+    row_count: Mapped[int] = mapped_column(Integer, default=0)
+    accepted_count: Mapped[int] = mapped_column(Integer, default=0)
+    duplicate_count: Mapped[int] = mapped_column(Integer, default=0)
+    error_count: Mapped[int] = mapped_column(Integer, default=0)
+    warnings_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    audit_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    committed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class RecruiterTalentPoolRecord(Base):
+    """Structured internal talent pool row — company-scoped, no raw PII beyond display name."""
+
+    __tablename__ = "recruiter_talent_pool_records"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    company_slug: Mapped[str] = mapped_column(String(80), index=True)
+    import_id: Mapped[int | None] = mapped_column(
+        ForeignKey("recruiter_talent_pool_imports.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    candidate_id: Mapped[str | None] = mapped_column(String(64), index=True, nullable=True)
+    application_id: Mapped[int | None] = mapped_column(Integer, index=True, nullable=True)
+    job_id: Mapped[int | None] = mapped_column(Integer, index=True, nullable=True)
+    external_ats_id: Mapped[str | None] = mapped_column(String(128), index=True, nullable=True)
+    display_name: Mapped[str] = mapped_column(String(200))
+    job_title: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    location: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    seniority: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    skills_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    data_quality_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    duplicate_key: Mapped[str] = mapped_column(String(128), index=True)
+    pipeline_status: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
 class AutoApplyConsent(Base):
     """GDPR-style consent for nightly autonomous applications."""
 

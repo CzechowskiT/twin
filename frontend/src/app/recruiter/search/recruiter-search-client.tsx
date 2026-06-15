@@ -413,6 +413,9 @@ export default function RecruiterSearchClient() {
             <Link href="/recruiter/jobs" className="twin-link">
               {t("recruiterJobs.title")}
             </Link>
+            <Link href="/recruiter/talent-pool" className="twin-link">
+              {t("recruiterTalentPool.title")}
+            </Link>
             <Link href="/workspace/recruiter" className="twin-link">
               {t("workspace.recruiterHomeTitle")}
             </Link>
