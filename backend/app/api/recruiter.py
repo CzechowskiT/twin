@@ -24,6 +24,7 @@ from app.services.recruiter_talent_radar_decisions import (
     list_recruiter_talent_radar_decisions,
     log_recruiter_talent_radar_decision,
 )
+from app.services.recruiter_talent_radar_digest import build_recruiter_talent_radar_digest
 from app.services.recruiter_inbox import (
     build_recruiter_batch,
     respond_recruiter_batch,
@@ -376,6 +377,32 @@ def recruiter_talent_radar_decisions_list(
             application_id=application_id,
             decision_filter=decision_filter,
             limit=limit,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.get("/talent-radar/digest")
+def recruiter_talent_radar_digest(
+    request: Request,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+    period: str | None = Query("7d", max_length=16),
+    job_id: int | None = Query(None, ge=1, alias="jobId"),
+    include_dismissed_summary: bool = Query(True, alias="includeDismissedSummary"),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return build_recruiter_talent_radar_digest(
+            db,
+            company_slug=slug,
+            locale=locale_from_request(request),
+            period=period,
+            job_id=job_id,
+            include_dismissed_summary=include_dismissed_summary,
         )
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc

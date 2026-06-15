@@ -84,6 +84,10 @@ export function RecruiterPipelineClient() {
           <Link href="/recruiter/talent-radar" className="font-medium text-[var(--twin-accent)] underline">
             {t("recruiterTalentRadar.navLink")}
           </Link>
+          {" · "}
+          <Link href="/recruiter/talent-radar/digest" className="font-medium text-[var(--twin-accent)] underline">
+            {t("recruiterTalentRadarDigest.digestLink")}
+          </Link>
         </p>
 
         <RecruiterAccessFields

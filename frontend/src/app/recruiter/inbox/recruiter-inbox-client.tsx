@@ -572,6 +572,10 @@ export default function RecruiterInboxClient() {
               <Link href="/recruiter/talent-radar" className="font-medium text-[var(--twin-accent)] underline">
                 {t("recruiterTalentRadar.navLink")}
               </Link>
+              {" · "}
+              <Link href="/recruiter/talent-radar/digest" className="font-medium text-[var(--twin-accent)] underline">
+                {t("recruiterTalentRadarDigest.digestLink")}
+              </Link>
             </p>
             <p className="mb-6 text-sm leading-relaxed text-[var(--foreground)]">{t("recruiterInbox.helperInvite")}</p>
             <div className="mb-6">

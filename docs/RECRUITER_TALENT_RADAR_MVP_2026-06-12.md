@@ -34,9 +34,13 @@ Core narrative (PL): *Zacznij od kandydatów, których TWIN już zna — zanim r
 | Surface | Path |
 | ------- | ---- |
 | UI | `/recruiter/talent-radar` |
+| Weekly digest | `/recruiter/talent-radar/digest` |
 | Hub tile | `/recruiter` → Radar Talentów (Pilot) |
+| Digest hub tile | `/recruiter` → Weekly Talent Radar Digest (Pilot) |
 | BFF proxy | `GET /api/recruiter/talent-radar` |
+| Digest BFF | `GET /api/recruiter/talent-radar/digest` |
 | API | `GET /api/v1/recruiter/talent-radar` |
+| Digest API | `GET /api/v1/recruiter/talent-radar/digest` |
 
 Auth: same as inbox — `X-Twin-Recruiter-Token` + `company_slug`.
 
@@ -100,4 +104,4 @@ cd ../backend && pytest tests/test_recruiter_talent_radar.py -q
 - External signals (consent-aware)
 - Consent-aware outreach workflows
 - Role-based radar subscriptions
-- Weekly talent digest
+- ~~Weekly talent digest~~ → **shipped** as dashboard digest at `/recruiter/talent-radar/digest` (2026-06-15); scheduled email not in scope

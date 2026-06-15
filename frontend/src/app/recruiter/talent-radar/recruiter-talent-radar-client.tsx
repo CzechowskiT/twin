@@ -40,6 +40,7 @@ import {
   type TalentRadarFilters,
   type TalentRadarPayload,
 } from "@/lib/recruiter-talent-radar";
+import { RECRUITER_TALENT_RADAR_DIGEST_ROUTE } from "@/lib/recruiter-talent-radar-digest";
 import {
   matchesDecisionFilter,
   TALENT_RADAR_DECISION_MARKERS,
@@ -342,6 +343,15 @@ export default function RecruiterTalentRadarClient() {
               {visibleRows.length > 0 ? (
                 <TalentRadarSummaryPanel stats={summaryStats} />
               ) : null}
+              <p className="text-sm">
+                <Link
+                  href={RECRUITER_TALENT_RADAR_DIGEST_ROUTE}
+                  className="font-medium text-[var(--twin-accent)] underline"
+                  data-testid="recruiter-talent-radar-digest-link"
+                >
+                  {t("recruiterTalentRadar.digestLink")}
+                </Link>
+              </p>
             </div>
           ) : null}
 
