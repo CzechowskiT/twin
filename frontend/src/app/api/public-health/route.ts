@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { resolveDeployCommitFromEnv } from "@/lib/deploy-commit";
 import { getUpstreamApiBase } from "@/lib/public-api-base";
 
 export const dynamic = "force-dynamic";
@@ -43,5 +44,16 @@ export async function GET() {
   if (celeryRes.ok) {
     celery = (await celeryRes.json()) as Record<string, unknown>;
   }
-  return NextResponse.json({ ...health, celery });
+  const apiCommit =
+    typeof health.git_commit === "string" && health.git_commit !== "unknown"
+      ? health.git_commit
+      : null;
+  const frontendCommit = resolveDeployCommitFromEnv();
+  return NextResponse.json({
+    ...health,
+    celery,
+    // Explicit deploy traceability: Vercel FE vs Railway API (git_commit stays API for compat).
+    frontend_commit: frontendCommit ?? "unknown",
+    api_commit: apiCommit ?? health.git_commit ?? "unknown",
+  });
 }
