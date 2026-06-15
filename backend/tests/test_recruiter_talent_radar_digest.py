@@ -183,6 +183,103 @@ def test_drafts_prepared_not_sent() -> None:
         assert out["summary"]["draftsPreparedNotSent"] >= 1
         drafts = out["sections"]["draftsPrepared"]
         assert drafts[0].get("status") == "not_sent"
+        assert drafts[0].get("draftCount") == 1
+        assert drafts[0].get("aggregateLabel")
+    finally:
+        db.close()
+
+
+def test_drafts_deduplicated_per_candidate() -> None:
+    db = _sqlite_session()
+    try:
+        app_row, slug = _seed_application(db)
+        for _ in range(4):
+            log_recruiter_talent_radar_decision(
+                db,
+                application_id=app_row.id,
+                company_slug=slug,
+                action_type="draft_prepared",
+                meta={"source": "talent_radar"},
+            )
+        out = build_recruiter_talent_radar_digest(db, company_slug=slug, locale="pl")
+        drafts = out["sections"]["draftsPrepared"]
+        assert len(drafts) == 1
+        assert drafts[0]["draftCount"] == 4
+        assert out["summary"]["draftsPreparedNotSent"] == 1
+        assert out["summary"]["draftDecisionCount"] == 4
+        assert "4 szkiców" in drafts[0]["aggregateLabel"]
+    finally:
+        db.close()
+
+
+def test_section_limited_to_five() -> None:
+    db = _sqlite_session()
+    try:
+        _, slug = _seed_application(db)
+        for i in range(8):
+            user = User(
+                email=f"digest-limit{i}@example.com",
+                hashed_password="x",
+                gdpr_consent_at=datetime.now(timezone.utc),
+            )
+            db.add(user)
+            db.flush()
+            cand = Candidate(user_id=user.id, name=f"Cand {i}", skills='["python"]')
+            db.add(cand)
+            job = Job(
+                job_board="pracuj",
+                external_id=f"digest-limit-j{i}",
+                title="Backend Engineer",
+                company="Digest Co",
+                url=f"https://example.com/j{i}",
+                is_validated=True,
+                requirements="python",
+                description="Backend",
+            )
+            db.add(job)
+            db.flush()
+            app_row = Application(candidate_id=cand.id, job_id=job.id, status=ApplicationStatus.APPLIED)
+            db.add(app_row)
+            db.flush()
+            log_recruiter_talent_radar_decision(
+                db,
+                application_id=app_row.id,
+                company_slug=slug,
+                action_type="draft_prepared",
+            )
+        db.commit()
+        out = build_recruiter_talent_radar_digest(db, company_slug=slug, locale="en")
+        meta = out["sectionMeta"]["draftsPrepared"]
+        assert len(out["sections"]["draftsPrepared"]) == 5
+        assert meta["totalCount"] >= 8
+        assert meta["moreInRadarCount"] >= 3
+    finally:
+        db.close()
+
+
+def test_unique_candidate_count_in_summary() -> None:
+    db = _sqlite_session()
+    try:
+        app_row, slug = _seed_application(db)
+        log_recruiter_talent_radar_decision(
+            db,
+            application_id=app_row.id,
+            company_slug=slug,
+            action_type="draft_prepared",
+        )
+        out = build_recruiter_talent_radar_digest(db, company_slug=slug, locale="en")
+        assert out["summary"]["uniqueCandidateCount"] >= 1
+        assert "uniqueCandidateCount" in out["summary"]
+    finally:
+        db.close()
+
+
+def test_narrative_mentions_unique_candidates() -> None:
+    db = _sqlite_session()
+    try:
+        _, slug = _seed_application(db)
+        out = build_recruiter_talent_radar_digest(db, company_slug=slug, locale="pl")
+        assert "unikalnych" in out["narrative"] or "łącznie" in out["narrative"]
     finally:
         db.close()
 

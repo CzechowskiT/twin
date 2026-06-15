@@ -38,12 +38,27 @@ export type DigestCandidate = {
   recommendedNextAction: string;
   dataConfidence?: "high" | "medium" | "low";
   status?: string;
+  draftCount?: number;
+  decisionCount?: number;
+  latestDecisionAt?: string;
+  firstDecisionAt?: string;
+  latestDraftPreparedAt?: string;
+  firstDraftPreparedAt?: string;
+  aggregateLabel?: string;
+};
+
+export type DigestSectionMeta = {
+  totalCount: number;
+  shownCount: number;
+  moreInRadarCount: number;
 };
 
 export type DismissPattern = {
   reasonCode: string;
   label: string;
   count: number;
+  decisionCount?: number;
+  recommendedNextAction?: string;
 };
 
 export type LowCoverageRole = {
@@ -67,6 +82,8 @@ export type TalentRadarDigestPayload = {
     newRadarDecisions: number;
     lowCoverageRoles: number;
     draftsPreparedNotSent: number;
+    draftDecisionCount?: number;
+    uniqueCandidateCount?: number;
   };
   sections?: {
     reviewFirst?: DigestCandidate[];
@@ -75,6 +92,14 @@ export type TalentRadarDigestPayload = {
     dismissedPatterns?: DismissPattern[];
     lowCoverageRoles?: LowCoverageRole[];
     draftsPrepared?: DigestCandidate[];
+  };
+  sectionMeta?: {
+    reviewFirst?: DigestSectionMeta;
+    returningFromSnooze?: DigestSectionMeta;
+    shortlistedWithoutFollowUp?: DigestSectionMeta;
+    dismissedPatterns?: DigestSectionMeta;
+    lowCoverageRoles?: DigestSectionMeta;
+    draftsPrepared?: DigestSectionMeta;
   };
   narrative?: string;
   dataQualityWarnings?: string[];
@@ -98,6 +123,8 @@ export function talentRadarDigestQueryParams(
   });
 }
 
+export const DIGEST_MAX_SECTION_ITEMS = 5;
+
 export function buildDigestCopyText(payload: TalentRadarDigestPayload): string {
   const lines: string[] = [];
   const period = payload.period?.label ?? "";
@@ -110,7 +137,7 @@ export function buildDigestCopyText(payload: TalentRadarDigestPayload): string {
   if (s) {
     lines.push("");
     lines.push(
-      `Review: ${s.candidatesToReview} | Snooze returns: ${s.returningFromSnooze} | Shortlist no follow-up: ${s.shortlistedWithoutFollowUp} | Drafts not sent: ${s.draftsPreparedNotSent}`,
+      `Unique candidates: ${s.uniqueCandidateCount ?? "—"} | Review: ${s.candidatesToReview} | Snooze returns: ${s.returningFromSnooze} | Shortlist no follow-up: ${s.shortlistedWithoutFollowUp} | Draft candidates: ${s.draftsPreparedNotSent} (${s.draftDecisionCount ?? 0} drafts)`,
     );
   }
   lines.push("");

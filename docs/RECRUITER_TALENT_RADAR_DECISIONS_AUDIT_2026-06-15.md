@@ -63,7 +63,7 @@ Auth: same recruiter token + `company_slug` as inbox.
   - **Visual polish** (2026-06-15): `bg-slate-950/85` + `backdrop-blur-md` overlay; solid modal panel; copy-only badge; grouped card chips; nested details panel; trust footer
   - Optimistic UI + toast confirmations
   - Badges on candidate cards
-- **Weekly digest** (2026-06-15): `/recruiter/talent-radar/digest` — aggregates decisions + radar signals; copy-only summary; see `docs/RECRUITER_TALENT_RADAR_WEEKLY_DIGEST_2026-06-15.md`
+- **Weekly digest** (2026-06-15): `/recruiter/talent-radar/digest` — aggregates decisions + radar signals; deduplicated sections (max 5), draft aggregation per candidate; copy-only summary; `test:recruiter-talent-radar-weekly-digest-premium`; see `docs/RECRUITER_TALENT_RADAR_WEEKLY_DIGEST_2026-06-15.md`
 - **i18n:** PL + EN under `recruiterTalentRadar.*` and `recruiterAudit.actionRadar*`
 
 ## Audit trail

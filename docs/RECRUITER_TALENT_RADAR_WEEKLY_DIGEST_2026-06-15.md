@@ -25,14 +25,20 @@ Auth: same as Talent Radar — `X-Twin-Recruiter-Token` + `company_slug`.
 
 ## What it summarizes
 
-1. **Review first** — strong/good fit, no dismiss/snooze, enough evidence
+1. **Review first** — strong/good fit, no dismiss/snooze, enough evidence (deduplicated, max 5 shown)
 2. **Returning from snooze** — snooze window due or near due
 3. **Shortlist without follow-up** — shortlisted >3 days with no later action
-4. **Dismissed patterns** — aggregate reason codes (no PII list by default)
+4. **Dismissed patterns** — aggregate reason codes only (no PII list)
 5. **Low-coverage roles** — roles with thin radar signals
-6. **Drafts prepared — not sent** — audit-only draft_prepared decisions
+6. **Drafts prepared — not sent** — aggregated per candidate/role with `draftCount`, `aggregateLabel` (e.g. “6 szkiców przygotowanych — żaden nie wysłany”)
 
-Summary cards: candidates to review, snooze returns, shortlist gaps, new decisions, low-coverage roles, drafts not sent.
+Summary cards: unique candidates, candidates to review, snooze returns, shortlist gaps, new decisions, low-coverage roles, draft candidates (+ `draftDecisionCount` raw total).
+
+**Deduplication key order:** `application_id` → `candidate_id+job_id` → `candidate_id` → `displayName+roleTitle`.
+
+**Section cap:** 5 items per section; overflow shows “+X więcej w Radarze” → `/recruiter/talent-radar`.
+
+**Per-item fields:** `draftCount`, `decisionCount`, `latestDecisionAt`, `firstDecisionAt`, `aggregateLabel`, `recommendedNextAction`.
 
 ## What it does NOT do (hard bans)
 
@@ -59,8 +65,11 @@ Copy button writes templated summary to clipboard — does not invoke mail/send 
 
 ```bash
 cd frontend && npm run test:recruiter-talent-radar-weekly-digest
+cd frontend && npm run test:recruiter-talent-radar-weekly-digest-premium
 cd ../backend && pytest tests/test_recruiter_talent_radar_digest.py -q
 ```
+
+Premium UX (2026-06-15): deduplicated drafts, executive narrative with `uniqueCandidateCount`, visible **Kopiuj podsumowanie** / **Skopiowano**, section meta with overflow link.
 
 ## Launch stance
 

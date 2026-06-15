@@ -10,9 +10,15 @@ type SummaryKey =
   | "shortlistedWithoutFollowUp"
   | "newRadarDecisions"
   | "lowCoverageRoles"
-  | "draftsPreparedNotSent";
+  | "draftsPreparedNotSent"
+  | "uniqueCandidateCount";
 
 const STAT_CONFIG: { key: SummaryKey; labelKey: TranslationKey; hintKey: TranslationKey }[] = [
+  {
+    key: "uniqueCandidateCount",
+    labelKey: "recruiterTalentRadarDigest.summaryUniqueCandidates",
+    hintKey: "recruiterTalentRadarDigest.summaryUniqueCandidatesHint",
+  },
   {
     key: "candidatesToReview",
     labelKey: "recruiterTalentRadarDigest.summaryCandidatesToReview",
@@ -48,7 +54,14 @@ const STAT_CONFIG: { key: SummaryKey; labelKey: TranslationKey; hintKey: Transla
 export function TalentRadarDigestSummary({
   summary,
 }: {
-  summary: Record<SummaryKey, number>;
+  summary: Partial<Record<SummaryKey, number>> & {
+    candidatesToReview: number;
+    returningFromSnooze: number;
+    shortlistedWithoutFollowUp: number;
+    newRadarDecisions: number;
+    lowCoverageRoles: number;
+    draftsPreparedNotSent: number;
+  };
 }) {
   const { t } = useTranslation();
 
@@ -62,7 +75,7 @@ export function TalentRadarDigestSummary({
           key={key}
           className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] p-4"
         >
-          <p className="text-2xl font-bold tabular-nums text-[var(--foreground)]">{summary[key]}</p>
+          <p className="text-2xl font-bold tabular-nums text-[var(--foreground)]">{summary[key] ?? 0}</p>
           <p className="mt-0.5 text-xs font-semibold text-[var(--foreground)]">{t(labelKey)}</p>
           <p className="mt-1 text-[11px] leading-relaxed text-[var(--twin-muted-strong)]">{t(hintKey)}</p>
         </div>
