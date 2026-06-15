@@ -38,7 +38,17 @@ RADAR_AUDIT_ACTION_MAP = {
     "review_card_opened": "radar_review_card_opened",
 }
 
-ALLOWED_DECISION_META_KEYS = frozenset({"source", "snooze_days", "dismiss_reason_code"})
+ALLOWED_DECISION_META_KEYS = frozenset(
+    {
+        "source",
+        "snooze_days",
+        "dismiss_reason_code",
+        "candidate_id",
+        "job_id",
+        "radar_score_snapshot",
+        "radar_fit_label_snapshot",
+    }
+)
 _FORBIDDEN_DECISION_META_KEYS = frozenset(
     {"decline_note", "note", "message", "body", "candidate_name", "email", "phone", "cv", "feedback"}
 )
@@ -180,6 +190,10 @@ def log_recruiter_talent_radar_decision(
         audit_meta["snooze_days"] = str(snooze_days)
     if act == "dismissed" and dismiss_reason_code:
         audit_meta["dismiss_reason_code"] = dismiss_reason_code
+    if act == "draft_prepared":
+        for key in ("candidate_id", "job_id", "radar_score_snapshot", "radar_fit_label_snapshot"):
+            if key in clean_meta:
+                audit_meta[key] = clean_meta[key]
 
     log_recruiter_audit_event(
         db,

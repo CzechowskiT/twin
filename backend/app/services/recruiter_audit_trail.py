@@ -25,7 +25,17 @@ RECRUITER_AUDIT_ACTION_TYPES = frozenset(
 )
 RECRUITER_CLIENT_AUDIT_ACTION_TYPES = frozenset({"review_opened"})
 ALLOWED_META_KEYS = frozenset(
-    {"status_before", "status_after", "source", "snooze_days", "dismiss_reason_code"}
+    {
+        "status_before",
+        "status_after",
+        "source",
+        "snooze_days",
+        "dismiss_reason_code",
+        "candidate_id",
+        "job_id",
+        "radar_score_snapshot",
+        "radar_fit_label_snapshot",
+    }
 )
 _FORBIDDEN_META_KEYS = frozenset(
     {"decline_note", "note", "message", "body", "candidate_name", "email", "phone", "cv", "feedback"}

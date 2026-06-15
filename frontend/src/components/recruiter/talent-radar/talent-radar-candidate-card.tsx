@@ -14,6 +14,7 @@ import {
 import {
   TALENT_RADAR_DECISION_MARKERS,
   effectiveDecisionState,
+  showsDraftPreparedBadge,
 } from "@/lib/recruiter-talent-radar-decisions";
 import {
   TALENT_RADAR_VISUAL_MARKERS,
@@ -36,14 +37,22 @@ function statusLabelKey(status: TalentRadarCandidate["status"]): TranslationKey 
   return map[status];
 }
 
-function decisionBadgeKey(state: ReturnType<typeof effectiveDecisionState>): TranslationKey | null {
-  if (state === "active") return null;
-  const map: Record<Exclude<ReturnType<typeof effectiveDecisionState>, "active">, TranslationKey> = {
-    shortlisted: "recruiterTalentRadar.badgeShortlisted",
-    snoozed: "recruiterTalentRadar.badgeSnoozed",
-    dismissed: "recruiterTalentRadar.badgeDismissed",
-  };
-  return map[state];
+function decisionBadgeKey(
+  row: TalentRadarCandidate,
+): TranslationKey | null {
+  const state = effectiveDecisionState(row.latest_decision);
+  if (state !== "active") {
+    const map: Record<Exclude<ReturnType<typeof effectiveDecisionState>, "active">, TranslationKey> = {
+      shortlisted: "recruiterTalentRadar.badgeShortlisted",
+      snoozed: "recruiterTalentRadar.badgeSnoozed",
+      dismissed: "recruiterTalentRadar.badgeDismissed",
+    };
+    return map[state];
+  }
+  if (showsDraftPreparedBadge(row.latest_decision)) {
+    return "recruiterTalentRadar.badgeDraftPrepared";
+  }
+  return null;
 }
 
 export function TalentRadarCandidateCard({
@@ -54,6 +63,7 @@ export function TalentRadarCandidateCard({
   onDismiss,
   onSnooze,
   onReviewCardOpen,
+  draftPreparing,
 }: {
   row: TalentRadarCandidate;
   roleTitle: string;
@@ -62,11 +72,11 @@ export function TalentRadarCandidateCard({
   onDismiss: () => void;
   onSnooze: () => void;
   onReviewCardOpen?: () => void;
+  draftPreparing?: boolean;
 }) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
-  const decisionState = effectiveDecisionState(row.latest_decision);
-  const badgeKey = decisionBadgeKey(decisionState);
+  const badgeKey = decisionBadgeKey(row);
 
   const whySurfaced = row.why_surfaced.slice(0, 2);
   const whyNow = row.why_now.slice(0, 2);
@@ -182,8 +192,13 @@ export function TalentRadarCandidateCard({
         >
           {t("recruiterTalentRadar.ctaReviewCard")}
         </Link>
-        <button type="button" className={talentRadarSecondaryCtaClass()} onClick={onDraft}>
-          {t("recruiterTalentRadar.ctaDraft")}
+        <button
+          type="button"
+          className={talentRadarSecondaryCtaClass()}
+          onClick={onDraft}
+          disabled={draftPreparing}
+        >
+          {draftPreparing ? t("recruiterTalentRadar.draftPreparing") : t("recruiterTalentRadar.ctaDraft")}
         </button>
         <button type="button" className={talentRadarSecondaryCtaClass()} onClick={onShortlist}>
           {t("recruiterTalentRadar.ctaShortlist")}

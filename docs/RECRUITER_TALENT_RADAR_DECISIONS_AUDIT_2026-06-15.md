@@ -58,6 +58,7 @@ Auth: same recruiter token + `company_slug` as inbox.
 - **Page:** `/recruiter/talent-radar`
   - Decision filter bar: Active / Shortlisted / Snoozed / Dismissed
   - Snooze + dismiss modals
+  - **Draft modal** (2026-06-15 fix): loading → visible panel → copy/close/review card; audit `draft_prepared` with radar snapshots (no message body)
   - Optimistic UI + toast confirmations
   - Badges on candidate cards
 - **i18n:** PL + EN under `recruiterTalentRadar.*` and `recruiterAudit.actionRadar*`
@@ -71,6 +72,7 @@ Radar actions append to `recruiter_audit_events` via `log_recruiter_audit_event`
 | Suite | Command |
 |-------|---------|
 | Frontend decisions (15 cases) | `npm run test:recruiter-talent-radar-decisions` |
+| Frontend draft action (14 cases) | `npm run test:recruiter-talent-radar-draft-action` |
 | Frontend radar MVP | `npm run test:recruiter-talent-radar-mvp` |
 | Backend decisions | `pytest tests/test_recruiter_talent_radar_decisions.py -q` |
 | Backend audit trail | `pytest tests/test_recruiter_audit_trail.py -q` |
@@ -87,6 +89,6 @@ Radar actions append to `recruiter_audit_events` via `log_recruiter_audit_event`
 2. Shortlist a candidate → appears under Shortlisted filter with badge
 3. Snooze 7d → hidden from Active, visible under Snoozed
 4. Dismiss with reason → visible under Dismissed
-5. Prepare draft → toast + audit row; stays in Active
+5. Prepare draft → modal opens (title includes “nie wysłano” / “not sent”), copy-only, badge **Szkic przygotowany — nie wysłano** on success; audit row `draft_prepared` with radar snapshots (no message body). On audit failure: local draft + warning.
 6. Open review card → audit row logged
 7. Confirm no send-email CTA anywhere on radar page

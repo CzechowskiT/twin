@@ -163,6 +163,32 @@ def test_audit_only_actions_do_not_change_filter_state() -> None:
         db.close()
 
 
+def test_draft_prepared_stores_radar_snapshots_in_meta() -> None:
+    db = _sqlite_session()
+    try:
+        app_row, slug = _seed_application(db)
+        out = log_recruiter_talent_radar_decision(
+            db,
+            application_id=app_row.id,
+            company_slug=slug,
+            action_type="draft_prepared",
+            meta={
+                "source": "talent_radar",
+                "candidate_id": "cand-1",
+                "job_id": "9",
+                "radar_score_snapshot": "72",
+                "radar_fit_label_snapshot": "good",
+            },
+        )
+        assert out["action_type"] == "draft_prepared"
+        assert out["meta"]["candidate_id"] == "cand-1"
+        assert out["meta"]["job_id"] == "9"
+        assert out["meta"]["radar_score_snapshot"] == "72"
+        assert out["meta"]["radar_fit_label_snapshot"] == "good"
+    finally:
+        db.close()
+
+
 def test_list_decision_filters() -> None:
     db = _sqlite_session()
     try:

@@ -11,6 +11,7 @@ import { TalentRadarCandidateGroups } from "@/components/recruiter/talent-radar/
 import { TalentRadarDecisionFilterBar } from "@/components/recruiter/talent-radar/talent-radar-decision-filter-bar";
 import {
   TalentRadarDismissModal,
+  TalentRadarDraftModal,
   TalentRadarSnoozeModal,
 } from "@/components/recruiter/talent-radar/talent-radar-decision-modals";
 import { TalentRadarFilterToolbar } from "@/components/recruiter/talent-radar/talent-radar-filter-toolbar";
@@ -42,6 +43,7 @@ import {
 import {
   matchesDecisionFilter,
   TALENT_RADAR_DECISION_MARKERS,
+  buildDraftPreparedDecisionBody,
   type PostTalentRadarDecisionBody,
   type TalentRadarDecisionFilter,
   type TalentRadarDismissReasonCode,
@@ -65,6 +67,12 @@ type PendingModal =
   | { kind: "dismiss"; row: TalentRadarCandidate }
   | null;
 
+type DraftModalState = {
+  row: TalentRadarCandidate;
+  text: string;
+  auditWarning: boolean;
+} | null;
+
 export default function RecruiterTalentRadarClient() {
   const { t, locale } = useTranslation();
   const searchParams = useSearchParams();
@@ -81,7 +89,8 @@ export default function RecruiterTalentRadarClient() {
   const [loading, setLoading] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [loaded, setLoaded] = useState(false);
-  const [draftText, setDraftText] = useState<string | null>(null);
+  const [draftModal, setDraftModal] = useState<DraftModalState>(null);
+  const [preparingDraftAppId, setPreparingDraftAppId] = useState<number | null>(null);
   const [decisionToast, setDecisionToast] = useState<string | null>(null);
   const [pendingModal, setPendingModal] = useState<PendingModal>(null);
   const [savingDecision, setSavingDecision] = useState(false);
@@ -242,6 +251,34 @@ export default function RecruiterTalentRadarClient() {
     return Number(row.application_id ?? row.id);
   }
 
+  const handleDraft = useCallback(
+    async (row: TalentRadarCandidate) => {
+      const aid = appId(row);
+      setPreparingDraftAppId(aid);
+      const text = buildOutreachDraftText(row, roleTitle, locale);
+      try {
+        const saved = await postDecision(buildDraftPreparedDecisionBody(row, filters.roleId));
+        if (saved) {
+          const enriched: TalentRadarLatestDecision = {
+            ...saved,
+            decision_state: saved.decision_state ?? "active",
+          };
+          applyOptimisticDecision(aid, enriched);
+          setDraftModal({ row, text, auditWarning: false });
+          setDecisionToast(t("recruiterTalentRadar.decisionDraftSaved"));
+          window.setTimeout(() => setDecisionToast(null), 4000);
+        } else {
+          setDraftModal({ row, text, auditWarning: true });
+        }
+      } catch {
+        setDraftModal({ row, text, auditWarning: true });
+      } finally {
+        setPreparingDraftAppId(null);
+      }
+    },
+    [applyOptimisticDecision, filters.roleId, locale, postDecision, roleTitle, t],
+  );
+
   return (
     <Shell wide>
       <RecruiterWorkspaceNav />
@@ -346,13 +383,8 @@ export default function RecruiterTalentRadarClient() {
               <TalentRadarCandidateGroups
                 rows={visibleRows}
                 roleTitle={roleTitle}
-                onDraft={(row) => {
-                  setDraftText(buildOutreachDraftText(row, roleTitle, locale));
-                  void runDecisionAction(
-                    { application_id: appId(row), action_type: "draft_prepared", meta: { source: "talent_radar" } },
-                    "recruiterTalentRadar.decisionDraftSaved",
-                  );
-                }}
+                preparingDraftAppId={preparingDraftAppId}
+                onDraft={(row) => void handleDraft(row)}
                 onShortlist={(row) =>
                   void runDecisionAction(
                     { application_id: appId(row), action_type: "shortlisted", meta: { source: "talent_radar" } },
@@ -378,25 +410,6 @@ export default function RecruiterTalentRadarClient() {
             {disclaimer || t("recruiterTalentRadar.disclaimer")}
           </p>
 
-          {draftText ? (
-            <Card
-              variant="soft"
-              className="mt-6 border-amber-500/30 p-5"
-              data-testid={RECRUITER_TALENT_RADAR_MARKERS.draftPanel}
-            >
-              <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">
-                {t("recruiterTalentRadar.draftTitle")}
-              </p>
-              <p className="twin-muted mt-1 text-xs">{t("recruiterTalentRadar.draftNotSent")}</p>
-              <pre className="mt-4 whitespace-pre-wrap rounded-lg bg-[var(--twin-surface)] p-4 text-sm leading-relaxed">
-                {draftText}
-              </pre>
-              <button type="button" className="twin-btn-ghost mt-4 text-sm" onClick={() => setDraftText(null)}>
-                {t("recruiterTalentRadar.draftClose")}
-              </button>
-            </Card>
-          ) : null}
-
           <p className="twin-muted mt-6 text-xs">
             {t("recruiterTalentRadar.contextLinks")}{" "}
             <Link href="/recruiter/search" className="underline">
@@ -414,6 +427,28 @@ export default function RecruiterTalentRadarClient() {
         </div>
       </div>
 
+      <TalentRadarDraftModal
+        open={draftModal != null}
+        row={draftModal?.row ?? null}
+        roleTitle={roleTitle}
+        draftText={draftModal?.text ?? ""}
+        auditWarning={draftModal?.auditWarning}
+        onClose={() => setDraftModal(null)}
+        onReviewCardOpen={
+          draftModal
+            ? () => {
+                void runDecisionAction(
+                  {
+                    application_id: appId(draftModal.row),
+                    action_type: "review_card_opened",
+                    meta: { source: "talent_radar" },
+                  },
+                  "recruiterTalentRadar.decisionReviewLogged",
+                );
+              }
+            : undefined
+        }
+      />
       <TalentRadarSnoozeModal
         open={pendingModal?.kind === "snooze"}
         onClose={() => setPendingModal(null)}

@@ -79,7 +79,7 @@ test("8 candidate card shows decision badge", () => {
 test("9 no email send or auto outreach in client", () => {
   const client = readSrc("src/app/recruiter/talent-radar/recruiter-talent-radar-client.tsx");
   assert.doesNotMatch(client, /send.*email|auto.*send|wyslij.*wiadom/i);
-  assert.match(client, /draft_prepared/);
+  assert.match(client, /buildDraftPreparedDecisionBody/);
 });
 
 test("10 optimistic decision POST to BFF", () => {

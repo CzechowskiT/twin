@@ -65,13 +65,14 @@ Every suggestion includes `why_surfaced`, `why_now`, `risks`, `missing_data`, `d
 
 Required disclaimer (EN): *Talent Radar surfaces signals and context. The recruiter decides whether and how to contact the candidate.*
 
-Outreach draft panel is **copy-only** — not sent by TWIN.
+Outreach draft opens a **fixed modal** (copy-only) — not sent by TWIN. Clicking **Prepare outreach draft** shows loading state, opens the panel with role context and safe personalization placeholder, logs `draft_prepared` audit metadata (no message body), and shows a **Draft prepared — not sent** badge on success.
 
 ## Tests
 
 ```bash
 cd frontend && npm run test:recruiter-talent-radar-mvp
 cd frontend && npm run test:recruiter-talent-radar-premium-ux
+cd frontend && npm run test:recruiter-talent-radar-draft-action
 cd ../backend && pytest tests/test_recruiter_talent_radar.py -q
 ```
 
