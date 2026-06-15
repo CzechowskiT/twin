@@ -3,6 +3,7 @@ import { COMPANY_HIRING_ROUTE } from "@/lib/company-hiring-dashboard";
 import { COMPANY_INTEGRATIONS_ROUTE } from "@/lib/company-integrations-readiness";
 import { COMPANY_ROLES_ROUTE } from "@/lib/company-jobs-roles";
 import { COMPANY_TEAM_ROUTE } from "@/lib/company-team-permissions";
+import { COMPANY_TALENT_POOL_ROUTE } from "@/lib/company-talent-pool";
 import type { WorkspaceModuleDef } from "@/lib/workspace-module-status";
 
 /** Company workspace module cards — honest billing/integrations readiness. */
@@ -31,6 +32,15 @@ export const COMPANY_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     valuePropKey: "workspaceModules.companyPipelineValue",
     ctaKey: "workspaceModules.companyPipelineCta",
     status: "live",
+  },
+  {
+    id: "talent_pool",
+    href: COMPANY_TALENT_POOL_ROUTE,
+    titleKey: "workspaceModules.companyTalentPoolTitle",
+    valuePropKey: "workspaceModules.companyTalentPoolValue",
+    hintKey: "workspaceModules.companyTalentPoolHint",
+    ctaKey: "workspaceModules.companyTalentPoolCta",
+    status: "pilot",
   },
   {
     id: "billing",

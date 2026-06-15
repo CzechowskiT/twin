@@ -21,6 +21,7 @@ from app.services.company_roles import (
     update_company_role,
 )
 from app.services.company_team import build_company_team_readiness
+from app.services.company_talent_pool import build_company_talent_pool
 from app.services.request_locale import locale_from_request
 
 router = APIRouter()
@@ -111,6 +112,29 @@ def company_pipeline_quality(
             db,
             company_slug=slug,
             locale=locale_from_request(request),
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.get("/talent-pool")
+def company_talent_pool(
+    request: Request,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+    limit: int = Query(50, ge=1, le=100),
+) -> dict:
+    """Company talent memory — summary, quality, source coverage (no PII)."""
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return build_company_talent_pool(
+            db,
+            company_slug=slug,
+            locale=locale_from_request(request),
+            limit=limit,
         )
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc

@@ -233,6 +233,7 @@ export default function CompanyPipelineClient() {
           <p className="twin-muted max-w-3xl text-xs">{t("companyPipeline.scopeNote")}</p>
           <div className="flex flex-wrap gap-4 text-sm">
             <Link href="/recruiter/inbox" className="twin-link font-medium">{t("companyPipeline.linkInbox")}</Link>
+            <Link href="/company/talent-pool" className="twin-link font-medium">{t("companyPipeline.linkTalentPool")}</Link>
             <Link href="/recruiter/jobs" className="twin-link font-medium">{t("companyPipeline.linkRecruiterJobs")}</Link>
             <Link href="/for-companies" className="twin-link font-medium">{t("companyPipeline.linkCompanies")}</Link>
           </div>

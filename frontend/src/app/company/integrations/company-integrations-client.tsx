@@ -10,6 +10,7 @@ import { COMPANY_INTEGRATION_ROWS } from "@/lib/company-integrations-readiness";
 
 const LABEL_KEYS: Record<string, TranslationKey> = {
   acceptance_inbox: "companyIntegrations.item_acceptance_inbox",
+  talent_pool_import: "companyIntegrations.item_talent_pool_import",
   ats_webhooks: "companyIntegrations.item_ats_webhooks",
   employer_calendar: "companyIntegrations.item_employer_calendar",
   employer_billing: "companyIntegrations.item_employer_billing",
@@ -66,6 +67,11 @@ export default function CompanyIntegrationsClient() {
       </ul>
 
       <p className="twin-muted mt-8 text-xs leading-relaxed">{t("companyIntegrations.scopeNote")}</p>
+      <p className="mt-4 text-sm">
+        <Link href="/company/talent-pool" className="twin-link font-medium">
+          {t("companyTalentPool.navLink")}
+        </Link>
+      </p>
     </Shell>
   );
 }

@@ -163,13 +163,15 @@ export default function RecruiterTalentPoolClient() {
               </ul>
             </Card>
           ) : (
-            <GuidedEmptyState
-              title={t("recruiterTalentPool.emptyTitle")}
-              message={t("recruiterTalentPool.emptyBody")}
-              steps={[t("recruiterTalentPool.emptyStep1"), t("recruiterTalentPool.emptyStep2")]}
-              actionHref={RECRUITER_TALENT_POOL_IMPORT_ROUTE}
-              actionLabel={t("recruiterTalentPool.emptyCta")}
-            />
+            <div data-testid={RECRUITER_TALENT_POOL_MARKERS.emptyState}>
+              <GuidedEmptyState
+                title={t("recruiterTalentPool.emptyTitle")}
+                message={t("recruiterTalentPool.emptyBody")}
+                steps={[t("recruiterTalentPool.emptyStep1"), t("recruiterTalentPool.emptyStep2")]}
+                actionHref={RECRUITER_TALENT_POOL_IMPORT_ROUTE}
+                actionLabel={t("recruiterTalentPool.emptyCta")}
+              />
+            </div>
           )}
         </div>
       ) : null}
