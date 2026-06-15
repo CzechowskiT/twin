@@ -4,8 +4,11 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { CompanyTalentPoolNextAction } from "@/components/company/company-talent-pool-next-action";
+import { CompanyTalentPoolRadarCta } from "@/components/company/company-talent-pool-radar-cta";
+import { CompanyTalentPoolReadinessGuide } from "@/components/company/company-talent-pool-readiness-guide";
+import { CompanyTalentPoolWorkspaceSelector } from "@/components/company/company-talent-pool-workspace-selector";
 import { CompanyWorkspaceNav } from "@/components/company/company-workspace-nav";
-import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
 import { useTranslation } from "@/components/language-provider";
 import type { TranslationKey } from "@/lib/i18n";
 import { Card, Shell } from "@/components/ui";
@@ -18,6 +21,7 @@ import {
   type CompanyTalentPoolPayload,
   type CompanyTalentPoolReadinessState,
 } from "@/lib/company-talent-pool";
+import { resolveCompanyTalentPoolNextBestAction } from "@/lib/company-talent-pool-next-best-action";
 import {
   RECRUITER_DEMO_COMPANY_SLUG,
   companySlugToLabel,
@@ -236,6 +240,10 @@ export default function CompanyTalentPoolClient() {
 
   const companyLabel = companySlugToLabel(companySlug || companyRaw);
   const hasRecords = (payload?.items.length ?? 0) > 0;
+  const nextBestAction = useMemo(
+    () => (payload ? resolveCompanyTalentPoolNextBestAction(payload) : null),
+    [payload],
+  );
 
   return (
     <Shell wide data-testid={COMPANY_TALENT_POOL_MARKERS.page}>
@@ -265,41 +273,25 @@ export default function CompanyTalentPoolClient() {
         </div>
       </header>
 
-      <Card variant="soft" className="mb-8 border-[var(--twin-border)]/80 p-5 sm:p-6">
-        <RecruiterAccessFields
-          token={token}
-          onTokenChange={setToken}
-          companySlug={companyRaw}
-          onCompanySlugChange={setCompanyRaw}
-          companyOptions={companyOptions}
-          idPrefix="company-talent-pool"
-        />
-        <div className="mt-4 flex flex-wrap gap-3">
-          <button type="button" className="twin-btn-solid twin-touch-target" disabled={loading} onClick={() => void loadPool()}>
-            {loading ? t("common.loadingEllipsis") : t("companyTalentPool.load")}
-          </button>
-          <button
-            type="button"
-            className="twin-btn-ghost twin-touch-target text-sm"
-            onClick={() => {
-              setCompanyRaw(RECRUITER_DEMO_COMPANY_SLUG);
-              void loadPool();
-            }}
-          >
-            {t("recruiterInbox.demoCompanyCta")}
-          </button>
-        </div>
-        {authError ? (
-          <p className="mt-4 text-sm text-[var(--twin-danger)]" role="alert">
-            {t("recruiterInbox.missingAuth")}
-          </p>
-        ) : null}
-        {errorKey ? (
-          <p className="mt-4 text-sm text-[var(--twin-danger)]" role="alert">
-            {t(errorKey === "loadFailed" ? "companyTalentPool.loadFailed" : (`recruiterInbox.${errorKey}` as TranslationKey))}
-          </p>
-        ) : null}
-      </Card>
+      <CompanyTalentPoolWorkspaceSelector
+        token={token}
+        onTokenChange={setToken}
+        companySlug={companyRaw}
+        onCompanySlugChange={setCompanyRaw}
+        companyOptions={companyOptions}
+        loading={loading}
+        authError={authError}
+        onLoad={() => void loadPool()}
+        onDemoCompany={() => {
+          setCompanyRaw(RECRUITER_DEMO_COMPANY_SLUG);
+          void loadPool();
+        }}
+      />
+      {errorKey ? (
+        <p className="-mt-4 mb-8 text-sm text-[var(--twin-danger)]" role="alert">
+          {t(errorKey === "loadFailed" ? "companyTalentPool.loadFailed" : (`recruiterInbox.${errorKey}` as TranslationKey))}
+        </p>
+      ) : null}
 
       {loading ? <p className="twin-muted text-sm">{t("companyTalentPool.loading")}</p> : null}
 
@@ -313,6 +305,8 @@ export default function CompanyTalentPoolClient() {
               {t("companyTalentPool.updated")} {new Date(payload.generated_at).toLocaleString(loc)}
             </p>
           </div>
+
+          {nextBestAction ? <CompanyTalentPoolNextAction action={nextBestAction} /> : null}
 
           <div
             className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
@@ -417,14 +411,20 @@ export default function CompanyTalentPoolClient() {
                         </span>
                       </div>
                       {row.job_id ? (
-                        <Link
-                          href={`/recruiter/talent-radar?role_id=${row.job_id}`}
-                          className="twin-link mt-2 inline-block text-xs"
-                          data-testid={COMPANY_TALENT_POOL_MARKERS.radarLink}
-                        >
-                          {t("companyTalentPool.openRoleRadar")}
-                        </Link>
-                      ) : null}
+                        <span className="mt-2 block">
+                          <CompanyTalentPoolRadarCta
+                            radarHref={`/recruiter/talent-radar?role_id=${row.job_id}`}
+                            recruiterPoolHref={payload.links.recruiter_pool}
+                          />
+                        </span>
+                      ) : (
+                        <span className="mt-2 block">
+                          <CompanyTalentPoolRadarCta
+                            radarHref={payload.links.talent_radar}
+                            recruiterPoolHref={payload.links.recruiter_pool}
+                          />
+                        </span>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -445,48 +445,56 @@ export default function CompanyTalentPoolClient() {
             ) : null}
           </Card>
 
-          <Card
-            variant="soft"
-            className="border-[var(--twin-border)]/80 p-5"
-            data-testid={COMPANY_TALENT_POOL_MARKERS.readinessPanel}
-          >
-            <h3 className="text-sm font-semibold">{t("companyTalentPool.readinessTitle")}</h3>
-            <p className="twin-muted mt-1 text-xs">{t("companyTalentPool.readinessBody")}</p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {READINESS_STATE_KEYS.map((state) => (
-                <span
-                  key={state}
-                  className="rounded-full border border-[var(--twin-border)] bg-[var(--twin-surface-soft)] px-2 py-0.5 text-xs"
-                >
-                  {t(READINESS_LABEL_KEYS[state])}: {fmt(payload.readiness.counts[state] ?? 0)}
-                </span>
-              ))}
-            </div>
-            {payload.readiness.candidates.length > 0 ? (
-              <ul className="mt-4 divide-y divide-[var(--twin-border)]/60">
-                {payload.readiness.candidates.map((candidate) => (
-                  <li key={candidate.id} className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm">
-                    <div>
-                      <p className="font-medium">{candidate.display_name}</p>
-                      <p className="twin-muted text-xs">
-                        {candidate.job_title || t("companyTalentPool.noJobTitle")}
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-full border border-[var(--twin-border)] px-2 py-0.5 text-xs">
-                        {t(READINESS_LABEL_KEYS[candidate.readiness_state])}
-                      </span>
-                      <Link href={candidate.radar_href} className="twin-link text-xs">
-                        {t("companyTalentPool.openRoleRadar")}
-                      </Link>
-                    </div>
-                  </li>
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Card
+              variant="soft"
+              className="border-[var(--twin-border)]/80 p-5"
+              data-testid={COMPANY_TALENT_POOL_MARKERS.readinessPanel}
+            >
+              <h3 className="text-sm font-semibold">{t("companyTalentPool.readinessTitle")}</h3>
+              <p className="twin-muted mt-1 text-xs">{t("companyTalentPool.readinessBody")}</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {READINESS_STATE_KEYS.map((state) => (
+                  <span
+                    key={state}
+                    className="rounded-full border border-[var(--twin-border)] bg-[var(--twin-surface-soft)] px-2 py-0.5 text-xs"
+                  >
+                    {t(READINESS_LABEL_KEYS[state])}: {fmt(payload.readiness.counts[state] ?? 0)}
+                  </span>
                 ))}
-              </ul>
-            ) : (
-              <p className="twin-muted mt-4 text-sm">{t("companyTalentPool.readinessEmpty")}</p>
-            )}
-          </Card>
+              </div>
+              {payload.readiness.candidates.length > 0 ? (
+                <ul className="mt-4 divide-y divide-[var(--twin-border)]/60">
+                  {payload.readiness.candidates.map((candidate) => (
+                    <li key={candidate.id} className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm">
+                      <div>
+                        <p className="font-medium">{candidate.display_name}</p>
+                        <p className="twin-muted text-xs">
+                          {candidate.job_title || t("companyTalentPool.noJobTitle")}
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded-full border border-[var(--twin-border)] px-2 py-0.5 text-xs">
+                          {t(READINESS_LABEL_KEYS[candidate.readiness_state])}
+                        </span>
+                        <CompanyTalentPoolRadarCta
+                          radarHref={candidate.radar_href}
+                          recruiterPoolHref={payload.links.recruiter_pool}
+                        />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="twin-muted mt-4 text-sm">{t("companyTalentPool.readinessEmpty")}</p>
+              )}
+            </Card>
+            <CompanyTalentPoolReadinessGuide
+              importHref={payload.links.recruiter_import}
+              recruiterPoolHref={payload.links.recruiter_pool}
+              integrationsHref={payload.links.integrations}
+            />
+          </div>
 
           <Card
             variant="soft"
@@ -548,7 +556,13 @@ export default function CompanyTalentPoolClient() {
             </div>
           )}
 
-          <p className="twin-muted max-w-3xl text-xs">{t("companyTalentPool.trustCopy")}</p>
+          <Card
+            variant="soft"
+            className="border-[var(--twin-border)]/80 bg-[var(--twin-surface-2)]/50 p-4"
+            data-testid={COMPANY_TALENT_POOL_MARKERS.trustPanel}
+          >
+            <p className="text-sm leading-relaxed text-[var(--foreground)]">{t("companyTalentPool.trustCopy")}</p>
+          </Card>
           <div className="flex flex-wrap gap-4 text-sm">
             <Link
               href={payload.links.recruiter_import}

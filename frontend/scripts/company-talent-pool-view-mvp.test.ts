@@ -181,8 +181,9 @@ test("7 role-aware radar links", () => {
     true,
   );
   const client = readSrc("src/app/company/talent-pool/company-talent-pool-client.tsx");
-  assert.match(client, /role_id=/);
-  assert.match(client, /COMPANY_TALENT_POOL_MARKERS\.radarLink/);
+  const cta = readSrc("src/components/company/company-talent-pool-radar-cta.tsx");
+  assert.match(client, /CompanyTalentPoolRadarCta/);
+  assert.match(cta, /COMPANY_TALENT_POOL_MARKERS\.radarLink/);
 });
 
 test("8 ask recruiter to review i18n", () => {
