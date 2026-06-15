@@ -80,5 +80,5 @@ Premium UX (2026-06-15): deduplicated drafts, executive narrative with `uniqueCa
 - Scheduled digest email (opt-in)
 - Slack/Teams summary
 - Weekly subscription per role
-- ATS import for richer memory
+- ~~ATS import for richer memory~~ → **CSV talent pool import shipped** (`docs/RECRUITER_TALENT_POOL_IMPORT_MVP_2026-06-15.md`)
 - External consent-aware signals

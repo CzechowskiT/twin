@@ -20,6 +20,15 @@ export const RECRUITER_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     status: "live",
   },
   {
+    id: "talent_pool",
+    href: "/recruiter/talent-pool",
+    titleKey: "workspaceModules.recruiterTalentPoolTitle",
+    valuePropKey: "workspaceModules.recruiterTalentPoolValue",
+    hintKey: "workspaceModules.recruiterTalentPoolHint",
+    ctaKey: "workspaceModules.recruiterTalentPoolCta",
+    status: "pilot",
+  },
+  {
     id: "search",
     href: "/recruiter/search",
     titleKey: "workspaceModules.recruiterSearchTitle",
