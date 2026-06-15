@@ -4,6 +4,11 @@ export const RECRUITER_AUDIT_ACTION_TYPES = [
   "decision_accept",
   "decision_decline",
   "review_opened",
+  "radar_shortlisted",
+  "radar_snoozed",
+  "radar_dismissed",
+  "radar_draft_prepared",
+  "radar_review_card_opened",
 ] as const;
 
 export const RECRUITER_AUDIT_FORBIDDEN_META_KEYS = [
@@ -18,7 +23,13 @@ export const RECRUITER_AUDIT_FORBIDDEN_META_KEYS = [
   "feedback",
 ] as const;
 
-export const RECRUITER_AUDIT_ALLOWED_META_KEYS = ["status_before", "status_after", "source"] as const;
+export const RECRUITER_AUDIT_ALLOWED_META_KEYS = [
+  "status_before",
+  "status_after",
+  "source",
+  "snooze_days",
+  "dismiss_reason_code",
+] as const;
 
 export type RecruiterAuditEventRow = {
   id: number;
@@ -49,6 +60,11 @@ export function recruiterAuditActionLabelKey(actionType: string): TranslationKey
     decision_accept: "recruiterAudit.actionDecisionAccept",
     decision_decline: "recruiterAudit.actionDecisionDecline",
     review_opened: "recruiterAudit.actionReviewOpened",
+    radar_shortlisted: "recruiterAudit.actionRadarShortlisted",
+    radar_snoozed: "recruiterAudit.actionRadarSnoozed",
+    radar_dismissed: "recruiterAudit.actionRadarDismissed",
+    radar_draft_prepared: "recruiterAudit.actionRadarDraftPrepared",
+    radar_review_card_opened: "recruiterAudit.actionRadarReviewOpened",
   };
   return map[actionType] ?? "recruiterAudit.actionUnknown";
 }

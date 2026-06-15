@@ -11,9 +11,22 @@ from sqlalchemy.orm import Session
 from app.database.models import Application, Job, RecruiterAuditEvent
 from app.utils.slug import slugify_company
 
-RECRUITER_AUDIT_ACTION_TYPES = frozenset({"decision_accept", "decision_decline", "review_opened"})
+RECRUITER_AUDIT_ACTION_TYPES = frozenset(
+    {
+        "decision_accept",
+        "decision_decline",
+        "review_opened",
+        "radar_shortlisted",
+        "radar_snoozed",
+        "radar_dismissed",
+        "radar_draft_prepared",
+        "radar_review_card_opened",
+    }
+)
 RECRUITER_CLIENT_AUDIT_ACTION_TYPES = frozenset({"review_opened"})
-ALLOWED_META_KEYS = frozenset({"status_before", "status_after", "source"})
+ALLOWED_META_KEYS = frozenset(
+    {"status_before", "status_after", "source", "snooze_days", "dismiss_reason_code"}
+)
 _FORBIDDEN_META_KEYS = frozenset(
     {"decline_note", "note", "message", "body", "candidate_name", "email", "phone", "cv", "feedback"}
 )

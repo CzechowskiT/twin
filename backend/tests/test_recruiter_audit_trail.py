@@ -143,5 +143,14 @@ def test_recruiter_audit_api_list_and_post(monkeypatch, recruiter_api_client: Te
 
 def test_action_types_frozen() -> None:
     assert RECRUITER_AUDIT_ACTION_TYPES == frozenset(
-        {"decision_accept", "decision_decline", "review_opened"}
+        {
+            "decision_accept",
+            "decision_decline",
+            "review_opened",
+            "radar_shortlisted",
+            "radar_snoozed",
+            "radar_dismissed",
+            "radar_draft_prepared",
+            "radar_review_card_opened",
+        }
     )

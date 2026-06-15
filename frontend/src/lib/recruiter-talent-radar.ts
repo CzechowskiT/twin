@@ -1,4 +1,4 @@
-/** Recruiter Talent Radar / Sourcing Memory Agent — types, filters, PII guards. */
+import type { TalentRadarLatestDecision } from "@/lib/recruiter-talent-radar-decisions";
 
 export const RECRUITER_TALENT_RADAR_ROUTE = "/recruiter/talent-radar";
 
@@ -87,6 +87,7 @@ export type TalentRadarCandidate = {
   data_confidence: TalentRadarDataConfidence;
   human_decision_required: true;
   job_title?: string;
+  latest_decision?: TalentRadarLatestDecision | null;
 };
 
 export type TalentRadarFilters = {

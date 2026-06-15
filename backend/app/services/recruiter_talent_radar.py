@@ -23,6 +23,7 @@ from app.services.recruiter_candidate_search import (
 from app.services.recruiter_inbox import _require_company_slug
 from app.services.recruiter_jobs import list_company_jobs
 from app.services.recruiter_match_explanations import INBOX_FORBIDDEN_PII_KEYS
+from app.services.recruiter_talent_radar_decisions import latest_decisions_by_application
 from app.utils.slug import slugify_company
 
 FitLabel = Literal["strong", "good", "possible", "weak"]
@@ -375,6 +376,13 @@ def build_recruiter_talent_radar(
 
     suggestions.sort(key=lambda r: float(r.get("score") or 0), reverse=True)
     suggestions = suggestions[:limit]
+
+    app_ids = [int(s["application_id"]) for s in suggestions if s.get("application_id")]
+    latest = latest_decisions_by_application(db, company_slug=slug, application_ids=app_ids)
+    for row in suggestions:
+        app_id = int(row.get("application_id") or 0)
+        decision = latest.get(app_id)
+        row["latest_decision"] = decision
 
     if not jobs:
         warnings.append(
