@@ -12,6 +12,10 @@ import {
   type TalentRadarCandidate,
 } from "@/lib/recruiter-talent-radar";
 import {
+  TALENT_RADAR_DECISION_MARKERS,
+  effectiveDecisionState,
+} from "@/lib/recruiter-talent-radar-decisions";
+import {
   TALENT_RADAR_VISUAL_MARKERS,
   talentRadarCandidateCardClass,
   talentRadarPrimaryCtaClass,
@@ -32,6 +36,16 @@ function statusLabelKey(status: TalentRadarCandidate["status"]): TranslationKey 
   return map[status];
 }
 
+function decisionBadgeKey(state: ReturnType<typeof effectiveDecisionState>): TranslationKey | null {
+  if (state === "active") return null;
+  const map: Record<Exclude<ReturnType<typeof effectiveDecisionState>, "active">, TranslationKey> = {
+    shortlisted: "recruiterTalentRadar.badgeShortlisted",
+    snoozed: "recruiterTalentRadar.badgeSnoozed",
+    dismissed: "recruiterTalentRadar.badgeDismissed",
+  };
+  return map[state];
+}
+
 export function TalentRadarCandidateCard({
   row,
   roleTitle,
@@ -39,6 +53,7 @@ export function TalentRadarCandidateCard({
   onShortlist,
   onDismiss,
   onSnooze,
+  onReviewCardOpen,
 }: {
   row: TalentRadarCandidate;
   roleTitle: string;
@@ -46,9 +61,12 @@ export function TalentRadarCandidateCard({
   onShortlist: () => void;
   onDismiss: () => void;
   onSnooze: () => void;
+  onReviewCardOpen?: () => void;
 }) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
+  const decisionState = effectiveDecisionState(row.latest_decision);
+  const badgeKey = decisionBadgeKey(decisionState);
 
   const whySurfaced = row.why_surfaced.slice(0, 2);
   const whyNow = row.why_now.slice(0, 2);
@@ -77,6 +95,14 @@ export function TalentRadarCandidateCard({
         </div>
         <div className="flex flex-col items-end gap-2">
           <TalentRadarFitBadge score={row.score} />
+          {badgeKey ? (
+            <span
+              className="rounded-full border border-[var(--twin-accent)]/40 bg-[var(--twin-accent)]/10 px-2 py-0.5 text-xs font-semibold text-[var(--twin-accent)]"
+              data-testid={TALENT_RADAR_DECISION_MARKERS.decisionBadge}
+            >
+              {t(badgeKey)}
+            </span>
+          ) : null}
           <span className="rounded-full border border-[var(--twin-border)] px-2 py-0.5 text-xs font-medium text-[var(--twin-muted-strong)]">
             {t(statusLabelKey(row.status))}
           </span>
@@ -152,6 +178,7 @@ export function TalentRadarCandidateCard({
         <Link
           href={talentRadarInboxHighlightHref(Number(row.application_id ?? row.id))}
           className={talentRadarPrimaryCtaClass()}
+          onClick={() => onReviewCardOpen?.()}
         >
           {t("recruiterTalentRadar.ctaReviewCard")}
         </Link>

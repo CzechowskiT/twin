@@ -39,6 +39,7 @@ export function TalentRadarCandidateGroups({
   onShortlist,
   onDismiss,
   onSnooze,
+  onReviewCardOpen,
 }: {
   rows: TalentRadarCandidate[];
   roleTitle: string;
@@ -46,6 +47,7 @@ export function TalentRadarCandidateGroups({
   onShortlist: (row: TalentRadarCandidate) => void;
   onDismiss: (row: TalentRadarCandidate) => void;
   onSnooze: (row: TalentRadarCandidate) => void;
+  onReviewCardOpen?: (row: TalentRadarCandidate) => void;
 }) {
   const { t } = useTranslation();
   const buckets = groupTalentRadarCandidates(rows);
@@ -79,6 +81,7 @@ export function TalentRadarCandidateGroups({
                     onShortlist={() => onShortlist(row)}
                     onDismiss={() => onDismiss(row)}
                     onSnooze={() => onSnooze(row)}
+                    onReviewCardOpen={onReviewCardOpen ? () => onReviewCardOpen(row) : undefined}
                   />
                 </li>
               ))}

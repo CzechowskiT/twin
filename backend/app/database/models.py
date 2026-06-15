@@ -729,6 +729,23 @@ class RecruiterAuditEvent(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
+class RecruiterTalentRadarDecision(Base):
+    """Persisted talent radar recruiter actions (shortlist, snooze, dismiss, audit-only)."""
+
+    __tablename__ = "recruiter_talent_radar_decisions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    application_id: Mapped[int] = mapped_column(
+        ForeignKey("applications.id", ondelete="CASCADE"),
+        index=True,
+    )
+    company_slug: Mapped[str] = mapped_column(String(80), index=True)
+    action_type: Mapped[str] = mapped_column(String(64))
+    meta_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    snooze_until: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
 class CandidateEvidenceItem(Base):
     """Skill evidence artifact linked to a candidate profile vault."""
 

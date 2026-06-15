@@ -11,10 +11,15 @@ import {
   sanitizeRecruiterAuditMeta,
 } from "../src/lib/recruiter-audit-trail";
 
-test("audit action types cover accept, decline, and review opened", () => {
+test("audit action types cover accept, decline, review opened, and radar", () => {
   assert.deepEqual([...RECRUITER_AUDIT_ACTION_TYPES].sort(), [
     "decision_accept",
     "decision_decline",
+    "radar_dismissed",
+    "radar_draft_prepared",
+    "radar_review_card_opened",
+    "radar_shortlisted",
+    "radar_snoozed",
     "review_opened",
   ]);
 });

@@ -20,6 +20,10 @@ from app.services.recruiter_audit_trail import (
 )
 from app.services.recruiter_candidate_search import build_recruiter_candidate_search
 from app.services.recruiter_talent_radar import build_recruiter_talent_radar
+from app.services.recruiter_talent_radar_decisions import (
+    list_recruiter_talent_radar_decisions,
+    log_recruiter_talent_radar_decision,
+)
 from app.services.recruiter_inbox import (
     build_recruiter_batch,
     respond_recruiter_batch,
@@ -148,6 +152,18 @@ def recruiter_inbox_respond(
 class RecruiterAuditLogIn(BaseModel):
     action_type: str = Field(..., max_length=64)
     meta: dict[str, str] | None = Field(None, description="Optional non-PII metadata")
+
+
+class RecruiterTalentRadarDecisionIn(BaseModel):
+    application_id: int = Field(..., ge=1)
+    action_type: str = Field(..., max_length=64)
+    meta: dict[str, str] | None = Field(None, description="Optional non-PII metadata")
+    snooze_days: int | None = Field(None, description="7, 30, or 90 when action_type is snoozed")
+    dismiss_reason_code: str | None = Field(
+        None,
+        max_length=32,
+        description="Category code when action_type is dismissed",
+    )
 
 
 class RecruiterScorecardIn(BaseModel):
@@ -336,6 +352,56 @@ def recruiter_talent_radar(
             timing_window=timing_window,
             signal_type=signal_type,
             limit=limit,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.get("/talent-radar/decisions")
+def recruiter_talent_radar_decisions_list(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+    application_id: int | None = Query(None, ge=1),
+    decision_filter: str | None = Query(None, max_length=32),
+    limit: int = Query(100, ge=1, le=200),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return list_recruiter_talent_radar_decisions(
+            db,
+            company_slug=slug,
+            application_id=application_id,
+            decision_filter=decision_filter,
+            limit=limit,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/talent-radar/decisions", status_code=status.HTTP_201_CREATED)
+@limiter.limit("120/minute", key_func=recruiter_token_key)
+def recruiter_talent_radar_decisions_log(
+    request: Request,
+    body: RecruiterTalentRadarDecisionIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return log_recruiter_talent_radar_decision(
+            db,
+            application_id=body.application_id,
+            company_slug=slug,
+            action_type=body.action_type,
+            meta=body.meta,
+            snooze_days=body.snooze_days,
+            dismiss_reason_code=body.dismiss_reason_code,
         )
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
