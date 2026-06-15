@@ -80,7 +80,7 @@ cd frontend && npm run test:trust-language-guard && npm run test:i18n-coverage
 | B6 | `/company/team` | Team tokens / permissions | — | 404 |
 | B7 | `/company/billing` | Plan + usage; billing **NOT LIVE** | — | Checkout live |
 | B8 | `/company/integrations` | Readiness page; planned/not-live rows | — | 404 or “all connected” |
-| B8b | `/company/talent-pool` | Executive summary + quality + source coverage or empty | Pilot; links to recruiter import | PII fields or auto outreach implied |
+| B8b | `/company/talent-pool` | Executive summary + quality + source coverage or empty; **next best action** + **readiness guide** + premium workspace selector | Pilot; links to recruiter import; role-aware Radar CTAs with recruiter-permissions hint | PII fields or auto outreach implied |
 | B9 | Roles → pipeline flow | Create role → see pipeline activity | Manual only | Broken API chain |
 
 **Unauth:** `/company/dashboard` → sign-in card → `/login/company`.

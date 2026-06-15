@@ -21,6 +21,10 @@ export const COMPANY_TALENT_POOL_MARKERS = {
   integrationsLink: "company-talent-pool-integrations-link",
   pipelineLink: "company-talent-pool-pipeline-link",
   radarLink: "company-talent-pool-radar-link",
+  workspaceSelector: "company-talent-pool-workspace-selector",
+  readinessGuide: "company-talent-pool-readiness-guide",
+  nextBestAction: "company-talent-pool-next-best-action",
+  trustPanel: "company-talent-pool-trust-panel",
 } as const;
 
 export const COMPANY_TALENT_POOL_READINESS_STATES = [

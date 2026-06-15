@@ -36,11 +36,20 @@ Pilot · Internal data first · No automatic outreach · Recruiter review requir
 ## Panels
 
 1. Executive summary (6 metrics)
-2. Data quality dimensions (8 categories)
-3. Role & skill coverage (top roles/skills, weak coverage, suggested actions)
-4. Candidate readiness list (5 states, Talent Radar deep links)
-5. Source coverage
-6. Recent records / empty state
+2. **Next best action** — deterministic from payload (import → duplicates → enrich → ask recruiter → open radar)
+3. Data quality dimensions (8 categories)
+4. Role & skill coverage (top roles/skills, weak coverage, role-aware recruiter Radar CTAs)
+5. Candidate readiness list + **readiness guide** (5 states explained with next-action links)
+6. Source coverage
+7. Recent records / empty state
+8. **Trust panel** — visible copy that talent memory does not contact candidates
+
+## Executive UX polish (2026-06-15)
+
+- **Premium workspace selector** — collapsible “Preview settings” / “Ustawienia podglądu”; labels Workspace firmy · Firma · Kod dostępu pilota; CTA Załaduj workspace
+- **Readiness guide** — Co oznacza gotowość kandydatów? with Ready, Needs enrichment, Consent required, Duplicate review, Stale
+- **Role-aware Radar CTAs** — default “Ask recruiter to review”; role-matched links → “Open in recruiter Radar” + recruiter-permissions hint (no cross-role access leak)
+- **Next best action** — Najlepszy następny krok; computed on frontend from API payload only (no LLM)
 
 ## CTAs
 
@@ -61,6 +70,7 @@ Pilot · Internal data first · No automatic outreach · Recruiter review requir
 
 ```bash
 cd frontend && npm run test:company-talent-pool-view-mvp   # 15 assertions
+cd frontend && npm run test:company-talent-pool-executive-ux   # 15 assertions — workspace selector, NBA, readiness guide
 cd backend && pytest tests/test_company_talent_pool.py tests/test_company_talent_pool_view.py -q
 ```
 
@@ -80,3 +90,4 @@ cd backend && pytest tests/test_company_talent_pool.py tests/test_company_talent
 
 - **#138** — initial MVP (executive summary, basic quality, source coverage, records list)
 - **fix/company-talent-pool-view-gaps-2026-06-15** — role/skill coverage, readiness states, expanded quality dimensions
+- **fix/company-talent-pool-executive-ux-polish-2026-06-15** — premium workspace selector, readiness guide, NBA panel, role-aware Radar CTAs, trust panel
