@@ -55,7 +55,7 @@ export function TalentRadarCandidateGroups({
   const buckets = groupTalentRadarCandidates(rows);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       {talentRadarReviewGroupOrder().map((group) => {
         const groupRows = buckets[group];
         if (!groupRows.length) return null;
@@ -73,7 +73,7 @@ export function TalentRadarCandidateGroups({
                 {groupRows.length}
               </p>
             </div>
-            <ul className="space-y-4">
+            <ul className="space-y-5">
               {groupRows.map((row) => (
                 <li key={row.id}>
                   <TalentRadarCandidateCard

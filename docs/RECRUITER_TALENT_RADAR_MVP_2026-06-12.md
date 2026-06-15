@@ -65,7 +65,7 @@ Every suggestion includes `why_surfaced`, `why_now`, `risks`, `missing_data`, `d
 
 Required disclaimer (EN): *Talent Radar surfaces signals and context. The recruiter decides whether and how to contact the candidate.*
 
-Outreach draft opens a **fixed modal** (copy-only) — not sent by TWIN. Clicking **Prepare outreach draft** shows loading state, opens the panel with role context and safe personalization placeholder, logs `draft_prepared` audit metadata (no message body), and shows a **Draft prepared — not sent** badge on success.
+Outreach draft opens a **fixed modal** (copy-only) — not sent by TWIN. Strong `bg-slate-950/85` overlay with `backdrop-blur-md` blocks card bleed-through. Clicking **Prepare outreach draft** shows loading state, opens the solid panel with copy-only badge, role context and safe personalization placeholder, logs `draft_prepared` audit metadata (no message body), and shows a **Draft prepared — not sent** badge on success.
 
 ## Tests
 
@@ -73,6 +73,7 @@ Outreach draft opens a **fixed modal** (copy-only) — not sent by TWIN. Clickin
 cd frontend && npm run test:recruiter-talent-radar-mvp
 cd frontend && npm run test:recruiter-talent-radar-premium-ux
 cd frontend && npm run test:recruiter-talent-radar-draft-action
+cd frontend && npm run test:recruiter-talent-radar-visual-polish
 cd ../backend && pytest tests/test_recruiter_talent_radar.py -q
 ```
 
@@ -83,7 +84,9 @@ cd ../backend && pytest tests/test_recruiter_talent_radar.py -q
 | Summary panel | Candidates, strong matches, needs verification, low confidence + no-auto-outreach note |
 | Fit bands | Strong 80–100, Good 60–79, Possible 40–59, Low 0–39 (visual badges) |
 | Groups | Review first / Possible match / Needs verification / Low confidence |
-| Cards | Header + 2× why surfaced + 1–2× why now + chips; expandable evidence/risks |
+| Cards | Premium header (name, role, fit, decision, evidence badges); grouped chips; nested expandable details (evidence/risks/missing/last decision); separated CTA tiers |
+| Draft modal | `bg-slate-950/85` overlay; copy-only badge; message box; copy primary / review secondary / close tertiary; ESC + focus trap |
+| Trust footer | Copy-only outreach reminder at page bottom |
 | CTA hierarchy | Primary: open review card; secondary: draft / shortlist / snooze / dismiss |
 | Filters | Premium toolbar with helper text |
 
