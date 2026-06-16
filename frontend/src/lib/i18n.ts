@@ -179,6 +179,7 @@ export type TranslationKey =
   | `persona.${keyof typeof en.persona}`
   | `demo.${keyof typeof en.demo}`
   | `interactiveDemo.${keyof typeof en.interactiveDemo}`
+  | `founderLedDemo.${keyof typeof en.founderLedDemo}`
   | `compare.${keyof typeof en.compare}`
   | `first1000.${keyof typeof en.first1000}`
   | `ux.${keyof typeof en.ux}`
@@ -4211,6 +4212,54 @@ eyebrow: "Product roadmap",
     decisionToast: "Demo only — “{action}” would update the recruiter pipeline.",
     acceptedOutcome: "Accepted for interview (demo) — calendar hold appears in the next step.",
     declinedOutcome: "Declined (demo) — candidate stays out of the acceptance calendar.",
+  },
+  founderLedDemo: {
+    pageEyebrow: "Founder-led demo",
+    pageTitle: "TWIN founder-led product walkthrough",
+    pageLead:
+      "A controlled walkthrough connecting company talent memory, recruiter operating cockpit, and candidate trust — using live product surfaces, honest status badges, and human decision gates. No auto-apply, no auto-outreach.",
+    heroCtaCompany: "Start company demo",
+    heroCtaRecruiter: "Open recruiter cockpit",
+    heroCtaCandidate: "Open candidate view",
+    journeyHeading: "Demo journey",
+    journeyLead:
+      "Follow the story from organizational talent memory through import, radar, review, and digest — ending with explicit human decision boundaries.",
+    journeyCompanyMemoryTitle: "Company talent memory",
+    journeyCompanyMemoryDesc: "Public entry for employers — roles, readiness, and talent intelligence direction.",
+    journeyTalentPoolImportTitle: "Talent Pool import",
+    journeyTalentPoolImportDesc: "Recruiter imports organizational talent signals into a shared pool (pilot).",
+    journeyTalentRadarTitle: "Talent Radar",
+    journeyTalentRadarDesc: "Ranked pipeline with snooze, dismiss, draft decisions, and audit-friendly memory.",
+    journeyCandidateProfileTitle: "Candidate profile",
+    journeyCandidateProfileDesc: "Candidate-side trust layer — profile, CV, matches, and consent-first transparency.",
+    journeyDecisionMemoryTitle: "Decision memory",
+    journeyDecisionMemoryDesc: "Inbox review card, shortlist state, and recruiter-owned accept / decline.",
+    journeyWeeklyDigestTitle: "Weekly Talent Radar digest",
+    journeyWeeklyDigestDesc: "Batch summary of radar movement — recruiter decides what to act on.",
+    journeyHumanDecisionTitle: "Safe human decisioning",
+    journeyHumanDecisionDesc: "Closing boundaries — TWIN prepares signal; recruiters and candidates decide.",
+    rolesHeading: "Enter by role",
+    roleCandidateTitle: "Candidate",
+    roleCandidateDesc: "Panel, offers, matches, profile — calendar of acceptance-ready moments.",
+    roleRecruiterTitle: "Recruiter",
+    roleRecruiterDesc: "Inbox, Talent Pool, Talent Radar, pipeline — operating cockpit.",
+    roleCompanyTitle: "Company",
+    roleCompanyDesc: "Dashboard, talent pool, roles — organizational talent memory.",
+    roleInvestorTitle: "Investor / board",
+    roleInvestorDesc: "Public metrics preview and gated workspace exports when signed in.",
+    boundariesHeading: "Safe product boundaries",
+    boundariesLead: "TWIN is a system-of-record direction — not an autopilot that applies or messages on your behalf.",
+    boundaryNoAutoApply: "No automatic applications — auto-apply remains paused on production.",
+    boundaryNoOutreach: "No automatic outreach — recruiters send messages; TWIN does not cold-email candidates.",
+    boundaryNoHiddenScraping: "No hidden scraping — adapters and consent are visible; demo uses honest statuses.",
+    boundaryHumanDecides: "Human recruiter decides — accept, decline, snooze, and draft states stay recruiter-owned.",
+    boundaryConsentTrust: "Consent and trust remain central — candidate data stays gated and explainable.",
+    closingStatement:
+      "TWIN is not auto-apply. TWIN is not auto-outreach. Recruiters decide. Candidates see slots worth showing up for.",
+    interactiveSectionTitle: "Interactive simulation (optional)",
+    interactiveSectionLead:
+      "Eight-step synthetic walkthrough below — sample data only, separate from the live product surfaces above.",
+    interactiveSectionCta: "Jump to interactive simulation",
   },
   compare: {
     disclaimer:
@@ -8621,6 +8670,55 @@ const pl: MessageTree = {
     decisionToast: "Tylko demo — „{action}” zaktualizowałoby pipeline rekrutera.",
     acceptedOutcome: "Zaakceptowano do rozmowy (demo) — hold pojawi się w następnym kroku.",
     declinedOutcome: "Odrzucono (demo) — kandydat nie trafia do kalendarza akceptacji.",
+  },
+  founderLedDemo: {
+    pageEyebrow: "Demo prowadzone przez founderów",
+    pageTitle: "TWIN — founder-led walkthrough produktu",
+    pageLead:
+      "Kontrolowany przewodnik łączący pamięć talentu firmy, kokpit rekrutera i warstwę zaufania kandydata — na live powierzchniach produktu, uczciwych badge’ach statusu i bramkach decyzji człowieka. Bez auto-apply, bez auto-outreach.",
+    heroCtaCompany: "Start demo firmy",
+    heroCtaRecruiter: "Otwórz kokpit rekrutera",
+    heroCtaCandidate: "Otwórz widok kandydata",
+    journeyHeading: "Ścieżka demo",
+    journeyLead:
+      "Od pamięci talentu organizacji przez import, radar, review i digest — z jawnymi granicami decyzji człowieka na końcu.",
+    journeyCompanyMemoryTitle: "Pamięć talentu firmy",
+    journeyCompanyMemoryDesc: "Publiczny entry dla pracodawców — role, readiness i kierunek talent intelligence.",
+    journeyTalentPoolImportTitle: "Import Talent Pool",
+    journeyTalentPoolImportDesc: "Rekruter importuje sygnały talentu organizacji do wspólnej puli (pilot).",
+    journeyTalentRadarTitle: "Talent Radar",
+    journeyTalentRadarDesc: "Rankingowany pipeline ze snooze, dismiss, draft i pamięcią decyzji pod audyt.",
+    journeyCandidateProfileTitle: "Profil kandydata",
+    journeyCandidateProfileDesc: "Warstwa zaufania kandydata — profil, CV, dopasowania i transparentność RODO-first.",
+    journeyDecisionMemoryTitle: "Pamięć decyzji",
+    journeyDecisionMemoryDesc: "Karta review w inbox, shortlist i accept / decline po stronie rekrutera.",
+    journeyWeeklyDigestTitle: "Tygodniowy digest Talent Radar",
+    journeyWeeklyDigestDesc: "Podsumowanie ruchu w radarze — rekruter decyduje, co robić dalej.",
+    journeyHumanDecisionTitle: "Bezpieczne decyzje człowieka",
+    journeyHumanDecisionDesc: "Granice na zakończenie — TWIN przygotowuje sygnał; decydują rekruterzy i kandydaci.",
+    rolesHeading: "Wejście wg roli",
+    roleCandidateTitle: "Kandydat",
+    roleCandidateDesc: "Panel, oferty, dopasowania, profil — kalendarz momentów warte przyjścia.",
+    roleRecruiterTitle: "Rekruter",
+    roleRecruiterDesc: "Inbox, Talent Pool, Talent Radar, pipeline — kokpit operacyjny.",
+    roleCompanyTitle: "Firma",
+    roleCompanyDesc: "Dashboard, talent pool, role — pamięć talentu organizacji.",
+    roleInvestorTitle: "Inwestor / board",
+    roleInvestorDesc: "Publiczny podgląd metryk i gated workspace pod eksporty po zalogowaniu.",
+    boundariesHeading: "Bezpieczne granice produktu",
+    boundariesLead:
+      "TWIN to kierunek system-of-record — nie autopilot aplikujący ani wysyłający wiadomości w Twoim imieniu.",
+    boundaryNoAutoApply: "Brak automatycznych aplikacji — auto-apply pozostaje wstrzymane na produkcji.",
+    boundaryNoOutreach: "Brak automatycznego outreach — wiadomości wysyła rekruter; TWIN nie cold-mailuje kandydatów.",
+    boundaryNoHiddenScraping: "Brak ukrytego scrapingu — adaptery i zgoda są widoczne; demo ma uczciwe statusy.",
+    boundaryHumanDecides: "Decyduje rekruter — accept, decline, snooze i draft zostają po stronie rekrutera.",
+    boundaryConsentTrust: "Zgoda i zaufanie w centrum — dane kandydata są gated i wyjaśnialne.",
+    closingStatement:
+      "TWIN to nie auto-apply. TWIN to nie auto-outreach. Decyduje rekruter. Kandydat widzi sloty warte przyjścia.",
+    interactiveSectionTitle: "Symulacja interaktywna (opcjonalnie)",
+    interactiveSectionLead:
+      "Ośmiokrokowy walkthrough syntetyczny poniżej — tylko dane przykładowe, oddzielnie od live powierzchni powyżej.",
+    interactiveSectionCta: "Przejdź do symulacji interaktywnej",
   },
   privacy: {
     title: "Polityka prywatności (MVP)",
