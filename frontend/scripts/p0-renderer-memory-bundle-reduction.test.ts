@@ -138,7 +138,7 @@ test("9 route fallbacks — LightweightRouteShell skeletons, no blank pages", ()
   const skeleton = read("src/components/workspace-route-skeleton.tsx");
   assert.match(shell, /lightweight-route-shell-skeleton/);
   assert.match(shell, /SLOW_PAINT_MS/);
-  assert.match(shell, /8_000/);
+  assert.match(shell, /4_000/);
   assert.match(layout, /WorkspaceRouteSkeleton/);
   assert.match(skeleton, /animate-pulse/);
   assert.match(read("src/app/login/login-layout-client.tsx"), /AuthRouteSkeleton/);
