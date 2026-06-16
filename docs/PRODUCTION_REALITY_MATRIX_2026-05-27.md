@@ -17,8 +17,9 @@
 - **Persona workspace navigation UX (2026-06-12):** `docs/PERSONA_WORKSPACE_NAVIGATION_PREMIUM_UX_2026-06-12.md` — module grids, `/recruiter` hub, login OAuth polish; launch **NO-GO** unchanged
 - **Company entry navigation (2026-06-16):** `/for-companies` → `/company/dashboard` + `/company/talent-pool` CTAs; `WORKSPACE_PATH.company` → dashboard; `test:company-entry-navigation`
 - **P0 workspace deep-link & multi-tab (2026-06-16):** `docs/P0_WORKSPACE_DEEPLINK_MULTITAB_2026-06-16.md` — `PERSONA_MODULE_ROUTES`; auth gate `?next=`; `resolveEffectiveSessionPersona`; Playwright `test:workspace-deeplink-new-tab` + `test:workspace-multitab-browser-smoke`
-- **P0 browser memory / multi-tab (2026-06-16):** `docs/P0_BROWSER_MEMORY_MULTITAB_PERFORMANCE_2026-06-16.md` — `PerformanceSafeBrandStrip` on workspace; `useLoadWhenVisible`; `LightweightRouteShell`; lazy demo data; `test:p0-browser-memory-multitab-performance`
-- **P0 renderer memory / bundle reduction (2026-06-16):** `docs/P0_RENDERER_MEMORY_PROFILE_2026-06-16.md` — split `ChromeHeader` (marketing/workspace/auth); dynamic `CompanyLogoMarquee`; bounded request deduper; `test:p0-renderer-memory-bundle-reduction`
+- **P0 browser memory / multi-tab (2026-06-16):** `docs/P0_BROWSER_MEMORY_MULTITAB_PERFORMANCE_2026-06-16.md` — `PerformanceSafeMovingLogoMarquee` on workspace/auth; `useLoadWhenVisible`; `LightweightRouteShell`; lazy demo data; `test:p0-browser-memory-multitab-performance`
+- **P0 renderer memory / bundle reduction (2026-06-16):** `docs/P0_RENDERER_MEMORY_PROFILE_2026-06-16.md` — split `ChromeHeader` (marketing/workspace/auth); route-aware marquee; bounded request deduper; `test:p0-renderer-memory-bundle-reduction`
+- **Performance-safe moving logo marquee (2026-06-16):** `docs/PERFORMANCE_SAFE_MOVING_LOGO_MARQUEE_2026-06-16.md` — ≤18 DOM nodes on workspace/auth; marketing lazy-loads full strip; `test:performance-safe-moving-logo-marquee`
 - **Multi-tab performance hardening (2026-06-16):** `docs/MULTI_TAB_PERFORMANCE_HARDENING_2026-06-16.md` — pause marquee/polling in hidden tabs; dedupe `public-health`; `test:multi-tab-performance-hardening`
 - **Launch-day monitoring / rollback:** `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` (2026-06-04)
 - **Recruiter alignment audit:** `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md` (2026-06-04)

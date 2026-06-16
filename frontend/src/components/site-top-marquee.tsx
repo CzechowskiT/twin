@@ -1,6 +1,10 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { usePathname } from "next/navigation";
+
+import { PerformanceSafeMovingLogoMarquee } from "@/components/marketing/performance-safe-moving-logo-marquee";
+import { isPerformanceLightChromePath } from "@/lib/performance-route-classification";
 
 const CompanyLogoMarquee = dynamic(
   () => import("@/components/marketing/company-logo-marquee").then((m) => m.CompanyLogoMarquee),
@@ -12,11 +16,18 @@ const CompanyLogoMarquee = dynamic(
   },
 );
 
-/** Full-width company marks above global header — scrolling marquee on all routes. */
+/** Full-width company marks above global header — route-aware marquee density. */
 export function SiteTopMarquee() {
+  const pathname = usePathname() ?? "";
+  const lightChrome = isPerformanceLightChromePath(pathname);
+
   return (
     <div className="site-top-marquee-band relative z-[45] w-full shrink-0">
-      <CompanyLogoMarquee />
+      {lightChrome ? (
+        <PerformanceSafeMovingLogoMarquee />
+      ) : (
+        <CompanyLogoMarquee />
+      )}
     </div>
   );
 }
