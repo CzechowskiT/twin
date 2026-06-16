@@ -97,6 +97,8 @@ Dashboard, login, register layouts are Server Components; client shells hold `Li
 cd frontend
 npm run test:p0-renderer-memory-bundle-reduction   # 12 assertions
 npm run test:p0-browser-memory-multitab-performance  # 15 assertions
+npm run test:workspace-deeplink-new-tab            # 10 static + Playwright deeplink
+npm run test:workspace-multitab-browser-smoke      # 8 Playwright, 12 concurrent routes
 npm run test:multi-tab-performance-hardening         # 16 assertions
 npm run build
 npx tsc --noEmit
@@ -104,7 +106,7 @@ npx tsc --noEmit
 
 ## Manual founder memory smoke
 
-**Status: founder memory smoke pending** — cannot measure Activity Monitor from CI.
+**Status:** Automated Playwright multi-tab smoke replaces manual founder pass for route paint + deeplink `next` — `test:workspace-multitab-browser-smoke` + `test:workspace-deeplink-new-tab`. Heap metrics still require local Activity Monitor if regressions suspected.
 
 1. Open 8–12 tabs: `/dashboard`, `/recruiter/talent-radar`, `/company/talent-pool`, `/login/candidate`, `/status`, `/investor`.
 2. Background all but one — renderer memory should stabilize below prior ~5 GB/tab baseline.
@@ -118,6 +120,7 @@ Unchanged: public **NO-GO**, auto-apply **PAUSED**, no auth relaxation.
 ## Related docs
 
 - `docs/P0_BROWSER_MEMORY_MULTITAB_PERFORMANCE_2026-06-16.md`
+- `docs/P0_WORKSPACE_DEEPLINK_MULTITAB_2026-06-16.md`
 - `docs/MULTI_TAB_PERFORMANCE_HARDENING_2026-06-16.md`
 - `docs/FOUNDER_PREMIUM_PRODUCT_QA_CHECKLIST_2026-06-08.md` — § multi-tab QA
 - `docs/PRODUCTION_REALITY_MATRIX_2026-05-27.md`

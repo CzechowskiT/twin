@@ -69,7 +69,10 @@ function resolvePersona(pathname: string, hasSession: boolean): MarketingPersona
 
 export function PersonaProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const [persona, setPersonaState] = useState<MarketingPersona>("candidate");
+  const [persona, setPersonaState] = useState<MarketingPersona>(() => {
+    if (typeof window === "undefined") return "candidate";
+    return resolvePersona(pathname, Boolean(getToken()));
+  });
   const [sessionLocked, setSessionLocked] = useState(false);
 
   useLayoutEffect(() => {

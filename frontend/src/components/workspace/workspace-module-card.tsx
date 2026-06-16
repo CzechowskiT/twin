@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { useTranslation } from "@/components/language-provider";
 import { Card } from "@/components/ui";
+import { scrollToDashboardHash } from "@/lib/dashboard-anchor";
 import type { WorkspaceModuleDef } from "@/lib/workspace-module-status";
 
 import { WorkspaceStatusBadge } from "./workspace-status-badge";
@@ -40,7 +41,12 @@ export function WorkspaceModuleCard({ module: mod }: { module: WorkspaceModuleDe
           {cardBody}
         </a>
       ) : (
-        <Link href={href} className="flex h-full flex-col">
+        <Link
+          href={href}
+          className="flex h-full flex-col"
+          prefetch={false}
+          onClick={href.includes("#") ? scrollToDashboardHash : undefined}
+        >
           {cardBody}
         </Link>
       )}

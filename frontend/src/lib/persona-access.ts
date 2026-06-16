@@ -8,8 +8,10 @@ import {
   type MarketingPersona,
 } from "@/lib/marketing-persona";
 import { COMPANY_ENTRY_DASHBOARD_ROUTE } from "@/lib/company-entry-navigation";
+import { isPersonaModuleDeepLink } from "@/lib/persona-module-routes";
 import { LOGIN_PATH, REGISTER_PATH, WORKSPACE_PATH } from "@/lib/persona-auth";
 import type { TranslationKey } from "@/lib/i18n";
+import { getSessionPersona } from "@/lib/session-persona";
 
 export type PersonaAudience = MarketingPersona;
 
@@ -201,6 +203,23 @@ function isSessionNeutralPath(pathname: string): boolean {
   return false;
 }
 
+/**
+ * Session persona for gates — path-locked routes win over transient React state
+ * so new tabs opened via cmd-click do not bounce to a generic hub.
+ */
+export function resolveEffectiveSessionPersona(
+  pathname: string,
+  marketingPersona: MarketingPersona,
+): MarketingPersona {
+  const pathLocked = sessionPersonaLockedByPath(pathname);
+  if (pathLocked) return pathLocked;
+  const session = getSessionPersona();
+  if (session) return session;
+  const fromPath = marketingPersonaFromPathExtended(pathname);
+  if (fromPath) return fromPath;
+  return marketingPersona;
+}
+
 /** Strict lane check for authenticated sessions — redirects cross-persona product routes. */
 export function sessionPersonaHomeRedirect(
   pathname: string,
@@ -212,6 +231,7 @@ export function sessionPersonaHomeRedirect(
     return "/recruiter/calendar";
   }
   if (isPathAllowedForPersona(pathname, persona)) return null;
+  if (isPersonaModuleDeepLink(pathname, persona)) return null;
   return WORKSPACE_PATH[persona];
 }
 
