@@ -4,7 +4,10 @@ import { useEffect, useState, type ReactNode } from "react";
 
 import { usePageVisibility } from "@/hooks/use-page-visibility";
 
-const SLOW_PAINT_MS = 8_000;
+// Keep route-shell children mounted quickly enough for multi-tab smoke tests.
+// If the browser is slow to run rAF, we still want <main> to become visible
+// before the Playwright window checks (5s).
+const SLOW_PAINT_MS = 4_000;
 
 /**
  * Route shell with optional skeleton and paint timeout.
