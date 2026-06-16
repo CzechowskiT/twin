@@ -16,7 +16,7 @@ type StepDef = {
 const STEPS: StepDef[] = [
   { id: "dashboard", href: "/dashboard", labelKey: "ux.flowStepDashboard" },
   { id: "profile", href: "/profile", labelKey: "ux.flowStepProfile" },
-  { id: "matches", href: "/dashboard#dashboard-matches", labelKey: "ux.flowStepMatches" },
+  { id: "matches", href: "/dashboard/matches", labelKey: "ux.flowStepMatches" },
   { id: "actions", href: "/dashboard#dashboard-applications", labelKey: "ux.flowStepActions" },
 ];
 

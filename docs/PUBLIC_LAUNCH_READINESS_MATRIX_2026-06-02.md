@@ -20,7 +20,7 @@
 
 **Safe-lane merge (2026-06-12):** Persona workspace **navigation & premium UX** — module grids (candidate/recruiter/company/investor), `/recruiter` hub, integrations redirect, login OAuth polish · `docs/PERSONA_WORKSPACE_NAVIGATION_PREMIUM_UX_2026-06-12.md` · `test:persona-dashboard-navigation` + `test:workspace-premium-empty-states` + `test:auth-login-options-ux` · **does not change launch NO-GO**.
 
-**Safe-lane merge (2026-06-16):** **All-persona navigation P0** — candidate Oferty/Dopasowania/Profil i CV route aliases, logout → `/` + Demo · `docs/P0_ALL_PERSONA_NAVIGATION_ROUTE_AUDIT_2026-06-16.md` · `test:p0-all-persona-navigation-routes` + `test:p0-all-persona-navigation-browser` · **does not change launch NO-GO**.
+**Safe-lane merge (2026-06-16):** **Candidate offers/matches real content** — distinct pages, removed dashboard anchor bounce · `test:candidate-offers-matches-real-content` · P0 performance **OPEN** · launch **NO-GO**.
 
 **Safe-lane merge (2026-06-16):** **Founder-led demo flow** — `/demo` orchestration layer, homepage Demo CTA validated · `docs/FOUNDER_LED_DEMO_FLOW_2026-06-16.md` · `test:founder-led-demo-flow` · **does not change launch NO-GO** · P0 performance **OPEN**.
 

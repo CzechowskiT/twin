@@ -58,12 +58,14 @@ test("1 workspace module hrefs resolve to existing app routes or safe external l
 
 test("2 candidate Oferty route /dashboard/jobs does not 404", () => {
   assert.ok(routePageExists(CANDIDATE_CANONICAL_ROUTES.jobs));
-  assert.match(read("src/app/dashboard/jobs/page.tsx"), /redirect/);
+  assert.match(read("src/app/dashboard/jobs/page.tsx"), /CandidateJobDiscovery/);
+  assert.doesNotMatch(read("src/app/dashboard/jobs/page.tsx"), /redirect\s*\(\s*["'`]\/dashboard/);
 });
 
 test("3 candidate Dopasowania route /dashboard/matches does not 404", () => {
   assert.ok(routePageExists(CANDIDATE_CANONICAL_ROUTES.matches));
-  assert.match(read("src/app/dashboard/matches/page.tsx"), /candidateMatchesTitle/);
+  assert.match(read("src/app/dashboard/matches/page.tsx"), /CandidateMatchesWorkspace/);
+  assert.doesNotMatch(read("src/components/candidate/candidate-matches-workspace.tsx"), /router\.replace/);
 });
 
 test("4 candidate Profil i CV route /profile exists with meaningful fallback shell", () => {
