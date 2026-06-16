@@ -11,6 +11,8 @@
 
 **All-persona navigation P0 (2026-06-16):** Candidate Oferty/Dopasowania/Profil i CV aliases, logout → `/` + Demo; `test:p0-all-persona-navigation-routes` + `test:p0-all-persona-navigation-browser` → `docs/P0_ALL_PERSONA_NAVIGATION_ROUTE_AUDIT_2026-06-16.md`.
 
+**Founder-led demo flow (2026-06-16):** `/demo` orchestration — company → recruiter → candidate story, role cards, trust boundaries; `test:founder-led-demo-flow` + browser smoke → `docs/FOUNDER_LED_DEMO_FLOW_2026-06-16.md`.
+
 **Program:** Premium Product Experience Polish Slices 0–7 (PRs [#52](https://github.com/CzechowskiT/twin/pull/52)–[#58](https://github.com/CzechowskiT/twin/pull/58))
 
 ---
