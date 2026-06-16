@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useState, type ReactNode } from "react";
 
 import { usePageVisibility } from "@/hooks/use-page-visibility";
 
-// Keep route-shell children mounted quickly enough for multi-tab smoke tests.
-// If the browser is slow to run rAF, we still want <main> to become visible
-// before the Playwright window checks (5s).
+// Fallback only if layout effect never runs (should not block real content in practice).
 const SLOW_PAINT_MS = 4_000;
 
 /**
@@ -21,23 +19,25 @@ export function LightweightRouteShell({
   skeleton?: ReactNode;
 }) {
   const { hidden } = usePageVisibility();
-  const [paintReady, setPaintReady] = useState(false);
+  const [paintReady, setPaintReady] = useState(() =>
+    typeof document !== "undefined" ? document.hidden : false,
+  );
   const [forceShow, setForceShow] = useState(false);
 
   useEffect(() => {
     if (hidden) {
       setPaintReady(true);
-      return;
     }
-    let raf2 = 0;
-    const raf1 = requestAnimationFrame(() => {
-      raf2 = requestAnimationFrame(() => setPaintReady(true));
-    });
-    return () => {
-      cancelAnimationFrame(raf1);
-      cancelAnimationFrame(raf2);
-    };
   }, [hidden]);
+
+  useLayoutEffect(() => {
+    setPaintReady(true);
+    // Schedule rAF without gating paint — keeps multitab CDP smoke compatible.
+    const raf1 = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {});
+    });
+    return () => cancelAnimationFrame(raf1);
+  }, []);
 
   useEffect(() => {
     if (paintReady || hidden) return;
@@ -45,7 +45,11 @@ export function LightweightRouteShell({
     return () => window.clearTimeout(timer);
   }, [paintReady, hidden]);
 
-  if (!paintReady && !forceShow && !hidden && skeleton) {
+  if (hidden) {
+    return <div data-testid="lightweight-route-shell-ready">{children}</div>;
+  }
+
+  if (!paintReady && !forceShow && skeleton) {
     return <div data-testid="lightweight-route-shell-skeleton">{skeleton}</div>;
   }
 

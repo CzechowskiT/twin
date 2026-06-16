@@ -108,7 +108,8 @@ test("5 globals strip GPU chrome on workspace routes", () => {
 test("6 workspace layouts use LightweightRouteShell via WorkspaceRouteLayout", () => {
   const layout = read("src/components/workspace-route-layout.tsx");
   const dashboard = read("src/app/dashboard/layout.tsx");
-  const recruiter = read("src/app/recruiter/layout.tsx");
+  const recruiter = read("src/app/recruiter/recruiter-layout-client.tsx");
+  const recruiterLayout = read("src/app/recruiter/layout.tsx");
   const company = read("src/app/company/layout.tsx");
   const login = read("src/app/login/login-layout-client.tsx");
   assert.match(layout, /LightweightRouteShell/);
@@ -116,6 +117,7 @@ test("6 workspace layouts use LightweightRouteShell via WorkspaceRouteLayout", (
   assert.match(layout, /WorkspaceRouteSkeleton/);
   assert.match(dashboard, /WorkspaceRouteLayout/);
   assert.match(recruiter, /WorkspaceRouteLayout/);
+  assert.doesNotMatch(recruiterLayout, /"use client"/);
   assert.match(company, /WorkspaceRouteLayout/);
   assert.match(login, /LightweightRouteShell/);
   assert.match(login, /AuthRouteSkeleton/);

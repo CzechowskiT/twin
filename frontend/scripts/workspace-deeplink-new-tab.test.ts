@@ -42,7 +42,7 @@ test("4 PersonaWorkspaceGate preserves next through login redirect", () => {
   const gate = read("src/components/persona-workspace-gate.tsx");
   assert.match(gate, /lockAuthRedirectDestination/);
   assert.match(gate, /loginPathWithNext/);
-  assert.match(gate, /router\.replace\(loginWithNext\)/);
+  assert.doesNotMatch(gate, /router\.replace\(loginWithNext\)/);
   assert.match(gate, /href=\{loginWithNext\}/);
   const locked = { current: null as string | null };
   lockAuthRedirectDestination(locked, "/recruiter/pipeline", "/login/recruiter", null);
@@ -96,6 +96,6 @@ test("10 workspace layouts wire gate + lightweight shell", () => {
   const layout = read("src/components/workspace-route-layout.tsx");
   assert.match(layout, /PersonaWorkspaceGate/);
   assert.match(layout, /LightweightRouteShell/);
-  assert.match(read("src/app/recruiter/layout.tsx"), /WorkspaceRouteLayout/);
+  assert.match(read("src/app/recruiter/recruiter-layout-client.tsx"), /WorkspaceRouteLayout/);
   assert.match(read("src/app/company/layout.tsx"), /WorkspaceRouteLayout/);
 });

@@ -1,13 +1,7 @@
-"use client";
-
 import type { ReactNode } from "react";
 
-import { WorkspaceRouteLayout } from "@/components/workspace-route-layout";
+import { RecruiterLayoutClient } from "@/app/recruiter/recruiter-layout-client";
 
 export default function RecruiterLayout({ children }: { children: ReactNode }) {
-  return (
-    <WorkspaceRouteLayout allowed={["recruiter", "investor"]} surface="recruiter">
-      {children}
-    </WorkspaceRouteLayout>
-  );
+  return <RecruiterLayoutClient>{children}</RecruiterLayoutClient>;
 }
