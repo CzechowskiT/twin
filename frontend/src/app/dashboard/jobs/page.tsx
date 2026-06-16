@@ -1,6 +1,8 @@
-import { redirect } from "next/navigation";
+"use client";
 
-/** Oferty — canonical job feed lives on workspace jobs discovery. */
-export default function DashboardJobsAliasPage() {
-  redirect("/workspace/candidate/jobs");
+import { CandidateJobDiscovery } from "@/components/job/candidate-job-discovery";
+
+/** Oferty — distinct candidate offers/jobs workspace (no dashboard bounce). */
+export default function DashboardJobsPage() {
+  return <CandidateJobDiscovery />;
 }

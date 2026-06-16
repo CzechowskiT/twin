@@ -2,7 +2,7 @@
 
 import { CandidateMatchesWorkspace } from "@/components/candidate/candidate-matches-workspace";
 
-/** Dopasowania — distinct candidate matches workspace (no dashboard anchor bounce). */
-export default function DashboardMatchesPage() {
+/** Workspace alias — same matches surface as /dashboard/matches. */
+export default function WorkspaceCandidateMatchesPage() {
   return <CandidateMatchesWorkspace />;
 }

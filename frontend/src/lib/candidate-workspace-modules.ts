@@ -13,6 +13,15 @@ export const CANDIDATE_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     status: "live",
   },
   {
+    id: "jobs",
+    href: CANDIDATE_CANONICAL_ROUTES.jobs,
+    titleKey: "workspaceModules.candidateJobsTitle",
+    valuePropKey: "workspaceModules.candidateJobsValue",
+    hintKey: "workspaceModules.candidateJobsHint",
+    ctaKey: "workspaceModules.candidateJobsCta",
+    status: "live",
+  },
+  {
     id: "matches",
     href: CANDIDATE_CANONICAL_ROUTES.matches,
     titleKey: "workspaceModules.candidateMatchesTitle",
@@ -100,4 +109,4 @@ export const CANDIDATE_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
   },
 ];
 
-export const CANDIDATE_MODULE_NAV_COLLAPSED_COUNT = 6;
+export const CANDIDATE_MODULE_NAV_COLLAPSED_COUNT = 7;

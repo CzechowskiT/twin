@@ -180,6 +180,8 @@ export type TranslationKey =
   | `demo.${keyof typeof en.demo}`
   | `interactiveDemo.${keyof typeof en.interactiveDemo}`
   | `founderLedDemo.${keyof typeof en.founderLedDemo}`
+  | `candidateMatchesPage.${keyof typeof en.candidateMatchesPage}`
+  | `candidateOffersPage.${keyof typeof en.candidateOffersPage}`
   | `compare.${keyof typeof en.compare}`
   | `first1000.${keyof typeof en.first1000}`
   | `ux.${keyof typeof en.ux}`
@@ -1729,8 +1731,12 @@ const en = {
     candidateProfileValue: "Completeness, LinkedIn sync, and verified readiness gate.",
     candidateProfileHint: "Start here before matches and applications.",
     candidateProfileCta: "Open profile",
-    candidateMatchesTitle: "Offers & matches",
-    candidateMatchesValue: "Ranked feed tied to your profile — not raw board spam.",
+    candidateJobsTitle: "Offers",
+    candidateJobsValue: "Browse ranked job feed tied to your profile — distinct from the main panel.",
+    candidateJobsHint: "Open when you want the offers lane only.",
+    candidateJobsCta: "Browse offers",
+    candidateMatchesTitle: "Matches",
+    candidateMatchesValue: "Ranked fit feed with explainable scores — not raw board spam.",
     candidateMatchesHint: "Save, dismiss, and prepare packages on your terms.",
     candidateMatchesCta: "Browse matches",
     candidateCareerTitle: "Career compass",
@@ -4261,6 +4267,26 @@ eyebrow: "Product roadmap",
       "Eight-step synthetic walkthrough below — sample data only, separate from the live product surfaces above.",
     interactiveSectionCta: "Jump to interactive simulation",
   },
+  candidateOffersPage: {
+    backToPanel: "Back to panel",
+  },
+  candidateMatchesPage: {
+    pageEyebrow: "Candidate matches",
+    pageTitle: "Matches",
+    pageLead:
+      "Ranked roles tied to your profile — fit explanation, missing fields, and human decision boundaries. This page stays here; it does not bounce to the generic panel.",
+    backToPanel: "Back to panel",
+    pilotBadge: "PILOT · SAMPLE MATCH CARDS",
+    pilotLead: "Live feed empty — sample cards show the matches lane until your profile generates real rankings.",
+    decisionBoundary: "You decide save, dismiss, and prepare — TWIN does not auto-apply or auto-message.",
+    emptyTitle: "No matches yet",
+    emptyMessage: "Complete your profile and consent boundaries — matches appear on this page when ready.",
+    emptyStep1: "Upload CV and tune matching boundaries in profile.",
+    emptyStep2: "Return here for ranked fit — not the generic dashboard scroll.",
+    emptyStep3: "Give feedback so the next batch respects your threshold.",
+    emptyCtaProfile: "Open profile",
+    ctaOffers: "Browse offers",
+  },
   compare: {
     disclaimer:
       "Illustrative comparison only. Auto-apply and delegated submit are phased and paused on production today. Calendar: Google/Microsoft OAuth; Apple via ICS/WebCal subscribe.",
@@ -6179,8 +6205,12 @@ const pl: MessageTree = {
     candidateProfileValue: "Kompletność, sync LinkedIn i bramka verified readiness.",
     candidateProfileHint: "Zacznij tutaj przed dopasowaniami i aplikacjami.",
     candidateProfileCta: "Otwórz profil",
-    candidateMatchesTitle: "Oferty i dopasowania",
-    candidateMatchesValue: "Ranking powiązany z profilem — nie surowy spam z tablic.",
+    candidateJobsTitle: "Oferty",
+    candidateJobsValue: "Przegląd ofert powiązany z profilem — osobna strona, nie panel główny.",
+    candidateJobsHint: "Otwórz, gdy chcesz tylko ścieżkę ofert.",
+    candidateJobsCta: "Przeglądaj oferty",
+    candidateMatchesTitle: "Dopasowania",
+    candidateMatchesValue: "Ranking dopasowań z wyjaśnialnymi wynikami — nie surowy spam z tablic.",
     candidateMatchesHint: "Zapisuj, odrzucaj i przygotowuj pakiety na swoich warunkach.",
     candidateMatchesCta: "Przeglądaj dopasowania",
     candidateCareerTitle: "Kompas kariery",
@@ -8719,6 +8749,26 @@ const pl: MessageTree = {
     interactiveSectionLead:
       "Ośmiokrokowy walkthrough syntetyczny poniżej — tylko dane przykładowe, oddzielnie od live powierzchni powyżej.",
     interactiveSectionCta: "Przejdź do symulacji interaktywnej",
+  },
+  candidateOffersPage: {
+    backToPanel: "Wróć do panelu",
+  },
+  candidateMatchesPage: {
+    pageEyebrow: "Dopasowania kandydata",
+    pageTitle: "Dopasowania",
+    pageLead:
+      "Ranking ról powiązany z profilem — wyjaśnienie dopasowania, brakujące pola i granice decyzji człowieka. Ta strona zostaje tutaj — bez odbicia do generycznego panelu.",
+    backToPanel: "Wróć do panelu",
+    pilotBadge: "PILOT · PRÓBKOWE KARTY DOPASOWAŃ",
+    pilotLead: "Feed live pusty — karty próbki pokazują ścieżkę dopasowań, dopóki profil nie wygeneruje rankingów.",
+    decisionBoundary: "Ty decydujesz o zapisie, odrzuceniu i przygotowaniu — TWIN nie auto-aplikuje ani nie wysyła wiadomości.",
+    emptyTitle: "Brak dopasowań",
+    emptyMessage: "Uzupełnij profil i granice zgody — dopasowania pojawią się na tej stronie, gdy będą gotowe.",
+    emptyStep1: "Wgraj CV i dostosuj granice dopasowania w profilu.",
+    emptyStep2: "Wracaj tutaj po ranking dopasowań — nie scroll panelu głównego.",
+    emptyStep3: "Daj feedback, żeby kolejna partia szanowała Twój próg.",
+    emptyCtaProfile: "Otwórz profil",
+    ctaOffers: "Przeglądaj oferty",
   },
   privacy: {
     title: "Polityka prywatności (MVP)",

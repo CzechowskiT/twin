@@ -13,7 +13,14 @@
 | Investor | 6 (+mailto) | 0 | Verified |
 
 **Logout:** `logoutRedirectPath()` → `/` (homepage marketing chrome includes flat **Demo** link → `/demo`).  
-**Auth:** `PersonaWorkspaceGate` preserves `?next=` via `loginPathWithNext`; matches page no longer auto-redirects when unauthenticated.  
+**Auth:** `PersonaWorkspaceGate` preserves `?next=` via `loginPathWithNext`; matches page stays on `/dashboard/matches` (no signed-in bounce to panel).
+
+## Root cause fix (2026-06-16) — real content
+
+PR #153 stopped 404s but `/dashboard/matches` used `router.replace("/dashboard#dashboard-matches")` when signed in, and `/dashboard/jobs` server-redirected away. Founder could not distinguish Panel vs Oferty vs Dopasowania.
+
+**Fix branch:** `fix/candidate-offers-matches-real-content-2026-06-16`  
+**Tests:** `test:candidate-offers-matches-real-content` + browser smoke.
 **Launch stance:** unchanged **NO-GO** — navigation repair only; no auth weakening.
 
 ## Candidate canonical mapping
@@ -22,8 +29,8 @@
 | ---------- | --------------- | -------------- |
 | Panel | `/dashboard` | Existing hub |
 | Kalendarz | `/dashboard/calendar` | Existing |
-| Oferty | `/dashboard/jobs` | **New** → redirect `/workspace/candidate/jobs` |
-| Dopasowania | `/dashboard/matches` | **New** fallback shell + auth-safe redirect when signed in |
+| Oferty | `/dashboard/jobs` | **Distinct offers page** — `CandidateJobDiscovery` (no dashboard bounce) |
+| Dopasowania | `/dashboard/matches` | **Distinct matches page** — `CandidateMatchesWorkspace` (removed `router.replace` to `#dashboard-matches`) |
 | Profil i CV | `/profile` | Module href updated from `/dashboard` |
 | CV alias | `/dashboard/cv` | **New** → redirect `/profile` |
 | Profile alias | `/dashboard/profile` | **New** → redirect `/profile` |
