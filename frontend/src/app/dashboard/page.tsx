@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { jobApplyActionsGuardFromReadiness } from "@/lib/job-apply-actions-guard";
 import { useDashboardVerifiedReadiness } from "@/hooks/dashboard/use-dashboard-verified-readiness";
@@ -13,9 +14,6 @@ import { ProfileCompletenessHint } from "@/components/ux/profile-completeness-hi
 import { WorkspaceFlowSteps } from "@/components/ux/workspace-flow-steps";
 import { EmailVerificationBanner } from "@/components/email-verification-banner";
 import { NightlyAutoApplyStrip } from "@/components/nightly-auto-apply-strip";
-import { DashboardTutorial } from "@/components/dashboard/dashboard-tutorial";
-import { FeedbackModal } from "@/components/feedback/feedback-modal";
-import { HelpWidget } from "@/components/help/help-widget";
 import { useTranslation } from "@/components/language-provider";
 import { Shell } from "@/components/ui";
 import { isCalendarConnected } from "@/lib/dashboard-next-best-action";
@@ -24,7 +22,6 @@ import { SHOW_SCRAPE_UI } from "@/lib/features";
 import { ApplicationsSection } from "@/components/dashboard/applications-section";
 import { CareerCompassStrip } from "@/components/dashboard/career-compass-strip";
 import { DashboardCalendarStrip } from "@/components/dashboard/dashboard-calendar-strip";
-import { DashboardModals } from "@/components/dashboard/dashboard-modals";
 import { DevelopmentFocusSection } from "@/components/dashboard/development-focus-section";
 import { JobsSection } from "@/components/dashboard/jobs-section";
 import { MatchesSection } from "@/components/dashboard/matches-section";
@@ -40,6 +37,23 @@ import { useDashboardMatchFeedback } from "@/hooks/dashboard/use-dashboard-match
 import { useDashboardModals } from "@/hooks/dashboard/use-dashboard-modals";
 import { useDashboardPolling } from "@/hooks/dashboard/use-dashboard-polling";
 import { useRouter } from "next/navigation";
+
+const DashboardTutorial = dynamic(
+  () => import("@/components/dashboard/dashboard-tutorial").then((m) => m.DashboardTutorial),
+  { ssr: false },
+);
+const FeedbackModal = dynamic(
+  () => import("@/components/feedback/feedback-modal").then((m) => m.FeedbackModal),
+  { ssr: false },
+);
+const HelpWidget = dynamic(
+  () => import("@/components/help/help-widget").then((m) => m.HelpWidget),
+  { ssr: false },
+);
+const DashboardModals = dynamic(
+  () => import("@/components/dashboard/dashboard-modals").then((m) => m.DashboardModals),
+  { ssr: false },
+);
 
 export default function DashboardPage() {
   const router = useRouter();

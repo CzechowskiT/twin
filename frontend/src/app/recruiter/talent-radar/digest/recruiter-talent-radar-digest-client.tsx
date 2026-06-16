@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { useAbortableFetch } from "@/hooks/use-abortable-fetch";
+import { useLoadWhenVisible } from "@/hooks/use-load-when-visible";
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
 import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspace-nav";
 import { TalentRadarDigestCopyButton } from "@/components/recruiter/talent-radar/talent-radar-digest-copy-button";
@@ -65,6 +66,8 @@ export default function RecruiterTalentRadarDigestClient() {
   const [authError, setAuthError] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
+
+  const lowerSectionsDeferred = useLoadWhenVisible({ rootMargin: "160px 0px" });
 
   const companyOptions = useMemo(
     () =>
@@ -230,6 +233,9 @@ export default function RecruiterTalentRadarDigestClient() {
 
               <TalentRadarDigestNarrative narrative={payload.narrative ?? ""} />
 
+              <div ref={lowerSectionsDeferred.ref}>
+                {lowerSectionsDeferred.shouldLoad ? (
+              <>
               {!hasContent ? (
                 <div data-testid={RECRUITER_TALENT_RADAR_DIGEST_MARKERS.emptyState}>
                   <GuidedEmptyState
@@ -305,6 +311,11 @@ export default function RecruiterTalentRadarDigestClient() {
               >
                 {t("recruiterTalentRadarDigest.backToRadar")}
               </Link>
+              </>
+                ) : (
+                  <div className="h-32 animate-pulse rounded-xl border border-[var(--twin-border)]/60 bg-[var(--twin-surface-soft)]/40" />
+                )}
+              </div>
             </div>
           ) : null}
         </div>

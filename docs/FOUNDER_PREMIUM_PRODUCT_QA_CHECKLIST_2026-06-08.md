@@ -143,7 +143,7 @@ curl -sS -o /dev/null -w "%{http_code}\n" https://twin-sooty.vercel.app/api/publ
 | `/api/public-health` | 200, `db_ok: true` |
 | `/recruiter/calendar` | 200, NOT LIVE copy |
 | `/dashboard` | 200 (auth redirect OK) |
-| Multi-tab (8–12 tabs) | Background tabs: logo marquee paused, CPU drops; `test:multi-tab-performance-hardening` green — see `docs/MULTI_TAB_PERFORMANCE_HARDENING_2026-06-16.md` |
+| Multi-tab (8–12 tabs) | Workspace tabs: static 6-logo strip; background tabs: marquee paused, CPU/memory drop; `test:p0-browser-memory-multitab-performance` + `test:multi-tab-performance-hardening` green — see `docs/P0_BROWSER_MEMORY_MULTITAB_PERFORMANCE_2026-06-16.md` |
 
 **Score §7:** ___ / 8
 

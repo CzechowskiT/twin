@@ -1,20 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { useAbortableFetch } from "@/hooks/use-abortable-fetch";
+import { useLoadWhenVisible } from "@/hooks/use-load-when-visible";
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
 import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspace-nav";
-import { TalentRadarCandidateGroups } from "@/components/recruiter/talent-radar/talent-radar-candidate-groups";
 import { TalentRadarDecisionFilterBar } from "@/components/recruiter/talent-radar/talent-radar-decision-filter-bar";
-import {
-  TalentRadarDismissModal,
-  TalentRadarDraftModal,
-  TalentRadarSnoozeModal,
-} from "@/components/recruiter/talent-radar/talent-radar-decision-modals";
 import { TalentRadarFilterToolbar } from "@/components/recruiter/talent-radar/talent-radar-filter-toolbar";
 import { TalentRadarSummaryPanel } from "@/components/recruiter/talent-radar/talent-radar-summary-panel";
 import { Card, Shell } from "@/components/ui";
@@ -54,6 +50,36 @@ import {
 } from "@/lib/recruiter-talent-radar-decisions";
 import { computeTalentRadarSummaryStats, TALENT_RADAR_VISUAL_MARKERS } from "@/lib/recruiter-talent-radar-visual";
 import { getClientApiLocale } from "@/lib/api-locale";
+
+const TalentRadarCandidateGroups = dynamic(
+  () =>
+    import("@/components/recruiter/talent-radar/talent-radar-candidate-groups").then(
+      (m) => m.TalentRadarCandidateGroups,
+    ),
+  { ssr: false },
+);
+
+const TalentRadarDismissModal = dynamic(
+  () =>
+    import("@/components/recruiter/talent-radar/talent-radar-decision-modals").then(
+      (m) => m.TalentRadarDismissModal,
+    ),
+  { ssr: false },
+);
+const TalentRadarDraftModal = dynamic(
+  () =>
+    import("@/components/recruiter/talent-radar/talent-radar-decision-modals").then(
+      (m) => m.TalentRadarDraftModal,
+    ),
+  { ssr: false },
+);
+const TalentRadarSnoozeModal = dynamic(
+  () =>
+    import("@/components/recruiter/talent-radar/talent-radar-decision-modals").then(
+      (m) => m.TalentRadarSnoozeModal,
+    ),
+  { ssr: false },
+);
 
 type RoleOption = { id: number; title: string };
 
@@ -98,6 +124,9 @@ export default function RecruiterTalentRadarClient() {
   const [pendingModal, setPendingModal] = useState<PendingModal>(null);
   const [savingDecision, setSavingDecision] = useState(false);
   const autoLoadDone = useRef(false);
+
+  const detailsDeferred = useLoadWhenVisible({ rootMargin: "140px 0px" });
+  const summaryDeferred = useLoadWhenVisible({ rootMargin: "80px 0px" });
 
   const companyOptions = useMemo(
     () =>
@@ -344,7 +373,13 @@ export default function RecruiterTalentRadarClient() {
               <TalentRadarFilterToolbar filters={filters} roles={roles} onChange={updateFilter} />
               <TalentRadarDecisionFilterBar value={decisionFilter} onChange={setDecisionFilter} />
               {visibleRows.length > 0 ? (
-                <TalentRadarSummaryPanel stats={summaryStats} />
+                <div ref={summaryDeferred.ref}>
+                  {summaryDeferred.shouldLoad ? (
+                    <TalentRadarSummaryPanel stats={summaryStats} />
+                  ) : (
+                    <div className="h-20 animate-pulse rounded-xl border border-[var(--twin-border)]/60 bg-[var(--twin-surface-soft)]/40" />
+                  )}
+                </div>
               ) : null}
               <p className="text-sm">
                 <Link
@@ -392,7 +427,8 @@ export default function RecruiterTalentRadarClient() {
           ) : null}
 
           {visibleRows.length > 0 ? (
-            <div className="mt-10">
+            <div className="mt-10" ref={detailsDeferred.ref}>
+              {detailsDeferred.shouldLoad ? (
               <TalentRadarCandidateGroups
                 rows={visibleRows}
                 roleTitle={roleTitle}
@@ -413,6 +449,9 @@ export default function RecruiterTalentRadarClient() {
                   )
                 }
               />
+              ) : (
+                <div className="h-40 animate-pulse rounded-xl border border-[var(--twin-border)]/60 bg-[var(--twin-surface-soft)]/40" />
+              )}
             </div>
           ) : null}
 

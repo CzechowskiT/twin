@@ -42,6 +42,7 @@
     "test:company-talent-pool-executive-ux": "npx --yes tsx scripts/company-talent-pool-executive-ux.test.ts",
     "test:company-entry-navigation": "npx --yes tsx scripts/company-entry-navigation.test.ts",
     "test:multi-tab-performance-hardening": "npx --yes tsx scripts/multi-tab-performance-hardening.test.ts",
+    "test:p0-browser-memory-multitab-performance": "npx --yes tsx scripts/p0-browser-memory-multitab-performance.test.ts",
     "test:company-billing-readiness-mvp": "npx --yes tsx scripts/company-billing-readiness-mvp.test.ts",
     "test:company-billing-plan-usage-readiness": "npx --yes tsx scripts/company-billing-plan-usage-readiness.test.ts",
     "test:candidate-transparency": "npx --yes tsx scripts/candidate-transparency.test.ts",

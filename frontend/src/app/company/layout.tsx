@@ -2,12 +2,12 @@
 
 import type { ReactNode } from "react";
 
-import { PersonaWorkspaceGate } from "@/components/persona-workspace-gate";
+import { WorkspaceRouteLayout } from "@/components/workspace-route-layout";
 
 export default function CompanyLayout({ children }: { children: ReactNode }) {
   return (
-    <PersonaWorkspaceGate allowed={["company", "recruiter"]} surface="company">
+    <WorkspaceRouteLayout allowed={["company", "recruiter"]} surface="company">
       {children}
-    </PersonaWorkspaceGate>
+    </WorkspaceRouteLayout>
   );
 }

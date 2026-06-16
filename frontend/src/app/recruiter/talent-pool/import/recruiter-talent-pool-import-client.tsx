@@ -6,6 +6,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
 import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspace-nav";
 import { useTranslation } from "@/components/language-provider";
+import { useAbortableFetch } from "@/hooks/use-abortable-fetch";
+import { useLoadWhenVisible } from "@/hooks/use-load-when-visible";
 import { Card, Shell } from "@/components/ui";
 import {
   mergeCompanyOptions,
@@ -25,6 +27,8 @@ import {
 
 export default function RecruiterTalentPoolImportClient() {
   const { t } = useTranslation();
+  const { fetch: fetchAbortable } = useAbortableFetch();
+  const previewDeferred = useLoadWhenVisible({ rootMargin: "100px 0px" });
   const [token, setToken] = useState("");
   const [companyRaw, setCompanyRaw] = useState("");
   const [csvText, setCsvText] = useState(TALENT_POOL_CSV_TEMPLATE);
@@ -61,7 +65,7 @@ export default function RecruiterTalentPoolImportClient() {
     setCommitResult(null);
     try {
       const q = talentPoolImportQuery(tkn, slug);
-      const res = await fetch(`/api/recruiter/talent-pool/import/preview?${q}`, {
+      const res = await fetchAbortable(`/api/recruiter/talent-pool/import/preview?${q}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ csv_text: csvText, import_source: "csv_paste" }),
@@ -76,7 +80,7 @@ export default function RecruiterTalentPoolImportClient() {
     } finally {
       setLoading(false);
     }
-  }, [token, companySlug, csvText]);
+  }, [token, companySlug, csvText, fetchAbortable]);
 
   const runCommit = useCallback(async () => {
     if (!preview?.import_id) return;
@@ -87,7 +91,7 @@ export default function RecruiterTalentPoolImportClient() {
     setError(null);
     try {
       const q = talentPoolImportQuery(tkn, slug);
-      const res = await fetch(`/api/recruiter/talent-pool/import/commit?${q}`, {
+      const res = await fetchAbortable(`/api/recruiter/talent-pool/import/commit?${q}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ import_id: preview.import_id }),
@@ -100,7 +104,7 @@ export default function RecruiterTalentPoolImportClient() {
     } finally {
       setLoading(false);
     }
-  }, [preview, token, companySlug]);
+  }, [preview, token, companySlug, fetchAbortable]);
 
   return (
     <Shell wide data-testid={RECRUITER_TALENT_POOL_MARKERS.importPage}>
@@ -144,6 +148,8 @@ export default function RecruiterTalentPoolImportClient() {
       </Card>
 
       {preview ? (
+        <div ref={previewDeferred.ref}>
+          {previewDeferred.shouldLoad ? (
         <Card variant="soft" className="mb-6 p-4" data-testid={RECRUITER_TALENT_POOL_MARKERS.previewPanel}>
           <h2 className="mb-2 text-sm font-semibold">{t("recruiterTalentPoolImport.previewTitle")}</h2>
           <p className="twin-muted mb-3 text-xs">
@@ -174,6 +180,10 @@ export default function RecruiterTalentPoolImportClient() {
             </button>
           ) : null}
         </Card>
+          ) : (
+            <div className="mb-6 h-32 animate-pulse rounded-xl border border-[var(--twin-border)]/60 bg-[var(--twin-surface-soft)]/40" />
+          )}
+        </div>
       ) : null}
 
       {commitResult ? (
