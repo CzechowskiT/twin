@@ -67,6 +67,8 @@ test("8 package registers production stuck-route regression tests", () => {
   const pkg = read("package.json");
   assert.match(pkg, /test:p0-production-stuck-route-regression/);
   assert.match(pkg, /test:prod-recruiter-multitab-stuck-routes/);
+  assert.match(pkg, /test:prod-recruiter-sequential-behavioral-smoke/);
+  assert.match(pkg, /test:prod-recruiter-controlled-multitab-smoke/);
 });
 
 test("10 e2e multitab specs use withFreshContext browser lifecycle helper", () => {
@@ -83,6 +85,27 @@ test("10 e2e multitab specs use withFreshContext browser lifecycle helper", () =
   assert.match(pwConfig, /globalTeardown/);
   assert.match(teardown, /chrome-headless-shell/);
   assert.match(teardown, /ms-playwright/);
+});
+
+test("11 sequential behavioral smoke uses withFreshContext and single worker", () => {
+  const sequential = read("e2e/prod-recruiter-sequential-behavioral-smoke.spec.ts");
+  const pkg = read("package.json");
+  assert.match(sequential, /withFreshContext/);
+  assert.match(sequential, /RECRUITER_ROUTES/);
+  assert.match(sequential, /Performance\.getMetrics/);
+  assert.match(pkg, /test:prod-recruiter-sequential-behavioral-smoke:raw/);
+  assert.match(pkg, /PLAYWRIGHT_ALLOW_PROD_SMOKE/);
+});
+
+test("12 controlled multitab smoke uses withFreshContext and single worker", () => {
+  const controlled = read("e2e/prod-recruiter-controlled-multitab-smoke.spec.ts");
+  const pkg = read("package.json");
+  assert.match(controlled, /withFreshContext/);
+  assert.match(controlled, /CHECKPOINTS_MS/);
+  assert.match(controlled, /staggerDelayMs/);
+  assert.match(controlled, /Performance\.getMetrics/);
+  assert.match(pkg, /test:prod-recruiter-controlled-multitab-smoke:raw/);
+  assert.match(pkg, /--workers=1/);
 });
 
 test("9 workspace route layout wires gate + lightweight shell", () => {
