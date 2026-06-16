@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 
 import { useTranslation } from "@/components/language-provider";
+import { usePageVisibility } from "@/hooks/use-page-visibility";
+import { useReducedMotionPreference } from "@/hooks/use-reduced-motion-preference";
 import { SafeCompanyLogo } from "@/components/marketing/safe-company-logo";
 import type { TranslationKey } from "@/lib/i18n";
 import { brandLogoUrls, type Brand } from "@/lib/brand-logo-urls";
@@ -116,18 +118,6 @@ const MARK_BOX_CLASS = "h-9 w-[6.75rem] sm:h-10 sm:w-[7.5rem]";
 const MARK_PLATE_CLASS =
   "border border-zinc-200/90 bg-white shadow-sm ring-1 ring-zinc-950/[0.04] dark:border-zinc-500/40 dark:bg-zinc-100 dark:ring-white/10";
 
-function usePrefersReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const onChange = () => setReduced(mq.matches);
-    onChange();
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
-  return reduced;
-}
-
 function BrandMark({
   brand,
   linkSuffix,
@@ -194,10 +184,12 @@ function LogoRow({
 
 /** Infinite marquee — duplicated strip; decorative marks only (no outbound hrefs). */
 export function CompanyLogoMarquee() {
-  const reducedMotion = usePrefersReducedMotion();
+  const reducedMotion = useReducedMotionPreference();
+  const { hidden } = usePageVisibility();
   const linkSuffixKey: TranslationKey = "site.marqueeBrandLinkSuffix";
+  const staticMarquee = reducedMotion || hidden;
 
-  if (reducedMotion) {
+  if (staticMarquee) {
     return (
       <div
         className="company-logo-marquee shrink-0 border-y border-[var(--twin-border)] bg-[var(--twin-surface)]/90 py-3.5 backdrop-blur-[2px] sm:py-4"

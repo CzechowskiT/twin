@@ -143,8 +143,9 @@ curl -sS -o /dev/null -w "%{http_code}\n" https://twin-sooty.vercel.app/api/publ
 | `/api/public-health` | 200, `db_ok: true` |
 | `/recruiter/calendar` | 200, NOT LIVE copy |
 | `/dashboard` | 200 (auth redirect OK) |
+| Multi-tab (8–12 tabs) | Background tabs: logo marquee paused, CPU drops; `test:multi-tab-performance-hardening` green — see `docs/MULTI_TAB_PERFORMANCE_HARDENING_2026-06-16.md` |
 
-**Score §7:** ___ / 6
+**Score §7:** ___ / 8
 
 ---
 
@@ -159,8 +160,8 @@ curl -sS -o /dev/null -w "%{http_code}\n" https://twin-sooty.vercel.app/api/publ
 | §4 Decision console | 6 | ___ |
 | §5 Trust language | 6 | ___ |
 | §6 Empty states | 6 | ___ |
-| §7 Smoke | 6 | ___ |
-| **Total (§1–7)** | **42 max → normalize to 18** | ___ / 42 → ___ / 18 |
+| §7 Smoke | 8 | ___ |
+| **Total (§1–7)** | **44 max → normalize to 18** | ___ / 44 → ___ / 18 |
 
 **Pass:** Total ≥ 14/18 and §0 all 2s.
 

@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
+import { useAbortableFetch } from "@/hooks/use-abortable-fetch";
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
 import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspace-nav";
 import { TalentRadarCandidateGroups } from "@/components/recruiter/talent-radar/talent-radar-candidate-groups";
@@ -76,6 +77,7 @@ type DraftModalState = {
 
 export default function RecruiterTalentRadarClient() {
   const { t, locale } = useTranslation();
+  const { fetch: fetchAbortable } = useAbortableFetch();
   const searchParams = useSearchParams();
   const [token, setToken] = useState("");
   const [companyRaw, setCompanyRaw] = useState("");
@@ -202,7 +204,7 @@ export default function RecruiterTalentRadarClient() {
     setCompanyRaw(slug);
     try {
       const q = talentRadarQueryParams(tkn, slug, filters);
-      const res = await fetch(`/api/recruiter/talent-radar?${q}`, {
+      const res = await fetchAbortable(`/api/recruiter/talent-radar?${q}`, {
         cache: "no-store",
         headers: { "X-Locale": getClientApiLocale() ?? "en" },
       });
@@ -220,14 +222,15 @@ export default function RecruiterTalentRadarClient() {
       setDisclaimer(data.disclaimer ?? t("recruiterTalentRadar.disclaimer"));
       setWarnings(data.data_quality_warnings ?? []);
       setLoaded(true);
-    } catch {
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
       setLoadError(t("recruiterInbox.errorNetwork"));
       setRows([]);
       setLoaded(false);
     } finally {
       setLoading(false);
     }
-  }, [token, companySlug, filters, t]);
+  }, [token, companySlug, filters, t, fetchAbortable]);
 
   useEffect(() => {
     if (!hydrated || autoLoadDone.current) return;

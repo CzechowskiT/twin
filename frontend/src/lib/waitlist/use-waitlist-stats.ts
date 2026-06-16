@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { useBackgroundAwareInterval } from "@/hooks/use-background-aware-interval";
 import { betaFetchLeaderboard, betaFetchStats, type BetaLeaderboardEntry, type BetaStats } from "@/lib/beta-api";
 import { WAITLIST_LEADERBOARD_REWARD_EN } from "@/lib/waitlist/leaderboard-reward";
 
@@ -35,12 +36,23 @@ export function useWaitlistStats() {
       }
     };
     void load();
-    const id = window.setInterval(() => void load(), 8000);
     return () => {
       alive = false;
-      window.clearInterval(id);
     };
   }, []);
+
+  useBackgroundAwareInterval(() => {
+    void (async () => {
+      try {
+        const [s, lb] = await Promise.all([betaFetchStats(), betaFetchLeaderboard(10)]);
+        setStats(s);
+        if (lb.length > 0) setLeaderboard(lb);
+        setError(null);
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : "Stats unavailable");
+      }
+    })();
+  }, 8000);
 
   const spotsRemaining = stats?.spots_left ?? 347;
   const signupsToday = stats?.signups_today ?? 23;

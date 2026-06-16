@@ -8,6 +8,7 @@ import { CookieConsentProvider } from "@/components/cookie-consent-provider";
 import { DocumentTitleSync } from "@/components/document-title-sync";
 import { LanguageProvider } from "@/components/language-provider";
 import { MarketingSurfaceSync } from "@/components/marketing-surface-sync";
+import { PageVisibilitySync } from "@/components/page-visibility-sync";
 import { PersonaRouteGuard } from "@/components/persona-route-guard";
 import { PersonaProvider } from "@/components/persona-provider";
 import { Toaster } from "react-hot-toast";
@@ -17,6 +18,7 @@ export function Providers({ children }: { children: ReactNode }) {
     <LanguageProvider>
       <CookieConsentProvider>
         <PersonaProvider>
+          <PageVisibilitySync />
           <PersonaRouteGuard />
           <DocumentTitleSync />
           <MarketingSurfaceSync />

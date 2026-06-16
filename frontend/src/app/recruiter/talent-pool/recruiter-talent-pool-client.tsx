@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
 import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspace-nav";
 import { useTranslation } from "@/components/language-provider";
+import { useAbortableFetch } from "@/hooks/use-abortable-fetch";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
 import {
@@ -24,6 +25,7 @@ import {
 
 export default function RecruiterTalentPoolClient() {
   const { t } = useTranslation();
+  const { fetch: fetchAbortable } = useAbortableFetch();
   const [token, setToken] = useState("");
   const [companyRaw, setCompanyRaw] = useState("");
   const [payload, setPayload] = useState<TalentPoolPayload | null>(null);
@@ -55,13 +57,13 @@ export default function RecruiterTalentPoolClient() {
     setLoading(true);
     try {
       const q = recruiterInboxQuery(tkn, slug);
-      const res = await fetch(`/api/recruiter/talent-pool?${q}`);
+      const res = await fetchAbortable(`/api/recruiter/talent-pool?${q}`);
       if (res.ok) setPayload((await res.json()) as TalentPoolPayload);
       else setPayload(null);
     } finally {
       setLoading(false);
     }
-  }, [token, companySlug]);
+  }, [token, companySlug, fetchAbortable]);
 
   return (
     <Shell wide data-testid={RECRUITER_TALENT_POOL_MARKERS.page}>

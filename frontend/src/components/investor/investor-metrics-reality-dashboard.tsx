@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
+import { fetchPublicHealthJson } from "@/lib/public-health-client";
 import {
   CONTROLLED_REVIEW_STATUS,
   formatGitCommitShort,
@@ -57,9 +58,8 @@ export function InvestorMetricsRealityDashboard() {
     let cancelled = false;
     void (async () => {
       try {
-        const res = await fetch("/api/public-health", { cache: "no-store" });
-        if (!res.ok) throw new Error(String(res.status));
-        if (!cancelled) setHealth((await res.json()) as PublicHealthSnapshot);
+        const data = await fetchPublicHealthJson<PublicHealthSnapshot>();
+        if (!cancelled) setHealth(data);
       } catch (e) {
         if (!cancelled) setErr(e instanceof Error ? e.message : "error");
       }
