@@ -20,6 +20,8 @@
 
 **Safe-lane merge (2026-06-12):** Persona workspace **navigation & premium UX** — module grids (candidate/recruiter/company/investor), `/recruiter` hub, integrations redirect, login OAuth polish · `docs/PERSONA_WORKSPACE_NAVIGATION_PREMIUM_UX_2026-06-12.md` · `test:persona-dashboard-navigation` + `test:workspace-premium-empty-states` + `test:auth-login-options-ux` · **does not change launch NO-GO**.
 
+**Safe-lane merge (2026-06-16):** **All-persona navigation P0** — candidate Oferty/Dopasowania/Profil i CV route aliases, logout → `/` + Demo · `docs/P0_ALL_PERSONA_NAVIGATION_ROUTE_AUDIT_2026-06-16.md` · `test:p0-all-persona-navigation-routes` + `test:p0-all-persona-navigation-browser` · **does not change launch NO-GO**.
+
 **Safe-lane merge (2026-06-11):** Recruiter inbox **premium card redesign** — decision rail, match score card, signal rows, review CTA · **does not change launch NO-GO**.
 
 **Safe-lane merge (2026-06-11):** Recruiter **candidate message drafts** — 4 templates, copy-to-clipboard, local contact phase after accept; no email send, no hidden PII · `docs/RECRUITER_CANDIDATE_MESSAGE_DRAFTS_MVP_2026-06-11.md` · **does not change launch NO-GO**.

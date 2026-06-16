@@ -60,6 +60,10 @@ PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app \
 
 Unchanged: public **NO-GO**, auto-apply **PAUSED**, no auth relaxation.
 
+## Related P0 (2026-06-16)
+
+- **`docs/P0_ALL_PERSONA_NAVIGATION_ROUTE_AUDIT_2026-06-16.md`** — all-persona module href audit, candidate Oferty/Dopasowania/Profil i CV aliases, logout → `/` with Demo on homepage.
+
 ## Related docs
 
 - `docs/P0_BROWSER_MEMORY_MULTITAB_PERFORMANCE_2026-06-16.md`
