@@ -1,15 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { CompanyTalentPoolNextAction } from "@/components/company/company-talent-pool-next-action";
 import { CompanyTalentPoolRadarCta } from "@/components/company/company-talent-pool-radar-cta";
-import { CompanyTalentPoolReadinessGuide } from "@/components/company/company-talent-pool-readiness-guide";
 import { CompanyTalentPoolWorkspaceSelector } from "@/components/company/company-talent-pool-workspace-selector";
 import { CompanyWorkspaceNav } from "@/components/company/company-workspace-nav";
 import { useTranslation } from "@/components/language-provider";
+import { useAbortableFetch } from "@/hooks/use-abortable-fetch";
 import type { TranslationKey } from "@/lib/i18n";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
@@ -40,6 +41,14 @@ import {
   recruiterInboxErrorMessageKey,
   type RecruiterInboxErrorMessageKey,
 } from "@/lib/recruiter-inbox-errors";
+
+const CompanyTalentPoolReadinessGuide = dynamic(
+  () =>
+    import("@/components/company/company-talent-pool-readiness-guide").then(
+      (m) => m.CompanyTalentPoolReadinessGuide,
+    ),
+  { ssr: false },
+);
 
 const EXEC_SUMMARY_KEYS = [
   "knownCandidates",
@@ -178,6 +187,7 @@ function sourceValue(
 
 export default function CompanyTalentPoolClient() {
   const { t, locale } = useTranslation();
+  const { fetch: fetchAbortable } = useAbortableFetch();
   const searchParams = useSearchParams();
   const invite = useMemo(() => parseRecruiterInviteSearchParams(searchParams), [searchParams]);
   const demoEnv = readRecruiterInboxDemoEnv();
@@ -213,7 +223,7 @@ export default function CompanyTalentPoolClient() {
     setErrorKey(null);
     try {
       const q = recruiterInboxQuery(token.trim(), slug);
-      const res = await fetch(`/api/company/talent-pool?${q}`, {
+      const res = await fetchAbortable(`/api/company/talent-pool?${q}`, {
         headers: { "X-Locale": getClientApiLocale() ?? "en" },
         cache: "no-store",
       });
@@ -225,13 +235,14 @@ export default function CompanyTalentPoolClient() {
       }
       setPayload((await res.json()) as CompanyTalentPoolPayload);
     } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
       const msg = err instanceof Error ? err.message : String(err);
       setErrorKey(isLikelyBrowserNetworkFailureMessage(msg) ? "errorNetwork" : "loadFailed");
       setPayload(null);
     } finally {
       setLoading(false);
     }
-  }, [companyRaw, knownSlugs, token]);
+  }, [companyRaw, knownSlugs, token, fetchAbortable]);
 
   useEffect(() => {
     if (!invite.token && !invite.companySlug) return;
@@ -246,6 +257,8 @@ export default function CompanyTalentPoolClient() {
     () => (payload ? resolveCompanyTalentPoolNextBestAction(payload) : null),
     [payload],
   );
+  const roleSkillCoverage = useMemo(() => payload?.role_skill_coverage ?? null, [payload]);
+  const readinessSnapshot = useMemo(() => payload?.readiness ?? null, [payload]);
 
   return (
     <Shell wide data-testid={COMPANY_TALENT_POOL_MARKERS.page}>
@@ -374,7 +387,7 @@ export default function CompanyTalentPoolClient() {
                   {t("companyTalentPool.topRolesTitle")}
                 </p>
                 <ul className="mt-2 space-y-1 text-sm">
-                  {payload.role_skill_coverage.top_roles.map((role) => (
+                  {roleSkillCoverage?.top_roles.map((role) => (
                     <li key={role.title} className="flex justify-between border-b border-[var(--twin-border)]/40 py-1">
                       <span>{role.title}</span>
                       <span className="twin-muted tabular-nums">{fmt(role.count)}</span>
@@ -387,7 +400,7 @@ export default function CompanyTalentPoolClient() {
                   {t("companyTalentPool.skillCoverageTitle")}
                 </p>
                 <ul className="mt-2 flex flex-wrap gap-2">
-                  {payload.role_skill_coverage.top_skills.map((skill) => (
+                  {roleSkillCoverage?.top_skills.map((skill) => (
                     <span
                       key={skill.skill}
                       className="rounded-full border border-[var(--twin-border)] bg-[var(--twin-surface-soft)] px-2 py-0.5 text-xs"
@@ -398,13 +411,13 @@ export default function CompanyTalentPoolClient() {
                 </ul>
               </div>
             </div>
-            {payload.role_skill_coverage.weak_coverage.length > 0 ? (
+            {(roleSkillCoverage?.weak_coverage.length ?? 0) > 0 ? (
               <div className="mt-4">
                 <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
                   {t("companyTalentPool.weakCoverageTitle")}
                 </p>
                 <ul className="mt-2 space-y-2 text-sm">
-                  {payload.role_skill_coverage.weak_coverage.map((row) => (
+                  {roleSkillCoverage?.weak_coverage.map((row) => (
                     <li key={row.role_title} className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3">
                       <div className="flex flex-wrap items-baseline justify-between gap-2">
                         <span className="font-medium">{row.role_title}</span>
@@ -432,9 +445,9 @@ export default function CompanyTalentPoolClient() {
                 </ul>
               </div>
             ) : null}
-            {payload.role_skill_coverage.suggested_actions.length > 0 ? (
+            {(roleSkillCoverage?.suggested_actions.length ?? 0) > 0 ? (
               <ul className="mt-4 flex flex-wrap gap-3 text-sm">
-                {payload.role_skill_coverage.suggested_actions.map((action) => (
+                {roleSkillCoverage?.suggested_actions.map((action) => (
                   <li key={action.code}>
                     <Link href={action.href} className="twin-link font-medium">
                       {action.code === "ask_recruiter_review"
@@ -461,13 +474,13 @@ export default function CompanyTalentPoolClient() {
                     key={state}
                     className="rounded-full border border-[var(--twin-border)] bg-[var(--twin-surface-soft)] px-2 py-0.5 text-xs"
                   >
-                    {t(READINESS_LABEL_KEYS[state])}: {fmt(payload.readiness.counts[state] ?? 0)}
+                    {t(READINESS_LABEL_KEYS[state])}: {fmt(readinessSnapshot?.counts[state] ?? 0)}
                   </span>
                 ))}
               </div>
-              {payload.readiness.candidates.length > 0 ? (
+              {(readinessSnapshot?.candidates.length ?? 0) > 0 ? (
                 <ul className="mt-4 divide-y divide-[var(--twin-border)]/60">
-                  {payload.readiness.candidates.map((candidate) => (
+                  {readinessSnapshot?.candidates.map((candidate) => (
                     <li key={candidate.id} className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm">
                       <div>
                         <p className="font-medium">{candidate.display_name}</p>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
+import { useAbortableFetch } from "@/hooks/use-abortable-fetch";
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
 import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspace-nav";
 import { TalentRadarDigestCopyButton } from "@/components/recruiter/talent-radar/talent-radar-digest-copy-button";
@@ -55,6 +56,7 @@ const EMPTY_SUMMARY = {
 
 export default function RecruiterTalentRadarDigestClient() {
   const { t } = useTranslation();
+  const { fetch: fetchAbortable } = useAbortableFetch();
   const [token, setToken] = useState("");
   const [companyRaw, setCompanyRaw] = useState("");
   const [period, setPeriod] = useState<TalentRadarDigestPeriod>("7d");
@@ -101,7 +103,7 @@ export default function RecruiterTalentRadarDigestClient() {
     setLoading(true);
     try {
       const q = talentRadarDigestQueryParams(tkn, slug, period);
-      const res = await fetch(`/api/recruiter/talent-radar/digest?${q}`, {
+      const res = await fetchAbortable(`/api/recruiter/talent-radar/digest?${q}`, {
         headers: { "X-Locale": getClientApiLocale() ?? "en" },
         cache: "no-store",
       });
@@ -115,19 +117,20 @@ export default function RecruiterTalentRadarDigestClient() {
       }
       setPayload((await res.json()) as TalentRadarDigestPayload);
       setLoaded(true);
-    } catch {
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
       setLoadError(t("recruiterInbox.errorNetwork"));
       setPayload(null);
     } finally {
       setLoading(false);
     }
-  }, [companySlug, period, t, token]);
+  }, [companySlug, period, t, token, fetchAbortable]);
 
-  const summary = payload?.summary ?? EMPTY_SUMMARY;
-  const sections = payload?.sections;
-  const sectionMeta = payload?.sectionMeta;
-  const hasContent = payload ? digestHasContent(payload) : false;
-  const warnings = payload?.dataQualityWarnings ?? [];
+  const summary = useMemo(() => payload?.summary ?? EMPTY_SUMMARY, [payload]);
+  const sections = useMemo(() => payload?.sections, [payload]);
+  const sectionMeta = useMemo(() => payload?.sectionMeta, [payload]);
+  const hasContent = useMemo(() => (payload ? digestHasContent(payload) : false), [payload]);
+  const warnings = useMemo(() => payload?.dataQualityWarnings ?? [], [payload]);
 
   return (
     <Shell wide>

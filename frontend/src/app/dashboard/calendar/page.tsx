@@ -13,6 +13,7 @@ import { CalendarConnectionsPanel } from "@/components/calendar/calendar-connect
 import { CalendarWeekView } from "@/components/calendar/calendar-week-view";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { useTranslation } from "@/components/language-provider";
+import { usePageVisibility } from "@/hooks/use-page-visibility";
 import { WorkspaceFlowSteps } from "@/components/ux/workspace-flow-steps";
 import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch, apiFetchBlob, isFetchTimeoutError, saveBlobAsFile } from "@/lib/api";
@@ -161,6 +162,7 @@ async function cancelInterviewRequest(interviewId: number): Promise<void> {
 
 export default function DashboardCalendarPage() {
   const { t, locale } = useTranslation();
+  const { hidden: pageHidden } = usePageVisibility();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -255,6 +257,7 @@ export default function DashboardCalendarPage() {
   );
 
   const scheduleDebouncedInterviewRefresh = useCallback(() => {
+      if (pageHidden) return;
       const token = getToken();
       if (!token) return;
       if (interviewRefreshTimerRef.current) {
@@ -267,7 +270,7 @@ export default function DashboardCalendarPage() {
         });
       }, 320);
     },
-    [fetchInterviewRows],
+    [fetchInterviewRows, pageHidden],
   );
 
   useEffect(

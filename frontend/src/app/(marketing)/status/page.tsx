@@ -7,6 +7,7 @@ import { useTranslation } from "@/components/language-provider";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { Card, Shell } from "@/components/ui";
+import { fetchPublicHealthJson } from "@/lib/public-health-client";
 
 type MvpStats = {
   validated_jobs: number;
@@ -52,13 +53,12 @@ export default function StatusPage() {
     let cancelled = false;
     void (async () => {
       try {
-        const [statsRes, healthRes] = await Promise.all([
+        const [statsRes, healthJson] = await Promise.all([
           fetch("/api/v1/public/mvp-stats", { cache: "no-store" }),
-          fetch("/api/public-health", { cache: "no-store" }),
+          fetchPublicHealthJson<HealthPayload>(),
         ]);
-        if (!statsRes.ok || !healthRes.ok) throw new Error("upstream");
+        if (!statsRes.ok) throw new Error("upstream");
         const statsJson = (await statsRes.json()) as MvpStats;
-        const healthJson = (await healthRes.json()) as HealthPayload;
         if (!cancelled) {
           setStats(statsJson);
           setHealth(healthJson);

@@ -1,7 +1,8 @@
-/**
- * OAuth button availability. Primary: `GET /api/v1/health?ops=1` (same-origin proxy).
- * Fallback: `GET /api/public-health` when health fetch fails but public-health confirms ops flags.
- */
+import { createRequestDeduper } from "@/lib/create-request-deduper";
+import { fetchPublicHealthJson } from "@/lib/public-health-client";
+
+const healthOpsDeduper = createRequestDeduper(30_000);
+
 export type OAuthProviderStatus = {
   linkedin: boolean;
   google: boolean;
@@ -115,13 +116,16 @@ export function buildOAuthProviderAvailabilities(
 }
 
 async function fetchHealthOpsFlags(path: string): Promise<HealthOpsOAuthFlags | null> {
+  const dedupeKey = `health-ops:${path}`;
   try {
-    const res = await fetch(path, {
-      cache: "no-store",
-      signal: AbortSignal.timeout(OAUTH_STATUS_FETCH_TIMEOUT_MS),
+    return await healthOpsDeduper(dedupeKey, async () => {
+      const res = await fetch(path, {
+        cache: "no-store",
+        signal: AbortSignal.timeout(OAUTH_STATUS_FETCH_TIMEOUT_MS),
+      });
+      if (!res.ok) return null;
+      return (await res.json()) as HealthOpsOAuthFlags;
     });
-    if (!res.ok) return null;
-    return (await res.json()) as HealthOpsOAuthFlags;
   } catch {
     return null;
   }
@@ -134,7 +138,7 @@ export async function fetchOAuthProviderStatus(): Promise<{
 }> {
   const [healthData, publicData] = await Promise.all([
     fetchHealthOpsFlags("/api/v1/health?ops=1"),
-    fetchHealthOpsFlags("/api/public-health"),
+    fetchPublicHealthJson<HealthOpsOAuthFlags>().catch(() => null),
   ]);
 
   const healthStatus = healthData ? parseHealthOpsOAuthFlags(healthData) : null;

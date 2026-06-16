@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 import { WaitlistBetaBanner } from "@/components/waitlist/waitlist-beta-banner";
+import { useBackgroundAwareInterval } from "@/hooks/use-background-aware-interval";
 import {
   BETA_REFERRAL_STORAGE_KEY,
   betaFetchStats,
@@ -59,12 +60,21 @@ function BetaLandingInner() {
         });
     };
     tick();
-    const id = window.setInterval(tick, 5000);
     return () => {
       alive = false;
-      window.clearInterval(id);
     };
   }, []);
+
+  useBackgroundAwareInterval(() => {
+    void betaFetchStats()
+      .then((s) => {
+        setStats(s);
+        setErr(null);
+      })
+      .catch((e: unknown) => {
+        setErr(e instanceof Error ? e.message : "Stats failed");
+      });
+  }, 5000);
 
   const tickerText = useMemo(() => {
     if (!stats?.recent?.length) return "Join the beta — your spot updates live.";

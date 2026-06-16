@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
+import { useBackgroundAwareInterval } from "@/hooks/use-background-aware-interval";
 import type { TranslationKey } from "@/lib/i18n";
 import { betaFetchStats, type BetaStats } from "@/lib/beta-api";
 
@@ -41,9 +42,9 @@ export function FoundersLaunchPage() {
     queueMicrotask(() => {
       void load();
     });
-    const id = window.setInterval(() => void load(), POLL_MS);
-    return () => window.clearInterval(id);
   }, [load]);
+
+  useBackgroundAwareInterval(() => void load(), POLL_MS);
 
   const shareUrl = useMemo(() => {
     if (typeof window === "undefined") return "/first-1000";

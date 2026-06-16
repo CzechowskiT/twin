@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { dashboardFetchUserMessage } from "@/components/dashboard/dashboard-helpers";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
+import { usePageVisibility } from "@/hooks/use-page-visibility";
 import type { TranslationKey } from "@/lib/i18n";
 import { persistJobFilters, type JobFilters } from "@/lib/jobs";
 
@@ -44,6 +45,7 @@ export function useDashboardPolling({
   setError,
   setFilters,
 }: UseDashboardPollingArgs) {
+  const { hidden } = usePageVisibility();
   const [scraping, setScraping] = useState(false);
   /** Background refresh after a queued scrape — button stays usable; feed updates on its own. */
   const [scrapePollActive, setScrapePollActive] = useState(false);
@@ -99,6 +101,10 @@ export function useDashboardPolling({
       if (cancelled || scrapePollCancelRef.current) {
         setScrapePollActive(false);
         scrapePollMetaRef.current = null;
+        return;
+      }
+      if (document.hidden) {
+        timer = setTimeout(() => void tick(), intervalMs * 4);
         return;
       }
       if (Date.now() - meta.startedAt > maxMs) {
@@ -167,7 +173,7 @@ export function useDashboardPolling({
       cancelled = true;
       if (timer) clearTimeout(timer);
     };
-  }, [scrapePollActive, refreshDashboardData, router, t]);
+  }, [scrapePollActive, refreshDashboardData, router, t, hidden]);
 
   const triggerScrapeAll = useCallback(
     async ({ hasProfile, filters, jobsTotal }: TriggerScrapeArgs) => {

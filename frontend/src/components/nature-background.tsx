@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 
+import { usePageVisibility } from "@/hooks/use-page-visibility";
+import { useReducedMotionPreference } from "@/hooks/use-reduced-motion-preference";
 import { NATURE_WALLPAPER_URLS } from "@/lib/nature-wallpapers";
 
 export type NatureVariant =
@@ -49,12 +51,12 @@ type NatureBackgroundProps = {
 export function NatureBackground({ variant }: NatureBackgroundProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const src = NATURE_WALLPAPER_URLS[variant];
+  const { hidden } = usePageVisibility();
+  const reducedMotion = useReducedMotionPreference();
 
   useEffect(() => {
     const el = rootRef.current;
-    if (!el) return;
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (mq.matches) return;
+    if (!el || hidden || reducedMotion) return;
 
     const onMove = (e: PointerEvent) => {
       const x = (e.clientX / Math.max(window.innerWidth, 1)) * 2 - 1;
@@ -65,7 +67,7 @@ export function NatureBackground({ variant }: NatureBackgroundProps) {
 
     window.addEventListener("pointermove", onMove, { passive: true });
     return () => window.removeEventListener("pointermove", onMove);
-  }, []);
+  }, [hidden, reducedMotion]);
 
   return (
     <div

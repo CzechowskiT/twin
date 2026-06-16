@@ -2234,6 +2234,31 @@ html[data-marketing-surface="studio"] a.marketing-hero-btn-signin:hover {
   -webkit-backface-visibility: hidden;
 }
 
+/** Multi-tab hardening — pause GPU-heavy chrome when tab is hidden or motion reduced. */
+html[data-page-hidden="true"] .marketing-marquee-track,
+html[data-reduced-motion="true"] .marketing-marquee-track {
+  animation-play-state: paused !important;
+}
+
+html[data-page-hidden="true"] .company-logo-marquee,
+html[data-page-hidden="true"] .site-top-marquee-band {
+  backdrop-filter: none;
+}
+
+html[data-page-hidden="true"] .landing-ambient,
+html[data-page-hidden="true"] .landing-ambient__mesh,
+html[data-page-hidden="true"] .landing-ambient__orb,
+html[data-reduced-motion="true"] .landing-ambient,
+html[data-reduced-motion="true"] .landing-ambient__mesh,
+html[data-reduced-motion="true"] .landing-ambient__orb {
+  animation-play-state: paused !important;
+}
+
+html[data-page-hidden="true"] .twin-nature-wallpaper-img {
+  transition: none;
+  transform: scale(1.08);
+}
+
 .marketing-marquee-segment {
   flex: 0 0 auto;
 }
