@@ -203,6 +203,7 @@ export const premiumEsOverlay: Record<string, unknown> = {
     "oauthMicrosoft": "Continuar con Microsoft",
     "oauthStatusLoading": "Comprobando disponibilidad de inicio de sesión…",
     "oauthDisabledReason": "No configurado en este despliegue",
+    "oauthRefreshFailed": "No se pudieron actualizar las opciones de inicio de sesión. El acceso por correo electrónico sigue funcionando.",
     "oauthUnavailable": "Aún no disponible en este sitio",
     "orContinue": "o continuar con",
     "password": "Contraseña",

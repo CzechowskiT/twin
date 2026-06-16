@@ -203,6 +203,7 @@ export const premiumJaOverlay: Record<string, unknown> = {
     "oauthMicrosoft": "Microsoft に進む",
     "oauthStatusLoading": "サインインの利用可否を確認しています…",
     "oauthDisabledReason": "このデプロイでは未設定です",
+    "oauthRefreshFailed": "サインインオプションを更新できませんでした。メールでのログインは引き続き利用できます。",
     "oauthUnavailable": "このサイトではまだ利用できません",
     "orContinue": "または続行してください",
     "password": "パスワード",

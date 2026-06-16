@@ -49,6 +49,7 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
     status: oauthStatus,
     availabilities: oauthAvailabilities,
     loaded: oauthStatusLoaded,
+    configFetchFailed,
   } = useOAuthProviderStatus();
 
   const safeNext = useMemo(() => {
@@ -302,19 +303,23 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
         <p className="twin-muted mb-2 text-center text-xs" aria-live="polite">
           {t("login.oauthStatusLoading")}
         </p>
-      ) : (
-        <OAuthWebButtons
-          availabilities={oauthAvailabilities}
-          unavailableLabel={t("login.oauthUnavailable")}
-          disabledReasonLabel={t("login.oauthDisabledReason")}
-          loadingLabel={t("login.oauthStatusLoading")}
-          labels={{
-            google: t("login.oauthGoogle"),
-            github: t("login.oauthGithub"),
-            microsoft: t("login.oauthMicrosoft"),
-          }}
-        />
-      )}
+      ) : configFetchFailed ? (
+        <p className="mb-2 text-center text-xs text-amber-700" role="status">
+          {t("login.oauthRefreshFailed")}
+        </p>
+      ) : null}
+      <OAuthWebButtons
+        availabilities={oauthAvailabilities}
+        unavailableLabel={t("login.oauthUnavailable")}
+        disabledReasonLabel={t("login.oauthDisabledReason")}
+        refreshFailedLabel={t("login.oauthRefreshFailed")}
+        loadingLabel={t("login.oauthStatusLoading")}
+        labels={{
+          google: t("login.oauthGoogle"),
+          github: t("login.oauthGithub"),
+          microsoft: t("login.oauthMicrosoft"),
+        }}
+      />
       <LinkedInLoginButton label={t("register.linkedIn")} />
       <p className="twin-muted mt-4 text-center text-sm">
         {t("register.hasAccount")}{" "}

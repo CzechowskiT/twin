@@ -63,7 +63,7 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
     return null;
   }, [searchParams, t]);
 
-  const { status: oauthStatus, availabilities: oauthAvailabilities, loaded: oauthStatusLoaded } =
+  const { status: oauthStatus, availabilities: oauthAvailabilities, loaded: oauthStatusLoaded, configFetchFailed } =
     useOAuthProviderStatus();
   const anyOAuthConfigured = hasConfiguredOAuthProvider(oauthStatus);
   const [userAltLoginExpanded, setUserAltLoginExpanded] = useState<boolean | null>(null);
@@ -194,19 +194,23 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
             <p className="twin-muted mb-2 text-center text-xs" aria-live="polite">
               {t("login.oauthStatusLoading")}
             </p>
-          ) : (
-            <OAuthWebButtons
-              availabilities={oauthAvailabilities}
-              unavailableLabel={t("login.oauthUnavailable")}
-              disabledReasonLabel={t("login.oauthDisabledReason")}
-              loadingLabel={t("login.oauthStatusLoading")}
-              labels={{
-                google: t("login.oauthGoogle"),
-                github: t("login.oauthGithub"),
-                microsoft: t("login.oauthMicrosoft"),
-              }}
-            />
-          )}
+          ) : configFetchFailed ? (
+            <p className="mb-2 text-center text-xs text-amber-700" role="status">
+              {t("login.oauthRefreshFailed")}
+            </p>
+          ) : null}
+          <OAuthWebButtons
+            availabilities={oauthAvailabilities}
+            unavailableLabel={t("login.oauthUnavailable")}
+            disabledReasonLabel={t("login.oauthDisabledReason")}
+            refreshFailedLabel={t("login.oauthRefreshFailed")}
+            loadingLabel={t("login.oauthStatusLoading")}
+            labels={{
+              google: t("login.oauthGoogle"),
+              github: t("login.oauthGithub"),
+              microsoft: t("login.oauthMicrosoft"),
+            }}
+          />
           {oauthStatusLoaded && !anyOAuthConfigured ? (
             <button
               type="button"

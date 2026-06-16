@@ -203,6 +203,7 @@ export const premiumDeOverlay: Record<string, unknown> = {
     "oauthMicrosoft": "Weiter mit Microsoft",
     "oauthStatusLoading": "Wir prüfen die Anmeldeverfügbarkeit…",
     "oauthDisabledReason": "In dieser Bereitstellung nicht konfiguriert",
+    "oauthRefreshFailed": "Anmeldeoptionen konnten nicht aktualisiert werden. Die Anmeldung per E-Mail funktioniert weiterhin.",
     "oauthUnavailable": "Noch nicht auf dieser Website verfügbar",
     "orContinue": "oder weitermachen",
     "password": "Passwort",
