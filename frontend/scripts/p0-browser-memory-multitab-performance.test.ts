@@ -48,8 +48,9 @@ test("2 LightweightRouteShell paints without blocking hidden tabs", () => {
   assert.match(src, /4_000/);
 });
 
-test("3 CompanyLogoMarquee scrolls on all routes with perf guards", () => {
+test("3 route-aware marquee: safe strip on workspace/auth, full on marketing", () => {
   const marquee = read("src/components/marketing/company-logo-marquee.tsx");
+  const safe = read("src/components/marketing/performance-safe-moving-logo-marquee.tsx");
   const siteTop = read("src/components/site-top-marquee.tsx");
   assert.match(marquee, /export function CompanyLogoMarquee/);
   assert.match(marquee, /MARQUEE_SEGMENTS/);
@@ -59,10 +60,14 @@ test("3 CompanyLogoMarquee scrolls on all routes with perf guards", () => {
   assert.match(marquee, /staticMarquee/);
   assert.doesNotMatch(marquee, /will-change/);
   assert.doesNotMatch(marquee, /backdrop-blur/);
+  assert.match(safe, /export function PerformanceSafeMovingLogoMarquee/);
+  assert.match(safe, /performance-safe-marquee-track/);
+  assert.match(safe, /usePageVisibility/);
+  assert.match(safe, /useReducedMotionPreference/);
+  assert.match(siteTop, /isPerformanceLightChromePath/);
+  assert.match(siteTop, /PerformanceSafeMovingLogoMarquee/);
   assert.match(siteTop, /CompanyLogoMarquee/);
   assert.match(siteTop, /dynamic\(/);
-  assert.doesNotMatch(siteTop, /PerformanceSafeBrandStrip/);
-  assert.doesNotMatch(siteTop, /isPerformanceLightChromePath/);
 });
 
 test("4 workspace route classification and html data attribute sync", () => {
@@ -89,11 +94,13 @@ test("5 globals pause marquee when hidden and strip workspace blur", () => {
   const css = read("src/app/globals.css");
   assert.match(css, /html\[data-workspace-route="true"\]/);
   assert.match(css, /company-logo-marquee/);
+  assert.match(css, /performance-safe-logo-marquee/);
   assert.match(css, /site-top-marquee-band/);
   assert.match(css, /backdrop-filter: none/);
   assert.doesNotMatch(css, /html\[data-workspace-route="true"\][\s\S]{0,400}\.marketing-marquee-track[\s\S]{0,120}animation: none/);
   assert.match(css, /html\[data-page-hidden="true"\]/);
   assert.match(css, /marketing-marquee-track/);
+  assert.match(css, /performance-safe-marquee-track/);
   assert.match(css, /animation-play-state: paused/);
   assert.match(css, /twin-studio-ambient/);
   assert.match(css, /landing-ambient__mesh/);

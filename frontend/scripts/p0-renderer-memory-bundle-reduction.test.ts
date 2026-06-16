@@ -45,15 +45,18 @@ test("2 workspace/auth headers avoid marketing SiteHeaderBar corporate nav array
   assert.match(marketingBar, /headerMarketingLaneLinks/);
 });
 
-test("3 full logo marquee lazy-loaded on all routes", () => {
+test("3 workspace/auth use safe marquee; marketing lazy-loads full strip", () => {
   const marquee = read("src/components/site-top-marquee.tsx");
+  const safe = read("src/components/marketing/performance-safe-moving-logo-marquee.tsx");
   const component = read("src/components/marketing/company-logo-marquee.tsx");
+  assert.match(marquee, /isPerformanceLightChromePath/);
+  assert.match(marquee, /PerformanceSafeMovingLogoMarquee/);
   assert.match(marquee, /dynamic\(/);
   assert.match(marquee, /company-logo-marquee/);
   assert.match(marquee, /CompanyLogoMarquee/);
-  assert.doesNotMatch(marquee, /PerformanceSafeBrandStrip/);
-  assert.doesNotMatch(marquee, /isPerformanceLightChromePath/);
   assert.doesNotMatch(marquee, /import \{ CompanyLogoMarquee \}/);
+  assert.match(safe, /performance-safe-marquee-track/);
+  assert.match(safe, /PERFORMANCE_SAFE_MARQUEE_BRANDS/);
   assert.match(component, /MARQUEE_SEGMENTS/);
   assert.match(component, /marketing-marquee-track/);
   const brandCount = (component.match(/\{ slug:/g) ?? []).length;
@@ -162,15 +165,17 @@ test("11 workspace CSS strips backdrop blur on data-workspace-route", () => {
   const sync = read("src/components/workspace-route-sync.tsx");
   assert.match(css, /html\[data-workspace-route="true"\]/);
   assert.match(css, /company-logo-marquee/);
+  assert.match(css, /performance-safe-logo-marquee/);
   assert.match(css, /backdrop-filter: none/);
   assert.doesNotMatch(css, /html\[data-workspace-route="true"\][\s\S]{0,400}\.marketing-marquee-track[\s\S]{0,120}animation: none/);
   assert.match(sync, /data-workspace-route/);
   assert.match(read("src/components/route-aware-background.tsx"), /return null/);
 });
 
-test("12 package registers renderer memory bundle reduction test", () => {
+test("12 package registers renderer memory and safe marquee tests", () => {
   const pkg = read("package.json");
   assert.match(pkg, /test:p0-renderer-memory-bundle-reduction/);
   assert.match(pkg, /p0-renderer-memory-bundle-reduction\.test\.ts/);
   assert.match(pkg, /test:p0-browser-memory-multitab-performance/);
+  assert.match(pkg, /test:performance-safe-moving-logo-marquee/);
 });

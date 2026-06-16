@@ -47,6 +47,7 @@
     "test:p0-production-stuck-route-regression": "npx --yes tsx scripts/p0-production-stuck-route-regression.test.ts",
     "test:prod-recruiter-multitab-stuck-routes": "echo 'DISABLED 2026-06-16: Playwright multitab e2e caused chrome-headless-shell CPU storm. Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 to run.' && exit 1",
     "test:p0-renderer-memory-bundle-reduction": "npx --yes tsx scripts/p0-renderer-memory-bundle-reduction.test.ts",
+    "test:performance-safe-moving-logo-marquee": "npx --yes tsx scripts/performance-safe-moving-logo-marquee.test.ts",
     "test:company-billing-readiness-mvp": "npx --yes tsx scripts/company-billing-readiness-mvp.test.ts",
     "test:company-billing-plan-usage-readiness": "npx --yes tsx scripts/company-billing-plan-usage-readiness.test.ts",
     "test:candidate-transparency": "npx --yes tsx scripts/candidate-transparency.test.ts",

@@ -43,7 +43,7 @@
 | Source | Mechanism | Fix |
 | ------ | --------- | --- |
 | Global chrome JS | `SiteChrome` → `Header` imported marketing + workspace headers + static marquee | `ChromeHeader` route split; dynamic `CompanyLogoMarquee` + `MarketingHeader` |
-| Brand GPU layers | 89 logos × 2 segments, `will-change`, `backdrop-blur` | `PerformanceSafeBrandStrip` (6 static logos) on workspace/auth |
+| Brand GPU layers | 89 logos × 2 segments, `will-change`, `backdrop-blur` | `PerformanceSafeMovingLogoMarquee` (≤18 DOM nodes) on workspace/auth — see `docs/PERFORMANCE_SAFE_MOVING_LOGO_MARQUEE_2026-06-16.md` |
 | Demo constants | `job-brief-demo-data.ts`, `job-employer-demo.ts` | `lazy-demo-data.ts`, `capDemoArray(10)`, dynamic import in panels |
 | Hydration trees | Talent pool/radar/digest/import below-fold | `useLoadWhenVisible` — summary first, details on intersect + tab visible |
 | Deduper leak | `createRequestDeduper` unbounded `Map` | `maxCacheEntries=64`, `evictStale`, `trimToMax` |
@@ -68,14 +68,15 @@ Dashboard, login, register layouts are Server Components; client shells hold `Li
 
 ### C. Dynamic import heavy surfaces
 
-- `CompanyLogoMarquee` — `site-top-marquee.tsx`
+- `CompanyLogoMarquee` — `site-top-marquee.tsx` (marketing routes only, `next/dynamic`)
+- `PerformanceSafeMovingLogoMarquee` — `site-top-marquee.tsx` (workspace/auth, compact subset)
 - `MarketingHeader` — `chrome-header.tsx`
 - `TwinRoiCalculator` — `calculator-b2b-client.tsx`
 - Investor room, dashboard modals, radar modals — retained from prior slice
 
 ### D. Cap brand / demo arrays
 
-- Workspace strip: **6** logos (`LIGHT_BRANDS`)
+- Workspace/auth marquee: **9** brands × **2** segments = **18** DOM nodes max (`marquee-brand-subset.ts`)
 - Demo arrays: **`DEMO_ARRAY_CAP = 10`** (`lazy-demo-data.ts`)
 - Roles tab similar roles: `capDemoArray(..., 8)`
 
@@ -96,6 +97,7 @@ Dashboard, login, register layouts are Server Components; client shells hold `Li
 ```bash
 cd frontend
 npm run test:p0-renderer-memory-bundle-reduction   # 12 assertions
+npm run test:performance-safe-moving-logo-marquee  # 12 assertions
 npm run test:p0-browser-memory-multitab-performance  # 15 assertions
 npm run test:workspace-deeplink-new-tab            # 10 static + Playwright deeplink
 npm run test:workspace-multitab-browser-smoke      # 8 Playwright, 12 concurrent routes
@@ -110,8 +112,8 @@ npx tsc --noEmit
 
 1. Open 8–12 tabs: `/dashboard`, `/recruiter/talent-radar`, `/company/talent-pool`, `/login/candidate`, `/status`, `/investor`.
 2. Background all but one — renderer memory should stabilize below prior ~5 GB/tab baseline.
-3. Workspace tabs: 6-logo static strip (not animated marquee).
-4. DevTools → Network: initial workspace load should not fetch `company-logo-marquee` chunk until marketing route visited.
+3. Workspace tabs: moving safe marquee (≤18 DOM nodes), not full 89-brand strip.
+4. DevTools → Network: workspace/auth load should not fetch `company-logo-marquee` chunk.
 
 ## Launch stance
 
@@ -119,6 +121,7 @@ Unchanged: public **NO-GO**, auto-apply **PAUSED**, no auth relaxation.
 
 ## Related docs
 
+- `docs/PERFORMANCE_SAFE_MOVING_LOGO_MARQUEE_2026-06-16.md`
 - `docs/P0_BROWSER_MEMORY_MULTITAB_PERFORMANCE_2026-06-16.md`
 - `docs/P0_WORKSPACE_DEEPLINK_MULTITAB_2026-06-16.md`
 - `docs/MULTI_TAB_PERFORMANCE_HARDENING_2026-06-16.md`
