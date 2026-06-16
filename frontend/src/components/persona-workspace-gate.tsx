@@ -70,6 +70,7 @@ export function PersonaWorkspaceGate({
   const hasToken = getToken();
   const effectivePersona = resolveEffectiveSessionPersona(pathname, persona);
   const authDestinationRef = useRef<string | null>(null);
+  const personaRedirectedRef = useRef(false);
   const loginWithNext = useMemo(() => {
     const destination = lockAuthRedirectDestination(
       authDestinationRef,
@@ -81,14 +82,13 @@ export function PersonaWorkspaceGate({
   }, [loginPath, pathname]);
 
   useEffect(() => {
-    if (!hasToken) {
-      router.replace(loginWithNext);
-      return;
-    }
+    if (!hasToken) return;
     if (allowed.includes(effectivePersona)) return;
     if (isPathAllowedForPersona(pathname, effectivePersona)) return;
+    if (personaRedirectedRef.current) return;
+    personaRedirectedRef.current = true;
     router.replace(WORKSPACE_PATH[effectivePersona]);
-  }, [allowed, effectivePersona, hasToken, loginWithNext, pathname, router]);
+  }, [allowed, effectivePersona, hasToken, pathname, router]);
 
   if (!hasToken) {
     return (
