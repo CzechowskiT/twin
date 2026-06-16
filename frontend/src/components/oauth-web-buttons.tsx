@@ -23,6 +23,7 @@ type OAuthWebButtonsProps = {
   labels: Labels;
   unavailableLabel: string;
   disabledReasonLabel: string;
+  refreshFailedLabel: string;
   loadingLabel: string;
 };
 
@@ -40,6 +41,7 @@ export function OAuthWebButtons({
   labels,
   unavailableLabel,
   disabledReasonLabel,
+  refreshFailedLabel,
   loadingLabel,
 }: OAuthWebButtonsProps) {
   const byProvider = new Map(availabilities.map((row) => [row.provider, row]));
@@ -64,6 +66,7 @@ export function OAuthWebButtons({
             label={labels[provider]}
             unavailableLabel={unavailableLabel}
             disabledReasonLabel={disabledReasonLabel}
+            refreshFailedLabel={refreshFailedLabel}
             loadingLabel={loadingLabel}
             icon={<Icon />}
           />
@@ -84,6 +87,7 @@ function Row({
   label,
   unavailableLabel,
   disabledReasonLabel,
+  refreshFailedLabel,
   loadingLabel,
   icon,
 }: {
@@ -91,6 +95,7 @@ function Row({
   label: string;
   unavailableLabel: string;
   disabledReasonLabel: string;
+  refreshFailedLabel: string;
   loadingLabel: string;
   icon: ReactNode;
 }) {
@@ -118,7 +123,9 @@ function Row({
   const reasonText =
     disabledReason === "not_configured" || disabledReason === "provider_disabled"
       ? disabledReasonLabel
-      : unavailableLabel;
+      : disabledReason === "config_fetch_failed"
+        ? refreshFailedLabel
+        : unavailableLabel;
 
   return (
     <div className={ROW_DISABLED} aria-disabled="true" title={reasonText}>

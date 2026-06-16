@@ -203,6 +203,7 @@ export const premiumFrOverlay: Record<string, unknown> = {
     "oauthMicrosoft": "Continuez avec Microsoft",
     "oauthStatusLoading": "Vérification de la disponibilité de connexion…",
     "oauthDisabledReason": "Non configuré sur ce déploiement",
+    "oauthRefreshFailed": "Impossible d'actualiser les options de connexion. La connexion par e-mail fonctionne toujours.",
     "oauthUnavailable": "Pas encore disponible sur ce site",
     "orContinue": "ou continuez avec",
     "password": "Mot de passe",

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import {
+  DEFAULT_LOGIN_PROVIDERS,
   OAUTH_LOGIN_BUTTONS_INITIAL,
   type AuthProviderAvailability,
   type OAuthProviderStatus,
@@ -37,7 +38,9 @@ export function useOAuthProviderStatus(): OAuthProviderStatusState {
     };
   }, []);
 
-  const availabilities = buildOAuthProviderAvailabilities(status, loaded, configFetchFailed);
+  const availabilities: AuthProviderAvailability[] = loaded
+    ? buildOAuthProviderAvailabilities(status, loaded, configFetchFailed)
+    : DEFAULT_LOGIN_PROVIDERS;
 
   return { status, availabilities, loaded, configFetchFailed };
 }

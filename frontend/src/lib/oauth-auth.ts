@@ -51,6 +51,17 @@ type HealthOpsOAuthFlags = {
 
 const OAUTH_WEB_PROVIDERS: OAuthWebProvider[] = ["google", "github", "microsoft"];
 
+/** Instant-render metadata for login/register — checking state until health reconciles. */
+export const DEFAULT_LOGIN_PROVIDERS: AuthProviderAvailability[] = OAUTH_WEB_PROVIDERS.map(
+  (provider) => ({
+    provider,
+    configured: false,
+    available: false,
+    loading: true,
+    reason: "loading" as const,
+  }),
+);
+
 function parseHealthOpsOAuthFlags(data: HealthOpsOAuthFlags): OAuthProviderStatus {
   return {
     linkedin: Boolean(data.linkedin_oauth_configured ?? true),

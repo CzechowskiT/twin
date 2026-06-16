@@ -1329,6 +1329,8 @@ const en = {
     oauthUnavailable: "Not available on this site yet",
     oauthStatusLoading: "Checking sign-in availability…",
     oauthDisabledReason: "Not configured on this deployment",
+    oauthRefreshFailed:
+      "Could not refresh sign-in options. Email login still works.",
   },
   forgotPassword: {
     title: "Reset password",
@@ -5719,6 +5721,8 @@ const pl: MessageTree = {
     oauthUnavailable: "Niedostępne na tej stronie",
     oauthStatusLoading: "Sprawdzamy dostępność logowania…",
     oauthDisabledReason: "Nieskonfigurowane w tym wdrożeniu",
+    oauthRefreshFailed:
+      "Nie udało się odświeżyć opcji logowania. Logowanie e-mailem nadal działa.",
     oauthGithub: "Kontynuuj z GitHub",
     oauthApple: "Kontynuuj z Apple",
     oauthMicrosoft: "Kontynuuj z Microsoft",

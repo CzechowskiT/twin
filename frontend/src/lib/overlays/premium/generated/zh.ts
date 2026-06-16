@@ -203,6 +203,7 @@ export const premiumZhOverlay: Record<string, unknown> = {
     "oauthMicrosoft": "继续 Microsoft",
     "oauthStatusLoading": "正在检查登录可用性…",
     "oauthDisabledReason": "此部署中未配置",
+    "oauthRefreshFailed": "无法刷新登录选项。电子邮件登录仍然可用。",
     "oauthUnavailable": "尚未在该网站上提供",
     "orContinue": "或继续",
     "password": "密码",

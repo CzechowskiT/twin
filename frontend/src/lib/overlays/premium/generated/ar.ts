@@ -203,6 +203,7 @@ export const premiumArOverlay: Record<string, unknown> = {
     "oauthMicrosoft": "متابعة مع Microsoft",
     "oauthStatusLoading": "جارٍ التحقق من توفر تسجيل الدخول…",
     "oauthDisabledReason": "غير مُكوَّن في هذا النشر",
+    "oauthRefreshFailed": "تعذّر تحديث خيارات تسجيل الدخول. تسجيل الدخول بالبريد الإلكتروني لا يزال يعمل.",
     "oauthUnavailable": "غير متوفر على هذا الموقع بعد",
     "orContinue": "أو الاستمرار مع",
     "password": "كلمة المرور",

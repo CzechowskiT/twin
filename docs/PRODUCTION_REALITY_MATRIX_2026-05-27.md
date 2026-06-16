@@ -17,6 +17,7 @@
 - **Persona workspace navigation UX (2026-06-12):** `docs/PERSONA_WORKSPACE_NAVIGATION_PREMIUM_UX_2026-06-12.md` — module grids, `/recruiter` hub, login OAuth polish; launch **NO-GO** unchanged
 - **Company entry navigation (2026-06-16):** `/for-companies` → `/company/dashboard` + `/company/talent-pool` CTAs; `WORKSPACE_PATH.company` → dashboard; `test:company-entry-navigation`
 - **Multi-tab performance hardening (2026-06-16):** `docs/MULTI_TAB_PERFORMANCE_HARDENING_2026-06-16.md` — pause marquee/polling in hidden tabs; dedupe `public-health`; `test:multi-tab-performance-hardening`
+- **Login OAuth instant render (2026-06-16):** `DEFAULT_LOGIN_PROVIDERS` — OAuth rows on first paint; `test:login-options-instant-render`; launch **NO-GO** unchanged
 - **Launch-day monitoring / rollback:** `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` (2026-06-04)
 - **Recruiter alignment audit:** `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md` (2026-06-04)
 - **DB incident (2026-05-29):** `INC-DB-2026-05-29-001` — **RESOLVED** + stabilization PASSED — see `docs/PRODUCTION_DB_RESTORE_INCIDENT_2026-05-29.md`
@@ -36,7 +37,7 @@
 | ------- | -------- | ---------- |
 | Public marketing (`/`, waitlist, first-1000, `/compare/*`) | HTTP 200 smoke; **final logo smoke PASS** **`2026-06-04T10:29:29Z`**; **copy fixes 2026-06-04** — founding qualified (`1a2eba4` + first-1000 headline); calendar strip + compare i18n aligned (OAuth vs ICS/WebCal; phased auto-apply); public launch still **NO-GO** (S2/ops) | **LIVE** (pilot); **NO-GO** uncontrolled public (gates, not copy alone) |
 | Status / public-health proxy | `git_commit=df15618`, `db_ok=true` in JSON (read-only check 2026-05-29) | **LIVE** |
-| Candidate login (OAuth + email) | **P0 (2026-06-12):** stale `twin_access_token` must not route login to direct API (`AUTH_BROWSER_STATE_AND_OAUTH_OPTIONS_INCIDENT`); OAuth `public-health` fallback; prior 10s timeout + expand (`AUTH_LOGIN_AND_OPTIONS_INCIDENT`) | **LIVE** API flags (`55b3835`); stale-browser login + OAuth grey **FAIL pre-fix**; fix **PENDING deploy** |
+| Candidate login (OAuth + email) | **P0 (2026-06-12):** stale `twin_access_token` must not route login to direct API (`AUTH_BROWSER_STATE_AND_OAUTH_OPTIONS_INCIDENT`); OAuth `public-health` fallback; prior 10s timeout + expand (`AUTH_LOGIN_AND_OPTIONS_INCIDENT`). **Instant render (2026-06-16):** OAuth rows visible on first paint, reconciled via deduped `public-health` | **LIVE** API flags; instant-render fix **PENDING deploy** |
 | Dashboard (candidate) | `/dashboard` 200; auth required for data; **module grid** `CandidateModuleNav` (2026-06-12) | **LIVE** |
 | Recruiter hub | `/recruiter` module grid; calendar sync **NOT LIVE** | **LIVE** (pilot) |
 | Demo interactive walkthrough | `/demo` — 8-step simulation PL/EN; `interactive-demo.test.ts`; `docs/INTERACTIVE_DEMO_WALKTHROUGH_2026-06-07.md` | **LIVE** (pilot) — synthetic only; calendar step **simulation** |

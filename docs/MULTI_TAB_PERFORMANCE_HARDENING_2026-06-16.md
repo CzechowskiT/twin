@@ -34,12 +34,14 @@ Opening 8–12 TWIN tabs caused severe browser/CPU slowdown. Root causes:
 - **Company talent pool:** dynamic import for readiness guide; memoized role/skill/readiness slices.
 - **Marketing polls:** waitlist stats, first-1000, beta landing use background-aware intervals.
 - **OAuth / ops / investor / status:** deduped public-health and health?ops=1 reads.
+- **Login/register OAuth (2026-06-16):** `DEFAULT_LOGIN_PROVIDERS` instant-render — Google/GitHub/Microsoft rows visible on first paint (checking state); `public-health` reconciles enable/disable without layout shift; `test:login-options-instant-render`.
 
 ## Verification
 
 ```bash
 cd frontend
 npm run test:multi-tab-performance-hardening
+npm run test:login-options-instant-render
 npm run build
 npx tsc --noEmit
 ```
