@@ -2259,6 +2259,25 @@ html[data-page-hidden="true"] .twin-nature-wallpaper-img {
   transform: scale(1.08);
 }
 
+/** Workspace/auth lanes — strip GPU-heavy chrome even when tab is visible. */
+html[data-workspace-route="true"] .company-logo-marquee,
+html[data-workspace-route="true"] .performance-safe-brand-strip,
+html[data-workspace-route="true"] .site-top-marquee-band {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html[data-workspace-route="true"] .marketing-marquee-track {
+  animation: none !important;
+  will-change: auto !important;
+}
+
+html[data-workspace-route="true"] .twin-studio-ambient,
+html[data-workspace-route="true"] .landing-ambient__mesh,
+html[data-workspace-route="true"] .landing-ambient__orb {
+  animation-play-state: paused !important;
+}
+
 .marketing-marquee-segment {
   flex: 0 0 auto;
 }

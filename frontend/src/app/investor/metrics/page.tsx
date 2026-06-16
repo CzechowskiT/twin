@@ -1,12 +1,21 @@
 "use client";
 
-import { InvestorMetricsRealityDashboard } from "@/components/investor/investor-metrics-reality-dashboard";
-import { PersonaWorkspaceGate } from "@/components/persona-workspace-gate";
+import dynamic from "next/dynamic";
+
+import { WorkspaceRouteLayout } from "@/components/workspace-route-layout";
+
+const InvestorMetricsRealityDashboard = dynamic(
+  () =>
+    import("@/components/investor/investor-metrics-reality-dashboard").then(
+      (m) => m.InvestorMetricsRealityDashboard,
+    ),
+  { ssr: false },
+);
 
 export default function InvestorMetricsPage() {
   return (
-    <PersonaWorkspaceGate allowed={["investor"]} surface="investor">
+    <WorkspaceRouteLayout allowed={["investor"]} surface="investor">
       <InvestorMetricsRealityDashboard />
-    </PersonaWorkspaceGate>
+    </WorkspaceRouteLayout>
   );
 }

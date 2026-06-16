@@ -1,9 +1,23 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 
-import { PersonaMarketingPage } from "@/components/marketing/persona-marketing-page";
 import { useTranslation } from "@/components/language-provider";
+
+const PersonaMarketingPage = dynamic(
+  () =>
+    import("@/components/marketing/persona-marketing-page").then((m) => m.PersonaMarketingPage),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="animate-pulse px-4 py-16 sm:px-6">
+        <div className="mx-auto h-8 max-w-xl rounded bg-[var(--twin-surface-soft)]" />
+        <div className="mx-auto mt-4 h-4 max-w-2xl rounded bg-[var(--twin-surface-soft)]" />
+      </div>
+    ),
+  },
+);
 
 export default function ForCompaniesPage() {
   const { t } = useTranslation();

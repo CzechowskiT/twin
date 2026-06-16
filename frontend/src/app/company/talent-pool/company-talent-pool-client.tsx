@@ -11,6 +11,7 @@ import { CompanyTalentPoolWorkspaceSelector } from "@/components/company/company
 import { CompanyWorkspaceNav } from "@/components/company/company-workspace-nav";
 import { useTranslation } from "@/components/language-provider";
 import { useAbortableFetch } from "@/hooks/use-abortable-fetch";
+import { useLoadWhenVisible } from "@/hooks/use-load-when-visible";
 import type { TranslationKey } from "@/lib/i18n";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
@@ -202,6 +203,9 @@ export default function CompanyTalentPoolClient() {
   const [authError, setAuthError] = useState(false);
   const [errorKey, setErrorKey] = useState<RecruiterInboxErrorMessageKey | "loadFailed" | null>(null);
   const [payload, setPayload] = useState<CompanyTalentPoolPayload | null>(null);
+
+  const readinessDeferred = useLoadWhenVisible({ rootMargin: "120px 0px" });
+  const detailsDeferred = useLoadWhenVisible({ rootMargin: "180px 0px" });
 
   const companyOptions = useMemo(() => mergeCompanyOptions(companyRaw), [companyRaw]);
   const knownSlugs = useMemo(() => new Set(companyOptions.map((o) => o.slug)), [companyOptions]);
@@ -460,6 +464,8 @@ export default function CompanyTalentPoolClient() {
             ) : null}
           </Card>
 
+          <div ref={readinessDeferred.ref}>
+            {readinessDeferred.shouldLoad ? (
           <div className="grid gap-6 lg:grid-cols-2">
             <Card
               variant="soft"
@@ -510,7 +516,14 @@ export default function CompanyTalentPoolClient() {
               integrationsHref={payload.links.integrations}
             />
           </div>
+            ) : (
+              <div className="h-32 animate-pulse rounded-xl border border-[var(--twin-border)]/60 bg-[var(--twin-surface-soft)]/40" />
+            )}
+          </div>
 
+          <div ref={detailsDeferred.ref}>
+            {detailsDeferred.shouldLoad ? (
+          <>
           <Card
             variant="soft"
             className="border-[var(--twin-border)]/80 p-5"
@@ -614,6 +627,11 @@ export default function CompanyTalentPoolClient() {
             >
               {t("companyTalentPool.linkPipeline")}
             </Link>
+          </div>
+          </>
+            ) : (
+              <div className="h-24 animate-pulse rounded-xl border border-[var(--twin-border)]/60 bg-[var(--twin-surface-soft)]/40" />
+            )}
           </div>
         </div>
       ) : null}

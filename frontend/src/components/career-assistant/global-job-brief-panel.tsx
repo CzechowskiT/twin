@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import type { Locale } from "@/lib/i18n";
-import { getDemoGlobalJobBrief, type GlobalJobBriefData } from "@/lib/job-brief-demo-data";
+import { capDemoArray, loadJobBriefDemoModule } from "@/lib/lazy-demo-data";
+import type { GlobalJobBriefData } from "@/lib/job-brief-demo-data";
 
 function MetaChip({ label, value }: { label: string; value: string }) {
   return (
@@ -151,28 +152,60 @@ export function GlobalJobBriefPanel({
   location?: string | null;
 }) {
   const { t, locale } = useTranslation();
-  const brief = useMemo(
-    () => getDemoGlobalJobBrief({ company, title: jobTitle, location: location ?? null }, locale as Locale),
-    [company, jobTitle, location, locale],
-  );
+  const [brief, setBrief] = useState<GlobalJobBriefData | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void loadJobBriefDemoModule().then((mod) => {
+      if (cancelled) return;
+      setBrief(
+        mod.getDemoGlobalJobBrief(
+          { company, title: jobTitle, location: location ?? null },
+          locale as Locale,
+        ),
+      );
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [company, jobTitle, location, locale]);
+
+  const cappedBrief = useMemo(() => {
+    if (!brief) return null;
+    return {
+      ...brief,
+      responsibilities: capDemoArray(brief.responsibilities),
+      qualifications: capDemoArray(brief.qualifications),
+      niceToHave: capDemoArray(brief.niceToHave),
+      techStack: capDemoArray(brief.techStack),
+      benefits: capDemoArray(brief.benefits),
+      similarRoles: capDemoArray(brief.similarRoles),
+    };
+  }, [brief]);
+
+  if (!cappedBrief) {
+    return (
+      <div className="h-40 animate-pulse rounded-xl border border-[var(--twin-border)]/60 bg-[var(--twin-surface-soft)]/40" />
+    );
+  }
 
   const chips = [
-    { label: t("jobBrief.chipRoleFamily"), value: brief.chipValues.roleFamily },
-    { label: t("jobBrief.chipSeniority"), value: brief.chipValues.seniority },
-    { label: t("jobBrief.chipEmployment"), value: brief.chipValues.employment },
-    { label: t("jobBrief.chipTeamSize"), value: brief.chipValues.teamSize },
-    { label: t("jobBrief.chipReportsTo"), value: brief.chipValues.reportsTo },
-    { label: t("jobBrief.chipComp"), value: brief.chipValues.compBand },
-    { label: t("jobBrief.chipEquity"), value: brief.chipValues.equity },
-    { label: t("jobBrief.chipWorkModel"), value: brief.chipValues.workModel },
-    { label: t("jobBrief.chipVisa"), value: brief.chipValues.visa },
-    { label: t("jobBrief.chipRelocation"), value: brief.chipValues.relocation },
-    { label: t("jobBrief.chipTravel"), value: brief.chipValues.travel },
+    { label: t("jobBrief.chipRoleFamily"), value: cappedBrief.chipValues.roleFamily },
+    { label: t("jobBrief.chipSeniority"), value: cappedBrief.chipValues.seniority },
+    { label: t("jobBrief.chipEmployment"), value: cappedBrief.chipValues.employment },
+    { label: t("jobBrief.chipTeamSize"), value: cappedBrief.chipValues.teamSize },
+    { label: t("jobBrief.chipReportsTo"), value: cappedBrief.chipValues.reportsTo },
+    { label: t("jobBrief.chipComp"), value: cappedBrief.chipValues.compBand },
+    { label: t("jobBrief.chipEquity"), value: cappedBrief.chipValues.equity },
+    { label: t("jobBrief.chipWorkModel"), value: cappedBrief.chipValues.workModel },
+    { label: t("jobBrief.chipVisa"), value: cappedBrief.chipValues.visa },
+    { label: t("jobBrief.chipRelocation"), value: cappedBrief.chipValues.relocation },
+    { label: t("jobBrief.chipTravel"), value: cappedBrief.chipValues.travel },
   ];
 
   return (
     <div className="space-y-4">
-      <BriefHeader company={company} jobTitle={jobTitle} brief={brief} t={t} />
+      <BriefHeader company={company} jobTitle={jobTitle} brief={cappedBrief} t={t} />
 
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {chips.map((c) => (
@@ -185,7 +218,7 @@ export function GlobalJobBriefPanel({
           <div>
             <h4 className="font-semibold">{t("jobBrief.responsibilities")}</h4>
             <ul className="mt-1 list-disc space-y-1 pl-5 text-[var(--twin-muted-strong)]">
-              {brief.responsibilities.map((x) => (
+              {cappedBrief.responsibilities.map((x) => (
                 <li key={x}>{x}</li>
               ))}
             </ul>
@@ -193,7 +226,7 @@ export function GlobalJobBriefPanel({
           <div>
             <h4 className="font-semibold">{t("jobBrief.qualifications")}</h4>
             <ul className="mt-1 list-disc space-y-1 pl-5 text-[var(--twin-muted-strong)]">
-              {brief.qualifications.map((x) => (
+              {cappedBrief.qualifications.map((x) => (
                 <li key={x}>{x}</li>
               ))}
             </ul>
@@ -201,7 +234,7 @@ export function GlobalJobBriefPanel({
           <div>
             <h4 className="font-semibold">{t("jobBrief.niceToHave")}</h4>
             <ul className="mt-1 list-disc space-y-1 pl-5 text-[var(--twin-muted-strong)]">
-              {brief.niceToHave.map((x) => (
+              {cappedBrief.niceToHave.map((x) => (
                 <li key={x}>{x}</li>
               ))}
             </ul>
@@ -209,7 +242,7 @@ export function GlobalJobBriefPanel({
           <div>
             <h4 className="font-semibold">{t("jobBrief.techStack")}</h4>
             <div className="mt-2 flex flex-wrap gap-1.5">
-              {brief.techStack.map((tech) => (
+              {cappedBrief.techStack.map((tech) => (
                 <span
                   key={tech}
                   className="rounded-md border border-[var(--twin-accent)]/30 bg-[var(--twin-accent-muted)] px-2 py-0.5 text-xs font-medium"
@@ -224,7 +257,7 @@ export function GlobalJobBriefPanel({
 
       <Section eyebrow={t("jobBrief.sectionOfficesEyebrow")} title={t("jobBrief.sectionOfficesTitle")}>
         <ul className="space-y-2 text-sm">
-          {brief.offices.map((o) => (
+          {cappedBrief.offices.map((o) => (
             <li
               key={`${o.city}-${o.country}`}
               className="flex flex-wrap items-baseline justify-between gap-2 border-b border-[var(--twin-border)]/60 pb-2 last:border-0"
@@ -239,26 +272,26 @@ export function GlobalJobBriefPanel({
           ))}
         </ul>
         <p className="twin-muted mt-3 text-xs">
-          {t("jobBrief.factRevenue")}: {brief.facts.revenue}
-          {brief.facts.ticker ? ` · ${t("jobBrief.factTicker")}: ${brief.facts.ticker}` : ""}
+          {t("jobBrief.factRevenue")}: {cappedBrief.facts.revenue}
+          {cappedBrief.facts.ticker ? ` · ${t("jobBrief.factTicker")}: ${cappedBrief.facts.ticker}` : ""}
         </p>
       </Section>
 
       <Section eyebrow={t("jobBrief.sectionCultureEyebrow")} title={t("jobBrief.sectionCultureTitle")}>
         <ul className="list-disc space-y-1 pl-5 text-sm text-[var(--twin-muted-strong)]">
-          {brief.cultureHighlights.map((x) => (
+          {cappedBrief.cultureHighlights.map((x) => (
             <li key={x}>{x}</li>
           ))}
         </ul>
         <p className="mt-3 text-sm leading-relaxed text-[var(--twin-muted-strong)]">
           <span className="font-semibold text-[var(--foreground)]">{t("jobBrief.dei")}: </span>
-          {brief.deiNote}
+          {cappedBrief.deiNote}
         </p>
       </Section>
 
       <Section title={t("jobBrief.sectionBenefitsTitle")} defaultOpen={false}>
         <ul className="list-disc space-y-1 pl-5 text-sm text-[var(--twin-muted-strong)]">
-          {brief.benefits.map((x) => (
+          {cappedBrief.benefits.map((x) => (
             <li key={x}>{x}</li>
           ))}
         </ul>
@@ -266,7 +299,7 @@ export function GlobalJobBriefPanel({
 
       <Section eyebrow={t("jobBrief.sectionProcessEyebrow")} title={t("jobBrief.sectionProcessTitle")}>
         <ol className="space-y-3">
-          {brief.interviewSteps.map((step, i) => (
+          {cappedBrief.interviewSteps.map((step, i) => (
             <li key={step.stage} className="flex gap-3 text-sm">
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--twin-accent-muted)] text-xs font-bold text-[var(--twin-accent)]">
                 {i + 1}
@@ -284,7 +317,7 @@ export function GlobalJobBriefPanel({
 
       <Section eyebrow={t("jobBrief.sectionTimelineEyebrow")} title={t("jobBrief.sectionTimelineTitle")} defaultOpen={false}>
         <ol className="relative space-y-3 border-l-2 border-[var(--twin-accent)]/40 pl-4 text-sm">
-          {brief.applicationTimeline.map((step) => (
+          {cappedBrief.applicationTimeline.map((step) => (
             <li key={step.stage} className="relative">
               <span className="absolute -left-[1.35rem] top-1.5 h-2 w-2 rounded-full bg-[var(--twin-accent)]" />
               <p className="font-semibold">{step.stage}</p>
@@ -297,7 +330,7 @@ export function GlobalJobBriefPanel({
       </Section>
 
       <Section title={t("jobBrief.sectionSimilarTitle")} defaultOpen={false}>
-        <SimilarRolesCarousel roles={brief.similarRoles} t={t} />
+        <SimilarRolesCarousel roles={cappedBrief.similarRoles} t={t} />
       </Section>
     </div>
   );

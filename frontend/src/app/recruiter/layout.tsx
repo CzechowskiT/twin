@@ -2,13 +2,12 @@
 
 import type { ReactNode } from "react";
 
-import { PersonaWorkspaceGate } from "@/components/persona-workspace-gate";
+import { WorkspaceRouteLayout } from "@/components/workspace-route-layout";
 
-/** Recruiter inbox and tools — requires session + recruiter or investor context. */
 export default function RecruiterLayout({ children }: { children: ReactNode }) {
   return (
-    <PersonaWorkspaceGate allowed={["recruiter", "investor"]} surface="recruiter">
+    <WorkspaceRouteLayout allowed={["recruiter", "investor"]} surface="recruiter">
       {children}
-    </PersonaWorkspaceGate>
+    </WorkspaceRouteLayout>
   );
 }
