@@ -20,6 +20,8 @@ export const COMPANY_TALENT_POOL_MARKERS = {
   importLink: "company-talent-pool-import-link",
   integrationsLink: "company-talent-pool-integrations-link",
   pipelineLink: "company-talent-pool-pipeline-link",
+  dashboardLink: "company-talent-pool-dashboard-link",
+  rolesLink: "company-talent-pool-roles-link",
   radarLink: "company-talent-pool-radar-link",
   workspaceSelector: "company-talent-pool-workspace-selector",
   readinessGuide: "company-talent-pool-readiness-guide",

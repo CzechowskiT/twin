@@ -10,7 +10,7 @@
 
 ```bash
 curl -sS https://twin-sooty.vercel.app/api/public-health | jq '{status,db_ok,git_commit}'
-cd frontend && npm run test:trust-language-guard && npm run test:i18n-coverage
+cd frontend && npm run test:trust-language-guard && npm run test:i18n-coverage && npm run test:company-entry-navigation
 ```
 
 | Pre | Criterion | PASS |
@@ -72,6 +72,7 @@ cd frontend && npm run test:trust-language-guard && npm run test:i18n-coverage
 
 | # | Route | PASS | PARTIAL | FAIL |
 | - | ----- | ---- | ------- | ---- |
+| B0 | `/for-companies` | Hero CTAs → `/company/dashboard` + `/company/talent-pool`; workspace preview cards; footer workspace links | Marketing only | 404 on workspace routes |
 | B1 | `/login/company` | Sign-in works | — | Cannot authenticate |
 | B2 | `/company/dashboard` | Hiring dashboard metrics or honest empty | Demo slug only | Fake revenue |
 | B3 | `/company/roles` | Roles list / CRUD per permissions | Read-only mode clear | 404 |

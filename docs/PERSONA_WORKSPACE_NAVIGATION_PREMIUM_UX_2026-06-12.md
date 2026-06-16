@@ -46,6 +46,8 @@ Status tiers: **Live / Pilot / Planned / Not live / Needs setup / Paused**
 | `/recruiter/talent-pool/import` | **PILOT** | CSV paste preview/commit |
 | `/workspace/recruiter` | **REDIRECT** | → `/recruiter` |
 | `/workspace/recruiter/integrations` | **REDIRECT** | → `/recruiter/integrations` |
+| `/for-companies` | **LIVE** | Marketing + procurement; hero CTAs → `/company/dashboard`, `/company/talent-pool`; workspace preview cards |
+| `/workspace/company` | **REDIRECT** | → `/company/dashboard` |
 | `/company/dashboard` | **LIVE** | Company module grid |
 | `/company/talent-pool` | **PILOT** | Organizational talent memory — internal data quality, no live ATS |
 | `/workspace/investor` | **LIVE** | Investor module hub (gated) |
@@ -77,6 +79,7 @@ Status tiers: **Live / Pilot / Planned / Not live / Needs setup / Paused**
 | `test:trust-language-guard` | **PASS** |
 | `test:auth-role-choice` | **PASS** |
 | `test:company-integrations-readiness-mvp` | **PASS** |
+| `test:company-entry-navigation` | **PASS** |
 | `test:recruiter-integrations-readiness-mvp` | **PASS** |
 | `npm run build` | **PASS** |
 | `tsc --noEmit` | **PASS** |
@@ -95,10 +98,11 @@ Status tiers: **Live / Pilot / Planned / Not live / Needs setup / Paused**
 
 1. **Candidate:** `/dashboard` → expand module grid → auto-apply card → `#auto-apply-readiness`
 2. **Recruiter:** `/recruiter` → calendar card shows **Not live** → inbox CTA works
-3. **Company:** `/company/dashboard` → module grid → integrations/billing badges honest
-4. **Investor (unauth):** `/investor` → gated preview section visible
-5. **Investor (auth):** `/workspace/investor` → full module hub
-6. **Login:** `/login/candidate` → OAuth loading copy PL/EN
+3. **Company:** `/for-companies` → hero **Otwórz panel firmy** → `/company/dashboard`; **Pamięć talentów** → `/company/talent-pool`; workspace preview cards
+4. **Company:** `/company/dashboard` → module grid → integrations/billing badges honest
+5. **Investor (unauth):** `/investor` → gated preview section visible
+6. **Investor (auth):** `/workspace/investor` → full module hub
+7. **Login:** `/login/candidate` → OAuth loading copy PL/EN
 
 See also: `docs/FOUNDER_AUTHENTICATED_PERSONA_SMOKE_RUNBOOK_2026-06-12.md`
 

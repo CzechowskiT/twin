@@ -4,10 +4,12 @@ import Link from "next/link";
 
 import { useTranslation } from "@/components/language-provider";
 import { CandidateRewardsBand } from "@/components/marketing/candidate-rewards-band";
+import { CompanyWorkspacePreview } from "@/components/marketing/company-workspace-preview";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { TalentPoolPreview } from "@/components/marketing/talent-pool-preview";
 import { Shell } from "@/components/ui";
 import { getPersonaBundle, type PersonaId } from "@/lib/persona-pages";
+import { COMPANY_ENTRY_MARKERS } from "@/lib/company-entry-navigation";
 
 export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
   const { locale, t } = useTranslation();
@@ -25,12 +27,14 @@ export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
             <div className="marketing-cta-stack pt-2">
               <Link
                 href={c.primaryCta.href}
+                data-testid={persona === "companies" ? COMPANY_ENTRY_MARKERS.heroDashboard : undefined}
                 className="section-cta-primary marketing-btn-primary-shadow twin-touch-target w-full max-w-md"
               >
                 {c.primaryCta.label}
               </Link>
               <Link
                 href={c.stackedCta.href}
+                data-testid={persona === "companies" ? COMPANY_ENTRY_MARKERS.heroTalentPool : undefined}
                 className="marketing-cta-filled-pill marketing-btn-primary-shadow twin-touch-target inline-flex min-h-[2.75rem] w-full items-center justify-center rounded-full bg-[var(--twin-accent)] px-6 text-sm font-semibold text-[var(--twin-on-accent)] transition hover:bg-[var(--twin-accent-hover)] active:scale-[0.98]"
               >
                 {c.stackedCta.label}
@@ -38,11 +42,28 @@ export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
               {c.secondaryCta ? (
                 <Link
                   href={c.secondaryCta.href}
+                  data-testid={persona === "companies" ? COMPANY_ENTRY_MARKERS.heroCalculator : undefined}
                   className="twin-touch-target inline-flex min-h-[2.75rem] w-full items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-6 text-sm font-semibold text-[var(--twin-muted-strong)] shadow-sm transition hover:border-[var(--twin-border-hover)] hover:bg-[var(--twin-accent-muted)] active:scale-[0.98]"
                 >
                   {c.secondaryCta.label}
                 </Link>
               ) : null}
+              {c.supplementaryCtas?.map((cta, idx) => (
+                <Link
+                  key={cta.href}
+                  href={cta.href}
+                  data-testid={
+                    persona === "companies"
+                      ? idx === 0
+                        ? COMPANY_ENTRY_MARKERS.heroWishlist
+                        : COMPANY_ENTRY_MARKERS.heroContact
+                      : undefined
+                  }
+                  className="twin-touch-target inline-flex min-h-[2.75rem] w-full items-center justify-center rounded-full border border-[var(--twin-border)] bg-[var(--twin-card)] px-6 text-sm font-semibold text-[var(--twin-muted-strong)] shadow-sm transition hover:border-[var(--twin-border-hover)] hover:bg-[var(--twin-accent-muted)] active:scale-[0.98]"
+                >
+                  {cta.label}
+                </Link>
+              ))}
             </div>
           ) : (
             <div className="flex flex-wrap gap-3 pt-2">
@@ -109,6 +130,8 @@ export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
         {persona === "recruiters" || persona === "companies" ? (
           <TalentPoolPreview />
         ) : null}
+
+        {persona === "companies" ? <CompanyWorkspacePreview /> : null}
 
         <section aria-labelledby="persona-pricing" className="text-start">
           <h2 id="persona-pricing" className="twin-section-title text-lg sm:text-xl">

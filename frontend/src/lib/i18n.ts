@@ -141,6 +141,7 @@ export type TranslationKey =
   | `recruiterJobs.${keyof typeof en.recruiterJobs}`
   | `recruiterCalendar.${keyof typeof en.recruiterCalendar}`
   | `companyPipeline.${keyof typeof en.companyPipeline}`
+  | `companyEntry.${keyof typeof en.companyEntry}`
   | `companyTalentPool.${keyof typeof en.companyTalentPool}`
   | `companyTeam.${keyof typeof en.companyTeam}`
   | `recruiterScheduling.${keyof typeof en.recruiterScheduling}`
@@ -3050,6 +3051,24 @@ eyebrow: "Product roadmap",
     emptyStep2: "Pick your company slug (demo: Nova Hiring PL).",
     emptyStep3: "Review segment counts and quality flags per role.",
   },
+  companyEntry: {
+    footerDashboard: "Company dashboard",
+    workspacePreviewTitle: "Company workspace",
+    workspacePreviewLead:
+      "Jump into the pilot workspace — hiring dashboard, talent memory, integrations readiness, and B2B ROI modeling.",
+    previewDashboardTitle: "Hiring dashboard",
+    previewDashboardDesc: "Segment counts, module grid, and pilot access for your company slug.",
+    previewDashboardCta: "Open dashboard",
+    previewTalentPoolTitle: "Talent memory",
+    previewTalentPoolDesc: "Internal candidate records — data quality and readiness before Radar surfacing.",
+    previewTalentPoolCta: "Open talent memory",
+    previewIntegrationsTitle: "Integrations",
+    previewIntegrationsDesc: "Honest ATS and calendar readiness rows — no fake connected claims.",
+    previewIntegrationsCta: "View integrations",
+    previewCalculatorTitle: "B2B calculator",
+    previewCalculatorDesc: "Model agency fees vs TWIN operating economics for CFO conversations.",
+    previewCalculatorCta: "Open calculator",
+  },
   companyTalentPool: {
     eyebrow: "Company workspace",
     title: "Company talent memory",
@@ -3156,7 +3175,9 @@ eyebrow: "Product roadmap",
     emptyCta: "Ask recruiter to import",
     trustCopy:
       "Company talent memory does not contact candidates — internal only, no automatic outreach, no live ATS sync. Recruiter review required before contact.",
-    linkImport: "Recruiter import",
+    linkImport: "Recruiter import · map to company roles",
+    linkDashboard: "Company dashboard",
+    linkRoles: "Company roles",
     linkIntegrations: "Integrations readiness",
     linkPipeline: "Pipeline overview",
   },
@@ -7432,6 +7453,24 @@ const pl: MessageTree = {
     emptyStep2: "Wybierz slug firmy (demo: Nova Hiring PL).",
     emptyStep3: "Przejrzyj liczby segmentów i flagi jakości per rola.",
   },
+  companyEntry: {
+    footerDashboard: "Panel firmy",
+    workspacePreviewTitle: "Workspace firmy",
+    workspacePreviewLead:
+      "Wejdź do pilotażowego workspace — panel rekrutacyjny, pamięć talentów, gotowość integracji i model ROI B2B.",
+    previewDashboardTitle: "Panel rekrutacyjny",
+    previewDashboardDesc: "Liczniki segmentów, siatka modułów i dostęp pilotażowy dla slug firmy.",
+    previewDashboardCta: "Otwórz panel",
+    previewTalentPoolTitle: "Pamięć talentów",
+    previewTalentPoolDesc: "Wewnętrzne rekordy kandydatów — jakość danych i gotowość przed surfacingiem w Radarze.",
+    previewTalentPoolCta: "Otwórz pamięć talentów",
+    previewIntegrationsTitle: "Integracje",
+    previewIntegrationsDesc: "Uczciwe wiersze gotowości ATS i kalendarza — bez fałszywych „wszystko podłączone”.",
+    previewIntegrationsCta: "Zobacz integracje",
+    previewCalculatorTitle: "Kalkulator B2B",
+    previewCalculatorDesc: "Modeluj success fee agencji vs ekonomię operacyjną TWIN pod rozmowy z CFO.",
+    previewCalculatorCta: "Otwórz kalkulator",
+  },
   companyTalentPool: {
     eyebrow: "Workspace firmy",
     title: "Pamięć talentów firmy",
@@ -7538,7 +7577,9 @@ const pl: MessageTree = {
     emptyCta: "Poproś rekrutera o import",
     trustCopy:
       "Pamięć talentów nie kontaktuje kandydatów — tylko wewnętrznie, bez automatycznego outreachu, bez live sync ATS. Wymagana recenzja rekrutera przed kontaktem.",
-    linkImport: "Import rekrutera",
+    linkImport: "Import rekrutera · mapowanie na role firmy",
+    linkDashboard: "Panel firmy",
+    linkRoles: "Role firmy",
     linkIntegrations: "Gotowość integracji",
     linkPipeline: "Przegląd pipeline",
   },

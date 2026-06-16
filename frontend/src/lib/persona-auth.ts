@@ -24,7 +24,7 @@ export const REGISTER_PATH: Record<LoginZone, string> = {
 export const WORKSPACE_PATH: Record<LoginZone, string> = {
   candidate: "/workspace/candidate",
   recruiter: "/workspace/recruiter",
-  company: "/for-companies",
+  company: "/company/dashboard",
   investor: "/workspace/investor",
 };
 
