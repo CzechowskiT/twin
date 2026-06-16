@@ -1,10 +1,11 @@
+import { CANDIDATE_CANONICAL_ROUTES } from "@/lib/candidate-canonical-routes";
 import type { WorkspaceModuleDef } from "@/lib/workspace-module-status";
 
 /** Candidate dashboard module cards — honest readiness, no fake live claims. */
 export const CANDIDATE_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
   {
     id: "profile",
-    href: "/dashboard",
+    href: CANDIDATE_CANONICAL_ROUTES.profile,
     titleKey: "workspaceModules.candidateProfileTitle",
     valuePropKey: "workspaceModules.candidateProfileValue",
     hintKey: "workspaceModules.candidateProfileHint",
@@ -13,7 +14,7 @@ export const CANDIDATE_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
   },
   {
     id: "matches",
-    href: "/dashboard/jobs",
+    href: CANDIDATE_CANONICAL_ROUTES.matches,
     titleKey: "workspaceModules.candidateMatchesTitle",
     valuePropKey: "workspaceModules.candidateMatchesValue",
     hintKey: "workspaceModules.candidateMatchesHint",

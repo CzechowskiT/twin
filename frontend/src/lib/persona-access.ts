@@ -548,7 +548,7 @@ export function showCandidateDemoNav(persona: MarketingPersona, hasSession: bool
 
 export function logoutRedirectPath(persona: MarketingPersona): string {
   void persona;
-  return "/login";
+  return "/";
 }
 
 export type HeaderAccountLink = { href: string; labelKey: TranslationKey; isLogout?: boolean };

@@ -15,6 +15,7 @@
 - **Rendered homepage i18n (2026-06-09):** `docs/RENDERED_HOMEPAGE_ZERO_ENGLISH_LEAKAGE_FIX_2026-06-09.md` — ES/DE homepage + waitlist copy; OG routes unchanged
 - **Investor metrics reality dashboard (2026-06-11):** `docs/INVESTOR_METRICS_REALITY_DASHBOARD_2026-06-11.md`
 - **Persona workspace navigation UX (2026-06-12):** `docs/PERSONA_WORKSPACE_NAVIGATION_PREMIUM_UX_2026-06-12.md` — module grids, `/recruiter` hub, login OAuth polish; launch **NO-GO** unchanged
+- **All-persona navigation P0 (2026-06-16):** `docs/P0_ALL_PERSONA_NAVIGATION_ROUTE_AUDIT_2026-06-16.md` — candidate route aliases, logout → `/`, module href guards; launch **NO-GO** unchanged
 - **Company entry navigation (2026-06-16):** `/for-companies` → `/company/dashboard` + `/company/talent-pool` CTAs; `WORKSPACE_PATH.company` → dashboard; `test:company-entry-navigation`
 - **P0 workspace deep-link & multi-tab (2026-06-16):** `docs/P0_WORKSPACE_DEEPLINK_MULTITAB_2026-06-16.md` — `PERSONA_MODULE_ROUTES`; auth gate `?next=`; `resolveEffectiveSessionPersona`; Playwright `test:workspace-deeplink-new-tab` + `test:workspace-multitab-browser-smoke`
 - **P0 browser memory / multi-tab (2026-06-16):** `docs/P0_BROWSER_MEMORY_MULTITAB_PERFORMANCE_2026-06-16.md` — `PerformanceSafeBrandStrip` on workspace; `useLoadWhenVisible`; `LightweightRouteShell`; lazy demo data; `test:p0-browser-memory-multitab-performance`

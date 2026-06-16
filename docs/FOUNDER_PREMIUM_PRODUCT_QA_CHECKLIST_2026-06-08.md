@@ -9,6 +9,8 @@
 
 **Workspace module navigation (2026-06-12):** Module grids on `/dashboard`, `/recruiter`, `/company/dashboard`, `/workspace/investor`; public `/investor` gated preview → `docs/PERSONA_WORKSPACE_NAVIGATION_PREMIUM_UX_2026-06-12.md`.
 
+**All-persona navigation P0 (2026-06-16):** Candidate Oferty/Dopasowania/Profil i CV aliases, logout → `/` + Demo; `test:p0-all-persona-navigation-routes` + `test:p0-all-persona-navigation-browser` → `docs/P0_ALL_PERSONA_NAVIGATION_ROUTE_AUDIT_2026-06-16.md`.
+
 **Program:** Premium Product Experience Polish Slices 0–7 (PRs [#52](https://github.com/CzechowskiT/twin/pull/52)–[#58](https://github.com/CzechowskiT/twin/pull/58))
 
 ---
