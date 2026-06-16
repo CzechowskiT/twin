@@ -11,7 +11,8 @@ test("unauthenticated users see login-required shell, not null", () => {
   assert.match(gate, /workspace\.authRequiredTitle/);
   assert.match(gate, /workspace\.authRequiredCta/);
   assert.doesNotMatch(gate, /if \(!hasToken\) return null/);
-  assert.match(gate, /router\.replace\(loginPath\)/);
+  assert.match(gate, /router\.replace\(loginWithNext\)/);
+  assert.match(gate, /loginPathWithNext/);
 });
 
 test("company surface uses company login path", () => {

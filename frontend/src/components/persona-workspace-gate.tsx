@@ -2,17 +2,22 @@
 
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { useMarketingPersona } from "@/components/persona-provider";
 import { Card, Shell } from "@/components/ui";
 import { clearToken, getToken } from "@/lib/auth";
 import type { TranslationKey } from "@/lib/i18n";
+import { buildAuthRedirectNext, lockAuthRedirectDestination, loginPathWithNext } from "@/lib/login-redirect";
 import type { MarketingPersona } from "@/lib/marketing-persona";
+import {
+  isPathAllowedForPersona,
+  logoutRedirectPath,
+  resolveEffectiveSessionPersona,
+} from "@/lib/persona-access";
 import { LOGIN_PATH, WORKSPACE_PATH } from "@/lib/persona-auth";
-import { logoutRedirectPath } from "@/lib/persona-access";
 
 const SURFACE_COPY: Record<
   "candidate" | "recruiter" | "investor" | "company",
@@ -57,21 +62,33 @@ export function PersonaWorkspaceGate({
 }) {
   const { t } = useTranslation();
   const { persona } = useMarketingPersona();
+  const pathname = usePathname();
   const router = useRouter();
   const copy = SURFACE_COPY[surface];
   const loginZone = allowed[0] ?? "candidate";
   const loginPath = LOGIN_PATH[loginZone];
   const hasToken = getToken();
+  const effectivePersona = resolveEffectiveSessionPersona(pathname, persona);
+  const authDestinationRef = useRef<string | null>(null);
+  const loginWithNext = useMemo(() => {
+    const destination = lockAuthRedirectDestination(
+      authDestinationRef,
+      pathname,
+      loginPath,
+      null,
+    );
+    return loginPathWithNext(loginPath, destination);
+  }, [loginPath, pathname]);
 
   useEffect(() => {
     if (!hasToken) {
-      router.replace(loginPath);
+      router.replace(loginWithNext);
       return;
     }
-    if (!allowed.includes(persona)) {
-      router.replace(WORKSPACE_PATH[persona]);
-    }
-  }, [allowed, hasToken, loginPath, persona, router]);
+    if (allowed.includes(effectivePersona)) return;
+    if (isPathAllowedForPersona(pathname, effectivePersona)) return;
+    router.replace(WORKSPACE_PATH[effectivePersona]);
+  }, [allowed, effectivePersona, hasToken, loginWithNext, pathname, router]);
 
   if (!hasToken) {
     return (
@@ -84,7 +101,7 @@ export function PersonaWorkspaceGate({
           <p className="twin-muted mt-4 text-sm leading-relaxed">{t("workspace.authRequiredLead")}</p>
           <p className="twin-muted mt-2 text-xs">{t("workspace.authRedirecting")}</p>
           <div className="mt-8">
-            <Link href={loginPath} className="twin-btn-primary twin-touch-target">
+            <Link href={loginWithNext} className="twin-btn-primary twin-touch-target">
               {t("workspace.authRequiredCta")}
             </Link>
           </div>
@@ -93,7 +110,7 @@ export function PersonaWorkspaceGate({
     );
   }
 
-  if (allowed.includes(persona)) {
+  if (allowed.includes(effectivePersona)) {
     return <>{children}</>;
   }
 
@@ -101,13 +118,13 @@ export function PersonaWorkspaceGate({
     <Shell wide>
       <Card variant="soft" className="p-6 sm:p-8">
         <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
-          {t("nav.ariaPersonaNav")}: {t(PERSONA_LABEL[persona])}
+          {t("nav.ariaPersonaNav")}: {t(PERSONA_LABEL[effectivePersona])}
         </p>
         <h1 className="twin-section-title mt-2 text-xl sm:text-2xl">{t(copy.title)}</h1>
         <p className="twin-muted mt-4 text-sm leading-relaxed">{t(copy.lead)}</p>
         <p className="twin-muted mt-4 text-sm leading-relaxed">{t("nav.logoutToSwitchRole")}</p>
         <div className="mt-8 flex flex-col gap-2 sm:flex-row">
-          <Link href={WORKSPACE_PATH[persona]} className="twin-btn-primary twin-touch-target">
+          <Link href={WORKSPACE_PATH[effectivePersona]} className="twin-btn-primary twin-touch-target">
             {t("workspace.goMyWorkspace")}
           </Link>
           <button
@@ -115,7 +132,7 @@ export function PersonaWorkspaceGate({
             className="twin-btn-secondary twin-touch-target"
             onClick={() => {
               clearToken();
-              router.replace(logoutRedirectPath(persona));
+              router.replace(logoutRedirectPath(effectivePersona));
             }}
           >
             {t("dashboard.logout")}

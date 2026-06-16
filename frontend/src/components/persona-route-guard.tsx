@@ -7,6 +7,7 @@ import { useMarketingPersona } from "@/components/persona-provider";
 import { getToken } from "@/lib/auth";
 import { sessionPersonaHomeRedirect } from "@/lib/persona-access";
 import { getSessionPersona, setSessionPersona } from "@/lib/session-persona";
+import { resolveEffectiveSessionPersona } from "@/lib/persona-access";
 
 /** Redirects signed-in users away from another persona's product routes. */
 export function PersonaRouteGuard() {
@@ -18,7 +19,7 @@ export function PersonaRouteGuard() {
     const token = getToken();
     if (!token) return;
 
-    const sessionPersona = getSessionPersona() ?? persona;
+    const sessionPersona = resolveEffectiveSessionPersona(pathname, getSessionPersona() ?? persona);
     if (!getSessionPersona()) {
       setSessionPersona(sessionPersona);
     }
