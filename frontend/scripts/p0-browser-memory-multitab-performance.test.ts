@@ -48,23 +48,21 @@ test("2 LightweightRouteShell paints without blocking hidden tabs", () => {
   assert.match(src, /4_000/);
 });
 
-test("3 PerformanceSafeBrandStrip is ultra-light on workspace routes", () => {
-  const strip = read("src/components/marketing/performance-safe-brand-strip.tsx");
-  const marquee = read("src/components/site-top-marquee.tsx");
-  assert.match(strip, /export function PerformanceSafeBrandStrip/);
-  assert.match(strip, /LIGHT_BRANDS/);
-  assert.match(strip, /performance-safe-brand-strip/);
-  assert.match(strip, /loading="lazy"/);
-  assert.match(strip, /SafeCompanyLogo/);
-  assert.doesNotMatch(strip, /marketing-marquee-track/);
-  assert.doesNotMatch(strip, /will-change/);
-  assert.doesNotMatch(strip, /backdrop-blur/);
-  assert.doesNotMatch(strip, /MARQUEE_SEGMENTS/);
-  assert.match(marquee, /isPerformanceLightChromePath/);
-  assert.match(marquee, /PerformanceSafeBrandStrip/);
-  assert.match(marquee, /CompanyLogoMarquee/);
-  assert.match(strip, /role="presentation"/);
-  assert.match(strip, /brandLogoUrls/);
+test("3 CompanyLogoMarquee scrolls on all routes with perf guards", () => {
+  const marquee = read("src/components/marketing/company-logo-marquee.tsx");
+  const siteTop = read("src/components/site-top-marquee.tsx");
+  assert.match(marquee, /export function CompanyLogoMarquee/);
+  assert.match(marquee, /MARQUEE_SEGMENTS/);
+  assert.match(marquee, /marketing-marquee-track/);
+  assert.match(marquee, /usePageVisibility/);
+  assert.match(marquee, /useReducedMotionPreference/);
+  assert.match(marquee, /staticMarquee/);
+  assert.doesNotMatch(marquee, /will-change/);
+  assert.doesNotMatch(marquee, /backdrop-blur/);
+  assert.match(siteTop, /CompanyLogoMarquee/);
+  assert.match(siteTop, /dynamic\(/);
+  assert.doesNotMatch(siteTop, /PerformanceSafeBrandStrip/);
+  assert.doesNotMatch(siteTop, /isPerformanceLightChromePath/);
 });
 
 test("4 workspace route classification and html data attribute sync", () => {
@@ -87,21 +85,19 @@ test("4 workspace route classification and html data attribute sync", () => {
   assert.match(classify, /\/register/);
 });
 
-test("5 globals strip GPU chrome on workspace routes", () => {
+test("5 globals pause marquee when hidden and strip workspace blur", () => {
   const css = read("src/app/globals.css");
   assert.match(css, /html\[data-workspace-route="true"\]/);
-  assert.match(css, /performance-safe-brand-strip/);
+  assert.match(css, /company-logo-marquee/);
+  assert.match(css, /site-top-marquee-band/);
   assert.match(css, /backdrop-filter: none/);
-  assert.match(css, /will-change: auto/);
-  assert.match(css, /animation: none/);
-  assert.match(css, /twin-studio-ambient/);
-  assert.match(css, /landing-ambient__mesh/);
-  assert.match(css, /landing-ambient__orb/);
+  assert.doesNotMatch(css, /html\[data-workspace-route="true"\][\s\S]{0,400}\.marketing-marquee-track[\s\S]{0,120}animation: none/);
   assert.match(css, /html\[data-page-hidden="true"\]/);
   assert.match(css, /marketing-marquee-track/);
   assert.match(css, /animation-play-state: paused/);
-  assert.match(css, /company-logo-marquee/);
-  assert.match(css, /site-top-marquee-band/);
+  assert.match(css, /twin-studio-ambient/);
+  assert.match(css, /landing-ambient__mesh/);
+  assert.match(css, /landing-ambient__orb/);
   assert.match(css, /twin-nature-wallpaper-img/);
 });
 
