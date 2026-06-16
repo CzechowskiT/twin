@@ -17,6 +17,7 @@
 - **Persona workspace navigation UX (2026-06-12):** `docs/PERSONA_WORKSPACE_NAVIGATION_PREMIUM_UX_2026-06-12.md` — module grids, `/recruiter` hub, login OAuth polish; launch **NO-GO** unchanged
 - **Company entry navigation (2026-06-16):** `/for-companies` → `/company/dashboard` + `/company/talent-pool` CTAs; `WORKSPACE_PATH.company` → dashboard; `test:company-entry-navigation`
 - **P0 browser memory / multi-tab (2026-06-16):** `docs/P0_BROWSER_MEMORY_MULTITAB_PERFORMANCE_2026-06-16.md` — `PerformanceSafeBrandStrip` on workspace; `useLoadWhenVisible`; `LightweightRouteShell`; lazy demo data; `test:p0-browser-memory-multitab-performance`
+- **P0 renderer memory / bundle reduction (2026-06-16):** `docs/P0_RENDERER_MEMORY_PROFILE_2026-06-16.md` — split `ChromeHeader` (marketing/workspace/auth); dynamic `CompanyLogoMarquee`; bounded request deduper; `test:p0-renderer-memory-bundle-reduction`
 - **Multi-tab performance hardening (2026-06-16):** `docs/MULTI_TAB_PERFORMANCE_HARDENING_2026-06-16.md` — pause marquee/polling in hidden tabs; dedupe `public-health`; `test:multi-tab-performance-hardening`
 - **Launch-day monitoring / rollback:** `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` (2026-06-04)
 - **Recruiter alignment audit:** `docs/TWIN_RECRUITER_ALIGNMENT_PRODUCT_AUDIT_2026-06-04.md` (2026-06-04)

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { TwinRoiCalculator } from "@/components/marketing/twin-roi-calculator";
+import { CalculatorB2bClient } from "@/app/(marketing)/calculator/b2b/calculator-b2b-client";
 
 export const metadata: Metadata = {
   title: "B2B ROI calculator — TWIN",
@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function CalculatorB2BPage() {
-  return <TwinRoiCalculator />;
+  return <CalculatorB2bClient />;
 }

@@ -1,8 +1,6 @@
 "use client";
 
-import { SiteHeaderBar } from "@/components/site-header-bar";
+import { WorkspaceHeader } from "@/components/workspace-header";
 
-/** Authenticated app chrome — read-only persona badge when a session exists. */
-export function AppHeader() {
-  return <SiteHeaderBar showPersonaBadge />;
-}
+/** @deprecated Use WorkspaceHeader — kept for legacy imports. */
+export const AppHeader = WorkspaceHeader;

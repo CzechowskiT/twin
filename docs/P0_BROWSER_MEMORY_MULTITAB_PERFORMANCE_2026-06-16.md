@@ -67,6 +67,7 @@ Unchanged: public **NO-GO**, auto-apply **PAUSED**, no auth relaxation.
 
 ## Related docs
 
+- `docs/P0_RENDERER_MEMORY_PROFILE_2026-06-16.md` — renderer bundle split (this PR's companion)
 - `docs/MULTI_TAB_PERFORMANCE_HARDENING_2026-06-16.md` — prior slice (polling, dedupe, marquee pause on hidden)
 - `docs/FOUNDER_PREMIUM_PRODUCT_QA_CHECKLIST_2026-06-08.md` — § multi-tab QA row
 - `docs/PRODUCTION_REALITY_MATRIX_2026-05-27.md` — ops reality entry
