@@ -16,8 +16,10 @@ import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
 import { getClientApiLocale } from "@/lib/api-locale";
 import { isLikelyBrowserNetworkFailureMessage } from "@/lib/api";
 import {
+  COMPANY_TALENT_POOL_BACK_LINKS,
+} from "@/lib/company-entry-navigation";
+import {
   COMPANY_TALENT_POOL_MARKERS,
-  COMPANY_TALENT_POOL_ROUTE,
   type CompanyTalentPoolPayload,
   type CompanyTalentPoolReadinessState,
 } from "@/lib/company-talent-pool";
@@ -565,11 +567,25 @@ export default function CompanyTalentPoolClient() {
           </Card>
           <div className="flex flex-wrap gap-4 text-sm">
             <Link
+              href={COMPANY_TALENT_POOL_BACK_LINKS.dashboard}
+              className="twin-link font-medium"
+              data-testid={COMPANY_TALENT_POOL_MARKERS.dashboardLink}
+            >
+              {t("companyTalentPool.linkDashboard")}
+            </Link>
+            <Link
               href={payload.links.recruiter_import}
               className="twin-link font-medium"
               data-testid={COMPANY_TALENT_POOL_MARKERS.importLink}
             >
               {t("companyTalentPool.linkImport")}
+            </Link>
+            <Link
+              href={COMPANY_TALENT_POOL_BACK_LINKS.roles}
+              className="twin-link font-medium"
+              data-testid={COMPANY_TALENT_POOL_MARKERS.rolesLink}
+            >
+              {t("companyTalentPool.linkRoles")}
             </Link>
             <Link
               href={payload.links.integrations}
@@ -584,9 +600,6 @@ export default function CompanyTalentPoolClient() {
               data-testid={COMPANY_TALENT_POOL_MARKERS.pipelineLink}
             >
               {t("companyTalentPool.linkPipeline")}
-            </Link>
-            <Link href={COMPANY_TALENT_POOL_ROUTE} className="twin-link font-medium">
-              {t("companyTalentPool.title")}
             </Link>
           </div>
         </div>

@@ -14,6 +14,14 @@ export default function ForCompaniesPage() {
       <section className="border-t border-[var(--twin-border)] py-10 text-center sm:py-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <p className="text-sm text-[var(--twin-muted-strong)]">
+            <Link href="/company/dashboard" className="twin-link font-semibold text-[var(--foreground)]">
+              {t("companyEntry.footerDashboard")}
+            </Link>
+            <span className="mx-2 text-[var(--twin-border)]">·</span>
+            <Link href="/company/talent-pool" className="twin-link font-semibold text-[var(--foreground)]">
+              {t("companyTalentPool.navLink")}
+            </Link>
+            <span className="mx-2 text-[var(--twin-border)]">·</span>
             <Link href="/company/pipeline" className="twin-link font-semibold text-[var(--foreground)]">
               {t("companyPipeline.navLink")}
             </Link>

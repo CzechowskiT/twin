@@ -44,9 +44,11 @@ export type PersonaBundle = {
   logisticsTitle: string;
   logistics: string[];
   primaryCta: { label: string; href: string };
-  /** Stacked under primary (e.g. wishlist under B2B calculator on for-companies). */
+  /** Stacked under primary (e.g. talent pool under dashboard on for-companies). */
   stackedCta?: { label: string; href: string };
   secondaryCta?: { label: string; href: string };
+  /** Extra row on for-companies (calculator, wishlist, contact). */
+  supplementaryCtas?: { label: string; href: string }[];
 };
 
 const candidatesEn: PersonaBundle = {
@@ -518,9 +520,13 @@ const companiesEn: PersonaBundle = {
     "Candidate marketing SKUs never include SSO or custom DPA unless upgraded through this lane.",
     "Calculator output remains illustrative; legal and financial sign-off stays with your teams.",
   ],
-  primaryCta: { label: "Open B2B ROI calculator", href: "/calculator/b2b" },
-  stackedCta: { label: "Join founding wishlist", href: "/waitlist" },
-  secondaryCta: { label: "Contact enterprise", href: "/contact" },
+  primaryCta: { label: "Open company dashboard", href: "/company/dashboard" },
+  stackedCta: { label: "View Talent Memory", href: "/company/talent-pool" },
+  secondaryCta: { label: "Open B2B ROI calculator", href: "/calculator/b2b" },
+  supplementaryCtas: [
+    { label: "Join founding wishlist", href: "/waitlist" },
+    { label: "Contact enterprise", href: "/contact" },
+  ],
 };
 
 const investorsEn: PersonaBundle = {
@@ -751,9 +757,13 @@ const companiesPl: PersonaBundle = {
     "SKU kandydata nie obejmuje SSO ani custom DPA bez przejścia tę ścieżką.",
     "Wynik kalkulatora pozostaje ilustracyjny; akceptacja prawno-finansowa pozostaje po stronie klienta.",
   ],
-  primaryCta: { label: "Otwórz kalkulator ROI B2B", href: "/calculator/b2b" },
-  stackedCta: { label: "Dołącz do founding wishlist", href: "/waitlist" },
-  secondaryCta: { label: "Kontakt enterprise", href: "/contact" },
+  primaryCta: { label: "Otwórz panel firmy", href: "/company/dashboard" },
+  stackedCta: { label: "Zobacz Pamięć Talentów", href: "/company/talent-pool" },
+  secondaryCta: { label: "Otwórz kalkulator ROI B2B", href: "/calculator/b2b" },
+  supplementaryCtas: [
+    { label: "Dołącz do founding wishlist", href: "/waitlist" },
+    { label: "Kontakt enterprise", href: "/contact" },
+  ],
 };
 
 export const PERSONA_PAGES: Record<PersonaId, { en: PersonaBundle; pl: PersonaBundle }> = {

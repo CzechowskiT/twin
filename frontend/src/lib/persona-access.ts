@@ -7,6 +7,7 @@ import {
   PERSONA_ROUTE,
   type MarketingPersona,
 } from "@/lib/marketing-persona";
+import { COMPANY_ENTRY_DASHBOARD_ROUTE } from "@/lib/company-entry-navigation";
 import { LOGIN_PATH, REGISTER_PATH, WORKSPACE_PATH } from "@/lib/persona-auth";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -319,11 +320,13 @@ export type HeaderSessionNavLink = { href: string; labelKey: TranslationKey };
 const SESSION_PANEL_PREFIXES: Partial<Record<string, readonly string[]>> = {
   "/workspace/recruiter": ["/workspace/recruiter", "/recruiter"],
   "/workspace/investor": ["/workspace/investor", "/investor"],
+  [COMPANY_ENTRY_DASHBOARD_ROUTE]: ["/company"],
 };
 
 /** Logged-in home for the Panel tab (candidate dashboard vs persona workspace). */
 export function sessionPanelHref(persona: MarketingPersona): string {
   if (persona === "candidate") return "/dashboard";
+  if (persona === "company") return COMPANY_ENTRY_DASHBOARD_ROUTE;
   return WORKSPACE_PATH[persona];
 }
 
@@ -424,6 +427,13 @@ export function momentumRailCtas(
     return [
       { href: "/investor/metrics", labelKey: "investorMetrics.title" },
       { href: "/for-investors", labelKey: "nav.forInvestors" },
+    ];
+  }
+  if (pathname.startsWith("/company") || pathname === "/for-companies") {
+    return [
+      { href: COMPANY_ENTRY_DASHBOARD_ROUTE, labelKey: "site.momentumCtaWorkspace" },
+      { href: "/company/talent-pool", labelKey: "companyTalentPool.navLink" },
+      { href: "/for-companies", labelKey: "nav.forCompanies" },
     ];
   }
   return defaultMomentumCtas(persona, hasSession);

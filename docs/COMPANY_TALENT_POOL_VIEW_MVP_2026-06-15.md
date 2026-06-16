@@ -71,14 +71,16 @@ Pilot · Internal data first · No automatic outreach · Recruiter review requir
 ```bash
 cd frontend && npm run test:company-talent-pool-view-mvp   # 15 assertions
 cd frontend && npm run test:company-talent-pool-executive-ux   # 15 assertions — workspace selector, NBA, readiness guide
+cd frontend && npm run test:company-entry-navigation   # 14 assertions — /for-companies → workspace routes
 cd backend && pytest tests/test_company_talent_pool.py tests/test_company_talent_pool_view.py -q
 ```
 
 ## Links from
 
+- `/for-companies` — hero CTAs (dashboard + talent memory) + **Workspace firmy** preview cards
 - `/company/dashboard` (workspace module card — Pilot)
 - Company workspace nav
-- `/company/pipeline`, `/company/integrations`, `/company/roles` (footer cross-links)
+- `/company/pipeline`, `/company/integrations`, `/company/roles` (footer cross-links incl. dashboard + roles on talent pool)
 
 ## Related docs
 
@@ -91,3 +93,4 @@ cd backend && pytest tests/test_company_talent_pool.py tests/test_company_talent
 - **#138** — initial MVP (executive summary, basic quality, source coverage, records list)
 - **fix/company-talent-pool-view-gaps-2026-06-15** — role/skill coverage, readiness states, expanded quality dimensions
 - **fix/company-talent-pool-executive-ux-polish-2026-06-15** — premium workspace selector, readiness guide, NBA panel, role-aware Radar CTAs, trust panel
+- **fix/company-entry-navigation-to-dashboard-talent-pool-2026-06-16** — `/for-companies` hero + workspace preview → `/company/dashboard` & `/company/talent-pool`; Panel header → dashboard; `/workspace/company` redirect
