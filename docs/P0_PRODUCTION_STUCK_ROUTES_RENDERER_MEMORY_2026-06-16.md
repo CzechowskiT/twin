@@ -60,10 +60,75 @@ npm run build && npx tsc --noEmit
 npm run test:p0-browser-memory-multitab-performance
 npm run test:workspace-deeplink-new-tab
 
-# After deploy:
-PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app \
-  npm run test:prod-recruiter-multitab-stuck-routes
+# After deploy (gated — NOT in default CI):
+PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 \
+  PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app \
+  npm run test:prod-recruiter-sequential-behavioral-smoke
+PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 \
+  PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app \
+  npm run test:prod-recruiter-controlled-multitab-smoke
 ```
+
+## Phase 3A — Sequential behavioral smoke (P0 gate)
+
+**Spec:** `frontend/e2e/prod-recruiter-sequential-behavioral-smoke.spec.ts`  
+**Jedna instancja przeglądarki, trasy sekwencyjnie (bez równoległych kart).**  
+**Bramka:** `PLAYWRIGHT_ALLOW_PROD_SMOKE=1` — nie uruchamia się w domyślnym CI.
+
+```bash
+cd frontend
+PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 \
+  PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app \
+  npm run test:prod-recruiter-sequential-behavioral-smoke
+```
+
+| Trasa | Status | Uwagi |
+| ----- | ------ | ----- |
+| 6 tras recruiter | _pending post-merge run_ | CDP heap/DOM @ 15s settle |
+
+**P0 Phase 3A:** _pending evidence_
+
+## Phase 3B — Controlled multitab smoke (P0 gate)
+
+**Spec:** `frontend/e2e/prod-recruiter-controlled-multitab-smoke.spec.ts`  
+**Jeden kontekst, 6 kart otwartych z opóźnieniem 500–1000 ms, checkpointy @ 15s i 30s.**
+
+```bash
+cd frontend
+PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 \
+  PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app \
+  npm run test:prod-recruiter-controlled-multitab-smoke
+```
+
+**PASS criteria (per tab @ 30s):**
+
+- Treść widoczna (≥40 znaków) **lub** karta auth **lub** `lightweight-route-shell-ready`
+- Brak utkniętego skeletonu @ 15s
+- Brak bounce do `/workspace/candidate` / `/workspace/recruiter`
+- `redirectCount ≤ 2`
+- `jsHeapUsedMb < 512` (CDP `Runtime.getHeapUsage` — **nie** RSS procesu Chrome)
+
+**Wyłączone:** brutalny 10–12 tab test (`test:prod-recruiter-multitab-stuck-routes`), `test:workspace-multitab-browser-smoke` na prod.
+
+| Checkpoint | Status | Uwagi |
+| ---------- | ------ | ----- |
+| 6 tab @ 30s | _pending post-merge run_ | stagger 500–1000 ms |
+
+**P0 Phase 3B:** _pending evidence_
+
+### JS heap (CDP) vs RSS — disclaimer
+
+Metryki w smoke używają **CDP `Runtime.getHeapUsage`** (JS heap V8 w rendererze Playwright/headless). **Nie mierzą RSS** procesu Chrome widocznego w Activity Monitor (founder: 5–7.5 GB/tab). PASS heap <512 MB **nie dowodzi** braku regresji GB-scale RSS przy 8–12 kartach w normalnym Chrome z sesją — wymaga osobnej walidacji po Phase 3B stable.
+
+## P0 incident status
+
+| Faza | Status |
+| ---- | ------ |
+| Phase 1 diagnostics | DONE |
+| Phase 2 fixes (PR #149) | MERGED |
+| Phase 3A sequential smoke | **OPEN** (pending prod run) |
+| Phase 3B controlled multitab | **OPEN** (pending prod run) |
+| **P0 overall** | **PARTIAL** — nie DONE dopóki 3B nie stable |
 
 ## Launch stance
 
