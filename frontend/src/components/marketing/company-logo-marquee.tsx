@@ -192,7 +192,7 @@ export function CompanyLogoMarquee() {
   if (staticMarquee) {
     return (
       <div
-        className="company-logo-marquee shrink-0 border-y border-[var(--twin-border)] bg-[var(--twin-surface)]/90 py-3.5 backdrop-blur-[2px] sm:py-4"
+        className="company-logo-marquee shrink-0 border-y border-[var(--twin-border)] bg-[var(--twin-surface)]/90 py-3.5 sm:py-4"
         role="presentation"
       >
         <div className="company-logo-marquee__viewport overflow-x-auto [-webkit-overflow-scrolling:touch] px-3 sm:px-5">
@@ -206,11 +206,11 @@ export function CompanyLogoMarquee() {
 
   return (
     <div
-      className="company-logo-marquee shrink-0 border-y border-[var(--twin-border)] bg-[var(--twin-surface)]/90 py-3.5 backdrop-blur-[2px] sm:py-4"
+      className="company-logo-marquee shrink-0 border-y border-[var(--twin-border)] bg-[var(--twin-surface)]/90 py-3.5 sm:py-4"
       role="presentation"
     >
       <div className="company-logo-marquee__viewport overflow-x-clip px-3 sm:px-5" aria-hidden>
-        <div className="marketing-marquee-track flex w-max items-center py-0.5 will-change-transform">
+        <div className="marketing-marquee-track flex w-max items-center py-0.5">
           {Array.from({ length: MARQUEE_SEGMENTS }, (_, segmentIndex) => (
             <LogoRow
               key={segmentIndex}

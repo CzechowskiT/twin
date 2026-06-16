@@ -45,17 +45,19 @@ test("2 workspace/auth headers avoid marketing SiteHeaderBar corporate nav array
   assert.match(marketingBar, /headerMarketingLaneLinks/);
 });
 
-test("3 marquee brand array lazy on marketing only — workspace uses 6-logo strip", () => {
+test("3 full logo marquee lazy-loaded on all routes", () => {
   const marquee = read("src/components/site-top-marquee.tsx");
-  const strip = read("src/components/marketing/performance-safe-brand-strip.tsx");
+  const component = read("src/components/marketing/company-logo-marquee.tsx");
   assert.match(marquee, /dynamic\(/);
   assert.match(marquee, /company-logo-marquee/);
-  assert.match(marquee, /PerformanceSafeBrandStrip/);
-  assert.match(marquee, /isPerformanceLightChromePath/);
+  assert.match(marquee, /CompanyLogoMarquee/);
+  assert.doesNotMatch(marquee, /PerformanceSafeBrandStrip/);
+  assert.doesNotMatch(marquee, /isPerformanceLightChromePath/);
   assert.doesNotMatch(marquee, /import \{ CompanyLogoMarquee \}/);
-  assert.match(strip, /LIGHT_BRANDS/);
-  const brandCount = (strip.match(/\{ slug:/g) ?? []).length;
-  assert.equal(brandCount, 6);
+  assert.match(component, /MARQUEE_SEGMENTS/);
+  assert.match(component, /marketing-marquee-track/);
+  const brandCount = (component.match(/\{ slug:/g) ?? []).length;
+  assert.ok(brandCount >= 80, `expected ~89 marquee brands, got ${brandCount}`);
 });
 
 test("4 auth/login layouts server-first with client island shells", () => {
@@ -155,12 +157,13 @@ test("10 talent radar/import lazy modals and abortable fetches", () => {
   assert.match(imp, /useAbortableFetch/);
 });
 
-test("11 workspace CSS strips GPU chrome on data-workspace-route", () => {
+test("11 workspace CSS strips backdrop blur on data-workspace-route", () => {
   const css = read("src/app/globals.css");
   const sync = read("src/components/workspace-route-sync.tsx");
   assert.match(css, /html\[data-workspace-route="true"\]/);
-  assert.match(css, /performance-safe-brand-strip/);
-  assert.match(css, /will-change: auto/);
+  assert.match(css, /company-logo-marquee/);
+  assert.match(css, /backdrop-filter: none/);
+  assert.doesNotMatch(css, /html\[data-workspace-route="true"\][\s\S]{0,400}\.marketing-marquee-track[\s\S]{0,120}animation: none/);
   assert.match(sync, /data-workspace-route/);
   assert.match(read("src/components/route-aware-background.tsx"), /return null/);
 });
