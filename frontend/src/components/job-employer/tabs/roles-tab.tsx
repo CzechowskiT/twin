@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
-import { buildEmployerContactDemo } from "@/lib/job-employer-demo";
-import { getDemoGlobalJobBrief } from "@/lib/job-brief-demo-data";
+import { capDemoArray, loadJobBriefDemoModule, loadJobEmployerDemoModule } from "@/lib/lazy-demo-data";
+import type { GlobalJobBriefData } from "@/lib/job-brief-demo-data";
 import type { Locale } from "@/lib/i18n";
+import type { EmployerContactDemo } from "@/lib/job-employer-demo";
 
 export function JobEmployerRolesTab({
   company,
@@ -17,11 +18,38 @@ export function JobEmployerRolesTab({
   location?: string | null;
 }) {
   const { t, locale } = useTranslation();
-  const contact = useMemo(() => buildEmployerContactDemo(company, jobTitle), [company, jobTitle]);
-  const brief = useMemo(
-    () => getDemoGlobalJobBrief({ company, title: jobTitle, location: location ?? null }, locale as Locale),
-    [company, jobTitle, location, locale],
-  );
+  const [contact, setContact] = useState<EmployerContactDemo | null>(null);
+  const [brief, setBrief] = useState<GlobalJobBriefData | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void Promise.all([loadJobEmployerDemoModule(), loadJobBriefDemoModule()]).then(([employerMod, briefMod]) => {
+      if (cancelled) return;
+      setContact(employerMod.buildEmployerContactDemo(company, jobTitle));
+      const raw = briefMod.getDemoGlobalJobBrief(
+        { company, title: jobTitle, location: location ?? null },
+        locale as Locale,
+      );
+      setBrief({
+        ...raw,
+        similarRoles: capDemoArray(raw.similarRoles, 8),
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [company, jobTitle, location, locale]);
+
+  const openRoles = useMemo(() => contact?.openRoles ?? [], [contact]);
+
+  if (!contact || !brief) {
+    return (
+      <div className="space-y-4 animate-pulse">
+        <div className="h-24 rounded-xl bg-[var(--twin-surface-soft)]" />
+        <div className="h-32 rounded-xl bg-[var(--twin-surface-soft)]" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -31,7 +59,7 @@ export function JobEmployerRolesTab({
         </p>
         <h3 className="mt-1 text-lg font-semibold">{t("jobBrief.sectionSimilarTitle")}</h3>
         <ul className="mt-4 space-y-3">
-          {contact.openRoles.map((role) => (
+          {openRoles.map((role) => (
             <li
               key={role.id}
               className={`rounded-xl border px-4 py-3 ${

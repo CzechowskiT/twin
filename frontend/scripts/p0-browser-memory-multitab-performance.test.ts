@@ -110,7 +110,7 @@ test("6 workspace layouts use LightweightRouteShell via WorkspaceRouteLayout", (
   const dashboard = read("src/app/dashboard/layout.tsx");
   const recruiter = read("src/app/recruiter/layout.tsx");
   const company = read("src/app/company/layout.tsx");
-  const login = read("src/app/login/layout.tsx");
+  const login = read("src/app/login/login-layout-client.tsx");
   assert.match(layout, /LightweightRouteShell/);
   assert.match(layout, /PersonaWorkspaceGate/);
   assert.match(layout, /WorkspaceRouteSkeleton/);
@@ -259,7 +259,7 @@ test("13 demo data is lazy-loaded and capped", () => {
   assert.match(brief, /import type \{ GlobalJobBriefData \}/);
   assert.match(brief, /cappedBrief/);
   assert.match(lazy, /slice\(0, cap\)/);
-  assert.match(lazy, /12/);
+  assert.match(lazy, /10/);
   assert.match(brief, /similarRoles: capDemoArray/);
 });
 

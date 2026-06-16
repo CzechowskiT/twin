@@ -25,14 +25,15 @@ Opening 8–12 TWIN tabs caused severe browser/CPU slowdown and 3–6 GB per ren
 | `useBackgroundAwareInterval` / `useBackgroundAwarePolling` | Pause or back off timers when tab hidden |
 | `useAbortableFetch` | Abort superseded/unmounted fetches |
 | `useLoadWhenVisible` | IntersectionObserver + tab visibility — defer heavy panels |
-| `createRequestDeduper` | 30–45s TTL coalesce for read-only health/config |
+| `createRequestDeduper` | 30–45s TTL coalesce; **max 64 cache entries** with eviction |
 | `fetchPublicHealthJson` | Deduped `/api/public-health` |
 | `useReducedMotionPreference` | `prefers-reduced-motion` hook |
 | `PageVisibilitySync` | Sets `data-page-hidden` / `data-reduced-motion` on `<html>` for CSS |
 | `WorkspaceRouteSync` | Sets `data-workspace-route` on workspace/auth paths |
 | `LightweightRouteShell` | Skeleton + 8s paint timeout; hidden tabs never block forever |
 | `PerformanceSafeBrandStrip` | 6-logo static strip for workspace/auth (no animation/blur) |
-| `lazy-demo-data` | Dynamic import + `capDemoArray(12)` for demo payloads |
+| `lazy-demo-data` | Dynamic import + `capDemoArray(10)` for demo payloads |
+| `ChromeHeader` / `WorkspaceSiteHeaderBar` / `AuthSiteHeaderBar` | Route-split headers — workspace/auth avoid marketing nav + marquee chunk |
 
 ## Applied surfaces
 
@@ -50,6 +51,7 @@ Opening 8–12 TWIN tabs caused severe browser/CPU slowdown and 3–6 GB per ren
 
 ```bash
 cd frontend
+npm run test:p0-renderer-memory-bundle-reduction
 npm run test:p0-browser-memory-multitab-performance
 npm run test:multi-tab-performance-hardening
 npm run build
