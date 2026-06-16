@@ -45,7 +45,7 @@ test("2 LightweightRouteShell paints without blocking hidden tabs", () => {
   assert.match(src, /clearTimeout/);
   assert.match(src, /children/);
   assert.match(src, /cancelAnimationFrame/);
-  assert.match(src, /8_000/);
+  assert.match(src, /4_000/);
 });
 
 test("3 PerformanceSafeBrandStrip is ultra-light on workspace routes", () => {
