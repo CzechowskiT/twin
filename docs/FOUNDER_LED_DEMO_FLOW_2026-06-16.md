@@ -43,6 +43,8 @@ Lightweight product orchestration layer connecting existing TWIN surfaces into o
 | Company pipeline alias | `/company/roles/demo-role-001/pipeline` | Auth |
 | Company Profile 360 alias | `/company/candidates/demo-candidate-001` | Auth |
 | Collaboration (pilot) | `/recruiter/candidates/demo-candidate-001/collaboration` | Auth |
+| Trust & consent (pilot) | `/recruiter/candidates/demo-candidate-001/trust` | Auth |
+| Job consent (pilot) | `/recruiter/jobs/demo-role-001/consent` | Auth |
 | Job feedback (pilot) | `/recruiter/jobs/demo-role-001/feedback` | Auth |
 | Job scorecards (pilot) | `/recruiter/jobs/demo-role-001/scorecards` | Auth |
 | Candidate panel | `/dashboard` | Auth |

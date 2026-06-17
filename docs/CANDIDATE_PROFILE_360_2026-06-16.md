@@ -36,6 +36,7 @@ Recruiter/company-facing **system-of-record direction** for one candidate — st
 - `/demo` journey — `recruiter_profile_360` step → `/recruiter/candidates/demo-candidate-001` (auth-gated).
 - Job pipeline (2026-06-17) — `demo-candidate-001` on `demo-role-001` shortlist links back to Profile 360.
 - Collaboration (2026-06-17) — Profile 360 notes/feedback link to collaboration workspace; pipeline decision memory links to job feedback/scorecards.
+- Trust layer (2026-06-17) — Profile 360 consent section links to trust workspace; pipeline consent badge and collaboration trust badge link to trust routes.
 
 ## Hard bans (preserved)
 

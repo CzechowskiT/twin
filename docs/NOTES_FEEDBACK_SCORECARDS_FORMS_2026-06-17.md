@@ -50,6 +50,7 @@ Recruiter/company-facing **collaboration layer** connected to Candidate Profile 
 - **Candidate Profile 360** — notes → collaboration; feedback → feedback/scorecard aliases.
 - **Job Pipeline** — candidate cards → profile + feedback/scorecard; decision memory → job feedback/scorecards.
 - **`/demo` journey** — `collaboration` step → `/recruiter/candidates/demo-candidate-001/collaboration`.
+- **Trust layer (2026-06-17)** — collaboration trust badge → trust workspace; see `docs/GDPR_CONSENT_CONTACT_HISTORY_2026-06-17.md`.
 
 ## Hard bans (preserved)
 

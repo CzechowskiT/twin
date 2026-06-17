@@ -19,6 +19,8 @@
 
 **Notes, Feedback, Scorecards & Forms (2026-06-17):** `/recruiter/candidates/demo-candidate-001/collaboration` pilot — 7 sections, scorecard 9 criteria, form previews, human boundaries; `test:notes-feedback-scorecards` → `docs/NOTES_FEEDBACK_SCORECARDS_FORMS_2026-06-17.md`.
 
+**GDPR / Consent / Contact History (2026-06-17):** `/recruiter/candidates/demo-candidate-001/trust` pilot — 9 sections, consent/contact permission/history, risk flags, audit connections; `test:gdpr-consent-contact-history` → `docs/GDPR_CONSENT_CONTACT_HISTORY_2026-06-17.md`.
+
 **Program:** Premium Product Experience Polish Slices 0–7 (PRs [#52](https://github.com/CzechowskiT/twin/pull/52)–[#58](https://github.com/CzechowskiT/twin/pull/58))
 
 ---
