@@ -178,6 +178,19 @@ export default function RecruiterJobsPage() {
         <Link href="/recruiter/inbox" className="twin-link mt-6 inline-block text-sm">
           {t("recruiterJobs.inboxLink")}
         </Link>
+        <div className="mt-6 rounded-lg border border-amber-500/30 bg-amber-500/5 p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-amber-200">
+            {t("jobPipeline.pilotBadge")}
+          </p>
+          <p className="mt-2 text-sm text-[var(--twin-muted-strong)]">{t("jobPipeline.demoJobsLead")}</p>
+          <Link
+            href="/recruiter/jobs/demo-role-001/pipeline"
+            className="twin-link mt-3 inline-block text-sm font-medium"
+            data-testid="recruiter-jobs-demo-pipeline-link"
+          >
+            {t("jobPipeline.openPipeline")}
+          </Link>
+        </div>
       </Card>
     </Shell>
   );

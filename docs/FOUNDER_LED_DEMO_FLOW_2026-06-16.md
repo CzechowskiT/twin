@@ -39,6 +39,8 @@ Lightweight product orchestration layer connecting existing TWIN surfaces into o
 | Weekly digest | `/recruiter/talent-radar/digest` | Auth |
 | Recruiter inbox | `/recruiter/inbox` | Auth |
 | Candidate Profile 360 (pilot) | `/recruiter/candidates/demo-candidate-001` | Auth |
+| Job pipeline (pilot) | `/recruiter/jobs/demo-role-001/pipeline` | Auth |
+| Company pipeline alias | `/company/roles/demo-role-001/pipeline` | Auth |
 | Company Profile 360 alias | `/company/candidates/demo-candidate-001` | Auth |
 | Candidate panel | `/dashboard` | Auth |
 | Offers | `/dashboard/jobs` | Auth (alias) |
@@ -59,6 +61,7 @@ Marketing header (`headerMarketingLaneLinks`) — **Demo** → `/demo` (unchange
 - **Pilot:** Talent Pool import, Talent Radar, digest — pilot badges in product.
 - **Paused / not live:** auto-apply, auto-outreach, recruiter calendar sync, live ATS sync — **not activated**.
 - **Pilot (2026-06-16):** Candidate Profile 360 — sample `demo-candidate-001` only; invalid IDs → guided not-found.
+- **Pilot (2026-06-17):** Job-Specific Pipeline — sample `demo-role-001` only; 7 stages; disabled stage actions; invalid IDs → guided not-found.
 
 ## Automated verification
 

@@ -15,6 +15,8 @@
 
 **Candidate Profile 360 (2026-06-16):** `/recruiter/candidates/demo-candidate-001` pilot — 11 sections, consent/decision memory, human boundaries; `test:candidate-profile-360` → `docs/CANDIDATE_PROFILE_360_2026-06-16.md`.
 
+**Job-Specific Pipeline (2026-06-17):** `/recruiter/jobs/demo-role-001/pipeline` pilot — 7 stages, candidate cards, decision memory, human boundaries; `test:job-specific-pipeline-statuses` → `docs/JOB_SPECIFIC_PIPELINE_STATUSES_2026-06-17.md`.
+
 **Program:** Premium Product Experience Polish Slices 0–7 (PRs [#52](https://github.com/CzechowskiT/twin/pull/52)–[#58](https://github.com/CzechowskiT/twin/pull/58))
 
 ---
