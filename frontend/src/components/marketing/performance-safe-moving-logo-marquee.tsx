@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, type CSSProperties } from "react";
+import type { CSSProperties } from "react";
 
 import { useTranslation } from "@/components/language-provider";
-import { SafeCompanyLogo } from "@/components/marketing/safe-company-logo";
+import { PerformanceSafeLogoMark } from "@/components/marketing/performance-safe-logo-mark";
 import { usePageVisibility } from "@/hooks/use-page-visibility";
 import { useReducedMotionPreference } from "@/hooks/use-reduced-motion-preference";
 import type { Brand } from "@/lib/brand-logo-urls";
@@ -12,9 +12,12 @@ import {
   PERFORMANCE_SAFE_MARQUEE_SEGMENTS,
 } from "@/lib/marquee-brand-subset";
 import type { TranslationKey } from "@/lib/i18n";
-import { performanceSafeCuratedLogoUrls } from "@/lib/performance-safe-curated-logos";
+import {
+  getPerformanceSafeCuratedLogoSpec,
+  isPerformanceSafeCuratedLogoSlug,
+} from "@/lib/performance-safe-curated-logos";
 
-const MARK_BOX_CLASS = "h-9 w-[7.25rem] sm:h-10 sm:w-[8rem]";
+const MARK_BOX_CLASS = "h-9 w-[8rem] sm:h-10 sm:w-[10rem]";
 
 const MARK_PLATE_CLASS =
   "border border-zinc-200/90 bg-white shadow-sm ring-1 ring-zinc-950/[0.04] dark:border-zinc-500/40 dark:bg-zinc-100 dark:ring-white/10";
@@ -28,14 +31,26 @@ function BrandMark({
   linkSuffix: string;
   tabIndex?: number;
 }) {
-  const urls = useMemo(() => performanceSafeCuratedLogoUrls(brand.slug), [brand.slug]);
-  const a11y = `${brand.name}${linkSuffix}`;
+  const spec = getPerformanceSafeCuratedLogoSpec(brand.slug);
+  const a11y = spec?.ariaLabel ? `${spec.ariaLabel}${linkSuffix}` : `${brand.name}${linkSuffix}`;
   const plateClass = `${MARK_BOX_CLASS} ${MARK_PLATE_CLASS} relative flex shrink-0 items-center justify-center rounded-lg`;
 
+  if (!spec || !isPerformanceSafeCuratedLogoSlug(brand.slug)) {
+    return null;
+  }
+
   return (
-    <span role="img" tabIndex={tabIndex} aria-label={a11y} title={a11y} className={plateClass}>
-      <span className="relative flex h-full w-full items-center justify-center px-1.5 py-1 sm:px-2">
-        <SafeCompanyLogo name={brand.name} urls={urls} loading="lazy" />
+    <span
+      role="img"
+      tabIndex={tabIndex}
+      aria-label={a11y}
+      title={a11y}
+      className={plateClass}
+      data-performance-safe-logo-card={brand.slug}
+      data-quality-status={spec.qualityStatus}
+    >
+      <span className="relative flex h-full w-full items-center justify-center px-2 py-1">
+        <PerformanceSafeLogoMark slug={brand.slug} />
       </span>
     </span>
   );
@@ -71,7 +86,7 @@ function LogoRow({
 
 /**
  * Bounded DOM marquee for workspace/auth — ≤27 logo nodes (9×3 segments),
- * self-hosted curated wordmarks only, CSS transform loop; pauses when tab
+ * inline curated wordmarks only, CSS transform loop; pauses when tab
  * hidden or motion reduced.
  */
 export function PerformanceSafeMovingLogoMarquee() {

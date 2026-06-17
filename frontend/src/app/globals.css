@@ -2307,9 +2307,21 @@ html[data-workspace-route="true"] .landing-ambient__orb {
   display: flex;
   width: max-content;
   flex-wrap: nowrap;
-  animation: performance-safe-marquee 48s linear infinite;
+  animation: performance-safe-marquee 52s linear infinite;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+}
+
+.performance-safe-logo-mark {
+  display: block;
+  height: 1rem;
+  width: 5rem;
+  max-width: 5.25rem;
+  flex-shrink: 0;
+}
+
+.performance-safe-logo-mark__inner {
+  transform-origin: center center;
 }
 
 html[data-page-hidden="true"] .performance-safe-marquee-track,

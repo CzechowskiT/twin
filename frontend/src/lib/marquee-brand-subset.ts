@@ -30,5 +30,5 @@ export const PERFORMANCE_SAFE_MARQUEE_HARD_MAX_DOM_NODES = 30;
 export const PERFORMANCE_SAFE_MARQUEE_LOOP_TRANSLATE_PERCENT =
   100 / PERFORMANCE_SAFE_MARQUEE_SEGMENTS;
 
-/** Every curated subset slug must have a self-hosted wordmark SVG. */
+/** Every curated subset slug has inline visual metadata (PerformanceSafeLogoMark). */
 export const PERFORMANCE_SAFE_MARQUEE_CURATED_SLUGS = PERFORMANCE_SAFE_CURATED_LOGO_SLUGS;

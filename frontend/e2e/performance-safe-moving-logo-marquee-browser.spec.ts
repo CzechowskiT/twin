@@ -84,20 +84,23 @@ test.describe("Performance-safe moving logo marquee browser", () => {
     });
   });
 
-  test("5 curated logos load from self-hosted marquee-curated paths", async ({ browser }) => {
+  test("5 every visible card has inline curated wordmark mark", async ({ browser }) => {
     await withFreshContext(browser, async (context) => {
       const page = await context.newPage();
       await page.goto("/login", { waitUntil: "domcontentloaded" });
       await dismissCookieBanner(page);
       await waitForSafeMarquee(page);
-      const srcs = await page
-        .locator(".performance-safe-logo-marquee img")
-        .evaluateAll((imgs) => imgs.map((img) => (img as HTMLImageElement).src));
-      assertCuratedSources(srcs);
+      const firstSegment = page.locator(".performance-safe-marquee-segment").first();
+      const marks = firstSegment.locator("[data-performance-safe-logo-mark]");
+      await expect(marks).toHaveCount(9);
+      for (const slug of CURATED_SLUGS) {
+        await expect(firstSegment.locator(`[data-performance-safe-logo-mark="${slug}"]`)).toHaveCount(1);
+      }
+      await expect(page.locator(".performance-safe-logo-marquee img")).toHaveCount(0);
     });
   });
 
-  test("6 track width covers at least viewport at 1440px", async ({ browser }) => {
+  test("6 track width covers at least 2.5x viewport at 1440px", async ({ browser }) => {
     await withFreshContext(browser, async (context) => {
       const page = await context.newPage();
       await page.setViewportSize({ width: 1440, height: 900 });
@@ -108,11 +111,11 @@ test.describe("Performance-safe moving logo marquee browser", () => {
         track: el.scrollWidth,
         viewport: el.parentElement?.clientWidth ?? 0,
       }));
-      expect(widths.track).toBeGreaterThanOrEqual(widths.viewport * 2);
+      expect(widths.track).toBeGreaterThanOrEqual(widths.viewport * 2.5);
     });
   });
 
-  test("7 track width covers at least viewport at 1920px", async ({ browser }) => {
+  test("7 track width covers at least 2.5x viewport at 1920px", async ({ browser }) => {
     await withFreshContext(browser, async (context) => {
       const page = await context.newPage();
       await page.setViewportSize({ width: 1920, height: 1080 });
@@ -123,7 +126,7 @@ test.describe("Performance-safe moving logo marquee browser", () => {
         track: el.scrollWidth,
         viewport: el.parentElement?.clientWidth ?? 0,
       }));
-      expect(widths.track).toBeGreaterThanOrEqual(widths.viewport * 2);
+      expect(widths.track).toBeGreaterThanOrEqual(widths.viewport * 2.5);
     });
   });
 
@@ -154,6 +157,7 @@ test.describe("Performance-safe moving logo marquee browser", () => {
       await page.evaluate(() => {
         document.documentElement.setAttribute("data-page-hidden", "true");
       });
+      await page.waitForTimeout(50);
       const playState = await page
         .locator(".performance-safe-marquee-track")
         .evaluate((el) => getComputedStyle(el).animationPlayState);
@@ -197,7 +201,45 @@ test.describe("Performance-safe moving logo marquee browser", () => {
     });
   });
 
-  test("13 no simpleicons CDN requests on login safe marquee", async ({ browser }) => {
+  test("13 logo cards have balanced bounding boxes and readable content", async ({ browser }) => {
+    await withFreshContext(browser, async (context) => {
+      const page = await context.newPage();
+      await page.goto("/login", { waitUntil: "domcontentloaded" });
+      await dismissCookieBanner(page);
+      await waitForSafeMarquee(page);
+      const metrics = await page
+        .locator(".performance-safe-marquee-segment")
+        .first()
+        .locator("[data-performance-safe-logo-card]")
+        .evaluateAll((cards) =>
+        cards.map((card) => {
+          const svg = card.querySelector("svg.performance-safe-logo-mark");
+          const cardBox = card.getBoundingClientRect();
+          const svgBox = svg?.getBoundingClientRect() ?? { width: 0, height: 0 };
+          const textLen = (svg?.textContent ?? "").trim().length;
+          return {
+            cardW: cardBox.width,
+            cardH: cardBox.height,
+            svgW: svgBox.width,
+            svgH: svgBox.height,
+            textLen,
+            quality: card.getAttribute("data-quality-status"),
+          };
+        }),
+      );
+      expect(metrics.length).toBe(9);
+      for (const m of metrics) {
+        expect(m.textLen).toBeGreaterThan(0);
+        expect(m.quality).toBe("verified-curated");
+        expect(m.svgH).toBeGreaterThanOrEqual(10);
+        expect(m.svgH).toBeLessThanOrEqual(18);
+        expect(m.svgW).toBeGreaterThanOrEqual(36);
+        expect(m.svgW / m.cardW).toBeLessThanOrEqual(0.92);
+      }
+    });
+  });
+
+  test("14 no simpleicons CDN requests on login safe marquee", async ({ browser }) => {
     await withFreshContext(browser, async (context) => {
       const page = await context.newPage();
       const cdnHits: string[] = [];
@@ -213,13 +255,34 @@ test.describe("Performance-safe moving logo marquee browser", () => {
       expect(cdnHits).toEqual([]);
     });
   });
-});
 
-function assertCuratedSources(srcs: string[]): void {
-  expect(srcs.length).toBeGreaterThan(0);
-  for (const src of srcs) {
-    expect(src).toMatch(/\/logos\/marquee-curated\//);
-    const slug = CURATED_SLUGS.find((s) => src.includes(`${s}.svg`));
-    expect(slug, `unexpected logo src: ${src}`).toBeTruthy();
-  }
-}
+  test("15 demo route shows logo strip (marketing or safe)", async ({ browser }) => {
+    await withFreshContext(browser, async (context) => {
+      const page = await context.newPage();
+      await page.goto("/demo", { waitUntil: "domcontentloaded" });
+      await dismissCookieBanner(page);
+      const safe = page.locator(".performance-safe-logo-marquee");
+      const marketing = page.locator(".company-logo-marquee");
+      const safeVisible = await safe.isVisible().catch(() => false);
+      const marketingVisible = await marketing.isVisible().catch(() => false);
+      expect(safeVisible || marketingVisible).toBe(true);
+    });
+  });
+
+  test("16 animation transform changes over time on visible tab", async ({ browser }) => {
+    await withFreshContext(browser, async (context) => {
+      const page = await context.newPage();
+      await page.goto("/login", { waitUntil: "domcontentloaded" });
+      await dismissCookieBanner(page);
+      await waitForSafeMarquee(page);
+      const readTransform = () =>
+        page.locator(".performance-safe-marquee-track").evaluate((el) => getComputedStyle(el).transform);
+      const t0 = await readTransform();
+      await page.waitForTimeout(400);
+      const t1 = await readTransform();
+      expect(t0).not.toBe("none");
+      expect(t1).not.toBe("none");
+      expect(t0).not.toEqual(t1);
+    });
+  });
+});
