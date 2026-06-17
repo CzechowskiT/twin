@@ -18,6 +18,7 @@ import {
   candidateCommunicationHref,
   SAFE_COMMUNICATION_CANDIDATE_DEMO_ID,
 } from "@/lib/safe-communication";
+import { atsImportReadinessHref } from "@/lib/ats-import-readiness";
 import { jobPipelineHref, JOB_PIPELINE_DEMO_ID } from "@/lib/job-pipeline";
 
 export type FounderLedDemoLink = {
@@ -131,6 +132,14 @@ export const FOUNDER_LED_DEMO_JOURNEY_STEPS: readonly FounderLedDemoLink[] = [
     loginPath: "/login/recruiter",
     titleKey: "safeCommunication.demoJourneyTitle",
     descKey: "safeCommunication.demoJourneyDesc",
+  },
+  {
+    id: "ats_import_readiness",
+    href: atsImportReadinessHref("recruiter"),
+    requiresAuth: true,
+    loginPath: "/login/recruiter",
+    titleKey: "atsImportReadiness.demoJourneyTitle",
+    descKey: "atsImportReadiness.demoJourneyDesc",
   },
   {
     id: "candidate_profile",

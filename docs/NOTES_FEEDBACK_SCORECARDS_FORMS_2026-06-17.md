@@ -53,6 +53,7 @@ Recruiter/company-facing **collaboration layer** connected to Candidate Profile 
 - **Trust layer (2026-06-17)** — collaboration trust badge → trust workspace; see `docs/GDPR_CONSENT_CONTACT_HISTORY_2026-06-17.md`.
 - **Team collaboration (2026-06-17)** — collaboration decision memory → team workspace; see `docs/TEAM_COLLABORATION_LAYER_2026-06-17.md`.
 - **Safe communication (2026-06-17)** — feedback request / decision memory → communication route; see `docs/SAFE_EMAIL_COMMUNICATION_LAYER_2026-06-17.md`.
+- **ATS import readiness (2026-06-17)** — Profile 360 activity import link → import readiness; see `docs/ATS_IMPORT_CONNECTOR_READINESS_2026-06-17.md`.
 
 ## Hard bans (preserved)
 

@@ -50,6 +50,7 @@ Recruiter/company-facing **team collaboration system-of-record layer** connected
 - **Trust** — audit connections → team route.
 - **`/demo` journey** — `team_collaboration` step → `/recruiter/candidates/demo-candidate-001/team`.
 - **Safe communication (2026-06-17)** — prepare communication draft task → communication/drafts; see `docs/SAFE_EMAIL_COMMUNICATION_LAYER_2026-06-17.md`.
+- **ATS import readiness (2026-06-17)** — talent pool CSV path links to import readiness mapping; see `docs/ATS_IMPORT_CONNECTOR_READINESS_2026-06-17.md`.
 
 ## Copy constraints
 

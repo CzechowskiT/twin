@@ -12,7 +12,7 @@ export const COMPANY_INTEGRATION_ROWS: CompanyIntegrationRow[] = [
   { id: "acceptance_inbox", status: "live", href: "/recruiter/inbox" },
   { id: "talent_pool_import", status: "pilot", href: "/company/talent-pool" },
   { id: "team_tokens", status: "pilot", href: "/company/team" },
-  { id: "ats_webhooks", status: "planned" },
+  { id: "ats_webhooks", status: "pilot", href: "/company/integrations/ats/import-readiness" },
   { id: "employer_calendar", status: "not_live" },
   { id: "employer_billing", status: "not_live", href: "/company/billing" },
   { id: "greenhouse_webhook", status: "planned" },

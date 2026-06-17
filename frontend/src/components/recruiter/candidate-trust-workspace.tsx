@@ -28,6 +28,7 @@ import {
 import { jobOverviewHref, jobPipelineHref } from "@/lib/job-pipeline";
 import type { TranslationKey } from "@/lib/i18n";
 import { candidateTeamHref } from "@/lib/team-collaboration";
+import { atsImportReadinessHref } from "@/lib/ats-import-readiness";
 import { candidateCommunicationHref } from "@/lib/safe-communication";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
@@ -266,6 +267,15 @@ function TrustContent({
                     {record.processing_context}
                   </p>
                   <p className="text-xs italic text-[var(--twin-muted-strong)]">{record.legal_basis_note}</p>
+                  {record.data_source === "ats_import" ? (
+                    <Link
+                      href={atsImportReadinessHref(surface)}
+                      className="twin-link mt-2 inline-block text-xs font-medium"
+                      data-testid="candidate-trust-import-readiness-link"
+                    >
+                      {t("atsImportReadiness.openImportReadiness")}
+                    </Link>
+                  ) : null}
                   <div>
                     <p className="font-medium">{t("candidateTrust.allowedPurposes")}</p>
                     <ul className="mt-2 list-inside list-disc">

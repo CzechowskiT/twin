@@ -53,6 +53,7 @@ Recruiter/company-facing **trust layer** connected to Candidate Profile 360, Job
 - **`/demo` journey** — `trust` step → `/recruiter/candidates/demo-candidate-001/trust`.
 - **Team collaboration (2026-06-17)** — trust audit connections → team workspace.
 - **Safe communication (2026-06-17)** — contact permission → communication route with warning; see `docs/SAFE_EMAIL_COMMUNICATION_LAYER_2026-06-17.md`.
+- **ATS import readiness (2026-06-17)** — `data_source === ats_import` → import readiness route; see `docs/ATS_IMPORT_CONNECTOR_READINESS_2026-06-17.md`.
 
 ## Copy constraints
 

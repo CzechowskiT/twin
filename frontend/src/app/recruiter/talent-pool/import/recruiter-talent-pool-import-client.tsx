@@ -24,6 +24,7 @@ import {
   type TalentPoolCommitPayload,
   type TalentPoolPreviewPayload,
 } from "@/lib/recruiter-talent-pool";
+import { atsImportReadinessHref } from "@/lib/ats-import-readiness";
 
 export default function RecruiterTalentPoolImportClient() {
   const { t } = useTranslation();
@@ -115,6 +116,15 @@ export default function RecruiterTalentPoolImportClient() {
         </Link>
         <h1 className="twin-page-intro text-2xl font-semibold">{t("recruiterTalentPoolImport.title")}</h1>
         <p className="twin-muted max-w-2xl text-sm">{t("recruiterTalentPoolImport.lead")}</p>
+        <p className="text-sm">
+          <Link
+            href={atsImportReadinessHref("recruiter")}
+            className="twin-link font-medium"
+            data-testid="talent-pool-import-ats-readiness-link"
+          >
+            {t("atsImportReadiness.openImportReadiness")}
+          </Link>
+        </p>
       </header>
 
       <Card variant="soft" className="mb-6 p-4">

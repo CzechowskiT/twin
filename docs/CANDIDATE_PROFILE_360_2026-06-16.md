@@ -39,6 +39,7 @@ Recruiter/company-facing **system-of-record direction** for one candidate — st
 - Trust layer (2026-06-17) — Profile 360 consent section links to trust workspace; pipeline consent badge and collaboration trust badge link to trust routes.
 - Team collaboration (2026-06-17) — Profile 360 activity section links to team workspace (`candidate-profile-360-team-link`).
 - Safe communication (2026-06-17) — Profile 360 activity + feedback links to communication workspace (`candidate-profile-360-communication-link`).
+- ATS import readiness (2026-06-17) — Profile 360 activity links to import readiness workspace (`candidate-profile-360-import-readiness-link`).
 
 ## Hard bans (preserved)
 

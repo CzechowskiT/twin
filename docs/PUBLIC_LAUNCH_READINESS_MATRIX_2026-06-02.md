@@ -36,6 +36,8 @@
 
 **Safe-lane merge (2026-06-17):** **Safe Email Communication Layer** — draft-only communication connected to Profile 360 + pipeline + notes + trust + team + decision memory · `docs/SAFE_EMAIL_COMMUNICATION_LAYER_2026-06-17.md` · `test:safe-email-communication-layer` · **does not change launch NO-GO** · P0 performance **OPEN**.
 
+**Safe-lane merge (2026-06-17):** **ATS Import / Connector Readiness** — mapping/review workspace connected to integrations + talent pool + Profile 360 + trust · `docs/ATS_IMPORT_CONNECTOR_READINESS_2026-06-17.md` · `test:ats-import-connector-readiness` · **no live ATS sync / writeback** · **does not change launch NO-GO** · P0 performance **OPEN**.
+
 **Safe-lane merge (2026-06-11):** Recruiter inbox **premium card redesign** — decision rail, match score card, signal rows, review CTA · **does not change launch NO-GO**.
 
 **Safe-lane merge (2026-06-11):** Recruiter **candidate message drafts** — 4 templates, copy-to-clipboard, local contact phase after accept; no email send, no hidden PII · `docs/RECRUITER_CANDIDATE_MESSAGE_DRAFTS_MVP_2026-06-11.md` · **does not change launch NO-GO**.
