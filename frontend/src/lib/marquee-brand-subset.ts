@@ -1,4 +1,5 @@
 import type { Brand } from "@/lib/brand-logo-urls";
+import { PERFORMANCE_SAFE_CURATED_LOGO_SLUGS } from "@/lib/performance-safe-curated-logos";
 
 /**
  * Compact marquee subset for workspace/auth — kept separate from the 89-brand
@@ -16,8 +17,18 @@ export const PERFORMANCE_SAFE_MARQUEE_BRANDS: Brand[] = [
   { slug: "netflix", name: "Netflix", domain: "netflix.com" },
 ];
 
-/** Two segments × brand count must stay within 12–18 DOM logo nodes. */
-export const PERFORMANCE_SAFE_MARQUEE_SEGMENTS = 2;
+/** Three identical segments for ultrawide seamless loop (9×3=27 nodes). */
+export const PERFORMANCE_SAFE_MARQUEE_SEGMENTS = 3;
 
 export const PERFORMANCE_SAFE_MARQUEE_MAX_DOM_NODES =
   PERFORMANCE_SAFE_MARQUEE_BRANDS.length * PERFORMANCE_SAFE_MARQUEE_SEGMENTS;
+
+/** Hard ceiling for light chrome — never exceed 30 logo nodes. */
+export const PERFORMANCE_SAFE_MARQUEE_HARD_MAX_DOM_NODES = 30;
+
+/** CSS translate fraction: exactly one segment width per animation cycle. */
+export const PERFORMANCE_SAFE_MARQUEE_LOOP_TRANSLATE_PERCENT =
+  100 / PERFORMANCE_SAFE_MARQUEE_SEGMENTS;
+
+/** Every curated subset slug must have a self-hosted wordmark SVG. */
+export const PERFORMANCE_SAFE_MARQUEE_CURATED_SLUGS = PERFORMANCE_SAFE_CURATED_LOGO_SLUGS;

@@ -2276,7 +2276,7 @@ html[data-workspace-route="true"] .landing-ambient__orb {
   flex: 0 0 auto;
 }
 
-/** Workspace/auth — bounded DOM marquee (≤18 nodes), transform-only loop. */
+/** Workspace/auth — bounded DOM marquee (≤27 nodes, 9×3 segments), transform-only loop. */
 .performance-safe-logo-marquee {
   overflow: visible;
   min-height: 4rem;
@@ -2294,13 +2294,19 @@ html[data-workspace-route="true"] .landing-ambient__orb {
     transform: translate3d(0, 0, 0);
   }
   to {
-    transform: translate3d(-50%, 0, 0);
+    /* Exactly one segment width — synced via --performance-safe-marquee-segments (default 3). */
+    transform: translate3d(
+      calc(-100% / var(--performance-safe-marquee-segments, 3)),
+      0,
+      0
+    );
   }
 }
 
 .performance-safe-marquee-track {
   display: flex;
   width: max-content;
+  flex-wrap: nowrap;
   animation: performance-safe-marquee 48s linear infinite;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
