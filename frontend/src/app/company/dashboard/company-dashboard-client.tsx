@@ -11,6 +11,10 @@ import type { TranslationKey } from "@/lib/i18n";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
 import {
+  COMPANY_HIRING_COCKPIT_MARKERS,
+  companyHiringCockpitHref,
+} from "@/lib/company-hiring-cockpit";
+import {
   type CompanyHiringDashboardPayload,
 } from "@/lib/company-hiring-dashboard";
 import {
@@ -101,6 +105,24 @@ export default function CompanyDashboardClient() {
         <h1 className="twin-page-intro text-2xl font-semibold sm:text-3xl">{t("companyHiring.title")}</h1>
         <p className="twin-muted max-w-2xl text-sm leading-relaxed">{t("companyHiring.lead")}</p>
       </header>
+
+      <Link
+        href={companyHiringCockpitHref()}
+        data-testid={COMPANY_HIRING_COCKPIT_MARKERS.hubPromo}
+        className="mb-6 block rounded-2xl transition hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--twin-accent)]"
+      >
+        <Card
+          variant="soft"
+          className="border-violet-500/25 bg-gradient-to-br from-violet-500/10 to-[var(--twin-surface-2)]/60 p-5 sm:p-6"
+        >
+          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-violet-300">
+            {t("companyHiringCockpit.pageEyebrow")}
+          </p>
+          <h2 className="mt-2 text-xl font-semibold text-[var(--foreground)]">{t("companyHiringCockpit.title")}</h2>
+          <p className="twin-muted mt-2 max-w-3xl text-sm leading-relaxed">{t("companyHiringCockpit.lead")}</p>
+          <p className="mt-4 text-sm font-medium text-[var(--twin-accent)]">{t("companyHiringCockpit.openHiringCockpit")} →</p>
+        </Card>
+      </Link>
 
       <div className="mb-8" data-testid="company-module-grid">
         <SystemOfRecordNavigationHub
