@@ -64,4 +64,12 @@ Stripe / Microsoft / mail — jeśli `/status` już zielone, **nie powtarzaj** �
 
 ---
 
-*Ostatnia aktualizacja: 2026-05-24 · gałąź doc: `cursor/founder-p0-docs`.*
+## D. P0 headless final state (2026-06-17)
+
+1. **Nie uruchamiaj** Phase 3B multitab (`test:phase3b-controlled-multitab`) — **BLOCKED** (CPU + headless shell).
+2. Dev może uruchomić: `npm run test:p0-no-headless-final-state` (statyczne) + browser smoke z `PLAYWRIGHT_ENABLE_BROWSER_TESTS=1`.
+3. Szczegóły: [P0_NO_HEADLESS_FINAL_STATE_2026-06-17.md](./P0_NO_HEADLESS_FINAL_STATE_2026-06-17.md).
+
+---
+
+*Ostatnia aktualizacja: 2026-06-17 · gałąź doc: `fix/p0-no-headless-final-state-2026-06-17`.*
