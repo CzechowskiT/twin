@@ -28,6 +28,7 @@ import {
 import { jobOverviewHref, jobPipelineHref } from "@/lib/job-pipeline";
 import type { TranslationKey } from "@/lib/i18n";
 import { candidateTeamHref } from "@/lib/team-collaboration";
+import { candidateCommunicationHref } from "@/lib/safe-communication";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -284,6 +285,13 @@ function TrustContent({
                 <>
                   <p className="twin-muted text-xs">{t("candidateTrust.contactPermissionLead")}</p>
                   <p className="font-medium text-amber-200">{t("candidateTrust.contactAfterReview")}</p>
+                  <Link
+                    href={candidateCommunicationHref(record.id, surface)}
+                    className="twin-link mt-2 inline-block text-xs font-medium"
+                    data-testid="candidate-trust-communication-link"
+                  >
+                    {t("safeCommunication.openCommunication")}
+                  </Link>
                   <ul className="space-y-3">
                     {record.contact_channels.map((ch) => (
                       <li

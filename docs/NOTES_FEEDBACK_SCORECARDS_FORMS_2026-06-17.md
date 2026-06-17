@@ -52,6 +52,7 @@ Recruiter/company-facing **collaboration layer** connected to Candidate Profile 
 - **`/demo` journey** — `collaboration` step → `/recruiter/candidates/demo-candidate-001/collaboration`.
 - **Trust layer (2026-06-17)** — collaboration trust badge → trust workspace; see `docs/GDPR_CONSENT_CONTACT_HISTORY_2026-06-17.md`.
 - **Team collaboration (2026-06-17)** — collaboration decision memory → team workspace; see `docs/TEAM_COLLABORATION_LAYER_2026-06-17.md`.
+- **Safe communication (2026-06-17)** — feedback request / decision memory → communication route; see `docs/SAFE_EMAIL_COMMUNICATION_LAYER_2026-06-17.md`.
 
 ## Hard bans (preserved)
 

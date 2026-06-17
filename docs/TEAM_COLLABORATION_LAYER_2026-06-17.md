@@ -49,6 +49,7 @@ Recruiter/company-facing **team collaboration system-of-record layer** connected
 - **Collaboration** — decision memory audit → team route.
 - **Trust** — audit connections → team route.
 - **`/demo` journey** — `team_collaboration` step → `/recruiter/candidates/demo-candidate-001/team`.
+- **Safe communication (2026-06-17)** — prepare communication draft task → communication/drafts; see `docs/SAFE_EMAIL_COMMUNICATION_LAYER_2026-06-17.md`.
 
 ## Copy constraints
 
