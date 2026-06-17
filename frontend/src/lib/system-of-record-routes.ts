@@ -13,10 +13,7 @@ import {
   CANDIDATE_PROFILE_360_DEMO_ID,
 } from "@/lib/candidate-profile-360";
 import { candidateTrustHref, CANDIDATE_TRUST_DEMO_ID } from "@/lib/candidate-trust";
-import {
-  decisionMemoryHref,
-  DECISION_MEMORY_DEMO_ID,
-} from "@/lib/decision-memory";
+import { decisionMemoryHref, DECISION_MEMORY_DEMO_ID } from "@/lib/decision-memory";
 import { COMPANY_BILLING_ROUTE } from "@/lib/company-billing-readiness";
 import { COMPANY_HIRING_ROUTE } from "@/lib/company-hiring-dashboard";
 import { COMPANY_INTEGRATIONS_ROUTE } from "@/lib/company-integrations-readiness";
@@ -258,6 +255,17 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     status: "live",
     moduleFamily: "dashboard",
     boundaryTags: [],
+  },
+  {
+    id: "recruiter_daily_cockpit",
+    persona: "recruiter",
+    href: "/recruiter/daily-cockpit",
+    titleKey: "recruiterDailyCockpit.demoJourneyTitle",
+    descriptionKey: "recruiterDailyCockpit.demoJourneyDesc",
+    ctaKey: "recruiterDailyCockpit.openDailyCockpit",
+    status: "pilot",
+    moduleFamily: "dashboard",
+    boundaryTags: ["pilot", "human_decision_required", "no_outreach", "no_ats_sync"],
   },
   {
     id: "recruiter_inbox",

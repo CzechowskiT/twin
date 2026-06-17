@@ -20,6 +20,7 @@ import {
 } from "@/lib/safe-communication";
 import { atsImportReadinessHref } from "@/lib/ats-import-readiness";
 import { decisionMemoryHref, DECISION_MEMORY_DEMO_ID } from "@/lib/decision-memory";
+import { recruiterDailyCockpitHref } from "@/lib/recruiter-daily-operating-cockpit";
 import { jobPipelineHref, JOB_PIPELINE_DEMO_ID } from "@/lib/job-pipeline";
 
 export type FounderLedDemoLink = {
@@ -159,6 +160,14 @@ export const FOUNDER_LED_DEMO_JOURNEY_STEPS: readonly FounderLedDemoLink[] = [
     descKey: "decisionMemory.demoJourneyDesc",
   },
   {
+    id: "daily_cockpit",
+    href: recruiterDailyCockpitHref(),
+    requiresAuth: true,
+    loginPath: "/login/recruiter",
+    titleKey: "recruiterDailyCockpit.demoJourneyTitle",
+    descKey: "recruiterDailyCockpit.demoJourneyDesc",
+  },
+  {
     id: "weekly_digest",
     href: "/recruiter/talent-radar/digest",
     requiresAuth: true,
@@ -223,6 +232,7 @@ export const FOUNDER_LED_DEMO_EXTENDED_ROUTES = [
   "/recruiter/candidates/demo-candidate-001/team",
   "/recruiter/candidates/demo-candidate-001/communication",
   "/recruiter/candidates/demo-candidate-001/decision-memory",
+  "/recruiter/daily-cockpit",
   "/company/candidates/demo-candidate-001",
   "/recruiter/inbox",
   "/dashboard/jobs",

@@ -8,6 +8,7 @@ import { decisionMemoryHref } from "@/lib/decision-memory";
 import { jobPipelineHref } from "@/lib/job-pipeline";
 import { LAUNCH_STANCE } from "@/lib/investor-metrics-reality";
 import type { TranslationKey } from "@/lib/i18n";
+import { recruiterDailyCockpitHref } from "@/lib/recruiter-daily-operating-cockpit";
 import { candidateCommunicationHref } from "@/lib/safe-communication";
 import { candidateTeamHref } from "@/lib/team-collaboration";
 import {
@@ -85,6 +86,11 @@ export const EXECUTIVE_PRODUCT_PROOF_DEMO_LINKS = [
     id: "decision_memory",
     href: decisionMemoryHref("demo-candidate-001", "recruiter"),
     labelKey: "executiveProductProof.linkDecisionMemory" as TranslationKey,
+  },
+  {
+    id: "daily_cockpit",
+    href: recruiterDailyCockpitHref(),
+    labelKey: "executiveProductProof.linkDailyCockpit" as TranslationKey,
   },
 ] as const;
 
