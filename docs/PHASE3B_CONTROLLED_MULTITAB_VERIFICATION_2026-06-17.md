@@ -1,9 +1,11 @@
 # Phase 3B Controlled Multitab Verification — 2026-06-17
 
+**STATUS: BLOCKED** — merged test infra only (PR #167); **forbidden to run** until shell fix + founder review.
+
 **Branch:** `verify/phase3b-controlled-multitab-2026-06-17`  
 **Base:** `cursor/phase1-monorepo-scaffold` @ `fda7567`  
 **Expected production frontend commit:** `fda75677c306aec76dbb83f65c483f8ba7cbe885`  
-**Verdict:** **PARTIAL** — local controlled multitab green; production not verified on `fda7567` (deploy lag + Playwright context crash). P0 stays **OPEN** (not DONE). Launch **NO-GO** unchanged.
+**Verdict:** **BLOCKED** — founder STOP. Test harness merged to `main`; verification **must not execute** until shell fix lands and founder unblocks. Prior session was **PARTIAL** (local 21/21; prod not verified). P0 **OPEN**. Launch **NO-GO** unchanged.
 
 ## Scope
 
@@ -29,6 +31,8 @@ Controlled Phase 3B multitab — **not** the founder 50-tab session. 21 routes i
 | Console errors per tab | ≤12 | — | burst |
 
 ## Commands
+
+> **DO NOT RUN** — Phase 3B is **BLOCKED** (founder STOP). npm scripts below exist in `package.json` (PR #167) for future use only. Do not execute static, browser, or prod variants until shell fix + founder review.
 
 ```bash
 cd frontend
