@@ -5,8 +5,8 @@ const FONT =
   'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
 
 function MicrosoftSquares() {
-  const size = 3.2;
-  const gap = 0.45;
+  const size = 3.8;
+  const gap = 0.5;
   const colors = ["#F25022", "#7FBA00", "#00A4EF", "#FFB900"] as const;
   return (
     <>
@@ -30,7 +30,7 @@ function MicrosoftSquares() {
 }
 
 function NvidiaAccent() {
-  return <rect x={0} y={2.5} width={2.5} height={11} rx={0.4} fill="#76B900" />;
+  return <rect x={0} y={2.2} width={2.8} height={11.5} rx={0.4} fill="#76B900" />;
 }
 
 function AmazonSmile() {
@@ -59,7 +59,7 @@ function BrandSvgContent({ slug }: { slug: PerformanceSafeCuratedLogoSlug }) {
           y={12.5}
           textAnchor="middle"
           fontFamily={FONT}
-          fontSize={11.5}
+          fontSize={14.5}
           fontWeight={600}
           fill={spec.brandColor}
         >
@@ -77,7 +77,7 @@ function BrandSvgContent({ slug }: { slug: PerformanceSafeCuratedLogoSlug }) {
             y={12.5}
             textAnchor="middle"
             fontFamily={FONT}
-            fontSize={9.5}
+            fontSize={12}
             fontWeight={600}
             fill={spec.brandColor}
           >
@@ -92,7 +92,7 @@ function BrandSvgContent({ slug }: { slug: PerformanceSafeCuratedLogoSlug }) {
           y={12.8}
           textAnchor="middle"
           fontFamily={FONT}
-          fontSize={11}
+          fontSize={14}
           fontWeight={600}
         >
           <tspan fill="#4285F4">G</tspan>
@@ -111,7 +111,7 @@ function BrandSvgContent({ slug }: { slug: PerformanceSafeCuratedLogoSlug }) {
             y={12.2}
             textAnchor="middle"
             fontFamily={FONT}
-            fontSize={11}
+            fontSize={14}
             fontWeight={600}
             fill={spec.brandColor}
           >
@@ -131,7 +131,7 @@ function BrandSvgContent({ slug }: { slug: PerformanceSafeCuratedLogoSlug }) {
             y={12.5}
             textAnchor="middle"
             fontFamily={FONT}
-            fontSize={10.5}
+            fontSize={13}
             fontWeight={700}
             letterSpacing={0.6}
             fill={spec.brandColor}
@@ -147,7 +147,7 @@ function BrandSvgContent({ slug }: { slug: PerformanceSafeCuratedLogoSlug }) {
           y={12.8}
           textAnchor="middle"
           fontFamily={FONT}
-          fontSize={12}
+          fontSize={15}
           fontWeight={700}
           fill={spec.brandColor}
         >
@@ -161,7 +161,7 @@ function BrandSvgContent({ slug }: { slug: PerformanceSafeCuratedLogoSlug }) {
           y={12.8}
           textAnchor="middle"
           fontFamily={FONT}
-          fontSize={12}
+          fontSize={15}
           fontWeight={800}
           letterSpacing={1.2}
           fill={spec.brandColor}
@@ -177,7 +177,7 @@ function BrandSvgContent({ slug }: { slug: PerformanceSafeCuratedLogoSlug }) {
           y={12.8}
           textAnchor="middle"
           fontFamily={FONT}
-          fontSize={11.5}
+          fontSize={14.5}
           fontWeight={600}
           fill={spec.brandColor}
         >
@@ -191,7 +191,7 @@ function BrandSvgContent({ slug }: { slug: PerformanceSafeCuratedLogoSlug }) {
           y={12.5}
           textAnchor="middle"
           fontFamily={FONT}
-          fontSize={10.5}
+          fontSize={13}
           fontWeight={800}
           letterSpacing={0.8}
           fill={spec.brandColor}

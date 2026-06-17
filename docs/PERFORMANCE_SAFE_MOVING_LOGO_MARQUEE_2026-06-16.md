@@ -133,6 +133,28 @@ Apple, Microsoft, Google, Amazon, NVIDIA, Meta, Visa, Salesforce, Netflix.
 
 P0 performance **OPEN**; Phase 3B **BLOCKED**; launch **NO-GO**.
 
+## Readability scale correction — 2026-06-17
+
+**Branch:** `fix/logo-marquee-readability-scale-2026-06-17`  
+**Incident:** After PR #161 balanced optical weight, founder reported logos **too small** (*„za małe są te logo”*) — cards felt large while wordmarks under-scaled.
+
+### Fix (narrow visual scale only)
+
+| Area | Change |
+| ---- | ------ |
+| CSS `.performance-safe-logo-mark` | `height` 1rem → **1.4rem** (~22px); `width` 5rem → **6.25rem** for 55–70% card occupancy |
+| `BrandSvgContent` | Wordmark `fontSize` bumped ~1.25–1.35×; Microsoft squares + NVIDIA accent slightly enlarged |
+| `opticalScale` | Readability floors raised (MS/Google/Amazon/Salesforce → 0.98–1.0); Apple cap 0.92; NVIDIA dominance cap unchanged at 0.92 |
+| Tests | Static test **11** (optical height band + dominance ratio); browser test **13** bbox 22–28px + occupancy 0.55–0.70 |
+
+### Unchanged
+
+- Moving marquee on workspace/auth; 9×3 = 27 nodes (max 30)
+- Inline wordmarks only — no CDN / `<img>`
+- Hidden-tab pause + reduced-motion static strip
+- No shell/gate/layout/fallback edits
+- P0 **OPEN**; Phase 3B **BLOCKED**; launch **NO-GO**
+
 ## Related docs
 
 - `docs/P0_RENDERER_MEMORY_PROFILE_2026-06-16.md` — renderer memory program (updated)

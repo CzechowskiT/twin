@@ -31,16 +31,16 @@ export interface PerformanceSafeCuratedLogoVisualSpec {
 }
 
 /** Minimum optical scale for readable wordmarks (Salesforce floor). */
-export const PERFORMANCE_SAFE_LOGO_READABILITY_MIN_OPTICAL_SCALE = 0.9;
+export const PERFORMANCE_SAFE_LOGO_READABILITY_MIN_OPTICAL_SCALE = 0.95;
 
 /** NVIDIA must not dominate the strip. */
 export const PERFORMANCE_SAFE_LOGO_NVIDIA_DOMINANCE_MAX_OPTICAL_SCALE = 0.92;
 
 /** Apple mark/wordmark cap when icon-heavy. */
-export const PERFORMANCE_SAFE_LOGO_APPLE_MARK_MAX_OPTICAL_SCALE = 0.88;
+export const PERFORMANCE_SAFE_LOGO_APPLE_MARK_MAX_OPTICAL_SCALE = 0.92;
 
 /** Salesforce must stay at or above readability floor. */
-export const PERFORMANCE_SAFE_LOGO_SALESFORCE_MIN_OPTICAL_SCALE = 0.94;
+export const PERFORMANCE_SAFE_LOGO_SALESFORCE_MIN_OPTICAL_SCALE = 0.98;
 
 const CURATED_SLUG_SET = new Set<string>(PERFORMANCE_SAFE_CURATED_LOGO_SLUGS);
 
@@ -53,7 +53,7 @@ export const PERFORMANCE_SAFE_CURATED_LOGO_VISUALS: Record<
     displayName: "Apple",
     renderType: "wordmark",
     brandColor: "#1d1d1f",
-    opticalScale: 0.88,
+    opticalScale: 0.92,
     ariaLabel: "Apple",
     qualityStatus: "verified-curated",
   },
@@ -62,7 +62,7 @@ export const PERFORMANCE_SAFE_CURATED_LOGO_VISUALS: Record<
     displayName: "Microsoft",
     renderType: "mixed",
     brandColor: "#5e5e5e",
-    opticalScale: 0.94,
+    opticalScale: 0.98,
     ariaLabel: "Microsoft",
     qualityStatus: "verified-curated",
   },
@@ -71,7 +71,7 @@ export const PERFORMANCE_SAFE_CURATED_LOGO_VISUALS: Record<
     displayName: "Google",
     renderType: "wordmark",
     brandColor: "#4285F4",
-    opticalScale: 0.94,
+    opticalScale: 0.98,
     ariaLabel: "Google",
     qualityStatus: "verified-curated",
   },
@@ -80,7 +80,7 @@ export const PERFORMANCE_SAFE_CURATED_LOGO_VISUALS: Record<
     displayName: "Amazon",
     renderType: "wordmark",
     brandColor: "#232f3e",
-    opticalScale: 0.94,
+    opticalScale: 0.98,
     ariaLabel: "Amazon",
     qualityStatus: "verified-curated",
   },
@@ -89,7 +89,7 @@ export const PERFORMANCE_SAFE_CURATED_LOGO_VISUALS: Record<
     displayName: "NVIDIA",
     renderType: "mixed",
     brandColor: "#76b900",
-    opticalScale: 0.9,
+    opticalScale: 0.92,
     ariaLabel: "NVIDIA",
     qualityStatus: "verified-curated",
   },
@@ -98,7 +98,7 @@ export const PERFORMANCE_SAFE_CURATED_LOGO_VISUALS: Record<
     displayName: "Meta",
     renderType: "wordmark",
     brandColor: "#0467df",
-    opticalScale: 0.96,
+    opticalScale: 0.98,
     ariaLabel: "Meta",
     qualityStatus: "verified-curated",
   },
@@ -107,7 +107,7 @@ export const PERFORMANCE_SAFE_CURATED_LOGO_VISUALS: Record<
     displayName: "Visa",
     renderType: "wordmark",
     brandColor: "#1434cb",
-    opticalScale: 0.96,
+    opticalScale: 0.98,
     ariaLabel: "Visa",
     qualityStatus: "verified-curated",
   },
@@ -116,7 +116,7 @@ export const PERFORMANCE_SAFE_CURATED_LOGO_VISUALS: Record<
     displayName: "Salesforce",
     renderType: "wordmark",
     brandColor: "#00a1e0",
-    opticalScale: 0.96,
+    opticalScale: 1,
     ariaLabel: "Salesforce",
     qualityStatus: "verified-curated",
   },
@@ -125,7 +125,7 @@ export const PERFORMANCE_SAFE_CURATED_LOGO_VISUALS: Record<
     displayName: "Netflix",
     renderType: "wordmark",
     brandColor: "#e50914",
-    opticalScale: 0.94,
+    opticalScale: 0.98,
     ariaLabel: "Netflix",
     qualityStatus: "verified-curated",
   },

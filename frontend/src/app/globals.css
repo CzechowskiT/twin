@@ -2314,9 +2314,9 @@ html[data-workspace-route="true"] .landing-ambient__orb {
 
 .performance-safe-logo-mark {
   display: block;
-  height: 1rem;
-  width: 5rem;
-  max-width: 5.25rem;
+  height: 1.4rem;
+  width: 6.25rem;
+  max-width: 6.5rem;
   flex-shrink: 0;
 }
 

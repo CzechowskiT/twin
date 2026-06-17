@@ -64,7 +64,7 @@ test("3 every brand has non-empty aria label", () => {
 test("4 every brand has optical scale metadata", () => {
   for (const slug of PERFORMANCE_SAFE_CURATED_LOGO_SLUGS) {
     const scale = PERFORMANCE_SAFE_CURATED_LOGO_VISUALS[slug].opticalScale;
-    assert.ok(typeof scale === "number" && scale >= 0.85 && scale <= 1);
+    assert.ok(typeof scale === "number" && scale >= 0.9 && scale <= 1);
   }
 });
 
@@ -115,7 +115,20 @@ test("10 no will-change, backdrop-filter, backdrop-blur on safe track/cards", ()
   assert.doesNotMatch(css, /\.performance-safe-marquee-track[\s\S]{0,200}will-change/);
 });
 
-test("11 hidden-tab pause preserved", () => {
+test("11 readability scale CSS targets 22–28px optical height band", () => {
+  const css = read("src/app/globals.css");
+  assert.match(css, /\.performance-safe-logo-mark[\s\S]{0,200}height:\s*1\.4rem/);
+  assert.match(css, /\.performance-safe-logo-mark[\s\S]{0,300}width:\s*6\.25rem/);
+  const scales = PERFORMANCE_SAFE_CURATED_LOGO_SLUGS.map(
+    (slug) => PERFORMANCE_SAFE_CURATED_LOGO_VISUALS[slug].opticalScale,
+  );
+  const minScale = Math.min(...scales);
+  const maxScale = Math.max(...scales);
+  assert.ok(maxScale / minScale <= 1.25, "dominance ratio must stay ≤1.25×");
+  assert.ok(minScale / maxScale >= 0.75, "lightest mark must stay ≥0.75× heaviest");
+});
+
+test("12 hidden-tab pause preserved", () => {
   const src = read("src/components/marketing/performance-safe-moving-logo-marquee.tsx");
   const css = read("src/app/globals.css");
   assert.match(src, /usePageVisibility/);
@@ -123,7 +136,7 @@ test("11 hidden-tab pause preserved", () => {
   assert.match(css, /animation-play-state: paused/);
 });
 
-test("12 reduced-motion fallback preserved", () => {
+test("13 reduced-motion fallback preserved", () => {
   const src = read("src/components/marketing/performance-safe-moving-logo-marquee.tsx");
   const css = read("src/app/globals.css");
   assert.match(src, /useReducedMotionPreference/);
@@ -131,14 +144,14 @@ test("12 reduced-motion fallback preserved", () => {
   assert.match(css, /html\[data-reduced-motion="true"\] \.performance-safe-marquee-track/);
 });
 
-test("13 seamless loop has at least 3 segments", () => {
+test("14 seamless loop has at least 3 segments", () => {
   assert.ok(PERFORMANCE_SAFE_MARQUEE_SEGMENTS >= 3);
   const css = read("src/app/globals.css");
   assert.match(css, /calc\(-100% \/ var\(--performance-safe-marquee-segments/);
   assert.equal(PERFORMANCE_SAFE_MARQUEE_LOOP_TRANSLATE_PERCENT, 100 / 3);
 });
 
-test("14 no broken/empty logo content in renderer", () => {
+test("15 no broken/empty logo content in renderer", () => {
   const mark = read("src/components/marketing/performance-safe-logo-mark.tsx");
   assert.match(mark, /PerformanceSafeLogoMark/);
   for (const slug of PERFORMANCE_SAFE_CURATED_LOGO_SLUGS) {
@@ -147,7 +160,7 @@ test("14 no broken/empty logo content in renderer", () => {
   assert.doesNotMatch(mark, /<img/);
 });
 
-test("15 no route shell/gate/layout/fallback files touched", () => {
+test("16 no route shell/gate/layout/fallback files touched", () => {
   const feature = [
     "src/components/marketing/performance-safe-moving-logo-marquee.tsx",
     "src/components/marketing/performance-safe-logo-mark.tsx",
@@ -161,14 +174,14 @@ test("15 no route shell/gate/layout/fallback files touched", () => {
   }
 });
 
-test("16 marketing full marquee lazy-loaded; site-top routes light chrome", () => {
+test("17 marketing full marquee lazy-loaded; site-top routes light chrome", () => {
   const siteTop = read("src/components/site-top-marquee.tsx");
   assert.match(siteTop, /PerformanceSafeMovingLogoMarquee/);
   assert.match(siteTop, /dynamic\(/);
   assert.doesNotMatch(siteTop, /import \{ CompanyLogoMarquee \}/);
 });
 
-test("17 package registers marquee tests", () => {
+test("18 package registers marquee tests", () => {
   const pkg = read("package.json");
   assert.match(pkg, /test:performance-safe-moving-logo-marquee/);
   assert.match(pkg, /test:performance-safe-moving-logo-marquee-browser/);
