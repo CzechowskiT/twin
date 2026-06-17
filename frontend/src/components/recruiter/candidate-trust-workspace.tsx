@@ -27,6 +27,7 @@ import {
 } from "@/lib/candidate-trust";
 import { jobOverviewHref, jobPipelineHref } from "@/lib/job-pipeline";
 import type { TranslationKey } from "@/lib/i18n";
+import { candidateTeamHref } from "@/lib/team-collaboration";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -418,6 +419,15 @@ function TrustContent({
                   <li>
                     <Link href={digestHref} className="twin-link font-medium">
                       {t("candidateTrust.auditDigest")}
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href={candidateTeamHref(record.id, surface)}
+                      className="twin-link font-medium"
+                      data-testid="candidate-trust-team-link"
+                    >
+                      {t("teamCollaboration.openTeamWorkspace")}
                     </Link>
                   </li>
                 </ul>

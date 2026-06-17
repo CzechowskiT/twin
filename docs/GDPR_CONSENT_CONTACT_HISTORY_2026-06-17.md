@@ -51,6 +51,7 @@ Recruiter/company-facing **trust layer** connected to Candidate Profile 360, Job
 - **Collaboration** — trust badge → trust route.
 - **Job Pipeline** — candidate card consent badge → trust route.
 - **`/demo` journey** — `trust` step → `/recruiter/candidates/demo-candidate-001/trust`.
+- **Team collaboration (2026-06-17)** — trust audit connections → team workspace.
 
 ## Copy constraints
 

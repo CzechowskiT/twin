@@ -23,6 +23,7 @@ import {
   candidateScorecardHref,
 } from "@/lib/candidate-collaboration";
 import { candidateTrustHref } from "@/lib/candidate-trust";
+import { candidateTeamHref } from "@/lib/team-collaboration";
 
 function fitLabelKey(fit: CandidateProfile360Record["fit_label"]): TranslationKey {
   const map: Record<CandidateProfile360Record["fit_label"], TranslationKey> = {
@@ -450,18 +451,27 @@ function ProfileContent({
           {sectionCard(
             CANDIDATE_PROFILE_360_MARKERS.activity,
             t("candidateProfile360.activityTitle"),
-            <ul className="space-y-2">
-              {record.activity_events.map((event) => (
-                <li key={`${event.type}-${event.at}`} className="flex gap-3 text-xs">
-                  <span className="shrink-0 rounded bg-[var(--twin-surface-soft)] px-2 py-0.5 font-medium">
-                    {t(activityTypeKey(event.type))}
-                  </span>
-                  <span>
-                    {event.at.slice(0, 10)} — {event.summary}
-                  </span>
-                </li>
-              ))}
-            </ul>,
+            <>
+              <ul className="space-y-2">
+                {record.activity_events.map((event) => (
+                  <li key={`${event.type}-${event.at}`} className="flex gap-3 text-xs">
+                    <span className="shrink-0 rounded bg-[var(--twin-surface-soft)] px-2 py-0.5 font-medium">
+                      {t(activityTypeKey(event.type))}
+                    </span>
+                    <span>
+                      {event.at.slice(0, 10)} — {event.summary}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href={candidateTeamHref(record.id, surface)}
+                className="twin-link mt-3 inline-block text-sm font-medium"
+                data-testid="candidate-profile-360-team-link"
+              >
+                {t("teamCollaboration.openTeamWorkspace")}
+              </Link>
+            </>,
             "lg:col-span-2",
           )}
         </div>
