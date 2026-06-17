@@ -11,6 +11,7 @@ import {
   talentRadarInboxHighlightHref,
   type TalentRadarCandidate,
 } from "@/lib/recruiter-talent-radar";
+import { candidateProfile360Href } from "@/lib/candidate-profile-360";
 import {
   TALENT_RADAR_DECISION_MARKERS,
   effectiveDecisionState,
@@ -254,6 +255,9 @@ export function TalentRadarCandidateCard({
           >
             {expanded ? t("recruiterTalentRadar.collapseDetails") : t("recruiterTalentRadar.expandDetails")}
           </button>
+          <Link href={candidateProfile360Href(String(row.id))} className={talentRadarTertiaryCtaClass()}>
+            {t("candidateProfile360.viewProfile360")}
+          </Link>
         </div>
       </div>
     </Card>

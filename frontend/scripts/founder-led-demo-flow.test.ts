@@ -72,6 +72,8 @@ function routePageExists(pathname: string): boolean {
         if (findPage(child, segments)) return true;
       } else if (name === head) {
         if (findPage(child, rest)) return true;
+      } else if (name.startsWith("[") && name.endsWith("]")) {
+        if (findPage(child, rest)) return true;
       }
     }
     return false;
