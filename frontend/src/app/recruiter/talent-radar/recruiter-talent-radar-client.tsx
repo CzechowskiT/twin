@@ -41,6 +41,7 @@ import {
   candidateProfile360Href,
   CANDIDATE_PROFILE_360_DEMO_ID,
 } from "@/lib/candidate-profile-360";
+import { jobPipelineHref, JOB_PIPELINE_DEMO_ID } from "@/lib/job-pipeline";
 import { RECRUITER_TALENT_RADAR_DIGEST_ROUTE } from "@/lib/recruiter-talent-radar-digest";
 import {
   matchesDecisionFilter,
@@ -400,6 +401,14 @@ export default function RecruiterTalentRadarClient() {
                   data-testid="recruiter-talent-radar-profile-360-link"
                 >
                   {t("candidateProfile360.viewProfile360")}
+                </Link>
+                <span className="twin-muted mx-2">·</span>
+                <Link
+                  href={jobPipelineHref(JOB_PIPELINE_DEMO_ID)}
+                  className="font-medium text-[var(--twin-accent)] underline"
+                  data-testid="recruiter-talent-radar-job-pipeline-link"
+                >
+                  {t("jobPipeline.openPipeline")}
                 </Link>
               </p>
             </div>

@@ -152,6 +152,19 @@ export default function CompanyRolesPage() {
               {t("companyTalentPool.navLink")}
             </Link>
           </p>
+          <div className="mt-6 rounded-lg border border-amber-500/30 bg-amber-500/5 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-amber-200">
+              {t("jobPipeline.pilotBadge")}
+            </p>
+            <p className="mt-2 text-sm text-[var(--twin-muted-strong)]">{t("jobPipeline.demoJobsLead")}</p>
+            <Link
+              href="/company/roles/demo-role-001/pipeline"
+              className="twin-link mt-3 inline-block text-sm font-medium"
+              data-testid="company-roles-demo-pipeline-link"
+            >
+              {t("jobPipeline.openPipeline")}
+            </Link>
+          </div>
         </div>
       </Card>
     </Shell>

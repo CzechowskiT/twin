@@ -34,6 +34,7 @@ Recruiter/company-facing **system-of-record direction** for one candidate — st
 - Talent Radar hero — sample Profile 360 link (`data-testid=recruiter-talent-radar-profile-360-link`).
 - Talent Radar candidate cards — `Open Profile 360` tertiary CTA.
 - `/demo` journey — `recruiter_profile_360` step → `/recruiter/candidates/demo-candidate-001` (auth-gated).
+- Job pipeline (2026-06-17) — `demo-candidate-001` on `demo-role-001` shortlist links back to Profile 360.
 
 ## Hard bans (preserved)
 

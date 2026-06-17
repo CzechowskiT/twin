@@ -7,10 +7,12 @@ import toast from "react-hot-toast";
 
 import { CompanyRoleForm } from "@/components/company/company-role-form";
 import { CompanyWorkspaceNav } from "@/components/company/company-workspace-nav";
+import { JobPipelineWorkspace } from "@/components/recruiter/job-pipeline-workspace";
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { type CompanyRole, COMPANY_ROLES_ROUTE } from "@/lib/company-jobs-roles";
+import { isJobPipelineDemoId } from "@/lib/job-pipeline";
 import {
   mergeCompanyOptions,
   readRecruiterInboxSession,
@@ -22,7 +24,11 @@ import {
 export default function CompanyRoleDetailPage() {
   const { t } = useTranslation();
   const params = useParams();
-  const roleId = Number(params.roleId);
+  const roleIdRaw = String(params.roleId ?? "");
+  if (isJobPipelineDemoId(roleIdRaw)) {
+    return <JobPipelineWorkspace jobId={roleIdRaw} surface="company" mode="overview" />;
+  }
+  const roleId = Number(roleIdRaw);
   const session = readRecruiterInboxSession();
   const [token, setToken] = useState(session.token);
   const [companyRaw, setCompanyRaw] = useState(session.companySlug);
