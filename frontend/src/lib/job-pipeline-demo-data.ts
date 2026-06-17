@@ -1,8 +1,9 @@
 /** Deterministic pilot Job Pipeline — sample only, no real PII. */
 
 import { CANDIDATE_PROFILE_360_DEMO_ID } from "@/lib/candidate-profile-360-demo-data";
+import { TWIN_DEMO_ROLE_PRIMARY_ID } from "@/lib/system-of-record-domain/constants";
 
-export const JOB_PIPELINE_DEMO_ID = "demo-role-001";
+export const JOB_PIPELINE_DEMO_ID = TWIN_DEMO_ROLE_PRIMARY_ID;
 
 export type JobPipelineStageId =
   | "new"

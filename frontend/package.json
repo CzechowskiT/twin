@@ -107,6 +107,8 @@
     "test:p0-no-headless-final-state": "npx --yes tsx scripts/p0-no-headless-final-state.test.ts",
     "test:p0-no-headless-final-state-browser": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'&&process.env.PLAYWRIGHT_ENABLE_BROWSER_TESTS!=='1'){console.error('Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 (local) or PLAYWRIGHT_ALLOW_PROD_SMOKE=1 (prod).');process.exit(1)}\" && npm run test:p0-no-headless-final-state-browser:raw",
     "test:p0-no-headless-final-state-browser:raw": "playwright test e2e/p0-no-headless-final-state-browser.spec.ts --workers=1",
+    "test:system-of-record-domain-kernel": "npx --yes tsx scripts/system-of-record-domain-kernel.test.ts",
+    "test:system-of-record-route-consistency": "npx --yes tsx scripts/system-of-record-route-consistency.test.ts",
     "test:system-of-record-navigation-hub": "npx --yes tsx scripts/system-of-record-navigation-hub.test.ts",
     "test:system-of-record-navigation-hub-browser": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'&&process.env.PLAYWRIGHT_ENABLE_BROWSER_TESTS!=='1'){console.error('Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 (local) or PLAYWRIGHT_ALLOW_PROD_SMOKE=1 (prod).');process.exit(1)}\" && npm run test:system-of-record-navigation-hub-browser:raw",
     "test:system-of-record-navigation-hub-browser:raw": "playwright test e2e/system-of-record-navigation-hub-browser.spec.ts --workers=1",

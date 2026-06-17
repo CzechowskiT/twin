@@ -1,6 +1,8 @@
 /** Deterministic pilot Candidate Profile 360 — sample only, no real PII. */
 
-export const CANDIDATE_PROFILE_360_DEMO_ID = "demo-candidate-001";
+import { TWIN_DEMO_CANDIDATE_PRIMARY_ID } from "@/lib/system-of-record-domain/constants";
+
+export const CANDIDATE_PROFILE_360_DEMO_ID = TWIN_DEMO_CANDIDATE_PRIMARY_ID;
 
 export type CandidateProfile360BackTarget = "talent_radar" | "talent_pool" | "inbox";
 
