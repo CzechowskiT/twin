@@ -179,8 +179,12 @@ export function PageMomentumRail({
         <p className="text-xs font-semibold uppercase tracking-wider text-[var(--twin-muted)]">
           {t("site.momentumEyebrow")}
         </p>
-        <p className="mt-1 text-sm font-medium text-[var(--twin-muted-strong)]">{t("site.momentumLead")}</p>
-        <p className="mt-3 max-w-prose text-sm leading-relaxed text-[var(--twin-muted-strong)]">{t(primaryTip)}</p>
+        <p className="mt-1 min-w-0 break-words text-sm font-medium leading-relaxed text-[var(--twin-muted-strong)]">
+          {t("site.momentumLead")}
+        </p>
+        <p className="mt-3 min-w-0 max-w-prose break-words text-sm leading-relaxed text-[var(--twin-muted-strong)]">
+          {t(primaryTip)}
+        </p>
         {secondaryTip !== primaryTip ? (
           <p className="mt-2 max-w-prose text-sm leading-relaxed text-[var(--twin-muted)]">{t(secondaryTip)}</p>
         ) : null}
