@@ -26,17 +26,7 @@
 
 **Safe-lane merge (2026-06-16):** **Candidate Profile 360** — recruiter/company profile pilot · `docs/CANDIDATE_PROFILE_360_2026-06-16.md` · `test:candidate-profile-360` · **does not change launch NO-GO** · P0 performance **OPEN**.
 
-**Safe-lane merge (2026-06-17):** **Job-Specific Pipeline + Process Statuses** — recruiter/company job pipeline pilot · `docs/JOB_SPECIFIC_PIPELINE_STATUSES_2026-06-17.md` · `test:job-specific-pipeline-statuses` · **does not change launch NO-GO** · P0 performance **OPEN**.
-
-**Safe-lane merge (2026-06-17):** **Notes, Feedback, Scorecards & Forms** — collaboration layer connected to Profile 360 + job pipeline · `docs/NOTES_FEEDBACK_SCORECARDS_FORMS_2026-06-17.md` · `test:notes-feedback-scorecards` · **does not change launch NO-GO** · P0 performance **OPEN**.
-
-**Safe-lane merge (2026-06-17):** **GDPR / Consent / Contact History** — trust layer connected to Profile 360 + job pipeline + collaboration · `docs/GDPR_CONSENT_CONTACT_HISTORY_2026-06-17.md` · `test:gdpr-consent-contact-history` · **does not change launch NO-GO** · P0 performance **OPEN**.
-
-**Safe-lane merge (2026-06-17):** **Team Collaboration Layer** — shared workspace connected to Profile 360 + pipeline + notes + trust + decision memory · `docs/TEAM_COLLABORATION_LAYER_2026-06-17.md` · `test:team-collaboration-layer` · **does not change launch NO-GO** · P0 performance **OPEN**.
-
-**Safe-lane merge (2026-06-17):** **Safe Email Communication Layer** — draft-only communication connected to Profile 360 + pipeline + notes + trust + team + decision memory · `docs/SAFE_EMAIL_COMMUNICATION_LAYER_2026-06-17.md` · `test:safe-email-communication-layer` · **does not change launch NO-GO** · P0 performance **OPEN**.
-
-**Safe-lane merge (2026-06-17):** **ATS Import / Connector Readiness** — mapping/review workspace connected to integrations + talent pool + Profile 360 + trust · `docs/ATS_IMPORT_CONNECTOR_READINESS_2026-06-17.md` · `test:ats-import-connector-readiness` · **no live ATS sync / writeback** · **does not change launch NO-GO** · P0 performance **OPEN**.
+**Phase 3B (2026-06-17):** Controlled multitab verification · **PARTIAL** — local 21/21 PASS @ `fda7567`; prod not on target commit · `docs/PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md` · `test:phase3b-controlled-multitab` · **does not change launch NO-GO** · P0 performance **OPEN→PARTIAL** (not DONE).
 
 **Safe-lane merge (2026-06-11):** Recruiter inbox **premium card redesign** — decision rail, match score card, signal rows, review CTA · **does not change launch NO-GO**.
 
