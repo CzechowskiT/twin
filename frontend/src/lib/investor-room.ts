@@ -21,6 +21,7 @@ export type InvestorRoomPersonaId = (typeof INVESTOR_ROOM_PERSONA_IDS)[number];
 export const INVESTOR_ROOM_DEMO_MAP = [
   { id:"interactiveDemo",href:"/demo",labelKey:"investorRoom.demoMapInteractive" as const },
   { id:"metrics",href:"/investor/metrics",labelKey:"investorRoom.demoMapMetrics" as const },
+  { id:"productProof",href:"/investor/product-proof",labelKey:"investorRoom.demoMapProductProof" as const },
   { id:"status",href:"/status",labelKey:"investorRoom.demoMapStatus" as const },
   { id:"calculator",href:"/investor/calculator",labelKey:"investorRoom.demoMapCalculator" as const },
   { id:"dataRoom",href:"/investor/data-room",labelKey:"investorRoom.demoMapDataRoom" as const },
