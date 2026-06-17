@@ -16,6 +16,14 @@ export type RecruiterAnalyticsPayload = {
 
 export const RECRUITER_ANALYTICS_ROUTE = "/recruiter/analytics";
 
+export const RECRUITER_ANALYTICS_PAGE_MARKER = "recruiter-analytics-page";
+
+export const RECRUITER_ANALYTICS_MARKERS = {
+  page: RECRUITER_ANALYTICS_PAGE_MARKER,
+  loadButton: "recruiter-analytics-load",
+  accessFields: "recruiter-analytics-access-fields",
+} as const;
+
 export function isRecruiterAnalyticsWorkspaceScoped(p: RecruiterAnalyticsPayload): boolean {
   return p.source === "workspace" && Boolean(p.company_slug?.trim());
 }

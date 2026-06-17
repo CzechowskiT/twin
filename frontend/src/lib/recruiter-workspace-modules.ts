@@ -1,8 +1,17 @@
+import { RECRUITER_DAILY_COCKPIT_ROUTE } from "@/lib/recruiter-daily-operating-cockpit";
 import { RECRUITER_INTEGRATIONS_ROUTE } from "@/lib/recruiter-integrations-readiness";
 import type { WorkspaceModuleDef } from "@/lib/workspace-module-status";
 
 /** Recruiter hub module cards — calendar sync explicitly NOT LIVE. */
 export const RECRUITER_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
+  {
+    id: "daily_cockpit",
+    href: RECRUITER_DAILY_COCKPIT_ROUTE,
+    titleKey: "recruiterDailyCockpit.demoJourneyTitle",
+    valuePropKey: "recruiterDailyCockpit.demoJourneyDesc",
+    ctaKey: "recruiterDailyCockpit.openDailyCockpit",
+    status: "pilot",
+  },
   {
     id: "inbox",
     href: "/recruiter/inbox",

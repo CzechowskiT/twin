@@ -6,7 +6,11 @@ import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-f
 import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspace-nav";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
-import { type RecruiterAnalyticsPayload } from "@/lib/recruiter-analytics";
+import {
+  RECRUITER_ANALYTICS_MARKERS,
+  RECRUITER_ANALYTICS_PAGE_MARKER,
+  type RecruiterAnalyticsPayload,
+} from "@/lib/recruiter-analytics";
 import {
   mergeCompanyOptions,
   readRecruiterInboxSession,
@@ -60,12 +64,13 @@ export default function RecruiterAnalyticsClient() {
 
   return (
     <Shell wide>
-      <RecruiterWorkspaceNav />
-      <header className="mb-6 space-y-2">
+      <div data-recruiter-analytics-page={RECRUITER_ANALYTICS_PAGE_MARKER}>
+        <RecruiterWorkspaceNav />
+        <header className="mb-6 space-y-2">
         <h1 className="twin-page-intro text-2xl font-semibold">{t("recruiterAnalytics.title")}</h1>
         <p className="twin-muted max-w-2xl text-sm">{t("recruiterAnalytics.lead")}</p>
       </header>
-      <Card variant="soft" className="mb-6 p-4">
+      <Card variant="soft" className="mb-6 p-4" data-testid={RECRUITER_ANALYTICS_MARKERS.accessFields}>
         <RecruiterAccessFields
           token={token}
           companySlug={companyRaw}
@@ -73,7 +78,13 @@ export default function RecruiterAnalyticsClient() {
           onTokenChange={setToken}
           onCompanySlugChange={setCompanyRaw}
         />
-        <button type="button" className="twin-btn-primary mt-4" disabled={loading} onClick={() => void load()}>
+        <button
+          type="button"
+          className="twin-btn-primary mt-4"
+          disabled={loading}
+          data-testid={RECRUITER_ANALYTICS_MARKERS.loadButton}
+          onClick={() => void load()}
+        >
           {loading ? t("recruiterAnalytics.loading") : t("recruiterAnalytics.load")}
         </button>
       </Card>
@@ -98,6 +109,7 @@ export default function RecruiterAnalyticsClient() {
         </div>
       ) : null}
       <p className="twin-muted mt-6 text-xs">{t("recruiterAnalytics.notLiveNote")}</p>
+      </div>
     </Shell>
   );
 }

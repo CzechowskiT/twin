@@ -4914,6 +4914,7 @@ eyebrow: "Product roadmap",
     openDecisionMemory: "Open decision memory",
   },
   recruiterDailyCockpit: {
+    navLink: "Daily cockpit",
     pageEyebrow: "Recruiter daily operating cockpit",
     title: "Today's worklist — pilot",
     lead: "Deterministic demo queues across decisions, trust, feedback, drafts, ATS review, and pipeline — human-owned actions only.",
@@ -10255,6 +10256,7 @@ const pl: MessageTree = {
     openDecisionMemory: "Otwórz pamięć decyzji",
   },
   recruiterDailyCockpit: {
+    navLink: "Daily cockpit",
     pageEyebrow: "Codzienny cockpit operacyjny rekrutera",
     title: "Dzisiejsza lista pracy — pilot",
     lead: "Deterministyczne kolejki demo: decyzje, trust, feedback, szkice, przegląd ATS i pipeline — tylko akcje człowieka.",

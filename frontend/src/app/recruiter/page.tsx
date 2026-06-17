@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useTranslation } from "@/components/language-provider";
 import { SystemOfRecordNavigationHub } from "@/components/workspace/system-of-record-navigation-hub";
 import { WorkspaceQuickActions } from "@/components/workspace/workspace-quick-actions";
-import { Shell } from "@/components/ui";
+import { Card, Shell } from "@/components/ui";
+import { RECRUITER_DAILY_COCKPIT_MARKERS, recruiterDailyCockpitHref } from "@/lib/recruiter-daily-operating-cockpit";
 
 /** Canonical recruiter hub — system-of-record module grid with honest readiness badges. */
 export default function RecruiterHubPage() {
@@ -17,13 +18,30 @@ export default function RecruiterHubPage() {
         <div className="mt-2">
           <WorkspaceQuickActions
             actions={[
-              { href: "/recruiter/daily-cockpit", labelKey: "recruiterDailyCockpit.openDailyCockpit" },
+              { href: recruiterDailyCockpitHref(), labelKey: "recruiterDailyCockpit.openDailyCockpit" },
               { href: "/recruiter/inbox", labelKey: "workspaceModules.recruiterInboxCta" },
               { href: "/recruiter/analytics", labelKey: "workspaceModules.recruiterAnalyticsCta" },
               { href: "/recruiter/integrations", labelKey: "workspaceModules.recruiterIntegrationsCta" },
             ]}
           />
         </div>
+        <Link
+          href={recruiterDailyCockpitHref()}
+          data-testid={RECRUITER_DAILY_COCKPIT_MARKERS.hubPromo}
+          className="mt-6 block rounded-2xl transition hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--twin-accent)]"
+        >
+          <Card
+            variant="soft"
+            className="border-violet-500/25 bg-gradient-to-br from-violet-500/10 to-[var(--twin-surface-2)]/60 p-5 sm:p-6"
+          >
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-violet-300">
+              {t("recruiterDailyCockpit.pageEyebrow")}
+            </p>
+            <h2 className="mt-2 text-xl font-semibold text-[var(--foreground)]">{t("recruiterDailyCockpit.title")}</h2>
+            <p className="twin-muted mt-2 max-w-3xl text-sm leading-relaxed">{t("recruiterDailyCockpit.lead")}</p>
+            <p className="mt-4 text-sm font-medium text-[var(--twin-accent)]">{t("recruiterDailyCockpit.openDailyCockpit")} →</p>
+          </Card>
+        </Link>
         <div className="mt-6">
           <SystemOfRecordNavigationHub
             persona="recruiter"
