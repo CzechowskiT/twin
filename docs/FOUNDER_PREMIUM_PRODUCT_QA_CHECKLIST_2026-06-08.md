@@ -9,7 +9,7 @@
 
 **Workspace module navigation (2026-06-12):** Module grids on `/dashboard`, `/recruiter`, `/company/dashboard`, `/workspace/investor`; public `/investor` gated preview → `docs/PERSONA_WORKSPACE_NAVIGATION_PREMIUM_UX_2026-06-12.md`.
 
-**All-persona navigation P0 (2026-06-16):** Candidate Oferty/Dopasowania/Profil i CV aliases, logout → `/` + Demo; `test:p0-all-persona-navigation-routes` + `test:p0-all-persona-navigation-browser` → `docs/P0_ALL_PERSONA_NAVIGATION_ROUTE_AUDIT_2026-06-16.md`.
+**All-persona navigation P0 (2026-06-16):** Candidate Oferty/Dopasowania distinct pages (no dashboard bounce); `test:candidate-offers-matches-real-content` → `docs/P0_ALL_PERSONA_NAVIGATION_ROUTE_AUDIT_2026-06-16.md`.
 
 **Founder-led demo flow (2026-06-16):** `/demo` orchestration — company → recruiter → candidate story, role cards, trust boundaries; `test:founder-led-demo-flow` + browser smoke → `docs/FOUNDER_LED_DEMO_FLOW_2026-06-16.md`.
 

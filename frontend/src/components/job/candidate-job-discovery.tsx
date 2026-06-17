@@ -12,6 +12,7 @@ import { InterviewProcessTimeline } from "@/components/job/InterviewProcessTimel
 import { ApplyTrackingCounter } from "@/components/job/ApplyTrackingCounter";
 import { SalaryCalculator } from "@/components/tools/SalaryCalculator";
 import { TechStackIcons } from "@/components/job/TechStackIcons";
+import { CANDIDATE_OFFERS_PAGE_MARKER } from "@/lib/candidate-offers-matches-demo-data";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 
@@ -84,6 +85,7 @@ export function CandidateJobDiscovery() {
 
   return (
     <Shell wide rail>
+      <div data-candidate-offers-page={CANDIDATE_OFFERS_PAGE_MARKER}>
       <div className="mb-4 flex min-w-0 flex-col gap-3 sm:mb-6 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <header className="min-w-0 shrink-0">
           <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
@@ -92,7 +94,7 @@ export function CandidateJobDiscovery() {
           <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">{t("jobBoard.discoveryTitle")}</h1>
           <p className="twin-muted mt-1 max-w-2xl text-sm leading-relaxed">{t("jobBoard.discoveryLead")}</p>
           <Link href="/dashboard" className="twin-muted mt-2 inline-block text-xs underline">
-            {t("dashboard.title")}
+            {t("candidateOffersPage.backToPanel")}
           </Link>
         </header>
         <CandidateWorkspaceSubnav ariaLabel={t("jobBoard.discoveryTitle")} />
@@ -145,6 +147,7 @@ export function CandidateJobDiscovery() {
             </Card>
           )}
         </aside>
+      </div>
       </div>
     </Shell>
   );
