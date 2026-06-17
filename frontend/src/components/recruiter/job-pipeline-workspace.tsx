@@ -39,6 +39,7 @@ import {
   resolveJobPipeline,
   stageColumnTestId,
 } from "@/lib/job-pipeline";
+import { jobTasksHref, jobTeamHref } from "@/lib/team-collaboration";
 
 const STAGE_ACCENT: Record<JobPipelineStageId, string> = {
   new: "border-sky-500/50 bg-sky-500/5",
@@ -416,6 +417,20 @@ function PipelineContent({
                   data-testid="job-pipeline-decision-memory-scorecards-link"
                 >
                   {t("candidateCollaboration.jobScorecardsLink")}
+                </Link>
+                <Link
+                  href={jobTeamHref(record.id, surface)}
+                  className="twin-link font-medium"
+                  data-testid="job-pipeline-decision-memory-team-link"
+                >
+                  {t("teamCollaboration.openTeamWorkspace")}
+                </Link>
+                <Link
+                  href={jobTasksHref(record.id, surface)}
+                  className="twin-link font-medium"
+                  data-testid="job-pipeline-decision-memory-tasks-link"
+                >
+                  {t("teamCollaboration.openTasks")}
                 </Link>
               </div>
               <ul className="mt-4 space-y-3">

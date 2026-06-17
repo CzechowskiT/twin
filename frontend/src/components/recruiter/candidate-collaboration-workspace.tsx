@@ -26,6 +26,7 @@ import {
 import { candidateTrustHref } from "@/lib/candidate-trust";
 import { jobOverviewHref, jobPipelineHref } from "@/lib/job-pipeline";
 import type { TranslationKey } from "@/lib/i18n";
+import { candidateTeamHref } from "@/lib/team-collaboration";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -426,6 +427,13 @@ function CollaborationContent({
                     </Link>
                     <Link href={candidateFeedbackHref(record.id, surface)} className="twin-link font-medium">
                       {t("candidateCollaboration.auditToFeedback")}
+                    </Link>
+                    <Link
+                      href={candidateTeamHref(record.id, surface)}
+                      className="twin-link font-medium"
+                      data-testid="candidate-collaboration-team-link"
+                    >
+                      {t("teamCollaboration.openTeamWorkspace")}
                     </Link>
                   </div>
                 </>,
