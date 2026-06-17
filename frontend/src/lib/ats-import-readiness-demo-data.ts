@@ -2,8 +2,9 @@
 
 import { CANDIDATE_PROFILE_360_DEMO_ID } from "@/lib/candidate-profile-360-demo-data";
 import { JOB_PIPELINE_DEMO_ID } from "@/lib/job-pipeline-demo-data";
+import { TWIN_DEMO_ATS_IMPORT_ID } from "@/lib/system-of-record-domain/constants";
 
-export const ATS_IMPORT_READINESS_DEMO_CONNECTOR = "lever-mapping-pilot";
+export const ATS_IMPORT_READINESS_DEMO_CONNECTOR = TWIN_DEMO_ATS_IMPORT_ID;
 export const ATS_IMPORT_SAMPLE_CANDIDATE_ID = CANDIDATE_PROFILE_360_DEMO_ID;
 export const ATS_IMPORT_SAMPLE_ROLE_ID = JOB_PIPELINE_DEMO_ID;
 
