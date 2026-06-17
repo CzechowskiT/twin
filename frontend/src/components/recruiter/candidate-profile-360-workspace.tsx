@@ -17,6 +17,11 @@ import {
   type CandidateProfile360Surface,
   resolveCandidateProfile360,
 } from "@/lib/candidate-profile-360";
+import {
+  candidateCollaborationHref,
+  candidateFeedbackHref,
+  candidateScorecardHref,
+} from "@/lib/candidate-collaboration";
 
 function fitLabelKey(fit: CandidateProfile360Record["fit_label"]): TranslationKey {
   const map: Record<CandidateProfile360Record["fit_label"], TranslationKey> = {
@@ -348,12 +353,16 @@ function ProfileContent({
           {sectionCard(
             CANDIDATE_PROFILE_360_MARKERS.notes,
             t("candidateProfile360.notesTitle"),
-            <GuidedEmptyState
-              message={t("candidateProfile360.notesEmptyMessage")}
-              steps={[t("candidateProfile360.notesEmptyStep1"), t("candidateProfile360.notesEmptyStep2")]}
-              actionLabel={t("candidateProfile360.notesEmptyCta")}
-              actionHref={surface === "company" ? "/company/talent-pool" : "/recruiter/inbox"}
-            />,
+            <>
+              <p className="twin-muted text-xs">{t("candidateProfile360.notesPilotLead")}</p>
+              <Link
+                href={candidateCollaborationHref(record.id, surface)}
+                className="twin-link mt-2 inline-block text-sm font-medium"
+                data-testid="candidate-profile-360-collaboration-link"
+              >
+                {t("candidateCollaboration.openCollaboration")}
+              </Link>
+            </>,
           )}
 
           {sectionCard(
@@ -363,7 +372,23 @@ function ProfileContent({
               <span className="inline-block rounded-full border border-[var(--twin-border)] px-2 py-0.5 text-xs font-medium">
                 {t("candidateProfile360.feedbackPlannedBadge")}
               </span>
-              <p className="twin-muted mt-3">{t("candidateProfile360.feedbackEmptyMessage")}</p>
+              <p className="twin-muted mt-3">{t("candidateProfile360.feedbackPilotLead")}</p>
+              <div className="mt-3 flex flex-wrap gap-3 text-sm">
+                <Link
+                  href={candidateFeedbackHref(record.id, surface)}
+                  className="twin-link font-medium"
+                  data-testid="candidate-profile-360-feedback-link"
+                >
+                  {t("candidateCollaboration.focusFeedback")}
+                </Link>
+                <Link
+                  href={candidateScorecardHref(record.id, surface)}
+                  className="twin-link font-medium"
+                  data-testid="candidate-profile-360-scorecard-link"
+                >
+                  {t("candidateCollaboration.focusScorecard")}
+                </Link>
+              </div>
             </>,
           )}
 

@@ -32,6 +32,7 @@ Recruiter/company-facing **system-of-record direction** for one job role — sev
 - Company Roles — demo pipeline link (`data-testid=company-roles-demo-pipeline-link`).
 - Talent Radar — pipeline link next to Profile 360 (`data-testid=recruiter-talent-radar-job-pipeline-link`).
 - `/demo` journey — `job_pipeline` step → `/recruiter/jobs/demo-role-001/pipeline` (auth-gated).
+- Collaboration (2026-06-17) — pipeline cards link feedback/scorecard; decision memory links job feedback/scorecards.
 
 ## Hard bans (preserved)
 

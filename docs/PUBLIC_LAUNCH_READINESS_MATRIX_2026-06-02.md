@@ -28,6 +28,8 @@
 
 **Safe-lane merge (2026-06-17):** **Job-Specific Pipeline + Process Statuses** — recruiter/company job pipeline pilot · `docs/JOB_SPECIFIC_PIPELINE_STATUSES_2026-06-17.md` · `test:job-specific-pipeline-statuses` · **does not change launch NO-GO** · P0 performance **OPEN**.
 
+**Safe-lane merge (2026-06-17):** **Notes, Feedback, Scorecards & Forms** — collaboration layer connected to Profile 360 + job pipeline · `docs/NOTES_FEEDBACK_SCORECARDS_FORMS_2026-06-17.md` · `test:notes-feedback-scorecards` · **does not change launch NO-GO** · P0 performance **OPEN**.
+
 **Safe-lane merge (2026-06-11):** Recruiter inbox **premium card redesign** — decision rail, match score card, signal rows, review CTA · **does not change launch NO-GO**.
 
 **Safe-lane merge (2026-06-11):** Recruiter **candidate message drafts** — 4 templates, copy-to-clipboard, local contact phase after accept; no email send, no hidden PII · `docs/RECRUITER_CANDIDATE_MESSAGE_DRAFTS_MVP_2026-06-11.md` · **does not change launch NO-GO**.
