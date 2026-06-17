@@ -107,6 +107,32 @@ Apple, Microsoft, Google, Amazon, NVIDIA, Meta, Visa, Salesforce, Netflix.
 - No changes to `LightweightRouteShell`, `PersonaWorkspaceGate`, workspace layouts, or route fallback.
 - Launch NO-GO and Phase 3B gating unchanged.
 
+## Final visual polish — 2026-06-17
+
+**Branch:** `fix/logo-marquee-final-visual-polish-2026-06-17`  
+**Incident:** Founder reported inconsistent visual weight after PR #160 — NVIDIA too heavy, Meta plain, Visa over-italic, Salesforce too small, mixed asset feel.
+
+### Approach
+
+**Option A — premium inline wordmark treatment** via `PerformanceSafeLogoMark`:
+
+- One consistent optical height (~16px) across all 9 brands
+- Per-brand `opticalScale` metadata (Apple capped 0.88, NVIDIA ≤0.92, Salesforce ≥0.94)
+- `qualityStatus: verified-curated` on every mark
+- No `<img>` / CDN on workspace/auth — inline SVG + system-ui text only
+
+### Curated subset (unchanged count)
+
+Apple, Microsoft, Google, Amazon, NVIDIA, Meta, Visa, Salesforce, Netflix.
+
+### Node count & loop
+
+9 × 3 segments = **27 nodes** (hard max 30). CSS `calc(-100% / 3)` seamless loop; animation **52s** (calmer). Hidden-tab pause + reduced-motion static strip unchanged.
+
+### Policy unchanged
+
+P0 performance **OPEN**; Phase 3B **BLOCKED**; launch **NO-GO**.
+
 ## Related docs
 
 - `docs/P0_RENDERER_MEMORY_PROFILE_2026-06-16.md` — renderer memory program (updated)
