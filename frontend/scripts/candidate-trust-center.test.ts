@@ -1,5 +1,5 @@
 /**
- * Candidate Trust Center — route, demo data, and hard-ban guards (23 assertions).
+ * Candidate Trust Center — route, demo data, and hard-ban guards (27 assertions).
  */
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
@@ -22,7 +22,7 @@ import {
 import { CANDIDATE_CANONICAL_ROUTES } from "../src/lib/candidate-canonical-routes";
 import { JOB_PIPELINE_DEMO_ID } from "../src/lib/job-pipeline-demo-data";
 import { SYSTEM_OF_RECORD_ROUTES } from "../src/lib/system-of-record-routes";
-import { en } from "../src/lib/i18n";
+import { dictionaries, en } from "../src/lib/i18n";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -218,4 +218,31 @@ test("23 controls remain disabled on pilot record", () => {
   const record = getCandidateTrustCenterDemo();
   assert.equal(record.controls_export_disabled, true);
   assert.equal(record.controls_delete_disabled, true);
+});
+
+test("24 momentum rail PL copy is complete — not truncated mid-word", () => {
+  const plLead = dictionaries.pl.site.momentumLead;
+  assert.match(plLead, /heroicznym szukaniem pracy raz w tygodniu/i);
+  assert.doesNotMatch(plLead, /heroicz szukaniem/i);
+  assert.ok(plLead.endsWith("."));
+});
+
+test("25 momentum rail EN copy is complete", () => {
+  const enLead = en.site.momentumLead;
+  assert.match(enLead, /heroic once-a-week job hunts/i);
+  assert.ok(enLead.endsWith("."));
+});
+
+test("26 trust center PL boundary body is full readable sentence", () => {
+  const boundary = dictionaries.pl.candidateTrustCenter.boundaryBody;
+  assert.match(boundary, /bez auto-apply/i);
+  assert.match(boundary, /bez automatycznego outreachu/i);
+  assert.ok(boundary.length > 120);
+});
+
+test("27 momentum rail component does not clamp or truncate lead copy", () => {
+  const rail = read("src/components/page-momentum-rail.tsx");
+  assert.doesNotMatch(rail, /line-clamp|truncate|overflow-hidden/);
+  assert.match(rail, /site\.momentumLead/);
+  assert.match(rail, /break-words/);
 });

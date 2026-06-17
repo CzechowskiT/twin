@@ -84,6 +84,12 @@ test("PL momentum rail — no English loanwords in authenticated sidebar copy", 
   assert.doesNotMatch(tips, /\bbilling\b/i);
   assert.doesNotMatch(tips, /\bfeed\b/i);
   assert.match(byKey["site.momentumEyebrow"] ?? "", /Utrzymaj tempo/i);
+  assert.match(
+    byKey["site.momentumLead"] ?? "",
+    /heroicznym szukaniem pracy raz w tygodniu/i,
+    "PL momentumLead must show full habit copy, not truncated mid-word",
+  );
+  assert.doesNotMatch(byKey["site.momentumLead"] ?? "", /heroicz szukaniem/i);
 });
 
 test("DE global chrome — founder-reported strings localized", () => {

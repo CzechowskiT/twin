@@ -349,7 +349,7 @@ export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } 
 
   momentumAria: "Podpowiedzi i skróty",
   momentumEyebrow: "Utrzymaj tempo",
-  momentumLead: "Małe nawyki wygrywają z jednorazowym, heroicz szukaniem pracy raz w tygodniu.",
+  momentumLead: "Małe nawyki wygrywają z jednorazowym heroicznym szukaniem pracy raz w tygodniu.",
   momentumTip1:
     "Gdy zapiszesz ofertę lub wyślesz aplikację z dopasowań albo strumienia ofert, wpisy trafiają do jednej osi czasu. Traktuj to jak prywatny rejestr aplikacji do momentu rozmów.",
   momentumTip2:
