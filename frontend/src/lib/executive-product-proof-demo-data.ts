@@ -132,6 +132,6 @@ export const EXECUTIVE_PRODUCT_PROOF_MILESTONES: ExecutiveProofMilestone[] = [
   { id: "ms-1", title: "SOR navigation hub + decision memory", target: "2026-06-17", status: "done" },
   { id: "ms-2", title: "Executive product proof board demo", target: "2026-06-17", status: "in_progress" },
   { id: "ms-3", title: "Recruiter & company daily cockpits", target: "2026-06-18", status: "planned" },
-  { id: "ms-4", title: "Candidate trust center", target: "2026-06-18", status: "planned" },
+  { id: "ms-4", title: "Candidate trust center", target: "2026-06-18", status: "done" },
   { id: "ms-5", title: "P0 performance closure (not Phase 3B)", target: "TBD", status: "planned" },
 ];

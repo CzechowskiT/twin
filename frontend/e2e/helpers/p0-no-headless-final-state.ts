@@ -12,6 +12,7 @@ export const P0_CRITICAL_CANDIDATE_ROUTES = [
   "/dashboard",
   "/dashboard/jobs",
   "/dashboard/matches",
+  "/dashboard/trust",
   "/profile",
   "/dashboard/profile",
   "/dashboard/cv",
@@ -54,6 +55,7 @@ export const P0_CRITICAL_ALL_ROUTES = [
 export const P0_PAGE_MARKER_SELECTORS = [
   "[data-candidate-profile-360-page]",
   "[data-candidate-trust-page]",
+  "[data-candidate-trust-center-page]",
   "[data-candidate-collaboration-page]",
   "[data-safe-communication-page]",
   "[data-team-collaboration-page]",
@@ -134,6 +136,7 @@ export function snapshotFinalStateDom(): P0DomFinalState {
   const markerSelectors = [
     "[data-candidate-profile-360-page]",
     "[data-candidate-trust-page]",
+    "[data-candidate-trust-center-page]",
     "[data-candidate-collaboration-page]",
     "[data-safe-communication-page]",
     "[data-team-collaboration-page]",
