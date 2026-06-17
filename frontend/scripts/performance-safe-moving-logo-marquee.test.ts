@@ -1,14 +1,21 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
 import {
   PERFORMANCE_SAFE_MARQUEE_BRANDS,
+  PERFORMANCE_SAFE_MARQUEE_CURATED_SLUGS,
+  PERFORMANCE_SAFE_MARQUEE_HARD_MAX_DOM_NODES,
+  PERFORMANCE_SAFE_MARQUEE_LOOP_TRANSLATE_PERCENT,
   PERFORMANCE_SAFE_MARQUEE_MAX_DOM_NODES,
   PERFORMANCE_SAFE_MARQUEE_SEGMENTS,
 } from "../src/lib/marquee-brand-subset";
+import {
+  PERFORMANCE_SAFE_CURATED_LOGO_SLUGS,
+  performanceSafeCuratedLogoUrl,
+} from "../src/lib/performance-safe-curated-logos";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -24,12 +31,13 @@ test("1 PerformanceSafeMovingLogoMarquee exported with bounded segments", () => 
   assert.match(src, /performance-safe-marquee-segment/);
 });
 
-test("2 compact brand subset stays within 12–18 DOM nodes", () => {
+test("2 compact brand subset stays within 18–27 DOM nodes (9×3 segments)", () => {
   assert.ok(PERFORMANCE_SAFE_MARQUEE_BRANDS.length >= 6);
   assert.ok(PERFORMANCE_SAFE_MARQUEE_BRANDS.length <= 9);
-  assert.equal(PERFORMANCE_SAFE_MARQUEE_SEGMENTS, 2);
-  assert.ok(PERFORMANCE_SAFE_MARQUEE_MAX_DOM_NODES >= 12);
-  assert.ok(PERFORMANCE_SAFE_MARQUEE_MAX_DOM_NODES <= 18);
+  assert.equal(PERFORMANCE_SAFE_MARQUEE_SEGMENTS, 3);
+  assert.ok(PERFORMANCE_SAFE_MARQUEE_MAX_DOM_NODES >= 18);
+  assert.ok(PERFORMANCE_SAFE_MARQUEE_MAX_DOM_NODES <= 27);
+  assert.ok(PERFORMANCE_SAFE_MARQUEE_MAX_DOM_NODES <= PERFORMANCE_SAFE_MARQUEE_HARD_MAX_DOM_NODES);
 });
 
 test("3 subset file does not import full 89-brand marquee array", () => {
@@ -109,8 +117,29 @@ test("11 PageVisibilitySync sets data-page-hidden for CSS pause", () => {
   assert.match(providers, /PageVisibilitySync/);
 });
 
-test("12 package registers performance-safe marquee test", () => {
+test("12 package registers performance-safe marquee tests", () => {
   const pkg = read("package.json");
   assert.match(pkg, /test:performance-safe-moving-logo-marquee/);
   assert.match(pkg, /performance-safe-moving-logo-marquee\.test\.ts/);
+  assert.match(pkg, /test:performance-safe-moving-logo-marquee-browser/);
+});
+
+test("13 safe marquee uses curated local logos only (no CDN fallback)", () => {
+  const src = read("src/components/marketing/performance-safe-moving-logo-marquee.tsx");
+  assert.match(src, /performanceSafeCuratedLogoUrls/);
+  assert.doesNotMatch(src, /brandLogoUrls/);
+  assert.equal(PERFORMANCE_SAFE_CURATED_LOGO_SLUGS.length, PERFORMANCE_SAFE_MARQUEE_BRANDS.length);
+  for (const slug of PERFORMANCE_SAFE_MARQUEE_CURATED_SLUGS) {
+    const path = join(root, "public", performanceSafeCuratedLogoUrl(slug).replace(/^\//, ""));
+    assert.ok(existsSync(path), `missing curated SVG for ${slug}: ${path}`);
+  }
+});
+
+test("14 seamless loop translates exactly one segment width", () => {
+  const css = read("src/app/globals.css");
+  assert.match(css, /--performance-safe-marquee-segments/);
+  assert.match(css, /calc\(-100% \/ var\(--performance-safe-marquee-segments/);
+  assert.equal(PERFORMANCE_SAFE_MARQUEE_LOOP_TRANSLATE_PERCENT, 100 / 3);
+  const src = read("src/components/marketing/performance-safe-moving-logo-marquee.tsx");
+  assert.match(src, /--performance-safe-marquee-segments/);
 });

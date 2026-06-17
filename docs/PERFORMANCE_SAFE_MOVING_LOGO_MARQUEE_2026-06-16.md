@@ -8,7 +8,7 @@
 
 | Route lane | Component | DOM logo nodes | Brand data | Animation |
 | ---------- | --------- | -------------- | ---------- | --------- |
-| Workspace + auth (`isPerformanceLightChromePath`) | `PerformanceSafeMovingLogoMarquee` | **≤18** (9 brands × 2 segments) | `marquee-brand-subset.ts` (compact) | CSS `translate3d` loop, 48s |
+| Workspace + auth (`isPerformanceLightChromePath`) | `PerformanceSafeMovingLogoMarquee` | **≤27** (9 brands × 3 segments) | `marquee-brand-subset.ts` + `performance-safe-curated-logos.ts` | CSS `translate3d` loop (1 segment/cycle), 48s |
 | Marketing + public | `CompanyLogoMarquee` (dynamic) | ~178 (89 × 2) | `company-logo-marquee.tsx` | CSS `translate3d` loop, 120s |
 
 **Never again:** static 6-logo strip on workspace, or eager 89-brand import on dashboard/recruiter/login.
@@ -75,6 +75,37 @@ Run prod smoke **only after** merge + deploy. Do **not** start Phase 3B before s
 14. **Deploy gate** — CI green → merge → deploy → prod Playwright smoke.
 15. **Phase 3B** — Blocked until post-deploy smoke passes; no founder manual smoke.
 16. **Regression guard** — P0 + dedicated test assert safe component on workspace/auth; forbid eager full marquee.
+
+## Final logo quality and seamless-loop correction — 2026-06-17
+
+**Branch:** `fix/final-logo-marquee-quality-seamless-loop-2026-06-17`  
+**Incident:** Founder reported wrong/generic logos (Meta infinity glyph, tiny Visa, Salesforce blob, thin Netflix N), visible gaps/pauses in the moving loop on workspace/auth.
+
+### Root cause
+
+1. **Logo quality** — `PerformanceSafeMovingLogoMarquee` used `brandLogoUrls()` → Simple Icons CDN/jsDelivr. Several slugs render monochrome glyphs or broken blobs on white plates, not recognizable wordmarks.
+2. **Seamless loop** — Two segments (`-50%` transform) left track width below 2.5× viewport on 1440/1920/ultrawide, exposing empty band gaps during the animation cycle.
+
+### Fix
+
+| Area | Change |
+| ---- | ------ |
+| Curated logos | `performance-safe-curated-logos.ts` + `public/logos/marquee-curated/*.svg` — self-hosted wordmarks for all 9 subset brands; safe marquee uses **only** local paths (no CDN). |
+| Segments | `PERFORMANCE_SAFE_MARQUEE_SEGMENTS = 3` → 27 DOM nodes (within hard max 30). |
+| CSS loop | `translate3d(calc(-100% / var(--performance-safe-marquee-segments, 3)), 0, 0)` — exactly one segment per cycle. |
+| Card width | Slightly wider plates (`7.25rem` / `8rem`) for better ultrawide coverage. |
+| Tests | `test:performance-safe-moving-logo-marquee` (14 specs); `test:performance-safe-moving-logo-marquee-browser` (13 browser specs, workers=1). |
+
+### Curated subset (workspace/auth only)
+
+Apple, Microsoft, Google, Amazon, NVIDIA, Meta, Visa, Salesforce, Netflix.
+
+### Policy unchanged
+
+- Moving marquee remains on workspace/auth (not static strip).
+- Full 89-brand `CompanyLogoMarquee` still lazy-loaded on marketing only.
+- No changes to `LightweightRouteShell`, `PersonaWorkspaceGate`, workspace layouts, or route fallback.
+- Launch NO-GO and Phase 3B gating unchanged.
 
 ## Related docs
 

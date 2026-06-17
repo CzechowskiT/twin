@@ -48,6 +48,8 @@
     "test:prod-recruiter-multitab-stuck-routes": "echo 'DISABLED 2026-06-16: Playwright multitab e2e caused chrome-headless-shell CPU storm. Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 to run.' && exit 1",
     "test:p0-renderer-memory-bundle-reduction": "npx --yes tsx scripts/p0-renderer-memory-bundle-reduction.test.ts",
     "test:performance-safe-moving-logo-marquee": "npx --yes tsx scripts/performance-safe-moving-logo-marquee.test.ts",
+    "test:performance-safe-moving-logo-marquee-browser": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'&&process.env.PLAYWRIGHT_ENABLE_BROWSER_TESTS!=='1'){console.error('Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 (local) or PLAYWRIGHT_ALLOW_PROD_SMOKE=1 (prod).');process.exit(1)}\" && npm run test:performance-safe-moving-logo-marquee-browser:raw",
+    "test:performance-safe-moving-logo-marquee-browser:raw": "playwright test e2e/performance-safe-moving-logo-marquee-browser.spec.ts --workers=1",
     "test:company-billing-readiness-mvp": "npx --yes tsx scripts/company-billing-readiness-mvp.test.ts",
     "test:company-billing-plan-usage-readiness": "npx --yes tsx scripts/company-billing-plan-usage-readiness.test.ts",
     "test:candidate-transparency": "npx --yes tsx scripts/candidate-transparency.test.ts",
