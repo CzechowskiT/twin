@@ -9,6 +9,7 @@ import { jobPipelineHref } from "@/lib/job-pipeline";
 import { LAUNCH_STANCE } from "@/lib/investor-metrics-reality";
 import type { TranslationKey } from "@/lib/i18n";
 import { recruiterDailyCockpitHref } from "@/lib/recruiter-daily-operating-cockpit";
+import { companyHiringCockpitHref } from "@/lib/company-hiring-cockpit";
 import { candidateCommunicationHref } from "@/lib/safe-communication";
 import { candidateTeamHref } from "@/lib/team-collaboration";
 import {
@@ -91,6 +92,11 @@ export const EXECUTIVE_PRODUCT_PROOF_DEMO_LINKS = [
     id: "daily_cockpit",
     href: recruiterDailyCockpitHref(),
     labelKey: "executiveProductProof.linkDailyCockpit" as TranslationKey,
+  },
+  {
+    id: "hiring_cockpit",
+    href: companyHiringCockpitHref(),
+    labelKey: "executiveProductProof.linkHiringCockpit" as TranslationKey,
   },
 ] as const;
 

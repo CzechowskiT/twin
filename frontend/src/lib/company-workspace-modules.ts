@@ -1,5 +1,6 @@
 import { COMPANY_BILLING_ROUTE } from "@/lib/company-billing-readiness";
 import { COMPANY_HIRING_ROUTE } from "@/lib/company-hiring-dashboard";
+import { COMPANY_HIRING_COCKPIT_ROUTE } from "@/lib/company-hiring-cockpit";
 import { COMPANY_INTEGRATIONS_ROUTE } from "@/lib/company-integrations-readiness";
 import { COMPANY_ROLES_ROUTE } from "@/lib/company-jobs-roles";
 import { COMPANY_TEAM_ROUTE } from "@/lib/company-team-permissions";
@@ -8,6 +9,14 @@ import type { WorkspaceModuleDef } from "@/lib/workspace-module-status";
 
 /** Company workspace module cards — honest billing/integrations readiness. */
 export const COMPANY_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
+  {
+    id: "hiring_cockpit",
+    href: COMPANY_HIRING_COCKPIT_ROUTE,
+    titleKey: "companyHiringCockpit.demoJourneyTitle",
+    valuePropKey: "companyHiringCockpit.demoJourneyDesc",
+    ctaKey: "companyHiringCockpit.openHiringCockpit",
+    status: "pilot",
+  },
   {
     id: "roles",
     href: COMPANY_ROLES_ROUTE,
