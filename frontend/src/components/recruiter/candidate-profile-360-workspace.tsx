@@ -24,6 +24,7 @@ import {
 } from "@/lib/candidate-collaboration";
 import { candidateTrustHref } from "@/lib/candidate-trust";
 import { candidateTeamHref } from "@/lib/team-collaboration";
+import { atsImportReadinessHref } from "@/lib/ats-import-readiness";
 import { candidateCommunicationHref } from "@/lib/safe-communication";
 
 function fitLabelKey(fit: CandidateProfile360Record["fit_label"]): TranslationKey {
@@ -485,6 +486,13 @@ function ProfileContent({
                 data-testid="candidate-profile-360-communication-link"
               >
                 {t("safeCommunication.openCommunication")}
+              </Link>
+              <Link
+                href={atsImportReadinessHref(surface)}
+                className="twin-link mt-2 inline-block text-sm font-medium"
+                data-testid="candidate-profile-360-import-readiness-link"
+              >
+                {t("atsImportReadiness.openImportReadiness")}
               </Link>
             </>,
             "lg:col-span-2",

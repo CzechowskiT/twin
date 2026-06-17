@@ -2,33 +2,34 @@
 
 import Link from "next/link";
 
-import { AtsIntegrationsPanel } from "@/components/recruiter/ats-integrations-panel";
+import { CompanyWorkspaceNav } from "@/components/company/company-workspace-nav";
 import { useTranslation } from "@/components/language-provider";
 import { Shell } from "@/components/ui";
 import { atsImportReadinessHref } from "@/lib/ats-import-readiness";
 
-export default function RecruiterAtsIntegrationsPage() {
+export default function CompanyAtsIntegrationsPage() {
   const { t } = useTranslation();
 
   return (
     <Shell wide>
+      <CompanyWorkspaceNav />
       <header className="mb-8 space-y-2">
         <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
-          {t("atsIntegrations.title")}
+          {t("atsImportReadiness.companyEyebrow")}
         </p>
-        <h1 className="twin-page-intro text-2xl font-semibold sm:text-3xl">{t("atsIntegrations.title")}</h1>
-        <p className="twin-muted max-w-2xl text-sm leading-relaxed">{t("atsIntegrations.lead")}</p>
+        <h1 className="twin-page-intro text-2xl font-semibold sm:text-3xl">{t("atsImportReadiness.companyTitle")}</h1>
+        <p className="twin-muted max-w-2xl text-sm leading-relaxed">{t("atsImportReadiness.companyLead")}</p>
         <p className="text-sm">
           <Link
-            href={atsImportReadinessHref("recruiter")}
+            href={atsImportReadinessHref("company")}
             className="twin-link font-medium"
-            data-testid="recruiter-ats-import-readiness-link"
+            data-testid="company-ats-import-readiness-link"
           >
             {t("atsImportReadiness.openImportReadiness")}
           </Link>
         </p>
       </header>
-      <AtsIntegrationsPanel />
+      <p className="twin-muted text-xs leading-relaxed">{t("atsImportReadiness.companyScopeNote")}</p>
     </Shell>
   );
 }
