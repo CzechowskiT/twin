@@ -13,6 +13,12 @@ import {
   candidateProfile360Href,
   isCandidateProfile360DemoId,
 } from "@/lib/candidate-profile-360";
+import {
+  candidateFeedbackHref,
+  candidateScorecardHref,
+  jobFeedbackHref,
+  jobScorecardsHref,
+} from "@/lib/candidate-collaboration";
 import type { TranslationKey } from "@/lib/i18n";
 import {
   candidatesForStage,
@@ -171,6 +177,24 @@ function CandidateCard({
       ) : (
         <p className="mt-3 text-xs text-[var(--twin-muted-strong)]">{t("jobPipeline.profileNotConnected")}</p>
       )}
+      {profileConnected ? (
+        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs">
+          <Link
+            href={candidateFeedbackHref(candidate.id, surface)}
+            className="twin-link font-medium"
+            data-testid={`job-pipeline-feedback-link-${candidate.id}`}
+          >
+            {t("candidateCollaboration.focusFeedback")}
+          </Link>
+          <Link
+            href={candidateScorecardHref(candidate.id, surface)}
+            className="twin-link font-medium"
+            data-testid={`job-pipeline-scorecard-link-${candidate.id}`}
+          >
+            {t("candidateCollaboration.focusScorecard")}
+          </Link>
+        </div>
+      ) : null}
     </article>
   );
 }
@@ -366,6 +390,22 @@ function PipelineContent({
                 {t("jobPipeline.decisionMemoryTitle")}
               </h2>
               <p className="twin-muted mt-2 text-xs">{t("jobPipeline.decisionMemoryLead")}</p>
+              <div className="mt-3 flex flex-wrap gap-3 text-xs">
+                <Link
+                  href={jobFeedbackHref(record.id, surface)}
+                  className="twin-link font-medium"
+                  data-testid="job-pipeline-decision-memory-feedback-link"
+                >
+                  {t("candidateCollaboration.jobFeedbackLink")}
+                </Link>
+                <Link
+                  href={jobScorecardsHref(record.id, surface)}
+                  className="twin-link font-medium"
+                  data-testid="job-pipeline-decision-memory-scorecards-link"
+                >
+                  {t("candidateCollaboration.jobScorecardsLink")}
+                </Link>
+              </div>
               <ul className="mt-4 space-y-3">
                 {record.decision_events.map((event) => (
                   <li

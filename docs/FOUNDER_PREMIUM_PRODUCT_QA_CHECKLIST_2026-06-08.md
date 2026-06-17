@@ -17,6 +17,8 @@
 
 **Job-Specific Pipeline (2026-06-17):** `/recruiter/jobs/demo-role-001/pipeline` pilot — 7 stages, candidate cards, decision memory, human boundaries; `test:job-specific-pipeline-statuses` → `docs/JOB_SPECIFIC_PIPELINE_STATUSES_2026-06-17.md`.
 
+**Notes, Feedback, Scorecards & Forms (2026-06-17):** `/recruiter/candidates/demo-candidate-001/collaboration` pilot — 7 sections, scorecard 9 criteria, form previews, human boundaries; `test:notes-feedback-scorecards` → `docs/NOTES_FEEDBACK_SCORECARDS_FORMS_2026-06-17.md`.
+
 **Program:** Premium Product Experience Polish Slices 0–7 (PRs [#52](https://github.com/CzechowskiT/twin/pull/52)–[#58](https://github.com/CzechowskiT/twin/pull/58))
 
 ---

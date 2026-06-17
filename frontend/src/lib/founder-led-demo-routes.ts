@@ -5,6 +5,10 @@
 import { loginPathWithNext } from "@/lib/login-redirect";
 import type { TranslationKey } from "@/lib/i18n";
 import { candidateProfile360Href, CANDIDATE_PROFILE_360_DEMO_ID } from "@/lib/candidate-profile-360";
+import {
+  candidateCollaborationHref,
+  CANDIDATE_COLLABORATION_DEMO_ID,
+} from "@/lib/candidate-collaboration";
 import { jobPipelineHref, JOB_PIPELINE_DEMO_ID } from "@/lib/job-pipeline";
 
 export type FounderLedDemoLink = {
@@ -86,6 +90,14 @@ export const FOUNDER_LED_DEMO_JOURNEY_STEPS: readonly FounderLedDemoLink[] = [
     loginPath: "/login/recruiter",
     titleKey: "jobPipeline.demoJourneyTitle",
     descKey: "jobPipeline.demoJourneyDesc",
+  },
+  {
+    id: "collaboration",
+    href: candidateCollaborationHref(CANDIDATE_COLLABORATION_DEMO_ID),
+    requiresAuth: true,
+    loginPath: "/login/recruiter",
+    titleKey: "candidateCollaboration.demoJourneyTitle",
+    descKey: "candidateCollaboration.demoJourneyDesc",
   },
   {
     id: "candidate_profile",
