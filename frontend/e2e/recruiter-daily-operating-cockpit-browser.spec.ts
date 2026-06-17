@@ -1,14 +1,16 @@
 /**
- * Recruiter Daily Operating Cockpit — browser smoke (workers=1, 18 assertions).
+ * Recruiter Daily Operating Cockpit — browser smoke (workers=1, 22 assertions).
  */
 import { expect, test, type Page } from "@playwright/test";
 
 import {
   RECRUITER_DAILY_COCKPIT_FORBIDDEN_PATTERNS,
   RECRUITER_DAILY_COCKPIT_MARKERS,
+  RECRUITER_DAILY_COCKPIT_MODULE_LINKS,
   RECRUITER_DAILY_COCKPIT_PAGE_MARKER,
   RECRUITER_DAILY_COCKPIT_ROUTE,
 } from "../src/lib/recruiter-daily-operating-cockpit";
+import { RECRUITER_ANALYTICS_MARKERS } from "../src/lib/recruiter-analytics";
 import { withFreshContext } from "./helpers/browser-lifecycle";
 
 const SETTLE_MS = 12_000;
@@ -239,6 +241,66 @@ test.describe("Recruiter Daily Operating Cockpit browser", () => {
       await gotoAndSettle(page, RECRUITER_DAILY_COCKPIT_ROUTE);
       if (!isAuthShell((await bodyText(page)).toLowerCase())) {
         await expect(page.locator('[data-testid="recruiter-daily-cockpit-link-profile360"]')).toBeVisible();
+      }
+    });
+  });
+
+  test("19 daily-cockpit is not analytics placeholder when authenticated", async ({ browser }) => {
+    await withFreshContext(browser, async (context) => {
+      const page = await context.newPage();
+      await gotoAndSettle(page, RECRUITER_DAILY_COCKPIT_ROUTE);
+      if (!isAuthShell((await bodyText(page)).toLowerCase())) {
+        await expect(
+          page.locator(`[data-recruiter-daily-cockpit-page="${RECRUITER_DAILY_COCKPIT_PAGE_MARKER}"]`),
+        ).toBeVisible();
+        await expect(page.locator(`[data-testid="${RECRUITER_ANALYTICS_MARKERS.loadButton}"]`)).toHaveCount(0);
+        await expect(page.locator(`[data-testid="${RECRUITER_DAILY_COCKPIT_MARKERS.priorityWorklist}"]`)).toBeVisible();
+      }
+    });
+  });
+
+  test("20 recruiter hub promo links to daily cockpit when authenticated", async ({ browser }) => {
+    await withFreshContext(browser, async (context) => {
+      const page = await context.newPage();
+      await gotoAndSettle(page, "/recruiter");
+      if (!isAuthShell((await bodyText(page)).toLowerCase())) {
+        const promo = page.locator(`[data-testid="${RECRUITER_DAILY_COCKPIT_MARKERS.hubPromo}"]`);
+        await expect(promo).toBeVisible();
+        await promo.click();
+        await page.waitForURL(`**${RECRUITER_DAILY_COCKPIT_ROUTE}**`, { timeout: SETTLE_MS });
+        await expect(
+          page.locator(`[data-recruiter-daily-cockpit-page="${RECRUITER_DAILY_COCKPIT_PAGE_MARKER}"]`),
+        ).toBeVisible();
+      }
+    });
+  });
+
+  test("21 module quick links resolve without 404 when authenticated", async ({ browser }) => {
+    await withFreshContext(browser, async (context) => {
+      const page = await context.newPage();
+      await gotoAndSettle(page, RECRUITER_DAILY_COCKPIT_ROUTE);
+      if (!isAuthShell((await bodyText(page)).toLowerCase())) {
+        for (const link of RECRUITER_DAILY_COCKPIT_MODULE_LINKS) {
+          if (link.id === "sor_hub") continue;
+          const response = await page.goto(link.href, { waitUntil: "domcontentloaded" });
+          expect(response?.status() ?? 0).not.toBe(404);
+          expect((await page.title()).toLowerCase()).not.toContain("404");
+        }
+      }
+    });
+  });
+
+  test("22 workspace nav daily cockpit tab resolves cockpit when authenticated", async ({ browser }) => {
+    await withFreshContext(browser, async (context) => {
+      const page = await context.newPage();
+      await gotoAndSettle(page, "/recruiter/analytics");
+      if (!isAuthShell((await bodyText(page)).toLowerCase())) {
+        await page.locator('a[href="/recruiter/daily-cockpit"]').first().click();
+        await page.waitForURL(`**${RECRUITER_DAILY_COCKPIT_ROUTE}**`, { timeout: SETTLE_MS });
+        await expect(
+          page.locator(`[data-recruiter-daily-cockpit-page="${RECRUITER_DAILY_COCKPIT_PAGE_MARKER}"]`),
+        ).toBeVisible();
+        await expect(page.locator(`[data-testid="${RECRUITER_ANALYTICS_MARKERS.loadButton}"]`)).toHaveCount(0);
       }
     });
   });

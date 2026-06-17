@@ -7,6 +7,7 @@ import { useTranslation } from "@/components/language-provider";
 import type { TranslationKey } from "@/lib/i18n";
 
 const TABS: { href: string; labelKey: TranslationKey }[] = [
+  { href: "/recruiter/daily-cockpit", labelKey: "recruiterDailyCockpit.navLink" },
   { href: "/recruiter/inbox", labelKey: "recruiterInbox.title" },
   { href: "/recruiter/pipeline", labelKey: "recruiterPipeline.title" },
   { href: "/recruiter/talent-radar", labelKey: "recruiterTalentRadar.navLink" },

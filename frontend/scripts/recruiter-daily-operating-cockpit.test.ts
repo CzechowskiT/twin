@@ -24,6 +24,8 @@ import {
   recruiterDailyCockpitHref,
   resolveRecruiterDailyCockpit,
 } from "../src/lib/recruiter-daily-operating-cockpit";
+import { RECRUITER_ANALYTICS_ROUTE } from "../src/lib/recruiter-analytics";
+import { RECRUITER_WORKSPACE_MODULES } from "../src/lib/recruiter-workspace-modules";
 import { SYSTEM_OF_RECORD_ROUTES } from "../src/lib/system-of-record-routes";
 import { dictionaries, en, LOCALES } from "../src/lib/i18n";
 
@@ -139,7 +141,7 @@ test("13 executive product proof links to daily cockpit", () => {
 
 test("14 recruiter hub quick action links to daily cockpit", () => {
   const hub = read("src/app/recruiter/page.tsx");
-  assert.match(hub, /\/recruiter\/daily-cockpit/);
+  assert.match(hub, /recruiterDailyCockpitHref/);
   assert.match(hub, /recruiterDailyCockpit\.openDailyCockpit/);
 });
 
@@ -218,4 +220,47 @@ test("23 comm drafts queue is draft-only — no sent language in demo summaries"
     assert.doesNotMatch(row.summary, /sent|outbound live|sync completed/i);
     assert.match(row.summary.toLowerCase(), /draft|copy-only|no outbound|approved/);
   }
+});
+
+test("24 workspace nav exposes daily cockpit before analytics", () => {
+  const nav = read("src/components/recruiter/recruiter-workspace-nav.tsx");
+  assert.match(nav, /\/recruiter\/daily-cockpit/);
+  assert.match(nav, /recruiterDailyCockpit\.navLink/);
+  assert.match(nav, /\/recruiter\/analytics/);
+  const dailyIdx = nav.indexOf("/recruiter/daily-cockpit");
+  const analyticsIdx = nav.indexOf("/recruiter/analytics");
+  assert.ok(dailyIdx >= 0 && analyticsIdx >= 0 && dailyIdx < analyticsIdx);
+});
+
+test("25 daily-cockpit route is not analytics placeholder page", () => {
+  const page = read("src/app/recruiter/daily-cockpit/page.tsx");
+  const analyticsPage = read("src/app/recruiter/analytics/page.tsx");
+  assert.match(page, /RecruiterDailyOperatingCockpitWorkspace/);
+  assert.doesNotMatch(page, /RecruiterAnalyticsClient/);
+  assert.match(analyticsPage, /RecruiterAnalyticsClient/);
+  assert.doesNotMatch(analyticsPage, /RecruiterDailyOperatingCockpitWorkspace/);
+});
+
+test("26 recruiter hub promo card links to daily cockpit", () => {
+  const hub = read("src/app/recruiter/page.tsx");
+  assert.match(hub, /RECRUITER_DAILY_COCKPIT_MARKERS\.hubPromo/);
+  assert.match(hub, /recruiterDailyCockpitHref/);
+});
+
+test("27 analytics placeholder markers stay on analytics route only", () => {
+  const analytics = read("src/app/recruiter/analytics/recruiter-analytics-client.tsx");
+  const cockpit = read(COCKPIT_COMPONENT);
+  assert.match(analytics, /RECRUITER_ANALYTICS_MARKERS\.loadButton/);
+  assert.match(analytics, /RECRUITER_ANALYTICS_PAGE_MARKER/);
+  assert.doesNotMatch(cockpit, /RECRUITER_ANALYTICS_MARKERS\.loadButton/);
+  assert.equal(RECRUITER_ANALYTICS_ROUTE, "/recruiter/analytics");
+});
+
+test("28 workspace modules register daily cockpit separately from analytics", () => {
+  const daily = RECRUITER_WORKSPACE_MODULES.find((m) => m.id === "daily_cockpit");
+  const analytics = RECRUITER_WORKSPACE_MODULES.find((m) => m.id === "analytics");
+  assert.ok(daily);
+  assert.ok(analytics);
+  assert.equal(daily?.href, RECRUITER_DAILY_COCKPIT_ROUTE);
+  assert.equal(analytics?.href, RECRUITER_ANALYTICS_ROUTE);
 });

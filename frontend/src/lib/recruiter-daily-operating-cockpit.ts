@@ -54,6 +54,8 @@ export const RECRUITER_DAILY_COCKPIT_MARKERS = {
   moduleLinks: "recruiter-daily-cockpit-module-links",
   boundaryBanner: "recruiter-daily-cockpit-boundary-banner",
   pilotBadge: "recruiter-daily-cockpit-pilot-badge",
+  hubPromo: "recruiter-daily-cockpit-hub-promo",
+  navLink: "recruiter-daily-cockpit-nav-link",
 } as const;
 
 export const RECRUITER_DAILY_COCKPIT_MODULE_LINKS = [
