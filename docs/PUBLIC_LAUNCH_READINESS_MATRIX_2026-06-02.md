@@ -34,6 +34,8 @@
 
 **Safe-lane merge (2026-06-17):** **Team Collaboration Layer** — shared workspace connected to Profile 360 + pipeline + notes + trust + decision memory · `docs/TEAM_COLLABORATION_LAYER_2026-06-17.md` · `test:team-collaboration-layer` · **does not change launch NO-GO** · P0 performance **OPEN**.
 
+**Safe-lane merge (2026-06-17):** **Safe Email Communication Layer** — draft-only communication connected to Profile 360 + pipeline + notes + trust + team + decision memory · `docs/SAFE_EMAIL_COMMUNICATION_LAYER_2026-06-17.md` · `test:safe-email-communication-layer` · **does not change launch NO-GO** · P0 performance **OPEN**.
+
 **Safe-lane merge (2026-06-11):** Recruiter inbox **premium card redesign** — decision rail, match score card, signal rows, review CTA · **does not change launch NO-GO**.
 
 **Safe-lane merge (2026-06-11):** Recruiter **candidate message drafts** — 4 templates, copy-to-clipboard, local contact phase after accept; no email send, no hidden PII · `docs/RECRUITER_CANDIDATE_MESSAGE_DRAFTS_MVP_2026-06-11.md` · **does not change launch NO-GO**.

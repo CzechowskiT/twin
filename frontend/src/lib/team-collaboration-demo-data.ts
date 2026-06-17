@@ -190,6 +190,15 @@ const DEMO_TASKS: TeamFollowUpTask[] = [
     status: "blocked",
     linked_surface: "team/tasks",
   },
+  {
+    id: "task-005",
+    title: "Prepare communication draft",
+    priority: "high",
+    due: "2026-06-17",
+    owner_label: "Recruiter (sample)",
+    status: "open",
+    linked_surface: "communication/drafts",
+  },
 ];
 
 const DEMO_QUESTIONS: TeamOpenQuestion[] = [

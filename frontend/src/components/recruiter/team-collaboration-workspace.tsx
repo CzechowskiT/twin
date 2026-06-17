@@ -37,6 +37,7 @@ import {
   type TeamCollaborationSurface,
   type TeamCollaborationView,
 } from "@/lib/team-collaboration";
+import { candidateCommunicationHref, jobCommunicationHref } from "@/lib/safe-communication";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -195,6 +196,11 @@ function TeamContent({ surface, view, header, record, candidateId, jobId }: Shar
   const digestHref = "/recruiter/talent-radar/digest";
   const teamHref = jobId ? jobTeamHref(jobId, surface) : candidateId ? undefined : undefined;
   const tasksHref = jobId ? jobTasksHref(jobId, surface) : undefined;
+  const communicationHref = candidateId
+    ? candidateCommunicationHref(candidateId, surface)
+    : jobId
+      ? jobCommunicationHref(jobId, surface)
+      : candidateCommunicationHref("demo-candidate-001", surface);
 
   return (
     <Shell wide rail>
@@ -281,6 +287,18 @@ function TeamContent({ surface, view, header, record, candidateId, jobId }: Shar
                     </div>
                     <p className="mt-1 text-[var(--twin-muted-strong)]">
                       {t("teamCollaboration.linkedSurface")}: {task.linked_surface}
+                      {task.linked_surface.includes("communication") ? (
+                        <>
+                          {" · "}
+                          <Link
+                            href={communicationHref}
+                            className="twin-link font-medium"
+                            data-testid="team-collaboration-communication-task-link"
+                          >
+                            {t("safeCommunication.openCommunication")}
+                          </Link>
+                        </>
+                      ) : null}
                     </p>
                     <button
                       type="button"
@@ -419,6 +437,15 @@ function TeamContent({ surface, view, header, record, candidateId, jobId }: Shar
                   </Link>
                 </li>
               ) : null}
+              <li>
+                <Link
+                  href={communicationHref}
+                  className="twin-link font-medium"
+                  data-testid="team-collaboration-communication-link"
+                >
+                  {t("safeCommunication.openCommunication")}
+                </Link>
+              </li>
             </ul>
           </>,
         )}

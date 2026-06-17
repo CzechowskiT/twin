@@ -32,6 +32,7 @@ Recruiter/company-facing **system-of-record direction** for one job role — sev
 - Company Roles — demo pipeline link (`data-testid=company-roles-demo-pipeline-link`).
 - Talent Radar — pipeline link next to Profile 360 (`data-testid=recruiter-talent-radar-job-pipeline-link`).
 - Team collaboration (2026-06-17) — pipeline decision memory links to job team + tasks routes.
+- Safe communication (2026-06-17) — pipeline decision memory links to job communication + drafts routes.
 - `/demo` journey — `job_pipeline` step → `/recruiter/jobs/demo-role-001/pipeline` (auth-gated).
 - Collaboration (2026-06-17) — pipeline cards link feedback/scorecard; decision memory links job feedback/scorecards.
 - Trust layer (2026-06-17) — pipeline candidate card consent badge links to trust workspace (`/recruiter/candidates/demo-candidate-001/trust`).

@@ -52,6 +52,7 @@ Recruiter/company-facing **trust layer** connected to Candidate Profile 360, Job
 - **Job Pipeline** — candidate card consent badge → trust route.
 - **`/demo` journey** — `trust` step → `/recruiter/candidates/demo-candidate-001/trust`.
 - **Team collaboration (2026-06-17)** — trust audit connections → team workspace.
+- **Safe communication (2026-06-17)** — contact permission → communication route with warning; see `docs/SAFE_EMAIL_COMMUNICATION_LAYER_2026-06-17.md`.
 
 ## Copy constraints
 

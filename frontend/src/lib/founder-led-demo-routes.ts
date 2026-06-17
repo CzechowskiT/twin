@@ -14,6 +14,10 @@ import {
   candidateTeamHref,
   TEAM_COLLABORATION_CANDIDATE_DEMO_ID,
 } from "@/lib/team-collaboration";
+import {
+  candidateCommunicationHref,
+  SAFE_COMMUNICATION_CANDIDATE_DEMO_ID,
+} from "@/lib/safe-communication";
 import { jobPipelineHref, JOB_PIPELINE_DEMO_ID } from "@/lib/job-pipeline";
 
 export type FounderLedDemoLink = {
@@ -121,6 +125,14 @@ export const FOUNDER_LED_DEMO_JOURNEY_STEPS: readonly FounderLedDemoLink[] = [
     descKey: "teamCollaboration.demoJourneyDesc",
   },
   {
+    id: "safe_communication",
+    href: candidateCommunicationHref(SAFE_COMMUNICATION_CANDIDATE_DEMO_ID),
+    requiresAuth: true,
+    loginPath: "/login/recruiter",
+    titleKey: "safeCommunication.demoJourneyTitle",
+    descKey: "safeCommunication.demoJourneyDesc",
+  },
+  {
     id: "candidate_profile",
     href: "/profile",
     requiresAuth: true,
@@ -199,6 +211,7 @@ export const FOUNDER_LED_DEMO_EXTENDED_ROUTES = [
   "/recruiter/talent-radar/digest",
   "/recruiter/candidates/demo-candidate-001",
   "/recruiter/candidates/demo-candidate-001/team",
+  "/recruiter/candidates/demo-candidate-001/communication",
   "/company/candidates/demo-candidate-001",
   "/recruiter/inbox",
   "/dashboard/jobs",

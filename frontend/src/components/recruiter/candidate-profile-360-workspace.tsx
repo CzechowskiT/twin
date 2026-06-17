@@ -24,6 +24,7 @@ import {
 } from "@/lib/candidate-collaboration";
 import { candidateTrustHref } from "@/lib/candidate-trust";
 import { candidateTeamHref } from "@/lib/team-collaboration";
+import { candidateCommunicationHref } from "@/lib/safe-communication";
 
 function fitLabelKey(fit: CandidateProfile360Record["fit_label"]): TranslationKey {
   const map: Record<CandidateProfile360Record["fit_label"], TranslationKey> = {
@@ -390,6 +391,13 @@ function ProfileContent({
                 >
                   {t("candidateCollaboration.focusScorecard")}
                 </Link>
+                <Link
+                  href={candidateCommunicationHref(record.id, surface)}
+                  className="twin-link font-medium"
+                  data-testid="candidate-profile-360-feedback-communication-link"
+                >
+                  {t("safeCommunication.openCommunication")}
+                </Link>
               </div>
             </>,
           )}
@@ -470,6 +478,13 @@ function ProfileContent({
                 data-testid="candidate-profile-360-team-link"
               >
                 {t("teamCollaboration.openTeamWorkspace")}
+              </Link>
+              <Link
+                href={candidateCommunicationHref(record.id, surface)}
+                className="twin-link mt-2 inline-block text-sm font-medium"
+                data-testid="candidate-profile-360-communication-link"
+              >
+                {t("safeCommunication.openCommunication")}
               </Link>
             </>,
             "lg:col-span-2",
