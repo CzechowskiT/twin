@@ -13,6 +13,10 @@ import {
   CANDIDATE_PROFILE_360_DEMO_ID,
 } from "@/lib/candidate-profile-360";
 import { candidateTrustHref, CANDIDATE_TRUST_DEMO_ID } from "@/lib/candidate-trust";
+import {
+  decisionMemoryHref,
+  DECISION_MEMORY_DEMO_ID,
+} from "@/lib/decision-memory";
 import { COMPANY_BILLING_ROUTE } from "@/lib/company-billing-readiness";
 import { COMPANY_HIRING_ROUTE } from "@/lib/company-hiring-dashboard";
 import { COMPANY_INTEGRATIONS_ROUTE } from "@/lib/company-integrations-readiness";
@@ -99,6 +103,8 @@ const RECRUITER_DEMO_TEAM = candidateTeamHref(TEAM_COLLABORATION_CANDIDATE_DEMO_
 const COMPANY_DEMO_TEAM = candidateTeamHref(TEAM_COLLABORATION_CANDIDATE_DEMO_ID, "company");
 const RECRUITER_DEMO_COMM = candidateCommunicationHref(SAFE_COMMUNICATION_CANDIDATE_DEMO_ID, "recruiter");
 const COMPANY_DEMO_COMM = candidateCommunicationHref(SAFE_COMMUNICATION_CANDIDATE_DEMO_ID, "company");
+const RECRUITER_DEMO_DECISION_MEMORY = decisionMemoryHref(DECISION_MEMORY_DEMO_ID, "recruiter");
+const COMPANY_DEMO_DECISION_MEMORY = decisionMemoryHref(DECISION_MEMORY_DEMO_ID, "company");
 
 /** Full system-of-record route inventory — single source for hub cards and QA guards. */
 export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
@@ -388,6 +394,17 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     boundaryTags: ["pilot", "draft_only", "no_outreach"],
   },
   {
+    id: "recruiter_demo_decision_memory",
+    persona: "recruiter",
+    href: RECRUITER_DEMO_DECISION_MEMORY,
+    titleKey: "decisionMemory.demoJourneyTitle",
+    descriptionKey: "decisionMemory.demoJourneyDesc",
+    ctaKey: "systemOfRecord.openDecisionMemoryCta",
+    status: "pilot",
+    moduleFamily: "evidence",
+    boundaryTags: ["pilot", "human_decision_required", "no_outreach", "no_ats_sync"],
+  },
+  {
     id: "recruiter_ats_import_readiness",
     persona: "recruiter",
     href: atsImportReadinessHref("recruiter"),
@@ -533,6 +550,17 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     status: "pilot",
     moduleFamily: "communication",
     boundaryTags: ["pilot", "draft_only", "no_outreach"],
+  },
+  {
+    id: "company_demo_decision_memory",
+    persona: "company",
+    href: COMPANY_DEMO_DECISION_MEMORY,
+    titleKey: "decisionMemory.demoJourneyTitle",
+    descriptionKey: "decisionMemory.demoJourneyDesc",
+    ctaKey: "systemOfRecord.openDecisionMemoryCta",
+    status: "pilot",
+    moduleFamily: "evidence",
+    boundaryTags: ["pilot", "human_decision_required", "no_outreach", "no_ats_sync"],
   },
   {
     id: "company_ats_import_readiness",

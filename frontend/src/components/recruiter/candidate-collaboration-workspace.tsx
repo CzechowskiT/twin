@@ -24,6 +24,7 @@ import {
   resolveJobCollaboration,
 } from "@/lib/candidate-collaboration";
 import { candidateTrustHref } from "@/lib/candidate-trust";
+import { decisionMemoryHref } from "@/lib/decision-memory";
 import { jobOverviewHref, jobPipelineHref } from "@/lib/job-pipeline";
 import type { TranslationKey } from "@/lib/i18n";
 import { candidateTeamHref } from "@/lib/team-collaboration";
@@ -442,6 +443,13 @@ function CollaborationContent({
                       data-testid="candidate-collaboration-communication-link"
                     >
                       {t("safeCommunication.openCommunication")}
+                    </Link>
+                    <Link
+                      href={decisionMemoryHref(record.id, surface)}
+                      className="twin-link font-medium"
+                      data-testid="candidate-collaboration-decision-memory-link"
+                    >
+                      {t("decisionMemory.openDecisionMemory")}
                     </Link>
                   </div>
                 </>,
