@@ -9,6 +9,7 @@ import {
   candidateCollaborationHref,
   CANDIDATE_COLLABORATION_DEMO_ID,
 } from "@/lib/candidate-collaboration";
+import { candidateTrustHref, CANDIDATE_TRUST_DEMO_ID } from "@/lib/candidate-trust";
 import { jobPipelineHref, JOB_PIPELINE_DEMO_ID } from "@/lib/job-pipeline";
 
 export type FounderLedDemoLink = {
@@ -98,6 +99,14 @@ export const FOUNDER_LED_DEMO_JOURNEY_STEPS: readonly FounderLedDemoLink[] = [
     loginPath: "/login/recruiter",
     titleKey: "candidateCollaboration.demoJourneyTitle",
     descKey: "candidateCollaboration.demoJourneyDesc",
+  },
+  {
+    id: "trust",
+    href: candidateTrustHref(CANDIDATE_TRUST_DEMO_ID),
+    requiresAuth: true,
+    loginPath: "/login/recruiter",
+    titleKey: "candidateTrust.demoJourneyTitle",
+    descKey: "candidateTrust.demoJourneyDesc",
   },
   {
     id: "candidate_profile",

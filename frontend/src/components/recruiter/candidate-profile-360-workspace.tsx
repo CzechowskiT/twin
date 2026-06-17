@@ -22,6 +22,7 @@ import {
   candidateFeedbackHref,
   candidateScorecardHref,
 } from "@/lib/candidate-collaboration";
+import { candidateTrustHref } from "@/lib/candidate-trust";
 
 function fitLabelKey(fit: CandidateProfile360Record["fit_label"]): TranslationKey {
   const map: Record<CandidateProfile360Record["fit_label"], TranslationKey> = {
@@ -419,6 +420,13 @@ function ProfileContent({
               ) : (
                 <p className="twin-muted text-xs">{t("candidateProfile360.consentClear")}</p>
               )}
+              <Link
+                href={candidateTrustHref(record.id, surface)}
+                className="twin-link mt-3 inline-block text-sm font-medium"
+                data-testid="candidate-profile-360-trust-link"
+              >
+                {t("candidateTrust.pageEyebrow")}
+              </Link>
             </>,
           )}
 

@@ -23,6 +23,7 @@ import {
   resolveCandidateCollaboration,
   resolveJobCollaboration,
 } from "@/lib/candidate-collaboration";
+import { candidateTrustHref } from "@/lib/candidate-trust";
 import { jobOverviewHref, jobPipelineHref } from "@/lib/job-pipeline";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -187,9 +188,13 @@ function CollaborationContent({
               >
                 {t("candidateCollaboration.pilotBadge")}
               </span>
-              <span className="rounded-full border border-[var(--twin-border)] px-2.5 py-0.5 text-xs text-[var(--twin-muted-strong)]">
+              <Link
+                href={candidateTrustHref(record.id, surface)}
+                className="rounded-full border border-[var(--twin-border)] px-2.5 py-0.5 text-xs text-[var(--twin-muted-strong)] twin-link"
+                data-testid="candidate-collaboration-trust-link"
+              >
                 {t("candidateCollaboration.trustConsent")}: {record.trust_label}
-              </span>
+              </Link>
             </div>
           </div>
           <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs">

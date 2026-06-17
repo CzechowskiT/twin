@@ -19,6 +19,7 @@ import {
   jobFeedbackHref,
   jobScorecardsHref,
 } from "@/lib/candidate-collaboration";
+import { candidateTrustHref } from "@/lib/candidate-trust";
 import type { TranslationKey } from "@/lib/i18n";
 import {
   candidatesForStage,
@@ -160,7 +161,18 @@ function CandidateCard({
       </div>
       <p className="mt-1 text-xs text-[var(--twin-muted-strong)]">{t(fitLabelKey(candidate.fit_label))}</p>
       <p className="mt-2 text-xs text-[var(--twin-muted-strong)]">
-        {t("jobPipeline.trustConsent")}: {candidate.trust_label}
+        {t("jobPipeline.trustConsent")}:{" "}
+        {profileConnected ? (
+          <Link
+            href={candidateTrustHref(candidate.id, surface)}
+            className="twin-link font-medium"
+            data-testid={`job-pipeline-consent-link-${candidate.id}`}
+          >
+            {candidate.trust_label}
+          </Link>
+        ) : (
+          candidate.trust_label
+        )}
       </p>
       <p className="mt-1 text-xs text-[var(--twin-muted-strong)]">
         {t("jobPipeline.lastActivity")}: {lastActivity}
