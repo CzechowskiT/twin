@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { useTranslation } from "@/components/language-provider";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
+import { SystemOfRecordNavigationHub } from "@/components/workspace/system-of-record-navigation-hub";
 import { WorkspaceModuleGrid } from "@/components/workspace/workspace-module-grid";
 import { FAQ_INVESTOR_HREF } from "@/lib/faq-anchor";
 import {
@@ -133,6 +134,14 @@ export function InvestorRoomPage() {
               <WorkspaceModuleGrid modules={[...INVESTOR_PUBLIC_PREVIEW_MODULES, ...INVESTOR_WORKSPACE_MODULES.slice(0, 3)]} />
             </div>
           </section>
+
+          <div className="mt-8" data-testid="investor-sor-proof-hub">
+            <SystemOfRecordNavigationHub
+              persona="investor"
+              titleKey="workspaceModules.investorHubTitle"
+              leadKey="systemOfRecord.investorHubLead"
+            />
+          </div>
 
           <div className="grid gap-6 md:grid-cols-2">
             <SectionCard title={t("investorRoom.problemTitle")}>

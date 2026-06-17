@@ -27,7 +27,7 @@ test("workspace module components exist", () => {
 
 test("recruiter hub route and redirect", () => {
   assert.equal(RECRUITER_HUB_ROUTE, "/recruiter");
-  assert.match(readFileSync(join(root, "src/app/recruiter/page.tsx"), "utf8"), /WorkspaceModuleHub/);
+  assert.match(readFileSync(join(root, "src/app/recruiter/page.tsx"), "utf8"), /SystemOfRecordNavigationHub/);
   assert.match(readFileSync(join(root, "src/app/workspace/recruiter/page.tsx"), "utf8"), /redirect/);
 });
 
@@ -56,8 +56,8 @@ test("recruiter calendar module is not live", () => {
 test("company and investor hubs wired", () => {
   assert.ok(COMPANY_WORKSPACE_MODULES.length >= 6);
   assert.ok(INVESTOR_WORKSPACE_MODULES.length >= 5);
-  assert.match(readFileSync(join(root, "src/app/company/dashboard/company-dashboard-client.tsx"), "utf8"), /WorkspaceModuleGrid/);
-  assert.match(readFileSync(join(root, "src/app/workspace/investor/page.tsx"), "utf8"), /WorkspaceModuleHub/);
+  assert.match(readFileSync(join(root, "src/app/company/dashboard/company-dashboard-client.tsx"), "utf8"), /SystemOfRecordNavigationHub/);
+  assert.match(readFileSync(join(root, "src/app/workspace/investor/page.tsx"), "utf8"), /SystemOfRecordNavigationHub/);
 });
 
 test("workspaceModules i18n keys for all locales", () => {
