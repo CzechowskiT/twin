@@ -9,6 +9,7 @@ import {
   candidateCollaborationHref,
   CANDIDATE_COLLABORATION_DEMO_ID,
 } from "@/lib/candidate-collaboration";
+import { candidateTrustCenterHref } from "@/lib/candidate-trust-center";
 import { candidateTrustHref, CANDIDATE_TRUST_DEMO_ID } from "@/lib/candidate-trust";
 import {
   candidateTeamHref,
@@ -151,6 +152,14 @@ export const FOUNDER_LED_DEMO_JOURNEY_STEPS: readonly FounderLedDemoLink[] = [
     loginPath: "/login",
     titleKey: "founderLedDemo.journeyCandidateProfileTitle",
     descKey: "founderLedDemo.journeyCandidateProfileDesc",
+  },
+  {
+    id: "candidate_trust_center",
+    href: candidateTrustCenterHref(),
+    requiresAuth: true,
+    loginPath: "/login",
+    titleKey: "candidateTrustCenter.demoJourneyTitle",
+    descKey: "candidateTrustCenter.demoJourneyDesc",
   },
   {
     id: "decision_memory",

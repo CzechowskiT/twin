@@ -14,6 +14,7 @@ export const CANDIDATE_CANONICAL_ROUTES = {
   interviewPrep: "/dashboard/interview-prep",
   plan: "/dashboard/plan",
   identity: "/dashboard/identity",
+  trust: "/dashboard/trust",
   referrals: "/dashboard/referrals",
   career: "/dashboard/career",
   billing: "/dashboard/billing",

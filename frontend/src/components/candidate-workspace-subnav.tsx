@@ -47,6 +47,9 @@ export function CandidateWorkspaceSubnav({
       <Link href="/dashboard/identity" className={itemClass}>
         {t("dashboard.identityLink")}
       </Link>
+      <Link href="/dashboard/trust" className={itemClass}>
+        {t("workspaceModules.candidateTrustCenterTitle")}
+      </Link>
       <Link href={candidateCalendarHref()} className={itemClass}>
         {t("dashboard.calendarLink")}
       </Link>
