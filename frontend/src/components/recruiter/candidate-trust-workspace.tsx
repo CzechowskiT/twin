@@ -11,6 +11,7 @@ import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
 import { candidateCollaborationHref } from "@/lib/candidate-collaboration";
 import { candidateProfile360Href } from "@/lib/candidate-profile-360";
+import { decisionMemoryHref } from "@/lib/decision-memory";
 import type {
   CandidateTrustRecord,
   ConsentDataSource,
@@ -446,6 +447,15 @@ function TrustContent({
                       data-testid="candidate-trust-team-link"
                     >
                       {t("teamCollaboration.openTeamWorkspace")}
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href={decisionMemoryHref(record.id, surface)}
+                      className="twin-link font-medium"
+                      data-testid="candidate-trust-decision-memory-link"
+                    >
+                      {t("decisionMemory.openDecisionMemory")}
                     </Link>
                   </li>
                 </ul>

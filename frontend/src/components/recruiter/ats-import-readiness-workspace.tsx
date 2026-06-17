@@ -28,6 +28,7 @@ import type {
 } from "@/lib/ats-import-readiness-demo-data";
 import { candidateProfile360Href } from "@/lib/candidate-profile-360";
 import { candidateTrustHref } from "@/lib/candidate-trust";
+import { decisionMemoryHref } from "@/lib/decision-memory";
 import type { TranslationKey } from "@/lib/i18n";
 import { jobPipelineHref } from "@/lib/job-pipeline";
 import { RECRUITER_TALENT_POOL_ROUTE } from "@/lib/recruiter-talent-pool";
@@ -446,6 +447,13 @@ function AtsImportReadinessContent({ surface, view }: WorkspaceProps) {
                 ))}
               </ul>
               <p className="text-xs italic text-[var(--twin-muted-strong)]">{t("atsImportReadiness.auditNoSync")}</p>
+              <Link
+                href={decisionMemoryHref("demo-candidate-001", surface)}
+                className="twin-link mt-3 inline-block text-xs font-medium"
+                data-testid="ats-import-readiness-decision-memory-link"
+              >
+                {t("decisionMemory.openDecisionMemory")}
+              </Link>
             </>,
             "lg:col-span-2",
           )}

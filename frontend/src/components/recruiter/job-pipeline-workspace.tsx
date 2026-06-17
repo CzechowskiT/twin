@@ -20,6 +20,7 @@ import {
   jobScorecardsHref,
 } from "@/lib/candidate-collaboration";
 import { candidateTrustHref } from "@/lib/candidate-trust";
+import { decisionMemoryHref } from "@/lib/decision-memory";
 import type { TranslationKey } from "@/lib/i18n";
 import {
   candidatesForStage,
@@ -446,6 +447,13 @@ function PipelineContent({
                   data-testid="job-pipeline-decision-memory-drafts-link"
                 >
                   {t("safeCommunication.openDrafts")}
+                </Link>
+                <Link
+                  href={decisionMemoryHref("demo-candidate-001", surface)}
+                  className="twin-link font-medium"
+                  data-testid="job-pipeline-decision-memory-audit-link"
+                >
+                  {t("decisionMemory.openDecisionMemory")}
                 </Link>
               </div>
               <ul className="mt-4 space-y-3">

@@ -16,6 +16,7 @@ import {
   candidateNotesHref,
 } from "@/lib/candidate-collaboration";
 import { candidateTrustHref } from "@/lib/candidate-trust";
+import { decisionMemoryHref } from "@/lib/decision-memory";
 import type { TranslationKey } from "@/lib/i18n";
 import { jobPipelineHref } from "@/lib/job-pipeline";
 import type {
@@ -423,13 +424,15 @@ function TeamContent({ surface, view, header, record, candidateId, jobId }: Shar
                   {t("teamCollaboration.auditDigest")}
                 </Link>
               </li>
-              {teamHref ? (
-                <li>
-                  <Link href={teamHref} className="twin-link font-medium" data-testid="team-collaboration-team-link">
-                    {t("teamCollaboration.auditDecisionMemory")}
-                  </Link>
-                </li>
-              ) : null}
+              <li>
+                <Link
+                  href={decisionMemoryHref(candidateId ?? "demo-candidate-001", surface)}
+                  className="twin-link font-medium"
+                  data-testid="team-collaboration-decision-memory-link"
+                >
+                  {t("teamCollaboration.auditDecisionMemory")}
+                </Link>
+              </li>
               {tasksHref ? (
                 <li>
                   <Link href={tasksHref} className="twin-link font-medium" data-testid="team-collaboration-tasks-link">

@@ -10,6 +10,7 @@ import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspac
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
 import { candidateProfile360Href } from "@/lib/candidate-profile-360";
+import { decisionMemoryHref } from "@/lib/decision-memory";
 import { candidateTrustHref } from "@/lib/candidate-trust";
 import type { TranslationKey } from "@/lib/i18n";
 import { jobPipelineHref } from "@/lib/job-pipeline";
@@ -436,6 +437,13 @@ function CommunicationContent({ surface, view, header, record, candidateId, jobI
                   data-testid="safe-communication-self-link"
                 >
                   {t("safeCommunication.auditCommunication")}
+                </Link>
+                <Link
+                  href={decisionMemoryHref(candidateId ?? "demo-candidate-001", surface)}
+                  className="twin-link font-medium"
+                  data-testid="safe-communication-decision-memory-link"
+                >
+                  {t("decisionMemory.openDecisionMemory")}
                 </Link>
               </div>
             </>,

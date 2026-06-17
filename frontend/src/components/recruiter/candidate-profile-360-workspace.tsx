@@ -23,6 +23,7 @@ import {
   candidateScorecardHref,
 } from "@/lib/candidate-collaboration";
 import { candidateTrustHref } from "@/lib/candidate-trust";
+import { decisionMemoryHref } from "@/lib/decision-memory";
 import { candidateTeamHref } from "@/lib/team-collaboration";
 import { atsImportReadinessHref } from "@/lib/ats-import-readiness";
 import { candidateCommunicationHref } from "@/lib/safe-communication";
@@ -454,6 +455,13 @@ function ProfileContent({
                   </li>
                 ))}
               </ul>
+              <Link
+                href={decisionMemoryHref(record.id, surface)}
+                className="twin-link mt-3 inline-block text-sm font-medium"
+                data-testid="candidate-profile-360-decision-memory-link"
+              >
+                {t("decisionMemory.openDecisionMemory")}
+              </Link>
             </>,
           )}
 
