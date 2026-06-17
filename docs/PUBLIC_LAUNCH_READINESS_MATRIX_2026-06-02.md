@@ -28,6 +28,8 @@
 
 **Phase 3B (2026-06-17):** Controlled multitab verification · **PARTIAL** — local 21/21 PASS @ `fda7567`; prod not on target commit · `docs/PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md` · `test:phase3b-controlled-multitab` · **does not change launch NO-GO** · P0 performance **OPEN→PARTIAL** (not DONE).
 
+**Phase 3B (2026-06-17):** Controlled multitab verification · **BLOCKED** — founder STOP; test infra merged only (PR #167); **DO NOT RUN** until shell fix + founder review · `docs/PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md` · `test:phase3b-controlled-multitab` (scripts present, execution forbidden) · **does not change launch NO-GO** · P0 performance **OPEN**.
+
 **Safe-lane merge (2026-06-11):** Recruiter inbox **premium card redesign** — decision rail, match score card, signal rows, review CTA · **does not change launch NO-GO**.
 
 **Safe-lane merge (2026-06-11):** Recruiter **candidate message drafts** — 4 templates, copy-to-clipboard, local contact phase after accept; no email send, no hidden PII · `docs/RECRUITER_CANDIDATE_MESSAGE_DRAFTS_MVP_2026-06-11.md` · **does not change launch NO-GO**.
