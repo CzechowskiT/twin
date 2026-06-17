@@ -17,6 +17,7 @@ export default function RecruiterHubPage() {
         <div className="mt-2">
           <WorkspaceQuickActions
             actions={[
+              { href: "/recruiter/daily-cockpit", labelKey: "recruiterDailyCockpit.openDailyCockpit" },
               { href: "/recruiter/inbox", labelKey: "workspaceModules.recruiterInboxCta" },
               { href: "/recruiter/analytics", labelKey: "workspaceModules.recruiterAnalyticsCta" },
               { href: "/recruiter/integrations", labelKey: "workspaceModules.recruiterIntegrationsCta" },
