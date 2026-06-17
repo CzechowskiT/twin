@@ -38,6 +38,8 @@ Lightweight product orchestration layer connecting existing TWIN surfaces into o
 | Talent Radar | `/recruiter/talent-radar` | Auth |
 | Weekly digest | `/recruiter/talent-radar/digest` | Auth |
 | Recruiter inbox | `/recruiter/inbox` | Auth |
+| Candidate Profile 360 (pilot) | `/recruiter/candidates/demo-candidate-001` | Auth |
+| Company Profile 360 alias | `/company/candidates/demo-candidate-001` | Auth |
 | Candidate panel | `/dashboard` | Auth |
 | Offers | `/dashboard/jobs` | Auth (alias) |
 | Matches | `/dashboard/matches` | Auth |
@@ -56,6 +58,7 @@ Marketing header (`headerMarketingLaneLinks`) — **Demo** → `/demo` (unchange
 - **Live:** existing workspace surfaces linked above; honest status badges on modules unchanged.
 - **Pilot:** Talent Pool import, Talent Radar, digest — pilot badges in product.
 - **Paused / not live:** auto-apply, auto-outreach, recruiter calendar sync, live ATS sync — **not activated**.
+- **Pilot (2026-06-16):** Candidate Profile 360 — sample `demo-candidate-001` only; invalid IDs → guided not-found.
 
 ## Automated verification
 

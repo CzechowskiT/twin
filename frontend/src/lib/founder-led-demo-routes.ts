@@ -4,6 +4,7 @@
  */
 import { loginPathWithNext } from "@/lib/login-redirect";
 import type { TranslationKey } from "@/lib/i18n";
+import { candidateProfile360Href, CANDIDATE_PROFILE_360_DEMO_ID } from "@/lib/candidate-profile-360";
 
 export type FounderLedDemoLink = {
   id: string;
@@ -68,6 +69,14 @@ export const FOUNDER_LED_DEMO_JOURNEY_STEPS: readonly FounderLedDemoLink[] = [
     loginPath: "/login/recruiter",
     titleKey: "founderLedDemo.journeyTalentRadarTitle",
     descKey: "founderLedDemo.journeyTalentRadarDesc",
+  },
+  {
+    id: "recruiter_profile_360",
+    href: candidateProfile360Href(CANDIDATE_PROFILE_360_DEMO_ID),
+    requiresAuth: true,
+    loginPath: "/login/recruiter",
+    titleKey: "candidateProfile360.demoJourneyTitle",
+    descKey: "candidateProfile360.demoJourneyDesc",
   },
   {
     id: "candidate_profile",
@@ -146,6 +155,8 @@ export const FOUNDER_LED_DEMO_EXTENDED_ROUTES = [
   "/recruiter/talent-pool/import",
   "/recruiter/talent-radar",
   "/recruiter/talent-radar/digest",
+  "/recruiter/candidates/demo-candidate-001",
+  "/company/candidates/demo-candidate-001",
   "/recruiter/inbox",
   "/dashboard/jobs",
   "/dashboard/matches",
