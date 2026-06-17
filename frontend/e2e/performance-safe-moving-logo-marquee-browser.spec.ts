@@ -231,10 +231,15 @@ test.describe("Performance-safe moving logo marquee browser", () => {
       for (const m of metrics) {
         expect(m.textLen).toBeGreaterThan(0);
         expect(m.quality).toBe("verified-curated");
-        expect(m.svgH).toBeGreaterThanOrEqual(10);
-        expect(m.svgH).toBeLessThanOrEqual(18);
-        expect(m.svgW).toBeGreaterThanOrEqual(36);
-        expect(m.svgW / m.cardW).toBeLessThanOrEqual(0.92);
+        expect(m.svgH).toBeGreaterThanOrEqual(22);
+        expect(m.svgH).toBeLessThanOrEqual(28);
+        expect(m.svgW).toBeGreaterThanOrEqual(52);
+        const heightOcc = m.svgH / m.cardH;
+        const widthOcc = m.svgW / m.cardW;
+        expect(heightOcc).toBeGreaterThanOrEqual(0.55);
+        expect(heightOcc).toBeLessThanOrEqual(0.7);
+        expect(widthOcc).toBeGreaterThanOrEqual(0.55);
+        expect(widthOcc).toBeLessThanOrEqual(0.7);
       }
     });
   });
