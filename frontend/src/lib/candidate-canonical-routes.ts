@@ -15,6 +15,7 @@ export const CANDIDATE_CANONICAL_ROUTES = {
   plan: "/dashboard/plan",
   identity: "/dashboard/identity",
   trust: "/dashboard/trust",
+  trustControls: "/dashboard/trust/controls",
   referrals: "/dashboard/referrals",
   career: "/dashboard/career",
   billing: "/dashboard/billing",
