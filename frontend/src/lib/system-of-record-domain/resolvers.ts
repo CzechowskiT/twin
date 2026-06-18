@@ -23,7 +23,7 @@ import {
   adaptCandidateTrustAuditExport,
   adaptCandidateConsentReceipt,
   adaptRecruiterTrustReviewQueue, adaptCandidateTrustOverview,
-  adaptCompanyHiringCockpit,
+  adaptCompanyCandidateTrustSummary, adaptCompanyHiringCockpit,
   adaptDecisionMemory,
   adaptJobPipeline,
   adaptRecruiterDailyCockpit,
@@ -115,6 +115,10 @@ export function resolveDecisionMemory(
 
 export function resolveRecruiterDailyCockpit(): RecruiterDailyCockpitRecord {
   return adaptRecruiterDailyCockpit();
+}
+
+export function resolveCompanyCandidateTrustSummary(candidateId?: string) {
+  return adaptCompanyCandidateTrustSummary(candidateId);
 }
 
 export function resolveCompanyHiringCockpit(): CompanyHiringCockpitRecord {

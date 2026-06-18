@@ -74,6 +74,10 @@ import {
   type CandidateTrustOverviewRecord,
 } from "@/lib/candidate-trust-overview-demo-data";
 import {
+  getCompanyCandidateTrustSummaryDemo,
+  type CompanyCandidateTrustSummaryRecord,
+} from "@/lib/company-candidate-trust-summary-demo-data";
+import {
   getCompanyHiringCockpitDemo,
   type CompanyHiringCockpitRecord,
 } from "@/lib/company-hiring-cockpit-demo-data";
@@ -172,6 +176,12 @@ export function adaptDecisionMemory(
 
 export function adaptRecruiterDailyCockpit(): RecruiterDailyCockpitRecord {
   return getRecruiterDailyCockpitDemo();
+}
+
+export function adaptCompanyCandidateTrustSummary(candidateId?: string): CompanyCandidateTrustSummaryRecord | null {
+  const id = (candidateId ?? "demo-candidate-001").trim();
+  if (id !== "demo-candidate-001") return null;
+  return getCompanyCandidateTrustSummaryDemo();
 }
 
 export function adaptCompanyHiringCockpit(): CompanyHiringCockpitRecord {
