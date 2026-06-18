@@ -16,6 +16,7 @@ import {
   CANDIDATE_TRUST_AUDIT_EXPORT_SAFE_LINKS,
   resolveCandidateTrustAuditExport,
 } from "@/lib/candidate-trust-audit-export";
+import { candidateConsentReceiptHref } from "@/lib/candidate-consent-receipt";
 import { candidateCorrectionRequestHref } from "@/lib/candidate-correction-request";
 import { candidateDataPortabilityHref } from "@/lib/candidate-data-portability";
 import { candidateExportPreviewHref } from "@/lib/candidate-export-preview";
@@ -166,6 +167,13 @@ function TrustAuditExportContent({ record }: { record: CandidateTrustAuditExport
               data-testid="candidate-trust-audit-export-revoke-delete-link"
             >
               {t("candidateRevokeDelete.pageTitle")}
+            </Link>
+            <Link
+              href={candidateConsentReceiptHref()}
+              className="twin-link font-medium"
+              data-testid="candidate-trust-audit-export-consent-receipt-link"
+            >
+              {t("candidateConsentReceipt.pageTitle")}
             </Link>
             <Link
               href={CANDIDATE_TRUST_AUDIT_EXPORT_SAFE_LINKS.panel}
