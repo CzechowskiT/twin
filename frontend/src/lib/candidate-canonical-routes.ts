@@ -19,6 +19,7 @@ export const CANDIDATE_CANONICAL_ROUTES = {
   trustExportPreview: "/dashboard/trust/export-preview",
   trustCorrections: "/dashboard/trust/corrections",
   trustPortability: "/dashboard/trust/portability",
+  trustRevokeDelete: "/dashboard/trust/revoke-delete",
   referrals: "/dashboard/referrals",
   career: "/dashboard/career",
   billing: "/dashboard/billing",

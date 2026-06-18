@@ -36,6 +36,7 @@ export const CANDIDATE_CORRECTION_REQUEST_SAFE_LINKS = {
   controlCenter: CANDIDATE_CANONICAL_ROUTES.trustControls,
   exportPreview: CANDIDATE_CANONICAL_ROUTES.trustExportPreview,
   dataPortability: CANDIDATE_CANONICAL_ROUTES.trustPortability,
+  revokeDelete: CANDIDATE_CANONICAL_ROUTES.trustRevokeDelete,
   panel: CANDIDATE_CANONICAL_ROUTES.panel,
   profile: CANDIDATE_CANONICAL_ROUTES.profile,
   jobs: CANDIDATE_CANONICAL_ROUTES.jobs,

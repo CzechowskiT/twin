@@ -18,6 +18,7 @@ import {
   adaptCandidateExportPreview,
   adaptCandidateCorrectionRequest,
   adaptCandidateDataPortability,
+  adaptCandidateRevokeDelete,
   adaptCompanyHiringCockpit,
   adaptDecisionMemory,
   adaptJobPipeline,
@@ -48,6 +49,7 @@ import type { CandidateControlCenterRecord } from "@/lib/candidate-control-cente
 import type { CandidateExportPreviewRecord } from "@/lib/candidate-export-preview-demo-data";
 import type { CandidateCorrectionRequestRecord } from "@/lib/candidate-correction-request-demo-data";
 import type { CandidateDataPortabilityRecord } from "@/lib/candidate-data-portability-demo-data";
+import type { CandidateRevokeDeleteRecord } from "@/lib/candidate-revoke-delete-demo-data";
 import type { CompanyHiringCockpitRecord } from "@/lib/company-hiring-cockpit-demo-data";
 import type { RecruiterDailyCockpitRecord } from "@/lib/recruiter-daily-operating-cockpit-demo-data";
 
@@ -139,6 +141,12 @@ export function resolveCandidateDataPortability(
   candidateId?: string,
 ): CandidateDataPortabilityRecord | null {
   return adaptCandidateDataPortability(candidateId);
+}
+
+export function resolveCandidateRevokeDelete(
+  candidateId?: string,
+): CandidateRevokeDeleteRecord | null {
+  return adaptCandidateRevokeDelete(candidateId);
 }
 
 export function resolveSystemOfRecordLinks(
