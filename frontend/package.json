@@ -199,7 +199,9 @@
     "test:recruiter-trust-review-queue-browser:raw": "playwright test e2e/recruiter-trust-review-queue-browser.spec.ts --workers=1",
     "test:company-candidate-trust-summary": "npx --yes tsx scripts/company-candidate-trust-summary.test.ts",
     "test:company-candidate-trust-summary-browser": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'&&process.env.PLAYWRIGHT_ENABLE_BROWSER_TESTS!=='1'){console.error('Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 or PLAYWRIGHT_ALLOW_PROD_SMOKE=1');process.exit(1)}\" && npm run test:company-candidate-trust-summary-browser:raw",
-    "test:company-candidate-trust-summary-browser:raw": "playwright test e2e/company-candidate-trust-summary-browser.spec.ts --workers=1"
+    "test:company-candidate-trust-summary-browser:raw": "playwright test e2e/company-candidate-trust-summary-browser.spec.ts --workers=1",
+    "test:investor-trust-proof": "npx --yes tsx scripts/investor-trust-proof.test.ts",
+    "test:investor-trust-proof-browser": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'&&process.env.PLAYWRIGHT_ENABLE_BROWSER_TESTS!=='1'){process.exit(1)}\" && playwright test e2e/investor-trust-proof-browser.spec.ts --workers=1"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

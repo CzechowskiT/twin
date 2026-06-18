@@ -2,6 +2,7 @@
 
 import { atsImportReadinessHref } from "@/lib/ats-import-readiness";
 import { candidateCollaborationHref } from "@/lib/candidate-collaboration";
+import { investorTrustProofHref } from "@/lib/investor-trust-proof";
 import { candidateProfile360Href } from "@/lib/candidate-profile-360";
 import { candidateTrustCenterHref } from "@/lib/candidate-trust-center";
 import { candidateControlCenterHref } from "@/lib/candidate-control-center";
