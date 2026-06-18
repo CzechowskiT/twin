@@ -1,0 +1,14 @@
+import assert from "node:assert/strict";
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import test from "node:test";
+import { INVESTOR_TRUST_PROOF_ROUTE, investorTrustProofHref, INVESTOR_TRUST_PROOF_MARKERS } from "../src/lib/investor-trust-proof";
+import { SYSTEM_OF_RECORD_ROUTES } from "../src/lib/system-of-record-routes";
+import { en, dictionaries } from "../src/lib/i18n";
+const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+test("1 route", () => { assert.ok(existsSync(join(root, "src/app/investor/trust-proof/page.tsx"))); assert.equal(investorTrustProofHref(), INVESTOR_TRUST_PROOF_ROUTE); });
+test("2 markers", () => { const w = readFileSync(join(root, "src/components/investor/investor-trust-proof-workspace.tsx"), "utf8"); assert.match(w, /INVESTOR_TRUST_PROOF_MARKERS\.architecture/); });
+test("3 sor", () => { assert.ok(SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "investor_trust_proof")); });
+test("4 i18n", () => { assert.ok(en.investorTrustProof.pageTitle); assert.ok(dictionaries.pl.investorTrustProof.pageTitle); });
+test("5 package", () => assert.match(readFileSync(join(root, "package.json"), "utf8"), /test:investor-trust-proof/));
