@@ -7,6 +7,7 @@ import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subna
 import { ExportPreviewPanel } from "@/components/candidate/export-preview-panel";
 import { CorrectionRequestPanel } from "@/components/candidate/correction-request-panel";
 import { DataPortabilityPanel } from "@/components/candidate/data-portability-panel";
+import { RevokeDeletePanel } from "@/components/candidate/revoke-delete-panel";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
@@ -25,6 +26,7 @@ import {
 import { resolveCandidateExportPreview } from "@/lib/candidate-export-preview";
 import { resolveCandidateCorrectionRequest } from "@/lib/candidate-correction-request";
 import { resolveCandidateDataPortability } from "@/lib/candidate-data-portability";
+import { resolveCandidateRevokeDelete } from "@/lib/candidate-revoke-delete";
 import type { CandidateControlCenterRecord } from "@/lib/candidate-control-center-demo-data";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -125,6 +127,7 @@ function ControlCenterContent({ record }: { record: CandidateControlCenterRecord
   const exportPreviewRecord = resolveCandidateExportPreview(record.id);
   const correctionRequestRecord = resolveCandidateCorrectionRequest(record.id);
   const dataPortabilityRecord = resolveCandidateDataPortability(record.id);
+  const revokeDeleteRecord = resolveCandidateRevokeDelete(record.id);
 
   return (
     <Shell wide rail>
@@ -379,18 +382,26 @@ function ControlCenterContent({ record }: { record: CandidateControlCenterRecord
         {sectionCard(
           CANDIDATE_CONTROL_CENTER_MARKERS.revokeDeletePlanned,
           t("candidateControlCenter.revokeDeleteTitle"),
-          <>
-            <p className="text-xs text-[var(--twin-muted-strong)]">{t("candidateControlCenter.revokeDeleteLead")}</p>
-            <div className="flex flex-wrap gap-3">
-              <button type="button" disabled className="twin-btn-secondary twin-touch-target cursor-not-allowed opacity-50">
-                {t("candidateControlCenter.revokeCta")}
-              </button>
-              <button type="button" disabled className="twin-btn-secondary twin-touch-target cursor-not-allowed opacity-50">
-                {t("candidateControlCenter.deleteCta")}
-              </button>
-            </div>
-            <p className="text-[10px] text-[var(--twin-muted)]">{t("candidateControlCenter.noMutation")}</p>
-          </>,
+          revokeDeleteRecord ? (
+            <RevokeDeletePanel
+              record={revokeDeleteRecord}
+              compact
+              marker={CANDIDATE_CONTROL_CENTER_MARKERS.revokeDeletePlanned}
+            />
+          ) : (
+            <>
+              <p className="text-xs text-[var(--twin-muted-strong)]">{t("candidateControlCenter.revokeDeleteLead")}</p>
+              <div className="flex flex-wrap gap-3">
+                <button type="button" disabled className="twin-btn-secondary twin-touch-target cursor-not-allowed opacity-50">
+                  {t("candidateControlCenter.revokeCta")}
+                </button>
+                <button type="button" disabled className="twin-btn-secondary twin-touch-target cursor-not-allowed opacity-50">
+                  {t("candidateControlCenter.deleteCta")}
+                </button>
+              </div>
+              <p className="text-[10px] text-[var(--twin-muted)]">{t("candidateControlCenter.noMutation")}</p>
+            </>
+          ),
         )}
 
         {sectionCard(

@@ -146,6 +146,13 @@ function DataPortabilityContent({ record }: { record: CandidateDataPortabilityRe
               {t("candidateDataPortability.linkCorrections")}
             </Link>
             <Link
+              href={CANDIDATE_DATA_PORTABILITY_SAFE_LINKS.revokeDelete}
+              className="twin-link font-medium"
+              data-testid="candidate-data-portability-revoke-delete-link"
+            >
+              {t("candidateDataPortability.linkRevokeDelete")}
+            </Link>
+            <Link
               href={CANDIDATE_DATA_PORTABILITY_SAFE_LINKS.profile}
               className="twin-link font-medium"
               data-testid="candidate-data-portability-profile-link"
