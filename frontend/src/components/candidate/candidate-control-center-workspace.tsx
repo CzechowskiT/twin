@@ -9,6 +9,7 @@ import { CorrectionRequestPanel } from "@/components/candidate/correction-reques
 import { IdentityVerificationPanel } from "@/components/candidate/identity-verification-panel";
 import { DataPortabilityPanel } from "@/components/candidate/data-portability-panel";
 import { RevokeDeletePanel } from "@/components/candidate/revoke-delete-panel";
+import { ConsentReceiptPanel } from "@/components/candidate/consent-receipt-panel";
 import { TrustAuditExportPanel } from "@/components/candidate/trust-audit-export-panel";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
@@ -30,6 +31,7 @@ import { resolveCandidateCorrectionRequest } from "@/lib/candidate-correction-re
 import { resolveCandidateIdentityVerification } from "@/lib/candidate-identity-verification";
 import { resolveCandidateDataPortability } from "@/lib/candidate-data-portability";
 import { resolveCandidateRevokeDelete } from "@/lib/candidate-revoke-delete";
+import { resolveCandidateConsentReceipt } from "@/lib/candidate-consent-receipt";
 import { resolveCandidateTrustAuditExport } from "@/lib/candidate-trust-audit-export";
 import type { CandidateControlCenterRecord } from "@/lib/candidate-control-center-demo-data";
 import type { TranslationKey } from "@/lib/i18n";
@@ -134,6 +136,7 @@ function ControlCenterContent({ record }: { record: CandidateControlCenterRecord
   const dataPortabilityRecord = resolveCandidateDataPortability(record.id);
   const revokeDeleteRecord = resolveCandidateRevokeDelete(record.id);
   const trustAuditExportRecord = resolveCandidateTrustAuditExport(record.id);
+  const consentReceiptRecord = resolveCandidateConsentReceipt(record.id);
 
   return (
     <Shell wide rail>
@@ -436,6 +439,23 @@ function ControlCenterContent({ record }: { record: CandidateControlCenterRecord
           ) : (
             <>
               <p className="text-xs text-[var(--twin-muted-strong)]">{t("candidateControlCenter.trustAuditExportLead")}</p>
+              <p className="text-[10px] text-[var(--twin-muted)]">{t("candidateControlCenter.noMutation")}</p>
+            </>
+          ),
+        )}
+
+        {sectionCard(
+          CANDIDATE_CONTROL_CENTER_MARKERS.trustConsentReceipt,
+          t("candidateControlCenter.trustConsentReceiptTitle"),
+          consentReceiptRecord ? (
+            <ConsentReceiptPanel
+              record={consentReceiptRecord}
+              compact
+              marker={CANDIDATE_CONTROL_CENTER_MARKERS.trustConsentReceipt}
+            />
+          ) : (
+            <>
+              <p className="text-xs text-[var(--twin-muted-strong)]">{t("candidateControlCenter.trustConsentReceiptLead")}</p>
               <p className="text-[10px] text-[var(--twin-muted)]">{t("candidateControlCenter.noMutation")}</p>
             </>
           ),

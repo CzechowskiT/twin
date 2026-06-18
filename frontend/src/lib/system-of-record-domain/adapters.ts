@@ -66,6 +66,10 @@ import {
   type CandidateTrustAuditExportRecord,
 } from "@/lib/candidate-trust-audit-export-demo-data";
 import {
+  getCandidateConsentReceiptDemo,
+  type CandidateConsentReceiptRecord,
+} from "@/lib/candidate-consent-receipt-demo-data";
+import {
   getCompanyHiringCockpitDemo,
   type CompanyHiringCockpitRecord,
 } from "@/lib/company-hiring-cockpit-demo-data";
@@ -228,4 +232,12 @@ export function adaptCandidateTrustAuditExport(
   const trimmed = (candidateId ?? TWIN_DEMO_CANDIDATE_PRIMARY_ID).trim();
   if (!trimmed || trimmed !== TWIN_DEMO_CANDIDATE_PRIMARY_ID) return null;
   return getCandidateTrustAuditExportDemo();
+}
+
+export function adaptCandidateConsentReceipt(
+  candidateId?: string,
+): CandidateConsentReceiptRecord | null {
+  const trimmed = (candidateId ?? TWIN_DEMO_CANDIDATE_PRIMARY_ID).trim();
+  if (!trimmed || trimmed !== TWIN_DEMO_CANDIDATE_PRIMARY_ID) return null;
+  return getCandidateConsentReceiptDemo();
 }

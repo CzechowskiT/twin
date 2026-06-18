@@ -14,6 +14,7 @@ import {
   CANDIDATE_REVOKE_DELETE_SAFE_LINKS,
   resolveCandidateRevokeDelete,
 } from "@/lib/candidate-revoke-delete";
+import { candidateConsentReceiptHref } from "@/lib/candidate-consent-receipt";
 import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -159,6 +160,13 @@ function RevokeDeleteContent({ record }: { record: CandidateRevokeDeleteRecord }
               data-testid="candidate-revoke-delete-audit-export-link"
             >
               {t("candidateTrustAuditExport.pageTitle")}
+            </Link>
+            <Link
+              href={candidateConsentReceiptHref()}
+              className="twin-link font-medium"
+              data-testid="candidate-revoke-delete-consent-receipt-link"
+            >
+              {t("candidateConsentReceipt.pageTitle")}
             </Link>
             <Link
               href={CANDIDATE_REVOKE_DELETE_SAFE_LINKS.profile}

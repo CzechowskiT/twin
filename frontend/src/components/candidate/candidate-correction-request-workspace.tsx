@@ -20,6 +20,7 @@ import {
 } from "@/lib/candidate-correction-request";
 import { candidateDataPortabilityHref } from "@/lib/candidate-data-portability";
 import { candidateRevokeDeleteHref } from "@/lib/candidate-revoke-delete";
+import { candidateConsentReceiptHref } from "@/lib/candidate-consent-receipt";
 import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -175,6 +176,13 @@ function CorrectionRequestContent({ record }: { record: CandidateCorrectionReque
               data-testid="candidate-correction-request-audit-export-link"
             >
               {t("candidateTrustAuditExport.pageTitle")}
+            </Link>
+            <Link
+              href={candidateConsentReceiptHref()}
+              className="twin-link font-medium"
+              data-testid="candidate-correction-request-consent-receipt-link"
+            >
+              {t("candidateConsentReceipt.pageTitle")}
             </Link>
             <Link
               href={CANDIDATE_CORRECTION_REQUEST_SAFE_LINKS.profile}

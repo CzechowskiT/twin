@@ -21,6 +21,7 @@ import {
 import { candidateCorrectionRequestHref } from "@/lib/candidate-correction-request";
 import { candidateDataPortabilityHref } from "@/lib/candidate-data-portability";
 import { candidateRevokeDeleteHref } from "@/lib/candidate-revoke-delete";
+import { candidateConsentReceiptHref } from "@/lib/candidate-consent-receipt";
 import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -176,6 +177,13 @@ function IdentityVerificationContent({ record }: { record: CandidateIdentityVeri
               data-testid="candidate-identity-verification-audit-export-link"
             >
               {t("candidateTrustAuditExport.pageTitle")}
+            </Link>
+            <Link
+              href={candidateConsentReceiptHref()}
+              className="twin-link font-medium"
+              data-testid="candidate-identity-verification-consent-receipt-link"
+            >
+              {t("candidateConsentReceipt.pageTitle")}
             </Link>
             <Link
               href={CANDIDATE_IDENTITY_VERIFICATION_SAFE_LINKS.profile}

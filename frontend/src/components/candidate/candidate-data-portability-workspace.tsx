@@ -14,6 +14,7 @@ import {
   CANDIDATE_DATA_PORTABILITY_SAFE_LINKS,
   resolveCandidateDataPortability,
 } from "@/lib/candidate-data-portability";
+import { candidateConsentReceiptHref } from "@/lib/candidate-consent-receipt";
 import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -159,6 +160,13 @@ function DataPortabilityContent({ record }: { record: CandidateDataPortabilityRe
               data-testid="candidate-data-portability-audit-export-link"
             >
               {t("candidateTrustAuditExport.pageTitle")}
+            </Link>
+            <Link
+              href={candidateConsentReceiptHref()}
+              className="twin-link font-medium"
+              data-testid="candidate-data-portability-consent-receipt-link"
+            >
+              {t("candidateConsentReceipt.pageTitle")}
             </Link>
             <Link
               href={CANDIDATE_DATA_PORTABILITY_SAFE_LINKS.profile}
