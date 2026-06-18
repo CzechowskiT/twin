@@ -91,10 +91,10 @@ test("5 invalid candidate id resolves to not-found marker not blank shell", () =
   assert.match(workspace, /candidateControlCenter\.notFoundTitle/);
 });
 
-test("6 export delete revoke disabled — no backend mutation", () => {
+test("6 export preview active — revoke delete disabled, no backend fetch", () => {
   const workspace = read("src/components/candidate/candidate-control-center-workspace.tsx");
+  assert.match(workspace, /ExportPreviewPanel/);
   assert.match(workspace, /disabled/);
-  assert.match(workspace, /candidateControlCenter\.exportCta/);
   assert.match(workspace, /candidateControlCenter\.deleteCta/);
   assert.match(workspace, /candidateControlCenter\.revokeCta/);
   assert.doesNotMatch(workspace, /fetch\(/);

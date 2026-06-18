@@ -15,6 +15,7 @@ import {
   adaptCandidateTrust,
   adaptCandidateTrustCenter,
   adaptCandidateControlCenter,
+  adaptCandidateExportPreview,
   adaptCompanyHiringCockpit,
   adaptDecisionMemory,
   adaptJobPipeline,
@@ -42,6 +43,7 @@ import type { JobPipelineRecord } from "@/lib/job-pipeline-demo-data";
 import type { CandidateSafeCommunicationRecord } from "@/lib/safe-communication-demo-data";
 import type { CandidateTrustCenterRecord } from "@/lib/candidate-trust-center-demo-data";
 import type { CandidateControlCenterRecord } from "@/lib/candidate-control-center-demo-data";
+import type { CandidateExportPreviewRecord } from "@/lib/candidate-export-preview-demo-data";
 import type { CompanyHiringCockpitRecord } from "@/lib/company-hiring-cockpit-demo-data";
 import type { RecruiterDailyCockpitRecord } from "@/lib/recruiter-daily-operating-cockpit-demo-data";
 
@@ -115,6 +117,12 @@ export function resolveCandidateControlCenter(
   candidateId?: string,
 ): CandidateControlCenterRecord | null {
   return adaptCandidateControlCenter(candidateId);
+}
+
+export function resolveCandidateExportPreview(
+  candidateId?: string,
+): CandidateExportPreviewRecord | null {
+  return adaptCandidateExportPreview(candidateId);
 }
 
 export function resolveSystemOfRecordLinks(

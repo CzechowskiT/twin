@@ -21,6 +21,7 @@ import {
   resolveCandidateTrustCenter,
 } from "@/lib/candidate-trust-center";
 import { candidateControlCenterHref } from "@/lib/candidate-control-center";
+import { candidateExportPreviewHref } from "@/lib/candidate-export-preview";
 import type { TranslationKey } from "@/lib/i18n";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
@@ -169,6 +170,13 @@ function TrustCenterContent({ record }: { record: CandidateTrustCenterRecord }) 
               data-testid="candidate-trust-center-controls-link"
             >
               {t("candidateControlCenter.linkControlCenter")}
+            </Link>
+            <Link
+              href={candidateExportPreviewHref()}
+              className="twin-link font-medium"
+              data-testid="candidate-trust-center-export-preview-link"
+            >
+              {t("candidateExportPreview.pageTitle")}
             </Link>
             <Link
               href={CANDIDATE_TRUST_CENTER_SAFE_LINKS.profile}

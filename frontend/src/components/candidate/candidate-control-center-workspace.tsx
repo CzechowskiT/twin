@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
+import { ExportPreviewPanel } from "@/components/candidate/export-preview-panel";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
@@ -19,6 +20,7 @@ import {
   CANDIDATE_CONTROL_CENTER_SAFE_LINKS,
   resolveCandidateControlCenter,
 } from "@/lib/candidate-control-center";
+import { resolveCandidateExportPreview } from "@/lib/candidate-export-preview";
 import type { CandidateControlCenterRecord } from "@/lib/candidate-control-center-demo-data";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -116,6 +118,7 @@ function ControlCenterNotFound() {
 
 function ControlCenterContent({ record }: { record: CandidateControlCenterRecord }) {
   const { t } = useTranslation();
+  const exportPreviewRecord = resolveCandidateExportPreview(record.id);
 
   return (
     <Shell wide rail>
@@ -214,28 +217,27 @@ function ControlCenterContent({ record }: { record: CandidateControlCenterRecord
         {sectionCard(
           CANDIDATE_CONTROL_CENTER_MARKERS.exportPreview,
           t("candidateControlCenter.exportPreviewTitle"),
-          <>
-            <p className="text-xs text-[var(--twin-muted-strong)]">{t("candidateControlCenter.exportPreviewLead")}</p>
-            <ul className="space-y-3">
-              {record.export_preview_sections.map((section) => (
-                <li key={section.id} className="rounded-lg border border-[var(--twin-border)]/60 p-3">
-                  <p className="font-medium">{section.label}</p>
-                  <p className="mt-1 text-xs text-[var(--twin-muted-strong)]">
-                    {section.item_count} {t("candidateControlCenter.exportItemsLabel")}
-                  </p>
-                  <ul className="mt-2 list-inside list-disc text-xs">
-                    {section.sample_items.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                </li>
-              ))}
-            </ul>
-            <button type="button" disabled className="twin-btn-secondary twin-touch-target cursor-not-allowed opacity-50">
-              {t("candidateControlCenter.exportCta")}
-            </button>
-            <p className="text-[10px] text-[var(--twin-muted)]">{t("candidateControlCenter.exportDisabledHint")}</p>
-          </>,
+          exportPreviewRecord ? (
+            <ExportPreviewPanel
+              record={exportPreviewRecord}
+              compact
+              marker={CANDIDATE_CONTROL_CENTER_MARKERS.exportPreview}
+            />
+          ) : (
+            <>
+              <p className="text-xs text-[var(--twin-muted-strong)]">{t("candidateControlCenter.exportPreviewLead")}</p>
+              <ul className="space-y-3">
+                {record.export_preview_sections.map((section) => (
+                  <li key={section.id} className="rounded-lg border border-[var(--twin-border)]/60 p-3">
+                    <p className="font-medium">{section.label}</p>
+                    <p className="mt-1 text-xs text-[var(--twin-muted-strong)]">
+                      {section.item_count} {t("candidateControlCenter.exportItemsLabel")}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ),
         )}
 
         {sectionCard(
