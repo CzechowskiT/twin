@@ -145,11 +145,13 @@ function IdentityPageContent() {
       ) : null}
 
       {pilotUnavailable ? (
-        <Card variant="soft" className="mb-6 border-amber-500/50 bg-amber-500/10 p-4">
-          <p className="text-sm font-semibold text-amber-950 dark:text-amber-100">{t("dashboard.identityPilotNotice")}</p>
-          <p className="mt-2 text-sm leading-relaxed text-amber-900/90 dark:text-amber-100/90">
-            {t("dashboard.identityNotConfigured")}
-          </p>
+        <Card
+          variant="soft"
+          className="mb-6 border-amber-500/40 bg-amber-500/15 p-4 text-sm leading-relaxed text-[var(--foreground)]"
+          data-testid="dashboard-identity-pilot-unavailable"
+        >
+          <p className="font-semibold">{t("dashboard.identityPilotNotice")}</p>
+          <p className="mt-2">{t("dashboard.identityNotConfigured")}</p>
         </Card>
       ) : null}
 

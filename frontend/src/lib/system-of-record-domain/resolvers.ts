@@ -17,6 +17,7 @@ import {
   adaptCandidateControlCenter,
   adaptCandidateExportPreview,
   adaptCandidateCorrectionRequest,
+  adaptCandidateIdentityVerification,
   adaptCandidateDataPortability,
   adaptCandidateRevokeDelete,
   adaptCandidateTrustAuditExport,
@@ -49,6 +50,7 @@ import type { CandidateTrustCenterRecord } from "@/lib/candidate-trust-center-de
 import type { CandidateControlCenterRecord } from "@/lib/candidate-control-center-demo-data";
 import type { CandidateExportPreviewRecord } from "@/lib/candidate-export-preview-demo-data";
 import type { CandidateCorrectionRequestRecord } from "@/lib/candidate-correction-request-demo-data";
+import type { CandidateIdentityVerificationRecord } from "@/lib/candidate-identity-verification-demo-data";
 import type { CandidateDataPortabilityRecord } from "@/lib/candidate-data-portability-demo-data";
 import type { CandidateRevokeDeleteRecord } from "@/lib/candidate-revoke-delete-demo-data";
 import type { CandidateTrustAuditExportRecord } from "@/lib/candidate-trust-audit-export-demo-data";
@@ -137,6 +139,12 @@ export function resolveCandidateCorrectionRequest(
   candidateId?: string,
 ): CandidateCorrectionRequestRecord | null {
   return adaptCandidateCorrectionRequest(candidateId);
+}
+
+export function resolveCandidateIdentityVerification(
+  candidateId?: string,
+): CandidateIdentityVerificationRecord | null {
+  return adaptCandidateIdentityVerification(candidateId);
 }
 
 export function resolveCandidateDataPortability(

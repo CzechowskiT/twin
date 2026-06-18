@@ -7,6 +7,7 @@ import { candidateTrustCenterHref } from "@/lib/candidate-trust-center";
 import { candidateControlCenterHref } from "@/lib/candidate-control-center";
 import { candidateExportPreviewHref } from "@/lib/candidate-export-preview";
 import { candidateCorrectionRequestHref } from "@/lib/candidate-correction-request";
+import { candidateIdentityVerificationHref } from "@/lib/candidate-identity-verification";
 import { candidateDataPortabilityHref } from "@/lib/candidate-data-portability";
 import { candidateRevokeDeleteHref } from "@/lib/candidate-revoke-delete";
 import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
@@ -94,6 +95,11 @@ export const EXECUTIVE_PRODUCT_PROOF_DEMO_LINKS = [
     id: "candidate_correction_request",
     href: candidateCorrectionRequestHref(),
     labelKey: "executiveProductProof.linkCandidateCorrectionRequest" as TranslationKey,
+  },
+  {
+    id: "candidate_identity_verification",
+    href: candidateIdentityVerificationHref(),
+    labelKey: "executiveProductProof.linkCandidateIdentityVerification" as TranslationKey,
   },
   {
     id: "candidate_data_portability",

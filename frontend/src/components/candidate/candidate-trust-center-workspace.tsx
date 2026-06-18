@@ -23,6 +23,7 @@ import {
 import { candidateControlCenterHref } from "@/lib/candidate-control-center";
 import { candidateExportPreviewHref } from "@/lib/candidate-export-preview";
 import { candidateCorrectionRequestHref } from "@/lib/candidate-correction-request";
+import { candidateIdentityVerificationHref } from "@/lib/candidate-identity-verification";
 import { candidateDataPortabilityHref } from "@/lib/candidate-data-portability";
 import { candidateRevokeDeleteHref } from "@/lib/candidate-revoke-delete";
 import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
@@ -181,6 +182,13 @@ function TrustCenterContent({ record }: { record: CandidateTrustCenterRecord }) 
               data-testid="candidate-trust-center-export-preview-link"
             >
               {t("candidateExportPreview.pageTitle")}
+            </Link>
+            <Link
+              href={candidateIdentityVerificationHref()}
+              className="twin-link font-medium"
+              data-testid="candidate-trust-center-identity-verification-link"
+            >
+              {t("candidateIdentityVerification.pageTitle")}
             </Link>
             <Link
               href={candidateCorrectionRequestHref()}

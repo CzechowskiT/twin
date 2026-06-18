@@ -13,6 +13,7 @@ import { candidateTrustCenterHref } from "@/lib/candidate-trust-center";
 import { candidateControlCenterHref } from "@/lib/candidate-control-center";
 import { candidateExportPreviewHref } from "@/lib/candidate-export-preview";
 import { candidateCorrectionRequestHref } from "@/lib/candidate-correction-request";
+import { candidateIdentityVerificationHref } from "@/lib/candidate-identity-verification";
 import { candidateDataPortabilityHref } from "@/lib/candidate-data-portability";
 import { candidateRevokeDeleteHref } from "@/lib/candidate-revoke-delete";
 import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
@@ -190,6 +191,14 @@ export const FOUNDER_LED_DEMO_JOURNEY_STEPS: readonly FounderLedDemoLink[] = [
     loginPath: "/login",
     titleKey: "candidateCorrectionRequest.demoJourneyTitle",
     descKey: "candidateCorrectionRequest.demoJourneyDesc",
+  },
+  {
+    id: "candidate_identity_verification",
+    href: candidateIdentityVerificationHref(),
+    requiresAuth: true,
+    loginPath: "/login",
+    titleKey: "candidateIdentityVerification.demoJourneyTitle",
+    descKey: "candidateIdentityVerification.demoJourneyDesc",
   },
   {
     id: "candidate_data_portability",
