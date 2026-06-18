@@ -100,6 +100,11 @@ export const RECRUITER_DAILY_COCKPIT_MODULE_LINKS = [
     labelKey: "recruiterDailyCockpit.linkAtsReadiness" as TranslationKey,
   },
   {
+    id: "trust_review_queue",
+    href: "/recruiter/trust-review-queue",
+    labelKey: "recruiterTrustReviewQueue.demoJourneyTitle" as TranslationKey,
+  },
+  {
     id: "decision_memory",
     href: decisionMemoryHref(RECRUITER_DAILY_COCKPIT_DEMO_CANDIDATE_ID, "recruiter"),
     labelKey: "recruiterDailyCockpit.linkDecisionMemory" as TranslationKey,

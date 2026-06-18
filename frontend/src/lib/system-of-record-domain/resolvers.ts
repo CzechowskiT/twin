@@ -22,7 +22,7 @@ import {
   adaptCandidateRevokeDelete,
   adaptCandidateTrustAuditExport,
   adaptCandidateConsentReceipt,
-  adaptCandidateTrustOverview,
+  adaptRecruiterTrustReviewQueue, adaptCandidateTrustOverview,
   adaptCompanyHiringCockpit,
   adaptDecisionMemory,
   adaptJobPipeline,
@@ -173,6 +173,10 @@ export function resolveCandidateConsentReceipt(
   candidateId?: string,
 ): CandidateConsentReceiptRecord | null {
   return adaptCandidateConsentReceipt(candidateId);
+}
+
+export function resolveRecruiterTrustReviewQueue() {
+  return adaptRecruiterTrustReviewQueue();
 }
 
 export function resolveCandidateTrustOverview(

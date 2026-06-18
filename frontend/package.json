@@ -193,7 +193,10 @@
     "test:prod-recruiter-multitab-stuck-routes:raw": "playwright test e2e/prod-recruiter-multitab-stuck-routes.spec.ts",
     "test:workspace-multitab-browser-smoke:raw": "playwright test e2e/workspace-multitab-browser-smoke.spec.ts",
     "test:e2e:raw": "playwright test",
-    "test:workspace-deeplink-new-tab:raw": "npx --yes tsx scripts/workspace-deeplink-new-tab.test.ts && playwright test e2e/workspace-deeplink-new-tab.spec.ts"
+    "test:workspace-deeplink-new-tab:raw": "npx --yes tsx scripts/workspace-deeplink-new-tab.test.ts && playwright test e2e/workspace-deeplink-new-tab.spec.ts",
+    "test:recruiter-trust-review-queue": "npx --yes tsx scripts/recruiter-trust-review-queue.test.ts",
+    "test:recruiter-trust-review-queue-browser": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'&&process.env.PLAYWRIGHT_ENABLE_BROWSER_TESTS!=='1'){console.error('Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 (local) or PLAYWRIGHT_ALLOW_PROD_SMOKE=1 (prod).');process.exit(1)}\" && npm run test:recruiter-trust-review-queue-browser:raw",
+    "test:recruiter-trust-review-queue-browser:raw": "playwright test e2e/recruiter-trust-review-queue-browser.spec.ts --workers=1"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
