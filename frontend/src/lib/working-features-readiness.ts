@@ -1,7 +1,5 @@
 /** Working features readiness matrix — internal board roadmap surface. */
 
-import { EXECUTIVE_PRODUCT_PROOF_PUBLIC_ROUTE } from "@/lib/executive-product-proof";
-import { investorTrustProofHref } from "@/lib/investor-trust-proof";
 import { LAUNCH_STANCE } from "@/lib/investor-metrics-reality";
 import type { TranslationKey } from "@/lib/i18n";
 import {
@@ -38,11 +36,8 @@ export const WORKING_FEATURES_READINESS_FORBIDDEN_PATTERNS: RegExp[] = [
 ];
 
 export const WORKING_FEATURES_READINESS_LINKS = [
-  {
-    href: EXECUTIVE_PRODUCT_PROOF_PUBLIC_ROUTE,
-    labelKey: "investorTrustProof.linkProductProof" as TranslationKey,
-  },
-  { href: investorTrustProofHref(), labelKey: "investorTrustProof.demoJourneyTitle" as TranslationKey },
+  { href: "/investor/product-proof", labelKey: "investorTrustProof.linkProductProof" as TranslationKey },
+  { href: "/investor/trust-proof", labelKey: "investorTrustProof.demoJourneyTitle" as TranslationKey },
 ] as const;
 
 export function workingFeaturesReadinessHref(): string {
