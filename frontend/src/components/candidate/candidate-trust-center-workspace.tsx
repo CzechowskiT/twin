@@ -27,6 +27,7 @@ import { candidateIdentityVerificationHref } from "@/lib/candidate-identity-veri
 import { candidateDataPortabilityHref } from "@/lib/candidate-data-portability";
 import { candidateRevokeDeleteHref } from "@/lib/candidate-revoke-delete";
 import { candidateConsentReceiptHref } from "@/lib/candidate-consent-receipt";
+import { candidateTrustOverviewHref } from "@/lib/candidate-trust-overview";
 import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -225,6 +226,13 @@ function TrustCenterContent({ record }: { record: CandidateTrustCenterRecord }) 
               data-testid="candidate-trust-center-consent-receipt-link"
             >
               {t("candidateConsentReceipt.pageTitle")}
+            </Link>
+            <Link
+              href={candidateTrustOverviewHref()}
+              className="twin-link font-medium"
+              data-testid="candidate-trust-center-overview-link"
+            >
+              {t("candidateTrustOverview.pageTitle")}
             </Link>
             <Link
               href={CANDIDATE_TRUST_CENTER_SAFE_LINKS.profile}

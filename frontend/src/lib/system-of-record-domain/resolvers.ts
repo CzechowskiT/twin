@@ -22,6 +22,7 @@ import {
   adaptCandidateRevokeDelete,
   adaptCandidateTrustAuditExport,
   adaptCandidateConsentReceipt,
+  adaptCandidateTrustOverview,
   adaptCompanyHiringCockpit,
   adaptDecisionMemory,
   adaptJobPipeline,
@@ -56,6 +57,7 @@ import type { CandidateDataPortabilityRecord } from "@/lib/candidate-data-portab
 import type { CandidateRevokeDeleteRecord } from "@/lib/candidate-revoke-delete-demo-data";
 import type { CandidateTrustAuditExportRecord } from "@/lib/candidate-trust-audit-export-demo-data";
 import type { CandidateConsentReceiptRecord } from "@/lib/candidate-consent-receipt-demo-data";
+import type { CandidateTrustOverviewRecord } from "@/lib/candidate-trust-overview-demo-data";
 import type { CompanyHiringCockpitRecord } from "@/lib/company-hiring-cockpit-demo-data";
 import type { RecruiterDailyCockpitRecord } from "@/lib/recruiter-daily-operating-cockpit-demo-data";
 
@@ -171,6 +173,12 @@ export function resolveCandidateConsentReceipt(
   candidateId?: string,
 ): CandidateConsentReceiptRecord | null {
   return adaptCandidateConsentReceipt(candidateId);
+}
+
+export function resolveCandidateTrustOverview(
+  candidateId?: string,
+): CandidateTrustOverviewRecord | null {
+  return adaptCandidateTrustOverview(candidateId);
 }
 
 export function resolveSystemOfRecordLinks(

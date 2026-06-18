@@ -12,6 +12,7 @@ import { candidateDataPortabilityHref } from "@/lib/candidate-data-portability";
 import { candidateRevokeDeleteHref } from "@/lib/candidate-revoke-delete";
 import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
 import { candidateConsentReceiptHref } from "@/lib/candidate-consent-receipt";
+import { candidateTrustOverviewHref } from "@/lib/candidate-trust-overview";
 import { candidateTrustHref } from "@/lib/candidate-trust";
 import { decisionMemoryHref } from "@/lib/decision-memory";
 import { jobPipelineHref } from "@/lib/job-pipeline";
@@ -121,6 +122,11 @@ export const EXECUTIVE_PRODUCT_PROOF_DEMO_LINKS = [
     id: "candidate_consent_receipt",
     href: candidateConsentReceiptHref(),
     labelKey: "executiveProductProof.linkCandidateConsentReceipt" as TranslationKey,
+  },
+  {
+    id: "candidate_trust_overview",
+    href: candidateTrustOverviewHref(),
+    labelKey: "executiveProductProof.linkCandidateTrustOverview" as TranslationKey,
   },
   {
     id: "team",
