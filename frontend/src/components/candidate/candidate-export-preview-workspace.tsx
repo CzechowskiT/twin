@@ -16,6 +16,7 @@ import {
   CANDIDATE_EXPORT_PREVIEW_SAFE_LINKS,
   resolveCandidateExportPreview,
 } from "@/lib/candidate-export-preview";
+import { candidateCorrectionRequestHref } from "@/lib/candidate-correction-request";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -112,6 +113,13 @@ function ExportPreviewContent({ record }: { record: CandidateExportPreviewRecord
               data-testid="candidate-export-preview-controls-link"
             >
               {t("candidateExportPreview.linkControlCenter")}
+            </Link>
+            <Link
+              href={candidateCorrectionRequestHref()}
+              className="twin-link font-medium"
+              data-testid="candidate-export-preview-correction-request-link"
+            >
+              {t("candidateCorrectionRequest.pageTitle")}
             </Link>
             <Link
               href={CANDIDATE_EXPORT_PREVIEW_SAFE_LINKS.profile}
