@@ -15,6 +15,7 @@ import { candidateExportPreviewHref } from "@/lib/candidate-export-preview";
 import { candidateCorrectionRequestHref } from "@/lib/candidate-correction-request";
 import { candidateDataPortabilityHref } from "@/lib/candidate-data-portability";
 import { candidateRevokeDeleteHref } from "@/lib/candidate-revoke-delete";
+import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
 import { candidateTrustHref, CANDIDATE_TRUST_DEMO_ID } from "@/lib/candidate-trust";
 import {
   candidateTeamHref,
@@ -205,6 +206,14 @@ export const FOUNDER_LED_DEMO_JOURNEY_STEPS: readonly FounderLedDemoLink[] = [
     loginPath: "/login",
     titleKey: "candidateRevokeDelete.demoJourneyTitle",
     descKey: "candidateRevokeDelete.demoJourneyDesc",
+  },
+  {
+    id: "candidate_trust_audit_export",
+    href: candidateTrustAuditExportHref(),
+    requiresAuth: true,
+    loginPath: "/login",
+    titleKey: "candidateTrustAuditExport.demoJourneyTitle",
+    descKey: "candidateTrustAuditExport.demoJourneyDesc",
   },
   {
     id: "decision_memory",

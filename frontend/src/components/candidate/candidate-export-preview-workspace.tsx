@@ -19,6 +19,7 @@ import {
 import { candidateCorrectionRequestHref } from "@/lib/candidate-correction-request";
 import { candidateDataPortabilityHref } from "@/lib/candidate-data-portability";
 import { candidateRevokeDeleteHref } from "@/lib/candidate-revoke-delete";
+import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -136,6 +137,13 @@ function ExportPreviewContent({ record }: { record: CandidateExportPreviewRecord
               data-testid="candidate-export-preview-revoke-delete-link"
             >
               {t("candidateRevokeDelete.pageTitle")}
+            </Link>
+            <Link
+              href={candidateTrustAuditExportHref()}
+              className="twin-link font-medium"
+              data-testid="candidate-export-preview-audit-export-link"
+            >
+              {t("candidateTrustAuditExport.pageTitle")}
             </Link>
             <Link
               href={CANDIDATE_EXPORT_PREVIEW_SAFE_LINKS.profile}

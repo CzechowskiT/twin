@@ -22,6 +22,7 @@ export const CANDIDATE_CONTROL_CENTER_MARKERS = {
   communicationPreferences: "candidate-control-center-communication-preferences",
   appMatchTransparency: "candidate-control-center-app-match-transparency",
   revokeDeletePlanned: "candidate-control-center-revoke-delete-planned",
+  trustAuditExport: "candidate-control-center-trust-audit-export",
   auditTimeline: "candidate-control-center-audit-timeline",
   boundary: "candidate-control-center-boundary",
   notFound: "candidate-control-center-not-found",

@@ -25,6 +25,7 @@ import { candidateExportPreviewHref } from "@/lib/candidate-export-preview";
 import { candidateCorrectionRequestHref } from "@/lib/candidate-correction-request";
 import { candidateDataPortabilityHref } from "@/lib/candidate-data-portability";
 import { candidateRevokeDeleteHref } from "@/lib/candidate-revoke-delete";
+import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
 import type { TranslationKey } from "@/lib/i18n";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
@@ -201,6 +202,13 @@ function TrustCenterContent({ record }: { record: CandidateTrustCenterRecord }) 
               data-testid="candidate-trust-center-revoke-delete-link"
             >
               {t("candidateRevokeDelete.pageTitle")}
+            </Link>
+            <Link
+              href={candidateTrustAuditExportHref()}
+              className="twin-link font-medium"
+              data-testid="candidate-trust-center-audit-export-link"
+            >
+              {t("candidateTrustAuditExport.pageTitle")}
             </Link>
             <Link
               href={CANDIDATE_TRUST_CENTER_SAFE_LINKS.profile}

@@ -308,6 +308,18 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     boundaryTags: ["pilot", "not_live", "human_decision_required", "no_outreach"],
   },
   {
+    id: "candidate_trust_audit_export",
+    persona: "candidate",
+    href: CANDIDATE_CANONICAL_ROUTES.trustAuditExport,
+    titleKey: "workspaceModules.candidateTrustAuditExportTitle",
+    descriptionKey: "workspaceModules.candidateTrustAuditExportValue",
+    hintKey: "workspaceModules.candidateTrustAuditExportHint",
+    ctaKey: "workspaceModules.candidateTrustAuditExportCta",
+    status: "pilot",
+    moduleFamily: "trust",
+    boundaryTags: ["pilot", "not_live", "human_decision_required"],
+  },
+  {
     id: "candidate_referrals",
     persona: "candidate",
     href: CANDIDATE_CANONICAL_ROUTES.referrals,

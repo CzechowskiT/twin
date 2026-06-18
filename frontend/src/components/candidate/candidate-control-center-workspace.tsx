@@ -8,6 +8,7 @@ import { ExportPreviewPanel } from "@/components/candidate/export-preview-panel"
 import { CorrectionRequestPanel } from "@/components/candidate/correction-request-panel";
 import { DataPortabilityPanel } from "@/components/candidate/data-portability-panel";
 import { RevokeDeletePanel } from "@/components/candidate/revoke-delete-panel";
+import { TrustAuditExportPanel } from "@/components/candidate/trust-audit-export-panel";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
@@ -27,6 +28,7 @@ import { resolveCandidateExportPreview } from "@/lib/candidate-export-preview";
 import { resolveCandidateCorrectionRequest } from "@/lib/candidate-correction-request";
 import { resolveCandidateDataPortability } from "@/lib/candidate-data-portability";
 import { resolveCandidateRevokeDelete } from "@/lib/candidate-revoke-delete";
+import { resolveCandidateTrustAuditExport } from "@/lib/candidate-trust-audit-export";
 import type { CandidateControlCenterRecord } from "@/lib/candidate-control-center-demo-data";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -128,6 +130,7 @@ function ControlCenterContent({ record }: { record: CandidateControlCenterRecord
   const correctionRequestRecord = resolveCandidateCorrectionRequest(record.id);
   const dataPortabilityRecord = resolveCandidateDataPortability(record.id);
   const revokeDeleteRecord = resolveCandidateRevokeDelete(record.id);
+  const trustAuditExportRecord = resolveCandidateTrustAuditExport(record.id);
 
   return (
     <Shell wide rail>
@@ -399,6 +402,23 @@ function ControlCenterContent({ record }: { record: CandidateControlCenterRecord
                   {t("candidateControlCenter.deleteCta")}
                 </button>
               </div>
+              <p className="text-[10px] text-[var(--twin-muted)]">{t("candidateControlCenter.noMutation")}</p>
+            </>
+          ),
+        )}
+
+        {sectionCard(
+          CANDIDATE_CONTROL_CENTER_MARKERS.trustAuditExport,
+          t("candidateControlCenter.trustAuditExportTitle"),
+          trustAuditExportRecord ? (
+            <TrustAuditExportPanel
+              record={trustAuditExportRecord}
+              compact
+              marker={CANDIDATE_CONTROL_CENTER_MARKERS.trustAuditExport}
+            />
+          ) : (
+            <>
+              <p className="text-xs text-[var(--twin-muted-strong)]">{t("candidateControlCenter.trustAuditExportLead")}</p>
               <p className="text-[10px] text-[var(--twin-muted)]">{t("candidateControlCenter.noMutation")}</p>
             </>
           ),
