@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { ExportPreviewPanel } from "@/components/candidate/export-preview-panel";
 import { CorrectionRequestPanel } from "@/components/candidate/correction-request-panel";
+import { DataPortabilityPanel } from "@/components/candidate/data-portability-panel";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
@@ -23,6 +24,7 @@ import {
 } from "@/lib/candidate-control-center";
 import { resolveCandidateExportPreview } from "@/lib/candidate-export-preview";
 import { resolveCandidateCorrectionRequest } from "@/lib/candidate-correction-request";
+import { resolveCandidateDataPortability } from "@/lib/candidate-data-portability";
 import type { CandidateControlCenterRecord } from "@/lib/candidate-control-center-demo-data";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -122,6 +124,7 @@ function ControlCenterContent({ record }: { record: CandidateControlCenterRecord
   const { t } = useTranslation();
   const exportPreviewRecord = resolveCandidateExportPreview(record.id);
   const correctionRequestRecord = resolveCandidateCorrectionRequest(record.id);
+  const dataPortabilityRecord = resolveCandidateDataPortability(record.id);
 
   return (
     <Shell wide rail>
@@ -271,6 +274,25 @@ function ControlCenterContent({ record }: { record: CandidateControlCenterRecord
               </ul>
               <button type="button" disabled className="twin-btn-secondary twin-touch-target cursor-not-allowed opacity-50">
                 {t("candidateControlCenter.submitCorrectionCta")}
+              </button>
+            </>
+          ),
+        )}
+
+        {sectionCard(
+          CANDIDATE_CONTROL_CENTER_MARKERS.dataPortability,
+          t("candidateControlCenter.dataPortabilityTitle"),
+          dataPortabilityRecord ? (
+            <DataPortabilityPanel
+              record={dataPortabilityRecord}
+              compact
+              marker={CANDIDATE_CONTROL_CENTER_MARKERS.dataPortability}
+            />
+          ) : (
+            <>
+              <p className="text-xs text-[var(--twin-muted-strong)]">{t("candidateControlCenter.dataPortabilityLead")}</p>
+              <button type="button" disabled className="twin-btn-secondary twin-touch-target cursor-not-allowed opacity-50">
+                {t("candidateControlCenter.submitPortabilityCta")}
               </button>
             </>
           ),

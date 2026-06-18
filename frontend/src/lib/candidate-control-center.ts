@@ -17,6 +17,7 @@ export const CANDIDATE_CONTROL_CENTER_MARKERS = {
   visibilityControls: "candidate-control-center-visibility-controls",
   exportPreview: "candidate-control-center-export-preview",
   correctionRequest: "candidate-control-center-correction-request",
+  dataPortability: "candidate-control-center-data-portability",
   consentReview: "candidate-control-center-consent-review",
   communicationPreferences: "candidate-control-center-communication-preferences",
   appMatchTransparency: "candidate-control-center-app-match-transparency",
