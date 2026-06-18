@@ -42,6 +42,10 @@ import {
   type CandidateControlCenterRecord,
 } from "@/lib/candidate-control-center-demo-data";
 import {
+  getCandidateExportPreviewDemo,
+  type CandidateExportPreviewRecord,
+} from "@/lib/candidate-export-preview-demo-data";
+import {
   getCompanyHiringCockpitDemo,
   type CompanyHiringCockpitRecord,
 } from "@/lib/company-hiring-cockpit-demo-data";
@@ -156,4 +160,12 @@ export function adaptCandidateControlCenter(
   const trimmed = (candidateId ?? TWIN_DEMO_CANDIDATE_PRIMARY_ID).trim();
   if (!trimmed || trimmed !== TWIN_DEMO_CANDIDATE_PRIMARY_ID) return null;
   return getCandidateControlCenterDemo();
+}
+
+export function adaptCandidateExportPreview(
+  candidateId?: string,
+): CandidateExportPreviewRecord | null {
+  const trimmed = (candidateId ?? TWIN_DEMO_CANDIDATE_PRIMARY_ID).trim();
+  if (!trimmed || trimmed !== TWIN_DEMO_CANDIDATE_PRIMARY_ID) return null;
+  return getCandidateExportPreviewDemo();
 }
