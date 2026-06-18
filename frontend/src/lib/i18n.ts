@@ -4940,6 +4940,7 @@ eyebrow: "Product roadmap",
     boundaryBody:
       "TWIN shows what you can control, preview, and review. No live export, delete, revoke, or outreach — you decide when to apply and who engages. Human decision required on all recruiter actions.",
     linkTrustCenter: "Trust center",
+    linkTrustOverview: "Trust overview",
     linkControlCenter: "Control center",
     linkProfile: "Profile",
     linkJobs: "Jobs",
@@ -11143,6 +11144,7 @@ const pl: MessageTree = {
     boundaryBody:
       "TWIN pokazuje, co możesz kontrolować, podglądać i przeglądać. Bez live eksportu, usuwania, cofania zgody ani outreachu — Ty decydujesz, kiedy aplikować i kto się kontaktuje. Wymagana decyzja człowieka przy wszystkich akcjach rekrutera.",
     linkTrustCenter: "Centrum zaufania",
+    linkTrustOverview: "Przegląd zaufania",
     linkControlCenter: "Centrum kontroli",
     linkProfile: "Profil",
     linkJobs: "Oferty",

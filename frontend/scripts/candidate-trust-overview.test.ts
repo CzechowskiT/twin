@@ -127,3 +127,9 @@ test("13 canonical route trustOverview registered", () => {
   assert.equal(CANDIDATE_CANONICAL_ROUTES.trustOverview, "/dashboard/trust/overview");
   assert.equal(candidateTrustOverviewHref(), "/dashboard/trust/overview");
 });
+
+test("14 control center links to overview", () => {
+  const cc = read("src/components/candidate/candidate-control-center-workspace.tsx");
+  assert.match(cc, /candidate-control-center-overview-link/);
+  assert.match(cc, /candidateTrustOverviewHref/);
+});

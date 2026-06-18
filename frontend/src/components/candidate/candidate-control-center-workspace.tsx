@@ -32,6 +32,7 @@ import { resolveCandidateIdentityVerification } from "@/lib/candidate-identity-v
 import { resolveCandidateDataPortability } from "@/lib/candidate-data-portability";
 import { resolveCandidateRevokeDelete } from "@/lib/candidate-revoke-delete";
 import { resolveCandidateConsentReceipt } from "@/lib/candidate-consent-receipt";
+import { candidateTrustOverviewHref } from "@/lib/candidate-trust-overview";
 import { resolveCandidateTrustAuditExport } from "@/lib/candidate-trust-audit-export";
 import type { CandidateControlCenterRecord } from "@/lib/candidate-control-center-demo-data";
 import type { TranslationKey } from "@/lib/i18n";
@@ -185,6 +186,13 @@ function ControlCenterContent({ record }: { record: CandidateControlCenterRecord
               data-testid="candidate-control-center-trust-link"
             >
               {t("candidateControlCenter.linkTrustCenter")}
+            </Link>
+            <Link
+              href={candidateTrustOverviewHref()}
+              className="twin-link font-medium"
+              data-testid="candidate-control-center-overview-link"
+            >
+              {t("candidateControlCenter.linkTrustOverview")}
             </Link>
             <Link
               href={CANDIDATE_CONTROL_CENTER_SAFE_LINKS.profile}
