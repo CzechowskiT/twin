@@ -50,6 +50,9 @@ export function CandidateWorkspaceSubnav({
       <Link href="/dashboard/trust" className={itemClass}>
         {t("workspaceModules.candidateTrustCenterTitle")}
       </Link>
+      <Link href="/dashboard/trust/controls" className={itemClass}>
+        {t("workspaceModules.candidateControlCenterTitle")}
+      </Link>
       <Link href={candidateCalendarHref()} className={itemClass}>
         {t("dashboard.calendarLink")}
       </Link>

@@ -20,6 +20,7 @@ import {
   CANDIDATE_TRUST_CENTER_SAFE_LINKS,
   resolveCandidateTrustCenter,
 } from "@/lib/candidate-trust-center";
+import { candidateControlCenterHref } from "@/lib/candidate-control-center";
 import type { TranslationKey } from "@/lib/i18n";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
@@ -162,6 +163,13 @@ function TrustCenterContent({ record }: { record: CandidateTrustCenterRecord }) 
             </div>
           </div>
           <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
+            <Link
+              href={candidateControlCenterHref()}
+              className="twin-link font-medium"
+              data-testid="candidate-trust-center-controls-link"
+            >
+              {t("candidateControlCenter.linkControlCenter")}
+            </Link>
             <Link
               href={CANDIDATE_TRUST_CENTER_SAFE_LINKS.profile}
               className="twin-link font-medium"

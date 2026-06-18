@@ -4,6 +4,7 @@ import { atsImportReadinessHref } from "@/lib/ats-import-readiness";
 import { candidateCollaborationHref } from "@/lib/candidate-collaboration";
 import { candidateProfile360Href } from "@/lib/candidate-profile-360";
 import { candidateTrustCenterHref } from "@/lib/candidate-trust-center";
+import { candidateControlCenterHref } from "@/lib/candidate-control-center";
 import { candidateTrustHref } from "@/lib/candidate-trust";
 import { decisionMemoryHref } from "@/lib/decision-memory";
 import { jobPipelineHref } from "@/lib/job-pipeline";
@@ -73,6 +74,11 @@ export const EXECUTIVE_PRODUCT_PROOF_DEMO_LINKS = [
     id: "candidate_trust_center",
     href: candidateTrustCenterHref(),
     labelKey: "executiveProductProof.linkCandidateTrustCenter" as TranslationKey,
+  },
+  {
+    id: "candidate_control_center",
+    href: candidateControlCenterHref(),
+    labelKey: "executiveProductProof.linkCandidateControlCenter" as TranslationKey,
   },
   {
     id: "team",
