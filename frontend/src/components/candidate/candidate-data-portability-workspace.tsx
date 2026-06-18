@@ -14,6 +14,7 @@ import {
   CANDIDATE_DATA_PORTABILITY_SAFE_LINKS,
   resolveCandidateDataPortability,
 } from "@/lib/candidate-data-portability";
+import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
 import type { TranslationKey } from "@/lib/i18n";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
@@ -151,6 +152,13 @@ function DataPortabilityContent({ record }: { record: CandidateDataPortabilityRe
               data-testid="candidate-data-portability-revoke-delete-link"
             >
               {t("candidateDataPortability.linkRevokeDelete")}
+            </Link>
+            <Link
+              href={candidateTrustAuditExportHref()}
+              className="twin-link font-medium"
+              data-testid="candidate-data-portability-audit-export-link"
+            >
+              {t("candidateTrustAuditExport.pageTitle")}
             </Link>
             <Link
               href={CANDIDATE_DATA_PORTABILITY_SAFE_LINKS.profile}

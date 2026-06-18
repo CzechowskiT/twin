@@ -14,6 +14,7 @@ import {
   CANDIDATE_REVOKE_DELETE_SAFE_LINKS,
   resolveCandidateRevokeDelete,
 } from "@/lib/candidate-revoke-delete";
+import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
 import type { TranslationKey } from "@/lib/i18n";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
@@ -151,6 +152,13 @@ function RevokeDeleteContent({ record }: { record: CandidateRevokeDeleteRecord }
               data-testid="candidate-revoke-delete-data-portability-link"
             >
               {t("candidateRevokeDelete.linkDataPortability")}
+            </Link>
+            <Link
+              href={candidateTrustAuditExportHref()}
+              className="twin-link font-medium"
+              data-testid="candidate-revoke-delete-audit-export-link"
+            >
+              {t("candidateTrustAuditExport.pageTitle")}
             </Link>
             <Link
               href={CANDIDATE_REVOKE_DELETE_SAFE_LINKS.profile}

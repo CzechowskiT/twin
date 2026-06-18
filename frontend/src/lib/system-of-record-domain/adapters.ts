@@ -58,6 +58,10 @@ import {
   type CandidateRevokeDeleteRecord,
 } from "@/lib/candidate-revoke-delete-demo-data";
 import {
+  getCandidateTrustAuditExportDemo,
+  type CandidateTrustAuditExportRecord,
+} from "@/lib/candidate-trust-audit-export-demo-data";
+import {
   getCompanyHiringCockpitDemo,
   type CompanyHiringCockpitRecord,
 } from "@/lib/company-hiring-cockpit-demo-data";
@@ -204,4 +208,12 @@ export function adaptCandidateRevokeDelete(
   const trimmed = (candidateId ?? TWIN_DEMO_CANDIDATE_PRIMARY_ID).trim();
   if (!trimmed || trimmed !== TWIN_DEMO_CANDIDATE_PRIMARY_ID) return null;
   return getCandidateRevokeDeleteDemo();
+}
+
+export function adaptCandidateTrustAuditExport(
+  candidateId?: string,
+): CandidateTrustAuditExportRecord | null {
+  const trimmed = (candidateId ?? TWIN_DEMO_CANDIDATE_PRIMARY_ID).trim();
+  if (!trimmed || trimmed !== TWIN_DEMO_CANDIDATE_PRIMARY_ID) return null;
+  return getCandidateTrustAuditExportDemo();
 }
