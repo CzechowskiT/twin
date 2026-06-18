@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { ExportPreviewPanel } from "@/components/candidate/export-preview-panel";
+import { CorrectionRequestPanel } from "@/components/candidate/correction-request-panel";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
@@ -21,6 +22,7 @@ import {
   resolveCandidateControlCenter,
 } from "@/lib/candidate-control-center";
 import { resolveCandidateExportPreview } from "@/lib/candidate-export-preview";
+import { resolveCandidateCorrectionRequest } from "@/lib/candidate-correction-request";
 import type { CandidateControlCenterRecord } from "@/lib/candidate-control-center-demo-data";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -119,6 +121,7 @@ function ControlCenterNotFound() {
 function ControlCenterContent({ record }: { record: CandidateControlCenterRecord }) {
   const { t } = useTranslation();
   const exportPreviewRecord = resolveCandidateExportPreview(record.id);
+  const correctionRequestRecord = resolveCandidateCorrectionRequest(record.id);
 
   return (
     <Shell wide rail>
@@ -243,26 +246,34 @@ function ControlCenterContent({ record }: { record: CandidateControlCenterRecord
         {sectionCard(
           CANDIDATE_CONTROL_CENTER_MARKERS.correctionRequest,
           t("candidateControlCenter.correctionRequestTitle"),
-          <>
-            <p className="text-xs text-[var(--twin-muted-strong)]">{t("candidateControlCenter.correctionRequestLead")}</p>
-            <ul className="space-y-3">
-              {record.correction_requests.map((req) => (
-                <li key={req.id} className="rounded-lg border border-[var(--twin-border)]/60 p-3">
-                  <p className="font-medium">{req.field}</p>
-                  <p className="mt-1 text-xs text-[var(--twin-muted-strong)]">
-                    {t("candidateControlCenter.currentValue")}: {req.current_value}
-                  </p>
-                  <p className="mt-1 text-xs">
-                    {t("candidateControlCenter.suggestedCorrection")}: {req.suggested_correction}
-                  </p>
-                  <p className="mt-2 text-[10px] text-[var(--twin-muted)]">{req.note}</p>
-                </li>
-              ))}
-            </ul>
-            <button type="button" disabled className="twin-btn-secondary twin-touch-target cursor-not-allowed opacity-50">
-              {t("candidateControlCenter.submitCorrectionCta")}
-            </button>
-          </>,
+          correctionRequestRecord ? (
+            <CorrectionRequestPanel
+              record={correctionRequestRecord}
+              compact
+              marker={CANDIDATE_CONTROL_CENTER_MARKERS.correctionRequest}
+            />
+          ) : (
+            <>
+              <p className="text-xs text-[var(--twin-muted-strong)]">{t("candidateControlCenter.correctionRequestLead")}</p>
+              <ul className="space-y-3">
+                {record.correction_requests.map((req) => (
+                  <li key={req.id} className="rounded-lg border border-[var(--twin-border)]/60 p-3">
+                    <p className="font-medium">{req.field}</p>
+                    <p className="mt-1 text-xs text-[var(--twin-muted-strong)]">
+                      {t("candidateControlCenter.currentValue")}: {req.current_value}
+                    </p>
+                    <p className="mt-1 text-xs">
+                      {t("candidateControlCenter.suggestedCorrection")}: {req.suggested_correction}
+                    </p>
+                    <p className="mt-2 text-[10px] text-[var(--twin-muted)]">{req.note}</p>
+                  </li>
+                ))}
+              </ul>
+              <button type="button" disabled className="twin-btn-secondary twin-touch-target cursor-not-allowed opacity-50">
+                {t("candidateControlCenter.submitCorrectionCta")}
+              </button>
+            </>
+          ),
         )}
 
         {sectionCard(
