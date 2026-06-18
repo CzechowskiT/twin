@@ -17,6 +17,7 @@ import {
   adaptCandidateControlCenter,
   adaptCandidateExportPreview,
   adaptCandidateCorrectionRequest,
+  adaptCandidateDataPortability,
   adaptCompanyHiringCockpit,
   adaptDecisionMemory,
   adaptJobPipeline,
@@ -46,6 +47,7 @@ import type { CandidateTrustCenterRecord } from "@/lib/candidate-trust-center-de
 import type { CandidateControlCenterRecord } from "@/lib/candidate-control-center-demo-data";
 import type { CandidateExportPreviewRecord } from "@/lib/candidate-export-preview-demo-data";
 import type { CandidateCorrectionRequestRecord } from "@/lib/candidate-correction-request-demo-data";
+import type { CandidateDataPortabilityRecord } from "@/lib/candidate-data-portability-demo-data";
 import type { CompanyHiringCockpitRecord } from "@/lib/company-hiring-cockpit-demo-data";
 import type { RecruiterDailyCockpitRecord } from "@/lib/recruiter-daily-operating-cockpit-demo-data";
 
@@ -131,6 +133,12 @@ export function resolveCandidateCorrectionRequest(
   candidateId?: string,
 ): CandidateCorrectionRequestRecord | null {
   return adaptCandidateCorrectionRequest(candidateId);
+}
+
+export function resolveCandidateDataPortability(
+  candidateId?: string,
+): CandidateDataPortabilityRecord | null {
+  return adaptCandidateDataPortability(candidateId);
 }
 
 export function resolveSystemOfRecordLinks(

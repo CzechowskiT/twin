@@ -13,6 +13,7 @@ import { candidateTrustCenterHref } from "@/lib/candidate-trust-center";
 import { candidateControlCenterHref } from "@/lib/candidate-control-center";
 import { candidateExportPreviewHref } from "@/lib/candidate-export-preview";
 import { candidateCorrectionRequestHref } from "@/lib/candidate-correction-request";
+import { candidateDataPortabilityHref } from "@/lib/candidate-data-portability";
 import { candidateTrustHref, CANDIDATE_TRUST_DEMO_ID } from "@/lib/candidate-trust";
 import {
   candidateTeamHref,
@@ -187,6 +188,14 @@ export const FOUNDER_LED_DEMO_JOURNEY_STEPS: readonly FounderLedDemoLink[] = [
     loginPath: "/login",
     titleKey: "candidateCorrectionRequest.demoJourneyTitle",
     descKey: "candidateCorrectionRequest.demoJourneyDesc",
+  },
+  {
+    id: "candidate_data_portability",
+    href: candidateDataPortabilityHref(),
+    requiresAuth: true,
+    loginPath: "/login",
+    titleKey: "candidateDataPortability.demoJourneyTitle",
+    descKey: "candidateDataPortability.demoJourneyDesc",
   },
   {
     id: "decision_memory",

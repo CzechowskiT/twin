@@ -23,6 +23,7 @@ import {
 import { candidateControlCenterHref } from "@/lib/candidate-control-center";
 import { candidateExportPreviewHref } from "@/lib/candidate-export-preview";
 import { candidateCorrectionRequestHref } from "@/lib/candidate-correction-request";
+import { candidateDataPortabilityHref } from "@/lib/candidate-data-portability";
 import type { TranslationKey } from "@/lib/i18n";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
@@ -185,6 +186,13 @@ function TrustCenterContent({ record }: { record: CandidateTrustCenterRecord }) 
               data-testid="candidate-trust-center-correction-request-link"
             >
               {t("candidateCorrectionRequest.pageTitle")}
+            </Link>
+            <Link
+              href={candidateDataPortabilityHref()}
+              className="twin-link font-medium"
+              data-testid="candidate-trust-center-data-portability-link"
+            >
+              {t("candidateDataPortability.pageTitle")}
             </Link>
             <Link
               href={CANDIDATE_TRUST_CENTER_SAFE_LINKS.profile}

@@ -18,6 +18,7 @@ import {
   CANDIDATE_CORRECTION_REQUEST_SAFE_LINKS,
   resolveCandidateCorrectionRequest,
 } from "@/lib/candidate-correction-request";
+import { candidateDataPortabilityHref } from "@/lib/candidate-data-portability";
 import type { TranslationKey } from "@/lib/i18n";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
@@ -151,6 +152,13 @@ function CorrectionRequestContent({ record }: { record: CandidateCorrectionReque
               data-testid="candidate-correction-request-export-preview-link"
             >
               {t("candidateCorrectionRequest.linkExportPreview")}
+            </Link>
+            <Link
+              href={candidateDataPortabilityHref()}
+              className="twin-link font-medium"
+              data-testid="candidate-correction-request-data-portability-link"
+            >
+              {t("candidateCorrectionRequest.linkDataPortability")}
             </Link>
             <Link
               href={CANDIDATE_CORRECTION_REQUEST_SAFE_LINKS.profile}

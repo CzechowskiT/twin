@@ -17,6 +17,7 @@ import {
   resolveCandidateExportPreview,
 } from "@/lib/candidate-export-preview";
 import { candidateCorrectionRequestHref } from "@/lib/candidate-correction-request";
+import { candidateDataPortabilityHref } from "@/lib/candidate-data-portability";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -120,6 +121,13 @@ function ExportPreviewContent({ record }: { record: CandidateExportPreviewRecord
               data-testid="candidate-export-preview-correction-request-link"
             >
               {t("candidateCorrectionRequest.pageTitle")}
+            </Link>
+            <Link
+              href={candidateDataPortabilityHref()}
+              className="twin-link font-medium"
+              data-testid="candidate-export-preview-data-portability-link"
+            >
+              {t("candidateDataPortability.pageTitle")}
             </Link>
             <Link
               href={CANDIDATE_EXPORT_PREVIEW_SAFE_LINKS.profile}
