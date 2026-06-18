@@ -53,6 +53,7 @@ export {
   resolveCandidateRevokeDelete,
   resolveCandidateTrustAuditExport,
   resolveCandidateConsentReceipt,
+  resolveRecruiterTrustReviewQueue,
   resolveCandidateTrustOverview,
   resolveCompanyHiringCockpit,
   resolveDecisionMemory,

@@ -19,6 +19,7 @@ import { jobPipelineHref } from "@/lib/job-pipeline";
 import { LAUNCH_STANCE } from "@/lib/investor-metrics-reality";
 import type { TranslationKey } from "@/lib/i18n";
 import { recruiterDailyCockpitHref } from "@/lib/recruiter-daily-operating-cockpit";
+import { recruiterTrustReviewQueueHref } from "@/lib/recruiter-trust-review-queue";
 import { companyHiringCockpitHref } from "@/lib/company-hiring-cockpit";
 import { candidateCommunicationHref } from "@/lib/safe-communication";
 import { candidateTeamHref } from "@/lib/team-collaboration";
@@ -147,6 +148,11 @@ export const EXECUTIVE_PRODUCT_PROOF_DEMO_LINKS = [
     id: "decision_memory",
     href: decisionMemoryHref("demo-candidate-001", "recruiter"),
     labelKey: "executiveProductProof.linkDecisionMemory" as TranslationKey,
+  },
+  {
+    id: "recruiter_trust_review_queue",
+    href: recruiterTrustReviewQueueHref(),
+    labelKey: "recruiterTrustReviewQueue.demoJourneyTitle" as TranslationKey,
   },
   {
     id: "daily_cockpit",

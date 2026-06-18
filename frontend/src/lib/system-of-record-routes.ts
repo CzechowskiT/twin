@@ -379,6 +379,17 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     boundaryTags: [],
   },
   {
+    id: "recruiter_trust_review_queue",
+    persona: "recruiter",
+    href: "/recruiter/trust-review-queue",
+    titleKey: "recruiterTrustReviewQueue.demoJourneyTitle",
+    descriptionKey: "recruiterTrustReviewQueue.demoJourneyDesc",
+    ctaKey: "recruiterTrustReviewQueue.openTrustReviewQueue",
+    status: "pilot",
+    moduleFamily: "trust",
+    boundaryTags: ["pilot", "human_decision_required", "no_outreach"],
+  },
+  {
     id: "recruiter_daily_cockpit",
     persona: "recruiter",
     href: "/recruiter/daily-cockpit",

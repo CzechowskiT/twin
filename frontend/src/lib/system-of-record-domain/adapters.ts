@@ -78,6 +78,10 @@ import {
   type CompanyHiringCockpitRecord,
 } from "@/lib/company-hiring-cockpit-demo-data";
 import {
+  getRecruiterTrustReviewQueueDemo,
+  type RecruiterTrustReviewQueueRecord,
+} from "@/lib/recruiter-trust-review-queue-demo-data";
+import {
   getRecruiterDailyCockpitDemo,
   type RecruiterDailyCockpitRecord,
 } from "@/lib/recruiter-daily-operating-cockpit-demo-data";
@@ -244,6 +248,10 @@ export function adaptCandidateConsentReceipt(
   const trimmed = (candidateId ?? TWIN_DEMO_CANDIDATE_PRIMARY_ID).trim();
   if (!trimmed || trimmed !== TWIN_DEMO_CANDIDATE_PRIMARY_ID) return null;
   return getCandidateConsentReceiptDemo();
+}
+
+export function adaptRecruiterTrustReviewQueue(): RecruiterTrustReviewQueueRecord {
+  return getRecruiterTrustReviewQueueDemo();
 }
 
 export function adaptCandidateTrustOverview(

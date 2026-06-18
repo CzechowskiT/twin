@@ -5459,6 +5459,8 @@ eyebrow: "Product roadmap",
     statusPlanned: "Planned",
     demoJourneyTitle: "Recruiter trust review queue",
     demoJourneyDesc: "Read-only queue aggregating candidate trust demo events for human review.",
+    openTrustReviewQueue: "Open trust review queue",
+    navLink: "Trust review queue",
   },
   companyCandidateTrustSummary: {
     pageEyebrow: "Candidate trust summary",
@@ -11663,6 +11665,8 @@ const pl: MessageTree = {
     statusPlanned: "Planowane",
     demoJourneyTitle: "Kolejka przeglądu zaufania rekrutera",
     demoJourneyDesc: "Kolejka tylko do odczytu agregująca zdarzenia demo zaufania kandydata do przeglądu.",
+    openTrustReviewQueue: "Otwórz kolejkę przeglądu zaufania",
+    navLink: "Kolejka przeglądu zaufania",
   },
   companyCandidateTrustSummary: {
     pageEyebrow: "Podsumowanie zaufania kandydata",
