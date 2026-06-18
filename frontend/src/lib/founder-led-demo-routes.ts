@@ -32,6 +32,7 @@ import { atsImportReadinessHref } from "@/lib/ats-import-readiness";
 import { decisionMemoryHref, DECISION_MEMORY_DEMO_ID } from "@/lib/decision-memory";
 import { recruiterDailyCockpitHref } from "@/lib/recruiter-daily-operating-cockpit";
 import { recruiterTrustReviewQueueHref } from "@/lib/recruiter-trust-review-queue";
+import { companyCandidateTrustSummaryHref } from "@/lib/company-candidate-trust-summary";
 import { companyHiringCockpitHref } from "@/lib/company-hiring-cockpit";
 import { jobPipelineHref, JOB_PIPELINE_DEMO_ID } from "@/lib/job-pipeline";
 
@@ -266,6 +267,14 @@ export const FOUNDER_LED_DEMO_JOURNEY_STEPS: readonly FounderLedDemoLink[] = [
     loginPath: "/login/recruiter",
     titleKey: "recruiterDailyCockpit.demoJourneyTitle",
     descKey: "recruiterDailyCockpit.demoJourneyDesc",
+  },
+  {
+    id: "company_candidate_trust_summary",
+    href: companyCandidateTrustSummaryHref(),
+    requiresAuth: true,
+    loginPath: "/login/company",
+    titleKey: "companyCandidateTrustSummary.demoJourneyTitle",
+    descKey: "companyCandidateTrustSummary.demoJourneyDesc",
   },
   {
     id: "company_hiring_cockpit",

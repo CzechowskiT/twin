@@ -20,6 +20,7 @@ import { LAUNCH_STANCE } from "@/lib/investor-metrics-reality";
 import type { TranslationKey } from "@/lib/i18n";
 import { recruiterDailyCockpitHref } from "@/lib/recruiter-daily-operating-cockpit";
 import { recruiterTrustReviewQueueHref } from "@/lib/recruiter-trust-review-queue";
+import { companyCandidateTrustSummaryHref } from "@/lib/company-candidate-trust-summary";
 import { companyHiringCockpitHref } from "@/lib/company-hiring-cockpit";
 import { candidateCommunicationHref } from "@/lib/safe-communication";
 import { candidateTeamHref } from "@/lib/team-collaboration";

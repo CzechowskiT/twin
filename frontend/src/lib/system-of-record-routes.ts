@@ -603,6 +603,17 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     boundaryTags: [],
   },
   {
+    id: "company_candidate_trust_summary",
+    persona: "company",
+    href: "/company/candidates/demo-candidate-001/trust-summary",
+    titleKey: "companyCandidateTrustSummary.demoJourneyTitle",
+    descriptionKey: "companyCandidateTrustSummary.demoJourneyDesc",
+    ctaKey: "companyCandidateTrustSummary.linkHiringCockpit",
+    status: "pilot",
+    moduleFamily: "trust",
+    boundaryTags: ["pilot", "human_decision_required", "no_outreach"],
+  },
+  {
     id: "company_hiring_cockpit",
     persona: "company",
     href: COMPANY_HIRING_COCKPIT_ROUTE,

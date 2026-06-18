@@ -55,6 +55,7 @@ export {
   resolveCandidateConsentReceipt,
   resolveRecruiterTrustReviewQueue,
   resolveCandidateTrustOverview,
+  resolveCompanyCandidateTrustSummary,
   resolveCompanyHiringCockpit,
   resolveDecisionMemory,
   resolveJobPipeline,
