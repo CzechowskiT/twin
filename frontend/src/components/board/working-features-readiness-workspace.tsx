@@ -16,9 +16,11 @@ import type { TranslationKey } from "@/lib/i18n";
 
 function section(marker: string, title: string, body: string): ReactNode {
   return (
-    <Card variant="soft" className="border-[var(--twin-border)]/80 p-5" data-testid={marker}>
-      <h2 className="text-sm font-semibold uppercase text-[var(--twin-muted-strong)]">{title}</h2>
-      <p className="mt-3 text-sm">{body}</p>
+    <Card variant="soft" className="border-[var(--twin-border)]/80 p-5">
+      <div data-testid={marker}>
+        <h2 className="text-sm font-semibold uppercase text-[var(--twin-muted-strong)]">{title}</h2>
+        <p className="mt-3 text-sm">{body}</p>
+      </div>
     </Card>
   );
 }
@@ -87,14 +89,16 @@ export function WorkingFeaturesReadinessWorkspace() {
           t("workingFeaturesReadiness.riskOrderLead"),
         )}
 
-        <Card variant="soft" data-testid={WORKING_FEATURES_READINESS_MARKERS.implementation} className="p-5">
-          <h2 className="text-sm font-semibold uppercase">{t("workingFeaturesReadiness.implementationTitle")}</h2>
-          <p className="mt-2 text-xs text-[var(--twin-muted-strong)]">{t("workingFeaturesReadiness.implementationLead")}</p>
-          <ol className="mt-3 list-decimal space-y-2 pl-4 text-sm">
-            {record.steps.map((key) => (
-              <li key={key}>{t(key as TranslationKey)}</li>
-            ))}
-          </ol>
+        <Card variant="soft" className="p-5">
+          <div data-testid={WORKING_FEATURES_READINESS_MARKERS.implementation}>
+            <h2 className="text-sm font-semibold uppercase">{t("workingFeaturesReadiness.implementationTitle")}</h2>
+            <p className="mt-2 text-xs text-[var(--twin-muted-strong)]">{t("workingFeaturesReadiness.implementationLead")}</p>
+            <ol className="mt-3 list-decimal space-y-2 pl-4 text-sm">
+              {record.steps.map((key) => (
+                <li key={key}>{t(key as TranslationKey)}</li>
+              ))}
+            </ol>
+          </div>
         </Card>
 
         {section(
