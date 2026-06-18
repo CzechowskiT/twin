@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { ExportPreviewPanel } from "@/components/candidate/export-preview-panel";
 import { CorrectionRequestPanel } from "@/components/candidate/correction-request-panel";
+import { IdentityVerificationPanel } from "@/components/candidate/identity-verification-panel";
 import { DataPortabilityPanel } from "@/components/candidate/data-portability-panel";
 import { RevokeDeletePanel } from "@/components/candidate/revoke-delete-panel";
 import { TrustAuditExportPanel } from "@/components/candidate/trust-audit-export-panel";
@@ -26,6 +27,7 @@ import {
 } from "@/lib/candidate-control-center";
 import { resolveCandidateExportPreview } from "@/lib/candidate-export-preview";
 import { resolveCandidateCorrectionRequest } from "@/lib/candidate-correction-request";
+import { resolveCandidateIdentityVerification } from "@/lib/candidate-identity-verification";
 import { resolveCandidateDataPortability } from "@/lib/candidate-data-portability";
 import { resolveCandidateRevokeDelete } from "@/lib/candidate-revoke-delete";
 import { resolveCandidateTrustAuditExport } from "@/lib/candidate-trust-audit-export";
@@ -127,6 +129,7 @@ function ControlCenterNotFound() {
 function ControlCenterContent({ record }: { record: CandidateControlCenterRecord }) {
   const { t } = useTranslation();
   const exportPreviewRecord = resolveCandidateExportPreview(record.id);
+  const identityVerificationRecord = resolveCandidateIdentityVerification(record.id);
   const correctionRequestRecord = resolveCandidateCorrectionRequest(record.id);
   const dataPortabilityRecord = resolveCandidateDataPortability(record.id);
   const revokeDeleteRecord = resolveCandidateRevokeDelete(record.id);
@@ -249,6 +252,20 @@ function ControlCenterContent({ record }: { record: CandidateControlCenterRecord
                 ))}
               </ul>
             </>
+          ),
+        )}
+
+        {sectionCard(
+          CANDIDATE_CONTROL_CENTER_MARKERS.identityVerification,
+          t("candidateControlCenter.identityVerificationTitle"),
+          identityVerificationRecord ? (
+            <IdentityVerificationPanel
+              record={identityVerificationRecord}
+              compact
+              marker={CANDIDATE_CONTROL_CENTER_MARKERS.identityVerification}
+            />
+          ) : (
+            <p className="text-xs text-[var(--twin-muted-strong)]">{t("candidateControlCenter.identityVerificationLead")}</p>
           ),
         )}
 

@@ -17,6 +17,7 @@ import {
   resolveCandidateExportPreview,
 } from "@/lib/candidate-export-preview";
 import { candidateCorrectionRequestHref } from "@/lib/candidate-correction-request";
+import { candidateIdentityVerificationHref } from "@/lib/candidate-identity-verification";
 import { candidateDataPortabilityHref } from "@/lib/candidate-data-portability";
 import { candidateRevokeDeleteHref } from "@/lib/candidate-revoke-delete";
 import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
@@ -116,6 +117,13 @@ function ExportPreviewContent({ record }: { record: CandidateExportPreviewRecord
               data-testid="candidate-export-preview-controls-link"
             >
               {t("candidateExportPreview.linkControlCenter")}
+            </Link>
+            <Link
+              href={candidateIdentityVerificationHref()}
+              className="twin-link font-medium"
+              data-testid="candidate-export-preview-identity-verification-link"
+            >
+              {t("candidateIdentityVerification.pageTitle")}
             </Link>
             <Link
               href={candidateCorrectionRequestHref()}

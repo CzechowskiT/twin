@@ -50,6 +50,10 @@ import {
   type CandidateCorrectionRequestRecord,
 } from "@/lib/candidate-correction-request-demo-data";
 import {
+  getCandidateIdentityVerificationDemo,
+  type CandidateIdentityVerificationRecord,
+} from "@/lib/candidate-identity-verification-demo-data";
+import {
   getCandidateDataPortabilityDemo,
   type CandidateDataPortabilityRecord,
 } from "@/lib/candidate-data-portability-demo-data";
@@ -192,6 +196,14 @@ export function adaptCandidateCorrectionRequest(
   const trimmed = (candidateId ?? TWIN_DEMO_CANDIDATE_PRIMARY_ID).trim();
   if (!trimmed || trimmed !== TWIN_DEMO_CANDIDATE_PRIMARY_ID) return null;
   return getCandidateCorrectionRequestDemo();
+}
+
+export function adaptCandidateIdentityVerification(
+  candidateId?: string,
+): CandidateIdentityVerificationRecord | null {
+  const trimmed = (candidateId ?? TWIN_DEMO_CANDIDATE_PRIMARY_ID).trim();
+  if (!trimmed || trimmed !== TWIN_DEMO_CANDIDATE_PRIMARY_ID) return null;
+  return getCandidateIdentityVerificationDemo();
 }
 
 export function adaptCandidateDataPortability(
