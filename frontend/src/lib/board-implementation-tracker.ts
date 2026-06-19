@@ -7,6 +7,12 @@ import {
   type ImplementationFeatureRow,
   type ImplementationTrackerRecord,
 } from "@/lib/board-implementation-tracker-demo-data";
+import {
+  BOARD_PERSISTENCE_BLOCKED_KEYS,
+  BOARD_PERSISTENCE_BLOCKED_MARKER,
+  BOARD_PERSISTENCE_SHIPPED_KEYS,
+  BOARD_PERSISTENCE_SHIPPED_MARKER,
+} from "@/lib/board-persistence-state";
 
 export { LAUNCH_STANCE };
 export type { ImplementationFeatureRow, ImplementationTrackerRecord };
@@ -28,6 +34,8 @@ export const BOARD_IMPLEMENTATION_TRACKER_MARKERS = {
   ownerSummary: "board-implementation-tracker-owner-summary",
   blockedRegister: "board-implementation-tracker-blocked-register",
   pilotBadge: "board-implementation-tracker-pilot-badge",
+  shippedState: BOARD_PERSISTENCE_SHIPPED_MARKER,
+  blockedState: BOARD_PERSISTENCE_BLOCKED_MARKER,
 } as const;
 
 export const BOARD_IMPLEMENTATION_TRACKER_FORBIDDEN_PATTERNS: RegExp[] = [
@@ -61,3 +69,5 @@ export function getImplementationTrackerOwners(): string[] {
   }
   return [...owners].sort();
 }
+
+export { BOARD_PERSISTENCE_BLOCKED_KEYS, BOARD_PERSISTENCE_SHIPPED_KEYS };

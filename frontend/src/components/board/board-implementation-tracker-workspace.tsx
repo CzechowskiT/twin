@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
+import { BoardPersistenceStateSections } from "@/components/board/board-persistence-state-sections";
 import {
   LAUNCH_STANCE,
   BOARD_IMPLEMENTATION_TRACKER_LINKS,
@@ -173,6 +174,11 @@ export function BoardImplementationTrackerWorkspace() {
             </ul>
           </>,
         )}
+
+        <BoardPersistenceStateSections
+          shippedTitle={t("boardPersistenceState.shippedTitle")}
+          blockedTitle={t("boardPersistenceState.blockedTitle")}
+        />
 
         {section(
           BOARD_IMPLEMENTATION_TRACKER_MARKERS.blockedRegister,
