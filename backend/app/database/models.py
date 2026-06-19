@@ -1158,3 +1158,22 @@ class WorkItem(Base):
         onupdate=datetime.utcnow,
     )
 
+
+class CandidateRoleStatus(Base):
+    """Safe non-final pipeline status per candidate-role pair."""
+
+    __tablename__ = "candidate_role_statuses"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_ref: Mapped[str] = mapped_column(String(64), index=True)
+    role_ref: Mapped[str] = mapped_column(String(64), index=True)
+    status: Mapped[str] = mapped_column(String(32))
+    company_slug: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    updated_by_user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
+
