@@ -15,11 +15,15 @@ import {
   type RecruiterTrustReviewQueueRecord,
 } from "@/lib/recruiter-trust-review-queue-demo-data";
 import { requestIntakeRecruiterHref } from "@/lib/request-intake";
+import { fetchSafePersistenceList } from "@/lib/safe-persistence-api";
+
+export type SafePersistenceSource = "live" | "demo";
 
 export { RECRUITER_TRUST_REVIEW_QUEUE_DEMO_CANDIDATE_ID };
 export { LAUNCH_STANCE };
 
 export const RECRUITER_TRUST_REVIEW_QUEUE_ROUTE = "/recruiter/trust-review-queue";
+export const REVIEW_QUEUE_API_PATH = "/api/v1/review-queue";
 
 export const RECRUITER_TRUST_REVIEW_QUEUE_PAGE_MARKER = "recruiter-trust-review-queue-page";
 
@@ -69,4 +73,20 @@ export function recruiterTrustReviewQueueHref(): string {
 
 export function resolveRecruiterTrustReviewQueue(): RecruiterTrustReviewQueueRecord {
   return getRecruiterTrustReviewQueueDemo();
+}
+
+type ApiReviewItem = { id: number; item_kind: string; subject_ref: string; status: string };
+type ApiReviewResponse = { items: ApiReviewItem[] };
+
+export async function loadRecruiterTrustReviewQueue(): Promise<{
+  source: SafePersistenceSource;
+  record: RecruiterTrustReviewQueueRecord;
+  liveCount: number;
+}> {
+  const demo = getRecruiterTrustReviewQueueDemo();
+  const result = await fetchSafePersistenceList<ApiReviewResponse>(REVIEW_QUEUE_API_PATH, { items: [] });
+  if (result.source === "live") {
+    return { source: "live", record: demo, liveCount: result.data.items.length };
+  }
+  return { source: "demo", record: demo, liveCount: 0 };
 }

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
@@ -9,7 +10,9 @@ import {
   LAUNCH_STANCE,
   WORK_ITEMS_MARKERS,
   WORK_ITEMS_PAGE_MARKER,
+  loadWorkItems,
   resolveWorkItems,
+  type SafePersistenceSource,
   type WorkItemRow,
 } from "@/lib/work-items";
 import type { TranslationKey } from "@/lib/i18n";
@@ -29,8 +32,24 @@ function section(marker: string, title: string, children: ReactNode): ReactNode 
 
 export function WorkItemsWorkspace({ scope }: Props) {
   const { t } = useTranslation();
-  const record = resolveWorkItems(scope);
+  const [record, setRecord] = useState(() => resolveWorkItems(scope));
+  const [source, setSource] = useState<SafePersistenceSource>("demo");
+
+  useEffect(() => {
+    let active = true;
+    void loadWorkItems(scope).then((res) => {
+      if (!active) return;
+      setRecord(res.record);
+      setSource(res.source);
+    });
+    return () => {
+      active = false;
+    };
+  }, [scope]);
+
   const titleKey = scope === "recruiter" ? "workItems.recruiterTitle" : "workItems.companyTitle";
+  const sourceKey =
+    source === "live" ? "safePersistence.liveApi" : "safePersistence.demoFallback";
 
   return (
     <Shell wide>
@@ -46,6 +65,9 @@ export function WorkItemsWorkspace({ scope }: Props) {
           </p>
           <h1 className="twin-section-title text-2xl">{t(titleKey as TranslationKey)}</h1>
           <p className="text-sm text-[var(--twin-muted-strong)]">{t("workItems.headerLead")}</p>
+          <p className="text-xs text-[var(--twin-muted)]" data-testid="work-items-data-source">
+            {t(sourceKey as "safePersistence.liveApi")}
+          </p>
           <span data-testid={WORK_ITEMS_MARKERS.pilotBadge} className="inline-block rounded-full border px-3 py-1 text-xs" data-launch-stance={LAUNCH_STANCE}>
             {t("workItems.pilotBadge")}
           </span>

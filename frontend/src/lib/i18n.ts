@@ -207,6 +207,7 @@ export type TranslationKey =
   | `implementationTracker.${keyof typeof en.implementationTracker}`
   | `firstWorkingPersistencePlan.${keyof typeof en.firstWorkingPersistencePlan}`
   | `auditEventFoundation.${keyof typeof en.auditEventFoundation}`
+  | `safePersistence.${keyof typeof en.safePersistence}`
   | `workItems.${keyof typeof en.workItems}`
   | `candidateRoleStatus.${keyof typeof en.candidateRoleStatus}`
   | `companyFeedback.${keyof typeof en.companyFeedback}`
@@ -5892,6 +5893,12 @@ eyebrow: "Product roadmap",
     phase3bBlocked: "Phase 3B remains HARD BLOCKED.",
     demoJourneyTitle: "Audit event foundation",
     demoJourneyDesc: "Append-only audit event persistence — safe internal write foundation.",
+  },
+  safePersistence: {
+    liveApi: "Live API connected — internal records only, no external side effect.",
+    demoFallback: "Demo fallback — authentication required for live API.",
+    internalRecords: "internal records",
+    authRequired: "Authentication required for live API.",
   },
   workItems: {
     pageEyebrow: "Work items",
@@ -12570,6 +12577,12 @@ const pl: MessageTree = {
     phase3bBlocked: "Phase 3B pozostaje HARD BLOCKED.",
     demoJourneyTitle: "Fundament zdarzeń audytu",
     demoJourneyDesc: "Persystencja zdarzeń audytu append-only — bezpieczny fundament zapisu wewnętrznego.",
+  },
+  safePersistence: {
+    liveApi: "Live API podłączone — tylko rekordy wewnętrzne, bez efektu zewnętrznego.",
+    demoFallback: "Demo fallback — live API wymaga uwierzytelnienia.",
+    internalRecords: "rekordów wewnętrznych",
+    authRequired: "Live API wymaga uwierzytelnienia.",
   },
   workItems: {
     pageEyebrow: "Elementy pracy",
