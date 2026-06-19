@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
+import { BoardPersistenceStateSections } from "@/components/board/board-persistence-state-sections";
 import {
   FIRST_WORKING_PERSISTENCE_PLAN_LINKS,
   FIRST_WORKING_PERSISTENCE_PLAN_MARKERS,
@@ -190,6 +191,11 @@ export function FirstWorkingPersistencePlanWorkspace() {
             <p className="text-xs text-[var(--twin-muted-strong)]">{t("firstWorkingPersistencePlan.phase3bBlocked")}</p>
           </>,
         )}
+
+        <BoardPersistenceStateSections
+          shippedTitle={t("boardPersistenceState.shippedTitle")}
+          blockedTitle={t("boardPersistenceState.blockedTitle")}
+        />
       </div>
     </Shell>
   );

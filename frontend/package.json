@@ -215,6 +215,7 @@
     "test:company-hiring-command-center-browser": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'&&process.env.PLAYWRIGHT_ENABLE_BROWSER_TESTS!=='1'){console.error('Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 or PLAYWRIGHT_ALLOW_PROD_SMOKE=1');process.exit(1)}\" && npm run test:company-hiring-command-center-browser:raw",
     "test:company-hiring-command-center-browser:raw": "playwright test e2e/company-hiring-command-center-browser.spec.ts --workers=1",
     "test:board-implementation-tracker": "npx --yes tsx scripts/board-implementation-tracker.test.ts",
+    "test:board-persistence-state": "npx --yes tsx scripts/board-persistence-state.test.ts",
     "test:board-implementation-tracker-browser": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'&&process.env.PLAYWRIGHT_ENABLE_BROWSER_TESTS!=='1'){console.error('Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 or PLAYWRIGHT_ALLOW_PROD_SMOKE=1');process.exit(1)}\" && npm run test:board-implementation-tracker-browser:raw",
     "test:board-implementation-tracker-browser:raw": "playwright test e2e/board-implementation-tracker-browser.spec.ts --workers=1",
     "test:first-working-persistence-plan": "npx --yes tsx scripts/first-working-persistence-plan.test.ts",

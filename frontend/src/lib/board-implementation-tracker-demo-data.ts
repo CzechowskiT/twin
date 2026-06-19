@@ -44,7 +44,7 @@ export function getImplementationTrackerDemo(): ImplementationTrackerRecord {
     row(
       "persist_notes",
       "implementationTracker.featurePersistentNotes",
-      "planned",
+      "pilot",
       "implementationTracker.nextNotesAppendOnly",
       "implementationTracker.depPersonaAuth",
       "implementationTracker.boundaryNoOutbound",
@@ -55,7 +55,7 @@ export function getImplementationTrackerDemo(): ImplementationTrackerRecord {
     row(
       "persist_tasks",
       "implementationTracker.featurePersistentTasks",
-      "planned",
+      "pilot",
       "implementationTracker.nextTasksOwnership",
       "implementationTracker.depNotesSchema",
       "implementationTracker.boundaryHumanDecision",
@@ -77,7 +77,7 @@ export function getImplementationTrackerDemo(): ImplementationTrackerRecord {
     row(
       "audit_event",
       "implementationTracker.featureAuditEvent",
-      "planned",
+      "pilot",
       "implementationTracker.nextAuditAppendOnly",
       "implementationTracker.depEventSchema",
       "implementationTracker.boundaryAppendOnly",
@@ -88,13 +88,13 @@ export function getImplementationTrackerDemo(): ImplementationTrackerRecord {
     row(
       "visibility_preference",
       "implementationTracker.featureVisibilityPreference",
-      "demo",
+      "pilot",
       "implementationTracker.nextConsentScope",
       "implementationTracker.depTrustCenter",
       "implementationTracker.boundaryNoRevoke",
       "Trust",
       "P1",
-      true,
+      false,
     ),
   ];
 
@@ -129,7 +129,7 @@ export function getImplementationTrackerDemo(): ImplementationTrackerRecord {
     row(
       "read_only_export",
       "implementationTracker.featureReadOnlyExport",
-      "demo",
+      "pilot",
       "implementationTracker.nextExportPreview",
       "implementationTracker.depAuditEvent",
       "implementationTracker.boundaryReadOnlyPreview",
@@ -143,7 +143,7 @@ export function getImplementationTrackerDemo(): ImplementationTrackerRecord {
     row(
       "request_intake_queue",
       "implementationTracker.featureRequestIntakeQueue",
-      "planned",
+      "pilot",
       "implementationTracker.nextIntakeAppend",
       "implementationTracker.depPersonaAuth",
       "implementationTracker.boundaryHumanDecision",

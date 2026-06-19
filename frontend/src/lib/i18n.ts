@@ -205,6 +205,7 @@ export type TranslationKey =
   | `workingFeaturesReadiness.${keyof typeof en.workingFeaturesReadiness}`
   | `workingDataReadiness.${keyof typeof en.workingDataReadiness}`
   | `implementationTracker.${keyof typeof en.implementationTracker}`
+  | `boardPersistenceState.${keyof typeof en.boardPersistenceState}`
   | `firstWorkingPersistencePlan.${keyof typeof en.firstWorkingPersistencePlan}`
   | `auditEventFoundation.${keyof typeof en.auditEventFoundation}`
   | `safePersistence.${keyof typeof en.safePersistence}`
@@ -5773,6 +5774,21 @@ eyebrow: "Product roadmap",
     boundaryLaunchNoGo: "Launch NO-GO",
     demoJourneyTitle: "Implementation tracker",
     demoJourneyDesc: "Internal board tracker for persistence and integration milestones — planning only.",
+  },
+  boardPersistenceState: {
+    shippedTitle: "Persistence shipped (backend + safe UI actions)",
+    blockedTitle: "Persistence still blocked",
+    shippedAuditEvents: "Audit events foundation — migrations 060, auth-gated GET/POST",
+    shippedWorkItems: "Work items — safe create/update UI wired (#208, #215)",
+    shippedReviewQueue: "Review queue — live GET with demo fallback (#208)",
+    shippedCompanyFeedback: "Company feedback — draft/submitted_for_review UI (#209, #216)",
+    shippedVisibilityPreferences: "Visibility preferences — safe POST/PATCH UI (#212)",
+    shippedExportRequests: "Export requests — preview record queue UI (#213)",
+    shippedRequestIntake: "Request intake — live counts in recruiter queues (#214)",
+    blockedEmailDraft: "Email draft approval — outbound still HARD BLOCKED",
+    blockedAtsWriteback: "ATS writeback — not live",
+    blockedDeleteRevoke: "Delete/revoke workflows — deferred",
+    blockedPublicLaunch: "Public launch — NO-GO (O7/S2 gates open)",
   },
   firstWorkingPersistencePlan: {
     pageEyebrow: "First working persistence plan",
@@ -12472,6 +12488,21 @@ const pl: MessageTree = {
     boundaryLaunchNoGo: "Launch NO-GO",
     demoJourneyTitle: "Tracker implementacji",
     demoJourneyDesc: "Wewnętrzny tracker board dla milestone persystencji i integracji — tylko planowanie.",
+  },
+  boardPersistenceState: {
+    shippedTitle: "Persystencja wdrożona (backend + bezpieczne akcje UI)",
+    blockedTitle: "Persystencja nadal zablokowana",
+    shippedAuditEvents: "Fundament audit events — migracje 060, GET/POST za auth",
+    shippedWorkItems: "Work items — podpięte bezpieczne create/update UI (#208, #215)",
+    shippedReviewQueue: "Review queue — live GET z demo fallback (#208)",
+    shippedCompanyFeedback: "Company feedback — UI draft/submitted_for_review (#209, #216)",
+    shippedVisibilityPreferences: "Visibility preferences — bezpieczne POST/PATCH UI (#212)",
+    shippedExportRequests: "Export requests — UI kolejki rekordów podglądu (#213)",
+    shippedRequestIntake: "Request intake — live count w kolejkach rekrutera (#214)",
+    blockedEmailDraft: "Zatwierdzenie szkicu email — outbound nadal HARD BLOCKED",
+    blockedAtsWriteback: "Writeback ATS — not live",
+    blockedDeleteRevoke: "Workflow delete/revoke — odłożone",
+    blockedPublicLaunch: "Public launch — NO-GO (bramki O7/S2 otwarte)",
   },
   firstWorkingPersistencePlan: {
     pageEyebrow: "Plan pierwszej working persistence",
