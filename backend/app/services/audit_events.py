@@ -18,6 +18,7 @@ ALLOWED_EVENT_TYPES = frozenset(
         "note_appended",
         "task_created",
         "queue_item_opened",
+        "queue_item_opened",
         "feedback_drafted",
         "review_opened",
         "foundation_demo",
@@ -28,6 +29,7 @@ ALLOWED_TARGET_TYPES = frozenset(
     {
         "work_item",
         "candidate_role",
+        "review_queue_item",
         "review_queue_item",
         "company_feedback",
         "audit_event",
