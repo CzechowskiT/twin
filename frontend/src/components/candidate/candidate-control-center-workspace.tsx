@@ -34,6 +34,7 @@ import { resolveCandidateRevokeDelete } from "@/lib/candidate-revoke-delete";
 import { resolveCandidateConsentReceipt } from "@/lib/candidate-consent-receipt";
 import { candidateTrustOverviewHref } from "@/lib/candidate-trust-overview";
 import { resolveCandidateTrustAuditExport } from "@/lib/candidate-trust-audit-export";
+import { candidateVisibilityPreferencesHref } from "@/lib/candidate-visibility-preferences";
 import type { CandidateControlCenterRecord } from "@/lib/candidate-control-center-demo-data";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -223,6 +224,9 @@ function ControlCenterContent({ record }: { record: CandidateControlCenterRecord
           t("candidateControlCenter.visibilityControlsTitle"),
           <>
             <p className="text-xs text-[var(--twin-muted-strong)]">{t("candidateControlCenter.visibilityControlsLead")}</p>
+            <Link href={candidateVisibilityPreferencesHref()} className="twin-link text-xs" data-testid="candidate-control-center-visibility-preferences-link">
+              {t("candidateControlCenter.linkVisibilityPreferences")}
+            </Link>
             <ul className="space-y-3">
               {record.visibility_controls.map((ctrl) => (
                 <li key={ctrl.id} className="flex flex-wrap items-start justify-between gap-2 rounded-lg border border-[var(--twin-border)]/60 p-3">

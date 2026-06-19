@@ -21,6 +21,7 @@ from app.api import (
     calendar_microsoft,
     candidates,
     candidate_role_status,
+    candidate_visibility_preferences,
     company,
     career_assistant,
     curated_careers,
@@ -53,6 +54,11 @@ api_router.include_router(
     candidate_role_status.router,
     prefix="/candidate-role-status",
     tags=["Candidate role status"],
+)
+api_router.include_router(
+    candidate_visibility_preferences.router,
+    prefix="/candidate-visibility-preferences",
+    tags=["Candidate visibility preferences"],
 )
 api_router.include_router(review_queue.router, prefix="/review-queue", tags=["Review queue"])
 api_router.include_router(
