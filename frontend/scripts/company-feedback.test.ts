@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
-import { COMPANY_FEEDBACK_ROUTE } from "../src/components/company/company-feedback-workspace";
+import { COMPANY_FEEDBACK_ROUTE } from "../src/lib/company-feedback";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const repo = join(root, "..");
@@ -19,4 +19,9 @@ test("7 seven sections", () => {
   assert.match(ws, /COMPANY_FEEDBACK_MARKERS\.boundary/);
   assert.match(ws, /visibilityBoundary/);
 });
-test("8 no hire in service", () => assert.doesNotMatch(readFileSync(join(repo, "backend/app/services/company_feedback_persistence.py"), "utf8"), /\bhired\b/));
+test("8 live api wiring", () => {
+  const ws = readFileSync(join(root, "src/components/company/company-feedback-workspace.tsx"), "utf8");
+  assert.match(ws, /loadCompanyFeedback/);
+  assert.match(ws, /company-feedback-data-source/);
+});
+test("9 no hire in service", () => assert.doesNotMatch(readFileSync(join(repo, "backend/app/services/company_feedback_persistence.py"), "utf8"), /\bhired\b/));

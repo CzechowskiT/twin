@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 
 import { CompanyWorkspaceNav } from "@/components/company/company-workspace-nav";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
+import { loadCompanyFeedback } from "@/lib/company-feedback";
 import type { CommandCenterQueueItem } from "@/lib/company-hiring-command-center-demo-data";
 import {
   companyCommandCenterPipelineHref,
@@ -68,6 +70,20 @@ function queueList(items: CommandCenterQueueItem[], profileLabel: string): React
 export function CompanyHiringCommandCenterWorkspace() {
   const { t } = useTranslation();
   const record = resolveCompanyHiringCommandCenter();
+  const [feedbackSourceKey, setFeedbackSourceKey] = useState<"safePersistence.demoFallback" | "safePersistence.liveApi">(
+    "safePersistence.demoFallback",
+  );
+
+  useEffect(() => {
+    let active = true;
+    void loadCompanyFeedback().then((res) => {
+      if (!active) return;
+      setFeedbackSourceKey(res.source === "live" ? "safePersistence.liveApi" : "safePersistence.demoFallback");
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <Shell wide rail>
@@ -89,6 +105,9 @@ export function CompanyHiringCommandCenterWorkspace() {
               </p>
               <h1 className="twin-section-title text-2xl sm:text-3xl">{t("companyHiringCommandCenter.title")}</h1>
               <p className="text-sm text-[var(--twin-muted-strong)]">{t("companyHiringCommandCenter.lead")}</p>
+              <p className="text-xs text-[var(--twin-muted)]" data-testid="company-hiring-command-center-feedback-source">
+                {t("companyFeedback.panelFeedbackSource")}: {t(feedbackSourceKey)}
+              </p>
             </div>
             <div className="flex flex-wrap gap-2">
               <span
