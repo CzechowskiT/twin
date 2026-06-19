@@ -192,6 +192,11 @@ export const EXECUTIVE_PRODUCT_PROOF_DEMO_LINKS = [
     href: "/board/working-data-readiness",
     labelKey: "workingDataReadiness.demoJourneyTitle" as TranslationKey,
   },
+  {
+    id: "board_implementation_tracker",
+    href: "/board/implementation-tracker",
+    labelKey: "implementationTracker.demoJourneyTitle" as TranslationKey,
+  },
 ] as const;
 
 export function getExecutiveProductProofSorStack(): readonly ExecutiveProofSorLayer[] {
