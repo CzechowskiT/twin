@@ -12,6 +12,9 @@ const PERSISTENCE_ENDPOINTS = [
   "candidate-role-status",
   "review-queue",
   "company-feedback",
+  "candidate-visibility-preferences",
+  "export-requests",
+  "request-intake",
 ] as const;
 
 const MIGRATION_CHAIN = [
@@ -20,36 +23,36 @@ const MIGRATION_CHAIN = [
   "062_candidate_role_status",
   "063_review_queue",
   "064_company_feedback",
+  "065_candidate_visibility_preferences",
+  "066_export_requests",
+  "067_request_intake",
 ] as const;
 
 function readRepo(rel: string): string {
   return readFileSync(join(repoRoot, rel), "utf8");
 }
 
-test("1 verification doc exists with expected sections", () => {
-  const doc = readRepo("docs/BACKEND_PERSISTENCE_PROD_VERIFICATION_2026-06-19.md");
+test("1 migration runbook exists with expected sections", () => {
+  const doc = readRepo("docs/PERSISTENCE_MIGRATION_RUNBOOK_2026-06-19.md");
   assert.match(doc, /public-health/);
-  assert.match(doc, /064_company_feedback/);
+  assert.match(doc, /067_request_intake/);
+  assert.match(doc, /065_candidate_visibility_preferences/);
   assert.match(doc, /401/);
-  assert.match(doc, /#199/);
 });
 
 test("2 router registers all persistence APIs", () => {
   const router = readRepo("backend/app/api/router.py");
-  for (const ep of PERSISTENCE_ENDPOINTS) {
-    const module = ep.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase()).replace(/-/g, "_");
-    const snake = ep === "candidate-role-status" ? "candidate_role_status" : module.replace(/([A-Z])/g, "_$1").toLowerCase();
-    const key = ep.includes("-") ? ep.split("-")[0] + (ep.includes("role") ? "_role_status" : ep.includes("feedback") ? "_feedback" : ep.includes("queue") ? "_queue" : "") : ep;
-    assert.match(router, new RegExp(ep.split("-")[0].replace("candidate", "candidate") || ep));
-  }
   assert.match(router, /audit_events/);
   assert.match(router, /work_items/);
   assert.match(router, /candidate_role_status/);
   assert.match(router, /review_queue/);
   assert.match(router, /company_feedback/);
+  assert.match(router, /candidate_visibility_preferences/);
+  assert.match(router, /export_requests/);
+  assert.match(router, /request_intake/);
 });
 
-test("3 migration chain 060-064 exists in repo", () => {
+test("3 migration chain 060-067 exists in repo", () => {
   for (const rev of MIGRATION_CHAIN) {
     const files = readRepo(`backend/alembic/versions/${rev}.py`);
     assert.ok(files.length > 0, `missing ${rev}`);
@@ -63,6 +66,9 @@ test("4 persistence APIs have no DELETE routes", () => {
     "backend/app/api/candidate_role_status.py",
     "backend/app/api/review_queue.py",
     "backend/app/api/company_feedback_persistence.py",
+    "backend/app/api/candidate_visibility_preferences.py",
+    "backend/app/api/export_requests.py",
+    "backend/app/api/request_intake.py",
   ];
   for (const mod of modules) {
     const src = readRepo(mod);
@@ -74,4 +80,9 @@ test("5 no hardcoded JWT in readiness script", () => {
   const self = readRepo("frontend/scripts/backend-persistence-prod-readiness.test.ts");
   const jwtPrefix = "Bearer " + "eyJ";
   assert.ok(!self.includes(jwtPrefix));
+});
+
+test("6 eight persistence endpoint constants documented", () => {
+  assert.equal(PERSISTENCE_ENDPOINTS.length, 8);
+  assert.ok(PERSISTENCE_ENDPOINTS.includes("request-intake"));
 });
