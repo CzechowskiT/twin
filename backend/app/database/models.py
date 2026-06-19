@@ -1135,3 +1135,26 @@ class AuditEvent(Base):
     external_side_effect: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
 
+
+class WorkItem(Base):
+    """Recruiter/company notes and tasks — safe internal persistence."""
+
+    __tablename__ = "work_items"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    item_type: Mapped[str] = mapped_column(String(32), index=True)
+    title: Mapped[str] = mapped_column(String(200))
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="open")
+    due_date: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    owner_label: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    persona_scope: Mapped[str] = mapped_column(String(32), index=True)
+    company_slug: Mapped[str | None] = mapped_column(String(80), nullable=True, index=True)
+    created_by_user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
+
