@@ -1177,3 +1177,24 @@ class CandidateRoleStatus(Base):
         onupdate=datetime.utcnow,
     )
 
+
+class ReviewQueueItem(Base):
+    """Internal recruiter review queue — no approve/reject/fulfill."""
+
+    __tablename__ = "review_queue_items"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    item_kind: Mapped[str] = mapped_column(String(64))
+    subject_ref: Mapped[str] = mapped_column(String(128))
+    status: Mapped[str] = mapped_column(String(32), default="open")
+    priority: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    owner_label: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    company_slug: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    created_by_user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
+

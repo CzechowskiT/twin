@@ -39,6 +39,7 @@ from app.api import (
     public,
     recruiter,
     referrals,
+    review_queue,
     talent_pool,
     work_items,
 )
@@ -52,6 +53,7 @@ api_router.include_router(
     prefix="/candidate-role-status",
     tags=["Candidate role status"],
 )
+api_router.include_router(review_queue.router, prefix="/review-queue", tags=["Review queue"])
 api_router.include_router(csp_reports.router, tags=["Security"])
 api_router.include_router(demo.router, prefix="/demo", tags=["Demo"])
 api_router.include_router(public.router, prefix="/public", tags=["Public"])
