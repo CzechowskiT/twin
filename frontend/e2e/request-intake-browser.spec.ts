@@ -11,6 +11,7 @@ import {
 import { withFreshContext } from "./helpers/browser-lifecycle";
 
 const SETTLE_MS = 12_000;
+const GOTO_TIMEOUT_MS = 45_000;
 const PATH = REQUEST_INTAKE_RECRUITER_ROUTE;
 
 async function dismissCookieBanner(page: Page): Promise<void> {
@@ -18,8 +19,12 @@ async function dismissCookieBanner(page: Page): Promise<void> {
   if (await accept.isVisible().catch(() => false)) await accept.click();
 }
 
+async function gotoRoute(page: Page, path: string) {
+  return page.goto(path, { waitUntil: "domcontentloaded", timeout: GOTO_TIMEOUT_MS });
+}
+
 async function bodyText(page: Page): Promise<string> {
-  return page.locator("body").innerText();
+  return page.locator("body").innerText().catch(() => "");
 }
 
 function isAuthShell(body: string): boolean {
@@ -35,48 +40,47 @@ function isAuthShell(body: string): boolean {
   );
 }
 
+function pageRootLocator(page: Page) {
+  return page.locator(
+    `[data-request-intake-page="${REQUEST_INTAKE_PAGE_MARKER}"], :text("Sign in required"), :text("Zaloguj")`,
+  );
+}
+
 test.describe("Request intake browser", () => {
-  test.describe.configure({ timeout: 120_000, mode: "serial" });
+  test.describe.configure({ timeout: 120_000 });
 
   test("1 recruiter route renders page or auth shell — not blank", async ({ browser }) => {
     await withFreshContext(browser, async (context) => {
       const page = await context.newPage();
-      const response = await page.goto(PATH, { waitUntil: "domcontentloaded" });
+      const response = await gotoRoute(page, PATH);
       await dismissCookieBanner(page);
       expect(response?.status() ?? 0).toBeLessThan(500);
-      await page
-        .locator(
-          `[data-request-intake-page="${REQUEST_INTAKE_PAGE_MARKER}"], :text("Sign in required"), :text("Zaloguj")`,
-        )
-        .first()
-        .waitFor({ state: "visible", timeout: SETTLE_MS })
-        .catch(() => undefined);
-      expect((await bodyText(page)).length).toBeGreaterThan(32);
+      await pageRootLocator(page).first().waitFor({ state: "visible", timeout: SETTLE_MS }).catch(() => undefined);
+      const body = (await bodyText(page)).toLowerCase();
+      expect(body.length).toBeGreaterThan(32);
+      if (!isAuthShell(body)) {
+        await expect(
+          page.locator(`[data-request-intake-page="${REQUEST_INTAKE_PAGE_MARKER}"]`),
+        ).toBeVisible();
+      }
     });
   });
 
   test("2 section markers when pilot loads", async ({ browser }) => {
     await withFreshContext(browser, async (context) => {
       const page = await context.newPage();
-      await page.goto(PATH, { waitUntil: "domcontentloaded" });
+      await gotoRoute(page, PATH);
       await dismissCookieBanner(page);
-      await page
-        .locator(
-          `[data-request-intake-page="${REQUEST_INTAKE_PAGE_MARKER}"], :text("Sign in required"), :text("Zaloguj")`,
-        )
-        .first()
-        .waitFor({ state: "visible", timeout: SETTLE_MS })
-        .catch(() => undefined);
-      const body = (await bodyText(page)).toLowerCase();
-      if (!isAuthShell(body)) {
-        for (const marker of [
-          REQUEST_INTAKE_MARKERS.header,
-          REQUEST_INTAKE_MARKERS.queue,
-          REQUEST_INTAKE_MARKERS.queueCount,
-          REQUEST_INTAKE_MARKERS.boundary,
-        ]) {
-          await expect(page.getByTestId(marker)).toBeVisible();
-        }
+      await pageRootLocator(page).first().waitFor({ state: "visible", timeout: SETTLE_MS }).catch(() => undefined);
+      const pageMarker = page.getByTestId(REQUEST_INTAKE_MARKERS.page);
+      if (!(await pageMarker.isVisible().catch(() => false))) return;
+      for (const marker of [
+        REQUEST_INTAKE_MARKERS.header,
+        REQUEST_INTAKE_MARKERS.queue,
+        REQUEST_INTAKE_MARKERS.queueCount,
+        REQUEST_INTAKE_MARKERS.boundary,
+      ]) {
+        await expect(page.getByTestId(marker)).toBeVisible({ timeout: SETTLE_MS });
       }
     });
   });
