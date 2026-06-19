@@ -919,6 +919,17 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     boundaryTags: ["pilot", "human_decision_required", "no_outreach", "not_live"],
   },
   {
+    id: "audit_event_foundation",
+    persona: "investor",
+    href: "/board/audit-event-foundation",
+    titleKey: "auditEventFoundation.demoJourneyTitle",
+    descriptionKey: "auditEventFoundation.demoJourneyDesc",
+    ctaKey: "auditEventFoundation.pageTitle",
+    status: "pilot",
+    moduleFamily: "trust",
+    boundaryTags: ["pilot", "human_decision_required", "no_outreach", "not_live", "backend_write"],
+  },
+  {
     id: "investor_trust_proof",
     persona: "investor",
     href: "/investor/trust-proof",

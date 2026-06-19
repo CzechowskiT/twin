@@ -203,6 +203,7 @@ export type TranslationKey =
   | `workingDataReadiness.${keyof typeof en.workingDataReadiness}`
   | `implementationTracker.${keyof typeof en.implementationTracker}`
   | `firstWorkingPersistencePlan.${keyof typeof en.firstWorkingPersistencePlan}`
+  | `auditEventFoundation.${keyof typeof en.auditEventFoundation}`
   | `recruiterOperationalWorkQueue.${keyof typeof en.recruiterOperationalWorkQueue}`
   | `teamCollaboration.${keyof typeof en.teamCollaboration}`
   | `safeCommunication.${keyof typeof en.safeCommunication}`
@@ -5819,6 +5820,34 @@ eyebrow: "Product roadmap",
     noRouteIntake: "No intake queue write route shipped in this slice",
     demoJourneyTitle: "First working persistence plan",
     demoJourneyDesc: "Spec-only backend rollout sequence for first working persistence — no routes or writes.",
+  },
+  auditEventFoundation: {
+    pageEyebrow: "Audit event foundation",
+    pageTitle: "Append-only audit event foundation",
+    pilotBadge: "PILOT · SAFE INTERNAL WRITE · NO EXTERNAL SIDE EFFECT",
+    headerLead:
+      "First backend-safe persistence layer — append-only audit events with persona auth. Internal write only; no outbound hooks.",
+    contractTitle: "API contract",
+    contractLead: "GET and POST only — no update or delete endpoints.",
+    allowedMethods: "Allowed methods",
+    samplesTitle: "Sample events",
+    samplesLead: "Demo-safe event examples — append-only, external_side_effect=false.",
+    boundariesTitle: "Safety boundaries",
+    boundariesLead: "Hard limits on this persistence foundation.",
+    boundaryAppendOnly: "Append-only — no update/delete on audit rows",
+    boundaryNoOutbound: "No email, calendar, ATS, or outreach from this layer",
+    boundaryAuthRequired: "Authenticated persona required on reads and writes",
+    boundaryNoLegalClaim: "No legal or GDPR compliance claims",
+    boundaryInternalOnly: "Internal TWIN DB write only — not live externally",
+    apiPreviewTitle: "API preview",
+    apiPreviewLead: "Authenticated clients may call GET/POST /api/v1/audit-events.",
+    apiPreviewNote: "Working feature preview — safe persistence with no external side effect.",
+    launchTitle: "Launch / P0 / Phase 3B status",
+    launchNoGo: "Public launch remains NO-GO until O7 and S2 gates close.",
+    p0Open: "P0 performance remains OPEN.",
+    phase3bBlocked: "Phase 3B remains HARD BLOCKED.",
+    demoJourneyTitle: "Audit event foundation",
+    demoJourneyDesc: "Append-only audit event persistence — safe internal write foundation.",
   },
   recruiterOperationalWorkQueue: {
     pageEyebrow: "Operational work queue",
@@ -12394,6 +12423,34 @@ const pl: MessageTree = {
     noRouteIntake: "Brak route write kolejki intake w tym slice",
     demoJourneyTitle: "Plan pierwszej working persistence",
     demoJourneyDesc: "Tylko spec sekwencji rollout backend dla pierwszej working persistence — bez route ani zapisów.",
+  },
+  auditEventFoundation: {
+    pageEyebrow: "Fundament zdarzeń audytu",
+    pageTitle: "Fundament zdarzeń audytu append-only",
+    pilotBadge: "PILOT · BEZPIECZNY ZAPIS WEWNĘTRZNY · BEZ EFEKTU ZEWNĘTRZNEGO",
+    headerLead:
+      "Pierwsza warstwa backend-safe persistence — zdarzenia audytu append-only z auth persony. Tylko zapis wewnętrzny; bez hooków outbound.",
+    contractTitle: "Kontrakt API",
+    contractLead: "Tylko GET i POST — bez endpointów update ani delete.",
+    allowedMethods: "Dozwolone metody",
+    samplesTitle: "Przykładowe zdarzenia",
+    samplesLead: "Przykłady demo-safe — append-only, external_side_effect=false.",
+    boundariesTitle: "Granice bezpieczeństwa",
+    boundariesLead: "Twarde limity tego fundamentu persystencji.",
+    boundaryAppendOnly: "Append-only — bez update/delete na wierszach audytu",
+    boundaryNoOutbound: "Bez email, kalendarza, ATS ani outreach z tej warstwy",
+    boundaryAuthRequired: "Uwierzytelniona persona wymagana przy odczycie i zapisie",
+    boundaryNoLegalClaim: "Bez roszczeń prawnych ani zgodności GDPR",
+    boundaryInternalOnly: "Tylko zapis w wewnętrznej DB TWIN — nie live na zewnątrz",
+    apiPreviewTitle: "Podgląd API",
+    apiPreviewLead: "Uwierzytelnieni klienci mogą wołać GET/POST /api/v1/audit-events.",
+    apiPreviewNote: "Podgląd working feature — safe persistence bez efektu zewnętrznego.",
+    launchTitle: "Stan launch / P0 / Phase 3B",
+    launchNoGo: "Public launch pozostaje NO-GO do zamknięcia bramek O7 i S2.",
+    p0Open: "P0 performance pozostaje OPEN.",
+    phase3bBlocked: "Phase 3B pozostaje HARD BLOCKED.",
+    demoJourneyTitle: "Fundament zdarzeń audytu",
+    demoJourneyDesc: "Persystencja zdarzeń audytu append-only — bezpieczny fundament zapisu wewnętrznego.",
   },
   recruiterOperationalWorkQueue: {
     pageEyebrow: "Kolejka operacyjna",
