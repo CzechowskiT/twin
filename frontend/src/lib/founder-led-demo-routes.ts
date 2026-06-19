@@ -34,6 +34,7 @@ import { recruiterDailyCockpitHref } from "@/lib/recruiter-daily-operating-cockp
 import { recruiterTrustReviewQueueHref } from "@/lib/recruiter-trust-review-queue";
 import { companyCandidateTrustSummaryHref } from "@/lib/company-candidate-trust-summary";
 import { companyHiringCockpitHref } from "@/lib/company-hiring-cockpit";
+import { companyHiringCommandCenterHref } from "@/lib/company-hiring-command-center";
 import { investorTrustProofHref } from "@/lib/investor-trust-proof";
 import { workingFeaturesReadinessHref } from "@/lib/working-features-readiness";
 import { workingDataReadinessHref } from "@/lib/working-data-readiness";
@@ -288,6 +289,14 @@ export const FOUNDER_LED_DEMO_JOURNEY_STEPS: readonly FounderLedDemoLink[] = [
     descKey: "companyHiringCockpit.demoJourneyDesc",
   },
   {
+    id: "company_hiring_command_center",
+    href: companyHiringCommandCenterHref(),
+    requiresAuth: true,
+    loginPath: "/login/company",
+    titleKey: "companyHiringCommandCenter.demoJourneyTitle",
+    descKey: "companyHiringCommandCenter.demoJourneyDesc",
+  },
+  {
     id: "investor_trust_proof",
     href: investorTrustProofHref(),
     requiresAuth: false,
@@ -375,6 +384,7 @@ export const FOUNDER_LED_DEMO_EXTENDED_ROUTES = [
   "/recruiter/candidates/demo-candidate-001/decision-memory",
   "/recruiter/daily-cockpit",
   "/company/hiring-cockpit",
+  "/company/hiring-command-center",
   "/company/candidates/demo-candidate-001",
   "/recruiter/inbox",
   "/dashboard/jobs",

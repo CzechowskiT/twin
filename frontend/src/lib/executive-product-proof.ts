@@ -23,6 +23,7 @@ import { recruiterDailyCockpitHref } from "@/lib/recruiter-daily-operating-cockp
 import { recruiterTrustReviewQueueHref } from "@/lib/recruiter-trust-review-queue";
 import { companyCandidateTrustSummaryHref } from "@/lib/company-candidate-trust-summary";
 import { companyHiringCockpitHref } from "@/lib/company-hiring-cockpit";
+import { companyHiringCommandCenterHref } from "@/lib/company-hiring-command-center";
 import { candidateCommunicationHref } from "@/lib/safe-communication";
 import { candidateTeamHref } from "@/lib/team-collaboration";
 import {
@@ -165,6 +166,11 @@ export const EXECUTIVE_PRODUCT_PROOF_DEMO_LINKS = [
     id: "hiring_cockpit",
     href: companyHiringCockpitHref(),
     labelKey: "executiveProductProof.linkHiringCockpit" as TranslationKey,
+  },
+  {
+    id: "hiring_command_center",
+    href: companyHiringCommandCenterHref(),
+    labelKey: "companyHiringCommandCenter.demoJourneyTitle" as TranslationKey,
   },
   {
     id: "company_candidate_trust_summary",
