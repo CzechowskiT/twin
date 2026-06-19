@@ -205,6 +205,7 @@ export type TranslationKey =
   | `firstWorkingPersistencePlan.${keyof typeof en.firstWorkingPersistencePlan}`
   | `auditEventFoundation.${keyof typeof en.auditEventFoundation}`
   | `workItems.${keyof typeof en.workItems}`
+  | `candidateRoleStatus.${keyof typeof en.candidateRoleStatus}`
   | `recruiterOperationalWorkQueue.${keyof typeof en.recruiterOperationalWorkQueue}`
   | `teamCollaboration.${keyof typeof en.teamCollaboration}`
   | `safeCommunication.${keyof typeof en.safeCommunication}`
@@ -5872,6 +5873,11 @@ eyebrow: "Product roadmap",
     recruiterMirror: "Recruiter view →",
     demoJourneyTitle: "Work items persistence",
     demoJourneyDesc: "Notes and tasks with safe internal persistence and audit trail.",
+  },
+  candidateRoleStatus: {
+    pageTitle: "Candidate role status",
+    headerLead: "Safe non-final pipeline statuses — no hire/reject/auto decision.",
+    boundaryLead: "Human review required · no ATS writeback · no email · append-only audit on change.",
   },
   recruiterOperationalWorkQueue: {
     pageEyebrow: "Operational work queue",
@@ -12498,6 +12504,11 @@ const pl: MessageTree = {
     recruiterMirror: "Widok rekrutera →",
     demoJourneyTitle: "Persystencja work items",
     demoJourneyDesc: "Notatki i zadania z bezpieczną persystencją wewnętrzną i śladem audytu.",
+  },
+  candidateRoleStatus: {
+    pageTitle: "Status kandydat-rola",
+    headerLead: "Bezpieczne niefinalne statusy pipeline — bez hire/reject/auto decyzji.",
+    boundaryLead: "Wymagany przegląd człowieka · bez writeback ATS · bez email · audyt append-only przy zmianie.",
   },
   recruiterOperationalWorkQueue: {
     pageEyebrow: "Kolejka operacyjna",

@@ -19,6 +19,7 @@ from app.api import (
     calendar,
     calendar_microsoft,
     candidates,
+    candidate_role_status,
     company,
     career_assistant,
     curated_careers,
@@ -46,6 +47,11 @@ api_router = APIRouter()
 api_router.include_router(health.router, tags=["Health"])
 api_router.include_router(audit_events.router, prefix="/audit-events", tags=["Audit events"])
 api_router.include_router(work_items.router, prefix="/work-items", tags=["Work items"])
+api_router.include_router(
+    candidate_role_status.router,
+    prefix="/candidate-role-status",
+    tags=["Candidate role status"],
+)
 api_router.include_router(csp_reports.router, tags=["Security"])
 api_router.include_router(demo.router, prefix="/demo", tags=["Demo"])
 api_router.include_router(public.router, prefix="/public", tags=["Public"])
