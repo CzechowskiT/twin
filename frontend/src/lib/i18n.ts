@@ -206,6 +206,7 @@ export type TranslationKey =
   | `auditEventFoundation.${keyof typeof en.auditEventFoundation}`
   | `workItems.${keyof typeof en.workItems}`
   | `candidateRoleStatus.${keyof typeof en.candidateRoleStatus}`
+  | `companyFeedback.${keyof typeof en.companyFeedback}`
   | `recruiterOperationalWorkQueue.${keyof typeof en.recruiterOperationalWorkQueue}`
   | `teamCollaboration.${keyof typeof en.teamCollaboration}`
   | `safeCommunication.${keyof typeof en.safeCommunication}`
@@ -5878,6 +5879,15 @@ eyebrow: "Product roadmap",
     pageTitle: "Candidate role status",
     headerLead: "Safe non-final pipeline statuses — no hire/reject/auto decision.",
     boundaryLead: "Human review required · no ATS writeback · no email · append-only audit on change.",
+  },
+  companyFeedback: {
+    pageTitle: "Company feedback",
+    listLead: "Internal feedback list — company scope only, no candidate route leakage.",
+    draftLead: "Feedback draft form preview — POST /api/v1/company-feedback.",
+    reviewLead: "Review status: draft, submitted_for_review, needs_revision.",
+    visibilityLead: "Candidate visibility boundary — not shared to candidate routes.",
+    auditLead: "Append-only audit trail on every feedback write.",
+    boundaryLead: "No hire/reject final action · no email · no ATS writeback · human review required.",
   },
   recruiterOperationalWorkQueue: {
     pageEyebrow: "Operational work queue",
@@ -12509,6 +12519,15 @@ const pl: MessageTree = {
     pageTitle: "Status kandydat-rola",
     headerLead: "Bezpieczne niefinalne statusy pipeline — bez hire/reject/auto decyzji.",
     boundaryLead: "Wymagany przegląd człowieka · bez writeback ATS · bez email · audyt append-only przy zmianie.",
+  },
+  companyFeedback: {
+    pageTitle: "Feedback firmy",
+    listLead: "Wewnętrzna lista feedbacku — tylko scope firmy, bez wycieku na route kandydata.",
+    draftLead: "Podgląd formularza szkicu feedbacku — POST /api/v1/company-feedback.",
+    reviewLead: "Status przeglądu: draft, submitted_for_review, needs_revision.",
+    visibilityLead: "Granica widoczności kandydata — nie udostępniane na route kandydata.",
+    auditLead: "Ślad audytu append-only przy każdym zapisie feedbacku.",
+    boundaryLead: "Bez finalnej akcji hire/reject · bez email · bez writeback ATS · wymagany przegląd człowieka.",
   },
   recruiterOperationalWorkQueue: {
     pageEyebrow: "Kolejka operacyjna",

@@ -7,6 +7,7 @@ from app.api import (
     auto_apply_settings,
     admin_ops,
     company,
+    company_feedback_persistence,
     consent,
     csp_reports,
     demo,
@@ -54,6 +55,11 @@ api_router.include_router(
     tags=["Candidate role status"],
 )
 api_router.include_router(review_queue.router, prefix="/review-queue", tags=["Review queue"])
+api_router.include_router(
+    company_feedback_persistence.router,
+    prefix="/company-feedback",
+    tags=["Company feedback"],
+)
 api_router.include_router(csp_reports.router, tags=["Security"])
 api_router.include_router(demo.router, prefix="/demo", tags=["Demo"])
 api_router.include_router(public.router, prefix="/public", tags=["Public"])

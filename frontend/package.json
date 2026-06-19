@@ -227,7 +227,8 @@
     "test:work-items-browser": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'&&process.env.PLAYWRIGHT_ENABLE_BROWSER_TESTS!=='1'){console.error('Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 or PLAYWRIGHT_ALLOW_PROD_SMOKE=1');process.exit(1)}\" && npm run test:work-items-browser:raw",
     "test:work-items-browser:raw": "playwright test e2e/work-items-browser.spec.ts --workers=1",
     "test:candidate-role-status": "npx --yes tsx scripts/candidate-role-status.test.ts",
-    "test:review-queue": "npx --yes tsx scripts/review-queue.test.ts"
+    "test:review-queue": "npx --yes tsx scripts/review-queue.test.ts",
+    "test:company-feedback": "npx --yes tsx scripts/company-feedback.test.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

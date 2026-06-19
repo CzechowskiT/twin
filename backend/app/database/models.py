@@ -1198,3 +1198,24 @@ class ReviewQueueItem(Base):
         onupdate=datetime.utcnow,
     )
 
+
+class CompanyFeedbackItem(Base):
+    """Internal company hiring feedback drafts — no hire/reject outbound."""
+
+    __tablename__ = "company_feedback_items"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_ref: Mapped[str] = mapped_column(String(64))
+    role_ref: Mapped[str] = mapped_column(String(64))
+    status: Mapped[str] = mapped_column(String(32), default="draft")
+    rating_preview: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    comment: Mapped[str | None] = mapped_column(Text, nullable=True)
+    company_slug: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    created_by_user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
+
