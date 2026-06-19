@@ -927,7 +927,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     ctaKey: "auditEventFoundation.pageTitle",
     status: "pilot",
     moduleFamily: "trust",
-    boundaryTags: ["pilot", "human_decision_required", "no_outreach", "not_live", "backend_write"],
+    boundaryTags: ["pilot", "human_decision_required", "no_outreach", "not_live"],
   },
   {
     id: "investor_trust_proof",
