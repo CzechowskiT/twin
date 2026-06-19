@@ -1118,3 +1118,20 @@ class LinkedinOptimization(Base):
     optimization_json: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
+
+class AuditEvent(Base):
+    """Append-only internal audit ledger — no update/delete; no external side effects."""
+
+    __tablename__ = "audit_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    event_type: Mapped[str] = mapped_column(String(64), index=True)
+    actor_persona: Mapped[str] = mapped_column(String(32), index=True)
+    actor_id: Mapped[str] = mapped_column(String(64))
+    target_type: Mapped[str] = mapped_column(String(64), index=True)
+    target_id: Mapped[str] = mapped_column(String(128), index=True)
+    metadata_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    source: Mapped[str] = mapped_column(String(32), default="twin_internal")
+    external_side_effect: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+

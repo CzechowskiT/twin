@@ -40,6 +40,7 @@ import { workingFeaturesReadinessHref } from "@/lib/working-features-readiness";
 import { workingDataReadinessHref } from "@/lib/working-data-readiness";
 import { boardImplementationTrackerHref } from "@/lib/board-implementation-tracker";
 import { firstWorkingPersistencePlanHref } from "@/lib/first-working-persistence-plan";
+import { auditEventFoundationHref } from "@/lib/audit-event-foundation";
 import { jobPipelineHref, JOB_PIPELINE_DEMO_ID } from "@/lib/job-pipeline";
 
 export type FounderLedDemoLink = {
@@ -332,6 +333,13 @@ export const FOUNDER_LED_DEMO_JOURNEY_STEPS: readonly FounderLedDemoLink[] = [
     requiresAuth: false,
     titleKey: "firstWorkingPersistencePlan.demoJourneyTitle",
     descKey: "firstWorkingPersistencePlan.demoJourneyDesc",
+  },
+  {
+    id: "audit_event_foundation",
+    href: auditEventFoundationHref(),
+    requiresAuth: false,
+    titleKey: "auditEventFoundation.demoJourneyTitle",
+    descKey: "auditEventFoundation.demoJourneyDesc",
   },
   {
     id: "weekly_digest",

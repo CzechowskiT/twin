@@ -202,6 +202,11 @@ export const EXECUTIVE_PRODUCT_PROOF_DEMO_LINKS = [
     href: "/board/first-working-persistence-plan",
     labelKey: "firstWorkingPersistencePlan.demoJourneyTitle" as TranslationKey,
   },
+  {
+    id: "audit_event_foundation",
+    href: "/board/audit-event-foundation",
+    labelKey: "auditEventFoundation.demoJourneyTitle" as TranslationKey,
+  },
 ] as const;
 
 export function getExecutiveProductProofSorStack(): readonly ExecutiveProofSorLayer[] {
