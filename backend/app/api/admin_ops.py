@@ -3,6 +3,7 @@
 from pydantic import BaseModel, Field
 
 from fastapi import APIRouter, Depends, Header, HTTPException, status
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
@@ -26,6 +27,37 @@ def _require_ops_admin(settings: Settings, authorization: str | None) -> None:
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail="Ops admin token not configured")
     if (authorization or "").strip() != f"Bearer {token}":
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid admin token")
+
+
+EXPECTED_ALEMBIC_HEAD = "067_request_intake"
+
+
+def _read_alembic_current(db: Session) -> str | None:
+    """Read-only Alembic revision from alembic_version — no secrets."""
+    try:
+        row = db.execute(text("SELECT version_num FROM alembic_version LIMIT 1")).fetchone()
+        return str(row[0]) if row and row[0] else None
+    except Exception:
+        return None
+
+
+@router.get("/migrations/current")
+def admin_migrations_current(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+) -> dict:
+    """Read-only Alembic current vs expected repo head — ops admin only."""
+    _require_ops_admin(settings, authorization)
+    current = _read_alembic_current(db)
+    head = EXPECTED_ALEMBIC_HEAD
+    return {
+        "current_revision": current,
+        "head_revision": head,
+        "head_revisions": [head],
+        "is_at_head": current == head if current else False,
+        "read_only": True,
+    }
 
 
 @router.get("/deploy-health")
