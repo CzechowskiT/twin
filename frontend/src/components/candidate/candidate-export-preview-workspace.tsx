@@ -6,6 +6,7 @@ import { useMemo } from "react";
 
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { ExportPreviewPanel } from "@/components/candidate/export-preview-panel";
+import { ExportRequestPersistenceNote } from "@/components/candidate/export-request-persistence-note";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
@@ -22,6 +23,7 @@ import { candidateDataPortabilityHref } from "@/lib/candidate-data-portability";
 import { candidateRevokeDeleteHref } from "@/lib/candidate-revoke-delete";
 import { candidateConsentReceiptHref } from "@/lib/candidate-consent-receipt";
 import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
+import { exportRequestsHref } from "@/lib/export-requests";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -168,11 +170,16 @@ function ExportPreviewContent({ record }: { record: CandidateExportPreviewRecord
             >
               {t("candidateExportPreview.linkProfile")}
             </Link>
+            <Link href={exportRequestsHref()} className="twin-link font-medium" data-testid="candidate-export-preview-export-requests-link">
+              {t("exportRequests.linkExportRequests")}
+            </Link>
             <Link href={CANDIDATE_EXPORT_PREVIEW_SAFE_LINKS.gdprConsent} className="twin-link font-medium">
               {t("candidateExportPreview.linkGdprConsent")}
             </Link>
           </div>
         </header>
+
+        <ExportRequestPersistenceNote testId="candidate-export-preview-export-request-note" />
 
         {sectionCard(
           CANDIDATE_EXPORT_PREVIEW_MARKERS.bundlePreview,

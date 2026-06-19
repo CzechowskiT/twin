@@ -6,6 +6,7 @@ import { useMemo } from "react";
 
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { ConsentReceiptPanel } from "@/components/candidate/consent-receipt-panel";
+import { ExportRequestPersistenceNote } from "@/components/candidate/export-request-persistence-note";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
@@ -221,6 +222,8 @@ function ConsentReceiptContent({ record }: { record: CandidateConsentReceiptReco
             </Link>
           </div>
         </header>
+
+        <ExportRequestPersistenceNote testId="candidate-consent-receipt-export-request-note" />
 
         {sectionCard(
           CANDIDATE_CONSENT_RECEIPT_MARKERS.receiptSummary,
