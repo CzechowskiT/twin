@@ -9,6 +9,7 @@ import { TrustAuditExportPanel } from "@/components/candidate/trust-audit-export
 import { ExportRequestPersistenceNote } from "@/components/candidate/export-request-persistence-note";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
+import { EXPORT_REQUEST_TYPES } from "@/lib/export-requests";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
 import type { CandidateTrustAuditExportRecord } from "@/lib/candidate-trust-audit-export-demo-data";
 import {
@@ -207,7 +208,10 @@ function TrustAuditExportContent({ record }: { record: CandidateTrustAuditExport
           </div>
         </header>
 
-        <ExportRequestPersistenceNote testId="candidate-trust-audit-export-request-note" />
+        <ExportRequestPersistenceNote
+          testId="candidate-trust-audit-export-request-note"
+          requestType={EXPORT_REQUEST_TYPES.trustAuditPreview}
+        />
 
         {sectionCard(
           CANDIDATE_TRUST_AUDIT_EXPORT_MARKERS.exportSummary,

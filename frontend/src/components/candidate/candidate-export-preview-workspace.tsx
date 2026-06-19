@@ -23,7 +23,7 @@ import { candidateDataPortabilityHref } from "@/lib/candidate-data-portability";
 import { candidateRevokeDeleteHref } from "@/lib/candidate-revoke-delete";
 import { candidateConsentReceiptHref } from "@/lib/candidate-consent-receipt";
 import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
-import { exportRequestsHref } from "@/lib/export-requests";
+import { EXPORT_REQUEST_TYPES, exportRequestsHref } from "@/lib/export-requests";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -179,7 +179,10 @@ function ExportPreviewContent({ record }: { record: CandidateExportPreviewRecord
           </div>
         </header>
 
-        <ExportRequestPersistenceNote testId="candidate-export-preview-export-request-note" />
+        <ExportRequestPersistenceNote
+          testId="candidate-export-preview-export-request-note"
+          requestType={EXPORT_REQUEST_TYPES.candidateExportPreview}
+        />
 
         {sectionCard(
           CANDIDATE_EXPORT_PREVIEW_MARKERS.bundlePreview,

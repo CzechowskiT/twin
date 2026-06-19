@@ -23,3 +23,19 @@ test("5 export preview note", () => assert.match(readFileSync(join(root, "src/co
 test("6 audit export note", () => assert.match(readFileSync(join(root, "src/components/candidate/candidate-trust-audit-export-workspace.tsx"), "utf8"), /ExportRequestPersistenceNote/));
 test("7 consent receipt note", () => assert.match(readFileSync(join(root, "src/components/candidate/candidate-consent-receipt-workspace.tsx"), "utf8"), /ExportRequestPersistenceNote/));
 test("8 docs", () => assert.ok(existsSync(join(repo, "docs/EXPORT_REQUESTS_2026-06-19.md"))));
+
+test("9 live API wiring", () => {
+  const ws = readFileSync(join(root, "src/components/candidate/export-requests-workspace.tsx"), "utf8");
+  assert.match(ws, /loadExportRequests/);
+  assert.match(ws, /createExportRequestRecord/);
+  assert.match(ws, /EXPORT_REQUESTS_MARKERS\.dataSource/);
+});
+
+test("10 trust surfaces queue action", () => {
+  const preview = readFileSync(join(root, "src/components/candidate/candidate-export-preview-workspace.tsx"), "utf8");
+  assert.match(preview, /EXPORT_REQUEST_TYPES\.candidateExportPreview/);
+  const audit = readFileSync(join(root, "src/components/candidate/candidate-trust-audit-export-workspace.tsx"), "utf8");
+  assert.match(audit, /EXPORT_REQUEST_TYPES\.trustAuditPreview/);
+  const consent = readFileSync(join(root, "src/components/candidate/candidate-consent-receipt-workspace.tsx"), "utf8");
+  assert.match(consent, /EXPORT_REQUEST_TYPES\.consentReceiptPreview/);
+});
