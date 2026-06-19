@@ -197,6 +197,11 @@ export const EXECUTIVE_PRODUCT_PROOF_DEMO_LINKS = [
     href: "/board/implementation-tracker",
     labelKey: "implementationTracker.demoJourneyTitle" as TranslationKey,
   },
+  {
+    id: "first_working_persistence_plan",
+    href: "/board/first-working-persistence-plan",
+    labelKey: "firstWorkingPersistencePlan.demoJourneyTitle" as TranslationKey,
+  },
 ] as const;
 
 export function getExecutiveProductProofSorStack(): readonly ExecutiveProofSorLayer[] {
