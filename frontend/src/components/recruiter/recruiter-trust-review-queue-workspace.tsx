@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspace-nav";
@@ -12,7 +13,9 @@ import {
   RECRUITER_TRUST_REVIEW_QUEUE_MARKERS,
   RECRUITER_TRUST_REVIEW_QUEUE_MODULE_LINKS,
   RECRUITER_TRUST_REVIEW_QUEUE_PAGE_MARKER,
+  loadRecruiterTrustReviewQueue,
   resolveRecruiterTrustReviewQueue,
+  type SafePersistenceSource,
 } from "@/lib/recruiter-trust-review-queue";
 import { requestIntakeRecruiterHref } from "@/lib/request-intake";
 import type { TranslationKey } from "@/lib/i18n";
@@ -37,7 +40,24 @@ function statusKey(status: TrustReviewQueueItem["status"]): TranslationKey {
 
 export function RecruiterTrustReviewQueueWorkspace() {
   const { t } = useTranslation();
-  const record = resolveRecruiterTrustReviewQueue();
+  const [record, setRecord] = useState(() => resolveRecruiterTrustReviewQueue());
+  const [source, setSource] = useState<SafePersistenceSource>("demo");
+  const [liveCount, setLiveCount] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+    void loadRecruiterTrustReviewQueue().then((res) => {
+      if (!active) return;
+      setRecord(res.record);
+      setSource(res.source);
+      setLiveCount(res.liveCount);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const sourceKey = source === "live" ? "safePersistence.liveApi" : "safePersistence.demoFallback";
 
   return (
     <Shell wide rail>
@@ -59,6 +79,10 @@ export function RecruiterTrustReviewQueueWorkspace() {
               </p>
               <h1 className="twin-section-title text-2xl sm:text-3xl">{t("recruiterTrustReviewQueue.pageTitle")}</h1>
               <p className="text-sm text-[var(--twin-muted-strong)]">{record.headline}</p>
+              <p className="text-xs text-[var(--twin-muted)]" data-testid="recruiter-trust-review-queue-data-source">
+                {t(sourceKey)}
+                {source === "live" ? ` · ${liveCount} ${t("safePersistence.internalRecords")}` : ""}
+              </p>
             </div>
             <div className="flex flex-wrap gap-2">
               <span

@@ -7,6 +7,9 @@ import {
   type WorkItemRecord,
   type WorkItemRow,
 } from "@/lib/work-items-demo-data";
+import { fetchSafePersistenceList } from "@/lib/safe-persistence-api";
+
+export type SafePersistenceSource = "live" | "demo";
 
 export { LAUNCH_STANCE };
 export type { WorkItemRecord, WorkItemRow };
@@ -46,4 +49,47 @@ export function workItemsCompanyHref(): string {
 
 export function resolveWorkItems(scope: "recruiter" | "company"): WorkItemRecord {
   return getWorkItemsDemo(scope);
+}
+
+type ApiWorkItem = {
+  id: number;
+  item_type: string;
+  title: string;
+  description?: string | null;
+  status: string;
+  owner_label?: string | null;
+};
+
+type ApiWorkItemsResponse = { items: ApiWorkItem[] };
+
+function mapApiItems(items: ApiWorkItem[]): WorkItemRow[] {
+  return items.map((row) => ({
+    id: String(row.id),
+    item_type: row.item_type as WorkItemRow["item_type"],
+    title: row.title,
+    description: row.description ?? "",
+    status: row.status,
+    owner_label: row.owner_label ?? "—",
+    backend_write: true as const,
+    external_side_effect: false as const,
+  }));
+}
+
+export async function loadWorkItems(scope: "recruiter" | "company"): Promise<{
+  source: SafePersistenceSource;
+  record: WorkItemRecord;
+}> {
+  const demo = getWorkItemsDemo(scope);
+  const query = `?persona_scope=${scope}`;
+  const result = await fetchSafePersistenceList<ApiWorkItemsResponse>(
+    `${WORK_ITEMS_API_PATH}${query}`,
+    { items: demo.items as unknown as ApiWorkItem[] },
+  );
+  if (result.source === "live" && result.data.items.length > 0) {
+    return {
+      source: "live",
+      record: { ...demo, items: mapApiItems(result.data.items) },
+    };
+  }
+  return { source: result.source, record: demo };
 }

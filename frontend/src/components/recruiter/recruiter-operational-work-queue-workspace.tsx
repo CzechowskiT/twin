@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspace-nav";
@@ -15,6 +16,8 @@ import {
   RECRUITER_OPERATIONAL_WORK_QUEUE_PAGE_MARKER,
   resolveRecruiterOperationalWorkQueue,
 } from "@/lib/recruiter-operational-work-queue";
+import { loadRecruiterTrustReviewQueue } from "@/lib/recruiter-trust-review-queue";
+import { loadWorkItems } from "@/lib/work-items";
 import type { TranslationKey } from "@/lib/i18n";
 
 function sectionCard(marker: string, title: string, children: ReactNode): ReactNode {
@@ -53,6 +56,20 @@ function worklistItems(items: WorkQueueItem[], t: (k: TranslationKey) => string)
 export function RecruiterOperationalWorkQueueWorkspace() {
   const { t } = useTranslation();
   const record = resolveRecruiterOperationalWorkQueue();
+  const [sourceKey, setSourceKey] = useState<"safePersistence.demoFallback" | "safePersistence.liveApi">(
+    "safePersistence.demoFallback",
+  );
+
+  useEffect(() => {
+    let active = true;
+    void Promise.all([loadWorkItems("recruiter"), loadRecruiterTrustReviewQueue()]).then(([wi, rq]) => {
+      if (!active) return;
+      setSourceKey(wi.source === "live" || rq.source === "live" ? "safePersistence.liveApi" : "safePersistence.demoFallback");
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <Shell wide rail>
@@ -71,6 +88,9 @@ export function RecruiterOperationalWorkQueueWorkspace() {
               </p>
               <h1 className="twin-section-title text-2xl sm:text-3xl">{t("recruiterOperationalWorkQueue.pageTitle")}</h1>
               <p className="text-sm text-[var(--twin-muted-strong)]">{record.headline}</p>
+              <p className="text-xs text-[var(--twin-muted)]" data-testid="recruiter-operational-work-queue-data-source">
+                {t(sourceKey)}
+              </p>
             </div>
             <span
               className="rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1 text-[10px] font-semibold uppercase text-violet-200"
