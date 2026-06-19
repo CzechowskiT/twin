@@ -77,3 +77,9 @@ test("11 recruiter route constant", () => {
   assert.equal(WORK_ITEMS_RECRUITER_ROUTE, "/recruiter/work-items");
   assert.match(read("package.json"), /test:work-items/);
 });
+
+test("12 create and patch wiring", () => {
+  const ws = read("src/components/recruiter/work-items-workspace.tsx");
+  assert.match(ws, /createWorkItem/);
+  assert.match(ws, /patchWorkItemStatus/);
+});
