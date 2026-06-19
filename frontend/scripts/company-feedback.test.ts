@@ -25,3 +25,11 @@ test("8 live api wiring", () => {
   assert.match(ws, /company-feedback-data-source/);
 });
 test("9 no hire in service", () => assert.doesNotMatch(readFileSync(join(repo, "backend/app/services/company_feedback_persistence.py"), "utf8"), /\bhired\b/));
+
+test("10 draft submit wiring", () => {
+  const ws = readFileSync(join(root, "src/components/company/company-feedback-workspace.tsx"), "utf8");
+  assert.match(ws, /createCompanyFeedbackDraft/);
+  assert.match(ws, /submitCompanyFeedbackForReview/);
+  const lib = readFileSync(join(root, "src/lib/company-feedback.ts"), "utf8");
+  assert.match(lib, /submitted_for_review/);
+});

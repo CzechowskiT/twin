@@ -5948,6 +5948,8 @@ eyebrow: "Product roadmap",
     auditLead: "Append-only audit trail on every feedback write.",
     boundaryLead: "No hire/reject final action · no email · no ATS writeback · human review required.",
     draftInternalNote: "Feedback draft recorded internally — not shared externally, no candidate notification.",
+    draftAction: "Queue internal draft",
+    submitReviewAction: "Mark submitted_for_review (internal)",
     panelFeedbackSource: "Company feedback API",
   },
   recruiterOperationalWorkQueue: {
@@ -12645,6 +12647,8 @@ const pl: MessageTree = {
     auditLead: "Ślad audytu append-only przy każdym zapisie feedbacku.",
     boundaryLead: "Bez finalnej akcji hire/reject · bez email · bez writeback ATS · wymagany przegląd człowieka.",
     draftInternalNote: "Szkic feedbacku zapisany wewnętrznie — nie udostępniany zewnętrznie, bez powiadomienia kandydata.",
+    draftAction: "Kolejkuj wewnętrzny szkic",
+    submitReviewAction: "Oznacz submitted_for_review (wewnętrznie)",
     panelFeedbackSource: "API feedbacku firmy",
   },
   recruiterOperationalWorkQueue: {

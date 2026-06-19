@@ -1,6 +1,6 @@
 /** Company feedback — internal drafts only, no candidate leakage. */
 
-import { fetchSafePersistenceList } from "@/lib/safe-persistence-api";
+import { fetchSafePersistenceList, patchSafePersistence, postSafePersistence, type SafePersistenceWriteResult } from "@/lib/safe-persistence-api";
 
 export const COMPANY_FEEDBACK_API_PATH = "/api/v1/company-feedback";
 
@@ -79,4 +79,23 @@ export async function loadCompanyFeedback(): Promise<{
     };
   }
   return { source: result.source, record: demo };
+}
+
+export async function createCompanyFeedbackDraft(input: {
+  candidate_ref: string;
+  role_ref: string;
+  rating_preview?: string;
+}): Promise<SafePersistenceWriteResult<ApiFeedbackItem>> {
+  return postSafePersistence<ApiFeedbackItem>(COMPANY_FEEDBACK_API_PATH, {
+    candidate_ref: input.candidate_ref,
+    role_ref: input.role_ref,
+    status: "draft",
+    rating_preview: input.rating_preview ?? "preview",
+  });
+}
+
+export async function submitCompanyFeedbackForReview(itemId: string): Promise<SafePersistenceWriteResult<ApiFeedbackItem>> {
+  return patchSafePersistence<ApiFeedbackItem>(`${COMPANY_FEEDBACK_API_PATH}/${itemId}`, {
+    status: "submitted_for_review",
+  });
 }
