@@ -36,6 +36,7 @@ import { companyCandidateTrustSummaryHref } from "@/lib/company-candidate-trust-
 import { companyHiringCockpitHref } from "@/lib/company-hiring-cockpit";
 import { investorTrustProofHref } from "@/lib/investor-trust-proof";
 import { workingFeaturesReadinessHref } from "@/lib/working-features-readiness";
+import { workingDataReadinessHref } from "@/lib/working-data-readiness";
 import { jobPipelineHref, JOB_PIPELINE_DEMO_ID } from "@/lib/job-pipeline";
 
 export type FounderLedDemoLink = {
@@ -299,6 +300,13 @@ export const FOUNDER_LED_DEMO_JOURNEY_STEPS: readonly FounderLedDemoLink[] = [
     requiresAuth: false,
     titleKey: "workingFeaturesReadiness.demoJourneyTitle",
     descKey: "workingFeaturesReadiness.demoJourneyDesc",
+  },
+  {
+    id: "working_data_readiness",
+    href: workingDataReadinessHref(),
+    requiresAuth: false,
+    titleKey: "workingDataReadiness.demoJourneyTitle",
+    descKey: "workingDataReadiness.demoJourneyDesc",
   },
   {
     id: "weekly_digest",

@@ -2,7 +2,6 @@
 
 import { atsImportReadinessHref } from "@/lib/ats-import-readiness";
 import { candidateCollaborationHref } from "@/lib/candidate-collaboration";
-import { investorTrustProofHref } from "@/lib/investor-trust-proof";
 import { workingFeaturesReadinessHref } from "@/lib/working-features-readiness";
 import { candidateProfile360Href } from "@/lib/candidate-profile-360";
 import { candidateTrustCenterHref } from "@/lib/candidate-trust-center";
@@ -174,13 +173,18 @@ export const EXECUTIVE_PRODUCT_PROOF_DEMO_LINKS = [
   },
   {
     id: "investor_trust_proof",
-    href: investorTrustProofHref(),
+    href: "/investor/trust-proof",
     labelKey: "investorTrustProof.demoJourneyTitle" as TranslationKey,
   },
   {
     id: "working_features_readiness",
     href: workingFeaturesReadinessHref(),
     labelKey: "workingFeaturesReadiness.demoJourneyTitle" as TranslationKey,
+  },
+  {
+    id: "working_data_readiness",
+    href: "/board/working-data-readiness",
+    labelKey: "workingDataReadiness.demoJourneyTitle" as TranslationKey,
   },
 ] as const;
 
