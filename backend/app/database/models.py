@@ -1241,3 +1241,19 @@ class CandidateVisibilityPreference(Base):
         onupdate=datetime.utcnow,
     )
 
+
+class ExportRequest(Base):
+    """Read-only export request preview records — no fulfillment."""
+
+    __tablename__ = "export_requests"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    request_type: Mapped[str] = mapped_column(String(64), index=True)
+    candidate_id: Mapped[str] = mapped_column(String(64), index=True)
+    role_context_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="draft")
+    source: Mapped[str] = mapped_column(String(32), default="twin_internal")
+    legal_claim: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_by_user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+

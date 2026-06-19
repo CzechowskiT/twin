@@ -189,6 +189,7 @@ export type TranslationKey =
   | `candidateTrustCenter.${keyof typeof en.candidateTrustCenter}`
   | `candidateControlCenter.${keyof typeof en.candidateControlCenter}`
   | `candidateVisibilityPreferences.${keyof typeof en.candidateVisibilityPreferences}`
+  | `exportRequests.${keyof typeof en.exportRequests}`
   | `candidateExportPreview.${keyof typeof en.candidateExportPreview}`
   | `candidateCorrectionRequest.${keyof typeof en.candidateCorrectionRequest}`
   | `candidateIdentityVerification.${keyof typeof en.candidateIdentityVerification}`
@@ -5000,6 +5001,15 @@ eyebrow: "Product roadmap",
     boundaryNoAts: "No ATS writeback",
     boundaryHumanReview: "Human review required for outreach",
     linkControlCenter: "Back to control center",
+  },
+  exportRequests: {
+    pageTitle: "Export request records",
+    headerLead: "Internal export request preview records only — no fulfillment, no legal claim.",
+    listLead: "POST creates an internal preview record — safe persistence, authentication required for live API.",
+    boundaryLead: "No email sent. No legal export completed. Client-side JSON downloads remain deterministic previews.",
+    inlineNote: "Internal export request preview — safe persistence only, no external side effect.",
+    linkControlCenter: "Control center",
+    linkExportRequests: "View export request records",
   },
   candidateExportPreview: {
     pageEyebrow: "Export preview bundle",
@@ -11661,6 +11671,15 @@ const pl: MessageTree = {
     boundaryNoAts: "Brak writeback ATS",
     boundaryHumanReview: "Outreach wymaga przeglądu człowieka",
     linkControlCenter: "Wróć do centrum kontroli",
+  },
+  exportRequests: {
+    pageTitle: "Rekordy próśb o eksport",
+    headerLead: "Tylko wewnętrzne rekordy podglądu prośby o eksport — bez realizacji, bez roszczenia prawnego.",
+    listLead: "POST tworzy wewnętrzny rekord podglądu — safe persistence, live API wymaga uwierzytelnienia.",
+    boundaryLead: "Brak wysłanego e-maila. Brak ukończonego eksportu prawnego. Pobrania JSON po stronie klienta pozostają deterministycznym podglądem.",
+    inlineNote: "Wewnętrzny podgląd prośby o eksport — tylko safe persistence, bez efektu zewnętrznego.",
+    linkControlCenter: "Centrum kontroli",
+    linkExportRequests: "Zobacz rekordy próśb o eksport",
   },
   candidateExportPreview: {
     pageEyebrow: "Paczka podglądu eksportu",

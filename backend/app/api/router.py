@@ -11,6 +11,7 @@ from app.api import (
     consent,
     csp_reports,
     demo,
+    export_requests,
     ops,
     investor_data_room,
     applications,
@@ -60,6 +61,7 @@ api_router.include_router(
     prefix="/candidate-visibility-preferences",
     tags=["Candidate visibility preferences"],
 )
+api_router.include_router(export_requests.router, prefix="/export-requests", tags=["Export requests"])
 api_router.include_router(review_queue.router, prefix="/review-queue", tags=["Review queue"])
 api_router.include_router(
     company_feedback_persistence.router,

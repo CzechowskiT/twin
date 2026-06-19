@@ -6,6 +6,7 @@ import { useMemo } from "react";
 
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { TrustAuditExportPanel } from "@/components/candidate/trust-audit-export-panel";
+import { ExportRequestPersistenceNote } from "@/components/candidate/export-request-persistence-note";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
@@ -205,6 +206,8 @@ function TrustAuditExportContent({ record }: { record: CandidateTrustAuditExport
             </Link>
           </div>
         </header>
+
+        <ExportRequestPersistenceNote testId="candidate-trust-audit-export-request-note" />
 
         {sectionCard(
           CANDIDATE_TRUST_AUDIT_EXPORT_MARKERS.exportSummary,
