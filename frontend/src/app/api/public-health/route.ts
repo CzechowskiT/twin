@@ -49,11 +49,30 @@ export async function GET() {
       ? health.git_commit
       : null;
   const frontendCommit = resolveDeployCommitFromEnv();
+  const resolvedApi = apiCommit ?? (typeof health.git_commit === "string" ? health.git_commit : "unknown");
+  const resolvedFrontend = frontendCommit ?? "unknown";
+  const shortFe = resolvedFrontend.slice(0, 7);
+  const shortApi = resolvedApi.slice(0, 7);
+  let commitInterpretation =
+    "Compare scaffold HEAD, Vercel frontend_commit, and Railway api_commit/git_commit separately.";
+  if (resolvedFrontend !== "unknown" && resolvedApi !== "unknown") {
+    commitInterpretation =
+      shortFe === shortApi
+        ? "Frontend (Vercel) and API (Railway) commits match on short SHA — aligned deploy for this slice."
+        : "Frontend (Vercel) and API (Railway) commits differ — common after frontend-only or backend-only PRs; verify Alembic head separately.";
+  } else if (resolvedFrontend === "unknown" || resolvedApi === "unknown") {
+    commitInterpretation =
+      "One or both deploy SHAs unknown — check Vercel/Railway deploy logs; migration verification is independent of frontend deploy.";
+  }
   return NextResponse.json({
     ...health,
     celery,
     // Explicit deploy traceability: Vercel FE vs Railway API (git_commit stays API for compat).
-    frontend_commit: frontendCommit ?? "unknown",
-    api_commit: apiCommit ?? health.git_commit ?? "unknown",
+    frontend_commit: resolvedFrontend,
+    api_commit: resolvedApi,
+    backend_git_commit: resolvedApi,
+    deployment_note:
+      "git_commit and api_commit reflect Railway API; frontend_commit reflects Vercel. Scaffold HEAD may differ during partial deploys.",
+    commit_interpretation: commitInterpretation,
   });
 }

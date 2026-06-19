@@ -908,6 +908,17 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     boundaryTags: ["pilot", "human_decision_required", "no_outreach", "not_live"],
   },
   {
+    id: "production_persistence_status",
+    persona: "investor",
+    href: "/board/production-persistence-status",
+    titleKey: "productionPersistenceStatus.demoJourneyTitle",
+    descriptionKey: "productionPersistenceStatus.demoJourneyDesc",
+    ctaKey: "productionPersistenceStatus.pageTitle",
+    status: "pilot",
+    moduleFamily: "trust",
+    boundaryTags: ["pilot", "human_decision_required", "no_outreach", "not_live"],
+  },
+  {
     id: "first_working_persistence_plan",
     persona: "investor",
     href: "/board/first-working-persistence-plan",

@@ -1,0 +1,107 @@
+# Alembic Production Head Verification — 2026-06-19
+
+**Branch:** `ops/prod-persistence-auth-smoke-and-health-clarity-2026-06-19`  
+**Expected repo head:** `067_request_intake`
+
+## Purpose
+
+Read-only verification that Railway production database Alembic revision matches repo head after persistence batch #204–#209.
+
+## Migration chain (060→067)
+
+```
+059_recruiter_talent_pool_import
+  → 060_audit_events_foundation
+  → 061_work_items
+  → 062_candidate_role_status
+  → 063_review_queue
+  → 064_company_feedback
+  → 065_candidate_visibility_preferences
+  → 066_export_requests
+  → 067_request_intake (head)
+```
+
+Local verification:
+
+```bash
+cd backend && alembic heads
+# Expected: 067_request_intake (head)
+```
+
+## Production verification paths
+
+### A. Railway shell (preferred)
+
+```bash
+# In Railway API service shell (read-only)
+alembic current
+# Expected: 067_request_intake (head)
+
+# SQL spot-check (read-only)
+SELECT version_num FROM alembic_version;
+# Expected: 067_request_intake
+```
+
+### B. Admin API endpoint (ops token required)
+
+```bash
+curl -sS -H "Authorization: Bearer $OPS_ADMIN_TOKEN" \
+  "https://<railway-api-host>/api/v1/admin/migrations/current" | jq .
+```
+
+Expected response shape:
+
+```json
+{
+  "current_revision": "067_request_intake",
+  "head_revision": "067_request_intake",
+  "head_revisions": ["067_request_intake"],
+  "is_at_head": true,
+  "read_only": true
+}
+```
+
+- Unauthenticated → **401**
+- No DB secrets in response
+- Read-only — no migration mutation
+
+### C. Table existence (read-only SQL)
+
+```sql
+SELECT COUNT(*) FROM candidate_visibility_preferences;
+SELECT COUNT(*) FROM export_requests;
+SELECT COUNT(*) FROM request_intake_items;
+```
+
+## If current < head
+
+1. **Stop** — do not run ad-hoc writes on production.
+2. Check Railway deploy logs for failed `alembic upgrade head`.
+3. Confirm deployed branch includes migrations 065–067.
+4. Re-deploy API service after fixing migration error.
+5. If migration partially applied — founder incident per `docs/PERSISTENCE_MIGRATION_RUNBOOK_2026-06-19.md`.
+6. **Do not** `alembic downgrade` on production without founder sign-off.
+
+## Rollback / restore note
+
+No automatic downgrade in prod. Failed migration → stop deploy, restore from Railway backup per incident runbook — never restore over production from this verification script.
+
+## Safety
+
+- Read-only verification only — no env change, no prod DB mutation from this doc.
+- public-health `db_ok: true` confirms connectivity, **not** revision level.
+
+## Tests
+
+```bash
+cd backend && pytest tests/test_admin_migrations_current.py -q
+cd frontend && npm run test:backend-persistence-prod-readiness
+```
+
+## Launch stance (unchanged)
+
+| Gate | Status |
+|------|--------|
+| Public launch | **NO-GO** |
+| P0 performance | **OPEN** |
+| Phase 3B | **HARD BLOCKED** |
