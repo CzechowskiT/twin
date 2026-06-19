@@ -223,6 +223,7 @@
     "test:audit-event-foundation": "npx --yes tsx scripts/audit-event-foundation.test.ts",
     "test:audit-event-foundation-browser": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'&&process.env.PLAYWRIGHT_ENABLE_BROWSER_TESTS!=='1'){console.error('Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 or PLAYWRIGHT_ALLOW_PROD_SMOKE=1');process.exit(1)}\" && npm run test:audit-event-foundation-browser:raw",
     "test:audit-event-foundation-browser:raw": "playwright test e2e/audit-event-foundation-browser.spec.ts --workers=1",
+    "test:backend-persistence-prod-readiness": "npx --yes tsx scripts/backend-persistence-prod-readiness.test.ts",
     "test:work-items": "npx --yes tsx scripts/work-items.test.ts",
     "test:work-items-browser": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'&&process.env.PLAYWRIGHT_ENABLE_BROWSER_TESTS!=='1'){console.error('Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 or PLAYWRIGHT_ALLOW_PROD_SMOKE=1');process.exit(1)}\" && npm run test:work-items-browser:raw",
     "test:work-items-browser:raw": "playwright test e2e/work-items-browser.spec.ts --workers=1",
