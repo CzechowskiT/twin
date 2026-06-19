@@ -1257,3 +1257,24 @@ class ExportRequest(Base):
     created_by_user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
+
+class RequestIntakeItem(Base):
+    """Internal trust request intake queue — human review only."""
+
+    __tablename__ = "request_intake_items"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    request_type: Mapped[str] = mapped_column(String(64))
+    subject_ref: Mapped[str] = mapped_column(String(128))
+    status: Mapped[str] = mapped_column(String(32), default="open")
+    candidate_ref: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    company_slug: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    source: Mapped[str] = mapped_column(String(32), default="twin_internal")
+    created_by_user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
+

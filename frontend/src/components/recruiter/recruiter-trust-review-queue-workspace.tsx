@@ -14,6 +14,7 @@ import {
   RECRUITER_TRUST_REVIEW_QUEUE_PAGE_MARKER,
   resolveRecruiterTrustReviewQueue,
 } from "@/lib/recruiter-trust-review-queue";
+import { requestIntakeRecruiterHref } from "@/lib/request-intake";
 import type { TranslationKey } from "@/lib/i18n";
 
 function sectionCard(marker: string, title: string, children: ReactNode): ReactNode {
@@ -80,6 +81,9 @@ export function RecruiterTrustReviewQueueWorkspace() {
                 {t(link.labelKey)}
               </Link>
             ))}
+            <Link href={requestIntakeRecruiterHref()} data-testid={RECRUITER_TRUST_REVIEW_QUEUE_MARKERS.requestIntakeLink} className="twin-link font-medium">
+              {t("recruiterTrustReviewQueue.linkRequestIntake")}
+            </Link>
           </div>
         </header>
 

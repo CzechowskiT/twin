@@ -34,6 +34,7 @@ ALLOWED_TARGET_TYPES = frozenset(
         "company_feedback",
         "visibility_preference",
         "export_request",
+        "request_intake_item",
         "audit_event",
         "demo_target",
     }
