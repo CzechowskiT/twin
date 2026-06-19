@@ -39,11 +39,13 @@ from app.api import (
     recruiter,
     referrals,
     talent_pool,
+    work_items,
 )
 
 api_router = APIRouter()
 api_router.include_router(health.router, tags=["Health"])
 api_router.include_router(audit_events.router, prefix="/audit-events", tags=["Audit events"])
+api_router.include_router(work_items.router, prefix="/work-items", tags=["Work items"])
 api_router.include_router(csp_reports.router, tags=["Security"])
 api_router.include_router(demo.router, prefix="/demo", tags=["Demo"])
 api_router.include_router(public.router, prefix="/public", tags=["Public"])

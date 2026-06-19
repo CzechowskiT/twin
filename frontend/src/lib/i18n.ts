@@ -204,6 +204,7 @@ export type TranslationKey =
   | `implementationTracker.${keyof typeof en.implementationTracker}`
   | `firstWorkingPersistencePlan.${keyof typeof en.firstWorkingPersistencePlan}`
   | `auditEventFoundation.${keyof typeof en.auditEventFoundation}`
+  | `workItems.${keyof typeof en.workItems}`
   | `recruiterOperationalWorkQueue.${keyof typeof en.recruiterOperationalWorkQueue}`
   | `teamCollaboration.${keyof typeof en.teamCollaboration}`
   | `safeCommunication.${keyof typeof en.safeCommunication}`
@@ -5848,6 +5849,29 @@ eyebrow: "Product roadmap",
     phase3bBlocked: "Phase 3B remains HARD BLOCKED.",
     demoJourneyTitle: "Audit event foundation",
     demoJourneyDesc: "Append-only audit event persistence — safe internal write foundation.",
+  },
+  workItems: {
+    pageEyebrow: "Work items",
+    recruiterTitle: "Recruiter notes and tasks",
+    companyTitle: "Company notes and tasks",
+    pilotBadge: "PILOT · SAFE PERSISTENCE · NO OUTBOUND",
+    headerLead: "Working feature preview for notes and tasks — internal write only, append-only audit on every change.",
+    listTitle: "Work item list",
+    createTitle: "Create note or task",
+    createLead: "Preview form for safe POST /api/v1/work-items — authenticated persona required.",
+    createNote: "No email sent · no schedule · no ATS writeback.",
+    statusTitle: "Status update preview",
+    statusLead: "PATCH supports safe fields only: status, title, description, due_date, owner_label.",
+    auditTitle: "Audit trail panel",
+    boundaryTitle: "Boundary panel",
+    boundaryLead: "Human review required · not live externally · no automatic outreach.",
+    disabledEmail: "Send email — disabled (not live)",
+    disabledSchedule: "Schedule interview — disabled (not live)",
+    disabledAts: "ATS sync — disabled (not live)",
+    companyMirror: "Company mirror →",
+    recruiterMirror: "Recruiter view →",
+    demoJourneyTitle: "Work items persistence",
+    demoJourneyDesc: "Notes and tasks with safe internal persistence and audit trail.",
   },
   recruiterOperationalWorkQueue: {
     pageEyebrow: "Operational work queue",
@@ -12451,6 +12475,29 @@ const pl: MessageTree = {
     phase3bBlocked: "Phase 3B pozostaje HARD BLOCKED.",
     demoJourneyTitle: "Fundament zdarzeń audytu",
     demoJourneyDesc: "Persystencja zdarzeń audytu append-only — bezpieczny fundament zapisu wewnętrznego.",
+  },
+  workItems: {
+    pageEyebrow: "Elementy pracy",
+    recruiterTitle: "Notatki i zadania rekrutera",
+    companyTitle: "Notatki i zadania firmy",
+    pilotBadge: "PILOT · SAFE PERSISTENCE · BEZ OUTBOUND",
+    headerLead: "Podgląd working feature dla notatek i zadań — tylko zapis wewnętrzny, audyt append-only przy każdej zmianie.",
+    listTitle: "Lista elementów pracy",
+    createTitle: "Utwórz notatkę lub zadanie",
+    createLead: "Formularz podglądu dla bezpiecznego POST /api/v1/work-items — wymagana uwierzytelniona persona.",
+    createNote: "Bez wysłanego emaila · bez harmonogramu · bez writeback ATS.",
+    statusTitle: "Podgląd aktualizacji statusu",
+    statusLead: "PATCH obsługuje tylko bezpieczne pola: status, title, description, due_date, owner_label.",
+    auditTitle: "Panel śladu audytu",
+    boundaryTitle: "Panel granic",
+    boundaryLead: "Wymagany przegląd człowieka · nie live na zewnątrz · bez automatycznego outreach.",
+    disabledEmail: "Wyślij email — wyłączone (not live)",
+    disabledSchedule: "Zaplanuj rozmowę — wyłączone (not live)",
+    disabledAts: "Sync ATS — wyłączone (not live)",
+    companyMirror: "Mirror firmy →",
+    recruiterMirror: "Widok rekrutera →",
+    demoJourneyTitle: "Persystencja work items",
+    demoJourneyDesc: "Notatki i zadania z bezpieczną persystencją wewnętrzną i śladem audytu.",
   },
   recruiterOperationalWorkQueue: {
     pageEyebrow: "Kolejka operacyjna",
