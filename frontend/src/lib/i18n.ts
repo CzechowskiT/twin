@@ -5023,6 +5023,8 @@ eyebrow: "Product roadmap",
     pilotBadge: "PILOT · INTERNAL INTAKE",
     boundaryLead: "No delete, revoke, email, or legal workflow. Human review required on every row.",
     linkTrustReviewQueue: "Trust review queue",
+    countLabel: "intake rows",
+    queueCountLead: "{count} rows in intake queue — read-only counts, no approve/fulfill.",
   },
   candidateExportPreview: {
     pageEyebrow: "Export preview bundle",
@@ -11715,6 +11717,8 @@ const pl: MessageTree = {
     pilotBadge: "PILOT · WEWNĘTRZNY INTAKE",
     boundaryLead: "Brak delete, revoke, e-maila ani workflow prawnego. Każdy wiersz wymaga przeglądu człowieka.",
     linkTrustReviewQueue: "Kolejka trust review",
+    countLabel: "wierszy intake",
+    queueCountLead: "{count} wierszy w kolejce intake — liczniki read-only, bez approve/fulfill.",
   },
   candidateExportPreview: {
     pageEyebrow: "Paczka podglądu eksportu",

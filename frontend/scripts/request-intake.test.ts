@@ -18,3 +18,12 @@ test("3 no delete", () => assert.doesNotMatch(readFileSync(join(repo, "backend/a
 test("4 trust review link", () => assert.match(readFileSync(join(root, "src/components/recruiter/recruiter-trust-review-queue-workspace.tsx"), "utf8"), /request-intake/));
 test("5 forbidden statuses", () => assert.match(readFileSync(join(repo, "backend/app/services/request_intake.py"), "utf8"), /FORBIDDEN_STATUSES/));
 test("6 docs", () => assert.ok(existsSync(join(repo, "docs/REQUEST_INTAKE_2026-06-19.md"))));
+
+test("7 live count wiring", () => {
+  const ws = readFileSync(join(root, "src/components/recruiter/request-intake-workspace.tsx"), "utf8");
+  assert.match(ws, /loadRequestIntake/);
+  assert.match(ws, /REQUEST_INTAKE_MARKERS\.queueCount/);
+  const op = readFileSync(join(root, "src/components/recruiter/recruiter-operational-work-queue-workspace.tsx"), "utf8");
+  assert.match(op, /loadRequestIntakeCount/);
+  assert.match(op, /recruiter-operational-work-queue-intake-count/);
+});
