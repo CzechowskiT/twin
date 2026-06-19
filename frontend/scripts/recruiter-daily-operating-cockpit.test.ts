@@ -171,9 +171,11 @@ test("17 cockpit copy avoids forbidden outreach/compliance claims", () => {
 });
 
 test("18 module links point to shipped SOR routes", () => {
+  const sorHrefs = new Set(SYSTEM_OF_RECORD_ROUTES.map((r) => r.href));
   for (const link of RECRUITER_DAILY_COCKPIT_MODULE_LINKS) {
     assert.ok(link.href.startsWith("/recruiter"), link.id);
     const valid =
+      sorHrefs.has(link.href) ||
       link.href === "/recruiter" ||
       link.href.includes("demo-candidate-001") ||
       link.href.includes("demo-role-001") ||
