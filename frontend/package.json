@@ -207,7 +207,10 @@
     "test:working-features-readiness-browser:raw": "playwright test e2e/working-features-readiness-browser.spec.ts --workers=1",
     "test:working-data-readiness": "npx --yes tsx scripts/working-data-readiness.test.ts",
     "test:working-data-readiness-browser": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'&&process.env.PLAYWRIGHT_ENABLE_BROWSER_TESTS!=='1'){console.error('Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 or PLAYWRIGHT_ALLOW_PROD_SMOKE=1');process.exit(1)}\" && npm run test:working-data-readiness-browser:raw",
-    "test:working-data-readiness-browser:raw": "playwright test e2e/working-data-readiness-browser.spec.ts --workers=1"
+    "test:working-data-readiness-browser:raw": "playwright test e2e/working-data-readiness-browser.spec.ts --workers=1",
+    "test:recruiter-operational-work-queue": "npx --yes tsx scripts/recruiter-operational-work-queue.test.ts",
+    "test:recruiter-operational-work-queue-browser": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'&&process.env.PLAYWRIGHT_ENABLE_BROWSER_TESTS!=='1'){console.error('Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 or PLAYWRIGHT_ALLOW_PROD_SMOKE=1');process.exit(1)}\" && npm run test:recruiter-operational-work-queue-browser:raw",
+    "test:recruiter-operational-work-queue-browser:raw": "playwright test e2e/recruiter-operational-work-queue-browser.spec.ts --workers=1"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

@@ -390,6 +390,17 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     boundaryTags: ["pilot", "human_decision_required", "no_outreach"],
   },
   {
+    id: "recruiter_operational_work_queue",
+    persona: "recruiter",
+    href: "/recruiter/operational-work-queue",
+    titleKey: "recruiterOperationalWorkQueue.demoJourneyTitle",
+    descriptionKey: "recruiterOperationalWorkQueue.demoJourneyDesc",
+    ctaKey: "recruiterOperationalWorkQueue.openWorkQueue",
+    status: "pilot",
+    moduleFamily: "inbox",
+    boundaryTags: ["pilot", "human_decision_required", "no_outreach", "not_live"],
+  },
+  {
     id: "recruiter_daily_cockpit",
     persona: "recruiter",
     href: "/recruiter/daily-cockpit",
