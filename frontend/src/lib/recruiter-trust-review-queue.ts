@@ -14,6 +14,7 @@ import {
   RECRUITER_TRUST_REVIEW_QUEUE_DEMO_CANDIDATE_ID,
   type RecruiterTrustReviewQueueRecord,
 } from "@/lib/recruiter-trust-review-queue-demo-data";
+import { requestIntakeRecruiterHref } from "@/lib/request-intake";
 
 export { RECRUITER_TRUST_REVIEW_QUEUE_DEMO_CANDIDATE_ID };
 export { LAUNCH_STANCE };
@@ -35,6 +36,7 @@ export const RECRUITER_TRUST_REVIEW_QUEUE_MARKERS = {
   pilotBadge: "recruiter-trust-review-queue-pilot-badge",
   hubPromo: "recruiter-trust-review-queue-hub-promo",
   navLink: "recruiter-trust-review-queue-nav-link",
+  requestIntakeLink: "recruiter-trust-review-queue-request-intake-link",
 } as const;
 
 export const RECRUITER_TRUST_REVIEW_QUEUE_FORBIDDEN_PATTERNS: RegExp[] = [

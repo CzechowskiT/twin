@@ -190,6 +190,7 @@ export type TranslationKey =
   | `candidateControlCenter.${keyof typeof en.candidateControlCenter}`
   | `candidateVisibilityPreferences.${keyof typeof en.candidateVisibilityPreferences}`
   | `exportRequests.${keyof typeof en.exportRequests}`
+  | `requestIntake.${keyof typeof en.requestIntake}`
   | `candidateExportPreview.${keyof typeof en.candidateExportPreview}`
   | `candidateCorrectionRequest.${keyof typeof en.candidateCorrectionRequest}`
   | `candidateIdentityVerification.${keyof typeof en.candidateIdentityVerification}`
@@ -5011,6 +5012,13 @@ eyebrow: "Product roadmap",
     linkControlCenter: "Control center",
     linkExportRequests: "View export request records",
   },
+  requestIntake: {
+    pageTitle: "Request intake queue",
+    headerLead: "Internal human review intake for candidate trust requests — no fulfillment.",
+    pilotBadge: "PILOT · INTERNAL INTAKE",
+    boundaryLead: "No delete, revoke, email, or legal workflow. Human review required on every row.",
+    linkTrustReviewQueue: "Trust review queue",
+  },
   candidateExportPreview: {
     pageEyebrow: "Export preview bundle",
     pageTitle: "Candidate export preview",
@@ -5465,6 +5473,7 @@ eyebrow: "Product roadmap",
     pilotBadge: "READ-ONLY · DEMO QUEUE",
     linkDailyCockpit: "Daily cockpit",
     linkSorHub: "Recruiter hub",
+    linkRequestIntake: "Request intake queue",
     summaryTitle: "Queue summary",
     summaryLead: "Aggregated candidate trust/control events needing human review — read-only, no approvals.",
     summaryTotal: "Total items",
@@ -11681,6 +11690,13 @@ const pl: MessageTree = {
     linkControlCenter: "Centrum kontroli",
     linkExportRequests: "Zobacz rekordy próśb o eksport",
   },
+  requestIntake: {
+    pageTitle: "Kolejka request intake",
+    headerLead: "Wewnętrzny intake do przeglądu człowieka dla próśb trust kandydata — bez realizacji.",
+    pilotBadge: "PILOT · WEWNĘTRZNY INTAKE",
+    boundaryLead: "Brak delete, revoke, e-maila ani workflow prawnego. Każdy wiersz wymaga przeglądu człowieka.",
+    linkTrustReviewQueue: "Kolejka trust review",
+  },
   candidateExportPreview: {
     pageEyebrow: "Paczka podglądu eksportu",
     pageTitle: "Podgląd eksportu kandydata",
@@ -12135,6 +12151,7 @@ const pl: MessageTree = {
     pilotBadge: "TYLKO ODCZYT · KOLEJKA DEMO",
     linkDailyCockpit: "Codzienny kokpit",
     linkSorHub: "Hub rekrutera",
+    linkRequestIntake: "Kolejka request intake",
     summaryTitle: "Podsumowanie kolejki",
     summaryLead: "Zagregowane zdarzenia zaufania/kontroli kandydata wymagające przeglądu — tylko odczyt, bez zatwierdzeń.",
     summaryTotal: "Łącznie pozycji",
