@@ -17,6 +17,7 @@ import {
   resolveRecruiterOperationalWorkQueue,
 } from "@/lib/recruiter-operational-work-queue";
 import { loadRecruiterTrustReviewQueue } from "@/lib/recruiter-trust-review-queue";
+import { loadRequestIntakeCount } from "@/lib/request-intake";
 import { loadWorkItems } from "@/lib/work-items";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -59,13 +60,17 @@ export function RecruiterOperationalWorkQueueWorkspace() {
   const [sourceKey, setSourceKey] = useState<"safePersistence.demoFallback" | "safePersistence.liveApi">(
     "safePersistence.demoFallback",
   );
+  const [intakeCount, setIntakeCount] = useState<number | null>(null);
 
   useEffect(() => {
     let active = true;
-    void Promise.all([loadWorkItems("recruiter"), loadRecruiterTrustReviewQueue()]).then(([wi, rq]) => {
-      if (!active) return;
-      setSourceKey(wi.source === "live" || rq.source === "live" ? "safePersistence.liveApi" : "safePersistence.demoFallback");
-    });
+    void Promise.all([loadWorkItems("recruiter"), loadRecruiterTrustReviewQueue(), loadRequestIntakeCount()]).then(
+      ([wi, rq, intake]) => {
+        if (!active) return;
+        setSourceKey(wi.source === "live" || rq.source === "live" || intake.source === "live" ? "safePersistence.liveApi" : "safePersistence.demoFallback");
+        setIntakeCount(intake.count);
+      },
+    );
     return () => {
       active = false;
     };
@@ -114,7 +119,7 @@ export function RecruiterOperationalWorkQueueWorkspace() {
           t("recruiterOperationalWorkQueue.summaryTitle"),
           <>
             <p className="text-[var(--twin-muted-strong)]">{t("recruiterOperationalWorkQueue.summaryLead")}</p>
-            <dl className="grid gap-2 sm:grid-cols-4">
+            <dl className="grid gap-2 sm:grid-cols-5">
               <div>
                 <dt className="text-xs uppercase text-[var(--twin-muted)]">{t("recruiterOperationalWorkQueue.summaryActive")}</dt>
                 <dd className="text-lg font-semibold">{record.summary_active}</dd>
@@ -130,6 +135,10 @@ export function RecruiterOperationalWorkQueueWorkspace() {
               <div>
                 <dt className="text-xs uppercase text-[var(--twin-muted)]">{t("recruiterOperationalWorkQueue.summaryStale")}</dt>
                 <dd className="text-lg font-semibold">{record.summary_stale}</dd>
+              </div>
+              <div data-testid="recruiter-operational-work-queue-intake-count">
+                <dt className="text-xs uppercase text-[var(--twin-muted)]">{t("requestIntake.countLabel")}</dt>
+                <dd className="text-lg font-semibold">{intakeCount ?? "—"}</dd>
               </div>
             </dl>
           </>,
