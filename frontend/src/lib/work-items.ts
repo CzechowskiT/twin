@@ -7,7 +7,7 @@ import {
   type WorkItemRecord,
   type WorkItemRow,
 } from "@/lib/work-items-demo-data";
-import { fetchSafePersistenceList } from "@/lib/safe-persistence-api";
+import { fetchSafePersistenceList, patchSafePersistence, postSafePersistence, type SafePersistenceWriteResult } from "@/lib/safe-persistence-api";
 
 export type SafePersistenceSource = "live" | "demo";
 
@@ -92,4 +92,24 @@ export async function loadWorkItems(scope: "recruiter" | "company"): Promise<{
     };
   }
   return { source: result.source, record: demo };
+}
+
+export async function createWorkItem(
+  scope: "recruiter" | "company",
+  input: { title: string; item_type: string; description?: string },
+): Promise<SafePersistenceWriteResult<ApiWorkItem>> {
+  return postSafePersistence<ApiWorkItem>(WORK_ITEMS_API_PATH, {
+    title: input.title,
+    item_type: input.item_type,
+    description: input.description ?? "",
+    persona_scope: scope,
+    status: "open",
+  });
+}
+
+export async function patchWorkItemStatus(
+  workItemId: string,
+  status: string,
+): Promise<SafePersistenceWriteResult<ApiWorkItem>> {
+  return patchSafePersistence<ApiWorkItem>(`${WORK_ITEMS_API_PATH}/${workItemId}`, { status });
 }

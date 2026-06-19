@@ -10,7 +10,9 @@ import {
   LAUNCH_STANCE,
   WORK_ITEMS_MARKERS,
   WORK_ITEMS_PAGE_MARKER,
+  createWorkItem,
   loadWorkItems,
+  patchWorkItemStatus,
   resolveWorkItems,
   type SafePersistenceSource,
   type WorkItemRow,
@@ -34,6 +36,11 @@ export function WorkItemsWorkspace({ scope }: Props) {
   const { t } = useTranslation();
   const [record, setRecord] = useState(() => resolveWorkItems(scope));
   const [source, setSource] = useState<SafePersistenceSource>("demo");
+  const [title, setTitle] = useState("");
+  const [itemType, setItemType] = useState<"note" | "task">("note");
+  const [writeStatus, setWriteStatus] = useState<"idle" | "live" | "demo">("idle");
+  const [statusWrite, setStatusWrite] = useState<"idle" | "live" | "demo">("idle");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -48,8 +55,63 @@ export function WorkItemsWorkspace({ scope }: Props) {
   }, [scope]);
 
   const titleKey = scope === "recruiter" ? "workItems.recruiterTitle" : "workItems.companyTitle";
-  const sourceKey =
-    source === "live" ? "safePersistence.liveApi" : "safePersistence.demoFallback";
+  const sourceKey = source === "live" ? "safePersistence.liveApi" : "safePersistence.demoFallback";
+  const writeKey =
+    writeStatus === "live" ? "safePersistence.internalWriteLive" : writeStatus === "demo" ? "safePersistence.internalWriteDemo" : null;
+  const statusKey =
+    statusWrite === "live" ? "safePersistence.internalWriteLive" : statusWrite === "demo" ? "safePersistence.internalWriteDemo" : null;
+  const firstItem = record.items[0];
+
+  async function onCreate(): Promise<void> {
+    if (!title.trim()) return;
+    setSaving(true);
+    setWriteStatus("idle");
+    const result = await createWorkItem(scope, { title: title.trim(), item_type: itemType });
+    if (result.wrote && result.data) {
+      setRecord((prev) => ({
+        ...prev,
+        items: [
+          {
+            id: String(result.data!.id),
+            item_type: result.data!.item_type as WorkItemRow["item_type"],
+            title: result.data!.title,
+            description: result.data!.description ?? "",
+            status: result.data!.status,
+            owner_label: result.data!.owner_label ?? "—",
+            backend_write: true,
+            external_side_effect: false,
+          },
+          ...prev.items,
+        ],
+      }));
+      setSource("live");
+      setWriteStatus("live");
+      setTitle("");
+    } else {
+      setWriteStatus("demo");
+    }
+    setSaving(false);
+  }
+
+  async function onPatchStatus(): Promise<void> {
+    if (!firstItem) return;
+    setSaving(true);
+    setStatusWrite("idle");
+    const result = await patchWorkItemStatus(firstItem.id, firstItem.status === "open" ? "in_progress" : "open");
+    if (result.wrote && result.data) {
+      setRecord((prev) => ({
+        ...prev,
+        items: prev.items.map((row) =>
+          row.id === firstItem.id ? { ...row, status: result.data!.status } : row,
+        ),
+      }));
+      setSource("live");
+      setStatusWrite("live");
+    } else {
+      setStatusWrite("demo");
+    }
+    setSaving(false);
+  }
 
   return (
     <Shell wide>
@@ -96,13 +158,52 @@ export function WorkItemsWorkspace({ scope }: Props) {
           <>
             <p>{t("workItems.createLead")}</p>
             <p className="text-xs text-[var(--twin-muted)]">{t("workItems.createNote")}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder={t("workItems.createTitlePlaceholder")}
+                className="min-w-[12rem] flex-1 rounded border bg-transparent px-2 py-1 text-xs"
+              />
+              <select
+                value={itemType}
+                onChange={(e) => setItemType(e.target.value as "note" | "task")}
+                className="rounded border bg-transparent px-2 py-1 text-xs"
+              >
+                <option value="note">note</option>
+                <option value="task">task</option>
+              </select>
+              <button
+                type="button"
+                className="rounded border px-3 py-1 text-xs disabled:opacity-50"
+                onClick={() => void onCreate()}
+                disabled={saving || !title.trim()}
+              >
+                {t("workItems.createAction")}
+              </button>
+            </div>
+            {writeKey ? <p className="mt-2 text-[10px] text-[var(--twin-muted)]">{t(writeKey)}</p> : null}
           </>,
         )}
 
         {section(
           WORK_ITEMS_MARKERS.statusPreview,
           t("workItems.statusTitle"),
-          <p className="text-xs">{t("workItems.statusLead")}</p>,
+          <>
+            <p className="text-xs">{t("workItems.statusLead")}</p>
+            {firstItem ? (
+              <button
+                type="button"
+                className="mt-2 rounded border px-3 py-1 text-xs disabled:opacity-50"
+                onClick={() => void onPatchStatus()}
+                disabled={saving}
+              >
+                {t("workItems.statusAction")}
+              </button>
+            ) : null}
+            {statusKey ? <p className="mt-2 text-[10px] text-[var(--twin-muted)]">{t(statusKey)}</p> : null}
+          </>,
         )}
 
         {section(
