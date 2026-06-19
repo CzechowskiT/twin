@@ -5936,6 +5936,8 @@ eyebrow: "Product roadmap",
     visibilityLead: "Candidate visibility boundary — not shared to candidate routes.",
     auditLead: "Append-only audit trail on every feedback write.",
     boundaryLead: "No hire/reject final action · no email · no ATS writeback · human review required.",
+    draftInternalNote: "Feedback draft recorded internally — not shared externally, no candidate notification.",
+    panelFeedbackSource: "Company feedback API",
   },
   recruiterOperationalWorkQueue: {
     pageEyebrow: "Operational work queue",
@@ -12620,6 +12622,8 @@ const pl: MessageTree = {
     visibilityLead: "Granica widoczności kandydata — nie udostępniane na route kandydata.",
     auditLead: "Ślad audytu append-only przy każdym zapisie feedbacku.",
     boundaryLead: "Bez finalnej akcji hire/reject · bez email · bez writeback ATS · wymagany przegląd człowieka.",
+    draftInternalNote: "Szkic feedbacku zapisany wewnętrznie — nie udostępniany zewnętrznie, bez powiadomienia kandydata.",
+    panelFeedbackSource: "API feedbacku firmy",
   },
   recruiterOperationalWorkQueue: {
     pageEyebrow: "Kolejka operacyjna",
