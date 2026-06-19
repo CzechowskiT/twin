@@ -1,17 +1,17 @@
 /**
- * Candidate visibility preferences — browser smoke (workers=1).
+ * Request intake — browser smoke (workers=1).
  */
 import { expect, test, type Page } from "@playwright/test";
 
 import {
-  CANDIDATE_VISIBILITY_PREFERENCES_MARKERS,
-  CANDIDATE_VISIBILITY_PREFERENCES_PAGE_MARKER,
-  CANDIDATE_VISIBILITY_PREFERENCES_ROUTE,
-} from "../src/lib/candidate-visibility-preferences";
+  REQUEST_INTAKE_MARKERS,
+  REQUEST_INTAKE_PAGE_MARKER,
+  REQUEST_INTAKE_RECRUITER_ROUTE,
+} from "../src/lib/request-intake";
 import { withFreshContext } from "./helpers/browser-lifecycle";
 
 const SETTLE_MS = 12_000;
-const PATH = CANDIDATE_VISIBILITY_PREFERENCES_ROUTE;
+const PATH = REQUEST_INTAKE_RECRUITER_ROUTE;
 
 async function dismissCookieBanner(page: Page): Promise<void> {
   const accept = page.getByRole("button", { name: /accept cookies/i });
@@ -35,10 +35,10 @@ function isAuthShell(body: string): boolean {
   );
 }
 
-test.describe("Candidate visibility preferences browser", () => {
+test.describe("Request intake browser", () => {
   test.describe.configure({ timeout: 120_000, mode: "serial" });
 
-  test("1 route renders page or auth shell — not blank", async ({ browser }) => {
+  test("1 recruiter route renders page or auth shell — not blank", async ({ browser }) => {
     await withFreshContext(browser, async (context) => {
       const page = await context.newPage();
       const response = await page.goto(PATH, { waitUntil: "domcontentloaded" });
@@ -46,7 +46,7 @@ test.describe("Candidate visibility preferences browser", () => {
       expect(response?.status() ?? 0).toBeLessThan(500);
       await page
         .locator(
-          `[data-candidate-visibility-preferences-page="${CANDIDATE_VISIBILITY_PREFERENCES_PAGE_MARKER}"], :text("Sign in required"), :text("Zaloguj")`,
+          `[data-request-intake-page="${REQUEST_INTAKE_PAGE_MARKER}"], :text("Sign in required"), :text("Zaloguj")`,
         )
         .first()
         .waitFor({ state: "visible", timeout: SETTLE_MS })
@@ -55,21 +55,28 @@ test.describe("Candidate visibility preferences browser", () => {
     });
   });
 
-  test("2 persistence note marker when page loads", async ({ browser }) => {
+  test("2 section markers when pilot loads", async ({ browser }) => {
     await withFreshContext(browser, async (context) => {
       const page = await context.newPage();
       await page.goto(PATH, { waitUntil: "domcontentloaded" });
       await dismissCookieBanner(page);
       await page
         .locator(
-          `[data-candidate-visibility-preferences-page="${CANDIDATE_VISIBILITY_PREFERENCES_PAGE_MARKER}"], :text("Sign in required"), :text("Zaloguj")`,
+          `[data-request-intake-page="${REQUEST_INTAKE_PAGE_MARKER}"], :text("Sign in required"), :text("Zaloguj")`,
         )
         .first()
         .waitFor({ state: "visible", timeout: SETTLE_MS })
         .catch(() => undefined);
       const body = (await bodyText(page)).toLowerCase();
       if (!isAuthShell(body)) {
-        await expect(page.getByTestId(CANDIDATE_VISIBILITY_PREFERENCES_MARKERS.persistenceNote)).toBeVisible();
+        for (const marker of [
+          REQUEST_INTAKE_MARKERS.header,
+          REQUEST_INTAKE_MARKERS.queue,
+          REQUEST_INTAKE_MARKERS.queueCount,
+          REQUEST_INTAKE_MARKERS.boundary,
+        ]) {
+          await expect(page.getByTestId(marker)).toBeVisible();
+        }
       }
     });
   });
