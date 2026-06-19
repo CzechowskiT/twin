@@ -18,6 +18,7 @@ import { decisionMemoryHref, DECISION_MEMORY_DEMO_ID } from "@/lib/decision-memo
 import { COMPANY_BILLING_ROUTE } from "@/lib/company-billing-readiness";
 import { COMPANY_HIRING_ROUTE } from "@/lib/company-hiring-dashboard";
 import { COMPANY_HIRING_COCKPIT_ROUTE } from "@/lib/company-hiring-cockpit";
+import { COMPANY_HIRING_COMMAND_CENTER_ROUTE } from "@/lib/company-hiring-command-center";
 import { COMPANY_INTEGRATIONS_ROUTE } from "@/lib/company-integrations-readiness";
 import { COMPANY_ROLES_ROUTE } from "@/lib/company-jobs-roles";
 import { COMPANY_TEAM_ROUTE } from "@/lib/company-team-permissions";
@@ -631,6 +632,17 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     titleKey: "companyHiringCockpit.demoJourneyTitle",
     descriptionKey: "companyHiringCockpit.demoJourneyDesc",
     ctaKey: "companyHiringCockpit.openHiringCockpit",
+    status: "pilot",
+    moduleFamily: "dashboard",
+    boundaryTags: ["pilot", "human_decision_required", "no_outreach", "no_ats_sync"],
+  },
+  {
+    id: "company_hiring_command_center",
+    persona: "company",
+    href: COMPANY_HIRING_COMMAND_CENTER_ROUTE,
+    titleKey: "companyHiringCommandCenter.demoJourneyTitle",
+    descriptionKey: "companyHiringCommandCenter.demoJourneyDesc",
+    ctaKey: "companyHiringCommandCenter.openCommandCenter",
     status: "pilot",
     moduleFamily: "dashboard",
     boundaryTags: ["pilot", "human_decision_required", "no_outreach", "no_ats_sync"],
