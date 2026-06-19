@@ -47,10 +47,18 @@ test("6 forbidden copy guard", () => {
   }
 });
 
-test("7 i18n keys present", () => {
+test("7 live API wiring", () => {
+  const ws = read("src/components/candidate/candidate-visibility-preferences-workspace.tsx");
+  assert.match(ws, /loadCandidateVisibilityPreferences/);
+  assert.match(ws, /saveCandidateVisibilityPreferences/);
+  assert.match(ws, /CANDIDATE_VISIBILITY_PREFERENCES_MARKERS\.dataSource/);
+  assert.match(ws, /CANDIDATE_VISIBILITY_PREFERENCES_MARKERS\.saveForm/);
+});
+
+test("8 i18n keys present", () => {
   assert.ok(en.candidateVisibilityPreferences.pageTitle);
 });
 
-test("8 docs", () => assert.ok(existsSync(join(repo, "docs/CANDIDATE_VISIBILITY_PREFERENCES_2026-06-19.md"))));
+test("9 docs", () => assert.ok(existsSync(join(repo, "docs/CANDIDATE_VISIBILITY_PREFERENCES_2026-06-19.md"))));
 
-test("9 package script", () => assert.match(readFileSync(join(root, "package.json"), "utf8"), /test:candidate-visibility-preferences/));
+test("10 package script", () => assert.match(readFileSync(join(root, "package.json"), "utf8"), /test:candidate-visibility-preferences/));

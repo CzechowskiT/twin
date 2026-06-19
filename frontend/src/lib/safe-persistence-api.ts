@@ -9,6 +9,12 @@ export type SafePersistenceResult<T> = {
   data: T;
 };
 
+export type SafePersistenceWriteResult<T> = {
+  source: SafePersistenceSource;
+  data: T | null;
+  wrote: boolean;
+};
+
 type ListPayload = { items?: unknown[] };
 
 export async function fetchSafePersistenceList<T extends ListPayload>(
@@ -24,4 +30,36 @@ export async function fetchSafePersistenceList<T extends ListPayload>(
     /* demo fallback — no session or API unavailable */
   }
   return { source: "demo", data: demo };
+}
+
+export async function postSafePersistence<T>(
+  apiPath: string,
+  body: Record<string, unknown>,
+): Promise<SafePersistenceWriteResult<T>> {
+  try {
+    const live = await apiFetch<T>(apiPath, {
+      method: "POST",
+      body: JSON.stringify(body),
+      preserveSessionOnUnauthorized: true,
+    });
+    return { source: "live", data: live, wrote: true };
+  } catch {
+    return { source: "demo", data: null, wrote: false };
+  }
+}
+
+export async function patchSafePersistence<T>(
+  apiPath: string,
+  body: Record<string, unknown>,
+): Promise<SafePersistenceWriteResult<T>> {
+  try {
+    const live = await apiFetch<T>(apiPath, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+      preserveSessionOnUnauthorized: true,
+    });
+    return { source: "live", data: live, wrote: true };
+  } catch {
+    return { source: "demo", data: null, wrote: false };
+  }
 }
