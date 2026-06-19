@@ -5014,6 +5014,8 @@ eyebrow: "Product roadmap",
     inlineNote: "Internal export request preview — safe persistence only, no external side effect.",
     linkControlCenter: "Control center",
     linkExportRequests: "View export request records",
+    createLead: "Queue an internal preview record — safe POST only, no fulfillment.",
+    queueAction: "Queue internal preview record",
   },
   requestIntake: {
     pageTitle: "Request intake queue",
@@ -11704,6 +11706,8 @@ const pl: MessageTree = {
     inlineNote: "Wewnętrzny podgląd prośby o eksport — tylko safe persistence, bez efektu zewnętrznego.",
     linkControlCenter: "Centrum kontroli",
     linkExportRequests: "Zobacz rekordy próśb o eksport",
+    createLead: "Kolejkuj wewnętrzny rekord podglądu — tylko bezpieczny POST, bez realizacji.",
+    queueAction: "Kolejkuj wewnętrzny rekord podglądu",
   },
   requestIntake: {
     pageTitle: "Kolejka request intake",

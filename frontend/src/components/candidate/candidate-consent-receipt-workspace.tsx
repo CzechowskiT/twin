@@ -9,6 +9,7 @@ import { ConsentReceiptPanel } from "@/components/candidate/consent-receipt-pane
 import { ExportRequestPersistenceNote } from "@/components/candidate/export-request-persistence-note";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
+import { EXPORT_REQUEST_TYPES } from "@/lib/export-requests";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
 import type { CandidateConsentReceiptRecord } from "@/lib/candidate-consent-receipt-demo-data";
 import {
@@ -223,7 +224,10 @@ function ConsentReceiptContent({ record }: { record: CandidateConsentReceiptReco
           </div>
         </header>
 
-        <ExportRequestPersistenceNote testId="candidate-consent-receipt-export-request-note" />
+        <ExportRequestPersistenceNote
+          testId="candidate-consent-receipt-export-request-note"
+          requestType={EXPORT_REQUEST_TYPES.consentReceiptPreview}
+        />
 
         {sectionCard(
           CANDIDATE_CONSENT_RECEIPT_MARKERS.receiptSummary,
