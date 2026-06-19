@@ -32,6 +32,7 @@ ALLOWED_TARGET_TYPES = frozenset(
         "review_queue_item",
         "review_queue_item",
         "company_feedback",
+        "visibility_preference",
         "audit_event",
         "demo_target",
     }

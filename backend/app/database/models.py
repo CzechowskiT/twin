@@ -1219,3 +1219,25 @@ class CompanyFeedbackItem(Base):
         onupdate=datetime.utcnow,
     )
 
+
+class CandidateVisibilityPreference(Base):
+    """Internal candidate visibility preferences — no external publication."""
+
+    __tablename__ = "candidate_visibility_preferences"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[str] = mapped_column(String(64), index=True)
+    profile_visibility: Mapped[str] = mapped_column(String(32))
+    cv_visibility: Mapped[str] = mapped_column(String(32))
+    match_visibility: Mapped[str] = mapped_column(String(32))
+    company_visibility: Mapped[str] = mapped_column(String(32))
+    communication_preference: Mapped[str] = mapped_column(String(32))
+    source: Mapped[str] = mapped_column(String(32), default="twin_internal")
+    created_by_user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
+
