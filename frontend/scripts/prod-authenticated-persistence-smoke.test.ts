@@ -154,14 +154,14 @@ test("9 authenticated POST smoke", async (t) => {
     {
       path: "/api/v1/audit-events",
       body: {
-        event_type: "prod_smoke_persistence_verified",
-        actor_persona: "founder",
-        target_type: "system",
+        event_type: "foundation_demo",
+        actor_persona: "board",
+        target_type: "demo_target",
         target_id: `prod-smoke-${stamp}`,
         metadata: {
-          smoke_test: true,
-          source: "twin_internal_prod_smoke",
-          external_side_effect: false,
+          scope: "twin_internal_prod_smoke",
+          item_kind: "smoke_test",
+          preview: "true",
         },
       },
     },
@@ -280,20 +280,21 @@ test("11 POST responses contain safe internal markers where available", async (t
     method: "POST",
     headers: auth,
     body: JSON.stringify({
-      event_type: "prod_smoke_persistence_verified",
-      actor_persona: "founder",
-      target_type: "system",
+      event_type: "foundation_demo",
+      actor_persona: "board",
+      target_type: "demo_target",
       target_id: `prod-smoke-marker-${Date.now()}`,
-      metadata: { smoke_test: true, source: "twin_internal_prod_smoke", external_side_effect: false },
+      metadata: { scope: "twin_internal_prod_smoke", item_kind: "smoke_test", preview: "true" },
     }),
   });
   assert.ok(status === 201 || status === 200, body.slice(0, 200));
   const parsed = JSON.parse(body) as Record<string, unknown>;
+  assert.equal(parsed.external_side_effect, false);
   const meta = parsed.metadata ?? parsed.metadata_json;
   if (meta && typeof meta === "object") {
     const m = meta as Record<string, unknown>;
-    assert.equal(m.smoke_test, true);
-    assert.equal(m.external_side_effect, false);
+    assert.equal(m.scope, "twin_internal_prod_smoke");
+    assert.equal(m.item_kind, "smoke_test");
   }
 });
 

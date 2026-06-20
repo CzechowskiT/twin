@@ -101,7 +101,7 @@ npm run test:prod-authenticated-persistence-smoke
 
 | Endpoint | Safe action |
 |----------|-------------|
-| `POST /api/v1/audit-events` | Append-only event `prod_smoke_persistence_verified` |
+| `POST /api/v1/audit-events` | Append-only event `foundation_demo` (allowlisted internal smoke) |
 | `POST /api/v1/work-items` | Internal task, `status: open` |
 | `POST /api/v1/candidate-role-status` | `needs_feedback` on demo refs |
 | `POST /api/v1/review-queue` | `trust_audit_review`, `priority: low` |
