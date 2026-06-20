@@ -1,5 +1,6 @@
 /**
  * Production persistence smoke — unauth 401 by default; safe POSTs only with TWIN_PROD_TEST_JWT.
+ * 12 assertions — see docs/AUTHENTICATED_PROD_PERSISTENCE_SMOKE_2026-06-19.md
  */
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -31,7 +32,14 @@ const FORBIDDEN_RESPONSE_PATTERNS = [
   /GDPR compliant/i,
   /persisted successfully/i,
   /saved successfully/i,
+  /production write enabled/i,
+  /export fulfilled/i,
+  /\bhired\b/i,
+  /\brejected\b/i,
+  /offer sent/i,
 ];
+
+const FORBIDDEN_STATUS_VALUES = ["hired", "rejected_final", "auto_rejected", "offer_sent"];
 
 function readRepo(rel: string): string {
   return readFileSync(join(repoRoot, rel), "utf8");
@@ -48,16 +56,27 @@ async function fetchStatus(path: string, init?: RequestInit): Promise<{ status: 
 
 test("1 smoke script and docs exist", () => {
   assert.ok(readRepo("docs/AUTHENTICATED_PROD_PERSISTENCE_SMOKE_2026-06-19.md").includes("TWIN_PROD_TEST_JWT"));
+  assert.ok(readRepo("docs/FOUNDER_TEST_AUTH_SMOKE_SETUP_2026-06-19.md").includes("TWIN_PROD_TEST_JWT"));
   assert.match(readRepo("frontend/package.json"), /test:prod-authenticated-persistence-smoke/);
+  assert.match(readRepo("frontend/package.json"), /verify:prod-persistence-auth/);
 });
 
 test("2 no hardcoded JWT in smoke script", () => {
   const self = readFileSync(fileURLToPath(import.meta.url), "utf8");
   const jwtPrefix = "Bearer " + "eyJ";
   assert.ok(!self.includes(jwtPrefix));
+  assert.doesNotMatch(self, /TWIN_PROD_TEST_JWT\s*=\s*["']eyJ/);
 });
 
-test("3 unauthenticated GET returns 401 on all persistence endpoints", async () => {
+test("3 founder auth setup doc covers token handling", () => {
+  const doc = readRepo("docs/FOUNDER_TEST_AUTH_SMOKE_SETUP_2026-06-19.md");
+  assert.match(doc, /OAuth2PasswordBearer|Bearer JWT/i);
+  assert.match(doc, /never commit/i);
+  assert.match(doc, /TWIN_PROD_SMOKE_WRITE/);
+  assert.match(doc, /mint.*not added|No token mint helper/i);
+});
+
+test("4 unauthenticated GET returns 401/403 on all persistence endpoints", async () => {
   for (const ep of PERSISTENCE_ENDPOINTS) {
     const { status } = await fetchStatus(`/api/v1/${ep}`);
     assert.ok(
@@ -67,7 +86,14 @@ test("3 unauthenticated GET returns 401 on all persistence endpoints", async () 
   }
 });
 
-test("4 public-health includes commit interpretation fields", async (t) => {
+test("5 admin migrations endpoint returns 401/403 without auth", async () => {
+  const { status, body } = await fetchStatus("/api/v1/admin/migrations/current");
+  assert.ok(status === 401 || status === 403, `admin/migrations/current expected 401/403, got ${status}`);
+  assert.doesNotMatch(body, /postgresql:\/\//i);
+  assert.doesNotMatch(body, /secret/i);
+});
+
+test("6 public-health 200 with db_ok and commit interpretation fields", async (t) => {
   const routeSrc = readRepo("frontend/src/app/api/public-health/route.ts");
   assert.match(routeSrc, /backend_git_commit/);
   assert.match(routeSrc, /commit_interpretation/);
@@ -76,6 +102,8 @@ test("4 public-health includes commit interpretation fields", async (t) => {
   const { status, body } = await fetchStatus("/api/public-health");
   assert.equal(status, 200, body.slice(0, 200));
   const json = JSON.parse(body) as Record<string, unknown>;
+  assert.equal(json.status, "ok");
+  assert.equal(json.db_ok, true);
   assert.ok(typeof json.frontend_commit === "string");
   assert.ok(typeof json.api_commit === "string");
   if (typeof json.backend_git_commit !== "string") {
@@ -86,15 +114,38 @@ test("4 public-health includes commit interpretation fields", async (t) => {
   assert.ok(typeof json.deployment_note === "string");
 });
 
-test("5 authenticated POST smoke", async (t) => {
+test("7 unauthenticated persistence GETs never 404 or 500", async () => {
+  for (const ep of PERSISTENCE_ENDPOINTS) {
+    const { status } = await fetchStatus(`/api/v1/${ep}`);
+    assert.notEqual(status, 404, `${ep} must not 404`);
+    assert.notEqual(status, 500, `${ep} must not 500`);
+  }
+});
+
+test("8 skip message when TWIN_PROD_TEST_JWT unset", async (t) => {
+  if (JWT) {
+    t.skip("JWT configured — skip convention verified in docs only");
+    return;
+  }
+  const doc = readRepo("docs/AUTHENTICATED_PROD_PERSISTENCE_SMOKE_2026-06-19.md");
+  assert.match(doc, /SKIPPED authenticated.*TWIN_PROD_TEST_JWT/i);
+  assert.match(doc, /Exit code \*\*0\*\*/);
+});
+
+test("9 authenticated POST smoke", async (t) => {
   if (!JWT) {
-    t.skip("SKIPPED authenticated smoke — no TWIN_PROD_TEST_JWT");
+    t.skip("SKIPPED authenticated POST smoke — TWIN_PROD_TEST_JWT not configured");
     return;
   }
   if (!SMOKE_WRITE) {
     t.skip("SKIPPED authenticated POST — set TWIN_PROD_SMOKE_WRITE=1 to enable writes");
     return;
   }
+
+  const { status: healthStatus, body: healthBody } = await fetchStatus("/api/public-health");
+  assert.equal(healthStatus, 200, healthBody.slice(0, 200));
+  const health = JSON.parse(healthBody) as Record<string, unknown>;
+  assert.equal(health.db_ok, true);
 
   const auth = { Authorization: `Bearer ${JWT}`, "Content-Type": "application/json" };
   const stamp = Date.now();
@@ -107,7 +158,11 @@ test("5 authenticated POST smoke", async (t) => {
         actor_persona: "founder",
         target_type: "system",
         target_id: `prod-smoke-${stamp}`,
-        metadata: { smoke_test: true, source: "twin_internal_prod_smoke", external_side_effect: false },
+        metadata: {
+          smoke_test: true,
+          source: "twin_internal_prod_smoke",
+          external_side_effect: false,
+        },
       },
     },
     {
@@ -124,7 +179,7 @@ test("5 authenticated POST smoke", async (t) => {
       body: {
         candidate_ref: "demo-candidate-001",
         role_ref: "demo-role-001",
-        status: "reviewed",
+        status: "needs_feedback",
       },
     },
     {
@@ -192,10 +247,58 @@ test("5 authenticated POST smoke", async (t) => {
     if ("external_side_effect" in parsed) {
       assert.equal(parsed.external_side_effect, false);
     }
+    if ("legal_claim" in parsed) {
+      assert.notEqual(parsed.legal_claim, true);
+    }
+    const statusField = parsed.status;
+    if (typeof statusField === "string") {
+      assert.ok(!FORBIDDEN_STATUS_VALUES.includes(statusField), `${path} forbidden status ${statusField}`);
+    }
+  }
+});
+
+test("10 authenticated GET returns 200 on all persistence endpoints", async (t) => {
+  if (!JWT) {
+    t.skip("SKIPPED authenticated GET — TWIN_PROD_TEST_JWT not configured");
+    return;
   }
 
   for (const ep of PERSISTENCE_ENDPOINTS) {
     const { status } = await fetchStatus(`/api/v1/${ep}`, { headers: { Authorization: `Bearer ${JWT}` } });
     assert.ok(status === 200, `authenticated GET ${ep} expected 200, got ${status}`);
   }
+});
+
+test("11 POST responses contain safe internal markers where available", async (t) => {
+  if (!JWT || !SMOKE_WRITE) {
+    t.skip("SKIPPED marker check — authenticated POST not enabled");
+    return;
+  }
+
+  const auth = { Authorization: `Bearer ${JWT}`, "Content-Type": "application/json" };
+  const { status, body } = await fetchStatus("/api/v1/audit-events", {
+    method: "POST",
+    headers: auth,
+    body: JSON.stringify({
+      event_type: "prod_smoke_persistence_verified",
+      actor_persona: "founder",
+      target_type: "system",
+      target_id: `prod-smoke-marker-${Date.now()}`,
+      metadata: { smoke_test: true, source: "twin_internal_prod_smoke", external_side_effect: false },
+    }),
+  });
+  assert.ok(status === 201 || status === 200, body.slice(0, 200));
+  const parsed = JSON.parse(body) as Record<string, unknown>;
+  const meta = parsed.metadata ?? parsed.metadata_json;
+  if (meta && typeof meta === "object") {
+    const m = meta as Record<string, unknown>;
+    assert.equal(m.smoke_test, true);
+    assert.equal(m.external_side_effect, false);
+  }
+});
+
+test("12 script never logs token value", () => {
+  const self = readFileSync(fileURLToPath(import.meta.url), "utf8");
+  assert.doesNotMatch(self, /console\.(log|info|debug|warn|error)\([^)]*JWT/);
+  assert.doesNotMatch(self, /console\.(log|info|debug|warn|error)\([^)]*Bearer/);
 });

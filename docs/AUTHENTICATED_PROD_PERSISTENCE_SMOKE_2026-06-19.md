@@ -1,7 +1,9 @@
 # Authenticated Production Persistence Smoke — 2026-06-19
 
-**Script:** `frontend/scripts/prod-authenticated-persistence-smoke.test.ts`  
-**Command:** `npm run test:prod-authenticated-persistence-smoke`
+**Script:** `frontend/scripts/prod-authenticated-persistence-smoke.test.ts` (12 assertions)  
+**Command:** `npm run test:prod-authenticated-persistence-smoke`  
+**Wrapper:** `npm run verify:prod-persistence-auth`  
+**Auth setup:** `docs/FOUNDER_TEST_AUTH_SMOKE_SETUP_2026-06-19.md`
 
 ## Purpose
 
@@ -21,7 +23,7 @@ Safe, non-destructive authenticated production POST smoke for persistence APIs (
 
 ```bash
 cd frontend
-TWIN_PROD_BASE_URL=https://twin-sooty.vercel.app npm run test:prod-authenticated-persistence-smoke
+TWIN_PROD_BASE_URL=https://twin-sooty.vercel.app npm run verify:prod-persistence-auth
 ```
 
 **With safe test token (founder ops only):**
@@ -40,7 +42,8 @@ TWIN_PROD_BASE_URL=https://twin-sooty.vercel.app \
 |----------|---------|--------|------------|
 | `/api/v1/audit-events` | GET, POST | 401 | POST append-only event |
 | `/api/v1/work-items` | GET, POST, PATCH | 401 | POST internal static task |
-| `/api/v1/candidate-role-status` | GET, POST, PATCH | 401 | POST `reviewed` status |
+| `/api/v1/admin/migrations/current` | GET | 401 | Ops admin token only (not user JWT) |
+| `/api/v1/candidate-role-status` | GET, POST, PATCH | 401 | POST `needs_feedback` status |
 | `/api/v1/review-queue` | GET, POST, PATCH | 401 | POST `trust_audit_review` |
 | `/api/v1/company-feedback` | GET, POST, PATCH | 401 | POST `draft` feedback |
 | `/api/v1/candidate-visibility-preferences` | GET, POST, PATCH | 401 | POST pilot_visible prefs |
@@ -53,7 +56,7 @@ All records use demo refs: `demo-candidate-001`, `demo-role-001`, `prod-smoke-<t
 
 - **AuditEvent:** `event_type: prod_smoke_persistence_verified`, metadata `{ smoke_test: true }`
 - **WorkItem:** `item_type: task`, `persona_scope: recruiter`, `status: open`
-- **CandidateRoleStatus:** `status: reviewed` (never hired/rejected/offer_sent)
+- **CandidateRoleStatus:** `status: needs_feedback` (never hired/rejected/offer_sent)
 - **ReviewQueue:** `item_kind: trust_audit_review`, `priority: low`
 - **CompanyFeedback:** `status: draft`, internal comment only
 - **VisibilityPreference:** pilot_visible / manual_review_required
@@ -71,8 +74,8 @@ All records use demo refs: `demo-candidate-001`, `demo-role-001`, `prod-smoke-<t
 
 When `TWIN_PROD_TEST_JWT` is unset:
 
-- Tests 1–4 run (static + unauth 401 + public-health fields)
-- Test 5 skips with message: `SKIPPED authenticated smoke — no TWIN_PROD_TEST_JWT`
+- Tests 1–8, 12 run (static + unauth 401 + admin migrations + public-health + skip convention)
+- Tests 9–11 skip with message: `SKIPPED authenticated POST smoke — TWIN_PROD_TEST_JWT not configured`
 - Exit code **0** (readiness convention — non-failing)
 
 When token set but `TWIN_PROD_SMOKE_WRITE` unset:
@@ -97,6 +100,8 @@ Smoke rows are append-only internal test records. No automatic cleanup — accep
 
 ## Related docs
 
+- `docs/FOUNDER_TEST_AUTH_SMOKE_SETUP_2026-06-19.md`
+- `docs/PRODUCTION_PERSISTENCE_STATUS_2026-06-19.md`
 - `docs/PERSISTENCE_MIGRATION_RUNBOOK_2026-06-19.md`
 - `docs/PROD_HEALTH_COMMIT_INTERPRETATION_2026-06-19.md`
 - `docs/ALEMBIC_PROD_HEAD_VERIFICATION_2026-06-19.md`
