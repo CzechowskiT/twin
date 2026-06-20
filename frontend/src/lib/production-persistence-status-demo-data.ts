@@ -15,12 +15,20 @@ export type MigrationCheckRow = {
   detail: string;
 };
 
+export type VerificationStatusRow = {
+  id: string;
+  label: string;
+  status: "done" | "ready" | "skipped" | "pending" | "no_go" | "open" | "blocked";
+  detail: string;
+};
+
 export type ProductionPersistenceStatusRecord = {
   healthUrl: string;
   expectedAlembicHead: string;
   migrationChain: readonly string[];
   endpoints: readonly PersistenceEndpointRow[];
   migrationChecks: readonly MigrationCheckRow[];
+  verificationStatus: readonly VerificationStatusRow[];
   limitations: readonly string[];
   nextOperatorActions: readonly string[];
   authSmokeCommand: string;
@@ -44,7 +52,7 @@ export function getProductionPersistenceStatusDemo(): ProductionPersistenceStatu
     endpoints: [
       { id: "audit", path: "/api/v1/audit-events", methods: "GET, POST", unauthExpected: "401", authSmoke: "POST append-only event" },
       { id: "work", path: "/api/v1/work-items", methods: "GET, POST, PATCH", unauthExpected: "401", authSmoke: "POST internal task" },
-      { id: "role", path: "/api/v1/candidate-role-status", methods: "GET, POST, PATCH", unauthExpected: "401", authSmoke: "POST safe status" },
+      { id: "role", path: "/api/v1/candidate-role-status", methods: "GET, POST, PATCH", unauthExpected: "401", authSmoke: "POST needs_feedback status" },
       { id: "queue", path: "/api/v1/review-queue", methods: "GET, POST, PATCH", unauthExpected: "401", authSmoke: "POST trust_audit_review" },
       { id: "feedback", path: "/api/v1/company-feedback", methods: "GET, POST, PATCH", unauthExpected: "401", authSmoke: "POST draft feedback" },
       { id: "visibility", path: "/api/v1/candidate-visibility-preferences", methods: "GET, POST, PATCH", unauthExpected: "401", authSmoke: "POST pilot_visible prefs" },
@@ -71,20 +79,89 @@ export function getProductionPersistenceStatusDemo(): ProductionPersistenceStatu
         detail: "Read-only COUNT on candidate_visibility_preferences, export_requests, request_intake_items",
       },
     ],
+    verificationStatus: [
+      {
+        id: "health-alignment",
+        label: "public-health commit alignment",
+        status: "done",
+        detail: "frontend_commit, api_commit, commit_interpretation on /api/public-health",
+      },
+      {
+        id: "backend-git-commit",
+        label: "backend_git_commit field",
+        status: "done",
+        detail: "Explicit Railway API SHA alias on public-health",
+      },
+      {
+        id: "commit-interpretation",
+        label: "commit_interpretation field",
+        status: "done",
+        detail: "Human-readable deploy alignment note",
+      },
+      {
+        id: "admin-protected",
+        label: "admin Alembic endpoint protected",
+        status: "done",
+        detail: "GET /api/v1/admin/migrations/current → 401 without OPS token",
+      },
+      {
+        id: "alembic-auth-check",
+        label: "Alembic current/head authenticated check",
+        status: "pending",
+        detail: "Requires OPS_ADMIN_TOKEN or Railway shell — not user JWT",
+      },
+      {
+        id: "unauth-401",
+        label: "unauthenticated persistence GET 401",
+        status: "done",
+        detail: "All 8 persistence endpoints return 401/403 without JWT",
+      },
+      {
+        id: "post-script",
+        label: "authenticated POST smoke script",
+        status: "ready",
+        detail: "npm run test:prod-authenticated-persistence-smoke — 12 assertions",
+      },
+      {
+        id: "post-execution",
+        label: "authenticated POST smoke execution",
+        status: "skipped",
+        detail: "SKIPPED — TWIN_PROD_TEST_JWT not configured",
+      },
+      {
+        id: "launch",
+        label: "Launch",
+        status: "no_go",
+        detail: "NO-GO",
+      },
+      {
+        id: "p0",
+        label: "P0 performance",
+        status: "open",
+        detail: "OPEN",
+      },
+      {
+        id: "phase3b",
+        label: "Phase 3B",
+        status: "blocked",
+        detail: "HARD BLOCKED",
+      },
+    ],
     limitations: [
       "Authenticated POST smoke skipped when TWIN_PROD_TEST_JWT is not configured — no token in repo.",
+      "No token mint helper in repo — obtain JWT via browser login; see docs/FOUNDER_TEST_AUTH_SMOKE_SETUP_2026-06-19.md",
       "public-health shows deploy SHAs, not Alembic revision — migration verification is separate.",
       "Frontend-only deploys may advance frontend_commit without changing Railway api_commit.",
       "Smoke records are append-only internal test rows — human review required; no external side effect.",
     ],
     nextOperatorActions: [
-      "Run npm run test:prod-authenticated-persistence-smoke (unauth 401 checks always).",
-      "With founder test JWT: TWIN_PROD_TEST_JWT=… TWIN_PROD_SMOKE_WRITE=1 npm run test:prod-authenticated-persistence-smoke",
+      "Run npm run verify:prod-persistence-auth (unauth 401 checks always).",
+      "With founder test JWT: TWIN_PROD_TEST_JWT=… TWIN_PROD_SMOKE_WRITE=1 npm run verify:prod-persistence-auth",
       "Confirm Railway alembic current = 067_request_intake via shell or admin endpoint.",
       "Compare scaffold HEAD, frontend_commit, api_commit using docs/PROD_HEALTH_COMMIT_INTERPRETATION_2026-06-19.md",
     ],
     authSmokeCommand:
-      "TWIN_PROD_BASE_URL=https://twin-sooty.vercel.app TWIN_PROD_TEST_JWT=$TWIN_PROD_TEST_JWT TWIN_PROD_SMOKE_WRITE=1 npm run test:prod-authenticated-persistence-smoke",
+      "TWIN_PROD_BASE_URL=https://twin-sooty.vercel.app TWIN_PROD_TEST_JWT=$TWIN_PROD_TEST_JWT TWIN_PROD_SMOKE_WRITE=1 npm run verify:prod-persistence-auth",
     authSmokeSkipReason: "token not configured — authenticated smoke skipped",
   };
 }

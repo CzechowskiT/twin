@@ -114,6 +114,22 @@ export function ProductionPersistenceStatusWorkspace() {
         )}
 
         {section(
+          PRODUCTION_PERSISTENCE_STATUS_MARKERS.verificationStatus,
+          t("productionPersistenceStatus.verificationStatusTitle"),
+          <>
+            <ul className="space-y-2">
+              {record.verificationStatus.map((row) => (
+                <li key={row.id} className="rounded border border-[var(--twin-border)]/60 px-3 py-2 text-xs">
+                  <span className="font-medium">{row.label}</span>
+                  <span className="ml-2 uppercase text-[var(--twin-accent)]">{row.status.replace("_", " ")}</span>
+                  <p className="mt-1 text-[var(--twin-muted-strong)]">{row.detail}</p>
+                </li>
+              ))}
+            </ul>
+          </>,
+        )}
+
+        {section(
           PRODUCTION_PERSISTENCE_STATUS_MARKERS.endpointMatrix,
           t("productionPersistenceStatus.endpointMatrixTitle"),
           <>

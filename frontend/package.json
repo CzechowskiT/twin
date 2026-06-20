@@ -238,6 +238,7 @@
     "test:candidate-visibility-preferences-browser:raw": "playwright test e2e/candidate-visibility-preferences-browser.spec.ts --workers=1",
     "test:backend-persistence-prod-readiness": "npx --yes tsx scripts/backend-persistence-prod-readiness.test.ts",
     "test:prod-authenticated-persistence-smoke": "npx --yes tsx scripts/prod-authenticated-persistence-smoke.test.ts",
+    "verify:prod-persistence-auth": "npm run test:prod-authenticated-persistence-smoke",
     "test:production-persistence-status": "npx --yes tsx scripts/production-persistence-status.test.ts",
     "test:production-persistence-status-browser": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'&&process.env.PLAYWRIGHT_ENABLE_BROWSER_TESTS!=='1'){console.error('Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 or PLAYWRIGHT_ALLOW_PROD_SMOKE=1');process.exit(1)}\" && npm run test:production-persistence-status-browser:raw",
     "test:production-persistence-status-browser:raw": "playwright test e2e/production-persistence-status-browser.spec.ts --workers=1",

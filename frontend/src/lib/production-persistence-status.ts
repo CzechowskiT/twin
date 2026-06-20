@@ -21,6 +21,7 @@ export const PRODUCTION_PERSISTENCE_STATUS_MARKERS = {
   commitInterpretation: "production-persistence-status-commit-interpretation",
   migrationChecklist: "production-persistence-status-migration-checklist",
   authSmokeReadiness: "production-persistence-status-auth-smoke-readiness",
+  verificationStatus: "production-persistence-status-verification-status",
   endpointMatrix: "production-persistence-status-endpoint-matrix",
   limitations: "production-persistence-status-limitations",
   nextAction: "production-persistence-status-next-action",
