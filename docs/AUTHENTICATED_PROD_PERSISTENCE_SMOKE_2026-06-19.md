@@ -54,7 +54,7 @@ TWIN_PROD_BASE_URL=https://twin-sooty.vercel.app \
 
 All records use demo refs: `demo-candidate-001`, `demo-role-001`, `prod-smoke-<timestamp>` subject IDs.
 
-- **AuditEvent:** `event_type: prod_smoke_persistence_verified`, metadata `{ smoke_test: true }`
+- **AuditEvent:** `event_type: foundation_demo`, `target_type: demo_target`, metadata `{ scope: twin_internal_prod_smoke, item_kind: smoke_test }`
 - **WorkItem:** `item_type: task`, `persona_scope: recruiter`, `status: open`
 - **CandidateRoleStatus:** `status: needs_feedback` (never hired/rejected/offer_sent)
 - **ReviewQueue:** `item_kind: trust_audit_review`, `priority: low`
