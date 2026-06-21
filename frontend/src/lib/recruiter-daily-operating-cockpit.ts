@@ -111,6 +111,11 @@ export const RECRUITER_DAILY_COCKPIT_MODULE_LINKS = [
     href: decisionMemoryHref(RECRUITER_DAILY_COCKPIT_DEMO_CANDIDATE_ID, "recruiter"),
     labelKey: "recruiterDailyCockpit.linkDecisionMemory" as TranslationKey,
   },
+  {
+    id: "placement_verification",
+    href: "/recruiter/placement-verification",
+    labelKey: "placementChecklist.recruiterPageTitle" as TranslationKey,
+  },
 ] as const;
 
 export const RECRUITER_DAILY_COCKPIT_FORBIDDEN_PATTERNS: RegExp[] = [
