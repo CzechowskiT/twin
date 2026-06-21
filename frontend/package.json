@@ -230,6 +230,7 @@
     "test:board-placement-evidence-monitor-browser": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'&&process.env.PLAYWRIGHT_ENABLE_BROWSER_TESTS!=='1'){console.error('Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 or PLAYWRIGHT_ALLOW_PROD_SMOKE=1');process.exit(1)}\" && npm run test:board-placement-evidence-monitor-browser:raw",
     "test:board-placement-evidence-monitor-browser:raw": "playwright test e2e/board-placement-evidence-monitor-browser.spec.ts --workers=1",
     "test:placement-verification-integration": "npx --yes tsx scripts/placement-verification-integration.test.ts",
+    "test:placement-events-ui-integration": "npx --yes tsx scripts/placement-events-ui-integration.test.ts",
     "test:board-persistence-operations-monitor": "npx --yes tsx scripts/board-persistence-operations-monitor.test.ts",
     "test:board-persistence-operations-monitor-browser": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'&&process.env.PLAYWRIGHT_ENABLE_BROWSER_TESTS!=='1'){console.error('Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 or PLAYWRIGHT_ALLOW_PROD_SMOKE=1');process.exit(1)}\" && npm run test:board-persistence-operations-monitor-browser:raw",
     "test:board-persistence-operations-monitor-browser:raw": "playwright test e2e/board-persistence-operations-monitor-browser.spec.ts --workers=1",

@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { useTranslation } from "@/components/language-provider";
+import { PlacementEventsTimeline } from "@/components/shared/placement-events-timeline";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
 import {
@@ -211,6 +212,8 @@ function PreviewContent({ record }: { record: PlacementVerificationRecord }) {
             <p className="text-xs text-[var(--twin-muted)]">{t("candidatePlacementVerification.demoActionsNote")}</p>
           </>,
         )}
+
+        <PlacementEventsTimeline placementId={record.placement_id} />
       </div>
     </Shell>
   );
