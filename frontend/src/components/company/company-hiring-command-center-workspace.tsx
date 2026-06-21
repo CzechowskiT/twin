@@ -6,8 +6,9 @@ import { useEffect, useState } from "react";
 
 import { CompanyWorkspaceNav } from "@/components/company/company-workspace-nav";
 import { useTranslation } from "@/components/language-provider";
+import { LiveOperatingStatePanel } from "@/components/shared/live-operating-state-panel";
 import { Card, Shell } from "@/components/ui";
-import { loadCompanyFeedback } from "@/lib/company-feedback";
+import { loadCompanyOperatingState, type OperatingStateSummary } from "@/lib/live-operating-state";
 import type { CommandCenterQueueItem } from "@/lib/company-hiring-command-center-demo-data";
 import {
   companyCommandCenterPipelineHref,
@@ -70,15 +71,12 @@ function queueList(items: CommandCenterQueueItem[], profileLabel: string): React
 export function CompanyHiringCommandCenterWorkspace() {
   const { t } = useTranslation();
   const record = resolveCompanyHiringCommandCenter();
-  const [feedbackSourceKey, setFeedbackSourceKey] = useState<"safePersistence.demoFallback" | "safePersistence.liveApi">(
-    "safePersistence.demoFallback",
-  );
+  const [operatingState, setOperatingState] = useState<OperatingStateSummary | null>(null);
 
   useEffect(() => {
     let active = true;
-    void loadCompanyFeedback().then((res) => {
-      if (!active) return;
-      setFeedbackSourceKey(res.source === "live" ? "safePersistence.liveApi" : "safePersistence.demoFallback");
+    void loadCompanyOperatingState().then((res) => {
+      if (active) setOperatingState(res);
     });
     return () => {
       active = false;
@@ -105,8 +103,11 @@ export function CompanyHiringCommandCenterWorkspace() {
               </p>
               <h1 className="twin-section-title text-2xl sm:text-3xl">{t("companyHiringCommandCenter.title")}</h1>
               <p className="text-sm text-[var(--twin-muted-strong)]">{t("companyHiringCommandCenter.lead")}</p>
-              <p className="text-xs text-[var(--twin-muted)]" data-testid="company-hiring-command-center-feedback-source">
-                {t("companyFeedback.panelFeedbackSource")}: {t(feedbackSourceKey)}
+              <p
+                className="text-xs text-[var(--twin-muted)]"
+                data-testid={COMPANY_HIRING_COMMAND_CENTER_MARKERS.operatingStateSource}
+              >
+                {operatingState ? t(operatingState.sourceKey) : t("liveOperatingState.loading")}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -150,6 +151,13 @@ export function CompanyHiringCommandCenterWorkspace() {
             ))}
           </nav>
         </header>
+
+        <LiveOperatingStatePanel
+          titleKey="companyHiringCommandCenter.operatingStateTitle"
+          leadKey="companyHiringCommandCenter.operatingStateLead"
+          summary={operatingState}
+          testId={COMPANY_HIRING_COMMAND_CENTER_MARKERS.operatingState}
+        />
 
         <div className="grid gap-6 lg:grid-cols-2">
           {sectionCard(

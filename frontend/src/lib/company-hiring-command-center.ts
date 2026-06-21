@@ -46,6 +46,8 @@ export const COMPANY_HIRING_COMMAND_CENTER_MARKERS = {
   pilotBadge: "company-hiring-command-center-pilot-badge",
   moduleLinks: "company-hiring-command-center-module-links",
   navLink: "company-hiring-command-center-nav-link",
+  operatingState: "company-hiring-command-center-operating-state",
+  operatingStateSource: "company-hiring-command-center-operating-state-source",
 } as const;
 
 export const COMPANY_HIRING_COMMAND_CENTER_FORBIDDEN_PATTERNS: RegExp[] = [
