@@ -91,6 +91,31 @@ No automatic downgrade in prod. Failed migration → stop deploy, restore from R
 - Read-only verification only — no env change, no prod DB mutation from this doc.
 - public-health `db_ok: true` confirms connectivity, **not** revision level.
 
+## Evidence log (append-only)
+
+| Field | Value |
+|-------|-------|
+| **date** | 2026-06-20 |
+| **method** | authenticated admin migrations endpoint |
+| **endpoint** | `/api/v1/admin/migrations/current` |
+| **production API host** | `https://twin-production-bcd9.up.railway.app` |
+| **expected head** | `067_request_intake` |
+| **actual current_revision** | `067_request_intake` |
+| **actual head_revision** | `067_request_intake` |
+| **actual head_revisions** | `["067_request_intake"]` |
+| **is_at_head** | `true` |
+| **read_only** | `true` |
+| **operator** | founder/operator |
+| **token handling** | `OPS_ADMIN_TOKEN` used locally only — not printed, not committed |
+| **write behavior** | no DB writes |
+| **public-health context** | `status`: ok · `db_ok`: true · `frontend_commit` (previously observed): `9e9f2b382e1a4fb9b5a6485a41dfba9676cd9540` · `api_commit` / `backend_git_commit` (previously observed): `1622b97867e0a02451437ddd5f502e9f0c8328c6` · note: public-health commit alignment is separate from Alembic DB head confirmation |
+| **conclusion** | production Alembic head confirmed |
+| **launch stance** | **NO-GO** |
+| **P0 performance** | **OPEN** |
+| **Phase 3B** | **HARD BLOCKED** |
+
+Authenticated persistence smoke was already **PASS** before this entry (11 pass, 0 fail, 1 skip). No secrets recorded in this log.
+
 ## Tests
 
 ```bash
