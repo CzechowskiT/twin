@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { CandidateTrustRequestStatusLoader } from "@/components/candidate/candidate-trust-request-status-loader";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import {
@@ -78,6 +79,7 @@ export function ExportRequestsWorkspace() {
           </p>
           <Link href={candidateControlCenterHref()} className="twin-link text-xs">{t("exportRequests.linkControlCenter")}</Link>
         </header>
+        <CandidateTrustRequestStatusLoader />
         <Card className="p-4" data-testid={EXPORT_REQUESTS_MARKERS.list}>
           <p className="mb-2 text-xs">{t("exportRequests.listLead")}</p>
           <ul className="space-y-1 text-xs">

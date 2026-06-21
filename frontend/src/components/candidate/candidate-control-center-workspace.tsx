@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { CandidateTrustRequestStatusLoader } from "@/components/candidate/candidate-trust-request-status-loader";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { ExportPreviewPanel } from "@/components/candidate/export-preview-panel";
 import { CorrectionRequestPanel } from "@/components/candidate/correction-request-panel";
@@ -218,6 +219,8 @@ function ControlCenterContent({ record }: { record: CandidateControlCenterRecord
             </Link>
           </div>
         </header>
+
+        <CandidateTrustRequestStatusLoader />
 
         {sectionCard(
           CANDIDATE_CONTROL_CENTER_MARKERS.visibilityControls,

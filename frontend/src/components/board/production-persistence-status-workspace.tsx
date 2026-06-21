@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { useTranslation } from "@/components/language-provider";
+import { OperationalCrossLinksPanel } from "@/components/shared/operational-cross-links-panel";
 import { Card, Shell } from "@/components/ui";
 import {
   LAUNCH_STANCE,
@@ -189,6 +190,8 @@ export function ProductionPersistenceStatusWorkspace() {
             </ul>
           </>,
         )}
+
+        <OperationalCrossLinksPanel />
       </div>
     </Shell>
   );

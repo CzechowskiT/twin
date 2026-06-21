@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
+import { OperationalCrossLinksPanel } from "@/components/shared/operational-cross-links-panel";
 import { Card, Shell } from "@/components/ui";
 import {
   COMPANY_FEEDBACK_MARKERS,
@@ -145,6 +146,7 @@ export function CompanyFeedbackWorkspace() {
         <Card className="p-4" data-testid={COMPANY_FEEDBACK_MARKERS.boundary}>
           <p className="text-xs">{t("companyFeedback.boundaryLead")}</p>
         </Card>
+        <OperationalCrossLinksPanel />
       </div>
     </Shell>
   );

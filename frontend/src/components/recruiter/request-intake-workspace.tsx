@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
+import { OperationalCrossLinksPanel } from "@/components/shared/operational-cross-links-panel";
 import { Card, Shell } from "@/components/ui";
 import {
   LAUNCH_STANCE,
@@ -68,6 +69,7 @@ export function RequestIntakeWorkspace() {
         <Card className="p-4" data-testid={REQUEST_INTAKE_MARKERS.boundary}>
           <p className="text-xs">{t("requestIntake.boundaryLead")}</p>
         </Card>
+        <OperationalCrossLinksPanel />
       </div>
     </Shell>
   );

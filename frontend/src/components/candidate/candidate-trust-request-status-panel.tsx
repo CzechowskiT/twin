@@ -26,14 +26,26 @@ export function CandidateTrustRequestStatusPanel({ status }: Props): ReactNode {
         <p className="mt-2 text-xs text-[var(--twin-muted)]" data-testid={CANDIDATE_TRUST_REQUEST_STATUS_MARKERS.sourceBadge}>
           {status ? t(status.sourceKey) : t("liveOperatingState.loading")}
         </p>
-        <dl className="mt-3 grid gap-3 sm:grid-cols-2">
+        <dl className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div data-testid={CANDIDATE_TRUST_REQUEST_STATUS_MARKERS.visibilityCount}>
+            <dt className="text-[10px] uppercase text-[var(--twin-muted)]">
+              {t("candidateVisibilityPreferences.pageTitle")}
+            </dt>
+            <dd className="text-lg font-semibold">{status?.visibilityCount ?? "—"}</dd>
+          </div>
           <div data-testid={CANDIDATE_TRUST_REQUEST_STATUS_MARKERS.exportCount}>
-            <dt className="text-[10px] uppercase text-[var(--twin-muted)]">{t("candidateTrustOverview.downloadAuditExport")}</dt>
+            <dt className="text-[10px] uppercase text-[var(--twin-muted)]">{t("exportRequests.pageTitle")}</dt>
             <dd className="text-lg font-semibold">{status?.exportCount ?? "—"}</dd>
           </div>
           <div data-testid={CANDIDATE_TRUST_REQUEST_STATUS_MARKERS.intakeCount}>
             <dt className="text-[10px] uppercase text-[var(--twin-muted)]">{t("requestIntake.countLabel")}</dt>
             <dd className="text-lg font-semibold">{status?.intakeCount ?? "—"}</dd>
+          </div>
+          <div data-testid={CANDIDATE_TRUST_REQUEST_STATUS_MARKERS.auditCount}>
+            <dt className="text-[10px] uppercase text-[var(--twin-muted)]">
+              {t("liveOperatingState.channelAuditEvents")}
+            </dt>
+            <dd className="text-lg font-semibold">{status?.auditCount ?? "—"}</dd>
           </div>
         </dl>
       </div>
