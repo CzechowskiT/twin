@@ -29,7 +29,7 @@ def _require_ops_admin(settings: Settings, authorization: str | None) -> None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid admin token")
 
 
-EXPECTED_ALEMBIC_HEAD = "067_request_intake"
+EXPECTED_ALEMBIC_HEAD = "068_placement_events_foundation"
 
 
 def _read_alembic_current(db: Session) -> str | None:
