@@ -26,6 +26,8 @@ const PERSISTENCE_ENDPOINTS = [
   "request-intake",
 ] as const;
 
+const PLACEMENT_EVENTS_ENDPOINT = "placement-events";
+
 const FORBIDDEN_RESPONSE_PATTERNS = [
   /email sent/i,
   /verified successfully/i,
@@ -77,7 +79,7 @@ test("3 founder auth setup doc covers token handling", () => {
 });
 
 test("4 unauthenticated GET returns 401/403 on all persistence endpoints", async () => {
-  for (const ep of PERSISTENCE_ENDPOINTS) {
+  for (const ep of [...PERSISTENCE_ENDPOINTS, PLACEMENT_EVENTS_ENDPOINT]) {
     const { status } = await fetchStatus(`/api/v1/${ep}`);
     assert.ok(
       status === 401 || status === 403,
@@ -115,7 +117,7 @@ test("6 public-health 200 with db_ok and commit interpretation fields", async (t
 });
 
 test("7 unauthenticated persistence GETs never 404 or 500", async () => {
-  for (const ep of PERSISTENCE_ENDPOINTS) {
+  for (const ep of [...PERSISTENCE_ENDPOINTS, PLACEMENT_EVENTS_ENDPOINT]) {
     const { status } = await fetchStatus(`/api/v1/${ep}`);
     assert.notEqual(status, 404, `${ep} must not 404`);
     assert.notEqual(status, 500, `${ep} must not 500`);
@@ -229,6 +231,18 @@ test("9 authenticated POST smoke", async (t) => {
         status: "open",
       },
     },
+    {
+      path: "/api/v1/placement-events",
+      body: {
+        placement_id: "demo-placement-001",
+        event_type: "demo_verification_recorded",
+        event_status: "internal_only",
+        actor_persona: "board",
+        candidate_id: "demo-candidate-001",
+        source: "twin_internal_prod_smoke",
+        metadata: { scope: "twin_internal_prod_smoke", preview: "true" },
+      },
+    },
   ];
 
   for (const { path, body } of posts) {
@@ -263,7 +277,7 @@ test("10 authenticated GET returns 200 on all persistence endpoints", async (t) 
     return;
   }
 
-  for (const ep of PERSISTENCE_ENDPOINTS) {
+  for (const ep of [...PERSISTENCE_ENDPOINTS, PLACEMENT_EVENTS_ENDPOINT]) {
     const { status } = await fetchStatus(`/api/v1/${ep}`, { headers: { Authorization: `Bearer ${JWT}` } });
     assert.ok(status === 200, `authenticated GET ${ep} expected 200, got ${status}`);
   }
