@@ -18,7 +18,7 @@ Read-only internal board summarizing production persistence verification state a
 | backend_git_commit field | **DONE** | Explicit alias for Railway API SHA |
 | commit_interpretation field | **DONE** | Human-readable deploy alignment note |
 | admin Alembic endpoint protected | **DONE** | `GET /api/v1/admin/migrations/current` → 401 without OPS token |
-| Alembic current/head authenticated check | **PENDING TOKEN / ADMIN ACCESS** | Requires `OPS_ADMIN_TOKEN` or Railway shell |
+| Alembic current/head authenticated check | **CONFIRMED — 067_request_intake** | 2026-06-20 — authenticated admin migrations endpoint (read-only); see `docs/ALEMBIC_PROD_HEAD_VERIFICATION_2026-06-19.md` § Evidence log |
 | unauthenticated persistence GET 401 | **DONE** | All 8 endpoints return 401/403 without JWT |
 | authenticated POST smoke script | **READY** | `npm run test:prod-authenticated-persistence-smoke` (12 assertions) |
 | authenticated POST smoke execution | **SKIPPED — TWIN_PROD_TEST_JWT missing** | Set env + `TWIN_PROD_SMOKE_WRITE=1` to run |

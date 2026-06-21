@@ -69,8 +69,8 @@ export function getProductionPersistenceStatusDemo(): ProductionPersistenceStatu
       {
         id: "railway-current",
         label: "Railway alembic current",
-        status: "pending_prod",
-        detail: "Confirm via Railway shell or GET /api/v1/admin/migrations/current (OPS_ADMIN_TOKEN)",
+        status: "verified_repo",
+        detail: "CONFIRMED — 067_request_intake (2026-06-20 admin migrations endpoint)",
       },
       {
         id: "tables",
@@ -107,8 +107,8 @@ export function getProductionPersistenceStatusDemo(): ProductionPersistenceStatu
       {
         id: "alembic-auth-check",
         label: "Alembic current/head authenticated check",
-        status: "pending",
-        detail: "Requires OPS_ADMIN_TOKEN or Railway shell — not user JWT",
+        status: "done",
+        detail: "CONFIRMED — 067_request_intake (2026-06-20 read-only admin endpoint)",
       },
       {
         id: "unauth-401",
@@ -157,7 +157,7 @@ export function getProductionPersistenceStatusDemo(): ProductionPersistenceStatu
     nextOperatorActions: [
       "Run npm run verify:prod-persistence-auth (unauth 401 checks always).",
       "With founder test JWT: TWIN_PROD_TEST_JWT=… TWIN_PROD_SMOKE_WRITE=1 npm run verify:prod-persistence-auth",
-      "Confirm Railway alembic current = 067_request_intake via shell or admin endpoint.",
+      "Alembic head confirmed 2026-06-20 — see docs/ALEMBIC_PROD_HEAD_VERIFICATION_2026-06-19.md § Evidence log.",
       "Compare scaffold HEAD, frontend_commit, api_commit using docs/PROD_HEALTH_COMMIT_INTERPRETATION_2026-06-19.md",
     ],
     authSmokeCommand:
