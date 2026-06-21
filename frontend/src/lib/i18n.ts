@@ -210,6 +210,7 @@ export type TranslationKey =
   | `firstWorkingPersistencePlan.${keyof typeof en.firstWorkingPersistencePlan}`
   | `auditEventFoundation.${keyof typeof en.auditEventFoundation}`
   | `safePersistence.${keyof typeof en.safePersistence}`
+  | `liveOperatingState.${keyof typeof en.liveOperatingState}`
   | `workItems.${keyof typeof en.workItems}`
   | `candidateRoleStatus.${keyof typeof en.candidateRoleStatus}`
   | `companyFeedback.${keyof typeof en.companyFeedback}`
@@ -5959,6 +5960,24 @@ eyebrow: "Product roadmap",
     internalWriteLive: "Internal record updated — safe persistence only, no external side effect.",
     internalWriteDemo: "Demo preview only — authentication required for live internal write.",
   },
+  liveOperatingState: {
+    loading: "Loading operating state…",
+    partialFallback: "Partial live — some channels connected, others on demo fallback.",
+    channelWorkItems: "Work items",
+    channelReviewQueue: "Review queue",
+    channelRequestIntake: "Request intake",
+    channelCandidateRoleStatus: "Role status",
+    channelCompanyFeedback: "Company feedback",
+    channelAuditEvents: "Audit events",
+    monitorTitle: "Persistence operations monitor",
+    monitorLead: "Cross-persona safe persistence channel health — live success, demo fallback, or partial.",
+    crossLinksTitle: "Operational cross-links",
+    crossLinksLead: "Jump between live persistence surfaces — recruiter, company, candidate, and board.",
+    auditWidgetTitle: "Recent audit activity",
+    auditWidgetLead: "Append-only audit event count — internal trace only, no external side effect.",
+    trustRequestStatusTitle: "Live request status",
+    trustRequestStatusLead: "Export and intake request counts from safe persistence — preview metadata only.",
+  },
   workItems: {
     pageEyebrow: "Work items",
     recruiterTitle: "Recruiter notes and tasks",
@@ -6278,6 +6297,8 @@ eyebrow: "Product roadmap",
     openDailyCockpit: "Open daily cockpit",
     digestTitle: "Weekly digest candidates",
     digestLead: "Talent Radar digest resurfacing — timing signals, not auto outreach.",
+    operatingStateTitle: "Today's operating state",
+    operatingStateLead: "Live persistence counts from work items, review queue, request intake, role status, company feedback, and audit events — internal records only.",
   },
   companyHiringCockpit: {
     navLink: "Hiring cockpit",
@@ -12707,6 +12728,24 @@ const pl: MessageTree = {
     internalWriteLive: "Zaktualizowano rekord wewnętrzny — tylko safe persistence, bez efektu zewnętrznego.",
     internalWriteDemo: "Tylko podgląd demo — live zapis wewnętrzny wymaga uwierzytelnienia.",
   },
+  liveOperatingState: {
+    loading: "Ładowanie stanu operacyjnego…",
+    partialFallback: "Częściowo live — część kanałów podłączona, reszta na demo fallback.",
+    channelWorkItems: "Elementy pracy",
+    channelReviewQueue: "Kolejka review",
+    channelRequestIntake: "Request intake",
+    channelCandidateRoleStatus: "Status roli",
+    channelCompanyFeedback: "Feedback firmy",
+    channelAuditEvents: "Zdarzenia audytu",
+    monitorTitle: "Monitor operacji persistence",
+    monitorLead: "Stan kanałów safe persistence między personami — live, demo fallback lub partial.",
+    crossLinksTitle: "Cross-linki operacyjne",
+    crossLinksLead: "Przejścia między powierzchniami live persistence — rekruter, firma, kandydat i board.",
+    auditWidgetTitle: "Ostatnia aktywność audytu",
+    auditWidgetLead: "Liczba zdarzeń append-only — tylko ślad wewnętrzny, bez efektu zewnętrznego.",
+    trustRequestStatusTitle: "Status żądań live",
+    trustRequestStatusLead: "Liczby żądań export i intake z safe persistence — tylko metadane podglądu.",
+  },
   workItems: {
     pageEyebrow: "Elementy pracy",
     recruiterTitle: "Notatki i zadania rekrutera",
@@ -13026,6 +13065,8 @@ const pl: MessageTree = {
     openDailyCockpit: "Otwórz daily cockpit",
     digestTitle: "Kandydaci z tygodniowego digestu",
     digestLead: "Resurfacing z Talent Radar digest — sygnały timingowe, bez auto outreachu.",
+    operatingStateTitle: "Dzisiejszy stan operacyjny",
+    operatingStateLead: "Liczby live persistence z work items, review queue, request intake, statusu roli, feedbacku firmy i audit events — tylko rekordy wewnętrzne.",
   },
   companyHiringCockpit: {
     navLink: "Hiring cockpit",
