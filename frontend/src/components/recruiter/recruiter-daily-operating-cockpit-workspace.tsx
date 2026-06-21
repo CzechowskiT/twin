@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspace-nav";
@@ -71,7 +71,8 @@ function queueList(items: CockpitQueueItem[], profileLabel: string): ReactNode {
 
 export function RecruiterDailyOperatingCockpitWorkspace() {
   const { t } = useTranslation();
-  const record = resolveRecruiterDailyCockpit();
+  const record = useMemo(() => resolveRecruiterDailyCockpit(), []);
+  const moduleLinks = useMemo(() => RECRUITER_DAILY_COCKPIT_MODULE_LINKS, []);
   const [operatingState, setOperatingState] = useState<OperatingStateSummary | null>(null);
 
   useEffect(() => {
@@ -136,7 +137,7 @@ export function RecruiterDailyOperatingCockpitWorkspace() {
             data-testid={RECRUITER_DAILY_COCKPIT_MARKERS.moduleLinks}
             aria-label={t("recruiterDailyCockpit.moduleLinksTitle")}
           >
-            {RECRUITER_DAILY_COCKPIT_MODULE_LINKS.map((link) => (
+            {moduleLinks.map((link) => (
               <Link
                 key={link.id}
                 href={link.href}

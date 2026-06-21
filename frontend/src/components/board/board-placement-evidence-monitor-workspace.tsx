@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { useMemo } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { CompactAuditTrailWidget } from "@/components/shared/compact-audit-trail-widget";
@@ -30,7 +31,8 @@ function section(marker: string, title: string, children: ReactNode): ReactNode 
 
 export function BoardPlacementEvidenceMonitorWorkspace() {
   const { t } = useTranslation();
-  const record = resolveBoardPlacementEvidenceMonitor();
+  const record = useMemo(() => resolveBoardPlacementEvidenceMonitor(), []);
+  const crossLinks = useMemo(() => BOARD_PLACEMENT_EVIDENCE_MONITOR_LINKS, []);
 
   return (
     <Shell wide>
@@ -164,7 +166,7 @@ export function BoardPlacementEvidenceMonitorWorkspace() {
           data-testid={BOARD_PLACEMENT_EVIDENCE_MONITOR_MARKERS.crossLinks}
           aria-label={t("liveOperatingState.crossLinksTitle")}
         >
-          {BOARD_PLACEMENT_EVIDENCE_MONITOR_LINKS.map((link) => (
+          {crossLinks.map((link) => (
             <Link key={link.id} href={link.href} className="twin-link rounded-full border border-[var(--twin-border)] px-3 py-1">
               {t(link.labelKey)}
             </Link>

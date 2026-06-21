@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { CompanyWorkspaceNav } from "@/components/company/company-workspace-nav";
 import { useTranslation } from "@/components/language-provider";
@@ -72,7 +72,9 @@ function queueList(items: CommandCenterQueueItem[], profileLabel: string): React
 
 export function CompanyHiringCommandCenterWorkspace() {
   const { t } = useTranslation();
-  const record = resolveCompanyHiringCommandCenter();
+  const record = useMemo(() => resolveCompanyHiringCommandCenter(), []);
+  const moduleLinks = useMemo(() => COMPANY_HIRING_COMMAND_CENTER_MODULE_LINKS, []);
+  const disabledActions = useMemo(() => COMPANY_HIRING_COMMAND_CENTER_DISABLED_ACTIONS, []);
   const [operatingState, setOperatingState] = useState<OperatingStateSummary | null>(null);
 
   useEffect(() => {
@@ -141,7 +143,7 @@ export function CompanyHiringCommandCenterWorkspace() {
             data-testid={COMPANY_HIRING_COMMAND_CENTER_MARKERS.moduleLinks}
             aria-label={t("companyHiringCommandCenter.moduleLinksTitle")}
           >
-            {COMPANY_HIRING_COMMAND_CENTER_MODULE_LINKS.map((link) => (
+            {moduleLinks.map((link) => (
               <Link
                 key={link.id}
                 href={link.href}
@@ -306,7 +308,7 @@ export function CompanyHiringCommandCenterWorkspace() {
                 className="mt-4 flex flex-wrap gap-2"
                 data-testid={COMPANY_HIRING_COMMAND_CENTER_MARKERS.disabledActions}
               >
-                {COMPANY_HIRING_COMMAND_CENTER_DISABLED_ACTIONS.map((action) => (
+                {disabledActions.map((action) => (
                   <button
                     key={action.key}
                     type="button"
