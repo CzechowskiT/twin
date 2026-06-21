@@ -35,6 +35,7 @@ ALLOWED_TARGET_TYPES = frozenset(
         "visibility_preference",
         "export_request",
         "request_intake_item",
+        "placement_verification_event",
         "audit_event",
         "demo_target",
     }
