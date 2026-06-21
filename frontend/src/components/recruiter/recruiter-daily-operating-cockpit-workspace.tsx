@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "@/components/language-provider";
 import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspace-nav";
 import { LiveOperatingStatePanel } from "@/components/shared/live-operating-state-panel";
+import { CompactAuditTrailWidget } from "@/components/shared/compact-audit-trail-widget";
 import { Card, Shell } from "@/components/ui";
 import { loadRecruiterOperatingState, type OperatingStateSummary } from "@/lib/live-operating-state";
 import type { CockpitQueueItem } from "@/lib/recruiter-daily-operating-cockpit-demo-data";
@@ -154,6 +155,8 @@ export function RecruiterDailyOperatingCockpitWorkspace() {
           summary={operatingState}
           testId={RECRUITER_DAILY_COCKPIT_MARKERS.operatingState}
         />
+
+        <CompactAuditTrailWidget />
 
         {sectionCard(
           RECRUITER_DAILY_COCKPIT_MARKERS.priorityWorklist,

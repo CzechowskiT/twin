@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 
 import { CandidateTrustRequestStatusPanel } from "@/components/candidate/candidate-trust-request-status-panel";
+import { CompactAuditTrailWidget } from "@/components/shared/compact-audit-trail-widget";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
@@ -131,6 +132,8 @@ function TrustOverviewContent({ record }: { record: CandidateTrustOverviewRecord
         </header>
 
         <CandidateTrustRequestStatusPanel status={requestStatus} />
+
+        <CompactAuditTrailWidget />
 
         {sectionCard(
           CANDIDATE_TRUST_OVERVIEW_MARKERS.moduleMap,

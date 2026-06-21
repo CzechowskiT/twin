@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { CompanyWorkspaceNav } from "@/components/company/company-workspace-nav";
 import { useTranslation } from "@/components/language-provider";
 import { LiveOperatingStatePanel } from "@/components/shared/live-operating-state-panel";
+import { CompactAuditTrailWidget } from "@/components/shared/compact-audit-trail-widget";
 import { Card, Shell } from "@/components/ui";
 import { loadCompanyOperatingState, type OperatingStateSummary } from "@/lib/live-operating-state";
 import type { CommandCenterQueueItem } from "@/lib/company-hiring-command-center-demo-data";
@@ -158,6 +159,8 @@ export function CompanyHiringCommandCenterWorkspace() {
           summary={operatingState}
           testId={COMPANY_HIRING_COMMAND_CENTER_MARKERS.operatingState}
         />
+
+        <CompactAuditTrailWidget />
 
         <div className="grid gap-6 lg:grid-cols-2">
           {sectionCard(
