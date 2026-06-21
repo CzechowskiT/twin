@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
+import { OperationalCrossLinksPanel } from "@/components/shared/operational-cross-links-panel";
 import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspace-nav";
 import { Card, Shell } from "@/components/ui";
 import type { TrustReviewQueueItem } from "@/lib/recruiter-trust-review-queue-demo-data";
@@ -222,6 +223,8 @@ export function RecruiterTrustReviewQueueWorkspace() {
             </div>
           </>,
         )}
+
+        <OperationalCrossLinksPanel />
       </div>
     </Shell>
   );

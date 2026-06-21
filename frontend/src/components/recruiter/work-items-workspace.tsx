@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
+import { OperationalCrossLinksPanel } from "@/components/shared/operational-cross-links-panel";
 import { Card, Shell } from "@/components/ui";
 import {
   LAUNCH_STANCE,
@@ -228,6 +229,8 @@ export function WorkItemsWorkspace({ scope }: Props) {
             <p className="text-xs">{t("workItems.boundaryLead")}</p>
           </>,
         )}
+
+        <OperationalCrossLinksPanel />
       </div>
     </Shell>
   );

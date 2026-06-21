@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { CandidateTrustRequestStatusLoader } from "@/components/candidate/candidate-trust-request-status-loader";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import {
@@ -97,6 +98,8 @@ export function CandidateVisibilityPreferencesWorkspace() {
             {t("candidateVisibilityPreferences.linkControlCenter")}
           </Link>
         </header>
+
+        <CandidateTrustRequestStatusLoader />
 
         <Card variant="soft" className="border-[var(--twin-border)]/80 p-5">
           <div data-testid={CANDIDATE_VISIBILITY_PREFERENCES_MARKERS.fields}>

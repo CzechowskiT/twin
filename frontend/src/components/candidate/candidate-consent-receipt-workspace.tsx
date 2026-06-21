@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { useMemo } from "react";
 
+import { CandidateTrustRequestStatusLoader } from "@/components/candidate/candidate-trust-request-status-loader";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { ConsentReceiptPanel } from "@/components/candidate/consent-receipt-panel";
 import { ExportRequestPersistenceNote } from "@/components/candidate/export-request-persistence-note";
@@ -223,6 +224,8 @@ function ConsentReceiptContent({ record }: { record: CandidateConsentReceiptReco
             </Link>
           </div>
         </header>
+
+        <CandidateTrustRequestStatusLoader />
 
         <ExportRequestPersistenceNote
           testId="candidate-consent-receipt-export-request-note"

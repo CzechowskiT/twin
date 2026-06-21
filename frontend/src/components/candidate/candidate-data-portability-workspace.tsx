@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { CandidateTrustRequestStatusLoader } from "@/components/candidate/candidate-trust-request-status-loader";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
@@ -191,6 +192,8 @@ function DataPortabilityContent({ record }: { record: CandidateDataPortabilityRe
             </Link>
           </div>
         </header>
+
+        <CandidateTrustRequestStatusLoader />
 
         {sectionCard(
           CANDIDATE_DATA_PORTABILITY_MARKERS.portabilityScope,

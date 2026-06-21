@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { CandidateTrustRequestStatusLoader } from "@/components/candidate/candidate-trust-request-status-loader";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { CorrectionCategoryLabel } from "@/components/candidate/correction-request-panel";
 import { useTranslation } from "@/components/language-provider";
@@ -207,6 +208,8 @@ function CorrectionRequestContent({ record }: { record: CandidateCorrectionReque
             </Link>
           </div>
         </header>
+
+        <CandidateTrustRequestStatusLoader />
 
         {sectionCard(
           CANDIDATE_CORRECTION_REQUEST_MARKERS.categories,

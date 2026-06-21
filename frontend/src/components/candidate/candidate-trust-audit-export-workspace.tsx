@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { useMemo } from "react";
 
+import { CandidateTrustRequestStatusLoader } from "@/components/candidate/candidate-trust-request-status-loader";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { TrustAuditExportPanel } from "@/components/candidate/trust-audit-export-panel";
 import { ExportRequestPersistenceNote } from "@/components/candidate/export-request-persistence-note";
@@ -207,6 +208,8 @@ function TrustAuditExportContent({ record }: { record: CandidateTrustAuditExport
             </Link>
           </div>
         </header>
+
+        <CandidateTrustRequestStatusLoader />
 
         <ExportRequestPersistenceNote
           testId="candidate-trust-audit-export-request-note"
