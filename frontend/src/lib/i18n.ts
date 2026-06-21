@@ -6428,6 +6428,8 @@ eyebrow: "Product roadmap",
     demoJourneyTitle: "Company hiring command center (sample)",
     demoJourneyDesc: "Hiring manager command view with role readiness, shortlist, blockers, trust, tasks, and disabled actions.",
     openCommandCenter: "Open command center",
+    operatingStateTitle: "Hiring operating state",
+    operatingStateLead: "Live persistence counts from work items, role status, company feedback, and audit events — internal records only.",
   },
   safeCommunication: {
     pageEyebrow: "Safe communication",
@@ -13196,6 +13198,8 @@ const pl: MessageTree = {
     demoJourneyTitle: "Centrum dowodzenia hiringu firmy (przykład)",
     demoJourneyDesc: "Widok dowodzenia HM z gotowością ról, shortlistą, blokerami, trust, zadaniami i wyłączonymi akcjami.",
     openCommandCenter: "Otwórz command center",
+    operatingStateTitle: "Stan operacyjny hiringu",
+    operatingStateLead: "Liczby live persistence z work items, statusu roli, feedbacku firmy i audit events — tylko rekordy wewnętrzne.",
   },
   safeCommunication: {
     pageEyebrow: "Bezpieczna komunikacja",
