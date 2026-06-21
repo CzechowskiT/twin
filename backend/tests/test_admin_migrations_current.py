@@ -26,7 +26,9 @@ def migrations_admin_client(monkeypatch):
         conn.execute(
             text("CREATE TABLE IF NOT EXISTS alembic_version (version_num VARCHAR(32) NOT NULL)")
         )
-        conn.execute(text("INSERT INTO alembic_version (version_num) VALUES ('067_request_intake')"))
+        conn.execute(
+            text("INSERT INTO alembic_version (version_num) VALUES ('068_placement_events_foundation')")
+        )
     Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
     db = Session()
 
@@ -55,8 +57,8 @@ def test_migrations_current_ok(migrations_admin_client) -> None:
     )
     assert res.status_code == 200
     body = res.json()
-    assert body["current_revision"] == "067_request_intake"
-    assert body["head_revision"] == "067_request_intake"
+    assert body["current_revision"] == "068_placement_events_foundation"
+    assert body["head_revision"] == "068_placement_events_foundation"
     assert body["is_at_head"] is True
     assert body["read_only"] is True
     blob = res.text.lower()
