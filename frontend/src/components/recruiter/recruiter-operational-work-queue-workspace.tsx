@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspace-nav";
+import { OperationalCrossLinksPanel } from "@/components/shared/operational-cross-links-panel";
 import { Card, Shell } from "@/components/ui";
 import type { WorkQueueItem } from "@/lib/recruiter-operational-work-queue-demo-data";
 import {
@@ -238,6 +239,8 @@ export function RecruiterOperationalWorkQueueWorkspace() {
             </div>
           </>,
         )}
+
+        <OperationalCrossLinksPanel />
       </div>
     </Shell>
   );

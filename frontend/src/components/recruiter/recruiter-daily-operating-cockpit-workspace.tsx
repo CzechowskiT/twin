@@ -8,6 +8,7 @@ import { useTranslation } from "@/components/language-provider";
 import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspace-nav";
 import { LiveOperatingStatePanel } from "@/components/shared/live-operating-state-panel";
 import { CompactAuditTrailWidget } from "@/components/shared/compact-audit-trail-widget";
+import { OperationalCrossLinksPanel } from "@/components/shared/operational-cross-links-panel";
 import { Card, Shell } from "@/components/ui";
 import { loadRecruiterOperatingState, type OperatingStateSummary } from "@/lib/live-operating-state";
 import type { CockpitQueueItem } from "@/lib/recruiter-daily-operating-cockpit-demo-data";
@@ -327,6 +328,8 @@ export function RecruiterDailyOperatingCockpitWorkspace() {
             "lg:col-span-2",
           )}
         </div>
+
+        <OperationalCrossLinksPanel />
       </div>
     </Shell>
   );

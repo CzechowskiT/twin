@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "@/components/language-provider";
 import { LiveOperatingStatePanel } from "@/components/shared/live-operating-state-panel";
 import { CompactAuditTrailWidget } from "@/components/shared/compact-audit-trail-widget";
+import { OperationalCrossLinksPanel } from "@/components/shared/operational-cross-links-panel";
 import { Shell } from "@/components/ui";
 import {
   BOARD_PERSISTENCE_OPERATIONS_MONITOR_LINKS,
@@ -58,6 +59,8 @@ export function BoardPersistenceOperationsMonitorWorkspace() {
         />
 
         <CompactAuditTrailWidget />
+
+        <OperationalCrossLinksPanel />
 
         <nav
           className="flex flex-wrap gap-2 text-xs"
