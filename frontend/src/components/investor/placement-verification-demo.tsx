@@ -4,6 +4,8 @@ import Link from "next/link";
 
 import { useTranslation } from "@/components/language-provider";
 import { Card } from "@/components/ui";
+import { PLACEMENT_VERIFICATION_INTEGRATION_LINKS } from "@/lib/placement-verification-integration";
+import type { TranslationKey } from "@/lib/i18n";
 
 const DEMO_EVENTS = [
   { type: "placement.declared", actor: "candidate", at: "T+0" },
@@ -31,6 +33,13 @@ export function PlacementVerificationDemo() {
         ))}
       </ol>
       <p className="twin-muted text-xs leading-relaxed">{t("placementDemo.seedNote")}</p>
+      <div className="flex flex-wrap gap-2">
+        {PLACEMENT_VERIFICATION_INTEGRATION_LINKS.filter((link) => link.id !== "investor_placement").map((link) => (
+          <Link key={link.id} href={link.href} className="twin-link rounded-full border border-[var(--twin-border)] px-3 py-1 text-xs">
+            {t(link.labelKey as TranslationKey)}
+          </Link>
+        ))}
+      </div>
       <Link href="/login" className="twin-link text-sm font-medium">
         {t("placementDemo.loginDemo")} →
       </Link>

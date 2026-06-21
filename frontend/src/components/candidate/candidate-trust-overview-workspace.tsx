@@ -17,6 +17,7 @@ import {
   CANDIDATE_TRUST_OVERVIEW_SAFE_LINKS,
   resolveCandidateTrustOverview,
 } from "@/lib/candidate-trust-overview";
+import { placementVerificationIntegrationHref } from "@/lib/placement-verification-integration";
 import type { TranslationKey } from "@/lib/i18n";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
@@ -242,6 +243,12 @@ function TrustOverviewContent({ record }: { record: CandidateTrustOverviewRecord
               </Link>
               <Link href={CANDIDATE_TRUST_OVERVIEW_SAFE_LINKS.profile} className="twin-link text-sm font-medium">
                 {t("candidateTrustOverview.linkProfile")}
+              </Link>
+              <Link
+                href={placementVerificationIntegrationHref("candidate_preview")}
+                className="twin-link text-sm font-medium"
+              >
+                {t("candidatePlacementVerification.pageTitle")}
               </Link>
             </div>
           </>,

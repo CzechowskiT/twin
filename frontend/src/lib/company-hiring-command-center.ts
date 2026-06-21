@@ -133,6 +133,11 @@ export const COMPANY_HIRING_COMMAND_CENTER_MODULE_LINKS = [
     href: decisionMemoryHref(COMPANY_HIRING_COMMAND_CENTER_DEMO_CANDIDATE_ID, "company"),
     labelKey: "companyHiringCommandCenter.linkDecisionMemory" as TranslationKey,
   },
+  {
+    id: "placement_verification",
+    href: "/company/placement-verification",
+    labelKey: "placementChecklist.companyPageTitle" as TranslationKey,
+  },
 ] as const;
 
 export function companyHiringCommandCenterHref(): string {
