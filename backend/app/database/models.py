@@ -654,16 +654,30 @@ class PlacementEvent(Base):
     __tablename__ = "placement_events"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    application_id: Mapped[int] = mapped_column(
+    application_id: Mapped[int | None] = mapped_column(
         ForeignKey("applications.id", ondelete="CASCADE"),
         index=True,
+        nullable=True,
     )
+    placement_id: Mapped[str | None] = mapped_column(String(128), index=True, nullable=True)
+    candidate_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    role_context_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    company_slug: Mapped[str | None] = mapped_column(String(80), nullable=True)
     event_type: Mapped[str] = mapped_column(String(64))
-    actor: Mapped[str] = mapped_column(String(32))
+    event_status: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    actor: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    actor_persona: Mapped[str | None] = mapped_column(String(32), nullable=True)
     detail_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    metadata_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    source: Mapped[str | None] = mapped_column(String(32), default="twin_internal")
+    external_side_effect: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_by_user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
-    application: Mapped["Application"] = relationship(back_populates="placement_events")
+    application: Mapped["Application | None"] = relationship(back_populates="placement_events")
 
 
 class ApiIdempotency(Base):

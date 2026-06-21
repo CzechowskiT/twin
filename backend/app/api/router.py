@@ -38,6 +38,7 @@ from app.api import (
     opportunities,
     partner,
     placement,
+    placement_events,
     profile_import,
     public,
     recruiter,
@@ -95,6 +96,11 @@ api_router.include_router(talent_pool.router, prefix="/talent-pool", tags=["Tale
 api_router.include_router(integrations_ats.router, prefix="/integrations", tags=["Integrations"])
 api_router.include_router(jobs.router, prefix="/jobs", tags=["Jobs"])
 api_router.include_router(placement.router, prefix="/placement", tags=["Placement"])
+api_router.include_router(
+    placement_events.router,
+    prefix="/placement-events",
+    tags=["Placement events"],
+)
 api_router.include_router(curated_careers.router, prefix="/employers", tags=["Employers"])
 api_router.include_router(partner.router, prefix="/partner", tags=["Partner"])
 api_router.include_router(applications.router, prefix="/applications", tags=["Applications"])
