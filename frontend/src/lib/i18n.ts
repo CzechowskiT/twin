@@ -201,6 +201,7 @@ export type TranslationKey =
   | `candidateTrustOverview.${keyof typeof en.candidateTrustOverview}`
   | `candidatePlacementVerification.${keyof typeof en.candidatePlacementVerification}`
   | `placementChecklist.${keyof typeof en.placementChecklist}`
+  | `boardPlacementEvidence.${keyof typeof en.boardPlacementEvidence}`
   | `recruiterTrustReviewQueue.${keyof typeof en.recruiterTrustReviewQueue}`
   | `companyCandidateTrustSummary.${keyof typeof en.companyCandidateTrustSummary}`
   | `investorTrustProof.${keyof typeof en.investorTrustProof}`
@@ -5558,6 +5559,23 @@ eyebrow: "Product roadmap",
     actionOutreachDisabled: "Employer outreach (disabled)",
     actionApproveDisabled: "Approve verification (disabled)",
     actionConfirmHireDisabled: "Confirm hire (disabled)",
+  },
+  boardPlacementEvidence: {
+    pageEyebrow: "Board placement evidence",
+    pageTitle: "Placement evidence monitor",
+    headerLead: "Cross-persona placement evidence health — internal demo proof, not legal verification.",
+    pilotBadge: "DEMO ONLY · EVIDENCE MONITOR",
+    evidenceMatrixTitle: "Evidence matrix",
+    evidenceMatrixLead: "Persona routes and evidence kinds — verification-ready preview, no external confirmation.",
+    colPersona: "Persona",
+    colRoute: "Route",
+    colKind: "Evidence kind",
+    colStatus: "Status",
+    economicsTitle: "Economics preview (no-op)",
+    economicsLead: "Fee eligibility not evaluated — no payment initiated, retention clock not started.",
+    riskTitle: "Risk flags",
+    blockedTitle: "Blocked capabilities",
+    personaRoutesTitle: "Persona routes",
   },
   recruiterTrustReviewQueue: {
     pageEyebrow: "Trust review queue",
@@ -12411,6 +12429,23 @@ const pl: MessageTree = {
     actionOutreachDisabled: "Outreach do pracodawcy (wył.)",
     actionApproveDisabled: "Zatwierdź weryfikację (wył.)",
     actionConfirmHireDisabled: "Potwierdź zatrudnienie (wył.)",
+  },
+  boardPlacementEvidence: {
+    pageEyebrow: "Dowód placementu — board",
+    pageTitle: "Monitor dowodu placementu",
+    headerLead: "Zdrowie dowodu placementu między personami — wewnętrzny demo proof, nie weryfikacja prawna.",
+    pilotBadge: "TYLKO DEMO · MONITOR DOWODU",
+    evidenceMatrixTitle: "Macierz dowodów",
+    evidenceMatrixLead: "Trasy person i rodzaje dowodów — podgląd gotowy do weryfikacji, bez potwierdzenia zewnętrznego.",
+    colPersona: "Persona",
+    colRoute: "Trasa",
+    colKind: "Rodzaj dowodu",
+    colStatus: "Status",
+    economicsTitle: "Podgląd ekonomii (no-op)",
+    economicsLead: "Kwalifikacja opłaty nieoceniona — brak inicjacji płatności, brak rozpoznania przychodu.",
+    riskTitle: "Flagi ryzyka",
+    blockedTitle: "Zablokowane możliwości",
+    personaRoutesTitle: "Trasy person",
   },
   recruiterTrustReviewQueue: {
     pageEyebrow: "Kolejka przeglądu zaufania",

@@ -41,6 +41,7 @@ export const BOARD_PERSISTENCE_OPERATIONS_MONITOR_LINKS = [
   { id: "first_plan", href: "/board/first-working-persistence-plan", labelKey: "firstWorkingPersistencePlan.demoJourneyTitle" as TranslationKey },
   { id: "daily_cockpit", href: "/recruiter/daily-cockpit", labelKey: "recruiterDailyCockpit.openDailyCockpit" as TranslationKey },
   { id: "command_center", href: "/company/hiring-command-center", labelKey: "companyHiringCommandCenter.openCommandCenter" as TranslationKey },
+  { id: "placement_evidence", href: "/board/placement-verification", labelKey: "boardPlacementEvidence.pageTitle" as TranslationKey },
 ] as const;
 
 export type BoardOperatingState = {
