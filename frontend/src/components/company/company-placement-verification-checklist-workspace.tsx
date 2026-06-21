@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { useTranslation } from "@/components/language-provider";
 import { OperationalCrossLinksPanel } from "@/components/shared/operational-cross-links-panel";
+import { PlacementEventsTimeline } from "@/components/shared/placement-events-timeline";
 import { Card, Shell } from "@/components/ui";
 import { LAUNCH_STANCE } from "@/lib/investor-metrics-reality";
 import type { PlacementChecklistItem } from "@/lib/recruiter-company-placement-verification-checklist-demo-data";
@@ -88,6 +89,8 @@ export function CompanyPlacementVerificationChecklistWorkspace() {
             ))}
           </div>
         </Card>
+
+        <PlacementEventsTimeline placementId={record.placement_id} />
 
         <div data-testid={COMPANY_PLACEMENT_VERIFICATION_MARKERS.crossLinks}>
           <OperationalCrossLinksPanel />

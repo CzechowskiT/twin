@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { useTranslation } from "@/components/language-provider";
 import { CompactAuditTrailWidget } from "@/components/shared/compact-audit-trail-widget";
 import { OperationalCrossLinksPanel } from "@/components/shared/operational-cross-links-panel";
+import { PlacementEventsTimeline } from "@/components/shared/placement-events-timeline";
 import { Card, Shell } from "@/components/ui";
 import { LAUNCH_STANCE } from "@/lib/investor-metrics-reality";
 import {
@@ -124,6 +125,8 @@ export function BoardPlacementEvidenceMonitorWorkspace() {
         )}
 
         <CompactAuditTrailWidget />
+
+        <PlacementEventsTimeline placementId={record.placement_id} />
 
         {section(
           BOARD_PLACEMENT_EVIDENCE_MONITOR_MARKERS.personaRoutes,

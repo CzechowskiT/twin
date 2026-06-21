@@ -201,6 +201,7 @@ export type TranslationKey =
   | `candidateTrustOverview.${keyof typeof en.candidateTrustOverview}`
   | `candidatePlacementVerification.${keyof typeof en.candidatePlacementVerification}`
   | `placementChecklist.${keyof typeof en.placementChecklist}`
+  | `placementEventsTimeline.${keyof typeof en.placementEventsTimeline}`
   | `boardPlacementEvidence.${keyof typeof en.boardPlacementEvidence}`
   | `recruiterTrustReviewQueue.${keyof typeof en.recruiterTrustReviewQueue}`
   | `companyCandidateTrustSummary.${keyof typeof en.companyCandidateTrustSummary}`
@@ -5559,6 +5560,14 @@ eyebrow: "Product roadmap",
     actionOutreachDisabled: "Employer outreach (disabled)",
     actionApproveDisabled: "Approve verification (disabled)",
     actionConfirmHireDisabled: "Confirm hire (disabled)",
+  },
+  placementEventsTimeline: {
+    title: "Append-only placement events",
+    lead: "Internal placement evidence timeline — read-only monitor, no write actions from UI.",
+    safetyNote:
+      "Append-only internal placement evidence · no external confirmation · no payment initiated · no invoice generated · no revenue recognition · human review required",
+    partialWarning: "Live API connected but empty — showing demo fallback rows.",
+    emptyState: "No placement events yet — demo fallback unavailable.",
   },
   boardPlacementEvidence: {
     pageEyebrow: "Board placement evidence",
@@ -12429,6 +12438,14 @@ const pl: MessageTree = {
     actionOutreachDisabled: "Outreach do pracodawcy (wył.)",
     actionApproveDisabled: "Zatwierdź weryfikację (wył.)",
     actionConfirmHireDisabled: "Potwierdź zatrudnienie (wył.)",
+  },
+  placementEventsTimeline: {
+    title: "Zdarzenia placementu append-only",
+    lead: "Oś wewnętrznego dowodu placementu — monitor tylko do odczytu, bez akcji zapisu z UI.",
+    safetyNote:
+      "Wewnętrzny dowód placementu append-only · brak potwierdzenia zewnętrznego · brak inicjacji płatności · brak wygenerowanej faktury · brak rozpoznania przychodu · wymagany przegląd człowieka",
+    partialWarning: "Live API podłączone, ale pusto — pokazano wiersze demo fallback.",
+    emptyState: "Brak zdarzeń placementu — demo fallback niedostępny.",
   },
   boardPlacementEvidence: {
     pageEyebrow: "Dowód placementu — board",
