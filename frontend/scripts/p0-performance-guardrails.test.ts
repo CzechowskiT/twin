@@ -52,6 +52,15 @@ test("6 placement timeline has no polling loop", () => {
   assert.doesNotMatch(timeline, /poll/i);
 });
 
-test("7 npm script registered", () => {
+test("7 cockpit routes memoize static demo data", () => {
+  const recruiter = read("src/components/recruiter/recruiter-daily-operating-cockpit-workspace.tsx");
+  const company = read("src/components/company/company-hiring-command-center-workspace.tsx");
+  const board = read("src/components/board/board-persistence-operations-monitor-workspace.tsx");
+  assert.match(recruiter, /useMemo\(\(\) => resolveRecruiterDailyCockpit\(\)/);
+  assert.match(company, /useMemo\(\(\) => resolveCompanyHiringCommandCenter\(\)/);
+  assert.match(board, /useMemo\(\(\) => resolveBoardPersistenceOperationsMonitor\(\)/);
+});
+
+test("8 npm script registered", () => {
   assert.match(read("package.json"), /test:p0-performance-guardrails/);
 });

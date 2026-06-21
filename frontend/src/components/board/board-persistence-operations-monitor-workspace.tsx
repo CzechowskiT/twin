@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { LiveOperatingStatePanel } from "@/components/shared/live-operating-state-panel";
@@ -34,7 +34,8 @@ function section(marker: string, title: string, children: ReactNode): ReactNode 
 
 export function BoardPersistenceOperationsMonitorWorkspace() {
   const { t } = useTranslation();
-  const record = resolveBoardPersistenceOperationsMonitor();
+  const record = useMemo(() => resolveBoardPersistenceOperationsMonitor(), []);
+  const crossLinks = useMemo(() => BOARD_PERSISTENCE_OPERATIONS_MONITOR_LINKS, []);
   const [state, setState] = useState<BoardOperatingState | null>(null);
   const [health, setHealth] = useState<PublicHealthSnapshot | null>(null);
 
@@ -212,7 +213,7 @@ export function BoardPersistenceOperationsMonitorWorkspace() {
           data-testid={BOARD_PERSISTENCE_OPERATIONS_MONITOR_MARKERS.crossLinks}
           aria-label={t("liveOperatingState.crossLinksTitle")}
         >
-          {BOARD_PERSISTENCE_OPERATIONS_MONITOR_LINKS.map((link) => (
+          {crossLinks.map((link) => (
             <Link key={link.id} href={link.href} className="twin-link rounded-full border border-[var(--twin-border)] px-3 py-1">
               {t(link.labelKey)}
             </Link>
