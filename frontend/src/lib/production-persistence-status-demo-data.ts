@@ -38,7 +38,7 @@ export type ProductionPersistenceStatusRecord = {
 export function getProductionPersistenceStatusDemo(): ProductionPersistenceStatusRecord {
   return {
     healthUrl: "/api/public-health",
-    expectedAlembicHead: "067_request_intake",
+    expectedAlembicHead: "068_placement_events_foundation",
     migrationChain: [
       "060_audit_events_foundation",
       "061_work_items",
@@ -48,6 +48,7 @@ export function getProductionPersistenceStatusDemo(): ProductionPersistenceStatu
       "065_candidate_visibility_preferences",
       "066_export_requests",
       "067_request_intake",
+      "068_placement_events_foundation",
     ],
     endpoints: [
       { id: "audit", path: "/api/v1/audit-events", methods: "GET, POST", unauthExpected: "401", authSmoke: "POST append-only event" },
@@ -58,25 +59,26 @@ export function getProductionPersistenceStatusDemo(): ProductionPersistenceStatu
       { id: "visibility", path: "/api/v1/candidate-visibility-preferences", methods: "GET, POST, PATCH", unauthExpected: "401", authSmoke: "POST pilot_visible prefs" },
       { id: "export", path: "/api/v1/export-requests", methods: "GET, POST", unauthExpected: "401", authSmoke: "POST preview_created export" },
       { id: "intake", path: "/api/v1/request-intake", methods: "GET, POST, PATCH", unauthExpected: "401", authSmoke: "POST correction_preview intake" },
+      { id: "placement_events", path: "/api/v1/placement-events", methods: "GET, POST", unauthExpected: "401", authSmoke: "POST demo_verification_recorded" },
     ],
     migrationChecks: [
       {
         id: "repo-head",
         label: "Repo Alembic head",
         status: "verified_repo",
-        detail: "Local chain 060→067 — see docs/ALEMBIC_PROD_HEAD_VERIFICATION_2026-06-19.md",
+        detail: "Local chain 060→068 — see docs/ALEMBIC_PROD_HEAD_VERIFICATION_2026-06-19.md",
       },
       {
         id: "railway-current",
         label: "Railway alembic current",
         status: "verified_repo",
-        detail: "CONFIRMED — 067_request_intake (2026-06-20 admin migrations endpoint)",
+        detail: "PENDING prod verify — repo head 068_placement_events_foundation (2026-06-21 batch)",
       },
       {
         id: "tables",
-        label: "Tables 065–067",
+        label: "Tables 065–068",
         status: "operator_action",
-        detail: "Read-only COUNT on candidate_visibility_preferences, export_requests, request_intake_items",
+        detail: "Read-only COUNT on visibility, export, intake, placement_events foundation columns",
       },
     ],
     verificationStatus: [
@@ -138,7 +140,7 @@ export function getProductionPersistenceStatusDemo(): ProductionPersistenceStatu
         id: "p0",
         label: "P0 performance",
         status: "open",
-        detail: "OPEN",
+        detail: "OPEN — inventory docs/P0_PERFORMANCE_INVENTORY_2026-06-21.md; low-risk hardening applied; no stress/headless/multitab run",
       },
       {
         id: "phase3b",
@@ -155,7 +157,8 @@ export function getProductionPersistenceStatusDemo(): ProductionPersistenceStatu
       "Smoke records are append-only internal test rows — human review required; no external side effect.",
     ],
     nextOperatorActions: [
-      "Run npm run verify:prod-persistence-auth (unauth 401 checks always).",
+      "Run npm run test:placement-events-auth-smoke for unauth checks on placement-events API.",
+      "Review docs/P0_PERFORMANCE_INVENTORY_2026-06-21.md — P0 remains OPEN.",
       "With founder test JWT: TWIN_PROD_TEST_JWT=… TWIN_PROD_SMOKE_WRITE=1 npm run verify:prod-persistence-auth",
       "Alembic head confirmed 2026-06-20 — see docs/ALEMBIC_PROD_HEAD_VERIFICATION_2026-06-19.md § Evidence log.",
       "Compare scaffold HEAD, frontend_commit, api_commit using docs/PROD_HEALTH_COMMIT_INTERPRETATION_2026-06-19.md",
