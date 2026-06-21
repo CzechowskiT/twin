@@ -9,6 +9,7 @@ export function getWorkingFeaturesReadinessDemo(): WorkingFeaturesReadinessRecor
       "workingFeaturesReadiness.implStep2",
       "workingFeaturesReadiness.implStep3",
       "workingFeaturesReadiness.implStep4",
+      "workingFeaturesReadiness.implStep5",
     ],
   };
 }
