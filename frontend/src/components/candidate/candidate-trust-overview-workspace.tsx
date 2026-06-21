@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 
+import { CandidateTrustRequestStatusPanel } from "@/components/candidate/candidate-trust-request-status-panel";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
@@ -14,6 +16,7 @@ import {
   CANDIDATE_TRUST_OVERVIEW_SAFE_LINKS,
   resolveCandidateTrustOverview,
 } from "@/lib/candidate-trust-overview";
+import { loadTrustRequestStatus, type TrustRequestStatus } from "@/lib/candidate-trust-request-status";
 import type { TranslationKey } from "@/lib/i18n";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
@@ -64,6 +67,17 @@ function TrustOverviewNotFound() {
 
 function TrustOverviewContent({ record }: { record: CandidateTrustOverviewRecord }) {
   const { t } = useTranslation();
+  const [requestStatus, setRequestStatus] = useState<TrustRequestStatus | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    void loadTrustRequestStatus().then((res) => {
+      if (active) setRequestStatus(res);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <Shell wide rail>
@@ -115,6 +129,8 @@ function TrustOverviewContent({ record }: { record: CandidateTrustOverviewRecord
             </Link>
           </div>
         </header>
+
+        <CandidateTrustRequestStatusPanel status={requestStatus} />
 
         {sectionCard(
           CANDIDATE_TRUST_OVERVIEW_MARKERS.moduleMap,
