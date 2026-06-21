@@ -56,6 +56,8 @@ export const RECRUITER_DAILY_COCKPIT_MARKERS = {
   pilotBadge: "recruiter-daily-cockpit-pilot-badge",
   hubPromo: "recruiter-daily-cockpit-hub-promo",
   navLink: "recruiter-daily-cockpit-nav-link",
+  operatingState: "recruiter-daily-cockpit-operating-state",
+  operatingStateSource: "recruiter-daily-cockpit-operating-state-source",
 } as const;
 
 export const RECRUITER_DAILY_COCKPIT_MODULE_LINKS = [

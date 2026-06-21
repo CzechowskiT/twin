@@ -2,10 +2,13 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspace-nav";
+import { LiveOperatingStatePanel } from "@/components/shared/live-operating-state-panel";
 import { Card, Shell } from "@/components/ui";
+import { loadRecruiterOperatingState, type OperatingStateSummary } from "@/lib/live-operating-state";
 import type { CockpitQueueItem } from "@/lib/recruiter-daily-operating-cockpit-demo-data";
 import {
   candidatePipelineHref,
@@ -67,6 +70,17 @@ function queueList(items: CockpitQueueItem[], profileLabel: string): ReactNode {
 export function RecruiterDailyOperatingCockpitWorkspace() {
   const { t } = useTranslation();
   const record = resolveRecruiterDailyCockpit();
+  const [operatingState, setOperatingState] = useState<OperatingStateSummary | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    void loadRecruiterOperatingState().then((res) => {
+      if (active) setOperatingState(res);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <Shell wide rail>
@@ -84,6 +98,12 @@ export function RecruiterDailyOperatingCockpitWorkspace() {
               </p>
               <h1 className="twin-section-title text-2xl sm:text-3xl">{t("recruiterDailyCockpit.title")}</h1>
               <p className="text-sm text-[var(--twin-muted-strong)]">{t("recruiterDailyCockpit.lead")}</p>
+              <p
+                className="text-xs text-[var(--twin-muted)]"
+                data-testid={RECRUITER_DAILY_COCKPIT_MARKERS.operatingStateSource}
+              >
+                {operatingState ? t(operatingState.sourceKey) : t("liveOperatingState.loading")}
+              </p>
             </div>
             <div className="flex flex-wrap gap-2">
               <span
@@ -128,9 +148,16 @@ export function RecruiterDailyOperatingCockpitWorkspace() {
         </header>
 
         <div className="grid gap-6 lg:grid-cols-2">
-          {sectionCard(
-            RECRUITER_DAILY_COCKPIT_MARKERS.priorityWorklist,
-            t("recruiterDailyCockpit.priorityWorklistTitle"),
+        <LiveOperatingStatePanel
+          titleKey="recruiterDailyCockpit.operatingStateTitle"
+          leadKey="recruiterDailyCockpit.operatingStateLead"
+          summary={operatingState}
+          testId={RECRUITER_DAILY_COCKPIT_MARKERS.operatingState}
+        />
+
+        {sectionCard(
+          RECRUITER_DAILY_COCKPIT_MARKERS.priorityWorklist,
+          t("recruiterDailyCockpit.priorityWorklistTitle"),
             <>
               <p className="twin-muted text-xs">{t("recruiterDailyCockpit.priorityWorklistLead")}</p>
               {queueList(record.priority_worklist, t("recruiterDailyCockpit.openProfile"))}
