@@ -39,6 +39,7 @@ export const AUDIT_EVENT_FOUNDATION_FORBIDDEN_PATTERNS: RegExp[] = [
 ];
 
 export const AUDIT_EVENT_FOUNDATION_LINKS = [
+  { href: "/board/persistence-operations-monitor", labelKey: "liveOperatingState.monitorTitle" as TranslationKey },
   { href: "/board/first-working-persistence-plan", labelKey: "firstWorkingPersistencePlan.demoJourneyTitle" as TranslationKey },
   { href: "/board/working-data-readiness", labelKey: "workingDataReadiness.demoJourneyTitle" as TranslationKey },
 ] as const;

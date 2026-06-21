@@ -49,6 +49,7 @@ export const PRODUCTION_PERSISTENCE_STATUS_FORBIDDEN_PATTERNS: RegExp[] = [
 ];
 
 export const PRODUCTION_PERSISTENCE_STATUS_LINKS = [
+  { href: "/board/persistence-operations-monitor", labelKey: "liveOperatingState.monitorTitle" as TranslationKey },
   { href: "/board/implementation-tracker", labelKey: "implementationTracker.demoJourneyTitle" as TranslationKey },
   { href: "/board/first-working-persistence-plan", labelKey: "firstWorkingPersistencePlan.demoJourneyTitle" as TranslationKey },
   { href: "/investor/product-proof", labelKey: "executiveProductProof.linkProductProof" as TranslationKey },
