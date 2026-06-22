@@ -49,6 +49,7 @@ TWIN_PROD_BASE_URL=https://twin-sooty.vercel.app \
 | `/api/v1/candidate-visibility-preferences` | GET, POST, PATCH | 401 | POST pilot_visible prefs |
 | `/api/v1/export-requests` | GET, POST | 401 | POST `preview_created` export |
 | `/api/v1/request-intake` | GET, POST, PATCH | 401 | POST `correction_preview` intake |
+| `/api/v1/placement-events` | GET, POST | 401 | POST `demo_verification_recorded` |
 
 ## Safe payloads (summary)
 
@@ -62,6 +63,7 @@ All records use demo refs: `demo-candidate-001`, `demo-role-001`, `prod-smoke-<t
 - **VisibilityPreference:** pilot_visible / manual_review_required
 - **ExportRequest:** `candidate_export_preview`, `status: preview_created`
 - **RequestIntake:** `correction_preview`, `status: open`
+- **PlacementEvent:** `event_type: demo_verification_recorded`, append-only internal marker
 
 ## Expected responses
 
@@ -105,6 +107,28 @@ Smoke rows are append-only internal test records. No automatic cleanup — accep
 - `docs/PERSISTENCE_MIGRATION_RUNBOOK_2026-06-19.md`
 - `docs/PROD_HEALTH_COMMIT_INTERPRETATION_2026-06-19.md`
 - `docs/ALEMBIC_PROD_HEAD_VERIFICATION_2026-06-19.md`
+- `docs/PLACEMENT_EVENTS_PROD_VERIFICATION_2026-06-21.md`
+
+## Evidence log (append-only)
+
+| Field | Value |
+|-------|-------|
+| **date** | 2026-06-21 |
+| **context** | authenticated production smoke rerun after placement_events + P0 batch |
+| **command** | `TWIN_PROD_BASE_URL=https://twin-sooty.vercel.app` · `TWIN_PROD_TEST_JWT` set locally · `TWIN_PROD_SMOKE_WRITE=1` · `npm run verify:prod-persistence-auth` |
+| **tests total** | 12 |
+| **pass** | 11 |
+| **fail** | 0 |
+| **skip** | 1 |
+| **authenticated POST smoke** | **PASS** |
+| **authenticated GET** | **200** on all persistence endpoints (including placement-events) |
+| **safe internal markers** | **PASS** where serialized |
+| **token handling** | script never logged token value |
+| **unauth persistence GET** | **401/403** on all persistence endpoints — no 404/500 |
+| **unauth admin migrations** | **401/403** |
+| **launch stance** | **NO-GO** |
+| **P0 performance** | **OPEN** |
+| **Phase 3B** | **HARD BLOCKED** |
 
 ## Launch stance (unchanged)
 

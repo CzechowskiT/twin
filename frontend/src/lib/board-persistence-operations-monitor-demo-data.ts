@@ -51,12 +51,13 @@ const ENDPOINTS: PersistenceEndpointRow[] = [
   { id: "visibility", path: "/api/v1/candidate-visibility-preferences", methods: "GET, POST, PATCH", unauthExpected: "401", authSmoke: "POST pilot_visible prefs" },
   { id: "export", path: "/api/v1/export-requests", methods: "GET, POST", unauthExpected: "401", authSmoke: "POST preview_created export" },
   { id: "intake", path: "/api/v1/request-intake", methods: "GET, POST, PATCH", unauthExpected: "401", authSmoke: "POST correction_preview intake" },
+  { id: "placement_events", path: "/api/v1/placement-events", methods: "GET, POST", unauthExpected: "401", authSmoke: "POST demo_verification_recorded" },
 ];
 
 export function getBoardPersistenceOperationsMonitorDemo(): BoardPersistenceOperationsMonitorRecord {
   return {
-    expectedAlembicHead: "067_request_intake",
-    alembicEvidence: "CONFIRMED — 067_request_intake (2026-06-20 admin migrations endpoint)",
+    expectedAlembicHead: "068_placement_events_foundation",
+    alembicEvidence: "CONFIRMED — 068_placement_events_foundation (2026-06-21 admin migrations endpoint)",
     publicHealthFallback: {
       status: "ok",
       db_ok: true,
@@ -69,7 +70,7 @@ export function getBoardPersistenceOperationsMonitorDemo(): BoardPersistenceOper
       pass: 11,
       fail: 0,
       skip: 1,
-      detail: "11 pass / 0 fail / 1 skip — authenticated persistence smoke when TWIN_PROD_TEST_JWT configured",
+      detail: "11 pass / 0 fail / 1 skip — PASS 2026-06-21 (TWIN_PROD_TEST_JWT + TWIN_PROD_SMOKE_WRITE=1)",
     },
     endpoints: ENDPOINTS,
     operationalSurfaces: [
