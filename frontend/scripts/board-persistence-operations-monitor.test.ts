@@ -41,11 +41,11 @@ test("4 loadBoardOperatingState returns recruiter and company", async () => {
   assert.equal(state.company.channels.length, 4);
 });
 
-test("5 monitor demo record has 8 endpoints and alembic 067", () => {
+test("5 monitor demo record has 9 endpoints and alembic 068", () => {
   const record = resolveBoardPersistenceOperationsMonitor();
-  assert.equal(record.endpoints.length, 8);
-  assert.equal(record.expectedAlembicHead, "067_request_intake");
-  assert.match(record.alembicEvidence, /067_request_intake/);
+  assert.equal(record.endpoints.length, 9);
+  assert.equal(record.expectedAlembicHead, "068_placement_events_foundation");
+  assert.match(record.alembicEvidence, /068_placement_events_foundation/);
   assert.equal(record.authSmoke.pass, 11);
   assert.equal(record.authSmoke.fail, 0);
   assert.equal(record.authSmoke.skip, 1);

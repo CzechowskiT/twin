@@ -68,3 +68,7 @@ npm run test:p0-renderer-memory-bundle-reduction   # existing
 - Phase 3B profiling when explicitly unblocked
 - Deeper dashboard code-splitting review
 - Backend API latency budgets for live persistence fan-out
+
+## Ops confirmation (2026-06-21)
+
+Operator verified production Alembic head `068_placement_events_foundation` and authenticated persistence smoke **PASS** (11 pass / 0 fail / 1 skip) after placement_events foundation deploy. No Phase 3B, stress, or headless runs in this confirmation batch. See `docs/PLACEMENT_EVENTS_PROD_VERIFICATION_2026-06-21.md`.

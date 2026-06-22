@@ -72,7 +72,7 @@ export function getProductionPersistenceStatusDemo(): ProductionPersistenceStatu
         id: "railway-current",
         label: "Railway alembic current",
         status: "verified_repo",
-        detail: "PENDING prod verify — repo head 068_placement_events_foundation (2026-06-21 batch)",
+        detail: "CONFIRMED — 068_placement_events_foundation (2026-06-21 read-only admin endpoint)",
       },
       {
         id: "tables",
@@ -110,13 +110,13 @@ export function getProductionPersistenceStatusDemo(): ProductionPersistenceStatu
         id: "alembic-auth-check",
         label: "Alembic current/head authenticated check",
         status: "done",
-        detail: "CONFIRMED — 067_request_intake (2026-06-20 read-only admin endpoint)",
+        detail: "CONFIRMED — 068_placement_events_foundation (2026-06-21 read-only admin endpoint)",
       },
       {
         id: "unauth-401",
         label: "unauthenticated persistence GET 401",
         status: "done",
-        detail: "All 8 persistence endpoints return 401/403 without JWT",
+        detail: "All 9 persistence endpoints return 401/403 without JWT",
       },
       {
         id: "post-script",
@@ -127,8 +127,14 @@ export function getProductionPersistenceStatusDemo(): ProductionPersistenceStatu
       {
         id: "post-execution",
         label: "authenticated POST smoke execution",
-        status: "skipped",
-        detail: "SKIPPED — TWIN_PROD_TEST_JWT not configured",
+        status: "done",
+        detail: "PASS — 11 pass / 0 fail / 1 skip (2026-06-21; TWIN_PROD_TEST_JWT + TWIN_PROD_SMOKE_WRITE=1)",
+      },
+      {
+        id: "placement-events",
+        label: "placement events foundation",
+        status: "done",
+        detail: "VERIFIED — Alembic 068 + auth smoke; docs/PLACEMENT_EVENTS_PROD_VERIFICATION_2026-06-21.md",
       },
       {
         id: "launch",
@@ -150,21 +156,20 @@ export function getProductionPersistenceStatusDemo(): ProductionPersistenceStatu
       },
     ],
     limitations: [
-      "Authenticated POST smoke skipped when TWIN_PROD_TEST_JWT is not configured — no token in repo.",
+      "Authenticated POST smoke requires TWIN_PROD_TEST_JWT locally — no token in repo.",
       "No token mint helper in repo — obtain JWT via browser login; see docs/FOUNDER_TEST_AUTH_SMOKE_SETUP_2026-06-19.md",
       "public-health shows deploy SHAs, not Alembic revision — migration verification is separate.",
       "Frontend-only deploys may advance frontend_commit without changing Railway api_commit.",
       "Smoke records are append-only internal test rows — human review required; no external side effect.",
     ],
     nextOperatorActions: [
-      "Run npm run test:placement-events-auth-smoke for unauth checks on placement-events API.",
       "Review docs/P0_PERFORMANCE_INVENTORY_2026-06-21.md — P0 remains OPEN.",
-      "With founder test JWT: TWIN_PROD_TEST_JWT=… TWIN_PROD_SMOKE_WRITE=1 npm run verify:prod-persistence-auth",
-      "Alembic head confirmed 2026-06-20 — see docs/ALEMBIC_PROD_HEAD_VERIFICATION_2026-06-19.md § Evidence log.",
+      "Alembic 068 confirmed 2026-06-21 — see docs/PLACEMENT_EVENTS_PROD_VERIFICATION_2026-06-21.md",
       "Compare scaffold HEAD, frontend_commit, api_commit using docs/PROD_HEALTH_COMMIT_INTERPRETATION_2026-06-19.md",
+      "Run npm run test:placement-events-auth-smoke for unauth checks on placement-events API.",
     ],
     authSmokeCommand:
       "TWIN_PROD_BASE_URL=https://twin-sooty.vercel.app TWIN_PROD_TEST_JWT=$TWIN_PROD_TEST_JWT TWIN_PROD_SMOKE_WRITE=1 npm run verify:prod-persistence-auth",
-    authSmokeSkipReason: "token not configured — authenticated smoke skipped",
+    authSmokeSkipReason: "2026-06-21 operator run PASS — 11 pass / 0 fail / 1 skip",
   };
 }

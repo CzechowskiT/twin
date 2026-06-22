@@ -1,13 +1,13 @@
 # Alembic Production Head Verification — 2026-06-19
 
 **Branch:** `ops/prod-persistence-auth-smoke-and-health-clarity-2026-06-19`  
-**Expected repo head:** `067_request_intake`
+**Expected repo head:** `068_placement_events_foundation` (as of 2026-06-21 placement events batch)
 
 ## Purpose
 
 Read-only verification that Railway production database Alembic revision matches repo head after persistence batch #204–#209.
 
-## Migration chain (060→067)
+## Migration chain (060→068)
 
 ```
 059_recruiter_talent_pool_import
@@ -18,14 +18,15 @@ Read-only verification that Railway production database Alembic revision matches
   → 064_company_feedback
   → 065_candidate_visibility_preferences
   → 066_export_requests
-  → 067_request_intake (head)
+  → 067_request_intake
+  → 068_placement_events_foundation (head)
 ```
 
 Local verification:
 
 ```bash
 cd backend && alembic heads
-# Expected: 067_request_intake (head)
+# Expected: 068_placement_events_foundation (head)
 ```
 
 ## Production verification paths
@@ -35,11 +36,11 @@ cd backend && alembic heads
 ```bash
 # In Railway API service shell (read-only)
 alembic current
-# Expected: 067_request_intake (head)
+# Expected: 068_placement_events_foundation (head)
 
 # SQL spot-check (read-only)
 SELECT version_num FROM alembic_version;
-# Expected: 067_request_intake
+# Expected: 068_placement_events_foundation
 ```
 
 ### B. Admin API endpoint (ops token required)
@@ -53,9 +54,9 @@ Expected response shape:
 
 ```json
 {
-  "current_revision": "067_request_intake",
-  "head_revision": "067_request_intake",
-  "head_revisions": ["067_request_intake"],
+  "current_revision": "068_placement_events_foundation",
+  "head_revision": "068_placement_events_foundation",
+  "head_revisions": ["068_placement_events_foundation"],
   "is_at_head": true,
   "read_only": true
 }
@@ -71,6 +72,7 @@ Expected response shape:
 SELECT COUNT(*) FROM candidate_visibility_preferences;
 SELECT COUNT(*) FROM export_requests;
 SELECT COUNT(*) FROM request_intake_items;
+SELECT COUNT(*) FROM placement_events;
 ```
 
 ## If current < head
@@ -115,6 +117,28 @@ No automatic downgrade in prod. Failed migration → stop deploy, restore from R
 | **Phase 3B** | **HARD BLOCKED** |
 
 Authenticated persistence smoke was already **PASS** before this entry (11 pass, 0 fail, 1 skip). No secrets recorded in this log.
+
+| Field | Value |
+|-------|-------|
+| **date** | 2026-06-21 |
+| **method** | authenticated admin migrations endpoint |
+| **endpoint** | `/api/v1/admin/migrations/current` |
+| **production API host** | `https://twin-sooty.vercel.app` (proxied to Railway API) |
+| **expected head** | `068_placement_events_foundation` |
+| **actual current_revision** | `068_placement_events_foundation` |
+| **actual head_revision** | `068_placement_events_foundation` |
+| **actual head_revisions** | `["068_placement_events_foundation"]` |
+| **is_at_head** | `true` |
+| **read_only** | `true` |
+| **operator** | founder/operator |
+| **token handling** | `OPS_ADMIN_TOKEN` used locally only — not printed, not committed |
+| **write behavior** | read-only check — no DB writes |
+| **conclusion** | production Alembic head confirmed for placement_events foundation |
+| **launch stance** | **NO-GO** |
+| **P0 performance** | **OPEN** |
+| **Phase 3B** | **HARD BLOCKED** |
+
+Authenticated persistence smoke rerun **PASS** same date (11 pass, 0 fail, 1 skip). See `docs/PLACEMENT_EVENTS_PROD_VERIFICATION_2026-06-21.md`.
 
 ## Tests
 

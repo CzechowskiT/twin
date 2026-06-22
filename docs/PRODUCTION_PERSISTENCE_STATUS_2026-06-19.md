@@ -18,10 +18,11 @@ Read-only internal board summarizing production persistence verification state a
 | backend_git_commit field | **DONE** | Explicit alias for Railway API SHA |
 | commit_interpretation field | **DONE** | Human-readable deploy alignment note |
 | admin Alembic endpoint protected | **DONE** | `GET /api/v1/admin/migrations/current` → 401 without OPS token |
-| Alembic current/head authenticated check | **CONFIRMED — 067_request_intake** | 2026-06-20 — authenticated admin migrations endpoint (read-only); see `docs/ALEMBIC_PROD_HEAD_VERIFICATION_2026-06-19.md` § Evidence log |
-| unauthenticated persistence GET 401 | **DONE** | All 8 endpoints return 401/403 without JWT |
+| Alembic current/head authenticated check | **CONFIRMED — 068_placement_events_foundation** | 2026-06-21 — read-only admin migrations endpoint; see `docs/ALEMBIC_PROD_HEAD_VERIFICATION_2026-06-19.md` § Evidence log |
+| unauthenticated persistence GET 401 | **DONE** | All 9 persistence endpoints return 401/403 without JWT |
 | authenticated POST smoke script | **READY** | `npm run test:prod-authenticated-persistence-smoke` (12 assertions) |
-| authenticated POST smoke execution | **SKIPPED — TWIN_PROD_TEST_JWT missing** | Set env + `TWIN_PROD_SMOKE_WRITE=1` to run |
+| authenticated POST smoke execution | **PASS — 11/0/1** | 2026-06-21 — `TWIN_PROD_TEST_JWT` + `TWIN_PROD_SMOKE_WRITE=1`; see `docs/AUTHENTICATED_PROD_PERSISTENCE_SMOKE_2026-06-19.md` § Evidence log |
+| placement_events foundation | **VERIFIED** | 2026-06-21 — Alembic 068 + auth smoke; see `docs/PLACEMENT_EVENTS_PROD_VERIFICATION_2026-06-21.md` |
 | Launch | **NO-GO** | Unchanged |
 | P0 performance | **OPEN** | Unchanged |
 | Phase 3B | **HARD BLOCKED** | Unchanged |
@@ -52,6 +53,7 @@ PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=ht
 - `docs/AUTHENTICATED_PROD_PERSISTENCE_SMOKE_2026-06-19.md`
 - `docs/ALEMBIC_PROD_HEAD_VERIFICATION_2026-06-19.md`
 - `docs/PROD_HEALTH_COMMIT_INTERPRETATION_2026-06-19.md`
+- `docs/PLACEMENT_EVENTS_PROD_VERIFICATION_2026-06-21.md`
 
 ---
 
