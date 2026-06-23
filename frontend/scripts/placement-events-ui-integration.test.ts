@@ -64,7 +64,7 @@ test("6 company placement route wires timeline", () => {
 });
 
 test("7 fallback path in loader", () => {
-  const lib = read("src/lib/placement-events.ts");
+  const lib = read("src/lib/placement-events-live.ts");
   assert.match(lib, /fetchSafePersistenceList/);
   assert.match(lib, /resolvePlacementEventsDemo/);
   assert.match(lib, /source: "partial"/);

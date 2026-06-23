@@ -4,13 +4,13 @@ import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
+import { PLACEMENT_EVENTS_TIMELINE_MARKERS } from "@/lib/placement-events";
 import {
   loadPlacementEventsTimeline,
-  PLACEMENT_EVENTS_TIMELINE_MARKERS,
   placementEventsTimelineSourceKey,
   type PlacementEventTimelineRow,
   type PlacementEventTimelineSource,
-} from "@/lib/placement-events";
+} from "@/lib/placement-events-live";
 
 type Props = {
   placementId?: string;
