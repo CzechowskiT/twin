@@ -201,6 +201,7 @@ export type TranslationKey =
   | `candidateTrustOverview.${keyof typeof en.candidateTrustOverview}`
   | `candidatePlacementVerification.${keyof typeof en.candidatePlacementVerification}`
   | `candidateCalendarReadiness.${keyof typeof en.candidateCalendarReadiness}`
+  | `schedulingProof.${keyof typeof en.schedulingProof}`
   | `placementChecklist.${keyof typeof en.placementChecklist}`
   | `placementEventsTimeline.${keyof typeof en.placementEventsTimeline}`
   | `boardPlacementEvidence.${keyof typeof en.boardPlacementEvidence}`
@@ -5554,6 +5555,14 @@ eyebrow: "Product roadmap",
     notFoundStep1: "Sign in with your candidate account.",
     notFoundStep2: "Open calendar workspace and return to readiness preview.",
     notFoundCta: "Back to calendar",
+  },
+  schedulingProof: {
+    recruiterPanelTitle: "Scheduling proof (read-only)",
+    recruiterPanelLead: "Microsoft Graph OAuth readiness cross-check — preview only, no recruiter calendar sync.",
+    companyPanelTitle: "Scheduling proof (read-only)",
+    companyPanelLead: "Hiring panel scheduling proof — demo meeting rows, no live invite dispatch.",
+    linkCandidateReadiness: "Candidate calendar readiness",
+    linkBoardMonitor: "Board calendar readiness monitor",
   },
   placementChecklist: {
     pageEyebrow: "Placement evidence checklist",
@@ -12467,6 +12476,14 @@ const pl: MessageTree = {
     notFoundStep1: "Zaloguj się na konto kandydata.",
     notFoundStep2: "Otwórz workspace kalendarza i wróć do podglądu gotowości.",
     notFoundCta: "Wróć do kalendarza",
+  },
+  schedulingProof: {
+    recruiterPanelTitle: "Dowód harmonogramowania (tylko odczyt)",
+    recruiterPanelLead: "Krzyżowy check gotowości OAuth Microsoft Graph — tylko podgląd, bez sync kalendarza rekrutera.",
+    companyPanelTitle: "Dowód harmonogramowania (tylko odczyt)",
+    companyPanelLead: "Dowód harmonogramowania panelu hiring — demo wierszy spotkań, bez live wysyłki zaproszeń.",
+    linkCandidateReadiness: "Gotowość kalendarza kandydata",
+    linkBoardMonitor: "Monitor gotowości kalendarza — board",
   },
   placementChecklist: {
     pageEyebrow: "Checklist dowodu placementu",
