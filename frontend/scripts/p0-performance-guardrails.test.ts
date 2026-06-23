@@ -64,3 +64,30 @@ test("7 cockpit routes memoize static demo data", () => {
 test("8 npm script registered", () => {
   assert.match(read("package.json"), /test:p0-performance-guardrails/);
 });
+
+test("9 placement timeline lazy-loaded on persona routes", () => {
+  for (const rel of [
+    "src/components/candidate/candidate-placement-verification-preview-workspace.tsx",
+    "src/components/board/board-placement-evidence-monitor-workspace.tsx",
+    "src/components/recruiter/recruiter-placement-verification-checklist-workspace.tsx",
+    "src/components/company/company-placement-verification-checklist-workspace.tsx",
+  ]) {
+    const src = read(rel);
+    assert.match(src, /dynamic\(/);
+    assert.match(src, /placement-events-timeline/);
+    assert.match(src, /ssr: false/);
+  }
+});
+
+test("10 dashboard lazy-loads forecast and progress panels", () => {
+  const dashboard = read("src/app/dashboard/page.tsx");
+  assert.match(dashboard, /OpportunityForecast = dynamic/);
+  assert.match(dashboard, /ProgressDashboard = dynamic/);
+});
+
+test("11 placement checklist records memoized", () => {
+  const recruiter = read("src/components/recruiter/recruiter-placement-verification-checklist-workspace.tsx");
+  const company = read("src/components/company/company-placement-verification-checklist-workspace.tsx");
+  assert.match(recruiter, /useMemo\(\(\) => resolveRecruiterPlacementChecklist\(\)/);
+  assert.match(company, /useMemo\(\(\) => resolveCompanyPlacementChecklist\(\)/);
+});

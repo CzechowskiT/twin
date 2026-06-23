@@ -11,7 +11,7 @@ Evidence-only inspection batch. **P0 performance remains OPEN.** No Phase 3B, mu
 | Public launch | **NO-GO** |
 | Safe moving logo (workspace/auth) | **Shipped** — `PerformanceSafeMovingLogoMarquee` |
 | Full 89-logo marketing marquee | **Isolated** — lazy-loaded on marketing paths only |
-| Placement events UI timeline | **Read-only** — no aggressive polling |
+| Placement events UI timeline | **Read-only** — no aggressive polling; lazy-loaded via `dynamic()` on persona routes |
 
 ## Prior heavy animation / logo issue
 
@@ -42,7 +42,7 @@ Earlier P0 work identified renderer memory pressure from the full ~89-brand `Com
 
 1. **Client-only heavy components** — B2B calculator, investor data room, dashboard modals use `dynamic()` (good); verify new surfaces follow same pattern.
 2. **Repeated fetches** — `live-operating-state.ts` fans out parallel safe-persistence GETs; acceptable with no polling; deduper exists (`create-request-deduper.ts`).
-3. **Large static arrays in render** — checklist/evidence demo arrays mapped each render on cockpit/monitor routes (low-risk memoization target — slice 5).
+3. **Large static arrays in render** — checklist/evidence demo arrays mapped each render on cockpit/monitor routes (low-risk memoization target — **slice 5 applied** on placement verification + dashboard forecast panels).
 4. **Unnecessary animations** — marketing marquee animation scoped; workspace safe marquee uses lighter CSS track.
 5. **Expensive re-renders** — placement timeline + audit widgets mount `useEffect` fetch once per page (no polling).
 6. **Large images/assets** — brand logos via CDN/Simple Icons on marketing marquee only; safe marquee uses fixed small set.
@@ -68,6 +68,14 @@ npm run test:p0-renderer-memory-bundle-reduction   # existing
 - Phase 3B profiling when explicitly unblocked
 - Deeper dashboard code-splitting review
 - Backend API latency budgets for live persistence fan-out
+
+## Safe-lane code splitting (2026-06-21 slice 5)
+
+- `PlacementEventsTimeline` lazy-loaded (`dynamic`, `ssr: false`) on all four placement-verification workspaces.
+- `/dashboard` — `OpportunityForecast` and `ProgressDashboard` behind `dynamic()` imports.
+- Recruiter/company placement checklist records memoized with `useMemo`.
+
+**P0 performance remains OPEN** — no Phase 3B profiling claims.
 
 ## Ops confirmation (2026-06-21)
 

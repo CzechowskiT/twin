@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
+import { useMemo } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { OperationalCrossLinksPanel } from "@/components/shared/operational-cross-links-panel";
-import { PlacementEventsTimeline } from "@/components/shared/placement-events-timeline";
 import { Card, Shell } from "@/components/ui";
 import { LAUNCH_STANCE } from "@/lib/investor-metrics-reality";
 import type { PlacementChecklistItem } from "@/lib/recruiter-company-placement-verification-checklist-demo-data";
@@ -18,6 +19,11 @@ import {
 import { companyHiringCommandCenterHref } from "@/lib/company-hiring-command-center";
 import type { TranslationKey } from "@/lib/i18n";
 
+const PlacementEventsTimeline = dynamic(
+  () => import("@/components/shared/placement-events-timeline").then((m) => m.PlacementEventsTimeline),
+  { ssr: false },
+);
+
 function statusLabelKey(status: PlacementChecklistItem["status"]): TranslationKey {
   const map: Record<PlacementChecklistItem["status"], TranslationKey> = {
     done: "placementChecklist.statusDone",
@@ -30,7 +36,7 @@ function statusLabelKey(status: PlacementChecklistItem["status"]): TranslationKe
 
 export function CompanyPlacementVerificationChecklistWorkspace() {
   const { t } = useTranslation();
-  const record = resolveCompanyPlacementChecklist();
+  const record = useMemo(() => resolveCompanyPlacementChecklist(), []);
 
   return (
     <Shell wide>

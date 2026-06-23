@@ -8,8 +8,6 @@ import { useDashboardVerifiedReadiness } from "@/hooks/dashboard/use-dashboard-v
 import { CandidateModuleNav } from "@/components/dashboard/candidate-module-nav";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { DashboardCommandCenter } from "@/components/dashboard-command-center";
-import { OpportunityForecast } from "@/components/dashboard/OpportunityForecast";
-import { ProgressDashboard } from "@/components/dashboard/ProgressDashboard";
 import { ProfileCompletenessHint } from "@/components/ux/profile-completeness-hint";
 import { WorkspaceFlowSteps } from "@/components/ux/workspace-flow-steps";
 import { EmailVerificationBanner } from "@/components/email-verification-banner";
@@ -52,6 +50,14 @@ const HelpWidget = dynamic(
 );
 const DashboardModals = dynamic(
   () => import("@/components/dashboard/dashboard-modals").then((m) => m.DashboardModals),
+  { ssr: false },
+);
+const OpportunityForecast = dynamic(
+  () => import("@/components/dashboard/OpportunityForecast").then((m) => m.OpportunityForecast),
+  { ssr: false },
+);
+const ProgressDashboard = dynamic(
+  () => import("@/components/dashboard/ProgressDashboard").then((m) => m.ProgressDashboard),
   { ssr: false },
 );
 

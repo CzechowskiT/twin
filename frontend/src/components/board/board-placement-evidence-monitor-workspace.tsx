@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import dynamic from "next/dynamic";
 import { useMemo } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { CompactAuditTrailWidget } from "@/components/shared/compact-audit-trail-widget";
 import { OperationalCrossLinksPanel } from "@/components/shared/operational-cross-links-panel";
-import { PlacementEventsTimeline } from "@/components/shared/placement-events-timeline";
 import { Card, Shell } from "@/components/ui";
 import { LAUNCH_STANCE } from "@/lib/investor-metrics-reality";
 import {
@@ -17,6 +17,11 @@ import {
   placementVerificationSourceKey,
   resolveBoardPlacementEvidenceMonitor,
 } from "@/lib/board-placement-evidence-monitor";
+
+const PlacementEventsTimeline = dynamic(
+  () => import("@/components/shared/placement-events-timeline").then((m) => m.PlacementEventsTimeline),
+  { ssr: false },
+);
 
 function section(marker: string, title: string, children: ReactNode): ReactNode {
   return (
