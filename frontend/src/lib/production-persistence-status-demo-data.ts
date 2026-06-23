@@ -137,6 +137,24 @@ export function getProductionPersistenceStatusDemo(): ProductionPersistenceStatu
         detail: "VERIFIED — Alembic 068 + auth smoke; docs/PLACEMENT_EVENTS_PROD_VERIFICATION_2026-06-21.md",
       },
       {
+        id: "placement-timeline-ui",
+        label: "placement events live timeline UI",
+        status: "done",
+        detail: "SHIPPED — PlacementEventsTimeline on 4 persona routes; test:placement-events-live-timeline + ui-integration",
+      },
+      {
+        id: "placement-events-smoke",
+        label: "placement events dedicated smoke",
+        status: "ready",
+        detail: "npm run verify:prod-placement-events-auth — unauth 401 + optional JWT GET/POST",
+      },
+      {
+        id: "p0-code-split",
+        label: "P0 safe-lane code splitting",
+        status: "done",
+        detail: "PR #251 — lazy timeline + dashboard dynamic panels; P0 remains OPEN",
+      },
+      {
         id: "launch",
         label: "Launch",
         status: "no_go",
@@ -146,7 +164,7 @@ export function getProductionPersistenceStatusDemo(): ProductionPersistenceStatu
         id: "p0",
         label: "P0 performance",
         status: "open",
-        detail: "OPEN — inventory docs/P0_PERFORMANCE_INVENTORY_2026-06-21.md; low-risk hardening applied; no stress/headless/multitab run",
+        detail: "OPEN — inventory + safe-lane splitting; no stress/headless/multitab run",
       },
       {
         id: "phase3b",
@@ -166,7 +184,8 @@ export function getProductionPersistenceStatusDemo(): ProductionPersistenceStatu
       "Review docs/P0_PERFORMANCE_INVENTORY_2026-06-21.md — P0 remains OPEN.",
       "Alembic 068 confirmed 2026-06-21 — see docs/PLACEMENT_EVENTS_PROD_VERIFICATION_2026-06-21.md",
       "Compare scaffold HEAD, frontend_commit, api_commit using docs/PROD_HEALTH_COMMIT_INTERPRETATION_2026-06-19.md",
-      "Run npm run test:placement-events-auth-smoke for unauth checks on placement-events API.",
+      "Run npm run verify:prod-placement-events-auth for placement-events unauth + optional JWT checks.",
+      "Review docs/P0_PERFORMANCE_INVENTORY_2026-06-21.md — P0 remains OPEN after safe-lane code splitting.",
     ],
     authSmokeCommand:
       "TWIN_PROD_BASE_URL=https://twin-sooty.vercel.app TWIN_PROD_TEST_JWT=$TWIN_PROD_TEST_JWT TWIN_PROD_SMOKE_WRITE=1 npm run verify:prod-persistence-auth",

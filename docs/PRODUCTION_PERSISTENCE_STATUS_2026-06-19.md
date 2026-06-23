@@ -22,9 +22,10 @@ Read-only internal board summarizing production persistence verification state a
 | unauthenticated persistence GET 401 | **DONE** | All 9 persistence endpoints return 401/403 without JWT |
 | authenticated POST smoke script | **READY** | `npm run test:prod-authenticated-persistence-smoke` (12 assertions) |
 | authenticated POST smoke execution | **PASS — 11/0/1** | 2026-06-21 — `TWIN_PROD_TEST_JWT` + `TWIN_PROD_SMOKE_WRITE=1`; see `docs/AUTHENTICATED_PROD_PERSISTENCE_SMOKE_2026-06-19.md` § Evidence log |
-| placement_events foundation | **VERIFIED** | 2026-06-21 — Alembic 068 + auth smoke; see `docs/PLACEMENT_EVENTS_PROD_VERIFICATION_2026-06-21.md` |
+| placement_events foundation | **VERIFIED** | 2026-06-21 — Alembic 068 + auth smoke; live timeline UI PR #247–#251 |
+| placement_events live timeline UI | **SHIPPED** | Read-only `PlacementEventsTimeline` on all persona placement-verification routes |
+| P0 performance | **OPEN** | Safe-lane code splitting applied PR #251 — no Phase 3B profiling |
 | Launch | **NO-GO** | Unchanged |
-| P0 performance | **OPEN** | Unchanged |
 | Phase 3B | **HARD BLOCKED** | Unchanged |
 
 ---
@@ -35,8 +36,8 @@ Read-only internal board summarizing production persistence verification state a
 # Board static tests
 cd frontend && npm run test:production-persistence-status
 
-# Full auth verification wrapper
-cd frontend && npm run verify:prod-persistence-auth
+# Placement events dedicated smoke
+cd frontend && npm run verify:prod-placement-events-auth
 
 # Browser smoke (local)
 PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 PLAYWRIGHT_ENABLE_WEBSERVER=1 npm run test:production-persistence-status-browser

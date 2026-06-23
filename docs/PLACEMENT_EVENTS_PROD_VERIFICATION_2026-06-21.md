@@ -82,6 +82,23 @@ Record operator verification that production Alembic migration `068_placement_ev
 
 ## Next recommended batch
 
-- Live placement-events timeline fetch wiring on persona surfaces (read-only, no polling)
-- P0 dashboard code-splitting review (safe lane — no Phase 3B)
+- ~~Live placement-events timeline fetch wiring on persona surfaces (read-only, no polling)~~ **SHIPPED** — PR #247–#251 (2026-06-21 live timeline batch)
+- ~~P0 dashboard code-splitting review (safe lane — no Phase 3B)~~ **SHIPPED slice 5** — lazy timeline + dashboard panels; P0 remains OPEN
 - Celery retention milestone design doc only — no activation
+
+## Live timeline UI batch (2026-06-21)
+
+| Slice | PR | Evidence |
+|-------|-----|----------|
+| Shared `placement-events-live` loader + timeline | [#247](https://github.com/CzechowskiT/twin/pull/247) | `test:placement-events-live-timeline` |
+| Candidate + board wiring | [#248](https://github.com/CzechowskiT/twin/pull/248) | `/dashboard`, `/profile`, `/board/placement-verification` |
+| Recruiter + company wiring | [#249](https://github.com/CzechowskiT/twin/pull/249) | cockpit/command-center cross-links |
+| Prod smoke extension | [#250](https://github.com/CzechowskiT/twin/pull/250) | `verify:prod-placement-events-auth` |
+| P0 safe-lane code splitting | [#251](https://github.com/CzechowskiT/twin/pull/251) | lazy `PlacementEventsTimeline`, dashboard `dynamic()` |
+| Docs + board evidence | pending | this slice |
+
+**Prod smoke command:**
+
+```bash
+TWIN_PROD_BASE_URL=https://twin-sooty.vercel.app npm run verify:prod-placement-events-auth
+```

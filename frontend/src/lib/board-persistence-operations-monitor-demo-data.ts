@@ -82,7 +82,10 @@ export function getBoardPersistenceOperationsMonitorDemo(): BoardPersistenceOper
       { id: "company_feedback", route: "/company/feedback", persona: "company", channels: "company-feedback", status: "live_ready" },
       { id: "trust_overview", route: "/dashboard/trust/overview", persona: "candidate", channels: "4 trust APIs", status: "live_ready" },
       { id: "board_monitor", route: "/board/persistence-operations-monitor", persona: "board", channels: "cross-persona", status: "live_ready" },
-      { id: "prod_status", route: "/board/production-persistence-status", persona: "board", channels: "verification", status: "live_ready" },
+      { id: "board_placement", route: "/board/placement-verification", persona: "board", channels: "placement-events-timeline", status: "live_ready" },
+      { id: "candidate_placement", route: "/dashboard/placement-verification", persona: "candidate", channels: "placement-events-timeline", status: "live_ready" },
+      { id: "recruiter_placement", route: "/recruiter/placement-verification", persona: "recruiter", channels: "placement-events-timeline", status: "live_ready" },
+      { id: "company_placement", route: "/company/placement-verification", persona: "company", channels: "placement-events-timeline", status: "live_ready" },
     ],
     blockedCapabilities: [
       { id: "email", label: "Email outbound", reason: "Not live — no message sent copy" },
