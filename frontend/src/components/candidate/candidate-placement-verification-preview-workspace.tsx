@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
 
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { useTranslation } from "@/components/language-provider";
-import { PlacementEventsTimeline } from "@/components/shared/placement-events-timeline";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
 import {
@@ -18,6 +18,11 @@ import {
 } from "@/lib/candidate-placement-verification-preview";
 import type { PlacementVerificationRecord } from "@/lib/placement-verification";
 import type { TranslationKey } from "@/lib/i18n";
+
+const PlacementEventsTimeline = dynamic(
+  () => import("@/components/shared/placement-events-timeline").then((m) => m.PlacementEventsTimeline),
+  { ssr: false },
+);
 
 function sectionCard(marker: string, title: string, children: ReactNode): ReactNode {
   return (
