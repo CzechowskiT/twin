@@ -123,3 +123,27 @@ test("16 timeline receives placementId from record", () => {
   assert.match(candidate, /PlacementEventsTimeline placementId=\{record\.placement_id\}/);
   assert.match(board, /PlacementEventsTimeline placementId=\{record\.placement_id\}/);
 });
+
+test("17 recruiter placement route page exists", () => {
+  const page = read("src/app/recruiter/placement-verification/page.tsx");
+  assert.match(page, /RecruiterPlacementVerificationChecklistWorkspace/);
+});
+
+test("18 company placement route page exists", () => {
+  const page = read("src/app/company/placement-verification/page.tsx");
+  assert.match(page, /CompanyPlacementVerificationChecklistWorkspace/);
+});
+
+test("19 cockpit cross-links include placement verification", () => {
+  const recruiter = read("src/lib/recruiter-daily-operating-cockpit.ts");
+  const company = read("src/lib/company-hiring-command-center.ts");
+  assert.match(recruiter, /\/recruiter\/placement-verification/);
+  assert.match(company, /\/company\/placement-verification/);
+});
+
+test("20 recruiter and company workspaces wire placementId", () => {
+  const recruiter = read("src/components/recruiter/recruiter-placement-verification-checklist-workspace.tsx");
+  const company = read("src/components/company/company-placement-verification-checklist-workspace.tsx");
+  assert.match(recruiter, /PlacementEventsTimeline placementId=\{record\.placement_id\}/);
+  assert.match(company, /PlacementEventsTimeline placementId=\{record\.placement_id\}/);
+});
