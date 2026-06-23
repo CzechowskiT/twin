@@ -101,3 +101,25 @@ test("11 launch stance unchanged in board workspace", () => {
 test("12 npm script registered", () => {
   assert.match(read("package.json"), /test:placement-events-ui-integration/);
 });
+
+test("13 profile placement route reuses candidate workspace", () => {
+  const page = read("src/app/profile/placement-verification/page.tsx");
+  assert.match(page, /CandidatePlacementVerificationPreviewWorkspace/);
+});
+
+test("14 dashboard placement route page exists", () => {
+  const page = read("src/app/dashboard/placement-verification/page.tsx");
+  assert.match(page, /CandidatePlacementVerificationPreviewWorkspace/);
+});
+
+test("15 board placement route page exists", () => {
+  const page = read("src/app/board/placement-verification/page.tsx");
+  assert.match(page, /BoardPlacementEvidenceMonitorWorkspace/);
+});
+
+test("16 timeline receives placementId from record", () => {
+  const candidate = read("src/components/candidate/candidate-placement-verification-preview-workspace.tsx");
+  const board = read("src/components/board/board-placement-evidence-monitor-workspace.tsx");
+  assert.match(candidate, /PlacementEventsTimeline placementId=\{record\.placement_id\}/);
+  assert.match(board, /PlacementEventsTimeline placementId=\{record\.placement_id\}/);
+});
