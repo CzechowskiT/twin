@@ -48,6 +48,7 @@ export const COMPANY_HIRING_COMMAND_CENTER_MARKERS = {
   navLink: "company-hiring-command-center-nav-link",
   operatingState: "company-hiring-command-center-operating-state",
   operatingStateSource: "company-hiring-command-center-operating-state-source",
+  schedulingProof: "company-hiring-command-center-scheduling-proof",
 } as const;
 
 export const COMPANY_HIRING_COMMAND_CENTER_FORBIDDEN_PATTERNS: RegExp[] = [
@@ -137,6 +138,11 @@ export const COMPANY_HIRING_COMMAND_CENTER_MODULE_LINKS = [
     id: "placement_verification",
     href: "/company/placement-verification",
     labelKey: "placementChecklist.companyPageTitle" as TranslationKey,
+  },
+  {
+    id: "calendar_readiness",
+    href: "/dashboard/calendar/readiness",
+    labelKey: "schedulingProof.linkCandidateReadiness" as TranslationKey,
   },
 ] as const;
 

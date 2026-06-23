@@ -21,6 +21,10 @@ import {
   RECRUITER_DAILY_COCKPIT_PAGE_MARKER,
   resolveRecruiterDailyCockpit,
 } from "@/lib/recruiter-daily-operating-cockpit";
+import {
+  resolveRecruiterSchedulingProof,
+  SCHEDULING_PROOF_LINKS,
+} from "@/lib/recruiter-company-scheduling-proof";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -72,6 +76,7 @@ function queueList(items: CockpitQueueItem[], profileLabel: string): ReactNode {
 export function RecruiterDailyOperatingCockpitWorkspace() {
   const { t } = useTranslation();
   const record = useMemo(() => resolveRecruiterDailyCockpit(), []);
+  const schedulingProof = useMemo(() => resolveRecruiterSchedulingProof(), []);
   const moduleLinks = useMemo(() => RECRUITER_DAILY_COCKPIT_MODULE_LINKS, []);
   const [operatingState, setOperatingState] = useState<OperatingStateSummary | null>(null);
 
@@ -310,6 +315,32 @@ export function RecruiterDailyOperatingCockpitWorkspace() {
                   </li>
                 ))}
               </ul>
+            </>,
+          )}
+
+          {sectionCard(
+            RECRUITER_DAILY_COCKPIT_MARKERS.schedulingProof,
+            t("schedulingProof.recruiterPanelTitle"),
+            <>
+              <p className="twin-muted text-xs">{schedulingProof.headline}</p>
+              <p className="twin-muted text-xs">{t("schedulingProof.recruiterPanelLead")}</p>
+              <ul className="space-y-2">
+                {schedulingProof.items.map((item) => (
+                  <li key={item.id} className="rounded border border-[var(--twin-border)]/60 p-2 text-xs">
+                    <span className="font-medium">{item.label}</span>
+                    <span className="ml-2 text-[var(--twin-muted)]">· {item.status}</span>
+                    <p className="mt-1 text-[var(--twin-muted)]">{item.detail}</p>
+                  </li>
+                ))}
+              </ul>
+              <p className="text-xs text-[var(--twin-muted)]">{schedulingProof.blocked_note}</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {SCHEDULING_PROOF_LINKS.map((link) => (
+                  <Link key={link.id} href={link.href} className="twin-link text-xs">
+                    {t(link.labelKey)}
+                  </Link>
+                ))}
+              </div>
             </>,
           )}
 

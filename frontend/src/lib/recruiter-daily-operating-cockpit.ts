@@ -58,6 +58,7 @@ export const RECRUITER_DAILY_COCKPIT_MARKERS = {
   navLink: "recruiter-daily-cockpit-nav-link",
   operatingState: "recruiter-daily-cockpit-operating-state",
   operatingStateSource: "recruiter-daily-cockpit-operating-state-source",
+  schedulingProof: "recruiter-daily-cockpit-scheduling-proof",
 } as const;
 
 export const RECRUITER_DAILY_COCKPIT_MODULE_LINKS = [
@@ -115,6 +116,11 @@ export const RECRUITER_DAILY_COCKPIT_MODULE_LINKS = [
     id: "placement_verification",
     href: "/recruiter/placement-verification",
     labelKey: "placementChecklist.recruiterPageTitle" as TranslationKey,
+  },
+  {
+    id: "calendar_readiness",
+    href: "/dashboard/calendar/readiness",
+    labelKey: "schedulingProof.linkCandidateReadiness" as TranslationKey,
   },
 ] as const;
 

@@ -22,6 +22,10 @@ import {
   COMPANY_HIRING_COMMAND_CENTER_PAGE_MARKER,
   resolveCompanyHiringCommandCenter,
 } from "@/lib/company-hiring-command-center";
+import {
+  resolveCompanySchedulingProof,
+  SCHEDULING_PROOF_LINKS,
+} from "@/lib/recruiter-company-scheduling-proof";
 import { COMPANY_ROLES_ROUTE } from "@/lib/company-jobs-roles";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -73,6 +77,7 @@ function queueList(items: CommandCenterQueueItem[], profileLabel: string): React
 export function CompanyHiringCommandCenterWorkspace() {
   const { t } = useTranslation();
   const record = useMemo(() => resolveCompanyHiringCommandCenter(), []);
+  const schedulingProof = useMemo(() => resolveCompanySchedulingProof(), []);
   const moduleLinks = useMemo(() => COMPANY_HIRING_COMMAND_CENTER_MODULE_LINKS, []);
   const disabledActions = useMemo(() => COMPANY_HIRING_COMMAND_CENTER_DISABLED_ACTIONS, []);
   const [operatingState, setOperatingState] = useState<OperatingStateSummary | null>(null);
@@ -288,6 +293,32 @@ export function CompanyHiringCommandCenterWorkspace() {
                   </li>
                 ))}
               </ul>
+            </>,
+          )}
+
+          {sectionCard(
+            COMPANY_HIRING_COMMAND_CENTER_MARKERS.schedulingProof,
+            t("schedulingProof.companyPanelTitle"),
+            <>
+              <p className="twin-muted text-xs">{schedulingProof.headline}</p>
+              <p className="twin-muted text-xs">{t("schedulingProof.companyPanelLead")}</p>
+              <ul className="space-y-2">
+                {schedulingProof.items.map((item) => (
+                  <li key={item.id} className="rounded border border-[var(--twin-border)]/60 p-2 text-xs">
+                    <span className="font-medium">{item.label}</span>
+                    <span className="ml-2 text-[var(--twin-muted)]">· {item.status}</span>
+                    <p className="mt-1 text-[var(--twin-muted)]">{item.detail}</p>
+                  </li>
+                ))}
+              </ul>
+              <p className="text-xs text-[var(--twin-muted)]">{schedulingProof.blocked_note}</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {SCHEDULING_PROOF_LINKS.map((link) => (
+                  <Link key={link.id} href={link.href} className="twin-link text-xs">
+                    {t(link.labelKey)}
+                  </Link>
+                ))}
+              </div>
             </>,
           )}
 
