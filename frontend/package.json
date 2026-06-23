@@ -222,6 +222,7 @@
     "test:board-implementation-tracker": "npx --yes tsx scripts/board-implementation-tracker.test.ts",
     "test:board-persistence-state": "npx --yes tsx scripts/board-persistence-state.test.ts",
     "test:placement-verification-domain": "npx --yes tsx scripts/placement-verification-domain.test.ts",
+    "test:calendar-readiness-domain": "npx --yes tsx scripts/calendar-readiness-domain.test.ts",
     "test:candidate-placement-verification-preview": "npx --yes tsx scripts/candidate-placement-verification-preview.test.ts",
     "test:candidate-placement-verification-preview-browser": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'&&process.env.PLAYWRIGHT_ENABLE_BROWSER_TESTS!=='1'){console.error('Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 or PLAYWRIGHT_ALLOW_PROD_SMOKE=1');process.exit(1)}\" && npm run test:candidate-placement-verification-preview-browser:raw",
     "test:recruiter-company-placement-verification": "npx --yes tsx scripts/recruiter-company-placement-verification.test.ts",
