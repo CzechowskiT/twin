@@ -202,6 +202,7 @@ export type TranslationKey =
   | `candidatePlacementVerification.${keyof typeof en.candidatePlacementVerification}`
   | `candidateCalendarReadiness.${keyof typeof en.candidateCalendarReadiness}`
   | `schedulingProof.${keyof typeof en.schedulingProof}`
+  | `boardCalendarReadiness.${keyof typeof en.boardCalendarReadiness}`
   | `placementChecklist.${keyof typeof en.placementChecklist}`
   | `placementEventsTimeline.${keyof typeof en.placementEventsTimeline}`
   | `boardPlacementEvidence.${keyof typeof en.boardPlacementEvidence}`
@@ -5563,6 +5564,21 @@ eyebrow: "Product roadmap",
     companyPanelLead: "Hiring panel scheduling proof — demo meeting rows, no live invite dispatch.",
     linkCandidateReadiness: "Candidate calendar readiness",
     linkBoardMonitor: "Board calendar readiness monitor",
+  },
+  boardCalendarReadiness: {
+    pageEyebrow: "Board calendar readiness",
+    pageTitle: "Calendar OAuth readiness monitor",
+    headerLead: "Cross-persona Microsoft Graph readiness preview — no live sync or Graph writes.",
+    providerMatrixTitle: "Provider matrix",
+    providerMatrixLead: "Google shipped; Microsoft readiness preview; ICS/WebCal fallback — preview only.",
+    colProvider: "Provider",
+    colOauth: "OAuth status",
+    colBusy: "Busy read",
+    colWrite: "Event write",
+    publicHealthTitle: "Public-health calendar flags",
+    publicHealthLead: "Deploy env signals — not per-user connection status.",
+    blockedTitle: "Blocked capabilities",
+    personaRoutesTitle: "Persona routes",
   },
   placementChecklist: {
     pageEyebrow: "Placement evidence checklist",
@@ -12484,6 +12500,21 @@ const pl: MessageTree = {
     companyPanelLead: "Dowód harmonogramowania panelu hiring — demo wierszy spotkań, bez live wysyłki zaproszeń.",
     linkCandidateReadiness: "Gotowość kalendarza kandydata",
     linkBoardMonitor: "Monitor gotowości kalendarza — board",
+  },
+  boardCalendarReadiness: {
+    pageEyebrow: "Gotowość kalendarza — board",
+    pageTitle: "Monitor gotowości OAuth kalendarza",
+    headerLead: "Podgląd gotowości Microsoft Graph między personami — bez live sync ani zapisów Graph.",
+    providerMatrixTitle: "Macierz providerów",
+    providerMatrixLead: "Google wdrożony; podgląd gotowości Microsoft; fallback ICS/WebCal — tylko preview.",
+    colProvider: "Provider",
+    colOauth: "Status OAuth",
+    colBusy: "Busy read",
+    colWrite: "Zapis eventu",
+    publicHealthTitle: "Flagi kalendarza w public-health",
+    publicHealthLead: "Sygnały env deployu — nie status połączenia per użytkownik.",
+    blockedTitle: "Zablokowane możliwości",
+    personaRoutesTitle: "Trasy person",
   },
   placementChecklist: {
     pageEyebrow: "Checklist dowodu placementu",

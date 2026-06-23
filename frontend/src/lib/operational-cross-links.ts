@@ -5,6 +5,7 @@ import { recruiterDailyCockpitHref } from "@/lib/recruiter-daily-operating-cockp
 import { boardPersistenceOperationsMonitorHref } from "@/lib/board-persistence-operations-monitor";
 import { productionPersistenceStatusHref } from "@/lib/production-persistence-status";
 import { placementVerificationIntegrationHref } from "@/lib/placement-verification-integration";
+import { boardCalendarReadinessMonitorHref } from "@/lib/board-calendar-readiness-monitor";
 
 export const OPERATIONAL_CROSS_LINKS_MARKER = "operational-cross-links";
 
@@ -18,6 +19,7 @@ export const OPERATIONAL_CROSS_LINKS = [
   { id: "work_items_company", href: "/company/work-items", labelKey: "workItems.companyTitle" as TranslationKey },
   { id: "trust_overview", href: "/dashboard/trust/overview", labelKey: "candidateTrustOverview.pageTitle" as TranslationKey },
   { id: "placement_evidence", href: placementVerificationIntegrationHref("board_monitor"), labelKey: "boardPlacementEvidence.pageTitle" as TranslationKey },
+  { id: "calendar_readiness", href: boardCalendarReadinessMonitorHref(), labelKey: "boardCalendarReadiness.pageTitle" as TranslationKey },
   { id: "board_monitor", href: boardPersistenceOperationsMonitorHref(), labelKey: "liveOperatingState.monitorTitle" as TranslationKey },
   { id: "prod_status", href: productionPersistenceStatusHref(), labelKey: "productionPersistenceStatus.pageEyebrow" as TranslationKey },
   { id: "work_items_recruiter", href: "/recruiter/work-items", labelKey: "workItems.recruiterTitle" as TranslationKey },

@@ -42,6 +42,7 @@ export const BOARD_PERSISTENCE_OPERATIONS_MONITOR_LINKS = [
   { id: "daily_cockpit", href: "/recruiter/daily-cockpit", labelKey: "recruiterDailyCockpit.openDailyCockpit" as TranslationKey },
   { id: "command_center", href: "/company/hiring-command-center", labelKey: "companyHiringCommandCenter.openCommandCenter" as TranslationKey },
   { id: "placement_evidence", href: "/board/placement-verification", labelKey: "boardPlacementEvidence.pageTitle" as TranslationKey },
+  { id: "calendar_readiness", href: "/board/calendar-readiness", labelKey: "boardCalendarReadiness.pageTitle" as TranslationKey },
 ] as const;
 
 export type BoardOperatingState = {
