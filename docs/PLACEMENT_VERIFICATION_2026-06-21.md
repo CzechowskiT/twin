@@ -58,12 +58,24 @@ Cross-surface entry points wired in slice 5:
 cd frontend
 npm run test:placement-verification-domain
 npm run test:candidate-placement-verification-preview
+npm run test:placement-events-live-timeline
+npm run test:placement-events-ui-integration
 npm run test:recruiter-company-placement-verification
 npm run test:board-placement-evidence-monitor
 npm run test:placement-verification-integration
 npm run test:trust-language-guard
 npm run test:i18n-coverage
 ```
+
+## Live events timeline (2026-06-21 batch)
+
+`PlacementEventsTimeline` — read-only append-only monitor on all placement-verification routes:
+
+- Loader: `frontend/src/lib/placement-events-live.ts` — live/demo/partial via `fetchSafePersistenceList`
+- Component: `frontend/src/components/shared/placement-events-timeline.tsx`
+- Lazy-loaded (`dynamic`, `ssr: false`) on persona workspaces after PR #251
+- Source badge: `safePersistence.liveApi` / `demoFallback` / `liveOperatingState.partialFallback`
+- No write buttons, no polling
 
 Optional browser smoke (prod):
 
