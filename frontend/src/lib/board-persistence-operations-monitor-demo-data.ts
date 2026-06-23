@@ -86,6 +86,7 @@ export function getBoardPersistenceOperationsMonitorDemo(): BoardPersistenceOper
       { id: "candidate_placement", route: "/dashboard/placement-verification", persona: "candidate", channels: "placement-events-timeline", status: "live_ready" },
       { id: "recruiter_placement", route: "/recruiter/placement-verification", persona: "recruiter", channels: "placement-events-timeline", status: "live_ready" },
       { id: "company_placement", route: "/company/placement-verification", persona: "company", channels: "placement-events-timeline", status: "live_ready" },
+      { id: "board_calendar", route: "/board/calendar-readiness", persona: "board", channels: "calendar-oauth-readiness", status: "demo_fallback" },
     ],
     blockedCapabilities: [
       { id: "email", label: "Email outbound", reason: "Not live — no message sent copy" },
