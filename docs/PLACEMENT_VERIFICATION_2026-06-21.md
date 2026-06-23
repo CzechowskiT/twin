@@ -100,3 +100,5 @@ PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=ht
 When moving beyond demo: append-only `placement_events`, authenticated verification APIs, Celery retention milestones — per architecture doc. Frontend surfaces remain preview until live API contracts land.
 
 **Update 2026-06-21:** Production foundation for `placement_events` is now operationally verified — Alembic head `068_placement_events_foundation` confirmed via read-only admin endpoint; authenticated persistence smoke **PASS** (11/0/1). See `docs/PLACEMENT_EVENTS_PROD_VERIFICATION_2026-06-21.md`. Launch **NO-GO**, P0 **OPEN**, Phase 3B **HARD BLOCKED** unchanged.
+
+**Update 2026-06-23:** Dedicated placement-events auth smoke **PASS** (6/0/1) via `npm run verify:prod-placement-events-auth` — authenticated POST PASS, GET 200, `placement_id` filter 200, unauth 401/403, token not logged. Alembic 068 **CONFIRMED** (unchanged). Prior JWT exposed in chat — **do not record**; fresh token for future runs. See `docs/PLACEMENT_EVENTS_PROD_VERIFICATION_2026-06-23.md`.

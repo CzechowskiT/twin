@@ -80,3 +80,7 @@ npm run test:p0-renderer-memory-bundle-reduction   # existing
 ## Ops confirmation (2026-06-21)
 
 Operator verified production Alembic head `068_placement_events_foundation` and authenticated persistence smoke **PASS** (11 pass / 0 fail / 1 skip) after placement_events foundation deploy. No Phase 3B, stress, or headless runs in this confirmation batch. See `docs/PLACEMENT_EVENTS_PROD_VERIFICATION_2026-06-21.md`.
+
+## Ops confirmation (2026-06-23)
+
+Dedicated placement-events auth smoke **PASS** (6 pass / 0 fail / 1 skip) via `npm run verify:prod-placement-events-auth` — authenticated POST, GET 200, `placement_id` filter 200, unauth 401/403, token not logged. Alembic 068 **CONFIRMED** (unchanged). P0 **OPEN**, Launch **NO-GO**, Phase 3B **HARD BLOCKED**. See `docs/PLACEMENT_EVENTS_PROD_VERIFICATION_2026-06-23.md`.

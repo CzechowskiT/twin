@@ -105,3 +105,14 @@ Transitions should be **idempotent** and **server-validated** (no trust-the-brow
 3. **Retention**: Celery date-driven checks + optional lightweight re-confirm in app.
 
 Each phase should **reduce** human touchpoints, not add parallel email processes.
+
+---
+
+## Ops evidence (append-only)
+
+| Date | Evidence |
+|------|----------|
+| 2026-06-21 | Alembic `068_placement_events_foundation` confirmed; broad persistence smoke 11/0/1 — `docs/PLACEMENT_EVENTS_PROD_VERIFICATION_2026-06-21.md` |
+| 2026-06-23 | Dedicated placement-events auth smoke **PASS** 6/0/1 — POST, GET 200, `placement_id` filter; `docs/PLACEMENT_EVENTS_PROD_VERIFICATION_2026-06-23.md` |
+
+Launch **NO-GO**, P0 **OPEN**, Phase 3B **HARD BLOCKED** unchanged.

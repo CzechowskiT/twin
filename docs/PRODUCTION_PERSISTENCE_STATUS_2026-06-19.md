@@ -23,6 +23,7 @@ Read-only internal board summarizing production persistence verification state a
 | authenticated POST smoke script | **READY** | `npm run test:prod-authenticated-persistence-smoke` (12 assertions) |
 | authenticated POST smoke execution | **PASS — 11/0/1** | 2026-06-21 — `TWIN_PROD_TEST_JWT` + `TWIN_PROD_SMOKE_WRITE=1`; see `docs/AUTHENTICATED_PROD_PERSISTENCE_SMOKE_2026-06-19.md` § Evidence log |
 | placement_events foundation | **VERIFIED** | 2026-06-21 — Alembic 068 + auth smoke; live timeline UI PR #247–#251 |
+| placement_events dedicated auth smoke | **PASS — 6/0/1** | 2026-06-23 — `verify:prod-placement-events-auth`; POST PASS, GET 200, placement_id filter 200; see `docs/PLACEMENT_EVENTS_PROD_VERIFICATION_2026-06-23.md` |
 | placement_events live timeline UI | **SHIPPED** | Read-only `PlacementEventsTimeline` on all persona placement-verification routes |
 | P0 performance | **OPEN** | Safe-lane code splitting applied PR #251 — no Phase 3B profiling |
 | Launch | **NO-GO** | Unchanged |
@@ -55,6 +56,7 @@ PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=ht
 - `docs/ALEMBIC_PROD_HEAD_VERIFICATION_2026-06-19.md`
 - `docs/PROD_HEALTH_COMMIT_INTERPRETATION_2026-06-19.md`
 - `docs/PLACEMENT_EVENTS_PROD_VERIFICATION_2026-06-21.md`
+- `docs/PLACEMENT_EVENTS_PROD_VERIFICATION_2026-06-23.md`
 
 ---
 

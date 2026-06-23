@@ -130,10 +130,28 @@ Smoke rows are append-only internal test records. No automatic cleanup — accep
 | **P0 performance** | **OPEN** |
 | **Phase 3B** | **HARD BLOCKED** |
 
+## Placement events dedicated smoke (2026-06-23)
+
+| Field | Value |
+|-------|-------|
+| **script** | `frontend/scripts/placement-events-auth-smoke.test.ts` (7 assertions) |
+| **command** | `npm run verify:prod-placement-events-auth` |
+| **pass** | 6 |
+| **fail** | 0 |
+| **skip** | 1 |
+| **authenticated POST** | **PASS** |
+| **authenticated GET** | **200** |
+| **placement_id filter GET** | **200** |
+| **unauth GET** | **401/403** — no 404/500 |
+| **token logged** | **no** |
+| **JWT security** | Prior token exposed in chat — **do not record**; obtain fresh JWT for future runs |
+| **detail doc** | `docs/PLACEMENT_EVENTS_PROD_VERIFICATION_2026-06-23.md` |
+
 ## Launch stance (unchanged)
 
 | Gate | Status |
 |------|--------|
+| placement_events auth smoke | **PASS** |
 | Public launch | **NO-GO** |
 | P0 performance | **OPEN** |
 | Phase 3B | **HARD BLOCKED** |

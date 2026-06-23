@@ -145,8 +145,8 @@ export function getProductionPersistenceStatusDemo(): ProductionPersistenceStatu
       {
         id: "placement-events-smoke",
         label: "placement events dedicated smoke",
-        status: "ready",
-        detail: "npm run verify:prod-placement-events-auth — unauth 401 + optional JWT GET/POST",
+        status: "done",
+        detail: "PASS — 6 pass / 0 fail / 1 skip (2026-06-23; verify:prod-placement-events-auth; POST PASS, GET 200, placement_id filter 200)",
       },
       {
         id: "p0-code-split",
@@ -183,12 +183,13 @@ export function getProductionPersistenceStatusDemo(): ProductionPersistenceStatu
     nextOperatorActions: [
       "Review docs/P0_PERFORMANCE_INVENTORY_2026-06-21.md — P0 remains OPEN.",
       "Alembic 068 confirmed 2026-06-21 — see docs/PLACEMENT_EVENTS_PROD_VERIFICATION_2026-06-21.md",
+      "Placement-events auth smoke PASS 2026-06-23 — see docs/PLACEMENT_EVENTS_PROD_VERIFICATION_2026-06-23.md",
       "Compare scaffold HEAD, frontend_commit, api_commit using docs/PROD_HEALTH_COMMIT_INTERPRETATION_2026-06-19.md",
       "Run npm run verify:prod-placement-events-auth for placement-events unauth + optional JWT checks.",
       "Review docs/P0_PERFORMANCE_INVENTORY_2026-06-21.md — P0 remains OPEN after safe-lane code splitting.",
     ],
     authSmokeCommand:
       "TWIN_PROD_BASE_URL=https://twin-sooty.vercel.app TWIN_PROD_TEST_JWT=$TWIN_PROD_TEST_JWT TWIN_PROD_SMOKE_WRITE=1 npm run verify:prod-persistence-auth",
-    authSmokeSkipReason: "2026-06-21 operator run PASS — 11 pass / 0 fail / 1 skip",
+    authSmokeSkipReason: "2026-06-23 placement-events smoke PASS — 6 pass / 0 fail / 1 skip",
   };
 }
