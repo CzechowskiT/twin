@@ -70,7 +70,7 @@ export function getBoardPersistenceOperationsMonitorDemo(): BoardPersistenceOper
       pass: 11,
       fail: 0,
       skip: 1,
-      detail: "11 pass / 0 fail / 1 skip — PASS 2026-06-21 (TWIN_PROD_TEST_JWT + TWIN_PROD_SMOKE_WRITE=1)",
+      detail: "11 pass / 0 fail / 1 skip — persistence PASS 2026-06-21; placement-events dedicated 6/0/1 PASS 2026-06-23",
     },
     endpoints: ENDPOINTS,
     operationalSurfaces: [
