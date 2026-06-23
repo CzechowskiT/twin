@@ -233,6 +233,7 @@
     "test:placement-events-live-timeline": "npx --yes tsx scripts/placement-events-live-timeline.test.ts",
     "test:placement-events-ui-integration": "npx --yes tsx scripts/placement-events-ui-integration.test.ts",
     "test:placement-events-auth-smoke": "npx --yes tsx scripts/placement-events-auth-smoke.test.ts",
+    "verify:prod-placement-events-auth": "npm run test:placement-events-auth-smoke",
     "test:p0-performance-guardrails": "npx --yes tsx scripts/p0-performance-guardrails.test.ts",
     "test:board-persistence-operations-monitor": "npx --yes tsx scripts/board-persistence-operations-monitor.test.ts",
     "test:board-persistence-operations-monitor-browser": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'&&process.env.PLAYWRIGHT_ENABLE_BROWSER_TESTS!=='1'){console.error('Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 or PLAYWRIGHT_ALLOW_PROD_SMOKE=1');process.exit(1)}\" && npm run test:board-persistence-operations-monitor-browser:raw",

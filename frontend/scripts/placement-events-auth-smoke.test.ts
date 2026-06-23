@@ -36,7 +36,9 @@ async function fetchStatus(path: string, init?: RequestInit): Promise<{ status: 
 }
 
 test("1 script and npm entry exist", () => {
-  assert.match(readFileSync(join(scriptRoot, "package.json"), "utf8"), /test:placement-events-auth-smoke/);
+  const pkg = readFileSync(join(scriptRoot, "package.json"), "utf8");
+  assert.match(pkg, /test:placement-events-auth-smoke/);
+  assert.match(pkg, /verify:prod-placement-events-auth/);
   assert.ok(readFileSync(fileURLToPath(import.meta.url), "utf8").includes(PLACEMENT_EVENTS_PATH));
 });
 
@@ -106,7 +108,18 @@ test("5 authenticated GET returns 200", async (t) => {
   assert.equal(status, 200);
 });
 
-test("6 script never logs token", () => {
+test("6 authenticated GET with placement_id filter returns 200", async (t) => {
+  if (!JWT) {
+    t.skip("SKIPPED placement_id GET — TWIN_PROD_TEST_JWT not configured");
+    return;
+  }
+  const { status } = await fetchStatus(`${PLACEMENT_EVENTS_PATH}?placement_id=demo-placement-001`, {
+    headers: { Authorization: `Bearer ${JWT}` },
+  });
+  assert.equal(status, 200);
+});
+
+test("7 script never logs token", () => {
   const self = readFileSync(fileURLToPath(import.meta.url), "utf8");
   assert.doesNotMatch(self, /console\.(log|info|debug|warn|error)\([^)]*JWT/);
 });
