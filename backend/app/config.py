@@ -425,6 +425,8 @@ class Settings(BaseSettings):
     # Microsoft Graph busy-read — read-only Calendars.Read preview; default off (product gate).
     microsoft_busy_read_enabled: bool = False
     microsoft_oauth_connect_gate_enabled: bool = False
+    # Optional OAuth scope override — forbidden write scopes stripped at runtime.
+    microsoft_calendar_scopes: str = ""
 
     # Recruiter batch inbox pilot (X-Twin-Recruiter-Token + company_slug filter).
     recruiter_inbox_token: str = ""
