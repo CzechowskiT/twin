@@ -61,18 +61,25 @@ def health_check(
 def celery_status() -> dict[str, str | bool | list[str]]:
     """Celery worker reachability and nightly auto-apply beat wiring (no secrets)."""
     from app.config import get_settings
-    from app.tasks.celery_app import celery_app
-
-    from app.tasks.celery_app import apply_celery_runtime_config
+    from app.tasks.celery_app import (
+        _configure_beat_schedule,
+        apply_celery_runtime_config,
+        celery_app,
+    )
 
     apply_celery_runtime_config()
+    _configure_beat_schedule()
     s = get_settings()
     schedule = celery_app.conf.beat_schedule or {}
+    market_tasks = sorted(k for k in schedule if k.startswith("market-scrape-"))
     out: dict[str, str | bool | list[str]] = {
         "celery_task_always_eager": s.celery_task_always_eager,
         "broker_configured": bool((s.celery_broker_url or "").strip()),
+        "scrape_beat_enabled": s.scrape_beat_enabled,
         "nightly_auto_apply_beat_enabled": s.nightly_auto_apply_beat_enabled,
         "beat_schedule_has_nightly": "nightly-auto-apply" in schedule,
+        "beat_schedule_has_market_scrape_pl": "market-scrape-pl-daily" in schedule,
+        "beat_schedule_market_tasks": market_tasks,
         "worker_active": False,
     }
     if s.celery_task_always_eager:

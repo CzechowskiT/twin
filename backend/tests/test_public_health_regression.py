@@ -209,8 +209,11 @@ def test_public_health_celery_status_keys_remain_stable() -> None:
     required_keys = {
         "celery_task_always_eager",
         "broker_configured",
+        "scrape_beat_enabled",
         "nightly_auto_apply_beat_enabled",
         "beat_schedule_has_nightly",
+        "beat_schedule_has_market_scrape_pl",
+        "beat_schedule_market_tasks",
         "worker_active",
     }
     assert required_keys <= set(body.keys()), body
