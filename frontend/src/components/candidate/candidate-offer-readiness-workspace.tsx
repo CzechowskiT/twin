@@ -9,6 +9,7 @@ import { CandidateOfferQuestionsPanel } from "@/components/shared/candidate-offe
 import { OfferComparisonPreview } from "@/components/shared/offer-comparison-preview";
 import { OfferReadinessChecklist } from "@/components/shared/offer-readiness-checklist";
 import { OfferReadinessEvidencePanel } from "@/components/shared/offer-readiness-evidence-panel";
+import { SchedulingDecisionContextPanel } from "@/components/shared/scheduling-decision-context-panel";
 import { OfferCalendarReadinessCard } from "@/components/shared/offer-calendar-readiness-card";
 import { MicrosoftBusyReadCrossLinkCard } from "@/components/shared/microsoft-busy-read-cross-link-card";
 import { OfferReadinessPanel } from "@/components/shared/offer-readiness-status-badge";
@@ -115,6 +116,8 @@ function PreviewContent({ record }: { record: OfferReadinessRecord }) {
           </ul>
           <p className="mt-4 text-xs text-[var(--twin-muted)]">{t("candidateOfferReadiness.boundaryNote")}</p>
         </Card>
+
+        <SchedulingDecisionContextPanel surface="offer_readiness" />
 
         <OfferReadinessEvidencePanel candidateId={record.candidate_id} />
 
