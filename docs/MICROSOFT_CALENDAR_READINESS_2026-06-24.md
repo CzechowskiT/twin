@@ -18,7 +18,7 @@ Extend the existing calendar readiness batch (PRs #254–#260) with a **focused 
 | Test | `npm run test:microsoft-calendar-readiness-domain` |
 
 **Microsoft busy-read stages:** `not_started` → `oauth_env_preview` → `busy_read_preview` → `hold_write_blocked` → `readiness_preview`  
-**Graph scopes (preview):** `offline_access`, `User.Read`, `Calendars.Read` — no write claims  
+**Graph scopes (active OAuth):** `offline_access`, `User.Read`, `Calendars.Read` — `Calendars.ReadWrite` forbidden (PRs #269–#273)  
 **Public-health flag:** `microsoft_calendar_configured` from `/api/public-health`
 
 ## Surfaces (extended)
@@ -101,3 +101,5 @@ Enforced by slice tests + `npm run test:trust-language-guard`.
 When explicitly unblocked: Microsoft Graph busy read behind OAuth connect UI, hold write behind consent — still no invite dispatch until product gate opens.
 
 See also: [MICROSOFT_BUSY_READ_READINESS_2026-06-24.md](./MICROSOFT_BUSY_READ_READINESS_2026-06-24.md) — full-stack busy-read API (#264–#268), live UI wiring, product gates default off (2026-06-24).
+
+See also: [MICROSOFT_CALENDAR_SCOPE_AUDIT_2026-06-24.md](./MICROSOFT_CALENDAR_SCOPE_AUDIT_2026-06-24.md) — OAuth scope hardening evidence (#269–#273).

@@ -75,7 +75,7 @@ W aplikacji: **Dashboard → Calendar → Connect Google Calendar**
 2. Redirect URI (Web):  
    `https://twin-production-bcd9.up.railway.app/api/v1/calendar/microsoft/callback`
 3. **Certificates & secrets** → New client secret → skopiuj wartość
-4. **API permissions** → Microsoft Graph → Delegated: `Calendars.ReadWrite`, `User.Read`, `offline_access`
+4. **API permissions** → Microsoft Graph → Delegated: `Calendars.Read`, `User.Read`, `offline_access` (read-only — **do not** grant `Calendars.ReadWrite`)
 5. Railway → Variables:
 
 | Zmienna | Wartość |
