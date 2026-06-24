@@ -119,7 +119,7 @@ export function getCalendarReadinessDemo(): CalendarReadinessRecord {
     blocked_capabilities: BLOCKED,
     source: "demo",
     headline: "Calendar OAuth readiness preview — Microsoft Graph env wiring check, no live sync.",
-    scopes_preview: ["offline_access", "User.Read", "Calendars.ReadWrite"],
+    scopes_preview: ["offline_access", "User.Read", "Calendars.Read"],
   };
 }
 

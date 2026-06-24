@@ -64,7 +64,8 @@ test("4 demo record has providers and blocked capabilities", () => {
   assert.equal(record.candidate_id, CALENDAR_READINESS_DEMO_CANDIDATE_ID);
   assert.equal(record.providers.length, 4);
   assert.ok(record.blocked_capabilities.length >= 5);
-  assert.ok(record.scopes_preview.includes("Calendars.ReadWrite"));
+  assert.ok(record.scopes_preview.includes("Calendars.Read"));
+  assert.equal(record.scopes_preview.includes("Calendars.ReadWrite"), false);
   assert.equal(record.source, "demo");
 });
 
