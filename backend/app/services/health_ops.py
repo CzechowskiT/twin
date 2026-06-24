@@ -66,17 +66,30 @@ def build_health_ops_public(s: Settings) -> dict[str, Any]:
             out["partner_export_configured"] = partner_export_configured(db_sess, s)
             out["validated_jobs"] = count_validated_jobs_public_traction(db_sess)
         # Avoid heavy market_coverage_report COUNTs on the public health path — use Redis scrape snapshot only.
+        from app.services.market_coverage_status import feed_stale_hours_threshold, _parse_run_ts
+        from datetime import datetime, timezone
+
         last_at = last_scrape_run_at()
         latest = get_latest_run()
         active = int(out.get("validated_jobs") or 0)
         target = max(1000, int(s.market_coverage_target_jobs))
+        feed_stale = False
+        if last_at:
+            last_dt = _parse_run_ts(last_at)
+            if last_dt:
+                hours = (datetime.now(timezone.utc) - last_dt).total_seconds() / 3600.0
+                feed_stale = hours > feed_stale_hours_threshold()
+        elif active == 0:
+            feed_stale = True
         mc: dict[str, Any] = {
             "last_scrape_run_at": last_at,
             "progress_to_10k_pct": round(min(100.0, 100.0 * active / target), 1) if target else None,
             "active_validated_jobs": active,
-            "feed_stale": False,
+            "feed_stale": feed_stale,
             "warnings": list(latest.get("warnings") or [])[:8] if latest else [],
         }
+        if feed_stale:
+            mc["warnings"] = ["feed_stale_no_recent_scrape", *mc["warnings"]]
         if latest and latest.get("status") == "running":
             mc["warnings"] = ["scrape_run_in_progress", *mc["warnings"]]
     except Exception:
