@@ -11,7 +11,36 @@ from app.services.calendar_oauth_redirect import effective_microsoft_calendar_re
 
 MS_AUTH_BASE = "https://login.microsoftonline.com"
 MS_GRAPH_ME = "https://graph.microsoft.com/v1.0/me"
-MS_CALENDAR_SCOPES = "offline_access User.Read Calendars.ReadWrite"
+MS_CALENDAR_SCOPES = "offline_access User.Read Calendars.Read"
+
+FORBIDDEN_MS_CALENDAR_SCOPE_TOKENS: frozenset[str] = frozenset(
+    {
+        "Calendars.ReadWrite",
+        "Mail.Send",
+        "OnlineMeetings.ReadWrite",
+    }
+)
+
+
+def sanitize_microsoft_calendar_scopes(raw: str) -> str:
+    """Drop forbidden Graph scopes from env override; keep read-only calendar access."""
+    parts = [p.strip() for p in raw.split() if p.strip()]
+    safe = [p for p in parts if p not in FORBIDDEN_MS_CALENDAR_SCOPE_TOKENS]
+    if "Calendars.Read" not in safe:
+        safe.append("Calendars.Read")
+    for required in ("offline_access", "User.Read"):
+        if required not in safe:
+            safe.insert(0, required)
+    return " ".join(safe)
+
+
+def effective_microsoft_calendar_scopes(s: Settings | None = None) -> str:
+    """Resolve OAuth scope string — default read-only; env override cannot add write scopes."""
+    settings = s or get_settings()
+    override = (settings.microsoft_calendar_scopes or "").strip()
+    if not override:
+        return MS_CALENDAR_SCOPES
+    return sanitize_microsoft_calendar_scopes(override)
 
 
 class MicrosoftCalendarOAuthError(Exception):
@@ -48,7 +77,7 @@ def build_microsoft_calendar_authorize_url(state: str) -> str:
         "response_type": "code",
         "redirect_uri": redirect_uri,
         "response_mode": "query",
-        "scope": MS_CALENDAR_SCOPES,
+        "scope": effective_microsoft_calendar_scopes(s),
         "state": state,
         "prompt": "consent",
     }
@@ -66,7 +95,7 @@ def exchange_microsoft_calendar_code(code: str) -> tuple[str, str | None]:
         "code": code,
         "redirect_uri": _redirect_uri(s),
         "grant_type": "authorization_code",
-        "scope": MS_CALENDAR_SCOPES,
+        "scope": effective_microsoft_calendar_scopes(s),
     }
     with httpx.Client(timeout=30.0) as client:
         token_res = client.post(
@@ -108,7 +137,7 @@ def refresh_microsoft_calendar_tokens(refresh_token_plain: str):
                 "client_secret": s.microsoft_client_secret,
                 "refresh_token": refresh_token_plain,
                 "grant_type": "refresh_token",
-                "scope": MS_CALENDAR_SCOPES,
+                "scope": effective_microsoft_calendar_scopes(s),
             },
             headers={"Content-Type": "application/x-www-form-urlencoded"},
         )
