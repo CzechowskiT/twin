@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { useMemo } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { EvidenceStatusBadge } from "@/components/shared/evidence-status-badge";
@@ -47,7 +48,7 @@ function relationSection(
 
 export function SchedulingDecisionContextPanel({ surface }: Props): ReactNode {
   const { t } = useTranslation();
-  const bundle = resolveSchedulingDecisionContext(surface);
+  const bundle = useMemo(() => resolveSchedulingDecisionContext(surface), [surface]);
 
   return (
     <Card

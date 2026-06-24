@@ -91,3 +91,29 @@ test("11 placement checklist records memoized", () => {
   assert.match(recruiter, /useMemo\(\(\) => resolveRecruiterPlacementChecklist\(\)/);
   assert.match(company, /useMemo\(\(\) => resolveCompanyPlacementChecklist\(\)/);
 });
+
+test("12 safe evidence doc exists and marks P0 OPEN", () => {
+  const doc = readRepo("docs/P0_PERFORMANCE_SAFE_EVIDENCE_2026-06-24.md");
+  assert.match(doc, /P0 performance remains OPEN/i);
+  assert.match(doc, /Phase 3B.*HARD BLOCKED/i);
+  assert.match(doc, /No Phase 3B/i);
+  assert.doesNotMatch(doc, /P0.*CLOSED/i);
+  assert.doesNotMatch(doc, /performance solved/i);
+});
+
+test("13 scheduling decision context panel memoizes demo bundle", () => {
+  const panel = read("src/components/shared/scheduling-decision-context-panel.tsx");
+  assert.match(panel, /useMemo\(\(\) => resolveSchedulingDecisionContext\(surface\)/);
+});
+
+test("14 route weight inventory script registered", () => {
+  assert.match(read("package.json"), /test:p0-route-weight-inventory/);
+});
+
+test("15 safe evidence doc blocks Phase 3B and stress runs", () => {
+  const doc = readRepo("docs/P0_PERFORMANCE_SAFE_EVIDENCE_2026-06-24.md");
+  assert.match(doc, /Phase 3B.*HARD BLOCKED/i);
+  assert.match(doc, /No stress or multitab validation/i);
+  assert.match(doc, /No headless-shell verification/i);
+  assert.doesNotMatch(doc, /Phase 3B.*unblocked/i);
+});
