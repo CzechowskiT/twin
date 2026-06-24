@@ -8,6 +8,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
+import { logProdSmokeCommitGate } from "./lib/prod-smoke-commit-gate";
+
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const scriptRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -61,6 +63,14 @@ test("1 smoke script and docs exist", () => {
   assert.ok(readRepo("docs/FOUNDER_TEST_AUTH_SMOKE_SETUP_2026-06-19.md").includes("TWIN_PROD_TEST_JWT"));
   assert.match(readRepo("frontend/package.json"), /test:prod-authenticated-persistence-smoke/);
   assert.match(readRepo("frontend/package.json"), /verify:prod-persistence-auth/);
+  assert.match(readRepo("frontend/package.json"), /test:prod-smoke-commit-gate/);
+});
+
+test("1b prod smoke commit gate fields (read-only)", async () => {
+  const gate = await logProdSmokeCommitGate();
+  assert.ok(typeof gate.prod_frontend_commit === "string");
+  assert.ok(typeof gate.repo_head === "string");
+  assert.equal(typeof gate.docs_only_drift, "boolean");
 });
 
 test("2 no hardcoded JWT in smoke script", () => {

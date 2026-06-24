@@ -53,7 +53,10 @@ test("4 i18n candidateCalendarReadiness keys in en and pl", () => {
 });
 
 test("5 package.json exposes candidate calendar readiness test", () => {
-  assert.match(read("package.json"), /test:candidate-calendar-readiness/);
+  const pkg = read("package.json");
+  assert.match(pkg, /test:candidate-calendar-readiness/);
+  assert.match(pkg, /test:candidate-calendar-readiness-browser/);
+  assert.match(pkg, /verify:prod-candidate-calendar-readiness/);
 });
 
 test("6 no forbidden sync copy in workspace or i18n", () => {

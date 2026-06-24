@@ -8,6 +8,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
+import { logProdSmokeCommitGate } from "./lib/prod-smoke-commit-gate";
+
 const scriptRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 const PROD_BASE = (process.env.TWIN_PROD_BASE_URL ?? "https://twin-sooty.vercel.app").replace(/\/$/, "");
@@ -15,6 +17,7 @@ const JWT = process.env.TWIN_PROD_TEST_JWT?.trim();
 const SMOKE_WRITE = process.env.TWIN_PROD_SMOKE_WRITE === "1";
 
 const PLACEMENT_EVENTS_PATH = "/api/v1/placement-events";
+const NON_CANONICAL_PLACEMENT_EVENTS_PATH = "/api/placement-events";
 
 const FORBIDDEN_RESPONSE_PATTERNS = [
   /employer confirmed/i,
@@ -39,7 +42,22 @@ test("1 script and npm entry exist", () => {
   const pkg = readFileSync(join(scriptRoot, "package.json"), "utf8");
   assert.match(pkg, /test:placement-events-auth-smoke/);
   assert.match(pkg, /verify:prod-placement-events-auth/);
+  assert.match(pkg, /test:prod-smoke-commit-gate/);
   assert.ok(readFileSync(fileURLToPath(import.meta.url), "utf8").includes(PLACEMENT_EVENTS_PATH));
+});
+
+test("1b prod smoke commit gate fields (read-only)", async () => {
+  const gate = await logProdSmokeCommitGate();
+  assert.ok(typeof gate.prod_frontend_commit === "string");
+  assert.ok(typeof gate.prod_api_commit === "string");
+  assert.ok(typeof gate.repo_head === "string");
+  assert.ok(typeof gate.commit_interpretation === "string");
+  assert.equal(typeof gate.docs_only_drift, "boolean");
+  assert.ok(
+    gate.alignment_status === "aligned" ||
+      gate.alignment_status === "acceptable_docs_only_drift" ||
+      gate.alignment_status === "failed_alignment",
+  );
 });
 
 test("2 unauthenticated GET returns 401/403 not 404/500", async () => {
@@ -47,6 +65,11 @@ test("2 unauthenticated GET returns 401/403 not 404/500", async () => {
   assert.ok(status === 401 || status === 403, `expected 401/403, got ${status}`);
   assert.notEqual(status, 404);
   assert.notEqual(status, 500);
+});
+
+test("2b non-canonical path without /v1 returns 404 — expected, not a failure", async () => {
+  const { status } = await fetchStatus(NON_CANONICAL_PLACEMENT_EVENTS_PATH);
+  assert.equal(status, 404, "canonical path is /api/v1/placement-events only");
 });
 
 test("3 skip message when JWT unset", async (t) => {

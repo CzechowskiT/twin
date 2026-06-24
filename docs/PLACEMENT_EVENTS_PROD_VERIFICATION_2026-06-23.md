@@ -39,7 +39,8 @@ Confirm dedicated production auth smoke for `/api/v1/placement-events` after the
 |-------|-------|
 | Path | `/api/v1/placement-events` |
 | Methods | GET, POST |
-| Unauthenticated | **401/403** — no 404/500 |
+| Unauthenticated | **401/403** — no 404/500 on canonical path |
+| Non-canonical | `/api/placement-events` (no `/v1`) → **404 expected** — not a smoke failure |
 | Auth smoke POST | `demo_verification_recorded` — append-only internal marker |
 | External side effects | **none** |
 
