@@ -76,3 +76,11 @@ test("8 no forbidden sync copy", () => {
 test("9 package.json exposes recruiter company calendar readiness test", () => {
   assert.match(read("package.json"), /test:recruiter-company-calendar-readiness/);
 });
+
+test("10 recruiter and company workspaces show microsoft busy-read summary", () => {
+  const recruiterWs = read("src/components/recruiter/recruiter-daily-operating-cockpit-workspace.tsx");
+  const companyWs = read("src/components/company/company-hiring-command-center-workspace.tsx");
+  assert.match(recruiterWs, /resolveMicrosoftCalendarReadiness/);
+  assert.match(companyWs, /resolveMicrosoftCalendarReadiness/);
+  assert.match(recruiterWs, /microsoft-calendar-readiness-busy-read/);
+});

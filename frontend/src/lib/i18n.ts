@@ -208,6 +208,7 @@ export type TranslationKey =
   | `operatingEvidence.${keyof typeof en.operatingEvidence}`
   | `placementVerificationEvidence.${keyof typeof en.placementVerificationEvidence}`
   | `calendarReadinessEvidence.${keyof typeof en.calendarReadinessEvidence}`
+  | `microsoftCalendarReadiness.${keyof typeof en.microsoftCalendarReadiness}`
   | `candidateOfferReadiness.${keyof typeof en.candidateOfferReadiness}`
   | `offerReadinessEvidence.${keyof typeof en.offerReadinessEvidence}`
   | `offerReadinessPreview.${keyof typeof en.offerReadinessPreview}`
@@ -5665,6 +5666,25 @@ eyebrow: "Product roadmap",
     capExternalConfirmDetail: "Work email and attestation links blocked in this pilot.",
     capBilling: "Billing / economics",
     capBillingDetail: "No payment initiated · no invoice · no revenue recognition.",
+  },
+  microsoftCalendarReadiness: {
+    busyReadTitle: "Microsoft Graph busy-read",
+    busyReadLead: "Busy-read preview path — OAuth env wiring check, no live sync or Graph writes.",
+    stageNotStarted: "Not started",
+    stageOauthEnvPreview: "OAuth env preview",
+    stageBusyReadPreview: "Busy read preview",
+    stageHoldWriteBlocked: "Hold write blocked",
+    stageReadinessPreview: "Readiness preview",
+    oauthStatusTitle: "Microsoft OAuth status",
+    publicHealthTitle: "microsoft_calendar_configured",
+    scopesTitle: "Graph scopes (preview)",
+    scopesLead: "Planned busy-read scopes — Calendars.Read only, no write claims.",
+    blockedTitle: "Blocked Microsoft capabilities",
+    blockedLead: "Hard bans for busy-read slice — preview only.",
+    offerCardTitle: "Calendar readiness for offers",
+    offerCardLead: "Microsoft Graph busy-read preview — check availability before offer acceptance scheduling.",
+    offerCardCta: "Open calendar readiness",
+    boundaryNote: "Busy-read preview only — no calendar sync, no Graph writes, no invites.",
   },
   calendarReadinessEvidence: {
     panelTitle: "Calendar readiness evidence",
@@ -12791,6 +12811,25 @@ const pl: MessageTree = {
     capExternalConfirmDetail: "Email służbowy i linki atestacji zablokowane w tym pilocie.",
     capBilling: "Billing / ekonomia",
     capBillingDetail: "Brak inicjacji płatności · brak faktury · brak rozpoznania przychodu.",
+  },
+  microsoftCalendarReadiness: {
+    busyReadTitle: "Microsoft Graph busy-read",
+    busyReadLead: "Ścieżka podglądu busy-read — sprawdzenie env OAuth, bez live sync i zapisów Graph.",
+    stageNotStarted: "Nie rozpoczęto",
+    stageOauthEnvPreview: "Podgląd env OAuth",
+    stageBusyReadPreview: "Podgląd busy-read",
+    stageHoldWriteBlocked: "Hold write zablokowany",
+    stageReadinessPreview: "Podgląd gotowości",
+    oauthStatusTitle: "Status OAuth Microsoft",
+    publicHealthTitle: "microsoft_calendar_configured",
+    scopesTitle: "Zakresy Graph (podgląd)",
+    scopesLead: "Planowane zakresy busy-read — tylko Calendars.Read, bez roszczeń zapisu.",
+    blockedTitle: "Zablokowane możliwości Microsoft",
+    blockedLead: "Hard bans dla slice busy-read — tylko podgląd.",
+    offerCardTitle: "Gotowość kalendarza dla ofert",
+    offerCardLead: "Podgląd busy-read Microsoft Graph — sprawdź dostępność przed planowaniem akceptacji oferty.",
+    offerCardCta: "Otwórz gotowość kalendarza",
+    boundaryNote: "Tylko podgląd busy-read — bez sync kalendarza, zapisów Graph i zaproszeń.",
   },
   calendarReadinessEvidence: {
     panelTitle: "Dowód gotowości kalendarza",

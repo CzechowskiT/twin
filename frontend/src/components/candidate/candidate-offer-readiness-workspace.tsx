@@ -9,6 +9,7 @@ import { CandidateOfferQuestionsPanel } from "@/components/shared/candidate-offe
 import { OfferComparisonPreview } from "@/components/shared/offer-comparison-preview";
 import { OfferReadinessChecklist } from "@/components/shared/offer-readiness-checklist";
 import { OfferReadinessEvidencePanel } from "@/components/shared/offer-readiness-evidence-panel";
+import { OfferCalendarReadinessCard } from "@/components/shared/offer-calendar-readiness-card";
 import { OfferReadinessPanel } from "@/components/shared/offer-readiness-status-badge";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
@@ -90,6 +91,8 @@ function PreviewContent({ record }: { record: OfferReadinessRecord }) {
         <div data-testid={CANDIDATE_OFFER_READINESS_MARKERS.questions}>
           <CandidateOfferQuestionsPanel questions={record.questions} />
         </div>
+
+        <OfferCalendarReadinessCard candidateId={record.candidate_id} />
 
         <Card
           variant="soft"

@@ -6,6 +6,7 @@ import { useMemo } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { OperationalCrossLinksPanel } from "@/components/shared/operational-cross-links-panel";
+import { MicrosoftCalendarReadinessBusyReadPanel } from "@/components/shared/microsoft-calendar-readiness-busy-read-panel";
 import { Card, Shell } from "@/components/ui";
 import {
   BOARD_CALENDAR_READINESS_MONITOR_LINKS,
@@ -13,6 +14,7 @@ import {
   BOARD_CALENDAR_READINESS_MONITOR_PAGE_MARKER,
   resolveBoardCalendarReadinessMonitor,
 } from "@/lib/board-calendar-readiness-monitor";
+import { resolveMicrosoftCalendarReadiness } from "@/lib/microsoft-calendar-readiness";
 
 function section(marker: string, title: string, children: ReactNode): ReactNode {
   return (
@@ -28,6 +30,7 @@ function section(marker: string, title: string, children: ReactNode): ReactNode 
 export function BoardCalendarReadinessMonitorWorkspace() {
   const { t } = useTranslation();
   const record = useMemo(() => resolveBoardCalendarReadinessMonitor(), []);
+  const microsoftRecord = useMemo(() => resolveMicrosoftCalendarReadiness(), []);
   const crossLinks = useMemo(() => BOARD_CALENDAR_READINESS_MONITOR_LINKS, []);
 
   return (
@@ -45,6 +48,10 @@ export function BoardCalendarReadinessMonitorWorkspace() {
           <p className="text-sm text-[var(--twin-muted-strong)]">{record.headline}</p>
           <p className="text-xs text-[var(--twin-muted)]">{t("boardCalendarReadiness.headerLead")}</p>
         </header>
+
+        {microsoftRecord ? (
+          <MicrosoftCalendarReadinessBusyReadPanel record={microsoftRecord} />
+        ) : null}
 
         {section(
           BOARD_CALENDAR_READINESS_MONITOR_MARKERS.providerMatrix,

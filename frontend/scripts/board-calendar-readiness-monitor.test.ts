@@ -33,6 +33,8 @@ test("2 workspace renders all section markers", () => {
   assert.match(ws, /BOARD_CALENDAR_READINESS_MONITOR_MARKERS\.personaRoutes/);
   assert.match(ws, /BOARD_CALENDAR_READINESS_MONITOR_MARKERS\.launch/);
   assert.match(ws, /OperationalCrossLinksPanel/);
+  assert.match(ws, /MicrosoftCalendarReadinessBusyReadPanel/);
+  assert.match(ws, /resolveMicrosoftCalendarReadiness/);
 });
 
 test("3 demo record has providers and persona routes", () => {

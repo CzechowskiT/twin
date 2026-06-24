@@ -133,3 +133,16 @@ test("12 candidate route constant", () => {
   assert.equal(CANDIDATE_OFFER_READINESS_ROUTE, "/dashboard/offer-readiness");
   assert.ok(resolveCandidateOfferReadinessView());
 });
+
+test("13 offer workspaces render calendar readiness card on five routes", () => {
+  const workspaces = [
+    "src/components/candidate/candidate-offer-readiness-workspace.tsx",
+    "src/components/recruiter/recruiter-offer-readiness-preview-workspace.tsx",
+    "src/components/board/board-offer-readiness-monitor-workspace.tsx",
+  ];
+  for (const ws of workspaces) {
+    assert.match(read(ws), /OfferCalendarReadinessCard/, ws);
+    assert.match(read(ws), /offer-calendar-readiness-card/, ws);
+  }
+  assert.equal(OFFER_ROUTES.length, 5);
+});
