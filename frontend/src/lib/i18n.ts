@@ -205,6 +205,9 @@ export type TranslationKey =
   | `boardCalendarReadiness.${keyof typeof en.boardCalendarReadiness}`
   | `placementChecklist.${keyof typeof en.placementChecklist}`
   | `placementEventsTimeline.${keyof typeof en.placementEventsTimeline}`
+  | `operatingEvidence.${keyof typeof en.operatingEvidence}`
+  | `placementVerificationEvidence.${keyof typeof en.placementVerificationEvidence}`
+  | `calendarReadinessEvidence.${keyof typeof en.calendarReadinessEvidence}`
   | `boardPlacementEvidence.${keyof typeof en.boardPlacementEvidence}`
   | `recruiterTrustReviewQueue.${keyof typeof en.recruiterTrustReviewQueue}`
   | `companyCandidateTrustSummary.${keyof typeof en.companyCandidateTrustSummary}`
@@ -5624,6 +5627,63 @@ eyebrow: "Product roadmap",
       "Append-only internal placement evidence · no external confirmation · no payment initiated · no invoice generated · no revenue recognition · human review required",
     partialWarning: "Live API connected but empty — showing demo fallback rows.",
     emptyState: "No placement events yet — demo fallback unavailable.",
+  },
+  operatingEvidence: {
+    sourceUnavailable: "Unavailable",
+    capabilityReady: "Ready",
+    capabilityPreview: "Preview",
+    capabilityBlocked: "Blocked",
+    capabilityUnavailable: "Unavailable",
+    colCapability: "Capability",
+    colDetail: "Detail",
+    colStatus: "Status",
+    statusSummaryLabel: "Status summary",
+    lastCheckedLabel: "Last checked",
+    emptyStateLead: "Operating evidence unavailable — sign in or open demo placement to preview.",
+    crossLinksTitle: "Related operating surfaces",
+  },
+  placementVerificationEvidence: {
+    panelTitle: "Placement verification evidence",
+    panelLead:
+      "Operating evidence center — verification preview only, not legal proof, invoice, payment, or revenue recognition.",
+    boundaryNote:
+      "Read-only operating evidence · no write actions · canonical GET /api/v1/placement-events · human review required",
+    statusSummary: "Verification preview active",
+    statusDetail: "Demo placement bundle with append-only timeline — external confirmation still missing.",
+    evidenceBundleTitle: "Evidence bundle",
+    evidenceBundleLead: "{count} evidence items in preview bundle — internal only.",
+    timelineEndpoint: "Canonical timeline endpoint",
+    capEventsTimeline: "Placement events timeline",
+    capEventsTimelineDetail: "Read-only GET /api/v1/placement-events — 401 unauthenticated is expected.",
+    capEvidenceItems: "Evidence items",
+    capEvidenceItemsDetail: "Self-declaration and document hints — no employer attestation.",
+    capExternalConfirm: "External confirmation",
+    capExternalConfirmDetail: "Work email and attestation links blocked in this pilot.",
+    capBilling: "Billing / economics",
+    capBillingDetail: "No payment initiated · no invoice · no revenue recognition.",
+  },
+  calendarReadinessEvidence: {
+    panelTitle: "Calendar readiness evidence",
+    panelLead:
+      "Operating evidence for OAuth readiness — preview only, not automated interview scheduling or calendar writes.",
+    boundaryNote:
+      "Readiness evidence only · writes disabled · Microsoft Graph event create blocked · no polling",
+    workspaceSectionTitle: "Operating evidence (readiness preview)",
+    statusSummary: "Readiness preview active",
+    statusDetail: "OAuth env and busy-read preview — hold writes and Microsoft sync remain blocked.",
+    oauthStatusTitle: "OAuth status",
+    readinessStatusTitle: "Readiness status",
+    readinessStageLabel: "Stage",
+    capOauthConfigured: "OAuth configured",
+    capOauthConfiguredDetail: "public-health google_calendar_configured / microsoft_calendar_configured flags.",
+    capReadReadiness: "Read readiness",
+    capReadReadinessDetail: "Busy-read preview path — no live sync claim.",
+    capWritesDisabled: "Calendar writes",
+    capWritesDisabledDetail: "Event create/update/delete blocked in readiness batch.",
+    capSmokeStatus: "Browser smoke",
+    capSmokeStatusDetail: "Auth-shell-safe Playwright specs — preview markers only.",
+    capRouteHealth: "Route health",
+    capRouteHealthDetail: "/dashboard/calendar and /dashboard/calendar/readiness not 404.",
   },
   boardPlacementEvidence: {
     pageEyebrow: "Board placement evidence",
@@ -12560,6 +12620,63 @@ const pl: MessageTree = {
       "Wewnętrzny dowód placementu append-only · brak potwierdzenia zewnętrznego · brak inicjacji płatności · brak wygenerowanej faktury · brak rozpoznania przychodu · wymagany przegląd człowieka",
     partialWarning: "Live API podłączone, ale pusto — pokazano wiersze demo fallback.",
     emptyState: "Brak zdarzeń placementu — demo fallback niedostępny.",
+  },
+  operatingEvidence: {
+    sourceUnavailable: "Niedostępne",
+    capabilityReady: "Gotowe",
+    capabilityPreview: "Podgląd",
+    capabilityBlocked: "Zablokowane",
+    capabilityUnavailable: "Niedostępne",
+    colCapability: "Możliwość",
+    colDetail: "Szczegół",
+    colStatus: "Status",
+    statusSummaryLabel: "Podsumowanie statusu",
+    lastCheckedLabel: "Ostatnia kontrola",
+    emptyStateLead: "Dowód operacyjny niedostępny — zaloguj się lub otwórz demo placement, aby zobaczyć podgląd.",
+    crossLinksTitle: "Powiązane powierzchnie operacyjne",
+  },
+  placementVerificationEvidence: {
+    panelTitle: "Dowód weryfikacji placementu",
+    panelLead:
+      "Centrum dowodu operacyjnego — tylko podgląd weryfikacji, nie dowód prawny, faktura, płatność ani rozpoznanie przychodu.",
+    boundaryNote:
+      "Dowód operacyjny tylko do odczytu · brak akcji zapisu · kanoniczny GET /api/v1/placement-events · wymagany przegląd człowieka",
+    statusSummary: "Podgląd weryfikacji aktywny",
+    statusDetail: "Pakiet demo placement z osią append-only — brak potwierdzenia zewnętrznego.",
+    evidenceBundleTitle: "Pakiet dowodów",
+    evidenceBundleLead: "{count} elementów dowodu w pakiecie podglądu — tylko wewnętrznie.",
+    timelineEndpoint: "Kanoniczny endpoint osi",
+    capEventsTimeline: "Oś zdarzeń placementu",
+    capEventsTimelineDetail: "Tylko odczyt GET /api/v1/placement-events — 401 bez auth jest oczekiwany.",
+    capEvidenceItems: "Elementy dowodu",
+    capEvidenceItemsDetail: "Self-declaration i wskazówki dokumentów — bez atestacji pracodawcy.",
+    capExternalConfirm: "Potwierdzenie zewnętrzne",
+    capExternalConfirmDetail: "Email służbowy i linki atestacji zablokowane w tym pilocie.",
+    capBilling: "Billing / ekonomia",
+    capBillingDetail: "Brak inicjacji płatności · brak faktury · brak rozpoznania przychodu.",
+  },
+  calendarReadinessEvidence: {
+    panelTitle: "Dowód gotowości kalendarza",
+    panelLead:
+      "Dowód operacyjny gotowości OAuth — tylko podgląd, nie automatyczne planowanie rozmów ani zapisy kalendarza.",
+    boundaryNote:
+      "Tylko dowód gotowości · zapisy wyłączone · Microsoft Graph create zablokowany · bez pollingu",
+    workspaceSectionTitle: "Dowód operacyjny (podgląd gotowości)",
+    statusSummary: "Podgląd gotowości aktywny",
+    statusDetail: "Podgląd env OAuth i busy-read — hold writes i sync Microsoft pozostają zablokowane.",
+    oauthStatusTitle: "Status OAuth",
+    readinessStatusTitle: "Status gotowości",
+    readinessStageLabel: "Etap",
+    capOauthConfigured: "OAuth skonfigurowany",
+    capOauthConfiguredDetail: "Flagi public-health google_calendar_configured / microsoft_calendar_configured.",
+    capReadReadiness: "Gotowość odczytu",
+    capReadReadinessDetail: "Ścieżka podglądu busy-read — bez roszczenia live sync.",
+    capWritesDisabled: "Zapisy kalendarza",
+    capWritesDisabledDetail: "Create/update/delete eventów zablokowane w batchu gotowości.",
+    capSmokeStatus: "Browser smoke",
+    capSmokeStatusDetail: "Specy Playwright auth-shell-safe — tylko markery podglądu.",
+    capRouteHealth: "Zdrowie tras",
+    capRouteHealthDetail: "/dashboard/calendar i /dashboard/calendar/readiness nie zwracają 404.",
   },
   boardPlacementEvidence: {
     pageEyebrow: "Dowód placementu — board",

@@ -6,6 +6,7 @@ import { useMemo } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { OperationalCrossLinksPanel } from "@/components/shared/operational-cross-links-panel";
+import { PlacementVerificationEvidencePanel } from "@/components/shared/placement-verification-evidence-panel";
 import { Card, Shell } from "@/components/ui";
 import { LAUNCH_STANCE } from "@/lib/investor-metrics-reality";
 import type { PlacementChecklistItem } from "@/lib/recruiter-company-placement-verification-checklist-demo-data";
@@ -95,6 +96,8 @@ export function CompanyPlacementVerificationChecklistWorkspace() {
             ))}
           </div>
         </Card>
+
+        <PlacementVerificationEvidencePanel placementId={record.placement_id} />
 
         <PlacementEventsTimeline placementId={record.placement_id} />
 

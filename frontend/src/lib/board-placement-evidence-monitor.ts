@@ -18,6 +18,7 @@ export const BOARD_PLACEMENT_EVIDENCE_MONITOR_MARKERS = {
   page: BOARD_PLACEMENT_EVIDENCE_MONITOR_PAGE_MARKER,
   header: "board-placement-evidence-monitor-header",
   evidenceMatrix: "board-placement-evidence-monitor-evidence-matrix",
+  operatingEvidence: "placement-verification-evidence-panel",
   economicsPreview: "board-placement-evidence-monitor-economics-preview",
   riskFlags: "board-placement-evidence-monitor-risk-flags",
   blockedCapabilities: "board-placement-evidence-monitor-blocked-capabilities",

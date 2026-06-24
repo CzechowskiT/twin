@@ -19,6 +19,7 @@ export const RECRUITER_PLACEMENT_VERIFICATION_MARKERS = {
   header: "recruiter-placement-verification-header",
   checklist: "recruiter-placement-verification-checklist",
   disabledActions: "recruiter-placement-verification-disabled-actions",
+  operatingEvidence: "placement-verification-evidence-panel",
   crossLinks: "recruiter-placement-verification-cross-links",
   sourceBadge: "recruiter-placement-verification-source",
 } as const;
@@ -28,6 +29,7 @@ export const COMPANY_PLACEMENT_VERIFICATION_MARKERS = {
   header: "company-placement-verification-header",
   checklist: "company-placement-verification-checklist",
   disabledActions: "company-placement-verification-disabled-actions",
+  operatingEvidence: "placement-verification-evidence-panel",
   crossLinks: "company-placement-verification-cross-links",
   sourceBadge: "company-placement-verification-source",
 } as const;

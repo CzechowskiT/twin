@@ -10,6 +10,7 @@ import {
 } from "@/components/career-assistant/career-assistant-modals";
 import { CalendarConnectedSuccessAlert } from "@/components/calendar/calendar-connected-success-alert";
 import { CalendarConnectionsPanel } from "@/components/calendar/calendar-connections-panel";
+import { CalendarOperatingEvidenceSection } from "@/components/calendar/calendar-operating-evidence-section";
 import { CalendarWeekView } from "@/components/calendar/calendar-week-view";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { useTranslation } from "@/components/language-provider";
@@ -1073,6 +1074,8 @@ export default function DashboardCalendarPage() {
           })();
         }}
       />
+
+      <CalendarOperatingEvidenceSection />
 
       <details className="mb-6 rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/40 px-4 py-3">
         <summary className="cursor-pointer text-sm font-semibold text-[var(--foreground)]">

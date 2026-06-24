@@ -20,6 +20,7 @@ export const CANDIDATE_CALENDAR_READINESS_MARKERS = {
   publicHealth: "candidate-calendar-readiness-public-health",
   blocked: "candidate-calendar-readiness-blocked",
   scopes: "candidate-calendar-readiness-scopes",
+  operatingEvidence: "calendar-readiness-evidence-panel",
   sourceBadge: "candidate-calendar-readiness-source",
   safeLinks: "candidate-calendar-readiness-safe-links",
   notFound: "candidate-calendar-readiness-not-found",

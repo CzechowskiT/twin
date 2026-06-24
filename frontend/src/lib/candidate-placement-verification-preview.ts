@@ -19,6 +19,7 @@ export const CANDIDATE_PLACEMENT_VERIFICATION_MARKERS = {
   header: "candidate-placement-verification-header",
   status: "candidate-placement-verification-status",
   evidence: "candidate-placement-verification-evidence",
+  operatingEvidence: "placement-verification-evidence-panel",
   externalGap: "candidate-placement-verification-external-gap",
   riskFlags: "candidate-placement-verification-risk-flags",
   demoActions: "candidate-placement-verification-demo-actions",
