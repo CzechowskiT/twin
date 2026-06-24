@@ -396,12 +396,21 @@ def microsoft_calendar_next_slot(
     return NextSlotOut(start_iso=pair[0], end_iso=pair[1])
 
 
+def _ensure_microsoft_calendar_write_enabled() -> None:
+    if not get_settings().microsoft_calendar_write_enabled:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Microsoft calendar event write is disabled on this server",
+        )
+
+
 @router.post("/microsoft/interviews", response_model=ScheduledInterviewOut)
 def microsoft_calendar_schedule_interview(
     body: ScheduleInterviewIn,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> ScheduledInterviewOut:
+    _ensure_microsoft_calendar_write_enabled()
     access = _microsoft_access_token(db, current_user.id)
     _ensure_application_owned(db, current_user.id, body.application_id)
 

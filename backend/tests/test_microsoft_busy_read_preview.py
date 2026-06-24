@@ -61,6 +61,20 @@ def test_busy_read_preview_unauthenticated(client: TestClient) -> None:
     assert res.status_code == 401
 
 
+def test_busy_read_preview_exposes_safety_flags_when_gate_off(preview_client, monkeypatch) -> None:
+    client, headers, _db, _user = preview_client
+    monkeypatch.setenv("MICROSOFT_BUSY_READ_ENABLED", "false")
+    get_settings.cache_clear()
+    res = client.get("/api/v1/calendar/microsoft/busy-read/preview", headers=headers)
+    get_settings.cache_clear()
+    assert res.status_code == 200
+    body = res.json()
+    assert body["product_gate_enabled"] is False
+    assert body["oauth_connect_gate_enabled"] is False
+    assert body["calendar_write_gate_enabled"] is False
+    assert "public_health_microsoft_configured" in body
+
+
 def test_busy_read_preview_demo_when_gate_off(preview_client, monkeypatch) -> None:
     client, headers, _db, _user = preview_client
     monkeypatch.setenv("MICROSOFT_BUSY_READ_ENABLED", "false")

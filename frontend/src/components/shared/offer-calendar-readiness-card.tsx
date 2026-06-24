@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { Card } from "@/components/ui";
+import { MicrosoftBusyReadStagingStatusBanner } from "@/components/shared/microsoft-busy-read-staging-status-banner";
 import { CANDIDATE_CALENDAR_READINESS_ROUTE } from "@/lib/candidate-calendar-readiness";
 import {
   MICROSOFT_CALENDAR_READINESS_MARKERS,
@@ -33,6 +34,7 @@ export function OfferCalendarReadinessCard({ candidateId }: Props): ReactNode {
         {t("microsoftCalendarReadiness.offerCardTitle")}
       </h2>
       <div className="mt-4 space-y-3 text-sm leading-relaxed text-[var(--foreground)]">
+        <MicrosoftBusyReadStagingStatusBanner compact />
         <p className="text-[var(--twin-muted-strong)]">{t("microsoftCalendarReadiness.offerCardLead")}</p>
         <p className="font-medium" data-testid={MICROSOFT_CALENDAR_READINESS_MARKERS.busyRead}>
           {t(microsoftBusyReadStageKey(record.busy_read_stage))}

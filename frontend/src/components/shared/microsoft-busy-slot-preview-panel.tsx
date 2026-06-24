@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card } from "@/components/ui";
+import { MicrosoftBusyReadStagingStatusBanner } from "@/components/shared/microsoft-busy-read-staging-status-banner";
 import {
   MICROSOFT_BUSY_READ_MARKERS,
   microsoftBusyReadLiveEnabled,
@@ -30,6 +31,7 @@ export function MicrosoftBusySlotPreviewPanel({ record, compact = false }: Props
         {t("microsoftBusyRead.slotPreviewTitle")}
       </h2>
       <div className="mt-4 space-y-3 text-sm leading-relaxed text-[var(--foreground)]">
+        <MicrosoftBusyReadStagingStatusBanner compact={compact} />
         <p className="text-[var(--twin-muted-strong)]">{t("microsoftBusyRead.slotPreviewLead")}</p>
         <p className="text-xs text-[var(--twin-muted)]">
           {t("microsoftBusyRead.providerLabel")}: Microsoft · {t("microsoftBusyRead.scopeLabel")}: Calendars.Read

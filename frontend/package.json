@@ -228,6 +228,8 @@
     "verify:prod-placement-verification-evidence": "npx --yes tsx scripts/verify-prod-placement-verification-evidence.ts",
     "test:calendar-readiness-domain": "npx --yes tsx scripts/calendar-readiness-domain.test.ts",
     "test:microsoft-calendar-readiness-domain": "npx --yes tsx scripts/microsoft-calendar-readiness-domain.test.ts",
+    "test:microsoft-busy-read-staging-smoke": "npx --yes tsx scripts/microsoft-busy-read-staging-smoke.test.ts",
+    "verify:prod-microsoft-busy-read": "npx --yes tsx scripts/verify-prod-microsoft-busy-read.ts",
     "test:microsoft-busy-read-contract": "npx --yes tsx scripts/microsoft-busy-read-contract.test.ts",
     "test:microsoft-busy-read-api-wiring": "npx --yes tsx scripts/microsoft-busy-read-api-wiring.test.ts",
     "test:microsoft-busy-slot-preview-panel": "npx --yes tsx scripts/microsoft-busy-slot-preview-panel.test.ts",

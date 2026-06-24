@@ -44,6 +44,7 @@ def build_health_ops_public(s: Settings) -> dict[str, Any]:
         "microsoft_calendar_configured": is_microsoft_calendar_oauth_configured(),
         "microsoft_busy_read_enabled": s.microsoft_busy_read_enabled,
         "microsoft_oauth_connect_gate_enabled": s.microsoft_oauth_connect_gate_enabled,
+        "microsoft_calendar_write_enabled": s.microsoft_calendar_write_enabled,
         "stripe_checkout_ready": _stripe_checkout_ready(s),
         "scrape_worker_ready": scrape_worker_ready(s),
         "scrape_beat_enabled": s.scrape_beat_enabled,

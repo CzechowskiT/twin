@@ -57,6 +57,10 @@ class MicrosoftBusyReadReadinessOut(BaseModel):
         False,
         description="True when MICROSOFT_OAUTH_CONNECT_GATE_ENABLED is set on the API.",
     )
+    calendar_write_gate_enabled: bool = Field(
+        False,
+        description="True when MICROSOFT_CALENDAR_WRITE_ENABLED is set on the API (legacy interview write).",
+    )
     source: BusyReadSource
     headline: str
 
@@ -79,4 +83,20 @@ class MicrosoftBusyReadPreviewOut(BaseModel):
     live_graph_stub: bool = Field(
         False,
         description="True when live Graph read is intentionally stubbed (unsafe token scope or upstream error).",
+    )
+    product_gate_enabled: bool = Field(
+        False,
+        description="True when MICROSOFT_BUSY_READ_ENABLED is set on the API.",
+    )
+    oauth_connect_gate_enabled: bool = Field(
+        False,
+        description="True when MICROSOFT_OAUTH_CONNECT_GATE_ENABLED is set on the API.",
+    )
+    calendar_write_gate_enabled: bool = Field(
+        False,
+        description="True when MICROSOFT_CALENDAR_WRITE_ENABLED is set on the API (legacy interview write).",
+    )
+    public_health_microsoft_configured: bool = Field(
+        False,
+        description="True when Microsoft Calendar OAuth client id, secret, and redirect URI are configured.",
     )

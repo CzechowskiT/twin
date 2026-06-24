@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { Card } from "@/components/ui";
+import { MicrosoftBusyReadStagingStatusBanner } from "@/components/shared/microsoft-busy-read-staging-status-banner";
 import {
   MICROSOFT_CALENDAR_READINESS_MARKERS,
   microsoftBusyReadStageKey,
@@ -27,6 +28,7 @@ export function MicrosoftCalendarReadinessBusyReadPanel({ record }: Props): Reac
         {t("microsoftCalendarReadiness.busyReadTitle")}
       </h2>
       <div className="mt-4 space-y-3 text-sm leading-relaxed text-[var(--foreground)]">
+        <MicrosoftBusyReadStagingStatusBanner />
         <p className="text-[var(--twin-muted-strong)]">{t("microsoftCalendarReadiness.busyReadLead")}</p>
         <p className="font-medium">{t(microsoftBusyReadStageKey(record.busy_read_stage))}</p>
 

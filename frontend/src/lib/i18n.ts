@@ -5715,6 +5715,11 @@ eyebrow: "Product roadmap",
     relatedToPlacementEvidence: "Related to placement evidence — no external confirmation claim.",
     relatedToBoardEvidence: "Related to board calendar readiness monitor.",
     crossLinkCta: "Open calendar readiness",
+    stagingStatusTitle: "Staging-only — Microsoft busy-read preview",
+    stagingStatusLead:
+      "Demo busy slots and readiness contract only. Live Graph busy-read is not enabled in production.",
+    stagingStatusGatesOff:
+      "Product gates off: MICROSOFT_BUSY_READ_ENABLED, MICROSOFT_OAUTH_CONNECT_GATE_ENABLED, MICROSOFT_CALENDAR_WRITE_ENABLED.",
   },
   calendarReadinessEvidence: {
     panelTitle: "Calendar readiness evidence",
@@ -12889,6 +12894,11 @@ const pl: MessageTree = {
     relatedToPlacementEvidence: "Powiązane z dowodem placement — brak roszczeń zewnętrznej konfirmacji.",
     relatedToBoardEvidence: "Powiązane z monitorem gotowości kalendarza board.",
     crossLinkCta: "Otwórz gotowość kalendarza",
+    stagingStatusTitle: "Tylko staging — podgląd Microsoft busy-read",
+    stagingStatusLead:
+      "Tylko demo slotów busy i kontrakt gotowości. Live Graph busy-read nie jest włączony na produkcji.",
+    stagingStatusGatesOff:
+      "Bramki produktowe wyłączone: MICROSOFT_BUSY_READ_ENABLED, MICROSOFT_OAUTH_CONNECT_GATE_ENABLED, MICROSOFT_CALENDAR_WRITE_ENABLED.",
   },
   calendarReadinessEvidence: {
     panelTitle: "Dowód gotowości kalendarza",

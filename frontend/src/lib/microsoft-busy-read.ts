@@ -59,6 +59,7 @@ export const MICROSOFT_BUSY_READ_MARKERS = {
   oauthGate: "microsoft-oauth-connect-ui-gate",
   crossLink: "microsoft-busy-read-cross-link",
   liveDisabled: "microsoft-busy-read-live-disabled",
+  stagingStatus: "microsoft-busy-read-staging-status",
 } as const;
 
 export const MICROSOFT_BUSY_READ_SOURCE_KEYS: Record<
