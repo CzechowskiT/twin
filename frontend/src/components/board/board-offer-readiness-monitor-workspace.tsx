@@ -8,6 +8,7 @@ import { useTranslation } from "@/components/language-provider";
 import { OperationalCrossLinksPanel } from "@/components/shared/operational-cross-links-panel";
 import { OfferReadinessEvidencePanel } from "@/components/shared/offer-readiness-evidence-panel";
 import { OfferCalendarReadinessCard } from "@/components/shared/offer-calendar-readiness-card";
+import { MicrosoftBusyReadCrossLinkCard } from "@/components/shared/microsoft-busy-read-cross-link-card";
 import { Card, Shell } from "@/components/ui";
 import { LAUNCH_STANCE } from "@/lib/investor-metrics-reality";
 import {
@@ -103,6 +104,7 @@ export function BoardOfferReadinessMonitorWorkspace(): ReactNode {
         )}
 
         <OfferCalendarReadinessCard candidateId={record.candidate_id} />
+        <MicrosoftBusyReadCrossLinkCard context="offer" candidateId={record.candidate_id} />
 
         <OfferReadinessEvidencePanel candidateId={record.candidate_id} />
 

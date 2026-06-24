@@ -9,6 +9,7 @@ import { OfferComparisonPreview } from "@/components/shared/offer-comparison-pre
 import { OfferReadinessChecklist } from "@/components/shared/offer-readiness-checklist";
 import { OfferReadinessEvidencePanel } from "@/components/shared/offer-readiness-evidence-panel";
 import { OfferCalendarReadinessCard } from "@/components/shared/offer-calendar-readiness-card";
+import { MicrosoftBusyReadCrossLinkCard } from "@/components/shared/microsoft-busy-read-cross-link-card";
 import { OfferReadinessPanel } from "@/components/shared/offer-readiness-status-badge";
 import { Card, Shell } from "@/components/ui";
 import { LAUNCH_STANCE } from "@/lib/investor-metrics-reality";
@@ -81,6 +82,7 @@ function PreviewBody({
         </Card>
 
         <OfferCalendarReadinessCard candidateId={record.candidate_id} />
+        <MicrosoftBusyReadCrossLinkCard context="offer" candidateId={record.candidate_id} />
 
         <OfferReadinessEvidencePanel candidateId={record.candidate_id} />
       </div>

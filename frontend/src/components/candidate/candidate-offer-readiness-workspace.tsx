@@ -10,6 +10,7 @@ import { OfferComparisonPreview } from "@/components/shared/offer-comparison-pre
 import { OfferReadinessChecklist } from "@/components/shared/offer-readiness-checklist";
 import { OfferReadinessEvidencePanel } from "@/components/shared/offer-readiness-evidence-panel";
 import { OfferCalendarReadinessCard } from "@/components/shared/offer-calendar-readiness-card";
+import { MicrosoftBusyReadCrossLinkCard } from "@/components/shared/microsoft-busy-read-cross-link-card";
 import { OfferReadinessPanel } from "@/components/shared/offer-readiness-status-badge";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
@@ -93,6 +94,7 @@ function PreviewContent({ record }: { record: OfferReadinessRecord }) {
         </div>
 
         <OfferCalendarReadinessCard candidateId={record.candidate_id} />
+        <MicrosoftBusyReadCrossLinkCard context="offer" candidateId={record.candidate_id} />
 
         <Card
           variant="soft"

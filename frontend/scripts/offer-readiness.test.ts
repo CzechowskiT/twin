@@ -146,3 +146,17 @@ test("13 offer workspaces render calendar readiness card on five routes", () => 
   }
   assert.equal(OFFER_ROUTES.length, 5);
 });
+
+test("14 offer and placement workspaces render microsoft busy-read cross-link", () => {
+  const workspaces = [
+    "src/components/candidate/candidate-offer-readiness-workspace.tsx",
+    "src/components/recruiter/recruiter-offer-readiness-preview-workspace.tsx",
+    "src/components/board/board-offer-readiness-monitor-workspace.tsx",
+    "src/components/candidate/candidate-placement-verification-preview-workspace.tsx",
+    "src/components/board/board-placement-evidence-monitor-workspace.tsx",
+  ];
+  for (const ws of workspaces) {
+    assert.match(read(ws), /MicrosoftBusyReadCrossLinkCard/, ws);
+    assert.match(read(ws), /microsoft-busy-read-cross-link/, ws);
+  }
+});

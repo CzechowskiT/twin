@@ -9,6 +9,8 @@ import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
 import { CalendarReadinessEvidencePanel } from "@/components/shared/calendar-readiness-evidence-panel";
 import { MicrosoftCalendarReadinessBusyReadPanel } from "@/components/shared/microsoft-calendar-readiness-busy-read-panel";
+import { MicrosoftBusySlotPreviewPanel } from "@/components/shared/microsoft-busy-slot-preview-panel";
+import { MicrosoftOAuthConnectUiGate } from "@/components/shared/microsoft-oauth-connect-ui-gate";
 import {
   CANDIDATE_CALENDAR_READINESS_MARKERS,
   CANDIDATE_CALENDAR_READINESS_PAGE_MARKER,
@@ -18,6 +20,7 @@ import {
 } from "@/lib/candidate-calendar-readiness";
 import type { CalendarReadinessRecord } from "@/lib/calendar-readiness";
 import { deriveMicrosoftFromCalendar } from "@/lib/microsoft-calendar-readiness";
+import { resolveMicrosoftBusyRead } from "@/lib/microsoft-busy-read";
 import type { TranslationKey } from "@/lib/i18n";
 
 function sectionCard(marker: string, title: string, children: ReactNode): ReactNode {
@@ -62,6 +65,7 @@ function PreviewNotFound() {
 
 function PreviewContent({ record }: { record: CalendarReadinessRecord }) {
   const { t } = useTranslation();
+  const busyRead = resolveMicrosoftBusyRead(record.candidate_id);
 
   return (
     <Shell wide rail>
@@ -113,6 +117,13 @@ function PreviewContent({ record }: { record: CalendarReadinessRecord }) {
         )}
 
         <MicrosoftCalendarReadinessBusyReadPanel record={deriveMicrosoftFromCalendar(record)} />
+
+        {busyRead ? (
+          <>
+            <MicrosoftBusySlotPreviewPanel record={busyRead} />
+            <MicrosoftOAuthConnectUiGate record={busyRead} />
+          </>
+        ) : null}
 
         {sectionCard(
           CANDIDATE_CALENDAR_READINESS_MARKERS.providers,
