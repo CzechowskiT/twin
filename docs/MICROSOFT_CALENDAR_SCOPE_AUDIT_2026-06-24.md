@@ -15,7 +15,21 @@
 | Interview write endpoint exists (legacy) | **Documented risk** | `backend/app/api/calendar_microsoft.py` POST `/microsoft/interviews` |
 | Prod env docs reference `Calendars.ReadWrite` | **P1 docs drift** | `docs/RAILWAY_PROD_ENV_PL.md` |
 
-**Verdict:** Safe to migrate OAuth authorize/token/refresh scopes to read-only. No blocker on live OAuth path — authorize URL is server-built; Azure app registration must add `Calendars.Read` delegated permission (founder ops). Interview write endpoint remains but requires separate product gate; not in scope for this batch.
+**Verdict:** OAuth authorize/token/refresh scopes migrated to read-only (PRs #269–#273). Azure app registration must grant delegated `Calendars.Read`. Interview write endpoint remains but requires separate product gate; not in scope for this batch.
+
+## Completion status (2026-06-24)
+
+| Slice | PR | Status |
+|-------|-----|--------|
+| 1 Audit | #269 | Merged |
+| 2 Remove ReadWrite | #270 | Merged |
+| 3 Gate safety tests | #271 | Merged |
+| 4 UI copy alignment | #272 | Merged |
+| 5 Docs evidence | #273 | Merged |
+
+**Final OAuth scopes:** `offline_access User.Read Calendars.Read`  
+**Env override:** `MICROSOFT_CALENDAR_SCOPES` — write scopes stripped at runtime  
+**Prod gates:** `MICROSOFT_BUSY_READ_ENABLED=false`, `MICROSOFT_OAUTH_CONNECT_GATE_ENABLED=false`
 
 ## Active OAuth scope source of truth
 
@@ -112,7 +126,7 @@ No new write scopes, event writes, invites, sync, or email in this batch.
 
 | Gate | Status |
 |------|--------|
-| OAuth scope migration | **IN PROGRESS** (this batch) |
+| OAuth scope migration | **COMPLETE** (PRs #269–#273) |
 | Live busy-read on prod | **NOT ENABLED** |
 | Public launch | **NO-GO** |
 | Phase 3B | **HARD BLOCKED** |

@@ -16,7 +16,7 @@ Full-stack **read-only busy-read contract**: backend readiness + preview APIs, f
 | `GET /api/v1/calendar/microsoft/busy-read/readiness` | Bearer | Capability contract: scopes, gates, oauth state — **no tokens** |
 | `GET /api/v1/calendar/microsoft/busy-read/preview` | Bearer | Redacted busy slots: `demo` / `not_connected` / `live_read_only` / `partial` |
 
-**Service:** `backend/app/services/microsoft_busy_read.py` — live Graph uses read-only `getSchedule` only when `MICROSOFT_BUSY_READ_ENABLED=true` and calendar connected; stubs on token/scope errors (`live_graph_stub: true`). Existing Microsoft calendar OAuth still requests `Calendars.ReadWrite` — **live busy-read remains stubbed in production until OAuth scopes migrate to `Calendars.Read` only** (documented; no fake live calls).
+**Service:** `backend/app/services/microsoft_busy_read.py` — live Graph uses read-only `getSchedule` only when `MICROSOFT_BUSY_READ_ENABLED=true` and calendar connected; stubs on token/scope errors (`live_graph_stub: true`). Microsoft calendar OAuth requests **`Calendars.Read` only** (PRs #269–#273, 2026-06-24) — `Calendars.ReadWrite` stripped from authorize/token/refresh and blocked via env override sanitization. **Live busy-read remains disabled in production** (`MICROSOFT_BUSY_READ_ENABLED=false`).
 
 ## Product gates (default false)
 
@@ -101,6 +101,16 @@ PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=ht
 | 4 Frontend UI wiring | #267 | `feature/microsoft-busy-read-ui-state-wiring-2026-06-24` |
 | 5 Docs evidence | #268 | `docs/microsoft-busy-read-live-readiness-evidence-2026-06-24` |
 
+## OAuth scope hardening batch (2026-06-24)
+
+| Slice | PR | Branch |
+|-------|-----|--------|
+| 1 Audit | #269 | `fix/microsoft-calendar-readonly-scope-audit-2026-06-24` |
+| 2 Remove ReadWrite | #270 | `fix/microsoft-calendar-readonly-oauth-scopes-2026-06-24` |
+| 3 Gate safety tests | #271 | `test/microsoft-busy-read-product-gate-safety-2026-06-24` |
+| 4 UI copy alignment | #272 | `fix/microsoft-calendar-readonly-copy-evidence-2026-06-24` |
+| 5 Docs evidence | #273 | `docs/microsoft-calendar-readonly-scope-evidence-2026-06-24` |
+
 ## Explicitly out of scope (hard bans)
 
 - Calendar sync, Graph writes, event create/update/delete
@@ -112,16 +122,17 @@ PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=ht
 
 | Gate | Status |
 |------|--------|
-| Microsoft Graph busy-read live | **NOT SHIPPED** — API + UI wired; gates default off; OAuth scope migration pending |
+| Microsoft Graph busy-read live | **NOT SHIPPED** — OAuth scopes migrated to read-only; gates default off |
 | Public launch | **NO-GO** |
 | P0 performance | **OPEN** |
 | Phase 3B | **HARD BLOCKED** |
 
 ## Next milestone
 
-1. Migrate Microsoft calendar OAuth to `Calendars.Read` (drop `Calendars.ReadWrite` from authorize scope).
-2. Set `MICROSOFT_BUSY_READ_ENABLED=true` in staging only after scope migration + founder smoke.
+1. ~~Migrate Microsoft calendar OAuth to `Calendars.Read`~~ **Done** (PRs #269–#273).
+2. Set `MICROSOFT_BUSY_READ_ENABLED=true` in staging only after founder smoke with read-only tokens.
 3. Optionally enable `MICROSOFT_OAUTH_CONNECT_GATE_ENABLED` for connect UI — still read-only, no writes.
+4. Azure: ensure delegated `Calendars.Read` granted; remove admin consent for `Calendars.ReadWrite` on new connections.
 
 ## Related docs
 
