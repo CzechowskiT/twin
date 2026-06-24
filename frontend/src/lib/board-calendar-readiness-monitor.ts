@@ -29,6 +29,7 @@ export const BOARD_CALENDAR_READINESS_MONITOR_MARKERS = {
 
 export const BOARD_CALENDAR_READINESS_MONITOR_LINKS = [
   { id: "candidate", href: "/dashboard/calendar/readiness", labelKey: "candidateCalendarReadiness.pageTitle" as TranslationKey },
+  { id: "busy_read_checklist", href: "/board/microsoft-busy-read-staging-checklist", labelKey: "boardMicrosoftBusyReadStagingChecklist.pageTitle" as TranslationKey },
   { id: "prod_status", href: "/board/production-persistence-status", labelKey: "productionPersistenceStatus.pageEyebrow" as TranslationKey },
   { id: "ops_monitor", href: "/board/persistence-operations-monitor", labelKey: "liveOperatingState.monitorTitle" as TranslationKey },
   { id: "recruiter", href: "/recruiter/daily-cockpit", labelKey: "recruiterDailyCockpit.pageTitle" as TranslationKey },
