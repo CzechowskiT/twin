@@ -83,7 +83,8 @@ def build_microsoft_busy_read_readiness(
 ) -> MicrosoftBusyReadReadinessOut:
     """Honest readiness contract — product gates default off; no token fields."""
     oauth_configured = _oauth_configured_flag()
-    gate_enabled = bool(getattr(settings, "microsoft_busy_read_enabled", False))
+    gate_enabled = settings.microsoft_busy_read_enabled
+    oauth_gate_enabled = settings.microsoft_oauth_connect_gate_enabled
 
     if not gate_enabled:
         return MicrosoftBusyReadReadinessOut(
@@ -93,6 +94,8 @@ def build_microsoft_busy_read_readiness(
             busy_read_status="demo_busy_slots_available",
             blocked_capabilities=list(_BLOCKED_CAPABILITIES),
             public_health_microsoft_configured=oauth_configured,
+            product_gate_enabled=gate_enabled,
+            oauth_connect_gate_enabled=oauth_gate_enabled,
             source="demo",
             headline=_READINESS_HEADLINE,
         )
@@ -106,9 +109,13 @@ def build_microsoft_busy_read_readiness(
         oauth_state = "read_only_connected_demo"
         busy_status = "demo_busy_slots_available"
         source = "partial"
-    elif oauth_configured:
+    elif oauth_configured and oauth_gate_enabled:
         oauth_state = "connect_available"
         busy_status = "ready_for_oauth"
+        source = "partial"
+    elif oauth_configured:
+        oauth_state = "connect_available"
+        busy_status = "demo_busy_slots_available"
         source = "partial"
     else:
         oauth_state = "not_connected"
@@ -122,6 +129,8 @@ def build_microsoft_busy_read_readiness(
         busy_read_status=busy_status,
         blocked_capabilities=list(_BLOCKED_CAPABILITIES),
         public_health_microsoft_configured=oauth_configured,
+        product_gate_enabled=gate_enabled,
+        oauth_connect_gate_enabled=oauth_gate_enabled,
         source=source,
         headline=_READINESS_HEADLINE,
     )
