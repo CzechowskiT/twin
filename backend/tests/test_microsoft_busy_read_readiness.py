@@ -83,6 +83,7 @@ def test_busy_read_readiness_contract_shape(busy_read_client) -> None:
     assert body["source"] == "demo"
     assert body["product_gate_enabled"] is False
     assert body["oauth_connect_gate_enabled"] is False
+    assert body["calendar_write_gate_enabled"] is False
     assert isinstance(body["blocked_capabilities"], list)
     assert len(body["blocked_capabilities"]) >= 5
     assert "public_health_microsoft_configured" in body

@@ -61,7 +61,16 @@ test("7 compact variant wired on recruiter and company cockpits", () => {
 
 test("8 i18n keys in en and pl", () => {
   assert.ok(en.microsoftBusyRead.liveBusyReadDisabled);
+  assert.ok(en.microsoftBusyRead.stagingStatusTitle);
   assert.ok(dictionaries.pl.microsoftBusyRead.eventDetailsRedacted);
+  assert.ok(dictionaries.pl.microsoftBusyRead.stagingStatusLead);
+});
+
+test("8b staging status banner wired", () => {
+  const panel = read("src/components/shared/microsoft-busy-slot-preview-panel.tsx");
+  const banner = read("src/components/shared/microsoft-busy-read-staging-status-banner.tsx");
+  assert.match(panel, /MicrosoftBusyReadStagingStatusBanner/);
+  assert.match(banner, /MICROSOFT_BUSY_READ_MARKERS\.stagingStatus/);
 });
 
 test("9 package.json exposes slot preview panel test", () => {

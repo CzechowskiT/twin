@@ -66,6 +66,7 @@ def test_settings_product_gates_default_false() -> None:
     settings = Settings()
     assert settings.microsoft_busy_read_enabled is False
     assert settings.microsoft_oauth_connect_gate_enabled is False
+    assert settings.microsoft_calendar_write_enabled is False
 
 
 @patch("app.services.partner_auth.partner_export_configured", return_value=False)
@@ -86,6 +87,7 @@ def test_public_health_gates_false_by_default(
     data = res.json()
     assert data.get("microsoft_busy_read_enabled") is False
     assert data.get("microsoft_oauth_connect_gate_enabled") is False
+    assert data.get("microsoft_calendar_write_enabled") is False
 
 
 def test_busy_read_readiness_gates_false_when_env_unset(gate_client) -> None:
@@ -95,6 +97,7 @@ def test_busy_read_readiness_gates_false_when_env_unset(gate_client) -> None:
     body = res.json()
     assert body["product_gate_enabled"] is False
     assert body["oauth_connect_gate_enabled"] is False
+    assert body.get("calendar_write_gate_enabled") is False
     assert body["busy_read_status"] == "demo_busy_slots_available"
 
 

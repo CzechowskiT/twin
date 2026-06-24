@@ -111,6 +111,14 @@ def _oauth_configured_flag() -> bool:
     return is_microsoft_calendar_oauth_configured()
 
 
+def _safety_flags(settings: Settings) -> dict[str, bool]:
+    return {
+        "product_gate_enabled": settings.microsoft_busy_read_enabled,
+        "oauth_connect_gate_enabled": settings.microsoft_oauth_connect_gate_enabled,
+        "calendar_write_gate_enabled": settings.microsoft_calendar_write_enabled,
+    }
+
+
 def build_microsoft_busy_read_readiness(
     db: Session,
     user_id: int,
@@ -120,6 +128,7 @@ def build_microsoft_busy_read_readiness(
     oauth_configured = _oauth_configured_flag()
     gate_enabled = settings.microsoft_busy_read_enabled
     oauth_gate_enabled = settings.microsoft_oauth_connect_gate_enabled
+    safety = _safety_flags(settings)
 
     if not gate_enabled:
         return MicrosoftBusyReadReadinessOut(
@@ -129,8 +138,7 @@ def build_microsoft_busy_read_readiness(
             busy_read_status="demo_busy_slots_available",
             blocked_capabilities=list(_BLOCKED_CAPABILITIES),
             public_health_microsoft_configured=oauth_configured,
-            product_gate_enabled=gate_enabled,
-            oauth_connect_gate_enabled=oauth_gate_enabled,
+            **safety,
             source="demo",
             headline=_READINESS_HEADLINE,
         )
@@ -164,8 +172,7 @@ def build_microsoft_busy_read_readiness(
         busy_read_status=busy_status,
         blocked_capabilities=list(_BLOCKED_CAPABILITIES),
         public_health_microsoft_configured=oauth_configured,
-        product_gate_enabled=gate_enabled,
-        oauth_connect_gate_enabled=oauth_gate_enabled,
+        **safety,
         source=source,
         headline=_READINESS_HEADLINE,
     )
@@ -213,13 +220,21 @@ def build_microsoft_busy_read_preview(
     settings: Settings,
 ) -> MicrosoftBusyReadPreviewOut:
     """Redacted busy slot preview — demo / not_connected / live_read_only / partial."""
+    oauth_configured = _oauth_configured_flag()
+    safety = _safety_flags(settings)
+    base_flags = {
+        **safety,
+        "public_health_microsoft_configured": oauth_configured,
+        "headline": _READINESS_HEADLINE,
+    }
+
     if not settings.microsoft_busy_read_enabled:
         return MicrosoftBusyReadPreviewOut(
             preview_mode="demo",
             busy_slot_preview=list(_DEMO_SLOTS),
             source="demo",
-            headline=_READINESS_HEADLINE,
             live_graph_stub=False,
+            **base_flags,
         )
 
     probe = probe_microsoft_calendar_health(db, user_id)
@@ -228,8 +243,8 @@ def build_microsoft_busy_read_preview(
             preview_mode="not_connected",
             busy_slot_preview=[],
             source="demo",
-            headline=_READINESS_HEADLINE,
             live_graph_stub=False,
+            **base_flags,
         )
 
     live_slots, stubbed = _live_busy_slots_from_graph(db, user_id)
@@ -238,8 +253,8 @@ def build_microsoft_busy_read_preview(
             preview_mode="live_read_only",
             busy_slot_preview=live_slots,
             source="live",
-            headline=_READINESS_HEADLINE,
             live_graph_stub=False,
+            **base_flags,
         )
 
     if live_slots and stubbed:
@@ -247,14 +262,14 @@ def build_microsoft_busy_read_preview(
             preview_mode="partial",
             busy_slot_preview=live_slots,
             source="partial",
-            headline=_READINESS_HEADLINE,
             live_graph_stub=True,
+            **base_flags,
         )
 
     return MicrosoftBusyReadPreviewOut(
         preview_mode="partial",
         busy_slot_preview=list(_DEMO_SLOTS),
         source="partial",
-        headline=_READINESS_HEADLINE,
         live_graph_stub=True,
+        **base_flags,
     )
