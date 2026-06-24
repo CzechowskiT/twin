@@ -1,8 +1,9 @@
 # Microsoft Graph Busy-Read Live Read-Only — 2026-06-24
 
 **Batch owner:** TWIN Microsoft Graph Read-Only Busy Retrieval Product Gate  
-**Base:** `cursor/phase1-monorepo-scaffold` @ fa72776 (PR #263 merged)  
-**Shipped:** PRs #264–#268 (5 slices, 2026-06-24)  
+**Base:** `cursor/phase1-monorepo-scaffold` @ 5498036 (PR #274 merged)  
+**Shipped:** PRs #264–#274 (6 batches, 2026-06-24)  
+**Staging smoke prep:** PRs #275–#278 (2026-06-24) — dry-run hardening, founder runbook, board checklist, docs evidence  
 **Mode:** read-only busy availability proof behind product gate — **no** calendar sync, Graph writes, invites, email, or token display
 
 ## Purpose
@@ -49,6 +50,7 @@ Public health (`?ops=1`): `microsoft_busy_read_enabled`, `microsoft_oauth_connec
 |---------|-------|----------|
 | Candidate | `/dashboard/calendar/readiness` | Live API wiring + slot preview + OAuth gate |
 | Board | `/board/calendar-readiness` | Slot preview + OAuth gate + cross-link |
+| Board | `/board/microsoft-busy-read-staging-checklist` | Staging prep checklist — gates OFF, smoke commands, hard bans |
 | Recruiter | `/recruiter/daily-cockpit` | Compact slot preview (live hook) |
 | Company | `/company/hiring-command-center` | Compact slot preview (live hook) |
 | Offer readiness | offer routes | `MicrosoftBusyReadCrossLinkCard` |
@@ -64,7 +66,7 @@ Public health (`?ops=1`): `microsoft_busy_read_enabled`, `microsoft_oauth_connec
 
 ```bash
 # Backend
-cd backend && pytest tests/test_microsoft_busy_read_readiness.py tests/test_microsoft_busy_read_preview.py -q
+cd backend && pytest tests/test_microsoft_busy_read_readiness.py tests/test_microsoft_busy_read_preview.py tests/test_microsoft_busy_read_gate_safety.py -q
 
 # Frontend
 cd frontend
@@ -73,6 +75,8 @@ npm run test:microsoft-busy-read-api-wiring
 npm run test:microsoft-busy-slot-preview-panel
 npm run test:microsoft-oauth-connect-ui-gate
 npm run test:board-calendar-readiness-monitor
+npm run test:board-microsoft-busy-read-staging-checklist
+npm run test:microsoft-busy-read-staging-smoke
 npm run test:offer-readiness
 npm run test:placement-verification-domain
 npm run test:trust-language-guard
@@ -84,12 +88,58 @@ npx tsc --noEmit
 **Prod smoke (after deploy):**
 
 ```bash
+# Pre-deploy static prep (no prod HTTP)
+TWIN_BUSY_READ_SMOKE_DRY_RUN=1 npm run verify:prod-microsoft-busy-read
+
+# Post-deploy safe HTTP (gates OFF)
+TWIN_PROD_BASE_URL=https://twin-sooty.vercel.app npm run verify:prod-microsoft-busy-read
+
 PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app \
   npm run test:board-calendar-readiness-monitor-browser
 
 PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app \
+  npm run test:board-microsoft-busy-read-staging-checklist-browser
+
+PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app \
   npm run verify:prod-candidate-calendar-readiness
 ```
+
+**Staging live Graph (future — not production):**
+
+```bash
+TWIN_PROD_BASE_URL=<staging-frontend-url> \
+  TWIN_BUSY_READ_SMOKE_ALLOW_LIVE=1 \
+  TWIN_PROD_TEST_JWT=<staging-test-jwt> \
+  npm run verify:prod-microsoft-busy-read
+```
+
+## Staging smoke prep batch (2026-06-24)
+
+| Slice | PR | Branch |
+|-------|-----|--------|
+| 3 Dry-run hardening | #275 | `test/microsoft-busy-read-smoke-dry-run-hardening-2026-06-24` |
+| 1 Founder runbook | #276 | `docs/microsoft-busy-read-founder-smoke-runbook-2026-06-24` |
+| 2 Board checklist | #277 | `feature/board-microsoft-busy-read-staging-checklist-2026-06-24` |
+| 4 Docs evidence | #278 | `docs/microsoft-busy-read-staging-readiness-evidence-2026-06-24` |
+
+**Smoke env vars:**
+
+| Var | Required for | Effect |
+|-----|--------------|--------|
+| `TWIN_BUSY_READ_SMOKE_DRY_RUN=1` | Pre-deploy prep | Static checks only — no prod HTTP |
+| *(default)* | Post-deploy prod safety | Safe HTTP — gates OFF verification |
+| `TWIN_BUSY_READ_SMOKE_ALLOW_LIVE=1` | Staging live Graph | Enables test 8 live probe — never on prod prep |
+
+**Artifacts:**
+
+| Artifact | Path |
+|----------|------|
+| Smoke env helpers | `frontend/scripts/lib/microsoft-busy-read-smoke-env.ts` |
+| Staging smoke test | `frontend/scripts/microsoft-busy-read-staging-smoke.test.ts` |
+| Prod verify wrapper | `frontend/scripts/verify-prod-microsoft-busy-read.ts` |
+| Founder runbook | `docs/MICROSOFT_BUSY_READ_STAGING_SMOKE_2026-06-24.md` |
+| Board checklist lib | `frontend/src/lib/board-microsoft-busy-read-staging-checklist.ts` |
+| Board checklist route | `/board/microsoft-busy-read-staging-checklist` |
 
 ## PR batch (2026-06-24)
 
@@ -130,12 +180,14 @@ PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=ht
 ## Next milestone
 
 1. ~~Migrate Microsoft calendar OAuth to `Calendars.Read`~~ **Done** (PRs #269–#273).
-2. Set `MICROSOFT_BUSY_READ_ENABLED=true` in staging only after founder smoke with read-only tokens.
-3. Optionally enable `MICROSOFT_OAUTH_CONNECT_GATE_ENABLED` for connect UI — still read-only, no writes.
-4. Azure: ensure delegated `Calendars.Read` granted; remove admin consent for `Calendars.ReadWrite` on new connections.
+2. ~~Staging smoke dry-run + founder runbook + board checklist~~ **Done** (PRs #275–#278).
+3. Set `MICROSOFT_BUSY_READ_ENABLED=true` in staging only after founder smoke with read-only tokens.
+4. Optionally enable `MICROSOFT_OAUTH_CONNECT_GATE_ENABLED` for connect UI — still read-only, no writes.
+5. Azure: ensure delegated `Calendars.Read` granted; remove admin consent for `Calendars.ReadWrite` on new connections.
 
 ## Related docs
 
+- [MICROSOFT_BUSY_READ_STAGING_SMOKE_2026-06-24.md](./MICROSOFT_BUSY_READ_STAGING_SMOKE_2026-06-24.md) — founder PL+EN runbook + smoke modes
 - [MICROSOFT_CALENDAR_READINESS_2026-06-24.md](./MICROSOFT_CALENDAR_READINESS_2026-06-24.md) — prior readiness layer (PR #262)
 - [CALENDAR_READINESS_OPERATING_EVIDENCE_2026-06-23.md](./CALENDAR_READINESS_OPERATING_EVIDENCE_2026-06-23.md) — board calendar evidence
 - [PLACEMENT_VERIFICATION.md](./PLACEMENT_VERIFICATION.md) — placement evidence cross-links
