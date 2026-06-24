@@ -19,6 +19,16 @@ const FORBIDDEN_PATTERNS: RegExp[] = [
   /\bapplies automatically\b/i,
   /\bguaranteed interview\b/i,
   /\bthousands of users\b/i,
+  /\blaunch ready\b/i,
+  /\bgdpr compliant\b/i,
+  /\bidentity verified\b/i,
+  /\bkyc passed\b/i,
+  /\bpayment completed\b/i,
+  /\bpayout completed\b/i,
+  /\bplacement externally verified\b/i,
+  /\bcandidate notified\b/i,
+  /\bphase 3b unlocked\b/i,
+  /\bp0 solved\b/i,
 ];
 
 const TRUST_SURFACES = [

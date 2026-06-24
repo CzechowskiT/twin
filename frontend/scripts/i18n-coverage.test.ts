@@ -54,6 +54,27 @@ function allowIdenticalPremiumValue(path: string, value: string, locale: Locale)
   return loanwords.test(value.trim());
 }
 
+test("interpolation placeholders match English for every locale string", () => {
+  const mismatches: string[] = [];
+  for (const locale of LOCALES) {
+    if (locale === "en") continue;
+    const dict = dictionaries[locale];
+    for (const path of enPaths) {
+      const enValue = getString(en, path);
+      const localeValue = getString(dict, path);
+      if (!enValue || !localeValue) continue;
+      const enPh = [...enValue.matchAll(/\{[^}]+\}/g)].map((m) => m[0]).sort().join(",");
+      const locPh = [...localeValue.matchAll(/\{[^}]+\}/g)].map((m) => m[0]).sort().join(",");
+      if (enPh !== locPh) mismatches.push(`${locale}:${path}`);
+    }
+  }
+  assert.equal(
+    mismatches.length,
+    0,
+    `Placeholder drift (${mismatches.length}): ${mismatches.slice(0, 8).join("; ")}`,
+  );
+});
+
 test("premium product keys are not English fallback for non-EN locales", () => {
   const premiumPaths = enPaths.filter(isPremiumPath);
   const offenders: string[] = [];

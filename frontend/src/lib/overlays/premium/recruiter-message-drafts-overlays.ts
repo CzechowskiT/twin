@@ -31,7 +31,7 @@ const es: DraftOverlay = {
     phaseToContact: "Por contactar",
     phaseContacted: "Contactado",
     phaseInvited: "Invitado",
-    invitationSubject: "Invitación a entrevista — {role}",
+    invitationSubject: "Invitación a entrevista — {role} en {company}",
     invitationBody:
       "Hola{candidateName},\n\nGracias por su interés en el puesto {role} en {company}. Nos gustaría invitarle a una primera conversación.\n\nIndíquenos cuándo estaría disponible la próxima semana.\n\nSaludos,\n{recruiterName}",
     missingInfoSubject: "Información adicional — {role} en {company}",
@@ -73,7 +73,7 @@ const it: DraftOverlay = {
     phaseToContact: "Da contattare",
     phaseContacted: "Contattato",
     phaseInvited: "Invitato",
-    invitationSubject: "Invito al colloquio — {role}",
+    invitationSubject: "Invito al colloquio — {role} presso {company}",
     invitationBody:
       "Buongiorno{candidateName},\n\nGrazie per l'interesse per la posizione {role} presso {company}. Vorremmo invitarla a un primo colloquio.\n\nCi indichi quando sarebbe disponibile la prossima settimana.\n\nCordiali saluti,\n{recruiterName}",
     missingInfoSubject: "Informazioni aggiuntive — {role} presso {company}",
@@ -115,7 +115,7 @@ const fr: DraftOverlay = {
     phaseToContact: "À contacter",
     phaseContacted: "Contacté",
     phaseInvited: "Invité",
-    invitationSubject: "Invitation entretien — {role}",
+    invitationSubject: "Invitation entretien — {role} chez {company}",
     invitationBody:
       "Bonjour{candidateName},\n\nMerci pour votre intérêt pour le poste {role} chez {company}. Nous aimerions vous inviter à un premier échange.\n\nIndiquez-nous vos disponibilités la semaine prochaine.\n\nCordialement,\n{recruiterName}",
     missingInfoSubject: "Informations complémentaires — {role} chez {company}",
@@ -157,7 +157,7 @@ const de: DraftOverlay = {
     phaseToContact: "Zu kontaktieren",
     phaseContacted: "Kontaktiert",
     phaseInvited: "Eingeladen",
-    invitationSubject: "Einladung zum Gespräch — {role}",
+    invitationSubject: "Einladung zum Gespräch — {role} bei {company}",
     invitationBody:
       "Guten Tag{candidateName},\n\nvielen Dank für Ihr Interesse an der Stelle {role} bei {company}. Wir möchten Sie zu einem Erstgespräch einladen.\n\nBitte teilen Sie uns mit, wann Sie nächste Woche verfügbar wären.\n\nMit freundlichen Grüßen\n{recruiterName}",
     missingInfoSubject: "Zusätzliche Informationen — {role} bei {company}",
@@ -199,7 +199,7 @@ const zh: DraftOverlay = {
     phaseToContact: "待联系",
     phaseContacted: "已联系",
     phaseInvited: "已邀请",
-    invitationSubject: "面试邀请 — {role}",
+    invitationSubject: "面试邀请 — {role} @ {company}",
     invitationBody:
       "您好{candidateName}，\n\n感谢您对 {company} {role} 职位的兴趣。我们想邀请您进行首次沟通。\n\n请告知您下周方便的时间。\n\n此致\n{recruiterName}",
     missingInfoSubject: "补充信息 — {company} {role}",
@@ -241,7 +241,7 @@ const ar: DraftOverlay = {
     phaseToContact: "بانتظار التواصل",
     phaseContacted: "تم التواصل",
     phaseInvited: "مدعو",
-    invitationSubject: "دعوة مقابلة — {role}",
+    invitationSubject: "دعوة مقابلة — {role} في {company}",
     invitationBody:
       "مرحبًا{candidateName}،\n\nشكرًا لاهتمامك بوظيفة {role} في {company}. نود دعوتك لمحادثة أولى.\n\nيرجى إخبارنا بمواعيدك المتاحة الأسبوع القادم.\n\nمع التحية،\n{recruiterName}",
     missingInfoSubject: "معلومات إضافية — {role} في {company}",
@@ -283,7 +283,7 @@ const ja: DraftOverlay = {
     phaseToContact: "未連絡",
     phaseContacted: "連絡済み",
     phaseInvited: "招待済み",
-    invitationSubject: "面談のご案内 — {role}",
+    invitationSubject: "面談のご案内 — {role}（{company}）",
     invitationBody:
       "こんにちは{candidateName}、\n\n{company} の {role} にご関心をお寄せいただきありがとうございます。初回の面談にご招待したく存じます。\n\n来週ご都合のよい日時をお知らせください。\n\nよろしくお願いいたします。\n{recruiterName}",
     missingInfoSubject: "追加情報のお願い — {company} {role}",
