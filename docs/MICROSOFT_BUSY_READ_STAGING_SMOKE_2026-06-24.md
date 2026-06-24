@@ -209,6 +209,7 @@ After deploy: `/board/microsoft-busy-read-staging-checklist` — read-only check
 
 ## Related docs
 
+- [MICROSOFT_BUSY_READ_STAGING_OPERATOR_SETUP_2026-06-24.md](./MICROSOFT_BUSY_READ_STAGING_OPERATOR_SETUP_2026-06-24.md) — staging env prep before live smoke
 - [MICROSOFT_BUSY_READ_READINESS_2026-06-24.md](./MICROSOFT_BUSY_READ_READINESS_2026-06-24.md)
 - [MICROSOFT_CALENDAR_SCOPE_AUDIT_2026-06-24.md](./MICROSOFT_CALENDAR_SCOPE_AUDIT_2026-06-24.md)
 - [RAILWAY_PROD_ENV_PL.md](./RAILWAY_PROD_ENV_PL.md) — Microsoft Calendar section
