@@ -6,6 +6,7 @@ import { useTranslation } from "@/components/language-provider";
 import { Button, Card } from "@/components/ui";
 import {
   MICROSOFT_BUSY_READ_MARKERS,
+  microsoftBusyReadLiveEnabled,
   microsoftBusyReadSourceKey,
   type MicrosoftBusyReadCapabilityRecord,
 } from "@/lib/microsoft-busy-read";
@@ -17,6 +18,7 @@ type Props = {
 
 export function MicrosoftBusySlotPreviewPanel({ record, compact = false }: Props): ReactNode {
   const { t } = useTranslation();
+  const liveEnabled = microsoftBusyReadLiveEnabled();
 
   return (
     <Card
@@ -67,7 +69,7 @@ export function MicrosoftBusySlotPreviewPanel({ record, compact = false }: Props
         <Button
           type="button"
           className="twin-btn-secondary twin-touch-target !w-auto self-start"
-          disabled
+          disabled={!liveEnabled}
           data-testid={MICROSOFT_BUSY_READ_MARKERS.liveDisabled}
         >
           {t("microsoftBusyRead.liveBusyReadDisabled")}

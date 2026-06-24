@@ -18,7 +18,7 @@ import {
   resolveBoardCalendarReadinessMonitor,
 } from "@/lib/board-calendar-readiness-monitor";
 import { resolveMicrosoftCalendarReadiness } from "@/lib/microsoft-calendar-readiness";
-import { resolveMicrosoftBusyRead } from "@/lib/microsoft-busy-read";
+import { useMicrosoftBusyReadLive } from "@/lib/use-microsoft-busy-read-live";
 
 function section(marker: string, title: string, children: ReactNode): ReactNode {
   return (
@@ -35,7 +35,7 @@ export function BoardCalendarReadinessMonitorWorkspace() {
   const { t } = useTranslation();
   const record = useMemo(() => resolveBoardCalendarReadinessMonitor(), []);
   const microsoftRecord = useMemo(() => resolveMicrosoftCalendarReadiness(), []);
-  const busyReadRecord = useMemo(() => resolveMicrosoftBusyRead(), []);
+  const { record: busyReadRecord } = useMicrosoftBusyReadLive();
   const crossLinks = useMemo(() => BOARD_CALENDAR_READINESS_MONITOR_LINKS, []);
 
   return (

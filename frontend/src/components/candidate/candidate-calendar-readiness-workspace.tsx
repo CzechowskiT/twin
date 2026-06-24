@@ -20,7 +20,7 @@ import {
 } from "@/lib/candidate-calendar-readiness";
 import type { CalendarReadinessRecord } from "@/lib/calendar-readiness";
 import { deriveMicrosoftFromCalendar } from "@/lib/microsoft-calendar-readiness";
-import { resolveMicrosoftBusyRead } from "@/lib/microsoft-busy-read";
+import { useMicrosoftBusyReadLive } from "@/lib/use-microsoft-busy-read-live";
 import type { TranslationKey } from "@/lib/i18n";
 
 function sectionCard(marker: string, title: string, children: ReactNode): ReactNode {
@@ -65,7 +65,7 @@ function PreviewNotFound() {
 
 function PreviewContent({ record }: { record: CalendarReadinessRecord }) {
   const { t } = useTranslation();
-  const busyRead = resolveMicrosoftBusyRead(record.candidate_id);
+  const { record: busyRead } = useMicrosoftBusyReadLive(record.candidate_id);
 
   return (
     <Shell wide rail>
