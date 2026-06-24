@@ -66,7 +66,12 @@ npx tsc --noEmit
 ```bash
 PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app \
   npm run test:board-calendar-readiness-monitor-browser
+
+PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app \
+  npm run verify:prod-candidate-calendar-readiness
 ```
+
+`verify:prod-candidate-calendar-readiness` runs the docs-only drift commit gate (`prod_frontend_commit`, `repo_head`, `docs_only_drift`) then browser smoke on `/dashboard/calendar/readiness` and `/dashboard/calendar`.
 
 ## Explicitly out of scope (hard bans)
 

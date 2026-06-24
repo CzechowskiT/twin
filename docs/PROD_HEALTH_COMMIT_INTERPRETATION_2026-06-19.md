@@ -46,6 +46,25 @@ For a given verification slice:
 
 Mismatch on short SHA alone is **not** automatically a deploy failure — check which platform the PR touched.
 
+## Docs-only drift gate (prod smoke helpers)
+
+Prod smoke wrappers (`verify:prod-*`, `placement-events-auth-smoke`, `prod-authenticated-persistence-smoke`) emit:
+
+| Field | Meaning |
+|-------|---------|
+| `prod_frontend_commit` | Vercel deploy SHA from `/api/public-health` |
+| `repo_head` | `git rev-parse HEAD` in the operator checkout |
+| `commit_interpretation` | public-health hint + drift classification |
+| `docs_only_drift` | `true` when `git diff prod_frontend_commit..HEAD` touches **only** `docs/` |
+
+| `alignment_status` | Smoke allowed? |
+|--------------------|----------------|
+| `aligned` | Yes |
+| `acceptable_docs_only_drift` | Yes — docs-only delta between prod FE and scaffold HEAD |
+| `failed_alignment` | **No** — non-docs source changed since prod frontend deploy |
+
+Canonical placement-events path: **`/api/v1/placement-events`** (unauth **401/403**). **`/api/placement-events`** without `/v1` → **404 is expected**, not a smoke failure.
+
 ## Verification command
 
 ```bash
