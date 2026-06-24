@@ -81,6 +81,8 @@ def test_busy_read_readiness_contract_shape(busy_read_client) -> None:
     assert "Calendars.ReadWrite" in body["forbidden_scopes"]
     assert body["busy_read_status"] == "demo_busy_slots_available"
     assert body["source"] == "demo"
+    assert body["product_gate_enabled"] is False
+    assert body["oauth_connect_gate_enabled"] is False
     assert isinstance(body["blocked_capabilities"], list)
     assert len(body["blocked_capabilities"]) >= 5
     assert "public_health_microsoft_configured" in body

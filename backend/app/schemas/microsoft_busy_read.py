@@ -43,5 +43,13 @@ class MicrosoftBusyReadReadinessOut(BaseModel):
     public_health_microsoft_configured: bool = Field(
         description="True when Microsoft Calendar OAuth client id, secret, and redirect URI are configured.",
     )
+    product_gate_enabled: bool = Field(
+        False,
+        description="True when MICROSOFT_BUSY_READ_ENABLED is set on the API.",
+    )
+    oauth_connect_gate_enabled: bool = Field(
+        False,
+        description="True when MICROSOFT_OAUTH_CONNECT_GATE_ENABLED is set on the API.",
+    )
     source: BusyReadSource
     headline: str

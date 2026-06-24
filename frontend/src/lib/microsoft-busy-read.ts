@@ -25,6 +25,10 @@ import {
   type MicrosoftOAuthConnectionState,
 } from "@/lib/microsoft-busy-read-demo-data";
 import type { TranslationKey } from "@/lib/i18n";
+import {
+  MICROSOFT_BUSY_READ_ENABLED,
+  MICROSOFT_OAUTH_CONNECT_GATE_ENABLED,
+} from "@/lib/features";
 
 export {
   allBusySlotsRedacted,
@@ -45,6 +49,10 @@ export type {
   MicrosoftOAuthConnectionState,
 };
 
+export {
+  MICROSOFT_BUSY_READ_ENABLED,
+  MICROSOFT_OAUTH_CONNECT_GATE_ENABLED,
+};
 export const MICROSOFT_BUSY_READ_MARKERS = {
   contract: "microsoft-busy-read-contract",
   slotPreview: "microsoft-busy-slot-preview",
@@ -61,8 +69,6 @@ export const MICROSOFT_BUSY_READ_SOURCE_KEYS: Record<
   live_read_only: "microsoftBusyRead.sourceLiveReadOnly",
   partial: "liveOperatingState.partialFallback",
 };
-
-export const MICROSOFT_OAUTH_CONNECT_GATE_ENABLED = false;
 
 export function microsoftBusyReadSourceKey(source: BusySlotSource): TranslationKey {
   return MICROSOFT_BUSY_READ_SOURCE_KEYS[source];
@@ -127,6 +133,10 @@ export function resolveMicrosoftBusyRead(candidateId?: string): MicrosoftBusyRea
 
 export function microsoftBusyReadConnectDisabled(): boolean {
   return !MICROSOFT_OAUTH_CONNECT_GATE_ENABLED;
+}
+
+export function microsoftBusyReadLiveEnabled(): boolean {
+  return MICROSOFT_BUSY_READ_ENABLED;
 }
 
 export function microsoftBusyReadHasForbiddenWriteScope(scopes: readonly string[]): boolean {

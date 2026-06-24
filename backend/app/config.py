@@ -422,6 +422,10 @@ class Settings(BaseSettings):
     demo_mode_enabled: bool = False
     demo_user_email: str = "demo@twin.career"
 
+    # Microsoft Graph busy-read — read-only Calendars.Read preview; default off (product gate).
+    microsoft_busy_read_enabled: bool = False
+    microsoft_oauth_connect_gate_enabled: bool = False
+
     # Recruiter batch inbox pilot (X-Twin-Recruiter-Token + company_slug filter).
     recruiter_inbox_token: str = ""
 
