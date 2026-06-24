@@ -9,6 +9,7 @@ import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
 import { PlacementVerificationEvidencePanel } from "@/components/shared/placement-verification-evidence-panel";
+import { MicrosoftBusyReadCrossLinkCard } from "@/components/shared/microsoft-busy-read-cross-link-card";
 import {
   CANDIDATE_PLACEMENT_VERIFICATION_MARKERS,
   CANDIDATE_PLACEMENT_VERIFICATION_PAGE_MARKER,
@@ -220,6 +221,7 @@ function PreviewContent({ record }: { record: PlacementVerificationRecord }) {
         )}
 
         <PlacementVerificationEvidencePanel placementId={record.placement_id} />
+        <MicrosoftBusyReadCrossLinkCard context="placement" candidateId={record.candidate_id} />
 
         <PlacementEventsTimeline placementId={record.placement_id} />
       </div>

@@ -34,6 +34,10 @@ test("2 workspace renders all section markers", () => {
   assert.match(ws, /BOARD_CALENDAR_READINESS_MONITOR_MARKERS\.launch/);
   assert.match(ws, /OperationalCrossLinksPanel/);
   assert.match(ws, /MicrosoftCalendarReadinessBusyReadPanel/);
+  assert.match(ws, /MicrosoftBusySlotPreviewPanel/);
+  assert.match(ws, /MicrosoftOAuthConnectUiGate/);
+  assert.match(ws, /MicrosoftBusyReadCrossLinkCard/);
+  assert.match(ws, /resolveMicrosoftBusyRead/);
   assert.match(ws, /resolveMicrosoftCalendarReadiness/);
 });
 

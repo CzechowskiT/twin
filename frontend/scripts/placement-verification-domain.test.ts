@@ -112,3 +112,9 @@ test("10 i18n safePersistence keys exist for source badge", () => {
     assert.ok(dictionaries.pl.safePersistence[key]);
   }
 });
+
+test("11 placement preview workspace links microsoft busy-read cross-link", () => {
+  const ws = read("src/components/candidate/candidate-placement-verification-preview-workspace.tsx");
+  assert.match(ws, /MicrosoftBusyReadCrossLinkCard/);
+  assert.match(ws, /context=\"placement\"/);
+});

@@ -7,6 +7,9 @@ import { useMemo } from "react";
 import { useTranslation } from "@/components/language-provider";
 import { OperationalCrossLinksPanel } from "@/components/shared/operational-cross-links-panel";
 import { MicrosoftCalendarReadinessBusyReadPanel } from "@/components/shared/microsoft-calendar-readiness-busy-read-panel";
+import { MicrosoftBusySlotPreviewPanel } from "@/components/shared/microsoft-busy-slot-preview-panel";
+import { MicrosoftOAuthConnectUiGate } from "@/components/shared/microsoft-oauth-connect-ui-gate";
+import { MicrosoftBusyReadCrossLinkCard } from "@/components/shared/microsoft-busy-read-cross-link-card";
 import { Card, Shell } from "@/components/ui";
 import {
   BOARD_CALENDAR_READINESS_MONITOR_LINKS,
@@ -15,6 +18,7 @@ import {
   resolveBoardCalendarReadinessMonitor,
 } from "@/lib/board-calendar-readiness-monitor";
 import { resolveMicrosoftCalendarReadiness } from "@/lib/microsoft-calendar-readiness";
+import { resolveMicrosoftBusyRead } from "@/lib/microsoft-busy-read";
 
 function section(marker: string, title: string, children: ReactNode): ReactNode {
   return (
@@ -31,6 +35,7 @@ export function BoardCalendarReadinessMonitorWorkspace() {
   const { t } = useTranslation();
   const record = useMemo(() => resolveBoardCalendarReadinessMonitor(), []);
   const microsoftRecord = useMemo(() => resolveMicrosoftCalendarReadiness(), []);
+  const busyReadRecord = useMemo(() => resolveMicrosoftBusyRead(), []);
   const crossLinks = useMemo(() => BOARD_CALENDAR_READINESS_MONITOR_LINKS, []);
 
   return (
@@ -51,6 +56,14 @@ export function BoardCalendarReadinessMonitorWorkspace() {
 
         {microsoftRecord ? (
           <MicrosoftCalendarReadinessBusyReadPanel record={microsoftRecord} />
+        ) : null}
+
+        {busyReadRecord ? (
+          <>
+            <MicrosoftBusySlotPreviewPanel record={busyReadRecord} />
+            <MicrosoftOAuthConnectUiGate record={busyReadRecord} />
+            <MicrosoftBusyReadCrossLinkCard context="board" candidateId={busyReadRecord.candidate_id} />
+          </>
         ) : null}
 
         {section(

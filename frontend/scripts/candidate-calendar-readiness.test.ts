@@ -40,6 +40,8 @@ test("2 workspace renders section markers", () => {
   assert.match(ws, /CANDIDATE_CALENDAR_READINESS_MARKERS\.providers/);
   assert.match(ws, /CANDIDATE_CALENDAR_READINESS_MARKERS\.blocked/);
   assert.match(ws, /MicrosoftCalendarReadinessBusyReadPanel/);
+  assert.match(ws, /MicrosoftBusySlotPreviewPanel/);
+  assert.match(ws, /MicrosoftOAuthConnectUiGate/);
   assert.match(ws, /deriveMicrosoftFromCalendar/);
 });
 
