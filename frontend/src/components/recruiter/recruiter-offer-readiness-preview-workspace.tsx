@@ -8,6 +8,7 @@ import { useTranslation } from "@/components/language-provider";
 import { OfferComparisonPreview } from "@/components/shared/offer-comparison-preview";
 import { OfferReadinessChecklist } from "@/components/shared/offer-readiness-checklist";
 import { OfferReadinessEvidencePanel } from "@/components/shared/offer-readiness-evidence-panel";
+import { OfferCalendarReadinessCard } from "@/components/shared/offer-calendar-readiness-card";
 import { OfferReadinessPanel } from "@/components/shared/offer-readiness-status-badge";
 import { Card, Shell } from "@/components/ui";
 import { LAUNCH_STANCE } from "@/lib/investor-metrics-reality";
@@ -78,6 +79,8 @@ function PreviewBody({
             </button>
           </div>
         </Card>
+
+        <OfferCalendarReadinessCard candidateId={record.candidate_id} />
 
         <OfferReadinessEvidencePanel candidateId={record.candidate_id} />
       </div>

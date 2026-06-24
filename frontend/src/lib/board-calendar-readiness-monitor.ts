@@ -23,6 +23,7 @@ export const BOARD_CALENDAR_READINESS_MONITOR_MARKERS = {
   personaRoutes: "board-calendar-readiness-monitor-persona-routes",
   launch: "board-calendar-readiness-monitor-launch",
   crossLinks: "board-calendar-readiness-monitor-cross-links",
+  microsoftBusyRead: "microsoft-calendar-readiness-busy-read",
   sourceBadge: "board-calendar-readiness-monitor-source",
 } as const;
 

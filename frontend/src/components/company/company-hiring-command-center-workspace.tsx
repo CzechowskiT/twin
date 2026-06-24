@@ -26,6 +26,10 @@ import {
   resolveCompanySchedulingProof,
   SCHEDULING_PROOF_LINKS,
 } from "@/lib/recruiter-company-scheduling-proof";
+import {
+  microsoftBusyReadStageKey,
+  resolveMicrosoftCalendarReadiness,
+} from "@/lib/microsoft-calendar-readiness";
 import { COMPANY_ROLES_ROUTE } from "@/lib/company-jobs-roles";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -78,6 +82,7 @@ export function CompanyHiringCommandCenterWorkspace() {
   const { t } = useTranslation();
   const record = useMemo(() => resolveCompanyHiringCommandCenter(), []);
   const schedulingProof = useMemo(() => resolveCompanySchedulingProof(), []);
+  const microsoftReadiness = useMemo(() => resolveMicrosoftCalendarReadiness(), []);
   const moduleLinks = useMemo(() => COMPANY_HIRING_COMMAND_CENTER_MODULE_LINKS, []);
   const disabledActions = useMemo(() => COMPANY_HIRING_COMMAND_CENTER_DISABLED_ACTIONS, []);
   const [operatingState, setOperatingState] = useState<OperatingStateSummary | null>(null);
@@ -312,6 +317,15 @@ export function CompanyHiringCommandCenterWorkspace() {
                 ))}
               </ul>
               <p className="text-xs text-[var(--twin-muted)]">{schedulingProof.blocked_note}</p>
+              {microsoftReadiness ? (
+                <p
+                  className="text-xs font-medium"
+                  data-testid="microsoft-calendar-readiness-busy-read"
+                >
+                  {t("microsoftCalendarReadiness.busyReadTitle")}:{" "}
+                  {t(microsoftBusyReadStageKey(microsoftReadiness.busy_read_stage))}
+                </p>
+              ) : null}
               <div className="mt-2 flex flex-wrap gap-2">
                 {SCHEDULING_PROOF_LINKS.map((link) => (
                   <Link key={link.id} href={link.href} className="twin-link text-xs">

@@ -8,6 +8,7 @@ import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
 import { CalendarReadinessEvidencePanel } from "@/components/shared/calendar-readiness-evidence-panel";
+import { MicrosoftCalendarReadinessBusyReadPanel } from "@/components/shared/microsoft-calendar-readiness-busy-read-panel";
 import {
   CANDIDATE_CALENDAR_READINESS_MARKERS,
   CANDIDATE_CALENDAR_READINESS_PAGE_MARKER,
@@ -16,6 +17,7 @@ import {
   resolveCandidateCalendarReadiness,
 } from "@/lib/candidate-calendar-readiness";
 import type { CalendarReadinessRecord } from "@/lib/calendar-readiness";
+import { deriveMicrosoftFromCalendar } from "@/lib/microsoft-calendar-readiness";
 import type { TranslationKey } from "@/lib/i18n";
 
 function sectionCard(marker: string, title: string, children: ReactNode): ReactNode {
@@ -109,6 +111,8 @@ function PreviewContent({ record }: { record: CalendarReadinessRecord }) {
             <p className="font-medium">{t(stageLabelKey(record.readiness_stage))}</p>
           </>,
         )}
+
+        <MicrosoftCalendarReadinessBusyReadPanel record={deriveMicrosoftFromCalendar(record)} />
 
         {sectionCard(
           CANDIDATE_CALENDAR_READINESS_MARKERS.providers,

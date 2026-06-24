@@ -21,6 +21,7 @@ export const CANDIDATE_CALENDAR_READINESS_MARKERS = {
   blocked: "candidate-calendar-readiness-blocked",
   scopes: "candidate-calendar-readiness-scopes",
   operatingEvidence: "calendar-readiness-evidence-panel",
+  microsoftBusyRead: "microsoft-calendar-readiness-busy-read",
   sourceBadge: "candidate-calendar-readiness-source",
   safeLinks: "candidate-calendar-readiness-safe-links",
   notFound: "candidate-calendar-readiness-not-found",

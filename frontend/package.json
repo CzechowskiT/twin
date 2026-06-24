@@ -227,6 +227,7 @@
     "test:placement-verification-evidence-browser:raw": "playwright test e2e/placement-verification-evidence-browser.spec.ts --workers=1",
     "verify:prod-placement-verification-evidence": "npx --yes tsx scripts/verify-prod-placement-verification-evidence.ts",
     "test:calendar-readiness-domain": "npx --yes tsx scripts/calendar-readiness-domain.test.ts",
+    "test:microsoft-calendar-readiness-domain": "npx --yes tsx scripts/microsoft-calendar-readiness-domain.test.ts",
     "test:operating-evidence-components": "npx --yes tsx scripts/operating-evidence-components.test.ts",
     "test:calendar-readiness-evidence": "npx --yes tsx scripts/calendar-readiness-evidence.test.ts",
     "test:calendar-readiness-evidence-browser": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'&&process.env.PLAYWRIGHT_ENABLE_BROWSER_TESTS!=='1'){console.error('Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 or PLAYWRIGHT_ALLOW_PROD_SMOKE=1');process.exit(1)}\" && npm run test:calendar-readiness-evidence-browser:raw",

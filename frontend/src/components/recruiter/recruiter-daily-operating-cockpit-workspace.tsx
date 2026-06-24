@@ -25,6 +25,10 @@ import {
   resolveRecruiterSchedulingProof,
   SCHEDULING_PROOF_LINKS,
 } from "@/lib/recruiter-company-scheduling-proof";
+import {
+  microsoftBusyReadStageKey,
+  resolveMicrosoftCalendarReadiness,
+} from "@/lib/microsoft-calendar-readiness";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -77,6 +81,7 @@ export function RecruiterDailyOperatingCockpitWorkspace() {
   const { t } = useTranslation();
   const record = useMemo(() => resolveRecruiterDailyCockpit(), []);
   const schedulingProof = useMemo(() => resolveRecruiterSchedulingProof(), []);
+  const microsoftReadiness = useMemo(() => resolveMicrosoftCalendarReadiness(), []);
   const moduleLinks = useMemo(() => RECRUITER_DAILY_COCKPIT_MODULE_LINKS, []);
   const [operatingState, setOperatingState] = useState<OperatingStateSummary | null>(null);
 
@@ -334,6 +339,15 @@ export function RecruiterDailyOperatingCockpitWorkspace() {
                 ))}
               </ul>
               <p className="text-xs text-[var(--twin-muted)]">{schedulingProof.blocked_note}</p>
+              {microsoftReadiness ? (
+                <p
+                  className="text-xs font-medium"
+                  data-testid="microsoft-calendar-readiness-busy-read"
+                >
+                  {t("microsoftCalendarReadiness.busyReadTitle")}:{" "}
+                  {t(microsoftBusyReadStageKey(microsoftReadiness.busy_read_stage))}
+                </p>
+              ) : null}
               <div className="mt-2 flex flex-wrap gap-2">
                 {SCHEDULING_PROOF_LINKS.map((link) => (
                   <Link key={link.id} href={link.href} className="twin-link text-xs">
