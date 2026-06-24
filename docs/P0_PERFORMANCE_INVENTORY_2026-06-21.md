@@ -84,3 +84,20 @@ Operator verified production Alembic head `068_placement_events_foundation` and 
 ## Ops confirmation (2026-06-23)
 
 Dedicated placement-events auth smoke **PASS** (6 pass / 0 fail / 1 skip) via `npm run verify:prod-placement-events-auth` — authenticated POST, GET 200, `placement_id` filter 200, unauth 401/403, token not logged. Alembic 068 **CONFIRMED** (unchanged). P0 **OPEN**, Launch **NO-GO**, Phase 3B **HARD BLOCKED**. See `docs/PLACEMENT_EVENTS_PROD_VERIFICATION_2026-06-23.md`.
+
+## Safe evidence extension (2026-06-24)
+
+Extended route inventory for readiness-heavy surfaces (calendar, offer, placement, board monitors). Scheduling decision context layer added — read-only, no perf regression claims. See `docs/P0_PERFORMANCE_SAFE_EVIDENCE_2026-06-24.md`.
+
+Additional routes in P0 scope:
+
+| Route | Notes |
+|-------|-------|
+| `/dashboard/calendar/readiness` | Calendar + Microsoft readiness panels |
+| `/dashboard/offer-readiness` | Offer checklist + scheduling decision context |
+| `/board/calendar-readiness` | Board calendar monitor |
+| `/board/offer-readiness` | Board offer monitor |
+
+Static guardrails extended: `test:p0-route-weight-inventory`, scheduling panel `useMemo` hardening.
+
+**P0 performance remains OPEN** — Phase 3B still **HARD BLOCKED**.
