@@ -16,6 +16,7 @@ import {
   MICROSOFT_OAUTH_CONNECT_GATE_ENABLED,
   microsoftBusyReadConnectDisabled,
 } from "../src/lib/microsoft-busy-read";
+import { MICROSOFT_BUSY_READ_ENABLED } from "../src/lib/features";
 import { dictionaries, en } from "../src/lib/i18n";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -88,4 +89,29 @@ test("9 i18n keys in en and pl", () => {
 
 test("10 package.json exposes oauth connect ui gate test", () => {
   assert.match(read("package.json"), /test:microsoft-oauth-connect-ui-gate/);
+});
+
+test("11 gates default false at build time", () => {
+  assert.equal(MICROSOFT_OAUTH_CONNECT_GATE_ENABLED, false);
+  const features = read("src/lib/features.ts");
+  assert.match(features, /MICROSOFT_OAUTH_CONNECT_GATE_ENABLED/);
+  assert.doesNotMatch(features, /NEXT_PUBLIC_MICROSOFT_OAUTH_CONNECT_GATE_ENABLED\s*===\s*"true"\s*\|\|\s*true/);
+});
+
+test("12 gate component has no authorize redirect or href", () => {
+  const src = read("src/components/shared/microsoft-oauth-connect-ui-gate.tsx");
+  assert.doesNotMatch(src, /authorize_url|\/microsoft\/authorize|window\.location|href=/i);
+  assert.doesNotMatch(src, /onClick/);
+});
+
+test("13 required scopes never include write tokens", () => {
+  for (const scope of MICROSOFT_BUSY_READ_REQUIRED_SCOPES) {
+    assert.equal(scope.includes("ReadWrite"), false, scope);
+    assert.equal(scope.includes("Mail.Send"), false, scope);
+  }
+  assert.ok(MICROSOFT_BUSY_READ_REQUIRED_SCOPES.includes("Calendars.Read"));
+});
+
+test("14 busy read live flag default off in features", () => {
+  assert.equal(MICROSOFT_BUSY_READ_ENABLED, false);
 });
