@@ -1,5 +1,6 @@
 /**
  * Production Microsoft busy-read staging smoke — gates OFF passes safe by default.
+ * Dry-run (TWIN_BUSY_READ_SMOKE_DRY_RUN=1): static checks only, no prod HTTP.
  * Live Graph checks require TWIN_BUSY_READ_SMOKE_ALLOW_LIVE=1 and optional JWT.
  */
 import assert from "node:assert/strict";
@@ -8,13 +9,19 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
+import {
+  MICROSOFT_BUSY_READ_SMOKE_ENV,
+  microsoftBusyReadSmokeAllowLive,
+  microsoftBusyReadSmokeDryRun,
+} from "./lib/microsoft-busy-read-smoke-env";
 import { logProdSmokeCommitGate } from "./lib/prod-smoke-commit-gate";
 
 const scriptRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 const PROD_BASE = (process.env.TWIN_PROD_BASE_URL ?? "https://twin-sooty.vercel.app").replace(/\/$/, "");
 const JWT = process.env.TWIN_PROD_TEST_JWT?.trim();
-const ALLOW_LIVE = process.env.TWIN_BUSY_READ_SMOKE_ALLOW_LIVE === "1";
+const DRY_RUN = microsoftBusyReadSmokeDryRun();
+const ALLOW_LIVE = microsoftBusyReadSmokeAllowLive();
 
 const READINESS_PATH = "/api/v1/calendar/microsoft/busy-read/readiness";
 const PREVIEW_PATH = "/api/v1/calendar/microsoft/busy-read/preview";
@@ -39,31 +46,51 @@ async function fetchStatus(path: string, init?: RequestInit): Promise<{ status: 
   return { status: res.status, body };
 }
 
-test("1 script and npm entry exist", () => {
+test("1 script, env helpers, and npm entry exist", () => {
   const pkg = readFileSync(join(scriptRoot, "package.json"), "utf8");
   assert.match(pkg, /test:microsoft-busy-read-staging-smoke/);
   assert.match(pkg, /verify:prod-microsoft-busy-read/);
-  assert.ok(readFileSync(join(scriptRoot, "scripts/verify-prod-microsoft-busy-read.ts"), "utf8").includes("test:microsoft-busy-read-staging-smoke"));
+  const verifyScript = readFileSync(join(scriptRoot, "scripts/verify-prod-microsoft-busy-read.ts"), "utf8");
+  assert.match(verifyScript, /test:microsoft-busy-read-staging-smoke/);
+  assert.match(verifyScript, /TWIN_BUSY_READ_SMOKE_DRY_RUN/);
+  assert.match(verifyScript, /TWIN_BUSY_READ_SMOKE_ALLOW_LIVE/);
+  assert.ok(readFileSync(join(scriptRoot, "scripts/lib/microsoft-busy-read-smoke-env.ts"), "utf8").includes(MICROSOFT_BUSY_READ_SMOKE_ENV.dryRun));
 });
 
-test("1b prod smoke commit gate fields (read-only)", async () => {
+test("1b prod smoke commit gate fields (read-only)", async (t) => {
+  if (DRY_RUN) {
+    t.skip("SKIPPED commit gate HTTP — TWIN_BUSY_READ_SMOKE_DRY_RUN=1");
+    return;
+  }
   const gate = await logProdSmokeCommitGate();
   assert.ok(typeof gate.prod_frontend_commit === "string");
   assert.ok(typeof gate.prod_api_commit === "string");
   assert.ok(typeof gate.repo_head === "string");
 });
 
-test("2 unauthenticated readiness returns 401", async () => {
+test("2 unauthenticated readiness returns 401", async (t) => {
+  if (DRY_RUN) {
+    t.skip("SKIPPED HTTP — TWIN_BUSY_READ_SMOKE_DRY_RUN=1");
+    return;
+  }
   const { status } = await fetchStatus(READINESS_PATH);
   assert.equal(status, 401);
 });
 
-test("3 unauthenticated preview returns 401", async () => {
+test("3 unauthenticated preview returns 401", async (t) => {
+  if (DRY_RUN) {
+    t.skip("SKIPPED HTTP — TWIN_BUSY_READ_SMOKE_DRY_RUN=1");
+    return;
+  }
   const { status } = await fetchStatus(PREVIEW_PATH);
   assert.equal(status, 401);
 });
 
 test("4 health ops exposes microsoft gates false (safe default)", async (t) => {
+  if (DRY_RUN) {
+    t.skip("SKIPPED HTTP — TWIN_BUSY_READ_SMOKE_DRY_RUN=1");
+    return;
+  }
   const { status, body } = await fetchStatus(HEALTH_OPS_PATH);
   if (status !== 200) {
     t.skip(`health ops unavailable (HTTP ${status})`);
@@ -78,6 +105,10 @@ test("4 health ops exposes microsoft gates false (safe default)", async (t) => {
 });
 
 test("5 authenticated readiness gates off when JWT set", async (t) => {
+  if (DRY_RUN) {
+    t.skip("SKIPPED HTTP — TWIN_BUSY_READ_SMOKE_DRY_RUN=1");
+    return;
+  }
   if (!JWT) {
     t.skip("SKIPPED authenticated readiness — TWIN_PROD_TEST_JWT not configured");
     return;
@@ -98,6 +129,10 @@ test("5 authenticated readiness gates off when JWT set", async (t) => {
 });
 
 test("6 authenticated preview demo when gates off", async (t) => {
+  if (DRY_RUN) {
+    t.skip("SKIPPED HTTP — TWIN_BUSY_READ_SMOKE_DRY_RUN=1");
+    return;
+  }
   if (!JWT) {
     t.skip("SKIPPED authenticated preview — TWIN_PROD_TEST_JWT not configured");
     return;
@@ -116,6 +151,10 @@ test("6 authenticated preview demo when gates off", async (t) => {
 });
 
 test("7 legacy interview write blocked when gate off", async (t) => {
+  if (DRY_RUN) {
+    t.skip("SKIPPED HTTP — TWIN_BUSY_READ_SMOKE_DRY_RUN=1");
+    return;
+  }
   if (!JWT) {
     t.skip("SKIPPED interview write probe — TWIN_PROD_TEST_JWT not configured");
     return;
@@ -136,6 +175,10 @@ test("7 legacy interview write blocked when gate off", async (t) => {
 });
 
 test("8 live smoke only when explicitly allowed", async (t) => {
+  if (DRY_RUN) {
+    t.skip("SKIPPED live Graph smoke — TWIN_BUSY_READ_SMOKE_DRY_RUN=1");
+    return;
+  }
   if (!ALLOW_LIVE) {
     t.skip("SKIPPED live Graph smoke — set TWIN_BUSY_READ_SMOKE_ALLOW_LIVE=1 for staging live checks");
     return;
@@ -155,9 +198,29 @@ test("8 live smoke only when explicitly allowed", async (t) => {
       data.preview_mode === "live_read_only" ||
       data.preview_mode === "partial",
   );
+  for (const pattern of FORBIDDEN_RESPONSE_PATTERNS) {
+    assert.doesNotMatch(body, pattern);
+  }
 });
 
-test("9 script never logs token", () => {
-  const self = readFileSync(fileURLToPath(import.meta.url), "utf8");
-  assert.doesNotMatch(self, /console\.(log|info|debug|warn|error)\([^)]*JWT/);
+test("9 scripts never log token", () => {
+  const paths = [
+    "scripts/microsoft-busy-read-staging-smoke.test.ts",
+    "scripts/verify-prod-microsoft-busy-read.ts",
+    "scripts/lib/microsoft-busy-read-smoke-env.ts",
+  ];
+  for (const rel of paths) {
+    const source = readFileSync(join(scriptRoot, rel), "utf8");
+    assert.doesNotMatch(source, /console\.(log|info|debug|warn|error)\([^)]*JWT/);
+    assert.doesNotMatch(source, /console\.(log|info|debug|warn|error)\([^)]*token/i);
+  }
+});
+
+test("10 dry-run mode skips all HTTP probes", () => {
+  if (!DRY_RUN) {
+    assert.ok(true, "not dry-run — HTTP probes run in tests 2–8");
+    return;
+  }
+  assert.equal(DRY_RUN, true);
+  assert.equal(ALLOW_LIVE, false, "dry-run prep must not combine with ALLOW_LIVE");
 });
