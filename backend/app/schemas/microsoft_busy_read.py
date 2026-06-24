@@ -25,6 +25,12 @@ MicrosoftBusyReadCapabilityStatus = Literal[
 
 BusyReadSource = Literal["demo", "live", "partial"]
 
+BusySlotStatus = Literal["busy", "tentative", "unavailable", "unknown"]
+
+BusySlotSource = Literal["demo", "live_read_only", "partial"]
+
+PreviewMode = Literal["demo", "not_connected", "live_read_only", "partial"]
+
 
 class MicrosoftBusyReadBlockedCapabilityOut(BaseModel):
     id: str
@@ -53,3 +59,24 @@ class MicrosoftBusyReadReadinessOut(BaseModel):
     )
     source: BusyReadSource
     headline: str
+
+
+class MicrosoftBusySlotPreviewOut(BaseModel):
+    start: str
+    end: str
+    status: BusySlotStatus
+    source: BusySlotSource
+    event_subject_redacted: Literal[True] = True
+
+
+class MicrosoftBusyReadPreviewOut(BaseModel):
+    provider: Literal["microsoft"] = "microsoft"
+    capability: Literal["busy_read"] = "busy_read"
+    preview_mode: PreviewMode
+    busy_slot_preview: list[MicrosoftBusySlotPreviewOut]
+    source: BusyReadSource
+    headline: str
+    live_graph_stub: bool = Field(
+        False,
+        description="True when live Graph read is intentionally stubbed (unsafe token scope or upstream error).",
+    )

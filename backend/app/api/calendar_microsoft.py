@@ -55,7 +55,10 @@ from app.services.calendar_provider_health import (
     microsoft_unsupported_account_failure,
     probe_microsoft_calendar_health,
 )
-from app.services.microsoft_busy_read import build_microsoft_busy_read_readiness
+from app.services.microsoft_busy_read import (
+    build_microsoft_busy_read_preview,
+    build_microsoft_busy_read_readiness,
+)
 from app.services.microsoft_calendar_oauth import (
     MicrosoftCalendarOAuthError,
     build_microsoft_calendar_authorize_url,
@@ -63,7 +66,7 @@ from app.services.microsoft_calendar_oauth import (
     is_microsoft_calendar_oauth_configured,
 )
 from app.services.token_crypto import encrypt_secret
-from app.schemas.microsoft_busy_read import MicrosoftBusyReadReadinessOut
+from app.schemas.microsoft_busy_read import MicrosoftBusyReadPreviewOut, MicrosoftBusyReadReadinessOut
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -167,6 +170,15 @@ class MicrosoftCalendarStatusOut(BaseModel):
 
 class MicrosoftCalendarAuthorizeOut(BaseModel):
     authorize_url: str
+
+
+@router.get("/microsoft/busy-read/preview", response_model=MicrosoftBusyReadPreviewOut)
+def microsoft_busy_read_preview(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> MicrosoftBusyReadPreviewOut:
+    """Redacted busy slot preview — no event subjects, no tokens."""
+    return build_microsoft_busy_read_preview(db, current_user.id, get_settings())
 
 
 @router.get("/microsoft/busy-read/readiness", response_model=MicrosoftBusyReadReadinessOut)
