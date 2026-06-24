@@ -7,6 +7,7 @@ import { useMemo } from "react";
 import { useTranslation } from "@/components/language-provider";
 import { OperationalCrossLinksPanel } from "@/components/shared/operational-cross-links-panel";
 import { MicrosoftCalendarReadinessBusyReadPanel } from "@/components/shared/microsoft-calendar-readiness-busy-read-panel";
+import { SchedulingDecisionContextPanel } from "@/components/shared/scheduling-decision-context-panel";
 import { MicrosoftBusySlotPreviewPanel } from "@/components/shared/microsoft-busy-slot-preview-panel";
 import { MicrosoftOAuthConnectUiGate } from "@/components/shared/microsoft-oauth-connect-ui-gate";
 import { MicrosoftBusyReadCrossLinkCard } from "@/components/shared/microsoft-busy-read-cross-link-card";
@@ -139,6 +140,8 @@ export function BoardCalendarReadinessMonitorWorkspace() {
             ))}
           </ul>,
         )}
+
+        <SchedulingDecisionContextPanel surface="calendar_readiness" />
 
         <OperationalCrossLinksPanel />
 

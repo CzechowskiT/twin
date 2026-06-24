@@ -9,6 +9,7 @@ import { useTranslation } from "@/components/language-provider";
 import { CompactAuditTrailWidget } from "@/components/shared/compact-audit-trail-widget";
 import { OperationalCrossLinksPanel } from "@/components/shared/operational-cross-links-panel";
 import { PlacementVerificationEvidencePanel } from "@/components/shared/placement-verification-evidence-panel";
+import { SchedulingDecisionContextPanel } from "@/components/shared/scheduling-decision-context-panel";
 import { MicrosoftBusyReadCrossLinkCard } from "@/components/shared/microsoft-busy-read-cross-link-card";
 import { Card, Shell } from "@/components/ui";
 import { LAUNCH_STANCE } from "@/lib/investor-metrics-reality";
@@ -132,6 +133,8 @@ export function BoardPlacementEvidenceMonitorWorkspace() {
             </ul>
           </>,
         )}
+
+        <SchedulingDecisionContextPanel surface="placement_verification" />
 
         <PlacementVerificationEvidencePanel placementId={record.placement_id} />
         <MicrosoftBusyReadCrossLinkCard context="placement" />

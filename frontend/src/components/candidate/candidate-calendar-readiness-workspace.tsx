@@ -8,6 +8,7 @@ import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
 import { CalendarReadinessEvidencePanel } from "@/components/shared/calendar-readiness-evidence-panel";
+import { SchedulingDecisionContextPanel } from "@/components/shared/scheduling-decision-context-panel";
 import { MicrosoftCalendarReadinessBusyReadPanel } from "@/components/shared/microsoft-calendar-readiness-busy-read-panel";
 import { MicrosoftBusySlotPreviewPanel } from "@/components/shared/microsoft-busy-slot-preview-panel";
 import { MicrosoftOAuthConnectUiGate } from "@/components/shared/microsoft-oauth-connect-ui-gate";
@@ -194,6 +195,8 @@ function PreviewContent({ record }: { record: CalendarReadinessRecord }) {
             </ul>
           </>,
         )}
+
+        <SchedulingDecisionContextPanel surface="calendar_readiness" />
 
         <CalendarReadinessEvidencePanel candidateId={record.candidate_id} />
 

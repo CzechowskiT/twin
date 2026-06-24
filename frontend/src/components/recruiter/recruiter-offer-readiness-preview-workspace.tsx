@@ -8,6 +8,7 @@ import { useTranslation } from "@/components/language-provider";
 import { OfferComparisonPreview } from "@/components/shared/offer-comparison-preview";
 import { OfferReadinessChecklist } from "@/components/shared/offer-readiness-checklist";
 import { OfferReadinessEvidencePanel } from "@/components/shared/offer-readiness-evidence-panel";
+import { SchedulingDecisionContextPanel } from "@/components/shared/scheduling-decision-context-panel";
 import { OfferCalendarReadinessCard } from "@/components/shared/offer-calendar-readiness-card";
 import { MicrosoftBusyReadCrossLinkCard } from "@/components/shared/microsoft-busy-read-cross-link-card";
 import { OfferReadinessPanel } from "@/components/shared/offer-readiness-status-badge";
@@ -83,6 +84,8 @@ function PreviewBody({
 
         <OfferCalendarReadinessCard candidateId={record.candidate_id} />
         <MicrosoftBusyReadCrossLinkCard context="offer" candidateId={record.candidate_id} />
+
+        <SchedulingDecisionContextPanel surface="offer_readiness" />
 
         <OfferReadinessEvidencePanel candidateId={record.candidate_id} />
       </div>
