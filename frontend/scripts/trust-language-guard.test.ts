@@ -58,6 +58,13 @@ function recruiterTrustCopy(locale: typeof en): string {
   return [r.lead, r.humanDecisionNote, r.decisionConsoleSubcopy, r.reviewDisclaimer].join("\n");
 }
 
+function recruiterCockpitTrustCopy(locale: typeof en): string {
+  const c = locale.recruiterDailyCockpit;
+  const q = locale.recruiterTrustReviewQueue;
+  const w = locale.recruiterOperationalWorkQueue;
+  return [c.humanBoundaryBody, c.atsImportLead, q.boundaryBody, w.boundaryBody].join("\n");
+}
+
 function homeTrustCopy(locale: typeof en): string {
   const h = locale.home;
   return [h.feature6Title, h.feature6Line, h.focusFootnote, h.focusChipAuto, h.vacationScene4Body].join("\n");
@@ -103,5 +110,12 @@ test("dashboard and recruiter trust copy state automation pause and human decisi
     const recruiter = recruiterTrustCopy(locale).toLowerCase();
     assert.match(recruiter, /recruiter decision|decyzja rekrutera/);
     assert.doesNotMatch(recruiter, /ai decides/);
+
+    const cockpit = recruiterCockpitTrustCopy(locale).toLowerCase();
+    assert.match(cockpit, /human|człowiek|ręczn|rekruter/);
+    assert.doesNotMatch(cockpit, /ai decides|ai hires/);
+    for (const pattern of [/\bguaranteed interview\b/i, /\bautomatic scheduling\b/i]) {
+      assert.doesNotMatch(cockpit, pattern, `${pattern} in recruiter cockpit trust copy (${locale})`);
+    }
   }
 });

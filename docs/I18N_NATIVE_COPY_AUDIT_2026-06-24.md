@@ -1,6 +1,7 @@
 # Native product copy audit — 2026-06-24
 
-**Branch:** `fix/i18n-native-product-copy-2026-06-24`  
+**Branch (batch 1):** `fix/i18n-native-product-copy-2026-06-24` → merged PR #284 (`e9d01fa`)  
+**Branch (batch 2):** `fix/i18n-persona-hub-recruiter-native-copy-2026-06-24`  
 **Owner:** TWIN Native-Language Product Copy & i18n Quality  
 **Mode:** COPY/I18N ONLY — no logic, routes, API, auth, shell, gates, Phase 3B
 
@@ -29,7 +30,8 @@
 | `frontend/src/lib/faq-messages.ts` | FAQ EN/PL |
 | `frontend/src/lib/overlays/*.ts` | es–ja base overlays |
 | `frontend/src/lib/overlays/premium/**` | Premium product overlays |
-| `frontend/scripts/i18n-native-copy-quality.test.ts` | **New** native copy guard |
+| `frontend/src/lib/overlays/premium/persona-hub-recruiter-overlays.ts` | **Batch 2** es/ja persona hub + recruiter cockpit placeholders |
+| `frontend/scripts/i18n-native-copy-quality.test.ts` | Native copy guard |
 | `frontend/scripts/trust-language-guard.test.ts` | Extended forbidden claims |
 | `frontend/scripts/i18n-coverage.test.ts` | Extended placeholder parity |
 
@@ -44,9 +46,13 @@
 | `alignmentowych` | English loan calque | → `uzgadniających` |
 | `Self-declaration` | English in PL strings | → `Oświadczenia własne` |
 | `board` as UI label | Opaque for PL executives | → `zarząd` where user-facing |
+| `outreach` / `outreachu` | HR anglicism in PL UI | → `kontakt wychodzący` |
+| `live sync` / `writeback` | Untranslated stack terms | → `bieżąca synchronizacja` / `zapis zwrotny do ATS` |
+| `outbound nie live` | Mixed EN/PL badge | → `wysyłka wychodząca nieaktywna` |
 
 ## High-risk product areas audited
 
+### Batch 1 (merged #284)
 - Placement verification evidence
 - Offer readiness center (candidate + recruiter/company preview + board)
 - Calendar readiness + Microsoft busy-read readiness
@@ -55,34 +61,54 @@
 - Dashboard automation transparency (PL/EN safety copy preserved)
 - Recruiter inbox trust copy (unchanged keys; already natural PL)
 
-## Changes made (this batch)
+### Batch 2 (persona hub + recruiter)
+- Workspace persona hub cards (recruiter/company SOR entry)
+- Company talent memory (`companyTalentPool`)
+- Recruiter trust review queue
+- Recruiter operational work queue
+- Recruiter daily operating cockpit
+- Premium overlays es/ja placeholders for above domains
 
-### Polish (heavy)
+## Changes made
+
+### Batch 1 — Polish (heavy)
 
 - Rewrote `placementVerificationEvidence`, `microsoftCalendarReadiness`, `microsoftBusyRead`, `calendarReadinessEvidence`, `candidateOfferReadiness`, `offerReadinessEvidence`, `schedulingDecisionContext`, `offerReadinessPreview`, `boardOfferReadiness`, `boardPlacementEvidence` in `i18n.ts`.
 - Global PL pass: `przegląd człowieka` → `ręczna weryfikacja` (11+ keys), `powierzchnie operacyjne` → `ekrany operacyjne`.
 
+### Batch 2 — Polish (persona / recruiter)
+
+- Rewrote PL in `workspace` hub hints, `systemOfRecord` boundaries, `companyTalentPool`, `recruiterTrustReviewQueue`, `recruiterOperationalWorkQueue`, `recruiterDailyCockpit`.
+- Replaced loanwords: `live sync` → `bieżąca synchronizacja`, `outreach` → `kontakt wychodzący`, `writeback` → `zapis zwrotny do ATS`, `outbound nie live` → `wysyłka wychodząca nieaktywna`.
+- Normalized labels: `talent pool` → `pamięć talentów`, `Daily cockpit` → `Kokpit dzienny`, `trust review` → `przegląd zaufania`.
+
+### Batch 2 — es / ja (targeted placeholders)
+
+- New `persona-hub-recruiter-overlays.ts` with page titles, leads, boundary copy for talent memory, trust review queue, work queue, daily cockpit.
+
 ### English (light)
 
-- Minor clarity tweak: `microsoftCalendarReadiness.busyReadLead`, `candidateOfferReadiness.summaryLead`.
+- Batch 1: minor clarity tweak on busy-read lead.
+- Batch 2: EN unchanged (source strings already natural).
 
 ### Other locales (targeted)
 
-- Fixed `{company}` placeholder drift in `recruiterMessageDrafts.invitationSubject` for es, it, fr, de, zh, ar, ja overlays.
+- Batch 1: Fixed `{company}` placeholder drift in `recruiterMessageDrafts.invitationSubject` for es–ja overlays.
+- Batch 2: es/ja persona-hub-recruiter overlay slice only; it/fr/de/zh/ar — deferred full native-review.
 
 ## Not changed
 
 - Keys, routes, enums, `data-testid`, API, auth, shell, gates, Phase 3B
 - Product logic, resolvers, components
-- Full es–ja premium copy rewrite (deferred — see recommendations)
+- Full es–ja premium copy rewrite outside persona/recruiter slice (deferred)
 
 ## Tests added / extended
 
 | Script | Change |
 | ------ | ------ |
-| `npm run test:i18n-native-copy-quality` | **New** — PL calque ban in critical domains, forbidden claims, placeholder parity, safety phrases |
-| `npm run test:i18n-coverage` | + placeholder parity vs EN |
-| `npm run test:trust-language-guard` | + additional forbidden claim patterns |
+| `npm run test:i18n-native-copy-quality` | + persona/recruiter domains in critical guard; + PL loanword test; + es/ja overlay smoke |
+| `npm run test:i18n-coverage` | (unchanged from batch 1) placeholder parity vs EN |
+| `npm run test:trust-language-guard` | + recruiter cockpit / queue boundary copy assertions |
 
 ## Browser smoke
 
@@ -92,9 +118,9 @@ Skipped — no existing `test:i18n-native-copy-quality-browser` pattern or local
 
 | Locale | Scope | Notes |
 | ------ | ----- | ----- |
-| `es`, `it`, `fr`, `de` | Recruiter/cockpit long-form copy | Functional overlays; not re-audited sentence-by-sentence |
-| `zh`, `ar`, `ja` | Same | Placeholder fix only in message drafts |
-| `pl` | Persona hub / talent pool / ATS import strings outside critical domains | Still contain loanwords (`live sync`, `outreach`) — next batch |
+| `es`, `it`, `fr`, `de` | Persona hub / recruiter long-form | Batch 2 placeholders es/ja only; expand to it/fr/de/zh/ar next |
+| `pl` | Talent Radar / ATS import / demo journey strings | Still contain some loanwords outside audited domains |
+| `pl` | `recruiterDailyOperatingCockpit` (legacy route) | Not in batch 2 scope |
 
 ## Launch stance
 

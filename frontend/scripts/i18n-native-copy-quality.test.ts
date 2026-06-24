@@ -102,7 +102,20 @@ const CRITICAL_DOMAINS = [
   "dashboard",
   "recruiterInbox",
   "home",
+  "companyTalentPool",
+  "recruiterTrustReviewQueue",
+  "recruiterOperationalWorkQueue",
+  "recruiterDailyCockpit",
 ] as const;
+
+const PERSONA_RECRUITER_PL_LOANWORDS: RegExp[] = [
+  /\blive sync\b/i,
+  /\boutreachu\b/i,
+  /\bwritebacku\b/i,
+  /\boutbound nie live\b/i,
+  /\bauto-outreachu\b/i,
+  /\bauto outreachu\b/i,
+];
 
 function domainBlob(locale: Locale, domain: (typeof CRITICAL_DOMAINS)[number]): string {
   const dict = dictionaries[locale] as Record<string, unknown>;
@@ -208,4 +221,31 @@ test("native PL phrasing uses natural offer-readiness and calendar labels", () =
   assert.match(pl.candidateOfferReadiness.pageTitle, /przygotowan|gotowość/i);
   assert.match(pl.microsoftBusyRead.slotPreviewTitle, /zajętości|odczyt|podgląd/i);
   assert.doesNotMatch(pl.placementVerificationEvidence.panelTitle, /Dowód operacyjny/i);
+});
+
+test("PL persona and recruiter hub domains avoid English loanwords for sync and outreach", () => {
+  const domains = [
+    "companyTalentPool",
+    "recruiterTrustReviewQueue",
+    "recruiterOperationalWorkQueue",
+    "recruiterDailyCockpit",
+  ] as const;
+  const blob = domains.map((d) => domainBlob("pl", d)).join("\n");
+  for (const pattern of PERSONA_RECRUITER_PL_LOANWORDS) {
+    assert.doesNotMatch(blob, pattern, `PL loanword ${pattern} in persona/recruiter domains`);
+  }
+  assert.match(dictionaries.pl.companyTalentPool.title, /pamięć talentów/i);
+  assert.match(dictionaries.pl.recruiterTrustReviewQueue.pageTitle, /przeglądu zaufania/i);
+  assert.match(dictionaries.pl.recruiterDailyCockpit.navLink, /kokpit dzienny/i);
+});
+
+test("es and ja persona hub recruiter overlays are not English page titles", () => {
+  for (const locale of ["es", "ja"] as const) {
+    const pool = dictionaries[locale].companyTalentPool;
+    assert.doesNotMatch(pool.title, /^Company talent memory$/);
+    const queue = dictionaries[locale].recruiterTrustReviewQueue;
+    assert.doesNotMatch(queue.pageTitle, /^Recruiter trust review queue$/);
+    const cockpit = dictionaries[locale].recruiterDailyCockpit;
+    assert.doesNotMatch(cockpit.pageEyebrow, /^Recruiter daily operating cockpit$/);
+  }
 });
