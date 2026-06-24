@@ -77,6 +77,16 @@ npm run test:i18n-coverage
 - Source badge: `safePersistence.liveApi` / `demoFallback` / `liveOperatingState.partialFallback`
 - No write buttons, no polling
 
+## Operating evidence center (2026-06-23)
+
+`PlacementVerificationEvidencePanel` on all five placement-verification routes — see [PLACEMENT_VERIFICATION_OPERATING_EVIDENCE_2026-06-23.md](./PLACEMENT_VERIFICATION_OPERATING_EVIDENCE_2026-06-23.md).
+
+```bash
+npm run test:placement-verification-evidence
+PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 npm run test:placement-verification-evidence-browser
+PLAYWRIGHT_ALLOW_PROD_SMOKE=1 npm run verify:prod-placement-verification-evidence
+```
+
 Optional browser smoke (prod):
 
 ```bash

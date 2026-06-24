@@ -7,6 +7,7 @@ import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subna
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
+import { CalendarReadinessEvidencePanel } from "@/components/shared/calendar-readiness-evidence-panel";
 import {
   CANDIDATE_CALENDAR_READINESS_MARKERS,
   CANDIDATE_CALENDAR_READINESS_PAGE_MARKER,
@@ -178,6 +179,8 @@ function PreviewContent({ record }: { record: CalendarReadinessRecord }) {
             </ul>
           </>,
         )}
+
+        <CalendarReadinessEvidencePanel candidateId={record.candidate_id} />
 
         <div data-testid={CANDIDATE_CALENDAR_READINESS_MARKERS.safeLinks} className="text-xs text-[var(--twin-muted)]">
           {t("candidateCalendarReadiness.boundaryNote")}

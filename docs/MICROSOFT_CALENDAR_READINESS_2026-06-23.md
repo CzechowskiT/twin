@@ -24,10 +24,22 @@ Ship cross-persona **readiness/preview** surfaces for Microsoft Graph calendar O
 | Persona | Route | Purpose |
 |---------|-------|---------|
 | Candidate | `/dashboard/calendar/readiness` | Microsoft OAuth readiness preview |
-| Candidate (workspace) | `/dashboard/calendar` | Existing calendar workspace (unchanged behavior) |
+| Candidate (workspace) | `/dashboard/calendar` | Existing calendar workspace + operating evidence section |
 | Recruiter | `/recruiter/daily-cockpit` | Scheduling proof panel (read-only) |
 | Company | `/company/hiring-command-center` | Scheduling proof panel (read-only) |
 | Board | `/board/calendar-readiness` | Cross-persona readiness monitor |
+
+## Operating evidence (2026-06-23)
+
+`CalendarReadinessEvidencePanel` on `/dashboard/calendar/readiness` and collapsible section on `/dashboard/calendar`.
+
+See [CALENDAR_READINESS_OPERATING_EVIDENCE_2026-06-23.md](./CALENDAR_READINESS_OPERATING_EVIDENCE_2026-06-23.md).
+
+```bash
+npm run test:calendar-readiness-evidence
+PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 npm run test:calendar-readiness-evidence-browser
+PLAYWRIGHT_ALLOW_PROD_SMOKE=1 npm run verify:prod-calendar-readiness-evidence
+```
 
 ## Copy guardrails
 
