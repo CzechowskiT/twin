@@ -100,4 +100,4 @@ Enforced by slice tests + `npm run test:trust-language-guard`.
 
 When explicitly unblocked: Microsoft Graph busy read behind OAuth connect UI, hold write behind consent — still no invite dispatch until product gate opens.
 
-See also: [MICROSOFT_BUSY_READ_READINESS_2026-06-24.md](./MICROSOFT_BUSY_READ_READINESS_2026-06-24.md) — busy-read capability contract, slot preview panel, disabled OAuth gate (2026-06-24 batch).
+See also: [MICROSOFT_BUSY_READ_READINESS_2026-06-24.md](./MICROSOFT_BUSY_READ_READINESS_2026-06-24.md) — full-stack busy-read API (#264–#268), live UI wiring, product gates default off (2026-06-24).
