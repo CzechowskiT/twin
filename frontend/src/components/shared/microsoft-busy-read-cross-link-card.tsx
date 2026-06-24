@@ -8,8 +8,8 @@ import { Card } from "@/components/ui";
 import { CANDIDATE_CALENDAR_READINESS_ROUTE } from "@/lib/candidate-calendar-readiness";
 import {
   MICROSOFT_BUSY_READ_MARKERS,
-  resolveMicrosoftBusyRead,
 } from "@/lib/microsoft-busy-read";
+import { useMicrosoftBusyReadLive } from "@/lib/use-microsoft-busy-read-live";
 import type { TranslationKey } from "@/lib/i18n";
 
 export const MICROSOFT_BUSY_READ_CROSS_LINK_MARKER = MICROSOFT_BUSY_READ_MARKERS.crossLink;
@@ -29,7 +29,7 @@ const CONTEXT_RELATED_KEYS: Record<MicrosoftBusyReadCrossLinkContext, Translatio
 
 export function MicrosoftBusyReadCrossLinkCard({ context, candidateId }: Props): ReactNode {
   const { t } = useTranslation();
-  const record = resolveMicrosoftBusyRead(candidateId);
+  const { record } = useMicrosoftBusyReadLive(candidateId);
   if (!record) return null;
 
   return (

@@ -31,7 +31,7 @@ import {
   resolveMicrosoftCalendarReadiness,
 } from "@/lib/microsoft-calendar-readiness";
 import { MicrosoftBusySlotPreviewPanel } from "@/components/shared/microsoft-busy-slot-preview-panel";
-import { resolveMicrosoftBusyRead } from "@/lib/microsoft-busy-read";
+import { useMicrosoftBusyReadLive } from "@/lib/use-microsoft-busy-read-live";
 import { COMPANY_ROLES_ROUTE } from "@/lib/company-jobs-roles";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -85,7 +85,7 @@ export function CompanyHiringCommandCenterWorkspace() {
   const record = useMemo(() => resolveCompanyHiringCommandCenter(), []);
   const schedulingProof = useMemo(() => resolveCompanySchedulingProof(), []);
   const microsoftReadiness = useMemo(() => resolveMicrosoftCalendarReadiness(), []);
-  const busyReadRecord = useMemo(() => resolveMicrosoftBusyRead(), []);
+  const { record: busyReadRecord } = useMicrosoftBusyReadLive();
   const moduleLinks = useMemo(() => COMPANY_HIRING_COMMAND_CENTER_MODULE_LINKS, []);
   const disabledActions = useMemo(() => COMPANY_HIRING_COMMAND_CENTER_DISABLED_ACTIONS, []);
   const [operatingState, setOperatingState] = useState<OperatingStateSummary | null>(null);

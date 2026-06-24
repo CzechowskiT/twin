@@ -30,7 +30,7 @@ import {
   resolveMicrosoftCalendarReadiness,
 } from "@/lib/microsoft-calendar-readiness";
 import { MicrosoftBusySlotPreviewPanel } from "@/components/shared/microsoft-busy-slot-preview-panel";
-import { resolveMicrosoftBusyRead } from "@/lib/microsoft-busy-read";
+import { useMicrosoftBusyReadLive } from "@/lib/use-microsoft-busy-read-live";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -84,7 +84,7 @@ export function RecruiterDailyOperatingCockpitWorkspace() {
   const record = useMemo(() => resolveRecruiterDailyCockpit(), []);
   const schedulingProof = useMemo(() => resolveRecruiterSchedulingProof(), []);
   const microsoftReadiness = useMemo(() => resolveMicrosoftCalendarReadiness(), []);
-  const busyReadRecord = useMemo(() => resolveMicrosoftBusyRead(), []);
+  const { record: busyReadRecord } = useMicrosoftBusyReadLive();
   const moduleLinks = useMemo(() => RECRUITER_DAILY_COCKPIT_MODULE_LINKS, []);
   const [operatingState, setOperatingState] = useState<OperatingStateSummary | null>(null);
 
