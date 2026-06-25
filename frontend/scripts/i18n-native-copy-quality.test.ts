@@ -106,6 +106,11 @@ const CRITICAL_DOMAINS = [
   "recruiterTrustReviewQueue",
   "recruiterOperationalWorkQueue",
   "recruiterDailyCockpit",
+  "recruiterTalentRadar",
+  "recruiterTalentRadarDigest",
+  "atsImportReadiness",
+  "founderLedDemo",
+  "executiveProductProof",
 ] as const;
 
 const PERSONA_RECRUITER_PL_LOANWORDS: RegExp[] = [
@@ -115,6 +120,16 @@ const PERSONA_RECRUITER_PL_LOANWORDS: RegExp[] = [
   /\boutbound nie live\b/i,
   /\bauto-outreachu\b/i,
   /\bauto outreachu\b/i,
+];
+
+const TALENT_RADAR_ATS_DEMO_PL_LOANWORDS: RegExp[] = [
+  /\boutreachu\b/i,
+  /\bwritebacku\b/i,
+  /\blive sync\b/i,
+  /\bprzegląd człowieka\b/i,
+  /\bauto-outreach\b/i,
+  /\bLIVE SYNC\b/i,
+  /\bWRITEBACK\b/i,
 ];
 
 function domainBlob(locale: Locale, domain: (typeof CRITICAL_DOMAINS)[number]): string {
@@ -247,5 +262,33 @@ test("es and ja persona hub recruiter overlays are not English page titles", () 
     assert.doesNotMatch(queue.pageTitle, /^Recruiter trust review queue$/);
     const cockpit = dictionaries[locale].recruiterDailyCockpit;
     assert.doesNotMatch(cockpit.pageEyebrow, /^Recruiter daily operating cockpit$/);
+  }
+});
+
+test("PL talent radar, ATS import, and demo domains avoid English loanwords", () => {
+  const domains = [
+    "recruiterTalentRadar",
+    "recruiterTalentRadarDigest",
+    "atsImportReadiness",
+    "founderLedDemo",
+    "executiveProductProof",
+  ] as const;
+  const blob = domains.map((d) => domainBlob("pl", d)).join("\n");
+  for (const pattern of TALENT_RADAR_ATS_DEMO_PL_LOANWORDS) {
+    assert.doesNotMatch(blob, pattern, `PL loanword ${pattern} in talent radar/ATS/demo domains`);
+  }
+  assert.match(dictionaries.pl.recruiterTalentRadar.title, /radar talentów/i);
+  assert.match(dictionaries.pl.atsImportReadiness.title, /gotowość importu ats/i);
+  assert.match(dictionaries.pl.founderLedDemo.journeyTalentRadarTitle, /radar talentów/i);
+});
+
+test("it fr de zh ar talent radar ATS demo overlays are not English page titles", () => {
+  for (const locale of ["it", "fr", "de", "zh", "ar"] as const) {
+    const radar = dictionaries[locale].recruiterTalentRadar;
+    assert.doesNotMatch(radar.title, /^Talent Radar$/);
+    const ats = dictionaries[locale].atsImportReadiness;
+    assert.doesNotMatch(ats.title, /^ATS Import Readiness$/);
+    const demo = dictionaries[locale].founderLedDemo;
+    assert.doesNotMatch(demo.journeyTalentRadarTitle, /^Talent Radar$/);
   }
 });
