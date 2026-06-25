@@ -24,14 +24,14 @@ const it: TalentRadarAtsDemoOverlay = {
     title: "Prontezza import ATS",
     lead: "Workspace di mappatura e revisione import — solo pilota demo. Nessuna sincronizzazione ATS live, nessuna credenziale, nessuna scrittura su ATS.",
     boundaryBody:
-      "TWIN mostra la mappatura di prontezza import ATS per la revisione del recruiter. Solo prontezza import — nessuna sincronizzazione ATS live, nessuna scrittura su ATS, nessun contatto in uscita automatico.",
+      "TWIN mostra la mappatura di prontezza import ATS per la revisione del recruiter. Solo prontezza import — nessuna sincronizzazione ATS live, nessuna scrittura nell'ATS, nessun contatto in uscita automatico.",
   },
   founderLedDemo: {
     journeyTalentRadarTitle: "Radar dei talenti",
     journeyTalentRadarDesc:
       "Pipeline classificata con posticipa, esclusione, bozze e memoria decisionale per audit.",
     boundaryNoOutreach:
-      "Nessun contatto in uscita automatico — i messaggi li invia il recruiter; TWIN non contatta i candidati in cold email.",
+      "Nessun contatto in uscita automatico — i messaggi li invia il recruiter; TWIN non contatta i candidati con email non richieste.",
   },
   executiveProductProof: {
     linkAtsReadiness: "Prontezza import ATS",
@@ -54,9 +54,9 @@ const fr: TalentRadarAtsDemoOverlay = {
   },
   atsImportReadiness: {
     title: "Préparation import ATS",
-    lead: "Espace de mapping et revue d'import — pilote démo uniquement. Pas de synchro ATS live, pas d'identifiants, pas d'écriture ATS.",
+    lead: "Espace de mapping et revue d'import — pilote démo uniquement. Aucune synchronisation ATS en direct, pas d'identifiants, pas d'écriture dans l'ATS.",
     boundaryBody:
-      "TWIN affiche le mapping de préparation import ATS pour revue recruteur. Préparation import uniquement — pas de synchro ATS live, pas d'écriture ATS, pas de contact sortant automatique.",
+      "TWIN affiche le mapping de préparation import ATS pour revue recruteur. Préparation import uniquement — aucune synchronisation ATS en direct, pas d'écriture dans l'ATS, pas de contact sortant automatique.",
   },
   founderLedDemo: {
     journeyTalentRadarTitle: "Radar des talents",
@@ -67,7 +67,7 @@ const fr: TalentRadarAtsDemoOverlay = {
   },
   executiveProductProof: {
     linkAtsReadiness: "Préparation import ATS",
-    boundaryNoAtsSync: "Pas de synchro ATS bidirectionnelle — aperçu préparation import uniquement.",
+    boundaryNoAtsSync: "Pas de synchronisation ATS bidirectionnelle — aperçu préparation import uniquement.",
     boundaryNoOutreach: "Pas de contact sortant automatique — les brouillons exigent une revue humaine.",
   },
 };
@@ -78,29 +78,29 @@ const de: TalentRadarAtsDemoOverlay = {
     navLink: "Talent-Radar",
     disclaimer:
       "Das Talent-Radar zeigt Signale und Kontext. Der Recruiter entscheidet, ob und wie der Kandidat kontaktiert wird.",
-    chipNoAutoOutreach: "Kein automatischer Outbound-Kontakt",
+    chipNoAutoOutreach: "Kein automatischer ausgehender Kontakt",
   },
   recruiterTalentRadarDigest: {
     title: "Wöchentlicher Talent-Radar-Digest",
-    trustNoOutreach: "Kein automatischer Outbound — der Recruiter entscheidet über jeden Kontakt.",
+    trustNoOutreach: "Kein automatischer ausgehender Kontakt — der Recruiter entscheidet über jeden Kontakt.",
   },
   atsImportReadiness: {
     title: "ATS-Import-Bereitschaft",
-    lead: "Mapping- und Import-Review-Workspace — nur Demo-Pilot. Keine Live-ATS-Sync, keine Credentials, kein ATS-Writeback.",
+    lead: "Mapping- und Import-Review-Workspace — nur Demo-Pilot. Keine Live-ATS-Synchronisierung, keine Zugangsdaten, kein Zurückschreiben ins ATS.",
     boundaryBody:
-      "TWIN zeigt ATS-Import-Bereitschafts-Mapping zur Recruiter-Review. Nur Import-Bereitschaft — keine Live-ATS-Sync, kein ATS-Writeback, kein automatischer Outbound.",
+      "TWIN zeigt ATS-Import-Bereitschafts-Mapping zur Recruiter-Prüfung. Nur Import-Bereitschaft — keine Live-ATS-Synchronisierung, kein Zurückschreiben ins ATS, kein automatischer ausgehender Kontakt.",
   },
   founderLedDemo: {
     journeyTalentRadarTitle: "Talent-Radar",
     journeyTalentRadarDesc:
-      "Gerankte Pipeline mit Snooze, Ablehnung, Entwürfen und auditfreundlicher Entscheidungshistorie.",
+      "Gerankte Pipeline mit Zurückstellen, Ablehnung, Entwürfen und auditfreundlicher Entscheidungshistorie.",
     boundaryNoOutreach:
-      "Kein automatischer Outbound — Recruiter senden Nachrichten; TWIN kontaktiert Kandidaten nicht per Cold-Mail.",
+      "Kein automatischer ausgehender Kontakt — Recruiter senden Nachrichten; TWIN kontaktiert Kandidaten nicht per unaufgeforderter E-Mail.",
   },
   executiveProductProof: {
     linkAtsReadiness: "ATS-Import-Bereitschaft",
-    boundaryNoAtsSync: "Keine bidirektionale ATS-Sync — nur Import-Bereitschafts-Vorschau.",
-    boundaryNoOutreach: "Kein automatischer Outbound — Entwürfe erfordern menschliche Review.",
+    boundaryNoAtsSync: "Keine bidirektionale ATS-Synchronisierung — nur Import-Bereitschafts-Vorschau.",
+    boundaryNoOutreach: "Kein automatischer ausgehender Kontakt — Entwürfe erfordern manuelle Prüfung.",
   },
 };
 
@@ -124,7 +124,7 @@ const zh: TalentRadarAtsDemoOverlay = {
   founderLedDemo: {
     journeyTalentRadarTitle: "人才雷达",
     journeyTalentRadarDesc: "带延后、排除、草稿决策与可审计决策记忆的排序管道。",
-    boundaryNoOutreach: "无自动外联 — 消息由招聘人员发送；TWIN 不会冷邮件联系候选人。",
+    boundaryNoOutreach: "无自动外联 — 消息由招聘人员发送；TWIN 不会通过未经请求的邮件联系候选人。",
   },
   executiveProductProof: {
     linkAtsReadiness: "ATS 导入就绪",
@@ -154,7 +154,7 @@ const ar: TalentRadarAtsDemoOverlay = {
     journeyTalentRadarTitle: "رادار المواهب",
     journeyTalentRadarDesc: "خط أنابيب مُرتّب مع تأجيل واستبعاد ومسودات وذاكرة قرارات قابلة للتدقيق.",
     boundaryNoOutreach:
-      "لا تواصل صادر تلقائي — المُوظّف يرسل الرسائل؛ TWIN لا يتواصل مع المرشحين ببريد بارد.",
+      "لا تواصل صادر تلقائي — المُوظّف يرسل الرسائل؛ TWIN لا يتواصل مع المرشحين ببريد غير مطلوب.",
   },
   executiveProductProof: {
     linkAtsReadiness: "جاهزية استيراد ATS",
@@ -174,6 +174,9 @@ const es: TalentRadarAtsDemoOverlay = {
   },
   atsImportReadiness: {
     title: "Preparación de importación ATS",
+    lead: "Espacio de mapeo y revisión de importación — piloto demo únicamente. Sin sincronización ATS en vivo, sin credenciales, sin escritura en el ATS.",
+    boundaryBody:
+      "TWIN muestra el mapeo de preparación de importación ATS para revisión del reclutador. Solo preparación de importación — sin sincronización ATS en vivo, sin escritura en el ATS, sin contacto saliente automático. Revisión manual y de privacidad requerida antes de cualquier importación futura.",
     noLiveSyncBadge: "SIN SINCRONIZACIÓN ATS EN VIVO",
     noWritebackBadge: "SIN ESCRITURA EN ATS",
   },
