@@ -64,6 +64,8 @@
     "test:trust-language-guard": "npx --yes tsx scripts/trust-language-guard.test.ts",
     "test:i18n-coverage": "npx --yes tsx scripts/i18n-coverage.test.ts",
     "test:i18n-native-copy-quality": "npx --yes tsx scripts/i18n-native-copy-quality.test.ts",
+    "test:i18n-native-copy-quality-browser": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'&&process.env.PLAYWRIGHT_ENABLE_BROWSER_TESTS!=='1'){console.error('Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 (local) or PLAYWRIGHT_ALLOW_PROD_SMOKE=1 (prod).');process.exit(1)}\" && npm run test:i18n-native-copy-quality-browser:raw",
+    "test:i18n-native-copy-quality-browser:raw": "playwright test e2e/i18n-native-copy-quality-browser.spec.ts --workers=1",
     "test:i18n-premium-product": "npx --yes tsx scripts/i18n-premium-product.test.ts",
     "test:i18n-global-chrome-guard": "npx --yes tsx scripts/i18n-global-chrome-guard.test.ts",
     "test:i18n-rendered-homepage-guard": "npx --yes tsx scripts/i18n-rendered-homepage-guard.test.ts",

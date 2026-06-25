@@ -26,6 +26,7 @@ import { RECRUITER_MESSAGE_DRAFTS_OVERLAYS } from "./overlays/premium/recruiter-
 import { PERSONA_HUB_RECRUITER_OVERLAYS } from "./overlays/premium/persona-hub-recruiter-overlays";
 import { TALENT_RADAR_ATS_DEMO_OVERLAYS } from "./overlays/premium/talent-radar-ats-demo-overlays";
 import { PROFILE_PIPELINE_TRUST_OVERLAYS } from "./overlays/premium/profile-pipeline-trust-overlays";
+import { OFFER_READINESS_PLACEMENT_CALENDAR_OVERLAYS } from "./overlays/premium/offer-readiness-placement-calendar-overlays";
 import { FAQ_MESSAGES_EN, FAQ_MESSAGES_PL } from "./faq-messages";
 import {
   EMPLOYER_MEDIA_MESSAGES_EN,
@@ -14788,6 +14789,7 @@ function localeFromOverlays(
   const personaHubRecruiterOverlay = PERSONA_HUB_RECRUITER_OVERLAYS[locale] ?? {};
   const talentRadarAtsDemoOverlay = TALENT_RADAR_ATS_DEMO_OVERLAYS[locale] ?? {};
   const profilePipelineTrustOverlay = PROFILE_PIPELINE_TRUST_OVERLAYS[locale] ?? {};
+  const offerPlacementCalendarOverlay = OFFER_READINESS_PLACEMENT_CALENDAR_OVERLAYS[locale] ?? {};
   const investorRoomOverlay = INVESTOR_ROOM_OVERLAYS[locale] ?? {};
   const investorDataRoomOverlay = INVESTOR_DATA_ROOM_OVERLAYS[locale as keyof typeof INVESTOR_DATA_ROOM_OVERLAYS] ?? {};
   return messagesFromEnOverlay(
@@ -14803,7 +14805,10 @@ function localeFromOverlays(
         personaHubRecruiterOverlay,
         mergeDeep(
           talentRadarAtsDemoOverlay,
-          mergeDeep(profilePipelineTrustOverlay, mergeDeep(investorRoomOverlay, investorDataRoomOverlay)),
+          mergeDeep(
+            mergeDeep(profilePipelineTrustOverlay, offerPlacementCalendarOverlay),
+            mergeDeep(investorRoomOverlay, investorDataRoomOverlay),
+          ),
         ),
       ),
     ),

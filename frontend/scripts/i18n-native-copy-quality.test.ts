@@ -358,3 +358,221 @@ test("es it fr de zh ar profile pipeline trust overlays are not English page tit
     assert.doesNotMatch(identity.pageTitle, /^Candidate identity verification$/);
   }
 });
+
+const OFFER_PLACEMENT_CALENDAR_DOMAINS = [
+  "candidateOfferReadiness",
+  "offerReadinessEvidence",
+  "placementVerificationEvidence",
+  "microsoftCalendarReadiness",
+  "microsoftBusyRead",
+  "calendarReadinessEvidence",
+] as const;
+
+const PREMIUM_READ_ONLY_BOUNDARY_PATHS = [
+  "candidateExportPreview.boundaryBody",
+  "recruiterTrustReviewQueue.boundaryBody",
+  "candidateOfferReadiness.boundaryNote",
+  "placementVerificationEvidence.boundaryNote",
+  "microsoftBusyRead.noInviteSent",
+  "microsoftBusyRead.noCalendarSync",
+] as const;
+
+const PREMIUM_HUMAN_DECISION_BOUNDARY_PATHS = [
+  "candidateProfile360.boundaryBody",
+  "jobPipeline.boundaryBody",
+  "candidateTrustCenter.boundaryBody",
+  "atsImportReadiness.boundaryBody",
+] as const;
+
+/** Overlay keys we translate — scan only these for English leakage. */
+const PREMIUM_TRANSLATED_PATHS = [
+  "candidateOfferReadiness.pageTitle",
+  "candidateOfferReadiness.summaryLead",
+  "candidateOfferReadiness.boundaryNote",
+  "offerReadinessEvidence.panelTitle",
+  "offerReadinessEvidence.boundaryNote",
+  "placementVerificationEvidence.panelTitle",
+  "placementVerificationEvidence.boundaryNote",
+  "microsoftBusyRead.slotPreviewTitle",
+  "microsoftBusyRead.noInviteSent",
+  "microsoftBusyRead.noCalendarSync",
+  "calendarReadinessEvidence.panelTitle",
+  "calendarReadinessEvidence.boundaryNote",
+  "companyTalentPool.title",
+  "recruiterTrustReviewQueue.pageTitle",
+  "recruiterTrustReviewQueue.boundaryBody",
+  "recruiterDailyCockpit.pageEyebrow",
+  "recruiterTalentRadar.title",
+  "atsImportReadiness.title",
+  "atsImportReadiness.boundaryBody",
+  "candidateProfile360.pageEyebrow",
+  "candidateProfile360.boundaryBody",
+  "jobPipeline.pageEyebrow",
+  "jobPipeline.boundaryBody",
+  "candidateTrustCenter.pageTitle",
+  "candidateTrustCenter.boundaryBody",
+  "candidateExportPreview.boundaryBody",
+  "candidateIdentityVerification.boundaryBody",
+] as const;
+
+/** English fragments that should not appear in non-EN premium overlay blobs. */
+const UNTRANSLATED_ENGLISH_FRAGMENTS: RegExp[] = [
+  /\bautomatic outreach is live\b/i,
+  /\bcold email\b/i,
+  /\bcold-mail\b/i,
+  /\bATS writeback\b/i,
+  /\blive sync\b/i,
+  /\bwriteback\b/i,
+  /\boutbound\b/i,
+  /\bshortlist\b/i,
+  /\bSnooze\b/,
+  /\bHuman review required\b/,
+];
+
+const ALLOWED_ENGLISH_TERMS =
+  /\b(TWIN|ATS|OAuth|Graph|API|Calendars\.Read|busy-read|Candidate Profile 360|Talent Radar|KYC|PII|JSON|NDA|GitHub|Stripe|Markdown|OpenAPI|GET|H5b|H5c|H5d|NO-GO|NOT LIVE|PAUSED|LIVE|Demo|demo|pilot|Pilot|placement|Placement|offer|Offer|recruiter|Recruiter|pipeline|Pipeline|cap table|founder|Founder|Microsoft|Google|ICS|WebCal|B2B|MRR|SKU|GA|CEO|CTO|FAQ|email|Email|status|Status|Persona|persona|beta|Beta|checklist|Checklist|append-only|read-only|Read-only)\b/;
+
+function stripAllowedEnglishTerms(value: string): string {
+  return value.replace(ALLOWED_ENGLISH_TERMS, "");
+}
+
+function premiumOverlayBlob(locale: Locale): string {
+  const domains = [
+    ...OFFER_PLACEMENT_CALENDAR_DOMAINS,
+    "companyTalentPool",
+    "recruiterTrustReviewQueue",
+    "recruiterDailyCockpit",
+    "recruiterTalentRadar",
+    "atsImportReadiness",
+    "candidateProfile360",
+    "jobPipeline",
+    "candidateTrustCenter",
+  ] as const;
+  return domains.map((d) => domainBlob(locale, d)).join("\n");
+}
+
+test("offer placement and calendar overlays are not English page titles for es it fr de zh ar", () => {
+  for (const locale of ["es", "it", "fr", "de", "zh", "ar"] as const) {
+    const offer = dictionaries[locale].candidateOfferReadiness;
+    assert.doesNotMatch(offer.pageTitle, /^Offer readiness center$/);
+    const placement = dictionaries[locale].placementVerificationEvidence;
+    assert.doesNotMatch(placement.panelTitle, /^Placement verification evidence$/);
+    const busy = dictionaries[locale].microsoftBusyRead;
+    assert.doesNotMatch(busy.slotPreviewTitle, /^Read-only busy availability$/);
+    const calendar = dictionaries[locale].calendarReadinessEvidence;
+    assert.doesNotMatch(calendar.panelTitle, /^Calendar readiness evidence$/);
+  }
+});
+
+test("it fr de zh ar persona hub recruiter overlays are not English page titles", () => {
+  for (const locale of ["it", "fr", "de", "zh", "ar"] as const) {
+    const pool = dictionaries[locale].companyTalentPool;
+    assert.doesNotMatch(pool.title, /^Company talent memory$/);
+    const queue = dictionaries[locale].recruiterTrustReviewQueue;
+    assert.doesNotMatch(queue.pageTitle, /^Recruiter trust review queue$/);
+    const cockpit = dictionaries[locale].recruiterDailyCockpit;
+    assert.doesNotMatch(cockpit.pageEyebrow, /^Recruiter daily operating cockpit$/);
+  }
+});
+
+function premiumTranslatedBlob(locale: Locale): string {
+  return PREMIUM_TRANSLATED_PATHS.map((path) => getString(dictionaries[locale], path) ?? "").join("\n");
+}
+
+test("premium overlay boundary copy exists for all supported locales", () => {
+  for (const locale of LOCALES) {
+    for (const path of PREMIUM_READ_ONLY_BOUNDARY_PATHS) {
+      const value = getString(dictionaries[locale], path);
+      assert.ok(value && value.trim().length > 8, `${locale} missing boundary copy at ${path}`);
+      const lower = value.toLowerCase();
+      if (path.includes("noInvite") || path.includes("noCalendar")) {
+        assert.match(
+          lower,
+          /invite|invit|zapros|einladung|邀请|دعو|同期|sync|sincron|synchron|مزامن|kalender|calendrier|calendario|日历|تقويم/,
+          `${locale} boundary should mention no-invite or no-sync at ${path}`,
+        );
+      } else {
+        assert.match(
+          lower,
+          /read-only|solo lectura|solo lettura|lecture seule|nur-les|只读|预览|للقراءة|odczyt|podgląd|anteprima|aperçu|vorschau|معاينة|preview|previa|lettura|lecture|lesen|读|demo|読み|専用|デモ/,
+          `${locale} boundary should state read-only/preview at ${path}`,
+        );
+      }
+    }
+    for (const path of PREMIUM_HUMAN_DECISION_BOUNDARY_PATHS) {
+      const value = getString(dictionaries[locale], path);
+      assert.ok(value && value.trim().length > 8, `${locale} missing boundary copy at ${path}`);
+      const lower = value.toLowerCase();
+      assert.match(
+        lower,
+        /recruiter|reclutador|rekruter|human|człowiek|ręczn|招聘|recruteur|mensch|bénéficiaire|kandydat|candidat|مرشح|موظف|候选|auto-apply|auto-candidat|automat|تلقائي|bez automat|nessuna auto|pas d'auto|kein auto|无自动|لا تقديم|manual|manuale|manuelle|人工|بشر/,
+        `${locale} boundary should state human/auto-apply limits at ${path}`,
+      );
+    }
+  }
+});
+
+test("non-English premium overlays avoid obvious untranslated English fragments", () => {
+  // ja: partial overlay slice only — full native review deferred.
+  for (const locale of ["es", "it", "fr", "de", "zh", "ar"] as const) {
+    const scrubbed = stripAllowedEnglishTerms(premiumTranslatedBlob(locale));
+    for (const pattern of UNTRANSLATED_ENGLISH_FRAGMENTS) {
+      assert.doesNotMatch(
+        scrubbed,
+        pattern,
+        `${pattern} in premium overlays (${locale})`,
+      );
+    }
+  }
+});
+
+test("long-form premium overlay domains preserve placeholder sets vs English", () => {
+  const premiumPaths = collectStringPaths({
+    candidateOfferReadiness: en.candidateOfferReadiness,
+    offerReadinessEvidence: en.offerReadinessEvidence,
+    placementVerificationEvidence: en.placementVerificationEvidence,
+    microsoftBusyRead: en.microsoftBusyRead,
+    calendarReadinessEvidence: en.calendarReadinessEvidence,
+    companyTalentPool: en.companyTalentPool,
+    recruiterTrustReviewQueue: en.recruiterTrustReviewQueue,
+    candidateProfile360: en.candidateProfile360,
+    jobPipeline: en.jobPipeline,
+    candidateTrustCenter: en.candidateTrustCenter,
+  });
+  for (const locale of ["es", "it", "fr", "de", "zh", "ar", "ja"] as const) {
+    const mismatches: string[] = [];
+    for (const path of premiumPaths) {
+      const enValue = getString(en, path);
+      const localeValue = getString(dictionaries[locale], path);
+      if (!enValue || !localeValue) continue;
+      const enPh = [...enValue.matchAll(/\{[^}]+\}/g)].map((m) => m[0]).sort().join(",");
+      const locPh = [...localeValue.matchAll(/\{[^}]+\}/g)].map((m) => m[0]).sort().join(",");
+      if (enPh !== locPh) mismatches.push(path);
+    }
+    assert.equal(
+      mismatches.length,
+      0,
+      `${locale} premium placeholder mismatch: ${mismatches.slice(0, 6).join(", ")}`,
+    );
+  }
+});
+
+test("long-form overlay domains avoid forbidden claims across all locales", () => {
+  const domains = [
+    ...OFFER_PLACEMENT_CALENDAR_DOMAINS,
+    "companyTalentPool",
+    "recruiterTalentRadar",
+    "candidateProfile360",
+    "candidateTrustCenter",
+  ] as const;
+  for (const locale of LOCALES) {
+    const blob = domains.map((d) => domainBlob(locale, d)).join("\n");
+    for (const pattern of FORBIDDEN_POSITIVE_CLAIM_PATTERNS) {
+      assert.equal(
+        hasPositiveForbiddenClaim(blob, pattern),
+        false,
+        `${pattern} (positive) in long-form overlays (${locale})`,
+      );
+    }
+  }
+});
