@@ -24,6 +24,7 @@ import {
 import { INVESTOR_DATA_ROOM_OVERLAYS } from "./overlays/premium/investor-data-room-overlays";
 import { RECRUITER_MESSAGE_DRAFTS_OVERLAYS } from "./overlays/premium/recruiter-message-drafts-overlays";
 import { PERSONA_HUB_RECRUITER_OVERLAYS } from "./overlays/premium/persona-hub-recruiter-overlays";
+import { TALENT_RADAR_ATS_DEMO_OVERLAYS } from "./overlays/premium/talent-radar-ats-demo-overlays";
 import { FAQ_MESSAGES_EN, FAQ_MESSAGES_PL } from "./faq-messages";
 import {
   EMPLOYER_MEDIA_MESSAGES_EN,
@@ -9436,7 +9437,7 @@ const pl: MessageTree = {
   },
   executiveProductProof: {
     pageEyebrow: "Executive product proof",
-    title: "Board demo pack — rzeczywistość system-of-record",
+    title: "Pakiet demo dla zarządu — rzeczywistość system-of-record",
     lead: "Uczciwa mapa tego, co wychodzi w safe-lane: dojrzałość modułów, granice i linki do demo — bez teatru launchowego.",
     publicNote: "Publiczny widok inwestora — ten sam uczciwy status co workspace; bez fałszywej trakcji.",
     workspaceNote: "Workspace inwestora — linki otwierają trasy pilota demo.",
@@ -9483,15 +9484,15 @@ const pl: MessageTree = {
     humanPoint3: "Decision memory to kontekst audytu, nie automatyczny werdykt.",
     boundaryTitle: "Co nie jest live",
     boundaryLead: "Jawne granice produktu — bez narracji przypadkowej aktywacji.",
-    boundaryNoOutreach: "Brak automatycznego outreachu — szkice wymagają review człowieka.",
+    boundaryNoOutreach: "Brak automatycznego kontaktu wychodzącego — szkice wymagają ręcznej weryfikacji.",
     boundaryNoAutoApply: "Brak aktywnego auto-apply — nocne aplikacje wstrzymane.",
-    boundaryNoAtsSync: "Brak dwukierunkowego sync ATS — tylko podgląd import readiness.",
+    boundaryNoAtsSync: "Brak dwukierunkowej synchronizacji ATS — tylko podgląd gotowości importu.",
     boundaryDraftOnly: "Warstwa komunikacji to tylko szkice w pilocie.",
     riskTitle: "Rejestr ryzyk",
     riskLead: "Otwarte ryzyka z mitigacją — zgodne z launch NO-GO.",
     milestonesTitle: "Kolejne kamienie milowe",
     milestonesLead: "Uporządkowane bramki dostaw — nie prognozy przychodu.",
-    demoJourneyTitle: "Executive product proof (board demo)",
+    demoJourneyTitle: "Dowód produktu dla zarządu (demo)",
     demoJourneyDesc: "Mapa SOR, macierz dojrzałości, historia safe-lane i linki demo.",
     openProductProofCta: "Otwórz product proof",
   },
@@ -10797,14 +10798,14 @@ const pl: MessageTree = {
     subtitleAgent:
       "Zacznij od kandydatów, których TWIN już zna — zanim rozpoczniesz sourcing od zera.",
     lead:
-      "Ponownie pokaż znanych kandydatów z workspace z wyjaśnialnymi sygnałami, kontekstem czasu i krokami tylko po ludzkiej ocenie. To nie jest ogólne wyszukiwanie. To nie jest automatyczny outreach.",
+      "Ponownie pokaż znanych kandydatów z workspace z wyjaśnialnymi sygnałami, kontekstem czasu i krokami tylko po ręcznej weryfikacji. To nie jest ogólne wyszukiwanie. To nie jest automatyczny kontakt wychodzący.",
     scopeTitle: "Najpierw dane wewnętrzne",
     scopeBody:
-      "Sugestie pochodzą z aplikacji, historii skrzynki, scorecardów i kart oceny dla jednego slug firmy. Bez zewnętrznego sourcingu, bez scrapingu zewnętrznych profili, bez auto-kontaktu.",
+      "Sugestie pochodzą z aplikacji, historii skrzynki, scorecardów i kart oceny dla jednego slug firmy. Bez zewnętrznego sourcingu, bez scrapingu zewnętrznych profili, bez automatycznego kontaktu.",
     demoLabel: "Demo / pilot pool — dane seed Nova Hiring PL",
     chipPilot: "Pilot",
-    chipHumanReview: "Wymagana ocena człowieka",
-    chipNoAutoOutreach: "Bez automatycznego outreachu",
+    chipHumanReview: "Wymagana ręczna weryfikacja",
+    chipNoAutoOutreach: "Bez automatycznego kontaktu wychodzącego",
     chipInternalData: "Najpierw dane wewnętrzne",
     filterRole: "Kontekst roli / ogłoszenia",
     filterAllRoles: "Wszystkie role w workspace",
@@ -10867,7 +10868,7 @@ const pl: MessageTree = {
     draftWhyReachingOut: "Dlaczego kontakt",
     draftRoleFallback: "Twoja otwarta rola",
     draftRecruiterReviewNote:
-      "Rekruter musi przejrzeć i spersonalizować przed wysłaniem. Bez automatycznego outreachu.",
+      "Rekruter musi przejrzeć i spersonalizować przed wysłaniem. Bez automatycznego kontaktu wychodzącego.",
     emptyTitle: "Radar nie znalazł jeszcze wystarczająco mocnych sygnałów dla tej roli",
     emptyBody:
       "Doprecyzuj wymagania roli, dodaj must-have skills lub uzupełnij dane kandydatów w skrzynce i wyszukiwarce.",
@@ -10889,7 +10890,7 @@ const pl: MessageTree = {
     summaryStrong: "Mocne dopasowania",
     summaryVerification: "Do weryfikacji",
     summaryLowConfidence: "Niska pewność",
-    summaryNoAutoOutreach: "Bez automatycznego outreachu — rekruter decyduje o każdym kontakcie.",
+    summaryNoAutoOutreach: "Bez automatycznego kontaktu wychodzącego — rekruter decyduje o każdym kontakcie.",
     filterToolbarTitle: "Doprecyzuj radar",
     filterToolbarHelper:
       "Zawęź po roli, segmencie, czasie lub sygnale. Filtry wpływają na to, kogo radar pokazuje — nie na auto-akcje.",
@@ -10903,7 +10904,7 @@ const pl: MessageTree = {
     groupLowConfidence: "Niska pewność",
     groupReviewFirstHint: "Mocne dopasowanie (80+) z wystarczającymi dowodami — zacznij przegląd tutaj.",
     groupPossibleMatchHint: "Umiarkowane dopasowanie (40–79) — warto sprawdzić przed sourcingiem zewnętrznym.",
-    groupNeedsVerificationHint: "Wymagana zgoda lub sprawdzenie danych przed kontaktem.",
+    groupNeedsVerificationHint: "Wymagana zgoda lub sprawdzenie danych przed kontaktem wychodzącym.",
     groupLowConfidenceHint: "Cienkie dowody lub nieaktualne dane — zweryfikuj przed działaniem.",
     decisionFilterTitle: "Widok decyzji",
     decisionFilter_active: "Aktywni",
@@ -10915,7 +10916,7 @@ const pl: MessageTree = {
     badgeDismissed: "Nietrafiony",
     badgeDraftPrepared: "Szkic przygotowany — nie wysłano",
     snoozeModalTitle: "Odłóż kandydata",
-    snoozeModalBody: "Ukryj z aktywnego radaru na wybrany okres. Bez automatycznego outreachu.",
+    snoozeModalBody: "Ukryj z aktywnego radaru na wybrany okres. Bez automatycznego kontaktu wychodzącego.",
     dismissModalTitle: "Oznacz jako nietrafiony",
     dismissModalBody: "Wybierz kategorię powodu. Bez notatek tekstowych — bezpieczne dla audytu.",
     modalCancel: "Anuluj",
@@ -10945,11 +10946,11 @@ const pl: MessageTree = {
     eyebrow: "Operacyjne podsumowanie",
     title: "Tygodniowy digest Radaru Talentów",
     subtitle:
-      "Najważniejsze kandydatury, decyzje i follow-upy z wybranego okresu — bez automatycznego outreachu.",
+      "Najważniejsze kandydatury, decyzje i follow-upy z wybranego okresu — bez automatycznego kontaktu wychodzącego.",
     trustTitle: "Digest tylko do przeglądu",
     trustBody:
       "Ten digest podsumowuje aktywność Radaru Talentów do Twojego przeglądu. TWIN nie wysyła e-maili ani nie kontaktuje kandydatów automatycznie.",
-    trustNoOutreach: "Bez automatycznego outreachu — rekruter decyduje o każdym kontakcie.",
+    trustNoOutreach: "Bez automatycznego kontaktu wychodzącego — rekruter decyduje o każdym kontakcie.",
     recruiterDecides: "Rekruter decyduje",
     digestNotSent: "Digest służy tylko do przeglądu — żadna wiadomość nie została wysłana.",
     draftNotSent: "Szkic przygotowany — nie wysłano",
@@ -11003,7 +11004,7 @@ const pl: MessageTree = {
     moreInRadar: "+{count} więcej w Radarze",
     nextAction: "Następny krok",
     actionOpenReviewCard: "Otwórz kartę oceny",
-    actionPrepareDraft: "Przygotuj szkic outreachu",
+    actionPrepareDraft: "Przygotuj szkic kontaktu wychodzącego",
     actionReviewDraft: "Przejrzyj szkic — nie wysłano",
     actionRefineRole: "Doprecyzuj kryteria roli",
     actionReviewDismiss: "Przejrzyj wzorce odrzuceń",
@@ -11749,7 +11750,7 @@ const pl: MessageTree = {
     pageEyebrow: "Demo prowadzone przez founderów",
     pageTitle: "TWIN — founder-led walkthrough produktu",
     pageLead:
-      "Kontrolowany przewodnik łączący pamięć talentu firmy, kokpit rekrutera i warstwę zaufania kandydata — na live powierzchniach produktu, uczciwych badge’ach statusu i bramkach decyzji człowieka. Bez auto-apply, bez auto-outreach.",
+      "Kontrolowany przewodnik łączący pamięć talentu firmy, kokpit rekrutera i warstwę zaufania kandydata — na live powierzchniach produktu, uczciwych badge’ach statusu i bramkach decyzji człowieka. Bez auto-apply, bez automatycznego kontaktu wychodzącego.",
     heroCtaCompany: "Start demo firmy",
     heroCtaRecruiter: "Otwórz kokpit rekrutera",
     heroCtaCandidate: "Otwórz widok kandydata",
@@ -11758,15 +11759,15 @@ const pl: MessageTree = {
       "Od pamięci talentu organizacji przez import, radar, review i digest — z jawnymi granicami decyzji człowieka na końcu.",
     journeyCompanyMemoryTitle: "Pamięć talentu firmy",
     journeyCompanyMemoryDesc: "Publiczny entry dla pracodawców — role, readiness i kierunek talent intelligence.",
-    journeyTalentPoolImportTitle: "Import Talent Pool",
+    journeyTalentPoolImportTitle: "Import pamięci talentów",
     journeyTalentPoolImportDesc: "Rekruter importuje sygnały talentu organizacji do wspólnej puli (pilot).",
-    journeyTalentRadarTitle: "Talent Radar",
-    journeyTalentRadarDesc: "Rankingowany pipeline ze snooze, dismiss, draft i pamięcią decyzji pod audyt.",
+    journeyTalentRadarTitle: "Radar talentów",
+    journeyTalentRadarDesc: "Rankingowany pipeline z odłożeniem, odrzuceniem, szkicami i pamięcią decyzji pod audyt.",
     journeyCandidateProfileTitle: "Profil kandydata",
     journeyCandidateProfileDesc: "Warstwa zaufania kandydata — profil, CV, dopasowania i transparentność RODO-first.",
     journeyDecisionMemoryTitle: "Pamięć decyzji",
     journeyDecisionMemoryDesc: "Karta review w inbox, shortlist i accept / decline po stronie rekrutera.",
-    journeyWeeklyDigestTitle: "Tygodniowy digest Talent Radar",
+    journeyWeeklyDigestTitle: "Tygodniowe podsumowanie Radaru talentów",
     journeyWeeklyDigestDesc: "Podsumowanie ruchu w radarze — rekruter decyduje, co robić dalej.",
     journeyHumanDecisionTitle: "Bezpieczne decyzje człowieka",
     journeyHumanDecisionDesc: "Granice na zakończenie — TWIN przygotowuje sygnał; decydują rekruterzy i kandydaci.",
@@ -11774,7 +11775,7 @@ const pl: MessageTree = {
     roleCandidateTitle: "Kandydat",
     roleCandidateDesc: "Panel, oferty, dopasowania, profil — kalendarz momentów warte przyjścia.",
     roleRecruiterTitle: "Rekruter",
-    roleRecruiterDesc: "Inbox, Talent Pool, Talent Radar, pipeline — kokpit operacyjny.",
+    roleRecruiterDesc: "Inbox, pamięć talentów, Radar talentów, pipeline — kokpit operacyjny.",
     roleCompanyTitle: "Firma",
     roleCompanyDesc: "Dashboard, talent pool, role — pamięć talentu organizacji.",
     roleInvestorTitle: "Inwestor / board",
@@ -11783,12 +11784,13 @@ const pl: MessageTree = {
     boundariesLead:
       "TWIN to kierunek system-of-record — nie autopilot aplikujący ani wysyłający wiadomości w Twoim imieniu.",
     boundaryNoAutoApply: "Brak automatycznych aplikacji — auto-apply pozostaje wstrzymane na produkcji.",
-    boundaryNoOutreach: "Brak automatycznego outreach — wiadomości wysyła rekruter; TWIN nie cold-mailuje kandydatów.",
+    boundaryNoOutreach:
+      "Brak automatycznego kontaktu wychodzącego — wiadomości wysyła rekruter; TWIN nie wysyła cold-maili do kandydatów.",
     boundaryNoHiddenScraping: "Brak ukrytego scrapingu — adaptery i zgoda są widoczne; demo ma uczciwe statusy.",
     boundaryHumanDecides: "Decyduje rekruter — accept, decline, snooze i draft zostają po stronie rekrutera.",
     boundaryConsentTrust: "Zgoda i zaufanie w centrum — dane kandydata są gated i wyjaśnialne.",
     closingStatement:
-      "TWIN to nie auto-apply. TWIN to nie auto-outreach. Decyduje rekruter. Kandydat widzi sloty warte przyjścia.",
+      "TWIN to nie auto-apply. TWIN to nie automatyczny kontakt wychodzący. Decyduje rekruter. Kandydat widzi sloty warte przyjścia.",
     interactiveSectionTitle: "Symulacja interaktywna (opcjonalnie)",
     interactiveSectionLead:
       "Ośmiokrokowy walkthrough syntetyczny poniżej — tylko dane przykładowe, oddzielnie od live powierzchni powyżej.",
@@ -14328,15 +14330,15 @@ const pl: MessageTree = {
   atsImportReadiness: {
     pageEyebrow: "Gotowość importu ATS",
     pilotBadge: "PILOT · GOTOWOŚĆ IMPORTU · NIE NA ŻYWO",
-    noLiveSyncBadge: "BRAK LIVE SYNC ATS",
-    noWritebackBadge: "BRAK WRITEBACK ATS",
+    noLiveSyncBadge: "BRAK BIEŻĄCEJ SYNCHRONIZACJI ATS",
+    noWritebackBadge: "BRAK ZAPISU ZWROTNEGO DO ATS",
     title: "Gotowość importu ATS",
-    lead: "Workspace mapowania i przeglądu importu — pilot demo-only. Bez live sync ATS, bez credentiali, bez writeback, bez jobów w tle.",
+    lead: "Workspace mapowania i przeglądu importu — pilot demo-only. Bez bieżącej synchronizacji ATS, bez credentiali, bez zapisu zwrotnego do ATS, bez jobów w tle.",
     humanReviewRequired: "Wymagana ręczna weryfikacja — tylko gotowość importu, nie na żywo.",
     privacyReviewRequired: "Wymagany przegląd prywatności — mapowanie zgody to tylko podgląd.",
     openImportReadiness: "Otwórz gotowość importu ATS",
-    openTalentPool: "Otwórz talent pool",
-    openTalentPoolImport: "Otwórz import talent pool",
+    openTalentPool: "Otwórz pamięć talentów",
+    openTalentPoolImport: "Otwórz import pamięci talentów",
     openProfile360: "Otwórz Profile 360",
     openTrust: "Otwórz zaufanie",
     openPipeline: "Otwórz pipeline",
@@ -14368,14 +14370,14 @@ const pl: MessageTree = {
     checkDedupeReviewed: "Reguły deduplikacji przejrzane",
     checkConsentMappingReviewed: "Mapowanie zgody przejrzane",
     checkPiiMinimized: "PII zminimalizowane w podglądzie",
-    checkNoWritebackConfirmed: "Brak writeback ATS potwierdzony",
-    checkHumanReviewOwner: "Właściciel przeglądu człowieka przypisany",
+    checkNoWritebackConfirmed: "Brak zapisu zwrotnego do ATS potwierdzony",
+    checkHumanReviewOwner: "Właściciel ręcznej weryfikacji przypisany",
     checkPilotScopeAcknowledged: "Zakres pilota potwierdzony (demo-only)",
     checklistPendingReview: "Oczekuje przeglądu",
     checklistMapped: "Zmapowane",
     checklistBlocked: "Zablokowane",
     riskFlagsTitle: "Flagi ryzyka importu",
-    riskFlagsLead: "Flagi do przeglądu gotowości importu — bez automatycznego outreachu.",
+    riskFlagsLead: "Flagi do przeglądu gotowości importu — bez automatycznego kontaktu wychodzącego.",
     riskInfo: "Info",
     riskWarning: "Ostrzeżenie",
     riskReview: "Przegląd",
@@ -14387,20 +14389,20 @@ const pl: MessageTree = {
     sampleSourceLabel: "Źródło importu",
     sampleConsentLabel: "Status zgody",
     auditTitle: "Ślad audytowy importu",
-    auditLead: "Zdarzenia mapowania, deduplikacji, zgody i walidacji — bez live sync, bez writeback.",
-    auditNoSync: "Brak live sync ATS — ślad audytowy tylko w kontekście produktu.",
+    auditLead: "Zdarzenia mapowania, deduplikacji, zgody i walidacji — bez bieżącej synchronizacji, bez zapisu zwrotnego do ATS.",
+    auditNoSync: "Brak bieżącej synchronizacji ATS — ślad audytowy tylko w kontekście produktu.",
     auditMappingPreviewed: "Mapowanie podglądnięte",
     auditDedupeReviewed: "Deduplikacja przejrzana",
     auditConsentMapped: "Zgoda zmapowana",
     auditValidationOpened: "Walidacja otwarta",
-    auditHumanReviewNoted: "Przegląd człowieka odnotowany",
-    boundaryTitle: "Granica przeglądu człowieka",
+    auditHumanReviewNoted: "Ręczna weryfikacja odnotowana",
+    boundaryTitle: "Granica ręcznej weryfikacji",
     boundaryBody:
-      "TWIN pokazuje mapowanie gotowości importu ATS do przeglądu rekrutera. Tylko gotowość importu — bez live sync ATS, bez writeback ATS, bez zapisanych credentiali, bez automatycznego outreachu. Wymagana ręczna weryfikacja i przegląd prywatności przed ewentualnym live importem.",
+      "TWIN pokazuje mapowanie gotowości importu ATS do przeglądu rekrutera. Tylko gotowość importu — bez bieżącej synchronizacji ATS, bez zapisu zwrotnego do ATS, bez zapisanych credentiali, bez automatycznego kontaktu wychodzącego. Wymagana ręczna weryfikacja i przegląd prywatności przed ewentualnym importem na żywo.",
     companyEyebrow: "Integracje firmy",
     companyTitle: "Gotowość importu ATS (firma)",
     companyLead: "Podgląd gotowości importu po stronie pracodawcy — tylko mapowanie i przegląd, nie na żywo.",
-    companyScopeNote: "Widok firmy współdzieli tę samą macierz demo — bez live sync i writeback.",
+    companyScopeNote: "Widok firmy współdzieli tę samą macierz demo — bez bieżącej synchronizacji i zapisu zwrotnego do ATS.",
     notFoundTitle: "Trasa importu ATS niedostępna",
     notFoundMessage:
       "Ta ścieżka nie jest w zestawie tras pilota. Użyj import-readiness, mapping lub deduplication (tylko rekruter).",
@@ -14783,6 +14785,7 @@ function localeFromOverlays(
   const faqOverlay = FAQ_LOCALE_OVERLAYS[locale] ?? {};
   const messageDraftsOverlay = RECRUITER_MESSAGE_DRAFTS_OVERLAYS[locale] ?? {};
   const personaHubRecruiterOverlay = PERSONA_HUB_RECRUITER_OVERLAYS[locale] ?? {};
+  const talentRadarAtsDemoOverlay = TALENT_RADAR_ATS_DEMO_OVERLAYS[locale] ?? {};
   const investorRoomOverlay = INVESTOR_ROOM_OVERLAYS[locale] ?? {};
   const investorDataRoomOverlay = INVESTOR_DATA_ROOM_OVERLAYS[locale as keyof typeof INVESTOR_DATA_ROOM_OVERLAYS] ?? {};
   return messagesFromEnOverlay(
@@ -14794,7 +14797,10 @@ function localeFromOverlays(
         ),
         messageDraftsOverlay,
       ),
-      mergeDeep(personaHubRecruiterOverlay, mergeDeep(investorRoomOverlay, investorDataRoomOverlay)),
+      mergeDeep(
+        personaHubRecruiterOverlay,
+        mergeDeep(talentRadarAtsDemoOverlay, mergeDeep(investorRoomOverlay, investorDataRoomOverlay)),
+      ),
     ),
   );
 }

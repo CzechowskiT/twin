@@ -65,6 +65,14 @@ function recruiterCockpitTrustCopy(locale: typeof en): string {
   return [c.humanBoundaryBody, c.atsImportLead, q.boundaryBody, w.boundaryBody].join("\n");
 }
 
+function talentRadarAtsDemoTrustCopy(locale: typeof en): string {
+  const r = locale.recruiterTalentRadar;
+  const d = locale.recruiterTalentRadarDigest;
+  const a = locale.atsImportReadiness;
+  const f = locale.founderLedDemo;
+  return [r.disclaimer, r.trustFooter, d.trustBody, a.boundaryBody, f.boundaryNoOutreach].join("\n");
+}
+
 function homeTrustCopy(locale: typeof en): string {
   const h = locale.home;
   return [h.feature6Title, h.feature6Line, h.focusFootnote, h.focusChipAuto, h.vacationScene4Body].join("\n");
@@ -116,6 +124,13 @@ test("dashboard and recruiter trust copy state automation pause and human decisi
     assert.doesNotMatch(cockpit, /ai decides|ai hires/);
     for (const pattern of [/\bguaranteed interview\b/i, /\bautomatic scheduling\b/i]) {
       assert.doesNotMatch(cockpit, pattern, `${pattern} in recruiter cockpit trust copy (${locale})`);
+    }
+
+    const talentRadar = talentRadarAtsDemoTrustCopy(locale).toLowerCase();
+    assert.match(talentRadar, /recruiter|rekruter|human|człowiek|ręczn|招聘|recruteur|recruiter/);
+    assert.doesNotMatch(talentRadar, /ai decides|ai hires|automatic outreach is live/);
+    for (const pattern of [/\bguaranteed interview\b/i, /\bautomatic scheduling\b/i]) {
+      assert.doesNotMatch(talentRadar, pattern, `${pattern} in talent radar ATS demo trust copy (${locale})`);
     }
   }
 });

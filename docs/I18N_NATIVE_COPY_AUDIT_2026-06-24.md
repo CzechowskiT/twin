@@ -1,7 +1,8 @@
 # Native product copy audit — 2026-06-24
 
 **Branch (batch 1):** `fix/i18n-native-product-copy-2026-06-24` → merged PR #284 (`e9d01fa`)  
-**Branch (batch 2):** `fix/i18n-persona-hub-recruiter-native-copy-2026-06-24`  
+**Branch (batch 2):** `fix/i18n-persona-hub-recruiter-native-copy-2026-06-24` → merged PR #285 (`68bae7f`)  
+**Branch (batch 3):** `fix/i18n-talent-radar-ats-demo-native-copy-2026-06-24`  
 **Owner:** TWIN Native-Language Product Copy & i18n Quality  
 **Mode:** COPY/I18N ONLY — no logic, routes, API, auth, shell, gates, Phase 3B
 
@@ -31,6 +32,7 @@
 | `frontend/src/lib/overlays/*.ts` | es–ja base overlays |
 | `frontend/src/lib/overlays/premium/**` | Premium product overlays |
 | `frontend/src/lib/overlays/premium/persona-hub-recruiter-overlays.ts` | **Batch 2** es/ja persona hub + recruiter cockpit placeholders |
+| `frontend/src/lib/overlays/premium/talent-radar-ats-demo-overlays.ts` | **Batch 3** it/fr/de/zh/ar/es/ja talent radar, ATS import, demo journey, board proof |
 | `frontend/scripts/i18n-native-copy-quality.test.ts` | Native copy guard |
 | `frontend/scripts/trust-language-guard.test.ts` | Extended forbidden claims |
 | `frontend/scripts/i18n-coverage.test.ts` | Extended placeholder parity |
@@ -69,6 +71,13 @@
 - Recruiter daily operating cockpit
 - Premium overlays es/ja placeholders for above domains
 
+### Batch 3 (talent radar + ATS import + demo)
+- Recruiter Talent Radar + weekly digest
+- ATS import readiness workspace
+- Founder-led demo journey
+- Executive / board product proof links and boundaries
+- Premium overlays it/fr/de/zh/ar (+ es/ja badges) for above domains
+
 ## Changes made
 
 ### Batch 1 — Polish (heavy)
@@ -85,6 +94,16 @@
 ### Batch 2 — es / ja (targeted placeholders)
 
 - New `persona-hub-recruiter-overlays.ts` with page titles, leads, boundary copy for talent memory, trust review queue, work queue, daily cockpit.
+
+### Batch 3 — Polish (talent radar / ATS / demo)
+
+- Rewrote PL in `recruiterTalentRadar`, `recruiterTalentRadarDigest`, `atsImportReadiness`, `founderLedDemo`, `executiveProductProof`.
+- Replaced loanwords: `outreach` → `kontakt wychodzący`, `live sync` → `bieżąca synchronizacja`, `writeback` → `zapis zwrotny do ATS`, `przegląd człowieka` → `ręczna weryfikacja`, `board` → `zarząd` where user-facing.
+- Normalized labels: `Talent Pool` → `pamięć talentów`, `Talent Radar` → `Radar talentów` in demo journey.
+
+### Batch 3 — it / fr / de / zh / ar (targeted placeholders)
+
+- New `talent-radar-ats-demo-overlays.ts` with titles, disclaimers, ATS import boundaries, demo journey steps, executive proof links.
 
 ### English (light)
 
@@ -106,9 +125,9 @@
 
 | Script | Change |
 | ------ | ------ |
-| `npm run test:i18n-native-copy-quality` | + persona/recruiter domains in critical guard; + PL loanword test; + es/ja overlay smoke |
+| `npm run test:i18n-native-copy-quality` | + persona/recruiter domains in critical guard; + PL loanword test; + es/ja overlay smoke; **batch 3:** + talent radar/ATS/demo PL loanword guard; + it/fr/de/zh/ar overlay smoke |
 | `npm run test:i18n-coverage` | (unchanged from batch 1) placeholder parity vs EN |
-| `npm run test:trust-language-guard` | + recruiter cockpit / queue boundary copy assertions |
+| `npm run test:trust-language-guard` | + recruiter cockpit / queue boundary copy assertions; **batch 3:** + talent radar / ATS / demo trust boundaries |
 
 ## Browser smoke
 
@@ -118,9 +137,9 @@ Skipped — no existing `test:i18n-native-copy-quality-browser` pattern or local
 
 | Locale | Scope | Notes |
 | ------ | ----- | ----- |
-| `es`, `it`, `fr`, `de` | Persona hub / recruiter long-form | Batch 2 placeholders es/ja only; expand to it/fr/de/zh/ar next |
-| `pl` | Talent Radar / ATS import / demo journey strings | Still contain some loanwords outside audited domains |
-| `pl` | `recruiterDailyOperatingCockpit` (legacy route) | Not in batch 2 scope |
+| `es`, `it`, `fr`, `de` | Persona hub / recruiter long-form | Batch 2 placeholders es/ja only; batch 3 adds talent radar slice for it/fr/de/zh/ar |
+| `pl` | Profile 360 / pipeline / trust demo strings outside batch 3 | Still contain some loanwords outside audited domains |
+| `pl` | `recruiterDailyOperatingCockpit` (legacy route) | Not in batch 2–3 scope |
 
 ## Launch stance
 
