@@ -111,6 +111,19 @@ const CRITICAL_DOMAINS = [
   "atsImportReadiness",
   "founderLedDemo",
   "executiveProductProof",
+  "candidateProfile360",
+  "jobPipeline",
+  "candidateCollaboration",
+  "candidateTrust",
+  "candidateTrustCenter",
+  "candidateControlCenter",
+  "candidateExportPreview",
+  "candidateIdentityVerification",
+  "candidateDataPortability",
+  "candidateRevokeDelete",
+  "candidateTrustAuditExport",
+  "candidateConsentReceipt",
+  "candidateTrustOverview",
 ] as const;
 
 const PERSONA_RECRUITER_PL_LOANWORDS: RegExp[] = [
@@ -130,6 +143,19 @@ const TALENT_RADAR_ATS_DEMO_PL_LOANWORDS: RegExp[] = [
   /\bauto-outreach\b/i,
   /\bLIVE SYNC\b/i,
   /\bWRITEBACK\b/i,
+];
+
+const PROFILE_PIPELINE_TRUST_PL_LOANWORDS: RegExp[] = [
+  /\boutreachu\b/i,
+  /\bwritebacku\b/i,
+  /\blive sync\b/i,
+  /\bProfile 360\b/i,
+  /\bTalent Radar\b/i,
+  /\bTalent Pool\b/i,
+  /\bscorecardy\b/i,
+  /\bverified readiness\b/i,
+  /\bsystem-of-record\b/i,
+  /\bauto-outreachu\b/i,
 ];
 
 function domainBlob(locale: Locale, domain: (typeof CRITICAL_DOMAINS)[number]): string {
@@ -290,5 +316,45 @@ test("it fr de zh ar talent radar ATS demo overlays are not English page titles"
     assert.doesNotMatch(ats.title, /^ATS Import Readiness$/);
     const demo = dictionaries[locale].founderLedDemo;
     assert.doesNotMatch(demo.journeyTalentRadarTitle, /^Talent Radar$/);
+  }
+});
+
+test("PL profile, pipeline, and trust domains avoid English loanwords", () => {
+  const domains = [
+    "candidateProfile360",
+    "jobPipeline",
+    "candidateCollaboration",
+    "candidateTrust",
+    "candidateTrustCenter",
+    "candidateControlCenter",
+    "candidateExportPreview",
+    "candidateIdentityVerification",
+    "candidateDataPortability",
+    "candidateRevokeDelete",
+    "candidateTrustAuditExport",
+    "candidateConsentReceipt",
+    "candidateTrustOverview",
+  ] as const;
+  const blob = domains.map((d) => domainBlob("pl", d)).join("\n");
+  for (const pattern of PROFILE_PIPELINE_TRUST_PL_LOANWORDS) {
+    assert.doesNotMatch(blob, pattern, `PL loanword ${pattern} in profile/pipeline/trust domains`);
+  }
+  assert.match(dictionaries.pl.candidateProfile360.pageEyebrow, /profil kandydata 360/i);
+  assert.match(dictionaries.pl.jobPipeline.pageEyebrow, /lejek rekrutacyjny/i);
+  assert.match(dictionaries.pl.candidateTrustCenter.pageTitle, /centrum zaufania/i);
+});
+
+test("es it fr de zh ar profile pipeline trust overlays are not English page titles", () => {
+  for (const locale of ["es", "it", "fr", "de", "zh", "ar"] as const) {
+    const profile = dictionaries[locale].candidateProfile360;
+    assert.doesNotMatch(profile.pageEyebrow, /^Candidate Profile 360$/);
+    const pipeline = dictionaries[locale].jobPipeline;
+    assert.doesNotMatch(pipeline.pageEyebrow, /^Job pipeline$/);
+    const trust = dictionaries[locale].candidateTrustCenter;
+    assert.doesNotMatch(trust.pageTitle, /^Candidate trust center$/);
+    const exportPreview = dictionaries[locale].candidateExportPreview;
+    assert.doesNotMatch(exportPreview.pageTitle, /^Candidate export preview$/);
+    const identity = dictionaries[locale].candidateIdentityVerification;
+    assert.doesNotMatch(identity.pageTitle, /^Candidate identity verification$/);
   }
 });

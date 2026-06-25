@@ -2,7 +2,8 @@
 
 **Branch (batch 1):** `fix/i18n-native-product-copy-2026-06-24` → merged PR #284 (`e9d01fa`)  
 **Branch (batch 2):** `fix/i18n-persona-hub-recruiter-native-copy-2026-06-24` → merged PR #285 (`68bae7f`)  
-**Branch (batch 3):** `fix/i18n-talent-radar-ats-demo-native-copy-2026-06-24`  
+**Branch (batch 3):** `fix/i18n-talent-radar-ats-demo-native-copy-2026-06-24` → merged PR #286 (`78e24ba`)  
+**Branch (batch 4):** `fix/i18n-profile-pipeline-trust-native-copy-2026-06-24`  
 **Owner:** TWIN Native-Language Product Copy & i18n Quality  
 **Mode:** COPY/I18N ONLY — no logic, routes, API, auth, shell, gates, Phase 3B
 
@@ -33,6 +34,7 @@
 | `frontend/src/lib/overlays/premium/**` | Premium product overlays |
 | `frontend/src/lib/overlays/premium/persona-hub-recruiter-overlays.ts` | **Batch 2** es/ja persona hub + recruiter cockpit placeholders |
 | `frontend/src/lib/overlays/premium/talent-radar-ats-demo-overlays.ts` | **Batch 3** it/fr/de/zh/ar/es/ja talent radar, ATS import, demo journey, board proof |
+| `frontend/src/lib/overlays/premium/profile-pipeline-trust-overlays.ts` | **Batch 4** es/it/fr/de/zh/ar profile 360, pipeline, trust center, export/identity/consent boundaries |
 | `frontend/scripts/i18n-native-copy-quality.test.ts` | Native copy guard |
 | `frontend/scripts/trust-language-guard.test.ts` | Extended forbidden claims |
 | `frontend/scripts/i18n-coverage.test.ts` | Extended placeholder parity |
@@ -78,6 +80,15 @@
 - Executive / board product proof links and boundaries
 - Premium overlays it/fr/de/zh/ar (+ es/ja badges) for above domains
 
+### Batch 4 (profile 360 + pipeline + trust)
+- Candidate Profile 360 (recruiter SOR view)
+- Job-specific pipeline + stage board
+- Collaboration scorecard / feedback copy
+- Candidate trust layer + trust center + control center
+- Export preview, identity verification, data portability, revoke/delete
+- Trust audit export, consent receipt, trust overview index
+- Premium overlays es/it/fr/de/zh/ar for page titles and trust boundaries
+
 ## Changes made
 
 ### Batch 1 — Polish (heavy)
@@ -105,6 +116,16 @@
 
 - New `talent-radar-ats-demo-overlays.ts` with titles, disclaimers, ATS import boundaries, demo journey steps, executive proof links.
 
+### Batch 4 — Polish (profile / pipeline / trust)
+
+- Rewrote PL in `candidateProfile360`, `jobPipeline`, `candidateCollaboration`, `candidateTrust`, `candidateTrustCenter`, `candidateControlCenter`, `candidateExportPreview`, `candidateIdentityVerification`, `candidateDataPortability`, `candidateRevokeDelete`, `candidateTrustAuditExport`, `candidateConsentReceipt`, `candidateTrustOverview`.
+- Replaced loanwords: `outreach` → `kontakt wychodzący`, `Profile 360` → `Profil 360`, `Talent Radar` → `Radar talentów`, `Talent Pool` → `pamięć talentów`, `scorecard` → `karta oceny`, `pipeline` (UI) → `lejek rekrutacyjny`, `verified readiness` → `gotowość zweryfikowana`, `system-of-record` → `rejestr operacyjny`.
+- Preserved safety copy: auto-apply paused, human decision, no auto-outreach, preview-only export/consent/revoke/identity.
+
+### Batch 4 — es / it / fr / de / zh / ar (targeted placeholders)
+
+- New `profile-pipeline-trust-overlays.ts` with page titles and boundary copy for profile 360, job pipeline, trust center, export preview, identity verification.
+
 ### English (light)
 
 - Batch 1: minor clarity tweak on busy-read lead.
@@ -125,9 +146,9 @@
 
 | Script | Change |
 | ------ | ------ |
-| `npm run test:i18n-native-copy-quality` | + persona/recruiter domains in critical guard; + PL loanword test; + es/ja overlay smoke; **batch 3:** + talent radar/ATS/demo PL loanword guard; + it/fr/de/zh/ar overlay smoke |
+| `npm run test:i18n-native-copy-quality` | + persona/recruiter domains in critical guard; + PL loanword test; + es/ja overlay smoke; **batch 3:** + talent radar/ATS/demo PL loanword guard; + it/fr/de/zh/ar overlay smoke; **batch 4:** + profile/pipeline/trust PL loanword guard; + es/it/fr/de/zh/ar overlay smoke |
 | `npm run test:i18n-coverage` | (unchanged from batch 1) placeholder parity vs EN |
-| `npm run test:trust-language-guard` | + recruiter cockpit / queue boundary copy assertions; **batch 3:** + talent radar / ATS / demo trust boundaries |
+| `npm run test:trust-language-guard` | + recruiter cockpit / queue boundary copy assertions; **batch 3:** + talent radar / ATS / demo trust boundaries; **batch 4:** + profile / pipeline / trust boundary assertions |
 
 ## Browser smoke
 
@@ -138,8 +159,8 @@ Skipped — no existing `test:i18n-native-copy-quality-browser` pattern or local
 | Locale | Scope | Notes |
 | ------ | ----- | ----- |
 | `es`, `it`, `fr`, `de` | Persona hub / recruiter long-form | Batch 2 placeholders es/ja only; batch 3 adds talent radar slice for it/fr/de/zh/ar |
-| `pl` | Profile 360 / pipeline / trust demo strings outside batch 3 | Still contain some loanwords outside audited domains |
-| `pl` | `recruiterDailyOperatingCockpit` (legacy route) | Not in batch 2–3 scope |
+| `pl` | Profile 360 / pipeline / trust demo strings outside batch 3 | Addressed in batch 4 |
+| `pl` | `recruiterDailyOperatingCockpit` (legacy route) | Not in batch 2–4 scope |
 
 ## Launch stance
 
