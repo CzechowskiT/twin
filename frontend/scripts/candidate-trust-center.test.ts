@@ -236,7 +236,7 @@ test("25 momentum rail EN copy is complete", () => {
 test("26 trust center PL boundary body is full readable sentence", () => {
   const boundary = dictionaries.pl.candidateTrustCenter.boundaryBody;
   assert.match(boundary, /bez auto-apply/i);
-  assert.match(boundary, /bez automatycznego outreachu/i);
+  assert.match(boundary, /bez automatycznego kontaktu wychodzącego/i);
   assert.ok(boundary.length > 120);
 });
 
