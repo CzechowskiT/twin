@@ -56,6 +56,11 @@ export const SCHEDULING_DECISION_CONTEXT_CROSS_LINKS = [
     href: "/dashboard/scheduling-proposal",
     labelKey: "schedulingProposal.pageTitle" as TranslationKey,
   },
+  {
+    id: "hiring_journey",
+    href: "/dashboard/hiring-journey",
+    labelKey: "hiringJourney.crossLinkHiringJourney" as TranslationKey,
+  },
 ] as const;
 
 export type SchedulingDecisionContextBundle = {

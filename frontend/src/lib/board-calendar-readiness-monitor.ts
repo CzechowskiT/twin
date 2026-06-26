@@ -35,6 +35,7 @@ export const BOARD_CALENDAR_READINESS_MONITOR_LINKS = [
   { id: "recruiter", href: "/recruiter/daily-cockpit", labelKey: "recruiterDailyCockpit.pageTitle" as TranslationKey },
   { id: "company", href: "/company/hiring-command-center", labelKey: "companyHiringCommandCenter.pageTitle" as TranslationKey },
   { id: "scheduling_proposal", href: "/board/scheduling-proposal", labelKey: "schedulingProposal.pageTitle" as TranslationKey },
+  { id: "hiring_journey", href: "/board/hiring-journey", labelKey: "hiringJourney.crossLinkHiringJourney" as TranslationKey },
 ] as const;
 
 export function boardCalendarReadinessMonitorHref(): string {

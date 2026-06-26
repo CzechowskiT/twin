@@ -53,6 +53,11 @@ export const PLACEMENT_VERIFICATION_EVIDENCE_CROSS_LINKS = [
     href: "/dashboard/trust/overview",
     labelKey: "candidateTrustOverview.pageTitle" as TranslationKey,
   },
+  {
+    id: "hiring_journey",
+    href: "/dashboard/hiring-journey",
+    labelKey: "hiringJourney.crossLinkHiringJourney" as TranslationKey,
+  },
 ] as const;
 
 export type PlacementVerificationEvidenceBundle = {
