@@ -6030,7 +6030,14 @@ eyebrow: "Product roadmap",
   hiringJourney: {
     pageEyebrow: "Hiring journey timeline",
     pageTitle: "Hiring Journey Timeline",
-    readOnlyBadge: "Read-only journey preview",
+    readOnlyBadge: "Read-only preview",
+    pilotBadge: "READ-ONLY · DEMO PREVIEW",
+    readOnlyNote:
+      "No live action has been taken — all write actions disabled, preview only for alignment conversations.",
+    noLiveActionLabel: "Live actions",
+    noLiveActionTaken: "No live action has been taken",
+    boardBlockedNote:
+      "Board monitor view — workflow transitions blocked until human review and staging gates clear.",
     subtitleCandidate:
       "Review how your hiring journey is assembled before any recruiter, company or system action happens.",
     subtitleRecruiter:
@@ -6042,11 +6049,13 @@ eyebrow: "Product roadmap",
     sourceReadinessPreview: "Readiness preview bundle",
     overallStatusTitle: "Overall journey status",
     overallStatusLabel: "Overall status",
-    overallStatusNote: "Demo journey assembly — no workflow transitions, no external confirmations.",
+    overallStatusNote:
+      "Demo journey assembly — no workflow transitions, no external confirmations, no live action taken.",
     blockingPointLabel: "Current blocking point",
     blockingPointScheduling: "Scheduling proposal blocked by calendar gate and human review",
+    blockingPointBoard: "Board safety gates hold — scheduling, calendar sync and workflow writes blocked",
     humanReviewLabel: "Human review",
-    humanReviewRequired: "Required before any live scheduling or offer action",
+    humanReviewRequired: "Human review required",
     noAutomaticLabel: "Automatic workflow",
     noAutomaticAction: "No automatic candidate advancement in this preview",
     overallPreview: "Preview",
@@ -6062,7 +6071,7 @@ eyebrow: "Product roadmap",
     stepBlockerLabel: "Blocker",
     stepNextActionLabel: "Next safe action",
     stepSafetyLabel: "Safety boundary",
-    stepOpenModule: "Open source module",
+    stepOpenModule: "View source module",
     statusComplete: "complete",
     statusReady: "ready",
     statusInReview: "in review",
@@ -13560,7 +13569,14 @@ const pl: MessageTree = {
   hiringJourney: {
     pageEyebrow: "Oś czasu procesu rekrutacyjnego",
     pageTitle: "Oś czasu procesu rekrutacyjnego",
-    readOnlyBadge: "Podgląd procesu tylko do odczytu",
+    readOnlyBadge: "Podgląd tylko do odczytu",
+    pilotBadge: "TYLKO ODCZYT · PODGLĄD DEMO",
+    readOnlyNote:
+      "Nie podjęto żadnej akcji na żywo — wszystkie zapisy wyłączone, podgląd wyłącznie do uzgodnień.",
+    noLiveActionLabel: "Akcje na żywo",
+    noLiveActionTaken: "Nie podjęto żadnej akcji na żywo",
+    boardBlockedNote:
+      "Widok monitora board — przejścia workflow zablokowane do czasu ręcznej weryfikacji i bramek stagingu.",
     subtitleCandidate:
       "Zobacz, jak składany jest Twój proces rekrutacyjny, zanim rekruter, firma albo system podejmą jakiekolwiek działanie.",
     subtitleRecruiter:
@@ -13572,11 +13588,14 @@ const pl: MessageTree = {
     sourceReadinessPreview: "Pakiet podglądu gotowości",
     overallStatusTitle: "Ogólny status procesu",
     overallStatusLabel: "Status ogólny",
-    overallStatusNote: "Demo złożenia procesu — bez przejść workflow, bez zewnętrznych potwierdzeń.",
+    overallStatusNote:
+      "Demo złożenia procesu — bez przejść workflow, bez zewnętrznych potwierdzeń, bez akcji na żywo.",
     blockingPointLabel: "Aktualny punkt blokady",
     blockingPointScheduling: "Propozycja planowania zablokowana bramą kalendarza i ręczną weryfikacją",
+    blockingPointBoard:
+      "Bramki bezpieczeństwa board wstrzymują — planowanie, synchronizacja kalendarza i zapisy workflow zablokowane",
     humanReviewLabel: "Weryfikacja ręczna",
-    humanReviewRequired: "Wymagana przed jakąkolwiek akcją planowania lub oferty na żywo",
+    humanReviewRequired: "Wymagana weryfikacja ręczna",
     noAutomaticLabel: "Automatyczny workflow",
     noAutomaticAction: "Brak automatycznego przesuwania kandydata w tym podglądzie",
     overallPreview: "Podgląd",
@@ -13592,7 +13611,7 @@ const pl: MessageTree = {
     stepBlockerLabel: "Blokada",
     stepNextActionLabel: "Następne bezpieczne działanie",
     stepSafetyLabel: "Granica bezpieczeństwa",
-    stepOpenModule: "Otwórz moduł źródłowy",
+    stepOpenModule: "Zobacz moduł źródłowy",
     statusComplete: "ukończone",
     statusReady: "gotowe",
     statusInReview: "w weryfikacji",

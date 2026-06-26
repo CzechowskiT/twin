@@ -10,6 +10,7 @@ type OfferPlacementCalendarOverlay = {
   boardOfferReadiness?: Record<string, string>;
   boardPlacementEvidence?: Record<string, string>;
   schedulingProposal?: Record<string, string>;
+  hiringJourney?: Record<string, string>;
 };
 
 const es: OfferPlacementCalendarOverlay = {
@@ -81,6 +82,16 @@ const es: OfferPlacementCalendarOverlay = {
     blockedActionsTitle: "Acciones bloqueadas",
     humanReviewTitle: "Lista de revisión humana",
     auditTrailTitle: "Materiales / auditoría",
+  },
+  hiringJourney: {
+    readOnlyBadge: "Vista previa solo lectura",
+    pilotBadge: "SOLO LECTURA · VISTA PREVIA DEMO",
+    readOnlyNote:
+      "No se ha tomado ninguna acción en vivo — escrituras deshabilitadas, vista previa solo para alineación.",
+    noLiveActionTaken: "No se ha tomado ninguna acción en vivo",
+    humanReviewRequired: "Revisión humana requerida",
+    boardBlockedNote:
+      "Vista de monitor board — transiciones de workflow bloqueadas hasta revisión humana y gates de staging.",
   },
 };
 
@@ -154,6 +165,16 @@ const it: OfferPlacementCalendarOverlay = {
     humanReviewTitle: "Checklist revisione umana",
     auditTrailTitle: "Materiali / audit",
   },
+  hiringJourney: {
+    readOnlyBadge: "Anteprima solo lettura",
+    pilotBadge: "SOLO LETTURA · ANTEPRIMA DEMO",
+    readOnlyNote:
+      "Nessuna azione live intrapresa — scritture disabilitate, anteprima solo per allineamento.",
+    noLiveActionTaken: "Nessuna azione live intrapresa",
+    humanReviewRequired: "Revisione umana richiesta",
+    boardBlockedNote:
+      "Vista monitor board — transizioni workflow bloccate fino a revisione umana e gate di staging.",
+  },
 };
 
 const fr: OfferPlacementCalendarOverlay = {
@@ -225,6 +246,16 @@ const fr: OfferPlacementCalendarOverlay = {
     blockedActionsTitle: "Actions bloquées",
     humanReviewTitle: "Liste de revue humaine",
     auditTrailTitle: "Preuves / audit",
+  },
+  hiringJourney: {
+    readOnlyBadge: "Aperçu lecture seule",
+    pilotBadge: "LECTURE SEULE · APERÇU DÉMO",
+    readOnlyNote:
+      "Aucune action live effectuée — écritures désactivées, aperçu uniquement pour alignement.",
+    noLiveActionTaken: "Aucune action live effectuée",
+    humanReviewRequired: "Revue humaine requise",
+    boardBlockedNote:
+      "Vue moniteur board — transitions workflow bloquées jusqu'à revue humaine et gates de staging.",
   },
 };
 
@@ -298,6 +329,16 @@ const de: OfferPlacementCalendarOverlay = {
     humanReviewTitle: "Checkliste menschliche Prüfung",
     auditTrailTitle: "Nachweise / Audit",
   },
+  hiringJourney: {
+    readOnlyBadge: "Nur-Lese-Vorschau",
+    pilotBadge: "NUR LESEN · DEMO-VORSCHAU",
+    readOnlyNote:
+      "Keine Live-Aktion ausgeführt — Schreibvorgänge deaktiviert, Vorschau nur zur Abstimmung.",
+    noLiveActionTaken: "Keine Live-Aktion ausgeführt",
+    humanReviewRequired: "Manuelle Prüfung erforderlich",
+    boardBlockedNote:
+      "Board-Monitor-Ansicht — Workflow-Übergänge blockiert bis manuelle Prüfung und Staging-Gates.",
+  },
 };
 
 const zh: OfferPlacementCalendarOverlay = {
@@ -354,6 +395,14 @@ const zh: OfferPlacementCalendarOverlay = {
     blockedActionsTitle: "已阻止的操作",
     humanReviewTitle: "人工审核清单",
     auditTrailTitle: "证据 / 审计",
+  },
+  hiringJourney: {
+    readOnlyBadge: "只读预览",
+    pilotBadge: "只读 · 演示预览",
+    readOnlyNote: "未执行任何实时操作 — 写入已禁用，预览仅用于对齐讨论。",
+    noLiveActionTaken: "未执行任何实时操作",
+    humanReviewRequired: "需要人工审核",
+    boardBlockedNote: "Board 监控视图 — 工作流转换已阻塞，待人工审核与 staging 门禁通过。",
   },
 };
 
@@ -418,6 +467,16 @@ const ar: OfferPlacementCalendarOverlay = {
     blockedActionsTitle: "إجراءات محظورة",
     humanReviewTitle: "قائمة المراجعة البشرية",
     auditTrailTitle: "أدلة / تدقيق",
+  },
+  hiringJourney: {
+    readOnlyBadge: "معاينة للقراءة فقط",
+    pilotBadge: "للقراءة فقط · معاينة تجريبية",
+    readOnlyNote:
+      "لم يُتخذ أي إجراء حي — الكتابة معطّلة، المعاينة للمواءمة فقط.",
+    noLiveActionTaken: "لم يُتخذ أي إجراء حي",
+    humanReviewRequired: "تتطلب مراجعة بشرية",
+    boardBlockedNote:
+      "عرض مراقب board — انتقالات workflow محظورة حتى المراجعة البشرية وبوابات staging.",
   },
 };
 

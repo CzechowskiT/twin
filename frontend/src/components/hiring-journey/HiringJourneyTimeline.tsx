@@ -58,12 +58,17 @@ export function HiringJourneyTimeline({ persona }: Props): ReactNode {
               <h1 className="twin-section-title text-2xl sm:text-3xl">{t("hiringJourney.pageTitle")}</h1>
               <p className="text-sm text-[var(--twin-muted-strong)]">{t(PERSONA_SUBTITLE_KEYS[persona])}</p>
             </div>
-            <span
-              className="inline-block rounded-full border border-[var(--twin-border)] px-3 py-1 text-xs font-semibold uppercase"
-              data-testid={HIRING_JOURNEY_MARKERS.readOnlyBadge}
-            >
-              {t("hiringJourney.readOnlyBadge")}
-            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span
+                className="inline-block rounded-full border border-[var(--twin-border)] px-3 py-1 text-xs font-semibold uppercase"
+                data-testid={HIRING_JOURNEY_MARKERS.readOnlyBadge}
+              >
+                {t("hiringJourney.readOnlyBadge")}
+              </span>
+              <span className="inline-block rounded-full border border-[var(--twin-border)] px-3 py-1 text-xs font-semibold uppercase">
+                {t("hiringJourney.pilotBadge")}
+              </span>
+            </div>
           </div>
           <p className="font-mono text-xs text-[var(--twin-muted)]">
             {journey.journeyId} · {HIRING_JOURNEY_DEMO_CANDIDATE_ID} · {HIRING_JOURNEY_DEMO_ROLE_ID}
@@ -75,6 +80,25 @@ export function HiringJourneyTimeline({ persona }: Props): ReactNode {
             {t(hiringJourneySourceKey(journey.source))}
           </span>
         </header>
+
+        <Card
+          variant="soft"
+          className="border-[var(--twin-border)]/80 p-4 sm:p-5"
+          data-testid={HIRING_JOURNEY_MARKERS.readOnlyNote}
+        >
+          <p className="text-xs text-[var(--twin-muted-strong)]">{t("hiringJourney.readOnlyNote")}</p>
+        </Card>
+
+        {persona === "board" ? (
+          <Card
+            variant="soft"
+            className="border-[var(--twin-accent)]/40 p-4 sm:p-5"
+            data-testid={HIRING_JOURNEY_MARKERS.boardBlocked}
+          >
+            <p className="text-xs font-medium text-[var(--twin-accent)]">{t("hiringJourney.overallBlocked")}</p>
+            <p className="mt-2 text-xs text-[var(--twin-muted-strong)]">{t("hiringJourney.boardBlockedNote")}</p>
+          </Card>
+        ) : null}
 
         <Card
           variant="soft"
@@ -100,6 +124,10 @@ export function HiringJourneyTimeline({ persona }: Props): ReactNode {
             <div>
               <dt className="text-xs text-[var(--twin-muted)]">{t("hiringJourney.noAutomaticLabel")}</dt>
               <dd className="font-medium">{t(journey.noAutomaticActionKey)}</dd>
+            </div>
+            <div data-testid={HIRING_JOURNEY_MARKERS.noLiveAction}>
+              <dt className="text-xs text-[var(--twin-muted)]">{t("hiringJourney.noLiveActionLabel")}</dt>
+              <dd className="font-medium">{t("hiringJourney.noLiveActionTaken")}</dd>
             </div>
           </dl>
           <p className="mt-4 text-xs text-[var(--twin-muted)]">{t("hiringJourney.overallStatusNote")}</p>
@@ -171,7 +199,11 @@ export function HiringJourneyTimeline({ persona }: Props): ReactNode {
                     <dd className="text-[var(--twin-muted)]">{t(step.safetyBoundaryKey)}</dd>
                   </div>
                 </dl>
-                <Link href={step.href} className="twin-link mt-3 inline-block text-xs font-medium">
+                <Link
+                  href={step.href}
+                  className="twin-link mt-3 inline-block text-xs font-medium"
+                  data-hiring-journey-nav="source-module"
+                >
                   {t("hiringJourney.stepOpenModule")} →
                 </Link>
               </li>
