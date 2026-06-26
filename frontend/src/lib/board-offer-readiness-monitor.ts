@@ -59,6 +59,11 @@ export const BOARD_OFFER_READINESS_LINKS = [
     href: "/board/placement-verification",
     labelKey: "boardPlacementEvidence.pageTitle" as TranslationKey,
   },
+  {
+    id: "scheduling_proposal",
+    href: "/board/scheduling-proposal",
+    labelKey: "schedulingProposal.pageTitle" as TranslationKey,
+  },
 ] as const;
 
 const DEMO_MATRIX: BoardOfferReadinessMatrixRow[] = [

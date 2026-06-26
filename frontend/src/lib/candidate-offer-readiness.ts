@@ -51,6 +51,11 @@ export const CANDIDATE_OFFER_READINESS_CROSS_LINKS = [
     labelKey: "candidateCalendarReadiness.pageTitle" as const,
   },
   {
+    id: "scheduling_proposal",
+    href: "/dashboard/scheduling-proposal",
+    labelKey: "schedulingProposal.pageTitle" as const,
+  },
+  {
     id: "decision_memory",
     href: "/recruiter/jobs/demo-role-001/decision-memory",
     labelKey: "candidateOfferReadiness.linkDecisionMemory" as const,

@@ -9,6 +9,7 @@ type OfferPlacementCalendarOverlay = {
   calendarReadinessEvidence?: Record<string, string>;
   boardOfferReadiness?: Record<string, string>;
   boardPlacementEvidence?: Record<string, string>;
+  schedulingProposal?: Record<string, string>;
 };
 
 const es: OfferPlacementCalendarOverlay = {
@@ -69,6 +70,17 @@ const es: OfferPlacementCalendarOverlay = {
     pageTitle: "Monitor de materiales de placement",
     headerLead:
       "Salud de materiales de placement entre personas — prueba demo interna, no verificación legal.",
+  },
+  schedulingProposal: {
+    pageTitle: "Paquete de propuesta de planificación",
+    readOnlyBadge: "Vista previa solo lectura",
+    subtitleCandidate: "Revise el contexto antes de que alguien envíe una invitación — sin acción automática.",
+    subtitleRecruiter: "Vista preparatoria antes de planificar manualmente — requiere revisión humana.",
+    subtitleCompany: "No se creó invitación ni evento de calendario — solo contexto de aprobación.",
+    subtitleBoard: "Muestra lógica de preparación, no planificación en vivo — solo materiales y barreras.",
+    blockedActionsTitle: "Acciones bloqueadas",
+    humanReviewTitle: "Lista de revisión humana",
+    auditTrailTitle: "Materiales / auditoría",
   },
 };
 
@@ -131,6 +143,17 @@ const it: OfferPlacementCalendarOverlay = {
     headerLead:
       "Salute materiali placement tra persone — prova demo interna, non verifica legale.",
   },
+  schedulingProposal: {
+    pageTitle: "Pacchetto proposta di pianificazione",
+    readOnlyBadge: "Anteprima solo lettura",
+    subtitleCandidate: "Rivedi il contesto prima che qualcuno invii un invito — nessuna azione automatica.",
+    subtitleRecruiter: "Vista preparatoria prima della pianificazione manuale — revisione umana richiesta.",
+    subtitleCompany: "Nessun invito o evento calendario creato — solo contesto di approvazione.",
+    subtitleBoard: "Mostra la logica di preparazione, non pianificazione live — solo materiali e barriere.",
+    blockedActionsTitle: "Azioni bloccate",
+    humanReviewTitle: "Checklist revisione umana",
+    auditTrailTitle: "Materiali / audit",
+  },
 };
 
 const fr: OfferPlacementCalendarOverlay = {
@@ -191,6 +214,17 @@ const fr: OfferPlacementCalendarOverlay = {
     pageTitle: "Moniteur de matériaux de placement",
     headerLead:
       "Santé des matériaux de placement inter-personas — preuve demo interne, pas de vérification légale.",
+  },
+  schedulingProposal: {
+    pageTitle: "Pack de proposition de planification",
+    readOnlyBadge: "Aperçu lecture seule",
+    subtitleCandidate: "Consultez le contexte avant toute invitation — aucune action automatique.",
+    subtitleRecruiter: "Vue préparatoire avant planification manuelle — revue humaine requise.",
+    subtitleCompany: "Aucune invitation ni événement calendrier créé — contexte d'approbation uniquement.",
+    subtitleBoard: "Prouve la logique de préparation, pas la planification live — matériaux et barrières.",
+    blockedActionsTitle: "Actions bloquées",
+    humanReviewTitle: "Liste de revue humaine",
+    auditTrailTitle: "Preuves / audit",
   },
 };
 
@@ -253,6 +287,17 @@ const de: OfferPlacementCalendarOverlay = {
     headerLead:
       "Gesundheit der Placement-Materialien über Personas — interner Demo-Nachweis, keine Rechtsverifizierung.",
   },
+  schedulingProposal: {
+    pageTitle: "Planungsvorschlags-Paket",
+    readOnlyBadge: "Nur-Lese-Vorschau",
+    subtitleCandidate: "Kontext prüfen, bevor jemand eine Einladung sendet — keine automatische Aktion.",
+    subtitleRecruiter: "Vorbereitungsansicht vor manueller Planung — menschliche Prüfung erforderlich.",
+    subtitleCompany: "Keine Einladung oder Kalenderereignis erstellt — nur Freigabekontext.",
+    subtitleBoard: "Zeigt Bereitschaftslogik, keine Live-Planung — nur Materialien und Gates.",
+    blockedActionsTitle: "Blockierte Aktionen",
+    humanReviewTitle: "Checkliste menschliche Prüfung",
+    auditTrailTitle: "Nachweise / Audit",
+  },
 };
 
 const zh: OfferPlacementCalendarOverlay = {
@@ -298,6 +343,17 @@ const zh: OfferPlacementCalendarOverlay = {
   boardPlacementEvidence: {
     pageTitle: "入职材料监控",
     headerLead: "跨角色的入职材料健康度 — 内部演示证明，非法律验证。",
+  },
+  schedulingProposal: {
+    pageTitle: "排期提案包",
+    readOnlyBadge: "只读预览",
+    subtitleCandidate: "在任何人发送邀请前可查看上下文 — 无自动日历操作。",
+    subtitleRecruiter: "手动排期前的准备视图 — 需人工审核。",
+    subtitleCompany: "未创建邀请或日历事件 — 仅审批上下文。",
+    subtitleBoard: "展示就绪逻辑，非实时排期 — 仅证据与门槛。",
+    blockedActionsTitle: "已阻止的操作",
+    humanReviewTitle: "人工审核清单",
+    auditTrailTitle: "证据 / 审计",
   },
 };
 
@@ -351,6 +407,17 @@ const ar: OfferPlacementCalendarOverlay = {
   boardPlacementEvidence: {
     pageTitle: "مراقب مواد التوظيف",
     headerLead: "صحة مواد التوظيف عبر الأدوار — إثبات تجريبي داخلي، ليس تحققًا قانونيًا.",
+  },
+  schedulingProposal: {
+    pageTitle: "حزمة اقتراح الجدولة",
+    readOnlyBadge: "معاينة للقراءة فقط",
+    subtitleCandidate: "راجع السياق قبل إرسال أي دعوة — بلا إجراء تلقائي في التقويم.",
+    subtitleRecruiter: "عرض تحضيري قبل الجدولة اليدوية — تتطلب مراجعة بشرية.",
+    subtitleCompany: "لم يُنشأ دعوة ولا حدث تقويم — سياق الموافقة فقط.",
+    subtitleBoard: "يُظهر منطق الجاهزية وليس الجدولة الحية — مواد وحواجز فقط.",
+    blockedActionsTitle: "إجراءات محظورة",
+    humanReviewTitle: "قائمة المراجعة البشرية",
+    auditTrailTitle: "أدلة / تدقيق",
   },
 };
 
