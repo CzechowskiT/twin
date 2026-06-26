@@ -1,5 +1,5 @@
 import { HiringJourneyTimeline } from "@/components/hiring-journey/HiringJourneyTimeline";
 
 export default function RecruiterHiringJourneyPage() {
-  return <HiringJourneyTimeline persona="recruiter" />;
+  return <HiringJourneyTimeline surface="recruiter" />;
 }
