@@ -118,9 +118,46 @@ test("5 timeline component shows read-only badge and markers", () => {
   const panel = read("src/components/hiring-journey/HiringJourneyTimeline.tsx");
   assert.match(panel, /HIRING_JOURNEY_MARKERS\.readOnlyBadge/);
   assert.match(panel, /hiringJourney\.readOnlyBadge/);
+  assert.match(panel, /HIRING_JOURNEY_MARKERS\.readOnlyNote/);
+  assert.match(panel, /HIRING_JOURNEY_MARKERS\.noLiveAction/);
+  assert.match(panel, /HIRING_JOURNEY_MARKERS\.boardBlocked/);
   assert.match(panel, /HIRING_JOURNEY_MARKERS\.timeline/);
   assert.match(panel, /HIRING_JOURNEY_MARKERS\.blockedActions/);
   assert.match(panel, /HIRING_JOURNEY_MARKERS\.auditSummary/);
+});
+
+test("5b read-only label uses canonical preview copy", () => {
+  assert.equal(en.hiringJourney.readOnlyBadge, "Read-only preview");
+  assert.match(en.hiringJourney.readOnlyNote, /no live action has been taken/i);
+  assert.equal(en.hiringJourney.humanReviewRequired, "Human review required");
+  assert.equal(en.hiringJourney.noLiveActionTaken, "No live action has been taken");
+});
+
+test("5c board persona shows blocked overall status and board blocking point", () => {
+  const journey = resolveHiringJourney("board");
+  assert.equal(journey.overallStatus, "blocked");
+  assert.equal(journey.blockingPointKey, "hiringJourney.blockingPointBoard");
+  assert.equal(en.hiringJourney.overallBlocked, "Blocked");
+});
+
+test("5d timeline has no live-action CTA controls", () => {
+  const panel = read("src/components/hiring-journey/HiringJourneyTimeline.tsx");
+  assert.doesNotMatch(panel, /type="submit"/);
+  assert.doesNotMatch(panel, /twin-btn-primary/);
+  assert.doesNotMatch(panel, /<button/);
+  assert.match(panel, /data-hiring-journey-nav="source-module"/);
+});
+
+test("5e step and cross-link hrefs are valid internal paths", () => {
+  for (const persona of HIRING_JOURNEY_PERSONAS) {
+    const journey = resolveHiringJourney(persona);
+    for (const step of journey.steps) {
+      assert.match(step.href, /^\/[a-z0-9/-]+$/);
+    }
+    for (const link of hiringJourneyCrossLinks(persona)) {
+      assert.match(link.href, /^\/[a-z0-9/-]+$/);
+    }
+  }
 });
 
 test("6 cross-links point to existing safe routes", () => {

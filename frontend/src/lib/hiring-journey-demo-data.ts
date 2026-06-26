@@ -342,13 +342,20 @@ export function getHiringJourneyAuditSummary(): readonly HiringJourneyAuditEntry
   return AUDIT_SUMMARY;
 }
 
+const PERSONA_BLOCKING_POINT: Record<HiringJourneyPersona, TranslationKey> = {
+  candidate: "hiringJourney.blockingPointScheduling",
+  recruiter: "hiringJourney.blockingPointScheduling",
+  company: "hiringJourney.blockingPointScheduling",
+  board: "hiringJourney.blockingPointBoard",
+};
+
 export function getHiringJourneyDemoBase(persona: HiringJourneyPersona): Omit<HiringJourney, "steps"> {
   return {
     journeyId: HIRING_JOURNEY_DEMO_ID,
     persona,
     source: "readiness_preview",
     overallStatus: PERSONA_OVERALL_STATUS[persona],
-    blockingPointKey: "hiringJourney.blockingPointScheduling",
+    blockingPointKey: PERSONA_BLOCKING_POINT[persona],
     humanReviewRequiredKey: "hiringJourney.humanReviewRequired",
     noAutomaticActionKey: "hiringJourney.noAutomaticAction",
     blockedActions: BLOCKED_ACTIONS,
