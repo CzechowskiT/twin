@@ -6,6 +6,7 @@ import {
   type CandidateTrustOverviewRecord,
 } from "@/lib/candidate-trust-overview-demo-data";
 import { CANDIDATE_CANONICAL_ROUTES } from "@/lib/candidate-canonical-routes";
+import { HIRING_JOURNEY_ROUTES } from "@/lib/hiring-journey";
 
 export { CANDIDATE_TRUST_OVERVIEW_DEMO_ID };
 
@@ -35,6 +36,7 @@ export const CANDIDATE_TRUST_OVERVIEW_SAFE_LINKS = {
   jobs: CANDIDATE_CANONICAL_ROUTES.jobs,
   matches: CANDIDATE_CANONICAL_ROUTES.matches,
   profile: CANDIDATE_CANONICAL_ROUTES.profile,
+  hiringJourney: HIRING_JOURNEY_ROUTES.candidate,
 } as const;
 
 export function candidateTrustOverviewHref(): string {

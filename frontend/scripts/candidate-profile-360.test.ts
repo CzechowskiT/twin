@@ -115,3 +115,10 @@ test("9 shell/gate/fallback/layout files not modified by candidate profile 360",
   assert.doesNotMatch(blob, /PersonaWorkspaceGate/);
   assert.doesNotMatch(blob, /WorkspaceRouteLayout/);
 });
+
+test("10 profile 360 links to hiring journey by surface", () => {
+  const workspace = read("src/components/recruiter/candidate-profile-360-workspace.tsx");
+  assert.match(workspace, /candidate-profile-360-hiring-journey-link/);
+  assert.match(workspace, /hiringJourneyPersonaRoute\(surface\)/);
+  assert.match(workspace, /candidateProfile360\.viewHiringJourney/);
+});

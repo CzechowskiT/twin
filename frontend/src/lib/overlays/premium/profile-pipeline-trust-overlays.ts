@@ -19,6 +19,7 @@ const es: ProfilePipelineTrustOverlay = {
   candidateProfile360: {
     pageEyebrow: "Perfil del candidato 360",
     pageTitle: "Perfil del candidato 360",
+    viewHiringJourney: "Ver recorrido de contratación",
     boundaryBody:
       "TWIN prepara señales y memoria — el reclutador decide lista corta, posponer, descartar y contacto. Sin auto-aplicación, sin contacto saliente automático, sin contacto oculto con el candidato.",
   },
@@ -43,12 +44,16 @@ const es: ProfilePipelineTrustOverlay = {
     boundaryBody:
       "Esta página es un piloto de verificación de identidad solo demo. Sin KYC, sin carga de documentos, sin llamadas a API de proveedor ni mutación de backend.",
   },
+  candidateTrustOverview: {
+    linkHiringJourney: "Ver recorrido de contratación",
+  },
 };
 
 const it: ProfilePipelineTrustOverlay = {
   candidateProfile360: {
     pageEyebrow: "Profilo candidato 360",
     pageTitle: "Profilo candidato 360",
+    viewHiringJourney: "Visualizza percorso di assunzione",
     boundaryBody:
       "TWIN prepara segnali e memoria — il recruiter decide lista ristretta, posticipa, scarta e contatto. Nessuna auto-candidatura, nessun contatto in uscita automatico, nessun contatto nascosto col candidato.",
   },
@@ -73,12 +78,16 @@ const it: ProfilePipelineTrustOverlay = {
     boundaryBody:
       "Questa pagina è un pilota di verifica identità solo demo. Nessun KYC, nessun caricamento documenti, nessuna chiamata API provider né mutazione backend.",
   },
+  candidateTrustOverview: {
+    linkHiringJourney: "Visualizza percorso di assunzione",
+  },
 };
 
 const fr: ProfilePipelineTrustOverlay = {
   candidateProfile360: {
     pageEyebrow: "Profil candidat 360",
     pageTitle: "Profil candidat 360",
+    viewHiringJourney: "Voir le parcours d'embauche",
     boundaryBody:
       "TWIN prépare signaux et mémoire — le recruteur décide liste restreinte, report, rejet et contact. Pas d'auto-candidature, pas de contact sortant automatique, pas de contact caché avec le candidat.",
   },
@@ -103,12 +112,16 @@ const fr: ProfilePipelineTrustOverlay = {
     boundaryBody:
       "Cette page est un pilote de vérification d'identité démo uniquement. Pas de KYC, pas de téléversement de documents, pas d'appels API fournisseur ni mutation backend.",
   },
+  candidateTrustOverview: {
+    linkHiringJourney: "Voir le parcours d'embauche",
+  },
 };
 
 const de: ProfilePipelineTrustOverlay = {
   candidateProfile360: {
     pageEyebrow: "Kandidatenprofil 360",
     pageTitle: "Kandidatenprofil 360",
+    viewHiringJourney: "Hiring Journey anzeigen",
     boundaryBody:
       "TWIN bereitet Signale und Historie vor — Recruiter entscheiden über Vorauswahl, Zurückstellen, Ablehnung und Kontakt. Keine automatische Bewerbung, kein automatischer ausgehender Kontakt, kein versteckter Kandidatenkontakt.",
   },
@@ -133,12 +146,16 @@ const de: ProfilePipelineTrustOverlay = {
     boundaryBody:
       "Diese Seite ist ein reiner Demo-Identitätsprüfungs-Pilot. Kein KYC, kein Dokumenten-Upload, keine Provider-API-Aufrufe, keine Backend-Mutation.",
   },
+  candidateTrustOverview: {
+    linkHiringJourney: "Hiring Journey anzeigen",
+  },
 };
 
 const zh: ProfilePipelineTrustOverlay = {
   candidateProfile360: {
     pageEyebrow: "候选人 360 档案",
     pageTitle: "候选人 360 档案",
+    viewHiringJourney: "查看招聘旅程",
     boundaryBody:
       "TWIN 准备信号与记忆 — 招聘人员决定入围、暂缓、拒绝与外联。无自动申请、无自动外联、无隐藏候选人联系。",
   },
@@ -163,12 +180,16 @@ const zh: ProfilePipelineTrustOverlay = {
     boundaryBody:
       "此页面为仅演示的身份验证试点。无 KYC、无文档上传、无供应商 API 调用、无后端变更。",
   },
+  candidateTrustOverview: {
+    linkHiringJourney: "查看招聘旅程",
+  },
 };
 
 const ar: ProfilePipelineTrustOverlay = {
   candidateProfile360: {
     pageEyebrow: "ملف المرشح 360",
     pageTitle: "ملف المرشح 360",
+    viewHiringJourney: "عرض رحلة التوظيف",
     boundaryBody:
       "TWIN يجهّز الإشارات والذاكرة — يقرر المُوظّف القائمة المختصرة والتأجيل والرفض والتواصل. لا تقديم تلقائي، لا تواصل صادر تلقائي، لا اتصال خفي بالمرشح.",
   },
@@ -192,6 +213,9 @@ const ar: ProfilePipelineTrustOverlay = {
     pageTitle: "التحقق من هوية المرشح",
     boundaryBody:
       "هذه الصفحة طيار تحقق هوية تجريبي فقط. بلا KYC ولا رفع مستندات ولا استدعاءات API للمزود ولا تغيير في الخادم.",
+  },
+  candidateTrustOverview: {
+    linkHiringJourney: "عرض رحلة التوظيف",
   },
 };
 
