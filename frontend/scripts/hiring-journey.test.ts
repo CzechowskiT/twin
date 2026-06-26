@@ -25,6 +25,8 @@ import {
   hiringJourneyHumanReviewStepIds,
   hiringJourneyOverviewLink,
   hiringJourneyPersonaLabelKey,
+  hiringJourneyProvenanceSourceModuleDrillIn,
+  hiringJourneySourceModuleHref,
   hiringJourneySurfacePersona,
   resolveHiringJourney,
 } from "../src/lib/hiring-journey";
@@ -103,6 +105,7 @@ test("3 each step has required fields", () => {
     assert.ok(step.owner);
     assert.ok(step.status);
     assert.ok(step.sourceModuleKey);
+    assert.ok(step.sourceModuleId);
     assert.ok(step.evidenceSummaryKey);
     assert.ok(step.provenance);
     assert.ok(step.provenance.evidenceLabelKey);
@@ -185,6 +188,9 @@ test("5 timeline component shows read-only badge and markers", () => {
   assert.match(panel, /HIRING_JOURNEY_MARKERS\.stepProvenanceHumanReview/);
   assert.match(panel, /HIRING_JOURNEY_MARKERS\.stepProvenanceNoLiveAction/);
   assert.match(panel, /HIRING_JOURNEY_MARKERS\.stepProvenanceMonitorOnly/);
+  assert.match(panel, /HIRING_JOURNEY_MARKERS\.stepProvenanceSourceModule/);
+  assert.match(panel, /hiringJourneyProvenanceSourceModuleDrillIn/);
+  assert.match(panel, /provenance-source-module/);
   assert.match(panel, /hiringJourney\.provenanceTitle/);
   assert.match(panel, /hiringJourney\.provenanceNoLiveActionTaken/);
 });
@@ -375,4 +381,69 @@ test("17 negative live-action guard — prohibited copy, controls, allowed nav",
   for (const navAttr of HIRING_JOURNEY_ALLOWED_NAV_ATTRIBUTES) {
     assert.match(componentSrc, new RegExp(navAttr.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
+});
+
+const DRILL_IN_ROUTE_FILES: Record<string, string> = {
+  "/dashboard/trust/overview": "src/app/dashboard/trust/overview/page.tsx",
+  "/profile": "src/app/profile/page.tsx",
+  "/dashboard/offer-readiness": "src/app/dashboard/offer-readiness/page.tsx",
+  "/recruiter/offer-readiness": "src/app/recruiter/offer-readiness/page.tsx",
+  "/company/offer-readiness": "src/app/company/offer-readiness/page.tsx",
+  "/board/offer-readiness": "src/app/board/offer-readiness/page.tsx",
+  "/dashboard/scheduling-proposal": "src/app/dashboard/scheduling-proposal/page.tsx",
+  "/recruiter/scheduling-proposal": "src/app/recruiter/scheduling-proposal/page.tsx",
+  "/company/scheduling-proposal": "src/app/company/scheduling-proposal/page.tsx",
+  "/board/scheduling-proposal": "src/app/board/scheduling-proposal/page.tsx",
+  "/dashboard/calendar/readiness": "src/app/dashboard/calendar/readiness/page.tsx",
+  "/board/calendar-readiness": "src/app/board/calendar-readiness/page.tsx",
+  "/dashboard/placement-verification": "src/app/dashboard/placement-verification/page.tsx",
+  "/recruiter/placement-verification": "src/app/recruiter/placement-verification/page.tsx",
+  "/company/placement-verification": "src/app/company/placement-verification/page.tsx",
+  "/board/placement-verification": "src/app/board/placement-verification/page.tsx",
+  "/recruiter/candidates/demo-candidate-001": "src/app/recruiter/candidates/[candidateId]/page.tsx",
+  "/recruiter/candidates/demo-candidate-001/trust": "src/app/recruiter/candidates/[candidateId]/trust/page.tsx",
+  "/company/candidates/demo-candidate-001": "src/app/company/candidates/[candidateId]/page.tsx",
+  "/company/candidates/demo-candidate-001/trust": "src/app/company/candidates/[candidateId]/trust/page.tsx",
+};
+
+test("18 provenance source module drill-in — safe route link, no route text, board blocked", () => {
+  const candidateTrust = hiringJourneyProvenanceSourceModuleDrillIn("trust_center", "candidate");
+  assert.ok(candidateTrust);
+  assert.equal(candidateTrust?.href, "/dashboard/trust/overview");
+  assert.equal(candidateTrust?.labelKey, "hiringJourney.provenanceDrillInReview");
+
+  const decisionContext = hiringJourneyProvenanceSourceModuleDrillIn(
+    "scheduling_decision_context",
+    "recruiter",
+  );
+  assert.equal(decisionContext, null);
+  assert.equal(hiringJourneySourceModuleHref("scheduling_decision_context", "recruiter"), null);
+
+  const recruiterCalendar = hiringJourneyProvenanceSourceModuleDrillIn("calendar_readiness", "recruiter");
+  assert.equal(recruiterCalendar, null);
+
+  const boardOffer = hiringJourneyProvenanceSourceModuleDrillIn("offer_readiness", "board");
+  assert.equal(boardOffer, null);
+  assert.equal(hiringJourneySourceModuleHref("offer_readiness", "board"), "/board/offer-readiness");
+
+  const journey = resolveHiringJourney("candidate");
+  const trustStep = journey.steps.find((step) => step.id === "trust_review");
+  const decisionStep = journey.steps.find((step) => step.id === "decision_review");
+  assert.ok(trustStep);
+  assert.ok(decisionStep);
+  assert.ok(hiringJourneyProvenanceSourceModuleDrillIn(trustStep!.sourceModuleId, "candidate"));
+  assert.equal(
+    hiringJourneyProvenanceSourceModuleDrillIn(decisionStep!.sourceModuleId, "candidate"),
+    null,
+  );
+
+  for (const [href, pageFile] of Object.entries(DRILL_IN_ROUTE_FILES)) {
+    assert.ok(existsSync(join(root, pageFile)), `page exists for drill-in href ${href}`);
+    assert.match(href, /^\/[a-z0-9/-]+$/);
+  }
+
+  const panel = read("src/components/hiring-journey/HiringJourneyTimeline.tsx");
+  assert.match(panel, /stepProvenanceSourceModuleLink/);
+  assert.match(panel, /stepProvenanceSourceModuleText/);
+  assert.doesNotMatch(panel, /provenanceDrillIn.*twin-btn-primary/);
 });

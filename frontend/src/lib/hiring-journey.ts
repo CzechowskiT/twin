@@ -4,8 +4,10 @@ import {
   getHiringJourneyDemoBase,
   getHiringJourneyStepTemplates,
   HIRING_JOURNEY_PERSONAS,
+  HIRING_JOURNEY_DEMO_CANDIDATE_ID,
   type HiringJourney,
   type HiringJourneyPersona,
+  type HiringJourneySourceModuleId,
   type HiringJourneyStepId,
   type HiringJourneyStepStatus,
   type HiringJourneyOverallStatus,
@@ -44,6 +46,9 @@ export const HIRING_JOURNEY_MARKERS = {
   stepProvenanceHumanReview: "hiring-journey-step-provenance-human-review",
   stepProvenanceNoLiveAction: "hiring-journey-step-provenance-no-live-action",
   stepProvenanceMonitorOnly: "hiring-journey-step-provenance-monitor-only",
+  stepProvenanceSourceModule: "hiring-journey-step-provenance-source-module",
+  stepProvenanceSourceModuleLink: "hiring-journey-step-provenance-source-module-link",
+  stepProvenanceSourceModuleText: "hiring-journey-step-provenance-source-module-text",
 } as const;
 
 /** User-facing hiring journey surfaces for copy guards (excludes guard pattern definitions). */
@@ -121,6 +126,8 @@ export const HIRING_JOURNEY_ALLOWED_NAV_ATTRIBUTES = [
   'data-hiring-journey-nav="candidate-alias"',
   'data-hiring-journey-nav="source-module"',
   'data-hiring-journey-nav="source-module-blocked"',
+  'data-hiring-journey-nav="provenance-source-module"',
+  'data-hiring-journey-nav="provenance-source-module-blocked"',
   "data-hiring-journey-nav={`cross-link-",
 ] as const;
 
@@ -311,6 +318,80 @@ export function hiringJourneyBoardStepNavBlocked(persona: HiringJourneyPersona):
   return persona === "board";
 }
 
+const SOURCE_MODULE_ROUTES: Record<
+  HiringJourneySourceModuleId,
+  Partial<Record<HiringJourneyPersona, string>>
+> = {
+  trust_center: {
+    candidate: "/dashboard/trust/overview",
+    recruiter: `/recruiter/candidates/${HIRING_JOURNEY_DEMO_CANDIDATE_ID}/trust`,
+    company: `/company/candidates/${HIRING_JOURNEY_DEMO_CANDIDATE_ID}/trust`,
+  },
+  profile_360: {
+    candidate: "/profile",
+    recruiter: `/recruiter/candidates/${HIRING_JOURNEY_DEMO_CANDIDATE_ID}`,
+    company: `/company/candidates/${HIRING_JOURNEY_DEMO_CANDIDATE_ID}`,
+  },
+  offer_readiness: {
+    candidate: "/dashboard/offer-readiness",
+    recruiter: "/recruiter/offer-readiness",
+    company: "/company/offer-readiness",
+    board: "/board/offer-readiness",
+  },
+  scheduling_proposal: {
+    candidate: "/dashboard/scheduling-proposal",
+    recruiter: "/recruiter/scheduling-proposal",
+    company: "/company/scheduling-proposal",
+    board: "/board/scheduling-proposal",
+  },
+  calendar_readiness: {
+    candidate: "/dashboard/calendar/readiness",
+    board: "/board/calendar-readiness",
+  },
+  scheduling_decision_context: {},
+  placement_verification: {
+    candidate: "/dashboard/placement-verification",
+    recruiter: "/recruiter/placement-verification",
+    company: "/company/placement-verification",
+    board: "/board/placement-verification",
+  },
+  job_discovery: {},
+  matching: {},
+  onboarding_preview: {},
+};
+
+const SOURCE_MODULE_DRILL_IN_KEYS: Partial<Record<HiringJourneySourceModuleId, TranslationKey>> = {
+  trust_center: "hiringJourney.provenanceDrillInReview",
+  profile_360: "hiringJourney.provenanceDrillInReview",
+  offer_readiness: "hiringJourney.provenanceDrillInView",
+  scheduling_proposal: "hiringJourney.provenanceDrillInView",
+  calendar_readiness: "hiringJourney.provenanceDrillInOpen",
+  placement_verification: "hiringJourney.provenanceDrillInReview",
+};
+
+export function hiringJourneySourceModuleHref(
+  moduleId: HiringJourneySourceModuleId,
+  persona: HiringJourneyPersona,
+): string | null {
+  return SOURCE_MODULE_ROUTES[moduleId][persona] ?? null;
+}
+
+export type HiringJourneyProvenanceDrillIn = {
+  href: string;
+  labelKey: TranslationKey;
+};
+
+export function hiringJourneyProvenanceSourceModuleDrillIn(
+  moduleId: HiringJourneySourceModuleId,
+  persona: HiringJourneyPersona,
+): HiringJourneyProvenanceDrillIn | null {
+  if (hiringJourneyBoardStepNavBlocked(persona)) return null;
+  const href = hiringJourneySourceModuleHref(moduleId, persona);
+  const labelKey = SOURCE_MODULE_DRILL_IN_KEYS[moduleId];
+  if (!href || !labelKey) return null;
+  return { href, labelKey };
+}
+
 export function hiringJourneyCrossLinks(
   persona: HiringJourneyPersona,
 ): readonly { id: string; href: string; labelKey: TranslationKey }[] {
@@ -374,4 +455,5 @@ export {
   HIRING_JOURNEY_PERSONAS,
   HIRING_JOURNEY_STEP_IDS,
   hiringJourneyHumanReviewStepIds,
+  type HiringJourneySourceModuleId,
 } from "@/lib/hiring-journey-demo-data";

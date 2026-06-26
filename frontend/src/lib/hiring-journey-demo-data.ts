@@ -47,6 +47,18 @@ export const HIRING_JOURNEY_STEP_IDS: readonly HiringJourneyStepId[] = [
   "onboarding_preview",
 ] as const;
 
+export type HiringJourneySourceModuleId =
+  | "trust_center"
+  | "profile_360"
+  | "offer_readiness"
+  | "scheduling_proposal"
+  | "calendar_readiness"
+  | "scheduling_decision_context"
+  | "placement_verification"
+  | "job_discovery"
+  | "matching"
+  | "onboarding_preview";
+
 export type HiringJourneyStepProvenance = {
   evidenceLabelKey: TranslationKey;
   humanReviewRequired: boolean;
@@ -59,6 +71,7 @@ export type HiringJourneyStepTemplate = {
   descriptionKey: TranslationKey;
   status: HiringJourneyStepStatus;
   owner: HiringJourneyOwner;
+  sourceModuleId: HiringJourneySourceModuleId;
   sourceModuleKey: TranslationKey;
   evidenceSummaryKey: TranslationKey;
   provenance: HiringJourneyStepProvenance;
@@ -109,6 +122,7 @@ const STEP_TEMPLATES: HiringJourneyStepTemplate[] = [
     descriptionKey: "hiringJourney.stepDiscoveryDescription",
     status: "complete",
     owner: "candidate",
+    sourceModuleId: "job_discovery",
     sourceModuleKey: "hiringJourney.moduleJobDiscovery",
     evidenceSummaryKey: "hiringJourney.stepDiscoveryEvidence",
     provenance: {
@@ -125,6 +139,7 @@ const STEP_TEMPLATES: HiringJourneyStepTemplate[] = [
     descriptionKey: "hiringJourney.stepMatchingDescription",
     status: "ready",
     owner: "system",
+    sourceModuleId: "matching",
     sourceModuleKey: "hiringJourney.moduleMatching",
     evidenceSummaryKey: "hiringJourney.stepMatchingEvidence",
     provenance: {
@@ -141,6 +156,7 @@ const STEP_TEMPLATES: HiringJourneyStepTemplate[] = [
     descriptionKey: "hiringJourney.stepTrustDescription",
     status: "in_review",
     owner: "candidate",
+    sourceModuleId: "trust_center",
     sourceModuleKey: "hiringJourney.moduleTrustCenter",
     evidenceSummaryKey: "hiringJourney.stepTrustEvidence",
     provenance: {
@@ -158,6 +174,7 @@ const STEP_TEMPLATES: HiringJourneyStepTemplate[] = [
     descriptionKey: "hiringJourney.stepProfileDescription",
     status: "preview_only",
     owner: "candidate",
+    sourceModuleId: "profile_360",
     sourceModuleKey: "hiringJourney.moduleProfile360",
     evidenceSummaryKey: "hiringJourney.stepProfileEvidence",
     provenance: {
@@ -174,6 +191,7 @@ const STEP_TEMPLATES: HiringJourneyStepTemplate[] = [
     descriptionKey: "hiringJourney.stepOfferReadinessDescription",
     status: "preview_only",
     owner: "recruiter",
+    sourceModuleId: "offer_readiness",
     sourceModuleKey: "hiringJourney.moduleOfferReadiness",
     evidenceSummaryKey: "hiringJourney.stepOfferReadinessEvidence",
     provenance: {
@@ -191,6 +209,7 @@ const STEP_TEMPLATES: HiringJourneyStepTemplate[] = [
     descriptionKey: "hiringJourney.stepSchedulingProposalDescription",
     status: "blocked",
     owner: "recruiter",
+    sourceModuleId: "scheduling_proposal",
     sourceModuleKey: "hiringJourney.moduleSchedulingProposal",
     evidenceSummaryKey: "hiringJourney.stepSchedulingProposalEvidence",
     provenance: {
@@ -208,6 +227,7 @@ const STEP_TEMPLATES: HiringJourneyStepTemplate[] = [
     descriptionKey: "hiringJourney.stepInterviewPrepDescription",
     status: "blocked",
     owner: "candidate",
+    sourceModuleId: "calendar_readiness",
     sourceModuleKey: "hiringJourney.moduleCalendarReadiness",
     evidenceSummaryKey: "hiringJourney.stepInterviewPrepEvidence",
     provenance: {
@@ -225,6 +245,7 @@ const STEP_TEMPLATES: HiringJourneyStepTemplate[] = [
     descriptionKey: "hiringJourney.stepDecisionReviewDescription",
     status: "not_started",
     owner: "recruiter",
+    sourceModuleId: "scheduling_decision_context",
     sourceModuleKey: "hiringJourney.moduleDecisionContext",
     evidenceSummaryKey: "hiringJourney.stepDecisionReviewEvidence",
     provenance: {
@@ -241,6 +262,7 @@ const STEP_TEMPLATES: HiringJourneyStepTemplate[] = [
     descriptionKey: "hiringJourney.stepOfferDecisionDescription",
     status: "not_started",
     owner: "company",
+    sourceModuleId: "offer_readiness",
     sourceModuleKey: "hiringJourney.moduleOfferReadiness",
     evidenceSummaryKey: "hiringJourney.stepOfferDecisionEvidence",
     provenance: {
@@ -257,6 +279,7 @@ const STEP_TEMPLATES: HiringJourneyStepTemplate[] = [
     descriptionKey: "hiringJourney.stepPlacementDescription",
     status: "preview_only",
     owner: "board",
+    sourceModuleId: "placement_verification",
     sourceModuleKey: "hiringJourney.modulePlacementVerification",
     evidenceSummaryKey: "hiringJourney.stepPlacementEvidence",
     provenance: {
@@ -274,6 +297,7 @@ const STEP_TEMPLATES: HiringJourneyStepTemplate[] = [
     descriptionKey: "hiringJourney.stepOnboardingDescription",
     status: "not_started",
     owner: "system",
+    sourceModuleId: "onboarding_preview",
     sourceModuleKey: "hiringJourney.moduleOnboardingPreview",
     evidenceSummaryKey: "hiringJourney.stepOnboardingEvidence",
     provenance: {
