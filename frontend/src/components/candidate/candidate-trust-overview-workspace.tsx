@@ -117,6 +117,13 @@ function TrustOverviewContent({ record }: { record: CandidateTrustOverviewRecord
             <Link href={CANDIDATE_TRUST_OVERVIEW_SAFE_LINKS.panel} className="twin-link font-medium">
               {t("candidateTrustOverview.linkDashboard")}
             </Link>
+            <Link
+              href={CANDIDATE_TRUST_OVERVIEW_SAFE_LINKS.hiringJourney}
+              className="twin-link font-medium"
+              data-testid="candidate-trust-overview-hiring-journey-link"
+            >
+              {t("candidateTrustOverview.linkHiringJourney")}
+            </Link>
           </div>
         </header>
 
@@ -243,6 +250,13 @@ function TrustOverviewContent({ record }: { record: CandidateTrustOverviewRecord
               </Link>
               <Link href={CANDIDATE_TRUST_OVERVIEW_SAFE_LINKS.profile} className="twin-link text-sm font-medium">
                 {t("candidateTrustOverview.linkProfile")}
+              </Link>
+              <Link
+                href={CANDIDATE_TRUST_OVERVIEW_SAFE_LINKS.hiringJourney}
+                className="twin-link text-sm font-medium"
+                data-testid="candidate-trust-overview-hiring-journey-link"
+              >
+                {t("candidateTrustOverview.linkHiringJourney")}
               </Link>
               <Link
                 href={placementVerificationIntegrationHref("candidate_preview")}

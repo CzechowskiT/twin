@@ -27,6 +27,7 @@ import { decisionMemoryHref } from "@/lib/decision-memory";
 import { candidateTeamHref } from "@/lib/team-collaboration";
 import { atsImportReadinessHref } from "@/lib/ats-import-readiness";
 import { candidateCommunicationHref } from "@/lib/safe-communication";
+import { hiringJourneyPersonaRoute } from "@/lib/hiring-journey";
 
 function fitLabelKey(fit: CandidateProfile360Record["fit_label"]): TranslationKey {
   const map: Record<CandidateProfile360Record["fit_label"], TranslationKey> = {
@@ -502,6 +503,14 @@ function ProfileContent({
               >
                 {t("atsImportReadiness.openImportReadiness")}
               </Link>
+              <Link
+                href={hiringJourneyPersonaRoute(surface)}
+                className="twin-link mt-2 inline-block text-sm font-medium"
+                data-testid="candidate-profile-360-hiring-journey-link"
+              >
+                {t("candidateProfile360.viewHiringJourney")}
+              </Link>
+              <p className="twin-muted mt-1 text-xs">{t("hiringJourney.readOnlyBadge")}</p>
             </>,
             "lg:col-span-2",
           )}

@@ -133,3 +133,10 @@ test("14 control center links to overview", () => {
   assert.match(cc, /candidate-control-center-overview-link/);
   assert.match(cc, /candidateTrustOverviewHref/);
 });
+
+test("15 trust overview links to hiring journey", () => {
+  const workspace = read("src/components/candidate/candidate-trust-overview-workspace.tsx");
+  assert.match(workspace, /candidate-trust-overview-hiring-journey-link/);
+  assert.match(workspace, /CANDIDATE_TRUST_OVERVIEW_SAFE_LINKS\.hiringJourney/);
+  assert.match(workspace, /candidateTrustOverview\.linkHiringJourney/);
+});
