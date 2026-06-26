@@ -12,6 +12,13 @@ import {
 } from "@/lib/hiring-journey-demo-data";
 import type { TranslationKey } from "@/lib/i18n";
 
+export type HiringJourneyRouteSurface =
+  | "candidate_dashboard"
+  | "candidate_profile"
+  | "recruiter"
+  | "company"
+  | "board";
+
 export const HIRING_JOURNEY_DOC = "docs/HIRING_JOURNEY_TIMELINE_2026-06-25.md";
 
 export const HIRING_JOURNEY_PAGE_MARKER = "hiring-journey-page";
@@ -29,6 +36,10 @@ export const HIRING_JOURNEY_MARKERS = {
   auditSummary: "hiring-journey-audit-summary",
   crossLinks: "hiring-journey-cross-links",
   sourceBadge: "hiring-journey-source-badge",
+  personaLabel: "hiring-journey-persona-label",
+  aliasNav: "hiring-journey-alias-nav",
+  overviewLink: "hiring-journey-overview-link",
+  boardStepNavBlocked: "hiring-journey-board-step-nav-blocked",
 } as const;
 
 export const HIRING_JOURNEY_ROUTES: Record<HiringJourneyPersona | "profile", string> = {
@@ -157,32 +168,101 @@ export function hiringJourneyPersonaRoute(persona: HiringJourneyPersona): string
   return HIRING_JOURNEY_ROUTES[persona];
 }
 
+const PERSONA_LABEL_KEYS: Record<HiringJourneyRouteSurface, TranslationKey> = {
+  candidate_dashboard: "hiringJourney.personaLabelCandidateDashboard",
+  candidate_profile: "hiringJourney.personaLabelCandidateProfile",
+  recruiter: "hiringJourney.personaLabelRecruiter",
+  company: "hiringJourney.personaLabelCompany",
+  board: "hiringJourney.personaLabelBoard",
+};
+
+const OVERVIEW_LINKS: Record<HiringJourneyRouteSurface, { href: string; labelKey: TranslationKey }> = {
+  candidate_dashboard: { href: "/dashboard", labelKey: "hiringJourney.overviewLinkDashboard" },
+  candidate_profile: { href: "/profile", labelKey: "hiringJourney.overviewLinkProfile" },
+  recruiter: { href: "/recruiter/daily-cockpit", labelKey: "hiringJourney.overviewLinkRecruiter" },
+  company: { href: "/company/hiring-cockpit", labelKey: "hiringJourney.overviewLinkCompany" },
+  board: { href: "/board", labelKey: "hiringJourney.overviewLinkBoard" },
+};
+
+export function hiringJourneySurfacePersona(surface: HiringJourneyRouteSurface): HiringJourneyPersona {
+  if (surface === "candidate_dashboard" || surface === "candidate_profile") return "candidate";
+  return surface;
+}
+
+export function hiringJourneyPersonaLabelKey(surface: HiringJourneyRouteSurface): TranslationKey {
+  return PERSONA_LABEL_KEYS[surface];
+}
+
+export function hiringJourneyOverviewLink(
+  surface: HiringJourneyRouteSurface,
+): { href: string; labelKey: TranslationKey } {
+  return OVERVIEW_LINKS[surface];
+}
+
+export function hiringJourneyCandidateAliasNav(
+  surface: HiringJourneyRouteSurface,
+): { href: string; labelKey: TranslationKey } | null {
+  if (surface === "candidate_dashboard") {
+    return { href: HIRING_JOURNEY_ROUTES.profile, labelKey: "hiringJourney.aliasLinkProfile" };
+  }
+  if (surface === "candidate_profile") {
+    return { href: HIRING_JOURNEY_ROUTES.candidate, labelKey: "hiringJourney.aliasLinkDashboard" };
+  }
+  return null;
+}
+
+export function hiringJourneyBoardStepNavBlocked(persona: HiringJourneyPersona): boolean {
+  return persona === "board";
+}
+
 export function hiringJourneyCrossLinks(
   persona: HiringJourneyPersona,
 ): readonly { id: string; href: string; labelKey: TranslationKey }[] {
   const profileRoute =
-    persona === "candidate" ? "/profile" : `/recruiter/candidates/demo-candidate-001`;
+    persona === "candidate"
+      ? "/profile"
+      : persona === "company"
+        ? "/company/candidates/demo-candidate-001"
+        : persona === "board"
+          ? "/board"
+          : `/recruiter/candidates/demo-candidate-001`;
   const trustRoute =
     persona === "candidate"
       ? "/dashboard/trust/overview"
       : persona === "company"
         ? "/company/candidate-trust"
-        : "/recruiter/daily-cockpit";
+        : persona === "board"
+          ? "/board"
+          : "/recruiter/daily-cockpit";
   const offerRoute = STEP_HREFS.offer_readiness[persona];
   const schedulingRoute = STEP_HREFS.scheduling_proposal[persona];
   const calendarRoute = STEP_HREFS.interview_preparation[persona];
   const placementRoute = STEP_HREFS.placement_verification[persona];
   const boardRoute = "/board/hiring-journey";
 
-  return [
-    { id: "profile", href: profileRoute, labelKey: "hiringJourney.crossLinkProfile" },
-    { id: "trust", href: trustRoute, labelKey: "hiringJourney.crossLinkTrust" },
-    { id: "offer_readiness", href: offerRoute, labelKey: "hiringJourney.crossLinkOfferReadiness" },
-    { id: "scheduling_proposal", href: schedulingRoute, labelKey: "hiringJourney.crossLinkSchedulingProposal" },
-    { id: "calendar_readiness", href: calendarRoute, labelKey: "hiringJourney.crossLinkCalendarReadiness" },
-    { id: "placement_verification", href: placementRoute, labelKey: "hiringJourney.crossLinkPlacementVerification" },
-    { id: "board", href: boardRoute, labelKey: "hiringJourney.crossLinkBoard" },
+  const links = [
+    { id: "profile", href: profileRoute, labelKey: "hiringJourney.crossLinkProfile" as TranslationKey },
+    { id: "trust", href: trustRoute, labelKey: "hiringJourney.crossLinkTrust" as TranslationKey },
+    { id: "offer_readiness", href: offerRoute, labelKey: "hiringJourney.crossLinkOfferReadiness" as TranslationKey },
+    {
+      id: "scheduling_proposal",
+      href: schedulingRoute,
+      labelKey: "hiringJourney.crossLinkSchedulingProposal" as TranslationKey,
+    },
+    {
+      id: "calendar_readiness",
+      href: calendarRoute,
+      labelKey: "hiringJourney.crossLinkCalendarReadiness" as TranslationKey,
+    },
+    {
+      id: "placement_verification",
+      href: placementRoute,
+      labelKey: "hiringJourney.crossLinkPlacementVerification" as TranslationKey,
+    },
+    { id: "board", href: boardRoute, labelKey: "hiringJourney.crossLinkBoard" as TranslationKey },
   ];
+
+  return persona === "board" ? links.filter((link) => link.id !== "board") : links;
 }
 
 export function resolveHiringJourney(persona: HiringJourneyPersona): HiringJourney {

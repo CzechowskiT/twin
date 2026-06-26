@@ -13,7 +13,12 @@ import {
   HIRING_JOURNEY_PERSONAS,
   HIRING_JOURNEY_ROUTES,
   HIRING_JOURNEY_STEP_IDS,
+  hiringJourneyBoardStepNavBlocked,
+  hiringJourneyCandidateAliasNav,
   hiringJourneyCrossLinks,
+  hiringJourneyOverviewLink,
+  hiringJourneyPersonaLabelKey,
+  hiringJourneySurfacePersona,
   resolveHiringJourney,
 } from "../src/lib/hiring-journey";
 import { dictionaries, en, LOCALES } from "../src/lib/i18n";
@@ -27,6 +32,14 @@ const ROUTE_FILES = [
   "src/app/company/hiring-journey/page.tsx",
   "src/app/board/hiring-journey/page.tsx",
 ] as const;
+
+const ROUTE_SURFACE: Record<(typeof ROUTE_FILES)[number], string> = {
+  "src/app/dashboard/hiring-journey/page.tsx": "candidate_dashboard",
+  "src/app/profile/hiring-journey/page.tsx": "candidate_profile",
+  "src/app/recruiter/hiring-journey/page.tsx": "recruiter",
+  "src/app/company/hiring-journey/page.tsx": "company",
+  "src/app/board/hiring-journey/page.tsx": "board",
+};
 
 const REQUIRED_BLOCKED = [
   /no automatic candidate advancement/i,
@@ -71,11 +84,12 @@ test("1 domain data contains four persona variants with eleven steps", () => {
   }
 });
 
-test("2 all five routes are registered", () => {
+test("2 all five routes are registered with surface props", () => {
   for (const route of ROUTE_FILES) {
     assert.ok(existsSync(join(root, route)), route);
     const src = read(route);
     assert.match(src, /HiringJourneyTimeline/);
+    assert.match(src, new RegExp(`surface="${ROUTE_SURFACE[route]}"`));
   }
   assert.equal(HIRING_JOURNEY_ROUTES.candidate, "/dashboard/hiring-journey");
   assert.equal(HIRING_JOURNEY_ROUTES.profile, "/profile/hiring-journey");
@@ -124,6 +138,10 @@ test("5 timeline component shows read-only badge and markers", () => {
   assert.match(panel, /HIRING_JOURNEY_MARKERS\.timeline/);
   assert.match(panel, /HIRING_JOURNEY_MARKERS\.blockedActions/);
   assert.match(panel, /HIRING_JOURNEY_MARKERS\.auditSummary/);
+  assert.match(panel, /HIRING_JOURNEY_MARKERS\.personaLabel/);
+  assert.match(panel, /HIRING_JOURNEY_MARKERS\.aliasNav/);
+  assert.match(panel, /HIRING_JOURNEY_MARKERS\.overviewLink/);
+  assert.match(panel, /HIRING_JOURNEY_MARKERS\.boardStepNavBlocked/);
 });
 
 test("5b read-only label uses canonical preview copy", () => {
@@ -146,6 +164,8 @@ test("5d timeline has no live-action CTA controls", () => {
   assert.doesNotMatch(panel, /twin-btn-primary/);
   assert.doesNotMatch(panel, /<button/);
   assert.match(panel, /data-hiring-journey-nav="source-module"/);
+  assert.match(panel, /data-hiring-journey-nav="source-module-blocked"/);
+  assert.match(panel, /hiringJourneyBoardStepNavBlocked/);
 });
 
 test("5e step and cross-link hrefs are valid internal paths", () => {
@@ -205,4 +225,59 @@ test("10 no token or secret-like strings in hiring journey sources", () => {
 test("11 doc file exists and npm script registered", () => {
   assert.ok(existsSync(join(root, "..", HIRING_JOURNEY_DOC)));
   assert.match(read("package.json"), /test:hiring-journey/);
+});
+
+test("12 persona labels exist for all five route surfaces", () => {
+  const surfaces = [
+    "candidate_dashboard",
+    "candidate_profile",
+    "recruiter",
+    "company",
+    "board",
+  ] as const;
+  for (const surface of surfaces) {
+    const key = hiringJourneyPersonaLabelKey(surface);
+    assert.ok(en.hiringJourney[key.split(".")[1] as keyof typeof en.hiringJourney]);
+    assert.ok(dictionaries.pl.hiringJourney[key.split(".")[1] as keyof typeof en.hiringJourney]);
+    assert.equal(hiringJourneySurfacePersona(surface), surface.startsWith("candidate") ? "candidate" : surface);
+  }
+});
+
+test("13 candidate alias nav links dashboard and profile routes", () => {
+  const dashboardAlias = hiringJourneyCandidateAliasNav("candidate_dashboard");
+  const profileAlias = hiringJourneyCandidateAliasNav("candidate_profile");
+  assert.ok(dashboardAlias);
+  assert.ok(profileAlias);
+  assert.equal(dashboardAlias?.href, "/profile/hiring-journey");
+  assert.equal(profileAlias?.href, "/dashboard/hiring-journey");
+  assert.equal(hiringJourneyCandidateAliasNav("recruiter"), null);
+  assert.equal(hiringJourneyCandidateAliasNav("board"), null);
+});
+
+test("14 overview links are persona-specific safe routes", () => {
+  assert.equal(hiringJourneyOverviewLink("candidate_dashboard").href, "/dashboard");
+  assert.equal(hiringJourneyOverviewLink("candidate_profile").href, "/profile");
+  assert.equal(hiringJourneyOverviewLink("recruiter").href, "/recruiter/daily-cockpit");
+  assert.equal(hiringJourneyOverviewLink("company").href, "/company/hiring-cockpit");
+  assert.equal(hiringJourneyOverviewLink("board").href, "/board");
+});
+
+test("15 candidate dashboard and profile aliases resolve identical journey data", () => {
+  const dashboardJourney = resolveHiringJourney(hiringJourneySurfacePersona("candidate_dashboard"));
+  const profileJourney = resolveHiringJourney(hiringJourneySurfacePersona("candidate_profile"));
+  assert.deepEqual(
+    dashboardJourney.steps.map((step) => step.id),
+    profileJourney.steps.map((step) => step.id),
+  );
+  assert.equal(dashboardJourney.overallStatus, profileJourney.overallStatus);
+});
+
+test("16 board cross-links omit self-route and step nav stays blocked", () => {
+  const boardLinks = hiringJourneyCrossLinks("board");
+  const hrefs = boardLinks.map((link) => link.href);
+  assert.ok(!hrefs.includes("/board/hiring-journey"));
+  assert.equal(hiringJourneyBoardStepNavBlocked("board"), true);
+  assert.equal(hiringJourneyBoardStepNavBlocked("candidate"), false);
+  const companyLinks = hiringJourneyCrossLinks("company");
+  assert.ok(companyLinks.some((link) => link.href === "/company/candidates/demo-candidate-001"));
 });

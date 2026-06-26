@@ -9,21 +9,29 @@ import { Card, Shell } from "@/components/ui";
 import {
   HIRING_JOURNEY_DEMO_CANDIDATE_ID,
   HIRING_JOURNEY_DEMO_ROLE_ID,
-  type HiringJourneyPersona,
 } from "@/lib/hiring-journey-demo-data";
 import {
   HIRING_JOURNEY_MARKERS,
   HIRING_JOURNEY_PAGE_MARKER,
+  hiringJourneyBoardStepNavBlocked,
+  hiringJourneyCandidateAliasNav,
   hiringJourneyCrossLinks,
   hiringJourneyOverallStatusKey,
+  hiringJourneyOverviewLink,
   hiringJourneyOwnerKey,
+  hiringJourneyPersonaLabelKey,
   hiringJourneySourceKey,
   hiringJourneyStepStatusKey,
+  hiringJourneySurfacePersona,
   resolveHiringJourney,
+  type HiringJourneyRouteSurface,
 } from "@/lib/hiring-journey";
 import type { TranslationKey } from "@/lib/i18n";
 
-const PERSONA_SUBTITLE_KEYS: Record<HiringJourneyPersona, TranslationKey> = {
+const PERSONA_SUBTITLE_KEYS: Record<
+  ReturnType<typeof hiringJourneySurfacePersona>,
+  TranslationKey
+> = {
   candidate: "hiringJourney.subtitleCandidate",
   recruiter: "hiringJourney.subtitleRecruiter",
   company: "hiringJourney.subtitleCompany",
@@ -31,13 +39,17 @@ const PERSONA_SUBTITLE_KEYS: Record<HiringJourneyPersona, TranslationKey> = {
 };
 
 type Props = {
-  persona: HiringJourneyPersona;
+  surface: HiringJourneyRouteSurface;
 };
 
-export function HiringJourneyTimeline({ persona }: Props): ReactNode {
+export function HiringJourneyTimeline({ surface }: Props): ReactNode {
   const { t } = useTranslation();
+  const persona = hiringJourneySurfacePersona(surface);
   const journey = useMemo(() => resolveHiringJourney(persona), [persona]);
   const crossLinks = useMemo(() => hiringJourneyCrossLinks(persona), [persona]);
+  const overviewLink = useMemo(() => hiringJourneyOverviewLink(surface), [surface]);
+  const aliasNav = useMemo(() => hiringJourneyCandidateAliasNav(surface), [surface]);
+  const boardStepNavBlocked = hiringJourneyBoardStepNavBlocked(persona);
 
   return (
     <Shell wide rail={persona === "candidate"}>
@@ -46,6 +58,27 @@ export function HiringJourneyTimeline({ persona }: Props): ReactNode {
         data-testid={HIRING_JOURNEY_MARKERS.page}
         className="space-y-6"
       >
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
+          <Link
+            href={overviewLink.href}
+            className="twin-link twin-touch-target font-medium"
+            data-testid={HIRING_JOURNEY_MARKERS.overviewLink}
+            data-hiring-journey-nav="overview"
+          >
+            ← {t(overviewLink.labelKey)}
+          </Link>
+          {aliasNav ? (
+            <Link
+              href={aliasNav.href}
+              className="twin-link font-medium"
+              data-testid={HIRING_JOURNEY_MARKERS.aliasNav}
+              data-hiring-journey-nav="candidate-alias"
+            >
+              {t(aliasNav.labelKey)}
+            </Link>
+          ) : null}
+        </div>
+
         <header
           className="space-y-4 border-b border-[var(--twin-border)]/60 pb-6"
           data-testid={HIRING_JOURNEY_MARKERS.header}
@@ -59,6 +92,12 @@ export function HiringJourneyTimeline({ persona }: Props): ReactNode {
               <p className="text-sm text-[var(--twin-muted-strong)]">{t(PERSONA_SUBTITLE_KEYS[persona])}</p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
+              <span
+                className="inline-block rounded-full border border-[var(--twin-accent)]/40 px-3 py-1 text-xs font-semibold uppercase text-[var(--twin-accent)]"
+                data-testid={HIRING_JOURNEY_MARKERS.personaLabel}
+              >
+                {t(hiringJourneyPersonaLabelKey(surface))}
+              </span>
               <span
                 className="inline-block rounded-full border border-[var(--twin-border)] px-3 py-1 text-xs font-semibold uppercase"
                 data-testid={HIRING_JOURNEY_MARKERS.readOnlyBadge}
@@ -199,13 +238,23 @@ export function HiringJourneyTimeline({ persona }: Props): ReactNode {
                     <dd className="text-[var(--twin-muted)]">{t(step.safetyBoundaryKey)}</dd>
                   </div>
                 </dl>
-                <Link
-                  href={step.href}
-                  className="twin-link mt-3 inline-block text-xs font-medium"
-                  data-hiring-journey-nav="source-module"
-                >
-                  {t("hiringJourney.stepOpenModule")} →
-                </Link>
+                {boardStepNavBlocked ? (
+                  <span
+                    className="mt-3 inline-block text-xs font-medium text-[var(--twin-muted)]"
+                    data-hiring-journey-nav="source-module-blocked"
+                    data-testid={HIRING_JOURNEY_MARKERS.boardStepNavBlocked}
+                  >
+                    {t("hiringJourney.stepOpenModuleBlocked")}
+                  </span>
+                ) : (
+                  <Link
+                    href={step.href}
+                    className="twin-link mt-3 inline-block text-xs font-medium"
+                    data-hiring-journey-nav="source-module"
+                  >
+                    {t("hiringJourney.stepOpenModule")} →
+                  </Link>
+                )}
               </li>
             ))}
           </ol>
@@ -262,6 +311,7 @@ export function HiringJourneyTimeline({ persona }: Props): ReactNode {
               key={link.id}
               href={link.href}
               className="twin-link rounded-full border border-[var(--twin-border)] px-3 py-1 text-xs"
+              data-hiring-journey-nav={`cross-link-${link.id}`}
             >
               {t(link.labelKey)}
             </Link>
