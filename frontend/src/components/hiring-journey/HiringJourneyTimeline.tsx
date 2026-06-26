@@ -20,6 +20,7 @@ import {
   hiringJourneyOverviewLink,
   hiringJourneyOwnerKey,
   hiringJourneyPersonaLabelKey,
+  hiringJourneyProvenanceSourceModuleDrillIn,
   hiringJourneySourceKey,
   hiringJourneyStepStatusKey,
   hiringJourneySurfacePersona,
@@ -182,7 +183,12 @@ export function HiringJourneyTimeline({ surface }: Props): ReactNode {
           </h2>
           <p className="mt-2 text-xs text-[var(--twin-muted)]">{t("hiringJourney.timelineLead")}</p>
           <ol className="mt-4 space-y-4">
-            {journey.steps.map((step) => (
+            {journey.steps.map((step) => {
+              const provenanceDrillIn = hiringJourneyProvenanceSourceModuleDrillIn(
+                step.sourceModuleId,
+                persona,
+              );
+              return (
               <li
                 key={step.id}
                 className="rounded border border-[var(--twin-border)]/60 p-4 text-xs"
@@ -208,11 +214,44 @@ export function HiringJourneyTimeline({ surface }: Props): ReactNode {
                     {t("hiringJourney.provenanceTitle")}
                   </p>
                   <dl className="mt-2 grid gap-2 sm:grid-cols-2">
-                    <div>
+                    <div
+                      data-testid={`${HIRING_JOURNEY_MARKERS.stepProvenanceSourceModule}-${step.id}`}
+                    >
                       <dt className="text-[10px] uppercase text-[var(--twin-muted)]">
                         {t("hiringJourney.stepSourceModuleLabel")}
                       </dt>
-                      <dd>{t(step.sourceModuleKey)}</dd>
+                      <dd>
+                        {provenanceDrillIn ? (
+                          <Link
+                            href={provenanceDrillIn.href}
+                            className="twin-link font-medium"
+                            data-testid={`${HIRING_JOURNEY_MARKERS.stepProvenanceSourceModuleLink}-${step.id}`}
+                            data-hiring-journey-nav="provenance-source-module"
+                          >
+                            {t(step.sourceModuleKey)}
+                          </Link>
+                        ) : boardStepNavBlocked ? (
+                          <span
+                            data-testid={`${HIRING_JOURNEY_MARKERS.stepProvenanceSourceModuleText}-${step.id}`}
+                            data-hiring-journey-nav="provenance-source-module-blocked"
+                          >
+                            {t(step.sourceModuleKey)}
+                          </span>
+                        ) : (
+                          <span data-testid={`${HIRING_JOURNEY_MARKERS.stepProvenanceSourceModuleText}-${step.id}`}>
+                            {t(step.sourceModuleKey)}
+                          </span>
+                        )}
+                        {provenanceDrillIn ? (
+                          <Link
+                            href={provenanceDrillIn.href}
+                            className="twin-link mt-1 block text-[10px] font-medium"
+                            data-hiring-journey-nav="provenance-source-module"
+                          >
+                            {t(provenanceDrillIn.labelKey)} →
+                          </Link>
+                        ) : null}
+                      </dd>
                     </div>
                     <div>
                       <dt className="text-[10px] uppercase text-[var(--twin-muted)]">
@@ -296,7 +335,8 @@ export function HiringJourneyTimeline({ surface }: Props): ReactNode {
                   </Link>
                 )}
               </li>
-            ))}
+            );
+            })}
           </ol>
         </Card>
 
