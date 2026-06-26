@@ -47,6 +47,11 @@ export const HIRING_JOURNEY_STEP_IDS: readonly HiringJourneyStepId[] = [
   "onboarding_preview",
 ] as const;
 
+export type HiringJourneyStepProvenance = {
+  evidenceLabelKey: TranslationKey;
+  humanReviewRequired: boolean;
+};
+
 export type HiringJourneyStepTemplate = {
   id: HiringJourneyStepId;
   order: number;
@@ -56,6 +61,7 @@ export type HiringJourneyStepTemplate = {
   owner: HiringJourneyOwner;
   sourceModuleKey: TranslationKey;
   evidenceSummaryKey: TranslationKey;
+  provenance: HiringJourneyStepProvenance;
   blockerKey?: TranslationKey;
   nextSafeActionKey: TranslationKey;
   safetyBoundaryKey: TranslationKey;
@@ -105,6 +111,10 @@ const STEP_TEMPLATES: HiringJourneyStepTemplate[] = [
     owner: "candidate",
     sourceModuleKey: "hiringJourney.moduleJobDiscovery",
     evidenceSummaryKey: "hiringJourney.stepDiscoveryEvidence",
+    provenance: {
+      evidenceLabelKey: "hiringJourney.provenanceDiscoveryEvidenceLabel",
+      humanReviewRequired: false,
+    },
     nextSafeActionKey: "hiringJourney.stepDiscoveryNextAction",
     safetyBoundaryKey: "hiringJourney.stepDiscoverySafety",
   },
@@ -117,6 +127,10 @@ const STEP_TEMPLATES: HiringJourneyStepTemplate[] = [
     owner: "system",
     sourceModuleKey: "hiringJourney.moduleMatching",
     evidenceSummaryKey: "hiringJourney.stepMatchingEvidence",
+    provenance: {
+      evidenceLabelKey: "hiringJourney.provenanceMatchingEvidenceLabel",
+      humanReviewRequired: false,
+    },
     nextSafeActionKey: "hiringJourney.stepMatchingNextAction",
     safetyBoundaryKey: "hiringJourney.stepMatchingSafety",
   },
@@ -129,6 +143,10 @@ const STEP_TEMPLATES: HiringJourneyStepTemplate[] = [
     owner: "candidate",
     sourceModuleKey: "hiringJourney.moduleTrustCenter",
     evidenceSummaryKey: "hiringJourney.stepTrustEvidence",
+    provenance: {
+      evidenceLabelKey: "hiringJourney.provenanceTrustEvidenceLabel",
+      humanReviewRequired: true,
+    },
     blockerKey: "hiringJourney.stepTrustBlocker",
     nextSafeActionKey: "hiringJourney.stepTrustNextAction",
     safetyBoundaryKey: "hiringJourney.stepTrustSafety",
@@ -142,6 +160,10 @@ const STEP_TEMPLATES: HiringJourneyStepTemplate[] = [
     owner: "candidate",
     sourceModuleKey: "hiringJourney.moduleProfile360",
     evidenceSummaryKey: "hiringJourney.stepProfileEvidence",
+    provenance: {
+      evidenceLabelKey: "hiringJourney.provenanceProfileEvidenceLabel",
+      humanReviewRequired: true,
+    },
     nextSafeActionKey: "hiringJourney.stepProfileNextAction",
     safetyBoundaryKey: "hiringJourney.stepProfileSafety",
   },
@@ -154,6 +176,10 @@ const STEP_TEMPLATES: HiringJourneyStepTemplate[] = [
     owner: "recruiter",
     sourceModuleKey: "hiringJourney.moduleOfferReadiness",
     evidenceSummaryKey: "hiringJourney.stepOfferReadinessEvidence",
+    provenance: {
+      evidenceLabelKey: "hiringJourney.provenanceOfferReadinessEvidenceLabel",
+      humanReviewRequired: true,
+    },
     blockerKey: "hiringJourney.stepOfferReadinessBlocker",
     nextSafeActionKey: "hiringJourney.stepOfferReadinessNextAction",
     safetyBoundaryKey: "hiringJourney.stepOfferReadinessSafety",
@@ -167,6 +193,10 @@ const STEP_TEMPLATES: HiringJourneyStepTemplate[] = [
     owner: "recruiter",
     sourceModuleKey: "hiringJourney.moduleSchedulingProposal",
     evidenceSummaryKey: "hiringJourney.stepSchedulingProposalEvidence",
+    provenance: {
+      evidenceLabelKey: "hiringJourney.provenanceSchedulingEvidenceLabel",
+      humanReviewRequired: true,
+    },
     blockerKey: "hiringJourney.stepSchedulingProposalBlocker",
     nextSafeActionKey: "hiringJourney.stepSchedulingProposalNextAction",
     safetyBoundaryKey: "hiringJourney.stepSchedulingProposalSafety",
@@ -180,6 +210,10 @@ const STEP_TEMPLATES: HiringJourneyStepTemplate[] = [
     owner: "candidate",
     sourceModuleKey: "hiringJourney.moduleCalendarReadiness",
     evidenceSummaryKey: "hiringJourney.stepInterviewPrepEvidence",
+    provenance: {
+      evidenceLabelKey: "hiringJourney.provenanceInterviewPrepEvidenceLabel",
+      humanReviewRequired: true,
+    },
     blockerKey: "hiringJourney.stepInterviewPrepBlocker",
     nextSafeActionKey: "hiringJourney.stepInterviewPrepNextAction",
     safetyBoundaryKey: "hiringJourney.stepInterviewPrepSafety",
@@ -193,6 +227,10 @@ const STEP_TEMPLATES: HiringJourneyStepTemplate[] = [
     owner: "recruiter",
     sourceModuleKey: "hiringJourney.moduleDecisionContext",
     evidenceSummaryKey: "hiringJourney.stepDecisionReviewEvidence",
+    provenance: {
+      evidenceLabelKey: "hiringJourney.provenanceDecisionReviewEvidenceLabel",
+      humanReviewRequired: true,
+    },
     nextSafeActionKey: "hiringJourney.stepDecisionReviewNextAction",
     safetyBoundaryKey: "hiringJourney.stepDecisionReviewSafety",
   },
@@ -205,6 +243,10 @@ const STEP_TEMPLATES: HiringJourneyStepTemplate[] = [
     owner: "company",
     sourceModuleKey: "hiringJourney.moduleOfferReadiness",
     evidenceSummaryKey: "hiringJourney.stepOfferDecisionEvidence",
+    provenance: {
+      evidenceLabelKey: "hiringJourney.provenanceOfferDecisionEvidenceLabel",
+      humanReviewRequired: true,
+    },
     nextSafeActionKey: "hiringJourney.stepOfferDecisionNextAction",
     safetyBoundaryKey: "hiringJourney.stepOfferDecisionSafety",
   },
@@ -217,6 +259,10 @@ const STEP_TEMPLATES: HiringJourneyStepTemplate[] = [
     owner: "board",
     sourceModuleKey: "hiringJourney.modulePlacementVerification",
     evidenceSummaryKey: "hiringJourney.stepPlacementEvidence",
+    provenance: {
+      evidenceLabelKey: "hiringJourney.provenancePlacementEvidenceLabel",
+      humanReviewRequired: true,
+    },
     blockerKey: "hiringJourney.stepPlacementBlocker",
     nextSafeActionKey: "hiringJourney.stepPlacementNextAction",
     safetyBoundaryKey: "hiringJourney.stepPlacementSafety",
@@ -230,6 +276,10 @@ const STEP_TEMPLATES: HiringJourneyStepTemplate[] = [
     owner: "system",
     sourceModuleKey: "hiringJourney.moduleOnboardingPreview",
     evidenceSummaryKey: "hiringJourney.stepOnboardingEvidence",
+    provenance: {
+      evidenceLabelKey: "hiringJourney.provenanceOnboardingEvidenceLabel",
+      humanReviewRequired: false,
+    },
     nextSafeActionKey: "hiringJourney.stepOnboardingNextAction",
     safetyBoundaryKey: "hiringJourney.stepOnboardingSafety",
   },
@@ -332,6 +382,10 @@ const PERSONA_OVERALL_STATUS: Record<HiringJourneyPersona, HiringJourneyOverallS
 
 export function getHiringJourneyStepTemplates(): readonly HiringJourneyStepTemplate[] {
   return STEP_TEMPLATES;
+}
+
+export function hiringJourneyHumanReviewStepIds(): readonly HiringJourneyStepId[] {
+  return STEP_TEMPLATES.filter((step) => step.provenance.humanReviewRequired).map((step) => step.id);
 }
 
 export function getHiringJourneyBlockedActions(): readonly HiringJourneyBlockedAction[] {

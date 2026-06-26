@@ -16,6 +16,7 @@ import {
   hiringJourneyBoardStepNavBlocked,
   hiringJourneyCandidateAliasNav,
   hiringJourneyCrossLinks,
+  hiringJourneyHumanReviewStepIds,
   hiringJourneyOverviewLink,
   hiringJourneyPersonaLabelKey,
   hiringJourneySurfacePersona,
@@ -105,9 +106,49 @@ test("3 each step has required fields", () => {
     assert.ok(step.status);
     assert.ok(step.sourceModuleKey);
     assert.ok(step.evidenceSummaryKey);
+    assert.ok(step.provenance);
+    assert.ok(step.provenance.evidenceLabelKey);
+    assert.equal(typeof step.provenance.humanReviewRequired, "boolean");
     assert.ok(step.nextSafeActionKey);
     assert.ok(step.safetyBoundaryKey);
     assert.ok(step.href.startsWith("/"));
+  }
+});
+
+test("3b each step has evidence provenance metadata", () => {
+  const journey = resolveHiringJourney("candidate");
+  assert.equal(journey.steps.length, HIRING_JOURNEY_STEP_IDS.length);
+  for (const step of journey.steps) {
+    assert.ok(
+      en.hiringJourney[step.provenance.evidenceLabelKey.split(".")[1] as keyof typeof en.hiringJourney],
+      `EN provenance label for ${step.id}`,
+    );
+    assert.ok(
+      dictionaries.pl.hiringJourney[step.provenance.evidenceLabelKey.split(".")[1] as keyof typeof en.hiringJourney],
+      `PL provenance label for ${step.id}`,
+    );
+  }
+});
+
+test("3c human review required on expected steps only", () => {
+  const expected = [
+    "trust_review",
+    "candidate_readiness",
+    "offer_readiness",
+    "scheduling_proposal",
+    "interview_preparation",
+    "decision_review",
+    "offer_decision",
+    "placement_verification",
+  ] as const;
+  assert.deepEqual([...hiringJourneyHumanReviewStepIds()].sort(), [...expected].sort());
+  const journey = resolveHiringJourney("recruiter");
+  for (const step of journey.steps) {
+    if (expected.includes(step.id as (typeof expected)[number])) {
+      assert.equal(step.provenance.humanReviewRequired, true, step.id);
+    } else {
+      assert.equal(step.provenance.humanReviewRequired, false, step.id);
+    }
   }
 });
 
@@ -142,6 +183,12 @@ test("5 timeline component shows read-only badge and markers", () => {
   assert.match(panel, /HIRING_JOURNEY_MARKERS\.aliasNav/);
   assert.match(panel, /HIRING_JOURNEY_MARKERS\.overviewLink/);
   assert.match(panel, /HIRING_JOURNEY_MARKERS\.boardStepNavBlocked/);
+  assert.match(panel, /HIRING_JOURNEY_MARKERS\.stepProvenance/);
+  assert.match(panel, /HIRING_JOURNEY_MARKERS\.stepProvenanceHumanReview/);
+  assert.match(panel, /HIRING_JOURNEY_MARKERS\.stepProvenanceNoLiveAction/);
+  assert.match(panel, /HIRING_JOURNEY_MARKERS\.stepProvenanceMonitorOnly/);
+  assert.match(panel, /hiringJourney\.provenanceTitle/);
+  assert.match(panel, /hiringJourney\.provenanceNoLiveActionTaken/);
 });
 
 test("5b read-only label uses canonical preview copy", () => {
@@ -270,6 +317,15 @@ test("15 candidate dashboard and profile aliases resolve identical journey data"
     profileJourney.steps.map((step) => step.id),
   );
   assert.equal(dashboardJourney.overallStatus, profileJourney.overallStatus);
+});
+
+test("5f board provenance shows monitor-only on every step", () => {
+  const panel = read("src/components/hiring-journey/HiringJourneyTimeline.tsx");
+  assert.match(panel, /persona === "board"/);
+  assert.match(panel, /provenanceMonitorOnly/);
+  assert.match(en.hiringJourney.provenanceMonitorOnly, /monitor-only/i);
+  assert.doesNotMatch(en.hiringJourney.provenancePlacementEvidenceLabel, /revenue/i);
+  assert.doesNotMatch(en.hiringJourney.provenancePlacementEvidenceLabel, /employer confirmed/i);
 });
 
 test("16 board cross-links omit self-route and step nav stays blocked", () => {

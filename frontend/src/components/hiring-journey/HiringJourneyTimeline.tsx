@@ -200,16 +200,56 @@ export function HiringJourneyTimeline({ surface }: Props): ReactNode {
                   </span>
                 </div>
                 <p className="mt-2 text-[var(--twin-muted-strong)]">{t(step.descriptionKey)}</p>
+                <div
+                  className="mt-3 rounded border border-dashed border-[var(--twin-border)]/70 bg-[var(--twin-surface-raised)]/30 p-3"
+                  data-testid={`${HIRING_JOURNEY_MARKERS.stepProvenance}-${step.id}`}
+                >
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--twin-muted)]">
+                    {t("hiringJourney.provenanceTitle")}
+                  </p>
+                  <dl className="mt-2 grid gap-2 sm:grid-cols-2">
+                    <div>
+                      <dt className="text-[10px] uppercase text-[var(--twin-muted)]">
+                        {t("hiringJourney.stepSourceModuleLabel")}
+                      </dt>
+                      <dd>{t(step.sourceModuleKey)}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-[10px] uppercase text-[var(--twin-muted)]">
+                        {t("hiringJourney.provenanceEvidenceLabel")}
+                      </dt>
+                      <dd>{t(step.provenance.evidenceLabelKey)}</dd>
+                    </div>
+                    <div data-testid={`${HIRING_JOURNEY_MARKERS.stepProvenanceHumanReview}-${step.id}`}>
+                      <dt className="text-[10px] uppercase text-[var(--twin-muted)]">
+                        {t("hiringJourney.provenanceHumanReviewLabel")}
+                      </dt>
+                      <dd>
+                        {step.provenance.humanReviewRequired
+                          ? t("hiringJourney.provenanceHumanReviewRequired")
+                          : t("hiringJourney.provenanceHumanReviewNotRequired")}
+                      </dd>
+                    </div>
+                    <div data-testid={`${HIRING_JOURNEY_MARKERS.stepProvenanceNoLiveAction}-${step.id}`}>
+                      <dt className="text-[10px] uppercase text-[var(--twin-muted)]">
+                        {t("hiringJourney.provenanceNoLiveActionLabel")}
+                      </dt>
+                      <dd>{t("hiringJourney.provenanceNoLiveActionTaken")}</dd>
+                    </div>
+                  </dl>
+                  {persona === "board" ? (
+                    <p
+                      className="mt-2 text-[10px] font-medium text-[var(--twin-accent)]"
+                      data-testid={`${HIRING_JOURNEY_MARKERS.stepProvenanceMonitorOnly}-${step.id}`}
+                    >
+                      {t("hiringJourney.provenanceMonitorOnly")}
+                    </p>
+                  ) : null}
+                </div>
                 <dl className="mt-3 grid gap-2 sm:grid-cols-2">
                   <div>
                     <dt className="text-[10px] uppercase text-[var(--twin-muted)]">{t("hiringJourney.stepOwnerLabel")}</dt>
                     <dd>{t(hiringJourneyOwnerKey(step.owner))}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-[10px] uppercase text-[var(--twin-muted)]">
-                      {t("hiringJourney.stepSourceModuleLabel")}
-                    </dt>
-                    <dd>{t(step.sourceModuleKey)}</dd>
                   </div>
                   <div className="sm:col-span-2">
                     <dt className="text-[10px] uppercase text-[var(--twin-muted)]">
