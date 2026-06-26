@@ -40,6 +40,10 @@ export const HIRING_JOURNEY_MARKERS = {
   aliasNav: "hiring-journey-alias-nav",
   overviewLink: "hiring-journey-overview-link",
   boardStepNavBlocked: "hiring-journey-board-step-nav-blocked",
+  stepProvenance: "hiring-journey-step-provenance",
+  stepProvenanceHumanReview: "hiring-journey-step-provenance-human-review",
+  stepProvenanceNoLiveAction: "hiring-journey-step-provenance-no-live-action",
+  stepProvenanceMonitorOnly: "hiring-journey-step-provenance-monitor-only",
 } as const;
 
 export const HIRING_JOURNEY_ROUTES: Record<HiringJourneyPersona | "profile", string> = {
@@ -274,4 +278,8 @@ export function resolveHiringJourney(persona: HiringJourneyPersona): HiringJourn
   return { ...base, steps };
 }
 
-export { HIRING_JOURNEY_PERSONAS, HIRING_JOURNEY_STEP_IDS } from "@/lib/hiring-journey-demo-data";
+export {
+  HIRING_JOURNEY_PERSONAS,
+  HIRING_JOURNEY_STEP_IDS,
+  hiringJourneyHumanReviewStepIds,
+} from "@/lib/hiring-journey-demo-data";
