@@ -34,6 +34,7 @@ export const BOARD_PLACEMENT_EVIDENCE_MONITOR_LINKS = [
   { id: "candidate_preview", href: "/dashboard/placement-verification", labelKey: "candidatePlacementVerification.pageTitle" as TranslationKey },
   { id: "recruiter_checklist", href: "/recruiter/placement-verification", labelKey: "placementChecklist.recruiterPageTitle" as TranslationKey },
   { id: "company_checklist", href: "/company/placement-verification", labelKey: "placementChecklist.companyPageTitle" as TranslationKey },
+  { id: "hiring_journey", href: "/board/hiring-journey", labelKey: "hiringJourney.crossLinkHiringJourney" as TranslationKey },
 ] as const;
 
 export function boardPlacementEvidenceMonitorHref(): string {

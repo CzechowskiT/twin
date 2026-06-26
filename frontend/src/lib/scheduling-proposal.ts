@@ -8,6 +8,7 @@ import {
   type SchedulingProposalStatus,
 } from "@/lib/scheduling-proposal-demo-data";
 import type { TranslationKey } from "@/lib/i18n";
+import { HIRING_JOURNEY_ROUTES } from "@/lib/hiring-journey";
 
 export const SCHEDULING_PROPOSAL_DOC = "docs/SCHEDULING_PROPOSAL_PACK_2026-06-25.md";
 
@@ -128,6 +129,11 @@ export function schedulingProposalCrossLinks(
     { id: "calendar_readiness", href: calendarRoute, labelKey: "schedulingProposal.crossLinkCalendarReadiness" },
     { id: "trust", href: trustRoute, labelKey: "schedulingProposal.crossLinkTrust" },
     { id: "board", href: boardRoute, labelKey: "schedulingProposal.crossLinkBoard" },
+    {
+      id: "hiring_journey",
+      href: HIRING_JOURNEY_ROUTES[persona],
+      labelKey: "hiringJourney.crossLinkHiringJourney",
+    },
   ];
 }
 
