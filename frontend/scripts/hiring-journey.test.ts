@@ -8,14 +8,20 @@ import { fileURLToPath } from "node:url";
 import test from "node:test";
 
 import {
+  HIRING_JOURNEY_ALLOWED_NAV_ATTRIBUTES,
+  HIRING_JOURNEY_ALLOWED_SAFE_COPY_MARKERS,
   HIRING_JOURNEY_DOC,
+  HIRING_JOURNEY_FORBIDDEN_LIVE_ACTION_COPY,
+  HIRING_JOURNEY_FORBIDDEN_MUTATION_CONTROLS,
   HIRING_JOURNEY_MARKERS,
   HIRING_JOURNEY_PERSONAS,
   HIRING_JOURNEY_ROUTES,
   HIRING_JOURNEY_STEP_IDS,
+  HIRING_JOURNEY_UI_SOURCE_FILES,
   hiringJourneyBoardStepNavBlocked,
   hiringJourneyCandidateAliasNav,
   hiringJourneyCrossLinks,
+  hiringJourneyHasAffirmativeForbiddenCopy,
   hiringJourneyHumanReviewStepIds,
   hiringJourneyOverviewLink,
   hiringJourneyPersonaLabelKey,
@@ -53,21 +59,13 @@ const REQUIRED_BLOCKED = [
   /no external employer confirmation/i,
 ] as const;
 
-const FORBIDDEN_COPY = [
-  /meeting created/i,
-  /(?<!no )invite sent/i,
-  /(?<!no )email sent/i,
-  /calendar synced/i,
-  /automatic scheduling/i,
-  /employer confirmed/i,
-  /candidate hired/i,
-  /offer accepted/i,
-  /placement confirmed externally/i,
-  /revenue recognized/i,
-  /launch ready/i,
-] as const;
+const FORBIDDEN_COPY = HIRING_JOURNEY_FORBIDDEN_LIVE_ACTION_COPY;
 
 const SECRET_PATTERNS = [/sk_live_/i, /Bearer eyJ/i, /password\s*=\s*["'][^"']+["']/i] as const;
+
+function stripSourceComments(src: string): string {
+  return src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
+}
 
 function read(rel: string): string {
   return readFileSync(join(root, rel), "utf8");
@@ -239,7 +237,11 @@ test("6 cross-links point to existing safe routes", () => {
 test("7 no forbidden claims in EN i18n namespace", () => {
   const blob = JSON.stringify(en.hiringJourney);
   for (const pattern of FORBIDDEN_COPY) {
-    assert.doesNotMatch(blob, pattern, `forbidden in EN: ${pattern}`);
+    assert.equal(
+      hiringJourneyHasAffirmativeForbiddenCopy(blob, pattern),
+      false,
+      `forbidden in EN: ${pattern}`,
+    );
   }
 });
 
@@ -336,4 +338,41 @@ test("16 board cross-links omit self-route and step nav stays blocked", () => {
   assert.equal(hiringJourneyBoardStepNavBlocked("candidate"), false);
   const companyLinks = hiringJourneyCrossLinks("company");
   assert.ok(companyLinks.some((link) => link.href === "/company/candidates/demo-candidate-001"));
+});
+
+test("17 negative live-action guard — prohibited copy, controls, allowed nav", () => {
+  const sourceBlob = HIRING_JOURNEY_UI_SOURCE_FILES.map((rel) => read(rel)).join("\n");
+  const componentSrc = stripSourceComments(read("src/components/hiring-journey/HiringJourneyTimeline.tsx"));
+
+  for (const pattern of FORBIDDEN_COPY) {
+    assert.equal(
+      hiringJourneyHasAffirmativeForbiddenCopy(sourceBlob, pattern),
+      false,
+      `affirmative forbidden copy in hiring journey sources: ${pattern}`,
+    );
+  }
+
+  for (const locale of LOCALES) {
+    const blob = JSON.stringify(dictionaries[locale].hiringJourney);
+    for (const pattern of FORBIDDEN_COPY) {
+      assert.equal(
+        hiringJourneyHasAffirmativeForbiddenCopy(blob, pattern),
+        false,
+        `affirmative forbidden copy in ${locale}.hiringJourney: ${pattern}`,
+      );
+    }
+  }
+
+  const enBlob = JSON.stringify(en.hiringJourney);
+  for (const marker of HIRING_JOURNEY_ALLOWED_SAFE_COPY_MARKERS) {
+    assert.match(enBlob, marker, `required safe marker in EN: ${marker}`);
+  }
+
+  for (const pattern of HIRING_JOURNEY_FORBIDDEN_MUTATION_CONTROLS) {
+    assert.doesNotMatch(componentSrc, pattern, `mutation control in timeline component: ${pattern}`);
+  }
+
+  for (const navAttr of HIRING_JOURNEY_ALLOWED_NAV_ATTRIBUTES) {
+    assert.match(componentSrc, new RegExp(navAttr.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
 });

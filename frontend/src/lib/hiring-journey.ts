@@ -46,6 +46,98 @@ export const HIRING_JOURNEY_MARKERS = {
   stepProvenanceMonitorOnly: "hiring-journey-step-provenance-monitor-only",
 } as const;
 
+/** User-facing hiring journey surfaces for copy guards (excludes guard pattern definitions). */
+export const HIRING_JOURNEY_UI_SOURCE_FILES = [
+  "src/lib/hiring-journey-demo-data.ts",
+  "src/components/hiring-journey/HiringJourneyTimeline.tsx",
+  "src/app/dashboard/hiring-journey/page.tsx",
+  "src/app/profile/hiring-journey/page.tsx",
+  "src/app/recruiter/hiring-journey/page.tsx",
+  "src/app/company/hiring-journey/page.tsx",
+  "src/app/board/hiring-journey/page.tsx",
+] as const;
+
+/** Static guard patterns — hiring journey scope only; consumed by scripts/hiring-journey.test.ts */
+export const HIRING_JOURNEY_SOURCE_FILES = [
+  "src/lib/hiring-journey.ts",
+  ...HIRING_JOURNEY_UI_SOURCE_FILES,
+] as const;
+
+export const HIRING_JOURNEY_FORBIDDEN_LIVE_ACTION_COPY = [
+  /\bschedule interview\b/i,
+  /\bsend invite\b/i,
+  /\bsend email\b/i,
+  /\bsync calendar\b/i,
+  /\badvance candidate\b/i,
+  /\bmove candidate\b/i,
+  /\bats writeback\b/i,
+  /\bwrite to ats\b/i,
+  /\bconfirm placement\b/i,
+  /\bemployer confirmed\b/i,
+  /\brevenue recognized\b/i,
+  /\bpayment initiated\b/i,
+  /\bcharge card\b/i,
+  /\bpay now\b/i,
+  /\bsubmit application\b/i,
+  /\bsend offer\b/i,
+  /\bapprove offer\b/i,
+  /\bbook interview\b/i,
+  /\bcalendar write\b/i,
+  /\bcalendar event write\b/i,
+  /\bevent write\b/i,
+  /\blive busy-read enabled\b/i,
+  /\blive busy-read is live\b/i,
+  /\blive busy-read available\b/i,
+  /meeting created/i,
+  /(?<!no )invite sent/i,
+  /(?<!no )email sent/i,
+  /calendar synced/i,
+  /automatic scheduling/i,
+  /candidate hired/i,
+  /(?<!no )offer accepted/i,
+  /placement confirmed externally/i,
+  /launch ready/i,
+] as const;
+
+export const HIRING_JOURNEY_ALLOWED_SAFE_COPY_MARKERS = [
+  /read-only preview/i,
+  /human review/i,
+  /no live action/i,
+  /monitor-only/i,
+  /\bblocked\b/i,
+  /provenance/i,
+] as const;
+
+export const HIRING_JOURNEY_FORBIDDEN_MUTATION_CONTROLS = [
+  /<button\b/i,
+  /type=["']submit["']/i,
+  /twin-btn-primary/,
+  /role=["']button["']/i,
+  /<form\b/i,
+] as const;
+
+export const HIRING_JOURNEY_ALLOWED_NAV_ATTRIBUTES = [
+  'data-hiring-journey-nav="overview"',
+  'data-hiring-journey-nav="candidate-alias"',
+  'data-hiring-journey-nav="source-module"',
+  'data-hiring-journey-nav="source-module-blocked"',
+  "data-hiring-journey-nav={`cross-link-",
+] as const;
+
+const LIVE_ACTION_NEGATION_WINDOW = 32;
+
+/** True when pattern matches outside a nearby no/not/blocked/disabled safety window. */
+export function hiringJourneyHasAffirmativeForbiddenCopy(text: string, pattern: RegExp): boolean {
+  const re = new RegExp(pattern.source, pattern.flags.includes("g") ? pattern.flags : `${pattern.flags}g`);
+  for (const match of text.matchAll(re)) {
+    const index = match.index ?? 0;
+    const window = text.slice(Math.max(0, index - LIVE_ACTION_NEGATION_WINDOW), index).toLowerCase();
+    if (/\b(?:no|not|blocked|disabled|without|never)\b/.test(window)) continue;
+    return true;
+  }
+  return false;
+}
+
 export const HIRING_JOURNEY_ROUTES: Record<HiringJourneyPersona | "profile", string> = {
   candidate: "/dashboard/hiring-journey",
   profile: "/profile/hiring-journey",
