@@ -26,6 +26,11 @@ Evidence-only batch. **P0 performance remains OPEN.** No Phase 3B, multitab, bro
 | `/board/calendar-readiness` | Board monitor + scheduling decision context |
 | `/board/placement-verification` | Evidence matrix + lazy timeline |
 | `/board/persistence-operations-monitor` | Multi-channel aggregate, memoized |
+| `/dashboard/hiring-journey` | Read-only timeline; memoized demo resolver |
+| `/profile/hiring-journey` | Candidate alias; read-only, no live-action |
+| `/recruiter/hiring-journey` | Read-only timeline; memoized demo resolver |
+| `/company/hiring-journey` | Read-only timeline; memoized demo resolver |
+| `/board/hiring-journey` | Blocked demo state; monitor-only drill-in |
 
 ## Known safety improvements (prior + this batch)
 

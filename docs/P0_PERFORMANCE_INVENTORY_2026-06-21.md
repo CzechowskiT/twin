@@ -101,3 +101,7 @@ Additional routes in P0 scope:
 Static guardrails extended: `test:p0-route-weight-inventory`, scheduling panel `useMemo` hardening.
 
 **P0 performance remains OPEN** — Phase 3B still **HARD BLOCKED**.
+
+## Batch 1 extension (2026-06-27)
+
+Hiring Journey routes added to static route-weight inventory (`test:p0-route-weight-inventory`). Scheduling-proposal routes **not** included — already guarded by dedicated `test:scheduling-proposal`. See [P0_PERFORMANCE_INVENTORY_2026-06-27.md](./P0_PERFORMANCE_INVENTORY_2026-06-27.md) (Batch 1 covered; P0 **OPEN**).
