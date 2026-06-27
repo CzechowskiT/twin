@@ -644,6 +644,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     href: COMPANY_HIRING_ROUTE,
     titleKey: "systemOfRecord.companyDashboardTitle",
     descriptionKey: "systemOfRecord.companyDashboardValue",
+    hintKey: "systemOfRecord.companyDashboardHint",
     ctaKey: "systemOfRecord.companyDashboardCta",
     status: "live",
     moduleFamily: "dashboard",

@@ -86,3 +86,9 @@ test("SoR registry includes reconciled workspace-only modules", () => {
   assert.equal(byId.company_pipeline?.status, "live");
   assert.equal(byId.candidate_career_compass?.status, "pilot");
 });
+
+test("company live SoR modules surface tenant token hints", () => {
+  const live = SYSTEM_OF_RECORD_ROUTES.filter((r) => r.persona === "company" && r.status === "live");
+  assert.ok(live.every((r) => r.hintKey));
+  assert.match(en.systemOfRecord.companyDashboardHint.toLowerCase(), /token|pilot|slug|tenant/i);
+});
