@@ -300,3 +300,5 @@ cd frontend && npm run build && npx tsc --noEmit
 | 2026-06-27 | Initial feature status audit at scaffold `ea8c1dc` (prod FE aligned) |
 | 2026-06-27 | Added LAUNCH_STANCE, legacy modules table, full board 13-route inventory |
 | 2026-06-27 | Slice 2 completed by PR #312 — SoR entries for recruiter_pipeline, recruiter_calendar, company_pipeline, candidate_career_compass |
+| 2026-06-27 | Slice 3 completed by PR #313 — company live SoR modules carry tenant token hints |
+| 2026-06-27 | Slice 4 completed by PR #316 — collapse recruiter inbox duplicate module cards (notes_scorecards, scheduling, audit) |
