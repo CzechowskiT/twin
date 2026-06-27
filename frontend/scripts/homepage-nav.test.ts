@@ -77,3 +77,10 @@ test("marketing header does not hide login on mobile menu", () => {
   assert.match(header, /ariaMobileNav/);
   assert.match(header, /headerAccountLinks\(persona, hasSession/);
 });
+
+test("chrome header avoids workspace shell on landing without active session", () => {
+  const chrome = read("src/components/chrome-header.tsx");
+  assert.match(chrome, /hasActiveSession/);
+  assert.match(chrome, /return <MarketingHeader \/>/);
+  assert.doesNotMatch(chrome, /Boolean\(getToken\(\)\)/);
+});

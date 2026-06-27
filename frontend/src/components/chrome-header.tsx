@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 
 import { AuthHeader } from "@/components/auth-header";
 import { WorkspaceHeader } from "@/components/workspace-header";
-import { getToken } from "@/lib/auth";
+import { hasActiveSession } from "@/lib/auth";
 import { isAuthPath, isWorkspacePath } from "@/lib/performance-route-classification";
 
 const MarketingHeader = dynamic(
@@ -28,7 +28,7 @@ export function ChromeHeader() {
   const [hasSession, setHasSession] = useState(false);
 
   useEffect(() => {
-    const sync = () => setHasSession(Boolean(getToken()));
+    const sync = () => setHasSession(hasActiveSession());
     sync();
     window.addEventListener("storage", sync);
     return () => window.removeEventListener("storage", sync);
