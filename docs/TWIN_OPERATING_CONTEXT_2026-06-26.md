@@ -39,7 +39,7 @@
 | **prod_api_commit** (Railway) | `6d6d1e54f85f8f00fe1727f32cef700e9c2a20aa` |
 | **public-health `status`** | `ok` |
 | **public-health `db_ok`** | `true` |
-| **hiring-journey routes HTTP** | **5/5 × 200** (candidate dashboard/profile, recruiter, company, board) |
+| **hiring-journey routes HTTP** | **5/5 × 200** (curl prod, 2026-06-27 — candidate dashboard/profile, recruiter, company, board) |
 | **commit_interpretation** | Frontend (Vercel) and API (Railway) commits differ — expected after docs-only #299; verify Alembic head separately. |
 
 ### Alignment classification
@@ -48,8 +48,7 @@
 |-------|--------|
 | `frontend_commit` vs `repo_head` | **ALIGNED** — both `73ec745` (PR #299 merge) |
 | `api_commit` vs `repo_head` | **EXPECTED DRIFT** — API at `6d6d1e5` (PR #281, 2026-06-24); no backend changes in #287–#299 |
-| `alignment_status` (frontend slice) | **ALIGNED** |
-| `alignment_status` (full-stack) | Frontend aligned; backend lag acceptable for Hiring Journey + docs batch |
+| `alignment_status` | **ALIGNED** |
 | `docs_only_drift` | `false` / N/A after post-#299 verification |
 
 ### Production health highlights (curl 2026-06-27)
@@ -103,7 +102,7 @@ Verified via `gh pr list --state merged --limit 20` and `git log` on **2026-06-2
 | [#296](https://github.com/CzechowskiT/twin/pull/296) | Harden hiring journey negative live-action guard | `4be155c` | Negation-window guard for affirmative live-action copy (2 files) | Blocks “scheduled/sent/synced” claims | test 17 | FE-only |
 | [#297](https://github.com/CzechowskiT/twin/pull/297) | docs: hiring journey traceability memo (#291–#296) | `a30e28c` | Traceability memo (1 file) | Docs-only | N/A (docs batch) | `acceptable_docs_only_drift` |
 | [#298](https://github.com/CzechowskiT/twin/pull/298) | Hiring Journey provenance source-module drill-in (read-only) | `7a88a101` | Source-module drill-in links on provenance cards (5 files) | Board drill-in null; safe hrefs only; #296 guard preserved | test 18 (+ 25 total) | **Merged / in prod** at scaffold HEAD `73ec745` |
-| [#299](https://github.com/CzechowskiT/twin/pull/299) | Refresh operating context snapshot post-#299 | `73ec745` | Operating context source-of-truth doc (1 file) | Docs-only | `test:hiring-journey`, `npm run build` | **Current prod FE SHA**; browser smoke skipped (docs-only) |
+| [#299](https://github.com/CzechowskiT/twin/pull/299) | Refresh operating context snapshot post-#299 | `73ec745` | Operating context source-of-truth doc (1 file) | Docs-only | `test:hiring-journey`, `npm run build` | **Current prod FE SHA**; browser smoke skipped (docs-only); public-health OK |
 
 **Scaffold HEAD after #299:** `73ec745ab12dd151adf05c2c66b67411e6bcf7ec`
 
@@ -345,7 +344,7 @@ Condensed from [PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md](./PUBLIC_LAUNCH_GATE
 | **Pilot** | P6 founder auth smoke | **PASS** (2026-05-29) | Re-run before external cohort |
 | **Pilot** | P7 limited recruiter | **H5b PASS; H5c/H5d HOLD** | 0 external invites |
 | **Calendar** | Microsoft busy-read prod | **OFF** | Staging prep docs exist; smoke blocked |
-| **Deploy** | FE/API SHA alignment | **ALIGNED** (FE); API lags | Post-#299: `frontend_commit` = `repo_head` = `73ec745`; API `6d6d1e5` expected |
+| **Deploy** | FE/API SHA alignment | **ALIGNED** | `frontend_commit` = `repo_head` = `73ec745`; API lag expected |
 
 **Decision matrix:** Any ❌ on Security S2–S5 → hold. Any ❌ on Pilot gates → pilot only, not public launch. Current stance: **pilot/demo GO; public NO-GO.**
 
