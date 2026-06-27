@@ -229,7 +229,7 @@ Board cards are internal readiness/evidence surfaces — not candidate/recruiter
 4. **Company `/company/pipeline` live in workspace, absent in SoR** — company ATS-lite surface orphaned from SoR.
 5. **Company `company_dashboard` SoR live without `hintKey`** — live badge without token/tenant scope hint (roles/talent_pool have hints).
 6. **Recruiter duplicate cards → `/recruiter/inbox`** — notes, scheduling, audit appear as separate modules but land on same page.
-7. **Candidate trust center (11 SoR routes) not in workspace grid** — trust discoverability split across nav surfaces.
+7. **Candidate trust center (11 SoR routes) not in workspace grid** — ~~trust discoverability split across nav surfaces~~ **Slice 7:** single `trust_center` pilot card in workspace grid → `/dashboard/trust`.
 8. **Candidate `career_compass` live in workspace, absent in SoR** — compass not in SoR inventory.
 9. **Company pipeline status skew** — workspace `pipeline` **live** vs SoR `company_demo_pipeline` **pilot** only.
 10. **Investor/board SoR overload** — 19 investor SoR entries mix product, board evidence, and demo proof links; hard to scan vs 6-card workspace hub.
@@ -303,3 +303,4 @@ cd frontend && npm run build && npx tsc --noEmit
 | 2026-06-27 | Slice 3 completed by PR #313 — company live SoR modules carry tenant token hints |
 | 2026-06-27 | Slice 4 completed by PR #316 — collapse recruiter inbox duplicate module cards (notes_scorecards, scheduling, audit) |
 | 2026-06-27 | Slice 6 completed — company workspace pipeline hintKey aligned with SoR; demo vs live copy boundaries |
+| 2026-06-27 | Slice 7 completed — candidate workspace trust_center card (pilot) links to `/dashboard/trust`; no duplicate trust cards |

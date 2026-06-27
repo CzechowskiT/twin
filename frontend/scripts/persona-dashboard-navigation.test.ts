@@ -4,6 +4,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
+import { CANDIDATE_CANONICAL_ROUTES } from "../src/lib/candidate-canonical-routes";
 import { CANDIDATE_WORKSPACE_MODULES } from "../src/lib/candidate-workspace-modules";
 import { RECRUITER_HUB_ROUTE, RECRUITER_WORKSPACE_MODULES } from "../src/lib/recruiter-workspace-modules";
 import { COMPANY_WORKSPACE_MODULES } from "../src/lib/company-workspace-modules";
@@ -112,4 +113,24 @@ test("recruiter workspace has one inbox module — no duplicate href cards", () 
   const inboxCards = RECRUITER_WORKSPACE_MODULES.filter((m) => m.href === inboxHref);
   assert.equal(inboxCards.length, 1);
   assert.equal(inboxCards[0]?.id, "inbox");
+});
+
+test("candidate workspace has one trust center card — pilot, canonical trust route", () => {
+  const trustHref = CANDIDATE_CANONICAL_ROUTES.trust;
+  const trustCards = CANDIDATE_WORKSPACE_MODULES.filter((m) => m.href === trustHref);
+  assert.equal(trustCards.length, 1);
+  const mod = trustCards[0];
+  assert.equal(mod?.id, "trust_center");
+  assert.equal(mod?.status, "pilot");
+  assert.equal(mod?.hintKey, "workspaceModules.candidateTrustCenterHint");
+  const sor = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "candidate_trust");
+  assert.equal(sor?.href, trustHref);
+  assert.equal(sor?.status, "pilot");
+  const copy = [
+    en.workspaceModules.candidateTrustCenterValue,
+    en.workspaceModules.candidateTrustCenterHint,
+    en.workspaceModules.candidateTrustCenterCta,
+  ].join("\n").toLowerCase();
+  assert.match(copy, /pilot|sample|demo/);
+  assert.doesNotMatch(copy, /\blive delete\b|\bexport now\b|\blegal advice\b|\bdsr fulfilled\b/);
 });

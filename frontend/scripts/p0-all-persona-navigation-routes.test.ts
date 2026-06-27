@@ -179,3 +179,15 @@ test("16 company live pipeline module exposes tenant hint — distinct from demo
   assert.match(en.workspaceModules.companyPipelineValue.toLowerCase(), /not the sample|live segment/i);
   assert.match(en.jobPipeline.demoJourneyDesc.toLowerCase(), /sample|demo|not your live/i);
 });
+
+test("17 candidate trust center module resolves to canonical trust route", () => {
+  const trust = CANDIDATE_WORKSPACE_MODULES.find((m) => m.id === "trust_center");
+  assert.ok(trust);
+  assert.equal(trust!.href, CANDIDATE_CANONICAL_ROUTES.trust);
+  assert.equal(trust!.status, "pilot");
+  assert.ok(routePageExists(CANDIDATE_CANONICAL_ROUTES.trust));
+  const duplicateTrust = CANDIDATE_WORKSPACE_MODULES.filter(
+    (m) => m.href === CANDIDATE_CANONICAL_ROUTES.trust,
+  );
+  assert.equal(duplicateTrust.length, 1);
+});
