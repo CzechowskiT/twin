@@ -39,7 +39,7 @@
 | **prod_api_commit** (Railway) | `6d6d1e54f85f8f00fe1727f32cef700e9c2a20aa` |
 | **public-health `status`** | `ok` |
 | **public-health `db_ok`** | `true` |
-| **hiring-journey routes HTTP** | **5/5 × 200** (candidate dashboard/profile, recruiter, company, board) |
+| **hiring-journey routes HTTP** | **5/5 × 200** (curl prod, 2026-06-27) |
 | **commit_interpretation** | Frontend (Vercel) and API (Railway) commits differ — expected after docs-only #299; verify Alembic head separately. |
 
 ### Alignment classification
@@ -90,7 +90,7 @@ Verified via `gh pr list --state merged --limit 20` and `git log` on **2026-06-2
 | [#289](https://github.com/CzechowskiT/twin/pull/289) | Stabilize P0 persona navigation smoke | `5288855` | P0 persona nav smoke script hardening (1 file) | Guard-only | `test:p0-all-persona-navigation-routes` | Static guard; browser optional |
 | [#290](https://github.com/CzechowskiT/twin/pull/290) | Add scheduling proposal pack preview | `6c767fa` | Read-only scheduling proposal preview routes + demo data (18 files) | Blocked calendar/invite/email boundaries | Scheduling + read-only guards | FE-only preview |
 
-### Hiring Journey batch (#291–#298)
+### Hiring Journey batch (#291–#299)
 
 | PR | Title | Merge SHA | Scope | Safety | Tests | Prod verification |
 |----|-------|-----------|-------|--------|-------|-------------------|
@@ -102,7 +102,7 @@ Verified via `gh pr list --state merged --limit 20` and `git log` on **2026-06-2
 | [#296](https://github.com/CzechowskiT/twin/pull/296) | Harden hiring journey negative live-action guard | `4be155c` | Negation-window guard for affirmative live-action copy (2 files) | Blocks “scheduled/sent/synced” claims | test 17 | FE-only |
 | [#297](https://github.com/CzechowskiT/twin/pull/297) | docs: hiring journey traceability memo (#291–#296) | `a30e28c` | Traceability memo (1 file) | Docs-only | N/A (docs batch) | `acceptable_docs_only_drift` |
 | [#298](https://github.com/CzechowskiT/twin/pull/298) | Hiring Journey provenance source-module drill-in (read-only) | `7a88a101` | Source-module drill-in links on provenance cards (5 files) | Board step nav stays blocked; safe hrefs only | test 18 (+ 25 total) | FE deploy; superseded by #299 on prod |
-| [#299](https://github.com/CzechowskiT/twin/pull/299) | Refresh operating context snapshot post-#299 | `73ec745` | Operating context source-of-truth doc (1 file) | Docs-only | `test:hiring-journey`, `npm run build` | **Current prod FE SHA**; browser smoke skipped (docs-only) |
+| [#299](https://github.com/CzechowskiT/twin/pull/299) | Refresh operating context snapshot post-#299 | `73ec745` | Operating context source-of-truth doc (1 file) | Docs-only | `test:hiring-journey`, `npm run build` | **Current prod FE SHA**; browser smoke skipped (docs-only); public-health OK |
 
 **Scaffold HEAD after #299:** `73ec745ab12dd151adf05c2c66b67411e6bcf7ec`
 
@@ -270,8 +270,8 @@ Scripts from `frontend/package.json`. Run from `frontend/` unless noted.
 |---------|--------|
 | `npm run test:hiring-journey` | **PASS** (25/25) |
 | `npm run build` | **PASS** |
-| `npm run test:hiring-journey-browser` | **SKIPPED** — docs-only #299; no FE deploy delta beyond operating context |
-| Hiring-journey routes HTTP smoke | **PASS** — 5/5 routes return 200 |
+| `npm run test:hiring-journey-browser` | **SKIPPED** — docs-only #299; no prod browser smoke |
+| Public-health + 5 hiring-journey routes | **PASS** — `status=ok`, `db_ok=true`, HTTP 200 × 5 |
 
 ---
 
