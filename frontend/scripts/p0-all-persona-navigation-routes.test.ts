@@ -168,3 +168,14 @@ test("15 workspace module cards avoid hidden PII field patterns in configs", () 
   assert.doesNotMatch(blob, /email|phone|ssn|password/i);
   assert.doesNotMatch(blob, /candidate_name|recruiter_email/i);
 });
+
+test("16 company live pipeline module exposes tenant hint — distinct from demo pipeline", () => {
+  const pipeline = COMPANY_WORKSPACE_MODULES.find((m) => m.id === "pipeline");
+  assert.ok(pipeline);
+  assert.equal(pipeline!.status, "live");
+  assert.ok(pipeline!.hintKey);
+  const hint = en.workspaceModules.companyPipelineHint.toLowerCase();
+  assert.match(hint, /no ats|ats writeback|writeback/i);
+  assert.match(en.workspaceModules.companyPipelineValue.toLowerCase(), /not the sample|live segment/i);
+  assert.match(en.jobPipeline.demoJourneyDesc.toLowerCase(), /sample|demo|not your live/i);
+});

@@ -716,7 +716,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     ctaKey: "systemOfRecord.openPipelineCta",
     status: "pilot",
     moduleFamily: "pipeline",
-    boundaryTags: ["pilot", "human_decision_required"],
+    boundaryTags: ["pilot", "human_decision_required", "no_ats_sync"],
   },
   {
     id: "company_talent_pool",

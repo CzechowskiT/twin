@@ -171,6 +171,22 @@ test("4b company pipeline live with token hint and human decision boundary", () 
   assert.ok(route!.boundaryTags.includes("no_ats_sync"));
   const hint = en.workspaceModules.companyPipelineHint.toLowerCase();
   assert.match(hint, /token|pilot|human|decision|review/i);
+  assert.match(hint, /no ats|ats writeback|writeback/i);
+});
+
+test("4e company demo pipeline pilot distinct from live workspace pipeline", () => {
+  const live = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "company_pipeline");
+  const demo = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "company_demo_pipeline");
+  assert.ok(live && demo);
+  assert.equal(live!.status, "live");
+  assert.equal(demo!.status, "pilot");
+  assert.notEqual(live!.href, demo!.href);
+  assert.ok(demo!.boundaryTags.includes("pilot"));
+  assert.ok(demo!.boundaryTags.includes("no_ats_sync"));
+  const demoTitle = en.jobPipeline.demoJourneyTitle.toLowerCase();
+  assert.match(demoTitle, /sample|demo|przykład|próbka/i);
+  const demoDesc = en.jobPipeline.demoJourneyDesc.toLowerCase();
+  assert.match(demoDesc, /sample|demo|not your live|live workspace/i);
 });
 
 test("4c company dashboard live with tenant token hint", () => {

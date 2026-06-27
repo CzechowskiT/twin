@@ -48,6 +48,7 @@ export const COMPANY_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     href: "/company/pipeline",
     titleKey: "workspaceModules.companyPipelineTitle",
     valuePropKey: "workspaceModules.companyPipelineValue",
+    hintKey: "workspaceModules.companyPipelineHint",
     ctaKey: "workspaceModules.companyPipelineCta",
     status: "live",
   },
