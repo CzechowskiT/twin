@@ -3,10 +3,10 @@
 **Purpose:** Single operator-facing snapshot for agents, founders, and CI smoke wrappers. Consolidates launch stance, deploy SHAs, recent PR history, Hiring Journey runtime state, test matrix, gates, blockers, and next steps.
 
 **Branch at capture:** `cursor/phase1-monorepo-scaffold`  
-**Captured UTC:** 2026-06-27 (local verification batch on scaffold HEAD `7a88a101`)
+**Captured UTC:** 2026-06-27 (post-#299 verification batch on scaffold HEAD `73ec745`)
 
 **Canonical references:**
-- [HIRING_JOURNEY_TRACEABILITY_2026-06-26.md](./HIRING_JOURNEY_TRACEABILITY_2026-06-26.md) — Hiring Journey detail (#291–#298)
+- [HIRING_JOURNEY_TRACEABILITY_2026-06-26.md](./HIRING_JOURNEY_TRACEABILITY_2026-06-26.md) — Hiring Journey detail (#291–#298); operating context (#299)
 - [PROD_HEALTH_COMMIT_INTERPRETATION_2026-06-19.md](./PROD_HEALTH_COMMIT_INTERPRETATION_2026-06-19.md) — SHA drift rules
 - [PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md](./PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md) — founder gate rows
 - [.cursorrules](../.cursorrules) — product north star, calendar, placement verification
@@ -29,27 +29,27 @@
 
 ## 2. Branch, commits, and deploy interpretation
 
-### Checkout snapshot (2026-06-27)
+### Checkout snapshot (2026-06-27, post-#299)
 
 | Field | Value |
 |-------|-------|
 | **Current branch** | `cursor/phase1-monorepo-scaffold` |
-| **repo_head / scaffold HEAD** | `7a88a101fb550546783d8fa08326052a4c46a2fc` |
-| **prod_frontend_commit** (Vercel) | `7a88a101fb550546783d8fa08326052a4c46a2fc` |
+| **repo_head / scaffold HEAD** | `73ec745ab12dd151adf05c2c66b67411e6bcf7ec` |
+| **prod_frontend_commit** (Vercel) | `73ec745ab12dd151adf05c2c66b67411e6bcf7ec` |
 | **prod_api_commit** (Railway) | `6d6d1e54f85f8f00fe1727f32cef700e9c2a20aa` |
 | **public-health `status`** | `ok` |
 | **public-health `db_ok`** | `true` |
-| **commit_interpretation** | Frontend (Vercel) and API (Railway) commits differ — common after frontend-only or backend-only PRs; verify Alembic head separately. |
+| **hiring-journey routes HTTP** | **5/5 × 200** (candidate dashboard/profile, recruiter, company, board) |
+| **commit_interpretation** | Frontend (Vercel) and API (Railway) commits differ — expected after docs-only #299; verify Alembic head separately. |
 
 ### Alignment classification
 
 | Check | Result |
 |-------|--------|
-| `frontend_commit` vs `repo_head` | **ALIGNED** — both `7a88a101` (PR #298 merge) |
-| `api_commit` vs `repo_head` | **EXPECTED DRIFT** — API at `6d6d1e5` (PR #281, 2026-06-24); no backend changes in #287–#298 |
-| `alignment_status` (frontend slice) | `aligned` |
-| `alignment_status` (full-stack) | Frontend aligned; backend lag acceptable for Hiring Journey batch |
-| `docs_only_drift` | `false` at capture (this doc not yet merged) |
+| `frontend_commit` vs `repo_head` | **ALIGNED** — both `73ec745` (PR #299 merge) |
+| `api_commit` vs `repo_head` | **EXPECTED DRIFT** — API at `6d6d1e5` (PR #281, 2026-06-24); no backend changes in #287–#299 |
+| `alignment_status` | **ALIGNED** |
+| `docs_only_drift` | `false` / N/A after post-#299 verification |
 
 ### Production health highlights (curl 2026-06-27)
 
@@ -101,9 +101,10 @@ Verified via `gh pr list --state merged --limit 20` and `git log` on **2026-06-2
 | [#295](https://github.com/CzechowskiT/twin/pull/295) | Hiring Journey evidence provenance cards | `349a645` | Provenance cards per step (5 files) | Monitor-only evidence | provenance metadata tests | FE-only |
 | [#296](https://github.com/CzechowskiT/twin/pull/296) | Harden hiring journey negative live-action guard | `4be155c` | Negation-window guard for affirmative live-action copy (2 files) | Blocks “scheduled/sent/synced” claims | test 17 | FE-only |
 | [#297](https://github.com/CzechowskiT/twin/pull/297) | docs: hiring journey traceability memo (#291–#296) | `a30e28c` | Traceability memo (1 file) | Docs-only | N/A (docs batch) | `acceptable_docs_only_drift` |
-| [#298](https://github.com/CzechowskiT/twin/pull/298) | Hiring Journey provenance source-module drill-in (read-only) | `7a88a101` | Source-module drill-in links on provenance cards (5 files) | Board step nav stays blocked; safe hrefs only | test 18 (+ 25 total) | **Current prod FE SHA** |
+| [#298](https://github.com/CzechowskiT/twin/pull/298) | Hiring Journey provenance source-module drill-in (read-only) | `7a88a101` | Source-module drill-in links on provenance cards (5 files) | Board step nav stays blocked; safe hrefs only | test 18 (+ 25 total) | FE deploy; superseded by #299 on prod |
+| [#299](https://github.com/CzechowskiT/twin/pull/299) | Refresh operating context snapshot post-#299 | `73ec745` | Operating context source-of-truth doc (1 file) | Docs-only | `test:hiring-journey`, `npm run build` | **Current prod FE SHA**; browser smoke skipped (docs-only) |
 
-**Scaffold HEAD after #298:** `7a88a101fb550546783d8fa08326052a4c46a2fc`
+**Scaffold HEAD after #299:** `73ec745ab12dd151adf05c2c66b67411e6bcf7ec`
 
 ### Remote branch note: `cursor/hiring-journey-provenance-drill-in`
 
@@ -263,12 +264,14 @@ Scripts from `frontend/package.json`. Run from `frontend/` unless noted.
 | `pytest tests/test_public_health_regression.py -q` | Public health surface regression |
 | `pytest tests/test_auto_apply_trigger_sweep_admin_gate.py -q` | Auto-apply sweep gate |
 
-### Docs batch verification (2026-06-27)
+### Docs batch verification (2026-06-27, post-#299)
 
 | Command | Result |
 |---------|--------|
 | `npm run test:hiring-journey` | **PASS** (25/25) |
 | `npm run build` | **PASS** |
+| `npm run test:hiring-journey-browser` | **SKIPPED** — docs-only #299; no FE deploy delta beyond operating context |
+| Hiring-journey routes HTTP smoke | **PASS** — 5/5 routes return 200 |
 
 ---
 
@@ -291,7 +294,7 @@ Condensed from [PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md](./PUBLIC_LAUNCH_GATE
 | **Pilot** | P6 founder auth smoke | **PASS** (2026-05-29) | Re-run before external cohort |
 | **Pilot** | P7 limited recruiter | **H5b PASS; H5c/H5d HOLD** | 0 external invites |
 | **Calendar** | Microsoft busy-read prod | **OFF** | Staging prep docs exist; smoke blocked |
-| **Deploy** | FE/API SHA alignment | **FE aligned; API lags** | Expected after #287–#298 batch |
+| **Deploy** | FE/API SHA alignment | **ALIGNED** | `frontend_commit` = `repo_head` = `73ec745`; API lag expected |
 
 **Decision matrix:** Any ❌ on Security S2–S5 → hold. Any ❌ on Pilot gates → pilot only, not public launch. Current stance: **pilot/demo GO; public NO-GO.**
 
@@ -320,7 +323,7 @@ Condensed from [PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md](./PUBLIC_LAUNCH_GATE
 
 ### API / deploy drift
 
-- `api_commit` (`6d6d1e5`) behind `frontend_commit` (`7a88a101`) — **expected** for frontend-only batch; not a deploy failure by itself.
+- `api_commit` (`6d6d1e5`) behind `frontend_commit` (`73ec745`) — **expected** for frontend/docs-only batch; not a deploy failure by itself.
 - Alembic head must be verified separately for persistence/backend slices.
 
 ### Auth shell for prod visual checks
@@ -340,7 +343,7 @@ Condensed from [PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md](./PUBLIC_LAUNCH_GATE
 
 Realistic backlog from current session state — ordered by dependency and safety.
 
-1. Merge this operating context doc; treat as source of truth for agents.
+1. Treat this operating context doc as source of truth for agents (merged via #299).
 2. Run prod hiring-journey browser smoke after any FE deploy: `PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app npm run test:hiring-journey-browser`.
 3. Polish provenance drill-in UX copy (EN/PL) if founder feedback — read-only only.
 4. Investor-room i18n parity sweep (`test:investor-room-mvp`, `test:i18n-premium-product`).
