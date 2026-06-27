@@ -77,12 +77,13 @@ test("1 central registry exports routes for all four personas", () => {
   assert.ok(SYSTEM_OF_RECORD_ROUTES.length >= 40);
 });
 
-test("2 candidate hub includes panel jobs matches profile cv applications evidence calendar plan identity referrals", () => {
+test("2 candidate hub includes panel jobs matches career compass profile cv applications evidence calendar plan identity referrals", () => {
   const ids = getSystemOfRecordRoutesForPersona("candidate").map((r) => r.id);
   for (const id of [
     "candidate_panel",
     "candidate_jobs",
     "candidate_matches",
+    "candidate_career_compass",
     "candidate_profile",
     "candidate_cv",
     "candidate_applications",
@@ -96,10 +97,21 @@ test("2 candidate hub includes panel jobs matches profile cv applications eviden
   }
 });
 
-test("3 recruiter hub includes inbox jobs pipeline demo talent radar pool import profile collaboration trust team communication ats integrations analytics search", () => {
+test("2b candidate career compass is pilot read-only — no live-action CTA", () => {
+  const route = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "candidate_career_compass");
+  assert.ok(route);
+  assert.equal(route!.status, "pilot");
+  assert.equal(route!.href, "/dashboard/career");
+  assert.ok(route!.boundaryTags.includes("pilot"));
+  assert.ok(route!.hintKey);
+});
+
+test("3 recruiter hub includes inbox pipeline calendar jobs demo talent radar pool import profile collaboration trust team communication ats integrations analytics search", () => {
   const ids = getSystemOfRecordRoutesForPersona("recruiter").map((r) => r.id);
   for (const id of [
     "recruiter_inbox",
+    "recruiter_pipeline",
+    "recruiter_calendar",
     "recruiter_jobs",
     "recruiter_demo_pipeline",
     "recruiter_talent_radar",
@@ -113,11 +125,32 @@ test("3 recruiter hub includes inbox jobs pipeline demo talent radar pool import
   }
 });
 
+test("3b recruiter pipeline live with human decision and no ATS sync", () => {
+  const route = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "recruiter_pipeline");
+  assert.ok(route);
+  assert.equal(route!.status, "live");
+  assert.equal(route!.href, "/recruiter/pipeline");
+  assert.ok(route!.boundaryTags.includes("human_decision_required"));
+  assert.ok(route!.boundaryTags.includes("no_ats_sync"));
+});
+
+test("3c recruiter calendar not_live — calendar sync not live", () => {
+  const route = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "recruiter_calendar");
+  assert.ok(route);
+  assert.equal(route!.status, "not_live");
+  assert.equal(route!.href, "/recruiter/calendar");
+  assert.ok(route!.boundaryTags.includes("not_live"));
+  assert.ok(route!.hintKey);
+  const hint = en.workspaceModules.recruiterCalendarHint.toLowerCase();
+  assert.match(hint, /inbox|sync|not live|nie aktywn/i);
+});
+
 test("4 company hub includes dashboard roles pipeline demo talent pool profile collaboration trust team communication ats integrations team billing", () => {
   const ids = getSystemOfRecordRoutesForPersona("company").map((r) => r.id);
   for (const id of [
     "company_dashboard",
     "company_roles",
+    "company_pipeline",
     "company_demo_pipeline",
     "company_talent_pool",
     "company_demo_profile_360",
@@ -126,6 +159,18 @@ test("4 company hub includes dashboard roles pipeline demo talent pool profile c
   ]) {
     assert.ok(ids.includes(id), id);
   }
+});
+
+test("4b company pipeline live with token hint and human decision boundary", () => {
+  const route = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "company_pipeline");
+  assert.ok(route);
+  assert.equal(route!.status, "live");
+  assert.equal(route!.href, "/company/pipeline");
+  assert.ok(route!.hintKey);
+  assert.ok(route!.boundaryTags.includes("human_decision_required"));
+  assert.ok(route!.boundaryTags.includes("no_ats_sync"));
+  const hint = en.workspaceModules.companyPipelineHint.toLowerCase();
+  assert.match(hint, /token|pilot|human|decision|review/i);
 });
 
 test("5 investor hub includes public room workspace metrics roadmap data room calculator placement demo and proof cards", () => {
