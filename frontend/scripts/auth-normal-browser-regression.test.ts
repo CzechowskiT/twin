@@ -12,7 +12,7 @@ import {
   buildOAuthProviderAvailabilities,
   OAUTH_LOGIN_BUTTONS_INITIAL,
 } from "../src/lib/oauth-auth";
-import { isStoredTokenStale, prepareForCredentialLogin } from "../src/lib/auth";
+import { isStoredTokenStale, hasActiveSession, prepareForCredentialLogin } from "../src/lib/auth";
 import {
   resolveLoginDiagnosticCode,
   resolveLoginErrorKey,
@@ -101,7 +101,7 @@ test("5: isStoredTokenStale detects malformed and expired tokens", () => {
 });
 
 test("6: oauth fetch falls back to public-health", () => {
-  assert.match(oauthAuthSrc, /\/api\/public-health/);
+  assert.match(oauthAuthSrc, /fetchPublicHealthJson/);
   assert.match(oauthAuthSrc, /fetchHealthOpsFlags/);
 });
 
@@ -143,4 +143,47 @@ test("10: OAuth rows disabled only for not_configured / loading — active uses 
   assert.match(oauthButtonsSrc, /disabledReason === "not_configured"/);
   assert.match(formSrc, /prepareForCredentialLogin/);
   assert.match(formSrc, /clearToken\(\)/);
+});
+
+test("11: chrome headers use hasActiveSession so stale JWT shows login", () => {
+  const chrome = readFileSync(join(root, "src/components/chrome-header.tsx"), "utf8");
+  const marketing = readFileSync(join(root, "src/components/site-header-bar.tsx"), "utf8");
+  const workspace = readFileSync(join(root, "src/components/workspace-site-header-bar.tsx"), "utf8");
+  assert.match(chrome, /hasActiveSession/);
+  assert.match(marketing, /hasActiveSession/);
+  assert.match(workspace, /hasActiveSession/);
+  assert.match(workspace, /hasSession \? "hidden md:inline-flex" : "inline-flex"/);
+
+  const key = "twin_access_token";
+  const storage = {
+    store: {} as Record<string, string>,
+    getItem(k: string) {
+      return this.store[k] ?? null;
+    },
+    setItem(k: string, v: string) {
+      this.store[k] = v;
+    },
+    removeItem(k: string) {
+      delete this.store[k];
+    },
+  };
+  const prevWindow = globalThis.window;
+  Object.defineProperty(globalThis, "window", {
+    value: { localStorage: storage, sessionStorage: storage },
+    configurable: true,
+  });
+  try {
+    storage.setItem(key, fakeJwt({ exp: 1 }));
+    assert.equal(hasActiveSession(), false);
+    assert.equal(storage.getItem(key), null);
+    storage.setItem(key, fakeJwt({ exp: Math.floor(Date.now() / 1000) + 600 }));
+    assert.equal(hasActiveSession(), true);
+  } finally {
+    if (prevWindow === undefined) {
+      // @ts-expect-error test cleanup
+      delete globalThis.window;
+    } else {
+      Object.defineProperty(globalThis, "window", { value: prevWindow, configurable: true });
+    }
+  }
 });
