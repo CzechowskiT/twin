@@ -173,6 +173,23 @@ test("4b company pipeline live with token hint and human decision boundary", () 
   assert.match(hint, /token|pilot|human|decision|review/i);
 });
 
+test("4c company dashboard live with tenant token hint", () => {
+  const route = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "company_dashboard");
+  assert.ok(route);
+  assert.equal(route!.status, "live");
+  assert.ok(route!.hintKey);
+  const hint = en.systemOfRecord.companyDashboardHint.toLowerCase();
+  assert.match(hint, /token|pilot|slug|tenant|scope/i);
+});
+
+test("4d all company live SoR entries carry token or scope hints", () => {
+  const live = getSystemOfRecordRoutesForPersona("company").filter((r) => r.status === "live");
+  assert.ok(live.length >= 3);
+  for (const route of live) {
+    assert.ok(route.hintKey, `${route.id} missing hintKey`);
+  }
+});
+
 test("5 investor hub includes public room workspace metrics roadmap data room calculator placement demo and proof cards", () => {
   const ids = getSystemOfRecordRoutesForPersona("investor").map((r) => r.id);
   for (const id of [
