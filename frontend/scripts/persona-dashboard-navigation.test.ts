@@ -9,6 +9,7 @@ import { RECRUITER_HUB_ROUTE, RECRUITER_WORKSPACE_MODULES } from "../src/lib/rec
 import { COMPANY_WORKSPACE_MODULES } from "../src/lib/company-workspace-modules";
 import { INVESTOR_WORKSPACE_MODULES } from "../src/lib/investor-workspace-modules";
 import { RECRUITER_INTEGRATIONS_ROUTE } from "../src/lib/recruiter-integrations-readiness";
+import { SYSTEM_OF_RECORD_ROUTES } from "../src/lib/system-of-record-routes";
 import { dictionaries, en, LOCALES } from "../src/lib/i18n";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -76,4 +77,12 @@ test("copy avoids fake live calendar sync", () => {
     en.workspaceModules.candidateAutoApplyValue,
   ].join("\n");
   assert.match(text.toLowerCase(), /not live|paused|wstrzymany/i);
+});
+
+test("SoR registry includes reconciled workspace-only modules", () => {
+  const byId = Object.fromEntries(SYSTEM_OF_RECORD_ROUTES.map((r) => [r.id, r]));
+  assert.equal(byId.recruiter_pipeline?.status, "live");
+  assert.equal(byId.recruiter_calendar?.status, "not_live");
+  assert.equal(byId.company_pipeline?.status, "live");
+  assert.equal(byId.candidate_career_compass?.status, "pilot");
 });
