@@ -92,3 +92,10 @@ test("company live SoR modules surface tenant token hints", () => {
   assert.ok(live.every((r) => r.hintKey));
   assert.match(en.systemOfRecord.companyDashboardHint.toLowerCase(), /token|pilot|slug|tenant/i);
 });
+
+test("recruiter workspace has one inbox module — no duplicate href cards", () => {
+  const inboxHref = "/recruiter/inbox";
+  const inboxCards = RECRUITER_WORKSPACE_MODULES.filter((m) => m.href === inboxHref);
+  assert.equal(inboxCards.length, 1);
+  assert.equal(inboxCards[0]?.id, "inbox");
+});
