@@ -17,6 +17,11 @@ const HEAVY_READINESS_ROUTES = [
   { route: "src/app/board/calendar-readiness/page.tsx", label: "/board/calendar-readiness" },
   { route: "src/app/board/placement-verification/page.tsx", label: "/board/placement-verification" },
   { route: "src/app/board/persistence-operations-monitor/page.tsx", label: "/board/persistence-operations-monitor" },
+  { route: "src/app/dashboard/hiring-journey/page.tsx", label: "/dashboard/hiring-journey" },
+  { route: "src/app/profile/hiring-journey/page.tsx", label: "/profile/hiring-journey" },
+  { route: "src/app/recruiter/hiring-journey/page.tsx", label: "/recruiter/hiring-journey" },
+  { route: "src/app/company/hiring-journey/page.tsx", label: "/company/hiring-journey" },
+  { route: "src/app/board/hiring-journey/page.tsx", label: "/board/hiring-journey" },
 ] as const;
 
 function read(rel: string): string {
@@ -60,6 +65,13 @@ test("5 safe evidence doc lists all inventory routes", () => {
   }
 });
 
-test("6 npm script registered", () => {
+test("6 hiring journey timeline memoizes demo resolver", () => {
+  assert.match(
+    read("src/components/hiring-journey/HiringJourneyTimeline.tsx"),
+    /useMemo\(\(\) => resolveHiringJourney\(persona\)/,
+  );
+});
+
+test("7 npm script registered", () => {
   assert.match(read("package.json"), /test:p0-route-weight-inventory/);
 });

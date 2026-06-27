@@ -46,7 +46,7 @@ Do not claim “P0 fixed”, “performance solved”, or launch-ready performan
 | Placement verification (4 personas) | Timeline fetch on mount | Lazy `dynamic()` timeline — shipped (#247–#251) | Network | Partial | Verify no polling regressions | Low |
 | 89-logo marketing marquee | Renderer pressure if leaked to workspace/auth | `frontend/scripts/p0-performance-guardrails.test.ts`, `PerformanceSafeMovingLogoMarquee` | Animation / DOM | **YES** if regresses | Keep guardrails on CI | Medium |
 | `p0-no-headless-final-state` (31 routes) | Sequential browser ~6–15 min; auth shell OK | `frontend/e2e/p0-no-headless-final-state-browser.spec.ts`, timeout 900s | Browser smoke | **YES** | Prod smoke with flags post-deploy | Medium |
-| Hiring Journey (5 routes) | HTTP 200 only; not in route-weight inventory yet | [HIRING_JOURNEY_TIMELINE_2026-06-25.md](./HIRING_JOURNEY_TIMELINE_2026-06-25.md), [TWIN_OPERATING_CONTEXT_2026-06-26.md](./TWIN_OPERATING_CONTEXT_2026-06-26.md) | Coverage gap | No (availability OK) | Add to route-weight inventory + optional browser smoke | Low–medium |
+| Hiring Journey (5 routes) | In route-weight inventory (Batch 1); browser smoke still gated | [HIRING_JOURNEY_TIMELINE_2026-06-25.md](./HIRING_JOURNEY_TIMELINE_2026-06-25.md), [TWIN_OPERATING_CONTEXT_2026-06-26.md](./TWIN_OPERATING_CONTEXT_2026-06-26.md) | Route weight | No (availability OK) | Optional gated browser smoke post-deploy | Low–medium |
 | Lighthouse budgets | No signed-off numbers | [P0_PERFORMANCE_SAFE_EVIDENCE_2026-06-24.md](./P0_PERFORMANCE_SAFE_EVIDENCE_2026-06-24.md) | Metrics | **YES** | Define budgets when Phase 3B unblocked | Medium |
 | Backend pytest ~325s | Slow CI | `docs/CTO_PRODUCT_TECH_AUDIT_2026-05-26.md` | CI duration | No (launch) | Parallelize pytest | Low |
 | `/status` Playwright | Cookie banner flake | `docs/RESPONSIVE_QA_MATRIX_2026-05-29.md` | Flaky test | No | Strict mode fix | Low |
@@ -100,7 +100,7 @@ Do not claim “P0 fixed”, “performance solved”, or launch-ready performan
 ### Performance risks (code inspection)
 
 1. **11 steps + cross-links + provenance drill-in** — moderate DOM; `useMemo` on `resolveHiringJourney` (OK).
-2. **Not yet in** `p0-route-weight-inventory`, `p0-no-headless-final-state` (29–31 routes), or Phase 3B route batches (21 routes) — coverage gap.
+2. **In** `p0-route-weight-inventory` (Batch 1, 2026-06-27). **Not yet in** `p0-no-headless-final-state` (29–31 routes) or Phase 3B route batches (21 routes).
 3. **Browser spec** — `SETTLE_MS = 12_000` × 5 routes ≈ 2–3 min sequential smoke.
 4. **Board persona** — blocked state adds extra provenance blocks; monitor-only drill-in (no href churn).
 
@@ -120,15 +120,17 @@ Detail: [HIRING_JOURNEY_TRACEABILITY_2026-06-26.md](./HIRING_JOURNEY_TRACEABILIT
 
 ## Remediation batches
 
-### Batch 1 — safe-lane static guards (recommended next)
+### Batch 1 — safe-lane static guards (**covered**)
 
 **Scope:** docs + static guardrails only. **No Phase 3B, no browser prod smoke.**
 
-1. Ship this inventory doc (`docs/P0_PERFORMANCE_INVENTORY_2026-06-27.md`) with SHA snapshot above.
-2. Extend `p0-route-weight-inventory` to include 5 hiring-journey routes (+ scheduling-proposal if applicable).
-3. Run on scaffold HEAD: `test:p0-performance-guardrails`, `test:p0-route-weight-inventory`, `test:hiring-journey`.
-4. Cross-link from [P0_PERFORMANCE_INVENTORY_2026-06-21.md](./P0_PERFORMANCE_INVENTORY_2026-06-21.md) → this doc.
-5. Update operating context §9 P0 blockers if inventory changes materially.
+1. ~~Ship this inventory doc~~ — shipped (#304).
+2. ~~Extend `p0-route-weight-inventory`~~ — 5 hiring-journey routes added; scheduling-proposal **skipped** (dedicated `test:scheduling-proposal` already guards those routes).
+3. ~~Run guardrails on scaffold HEAD~~ — `test:p0-performance-guardrails`, `test:p0-route-weight-inventory`, `test:hiring-journey`.
+4. ~~Cross-link from 2026-06-21 doc~~ — done.
+5. Operating context §9 — no material blocker change (inventory only; P0 **OPEN**).
+
+**P0 performance remains OPEN** — Batch 1 does not close the gate.
 
 ### Batch 2 — post-unblock Phase 3B (not now)
 
