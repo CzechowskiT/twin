@@ -26,6 +26,8 @@ Evidence-only inventory of persona workspace module cards vs the System-of-Recor
 | **P0 performance / navigation** | **OPEN** |
 | **Phase 3B controlled multitab** | **BLOCKED** (founder STOP) |
 
+**Code constant:** `LAUNCH_STANCE = "noGo"` in `frontend/src/lib/investor-metrics-reality.ts` — re-exported by board readiness modules (`working-features-readiness.ts`, `board-implementation-tracker.ts`, etc.). UI marker: `investor-launch-stance-no-go`.
+
 Do not infer launch readiness from card badges, hub completeness, or static test PASS alone.
 
 ---
@@ -62,6 +64,43 @@ Each entry carries: `id`, `persona`, `href`, i18n keys, `status`, `moduleFamily`
 | `SystemOfRecordBoundaryBadge` | Surfaces `boundaryTags`: `pilot`, `draft_only`, `not_live`, `human_decision_required`, `no_outreach`, `no_ats_sync` |
 | `SystemOfRecordModuleCard` | SoR hub card = status badge + boundary badges + optional `hintKey` |
 | `WorkspaceModuleCard` | Workspace grid card = status badge only (no boundary tags) |
+
+### Legacy / workspace-only modules (not in SoR)
+
+These routes resolve via `page.tsx` and appear in `*-workspace-modules.ts` or deep-link guards (`persona-module-routes.ts`) but are **absent from `SYSTEM_OF_RECORD_ROUTES`** — invisible to SoR hub QA guards:
+
+| Module | Persona | href | WS status | Notes |
+|--------|---------|------|-----------|-------|
+| `pipeline` | recruiter | `/recruiter/pipeline` | live | Primary ATS-lite surface |
+| `calendar` | recruiter | `/recruiter/calendar` | not_live | Explicit NOT LIVE |
+| `pipeline` | company | `/company/pipeline` | live | Company ATS-lite |
+| `settings` | company | `/company/dashboard` | needs_setup | Orphan card → dashboard |
+| `career_compass` | candidate | `/dashboard/career` | live | Career preview |
+| `notes_scorecards` | recruiter | `/recruiter/inbox` | live | Duplicate CTA to inbox |
+| `scheduling` | recruiter | `/recruiter/inbox` | pilot | Duplicate CTA to inbox |
+| `audit` | recruiter | `/recruiter/inbox` | pilot | Duplicate CTA to inbox |
+
+**Deprecated chrome (not module cards):** `header.tsx` → `@deprecated Use ChromeHeader`; `app-header.tsx` → `@deprecated Use WorkspaceHeader`. Kept for legacy imports only.
+
+### Board routes (13 `page.tsx` under `/board/*`)
+
+SoR lists **6** board entries under investor persona; **7 additional board pages** exist as operational/evidence monitors without SoR cards:
+
+| Route | In SoR? | Purpose |
+|-------|---------|---------|
+| `/board/working-features-readiness` | ✅ | Feature readiness evidence |
+| `/board/working-data-readiness` | ✅ | Data readiness evidence |
+| `/board/implementation-tracker` | ✅ | Implementation tracker |
+| `/board/production-persistence-status` | ✅ | Production persistence status |
+| `/board/first-working-persistence-plan` | ✅ | First working persistence plan |
+| `/board/audit-event-foundation` | ✅ | Audit event foundation |
+| `/board/persistence-operations-monitor` | ❌ | Cross-persona ops monitor |
+| `/board/placement-verification` | ❌ | Placement evidence monitor |
+| `/board/calendar-readiness` | ❌ | Calendar OAuth readiness |
+| `/board/microsoft-busy-read-staging-checklist` | ❌ | Microsoft busy-read staging |
+| `/board/offer-readiness` | ❌ | Offer readiness monitor |
+| `/board/scheduling-proposal` | ❌ | Scheduling proposal monitor |
+| `/board/hiring-journey` | ❌ | Cross-persona hiring journey |
 
 **Classification legend (this audit):**
 
@@ -165,7 +204,9 @@ Each entry carries: `id`, `persona`, `href`, i18n keys, `status`, `moduleFamily`
 
 **Investor SoR extras:** `/workspace/investor` hub, `/demo`, product-proof (live + boundary tags), 3 proof deep-links (pipeline/collab/ATS demo).
 
-### Board (SoR under investor persona — 6 cards)
+### Board (13 routes — 6 in SoR, 7 monitor-only)
+
+See **Board routes (13 `page.tsx`)** in Architecture above. SoR cards under investor persona:
 
 | Card ID | href | SoR status | boundaryTags | Class |
 |---------|------|------------|--------------|-------|
@@ -257,3 +298,4 @@ cd frontend && npm run build && npx tsc --noEmit
 | Date | Change |
 |------|--------|
 | 2026-06-27 | Initial feature status audit at scaffold `ea8c1dc` (prod FE aligned) |
+| 2026-06-27 | Added LAUNCH_STANCE, legacy modules table, full board 13-route inventory |
