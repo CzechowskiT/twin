@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useTranslation } from "@/components/language-provider";
 import { useMarketingPersona } from "@/components/persona-provider";
-import { getToken } from "@/lib/auth";
+import { hasActiveSession } from "@/lib/auth";
 import { headerAccountLinks } from "@/lib/persona-access";
 
 /** Auth-only header — logo, account links, language; no marketing persona nav arrays. */
@@ -20,7 +20,7 @@ export function AuthSiteHeaderBar() {
   const accountLinks = headerAccountLinks(persona, hasSession, { marketingChrome: false });
 
   useEffect(() => {
-    const sync = () => setHasSession(Boolean(getToken()));
+    const sync = () => setHasSession(hasActiveSession());
     sync();
     window.addEventListener("storage", sync);
     return () => window.removeEventListener("storage", sync);

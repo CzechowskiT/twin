@@ -9,7 +9,7 @@ import { useTranslation } from "@/components/language-provider";
 import { PersonaBadge } from "@/components/persona-badge";
 import { useMarketingPersona } from "@/components/persona-provider";
 import { apiFetch } from "@/lib/api";
-import { clearToken, getToken } from "@/lib/auth";
+import { clearToken, getToken, hasActiveSession } from "@/lib/auth";
 import { isDemoUserEmail } from "@/lib/demo-user";
 import { scrollToDashboardHash } from "@/lib/dashboard-anchor";
 import {
@@ -64,7 +64,7 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
   const highlightDemoNav = isDemoUserEmail(userEmail);
 
   useEffect(() => {
-    const sync = () => setHasSession(Boolean(getToken()));
+    const sync = () => setHasSession(hasActiveSession());
     sync();
     window.addEventListener("storage", sync);
     return () => window.removeEventListener("storage", sync);
