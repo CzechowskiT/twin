@@ -85,3 +85,14 @@ export function prepareForCredentialLogin(): void {
     clearToken();
   }
 }
+
+/** True when a valid JWT is stored; clears expired/malformed blobs so chrome shows login. */
+export function hasActiveSession(): boolean {
+  const token = getToken();
+  if (!token) return false;
+  if (isStoredTokenStale(token)) {
+    clearToken();
+    return false;
+  }
+  return true;
+}
