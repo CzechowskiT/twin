@@ -302,3 +302,4 @@ cd frontend && npm run build && npx tsc --noEmit
 | 2026-06-27 | Slice 2 completed by PR #312 — SoR entries for recruiter_pipeline, recruiter_calendar, company_pipeline, candidate_career_compass |
 | 2026-06-27 | Slice 3 completed by PR #313 — company live SoR modules carry tenant token hints |
 | 2026-06-27 | Slice 4 completed by PR #316 — collapse recruiter inbox duplicate module cards (notes_scorecards, scheduling, audit) |
+| 2026-06-27 | Slice 6 completed — company workspace pipeline hintKey aligned with SoR; demo vs live copy boundaries |

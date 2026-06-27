@@ -93,6 +93,20 @@ test("company live SoR modules surface tenant token hints", () => {
   assert.match(en.systemOfRecord.companyDashboardHint.toLowerCase(), /token|pilot|slug|tenant/i);
 });
 
+test("company workspace pipeline live with hint aligned to SoR boundaries", () => {
+  const mod = COMPANY_WORKSPACE_MODULES.find((m) => m.id === "pipeline");
+  assert.ok(mod);
+  assert.equal(mod!.status, "live");
+  assert.equal(mod!.hintKey, "workspaceModules.companyPipelineHint");
+  const sor = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "company_pipeline");
+  assert.equal(sor?.status, "live");
+  assert.ok(sor?.hintKey);
+  const hint = en.workspaceModules.companyPipelineHint.toLowerCase();
+  assert.match(hint, /token|pilot|human|decision|review/i);
+  assert.match(hint, /no ats|ats writeback|writeback/i);
+  assert.match(en.workspaceModules.companyPipelineValue.toLowerCase(), /not the sample|live segment/i);
+});
+
 test("recruiter workspace has one inbox module — no duplicate href cards", () => {
   const inboxHref = "/recruiter/inbox";
   const inboxCards = RECRUITER_WORKSPACE_MODULES.filter((m) => m.href === inboxHref);
