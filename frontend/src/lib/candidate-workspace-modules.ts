@@ -65,6 +65,15 @@ export const CANDIDATE_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     status: "live",
   },
   {
+    id: "trust_center",
+    href: CANDIDATE_CANONICAL_ROUTES.trust,
+    titleKey: "workspaceModules.candidateTrustCenterTitle",
+    valuePropKey: "workspaceModules.candidateTrustCenterValue",
+    hintKey: "workspaceModules.candidateTrustCenterHint",
+    ctaKey: "workspaceModules.candidateTrustCenterCta",
+    status: "pilot",
+  },
+  {
     id: "calendar",
     href: "/dashboard/calendar",
     titleKey: "workspaceModules.candidateCalendarTitle",

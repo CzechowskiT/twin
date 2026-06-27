@@ -148,7 +148,7 @@ A demo meets **full-confidence** when ALL of the following hold:
 | T1 | Recruiter duplicate inbox cards (notes/scheduling/audit) | P1 | **Slice 4 (this PR)** — collapse |
 | T2 | Company workspace `pipeline` **live** vs SoR demo pipeline **pilot** | P2 | **Slice 6 (this PR)** — hint + demo/live copy |
 | T3 | Investor SoR overload (19 entries mix product/board/demo) | P2 | Slice 8 — hub grouping |
-| T4 | Candidate trust (11 routes) not in workspace grid | P2 | Slice 7 — discoverability link |
+| T4 | Candidate trust (11 routes) not in workspace grid | P2 | **Slice 7 (this PR)** — discoverability link |
 | T5 | Company `settings` orphan → dashboard | P3 | Slice 9 — re-badge or remove |
 | T6 | Investor `investor_product_proof` **live** with heavy boundaries | P2 | Slice 10 — copy/badge tighten |
 | T7 | Board 7 monitor routes without SoR cards | P3 | Document only (intentional) |
@@ -390,6 +390,7 @@ flowchart LR
 | 2026-06-27 | Initial plan at scaffold `86c8c1b`; Slice 4 recruiter inbox duplicate collapse |
 | 2026-06-27 | Baseline includes #309–#313 merges; PR #314 noted OPEN |
 | 2026-06-27 | Slice 6 company pipeline status align — workspace hintKey, demo/live copy, no_ats_sync on demo SoR |
+| 2026-06-27 | Slice 7 candidate trust discoverability — one pilot `trust_center` workspace card → `/dashboard/trust`; existing i18n keys; no new routes |
 
 ---
 
