@@ -459,7 +459,7 @@ Condensed from [PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md](./PUBLIC_LAUNCH_GATE
 | **12** | P0 shell fix (`LightweightRouteShell`) | **Founder review required** before any Phase 3B or multitab browser work |
 | **14** | Investor room i18n parity | ✅ Shipped — copy-only EN/PL + overlays |
 | **15** | Public nav investor entrypoint | ✅ Shipped — header persona lane adds `/investor` (desktop + mobile) |
-| **16** | Phase 3B static guard refresh (post-shell) | Depends on Slice 12 |
+| **16** | Phase 3B static guard refresh | ✅ Shipped — `PHASE3B_ALL_ROUTES` = 20 routes; static guards 8; P0 36 unchanged |
 | **Phase 3B browser** | `test:phase3b-controlled-multitab-browser` | **HARD BLOCKED** — founder STOP |
 
 ### Safe fallback next items (no live-action, no Phase 3B)

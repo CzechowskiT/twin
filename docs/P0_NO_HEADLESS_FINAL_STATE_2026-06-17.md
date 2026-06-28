@@ -114,6 +114,7 @@ npx tsc --noEmit
 | 2026-06-17 | Initial P0 no-headless guardrail; Phase 3B BLOCKED |
 | 2026-06-28 | **Slice 13** — 36 routes (5 hiring-journey added); browser smoke remains gated |
 | 2026-06-28 | **Slice 12 founder-review package** — static guard test 10; no shell implementation |
+| 2026-06-28 | **Slice 16** — Phase 3B static guard refresh; `PHASE3B_ALL_ROUTES` = 20 routes; p0-no-headless **36 unchanged**; browser gated |
 
 ## Merge criteria
 

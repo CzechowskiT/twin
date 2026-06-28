@@ -1,7 +1,57 @@
+/** Phase 3B controlled multitab route inventory — static list only; execution BLOCKED. */
+
 export const PHASE3B_PUBLIC_ROUTES = ["/", "/demo", "/for-companies"] as const;
-export const PHASE3B_CANDIDATE_ROUTES = ["/dashboard", "/dashboard/jobs", "/dashboard/matches", "/profile"] as const;
-export const PHASE3B_RECRUITER_ROUTES = ["/recruiter", "/recruiter/candidates/demo-candidate-001", "/recruiter/candidates/demo-candidate-001/trust", "/recruiter/candidates/demo-candidate-001/team", "/recruiter/candidates/demo-candidate-001/communication", "/recruiter/jobs/demo-role-001/pipeline", "/recruiter/integrations/ats/import-readiness"] as const;
-export const PHASE3B_COMPANY_ROUTES = ["/company/dashboard", "/company/candidates/demo-candidate-001", "/company/candidates/demo-candidate-001/trust", "/company/candidates/demo-candidate-001/team", "/company/candidates/demo-candidate-001/communication", "/company/roles/demo-role-001/pipeline"] as const;
-export const PHASE3B_ROUTE_BATCHES = [{ label: "public-candidate", routes: [...PHASE3B_PUBLIC_ROUTES, ...PHASE3B_CANDIDATE_ROUTES] }, { label: "recruiter", routes: [...PHASE3B_RECRUITER_ROUTES] }, { label: "company", routes: [...PHASE3B_COMPANY_ROUTES] }] as const;
-export const PHASE3B_HEAP_FAIL_MB = 180; export const PHASE3B_HEAP_WARN_MB = 120; export const PHASE3B_DOM_FAIL = 15000; export const PHASE3B_DOM_WARN = 10000;
-export const PHASE3B_IDLE_MS_MIN = 60_000; export const PHASE3B_IDLE_MS_MAX = 90_000; export const PHASE3B_MAX_TABS = 8; export const PHASE3B_SAFE_MARQUEE_MAX_NODES = 30; export const PHASE3B_FULL_MARQUEE_FAIL_NODES = 89;
+
+export const PHASE3B_CANDIDATE_ROUTES = [
+  "/dashboard",
+  "/dashboard/jobs",
+  "/dashboard/matches",
+  "/profile",
+] as const;
+
+export const PHASE3B_RECRUITER_ROUTES = [
+  "/recruiter",
+  "/recruiter/candidates/demo-candidate-001",
+  "/recruiter/candidates/demo-candidate-001/trust",
+  "/recruiter/candidates/demo-candidate-001/team",
+  "/recruiter/candidates/demo-candidate-001/communication",
+  "/recruiter/jobs/demo-role-001/pipeline",
+  "/recruiter/integrations/ats/import-readiness",
+] as const;
+
+export const PHASE3B_COMPANY_ROUTES = [
+  "/company/dashboard",
+  "/company/candidates/demo-candidate-001",
+  "/company/candidates/demo-candidate-001/trust",
+  "/company/candidates/demo-candidate-001/team",
+  "/company/candidates/demo-candidate-001/communication",
+  "/company/roles/demo-role-001/pipeline",
+] as const;
+
+export const PHASE3B_ROUTE_BATCHES = [
+  {
+    label: "public-candidate",
+    routes: [...PHASE3B_PUBLIC_ROUTES, ...PHASE3B_CANDIDATE_ROUTES],
+  },
+  { label: "recruiter", routes: [...PHASE3B_RECRUITER_ROUTES] },
+  { label: "company", routes: [...PHASE3B_COMPANY_ROUTES] },
+] as const;
+
+export const PHASE3B_ALL_ROUTES = [
+  ...PHASE3B_PUBLIC_ROUTES,
+  ...PHASE3B_CANDIDATE_ROUTES,
+  ...PHASE3B_RECRUITER_ROUTES,
+  ...PHASE3B_COMPANY_ROUTES,
+] as const;
+
+export const PHASE3B_ROUTE_COUNT = PHASE3B_ALL_ROUTES.length;
+
+export const PHASE3B_HEAP_FAIL_MB = 180;
+export const PHASE3B_HEAP_WARN_MB = 120;
+export const PHASE3B_DOM_FAIL = 15000;
+export const PHASE3B_DOM_WARN = 10000;
+export const PHASE3B_IDLE_MS_MIN = 60_000;
+export const PHASE3B_IDLE_MS_MAX = 90_000;
+export const PHASE3B_MAX_TABS = 8;
+export const PHASE3B_SAFE_MARQUEE_MAX_NODES = 30;
+export const PHASE3B_FULL_MARQUEE_FAIL_NODES = 89;
