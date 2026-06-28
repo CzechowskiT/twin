@@ -308,3 +308,4 @@ cd frontend && npm run build && npx tsc --noEmit
 | 2026-06-28 | Slice 9 completed — removed company workspace `settings` orphan card (duplicate of `/company/dashboard` SoR entry) |
 | 2026-06-28 | Slice 10 completed — investor product proof SoR card: `sorHubHint`, bounded diligence copy; status stays live |
 | 2026-06-28 | Slice 11 completed — marketing copy trust sweep (home, how-it-works, demo, FAQ, onboarding EN+PL); guards extended; LAUNCH_STANCE unchanged |
+| 2026-06-28 | Slice 15 completed — public header persona nav adds Investor/Inwestor → `/investor` (5 flat links: candidate, recruiter, company, investor, demo); EN/PL parity via existing `nav.personaInvestor` |

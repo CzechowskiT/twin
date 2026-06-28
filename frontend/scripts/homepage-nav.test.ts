@@ -21,19 +21,27 @@ function read(path: string): string {
   return readFileSync(join(root, path), "utf8");
 }
 
-test("marketing lane links expose candidate, recruiter, company, and demo", () => {
+test("marketing lane links expose candidate, recruiter, company, investor, and demo", () => {
   const links = headerMarketingLaneLinks();
-  assert.equal(links.length, 4);
+  assert.equal(links.length, 5);
   assert.deepEqual(
     links.map((l) => l.href),
-    ["/for-candidates", "/for-recruiters", "/for-companies", "/demo"],
+    ["/for-candidates", "/for-recruiters", "/for-companies", "/investor", "/demo"],
   );
   assert.deepEqual(links.map((l) => l.labelKey), [
     "nav.personaCandidate",
     "nav.personaRecruiter",
     "nav.personaCompany",
+    "nav.personaInvestor",
     "nav.demo",
   ]);
+});
+
+test("marketing lane investor link points to canonical investor room", () => {
+  const investor = headerMarketingLaneLinks().find((l) => l.labelKey === "nav.personaInvestor");
+  assert.ok(investor);
+  assert.equal(investor.href, "/investor");
+  assert.equal(investor.persona, "investor");
 });
 
 test("marketing login href points to role-choice hub", () => {
