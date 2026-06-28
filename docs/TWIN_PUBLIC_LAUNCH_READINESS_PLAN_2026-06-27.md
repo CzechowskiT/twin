@@ -309,13 +309,15 @@ flowchart LR
 | 11 | Marketing copy trust sweep | FE/docs | homepage, `/demo`, FAQ | No live claims | ✅ Slice 11 |
 | 12 | P0 shell fix (founder review) | FE | `LightweightRouteShell` | **Blocked** |
 | 13 | Hiring journey → p0-no-headless list | FE/tests | Add 5 routes to 36-route spec | ✅ Slice 13 — gated browser |
-| 14 | Phase 3B static guard refresh | FE/tests | Post-shell route batch | **Blocked** |
-| 15 | Lighthouse budget definition | Docs | Signed numbers doc | Post-3B |
-| 16 | Microsoft busy-read staging smoke | FE/API | Staging only | Gates false in prod |
-| 17 | Self-service DSR delete MVP | BE/FE | L6 closure | Privacy review |
-| 18 | H5c slot-1 external recruiter | Ops/docs | Pilot pack execution | Founder GO only |
-| 19 | Auto-apply Stage 3 prep | BE | Allowlist + caps design | No activation |
-| 20 | Public launch gate re-audit | Docs | Refresh checklist at P0 CLOSED | Founder sign-off |
+| 14 | Investor room i18n parity | FE/tests | `/investor`, product proof, SoR groups EN/PL | ✅ Slice 14 — copy-only |
+| 15 | Public nav investor entrypoint | FE | Header persona lane → `/investor` | ✅ Slice 15 — copy-only |
+| 16 | Phase 3B static guard refresh | FE/tests | Post-shell route batch | **Blocked** |
+| 17 | Lighthouse budget definition | Docs | Signed numbers doc | Post-3B |
+| 18 | Microsoft busy-read staging smoke | FE/API | Staging only | Gates false in prod |
+| 19 | Self-service DSR delete MVP | BE/FE | L6 closure | Privacy review |
+| 20 | H5c slot-1 external recruiter | Ops/docs | Pilot pack execution | Founder GO only |
+| 21 | Auto-apply Stage 3 prep | BE | Allowlist + caps design | No activation |
+| 22 | Public launch gate re-audit | Docs | Refresh checklist at P0 CLOSED | Founder sign-off |
 
 ### Slice 4 detail (this PR)
 
@@ -356,6 +358,14 @@ flowchart LR
 **Approach:** **Copy-only trust sweep** — tighten EN+PL i18n and FAQ to prepare-only / phased / human-decision language; extend `trust-language-guard` and `i18n-native-copy-quality` with EN/PL marketing-domain guards (positive-claim detection allows negative context: “no ATS writeback”, “NO-GO”, “human review”).
 
 **Non-goals:** No LAUNCH_STANCE change, no route/auth/feature-flag/backend changes, no Phase 3B.
+
+### Slice 14 detail
+
+**Problem:** Investor room (`/investor`, `/for-investors`), executive product proof, and investor SoR group headings had EN/PL parity gaps — English loanwords and missing `demoMapProductProof` overlay keys for non-EN locales.
+
+**Approach:** **Copy-only i18n parity** — localize PL investor room + product proof labels; align SoR group leads with bounded-diligence boundaries; add overlay `demoMapProductProof` for es/it/fr/de/zh/ar/ja; extend static guards.
+
+**Non-goals:** No shell, no Phase 3B, no browser smoke, no launch/ATS/outreach claims, no LAUNCH_STANCE change.
 
 ## 16. Investor Demo Script Boundaries
 
@@ -426,6 +436,7 @@ flowchart LR
 | 2026-06-28 | Slice 11 marketing copy trust sweep — homepage, how-it-works, demo, FAQ, onboarding EN+PL bounded; trust-language guards extended |
 | 2026-06-28 | **Slice 13 shipped** (#324) — 5 hiring-journey routes → p0-no-headless (36 routes); browser gated |
 | 2026-06-28 | **Slice 12** — founder-review package prepared ([P0_SHELL_FOUNDER_REVIEW_2026-06-28.md](./P0_SHELL_FOUNDER_REVIEW_2026-06-28.md)); shell implementation **not started**; Phase 3B **BLOCKED** |
+| 2026-06-28 | **Slice 14** — investor room i18n parity EN/PL + overlay `demoMapProductProof`; SoR group leads aligned; static guards extended; LAUNCH_STANCE unchanged |
 | 2026-06-28 | **Slice 15** — public marketing header adds Inwestor/Investor → `/investor` between Firma and Demo (desktop + mobile persona nav); no new routes; LAUNCH_STANCE unchanged |
 
 ---

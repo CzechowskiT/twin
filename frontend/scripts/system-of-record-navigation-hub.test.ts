@@ -352,6 +352,14 @@ test("16 investor group i18n avoids launch-ready copy in all locales", () => {
   assert.match(demoLead, /writeback|no ats|sample|demo/);
 });
 
+test("18 PL investor group leads avoid English loanwords for outreach and writeback", () => {
+  const pl = dictionaries.pl.systemOfRecord;
+  assert.doesNotMatch(pl.investorGroupDemoLead, /outreachu|writebacku/i);
+  assert.doesNotMatch(pl.investorGroupProductLead, /executive proof/i);
+  assert.match(pl.investorGroupDemoLead.toLowerCase(), /kontakt|ats|przykład|demo/);
+  assert.match(pl.investorGroupProductLead.toLowerCase(), /dowód|due diligence|produkt/);
+});
+
 test("17b investor product proof live with hint and diligence boundaries", () => {
   const route = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "investor_product_proof");
   assert.ok(route);
