@@ -6,6 +6,8 @@
 
 **Canonical references:**
 - [P0_SHELL_FOUNDER_REVIEW_2026-06-28.md](./P0_SHELL_FOUNDER_REVIEW_2026-06-28.md)
+- [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md)
+- [gate-d-prod-browser-smoke-decision-2026-06-28.md](./gate-d-prod-browser-smoke-decision-2026-06-28.md)
 - [P0_NO_HEADLESS_FINAL_STATE_2026-06-17.md](./P0_NO_HEADLESS_FINAL_STATE_2026-06-17.md)
 - [PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md](./PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md)
 - [P0_PERFORMANCE_INVENTORY_2026-06-27.md](./P0_PERFORMANCE_INVENTORY_2026-06-27.md)
@@ -17,7 +19,7 @@
 | Item | Status |
 |------|--------|
 | **Slice 12** | **Gate B + Gate C SHIPPED** — shell fix merged; **local browser 36/36 PASS**; Gates D–F **PENDING** |
-| **This checklist** | **Gate B = YES**, **Gate C = YES (local browser only)** — see [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md) |
+| **This checklist** | **Gate B = YES**, **Gate C = YES (local browser only)** — [gate-c evidence](./gate-c-browser-validation-result-2026-06-28.md); **Gate D decision package** — [gate-d decision](./gate-d-prod-browser-smoke-decision-2026-06-28.md) |
 | **Implementation approval** | **Gate B YES** — minimal shell/gate/layout branch only; no broad refactor |
 | **Public launch** | **NO-GO** |
 | **P0 performance** | **OPEN** |
@@ -96,7 +98,19 @@ PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 PLAYWRIGHT_ENABLE_WEBSERVER=1 \
 
 ---
 
-## 6. What Gate E Means
+## 6. What Gate D Means
+
+**Gate D — Production browser smoke boundary approved**
+
+- Founder explicitly approves running `test:p0-no-headless-final-state-browser` against **production** after Gate C local PASS.
+- Requires `PLAYWRIGHT_ALLOW_PROD_SMOKE=1` **and** `PLAYWRIGHT_SKIP_WEBSERVER=1`; optional `PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app`.
+- Same 36 routes, workers=1, sequential — see [gate-d-prod-browser-smoke-decision-2026-06-28.md](./gate-d-prod-browser-smoke-decision-2026-06-28.md).
+- Gate D does **NOT** approve Phase 3B (Gate E), close P0, or change launch stance.
+- **Default: PENDING** — prod browser **not executed** until founder YES.
+
+---
+
+## 7. What Gate E Means
 
 **Gate E — Phase 3B controlled multitab approved**
 
@@ -110,7 +124,7 @@ Reference: [PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md](./PHASE3B_CO
 
 ---
 
-## 7. Required YES/NO Decision Table
+## 8. Required YES/NO Decision Table
 
 **Default for all gates: PENDING.** Founder must change to YES or NO explicitly.
 
@@ -119,15 +133,15 @@ Reference: [PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md](./PHASE3B_CO
 | **A** | Static scope confirmed (docs + guards)? | **PENDING** | Merge checklist PR; no runtime change |
 | **B** | Implementation branch approved (`LightweightRouteShell` / `PersonaWorkspaceGate`)? | **YES** | Minimal fix branch merged; §9 static gates passed |
 | **C** | Gated local browser validation approved? | **YES** (local only) | **PASS** 36/36 — prod browser still **blocked** until Gate D |
-| **D** | Production smoke boundary approved? | **PENDING** | Run prod smoke with `PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1` |
+| **D** | Production smoke boundary approved? | **PENDING** | Run prod smoke per [gate-d decision](./gate-d-prod-browser-smoke-decision-2026-06-28.md) §4 |
 | **E** | Phase 3B controlled multitab approved? | **PENDING** | Gated browser per Phase 3B doc (20 routes, workers=1) |
 | **F** | Launch-gate re-audit approved? | **PENDING** | Re-run launch gate checklist; still requires separate founder GO for public launch |
 
-**Founder note (2026-06-28):** Gate B merged (PR #332); Gate C **YES** — local browser **36/36 PASS** ([evidence](./gate-c-browser-validation-result-2026-06-28.md)). **No prod browser**, **no Phase 3B**, **no P0 closure**. Gate D/E/F remain **PENDING**.
+**Founder note (2026-06-28):** Gate B merged (PR #332); Gate C **YES** — local browser **36/36 PASS** ([evidence](./gate-c-browser-validation-result-2026-06-28.md)). Gate D **decision package** prepared ([gate-d decision](./gate-d-prod-browser-smoke-decision-2026-06-28.md)) — **prod browser not run**. **No Phase 3B**, **no P0 closure**. Gate D/E/F remain **PENDING**.
 
 ---
 
-## 8. Founder Must Explicitly Accept These Constraints
+## 9. Founder Must Explicitly Accept These Constraints
 
 Before marking any gate YES, founder confirms acceptance of:
 
@@ -146,7 +160,7 @@ Before marking any gate YES, founder confirms acceptance of:
 
 ---
 
-## 9. Static Gates Required Before Any Gate B Implementation Merge
+## 10. Static Gates Required Before Any Gate B Implementation Merge
 
 All must pass on implementation PR before merge:
 
@@ -166,7 +180,7 @@ npx tsc --noEmit
 
 ---
 
-## 10. Stop Conditions
+## 11. Stop Conditions
 
 **STOP immediately and revert if any occur during gated work:**
 
@@ -185,7 +199,7 @@ npx tsc --noEmit
 
 ---
 
-## 11. Decision Record Template
+## 12. Decision Record Template
 
 Copy-paste and fill when founder decides:
 
@@ -213,7 +227,7 @@ Notes: ...
 
 ---
 
-## 12. Next Prompt If Gate B = YES
+## 13. Next Prompt If Gate B = YES
 
 Use this prompt stub only after founder explicitly marks Gate B = YES in §11:
 
@@ -240,7 +254,7 @@ After merge, wait for founder Gate C before any browser smoke.
 
 ---
 
-## 13. Next Prompt If Gate B = NO
+## 14. Next Prompt If Gate B = NO
 
 Use this prompt stub if founder marks Gate B = NO or leaves it PENDING:
 
@@ -281,6 +295,8 @@ cd frontend && \
 
 **Gate C browser (local):** **PASS** 36/36 — see [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md).
 
-**Not run:** prod browser (Gate D), Phase 3B (Gate E), multitab stress.
+**Gate D decision package:** [gate-d-prod-browser-smoke-decision-2026-06-28.md](./gate-d-prod-browser-smoke-decision-2026-06-28.md) — **PENDING**, prod browser **not executed**.
+
+**Not run:** prod browser execution (Gate D), Phase 3B (Gate E), multitab stress.
 
 **Public launch: NO-GO · P0 performance: OPEN · Phase 3B: HARD BLOCKED · Gate B: YES · Gate C: YES (local) · Gate D/E/F: PENDING**

@@ -334,4 +334,31 @@ test("16 phase3b static inventory blocked — 20 routes, browser gated, P0 OPEN"
   const p0Doc = readFileSync(join(root, "..", "docs", "P0_NO_HEADLESS_FINAL_STATE_2026-06-17.md"), "utf8");
   assert.match(p0Doc, /36 routes/i);
   assert.match(p0Doc, /Phase 3B.*BLOCKED/i);
+  assert.match(p0Doc, /gate-d-prod-browser-smoke-decision-2026-06-28/i);
+});
+
+test("17 gate d pending — prod smoke env flags, stance blocked, no launch GO claims", () => {
+  const gateD = readFileSync(join(root, "..", "docs", "gate-d-prod-browser-smoke-decision-2026-06-28.md"), "utf8");
+  assert.match(gateD, /Gate D.*PENDING/i);
+  assert.match(gateD, /Gate B.*YES/i);
+  assert.match(gateD, /Gate C.*YES/i);
+  assert.match(gateD, /Gate E.*PENDING/i);
+  assert.match(gateD, /PLAYWRIGHT_ALLOW_PROD_SMOKE=1/);
+  assert.match(gateD, /PLAYWRIGHT_SKIP_WEBSERVER=1/);
+  assert.match(gateD, /Phase 3B.*HARD BLOCKED/i);
+  assert.match(gateD, /P0.*OPEN/i);
+  assert.match(gateD, /NO-GO/i);
+  assert.doesNotMatch(gateD, /\| \*\*P0:\*\* \| \*\*CLOSED\*\*/);
+  assert.doesNotMatch(gateD, /Launch stance:\s*\*\*GO\*\*/i);
+
+  const spec = read("e2e/p0-no-headless-final-state-browser.spec.ts");
+  assert.match(spec, /PLAYWRIGHT_ALLOW_PROD_SMOKE=1/);
+  assert.match(spec, /PLAYWRIGHT_SKIP_WEBSERVER=1/);
+
+  const smokeWorkflow = readFileSync(join(root, "..", ".github/workflows/smoke.yml"), "utf8");
+  assert.doesNotMatch(smokeWorkflow, /playwright test/i);
+  assert.doesNotMatch(smokeWorkflow, /p0-no-headless-final-state-browser/);
+
+  const launchStance = read("src/lib/investor-metrics-reality.ts");
+  assert.match(launchStance, /LAUNCH_STANCE\s*=\s*"noGo"/);
 });

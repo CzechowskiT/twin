@@ -21,7 +21,7 @@
 | **P0 performance** | **OPEN** — no Phase 3B prod proof, no signed Lighthouse budgets |
 | **Phase 3B controlled multitab** | **HARD BLOCKED** — founder STOP (2026-06-17) |
 | **Public launch** | **NO-GO** |
-| **This document** | **Gate B + Gate C local browser PASS 2026-06-28** — Gates D/E **PENDING** |
+| **This document** | **Gate B + Gate C local browser PASS 2026-06-28** — Gate D **decision package** prepared; Gates D/E **PENDING** |
 
 **Slice 13 shipped** (PR #324): 5 hiring-journey routes added to `p0-no-headless-final-state` (31 → **36 routes**); static guards 9/9; browser smoke remains **gated**, not default CI.
 
@@ -109,7 +109,7 @@ Each gate is a **separate yes/no**. Default for all: **NO / HOLD** until founder
 | **A** | Approve this static review package (docs + guards)? | HOLD | Merge this PR; no runtime change |
 | **B** | Approve opening an **implementation branch** for `LightweightRouteShell` / `PersonaWorkspaceGate` / layout? | **YES** | Minimal fix merged `fix/p0-shell-lightweight-route-2026-06-28`; Gate C required before browser |
 | **C** | Approve **gated local browser** validation (`test:p0-no-headless-final-state-browser`, 36 routes)? | **YES** (local only) | **PASS** 36/36 — see [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md); prod still requires Gate D |
-| **D** | Approve **gated prod browser** smoke post-deploy? | **PENDING** | Run with `PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1` |
+| **D** | Approve **gated prod browser** smoke post-deploy? | **PENDING** | Run per [gate-d decision](./gate-d-prod-browser-smoke-decision-2026-06-28.md) §4 — `PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1` |
 | **E** | Approve **Phase 3B unblock** (controlled multitab, 20 routes)? | **PENDING** | Requires Gate C PASS first; then gated browser per Phase 3B doc |
 | **F** | Approve production smoke boundaries (founder JWT, sequential only, workers=1)? | **PENDING** | Document JWT + route list in ops runbook |
 
@@ -228,7 +228,8 @@ Even perfect shell performance does **not** imply public launch, auto-apply acti
 | TBD | Gate A — approve review package | **PENDING** |
 | 2026-06-28 | **Gate B — minimal shell fix merged** (`PersonaWorkspaceGateShell`, `hasActiveSession`, lazy `OnboardingGate`) | **SHIPPED** |
 | 2026-06-28 | **Gate C — local browser validation PASS** (36/36, workers=1) | **SHIPPED** — [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md) |
-| TBD | Gate D — prod browser boundary | **PENDING** |
+| 2026-06-28 | **Gate D — prod browser decision package** (docs + static guards; **not executed**) | **PENDING** — [gate-d-prod-browser-smoke-decision-2026-06-28.md](./gate-d-prod-browser-smoke-decision-2026-06-28.md) |
+| TBD | Gate D — prod browser execution | **PENDING** |
 | TBD | Gate E — Phase 3B unblock | **PENDING** |
 | TBD | P0 performance **CLOSED** | **BLOCKED** |
 | TBD | Public launch **GO** | **BLOCKED** |
@@ -250,6 +251,8 @@ cd frontend && \
 
 **Gate C local browser:** **PASS** 36/36 — [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md).
 
-**Not run:** prod browser (Gate D), Phase 3B (Gate E), multitab, stress.
+**Gate D decision package:** [gate-d-prod-browser-smoke-decision-2026-06-28.md](./gate-d-prod-browser-smoke-decision-2026-06-28.md) — **PENDING**, prod browser **not executed**.
+
+**Not run:** prod browser execution (Gate D), Phase 3B (Gate E), multitab, stress.
 
 **Public launch: NO-GO · P0 performance: OPEN · Phase 3B: HARD BLOCKED · Gate C: YES (local PASS)**

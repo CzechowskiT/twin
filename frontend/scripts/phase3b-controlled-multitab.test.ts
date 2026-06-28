@@ -120,6 +120,7 @@ test("9 slice12 founder signoff checklist — Gate B YES, Gate C YES (local), Ga
   assert.match(checklist, /Gate B.*YES/i);
   assert.match(checklist, /Gate C.*YES/i);
   assert.match(checklist, /Gate E.*PENDING/i);
+  assert.match(checklist, /Gate D.*PENDING/i);
   assert.match(checklist, /36 routes/i);
   assert.match(checklist, /20 routes/i);
   assert.match(checklist, /7 \+ 7 \+ 6/);
@@ -127,6 +128,7 @@ test("9 slice12 founder signoff checklist — Gate B YES, Gate C YES (local), Ga
   assert.match(checklist, /P0 performance.*OPEN/i);
   assert.match(checklist, /Public launch.*NO-GO/i);
   assert.match(checklist, /gate-c-browser-validation-result-2026-06-28/i);
+  assert.match(checklist, /gate-d-prod-browser-smoke-decision-2026-06-28/i);
 
   const launchStance = read("src/lib/investor-metrics-reality.ts");
   assert.match(launchStance, /LAUNCH_STANCE\s*=\s*"noGo"/);
@@ -134,4 +136,27 @@ test("9 slice12 founder signoff checklist — Gate B YES, Gate C YES (local), Ga
   const smokeWorkflow = readRepo(".github/workflows/smoke.yml");
   assert.doesNotMatch(smokeWorkflow, /playwright test/i);
   assert.doesNotMatch(smokeWorkflow, /phase3b-controlled-multitab/);
+});
+
+test("10 gate d decision package — Gate D PENDING, prod env flags documented, no overclaims", () => {
+  const gateD = readRepo("docs/gate-d-prod-browser-smoke-decision-2026-06-28.md");
+  assert.match(gateD, /Gate D.*PENDING/i);
+  assert.match(gateD, /Gate B.*YES/i);
+  assert.match(gateD, /Gate C.*YES/i);
+  assert.match(gateD, /Gate E.*PENDING/i);
+  assert.match(gateD, /PLAYWRIGHT_ALLOW_PROD_SMOKE=1/);
+  assert.match(gateD, /PLAYWRIGHT_SKIP_WEBSERVER=1/);
+  assert.match(gateD, /Phase 3B.*HARD BLOCKED/i);
+  assert.match(gateD, /P0.*OPEN/i);
+  assert.match(gateD, /NO-GO/i);
+  assert.doesNotMatch(gateD, /\| \*\*P0:\*\* \| \*\*CLOSED\*\*/);
+  assert.doesNotMatch(gateD, /Launch stance:\s*\*\*GO\*\*/i);
+
+  const spec = read("e2e/p0-no-headless-final-state-browser.spec.ts");
+  assert.match(spec, /PLAYWRIGHT_ALLOW_PROD_SMOKE=1/);
+  assert.match(spec, /PLAYWRIGHT_SKIP_WEBSERVER=1/);
+
+  const smokeWorkflow = readRepo(".github/workflows/smoke.yml");
+  assert.doesNotMatch(smokeWorkflow, /playwright test/i);
+  assert.doesNotMatch(smokeWorkflow, /p0-no-headless-final-state-browser/);
 });

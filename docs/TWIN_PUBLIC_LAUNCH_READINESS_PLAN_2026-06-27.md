@@ -443,6 +443,7 @@ flowchart LR
 | 2026-06-28 | **Slice 17** — homepage compact Explore TWIN / Poznaj TWIN quick-entry panel (7 existing routes); bounded EN/PL i18n; `test:homepage-nav` extended; no shell, no browser, LAUNCH_STANCE unchanged |
 | 2026-06-28 | **Slice 18** — public footer stable sitemap (9 links): persona marketing pages + `/investor` (executive room) distinct from `/for-investors`; Trust + Status in explore column; `public-footer-sitemap-routes.ts`; persona-dependent footer links removed; LAUNCH_STANCE unchanged |
 | 2026-06-28 | **Slice 12 Gate C executed** — local browser **36/36 PASS**; Gate D/E/F **PENDING**; P0 **OPEN**; Phase 3B **BLOCKED**; LAUNCH_STANCE unchanged |
+| 2026-06-28 | **Slice 12 Gate D decision package** — [gate-d-prod-browser-smoke-decision-2026-06-28.md](./gate-d-prod-browser-smoke-decision-2026-06-28.md); prod browser **not executed**; Gate D **PENDING** |
 
 ---
 
