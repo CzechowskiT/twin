@@ -21,7 +21,7 @@
 | **P0 performance** | **OPEN** — no Phase 3B prod proof, no signed Lighthouse budgets |
 | **Phase 3B controlled multitab** | **HARD BLOCKED** — founder STOP (2026-06-17) |
 | **Public launch** | **NO-GO** |
-| **This document** | **Gate B minimal shell fix merged 2026-06-28** — Gates C/E **PENDING** |
+| **This document** | **Gate B + Gate C local browser PASS 2026-06-28** — Gates D/E **PENDING** |
 
 **Slice 13 shipped** (PR #324): 5 hiring-journey routes added to `p0-no-headless-final-state` (31 → **36 routes**); static guards 9/9; browser smoke remains **gated**, not default CI.
 
@@ -33,11 +33,12 @@
 
 | Field | Value |
 |-------|-------|
-| **repo_head** | `9d0f9bc36720e6348270dd0a499a2542087ebccc` (PR #324) |
-| **prod_frontend_commit** | `9d0f9bc36720e6348270dd0a499a2542087ebccc` (public-health 2026-06-28) |
+| **repo_head** | `62138dccd986bb068e717a9dafee38f822e94c66` (PR #332) |
+| **prod_frontend_commit** | `62138dccd986bb068e717a9dafee38f822e94c66` (public-health 2026-06-28) |
 | **prod_api_commit** | `6d6d1e54f85f8f00fe1727f32cef700e9c2a20aa` (`6d6d1e5`, PR #281) |
 | **public-health** | `status=ok`, `db_ok=true` |
-| **alignment_status** | **ALIGNED** — prod FE matches scaffold post-#324 deploy |
+| **alignment_status** | **ALIGNED** — prod FE matches scaffold post-#332 |
+| **Gate C local browser** | **PASS** — 36/36, workers=1, 44.5s — [evidence](./gate-c-browser-validation-result-2026-06-28.md) |
 | **p0-no-headless route inventory** | **36 routes** (public 3, candidate 10, recruiter 11, company 11, board 1) |
 | **Hiring Journey in inventory** | ✅ 5 routes — static/gated prep only; browser not run |
 
@@ -107,7 +108,7 @@ Each gate is a **separate yes/no**. Default for all: **NO / HOLD** until founder
 |------|----------|---------|---------------------------|
 | **A** | Approve this static review package (docs + guards)? | HOLD | Merge this PR; no runtime change |
 | **B** | Approve opening an **implementation branch** for `LightweightRouteShell` / `PersonaWorkspaceGate` / layout? | **YES** | Minimal fix merged `fix/p0-shell-lightweight-route-2026-06-28`; Gate C required before browser |
-| **C** | Approve **gated local browser** validation (`test:p0-no-headless-final-state-browser`, 36 routes)? | **PENDING** | Run with `PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 PLAYWRIGHT_ENABLE_WEBSERVER=1` locally only |
+| **C** | Approve **gated local browser** validation (`test:p0-no-headless-final-state-browser`, 36 routes)? | **YES** (local only) | **PASS** 36/36 — see [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md); prod still requires Gate D |
 | **D** | Approve **gated prod browser** smoke post-deploy? | **PENDING** | Run with `PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1` |
 | **E** | Approve **Phase 3B unblock** (controlled multitab, 20 routes)? | **PENDING** | Requires Gate C PASS first; then gated browser per Phase 3B doc |
 | **F** | Approve production smoke boundaries (founder JWT, sequential only, workers=1)? | **PENDING** | Document JWT + route list in ops runbook |
@@ -226,7 +227,8 @@ Even perfect shell performance does **not** imply public launch, auto-apply acti
 | 2026-06-28 | **Slice 12 founder sign-off checklist** — [SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md](./SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md); Gates A–F default **PENDING** | **PENDING FOUNDER REVIEW** |
 | TBD | Gate A — approve review package | **PENDING** |
 | 2026-06-28 | **Gate B — minimal shell fix merged** (`PersonaWorkspaceGateShell`, `hasActiveSession`, lazy `OnboardingGate`) | **SHIPPED** |
-| TBD | Gate C — approve gated browser validation | **PENDING** |
+| 2026-06-28 | **Gate C — local browser validation PASS** (36/36, workers=1) | **SHIPPED** — [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md) |
+| TBD | Gate D — prod browser boundary | **PENDING** |
 | TBD | Gate E — Phase 3B unblock | **PENDING** |
 | TBD | P0 performance **CLOSED** | **BLOCKED** |
 | TBD | Public launch **GO** | **BLOCKED** |
@@ -246,6 +248,8 @@ cd frontend && \
   npm run build && npx tsc --noEmit
 ```
 
-**Not run:** browser smokes, Phase 3B, multitab, stress.
+**Gate C local browser:** **PASS** 36/36 — [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md).
 
-**Public launch: NO-GO · P0 performance: OPEN · Phase 3B: HARD BLOCKED**
+**Not run:** prod browser (Gate D), Phase 3B (Gate E), multitab, stress.
+
+**Public launch: NO-GO · P0 performance: OPEN · Phase 3B: HARD BLOCKED · Gate C: YES (local PASS)**
