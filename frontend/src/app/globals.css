@@ -2274,6 +2274,7 @@ html[data-workspace-route="true"] .landing-ambient__orb {
 
 .marketing-marquee-segment {
   flex: 0 0 auto;
+  /* Trailing inset matches gap-x-* so duplicated strip seams stay evenly spaced. */
 }
 
 /** Workspace/auth — bounded DOM marquee (≤27 nodes, 9×3 segments), transform-only loop. */
@@ -2315,7 +2316,7 @@ html[data-workspace-route="true"] .landing-ambient__orb {
 .performance-safe-logo-mark {
   display: block;
   height: 1.4rem;
-  width: 6.25rem;
+  width: 100%;
   max-width: 6.5rem;
   flex-shrink: 0;
 }
@@ -2338,6 +2339,7 @@ html[data-workspace-route="true"] .performance-safe-logo-marquee .performance-sa
 
 .performance-safe-marquee-segment {
   flex: 0 0 auto;
+  /* Trailing inset matches gap-x-* so tri-segment loop seams stay evenly spaced. */
 }
 
 /**

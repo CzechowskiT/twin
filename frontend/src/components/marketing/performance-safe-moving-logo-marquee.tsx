@@ -17,7 +17,9 @@ import {
   isPerformanceSafeCuratedLogoSlug,
 } from "@/lib/performance-safe-curated-logos";
 
-const MARK_BOX_CLASS = "h-9 w-[8rem] sm:h-10 sm:w-[10rem]";
+/** Fixed plate — uniform inset; width matches curated SVG band in globals.css. */
+const MARK_BOX_CLASS =
+  "box-border h-9 w-[7.25rem] sm:h-10 sm:w-[8.5rem]";
 
 const MARK_PLATE_CLASS =
   "border border-zinc-200/90 bg-white shadow-sm ring-1 ring-zinc-950/[0.04] dark:border-zinc-500/40 dark:bg-zinc-100 dark:ring-white/10";
@@ -49,7 +51,7 @@ function BrandMark({
       data-performance-safe-logo-card={brand.slug}
       data-quality-status={spec.qualityStatus}
     >
-      <span className="relative flex h-full w-full items-center justify-center px-2 py-1">
+      <span className="relative flex h-full w-full items-center justify-center px-2.5 py-1.5 sm:px-3">
         <PerformanceSafeLogoMark slug={brand.slug} />
       </span>
     </span>
@@ -69,7 +71,7 @@ function LogoRow({
   const linkSuffix = t(linkSuffixKey);
   return (
     <div
-      className="performance-safe-marquee-segment inline-flex shrink-0 items-center gap-x-4 sm:gap-x-5"
+      className="performance-safe-marquee-segment inline-flex shrink-0 items-center gap-x-4 pe-4 sm:gap-x-5 sm:pe-5"
       aria-hidden={ariaHidden}
     >
       {PERFORMANCE_SAFE_MARQUEE_BRANDS.map((brand) => (

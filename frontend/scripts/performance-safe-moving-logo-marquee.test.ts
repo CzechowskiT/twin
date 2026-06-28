@@ -118,7 +118,7 @@ test("10 no will-change, backdrop-filter, backdrop-blur on safe track/cards", ()
 test("11 readability scale CSS targets 22–28px optical height band", () => {
   const css = read("src/app/globals.css");
   assert.match(css, /\.performance-safe-logo-mark[\s\S]{0,200}height:\s*1\.4rem/);
-  assert.match(css, /\.performance-safe-logo-mark[\s\S]{0,300}width:\s*6\.25rem/);
+  assert.match(css, /\.performance-safe-logo-mark[\s\S]{0,300}width:\s*100%/);
   const scales = PERFORMANCE_SAFE_CURATED_LOGO_SLUGS.map(
     (slug) => PERFORMANCE_SAFE_CURATED_LOGO_VISUALS[slug].opticalScale,
   );

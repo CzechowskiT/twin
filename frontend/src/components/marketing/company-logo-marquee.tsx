@@ -112,7 +112,8 @@ const BRANDS: Brand[] = [...MARQUEE_BRAND_ENTRIES].sort((a, b) => {
 const MARQUEE_SEGMENTS = 2;
 
 /** Uniform slot — inner inset + `object-contain` keeps wide wordmarks (e.g. Amex) inside the plate. */
-const MARK_BOX_CLASS = "h-9 w-[6.75rem] sm:h-10 sm:w-[7.5rem]";
+const MARK_BOX_CLASS =
+  "box-border h-9 w-[7.25rem] sm:h-10 sm:w-[8.5rem]";
 
 /** Light plate so colorful favicons stay legible on studio (dark) and light marketing rails. */
 const MARK_PLATE_CLASS =
@@ -143,7 +144,7 @@ function BrandMark({
       title={a11y}
       className={plateClass}
     >
-      <span className="relative flex h-full w-full items-center justify-center px-1.5 py-1 sm:px-2">
+      <span className="relative flex h-full w-full items-center justify-center px-2.5 py-1.5 sm:px-3">
         <SafeCompanyLogo
           name={brand.name}
           urls={urls}
@@ -167,7 +168,7 @@ function LogoRow({
   const linkSuffix = t(linkSuffixKey);
   return (
     <div
-      className="marketing-marquee-segment inline-flex shrink-0 items-center gap-x-4 sm:gap-x-5"
+      className="marketing-marquee-segment inline-flex shrink-0 items-center gap-x-4 pe-4 sm:gap-x-5 sm:pe-5"
       aria-hidden={ariaHidden}
     >
       {BRANDS.map((brand) => (
