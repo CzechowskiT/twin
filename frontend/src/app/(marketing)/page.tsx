@@ -1,5 +1,6 @@
 "use client";
 
+import { LandingExploreTwin } from "@/components/marketing/landing-explore-twin";
 import { LandingBento } from "@/components/marketing/landing-bento";
 import { LandingCtaBand } from "@/components/marketing/landing-cta-band";
 import { LandingFaq } from "@/components/marketing/landing-faq";
@@ -21,6 +22,7 @@ export default function Home() {
         <LandingHero />
         <CandidateRewardsBand variant="home" />
         <LandingTrustCue />
+        <LandingExploreTwin />
         <div className="marketing-home-rail space-y-2">
           <LandingHomeStats />
           <DemoLiveSnapshot fullDemoHref="/demo" />

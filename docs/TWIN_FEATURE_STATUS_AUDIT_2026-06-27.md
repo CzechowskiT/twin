@@ -309,3 +309,4 @@ cd frontend && npm run build && npx tsc --noEmit
 | 2026-06-28 | Slice 10 completed — investor product proof SoR card: `sorHubHint`, bounded diligence copy; status stays live |
 | 2026-06-28 | Slice 11 completed — marketing copy trust sweep (home, how-it-works, demo, FAQ, onboarding EN+PL); guards extended; LAUNCH_STANCE unchanged |
 | 2026-06-28 | Slice 15 completed — public header persona nav adds Investor/Inwestor → `/investor` (5 flat links: candidate, recruiter, company, investor, demo); EN/PL parity via existing `nav.personaInvestor` |
+| 2026-06-28 | Slice 17 completed — homepage Explore TWIN quick-entry panel: 7 cards (`/dashboard`, `/recruiter`, `/company/dashboard`, `/investor`, `/demo`, `/dashboard/trust`, `/status`); bounded EN/PL copy; header nav from #326 preserved |
