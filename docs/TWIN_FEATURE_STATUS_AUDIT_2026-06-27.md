@@ -244,7 +244,7 @@ Board cards are internal readiness/evidence surfaces — not candidate/recruiter
 | 2 | Company SoR `company_dashboard` | **Live** badge without `hintKey`; scope/token expectations unclear |
 | 3 | Company workspace `pipeline` vs SoR demo pipeline | User sees **live** pipeline in company grid; SoR only lists **pilot** demo pipeline |
 | 4 | Recruiter workspace `pipeline` **live** | Not listed in SoR hub — investors/founders auditing SoR underestimate recruiter maturity |
-| 5 | Investor SoR `investor_product_proof` | **Live** with executive proof copy; still `human_decision_required`, `no_outreach`, `no_ats_sync` — easy to over-read as production workflow |
+| 5 | Investor SoR `investor_product_proof` | **Live** with `sorHubHint` + bounded diligence copy — `human_decision_required`, `no_outreach`, `no_ats_sync` badges remain |
 
 ---
 
@@ -306,3 +306,4 @@ cd frontend && npm run build && npx tsc --noEmit
 | 2026-06-27 | Slice 7 completed — candidate workspace trust_center card (pilot) links to `/dashboard/trust`; no duplicate trust cards |
 | 2026-06-28 | Slice 8 completed — investor SoR hub grouped into product / board evidence / demo proof sections with EN+PL boundary intros |
 | 2026-06-28 | Slice 9 completed — removed company workspace `settings` orphan card (duplicate of `/company/dashboard` SoR entry) |
+| 2026-06-28 | Slice 10 completed — investor product proof SoR card: `sorHubHint`, bounded diligence copy; status stays live |

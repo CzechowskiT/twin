@@ -150,7 +150,7 @@ A demo meets **full-confidence** when ALL of the following hold:
 | T3 | Investor SoR overload (19 entries mix product/board/demo) | P2 | Slice 8 — hub grouping |
 | T4 | Candidate trust (11 routes) not in workspace grid | P2 | **Slice 7 (this PR)** — discoverability link |
 | T5 | Company `settings` orphan → dashboard | P3 | **Slice 9 (this PR)** — removed orphan card |
-| T6 | Investor `investor_product_proof` **live** with heavy boundaries | P2 | Slice 10 — copy/badge tighten |
+| T6 | Investor `investor_product_proof` **live** with heavy boundaries | P2 | **Slice 10 (this PR)** — copy/badge tighten |
 | T7 | Board 7 monitor routes without SoR cards | P3 | Document only (intentional) |
 | T8 | Landing/marketing copy vs prod reality | P2 | Slice 11 — trust-language sweep |
 
@@ -305,7 +305,7 @@ flowchart LR
 | 7 | Candidate trust hub link | FE | Dashboard quick link to trust SoR | Read-only |
 | 8 | Investor SoR hub grouping | FE | Group board vs product in hub UI | Copy-only | ✅ Slice 8 |
 | 9 | Company settings card fix | FE | Remove orphan or honest redirect | UX | ✅ Slice 9 |
-| 10 | Investor product proof badge | FE | Tighten live + boundary display | Copy |
+| 10 | Investor product proof badge | FE | Tighten live + boundary display | Copy | ✅ Slice 10 |
 | 11 | Marketing copy trust sweep | FE/docs | homepage, `/demo`, FAQ | No live claims |
 | 12 | P0 shell fix (founder review) | FE | `LightweightRouteShell` | **Blocked** |
 | 13 | Hiring journey → p0-no-headless list | FE/tests | Add 5 routes to 31-route spec | Gated browser |
@@ -340,6 +340,14 @@ flowchart LR
 **Approach:** **Remove orphan** — dashboard remains the sole entry via SoR hub on company dashboard; no `/company/settings` route.
 
 **Non-goals:** No backend/API/auth/workflow, no new settings surface, no company SoR registry changes.
+
+### Slice 10 detail
+
+**Problem:** Investor SoR `investor_product_proof` is **live** with `human_decision_required`, `no_outreach`, `no_ats_sync` boundaries — easy to over-read as a production workflow during diligence.
+
+**Approach:** **Option A — keep live, strengthen copy** — add `hintKey` on the SoR card, tighten `demoJourneyDesc` and investor product group lead (bounded proof, no launch/outreach/ATS writeback claims).
+
+**Non-goals:** No status downgrade to pilot, no route removal, no backend/API/live-action, no investor grouping relabel.
 
 ---
 
@@ -408,6 +416,7 @@ flowchart LR
 | 2026-06-27 | Slice 6 company pipeline status align — workspace hintKey, demo/live copy, no_ats_sync on demo SoR |
 | 2026-06-27 | Slice 7 candidate trust discoverability — one pilot `trust_center` workspace card → `/dashboard/trust`; existing i18n keys; no new routes |
 | 2026-06-28 | Slice 9 company settings orphan removed — dashboard only via SoR hub; 8 unique company workspace cards |
+| 2026-06-28 | Slice 10 investor product proof — `sorHubHint` + bounded diligence copy on live SoR card; boundaries unchanged |
 
 ---
 
