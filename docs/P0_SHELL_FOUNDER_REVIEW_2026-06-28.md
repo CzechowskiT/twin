@@ -21,7 +21,7 @@
 | **P0 performance** | **OPEN** — no Phase 3B prod proof, no signed Lighthouse budgets |
 | **Phase 3B controlled multitab** | **HARD BLOCKED** — founder STOP (2026-06-17) |
 | **Public launch** | **NO-GO** |
-| **This document** | **Review package** — defines gates founder must approve before any shell/gate/layout implementation |
+| **This document** | **Gate B minimal shell fix merged 2026-06-28** — Gates C/E **PENDING** |
 
 **Slice 13 shipped** (PR #324): 5 hiring-journey routes added to `p0-no-headless-final-state` (31 → **36 routes**); static guards 9/9; browser smoke remains **gated**, not default CI.
 
@@ -106,11 +106,11 @@ Each gate is a **separate yes/no**. Default for all: **NO / HOLD** until founder
 | Gate | Question | Default | If YES → allowed next step |
 |------|----------|---------|---------------------------|
 | **A** | Approve this static review package (docs + guards)? | HOLD | Merge this PR; no runtime change |
-| **B** | Approve opening an **implementation branch** for `LightweightRouteShell` / `PersonaWorkspaceGate` / layout? | **NO** | Create fix branch; §7 static gates must pass before merge |
-| **C** | Approve **gated local browser** validation (`test:p0-no-headless-final-state-browser`, 36 routes)? | **NO** | Run with `PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 PLAYWRIGHT_ENABLE_WEBSERVER=1` locally only |
-| **D** | Approve **gated prod browser** smoke post-deploy? | **NO** | Run with `PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1` |
-| **E** | Approve **Phase 3B unblock** (controlled multitab, 20 routes)? | **NO** | Slice 16 static guards → then gated browser per [PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md](./PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md) |
-| **F** | Approve production smoke boundaries (founder JWT, sequential only, workers=1)? | **NO** | Document JWT + route list in ops runbook |
+| **B** | Approve opening an **implementation branch** for `LightweightRouteShell` / `PersonaWorkspaceGate` / layout? | **YES** | Minimal fix merged `fix/p0-shell-lightweight-route-2026-06-28`; Gate C required before browser |
+| **C** | Approve **gated local browser** validation (`test:p0-no-headless-final-state-browser`, 36 routes)? | **PENDING** | Run with `PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 PLAYWRIGHT_ENABLE_WEBSERVER=1` locally only |
+| **D** | Approve **gated prod browser** smoke post-deploy? | **PENDING** | Run with `PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1` |
+| **E** | Approve **Phase 3B unblock** (controlled multitab, 20 routes)? | **PENDING** | Requires Gate C PASS first; then gated browser per Phase 3B doc |
+| **F** | Approve production smoke boundaries (founder JWT, sequential only, workers=1)? | **PENDING** | Document JWT + route list in ops runbook |
 
 **Founder response format (copy-paste):**
 
@@ -225,8 +225,8 @@ Even perfect shell performance does **not** imply public launch, auto-apply acti
 | 2026-06-28 | Slice 16 — Phase 3B static guard refresh (20 routes, 8 static guards) | **SHIPPED** |
 | 2026-06-28 | **Slice 12 founder sign-off checklist** — [SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md](./SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md); Gates A–F default **PENDING** | **PENDING FOUNDER REVIEW** |
 | TBD | Gate A — approve review package | **PENDING** |
-| TBD | Gate B — approve shell implementation branch | **PENDING** |
-| TBD | Gate C/D — approve gated browser validation | **PENDING** |
+| 2026-06-28 | **Gate B — minimal shell fix merged** (`PersonaWorkspaceGateShell`, `hasActiveSession`, lazy `OnboardingGate`) | **SHIPPED** |
+| TBD | Gate C — approve gated browser validation | **PENDING** |
 | TBD | Gate E — Phase 3B unblock | **PENDING** |
 | TBD | P0 performance **CLOSED** | **BLOCKED** |
 | TBD | Public launch **GO** | **BLOCKED** |
