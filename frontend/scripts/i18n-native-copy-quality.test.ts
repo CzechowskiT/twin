@@ -68,7 +68,19 @@ const FORBIDDEN_POSITIVE_CLAIM_PATTERNS: RegExp[] = [
   /\bcandidate notified\b/i,
   /\bphase 3b unlocked\b/i,
   /\bp0 solved\b/i,
+  /\bwhile you sleep\b/i,
+  /\bapplies only where you agree\b/i,
+  /\bautomatic outreach is live\b/i,
+  /\bats writeback completed\b/i,
+  /\bcalendar writes enabled\b/i,
 ];
+
+const MARKETING_TRUST_DOMAINS = [
+  "home",
+  "marketingHowItWorks",
+  "demo",
+  "onboardingFlow",
+] as const;
 
 function hasPositiveForbiddenClaim(blob: string, pattern: RegExp): boolean {
   const re = new RegExp(pattern.source, pattern.flags.includes("g") ? pattern.flags : `${pattern.flags}g`);
@@ -205,6 +217,34 @@ test("placeholder tokens match English across all locales", () => {
       mismatches.length,
       0,
       `${locale} placeholder mismatch: ${mismatches.slice(0, 6).join(", ")}`,
+    );
+  }
+});
+
+function marketingDomainBlob(locale: Locale, domain: (typeof MARKETING_TRUST_DOMAINS)[number]): string {
+  const dict = dictionaries[locale] as Record<string, unknown>;
+  return JSON.stringify(dict[domain] ?? {});
+}
+
+test("EN and PL marketing domains avoid positive-only automation and calendar claims", () => {
+  for (const locale of ["en", "pl"] as const) {
+    const blob = MARKETING_TRUST_DOMAINS.map((d) => marketingDomainBlob(locale, d)).join("\n");
+    for (const pattern of FORBIDDEN_POSITIVE_CLAIM_PATTERNS) {
+      assert.equal(
+        hasPositiveForbiddenClaim(blob, pattern),
+        false,
+        `${pattern} (positive) in marketing domains (${locale})`,
+      );
+    }
+    const lower = blob.toLowerCase();
+    assert.match(lower, /auto-apply.*paused|auto-aplik.*wstrzym|auto-aplikacja.*wstrzym/);
+    assert.match(
+      lower,
+      /prepare-only|prepare only|pakiety prepare|packages for your review|przygotowuje pakiety|human decision|decyzja człowieka/,
+    );
+    assert.match(
+      lower,
+      /no automatic outreach|bez automatycznego kontaktu|no microsoft calendar writes|zapisy microsoft.*wyłączone|microsoft.*off in prod/,
     );
   }
 });

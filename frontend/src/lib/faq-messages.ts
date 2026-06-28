@@ -35,7 +35,7 @@ export const FAQ_MESSAGES_EN = {
     "Phase 1 scraping targets Polish boards such as pracuj.pl and rocketjobs.pl, plus LinkedIn where configured. You choose which sources to enable; ops may gate scrapers on allowlists in beta. More boards land as compliance and reliability allow.",
   candidates03Q: "What is auto-apply — and is it live?",
   candidates03A:
-    "Nightly auto-apply runs only after explicit consent and where a board’s flow can be automated safely. It is in the repo with Celery scheduling — treat it as beta: not every posting or employer site is eligible. You can review what was sent and track status in your pipeline.",
+    "Auto-apply is paused on production today. Nightly auto-apply runs only after explicit consent and where a board’s flow can be automated safely — treat it as beta in the repo with Celery scheduling: not every posting or employer site is eligible. You can review prepare packages and track status in your pipeline.",
   candidates04Q: "Can TWIN tailor my CV for a role?",
   candidates04A:
     "Yes — Career Assistant includes ATS-oriented CV optimization tied to a specific job when you have a CV on profile. Outputs are drafts you should review; we do not silently replace your master CV without you choosing to use the result.",
@@ -44,7 +44,7 @@ export const FAQ_MESSAGES_EN = {
     "Live slices include company intel, cover letter drafts, hiring-manager insights, interview prep, negotiation briefs, follow-up emails, and LinkedIn suggestions — all gated on profile data and explicit product use. Features evolve; see in-app labels for what your build exposes.",
   candidates06Q: "How do calendars and interview holds work?",
   candidates06A:
-    "Shipped: Google Calendar OAuth (busy times + writing holds where configured), WebCal subscribe links, and ICS-friendly exports. Microsoft 365 via Graph is wired in the product direction with OAuth when API credentials are set. Apple users typically subscribe via WebCal/ICS — there is no single “Sign in with Apple Calendar” for all apps.",
+    "Shipped: Google Calendar OAuth (busy times + hold writes where configured), WebCal subscribe links, and ICS-friendly exports. Microsoft 365 busy-read via Graph is gated off in production today — calendar writes and invites stay blocked. Apple users typically subscribe via WebCal/ICS — there is no single “Sign in with Apple Calendar” for all apps.",
   candidates07Q: "What is the candidate acceptance queue?",
   candidates07A:
     "A short dashboard list of interview holds and strong matches you can keep, reschedule, or decline — so your calendar stays intentional. It complements recruiter-proposed slots; it is not a second spam inbox.",
@@ -184,7 +184,7 @@ export const FAQ_MESSAGES_PL = {
     "Faza 1: m.in. pracuj.pl, rocketjobs.pl oraz LinkedIn przy konfiguracji. Ty wybierasz źródła; w becie scrapery mogą być na allowliście ops. Kolejne portale, gdy compliance i niezawodność na to pozwalają.",
   candidates03Q: "Czym jest auto-aplikacja i czy działa?",
   candidates03A:
-    "Nocna auto-aplikacja tylko po wyraźnej zgodzie i tam, gdzie ścieżka portalu da się bezpiecznie zautomatyzować. Jest w repozytorium z harmonogramem Celery — traktuj jako betę: nie każda oferta jest kwalifikowana. Możesz przeglądać wysyłki i status w ścieżce aplikacji.",
+    "Auto-aplikacja jest wstrzymana na produkcji dziś. Nocna auto-aplikacja tylko po wyraźnej zgodzie i tam, gdzie ścieżka portalu da się bezpiecznie zautomatyzować — traktuj jako betę w repozytorium z harmonogramem Celery: nie każda oferta jest kwalifikowana. Możesz przeglądać pakiety prepare-only i status w ścieżce aplikacji.",
   candidates04Q: "Czy TWIN dopasuje CV pod rolę?",
   candidates04A:
     "Tak — Asystent kariery ma optymalizację CV pod ATS dla konkretnej oferty, gdy masz CV w profilu. To szkice do Twojej recenzji; nie podmieniamy głównego CV bez Twojej decyzji.",
@@ -193,7 +193,7 @@ export const FAQ_MESSAGES_PL = {
     "Na żywo m.in.: informacje o firmie, szkice listów, spojrzenie hiring managera, przygotowanie do rozmowy, negocjacje, dalszy kontakt, sugestie LinkedIn — przy danych profilu i użyciu funkcji. Zakres rośnie; sprawdź etykiety w aplikacji dla swojej wersji.",
   candidates06Q: "Jak działają kalendarz i holdy na rozmowy?",
   candidates06A:
-    "Wdrożone: OAuth Google Calendar (zajętość + zapisy holdów), subskrypcja WebCal, eksporty ICS. Kierunek Microsoft 365 przez Graph z OAuth, gdy API ma credentials. Użytkownicy Apple zwykle subskrybują WebCal/ICS — nie ma jednego „Zaloguj przez Apple Calendar” dla każdej aplikacji.",
+    "Wdrożone: OAuth Google Calendar (zajętość + zapisy holdów tam, gdzie skonfigurowane), subskrypcja WebCal, eksporty ICS. Busy-read Microsoft 365 przez Graph jest dziś wyłączony na produkcji — zapisy kalendarza i zaproszenia zablokowane. Użytkownicy Apple zwykle subskrybują WebCal/ICS — nie ma jednego „Zaloguj przez Apple Calendar” dla każdej aplikacji.",
   candidates07Q: "Czym jest kolejka akceptacji kandydata?",
   candidates07A:
     "Krótka lista holdów i mocnych dopasowań: zostaw, przełóż lub odrzuć — żeby kalendarz był świadomy. Uzupełnia sloty od rekrutera; to nie druga skrzynka spamu.",

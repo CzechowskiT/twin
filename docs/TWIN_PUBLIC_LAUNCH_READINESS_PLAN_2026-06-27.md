@@ -306,7 +306,7 @@ flowchart LR
 | 8 | Investor SoR hub grouping | FE | Group board vs product in hub UI | Copy-only | ✅ Slice 8 |
 | 9 | Company settings card fix | FE | Remove orphan or honest redirect | UX | ✅ Slice 9 |
 | 10 | Investor product proof badge | FE | Tighten live + boundary display | Copy | ✅ Slice 10 |
-| 11 | Marketing copy trust sweep | FE/docs | homepage, `/demo`, FAQ | No live claims |
+| 11 | Marketing copy trust sweep | FE/docs | homepage, `/demo`, FAQ | No live claims | ✅ Slice 11 |
 | 12 | P0 shell fix (founder review) | FE | `LightweightRouteShell` | **Blocked** |
 | 13 | Hiring journey → p0-no-headless list | FE/tests | Add 5 routes to 31-route spec | Gated browser |
 | 14 | Phase 3B static guard refresh | FE/tests | Post-shell route batch | **Blocked** |
@@ -349,7 +349,13 @@ flowchart LR
 
 **Non-goals:** No status downgrade to pilot, no route removal, no backend/API/live-action, no investor grouping relabel.
 
----
+### Slice 11 detail
+
+**Problem:** Homepage, `/how-it-works`, `/demo`, FAQ, and onboarding still implied live auto-apply, calendar sync/writes, or “while you sleep” automation inconsistent with launch stance (auto-apply **PAUSED**, Microsoft calendar writes **OFF**, public **NO-GO**).
+
+**Approach:** **Copy-only trust sweep** — tighten EN+PL i18n and FAQ to prepare-only / phased / human-decision language; extend `trust-language-guard` and `i18n-native-copy-quality` with EN/PL marketing-domain guards (positive-claim detection allows negative context: “no ATS writeback”, “NO-GO”, “human review”).
+
+**Non-goals:** No LAUNCH_STANCE change, no route/auth/feature-flag/backend changes, no Phase 3B.
 
 ## 16. Investor Demo Script Boundaries
 
@@ -417,6 +423,7 @@ flowchart LR
 | 2026-06-27 | Slice 7 candidate trust discoverability — one pilot `trust_center` workspace card → `/dashboard/trust`; existing i18n keys; no new routes |
 | 2026-06-28 | Slice 9 company settings orphan removed — dashboard only via SoR hub; 8 unique company workspace cards |
 | 2026-06-28 | Slice 10 investor product proof — `sorHubHint` + bounded diligence copy on live SoR card; boundaries unchanged |
+| 2026-06-28 | Slice 11 marketing copy trust sweep — homepage, how-it-works, demo, FAQ, onboarding EN+PL bounded; trust-language guards extended |
 
 ---
 
