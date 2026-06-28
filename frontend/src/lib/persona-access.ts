@@ -515,12 +515,13 @@ export type HeaderMarketingLaneLink = {
   persona?: MarketingPersona;
 };
 
-/** Logged-out marketing chrome: Kandydat · Rekruter · Firmy · Demo (flat links, not a dropdown). */
+/** Logged-out marketing chrome: Kandydat · Rekruter · Firma · Inwestor · Demo (flat links, not a dropdown). */
 export function headerMarketingLaneLinks(): HeaderMarketingLaneLink[] {
   return [
     { href: PERSONA_ROUTE.candidate, labelKey: "nav.personaCandidate", persona: "candidate" },
     { href: PERSONA_ROUTE.recruiter, labelKey: "nav.personaRecruiter", persona: "recruiter" },
     { href: PERSONA_ROUTE.company, labelKey: "nav.personaCompany", persona: "company" },
+    { href: "/investor", labelKey: "nav.personaInvestor", persona: "investor" },
     { href: "/demo", labelKey: "nav.demo" },
   ];
 }

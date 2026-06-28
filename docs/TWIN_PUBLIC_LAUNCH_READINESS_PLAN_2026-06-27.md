@@ -426,6 +426,7 @@ flowchart LR
 | 2026-06-28 | Slice 11 marketing copy trust sweep — homepage, how-it-works, demo, FAQ, onboarding EN+PL bounded; trust-language guards extended |
 | 2026-06-28 | **Slice 13 shipped** (#324) — 5 hiring-journey routes → p0-no-headless (36 routes); browser gated |
 | 2026-06-28 | **Slice 12** — founder-review package prepared ([P0_SHELL_FOUNDER_REVIEW_2026-06-28.md](./P0_SHELL_FOUNDER_REVIEW_2026-06-28.md)); shell implementation **not started**; Phase 3B **BLOCKED** |
+| 2026-06-28 | **Slice 15** — public marketing header adds Inwestor/Investor → `/investor` between Firma and Demo (desktop + mobile persona nav); no new routes; LAUNCH_STANCE unchanged |
 
 ---
 

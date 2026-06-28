@@ -457,7 +457,9 @@ Condensed from [PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md](./PUBLIC_LAUNCH_GATE
 | Slice | Item | Blocker |
 |-------|------|---------|
 | **12** | P0 shell fix (`LightweightRouteShell`) | **Founder review required** before any Phase 3B or multitab browser work |
-| **14** | Phase 3B static guard refresh (post-shell) | Depends on Slice 12 |
+| **14** | Investor room i18n parity | ✅ Shipped — copy-only EN/PL + overlays |
+| **15** | Public nav investor entrypoint | ✅ Shipped — header persona lane adds `/investor` (desktop + mobile) |
+| **16** | Phase 3B static guard refresh (post-shell) | Depends on Slice 12 |
 | **Phase 3B browser** | `test:phase3b-controlled-multitab-browser` | **HARD BLOCKED** — founder STOP |
 
 ### Safe fallback next items (no live-action, no Phase 3B)
@@ -471,7 +473,7 @@ Ordered by dependency and safety — autonomous batches allowed:
 5. Staging Microsoft busy-read smoke when operator JWT available — **do not flip prod gates**.
 6. Founder authenticated prod persistence smoke re-run with JWT ([AUTHENTICATED_PROD_PERSISTENCE_SMOKE_2026-06-19.md](./AUTHENTICATED_PROD_PERSISTENCE_SMOKE_2026-06-19.md)).
 7. Alembic prod head read-only re-check (`050_stripe_webhook_events` / `068_placement_events_foundation`).
-8. Investor-room i18n parity sweep (`test:investor-room-mvp`, `test:i18n-premium-product`).
+8. ~~Investor-room i18n parity sweep (`test:investor-room-mvp`, `test:i18n-premium-product`).~~ ✅ Shipped — Slice 14.
 9. Long-form native copy QA continuation (#287/#288 pattern) on remaining surfaces.
 10. Scheduling proposal pack cross-link audit with hiring journey step 6.
 11. Offer readiness ↔ scheduling decision context alignment check.
@@ -483,7 +485,7 @@ Ordered by dependency and safety — autonomous batches allowed:
 17. Limited recruiter pilot: founder supplies H5d slot-1 shortlist names.
 18. H5c GO SMALL 1/2 decision pack review — **no outbound until explicit GO**.
 19. Investor demo dry-run against prod with curated accounts (§16 boundaries in launch readiness plan).
-20. Lighthouse budget definition doc (Slice 15) — post-Phase 3B; docs-only prep OK now.
+20. Lighthouse budget definition doc — post-Phase 3B; docs-only prep OK now.
 
 ### No-live-action boundaries (unchanged post-#322)
 

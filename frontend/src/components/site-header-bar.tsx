@@ -34,7 +34,7 @@ function growthCtaClass(variant: GrowthCtaVariant, base: string): string {
 }
 
 type SiteHeaderBarProps = {
-  /** Flat Kandydat/Rekruter/Firmy/Demo links on public marketing chrome. */
+  /** Flat Kandydat/Rekruter/Firma/Inwestor/Demo links on public marketing chrome. */
   showMarketingPersonaNav?: boolean;
   /** Read-only persona badge for authenticated app chrome — never on public marketing. */
   showPersonaBadge: boolean;
