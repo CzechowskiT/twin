@@ -1,5 +1,5 @@
 /**
- * P0 no headless final state — static guards (9 assertions).
+ * P0 no headless final state — static guards (10 assertions).
  * Phase 3B multitab verification is BLOCKED; this guardrail replaces final-state checks.
  */
 import assert from "node:assert/strict";
@@ -222,4 +222,36 @@ test("9 hiring journey routes in p0 inventory — static gated, P0 OPEN, phase3b
   assert.match(inv, /P0 performance remains OPEN/i);
   assert.match(inv, /Phase 3B.*HARD BLOCKED/i);
   assert.match(inv, /p0-no-headless-final-state.*36 routes/i);
+});
+
+test("10 founder review stance — Phase 3B blocked, browser gated, P0 OPEN, shell impl needs approval", () => {
+  const founderReview = readRepo("docs/P0_SHELL_FOUNDER_REVIEW_2026-06-28.md");
+  assert.match(founderReview, /Phase 3B.*HARD BLOCKED/i);
+  assert.match(founderReview, /P0 performance.*OPEN/i);
+  assert.match(founderReview, /Public launch.*NO-GO/i);
+  assert.match(founderReview, /Founder Decision Required/i);
+  assert.match(founderReview, /36 routes/i);
+
+  const p0Doc = readRepo("docs/P0_NO_HEADLESS_FINAL_STATE_2026-06-17.md");
+  assert.match(p0Doc, /Phase 3B.*BLOCKED/i);
+  assert.match(p0Doc, /founder review/i);
+  assert.match(p0Doc, /36 routes/i);
+
+  const phase3bDoc = readRepo("docs/PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md");
+  assert.match(phase3bDoc, /STATUS: BLOCKED/i);
+  assert.match(phase3bDoc, /DO NOT RUN/i);
+
+  const pkg = read("package.json");
+  assert.match(pkg, /test:p0-no-headless-final-state-browser/);
+  assert.match(pkg, /PLAYWRIGHT_ENABLE_BROWSER_TESTS/);
+  assert.match(pkg, /test:phase3b-controlled-multitab-browser/);
+  assert.match(pkg, /test:e2e.*DISABLED/i);
+
+  const smokeWorkflow = readRepo(".github/workflows/smoke.yml");
+  assert.doesNotMatch(smokeWorkflow, /p0-no-headless-final-state-browser/);
+  assert.doesNotMatch(smokeWorkflow, /phase3b-controlled-multitab/);
+  assert.doesNotMatch(smokeWorkflow, /playwright test/i);
+
+  const launchStance = read("src/lib/investor-metrics-reality.ts");
+  assert.match(launchStance, /LAUNCH_STANCE\s*=\s*"noGo"/);
 });

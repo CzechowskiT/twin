@@ -527,3 +527,4 @@ All preview surfaces — Hiring Journey, Scheduling Proposal Pack, marketing cop
 | 2026-06-26 | Initial source of truth via PR #299 |
 | 2026-06-27 | Refreshed post-#301; prod FE `50ff73d`; PR tables through #301 |
 | 2026-06-28 | **Refresh post-PR #322** — prod FE/API SHAs (`dcacc9d` / `6d6d1e5`); PR history #302–#322; Slices 4–11 shipped; safe-lane smoke **11/11**; Slice **12 blocked** (P0 shell founder review); `docs_only_drift` note for this docs batch |
+| 2026-06-28 | **Slice 13 shipped** (#324) — p0-no-headless 36 routes; prod FE `9d0f9bc`; **Slice 12 founder-review package prepared** — [P0_SHELL_FOUNDER_REVIEW_2026-06-28.md](./P0_SHELL_FOUNDER_REVIEW_2026-06-28.md); implementation remains blocked pending §6 gates |

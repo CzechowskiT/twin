@@ -105,6 +105,16 @@ npx tsc --noEmit
 
 **BLOCKED** — do not run `test:phase3b-controlled-multitab` or prod variant. See `docs/PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md`.
 
+**Founder review:** Slice 12 review package at [P0_SHELL_FOUNDER_REVIEW_2026-06-28.md](./P0_SHELL_FOUNDER_REVIEW_2026-06-28.md). Shell/gate/layout implementation forbidden until founder Gate B approved.
+
+## Changelog
+
+| Date | Change |
+|------|--------|
+| 2026-06-17 | Initial P0 no-headless guardrail; Phase 3B BLOCKED |
+| 2026-06-28 | **Slice 13** — 36 routes (5 hiring-journey added); browser smoke remains gated |
+| 2026-06-28 | **Slice 12 founder-review package** — static guard test 10; no shell implementation |
+
 ## Merge criteria
 
 Merge only if changes are **tests + route-level fixes** without touching `LightweightRouteShell`, `PersonaWorkspaceGate`, `workspace-route-layout.tsx`, or loading/fallback shells. If those are required → STOP, document exact files + plan, founder review before merge.
