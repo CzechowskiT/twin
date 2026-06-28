@@ -8,7 +8,10 @@ export type PublicExploreTwinEntryId =
   | "investor"
   | "demo"
   | "trust"
-  | "status";
+  | "status"
+  | "productProof"
+  | "faq"
+  | "howItWorks";
 
 export type PublicExploreTwinEntry = {
   id: PublicExploreTwinEntryId;
@@ -59,6 +62,24 @@ export const PUBLIC_EXPLORE_TWIN_ENTRIES: readonly PublicExploreTwinEntry[] = [
     href: "/status",
     titleKey: "home.exploreTwinStatusTitle",
     hintKey: "home.exploreTwinStatusHint",
+  },
+  {
+    id: "productProof",
+    href: "/investor/product-proof",
+    titleKey: "home.exploreTwinProductProofTitle",
+    hintKey: "home.exploreTwinProductProofHint",
+  },
+  {
+    id: "faq",
+    href: "/faq",
+    titleKey: "home.exploreTwinFaqTitle",
+    hintKey: "home.exploreTwinFaqHint",
+  },
+  {
+    id: "howItWorks",
+    href: "/how-it-works",
+    titleKey: "home.exploreTwinHowItWorksTitle",
+    hintKey: "home.exploreTwinHowItWorksHint",
   },
 ] as const;
 

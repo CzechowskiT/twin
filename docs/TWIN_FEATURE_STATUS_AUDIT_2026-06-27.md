@@ -311,3 +311,4 @@ cd frontend && npm run build && npx tsc --noEmit
 | 2026-06-28 | Slice 15 completed — public header persona nav adds Investor/Inwestor → `/investor` (5 flat links: candidate, recruiter, company, investor, demo); EN/PL parity via existing `nav.personaInvestor` |
 | 2026-06-28 | Slice 17 completed — homepage Explore TWIN quick-entry panel: 7 cards (`/dashboard`, `/recruiter`, `/company/dashboard`, `/investor`, `/demo`, `/dashboard/trust`, `/status`); bounded EN/PL copy; header nav from #326 preserved |
 | 2026-06-28 | Slice 18 completed — footer stable public sitemap: 9 links incl. `/for-investors` (marketing) + `/investor` (executive room) + `/dashboard/trust` + `/status`; removed persona-dependent footer explore; header (#326) + Explore TWIN (#330) unchanged |
+| 2026-06-28 | Slice 19 completed — Explore TWIN mega-panel in guest header (desktop dropdown + mobile sections); homepage panel 10 cards; padding regression guard; no Gate D browser / Phase 3B |

@@ -15,6 +15,10 @@ import {
   showMarketingPersonaNav,
 } from "../src/lib/persona-access";
 import { PUBLIC_EXPLORE_TWIN_ENTRIES, PUBLIC_EXPLORE_TWIN_HREFS } from "../src/lib/public-explore-twin-routes";
+import {
+  HEADER_EXPLORE_MEGA_PANEL_GROUPS,
+  HEADER_EXPLORE_MEGA_PANEL_HREFS,
+} from "../src/lib/public-explore-mega-panel-routes";
 import { PUBLIC_FOOTER_SITEMAP_HREFS } from "../src/lib/public-footer-sitemap-routes";
 import { dictionaries, en } from "../src/lib/i18n";
 
@@ -101,7 +105,43 @@ test("chrome header avoids workspace shell on landing without active session", (
   assert.doesNotMatch(chrome, /Boolean\(getToken\(\)\)/);
 });
 
-test("homepage wires explore twin quick-entry panel with seven existing routes", () => {
+test("site header renders Explore TWIN mega-panel trigger on marketing chrome", () => {
+  const header = read("src/components/site-header-bar.tsx");
+  assert.match(header, /SiteHeaderExplorePanel/);
+  assert.match(header, /variant="desktop"/);
+  assert.match(header, /variant="mobile"/);
+});
+
+test("guest header main lane excludes executive investor room shortcut", () => {
+  const links = headerMarketingLaneLinks();
+  assert.ok(!links.some((l) => l.href === "/investor"));
+  assert.ok(!links.some((l) => l.href.startsWith("/investor/")));
+});
+
+test("explore mega-panel groups route to existing public surfaces", () => {
+  assert.equal(HEADER_EXPLORE_MEGA_PANEL_GROUPS.length, 4);
+  assert.deepEqual(
+    HEADER_EXPLORE_MEGA_PANEL_GROUPS.map((g) => g.id),
+    ["product", "investors", "demo", "trust"],
+  );
+  assert.deepEqual(HEADER_EXPLORE_MEGA_PANEL_HREFS, [
+    "/dashboard",
+    "/recruiter",
+    "/company/dashboard",
+    "/for-investors",
+    "/investor",
+    "/investor/product-proof",
+    "/demo",
+    "/how-it-works",
+    "/faq",
+    "/dashboard/trust",
+    "/status",
+  ]);
+  const investorGroup = HEADER_EXPLORE_MEGA_PANEL_GROUPS.find((g) => g.id === "investors");
+  assert.ok(investorGroup?.links.some((l) => l.href === "/investor" && l.highlight));
+});
+
+test("homepage wires explore twin quick-entry panel with ten existing routes", () => {
   const home = read("src/app/(marketing)/page.tsx");
   const panel = read("src/components/marketing/landing-explore-twin.tsx");
   assert.match(home, /LandingExploreTwin/);
@@ -109,8 +149,8 @@ test("homepage wires explore twin quick-entry panel with seven existing routes",
   assert.match(panel, /id="explore-twin"/);
 });
 
-test("explore twin registry exposes seven bounded quick-entry links", () => {
-  assert.equal(PUBLIC_EXPLORE_TWIN_ENTRIES.length, 7);
+test("explore twin registry exposes ten bounded quick-entry links", () => {
+  assert.equal(PUBLIC_EXPLORE_TWIN_ENTRIES.length, 10);
   assert.deepEqual(PUBLIC_EXPLORE_TWIN_HREFS, [
     "/dashboard",
     "/recruiter",
@@ -119,12 +159,31 @@ test("explore twin registry exposes seven bounded quick-entry links", () => {
     "/demo",
     "/dashboard/trust",
     "/status",
+    "/investor/product-proof",
+    "/faq",
+    "/how-it-works",
   ]);
   const ids = new Set(PUBLIC_EXPLORE_TWIN_ENTRIES.map((e) => e.id));
-  assert.equal(ids.size, 7);
+  assert.equal(ids.size, 10);
   for (const entry of PUBLIC_EXPLORE_TWIN_ENTRIES) {
     assert.match(entry.titleKey, /^home\.exploreTwin/);
     assert.match(entry.hintKey, /^home\.exploreTwin/);
+  }
+});
+
+test("marketing homepage rails keep horizontal padding regression guard", () => {
+  const required = ["mx-auto", "max-w-6xl", "px-4", "sm:px-6"];
+  for (const path of [
+    "src/components/marketing/landing-hero.tsx",
+    "src/components/marketing/candidate-rewards-band.tsx",
+    "src/components/marketing/landing-faq.tsx",
+    "src/components/marketing/landing-cta-band.tsx",
+    "src/app/(marketing)/page.tsx",
+  ]) {
+    const src = read(path);
+    for (const token of required) {
+      assert.match(src, new RegExp(token), `${path} missing ${token}`);
+    }
   }
 });
 
@@ -148,6 +207,9 @@ test("explore twin EN/PL copy is bounded — no launch-ready or live ATS claims"
       h.exploreTwinRecruiterHint,
       h.exploreTwinCompanyHint,
       h.exploreTwinInvestorHint,
+      h.exploreTwinProductProofHint,
+      h.exploreTwinFaqHint,
+      h.exploreTwinHowItWorksHint,
     ].join("\n");
     assert.equal(hasPositiveClaim(blob, positiveForbidden), false, locale);
     assert.match(blob.toLowerCase(), /paused|wstrzym|not live|nie jest live|no-go|pilot/);

@@ -82,6 +82,7 @@ test("headerAccountLinks for logged-in users show panel and logout only", () => 
 test("marketing persona nav is logged-out marketing chrome only", () => {
   assert.equal(showMarketingPersonaNav(false, true), true);
   assert.equal(headerMarketingLaneLinks().some((l) => l.href === "/demo"), true);
+  assert.equal(headerMarketingLaneLinks().some((l) => l.href === "/investor"), false);
 });
 
 test("logged-out growth pill on recruiter lanes points to demo, not B2B calculator", () => {
