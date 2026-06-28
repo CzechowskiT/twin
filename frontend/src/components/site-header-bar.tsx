@@ -8,6 +8,7 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 import { useTranslation } from "@/components/language-provider";
 import { PersonaBadge } from "@/components/persona-badge";
 import { useMarketingPersona } from "@/components/persona-provider";
+import { SiteHeaderExplorePanel } from "@/components/site-header-explore-panel";
 import { apiFetch } from "@/lib/api";
 import { clearToken, getToken, hasActiveSession } from "@/lib/auth";
 import { isDemoUserEmail } from "@/lib/demo-user";
@@ -169,8 +170,9 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
           className="order-3 hidden min-w-0 flex-1 basis-full flex-nowrap items-center justify-center gap-x-3 overflow-x-auto overscroll-x-contain text-[13px] font-medium [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-x-4 sm:text-sm md:order-none md:flex md:basis-auto lg:gap-x-5 lg:text-[0.9375rem] [&::-webkit-scrollbar]:hidden"
           aria-label={t("nav.ariaSiteNav")}
         >
-          {personaLaneNav
-            ? marketingLaneLinks.map((item) => {
+          {personaLaneNav ? (
+            <>
+              {marketingLaneLinks.map((item) => {
                 const active =
                   item.href === "/demo"
                     ? demoActive
@@ -185,8 +187,10 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
                     {t(item.labelKey)}
                   </Link>
                 );
-              })
-            : showMarketingNav
+              })}
+              <SiteHeaderExplorePanel variant="desktop" />
+            </>
+          ) : showMarketingNav
             ? corporateNavPrimary.map((item) => (
                 <Link key={item.href} href={item.href} className={linkClass}>
                   {item.label}
@@ -329,6 +333,7 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
                       {t(item.labelKey)}
                     </Link>
                   ))}
+                  <SiteHeaderExplorePanel variant="mobile" onNavigate={closeMobileMenu} />
                 </>
               ) : showMarketingNav ? (
                 <>
