@@ -303,7 +303,7 @@ flowchart LR
 | 5 | Launch readiness plan doc | Docs | This file | **This PR** |
 | 6 | Company pipeline status align | FE | WS vs SoR status skew | Frontend-only |
 | 7 | Candidate trust hub link | FE | Dashboard quick link to trust SoR | Read-only |
-| 8 | Investor SoR hub grouping | FE | Group board vs product in hub UI | Copy-only |
+| 8 | Investor SoR hub grouping | FE | Group board vs product in hub UI | Copy-only | ✅ Slice 8 |
 | 9 | Company settings card fix | FE | Remove orphan or honest redirect | UX |
 | 10 | Investor product proof badge | FE | Tighten live + boundary display | Copy |
 | 11 | Marketing copy trust sweep | FE/docs | homepage, `/demo`, FAQ | No live claims |
@@ -324,6 +324,14 @@ flowchart LR
 **Approach:** **Collapse** — remove the three duplicate cards; capabilities remain accessible inside inbox (notes in review cards, scheduling via prepare-invite panel, audit via decision events).
 
 **Non-goals:** No new routes, no backend changes, no inbox UI changes, no live-action activation.
+
+### Slice 8 detail
+
+**Problem:** Investor SoR hub listed 19 flat cards mixing product surfaces, `/board/*` readiness evidence, and demo proof deep-links — hard to scan during diligence.
+
+**Approach:** **Group** — `investorGroup` field on investor SoR entries; hub renders four optional sections (`investorProduct`, `boardEvidence`, `demoProof`, `accessContact`) with EN/PL headings and boundary intro copy (read-only board, demo no writeback).
+
+**Non-goals:** No route removal, no non-investor hub changes, no backend/API/live-action.
 
 ---
 

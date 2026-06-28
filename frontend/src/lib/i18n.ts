@@ -2041,6 +2041,17 @@ const en = {
     recruiterHubLead: "Batch acceptance, pipeline, talent layers, and integrations — outreach and ATS sync stay off.",
     companyHubLead: "Roles, talent pool, collaboration demos, and billing readiness — pilot access required for metrics.",
     investorHubLead: "Metrics, roadmap, data room, and system-of-record proof cards for diligence.",
+    investorGroupProductTitle: "Product & diligence",
+    investorGroupProductLead:
+      "Investor-facing metrics, roadmap, data room, and executive proof — honest status badges on every card.",
+    investorGroupBoardTitle: "Board evidence (read-only)",
+    investorGroupBoardLead:
+      "Internal readiness monitors under /board — read-only evidence only; no mutations or live-action triggers.",
+    investorGroupDemoTitle: "Demo & proof walkthroughs",
+    investorGroupDemoLead:
+      "Founder-led demo and deep-link proof cards — sample data only; no ATS writeback or outreach.",
+    investorGroupAccessTitle: "Access & contact",
+    investorGroupAccessLead: "Deck requests and founder contact — external mailto links only.",
   },
   developers: {
     title: "Developers & integrators",
@@ -9595,6 +9606,17 @@ const pl: MessageTree = {
     recruiterHubLead: "Hurtowa akceptacja, pipeline, warstwy talentu i integracje — kontakt wychodzący i synchronizacja ATS wyłączone.",
     companyHubLead: "Role, pamięć talentów, demo współpracy i billing — metryki wymagają tokenu pilota.",
     investorHubLead: "Metryki, roadmapa, data room i karty dowodów rejestru operacyjnego do due diligence.",
+    investorGroupProductTitle: "Produkt i due diligence",
+    investorGroupProductLead:
+      "Metryki, roadmapa, data room i executive proof dla inwestora — uczciwe badge statusu na każdej karcie.",
+    investorGroupBoardTitle: "Dowody board (tylko odczyt)",
+    investorGroupBoardLead:
+      "Wewnętrzne monitory gotowości pod /board — tylko dowody read-only; bez mutacji ani live-action.",
+    investorGroupDemoTitle: "Demo i ścieżki dowodowe",
+    investorGroupDemoLead:
+      "Demo founder-led i karty proof deep-link — tylko dane przykładowe; bez writeback do ATS ani outreachu.",
+    investorGroupAccessTitle: "Dostęp i kontakt",
+    investorGroupAccessLead: "Prośby o deck i kontakt z founderem — wyłącznie zewnętrzne linki mailto.",
   },
   developers: {
     title: "Dla developerów i integratorów",
