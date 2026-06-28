@@ -3,11 +3,11 @@
 **Purpose:** Single operator-facing snapshot for agents, founders, and CI smoke wrappers. Consolidates launch stance, deploy SHAs, recent PR history, Hiring Journey runtime state, test matrix, gates, blockers, and next steps.
 
 **Branch at capture:** `cursor/phase1-monorepo-scaffold`  
-**Captured UTC:** 2026-06-28 (post-#322 verification batch on scaffold HEAD `dcacc9d`)
+**Captured UTC:** 2026-06-28 (post Gate C local browser PASS on scaffold HEAD `62138dc`)
 **Prior refresh:** 2026-06-27 post-#301 (`50ff73d`)
 
 **Canonical references:**
-- [TWIN_PUBLIC_LAUNCH_READINESS_PLAN_2026-06-27.md](./TWIN_PUBLIC_LAUNCH_READINESS_PLAN_2026-06-27.md) — Slices 4–11 shipped (#315–#322); Slice 12 blocked
+- [TWIN_PUBLIC_LAUNCH_READINESS_PLAN_2026-06-27.md](./TWIN_PUBLIC_LAUNCH_READINESS_PLAN_2026-06-27.md) — Slices 4–11 shipped (#315–#322); Slice 12 Gate B+C (#332 + Gate C PASS)
 - [TWIN_FEATURE_STATUS_AUDIT_2026-06-27.md](./TWIN_FEATURE_STATUS_AUDIT_2026-06-27.md) — module truthfulness inventory (#311)
 - [HIRING_JOURNEY_TRACEABILITY_2026-06-26.md](./HIRING_JOURNEY_TRACEABILITY_2026-06-26.md) — Hiring Journey detail (#291–#298); operating context (#299+)
 - [PROD_HEALTH_COMMIT_INTERPRETATION_2026-06-19.md](./PROD_HEALTH_COMMIT_INTERPRETATION_2026-06-19.md) — SHA drift rules
@@ -32,27 +32,28 @@
 
 ## 2. Branch, commits, and deploy interpretation
 
-### Checkout snapshot (2026-06-28, post-#322)
+### Checkout snapshot (2026-06-28, post Gate C)
 
 | Field | Value |
 |-------|-------|
 | **Current branch** | `cursor/phase1-monorepo-scaffold` |
-| **repo_head / scaffold HEAD** | `dcacc9d5c7fc30d56593994babd3e50a8d1aa863` (`dcacc9d`, PR #322) |
-| **prod_frontend_commit** (Vercel) | `dcacc9d5c7fc30d56593994babd3e50a8d1aa863` |
+| **repo_head / scaffold HEAD** | `62138dccd986bb068e717a9dafee38f822e94c66` (`62138dc`, PR #332 Gate B) |
+| **prod_frontend_commit** (Vercel) | `62138dccd986bb068e717a9dafee38f822e94c66` |
 | **prod_api_commit** (Railway) | `6d6d1e54f85f8f00fe1727f32cef700e9c2a20aa` (`6d6d1e5`, PR #281) |
 | **public-health `status`** | `ok` |
 | **public-health `db_ok`** | `true` |
-| **hiring-journey routes HTTP** | **5/5 × 200** (curl prod, 2026-06-28 — candidate dashboard/profile, recruiter, company, board) |
-| **commit_interpretation** | Frontend (Vercel) and API (Railway) commits differ — expected after frontend-only #309–#322; verify Alembic head separately. |
+| **Gate C local browser** | **PASS** 36/36 — [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md) |
+| **HTTP smoke (14 routes)** | **14/14 × 200** (prod read-only, post-align) |
+| **commit_interpretation** | Frontend (Vercel) and API (Railway) commits differ — expected; verify Alembic head separately. |
 
 ### Alignment classification
 
 | Check | Result |
 |-------|--------|
-| `frontend_commit` vs `repo_head` | **ALIGNED** — both `dcacc9d` (PR #322 merge) |
-| `api_commit` vs `repo_head` | **EXPECTED DRIFT** — API at `6d6d1e5` (PR #281, 2026-06-24); no backend changes in #309–#322 |
+| `frontend_commit` vs `repo_head` | **ALIGNED** — both `62138dc` (PR #332 merge) |
+| `api_commit` vs `repo_head` | **EXPECTED DRIFT** — API at `6d6d1e5` (PR #281); no backend changes in Gate B/C batch |
 | `alignment_status` | **ALIGNED** (frontend); API lag **expected** |
-| `docs_only_drift` | `false` at capture — prod FE aligned with scaffold; **will be `true` after this docs-only refresh merges** (`acceptable_docs_only_drift`) |
+| `docs_only_drift` | `true` after Gate C docs PR merges — **acceptable_docs_only_drift** |
 
 ### Production health highlights (curl 2026-06-28)
 
@@ -60,7 +61,7 @@
 {
   "status": "ok",
   "db_ok": true,
-  "frontend_commit": "dcacc9d5c7fc30d56593994babd3e50a8d1aa863",
+  "frontend_commit": "62138dccd986bb068e717a9dafee38f822e94c66",
   "api_commit": "6d6d1e54f85f8f00fe1727f32cef700e9c2a20aa",
   "validated_jobs": 652,
   "market_coverage_progress_pct": 6,
@@ -533,4 +534,4 @@ All preview surfaces — Hiring Journey, Scheduling Proposal Pack, marketing cop
 | 2026-06-28 | **Slice 12 founder sign-off checklist added** — [SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md](./SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md); Gates A–F **PENDING**; shell implementation still **BLOCKED** |
 | 2026-06-28 | **Slice 17** — homepage Explore TWIN / Poznaj TWIN panel (7 existing-route cards); `public-explore-twin-routes.ts` registry; Gate B / Phase 3B / shell **unchanged BLOCKED** |
 | 2026-06-28 | **Slice 18** — footer secondary nav aligned with header + Explore TWIN model: stable 9-link sitemap (`public-footer-sitemap-routes.ts`); `/investor` vs `/for-investors` semantically distinct; Gate B / Phase 3B / shell **unchanged BLOCKED** |
-| 2026-06-28 | **Slice 12 Gate B shipped** — minimal shell/gate fix (`PersonaWorkspaceGateShell`, `hasActiveSession`, lazy `OnboardingGate`); Gate C/E **PENDING**; P0 **OPEN**; Phase 3B **BLOCKED** |
+| 2026-06-28 | **Slice 12 Gate C executed** — local browser **36/36 PASS** ([gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md)); prod FE `62138dc`; Gate D/E/F **PENDING**; P0 **OPEN**; Phase 3B **BLOCKED** |

@@ -105,7 +105,7 @@ npx tsc --noEmit
 
 **BLOCKED** — do not run `test:phase3b-controlled-multitab` or prod variant. See `docs/PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md`.
 
-**Founder review:** Slice 12 Gate B minimal shell fix merged 2026-06-28 — see [P0_SHELL_FOUNDER_REVIEW_2026-06-28.md](./P0_SHELL_FOUNDER_REVIEW_2026-06-28.md). Gate C browser validation **PENDING**. Phase 3B remains **BLOCKED** until Gate E.
+**Founder review:** Slice 12 Gate B minimal shell fix merged 2026-06-28 — see [P0_SHELL_FOUNDER_REVIEW_2026-06-28.md](./P0_SHELL_FOUNDER_REVIEW_2026-06-28.md). Gate C local browser **PASS** 36/36 — [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md). Phase 3B remains **BLOCKED** until Gate E.
 
 ## Changelog
 
@@ -114,7 +114,8 @@ npx tsc --noEmit
 | 2026-06-17 | Initial P0 no-headless guardrail; Phase 3B BLOCKED |
 | 2026-06-28 | **Slice 13** — 36 routes (5 hiring-journey added); browser smoke remains gated |
 | 2026-06-28 | **Slice 12 founder-review package** — static guard test 10; no shell implementation |
-| 2026-06-28 | **Slice 12 Gate B** — minimal shell/gate fix merged; Gate C/E **PENDING**; 36 routes unchanged |
+| 2026-06-28 | **Slice 12 Gate B** — minimal shell/gate fix merged; Gate C local browser **PASS** 36/36; Gate E **PENDING**; 36 routes unchanged |
+| 2026-06-28 | **Gate C** — local `test:p0-no-headless-final-state-browser` PASS — [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md) |
 
 ## Merge criteria
 

@@ -230,7 +230,7 @@ test("10 founder review stance — Gate B YES merged, Phase 3B blocked, browser 
   assert.match(founderReview, /P0 performance.*OPEN/i);
   assert.match(founderReview, /Public launch.*NO-GO/i);
   assert.match(founderReview, /Gate B.*YES/i);
-  assert.match(founderReview, /Gate C.*PENDING/i);
+  assert.match(founderReview, /Gate C.*YES/i);
   assert.match(founderReview, /36 routes/i);
 
   const p0Doc = readRepo("docs/P0_NO_HEADLESS_FINAL_STATE_2026-06-17.md");
