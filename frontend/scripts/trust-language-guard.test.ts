@@ -38,6 +38,28 @@ const TRUST_SURFACES = [
   "src/components/marketing/landing-trust-cue.tsx",
 ] as const;
 
+/** Positive-only marketing claims — skip when preceded by not/no/bez/nie/brak/without. */
+const MARKETING_POSITIVE_CLAIM_PATTERNS: RegExp[] = [
+  /\blaunch ready\b/i,
+  /\bgdpr compliant\b/i,
+  /\bats writeback completed\b/i,
+  /\bautomatic outreach is live\b/i,
+  /\bapplies automatically\b/i,
+  /\bcalendar writes enabled\b/i,
+  /\bwhile you sleep\b/i,
+];
+
+function hasPositiveForbiddenClaim(blob: string, pattern: RegExp): boolean {
+  const re = new RegExp(pattern.source, pattern.flags.includes("g") ? pattern.flags : `${pattern.flags}g`);
+  for (const match of blob.matchAll(re)) {
+    const idx = match.index ?? 0;
+    const before = blob.slice(Math.max(0, idx - 28), idx);
+    if (/\b(not|no|bez|nie|brak|without|blocked|disabled|off|paused|wstrzym)\s*$/i.test(before)) continue;
+    return true;
+  }
+  return false;
+}
+
 function readSurface(relativePath: string): string {
   return readFileSync(join(root, relativePath), "utf8");
 }
@@ -84,7 +106,38 @@ function profilePipelineTrustCopy(locale: typeof en): string {
 
 function homeTrustCopy(locale: typeof en): string {
   const h = locale.home;
-  return [h.feature6Title, h.feature6Line, h.focusFootnote, h.focusChipAuto, h.vacationScene4Body].join("\n");
+  return [
+    h.insideTitle,
+    h.insideStep3Line,
+    h.feature6Title,
+    h.feature6Line,
+    h.focusFootnote,
+    h.focusChipAuto,
+    h.audienceCandidateBody,
+    h.vacationScene4Body,
+    h.vacationActivity4,
+  ].join("\n");
+}
+
+function marketingHowItWorksTrustCopy(locale: typeof en): string {
+  const m = locale.marketingHowItWorks;
+  return [
+    m.lead,
+    m.contrastWith3,
+    m.step3Line,
+    m.step4Line,
+    m.timeline2Body,
+    m.timeline3Body,
+  ].join("\n");
+}
+
+function demoTrustCopy(locale: typeof en): string {
+  const d = locale.demo;
+  return [d.pageLead, d.heroPipelineBody, d.step6Lead, d.statusPreparedBody, d.calendarHint].join("\n");
+}
+
+function onboardingTrustCopy(locale: typeof en): string {
+  return locale.onboardingFlow.welcomeBody;
 }
 
 test("trust surfaces contain no forbidden live-automation or AI-decides claims", () => {
@@ -105,6 +158,27 @@ test("autopilot mentions in i18n home include phased or paused context", () => {
       /phased|paused|prepare-only|not live|wstrzym|etapami|fazow/,
       "autopilot copy must include phased/paused context",
     );
+  }
+});
+
+test("EN and PL marketing surfaces avoid positive-only launch and automation claims", () => {
+  for (const locale of [en, pl]) {
+    const blob = [
+      homeTrustCopy(locale),
+      marketingHowItWorksTrustCopy(locale),
+      demoTrustCopy(locale),
+      onboardingTrustCopy(locale),
+    ].join("\n");
+    for (const pattern of MARKETING_POSITIVE_CLAIM_PATTERNS) {
+      assert.equal(
+        hasPositiveForbiddenClaim(blob, pattern),
+        false,
+        `${pattern} (positive) in marketing trust copy (${locale})`,
+      );
+    }
+    const lower = blob.toLowerCase();
+    assert.match(lower, /auto-apply.*paused|auto-aplik.*wstrzym|auto-aplikacja.*wstrzym/);
+    assert.match(lower, /prepare-only|prepare only|pakiety prepare|packages for your review|przygotowuje pakiety/);
   }
 });
 

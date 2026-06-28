@@ -328,13 +328,15 @@ const en = {
     teaserCard3Title: "Engineering manager",
     teaserCard3Meta: "Warsaw · 85% match",
     insideEyebrow: "What you get inside",
-    insideTitle: "Your pipeline can work while you sleep — when automation you enable is available",
+    insideTitle:
+      "Your pipeline can keep moving while you are away — phased automation only where you consent (prepare-only on production today)",
     insideStep1Title: "Ranked feed",
     insideStep1Line: "Roles scored to your profile — not a firehose of every listing.",
     insideStep2Title: "Application ledger",
     insideStep2Line: "Every save and status in one timeline recruiters can trust.",
     insideStep3Title: "Interview calendar",
-    insideStep3Line: "Slots worth showing up for, synced when you connect calendar.",
+    insideStep3Line:
+      "Slots worth showing up for — calendar holds and exports where OAuth or ICS subscribe is enabled (no Microsoft calendar writes in prod today).",
     stickyCtaLabel: "Join founding wishlist",
     stickyCtaMicro: "Founding early access · email only · Terms apply",
     joinWishlist: "Join founding wishlist",
@@ -457,7 +459,7 @@ const en = {
       "Three products, three receipts: candidate checkout (Stripe), recruiter seats (invoice), company programs (annual). Pick the lane and keep the SKUs straight.",
     audienceCandidateTitle: "Candidates",
     audienceCandidateBody:
-      "After time away, your calendar should hold a short list of interviews worth taking, not random spam. TWIN pulls roles from the boards you enable, ranks them to your profile, and keeps one pipeline. Where boards allow, CV intelligence and auto-apply join in. Once you land, light passive watch and quiet digests can keep you in a monthly rhythm instead of a panic tab.",
+      "After time away, your calendar should hold a short list of interviews worth taking, not random spam. TWIN pulls roles from the boards you enable, ranks them to your profile, and keeps one pipeline. CV intelligence and auto-apply roll out in public phases — auto-apply stays paused on production until gates allow. Once you land, light passive watch and quiet digests can keep you in a monthly rhythm instead of a panic tab.",
     audienceRecruiterTitle: "Recruiters & sourcers",
     audienceRecruiterBody:
       "After time away, you want a tight queue of pre-matched profiles to accept or pass, not a firehose of CVs. Watchlists, hiring-manager packets, governance presets, and seat-based billing are aimed at that acceptance workflow, not at raw volume for its own sake.",
@@ -483,7 +485,7 @@ const en = {
     vacationActivity1: "Day 1: new roles land in one feed",
     vacationActivity2: "Day 2: ranked matches stack against her profile",
     vacationActivity3: "Day 5: first recruiter thread worth a reply",
-    vacationActivity4: "Day 9: slots lock on the calendar windows Sarah marked safe",
+    vacationActivity4: "Day 9 (storyboard): interview holds queue in the windows Sarah marked safe — not live calendar writes on this page",
     vacationActivity5: "Day 14: a week of conversations queued, not chaos",
     vacationScene3Stamp: "Day 14, back home",
     vacationScene3Title: "She opens her calendar",
@@ -1672,7 +1674,8 @@ const en = {
     progressLabel: "Step",
     progressPercent: "{pct}% complete",
     welcomeTitle: "Welcome to TWIN",
-    welcomeBody: "Your agent works while you sleep — surfacing matched roles and interview-ready moments, not inbox noise.",
+    welcomeBody:
+      "TWIN ranks roles while you are away — surfacing matched roles and interview-ready moments, not inbox noise. Auto-apply stays paused on production until gates allow.",
     profileTitle: "Build your profile",
     profileBody: "Add your name, target titles, and location — recommendations use these fields.",
     skillsTitle: "Add your skills",
@@ -2068,7 +2071,8 @@ const en = {
   marketingHowItWorks: {
     eyebrow: "How it works",
     title: "Come back to a short calendar — not a flooded inbox",
-    lead: "Set your bar once. TWIN ranks roles while you are away, applies only where you agree, and puts interview slots on the calendar you already use. Recruiters see profiles already matched — accept, decline, or reschedule.",
+    lead:
+      "Set your bar once. TWIN ranks roles while you are away and prepares application packages for your review — auto-apply stays paused on production until gates allow. Calendar holds and exports land where OAuth or ICS subscribe is enabled. Recruiters see profiles already matched — accept, decline, or reschedule (human decision, no automatic outreach).",
     ctaStart: "Create free account",
     ctaDemo: "Watch demo",
     contrastEyebrow: "The shift",
@@ -2081,7 +2085,8 @@ const en = {
     withTitle: "With TWIN",
     contrastWith1: "A ranked pipeline — only roles that cleared your profile bar",
     contrastWith2: "One cockpit: discovery, status, and calendar in one place",
-    contrastWith3: "Interview slots worth showing up for, synced to Google Calendar (more providers coming)",
+    contrastWith3:
+      "Interview slots worth showing up for — Google Calendar holds where connected; Microsoft busy-read and writes gated; ICS/WebCal subscribe as fallback",
     contrastWith4: "Accept, decline, or reschedule — for candidates and recruiters alike",
     stepsEyebrow: "Four steps",
     stepsTitle: "From profile to acceptance-ready calendar",
@@ -2093,10 +2098,10 @@ const en = {
     step2Line: "New listings score against your profile as they arrive.",
     step2Outcome: "Outcome: a ranked feed — not every posting on the internet.",
     step3Title: "Apply with consent",
-    step3Line: "Review top matches; auto-apply only where you opt in.",
+    step3Line: "Review top matches; prepare packages first — auto-apply only where you opt in and gates allow (paused on production today).",
     step3Outcome: "Outcome: applications logged with receipts, not mystery submissions.",
     step4Title: "Calendar of acceptance",
-    step4Line: "Pre-qualified slots land on your calendar; you accept or pass.",
+    step4Line: "Pre-qualified slots preview as holds or exports on your calendar; you accept or pass — no automatic outreach.",
     step4Outcome: "Outcome: fewer calls, better calls — that is the north star.",
     timelineEyebrow: "Your first two weeks",
     timelineTitle: "What it feels like in practice",
@@ -2106,10 +2111,11 @@ const en = {
     timeline1Body: "Connect boards, upload CV. First ranked roles appear within minutes.",
     timeline2When: "Week 1",
     timeline2Title: "Pipeline builds",
-    timeline2Body: "Saves, statuses, and match scores in one ledger. Demo shows the auto-apply flow.",
+    timeline2Body: "Saves, statuses, and match scores in one ledger. Demo shows prepare-only packages — auto-apply paused on production.",
     timeline3When: "Week 2+",
     timeline3Title: "Calendar fills with intent",
-    timeline3Body: "Interview holds and confirmed slots sync where calendar is connected. You choose what stays.",
+    timeline3Body:
+      "Interview holds preview where calendar OAuth or ICS subscribe is connected — Microsoft calendar writes remain off in prod. You choose what stays.",
     ctaBandEyebrow: "See it yourself",
     ctaBandTitle: "Try the interactive demo — or create an account and watch your first matches appear.",
     ctaBandMicro: "Free · consent-first · no card for signup",
@@ -2120,7 +2126,7 @@ const en = {
     pageTitle: "Verify your email",
     pageBody: "Open the link we sent after registration. You can resend from the dashboard banner if needed.",
     bannerTitle: "Confirm your email",
-    bannerBody: "Verify your address to unlock auto-apply and full account features.",
+    bannerBody: "Verify your address to unlock full account features and prepare-only automation when gates allow.",
     resend: "Resend link",
     openPage: "Help",
     sent: "Verification email sent if your account needs it.",
@@ -4383,7 +4389,7 @@ eyebrow: "Product roadmap",
     stepNav9: "Next steps",
     heroPipelineTitle: "One pipeline, not seventeen tabs",
     heroPipelineBody:
-      "Upload CV → structured profile → up to 200 ranked roles → top 20 highlighted → prepare → track honest submission states → interview holds on your calendar.",
+      "Upload CV → structured profile → up to 200 ranked roles → top 20 highlighted → prepare packages (auto-apply paused on production) → track honest submission states → interview holds preview on your calendar.",
     heroCvLabel: "Sample profile signal",
     heroRankLabel: "Ranking funnel",
     heroRankHint: "final_score surfaces the best fits first; the rest stay in your workspace up to 200.",
@@ -4417,7 +4423,7 @@ eyebrow: "Product roadmap",
     step6Eyebrow: "Preparation",
     step6Title: "Application preparation before send",
     step6Lead:
-      "TWIN assembles tailored pitch text and a package you can review. Automation only runs where boards and your consent allow.",
+      "TWIN assembles tailored pitch text and a package you can review. Automation only runs where boards and your consent allow — auto-apply stays paused on production until gates allow.",
     prep1: "Match score and listing context attached to the application record",
     prep2: "Tailored pitch and bullets aligned to the role (review before send)",
     prep3: "PDF package ready — manual apply opens the employer flow when automation is not supported",
@@ -4426,7 +4432,7 @@ eyebrow: "Product roadmap",
     step7Lead:
       "Every state is evidence-backed. We never mark confirmed without a trace, confirmation, or ATS signal.",
     statusPrepared: "Prepared",
-    statusPreparedBody: "Materials ready — you or the agent review before anything is sent.",
+    statusPreparedBody: "Materials ready — you review before anything is sent (auto-apply paused on production today).",
     statusManual: "Manual",
     statusManualBody: "Portal needs your click; TWIN prepared the package.",
     statusAttempted: "Attempted",
@@ -4438,7 +4444,8 @@ eyebrow: "Product roadmap",
     step8Lead:
       "Return from time away to a short list of interviews worth preparing for — accept, decline, or reschedule — not random inbox spam.",
     calendarHoldTitle: "Interview hold (demo)",
-    calendarHint: "Google Calendar today; Microsoft 365 and ICS subscribe on the roadmap — same north star for every stack.",
+    calendarHint:
+      "Google Calendar OAuth holds where configured today; Microsoft busy-read gated and calendar writes off in prod; ICS/WebCal subscribe on the roadmap.",
     ctaSectionTitle: "Continue in TWIN",
     ctaSectionLead: "This walkthrough is the map; your account is the territory.",
     ctaDashboard: "Open dashboard",
@@ -7874,13 +7881,15 @@ const pl: MessageTree = {
     teaserCard3Title: "Engineering manager",
     teaserCard3Meta: "Warszawa · 85% dopasowania",
     insideEyebrow: "Co dostajesz w środku",
-    insideTitle: "Ścieżka aplikacji może działać, kiedy śpisz — gdy włączona automatyzacja jest dostępna",
+    insideTitle:
+      "Ścieżka aplikacji może iść dalej, gdy jesteś offline — automatyzacja fazowa tylko za Twoją zgodą (dziś prepare-only na produkcji)",
     insideStep1Title: "Rankingowany feed",
     insideStep1Line: "Oferty pod Twój profil — nie zalew każdego ogłoszenia.",
     insideStep2Title: "Rejestr aplikacji",
     insideStep2Line: "Każdy zapis i status w jednej osi czasu.",
     insideStep3Title: "Kalendarz rozmów",
-    insideStep3Line: "Sloty warte przyjścia — z synciem kalendarza, gdy go połączysz.",
+    insideStep3Line:
+      "Sloty warte przyjścia — holdy kalendarza i eksporty tam, gdzie OAuth lub subskrypcja ICS (bez zapisów Microsoft Calendar na produkcji dziś).",
     stickyCtaLabel: "Dołącz do wishlisty founding",
     stickyCtaMicro: "Founding early access · sam e-mail · wg Regulaminu",
     joinWishlist: "Dołącz do wishlisty founding",
@@ -8003,7 +8012,7 @@ const pl: MessageTree = {
       "Trzy produkty, trzy rozliczenia: kandydat (Stripe), rekruter (faktura), firma (rocznie). Wybierz personę i nie myl planów.",
     audienceCandidateTitle: "Kandydaci",
     audienceCandidateBody:
-      "Po przerwie kalendarz powinien pokazywać krótką listę rozmów wartych czasu, a nie spam. TWIN zbiera oferty z włączonych portali, rankuje je do profilu i trzyma jedną ścieżkę aplikacji. Tam, gdzie to możliwe, dochodzi inteligencja CV i auto-aplikacja. Po starcie w roli: lekki podgląd i skrót w ciszy, żeby zostać w miesięcznym nawyku zamiast paniki w kartach.",
+      "Po przerwie kalendarz powinien pokazywać krótką listę rozmów wartych czasu, a nie spam. TWIN zbiera oferty z włączonych portali, rankuje je do profilu i trzyma jedną ścieżkę aplikacji. Inteligencja CV i auto-aplikacja w fazach publicznych — auto-aplikacja wstrzymana na produkcji, dopóki bramki na to nie pozwolą. Po starcie w roli: lekki podgląd i skrót w ciszy, żeby zostać w miesięcznym nawyku zamiast paniki w kartach.",
     audienceRecruiterTitle: "Rekruterzy i sourcerzy",
     audienceRecruiterBody:
       "Po przerwie chcesz krótką kolejkę dopasowanych profili do akceptacji lub odrzucenia, a nie zalewę CV. Listy obserwowanych, paczki dla manager rekrutacjia, presety zgodności i rozliczenie per miejsce są pod akceptację zbiorczą, nie pod surowy wolumen.",
@@ -8029,7 +8038,8 @@ const pl: MessageTree = {
     vacationActivity1: "Dzień 1: nowe role w jednym feedzie",
     vacationActivity2: "Dzień 2: kolejka dopasowań pod profil",
     vacationActivity3: "Dzień 5: pierwszy wątek od rekrutera, który warto otworzyć",
-    vacationActivity4: "Dzień 9: sloty domykają się w kalendarzu „bezpiecznych” okien",
+    vacationActivity4:
+      "Dzień 9 (storyboard): kolejka holdów rozmów w „bezpiecznych” oknach — nie live zapisów kalendarza na tej stronie",
     vacationActivity5: "Dzień 14: tydzień rozmów ustawiony w kolejce, nie chaos",
     vacationScene3Stamp: "Dzień 14, powrót",
     vacationScene3Title: "Otwiera kalendarz",
@@ -9236,7 +9246,8 @@ const pl: MessageTree = {
     progressLabel: "Krok",
     progressPercent: "Ukończono {pct}%",
     welcomeTitle: "Witaj w TWIN",
-    welcomeBody: "Agent działa, gdy śpisz — pokazuje dopasowane role i terminy warte przyjścia, a nie szum w skrzynce.",
+    welcomeBody:
+      "TWIN rankuje role, gdy jesteś offline — pokazuje dopasowane oferty i terminy warte przyjścia, a nie szum w skrzynce. Auto-aplikacja wstrzymana na produkcji, dopóki bramki na to nie pozwolą.",
     profileTitle: "Uzupełnij profil",
     profileBody: "Imię, docelowe stanowiska i lokalizacja — rekomendacje korzystają z tych pól.",
     skillsTitle: "Dodaj umiejętności",
@@ -9632,7 +9643,8 @@ const pl: MessageTree = {
   marketingHowItWorks: {
     eyebrow: "Jak to działa",
     title: "Wracasz do krótkiego kalendarza — nie zalanej skrzynki",
-    lead: "Ustawiasz poprzeczkę raz. TWIN dopasowuje, gdy jesteś offline, aplikuje tylko tam, gdzie się zgadzasz, i ląduje rozmowami w kalendarzu, którego już używasz. Rekruter widzi profile już dopasowane — akceptuj, odrzuć lub przełóż.",
+    lead:
+      "Ustawiasz poprzeczkę raz. TWIN rankuje, gdy jesteś offline, i przygotowuje pakiety aplikacji do Twojej recenzji — auto-aplikacja wstrzymana na produkcji, dopóki bramki na to nie pozwolą. Holdy kalendarza i eksporty tam, gdzie OAuth lub subskrypcja ICS. Rekruter widzi profile już dopasowane — akceptuj, odrzuć lub przełóż (decyzja człowieka, bez automatycznego kontaktu wychodzącego).",
     ctaStart: "Załóż darmowe konto",
     ctaDemo: "Zobacz demo",
     contrastEyebrow: "Zmiana",
@@ -9645,7 +9657,8 @@ const pl: MessageTree = {
     withTitle: "Z TWIN",
     contrastWith1: "Rankingowany pipeline — tylko role, które przeszły Twój profil",
     contrastWith2: "Jeden cockpit: odkrywanie, status i kalendarz w jednym miejscu",
-    contrastWith3: "Sloty rozmów warte przyjścia, sync z Google Calendar (kolejne kalendarze w drodze)",
+    contrastWith3:
+      "Sloty rozmów warte przyjścia — holdy Google Calendar po połączeniu; busy-read i zapisy Microsoft z bramkami; subskrypcja ICS/WebCal jako fallback",
     contrastWith4: "Akceptuj, odrzuć lub przełóż — dla kandydata i rekrutera",
     stepsEyebrow: "Cztery kroki",
     stepsTitle: "Od profilu do kalendarza gotowego do akceptacji",
@@ -9657,10 +9670,12 @@ const pl: MessageTree = {
     step2Line: "Nowe oferty oceniane względem profilu na bieżąco.",
     step2Outcome: "Efekt: rankingowany feed — nie każde ogłoszenie w sieci.",
     step3Title: "Aplikuj ze zgodą",
-    step3Line: "Przeglądasz top dopasowania; auto-aplikacja tylko tam, gdzie optujesz.",
+    step3Line:
+      "Przeglądasz top dopasowania; najpierw pakiety prepare-only — auto-aplikacja tylko tam, gdzie optujesz i bramki pozwalają (dziś wstrzymana na produkcji).",
     step3Outcome: "Efekt: aplikacje z potwierdzeniem, nie tajemnicze wysyłki.",
     step4Title: "Kalendarz akceptacji",
-    step4Line: "Wstępnie zakwalifikowane sloty lądują w kalendarzu; akceptujesz albo odpuszczasz.",
+    step4Line:
+      "Wstępnie zakwalifikowane sloty jako holdy lub eksport w kalendarzu; akceptujesz albo odpuszczasz — bez automatycznego kontaktu wychodzącego.",
     step4Outcome: "Efekt: mniej rozmów, lepsze rozmowy — o to chodzi.",
     timelineEyebrow: "Pierwsze dwa tygodnie",
     timelineTitle: "Jak to wygląda w praktyce",
@@ -9670,10 +9685,12 @@ const pl: MessageTree = {
     timeline1Body: "Portale, CV. Pierwsze rankingi w minutach.",
     timeline2When: "Tydzień 1",
     timeline2Title: "Pipeline rośnie",
-    timeline2Body: "Zapisane oferty, statusy i wyniki dopasowania w jednym rejestrze. Demo pokazuje auto-aplikację.",
+    timeline2Body:
+      "Zapisane oferty, statusy i wyniki dopasowania w jednym rejestrze. Demo pokazuje pakiety prepare-only — auto-aplikacja wstrzymana na produkcji.",
     timeline3When: "Tydzień 2+",
     timeline3Title: "Kalendarz z intencją",
-    timeline3Body: "Rezerwacje i potwierdzone sloty sync tam, gdzie podłączony kalendarz. Ty decydujesz, co zostaje.",
+    timeline3Body:
+      "Podgląd holdów rozmów tam, gdzie OAuth kalendarza lub subskrypcja ICS — zapisy Microsoft Calendar wyłączone na produkcji. Ty decydujesz, co zostaje.",
     ctaBandEyebrow: "Zobacz sam",
     ctaBandTitle: "Uruchom interaktywne demo — albo załóż konto i zobacz pierwsze dopasowania.",
     ctaBandMicro: "Za zero · zgoda od dnia 1 · bez karty przy rejestracji",
@@ -9684,7 +9701,8 @@ const pl: MessageTree = {
     pageTitle: "Potwierdź e-mail",
     pageBody: "Otwórz link z wiadomości po rejestracji. Możesz wysłać ponownie z banera w panelu.",
     bannerTitle: "Potwierdź adres e-mail",
-    bannerBody: "Zweryfikuj e-mail, aby odblokować auto-aplikację i pełne funkcje konta.",
+    bannerBody:
+      "Zweryfikuj e-mail, aby odblokować pełne funkcje konta i automatyzację prepare-only, gdy bramki na to pozwolą.",
     resend: "Wyślij link ponownie",
     openPage: "Pomoc",
     sent: "Wysłano link weryfikacyjny, jeśli konto tego wymaga.",
@@ -11955,7 +11973,7 @@ const pl: MessageTree = {
     stepNav9: "Dalej",
     heroPipelineTitle: "Jeden pipeline zamiast siedemnastu kart",
     heroPipelineBody:
-      "CV → profil → do 200 rankingowych ofert → top 20 na pierwszy plan → przygotowanie → uczciwe statusy wysyłki → bloki rozmów w kalendarzu.",
+      "CV → profil → do 200 rankingowych ofert → top 20 na pierwszy plan → pakiety prepare-only (auto-aplikacja wstrzymana na produkcji) → uczciwe statusy wysyłki → podgląd holdów rozmów w kalendarzu.",
     heroCvLabel: "Przykładowy sygnał profilu",
     heroRankLabel: "Lejek rankingu",
     heroRankHint: "final_score wysuwa najlepsze dopasowania; reszta zostaje w workspace do 200.",
@@ -11989,7 +12007,7 @@ const pl: MessageTree = {
     step6Eyebrow: "Przygotowanie",
     step6Title: "Przygotowanie aplikacji przed wysłaniem",
     step6Lead:
-      "TWIN składa dopasowany pitch i paczkę do przeglądu. Automatyzacja działa tylko tam, gdzie portale i Twoja zgoda na to pozwalają.",
+      "TWIN składa dopasowany pitch i paczkę do przeglądu. Automatyzacja działa tylko tam, gdzie portale i Twoja zgoda na to pozwalają — auto-aplikacja wstrzymana na produkcji, dopóki bramki na to nie pozwolą.",
     prep1: "Wynik dopasowania i kontekst oferty przy rekordzie aplikacji",
     prep2: "Pitch i punkty pod rolę (przegląd przed wysłaniem)",
     prep3: "Paczka PDF gotowa — ręczna aplikacja otwiera flow pracodawcy, gdy automatyzacja nie jest wspierana",
@@ -11998,7 +12016,8 @@ const pl: MessageTree = {
     step7Lead:
       "Każdy stan ma pokrycie w dowodach. Nie oznaczamy potwierdzone bez śladu, potwierdzenia albo sygnału z ATS.",
     statusPrepared: "Przygotowane",
-    statusPreparedBody: "Materiały gotowe — Ty lub agent przeglądacie przed wysłaniem.",
+    statusPreparedBody:
+      "Materiały gotowe — Ty przeglądasz przed wysłaniem (auto-aplikacja wstrzymana na produkcji dziś).",
     statusManual: "Ręczne",
     statusManualBody: "Portal wymaga Twojego kliknięcia; TWIN przygotował paczkę.",
     statusAttempted: "Próba wysłania",
@@ -12010,7 +12029,8 @@ const pl: MessageTree = {
     step8Lead:
       "Po urlopie wracasz do krótkiej listy rozmów wartych przygotowania — akceptuj, odrzuć, przełóż — zamiast losowego spamu w skrzynce.",
     calendarHoldTitle: "Blok rozmowy (demo)",
-    calendarHint: "Google Calendar dziś; Microsoft 365 i ICS w roadmapie — ten sam north star dla każdego stacku.",
+    calendarHint:
+      "Holdy Google Calendar OAuth tam, gdzie skonfigurowane; busy-read Microsoft z bramkami, zapisy wyłączone na produkcji; subskrypcja ICS/WebCal w roadmapie.",
     ctaSectionTitle: "Kontynuuj w TWIN",
     ctaSectionLead: "Ten przewodnik to mapa; konto to teren.",
     ctaDashboard: "Otwórz panel",
