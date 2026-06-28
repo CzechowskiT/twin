@@ -1,0 +1,249 @@
+# P0 Shell Founder Review — 2026-06-28
+
+**Branch:** `docs/p0-shell-founder-review-2026-06-28`  
+**Base:** `cursor/phase1-monorepo-scaffold` @ `9d0f9bc` (PR #324 merged)  
+**Owner:** TWIN P0 Performance / Shell Review  
+**Purpose:** Founder decision package for Slice 12 — **review only**, not implementation approval.
+
+**Canonical references:**
+- [P0_NO_HEADLESS_FINAL_STATE_2026-06-17.md](./P0_NO_HEADLESS_FINAL_STATE_2026-06-17.md)
+- [P0_PRODUCTION_STUCK_ROUTES_RENDERER_MEMORY_2026-06-16.md](./P0_PRODUCTION_STUCK_ROUTES_RENDERER_MEMORY_2026-06-16.md)
+- [PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md](./PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md)
+- [P0_PERFORMANCE_INVENTORY_2026-06-27.md](./P0_PERFORMANCE_INVENTORY_2026-06-27.md)
+- [TWIN_PUBLIC_LAUNCH_READINESS_PLAN_2026-06-27.md](./TWIN_PUBLIC_LAUNCH_READINESS_PLAN_2026-06-27.md)
+
+---
+
+## 1. Executive Summary
+
+| Gate | Status |
+|------|--------|
+| **P0 performance** | **OPEN** — no Phase 3B prod proof, no signed Lighthouse budgets |
+| **Phase 3B controlled multitab** | **HARD BLOCKED** — founder STOP (2026-06-17) |
+| **Public launch** | **NO-GO** |
+| **This document** | **Review package** — defines gates founder must approve before any shell/gate/layout implementation |
+
+**Slice 13 shipped** (PR #324): 5 hiring-journey routes added to `p0-no-headless-final-state` (31 → **36 routes**); static guards 9/9; browser smoke remains **gated**, not default CI.
+
+**Slice 12 remains blocked** until founder explicitly approves implementation gates in §6. This PR prepares the review package and static guards only — **no shell code changes**.
+
+---
+
+## 2. Current Baseline
+
+| Field | Value |
+|-------|-------|
+| **repo_head** | `9d0f9bc36720e6348270dd0a499a2542087ebccc` (PR #324) |
+| **prod_frontend_commit** | `9d0f9bc36720e6348270dd0a499a2542087ebccc` (public-health 2026-06-28) |
+| **prod_api_commit** | `6d6d1e54f85f8f00fe1727f32cef700e9c2a20aa` (`6d6d1e5`, PR #281) |
+| **public-health** | `status=ok`, `db_ok=true` |
+| **alignment_status** | **ALIGNED** — prod FE matches scaffold post-#324 deploy |
+| **p0-no-headless route inventory** | **36 routes** (public 3, candidate 10, recruiter 11, company 11, board 1) |
+| **Hiring Journey in inventory** | ✅ 5 routes — static/gated prep only; browser not run |
+
+### Route lanes (36)
+
+| Lane | Count | Hiring Journey route |
+|------|-------|----------------------|
+| Public | 3 | — |
+| Candidate | 10 | `/dashboard/hiring-journey`, `/profile/hiring-journey` |
+| Recruiter | 11 | `/recruiter/hiring-journey` |
+| Company | 11 | `/company/hiring-journey` |
+| Board | 1 | `/board/hiring-journey` |
+
+Inventory: `frontend/e2e/helpers/p0-no-headless-final-state.ts`
+
+---
+
+## 3. Problem Statement
+
+1. **Shell paint / route performance risk remains unresolved.** Prior founder incident (2026-06-16): 6+ recruiter tabs → blank screens, Chrome renderers 5–7.5 GB each. Root cause implicates `LightweightRouteShell` skeleton deferral, `PersonaWorkspaceGate` redirect churn, and client-heavy layouts.
+
+2. **No Phase 3B prod proof after prior incident.** Phase 3B local run was 21/21 PARTIAL; prod run **FAIL** (context crash + commit mismatch). Phase 3B heuristic allowed `shellReady || mainVisible` to PASS with chrome-only frames — false positive risk documented in [P0_NO_HEADLESS_FINAL_STATE_2026-06-17.md](./P0_NO_HEADLESS_FINAL_STATE_2026-06-17.md).
+
+3. **Browser / default CI remains blocked.** Playwright default CI **DISABLED** since 2026-06-16 CPU storm (`test:e2e` exits 1). All browser smokes require explicit env flags (`PLAYWRIGHT_ENABLE_BROWSER_TESTS=1` or `PLAYWRIGHT_ALLOW_PROD_SMOKE=1`). GitHub `smoke.yml` runs backend pytest + `npm run build` only — no Playwright.
+
+4. **P0 headless guard exists but shell fix not applied.** Static evaluator distinguishes auth card vs chrome-only shell (`isChromeOnly`). Implementation of shell/gate/layout changes is **forbidden** without this founder review.
+
+---
+
+## 4. Proposed Technical Direction
+
+**Review scope only — no code in this slice.**
+
+| Component | File | Intended risk reduction (post-approval) |
+|-----------|------|----------------------------------------|
+| Paint shell | `frontend/src/components/lightweight-route-shell.tsx` | Ensure hidden tabs and hydration stalls cannot leave skeleton as final state; align with `isChromeOnly` evaluator |
+| Auth gate | `frontend/src/components/persona-workspace-gate.tsx` | Preserve auth card as valid final state; eliminate redirect loops on multi-tab open |
+| Workspace layout | `frontend/src/components/workspace-route-layout.tsx` | Gate → shell ordering; skeleton only when necessary |
+| Loading shells | persona `loading.tsx` files | Server skeleton before hydration without blocking forever |
+| Phase 3B evaluator | `frontend/e2e/helpers/phase3b-controlled-routes.ts` | Tighten paint heuristic after shell fix — no skeleton false-PASS |
+
+**Prior fix plan (Phase 2, PR #149 — reference only):** Fixes A–F documented in [P0_PRODUCTION_STUCK_ROUTES_RENDERER_MEMORY_2026-06-16.md](./P0_PRODUCTION_STUCK_ROUTES_RENDERER_MEMORY_2026-06-16.md). Founder must confirm which fixes remain in scope before implementation branch opens.
+
+**Implementation branch naming (suggested):** `fix/p0-shell-lightweight-route-2026-06-XX` — **do not create until Gate B approved (§6).**
+
+---
+
+## 5. Explicit Non-Goals
+
+This review package and any subsequent approved implementation **must not**:
+
+- Change backend, API, auth provider, DB, migrations, or env
+- Activate live actions (auto-apply, calendar write, email send, ATS sync, outreach)
+- Run Phase 3B, multitab stress, or headless browser in default CI
+- Claim P0 **CLOSED** or public launch **GO**
+- Enable `test:e2e` or browser scripts without explicit env flags
+- Touch hiring-journey workflow engine (remains `readiness_preview`)
+- Merge shell/gate/layout changes without founder sign-off on §6 gates
+
+---
+
+## 6. Founder Decision Required
+
+Each gate is a **separate yes/no**. Default for all: **NO / HOLD** until founder responds.
+
+| Gate | Question | Default | If YES → allowed next step |
+|------|----------|---------|---------------------------|
+| **A** | Approve this static review package (docs + guards)? | HOLD | Merge this PR; no runtime change |
+| **B** | Approve opening an **implementation branch** for `LightweightRouteShell` / `PersonaWorkspaceGate` / layout? | **NO** | Create fix branch; §7 static gates must pass before merge |
+| **C** | Approve **gated local browser** validation (`test:p0-no-headless-final-state-browser`, 36 routes)? | **NO** | Run with `PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 PLAYWRIGHT_ENABLE_WEBSERVER=1` locally only |
+| **D** | Approve **gated prod browser** smoke post-deploy? | **NO** | Run with `PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1` |
+| **E** | Approve **Phase 3B unblock** (controlled multitab, 21 routes)? | **NO** | Slice 14 static guards → then gated browser per [PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md](./PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md) |
+| **F** | Approve production smoke boundaries (founder JWT, sequential only, workers=1)? | **NO** | Document JWT + route list in ops runbook |
+
+**Founder response format (copy-paste):**
+
+```
+Slice 12 gates: A=YES|NO B=YES|NO C=YES|NO D=YES|NO E=YES|NO F=YES|NO
+Notes: ...
+```
+
+---
+
+## 7. Required Static Gates Before Any Implementation
+
+All must pass on implementation PR before merge:
+
+```bash
+cd frontend
+npm run test:p0-no-headless-final-state      # 10/10 assertions (includes stance guard)
+npm run test:p0-route-weight-inventory
+npm run test:p0-performance-guardrails
+npm run test:hiring-journey
+npm run build
+npx tsc --noEmit
+```
+
+**Additional merge criteria (from P0 no-headless doc):** Changes must be shell/gate/layout fixes only if Gate B approved. Route-level fixes allowed without shell touch. If shell files change → founder Gate B must be YES.
+
+---
+
+## 8. Required Gated Browser Validation After Explicit Unblock Only
+
+**Never default CI.** Requires founder Gate C and/or D.
+
+### Local (Gate C)
+
+```bash
+cd frontend
+PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 PLAYWRIGHT_ENABLE_WEBSERVER=1 \
+  npm run test:p0-no-headless-final-state-browser
+
+PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 PLAYWRIGHT_ENABLE_WEBSERVER=1 \
+  npm run test:hiring-journey-browser
+```
+
+### Production (Gate D)
+
+```bash
+cd frontend
+PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 \
+  PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app \
+  npm run test:p0-no-headless-final-state-browser
+```
+
+### Phase 3B (Gate E — separate, post-shell)
+
+```bash
+# DO NOT RUN until Gate E = YES
+PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 PLAYWRIGHT_ENABLE_WEBSERVER=1 \
+  npm run test:phase3b-controlled-multitab-browser
+```
+
+**Env flags summary:**
+
+| Flag | Purpose |
+|------|---------|
+| `PLAYWRIGHT_ENABLE_BROWSER_TESTS=1` | Local browser smokes |
+| `PLAYWRIGHT_ENABLE_WEBSERVER=1` | Start local Next.js for browser tests |
+| `PLAYWRIGHT_ALLOW_PROD_SMOKE=1` | Prod URL smoke (requires Gate D) |
+| `PLAYWRIGHT_SKIP_WEBSERVER=1` | Use prod/staging URL instead of local |
+
+---
+
+## 9. Rollback / Stop Conditions
+
+**STOP immediately and revert if any occur during gated browser work:**
+
+| Condition | Action |
+|-----------|--------|
+| `chrome-headless-shell` CPU storm / runner hang | Abort; do not merge; document in Phase 3B doc |
+| Memory spike (>512 MB JS heap per tab or founder RSS regression) | STOP Phase 3B; keep BLOCKED |
+| Route timeout (>900s suite) or stuck skeleton final state | Fix route or shell before retry |
+| Hydration/auth-shell regression (lost `next=` deep link) | Revert shell/gate change |
+| Production commit mismatch during prod smoke | Wait for Vercel deploy; do not claim PASS |
+| False PASS (chrome-only shell passes evaluator) | Tighten evaluator; do not unblock Phase 3B |
+
+**Rollback:** Revert implementation PR; restore Phase 3B **BLOCKED**; P0 remains **OPEN**.
+
+---
+
+## 10. Launch Impact
+
+| Outcome | Launch stance |
+|---------|---------------|
+| Shell fix merges + local browser PASS | **NO-GO** — P0 still OPEN until Phase 3B prod PASS + multitab RSS validated |
+| Phase 3B local PASS | **NO-GO** — prod proof required |
+| Phase 3B prod PASS | **NO-GO** — Lighthouse budgets, stress closure, launch gate audit (§5 launch plan) still open |
+| All P0 gates closed | Founder sign-off on [PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md](./PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md) required — **not automatic GO** |
+
+**Code constant unchanged:** `LAUNCH_STANCE = "noGo"` in `frontend/src/lib/investor-metrics-reality.ts`
+
+Even perfect shell performance does **not** imply public launch, auto-apply activation, or external recruiter invites (H5c/H5d **HOLD**).
+
+---
+
+## 11. Decision Log
+
+| Date | Decision | Status |
+|------|----------|--------|
+| 2026-06-17 | Phase 3B multitab — **STOP** until shell fix | **ACTIVE BLOCK** |
+| 2026-06-16 | Playwright default CI **DISABLED** | **ACTIVE** |
+| 2026-06-28 | Slice 13 — hiring journey → p0-no-headless (36 routes) | **SHIPPED** (#324) |
+| 2026-06-28 | Slice 12 — P0 shell founder review package | **PENDING FOUNDER REVIEW** |
+| TBD | Gate A — approve review package | **PENDING** |
+| TBD | Gate B — approve shell implementation branch | **PENDING** |
+| TBD | Gate C/D — approve gated browser validation | **PENDING** |
+| TBD | Gate E — Phase 3B unblock | **PENDING** |
+| TBD | P0 performance **CLOSED** | **BLOCKED** |
+| TBD | Public launch **GO** | **BLOCKED** |
+
+---
+
+## Verification (this PR)
+
+```bash
+cd /Users/tomek/Projects/twin
+test -f docs/P0_SHELL_FOUNDER_REVIEW_2026-06-28.md
+cd frontend && \
+  npm run test:p0-no-headless-final-state && \
+  npm run test:p0-route-weight-inventory && \
+  npm run test:p0-performance-guardrails && \
+  npm run test:hiring-journey && \
+  npm run build && npx tsc --noEmit
+```
+
+**Not run:** browser smokes, Phase 3B, multitab, stress.
+
+**Public launch: NO-GO · P0 performance: OPEN · Phase 3B: HARD BLOCKED**

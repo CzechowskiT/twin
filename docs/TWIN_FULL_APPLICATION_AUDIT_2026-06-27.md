@@ -720,3 +720,5 @@ export const DEFAULT_EXTERNAL_INVITES_SENT = 0;
 | 2026-06-27 | Initial full application audit at scaffold `28d439b`; prod FE aligned; incorporates #311–#312 baseline + #313 pending |
 | 2026-06-28 | **Slice 13** — 5 hiring-journey routes in `p0-no-headless-final-state` (31 → 36); static guards 9/9; P0 **OPEN**; Phase 3B **BLOCKED** |
 | 2026-06-28 | **Reconciled post-#323** — SHAs (`dcacc9d` prod FE, `6d6d1e5` API, `7ad86c7` scaffold); Slices 3–11 marked shipped; Slice 12 blocked; Slice 13 next |
+| 2026-06-28 | **Slice 13 shipped** (#324) — 36-route p0-no-headless inventory; static guards 9→10 |
+| 2026-06-28 | **Slice 12 founder-review package** — [P0_SHELL_FOUNDER_REVIEW_2026-06-28.md](./P0_SHELL_FOUNDER_REVIEW_2026-06-28.md); shell impl blocked pending founder §6 gates |
