@@ -8,6 +8,7 @@ import { CANDIDATE_CANONICAL_ROUTES } from "../src/lib/candidate-canonical-route
 import { CANDIDATE_WORKSPACE_MODULES } from "../src/lib/candidate-workspace-modules";
 import { RECRUITER_HUB_ROUTE, RECRUITER_WORKSPACE_MODULES } from "../src/lib/recruiter-workspace-modules";
 import { COMPANY_WORKSPACE_MODULES } from "../src/lib/company-workspace-modules";
+import { COMPANY_HIRING_ROUTE } from "../src/lib/company-hiring-dashboard";
 import { INVESTOR_WORKSPACE_MODULES } from "../src/lib/investor-workspace-modules";
 import { RECRUITER_INTEGRATIONS_ROUTE } from "../src/lib/recruiter-integrations-readiness";
 import { SYSTEM_OF_RECORD_ROUTES } from "../src/lib/system-of-record-routes";
@@ -113,6 +114,17 @@ test("recruiter workspace has one inbox module — no duplicate href cards", () 
   const inboxCards = RECRUITER_WORKSPACE_MODULES.filter((m) => m.href === inboxHref);
   assert.equal(inboxCards.length, 1);
   assert.equal(inboxCards[0]?.id, "inbox");
+});
+
+test("company workspace has no orphan settings card — dashboard only in SoR hub", () => {
+  const settings = COMPANY_WORKSPACE_MODULES.find((m) => m.id === "settings");
+  assert.equal(settings, undefined);
+  const dashboardCards = COMPANY_WORKSPACE_MODULES.filter((m) => m.href === COMPANY_HIRING_ROUTE);
+  assert.equal(dashboardCards.length, 0);
+  const hrefs = COMPANY_WORKSPACE_MODULES.map((m) => m.href);
+  assert.equal(hrefs.length, new Set(hrefs).size, "company workspace module hrefs must be unique");
+  const sor = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "company_dashboard");
+  assert.equal(sor?.href, COMPANY_HIRING_ROUTE);
 });
 
 test("candidate workspace has one trust center card — pilot, canonical trust route", () => {

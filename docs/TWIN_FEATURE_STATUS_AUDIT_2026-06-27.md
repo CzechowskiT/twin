@@ -305,3 +305,4 @@ cd frontend && npm run build && npx tsc --noEmit
 | 2026-06-27 | Slice 6 completed — company workspace pipeline hintKey aligned with SoR; demo vs live copy boundaries |
 | 2026-06-27 | Slice 7 completed — candidate workspace trust_center card (pilot) links to `/dashboard/trust`; no duplicate trust cards |
 | 2026-06-28 | Slice 8 completed — investor SoR hub grouped into product / board evidence / demo proof sections with EN+PL boundary intros |
+| 2026-06-28 | Slice 9 completed — removed company workspace `settings` orphan card (duplicate of `/company/dashboard` SoR entry) |
