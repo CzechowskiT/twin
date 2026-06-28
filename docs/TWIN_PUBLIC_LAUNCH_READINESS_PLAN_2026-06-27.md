@@ -149,7 +149,7 @@ A demo meets **full-confidence** when ALL of the following hold:
 | T2 | Company workspace `pipeline` **live** vs SoR demo pipeline **pilot** | P2 | **Slice 6 (this PR)** — hint + demo/live copy |
 | T3 | Investor SoR overload (19 entries mix product/board/demo) | P2 | Slice 8 — hub grouping |
 | T4 | Candidate trust (11 routes) not in workspace grid | P2 | **Slice 7 (this PR)** — discoverability link |
-| T5 | Company `settings` orphan → dashboard | P3 | Slice 9 — re-badge or remove |
+| T5 | Company `settings` orphan → dashboard | P3 | **Slice 9 (this PR)** — removed orphan card |
 | T6 | Investor `investor_product_proof` **live** with heavy boundaries | P2 | Slice 10 — copy/badge tighten |
 | T7 | Board 7 monitor routes without SoR cards | P3 | Document only (intentional) |
 | T8 | Landing/marketing copy vs prod reality | P2 | Slice 11 — trust-language sweep |
@@ -304,7 +304,7 @@ flowchart LR
 | 6 | Company pipeline status align | FE | WS vs SoR status skew | Frontend-only |
 | 7 | Candidate trust hub link | FE | Dashboard quick link to trust SoR | Read-only |
 | 8 | Investor SoR hub grouping | FE | Group board vs product in hub UI | Copy-only | ✅ Slice 8 |
-| 9 | Company settings card fix | FE | Remove orphan or honest redirect | UX |
+| 9 | Company settings card fix | FE | Remove orphan or honest redirect | UX | ✅ Slice 9 |
 | 10 | Investor product proof badge | FE | Tighten live + boundary display | Copy |
 | 11 | Marketing copy trust sweep | FE/docs | homepage, `/demo`, FAQ | No live claims |
 | 12 | P0 shell fix (founder review) | FE | `LightweightRouteShell` | **Blocked** |
@@ -332,6 +332,14 @@ flowchart LR
 **Approach:** **Group** — `investorGroup` field on investor SoR entries; hub renders four optional sections (`investorProduct`, `boardEvidence`, `demoProof`, `accessContact`) with EN/PL headings and boundary intro copy (read-only board, demo no writeback).
 
 **Non-goals:** No route removal, no non-investor hub changes, no backend/API/live-action.
+
+### Slice 9 detail
+
+**Problem:** Company workspace showed a `settings` module card (`needs_setup`) linking to `/company/dashboard` — duplicate of SoR `company_dashboard` without honest “same page” hint.
+
+**Approach:** **Remove orphan** — dashboard remains the sole entry via SoR hub on company dashboard; no `/company/settings` route.
+
+**Non-goals:** No backend/API/auth/workflow, no new settings surface, no company SoR registry changes.
 
 ---
 
@@ -399,6 +407,7 @@ flowchart LR
 | 2026-06-27 | Baseline includes #309–#313 merges; PR #314 noted OPEN |
 | 2026-06-27 | Slice 6 company pipeline status align — workspace hintKey, demo/live copy, no_ats_sync on demo SoR |
 | 2026-06-27 | Slice 7 candidate trust discoverability — one pilot `trust_center` workspace card → `/dashboard/trust`; existing i18n keys; no new routes |
+| 2026-06-28 | Slice 9 company settings orphan removed — dashboard only via SoR hub; 8 unique company workspace cards |
 
 ---
 
