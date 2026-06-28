@@ -10,6 +10,8 @@ import test from "node:test";
 import {
   collectSystemOfRecordHrefs,
   getSystemOfRecordRoutesForPersona,
+  groupInvestorSoRRoutes,
+  resolveInvestorSoRGroup,
   SYSTEM_OF_RECORD_BOUNDARY_LABEL_KEYS,
   SYSTEM_OF_RECORD_HUB_MARKER,
   SYSTEM_OF_RECORD_ROUTES,
@@ -289,4 +291,74 @@ test("13 hub marker constant matches navigation hub test id", () => {
     en.systemOfRecord.recruiterHubLead,
   ].join("\n");
   assert.match(copy.toLowerCase(), /outreach|ats|sync/);
+});
+
+test("14 investor hub lists all 19 entries with explicit investorGroup", () => {
+  const investor = getSystemOfRecordRoutesForPersona("investor");
+  assert.equal(investor.length, 19);
+  for (const route of investor) {
+    assert.ok(route.investorGroup, `${route.id} missing investorGroup`);
+    assert.equal(resolveInvestorSoRGroup(route), route.investorGroup);
+  }
+});
+
+test("15 investor hub groups board under boardEvidence and demo under demoProof", () => {
+  const grouped = groupInvestorSoRRoutes(getSystemOfRecordRoutesForPersona("investor"));
+  assert.equal(grouped.investorProduct.length, 9);
+  assert.equal(grouped.boardEvidence.length, 6);
+  assert.equal(grouped.demoProof.length, 4);
+  assert.equal(grouped.accessContact.length, 0);
+
+  for (const route of grouped.boardEvidence) {
+    assert.ok(route.href.startsWith("/board/"), route.id);
+    assert.equal(route.investorGroup, "boardEvidence");
+  }
+  for (const route of grouped.demoProof) {
+    assert.ok(
+      route.href === "/demo" || route.moduleFamily === "demo",
+      `${route.id} should be demo proof`,
+    );
+    assert.equal(route.investorGroup, "demoProof");
+  }
+
+  const hub = read("src/components/workspace/system-of-record-navigation-hub.tsx");
+  assert.match(hub, /data-sor-investor-group=\{group\}/);
+  assert.match(hub, /INVESTOR_SOR_GROUP_ORDER/);
+  assert.match(hub, /INVESTOR_SOR_GROUP_HEADING_KEYS/);
+  assert.match(hub, /INVESTOR_SOR_GROUP_LEAD_KEYS/);
+});
+
+test("16 investor group i18n avoids launch-ready copy in all locales", () => {
+  const keys = [
+    "investorGroupProductTitle",
+    "investorGroupProductLead",
+    "investorGroupBoardTitle",
+    "investorGroupBoardLead",
+    "investorGroupDemoTitle",
+    "investorGroupDemoLead",
+    "investorGroupAccessTitle",
+    "investorGroupAccessLead",
+  ] as const;
+  for (const locale of LOCALES) {
+    for (const key of keys) {
+      const val = dictionaries[locale].systemOfRecord[key];
+      assert.ok(typeof val === "string" && val.length > 0, `${locale} ${key}`);
+      assert.doesNotMatch(val, /launch ready/i, `${locale} ${key}`);
+    }
+  }
+  const boardLead = en.systemOfRecord.investorGroupBoardLead.toLowerCase();
+  assert.match(boardLead, /read-only|read only/);
+  const demoLead = en.systemOfRecord.investorGroupDemoLead.toLowerCase();
+  assert.match(demoLead, /writeback|no ats|sample|demo/);
+});
+
+test("17 non-investor hubs stay flat — no investor grouping markup", () => {
+  const hub = read("src/components/workspace/system-of-record-navigation-hub.tsx");
+  assert.match(hub, /persona === "investor"/);
+  assert.doesNotMatch(read("src/app/recruiter/page.tsx"), /data-sor-investor-group/);
+  assert.doesNotMatch(read("src/components/dashboard/candidate-module-nav.tsx"), /data-sor-investor-group/);
+  for (const persona of ["candidate", "recruiter", "company"] as const) {
+    const count = getSystemOfRecordRoutesForPersona(persona).length;
+    assert.ok(count >= 8, persona);
+  }
 });
