@@ -112,3 +112,24 @@ test("8 p0 performance inventory — Phase 3B blocked, 36 p0 routes, 20 phase3b 
   assert.match(inv, /Phase 3B.*20 routes/i);
   assert.match(inv, /test:e2e.*DISABLED/i);
 });
+
+test("9 slice12 founder signoff checklist — exists, Gate B PENDING, stance blocked", () => {
+  const checklist = readRepo("docs/SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md");
+  assert.match(checklist, /Slice 12 Founder Sign-Off Checklist/i);
+  assert.match(checklist, /Gate B.*PENDING/i);
+  assert.match(checklist, /Gate B is NOT YES by default/i);
+  assert.match(checklist, /36 routes/i);
+  assert.match(checklist, /20 routes/i);
+  assert.match(checklist, /7 \+ 7 \+ 6/);
+  assert.match(checklist, /Phase 3B.*HARD BLOCKED/i);
+  assert.match(checklist, /P0 performance.*OPEN/i);
+  assert.match(checklist, /Public launch.*NO-GO/i);
+  assert.match(checklist, /NOT granted.*Gate B.*YES/i);
+
+  const launchStance = read("src/lib/investor-metrics-reality.ts");
+  assert.match(launchStance, /LAUNCH_STANCE\s*=\s*"noGo"/);
+
+  const smokeWorkflow = readRepo(".github/workflows/smoke.yml");
+  assert.doesNotMatch(smokeWorkflow, /playwright test/i);
+  assert.doesNotMatch(smokeWorkflow, /phase3b-controlled-multitab/);
+});

@@ -223,6 +223,7 @@ Even perfect shell performance does **not** imply public launch, auto-apply acti
 | 2026-06-28 | Slice 13 — hiring journey → p0-no-headless (36 routes) | **SHIPPED** (#324) |
 | 2026-06-28 | Slice 12 — P0 shell founder review package | **PENDING FOUNDER REVIEW** |
 | 2026-06-28 | Slice 16 — Phase 3B static guard refresh (20 routes, 8 static guards) | **SHIPPED** |
+| 2026-06-28 | **Slice 12 founder sign-off checklist** — [SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md](./SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md); Gates A–F default **PENDING** | **PENDING FOUNDER REVIEW** |
 | TBD | Gate A — approve review package | **PENDING** |
 | TBD | Gate B — approve shell implementation branch | **PENDING** |
 | TBD | Gate C/D — approve gated browser validation | **PENDING** |
