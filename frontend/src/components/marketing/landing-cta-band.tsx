@@ -12,7 +12,7 @@ export function LandingCtaBand() {
   const { t } = useTranslation();
   return (
     <section className="marketing-section-cta-band border-t border-[var(--twin-border)] py-20 sm:py-24 md:py-28">
-      <div className="marketing-home-rail">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <ScrollReveal delayMs={80}>
           <BentoSpotlight className="flex flex-col items-stretch justify-between gap-8 p-8 sm:p-10 lg:flex-row lg:items-center lg:gap-10">
             <div className="min-w-0 max-w-2xl flex-1">
