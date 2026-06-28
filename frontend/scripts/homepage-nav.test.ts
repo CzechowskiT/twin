@@ -14,6 +14,8 @@ import {
   headerMarketingLoginHref,
   showMarketingPersonaNav,
 } from "../src/lib/persona-access";
+import { PUBLIC_EXPLORE_TWIN_ENTRIES, PUBLIC_EXPLORE_TWIN_HREFS } from "../src/lib/public-explore-twin-routes";
+import { dictionaries, en } from "../src/lib/i18n";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -91,4 +93,59 @@ test("chrome header avoids workspace shell on landing without active session", (
   assert.match(chrome, /hasActiveSession/);
   assert.match(chrome, /return <MarketingHeader \/>/);
   assert.doesNotMatch(chrome, /Boolean\(getToken\(\)\)/);
+});
+
+test("homepage wires explore twin quick-entry panel with seven existing routes", () => {
+  const home = read("src/app/(marketing)/page.tsx");
+  const panel = read("src/components/marketing/landing-explore-twin.tsx");
+  assert.match(home, /LandingExploreTwin/);
+  assert.match(panel, /PUBLIC_EXPLORE_TWIN_ENTRIES/);
+  assert.match(panel, /id="explore-twin"/);
+});
+
+test("explore twin registry exposes seven bounded quick-entry links", () => {
+  assert.equal(PUBLIC_EXPLORE_TWIN_ENTRIES.length, 7);
+  assert.deepEqual(PUBLIC_EXPLORE_TWIN_HREFS, [
+    "/dashboard",
+    "/recruiter",
+    "/company/dashboard",
+    "/investor",
+    "/demo",
+    "/dashboard/trust",
+    "/status",
+  ]);
+  const ids = new Set(PUBLIC_EXPLORE_TWIN_ENTRIES.map((e) => e.id));
+  assert.equal(ids.size, 7);
+  for (const entry of PUBLIC_EXPLORE_TWIN_ENTRIES) {
+    assert.match(entry.titleKey, /^home\.exploreTwin/);
+    assert.match(entry.hintKey, /^home\.exploreTwin/);
+  }
+});
+
+test("explore twin EN/PL copy is bounded — no launch-ready or live ATS claims", () => {
+  const positiveForbidden = /\blaunch ready\b|\blive ats\b|\bauto-apply is live\b/i;
+  function hasPositiveClaim(blob: string, pattern: RegExp): boolean {
+    const re = new RegExp(pattern.source, pattern.flags.includes("g") ? pattern.flags : `${pattern.flags}g`);
+    for (const match of blob.matchAll(re)) {
+      const idx = match.index ?? 0;
+      const before = blob.slice(Math.max(0, idx - 28), idx);
+      if (/\b(not|no|bez|nie|brak|without)\s*$/i.test(before)) continue;
+      return true;
+    }
+    return false;
+  }
+  for (const locale of ["en", "pl"] as const) {
+    const h = dictionaries[locale].home;
+    const blob = [
+      h.exploreTwinLead,
+      h.exploreTwinCandidateHint,
+      h.exploreTwinRecruiterHint,
+      h.exploreTwinCompanyHint,
+      h.exploreTwinInvestorHint,
+    ].join("\n");
+    assert.equal(hasPositiveClaim(blob, positiveForbidden), false, locale);
+    assert.match(blob.toLowerCase(), /paused|wstrzym|not live|nie jest live|no-go|pilot/);
+  }
+  assert.equal(en.home.exploreTwinEyebrow, "Explore TWIN");
+  assert.equal(dictionaries.pl.home.exploreTwinEyebrow, "Poznaj TWIN");
 });
