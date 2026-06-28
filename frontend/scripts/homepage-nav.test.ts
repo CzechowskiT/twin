@@ -24,26 +24,31 @@ function read(path: string): string {
   return readFileSync(join(root, path), "utf8");
 }
 
-test("marketing lane links expose candidate, recruiter, company, investor, and demo", () => {
+test("marketing lane links expose persona landings, FAQ, and demo — no workspace shortcuts", () => {
   const links = headerMarketingLaneLinks();
-  assert.equal(links.length, 5);
+  assert.equal(links.length, 6);
   assert.deepEqual(
     links.map((l) => l.href),
-    ["/for-candidates", "/for-recruiters", "/for-companies", "/investor", "/demo"],
+    ["/for-candidates", "/for-recruiters", "/for-companies", "/for-investors", "/faq", "/demo"],
   );
   assert.deepEqual(links.map((l) => l.labelKey), [
     "nav.personaCandidate",
     "nav.personaRecruiter",
     "nav.personaCompany",
     "nav.personaInvestor",
+    "nav.faq",
     "nav.demo",
   ]);
+  const workspaceShortcuts = ["/dashboard", "/recruiter", "/company/dashboard", "/investor", "/workspace"];
+  for (const href of links.map((l) => l.href)) {
+    assert.ok(!workspaceShortcuts.some((w) => href === w || href.startsWith(`${w}/`)), href);
+  }
 });
 
-test("marketing lane investor link points to canonical investor room", () => {
+test("marketing lane investor link points to public fundraising page, not executive room", () => {
   const investor = headerMarketingLaneLinks().find((l) => l.labelKey === "nav.personaInvestor");
   assert.ok(investor);
-  assert.equal(investor.href, "/investor");
+  assert.equal(investor.href, "/for-investors");
   assert.equal(investor.persona, "investor");
 });
 
