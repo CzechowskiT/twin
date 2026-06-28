@@ -11,7 +11,7 @@ import { ScrollReveal } from "@/components/marketing/scroll-reveal";
 export function LandingHero() {
   const { t } = useTranslation();
   return (
-    <section className="marketing-section-hero marketing-home-rail relative flex w-full flex-col justify-center pb-12 pt-14 sm:pb-16 sm:pt-16 md:min-h-[min(92svh,880px)] md:pb-20 md:pt-20">
+    <section className="marketing-section-hero relative mx-auto flex w-full max-w-6xl flex-col justify-center px-4 pb-12 pt-14 sm:px-6 sm:pb-16 sm:pt-16 md:min-h-[min(92svh,880px)] md:pb-20 md:pt-20">
       <ScrollReveal>
         <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_min(20rem,34%)] lg:items-start lg:gap-x-10 xl:grid-cols-[minmax(0,1fr)_min(24rem,36%)] xl:gap-x-12">
           <div className="min-w-0">

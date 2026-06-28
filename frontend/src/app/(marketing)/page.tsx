@@ -23,7 +23,7 @@ export default function Home() {
         <CandidateRewardsBand variant="home" />
         <LandingTrustCue />
         <LandingExploreTwin />
-        <div className="marketing-home-rail space-y-2">
+        <div className="mx-auto max-w-6xl space-y-2 px-4 sm:px-6">
           <LandingHomeStats />
           <DemoLiveSnapshot fullDemoHref="/demo" />
         </div>

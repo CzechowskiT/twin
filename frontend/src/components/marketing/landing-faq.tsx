@@ -24,7 +24,7 @@ export function LandingFaq() {
 
   return (
     <section className="border-t border-[var(--twin-border)] py-20 sm:py-24 md:py-28">
-      <div className="marketing-home-rail">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <ScrollReveal delayMs={40}>
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-muted)]">{t("home.faqEyebrow")}</p>
           <h2 className="marketing-home-headline mt-3 text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-3xl">{t("home.faqTitle")}</h2>
