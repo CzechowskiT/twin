@@ -231,7 +231,10 @@ test("10 founder review stance — Gate B YES merged, Phase 3B blocked, browser 
   assert.match(founderReview, /Public launch.*NO-GO/i);
   assert.match(founderReview, /Gate B.*YES/i);
   assert.match(founderReview, /Gate C.*YES/i);
+  assert.match(founderReview, /Gate D.*PENDING/i);
   assert.match(founderReview, /36 routes/i);
+  assert.doesNotMatch(founderReview, /\| \*\*P0 performance\*\* \| \*\*CLOSED\*\*/);
+  assert.doesNotMatch(founderReview, /\| \*\*Public launch\*\* \| \*\*GO\*\*/);
 
   const p0Doc = readRepo("docs/P0_NO_HEADLESS_FINAL_STATE_2026-06-17.md");
   assert.match(p0Doc, /Phase 3B.*BLOCKED/i);
@@ -255,4 +258,15 @@ test("10 founder review stance — Gate B YES merged, Phase 3B blocked, browser 
 
   const launchStance = read("src/lib/investor-metrics-reality.ts");
   assert.match(launchStance, /LAUNCH_STANCE\s*=\s*"noGo"/);
+
+  const gateD = readRepo("docs/gate-d-prod-browser-smoke-decision-2026-06-28.md");
+  assert.match(gateD, /Gate D.*PENDING/i);
+  assert.match(gateD, /PLAYWRIGHT_ALLOW_PROD_SMOKE=1/);
+  assert.match(gateD, /PLAYWRIGHT_SKIP_WEBSERVER=1/);
+  assert.doesNotMatch(gateD, /\| \*\*P0:\*\* \| \*\*CLOSED\*\*/);
+  assert.doesNotMatch(gateD, /Launch stance:\s*\*\*GO\*\*/i);
+
+  const spec = read("e2e/p0-no-headless-final-state-browser.spec.ts");
+  assert.match(spec, /PLAYWRIGHT_ALLOW_PROD_SMOKE=1/);
+  assert.match(spec, /PLAYWRIGHT_SKIP_WEBSERVER=1/);
 });
