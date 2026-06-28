@@ -308,7 +308,7 @@ flowchart LR
 | 10 | Investor product proof badge | FE | Tighten live + boundary display | Copy | ✅ Slice 10 |
 | 11 | Marketing copy trust sweep | FE/docs | homepage, `/demo`, FAQ | No live claims | ✅ Slice 11 |
 | 12 | P0 shell fix (founder review) | FE | `LightweightRouteShell` | **Blocked** |
-| 13 | Hiring journey → p0-no-headless list | FE/tests | Add 5 routes to 31-route spec | Gated browser |
+| 13 | Hiring journey → p0-no-headless list | FE/tests | Add 5 routes to 36-route spec | ✅ Slice 13 — gated browser |
 | 14 | Phase 3B static guard refresh | FE/tests | Post-shell route batch | **Blocked** |
 | 15 | Lighthouse budget definition | Docs | Signed numbers doc | Post-3B |
 | 16 | Microsoft busy-read staging smoke | FE/API | Staging only | Gates false in prod |
