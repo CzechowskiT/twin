@@ -722,3 +722,4 @@ export const DEFAULT_EXTERNAL_INVITES_SENT = 0;
 | 2026-06-28 | **Reconciled post-#323** — SHAs (`dcacc9d` prod FE, `6d6d1e5` API, `7ad86c7` scaffold); Slices 3–11 marked shipped; Slice 12 blocked; Slice 13 next |
 | 2026-06-28 | **Slice 13 shipped** (#324) — 36-route p0-no-headless inventory; static guards 9→10 |
 | 2026-06-28 | **Slice 12 founder-review package** — [P0_SHELL_FOUNDER_REVIEW_2026-06-28.md](./P0_SHELL_FOUNDER_REVIEW_2026-06-28.md); shell impl blocked pending founder §6 gates |
+| 2026-06-28 | **Slice 14** — investor room i18n parity (`demoMapProductProof`, PL executive proof labels, SoR group loanword cleanup); guards 9/6/4 extended; P0 **OPEN**; Phase 3B **BLOCKED** |

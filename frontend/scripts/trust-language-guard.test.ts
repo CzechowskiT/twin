@@ -136,6 +136,27 @@ function demoTrustCopy(locale: typeof en): string {
   return [d.pageLead, d.heroPipelineBody, d.step6Lead, d.statusPreparedBody, d.calendarHint].join("\n");
 }
 
+function investorRoomTrustCopy(locale: typeof en): string {
+  const r = locale.investorRoom;
+  const s = locale.systemOfRecord;
+  return [
+    r.launchStanceBody,
+    r.lead,
+    r.persona_candidate_body,
+    r.persona_recruiter_body,
+    r.statusItem_autoApply_body,
+    r.statusItem_delegatedApply_body,
+    r.statusItem_recruiterIntegrations_body,
+    s.investorGroupProductLead,
+    s.investorGroupDemoLead,
+  ].join("\n");
+}
+
+function executiveProductProofTrustCopy(locale: typeof en): string {
+  const e = locale.executiveProductProof;
+  return [e.lead, e.launchDetail, e.demoJourneyDesc, e.sorHubHint, e.boundaryNoOutreach, e.boundaryNoAtsSync].join("\n");
+}
+
 function onboardingTrustCopy(locale: typeof en): string {
   return locale.onboardingFlow.welcomeBody;
 }
@@ -188,6 +209,23 @@ test("i18n dictionaries contain no forbidden live-automation or AI-decides claim
     for (const pattern of FORBIDDEN_PATTERNS) {
       assert.doesNotMatch(blob, pattern, `${pattern} in dictionaries.${locale}`);
     }
+  }
+});
+
+test("investor room and product proof copy state NO-GO and bounded diligence", () => {
+  for (const locale of [en, pl]) {
+    const room = investorRoomTrustCopy(locale).toLowerCase();
+    assert.match(room, /no-go|no go|wstrzym|nie live|not live|paused/);
+    assert.match(room, /auto-apply.*paused|auto-apply.*wstrzym|auto-aplik/);
+    assert.doesNotMatch(room, /launch ready|general availability|ga launch/);
+    for (const pattern of [/\bats writeback completed\b/i, /\bautomatic outreach is live\b/i]) {
+      assert.doesNotMatch(room, pattern, `${pattern} in investor room trust copy (${locale})`);
+    }
+
+    const proof = executiveProductProofTrustCopy(locale).toLowerCase();
+    assert.match(proof, /no-go|blocked|zablok|human|człowiek|decyzj/);
+    assert.match(proof, /outreach|ats|writeback|kontakt|sync/);
+    assert.doesNotMatch(proof, /phase 3b unlocked|p0 solved|launch ready/);
   }
 });
 

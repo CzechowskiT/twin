@@ -6,6 +6,7 @@ import test from "node:test";
 
 import {
   INVESTOR_ROOM_ROUTE,
+  INVESTOR_ROOM_DEMO_MAP,
   INVESTOR_ROOM_STATUS,
   INVESTOR_ROOM_STATUS_ITEM_IDS,
   INVESTOR_ROOM_VISUAL_MARKERS,
@@ -95,5 +96,31 @@ test("all locales include investorRoom keys", () => {
       const val = section[key as keyof typeof section];
       assert.ok(val?.length, `${locale}.investorRoom.${key} empty`);
     }
+  }
+});
+
+test("demo map includes product proof route for diligence walkthrough", () => {
+  const productProof = INVESTOR_ROOM_DEMO_MAP.find((entry) => entry.id === "productProof");
+  assert.ok(productProof);
+  assert.equal(productProof?.href, "/investor/product-proof");
+  assert.equal(productProof?.labelKey, "investorRoom.demoMapProductProof");
+  const roomLib = readSrc("src/lib/investor-room.ts");
+  assert.match(roomLib, /productProof/);
+  assert.match(roomLib, /\/investor\/product-proof/);
+});
+
+test("PL investor room localizes critical diligence keys vs EN", () => {
+  const pl = dictionaries.pl.investorRoom;
+  assert.notEqual(pl.demoMapProductProof, en.investorRoom.demoMapProductProof);
+  assert.notEqual(pl.roadmapTitle, en.investorRoom.roadmapTitle);
+  assert.notEqual(pl.risk_k3_title, en.investorRoom.risk_k3_title);
+  assert.match(pl.demoMapProductProof.toLowerCase(), /dowód|produkt/);
+  assert.doesNotMatch(pl.statusItem_marketingPilot_body, /pilot-safe/i);
+});
+
+test("overlay locales localize demoMapProductProof label", () => {
+  for (const locale of ["es", "it", "fr", "de", "zh", "ar", "ja"] as const) {
+    const label = dictionaries[locale].investorRoom.demoMapProductProof;
+    assert.notEqual(label, en.investorRoom.demoMapProductProof, locale);
   }
 });

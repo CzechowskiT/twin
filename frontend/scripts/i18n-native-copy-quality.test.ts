@@ -123,6 +123,7 @@ const CRITICAL_DOMAINS = [
   "atsImportReadiness",
   "founderLedDemo",
   "executiveProductProof",
+  "investorRoom",
   "candidateProfile360",
   "jobPipeline",
   "candidateCollaboration",
@@ -346,6 +347,15 @@ test("PL talent radar, ATS import, and demo domains avoid English loanwords", ()
   assert.match(dictionaries.pl.recruiterTalentRadar.title, /radar talentów/i);
   assert.match(dictionaries.pl.atsImportReadiness.title, /gotowość importu ats/i);
   assert.match(dictionaries.pl.founderLedDemo.journeyTalentRadarTitle, /radar talentów/i);
+});
+
+test("PL investor room and executive proof avoid English loanwords", () => {
+  const blob = [domainBlob("pl", "investorRoom"), domainBlob("pl", "executiveProductProof")].join("\n");
+  for (const pattern of [/\boutreachu\b/i, /\bwritebacku\b/i, /\bExecutive product proof\b/]) {
+    assert.doesNotMatch(blob, pattern, `PL loanword ${pattern} in investor domains`);
+  }
+  assert.notEqual(dictionaries.pl.investorRoom.demoMapProductProof, en.investorRoom.demoMapProductProof);
+  assert.notEqual(dictionaries.pl.executiveProductProof.pageEyebrow, en.executiveProductProof.pageEyebrow);
 });
 
 test("it fr de zh ar talent radar ATS demo overlays are not English page titles", () => {

@@ -165,3 +165,18 @@ test("16 Phase 3B referenced as blocked not shipped", () => {
   const demo = read("src/lib/executive-product-proof-demo-data.ts");
   assert.match(demo, /Phase 3B.*blocked/i);
 });
+
+test("17 PL executive product proof eyebrow localized vs EN", () => {
+  const pl = dictionaries.pl.executiveProductProof;
+  assert.notEqual(pl.pageEyebrow, en.executiveProductProof.pageEyebrow);
+  assert.doesNotMatch(pl.pageEyebrow, /^Executive product proof$/);
+  assert.match(pl.sorHubHint.toLowerCase(), /dowód|due diligence|kontakt|ats/);
+});
+
+test("18 investor room demo map label key resolves in all locales", () => {
+  for (const locale of LOCALES) {
+    const label = dictionaries[locale].investorRoom.demoMapProductProof;
+    assert.ok(label.length > 0, locale);
+    assert.doesNotMatch(label, /launch ready/i, locale);
+  }
+});
