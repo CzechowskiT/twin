@@ -1,9 +1,9 @@
 # Slice 12 Founder Sign-Off Checklist — 2026-06-28
 
-**Branch:** `docs/slice12-founder-signoff-checklist-2026-06-28`  
-**Base:** `cursor/phase1-monorepo-scaffold` @ `30fab4b` (PR #328 merged)  
+**Branch:** `fix/p0-shell-lightweight-route-2026-06-28`  
+**Base:** `cursor/phase1-monorepo-scaffold` @ `23b60ed`  
 **Owner:** TWIN P0 Performance / Shell Review  
-**Purpose:** Founder decision checklist for Slice 12 Gates A–F — **decision only**, not implementation approval.
+**Purpose:** Founder decision checklist for Slice 12 Gates A–F — **Gate B minimal shell implementation merged 2026-06-28**.
 
 **Canonical references:**
 - [P0_SHELL_FOUNDER_REVIEW_2026-06-28.md](./P0_SHELL_FOUNDER_REVIEW_2026-06-28.md)
@@ -17,12 +17,12 @@
 
 | Item | Status |
 |------|--------|
-| **Slice 12** | **BLOCKED** — awaiting founder explicit gate decisions |
-| **This checklist** | **Decision package only** — no runtime change |
-| **Implementation approval** | **NOT granted** unless Gate B is explicitly marked **YES** |
+| **Slice 12** | **Gate B SHIPPED** — minimal `LightweightRouteShell` / `PersonaWorkspaceGate` fix merged; Gates C–F **PENDING** |
+| **This checklist** | **Gate B = YES** — minimal implementation only; browser blocked until Gate C |
+| **Implementation approval** | **Gate B YES** — minimal shell/gate/layout branch only; no broad refactor |
 | **Public launch** | **NO-GO** |
 | **P0 performance** | **OPEN** |
-| **Phase 3B controlled multitab** | **HARD BLOCKED** |
+| **Phase 3B controlled multitab** | **HARD BLOCKED** (Gate E **PENDING**) |
 
 Founder must complete §7 decision table before any shell/gate/layout implementation branch opens. Gate A approval merges this checklist and confirms scope — it does **not** authorize code changes.
 
@@ -32,11 +32,11 @@ Founder must complete §7 decision table before any shell/gate/layout implementa
 
 | Field | Value |
 |-------|-------|
-| **repo_head** | `30fab4b9859fc30e7f40828a257856a2dcafc91c` (PR #328, Slice 16 static guards) |
-| **prod_frontend_commit** | `30fab4b9859fc30e7f40828a257856a2dcafc91c` (public-health 2026-06-28) |
+| **repo_head** | `23b60eddd7e1459663ecd686217c102459cf1c79` (Gate B shell fix branch base) |
+| **prod_frontend_commit** | `ffc8432f5c1f04339ce56f500acd0bf50e6f8907` (public-health 2026-06-28) |
 | **prod_api_commit** | `6d6d1e54f85f8f00fe1727f32cef700e9c2a20aa` (`6d6d1e5`, PR #281) |
 | **public-health** | `status=ok`, `db_ok=true` |
-| **alignment_status** | **ALIGNED** — prod FE matches scaffold post-#328 deploy |
+| **alignment_status** | **PARTIAL** — prod FE `ffc8432` ahead of Gate B merge; re-check post-deploy |
 | **p0-no-headless route inventory** | **36 routes** (public 3, candidate 10, recruiter 11, company 11, board 1) |
 | **Phase 3B static inventory** | **20 routes** in `PHASE3B_ALL_ROUTES` |
 | **Phase 3B batches** | **7 + 7 + 6** (`PHASE3B_ROUTE_BATCHES`) |
@@ -117,13 +117,13 @@ Reference: [PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md](./PHASE3B_CO
 | Gate | Question | Status | If YES → allowed next step |
 |------|----------|--------|---------------------------|
 | **A** | Static scope confirmed (docs + guards)? | **PENDING** | Merge checklist PR; no runtime change |
-| **B** | Implementation branch approved (`LightweightRouteShell` / `PersonaWorkspaceGate`)? | **PENDING** | Create fix branch; §9 static gates before merge |
+| **B** | Implementation branch approved (`LightweightRouteShell` / `PersonaWorkspaceGate`)? | **YES** | Minimal fix branch merged; §9 static gates passed |
 | **C** | Gated local browser validation approved? | **PENDING** | Run `test:p0-no-headless-final-state-browser` with env flags locally only |
 | **D** | Production smoke boundary approved? | **PENDING** | Run prod smoke with `PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1` |
 | **E** | Phase 3B controlled multitab approved? | **PENDING** | Gated browser per Phase 3B doc (20 routes, workers=1) |
 | **F** | Launch-gate re-audit approved? | **PENDING** | Re-run launch gate checklist; still requires separate founder GO for public launch |
 
-**Gate B is NOT YES by default.** Implementation cannot start while Gate B = PENDING or NO.
+**Founder note (2026-06-28):** Gate B approved for **minimal implementation only** — `PersonaWorkspaceGateShell`, `hasActiveSession` stale-JWT guard, lazy `OnboardingGate`. Browser validation **blocked until Gate C = YES**. Phase 3B **blocked until Gate E = YES**.
 
 ---
 
@@ -281,4 +281,4 @@ cd frontend && \
 
 **Not run:** browser smokes, Phase 3B, multitab, stress, shell implementation.
 
-**Public launch: NO-GO · P0 performance: OPEN · Phase 3B: HARD BLOCKED · Gate B: PENDING**
+**Public launch: NO-GO · P0 performance: OPEN · Phase 3B: HARD BLOCKED · Gate B: YES · Gate C/E: PENDING**

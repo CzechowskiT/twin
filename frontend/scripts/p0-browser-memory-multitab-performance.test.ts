@@ -117,6 +117,8 @@ test("6 workspace layouts use LightweightRouteShell via WorkspaceRouteLayout", (
   const login = read("src/app/login/login-layout-client.tsx");
   assert.match(layout, /LightweightRouteShell/);
   assert.match(layout, /PersonaWorkspaceGate/);
+  assert.match(layout, /dynamic\(/);
+  assert.match(layout, /OnboardingGate/);
   assert.match(layout, /WorkspaceRouteSkeleton/);
   assert.match(dashboard, /WorkspaceRouteLayout/);
   assert.match(recruiter, /WorkspaceRouteLayout/);

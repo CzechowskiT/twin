@@ -7,8 +7,11 @@ import { useEffect, useMemo, useRef } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { useMarketingPersona } from "@/components/persona-provider";
-import { Card, Shell } from "@/components/ui";
-import { clearToken, getToken } from "@/lib/auth";
+import {
+  PersonaWorkspaceGateCard,
+  PersonaWorkspaceGateShell,
+} from "@/components/persona-workspace-gate-shell";
+import { clearToken, hasActiveSession } from "@/lib/auth";
 import type { TranslationKey } from "@/lib/i18n";
 import { buildAuthRedirectNext, lockAuthRedirectDestination, loginPathWithNext } from "@/lib/login-redirect";
 import type { MarketingPersona } from "@/lib/marketing-persona";
@@ -67,7 +70,7 @@ export function PersonaWorkspaceGate({
   const copy = SURFACE_COPY[surface];
   const loginZone = allowed[0] ?? "candidate";
   const loginPath = LOGIN_PATH[loginZone];
-  const hasToken = getToken();
+  const hasSession = hasActiveSession();
   const effectivePersona = resolveEffectiveSessionPersona(pathname, persona);
   const authDestinationRef = useRef<string | null>(null);
   const personaRedirectedRef = useRef(false);
@@ -82,18 +85,18 @@ export function PersonaWorkspaceGate({
   }, [loginPath, pathname]);
 
   useEffect(() => {
-    if (!hasToken) return;
+    if (!hasSession) return;
     if (allowed.includes(effectivePersona)) return;
     if (isPathAllowedForPersona(pathname, effectivePersona)) return;
     if (personaRedirectedRef.current) return;
     personaRedirectedRef.current = true;
     router.replace(WORKSPACE_PATH[effectivePersona]);
-  }, [allowed, effectivePersona, hasToken, pathname, router]);
+  }, [allowed, effectivePersona, hasSession, pathname, router]);
 
-  if (!hasToken) {
+  if (!hasSession) {
     return (
-      <Shell wide>
-        <Card variant="soft" className="p-6 sm:p-8">
+      <PersonaWorkspaceGateShell>
+        <PersonaWorkspaceGateCard>
           <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
             {t("workspace.authRequiredTitle")}
           </p>
@@ -105,8 +108,8 @@ export function PersonaWorkspaceGate({
               {t("workspace.authRequiredCta")}
             </Link>
           </div>
-        </Card>
-      </Shell>
+        </PersonaWorkspaceGateCard>
+      </PersonaWorkspaceGateShell>
     );
   }
 
@@ -115,8 +118,8 @@ export function PersonaWorkspaceGate({
   }
 
   return (
-    <Shell wide>
-      <Card variant="soft" className="p-6 sm:p-8">
+    <PersonaWorkspaceGateShell>
+      <PersonaWorkspaceGateCard>
         <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
           {t("nav.ariaPersonaNav")}: {t(PERSONA_LABEL[effectivePersona])}
         </p>
@@ -138,7 +141,7 @@ export function PersonaWorkspaceGate({
             {t("dashboard.logout")}
           </button>
         </div>
-      </Card>
-    </Shell>
+      </PersonaWorkspaceGateCard>
+    </PersonaWorkspaceGateShell>
   );
 }

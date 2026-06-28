@@ -533,3 +533,4 @@ All preview surfaces — Hiring Journey, Scheduling Proposal Pack, marketing cop
 | 2026-06-28 | **Slice 12 founder sign-off checklist added** — [SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md](./SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md); Gates A–F **PENDING**; shell implementation still **BLOCKED** |
 | 2026-06-28 | **Slice 17** — homepage Explore TWIN / Poznaj TWIN panel (7 existing-route cards); `public-explore-twin-routes.ts` registry; Gate B / Phase 3B / shell **unchanged BLOCKED** |
 | 2026-06-28 | **Slice 18** — footer secondary nav aligned with header + Explore TWIN model: stable 9-link sitemap (`public-footer-sitemap-routes.ts`); `/investor` vs `/for-investors` semantically distinct; Gate B / Phase 3B / shell **unchanged BLOCKED** |
+| 2026-06-28 | **Slice 12 Gate B shipped** — minimal shell/gate fix (`PersonaWorkspaceGateShell`, `hasActiveSession`, lazy `OnboardingGate`); Gate C/E **PENDING**; P0 **OPEN**; Phase 3B **BLOCKED** |

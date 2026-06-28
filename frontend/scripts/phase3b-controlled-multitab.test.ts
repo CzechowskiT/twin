@@ -92,12 +92,13 @@ test("6 smoke.yml excludes playwright and phase3b browser smokes", () => {
   assert.doesNotMatch(smokeWorkflow, /p0-no-headless-final-state-browser/);
 });
 
-test("7 founder review — Gate B pending, Phase 3B HARD BLOCKED, P0 OPEN, launch NO-GO", () => {
+test("7 founder review — Gate B YES (minimal shell merged), Gate C PENDING, Phase 3B HARD BLOCKED", () => {
   const founderReview = readRepo("docs/P0_SHELL_FOUNDER_REVIEW_2026-06-28.md");
   assert.match(founderReview, /Phase 3B.*HARD BLOCKED/i);
   assert.match(founderReview, /P0 performance.*OPEN/i);
   assert.match(founderReview, /Public launch.*NO-GO/i);
-  assert.match(founderReview, /Gate B.*PENDING/i);
+  assert.match(founderReview, /Gate B.*YES/i);
+  assert.match(founderReview, /Gate C.*PENDING/i);
   assert.match(founderReview, /20 routes/i);
 
   const launchStance = read("src/lib/investor-metrics-reality.ts");
@@ -113,18 +114,19 @@ test("8 p0 performance inventory — Phase 3B blocked, 36 p0 routes, 20 phase3b 
   assert.match(inv, /test:e2e.*DISABLED/i);
 });
 
-test("9 slice12 founder signoff checklist — exists, Gate B PENDING, stance blocked", () => {
+test("9 slice12 founder signoff checklist — Gate B YES, Gate C/E PENDING, stance blocked", () => {
   const checklist = readRepo("docs/SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md");
   assert.match(checklist, /Slice 12 Founder Sign-Off Checklist/i);
-  assert.match(checklist, /Gate B.*PENDING/i);
-  assert.match(checklist, /Gate B is NOT YES by default/i);
+  assert.match(checklist, /Gate B.*YES/i);
+  assert.match(checklist, /Gate C.*PENDING/i);
+  assert.match(checklist, /Gate E.*PENDING/i);
   assert.match(checklist, /36 routes/i);
   assert.match(checklist, /20 routes/i);
   assert.match(checklist, /7 \+ 7 \+ 6/);
   assert.match(checklist, /Phase 3B.*HARD BLOCKED/i);
   assert.match(checklist, /P0 performance.*OPEN/i);
   assert.match(checklist, /Public launch.*NO-GO/i);
-  assert.match(checklist, /NOT granted.*Gate B.*YES/i);
+  assert.match(checklist, /minimal implementation only/i);
 
   const launchStance = read("src/lib/investor-metrics-reality.ts");
   assert.match(launchStance, /LAUNCH_STANCE\s*=\s*"noGo"/);

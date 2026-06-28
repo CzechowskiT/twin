@@ -224,12 +224,13 @@ test("9 hiring journey routes in p0 inventory — static gated, P0 OPEN, phase3b
   assert.match(inv, /p0-no-headless-final-state.*36 routes/i);
 });
 
-test("10 founder review stance — Phase 3B blocked, browser gated, P0 OPEN, shell impl needs approval", () => {
+test("10 founder review stance — Gate B YES merged, Phase 3B blocked, browser gated, P0 OPEN", () => {
   const founderReview = readRepo("docs/P0_SHELL_FOUNDER_REVIEW_2026-06-28.md");
   assert.match(founderReview, /Phase 3B.*HARD BLOCKED/i);
   assert.match(founderReview, /P0 performance.*OPEN/i);
   assert.match(founderReview, /Public launch.*NO-GO/i);
-  assert.match(founderReview, /Founder Decision Required/i);
+  assert.match(founderReview, /Gate B.*YES/i);
+  assert.match(founderReview, /Gate C.*PENDING/i);
   assert.match(founderReview, /36 routes/i);
 
   const p0Doc = readRepo("docs/P0_NO_HEADLESS_FINAL_STATE_2026-06-17.md");

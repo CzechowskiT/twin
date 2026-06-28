@@ -724,4 +724,4 @@ export const DEFAULT_EXTERNAL_INVITES_SENT = 0;
 | 2026-06-28 | **Slice 12 founder-review package** — [P0_SHELL_FOUNDER_REVIEW_2026-06-28.md](./P0_SHELL_FOUNDER_REVIEW_2026-06-28.md); shell impl blocked pending founder §6 gates |
 | 2026-06-28 | **Slice 14** — investor room i18n parity (`demoMapProductProof`, PL executive proof labels, SoR group loanword cleanup); guards 9/6/4 extended; P0 **OPEN**; Phase 3B **BLOCKED** |
 | 2026-06-28 | **Slice 16** — Phase 3B static guard refresh: inventory **20 routes** (7+7+6); `PHASE3B_ALL_ROUTES`; static guards 3→8; P0 **36 unchanged**; Phase 3B **BLOCKED** |
-| 2026-06-28 | **Slice 12 sign-off checklist** — [SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md](./SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md); no launch/P0/Phase3B state changed; Gate B **PENDING** |
+| 2026-06-28 | **Slice 12 Gate B shipped** — minimal shell/gate fix; Gate C/E **PENDING**; P0 **OPEN**; Phase 3B **BLOCKED**; launch **NO-GO** |
