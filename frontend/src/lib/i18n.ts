@@ -2039,7 +2039,7 @@ const en = {
     investorHubLead: "Metrics, roadmap, data room, and system-of-record proof cards for diligence.",
     investorGroupProductTitle: "Product & diligence",
     investorGroupProductLead:
-      "Investor-facing metrics, roadmap, data room, and executive proof — honest status badges on every card.",
+      "Investor-facing metrics, roadmap, data room, and executive proof — honest status badges; product proof is bounded diligence, not a production workflow.",
     investorGroupBoardTitle: "Board evidence (read-only)",
     investorGroupBoardLead:
       "Internal readiness monitors under /board — read-only evidence only; no mutations or live-action triggers.",
@@ -2251,7 +2251,10 @@ const en = {
     milestonesTitle: "Next milestones",
     milestonesLead: "Ordered delivery gates — not revenue forecasts.",
     demoJourneyTitle: "Executive product proof (board demo)",
-    demoJourneyDesc: "SOR stack map, maturity matrix, safe-lane history, and demo links.",
+    demoJourneyDesc:
+      "Read-only diligence board — SOR maturity, safe-lane history, and demo links. No launch workflow, outreach, or ATS writeback.",
+    sorHubHint:
+      "Route is live — content is bounded proof only; human decisions required, no outreach, no ATS sync.",
     openProductProofCta: "Open product proof",
   },
   recruiterDailyOperatingCockpit: {
@@ -9600,7 +9603,7 @@ const pl: MessageTree = {
     investorHubLead: "Metryki, roadmapa, data room i karty dowodów rejestru operacyjnego do due diligence.",
     investorGroupProductTitle: "Produkt i due diligence",
     investorGroupProductLead:
-      "Metryki, roadmapa, data room i executive proof dla inwestora — uczciwe badge statusu na każdej karcie.",
+      "Metryki, roadmapa, data room i executive proof dla inwestora — uczciwe badge statusu; product proof to ograniczony due diligence, nie workflow produkcyjny.",
     investorGroupBoardTitle: "Dowody board (tylko odczyt)",
     investorGroupBoardLead:
       "Wewnętrzne monitory gotowości pod /board — tylko dowody read-only; bez mutacji ani live-action.",
@@ -9812,7 +9815,10 @@ const pl: MessageTree = {
     milestonesTitle: "Kolejne kamienie milowe",
     milestonesLead: "Uporządkowane bramki dostaw — nie prognozy przychodu.",
     demoJourneyTitle: "Dowód produktu dla zarządu (demo)",
-    demoJourneyDesc: "Mapa SOR, macierz dojrzałości, historia safe-lane i linki demo.",
+    demoJourneyDesc:
+      "Due diligence tylko do odczytu — dojrzałość SOR, historia safe-lane i linki demo. Bez workflowu launchu, kontaktu wychodzącego ani zapisu do ATS.",
+    sorHubHint:
+      "Trasa live — treść to ograniczony dowód; decyzje człowieka, bez kontaktu wychodzącego i synchronizacji ATS.",
     openProductProofCta: "Otwórz product proof",
   },
   recruiterDailyOperatingCockpit: {

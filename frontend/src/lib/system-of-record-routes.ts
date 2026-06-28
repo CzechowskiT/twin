@@ -1048,6 +1048,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     href: "/investor/product-proof",
     titleKey: "executiveProductProof.demoJourneyTitle",
     descriptionKey: "executiveProductProof.demoJourneyDesc",
+    hintKey: "executiveProductProof.sorHubHint",
     ctaKey: "executiveProductProof.openProductProofCta",
     status: "live",
     moduleFamily: "investor",

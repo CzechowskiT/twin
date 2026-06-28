@@ -1,5 +1,5 @@
 /**
- * System-of-record navigation hub — static route registry and hub wiring (13 assertions).
+ * System-of-record navigation hub — static route registry and hub wiring (18 assertions).
  */
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
@@ -350,6 +350,25 @@ test("16 investor group i18n avoids launch-ready copy in all locales", () => {
   assert.match(boardLead, /read-only|read only/);
   const demoLead = en.systemOfRecord.investorGroupDemoLead.toLowerCase();
   assert.match(demoLead, /writeback|no ats|sample|demo/);
+});
+
+test("17b investor product proof live with hint and diligence boundaries", () => {
+  const route = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "investor_product_proof");
+  assert.ok(route);
+  assert.equal(route!.status, "live");
+  assert.equal(route!.href, "/investor/product-proof");
+  assert.equal(route!.investorGroup, "investorProduct");
+  assert.ok(route!.hintKey);
+  assert.ok(route!.boundaryTags.includes("human_decision_required"));
+  assert.ok(route!.boundaryTags.includes("no_outreach"));
+  assert.ok(route!.boundaryTags.includes("no_ats_sync"));
+  assert.ok(!route!.boundaryTags.includes("pilot"));
+  assert.ok(!route!.boundaryTags.includes("not_live"));
+  const hint = en.executiveProductProof.sorHubHint.toLowerCase();
+  assert.match(hint, /bounded|proof|diligence|live/i);
+  assert.match(hint, /outreach|ats|human/i);
+  const desc = en.executiveProductProof.demoJourneyDesc.toLowerCase();
+  assert.match(desc, /read-only|diligence|no launch|no outreach|writeback/i);
 });
 
 test("17 non-investor hubs stay flat — no investor grouping markup", () => {
