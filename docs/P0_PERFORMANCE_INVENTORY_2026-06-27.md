@@ -37,7 +37,7 @@ Do not claim “P0 fixed”, “performance solved”, or launch-ready performan
 
 | Route / module | Symptom | Evidence | Category | Launch-blocking | Next action | Risk |
 |----------------|---------|----------|----------|-----------------|-------------|------|
-| Phase 3B multitab (21 routes) | No prod proof; local ~4.6 min; prod crash + commit mismatch | [PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md](./PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md), `frontend/e2e/phase3b-controlled-multitab.spec.ts` | Multitab / memory | **YES** | Founder unblock + shell fix before rerun | High |
+| Phase 3B multitab (20 routes) | No prod proof; local ~4.6 min; prod crash + commit mismatch | [PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md](./PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md), `frontend/e2e/phase3b-controlled-multitab.spec.ts` | Multitab / memory | **YES** | Founder unblock + shell fix before rerun | High |
 | Playwright default OFF | `test:e2e`, multitab smokes **DISABLED** (CPU storm 2026-06-16) | `frontend/package.json` (e.g. `test:e2e`, `test:workspace-multitab-browser-smoke`, `test:prod-recruiter-multitab-stuck-routes`) | CI / ops | **YES** (no auto browser gate) | Explicit env flags only; no CI headless yet (`P1_CI_HARDENING`) | High |
 | `LightweightRouteShell` + Phase 3B heuristic | Skeleton-only could pass as PASS | [P0_NO_HEADLESS_FINAL_STATE_2026-06-17.md](./P0_NO_HEADLESS_FINAL_STATE_2026-06-17.md), `SLOW_PAINT_MS=4000` in e2e helpers | Shell / paint | **YES** | Founder review shell; Phase 3B blocked until fix | High |
 | 8–12 Chrome tabs (founder) | 3–6 GB/renderer, tab slow | [P0_BROWSER_MEMORY_MULTITAB_PERFORMANCE_2026-06-16.md](./P0_BROWSER_MEMORY_MULTITAB_PERFORMANCE_2026-06-16.md) | Memory | **YES** | Manual multitab after Phase 3B unblock | High |
@@ -100,7 +100,7 @@ Do not claim “P0 fixed”, “performance solved”, or launch-ready performan
 ### Performance risks (code inspection)
 
 1. **11 steps + cross-links + provenance drill-in** — moderate DOM; `useMemo` on `resolveHiringJourney` (OK).
-2. **In** `p0-route-weight-inventory` (Batch 1, 2026-06-27) **and** `p0-no-headless-final-state` (Slice 13, 36 routes). **Not in** Phase 3B route batches (21 routes).
+2. **In** `p0-route-weight-inventory` (Batch 1, 2026-06-27) **and** `p0-no-headless-final-state` (Slice 13, 36 routes). **Not in** Phase 3B route batches (20 routes).
 3. **Browser spec** — `SETTLE_MS = 12_000` × 5 routes ≈ 2–3 min sequential smoke.
 4. **Board persona** — blocked state adds extra provenance blocks; monitor-only drill-in (no href churn).
 
@@ -196,6 +196,7 @@ npm run test:performance-safe-moving-logo-marquee
 | Date | Change |
 |------|--------|
 | 2026-06-28 | **Slice 13** — 5 hiring-journey routes added to `p0-no-headless-final-state` (31 → 36 routes); static guards 9/9; browser smoke remains gated; P0 **OPEN**; Phase 3B **HARD BLOCKED** |
+| 2026-06-28 | **Slice 16** — Phase 3B static guard refresh: `PHASE3B_ALL_ROUTES` = **20 routes** (7+7+6 batches; reconciled from historical ~21 label); static guards 3→8; p0-no-headless **36 unchanged**; browser gated |
 
 ---
 

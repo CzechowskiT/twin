@@ -438,6 +438,7 @@ flowchart LR
 | 2026-06-28 | **Slice 12** — founder-review package prepared ([P0_SHELL_FOUNDER_REVIEW_2026-06-28.md](./P0_SHELL_FOUNDER_REVIEW_2026-06-28.md)); shell implementation **not started**; Phase 3B **BLOCKED** |
 | 2026-06-28 | **Slice 14** — investor room i18n parity EN/PL + overlay `demoMapProductProof`; SoR group leads aligned; static guards extended; LAUNCH_STANCE unchanged |
 | 2026-06-28 | **Slice 15** — public marketing header adds Inwestor/Investor → `/investor` between Firma and Demo (desktop + mobile persona nav); no new routes; LAUNCH_STANCE unchanged |
+| 2026-06-28 | **Slice 16** — Phase 3B static guard refresh: `PHASE3B_ALL_ROUTES` = 20 routes (7+7+6 batches); static guards 3→8; p0-no-headless **36 unchanged**; Phase 3B **BLOCKED**; browser gated |
 
 ---
 

@@ -327,7 +327,7 @@ Hits confined to hiring-journey negation guards and SoR career compass read-only
 
 | Item | Launch-blocking | Evidence |
 |------|-----------------|----------|
-| Phase 3B multitab (21 routes) | **YES** | HARD BLOCKED; local ~4.6 min; prod crash history |
+| Phase 3B multitab (20 routes) | **YES** | HARD BLOCKED; local ~4.6 min; prod crash history |
 | Playwright default OFF | **YES** | `test:e2e` exits 1 — CPU storm 2026-06-16 |
 | `LightweightRouteShell` paint heuristic | **YES** | Skeleton could false-PASS Phase 3B |
 | 8–12 Chrome tabs founder report | **YES** | 3–6 GB RSS — not re-run this audit |
@@ -723,3 +723,4 @@ export const DEFAULT_EXTERNAL_INVITES_SENT = 0;
 | 2026-06-28 | **Slice 13 shipped** (#324) — 36-route p0-no-headless inventory; static guards 9→10 |
 | 2026-06-28 | **Slice 12 founder-review package** — [P0_SHELL_FOUNDER_REVIEW_2026-06-28.md](./P0_SHELL_FOUNDER_REVIEW_2026-06-28.md); shell impl blocked pending founder §6 gates |
 | 2026-06-28 | **Slice 14** — investor room i18n parity (`demoMapProductProof`, PL executive proof labels, SoR group loanword cleanup); guards 9/6/4 extended; P0 **OPEN**; Phase 3B **BLOCKED** |
+| 2026-06-28 | **Slice 16** — Phase 3B static guard refresh: inventory **20 routes** (7+7+6); `PHASE3B_ALL_ROUTES`; static guards 3→8; P0 **36 unchanged**; Phase 3B **BLOCKED** |

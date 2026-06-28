@@ -109,7 +109,7 @@ Each gate is a **separate yes/no**. Default for all: **NO / HOLD** until founder
 | **B** | Approve opening an **implementation branch** for `LightweightRouteShell` / `PersonaWorkspaceGate` / layout? | **NO** | Create fix branch; §7 static gates must pass before merge |
 | **C** | Approve **gated local browser** validation (`test:p0-no-headless-final-state-browser`, 36 routes)? | **NO** | Run with `PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 PLAYWRIGHT_ENABLE_WEBSERVER=1` locally only |
 | **D** | Approve **gated prod browser** smoke post-deploy? | **NO** | Run with `PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1` |
-| **E** | Approve **Phase 3B unblock** (controlled multitab, 21 routes)? | **NO** | Slice 14 static guards → then gated browser per [PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md](./PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md) |
+| **E** | Approve **Phase 3B unblock** (controlled multitab, 20 routes)? | **NO** | Slice 16 static guards → then gated browser per [PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md](./PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md) |
 | **F** | Approve production smoke boundaries (founder JWT, sequential only, workers=1)? | **NO** | Document JWT + route list in ops runbook |
 
 **Founder response format (copy-paste):**
@@ -222,6 +222,7 @@ Even perfect shell performance does **not** imply public launch, auto-apply acti
 | 2026-06-16 | Playwright default CI **DISABLED** | **ACTIVE** |
 | 2026-06-28 | Slice 13 — hiring journey → p0-no-headless (36 routes) | **SHIPPED** (#324) |
 | 2026-06-28 | Slice 12 — P0 shell founder review package | **PENDING FOUNDER REVIEW** |
+| 2026-06-28 | Slice 16 — Phase 3B static guard refresh (20 routes, 8 static guards) | **SHIPPED** |
 | TBD | Gate A — approve review package | **PENDING** |
 | TBD | Gate B — approve shell implementation branch | **PENDING** |
 | TBD | Gate C/D — approve gated browser validation | **PENDING** |

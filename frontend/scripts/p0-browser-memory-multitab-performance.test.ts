@@ -310,3 +310,26 @@ test("15 package registers P0 and prior performance tests", () => {
   assert.ok(pkg.includes("test:homepage-nav"));
   assert.ok(pkg.includes("test:investor-room-mvp"));
 });
+
+test("16 phase3b static inventory blocked — 20 routes, browser gated, P0 OPEN", () => {
+  const helper = read("e2e/helpers/phase3b-controlled-routes.ts");
+  assert.match(helper, /PHASE3B_ALL_ROUTES/);
+  assert.match(helper, /PHASE3B_ROUTE_COUNT/);
+
+  const phase3bTest = read("scripts/phase3b-controlled-multitab.test.ts");
+  assert.match(phase3bTest, /PHASE3B_ROUTE_COUNT, 20/);
+  assert.match(phase3bTest, /Phase 3B.*HARD BLOCKED/i);
+
+  const pkg = read("package.json");
+  assert.match(pkg, /test:phase3b-controlled-multitab-browser/);
+  assert.match(pkg, /PLAYWRIGHT_ENABLE_BROWSER_TESTS/);
+  assert.match(pkg, /test:e2e.*DISABLED/i);
+
+  const phase3bDoc = readFileSync(join(root, "..", "docs", "PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md"), "utf8");
+  assert.match(phase3bDoc, /STATUS: BLOCKED/i);
+  assert.match(phase3bDoc, /DO NOT RUN/i);
+
+  const p0Doc = readFileSync(join(root, "..", "docs", "P0_NO_HEADLESS_FINAL_STATE_2026-06-17.md"), "utf8");
+  assert.match(p0Doc, /36 routes/i);
+  assert.match(p0Doc, /Phase 3B.*BLOCKED/i);
+});
