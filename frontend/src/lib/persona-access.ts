@@ -574,51 +574,6 @@ export function headerAccountLinks(
   ];
 }
 
-export function footerExploreHrefsForPersona(persona: MarketingPersona): string[] {
-  const common = ["/waitlist", "/", "/demo", "/faq", "/status", "/developers"];
-  if (persona === "company") {
-    return [
-      ...common,
-      "/for-companies",
-      "/calculator/b2b",
-      "/login/company",
-      "/companies/signup",
-      "/contact",
-    ];
-  }
-  if (persona === "investor") {
-    return [
-      ...common,
-      "/for-investors",
-      "/workspace/investor",
-      "/investor/calculator",
-      "/investor/metrics",
-      "/login/investor",
-      "/contact",
-    ];
-  }
-  if (persona === "recruiter") {
-    return [
-      ...common,
-      "/for-recruiters",
-      "/workspace/recruiter",
-      "/calculator/b2b",
-      "/recruiter/inbox",
-      "/login/recruiter",
-      "/contact",
-    ];
-  }
-  return [
-    ...common,
-    "/for-candidates",
-    "/for-investors",
-    "/workspace/candidate",
-    "/login/candidate",
-    "/register/candidate",
-    "/contact",
-  ];
-}
-
 export function personaGateRedirect(persona: MarketingPersona): string {
   return PERSONA_ROUTE[persona];
 }

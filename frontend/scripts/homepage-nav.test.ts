@@ -15,6 +15,7 @@ import {
   showMarketingPersonaNav,
 } from "../src/lib/persona-access";
 import { PUBLIC_EXPLORE_TWIN_ENTRIES, PUBLIC_EXPLORE_TWIN_HREFS } from "../src/lib/public-explore-twin-routes";
+import { PUBLIC_FOOTER_SITEMAP_HREFS } from "../src/lib/public-footer-sitemap-routes";
 import { dictionaries, en } from "../src/lib/i18n";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -148,4 +149,32 @@ test("explore twin EN/PL copy is bounded — no launch-ready or live ATS claims"
   }
   assert.equal(en.home.exploreTwinEyebrow, "Explore TWIN");
   assert.equal(dictionaries.pl.home.exploreTwinEyebrow, "Poznaj TWIN");
+});
+
+test("site footer renders stable public sitemap — distinct investor routes", () => {
+  const footer = read("src/components/site-footer.tsx");
+  assert.match(footer, /PUBLIC_FOOTER_SITEMAP_ENTRIES/);
+  assert.doesNotMatch(footer, /footerExploreHrefsForPersona/);
+  assert.doesNotMatch(footer, /useMarketingPersona/);
+  assert.doesNotMatch(footer, /\/for-investors.*footerCompany|footerCompany[\s\S]*\/for-investors/);
+  assert.deepEqual(PUBLIC_FOOTER_SITEMAP_HREFS, [
+    "/for-candidates",
+    "/for-recruiters",
+    "/for-companies",
+    "/for-investors",
+    "/investor",
+    "/demo",
+    "/faq",
+    "/status",
+    "/dashboard/trust",
+  ]);
+});
+
+test("footer investor labels distinguish marketing page from executive room (EN/PL)", () => {
+  assert.equal(en.site.footerForInvestors, "For investors");
+  assert.equal(en.site.footerInvestorRoom, "Investor room");
+  assert.notEqual(en.site.footerForInvestors, en.site.footerInvestorRoom);
+  assert.equal(dictionaries.pl.site.footerForInvestors, "Dla inwestorów");
+  assert.equal(dictionaries.pl.site.footerInvestorRoom, "Sala executive");
+  assert.notEqual(dictionaries.pl.site.footerForInvestors, dictionaries.pl.site.footerInvestorRoom);
 });

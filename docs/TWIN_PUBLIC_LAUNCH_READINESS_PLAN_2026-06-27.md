@@ -441,6 +441,7 @@ flowchart LR
 | 2026-06-28 | **Slice 16** — Phase 3B static guard refresh: `PHASE3B_ALL_ROUTES` = 20 routes (7+7+6 batches); static guards 3→8; p0-no-headless **36 unchanged**; Phase 3B **BLOCKED**; browser gated |
 | 2026-06-28 | **Slice 12 sign-off checklist** — [SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md](./SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md); remains **BLOCKED** pending Gate B explicit **YES**; launch/P0/Phase3B stance unchanged |
 | 2026-06-28 | **Slice 17** — homepage compact Explore TWIN / Poznaj TWIN quick-entry panel (7 existing routes); bounded EN/PL i18n; `test:homepage-nav` extended; no shell, no browser, LAUNCH_STANCE unchanged |
+| 2026-06-28 | **Slice 18** — public footer stable sitemap (9 links): persona marketing pages + `/investor` (executive room) distinct from `/for-investors`; Trust + Status in explore column; `public-footer-sitemap-routes.ts`; persona-dependent footer links removed; LAUNCH_STANCE unchanged |
 
 ---
 
