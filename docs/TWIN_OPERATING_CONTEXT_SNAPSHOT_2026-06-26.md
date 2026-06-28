@@ -2,6 +2,8 @@
 
 **Cel:** Jednorazowy snapshot operacyjny dla agentów, founderów i smoke wrapperów CI. Uzupełnia (nie zastępuje) [TWIN_OPERATING_CONTEXT_2026-06-26.md](./TWIN_OPERATING_CONTEXT_2026-06-26.md).
 
+> **2026-06-28:** Kanoniczny refresh operacyjny jest w głównym dokumencie SoR (§2 SHAs, PR #309–#322, smoke 11/11). Ten plik pozostaje snapshotem z 2026-06-26/27 — nie duplikować.
+
 **Branch capture:** `docs/twin-operating-context-snapshot-2026-06-26`  
 **repo_head:** `73ec745ab12dd151adf05c2c66b67411e6bcf7ec`  
 **Captured UTC:** 2026-06-27
