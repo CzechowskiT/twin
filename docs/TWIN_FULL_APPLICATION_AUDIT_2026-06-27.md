@@ -166,7 +166,7 @@ Added SoR entries aligned with workspace-only routes:
 |-----|------|-------|
 | 7 board monitor routes not in SoR | Ops monitors invisible to SoR QA | **PILOT_LIMITED** (acceptable) |
 | Slice **12** (P0 shell founder review) | **BLOCKED** — no Phase 3B until unblock | **BLOCKED** |
-| Slice **13** (`p0-no-headless` + hiring-journey routes) | Next safe-lane prep | Planned |
+| Slice **13** (`p0-no-headless` + hiring-journey routes) | ✅ Shipped — 36 routes, static guards | Done |
 
 ### Hub wiring
 
@@ -529,12 +529,11 @@ No automated Dependabot gate verified in this audit.
 
 - Merge this full audit (#314) reconciled post-#323.
 - Operating context at `7ad86c7`; prod FE remains `dcacc9d` until next deploy (`docs_only_drift` acceptable).
-- **Next:** Slice **13** — add 5 hiring-journey routes to `p0-no-headless` list (prep only; no Phase 3B).
+- **Next:** Slice **12** — P0 shell founder review (blocked until explicit unblock).
+- ~~Extend `p0-no-headless-final-state` route list with hiring-journey routes (Slice 13).~~ ✅ Shipped — 36 routes.
 
 ### 1 week
 
-- Slice **12** — P0 shell founder review (blocked until explicit unblock).
-- Extend `p0-no-headless-final-state` route list with hiring-journey routes (Slice 13).
 - Alembic prod head verification runbook execution.
 
 ### 2 weeks
@@ -577,7 +576,7 @@ All must be true:
 | 3 | Recruiter inbox card dedup (#316) | FE UX | ✅ Shipped (Slice 4) |
 | 4 | Launch readiness plan + inbox truth (#315–#316) | Docs + FE | ✅ Shipped |
 | 5 | Alembic prod head verification | Ops | Pending |
-| 6 | **`p0-no-headless` + hiring-journey routes** (Slice 13) | Test | **Next recommended** |
+| 6 | **`p0-no-headless` + hiring-journey routes** (Slice 13) | Test | ✅ Shipped (36 routes) |
 | 7 | Microsoft busy-read staging enable | BE/FE | Checklist docs |
 | 8 | Board monitor → optional SoR stubs | FE registry | Low priority |
 | 9 | Phase 3B shell fix (Slice 12) | FE perf | **BLOCKED — founder review** |
@@ -719,4 +718,5 @@ export const DEFAULT_EXTERNAL_INVITES_SENT = 0;
 | Date | Change |
 |------|--------|
 | 2026-06-27 | Initial full application audit at scaffold `28d439b`; prod FE aligned; incorporates #311–#312 baseline + #313 pending |
+| 2026-06-28 | **Slice 13** — 5 hiring-journey routes in `p0-no-headless-final-state` (31 → 36); static guards 9/9; P0 **OPEN**; Phase 3B **BLOCKED** |
 | 2026-06-28 | **Reconciled post-#323** — SHAs (`dcacc9d` prod FE, `6d6d1e5` API, `7ad86c7` scaffold); Slices 3–11 marked shipped; Slice 12 blocked; Slice 13 next |

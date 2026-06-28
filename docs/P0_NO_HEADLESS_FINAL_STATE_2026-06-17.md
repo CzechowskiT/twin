@@ -40,14 +40,15 @@ Final state **passes** if the user sees:
 
 **Fix strategy in this PR:** sequential **one-page** browser smoke with `isChromeOnly` detection (sparse `main` + header/marquee present, no auth card). Route-level fixes only where a route lacks auth card, demo marker, or guided not-found.
 
-## Critical routes (29)
+## Critical routes (36)
 
 | Lane | Routes |
 | ---- | ------ |
 | Public | `/`, `/demo`, `/for-companies` |
-| Candidate | `/dashboard`, `/dashboard/jobs`, `/dashboard/matches`, `/profile`, `/dashboard/profile`, `/dashboard/cv` |
-| Recruiter | `/recruiter`, demo-candidate-001 (+ trust/team/communication/collaboration), demo-role-001 pipeline/team/tasks, `ats/import-readiness` |
-| Company | `/company/dashboard`, demo candidate surfaces, demo role pipeline/team/tasks, `ats/import-readiness` |
+| Candidate | `/dashboard`, `/dashboard/jobs`, `/dashboard/matches`, `/dashboard/trust`, `/dashboard/trust/controls`, `/profile`, `/dashboard/profile`, `/dashboard/cv`, `/dashboard/hiring-journey`, `/profile/hiring-journey` |
+| Recruiter | `/recruiter`, demo-candidate-001 (+ trust/team/communication/collaboration), demo-role-001 pipeline/team/tasks, `ats/import-readiness`, `/recruiter/hiring-journey` |
+| Company | `/company/dashboard`, demo candidate surfaces, demo role pipeline/team/tasks, `ats/import-readiness`, `/company/hiring-journey` |
+| Board | `/board/hiring-journey` |
 
 Inventory: `frontend/e2e/helpers/p0-no-headless-final-state.ts`
 
@@ -56,7 +57,7 @@ Inventory: `frontend/e2e/helpers/p0-no-headless-final-state.ts`
 | Artifact | Path |
 | -------- | ---- |
 | Shared evaluator | `frontend/e2e/helpers/p0-no-headless-final-state.ts` |
-| Static guards (8) | `frontend/scripts/p0-no-headless-final-state.test.ts` |
+| Static guards | `frontend/scripts/p0-no-headless-final-state.test.ts` |
 | Browser smoke | `frontend/e2e/p0-no-headless-final-state-browser.spec.ts` |
 
 ### Commands
@@ -112,6 +113,6 @@ Merge only if changes are **tests + route-level fixes** without touching `Lightw
 
 | Label | Meaning |
 | ----- | ------- |
-| P0 headless guard **PASS** | All 29 routes pass sequential browser smoke |
+| P0 headless guard **PASS** | All 36 routes pass sequential browser smoke |
 | Phase 3B | **BLOCKED** |
 | Public launch | **NO-GO** (unchanged) |

@@ -467,7 +467,7 @@ Ordered by dependency and safety — autonomous batches allowed:
 1. **Merge PR #314** — full application audit (docs-only); complements launch readiness plan.
 2. Re-capture §2 SHAs after this operating context refresh merges (`docs_only_drift: true` → acceptable).
 3. Prod hiring-journey browser smoke after FE deploy: `PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app npm run test:hiring-journey-browser`.
-4. **Slice 13** (prep only) — add 5 hiring-journey routes to `p0-no-headless` list; gated browser, no default CI.
+4. ~~**Slice 13** (prep only) — add 5 hiring-journey routes to `p0-no-headless` list; gated browser, no default CI.~~ ✅ Shipped — 36 routes.
 5. Staging Microsoft busy-read smoke when operator JWT available — **do not flip prod gates**.
 6. Founder authenticated prod persistence smoke re-run with JWT ([AUTHENTICATED_PROD_PERSISTENCE_SMOKE_2026-06-19.md](./AUTHENTICATED_PROD_PERSISTENCE_SMOKE_2026-06-19.md)).
 7. Alembic prod head read-only re-check (`050_stripe_webhook_events` / `068_placement_events_foundation`).

@@ -45,8 +45,8 @@ Do not claim “P0 fixed”, “performance solved”, or launch-ready performan
 | `/board/persistence-operations-monitor` | Multi-channel fetch aggregate | [P0_PERFORMANCE_SAFE_EVIDENCE_2026-06-24.md](./P0_PERFORMANCE_SAFE_EVIDENCE_2026-06-24.md) | Fetch fan-out | **YES** | API latency budget for live persistence fan-out | Medium |
 | Placement verification (4 personas) | Timeline fetch on mount | Lazy `dynamic()` timeline — shipped (#247–#251) | Network | Partial | Verify no polling regressions | Low |
 | 89-logo marketing marquee | Renderer pressure if leaked to workspace/auth | `frontend/scripts/p0-performance-guardrails.test.ts`, `PerformanceSafeMovingLogoMarquee` | Animation / DOM | **YES** if regresses | Keep guardrails on CI | Medium |
-| `p0-no-headless-final-state` (31 routes) | Sequential browser ~6–15 min; auth shell OK | `frontend/e2e/p0-no-headless-final-state-browser.spec.ts`, timeout 900s | Browser smoke | **YES** | Prod smoke with flags post-deploy | Medium |
-| Hiring Journey (5 routes) | In route-weight inventory (Batch 1); browser smoke still gated | [HIRING_JOURNEY_TIMELINE_2026-06-25.md](./HIRING_JOURNEY_TIMELINE_2026-06-25.md), [TWIN_OPERATING_CONTEXT_2026-06-26.md](./TWIN_OPERATING_CONTEXT_2026-06-26.md) | Route weight | No (availability OK) | Optional gated browser smoke post-deploy | Low–medium |
+| `p0-no-headless-final-state` (36 routes) | Sequential browser ~7–18 min; auth shell OK | `frontend/e2e/p0-no-headless-final-state-browser.spec.ts`, timeout 900s | Browser smoke | **YES** | Prod smoke with flags post-deploy | Medium |
+| Hiring Journey (5 routes) | In route-weight inventory (Batch 1) **and** p0-no-headless (Slice 13); browser smoke still gated | [HIRING_JOURNEY_TIMELINE_2026-06-25.md](./HIRING_JOURNEY_TIMELINE_2026-06-25.md), [TWIN_OPERATING_CONTEXT_2026-06-26.md](./TWIN_OPERATING_CONTEXT_2026-06-26.md) | Route weight | No (availability OK) | Optional gated browser smoke post-deploy | Low–medium |
 | Lighthouse budgets | No signed-off numbers | [P0_PERFORMANCE_SAFE_EVIDENCE_2026-06-24.md](./P0_PERFORMANCE_SAFE_EVIDENCE_2026-06-24.md) | Metrics | **YES** | Define budgets when Phase 3B unblocked | Medium |
 | Backend pytest ~325s | Slow CI | `docs/CTO_PRODUCT_TECH_AUDIT_2026-05-26.md` | CI duration | No (launch) | Parallelize pytest | Low |
 | `/status` Playwright | Cookie banner flake | `docs/RESPONSIVE_QA_MATRIX_2026-05-29.md` | Flaky test | No | Strict mode fix | Low |
@@ -69,7 +69,7 @@ Do not claim “P0 fixed”, “performance solved”, or launch-ready performan
 | Script | Duration (approx.) |
 |--------|-------------------|
 | `test:hiring-journey-browser` | ~2–3 min (5 routes × `SETTLE_MS=12_000`, timeout 120s/test) |
-| `test:p0-no-headless-final-state-browser` | ~6–15 min (31 routes × 12s settle, timeout 900s) |
+| `test:p0-no-headless-final-state-browser` | ~7–18 min (36 routes × 12s settle, timeout 900s) |
 | Phase 3B local (blocked) | ~4.6 min documented |
 
 ---
@@ -100,7 +100,7 @@ Do not claim “P0 fixed”, “performance solved”, or launch-ready performan
 ### Performance risks (code inspection)
 
 1. **11 steps + cross-links + provenance drill-in** — moderate DOM; `useMemo` on `resolveHiringJourney` (OK).
-2. **In** `p0-route-weight-inventory` (Batch 1, 2026-06-27). **Not yet in** `p0-no-headless-final-state` (29–31 routes) or Phase 3B route batches (21 routes).
+2. **In** `p0-route-weight-inventory` (Batch 1, 2026-06-27) **and** `p0-no-headless-final-state` (Slice 13, 36 routes). **Not in** Phase 3B route batches (21 routes).
 3. **Browser spec** — `SETTLE_MS = 12_000` × 5 routes ≈ 2–3 min sequential smoke.
 4. **Board persona** — blocked state adds extra provenance blocks; monitor-only drill-in (no href churn).
 
@@ -131,6 +131,16 @@ Detail: [HIRING_JOURNEY_TRACEABILITY_2026-06-26.md](./HIRING_JOURNEY_TRACEABILIT
 5. Operating context §9 — no material blocker change (inventory only; P0 **OPEN**).
 
 **P0 performance remains OPEN** — Batch 1 does not close the gate.
+
+### Batch 1.5 — Slice 13: hiring journey → p0-no-headless (**covered**)
+
+**Scope:** static route inventory + guards only. **No Phase 3B, no default browser CI.**
+
+1. Add 5 hiring-journey routes to `frontend/e2e/helpers/p0-no-headless-final-state.ts` (31 → **36** routes; new `P0_CRITICAL_BOARD_ROUTES`).
+2. Extend `p0-no-headless-final-state.test.ts` — all 5 present, no dupes, hiring-journey page marker, browser gated, P0 OPEN / Phase 3B HARD BLOCKED.
+3. **No shell / gate / layout changes.**
+
+**P0 performance remains OPEN** — Slice 13 does not close the gate.
 
 ### Batch 2 — post-unblock Phase 3B (not now)
 
@@ -178,6 +188,14 @@ npm run test:performance-safe-moving-logo-marquee
 # Browser (gated — NOT default CI):
 # PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 npm run test:hiring-journey-browser
 ```
+
+---
+
+## Changelog
+
+| Date | Change |
+|------|--------|
+| 2026-06-28 | **Slice 13** — 5 hiring-journey routes added to `p0-no-headless-final-state` (31 → 36 routes); static guards 9/9; browser smoke remains gated; P0 **OPEN**; Phase 3B **HARD BLOCKED** |
 
 ---
 
