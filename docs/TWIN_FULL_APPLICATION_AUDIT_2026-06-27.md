@@ -5,10 +5,13 @@
 **Method:** Static code inspection, prod `public-health`, required guard scripts, no runtime mutations.
 
 **Related baselines:**
-- [TWIN_FEATURE_STATUS_AUDIT_2026-06-27.md](./TWIN_FEATURE_STATUS_AUDIT_2026-06-27.md) — persona module / SoR registry (#311, #312)
+- [TWIN_OPERATING_CONTEXT_2026-06-26.md](./TWIN_OPERATING_CONTEXT_2026-06-26.md) — canonical operator snapshot (#299–#323)
+- [TWIN_PUBLIC_LAUNCH_READINESS_PLAN_2026-06-27.md](./TWIN_PUBLIC_LAUNCH_READINESS_PLAN_2026-06-27.md) — Slices 4–11 shipped; Slice 12 blocked
+- [TWIN_FEATURE_STATUS_AUDIT_2026-06-27.md](./TWIN_FEATURE_STATUS_AUDIT_2026-06-27.md) — persona module / SoR registry (#311–#322)
 - [P0_PERFORMANCE_INVENTORY_2026-06-27.md](./P0_PERFORMANCE_INVENTORY_2026-06-27.md) — P0 performance gate (#304)
-- [TWIN_OPERATING_CONTEXT_2026-06-26.md](./TWIN_OPERATING_CONTEXT_2026-06-26.md) — operator snapshot (#299–#301)
 - [HIRING_JOURNEY_TRACEABILITY_2026-06-26.md](./HIRING_JOURNEY_TRACEABILITY_2026-06-26.md) — hiring journey (#291–#298)
+
+**Reconciliation (2026-06-28, PR #314 onto scaffold post-#323):** Original evidence captured at `28d439b` (2026-06-27). Sections below retain that static-inspection baseline; SHA tables, slice status, and resolved truthfulness items are updated to match operating context and launch plan — prod FE `dcacc9d` (Slice 11 / #322), API `6d6d1e5`, scaffold `7ad86c7` (#323), `docs_only_drift: true` acceptable.
 
 ---
 
@@ -24,10 +27,10 @@ TWIN is a **Phase 1 MVP monorepo** with a large, honest frontend surface (230 ro
 | 2 | **P0 performance OPEN** — no Phase 3B proof, Playwright default OFF | **BLOCKED** | Hard gate |
 | 3 | **Phase 3B multitab HARD BLOCKED** (founder STOP) | **BLOCKED** | Hard gate |
 | 4 | **Auto-apply / delegated apply PAUSED** — beat may show OK; submission not live | **BLOCKED** | Hard gate |
-| 5 | Prod FE **aligned** with scaffold (`28d439b`); API at `6d6d1e5` (expected drift) | **WORKING** | Ops OK |
+| 5 | Prod FE **`dcacc9d`** (#322); API **`6d6d1e5`** (expected drift); scaffold **`7ad86c7`** (#323 docs) | **WORKING** | Ops OK; `docs_only_drift` acceptable |
 | 6 | SoR registry **reconciled** (#312): 83 entries incl. pipeline/calendar/career compass | **WORKING** | QA improved |
-| 7 | **Company dashboard SoR live without `hintKey`** — Slice 3 (#313) open | **MISLEADING_OR_RISKY** | Medium |
-| 8 | Recruiter **3 workspace cards → same inbox URL** (notes/scheduling/audit) | **MISLEADING_OR_RISKY** | Medium |
+| 7 | **Company SoR token hints** — Slice 3 (#313) **shipped** (`86c8c1b`) | **WORKING** | Resolved post-audit |
+| 8 | Recruiter inbox duplicate cards — Slice 4 (#316) **shipped**; marketing bounded (#322) | **WORKING** | Resolved post-audit |
 | 9 | **Microsoft calendar write/busy-read disabled** in prod health | **PILOT_LIMITED** | Corporate calendar gap |
 | 10 | **Market coverage 6%** — scrape beat OK but thin inventory | **PILOT_LIMITED** | Product depth |
 
@@ -37,14 +40,15 @@ TWIN is a **Phase 1 MVP monorepo** with a large, honest frontend surface (230 ro
 
 ## 2. Source of Truth / SHA / Environment Snapshot
 
-### Git capture (2026-06-27, audit run)
+### Git capture (2026-06-27 original; reconciled 2026-06-28 post-#323)
 
 | Field | Value |
 |-------|-------|
-| **Branch** | `cursor/phase1-monorepo-scaffold` (base); audit PR from `docs/full-application-audit-2026-06-27` |
-| **repo_head** | `28d439b581ff08234dee46ac0c4fcfe9957ce95f` (`28d439b`) |
-| **Working tree** | Clean at audit start |
-| **Recent merges** | #312 SoR reconcile, #311 feature audit, #310 landing auth e2e, #309 auth reconcile |
+| **Branch** | `cursor/phase1-monorepo-scaffold` (base); audit PR #314 from `docs/full-application-audit-2026-06-27` |
+| **repo_head (scaffold)** | `7ad86c7eafc42878726bd643c8fbd50753c3af60` (`7ad86c7`, PR #323 operating-context refresh) |
+| **Original audit HEAD** | `28d439b581ff08234dee46ac0c4fcfe9957ce95f` (`28d439b`, 2026-06-27 static inspection) |
+| **Working tree** | Clean at reconcile |
+| **Recent merges** | #323 operating context; #315–#322 Slices 4–11; #313 Slice 3; #311–#312 feature/SoR audits |
 
 ### Production (`GET https://twin-sooty.vercel.app/api/public-health`)
 
@@ -52,9 +56,9 @@ TWIN is a **Phase 1 MVP monorepo** with a large, honest frontend surface (230 ro
 |-------|-------|
 | **status** | `ok` |
 | **db_ok** | `true` |
-| **prod_frontend_commit** | `28d439b581ff08234dee46ac0c4fcfe9957ce95f` |
+| **prod_frontend_commit** | `dcacc9d5c7fc30d56593994babd3e50a8d1aa863` (`dcacc9d`, PR #322 Slice 11) |
 | **prod_api_commit** | `6d6d1e54f85f8f00fe1727f32cef700e9c2a20aa` (`6d6d1e5`) |
-| **alignment_status** | **Frontend ALIGNED** with repo_head; **API expected drift** (frontend/docs batches #287–#312) |
+| **alignment_status** | **Frontend ALIGNED** with prod at `dcacc9d`; scaffold **`7ad86c7`** docs-only ahead (`docs_only_drift: true`, acceptable); **API expected drift** (#309–#322 frontend-only) |
 | **validated_jobs** | 652 |
 | **market_coverage_progress_pct** | 6 |
 | **stripe_checkout_ready** | true |
@@ -93,7 +97,7 @@ TWIN is a **Phase 1 MVP monorepo** with a large, honest frontend surface (230 ro
 | Calendar | `/dashboard/calendar` | **READ_ONLY_WORKING** | Google OAuth read; no recruiter sync |
 | Applications | `/dashboard/applications` | **READ_ONLY_WORKING** | Transparency; auto-apply paused |
 | Auto-apply | `/dashboard#auto-apply-readiness` | **BLOCKED** | Ops pause; `paused` badge |
-| Trust center (11 routes) | `/dashboard/trust/*`, `/profile/trust/*` | **PILOT_LIMITED** | SoR-only; boundary tags |
+| Trust center (11 routes) | `/dashboard/trust/*`, `/profile/trust/*` | **PILOT_LIMITED** | SoR-only; Slice 7 (#318) adds workspace `trust_center` card |
 | Hiring journey | `/dashboard/hiring-journey` | **READ_ONLY_WORKING** | Preview only; 25/25 static tests |
 
 ### Recruiter (15 workspace cards + 23 SoR entries)
@@ -105,7 +109,7 @@ TWIN is a **Phase 1 MVP monorepo** with a large, honest frontend surface (230 ro
 | Jobs / Search | `/recruiter/jobs`, `/recruiter/search` | **WORKING** | Workspace pool search |
 | Calendar | `/recruiter/calendar` | **BLOCKED** | `not_live`; in SoR post-#312 |
 | Trust review queue | `/recruiter/trust-review-queue` | **PILOT_LIMITED** | Demo queue |
-| Notes / Scheduling / Audit cards | all → `/recruiter/inbox` | **MISLEADING_OR_RISKY** | Three cards, one URL |
+| Notes / Scheduling / Audit cards | collapsed post-#316 (Slice 4) | **WORKING** | Duplicate inbox cards removed |
 | Integrations / Talent radar | various | **PILOT_LIMITED** | `no_ats_sync`, `no_outreach` |
 
 ### Company (9 workspace cards + 18 SoR entries)
@@ -115,8 +119,8 @@ TWIN is a **Phase 1 MVP monorepo** with a large, honest frontend surface (230 ro
 | Roles / Pipeline | `/company/roles`, `/company/pipeline` | **WORKING** | Pipeline in SoR post-#312 |
 | Hiring cockpit / command center | demo journeys | **PILOT_LIMITED** | `no_ats_sync` |
 | Billing | `/company/billing` | **BLOCKED** | Honest `not_live` |
-| Dashboard SoR | `company_dashboard` | **MISLEADING_OR_RISKY** | Live badge, **no `hintKey`** (#313 pending) |
-| Settings card | → `/company/dashboard` | **BLOCKED** | `needs_setup` orphan |
+| Dashboard SoR | `company_dashboard` | **WORKING** | `hintKey` on all live company SoR modules post-#313 (Slice 3) |
+| Settings card | removed post-#320 (Slice 9) | **WORKING** | Orphan card removed; dashboard via SoR only |
 
 ### Investor / Board (6+2 workspace + 19 SoR + 13 board pages)
 
@@ -156,15 +160,13 @@ Added SoR entries aligned with workspace-only routes:
 
 **Static guards:** `test:system-of-record-navigation-hub` — **17/17 PASS** including reconciled workspace-only modules assertion.
 
-### Remaining registry gaps
+### Remaining registry gaps (post-#322)
 
 | Gap | Risk | Class |
 |-----|------|-------|
-| `company_dashboard` live without `hintKey` | Scope/token expectations unclear | **MISLEADING_OR_RISKY** |
-| Recruiter inbox duplicate cards (WS only) | Three modules → one href | **MISLEADING_OR_RISKY** |
 | 7 board monitor routes not in SoR | Ops monitors invisible to SoR QA | **PILOT_LIMITED** (acceptable) |
-| Candidate trust (11 routes) not in WS grid | Split navigation surfaces | **PILOT_LIMITED** |
-| PR #313 (Slice 3 company hints) | **OPEN** — adds tenant/token hints | Pending |
+| Slice **12** (P0 shell founder review) | **BLOCKED** — no Phase 3B until unblock | **BLOCKED** |
+| Slice **13** (`p0-no-headless` + hiring-journey routes) | Next safe-lane prep | Planned |
 
 ### Hub wiring
 
@@ -205,7 +207,7 @@ SoR hub pages wired for all personas (`test:system-of-record-navigation-hub` tes
 | Auto-apply | Service + nightly sweep code present | **BLOCKED** for public — readiness gates in tests |
 | CI smoke subset | 8 pytest modules in `smoke.yml` | ~subset of full ~547 backend test files |
 
-**API drift:** Backend at `6d6d1e5` while FE at `28d439b` — expected after frontend-only PRs; no evidence of broken contract on audited routes.
+**API drift:** Backend at `6d6d1e5` while prod FE at `dcacc9d` — expected after frontend-only PRs #309–#322; no evidence of broken contract on audited routes.
 
 ---
 
@@ -443,11 +445,11 @@ CI prod-health job runs on scaffold push after build + backend smoke.
 | `LAUNCH_STANCE = "noGo"` on investor metrics | **WORKING** | Honest launch stance marker |
 | Workspace status badges | **WORKING** | live/pilot/not_live/paused/planned |
 | SoR boundary badges | **WORKING** | pilot, draft_only, not_live, no_outreach, etc. |
-| Recruiter duplicate inbox cards | **MISLEADING_OR_RISKY** | Needs UX collapse or distinct anchors |
-| Company dashboard live without hint | **MISLEADING_OR_RISKY** | #313 pending |
-| Investor product proof "live" | **PILOT_LIMITED** | Boundary tags present — easy to over-read |
+| Recruiter duplicate inbox cards | **WORKING** | Collapsed in #316 (Slice 4) |
+| Company dashboard live without hint | **WORKING** | #313 (Slice 3) shipped |
+| Investor product proof "live" | **WORKING** | Slice 10 (#321) — `sorHubHint` + bounded copy |
 | Hiring journey "scheduled/sent" copy | **WORKING** | Negative live-action guard (#296) |
-| Marketing north star copy | **READ_ONLY_WORKING** | Calendar-of-acceptance framing |
+| Marketing north star copy | **WORKING** | Slice 11 (#322) — prepare-only / human-decision language |
 
 ---
 
@@ -497,7 +499,7 @@ No automated Dependabot gate verified in this audit.
 | Microsoft calendar corporate | **NOT READY** | Flags false in prod | Medium |
 | Market depth | **6%** | coverage_pct | Medium |
 | Legal/compliance sign-off | **NOT AUDITED** | Partial trust center | Medium |
-| SoR registry completeness | **IMPROVED** | #312 merged | No (Slice 3 hints pending) |
+| SoR registry completeness | **IMPROVED** | #312–#322 Slices 2–11 shipped | No (Slice 12 blocked) |
 | CI full pytest | **PARTIAL** | Subset in smoke.yml | Low |
 
 **Launch verdict: NO-GO** — multiple hard gates OPEN.
@@ -510,8 +512,8 @@ No automated Dependabot gate verified in this audit.
 |----|------|------------|--------|------------|
 | R1 | Phase 3B false PASS via shell skeleton | Medium | High | Founder review shell; keep BLOCKED |
 | R2 | Stale JWT UX regression | Low | Medium | #309/#310 tests + e2e |
-| R3 | SoR live badge without scope hint | Medium | Medium | Merge #313 Slice 3 |
-| R4 | Duplicate recruiter inbox cards | Medium | Low | UX collapse PR |
+| R3 | SoR live badge without scope hint | Low | Medium | **Closed** — #313 Slice 3 shipped |
+| R4 | Duplicate recruiter inbox cards | Low | Low | **Closed** — #316 Slice 4 shipped |
 | R5 | Auto-apply accidental enable | Low | Critical | Readiness gates; ops pause |
 | R6 | API/FE SHA drift hides migration lag | Medium | High | Alembic prod verification |
 | R7 | XSS token theft (localStorage JWT) | Low | High | Future httpOnly session |
@@ -525,14 +527,14 @@ No automated Dependabot gate verified in this audit.
 
 ### 48 hours (docs + safe guards)
 
-- Merge this full audit + #313 company hints if CI green on code PR.
-- Reconcile operating context SHA to `28d439b`.
-- Run gated `test:landing-auth-shell-browser` locally if auth UX touched.
+- Merge this full audit (#314) reconciled post-#323.
+- Operating context at `7ad86c7`; prod FE remains `dcacc9d` until next deploy (`docs_only_drift` acceptable).
+- **Next:** Slice **13** — add 5 hiring-journey routes to `p0-no-headless` list (prep only; no Phase 3B).
 
 ### 1 week
 
-- Collapse or re-badge recruiter inbox duplicate cards.
-- Extend `p0-no-headless-final-state` route list with hiring-journey routes.
+- Slice **12** — P0 shell founder review (blocked until explicit unblock).
+- Extend `p0-no-headless-final-state` route list with hiring-journey routes (Slice 13).
 - Alembic prod head verification runbook execution.
 
 ### 2 weeks
@@ -543,9 +545,9 @@ No automated Dependabot gate verified in this audit.
 
 ### 4 weeks
 
-- Founder shell review → Phase 3B static guards only.
+- Founder shell review → Phase 3B static guards only (Slice 12).
 - Lighthouse budget draft for P0 routes.
-- Candidate trust center discoverability in workspace grid (read-only links).
+- Candidate trust center discoverability in workspace grid — **shipped** Slice 7 (#318).
 
 ### 8 weeks
 
@@ -568,18 +570,18 @@ All must be true:
 
 ## 24. First 10 Implementation Slices
 
-| # | Slice | Type | Depends on |
-|---|-------|------|------------|
-| 1 | **This full audit doc** | Docs | — |
-| 2 | **#313 company SoR token hints** | FE/i18n | Slice 2 (#312) ✅ |
-| 3 | Recruiter inbox card dedup / honest CTAs | FE UX | — |
-| 4 | Operating context SHA refresh | Docs | #312 merge |
-| 5 | Alembic prod head verification | Ops | Railway access |
-| 6 | `p0-no-headless` + hiring-journey routes | Test | None |
+| # | Slice | Type | Status |
+|---|-------|------|--------|
+| 1 | **This full audit doc** (#314) | Docs | ✅ Reconciled post-#323 |
+| 2 | **#313 company SoR token hints** | FE/i18n | ✅ Shipped (`86c8c1b`) |
+| 3 | Recruiter inbox card dedup (#316) | FE UX | ✅ Shipped (Slice 4) |
+| 4 | Launch readiness plan + inbox truth (#315–#316) | Docs + FE | ✅ Shipped |
+| 5 | Alembic prod head verification | Ops | Pending |
+| 6 | **`p0-no-headless` + hiring-journey routes** (Slice 13) | Test | **Next recommended** |
 | 7 | Microsoft busy-read staging enable | BE/FE | Checklist docs |
 | 8 | Board monitor → optional SoR stubs | FE registry | Low priority |
-| 9 | Phase 3B shell fix | FE perf | **Founder unblock** |
-| 10 | Phase 3B controlled browser (local → prod) | E2E | Slice 9 |
+| 9 | Phase 3B shell fix (Slice 12) | FE perf | **BLOCKED — founder review** |
+| 10 | Phase 3B controlled browser (local → prod) | E2E | **HARD BLOCKED** |
 
 ---
 
@@ -589,17 +591,18 @@ All must be true:
 
 ```
 Branch: cursor/phase1-monorepo-scaffold
-HEAD:   28d439b581ff08234dee46ac0c4fcfe9957ce95f
-Clean:  yes (at audit start)
+HEAD:   7ad86c7eafc42878726bd643c8fbd50753c3af60 (post-#323 reconcile)
+Original audit HEAD: 28d439b581ff08234dee46ac0c4fcfe9957ce95f (2026-06-27)
+Clean:  yes (at reconcile)
 ```
 
-### B. Production public-health (2026-06-27)
+### B. Production public-health (canonical at reconcile — prod FE `dcacc9d`)
 
 ```json
 {
   "status": "ok",
   "db_ok": true,
-  "frontend_commit": "28d439b581ff08234dee46ac0c4fcfe9957ce95f",
+  "frontend_commit": "dcacc9d5c7fc30d56593994babd3e50a8d1aa863",
   "api_commit": "6d6d1e54f85f8f00fe1727f32cef700e9c2a20aa",
   "validated_jobs": 652,
   "market_coverage_progress_pct": 6,
@@ -630,15 +633,18 @@ Clean:  yes (at audit start)
 | Company | 18 |
 | Investor | 19 |
 
-### E. PR trace (#309–#313)
+### E. PR trace (#309–#323)
 
 | PR | Title | State | SHA |
 |----|-------|-------|-----|
-| [#309](https://github.com/CzechowskiT/twin/pull/309) | Landing auth-shell reconcile | MERGED | `dbedcf0` |
-| [#310](https://github.com/CzechowskiT/twin/pull/310) | Landing auth-shell browser e2e | MERGED | `d8dfd1a` |
+| [#309](https://github.com/CzechowskiT/twin/pull/309) | Landing auth-shell reconcile | MERGED | `4226551` |
+| [#310](https://github.com/CzechowskiT/twin/pull/310) | Landing auth-shell browser e2e | MERGED | `ea8c1dc` |
 | [#311](https://github.com/CzechowskiT/twin/pull/311) | Feature status audit | MERGED | `57d9c92` |
 | [#312](https://github.com/CzechowskiT/twin/pull/312) | SoR registry reconcile Slice 2 | MERGED | `b43b135` |
-| [#313](https://github.com/CzechowskiT/twin/pull/313) | Company SoR token hints Slice 3 | **OPEN** | — |
+| [#313](https://github.com/CzechowskiT/twin/pull/313) | Company SoR token hints Slice 3 | MERGED | `86c8c1b` |
+| [#315](https://github.com/CzechowskiT/twin/pull/315)–[#322](https://github.com/CzechowskiT/twin/pull/322) | Launch readiness Slices 4–11 | MERGED | `dcacc9d` (prod FE) |
+| [#323](https://github.com/CzechowskiT/twin/pull/323) | Operating context refresh | MERGED | `7ad86c7` (scaffold) |
+| [#314](https://github.com/CzechowskiT/twin/pull/314) | Full application audit (this doc) | **This PR** | — |
 
 ### F. Verification commands (audit run)
 
@@ -704,7 +710,7 @@ export const DEFAULT_EXTERNAL_INVITES_SENT = 0;
 - No product / runtime / backend / API / auth / env / workflow changes
 - No Phase 3B, prod mutation, or broad browser stress
 - No launch GO, P0 closure, or Phase 3B unblock claims
-- No merging #313 — documented as OPEN follow-on
+- No Slice 12 execution without founder unblock
 
 ---
 
@@ -713,3 +719,4 @@ export const DEFAULT_EXTERNAL_INVITES_SENT = 0;
 | Date | Change |
 |------|--------|
 | 2026-06-27 | Initial full application audit at scaffold `28d439b`; prod FE aligned; incorporates #311–#312 baseline + #313 pending |
+| 2026-06-28 | **Reconciled post-#323** — SHAs (`dcacc9d` prod FE, `6d6d1e5` API, `7ad86c7` scaffold); Slices 3–11 marked shipped; Slice 12 blocked; Slice 13 next |
