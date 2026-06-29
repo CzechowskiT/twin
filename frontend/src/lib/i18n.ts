@@ -169,6 +169,7 @@ export type TranslationKey =
   | `strategic.${keyof typeof en.strategic}`
   | `jobBrief.${keyof typeof en.jobBrief}`
   | `marketingHowItWorks.${keyof typeof en.marketingHowItWorks}`
+  | `marketingCrosslinks.${keyof typeof en.marketingCrosslinks}`
   | `workspace.${keyof typeof en.workspace}`
   | `workspaceModules.${keyof typeof en.workspaceModules}`
   | `developers.${keyof typeof en.developers}`
@@ -2098,6 +2099,10 @@ const en = {
     scrapeOpsHint:
       "Set SCRAPE_OPS_EMAILS or SCRAPE_OPS_USER_IDS on the API, SCRAPE_WORKER_READY=true on the worker, and Redis for Celery. Monitor validated_jobs on /status. Full runbook: docs/SCRAPE_OPS.md in the repo.",
     authNote: "Write endpoints live under /api/v1/ with JWT from /auth/login or register.",
+  },
+  marketingCrosslinks: {
+    ariaLabel: "Related public pages",
+    heading: "Also explore",
   },
   marketingHowItWorks: {
     eyebrow: "How it works",
@@ -9703,6 +9708,10 @@ const pl: MessageTree = {
     scrapeOpsHint:
       "Ustaw SCRAPE_OPS_EMAILS lub SCRAPE_OPS_USER_IDS na API, SCRAPE_WORKER_READY=true na workerze i Redis dla Celery. Licznik ofert na /status. Runbook: docs/SCRAPE_OPS.md w repozytorium.",
     authNote: "Zapis pod /api/v1/ z JWT z /auth/login lub rejestracji.",
+  },
+  marketingCrosslinks: {
+    ariaLabel: "Powiązane strony publiczne",
+    heading: "Zobacz też",
   },
   marketingHowItWorks: {
     eyebrow: "Jak to działa",

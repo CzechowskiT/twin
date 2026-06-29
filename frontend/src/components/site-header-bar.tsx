@@ -167,7 +167,7 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
         </div>
 
         <nav
-          className="order-3 hidden min-w-0 flex-1 basis-full flex-nowrap items-center justify-center gap-x-3 overflow-x-auto overscroll-x-contain text-[13px] font-medium [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-x-4 sm:text-sm md:order-none md:flex md:basis-auto lg:gap-x-5 lg:text-[0.9375rem] [&::-webkit-scrollbar]:hidden"
+          className="order-3 hidden min-w-0 flex-1 flex-wrap items-center justify-center gap-x-3 gap-y-2 overflow-x-auto overscroll-x-contain text-[13px] font-medium [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-x-4 sm:text-sm md:order-none md:flex md:basis-auto lg:gap-x-5 lg:text-[0.9375rem] [&::-webkit-scrollbar]:hidden"
           aria-label={t("nav.ariaSiteNav")}
         >
           {personaLaneNav ? (

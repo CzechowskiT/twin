@@ -313,3 +313,4 @@ cd frontend && npm run build && npx tsc --noEmit
 | 2026-06-28 | Slice 18 completed — footer stable public sitemap: 9 links incl. `/for-investors` (marketing) + `/investor` (executive room) + `/dashboard/trust` + `/status`; removed persona-dependent footer explore; header (#326) + Explore TWIN (#330) unchanged |
 | 2026-06-28 | Slice 19 completed — Explore TWIN mega-panel in guest header (desktop dropdown + mobile sections); homepage panel 10 cards; padding regression guard; no Gate D browser / Phase 3B |
 | 2026-06-28 | Slice 20 completed — `/for-investors` vs `/investor` label/route separation hardened; fundraising CTAs → executive room + product proof + demo; public page container rhythm; static marketing consistency guard; Gate D/E **PENDING** |
+| 2026-06-28 | Slice 21 completed — founder-led demo cross-links on public marketing surfaces; mobile spacing guards; `test:founder-demo-crosslinks`; Gate D/E **PENDING** |

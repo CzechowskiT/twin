@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import { FaqPageSections } from "@/components/marketing/faq-panel";
+import { MarketingCrosslinksBand } from "@/components/marketing/marketing-crosslinks-band";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { ScrollReveal } from "@/components/marketing/scroll-reveal";
@@ -21,17 +22,12 @@ export default function FaqPage() {
         <ScrollReveal delayMs={0}>
           <MarketingPageHeader eyebrow={t("home.faqEyebrow")} title={t("site.faqPageTitle")} lead={t("site.faqPageLead")}>
             {metaLine ? <p className="text-sm text-[var(--twin-muted-strong)]">{metaLine}</p> : null}
-            <p className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-[var(--twin-muted-strong)]">
+            <p className="text-sm">
               <Link href="/" className="twin-link font-medium">
                 {t("site.faqMoreHome")}
               </Link>
-              <Link href="/demo" className="twin-link font-medium">
-                {t("nav.demo")}
-              </Link>
-              <Link href="/#explore-twin" className="twin-link font-medium">
-                {t("nav.exploreTwin")}
-              </Link>
             </p>
+            <MarketingCrosslinksBand page="faq" />
           </MarketingPageHeader>
         </ScrollReveal>
         <div className="mt-10">

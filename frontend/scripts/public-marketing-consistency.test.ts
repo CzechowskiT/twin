@@ -94,13 +94,17 @@ test("for-investors marketing page links to investor room, product proof, and de
   }
 });
 
-test("faq and how-it-works link back to demo or explore twin", () => {
+test("faq and how-it-works link back to demo, how-it-works, or explore twin via crosslinks band", () => {
   const faq = read("src/app/(marketing)/faq/page.tsx");
   const how = read("src/app/(marketing)/how-it-works/page.tsx");
-  assert.match(faq, /href="\/demo"/);
-  assert.match(faq, /href="\/#explore-twin"/);
-  assert.match(how, /href="\/demo"/);
-  assert.match(how, /href="\/#explore-twin"/);
+  const routes = read("src/lib/founder-demo-crosslinks-routes.ts");
+  assert.match(faq, /page="faq"/);
+  assert.match(how, /page="how-it-works"/);
+  for (const href of ["/demo", "/how-it-works", "/#explore-twin"]) {
+    assert.match(routes, new RegExp(`"${href.replace("/", "\\/")}"`));
+  }
+  assert.match(routes, /"how-it-works":[\s\S]*"\/faq"/);
+  assert.match(routes, /faq:[\s\S]*"\/how-it-works"/);
 });
 
 test("persona marketing CTAs stay lane-coherent — recruiter avoids B2B calculator", () => {
@@ -125,6 +129,7 @@ test("public marketing surfaces keep container rhythm", () => {
     "src/components/investor/executive-product-proof-board.tsx",
     "src/app/(marketing)/faq/page.tsx",
     "src/app/(marketing)/how-it-works/page.tsx",
+    "src/components/marketing/founder-led-demo-flow.tsx",
     "src/app/(marketing)/status/page.tsx",
   ];
   for (const path of paths) {

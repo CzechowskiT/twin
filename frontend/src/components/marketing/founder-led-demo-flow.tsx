@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { useTranslation } from "@/components/language-provider";
+import { MarketingCrosslinksBand } from "@/components/marketing/marketing-crosslinks-band";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { Shell } from "@/components/ui";
 import {
@@ -71,6 +72,7 @@ export function FounderLedDemoFlow() {
                 </Link>
               ))}
             </div>
+            <MarketingCrosslinksBand page="demo" className="pt-3" />
           </header>
 
           <section className="space-y-5" data-founder-led-demo="journey">

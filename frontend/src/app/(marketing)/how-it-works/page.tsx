@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { useTranslation } from "@/components/language-provider";
 import { HowItWorksPageContent } from "@/components/marketing/how-it-works-page-content";
+import { MarketingCrosslinksBand } from "@/components/marketing/marketing-crosslinks-band";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { MvpLiveStatsStrip } from "@/components/marketing/mvp-live-stats-strip";
@@ -21,17 +22,15 @@ export default function HowItWorksPage() {
           title={t("marketingHowItWorks.title")}
           lead={t("marketingHowItWorks.lead")}
         >
-          <div className="flex flex-wrap gap-3 pt-2">
+          <div className="flex flex-wrap gap-3 gap-y-2 pt-2">
             <Link href="/register/candidate" className="section-cta-primary marketing-btn-primary-shadow twin-touch-target">
               {t("marketingHowItWorks.ctaStart")}
             </Link>
             <Link href="/demo" className="section-cta-secondary twin-touch-target">
               {t("marketingHowItWorks.ctaDemo")}
             </Link>
-            <Link href="/#explore-twin" className="section-cta-secondary twin-touch-target">
-              {t("nav.exploreTwin")}
-            </Link>
           </div>
+          <MarketingCrosslinksBand page="how-it-works" className="pt-3" />
         </MarketingPageHeader>
         <div className="mt-10">
           <MvpLiveStatsStrip />

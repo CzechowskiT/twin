@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 
 import { useTranslation } from "@/components/language-provider";
+import { MarketingCrosslinksBand } from "@/components/marketing/marketing-crosslinks-band";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { SystemOfRecordNavigationHub } from "@/components/workspace/system-of-record-navigation-hub";
 import { WorkspaceModuleGrid } from "@/components/workspace/workspace-module-grid";
@@ -109,6 +110,7 @@ export function InvestorRoomPage() {
             </h1>
             <p className="max-w-3xl text-lg font-medium text-[var(--twin-fg)]">{t("investorRoom.thesis")}</p>
             <p className="max-w-3xl text-base leading-relaxed text-[var(--twin-muted-strong)]">{t("investorRoom.lead")}</p>
+            <MarketingCrosslinksBand page="investor" className="pt-2" />
           </header>
 
           <div
