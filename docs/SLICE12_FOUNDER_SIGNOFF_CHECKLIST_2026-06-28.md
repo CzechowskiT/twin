@@ -9,6 +9,7 @@
 - [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md)
 - [gate-d-prod-browser-smoke-decision-2026-06-28.md](./gate-d-prod-browser-smoke-decision-2026-06-28.md)
 - [gate-d-prod-browser-smoke-preflight-2026-06-28.md](./gate-d-prod-browser-smoke-preflight-2026-06-28.md)
+- [GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md)
 - [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md)
 - [P0_NO_HEADLESS_FINAL_STATE_2026-06-17.md](./P0_NO_HEADLESS_FINAL_STATE_2026-06-17.md)
 - [PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md](./PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md)
@@ -121,6 +122,7 @@ PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 PLAYWRIGHT_ENABLE_WEBSERVER=1 \
 - **Prerequisites:** Gate B = YES (shell fix merged), Gate C = YES (local browser PASS on 36 P0 routes).
 - Phase 3B remains **HARD BLOCKED** until Gate E is explicitly marked **YES**.
 - **Prerequisites package:** [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) — **not executed**.
+- **Founder decision package:** [GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) — **PENDING** — requires explicit **Gate E = YES** before Phase 3B.
 - Gate E does **NOT** close P0 — prod Phase 3B PASS + RSS validation still required.
 - Gate E does **NOT** approve public launch.
 
@@ -138,7 +140,7 @@ Reference: [PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md](./PHASE3B_CO
 | **B** | Implementation branch approved (`LightweightRouteShell` / `PersonaWorkspaceGate`)? | **YES** | Minimal fix branch merged; §9 static gates passed |
 | **C** | Gated local browser validation approved? | **YES** (local only) | **PASS** 36/36 — prod browser still **blocked** until Gate D |
 | **D** | Production smoke boundary approved? | **YES** | **PASS** 36/36 prod — [gate-d result](./gate-d-prod-browser-smoke-result-2026-06-28.md) |
-| **E** | Phase 3B controlled multitab approved? | **PENDING** | Gated browser per Phase 3B doc (20 routes, workers=1) — requires separate Gate E = YES |
+| **E** | Phase 3B controlled multitab approved? | **PENDING** | [GATE_E founder decision package](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) — gated browser per Phase 3B doc (20 routes, workers=1) — requires separate Gate E = YES |
 | **F** | Launch-gate re-audit approved? | **PENDING** | Re-run launch gate checklist; still requires separate founder GO for public launch |
 
 **Founder note (2026-06-29):** Gate B merged (PR #332); Gate C **YES** — local browser **36/36 PASS** ([evidence](./gate-c-browser-validation-result-2026-06-28.md)); Gate D **YES** — prod browser **36/36 PASS** ([result](./gate-d-prod-browser-smoke-result-2026-06-28.md)). **No Phase 3B**, **no P0 closure**. Gate E/F remain **PENDING**.
@@ -300,6 +302,8 @@ cd frontend && \
 **Gate C browser (local):** **PASS** 36/36 — see [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md).
 
 **Gate D prod browser:** **PASS** 36/36 — [gate-d-prod-browser-smoke-result-2026-06-28.md](./gate-d-prod-browser-smoke-result-2026-06-28.md).
+
+**Gate E founder decision package:** [GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) — **PENDING**, Phase 3B **not executed**.
 
 **Gate E prerequisites package:** [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) — **PENDING**, Phase 3B **not executed**.
 

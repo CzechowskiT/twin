@@ -212,21 +212,42 @@ test("14 gate d preflight — no Phase 3B; Gate E cannot run by default; no CI b
   assert.doesNotMatch(smokeWorkflow, /playwright test/i);
 });
 
-test("15 readiness consistency lock — decision docs aligned on NO-GO / P0 OPEN / Gate D/E PENDING", () => {
+test("15 readiness consistency lock — decision docs aligned; Gate D PASS allowed in post-pass docs", () => {
   const pkg = read("package.json");
   assert.match(pkg, /test:readiness-consistency-lock/);
 
-  const decisionDocs = [
-    "docs/gate-d-prod-browser-smoke-decision-2026-06-28.md",
-    "docs/gate-e-phase3b-prerequisites-decision-2026-06-28.md",
+  const postPassDocs = [
     "docs/LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md",
     "docs/SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md",
+    "docs/GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md",
   ];
-  for (const doc of decisionDocs) {
+  for (const doc of postPassDocs) {
     const content = readRepo(doc);
     assert.match(content, /NO-GO/i, doc);
     assert.match(content, /P0.*OPEN/i, doc);
-    assert.match(content, /Gate D.*PENDING/i, doc);
+    assert.match(content, /Gate D.*YES/i, doc);
     assert.match(content, /Gate E.*PENDING/i, doc);
+    assert.match(content, /Phase 3B.*(NOT RUN|HARD BLOCKED|not run)/i, doc);
   }
+
+  const historicalGateD = readRepo("docs/gate-d-prod-browser-smoke-decision-2026-06-28.md");
+  assert.match(historicalGateD, /Gate D.*PENDING/i);
+});
+
+test("16 gate e founder decision package — PENDING, references Gate D PASS, command not default CI", () => {
+  const gateEPackage = readRepo("docs/GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md");
+  assert.match(gateEPackage, /Gate E.*PENDING/i);
+  assert.match(gateEPackage, /gate-d-prod-browser-smoke-result-2026-06-28\.md/);
+  assert.match(gateEPackage, /36\/36 PASS/i);
+  assert.match(gateEPackage, /Phase 3B.*(NOT RUN|HARD BLOCKED)/i);
+  assert.match(gateEPackage, /test:phase3b-controlled-multitab-prod/);
+  assert.match(gateEPackage, /PLAYWRIGHT_ALLOW_PROD_SMOKE=1/);
+
+  const pkg = read("package.json");
+  assert.match(pkg, /test:gate-e-founder-decision-package/);
+  assert.match(pkg, /test:e2e.*DISABLED/i);
+  assert.doesNotMatch(pkg, /"test":\s*"playwright test"/);
+
+  const smokeWorkflow = readRepo(".github/workflows/smoke.yml");
+  assert.doesNotMatch(smokeWorkflow, /phase3b-controlled-multitab/);
 });

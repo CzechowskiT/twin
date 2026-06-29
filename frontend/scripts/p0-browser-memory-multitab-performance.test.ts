@@ -359,10 +359,18 @@ test("17 gate d prod result — PASS recorded, stance blocked, no launch GO clai
   assert.match(launchStance, /LAUNCH_STANCE\s*=\s*"noGo"/);
 });
 
-test("18 gate e prerequisites — explicit approval required, Gate D before E, no default execution", () => {
+test("18 gate e prerequisites and founder package — explicit approval required, Gate D before E", () => {
   const gateE = readFileSync(join(root, "..", "docs", "gate-e-phase3b-prerequisites-decision-2026-06-28.md"), "utf8");
+  const gateEPackage = readFileSync(
+    join(root, "..", "docs", "GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md"),
+    "utf8",
+  );
   assert.match(gateE, /Gate E.*PENDING/i);
   assert.match(gateE, /Gate D.*PASS/i);
+  assert.match(gateEPackage, /Gate E.*PENDING/i);
+  assert.match(gateEPackage, /gate-d-prod-browser-smoke-result-2026-06-28\.md/);
+  assert.match(gateEPackage, /36\/36 PASS/i);
+  assert.match(gateEPackage, /Phase 3B.*(NOT RUN|HARD BLOCKED)/i);
   assert.match(gateE, /Phase 3B.*HARD BLOCKED/i);
   assert.match(gateE, /PLAYWRIGHT_ENABLE_BROWSER_TESTS=1/);
   assert.match(gateE, /PLAYWRIGHT_ALLOW_PROD_SMOKE=1/);
@@ -384,6 +392,9 @@ test("18 gate e prerequisites — explicit approval required, Gate D before E, n
   const p0Doc = readFileSync(join(root, "..", "docs", "P0_NO_HEADLESS_FINAL_STATE_2026-06-17.md"), "utf8");
   assert.match(p0Doc, /gate-e-phase3b-prerequisites-decision-2026-06-28/i);
   assert.match(p0Doc, /Phase 3B.*BLOCKED/i);
+
+  const pkgJson = read("package.json");
+  assert.match(pkgJson, /test:gate-e-founder-decision-package/);
 });
 
 test("20 readiness consistency lock — gate docs and npm script registered", () => {
