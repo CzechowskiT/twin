@@ -197,3 +197,18 @@ test("12 slice25 evidence index — exists, Phase 3B not run, no overclaims", ()
   const founderChecklist = readRepo("docs/FOUNDER_DEMO_CHECKLIST_2026-06-28.md");
   assert.match(founderChecklist, /Founder Demo Checklist/);
 });
+
+test("13 gate d preflight — does not permit Phase 3B; Gate D PENDING; no default CI browser", () => {
+  const preflight = readRepo("docs/gate-d-prod-browser-smoke-preflight-2026-06-28.md");
+  assert.match(preflight, /Gate D.*PENDING/i);
+  assert.match(preflight, /Phase 3B.*HARD BLOCKED/i);
+  assert.match(preflight, /no Phase 3B|does not.*Phase 3B/i);
+  assert.doesNotMatch(preflight, /Phase 3B.*\*\*PASS\*\*/i);
+
+  const gateE = readRepo("docs/gate-e-phase3b-prerequisites-decision-2026-06-28.md");
+  assert.match(gateE, /Gate E.*PENDING/i);
+  assert.match(gateE, /does NOT approve Gate E/i);
+
+  const smokeWorkflow = readRepo(".github/workflows/smoke.yml");
+  assert.doesNotMatch(smokeWorkflow, /playwright test/i);
+});

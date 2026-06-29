@@ -173,7 +173,9 @@ All must be true **before** executing §4:
 
 ## 7. Result Template
 
-Copy-paste and fill after Gate D execution (only if founder approved §8):
+Copy-paste and fill after Gate D execution (only if founder approved §8).
+**Blank template:** [gate-d-prod-browser-smoke-result-template-2026-06-28.md](./gate-d-prod-browser-smoke-result-template-2026-06-28.md)
+**Preflight runbook:** [gate-d-prod-browser-smoke-preflight-2026-06-28.md](./gate-d-prod-browser-smoke-preflight-2026-06-28.md)
 
 ```
 Gate D Production Browser Smoke — Result Record
@@ -320,6 +322,8 @@ Re-offer Gate D decision package when founder ready.
 - **Gate E / Phase 3B:** remains **PENDING / HARD BLOCKED**
 - **Gate D prod browser:** **NOT EXECUTED** in this package
 - **Default CI:** Playwright remains **DISABLED** in `smoke.yml`
+
+**Related (Slice 26):** [gate-d preflight runbook](./gate-d-prod-browser-smoke-preflight-2026-06-28.md) · [result template](./gate-d-prod-browser-smoke-result-template-2026-06-28.md) — Gate D remains **PENDING**.
 
 ---
 
