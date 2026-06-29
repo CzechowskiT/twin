@@ -22,7 +22,7 @@
 |------|--------|---------|
 | **Public launch** | **NO-GO** | No uncontrolled signup spike, LinkedIn/X/PressOn announcement, or “we’re live” marketing. Pilot/demo/investor flows only. |
 | **P0 performance** | **OPEN** | No Phase 3B proof, no signed Lighthouse budgets, no multitab/stress closure. See [P0_PERFORMANCE_SAFE_EVIDENCE_2026-06-24.md](./P0_PERFORMANCE_SAFE_EVIDENCE_2026-06-24.md). |
-| **Phase 3B controlled multitab** | **HARD BLOCKED** | Founder STOP. Test harness exists (PR #167) but **must not run** until shell fix + explicit unblock. See [PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md](./PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md). |
+| **Phase 3B controlled multitab** | **FAIL** — prod **0/20** ([gate-e result](./gate-e-phase3b-result-2026-06-28.md)); attempt 1 ABORTED_RESOURCE_SAFETY |
 | **Controlled pilot / demo** | **GO** (with constraints) | Named users, founder-watched. H5c/H5d recruiter cohort **HOLD**; external invites **0**. |
 | **Auto-apply / delegated apply** | **PAUSED / NOT LIVE** | Nightly beat may show OK on health; submission path not live for public. |
 
@@ -551,3 +551,4 @@ All preview surfaces — Hiring Journey, Scheduling Proposal Pack, marketing cop
 | 2026-06-29 | **Slice 30** — Gate D founder decision prompt [GATE_D_FOUNDER_DECISION_PROMPT_2026-06-28.md](./GATE_D_FOUNDER_DECISION_PROMPT_2026-06-28.md); `test:gate-d-founder-decision-prompt`; founder_decision **PENDING**; prod FE aligned `bb0957b3` post-#347; Gate D browser **not run**; Launch **NO-GO**; P0 **OPEN**; Gate D/E **PENDING**; Phase 3B **BLOCKED** |
 | 2026-06-29 | **Slice 32** — Gate D prod browser smoke **36/36 PASS** ([gate-d-prod-browser-smoke-result-2026-06-28.md](./gate-d-prod-browser-smoke-result-2026-06-28.md)); `test:gate-d-prod-browser-smoke-result`; prod FE aligned `1a7acc00`; Launch **NO-GO**; P0 **OPEN**; Gate D **YES/PASS**; Gate E **PENDING**; Phase 3B **NOT RUN** |
 | 2026-06-29 | **Slice 33** — Gate E founder decision package [GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) + result template; `test:gate-e-founder-decision-package`; Gate D **YES/PASS** prerequisite; Gate E **PENDING**; Phase 3B **NOT RUN**; Launch **NO-GO**; P0 **OPEN** |
+| 2026-06-29 | **Slice 34** — Gate E Phase 3B prod reattempt [gate-e result](./gate-e-phase3b-result-2026-06-28.md) **0/20 FAIL**; attempt 1 [ABORTED_RESOURCE_SAFETY](./gate-e-phase3b-attempt-1-aborted-resource-safety-2026-06-28.md); `test:gate-e-phase3b-result`; Launch **NO-GO**; P0 **OPEN**; Gate F **PENDING** |

@@ -120,9 +120,9 @@ PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 PLAYWRIGHT_ENABLE_WEBSERVER=1 \
 
 - Founder explicitly approves Phase 3B controlled multitab browser execution (20 routes, 3 batches 7+7+6).
 - **Prerequisites:** Gate B = YES (shell fix merged), Gate C = YES (local browser PASS on 36 P0 routes).
-- Phase 3B remains **HARD BLOCKED** until Gate E is explicitly marked **YES**.
-- **Prerequisites package:** [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) — **not executed**.
-- **Founder decision package:** [GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) — **PENDING** — requires explicit **Gate E = YES** before Phase 3B.
+- Phase 3B **executed FAIL** on prod — [gate-e result](./gate-e-phase3b-result-2026-06-28.md) **0/20**; attempt 1 [ABORTED_RESOURCE_SAFETY](./gate-e-phase3b-attempt-1-aborted-resource-safety-2026-06-28.md).
+- **Prerequisites package:** [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md).
+- **Founder decision package:** [GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md).
 - Gate E does **NOT** close P0 — prod Phase 3B PASS + RSS validation still required.
 - Gate E does **NOT** approve public launch.
 
@@ -140,10 +140,10 @@ Reference: [PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md](./PHASE3B_CO
 | **B** | Implementation branch approved (`LightweightRouteShell` / `PersonaWorkspaceGate`)? | **YES** | Minimal fix branch merged; §9 static gates passed |
 | **C** | Gated local browser validation approved? | **YES** (local only) | **PASS** 36/36 — prod browser still **blocked** until Gate D |
 | **D** | Production smoke boundary approved? | **YES** | **PASS** 36/36 prod — [gate-d result](./gate-d-prod-browser-smoke-result-2026-06-28.md) |
-| **E** | Phase 3B controlled multitab approved? | **PENDING** | [GATE_E founder decision package](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) — gated browser per Phase 3B doc (20 routes, workers=1) — requires separate Gate E = YES |
+| **E** | Phase 3B controlled multitab approved? | **YES (FAIL)** | [gate-e result](./gate-e-phase3b-result-2026-06-28.md) — **0/20 FAIL** prod multitab; [attempt 1](./gate-e-phase3b-attempt-1-aborted-resource-safety-2026-06-28.md) ABORTED_RESOURCE_SAFETY |
 | **F** | Launch-gate re-audit approved? | **PENDING** | Re-run launch gate checklist; still requires separate founder GO for public launch |
 
-**Founder note (2026-06-29):** Gate B merged (PR #332); Gate C **YES** — local browser **36/36 PASS** ([evidence](./gate-c-browser-validation-result-2026-06-28.md)); Gate D **YES** — prod browser **36/36 PASS** ([result](./gate-d-prod-browser-smoke-result-2026-06-28.md)). **No Phase 3B**, **no P0 closure**. Gate E/F remain **PENDING**.
+**Founder note (2026-06-29):** Gate B merged (PR #332); Gate C **YES** — local browser **36/36 PASS**; Gate D **YES** — prod browser **36/36 PASS**; Gate E **YES** — prod Phase 3B **0/20 FAIL** ([result](./gate-e-phase3b-result-2026-06-28.md), attempt 1 [ABORTED_RESOURCE_SAFETY](./gate-e-phase3b-attempt-1-aborted-resource-safety-2026-06-28.md)). **No P0 closure**. Gate F **PENDING**.
 
 ---
 

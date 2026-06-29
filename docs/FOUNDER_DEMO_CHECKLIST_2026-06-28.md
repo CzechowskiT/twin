@@ -30,7 +30,7 @@ Complete before sharing screen:
 | Launch stance | **NO-GO** | `LAUNCH_STANCE = "noGo"` |
 | P0 | **OPEN** | Do not claim closed |
 | Gate D | **PENDING** — prod browser not run | [founder checkpoint](./GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md) · [preflight runbook](./gate-d-prod-browser-smoke-preflight-2026-06-28.md) |
-| Gate E | **PENDING** — Phase 3B not run | |
+| Gate E | **YES / FAIL** — Phase 3B prod **0/20** | [gate-e result](./gate-e-phase3b-result-2026-06-28.md) |
 | Auto-apply | **PAUSED** | public-health / ops context |
 | Browser tab discipline | Single-tab demo path | No multitab stress |
 
@@ -77,7 +77,7 @@ Optional deep dives (only if time + audience fit): candidate dashboard preview, 
 |------------|-----|
 | launch-ready / production-ready for everyone | Launch **NO-GO** |
 | P0 closed / performance signed off | P0 **OPEN**; Gate D not run |
-| Phase 3B passed / multitab verified | Phase 3B **NOT RUN** |
+| Phase 3B passed / multitab verified | Phase 3B **FAIL** 0/20 — do not claim PASS |
 | live ATS writeback / ATS sync | **NOT LIVE** |
 | live outreach / email sent / campaigns running | **NOT LIVE** |
 | calendar writes / automatic scheduling sync | **NOT LIVE** in prod |
@@ -92,11 +92,11 @@ Optional deep dives (only if time + audience fit): candidate dashboard preview, 
 
 | Boundary | Status |
 |----------|--------|
-| **Gate D** | **PENDING** — no prod browser smoke yet — founder must answer [checkpoint §3](./GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md): **YES** / **NO** / **PENDING** |
-| **Gate E** | **PENDING** — Phase 3B **HARD BLOCKED** |
+| **Gate D** | **YES / PASS** — prod browser **36/36** — [gate-d result](./gate-d-prod-browser-smoke-result-2026-06-28.md) |
+| **Gate E** | **YES / FAIL** — Phase 3B prod **0/20** — [gate-e result](./gate-e-phase3b-result-2026-06-28.md) |
 | **Launch** | **NO-GO** |
 | **P0** | **OPEN** |
-| **Phase 3B** | **NOT RUN** — do not demo multitab proof |
+| **Phase 3B** | **FAIL** — do not demo multitab proof as PASS |
 | **Default CI browser** | **DISABLED** — not evidence of prod browser PASS |
 | **Microsoft calendar write** | **OFF** in prod |
 | **H5c/H5d external invites** | **HOLD** |
@@ -122,4 +122,4 @@ Full gate table: [LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md](./LAUNCH_READIN
 
 Static guard: `npm run test:launch-readiness-evidence-guard` · `npm run test:gate-d-founder-decision-checkpoint`
 
-**Public launch: NO-GO · P0: OPEN · Gate D/E: PENDING · Phase 3B: NOT RUN**
+**Public launch: NO-GO · P0: OPEN · Gate D: YES/PASS · Gate E: YES/FAIL · Phase 3B: FAIL (0/20)**

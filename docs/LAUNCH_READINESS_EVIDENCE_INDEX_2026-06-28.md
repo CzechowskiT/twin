@@ -18,9 +18,9 @@
 | **Gate B** | **YES** — minimal `LightweightRouteShell` / `PersonaWorkspaceGate` fix merged (PR #332 @ `62138dc`) |
 | **Gate C** | **YES** — local browser **36/36 PASS** (workers=1) — [gate-c result](./gate-c-browser-validation-result-2026-06-28.md) |
 | **Gate D** | **YES** — prod browser **36/36 PASS** (54.9s, workers=1) — [gate-d result](./gate-d-prod-browser-smoke-result-2026-06-28.md); [preflight runbook](./gate-d-prod-browser-smoke-preflight-2026-06-28.md) |
-| **Gate E** | **PENDING** — Phase 3B controlled multitab **not run** — [gate-e decision package](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) · [prerequisites](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) |
+| **Gate E** | **YES / FAIL** — Phase 3B prod reattempt **0/20** — [gate-e result](./gate-e-phase3b-result-2026-06-28.md) · [attempt 1 abort](./gate-e-phase3b-attempt-1-aborted-resource-safety-2026-06-28.md) |
 | **Gate F** | **PENDING** — production smoke boundaries / re-audit |
-| **Phase 3B** | **HARD BLOCKED** — founder STOP; no execution claim |
+| **Phase 3B** | **FAIL** — prod multitab executed; blank-or-no-content 20/20 |
 | **Code constant** | `LAUNCH_STANCE = "noGo"` in `frontend/src/lib/investor-metrics-reality.ts` |
 
 Controlled investor/founder demo is **supported** with explicit boundaries (§6–§7). Public launch messaging, uncontrolled signup spikes, and “we’re live” claims remain **forbidden**.
@@ -35,7 +35,7 @@ Controlled investor/founder demo is **supported** with explicit boundaries (§6�
 | **B** | Implementation branch approved? | **YES** | PR #332 @ `62138dcc986bb068e717a9dafee38f822e94c66` — shell/gate minimal fix merged |
 | **C** | Gated local browser validation? | **YES** | PR #333 + [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md) — **36/36 PASS**, 44.5s, workers=1 |
 | **D** | Gated prod browser smoke? | **YES** | [gate-d result](./gate-d-prod-browser-smoke-result-2026-06-28.md) — **36/36 PASS** on `https://twin-sooty.vercel.app`, 54.9s, workers=1 |
-| **E** | Phase 3B unblock? | **PENDING** | [gate-e decision package](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) — **not executed** |
+| **E** | Phase 3B unblock? | **YES / FAIL** | [gate-e result](./gate-e-phase3b-result-2026-06-28.md) — **0/20 FAIL** (reattempt); [attempt 1](./gate-e-phase3b-attempt-1-aborted-resource-safety-2026-06-28.md) ABORTED_RESOURCE_SAFETY |
 | **F** | Prod smoke boundaries / re-audit? | **PENDING** | Awaits Gate D/E evidence |
 
 **Pilot/demo GO does not imply public launch GO.**
@@ -160,6 +160,7 @@ Inventory sources:
 | `test:gate-d-pending-state-maintenance` | 11 | Gate D pending state maintenance lock (Slice 31) |
 | `test:gate-d-prod-browser-smoke-result` | 9 | Gate D prod browser smoke result guards (Slice 32) |
 | `test:gate-e-founder-decision-package` | 13 | Gate E founder decision package guards (Slice 33) |
+| `test:gate-e-phase3b-result` | 11 | Gate E Phase 3B prod result guards (Slice 34) |
 
 Full step-by-step founder script: [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUNDER_DEMO_CHECKLIST_2026-06-28.md).
 
@@ -172,8 +173,8 @@ Full step-by-step founder script: [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUND
 | **Public launch GO** | **NOT approved** |
 | **P0 closure** | **NOT approved** — remains **OPEN** |
 | **Gate D prod browser** | **EXECUTED PASS** — 36/36 — [result doc](./gate-d-prod-browser-smoke-result-2026-06-28.md) |
-| **Gate E Phase 3B** | **NOT run** — **HARD BLOCKED** |
-| **Phase 3B pass claim** | **Forbidden** — no prod/local Phase 3B execution signed off |
+| **Gate E Phase 3B** | **EXECUTED FAIL** — 0/20 — [result doc](./gate-e-phase3b-result-2026-06-28.md) |
+| **Phase 3B pass claim** | **Forbidden** — prod FAIL 0/20; not PASS |
 | **Default CI browser** | **DISABLED** — explicit env flags required |
 | **ATS writeback** | **NOT LIVE** |
 | **Outreach / email send** | **NOT LIVE** |
@@ -188,7 +189,7 @@ Full step-by-step founder script: [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUND
 ## 8. Required Next Decisions
 
 1. ~~**Gate D = YES**~~ → **DONE** — [gate-d result](./gate-d-prod-browser-smoke-result-2026-06-28.md) records **36/36 PASS** (2026-06-29).
-2. **Gate E = YES** → founder review after Gate D **PASS**; [gate-e decision package](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) + gated Phase 3B per §6 — **separate explicit YES required**.
+2. ~~**Gate E = YES**~~ → **DONE (FAIL)** — [gate-e result](./gate-e-phase3b-result-2026-06-28.md) records **0/20 FAIL** on prod multitab (2026-06-29 reattempt). Fix branch required before retry.
 3. **Gate F / launch re-audit** → only after Gate D/E evidence and P0 performance review.
 4. **Public launch GO** → separate founder decision; §5 launch gate matrix must be green; **not implied** by this index.
 
@@ -222,7 +223,9 @@ This index summarizes evidence; the checklist is the **operational run sheet** f
 | [gate-d-prod-browser-smoke-result-template-2026-06-28.md](./gate-d-prod-browser-smoke-result-template-2026-06-28.md) | Gate D result template (blank — execution in dated result doc) |
 | [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) | Gate E prerequisites — **PENDING** |
 | [GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) | Gate E founder decision package — **PENDING** |
-| [gate-e-phase3b-result-template-2026-06-28.md](./gate-e-phase3b-result-template-2026-06-28.md) | Gate E result template (blank — no execution) |
+| [gate-e-phase3b-result-template-2026-06-28.md](./gate-e-phase3b-result-template-2026-06-28.md) | Gate E result template (blank — execution in dated result doc) |
+| [gate-e-phase3b-attempt-1-aborted-resource-safety-2026-06-28.md](./gate-e-phase3b-attempt-1-aborted-resource-safety-2026-06-28.md) | Gate E attempt 1 — **ABORTED_RESOURCE_SAFETY** |
+| [gate-e-phase3b-result-2026-06-28.md](./gate-e-phase3b-result-2026-06-28.md) | Gate E Phase 3B prod **0/20 FAIL** (reattempt) |
 | [TWIN_PUBLIC_LAUNCH_READINESS_PLAN_2026-06-27.md](./TWIN_PUBLIC_LAUNCH_READINESS_PLAN_2026-06-27.md) | Launch roadmap + demo boundaries |
 | [TWIN_FEATURE_STATUS_AUDIT_2026-06-27.md](./TWIN_FEATURE_STATUS_AUDIT_2026-06-27.md) | Module classification |
 | [TWIN_OPERATING_CONTEXT_2026-06-26.md](./TWIN_OPERATING_CONTEXT_2026-06-26.md) | Ops source of truth |
@@ -242,4 +245,4 @@ This index summarizes evidence; the checklist is the **operational run sheet** f
 - No backend/API/auth/DB/env/smoke.yml changes.
 - No launch GO, no P0 closed claims.
 
-**Public launch: NO-GO · P0: OPEN · Gate D: YES/PASS · Gate E: PENDING · Phase 3B: NOT RUN / HARD BLOCKED**
+**Public launch: NO-GO · P0: OPEN · Gate D: YES/PASS · Gate E: YES/FAIL · Phase 3B: FAIL (0/20 prod multitab)**

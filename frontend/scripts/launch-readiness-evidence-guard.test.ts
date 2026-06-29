@@ -36,6 +36,8 @@ const REQUIRED_SOURCE_DOCS = [
   "GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md",
   "gate-e-phase3b-prerequisites-decision-2026-06-28.md",
   "gate-e-phase3b-result-template-2026-06-28.md",
+  "gate-e-phase3b-result-2026-06-28.md",
+  "gate-e-phase3b-attempt-1-aborted-resource-safety-2026-06-28.md",
   "TWIN_PUBLIC_LAUNCH_READINESS_PLAN_2026-06-27.md",
   "TWIN_OPERATING_CONTEXT_2026-06-26.md",
 ] as const;
@@ -51,14 +53,15 @@ test("1 evidence index and founder checklist docs exist", () => {
   assert.match(checklist, /Founder Demo Checklist/);
 });
 
-test("2 evidence index — Launch NO-GO, P0 OPEN, Gate D YES prod PASS, Gate E PENDING, Phase 3B not run", () => {
+test("2 evidence index — Launch NO-GO, P0 OPEN, Gate D YES prod PASS, Gate E YES FAIL, Phase 3B FAIL", () => {
   const index = readRepo(EVIDENCE_INDEX);
   assert.match(index, /NO-GO/i);
   assert.match(index, /P0.*OPEN/i);
   assert.match(index, /Gate D.*YES/i);
   assert.match(index, /36\/36 PASS/i);
-  assert.match(index, /Gate E.*PENDING/i);
-  assert.match(index, /Phase 3B.*(NOT RUN|HARD BLOCKED|not run)/i);
+  assert.match(index, /Gate E.*YES/i);
+  assert.match(index, /Phase 3B.*FAIL/i);
+  assert.match(index, /0\/20/i);
 });
 
 test("3 evidence index — no launch approval or P0 closed or Phase 3B passed claims", () => {
@@ -114,7 +117,7 @@ test("9 evidence index references Gate D preflight and Gate D prod result", () =
   assert.match(index, /gate-d-prod-browser-smoke-preflight-2026-06-28\.md/);
   assert.match(index, /gate-d-prod-browser-smoke-result-2026-06-28\.md/);
   assert.match(index, /Gate D.*YES/i);
-  assert.match(index, /Gate E.*PENDING/i);
+  assert.match(index, /Gate E.*YES/i);
   assert.match(index, /NO-GO/i);
   assert.match(index, /P0.*OPEN/i);
 });
@@ -129,7 +132,7 @@ test("11 evidence index references Gate D prod result — not Phase 3B PASS", ()
   const index = readRepo(EVIDENCE_INDEX);
   assert.match(index, /gate-d-prod-browser-smoke-result-2026-06-28\.md/);
   assert.match(index, /Gate D.*YES/i);
-  assert.match(index, /Gate E.*PENDING/i);
+  assert.match(index, /Gate E.*YES/i);
   assert.match(index, /NO-GO/i);
   assert.match(index, /P0.*OPEN/i);
   assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
@@ -139,7 +142,7 @@ test("12 evidence index references Gate D founder decision checkpoint", () => {
   const index = readRepo(EVIDENCE_INDEX);
   assert.match(index, /GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28\.md/);
   assert.match(index, /Gate D.*YES/i);
-  assert.match(index, /Gate E.*PENDING/i);
+  assert.match(index, /Gate E.*YES/i);
   assert.match(index, /NO-GO/i);
   assert.match(index, /P0.*OPEN/i);
   assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
@@ -150,7 +153,7 @@ test("13 evidence index references readiness consistency lock guard", () => {
   assert.match(index, /test:readiness-consistency-lock/);
   assert.match(index, /readiness-consistency-lock/);
   assert.match(index, /Gate D.*YES/i);
-  assert.match(index, /Gate E.*PENDING/i);
+  assert.match(index, /Gate E.*YES/i);
   assert.match(index, /NO-GO/i);
   assert.match(index, /P0.*OPEN/i);
   assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
@@ -161,7 +164,7 @@ test("14 evidence index references gate D prod browser smoke result guard", () =
   assert.match(index, /test:gate-d-prod-browser-smoke-result/);
   assert.match(index, /gate-d-prod-browser-smoke-result/);
   assert.match(index, /Gate D.*YES/i);
-  assert.match(index, /Gate E.*PENDING/i);
+  assert.match(index, /Gate E.*YES/i);
   assert.match(index, /NO-GO/i);
   assert.match(index, /P0.*OPEN/i);
   assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
@@ -172,10 +175,19 @@ test("15 evidence index references Gate E founder decision package", () => {
   assert.match(index, /GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28\.md/);
   assert.match(index, /test:gate-e-founder-decision-package/);
   assert.match(index, /Gate D.*YES/i);
-  assert.match(index, /36\/36 PASS/i);
-  assert.match(index, /Gate E.*PENDING/i);
-  assert.match(index, /Phase 3B.*(NOT RUN|HARD BLOCKED|not run)/i);
+  assert.match(index, /Gate E.*YES/i);
+  assert.match(index, /Phase 3B.*FAIL/i);
   assert.match(index, /NO-GO/i);
   assert.match(index, /P0.*OPEN/i);
   assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
+});
+
+test("16 evidence index references gate E phase3b result guard", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /test:gate-e-phase3b-result/);
+  assert.match(index, /gate-e-phase3b-result-2026-06-28/);
+  assert.match(index, /Gate E.*YES/i);
+  assert.match(index, /Phase 3B.*FAIL/i);
+  assert.match(index, /NO-GO/i);
+  assert.match(index, /P0.*OPEN/i);
 });
