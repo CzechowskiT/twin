@@ -1,5 +1,5 @@
 /**
- * Slice 29 — readiness decision consistency lock (static, no browser).
+ * Slice 31 — Gate D pending state maintenance (static, no browser).
  */
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -46,6 +46,7 @@ const DECISION_DOCS = [
   GATE_D_DECISION,
   GATE_D_PREFLIGHT,
   GATE_D_CHECKPOINT,
+  GATE_D_PROMPT,
   GATE_E,
   EVIDENCE_INDEX,
   SLICE12,
@@ -58,6 +59,7 @@ const GATE_D_COMMAND_DOCS = [
   GATE_D_PREFLIGHT,
   GATE_D_CHECKPOINT,
   GATE_D_RESULT,
+  GATE_D_PROMPT,
 ] as const;
 
 const REQUIRED_COMMAND_PARTS = [
@@ -82,6 +84,7 @@ const FORBIDDEN_STATUS_PATTERNS = [
   /\| \*\*Phase 3B\*\* \|.*\*\*PASS\*\*/i,
   /launch approved/i,
   /prod browser smoke executed.*\*\*PASS\*\*/i,
+  /Gate D.*executed.*\*\*PASS\*\*/i,
 ] as const;
 
 const GATE_D_COMMAND_RE =
@@ -89,17 +92,6 @@ const GATE_D_COMMAND_RE =
 
 function readRepo(relativePath: string): string {
   return readFileSync(join(repoRoot, relativePath), "utf8");
-}
-
-function normalizeCommand(text: string): string {
-  return text
-    .replace(/\\\s*\n/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function extractGateDCommands(doc: string): string[] {
-  return doc.match(GATE_D_COMMAND_RE) ?? [];
 }
 
 test("1 all key readiness docs exist", () => {
@@ -118,7 +110,7 @@ test("2 decision docs — Launch NO-GO, P0 OPEN, Gate D/E PENDING, Phase 3B bloc
     assert.match(content, /Gate E.*PENDING/i, `${doc}: missing Gate E PENDING`);
     assert.match(
       content,
-      /Phase 3B.*(NOT RUN|HARD BLOCKED|not run)/i,
+      /Phase 3B.*(NOT RUN|HARD BLOCKED|not run|BLOCKED)/i,
       `${doc}: missing Phase 3B blocked`,
     );
   }
@@ -133,28 +125,41 @@ test("3 decision docs — no forbidden launch/gate overclaims", () => {
   }
 });
 
-test("4 gate D checkpoint — exact founder question and YES / NO / PENDING answers", () => {
-  const checkpoint = readRepo(GATE_D_CHECKPOINT);
-  assert.match(
-    checkpoint,
-    new RegExp(FOUNDER_QUESTION.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
-  );
-  assert.match(checkpoint, /Gate D = YES/);
-  assert.match(checkpoint, /Gate D = NO \/ PENDING/);
-});
-
-test("5 gate D command — required parts in all command-bearing docs", () => {
+test("4 gate D command — present in command-bearing docs but NOT TO RUN without Gate D = YES", () => {
   for (const doc of GATE_D_COMMAND_DOCS) {
     const content = readRepo(doc);
     for (const part of REQUIRED_COMMAND_PARTS) {
       assert.match(content, new RegExp(part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")), `${doc}`);
     }
+    assert.match(
+      content,
+      /NOT TO RUN|not executed|must not run|not run|no Gate D execution recorded|Template only/i,
+      `${doc}: missing do-not-run guard`,
+    );
+    if (doc !== GATE_D_RESULT) {
+      assert.match(content, /Gate D = YES|founder YES/i, `${doc}: missing Gate D = YES requirement`);
+    } else {
+      assert.match(content, /founder YES|Gate D remains PENDING/i, `${doc}: missing founder YES / PENDING guard`);
+    }
   }
 });
 
-test("6 gate D command — identical canonical one-liner across decision/preflight/checkpoint/result", () => {
+test("5 gate D prompt/checkpoint — exact founder question and YES / NO / PENDING answers", () => {
+  for (const doc of [GATE_D_PROMPT, GATE_D_CHECKPOINT]) {
+    const content = readRepo(doc);
+    assert.match(
+      content,
+      new RegExp(FOUNDER_QUESTION.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
+      `${doc}: missing founder question`,
+    );
+    assert.match(content, /Gate D = YES/, `${doc}: missing Gate D = YES`);
+    assert.match(content, /Gate D = NO \/ PENDING/, `${doc}: missing Gate D = NO / PENDING`);
+  }
+});
+
+test("6 gate D command — identical canonical one-liner across command docs", () => {
   for (const doc of GATE_D_COMMAND_DOCS) {
-    const commands = extractGateDCommands(readRepo(doc));
+    const commands = readRepo(doc).match(GATE_D_COMMAND_RE) ?? [];
     assert.ok(commands.length > 0, `${doc}: canonical Gate D command missing`);
     for (const cmd of commands) {
       assert.equal(cmd, CANONICAL_GATE_D_COMMAND, `${doc}: command drift`);
@@ -162,12 +167,12 @@ test("6 gate D command — identical canonical one-liner across decision/preflig
   }
 });
 
-test("7 gate E — requires Gate D PASS or founder override; does not approve Gate E", () => {
-  const gateE = readRepo(GATE_E);
-  assert.match(gateE, /Gate D.*PASS/i);
-  assert.match(gateE, /override/i);
-  assert.match(gateE, /does NOT approve Gate E/i);
-  assert.match(gateE, /Gate E.*PENDING/i);
+test("7 gate D result template — template only, Gate D remains PENDING", () => {
+  const template = readRepo(GATE_D_RESULT);
+  assert.match(template, /Template only/i);
+  assert.match(template, /no Gate D execution recorded|not executed/i);
+  assert.match(template, /Gate D remains PENDING/i);
+  assert.doesNotMatch(template, /\| \*\*Gate D\*\* \|.*\*\*PASS\*\*/i);
 });
 
 test("8 smoke.yml — no Playwright or default prod browser", () => {
@@ -187,57 +192,7 @@ test("9 package.json — prod browser not default; browser scripts gated", () =>
   assert.doesNotMatch(pkg, /"ci":\s*"[^"]*p0-no-headless-final-state-browser/);
 });
 
-test("10 gate D result template — template only, Gate D remains PENDING", () => {
-  const template = readRepo(GATE_D_RESULT);
-  assert.match(template, /Template only/i);
-  assert.match(template, /no Gate D execution recorded/i);
-  assert.match(template, /Gate D remains PENDING/i);
-});
-
-test("11 npm script test:readiness-consistency-lock registered", () => {
-  const pkg = readFileSync(join(root, "package.json"), "utf8");
-  assert.match(pkg, /test:readiness-consistency-lock/);
-  assert.match(pkg, /readiness-consistency-lock\.test\.ts/);
-});
-
-test("12 evidence index references readiness consistency lock guard", () => {
-  const index = readRepo(EVIDENCE_INDEX);
-  assert.match(index, /test:readiness-consistency-lock/);
-  assert.match(index, /readiness-consistency-lock/);
-  assert.match(index, /Gate D.*PENDING/i);
-  assert.match(index, /Gate E.*PENDING/i);
-  assert.match(index, /NO-GO/i);
-  assert.match(index, /P0.*OPEN/i);
-});
-
-test("13 gate D founder decision prompt exists and Gate D remains PENDING", () => {
-  const prompt = readRepo(GATE_D_PROMPT);
-  assert.match(prompt, /Gate D Founder Decision Prompt/);
-  assert.match(prompt, /Gate D.*PENDING/i);
-  assert.match(prompt, /NOT TO RUN/i);
-  assert.match(prompt, /NOT EXECUTED|not executed|must not run/i);
-  assert.doesNotMatch(prompt, /\| \*\*Gate D\*\* \|.*\*\*PASS\*\*/i);
-});
-
-test("14 no result doc claims Gate D PASS or Phase 3B PASS", () => {
-  const resultTemplate = readRepo(GATE_D_RESULT);
-  assert.match(resultTemplate, /Template only/i);
-  assert.match(resultTemplate, /Gate D remains PENDING/i);
-  assert.doesNotMatch(resultTemplate, /\| \*\*Gate D\*\* \|.*\*\*PASS\*\*/i);
-  assert.doesNotMatch(resultTemplate, /Phase 3B:\s*\*\*PASS\*\*/i);
-  assert.doesNotMatch(resultTemplate, /\| \*\*Phase 3B\*\* \|.*\*\*PASS\*\*/i);
-});
-
-test("15 gate D prompt — exact command matches canonical one-liner", () => {
-  const prompt = readRepo(GATE_D_PROMPT);
-  const commands = prompt.match(GATE_D_COMMAND_RE) ?? [];
-  assert.ok(commands.length > 0, "prompt: canonical Gate D command missing");
-  for (const cmd of commands) {
-    assert.equal(cmd, CANONICAL_GATE_D_COMMAND, "prompt: command drift");
-  }
-});
-
-test("16 evidence index references gate D pending state maintenance guard", () => {
+test("10 evidence index — Gate D pending maintenance guard referenced", () => {
   const index = readRepo(EVIDENCE_INDEX);
   assert.match(index, /test:gate-d-pending-state-maintenance/);
   assert.match(index, /gate-d-pending-state-maintenance/);
@@ -245,6 +200,10 @@ test("16 evidence index references gate D pending state maintenance guard", () =
   assert.match(index, /Gate E.*PENDING/i);
   assert.match(index, /NO-GO/i);
   assert.match(index, /P0.*OPEN/i);
-  assert.doesNotMatch(index, /\| \*\*Gate D\*\* \|.*\*\*PASS\*\*/i);
-  assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
+});
+
+test("11 npm script test:gate-d-pending-state-maintenance registered", () => {
+  const pkg = readFileSync(join(root, "package.json"), "utf8");
+  assert.match(pkg, /test:gate-d-pending-state-maintenance/);
+  assert.match(pkg, /gate-d-pending-state-maintenance\.test\.ts/);
 });

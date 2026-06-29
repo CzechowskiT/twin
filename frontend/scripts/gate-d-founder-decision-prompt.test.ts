@@ -106,3 +106,14 @@ test("10 npm script test:gate-d-founder-decision-prompt registered", () => {
   assert.match(pkg, /test:gate-d-founder-decision-prompt/);
   assert.match(pkg, /gate-d-founder-decision-prompt\.test\.ts/);
 });
+
+test("11 evidence index references gate D pending state maintenance guard", () => {
+  const index = readRepo("docs/LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md");
+  assert.match(index, /test:gate-d-pending-state-maintenance/);
+  assert.match(index, /gate-d-pending-state-maintenance/);
+  assert.match(index, /Gate D.*PENDING/i);
+  assert.match(index, /Gate E.*PENDING/i);
+  assert.match(index, /NO-GO/i);
+  assert.match(index, /P0.*OPEN/i);
+  assert.doesNotMatch(index, /\| \*\*Gate D\*\* \|.*\*\*PASS\*\*/i);
+});

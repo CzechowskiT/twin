@@ -1,6 +1,6 @@
 # Launch Readiness Evidence Index — 2026-06-28
 
-**Branch at capture:** `cursor/phase1-monorepo-scaffold` @ `bb0957b3` (post PR #347 Slice 30)
+**Branch at capture:** `cursor/phase1-monorepo-scaffold` @ `0270a665` (post PR #348 Slice 31)
 **Purpose:** Founder/investor-readable **evidence index** — what is working, what is guarded, what is blocked, and how to demo without overclaims.  
 **This is not launch approval.**
 
@@ -44,19 +44,19 @@ Controlled investor/founder demo is **supported** with explicit boundaries (§6�
 
 ## 3. Runtime Alignment Snapshot
 
-Captured **2026-06-29** (Slice 30 baseline, prod read-only). Values reflect **latest known at time of report** — runtime may advance after docs-only merges.
+Captured **2026-06-29** (Slice 31 baseline, prod read-only). Values reflect **latest known at time of report** — runtime may advance after docs-only merges.
 
 | Field | Value |
 |-------|-------|
-| **repo_head** | `bb0957b3aeed49ddc43c9269d50b75161a9c0d2f` (`bb0957b3`, PR #347 Slice 29) |
-| **prod_frontend_commit** | `bb0957b3aeed49ddc43c9269d50b75161a9c0d2f` (aligned post-#347) |
+| **repo_head** | `0270a6652b0d3e52de356508d9303137a937878a` (`0270a665`, PR #348 Slice 31) |
+| **prod_frontend_commit** | `0270a6652b0d3e52de356508d9303137a937878a` (`0270a665`, aligned post-#348) |
 | **prod_api_commit** | `6d6d1e54f85f8f00fe1727f32cef700e9c2a20aa` (`6d6d1e5`, PR #281) |
-| **public-health** | `status=ok`, `db_ok=true` |
+| **public-health** | `status=ok`, `db_ok=true` (10× poll 2026-06-29) |
 | **validated_jobs** | 652 |
 | **market_coverage_progress_pct** | 6 |
 | **stripe_checkout_ready** | true |
-| **alignment_status** | **ALIGNED** — prod FE matches scaffold HEAD post-#347 |
-| **docs_only_drift** | **false** — prod FE `bb0957b3` ≥ scaffold `bb0957b3` |
+| **alignment_status** | **ALIGNED** — prod FE matches scaffold HEAD post-#348 |
+| **docs_only_drift** | **false** — prod FE `0270a665` = scaffold `0270a665` |
 | **HTTP smoke (10 routes)** | **10/10 × 200** (curl, read-only) — see below |
 
 ### HTTP smoke (10 routes, prod — curl only)
@@ -96,6 +96,7 @@ Concise shipped evidence (static + documented; no new runtime activation in Slic
 | **Gate D founder checkpoint** | [GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md](./GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md) + `test:gate-d-founder-decision-checkpoint` (Slice 28) — **not executed** |
 | **Gate D founder decision prompt** | [GATE_D_FOUNDER_DECISION_PROMPT_2026-06-28.md](./GATE_D_FOUNDER_DECISION_PROMPT_2026-06-28.md) + `test:gate-d-founder-decision-prompt` (Slice 30) — **PENDING**, no browser run |
 | **Readiness consistency lock** | `test:readiness-consistency-lock` (Slice 29) — cross-doc gate/launch stance guards |
+| **Gate D pending state maintenance** | `test:gate-d-pending-state-maintenance` (Slice 31) — recurring Gate D/E PENDING + NO-GO stance lock |
 | **Public marketing copy** | EN/PL label consistency (`test:public-marketing-copy-consistency`, Slice 27) |
 | **Gate E prerequisites** | Decision package prepared; Phase 3B inventory **20 routes** (7+7+6) — static only |
 | **Launch stance marker** | `LAUNCH_STANCE = "noGo"` unchanged |
@@ -147,12 +148,13 @@ Inventory sources:
 | `test:public-route-reference-guard` | 8 | Registry hrefs, 10-card Explore, product-proof discoverability |
 | `test:mobile-public-readiness` | 10 | Mobile overflow/tap-target on demo surfaces |
 | `test:homepage-nav` | 17 | Header/footer nav + Explore TWIN |
-| `test:launch-readiness-evidence-guard` | 13 | This index + checklist stance guards (Slices 25–29) |
+| `test:launch-readiness-evidence-guard` | 14 | This index + checklist stance guards (Slices 25–31) |
 | `test:public-marketing-copy-consistency` | 7 | EN/PL marketing label terminology (Slice 27) |
 | `test:gate-d-preflight-readiness` | 9 | Gate D preflight runbook guards (Slices 26–28) |
 | `test:gate-d-founder-decision-checkpoint` | 13 | Gate D founder decision checkpoint (Slice 28) |
-| `test:gate-d-founder-decision-prompt` | 10 | Gate D founder decision prompt (Slice 30) |
-| `test:readiness-consistency-lock` | 15 | Cross-doc readiness stance consistency lock (Slice 29–30) |
+| `test:gate-d-founder-decision-prompt` | 11 | Gate D founder decision prompt (Slice 30–31) |
+| `test:readiness-consistency-lock` | 16 | Cross-doc readiness stance consistency lock (Slice 29–31) |
+| `test:gate-d-pending-state-maintenance` | 11 | Gate D pending state maintenance lock (Slice 31) |
 
 Full step-by-step founder script: [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUNDER_DEMO_CHECKLIST_2026-06-28.md).
 
@@ -228,7 +230,7 @@ This index summarizes evidence; the checklist is the **operational run sheet** f
 
 ## Hard bans honoured (this doc)
 
-- Docs/static guards only — no product runtime changes in Slice 30.
+- Docs/static guards only — no product runtime changes in Slice 31.
 - No Gate D prod browser, no Phase 3B execution, no default CI browser.
 - No backend/API/auth/DB/env/smoke.yml changes.
 - No launch GO, no P0 closed claims.
