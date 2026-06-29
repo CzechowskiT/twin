@@ -320,3 +320,4 @@ cd frontend && npm run build && npx tsc --noEmit
 | 2026-06-28 | Slice 25 completed — [LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md](./LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md) + [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUNDER_DEMO_CHECKLIST_2026-06-28.md); public/demo evidence organized; no launch approval |
 | 2026-06-28 | Slice 26 completed — Gate D preflight runbook + result template; `test:gate-d-preflight-readiness`; Gate D **not executed**; Gate D/E **PENDING** |
 | 2026-06-28 | Slice 27 completed — public marketing EN/PL copy consistency; `test:public-marketing-copy-consistency`; evidence index alignment; Gate D preflight ready **not executed**; Gate D/E **PENDING** |
+| 2026-06-29 | Slice 28 completed — Gate D founder decision checkpoint; `test:gate-d-founder-decision-checkpoint`; prod FE aligned `3f156327` post-#345; Gate D **not executed**; Gate D/E **PENDING** |

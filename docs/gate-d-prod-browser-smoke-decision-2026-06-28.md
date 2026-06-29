@@ -323,7 +323,7 @@ Re-offer Gate D decision package when founder ready.
 - **Gate D prod browser:** **NOT EXECUTED** in this package
 - **Default CI:** Playwright remains **DISABLED** in `smoke.yml`
 
-**Related (Slice 26):** [gate-d preflight runbook](./gate-d-prod-browser-smoke-preflight-2026-06-28.md) · [result template](./gate-d-prod-browser-smoke-result-template-2026-06-28.md) — Gate D remains **PENDING**.
+**Related (Slice 28):** [Gate D founder checkpoint](./GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md) · [result template](./gate-d-prod-browser-smoke-result-template-2026-06-28.md) — Gate D remains **PENDING**.
 
 ---
 

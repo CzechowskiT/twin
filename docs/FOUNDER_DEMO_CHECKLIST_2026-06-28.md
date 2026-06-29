@@ -29,7 +29,7 @@ Complete before sharing screen:
 | Safe HTTP smoke | **10/10 × 200** | curl routes in evidence index §3 |
 | Launch stance | **NO-GO** | `LAUNCH_STANCE = "noGo"` |
 | P0 | **OPEN** | Do not claim closed |
-| Gate D | **PENDING** — prod browser not run | [preflight runbook](./gate-d-prod-browser-smoke-preflight-2026-06-28.md) |
+| Gate D | **PENDING** — prod browser not run | [founder checkpoint](./GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md) · [preflight runbook](./gate-d-prod-browser-smoke-preflight-2026-06-28.md) |
 | Gate E | **PENDING** — Phase 3B not run | |
 | Auto-apply | **PAUSED** | public-health / ops context |
 | Browser tab discipline | Single-tab demo path | No multitab stress |
@@ -92,7 +92,7 @@ Optional deep dives (only if time + audience fit): candidate dashboard preview, 
 
 | Boundary | Status |
 |----------|--------|
-| **Gate D** | **PENDING** — no prod browser smoke yet |
+| **Gate D** | **PENDING** — no prod browser smoke yet — founder must answer [checkpoint §3](./GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md): **YES** / **NO** / **PENDING** |
 | **Gate E** | **PENDING** — Phase 3B **HARD BLOCKED** |
 | **Launch** | **NO-GO** |
 | **P0** | **OPEN** |
@@ -120,6 +120,6 @@ Full gate table: [LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md](./LAUNCH_READIN
 
 ## Verification
 
-Static guard: `npm run test:launch-readiness-evidence-guard`
+Static guard: `npm run test:launch-readiness-evidence-guard` · `npm run test:gate-d-founder-decision-checkpoint`
 
 **Public launch: NO-GO · P0: OPEN · Gate D/E: PENDING · Phase 3B: NOT RUN**

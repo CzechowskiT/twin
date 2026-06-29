@@ -31,6 +31,7 @@ const REQUIRED_SOURCE_DOCS = [
   "gate-d-prod-browser-smoke-decision-2026-06-28.md",
   "gate-d-prod-browser-smoke-preflight-2026-06-28.md",
   "gate-d-prod-browser-smoke-result-template-2026-06-28.md",
+  "GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md",
   "gate-e-phase3b-prerequisites-decision-2026-06-28.md",
   "TWIN_PUBLIC_LAUNCH_READINESS_PLAN_2026-06-27.md",
   "TWIN_OPERATING_CONTEXT_2026-06-26.md",
@@ -128,4 +129,15 @@ test("11 evidence index does not claim Gate D PASS or Phase 3B PASS", () => {
   assert.match(index, /Gate E.*PENDING/i);
   assert.match(index, /NO-GO/i);
   assert.match(index, /P0.*OPEN/i);
+});
+
+test("12 evidence index references Gate D founder decision checkpoint", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28\.md/);
+  assert.match(index, /Gate D.*PENDING/i);
+  assert.match(index, /Gate E.*PENDING/i);
+  assert.match(index, /NO-GO/i);
+  assert.match(index, /P0.*OPEN/i);
+  assert.doesNotMatch(index, /\| \*\*Gate D\*\* \|.*\*\*PASS\*\*/i);
+  assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
 });
