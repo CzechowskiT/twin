@@ -112,3 +112,20 @@ test("9 evidence index references Gate D preflight while Gate D/E remain PENDING
   assert.match(index, /NO-GO/i);
   assert.match(index, /P0.*OPEN/i);
 });
+
+test("10 evidence index references Gate D result template or result process", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /gate-d-prod-browser-smoke-result-template-2026-06-28\.md/);
+  assert.match(index, /result template|fill.*template/i);
+});
+
+test("11 evidence index does not claim Gate D PASS or Phase 3B PASS", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.doesNotMatch(index, /\| \*\*Gate D\*\* \|.*\*\*PASS\*\*/i);
+  assert.doesNotMatch(index, /Gate D.*\*\*YES\*\*.*prod browser/i);
+  assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
+  assert.match(index, /Gate D.*PENDING/i);
+  assert.match(index, /Gate E.*PENDING/i);
+  assert.match(index, /NO-GO/i);
+  assert.match(index, /P0.*OPEN/i);
+});

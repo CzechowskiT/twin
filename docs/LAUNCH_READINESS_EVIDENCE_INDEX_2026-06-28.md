@@ -44,20 +44,20 @@ Controlled investor/founder demo is **supported** with explicit boundaries (§6�
 
 ## 3. Runtime Alignment Snapshot
 
-Captured **2026-06-28** (pre-Slice 25 changes, prod read-only):
+Captured **2026-06-28** (Slice 27 baseline, prod read-only). Values reflect **latest known at time of report** — runtime may advance after docs-only merges.
 
 | Field | Value |
 |-------|-------|
-| **repo_head** | `b50ef1030839d761e1b428c5c10e738de0d8de16` (`b50ef103`, PR #342) |
-| **prod_frontend_commit** | `b50ef1030839d761e1b428c5c10e738de0d8de16` |
+| **repo_head** | `fd36ae39e45cd5d7b695edd4ed103acabf70212a` (`fd36ae39`, PR #344 Slice 26) |
+| **prod_frontend_commit** | `fd36ae39e45cd5d7b695edd4ed103acabf70212a` (aligned post-#344) |
 | **prod_api_commit** | `6d6d1e54f85f8f00fe1727f32cef700e9c2a20aa` (`6d6d1e5`, PR #281) |
 | **public-health** | `status=ok`, `db_ok=true` |
 | **validated_jobs** | 652 |
 | **market_coverage_progress_pct** | 6 |
 | **stripe_checkout_ready** | true |
-| **alignment_status** | **ALIGNED** — prod FE matches scaffold HEAD post-#342 |
-| **docs_only_drift** | **false** at capture — prior Gate E baseline had `e8564583`; Vercel caught up to `b50ef103` after #342 |
-| **HTTP smoke (10 routes)** | **10/10 × 200** (curl, read-only) — see §6 |
+| **alignment_status** | **ALIGNED** — prod FE matches scaffold HEAD post-#344 |
+| **docs_only_drift** | **false** at capture — prior Slice 26 note had prod `27aa372c` vs scaffold `fd36ae39`; Vercel caught up after #344 |
+| **HTTP smoke (10 routes)** | **10/10 × 200** (curl, read-only) — see below |
 
 ### HTTP smoke (10 routes, prod — curl only)
 
@@ -92,6 +92,8 @@ Concise shipped evidence (static + documented; no new runtime activation in Slic
 | **Founder demo crosslinks** | `founder-demo-crosslinks-routes.ts` + `MarketingCrosslinksBand` on demo/how-it-works/faq/investor surfaces (Slice 21) |
 | **Mobile static readiness** | `test:mobile-public-readiness`, overflow/tap-target guards (Slices 22–23) |
 | **Public route reference** | `test:public-route-reference-guard` — registry uniqueness + investor IA (Slice 24) |
+| **Gate D preflight** | Runbook + result template + `test:gate-d-preflight-readiness` (Slice 26) — **not executed** |
+| **Public marketing copy** | EN/PL label consistency (`test:public-marketing-copy-consistency`, Slice 27) |
 | **Gate E prerequisites** | Decision package prepared; Phase 3B inventory **20 routes** (7+7+6) — static only |
 | **Launch stance marker** | `LAUNCH_STANCE = "noGo"` unchanged |
 
@@ -142,7 +144,9 @@ Inventory sources:
 | `test:public-route-reference-guard` | 8 | Registry hrefs, 10-card Explore, product-proof discoverability |
 | `test:mobile-public-readiness` | 10 | Mobile overflow/tap-target on demo surfaces |
 | `test:homepage-nav` | 17 | Header/footer nav + Explore TWIN |
-| `test:launch-readiness-evidence-guard` | — | This index + checklist stance guards (Slice 25) |
+| `test:launch-readiness-evidence-guard` | 11 | This index + checklist stance guards (Slices 25–27) |
+| `test:public-marketing-copy-consistency` | 7 | EN/PL marketing label terminology (Slice 27) |
+| `test:gate-d-preflight-readiness` | 8 | Gate D preflight runbook guards (Slice 26) |
 
 Full step-by-step founder script: [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUNDER_DEMO_CHECKLIST_2026-06-28.md).
 
