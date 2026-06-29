@@ -300,6 +300,8 @@ cd frontend && \
 
 **Gate D decision package:** [gate-d-prod-browser-smoke-decision-2026-06-28.md](./gate-d-prod-browser-smoke-decision-2026-06-28.md) — **PENDING**, prod browser **not executed**.
 
+**Gate D founder checkpoint (Slice 28):** [GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md](./GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md) — **PENDING**, founder decision required before prod browser.
+
 **Gate E prerequisites package:** [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) — **PENDING**, Phase 3B **not executed**.
 
 **Launch evidence index (Slice 25):** [LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md](./LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md) · [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUNDER_DEMO_CHECKLIST_2026-06-28.md)

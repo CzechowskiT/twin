@@ -13,6 +13,7 @@ const repoRoot = join(root, "..");
 const PREFLIGHT = "docs/gate-d-prod-browser-smoke-preflight-2026-06-28.md";
 const RESULT_TEMPLATE = "docs/gate-d-prod-browser-smoke-result-template-2026-06-28.md";
 const GATE_D_DECISION = "docs/gate-d-prod-browser-smoke-decision-2026-06-28.md";
+const GATE_D_CHECKPOINT = "docs/GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md";
 const GATE_E = "docs/gate-e-phase3b-prerequisites-decision-2026-06-28.md";
 
 const REQUIRED_COMMAND_PARTS = [
@@ -99,4 +100,21 @@ test("8 gate-d decision links preflight and result template", () => {
   const gateD = readRepo(GATE_D_DECISION);
   assert.match(gateD, /gate-d-prod-browser-smoke-preflight-2026-06-28\.md/);
   assert.match(gateD, /gate-d-prod-browser-smoke-result-template-2026-06-28\.md/);
+});
+
+test("9 preflight and checkpoint cross-reference; command unchanged; no execution recorded", () => {
+  const preflight = readRepo(PREFLIGHT);
+  const checkpoint = readRepo(GATE_D_CHECKPOINT);
+  assert.match(preflight, /gate-d-prod-browser-smoke-preflight-2026-06-28\.md/);
+  assert.match(checkpoint, /gate-d-prod-browser-smoke-preflight-2026-06-28\.md/);
+  assert.match(checkpoint, /GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28\.md/);
+  for (const part of REQUIRED_COMMAND_PARTS) {
+    assert.match(preflight, new RegExp(part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+    assert.match(checkpoint, new RegExp(part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+  assert.match(preflight, /NOT RUN|not executed/i);
+  assert.match(checkpoint, /NOT EXECUTED|not executed|must not run/i);
+  const template = readRepo(RESULT_TEMPLATE);
+  assert.match(template, /Template only/i);
+  assert.match(template, /no Gate D execution recorded/i);
 });

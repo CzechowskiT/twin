@@ -453,6 +453,7 @@ flowchart LR
 | 2026-06-28 | **Slice 25** — launch readiness evidence index + founder demo checklist; `test:launch-readiness-evidence-guard`; Launch **NO-GO**; P0 **OPEN**; Gate D/E **PENDING**; Phase 3B **NOT RUN** |
 | 2026-06-28 | **Slice 26** — Gate D preflight runbook + result template ready; `test:gate-d-preflight-readiness`; Gate D **not executed**; Launch **NO-GO**; P0 **OPEN**; Gate D/E **PENDING** |
 | 2026-06-28 | **Slice 27** — public marketing EN/PL copy consistency sweep; `test:public-marketing-copy-consistency`; evidence doc alignment; Gate D preflight remains ready **not executed**; Launch **NO-GO**; P0 **OPEN**; Gate D/E **PENDING**; Phase 3B **BLOCKED** |
+| 2026-06-29 | **Slice 28** — Gate D founder decision checkpoint; `test:gate-d-founder-decision-checkpoint`; prod FE aligned `3f156327` post-#345; Gate D **not executed**; Launch **NO-GO**; P0 **OPEN**; Gate D/E **PENDING** |
 
 ---
 

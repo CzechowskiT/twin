@@ -8,7 +8,7 @@
 **Gate E / F:** **PENDING**  
 **Launch stance:** **NO-GO** · **P0:** **OPEN** · **Phase 3B:** **HARD BLOCKED**
 
-**Related:** [gate-d decision](./gate-d-prod-browser-smoke-decision-2026-06-28.md) · [result template](./gate-d-prod-browser-smoke-result-template-2026-06-28.md) · [evidence index](./LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md)
+**Related:** [gate-d decision](./gate-d-prod-browser-smoke-decision-2026-06-28.md) · [founder checkpoint](./GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md) · [result template](./gate-d-prod-browser-smoke-result-template-2026-06-28.md) · [evidence index](./LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md)
 
 ---
 
@@ -118,7 +118,7 @@ Run **all** before §4:
 |---|-------|------------------|
 | 1 | Scaffold synced | `git checkout cursor/phase1-monorepo-scaffold && git pull --ff-only` |
 | 2 | Known repo HEAD | `git rev-parse HEAD` |
-| 3 | Gate D founder approval | Founder explicitly marked Gate D = **YES** (§8 in [gate-d decision](./gate-d-prod-browser-smoke-decision-2026-06-28.md)) |
+| 3 | Gate D founder approval | Founder explicitly marked Gate D = **YES** in [founder checkpoint §3](./GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md) (or §8 in [gate-d decision](./gate-d-prod-browser-smoke-decision-2026-06-28.md)) |
 | 4 | public-health OK | `curl https://twin-sooty.vercel.app/api/public-health` → `status=ok`, `db_ok=true` |
 | 5 | Deploy alignment | `frontend_commit` matches intended runtime baseline; wait for Vercel if mismatch |
 | 6 | Safe HTTP smoke | 10/10 or 14/14 routes × 200 (curl only) |
