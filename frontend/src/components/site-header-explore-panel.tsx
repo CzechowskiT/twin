@@ -33,7 +33,7 @@ function ExploreLink({
   const { t } = useTranslation();
   const active = isLinkActive(pathname, link.href);
   const base = mobile
-    ? "twin-touch-target twin-nav-link block whitespace-nowrap rounded px-3 py-2.5 text-sm hover:bg-[var(--twin-accent-muted)]"
+    ? "twin-touch-target twin-nav-link block min-w-0 break-words rounded px-3 py-2.5 text-sm hover:bg-[var(--twin-accent-muted)]"
     : "block rounded-md px-2 py-1.5 text-[13px] font-medium leading-snug transition hover:bg-[var(--twin-accent-muted)]/60";
   const highlight = link.highlight ? " text-[var(--twin-accent)]" : "";
   const activeClass = active ? " text-[var(--twin-accent)]" : "";
@@ -70,27 +70,29 @@ export function SiteHeaderExplorePanel({ variant, onNavigate }: SiteHeaderExplor
 
   if (variant === "mobile") {
     return (
-      <>
+      <div className="min-w-0 overflow-x-hidden" data-site-header-explore="mobile">
         <p className="mt-2 border-t border-[var(--twin-border)] px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
           {t("nav.exploreTwin")}
         </p>
         {HEADER_EXPLORE_MEGA_PANEL_GROUPS.map((group) => (
-          <div key={group.id}>
+          <div key={group.id} className="min-w-0">
             <p className="px-3 pb-0.5 pt-2 text-[10px] font-semibold uppercase tracking-wide text-[var(--twin-muted)]">
               {t(group.titleKey)}
             </p>
-            {group.links.map((link) => (
-              <ExploreLink
-                key={link.href}
-                link={link}
-                pathname={pathname}
-                onNavigate={onNavigate}
-                mobile
-              />
-            ))}
+            <div className="flex min-w-0 flex-col gap-0.5">
+              {group.links.map((link) => (
+                <ExploreLink
+                  key={link.href}
+                  link={link}
+                  pathname={pathname}
+                  onNavigate={onNavigate}
+                  mobile
+                />
+              ))}
+            </div>
           </div>
         ))}
-      </>
+      </div>
     );
   }
 

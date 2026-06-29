@@ -114,6 +114,32 @@ test("marketing crosslinks band keeps mobile grid, container rhythm, and overflo
   assert.match(band, /data-founder-demo-crosslinks/);
 });
 
+test("every founder demo page has at least two outgoing cross-links", () => {
+  for (const page of Object.keys(FOUNDER_DEMO_CROSSLINKS_BY_PAGE) as (keyof typeof FOUNDER_DEMO_CROSSLINKS_BY_PAGE)[]) {
+    const hrefs = founderDemoCrosslinkHrefs(page);
+    assert.ok(hrefs.length >= 2, `${page} must expose at least two cross-links`);
+  }
+});
+
+test("/demo links to investor room and product proof", () => {
+  const hrefs = founderDemoCrosslinkHrefs("demo");
+  assert.ok(hrefs.includes("/investor"));
+  assert.ok(hrefs.includes("/investor/product-proof"));
+});
+
+test("/investor and /investor/product-proof mutually link", () => {
+  const investor = founderDemoCrosslinkHrefs("investor");
+  const proof = founderDemoCrosslinkHrefs("investor-product-proof");
+  assert.ok(investor.includes("/investor/product-proof"));
+  assert.ok(proof.includes("/investor"));
+});
+
+test("/for-investors uses hero CTAs instead of MarketingCrosslinksBand", () => {
+  const fundraising = read("src/components/marketing/investor-fundraising-page.tsx");
+  assert.doesNotMatch(fundraising, /<MarketingCrosslinksBand/);
+  assertHrefsInSource(fundraising, founderDemoCrosslinkHrefs("for-investors"), "for-investors");
+});
+
 test("founder demo surfaces keep min-w-0 mobile spacing guards", () => {
   const demo = read("src/components/marketing/founder-led-demo-flow.tsx");
   assert.match(demo, /marketing-copy-rail min-w-0/);
