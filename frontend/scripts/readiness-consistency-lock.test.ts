@@ -19,6 +19,8 @@ const GATE_D_RESULT_EXECUTED = "docs/gate-d-prod-browser-smoke-result-2026-06-28
 const GATE_E = "docs/gate-e-phase3b-prerequisites-decision-2026-06-28.md";
 const GATE_E_PACKAGE = "docs/GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md";
 const GATE_E_RESULT_TEMPLATE = "docs/gate-e-phase3b-result-template-2026-06-28.md";
+const GATE_E_RESULT_EXECUTED = "docs/gate-e-phase3b-result-2026-06-28.md";
+const GATE_E_ATTEMPT_1 = "docs/gate-e-phase3b-attempt-1-aborted-resource-safety-2026-06-28.md";
 const EVIDENCE_INDEX = "docs/LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md";
 const SLICE12 = "docs/SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md";
 const FOUNDER_DEMO = "docs/FOUNDER_DEMO_CHECKLIST_2026-06-28.md";
@@ -38,6 +40,8 @@ const KEY_DOCS = [
   GATE_E,
   GATE_E_PACKAGE,
   GATE_E_RESULT_TEMPLATE,
+  GATE_E_RESULT_EXECUTED,
+  GATE_E_ATTEMPT_1,
   EVIDENCE_INDEX,
   SLICE12,
   FOUNDER_DEMO,
@@ -58,6 +62,9 @@ const HISTORICAL_PACKAGE_DOCS = [
 const POST_PASS_STANCE_DOCS = [
   GATE_E,
   GATE_E_PACKAGE,
+] as const;
+
+const POST_GATE_E_EXECUTION_DOCS = [
   EVIDENCE_INDEX,
   SLICE12,
   FOUNDER_DEMO,
@@ -67,6 +74,7 @@ const POST_PASS_STANCE_DOCS = [
 const DECISION_DOCS = [
   ...HISTORICAL_PACKAGE_DOCS,
   ...POST_PASS_STANCE_DOCS,
+  ...POST_GATE_E_EXECUTION_DOCS,
 ] as const;
 
 const GATE_D_COMMAND_DOCS = [
@@ -125,8 +133,8 @@ test("1 all key readiness docs exist", () => {
   }
 });
 
-test("2 decision docs — Launch NO-GO, P0 OPEN, Gate E PENDING, Phase 3B blocked", () => {
-  for (const doc of DECISION_DOCS) {
+test("2 decision docs — Launch NO-GO, P0 OPEN, Gate E stance, Phase 3B stance", () => {
+  for (const doc of [...POST_PASS_STANCE_DOCS, ...HISTORICAL_PACKAGE_DOCS]) {
     const content = readRepo(doc);
     assert.match(content, /NO-GO/i, `${doc}: missing NO-GO`);
     assert.match(content, /P0.*OPEN/i, `${doc}: missing P0 OPEN`);
@@ -137,13 +145,17 @@ test("2 decision docs — Launch NO-GO, P0 OPEN, Gate E PENDING, Phase 3B blocke
       `${doc}: missing Phase 3B blocked`,
     );
   }
+  for (const doc of POST_GATE_E_EXECUTION_DOCS) {
+    const content = readRepo(doc);
+    assert.match(content, /NO-GO/i, `${doc}: missing NO-GO`);
+    assert.match(content, /P0.*OPEN/i, `${doc}: missing P0 OPEN`);
+    assert.match(content, /Gate E.*YES/i, `${doc}: missing Gate E YES`);
+    assert.match(content, /Phase 3B.*FAIL/i, `${doc}: missing Phase 3B FAIL`);
+    assert.match(content, /Gate D.*YES/i, `${doc}: missing Gate D YES`);
+  }
   for (const doc of HISTORICAL_PACKAGE_DOCS) {
     const content = readRepo(doc);
     assert.match(content, /Gate D.*PENDING/i, `${doc}: historical package should remain PENDING`);
-  }
-  for (const doc of POST_PASS_STANCE_DOCS) {
-    const content = readRepo(doc);
-    assert.match(content, /Gate D.*YES/i, `${doc}: missing Gate D YES after prod PASS`);
   }
 });
 
@@ -290,4 +302,26 @@ test("18 gate E result template — template only, no execution recorded", () =>
   assert.match(template, /Gate E remains PENDING/i);
   assert.match(template, /P0.*OPEN/i);
   assert.match(template, /NO-GO/i);
+});
+
+test("19 gate E executed result — FAIL verdict, attempt 1 ref, no overclaims", () => {
+  const result = readRepo(GATE_E_RESULT_EXECUTED);
+  assert.match(result, /verdict:\s+FAIL/i);
+  assert.match(result, /pass:\s+0/i);
+  assert.match(result, /fail:\s+20/i);
+  assert.match(result, /gate-e-phase3b-attempt-1-aborted-resource-safety/i);
+  assert.match(result, /P0.*OPEN/i);
+  assert.match(result, /NO-GO/i);
+  assert.match(result, /Gate F.*PENDING/i);
+  assert.doesNotMatch(result, /Phase 3B:\s*\*\*PASS\*\*/i);
+  assert.doesNotMatch(result, /Launch stance:\s*\*\*GO\*\*/i);
+});
+
+test("20 evidence index references gate E phase3b result guard", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /test:gate-e-phase3b-result/);
+  assert.match(index, /gate-e-phase3b-result-2026-06-28/);
+  assert.match(index, /Phase 3B.*FAIL/i);
+  assert.match(index, /NO-GO/i);
+  assert.match(index, /P0.*OPEN/i);
 });

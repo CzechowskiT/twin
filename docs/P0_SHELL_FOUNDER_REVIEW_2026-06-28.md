@@ -19,9 +19,9 @@
 | Gate | Status |
 |------|--------|
 | **P0 performance** | **OPEN** — no Phase 3B prod proof, no signed Lighthouse budgets |
-| **Phase 3B controlled multitab** | **HARD BLOCKED** — founder STOP (2026-06-17) |
+| **Phase 3B controlled multitab** | **FAIL** — prod **0/20** ([gate-e result](./gate-e-phase3b-result-2026-06-28.md)); attempt 1 ABORTED_RESOURCE_SAFETY |
 | **Public launch** | **NO-GO** |
-| **This document** | **Gate B + Gate C + Gate D PASS 2026-06-28/29** — local + prod browser **36/36 PASS**; Gate E **PENDING** |
+| **This document** | **Gate B + Gate C + Gate D PASS** — local + prod browser **36/36 PASS**; Gate E **YES/FAIL** — Phase 3B prod **0/20** |
 
 **Slice 13 shipped** (PR #324): 5 hiring-journey routes added to `p0-no-headless-final-state` (31 → **36 routes**); static guards 9/9; browser smoke remains **gated**, not default CI.
 
@@ -231,8 +231,7 @@ Even perfect shell performance does **not** imply public launch, auto-apply acti
 | 2026-06-28 | **Gate D — prod browser decision package** (docs + static guards; **not executed**) | **PENDING** — [gate-d-prod-browser-smoke-decision-2026-06-28.md](./gate-d-prod-browser-smoke-decision-2026-06-28.md) |
 | 2026-06-28 | **Gate E — Phase 3B prerequisites package** (docs + static guards; **not executed**) | **PENDING** — [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) |
 | 2026-06-29 | **Gate D — prod browser PASS** 36/36 | **PASS** — [gate-d-prod-browser-smoke-result-2026-06-28.md](./gate-d-prod-browser-smoke-result-2026-06-28.md) |
-| TBD | **Gate E — founder decision package** | **PENDING** — [GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) |
-| TBD | Gate E — Phase 3B execution | **PENDING** — requires explicit Gate E = YES |
+| 2026-06-29 | **Gate E — Phase 3B prod FAIL** 0/20 (reattempt); attempt 1 ABORTED_RESOURCE_SAFETY | **FAIL** — [gate-e-phase3b-result-2026-06-28.md](./gate-e-phase3b-result-2026-06-28.md) |
 | TBD | P0 performance **CLOSED** | **BLOCKED** |
 | TBD | Public launch **GO** | **BLOCKED** |
 
@@ -255,12 +254,14 @@ cd frontend && \
 
 **Gate D prod browser:** **PASS** 36/36 — [gate-d-prod-browser-smoke-result-2026-06-28.md](./gate-d-prod-browser-smoke-result-2026-06-28.md).
 
-**Gate E founder decision package:** [GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) — **PENDING**, Phase 3B **not executed**.
+**Gate E Phase 3B prod:** **FAIL** 0/20 — [gate-e-phase3b-result-2026-06-28.md](./gate-e-phase3b-result-2026-06-28.md) (attempt 1 [ABORTED_RESOURCE_SAFETY](./gate-e-phase3b-attempt-1-aborted-resource-safety-2026-06-28.md)).
 
-**Gate E prerequisites package:** [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) — **PENDING**, Phase 3B **not executed**.
+**Gate E founder decision package:** [GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) — historical package (**PENDING** at publish).
+
+**Gate E prerequisites package:** [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) — historical package (**PENDING** at publish).
 
 **Launch evidence index (Slice 25):** [LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md](./LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md) · [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUNDER_DEMO_CHECKLIST_2026-06-28.md)
 
 **Not run:** Phase 3B (Gate E), multitab, stress.
 
-**Public launch: NO-GO · P0 performance: OPEN · Phase 3B: HARD BLOCKED · Gate C: YES (local PASS) · Gate D: YES (prod PASS)**
+**Public launch: NO-GO · P0 performance: OPEN · Phase 3B: FAIL (0/20 prod) · Gate C: YES (local PASS) · Gate D: YES (prod PASS) · Gate E: YES/FAIL**

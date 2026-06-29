@@ -92,9 +92,9 @@ test("6 smoke.yml excludes playwright and phase3b browser smokes", () => {
   assert.doesNotMatch(smokeWorkflow, /p0-no-headless-final-state-browser/);
 });
 
-test("7 founder review — Gate B YES (minimal shell merged), Gate C YES (local browser PASS), Phase 3B HARD BLOCKED", () => {
+test("7 founder review — Gate B YES, Gate C YES, Gate E FAIL, Phase 3B prod 0/20", () => {
   const founderReview = readRepo("docs/P0_SHELL_FOUNDER_REVIEW_2026-06-28.md");
-  assert.match(founderReview, /Phase 3B.*HARD BLOCKED/i);
+  assert.match(founderReview, /Phase 3B.*FAIL/i);
   assert.match(founderReview, /P0 performance.*OPEN/i);
   assert.match(founderReview, /Public launch.*NO-GO/i);
   assert.match(founderReview, /Gate B.*YES/i);
@@ -114,21 +114,22 @@ test("8 p0 performance inventory — Phase 3B blocked, 36 p0 routes, 20 phase3b 
   assert.match(inv, /test:e2e.*DISABLED/i);
 });
 
-test("9 slice12 founder signoff checklist — Gate B YES, Gate C YES, Gate D YES prod, Gate E PENDING", () => {
+test("9 slice12 founder signoff checklist — Gate B YES, Gate C YES, Gate D YES, Gate E FAIL", () => {
   const checklist = readRepo("docs/SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md");
   assert.match(checklist, /Slice 12 Founder Sign-Off Checklist/i);
   assert.match(checklist, /Gate B.*YES/i);
   assert.match(checklist, /Gate C.*YES/i);
   assert.match(checklist, /Gate D.*YES/i);
-  assert.match(checklist, /Gate E.*PENDING/i);
+  assert.match(checklist, /Gate E.*YES/i);
   assert.match(checklist, /36 routes/i);
   assert.match(checklist, /20 routes/i);
   assert.match(checklist, /7 \+ 7 \+ 6/);
-  assert.match(checklist, /Phase 3B.*HARD BLOCKED/i);
+  assert.match(checklist, /Phase 3B.*FAIL/i);
   assert.match(checklist, /P0 performance.*OPEN/i);
   assert.match(checklist, /Public launch.*NO-GO/i);
   assert.match(checklist, /gate-c-browser-validation-result-2026-06-28/i);
   assert.match(checklist, /gate-d-prod-browser-smoke-result-2026-06-28/i);
+  assert.match(checklist, /gate-e-phase3b-result-2026-06-28/i);
 
   const launchStance = read("src/lib/investor-metrics-reality.ts");
   assert.match(launchStance, /LAUNCH_STANCE\s*=\s*"noGo"/);
@@ -186,11 +187,12 @@ test("11 gate e prerequisites — doc exists, PENDING, Gate D PASS prerequisite,
   assert.match(launchStance, /LAUNCH_STANCE\s*=\s*"noGo"/);
 });
 
-test("12 slice25 evidence index — exists, Phase 3B not run, no overclaims", () => {
+test("12 slice25 evidence index — exists, Phase 3B FAIL, no overclaims", () => {
   const evidenceIndex = readRepo("docs/LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md");
   assert.match(evidenceIndex, /Launch Readiness Evidence Index/);
-  assert.match(evidenceIndex, /Phase 3B.*(NOT RUN|HARD BLOCKED|not run)/i);
-  assert.match(evidenceIndex, /Gate E.*PENDING/i);
+  assert.match(evidenceIndex, /Phase 3B.*FAIL/i);
+  assert.match(evidenceIndex, /Gate E.*YES/i);
+  assert.match(evidenceIndex, /0\/20/i);
   assert.doesNotMatch(evidenceIndex, /Phase 3B.*\*\*PASS\*\*/i);
   assert.doesNotMatch(evidenceIndex, /Launch stance:\s*\*\*GO\*\*/i);
 
@@ -219,16 +221,19 @@ test("15 readiness consistency lock — decision docs aligned; Gate D PASS allow
   const postPassDocs = [
     "docs/LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md",
     "docs/SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md",
-    "docs/GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md",
   ];
   for (const doc of postPassDocs) {
     const content = readRepo(doc);
     assert.match(content, /NO-GO/i, doc);
     assert.match(content, /P0.*OPEN/i, doc);
     assert.match(content, /Gate D.*YES/i, doc);
-    assert.match(content, /Gate E.*PENDING/i, doc);
-    assert.match(content, /Phase 3B.*(NOT RUN|HARD BLOCKED|not run)/i, doc);
+    assert.match(content, /Gate E.*YES/i, doc);
+    assert.match(content, /Phase 3B.*FAIL/i, doc);
   }
+
+  const historicalGateE = readRepo("docs/GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md");
+  assert.match(historicalGateE, /Gate E.*PENDING/i);
+  assert.match(historicalGateE, /Phase 3B.*(NOT RUN|HARD BLOCKED)/i);
 
   const historicalGateD = readRepo("docs/gate-d-prod-browser-smoke-decision-2026-06-28.md");
   assert.match(historicalGateD, /Gate D.*PENDING/i);

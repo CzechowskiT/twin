@@ -337,7 +337,21 @@ test("16 phase3b static inventory blocked — 20 routes, browser gated, P0 OPEN"
   assert.match(p0Doc, /gate-d-prod-browser-smoke-decision-2026-06-28/i);
 });
 
-test("17 gate d prod result — PASS recorded, stance blocked, no launch GO claims", () => {
+test("17 gate e result — FAIL recorded, stance blocked, no launch GO claims", () => {
+  const gateEResult = readFileSync(join(root, "..", "docs", "gate-e-phase3b-result-2026-06-28.md"), "utf8");
+  assert.match(gateEResult, /Gate E = \*\*YES\*\*/);
+  assert.match(gateEResult, /0\/20/i);
+  assert.match(gateEResult, /verdict:\s+FAIL/i);
+  assert.match(gateEResult, /P0.*OPEN/i);
+  assert.match(gateEResult, /NO-GO/i);
+  assert.doesNotMatch(gateEResult, /Phase 3B:\s*\*\*PASS\*\*/i);
+  assert.doesNotMatch(gateEResult, /Launch stance:\s*\*\*GO\*\*/i);
+
+  const pkg = read("package.json");
+  assert.match(pkg, /test:gate-e-phase3b-result/);
+});
+
+test("18 gate d prod result — PASS recorded, stance blocked, no launch GO claims", () => {
   const gateDResult = readFileSync(join(root, "..", "docs", "gate-d-prod-browser-smoke-result-2026-06-28.md"), "utf8");
   assert.match(gateDResult, /Gate D = \*\*YES\*\*/);
   assert.match(gateDResult, /36\/36 PASS/i);
@@ -405,7 +419,8 @@ test("20 readiness consistency lock — gate docs and npm script registered", ()
   const evidenceIndex = readFileSync(join(root, "..", "docs", "LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md"), "utf8");
   assert.match(evidenceIndex, /test:readiness-consistency-lock/);
   assert.match(evidenceIndex, /Gate D.*YES/i);
-  assert.match(evidenceIndex, /Gate E.*PENDING/i);
+  assert.match(evidenceIndex, /Gate E.*YES/i);
+  assert.match(evidenceIndex, /Phase 3B.*FAIL/i);
   assert.match(evidenceIndex, /NO-GO/i);
   assert.match(evidenceIndex, /P0.*OPEN/i);
 });

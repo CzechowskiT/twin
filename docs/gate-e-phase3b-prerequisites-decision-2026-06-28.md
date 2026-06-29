@@ -14,7 +14,9 @@
 
 Gate B (minimal shell fix) is **merged**. Gate C unlocked **local** sequential browser validation (36 P0 routes, workers=1, **PASS**). Gate D prod browser smoke **PASS** (36/36, 54.9s). Gate E is the **next separate founder boundary** for Phase 3B controlled multitab validation (20 routes, 3 batches 7+7+6).
 
-**This package does NOT approve Gate E.** It prepares prerequisites documentation and static guards only. It does **not** execute Phase 3B, does **not** set Gate E = YES, does **not** close P0, and does **not** change launch stance.
+**This package does NOT approve Gate E.** It prepares prerequisites documentation and static guards only.
+
+**Gate E execution result (post-prerequisites):** [gate-e-phase3b-result-2026-06-28.md](./gate-e-phase3b-result-2026-06-28.md) — **0/20 FAIL** (reattempt); attempt 1 [ABORTED_RESOURCE_SAFETY](./gate-e-phase3b-attempt-1-aborted-resource-safety-2026-06-28.md). This prerequisites package remains historical **PENDING** at publish.
 
 | Item | Status |
 |------|--------|
