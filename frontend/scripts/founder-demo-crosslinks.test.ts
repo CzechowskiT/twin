@@ -99,32 +99,34 @@ test("/investor/product-proof wires MarketingCrosslinksBand for investor, for-in
   }
 });
 
-test("marketing crosslinks band keeps mobile-friendly flex-wrap spacing", () => {
+test("marketing crosslinks band keeps mobile grid, container rhythm, and overflow guards", () => {
   const band = read("src/components/marketing/marketing-crosslinks-band.tsx");
-  assert.match(band, /flex flex-wrap/);
-  assert.match(band, /gap-x-4 gap-y-2/);
+  assert.match(band, /mx-auto/);
+  assert.match(band, /max-w-6xl/);
+  assert.match(band, /px-4/);
+  assert.match(band, /sm:px-6/);
+  assert.match(band, /grid-cols-1/);
+  assert.match(band, /sm:grid-cols-2/);
+  assert.match(band, /lg:grid-cols-3/);
+  assert.match(band, /gap-3/);
+  assert.match(band, /overflow-x-hidden/);
+  assert.match(band, /twin-touch-target/);
   assert.match(band, /data-founder-demo-crosslinks/);
 });
 
-test("mobile spacing guards on header, explore panel, explore twin grid, and footer", () => {
-  const header = read("src/components/site-header-bar.tsx");
-  assert.match(header, /flex-wrap/);
-  assert.match(header, /gap-y-2/);
+test("founder demo surfaces keep min-w-0 mobile spacing guards", () => {
+  const demo = read("src/components/marketing/founder-led-demo-flow.tsx");
+  assert.match(demo, /marketing-copy-rail min-w-0/);
+  assert.match(demo, /grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3/);
 
-  const explorePanel = read("src/components/site-header-explore-panel.tsx");
-  assert.match(explorePanel, /shrink-0/);
-  assert.match(explorePanel, /variant === "mobile"/);
-  assert.match(explorePanel, /px-3/);
-
-  const exploreTwin = read("src/components/marketing/landing-explore-twin.tsx");
-  assert.match(exploreTwin, /px-4/);
-  assert.match(exploreTwin, /sm:px-6/);
-  assert.match(exploreTwin, /gap-3/);
+  const investorRoom = read("src/components/investor/investor-room-page.tsx");
+  assert.match(investorRoom, /marketing-copy-rail min-w-0/);
 
   const fundraising = read("src/components/marketing/investor-fundraising-page.tsx");
+  assert.match(fundraising, /marketing-copy-rail min-w-0/);
   assert.match(fundraising, /gap-y-2/);
 
-  const footer = read("src/components/site-footer.tsx");
-  assert.match(footer, /gap-8/);
-  assert.match(footer, /sm:gap-10/);
+  const productProof = read("src/components/investor/executive-product-proof-board.tsx");
+  assert.match(productProof, /overflow-x-hidden/);
+  assert.match(productProof, /min-w-0/);
 });

@@ -58,7 +58,7 @@ export function InvestorFundraisingPage({ ycMode = false }: { ycMode?: boolean }
   return (
     <Shell wide>
       <MarketingPageSurface wide withCard={false}>
-        <div className="marketing-copy-rail space-y-12 sm:space-y-14">
+        <div className="marketing-copy-rail min-w-0 space-y-12 sm:space-y-14">
           {ycMode ? (
             <header className="space-y-3 text-start">
               <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
@@ -93,7 +93,7 @@ export function InvestorFundraisingPage({ ycMode = false }: { ycMode?: boolean }
               </Link>
             </header>
           ) : (
-            <header className="space-y-4 text-start">
+            <header className="min-w-0 space-y-4 text-start">
               <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
                 {t("investorFundraising.eyebrow")}
               </p>
