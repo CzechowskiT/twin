@@ -43,8 +43,17 @@ const FORBIDDEN_LAUNCH_GO: RegExp[] = [
 test("investor room route and page module exist", () => {
   assert.equal(INVESTOR_ROOM_ROUTE, "/investor");
   assert.match(readSrc("src/app/investor/page.tsx"), /InvestorRoomPage/);
-  assert.match(readSrc("src/app/(marketing)/for-investors/page.tsx"), /InvestorRoomPage/);
   assert.match(readSrc("src/components/investor/investor-room-page.tsx"), /data-testid="investor-room-page"/);
+});
+
+test("for-investors marketing page is distinct from executive investor room", () => {
+  const forInvestors = readSrc("src/app/(marketing)/for-investors/page.tsx");
+  assert.match(forInvestors, /InvestorFundraisingPage/);
+  assert.doesNotMatch(forInvestors, /InvestorRoomPage/);
+  const fundraising = readSrc("src/components/marketing/investor-fundraising-page.tsx");
+  assert.match(fundraising, /href="\/investor"/);
+  assert.match(fundraising, /href="\/investor\/product-proof"/);
+  assert.match(fundraising, /href="\/demo"/);
 });
 
 test("reality status sections exist with live, demo, and not-live tiers", () => {

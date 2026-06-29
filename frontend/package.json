@@ -61,6 +61,7 @@
     "test:candidate-interview-prep-mvp": "npx --yes tsx scripts/candidate-interview-prep-mvp.test.ts",
     "test:candidate-profile-evidence-vault": "npx --yes tsx scripts/candidate-profile-evidence-vault.test.ts",
     "test:homepage-nav": "npx --yes tsx scripts/homepage-nav.test.ts",
+    "test:public-marketing-consistency": "npx --yes tsx scripts/public-marketing-consistency.test.ts",
     "test:landing-auth-shell": "npx --yes tsx scripts/landing-auth-shell.test.ts",
     "test:landing-auth-shell-browser": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'&&process.env.PLAYWRIGHT_ENABLE_BROWSER_TESTS!=='1'){console.error('Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 or PLAYWRIGHT_ALLOW_PROD_SMOKE=1');process.exit(1)}\" && npm run test:landing-auth-shell-browser:raw",
     "test:landing-auth-shell-browser:raw": "playwright test e2e/landing-auth-shell-browser.spec.ts --workers=1",

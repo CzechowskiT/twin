@@ -2346,6 +2346,8 @@ const en = {
     heroLead:
       "TWIN is an autonomous career agent: matching, consent, and async work while you are away → ranked pipeline → accept / decline / reschedule → calendar sync. Phase 1 MVP — Polish boards first, multi-persona platform.",
     ctaDataRoom: "Open data room",
+    ctaInvestorRoom: "Investor room (executive view)",
+    ctaProductProof: "Product proof board",
     ctaMetrics: "Full metrics dashboard",
     ctaDeck: "Request deck",
     ctaDemo: "Product demo",
@@ -9953,6 +9955,8 @@ const pl: MessageTree = {
     heroLead:
       "TWIN to autonomiczny agent kariery: dopasowanie, zgoda i praca asynchroniczna → rankingowany pipeline → akceptuj / odrzuć / przełóż → sync kalendarza. MVP fazy 1 — polskie portale, platforma wielu person.",
     ctaDataRoom: "Otwórz data room",
+    ctaInvestorRoom: "Sala executive (widok due diligence)",
+    ctaProductProof: "Tablica product proof",
     ctaMetrics: "Pełny panel metryk",
     ctaDeck: "Poproś o deck",
     ctaDemo: "Demo produktu",

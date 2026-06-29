@@ -103,11 +103,15 @@ export function InvestorFundraisingPage({ ycMode = false }: { ycMode?: boolean }
                 {t("investorFundraising.heroLead")}
               </p>
               <div className="flex flex-wrap gap-3 pt-2">
-                <CtaPill href="/investor/data-room" primary>
-                  {t("investorFundraising.ctaDataRoom")}
+                <CtaPill href="/investor" primary>
+                  {t("investorFundraising.ctaInvestorRoom")}
                 </CtaPill>
-                <CtaPill href={deckHref}>{t("investorFundraising.ctaDeck")}</CtaPill>
+                <CtaPill href="/investor/product-proof">{t("investorFundraising.ctaProductProof")}</CtaPill>
                 <CtaPill href="/demo">{t("investorFundraising.ctaDemo")}</CtaPill>
+              </div>
+              <div className="flex flex-wrap gap-3 pt-1">
+                <CtaPill href="/investor/data-room">{t("investorFundraising.ctaDataRoom")}</CtaPill>
+                <CtaPill href={deckHref}>{t("investorFundraising.ctaDeck")}</CtaPill>
                 <CtaPill href="/for-investors/yc">{t("investorFundraising.ctaYc")}</CtaPill>
               </div>
             </header>
