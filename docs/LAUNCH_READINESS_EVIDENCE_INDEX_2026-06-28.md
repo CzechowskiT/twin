@@ -1,6 +1,6 @@
 # Launch Readiness Evidence Index — 2026-06-28
 
-**Branch at capture:** `cursor/phase1-monorepo-scaffold` @ `28fb3b4d` (post PR #346 Slice 28)  
+**Branch at capture:** `cursor/phase1-monorepo-scaffold` @ `bb0957b3` (post PR #347 Slice 30)
 **Purpose:** Founder/investor-readable **evidence index** — what is working, what is guarded, what is blocked, and how to demo without overclaims.  
 **This is not launch approval.**
 
@@ -17,7 +17,7 @@
 | **P0 performance** | **OPEN** |
 | **Gate B** | **YES** — minimal `LightweightRouteShell` / `PersonaWorkspaceGate` fix merged (PR #332 @ `62138dc`) |
 | **Gate C** | **YES** — local browser **36/36 PASS** (workers=1) — [gate-c result](./gate-c-browser-validation-result-2026-06-28.md) |
-| **Gate D** | **PENDING** — prod browser smoke **not run** — [founder checkpoint](./GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md); [gate-d decision](./gate-d-prod-browser-smoke-decision-2026-06-28.md); preflight [runbook](./gate-d-prod-browser-smoke-preflight-2026-06-28.md) + [result template](./gate-d-prod-browser-smoke-result-template-2026-06-28.md) |
+| **Gate D** | **PENDING** — prod browser smoke **not run** — [founder prompt](./GATE_D_FOUNDER_DECISION_PROMPT_2026-06-28.md); [founder checkpoint](./GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md); [gate-d decision](./gate-d-prod-browser-smoke-decision-2026-06-28.md); preflight [runbook](./gate-d-prod-browser-smoke-preflight-2026-06-28.md) + [result template](./gate-d-prod-browser-smoke-result-template-2026-06-28.md) |
 | **Gate E** | **PENDING** — Phase 3B controlled multitab **not run** — [gate-e prerequisites](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) |
 | **Gate F** | **PENDING** — production smoke boundaries / re-audit |
 | **Phase 3B** | **HARD BLOCKED** — founder STOP; no execution claim |
@@ -34,7 +34,7 @@ Controlled investor/founder demo is **supported** with explicit boundaries (§6�
 | **A** | Static review package confirmed? | **PENDING** | [P0_SHELL_FOUNDER_REVIEW_2026-06-28.md](./P0_SHELL_FOUNDER_REVIEW_2026-06-28.md), [SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md](./SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md) |
 | **B** | Implementation branch approved? | **YES** | PR #332 @ `62138dcc986bb068e717a9dafee38f822e94c66` — shell/gate minimal fix merged |
 | **C** | Gated local browser validation? | **YES** | PR #333 + [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md) — **36/36 PASS**, 44.5s, workers=1 |
-| **D** | Gated prod browser smoke? | **PENDING** | [founder checkpoint](./GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md) + [gate-d decision](./gate-d-prod-browser-smoke-decision-2026-06-28.md) + [preflight](./gate-d-prod-browser-smoke-preflight-2026-06-28.md) — **not executed** |
+| **D** | Gated prod browser smoke? | **PENDING** | [founder prompt](./GATE_D_FOUNDER_DECISION_PROMPT_2026-06-28.md) + [founder checkpoint](./GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md) + [gate-d decision](./gate-d-prod-browser-smoke-decision-2026-06-28.md) + [preflight](./gate-d-prod-browser-smoke-preflight-2026-06-28.md) — **not executed** |
 | **E** | Phase 3B unblock? | **PENDING** | [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) — **not executed** |
 | **F** | Prod smoke boundaries / re-audit? | **PENDING** | Awaits Gate D/E evidence |
 
@@ -44,19 +44,19 @@ Controlled investor/founder demo is **supported** with explicit boundaries (§6�
 
 ## 3. Runtime Alignment Snapshot
 
-Captured **2026-06-29** (Slice 29 baseline, prod read-only). Values reflect **latest known at time of report** — runtime may advance after docs-only merges.
+Captured **2026-06-29** (Slice 30 baseline, prod read-only). Values reflect **latest known at time of report** — runtime may advance after docs-only merges.
 
 | Field | Value |
 |-------|-------|
-| **repo_head** | `28fb3b4db78068f19180939fe698236f867a17fb` (`28fb3b4d`, PR #346 Slice 28) |
-| **prod_frontend_commit** | `28fb3b4db78068f19180939fe698236f867a17fb` (aligned post-#346) |
+| **repo_head** | `bb0957b3aeed49ddc43c9269d50b75161a9c0d2f` (`bb0957b3`, PR #347 Slice 29) |
+| **prod_frontend_commit** | `bb0957b3aeed49ddc43c9269d50b75161a9c0d2f` (aligned post-#347) |
 | **prod_api_commit** | `6d6d1e54f85f8f00fe1727f32cef700e9c2a20aa` (`6d6d1e5`, PR #281) |
 | **public-health** | `status=ok`, `db_ok=true` |
 | **validated_jobs** | 652 |
 | **market_coverage_progress_pct** | 6 |
 | **stripe_checkout_ready** | true |
-| **alignment_status** | **ALIGNED** — prod FE matches scaffold HEAD post-#346 |
-| **docs_only_drift** | **false** — prod FE `28fb3b4d` ≥ scaffold `28fb3b4d` |
+| **alignment_status** | **ALIGNED** — prod FE matches scaffold HEAD post-#347 |
+| **docs_only_drift** | **false** — prod FE `bb0957b3` ≥ scaffold `bb0957b3` |
 | **HTTP smoke (10 routes)** | **10/10 × 200** (curl, read-only) — see below |
 
 ### HTTP smoke (10 routes, prod — curl only)
@@ -94,6 +94,7 @@ Concise shipped evidence (static + documented; no new runtime activation in Slic
 | **Public route reference** | `test:public-route-reference-guard` — registry uniqueness + investor IA (Slice 24) |
 | **Gate D preflight** | Runbook + result template + `test:gate-d-preflight-readiness` (Slice 26) — **not executed** |
 | **Gate D founder checkpoint** | [GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md](./GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md) + `test:gate-d-founder-decision-checkpoint` (Slice 28) — **not executed** |
+| **Gate D founder decision prompt** | [GATE_D_FOUNDER_DECISION_PROMPT_2026-06-28.md](./GATE_D_FOUNDER_DECISION_PROMPT_2026-06-28.md) + `test:gate-d-founder-decision-prompt` (Slice 30) — **PENDING**, no browser run |
 | **Readiness consistency lock** | `test:readiness-consistency-lock` (Slice 29) — cross-doc gate/launch stance guards |
 | **Public marketing copy** | EN/PL label consistency (`test:public-marketing-copy-consistency`, Slice 27) |
 | **Gate E prerequisites** | Decision package prepared; Phase 3B inventory **20 routes** (7+7+6) — static only |
@@ -150,7 +151,8 @@ Inventory sources:
 | `test:public-marketing-copy-consistency` | 7 | EN/PL marketing label terminology (Slice 27) |
 | `test:gate-d-preflight-readiness` | 9 | Gate D preflight runbook guards (Slices 26–28) |
 | `test:gate-d-founder-decision-checkpoint` | 13 | Gate D founder decision checkpoint (Slice 28) |
-| `test:readiness-consistency-lock` | 12 | Cross-doc readiness stance consistency lock (Slice 29) |
+| `test:gate-d-founder-decision-prompt` | 10 | Gate D founder decision prompt (Slice 30) |
+| `test:readiness-consistency-lock` | 15 | Cross-doc readiness stance consistency lock (Slice 29–30) |
 
 Full step-by-step founder script: [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUNDER_DEMO_CHECKLIST_2026-06-28.md).
 
@@ -178,7 +180,7 @@ Full step-by-step founder script: [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUND
 
 ## 8. Required Next Decisions
 
-1. **Gate D = YES** → founder checkpoint [§3](./GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md); run gated prod browser smoke per [gate-d preflight §4](./gate-d-prod-browser-smoke-preflight-2026-06-28.md) (`PLAYWRIGHT_ALLOW_PROD_SMOKE=1`, `PLAYWRIGHT_SKIP_WEBSERVER=1`, workers=1); fill [result template](./gate-d-prod-browser-smoke-result-template-2026-06-28.md).
+1. **Gate D = YES** → founder prompt [§1](./GATE_D_FOUNDER_DECISION_PROMPT_2026-06-28.md) + checkpoint [§3](./GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md); run gated prod browser smoke per [gate-d preflight §4](./gate-d-prod-browser-smoke-preflight-2026-06-28.md) (`PLAYWRIGHT_ALLOW_PROD_SMOKE=1`, `PLAYWRIGHT_SKIP_WEBSERVER=1`, workers=1); fill [result template](./gate-d-prod-browser-smoke-result-template-2026-06-28.md).
 2. **Gate E = YES** → only after Gate D **PASS** or documented founder override; then gated Phase 3B per [gate-e prerequisites §7](./gate-e-phase3b-prerequisites-decision-2026-06-28.md).
 3. **Gate F / launch re-audit** → only after Gate D/E evidence and P0 performance review.
 4. **Public launch GO** → separate founder decision; §5 launch gate matrix must be green; **not implied** by this index.
@@ -207,6 +209,7 @@ This index summarizes evidence; the checklist is the **operational run sheet** f
 | [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md) | Gate C local browser 36/36 PASS |
 | [gate-d-prod-browser-smoke-decision-2026-06-28.md](./gate-d-prod-browser-smoke-decision-2026-06-28.md) | Gate D decision package — **PENDING** |
 | [GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md](./GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md) | Gate D founder decision checkpoint — **PENDING** |
+| [GATE_D_FOUNDER_DECISION_PROMPT_2026-06-28.md](./GATE_D_FOUNDER_DECISION_PROMPT_2026-06-28.md) | Gate D founder decision prompt — **PENDING** |
 | [gate-d-prod-browser-smoke-preflight-2026-06-28.md](./gate-d-prod-browser-smoke-preflight-2026-06-28.md) | Gate D preflight runbook — **not executed** |
 | [gate-d-prod-browser-smoke-result-template-2026-06-28.md](./gate-d-prod-browser-smoke-result-template-2026-06-28.md) | Gate D result template — fill after approved run |
 | [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) | Gate E prerequisites — **PENDING** |
@@ -225,7 +228,7 @@ This index summarizes evidence; the checklist is the **operational run sheet** f
 
 ## Hard bans honoured (this doc)
 
-- Docs/static guards only — no product runtime changes in Slice 29.
+- Docs/static guards only — no product runtime changes in Slice 30.
 - No Gate D prod browser, no Phase 3B execution, no default CI browser.
 - No backend/API/auth/DB/env/smoke.yml changes.
 - No launch GO, no P0 closed claims.
