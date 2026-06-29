@@ -36,9 +36,7 @@ HTTP smoke (curl, pre-run):
   all 200:                 yes | no — list failures: ___________
 
 Exact command:
-  cd frontend && PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 \
-    PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app \
-    npm run test:p0-no-headless-final-state-browser -- --workers=1
+  cd frontend && PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app npm run test:p0-no-headless-final-state-browser -- --workers=1
 
 Run parameters:
   base URL:                https://twin-sooty.vercel.app

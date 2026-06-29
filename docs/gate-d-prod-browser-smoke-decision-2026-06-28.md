@@ -113,10 +113,7 @@ All passed at Gate C run; re-run before any Gate D execution:
 **Do not run until founder sets Gate D = YES (§8).**
 
 ```bash
-cd frontend
-PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 \
-  PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app \
-  npm run test:p0-no-headless-final-state-browser -- --workers=1
+cd frontend && PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app npm run test:p0-no-headless-final-state-browser -- --workers=1
 ```
 
 | Parameter | Value |
@@ -191,9 +188,7 @@ Deploy alignment at run time:
   alignment_status:       ALIGNED | DRIFT (wait)
 
 Command:
-  PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 \
-  PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app \
-  npm run test:p0-no-headless-final-state-browser -- --workers=1
+  cd frontend && PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app npm run test:p0-no-headless-final-state-browser -- --workers=1
 
 Results:
   Routes total:     36
@@ -266,10 +261,7 @@ Gate D = YES (founder approved [date]).
 Gate B = YES (merged 62138dc). Gate C = YES (local 36/36 PASS).
 
 Execute prod browser smoke ONLY:
-  cd frontend
-  PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 \
-  PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app \
-  npm run test:p0-no-headless-final-state-browser -- --workers=1
+  cd frontend && PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app npm run test:p0-no-headless-final-state-browser -- --workers=1
 
 Pre-check: public-health frontend_commit aligned; HTTP smoke 14/14 × 200.
 Fill docs/gate-d-prod-browser-smoke-result-YYYY-MM-DD.md per gate-d decision §7.

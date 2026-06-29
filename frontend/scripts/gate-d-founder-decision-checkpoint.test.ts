@@ -134,3 +134,15 @@ test("12 result template remains template-only with no execution recorded", () =
   assert.match(template, /no Gate D execution recorded/i);
   assert.match(template, /Gate D remains PENDING/i);
 });
+
+test("13 readiness consistency lock registered; gate D command matches preflight", () => {
+  const pkg = readFileSync(join(root, "package.json"), "utf8");
+  assert.match(pkg, /test:readiness-consistency-lock/);
+
+  const canonical =
+    "cd frontend && PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app npm run test:p0-no-headless-final-state-browser -- --workers=1";
+  const checkpoint = readRepo(CHECKPOINT);
+  const preflight = readRepo(PREFLIGHT);
+  assert.match(checkpoint, new RegExp(canonical.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  assert.match(preflight, new RegExp(canonical.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+});

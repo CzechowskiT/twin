@@ -321,3 +321,4 @@ cd frontend && npm run build && npx tsc --noEmit
 | 2026-06-28 | Slice 26 completed — Gate D preflight runbook + result template; `test:gate-d-preflight-readiness`; Gate D **not executed**; Gate D/E **PENDING** |
 | 2026-06-28 | Slice 27 completed — public marketing EN/PL copy consistency; `test:public-marketing-copy-consistency`; evidence index alignment; Gate D preflight ready **not executed**; Gate D/E **PENDING** |
 | 2026-06-29 | Slice 28 completed — Gate D founder decision checkpoint; `test:gate-d-founder-decision-checkpoint`; prod FE aligned `3f156327` post-#345; Gate D **not executed**; Gate D/E **PENDING** |
+| 2026-06-29 | Slice 29 completed — readiness decision consistency lock (`test:readiness-consistency-lock`); Gate D command unified across gate docs; prod FE aligned `28fb3b4d` post-#346; Gate D/E **PENDING** |

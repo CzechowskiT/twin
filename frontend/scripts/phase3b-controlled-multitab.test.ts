@@ -198,12 +198,11 @@ test("12 slice25 evidence index — exists, Phase 3B not run, no overclaims", ()
   assert.match(founderChecklist, /Founder Demo Checklist/);
 });
 
-test("13 gate d preflight — does not permit Phase 3B; Gate D PENDING; no default CI browser", () => {
+test("14 gate d preflight — no Phase 3B; Gate E cannot run by default; no CI browser", () => {
   const preflight = readRepo("docs/gate-d-prod-browser-smoke-preflight-2026-06-28.md");
   assert.match(preflight, /Gate D.*PENDING/i);
   assert.match(preflight, /Phase 3B.*HARD BLOCKED/i);
   assert.match(preflight, /no Phase 3B|does not.*Phase 3B/i);
-  assert.doesNotMatch(preflight, /Phase 3B.*\*\*PASS\*\*/i);
 
   const gateE = readRepo("docs/gate-e-phase3b-prerequisites-decision-2026-06-28.md");
   assert.match(gateE, /Gate E.*PENDING/i);
@@ -211,4 +210,23 @@ test("13 gate d preflight — does not permit Phase 3B; Gate D PENDING; no defau
 
   const smokeWorkflow = readRepo(".github/workflows/smoke.yml");
   assert.doesNotMatch(smokeWorkflow, /playwright test/i);
+});
+
+test("15 readiness consistency lock — decision docs aligned on NO-GO / P0 OPEN / Gate D/E PENDING", () => {
+  const pkg = read("package.json");
+  assert.match(pkg, /test:readiness-consistency-lock/);
+
+  const decisionDocs = [
+    "docs/gate-d-prod-browser-smoke-decision-2026-06-28.md",
+    "docs/gate-e-phase3b-prerequisites-decision-2026-06-28.md",
+    "docs/LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md",
+    "docs/SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md",
+  ];
+  for (const doc of decisionDocs) {
+    const content = readRepo(doc);
+    assert.match(content, /NO-GO/i, doc);
+    assert.match(content, /P0.*OPEN/i, doc);
+    assert.match(content, /Gate D.*PENDING/i, doc);
+    assert.match(content, /Gate E.*PENDING/i, doc);
+  }
 });

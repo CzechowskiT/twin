@@ -390,19 +390,15 @@ test("18 gate e prerequisites — explicit approval required, Gate D before E, n
   assert.match(p0Doc, /Phase 3B.*BLOCKED/i);
 });
 
-test("19 gate d preflight — no Phase 3B; Gate E cannot run by default; no CI browser", () => {
-  const preflight = readFileSync(join(root, "..", "docs", "gate-d-prod-browser-smoke-preflight-2026-06-28.md"), "utf8");
-  assert.match(preflight, /Gate D.*PENDING/i);
-  assert.match(preflight, /Phase 3B.*HARD BLOCKED/i);
-  assert.match(preflight, /no Phase 3B|Out of scope/i);
-
-  const gateE = readFileSync(join(root, "..", "docs", "gate-e-phase3b-prerequisites-decision-2026-06-28.md"), "utf8");
-  assert.match(gateE, /Gate E.*PENDING/i);
-  assert.match(gateE, /does NOT approve Gate E/i);
-
+test("20 readiness consistency lock — gate docs and npm script registered", () => {
   const pkg = read("package.json");
-  assert.match(pkg, /test:e2e.*DISABLED/i);
+  assert.match(pkg, /test:readiness-consistency-lock/);
+  assert.match(pkg, /readiness-consistency-lock\.test\.ts/);
 
-  const smokeWorkflow = readFileSync(join(root, "..", ".github/workflows/smoke.yml"), "utf8");
-  assert.doesNotMatch(smokeWorkflow, /playwright test/i);
+  const evidenceIndex = readFileSync(join(root, "..", "docs", "LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md"), "utf8");
+  assert.match(evidenceIndex, /test:readiness-consistency-lock/);
+  assert.match(evidenceIndex, /Gate D.*PENDING/i);
+  assert.match(evidenceIndex, /Gate E.*PENDING/i);
+  assert.match(evidenceIndex, /NO-GO/i);
+  assert.match(evidenceIndex, /P0.*OPEN/i);
 });

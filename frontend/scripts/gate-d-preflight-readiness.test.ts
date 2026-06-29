@@ -102,7 +102,7 @@ test("8 gate-d decision links preflight and result template", () => {
   assert.match(gateD, /gate-d-prod-browser-smoke-result-template-2026-06-28\.md/);
 });
 
-test("9 preflight and checkpoint cross-reference; command unchanged; no execution recorded", () => {
+test("10 preflight and checkpoint cross-reference; command unchanged; no execution recorded", () => {
   const preflight = readRepo(PREFLIGHT);
   const checkpoint = readRepo(GATE_D_CHECKPOINT);
   assert.match(preflight, /gate-d-prod-browser-smoke-preflight-2026-06-28\.md/);
@@ -117,4 +117,17 @@ test("9 preflight and checkpoint cross-reference; command unchanged; no executio
   const template = readRepo(RESULT_TEMPLATE);
   assert.match(template, /Template only/i);
   assert.match(template, /no Gate D execution recorded/i);
+});
+
+test("11 readiness consistency lock — gate D command identical across package docs", () => {
+  const pkg = readFileSync(join(root, "package.json"), "utf8");
+  assert.match(pkg, /test:readiness-consistency-lock/);
+  assert.match(pkg, /readiness-consistency-lock\.test\.ts/);
+
+  const canonical =
+    "cd frontend && PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app npm run test:p0-no-headless-final-state-browser -- --workers=1";
+  for (const doc of [PREFLIGHT, GATE_D_CHECKPOINT, RESULT_TEMPLATE, GATE_D_DECISION]) {
+    const content = readRepo(doc);
+    assert.match(content, new RegExp(canonical.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")), doc);
+  }
 });
