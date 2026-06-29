@@ -21,7 +21,7 @@
 | **P0 performance** | **OPEN** — no Phase 3B prod proof, no signed Lighthouse budgets |
 | **Phase 3B controlled multitab** | **HARD BLOCKED** — founder STOP (2026-06-17) |
 | **Public launch** | **NO-GO** |
-| **This document** | **Gate B + Gate C local browser PASS 2026-06-28** — Gate D **decision package** prepared; Gates D/E **PENDING** |
+| **This document** | **Gate B + Gate C + Gate D PASS 2026-06-28/29** — local + prod browser **36/36 PASS**; Gate E **PENDING** |
 
 **Slice 13 shipped** (PR #324): 5 hiring-journey routes added to `p0-no-headless-final-state` (31 → **36 routes**); static guards 9/9; browser smoke remains **gated**, not default CI.
 
@@ -252,12 +252,12 @@ cd frontend && \
 
 **Gate C local browser:** **PASS** 36/36 — [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md).
 
-**Gate D decision package:** [gate-d-prod-browser-smoke-decision-2026-06-28.md](./gate-d-prod-browser-smoke-decision-2026-06-28.md) — **PENDING**, prod browser **not executed**.
+**Gate D prod browser:** **PASS** 36/36 — [gate-d-prod-browser-smoke-result-2026-06-28.md](./gate-d-prod-browser-smoke-result-2026-06-28.md).
 
 **Gate E prerequisites package:** [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) — **PENDING**, Phase 3B **not executed**.
 
 **Launch evidence index (Slice 25):** [LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md](./LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md) · [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUNDER_DEMO_CHECKLIST_2026-06-28.md)
 
-**Not run:** prod browser execution (Gate D), Phase 3B (Gate E), multitab, stress.
+**Not run:** Phase 3B (Gate E), multitab, stress.
 
-**Public launch: NO-GO · P0 performance: OPEN · Phase 3B: HARD BLOCKED · Gate C: YES (local PASS)**
+**Public launch: NO-GO · P0 performance: OPEN · Phase 3B: HARD BLOCKED · Gate C: YES (local PASS) · Gate D: YES (prod PASS)**

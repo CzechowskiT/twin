@@ -30,6 +30,7 @@ const REQUIRED_SOURCE_DOCS = [
   "gate-c-browser-validation-result-2026-06-28.md",
   "gate-d-prod-browser-smoke-decision-2026-06-28.md",
   "gate-d-prod-browser-smoke-preflight-2026-06-28.md",
+  "gate-d-prod-browser-smoke-result-2026-06-28.md",
   "gate-d-prod-browser-smoke-result-template-2026-06-28.md",
   "GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md",
   "gate-e-phase3b-prerequisites-decision-2026-06-28.md",
@@ -48,11 +49,12 @@ test("1 evidence index and founder checklist docs exist", () => {
   assert.match(checklist, /Founder Demo Checklist/);
 });
 
-test("2 evidence index — Launch NO-GO, P0 OPEN, Gate D/E PENDING, Phase 3B not run", () => {
+test("2 evidence index — Launch NO-GO, P0 OPEN, Gate D YES prod PASS, Gate E PENDING, Phase 3B not run", () => {
   const index = readRepo(EVIDENCE_INDEX);
   assert.match(index, /NO-GO/i);
   assert.match(index, /P0.*OPEN/i);
-  assert.match(index, /Gate D.*PENDING/i);
+  assert.match(index, /Gate D.*YES/i);
+  assert.match(index, /36\/36 PASS/i);
   assert.match(index, /Gate E.*PENDING/i);
   assert.match(index, /Phase 3B.*(NOT RUN|HARD BLOCKED|not run)/i);
 });
@@ -105,10 +107,11 @@ test("8 LAUNCH_STANCE remains noGo in code", () => {
   assert.match(launchStance, /LAUNCH_STANCE\s*=\s*"noGo"/);
 });
 
-test("9 evidence index references Gate D preflight while Gate D/E remain PENDING", () => {
+test("9 evidence index references Gate D preflight and Gate D prod result", () => {
   const index = readRepo(EVIDENCE_INDEX);
   assert.match(index, /gate-d-prod-browser-smoke-preflight-2026-06-28\.md/);
-  assert.match(index, /Gate D.*PENDING/i);
+  assert.match(index, /gate-d-prod-browser-smoke-result-2026-06-28\.md/);
+  assert.match(index, /Gate D.*YES/i);
   assert.match(index, /Gate E.*PENDING/i);
   assert.match(index, /NO-GO/i);
   assert.match(index, /P0.*OPEN/i);
@@ -120,25 +123,23 @@ test("10 evidence index references Gate D result template or result process", ()
   assert.match(index, /result template|fill.*template/i);
 });
 
-test("11 evidence index does not claim Gate D PASS or Phase 3B PASS", () => {
+test("11 evidence index references Gate D prod result — not Phase 3B PASS", () => {
   const index = readRepo(EVIDENCE_INDEX);
-  assert.doesNotMatch(index, /\| \*\*Gate D\*\* \|.*\*\*PASS\*\*/i);
-  assert.doesNotMatch(index, /Gate D.*\*\*YES\*\*.*prod browser/i);
-  assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
-  assert.match(index, /Gate D.*PENDING/i);
+  assert.match(index, /gate-d-prod-browser-smoke-result-2026-06-28\.md/);
+  assert.match(index, /Gate D.*YES/i);
   assert.match(index, /Gate E.*PENDING/i);
   assert.match(index, /NO-GO/i);
   assert.match(index, /P0.*OPEN/i);
+  assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
 });
 
 test("12 evidence index references Gate D founder decision checkpoint", () => {
   const index = readRepo(EVIDENCE_INDEX);
   assert.match(index, /GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28\.md/);
-  assert.match(index, /Gate D.*PENDING/i);
+  assert.match(index, /Gate D.*YES/i);
   assert.match(index, /Gate E.*PENDING/i);
   assert.match(index, /NO-GO/i);
   assert.match(index, /P0.*OPEN/i);
-  assert.doesNotMatch(index, /\| \*\*Gate D\*\* \|.*\*\*PASS\*\*/i);
   assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
 });
 
@@ -146,22 +147,20 @@ test("13 evidence index references readiness consistency lock guard", () => {
   const index = readRepo(EVIDENCE_INDEX);
   assert.match(index, /test:readiness-consistency-lock/);
   assert.match(index, /readiness-consistency-lock/);
-  assert.match(index, /Gate D.*PENDING/i);
+  assert.match(index, /Gate D.*YES/i);
   assert.match(index, /Gate E.*PENDING/i);
   assert.match(index, /NO-GO/i);
   assert.match(index, /P0.*OPEN/i);
-  assert.doesNotMatch(index, /\| \*\*Gate D\*\* \|.*\*\*PASS\*\*/i);
   assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
 });
 
-test("14 evidence index references gate D pending state maintenance guard", () => {
+test("14 evidence index references gate D prod browser smoke result guard", () => {
   const index = readRepo(EVIDENCE_INDEX);
-  assert.match(index, /test:gate-d-pending-state-maintenance/);
-  assert.match(index, /gate-d-pending-state-maintenance/);
-  assert.match(index, /Gate D.*PENDING/i);
+  assert.match(index, /test:gate-d-prod-browser-smoke-result/);
+  assert.match(index, /gate-d-prod-browser-smoke-result/);
+  assert.match(index, /Gate D.*YES/i);
   assert.match(index, /Gate E.*PENDING/i);
   assert.match(index, /NO-GO/i);
   assert.match(index, /P0.*OPEN/i);
-  assert.doesNotMatch(index, /\| \*\*Gate D\*\* \|.*\*\*PASS\*\*/i);
   assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
 });

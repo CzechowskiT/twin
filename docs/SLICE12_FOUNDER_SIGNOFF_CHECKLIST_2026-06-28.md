@@ -20,8 +20,8 @@
 
 | Item | Status |
 |------|--------|
-| **Slice 12** | **Gate B + Gate C SHIPPED** — shell fix merged; **local browser 36/36 PASS**; Gates D–F **PENDING** |
-| **This checklist** | **Gate B = YES**, **Gate C = YES (local browser only)** — [gate-c evidence](./gate-c-browser-validation-result-2026-06-28.md); **Gate D decision package** — [gate-d decision](./gate-d-prod-browser-smoke-decision-2026-06-28.md) |
+| **Slice 12** | **Gate B + Gate C + Gate D SHIPPED** — shell fix merged; **local browser 36/36 PASS**; **prod browser 36/36 PASS**; Gates E–F **PENDING** |
+| **This checklist** | **Gate B = YES**, **Gate C = YES (local)**, **Gate D = YES (prod)** — [gate-c evidence](./gate-c-browser-validation-result-2026-06-28.md); [gate-d result](./gate-d-prod-browser-smoke-result-2026-06-28.md) |
 | **Implementation approval** | **Gate B YES** — minimal shell/gate/layout branch only; no broad refactor |
 | **Public launch** | **NO-GO** |
 | **P0 performance** | **OPEN** |
@@ -41,6 +41,7 @@ Founder must complete §7 decision table before any shell/gate/layout implementa
 | **public-health** | `status=ok`, `db_ok=true` |
 | **alignment_status** | **ALIGNED** — prod FE matches scaffold HEAD post-#332 |
 | **Gate C browser** | **PASS** — 36/36 local, workers=1, 44.5s — [evidence](./gate-c-browser-validation-result-2026-06-28.md) |
+| **Gate D browser** | **PASS** — 36/36 prod, workers=1, 54.9s — [evidence](./gate-d-prod-browser-smoke-result-2026-06-28.md) |
 | **p0-no-headless route inventory** | **36 routes** (public 3, candidate 10, recruiter 11, company 11, board 1) |
 | **Phase 3B static inventory** | **20 routes** in `PHASE3B_ALL_ROUTES` |
 | **Phase 3B batches** | **7 + 7 + 6** (`PHASE3B_ROUTE_BATCHES`) |
@@ -136,11 +137,11 @@ Reference: [PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md](./PHASE3B_CO
 | **A** | Static scope confirmed (docs + guards)? | **PENDING** | Merge checklist PR; no runtime change |
 | **B** | Implementation branch approved (`LightweightRouteShell` / `PersonaWorkspaceGate`)? | **YES** | Minimal fix branch merged; §9 static gates passed |
 | **C** | Gated local browser validation approved? | **YES** (local only) | **PASS** 36/36 — prod browser still **blocked** until Gate D |
-| **D** | Production smoke boundary approved? | **PENDING** | Run prod smoke per [gate-d decision](./gate-d-prod-browser-smoke-decision-2026-06-28.md) §4 |
-| **E** | Phase 3B controlled multitab approved? | **PENDING** | Gated browser per Phase 3B doc (20 routes, workers=1) |
+| **D** | Production smoke boundary approved? | **YES** | **PASS** 36/36 prod — [gate-d result](./gate-d-prod-browser-smoke-result-2026-06-28.md) |
+| **E** | Phase 3B controlled multitab approved? | **PENDING** | Gated browser per Phase 3B doc (20 routes, workers=1) — requires separate Gate E = YES |
 | **F** | Launch-gate re-audit approved? | **PENDING** | Re-run launch gate checklist; still requires separate founder GO for public launch |
 
-**Founder note (2026-06-28):** Gate B merged (PR #332); Gate C **YES** — local browser **36/36 PASS** ([evidence](./gate-c-browser-validation-result-2026-06-28.md)). Gate D **decision package** prepared ([gate-d decision](./gate-d-prod-browser-smoke-decision-2026-06-28.md)) — **prod browser not run**. **No Phase 3B**, **no P0 closure**. Gate D/E/F remain **PENDING**.
+**Founder note (2026-06-29):** Gate B merged (PR #332); Gate C **YES** — local browser **36/36 PASS** ([evidence](./gate-c-browser-validation-result-2026-06-28.md)); Gate D **YES** — prod browser **36/36 PASS** ([result](./gate-d-prod-browser-smoke-result-2026-06-28.md)). **No Phase 3B**, **no P0 closure**. Gate E/F remain **PENDING**.
 
 ---
 
@@ -298,18 +299,12 @@ cd frontend && \
 
 **Gate C browser (local):** **PASS** 36/36 — see [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md).
 
-**Gate D decision package:** [gate-d-prod-browser-smoke-decision-2026-06-28.md](./gate-d-prod-browser-smoke-decision-2026-06-28.md) — **PENDING**, prod browser **not executed**.
-
-**Gate D founder checkpoint (Slice 28):** [GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md](./GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md) — **PENDING**, founder decision required before prod browser.
-
-**Gate D founder decision prompt (Slice 30):** [GATE_D_FOUNDER_DECISION_PROMPT_2026-06-28.md](./GATE_D_FOUNDER_DECISION_PROMPT_2026-06-28.md) — **PENDING**; `npm run test:gate-d-founder-decision-prompt` — explicit **Gate D = YES** required before browser.
-
-**Readiness consistency lock (Slice 29):** `npm run test:readiness-consistency-lock` — cross-doc guards for Launch **NO-GO**, P0 **OPEN**, Gate D/E **PENDING**, Phase 3B **BLOCKED**.
+**Gate D prod browser:** **PASS** 36/36 — [gate-d-prod-browser-smoke-result-2026-06-28.md](./gate-d-prod-browser-smoke-result-2026-06-28.md).
 
 **Gate E prerequisites package:** [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) — **PENDING**, Phase 3B **not executed**.
 
 **Launch evidence index (Slice 25):** [LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md](./LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md) · [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUNDER_DEMO_CHECKLIST_2026-06-28.md)
 
-**Not run:** prod browser execution (Gate D), Phase 3B (Gate E), multitab stress.
+**Not run:** Phase 3B (Gate E), multitab stress.
 
-**Public launch: NO-GO · P0 performance: OPEN · Phase 3B: HARD BLOCKED · Gate B: YES · Gate C: YES (local) · Gate D/E/F: PENDING**
+**Public launch: NO-GO · P0 performance: OPEN · Phase 3B: HARD BLOCKED · Gate B: YES · Gate C: YES (local) · Gate D: YES (prod PASS) · Gate E/F: PENDING**

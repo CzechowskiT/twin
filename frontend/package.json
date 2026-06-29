@@ -70,6 +70,7 @@
     "test:gate-d-founder-decision-prompt": "npx --yes tsx scripts/gate-d-founder-decision-prompt.test.ts",
     "test:readiness-consistency-lock": "npx --yes tsx scripts/readiness-consistency-lock.test.ts",
     "test:gate-d-pending-state-maintenance": "npx --yes tsx scripts/gate-d-pending-state-maintenance.test.ts",
+    "test:gate-d-prod-browser-smoke-result": "npx --yes tsx scripts/gate-d-prod-browser-smoke-result.test.ts",
     "test:founder-demo-crosslinks": "npx --yes tsx scripts/founder-demo-crosslinks.test.ts",
     "test:mobile-public-readiness": "npx --yes tsx scripts/mobile-public-readiness.test.ts",
     "test:landing-auth-shell": "npx --yes tsx scripts/landing-auth-shell.test.ts",

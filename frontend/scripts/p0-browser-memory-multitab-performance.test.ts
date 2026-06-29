@@ -337,19 +337,15 @@ test("16 phase3b static inventory blocked — 20 routes, browser gated, P0 OPEN"
   assert.match(p0Doc, /gate-d-prod-browser-smoke-decision-2026-06-28/i);
 });
 
-test("17 gate d pending — prod smoke env flags, stance blocked, no launch GO claims", () => {
-  const gateD = readFileSync(join(root, "..", "docs", "gate-d-prod-browser-smoke-decision-2026-06-28.md"), "utf8");
-  assert.match(gateD, /Gate D.*PENDING/i);
-  assert.match(gateD, /Gate B.*YES/i);
-  assert.match(gateD, /Gate C.*YES/i);
-  assert.match(gateD, /Gate E.*PENDING/i);
-  assert.match(gateD, /PLAYWRIGHT_ALLOW_PROD_SMOKE=1/);
-  assert.match(gateD, /PLAYWRIGHT_SKIP_WEBSERVER=1/);
-  assert.match(gateD, /Phase 3B.*HARD BLOCKED/i);
-  assert.match(gateD, /P0.*OPEN/i);
-  assert.match(gateD, /NO-GO/i);
-  assert.doesNotMatch(gateD, /\| \*\*P0:\*\* \| \*\*CLOSED\*\*/);
-  assert.doesNotMatch(gateD, /Launch stance:\s*\*\*GO\*\*/i);
+test("17 gate d prod result — PASS recorded, stance blocked, no launch GO claims", () => {
+  const gateDResult = readFileSync(join(root, "..", "docs", "gate-d-prod-browser-smoke-result-2026-06-28.md"), "utf8");
+  assert.match(gateDResult, /Gate D = \*\*YES\*\*/);
+  assert.match(gateDResult, /36\/36 PASS/i);
+  assert.match(gateDResult, /Phase 3B.*HARD BLOCKED/i);
+  assert.match(gateDResult, /P0.*OPEN/i);
+  assert.match(gateDResult, /NO-GO/i);
+  assert.doesNotMatch(gateDResult, /\| \*\*P0:\*\* \| \*\*CLOSED\*\*/);
+  assert.doesNotMatch(gateDResult, /Launch stance:\s*\*\*GO\*\*/i);
 
   const spec = read("e2e/p0-no-headless-final-state-browser.spec.ts");
   assert.match(spec, /PLAYWRIGHT_ALLOW_PROD_SMOKE=1/);
@@ -397,7 +393,7 @@ test("20 readiness consistency lock — gate docs and npm script registered", ()
 
   const evidenceIndex = readFileSync(join(root, "..", "docs", "LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md"), "utf8");
   assert.match(evidenceIndex, /test:readiness-consistency-lock/);
-  assert.match(evidenceIndex, /Gate D.*PENDING/i);
+  assert.match(evidenceIndex, /Gate D.*YES/i);
   assert.match(evidenceIndex, /Gate E.*PENDING/i);
   assert.match(evidenceIndex, /NO-GO/i);
   assert.match(evidenceIndex, /P0.*OPEN/i);

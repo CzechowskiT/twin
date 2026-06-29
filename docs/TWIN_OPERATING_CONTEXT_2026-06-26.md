@@ -43,7 +43,7 @@
 | **public-health `status`** | `ok` |
 | **public-health `db_ok`** | `true` |
 | **Gate C local browser** | **PASS** 36/36 — [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md) |
-| **Gate D decision package** | **PENDING** — [gate-d-prod-browser-smoke-decision-2026-06-28.md](./gate-d-prod-browser-smoke-decision-2026-06-28.md); prod browser **not executed** |
+| **Gate D decision package** | **EXECUTED** — prod browser **36/36 PASS** — [gate-d-prod-browser-smoke-result-2026-06-28.md](./gate-d-prod-browser-smoke-result-2026-06-28.md) |
 | **HTTP smoke (14 routes)** | **14/14 × 200** (prod read-only) |
 | **commit_interpretation** | Frontend (Vercel) and API (Railway) commits differ — expected; verify Alembic head separately. |
 
@@ -549,4 +549,4 @@ All preview surfaces — Hiring Journey, Scheduling Proposal Pack, marketing cop
 | 2026-06-29 | **Slice 28** — Gate D founder decision checkpoint [GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md](./GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md); `test:gate-d-founder-decision-checkpoint`; prod FE aligned `3f156327` post-#345; Gate D/E **PENDING**; Launch **NO-GO**; P0 **OPEN**; Phase 3B **BLOCKED** |
 | 2026-06-29 | **Slice 29** — readiness decision consistency lock (`test:readiness-consistency-lock`); cross-doc gate/launch stance guards; prod FE aligned `28fb3b4d` post-#346; Gate D/E **PENDING**; Launch **NO-GO**; P0 **OPEN**; Phase 3B **BLOCKED** |
 | 2026-06-29 | **Slice 30** — Gate D founder decision prompt [GATE_D_FOUNDER_DECISION_PROMPT_2026-06-28.md](./GATE_D_FOUNDER_DECISION_PROMPT_2026-06-28.md); `test:gate-d-founder-decision-prompt`; founder_decision **PENDING**; prod FE aligned `bb0957b3` post-#347; Gate D browser **not run**; Launch **NO-GO**; P0 **OPEN**; Gate D/E **PENDING**; Phase 3B **BLOCKED** |
-| 2026-06-29 | **Slice 31** — Gate D pending state maintenance (`test:gate-d-pending-state-maintenance`); runtime snapshot refresh; prod FE aligned `0270a665` post-#348; public-health 10× ok; HTTP smoke **10/10**; founder_decision **PENDING**; Gate D browser **not run**; Launch **NO-GO**; P0 **OPEN**; Gate D/E **PENDING**; Phase 3B **BLOCKED** |
+| 2026-06-29 | **Slice 32** — Gate D prod browser smoke **36/36 PASS** ([gate-d-prod-browser-smoke-result-2026-06-28.md](./gate-d-prod-browser-smoke-result-2026-06-28.md)); `test:gate-d-prod-browser-smoke-result`; prod FE aligned `1a7acc00`; Launch **NO-GO**; P0 **OPEN**; Gate D **YES/PASS**; Gate E **PENDING**; Phase 3B **NOT RUN** |

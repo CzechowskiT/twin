@@ -4,25 +4,25 @@
 **Founder decision:** Gate E = **PENDING** — **no Phase 3B controlled multitab executed in this package**  
 **Gate B:** **YES** (PR #332 `62138dc` shell fix merged)  
 **Gate C:** **YES** — local browser **36/36 PASS** — [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md)  
-**Gate D:** **PENDING** — prod browser **not executed** — [gate-d-prod-browser-smoke-decision-2026-06-28.md](./gate-d-prod-browser-smoke-decision-2026-06-28.md)  
+**Gate D:** **YES** — prod browser **36/36 PASS** — [gate-d-prod-browser-smoke-result-2026-06-28.md](./gate-d-prod-browser-smoke-result-2026-06-28.md)  
 **Launch stance:** **NO-GO** · **P0:** **OPEN** · **Phase 3B:** **HARD BLOCKED**
 
 ---
 
 ## 1. Executive Summary
 
-Gate B (minimal shell fix) is **merged**. Gate C unlocked **local** sequential browser validation (36 P0 routes, workers=1, **PASS**). Gate D remains the **separate founder boundary** for production browser smoke — **not executed**. Gate E is the **next separate founder boundary** for Phase 3B controlled multitab validation (20 routes, 3 batches 7+7+6).
+Gate B (minimal shell fix) is **merged**. Gate C unlocked **local** sequential browser validation (36 P0 routes, workers=1, **PASS**). Gate D prod browser smoke **PASS** (36/36, 54.9s). Gate E is the **next separate founder boundary** for Phase 3B controlled multitab validation (20 routes, 3 batches 7+7+6).
 
 **This package does NOT approve Gate E.** It prepares prerequisites documentation and static guards only. It does **not** execute Phase 3B, does **not** set Gate E = YES, does **not** close P0, and does **not** change launch stance.
 
 | Item | Status |
 |------|--------|
 | **Gate E decision** | **PENDING** — awaiting explicit founder YES |
-| **Gate D prerequisite** | **PENDING** — Gate D PASS required before Gate E unless founder documents explicit override |
+| **Gate D prerequisite** | **PASS** — [gate-d result](./gate-d-prod-browser-smoke-result-2026-06-28.md) — Gate E requires separate founder YES |
 | **Phase 3B inventory** | **20 routes** in batches **7+7+6** — static guards only |
 | **HTTP smoke (15 routes)** | **15/15 × 200** (curl, read-only, pre-change baseline) |
 | **Default CI** | Playwright **DISABLED** — `smoke.yml` has no browser steps |
-| **Next unlock** | Founder marks Gate D = YES → prod browser PASS → then Gate E = YES → run gated Phase 3B command (§7) |
+| **Next unlock** | Founder marks Gate E = YES → run gated Phase 3B command (§7) |
 
 ---
 
@@ -309,4 +309,4 @@ cd frontend && \
 
 **Not run:** Gate D prod browser, Phase 3B browser execution, multitab stress.
 
-**Public launch: NO-GO · P0 performance: OPEN · Phase 3B: HARD BLOCKED · Gate B: YES · Gate C: YES (local) · Gate D/E/F: PENDING**
+**Public launch: NO-GO · P0 performance: OPEN · Phase 3B: HARD BLOCKED · Gate B: YES · Gate C: YES (local) · Gate D: YES (prod PASS) · Gate E/F: PENDING**
