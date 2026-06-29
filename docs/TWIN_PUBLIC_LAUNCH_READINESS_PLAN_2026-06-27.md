@@ -457,6 +457,7 @@ flowchart LR
 | 2026-06-29 | **Slice 29** — readiness decision consistency lock; `test:readiness-consistency-lock`; Gate D command unified across decision/preflight/checkpoint/result; prod FE aligned `28fb3b4d` post-#346; Launch **NO-GO**; P0 **OPEN**; Gate D/E **PENDING**; Phase 3B **BLOCKED** |
 | 2026-06-29 | **Slice 30** — Gate D founder decision prompt; `test:gate-d-founder-decision-prompt`; founder_decision **PENDING**; prod FE aligned `bb0957b3` post-#347; Gate D browser **not run**; Launch **NO-GO**; P0 **OPEN**; Gate D/E **PENDING**; Phase 3B **BLOCKED** |
 | 2026-06-29 | **Slice 32** — Gate D prod browser smoke **36/36 PASS**; `test:gate-d-prod-browser-smoke-result`; prod FE aligned `1a7acc00`; Gate D **YES/PASS**; Launch **NO-GO**; P0 **OPEN**; Gate E **PENDING**; Phase 3B **NOT RUN** |
+| 2026-06-29 | **Slice 33** — Gate E founder decision package; `test:gate-e-founder-decision-package`; Gate D **PASS** prerequisite; explicit **Gate E = YES** required before Phase 3B; Launch **NO-GO**; P0 **OPEN**; Phase 3B **NOT RUN** |
 
 ---
 

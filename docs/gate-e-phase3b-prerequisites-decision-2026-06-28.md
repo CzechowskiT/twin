@@ -1,10 +1,11 @@
 # Gate E Phase 3B Prerequisites — Decision Package — 2026-06-28
 
-**Branch at package:** `cursor/phase1-monorepo-scaffold` @ `e856458` (post PR #341 Slice 23 merge)  
-**Founder decision:** Gate E = **PENDING** — **no Phase 3B controlled multitab executed in this package**  
-**Gate B:** **YES** (PR #332 `62138dc` shell fix merged)  
-**Gate C:** **YES** — local browser **36/36 PASS** — [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md)  
-**Gate D:** **YES** — prod browser **36/36 PASS** — [gate-d-prod-browser-smoke-result-2026-06-28.md](./gate-d-prod-browser-smoke-result-2026-06-28.md)  
+**Branch at package:** `cursor/phase1-monorepo-scaffold` @ `4d8f82e4` (post PR #350 Gate D PASS merge)
+**Founder decision:** Gate E = **PENDING** — **no Phase 3B controlled multitab executed in this package**
+**Gate B:** **YES** (PR #332 `62138dc` shell fix merged)
+**Gate C:** **YES** — local browser **36/36 PASS** — [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md)
+**Gate D:** **YES** — prod browser **36/36 PASS** — [gate-d-prod-browser-smoke-result-2026-06-28.md](./gate-d-prod-browser-smoke-result-2026-06-28.md)
+**Gate E decision package:** [GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) — **PENDING**
 **Launch stance:** **NO-GO** · **P0:** **OPEN** · **Phase 3B:** **HARD BLOCKED**
 
 ---
@@ -22,7 +23,7 @@ Gate B (minimal shell fix) is **merged**. Gate C unlocked **local** sequential b
 | **Phase 3B inventory** | **20 routes** in batches **7+7+6** — static guards only |
 | **HTTP smoke (15 routes)** | **15/15 × 200** (curl, read-only, pre-change baseline) |
 | **Default CI** | Playwright **DISABLED** — `smoke.yml` has no browser steps |
-| **Next unlock** | Founder marks Gate E = YES → run gated Phase 3B command (§7) |
+| **Next unlock** | Founder marks Gate E = YES in [GATE_E founder decision package](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) → run gated Phase 3B command (§7) |
 
 ---
 
@@ -45,9 +46,8 @@ Gate B (minimal shell fix) is **merged**. Gate C unlocked **local** sequential b
 |------------------|----------|--------|
 | **B** | PR #332 @ `62138dcc986bb068e717a9dafee38f822e94c66` — minimal shell fix | **MERGED** |
 | **C** | PR #333 @ `8774d33` + [gate-c result](./gate-c-browser-validation-result-2026-06-28.md) | **36/36 PASS** local |
-| **D** | PR #334 @ `b585055` + [gate-d decision](./gate-d-prod-browser-smoke-decision-2026-06-28.md) | **PENDING** — not run |
-| **Public UX** | PR #341 @ `e856458` — Slice 23 mobile visual QA static | **MERGED** |
-| **E** | This package | **PENDING** — not run |
+| **D** | PR #334 @ `b585055` + [gate-d result](./gate-d-prod-browser-smoke-result-2026-06-28.md) | **PASS** — 36/36 prod |
+| **E** | [GATE_E founder decision package](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) + this prerequisites doc | **PENDING** — not run |
 | **Phase 3B** | [PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md](./PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md) | **HARD BLOCKED** |
 
 ### HTTP smoke (15 routes, prod read-only — curl)
@@ -202,8 +202,8 @@ Reference: `frontend/e2e/phase3b-controlled-multitab.spec.ts`, `frontend/scripts
 | **A** | Static scope confirmed? | **PENDING** | Merge checklist PR |
 | **B** | Implementation branch approved? | **YES** | Merged PR #332 `62138dc` |
 | **C** | Gated local browser validation? | **YES** (local PASS) | **36/36 PASS** |
-| **D** | Production browser smoke approved? | **PENDING** | Run gate-d §4 command; fill result template |
-| **E** | Phase 3B controlled multitab approved? | **PENDING** | Run §7 command after Gate D PASS |
+| **D** | Production browser smoke approved? | **YES** — [gate-d result](./gate-d-prod-browser-smoke-result-2026-06-28.md) **36/36 PASS** |
+| **E** | Phase 3B controlled multitab approved? | **PENDING** | Run [GATE_E package](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) §6 command after Gate E = YES |
 | **F** | Launch-gate re-audit approved? | **PENDING** | Re-run launch checklist |
 
 **Founder response format (copy-paste):**

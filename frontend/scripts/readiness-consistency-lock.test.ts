@@ -17,6 +17,8 @@ const GATE_D_PROMPT = "docs/GATE_D_FOUNDER_DECISION_PROMPT_2026-06-28.md";
 const GATE_D_RESULT = "docs/gate-d-prod-browser-smoke-result-template-2026-06-28.md";
 const GATE_D_RESULT_EXECUTED = "docs/gate-d-prod-browser-smoke-result-2026-06-28.md";
 const GATE_E = "docs/gate-e-phase3b-prerequisites-decision-2026-06-28.md";
+const GATE_E_PACKAGE = "docs/GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md";
+const GATE_E_RESULT_TEMPLATE = "docs/gate-e-phase3b-result-template-2026-06-28.md";
 const EVIDENCE_INDEX = "docs/LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md";
 const SLICE12 = "docs/SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md";
 const FOUNDER_DEMO = "docs/FOUNDER_DEMO_CHECKLIST_2026-06-28.md";
@@ -34,6 +36,8 @@ const KEY_DOCS = [
   GATE_D_RESULT,
   GATE_D_RESULT_EXECUTED,
   GATE_E,
+  GATE_E_PACKAGE,
+  GATE_E_RESULT_TEMPLATE,
   EVIDENCE_INDEX,
   SLICE12,
   FOUNDER_DEMO,
@@ -53,6 +57,7 @@ const HISTORICAL_PACKAGE_DOCS = [
 
 const POST_PASS_STANCE_DOCS = [
   GATE_E,
+  GATE_E_PACKAGE,
   EVIDENCE_INDEX,
   SLICE12,
   FOUNDER_DEMO,
@@ -265,4 +270,24 @@ test("16 evidence index references gate D prod browser smoke result guard", () =
   assert.match(index, /NO-GO/i);
   assert.match(index, /P0.*OPEN/i);
   assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
+});
+
+test("17 gate E founder decision package — PENDING, Gate D PASS prerequisite, no overclaims", () => {
+  const gateEPackage = readRepo(GATE_E_PACKAGE);
+  assert.match(gateEPackage, /Gate E.*PENDING/i);
+  assert.match(gateEPackage, /Gate D.*PASS|36\/36 PASS/i);
+  assert.match(gateEPackage, /Phase 3B.*(NOT RUN|HARD BLOCKED)/i);
+  assert.match(gateEPackage, /NO-GO/i);
+  assert.match(gateEPackage, /P0.*OPEN/i);
+  assert.doesNotMatch(gateEPackage, /Launch stance:\s*\*\*GO\*\*/i);
+  assert.doesNotMatch(gateEPackage, /Phase 3B:\s*\*\*PASS\*\*/i);
+});
+
+test("18 gate E result template — template only, no execution recorded", () => {
+  const template = readRepo(GATE_E_RESULT_TEMPLATE);
+  assert.match(template, /Template only/i);
+  assert.match(template, /no Gate E execution recorded/i);
+  assert.match(template, /Gate E remains PENDING/i);
+  assert.match(template, /P0.*OPEN/i);
+  assert.match(template, /NO-GO/i);
 });

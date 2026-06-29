@@ -18,7 +18,7 @@
 | **Gate B** | **YES** — minimal `LightweightRouteShell` / `PersonaWorkspaceGate` fix merged (PR #332 @ `62138dc`) |
 | **Gate C** | **YES** — local browser **36/36 PASS** (workers=1) — [gate-c result](./gate-c-browser-validation-result-2026-06-28.md) |
 | **Gate D** | **YES** — prod browser **36/36 PASS** (54.9s, workers=1) — [gate-d result](./gate-d-prod-browser-smoke-result-2026-06-28.md); [preflight runbook](./gate-d-prod-browser-smoke-preflight-2026-06-28.md) |
-| **Gate E** | **PENDING** — Phase 3B controlled multitab **not run** — [gate-e prerequisites](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) |
+| **Gate E** | **PENDING** — Phase 3B controlled multitab **not run** — [gate-e decision package](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) · [prerequisites](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) |
 | **Gate F** | **PENDING** — production smoke boundaries / re-audit |
 | **Phase 3B** | **HARD BLOCKED** — founder STOP; no execution claim |
 | **Code constant** | `LAUNCH_STANCE = "noGo"` in `frontend/src/lib/investor-metrics-reality.ts` |
@@ -35,7 +35,7 @@ Controlled investor/founder demo is **supported** with explicit boundaries (§6�
 | **B** | Implementation branch approved? | **YES** | PR #332 @ `62138dcc986bb068e717a9dafee38f822e94c66` — shell/gate minimal fix merged |
 | **C** | Gated local browser validation? | **YES** | PR #333 + [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md) — **36/36 PASS**, 44.5s, workers=1 |
 | **D** | Gated prod browser smoke? | **YES** | [gate-d result](./gate-d-prod-browser-smoke-result-2026-06-28.md) — **36/36 PASS** on `https://twin-sooty.vercel.app`, 54.9s, workers=1 |
-| **E** | Phase 3B unblock? | **PENDING** | [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) — **not executed** |
+| **E** | Phase 3B unblock? | **PENDING** | [gate-e decision package](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) — **not executed** |
 | **F** | Prod smoke boundaries / re-audit? | **PENDING** | Awaits Gate D/E evidence |
 
 **Pilot/demo GO does not imply public launch GO.**
@@ -100,6 +100,8 @@ Concise shipped evidence (static + documented; no new runtime activation in Slic
 | **Gate D pending state maintenance** | `test:gate-d-pending-state-maintenance` (Slice 31) — recurring Gate D/E PENDING + NO-GO stance lock |
 | **Public marketing copy** | EN/PL label consistency (`test:public-marketing-copy-consistency`, Slice 27) |
 | **Gate E prerequisites** | Decision package prepared; Phase 3B inventory **20 routes** (7+7+6) — static only |
+| **Gate E founder decision** | [GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) + `test:gate-e-founder-decision-package` (Slice 33) — **PENDING**, no Phase 3B execution |
+| **Gate E result template** | [gate-e-phase3b-result-template-2026-06-28.md](./gate-e-phase3b-result-template-2026-06-28.md) — template only |
 | **Launch stance marker** | `LAUNCH_STANCE = "noGo"` unchanged |
 
 ---
@@ -149,7 +151,7 @@ Inventory sources:
 | `test:public-route-reference-guard` | 8 | Registry hrefs, 10-card Explore, product-proof discoverability |
 | `test:mobile-public-readiness` | 10 | Mobile overflow/tap-target on demo surfaces |
 | `test:homepage-nav` | 17 | Header/footer nav + Explore TWIN |
-| `test:launch-readiness-evidence-guard` | 14 | This index + checklist stance guards (Slices 25–31) |
+| `test:launch-readiness-evidence-guard` | 15 | This index + checklist stance guards (Slices 25–33) |
 | `test:public-marketing-copy-consistency` | 7 | EN/PL marketing label terminology (Slice 27) |
 | `test:gate-d-preflight-readiness` | 9 | Gate D preflight runbook guards (Slices 26–28) |
 | `test:gate-d-founder-decision-checkpoint` | 13 | Gate D founder decision checkpoint (Slice 28) |
@@ -157,6 +159,7 @@ Inventory sources:
 | `test:readiness-consistency-lock` | 16 | Cross-doc readiness stance consistency lock (Slice 29–31) |
 | `test:gate-d-pending-state-maintenance` | 11 | Gate D pending state maintenance lock (Slice 31) |
 | `test:gate-d-prod-browser-smoke-result` | 9 | Gate D prod browser smoke result guards (Slice 32) |
+| `test:gate-e-founder-decision-package` | 13 | Gate E founder decision package guards (Slice 33) |
 
 Full step-by-step founder script: [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUNDER_DEMO_CHECKLIST_2026-06-28.md).
 
@@ -185,7 +188,7 @@ Full step-by-step founder script: [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUND
 ## 8. Required Next Decisions
 
 1. ~~**Gate D = YES**~~ → **DONE** — [gate-d result](./gate-d-prod-browser-smoke-result-2026-06-28.md) records **36/36 PASS** (2026-06-29).
-2. **Gate E = YES** → founder review after Gate D **PASS**; then gated Phase 3B per [gate-e prerequisites §7](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) — **separate explicit YES required**.
+2. **Gate E = YES** → founder review after Gate D **PASS**; [gate-e decision package](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) + gated Phase 3B per §6 — **separate explicit YES required**.
 3. **Gate F / launch re-audit** → only after Gate D/E evidence and P0 performance review.
 4. **Public launch GO** → separate founder decision; §5 launch gate matrix must be green; **not implied** by this index.
 
@@ -218,6 +221,8 @@ This index summarizes evidence; the checklist is the **operational run sheet** f
 | [gate-d-prod-browser-smoke-result-2026-06-28.md](./gate-d-prod-browser-smoke-result-2026-06-28.md) | Gate D prod browser **36/36 PASS** |
 | [gate-d-prod-browser-smoke-result-template-2026-06-28.md](./gate-d-prod-browser-smoke-result-template-2026-06-28.md) | Gate D result template (blank — execution in dated result doc) |
 | [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) | Gate E prerequisites — **PENDING** |
+| [GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) | Gate E founder decision package — **PENDING** |
+| [gate-e-phase3b-result-template-2026-06-28.md](./gate-e-phase3b-result-template-2026-06-28.md) | Gate E result template (blank — no execution) |
 | [TWIN_PUBLIC_LAUNCH_READINESS_PLAN_2026-06-27.md](./TWIN_PUBLIC_LAUNCH_READINESS_PLAN_2026-06-27.md) | Launch roadmap + demo boundaries |
 | [TWIN_FEATURE_STATUS_AUDIT_2026-06-27.md](./TWIN_FEATURE_STATUS_AUDIT_2026-06-27.md) | Module classification |
 | [TWIN_OPERATING_CONTEXT_2026-06-26.md](./TWIN_OPERATING_CONTEXT_2026-06-26.md) | Ops source of truth |

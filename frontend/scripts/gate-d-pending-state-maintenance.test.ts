@@ -1,5 +1,5 @@
 /**
- * Slice 31 — Gate D pending state maintenance (static, no browser).
+ * Slice 31 — Gate D historical pending + post-pass stance maintenance (static, no browser).
  */
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -15,6 +15,7 @@ const GATE_D_PREFLIGHT = "docs/gate-d-prod-browser-smoke-preflight-2026-06-28.md
 const GATE_D_CHECKPOINT = "docs/GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md";
 const GATE_D_PROMPT = "docs/GATE_D_FOUNDER_DECISION_PROMPT_2026-06-28.md";
 const GATE_D_RESULT = "docs/gate-d-prod-browser-smoke-result-template-2026-06-28.md";
+const GATE_E_PACKAGE = "docs/GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md";
 const GATE_E = "docs/gate-e-phase3b-prerequisites-decision-2026-06-28.md";
 const EVIDENCE_INDEX = "docs/LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md";
 const SLICE12 = "docs/SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md";
@@ -32,6 +33,7 @@ const KEY_DOCS = [
   GATE_D_PROMPT,
   GATE_D_RESULT,
   GATE_E,
+  GATE_E_PACKAGE,
   EVIDENCE_INDEX,
   SLICE12,
   FOUNDER_DEMO,
@@ -51,7 +53,7 @@ const DECISION_DOCS = [
   FOUNDER_DEMO,
 ] as const;
 
-const POST_PASS_STANCE_DOCS = [EVIDENCE_INDEX, SLICE12, P0_SHELL_REVIEW] as const;
+const POST_PASS_STANCE_DOCS = [EVIDENCE_INDEX, SLICE12, P0_SHELL_REVIEW, GATE_E_PACKAGE] as const;
 
 const GATE_D_COMMAND_DOCS = [
   GATE_D_DECISION,
@@ -205,10 +207,11 @@ test("9 package.json — prod browser not default; browser scripts gated", () =>
   assert.doesNotMatch(pkg, /"ci":\s*"[^"]*p0-no-headless-final-state-browser/);
 });
 
-test("10 evidence index — Gate D prod result guard referenced", () => {
+test("10 evidence index — Gate D prod result and Gate E decision package referenced", () => {
   const index = readRepo(EVIDENCE_INDEX);
   assert.match(index, /test:gate-d-prod-browser-smoke-result/);
   assert.match(index, /gate-d-prod-browser-smoke-result-2026-06-28/);
+  assert.match(index, /GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28\.md/);
   assert.match(index, /Gate D.*YES/i);
   assert.match(index, /Gate E.*PENDING/i);
   assert.match(index, /NO-GO/i);
