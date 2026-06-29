@@ -28,6 +28,9 @@ export default function HowItWorksPage() {
             <Link href="/demo" className="section-cta-secondary twin-touch-target">
               {t("marketingHowItWorks.ctaDemo")}
             </Link>
+            <Link href="/#explore-twin" className="section-cta-secondary twin-touch-target">
+              {t("nav.exploreTwin")}
+            </Link>
           </div>
         </MarketingPageHeader>
         <div className="mt-10">

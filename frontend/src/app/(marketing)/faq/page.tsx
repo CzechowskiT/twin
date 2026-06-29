@@ -21,9 +21,15 @@ export default function FaqPage() {
         <ScrollReveal delayMs={0}>
           <MarketingPageHeader eyebrow={t("home.faqEyebrow")} title={t("site.faqPageTitle")} lead={t("site.faqPageLead")}>
             {metaLine ? <p className="text-sm text-[var(--twin-muted-strong)]">{metaLine}</p> : null}
-            <p className="text-sm text-[var(--twin-muted-strong)]">
+            <p className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-[var(--twin-muted-strong)]">
               <Link href="/" className="twin-link font-medium">
                 {t("site.faqMoreHome")}
+              </Link>
+              <Link href="/demo" className="twin-link font-medium">
+                {t("nav.demo")}
+              </Link>
+              <Link href="/#explore-twin" className="twin-link font-medium">
+                {t("nav.exploreTwin")}
               </Link>
             </p>
           </MarketingPageHeader>

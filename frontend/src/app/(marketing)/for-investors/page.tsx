@@ -1,8 +1,8 @@
 "use client";
 
-import { InvestorRoomPage } from "@/components/investor/investor-room-page";
+import { InvestorFundraisingPage } from "@/components/marketing/investor-fundraising-page";
 
-/** Legacy marketing alias — same honest investor room as `/investor`. */
+/** Public investor marketing context — distinct from executive `/investor` room. */
 export default function ForInvestorsPage() {
-  return <InvestorRoomPage />;
+  return <InvestorFundraisingPage />;
 }

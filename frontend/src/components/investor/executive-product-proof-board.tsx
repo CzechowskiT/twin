@@ -54,7 +54,10 @@ export function ExecutiveProductProofBoard({ workspace = false }: { workspace?: 
 
   return (
     <Shell wide>
-      <div data-executive-product-proof-page={EXECUTIVE_PRODUCT_PROOF_PAGE_MARKER} className="mx-auto max-w-5xl space-y-6">
+      <div
+        data-executive-product-proof-page={EXECUTIVE_PRODUCT_PROOF_PAGE_MARKER}
+        className="mx-auto max-w-6xl space-y-6 px-4 sm:px-6"
+      >
         <header className="space-y-3" data-testid={EXECUTIVE_PRODUCT_PROOF_MARKERS.header}>
           <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
             {t("executiveProductProof.pageEyebrow")}

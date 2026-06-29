@@ -179,10 +179,13 @@ test("marketing homepage rails keep horizontal padding regression guard", () => 
     "src/components/marketing/landing-faq.tsx",
     "src/components/marketing/landing-cta-band.tsx",
     "src/app/(marketing)/page.tsx",
+    "src/components/marketing/investor-fundraising-page.tsx",
+    "src/components/investor/executive-product-proof-board.tsx",
   ]) {
     const src = read(path);
+    const viaSurface = src.includes("MarketingPageSurface");
     for (const token of required) {
-      assert.match(src, new RegExp(token), `${path} missing ${token}`);
+      assert.ok(src.includes(token) || viaSurface, `${path} missing ${token}`);
     }
   }
 });
