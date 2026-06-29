@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { useTranslation } from "@/components/language-provider";
+import { MarketingCrosslinksBand } from "@/components/marketing/marketing-crosslinks-band";
 import { Card, Shell } from "@/components/ui";
 import {
   EXECUTIVE_PRODUCT_PROOF_DEMO_LINKS,
@@ -69,6 +70,7 @@ export function ExecutiveProductProofBoard({ workspace = false }: { workspace?: 
           ) : (
             <p className="text-xs text-[var(--twin-muted-strong)]">{t("executiveProductProof.publicNote")}</p>
           )}
+          <MarketingCrosslinksBand page="investor-product-proof" className="pt-2" />
         </header>
 
         <div className="grid gap-5 lg:grid-cols-2">

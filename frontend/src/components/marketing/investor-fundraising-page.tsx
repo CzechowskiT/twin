@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { useTranslation } from "@/components/language-provider";
 import { InvestorRoadmapPanel } from "@/components/investor-roadmap-panel";
+import { MarketingCrosslinksBand } from "@/components/marketing/marketing-crosslinks-band";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { MvpLiveStatsStrip } from "@/components/marketing/mvp-live-stats-strip";
 import { clearCookieConsent } from "@/lib/cookie-consent";
@@ -102,14 +103,14 @@ export function InvestorFundraisingPage({ ycMode = false }: { ycMode?: boolean }
               <p className="max-w-3xl text-base leading-relaxed text-[var(--twin-muted-strong)] sm:text-lg">
                 {t("investorFundraising.heroLead")}
               </p>
-              <div className="flex flex-wrap gap-3 pt-2">
+              <div className="flex flex-wrap gap-3 gap-y-2 pt-2">
                 <CtaPill href="/investor" primary>
                   {t("investorFundraising.ctaInvestorRoom")}
                 </CtaPill>
                 <CtaPill href="/investor/product-proof">{t("investorFundraising.ctaProductProof")}</CtaPill>
                 <CtaPill href="/demo">{t("investorFundraising.ctaDemo")}</CtaPill>
               </div>
-              <div className="flex flex-wrap gap-3 pt-1">
+              <div className="flex flex-wrap gap-3 gap-y-2 pt-1">
                 <CtaPill href="/investor/data-room">{t("investorFundraising.ctaDataRoom")}</CtaPill>
                 <CtaPill href={deckHref}>{t("investorFundraising.ctaDeck")}</CtaPill>
                 <CtaPill href="/for-investors/yc">{t("investorFundraising.ctaYc")}</CtaPill>

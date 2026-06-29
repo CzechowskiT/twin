@@ -29,7 +29,7 @@ export function LandingExploreTwin() {
           </p>
         </ScrollReveal>
 
-        <ul className="mt-6 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3 xl:grid-cols-4">
           {PUBLIC_EXPLORE_TWIN_ENTRIES.map((entry, i) => (
             <ScrollReveal key={entry.id} delayMs={30 + i * 25} className="h-full">
               <li className="h-full list-none">

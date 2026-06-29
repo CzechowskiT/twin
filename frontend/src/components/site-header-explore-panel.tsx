@@ -97,7 +97,7 @@ export function SiteHeaderExplorePanel({ variant, onNavigate }: SiteHeaderExplor
   return (
     <details ref={detailsRef} className="relative shrink-0">
       <summary
-        className="twin-nav-link cursor-pointer list-none whitespace-nowrap [&::-webkit-details-marker]:hidden"
+        className="twin-nav-link shrink-0 cursor-pointer list-none whitespace-normal sm:whitespace-nowrap [&::-webkit-details-marker]:hidden"
         aria-haspopup="true"
       >
         {t("nav.exploreTwin")}
