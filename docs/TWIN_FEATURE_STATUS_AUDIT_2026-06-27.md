@@ -315,3 +315,4 @@ cd frontend && npm run build && npx tsc --noEmit
 | 2026-06-28 | Slice 20 completed — `/for-investors` vs `/investor` label/route separation hardened; fundraising CTAs → executive room + product proof + demo; public page container rhythm; static marketing consistency guard; Gate D/E **PENDING** |
 | 2026-06-28 | Slice 21 completed — founder-led demo cross-links on public marketing surfaces; mobile spacing guards; `test:founder-demo-crosslinks`; Gate D/E **PENDING** |
 | 2026-06-28 | Slice 22 completed — mobile founder demo readiness (`MarketingCrosslinksBand` grid/container hardening, overflow guards on demo/investor surfaces, header/footer mobile rhythm); `test:mobile-public-readiness`; Slice 21 cross-links preserved; Gate D/E **PENDING** |
+| 2026-06-28 | Slice 23 completed — static mobile visual QA hardening (Explore mobile panel overflow/tap-target guards, extended static test suite); Slice 21 cross-links preserved; Gate D/E **PENDING** |

@@ -446,6 +446,7 @@ flowchart LR
 | 2026-06-28 | **Slice 20** — public marketing CTA/container consistency; `/for-investors` fundraising page separated from `/investor` executive room; investor room + product proof + demo discoverability; FAQ/how-it-works explore links; `public-marketing-consistency` static guard; no Gate D browser; LAUNCH_STANCE unchanged |
 | 2026-06-28 | **Slice 21** — founder demo cross-links band on demo/how-it-works/faq/investor/product-proof; mobile spacing polish (header wrap, Explore, grid, CTAs, footer); `test:founder-demo-crosslinks`; no Gate D browser; LAUNCH_STANCE unchanged |
 | 2026-06-28 | **Slice 22** — mobile founder demo readiness: `MarketingCrosslinksBand` container grid + overflow guards; min-w-0 on demo/investor surfaces; header/footer mobile rhythm; `test:mobile-public-readiness`; no Gate D browser; LAUNCH_STANCE unchanged |
+| 2026-06-28 | **Slice 23** — static mobile visual QA hardening: Explore mobile panel flex-col/overflow guards; extended `test:mobile-public-readiness` + crosslink/consistency guards; Slice 21 map preserved; no Gate D browser; LAUNCH_STANCE unchanged |
 | 2026-06-28 | **Slice 12 Gate C executed** — local browser **36/36 PASS**; Gate D/E/F **PENDING**; P0 **OPEN**; Phase 3B **BLOCKED**; LAUNCH_STANCE unchanged |
 | 2026-06-28 | **Slice 12 Gate D decision package** — [gate-d-prod-browser-smoke-decision-2026-06-28.md](./gate-d-prod-browser-smoke-decision-2026-06-28.md); prod browser **not executed**; Gate D **PENDING** |
 

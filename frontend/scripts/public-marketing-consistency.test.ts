@@ -141,6 +141,26 @@ test("public marketing surfaces keep container rhythm", () => {
   }
 });
 
+test("/investor executive room remains distinct from fundraising page", () => {
+  const room = read("src/components/investor/investor-room-page.tsx");
+  const investorRoot = read("src/app/investor/page.tsx");
+  const fundraising = read("src/components/marketing/investor-fundraising-page.tsx");
+  assert.match(investorRoot, /InvestorRoomPage/);
+  assert.doesNotMatch(investorRoot, /InvestorFundraisingPage/);
+  assert.match(room, /MarketingCrosslinksBand/);
+  assert.doesNotMatch(room, /InvestorFundraisingPage/);
+  assert.doesNotMatch(fundraising, /InvestorRoomPage/);
+});
+
+test("/investor/product-proof keeps safe public container rhythm", () => {
+  const board = read("src/components/investor/executive-product-proof-board.tsx");
+  assert.match(board, /max-w-6xl/);
+  assert.match(board, /px-4/);
+  assert.match(board, /sm:px-6/);
+  assert.match(board, /overflow-x-hidden/);
+  assert.match(board, /min-w-0/);
+});
+
 test("investor fundraising copy avoids unsafe launch or live-action claims", () => {
   const positiveForbidden =
     /\blaunch ready\b|\bproduction ready\b|\bphase 3b passed\b|\bp0 closed\b|\blive ats\b|\boutreach sent\b|\bcalendar write\b|\bpayment active\b/i;
