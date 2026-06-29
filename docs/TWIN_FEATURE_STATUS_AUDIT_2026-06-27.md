@@ -318,3 +318,4 @@ cd frontend && npm run build && npx tsc --noEmit
 | 2026-06-28 | Slice 23 completed — static mobile visual QA hardening (Explore mobile panel overflow/tap-target guards, extended static test suite); Slice 21 cross-links preserved; Gate D/E **PENDING** |
 | 2026-06-28 | Slice 24 completed — dead `MarketingCrosslinksBand` import removed from fundraising page; `test:public-route-reference-guard` (10-card Explore, investor IA, product-proof discoverability); Gate E prerequisites package; Gate D/E **PENDING** |
 | 2026-06-28 | Slice 25 completed — [LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md](./LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md) + [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUNDER_DEMO_CHECKLIST_2026-06-28.md); public/demo evidence organized; no launch approval |
+| 2026-06-28 | Slice 26 completed — Gate D preflight runbook + result template; `test:gate-d-preflight-readiness`; Gate D **not executed**; Gate D/E **PENDING** |

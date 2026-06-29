@@ -29,7 +29,7 @@ Complete before sharing screen:
 | Safe HTTP smoke | **10/10 × 200** | curl routes in evidence index §3 |
 | Launch stance | **NO-GO** | `LAUNCH_STANCE = "noGo"` |
 | P0 | **OPEN** | Do not claim closed |
-| Gate D | **PENDING** — prod browser not run | |
+| Gate D | **PENDING** — prod browser not run | [preflight runbook](./gate-d-prod-browser-smoke-preflight-2026-06-28.md) |
 | Gate E | **PENDING** — Phase 3B not run | |
 | Auto-apply | **PAUSED** | public-health / ops context |
 | Browser tab discipline | Single-tab demo path | No multitab stress |

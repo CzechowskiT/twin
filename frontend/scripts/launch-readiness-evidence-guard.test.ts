@@ -29,6 +29,8 @@ const DEMO_PATH_ROUTES = [
 const REQUIRED_SOURCE_DOCS = [
   "gate-c-browser-validation-result-2026-06-28.md",
   "gate-d-prod-browser-smoke-decision-2026-06-28.md",
+  "gate-d-prod-browser-smoke-preflight-2026-06-28.md",
+  "gate-d-prod-browser-smoke-result-template-2026-06-28.md",
   "gate-e-phase3b-prerequisites-decision-2026-06-28.md",
   "TWIN_PUBLIC_LAUNCH_READINESS_PLAN_2026-06-27.md",
   "TWIN_OPERATING_CONTEXT_2026-06-26.md",
@@ -100,4 +102,13 @@ test("7 evidence index links founder demo checklist", () => {
 test("8 LAUNCH_STANCE remains noGo in code", () => {
   const launchStance = readFileSync(join(root, "src/lib/investor-metrics-reality.ts"), "utf8");
   assert.match(launchStance, /LAUNCH_STANCE\s*=\s*"noGo"/);
+});
+
+test("9 evidence index references Gate D preflight while Gate D/E remain PENDING", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /gate-d-prod-browser-smoke-preflight-2026-06-28\.md/);
+  assert.match(index, /Gate D.*PENDING/i);
+  assert.match(index, /Gate E.*PENDING/i);
+  assert.match(index, /NO-GO/i);
+  assert.match(index, /P0.*OPEN/i);
 });

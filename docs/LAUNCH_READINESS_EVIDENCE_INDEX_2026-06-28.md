@@ -17,7 +17,7 @@
 | **P0 performance** | **OPEN** |
 | **Gate B** | **YES** — minimal `LightweightRouteShell` / `PersonaWorkspaceGate` fix merged (PR #332 @ `62138dc`) |
 | **Gate C** | **YES** — local browser **36/36 PASS** (workers=1) — [gate-c result](./gate-c-browser-validation-result-2026-06-28.md) |
-| **Gate D** | **PENDING** — prod browser smoke **not run** — [gate-d decision](./gate-d-prod-browser-smoke-decision-2026-06-28.md) |
+| **Gate D** | **PENDING** — prod browser smoke **not run** — [gate-d decision](./gate-d-prod-browser-smoke-decision-2026-06-28.md); preflight [runbook](./gate-d-prod-browser-smoke-preflight-2026-06-28.md) + [result template](./gate-d-prod-browser-smoke-result-template-2026-06-28.md) |
 | **Gate E** | **PENDING** — Phase 3B controlled multitab **not run** — [gate-e prerequisites](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) |
 | **Gate F** | **PENDING** — production smoke boundaries / re-audit |
 | **Phase 3B** | **HARD BLOCKED** — founder STOP; no execution claim |
@@ -34,7 +34,7 @@ Controlled investor/founder demo is **supported** with explicit boundaries (§6�
 | **A** | Static review package confirmed? | **PENDING** | [P0_SHELL_FOUNDER_REVIEW_2026-06-28.md](./P0_SHELL_FOUNDER_REVIEW_2026-06-28.md), [SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md](./SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md) |
 | **B** | Implementation branch approved? | **YES** | PR #332 @ `62138dcc986bb068e717a9dafee38f822e94c66` — shell/gate minimal fix merged |
 | **C** | Gated local browser validation? | **YES** | PR #333 + [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md) — **36/36 PASS**, 44.5s, workers=1 |
-| **D** | Gated prod browser smoke? | **PENDING** | [gate-d-prod-browser-smoke-decision-2026-06-28.md](./gate-d-prod-browser-smoke-decision-2026-06-28.md) — **not executed** |
+| **D** | Gated prod browser smoke? | **PENDING** | [gate-d decision](./gate-d-prod-browser-smoke-decision-2026-06-28.md) + [preflight](./gate-d-prod-browser-smoke-preflight-2026-06-28.md) — **not executed** |
 | **E** | Phase 3B unblock? | **PENDING** | [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) — **not executed** |
 | **F** | Prod smoke boundaries / re-audit? | **PENDING** | Awaits Gate D/E evidence |
 
@@ -170,7 +170,7 @@ Full step-by-step founder script: [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUND
 
 ## 8. Required Next Decisions
 
-1. **Gate D = YES** → run gated prod browser smoke per [gate-d decision §4](./gate-d-prod-browser-smoke-decision-2026-06-28.md) (`PLAYWRIGHT_ALLOW_PROD_SMOKE=1`, `PLAYWRIGHT_SKIP_WEBSERVER=1`, workers=1).
+1. **Gate D = YES** → run gated prod browser smoke per [gate-d preflight §4](./gate-d-prod-browser-smoke-preflight-2026-06-28.md) (`PLAYWRIGHT_ALLOW_PROD_SMOKE=1`, `PLAYWRIGHT_SKIP_WEBSERVER=1`, workers=1); fill [result template](./gate-d-prod-browser-smoke-result-template-2026-06-28.md).
 2. **Gate E = YES** → only after Gate D **PASS** or documented founder override; then gated Phase 3B per [gate-e prerequisites §7](./gate-e-phase3b-prerequisites-decision-2026-06-28.md).
 3. **Gate F / launch re-audit** → only after Gate D/E evidence and P0 performance review.
 4. **Public launch GO** → separate founder decision; §5 launch gate matrix must be green; **not implied** by this index.
@@ -198,6 +198,8 @@ This index summarizes evidence; the checklist is the **operational run sheet** f
 |----------|------|
 | [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md) | Gate C local browser 36/36 PASS |
 | [gate-d-prod-browser-smoke-decision-2026-06-28.md](./gate-d-prod-browser-smoke-decision-2026-06-28.md) | Gate D decision package — **PENDING** |
+| [gate-d-prod-browser-smoke-preflight-2026-06-28.md](./gate-d-prod-browser-smoke-preflight-2026-06-28.md) | Gate D preflight runbook — **not executed** |
+| [gate-d-prod-browser-smoke-result-template-2026-06-28.md](./gate-d-prod-browser-smoke-result-template-2026-06-28.md) | Gate D result template — fill after approved run |
 | [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) | Gate E prerequisites — **PENDING** |
 | [TWIN_PUBLIC_LAUNCH_READINESS_PLAN_2026-06-27.md](./TWIN_PUBLIC_LAUNCH_READINESS_PLAN_2026-06-27.md) | Launch roadmap + demo boundaries |
 | [TWIN_FEATURE_STATUS_AUDIT_2026-06-27.md](./TWIN_FEATURE_STATUS_AUDIT_2026-06-27.md) | Module classification |
