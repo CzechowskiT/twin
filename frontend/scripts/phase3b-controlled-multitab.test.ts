@@ -160,3 +160,28 @@ test("10 gate d decision package — Gate D PENDING, prod env flags documented, 
   assert.doesNotMatch(smokeWorkflow, /playwright test/i);
   assert.doesNotMatch(smokeWorkflow, /p0-no-headless-final-state-browser/);
 });
+
+test("11 gate e prerequisites — doc exists, PENDING, blocked, no overclaims", () => {
+  const gateE = readRepo("docs/gate-e-phase3b-prerequisites-decision-2026-06-28.md");
+  assert.match(gateE, /Gate E.*PENDING/i);
+  assert.match(gateE, /Gate D.*PENDING/i);
+  assert.match(gateE, /Gate B.*YES/i);
+  assert.match(gateE, /Gate C.*YES/i);
+  assert.match(gateE, /Phase 3B.*HARD BLOCKED/i);
+  assert.match(gateE, /20 routes/i);
+  assert.match(gateE, /7 \+ 7 \+ 6/);
+  assert.match(gateE, /P0.*OPEN/i);
+  assert.match(gateE, /NO-GO/i);
+  assert.match(gateE, /does NOT approve Gate E/i);
+  assert.doesNotMatch(gateE, /Launch stance:\s*\*\*GO\*\*/i);
+
+  const checklist = readRepo("docs/SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md");
+  assert.match(checklist, /gate-e-phase3b-prerequisites-decision-2026-06-28/i);
+
+  const smokeWorkflow = readRepo(".github/workflows/smoke.yml");
+  assert.doesNotMatch(smokeWorkflow, /playwright test/i);
+  assert.doesNotMatch(smokeWorkflow, /phase3b-controlled-multitab-browser/);
+
+  const launchStance = read("src/lib/investor-metrics-reality.ts");
+  assert.match(launchStance, /LAUNCH_STANCE\s*=\s*"noGo"/);
+});

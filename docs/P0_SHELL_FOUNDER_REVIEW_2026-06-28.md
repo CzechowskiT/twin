@@ -229,6 +229,7 @@ Even perfect shell performance does **not** imply public launch, auto-apply acti
 | 2026-06-28 | **Gate B — minimal shell fix merged** (`PersonaWorkspaceGateShell`, `hasActiveSession`, lazy `OnboardingGate`) | **SHIPPED** |
 | 2026-06-28 | **Gate C — local browser validation PASS** (36/36, workers=1) | **SHIPPED** — [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md) |
 | 2026-06-28 | **Gate D — prod browser decision package** (docs + static guards; **not executed**) | **PENDING** — [gate-d-prod-browser-smoke-decision-2026-06-28.md](./gate-d-prod-browser-smoke-decision-2026-06-28.md) |
+| 2026-06-28 | **Gate E — Phase 3B prerequisites package** (docs + static guards; **not executed**) | **PENDING** — [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) |
 | TBD | Gate D — prod browser execution | **PENDING** |
 | TBD | Gate E — Phase 3B unblock | **PENDING** |
 | TBD | P0 performance **CLOSED** | **BLOCKED** |
@@ -252,6 +253,8 @@ cd frontend && \
 **Gate C local browser:** **PASS** 36/36 — [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md).
 
 **Gate D decision package:** [gate-d-prod-browser-smoke-decision-2026-06-28.md](./gate-d-prod-browser-smoke-decision-2026-06-28.md) — **PENDING**, prod browser **not executed**.
+
+**Gate E prerequisites package:** [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) — **PENDING**, Phase 3B **not executed**.
 
 **Not run:** prod browser execution (Gate D), Phase 3B (Gate E), multitab, stress.
 
