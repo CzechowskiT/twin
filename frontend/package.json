@@ -63,6 +63,7 @@
     "test:homepage-nav": "npx --yes tsx scripts/homepage-nav.test.ts",
     "test:public-marketing-consistency": "npx --yes tsx scripts/public-marketing-consistency.test.ts",
     "test:public-route-reference-guard": "npx --yes tsx scripts/public-route-reference-guard.test.ts",
+    "test:launch-readiness-evidence-guard": "npx --yes tsx scripts/launch-readiness-evidence-guard.test.ts",
     "test:founder-demo-crosslinks": "npx --yes tsx scripts/founder-demo-crosslinks.test.ts",
     "test:mobile-public-readiness": "npx --yes tsx scripts/mobile-public-readiness.test.ts",
     "test:landing-auth-shell": "npx --yes tsx scripts/landing-auth-shell.test.ts",
