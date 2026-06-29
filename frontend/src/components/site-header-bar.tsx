@@ -140,7 +140,7 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
   return (
     <header className="twin-header-bar sticky top-0 z-50">
       <div className="twin-header-stripe" aria-hidden />
-      <div className="twin-container flex flex-wrap items-center gap-x-3 gap-y-2 py-3 lg:gap-x-4 lg:py-3.5">
+      <div className="twin-container flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 py-3 lg:gap-x-4 lg:py-3.5">
         <div className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3">
           <Link href="/" className="twin-logo shrink-0">
             TWIN<span className="twin-logo-accent">.</span>

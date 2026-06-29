@@ -19,19 +19,30 @@ export function MarketingCrosslinksBand({ page, className = "" }: MarketingCross
   const links = FOUNDER_DEMO_CROSSLINKS_BY_PAGE[page];
 
   return (
-    <nav
-      className={`flex flex-wrap items-center gap-x-4 gap-y-2 text-sm ${className}`.trim()}
-      aria-label={t("marketingCrosslinks.ariaLabel")}
+    <div
+      className={`-mx-4 min-w-0 overflow-x-hidden sm:-mx-6 ${className}`.trim()}
       data-founder-demo-crosslinks={page}
     >
-      <span className="w-full shrink-0 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--twin-muted)] sm:w-auto">
-        {t("marketingCrosslinks.heading")}
-      </span>
-      {links.map((link) => (
-        <Link key={link.href} href={link.href} className="twin-link font-medium">
-          {t(link.labelKey)}
-        </Link>
-      ))}
-    </nav>
+      <nav
+        className="mx-auto max-w-6xl px-4 sm:px-6"
+        aria-label={t("marketingCrosslinks.ariaLabel")}
+      >
+        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--twin-muted)]">
+          {t("marketingCrosslinks.heading")}
+        </p>
+        <ul className="mt-2 grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {links.map((link) => (
+            <li key={link.href} className="min-w-0 list-none">
+              <Link
+                href={link.href}
+                className="twin-touch-target twin-link block min-w-0 break-words rounded-lg px-2 py-2.5 text-sm font-medium hover:bg-[var(--twin-accent-muted)]/25"
+              >
+                {t(link.labelKey)}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
   );
 }

@@ -110,6 +110,7 @@ test("site header renders Explore TWIN mega-panel trigger on marketing chrome", 
   assert.match(header, /SiteHeaderExplorePanel/);
   assert.match(header, /variant="desktop"/);
   assert.match(header, /variant="mobile"/);
+  assert.match(header, /min-w-0/);
 });
 
 test("guest header main lane excludes executive investor room shortcut", () => {

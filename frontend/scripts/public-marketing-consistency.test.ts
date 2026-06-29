@@ -126,6 +126,7 @@ test("public marketing surfaces keep container rhythm", () => {
   const paths = [
     "src/components/marketing/investor-fundraising-page.tsx",
     "src/components/marketing/marketing-page-surface.tsx",
+    "src/components/marketing/marketing-crosslinks-band.tsx",
     "src/components/investor/executive-product-proof-board.tsx",
     "src/app/(marketing)/faq/page.tsx",
     "src/app/(marketing)/how-it-works/page.tsx",

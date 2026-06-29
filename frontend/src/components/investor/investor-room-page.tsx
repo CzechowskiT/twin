@@ -98,10 +98,10 @@ export function InvestorRoomPage() {
     <Shell wide>
       <MarketingPageSurface wide withCard={false}>
         <div
-          className={`${INVESTOR_ROOM_VISUAL_MARKERS.page} marketing-copy-rail space-y-10 sm:space-y-12`}
+          className={`${INVESTOR_ROOM_VISUAL_MARKERS.page} marketing-copy-rail min-w-0 space-y-10 sm:space-y-12`}
           data-testid="investor-room-page"
         >
-          <header className="space-y-4 text-start">
+          <header className="min-w-0 space-y-4 text-start">
             <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
               {t("investorRoom.eyebrow")}
             </p>

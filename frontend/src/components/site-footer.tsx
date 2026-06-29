@@ -48,8 +48,8 @@ export function SiteFooter() {
 
   return (
     <footer className="border-t border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/80">
-      <div className="twin-container py-10 sm:py-12">
-        <div className="grid gap-8 sm:grid-cols-2 sm:gap-10 lg:grid-cols-4">
+      <div className="twin-container min-w-0 overflow-x-hidden py-10 sm:py-12">
+        <div className="grid min-w-0 grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-10 lg:grid-cols-4">
           <div className="min-w-0">
             <Link href="/" className="twin-logo inline-block text-lg no-underline hover:opacity-90">
               TWIN<span className="twin-logo-accent">.</span>
