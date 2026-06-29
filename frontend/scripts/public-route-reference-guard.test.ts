@@ -21,6 +21,7 @@ import { PUBLIC_EXPLORE_TWIN_ENTRIES, PUBLIC_EXPLORE_TWIN_HREFS } from "../src/l
 import { PUBLIC_FOOTER_SITEMAP_HREFS } from "../src/lib/public-footer-sitemap-routes";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const repoRoot = join(root, "..");
 
 function read(path: string): string {
   return readFileSync(join(root, path), "utf8");
@@ -133,4 +134,36 @@ test("8 /for-investors and /investor remain semantically separate routes", () =>
   assert.ok(fundraisingHref);
   assert.ok(roomHref);
   assert.ok(roomHref.highlight);
+});
+
+const FOUNDER_DEMO_CHECKLIST_ROUTES = [
+  "/",
+  "/#explore-twin",
+  "/for-investors",
+  "/investor",
+  "/investor/product-proof",
+  "/demo",
+  "/how-it-works",
+  "/faq",
+  "/dashboard/trust",
+  "/status",
+] as const;
+
+test("9 founder demo checklist routes match known public registries", () => {
+  const checklist = readFileSync(join(repoRoot, "docs/FOUNDER_DEMO_CHECKLIST_2026-06-28.md"), "utf8");
+  const registryHrefs = new Set([
+    ...headerMarketingLaneLinks().map((l) => l.href),
+    ...HEADER_EXPLORE_MEGA_PANEL_HREFS,
+    ...PUBLIC_EXPLORE_TWIN_HREFS,
+    ...PUBLIC_FOOTER_SITEMAP_HREFS,
+    ...Object.values(FOUNDER_DEMO_CROSSLINKS_BY_PAGE).flatMap((links) => links.map((l) => l.href)),
+    "/",
+    "/status",
+    "/#explore-twin",
+  ]);
+  for (const route of FOUNDER_DEMO_CHECKLIST_ROUTES) {
+    assert.match(checklist, new RegExp(route.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+    if (route === "/" || route.startsWith("/#")) continue;
+    assert.ok(registryHrefs.has(route), `checklist route ${route} missing from registries`);
+  }
 });

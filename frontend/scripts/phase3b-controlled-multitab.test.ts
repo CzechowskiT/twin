@@ -185,3 +185,15 @@ test("11 gate e prerequisites — doc exists, PENDING, blocked, no overclaims", 
   const launchStance = read("src/lib/investor-metrics-reality.ts");
   assert.match(launchStance, /LAUNCH_STANCE\s*=\s*"noGo"/);
 });
+
+test("12 slice25 evidence index — exists, Phase 3B not run, no overclaims", () => {
+  const evidenceIndex = readRepo("docs/LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md");
+  assert.match(evidenceIndex, /Launch Readiness Evidence Index/);
+  assert.match(evidenceIndex, /Phase 3B.*(NOT RUN|HARD BLOCKED|not run)/i);
+  assert.match(evidenceIndex, /Gate E.*PENDING/i);
+  assert.doesNotMatch(evidenceIndex, /Phase 3B.*\*\*PASS\*\*/i);
+  assert.doesNotMatch(evidenceIndex, /Launch stance:\s*\*\*GO\*\*/i);
+
+  const founderChecklist = readRepo("docs/FOUNDER_DEMO_CHECKLIST_2026-06-28.md");
+  assert.match(founderChecklist, /Founder Demo Checklist/);
+});
