@@ -452,6 +452,7 @@ flowchart LR
 | 2026-06-28 | **Slice 24** — public route reference guard + dead-import cleanup; Gate E prerequisites [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md); Gate E **PENDING**; no P0 closure / launch GO |
 | 2026-06-28 | **Slice 25** — launch readiness evidence index + founder demo checklist; `test:launch-readiness-evidence-guard`; Launch **NO-GO**; P0 **OPEN**; Gate D/E **PENDING**; Phase 3B **NOT RUN** |
 | 2026-06-28 | **Slice 26** — Gate D preflight runbook + result template ready; `test:gate-d-preflight-readiness`; Gate D **not executed**; Launch **NO-GO**; P0 **OPEN**; Gate D/E **PENDING** |
+| 2026-06-28 | **Slice 27** — public marketing EN/PL copy consistency sweep; `test:public-marketing-copy-consistency`; evidence doc alignment; Gate D preflight remains ready **not executed**; Launch **NO-GO**; P0 **OPEN**; Gate D/E **PENDING**; Phase 3B **BLOCKED** |
 
 ---
 

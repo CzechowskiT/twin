@@ -242,8 +242,8 @@ test("site footer renders stable public sitemap — distinct investor routes", (
 });
 
 test("footer investor labels distinguish marketing page from executive room (EN/PL)", () => {
-  assert.equal(en.site.footerForInvestors, "For investors");
-  assert.equal(en.site.footerInvestorRoom, "Investor room");
+  assert.equal(en.site.footerForInvestors, "For Investors");
+  assert.equal(en.site.footerInvestorRoom, "Investor Room");
   assert.notEqual(en.site.footerForInvestors, en.site.footerInvestorRoom);
   assert.equal(dictionaries.pl.site.footerForInvestors, "Dla inwestorów");
   assert.equal(dictionaries.pl.site.footerInvestorRoom, "Sala executive");

@@ -262,3 +262,58 @@ test("dashboard and recruiter trust copy state automation pause and human decisi
     }
   }
 });
+
+const EVIDENCE_DOCS = [
+  "docs/LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md",
+  "docs/FOUNDER_DEMO_CHECKLIST_2026-06-28.md",
+  "docs/gate-d-prod-browser-smoke-preflight-2026-06-28.md",
+  "docs/gate-d-prod-browser-smoke-result-template-2026-06-28.md",
+  "docs/gate-d-prod-browser-smoke-decision-2026-06-28.md",
+  "docs/gate-e-phase3b-prerequisites-decision-2026-06-28.md",
+] as const;
+
+function readRepoDoc(relativePath: string): string {
+  const repoRoot = join(root, "..");
+  return readFileSync(join(repoRoot, relativePath), "utf8");
+}
+
+function hasPositiveDocWorkflowClaim(blob: string, pattern: RegExp): boolean {
+  const re = new RegExp(pattern.source, pattern.flags.includes("g") ? pattern.flags : `${pattern.flags}g`);
+  for (const match of blob.matchAll(re)) {
+    const idx = match.index ?? 0;
+    const lineStart = blob.lastIndexOf("\n", idx) + 1;
+    const lineEnd = blob.indexOf("\n", idx);
+    const line = blob.slice(lineStart, lineEnd === -1 ? undefined : lineEnd);
+    if (/\bNOT LIVE\b|\bnot live\b|\bNIE LIVE\b|\bno\b|\bnot\b|\bbez\b|\bforbidden\b/i.test(line)) continue;
+    const before = blob.slice(Math.max(0, idx - 28), idx);
+    if (/\b(not|no|bez|nie|brak|without|blocked|disabled|off|paused|wstrzym)\s*$/i.test(before)) continue;
+    return true;
+  }
+  return false;
+}
+
+test("14 evidence docs avoid launch GO, P0 closed, Phase 3B passed, and live workflow claims", () => {
+  const stanceForbidden = [
+    /Launch stance:\s*\*\*GO\*\*/i,
+    /\| \*\*P0:\*\* \| \*\*CLOSED\*\*/,
+    /Phase 3B.*\*\*PASS\*\*/i,
+    /Gate D.*\*\*PASS\*\*.*executed/i,
+  ];
+  const positiveWorkflowForbidden = [
+    /\blive ATS writeback\b/i,
+    /\boutreach (is )?live\b/i,
+    /\bcalendar write(s)? enabled\b/i,
+    /\bpayment(s)? active\b/i,
+  ];
+
+  for (const doc of EVIDENCE_DOCS) {
+    const src = readRepoDoc(doc);
+    for (const pattern of stanceForbidden) {
+      assert.equal(hasPositiveDocWorkflowClaim(src, pattern), false, `${pattern} in ${doc}`);
+    }
+    for (const pattern of positiveWorkflowForbidden) {
+      assert.equal(hasPositiveDocWorkflowClaim(src, pattern), false, `${pattern} in ${doc}`);
+    }
+    assert.match(src, /NO-GO|PENDING|not run|NOT RUN|HARD BLOCKED|No public launch/i, doc);
+  }
+});
