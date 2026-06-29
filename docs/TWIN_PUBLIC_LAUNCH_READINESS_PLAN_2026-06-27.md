@@ -449,6 +449,7 @@ flowchart LR
 | 2026-06-28 | **Slice 23** — static mobile visual QA hardening: Explore mobile panel flex-col/overflow guards; extended `test:mobile-public-readiness` + crosslink/consistency guards; Slice 21 map preserved; no Gate D browser; LAUNCH_STANCE unchanged |
 | 2026-06-28 | **Slice 12 Gate C executed** — local browser **36/36 PASS**; Gate D/E/F **PENDING**; P0 **OPEN**; Phase 3B **BLOCKED**; LAUNCH_STANCE unchanged |
 | 2026-06-28 | **Slice 12 Gate D decision package** — [gate-d-prod-browser-smoke-decision-2026-06-28.md](./gate-d-prod-browser-smoke-decision-2026-06-28.md); prod browser **not executed**; Gate D **PENDING** |
+| 2026-06-28 | **Slice 24** — public route reference guard + dead-import cleanup; Gate E prerequisites [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md); Gate E **PENDING**; no P0 closure / launch GO |
 
 ---
 

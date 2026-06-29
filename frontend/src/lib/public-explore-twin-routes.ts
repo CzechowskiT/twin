@@ -1,6 +1,6 @@
 import type { TranslationKey } from "@/lib/i18n";
 
-/** Homepage quick-entry cards — existing public routes only (Slice 17). */
+/** Homepage Explore TWIN quick-entry cards — 10 existing public routes (Slice 17 → expanded Slice 19). */
 export type PublicExploreTwinEntryId =
   | "candidate"
   | "recruiter"

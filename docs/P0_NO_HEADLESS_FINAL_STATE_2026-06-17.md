@@ -105,7 +105,7 @@ npx tsc --noEmit
 
 **BLOCKED** — do not run `test:phase3b-controlled-multitab` or prod variant. See `docs/PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md`.
 
-**Founder review:** Slice 12 Gate B minimal shell fix merged 2026-06-28 — see [P0_SHELL_FOUNDER_REVIEW_2026-06-28.md](./P0_SHELL_FOUNDER_REVIEW_2026-06-28.md). Gate C local browser **PASS** 36/36 — [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md). Gate D **decision package** prepared — [gate-d-prod-browser-smoke-decision-2026-06-28.md](./gate-d-prod-browser-smoke-decision-2026-06-28.md); prod browser **not executed**. Phase 3B remains **BLOCKED** until Gate E.
+**Founder review:** Slice 12 Gate B minimal shell fix merged 2026-06-28 — see [P0_SHELL_FOUNDER_REVIEW_2026-06-28.md](./P0_SHELL_FOUNDER_REVIEW_2026-06-28.md). Gate C local browser **PASS** 36/36 — [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md). Gate D **decision package** prepared — [gate-d-prod-browser-smoke-decision-2026-06-28.md](./gate-d-prod-browser-smoke-decision-2026-06-28.md); prod browser **not executed**. Gate E **prerequisites package** prepared — [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md); Phase 3B **not executed**. Phase 3B remains **BLOCKED** until Gate E.
 
 ## Changelog
 
@@ -117,6 +117,7 @@ npx tsc --noEmit
 | 2026-06-28 | **Slice 12 Gate B** — minimal shell/gate fix merged; Gate C local browser **PASS** 36/36; Gate E **PENDING**; 36 routes unchanged |
 | 2026-06-28 | **Gate C** — local `test:p0-no-headless-final-state-browser` PASS — [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md) |
 | 2026-06-28 | **Gate D decision package** — prod browser boundary docs; **not executed** — [gate-d-prod-browser-smoke-decision-2026-06-28.md](./gate-d-prod-browser-smoke-decision-2026-06-28.md) |
+| 2026-06-28 | **Gate E prerequisites package** — Phase 3B boundary docs; **not executed** — [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) |
 
 ## Merge criteria
 

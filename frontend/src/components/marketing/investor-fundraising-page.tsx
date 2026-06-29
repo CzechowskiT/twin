@@ -5,7 +5,6 @@ import Link from "next/link";
 
 import { useTranslation } from "@/components/language-provider";
 import { InvestorRoadmapPanel } from "@/components/investor-roadmap-panel";
-import { MarketingCrosslinksBand } from "@/components/marketing/marketing-crosslinks-band";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { MvpLiveStatsStrip } from "@/components/marketing/mvp-live-stats-strip";
 import { clearCookieConsent } from "@/lib/cookie-consent";
