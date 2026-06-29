@@ -302,6 +302,8 @@ cd frontend && \
 
 **Gate D founder checkpoint (Slice 28):** [GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md](./GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md) — **PENDING**, founder decision required before prod browser.
 
+**Gate D founder decision prompt (Slice 30):** [GATE_D_FOUNDER_DECISION_PROMPT_2026-06-28.md](./GATE_D_FOUNDER_DECISION_PROMPT_2026-06-28.md) — **PENDING**; `npm run test:gate-d-founder-decision-prompt` — explicit **Gate D = YES** required before browser.
+
 **Readiness consistency lock (Slice 29):** `npm run test:readiness-consistency-lock` — cross-doc guards for Launch **NO-GO**, P0 **OPEN**, Gate D/E **PENDING**, Phase 3B **BLOCKED**.
 
 **Gate E prerequisites package:** [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) — **PENDING**, Phase 3B **not executed**.

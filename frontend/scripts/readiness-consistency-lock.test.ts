@@ -13,6 +13,7 @@ const repoRoot = join(root, "..");
 const GATE_D_DECISION = "docs/gate-d-prod-browser-smoke-decision-2026-06-28.md";
 const GATE_D_PREFLIGHT = "docs/gate-d-prod-browser-smoke-preflight-2026-06-28.md";
 const GATE_D_CHECKPOINT = "docs/GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md";
+const GATE_D_PROMPT = "docs/GATE_D_FOUNDER_DECISION_PROMPT_2026-06-28.md";
 const GATE_D_RESULT = "docs/gate-d-prod-browser-smoke-result-template-2026-06-28.md";
 const GATE_E = "docs/gate-e-phase3b-prerequisites-decision-2026-06-28.md";
 const EVIDENCE_INDEX = "docs/LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md";
@@ -28,6 +29,7 @@ const KEY_DOCS = [
   GATE_D_DECISION,
   GATE_D_PREFLIGHT,
   GATE_D_CHECKPOINT,
+  GATE_D_PROMPT,
   GATE_D_RESULT,
   GATE_E,
   EVIDENCE_INDEX,
@@ -206,4 +208,31 @@ test("12 evidence index references readiness consistency lock guard", () => {
   assert.match(index, /Gate E.*PENDING/i);
   assert.match(index, /NO-GO/i);
   assert.match(index, /P0.*OPEN/i);
+});
+
+test("13 gate D founder decision prompt exists and Gate D remains PENDING", () => {
+  const prompt = readRepo(GATE_D_PROMPT);
+  assert.match(prompt, /Gate D Founder Decision Prompt/);
+  assert.match(prompt, /Gate D.*PENDING/i);
+  assert.match(prompt, /NOT TO RUN/i);
+  assert.match(prompt, /NOT EXECUTED|not executed|must not run/i);
+  assert.doesNotMatch(prompt, /\| \*\*Gate D\*\* \|.*\*\*PASS\*\*/i);
+});
+
+test("14 no result doc claims Gate D PASS or Phase 3B PASS", () => {
+  const resultTemplate = readRepo(GATE_D_RESULT);
+  assert.match(resultTemplate, /Template only/i);
+  assert.match(resultTemplate, /Gate D remains PENDING/i);
+  assert.doesNotMatch(resultTemplate, /\| \*\*Gate D\*\* \|.*\*\*PASS\*\*/i);
+  assert.doesNotMatch(resultTemplate, /Phase 3B:\s*\*\*PASS\*\*/i);
+  assert.doesNotMatch(resultTemplate, /\| \*\*Phase 3B\*\* \|.*\*\*PASS\*\*/i);
+});
+
+test("15 gate D prompt — exact command matches canonical one-liner", () => {
+  const prompt = readRepo(GATE_D_PROMPT);
+  const commands = prompt.match(GATE_D_COMMAND_RE) ?? [];
+  assert.ok(commands.length > 0, "prompt: canonical Gate D command missing");
+  for (const cmd of commands) {
+    assert.equal(cmd, CANONICAL_GATE_D_COMMAND, "prompt: command drift");
+  }
 });
