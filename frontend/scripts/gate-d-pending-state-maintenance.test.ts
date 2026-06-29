@@ -48,11 +48,10 @@ const DECISION_DOCS = [
   GATE_D_CHECKPOINT,
   GATE_D_PROMPT,
   GATE_E,
-  EVIDENCE_INDEX,
-  SLICE12,
   FOUNDER_DEMO,
-  P0_SHELL_REVIEW,
 ] as const;
+
+const POST_PASS_STANCE_DOCS = [EVIDENCE_INDEX, SLICE12, P0_SHELL_REVIEW] as const;
 
 const GATE_D_COMMAND_DOCS = [
   GATE_D_DECISION,
@@ -101,18 +100,32 @@ test("1 all key readiness docs exist", () => {
   }
 });
 
-test("2 decision docs — Launch NO-GO, P0 OPEN, Gate D/E PENDING, Phase 3B blocked", () => {
+test("2 historical package docs — Launch NO-GO, P0 OPEN, Gate D/E PENDING in decision packages", () => {
   for (const doc of DECISION_DOCS) {
     const content = readRepo(doc);
     assert.match(content, /NO-GO/i, `${doc}: missing NO-GO`);
     assert.match(content, /P0.*OPEN/i, `${doc}: missing P0 OPEN`);
-    assert.match(content, /Gate D.*PENDING/i, `${doc}: missing Gate D PENDING`);
     assert.match(content, /Gate E.*PENDING/i, `${doc}: missing Gate E PENDING`);
     assert.match(
       content,
       /Phase 3B.*(NOT RUN|HARD BLOCKED|not run|BLOCKED)/i,
       `${doc}: missing Phase 3B blocked`,
     );
+  }
+  for (const doc of [GATE_D_DECISION, GATE_D_PREFLIGHT, GATE_D_CHECKPOINT, GATE_D_PROMPT]) {
+    const content = readRepo(doc);
+    assert.match(content, /Gate D.*PENDING/i, `${doc}: missing Gate D PENDING`);
+  }
+  const gateE = readRepo(GATE_E);
+  assert.match(gateE, /Gate D.*YES/i);
+});
+
+test("2b post-pass stance docs — Gate D YES prod PASS recorded", () => {
+  for (const doc of POST_PASS_STANCE_DOCS) {
+    const content = readRepo(doc);
+    assert.match(content, /Gate D.*YES/i, `${doc}: missing Gate D YES`);
+    assert.match(content, /NO-GO/i, `${doc}: missing NO-GO`);
+    assert.match(content, /P0.*OPEN/i, `${doc}: missing P0 OPEN`);
   }
 });
 
@@ -192,11 +205,11 @@ test("9 package.json — prod browser not default; browser scripts gated", () =>
   assert.doesNotMatch(pkg, /"ci":\s*"[^"]*p0-no-headless-final-state-browser/);
 });
 
-test("10 evidence index — Gate D pending maintenance guard referenced", () => {
+test("10 evidence index — Gate D prod result guard referenced", () => {
   const index = readRepo(EVIDENCE_INDEX);
-  assert.match(index, /test:gate-d-pending-state-maintenance/);
-  assert.match(index, /gate-d-pending-state-maintenance/);
-  assert.match(index, /Gate D.*PENDING/i);
+  assert.match(index, /test:gate-d-prod-browser-smoke-result/);
+  assert.match(index, /gate-d-prod-browser-smoke-result-2026-06-28/);
+  assert.match(index, /Gate D.*YES/i);
   assert.match(index, /Gate E.*PENDING/i);
   assert.match(index, /NO-GO/i);
   assert.match(index, /P0.*OPEN/i);

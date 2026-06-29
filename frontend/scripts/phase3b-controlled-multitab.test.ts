@@ -114,13 +114,13 @@ test("8 p0 performance inventory — Phase 3B blocked, 36 p0 routes, 20 phase3b 
   assert.match(inv, /test:e2e.*DISABLED/i);
 });
 
-test("9 slice12 founder signoff checklist — Gate B YES, Gate C YES (local), Gate E PENDING, stance blocked", () => {
+test("9 slice12 founder signoff checklist — Gate B YES, Gate C YES, Gate D YES prod, Gate E PENDING", () => {
   const checklist = readRepo("docs/SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md");
   assert.match(checklist, /Slice 12 Founder Sign-Off Checklist/i);
   assert.match(checklist, /Gate B.*YES/i);
   assert.match(checklist, /Gate C.*YES/i);
+  assert.match(checklist, /Gate D.*YES/i);
   assert.match(checklist, /Gate E.*PENDING/i);
-  assert.match(checklist, /Gate D.*PENDING/i);
   assert.match(checklist, /36 routes/i);
   assert.match(checklist, /20 routes/i);
   assert.match(checklist, /7 \+ 7 \+ 6/);
@@ -128,7 +128,7 @@ test("9 slice12 founder signoff checklist — Gate B YES, Gate C YES (local), Ga
   assert.match(checklist, /P0 performance.*OPEN/i);
   assert.match(checklist, /Public launch.*NO-GO/i);
   assert.match(checklist, /gate-c-browser-validation-result-2026-06-28/i);
-  assert.match(checklist, /gate-d-prod-browser-smoke-decision-2026-06-28/i);
+  assert.match(checklist, /gate-d-prod-browser-smoke-result-2026-06-28/i);
 
   const launchStance = read("src/lib/investor-metrics-reality.ts");
   assert.match(launchStance, /LAUNCH_STANCE\s*=\s*"noGo"/);
@@ -161,10 +161,10 @@ test("10 gate d decision package — Gate D PENDING, prod env flags documented, 
   assert.doesNotMatch(smokeWorkflow, /p0-no-headless-final-state-browser/);
 });
 
-test("11 gate e prerequisites — doc exists, PENDING, blocked, no overclaims", () => {
+test("11 gate e prerequisites — doc exists, PENDING, Gate D PASS prerequisite, no overclaims", () => {
   const gateE = readRepo("docs/gate-e-phase3b-prerequisites-decision-2026-06-28.md");
   assert.match(gateE, /Gate E.*PENDING/i);
-  assert.match(gateE, /Gate D.*PENDING/i);
+  assert.match(gateE, /Gate D.*YES|Gate D.*PASS/i);
   assert.match(gateE, /Gate B.*YES/i);
   assert.match(gateE, /Gate C.*YES/i);
   assert.match(gateE, /Phase 3B.*HARD BLOCKED/i);

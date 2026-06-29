@@ -15,6 +15,7 @@ const GATE_D_PREFLIGHT = "docs/gate-d-prod-browser-smoke-preflight-2026-06-28.md
 const GATE_D_CHECKPOINT = "docs/GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md";
 const GATE_D_PROMPT = "docs/GATE_D_FOUNDER_DECISION_PROMPT_2026-06-28.md";
 const GATE_D_RESULT = "docs/gate-d-prod-browser-smoke-result-template-2026-06-28.md";
+const GATE_D_RESULT_EXECUTED = "docs/gate-d-prod-browser-smoke-result-2026-06-28.md";
 const GATE_E = "docs/gate-e-phase3b-prerequisites-decision-2026-06-28.md";
 const EVIDENCE_INDEX = "docs/LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md";
 const SLICE12 = "docs/SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md";
@@ -31,6 +32,7 @@ const KEY_DOCS = [
   GATE_D_CHECKPOINT,
   GATE_D_PROMPT,
   GATE_D_RESULT,
+  GATE_D_RESULT_EXECUTED,
   GATE_E,
   EVIDENCE_INDEX,
   SLICE12,
@@ -42,15 +44,24 @@ const KEY_DOCS = [
   FEATURE_AUDIT,
 ] as const;
 
-const DECISION_DOCS = [
+const HISTORICAL_PACKAGE_DOCS = [
   GATE_D_DECISION,
   GATE_D_PREFLIGHT,
   GATE_D_CHECKPOINT,
+  GATE_D_PROMPT,
+] as const;
+
+const POST_PASS_STANCE_DOCS = [
   GATE_E,
   EVIDENCE_INDEX,
   SLICE12,
   FOUNDER_DEMO,
   P0_SHELL_REVIEW,
+] as const;
+
+const DECISION_DOCS = [
+  ...HISTORICAL_PACKAGE_DOCS,
+  ...POST_PASS_STANCE_DOCS,
 ] as const;
 
 const GATE_D_COMMAND_DOCS = [
@@ -109,18 +120,25 @@ test("1 all key readiness docs exist", () => {
   }
 });
 
-test("2 decision docs — Launch NO-GO, P0 OPEN, Gate D/E PENDING, Phase 3B blocked", () => {
+test("2 decision docs — Launch NO-GO, P0 OPEN, Gate E PENDING, Phase 3B blocked", () => {
   for (const doc of DECISION_DOCS) {
     const content = readRepo(doc);
     assert.match(content, /NO-GO/i, `${doc}: missing NO-GO`);
     assert.match(content, /P0.*OPEN/i, `${doc}: missing P0 OPEN`);
-    assert.match(content, /Gate D.*PENDING/i, `${doc}: missing Gate D PENDING`);
     assert.match(content, /Gate E.*PENDING/i, `${doc}: missing Gate E PENDING`);
     assert.match(
       content,
       /Phase 3B.*(NOT RUN|HARD BLOCKED|not run)/i,
       `${doc}: missing Phase 3B blocked`,
     );
+  }
+  for (const doc of HISTORICAL_PACKAGE_DOCS) {
+    const content = readRepo(doc);
+    assert.match(content, /Gate D.*PENDING/i, `${doc}: historical package should remain PENDING`);
+  }
+  for (const doc of POST_PASS_STANCE_DOCS) {
+    const content = readRepo(doc);
+    assert.match(content, /Gate D.*YES/i, `${doc}: missing Gate D YES after prod PASS`);
   }
 });
 
@@ -204,13 +222,13 @@ test("12 evidence index references readiness consistency lock guard", () => {
   const index = readRepo(EVIDENCE_INDEX);
   assert.match(index, /test:readiness-consistency-lock/);
   assert.match(index, /readiness-consistency-lock/);
-  assert.match(index, /Gate D.*PENDING/i);
+  assert.match(index, /Gate D.*YES/i);
   assert.match(index, /Gate E.*PENDING/i);
   assert.match(index, /NO-GO/i);
   assert.match(index, /P0.*OPEN/i);
 });
 
-test("13 gate D founder decision prompt exists and Gate D remains PENDING", () => {
+test("13 gate D founder decision prompt exists — historical PENDING package", () => {
   const prompt = readRepo(GATE_D_PROMPT);
   assert.match(prompt, /Gate D Founder Decision Prompt/);
   assert.match(prompt, /Gate D.*PENDING/i);
@@ -219,13 +237,14 @@ test("13 gate D founder decision prompt exists and Gate D remains PENDING", () =
   assert.doesNotMatch(prompt, /\| \*\*Gate D\*\* \|.*\*\*PASS\*\*/i);
 });
 
-test("14 no result doc claims Gate D PASS or Phase 3B PASS", () => {
+test("14 executed result doc claims Gate D PASS; template remains PENDING", () => {
+  const resultExecuted = readRepo(GATE_D_RESULT_EXECUTED);
+  assert.match(resultExecuted, /verdict:\s+PASS/i);
+  assert.match(resultExecuted, /36\/36 PASS/i);
+  assert.doesNotMatch(resultExecuted, /Phase 3B:\s*\*\*PASS\*\*/i);
   const resultTemplate = readRepo(GATE_D_RESULT);
   assert.match(resultTemplate, /Template only/i);
   assert.match(resultTemplate, /Gate D remains PENDING/i);
-  assert.doesNotMatch(resultTemplate, /\| \*\*Gate D\*\* \|.*\*\*PASS\*\*/i);
-  assert.doesNotMatch(resultTemplate, /Phase 3B:\s*\*\*PASS\*\*/i);
-  assert.doesNotMatch(resultTemplate, /\| \*\*Phase 3B\*\* \|.*\*\*PASS\*\*/i);
 });
 
 test("15 gate D prompt — exact command matches canonical one-liner", () => {
@@ -237,14 +256,13 @@ test("15 gate D prompt — exact command matches canonical one-liner", () => {
   }
 });
 
-test("16 evidence index references gate D pending state maintenance guard", () => {
+test("16 evidence index references gate D prod browser smoke result guard", () => {
   const index = readRepo(EVIDENCE_INDEX);
-  assert.match(index, /test:gate-d-pending-state-maintenance/);
-  assert.match(index, /gate-d-pending-state-maintenance/);
-  assert.match(index, /Gate D.*PENDING/i);
+  assert.match(index, /test:gate-d-prod-browser-smoke-result/);
+  assert.match(index, /gate-d-prod-browser-smoke-result-2026-06-28/);
+  assert.match(index, /Gate D.*YES/i);
   assert.match(index, /Gate E.*PENDING/i);
   assert.match(index, /NO-GO/i);
   assert.match(index, /P0.*OPEN/i);
-  assert.doesNotMatch(index, /\| \*\*Gate D\*\* \|.*\*\*PASS\*\*/i);
   assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
 });
