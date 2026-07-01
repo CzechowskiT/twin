@@ -74,6 +74,7 @@
     "test:gate-d-prod-browser-smoke-result": "npx --yes tsx scripts/gate-d-prod-browser-smoke-result.test.ts",
     "test:gate-e-founder-decision-package": "npx --yes tsx scripts/gate-e-founder-decision-package.test.ts",
     "test:gate-e-phase3b-result": "npx --yes tsx scripts/gate-e-phase3b-result.test.ts",
+    "test:gate-e-retry-after-harness-fix-checkpoint": "npx --yes tsx scripts/gate-e-retry-after-harness-fix-checkpoint.test.ts",
     "test:founder-demo-crosslinks": "npx --yes tsx scripts/founder-demo-crosslinks.test.ts",
     "test:mobile-public-readiness": "npx --yes tsx scripts/mobile-public-readiness.test.ts",
     "test:landing-auth-shell": "npx --yes tsx scripts/landing-auth-shell.test.ts",

@@ -21,6 +21,7 @@ const GATE_E_PACKAGE = "docs/GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md";
 const GATE_E_RESULT_TEMPLATE = "docs/gate-e-phase3b-result-template-2026-06-28.md";
 const GATE_E_RESULT_EXECUTED = "docs/gate-e-phase3b-result-2026-06-28.md";
 const GATE_E_ATTEMPT_1 = "docs/gate-e-phase3b-attempt-1-aborted-resource-safety-2026-06-28.md";
+const GATE_E_RETRY_CHECKPOINT = "docs/GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md";
 const EVIDENCE_INDEX = "docs/LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md";
 const SLICE12 = "docs/SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md";
 const FOUNDER_DEMO = "docs/FOUNDER_DEMO_CHECKLIST_2026-06-28.md";
@@ -42,6 +43,7 @@ const KEY_DOCS = [
   GATE_E_RESULT_TEMPLATE,
   GATE_E_RESULT_EXECUTED,
   GATE_E_ATTEMPT_1,
+  GATE_E_RETRY_CHECKPOINT,
   EVIDENCE_INDEX,
   SLICE12,
   FOUNDER_DEMO,
@@ -336,4 +338,24 @@ test("21 phase3b harness diagnostics — guard registered, Phase 3B FAIL preserv
   const index = readRepo(EVIDENCE_INDEX);
   assert.match(index, /test:phase3b-harness-diagnostics/);
   assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
+});
+
+test("22 gate E retry checkpoint — PENDING, FAIL stance preserved, no overclaims", () => {
+  const checkpoint = readRepo(GATE_E_RETRY_CHECKPOINT);
+  assert.match(checkpoint, /Gate E retry after harness fix = YES/);
+  assert.match(checkpoint, /Gate E retry after harness fix = NO \/ PENDING/);
+  assert.match(checkpoint, /2969b1f4/);
+  assert.match(checkpoint, /NOT EXECUTED|not executed|NOT RUN/i);
+  assert.match(checkpoint, /Phase 3B.*FAIL/i);
+  assert.match(checkpoint, /NO-GO/i);
+  assert.match(checkpoint, /P0.*OPEN/i);
+  assert.match(checkpoint, /Gate F.*PENDING/i);
+  assert.doesNotMatch(checkpoint, /Phase 3B:\s*\*\*PASS\*\*/i);
+  assert.doesNotMatch(checkpoint, /Launch stance:\s*\*\*GO\*\*/i);
+  assert.doesNotMatch(checkpoint, /Gate F.*\*\*YES\*\*/i);
+  const pkg = readFileSync(join(root, "package.json"), "utf8");
+  assert.match(pkg, /test:gate-e-retry-after-harness-fix-checkpoint/);
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29/);
+  assert.match(index, /Phase 3B.*FAIL/i);
 });

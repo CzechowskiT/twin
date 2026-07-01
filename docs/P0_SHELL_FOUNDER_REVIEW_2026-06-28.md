@@ -19,7 +19,7 @@
 | Gate | Status |
 |------|--------|
 | **P0 performance** | **OPEN** — no Phase 3B prod proof, no signed Lighthouse budgets |
-| **Phase 3B controlled multitab** | **FAIL** — prod **0/20** ([gate-e result](./gate-e-phase3b-result-2026-06-28.md)); attempt 1 ABORTED_RESOURCE_SAFETY |
+| **Phase 3B controlled multitab** | **FAIL** — prod **0/20** ([gate-e result](./gate-e-phase3b-result-2026-06-28.md)); post-fix retry **HARD BLOCKED** until [retry checkpoint](./GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md) founder YES |
 | **Public launch** | **NO-GO** |
 | **This document** | **Gate B + Gate C + Gate D PASS** — local + prod browser **36/36 PASS**; Gate E **YES/FAIL** — Phase 3B prod **0/20** |
 
@@ -260,6 +260,8 @@ cd frontend && \
 **Gate E founder decision package:** [GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) — historical package (**PENDING** at publish).
 
 **Gate E prerequisites package:** [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) — historical package (**PENDING** at publish).
+
+**Gate E retry-after-harness-fix checkpoint:** [GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md](./GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md) — **PENDING**; prod FE aligned `2969b1f4` post-PR #353; **no post-fix browser run**.
 
 **Launch evidence index (Slice 25):** [LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md](./LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md) · [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUNDER_DEMO_CHECKLIST_2026-06-28.md)
 

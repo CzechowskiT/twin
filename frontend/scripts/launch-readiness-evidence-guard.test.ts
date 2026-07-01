@@ -39,6 +39,7 @@ const REQUIRED_SOURCE_DOCS = [
   "gate-e-phase3b-result-2026-06-28.md",
   "gate-e-phase3b-attempt-1-aborted-resource-safety-2026-06-28.md",
   "PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md",
+  "GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md",
   "TWIN_PUBLIC_LAUNCH_READINESS_PLAN_2026-06-27.md",
   "TWIN_OPERATING_CONTEXT_2026-06-26.md",
 ] as const;
@@ -201,4 +202,17 @@ test("17 evidence index references phase3b harness diagnostics guard", () => {
   assert.match(index, /NO-GO/i);
   assert.match(index, /P0.*OPEN/i);
   assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
+});
+
+test("18 evidence index references gate E retry-after-harness-fix checkpoint", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29/);
+  assert.match(index, /test:gate-e-retry-after-harness-fix-checkpoint/);
+  assert.match(index, /2969b1f4/);
+  assert.match(index, /Gate E retry.*PENDING|PENDING.*retry/i);
+  assert.match(index, /Phase 3B.*FAIL/i);
+  assert.match(index, /NO-GO/i);
+  assert.match(index, /P0.*OPEN/i);
+  assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
+  assert.doesNotMatch(index, /Gate F.*\*\*YES\*\*/i);
 });
