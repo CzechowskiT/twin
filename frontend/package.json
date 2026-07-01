@@ -77,6 +77,7 @@
     "test:gate-e-retry-after-harness-fix-checkpoint": "npx --yes tsx scripts/gate-e-retry-after-harness-fix-checkpoint.test.ts",
     "test:gate-e-retry-after-harness-fix-result": "npx --yes tsx scripts/gate-e-retry-after-harness-fix-result.test.ts",
     "test:gate-e-retry-with-token-result": "npx --yes tsx scripts/gate-e-retry-with-token-result.test.ts",
+    "test:gate-e-attempt4-with-token-result": "npx --yes tsx scripts/gate-e-attempt4-with-token-result.test.ts",
     "test:founder-demo-crosslinks": "npx --yes tsx scripts/founder-demo-crosslinks.test.ts",
     "test:mobile-public-readiness": "npx --yes tsx scripts/mobile-public-readiness.test.ts",
     "test:landing-auth-shell": "npx --yes tsx scripts/landing-auth-shell.test.ts",
