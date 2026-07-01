@@ -325,3 +325,15 @@ test("20 evidence index references gate E phase3b result guard", () => {
   assert.match(index, /NO-GO/i);
   assert.match(index, /P0.*OPEN/i);
 });
+
+test("21 phase3b harness diagnostics — guard registered, Phase 3B FAIL preserved", () => {
+  const pkg = readFileSync(join(root, "package.json"), "utf8");
+  assert.match(pkg, /test:phase3b-harness-diagnostics/);
+  const plan = readRepo("docs/PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md");
+  assert.match(plan, /Phase 3B.*FAIL/i);
+  assert.match(plan, /frontend_commit/);
+  assert.match(plan, /AUTH_TOKEN_REQUIRED/);
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /test:phase3b-harness-diagnostics/);
+  assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
+});

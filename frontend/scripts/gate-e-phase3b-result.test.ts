@@ -126,3 +126,14 @@ test("11 gate D result still PASS prerequisite; Gate E FAIL does not undo Gate D
   assert.match(gateD, /36\/36 PASS/i);
   assert.match(gateD, /verdict:\s+PASS/i);
 });
+
+test("12 harness diagnostics guard — stale commit removed, preflight wired", () => {
+  const pkg = readFileSync(join(root, "package.json"), "utf8");
+  assert.match(pkg, /test:phase3b-harness-diagnostics/);
+  const spec = readFileSync(join(root, "e2e/phase3b-controlled-multitab.spec.ts"), "utf8");
+  assert.match(spec, /buildPhase3bPreflightSnapshot/);
+  assert.doesNotMatch(spec, /fda7567/);
+  const plan = readRepo("docs/PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md");
+  assert.match(plan, /Phase 3B.*FAIL/i);
+  assert.match(plan, /frontend_commit/);
+});

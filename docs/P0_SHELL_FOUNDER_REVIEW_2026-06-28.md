@@ -78,7 +78,8 @@ Inventory: `frontend/e2e/helpers/p0-no-headless-final-state.ts`
 | Auth gate | `frontend/src/components/persona-workspace-gate.tsx` | Preserve auth card as valid final state; eliminate redirect loops on multi-tab open |
 | Workspace layout | `frontend/src/components/workspace-route-layout.tsx` | Gate → shell ordering; skeleton only when necessary |
 | Loading shells | persona `loading.tsx` files | Server skeleton before hydration without blocking forever |
-| Phase 3B evaluator | `frontend/e2e/helpers/phase3b-controlled-routes.ts` | Tighten paint heuristic after shell fix — no skeleton false-PASS |
+| Phase 3B evaluator | `frontend/e2e/helpers/phase3b-harness-diagnostics.ts` | Auth tier + classification enum; preflight `frontend_commit` gate (Slice 35) |
+| Phase 3B routes | `frontend/e2e/helpers/phase3b-controlled-routes.ts` | 20 routes in 3 batches (7+7+6) |
 
 **Prior fix plan (Phase 2, PR #149 — reference only):** Fixes A–F documented in [P0_PRODUCTION_STUCK_ROUTES_RENDERER_MEMORY_2026-06-16.md](./P0_PRODUCTION_STUCK_ROUTES_RENDERER_MEMORY_2026-06-16.md). Founder must confirm which fixes remain in scope before implementation branch opens.
 

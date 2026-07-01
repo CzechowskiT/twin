@@ -48,14 +48,22 @@ test("1 phase3b route inventory — 20 routes in 3 batches (7+7+6)", () => {
   }
 });
 
-test("2 phase3b route helper and e2e spec exist", () => {
+test("2 phase3b route helper and e2e spec exist with harness diagnostics", () => {
   const helper = read("e2e/helpers/phase3b-controlled-routes.ts");
   assert.match(helper, /PHASE3B_ROUTE_BATCHES/);
   assert.match(helper, /PHASE3B_ALL_ROUTES/);
   assert.match(helper, /PHASE3B_ROUTE_COUNT/);
-  assert.match(read("e2e/phase3b-controlled-multitab.spec.ts"), /withFreshContext/);
-  assert.match(read("e2e/phase3b-controlled-multitab.spec.ts"), /fda75677c306aec76dbb83f65c483f8ba7cbe885/);
-  assert.match(read("e2e/phase3b-controlled-multitab.spec.ts"), /PHASE3B_ROUTE_BATCHES/);
+  const spec = read("e2e/phase3b-controlled-multitab.spec.ts");
+  assert.match(spec, /withFreshContext/);
+  assert.match(spec, /phase3b-harness-diagnostics/);
+  assert.match(spec, /buildPhase3bPreflightSnapshot/);
+  assert.match(spec, /PHASE3B_ROUTE_BATCHES/);
+  assert.doesNotMatch(spec, /fda7567/);
+  assert.doesNotMatch(spec, /EXPECTED_PROD_COMMIT/);
+
+  const diagHelper = read("e2e/helpers/phase3b-harness-diagnostics.ts");
+  assert.match(diagHelper, /classifyPhase3bRouteAuth/);
+  assert.match(diagHelper, /AUTH_TOKEN_REQUIRED/);
 });
 
 test("3 phase3b npm scripts registered workers=1 and browser gated", () => {
@@ -81,8 +89,10 @@ test("5 phase3b doc blocked — STATUS BLOCKED, DO NOT RUN, 20 routes", () => {
   const doc = readRepo("docs/PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md");
   assert.match(doc, /STATUS: BLOCKED/i);
   assert.match(doc, /DO NOT RUN/i);
-  assert.match(doc, /fda7567/);
   assert.match(doc, /20 routes/i);
+
+  const plan = readRepo("docs/PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md");
+  assert.match(plan, /harness diagnostic/i);
 });
 
 test("6 smoke.yml excludes playwright and phase3b browser smokes", () => {
@@ -187,12 +197,19 @@ test("11 gate e prerequisites — doc exists, PENDING, Gate D PASS prerequisite,
   assert.match(launchStance, /LAUNCH_STANCE\s*=\s*"noGo"/);
 });
 
-test("12 slice25 evidence index — exists, Phase 3B FAIL, no overclaims", () => {
+test("12 npm script test:phase3b-harness-diagnostics registered", () => {
+  const pkg = read("package.json");
+  assert.match(pkg, /test:phase3b-harness-diagnostics/);
+  assert.match(pkg, /phase3b-harness-diagnostics\.test\.ts/);
+});
+
+test("13 slice25 evidence index — exists, Phase 3B FAIL, harness diagnostics", () => {
   const evidenceIndex = readRepo("docs/LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md");
   assert.match(evidenceIndex, /Launch Readiness Evidence Index/);
   assert.match(evidenceIndex, /Phase 3B.*FAIL/i);
   assert.match(evidenceIndex, /Gate E.*YES/i);
   assert.match(evidenceIndex, /0\/20/i);
+  assert.match(evidenceIndex, /test:phase3b-harness-diagnostics/);
   assert.doesNotMatch(evidenceIndex, /Phase 3B.*\*\*PASS\*\*/i);
   assert.doesNotMatch(evidenceIndex, /Launch stance:\s*\*\*GO\*\*/i);
 

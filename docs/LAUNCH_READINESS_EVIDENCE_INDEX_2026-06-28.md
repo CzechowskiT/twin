@@ -161,6 +161,7 @@ Inventory sources:
 | `test:gate-d-prod-browser-smoke-result` | 9 | Gate D prod browser smoke result guards (Slice 32) |
 | `test:gate-e-founder-decision-package` | 13 | Gate E founder decision package guards (Slice 33) |
 | `test:gate-e-phase3b-result` | 11 | Gate E Phase 3B prod result guards (Slice 34) |
+| `test:phase3b-harness-diagnostics` | 10 | Phase 3B harness diagnostics guards (Slice 35) |
 
 Full step-by-step founder script: [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUNDER_DEMO_CHECKLIST_2026-06-28.md).
 
@@ -233,6 +234,7 @@ This index summarizes evidence; the checklist is the **operational run sheet** f
 | [P0_NO_HEADLESS_FINAL_STATE_2026-06-17.md](./P0_NO_HEADLESS_FINAL_STATE_2026-06-17.md) | P0 headless false-PASS incident |
 | [P0_PERFORMANCE_INVENTORY_2026-06-27.md](./P0_PERFORMANCE_INVENTORY_2026-06-27.md) | P0 route inventory |
 | [PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md](./PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md) | Phase 3B **BLOCKED** |
+| [PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md](./PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md) | Phase 3B harness diagnostics hardening (Slice 35) — **FAIL unchanged** |
 | [SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md](./SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md) | Gates A–F checklist |
 | [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUNDER_DEMO_CHECKLIST_2026-06-28.md) | Bounded demo run sheet (Slice 25) |
 | [HIRING_JOURNEY_TRACEABILITY_2026-06-26.md](./HIRING_JOURNEY_TRACEABILITY_2026-06-26.md) | Hiring journey preview traceability |

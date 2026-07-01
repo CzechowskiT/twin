@@ -459,6 +459,7 @@ flowchart LR
 | 2026-06-29 | **Slice 32** — Gate D prod browser smoke **36/36 PASS**; `test:gate-d-prod-browser-smoke-result`; prod FE aligned `1a7acc00`; Gate D **YES/PASS**; Launch **NO-GO**; P0 **OPEN**; Gate E **PENDING**; Phase 3B **NOT RUN** |
 | 2026-06-29 | **Slice 33** — Gate E founder decision package; `test:gate-e-founder-decision-package`; Gate D **PASS** prerequisite; explicit **Gate E = YES** required before Phase 3B; Launch **NO-GO**; P0 **OPEN**; Phase 3B **NOT RUN** |
 | 2026-06-29 | **Slice 34** — Gate E Phase 3B prod reattempt **0/20 FAIL**; attempt 1 ABORTED_RESOURCE_SAFETY; `test:gate-e-phase3b-result`; Launch **NO-GO**; P0 **OPEN**; Gate F **PENDING** |
+| 2026-06-29 | **Slice 35** — Phase 3B multitab harness diagnostics ([plan](./PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md)); `test:phase3b-harness-diagnostics`; preflight `frontend_commit` gate; Phase 3B **FAIL unchanged**; Launch **NO-GO**; P0 **OPEN**; Gate F **PENDING** |
 
 ---
 

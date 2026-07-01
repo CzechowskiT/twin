@@ -18,6 +18,8 @@ Gate B (minimal shell fix) is **merged**. Gate C unlocked **local** sequential b
 
 **Gate E execution result (post-prerequisites):** [gate-e-phase3b-result-2026-06-28.md](./gate-e-phase3b-result-2026-06-28.md) — **0/20 FAIL** (reattempt); attempt 1 [ABORTED_RESOURCE_SAFETY](./gate-e-phase3b-attempt-1-aborted-resource-safety-2026-06-28.md). This prerequisites package remains historical **PENDING** at publish.
 
+**Harness diagnostics (Slice 35):** [PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md](./PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md) — stale `fda7567` commit constant removed; preflight `frontend_commit` gate; `test:phase3b-harness-diagnostics`. **Phase 3B remains FAIL** — no second reattempt in this slice.
+
 | Item | Status |
 |------|--------|
 | **Gate E decision** | **PENDING** — awaiting explicit founder YES |
