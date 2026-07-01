@@ -12,12 +12,30 @@
  * - `targetEnv` values already set always win over file contents (an
  *   explicitly exported `TWIN_ACCESS_TOKEN` is never overridden).
  * - Missing files are a no-op, not an error.
+ *
+ * Module-format note (found by Gate E Phase 3B attempt 5, 2026-06-29): this
+ * package.json has no `"type": "module"`, so Playwright's built-in TS
+ * transform emits CommonJS for this file. A literal top-level
+ * `import.meta.url` is still detected by that transform and forces
+ * ESM-vs-CJS output to disagree, crashing at load with
+ * `ReferenceError: exports is not defined in ES module scope` before any
+ * test runs. `__dirname` is already CJS-safe and is also shimmed by `tsx`
+ * (verified), so it is tried first; the indirect `(0, eval)` call only
+ * exists to hide the `import.meta` token from static bundler analysis in the
+ * rare pure-ESM fallback path, and is never reached under `tsx` or
+ * Playwright.
  */
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const HELPERS_DIR = dirname(fileURLToPath(import.meta.url));
+function resolveHelpersDir(): string {
+  if (typeof __dirname === "string") return __dirname;
+  const importMetaUrl = (0, eval)("import.meta.url") as string;
+  return dirname(fileURLToPath(importMetaUrl));
+}
+
+const HELPERS_DIR = resolveHelpersDir();
 const FRONTEND_ROOT = join(HELPERS_DIR, "..", "..");
 const REPO_ROOT = join(FRONTEND_ROOT, "..");
 

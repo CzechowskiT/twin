@@ -1,8 +1,8 @@
 # Gate E Retry After Harness Fix Checkpoint — 2026-06-29
 
 **Branch at package:** `docs/gate-e-retry-after-harness-fix-checkpoint-2026-06-29` from `cursor/phase1-monorepo-scaffold` @ `2969b1f4` (post PR #353 harness diagnostics merge)  
-**Founder decision:** Gate E retry after harness fix = **YES** — post-harness retry attempted three times; **PARTIAL/AUTH_TOKEN_REQUIRED** on all — [with-token result](./gate-e-phase3b-retry-with-token-result-2026-06-29.md)  
-**Post-harness browser:** **NOT RUN** — `TWIN_ACCESS_TOKEN` absent in runner env (attempts #1 PR #355 + #2 PR #356 + #3 with-token PR #357 + #4 with-token — [attempt 4 result](./gate-e-phase3b-attempt4-with-token-result-2026-06-29.md))
+**Founder decision:** Gate E retry after harness fix = **YES** — post-harness retry attempted five times; **PARTIAL** on all — [attempt 5 result](./gate-e-phase3b-attempt5-with-token-result-2026-06-29.md)  
+**Post-harness browser:** **EXECUTED ONCE** (attempt 5) — crashed at module load (`HARNESS_LOAD_FAILURE`), 0/20 routes evaluated; defect fixed same PR, **unverified by browser** — [attempt 5 result](./gate-e-phase3b-attempt5-with-token-result-2026-06-29.md). Attempts #1 PR #355 + #2 PR #356 + #3 with-token PR #357 + #4 with-token PR #358 all stopped at `AUTH_TOKEN_REQUIRED` before the browser ran — [attempt 4 result](./gate-e-phase3b-attempt4-with-token-result-2026-06-29.md)
 **Package type:** Founder decision checkpoint + static guards — **not execution approval**  
 **Gate B:** **YES** (PR #332 `62138dc` shell fix merged)  
 **Gate C:** **YES** — local browser **36/36 PASS** — [gate-c result](./gate-c-browser-validation-result-2026-06-28.md)  
@@ -45,9 +45,9 @@ It is a **decision boundary document** only. Execution requires a separate found
 | **D** | [gate-d result](./gate-d-prod-browser-smoke-result-2026-06-28.md) | **36/36 PASS** prod, 54.9s, workers=1 |
 | **E (prior)** | [gate-e result](./gate-e-phase3b-result-2026-06-28.md) | **0/20 FAIL** — blank-or-no-content 20/20 |
 | **Harness fix** | PR #353 @ `2969b1f4` — [diagnostic plan](./PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md) | **MERGED** — diagnostics hardened |
-| **Post-fix browser** | [retry result](./gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md) · [with-token result (attempt 3)](./gate-e-phase3b-retry-with-token-result-2026-06-29.md) · [with-token result (attempt 4)](./gate-e-phase3b-attempt4-with-token-result-2026-06-29.md) | **NOT RUN** — PARTIAL/AUTH_TOKEN_REQUIRED (token absent; attempts #1 + #2 + #3 + #4) |
+| **Post-fix browser** | [retry result](./gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md) · [with-token result (attempt 3)](./gate-e-phase3b-retry-with-token-result-2026-06-29.md) · [with-token result (attempt 4)](./gate-e-phase3b-attempt4-with-token-result-2026-06-29.md) · [with-token result (attempt 5)](./gate-e-phase3b-attempt5-with-token-result-2026-06-29.md) | Attempts #1–#4: **NOT RUN** — PARTIAL/AUTH_TOKEN_REQUIRED. Attempt 5: **EXECUTED ONCE** — PARTIAL/HARNESS_LOAD_FAILURE, 0/20 routes evaluated, defect fixed same PR but **unverified by browser** |
 
-**No post-fix browser evidence exists.** Post-harness retries stopped at `AUTH_TOKEN_REQUIRED` preflight on all four attempts — see [retry result](./gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md), [with-token result (attempt 3)](./gate-e-phase3b-retry-with-token-result-2026-06-29.md), and [with-token result (attempt 4)](./gate-e-phase3b-attempt4-with-token-result-2026-06-29.md). Prior 0/20 FAIL unchanged.
+**No route-level post-fix browser evidence exists yet.** Attempts #1–#4 stopped at `AUTH_TOKEN_REQUIRED` preflight before the browser ran — see [retry result](./gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md), [with-token result (attempt 3)](./gate-e-phase3b-retry-with-token-result-2026-06-29.md), and [with-token result (attempt 4)](./gate-e-phase3b-attempt4-with-token-result-2026-06-29.md). Attempt 5 ([result](./gate-e-phase3b-attempt5-with-token-result-2026-06-29.md)) had the token present and the browser executed for the first time, but it crashed at module load (`HARNESS_LOAD_FAILURE`) before any route ran; the defect was fixed in the same PR but not re-verified by a browser (no second prod run). Prior 0/20 FAIL unchanged.
 
 ---
 
