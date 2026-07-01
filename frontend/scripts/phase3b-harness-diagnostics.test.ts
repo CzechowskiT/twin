@@ -224,4 +224,8 @@ test("12 post-harness retry result — PARTIAL AUTH_TOKEN_REQUIRED, prior FAIL p
   assert.doesNotMatch(retryResult, /Phase 3B:\s*\*\*PASS\*\*/i);
   const pkg = read("package.json");
   assert.match(pkg, /test:gate-e-retry-after-harness-fix-result/);
+  assert.match(pkg, /test:gate-e-retry-with-token-result/);
+  const withTokenResult = readRepo("docs/gate-e-phase3b-retry-with-token-result-2026-06-29.md");
+  assert.match(withTokenResult, /AUTH_TOKEN_REQUIRED/);
+  assert.match(withTokenResult, /Attempt 3 — Execution Record/);
 });

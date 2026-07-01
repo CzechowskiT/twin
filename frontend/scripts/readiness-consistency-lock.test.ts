@@ -362,3 +362,27 @@ test("23 gate E post-harness retry result — PARTIAL, AUTH_TOKEN_REQUIRED, FAIL
   assert.match(index, /AUTH_TOKEN_REQUIRED|PARTIAL/i);
   assert.match(index, /Phase 3B.*FAIL/i);
 });
+
+test("24 gate E with-token retry result — PARTIAL, AUTH_TOKEN_REQUIRED, FAIL stance preserved", () => {
+  const result = readRepo("docs/gate-e-phase3b-retry-with-token-result-2026-06-29.md");
+  assert.match(result, /Gate E retry after harness fix = \*\*YES\*\*/);
+  assert.match(result, /verdict:\s+PARTIAL/i);
+  assert.match(result, /AUTH_TOKEN_REQUIRED/);
+  assert.match(result, /token present in env:\s+false/i);
+  assert.match(result, /browser NOT RUN|NOT RUN/i);
+  assert.match(result, /Attempt 3 — Execution Record/);
+  assert.match(result, /with-token retry #3/i);
+  assert.match(result, /70367c14/);
+  assert.match(result, /Phase 3B.*FAIL/i);
+  assert.match(result, /0\/20/i);
+  assert.match(result, /NO-GO/i);
+  assert.match(result, /P0.*OPEN/i);
+  assert.match(result, /Gate F.*PENDING/i);
+  assert.doesNotMatch(result, /Phase 3B:\s*\*\*PASS\*\*/i);
+  const pkg = readFileSync(join(root, "package.json"), "utf8");
+  assert.match(pkg, /test:gate-e-retry-with-token-result/);
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /gate-e-phase3b-retry-with-token-result-2026-06-29/);
+  assert.match(index, /AUTH_TOKEN_REQUIRED|PARTIAL/i);
+  assert.match(index, /Phase 3B.*FAIL/i);
+});

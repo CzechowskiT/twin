@@ -150,4 +150,8 @@ test("13 gate E retry result — PARTIAL AUTH_TOKEN_REQUIRED, browser NOT RUN, p
   assert.doesNotMatch(retryResult, /Phase 3B:\s*\*\*PASS\*\*/i);
   const pkg = readFileSync(join(root, "package.json"), "utf8");
   assert.match(pkg, /test:gate-e-retry-after-harness-fix-result/);
+  assert.match(pkg, /test:gate-e-retry-with-token-result/);
+  const withTokenResult = readRepo("docs/gate-e-phase3b-retry-with-token-result-2026-06-29.md");
+  assert.match(withTokenResult, /AUTH_TOKEN_REQUIRED/);
+  assert.match(withTokenResult, /verdict:\s+PARTIAL/i);
 });
