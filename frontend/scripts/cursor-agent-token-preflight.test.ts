@@ -73,6 +73,42 @@ test("3 process.env / caller-supplied values take precedence over file contents"
   });
 });
 
+test("3b an existing empty-string value does not block a real file value (empty is not \"set\")", () => {
+  withTmpDir((dir) => {
+    const rootEnvPath = join(dir, "root.env.local");
+    const frontendEnvPath = join(dir, "frontend.env.local");
+    writeFileSync(frontendEnvPath, "TWIN_ACCESS_TOKEN=real-fixture-value\n");
+    const targetEnv: Record<string, string | undefined> = { TWIN_ACCESS_TOKEN: "" };
+    const result = loadLocalTestEnv({ rootEnvPath, frontendEnvPath, targetEnv });
+    assert.equal(targetEnv.TWIN_ACCESS_TOKEN, "real-fixture-value");
+    assert.equal(result.tokenPresent, true);
+  });
+});
+
+test("3c export prefix tolerates tabs/multiple spaces, not just a single space", () => {
+  withTmpDir((dir) => {
+    const rootEnvPath = join(dir, "root.env.local");
+    const frontendEnvPath = join(dir, "frontend.env.local");
+    writeFileSync(frontendEnvPath, "export\tTWIN_ACCESS_TOKEN=tabbed-export-value\n");
+    const targetEnv: Record<string, string | undefined> = {};
+    const result = loadLocalTestEnv({ rootEnvPath, frontendEnvPath, targetEnv });
+    assert.equal(targetEnv.TWIN_ACCESS_TOKEN, "tabbed-export-value");
+    assert.equal(result.tokenPresent, true);
+  });
+});
+
+test("3d a leading UTF-8 BOM on the first line does not hide its key", () => {
+  withTmpDir((dir) => {
+    const rootEnvPath = join(dir, "root.env.local");
+    const frontendEnvPath = join(dir, "frontend.env.local");
+    writeFileSync(frontendEnvPath, "\uFEFFTWIN_ACCESS_TOKEN=bom-prefixed-value\n");
+    const targetEnv: Record<string, string | undefined> = {};
+    const result = loadLocalTestEnv({ rootEnvPath, frontendEnvPath, targetEnv });
+    assert.equal(targetEnv.TWIN_ACCESS_TOKEN, "bom-prefixed-value");
+    assert.equal(result.tokenPresent, true);
+  });
+});
+
 test("4 deterministic order — root .env.local loads before frontend/.env.local", () => {
   withTmpDir((dir) => {
     const rootEnvPath = join(dir, "root.env.local");

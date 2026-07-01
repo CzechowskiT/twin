@@ -45,13 +45,19 @@ export type LoadLocalTestEnvResult = {
   };
 };
 
+/** Strips a leading UTF-8 BOM (`\uFEFF`), if present — some editors save `.env.local` with one. */
+function stripBom(content: string): string {
+  return content.charCodeAt(0) === 0xfeff ? content.slice(1) : content;
+}
+
 /** Minimal KEY=VALUE parser — comments, blank lines, optional quotes, `export ` prefix. */
 function parseEnvFile(content: string): Record<string, string> {
   const values: Record<string, string> = {};
-  for (const rawLine of content.split(/\r?\n/)) {
+  for (const rawLine of stripBom(content).split(/\r?\n/)) {
     const line = rawLine.trim();
     if (!line || line.startsWith("#")) continue;
-    const withoutExport = line.startsWith("export ") ? line.slice("export ".length) : line;
+    // Tolerate any amount of whitespace after `export` (space or tab), not just a single space.
+    const withoutExport = line.replace(/^export\s+/, "");
     const eqIndex = withoutExport.indexOf("=");
     if (eqIndex <= 0) continue;
     const key = withoutExport.slice(0, eqIndex).trim();
@@ -65,7 +71,13 @@ function parseEnvFile(content: string): Record<string, string> {
   return values;
 }
 
-/** Reads + parses `path` into `target`, without overriding keys already set. Returns whether the file existed. */
+/**
+ * Reads + parses `path` into `target`, without overriding keys already set to a
+ * non-empty value. An existing key that is present but empty (e.g. a shell that
+ * exports `TWIN_ACCESS_TOKEN=` with no value) is treated as "not actually set"
+ * so a real value from the file can still fill it in. Returns whether the file
+ * existed.
+ */
 function loadFileInto(path: string, target: Record<string, string | undefined>): boolean {
   if (!existsSync(path)) return false;
   let content: string;
@@ -76,7 +88,7 @@ function loadFileInto(path: string, target: Record<string, string | undefined>):
   }
   const parsed = parseEnvFile(content);
   for (const [key, value] of Object.entries(parsed)) {
-    if (target[key] === undefined) target[key] = value;
+    if (target[key] === undefined || target[key] === "") target[key] = value;
   }
   return true;
 }
