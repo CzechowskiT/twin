@@ -233,6 +233,7 @@ Even perfect shell performance does **not** imply public launch, auto-apply acti
 | 2026-06-28 | **Gate E — Phase 3B prerequisites package** (docs + static guards; **not executed**) | **PENDING** — [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) |
 | 2026-06-29 | **Gate D — prod browser PASS** 36/36 | **PASS** — [gate-d-prod-browser-smoke-result-2026-06-28.md](./gate-d-prod-browser-smoke-result-2026-06-28.md) |
 | 2026-06-29 | **Gate E — Phase 3B prod FAIL** 0/20 (reattempt); attempt 1 ABORTED_RESOURCE_SAFETY | **FAIL** — [gate-e-phase3b-result-2026-06-28.md](./gate-e-phase3b-result-2026-06-28.md) |
+| 2026-07-01 | **Cursor-agent `TWIN_ACCESS_TOKEN` loading harness/tooling fix** (Slice 40) — [CURSOR_AGENT_TOKEN_LOADING_2026-06-29.md](./CURSOR_AGENT_TOKEN_LOADING_2026-06-29.md); no browser run; Gate E remains **PARTIAL/AUTH_TOKEN_REQUIRED** | **SHIPPED** (tooling only) |
 | TBD | P0 performance **CLOSED** | **BLOCKED** |
 | TBD | Public launch **GO** | **BLOCKED** |
 

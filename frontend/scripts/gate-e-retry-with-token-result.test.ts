@@ -105,3 +105,15 @@ test("8 with-token result — attempt 3 recorded; prior retries preserved", () =
   const priorRetry = readRepo(PRIOR_RETRY_RESULT);
   assert.match(priorRetry, /post-harness retry #2/i);
 });
+
+test("9 cursor-agent token loading fix (Slice 40) — closes agent-visibility gap; stance unchanged", () => {
+  const tokenDoc = readRepo("docs/CURSOR_AGENT_TOKEN_LOADING_2026-06-29.md");
+  assert.match(tokenDoc, /load-local-test-env\.ts/);
+  assert.match(tokenDoc, /never log/i);
+  assert.match(tokenDoc, /Phase 3B.*FAIL/i);
+  assert.doesNotMatch(tokenDoc, /Gate E:\s*\*\*PASS\*\*/i);
+  const spec = readFileSync(join(root, "e2e/phase3b-controlled-multitab.spec.ts"), "utf8");
+  assert.match(spec, /loadLocalTestEnv\(\)/);
+  const checkpoint = readRepo(RETRY_CHECKPOINT);
+  assert.match(checkpoint, /CURSOR_AGENT_TOKEN_LOADING_2026-06-29/);
+});

@@ -386,3 +386,19 @@ test("24 gate E with-token retry result — PARTIAL, AUTH_TOKEN_REQUIRED, FAIL s
   assert.match(index, /AUTH_TOKEN_REQUIRED|PARTIAL/i);
   assert.match(index, /Phase 3B.*FAIL/i);
 });
+
+test("25 cursor-agent token loading fix (Slice 40) — referenced, no overclaims, guard registered", () => {
+  const tokenDoc = readRepo("docs/CURSOR_AGENT_TOKEN_LOADING_2026-06-29.md");
+  assert.match(tokenDoc, /Cursor Agent.*Token Loading/i);
+  assert.match(tokenDoc, /NO-GO/i);
+  assert.match(tokenDoc, /P0.*OPEN/i);
+  assert.match(tokenDoc, /Gate F.*PENDING/i);
+  assert.doesNotMatch(tokenDoc, /Gate E:\s*\*\*PASS\*\*/i);
+  assert.doesNotMatch(tokenDoc, /Launch stance:\s*\*\*GO\*\*/i);
+  const pkg = readFileSync(join(root, "package.json"), "utf8");
+  assert.match(pkg, /test:cursor-agent-token-preflight/);
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /CURSOR_AGENT_TOKEN_LOADING_2026-06-29/);
+  const checkpoint = readRepo(GATE_E_RETRY_CHECKPOINT);
+  assert.match(checkpoint, /CURSOR_AGENT_TOKEN_LOADING_2026-06-29/);
+});

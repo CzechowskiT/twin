@@ -11,7 +11,7 @@
 **Gate F:** **PENDING**  
 **Launch stance:** **NO-GO** · **P0:** **OPEN** · **Phase 3B:** **FAIL** (harness hardened; no post-fix browser evidence)
 
-**Related:** [harness diagnostic plan](./PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md) · [Gate E result](./gate-e-phase3b-result-2026-06-28.md) · [evidence index](./LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md)
+**Related:** [harness diagnostic plan](./PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md) · [Gate E result](./gate-e-phase3b-result-2026-06-28.md) · [evidence index](./LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md) · [Cursor-agent token loading fix](./CURSOR_AGENT_TOKEN_LOADING_2026-06-29.md) (Slice 40 — precondition 6 tooling gap diagnosed; no new browser evidence)
 
 ---
 
@@ -133,8 +133,8 @@ All must pass **before** §8:
 3. `public-health` → `status=ok`, `db_ok=true`
 4. Deploy alignment — `frontend_commit` ≥ `2969b1f4` (harness fix SHA)
 5. Safe HTTP smoke **10/10 × 200** (curl only)
-6. `TWIN_ACCESS_TOKEN` available in env when workspace / token-required routes are evaluated — without it, harness reports `AUTH_TOKEN_REQUIRED` (PARTIAL), not product PASS
-7. Static guards pass (`tsc`, checkpoint guards, harness diagnostics)
+6. `TWIN_ACCESS_TOKEN` available in env when workspace / token-required routes are evaluated — without it, harness reports `AUTH_TOKEN_REQUIRED` (PARTIAL), not product PASS. As of Slice 40 ([CURSOR_AGENT_TOKEN_LOADING_2026-06-29.md](./CURSOR_AGENT_TOKEN_LOADING_2026-06-29.md)), the spec safely auto-loads `frontend/.env.local` for Cursor-agent/npm shells that don't source it themselves — this removes one precondition-6 failure mode, but does **not** by itself prove a token exists; still verify with `test -n "$TWIN_ACCESS_TOKEN"` (boolean only) before retry
+7. Static guards pass (`tsc`, checkpoint guards, harness diagnostics, `test:cursor-agent-token-preflight`)
 8. Clean local resource baseline (no CPU/memory incident)
 9. `smoke.yml` has no Playwright steps (default CI browser **DISABLED**)
 

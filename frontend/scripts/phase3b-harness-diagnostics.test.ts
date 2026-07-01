@@ -229,3 +229,17 @@ test("12 post-harness retry result — PARTIAL AUTH_TOKEN_REQUIRED, prior FAIL p
   assert.match(withTokenResult, /AUTH_TOKEN_REQUIRED/);
   assert.match(withTokenResult, /Attempt 3 — Execution Record/);
 });
+
+test("13 cursor-agent token loading fix (Slice 40) — doc + guard exist, no PASS/GO overclaims", () => {
+  const doc = readRepo("docs/CURSOR_AGENT_TOKEN_LOADING_2026-06-29.md");
+  assert.match(doc, /Cursor Agent.*Token Loading/i);
+  assert.match(doc, /load-local-test-env\.ts/);
+  assert.match(doc, /Gate E.*(PARTIAL|AUTH_TOKEN_REQUIRED|FAIL)/i);
+  assert.doesNotMatch(doc, /Gate E:\s*\*\*PASS\*\*/i);
+  assert.doesNotMatch(doc, /Launch stance:\s*\*\*GO\*\*/i);
+  const pkg = read("package.json");
+  assert.match(pkg, /test:cursor-agent-token-preflight/);
+  assert.match(pkg, /cursor-agent-token-preflight\.test\.ts/);
+  const spec = read("e2e/phase3b-controlled-multitab.spec.ts");
+  assert.match(spec, /loadLocalTestEnv/);
+});

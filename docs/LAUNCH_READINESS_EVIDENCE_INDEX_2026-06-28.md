@@ -108,6 +108,7 @@ Concise shipped evidence (static + documented; no new runtime activation in Slic
 | **Gate E post-harness retry result** | [gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md](./gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md) + `test:gate-e-retry-after-harness-fix-result` (Slice 37) — **PARTIAL/AUTH_TOKEN_REQUIRED** (attempts #1 + #2), browser **NOT RUN** |
 | **Gate E with-token retry result (attempt 3)** | [gate-e-phase3b-retry-with-token-result-2026-06-29.md](./gate-e-phase3b-retry-with-token-result-2026-06-29.md) + `test:gate-e-retry-with-token-result` (Slice 38) — **PARTIAL/AUTH_TOKEN_REQUIRED** (attempt 3), browser **NOT RUN** |
 | **Gate E with-token retry result (attempt 4)** | [gate-e-phase3b-attempt4-with-token-result-2026-06-29.md](./gate-e-phase3b-attempt4-with-token-result-2026-06-29.md) + `test:gate-e-attempt4-with-token-result` (Slice 39) — **PARTIAL/AUTH_TOKEN_REQUIRED** (attempt 4), browser **NOT RUN** |
+| **Cursor-agent token loading fix** | [CURSOR_AGENT_TOKEN_LOADING_2026-06-29.md](./CURSOR_AGENT_TOKEN_LOADING_2026-06-29.md) + `test:cursor-agent-token-preflight` (Slice 40) — safe `.env.local` loader for agent/npm harnesses; **no new browser evidence**; Gate E remains **PARTIAL/AUTH_TOKEN_REQUIRED** |
 | **Launch stance marker** | `LAUNCH_STANCE = "noGo"` unchanged |
 
 ---
@@ -257,6 +258,7 @@ This index summarizes evidence; the checklist is the **operational run sheet** f
 | [SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md](./SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md) | Gates A–F checklist |
 | [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUNDER_DEMO_CHECKLIST_2026-06-28.md) | Bounded demo run sheet (Slice 25) |
 | [HIRING_JOURNEY_TRACEABILITY_2026-06-26.md](./HIRING_JOURNEY_TRACEABILITY_2026-06-26.md) | Hiring journey preview traceability |
+| [CURSOR_AGENT_TOKEN_LOADING_2026-06-29.md](./CURSOR_AGENT_TOKEN_LOADING_2026-06-29.md) | Slice 40 — Cursor-agent `TWIN_ACCESS_TOKEN` loading harness/tooling fix (`test:cursor-agent-token-preflight`); no new Phase 3B browser evidence; Gate E stance unchanged |
 
 ---
 
