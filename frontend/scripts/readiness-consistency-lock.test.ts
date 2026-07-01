@@ -340,22 +340,23 @@ test("21 phase3b harness diagnostics — guard registered, Phase 3B FAIL preserv
   assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
 });
 
-test("22 gate E retry checkpoint — PENDING, FAIL stance preserved, no overclaims", () => {
-  const checkpoint = readRepo(GATE_E_RETRY_CHECKPOINT);
-  assert.match(checkpoint, /Gate E retry after harness fix = YES/);
-  assert.match(checkpoint, /Gate E retry after harness fix = NO \/ PENDING/);
-  assert.match(checkpoint, /2969b1f4/);
-  assert.match(checkpoint, /NOT EXECUTED|not executed|NOT RUN/i);
-  assert.match(checkpoint, /Phase 3B.*FAIL/i);
-  assert.match(checkpoint, /NO-GO/i);
-  assert.match(checkpoint, /P0.*OPEN/i);
-  assert.match(checkpoint, /Gate F.*PENDING/i);
-  assert.doesNotMatch(checkpoint, /Phase 3B:\s*\*\*PASS\*\*/i);
-  assert.doesNotMatch(checkpoint, /Launch stance:\s*\*\*GO\*\*/i);
-  assert.doesNotMatch(checkpoint, /Gate F.*\*\*YES\*\*/i);
+test("23 gate E post-harness retry result — PARTIAL, AUTH_TOKEN_REQUIRED, FAIL stance preserved", () => {
+  const result = readRepo("docs/gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md");
+  assert.match(result, /Gate E retry after harness fix = \*\*YES\*\*/);
+  assert.match(result, /verdict:\s+PARTIAL/i);
+  assert.match(result, /AUTH_TOKEN_REQUIRED/);
+  assert.match(result, /token present in env:\s+false/i);
+  assert.match(result, /browser NOT RUN|NOT RUN/i);
+  assert.match(result, /Phase 3B.*FAIL/i);
+  assert.match(result, /0\/20/i);
+  assert.match(result, /NO-GO/i);
+  assert.match(result, /P0.*OPEN/i);
+  assert.match(result, /Gate F.*PENDING/i);
+  assert.doesNotMatch(result, /Phase 3B:\s*\*\*PASS\*\*/i);
   const pkg = readFileSync(join(root, "package.json"), "utf8");
-  assert.match(pkg, /test:gate-e-retry-after-harness-fix-checkpoint/);
+  assert.match(pkg, /test:gate-e-retry-after-harness-fix-result/);
   const index = readRepo(EVIDENCE_INDEX);
-  assert.match(index, /GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29/);
+  assert.match(index, /gate-e-phase3b-retry-after-harness-fix-result-2026-06-29/);
+  assert.match(index, /AUTH_TOKEN_REQUIRED|PARTIAL/i);
   assert.match(index, /Phase 3B.*FAIL/i);
 });

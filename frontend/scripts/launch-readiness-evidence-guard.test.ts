@@ -40,6 +40,7 @@ const REQUIRED_SOURCE_DOCS = [
   "gate-e-phase3b-attempt-1-aborted-resource-safety-2026-06-28.md",
   "PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md",
   "GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md",
+  "gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md",
   "TWIN_PUBLIC_LAUNCH_READINESS_PLAN_2026-06-27.md",
   "TWIN_OPERATING_CONTEXT_2026-06-26.md",
 ] as const;
@@ -204,15 +205,26 @@ test("17 evidence index references phase3b harness diagnostics guard", () => {
   assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
 });
 
-test("18 evidence index references gate E retry-after-harness-fix checkpoint", () => {
+test("18 evidence index references gate E retry-after-harness-fix checkpoint and post-harness result", () => {
   const index = readRepo(EVIDENCE_INDEX);
   assert.match(index, /GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29/);
+  assert.match(index, /gate-e-phase3b-retry-after-harness-fix-result-2026-06-29/);
   assert.match(index, /test:gate-e-retry-after-harness-fix-checkpoint/);
+  assert.match(index, /test:gate-e-retry-after-harness-fix-result/);
   assert.match(index, /2969b1f4/);
-  assert.match(index, /Gate E retry.*PENDING|PENDING.*retry/i);
+  assert.match(index, /AUTH_TOKEN_REQUIRED|PARTIAL/i);
   assert.match(index, /Phase 3B.*FAIL/i);
   assert.match(index, /NO-GO/i);
   assert.match(index, /P0.*OPEN/i);
   assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
   assert.doesNotMatch(index, /Gate F.*\*\*YES\*\*/i);
+});
+
+test("19 evidence index — post-harness retry PARTIAL; browser NOT RUN", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /Gate E post-harness retry: PARTIAL|PARTIAL.*AUTH_TOKEN_REQUIRED/i);
+  assert.match(index, /browser.*NOT RUN|NOT RUN/i);
+  const result = readRepo("docs/gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md");
+  assert.match(result, /verdict:\s+PARTIAL/i);
+  assert.match(result, /token present in env:\s+false/i);
 });
