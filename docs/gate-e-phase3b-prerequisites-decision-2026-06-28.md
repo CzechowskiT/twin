@@ -22,6 +22,8 @@ Gate B (minimal shell fix) is **merged**. Gate C unlocked **local** sequential b
 
 **Gate E retry result (Slice 37):** [gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md](./gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md) — founder YES (×2); **PARTIAL/AUTH_TOKEN_REQUIRED** on attempts #1 + #2; browser **NOT RUN**. **Phase 3B remains FAIL** — prior 0/20 unchanged.
 
+**Gate E with-token retry results (Slices 38-39):** [attempt 3](./gate-e-phase3b-retry-with-token-result-2026-06-29.md) · [attempt 4](./gate-e-phase3b-attempt4-with-token-result-2026-06-29.md) — founder with-token YES (×2); **PARTIAL/AUTH_TOKEN_REQUIRED** on both attempts; browser **NOT RUN**. **Phase 3B remains FAIL** — prior 0/20 unchanged.
+
 | Item | Status |
 |------|--------|
 | **Gate E decision** | **PENDING** — awaiting explicit founder YES |

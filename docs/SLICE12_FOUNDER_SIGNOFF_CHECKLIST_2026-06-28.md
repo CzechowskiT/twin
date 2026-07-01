@@ -145,6 +145,8 @@ Reference: [PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md](./PHASE3B_CO
 
 **Founder note (2026-06-29):** Gate B merged (PR #332); Gate C **YES** — local browser **36/36 PASS**; Gate D **YES** — prod browser **36/36 PASS**; Gate E **YES** — prod Phase 3B **0/20 FAIL** ([result](./gate-e-phase3b-result-2026-06-28.md), attempt 1 [ABORTED_RESOURCE_SAFETY](./gate-e-phase3b-attempt-1-aborted-resource-safety-2026-06-28.md)). **No P0 closure**. Gate F **PENDING**.
 
+**Founder note (2026-07-01):** Post-harness Gate E retries (with-token) — attempt 3 [PARTIAL/AUTH_TOKEN_REQUIRED](./gate-e-phase3b-retry-with-token-result-2026-06-29.md); attempt 4 [PARTIAL/AUTH_TOKEN_REQUIRED](./gate-e-phase3b-attempt4-with-token-result-2026-06-29.md). Browser **NOT RUN** on either — `TWIN_ACCESS_TOKEN` absent in agent runner env both times. Prior 0/20 FAIL unchanged. **No P0 closure**. Launch **NO-GO**. Gate F **PENDING**.
+
 ---
 
 ## 9. Founder Must Explicitly Accept These Constraints
