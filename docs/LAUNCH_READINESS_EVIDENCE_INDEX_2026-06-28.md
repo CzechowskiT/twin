@@ -1,6 +1,6 @@
 # Launch Readiness Evidence Index — 2026-06-28
 
-**Branch at capture:** `docs/gate-e-retry-after-harness-fix-result-attempt2-2026-06-29` @ `d37d427f` (Gate E post-harness retry attempt 2 — PARTIAL/AUTH_TOKEN_REQUIRED)
+**Branch at capture:** `docs/gate-e-retry-with-token-result-2026-06-29` @ `70367c14` (Gate E with-token retry attempt 3 — PARTIAL/AUTH_TOKEN_REQUIRED)
 **Purpose:** Founder/investor-readable **evidence index** — what is working, what is guarded, what is blocked, and how to demo without overclaims.  
 **This is not launch approval.**
 
@@ -20,6 +20,7 @@
 | **Gate D** | **YES** — prod browser **36/36 PASS** (54.9s, workers=1) — [gate-d result](./gate-d-prod-browser-smoke-result-2026-06-28.md); [preflight runbook](./gate-d-prod-browser-smoke-preflight-2026-06-28.md) |
 | **Gate E** | **YES / FAIL** — Phase 3B prod reattempt **0/20** — [gate-e result](./gate-e-phase3b-result-2026-06-28.md) · [attempt 1 abort](./gate-e-phase3b-attempt-1-aborted-resource-safety-2026-06-28.md) |
 | **Gate E retry (post-harness)** | **PARTIAL** — [retry result](./gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md) — founder YES (×2); **AUTH_TOKEN_REQUIRED**; browser **NOT RUN** (attempts #1 PR #355 + #2) |
+| **Gate E retry (with token)** | **PARTIAL** — [with-token result](./gate-e-phase3b-retry-with-token-result-2026-06-29.md) — founder YES (attempt 3); **AUTH_TOKEN_REQUIRED**; browser **NOT RUN** |
 | **Gate F** | **PENDING** — production smoke boundaries / re-audit |
 | **Phase 3B** | **FAIL** — prod multitab executed; blank-or-no-content 20/20; harness hardened (PR #353) — **not fixed by runtime evidence** |
 | **Code constant** | `LAUNCH_STANCE = "noGo"` in `frontend/src/lib/investor-metrics-reality.ts` |
@@ -45,19 +46,19 @@ Controlled investor/founder demo is **supported** with explicit boundaries (§6�
 
 ## 3. Runtime Alignment Snapshot
 
-Captured **2026-07-01** (Gate E post-harness retry attempt 2 preflight, prod read-only). Values reflect **latest known at time of report** — runtime may advance after docs-only merges.
+Captured **2026-07-01** (Gate E with-token retry attempt 3 preflight, prod read-only). Values reflect **latest known at time of report** — runtime may advance after docs-only merges.
 
 | Field | Value |
 |-------|-------|
-| **repo_head** | `d37d427fe0b241ac0d0f5a2fe96430a90a734112` (`d37d427f`, post Gate E retry attempt 2) |
-| **prod_frontend_commit** | `d37d427fe0b241ac0d0f5a2fe96430a90a734112` (`d37d427f`, aligned) |
+| **repo_head** | `70367c1453d6df972d6be34fd91839be7a407325` (`70367c14`, post Gate E with-token retry attempt 3) |
+| **prod_frontend_commit** | `70367c1453d6df972d6be34fd91839be7a407325` (`70367c14`, aligned) |
 | **prod_api_commit** | `6d6d1e54f85f8f00fe1727f32cef700e9c2a20aa` (`6d6d1e5`, PR #281) |
 | **public-health** | `status=ok`, `db_ok=true` (10× poll 2026-06-29) |
 | **validated_jobs** | 652 |
 | **market_coverage_progress_pct** | 6 |
 | **stripe_checkout_ready** | true |
 | **alignment_status** | **ALIGNED** — `frontend_commit` ≥ `2969b1f4` (harness fix deployed) |
-| **docs_only_drift** | **false** — prod FE = repo HEAD `d37d427f` |
+| **docs_only_drift** | **false** — prod FE = repo HEAD `70367c14` |
 | **HTTP smoke (10 routes)** | **10/10 × 200** (curl, read-only) — see below |
 
 ### HTTP smoke (10 routes, prod — curl only)
@@ -105,6 +106,7 @@ Concise shipped evidence (static + documented; no new runtime activation in Slic
 | **Gate E result template** | [gate-e-phase3b-result-template-2026-06-28.md](./gate-e-phase3b-result-template-2026-06-28.md) — template only |
 | **Gate E retry checkpoint** | [GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md](./GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md) + `test:gate-e-retry-after-harness-fix-checkpoint` (Slice 36) |
 | **Gate E post-harness retry result** | [gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md](./gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md) + `test:gate-e-retry-after-harness-fix-result` (Slice 37) — **PARTIAL/AUTH_TOKEN_REQUIRED** (attempts #1 + #2), browser **NOT RUN** |
+| **Gate E with-token retry result** | [gate-e-phase3b-retry-with-token-result-2026-06-29.md](./gate-e-phase3b-retry-with-token-result-2026-06-29.md) + `test:gate-e-retry-with-token-result` (Slice 38) — **PARTIAL/AUTH_TOKEN_REQUIRED** (attempt 3), browser **NOT RUN** |
 | **Launch stance marker** | `LAUNCH_STANCE = "noGo"` unchanged |
 
 ---
@@ -167,6 +169,7 @@ Inventory sources:
 | `test:phase3b-harness-diagnostics` | 10 | Phase 3B harness diagnostics guards (Slice 35) |
 | `test:gate-e-retry-after-harness-fix-checkpoint` | 12 | Gate E retry-after-harness-fix checkpoint (Slice 36) |
 | `test:gate-e-retry-after-harness-fix-result` | 7 | Gate E post-harness retry result guards (Slice 37) |
+| `test:gate-e-retry-with-token-result` | 8 | Gate E with-token retry result guards (Slice 38) |
 
 Full step-by-step founder script: [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUNDER_DEMO_CHECKLIST_2026-06-28.md).
 
@@ -181,6 +184,7 @@ Full step-by-step founder script: [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUND
 | **Gate D prod browser** | **EXECUTED PASS** — 36/36 — [result doc](./gate-d-prod-browser-smoke-result-2026-06-28.md) |
 | **Gate E Phase 3B** | **EXECUTED FAIL** — 0/20 — [result doc](./gate-e-phase3b-result-2026-06-28.md) |
 | **Gate E post-harness retry** | **PARTIAL** — AUTH_TOKEN_REQUIRED — [retry result](./gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md); browser **NOT RUN** (attempts #1 + #2) |
+| **Gate E with-token retry** | **PARTIAL** — AUTH_TOKEN_REQUIRED — [with-token result](./gate-e-phase3b-retry-with-token-result-2026-06-29.md); browser **NOT RUN** (attempt 3) |
 | **Phase 3B pass claim** | **Forbidden** — prior prod FAIL 0/20; post-harness browser not executed |
 | **Default CI browser** | **DISABLED** — explicit env flags required |
 | **ATS writeback** | **NOT LIVE** |
@@ -198,9 +202,10 @@ Full step-by-step founder script: [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUND
 1. ~~**Gate D = YES**~~ → **DONE** — [gate-d result](./gate-d-prod-browser-smoke-result-2026-06-28.md) records **36/36 PASS** (2026-06-29).
 2. ~~**Gate E = YES**~~ → **DONE (FAIL)** — [gate-e result](./gate-e-phase3b-result-2026-06-28.md) records **0/20 FAIL** on prod multitab (2026-06-29 reattempt). Harness fix merged (PR #353); **post-fix retry requires** [retry checkpoint](./GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md) founder YES.
 3. ~~**Gate E retry after harness fix = YES**~~ → **DONE (PARTIAL ×2)** — [retry result](./gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md) — **AUTH_TOKEN_REQUIRED** on attempts #1 (PR #355) and #2; browser **NOT RUN**; prior 0/20 FAIL unchanged.
-4. **Gate E post-harness retry with token** → requires `TWIN_ACCESS_TOKEN` in runner env + new founder authorization (both prior YES attempts consumed at preflight stop).
-5. **Gate F / launch re-audit** → only after Gate D/E evidence and P0 performance review.
-6. **Public launch GO** → separate founder decision; §5 launch gate matrix must be green; **not implied** by this index.
+4. ~~**Gate E post-harness retry with token**~~ → **DONE (PARTIAL)** — [with-token result](./gate-e-phase3b-retry-with-token-result-2026-06-29.md) — **AUTH_TOKEN_REQUIRED** on attempt 3; browser **NOT RUN**; prior 0/20 FAIL unchanged.
+5. **Gate E with-token browser re-run** → requires `TWIN_ACCESS_TOKEN` exported to agent runner env (`test -n "$TWIN_ACCESS_TOKEN"`) + new founder authorization.
+6. **Gate F / launch re-audit** → only after Gate D/E evidence and P0 performance review.
+7. **Public launch GO** → separate founder decision; §5 launch gate matrix must be green; **not implied** by this index.
 
 **Founder response format (Gates A–F):** see [SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md](./SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md) §7.
 
@@ -245,6 +250,7 @@ This index summarizes evidence; the checklist is the **operational run sheet** f
 | [PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md](./PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md) | Phase 3B harness diagnostics hardening (Slice 35) — **FAIL unchanged** |
 | [GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md](./GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md) | Gate E retry-after-harness-fix checkpoint (Slice 36) |
 | [gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md](./gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md) | Gate E post-harness retry **PARTIAL/AUTH_TOKEN_REQUIRED** (attempts #1 + #2, Slice 37) — browser **NOT RUN** |
+| [gate-e-phase3b-retry-with-token-result-2026-06-29.md](./gate-e-phase3b-retry-with-token-result-2026-06-29.md) | Gate E with-token retry **PARTIAL/AUTH_TOKEN_REQUIRED** (attempt 3, Slice 38) — browser **NOT RUN** |
 | [SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md](./SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md) | Gates A–F checklist |
 | [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUNDER_DEMO_CHECKLIST_2026-06-28.md) | Bounded demo run sheet (Slice 25) |
 | [HIRING_JOURNEY_TRACEABILITY_2026-06-26.md](./HIRING_JOURNEY_TRACEABILITY_2026-06-26.md) | Hiring journey preview traceability |
@@ -257,4 +263,4 @@ This index summarizes evidence; the checklist is the **operational run sheet** f
 - No backend/API/auth/DB/env/smoke.yml changes.
 - No launch GO, no P0 closed claims.
 
-**Public launch: NO-GO · P0: OPEN · Gate D: YES/PASS · Gate E: YES/FAIL · Phase 3B: FAIL (0/20 prod multitab) · Gate E post-harness retry: PARTIAL/AUTH_TOKEN_REQUIRED**
+**Public launch: NO-GO · P0: OPEN · Gate D: YES/PASS · Gate E: YES/FAIL · Phase 3B: FAIL (0/20 prod multitab) · Gate E post-harness retry: PARTIAL/AUTH_TOKEN_REQUIRED · Gate E with-token retry: PARTIAL/AUTH_TOKEN_REQUIRED**

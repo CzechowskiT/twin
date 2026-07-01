@@ -126,3 +126,13 @@ test("12 prior gate E result still FAIL — not reversed by checkpoint", () => {
   const checkpoint = readRepo(CHECKPOINT);
   assert.match(checkpoint, /not reversed|prior 0\/20|unchanged/i);
 });
+
+test("13 checkpoint references with-token retry result — attempt 3 PARTIAL", () => {
+  const checkpoint = readRepo(CHECKPOINT);
+  assert.match(checkpoint, /gate-e-phase3b-retry-with-token-result-2026-06-29/);
+  assert.match(checkpoint, /attempts #1.*#2.*#3|#3 with-token/i);
+  assert.match(checkpoint, /AUTH_TOKEN_REQUIRED|PARTIAL/i);
+  const withTokenResult = readRepo("docs/gate-e-phase3b-retry-with-token-result-2026-06-29.md");
+  assert.match(withTokenResult, /Attempt 3 — Execution Record/);
+  assert.match(withTokenResult, /token present in env:\s+false/i);
+});
