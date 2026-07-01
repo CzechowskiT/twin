@@ -339,6 +339,7 @@ Scripts from `frontend/package.json`. Run from `frontend/` unless noted.
 | `npm run test:p0-renderer-memory-bundle-reduction` | Bundle/renderer memory reductions |
 | `npm run test:phase3b-controlled-multitab` | Phase 3B static guards (**BLOCKED to run browser variant**) |
 | `npm run test:phase3b-harness-diagnostics` | Phase 3B harness diagnostics static guards (Slice 35) |
+| `npm run test:gate-e-retry-after-harness-fix-checkpoint` | Gate E retry-after-harness-fix checkpoint static guards (Slice 36) |
 | `npm run test:multi-tab-performance-hardening` | Multi-tab perf hardening guards |
 
 ### Build / typecheck
@@ -554,3 +555,4 @@ All preview surfaces — Hiring Journey, Scheduling Proposal Pack, marketing cop
 | 2026-06-29 | **Slice 33** — Gate E founder decision package [GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) + result template; `test:gate-e-founder-decision-package`; Gate D **YES/PASS** prerequisite; Gate E **PENDING**; Phase 3B **NOT RUN**; Launch **NO-GO**; P0 **OPEN** |
 | 2026-06-29 | **Slice 34** — Gate E Phase 3B prod reattempt [gate-e result](./gate-e-phase3b-result-2026-06-28.md) **0/20 FAIL**; attempt 1 [ABORTED_RESOURCE_SAFETY](./gate-e-phase3b-attempt-1-aborted-resource-safety-2026-06-28.md); `test:gate-e-phase3b-result`; Launch **NO-GO**; P0 **OPEN**; Gate F **PENDING** |
 | 2026-06-29 | **Slice 35** — Phase 3B multitab harness diagnostics [plan](./PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md); `test:phase3b-harness-diagnostics`; stale `fda7567` commit constant removed; preflight `frontend_commit` gate; Launch **NO-GO**; P0 **OPEN**; Phase 3B **FAIL**; Gate F **PENDING** |
+| 2026-06-29 | **Slice 36** — Gate E retry-after-harness-fix checkpoint [GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md](./GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md); `test:gate-e-retry-after-harness-fix-checkpoint`; prod FE aligned `2969b1f4` post-#353; Gate E retry **PENDING**; Phase 3B **FAIL unchanged**; Launch **NO-GO**; P0 **OPEN**; Gate F **PENDING** |

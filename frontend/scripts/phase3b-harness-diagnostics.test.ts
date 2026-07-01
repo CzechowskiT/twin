@@ -210,3 +210,18 @@ test("10 diagnostic plan doc exists; Phase 3B FAIL stance preserved", () => {
   assert.match(gateE, /0\/20/i);
   assert.match(gateE, /verdict:\s+FAIL/i);
 });
+
+test("11 retry checkpoint doc — PENDING, harness fix SHA, no Phase 3B PASS claim", () => {
+  const checkpoint = readRepo("docs/GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md");
+  assert.match(checkpoint, /Gate E Retry After Harness Fix/i);
+  assert.match(checkpoint, /2969b1f4/);
+  assert.match(checkpoint, /PR #353/);
+  assert.match(checkpoint, /NOT EXECUTED|not executed|NOT RUN/i);
+  assert.match(checkpoint, /Phase 3B.*FAIL/i);
+  assert.match(checkpoint, /NO-GO/i);
+  assert.match(checkpoint, /P0.*OPEN/i);
+  assert.match(checkpoint, /Gate F.*PENDING/i);
+  assert.doesNotMatch(checkpoint, /Phase 3B:\s*\*\*PASS\*\*/i);
+  const pkg = read("package.json");
+  assert.match(pkg, /test:gate-e-retry-after-harness-fix-checkpoint/);
+});

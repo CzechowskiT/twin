@@ -18,7 +18,9 @@ Gate B (minimal shell fix) is **merged**. Gate C unlocked **local** sequential b
 
 **Gate E execution result (post-prerequisites):** [gate-e-phase3b-result-2026-06-28.md](./gate-e-phase3b-result-2026-06-28.md) — **0/20 FAIL** (reattempt); attempt 1 [ABORTED_RESOURCE_SAFETY](./gate-e-phase3b-attempt-1-aborted-resource-safety-2026-06-28.md). This prerequisites package remains historical **PENDING** at publish.
 
-**Harness diagnostics (Slice 35):** [PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md](./PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md) — stale `fda7567` commit constant removed; preflight `frontend_commit` gate; `test:phase3b-harness-diagnostics`. **Phase 3B remains FAIL** — no second reattempt in this slice.
+**Harness diagnostics (Slice 35):** [PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md](./PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md) — stale `fda7567` commit constant removed; preflight `frontend_commit` gate; `test:phase3b-harness-diagnostics`. **Phase 3B remains FAIL** — no second reattempt in that slice.
+
+**Gate E retry checkpoint (Slice 36):** [GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md](./GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md) — founder decision for post-harness Phase 3B prod retry; `test:gate-e-retry-after-harness-fix-checkpoint`; prod FE aligned `2969b1f4` post-PR #353. **Phase 3B remains FAIL** — no post-fix browser run in this package.
 
 | Item | Status |
 |------|--------|
@@ -27,7 +29,7 @@ Gate B (minimal shell fix) is **merged**. Gate C unlocked **local** sequential b
 | **Phase 3B inventory** | **20 routes** in batches **7+7+6** — static guards only |
 | **HTTP smoke (15 routes)** | **15/15 × 200** (curl, read-only, pre-change baseline) |
 | **Default CI** | Playwright **DISABLED** — `smoke.yml` has no browser steps |
-| **Next unlock** | Founder marks Gate E = YES in [GATE_E founder decision package](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) → run gated Phase 3B command (§7) |
+| **Next unlock** | Founder marks **Gate E retry after harness fix = YES** in [retry checkpoint](./GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md) (deploy aligned `frontend_commit` ≥ `2969b1f4`) → run gated Phase 3B command |
 
 ---
 
