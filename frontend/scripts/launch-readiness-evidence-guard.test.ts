@@ -242,3 +242,16 @@ test("20 evidence index — with-token retry PARTIAL; browser NOT RUN", () => {
   assert.match(result, /Attempt 3 — Execution Record/);
   assert.doesNotMatch(result, /Phase 3B:\s*\*\*PASS\*\*/i);
 });
+
+test("21 evidence index references cursor-agent token loading fix (Slice 40); no overclaims", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /CURSOR_AGENT_TOKEN_LOADING_2026-06-29/);
+  assert.match(index, /test:cursor-agent-token-preflight/);
+  assert.match(index, /NO-GO/i);
+  assert.match(index, /P0.*OPEN/i);
+  assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
+  const tokenDoc = readRepo("docs/CURSOR_AGENT_TOKEN_LOADING_2026-06-29.md");
+  assert.match(tokenDoc, /load-local-test-env\.ts/);
+  assert.match(tokenDoc, /No print\/log\/commit token values|never log/i);
+  assert.doesNotMatch(tokenDoc, /Launch stance:\s*\*\*GO\*\*/i);
+});

@@ -463,6 +463,7 @@ flowchart LR
 | 2026-07-01 | **Slice 37** — Gate E post-harness retry result ([result](./gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md)); `test:gate-e-retry-after-harness-fix-result`; founder YES (×2); **PARTIAL/AUTH_TOKEN_REQUIRED** on attempts #1 + #2; browser **NOT RUN**; Launch **NO-GO**; P0 **OPEN**; Gate F **PENDING** |
 | 2026-07-01 | **Slice 38** — Gate E with-token retry result attempt 3 ([result](./gate-e-phase3b-retry-with-token-result-2026-06-29.md)); `test:gate-e-retry-with-token-result`; **PARTIAL/AUTH_TOKEN_REQUIRED**; browser **NOT RUN**; Launch **NO-GO**; P0 **OPEN**; Gate F **PENDING** |
 | 2026-07-01 | **Slice 39** — Gate E with-token retry result attempt 4 ([result](./gate-e-phase3b-attempt4-with-token-result-2026-06-29.md)); `test:gate-e-attempt4-with-token-result`; **PARTIAL/AUTH_TOKEN_REQUIRED**; browser **NOT RUN**; prod FE aligned `a5d964d1`; Launch **NO-GO**; P0 **OPEN**; Gate F **PENDING** |
+| 2026-07-01 | **Slice 40** — Cursor-agent `TWIN_ACCESS_TOKEN` loading harness/tooling fix ([doc](./CURSOR_AGENT_TOKEN_LOADING_2026-06-29.md)); safe `.env.local` loader (`load-local-test-env.ts`) + `test:cursor-agent-token-preflight`; diagnostic-only, **no browser run**; Gate E remains **PARTIAL/AUTH_TOKEN_REQUIRED**; Launch **NO-GO**; P0 **OPEN**; Gate F **PENDING** |
 
 ---
 

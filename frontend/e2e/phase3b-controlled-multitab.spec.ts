@@ -6,6 +6,7 @@ import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { withFreshContext } from "./helpers/browser-lifecycle";
+import { loadLocalTestEnv } from "./helpers/load-local-test-env";
 import {
   classifyPhase3bRouteAuth,
   classifyPhase3bRouteFailure,
@@ -20,6 +21,11 @@ import {
   PHASE3B_IDLE_MS_MAX, PHASE3B_IDLE_MS_MIN, PHASE3B_ROUTE_BATCHES,
   PHASE3B_SAFE_MARQUEE_MAX_NODES, PHASE3B_FULL_MARQUEE_FAIL_NODES,
 } from "./helpers/phase3b-controlled-routes";
+
+// Safe local env fallback — loads root/frontend .env.local for Cursor-agent/npm
+// shells that don't auto-source them. No-op when TWIN_ACCESS_TOKEN is already
+// exported (CI, prod runners) or when no local env files exist.
+loadLocalTestEnv();
 
 const PROD_BASE = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3000";
 const IS_PROD = PROD_BASE.includes("vercel.app");
