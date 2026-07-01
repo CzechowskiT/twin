@@ -7,6 +7,15 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { withFreshContext } from "./helpers/browser-lifecycle";
 import {
+  classifyPhase3bRouteAuth,
+  classifyPhase3bRouteFailure,
+  parsePhase3bPublicHealth,
+  buildPhase3bPreflightSnapshot,
+  type Phase3bDiagnosticClassification,
+  type Phase3bPreflightSnapshot,
+  type Phase3bRouteAuthTier,
+} from "./helpers/phase3b-harness-diagnostics";
+import {
   PHASE3B_DOM_FAIL, PHASE3B_DOM_WARN, PHASE3B_HEAP_FAIL_MB, PHASE3B_HEAP_WARN_MB,
   PHASE3B_IDLE_MS_MAX, PHASE3B_IDLE_MS_MIN, PHASE3B_ROUTE_BATCHES,
   PHASE3B_SAFE_MARQUEE_MAX_NODES, PHASE3B_FULL_MARQUEE_FAIL_NODES,
@@ -14,7 +23,6 @@ import {
 
 const PROD_BASE = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3000";
 const IS_PROD = PROD_BASE.includes("vercel.app");
-const EXPECTED_PROD_COMMIT = "fda75677c306aec76dbb83f65c483f8ba7cbe885";
 const ACCESS_TOKEN = process.env.TWIN_ACCESS_TOKEN?.trim() ?? "";
 const OUT_DIR = join(process.cwd(), ".diagnostics");
 const ROUTE_GOTO_MS = 30_000;
@@ -28,25 +36,52 @@ const MAX_AUTH_GATE_NAVIGATIONS = 3;
 
 type RouteStatus = "PASS" | "PARTIAL" | "WARN" | "FAIL";
 type RouteReport = {
-  batch: string; route: string; finalUrl: string; pathname: string; httpStatus: number | null;
-  visibleTextLength: number; mainVisible: boolean; shellReady: boolean; shellSkeleton: boolean;
-  hasAuthCard: boolean; hasNotFound: boolean; redirectCount: number; consoleErrorCount: number;
-  publicHealthRequestCount: number; authGateNavCount: number; marqueeRemountCount: number;
-  marketingLogoNodes: number; safeMarqueeLogoNodes: number; jsHeapUsedMb: number | null;
-  domNodes: number | null; layoutCount: number | null; status: RouteStatus;
-  failReasons: string[]; warnReasons: string[];
+  batch: string;
+  route: string;
+  authTier: Phase3bRouteAuthTier;
+  classification: Phase3bDiagnosticClassification;
+  finalUrl: string;
+  pathname: string;
+  documentTitle: string;
+  rootPresent: boolean;
+  httpStatus: number | null;
+  visibleTextLength: number;
+  mainVisible: boolean;
+  shellReady: boolean;
+  shellSkeleton: boolean;
+  hasAuthCard: boolean;
+  hasNotFound: boolean;
+  redirectCount: number;
+  consoleErrorCount: number;
+  pageErrorCount: number;
+  consoleErrors: string[];
+  pageErrors: string[];
+  publicHealthRequestCount: number;
+  authGateNavCount: number;
+  marqueeRemountCount: number;
+  marketingLogoNodes: number;
+  safeMarqueeLogoNodes: number;
+  jsHeapUsedMb: number | null;
+  domNodes: number | null;
+  layoutCount: number | null;
+  cdpStatus: "ok" | "unavailable" | "timeout";
+  status: RouteStatus;
+  failReasons: string[];
+  warnReasons: string[];
 };
 type RouteTracker = {
-  route: string; page: Page; httpStatus: number | null; consoleErrors: string[];
-  publicHealthRequests: number; authGateNavCount: number; marqueeRemountCount: number;
-  lastMarqueeSignature: string; getRedirectCount: () => number;
+  route: string;
+  page: Page;
+  httpStatus: number | null;
+  consoleErrors: string[];
+  pageErrors: string[];
+  publicHealthRequests: number;
+  authGateNavCount: number;
+  marqueeRemountCount: number;
+  lastMarqueeSignature: string;
+  getRedirectCount: () => number;
 };
 
-function isWorkspaceOrAuthPath(pathname: string): boolean {
-  return pathname.startsWith("/dashboard") || pathname.startsWith("/profile") ||
-    pathname.startsWith("/recruiter") || pathname.startsWith("/company") ||
-    pathname.startsWith("/login") || pathname.startsWith("/register");
-}
 function staggerDelayMs(index: number): number {
   return STAGGER_MIN_MS + ((index * 137) % (STAGGER_MAX_MS - STAGGER_MIN_MS + 1));
 }
@@ -64,9 +99,11 @@ async function dismissCookieBanner(page: Page): Promise<void> {
 }
 function attachRouteTracker(page: Page, route: string, httpStatus: number | null): RouteTracker {
   const consoleErrors: string[] = [];
+  const pageErrors: string[] = [];
   let redirectCount = 0, lastUrl = "", publicHealthRequests = 0, authGateNavCount = 0;
   let marqueeRemountCount = 0, lastMarqueeSignature = "";
   page.on("console", (msg) => { if (msg.type() === "error") consoleErrors.push(msg.text()); });
+  page.on("pageerror", (err) => { pageErrors.push(String(err)); });
   page.on("request", (req) => { if (req.url().includes("/api/public-health")) publicHealthRequests += 1; });
   page.on("framenavigated", (frame) => {
     if (frame !== page.mainFrame()) return;
@@ -86,7 +123,7 @@ function attachRouteTracker(page: Page, route: string, httpStatus: number | null
       lastMarqueeSignature = sig;
     } catch { /* ignore */ }
   });
-  return { route, page, httpStatus, consoleErrors, publicHealthRequests, authGateNavCount,
+  return { route, page, httpStatus, consoleErrors, pageErrors, publicHealthRequests, authGateNavCount,
     marqueeRemountCount, lastMarqueeSignature, getRedirectCount: () => redirectCount };
 }
 async function readDomState(page: Page) {
@@ -96,6 +133,7 @@ async function readDomState(page: Page) {
         const main = document.querySelector("main");
         const visibleText = (document.body?.innerText ?? "").replace(/\s+/g, " ").trim();
         const bodyLower = visibleText.toLowerCase();
+        const root = document.getElementById("__next") ?? document.querySelector("#root") ?? document.body;
         return {
           visibleTextLength: visibleText.length,
           mainVisible: Boolean(main && (main as HTMLElement).offsetParent !== null),
@@ -104,6 +142,8 @@ async function readDomState(page: Page) {
           hasAuthCard: /sign in|zaloguj|auth required|wymagane logowanie|przekierowanie|redirecting to sign in|go to sign in|przejdź do logowania/i.test(visibleText),
           hasNotFound: bodyLower.includes("404") || bodyLower.includes("not found") || bodyLower.includes("nie znaleziono"),
           pathname: window.location.pathname,
+          documentTitle: document.title ?? "",
+          rootPresent: Boolean(root && root.childElementCount > 0),
           marketingLogoNodes: document.querySelectorAll(".company-logo-marquee [role='img'], .company-logo-marquee img").length,
           safeMarqueeLogoNodes: document.querySelectorAll(".performance-safe-logo-marquee [role='img']").length,
         };
@@ -112,7 +152,8 @@ async function readDomState(page: Page) {
     ]);
   } catch {
     return { visibleTextLength: 0, mainVisible: false, shellReady: false, shellSkeleton: false,
-      hasAuthCard: false, hasNotFound: false, pathname: "", marketingLogoNodes: 0, safeMarqueeLogoNodes: 0 };
+      hasAuthCard: false, hasNotFound: false, pathname: "", documentTitle: "", rootPresent: false,
+      marketingLogoNodes: 0, safeMarqueeLogoNodes: 0 };
   }
 }
 async function captureCdp(page: Page) {
@@ -123,48 +164,39 @@ async function captureCdp(page: Page) {
       new Promise<never>((_, reject) => setTimeout(() => reject(new Error("cdp-timeout")), 5_000)),
     ]);
     return { jsHeapUsedMb: Math.round(heap.usedSize / (1024 * 1024)), domNodes: counters.nodes,
-      layoutCount: perf.metrics.find((m) => m.name === "LayoutCount")?.value ?? null };
-  } catch {
-    return { jsHeapUsedMb: null, domNodes: null, layoutCount: null };
+      layoutCount: perf.metrics.find((m) => m.name === "LayoutCount")?.value ?? null, cdpStatus: "ok" as const };
+  } catch (err) {
+    const cdpStatus = String(err).includes("cdp-timeout") ? "timeout" as const : "unavailable" as const;
+    return { jsHeapUsedMb: null, domNodes: null, layoutCount: null, cdpStatus };
   }
 }
-function evaluateRoute(batch: string, tracker: RouteTracker, dom: Awaited<ReturnType<typeof readDomState>>, cdp: Awaited<ReturnType<typeof captureCdp>>): RouteReport {
-  const failReasons: string[] = [], warnReasons: string[] = [];
-  const loginWithNext = dom.pathname.includes("/login") && !tracker.route.startsWith("/login");
-  if (tracker.httpStatus === 404) failReasons.push("http-404");
-  if (dom.hasNotFound && dom.visibleTextLength < MIN_VISIBLE_TEXT) failReasons.push("not-found-page");
-  const hasContent = dom.visibleTextLength >= MIN_VISIBLE_TEXT || dom.hasAuthCard || dom.shellReady || dom.mainVisible;
-  if (!hasContent && !loginWithNext) failReasons.push("blank-or-no-content");
-  if (dom.shellSkeleton && !dom.shellReady && !dom.hasAuthCard && dom.visibleTextLength < MIN_VISIBLE_TEXT) failReasons.push("stuck-skeleton");
-  if (tracker.getRedirectCount() > MAX_REDIRECTS) failReasons.push(`redirect-storm:${tracker.getRedirectCount()}`);
-  if (tracker.consoleErrors.length > MAX_CONSOLE_ERRORS) failReasons.push(`console-burst:${tracker.consoleErrors.length}`);
-  if (tracker.publicHealthRequests > MAX_PUBLIC_HEALTH_REQUESTS) failReasons.push(`public-health-loop:${tracker.publicHealthRequests}`);
-  if (tracker.authGateNavCount > MAX_AUTH_GATE_NAVIGATIONS) failReasons.push(`auth-gate-loop:${tracker.authGateNavCount}`);
-  if (tracker.marqueeRemountCount > 2) failReasons.push(`marquee-remount-loop:${tracker.marqueeRemountCount}`);
-  if (isWorkspaceOrAuthPath(dom.pathname)) {
-    if (dom.marketingLogoNodes >= PHASE3B_FULL_MARQUEE_FAIL_NODES) failReasons.push(`89-logo-dom:${dom.marketingLogoNodes}`);
-    if (dom.safeMarqueeLogoNodes > PHASE3B_SAFE_MARQUEE_MAX_NODES) failReasons.push(`safe-marquee-overflow:${dom.safeMarqueeLogoNodes}`);
-  }
-  if (cdp.jsHeapUsedMb !== null) {
-    if (cdp.jsHeapUsedMb > PHASE3B_HEAP_FAIL_MB) failReasons.push(`heap-fail:${cdp.jsHeapUsedMb}MB`);
-    else if (cdp.jsHeapUsedMb > PHASE3B_HEAP_WARN_MB) warnReasons.push(`heap-warn:${cdp.jsHeapUsedMb}MB`);
-  }
-  if (cdp.domNodes !== null) {
-    if (cdp.domNodes > PHASE3B_DOM_FAIL) failReasons.push(`dom-fail:${cdp.domNodes}`);
-    else if (cdp.domNodes > PHASE3B_DOM_WARN) warnReasons.push(`dom-warn:${cdp.domNodes}`);
-  }
-  let status: RouteStatus = "PASS";
-  if (failReasons.length > 0) status = "FAIL";
-  else if (loginWithNext && !ACCESS_TOKEN) status = "PARTIAL";
-  else if (warnReasons.length > 0) status = "WARN";
-  return { batch, route: tracker.route, finalUrl: tracker.page.url(), pathname: dom.pathname,
-    httpStatus: tracker.httpStatus, visibleTextLength: dom.visibleTextLength, mainVisible: dom.mainVisible,
-    shellReady: dom.shellReady, shellSkeleton: dom.shellSkeleton, hasAuthCard: dom.hasAuthCard,
-    hasNotFound: dom.hasNotFound, redirectCount: tracker.getRedirectCount(), consoleErrorCount: tracker.consoleErrors.length,
+function evaluateRoute(batch: string, tracker: RouteTracker, dom: Awaited<ReturnType<typeof readDomState>>,
+  cdp: Awaited<ReturnType<typeof captureCdp>>): RouteReport {
+  const authTier = classifyPhase3bRouteAuth(tracker.route);
+  const verdict = classifyPhase3bRouteFailure({
+    route: tracker.route, authTier, hasAccessToken: Boolean(ACCESS_TOKEN),
+    httpStatus: tracker.httpStatus, dom, cdp,
+    redirectCount: tracker.getRedirectCount(), consoleErrorCount: tracker.consoleErrors.length,
+    pageErrorCount: tracker.pageErrors.length, publicHealthRequestCount: tracker.publicHealthRequests,
+    authGateNavCount: tracker.authGateNavCount, marqueeRemountCount: tracker.marqueeRemountCount,
+    maxRedirects: MAX_REDIRECTS, maxConsoleErrors: MAX_CONSOLE_ERRORS,
+    maxPublicHealthRequests: MAX_PUBLIC_HEALTH_REQUESTS, maxAuthGateNavigations: MAX_AUTH_GATE_NAVIGATIONS,
+    minVisibleText: MIN_VISIBLE_TEXT, heapFailMb: PHASE3B_HEAP_FAIL_MB, heapWarnMb: PHASE3B_HEAP_WARN_MB,
+    domFail: PHASE3B_DOM_FAIL, domWarn: PHASE3B_DOM_WARN,
+    safeMarqueeMaxNodes: PHASE3B_SAFE_MARQUEE_MAX_NODES, fullMarqueeFailNodes: PHASE3B_FULL_MARQUEE_FAIL_NODES,
+  });
+  return { batch, route: tracker.route, authTier, classification: verdict.classification,
+    finalUrl: tracker.page.url(), pathname: dom.pathname, documentTitle: dom.documentTitle,
+    rootPresent: dom.rootPresent, httpStatus: tracker.httpStatus, visibleTextLength: dom.visibleTextLength,
+    mainVisible: dom.mainVisible, shellReady: dom.shellReady, shellSkeleton: dom.shellSkeleton,
+    hasAuthCard: dom.hasAuthCard, hasNotFound: dom.hasNotFound, redirectCount: tracker.getRedirectCount(),
+    consoleErrorCount: tracker.consoleErrors.length, pageErrorCount: tracker.pageErrors.length,
+    consoleErrors: tracker.consoleErrors.slice(0, 5), pageErrors: tracker.pageErrors.slice(0, 5),
     publicHealthRequestCount: tracker.publicHealthRequests, authGateNavCount: tracker.authGateNavCount,
     marqueeRemountCount: tracker.marqueeRemountCount, marketingLogoNodes: dom.marketingLogoNodes,
     safeMarqueeLogoNodes: dom.safeMarqueeLogoNodes, jsHeapUsedMb: cdp.jsHeapUsedMb, domNodes: cdp.domNodes,
-    layoutCount: cdp.layoutCount, status, failReasons, warnReasons };
+    layoutCount: cdp.layoutCount, cdpStatus: cdp.cdpStatus, status: verdict.status,
+    failReasons: verdict.failReasons, warnReasons: verdict.warnReasons };
 }
 async function openRouteStaggered(context: BrowserContext, path: string): Promise<RouteTracker> {
   const page = await context.newPage();
@@ -176,30 +208,38 @@ async function settleTabForMetrics(page: Page): Promise<void> {
   await page.bringToFront();
   await page.waitForTimeout(400);
 }
-async function pollPublicHealth(): Promise<{ ok: boolean; gitCommit: string | null }> {
+async function pollPublicHealth() {
   try {
     const res = await fetch(`${PROD_BASE}/api/public-health`, { signal: AbortSignal.timeout(15_000) });
-    if (!res.ok) return { ok: false, gitCommit: null };
-    const json = (await res.json()) as { status?: string; git_commit?: string };
-    return { ok: json.status === "ok", gitCommit: json.git_commit ?? null };
-  } catch { return { ok: false, gitCommit: null }; }
+    if (!res.ok) return null;
+    return parsePhase3bPublicHealth((await res.json()) as Record<string, unknown>);
+  } catch { return null; }
 }
 
-test.describe.configure({ timeout: IS_PROD ? 900_000 : 1_200_000 });
-let prodCommitActual: string | null = null;
-let prodCommitMismatch = false;
+test.describe.configure({ mode: "serial", timeout: IS_PROD ? 900_000 : 1_200_000 });
+let preflight: Phase3bPreflightSnapshot | null = null;
 
 test.describe("Phase 3B controlled multitab verification", () => {
   test.use({ baseURL: PROD_BASE });
-  test.beforeAll(async () => {
-    if (!IS_PROD) return;
+
+  test("prod preflight — public-health + frontend_commit alignment", async () => {
+    test.skip(!IS_PROD, "prod preflight only on vercel.app");
     const health = await pollPublicHealth();
-    prodCommitActual = health.gitCommit;
-    prodCommitMismatch = health.gitCommit !== EXPECTED_PROD_COMMIT;
-    if (prodCommitMismatch) console.warn(`PHASE3B_COMMIT_MISMATCH expected=${EXPECTED_PROD_COMMIT} actual=${health.gitCommit}`);
+    expect(health, "public-health unavailable").not.toBeNull();
+    preflight = buildPhase3bPreflightSnapshot(health!);
+    expect(preflight.publicHealthStatus, "public-health status").toBe("ok");
+    expect(preflight.publicHealthDbOk, "public-health db_ok").toBe(true);
+    expect(preflight.frontendCommitActual, "frontend_commit present").toBeTruthy();
+    expect(preflight.apiCommitActual, "api_commit present").toBeTruthy();
+    expect(preflight.classification, `preflight: expected=${preflight.frontendCommitExpected} actual=${preflight.frontendCommitActual}`).not.toBe("COMMIT_MISMATCH");
+    expect(preflight.ok, "preflight ok").toBe(true);
   });
+
   for (const batch of PHASE3B_ROUTE_BATCHES) {
     test(`batch ${batch.label}: ${batch.routes.length} tabs idle ${PHASE3B_IDLE_MS_MIN / 1000}s–${PHASE3B_IDLE_MS_MAX / 1000}s`, async ({ browser }) => {
+      if (IS_PROD && preflight && !preflight.ok) {
+        test.skip(true, `preflight failed: ${preflight.classification}`);
+      }
       expect(batch.routes.length).toBeLessThanOrEqual(8);
       mkdirSync(OUT_DIR, { recursive: true });
       const reports: RouteReport[] = [];
@@ -217,13 +257,22 @@ test.describe("Phase 3B controlled multitab verification", () => {
           reports.push(evaluateRoute(batch.label, tracker, await readDomState(tracker.page), await captureCdp(tracker.page)));
         }
       });
-      const payload = { phase: "3B-controlled-multitab", batch: batch.label, baseUrl: PROD_BASE,
-        prodCommitExpected: EXPECTED_PROD_COMMIT, prodCommitActual, prodCommitMismatch,
+      const payload = {
+        phase: "3B-controlled-multitab",
+        batch: batch.label,
+        baseUrl: PROD_BASE,
+        preflight: preflight ?? { classification: "PREFLIGHT_OK", ok: true },
+        frontendCommitExpected: preflight?.frontendCommitExpected ?? null,
+        frontendCommitActual: preflight?.frontendCommitActual ?? null,
+        apiCommitActual: preflight?.apiCommitActual ?? null,
+        frontendCommitMismatch: preflight?.frontendCommitMismatch ?? false,
         idleMs: PHASE3B_IDLE_MS_MIN + Math.floor((PHASE3B_IDLE_MS_MAX - PHASE3B_IDLE_MS_MIN) * (batch.routes.length / 8)),
-        accessToken: Boolean(ACCESS_TOKEN), routes: reports };
+        accessToken: Boolean(ACCESS_TOKEN),
+        routes: reports,
+      };
       writeFileSync(join(OUT_DIR, `phase3b-controlled-multitab-${batch.label}.json`), JSON.stringify(payload, null, 2));
       for (const report of reports) {
-        expect.soft(report.status, `${report.route}: ${report.failReasons.join(",")}`).not.toBe("FAIL");
+        expect.soft(report.status, `${report.route}: ${report.classification} ${report.failReasons.join(",")}`).not.toBe("FAIL");
         expect(report.httpStatus, `${report.route} HTTP`).not.toBe(404);
         expect(report.redirectCount).toBeLessThanOrEqual(MAX_REDIRECTS);
         if (report.jsHeapUsedMb !== null) expect(report.jsHeapUsedMb).toBeLessThanOrEqual(PHASE3B_HEAP_FAIL_MB);
@@ -231,8 +280,4 @@ test.describe("Phase 3B controlled multitab verification", () => {
       }
     });
   }
-  test("prod frontend commit matches fda7567 (post-route gate)", async () => {
-    test.skip(!IS_PROD, "prod commit gate only on vercel.app");
-    expect(prodCommitMismatch, `git_commit mismatch: ${prodCommitActual}`).toBe(false);
-  });
 });

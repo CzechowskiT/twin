@@ -38,6 +38,7 @@ const REQUIRED_SOURCE_DOCS = [
   "gate-e-phase3b-result-template-2026-06-28.md",
   "gate-e-phase3b-result-2026-06-28.md",
   "gate-e-phase3b-attempt-1-aborted-resource-safety-2026-06-28.md",
+  "PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md",
   "TWIN_PUBLIC_LAUNCH_READINESS_PLAN_2026-06-27.md",
   "TWIN_OPERATING_CONTEXT_2026-06-26.md",
 ] as const;
@@ -190,4 +191,14 @@ test("16 evidence index references gate E phase3b result guard", () => {
   assert.match(index, /Phase 3B.*FAIL/i);
   assert.match(index, /NO-GO/i);
   assert.match(index, /P0.*OPEN/i);
+});
+
+test("17 evidence index references phase3b harness diagnostics guard", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /test:phase3b-harness-diagnostics/);
+  assert.match(index, /PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29/);
+  assert.match(index, /Phase 3B.*FAIL/i);
+  assert.match(index, /NO-GO/i);
+  assert.match(index, /P0.*OPEN/i);
+  assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
 });

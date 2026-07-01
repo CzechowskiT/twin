@@ -424,3 +424,14 @@ test("20 readiness consistency lock — gate docs and npm script registered", ()
   assert.match(evidenceIndex, /NO-GO/i);
   assert.match(evidenceIndex, /P0.*OPEN/i);
 });
+
+test("21 phase3b harness diagnostics — helper, no stale commit, Phase 3B FAIL", () => {
+  const pkg = read("package.json");
+  assert.match(pkg, /test:phase3b-harness-diagnostics/);
+  const spec = read("e2e/phase3b-controlled-multitab.spec.ts");
+  assert.match(spec, /phase3b-harness-diagnostics/);
+  assert.doesNotMatch(spec, /fda7567/);
+  const plan = readFileSync(join(root, "..", "docs", "PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md"), "utf8");
+  assert.match(plan, /Phase 3B.*FAIL/i);
+  assert.match(plan, /NO-GO/i);
+});
