@@ -138,20 +138,16 @@ test("12 harness diagnostics guard — stale commit removed, preflight wired", (
   assert.match(plan, /frontend_commit/);
 });
 
-test("13 gate E retry checkpoint — PENDING, aligned deploy, no post-fix browser", () => {
-  const checkpoint = readRepo("docs/GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md");
-  assert.match(checkpoint, /Gate E retry after harness fix = YES/);
-  assert.match(checkpoint, /2969b1f4/);
-  assert.match(checkpoint, /ALIGNED/i);
-  assert.match(checkpoint, /NOT EXECUTED|not executed|NOT RUN/i);
-  assert.match(checkpoint, /test:phase3b-controlled-multitab-prod/);
-  assert.match(checkpoint, /NOT TO RUN/i);
-  assert.match(checkpoint, /TWIN_ACCESS_TOKEN/);
-  assert.match(checkpoint, /Phase 3B.*FAIL/i);
-  assert.match(checkpoint, /NO-GO/i);
-  assert.match(checkpoint, /P0.*OPEN/i);
-  assert.match(checkpoint, /Gate F.*PENDING/i);
-  assert.doesNotMatch(checkpoint, /Phase 3B:\s*\*\*PASS\*\*/i);
+test("13 gate E retry result — PARTIAL AUTH_TOKEN_REQUIRED, browser NOT RUN, prior FAIL preserved", () => {
+  const retryResult = readRepo("docs/gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md");
+  assert.match(retryResult, /Gate E retry after harness fix = \*\*YES\*\*/);
+  assert.match(retryResult, /verdict:\s+PARTIAL/i);
+  assert.match(retryResult, /AUTH_TOKEN_REQUIRED/);
+  assert.match(retryResult, /token present in env:\s+false/i);
+  assert.match(retryResult, /browser NOT RUN|NOT RUN/i);
+  assert.match(retryResult, /Phase 3B.*FAIL/i);
+  assert.match(retryResult, /0\/20/i);
+  assert.doesNotMatch(retryResult, /Phase 3B:\s*\*\*PASS\*\*/i);
   const pkg = readFileSync(join(root, "package.json"), "utf8");
-  assert.match(pkg, /test:gate-e-retry-after-harness-fix-checkpoint/);
+  assert.match(pkg, /test:gate-e-retry-after-harness-fix-result/);
 });

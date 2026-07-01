@@ -1,7 +1,8 @@
 # Gate E Retry After Harness Fix Checkpoint — 2026-06-29
 
 **Branch at package:** `docs/gate-e-retry-after-harness-fix-checkpoint-2026-06-29` from `cursor/phase1-monorepo-scaffold` @ `2969b1f4` (post PR #353 harness diagnostics merge)  
-**Founder decision:** Gate E retry after harness fix = **PENDING** — **no Phase 3B prod browser executed in this package**  
+**Founder decision:** Gate E retry after harness fix = **YES** — post-harness retry attempted; **PARTIAL/AUTH_TOKEN_REQUIRED** — [result doc](./gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md)  
+**Post-harness browser:** **NOT RUN** — `TWIN_ACCESS_TOKEN` absent in runner env  
 **Package type:** Founder decision checkpoint + static guards — **not execution approval**  
 **Gate B:** **YES** (PR #332 `62138dc` shell fix merged)  
 **Gate C:** **YES** — local browser **36/36 PASS** — [gate-c result](./gate-c-browser-validation-result-2026-06-28.md)  
@@ -44,9 +45,9 @@ It is a **decision boundary document** only. Execution requires a separate found
 | **D** | [gate-d result](./gate-d-prod-browser-smoke-result-2026-06-28.md) | **36/36 PASS** prod, 54.9s, workers=1 |
 | **E (prior)** | [gate-e result](./gate-e-phase3b-result-2026-06-28.md) | **0/20 FAIL** — blank-or-no-content 20/20 |
 | **Harness fix** | PR #353 @ `2969b1f4` — [diagnostic plan](./PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md) | **MERGED** — diagnostics hardened |
-| **Post-fix browser** | This checkpoint | **NOT RUN** — no post-fix Phase 3B evidence |
+| **Post-fix browser** | [retry result](./gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md) | **NOT RUN** — PARTIAL/AUTH_TOKEN_REQUIRED (token absent) |
 
-**No post-fix browser evidence exists.** Harness hardening improves failure taxonomy and preflight; it does not prove Phase 3B PASS.
+**No post-fix browser evidence exists.** Post-harness retry stopped at `AUTH_TOKEN_REQUIRED` preflight — see [result doc](./gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md). Prior 0/20 FAIL unchanged.
 
 ---
 
@@ -195,7 +196,7 @@ Even if a post-fix Gate E retry **PASS**, it does **not**:
 
 ## Explicit Non-Claims
 
-- **Phase 3B prod retry:** **NOT EXECUTED** in this checkpoint package
+- **Phase 3B prod retry (post-harness):** **NOT EXECUTED** — PARTIAL/AUTH_TOKEN_REQUIRED — [result doc](./gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md)
 - **Phase 3B:** **FAIL** — prior 0/20 unchanged; harness fix ≠ PASS
 - **P0 performance:** **OPEN**
 - **Public launch:** **NO-GO**
