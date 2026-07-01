@@ -217,6 +217,8 @@ test("12 post-harness retry result — PARTIAL AUTH_TOKEN_REQUIRED, prior FAIL p
   assert.match(retryResult, /verdict:\s+PARTIAL/i);
   assert.match(retryResult, /token present in env:\s+false/i);
   assert.match(retryResult, /browser NOT RUN|NOT RUN/i);
+  assert.match(retryResult, /Attempt 2 — Execution Record/);
+  assert.match(retryResult, /post-harness retry #2/i);
   assert.match(retryResult, /Phase 3B.*FAIL/i);
   assert.match(retryResult, /0\/20/i);
   assert.doesNotMatch(retryResult, /Phase 3B:\s*\*\*PASS\*\*/i);

@@ -91,3 +91,14 @@ test("7 npm script test:gate-e-retry-after-harness-fix-result registered", () =>
   assert.match(pkg, /test:gate-e-retry-after-harness-fix-result/);
   assert.match(pkg, /gate-e-retry-after-harness-fix-result\.test\.ts/);
 });
+
+test("8 retry result — attempt 2 recorded; second founder YES; token still absent", () => {
+  const result = readRepo(RETRY_RESULT);
+  assert.match(result, /Attempt 2 — Execution Record/);
+  assert.match(result, /post-harness retry #2/i);
+  assert.match(result, /second substantive authorization/i);
+  assert.match(result, /d37d427f/);
+  assert.match(result, /token present in env:\s+false/i);
+  assert.match(result, /verdict:\s+PARTIAL/i);
+  assert.match(result, /browser NOT RUN|NOT RUN/i);
+});

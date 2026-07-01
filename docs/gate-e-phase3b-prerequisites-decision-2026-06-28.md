@@ -20,7 +20,7 @@ Gate B (minimal shell fix) is **merged**. Gate C unlocked **local** sequential b
 
 **Harness diagnostics (Slice 35):** [PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md](./PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md) — stale `fda7567` commit constant removed; preflight `frontend_commit` gate; `test:phase3b-harness-diagnostics`. **Phase 3B remains FAIL** — no second reattempt in that slice.
 
-**Gate E retry result (Slice 37):** [gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md](./gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md) — founder YES; **PARTIAL/AUTH_TOKEN_REQUIRED**; browser **NOT RUN**. **Phase 3B remains FAIL** — prior 0/20 unchanged.
+**Gate E retry result (Slice 37):** [gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md](./gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md) — founder YES (×2); **PARTIAL/AUTH_TOKEN_REQUIRED** on attempts #1 + #2; browser **NOT RUN**. **Phase 3B remains FAIL** — prior 0/20 unchanged.
 
 | Item | Status |
 |------|--------|
