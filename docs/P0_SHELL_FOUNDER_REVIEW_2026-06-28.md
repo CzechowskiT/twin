@@ -261,7 +261,7 @@ cd frontend && \
 
 **Gate E prerequisites package:** [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) — historical package (**PENDING** at publish).
 
-**Gate E retry-after-harness-fix checkpoint:** [GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md](./GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md) — founder YES; post-harness retry **PARTIAL/AUTH_TOKEN_REQUIRED** — [result doc](./gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md); browser **NOT RUN**.
+**Gate E retry-after-harness-fix checkpoint:** [GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md](./GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md) — founder YES (×2); post-harness retry **PARTIAL/AUTH_TOKEN_REQUIRED** on attempts #1 + #2 — [result doc](./gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md); browser **NOT RUN**.
 
 **Launch evidence index (Slice 25):** [LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md](./LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md) · [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUNDER_DEMO_CHECKLIST_2026-06-28.md)
 

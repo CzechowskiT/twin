@@ -1,17 +1,83 @@
 # Gate E Phase 3B Retry After Harness Fix — Result — 2026-06-29
 
-**Branch at run:** `docs/gate-e-retry-after-harness-fix-result-2026-06-29` from `cursor/phase1-monorepo-scaffold` @ `c038e9e3`  
-**Founder decision:** Gate E retry after harness fix = **YES** (one authorized post-harness prod retry)  
+**Branch at run:** `docs/gate-e-retry-after-harness-fix-result-attempt2-2026-06-29` from `cursor/phase1-monorepo-scaffold` @ `d37d427f`  
+**Founder decision:** Gate E retry after harness fix = **YES** — **attempt 2** (second substantive authorization; PR #355 attempt 1 consumed preflight stop only)  
 **Prior Gate E:** **YES / FAIL** — 0/20 — [gate-e result](./gate-e-phase3b-result-2026-06-28.md)  
 **Harness fix:** PR #353 @ `2969b1f4` — [diagnostic plan](./PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md)  
 **Gate F:** **PENDING**  
-**Launch stance:** **NO-GO** · **P0:** **OPEN** · **Phase 3B:** **FAIL** (prior 0/20 unchanged; post-harness browser **NOT RUN**)
+**Launch stance:** **NO-GO** · **P0:** **OPEN** · **Phase 3B:** **FAIL** (prior 0/20 unchanged; post-harness browser **NOT RUN** on either retry attempt)
 
 **Related:** [retry checkpoint](./GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md) · [prior gate-e result](./gate-e-phase3b-result-2026-06-28.md) · [evidence index](./LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md)
 
 ---
 
-## Execution Record
+## Attempt 2 — Execution Record (latest)
+
+```
+Gate E Phase 3B Retry After Harness Fix — Attempt 2 Result Record
+=========================================================
+Founder decision source:     YES (Gate E retry after harness fix = YES — attempt 2)
+Founder approval timestamp:  2026-07-01 (second substantive authorization)
+Runner:                      Cursor agent — canonical Gate E post-harness prod Phase 3B command (authorized once; NOT executed — token gate)
+
+Deploy alignment at run time:
+  repo_head:                 d37d427fe0b241ac0d0f5a2fe96430a90a734112
+  prod_frontend_commit:      d37d427fe0b241ac0d0f5a2fe96430a90a734112
+  prod_api_commit:           6d6d1e54f85f8f00fe1727f32cef700e9c2a20aa
+  target environment:        prod (preflight only — browser not executed)
+  public-health status:      ok
+  public-health db_ok:       true
+  alignment_status:          ALIGNED — frontend_commit >= 2969b1f4 (harness fix deployed)
+
+HTTP smoke (curl, pre-run):
+  routes checked:            10
+  all 200:                   yes
+
+TWIN_ACCESS_TOKEN preflight:
+  token present in env:      false
+  stop reason:               AUTH_TOKEN_REQUIRED — preflight §7.6; browser not started
+
+Local resource safety (pre-browser check):
+  power:                     AC connected
+  load avg (1/5/15):         3.46 / 2.94 / 2.72
+  verdict:                   SAFE (not reached — stopped at token gate)
+
+Exact command (authorized, NOT executed):
+  cd frontend && PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app npm run test:phase3b-controlled-multitab-prod
+
+Run parameters (would-have):
+  workers:                   1
+  total routes:              20
+  batches:                   7 + 7 + 6
+
+Results:
+  pass:                      n/a
+  fail:                      n/a
+  duration:                  n/a
+  verdict:                   PARTIAL — AUTH_TOKEN_REQUIRED (browser NOT RUN)
+
+Failure counts:
+  AUTH_TOKEN_REQUIRED:       preflight stop — token-required workspace batches need TWIN_ACCESS_TOKEN
+  prior blank-or-no-content: 20 (unchanged from 2026-06-28 reattempt)
+
+Artifacts:
+  traces/screenshots/log path: none — browser not executed
+
+Gate F recommendation:
+  Proceed to Gate F founder review: no — Phase 3B post-harness retry blocked at auth preflight (attempt 2); prior 0/20 FAIL unchanged
+  Notes: Second founder YES received; TWIN_ACCESS_TOKEN still absent in runner env. No further post-harness browser attempts without token in env + new founder authorization.
+
+Explicit non-claims (must remain true unless separate founder decisions):
+  P0 stance:      OPEN
+  Launch stance:  NO-GO
+  Gate F:         PENDING
+  Default CI:     browser DISABLED
+  Phase 3B PASS:  NOT CLAIMED — prior 0/20 FAIL stands
+```
+
+---
+
+## Attempt 1 — Execution Record (PR #355)
 
 ```
 Gate E Phase 3B Retry After Harness Fix — Result Record
@@ -78,13 +144,13 @@ Explicit non-claims (must remain true unless separate founder decisions):
 
 ---
 
-## 1. Preflight (Part A) — PARTIAL at token gate
+## 1. Preflight (Part A) — PARTIAL at token gate (attempt 2)
 
 | Check | Result |
 |-------|--------|
-| Scaffold synced | **PASS** — `cursor/phase1-monorepo-scaffold` @ `c038e9e3` |
-| Founder Gate E retry after harness fix = YES | **PASS** — authorized once |
-| public-health | **PASS** — `status=ok`, `db_ok=true`, FE `c038e9e3` ≥ `2969b1f4` |
+| Scaffold synced | **PASS** — `cursor/phase1-monorepo-scaffold` @ `d37d427f` |
+| Founder Gate E retry after harness fix = YES | **PASS** — attempt 2 authorized (second substantive YES) |
+| public-health | **PASS** — `status=ok`, `db_ok=true`, FE `d37d427f` ≥ `2969b1f4` |
 | HTTP smoke (10 routes) | **PASS** — 10/10 × 200 |
 | `TWIN_ACCESS_TOKEN` in env | **FAIL** — absent; **STOP** per §7.6 |
 | Local resource baseline | **PASS** — safe (not used; stopped before browser) |
@@ -98,7 +164,8 @@ Explicit non-claims (must remain true unless separate founder decisions):
 |---------|---------|-------------------|-------|
 | **1** | **ABORTED_RESOURCE_SAFETY** | **No** | [attempt-1 doc](./gate-e-phase3b-attempt-1-aborted-resource-safety-2026-06-28.md) |
 | **2 (prior reattempt)** | **FAIL** | **Yes** (once) | 0/20 — blank-or-no-content — [gate-e result](./gate-e-phase3b-result-2026-06-28.md) |
-| **3 (post-harness retry)** | **PARTIAL** | **No** | **AUTH_TOKEN_REQUIRED** — this doc |
+| **3 (post-harness retry #1)** | **PARTIAL** | **No** | **AUTH_TOKEN_REQUIRED** — PR #355 @ `d37d427f` |
+| **4 (post-harness retry #2)** | **PARTIAL** | **No** | Second founder YES; token still absent — this update |
 
 ---
 

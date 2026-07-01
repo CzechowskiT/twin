@@ -347,6 +347,8 @@ test("23 gate E post-harness retry result — PARTIAL, AUTH_TOKEN_REQUIRED, FAIL
   assert.match(result, /AUTH_TOKEN_REQUIRED/);
   assert.match(result, /token present in env:\s+false/i);
   assert.match(result, /browser NOT RUN|NOT RUN/i);
+  assert.match(result, /Attempt 2 — Execution Record/);
+  assert.match(result, /post-harness retry #2/i);
   assert.match(result, /Phase 3B.*FAIL/i);
   assert.match(result, /0\/20/i);
   assert.match(result, /NO-GO/i);
