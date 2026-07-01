@@ -29,8 +29,12 @@ function MicrosoftSquares() {
   );
 }
 
+/**
+ * Small rounded accent chip — decorative brand-color token, not a logo mark.
+ * Sized/positioned to stay fully inside the 0–16 viewBox (no clipping).
+ */
 function NvidiaAccent() {
-  return <rect x={0} y={2.2} width={2.8} height={11.5} rx={0.4} fill="#76B900" />;
+  return <rect x={0} y={0} width={8} height={8} rx={2} fill="#76B900" />;
 }
 
 function AmazonSmile() {
@@ -123,11 +127,11 @@ function BrandSvgContent({ slug }: { slug: PerformanceSafeCuratedLogoSlug }) {
     case "nvidia":
       return (
         <>
-          <g transform="translate(10 3.5)">
+          <g transform="translate(14 4)">
             <NvidiaAccent />
           </g>
           <text
-            x={50}
+            x={56}
             y={12.5}
             textAnchor="middle"
             fontFamily={FONT}
