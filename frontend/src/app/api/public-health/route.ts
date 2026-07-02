@@ -5,33 +5,74 @@ import { getUpstreamApiBase } from "@/lib/public-api-base";
 
 export const dynamic = "force-dynamic";
 
-/** Public proxy: API liveness + db_ok + ops flags (no secrets). */
-export async function GET() {
+/**
+ * Health timeout is authoritative: a real upstream failure here must surface
+ * as 502/degraded. Celery timeout is intentionally >= 5s (worker introspection
+ * has been observed at ~4.3-4.5s) and is soft-fail-only — celery-status never
+ * blocks or crashes the route; it is optional diagnostics attached to a
+ * healthy response.
+ */
+const HEALTH_TIMEOUT_MS = 10_000;
+const CELERY_TIMEOUT_MS = 5_000;
+
+type JsonRecord = Record<string, unknown>;
+
+/** Parse a Response body as JSON without throwing on empty/invalid bodies. */
+async function safeReadJson(res: Response): Promise<JsonRecord | null> {
+  try {
+    const text = await res.text();
+    if (!text) return null;
+    return JSON.parse(text) as JsonRecord;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Public proxy: API liveness + db_ok + ops flags (no secrets).
+ *
+ * `?mode=liveness` returns an immediate `{ status: "ok", mode: "liveness" }`
+ * without contacting the upstream API/db/celery at all — a fast frontend
+ * reachability probe. It is opt-in only; the **default** (no query param)
+ * response is unchanged in shape and still round-trips upstream `db_ok` for
+ * Gate E / evidence-doc backward compatibility.
+ */
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  if (searchParams.get("mode") === "liveness") {
+    return NextResponse.json({ status: "ok", mode: "liveness" });
+  }
+
   const base = getUpstreamApiBase();
   if (!base) {
     return NextResponse.json({ detail: "API base URL not configured" }, { status: 503 });
   }
   const root = base.replace(/\/$/, "");
-  const healthTimeoutMs = 10_000;
-  const celeryTimeoutMs = 4_000;
-  let healthRes: Response;
-  let celeryRes: Response;
-  try {
-    healthRes = await fetch(`${root}/api/v1/health?db=1&ops=1`, {
+
+  // Fetch health (authoritative, strict timeout) and celery-status (optional,
+  // soft-fail) in parallel so a slow celery introspection call can never push
+  // total latency past the platform request timeout on its own.
+  const [healthResult, celeryResult] = await Promise.allSettled([
+    fetch(`${root}/api/v1/health?db=1&ops=1`, {
       cache: "no-store",
-      signal: AbortSignal.timeout(healthTimeoutMs),
-    });
-    celeryRes = await fetch(`${root}/api/v1/health/celery-status`, {
+      signal: AbortSignal.timeout(HEALTH_TIMEOUT_MS),
+    }),
+    fetch(`${root}/api/v1/health/celery-status`, {
       cache: "no-store",
-      signal: AbortSignal.timeout(celeryTimeoutMs),
-    }).catch(() => new Response(null, { status: 504 }));
-  } catch (err) {
+      signal: AbortSignal.timeout(CELERY_TIMEOUT_MS),
+    }),
+  ]);
+
+  if (healthResult.status === "rejected") {
+    const err = healthResult.reason;
     const msg = err instanceof Error ? err.message : "fetch failed";
     return NextResponse.json(
       { detail: `Cannot reach API (${msg}).`, status: "degraded", db_ok: false },
       { status: 502 },
     );
   }
+
+  const healthRes = healthResult.value;
   if (!healthRes.ok) {
     const body = await healthRes.text();
     return new NextResponse(body, {
@@ -39,11 +80,34 @@ export async function GET() {
       headers: { "Content-Type": healthRes.headers.get("content-type") ?? "application/json" },
     });
   }
-  const health = (await healthRes.json()) as Record<string, unknown>;
-  let celery: Record<string, unknown> = {};
-  if (celeryRes.ok) {
-    celery = (await celeryRes.json()) as Record<string, unknown>;
+
+  const health = await safeReadJson(healthRes);
+  if (health === null) {
+    return NextResponse.json(
+      { detail: "API health response was not valid JSON.", status: "degraded", db_ok: false },
+      { status: 502 },
+    );
   }
+
+  // celery-status is diagnostics only: any failure (timeout, non-2xx, bad
+  // JSON) degrades to `{}` + a `celery_warning` string. It never changes the
+  // response status and never throws.
+  let celery: JsonRecord = {};
+  let celeryWarning: string | null = null;
+  if (celeryResult.status === "rejected") {
+    const err = celeryResult.reason;
+    celeryWarning = `celery-status unreachable: ${err instanceof Error ? err.message : "fetch failed"}`;
+  } else if (!celeryResult.value.ok) {
+    celeryWarning = `celery-status returned HTTP ${celeryResult.value.status}`;
+  } else {
+    const parsed = await safeReadJson(celeryResult.value);
+    if (parsed === null) {
+      celeryWarning = "celery-status response was not valid JSON";
+    } else {
+      celery = parsed;
+    }
+  }
+
   const apiCommit =
     typeof health.git_commit === "string" && health.git_commit !== "unknown"
       ? health.git_commit
@@ -67,6 +131,7 @@ export async function GET() {
   return NextResponse.json({
     ...health,
     celery,
+    ...(celeryWarning ? { celery_warning: celeryWarning } : {}),
     // Explicit deploy traceability: Vercel FE vs Railway API (git_commit stays API for compat).
     frontend_commit: resolvedFrontend,
     api_commit: resolvedApi,

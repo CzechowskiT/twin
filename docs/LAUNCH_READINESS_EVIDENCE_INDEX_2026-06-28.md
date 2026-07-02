@@ -111,6 +111,7 @@ Concise shipped evidence (static + documented; no new runtime activation in Slic
 | **Gate E with-token retry result (attempt 3)** | [gate-e-phase3b-retry-with-token-result-2026-06-29.md](./gate-e-phase3b-retry-with-token-result-2026-06-29.md) + `test:gate-e-retry-with-token-result` (Slice 38) — **PARTIAL/AUTH_TOKEN_REQUIRED** (attempt 3), browser **NOT RUN** |
 | **Gate E with-token retry result (attempt 4)** | [gate-e-phase3b-attempt4-with-token-result-2026-06-29.md](./gate-e-phase3b-attempt4-with-token-result-2026-06-29.md) + `test:gate-e-attempt4-with-token-result` (Slice 39) — **PARTIAL/AUTH_TOKEN_REQUIRED** (attempt 4), browser **NOT RUN** |
 | **Cursor-agent token loading fix** | [CURSOR_AGENT_TOKEN_LOADING_2026-06-29.md](./CURSOR_AGENT_TOKEN_LOADING_2026-06-29.md) + `test:cursor-agent-token-preflight` (Slice 40) — safe `.env.local` loader for agent/npm harnesses; **no new browser evidence**; Gate E remains **PARTIAL/AUTH_TOKEN_REQUIRED** |
+| **public-health proxy stability fix** | `frontend/src/app/api/public-health/route.ts` (Slice 43, frontend-only) + `test:public-health-route-stability` — health + celery-status fetched **in parallel** (fixes proven root cause of intermittent prod 502s: sequential fetches + ~4.3-4.5s celery introspection past the 10s platform timeout); celery-status **soft-fail-only** (`celery: {}` + `celery_warning`, no more unguarded-JSON empty 500); `db_ok`/`status` remain health-authoritative (Gate E compat unchanged); optional `?mode=liveness` fast path; **no backend/API/DB/env change**; prod improvement requires a Vercel deploy |
 | **Gate E with-token retry result (attempt 5)** | [gate-e-phase3b-attempt5-with-token-result-2026-06-29.md](./gate-e-phase3b-attempt5-with-token-result-2026-06-29.md) + `test:gate-e-attempt5-with-token-result` (Slice 41) — **PARTIAL/HARNESS_LOAD_FAILURE** (attempt 5) — token present, browser **EXECUTED ONCE**, crashed at module load before any route ran; loader defect fixed same PR, verified without a browser (`tsc`/`tsx`/`playwright --list`); Phase 3B route-level evidence still **NONE** |
 | **Gate E with-token retry result (attempt 6)** | [gate-e-phase3b-attempt6-resource-safety-abort-2026-06-29.md](./gate-e-phase3b-attempt6-resource-safety-abort-2026-06-29.md) + `test:gate-e-attempt6-resource-abort` (Slice 42) — **ABORTED_RESOURCE_SAFETY** (attempt 6) — founder YES, token present, canonical prod command **started** then manually interrupted for local resource safety (`chrome-headless-shell` CPU saturation + elevated `kernel_task`); 0/20 routes evaluated; **INCONCLUSIVE**, not a product FAIL; process cleanup confirmed (0 `chrome-headless-shell`, 0 orphan playwright/npm processes); no automatic retry; attempt 7 plan prepared but **NOT authorized** — [GATE_E_ATTEMPT7_SAFETY_PLAN_2026-06-29.md](./GATE_E_ATTEMPT7_SAFETY_PLAN_2026-06-29.md) |
 | **Launch stance marker** | `LAUNCH_STANCE = "noGo"` unchanged |
@@ -178,6 +179,7 @@ Inventory sources:
 | `test:gate-e-retry-with-token-result` | 8 | Gate E with-token retry result guards, attempt 3 (Slice 38) |
 | `test:gate-e-attempt4-with-token-result` | 10 | Gate E with-token retry result guards, attempt 4 (Slice 39) |
 | `test:gate-e-attempt5-with-token-result` | 13 | Gate E with-token retry result guards, attempt 5 — `HARNESS_LOAD_FAILURE` + loader fix (Slice 41) |
+| `test:public-health-route-stability` | 9 | `/api/public-health` proxy stability — parallel fetch, celery soft-fail, health-authoritative 502 (Slice 43, frontend-only) |
 
 Full step-by-step founder script: [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUNDER_DEMO_CHECKLIST_2026-06-28.md).
 
@@ -271,6 +273,7 @@ This index summarizes evidence; the checklist is the **operational run sheet** f
 | [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUNDER_DEMO_CHECKLIST_2026-06-28.md) | Bounded demo run sheet (Slice 25) |
 | [HIRING_JOURNEY_TRACEABILITY_2026-06-26.md](./HIRING_JOURNEY_TRACEABILITY_2026-06-26.md) | Hiring journey preview traceability |
 | [CURSOR_AGENT_TOKEN_LOADING_2026-06-29.md](./CURSOR_AGENT_TOKEN_LOADING_2026-06-29.md) | Slice 40 — Cursor-agent `TWIN_ACCESS_TOKEN` loading harness/tooling fix (`test:cursor-agent-token-preflight`); no new Phase 3B browser evidence; Gate E stance unchanged |
+| `frontend/src/app/api/public-health/route.ts` | Slice 43 — frontend-only `/api/public-health` proxy stability fix (parallel health/celery fetch, soft-fail celery, `test:public-health-route-stability`); no backend/API/DB/env change; no gate/launch stance change |
 
 ---
 
