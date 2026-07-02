@@ -24,6 +24,10 @@ Gate B (minimal shell fix) is **merged**. Gate C unlocked **local** sequential b
 
 **Gate E with-token retry results (Slices 38-39):** [attempt 3](./gate-e-phase3b-retry-with-token-result-2026-06-29.md) · [attempt 4](./gate-e-phase3b-attempt4-with-token-result-2026-06-29.md) — founder with-token YES (×2); **PARTIAL/AUTH_TOKEN_REQUIRED** on both attempts; browser **NOT RUN**. **Phase 3B remains FAIL** — prior 0/20 unchanged.
 
+**Gate E with-token retry result (Slice 41, attempt 5):** [attempt 5](./gate-e-phase3b-attempt5-with-token-result-2026-06-29.md) — token present, browser **executed once**, crashed at module load (`HARNESS_LOAD_FAILURE`); loader defect fixed same PR, unverified by browser. **Phase 3B remains FAIL** — prior 0/20 unchanged.
+
+**Gate E with-token retry result (Slice 42, attempt 6):** [attempt 6 abort](./gate-e-phase3b-attempt6-resource-safety-abort-2026-06-29.md) — founder YES; canonical command **started**, manually interrupted for local resource safety (`chrome-headless-shell` CPU saturation + elevated `kernel_task`); 0/20 routes evaluated; **ABORTED_RESOURCE_SAFETY/INCONCLUSIVE**, not a product FAIL. **Phase 3B remains FAIL** — prior 0/20 unchanged. Attempt 7 planned but **NOT authorized** — [attempt 7 safety plan](./GATE_E_ATTEMPT7_SAFETY_PLAN_2026-06-29.md).
+
 | Item | Status |
 |------|--------|
 | **Gate E decision** | **PENDING** — awaiting explicit founder YES |

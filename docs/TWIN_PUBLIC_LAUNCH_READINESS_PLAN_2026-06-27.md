@@ -464,6 +464,7 @@ flowchart LR
 | 2026-07-01 | **Slice 38** — Gate E with-token retry result attempt 3 ([result](./gate-e-phase3b-retry-with-token-result-2026-06-29.md)); `test:gate-e-retry-with-token-result`; **PARTIAL/AUTH_TOKEN_REQUIRED**; browser **NOT RUN**; Launch **NO-GO**; P0 **OPEN**; Gate F **PENDING** |
 | 2026-07-01 | **Slice 39** — Gate E with-token retry result attempt 4 ([result](./gate-e-phase3b-attempt4-with-token-result-2026-06-29.md)); `test:gate-e-attempt4-with-token-result`; **PARTIAL/AUTH_TOKEN_REQUIRED**; browser **NOT RUN**; prod FE aligned `a5d964d1`; Launch **NO-GO**; P0 **OPEN**; Gate F **PENDING** |
 | 2026-07-01 | **Slice 40** — Cursor-agent `TWIN_ACCESS_TOKEN` loading harness/tooling fix ([doc](./CURSOR_AGENT_TOKEN_LOADING_2026-06-29.md)); safe `.env.local` loader (`load-local-test-env.ts`) + `test:cursor-agent-token-preflight`; diagnostic-only, **no browser run**; Gate E remains **PARTIAL/AUTH_TOKEN_REQUIRED**; Launch **NO-GO**; P0 **OPEN**; Gate F **PENDING** |
+| 2026-07-02 | **Slice 42** — Gate E Phase 3B prod retry attempt 6 ([abort record](./gate-e-phase3b-attempt6-resource-safety-abort-2026-06-29.md)); `test:gate-e-attempt6-resource-abort`; founder YES; canonical command **started**, manually interrupted for local resource safety (`chrome-headless-shell` CPU saturation); 0/20 routes evaluated; **ABORTED_RESOURCE_SAFETY/INCONCLUSIVE**; attempt 7 plan prepared but **NOT authorized** ([safety plan](./GATE_E_ATTEMPT7_SAFETY_PLAN_2026-06-29.md)); Phase 3B **FAIL unchanged**; Launch **NO-GO**; P0 **OPEN**; Gate F **PENDING** |
 
 ---
 
