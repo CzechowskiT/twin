@@ -12,6 +12,7 @@
     "test:analytics-consent": "npx --yes tsx scripts/analytics-consent-default-denied.test.ts",
     "test:security-headers": "npx --yes tsx scripts/security-headers.test.ts",
     "test:safe-company-logo": "npx --yes tsx scripts/safe-company-logo.test.ts",
+    "test:nvidia-logo-chip-rendering": "npx --yes tsx scripts/nvidia-logo-chip-rendering.test.ts",
     "test:verified-readiness-guard": "npx --yes tsx scripts/verified-readiness-guard.test.ts",
     "test:dashboard-ux-safety": "npx --yes tsx scripts/dashboard-ux-safety.test.ts",
     "test:dashboard-next-best-action": "npx --yes tsx scripts/dashboard-next-best-action.test.ts",

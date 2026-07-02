@@ -29,10 +29,6 @@ function MicrosoftSquares() {
   );
 }
 
-function NvidiaAccent() {
-  return <rect x={0} y={2.2} width={2.8} height={11.5} rx={0.4} fill="#76B900" />;
-}
-
 function AmazonSmile() {
   return (
     <path
@@ -121,24 +117,21 @@ function BrandSvgContent({ slug }: { slug: PerformanceSafeCuratedLogoSlug }) {
         </>
       );
     case "nvidia":
+      // Text-only wordmark: no real NVIDIA logo asset is licensed in this repo,
+      // so we never render a pseudo-icon/accent shape standing in for the mark.
       return (
-        <>
-          <g transform="translate(10 3.5)">
-            <NvidiaAccent />
-          </g>
-          <text
-            x={50}
-            y={12.5}
-            textAnchor="middle"
-            fontFamily={FONT}
-            fontSize={13}
-            fontWeight={700}
-            letterSpacing={0.6}
-            fill={spec.brandColor}
-          >
-            NVIDIA
-          </text>
-        </>
+        <text
+          x={44}
+          y={12.5}
+          textAnchor="middle"
+          fontFamily={FONT}
+          fontSize={13}
+          fontWeight={700}
+          letterSpacing={0.6}
+          fill={spec.brandColor}
+        >
+          NVIDIA
+        </text>
       );
     case "meta":
       return (
