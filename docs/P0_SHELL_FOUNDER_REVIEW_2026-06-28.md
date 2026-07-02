@@ -234,6 +234,8 @@ Even perfect shell performance does **not** imply public launch, auto-apply acti
 | 2026-06-29 | **Gate D — prod browser PASS** 36/36 | **PASS** — [gate-d-prod-browser-smoke-result-2026-06-28.md](./gate-d-prod-browser-smoke-result-2026-06-28.md) |
 | 2026-06-29 | **Gate E — Phase 3B prod FAIL** 0/20 (reattempt); attempt 1 ABORTED_RESOURCE_SAFETY | **FAIL** — [gate-e-phase3b-result-2026-06-28.md](./gate-e-phase3b-result-2026-06-28.md) |
 | 2026-07-01 | **Cursor-agent `TWIN_ACCESS_TOKEN` loading harness/tooling fix** (Slice 40) — [CURSOR_AGENT_TOKEN_LOADING_2026-06-29.md](./CURSOR_AGENT_TOKEN_LOADING_2026-06-29.md); no browser run; Gate E remains **PARTIAL/AUTH_TOKEN_REQUIRED** | **SHIPPED** (tooling only) |
+| 2026-07-01 | **Gate E with-token retry attempt 5** — token present, browser **executed once**, crashed at module load (`HARNESS_LOAD_FAILURE`); loader defect fixed same PR, unverified by browser | **PARTIAL** — [gate-e-phase3b-attempt5-with-token-result-2026-06-29.md](./gate-e-phase3b-attempt5-with-token-result-2026-06-29.md) |
+| 2026-07-02 | **Gate E with-token retry attempt 6** — canonical command **started**, manually interrupted for local resource safety (`chrome-headless-shell` CPU saturation + elevated `kernel_task`); process cleanup confirmed; 0/20 routes evaluated; no automatic retry; attempt 7 **NOT authorized** | **ABORTED_RESOURCE_SAFETY / INCONCLUSIVE** — [gate-e-phase3b-attempt6-resource-safety-abort-2026-06-29.md](./gate-e-phase3b-attempt6-resource-safety-abort-2026-06-29.md) |
 | TBD | P0 performance **CLOSED** | **BLOCKED** |
 | TBD | Public launch **GO** | **BLOCKED** |
 
@@ -262,10 +264,10 @@ cd frontend && \
 
 **Gate E prerequisites package:** [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) — historical package (**PENDING** at publish).
 
-**Gate E retry-after-harness-fix checkpoint:** [GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md](./GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md) — founder YES (×4); post-harness retry **PARTIAL/AUTH_TOKEN_REQUIRED** on attempts #1 + #2 — [result doc](./gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md); with-token retries **PARTIAL/AUTH_TOKEN_REQUIRED** on attempts #3 — [attempt 3 result](./gate-e-phase3b-retry-with-token-result-2026-06-29.md) — and #4 — [attempt 4 result](./gate-e-phase3b-attempt4-with-token-result-2026-06-29.md); browser **NOT RUN** on all four attempts.
+**Gate E retry-after-harness-fix checkpoint:** [GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md](./GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md) — founder YES (×4); post-harness retry **PARTIAL/AUTH_TOKEN_REQUIRED** on attempts #1 + #2 — [result doc](./gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md); with-token retries **PARTIAL/AUTH_TOKEN_REQUIRED** on attempts #3 — [attempt 3 result](./gate-e-phase3b-retry-with-token-result-2026-06-29.md) — and #4 — [attempt 4 result](./gate-e-phase3b-attempt4-with-token-result-2026-06-29.md); browser **NOT RUN** on all four attempts. **Attempt 5** — token present, browser **executed once**, crashed at module load (`HARNESS_LOAD_FAILURE`) — [attempt 5 result](./gate-e-phase3b-attempt5-with-token-result-2026-06-29.md). **Attempt 6** — command **started**, manually interrupted for local resource safety — **ABORTED_RESOURCE_SAFETY/INCONCLUSIVE** — [attempt 6 abort](./gate-e-phase3b-attempt6-resource-safety-abort-2026-06-29.md); attempt 7 planned but **NOT authorized** — [attempt 7 safety plan](./GATE_E_ATTEMPT7_SAFETY_PLAN_2026-06-29.md).
 
 **Launch evidence index (Slice 25):** [LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md](./LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md) · [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUNDER_DEMO_CHECKLIST_2026-06-28.md)
 
-**Not run:** Phase 3B (Gate E), multitab, stress.
+**Not run:** Phase 3B (Gate E) route-level completion (attempts 5-6 both produced zero route-level evidence), multitab, stress. Attempt 7 **not run, not authorized**.
 
 **Public launch: NO-GO · P0 performance: OPEN · Phase 3B: FAIL (0/20 prod) · Gate C: YES (local PASS) · Gate D: YES (prod PASS) · Gate E: YES/FAIL**
