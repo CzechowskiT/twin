@@ -87,7 +87,7 @@ export const PERFORMANCE_SAFE_CURATED_LOGO_VISUALS: Record<
   nvidia: {
     id: "nvidia",
     displayName: "NVIDIA",
-    renderType: "mixed",
+    renderType: "wordmark",
     brandColor: "#76b900",
     opticalScale: 0.92,
     ariaLabel: "NVIDIA",
