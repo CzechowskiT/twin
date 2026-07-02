@@ -67,6 +67,7 @@
     "test:public-marketing-copy-consistency": "npx --yes tsx scripts/public-marketing-copy-consistency.test.ts",
     "test:public-route-reference-guard": "npx --yes tsx scripts/public-route-reference-guard.test.ts",
     "test:launch-readiness-evidence-guard": "npx --yes tsx scripts/launch-readiness-evidence-guard.test.ts",
+    "test:public-health-route-stability": "npx --yes tsx scripts/public-health-route-stability.test.ts",
     "test:gate-d-preflight-readiness": "npx --yes tsx scripts/gate-d-preflight-readiness.test.ts",
     "test:gate-d-founder-decision-checkpoint": "npx --yes tsx scripts/gate-d-founder-decision-checkpoint.test.ts",
     "test:gate-d-founder-decision-prompt": "npx --yes tsx scripts/gate-d-founder-decision-prompt.test.ts",
