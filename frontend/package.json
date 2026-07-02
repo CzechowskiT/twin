@@ -80,6 +80,7 @@
     "test:gate-e-attempt4-with-token-result": "npx --yes tsx scripts/gate-e-attempt4-with-token-result.test.ts",
     "test:gate-e-attempt5-with-token-result": "npx --yes tsx scripts/gate-e-attempt5-with-token-result.test.ts",
     "test:gate-e-attempt6-resource-abort": "npx --yes tsx scripts/gate-e-attempt6-resource-abort.test.ts",
+    "test:gate-e-attempt7-execution-guarantee": "npx --yes tsx scripts/gate-e-attempt7-execution-guarantee.test.ts",
     "test:cursor-agent-token-preflight": "npx --yes tsx scripts/cursor-agent-token-preflight.test.ts",
     "test:founder-demo-crosslinks": "npx --yes tsx scripts/founder-demo-crosslinks.test.ts",
     "test:mobile-public-readiness": "npx --yes tsx scripts/mobile-public-readiness.test.ts",

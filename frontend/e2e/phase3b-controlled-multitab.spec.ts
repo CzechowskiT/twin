@@ -2,7 +2,7 @@
  * Phase 3B controlled multitab verification — ONE context per batch (≤8 tabs),
  * staggered open, idle 60–90s, CDP heap/DOM per route.
  */
-import { expect, test, type BrowserContext, type Page } from "@playwright/test";
+import { expect, test, type Browser, type BrowserContext, type Page } from "@playwright/test";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { withFreshContext } from "./helpers/browser-lifecycle";
@@ -18,7 +18,7 @@ import {
 } from "./helpers/phase3b-harness-diagnostics";
 import {
   PHASE3B_DOM_FAIL, PHASE3B_DOM_WARN, PHASE3B_HEAP_FAIL_MB, PHASE3B_HEAP_WARN_MB,
-  PHASE3B_IDLE_MS_MAX, PHASE3B_IDLE_MS_MIN, PHASE3B_ROUTE_BATCHES,
+  PHASE3B_IDLE_MS_MAX, PHASE3B_IDLE_MS_MIN, PHASE3B_MAX_TABS, PHASE3B_ROUTE_BATCHES,
   PHASE3B_SAFE_MARQUEE_MAX_NODES, PHASE3B_FULL_MARQUEE_FAIL_NODES,
 } from "./helpers/phase3b-controlled-routes";
 
@@ -204,7 +204,42 @@ function evaluateRoute(batch: string, tracker: RouteTracker, dom: Awaited<Return
     layoutCount: cdp.layoutCount, cdpStatus: cdp.cdpStatus, status: verdict.status,
     failReasons: verdict.failReasons, warnReasons: verdict.warnReasons };
 }
+/**
+ * Gate E attempt 7 execution guarantee (2026-06-29): hard runtime ceiling on
+ * concurrent tabs, independent of the route-batch data itself. Even if
+ * PHASE3B_ROUTE_BATCHES is ever edited to exceed PHASE3B_MAX_TABS, this
+ * throws before a new tab/page (and its renderer process) is created,
+ * instead of silently fanning out. See
+ * docs/GATE_E_ATTEMPT7_EXECUTION_GUARANTEE_2026-06-29.md.
+ */
+function assertTabBudget(context: BrowserContext): void {
+  const openPages = context.pages().length;
+  if (openPages >= PHASE3B_MAX_TABS) {
+    throw new Error(
+      `phase3b tab budget exceeded: ${openPages} pages already open (max ${PHASE3B_MAX_TABS}); refusing to open another`,
+    );
+  }
+}
+
+/**
+ * Gate E attempt 7 execution guarantee (2026-06-29): before opening a fresh
+ * batch context, assert the shared worker browser has zero live contexts.
+ * A non-zero count here means the previous batch's withFreshContext cleanup
+ * did not run (or did not complete) — exactly the failure mode that could
+ * let contexts/pages accumulate across sequential batches. Fails loudly
+ * instead of silently stacking browser resources.
+ */
+function assertNoLeakedContextsFromPriorBatch(browser: Browser): void {
+  const liveContexts = browser.contexts().length;
+  if (liveContexts !== 0) {
+    throw new Error(
+      `phase3b context leak detected: ${liveContexts} browser context(s) still open before starting a new batch (expected 0)`,
+    );
+  }
+}
+
 async function openRouteStaggered(context: BrowserContext, path: string): Promise<RouteTracker> {
+  assertTabBudget(context);
   const page = await context.newPage();
   const response = await page.goto(path, { waitUntil: "domcontentloaded", timeout: ROUTE_GOTO_MS });
   await dismissCookieBanner(page);
@@ -222,7 +257,12 @@ async function pollPublicHealth() {
   } catch { return null; }
 }
 
-test.describe.configure({ mode: "serial", timeout: IS_PROD ? 900_000 : 1_200_000 });
+// Gate E attempt 7 execution guarantee (2026-06-29): retries pinned to 0 at the
+// describe level, independent of playwright.config.ts's CI-conditional global
+// `retries`. Phase 3B must never auto-retry (hard ban, see
+// GATE_E_ATTEMPT7_SAFETY_PLAN_2026-06-29.md §4.5) even if this spec is ever
+// invoked with CI=1 set in the environment.
+test.describe.configure({ mode: "serial", retries: 0, timeout: IS_PROD ? 900_000 : 1_200_000 });
 let preflight: Phase3bPreflightSnapshot | null = null;
 
 test.describe("Phase 3B controlled multitab verification", () => {
@@ -246,7 +286,8 @@ test.describe("Phase 3B controlled multitab verification", () => {
       if (IS_PROD && preflight && !preflight.ok) {
         test.skip(true, `preflight failed: ${preflight.classification}`);
       }
-      expect(batch.routes.length).toBeLessThanOrEqual(8);
+      expect(batch.routes.length).toBeLessThanOrEqual(PHASE3B_MAX_TABS);
+      assertNoLeakedContextsFromPriorBatch(browser);
       mkdirSync(OUT_DIR, { recursive: true });
       const reports: RouteReport[] = [];
       await withFreshContext(browser, async (context) => {
