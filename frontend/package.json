@@ -85,6 +85,7 @@
     "test:gate-e-attempt7-execution-guarantee": "npx --yes tsx scripts/gate-e-attempt7-execution-guarantee.test.ts",
     "test:gate-e-attempt8-result": "npx --yes tsx scripts/gate-e-attempt8-result.test.ts",
     "test:gate-e-attempt9-result": "npx --yes tsx scripts/gate-e-attempt9-result.test.ts",
+    "test:gate-e-attempt10-result": "npx --yes tsx scripts/gate-e-attempt10-result.test.ts",
     "test:phase3b-resource-watchdog": "npx --yes tsx scripts/phase3b-resource-watchdog.test.ts",
     "test:cursor-agent-token-preflight": "npx --yes tsx scripts/cursor-agent-token-preflight.test.ts",
     "test:founder-demo-crosslinks": "npx --yes tsx scripts/founder-demo-crosslinks.test.ts",

@@ -95,6 +95,27 @@ type RouteTracker = {
   getRedirectCount: () => number;
 };
 
+/**
+ * Best-effort extraction of the underlying OS PID for a Playwright `Browser`
+ * fixture. `browser.process()` is NOT part of Playwright Test's public
+ * `Browser` type (only `BrowserServer`/`ElectronApplication` expose it) —
+ * this reads it defensively off the runtime object when present, and
+ * returns null otherwise. A null result means ownership cannot be proven,
+ * and the resource watchdog (phase3b-resource-watchdog.ts) correctly
+ * degrades to NEEDS_MANUAL_REVIEW rather than guessing — see
+ * docs/PHASE3B_MACOS_PROCESS_DETECTION_2026-07-03.md §2.
+ */
+function tryGetBrowserPid(browser: Browser): number | null {
+  const maybeProcess = (browser as unknown as { process?: () => { pid?: number } | null }).process;
+  if (typeof maybeProcess !== "function") return null;
+  try {
+    const child = maybeProcess.call(browser);
+    return typeof child?.pid === "number" ? child.pid : null;
+  } catch {
+    return null;
+  }
+}
+
 function staggerDelayMs(index: number): number {
   return STAGGER_MIN_MS + ((index * 137) % (STAGGER_MAX_MS - STAGGER_MIN_MS + 1));
 }
@@ -289,6 +310,23 @@ test.describe("Phase 3B controlled multitab verification", () => {
   test.use({ baseURL: PROD_BASE });
 
   test.afterAll(() => {
+    // Attempt 10 macOS process-detection hardening (2026-07-03): record the
+    // owned Chrome-family PID tree one last time before stopping, so a
+    // NEEDS_MANUAL_REVIEW status (unowned Chrome-family matches — e.g. a
+    // real daily-driver Chrome) is visible in .diagnostics even when no
+    // PROCESS_COUNT_EXCEEDED/RUN_TIMEOUT_EXCEEDED violation ever fired.
+    if (resourceWatchdog) {
+      const finalOwnership = resourceWatchdog.captureOwnershipSnapshot();
+      try {
+        mkdirSync(OUT_DIR, { recursive: true });
+        writeFileSync(
+          join(OUT_DIR, "phase3b-process-ownership-final.json"),
+          JSON.stringify(finalOwnership, null, 2),
+        );
+      } catch {
+        /* diagnostics are best-effort; never fail the run over a write error */
+      }
+    }
     resourceWatchdog?.stop();
   });
 
@@ -314,6 +352,14 @@ test.describe("Phase 3B controlled multitab verification", () => {
       if (IS_PROD && preflight && !preflight.ok) {
         test.skip(true, `preflight failed: ${preflight.classification}`);
       }
+      // Attempt 10 macOS process-detection hardening (2026-07-03): bind the
+      // watchdog to the actual Playwright browser PID as soon as it's known,
+      // so ownership-based cleanup (see phase3b-resource-watchdog.ts) can
+      // scope itself to this run's real process tree — not just the
+      // chrome-headless-shell name, which undercounted a real Chrome/Chromium
+      // channel's process pressure. Never widens what gets killed; only
+      // narrows/confirms it.
+      resourceWatchdog?.setBrowserPid(tryGetBrowserPid(browser));
       if (resourceWatchdog) assertNoWatchdogViolation(resourceWatchdog);
       expect(batch.routes.length).toBeLessThanOrEqual(PHASE3B_MAX_TABS);
       assertNoLeakedContextsFromPriorBatch(browser);
