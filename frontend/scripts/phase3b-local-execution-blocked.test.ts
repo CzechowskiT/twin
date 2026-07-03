@@ -193,3 +193,14 @@ test("16 attempt 11 result doc exists — USER_ABORTED, 0 routes evaluated, no o
   assert.match(doc, /P0.*OPEN/i);
   assert.match(doc, /Gate F.*PENDING/i);
 });
+
+test("17 run 28650677999's GITHUB_ACTIONS-aware orphan-detection fix does not loosen the local hard block — the guard script itself still has no GITHUB_ACTIONS-adjacent orphan/ancestry logic to bypass", () => {
+  // The fix for run 28650677999's false orphan detection lives entirely in
+  // frontend/e2e/helpers/phase3b-resource-watchdog.ts (countOrphanedPhase3bProcesses),
+  // which is never reached locally because scripts/phase3b-prod-local-guard.ts
+  // exits 1 before Playwright (and therefore this watchdog module) is ever
+  // imported. The guard script itself must remain untouched by that fix.
+  const guard = read(GUARD_SCRIPT);
+  assert.doesNotMatch(guard, /phase3b-resource-watchdog/);
+  assert.doesNotMatch(guard, /countOrphanedPhase3bProcesses|getCurrentRunProcessTree/);
+});

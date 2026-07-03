@@ -237,3 +237,49 @@ test("23 no test in this file or the workflow prints an actual token value", () 
   const source = readFrontend("scripts/gate-e-isolated-runner-guard.test.ts");
   assert.doesNotMatch(source, /console\.(log|error|warn|info|debug)\([^)]*TWIN_ACCESS_TOKEN\s*[,)]/);
 });
+
+// --- Run 28650677999 (2026-07-03) — CI false orphan detection fix ----------
+
+test("24 pre-run cleanup step exists, runs before the Phase 3B step, prints before/after counts, never exposes the token", () => {
+  const workflow = readRepo(WORKFLOW);
+  const cleanupIdx = workflow.indexOf("Pre-run cleanup");
+  const phase3bIdx = workflow.indexOf("Gate E Phase 3B prod — controlled multitab");
+  assert.ok(cleanupIdx > -1, "expected a pre-run cleanup step");
+  assert.ok(phase3bIdx > -1, "expected the Phase 3B run step");
+  assert.ok(cleanupIdx < phase3bIdx, "pre-run cleanup must run before the Phase 3B step");
+  const block = workflow.slice(cleanupIdx, phase3bIdx);
+  assert.match(block, /Before cleanup/);
+  assert.match(block, /After cleanup/);
+  assert.match(block, /pgrep -fc chrome-headless-shell/);
+  assert.match(block, /pkill -f chrome-headless-shell/);
+  assert.match(block, /2>\/dev\/null \|\| (true|echo 0\))/, "pre-run cleanup must never fail the job when nothing matches");
+  assert.doesNotMatch(block, /secrets\./);
+  assert.doesNotMatch(block, /TWIN_ACCESS_TOKEN/);
+});
+
+test("25 pre-run cleanup step does not gate on 'if: always()' — it must run before the job could have failed", () => {
+  const workflow = readRepo(WORKFLOW);
+  const cleanupIdx = workflow.indexOf("Pre-run cleanup");
+  const nextStepIdx = workflow.indexOf("- name:", cleanupIdx + 1);
+  const block = workflow.slice(cleanupIdx, nextStepIdx);
+  assert.doesNotMatch(block, /if:\s*always\(\)/);
+});
+
+test("26 static preflight guards, hard-ban confirmations, and no-overclaims job summary are all unaffected by the pre-run cleanup addition", () => {
+  const workflow = readRepo(WORKFLOW);
+  assert.match(workflow, /Validate hard-ban confirmation inputs/);
+  assert.match(workflow, /Static preflight guards/);
+  assert.match(workflow, /Explicit non-claims/);
+  assert.match(workflow, /does not.{0,20}constitute Launch GO/i);
+  assert.match(workflow, /remains OPEN/i);
+  assert.match(workflow, /remains PENDING/i);
+});
+
+test("27 evidence index and isolated runner plan record run 28650677999's false-positive orphan detection", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  const plan = readRepo(PLAN_DOC);
+  assert.match(index, /28650677999/);
+  assert.match(plan, /28650677999/);
+  assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
+  assert.doesNotMatch(plan, /Phase 3B:\s*\*\*PASS\*\*/i);
+});

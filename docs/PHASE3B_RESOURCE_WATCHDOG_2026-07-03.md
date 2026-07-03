@@ -100,3 +100,37 @@ No Playwright browser was launched, no `chrome-headless-shell` process was spawn
 - **Default CI browser:** **DISABLED** (`smoke.yml` unchanged)
 
 **Public launch: NO-GO · P0: OPEN · Phase 3B: FAIL (prior 0/20, unchanged) · Gate F: PENDING · Phase 3B resource watchdog: MERGED, code-enforced, statically verified · Attempt 10: still requires separate founder authorization, NOT AUTHORIZED, NOT RUN**
+
+---
+
+## 6. Addendum (2026-07-03) — Run 28650677999 False-Positive Orphan Detection
+
+**Status:** **STATIC/CI FIX ONLY — NO Phase 3B EXECUTION, NO LOCAL PLAYWRIGHT, NO PROD MUTATION, NO backend/API/auth/DB/env CHANGES.**
+
+**What happened:** Run [`28650677999`](../.github/workflows/gate-e-phase3b-manual.yml) — the first attempt on the isolated GitHub Actions runner (see [`GATE_E_ISOLATED_RUNNER_PLAN_2026-07-03.md`](./GATE_E_ISOLATED_RUNNER_PLAN_2026-07-03.md)) — failed `PRECONDITION_FAILED` at the `prod preflight` test with:
+
+```
+Error: phase3b resource watchdog: 10 orphaned playwright/phase3b process(es) already running before start; refusing to start a new Phase 3B run
+```
+
+`public-health` (10/10) and the 10-route HTTP smoke both passed read-only. **Zero Phase 3B routes were evaluated** — `assertResourceSafeToStart()` refused to start before any browser was launched, exactly as designed for a *genuine* orphan — except this was not one.
+
+**Root cause:** `countOrphanedPhase3bProcesses()` summed `pgrep -f` matches for `PHASE3B_RUN_RELATED_PROCESS_PATTERNS` (`npm.*phase3b-controlled-multitab`, `node.*phase3b-controlled-multitab`, `playwright.*phase3b`, `test:phase3b-controlled-multitab-prod`, `test:phase3b-controlled-multitab-browser`) against the **entire host process table**, with no notion of "this run's own ancestor chain" vs. "a leftover process from a different run." The canonical npm script chain that invokes this very preflight check is itself several nested, still-running processes at the moment the check executes — `npm run test:phase3b-controlled-multitab-prod` → `npm run test:phase3b-controlled-multitab-browser:raw` → `npx tsx scripts/phase3b-prod-local-guard.ts` → `playwright test e2e/phase3b-controlled-multitab.spec.ts` (plus the Playwright worker process) — and every one of those ancestor command lines legitimately contains a literal npm script name the patterns look for (a single ancestor process's command line matches multiple patterns at once, e.g. both `"npm.*phase3b-controlled-multitab"` and `"test:phase3b-controlled-multitab-prod"`). This is **structurally guaranteed to over-count on the very first, cleanest possible run** — it is not evidence of `npm ci`/`npx playwright install` leaving anything behind (those are separate, already-completed steps by the time this check runs); it is the check counting **its own still-running ancestors** as if they belonged to someone else's leftover run.
+
+**Fix (this task):**
+
+| Component | File | Change |
+|---|---|---|
+| Ancestry helpers | `frontend/e2e/helpers/phase3b-resource-watchdog.ts` | New `getAncestorPids(pid)` (walks the parent chain via `ps -o ppid=`, portable across macOS/Linux) and `getCurrentRunProcessTree(pid)` (self + ancestors + descendants, via the existing `getOwnedProcessTree`) |
+| Orphan counting | `frontend/e2e/helpers/phase3b-resource-watchdog.ts` (`countOrphanedPhase3bProcesses`) | Now takes an injectable `env` (defaults to `process.env`). When `GITHUB_ACTIONS==='true'`, excludes any orphan-pattern PID that is provably part of this run's own process tree before counting. **Local Mac behavior (`GITHUB_ACTIONS!=='true'`) is byte-for-byte unchanged** — the exact original strict summed-`pgrep`-count implementation, with no ancestry lookup at all |
+| `assertResourceSafeToStart` | same file | Now also accepts an injectable `env`, passed through to `countOrphanedPhase3bProcesses` |
+| Workflow defense-in-depth | `.github/workflows/gate-e-phase3b-manual.yml` | New **Pre-run cleanup** step, immediately before the Phase 3B run step: prints before/after `chrome-headless-shell` and orphan-pattern counts, best-effort `pkill`s any genuine leftover (never fails the job if none found, never touches `TWIN_ACCESS_TOKEN`) |
+| Tests | `frontend/scripts/phase3b-resource-watchdog.test.ts`, `frontend/scripts/gate-e-isolated-runner-guard.test.ts`, `frontend/scripts/phase3b-local-execution-blocked.test.ts` | New tests reproduce the exact false positive with a synthetic self-descendant process, prove `GITHUB_ACTIONS=true` excludes it while strict local semantics still catch it, prove the pre-run cleanup step exists and never fails, and prove the local hard block is untouched by this fix |
+
+**Only fails now on a genuinely unowned orphan** — a process matching these patterns that is **not** part of this run's own ancestor/descendant tree (e.g. a real leftover from a previous job on a reused host, or an actual runaway). This narrows detection; it never widens what is treated as safe beyond "not part of this run."
+
+**Is an isolated rerun safe now?** **Yes, with the caveat that this fix has only been verified statically (`tsc`, unit tests, `npm run build`) — it has not yet been proven against a live GitHub Actions run.** The recommended next step is a fresh `workflow_dispatch` dispatch (separately founder-authorized, per §6 above) to confirm `assertResourceSafeToStart()` no longer false-positives in the real isolated-runner environment. **This document does not authorize that rerun** — it is a code fix, not a founder "YES."
+
+**This addendum does not authorize any Phase 3B attempt, does not run Playwright, does not touch backend/API/auth/DB/env, and does not change local Mac behavior.**
+
+**Public launch: NO-GO · P0: OPEN · Gate F: PENDING · Run 28650677999: PRECONDITION_FAILED (false positive, root-caused and fixed) · Isolated rerun: safe to attempt once separately founder-authorized, NOT YET RE-VERIFIED LIVE**
