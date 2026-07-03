@@ -157,6 +157,55 @@ function directChildPids(pid: number): number[] {
   }
 }
 
+/** Parent PID of `pid` via `ps -o ppid=`, portable across macOS and Linux (GHA `ubuntu-latest`). Never throws; returns null when unknown/unavailable. */
+function getParentPid(pid: number): number | null {
+  try {
+    const out = execFileSync("ps", ["-o", "ppid=", "-p", String(pid)], {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    });
+    const ppid = Number.parseInt(out.trim(), 10);
+    return Number.isFinite(ppid) && ppid > 0 ? ppid : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Walks `pid`'s parent chain up to `maxDepth` levels (via `ps -o ppid=`),
+ * stopping at PID 1/0, an unknown parent, or a cycle. Read-only, never
+ * throws. Exported for tests only.
+ */
+export function getAncestorPids(pid: number, maxDepth = 32): number[] {
+  const ancestors: number[] = [];
+  let current = pid;
+  for (let depth = 0; depth < maxDepth; depth += 1) {
+    const parent = getParentPid(current);
+    if (parent === null || parent === current || ancestors.includes(parent)) break;
+    ancestors.push(parent);
+    current = parent;
+  }
+  return ancestors;
+}
+
+/**
+ * The full set of PIDs that belong to *this very invocation* of the Phase 3B
+ * run: every ancestor process that launched it (the nested npm/npx/node/
+ * playwright chain — e.g. `npm run test:phase3b-controlled-multitab-prod` ->
+ * `npm run test:phase3b-controlled-multitab-browser:raw` -> `npx tsx
+ * scripts/phase3b-prod-local-guard.ts` -> `playwright test
+ * e2e/phase3b-controlled-multitab.spec.ts`), this process itself, and every
+ * descendant it has spawned. See `countOrphanedPhase3bProcesses()` for why
+ * this exists — on GITHUB_ACTIONS, every one of those ancestor processes
+ * legitimately matches `PHASE3B_RUN_RELATED_PROCESS_PATTERNS` (their own
+ * command lines literally contain the npm script names being checked for),
+ * so without this exclusion a fresh run always misclassifies its own
+ * still-running setup chain as "orphaned." Exported for tests only.
+ */
+export function getCurrentRunProcessTree(pid: number = process.pid): Set<number> {
+  return new Set<number>([pid, ...getAncestorPids(pid), ...getOwnedProcessTree(pid)]);
+}
+
 /** True if `pgrep` appears to be usable on this host (best-effort probe). */
 export function isProcessInspectionAvailable(): boolean {
   try {
@@ -179,8 +228,47 @@ export function getChromeHeadlessShellPids(): number[] {
   return runPgrepPids("chrome-headless-shell");
 }
 
-export function countOrphanedPhase3bProcesses(): number {
-  return PHASE3B_RUN_RELATED_PROCESS_PATTERNS.reduce((sum, pattern) => sum + runPgrepCount(pattern), 0);
+/**
+ * Counts processes matching `PHASE3B_RUN_RELATED_PROCESS_PATTERNS`.
+ *
+ * Run 28650677999 (2026-07-03, first isolated GitHub Actions attempt)
+ * failed `PRECONDITION_FAILED` with "10 orphaned playwright/phase3b
+ * process(es) already running before start" on the very first invocation —
+ * a false positive. Root cause: the canonical npm script chain
+ * (`test:phase3b-controlled-multitab-prod` -> `...-browser:raw` -> `npx tsx
+ * scripts/phase3b-prod-local-guard.ts` -> `playwright test
+ * e2e/phase3b-controlled-multitab.spec.ts`) is itself several nested
+ * npm/npx/node/playwright processes, every one of which is still alive
+ * (they are this run's own *ancestors*) at the moment this preflight check
+ * runs from inside the Playwright process — and every one of their command
+ * lines legitimately contains a literal npm script name that these very
+ * patterns look for (e.g. `npm run test:phase3b-controlled-multitab-prod`
+ * matches `"npm.*phase3b-controlled-multitab"` and
+ * `"test:phase3b-controlled-multitab-prod"` simultaneously). This is
+ * structurally guaranteed to over-count on a clean run — it is not evidence
+ * of a leftover process from a *different*, prior run.
+ *
+ * On `GITHUB_ACTIONS=true`, this now excludes any matching PID that is
+ * provably part of *this run's own* process tree (`getCurrentRunProcessTree`
+ * — ancestors + self + descendants), so only a genuinely unowned orphan
+ * (e.g. a leftover process from a previous, unrelated job/run on a reused
+ * host, or a real runaway) still counts. Local Mac behavior is completely
+ * unchanged: the founder Mac is already hard-blocked from running Phase 3B
+ * at all (see docs/PHASE3B_LOCAL_EXECUTION_DISABLED_2026-07-03.md), and this
+ * function's non-GHA branch is byte-for-byte the original strict
+ * summed-pgrep-count implementation.
+ */
+export function countOrphanedPhase3bProcesses(
+  env: Record<string, string | undefined> = process.env,
+): number {
+  if (env.GITHUB_ACTIONS !== "true") {
+    return PHASE3B_RUN_RELATED_PROCESS_PATTERNS.reduce((sum, pattern) => sum + runPgrepCount(pattern), 0);
+  }
+  const selfTree = getCurrentRunProcessTree();
+  return PHASE3B_RUN_RELATED_PROCESS_PATTERNS.reduce(
+    (sum, pattern) => sum + runPgrepPids(pattern).filter((pid) => !selfTree.has(pid)).length,
+    0,
+  );
 }
 
 /** Best-effort SIGTERM to any `chrome-headless-shell` process. Never throws. Always safe: no ordinary user process is ever named this. */
@@ -345,14 +433,14 @@ export function cleanupOwnedChromeProcesses(browserPid: number | null): Phase3bO
  * operator behavior, not evidence of a leftover Phase 3B run, and must never
  * block a legitimate attempt from starting.
  */
-export function assertResourceSafeToStart(): void {
+export function assertResourceSafeToStart(env: Record<string, string | undefined> = process.env): void {
   const chromeCount = countChromeHeadlessShellProcesses();
   if (chromeCount > 0) {
     throw new Error(
       `phase3b resource watchdog: ${chromeCount} chrome-headless-shell process(es) already running before start; refusing to start a new Phase 3B run`,
     );
   }
-  const orphanCount = countOrphanedPhase3bProcesses();
+  const orphanCount = countOrphanedPhase3bProcesses(env);
   if (orphanCount > 0) {
     throw new Error(
       `phase3b resource watchdog: ${orphanCount} orphaned playwright/phase3b process(es) already running before start; refusing to start a new Phase 3B run`,

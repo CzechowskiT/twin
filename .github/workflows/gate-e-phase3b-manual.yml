@@ -159,6 +159,45 @@ jobs:
           fi
           echo "OK: HTTP smoke 10/10 x HTTP 200"
 
+      - name: Pre-run cleanup — clear stale browser/orphan-pattern processes before Phase 3B (isolated runner, best-effort)
+        run: |
+          set -uo pipefail
+          patterns=(
+            "playwright.*phase3b"
+            "test:phase3b-controlled-multitab-prod"
+            "test:phase3b-controlled-multitab-browser"
+            "npm.*phase3b-controlled-multitab"
+            "node.*phase3b-controlled-multitab"
+          )
+          echo "Before cleanup:"
+          before_chrome=$(pgrep -fc chrome-headless-shell 2>/dev/null || echo 0)
+          echo "  chrome-headless-shell: ${before_chrome}"
+          for pattern in "${patterns[@]}"; do
+            count=$(pgrep -fc "$pattern" 2>/dev/null || echo 0)
+            echo "  pattern '${pattern}': ${count}"
+          done
+          # Best-effort only — never fails this step if nothing matches. Safe on
+          # this ephemeral, single-purpose runner: run 28650677999's own npm
+          # ci/playwright-install steps have already fully exited by this point
+          # (each `run:` step is a separate process tree), so anything still
+          # matching here would be a genuine leftover, never this run's own
+          # not-yet-started Phase 3B process chain.
+          pkill -f chrome-headless-shell 2>/dev/null || true
+          for pattern in "${patterns[@]}"; do
+            pkill -f "$pattern" 2>/dev/null || true
+          done
+          sleep 1
+          echo "After cleanup:"
+          after_chrome=$(pgrep -fc chrome-headless-shell 2>/dev/null || echo 0)
+          echo "  chrome-headless-shell: ${after_chrome}"
+          for pattern in "${patterns[@]}"; do
+            count=$(pgrep -fc "$pattern" 2>/dev/null || echo 0)
+            echo "  pattern '${pattern}': ${count}"
+          done
+          echo "Pre-run cleanup complete (best-effort, never fails this job)."
+          echo "Note: this step cannot clear a not-yet-started Phase 3B run's own npm/npx/playwright ancestor chain — that self-match false positive (run 28650677999) is fixed in the resource watchdog itself (frontend/e2e/helpers/phase3b-resource-watchdog.ts), which now excludes this run's own process ancestry when GITHUB_ACTIONS=true."
+          exit 0
+
       - name: Gate E Phase 3B prod — controlled multitab (canonical command)
         working-directory: frontend
         env:

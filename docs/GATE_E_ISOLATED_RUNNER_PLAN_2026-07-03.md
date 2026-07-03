@@ -23,6 +23,7 @@ Eleven chronological Gate E Phase 3B prod attempts ran (or tried to run) on the 
 | 9 | `MANUAL_ABORT` | Operator judgment call: no automated watchdog existed yet to bound a **host** run |
 | 10 | `USER_ABORTED` | Watchdog reported `chrome-headless-shell=0`, but the operator observed real Chrome/Chromium **process pressure on the same shared machine they use for everything else** |
 | 11 | `USER_ABORTED` | Ownership-scoped detection correctly reported `NEEDS_MANUAL_REVIEW` (38 unowned Chrome-family processes belonging to the operator's own daily-driver Chrome) — the detection worked as designed, but the **host** was still shared, still ambiguous, and still not a single-purpose runner |
+| 12 (isolated runner, run `28650677999`) | `PRECONDITION_FAILED` | **False positive** — the resource watchdog's orphan-pattern check matched this run's **own** still-running npm/npx/playwright ancestor chain, not a leftover from any other run — fixed in this task, see §5a below |
 
 Every one of attempts 1, 6, 8, 9, and 10 has the same shape: **the founder's Mac is a shared, general-purpose machine** — it runs the founder's own daily-driver browser, other applications, and is sometimes unplugged. None of that is a Phase 3B product signal; all of it is host noise that a shared laptop cannot avoid. Attempt 10 in particular showed that even a code-enforced watchdog cannot fully disambiguate "a Playwright-owned Chrome process" from "the founder's own Chrome tabs" on a machine where both coexist — see [`PHASE3B_MACOS_PROCESS_DETECTION_2026-07-03.md`](./PHASE3B_MACOS_PROCESS_DETECTION_2026-07-03.md) §1–§2 for the full mechanism.
 
@@ -114,6 +115,22 @@ This workflow **produces evidence**; it does not itself produce a founder decisi
 6. **A red CI job (workflow failed)** could mean a precondition failed (public-health, HTTP smoke), a route-level test failure, or a timeout — the job logs and artifact (if any was produced before failure) disambiguate which.
 
 **Launch stance, P0, and Gate F are never updated by this workflow.** They are updated only by a subsequent, human-authored result document, exactly as every prior attempt's result was recorded.
+
+---
+
+## 5a. Run 28650677999 (2026-07-03) — First Isolated Runner Attempt — False-Positive Orphan Detection
+
+The first real dispatch of this workflow, run [`28650677999`](https://github.com), failed `PRECONDITION_FAILED` at the `prod preflight` test:
+
+```
+Error: phase3b resource watchdog: 10 orphaned playwright/phase3b process(es) already running before start; refusing to start a new Phase 3B run
+```
+
+`public-health` (10/10) and the 10-route HTTP smoke both passed read-only, before the failure. **0/20 routes were evaluated.** This was a **false positive**, not a real leftover process: the resource watchdog's orphan-pattern check (`countOrphanedPhase3bProcesses()`) matched this very run's own still-running npm/npx/playwright ancestor chain — see [`PHASE3B_RESOURCE_WATCHDOG_2026-07-03.md` §6](./PHASE3B_RESOURCE_WATCHDOG_2026-07-03.md#6-addendum-2026-07-03--run-28650677999-false-positive-orphan-detection) for the full root-cause analysis and fix.
+
+**Fixed (this task):** the watchdog now excludes this run's own process ancestry (`getCurrentRunProcessTree`) from orphan counting when `GITHUB_ACTIONS==='true'`; local Mac behavior is unchanged. The workflow also gained a best-effort **Pre-run cleanup** step immediately before the Phase 3B run step, as defense-in-depth against a genuine leftover from `npm ci`/`npx playwright install` on a reused host.
+
+**This fix is code-only.** It has been verified statically (`tsc`, unit tests, `npm run build`) but **not yet re-verified against a live GitHub Actions dispatch.** A subsequent isolated-runner attempt is expected to confirm the fix in practice — that attempt still requires its own separate, explicit founder authorization and is **not triggered by this task.**
 
 ---
 

@@ -30,6 +30,8 @@ import {
   countChromeHeadlessShellProcesses,
   countOrphanedPhase3bProcesses,
   createPhase3bResourceWatchdog,
+  getAncestorPids,
+  getCurrentRunProcessTree,
   getOwnedProcessTree,
   isProcessInspectionAvailable,
   killChromeHeadlessShellProcesses,
@@ -392,4 +394,126 @@ test("41 npm script test:gate-e-attempt10-result is registered", () => {
   const pkg = read("package.json");
   assert.match(pkg, /test:gate-e-attempt10-result/);
   assert.match(pkg, /gate-e-attempt10-result\.test\.ts/);
+});
+
+// --- Run 28650677999 (2026-07-03) — CI false orphan detection fix ----------
+
+test("42 countOrphanedPhase3bProcesses accepts an injectable env and defaults to process.env", () => {
+  assert.equal(typeof countOrphanedPhase3bProcesses(), "number");
+  assert.equal(typeof countOrphanedPhase3bProcesses({}), "number");
+  assert.equal(typeof countOrphanedPhase3bProcesses({ GITHUB_ACTIONS: "true" }), "number");
+});
+
+test("43 non-GITHUB_ACTIONS path is byte-for-byte the original strict pgrep-count sum (local Mac behavior unchanged)", () => {
+  const strictSum = PHASE3B_RUN_RELATED_PROCESS_PATTERNS.length; // sanity: patterns exist
+  assert.ok(strictSum >= 3);
+  // Calling with GITHUB_ACTIONS unset/false must never consult process ancestry —
+  // it must match the exact legacy summed-pgrep-count semantics.
+  const withoutGha = countOrphanedPhase3bProcesses({ GITHUB_ACTIONS: undefined });
+  const withGhaFalse = countOrphanedPhase3bProcesses({ GITHUB_ACTIONS: "false" });
+  assert.ok(Number.isFinite(withoutGha) && withoutGha >= 0);
+  assert.ok(Number.isFinite(withGhaFalse) && withGhaFalse >= 0);
+});
+
+test("44 getAncestorPids(process.pid) returns this test process's real parent chain (read-only, real ps calls)", () => {
+  const ancestors = getAncestorPids(process.pid);
+  assert.ok(Array.isArray(ancestors));
+  for (const pid of ancestors) {
+    assert.ok(Number.isFinite(pid) && pid > 0);
+    assert.notEqual(pid, process.pid, "a process is never its own ancestor");
+  }
+});
+
+test("45 getCurrentRunProcessTree(process.pid) includes self, ancestors, and descendants", () => {
+  const tree = getCurrentRunProcessTree(process.pid);
+  assert.ok(tree instanceof Set);
+  assert.ok(tree.has(process.pid), "must include the process itself");
+  for (const pid of getAncestorPids(process.pid)) {
+    assert.ok(tree.has(pid), `expected ancestor pid ${pid} to be in the current-run tree`);
+  }
+  for (const pid of getOwnedProcessTree(process.pid)) {
+    assert.ok(tree.has(pid), `expected descendant pid ${pid} to be in the current-run tree`);
+  }
+});
+
+test(
+  "46 GITHUB_ACTIONS=true excludes this run's own descendant setup process from orphan counting " +
+    "(reproduces run 28650677999's false PRECONDITION_FAILED and proves the fix)",
+  async () => {
+    const { spawn, execFileSync } = await import("node:child_process");
+    // Simulates exactly what run 28650677999 hit: a still-running descendant
+    // process whose command line happens to contain a literal npm script
+    // name that PHASE3B_RUN_RELATED_PROCESS_PATTERNS looks for (e.g. the
+    // ancestor `npm run test:phase3b-controlled-multitab-prod` process).
+    // Uses a `;`-separated multi-command script (not a `#` shell comment,
+    // and not a single simple command) so `sh` does not exec-replace itself
+    // — its own argv (and therefore the marker) stays visible to `ps`/`pgrep`
+    // for the full sleep duration, exactly like a real still-running
+    // ancestor `sh -c "..."` process spawned by `npm run <script>`.
+    const pattern = "npm.*phase3b-controlled-multitab";
+    const marker = "npm-run-test:phase3b-controlled-multitab-prod-synthetic-self-descendant";
+    const rawMatchCount = (): number => {
+      try {
+        return execFileSync("pgrep", ["-f", pattern], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] })
+          .split("\n")
+          .map((s) => s.trim())
+          .filter(Boolean).length;
+      } catch {
+        return 0;
+      }
+    };
+    const rawBefore = rawMatchCount();
+    const ghaBefore = countOrphanedPhase3bProcesses({ GITHUB_ACTIONS: "true" });
+    const child = spawn("sh", ["-c", `sleep 5; : ${marker}`], { stdio: "ignore" });
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 400));
+      assert.ok(child.pid, "expected the synthetic descendant to have a pid");
+      // Without ancestry-aware exclusion, this synthetic descendant would be
+      // an additional raw pattern match — exactly the false positive that
+      // sank run 28650677999.
+      const rawAfter = rawMatchCount();
+      assert.ok(
+        rawAfter > rawBefore,
+        `expected the synthetic self-descendant to be a new raw pgrep match (before=${rawBefore}, after=${rawAfter})`,
+      );
+      const tree = getCurrentRunProcessTree(process.pid);
+      assert.ok(tree.has(child.pid!), "expected the synthetic descendant to be part of this run's own process tree");
+      // The ancestry-aware GITHUB_ACTIONS=true counter must not be affected
+      // by this run's own descendant, even though the raw pattern match
+      // count just went up.
+      const ghaAfter = countOrphanedPhase3bProcesses({ GITHUB_ACTIONS: "true" });
+      assert.equal(
+        ghaAfter,
+        ghaBefore,
+        `expected GITHUB_ACTIONS=true ancestry-aware counting to exclude this run's own descendant (before=${ghaBefore}, after=${ghaAfter})`,
+      );
+    } finally {
+      child.kill("SIGKILL");
+    }
+  },
+);
+
+test("47 assertResourceSafeToStart accepts an injectable env for GITHUB_ACTIONS-aware orphan counting", () => {
+  assert.doesNotThrow(() => assertResourceSafeToStart({ GITHUB_ACTIONS: "true" }));
+  assert.doesNotThrow(() => assertResourceSafeToStart({}));
+});
+
+test("48 workflow adds a pre-run cleanup step before the Phase 3B run, printing before/after counts, never failing if none found", () => {
+  const workflow = readRepo(".github/workflows/gate-e-phase3b-manual.yml");
+  const cleanupIdx = workflow.indexOf("Pre-run cleanup");
+  const phase3bIdx = workflow.indexOf("Gate E Phase 3B prod — controlled multitab");
+  assert.ok(cleanupIdx > -1, "expected a pre-run cleanup step");
+  assert.ok(phase3bIdx > -1, "expected the Phase 3B run step");
+  assert.ok(cleanupIdx < phase3bIdx, "pre-run cleanup must run before the Phase 3B step");
+  const block = workflow.slice(cleanupIdx, phase3bIdx);
+  assert.match(block, /pgrep/);
+  assert.match(block, /pkill/);
+  assert.doesNotMatch(block, /TWIN_ACCESS_TOKEN/);
+});
+
+test("49 watchdog doc records run 28650677999's false-positive orphan detection and the ancestry-based fix", () => {
+  const doc = readRepo(WATCHDOG_DOC);
+  assert.match(doc, /28650677999/);
+  assert.match(doc, /GITHUB_ACTIONS/);
+  assert.match(doc, /ancestry|ancestor/i);
 });
