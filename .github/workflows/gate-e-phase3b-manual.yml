@@ -1,0 +1,206 @@
+name: gate-e-phase3b-manual
+
+# Manual-only, isolated Gate E Phase 3B prod runner — 2026-07-03.
+# See docs/GATE_E_ISOLATED_RUNNER_PLAN_2026-07-03.md.
+#
+# Why this exists: 10 founder-Mac Gate E Phase 3B prod attempts (see
+# docs/gate-e-phase3b-attempt10-result-2026-07-03.md) were aborted or
+# blocked by *local host* resource/process-detection ambiguity — never by
+# a genuine product defect. Moving execution to an ephemeral, single-purpose
+# GitHub Actions runner removes the founder Mac from Phase 3B entirely:
+# every run gets a clean host with nothing else competing for CPU/process
+# namespace, and the runner is destroyed afterward regardless of outcome.
+#
+# This workflow does NOT authorize any attempt by itself. It still requires
+# the operator to explicitly type "yes" to all three confirmation inputs
+# below, mirroring the founder-authorization discipline used for every
+# prior attempt. It does not deploy anything, does not run Gate D, and does
+# not claim Launch GO, P0 closure, or Gate F YES under any circumstance.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_gate_e:
+        description: 'Type "yes" to confirm explicit founder authorization for this Gate E Phase 3B prod attempt'
+        required: true
+        type: string
+      confirm_prod_smoke:
+        description: 'Type "yes" to confirm this is a READ-ONLY prod smoke run (no prod mutation, no writes)'
+        required: true
+        type: string
+      confirm_no_launch_go:
+        description: 'Type "yes" to confirm this run does NOT constitute Launch GO, Gate D, or P0 closure'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+# Never allow two Gate E Phase 3B prod attempts to race against the same
+# production target at once.
+concurrency:
+  group: gate-e-phase3b-manual
+  cancel-in-progress: false
+
+env:
+  PROD_BASE_URL: https://twin-sooty.vercel.app
+
+jobs:
+  gate-e-phase3b-prod:
+    name: Gate E Phase 3B prod (isolated runner)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Validate hard-ban confirmation inputs
+        run: |
+          set -euo pipefail
+          fail=0
+          if [ "${{ inputs.confirm_gate_e }}" != "yes" ]; then
+            echo "::error::confirm_gate_e must be exactly 'yes' (explicit founder authorization required). Got: '${{ inputs.confirm_gate_e }}'"
+            fail=1
+          fi
+          if [ "${{ inputs.confirm_prod_smoke }}" != "yes" ]; then
+            echo "::error::confirm_prod_smoke must be exactly 'yes' (read-only prod smoke acknowledgement required). Got: '${{ inputs.confirm_prod_smoke }}'"
+            fail=1
+          fi
+          if [ "${{ inputs.confirm_no_launch_go }}" != "yes" ]; then
+            echo "::error::confirm_no_launch_go must be exactly 'yes' (this run must not be conflated with Launch GO/Gate D/P0 closure). Got: '${{ inputs.confirm_no_launch_go }}'"
+            fail=1
+          fi
+          if [ "$fail" -ne 0 ]; then
+            echo "::error::One or more required confirmations were not 'yes'. Aborting before checkout — no code checked out, no prod requests made."
+            exit 1
+          fi
+          echo "All three confirmation inputs = yes. Proceeding."
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: npm ci
+        working-directory: frontend
+        run: npm ci
+
+      - name: Install Playwright chromium (isolated runner only)
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: Static preflight guards (no browser, no prod requests)
+        working-directory: frontend
+        run: |
+          npx tsc --noEmit -p .
+          npm run test:phase3b-resource-watchdog
+          npm run test:phase3b-controlled-multitab
+          npm run test:gate-e-isolated-runner-guard
+          npm run test:phase3b-local-execution-blocked
+
+      - name: Verify workers=1 / retries=0 are code-enforced (not overridable by this workflow)
+        working-directory: frontend
+        run: |
+          set -euo pipefail
+          grep -q 'workers: 1,' playwright.config.ts
+          grep -q 'retries: process.env.CI ? 1 : 0' playwright.config.ts
+          grep -q 'retries: 0' e2e/phase3b-controlled-multitab.spec.ts
+          echo "OK: workers=1 / retries=0 confirmed in source, unchanged by this workflow."
+
+      - name: Prod public-health — 10x poll (read-only)
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 10); do
+            http_code=$(curl -fsS -o /tmp/public-health.json -w "%{http_code}" "${PROD_BASE_URL}/api/public-health" || echo "000")
+            if [ "$http_code" != "200" ]; then
+              echo "::error::public-health attempt ${i}/10 returned HTTP ${http_code}"
+              cat /tmp/public-health.json 2>/dev/null || true
+              exit 1
+            fi
+            status=$(python3 -c "import json;print(json.load(open('/tmp/public-health.json')).get('status'))")
+            db_ok=$(python3 -c "import json;print(json.load(open('/tmp/public-health.json')).get('db_ok'))")
+            echo "public-health attempt ${i}/10: HTTP ${http_code} status=${status} db_ok=${db_ok}"
+            if [ "$status" != "ok" ] || [ "$db_ok" != "True" ]; then
+              echo "::error::public-health attempt ${i}/10 unhealthy: status=${status} db_ok=${db_ok}"
+              exit 1
+            fi
+            sleep 0.5
+          done
+          echo "OK: public-health 10/10 x HTTP 200, status=ok, db_ok=true"
+
+      - name: HTTP smoke — 10 routes (read-only, prod)
+        run: |
+          set -euo pipefail
+          routes=(
+            "/"
+            "/for-candidates"
+            "/for-recruiters"
+            "/for-companies"
+            "/for-investors"
+            "/investor"
+            "/investor/product-proof"
+            "/demo"
+            "/how-it-works"
+            "/faq"
+          )
+          fail=0
+          for route in "${routes[@]}"; do
+            http_code=$(curl -fsS -o /dev/null -w "%{http_code}" "${PROD_BASE_URL}${route}" || echo "000")
+            echo "route ${route} -> HTTP ${http_code}"
+            if [ "$http_code" != "200" ]; then
+              echo "::error::route ${route} returned HTTP ${http_code}"
+              fail=1
+            fi
+          done
+          if [ "$fail" -ne 0 ]; then
+            echo "::error::HTTP smoke failed — one or more of the 10 routes did not return 200"
+            exit 1
+          fi
+          echo "OK: HTTP smoke 10/10 x HTTP 200"
+
+      - name: Gate E Phase 3B prod — controlled multitab (canonical command)
+        working-directory: frontend
+        env:
+          TWIN_ACCESS_TOKEN: ${{ secrets.TWIN_ACCESS_TOKEN }}
+          PHASE3B_RESOURCE_WATCHDOG: "1"
+          PLAYWRIGHT_ALLOW_PROD_SMOKE: "1"
+          PLAYWRIGHT_SKIP_WEBSERVER: "1"
+          PLAYWRIGHT_BASE_URL: https://twin-sooty.vercel.app
+          CI: "true"
+        run: |
+          echo "TWIN_ACCESS_TOKEN present: $([ -n "$TWIN_ACCESS_TOKEN" ] && echo true || echo false)"
+          npm run test:phase3b-controlled-multitab-prod
+
+      - name: Cleanup — kill any leftover browser/phase3b processes (isolated runner, best-effort)
+        if: always()
+        run: |
+          pkill -f chrome-headless-shell 2>/dev/null || true
+          pkill -f "playwright.*phase3b" 2>/dev/null || true
+          echo "Cleanup step complete (runner is ephemeral and will be destroyed regardless)."
+
+      - name: Upload diagnostics + playwright report + ownership snapshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate-e-phase3b-evidence-${{ github.run_id }}
+          path: |
+            frontend/.diagnostics/**
+            frontend/playwright-report/**
+            frontend/test-results/**
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Explicit non-claims (job summary)
+        if: always()
+        run: |
+          {
+            echo "## Gate E Phase 3B — isolated runner — explicit non-claims"
+            echo ""
+            echo "- This run does **not** constitute Launch GO."
+            echo "- This run does **not** close P0 (remains OPEN)."
+            echo "- This run does **not** execute or approve Gate D."
+            echo "- This run does **not** set Gate F (remains PENDING)."
+            echo "- No production deploy was performed by this workflow."
+            echo "- Result interpretation and any founder/launch stance update happens in a separate, human-reviewed docs change — never automatically from this workflow."
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -29,6 +29,20 @@ import {
   PHASE3B_SAFE_MARQUEE_MAX_NODES, PHASE3B_FULL_MARQUEE_FAIL_NODES,
 } from "./helpers/phase3b-controlled-routes";
 
+// Local execution guard (2026-07-03) — defense in depth against a direct
+// `playwright test e2e/phase3b-controlled-multitab.spec.ts` invocation that
+// bypasses the npm script chain (and its earlier
+// scripts/phase3b-prod-local-guard.ts check) entirely. The founder Mac is
+// retired as a Phase 3B execution host — see
+// docs/PHASE3B_LOCAL_EXECUTION_DISABLED_2026-07-03.md. This runs at module
+// load, before any test() registers and before any browser/context/page is
+// created by a Playwright fixture.
+if (process.env.GITHUB_ACTIONS !== "true") {
+  // eslint-disable-next-line no-console -- deliberate operator-facing message, exact text required
+  console.error("Local Phase 3B execution is disabled. Use the GitHub Actions workflow.");
+  process.exit(1);
+}
+
 // Safe local env fallback — loads root/frontend .env.local for Cursor-agent/npm
 // shells that don't auto-source them. No-op when TWIN_ACCESS_TOKEN is already
 // exported (CI, prod runners) or when no local env files exist.

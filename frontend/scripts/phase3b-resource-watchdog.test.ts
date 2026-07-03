@@ -181,7 +181,7 @@ test("18 npm script test:phase3b-controlled-multitab-prod refuses to run without
   const pkg = read("package.json");
   assert.match(
     pkg,
-    /"test:phase3b-controlled-multitab-prod":\s*"node -e \\"if\(process\.env\.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'\)/,
+    /"test:phase3b-controlled-multitab-prod":\s*"npx --yes tsx scripts\/phase3b-prod-local-guard\.ts && node -e \\"if\(process\.env\.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'\)/,
   );
   assert.match(pkg, /PHASE3B_RESOURCE_WATCHDOG!=='1'/);
   assert.match(pkg, /Set PHASE3B_RESOURCE_WATCHDOG=1 to run production phase3b multitab/);
