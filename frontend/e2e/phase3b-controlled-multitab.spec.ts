@@ -28,6 +28,10 @@ import {
   PHASE3B_IDLE_MS_MAX, PHASE3B_IDLE_MS_MIN, PHASE3B_MAX_TABS, PHASE3B_ROUTE_BATCHES,
   PHASE3B_SAFE_MARQUEE_MAX_NODES, PHASE3B_FULL_MARQUEE_FAIL_NODES,
 } from "./helpers/phase3b-controlled-routes";
+import {
+  writeGateEAttemptStatus,
+  type GateERouteCounts,
+} from "./helpers/gate-e-attempt-status";
 
 // Local execution guard (2026-07-03) — defense in depth against a direct
 // `playwright test e2e/phase3b-controlled-multitab.spec.ts` invocation that
@@ -60,6 +64,48 @@ const MAX_REDIRECTS = 2;
 const MAX_CONSOLE_ERRORS = 12;
 const MAX_PUBLIC_HEALTH_REQUESTS = 4;
 const MAX_AUTH_GATE_NAVIGATIONS = 3;
+
+// Cancellation-hardening (2026-07-03, see
+// docs/gate-e-phase3b-attempt12-result-2026-07-03.md): attempt 12 dispatch 2
+// (run 28652257796) went silent for ~4m21s between the last visible
+// Playwright output and an unexplained job-level cancellation, with zero
+// artifacts uploaded because the cancellation skipped every subsequent
+// `if: always()` step, including "Upload diagnostics". GITHUB_RUN_ID/
+// GITHUB_SHA are ambient on every GitHub Actions runner (no workflow env:
+// wiring needed); both are null on a local run, which is fine — local
+// Phase 3B execution is already hard-blocked above.
+const GATE_E_RUN_ID = process.env.GITHUB_RUN_ID ?? null;
+const GATE_E_REPO_SHA = process.env.GITHUB_SHA ?? null;
+const GATE_E_HEARTBEAT_MS = 30_000;
+
+/**
+ * Emits a `[gate-e-heartbeat]` console.log line every `GATE_E_HEARTBEAT_MS`
+ * while waiting out `ms` of idle time. Plain Node `console.log` calls from
+ * test code go straight to the process's own stdout — captured live by
+ * GitHub Actions as the job runs, unlike an artifact upload, which needs a
+ * later step to actually execute. This is what closes the ~4m21s silent
+ * gap observed in attempt 12: even under a hard external cancellation that
+ * skips every subsequent step, the log lines already streamed are
+ * preserved and show exactly how far the run got.
+ */
+async function idleWithHeartbeat(ms: number, label: string): Promise<void> {
+  let remaining = ms;
+  while (remaining > 0) {
+    const tick = Math.min(GATE_E_HEARTBEAT_MS, remaining);
+    await new Promise((r) => setTimeout(r, tick));
+    remaining -= tick;
+    console.log(`[gate-e-heartbeat] batch ${label}: idle wait ${ms - remaining}/${ms}ms elapsed`);
+  }
+}
+
+function statusForRouteKey(status: RouteStatus): keyof Omit<GateERouteCounts, "total"> {
+  return status.toLowerCase() as keyof Omit<GateERouteCounts, "total">;
+}
+
+/** Running totals across batches, for cumulative `routeCounts`/`classifications` in the persisted status file. */
+const cumulativeRouteCounts: GateERouteCounts = { total: 0, pass: 0, partial: 0, warn: 0, fail: 0 };
+const cumulativeClassifications: Record<string, string> = {};
+let completedBatchCount = 0;
 
 type RouteStatus = "PASS" | "PARTIAL" | "WARN" | "FAIL";
 type RouteReport = {
@@ -341,6 +387,22 @@ test.describe("Phase 3B controlled multitab verification", () => {
         /* diagnostics are best-effort; never fail the run over a write error */
       }
     }
+    // Cancellation-hardening (2026-07-03): final checkpoint, so a completed
+    // (pass, fail, or timed-out) run's status file always reaches
+    // "final-cleanup" — distinguishable from a run whose last persisted
+    // stage was "batch-start"/"batch-complete", which means it never got
+    // this far (a hard external cancellation, per attempt 12).
+    console.log("[gate-e-heartbeat] final-cleanup: afterAll reached, stopping resource watchdog");
+    writeGateEAttemptStatus({
+      stage: "final-cleanup",
+      runId: GATE_E_RUN_ID,
+      repoSha: GATE_E_REPO_SHA,
+      healthStatus: "ok",
+      smokeStatus: "ok",
+      batchProgress: { totalBatches: PHASE3B_ROUTE_BATCHES.length, completedBatches: completedBatchCount, currentBatch: null },
+      routeCounts: { ...cumulativeRouteCounts },
+      classifications: { ...cumulativeClassifications },
+    });
     resourceWatchdog?.stop();
   });
 
@@ -359,6 +421,22 @@ test.describe("Phase 3B controlled multitab verification", () => {
     expect(preflight.apiCommitActual, "api_commit present").toBeTruthy();
     expect(preflight.classification, `preflight: expected=${preflight.frontendCommitExpected} actual=${preflight.frontendCommitActual}`).not.toBe("COMMIT_MISMATCH");
     expect(preflight.ok, "preflight ok").toBe(true);
+    // Cancellation-hardening (2026-07-03): the "prod preflight" sub-test was
+    // the last thing attempt 12 (dispatch 2) completed before ~4m21s of
+    // silence and an unexplained cancellation — see
+    // docs/gate-e-phase3b-attempt12-result-2026-07-03.md §2. Logging and
+    // persisting immediately after preflight passes means a future
+    // cancellation at exactly this point leaves both a log line and a
+    // status file confirming preflight succeeded, instead of silence.
+    console.log("[gate-e-heartbeat] preflight-complete: public-health + frontend_commit alignment PASSED, starting route batches");
+    writeGateEAttemptStatus({
+      stage: "preflight-complete",
+      runId: GATE_E_RUN_ID,
+      repoSha: GATE_E_REPO_SHA,
+      healthStatus: "ok",
+      smokeStatus: "ok",
+      batchProgress: { totalBatches: PHASE3B_ROUTE_BATCHES.length, completedBatches: 0, currentBatch: null },
+    });
   });
 
   for (const batch of PHASE3B_ROUTE_BATCHES) {
@@ -366,6 +444,20 @@ test.describe("Phase 3B controlled multitab verification", () => {
       if (IS_PROD && preflight && !preflight.ok) {
         test.skip(true, `preflight failed: ${preflight.classification}`);
       }
+      // Cancellation-hardening (2026-07-03): log + persist status before
+      // opening any tab, so a batch that never reaches "batch-complete" is
+      // visibly distinguishable (in both the live log stream and, if the
+      // upload step gets a chance to run, the uploaded status file) from a
+      // batch that completed or never started at all.
+      console.log(`[gate-e-heartbeat] batch-start: ${batch.label} (${batch.routes.length} routes)`);
+      writeGateEAttemptStatus({
+        stage: "batch-start",
+        runId: GATE_E_RUN_ID,
+        repoSha: GATE_E_REPO_SHA,
+        healthStatus: "ok",
+        smokeStatus: "ok",
+        batchProgress: { totalBatches: PHASE3B_ROUTE_BATCHES.length, completedBatches: completedBatchCount, currentBatch: batch.label },
+      });
       // Attempt 10 macOS process-detection hardening (2026-07-03): bind the
       // watchdog to the actual Playwright browser PID as soon as it's known,
       // so ownership-based cleanup (see phase3b-resource-watchdog.ts) can
@@ -387,7 +479,11 @@ test.describe("Phase 3B controlled multitab verification", () => {
           if (i < batch.routes.length - 1) await new Promise((r) => setTimeout(r, staggerDelayMs(i)));
         }
         const idleMs = PHASE3B_IDLE_MS_MIN + Math.floor((PHASE3B_IDLE_MS_MAX - PHASE3B_IDLE_MS_MIN) * (batch.routes.length / 8));
-        await new Promise((r) => setTimeout(r, idleMs));
+        // Cancellation-hardening (2026-07-03): this idle wait (60-90s) was
+        // exactly the kind of silent gap that made attempt 12's ~4m21s
+        // silence-then-cancellation ambiguous to diagnose after the fact —
+        // emit a heartbeat every 30s instead of waiting silently.
+        await idleWithHeartbeat(idleMs, batch.label);
         if (resourceWatchdog) assertNoWatchdogViolation(resourceWatchdog);
         for (const tracker of trackers) {
           await settleTabForMetrics(tracker.page);
@@ -408,6 +504,29 @@ test.describe("Phase 3B controlled multitab verification", () => {
         routes: reports,
       };
       writeFileSync(join(OUT_DIR, `phase3b-controlled-multitab-${batch.label}.json`), JSON.stringify(payload, null, 2));
+      // Cancellation-hardening (2026-07-03): accumulate cumulative
+      // route-level totals/classifications and persist status immediately
+      // after this batch's own evidence file is written — before the
+      // `expect.soft` assertions below run, so a batch that fails an
+      // assertion still leaves "batch-complete" (with this batch's own
+      // route data already recorded) rather than nothing at all.
+      completedBatchCount += 1;
+      for (const report of reports) {
+        cumulativeRouteCounts.total += 1;
+        cumulativeRouteCounts[statusForRouteKey(report.status)] += 1;
+        cumulativeClassifications[report.route] = report.classification;
+      }
+      console.log(`[gate-e-heartbeat] batch-complete: ${batch.label} (${completedBatchCount}/${PHASE3B_ROUTE_BATCHES.length} batches done, ${cumulativeRouteCounts.total} routes evaluated so far)`);
+      writeGateEAttemptStatus({
+        stage: "batch-complete",
+        runId: GATE_E_RUN_ID,
+        repoSha: GATE_E_REPO_SHA,
+        healthStatus: "ok",
+        smokeStatus: "ok",
+        batchProgress: { totalBatches: PHASE3B_ROUTE_BATCHES.length, completedBatches: completedBatchCount, currentBatch: batch.label },
+        routeCounts: { ...cumulativeRouteCounts },
+        classifications: { ...cumulativeClassifications },
+      });
       for (const report of reports) {
         expect.soft(report.status, `${report.route}: ${report.classification} ${report.failReasons.join(",")}`).not.toBe("FAIL");
         expect(report.httpStatus, `${report.route} HTTP`).not.toBe(404);
