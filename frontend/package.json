@@ -87,6 +87,7 @@
     "test:gate-e-attempt9-result": "npx --yes tsx scripts/gate-e-attempt9-result.test.ts",
     "test:gate-e-attempt10-result": "npx --yes tsx scripts/gate-e-attempt10-result.test.ts",
     "test:gate-e-attempt12-result": "npx --yes tsx scripts/gate-e-attempt12-result.test.ts",
+    "test:gate-e-attempt13-result": "npx --yes tsx scripts/gate-e-attempt13-result.test.ts",
     "test:phase3b-resource-watchdog": "npx --yes tsx scripts/phase3b-resource-watchdog.test.ts",
     "test:gate-e-isolated-runner-guard": "npx --yes tsx scripts/gate-e-isolated-runner-guard.test.ts",
     "test:gate-e-isolated-runner-cancel-safety": "npx --yes tsx scripts/gate-e-isolated-runner-cancel-safety.test.ts",
