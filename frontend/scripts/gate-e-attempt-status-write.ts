@@ -13,6 +13,13 @@
  *   GATE_E_STAGE   (required) one of GateEAttemptStage
  *   GATE_E_HEALTH  optional, "ok" | "fail"
  *   GATE_E_SMOKE   optional, "ok" | "fail"
+ *   PHASE3B_BATCH  optional, "public-candidate" | "recruiter" | "company" —
+ *                  Gate E Phase 3B split-batch execution (2026-07-03, see
+ *                  docs/GATE_E_PHASE3B_SPLIT_BATCH_EXECUTION_PLAN_2026-07-03.md);
+ *                  set at the isolated-runner matrix job's env level so even
+ *                  the shell-only checkpoints (workflow-start, public-health,
+ *                  HTTP smoke, pre-run cleanup) before Playwright ever runs
+ *                  are recorded against the correct batch
  *   GITHUB_RUN_ID  ambient on every GitHub Actions runner — used as-is
  *   GITHUB_SHA     ambient on every GitHub Actions runner — used as-is
  *
@@ -36,6 +43,7 @@ const result = writeGateEAttemptStatus({
   stage,
   runId: process.env.GITHUB_RUN_ID ?? null,
   repoSha: process.env.GITHUB_SHA ?? null,
+  batch: process.env.PHASE3B_BATCH?.trim() || null,
   healthStatus: process.env.GATE_E_HEALTH as GateEHealthStatus | undefined,
   smokeStatus: process.env.GATE_E_SMOKE as GateEHealthStatus | undefined,
 });

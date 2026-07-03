@@ -25,7 +25,7 @@ import {
 } from "./helpers/phase3b-resource-watchdog";
 import {
   PHASE3B_DOM_FAIL, PHASE3B_DOM_WARN, PHASE3B_HEAP_FAIL_MB, PHASE3B_HEAP_WARN_MB,
-  PHASE3B_IDLE_MS_MAX, PHASE3B_IDLE_MS_MIN, PHASE3B_MAX_TABS, PHASE3B_ROUTE_BATCHES,
+  PHASE3B_IDLE_MS_MAX, PHASE3B_IDLE_MS_MIN, PHASE3B_MAX_TABS, selectPhase3bRouteBatches,
   PHASE3B_SAFE_MARQUEE_MAX_NODES, PHASE3B_FULL_MARQUEE_FAIL_NODES,
 } from "./helpers/phase3b-controlled-routes";
 import {
@@ -77,6 +77,20 @@ const MAX_AUTH_GATE_NAVIGATIONS = 3;
 const GATE_E_RUN_ID = process.env.GITHUB_RUN_ID ?? null;
 const GATE_E_REPO_SHA = process.env.GITHUB_SHA ?? null;
 const GATE_E_HEARTBEAT_MS = 30_000;
+
+// Gate E Phase 3B split-batch execution (2026-07-03, see
+// docs/GATE_E_PHASE3B_SPLIT_BATCH_EXECUTION_PLAN_2026-07-03.md): when
+// PHASE3B_BATCH is set to one of "public-candidate" | "recruiter" | "company"
+// (as each isolated-runner matrix job now is), this run's route batches are
+// filtered down to that single named batch. Every other reference in this
+// file to PHASE3B_ROUTE_BATCHES (the batch loop, `.length`,
+// batchProgress.totalBatches) stays byte-for-byte the same and simply
+// operates on the filtered result below, so a split-batch job's status
+// file/heartbeats correctly report a single-batch run instead of claiming a
+// 3-batch run it never attempts. Unset (local full-run/legacy invocation)
+// still resolves to all 3 batches, unchanged.
+const PHASE3B_ROUTE_BATCHES = selectPhase3bRouteBatches(process.env);
+const PHASE3B_BATCH_ENV = process.env.PHASE3B_BATCH?.trim() || null;
 
 /**
  * Emits a `[gate-e-heartbeat]` console.log line every `GATE_E_HEARTBEAT_MS`
@@ -395,6 +409,7 @@ test.describe("Phase 3B controlled multitab verification", () => {
     console.log("[gate-e-heartbeat] final-cleanup: afterAll reached, stopping resource watchdog");
     writeGateEAttemptStatus({
       stage: "final-cleanup",
+      batch: PHASE3B_BATCH_ENV,
       runId: GATE_E_RUN_ID,
       repoSha: GATE_E_REPO_SHA,
       healthStatus: "ok",
@@ -431,6 +446,7 @@ test.describe("Phase 3B controlled multitab verification", () => {
     console.log("[gate-e-heartbeat] preflight-complete: public-health + frontend_commit alignment PASSED, starting route batches");
     writeGateEAttemptStatus({
       stage: "preflight-complete",
+      batch: PHASE3B_BATCH_ENV,
       runId: GATE_E_RUN_ID,
       repoSha: GATE_E_REPO_SHA,
       healthStatus: "ok",
@@ -452,6 +468,7 @@ test.describe("Phase 3B controlled multitab verification", () => {
       console.log(`[gate-e-heartbeat] batch-start: ${batch.label} (${batch.routes.length} routes)`);
       writeGateEAttemptStatus({
         stage: "batch-start",
+        batch: PHASE3B_BATCH_ENV,
         runId: GATE_E_RUN_ID,
         repoSha: GATE_E_REPO_SHA,
         healthStatus: "ok",
@@ -519,6 +536,7 @@ test.describe("Phase 3B controlled multitab verification", () => {
       console.log(`[gate-e-heartbeat] batch-complete: ${batch.label} (${completedBatchCount}/${PHASE3B_ROUTE_BATCHES.length} batches done, ${cumulativeRouteCounts.total} routes evaluated so far)`);
       writeGateEAttemptStatus({
         stage: "batch-complete",
+        batch: PHASE3B_BATCH_ENV,
         runId: GATE_E_RUN_ID,
         repoSha: GATE_E_REPO_SHA,
         healthStatus: "ok",

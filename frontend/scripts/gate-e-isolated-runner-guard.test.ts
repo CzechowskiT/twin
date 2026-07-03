@@ -283,3 +283,66 @@ test("27 evidence index and isolated runner plan record run 28650677999's false-
   assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
   assert.doesNotMatch(plan, /Phase 3B:\s*\*\*PASS\*\*/i);
 });
+
+// --- Gate E Phase 3B split-batch execution (2026-07-03) ---------------------
+// See docs/GATE_E_PHASE3B_SPLIT_BATCH_EXECUTION_PLAN_2026-07-03.md and the
+// dedicated frontend/scripts/gate-e-phase3b-split-batch.test.ts for the full
+// battery of split-batch assertions; this file only adds the minimum needed
+// to prove the pre-split invariants (single-job assumptions this file
+// originally encoded) still hold true per matrix batch job.
+
+test("28 gate-e-phase3b-prod is now a 3-way sequential matrix (public-candidate, recruiter, company), never more than 1 batch in flight", () => {
+  const workflow = readRepo(WORKFLOW);
+  assert.match(workflow, /matrix:\s*\n\s*batch:\s*\[public-candidate,\s*recruiter,\s*company\]/);
+  assert.match(workflow, /max-parallel:\s*1/);
+  assert.match(workflow, /fail-fast:\s*false/);
+});
+
+test("29 every pre-split invariant (timeout bound, artifact upload, cleanup, non-claims) still holds inside the matrix job body", () => {
+  const workflow = readRepo(WORKFLOW);
+  const prodJobIdx = workflow.indexOf("gate-e-phase3b-prod:");
+  const aggregateJobIdx = workflow.indexOf("gate-e-phase3b-aggregate:");
+  assert.ok(prodJobIdx > -1 && aggregateJobIdx > prodJobIdx, "expected gate-e-phase3b-prod before gate-e-phase3b-aggregate");
+  const prodJobBlock = workflow.slice(prodJobIdx, aggregateJobIdx);
+  const match = prodJobBlock.match(/timeout-minutes:\s*(\d+)/);
+  assert.ok(match, "expected a job-level timeout-minutes inside the matrix job");
+  const minutes = Number.parseInt(match![1]!, 10);
+  assert.ok(minutes >= 45 && minutes <= 60, `expected timeout between 45-60 minutes, got ${minutes}`);
+  assert.match(prodJobBlock, /upload-artifact@v4/);
+  assert.match(prodJobBlock, /if:\s*always\(\)/);
+  assert.match(prodJobBlock, /pkill/);
+  assert.match(prodJobBlock, /does \*\*not\*\* constitute Launch GO/i);
+});
+
+test("30 a new gate-e-phase3b-aggregate job exists, runs after every matrix batch reaches a conclusion, and never fails on a missing batch", () => {
+  const workflow = readRepo(WORKFLOW);
+  const aggregateIdx = workflow.indexOf("gate-e-phase3b-aggregate:");
+  assert.ok(aggregateIdx > -1, "expected a gate-e-phase3b-aggregate job");
+  const block = workflow.slice(aggregateIdx);
+  assert.match(block, /needs:\s*gate-e-phase3b-prod/);
+  assert.match(block, /if:\s*always\(\)/);
+  assert.match(block, /continue-on-error:\s*true/);
+  assert.match(block, /gate-e-phase3b-evidence-aggregate-\$\{\{\s*github\.run_id\s*\}\}/);
+});
+
+test("31 aggregation job carries the same explicit non-claims footer as the batch job — no new Launch GO/Gate D/Gate F/P0 claims", () => {
+  const workflow = readRepo(WORKFLOW);
+  const aggregateIdx = workflow.indexOf("gate-e-phase3b-aggregate:");
+  const block = workflow.slice(aggregateIdx);
+  assert.doesNotMatch(block, /vercel\s+deploy/i);
+  assert.doesNotMatch(block, /railway\s+(up|deploy)/i);
+  assert.doesNotMatch(block, /Gate D\s*[:=]\s*(YES|PASS)/i);
+  assert.doesNotMatch(block, /Phase 3B:\s*\*\*PASS\*\*/i);
+  assert.match(block, /remains OPEN/i);
+  assert.match(block, /remains PENDING/i);
+});
+
+test("32 npm script test:gate-e-phase3b-split-batch is registered and wired into the matrix job's static preflight guards", () => {
+  const pkg = readFrontend("package.json");
+  assert.match(pkg, /"test:gate-e-phase3b-split-batch":/);
+  assert.match(pkg, /gate-e-phase3b-split-batch\.test\.ts/);
+  const workflow = readRepo(WORKFLOW);
+  const preflightIdx = workflow.indexOf("Static preflight guards");
+  const block = workflow.slice(preflightIdx, preflightIdx + 800);
+  assert.match(block, /test:gate-e-phase3b-split-batch/);
+});
