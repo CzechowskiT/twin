@@ -110,3 +110,13 @@ Before attempt 7 is authorized, the harness itself must be confirmed capable of 
 - **Default CI browser:** **DISABLED**
 
 **Public launch: NO-GO · P0: OPEN · Phase 3B: FAIL (attempt 6 NOT COMPLETED, INCONCLUSIVE) · Gate F: PENDING · Attempt 7: NOT AUTHORIZED**
+
+---
+
+## Addendum — 2026-07-03: §5 Harness Gap Check, Automated Watchdog Closed
+
+This plan's §5 harness gap check asked whether an **automated, verifiable** guard existed for the concurrency cap, beyond manual operator observation. At the time, the answer for the *application-level* ceiling was resolved by [`GATE_E_ATTEMPT7_EXECUTION_GUARANTEE_2026-06-29.md`](./GATE_E_ATTEMPT7_EXECUTION_GUARANTEE_2026-06-29.md) — but that guarantee's own §4 explicitly left **host-level resource conditions during a live run** as a manual-stop-rule-only safeguard, with no automated watchdog. [Attempt 9](./gate-e-phase3b-attempt9-result-2026-07-02.md) was manually aborted **before** any Playwright invocation specifically because that gap was still open.
+
+**[`PHASE3B_RESOURCE_WATCHDOG_2026-07-03.md`](./PHASE3B_RESOURCE_WATCHDOG_2026-07-03.md) closes it**: a code-enforced watchdog (`frontend/e2e/helpers/phase3b-resource-watchdog.ts`) now monitors `chrome-headless-shell` process count and run duration, kills orphaned processes on violation, and production Phase 3B runs refuse to start without `PHASE3B_RESOURCE_WATCHDOG=1` explicitly set (`npm run test:phase3b-resource-watchdog`, static, no browser).
+
+**This addendum does not authorize attempt 7, 8, 9, or 10.** Each Gate E Phase 3B prod attempt still requires its own, separate, explicit founder authorization — this addendum only records that the specific §5 residual risk (no automated host-resource watchdog) is now closed in code.

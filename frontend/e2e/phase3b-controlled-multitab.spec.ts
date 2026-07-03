@@ -17,6 +17,13 @@ import {
   type Phase3bRouteAuthTier,
 } from "./helpers/phase3b-harness-diagnostics";
 import {
+  assertNoWatchdogViolation,
+  assertResourceSafeToStart,
+  createPhase3bResourceWatchdog,
+  requirePhase3bResourceWatchdogEnabled,
+  type Phase3bResourceWatchdogHandle,
+} from "./helpers/phase3b-resource-watchdog";
+import {
   PHASE3B_DOM_FAIL, PHASE3B_DOM_WARN, PHASE3B_HEAP_FAIL_MB, PHASE3B_HEAP_WARN_MB,
   PHASE3B_IDLE_MS_MAX, PHASE3B_IDLE_MS_MIN, PHASE3B_MAX_TABS, PHASE3B_ROUTE_BATCHES,
   PHASE3B_SAFE_MARQUEE_MAX_NODES, PHASE3B_FULL_MARQUEE_FAIL_NODES,
@@ -265,11 +272,32 @@ async function pollPublicHealth() {
 test.describe.configure({ mode: "serial", retries: 0, timeout: IS_PROD ? 900_000 : 1_200_000 });
 let preflight: Phase3bPreflightSnapshot | null = null;
 
+/**
+ * Gate E attempt 9 follow-up (2026-07-03): production Phase 3B runs must not
+ * start without a code-enforced resource watchdog. Attempt 9 was manually
+ * aborted before any Playwright invocation precisely because this guard did
+ * not exist yet — see docs/gate-e-phase3b-attempt9-result-2026-07-02.md and
+ * docs/PHASE3B_RESOURCE_WATCHDOG_2026-07-03.md. Evaluated at module load, so
+ * a prod run refuses before any browser is launched, not just before the
+ * first assertion runs.
+ */
+requirePhase3bResourceWatchdogEnabled(IS_PROD);
+
+let resourceWatchdog: Phase3bResourceWatchdogHandle | null = null;
+
 test.describe("Phase 3B controlled multitab verification", () => {
   test.use({ baseURL: PROD_BASE });
 
+  test.afterAll(() => {
+    resourceWatchdog?.stop();
+  });
+
   test("prod preflight — public-health + frontend_commit alignment", async () => {
     test.skip(!IS_PROD, "prod preflight only on vercel.app");
+    if (IS_PROD) {
+      assertResourceSafeToStart();
+      resourceWatchdog = createPhase3bResourceWatchdog();
+    }
     const health = await pollPublicHealth();
     expect(health, "public-health unavailable").not.toBeNull();
     preflight = buildPhase3bPreflightSnapshot(health!);
@@ -286,6 +314,7 @@ test.describe("Phase 3B controlled multitab verification", () => {
       if (IS_PROD && preflight && !preflight.ok) {
         test.skip(true, `preflight failed: ${preflight.classification}`);
       }
+      if (resourceWatchdog) assertNoWatchdogViolation(resourceWatchdog);
       expect(batch.routes.length).toBeLessThanOrEqual(PHASE3B_MAX_TABS);
       assertNoLeakedContextsFromPriorBatch(browser);
       mkdirSync(OUT_DIR, { recursive: true });
@@ -299,6 +328,7 @@ test.describe("Phase 3B controlled multitab verification", () => {
         }
         const idleMs = PHASE3B_IDLE_MS_MIN + Math.floor((PHASE3B_IDLE_MS_MAX - PHASE3B_IDLE_MS_MIN) * (batch.routes.length / 8));
         await new Promise((r) => setTimeout(r, idleMs));
+        if (resourceWatchdog) assertNoWatchdogViolation(resourceWatchdog);
         for (const tracker of trackers) {
           await settleTabForMetrics(tracker.page);
           reports.push(evaluateRoute(batch.label, tracker, await readDomState(tracker.page), await captureCdp(tracker.page)));
