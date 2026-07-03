@@ -80,6 +80,17 @@ export type GateEAttemptStatus = {
   timestamp: string;
   runId: string | null;
   repoSha: string | null;
+  /**
+   * Gate E Phase 3B split-batch execution (2026-07-03) — which isolated-
+   * runner matrix batch ("public-candidate" | "recruiter" | "company") this
+   * status file belongs to, sourced from the PHASE3B_BATCH env var. `null`
+   * for a legacy/local unsplit run that executes all 3 batches in one job.
+   * Distinct from `batchProgress.currentBatch`, which tracks progress
+   * *within* a single run (one or many batches); this field identifies
+   * *which* isolated-runner job produced the file at all — see
+   * docs/GATE_E_PHASE3B_SPLIT_BATCH_EXECUTION_PLAN_2026-07-03.md.
+   */
+  batch: string | null;
   healthStatus: GateEHealthStatus;
   smokeStatus: GateEHealthStatus;
   batchProgress: GateEBatchProgress;
@@ -89,6 +100,11 @@ export type GateEAttemptStatus = {
 
 const EMPTY_BATCH_PROGRESS: GateEBatchProgress = { totalBatches: 0, completedBatches: 0, currentBatch: null };
 const EMPTY_ROUTE_COUNTS: GateERouteCounts = { total: 0, pass: 0, partial: 0, warn: 0, fail: 0 };
+
+/** Per-batch status file name, e.g. `gate-e-attempt-status-recruiter.json` — see writeGateEAttemptStatus. */
+export function getGateEBatchAttemptStatusFileName(batch: string): string {
+  return `gate-e-attempt-status-${batch}.json`;
+}
 
 function readExistingStatus(): Partial<GateEAttemptStatus> {
   try {
@@ -120,6 +136,7 @@ export function writeGateEAttemptStatus(
       timestamp: new Date().toISOString(),
       runId: update.runId ?? existing.runId ?? null,
       repoSha: update.repoSha ?? existing.repoSha ?? null,
+      batch: update.batch ?? existing.batch ?? null,
       healthStatus: update.healthStatus ?? existing.healthStatus ?? "unknown",
       smokeStatus: update.smokeStatus ?? existing.smokeStatus ?? "unknown",
       batchProgress: { ...EMPTY_BATCH_PROGRESS, ...existing.batchProgress, ...update.batchProgress },
@@ -128,6 +145,20 @@ export function writeGateEAttemptStatus(
     };
     mkdirSync(GATE_E_ATTEMPT_STATUS_DIR, { recursive: true });
     writeFileSync(GATE_E_ATTEMPT_STATUS_FILE, JSON.stringify(merged, null, 2));
+    // Gate E Phase 3B split-batch execution (2026-07-03): additionally
+    // persist a per-batch-named copy so 3 parallel/sequential isolated-
+    // runner matrix jobs (one per PHASE3B_BATCH) never share a single
+    // ambiguous `gate-e-attempt-status.json` when their artifacts are later
+    // inspected side by side — see
+    // docs/GATE_E_PHASE3B_SPLIT_BATCH_EXECUTION_PLAN_2026-07-03.md. The
+    // default file above is always written too, unchanged, for backward
+    // compatibility with the existing artifact-upload path list.
+    if (merged.batch) {
+      writeFileSync(
+        join(GATE_E_ATTEMPT_STATUS_DIR, getGateEBatchAttemptStatusFileName(merged.batch)),
+        JSON.stringify(merged, null, 2),
+      );
+    }
     return merged;
   } catch {
     return null;

@@ -6,7 +6,7 @@
 **This document does not authorize attempt 12 or any future attempt.** Each attempt still requires its own separate, explicit founder authorization, exactly as attempts 7–11 did — and now can only run via the isolated GitHub Actions workflow.
 **Launch stance:** **NO-GO** · **P0:** **OPEN** · **Gate F:** **PENDING**
 
-**Related:** [attempt 11 result](./gate-e-phase3b-attempt11-result-2026-07-03.md) · [attempt 10 result](./gate-e-phase3b-attempt10-result-2026-07-03.md) · [local execution disabled](./PHASE3B_LOCAL_EXECUTION_DISABLED_2026-07-03.md) · [macOS process detection](./PHASE3B_MACOS_PROCESS_DETECTION_2026-07-03.md) · [resource watchdog](./PHASE3B_RESOURCE_WATCHDOG_2026-07-03.md) · [attempt 7 execution guarantee](./GATE_E_ATTEMPT7_EXECUTION_GUARANTEE_2026-06-29.md) · [evidence index](./LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md)
+**Related:** [split-batch execution plan](./GATE_E_PHASE3B_SPLIT_BATCH_EXECUTION_PLAN_2026-07-03.md) · [attempt 12 result](./gate-e-phase3b-attempt12-result-2026-07-03.md) · [attempt 13 result](./gate-e-phase3b-attempt13-result-2026-07-03.md) · [attempt 11 result](./gate-e-phase3b-attempt11-result-2026-07-03.md) · [attempt 10 result](./gate-e-phase3b-attempt10-result-2026-07-03.md) · [local execution disabled](./PHASE3B_LOCAL_EXECUTION_DISABLED_2026-07-03.md) · [macOS process detection](./PHASE3B_MACOS_PROCESS_DETECTION_2026-07-03.md) · [resource watchdog](./PHASE3B_RESOURCE_WATCHDOG_2026-07-03.md) · [attempt 7 execution guarantee](./GATE_E_ATTEMPT7_EXECUTION_GUARANTEE_2026-06-29.md) · [evidence index](./LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md)
 
 ---
 
@@ -148,6 +148,18 @@ Given that constraint, this task hardened observability at the two layers that *
 **What this does and does not fix:** it does **not** make artifact upload succeed after a hard cancellation — no GitHub Actions workflow can guarantee that. It **does** mean a cancelled run's live log (`gh run view --log`) now shows exactly which stage was reached and when, even when zero artifacts are produced, closing the "almost no forensic trail" gap attempt 12 exposed. It changes **no Phase 3B pass/fail logic**, does **not** weaken the resource watchdog (`frontend/e2e/helpers/phase3b-resource-watchdog.ts` is unchanged), touches **no backend/API/auth/DB/env code**, and **does not authorize or dispatch attempt 13** — every attempt still requires its own separate, explicit founder authorization exactly as before.
 
 Verified statically only (`tsc`, `npm run test:gate-e-isolated-runner-guard`, `npm run test:gate-e-isolated-runner-cancel-safety`, `npm run test:phase3b-resource-watchdog`, `npm run build`) — this task did not dispatch the workflow.
+
+---
+
+## 5c. Split-Batch Execution (this task, 2026-07-03) — Splitting the Single Long-Lived Job Into 3 Sequential Batch Jobs
+
+Both isolated-runner attempts so far ended inside the single, long-lived `gate-e-phase3b-prod` job — attempt 12 dispatch 2 (`RUNNER_CANCELLED`) after ~4m21s, attempt 13 (`RUNNER_LOST_COMMUNICATION`) after ~46m43s — before any route-level evidence was confirmed. The cancellation hardening in §5b maximizes forensic trail from a single job, but does not shorten the window that job is exposed to an infrastructure-level ending.
+
+This task splits `gate-e-phase3b-prod` into a `matrix: batch: [public-candidate, recruiter, company]` strategy (`fail-fast: false`, `max-parallel: 1` — strictly sequential, never more than one batch in flight, preserving the existing single-attempt discipline), so each batch job's canonical-command step only has to survive one ~7-route batch instead of all 20 routes continuously. A new `gate-e-phase3b-aggregate` job (`needs: gate-e-phase3b-prod`, `if: always()`) then merges whatever per-batch evidence each of the 3 batch jobs produced into one combined summary, without drawing any new pass/fail conclusion of its own — a batch that produced no artifact (e.g. lost to a hard infrastructure ending before its own upload step) is reported `MISSING`, not treated as an aggregation failure.
+
+**Full detail, rationale, job-flow diagram, and result-interpretation addendum:** see [`GATE_E_PHASE3B_SPLIT_BATCH_EXECUTION_PLAN_2026-07-03.md`](./GATE_E_PHASE3B_SPLIT_BATCH_EXECUTION_PLAN_2026-07-03.md).
+
+Verified statically only (`tsc`, `npm run test:gate-e-isolated-runner-guard` (extended), `npm run test:gate-e-phase3b-split-batch` (new), `npm run test:phase3b-controlled-multitab`, `npm run test:phase3b-local-execution-blocked`, `npm run build`) — this task did not dispatch the workflow and does not authorize attempt 14.
 
 ---
 

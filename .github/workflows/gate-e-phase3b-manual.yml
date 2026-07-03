@@ -46,9 +46,27 @@ env:
 
 jobs:
   gate-e-phase3b-prod:
-    name: Gate E Phase 3B prod (isolated runner)
+    name: "Gate E Phase 3B prod (isolated runner, batch: ${{ matrix.batch }})"
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    # Gate E Phase 3B split-batch execution (2026-07-03, see
+    # docs/GATE_E_PHASE3B_SPLIT_BATCH_EXECUTION_PLAN_2026-07-03.md): one
+    # isolated-runner job per route batch instead of all 3 batches inside a
+    # single long-lived job — the shape that produced attempt 12's
+    # RUNNER_CANCELLED and attempt 13's RUNNER_LOST_COMMUNICATION results.
+    # max-parallel: 1 keeps batches strictly sequential (never more than one
+    # Phase 3B prod attempt in flight at a time, matching the workers=1 /
+    # retries=0 single-attempt discipline this workflow has always enforced);
+    # fail-fast: false means a failed/cancelled/lost-communication batch does
+    # NOT cancel the remaining batches, so a single bad batch no longer
+    # discards the other batches' evidence, unlike the prior single-job shape.
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        batch: [public-candidate, recruiter, company]
+    env:
+      PHASE3B_BATCH: ${{ matrix.batch }}
     steps:
       - name: Validate hard-ban confirmation inputs
         run: |
@@ -103,6 +121,7 @@ jobs:
           npm run test:phase3b-resource-watchdog
           npm run test:phase3b-controlled-multitab
           npm run test:gate-e-isolated-runner-guard
+          npm run test:gate-e-phase3b-split-batch
           npm run test:phase3b-local-execution-blocked
 
       - name: Verify workers=1 / retries=0 are code-enforced (not overridable by this workflow)
@@ -267,7 +286,7 @@ jobs:
           ( while true; do sleep 30; echo "[gate-e-heartbeat] canonical command still running at $(date -u +%FT%TZ)"; done ) &
           HEARTBEAT_PID=$!
           set +e
-          npm run test:phase3b-controlled-multitab-prod
+          npm run test:phase3b-controlled-multitab-prod:${{ matrix.batch }}
           CANONICAL_EXIT_CODE=$?
           set -e
           kill "$HEARTBEAT_PID" 2>/dev/null || true
@@ -295,7 +314,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: gate-e-phase3b-evidence-${{ github.run_id }}
+          name: gate-e-phase3b-evidence-${{ matrix.batch }}-${{ github.run_id }}
           path: |
             frontend/.diagnostics/**
             frontend/.diagnostics/gate-e-attempt-status.json
@@ -316,4 +335,169 @@ jobs:
             echo "- This run does **not** set Gate F (remains PENDING)."
             echo "- No production deploy was performed by this workflow."
             echo "- Result interpretation and any founder/launch stance update happens in a separate, human-reviewed docs change — never automatically from this workflow."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # Gate E Phase 3B split-batch execution (2026-07-03, see
+  # docs/GATE_E_PHASE3B_SPLIT_BATCH_EXECUTION_PLAN_2026-07-03.md): runs after
+  # all 3 `gate-e-phase3b-prod` matrix batches reach a conclusion (pass,
+  # fail, cancelled, or lost-communication — `if: always()` + `needs:` on the
+  # matrix job id waits for every instance), and merges whatever per-batch
+  # evidence each of them managed to produce into one combined summary. This
+  # job draws no new pass/fail verdict of its own — it only aggregates
+  # already-produced batch evidence for human review, exactly like every
+  # other step in this workflow. If a batch job never uploaded an artifact
+  # (e.g. a hard external cancellation before its own upload step could run),
+  # aggregation simply records that batch as MISSING instead of failing the
+  # whole aggregation.
+  gate-e-phase3b-aggregate:
+    name: Gate E Phase 3B prod — aggregate batch evidence
+    needs: gate-e-phase3b-prod
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Download all batch evidence artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: gate-e-phase3b-evidence-*-${{ github.run_id }}
+          path: batch-evidence
+          merge-multiple: false
+        continue-on-error: true
+
+      - name: Merge per-batch diagnostics into one aggregate summary (best-effort, never fails the job)
+        run: |
+          set +e
+          python3 - <<'PYEOF'
+          import json
+          import glob
+          import os
+
+          BATCHES = ["public-candidate", "recruiter", "company"]
+          root = "batch-evidence"
+          summary = {"phase": "3B-controlled-multitab-aggregate", "batches": {}}
+
+          # os.walk (not glob) on purpose: the evidence tree contains a
+          # hidden `.diagnostics` directory, and Python's glob("**") does
+          # NOT descend into dot-directories by default.
+          all_files = []
+          for dirpath, _dirnames, filenames in os.walk(root):
+              for filename in filenames:
+                  all_files.append(os.path.join(dirpath, filename))
+
+          for batch in BATCHES:
+              entry = {
+                  "batch": batch,
+                  "attemptStatus": None,
+                  "routeCounts": None,
+                  "artifactFound": False,
+              }
+              status_matches = [
+                  p for p in all_files
+                  if os.path.basename(p) == f"gate-e-attempt-status-{batch}.json"
+              ] or [
+                  p for p in all_files
+                  if os.path.basename(p) == "gate-e-attempt-status.json" and f"-{batch}-" in p
+              ]
+              route_matches = [
+                  p for p in all_files
+                  if os.path.basename(p) == f"phase3b-controlled-multitab-{batch}.json"
+              ]
+              if status_matches:
+                  entry["artifactFound"] = True
+                  try:
+                      with open(status_matches[0], "r", encoding="utf-8") as fh:
+                          status_json = json.load(fh)
+                      entry["attemptStatus"] = {
+                          "stage": status_json.get("stage"),
+                          "healthStatus": status_json.get("healthStatus"),
+                          "smokeStatus": status_json.get("smokeStatus"),
+                      }
+                  except Exception as exc:  # noqa: BLE001 - best-effort aggregation only
+                      entry["attemptStatus"] = {"error": str(exc)}
+              if route_matches:
+                  entry["artifactFound"] = True
+                  try:
+                      with open(route_matches[0], "r", encoding="utf-8") as fh:
+                          route_json = json.load(fh)
+                      counts = {"total": 0, "pass": 0, "partial": 0, "warn": 0, "fail": 0}
+                      for route in route_json.get("routes", []):
+                          counts["total"] += 1
+                          status_key = str(route.get("status", "")).lower()
+                          if status_key in counts:
+                              counts[status_key] += 1
+                      entry["routeCounts"] = counts
+                  except Exception as exc:  # noqa: BLE001 - best-effort aggregation only
+                      entry["routeCounts"] = {"error": str(exc)}
+              summary["batches"][batch] = entry
+
+          totals = {"total": 0, "pass": 0, "partial": 0, "warn": 0, "fail": 0}
+          for entry in summary["batches"].values():
+              counts = entry.get("routeCounts") or {}
+              for key in totals:
+                  totals[key] += counts.get(key, 0) if isinstance(counts.get(key), int) else 0
+          summary["totals"] = totals
+
+          with open("gate-e-phase3b-aggregate.json", "w", encoding="utf-8") as fh:
+              json.dump(summary, fh, indent=2)
+
+          lines = [
+              "## Gate E Phase 3B — split-batch aggregate summary",
+              "",
+              "This aggregation merges evidence already produced by the 3 batch jobs above. It draws no new pass/fail verdict of its own.",
+              "",
+              "| Batch | Artifact found | Stage reached | Routes (pass/partial/warn/fail/total) |",
+              "|---|---|---|---|",
+          ]
+          for batch in BATCHES:
+              entry = summary["batches"][batch]
+              found = "yes" if entry["artifactFound"] else "MISSING"
+              stage = (entry.get("attemptStatus") or {}).get("stage", "n/a")
+              counts = entry.get("routeCounts") or {}
+              route_cell = (
+                  f"{counts.get('pass', 0)}/{counts.get('partial', 0)}/{counts.get('warn', 0)}/"
+                  f"{counts.get('fail', 0)}/{counts.get('total', 0)}"
+                  if counts and "error" not in counts
+                  else "n/a"
+              )
+              lines.append(f"| {batch} | {found} | {stage} | {route_cell} |")
+          lines.append("")
+          lines.append(
+              f"**Aggregate totals — pass={totals['pass']} partial={totals['partial']} "
+              f"warn={totals['warn']} fail={totals['fail']} total={totals['total']}**"
+          )
+          lines.append("")
+          lines.append("This aggregation does **not** constitute a Phase 3B PASS, Launch GO, Gate D, or Gate F YES.")
+
+          summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
+          if summary_path:
+              with open(summary_path, "a", encoding="utf-8") as fh:
+                  fh.write("\n".join(lines) + "\n")
+          else:
+              print("\n".join(lines))
+          PYEOF
+          exit 0
+
+      - name: Upload aggregate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate-e-phase3b-evidence-aggregate-${{ github.run_id }}
+          path: |
+            batch-evidence/**
+            gate-e-phase3b-aggregate.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Explicit non-claims (aggregate job summary)
+        if: always()
+        run: |
+          {
+            echo "## Gate E Phase 3B — split-batch aggregation — explicit non-claims"
+            echo ""
+            echo "- This aggregation job does **not** constitute Launch GO."
+            echo "- This aggregation job does **not** close P0 (remains OPEN)."
+            echo "- This aggregation job does **not** execute or approve Gate D."
+            echo "- This aggregation job does **not** set Gate F (remains PENDING)."
+            echo "- No production deploy was performed by this workflow."
+            echo "- It only merges evidence already produced by the 3 batch jobs above; it draws no new pass/fail conclusion of its own."
           } >> "$GITHUB_STEP_SUMMARY"
