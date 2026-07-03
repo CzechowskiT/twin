@@ -90,6 +90,12 @@ jobs:
         working-directory: frontend
         run: npx playwright install --with-deps chromium
 
+      - name: Persist attempt status — workflow start (heartbeat)
+        working-directory: frontend
+        run: |
+          echo "[gate-e-heartbeat] workflow-start: checkout + npm ci + playwright install complete, run_id=${GITHUB_RUN_ID} sha=${GITHUB_SHA}"
+          GATE_E_STAGE=workflow-start npx --yes tsx scripts/gate-e-attempt-status-write.ts
+
       - name: Static preflight guards (no browser, no prod requests)
         working-directory: frontend
         run: |
@@ -129,6 +135,12 @@ jobs:
           done
           echo "OK: public-health 10/10 x HTTP 200, status=ok, db_ok=true"
 
+      - name: Persist attempt status — public-health complete (heartbeat)
+        working-directory: frontend
+        run: |
+          echo "[gate-e-heartbeat] public-health-complete: 10/10 x HTTP 200, status=ok, db_ok=true"
+          GATE_E_STAGE=public-health-complete GATE_E_HEALTH=ok npx --yes tsx scripts/gate-e-attempt-status-write.ts
+
       - name: HTTP smoke — 10 routes (read-only, prod)
         run: |
           set -euo pipefail
@@ -158,6 +170,12 @@ jobs:
             exit 1
           fi
           echo "OK: HTTP smoke 10/10 x HTTP 200"
+
+      - name: Persist attempt status — HTTP smoke complete (heartbeat)
+        working-directory: frontend
+        run: |
+          echo "[gate-e-heartbeat] http-smoke-complete: 10/10 x HTTP 200"
+          GATE_E_STAGE=http-smoke-complete GATE_E_HEALTH=ok GATE_E_SMOKE=ok npx --yes tsx scripts/gate-e-attempt-status-write.ts
 
       - name: Pre-run cleanup — clear stale browser/orphan-pattern processes before Phase 3B (isolated runner, best-effort)
         run: |
@@ -198,8 +216,40 @@ jobs:
           echo "Note: this step cannot clear a not-yet-started Phase 3B run's own npm/npx/playwright ancestor chain — that self-match false positive (run 28650677999) is fixed in the resource watchdog itself (frontend/e2e/helpers/phase3b-resource-watchdog.ts), which now excludes this run's own process ancestry when GITHUB_ACTIONS=true."
           exit 0
 
+      - name: Persist attempt status — pre-run cleanup complete (heartbeat)
+        working-directory: frontend
+        run: |
+          echo "[gate-e-heartbeat] pre-run-cleanup-complete: orphan-pattern check done"
+          GATE_E_STAGE=pre-run-cleanup-complete GATE_E_HEALTH=ok GATE_E_SMOKE=ok npx --yes tsx scripts/gate-e-attempt-status-write.ts
+
+      # Cancellation-hardening (2026-07-03, see
+      # docs/gate-e-phase3b-attempt12-result-2026-07-03.md): attempt 12
+      # dispatch 2 (run 28652257796) passed every precondition above, then
+      # went silent for ~4m21s and was cancelled at the infrastructure level
+      # before any route batch ran, with zero artifacts uploaded (a
+      # job-level cancellation skips every subsequent step regardless of
+      # `if: always()`, including "Upload diagnostics"). This checkpoint —
+      # immediately before the canonical command — is the last point this
+      # workflow can log/persist before handing off to the long-running
+      # Playwright process, which now emits its own heartbeats internally
+      # (see phase3b-controlled-multitab.spec.ts).
+      - name: Persist attempt status — before canonical command (heartbeat)
+        working-directory: frontend
+        run: |
+          echo "[gate-e-heartbeat] before-canonical: starting npm run test:phase3b-controlled-multitab-prod at $(date -u +%FT%TZ)"
+          GATE_E_STAGE=before-canonical GATE_E_HEALTH=ok GATE_E_SMOKE=ok npx --yes tsx scripts/gate-e-attempt-status-write.ts
+
       - name: Gate E Phase 3B prod — controlled multitab (canonical command)
         working-directory: frontend
+        # Explicit step-level timeout (2026-07-03 hardening), independent of
+        # the 60-minute job timeout: bounds this specific long-running step
+        # so a genuine harness hang produces an unambiguous `timed_out`
+        # conclusion instead of being indistinguishable from an external
+        # `cancelled` one (see attempt 12 §3). Leaves headroom under the
+        # job's 60-minute budget for checkout/npm ci/Playwright install/
+        # static guards/public-health/HTTP smoke, which together take a few
+        # minutes, not tens of minutes.
+        timeout-minutes: 40
         env:
           TWIN_ACCESS_TOKEN: ${{ secrets.TWIN_ACCESS_TOKEN }}
           PHASE3B_RESOURCE_WATCHDOG: "1"
@@ -209,22 +259,46 @@ jobs:
           CI: "true"
         run: |
           echo "TWIN_ACCESS_TOKEN present: $([ -n "$TWIN_ACCESS_TOKEN" ] && echo true || echo false)"
+          # Cancellation-hardening (2026-07-03): background heartbeat so the
+          # live GitHub Actions log shows this step is still alive every 30s
+          # even during Playwright's own idle waits — closing the ~4m21s
+          # silent gap observed in attempt 12 at the workflow-log level, on
+          # top of the spec-level heartbeats emitted by Playwright itself.
+          ( while true; do sleep 30; echo "[gate-e-heartbeat] canonical command still running at $(date -u +%FT%TZ)"; done ) &
+          HEARTBEAT_PID=$!
+          set +e
           npm run test:phase3b-controlled-multitab-prod
+          CANONICAL_EXIT_CODE=$?
+          set -e
+          kill "$HEARTBEAT_PID" 2>/dev/null || true
+          wait "$HEARTBEAT_PID" 2>/dev/null || true
+          exit $CANONICAL_EXIT_CODE
+
+      - name: Persist attempt status — canonical command finished (heartbeat)
+        if: always()
+        working-directory: frontend
+        run: |
+          echo "[gate-e-heartbeat] canonical-complete: canonical command step reached a conclusion at $(date -u +%FT%TZ)"
+          GATE_E_STAGE=canonical-complete GATE_E_HEALTH=ok GATE_E_SMOKE=ok npx --yes tsx scripts/gate-e-attempt-status-write.ts || true
 
       - name: Cleanup — kill any leftover browser/phase3b processes (isolated runner, best-effort)
         if: always()
+        working-directory: frontend
         run: |
+          echo "[gate-e-heartbeat] final-cleanup: starting best-effort cleanup at $(date -u +%FT%TZ)"
           pkill -f chrome-headless-shell 2>/dev/null || true
           pkill -f "playwright.*phase3b" 2>/dev/null || true
+          GATE_E_STAGE=workflow-cleanup npx --yes tsx scripts/gate-e-attempt-status-write.ts || true
           echo "Cleanup step complete (runner is ephemeral and will be destroyed regardless)."
 
-      - name: Upload diagnostics + playwright report + ownership snapshot
+      - name: Upload diagnostics + playwright report + ownership snapshot + attempt status
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: gate-e-phase3b-evidence-${{ github.run_id }}
           path: |
             frontend/.diagnostics/**
+            frontend/.diagnostics/gate-e-attempt-status.json
             frontend/playwright-report/**
             frontend/test-results/**
           if-no-files-found: warn

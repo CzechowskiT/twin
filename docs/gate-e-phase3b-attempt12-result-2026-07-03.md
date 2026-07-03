@@ -145,6 +145,21 @@ This is scoped as **`RUNNER_CANCELLED`** — a new classification, distinct from
 
 ---
 
+## 5a. Cancellation-Hardening Follow-Up (this task, 2026-07-03)
+
+This RUNNER_CANCELLED classification exposed a second, distinct gap beyond "why was it cancelled": **the run left almost no forensic trail**, because a job-level cancellation skips every subsequent step regardless of its `if: always()` condition — including the "Upload diagnostics" step itself (§3 above). A follow-up task hardened the isolated-runner workflow and the Phase 3B harness against exactly this failure mode, **without re-dispatching attempt 13 and without weakening the resource watchdog**:
+
+| Hardening | What it does |
+|---|---|
+| `[gate-e-heartbeat]` log lines | Emitted before the canonical command, after preflight passes, before/after every route batch, during every idle wait (every 30s), and at final cleanup — plain `console.log`/`echo` output is streamed live by GitHub Actions as the job runs, so it survives even a hard cancellation that skips every subsequent step (unlike an artifact, which needs a later step to actually execute) |
+| `frontend/.diagnostics/gate-e-attempt-status.json` | Best-effort JSON snapshot (stage, timestamp, run id, repo sha, health/smoke status, batch progress, cumulative route counts, cumulative classifications) persisted after every stage — via `frontend/e2e/helpers/gate-e-attempt-status.ts` from the Playwright spec and `frontend/scripts/gate-e-attempt-status-write.ts` from the workflow's bash steps |
+| Explicit canonical-command step timeout | `timeout-minutes: 40` added to the canonical command step (independent of the existing 60-minute job timeout) — a genuine harness hang now produces its own step conclusion instead of being indistinguishable from an external cancellation |
+| Artifact upload confirmed `if: always()` | Unchanged (already existed), now explicitly includes `frontend/.diagnostics/gate-e-attempt-status.json` in its upload path alongside `.diagnostics/**`, `playwright-report/**`, `test-results/**` |
+
+**This is observability hardening only.** It does not change Phase 3B pass/fail logic, does not weaken the resource watchdog, does not touch backend/API/auth/DB/env code, and — like this document itself — **does not authorize or dispatch attempt 13**. See `docs/GATE_E_ISOLATED_RUNNER_PLAN_2026-07-03.md` for the full write-up.
+
+---
+
 ## 6. Recommendation — Attempt 13
 
 Consistent with the established discipline in this repository (no attempt auto-retries; every attempt requires its own separate, explicit founder authorization — see attempts 7 through 11), **this document does not authorize or trigger a further dispatch.** If a re-run is desired:

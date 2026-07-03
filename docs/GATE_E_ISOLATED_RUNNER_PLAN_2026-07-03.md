@@ -134,6 +134,23 @@ Error: phase3b resource watchdog: 10 orphaned playwright/phase3b process(es) alr
 
 ---
 
+## 5b. Cancellation-Hardening (this task, 2026-07-03) — Surviving a Silent GitHub Actions Cancellation
+
+Attempt 12 dispatch 2 (run `28652257796`) passed every scripted precondition and the Phase 3B "prod preflight" sub-test, then went silent for ~4m21s before the job was **cancelled at the GitHub Actions infrastructure level** — see [attempt 12 result](./gate-e-phase3b-attempt12-result-2026-07-03.md) §3. The per-step job API showed every subsequent step, **including "Upload diagnostics" itself**, marked `skipped` — a job-level cancellation skips every remaining step regardless of its `if: always()` condition. This is a documented GitHub Actions limitation, not a bug in this workflow: **no `if: always()` step can be guaranteed to run after a hard external cancellation.**
+
+Given that constraint, this task hardened observability at the two layers that *do* survive a hard cancellation — the live log stream (captured by GitHub Actions as the job runs, not after it finishes) and best-effort disk persistence (useful whenever the cancellation is graceful enough, or a future failure is a real timeout/error rather than a hard external cancel, for `if: always()` steps to still run):
+
+1. **`[gate-e-heartbeat]` log lines** at every required checkpoint — before the canonical command (workflow step), immediately after the "prod preflight" sub-test passes (spec), immediately before and after every route batch (spec), every 30 seconds during each batch's 60–90s idle wait (spec), during the canonical command step itself via a background shell loop (workflow), and at final cleanup (both the spec's `afterAll` and the workflow's `Cleanup` step).
+2. **`frontend/.diagnostics/gate-e-attempt-status.json`** — a best-effort, read-merge-write JSON snapshot (`frontend/e2e/helpers/gate-e-attempt-status.ts`, invoked directly from the Playwright spec and via a thin CLI wrapper `frontend/scripts/gate-e-attempt-status-write.ts` from the workflow's bash steps) written after every stage: `workflow-start`, `public-health-complete`, `http-smoke-complete`, `pre-run-cleanup-complete`, `before-canonical`, `preflight-complete`, `batch-start`/`batch-complete` (per batch, with cumulative route counts and per-route classifications), `canonical-complete`, `workflow-cleanup`, `final-cleanup`.
+3. **Explicit step-level timeout** on the canonical command step (`timeout-minutes: 40`, strictly under the existing 60-minute job timeout) — a genuine harness hang now surfaces as that step's own conclusion instead of being indistinguishable from an external cancellation. The job timeout (60 min), the per-batch Playwright timeout (`test.describe.configure({ timeout: … })`, unchanged), and the per-route navigation timeout (`ROUTE_GOTO_MS = 30_000`, unchanged) were all already explicit and are unaffected.
+4. **Artifact upload** — unchanged in trigger (`if: always()`, already existed), now explicitly lists `frontend/.diagnostics/gate-e-attempt-status.json` in its upload path.
+
+**What this does and does not fix:** it does **not** make artifact upload succeed after a hard cancellation — no GitHub Actions workflow can guarantee that. It **does** mean a cancelled run's live log (`gh run view --log`) now shows exactly which stage was reached and when, even when zero artifacts are produced, closing the "almost no forensic trail" gap attempt 12 exposed. It changes **no Phase 3B pass/fail logic**, does **not** weaken the resource watchdog (`frontend/e2e/helpers/phase3b-resource-watchdog.ts` is unchanged), touches **no backend/API/auth/DB/env code**, and **does not authorize or dispatch attempt 13** — every attempt still requires its own separate, explicit founder authorization exactly as before.
+
+Verified statically only (`tsc`, `npm run test:gate-e-isolated-runner-guard`, `npm run test:gate-e-isolated-runner-cancel-safety`, `npm run test:phase3b-resource-watchdog`, `npm run build`) — this task did not dispatch the workflow.
+
+---
+
 ## 6. Attempt 11+ — Isolated Runner Only
 
 **Attempt 11 remains BLOCKED** per [attempt 10's §5 hard precondition](./gate-e-phase3b-attempt10-result-2026-07-03.md#5-attempt-11--hard-precondition) — the macOS process-detection hardening being merged does not by itself authorize attempt 11, and neither does this isolated-runner workflow. Both are now true:
