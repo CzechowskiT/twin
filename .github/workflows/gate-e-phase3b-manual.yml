@@ -152,6 +152,7 @@ jobs:
           npm run test:gate-e-isolated-runner-guard
           npm run test:gate-e-phase3b-split-batch
           npm run test:gate-e-phase3b-route-sharding
+          npm run test:gate-e-artifact-upload-guard
           npm run test:phase3b-local-execution-blocked
 
       - name: Verify workers=1 / retries=0 are code-enforced (not overridable by this workflow)
@@ -351,6 +352,7 @@ jobs:
             frontend/.diagnostics/gate-e-attempt-status.json
             frontend/playwright-report/**
             frontend/test-results/**
+          include-hidden-files: true
           if-no-files-found: warn
           retention-days: 30
 
@@ -532,6 +534,7 @@ jobs:
           path: |
             route-evidence/**
             gate-e-phase3b-route-aggregate.json
+          include-hidden-files: true
           if-no-files-found: warn
           retention-days: 30
 
