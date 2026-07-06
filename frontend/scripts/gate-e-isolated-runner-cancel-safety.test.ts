@@ -200,12 +200,12 @@ test("16 workflow final cleanup step logs a heartbeat and persists workflow-clea
   assert.match(block, /GATE_E_STAGE=workflow-cleanup/);
 });
 
-test("17 workflow — job timeout unchanged (45-60 min) AND canonical command step has its own explicit, tighter timeout-minutes", () => {
+test("17 workflow — job timeout bounded (10-30 min, route-level sharding since 2026-07-06) AND canonical command step has its own explicit, tighter timeout-minutes", () => {
   const workflow = readRepo(WORKFLOW);
   const jobTimeoutMatch = workflow.match(/timeout-minutes:\s*(\d+)/);
   assert.ok(jobTimeoutMatch, "expected a job-level timeout-minutes");
   const jobTimeout = Number.parseInt(jobTimeoutMatch![1]!, 10);
-  assert.ok(jobTimeout >= 45 && jobTimeout <= 60, `expected job timeout 45-60min, got ${jobTimeout}`);
+  assert.ok(jobTimeout >= 10 && jobTimeout <= 30, `expected job timeout 10-30min (route-level sharding), got ${jobTimeout}`);
 
   const canonicalIdx = workflow.indexOf("Gate E Phase 3B prod — controlled multitab (canonical command)");
   const nextStepIdx = workflow.indexOf("- name:", canonicalIdx + 1);

@@ -89,6 +89,69 @@ export function selectPhase3bRouteBatches(
   return [match];
 }
 
+/**
+ * Gate E Phase 3B route-level sharding (2026-07-06) — see
+ * docs/GATE_E_PHASE3B_ROUTE_SHARDING_PLAN_2026-07-03.md. Attempt 14
+ * (2026-07-06, run 28771385932) showed all 3 batch-level isolated-runner
+ * jobs (6-7 routes each) killed by `RUNNER_SHUTDOWN_SIGNAL`/exit 143 — a
+ * third, distinct GitHub Actions infrastructure non-completion signature —
+ * with 0/20 routes confirmed, and no correlation between batch size/
+ * duration and the failure. This section shards the same 20-route
+ * inventory one level finer than `PHASE3B_ROUTE_BATCHES`: exactly one route
+ * per isolated-runner matrix job, so a single runner-level termination can
+ * cost at most one route's evidence instead of an entire 6-7-route batch's.
+ * Purely additive — `PHASE3B_ROUTE_BATCHES`/`selectPhase3bRouteBatches`
+ * above are unchanged and still used whenever `PHASE3B_ROUTE` is unset.
+ */
+export function slugifyPhase3bRoute(route: string): string {
+  if (route === "/") return "root";
+  return route.replace(/^\//, "").replace(/\//g, "-");
+}
+
+export type Phase3bRouteEntry = { route: (typeof PHASE3B_ALL_ROUTES)[number]; slug: string };
+
+/** One entry per route in `PHASE3B_ALL_ROUTES`, same order, each paired with its artifact-safe slug. */
+export const PHASE3B_ROUTE_ENTRIES: readonly Phase3bRouteEntry[] = PHASE3B_ALL_ROUTES.map((route) => ({
+  route,
+  slug: slugifyPhase3bRoute(route),
+}));
+
+export const PHASE3B_ROUTE_SLUGS: readonly string[] = PHASE3B_ROUTE_ENTRIES.map((entry) => entry.slug);
+
+export function isPhase3bRoute(value: string): value is (typeof PHASE3B_ALL_ROUTES)[number] {
+  return (PHASE3B_ALL_ROUTES as readonly string[]).includes(value);
+}
+
+/**
+ * Filters to a single route when `PHASE3B_ROUTE` is set to one of
+ * `PHASE3B_ALL_ROUTES` (as each route-sharded isolated-runner matrix job now
+ * is) — analogous to `selectPhase3bRouteBatches`/`PHASE3B_BATCH`, one level
+ * finer. Returns `null`, unfiltered, when `PHASE3B_ROUTE` is unset (batch
+ * mode or legacy full-run mode — the caller falls back to
+ * `selectPhase3bRouteBatches` in that case). Throws on an unknown value so a
+ * typo in CI fails loudly before Playwright ever launches, instead of
+ * silently running the wrong route (or all of them). `PHASE3B_ROUTE` and
+ * `PHASE3B_BATCH` are mutually exclusive — throws if both are set, so a
+ * misconfigured matrix job can never silently pick one shape over the other.
+ */
+export function selectPhase3bRoute(
+  env: NodeJS.ProcessEnv = process.env,
+): (typeof PHASE3B_ALL_ROUTES)[number] | null {
+  const raw = env.PHASE3B_ROUTE?.trim();
+  if (!raw) return null;
+  if (env.PHASE3B_BATCH?.trim()) {
+    throw new Error(
+      `PHASE3B_ROUTE ("${raw}") and PHASE3B_BATCH ("${env.PHASE3B_BATCH.trim()}") are mutually exclusive — set only one`,
+    );
+  }
+  if (!isPhase3bRoute(raw)) {
+    throw new Error(
+      `Unknown PHASE3B_ROUTE "${raw}" — expected one of the ${PHASE3B_ALL_ROUTES.length} routes in PHASE3B_ALL_ROUTES (or unset for batch/full-run mode)`,
+    );
+  }
+  return raw;
+}
+
 export const PHASE3B_HEAP_FAIL_MB = 180;
 export const PHASE3B_HEAP_WARN_MB = 120;
 export const PHASE3B_DOM_FAIL = 15000;

@@ -118,12 +118,12 @@ test("8 workflow runs public-health 10x poll and 10-route HTTP smoke, read-only"
   }
 });
 
-test("9 job timeout is bounded between 45 and 60 minutes", () => {
+test("9 job timeout is bounded between 10 and 30 minutes (route-level sharding, 2026-07-06 — see test 33+)", () => {
   const workflow = readRepo(WORKFLOW);
   const match = workflow.match(/timeout-minutes:\s*(\d+)/);
   assert.ok(match, "expected a job-level timeout-minutes");
   const minutes = Number.parseInt(match![1]!, 10);
-  assert.ok(minutes >= 45 && minutes <= 60, `expected timeout between 45-60 minutes, got ${minutes}`);
+  assert.ok(minutes >= 10 && minutes <= 30, `expected timeout between 10-30 minutes, got ${minutes}`);
 });
 
 test("10 artifacts uploaded — .diagnostics, playwright report, test-results", () => {
@@ -291,9 +291,10 @@ test("27 evidence index and isolated runner plan record run 28650677999's false-
 // to prove the pre-split invariants (single-job assumptions this file
 // originally encoded) still hold true per matrix batch job.
 
-test("28 gate-e-phase3b-prod is now a 3-way sequential matrix (public-candidate, recruiter, company), never more than 1 batch in flight", () => {
+test("28 [SUPERSEDED 2026-07-06, see test 33+] gate-e-phase3b-prod is no longer a batch matrix — it is now a 20-route matrix (route-level sharding)", () => {
   const workflow = readRepo(WORKFLOW);
-  assert.match(workflow, /matrix:\s*\n\s*batch:\s*\[public-candidate,\s*recruiter,\s*company\]/);
+  assert.doesNotMatch(workflow, /matrix:\s*\n\s*batch:\s*\[public-candidate,\s*recruiter,\s*company\]/);
+  assert.match(workflow, /matrix:\s*\n\s*include:/);
   assert.match(workflow, /max-parallel:\s*1/);
   assert.match(workflow, /fail-fast:\s*false/);
 });
@@ -307,7 +308,7 @@ test("29 every pre-split invariant (timeout bound, artifact upload, cleanup, non
   const match = prodJobBlock.match(/timeout-minutes:\s*(\d+)/);
   assert.ok(match, "expected a job-level timeout-minutes inside the matrix job");
   const minutes = Number.parseInt(match![1]!, 10);
-  assert.ok(minutes >= 45 && minutes <= 60, `expected timeout between 45-60 minutes, got ${minutes}`);
+  assert.ok(minutes >= 10 && minutes <= 30, `expected timeout between 10-30 minutes (route-level sharding), got ${minutes}`);
   assert.match(prodJobBlock, /upload-artifact@v4/);
   assert.match(prodJobBlock, /if:\s*always\(\)/);
   assert.match(prodJobBlock, /pkill/);
@@ -345,4 +346,76 @@ test("32 npm script test:gate-e-phase3b-split-batch is registered and wired into
   const preflightIdx = workflow.indexOf("Static preflight guards");
   const block = workflow.slice(preflightIdx, preflightIdx + 800);
   assert.match(block, /test:gate-e-phase3b-split-batch/);
+});
+
+// --- Gate E Phase 3B route-level sharding (2026-07-06) ----------------------
+// See docs/GATE_E_PHASE3B_ROUTE_SHARDING_PLAN_2026-07-03.md and the dedicated
+// frontend/scripts/gate-e-phase3b-route-sharding.test.ts for the full battery
+// of route-sharding assertions; this file only extends the minimum needed to
+// prove the batch-matrix invariants above have genuinely been replaced, not
+// just supplemented, by the 20-route matrix.
+
+test("33 gate-e-phase3b-prod matrix is a 20-entry include list, one { route, slug } pair per PHASE3B_ALL_ROUTES entry", () => {
+  const workflow = readRepo(WORKFLOW);
+  const matrixIdx = workflow.indexOf("matrix:\n        include:");
+  assert.ok(matrixIdx > -1, "expected an `include:` matrix");
+  const entries = workflow.slice(matrixIdx).match(/- \{ route: "[^"]+", slug: [\w-]+ \}/g) ?? [];
+  assert.equal(entries.length, 20, `expected exactly 20 matrix entries, found ${entries.length}`);
+});
+
+test("34 job env sets PHASE3B_ROUTE from matrix.route (not PHASE3B_BATCH from matrix.batch)", () => {
+  const workflow = readRepo(WORKFLOW);
+  assert.match(workflow, /PHASE3B_ROUTE:\s*\$\{\{\s*matrix\.route\s*\}\}/);
+  assert.doesNotMatch(workflow, /PHASE3B_BATCH:\s*\$\{\{\s*matrix\.batch\s*\}\}/);
+});
+
+test("35 canonical command step calls the generic per-route npm script, keyed by env not by a matrix.batch-specific script name", () => {
+  const workflow = readRepo(WORKFLOW);
+  assert.match(workflow, /npm run test:phase3b-controlled-multitab-prod:route/);
+  assert.doesNotMatch(workflow, /npm run test:phase3b-controlled-multitab-prod:\$\{\{\s*matrix\.batch\s*\}\}/);
+});
+
+test("36 evidence artifact is named by matrix.slug, not matrix.batch", () => {
+  const workflow = readRepo(WORKFLOW);
+  assert.match(workflow, /gate-e-phase3b-evidence-\$\{\{\s*matrix\.slug\s*\}\}-\$\{\{\s*github\.run_id\s*\}\}/);
+  assert.doesNotMatch(workflow, /gate-e-phase3b-evidence-\$\{\{\s*matrix\.batch\s*\}\}/);
+});
+
+test("37 canonical command step timeout is strictly less than the job timeout, both explicit and bounded (route-level sharding)", () => {
+  const workflow = readRepo(WORKFLOW);
+  const jobTimeoutMatch = workflow.match(/timeout-minutes:\s*(\d+)/);
+  const jobTimeout = Number.parseInt(jobTimeoutMatch![1]!, 10);
+  const canonicalIdx = workflow.indexOf("Gate E Phase 3B prod — controlled multitab (canonical command)");
+  const nextStepIdx = workflow.indexOf("- name:", canonicalIdx + 1);
+  const canonicalBlock = workflow.slice(canonicalIdx, nextStepIdx);
+  const stepTimeoutMatch = canonicalBlock.match(/timeout-minutes:\s*(\d+)/);
+  assert.ok(stepTimeoutMatch, "expected an explicit timeout-minutes on the canonical command step");
+  const stepTimeout = Number.parseInt(stepTimeoutMatch![1]!, 10);
+  assert.ok(stepTimeout > 0 && stepTimeout < jobTimeout, `expected canonical step timeout (${stepTimeout}) < job timeout (${jobTimeout})`);
+});
+
+test("38 npm script test:phase3b-controlled-multitab-prod:route is a plain delegate — no baked-in route, no bypass of the local guard", () => {
+  const pkg = readFrontend("package.json");
+  assert.match(pkg, /"test:phase3b-controlled-multitab-prod:route":\s*"npm run test:phase3b-controlled-multitab-prod"/);
+});
+
+test("39 npm script test:gate-e-phase3b-route-sharding is registered and wired into the matrix job's static preflight guards", () => {
+  const pkg = readFrontend("package.json");
+  assert.match(pkg, /"test:gate-e-phase3b-route-sharding":/);
+  assert.match(pkg, /gate-e-phase3b-route-sharding\.test\.ts/);
+  const workflow = readRepo(WORKFLOW);
+  const preflightIdx = workflow.indexOf("Static preflight guards");
+  const block = workflow.slice(preflightIdx, preflightIdx + 800);
+  assert.match(block, /test:gate-e-phase3b-route-sharding/);
+});
+
+test("40 aggregation job's Python route list has exactly 20 (slug, route) tuples, matching the matrix include count", () => {
+  const workflow = readRepo(WORKFLOW);
+  const aggregateIdx = workflow.indexOf("gate-e-phase3b-aggregate:");
+  const routesIdx = workflow.indexOf("ROUTES = [", aggregateIdx);
+  assert.ok(routesIdx > -1, "expected a ROUTES = [...] python list in the aggregation job");
+  const closeIdx = workflow.indexOf("]", routesIdx);
+  const block = workflow.slice(routesIdx, closeIdx);
+  const tuples = block.match(/\("[\w-]+",\s*"[^"]*"\)/g) ?? [];
+  assert.equal(tuples.length, 20, `expected 20 (slug, route) tuples, found ${tuples.length}`);
 });

@@ -26,6 +26,7 @@ import {
 import {
   PHASE3B_DOM_FAIL, PHASE3B_DOM_WARN, PHASE3B_HEAP_FAIL_MB, PHASE3B_HEAP_WARN_MB,
   PHASE3B_IDLE_MS_MAX, PHASE3B_IDLE_MS_MIN, PHASE3B_MAX_TABS, selectPhase3bRouteBatches,
+  selectPhase3bRoute, slugifyPhase3bRoute,
   PHASE3B_SAFE_MARQUEE_MAX_NODES, PHASE3B_FULL_MARQUEE_FAIL_NODES,
 } from "./helpers/phase3b-controlled-routes";
 import {
@@ -82,15 +83,31 @@ const GATE_E_HEARTBEAT_MS = 30_000;
 // docs/GATE_E_PHASE3B_SPLIT_BATCH_EXECUTION_PLAN_2026-07-03.md): when
 // PHASE3B_BATCH is set to one of "public-candidate" | "recruiter" | "company"
 // (as each isolated-runner matrix job now is), this run's route batches are
-// filtered down to that single named batch. Every other reference in this
-// file to PHASE3B_ROUTE_BATCHES (the batch loop, `.length`,
-// batchProgress.totalBatches) stays byte-for-byte the same and simply
-// operates on the filtered result below, so a split-batch job's status
-// file/heartbeats correctly report a single-batch run instead of claiming a
-// 3-batch run it never attempts. Unset (local full-run/legacy invocation)
-// still resolves to all 3 batches, unchanged.
-const PHASE3B_ROUTE_BATCHES = selectPhase3bRouteBatches(process.env);
-const PHASE3B_BATCH_ENV = process.env.PHASE3B_BATCH?.trim() || null;
+// filtered down to that single named batch. Unset (local full-run/legacy
+// invocation) still resolves to all 3 batches, unchanged.
+//
+// Gate E Phase 3B route-level sharding (2026-07-06, see
+// docs/GATE_E_PHASE3B_ROUTE_SHARDING_PLAN_2026-07-03.md): when PHASE3B_ROUTE
+// is set to one of the 20 PHASE3B_ALL_ROUTES entries (as each route-sharded
+// isolated-runner matrix job now is, superseding the 3-way batch matrix
+// after attempt 14's RUNNER_SHUTDOWN_SIGNAL struck all 3 batches in one
+// dispatch), this run's route batches are filtered down to a single
+// one-route pseudo-batch instead — reusing the exact same shape
+// (`{ label, routes }`) so every other reference in this file to
+// PHASE3B_ROUTE_BATCHES (the batch loop, `.length`, `batchProgress.
+// totalBatches`, per-route JSON/status file naming keyed off `batch.label`)
+// stays byte-for-byte the same and simply operates on the filtered result
+// below. selectPhase3bRoute throws if PHASE3B_ROUTE and PHASE3B_BATCH are
+// both set, so a misconfigured matrix job can never silently run the wrong
+// shape.
+type Phase3bRouteBatch = { label: string; routes: readonly string[] };
+const PHASE3B_ROUTE_ENV = selectPhase3bRoute(process.env);
+const PHASE3B_ROUTE_BATCHES: readonly Phase3bRouteBatch[] = PHASE3B_ROUTE_ENV
+  ? [{ label: slugifyPhase3bRoute(PHASE3B_ROUTE_ENV), routes: [PHASE3B_ROUTE_ENV] }]
+  : selectPhase3bRouteBatches(process.env);
+const PHASE3B_BATCH_ENV = PHASE3B_ROUTE_ENV
+  ? slugifyPhase3bRoute(PHASE3B_ROUTE_ENV)
+  : process.env.PHASE3B_BATCH?.trim() || null;
 
 /**
  * Emits a `[gate-e-heartbeat]` console.log line every `GATE_E_HEARTBEAT_MS`

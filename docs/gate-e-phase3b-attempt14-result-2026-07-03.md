@@ -155,6 +155,14 @@ Consistent with the established discipline in this repository (no attempt auto-r
 
 ---
 
+## 7. Follow-Up (Addendum, 2026-07-06) — Route-Level Sharding
+
+Per §6.3 above, this document's own root-cause investigation found no consistent correlation between batch size/duration and the `RUNNER_SHUTDOWN_SIGNAL` failure (the smallest batch, `company` at 6 routes, survived ~8-10x longer than the other two before the identical signal). Since a runner-level termination can strike at any point regardless of what the harness is doing, a follow-up task shards `gate-e-phase3b-prod` one level finer than the split-batch shape exercised by this attempt: a **20-entry route matrix** (one route per isolated-runner job) instead of the 3-way batch matrix, so a single future `RUNNER_SHUTDOWN_SIGNAL` (or any other infrastructure-level ending) can cost at most 1 of 20 routes' evidence instead of an entire 6-7-route batch's. See [`GATE_E_PHASE3B_ROUTE_SHARDING_PLAN_2026-07-03.md`](./GATE_E_PHASE3B_ROUTE_SHARDING_PLAN_2026-07-03.md) for full detail.
+
+**This addendum does not change this document's own `RUNNER_SHUTDOWN_SIGNAL`/`INCONCLUSIVE` classification, does not authorize attempt 15, and was verified statically only (no dispatch).**
+
+---
+
 ## Execution Record
 
 ```
