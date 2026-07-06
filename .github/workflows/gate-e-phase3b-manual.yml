@@ -46,27 +46,56 @@ env:
 
 jobs:
   gate-e-phase3b-prod:
-    name: "Gate E Phase 3B prod (isolated runner, batch: ${{ matrix.batch }})"
+    name: "Gate E Phase 3B prod (isolated runner, route: ${{ matrix.slug }})"
     runs-on: ubuntu-latest
-    timeout-minutes: 60
-    # Gate E Phase 3B split-batch execution (2026-07-03, see
-    # docs/GATE_E_PHASE3B_SPLIT_BATCH_EXECUTION_PLAN_2026-07-03.md): one
-    # isolated-runner job per route batch instead of all 3 batches inside a
-    # single long-lived job — the shape that produced attempt 12's
-    # RUNNER_CANCELLED and attempt 13's RUNNER_LOST_COMMUNICATION results.
-    # max-parallel: 1 keeps batches strictly sequential (never more than one
+    # Gate E Phase 3B route-level sharding (2026-07-06, see
+    # docs/GATE_E_PHASE3B_ROUTE_SHARDING_PLAN_2026-07-03.md): one
+    # isolated-runner job per ROUTE (20 jobs) instead of per 6-7-route batch
+    # (3 jobs, the shape attempt 14 exercised) — attempt 14 (run
+    # 28771385932) showed all 3 batch jobs killed by RUNNER_SHUTDOWN_SIGNAL/
+    # exit 143 with 0/20 routes confirmed and no correlation between batch
+    # size/duration and the failure, so this shards one level finer: a
+    # single route's canonical-command window is far shorter than even the
+    # smallest prior batch, minimizing how much evidence any one runner
+    # termination can cost. 20 minutes is generous headroom over a
+    # single-route run (checkout + npm ci + playwright install ~1-2min,
+    # canonical command ~1-3min for one route's stagger/idle/CDP-capture
+    # window) — far below the 45-60min bound the old 6-7-route batch jobs
+    # needed.
+    timeout-minutes: 20
+    # max-parallel: 1 keeps routes strictly sequential (never more than one
     # Phase 3B prod attempt in flight at a time, matching the workers=1 /
-    # retries=0 single-attempt discipline this workflow has always enforced);
-    # fail-fast: false means a failed/cancelled/lost-communication batch does
-    # NOT cancel the remaining batches, so a single bad batch no longer
-    # discards the other batches' evidence, unlike the prior single-job shape.
+    # retries=0 single-attempt discipline this workflow has always
+    # enforced); fail-fast: false means a failed/cancelled/shutdown-signal
+    # route does NOT cancel the remaining routes, so a single bad route no
+    # longer discards the other 19 routes' evidence.
     strategy:
       fail-fast: false
       max-parallel: 1
       matrix:
-        batch: [public-candidate, recruiter, company]
+        include:
+          - { route: "/", slug: root }
+          - { route: "/demo", slug: demo }
+          - { route: "/for-companies", slug: for-companies }
+          - { route: "/dashboard", slug: dashboard }
+          - { route: "/dashboard/jobs", slug: dashboard-jobs }
+          - { route: "/dashboard/matches", slug: dashboard-matches }
+          - { route: "/profile", slug: profile }
+          - { route: "/recruiter", slug: recruiter }
+          - { route: "/recruiter/candidates/demo-candidate-001", slug: recruiter-candidates-demo-candidate-001 }
+          - { route: "/recruiter/candidates/demo-candidate-001/trust", slug: recruiter-candidates-demo-candidate-001-trust }
+          - { route: "/recruiter/candidates/demo-candidate-001/team", slug: recruiter-candidates-demo-candidate-001-team }
+          - { route: "/recruiter/candidates/demo-candidate-001/communication", slug: recruiter-candidates-demo-candidate-001-communication }
+          - { route: "/recruiter/jobs/demo-role-001/pipeline", slug: recruiter-jobs-demo-role-001-pipeline }
+          - { route: "/recruiter/integrations/ats/import-readiness", slug: recruiter-integrations-ats-import-readiness }
+          - { route: "/company/dashboard", slug: company-dashboard }
+          - { route: "/company/candidates/demo-candidate-001", slug: company-candidates-demo-candidate-001 }
+          - { route: "/company/candidates/demo-candidate-001/trust", slug: company-candidates-demo-candidate-001-trust }
+          - { route: "/company/candidates/demo-candidate-001/team", slug: company-candidates-demo-candidate-001-team }
+          - { route: "/company/candidates/demo-candidate-001/communication", slug: company-candidates-demo-candidate-001-communication }
+          - { route: "/company/roles/demo-role-001/pipeline", slug: company-roles-demo-role-001-pipeline }
     env:
-      PHASE3B_BATCH: ${{ matrix.batch }}
+      PHASE3B_ROUTE: ${{ matrix.route }}
     steps:
       - name: Validate hard-ban confirmation inputs
         run: |
@@ -122,6 +151,7 @@ jobs:
           npm run test:phase3b-controlled-multitab
           npm run test:gate-e-isolated-runner-guard
           npm run test:gate-e-phase3b-split-batch
+          npm run test:gate-e-phase3b-route-sharding
           npm run test:phase3b-local-execution-blocked
 
       - name: Verify workers=1 / retries=0 are code-enforced (not overridable by this workflow)
@@ -260,15 +290,16 @@ jobs:
 
       - name: Gate E Phase 3B prod — controlled multitab (canonical command)
         working-directory: frontend
-        # Explicit step-level timeout (2026-07-03 hardening), independent of
-        # the 60-minute job timeout: bounds this specific long-running step
-        # so a genuine harness hang produces an unambiguous `timed_out`
-        # conclusion instead of being indistinguishable from an external
-        # `cancelled` one (see attempt 12 §3). Leaves headroom under the
-        # job's 60-minute budget for checkout/npm ci/Playwright install/
-        # static guards/public-health/HTTP smoke, which together take a few
-        # minutes, not tens of minutes.
-        timeout-minutes: 40
+        # Explicit step-level timeout (2026-07-03 hardening; re-scoped
+        # 2026-07-06 for route-level sharding), independent of the job
+        # timeout: bounds this specific step so a genuine harness hang
+        # produces an unambiguous `timed_out` conclusion instead of being
+        # indistinguishable from an external `cancelled`/shutdown-signal one
+        # (see attempt 12 §3, attempt 14 §3). A single route's own
+        # stagger/idle/CDP-capture window is well under 2 minutes (see
+        # PHASE3B_IDLE_MS_MIN/MAX in phase3b-controlled-routes.ts); 10
+        # minutes leaves generous headroom under the job's 20-minute budget.
+        timeout-minutes: 10
         env:
           TWIN_ACCESS_TOKEN: ${{ secrets.TWIN_ACCESS_TOKEN }}
           PHASE3B_RESOURCE_WATCHDOG: "1"
@@ -286,7 +317,7 @@ jobs:
           ( while true; do sleep 30; echo "[gate-e-heartbeat] canonical command still running at $(date -u +%FT%TZ)"; done ) &
           HEARTBEAT_PID=$!
           set +e
-          npm run test:phase3b-controlled-multitab-prod:${{ matrix.batch }}
+          npm run test:phase3b-controlled-multitab-prod:route
           CANONICAL_EXIT_CODE=$?
           set -e
           kill "$HEARTBEAT_PID" 2>/dev/null || true
@@ -314,7 +345,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: gate-e-phase3b-evidence-${{ matrix.batch }}-${{ github.run_id }}
+          name: gate-e-phase3b-evidence-${{ matrix.slug }}-${{ github.run_id }}
           path: |
             frontend/.diagnostics/**
             frontend/.diagnostics/gate-e-attempt-status.json
@@ -337,44 +368,69 @@ jobs:
             echo "- Result interpretation and any founder/launch stance update happens in a separate, human-reviewed docs change — never automatically from this workflow."
           } >> "$GITHUB_STEP_SUMMARY"
 
-  # Gate E Phase 3B split-batch execution (2026-07-03, see
-  # docs/GATE_E_PHASE3B_SPLIT_BATCH_EXECUTION_PLAN_2026-07-03.md): runs after
-  # all 3 `gate-e-phase3b-prod` matrix batches reach a conclusion (pass,
-  # fail, cancelled, or lost-communication — `if: always()` + `needs:` on the
-  # matrix job id waits for every instance), and merges whatever per-batch
-  # evidence each of them managed to produce into one combined summary. This
-  # job draws no new pass/fail verdict of its own — it only aggregates
-  # already-produced batch evidence for human review, exactly like every
-  # other step in this workflow. If a batch job never uploaded an artifact
-  # (e.g. a hard external cancellation before its own upload step could run),
-  # aggregation simply records that batch as MISSING instead of failing the
-  # whole aggregation.
+  # Gate E Phase 3B route-level sharding (2026-07-06, see
+  # docs/GATE_E_PHASE3B_ROUTE_SHARDING_PLAN_2026-07-03.md): runs after all 20
+  # `gate-e-phase3b-prod` matrix route jobs reach a conclusion (pass, fail,
+  # cancelled, or shutdown-signal — `if: always()` + `needs:` on the matrix
+  # job id waits for every instance), and merges whatever per-route evidence
+  # each of them managed to produce into one combined summary. This job
+  # draws no new pass/fail verdict of its own — it only aggregates
+  # already-produced route evidence for human review, exactly like every
+  # other step in this workflow (and exactly like the prior per-batch
+  # aggregator it supersedes). If a route job never uploaded an artifact
+  # (e.g. a hard external cancellation before its own upload step could
+  # run), aggregation simply records that route as MISSING instead of
+  # failing the whole aggregation.
   gate-e-phase3b-aggregate:
-    name: Gate E Phase 3B prod — aggregate batch evidence
+    name: Gate E Phase 3B prod — aggregate route evidence
     needs: gate-e-phase3b-prod
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Download all batch evidence artifacts
+      - name: Download all route evidence artifacts
         uses: actions/download-artifact@v4
         with:
           pattern: gate-e-phase3b-evidence-*-${{ github.run_id }}
-          path: batch-evidence
+          path: route-evidence
           merge-multiple: false
         continue-on-error: true
 
-      - name: Merge per-batch diagnostics into one aggregate summary (best-effort, never fails the job)
+      - name: Merge per-route diagnostics into one aggregate summary (best-effort, never fails the job)
         run: |
           set +e
           python3 - <<'PYEOF'
           import json
-          import glob
           import os
 
-          BATCHES = ["public-candidate", "recruiter", "company"]
-          root = "batch-evidence"
-          summary = {"phase": "3B-controlled-multitab-aggregate", "batches": {}}
+          # Keep in sync with the matrix `include:` list above and with
+          # PHASE3B_ROUTE_ENTRIES in
+          # frontend/e2e/helpers/phase3b-controlled-routes.ts — proven by
+          # frontend/scripts/gate-e-phase3b-route-sharding.test.ts.
+          ROUTES = [
+              ("root", "/"),
+              ("demo", "/demo"),
+              ("for-companies", "/for-companies"),
+              ("dashboard", "/dashboard"),
+              ("dashboard-jobs", "/dashboard/jobs"),
+              ("dashboard-matches", "/dashboard/matches"),
+              ("profile", "/profile"),
+              ("recruiter", "/recruiter"),
+              ("recruiter-candidates-demo-candidate-001", "/recruiter/candidates/demo-candidate-001"),
+              ("recruiter-candidates-demo-candidate-001-trust", "/recruiter/candidates/demo-candidate-001/trust"),
+              ("recruiter-candidates-demo-candidate-001-team", "/recruiter/candidates/demo-candidate-001/team"),
+              ("recruiter-candidates-demo-candidate-001-communication", "/recruiter/candidates/demo-candidate-001/communication"),
+              ("recruiter-jobs-demo-role-001-pipeline", "/recruiter/jobs/demo-role-001/pipeline"),
+              ("recruiter-integrations-ats-import-readiness", "/recruiter/integrations/ats/import-readiness"),
+              ("company-dashboard", "/company/dashboard"),
+              ("company-candidates-demo-candidate-001", "/company/candidates/demo-candidate-001"),
+              ("company-candidates-demo-candidate-001-trust", "/company/candidates/demo-candidate-001/trust"),
+              ("company-candidates-demo-candidate-001-team", "/company/candidates/demo-candidate-001/team"),
+              ("company-candidates-demo-candidate-001-communication", "/company/candidates/demo-candidate-001/communication"),
+              ("company-roles-demo-role-001-pipeline", "/company/roles/demo-role-001/pipeline"),
+          ]
+          root = "route-evidence"
+          summary = {"phase": "3B-controlled-multitab-route-aggregate", "routes": {}}
 
           # os.walk (not glob) on purpose: the evidence tree contains a
           # hidden `.diagnostics` directory, and Python's glob("**") does
@@ -384,23 +440,24 @@ jobs:
               for filename in filenames:
                   all_files.append(os.path.join(dirpath, filename))
 
-          for batch in BATCHES:
+          for slug, route in ROUTES:
               entry = {
-                  "batch": batch,
+                  "slug": slug,
+                  "route": route,
                   "attemptStatus": None,
-                  "routeCounts": None,
+                  "routeStatus": None,
                   "artifactFound": False,
               }
               status_matches = [
                   p for p in all_files
-                  if os.path.basename(p) == f"gate-e-attempt-status-{batch}.json"
+                  if os.path.basename(p) == f"gate-e-attempt-status-{slug}.json"
               ] or [
                   p for p in all_files
-                  if os.path.basename(p) == "gate-e-attempt-status.json" and f"-{batch}-" in p
+                  if os.path.basename(p) == "gate-e-attempt-status.json" and f"-{slug}-" in p
               ]
               route_matches = [
                   p for p in all_files
-                  if os.path.basename(p) == f"phase3b-controlled-multitab-{batch}.json"
+                  if os.path.basename(p) == f"phase3b-controlled-multitab-{slug}.json"
               ]
               if status_matches:
                   entry["artifactFound"] = True
@@ -419,51 +476,41 @@ jobs:
                   try:
                       with open(route_matches[0], "r", encoding="utf-8") as fh:
                           route_json = json.load(fh)
-                      counts = {"total": 0, "pass": 0, "partial": 0, "warn": 0, "fail": 0}
-                      for route in route_json.get("routes", []):
-                          counts["total"] += 1
-                          status_key = str(route.get("status", "")).lower()
-                          if status_key in counts:
-                              counts[status_key] += 1
-                      entry["routeCounts"] = counts
+                      route_reports = route_json.get("routes", [])
+                      entry["routeStatus"] = route_reports[0].get("status") if route_reports else "MISSING"
                   except Exception as exc:  # noqa: BLE001 - best-effort aggregation only
-                      entry["routeCounts"] = {"error": str(exc)}
-              summary["batches"][batch] = entry
+                      entry["routeStatus"] = f"error:{exc}"
+              summary["routes"][slug] = entry
 
-          totals = {"total": 0, "pass": 0, "partial": 0, "warn": 0, "fail": 0}
-          for entry in summary["batches"].values():
-              counts = entry.get("routeCounts") or {}
-              for key in totals:
-                  totals[key] += counts.get(key, 0) if isinstance(counts.get(key), int) else 0
+          totals = {"total": 0, "pass": 0, "partial": 0, "warn": 0, "fail": 0, "missing": 0}
+          for entry in summary["routes"].values():
+              totals["total"] += 1
+              status = str(entry.get("routeStatus") or "MISSING").lower()
+              key = status if status in ("pass", "partial", "warn", "fail") else "missing"
+              totals[key] += 1
           summary["totals"] = totals
 
-          with open("gate-e-phase3b-aggregate.json", "w", encoding="utf-8") as fh:
+          with open("gate-e-phase3b-route-aggregate.json", "w", encoding="utf-8") as fh:
               json.dump(summary, fh, indent=2)
 
           lines = [
-              "## Gate E Phase 3B — split-batch aggregate summary",
+              "## Gate E Phase 3B — route-level sharding aggregate summary (20 routes)",
               "",
-              "This aggregation merges evidence already produced by the 3 batch jobs above. It draws no new pass/fail verdict of its own.",
+              "This aggregation merges evidence already produced by the 20 route jobs above. It draws no new pass/fail verdict of its own.",
               "",
-              "| Batch | Artifact found | Stage reached | Routes (pass/partial/warn/fail/total) |",
+              "| Route | Artifact found | Stage reached | Status |",
               "|---|---|---|---|",
           ]
-          for batch in BATCHES:
-              entry = summary["batches"][batch]
+          for slug, route in ROUTES:
+              entry = summary["routes"][slug]
               found = "yes" if entry["artifactFound"] else "MISSING"
               stage = (entry.get("attemptStatus") or {}).get("stage", "n/a")
-              counts = entry.get("routeCounts") or {}
-              route_cell = (
-                  f"{counts.get('pass', 0)}/{counts.get('partial', 0)}/{counts.get('warn', 0)}/"
-                  f"{counts.get('fail', 0)}/{counts.get('total', 0)}"
-                  if counts and "error" not in counts
-                  else "n/a"
-              )
-              lines.append(f"| {batch} | {found} | {stage} | {route_cell} |")
+              status = entry.get("routeStatus") or "MISSING"
+              lines.append(f"| {route} | {found} | {stage} | {status} |")
           lines.append("")
           lines.append(
               f"**Aggregate totals — pass={totals['pass']} partial={totals['partial']} "
-              f"warn={totals['warn']} fail={totals['fail']} total={totals['total']}**"
+              f"warn={totals['warn']} fail={totals['fail']} missing={totals['missing']} total={totals['total']}**"
           )
           lines.append("")
           lines.append("This aggregation does **not** constitute a Phase 3B PASS, Launch GO, Gate D, or Gate F YES.")
@@ -483,8 +530,8 @@ jobs:
         with:
           name: gate-e-phase3b-evidence-aggregate-${{ github.run_id }}
           path: |
-            batch-evidence/**
-            gate-e-phase3b-aggregate.json
+            route-evidence/**
+            gate-e-phase3b-route-aggregate.json
           if-no-files-found: warn
           retention-days: 30
 
@@ -492,12 +539,12 @@ jobs:
         if: always()
         run: |
           {
-            echo "## Gate E Phase 3B — split-batch aggregation — explicit non-claims"
+            echo "## Gate E Phase 3B — route-sharding aggregation — explicit non-claims"
             echo ""
             echo "- This aggregation job does **not** constitute Launch GO."
             echo "- This aggregation job does **not** close P0 (remains OPEN)."
             echo "- This aggregation job does **not** execute or approve Gate D."
             echo "- This aggregation job does **not** set Gate F (remains PENDING)."
             echo "- No production deploy was performed by this workflow."
-            echo "- It only merges evidence already produced by the 3 batch jobs above; it draws no new pass/fail conclusion of its own."
+            echo "- It only merges evidence already produced by the 20 route jobs above; it draws no new pass/fail conclusion of its own."
           } >> "$GITHUB_STEP_SUMMARY"

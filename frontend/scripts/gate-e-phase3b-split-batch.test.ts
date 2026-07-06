@@ -158,11 +158,12 @@ test("11 writeGateEAttemptStatus records the batch field and round-trips a real 
   }
 });
 
-test("12 spec file resolves route batches via selectPhase3bRouteBatches, not the raw PHASE3B_ROUTE_BATCHES import", () => {
+test("12 spec file resolves route batches via selectPhase3bRouteBatches (batch mode) with a route-mode override via selectPhase3bRoute (2026-07-06), not the raw PHASE3B_ROUTE_BATCHES import", () => {
   const spec = readFrontend("e2e/phase3b-controlled-multitab.spec.ts");
   assert.match(spec, /selectPhase3bRouteBatches/);
-  assert.match(spec, /const PHASE3B_ROUTE_BATCHES = selectPhase3bRouteBatches\(process\.env\)/);
-  assert.match(spec, /const PHASE3B_BATCH_ENV = process\.env\.PHASE3B_BATCH/);
+  assert.match(spec, /selectPhase3bRoute\(process\.env\)/);
+  assert.match(spec, /:\s*selectPhase3bRouteBatches\(process\.env\)/);
+  assert.match(spec, /PHASE3B_BATCH_ENV\s*=\s*PHASE3B_ROUTE_ENV/);
   assert.match(spec, /batch:\s*PHASE3B_BATCH_ENV/);
 });
 
@@ -172,21 +173,37 @@ test("13 gate-e-attempt-status-write.ts CLI wrapper threads PHASE3B_BATCH throug
   assert.match(writer, /batch:\s*process\.env\.PHASE3B_BATCH/);
 });
 
-test("14 workflow gate-e-phase3b-prod job is a matrix over the 3 route batches, strictly sequential", () => {
+// --- Superseded 2026-07-06: gate-e-phase3b-prod is no longer a batch matrix ---
+// Attempt 14 (run 28771385932, 2026-07-06) showed all 3 batch-level matrix
+// jobs from this section killed by RUNNER_SHUTDOWN_SIGNAL with 0/20 routes
+// confirmed. The live workflow now shards by ROUTE (20 jobs), not by BATCH
+// (3 jobs) — see docs/GATE_E_PHASE3B_ROUTE_SHARDING_PLAN_2026-07-03.md and
+// frontend/scripts/gate-e-phase3b-route-sharding.test.ts for the current
+// workflow-shape assertions. The PHASE3B_BATCH selection function, its
+// batch-scoped npm scripts (tests 1-13 above), and the underlying
+// PHASE3B_ROUTE_BATCHES data are all still present and still work — this
+// section only proves the *live workflow* has actually moved off the
+// batch-matrix shape, not merely gained a route-matrix alongside it.
+
+test("14 workflow gate-e-phase3b-prod job is NO LONGER a matrix over the 3 route batches — superseded by 20-route sharding", () => {
   const workflow = readRepo(WORKFLOW);
-  assert.match(workflow, /strategy:\s*\n\s*fail-fast:\s*false\s*\n\s*max-parallel:\s*1\s*\n\s*matrix:\s*\n\s*batch:\s*\[public-candidate,\s*recruiter,\s*company\]/);
-  assert.match(workflow, /PHASE3B_BATCH:\s*\$\{\{\s*matrix\.batch\s*\}\}/);
+  assert.doesNotMatch(workflow, /matrix:\s*\n\s*batch:\s*\[public-candidate,\s*recruiter,\s*company\]/);
+  assert.doesNotMatch(workflow, /PHASE3B_BATCH:\s*\$\{\{\s*matrix\.batch\s*\}\}/);
+  assert.match(workflow, /matrix:\s*\n\s*include:/);
+  assert.match(workflow, /strategy:\s*\n\s*fail-fast:\s*false\s*\n\s*max-parallel:\s*1/);
 });
 
-test("15 workflow canonical command step calls the batch-specific npm script keyed by matrix.batch", () => {
+test("15 workflow canonical command step no longer calls a matrix.batch-keyed npm script — it calls the generic per-route script instead", () => {
   const workflow = readRepo(WORKFLOW);
-  assert.match(workflow, /npm run test:phase3b-controlled-multitab-prod:\$\{\{\s*matrix\.batch\s*\}\}/);
+  assert.doesNotMatch(workflow, /npm run test:phase3b-controlled-multitab-prod:\$\{\{\s*matrix\.batch\s*\}\}/);
+  assert.match(workflow, /npm run test:phase3b-controlled-multitab-prod:route/);
 });
 
-test("16 workflow uploads a distinct, batch-named evidence artifact per matrix job with if: always()", () => {
+test("16 workflow no longer uploads a matrix.batch-named artifact — it uploads a matrix.slug-named artifact instead, still if: always()", () => {
   const workflow = readRepo(WORKFLOW);
-  const uploadIdx = workflow.indexOf("gate-e-phase3b-evidence-${{ matrix.batch }}-${{ github.run_id }}");
-  assert.ok(uploadIdx > -1, "expected a batch-scoped artifact name");
+  assert.doesNotMatch(workflow, /gate-e-phase3b-evidence-\$\{\{\s*matrix\.batch\s*\}\}/);
+  const uploadIdx = workflow.indexOf("gate-e-phase3b-evidence-${{ matrix.slug }}-${{ github.run_id }}");
+  assert.ok(uploadIdx > -1, "expected a slug-scoped artifact name");
   const precedingBlock = workflow.slice(Math.max(0, uploadIdx - 400), uploadIdx);
   assert.match(precedingBlock, /if:\s*always\(\)/);
   assert.match(precedingBlock, /upload-artifact@v4/);
@@ -210,9 +227,9 @@ test("18 aggregation job downloads all batch artifacts by pattern and tolerates 
   assert.match(block, /continue-on-error:\s*true/);
 });
 
-test("19 aggregation merge step uses os.walk (not glob) so it can see files under the hidden .diagnostics directory", () => {
+test("19 aggregation merge step uses os.walk (not glob) so it can see files under the hidden .diagnostics directory (step renamed to per-route in route sharding, same os.walk discipline)", () => {
   const workflow = readRepo(WORKFLOW);
-  const mergeIdx = workflow.indexOf("Merge per-batch diagnostics");
+  const mergeIdx = workflow.indexOf("Merge per-route diagnostics");
   assert.ok(mergeIdx > -1, "expected a merge step");
   const block = workflow.slice(mergeIdx, mergeIdx + 4000);
   assert.match(block, /os\.walk\(root\)/);

@@ -6,7 +6,7 @@
 **This document does not authorize attempt 12 or any future attempt.** Each attempt still requires its own separate, explicit founder authorization, exactly as attempts 7–11 did — and now can only run via the isolated GitHub Actions workflow.
 **Launch stance:** **NO-GO** · **P0:** **OPEN** · **Gate F:** **PENDING**
 
-**Related:** [split-batch execution plan](./GATE_E_PHASE3B_SPLIT_BATCH_EXECUTION_PLAN_2026-07-03.md) · [attempt 12 result](./gate-e-phase3b-attempt12-result-2026-07-03.md) · [attempt 13 result](./gate-e-phase3b-attempt13-result-2026-07-03.md) · [attempt 11 result](./gate-e-phase3b-attempt11-result-2026-07-03.md) · [attempt 10 result](./gate-e-phase3b-attempt10-result-2026-07-03.md) · [local execution disabled](./PHASE3B_LOCAL_EXECUTION_DISABLED_2026-07-03.md) · [macOS process detection](./PHASE3B_MACOS_PROCESS_DETECTION_2026-07-03.md) · [resource watchdog](./PHASE3B_RESOURCE_WATCHDOG_2026-07-03.md) · [attempt 7 execution guarantee](./GATE_E_ATTEMPT7_EXECUTION_GUARANTEE_2026-06-29.md) · [evidence index](./LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md)
+**Related:** [route-sharding plan](./GATE_E_PHASE3B_ROUTE_SHARDING_PLAN_2026-07-03.md) · [split-batch execution plan](./GATE_E_PHASE3B_SPLIT_BATCH_EXECUTION_PLAN_2026-07-03.md) · [attempt 14 result](./gate-e-phase3b-attempt14-result-2026-07-03.md) · [attempt 12 result](./gate-e-phase3b-attempt12-result-2026-07-03.md) · [attempt 13 result](./gate-e-phase3b-attempt13-result-2026-07-03.md) · [attempt 11 result](./gate-e-phase3b-attempt11-result-2026-07-03.md) · [attempt 10 result](./gate-e-phase3b-attempt10-result-2026-07-03.md) · [local execution disabled](./PHASE3B_LOCAL_EXECUTION_DISABLED_2026-07-03.md) · [macOS process detection](./PHASE3B_MACOS_PROCESS_DETECTION_2026-07-03.md) · [resource watchdog](./PHASE3B_RESOURCE_WATCHDOG_2026-07-03.md) · [attempt 7 execution guarantee](./GATE_E_ATTEMPT7_EXECUTION_GUARANTEE_2026-06-29.md) · [evidence index](./LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md)
 
 ---
 
@@ -160,6 +160,18 @@ This task splits `gate-e-phase3b-prod` into a `matrix: batch: [public-candidate,
 **Full detail, rationale, job-flow diagram, and result-interpretation addendum:** see [`GATE_E_PHASE3B_SPLIT_BATCH_EXECUTION_PLAN_2026-07-03.md`](./GATE_E_PHASE3B_SPLIT_BATCH_EXECUTION_PLAN_2026-07-03.md).
 
 Verified statically only (`tsc`, `npm run test:gate-e-isolated-runner-guard` (extended), `npm run test:gate-e-phase3b-split-batch` (new), `npm run test:phase3b-controlled-multitab`, `npm run test:phase3b-local-execution-blocked`, `npm run build`) — this task did not dispatch the workflow and does not authorize attempt 14.
+
+---
+
+## 5d. Route-Level Sharding (this task, 2026-07-06) — Sharding One Level Finer Than Batches
+
+Attempt 14 (run `28771385932`) was the first live dispatch of the §5c split-batch shape — all 3 batch matrix jobs passed every precondition and the canonical command's own "prod preflight" sub-test, then **all 3** were independently killed by a GitHub-provided `RUNNER_SHUTDOWN_SIGNAL` (exit 143) with **0/20 routes confirmed**, and no correlation between batch size/duration and the failure (the smallest batch survived ~8-10x longer than the other two before the identical signal). This showed that splitting into 3 batches was not fine-grained enough: a runner-level termination that can strike at any point still cost an entire 6-7-route batch's worth of evidence each time.
+
+This task shards one level finer: `gate-e-phase3b-prod` becomes a **20-entry route matrix** (`matrix: include: [{route, slug}, ...]`, `fail-fast: false`, `max-parallel: 1` — strictly sequential, one route per job), so a single runner-level termination can now cost at most 1 of 20 routes' evidence instead of 6-7. The `gate-e-phase3b-aggregate` job (`needs: gate-e-phase3b-prod`, `if: always()`) is rewritten to merge per-route (not per-batch) evidence into a 20-row summary table, with the same "draws no new pass/fail verdict, missing routes reported as MISSING" discipline as the batch aggregator it supersedes.
+
+**Full detail, rationale, job-flow diagram, and result-interpretation addendum:** see [`GATE_E_PHASE3B_ROUTE_SHARDING_PLAN_2026-07-03.md`](./GATE_E_PHASE3B_ROUTE_SHARDING_PLAN_2026-07-03.md).
+
+Verified statically only (`tsc`, `npm run test:gate-e-isolated-runner-guard` (extended), `npm run test:gate-e-phase3b-route-sharding` (new), `npm run test:gate-e-phase3b-split-batch` (superseded workflow-shape assertions updated), `npm run test:phase3b-controlled-multitab`, `npm run test:phase3b-local-execution-blocked`, `npm run build`) — this task did not dispatch the workflow and does not authorize attempt 15.
 
 ---
 
