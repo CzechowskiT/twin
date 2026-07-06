@@ -4,9 +4,8 @@ import { useEffect, useState } from "react";
 
 /** Tracks `document.visibilityState` — hidden tabs should pause timers and animations. */
 export function usePageVisibility(): { hidden: boolean; visible: boolean } {
-  const [hidden, setHidden] = useState(() =>
-    typeof document !== "undefined" ? document.hidden : false,
-  );
+  // Match server first paint (always visible) — sync real visibility after mount (React #418).
+  const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
     const onChange = () => setHidden(document.hidden);

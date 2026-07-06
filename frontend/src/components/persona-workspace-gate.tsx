@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { useMarketingPersona } from "@/components/persona-provider";
@@ -11,6 +11,7 @@ import {
   PersonaWorkspaceGateCard,
   PersonaWorkspaceGateShell,
 } from "@/components/persona-workspace-gate-shell";
+import { WorkspaceRouteSkeleton } from "@/components/workspace-route-skeleton";
 import { clearToken, hasActiveSession } from "@/lib/auth";
 import type { TranslationKey } from "@/lib/i18n";
 import { buildAuthRedirectNext, lockAuthRedirectDestination, loginPathWithNext } from "@/lib/login-redirect";
@@ -70,7 +71,7 @@ export function PersonaWorkspaceGate({
   const copy = SURFACE_COPY[surface];
   const loginZone = allowed[0] ?? "candidate";
   const loginPath = LOGIN_PATH[loginZone];
-  const hasSession = hasActiveSession();
+  const [hasSession, setHasSession] = useState<boolean | null>(null);
   const effectivePersona = resolveEffectiveSessionPersona(pathname, persona);
   const authDestinationRef = useRef<string | null>(null);
   const personaRedirectedRef = useRef(false);
@@ -85,6 +86,10 @@ export function PersonaWorkspaceGate({
   }, [loginPath, pathname]);
 
   useEffect(() => {
+    queueMicrotask(() => setHasSession(hasActiveSession()));
+  }, [pathname]);
+
+  useEffect(() => {
     if (!hasSession) return;
     if (allowed.includes(effectivePersona)) return;
     if (isPathAllowedForPersona(pathname, effectivePersona)) return;
@@ -92,6 +97,10 @@ export function PersonaWorkspaceGate({
     personaRedirectedRef.current = true;
     router.replace(WORKSPACE_PATH[effectivePersona]);
   }, [allowed, effectivePersona, hasSession, pathname, router]);
+
+  if (hasSession === null) {
+    return <WorkspaceRouteSkeleton />;
+  }
 
   if (!hasSession) {
     return (
