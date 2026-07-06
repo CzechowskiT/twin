@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { useMarketingPersona } from "@/components/persona-provider";
@@ -153,7 +153,11 @@ export function PageMomentumRail({
   const pathname = usePathname() ?? "";
   const { t } = useTranslation();
   const { persona } = useMarketingPersona();
-  const hasSession = Boolean(getToken());
+  const [hasSession, setHasSession] = useState(false);
+
+  useEffect(() => {
+    queueMicrotask(() => setHasSession(Boolean(getToken())));
+  }, [pathname]);
 
   const primaryTip = useMemo(() => TIPS[tipIndex(pathname, 0)], [pathname]);
   const secondaryTip = useMemo(() => TIPS[tipIndex(pathname, 1)], [pathname]);

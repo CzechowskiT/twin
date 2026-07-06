@@ -19,9 +19,8 @@ export function LightweightRouteShell({
   skeleton?: ReactNode;
 }) {
   const { hidden } = usePageVisibility();
-  const [paintReady, setPaintReady] = useState(() =>
-    typeof document !== "undefined" ? document.hidden : false,
-  );
+  // Match server first paint — never read document.hidden before hydration (React #418).
+  const [paintReady, setPaintReady] = useState(false);
   const [forceShow, setForceShow] = useState(false);
 
   useEffect(() => {

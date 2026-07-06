@@ -76,6 +76,7 @@
     "test:gate-d-founder-decision-checkpoint": "npx --yes tsx scripts/gate-d-founder-decision-checkpoint.test.ts",
     "test:gate-d-founder-decision-prompt": "npx --yes tsx scripts/gate-d-founder-decision-prompt.test.ts",
     "test:readiness-consistency-lock": "npx --yes tsx scripts/readiness-consistency-lock.test.ts",
+    "test:recruiter-page-error-root-cause": "npx --yes tsx scripts/recruiter-page-error-root-cause.test.ts",
     "test:gate-d-pending-state-maintenance": "npx --yes tsx scripts/gate-d-pending-state-maintenance.test.ts",
     "test:gate-d-prod-browser-smoke-result": "npx --yes tsx scripts/gate-d-prod-browser-smoke-result.test.ts",
     "test:gate-e-founder-decision-package": "npx --yes tsx scripts/gate-e-founder-decision-package.test.ts",
