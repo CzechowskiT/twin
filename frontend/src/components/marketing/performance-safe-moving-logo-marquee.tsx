@@ -103,7 +103,7 @@ export function PerformanceSafeMovingLogoMarquee() {
   if (staticMarquee) {
     return (
       <div
-        className="performance-safe-logo-marquee shrink-0 border-y border-[var(--twin-border)] bg-[var(--twin-surface)]/90 py-3.5 sm:py-4"
+        className="performance-safe-logo-marquee shrink-0 border-y border-[var(--twin-border)] bg-[var(--twin-surface)]/90 py-2 sm:py-2.5"
         role="presentation"
       >
         <div className="performance-safe-logo-marquee__viewport overflow-x-auto snap-x snap-mandatory [-webkit-overflow-scrolling:touch] px-3 sm:px-5">
@@ -117,7 +117,7 @@ export function PerformanceSafeMovingLogoMarquee() {
 
   return (
     <div
-      className="performance-safe-logo-marquee shrink-0 border-y border-[var(--twin-border)] bg-[var(--twin-surface)]/90 py-3.5 sm:py-4"
+      className="performance-safe-logo-marquee shrink-0 border-y border-[var(--twin-border)] bg-[var(--twin-surface)]/90 py-2 sm:py-2.5"
       role="presentation"
     >
       <div className="performance-safe-logo-marquee__viewport overflow-x-clip px-3 sm:px-5" aria-hidden>
