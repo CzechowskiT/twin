@@ -195,3 +195,19 @@
 - `docs/PRODUCTION_CUTOVER_REPORT_2026-05-27.md`
 - `docs/API_PRODUCTION_CUTOVER_DECISION_2026-05-27.md`
 - `docs/CANDIDATE_E2E_MANUAL_SMOKE_2026-05-27.md`
+
+---
+
+## Canonical status addendum (2026-07-07)
+
+**Gate F evidence completion** — [GATE_F_EVIDENCE_COMPLETION_2026-07-07.md](./GATE_F_EVIDENCE_COMPLETION_2026-07-07.md)
+
+| Topic | Current stance |
+|-------|----------------|
+| **P0 multitab / RSS** | **RESOLVED** — [P0_CLOSURE_DECISION_2026-07-07.md](./P0_CLOSURE_DECISION_2026-07-07.md); Gate E attempt 19 **20/20** |
+| **Phase 3B** | **PASS** prod harness (not BLOCKED / not PARTIAL for launch gating) |
+| **P0 track** | **CLOSED** — not OPEN |
+| **CSP enforce (S2)** | **PASS** / **LIVE enforce** — matrix rows stating report-only / **BLOCKED BY POLICY** are **historical**; canonical S2 PASS per checklist |
+| **Public launch announcement** | **FAIL / NO-GO** — unchanged |
+| **Gate F** | **PENDING** |
+| **Launch GO** | **Not granted** |

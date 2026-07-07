@@ -72,8 +72,8 @@ test("6 re-audit result — includes PASS FAIL NEEDS_REVIEW NOT_APPLICABLE statu
 test("7 re-audit result — includes summary counts", () => {
   const result = readRepo(REAUDIT_RESULT);
   assert.match(result, /Audit summary/i);
-  assert.match(result, /\*\*PASS\*\* \| 35/);
-  assert.match(result, /\*\*NEEDS_REVIEW\*\* \| 14/);
+  assert.match(result, /\*\*PASS\*\* \| 40/);
+  assert.match(result, /\*\*NEEDS_REVIEW\*\* \| 8/);
   assert.match(result, /\*\*FAIL\*\* \| 1/);
   assert.match(result, /\*\*NOT_APPLICABLE\*\* \| 0/);
 });
