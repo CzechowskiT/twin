@@ -115,10 +115,11 @@ test("10 no will-change, backdrop-filter, backdrop-blur on safe track/cards", ()
   assert.doesNotMatch(css, /\.performance-safe-marquee-track[\s\S]{0,200}will-change/);
 });
 
-test("11 readability scale CSS targets 22–28px optical height band", () => {
+test("11 readability scale CSS targets 32–48px partner logo height band", () => {
   const css = read("src/app/globals.css");
-  assert.match(css, /\.performance-safe-logo-mark[\s\S]{0,200}height:\s*1\.4rem/);
-  assert.match(css, /\.performance-safe-logo-mark[\s\S]{0,300}width:\s*100%/);
+  assert.match(css, /\.performance-safe-logo-mark[\s\S]{0,200}height:\s*2rem/);
+  assert.match(css, /\.performance-safe-logo-mark[\s\S]{0,320}max-height:\s*3rem/);
+  assert.match(css, /\.partner-logo img[\s\S]{0,200}min-height:\s*2rem/);
   const scales = PERFORMANCE_SAFE_CURATED_LOGO_SLUGS.map(
     (slug) => PERFORMANCE_SAFE_CURATED_LOGO_VISUALS[slug].opticalScale,
   );

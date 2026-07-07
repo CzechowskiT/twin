@@ -8,6 +8,10 @@ import { useReducedMotionPreference } from "@/hooks/use-reduced-motion-preferenc
 import { SafeCompanyLogo } from "@/components/marketing/safe-company-logo";
 import type { TranslationKey } from "@/lib/i18n";
 import { brandLogoUrls, type Brand } from "@/lib/brand-logo-urls";
+import {
+  PARTNER_LOGO_MARK_BOX_CLASS,
+  PARTNER_LOGO_ROW_GAP_CLASS,
+} from "@/lib/partner-logo-styles";
 
 /** Fortune 500–heavy mix; domain keys map to verified SI slugs in `MARQUEE_BRAND_LOGO_MAP`. */
 const MARQUEE_BRAND_ENTRIES: Brand[] = [
@@ -112,8 +116,7 @@ const BRANDS: Brand[] = [...MARQUEE_BRAND_ENTRIES].sort((a, b) => {
 const MARQUEE_SEGMENTS = 2;
 
 /** Uniform slot — inner inset + `object-contain` keeps wide wordmarks (e.g. Amex) inside the plate. */
-const MARK_BOX_CLASS =
-  "box-border h-9 w-[7.25rem] sm:h-10 sm:w-[8.5rem]";
+const MARK_BOX_CLASS = PARTNER_LOGO_MARK_BOX_CLASS;
 
 /** Light plate so colorful favicons stay legible on studio (dark) and light marketing rails. */
 const MARK_PLATE_CLASS =
@@ -142,7 +145,7 @@ function BrandMark({
       tabIndex={tabIndex}
       aria-label={a11y}
       title={a11y}
-      className={plateClass}
+      className={`${plateClass} snap-center`}
     >
       <span className="relative flex h-full w-full items-center justify-center px-2.5 py-1.5 sm:px-3">
         <SafeCompanyLogo
@@ -168,7 +171,7 @@ function LogoRow({
   const linkSuffix = t(linkSuffixKey);
   return (
     <div
-      className="marketing-marquee-segment inline-flex shrink-0 items-center gap-x-4 pe-4 sm:gap-x-5 sm:pe-5"
+      className={`marketing-marquee-segment inline-flex shrink-0 items-center ${PARTNER_LOGO_ROW_GAP_CLASS}`}
       aria-hidden={ariaHidden}
     >
       {BRANDS.map((brand) => (
@@ -196,7 +199,7 @@ export function CompanyLogoMarquee() {
         className="company-logo-marquee shrink-0 border-y border-[var(--twin-border)] bg-[var(--twin-surface)]/90 py-3.5 sm:py-4"
         role="presentation"
       >
-        <div className="company-logo-marquee__viewport overflow-x-auto [-webkit-overflow-scrolling:touch] px-3 sm:px-5">
+        <div className="company-logo-marquee__viewport overflow-x-auto snap-x snap-mandatory [-webkit-overflow-scrolling:touch] px-3 sm:px-5">
           <div className="flex w-max items-center py-1">
             <LogoRow segmentIndex={0} ariaHidden={false} linkSuffixKey={linkSuffixKey} />
           </div>
