@@ -97,7 +97,7 @@ export function WaitlistPageClient() {
       <div className="wl-inner">
         <header className="wl-top-bar">
           <Link href="/" className="wl-logo">
-            TWIN<span>.</span>
+            TWIN
           </Link>
           <motion.div className="wl-top-actions">
             <LanguageSwitcher />

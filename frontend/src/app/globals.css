@@ -903,14 +903,6 @@ html[data-marketing-surface="studio"] .twin-logo {
   color: #f8fafc;
 }
 
-html[data-marketing-surface="studio"] .twin-logo-accent {
-  color: #cbd5e1;
-}
-
-.twin-logo-accent {
-  color: var(--twin-cta);
-}
-
 .twin-nav-link {
   color: var(--twin-muted-strong);
   transition: color 0.15s ease;
