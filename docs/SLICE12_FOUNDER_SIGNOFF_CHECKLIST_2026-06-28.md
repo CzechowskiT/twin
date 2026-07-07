@@ -314,3 +314,11 @@ cd frontend && \
 **Not run:** Phase 3B (Gate E), multitab stress.
 
 **Public launch: NO-GO · P0 performance: OPEN · Phase 3B: HARD BLOCKED · Gate B: YES · Gate C: YES (local) · Gate D: YES (prod PASS) · Gate E/F: PENDING**
+
+---
+
+## Canonical status addendum (2026-07-07)
+
+**P0: CLOSED** | **Gate E: PASS (attempt 19, 20/20)** | **Gate F: PENDING** | **Launch: NO-GO**
+
+P0 closed per [P0 closure decision](./P0_CLOSURE_DECISION_2026-07-07.md). Phase 3B prod **PASS 20/20** — [attempt 19](./gate-e-phase3b-attempt19-result-2026-07-06.md). Performance optimization → Performance 2.0 backlog. Historical sections above reflect pre-closure state.

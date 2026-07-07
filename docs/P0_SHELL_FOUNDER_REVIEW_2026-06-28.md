@@ -271,3 +271,11 @@ cd frontend && \
 **Not run:** Phase 3B (Gate E) route-level completion (attempts 5-6 both produced zero route-level evidence), multitab, stress. Attempt 7 **not run, not authorized**.
 
 **Public launch: NO-GO · P0 performance: OPEN · Phase 3B: FAIL (0/20 prod) · Gate C: YES (local PASS) · Gate D: YES (prod PASS) · Gate E: YES/FAIL**
+
+---
+
+## Canonical status addendum (2026-07-07)
+
+**P0: CLOSED** | **Gate E: PASS (attempt 19, 20/20)** | **Gate F: PENDING** | **Launch: NO-GO**
+
+P0 closed per [closure decision](./P0_CLOSURE_DECISION_2026-07-07.md). Phase 3B prod harness **PASS 20/20** — [attempt 19](./gate-e-phase3b-attempt19-result-2026-07-06.md). Historical sections above reflect pre-closure state.

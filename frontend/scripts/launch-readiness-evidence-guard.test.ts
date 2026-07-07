@@ -57,23 +57,24 @@ test("1 evidence index and founder checklist docs exist", () => {
   assert.match(checklist, /Founder Demo Checklist/);
 });
 
-test("2 evidence index — Launch NO-GO, P0 OPEN, Gate D YES prod PASS, Gate E YES FAIL, Phase 3B FAIL", () => {
+test("2 evidence index — Launch NO-GO, P0 CLOSED, Gate D YES prod PASS, Gate E PASS attempt 19", () => {
   const index = readRepo(EVIDENCE_INDEX);
   assert.match(index, /NO-GO/i);
-  assert.match(index, /P0.*OPEN/i);
+  assert.match(index, /P0.*CLOSED/i);
   assert.match(index, /Gate D.*YES/i);
   assert.match(index, /36\/36 PASS/i);
-  assert.match(index, /Gate E.*YES/i);
-  assert.match(index, /Phase 3B.*FAIL/i);
-  assert.match(index, /0\/20/i);
+  assert.match(index, /Gate E.*PASS|20\/20 PASS/i);
+  assert.match(index, /Phase 3B.*PASS.*20\/20|20\/20.*PASS/i);
+  assert.match(index, /28849996684/);
 });
 
-test("3 evidence index — no launch approval or P0 closed or Phase 3B passed claims", () => {
+test("3 evidence index — no launch approval or Gate F YES claims", () => {
   const index = readRepo(EVIDENCE_INDEX);
   assert.doesNotMatch(index, /Launch stance:\s*\*\*GO\*\*/i);
-  assert.doesNotMatch(index, /\| \*\*P0:\*\* \| \*\*CLOSED\*\*/);
-  assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
+  assert.doesNotMatch(index, /Gate F.*\*\*YES\*\*/i);
   assert.doesNotMatch(index, /launch approved/i);
+  assert.match(index, /Canonical status \(2026-07-07\)/i);
+  assert.match(index, /P0.*CLOSED/i);
 });
 
 test("4 founder demo checklist — all demo path routes present", () => {
@@ -123,7 +124,7 @@ test("9 evidence index references Gate D preflight and Gate D prod result", () =
   assert.match(index, /Gate D.*YES/i);
   assert.match(index, /Gate E.*YES/i);
   assert.match(index, /NO-GO/i);
-  assert.match(index, /P0.*OPEN/i);
+  assert.match(index, /P0.*CLOSED/i);
 });
 
 test("10 evidence index references Gate D result template or result process", () => {
@@ -138,8 +139,7 @@ test("11 evidence index references Gate D prod result — not Phase 3B PASS", ()
   assert.match(index, /Gate D.*YES/i);
   assert.match(index, /Gate E.*YES/i);
   assert.match(index, /NO-GO/i);
-  assert.match(index, /P0.*OPEN/i);
-  assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
+  assert.match(index, /P0.*CLOSED/i);
 });
 
 test("12 evidence index references Gate D founder decision checkpoint", () => {
@@ -148,8 +148,7 @@ test("12 evidence index references Gate D founder decision checkpoint", () => {
   assert.match(index, /Gate D.*YES/i);
   assert.match(index, /Gate E.*YES/i);
   assert.match(index, /NO-GO/i);
-  assert.match(index, /P0.*OPEN/i);
-  assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
+  assert.match(index, /P0.*CLOSED/i);
 });
 
 test("13 evidence index references readiness consistency lock guard", () => {
@@ -159,8 +158,7 @@ test("13 evidence index references readiness consistency lock guard", () => {
   assert.match(index, /Gate D.*YES/i);
   assert.match(index, /Gate E.*YES/i);
   assert.match(index, /NO-GO/i);
-  assert.match(index, /P0.*OPEN/i);
-  assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
+  assert.match(index, /P0.*CLOSED/i);
 });
 
 test("14 evidence index references gate D prod browser smoke result guard", () => {
@@ -170,8 +168,7 @@ test("14 evidence index references gate D prod browser smoke result guard", () =
   assert.match(index, /Gate D.*YES/i);
   assert.match(index, /Gate E.*YES/i);
   assert.match(index, /NO-GO/i);
-  assert.match(index, /P0.*OPEN/i);
-  assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
+  assert.match(index, /P0.*CLOSED/i);
 });
 
 test("15 evidence index references Gate E founder decision package", () => {
@@ -180,10 +177,9 @@ test("15 evidence index references Gate E founder decision package", () => {
   assert.match(index, /test:gate-e-founder-decision-package/);
   assert.match(index, /Gate D.*YES/i);
   assert.match(index, /Gate E.*YES/i);
-  assert.match(index, /Phase 3B.*FAIL/i);
+  assert.match(index, /Phase 3B.*PASS.*20\/20|20\/20.*PASS/i);
   assert.match(index, /NO-GO/i);
-  assert.match(index, /P0.*OPEN/i);
-  assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
+  assert.match(index, /P0.*CLOSED/i);
 });
 
 test("16 evidence index references gate E phase3b result guard", () => {
@@ -191,19 +187,18 @@ test("16 evidence index references gate E phase3b result guard", () => {
   assert.match(index, /test:gate-e-phase3b-result/);
   assert.match(index, /gate-e-phase3b-result-2026-06-28/);
   assert.match(index, /Gate E.*YES/i);
-  assert.match(index, /Phase 3B.*FAIL/i);
+  assert.match(index, /Phase 3B.*PASS.*20\/20|20\/20.*PASS/i);
   assert.match(index, /NO-GO/i);
-  assert.match(index, /P0.*OPEN/i);
+  assert.match(index, /P0.*CLOSED/i);
 });
 
 test("17 evidence index references phase3b harness diagnostics guard", () => {
   const index = readRepo(EVIDENCE_INDEX);
   assert.match(index, /test:phase3b-harness-diagnostics/);
   assert.match(index, /PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29/);
-  assert.match(index, /Phase 3B.*FAIL/i);
+  assert.match(index, /Phase 3B.*PASS.*20\/20|20\/20.*PASS/i);
   assert.match(index, /NO-GO/i);
-  assert.match(index, /P0.*OPEN/i);
-  assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
+  assert.match(index, /P0.*CLOSED/i);
 });
 
 test("18 evidence index references gate E retry-after-harness-fix checkpoint and post-harness result", () => {
@@ -214,10 +209,9 @@ test("18 evidence index references gate E retry-after-harness-fix checkpoint and
   assert.match(index, /test:gate-e-retry-after-harness-fix-result/);
   assert.match(index, /2969b1f4/);
   assert.match(index, /AUTH_TOKEN_REQUIRED|PARTIAL/i);
-  assert.match(index, /Phase 3B.*FAIL/i);
+  assert.match(index, /Phase 3B.*PASS.*20\/20|20\/20.*PASS/i);
   assert.match(index, /NO-GO/i);
-  assert.match(index, /P0.*OPEN/i);
-  assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
+  assert.match(index, /P0.*CLOSED/i);
   assert.doesNotMatch(index, /Gate F.*\*\*YES\*\*/i);
 });
 
@@ -248,8 +242,7 @@ test("21 evidence index references cursor-agent token loading fix (Slice 40); no
   assert.match(index, /CURSOR_AGENT_TOKEN_LOADING_2026-06-29/);
   assert.match(index, /test:cursor-agent-token-preflight/);
   assert.match(index, /NO-GO/i);
-  assert.match(index, /P0.*OPEN/i);
-  assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
+  assert.match(index, /P0.*CLOSED/i);
   const tokenDoc = readRepo("docs/CURSOR_AGENT_TOKEN_LOADING_2026-06-29.md");
   assert.match(tokenDoc, /load-local-test-env\.ts/);
   assert.match(tokenDoc, /No print\/log\/commit token values|never log/i);

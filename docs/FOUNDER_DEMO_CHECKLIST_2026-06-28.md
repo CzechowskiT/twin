@@ -123,3 +123,11 @@ Full gate table: [LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md](./LAUNCH_READIN
 Static guard: `npm run test:launch-readiness-evidence-guard` · `npm run test:gate-d-founder-decision-checkpoint`
 
 **Public launch: NO-GO · P0: OPEN · Gate D: YES/PASS · Gate E: YES/FAIL · Phase 3B: FAIL (0/20)**
+
+---
+
+## Canonical status addendum (2026-07-07)
+
+**P0: CLOSED** | **Gate E: PASS (attempt 19, 20/20)** | **Gate F: PENDING** | **Launch: NO-GO**
+
+For demos: Phase 3B **PASS 20/20** documented — do not claim Launch GO. P0 closed; Gate F still PENDING. See [evidence index](./LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md).

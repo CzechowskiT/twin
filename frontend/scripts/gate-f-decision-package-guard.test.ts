@@ -22,7 +22,7 @@ const REQUIRED_SECTIONS = [
   "2. Current Launch Stance",
   "3. Gate E Evidence",
   "4. Remaining Risks",
-  "5. Criteria to Close P0",
+  "5. P0 closure status (2026-07-07)",
   "6. Criteria to Move Gate F",
   "7. What Gate F Will Not Do",
   "8. Explicit Founder Decision Prompt",
@@ -50,26 +50,25 @@ test("2 gate F package — required sections present", () => {
   }
 });
 
-test("3 gate F package — Launch NO-GO, P0 OPEN, Gate F PENDING", () => {
+test("3 gate F package — Launch NO-GO, P0 CLOSED, Gate F PENDING", () => {
   const pkg = readRepo(GATE_F_PACKAGE);
   const stance = pkgSection(pkg, "2. Current Launch Stance");
   assert.match(stance, /NO-GO/i);
-  assert.match(stance, /P0.*OPEN/i);
+  assert.match(stance, /P0.*CLOSED/i);
   assert.match(stance, /Gate F.*PENDING/i);
   assert.doesNotMatch(pkg, /Launch stance:\s*\*\*GO\*\*/i);
-  assert.doesNotMatch(pkg, /\| \*\*P0 performance\*\* \| \*\*CLOSED\*\*/);
   assert.doesNotMatch(pkg, /\| \*\*Gate F.*\*\* \| \*\*YES\*\*/);
 });
 
-test("4 gate F package — does not inappropriately claim Launch GO, P0 CLOSED, or Gate F YES", () => {
+test("4 gate F package — does not inappropriately claim Launch GO or Gate F YES", () => {
   const pkg = readRepo(GATE_F_PACKAGE);
   const footer = pkgSection(pkg, "10. Launch Stance Footer");
   assert.match(footer, /NO-GO/i);
-  assert.match(footer, /P0:\s*OPEN/i);
+  assert.match(footer, /P0:\s*CLOSED/i);
   assert.match(footer, /Gate F:\s*PENDING/i);
   assert.match(pkg, /No Launch GO/i);
-  assert.match(pkg, /No P0 CLOSED/i);
   assert.match(pkg, /No Gate F YES claimed/i);
+  assert.match(pkg, /P0_CLOSURE_DECISION_2026-07-07\.md/);
   assert.doesNotMatch(pkg, /Public launch:\s*\*\*GO\*\*/i);
 });
 
@@ -135,11 +134,11 @@ test("10 gate F package — links launch gate checklist and P0 closure criteria"
   assert.match(checklist, /Public launch gate checklist/);
 });
 
-test("11 gate F package — Phase 3B PASS acknowledged without closing P0", () => {
+test("11 gate F package — Phase 3B PASS acknowledged; P0 CLOSED", () => {
   const pkg = readRepo(GATE_F_PACKAGE);
   assert.match(pkg, /Phase 3B.*PASS/i);
-  assert.match(pkg, /P0.*OPEN/i);
-  assert.match(pkg, /RSS validation/i);
+  assert.match(pkg, /P0.*CLOSED/i);
+  assert.match(pkg, /P0_CLOSURE_DECISION_2026-07-07\.md/);
 });
 
 test("12 npm script test:gate-f-decision-package-guard registered", () => {

@@ -8,7 +8,7 @@
 
 **PR #387 merge + deploy:** **YES — merged in this pipeline**; Vercel `frontend_commit` aligned to **PR #387 merge SHA** (`b009c552`) before dispatch; prod later advanced to `80d981c` (docs-only #386 atop #387).
 
-**Public launch: NO-GO · P0: OPEN · Gate F: PENDING**
+**Public launch: NO-GO · P0: CLOSED · Gate F: PENDING**
 
 **Related:** [attempt 18 result](./gate-e-phase3b-attempt18-result-2026-07-06.md) · [PR #387](https://github.com/CzechowskiT/twin/pull/387) · [PR #386](https://github.com/CzechowskiT/twin/pull/386) · [route-sharding plan](./GATE_E_PHASE3B_ROUTE_SHARDING_PLAN_2026-07-03.md)
 
@@ -120,10 +120,12 @@
 
 ## 6. Gate F recommendation (Gate F remains **PENDING**)
 
-Phase 3B route harness is green, but **founder launch bar / P0 closure** is out of scope for this run. **Gate F stays PENDING** pending explicit founder Gate F review and remaining P0 items. Do **not** set Gate F YES or Launch GO from this document alone.
+Phase 3B route harness is green. **P0 CLOSED** per [closure decision](./P0_CLOSURE_DECISION_2026-07-07.md) (2026-07-07). **Gate F stays PENDING** pending explicit founder Gate F review. Do **not** set Gate F YES or Launch GO from this document alone.
 
 ---
 
 ## 7. Launch stance
 
-**NO-GO** for public launch (founder stance unchanged). **P0 OPEN.** **Gate F PENDING.** No Launch GO or P0 CLOSED claimed.
+**NO-GO** for public launch. **P0 CLOSED** (post-attempt-19 founder RSS validation). **Gate F PENDING.** No Launch GO or Gate F YES claimed.
+
+**Addendum (2026-07-07):** Header/footer updated after P0 closure. Historical attempt-19-at-run-time stance was P0 OPEN pending RSS smoke.

@@ -76,11 +76,11 @@ test("7 re-audit plan — says no Launch GO", () => {
   assert.doesNotMatch(plan, /Public launch:\s*\*\*GO\*\*/i);
 });
 
-test("8 re-audit plan — says no P0 CLOSED", () => {
+test("8 re-audit plan — P0 CLOSED per closure decision", () => {
   const plan = readRepo(REAUDIT_PLAN);
-  assert.match(plan, /No P0 CLOSED/i);
-  assert.match(plan, /P0.*OPEN/i);
-  assert.doesNotMatch(plan, /\| \*\*P0.*\*\* \| \*\*CLOSED\*\*/);
+  assert.match(plan, /P0.*CLOSED/i);
+  assert.match(plan, /P0_CLOSURE_DECISION_2026-07-07\.md/);
+  assert.match(plan, /Performance 2\.0/i);
 });
 
 test("9 re-audit plan — says no Gate F YES", () => {
@@ -91,12 +91,10 @@ test("9 re-audit plan — says no Gate F YES", () => {
   assert.doesNotMatch(plan, /Gate F = \*\*YES\*\*/);
 });
 
-test("10 re-audit plan — RSS multitab smoke is separate", () => {
+test("10 re-audit plan — Performance 2.0 separate from Gate F", () => {
   const plan = readRepo(REAUDIT_PLAN);
-  assert.match(plan, /RSS multitab/i);
+  assert.match(plan, /Performance 2\.0/i);
   assert.match(plan, /separate/i);
-  assert.match(plan, /P0 dependency/i);
-  assert.match(plan, /P0 cannot be closed without RSS multitab/i);
 });
 
 test("11 re-audit plan — includes founder Gate F YES/NO/PENDING question", () => {

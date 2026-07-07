@@ -181,17 +181,9 @@ No founder answer yet. This plan is **preparatory** — row-by-row table ready f
 
 ---
 
-## 7. P0 dependency (separate from Gate F)
+## 7. P0 status (separate from Gate F)
 
-**RSS multitab manual smoke** on prod workspace routes (real Chrome 8–12 tabs) remains a **separate founder track** per [P0_BROWSER_MEMORY_MULTITAB_PERFORMANCE_2026-06-16.md](./P0_BROWSER_MEMORY_MULTITAB_PERFORMANCE_2026-06-16.md).
-
-| Item | Gate E attempt 19 | P0 closure |
-|------|-------------------|------------|
-| Phase 3B CDP heap harness | **MET** — 20/20 PASS | Necessary but **not sufficient** |
-| RSS multitab manual smoke | **NOT MET** — not documented | **Required** before P0 CLOSED |
-| Lighthouse / perf budgets post–#387 | **NOT MET** | Founder or gated perf pass |
-
-P0 cannot be closed without RSS multitab manual smoke evidence and a **separate founder P0 closure record**. Gate F YES does **not** close P0.
+**P0 = CLOSED** per [P0 closure decision](./P0_CLOSURE_DECISION_2026-07-07.md) (2026-07-07). Performance optimization → **Performance 2.0** backlog. Gate F YES does **not** imply Launch GO.
 
 ---
 
@@ -208,7 +200,7 @@ P0 cannot be closed without RSS multitab manual smoke evidence and a **separate 
 ### Explicit non-conflation
 
 - **Gate F = YES is not Launch GO.**
-- **P0 remains OPEN** until RSS multitab manual smoke and separate P0 closure.
+- **P0 CLOSED** per [closure decision](./P0_CLOSURE_DECISION_2026-07-07.md).
 - **Launch GO** requires P0 closure **and** Gate F re-audit **and** separate public-launch founder decision.
 
 ### Decision record template
@@ -243,12 +235,12 @@ _____________________________________________
 3. Founder authenticated P6 spot-check post–#384/#387.
 4. Copy & claims audit against [PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md](./PUBLIC_LAUNCH_COPY_CLAIMS_AUDIT_2026-06-04.md).
 5. Publish updated gate stance doc — **still NO-GO** until P0 + launch decisions.
-6. **Separately:** RSS multitab manual smoke for P0 track.
+6. **Separately:** Performance 2.0 optimization backlog (not P0 blockers).
 
 ---
 
 ## 10. Launch stance footer
 
-**Public launch: NO-GO · P0: OPEN · Gate F: PENDING · Phase 3B: PASS (20/20 attempt 19)**
+**Public launch: NO-GO · P0: CLOSED · Gate F: PENDING · Phase 3B: PASS (20/20 attempt 19)**
 
-No Launch GO. No P0 CLOSED. No Gate F YES claimed by this document.
+No Launch GO. No Gate F YES claimed by this document.

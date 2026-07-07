@@ -8,6 +8,8 @@
 
 **PR #381 artifact-upload verification (this run):** **YES — VERIFIED** on SHA with `include-hidden-files: true`. All 20 route zips contain `.diagnostics/`; aggregate reports **`pass=19 fail=1 missing=0`**. See §4.
 
+**Superseded by [attempt 19](./gate-e-phase3b-attempt19-result-2026-07-06.md) (20/20 PASS).** Historical record only.
+
 **Public launch: NO-GO · P0: OPEN · Gate F: PENDING**
 
 **Related:** [attempt 17 result](./gate-e-phase3b-attempt17-result-2026-07-03.md) · [PR #384](https://github.com/CzechowskiT/twin/pull/384) · [route-sharding plan](./GATE_E_PHASE3B_ROUTE_SHARDING_PLAN_2026-07-03.md)
