@@ -16,6 +16,11 @@ import { useTranslation } from "@/components/language-provider";
 import { Shell } from "@/components/ui";
 import { isCalendarConnected } from "@/lib/dashboard-next-best-action";
 import { SHOW_SCRAPE_UI } from "@/lib/features";
+import {
+  DASHBOARD_HOME_APPLICATIONS_PREVIEW,
+  DASHBOARD_HOME_JOBS_PREVIEW,
+  DASHBOARD_HOME_MATCHES_PREVIEW,
+} from "@/lib/dashboard-dom-budget";
 
 import { ApplicationsSection } from "@/components/dashboard/applications-section";
 import { CareerCompassStrip } from "@/components/dashboard/career-compass-strip";
@@ -398,6 +403,8 @@ export default function DashboardPage() {
           matchesCsvBusy={exports.matchesCsvBusy}
           matchesXlsxBusy={exports.matchesXlsxBusy}
           showApplyPrompt={polling.showApplyPrompt}
+          previewLimit={DASHBOARD_HOME_MATCHES_PREVIEW}
+          viewAllHref="/dashboard/matches"
           onSubmitFeedback={(jobId, value) => void submitMatchFeedback(jobId, value)}
           onApply={applyToJob}
           onAutoApply={autoApplyToJob}
@@ -430,6 +437,8 @@ export default function DashboardPage() {
           feedbackBusy={feedbackBusy}
           placementFlowBusy={placementFlowBusy}
           placementEventsInvalidateKey={placementEventsInvalidateKey}
+          previewLimit={DASHBOARD_HOME_APPLICATIONS_PREVIEW}
+          viewAllHref="/dashboard/applications"
           onDownloadCsv={() => void exports.downloadApplicationsCsv()}
           onDownloadXlsx={() => void exports.downloadApplicationsXlsx()}
           onStatusChange={updateApplicationStatus}
@@ -468,6 +477,8 @@ export default function DashboardPage() {
         autoApplyingId={autoApplyingId}
         applyActionsGuard={applyActionsGuard}
         jobsLoadMoreBusy={jobsLoadMoreBusy}
+        previewLimit={DASHBOARD_HOME_JOBS_PREVIEW}
+        viewAllHref="/dashboard/jobs"
         onFiltersChange={setFilters}
         onApplyFilters={() => void applyJobFilters()}
         onLoadMore={() => void loadMoreJobs()}

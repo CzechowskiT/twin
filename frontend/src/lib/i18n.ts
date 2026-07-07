@@ -632,6 +632,13 @@ const en = {
     jobs: "Jobs",
     jobsLoading: "Loading jobs…",
     jobsShowingSummary: "Showing {shown} of {total} listings in this feed (filters apply).",
+    homeJobsPreviewSummary: "Preview: {shown} of {total} listings — open Jobs for filters and pagination.",
+    homeMatchesPreviewLead:
+      "Preview of your ranked feed — open Matches for the full list, exports, and feedback.",
+    homeViewAllJobs: "View all jobs ({total})",
+    homeViewAllMatches: "View all matches ({total})",
+    homeViewAllApplications: "View all applications ({total})",
+    homeApplicationsPreviewSummary: "Preview: {shown} of {total} tracked",
     marketLastUpdateToday: "Last market update: today (autonomous scrape).",
     marketLastUpdateYesterday: "Last market update: yesterday.",
     marketLastUpdateOlder: "Last market update: more than a day ago — feed may refresh overnight.",
@@ -8223,6 +8230,13 @@ const pl: MessageTree = {
     jobs: "Oferty",
     jobsLoading: "Ładowanie ofert…",
     jobsShowingSummary: "W feedzie: {shown} z {total} ofert (działają filtry).",
+    homeJobsPreviewSummary: "Podgląd: {shown} z {total} ofert — pełny feed w Ofertach (filtry i paginacja).",
+    homeMatchesPreviewLead:
+      "Podgląd rankingu — pełna lista, eksport i feedback w Dopasowaniach.",
+    homeViewAllJobs: "Zobacz wszystkie oferty ({total})",
+    homeViewAllMatches: "Zobacz wszystkie dopasowania ({total})",
+    homeViewAllApplications: "Zobacz wszystkie aplikacje ({total})",
+    homeApplicationsPreviewSummary: "Podgląd: {shown} z {total} śledzonych",
     marketLastUpdateToday: "Ostatnia aktualizacja rynku: dziś (automatyczny scraping).",
     marketLastUpdateYesterday: "Ostatnia aktualizacja rynku: wczoraj.",
     marketLastUpdateOlder:

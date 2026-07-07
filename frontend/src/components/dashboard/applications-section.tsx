@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import {
   ApplicationsPanel,
   type ApplicationRow,
@@ -33,6 +35,9 @@ type Props = {
   onOpenAutoApplyPackage: (applicationId: number) => Promise<void>;
   onOptimizeCv: (id: number, title: string) => void;
   onNegotiateSalary: (id: number, title: string) => void;
+  /** Home dashboard preview cap — full list lives on `/dashboard/applications`. */
+  previewLimit?: number;
+  viewAllHref?: string;
 };
 
 /**
@@ -62,8 +67,15 @@ export function ApplicationsSection({
   onOpenAutoApplyPackage,
   onOptimizeCv,
   onNegotiateSalary,
+  previewLimit,
+  viewAllHref,
 }: Props) {
   const { t } = useTranslation();
+  const previewMode = previewLimit != null && previewLimit > 0;
+  const displayApplications =
+    previewMode ? applications.slice(0, previewLimit) : applications;
+  const hasMoreInPreview =
+    previewMode && applicationsTotal > displayApplications.length;
 
   return (
     <Card id="dashboard-applications" variant="soft">
@@ -71,7 +83,11 @@ export function ApplicationsSection({
         <h2 className="twin-section-title">
           {t("dashboard.applications")}{" "}
           <span className="twin-muted text-base font-normal">
-            {applications.length >= applicationsTotal
+            {previewMode
+              ? t("dashboard.homeApplicationsPreviewSummary")
+                  .replace("{shown}", String(displayApplications.length))
+                  .replace("{total}", String(applicationsTotal))
+              : applications.length >= applicationsTotal
               ? t("dashboard.applicationsSummaryAll").replace("{total}", String(applicationsTotal))
               : t("dashboard.applicationsSummaryPartial")
                   .replace("{shown}", String(applications.length))
@@ -113,7 +129,7 @@ export function ApplicationsSection({
         />
       ) : (
       <ApplicationsPanel
-        items={applications}
+        items={displayApplications}
         onStatusChange={onStatusChange}
         onRemove={onRemove}
         onSaveFeedback={onSaveFeedback}
@@ -131,6 +147,13 @@ export function ApplicationsSection({
         onNegotiateSalary={onNegotiateSalary}
       />
       )}
+      {previewMode && hasMoreInPreview && viewAllHref ? (
+        <p className="mt-4 text-center">
+          <Link href={viewAllHref} className="twin-link text-sm font-medium">
+            {t("dashboard.homeViewAllApplications").replace("{total}", String(applicationsTotal))}
+          </Link>
+        </p>
+      ) : null}
     </Card>
   );
 }

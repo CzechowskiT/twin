@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo } from "react";
 
 import { useTranslation } from "@/components/language-provider";
@@ -53,6 +54,9 @@ type Props = {
   onDownloadXlsx: () => void;
   onApplyPromptDismiss: () => void;
   onApplyPromptOpenFirst: () => void;
+  /** Home dashboard preview cap — full feed lives on `/dashboard/matches`. */
+  previewLimit?: number;
+  viewAllHref?: string;
 };
 
 const GROUP_META: Record<
@@ -105,13 +109,18 @@ export function MatchesSection({
   onDownloadXlsx,
   onApplyPromptDismiss,
   onApplyPromptOpenFirst,
+  previewLimit,
+  viewAllHref,
 }: Props) {
   void topHighlightMatches;
   void moreRecommendationMatches;
   const { t } = useTranslation();
+  const previewMode = previewLimit != null && previewLimit > 0;
+  const displayMatches = previewMode ? visibleMatches.slice(0, previewLimit) : visibleMatches;
+  const hasMoreInPreview = previewMode && visibleMatches.length > displayMatches.length;
   const confidenceGroups = useMemo(
-    () => groupMatchesByConfidence(visibleMatches),
-    [visibleMatches],
+    () => groupMatchesByConfidence(displayMatches),
+    [displayMatches],
   );
 
   if (!matchesInitialSkeleton && matches === null) return null;
@@ -185,9 +194,12 @@ export function MatchesSection({
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="twin-section-title">
-                {t("dashboard.rankedFeedTitle")} ({visibleMatches.length})
+                {t("dashboard.rankedFeedTitle")} ({previewMode ? displayMatches.length : visibleMatches.length}
+                {previewMode && hasMoreInPreview ? ` / ${visibleMatches.length}` : ""})
               </h2>
-              <p className="twin-muted mt-1 text-sm">{t("dashboard.rankedFeedLeadGrouped")}</p>
+              <p className="twin-muted mt-1 text-sm">
+                {previewMode ? t("dashboard.homeMatchesPreviewLead") : t("dashboard.rankedFeedLeadGrouped")}
+              </p>
             </div>
             <div className="flex flex-wrap gap-2 self-start sm:self-auto sm:shrink-0">
               <button
@@ -252,6 +264,13 @@ export function MatchesSection({
                   </section>
                 );
               })}
+              {previewMode && hasMoreInPreview && viewAllHref ? (
+                <p className="text-center">
+                  <Link href={viewAllHref} className="twin-link text-sm font-medium">
+                    {t("dashboard.homeViewAllMatches").replace("{total}", String(visibleMatches.length))}
+                  </Link>
+                </p>
+              ) : null}
             </div>
           )}
         </>
