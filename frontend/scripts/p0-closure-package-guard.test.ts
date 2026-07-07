@@ -72,20 +72,20 @@ test("5 closure checklist — references gate e pass and gate f reaudit", () => 
   readRepo(GATE_F_REAUDIT);
 });
 
-test("6 closure checklist — rss smoke and evidence checkboxes not done", () => {
+test("6 closure checklist — rss smoke and evidence marked done", () => {
   const { checklist } = bothDocs();
   assert.match(checklist, /RSS multitab manual smoke completed/);
-  assert.match(checklist, /NOT DONE/);
   assert.match(checklist, /Evidence attached/);
+  assert.match(checklist, /DONE.*✓|✓/);
   assert.match(checklist, /P0_MULTITAB_RSS_SMOKE_RUNBOOK_2026-07-07\.md/);
+  assert.match(checklist, /P0_CLOSURE_DECISION_2026-07-07\.md/);
 });
 
-test("7 closure checklist — p0 closure requires founder approval", () => {
+test("7 closure checklist — founder approval recorded", () => {
   const { checklist } = bothDocs();
   assert.match(checklist, /Founder approval/);
-  assert.match(checklist, /required before P0 CLOSED/i);
-  assert.match(checklist, /Founder must explicitly confirm/);
-  assert.match(checklist, /P0 Closure Decision/);
+  assert.match(checklist, /Founder approval recorded|Founder confirmed/i);
+  assert.match(checklist, /P0_CLOSURE_DECISION_2026-07-07\.md/);
 });
 
 test("8 both docs — launch go is separate", () => {
@@ -107,14 +107,11 @@ test("9 both docs — gate f yes is separate", () => {
   assert.match(runbook, /does not grant Launch GO or Gate F YES/i);
 });
 
-test("10 both docs — do not claim p0 closed", () => {
+test("10 runbook pre-closure stance; checklist records p0 closed", () => {
   const { runbook, checklist } = bothDocs();
-  for (const doc of [runbook, checklist]) {
-    assert.match(doc, /No P0 CLOSED|P0: OPEN|P0 remains OPEN|P0 is \*\*not\*\* closed/i);
-    assert.doesNotMatch(doc, /\| \*\*P0\*\* \| \*\*CLOSED\*\*/);
-    assert.doesNotMatch(doc, /P0:\s*\*\*CLOSED\*\*/);
-    assert.doesNotMatch(doc, /\*\*P0:\*\* \*\*CLOSED\*\*/);
-  }
+  assert.match(runbook, /No P0 CLOSED|P0: OPEN|P0 remains OPEN|P0 is \*\*not\*\* closed/i);
+  assert.match(checklist, /\*\*P0:\*\* \*\*CLOSED\*\*/);
+  assert.match(checklist, /P0 is CLOSED|P0 track closed/i);
 });
 
 test("11 both docs — do not claim launch go", () => {
