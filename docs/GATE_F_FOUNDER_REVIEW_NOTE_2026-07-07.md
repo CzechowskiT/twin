@@ -2,7 +2,7 @@
 
 **Branch:** `cursor/phase1-monorepo-scaffold` @ post **PR #389** (Gate F decision package)  
 **Package:** [GATE_F_DECISION_PACKAGE_2026-07-06.md](./GATE_F_DECISION_PACKAGE_2026-07-06.md)  
-**Gate F:** **PENDING** · **P0:** **OPEN** · **Launch:** **NO-GO** · **Phase 3B:** **PASS** (20/20 attempt 19)
+**Gate F:** **PENDING** · **P0:** **CLOSED** · **Launch:** **NO-GO** · **Phase 3B:** **PASS** (20/20 attempt 19)
 
 ---
 
@@ -31,14 +31,13 @@
 
 | Blocker | Status |
 |---------|--------|
-| **P0 performance** | **OPEN** — multitab RSS validation (real Chrome 8–12 tabs) **not documented** |
-| **Launch-gate checklist** | Not re-audited since pre–Gate E era |
-| **Gate F re-audit** | **PENDING** — founder has not authorized |
+| **Gate F founder decision** | **PENDING** — re-audit executed; founder has not recorded YES/NO |
+| **NEEDS_REVIEW rows** (14) | Not dispositioned — [re-audit result](./GATE_F_REAUDIT_RESULT_2026-07-07.md) |
 | **Public launch decision** | **NO-GO** — separate from Gate F |
 | **Auto-apply / delegated apply** | **PAUSED** / **NOT LIVE** |
 | **H5c/H5d recruiter cohort** | **HOLD** |
 
-**P0 cannot be closed without RSS multitab manual smoke on prod workspace routes and documented evidence** per [P0_BROWSER_MEMORY_MULTITAB_PERFORMANCE_2026-06-16.md](./P0_BROWSER_MEMORY_MULTITAB_PERFORMANCE_2026-06-16.md). Phase 3B PASS (CDP heap harness) is necessary but **not sufficient** for P0 closure.
+**P0 CLOSED** per [closure decision](./P0_CLOSURE_DECISION_2026-07-07.md) (2026-07-07). Remaining tab slowness and memory pressure → **Performance 2.0** — not launch blockers.
 
 ---
 
@@ -61,13 +60,13 @@ Gate E prod Phase 3B **PASS 20/20** (attempt 19) removes the primary product har
 ### Explicit non-conflation
 
 - **Gate F = YES is not Launch GO.** Re-audit approval does not approve public launch.
-- **P0 remains OPEN** until RSS multitab manual smoke evidence and separate founder P0 closure record.
-- **Launch GO** requires a **separate founder decision** after P0 closure **and** Gate F re-audit — not implied by Gate E PASS or Gate F YES.
+- **P0 CLOSED** per [closure decision](./P0_CLOSURE_DECISION_2026-07-07.md) — separate from Gate F YES.
+- **Launch GO** requires Gate F decision **and** separate public-launch founder decision.
 
 ---
 
 ## Current stance
 
-**Launch: NO-GO · P0: OPEN · Gate F: PENDING · Phase 3B: PASS (20/20 attempt 19)**
+**Launch: NO-GO · P0: CLOSED · Gate F: PENDING · Phase 3B: PASS (20/20 attempt 19)**
 
-This note does not set Gate F YES, does not close P0, and does not claim public launch approval.
+This note does not set Gate F YES and does not claim public launch approval.

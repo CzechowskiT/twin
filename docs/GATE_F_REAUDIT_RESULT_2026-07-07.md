@@ -182,17 +182,9 @@ No Launch GO. No P0 CLOSED. No Gate F YES claimed by this document.
 
 ---
 
-## 7. P0 dependency (separate from Gate F)
+## 7. P0 status (separate from Gate F)
 
-**RSS multitab manual smoke** on prod workspace routes (real Chrome 8–12 tabs) remains a **separate founder track** per [P0_BROWSER_MEMORY_MULTITAB_PERFORMANCE_2026-06-16.md](./P0_BROWSER_MEMORY_MULTITAB_PERFORMANCE_2026-06-16.md).
-
-| Item | Gate E attempt 19 | P0 closure |
-|------|-------------------|------------|
-| Phase 3B CDP heap harness | **MET** — 20/20 PASS | Necessary but **not sufficient** |
-| RSS multitab manual smoke | **NOT MET** — not documented | **Required** before P0 CLOSED |
-| Lighthouse / perf budgets post–#387 | **NOT MET** | Founder or gated perf pass |
-
-**P0 remains OPEN until RSS multitab manual smoke evidence** is recorded and a **separate founder P0 closure record** is published. Gate F YES does **not** close P0.
+**P0 = CLOSED** per [P0 closure decision](./P0_CLOSURE_DECISION_2026-07-07.md) (founder RSS validation 2026-07-07). Engineering blockers **0**. Remaining performance items → **Performance 2.0** backlog — **not** P0 blockers. Gate F YES does **not** imply Launch GO.
 
 ---
 
@@ -210,7 +202,7 @@ No Launch GO. No P0 CLOSED. No Gate F YES claimed by this document.
 
 - **Gate F remains PENDING until founder decision** — this result does not set Gate F YES.
 - **Gate F = YES is not Launch GO.**
-- **P0 remains OPEN** until RSS multitab manual smoke and separate P0 closure.
+- **P0 CLOSED** per [closure decision](./P0_CLOSURE_DECISION_2026-07-07.md) — separate from Gate F YES.
 - **Launch GO** requires P0 closure **and** Gate F re-audit acceptance **and** separate public-launch founder decision.
 
 ### Decision record template
@@ -240,6 +232,6 @@ _____________________________________________
 
 ## 9. Launch stance footer
 
-**Public launch: NO-GO · P0: OPEN · Gate F: PENDING · Phase 3B: PASS (20/20 attempt 19)**
+**Public launch: NO-GO · P0: CLOSED · Gate F: PENDING · Phase 3B: PASS (20/20 attempt 19)**
 
-No Launch GO. No P0 CLOSED. No Gate F YES claimed by this document.
+No Launch GO. No Gate F YES claimed by this document.

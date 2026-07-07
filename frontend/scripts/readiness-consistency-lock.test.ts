@@ -102,12 +102,22 @@ const FOUNDER_QUESTION =
 
 const FORBIDDEN_STATUS_PATTERNS = [
   /Launch stance:\s*\*\*GO\*\*/i,
-  /\| \*\*P0:\*\* \| \*\*CLOSED\*\*/,
   /\| \*\*Gate D\*\* \|.*\*\*PASS\*\*/i,
   /\| \*\*Gate E\*\* \|.*\*\*YES\*\*/i,
-  /\| \*\*Phase 3B\*\* \|.*\*\*PASS\*\*/i,
   /launch approved/i,
   /prod browser smoke executed.*\*\*PASS\*\*/i,
+] as const;
+
+const FORBIDDEN_HISTORICAL_PATTERNS = [
+  ...FORBIDDEN_STATUS_PATTERNS,
+  /\| \*\*Phase 3B\*\* \|.*\*\*PASS\*\*/i,
+] as const;
+
+const CANONICAL_POST_P0_PATTERNS = [
+  /P0:\s*CLOSED|P0 performance.*CLOSED/i,
+  /Phase 3B.*PASS.*20\/20|20\/20.*PASS/i,
+  /Gate F.*PENDING/i,
+  /NO-GO/i,
 ] as const;
 
 const GATE_D_COMMAND_RE =
@@ -150,9 +160,14 @@ test("2 decision docs — Launch NO-GO, P0 OPEN, Gate E stance, Phase 3B stance"
   for (const doc of POST_GATE_E_EXECUTION_DOCS) {
     const content = readRepo(doc);
     assert.match(content, /NO-GO/i, `${doc}: missing NO-GO`);
-    assert.match(content, /P0.*OPEN/i, `${doc}: missing P0 OPEN`);
-    assert.match(content, /Gate E.*YES/i, `${doc}: missing Gate E YES`);
-    assert.match(content, /Phase 3B.*FAIL/i, `${doc}: missing Phase 3B FAIL`);
+    if (doc === EVIDENCE_INDEX) {
+      assert.match(content, /Canonical status \(2026-07-07\)/i, `${doc}: missing canonical status block`);
+    } else {
+      assert.match(content, /Canonical status addendum \(2026-07-07\)/i, `${doc}: missing canonical addendum`);
+    }
+    for (const pattern of CANONICAL_POST_P0_PATTERNS) {
+      assert.match(content, pattern, `${doc}: missing canonical post-P0 pattern ${pattern}`);
+    }
     assert.match(content, /Gate D.*YES/i, `${doc}: missing Gate D YES`);
   }
   for (const doc of HISTORICAL_PACKAGE_DOCS) {
@@ -162,11 +177,19 @@ test("2 decision docs — Launch NO-GO, P0 OPEN, Gate E stance, Phase 3B stance"
 });
 
 test("3 decision docs — no forbidden launch/gate overclaims", () => {
-  for (const doc of DECISION_DOCS) {
+  for (const doc of HISTORICAL_PACKAGE_DOCS) {
+    const content = readRepo(doc);
+    for (const pattern of FORBIDDEN_HISTORICAL_PATTERNS) {
+      assert.doesNotMatch(content, pattern, `${doc}: forbidden claim ${pattern}`);
+    }
+  }
+  for (const doc of [...POST_PASS_STANCE_DOCS, ...POST_GATE_E_EXECUTION_DOCS]) {
     const content = readRepo(doc);
     for (const pattern of FORBIDDEN_STATUS_PATTERNS) {
       assert.doesNotMatch(content, pattern, `${doc}: forbidden claim ${pattern}`);
     }
+    assert.doesNotMatch(content, /Launch stance:\s*\*\*GO\*\*/i, `${doc}: Launch GO forbidden`);
+    assert.doesNotMatch(content, /Gate F.*\*\*YES\*\*/i, `${doc}: Gate F YES forbidden`);
   }
 });
 
@@ -242,9 +265,9 @@ test("12 evidence index references readiness consistency lock guard", () => {
   assert.match(index, /test:readiness-consistency-lock/);
   assert.match(index, /readiness-consistency-lock/);
   assert.match(index, /Gate D.*YES/i);
-  assert.match(index, /Gate E.*PENDING/i);
   assert.match(index, /NO-GO/i);
-  assert.match(index, /P0.*OPEN/i);
+  assert.match(index, /P0.*CLOSED/i);
+  assert.match(index, /Canonical status \(2026-07-07\)/i);
 });
 
 test("13 gate D founder decision prompt exists — historical PENDING package", () => {
@@ -280,10 +303,9 @@ test("16 evidence index references gate D prod browser smoke result guard", () =
   assert.match(index, /test:gate-d-prod-browser-smoke-result/);
   assert.match(index, /gate-d-prod-browser-smoke-result-2026-06-28/);
   assert.match(index, /Gate D.*YES/i);
-  assert.match(index, /Gate E.*PENDING/i);
   assert.match(index, /NO-GO/i);
-  assert.match(index, /P0.*OPEN/i);
-  assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
+  assert.match(index, /P0.*CLOSED/i);
+  assert.match(index, /Phase 3B.*PASS.*20\/20|20\/20.*PASS/i);
 });
 
 test("17 gate E founder decision package — PENDING, Gate D PASS prerequisite, no overclaims", () => {
@@ -323,12 +345,13 @@ test("20 evidence index references gate E phase3b result guard", () => {
   const index = readRepo(EVIDENCE_INDEX);
   assert.match(index, /test:gate-e-phase3b-result/);
   assert.match(index, /gate-e-phase3b-result-2026-06-28/);
-  assert.match(index, /Phase 3B.*FAIL/i);
+  assert.match(index, /gate-e-phase3b-attempt19-result-2026-07-06/);
+  assert.match(index, /Phase 3B.*PASS.*20\/20|20\/20.*PASS/i);
   assert.match(index, /NO-GO/i);
-  assert.match(index, /P0.*OPEN/i);
+  assert.match(index, /P0.*CLOSED/i);
 });
 
-test("21 phase3b harness diagnostics — guard registered, Phase 3B FAIL preserved", () => {
+test("21 phase3b harness diagnostics — guard registered, canonical PASS via attempt 19", () => {
   const pkg = readFileSync(join(root, "package.json"), "utf8");
   assert.match(pkg, /test:phase3b-harness-diagnostics/);
   const plan = readRepo("docs/PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md");
@@ -337,7 +360,8 @@ test("21 phase3b harness diagnostics — guard registered, Phase 3B FAIL preserv
   assert.match(plan, /AUTH_TOKEN_REQUIRED/);
   const index = readRepo(EVIDENCE_INDEX);
   assert.match(index, /test:phase3b-harness-diagnostics/);
-  assert.doesNotMatch(index, /Phase 3B.*\*\*PASS\*\*/i);
+  assert.match(index, /gate-e-phase3b-attempt19-result-2026-07-06/);
+  assert.match(index, /Phase 3B.*PASS.*20\/20|20\/20.*PASS/i);
 });
 
 test("23 gate E post-harness retry result — PARTIAL, AUTH_TOKEN_REQUIRED, FAIL stance preserved", () => {

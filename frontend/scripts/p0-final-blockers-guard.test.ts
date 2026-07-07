@@ -35,7 +35,7 @@ function section(doc: string, heading: string): string {
 
 test("1 P0_FINAL_BLOCKERS doc exists", () => {
   const doc = finalBlockers();
-  assert.match(doc, /P0_FINAL_BLOCKERS|P0 final blockers|Remaining blocker/i);
+  assert.match(doc, /P0_FINAL_BLOCKERS|P0 final blockers|Remaining blockers/i);
 });
 
 test("2 engineering section — no documentation tasks listed as open", () => {
@@ -50,11 +50,11 @@ test("2 engineering section — no documentation tasks listed as open", () => {
 
 test("3 remaining blockers — every row has owner", () => {
   const doc = finalBlockers();
-  const blockers = section(doc, "Remaining blocker");
+  const blockers = section(doc, "Remaining blockers");
   const rows = blockers
     .split("\n")
     .filter((line) => line.startsWith("|") && !line.includes("---") && !line.includes("Blocker |"));
-  assert.ok(rows.length >= 3, "expected blocker table rows");
+  assert.ok(rows.length >= 2, "expected blocker table rows");
   for (const row of rows) {
     const cols = row.split("|").map((c) => c.trim()).filter(Boolean);
     assert.ok(cols.length >= 4, `blocker row missing columns: ${row}`);
@@ -66,7 +66,7 @@ test("3 remaining blockers — every row has owner", () => {
 
 test("4 remaining blockers — every row has evidence required", () => {
   const doc = finalBlockers();
-  const blockers = section(doc, "Remaining blocker");
+  const blockers = section(doc, "Remaining blockers");
   const rows = blockers
     .split("\n")
     .filter((line) => line.startsWith("|") && !line.includes("---") && !line.includes("Blocker |"));
@@ -77,21 +77,20 @@ test("4 remaining blockers — every row has evidence required", () => {
   }
 });
 
-test("5 exit criteria section exists with P0 Gate F Launch tracks", () => {
+test("5 exit criteria section exists with Gate F Launch tracks", () => {
   const doc = finalBlockers();
   const exit = section(doc, "Exit criteria");
-  assert.match(exit, /P0 CLOSED|recommending P0 CLOSED/i);
   assert.match(exit, /Gate F/i);
   assert.match(exit, /Launch/i);
-  assert.match(exit, /MET|NOT MET|OPEN|PENDING|NO-GO/);
+  assert.match(exit, /P0 CLOSED|MET.*closure decision/i);
+  assert.match(exit, /MET|NOT MET|PENDING|NO-GO/);
 });
 
-test("6 does not claim P0 CLOSED", () => {
+test("6 claims P0 CLOSED not Launch GO", () => {
   const doc = finalBlockers();
-  assert.match(doc, /P0: OPEN|P0 is \*\*not\*\* closed|does not close P0/i);
-  assert.doesNotMatch(doc, /\| \*\*P0\*\* \| \*\*CLOSED\*\*/);
-  assert.doesNotMatch(doc, /P0:\s*\*\*CLOSED\*\*/);
-  assert.doesNotMatch(doc, /\*\*P0:\*\* \*\*CLOSED\*\*/);
+  assert.match(doc, /P0:\s*\*\*CLOSED\*\*|P0 CLOSED/i);
+  assert.match(doc, /P0_CLOSURE_DECISION_2026-07-07\.md/);
+  assert.doesNotMatch(doc, /Launch:\s*\*\*GO\*\*/i);
 });
 
 test("7 does not claim Gate F YES", () => {
@@ -109,12 +108,11 @@ test("8 does not claim Launch GO", () => {
   assert.doesNotMatch(doc, /Launch GO granted/i);
 });
 
-test("9 founder tasks section lists manual RSS smoke actions", () => {
+test("9 founder tasks section lists Gate F review actions", () => {
   const doc = finalBlockers();
   const founder = section(doc, "Founder tasks");
-  assert.match(founder, /RSS smoke/i);
-  assert.match(founder, /execution record/i);
-  assert.match(founder, /closure decision/i);
+  assert.match(founder, /Gate F/i);
+  assert.match(founder, /re-audit|NEEDS_REVIEW/i);
 });
 
 test("10 npm script test:p0-final-blockers-guard registered", () => {

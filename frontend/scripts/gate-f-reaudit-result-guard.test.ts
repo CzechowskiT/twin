@@ -84,10 +84,11 @@ test("8 re-audit result — says Gate F remains PENDING until founder decision",
   assert.match(result, /Gate F.*PENDING/i);
 });
 
-test("9 re-audit result — says P0 remains OPEN until RSS multitab manual smoke evidence", () => {
+test("9 re-audit result — P0 CLOSED per closure decision", () => {
   const result = readRepo(REAUDIT_RESULT);
-  assert.match(result, /P0 remains OPEN until RSS multitab manual smoke evidence/i);
-  assert.match(result, /RSS multitab/i);
+  assert.match(result, /P0.*CLOSED/i);
+  assert.match(result, /P0_CLOSURE_DECISION_2026-07-07\.md/);
+  assert.match(result, /Performance 2\.0/i);
 });
 
 test("10 re-audit result — says Launch GO remains separate", () => {
@@ -104,14 +105,7 @@ test("11 re-audit result — does NOT say Launch GO granted", () => {
   assert.doesNotMatch(result, /Launch GO granted/i);
 });
 
-test("12 re-audit result — does NOT say P0 CLOSED", () => {
-  const result = readRepo(REAUDIT_RESULT);
-  assert.match(result, /No P0 CLOSED/i);
-  assert.match(result, /P0.*OPEN/i);
-  assert.doesNotMatch(result, /\| \*\*P0.*\*\* \| \*\*CLOSED\*\*/);
-});
-
-test("13 re-audit result — does NOT set Gate F YES", () => {
+test("12 re-audit result — does NOT set Gate F YES", () => {
   const result = readRepo(REAUDIT_RESULT);
   assert.match(result, /No Gate F YES/i);
   assert.doesNotMatch(result, /\*\*Gate F:\*\* \*\*YES\*\*/);

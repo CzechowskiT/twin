@@ -8,7 +8,7 @@
 **Gate D:** **YES / PASS** — prod browser **36/36 PASS** — [gate-d result](./gate-d-prod-browser-smoke-result-2026-06-28.md)  
 **Gate E:** **YES / PASS** — prod Phase 3B **20/20 PASS** (attempt 19) — [attempt 19 result](./gate-e-phase3b-attempt19-result-2026-07-06.md)  
 **Gate F:** **PENDING**  
-**Launch stance:** **NO-GO** · **P0:** **OPEN** · **Phase 3B:** **PASS** (prod 20/20 @ attempt 19)
+**Launch stance:** **NO-GO** · **P0:** **CLOSED** · **Phase 3B:** **PASS** (prod 20/20 @ attempt 19)
 
 **Related:** [attempt 19](./gate-e-phase3b-attempt19-result-2026-07-06.md) · [attempt 18](./gate-e-phase3b-attempt18-result-2026-07-06.md) · [attempt 17](./gate-e-phase3b-attempt17-result-2026-07-03.md) · [launch gate checklist](./PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md) · [production reality matrix](./PRODUCTION_REALITY_MATRIX_2026-05-27.md) · [slice 12 sign-off](./SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md) · [evidence index](./LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md)
 
@@ -21,7 +21,7 @@ Gate F is the **next separate founder decision** after Gate E Phase 3B prod **PA
 **This package does NOT:**
 
 - Approve public launch (**Launch GO**)
-- Close P0 performance
+- Close P0 performance (already **CLOSED** per [closure decision](./P0_CLOSURE_DECISION_2026-07-07.md))
 - Set Gate F = YES automatically
 - Execute a fresh launch-gate re-audit (founder must authorize separately)
 - Change backend, API, auth, DB, or env configuration
@@ -39,7 +39,7 @@ It is a **decision boundary document** only. Gate F = YES requires a separate fo
 | Field | Status |
 |-------|--------|
 | **Public launch** | **NO-GO** |
-| **P0 performance** | **OPEN** |
+| **P0 performance** | **CLOSED** — [closure decision](./P0_CLOSURE_DECISION_2026-07-07.md) (2026-07-07); Performance 2.0 backlog for optimization |
 | **Gate F (launch-gate re-audit)** | **PENDING** |
 | **Phase 3B prod harness** | **PASS** — 20/20 routes (attempt 19) |
 | **Controlled pilot / demo** | **GO** (unchanged) |
@@ -47,7 +47,7 @@ It is a **decision boundary document** only. Gate F = YES requires a separate fo
 | **Delegated apply** | **NOT LIVE** |
 | **H5c / H5d recruiter cohort** | **HOLD** — external invites **not sent** |
 
-**Explicit non-claims:** This document does **not** set Launch GO, P0 CLOSED, or Gate F YES.
+**Explicit non-claims:** This document does **not** set Launch GO or Gate F YES. P0 **CLOSED** per separate [closure decision](./P0_CLOSURE_DECISION_2026-07-07.md).
 
 ---
 
@@ -98,36 +98,34 @@ It is a **decision boundary document** only. Gate F = YES requires a separate fo
 
 ## 4. Remaining Risks (Beyond Phase 3B Harness)
 
-Phase 3B prod **PASS** removes the primary product harness blocker but **does not** close P0 or approve public launch. Open items from repo docs:
+Phase 3B prod **PASS** removes the primary product harness blocker but **does not** approve public launch. Open items from repo docs:
 
 | # | Risk / gap | Source | Blocks |
 |---|------------|--------|--------|
-| R1 | **P0 performance still OPEN** — Phase 3B PASS is necessary but docs require **multitab RSS validation** (real Chrome 8–12 tabs), not CDP heap alone | [P0_BROWSER_MEMORY_MULTITAB_PERFORMANCE_2026-06-16.md](./P0_BROWSER_MEMORY_MULTITAB_PERFORMANCE_2026-06-16.md), [P0_PRODUCTION_STUCK_ROUTES_RENDERER_MEMORY_2026-06-16.md](./P0_PRODUCTION_STUCK_ROUTES_RENDERER_MEMORY_2026-06-16.md) | P0 closure, Launch GO |
-| R2 | **Launch-gate checklist not re-audited** since pre–Gate E era | [PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md](./PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md) | Gate F YES, Launch GO |
+| R1 | **Gate F founder decision PENDING** — re-audit executed; 14 NEEDS_REVIEW rows | [GATE_F_REAUDIT_RESULT_2026-07-07.md](./GATE_F_REAUDIT_RESULT_2026-07-07.md) | Gate F YES, Launch GO |
+| R2 | **Launch-gate checklist rows** need refresh post–re-audit | [PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md](./PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md) | Launch GO |
 | R3 | **Founder limited-launch decision pending** (public announcement) | Launch checklist § checkpoint | Launch GO |
 | R4 | **Auto-apply PAUSED** / delegated **NOT LIVE** — GAP-04 optional open | [PRODUCTION_REALITY_MATRIX_2026-05-27.md](./PRODUCTION_REALITY_MATRIX_2026-05-27.md) | Uncontrolled public launch |
 | R5 | **H5c/H5d HOLD** — 0/3–5 external recruiter invites | [H5C_GO_SMALL_DECISION_PACK_2026-06-07.md](./H5C_GO_SMALL_DECISION_PACK_2026-06-07.md) | Two-sided marketplace claim |
 | R6 | **O6/O10 Vercel canonical drift** documented | Launch checklist O6, O10 | Ops confidence |
 | R7 | **Recruiter calendar sync NOT LIVE** (placeholder) | Production reality matrix | Product claims audit |
 | R8 | **L6 DSR partial** / **O5 Apple calendar partial** — pilot waivers only | Launch checklist L6, O5 | Uncontrolled public launch without waiver review |
-| R9 | **Lighthouse / stress budgets** not re-closed post–attempt 19 | [P0_SHELL_FOUNDER_REVIEW_2026-06-28.md](./P0_SHELL_FOUNDER_REVIEW_2026-06-28.md) §10 | P0 closure |
+| R9 | **Performance 2.0** — multitab RSS/memory/swap optimization (not P0 blockers) | [P0 closure decision §4](./P0_CLOSURE_DECISION_2026-07-07.md#4-performance-20-backlog-not-p0-blockers) | Launch polish only |
 
 ---
 
-## 5. Criteria to Close P0 (Evidence-Based)
+## 5. P0 closure status (2026-07-07)
 
-From [SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md](./SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md) §8–9 and [P0_SHELL_FOUNDER_REVIEW_2026-06-28.md](./P0_SHELL_FOUNDER_REVIEW_2026-06-28.md) §10. **All must be satisfied** before P0 may move from OPEN → CLOSED:
+**P0 = CLOSED** per [P0 closure decision](./P0_CLOSURE_DECISION_2026-07-07.md). Founder RSS multitab smoke **PASS**; engineering blockers **0**. Remaining performance items → **Performance 2.0** backlog (not P0 blockers).
 
-| # | Criterion | Attempt 19 status | Founder action |
-|---|-----------|-------------------|----------------|
-| P0-1 | **Phase 3B prod PASS** — 20/20 routes, 0 × `page-error:1`, 0 × `DOM_FAIL` | **MET** (attempt 19) | Review [attempt 19 diagnostics](./gate-e-phase3b-attempt19-result-2026-07-06.md) |
-| P0-2 | **Multitab RSS validation** — manual 8–12 tab Chrome on prod workspace routes; no GB-scale RSS regression | **NOT MET** — harness uses CDP heap, not founder RSS | Founder manual smoke per [P0_BROWSER_MEMORY_MULTITAB_PERFORMANCE_2026-06-16.md](./P0_BROWSER_MEMORY_MULTITAB_PERFORMANCE_2026-06-16.md) § Manual |
-| P0-3 | **Static P0 guards green** on scaffold HEAD | Verify on decision branch | `npm run test:p0-no-headless-final-state` + related suite |
-| P0-4 | **Lighthouse / performance budgets** re-checked post–DOM fix | **NOT MET** — not re-run after PR #387 | Founder or gated perf pass |
-| P0-5 | **No hydration/auth-shell regression** on deep links | **MET** on harness routes (0 page-error) | Optional founder spot-check |
-| P0-6 | **Explicit founder P0 closure record** — separate from Gate F | **NOT MET** | Founder signs P0 CLOSED in decision record (§8) |
+| # | Criterion | Status |
+|---|-----------|--------|
+| P0-1 | Phase 3B prod PASS 20/20 | **MET** (attempt 19) |
+| P0-2 | Multitab RSS validation (real Chrome) | **MET** — founder PASS 2026-07-07 |
+| P0-3 | Static P0 guards green | **MET** |
+| P0-4 | Founder P0 closure record | **MET** — [closure decision](./P0_CLOSURE_DECISION_2026-07-07.md) |
 
-**P0 closure is a separate founder decision from Gate F YES and from Launch GO.**
+**P0 closure is separate from Gate F YES and Launch GO.**
 
 ---
 
@@ -155,7 +153,7 @@ Gate F = **launch-gate re-audit** per [SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06
 | Action | Stance |
 |--------|--------|
 | Approve **public launch** | Launch remains **NO-GO** until separate founder GO |
-| Close **P0** | P0 remains **OPEN** until §5 criteria + founder record |
+| Close **P0** | **CLOSED** per [closure decision](./P0_CLOSURE_DECISION_2026-07-07.md) — separate from Gate F |
 | Enable **auto-apply** or **delegated apply** | **PAUSED** / **NOT LIVE** |
 | Send **external recruiter invites** | H5c/H5d **HOLD** |
 | Mutate production data | Read-only audits only |
@@ -215,13 +213,13 @@ _____________________________________________
 |------|----------------|
 | **Gate F review** | **YES — recommend founder review** of this package and attempt 19 evidence. **Not** auto Gate F YES. |
 | **Phase 3B** | **PASS** — no further isolated-runner dispatch required unless regression |
-| **Next engineering slice** | P0 RSS manual validation + launch checklist row refresh **after** founder Gate F = YES |
+| **Next engineering slice** | Gate F founder review + NEEDS_REVIEW disposition; Performance 2.0 optimization backlog |
 | **Launch** | **NO-GO** — unchanged |
 
 ---
 
 ## 10. Launch Stance Footer
 
-**Public launch: NO-GO · P0: OPEN · Gate F: PENDING · Phase 3B: PASS (20/20 attempt 19)**
+**Public launch: NO-GO · P0: CLOSED · Gate F: PENDING · Phase 3B: PASS (20/20 attempt 19)**
 
-No Launch GO. No P0 CLOSED. No Gate F YES claimed by this document.
+No Launch GO. No Gate F YES claimed by this document. P0 CLOSED per [closure decision](./P0_CLOSURE_DECISION_2026-07-07.md).

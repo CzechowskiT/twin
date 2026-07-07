@@ -40,27 +40,24 @@ test("3 founder note — Gate F YES is not Launch GO", () => {
   assert.match(note, /Gate F = YES is not Launch GO/i);
 });
 
-test("4 founder note — P0 remains open until RSS multitab evidence", () => {
+test("4 founder note — P0 CLOSED per closure decision", () => {
   const note = readRepo(FOUNDER_NOTE);
-  assert.match(note, /P0 remains OPEN/i);
-  assert.match(note, /RSS multitab/i);
-  assert.match(note, /P0 cannot be closed without RSS multitab/i);
+  assert.match(note, /P0.*CLOSED/i);
+  assert.match(note, /P0_CLOSURE_DECISION_2026-07-07\.md/);
 });
 
 test("5 founder note — Launch GO is separate founder decision", () => {
   const note = readRepo(FOUNDER_NOTE);
-  assert.match(note, /Launch GO.*separate/i);
-  assert.match(note, /separate founder decision/i);
+  assert.match(note, /Launch GO.*separate|separate public-launch founder decision/i);
 });
 
-test("6 founder note — does not claim Launch GO, P0 CLOSED, or Gate F YES", () => {
+test("6 founder note — does not claim Launch GO or Gate F YES", () => {
   const note = readRepo(FOUNDER_NOTE);
   assert.match(note, /Launch:.*NO-GO/i);
-  assert.match(note, /P0:.*OPEN/i);
+  assert.match(note, /P0:.*CLOSED/i);
   assert.match(note, /Gate F:.*PENDING/i);
   assert.doesNotMatch(note, /Launch:\s*\*\*GO\*\*/i);
   assert.doesNotMatch(note, /Public launch:\s*\*\*GO\*\*/i);
-  assert.doesNotMatch(note, /\| \*\*P0.*\*\* \| \*\*CLOSED\*\*/);
   assert.doesNotMatch(note, /\*\*Gate F:\*\* \*\*YES\*\*/);
   assert.doesNotMatch(note, /Gate F = \*\*YES\*\*/);
   assert.match(note, /does not set Gate F YES/i);
