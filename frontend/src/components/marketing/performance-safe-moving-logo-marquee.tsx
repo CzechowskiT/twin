@@ -13,7 +13,7 @@ import {
 } from "@/lib/marquee-brand-subset";
 import type { TranslationKey } from "@/lib/i18n";
 import {
-  PARTNER_LOGO_MARK_BOX_CLASS,
+  PARTNER_LOGO_CARD_CLASS,
   PARTNER_LOGO_ROW_GAP_CLASS,
 } from "@/lib/partner-logo-styles";
 import {
@@ -21,8 +21,8 @@ import {
   isPerformanceSafeCuratedLogoSlug,
 } from "@/lib/performance-safe-curated-logos";
 
-/** Fixed plate — uniform inset; width matches curated SVG band in globals.css. */
-const MARK_BOX_CLASS = PARTNER_LOGO_MARK_BOX_CLASS;
+/** Fixed card — partner-logo-card sizing; SVG band in globals.css. */
+const MARK_CARD_CLASS = PARTNER_LOGO_CARD_CLASS;
 
 const MARK_PLATE_CLASS =
   "border border-zinc-200/90 bg-white shadow-sm ring-1 ring-zinc-950/[0.04] dark:border-zinc-500/40 dark:bg-zinc-100 dark:ring-white/10";
@@ -38,7 +38,7 @@ function BrandMark({
 }) {
   const spec = getPerformanceSafeCuratedLogoSpec(brand.slug);
   const a11y = spec?.ariaLabel ? `${spec.ariaLabel}${linkSuffix}` : `${brand.name}${linkSuffix}`;
-  const plateClass = `${MARK_BOX_CLASS} ${MARK_PLATE_CLASS} relative flex shrink-0 items-center justify-center rounded-lg`;
+  const plateClass = `${MARK_CARD_CLASS} ${MARK_PLATE_CLASS} relative flex shrink-0 items-center justify-center rounded-lg`;
 
   if (!spec || !isPerformanceSafeCuratedLogoSlug(brand.slug)) {
     return null;
@@ -54,7 +54,7 @@ function BrandMark({
       data-performance-safe-logo-card={brand.slug}
       data-quality-status={spec.qualityStatus}
     >
-      <span className="relative flex h-full w-full items-center justify-center px-2.5 py-1.5 sm:px-3">
+      <span className="relative flex h-full w-full items-center justify-center">
         <PerformanceSafeLogoMark slug={brand.slug} />
       </span>
     </span>
