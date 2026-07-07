@@ -107,6 +107,7 @@
     "test:gate-f-reaudit-plan-guard": "npx --yes tsx scripts/gate-f-reaudit-plan-guard.test.ts",
     "test:gate-f-reaudit-result-guard": "npx --yes tsx scripts/gate-f-reaudit-result-guard.test.ts",
     "test:p0-closure-package-guard": "npx --yes tsx scripts/p0-closure-package-guard.test.ts",
+    "test:p0-closure-decision-guard": "npx --yes tsx scripts/p0-closure-decision-guard.test.ts",
     "test:p0-rss-evidence-template-guard": "npx --yes tsx scripts/p0-rss-evidence-template-guard.test.ts",
     "test:p0-rss-execution-record-guard": "npx --yes tsx scripts/p0-rss-execution-record-guard.test.ts",
     "test:p0-final-blockers-guard": "npx --yes tsx scripts/p0-final-blockers-guard.test.ts",

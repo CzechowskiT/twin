@@ -1,8 +1,8 @@
 # P0 Closure Checklist — 2026-07-07
 
-**Status:** **IN PROGRESS** — package prepared; founder manual smoke pending  
-**Launch stance:** **NO-GO** · **P0:** **OPEN** · **Gate F:** **PENDING**  
-**Related:** [RSS smoke runbook](./P0_MULTITAB_RSS_SMOKE_RUNBOOK_2026-07-07.md) · [Gate E attempt 19](./gate-e-phase3b-attempt19-result-2026-07-06.md) · [Gate F re-audit result](./GATE_F_REAUDIT_RESULT_2026-07-07.md) · [P0 browser memory incident](./P0_BROWSER_MEMORY_MULTITAB_PERFORMANCE_2026-06-16.md)
+**Status:** **COMPLETE** — P0 performance track closed (founder decision 2026-07-07)
+**Launch stance:** **NO-GO** · **P0:** **CLOSED** · **Gate F:** **PENDING**
+**Related:** [P0 closure decision](./P0_CLOSURE_DECISION_2026-07-07.md) · [RSS smoke runbook](./P0_MULTITAB_RSS_SMOKE_RUNBOOK_2026-07-07.md) · [Gate E attempt 19](./gate-e-phase3b-attempt19-result-2026-07-06.md) · [Gate F re-audit result](./GATE_F_REAUDIT_RESULT_2026-07-07.md) · [P0 browser memory incident](./P0_BROWSER_MEMORY_MULTITAB_PERFORMANCE_2026-06-16.md)
 
 ---
 
@@ -16,12 +16,12 @@ Track prerequisites for **P0 performance closure** as a **separate track** from 
 
 | # | Item | Status | Evidence |
 |---|------|--------|----------|
-| 1 | **Gate E Phase 3B PASS 20/20** (attempt 19) | **DONE** | Run [`28849996684`](https://github.com/CzechowskiT/twin/actions/runs/28849996684), SHA `80d981c7336807b7abd44580f101391b6952ff8b` — [attempt 19 result](./gate-e-phase3b-attempt19-result-2026-07-06.md) |
-| 2 | **Gate F re-audit completed** | **DONE** | [GATE_F_REAUDIT_RESULT_2026-07-07.md](./GATE_F_REAUDIT_RESULT_2026-07-07.md) — 35 PASS, 14 NEEDS_REVIEW, 1 FAIL; Gate F remains **PENDING** |
-| 3 | **RSS multitab manual smoke completed** | ☐ **NOT DONE** | Execute [P0_MULTITAB_RSS_SMOKE_RUNBOOK_2026-07-07.md](./P0_MULTITAB_RSS_SMOKE_RUNBOOK_2026-07-07.md) — real Chrome, **8–12 tabs**, prod workspace routes |
-| 4 | **Evidence attached** | ☐ **NOT DONE** | Activity Monitor screenshots, metrics table, `public-health` JSON per runbook §10 |
-| 5 | **Founder approval** | ☐ **NOT DONE** | Explicit founder sign-off on P0 closure (see §4) |
-| 6 | **P0 closure decision recorded** | ☐ **NOT DONE** | Separate founder P0 closure record published |
+| 1 | **Gate E Phase 3B PASS 20/20** (attempt 19) | **DONE** ✓ | Run [`28849996684`](https://github.com/CzechowskiT/twin/actions/runs/28849996684), SHA `80d981c7336807b7abd44580f101391b6952ff8b` — [attempt 19 result](./gate-e-phase3b-attempt19-result-2026-07-06.md) |
+| 2 | **Gate F re-audit completed** | **DONE** ✓ | [GATE_F_REAUDIT_RESULT_2026-07-07.md](./GATE_F_REAUDIT_RESULT_2026-07-07.md) — 35 PASS, 14 NEEDS_REVIEW, 1 FAIL; Gate F remains **PENDING** |
+| 3 | **RSS multitab manual smoke completed** | **DONE** ✓ | Founder manual Chrome smoke per [runbook](./P0_MULTITAB_RSS_SMOKE_RUNBOOK_2026-07-07.md); outcome **PASS** — see [closure decision §3](./P0_CLOSURE_DECISION_2026-07-07.md#3-founder-rss-smoke-observations) |
+| 4 | **Evidence attached** | **DONE** ✓ | Founder observations recorded in [P0_CLOSURE_DECISION_2026-07-07.md](./P0_CLOSURE_DECISION_2026-07-07.md) §3 (no separate screenshots in repo) |
+| 5 | **Founder approval** | **DONE** ✓ | Founder explicit P0 closure approval — [P0_CLOSURE_DECISION_2026-07-07.md](./P0_CLOSURE_DECISION_2026-07-07.md) |
+| 6 | **P0 closure decision recorded** | **DONE** ✓ | [P0_CLOSURE_DECISION_2026-07-07.md](./P0_CLOSURE_DECISION_2026-07-07.md) |
 
 ---
 
@@ -30,32 +30,22 @@ Track prerequisites for **P0 performance closure** as a **separate track** from 
 | Track | Requirement | Met? |
 |-------|-------------|------|
 | Harness | Phase 3B CDP heap 20/20 prod PASS | **YES** (attempt 19) |
-| Manual | RSS multitab smoke 8–12 tabs real Chrome | **NO** — runbook ready, not executed |
-| Governance | Founder approval + closure record | **NO** |
+| Manual | RSS multitab smoke 8–12 tabs real Chrome | **YES** — founder PASS |
+| Governance | Founder approval + closure record | **YES** |
 
-**P0 remains OPEN** until items 3–6 are checked.
+**P0 is CLOSED** — all items 1–6 checked.
 
 ---
 
 ## 4. Founder approval (required before P0 CLOSED)
 
-Founder must explicitly confirm:
+Founder confirmed:
 
-1. RSS smoke outcome reviewed (PASS / FAIL / ABORT with evidence)
-2. No GB-scale RSS regression on prod workspace routes
-3. Authorize P0 performance track closure in a separate founder decision record
+1. RSS smoke outcome reviewed — **PASS**
+2. No GB-scale RSS regression; Chrome stable, no OOM, no kernel panic
+3. P0 performance track closure authorized in [closure decision](./P0_CLOSURE_DECISION_2026-07-07.md)
 
-**Template:**
-
-```
-P0 Closure Decision — YYYY-MM-DD
-RSS smoke outcome: PASS / FAIL / ABORT
-Evidence path: docs/evidence/p0-rss-smoke-YYYYMMDD/ (or attached)
-Founder approval: YES / NO
-If YES: founder records P0 track closure (separate record; Launch still separate)
-```
-
-☐ Founder approval recorded
+☑ **Founder approval recorded** — 2026-07-07
 
 ---
 
@@ -63,11 +53,11 @@ If YES: founder records P0 track closure (separate record; Launch still separate
 
 | Decision | Independent? | Current state |
 |----------|--------------|---------------|
-| **P0 CLOSED** | Separate from Gate F | **OPEN** — not closed |
+| **P0 CLOSED** | Separate from Gate F | **CLOSED** — [decision](./P0_CLOSURE_DECISION_2026-07-07.md) |
 | **Gate F YES** | Separate from P0 and Launch | **PENDING** — [re-audit](./GATE_F_REAUDIT_RESULT_2026-07-07.md) does not set YES |
-| **Launch GO** | Requires P0 closure **and** Gate F **and** public-launch founder decision | **NO-GO** |
+| **Launch GO** | Requires Gate F **and** public-launch founder decision | **NO-GO** |
 
-- **Gate F YES does not close P0.**
+- **Gate F YES does not close P0** (P0 already closed separately).
 - **P0 CLOSED does not grant Launch GO.**
 - **Launch GO remains separate** — requires all gates plus explicit public-launch founder decision.
 
@@ -78,16 +68,17 @@ If YES: founder records P0 track closure (separate record; Launch still separate
 | Component | Status |
 |-----------|--------|
 | RSS smoke runbook | **READY** — [P0_MULTITAB_RSS_SMOKE_RUNBOOK_2026-07-07.md](./P0_MULTITAB_RSS_SMOKE_RUNBOOK_2026-07-07.md) |
-| Closure checklist (this doc) | **READY** |
-| Static guard `test:p0-closure-package-guard` | **READY** |
-| Founder manual smoke | **PENDING** |
+| Closure checklist (this doc) | **COMPLETE** |
+| P0 closure decision | **RECORDED** — [P0_CLOSURE_DECISION_2026-07-07.md](./P0_CLOSURE_DECISION_2026-07-07.md) |
+| Static guard `test:p0-closure-decision-guard` | **READY** |
+| Founder manual smoke | **DONE** |
 
-**P0 closure package is complete for founder manual execution.** P0 is **not** closed until smoke + evidence + founder approval.
+**P0 closure package complete. P0 track closed.**
 
 ---
 
 ## 7. Launch stance footer
 
-**Launch: NO-GO** · **P0: OPEN** · **Gate F: PENDING**
+**Launch: NO-GO** · **P0: CLOSED** · **Gate F: PENDING**
 
-No P0 CLOSED. No Launch GO. No Gate F YES claimed by this checklist.
+No Launch GO. No Gate F YES claimed by this checklist.
