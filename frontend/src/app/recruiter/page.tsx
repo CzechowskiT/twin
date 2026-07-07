@@ -19,10 +19,10 @@ export default function RecruiterHubPage() {
         <div className="mt-2">
           <WorkspaceQuickActions
             actions={[
-              { href: recruiterDailyCockpitHref(), labelKey: "recruiterDailyCockpit.openDailyCockpit" },
               { href: "/recruiter/inbox", labelKey: "workspaceModules.recruiterInboxCta" },
-              { href: "/recruiter/analytics", labelKey: "workspaceModules.recruiterAnalyticsCta" },
-              { href: "/recruiter/integrations", labelKey: "workspaceModules.recruiterIntegrationsCta" },
+              { href: "/recruiter/pipeline", labelKey: "workspaceModules.recruiterPipelineCta" },
+              { href: "/recruiter/jobs", labelKey: "workspaceModules.recruiterJobsCta" },
+              { href: "/recruiter/search", labelKey: "workspaceModules.recruiterSearchCta" },
             ]}
           />
         </div>

@@ -36,7 +36,7 @@ export const CANDIDATE_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     titleKey: "workspaceModules.candidateCareerTitle",
     valuePropKey: "workspaceModules.candidateCareerValue",
     ctaKey: "workspaceModules.candidateCareerCta",
-    status: "live",
+    status: "pilot",
   },
   {
     id: "plan_payments",
