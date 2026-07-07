@@ -103,11 +103,13 @@ export function WorkspaceSiteHeaderBar() {
           <Link href="/" className="twin-logo shrink-0">
             TWIN<span className="twin-logo-accent">.</span>
           </Link>
-          {showDemoNav ? (
+          {headerDemoCtaVisible ? (
             <Link
               href="/demo"
-              className={demoPillClassName}
+              className={`${demoPillClassName} inline-flex px-3 sm:px-4`}
+              aria-label={t("nav.demo")}
               aria-current={demoActive ? "page" : undefined}
+              onClick={onHeaderDemoClick}
             >
               {t("nav.demo")}
             </Link>
