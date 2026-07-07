@@ -113,6 +113,14 @@ test("site header renders Explore TWIN mega-panel trigger on marketing chrome", 
   assert.match(header, /min-w-0/);
 });
 
+test("site header exposes primary Demo CTA on account rail with analytics", () => {
+  const header = read("src/components/site-header-bar.tsx");
+  assert.match(header, /showHeaderDemoCta/);
+  assert.match(header, /header_demo_click/);
+  assert.match(header, /marketingNavLinks/);
+  assert.doesNotMatch(header, /marketingLaneLinks\.map\(\(item\) => \{[\s\S]*item\.href === "\/demo"/);
+});
+
 test("guest header main lane excludes executive investor room shortcut", () => {
   const links = headerMarketingLaneLinks();
   assert.ok(!links.some((l) => l.href === "/investor"));

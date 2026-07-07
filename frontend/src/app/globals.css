@@ -1394,7 +1394,7 @@ html[data-marketing-surface="studio"] .twin-nav-roi-pill:hover {
 
 .company-logo-marquee {
   overflow: visible;
-  min-height: 4rem;
+  min-height: 5rem;
 }
 
 .company-logo-marquee__viewport {
@@ -2280,7 +2280,27 @@ html[data-workspace-route="true"] .landing-ambient__orb {
 /** Workspace/auth — bounded DOM marquee (≤27 nodes, 9×3 segments), transform-only loop. */
 .performance-safe-logo-marquee {
   overflow: visible;
-  min-height: 4rem;
+  min-height: 5rem;
+}
+
+.partner-logo-card {
+  min-height: 5rem;
+  min-width: 12rem;
+  padding: 1.5rem 2rem;
+}
+
+.partner-logo img {
+  height: 2.5rem;
+  max-height: 2.5rem;
+  width: auto;
+  object-fit: contain;
+}
+
+@media (min-width: 768px) {
+  .partner-logo img {
+    height: 3rem;
+    max-height: 3rem;
+  }
 }
 
 .performance-safe-logo-marquee__viewport {
@@ -2315,10 +2335,18 @@ html[data-workspace-route="true"] .landing-ambient__orb {
 
 .performance-safe-logo-mark {
   display: block;
-  height: 1.4rem;
+  height: 2.5rem;
   width: 100%;
-  max-width: 6.5rem;
+  max-width: 7.5rem;
+  max-height: 2.5rem;
   flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .performance-safe-logo-mark {
+    height: 3rem;
+    max-height: 3rem;
+  }
 }
 
 .performance-safe-logo-mark__inner {
