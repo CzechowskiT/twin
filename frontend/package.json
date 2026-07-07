@@ -108,6 +108,7 @@
     "test:gate-f-reaudit-result-guard": "npx --yes tsx scripts/gate-f-reaudit-result-guard.test.ts",
     "test:p0-closure-package-guard": "npx --yes tsx scripts/p0-closure-package-guard.test.ts",
     "test:p0-rss-evidence-template-guard": "npx --yes tsx scripts/p0-rss-evidence-template-guard.test.ts",
+    "test:p0-rss-founder-instructions-guard": "npx --yes tsx scripts/p0-rss-founder-instructions-guard.test.ts",
     "test:phase3b-local-execution-blocked": "npx --yes tsx scripts/phase3b-local-execution-blocked.test.ts",
     "test:cursor-agent-token-preflight": "npx --yes tsx scripts/cursor-agent-token-preflight.test.ts",
     "test:founder-demo-crosslinks": "npx --yes tsx scripts/founder-demo-crosslinks.test.ts",
