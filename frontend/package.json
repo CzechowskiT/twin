@@ -105,6 +105,7 @@
     "test:gate-f-decision-package-guard": "npx --yes tsx scripts/gate-f-decision-package-guard.test.ts",
     "test:gate-f-founder-review-note-guard": "npx --yes tsx scripts/gate-f-founder-review-note-guard.test.ts",
     "test:gate-f-reaudit-plan-guard": "npx --yes tsx scripts/gate-f-reaudit-plan-guard.test.ts",
+    "test:gate-f-reaudit-result-guard": "npx --yes tsx scripts/gate-f-reaudit-result-guard.test.ts",
     "test:phase3b-local-execution-blocked": "npx --yes tsx scripts/phase3b-local-execution-blocked.test.ts",
     "test:cursor-agent-token-preflight": "npx --yes tsx scripts/cursor-agent-token-preflight.test.ts",
     "test:founder-demo-crosslinks": "npx --yes tsx scripts/founder-demo-crosslinks.test.ts",
