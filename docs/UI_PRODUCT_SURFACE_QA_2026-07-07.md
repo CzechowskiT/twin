@@ -2,7 +2,7 @@
 
 **Canonical stance:** P0 CLOSED | Gate E PASS 20/20 | Gate F PENDING | **Launch NO-GO**
 
-This record captures merge evidence, deploy alignment, and visual QA status after PRs **#401**, **#402**, and **#403**. It does **not** declare Gate F YES or Launch GO.
+Merge evidence, deploy alignment, and **production visual QA** after PRs **#401–#404**. Does **not** declare Gate F YES or Launch GO.
 
 ## Merge evidence
 
@@ -13,39 +13,58 @@ This record captures merge evidence, deploy alignment, and visual QA status afte
 | [#403](https://github.com/CzechowskiT/twin/pull/403) | feat: simplify pilot product surface visibility | `a9b4e23c3f2a075546e362c66c4f65481159c630` |
 | [#404](https://github.com/CzechowskiT/twin/pull/404) | docs: UI product surface QA record + guard | `11495f6cdd5a133e71f270886f532a03341eff6f` |
 
-**Scaffold HEAD after merges:** `11495f6cdd5a133e71f270886f532a03341eff6f` (docs-only delta over `a9b4e23c`)
+**UI deploy reference (Vercel + Railway):** `a9b4e23c3f2a075546e362c66c4f65481159c630`
 
 ## Deploy alignment
 
+Polled `GET https://twin-sooty.vercel.app/api/public-health` on **2026-07-07** (aligned on first poll).
+
 | Signal | SHA / value |
 |--------|-------------|
-| `GET https://twin-sooty.vercel.app/api/public-health` → `frontend_commit` | `a9b4e23c3f2a075546e362c66c4f65481159c630` |
-| `api_commit` / `git_commit` (Railway) | `a9b4e23c3f2a075546e362c66c4f65481159c630` |
-| UI slice scaffold HEAD (#403) | `a9b4e23c3f2a075546e362c66c4f65481159c630` |
-| Scaffold HEAD (incl. QA doc [#404](https://github.com/CzechowskiT/twin/pull/404)) | `11495f6cdd5a133e71f270886f532a03341eff6f` |
-| **Alignment** | **ALIGNED** — Vercel frontend matches #402/#403 merge SHA (2026-07-07, post-#404 merge) |
+| `status` | `ok` |
+| `db_ok` | `true` |
+| `frontend_commit` | `a9b4e23c3f2a075546e362c66c4f65481159c630` |
+| `api_commit` / `git_commit` | `a9b4e23c3f2a075546e362c66c4f65481159c630` |
+| **Alignment** | **ALIGNED** — production frontend matches #402/#403 merge SHA |
 
-**QA pending deploy:** cleared for UI slice SHAs; founder browser confirm still required for layout/viewport evidence (see visual follow-ups).
+## Production visual QA summary
+
+Browser evidence: Playwright against `https://twin-sooty.vercel.app` (`PLAYWRIGHT_ALLOW_PROD_SMOKE=1`, 2026-07-07).
+
+| Area | Result | Notes |
+|------|--------|-------|
+| Header DEMO CTA | **PARTIAL** | Demo visible, `/demo`, before Login/Register in header link order; desktop/tablet/mobile without horizontal overflow; **residual:** one `/demo` in central persona cluster (Explore panel) alongside logo-rail pill |
+| Partner logos on `/` | **PASS** | Walmart, Goldman Sachs, Wells Fargo, American Express readable; marquee animation OK on visible tab |
+| Candidate hub `/dashboard` | **PARTIAL** | Static guards **PASS**; unauthenticated prod (auth shell) — roadmap/auto-apply/billing not visually confirmed |
+| Recruiter hub `/recruiter` | **PARTIAL** | Static guards **PASS**; auth shell — calendar/ATS/work queue not visually confirmed logged-in |
+| Company hub `/company/dashboard` | **PARTIAL** | Static guards **PASS**; auth shell — billing/integrations/delegated apply not visually confirmed |
+
+**Screenshots:**
+
+- `docs/screenshots/ui-product-surface-qa-2026-07-07/homepage-header-desktop.png`
+- `docs/screenshots/ui-product-surface-qa-2026-07-07/homepage-header-mobile.png`
+- `docs/screenshots/ui-product-surface-qa-2026-07-07/homepage-partner-marquee-desktop.png`
 
 ## Header DEMO CTA (#402)
 
 | Check | Static / code | Production visual |
 |-------|---------------|-------------------|
-| DEMO CTA on account rail before Login/Register | **PASS** (`site-header-bar.tsx`, `homepage-nav.test.ts`) | **PARTIAL** — deploy aligned; HTML curl shows DEMO strings; rail/layout not verified in browser |
-| `/demo` not duplicated in central persona nav | **PASS** (`marketingNavLinks` filters `/demo`) | **PARTIAL** — needs founder viewport (MCP browser unavailable in agent run) |
-| Mobile drawer includes DEMO without central duplicate | **PASS** (mobile `renderHeaderDemoCta`) | **PARTIAL** — 375px drawer not exercised |
+| DEMO CTA before Login/Register | **PASS** | **PASS** (Playwright prod) |
+| `/demo` not duplicated in flat central persona nav | **PASS** (`marketingNavLinks`) | **PARTIAL** — Explore panel adds one center `/demo` |
+| Mobile drawer includes DEMO | **PASS** | **PASS** (375px, no overflow) |
+| Link to `/demo` | **PASS** | **PASS** |
 
-**Overall header DEMO:** **PARTIAL** (code PASS; prod deploy aligned; browser visual **PENDING** founder/MCP)
+**Overall header DEMO:** **PARTIAL**
 
 ## Partner logos (#402)
 
 | Check | Static / code | Production visual |
 |-------|---------------|-------------------|
-| Walmart, Goldman Sachs, Wells Fargo, American Express in marquee set | **PASS** (`company-logo-marquee.tsx`) | **PARTIAL** — logos client-rendered; curl found no alt text on first paint |
-| Card min dimensions / readable logo height band | **PASS** (`globals.css`, `partner-logo-styles.ts`, marquee tests) | **PARTIAL** — needs founder viewport |
-| Responsive marquee (reduced-motion safe) | **PASS** (`performance-safe-moving-logo-marquee.test.ts`) | **PARTIAL** — needs founder viewport |
+| Walmart, Goldman Sachs, Wells Fargo, American Express | **PASS** | **PASS** |
+| Readable size / not clipped (homepage marquee) | **PASS** | **PASS** |
+| Marquee motion / reduced-motion path | **PASS** | **PASS** |
 
-**Overall partner logos:** **PARTIAL** (code PASS; deploy aligned; marquee not verified in browser)
+**Overall partner logos:** **PASS**
 
 ## Product surface visibility (#403)
 
@@ -53,31 +72,24 @@ Controlled-pilot primary limits: candidate **≤8**, recruiter **≤5**, company
 
 | Persona | Route / hub | Static guard | Production visual |
 |---------|-------------|--------------|-------------------|
-| Candidate | `/dashboard` hub — primary live cards, collapsed roadmap, auto-apply not primary, billing not live checkout | **PASS** (`product-surface-visibility-guard.test.ts`) | **PARTIAL** — route shells load (HTTP 200); hub grid needs auth/browser |
-| Recruiter | `/recruiter` — ≤5 primary; calendar / ATS / integrations not primary live | **PASS** | **PARTIAL** — route shells load (HTTP 200); hub grid needs auth/browser |
-| Company | `/company/dashboard` — ≤4 primary; billing / integrations not primary live | **PASS** | **PARTIAL** — route shells load (HTTP 200); hub grid needs auth/browser |
+| Candidate | `/dashboard` — ≤8 primary, roadmap collapsed, auto-apply not primary, billing not live checkout | **PASS** | **PARTIAL** (auth gate) |
+| Recruiter | `/recruiter` — ≤5 primary; calendar/ATS not primary live; work queue hidden | **PASS** | **PARTIAL** (auth gate) |
+| Company | `/company/dashboard` — ≤4 primary; billing/integrations not primary live | **PASS** | **PARTIAL** (auth gate) |
 
-**Overall product surface:** **PARTIAL** (guards PASS; prod shells only without authenticated hub render)
+**Overall product surface:** **PARTIAL**
 
-## Visual follow-ups (post-deploy)
+## Visual follow-ups
 
-**Automated prod check (2026-07-07):** `public-health` aligned; homepage curl shows DEMO copy; hub routes return 200 with loading shells — no Playwright/MCP browser in this run.
-
-1. Founder confirm homepage header: DEMO pill on right rail, no duplicate in center nav, mobile drawer at 375px width.
-2. Founder confirm partner marquee: four named logos readable, no clipping on tablet/desktop.
-3. Founder confirm `/dashboard`, `/recruiter`, `/company/dashboard` hub grids match primary/roadmap split and badges.
-4. ~~Re-fetch `public-health` and update this doc’s deploy table when aligned.~~ **Done** — see Deploy alignment.
+1. Remove or relabel Explore-panel `/demo` so marketing chrome has a single intentional Demo entry.
+2. Authenticated prod pass on hubs with founder demo account (`docs/DEMO_LOGIN_FOR_FOUNDER.md`) — **P6**.
+3. Optional: `/login` safe-marquee SVG height band (Playwright test 13); homepage marquee OK.
 
 ## Founder decisions still required
 
-Documented in `docs/GATE_F_FOUNDER_FINAL_DECISION_2026-07-07.md` (blank choices):
-
-- **S9** — `ecdsa` PYSEC-2026-1325 disposition
-- **P6** — authenticated prod smoke disposition
-- **Gate F** — YES | NO | PENDING (harness/evidence only; not Launch GO)
+`docs/GATE_F_FOUNDER_FINAL_DECISION_2026-07-07.md`: **S9**, **P6**, **Gate F** (not Launch GO).
 
 ## Gate F readiness note
 
-Evidence package for founder review is merged (#401). UI slices (#402, #403) are merged with static guards green; **production visual sign-off is no longer blocked on deploy alignment** for #402/#403 SHAs; founder viewport/hub auth checks remain before Gate F YES.
+#402/#403 live at `a9b4e23…`; homepage/logo prod smoke done; hub grids await authenticated P6.
 
 **No Gate F YES decided here. No Launch GO claimed here.**
