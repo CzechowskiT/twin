@@ -109,6 +109,7 @@
     "test:p0-closure-package-guard": "npx --yes tsx scripts/p0-closure-package-guard.test.ts",
     "test:p0-rss-evidence-template-guard": "npx --yes tsx scripts/p0-rss-evidence-template-guard.test.ts",
     "test:p0-rss-execution-record-guard": "npx --yes tsx scripts/p0-rss-execution-record-guard.test.ts",
+    "test:p0-final-blockers-guard": "npx --yes tsx scripts/p0-final-blockers-guard.test.ts",
     "test:p0-rss-founder-instructions-guard": "npx --yes tsx scripts/p0-rss-founder-instructions-guard.test.ts",
     "test:phase3b-local-execution-blocked": "npx --yes tsx scripts/phase3b-local-execution-blocked.test.ts",
     "test:cursor-agent-token-preflight": "npx --yes tsx scripts/cursor-agent-token-preflight.test.ts",
