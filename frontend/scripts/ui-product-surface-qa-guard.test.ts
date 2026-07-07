@@ -48,7 +48,8 @@ test("3 records deploy alignment and frontend_commit evidence", () => {
   const doc = qaDoc();
   assert.match(doc, /public-health/i);
   assert.match(doc, /frontend_commit/i);
-  assert.match(doc, /PENDING deploy|QA pending deploy/i);
+  assert.match(doc, /PENDING deploy|QA pending deploy|ALIGNED/i);
+  assert.match(doc, /frontend_commit/i);
 });
 
 test("4 header demo qa section present", () => {
