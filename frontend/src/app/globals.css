@@ -2280,26 +2280,26 @@ html[data-workspace-route="true"] .landing-ambient__orb {
 /** Workspace/auth — bounded DOM marquee (≤27 nodes, 9×3 segments), transform-only loop. */
 .performance-safe-logo-marquee {
   overflow: visible;
-  min-height: 5rem;
+  min-height: 2.75rem;
 }
 
 .partner-logo-card {
-  min-height: 5rem;
-  min-width: 12rem;
-  padding: 1.5rem 2rem;
+  min-height: 2.75rem;
+  min-width: 7.5rem;
+  padding: 0.5rem 0.75rem;
 }
 
 .partner-logo img {
-  height: 2.5rem;
-  max-height: 2.5rem;
+  height: 1.5rem;
+  max-height: 1.5rem;
   width: auto;
   object-fit: contain;
 }
 
 @media (min-width: 768px) {
   .partner-logo img {
-    height: 3rem;
-    max-height: 3rem;
+    height: 2rem;
+    max-height: 2rem;
   }
 }
 
@@ -2335,17 +2335,17 @@ html[data-workspace-route="true"] .landing-ambient__orb {
 
 .performance-safe-logo-mark {
   display: block;
-  height: 2.5rem;
+  height: 1.5rem;
   width: 100%;
   max-width: 7.5rem;
-  max-height: 2.5rem;
+  max-height: 1.5rem;
   flex-shrink: 0;
 }
 
 @media (min-width: 768px) {
   .performance-safe-logo-mark {
-    height: 3rem;
-    max-height: 3rem;
+    height: 2rem;
+    max-height: 2rem;
   }
 }
 
