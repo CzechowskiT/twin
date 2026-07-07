@@ -459,7 +459,7 @@ export function momentumRailCtas(
   return defaultMomentumCtas(persona, hasSession);
 }
 
-/** Kalendarz | Panel | Demo — calendar href is persona-aware (recruiter → roadmap placeholder). */
+/** Kalendarz | Panel — Demo pill lives beside the logo via showHeaderDemoCta(). */
 export function headerSessionNavLinks(
   persona: MarketingPersona,
   hasSession: boolean,
@@ -468,7 +468,6 @@ export function headerSessionNavLinks(
   return [
     { href: calendarNavHref(persona), labelKey: "dashboard.calendarLink" },
     { href: sessionPanelHref(persona), labelKey: "nav.dashboard" },
-    { href: "/demo", labelKey: "nav.demo" },
   ];
 }
 
@@ -543,9 +542,16 @@ export function showCandidateProductNav(persona: MarketingPersona): boolean {
   return persona === "candidate";
 }
 
-/** Demo beside the logo — logged-out candidates only; signed-in users get Demo in the center tab strip. */
+/** @deprecated Use showHeaderDemoCta — demo pill is always beside the logo. */
 export function showCandidateDemoNav(persona: MarketingPersona, hasSession: boolean): boolean {
-  return !hasSession && persona === "candidate";
+  void persona;
+  void hasSession;
+  return false;
+}
+
+/** Primary Demo pill beside the TWIN logo in global header chrome. */
+export function showHeaderDemoCta(): boolean {
+  return true;
 }
 
 export function logoutRedirectPath(persona: MarketingPersona): string {

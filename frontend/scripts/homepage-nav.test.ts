@@ -113,11 +113,14 @@ test("site header renders Explore TWIN mega-panel trigger on marketing chrome", 
   assert.match(header, /min-w-0/);
 });
 
-test("site header exposes primary Demo CTA on account rail with analytics", () => {
+test("site header exposes primary Demo CTA beside logo with analytics", () => {
   const header = read("src/components/site-header-bar.tsx");
   assert.match(header, /showHeaderDemoCta/);
   assert.match(header, /header_demo_click/);
+  assert.match(header, /renderHeaderDemoCta/);
   assert.match(header, /marketingNavLinks/);
+  assert.match(header, /twin-logo[\s\S]{0,500}renderHeaderDemoCta/);
+  assert.doesNotMatch(header, /ml-auto flex[\s\S]{0,240}renderHeaderDemoCta/);
   assert.doesNotMatch(header, /marketingLaneLinks\.map\(\(item\) => \{[\s\S]*item\.href === "\/demo"/);
 });
 

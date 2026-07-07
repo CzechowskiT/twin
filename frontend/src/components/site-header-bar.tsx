@@ -23,8 +23,8 @@ import {
   headerSessionNavLinks,
   isSessionNavLinkActive,
   logoutRedirectPath,
-  showCandidateDemoNav,
   showCorporateNav,
+  showHeaderDemoCta,
   showMarketingPersonaNav,
 } from "@/lib/persona-access";
 
@@ -54,8 +54,8 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
   const [locationHash, setLocationHash] = useState("");
   const growthLinks = headerGrowthLinksForPersona(persona, pathname, hasSession);
   const sessionNavLinks = headerSessionNavLinks(persona, hasSession);
-  const showDemoNav = showCandidateDemoNav(persona, hasSession);
   const personaLaneNav = showMarketingPersonaNav(hasSession, marketingChrome);
+  const headerDemoCtaVisible = showHeaderDemoCta();
   const marketingLaneLinks = headerMarketingLaneLinks();
   const showMarketingNav = showCorporateNav(hasSession) && !personaLaneNav;
   const accountLinks = headerAccountLinks(persona, hasSession, { marketingChrome: personaLaneNav });
@@ -137,8 +137,6 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
   };
 
   const primaryGrowth = growthLinks[0];
-  const showHeaderDemoCta =
-    personaLaneNav || showDemoNav || primaryGrowth?.href === "/demo";
   const marketingNavLinks = marketingLaneLinks.filter((item) => item.href !== "/demo");
   const leftRailGrowth =
     primaryGrowth && primaryGrowth.href !== "/demo" ? primaryGrowth : null;
@@ -168,6 +166,9 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
           <Link href="/" className="twin-logo shrink-0">
             TWIN<span className="twin-logo-accent">.</span>
           </Link>
+          {headerDemoCtaVisible
+            ? renderHeaderDemoCta(`${demoPillClassName} inline-flex px-3 sm:px-4`)
+            : null}
           {leftRailGrowth ? (
             <Link
               href={leftRailGrowth.href}
@@ -240,9 +241,6 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
         </nav>
 
         <div className="ml-auto flex min-w-0 shrink-0 flex-wrap items-center justify-end gap-x-2 gap-y-1">
-          {showHeaderDemoCta
-            ? renderHeaderDemoCta(`${demoPillClassName} inline-flex px-3 sm:px-4`)
-            : null}
           {accountLinks.map((item) =>
             item.isLogout ? (
               <button
@@ -279,17 +277,15 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
               aria-label={t("nav.ariaMobileNav")}
               style={{ boxShadow: "var(--twin-shadow-md)" }}
             >
-              {showHeaderDemoCta
-                ? renderHeaderDemoCta(`${demoPillClassName} mb-2 w-full`)
-                : leftRailGrowth ? (
-                    <Link
-                      href={leftRailGrowth.href}
-                      onClick={closeMobileMenu}
-                      className={`${growthCtaClass(leftRailGrowth.variant, headerCtaBase)} mb-2 w-full`}
-                    >
-                      {t(leftRailGrowth.labelKey)}
-                    </Link>
-                  ) : null}
+              {leftRailGrowth ? (
+                <Link
+                  href={leftRailGrowth.href}
+                  onClick={closeMobileMenu}
+                  className={`${growthCtaClass(leftRailGrowth.variant, headerCtaBase)} mb-2 w-full`}
+                >
+                  {t(leftRailGrowth.labelKey)}
+                </Link>
+              ) : null}
               {hasSession ? (
                 <>
                   <p className="mt-1 border-t border-[var(--twin-border)] px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">

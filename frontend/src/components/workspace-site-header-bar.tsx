@@ -8,6 +8,7 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 import { useTranslation } from "@/components/language-provider";
 import { PersonaBadge } from "@/components/persona-badge";
 import { useMarketingPersona } from "@/components/persona-provider";
+import { trackEvent } from "@/lib/analytics";
 import { apiFetch } from "@/lib/api";
 import { clearToken, getToken, hasActiveSession } from "@/lib/auth";
 import { isDemoUserEmail } from "@/lib/demo-user";
@@ -18,7 +19,7 @@ import {
   headerSessionNavLinks,
   isSessionNavLinkActive,
   logoutRedirectPath,
-  showCandidateDemoNav,
+  showHeaderDemoCta,
 } from "@/lib/persona-access";
 
 /** Workspace-only header — no corporate marketing nav or marquee brand arrays. */
@@ -32,7 +33,7 @@ export function WorkspaceSiteHeaderBar() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [locationHash, setLocationHash] = useState("");
   const sessionNavLinks = headerSessionNavLinks(persona, hasSession);
-  const showDemoNav = showCandidateDemoNav(persona, hasSession);
+  const headerDemoCtaVisible = showHeaderDemoCta();
   const accountLinks = headerAccountLinks(persona, hasSession, { marketingChrome: false });
   const demoActive = pathname === "/demo" || pathname.startsWith("/demo/");
   const dashboardSectionActive =
@@ -93,6 +94,11 @@ export function WorkspaceSiteHeaderBar() {
     clearToken();
     closeMobileMenu();
     router.push(loginPath);
+  };
+
+  const onHeaderDemoClick = () => {
+    trackEvent("header_demo_click", { surface: "workspace_header" });
+    closeMobileMenu();
   };
 
   return (
