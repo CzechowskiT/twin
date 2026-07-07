@@ -379,9 +379,12 @@ test("17b investor product proof live with hint and diligence boundaries", () =>
   assert.match(desc, /read-only|diligence|no launch|no outreach|writeback/i);
 });
 
-test("17 non-investor hubs stay flat — no investor grouping markup", () => {
+test("17 non-investor hubs split live primary from collapsed pilot roadmap", () => {
   const hub = read("src/components/workspace/system-of-record-navigation-hub.tsx");
   assert.match(hub, /persona === "investor"/);
+  assert.match(hub, /splitProductSurfaceRoutes/);
+  assert.match(hub, /data-product-surface-primary/);
+  assert.match(hub, /data-product-surface-roadmap/);
   assert.doesNotMatch(read("src/app/recruiter/page.tsx"), /data-sor-investor-group/);
   assert.doesNotMatch(read("src/components/dashboard/candidate-module-nav.tsx"), /data-sor-investor-group/);
   for (const persona of ["candidate", "recruiter", "company"] as const) {

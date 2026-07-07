@@ -1,10 +1,11 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import type { TranslationKey } from "@/lib/i18n";
 import type { MarketingPersona } from "@/lib/marketing-persona";
+import { splitProductSurfaceRoutes } from "@/lib/product-surface-visibility";
 import {
   getSystemOfRecordRoutesForPersona,
   groupInvestorSoRRoutes,
@@ -44,6 +45,11 @@ export function SystemOfRecordNavigationHub({
 }) {
   const { t } = useTranslation();
   const routes = getSystemOfRecordRoutesForPersona(persona);
+  const [roadmapExpanded, setRoadmapExpanded] = useState(false);
+  const surface =
+    persona === "investor"
+      ? { primary: routes, roadmap: [] as readonly SystemOfRecordRouteEntry[], hidden: [] }
+      : splitProductSurfaceRoutes(persona, routes);
 
   return (
     <section
@@ -80,8 +86,40 @@ export function SystemOfRecordNavigationHub({
           })}
         </div>
       ) : (
-        <div className="mt-4">
-          <SoRModuleGrid routes={routes} />
+        <div className="mt-4 space-y-6" data-product-surface-hub={persona}>
+          <div data-product-surface-primary>
+            <SoRModuleGrid routes={surface.primary} />
+          </div>
+          {surface.roadmap.length > 0 ? (
+            <div data-product-surface-roadmap>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h3 className="text-sm font-semibold text-[var(--foreground)]">
+                    {t("productSurface.roadmapSectionTitle")}
+                  </h3>
+                  <p className="twin-muted mt-1 max-w-3xl text-xs leading-relaxed">
+                    {t("productSurface.roadmapSectionLead")}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="twin-link text-sm font-semibold"
+                  onClick={() => setRoadmapExpanded((open) => !open)}
+                  aria-expanded={roadmapExpanded}
+                  data-testid="product-surface-roadmap-toggle"
+                >
+                  {roadmapExpanded
+                    ? t("productSurface.hideRoadmapModules")
+                    : t("productSurface.showRoadmapModules")}
+                </button>
+              </div>
+              {roadmapExpanded ? (
+                <div className="mt-3">
+                  <SoRModuleGrid routes={surface.roadmap} />
+                </div>
+              ) : null}
+            </div>
+          ) : null}
         </div>
       )}
       {children}

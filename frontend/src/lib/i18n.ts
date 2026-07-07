@@ -172,6 +172,7 @@ export type TranslationKey =
   | `marketingCrosslinks.${keyof typeof en.marketingCrosslinks}`
   | `workspace.${keyof typeof en.workspace}`
   | `workspaceModules.${keyof typeof en.workspaceModules}`
+  | `productSurface.${keyof typeof en.productSurface}`
   | `developers.${keyof typeof en.developers}`
   | `meta.${keyof typeof en.meta}`
   | `privacy.${keyof typeof en.privacy}`
@@ -1823,6 +1824,13 @@ const en = {
     toolInvestorRoadmap: "Roadmap & founder updates",
     toolInvestorRoadmapDesc: "Honest now/next/later, risks, and validation milestones from production matrices.",
   },
+  productSurface: {
+    roadmapSectionTitle: "Pilot & roadmap modules",
+    roadmapSectionLead:
+      "Preview lanes with honest PILOT, COMING SOON, or PAUSED badges — collapsed by default so the core product looks finished.",
+    showRoadmapModules: "Show pilot & roadmap",
+    hideRoadmapModules: "Hide pilot & roadmap",
+  },
   workspaceModules: {
     hubEyebrow: "Workspace modules",
     quickActionsAria: "Quick workspace actions",
@@ -1835,7 +1843,7 @@ const en = {
     statusNeedsSetup: "Needs setup",
     statusPaused: "Paused",
     candidateHubTitle: "Your candidate modules",
-    candidateHubLead: "Every lane in one grid — honest status badges, no empty screens. Auto-apply stays paused until readiness checks pass.",
+    candidateHubLead: "Core live modules first — pilot and roadmap lanes stay in a collapsed section with honest badges.",
     candidateProfileTitle: "Profile & CV",
     candidateProfileValue: "Completeness, LinkedIn sync, and verified readiness gate.",
     candidateProfileHint: "Start here before matches and applications.",
@@ -1921,7 +1929,7 @@ const en = {
     candidateAutoApplyHint: "Checklist: profile ready, verified readiness, consent, calendar optional.",
     candidateAutoApplyCta: "View readiness",
     recruiterHubTitle: "Recruiter workspace",
-    recruiterHubLead: "Batch acceptance, pipeline, and integrations — calendar sync is not live yet.",
+    recruiterHubLead: "Inbox, pipeline, jobs, and search first — calendar sync, ATS, and integrations stay in the collapsed pilot section.",
     recruiterInboxTitle: "Acceptance inbox",
     recruiterInboxValue: "Pre-qualified candidates per company slug — accept, decline, reschedule.",
     recruiterInboxCta: "Open inbox",
@@ -1971,7 +1979,7 @@ const en = {
       "Weekly review of candidates, decisions, and follow-ups from Talent Radar.",
     recruiterTalentRadarDigestCta: "Open digest",
     companyHubTitle: "Company workspace",
-    companyHubLead: "Roles, team tokens, pipeline, and billing readiness — enter pilot access to load metrics.",
+    companyHubLead: "Dashboard, roles, pipeline, and talent pool first — billing and integrations stay in the collapsed pilot section.",
     companyRolesTitle: "Roles",
     companyRolesValue: "Create and publish open roles for your slug.",
     companyRolesHint: "Requires pilot token + company slug.",
@@ -2075,9 +2083,9 @@ const en = {
     investorProofAtsTitle: "ATS readiness proof",
     investorProofAtsValue: "Import mapping and dedupe preview — no live sync or writeback.",
     investorProofAtsCta: "View ATS proof",
-    candidateHubLead: "Every candidate lane — honest status and boundary badges, no hidden URLs.",
-    recruiterHubLead: "Batch acceptance, pipeline, talent layers, and integrations — outreach and ATS sync stay off.",
-    companyHubLead: "Roles, talent pool, collaboration demos, and billing readiness — pilot access required for metrics.",
+    candidateHubLead: "Core live modules first — pilot and roadmap lanes collapsed with honest boundary badges.",
+    recruiterHubLead: "Inbox, pipeline, jobs, and search first — calendar sync, ATS, and integrations stay collapsed under pilot.",
+    companyHubLead: "Dashboard, roles, pipeline, and talent pool first — billing and integrations collapsed under pilot.",
     investorHubLead: "Metrics, roadmap, data room, and system-of-record proof cards for diligence.",
     investorGroupProductTitle: "Product & diligence",
     investorGroupProductLead:
@@ -9439,6 +9447,13 @@ const pl: MessageTree = {
     toolInvestorRoadmap: "Roadmapa i aktualizacje founderów",
     toolInvestorRoadmapDesc: "Uczciwe teraz/następne/później, ryzyka i kamienie walidacji z macierzy produkcyjnych.",
   },
+  productSurface: {
+    roadmapSectionTitle: "Moduły pilota i roadmapy",
+    roadmapSectionLead:
+      "Podglądowe ścieżki z uczciwymi badge'ami PILOT, COMING SOON lub PAUSED — domyślnie zwinięte, żeby rdzeń produktu wyglądał na dopracowany.",
+    showRoadmapModules: "Pokaż pilot i roadmapę",
+    hideRoadmapModules: "Ukryj pilot i roadmapę",
+  },
   workspaceModules: {
     hubEyebrow: "Moduły workspace",
     quickActionsAria: "Szybkie akcje workspace",
@@ -9451,7 +9466,7 @@ const pl: MessageTree = {
     statusNeedsSetup: "Wymaga konfiguracji",
     statusPaused: "Wstrzymane",
     candidateHubTitle: "Twoje moduły kandydata",
-    candidateHubLead: "Wszystkie ścieżki w jednej siatce — uczciwe statusy, bez pustych ekranów. Auto-aplikacja wstrzymana do spełnienia checklisty.",
+    candidateHubLead: "Najpierw moduły live — ścieżki pilota i roadmapy w zwiniętej sekcji z uczciwymi badge'ami.",
     candidateProfileTitle: "Profil i CV",
     candidateProfileValue: "Kompletność, sync LinkedIn i bramka gotowości zweryfikowanej.",
     candidateProfileHint: "Zacznij tutaj przed dopasowaniami i aplikacjami.",
@@ -9537,7 +9552,7 @@ const pl: MessageTree = {
     candidateAutoApplyHint: "Checklista: profil, gotowości zweryfikowanej, zgoda, kalendarz opcjonalnie.",
     candidateAutoApplyCta: "Zobacz gotowość",
     recruiterHubTitle: "Strefa rekrutera",
-    recruiterHubLead: "Hurtowa akceptacja, pipeline i integracje — synchronizacja kalendarza nie jest jeszcze aktywna.",
+    recruiterHubLead: "Najpierw inbox, pipeline, oferty i wyszukiwanie — sync kalendarza, ATS i integracje w zwiniętej sekcji pilota.",
     recruiterInboxTitle: "Skrzynka akceptacji",
     recruiterInboxValue: "Pre-kwalifikowani kandydaci per slug firmy — akceptuj, odrzuć, przełóż.",
     recruiterInboxCta: "Otwórz skrzynkę",
@@ -9587,7 +9602,7 @@ const pl: MessageTree = {
       "Tygodniowy przegląd kandydatów, decyzji i follow-upów z Radaru Talentów.",
     recruiterTalentRadarDigestCta: "Otwórz digest",
     companyHubTitle: "Strefa firmy",
-    companyHubLead: "Role, tokeny zespołu, pipeline i billing — wpisz token pilotażowy, aby załadować metryki.",
+    companyHubLead: "Najpierw dashboard, role, pipeline i talent pool — billing i integracje w zwiniętej sekcji pilota.",
     companyRolesTitle: "Role",
     companyRolesValue: "Twórz i publikuj otwarte role dla swojego slug.",
     companyRolesHint: "Wymaga tokenu pilota + slug firmy.",
@@ -9691,9 +9706,9 @@ const pl: MessageTree = {
     investorProofAtsTitle: "Dowód gotowości ATS",
     investorProofAtsValue: "Mapowanie importu i podgląd deduplikacji — bez bieżącej synchronizacji ani zapisu zwrotnego do ATS.",
     investorProofAtsCta: "Zobacz dowód ATS",
-    candidateHubLead: "Każda ścieżka kandydata — uczciwy status i tagi granic, bez ukrytych URL.",
-    recruiterHubLead: "Hurtowa akceptacja, pipeline, warstwy talentu i integracje — kontakt wychodzący i synchronizacja ATS wyłączone.",
-    companyHubLead: "Role, pamięć talentów, demo współpracy i billing — metryki wymagają tokenu pilota.",
+    candidateHubLead: "Najpierw moduły live — ścieżki pilota i roadmapy zwinięte z uczciwymi badge'ami granic.",
+    recruiterHubLead: "Najpierw inbox, pipeline, oferty i wyszukiwanie — sync kalendarza, ATS i integracje zwinięte w sekcji pilota.",
+    companyHubLead: "Najpierw dashboard, role, pipeline i talent pool — billing i integracje zwinięte w sekcji pilota.",
     investorHubLead: "Metryki, roadmapa, data room i karty dowodów rejestru operacyjnego do due diligence.",
     investorGroupProductTitle: "Produkt i due diligence",
     investorGroupProductLead:
