@@ -1,10 +1,10 @@
 # Gate F Re-audit Result — 2026-07-07
 
-**Branch:** `cursor/phase1-monorepo-scaffold` @ post **PR #391** (`849bf377`) — re-audit plan merged  
-**Package type:** Row-by-row re-audit result + static guards — **not launch approval**  
-**Gate E:** **YES / PASS** — prod Phase 3B **20/20 PASS** (attempt 19)  
-**Gate F:** **PENDING** — re-audit **executed** per plan; founder decision **not yet recorded**  
-**Launch stance:** **NO-GO** · **P0:** **OPEN** · **Phase 3B:** **PASS** (prod 20/20 @ attempt 19)
+**Branch:** `cursor/phase1-monorepo-scaffold` @ post **PR #399** (`c76f089c`) — P0 consistency + evidence completion
+**Package type:** Row-by-row re-audit result + static guards — **not launch approval**
+**Gate E:** **YES / PASS** — prod Phase 3B **20/20 PASS** (attempt 19)
+**Gate F:** **PENDING** — re-audit **executed** per plan; founder decision **not yet recorded**
+**Launch stance:** **NO-GO** · **P0:** **CLOSED** · **Phase 3B:** **PASS** (prod 20/20 @ attempt 19)
 
 **Related:** [re-audit plan](./GATE_F_REAUDIT_PLAN_2026-07-07.md) · [Gate F decision package](./GATE_F_DECISION_PACKAGE_2026-07-06.md) · [founder review note](./GATE_F_FOUNDER_REVIEW_NOTE_2026-07-07.md) · [attempt 19](./gate-e-phase3b-attempt19-result-2026-07-06.md) · [launch gate checklist](./PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md) · [production reality matrix](./PRODUCTION_REALITY_MATRIX_2026-05-27.md)
 
@@ -62,8 +62,8 @@ Gate F remains **PENDING** until the founder records a decision per §8.
 | PUBLIC_LAUNCH_GATE_CHECKLIST | **S5** Stripe `event.id` dedup | Alembic `050_stripe_webhook_events` on prod (2026-05-29) | **PASS** | Founder/ops | Read-only `alembic_version` re-check |
 | PUBLIC_LAUNCH_GATE_CHECKLIST | **S6** Auto-apply sweep gate 10+ tests | `test_auto_apply_trigger_sweep_admin_gate.py` | **PASS** | Engineering | `pytest` on scaffold HEAD |
 | PUBLIC_LAUNCH_GATE_CHECKLIST | **S7** Public health regression tests | `test_public_health_regression.py` | **PASS** | Engineering | CI smoke green |
-| PUBLIC_LAUNCH_GATE_CHECKLIST | **S8** No secrets in repo | One-shot verified 2026-05-29 | **NEEDS_REVIEW** | Founder | `gh secret list` + `git grep` before launch |
-| PUBLIC_LAUNCH_GATE_CHECKLIST | **S9** No HIGH CVEs in baseline | Baseline doc + safety/npm audit | **NEEDS_REVIEW** | Founder | Re-run `safety check` + `npm audit` |
+| PUBLIC_LAUNCH_GATE_CHECKLIST | **S8** No secrets in repo | **2026-07-07** — `gh secret list` → **1** repo secret (name only); `grep` `sk_live`/`AKIA`/PEM in app source → **0** live matches (test patterns only) | **PASS** | Ops | Re-run before public launch if new commits land |
+| PUBLIC_LAUNCH_GATE_CHECKLIST | **S9** No HIGH CVEs in baseline | **2026-07-07** — `npm audit --audit-level=high` → **0 HIGH** (4 low/moderate); `pip-audit -r requirements.txt` → **1** finding `ecdsa` `PYSEC-2026-1325` (timing side-channel; no fix planned) | **NEEDS_REVIEW** | Founder | Accept transitive risk / waiver or plan `ecdsa` removal |
 | PUBLIC_LAUNCH_GATE_CHECKLIST | **S10** OAuth callback rate-limit | `1efd8b1` on auth + calendar + ATS | **PASS** | Engineering | Runtime SHA verify |
 | PUBLIC_LAUNCH_GATE_CHECKLIST | **S10b** Mutation caps + saved-jobs | `1c731fc` + tests | **PASS** | Engineering | O2/O6 SHA alignment check |
 | PUBLIC_LAUNCH_GATE_CHECKLIST | **S10c** Cookie consent + recruiter inbox limits | `67a22dc` + tests | **PASS** | Engineering | O2/O6 SHA alignment check |
@@ -73,17 +73,17 @@ Gate F remains **PENDING** until the founder records a decision per §8.
 
 | Source document | Checklist item | Current evidence | Status | Owner | Required next action |
 |-----------------|----------------|------------------|--------|-------|----------------------|
-| PUBLIC_LAUNCH_GATE_CHECKLIST | **O1** Smoke workflow green (latest 5 commits) | PR #391 merge CI SUCCESS (backend-smoke, frontend-build) | **NEEDS_REVIEW** | Ops | `gh run list --workflow smoke.yml --limit 5` on prod SHAs |
+| PUBLIC_LAUNCH_GATE_CHECKLIST | **O1** Smoke workflow green (latest 5 commits) | **2026-07-07** — `gh run list --workflow smoke.yml --limit 5` → **5/5** `conclusion=success` (latest `c76f089c` @ `2026-07-07T17:56:36Z`) | **PASS** | Ops | Keep green on scaffold merges |
 | PUBLIC_LAUNCH_GATE_CHECKLIST | **O2** `public-health` ok + `db_ok=true` | Attempt 19: `ok` / `db_ok=true` @ SHA `80d981c` | **PASS** | Ops | Refresh checklist row SHA from `df15618` → `80d981c` |
-| PUBLIC_LAUNCH_GATE_CHECKLIST | **O3** Celery worker active | celery-status endpoint documented green | **NEEDS_REVIEW** | Ops | `curl …/health/celery-status` on current prod |
+| PUBLIC_LAUNCH_GATE_CHECKLIST | **O3** Celery worker active | **2026-07-07** — `GET …/api/v1/health/celery-status` → HTTP **200**, `worker_active=true`, `worker_nodes` non-empty; latency **~5.9s** | **PASS** | Ops | Monitor worker restarts |
 | PUBLIC_LAUNCH_GATE_CHECKLIST | **O4** Stripe webhook reachable | Audit doc + signature gate | **PASS** | Engineering | No change unless billing deploy |
 | PUBLIC_LAUNCH_GATE_CHECKLIST | **O5** Calendar OAuth (Google + Microsoft; Apple partial) | Google FULL prod smoke 2026-05-29; Microsoft LIVE; Apple partial — waiver `2026-06-03` | **NEEDS_REVIEW** | Founder | Confirm copy does not overpromise Apple; waiver still valid |
-| PUBLIC_LAUNCH_GATE_CHECKLIST | **O6** Vercel canonical alias + drift guard | Drift documented; canonical project correct | **NEEDS_REVIEW** | Ops | `bash scripts/check-vercel-canonical-alias.sh` |
+| PUBLIC_LAUNCH_GATE_CHECKLIST | **O6** Vercel canonical alias + drift guard | **2026-07-07** — `scripts/check-vercel-canonical-alias.sh` → **OK** (`twin` @ canonical team; alias `twin-sooty.vercel.app`) | **PASS** | Ops | Re-run after Vercel project changes |
 | PUBLIC_LAUNCH_GATE_CHECKLIST | **O7** Backup/restore exercised | Staging drill PASS 2026-06-01 | **PASS** | Founder | O7 re-drill post–#108/#110 noted BLOCKED in matrix — confirm still acceptable |
 | PUBLIC_LAUNCH_GATE_CHECKLIST | **O8** Incident response runbook | `INCIDENT_RESPONSE_RUNBOOK_2026-05-27.md` | **PASS** | Engineering | Named on-call current |
 | PUBLIC_LAUNCH_GATE_CHECKLIST | **O8b** Launch-day monitoring runbook | `LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` | **PASS** | Engineering | Records public NO-GO — still accurate |
 | PUBLIC_LAUNCH_GATE_CHECKLIST | **O9** Security risk register current | `SECURITY_RISK_REGISTER_2026-05-27.md` | **PASS** | Engineering | Refresh if new risks since attempt 19 |
-| PUBLIC_LAUNCH_GATE_CHECKLIST | **O10** Vercel canonical re-link fixed or workaround | Workaround documented | **NEEDS_REVIEW** | Ops | Reconcile with O6 drift check |
+| PUBLIC_LAUNCH_GATE_CHECKLIST | **O10** Vercel canonical re-link fixed or workaround | **2026-07-07** — reconciled with **O6 PASS** (local `project.json` canonical; public alias served) | **PASS** | Ops | Document any future re-link in runbook |
 
 ### 3.3 Public launch gate checklist — Legal / privacy (L1–L7)
 
@@ -106,7 +106,7 @@ Gate F remains **PENDING** until the founder records a decision per §8.
 | PUBLIC_LAUNCH_GATE_CHECKLIST | **P3** Pilot offer copy reviewed | `PILOT_OFFER_FINAL.md` | **PASS** | Founder | — |
 | PUBLIC_LAUNCH_GATE_CHECKLIST | **P4** Pilot pricing verified | B2B pricing docs | **PASS** | Founder | — |
 | PUBLIC_LAUNCH_GATE_CHECKLIST | **P5** Pilot kill-switch tested | Auto-apply sweep admin gate tests | **PASS** | Engineering | — |
-| PUBLIC_LAUNCH_GATE_CHECKLIST | **P6** Founder authenticated prod smoke | 8/8 routes PASS 2026-05-29; attempt 19 deep-link routes 0 × `page-error:1` | **NEEDS_REVIEW** | Founder | Re-smoke authenticated subpages post–PR #384/#387 |
+| PUBLIC_LAUNCH_GATE_CHECKLIST | **P6** Founder authenticated prod smoke | Gate E attempt 19 **20/20** harness (unauthenticated/deep-link); prior founder **8/8** PASS `2026-05-29` | **NEEDS_REVIEW** | Founder | Manual: [authenticated persona runbook](./FOUNDER_AUTHENTICATED_PERSONA_SMOKE_RUNBOOK_2026-06-12.md) §1 **C2–C8** (+ company/recruiter tables) on current prod — **no Playwright** |
 | PUBLIC_LAUNCH_GATE_CHECKLIST | **P7** Limited recruiter pilot pack | H5b PASS; H5c/H5d **HOLD**; 0/3–5 invited | **NEEDS_REVIEW** | Founder | Public launch blocked; pilot GO unchanged |
 
 ### 3.5 Production reality matrix — Capability claims (selected rows)
@@ -121,7 +121,7 @@ Gate F remains **PENDING** until the founder records a decision per §8.
 | PRODUCTION_REALITY_MATRIX | Delegated apply | Hard-false gateway; NOT LIVE | **PASS** | Engineering | No overclaim in copy |
 | PRODUCTION_REALITY_MATRIX | Recruiter calendar sync | Placeholder — **NOT LIVE** | **PASS** | Founder | Confirm marketing does not claim live sync |
 | PRODUCTION_REALITY_MATRIX | Recruiter inbox + H5 cohort | R1–R5 PASS; H5c/H5d **HOLD** | **NEEDS_REVIEW** | Founder | External invites **not sent** — correct |
-| PRODUCTION_REALITY_MATRIX | P0 browser memory / multi-tab | Phase 3B CDP heap PASS; **RSS multitab manual NOT documented** | **NEEDS_REVIEW** | Founder | **Separate P0 track** — see §7 |
+| PRODUCTION_REALITY_MATRIX | P0 browser memory / multi-tab | [P0 closure decision](./P0_CLOSURE_DECISION_2026-07-07.md) + Gate E attempt 19 **20/20** + founder RSS validation **2026-07-07** | **RESOLVED** | Founder | Performance 2.0 backlog only — not a P0 blocker |
 | PRODUCTION_REALITY_MATRIX | Public launch announcement | Gate checklist + matrix | **FAIL** | Founder | Public **NO-GO** — founder limited-launch decision pending |
 | PRODUCTION_REALITY_MATRIX | CSP enforce mode | S2 PASS post-enforce 2026-06-05 | **PASS** | Founder | Matrix header stale "READY FOR FOUNDER DECISION" — refresh |
 | PRODUCTION_REALITY_MATRIX | Lighthouse / perf budgets | Not re-run post–PR #387 | **NEEDS_REVIEW** | Founder | P0-4 criterion — separate from Gate F harness |
@@ -135,15 +135,34 @@ Gate F remains **PENDING** until the founder records a decision per §8.
 | gate-e-phase3b-attempt19 | `/dashboard` DOM budget | **3356** nodes ≤ 15000 (was 21094) | **PASS** | Engineering | PR #387 dashboard-dom-budget |
 | gate-e-phase3b-attempt19 | `frontend_commit` alignment | Aligned @ `80d981c` | **PASS** | Ops | Record in launch checklist O2 row |
 
+
+### 3.7 Evidence completion slice (Executive Review — 2026-07-07)
+
+Read-only operator checks (no prod mutation). Detail log: [GATE_F_EVIDENCE_COMPLETION_2026-07-07.md](./GATE_F_EVIDENCE_COMPLETION_2026-07-07.md).
+
+| ID | Disposition | Evidence summary (UTC **2026-07-07**) |
+|----|-------------|----------------------------------------|
+| **S8** | **PASS** | `gh secret list` → **1** repo secret (name only); source `grep` → no live `sk_live` / `AKIA` / PEM in app tree |
+| **S9** | **NEEDS_REVIEW** | `npm audit --audit-level=high` → **0 HIGH**; `pip-audit` → `ecdsa` `PYSEC-2026-1325` (no planned fix) |
+| **O1** | **PASS** | `gh run list --workflow smoke.yml --limit 5` → **5/5** `success` (head `c76f089c`) |
+| **O3** | **PASS** | `GET /api/v1/health/celery-status` → **200**, `worker_active=true`, ~**5.9s** |
+| **O6 / O10** | **PASS** | `scripts/check-vercel-canonical-alias.sh` → canonical **OK** |
+| **P6** | **NEEDS_REVIEW** | Attempt 19 harness ≠ full authenticated persona smoke — founder manual per [runbook](./FOUNDER_AUTHENTICATED_PERSONA_SMOKE_RUNBOOK_2026-06-12.md) |
+
+**Slice totals:** **PASS 5** · **NEEDS_REVIEW 2** · **FAIL 0** (S9, P6).
+
+**Founder Gate F decision:** Evidence for the six Executive Review items is **recorded**; **Gate F remains PENDING** until founder answers §8. **Gate F YES ≠ Launch GO.**
+
 ---
 
 ## 4. Audit summary
 
 | Status | Count (checklist + matrix rows above) |
 |--------|---------------------------------------|
-| **PASS** | 35 |
-| **NEEDS_REVIEW** | 14 |
+| **PASS** | 40 |
+| **NEEDS_REVIEW** | 8 |
 | **FAIL** | 1 (public launch announcement — intentional NO-GO) |
+| **RESOLVED** | 1 |
 | **NOT_APPLICABLE** | 0 |
 
 **Verdict:** Product harness and security baseline largely **PASS** on attempt 19 evidence. **NEEDS_REVIEW** rows require founder/operator manual steps before Gate F may move to YES. **Public launch remains NO-GO.**
@@ -157,9 +176,9 @@ This summary is **informational only** — not Gate F YES, not Launch GO.
 | Blocker | Status | Detail |
 |---------|--------|--------|
 | **Public launch decision** | **FAIL / NO-GO** | Founder has not approved public launch; matrix row explicitly FAIL |
-| **P0 performance** | **OPEN** | RSS multitab manual smoke (real Chrome 8–12 tabs) **not documented** |
-| **Gate F founder decision** | **PENDING** | Re-audit executed; founder has not recorded YES/NO/PENDING answer |
-| **NEEDS_REVIEW rows (14)** | Open | S8, S9, O1, O3, O5, O6, O10, L6, P6, P7 + matrix recruiter inbox, P0 multitab, Lighthouse |
+| **P0 performance** | **CLOSED** | [P0 closure decision](./P0_CLOSURE_DECISION_2026-07-07.md) — RSS validated **2026-07-07**; not a Launch GO prerequisite alone |
+| **Gate F founder decision** | **PENDING** | Re-audit + evidence completion **2026-07-07**; founder has not recorded YES/NO/PENDING answer |
+| **NEEDS_REVIEW rows (8)** | Open | S9, O5, L6, P6, P7 + matrix recruiter inbox, Lighthouse (+ executive waivers) |
 | **Auto-apply / delegated apply** | Policy hold | **PAUSED** / **NOT LIVE** — correct for NO-GO |
 | **H5c/H5d recruiter cohort** | **HOLD** | External invites **not sent** |
 
@@ -172,7 +191,7 @@ This summary is **informational only** — not Gate F YES, not Launch GO.
 | Claim | Stance |
 |-------|--------|
 | **Launch GO** | **NOT claimed** — public launch **NO-GO** |
-| **P0 CLOSED** | **NOT claimed** — P0 **OPEN** |
+| **P0 CLOSED** | **Documented** in §7 — not Launch GO |
 | **Gate F YES** | **NOT claimed** — Gate F **PENDING** |
 | Phase 3B re-run | **NOT in scope** — attempt 19 PASS sufficient unless regression |
 | Backend/API/auth/DB/env mutation | **FORBIDDEN** |
@@ -197,6 +216,11 @@ No Launch GO. No P0 CLOSED. No Gate F YES claimed by this document.
 | **Gate F = YES** | Founder accepts re-audit completion; authorize doc refresh for PASS rows; **still not Launch GO** |
 | **Gate F = NO** | Blockers remain; hold re-audit |
 | **Gate F = PENDING** | No action (default) |
+
+
+### Evidence completion readiness (2026-07-07)
+
+Executive Review open items **S8, O1, O3, O6/O10** closed with **PASS** evidence. **S9** and **P6** remain **NEEDS_REVIEW** (dependency waiver + founder authenticated manual smoke). This package is **ready for founder Gate F decision** (YES/NO/PENDING) — it does **not** set Gate F YES or Launch GO.
 
 ### Explicit non-conflation
 

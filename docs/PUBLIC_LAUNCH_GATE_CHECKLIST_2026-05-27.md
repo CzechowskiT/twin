@@ -262,3 +262,23 @@ Warning: this check is non-destructive; do **not** run `alembic upgrade` manuall
 ### 24h post-enforce monitoring (founder cadence)
 
 Monitor Railway `csp_report` for **24h** after enforce deploy (`2026-06-05T16:20:13Z` → `2026-06-06T16:20:13Z`). Triage per `docs/S2_CSP_RAILWAY_LOG_TRIAGE_PLAN_2026-06-01.md`. Rollback per `docs/S2_CSP_ENFORCE_READINESS_2026-06-01.md` § Rollback plan.
+
+---
+
+## Canonical status addendum (2026-07-07)
+
+**Gate F evidence completion** — [GATE_F_EVIDENCE_COMPLETION_2026-07-07.md](./GATE_F_EVIDENCE_COMPLETION_2026-07-07.md) · [re-audit result](./GATE_F_REAUDIT_RESULT_2026-07-07.md)
+
+| Topic | Current stance |
+|-------|----------------|
+| **P0** | **CLOSED** — [P0_CLOSURE_DECISION_2026-07-07.md](./P0_CLOSURE_DECISION_2026-07-07.md) |
+| **Phase 3B** | **PASS** — Gate E attempt 19 **20/20** @ `80d981c` (not BLOCKED) |
+| **S8** | **PASS** (2026-07-07 read-only recheck) |
+| **S9** | **NEEDS_REVIEW** — `ecdsa` `PYSEC-2026-1325` via `pip-audit`; npm **0 HIGH** |
+| **O1** | **PASS** — smoke.yml **5/5** green |
+| **O3** | **PASS** — `worker_active=true` |
+| **O6 / O10** | **PASS** — canonical alias script **OK** |
+| **P6** | **NEEDS_REVIEW** — founder authenticated manual runbook |
+| **S2 CSP enforce** | **PASS** (canonical) — historical “report-only / READY FOR FOUNDER DECISION” rows **superseded** by post-enforce smoke `2026-06-05` |
+| **Public launch** | **NO-GO** (separate from Gate F) |
+| **Gate F** | **PENDING** |
