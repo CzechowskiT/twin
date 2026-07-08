@@ -25,6 +25,7 @@ import {
   type InvestorScenario,
 } from "@/lib/investor-calculator-model";
 import type { Locale } from "@/lib/i18n";
+import { INVESTOR_CALCULATOR_ILLUSTRATIVE_ONLY } from "@/lib/seven-day-d5-investor";
 import {
   effectiveMonthlySubscriptionUsd,
   formatCandidateListPriceUsd,
@@ -267,6 +268,11 @@ export function InvestorCalculator() {
             {t("investorCalc.lead")}
           </p>
           <p className="mx-auto mt-2 max-w-2xl text-xs text-[var(--twin-muted-strong)]">{t("investorCalc.disclaimer")}</p>
+          {INVESTOR_CALCULATOR_ILLUSTRATIVE_ONLY ? (
+            <p className="mx-auto mt-2 max-w-2xl text-xs text-[var(--twin-muted-strong)]" data-seven-day-investor-calculator-illustrative>
+              {t("sevenDayD5.calculatorIllustrativeBody")}
+            </p>
+          ) : null}
         </header>
 
         <MvpLiveStatsStrip />

@@ -28,7 +28,8 @@ export const INVESTOR_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     valuePropKey: "workspaceModules.investorDataRoomValue",
     hintKey: "workspaceModules.investorDataRoomHint",
     ctaKey: "workspaceModules.investorDataRoomCta",
-    status: "pilot",
+    status: "preview",
+    statusLabelKey: "sevenDayD5.dataRoomInviteOnlyBadge",
   },
   {
     id: "calculator",

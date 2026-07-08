@@ -1,0 +1,65 @@
+/**
+ * Seven-day D5 investor slice — honest preview hierarchy, invite-only data room,
+ * placement pilot boundary, board hidden from default hub. Frontend/UI only.
+ */
+
+/** Public investor room — preview copy, one CTA, less badge noise. */
+export const INVESTOR_ROOM_SIMPLIFIED_HIERARCHY = true;
+
+/** Duplicate SoR hub hidden on public /investor — workspace owns navigation. */
+export const HIDE_INVESTOR_SOR_ON_PUBLIC_ROOM = true;
+
+/** Personas, demo map, status matrix, roadmap, risks collapsed on public room. */
+export const COLLAPSE_INVESTOR_ROOM_DETAIL_SECTIONS = true;
+
+/** Single honest next action on investor workspace hub. */
+export const SHOW_INVESTOR_HUB_NEXT_ACTION = true;
+
+/** First diligence step — metrics reality before depth modules. */
+export const INVESTOR_HUB_NEXT_ACTION_HREF = "/investor/metrics" as const;
+
+/** Data room founder_decision — invite-only preview, no fake live secure room. */
+export const DATA_ROOM_INVITE_ONLY_PREVIEW = true;
+export const DATA_ROOM_FOUNDER_DECISION = true;
+
+/** Placement economics — limited pilot DD cohort only. */
+export const PLACEMENT_LIMITED_PILOT = true;
+
+/** Trust / product proof — founder-led preview, no verified external customer claims. */
+export const TRUST_PROOF_PREVIEW_BOUNDARY = true;
+export const PRODUCT_PROOF_PREVIEW_BOUNDARY = true;
+
+/** Board evidence hidden from default investor hub — routes remain deep-linkable. */
+export const HIDE_BOARD_FROM_INVESTOR_DEFAULT_HUB = true;
+export const INVESTOR_BOARD_COLLAPSED_DEFAULT = true;
+
+/** Metrics, calculator, roadmap — controlled illustrative preview copy. */
+export const INVESTOR_METRICS_CONTROLLED_PREVIEW = true;
+export const INVESTOR_CALCULATOR_ILLUSTRATIVE_ONLY = true;
+export const INVESTOR_ROADMAP_CONTROLLED_PREVIEW = true;
+
+/** Investor UI must not claim public launch GO. */
+export const NO_PUBLIC_LAUNCH_CLAIMS_INVESTOR_UI = true;
+
+/** Live public-preview investor modules. */
+export const INVESTOR_PRIMARY_MODULE_IDS = [
+  "metrics",
+  "roadmap",
+  "calculator",
+  "contact",
+  "investor_metrics",
+  "investor_roadmap",
+  "investor_calculator",
+  "investor_public_room",
+  "investor_workspace_hub",
+] as const;
+
+/** Pilot / invite-only / founder-decision modules — roadmap tier on hub. */
+export const INVESTOR_ROADMAP_MODULE_IDS = [
+  "data_room",
+  "placement",
+  "investor_data_room",
+  "investor_placement",
+  "investor_trust_proof",
+  "investor_product_proof",
+] as const;

@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useState } from "react";
 import Link from "next/link";
 
 import { useTranslation } from "@/components/language-provider";
@@ -30,6 +31,11 @@ import {
 } from "@/lib/investor-room";
 import { INVESTOR_PUBLIC_PREVIEW_MODULES, INVESTOR_WORKSPACE_MODULES } from "@/lib/investor-workspace-modules";
 import { INVESTOR_ROOM_SIMPLIFIED_PREVIEW } from "@/lib/product-polish-p2";
+import {
+  COLLAPSE_INVESTOR_ROOM_DETAIL_SECTIONS,
+  HIDE_INVESTOR_SOR_ON_PUBLIC_ROOM,
+  INVESTOR_ROOM_SIMPLIFIED_HIERARCHY,
+} from "@/lib/seven-day-d5-investor";
 import { Shell } from "@/components/ui";
 
 const DECK_MAIL = "contact@twin.care";
@@ -76,6 +82,7 @@ function CtaPill({ href, children, primary }: { href: string; children: ReactNod
 /** Public investor room — honest executive view aligned with production reality matrices. */
 export function InvestorRoomPage() {
   const { t } = useTranslation();
+  const [detailsExpanded, setDetailsExpanded] = useState(!COLLAPSE_INVESTOR_ROOM_DETAIL_SECTIONS);
   const deckHref = `mailto:${DECK_MAIL}?subject=${encodeURIComponent(t("investorRoom.contactMailSubject"))}`;
 
   const statusByTier = {
@@ -93,17 +100,22 @@ export function InvestorRoomPage() {
         >
           <header className="min-w-0 space-y-4 text-start">
             <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
-              {t("investorRoom.eyebrow")}
+              {INVESTOR_ROOM_SIMPLIFIED_HIERARCHY ? t("sevenDayD5.investorRoomPreviewEyebrow") : t("investorRoom.eyebrow")}
             </p>
             <h1 className="twin-page-intro twin-section-title max-w-4xl text-2xl sm:text-3xl md:text-4xl">
               {t("investorRoom.title")}
             </h1>
             <p className="max-w-3xl text-lg font-medium text-[var(--twin-fg)]">{t("investorRoom.thesis")}</p>
-            <p className="max-w-3xl text-base leading-relaxed text-[var(--twin-muted-strong)]">{t("investorRoom.lead")}</p>
+            <p className="max-w-3xl text-base leading-relaxed text-[var(--twin-muted-strong)]">
+              {INVESTOR_ROOM_SIMPLIFIED_HIERARCHY ? t("sevenDayD5.investorRoomPreviewLead") : t("investorRoom.lead")}
+            </p>
             <div className="flex flex-wrap gap-3 pt-2">
               <CtaPill href={deckHref} primary>
                 {t("investorRoom.contactCta")}
               </CtaPill>
+              {INVESTOR_ROOM_SIMPLIFIED_HIERARCHY ? (
+                <CtaPill href="/investor/data-room">{t("sevenDayD5.investorRoomDataRoomCta")}</CtaPill>
+              ) : null}
             </div>
             <MarketingCrosslinksBand page="investor" className="pt-2" />
           </header>
@@ -134,6 +146,7 @@ export function InvestorRoomPage() {
           </section>
           )}
 
+          {HIDE_INVESTOR_SOR_ON_PUBLIC_ROOM ? null : (
           <div className="mt-8" data-testid="investor-sor-proof-hub">
             <SystemOfRecordNavigationHub
               persona="investor"
@@ -141,7 +154,62 @@ export function InvestorRoomPage() {
               leadKey="systemOfRecord.investorHubLead"
             />
           </div>
+          )}
 
+          {COLLAPSE_INVESTOR_ROOM_DETAIL_SECTIONS ? (
+            <div className="rounded-2xl border border-[var(--twin-border)] bg-[var(--twin-card)]/60 p-5 sm:p-6" data-seven-day-investor-room-details-collapsed>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-sm font-semibold text-[var(--foreground)]">{t("sevenDayD5.investorRoomDetailsTitle")}</h2>
+                  <p className="twin-muted mt-1 max-w-3xl text-xs leading-relaxed">{t("sevenDayD5.investorRoomDetailsLead")}</p>
+                </div>
+                <button
+                  type="button"
+                  className="twin-link text-sm font-semibold"
+                  onClick={() => setDetailsExpanded((open) => !open)}
+                  aria-expanded={detailsExpanded}
+                  data-testid="investor-room-details-toggle"
+                >
+                  {detailsExpanded ? t("sevenDayD5.investorRoomDetailsHide") : t("sevenDayD5.investorRoomDetailsShow")}
+                </button>
+              </div>
+              {detailsExpanded ? (
+                <div className="mt-6 space-y-10">
+                  <InvestorRoomDetailSections t={t} statusByTier={statusByTier} />
+                </div>
+              ) : null}
+            </div>
+          ) : (
+            <InvestorRoomDetailSections t={t} statusByTier={statusByTier} />
+          )}
+
+          <SectionCard title={t("investorRoom.contactTitle")} lead={t("investorRoom.contactLead")}>
+            <div className="flex flex-wrap gap-3">
+              <CtaPill href={FAQ_INVESTOR_HREF}>{t("investorRoom.contactFaq")}</CtaPill>
+              <CtaPill href="/workspace/investor">{t("investorRoom.contactWorkspace")}</CtaPill>
+            </div>
+          </SectionCard>
+
+          <p className="max-w-3xl text-xs leading-relaxed text-[var(--twin-muted)]">{t("investorRoom.footerNote")}</p>
+        </div>
+      </MarketingPageSurface>
+    </Shell>
+  );
+}
+
+function InvestorRoomDetailSections({
+  t,
+  statusByTier,
+}: {
+  t: (key: import("@/lib/i18n").TranslationKey) => string;
+  statusByTier: {
+    live: typeof INVESTOR_ROOM_STATUS_ITEM_IDS[number][];
+    demo: typeof INVESTOR_ROOM_STATUS_ITEM_IDS[number][];
+    notLive: typeof INVESTOR_ROOM_STATUS_ITEM_IDS[number][];
+  };
+}) {
+  return (
+    <>
           <div className="grid gap-6 md:grid-cols-2">
             <SectionCard title={t("investorRoom.problemTitle")}>
               <p className="text-sm leading-relaxed text-[var(--twin-muted-strong)]">{t("investorRoom.problemBody")}</p>
@@ -183,10 +251,7 @@ export function InvestorRoomPage() {
             </ul>
           </SectionCard>
 
-          <div
-            className={INVESTOR_ROOM_VISUAL_MARKERS.statusSection}
-            data-testid="investor-room-status"
-          >
+          <div className={INVESTOR_ROOM_VISUAL_MARKERS.statusSection} data-testid="investor-room-status">
             <SectionCard title={t("investorRoom.statusTitle")} lead={t("investorRoom.statusLead")}>
               <div className="space-y-8">
                 {(["live", "demo", "notLive"] as const).map((tier) => {
@@ -249,17 +314,6 @@ export function InvestorRoomPage() {
               ))}
             </ul>
           </SectionCard>
-
-          <SectionCard title={t("investorRoom.contactTitle")} lead={t("investorRoom.contactLead")}>
-            <div className="flex flex-wrap gap-3">
-              <CtaPill href={FAQ_INVESTOR_HREF}>{t("investorRoom.contactFaq")}</CtaPill>
-              <CtaPill href="/workspace/investor">{t("investorRoom.contactWorkspace")}</CtaPill>
-            </div>
-          </SectionCard>
-
-          <p className="max-w-3xl text-xs leading-relaxed text-[var(--twin-muted)]">{t("investorRoom.footerNote")}</p>
-        </div>
-      </MarketingPageSurface>
-    </Shell>
+    </>
   );
 }

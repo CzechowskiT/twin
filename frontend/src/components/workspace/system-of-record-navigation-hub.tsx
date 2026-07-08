@@ -7,6 +7,10 @@ import type { TranslationKey } from "@/lib/i18n";
 import type { MarketingPersona } from "@/lib/marketing-persona";
 import { splitProductSurfaceRoutes } from "@/lib/product-surface-visibility";
 import {
+  INVESTOR_BOARD_COLLAPSED_DEFAULT,
+  HIDE_BOARD_FROM_INVESTOR_DEFAULT_HUB,
+} from "@/lib/seven-day-d5-investor";
+import {
   getSystemOfRecordRoutesForPersona,
   groupInvestorSoRRoutes,
   INVESTOR_SOR_GROUP_HEADING_KEYS,
@@ -46,10 +50,8 @@ export function SystemOfRecordNavigationHub({
   const { t } = useTranslation();
   const routes = getSystemOfRecordRoutesForPersona(persona);
   const [roadmapExpanded, setRoadmapExpanded] = useState(false);
-  const surface =
-    persona === "investor"
-      ? { primary: routes, roadmap: [] as readonly SystemOfRecordRouteEntry[], hidden: [] }
-      : splitProductSurfaceRoutes(persona, routes);
+  const [boardExpanded, setBoardExpanded] = useState(!INVESTOR_BOARD_COLLAPSED_DEFAULT);
+  const surface = splitProductSurfaceRoutes(persona, routes);
 
   return (
     <section
@@ -66,24 +68,84 @@ export function SystemOfRecordNavigationHub({
       </h2>
       <p className="twin-muted mt-2 max-w-3xl text-sm leading-relaxed">{t(leadKey)}</p>
       {persona === "investor" ? (
-        <div className="mt-4 space-y-8">
-          {INVESTOR_SOR_GROUP_ORDER.map((group) => {
-            const groupRoutes = groupInvestorSoRRoutes(routes)[group];
-            if (groupRoutes.length === 0) return null;
-            return (
-              <div key={group} data-sor-investor-group={group}>
-                <h3 className="text-sm font-semibold text-[var(--foreground)]">
-                  {t(INVESTOR_SOR_GROUP_HEADING_KEYS[group])}
-                </h3>
-                <p className="twin-muted mt-1 max-w-3xl text-xs leading-relaxed">
-                  {t(INVESTOR_SOR_GROUP_LEAD_KEYS[group])}
-                </p>
-                <div className="mt-3">
-                  <SoRModuleGrid routes={groupRoutes} />
+        <div className="mt-4 space-y-6" data-product-surface-hub="investor">
+          <div data-product-surface-primary>
+            <div className="space-y-8">
+              {INVESTOR_SOR_GROUP_ORDER.filter((g) => g === "investorProduct" || g === "accessContact").map((group) => {
+                const groupRoutes = groupInvestorSoRRoutes(surface.primary)[group];
+                if (groupRoutes.length === 0) return null;
+                return (
+                  <div key={group} data-sor-investor-group={group}>
+                    <h3 className="text-sm font-semibold text-[var(--foreground)]">
+                      {t(INVESTOR_SOR_GROUP_HEADING_KEYS[group])}
+                    </h3>
+                    <p className="twin-muted mt-1 max-w-3xl text-xs leading-relaxed">
+                      {t(INVESTOR_SOR_GROUP_LEAD_KEYS[group])}
+                    </p>
+                    <div className="mt-3">
+                      <SoRModuleGrid routes={groupRoutes} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          {surface.roadmap.length > 0 ? (
+            <div data-product-surface-roadmap data-seven-day-investor-roadmap-modules>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h3 className="text-sm font-semibold text-[var(--foreground)]">
+                    {t("sevenDayD5.investorRoadmapSectionTitle")}
+                  </h3>
+                  <p className="twin-muted mt-1 max-w-3xl text-xs leading-relaxed">
+                    {t("sevenDayD5.investorRoadmapSectionLead")}
+                  </p>
                 </div>
+                <button
+                  type="button"
+                  className="twin-link text-sm font-semibold"
+                  onClick={() => setRoadmapExpanded((open) => !open)}
+                  aria-expanded={roadmapExpanded}
+                  data-testid="investor-product-surface-roadmap-toggle"
+                >
+                  {roadmapExpanded ? t("productSurface.hideRoadmapModules") : t("productSurface.showRoadmapModules")}
+                </button>
               </div>
-            );
-          })}
+              {roadmapExpanded ? (
+                <div className="mt-3">
+                  <SoRModuleGrid routes={surface.roadmap} />
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+          {HIDE_BOARD_FROM_INVESTOR_DEFAULT_HUB && surface.hidden.length > 0 ? (
+            <div data-product-surface-hidden data-seven-day-investor-board-hidden>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h3 className="text-sm font-semibold text-[var(--foreground)]">
+                    {t("sevenDayD5.investorBoardHiddenTitle")}
+                  </h3>
+                  <p className="twin-muted mt-1 max-w-3xl text-xs leading-relaxed">
+                    {t("sevenDayD5.investorBoardHiddenLead")}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="twin-link text-sm font-semibold"
+                  onClick={() => setBoardExpanded((open) => !open)}
+                  aria-expanded={boardExpanded}
+                  data-testid="investor-board-internal-toggle"
+                >
+                  {boardExpanded ? t("sevenDayD5.investorBoardHide") : t("sevenDayD5.investorBoardShow")}
+                </button>
+              </div>
+              {boardExpanded ? (
+                <div className="mt-3">
+                  <SoRModuleGrid routes={surface.hidden} />
+                </div>
+              ) : null}
+            </div>
+          ) : null}
         </div>
       ) : (
         <div className="mt-4 space-y-6" data-product-surface-hub={persona}>

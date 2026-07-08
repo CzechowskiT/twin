@@ -14,6 +14,7 @@ import {
   INVESTOR_DATA_ROOM_PUBLIC_DOCS,
   INVESTOR_DATA_ROOM_VISUAL_MARKERS,
 } from "@/lib/investor-data-room-request-access";
+import { DATA_ROOM_INVITE_ONLY_PREVIEW } from "@/lib/seven-day-d5-investor";
 import { getPublicApiBase } from "@/lib/public-api-base";
 
 const DOC_LABEL_KEY: Record<(typeof INVESTOR_DATA_ROOM_PUBLIC_DOCS)[number]["id"], TranslationKey> = {
@@ -67,6 +68,17 @@ export function InvestorDataRoomPanel() {
 
   return (
     <div className="space-y-8">
+      {DATA_ROOM_INVITE_ONLY_PREVIEW ? (
+        <Card
+          variant="soft"
+          className="border-[var(--twin-border)]/80 p-5 sm:p-6"
+          data-testid="seven-day-investor-data-room-invite-boundary"
+          data-seven-day-investor-data-room-invite-boundary
+        >
+          <h2 className="text-lg font-semibold">{t("sevenDayD5.dataRoomBoundaryTitle")}</h2>
+          <p className="twin-muted mt-2 max-w-3xl text-sm leading-relaxed">{t("sevenDayD5.dataRoomBoundaryBody")}</p>
+        </Card>
+      ) : null}
       <Card variant="soft" className="p-5 sm:p-6" data-testid={INVESTOR_DATA_ROOM_VISUAL_MARKERS.transparencyBanner}>
         <h2 className="text-lg font-semibold">{t("investorDataRoom.transparencyTitle")}</h2>
         <p className="twin-muted mt-2 max-w-3xl text-sm leading-relaxed">{t("investorDataRoom.transparencyBody")}</p>
@@ -92,8 +104,12 @@ export function InvestorDataRoomPanel() {
       </section>
 
       <section data-testid={INVESTOR_DATA_ROOM_VISUAL_MARKERS.liveSurfaces}>
-        <h2 className="text-lg font-semibold">{t("investorDataRoom.liveSurfacesTitle")}</h2>
-        <p className="twin-muted mt-1 max-w-2xl text-sm">{t("investorDataRoom.liveSurfacesLead")}</p>
+        <h2 className="text-lg font-semibold">
+          {DATA_ROOM_INVITE_ONLY_PREVIEW ? t("sevenDayD5.dataRoomVerifySurfacesTitle") : t("investorDataRoom.liveSurfacesTitle")}
+        </h2>
+        <p className="twin-muted mt-1 max-w-2xl text-sm">
+          {DATA_ROOM_INVITE_ONLY_PREVIEW ? t("sevenDayD5.dataRoomVerifySurfacesLead") : t("investorDataRoom.liveSurfacesLead")}
+        </p>
         <ul className="mt-4 grid gap-2 sm:grid-cols-2">
           {INVESTOR_DATA_ROOM_LIVE_SURFACE_IDS.map((id) => {
             const { href, external } = liveSurfaceHref(id, openApiUrl);
