@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 
 import { ChromeHeader } from "@/components/chrome-header";
+import { PilotPreviewBoundary } from "@/components/pilot-preview-boundary";
 import { RouteAwareBackground } from "@/components/route-aware-background";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteTopMarquee } from "@/components/site-top-marquee";
@@ -17,6 +18,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
       {!immersive ? <RouteAwareBackground /> : null}
       {!immersive ? <SiteTopMarquee /> : null}
       {!immersive ? <ChromeHeader /> : null}
+      {!immersive ? <PilotPreviewBoundary /> : null}
       <main
         className={`relative z-10 flex min-h-0 flex-1 flex-col pb-[env(safe-area-inset-bottom,0)] ${immersive ? "min-h-[100dvh]" : ""}`}
       >

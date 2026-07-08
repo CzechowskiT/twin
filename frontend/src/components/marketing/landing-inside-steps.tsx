@@ -50,10 +50,7 @@ export function LandingInsideSteps() {
             >
               {t("home.joinWishlist")}
             </Link>
-            <Link
-              href="/register"
-              className="section-cta-secondary twin-touch-target px-7 text-sm"
-            >
+            <Link href="/register" className="twin-link twin-touch-target text-sm font-semibold">
               {t("home.getStarted")}
             </Link>
           </div>
