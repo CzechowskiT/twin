@@ -76,7 +76,7 @@ export function CandidateRewardsBand({ variant = "home" }: { variant?: "home" | 
 
   return (
     <section id={sectionId} className={sectionClass} aria-labelledby="candidate-rewards-heading">
-      <div className={variant === "home" ? "marketing-home-rail" : ""}>
+      <div className={variant === "home" ? "mx-auto max-w-6xl px-4 sm:px-6" : ""}>
         <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-muted)]">
           {t("candidateRewards.eyebrow")}
         </p>

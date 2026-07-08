@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useTranslation } from "@/components/language-provider";
 import { JobFiltersBar } from "@/components/job-filters";
 import { JobList } from "@/components/job-list";
@@ -46,6 +48,9 @@ type Props = {
   onResearch?: (id: number, title: string, company: string, location: string | null) => void;
   onHiringInsights?: (id: number, title: string) => void;
   onViewEmployer?: (job: EmployerJob) => void;
+  /** Home dashboard preview cap — full feed lives on `/dashboard/jobs`. */
+  previewLimit?: number;
+  viewAllHref?: string;
 };
 
 /**
@@ -74,8 +79,14 @@ export function JobsSection({
   onResearch,
   onHiringInsights,
   onViewEmployer,
+  previewLimit,
+  viewAllHref,
 }: Props) {
   const { t } = useTranslation();
+  const previewMode = previewLimit != null && previewLimit > 0;
+  const displayItems =
+    previewMode && jobs ? jobs.items.slice(0, previewLimit) : (jobs?.items ?? []);
+  const hasMoreInPreview = previewMode && jobs != null && jobs.total > displayItems.length;
 
   return (
     <Card id="dashboard-jobs" variant="soft">
@@ -102,12 +113,14 @@ export function JobsSection({
           {t("dashboard.marketFeedStale")}
         </p>
       ) : null}
-      <JobFiltersBar
-        filters={filters}
-        options={filterOptions}
-        onChange={onFiltersChange}
-        onApply={onApplyFilters}
-      />
+      {previewMode ? null : (
+        <JobFiltersBar
+          filters={filters}
+          options={filterOptions}
+          onChange={onFiltersChange}
+          onApply={onApplyFilters}
+        />
+      )}
       {jobs === null ? (
         <div className="mt-3 space-y-3" aria-busy="true" aria-live="polite">
           <p className="twin-muted text-sm">{t("dashboard.jobsLoading")}</p>
@@ -125,14 +138,18 @@ export function JobsSection({
           ) : null}
           {jobs.total > 0 ? (
             <p className="twin-muted mb-2 text-xs leading-relaxed">
-              {t("dashboard.jobsShowingSummary")
-                .replace("{shown}", String(jobs.items.length))
-                .replace("{total}", String(jobs.total))}
+              {previewMode
+                ? t("dashboard.homeJobsPreviewSummary")
+                    .replace("{shown}", String(displayItems.length))
+                    .replace("{total}", String(jobs.total))
+                : t("dashboard.jobsShowingSummary")
+                    .replace("{shown}", String(jobs.items.length))
+                    .replace("{total}", String(jobs.total))}
             </p>
           ) : null}
           {jobs.total > 0 ? (
             <JobList
-              items={jobs.items}
+              items={displayItems}
               showScore={hasProfile}
               applicationStatus={displayApplicationStatus}
               onApply={hasProfile ? onApply : undefined}
@@ -164,7 +181,14 @@ export function JobsSection({
               onDismiss={hasProfile ? onDismiss : undefined}
             />
           ) : null}
-          {jobs.total > 0 && jobs.items.length < jobs.total ? (
+          {previewMode && hasMoreInPreview && viewAllHref ? (
+            <p className="mt-4 text-center">
+              <Link href={viewAllHref} className="twin-link text-sm font-medium">
+                {t("dashboard.homeViewAllJobs").replace("{total}", String(jobs.total))}
+              </Link>
+            </p>
+          ) : null}
+          {!previewMode && jobs.total > 0 && jobs.items.length < jobs.total ? (
             <div className="mt-4 flex justify-center">
               <button
                 type="button"
@@ -176,7 +200,9 @@ export function JobsSection({
               </button>
             </div>
           ) : null}
-          <p className="twin-muted mt-3 text-[11px] leading-relaxed">{t("dashboard.jobsCorpusNote")}</p>
+          {previewMode ? null : (
+            <p className="twin-muted mt-3 text-[11px] leading-relaxed">{t("dashboard.jobsCorpusNote")}</p>
+          )}
         </>
       )}
       {jobs !== null && (jobs.total === 0 || jobs.items.length === 0) ? (

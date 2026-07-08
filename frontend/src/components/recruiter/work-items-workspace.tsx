@@ -19,6 +19,7 @@ import {
   type WorkItemRow,
 } from "@/lib/work-items";
 import type { TranslationKey } from "@/lib/i18n";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 
 type Props = { scope: "recruiter" | "company" };
 
@@ -131,9 +132,7 @@ export function WorkItemsWorkspace({ scope }: Props) {
           <p className="text-xs text-[var(--twin-muted)]" data-testid="work-items-data-source">
             {t(sourceKey as "safePersistence.liveApi")}
           </p>
-          <span data-testid={WORK_ITEMS_MARKERS.pilotBadge} className="inline-block rounded-full border px-3 py-1 text-xs" data-launch-stance={LAUNCH_STANCE}>
-            {t("workItems.pilotBadge")}
-          </span>
+          <DemoJourneyPilotStatus testId={WORK_ITEMS_MARKERS.pilotBadge} />
           {scope === "recruiter" ? (
             <Link href="/company/work-items" className="twin-link text-xs">{t("workItems.companyMirror")}</Link>
           ) : (

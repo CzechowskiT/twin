@@ -11,7 +11,7 @@ import { ScrollReveal } from "@/components/marketing/scroll-reveal";
 export function LandingHero() {
   const { t } = useTranslation();
   return (
-    <section className="marketing-section-hero marketing-home-rail relative flex w-full flex-col justify-center pb-12 pt-14 sm:pb-16 sm:pt-16 md:min-h-[min(92svh,880px)] md:pb-20 md:pt-20">
+    <section className="marketing-section-hero relative mx-auto flex w-full max-w-6xl flex-col justify-center px-4 pb-12 pt-14 sm:px-6 sm:pb-16 sm:pt-16 md:min-h-[min(92svh,880px)] md:pb-20 md:pt-20">
       <ScrollReveal>
         <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_min(20rem,34%)] lg:items-start lg:gap-x-10 xl:grid-cols-[minmax(0,1fr)_min(24rem,36%)] xl:gap-x-12">
           <div className="min-w-0">
@@ -49,15 +49,9 @@ export function LandingHero() {
               </Link>
               <p className="text-xs font-medium text-[var(--twin-muted-strong)]">{t("home.joinWishlistMicro")}</p>
             </div>
-            <div className="flex min-w-0 flex-col gap-2 sm:max-w-[min(100%,20rem)]">
-              <Link
-                href="/register"
-                className="landing-hero-register-cta section-cta-secondary marketing-hero-btn-cta twin-touch-target w-full transition duration-200 sm:w-auto"
-              >
-                {t("home.getStarted")}
-              </Link>
-              <p className="text-xs font-medium text-[var(--twin-accent)]">{t("home.ctaRegisterMicro")}</p>
-            </div>
+            <Link href="/register" className="twin-link twin-touch-target self-start text-sm font-semibold">
+              {t("home.getStarted")}
+            </Link>
           </div>
           <InteractiveDemoCta className="mt-1 max-w-xl" />
         </div>

@@ -12,7 +12,7 @@ export function LandingCtaBand() {
   const { t } = useTranslation();
   return (
     <section className="marketing-section-cta-band border-t border-[var(--twin-border)] py-20 sm:py-24 md:py-28">
-      <div className="marketing-home-rail">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <ScrollReveal delayMs={80}>
           <BentoSpotlight className="flex flex-col items-stretch justify-between gap-8 p-8 sm:p-10 lg:flex-row lg:items-center lg:gap-10">
             <div className="min-w-0 max-w-2xl flex-1">
@@ -28,27 +28,19 @@ export function LandingCtaBand() {
               </div>
             </div>
             <div className="flex w-full min-w-0 flex-col gap-5 lg:max-w-md lg:shrink-0">
-              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start">
-                <div className="flex flex-col gap-1.5">
-                  <Link
-                    href="/waitlist"
-                    className="twin-header-cta twin-nav-waitlist-pill twin-touch-target px-7 text-sm"
-                    onClick={() => trackEvent("waitlist_cta_click", { surface: "home_cta_band" })}
-                  >
-                    {t("home.joinWishlist")}
-                  </Link>
-                  <p className="text-center text-[11px] text-[var(--twin-muted)] sm:text-start">{t("home.joinWishlistMicro")}</p>
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <Link
-                    href="/register"
-                    className="section-cta-primary marketing-btn-primary-shadow twin-touch-target px-7 text-sm text-center"
-                  >
-                    {t("home.getStarted")}
-                  </Link>
-                  <p className="text-center text-[11px] text-[var(--twin-accent)] sm:text-start">{t("home.ctaRegisterMicro")}</p>
-                </div>
+              <div className="flex flex-col gap-1.5">
+                <Link
+                  href="/waitlist"
+                  className="twin-header-cta twin-nav-waitlist-pill twin-touch-target px-7 text-sm"
+                  onClick={() => trackEvent("waitlist_cta_click", { surface: "home_cta_band" })}
+                >
+                  {t("home.joinWishlist")}
+                </Link>
+                <p className="text-center text-[11px] text-[var(--twin-muted)] sm:text-start">{t("home.joinWishlistMicro")}</p>
               </div>
+              <Link href="/register" className="twin-link twin-touch-target self-center text-sm font-semibold sm:self-start">
+                {t("home.getStarted")}
+              </Link>
               <InteractiveDemoCta showSignIn={false} />
             </div>
           </BentoSpotlight>

@@ -29,6 +29,7 @@ import { jobOverviewHref, jobPipelineHref } from "@/lib/job-pipeline";
 import type { TranslationKey } from "@/lib/i18n";
 import { candidateTeamHref } from "@/lib/team-collaboration";
 import { candidateCommunicationHref } from "@/lib/safe-communication";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -185,12 +186,7 @@ function CollaborationContent({
               ) : null}
             </div>
             <div className="flex flex-col items-end gap-2">
-              <span
-                className="rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-200"
-                data-testid={CANDIDATE_COLLABORATION_MARKERS.pilotBadge}
-              >
-                {t("candidateCollaboration.pilotBadge")}
-              </span>
+              <DemoJourneyPilotStatus testId={CANDIDATE_COLLABORATION_MARKERS.pilotBadge} />
               <Link
                 href={candidateTrustHref(record.id, surface)}
                 className="rounded-full border border-[var(--twin-border)] px-2.5 py-0.5 text-xs text-[var(--twin-muted-strong)] twin-link"

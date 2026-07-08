@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
@@ -178,11 +179,9 @@ export default function RecruiterJobsPage() {
         <Link href="/recruiter/inbox" className="twin-link mt-6 inline-block text-sm">
           {t("recruiterJobs.inboxLink")}
         </Link>
-        <div className="mt-6 rounded-lg border border-amber-500/30 bg-amber-500/5 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-amber-200">
-            {t("jobPipeline.pilotBadge")}
-          </p>
-          <p className="mt-2 text-sm text-[var(--twin-muted-strong)]">{t("jobPipeline.demoJobsLead")}</p>
+        <div className="mt-6 rounded-lg border border-[var(--twin-border)]/80 p-4">
+          <DemoJourneyPilotStatus className="items-start" />
+          <p className="mt-3 text-sm text-[var(--twin-muted-strong)]">{t("jobPipeline.demoJobsLead")}</p>
           <Link
             href="/recruiter/jobs/demo-role-001/pipeline"
             className="twin-link mt-3 inline-block text-sm font-medium"

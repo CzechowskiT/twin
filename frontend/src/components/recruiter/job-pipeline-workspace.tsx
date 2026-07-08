@@ -42,6 +42,7 @@ import {
 } from "@/lib/job-pipeline";
 import { jobTasksHref, jobTeamHref } from "@/lib/team-collaboration";
 import { jobCommunicationHref, jobDraftsHref } from "@/lib/safe-communication";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 
 const STAGE_ACCENT: Record<JobPipelineStageId, string> = {
   new: "border-sky-500/50 bg-sky-500/5",
@@ -289,12 +290,7 @@ function PipelineContent({
               </p>
             </div>
             <div className="flex flex-col items-end gap-2">
-              <span
-                className="rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-200"
-                data-testid={JOB_PIPELINE_MARKERS.pilotBadge}
-              >
-                {t("jobPipeline.pilotBadge")}
-              </span>
+              <DemoJourneyPilotStatus testId={JOB_PIPELINE_MARKERS.pilotBadge} />
               <span className="rounded-full border border-[var(--twin-border)] px-2.5 py-0.5 text-xs font-medium">
                 {t(priorityKey(record.priority))}
               </span>

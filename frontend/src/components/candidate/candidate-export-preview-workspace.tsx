@@ -24,6 +24,7 @@ import { candidateRevokeDeleteHref } from "@/lib/candidate-revoke-delete";
 import { candidateConsentReceiptHref } from "@/lib/candidate-consent-receipt";
 import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
 import { EXPORT_REQUEST_TYPES, exportRequestsHref } from "@/lib/export-requests";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -94,12 +95,7 @@ function ExportPreviewContent({ record }: { record: CandidateExportPreviewRecord
               </p>
             </div>
             <div className="flex flex-col items-end gap-2">
-              <span
-                className="rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-200"
-                data-testid={CANDIDATE_EXPORT_PREVIEW_MARKERS.pilotBadge}
-              >
-                {t("candidateExportPreview.pilotBadge")}
-              </span>
+              <DemoJourneyPilotStatus testId={CANDIDATE_EXPORT_PREVIEW_MARKERS.pilotBadge} />
               <span className="text-xs text-[var(--twin-muted-strong)]">{record.export_label}</span>
               <span className="text-[10px] text-[var(--twin-muted-strong)]">
                 {t("candidateExportPreview.lastReviewed")}: {record.last_reviewed_at.slice(0, 10)}

@@ -726,6 +726,13 @@ html[data-cookie-banner="open"] main {
   box-shadow: 0 0 0 1px rgb(16 185 129 / 0.12);
 }
 
+.twin-auth-zone-hub__card > span[aria-hidden] svg {
+  display: block;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
 .twin-auth-zone-hub__hint {
   text-wrap: pretty;
 }
@@ -1394,7 +1401,7 @@ html[data-marketing-surface="studio"] .twin-nav-roi-pill:hover {
 
 .company-logo-marquee {
   overflow: visible;
-  min-height: 4rem;
+  min-height: 5rem;
 }
 
 .company-logo-marquee__viewport {
@@ -2274,12 +2281,40 @@ html[data-workspace-route="true"] .landing-ambient__orb {
 
 .marketing-marquee-segment {
   flex: 0 0 auto;
+  /* Trailing inset matches gap-x-* so duplicated strip seams stay evenly spaced. */
 }
 
 /** Workspace/auth — bounded DOM marquee (≤27 nodes, 9×3 segments), transform-only loop. */
 .performance-safe-logo-marquee {
   overflow: visible;
-  min-height: 4rem;
+  min-height: 5rem;
+}
+
+.partner-logo-card {
+  width: auto;
+  min-height: 5rem;
+  min-width: 88px;
+  max-width: 140px;
+  padding: 0.75rem 1rem;
+}
+
+.partner-logo img {
+  height: 2.5rem;
+  max-height: 2.5rem;
+  width: auto;
+  object-fit: contain;
+}
+
+.partner-logo[data-optical-scale] img {
+  transform: scale(var(--partner-logo-optical-scale, 1));
+  transform-origin: center center;
+}
+
+@media (min-width: 768px) {
+  .partner-logo img {
+    height: 3rem;
+    max-height: 3rem;
+  }
 }
 
 .performance-safe-logo-marquee__viewport {
@@ -2314,10 +2349,18 @@ html[data-workspace-route="true"] .landing-ambient__orb {
 
 .performance-safe-logo-mark {
   display: block;
-  height: 1.4rem;
-  width: 6.25rem;
-  max-width: 6.5rem;
+  height: 2.5rem;
+  width: 100%;
+  max-width: 7.5rem;
+  max-height: 2.5rem;
   flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .performance-safe-logo-mark {
+    height: 3rem;
+    max-height: 3rem;
+  }
 }
 
 .performance-safe-logo-mark__inner {
@@ -2338,6 +2381,7 @@ html[data-workspace-route="true"] .performance-safe-logo-marquee .performance-sa
 
 .performance-safe-marquee-segment {
   flex: 0 0 auto;
+  /* Trailing inset matches gap-x-* so tri-segment loop seams stay evenly spaced. */
 }
 
 /**

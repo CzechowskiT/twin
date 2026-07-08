@@ -6,7 +6,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { CompanyWorkspaceNav } from "@/components/company/company-workspace-nav";
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
 import { useTranslation } from "@/components/language-provider";
+import { PremiumPreviewSurface } from "@/components/workspace/premium-preview-surface";
+import { IntegrationRowStatusBadge } from "@/components/workspace/integration-row-status-badge";
+import { WorkspacePilotPageHeader } from "@/components/workspace/workspace-pilot-page-header";
 import type { TranslationKey } from "@/lib/i18n";
+import { BILLING_PREMIUM_PREVIEW_ONLY } from "@/lib/product-polish-p2";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
 import {
@@ -84,24 +88,25 @@ export default function CompanyBillingClient() {
 
   const integrationLabel = (key: string): TranslationKey =>
     `companyBilling.integration_${key}` as TranslationKey;
-  const integrationStatusLabel = (status: string): TranslationKey =>
-    `companyBilling.integrationStatus_${status}` as TranslationKey;
 
   return (
     <Shell wide>
       <CompanyWorkspaceNav />
-      <header className="mb-8 space-y-2">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
-          {t("companyBilling.eyebrow")}
-        </p>
-        <h1 className="twin-page-intro text-2xl font-semibold sm:text-3xl">{t("companyBilling.title")}</h1>
-        <p className="twin-muted max-w-2xl text-sm leading-relaxed">{t("companyBilling.lead")}</p>
-      </header>
+      <WorkspacePilotPageHeader
+        eyebrowKey="companyBilling.eyebrow"
+        titleKey="companyBilling.title"
+        leadKey="companyBilling.lead"
+        status="preview"
+      />
 
-      <Card variant="soft" className="mb-6 border-amber-500/30 bg-amber-500/5 p-4">
-        <h2 className="text-sm font-semibold text-[var(--foreground)]">{t("companyBilling.billingNotLiveTitle")}</h2>
-        <p className="twin-muted mt-2 text-sm leading-relaxed">{t("companyBilling.billingNotLiveBody")}</p>
-      </Card>
+      {BILLING_PREMIUM_PREVIEW_ONLY ? (
+        <PremiumPreviewSurface variant="company" className="mb-6" />
+      ) : (
+        <Card variant="soft" className="mb-6 border-amber-500/30 bg-amber-500/5 p-4">
+          <h2 className="text-sm font-semibold text-[var(--foreground)]">{t("companyBilling.billingNotLiveTitle")}</h2>
+          <p className="twin-muted mt-2 text-sm leading-relaxed">{t("companyBilling.billingNotLiveBody")}</p>
+        </Card>
+      )}
 
       <Card variant="soft" className="mb-6 border-[var(--twin-border)]/80 p-4">
         <RecruiterAccessFields
@@ -176,9 +181,7 @@ export default function CompanyBillingClient() {
                   className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-[var(--twin-border)]/70 px-3 py-2 text-sm"
                 >
                   <span>{t(integrationLabel(row.key))}</span>
-                  <span className="rounded-full bg-[var(--twin-surface-soft)] px-2 py-0.5 text-xs font-medium">
-                    {t(integrationStatusLabel(row.status))}
-                  </span>
+                  <IntegrationRowStatusBadge status={row.status} />
                 </li>
               ))}
             </ul>

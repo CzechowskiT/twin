@@ -9,6 +9,7 @@ import { useTranslation } from "@/components/language-provider";
 import { LiveOperatingStatePanel } from "@/components/shared/live-operating-state-panel";
 import { CompactAuditTrailWidget } from "@/components/shared/compact-audit-trail-widget";
 import { OperationalCrossLinksPanel } from "@/components/shared/operational-cross-links-panel";
+import { WorkspaceStatusBadge } from "@/components/workspace/workspace-status-badge";
 import { Card, Shell } from "@/components/ui";
 import { loadCompanyOperatingState, type OperatingStateSummary } from "@/lib/live-operating-state";
 import type { CommandCenterQueueItem } from "@/lib/company-hiring-command-center-demo-data";
@@ -128,21 +129,7 @@ export function CompanyHiringCommandCenterWorkspace() {
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <span
-                className="rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-violet-200"
-                data-testid={COMPANY_HIRING_COMMAND_CENTER_MARKERS.pilotBadge}
-              >
-                {t("companyHiringCommandCenter.pilotBadge")}
-              </span>
-              <span
-                className="rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-amber-200"
-                data-launch-stance={LAUNCH_STANCE}
-              >
-                {t("companyHiringCommandCenter.launchNoGoBadge")}
-              </span>
-              <span className="rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-sky-200">
-                {t("companyHiringCommandCenter.draftOnlyBadge")}
-              </span>
+              <WorkspaceStatusBadge status="pilot" testId={COMPANY_HIRING_COMMAND_CENTER_MARKERS.pilotBadge} />
             </div>
           </div>
           <p className="text-xs text-[var(--twin-muted-strong)]">

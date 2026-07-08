@@ -57,7 +57,7 @@ export function InvestorFundraisingPage({ ycMode = false }: { ycMode?: boolean }
   return (
     <Shell wide>
       <MarketingPageSurface wide withCard={false}>
-        <div className="marketing-copy-rail space-y-12 sm:space-y-14">
+        <div className="marketing-copy-rail min-w-0 space-y-12 sm:space-y-14">
           {ycMode ? (
             <header className="space-y-3 text-start">
               <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
@@ -92,7 +92,7 @@ export function InvestorFundraisingPage({ ycMode = false }: { ycMode?: boolean }
               </Link>
             </header>
           ) : (
-            <header className="space-y-4 text-start">
+            <header className="min-w-0 space-y-4 text-start">
               <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
                 {t("investorFundraising.eyebrow")}
               </p>
@@ -102,12 +102,16 @@ export function InvestorFundraisingPage({ ycMode = false }: { ycMode?: boolean }
               <p className="max-w-3xl text-base leading-relaxed text-[var(--twin-muted-strong)] sm:text-lg">
                 {t("investorFundraising.heroLead")}
               </p>
-              <div className="flex flex-wrap gap-3 pt-2">
-                <CtaPill href="/investor/data-room" primary>
-                  {t("investorFundraising.ctaDataRoom")}
+              <div className="flex flex-wrap gap-3 gap-y-2 pt-2">
+                <CtaPill href="/investor" primary>
+                  {t("investorFundraising.ctaInvestorRoom")}
                 </CtaPill>
-                <CtaPill href={deckHref}>{t("investorFundraising.ctaDeck")}</CtaPill>
+                <CtaPill href="/investor/product-proof">{t("investorFundraising.ctaProductProof")}</CtaPill>
                 <CtaPill href="/demo">{t("investorFundraising.ctaDemo")}</CtaPill>
+              </div>
+              <div className="flex flex-wrap gap-3 gap-y-2 pt-1">
+                <CtaPill href="/investor/data-room">{t("investorFundraising.ctaDataRoom")}</CtaPill>
+                <CtaPill href={deckHref}>{t("investorFundraising.ctaDeck")}</CtaPill>
                 <CtaPill href="/for-investors/yc">{t("investorFundraising.ctaYc")}</CtaPill>
               </div>
             </header>

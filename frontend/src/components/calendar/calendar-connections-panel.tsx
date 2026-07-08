@@ -11,9 +11,15 @@ import {
 } from "@/components/calendar/calendar-brand-icons";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card } from "@/components/ui";
+import { WorkspaceStatusBadge } from "@/components/workspace/workspace-status-badge";
 import type { TranslationKey } from "@/lib/i18n";
 import type { ProviderHealth, ProviderStatusPhase } from "@/lib/calendar-provider-health";
 import { isMicrosoftUnsupportedAccountMessage, providerBadgeHealth } from "@/lib/calendar-provider-health";
+import {
+  CALENDAR_PROVIDER_TIERS,
+  FORCE_MICROSOFT_CALENDAR_COMING_SOON,
+  type CalendarProviderTierKey,
+} from "@/lib/product-polish-p2";
 import { webcalToHttps } from "@/lib/webcal-subscribe";
 
 type ProviderState = {
@@ -50,6 +56,10 @@ export type CalendarConnectionsPanelProps = {
   onRetryCalendarEvents?: () => void;
   onRetryCalendarStatus?: () => void;
 };
+
+function ProviderTierBadge({ provider }: { provider: CalendarProviderTierKey }) {
+  return <WorkspaceStatusBadge status={CALENDAR_PROVIDER_TIERS[provider]} />;
+}
 
 function StatusBadge({
   provider,
@@ -117,15 +127,20 @@ function StatusBadge({
 function ProviderCardHeader({
   icon,
   title,
+  tier,
   badge,
 }: {
   icon: ReactNode;
   title: string;
+  tier: CalendarProviderTierKey;
   badge: ReactNode;
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex justify-end">{badge}</div>
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        <ProviderTierBadge provider={tier} />
+        {badge}
+      </div>
       <div className="flex min-w-0 items-center gap-3">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]">
           {icon}
@@ -157,6 +172,8 @@ function ProviderCard({
   onRetryEvents,
   onRetryStatus,
   connectLabelKeyOverride,
+  tier,
+  forceComingSoon,
 }: {
   icon: ReactNode;
   titleKey: TranslationKey;
@@ -178,16 +195,19 @@ function ProviderCard({
   onRetryEvents?: () => void;
   onRetryStatus?: () => void;
   connectLabelKeyOverride?: TranslationKey;
+  tier: CalendarProviderTierKey;
+  forceComingSoon?: boolean;
 }) {
   const { t } = useTranslation();
   const connectBusy = actionBusy === connectBusyKey;
   const disconnectBusy = actionBusy === disconnectBusyKey;
   const anyBusy = Boolean(actionBusy);
   const connectLabel = connectLabelKeyOverride ?? connectLabelKey;
+  const oauthAvailable = provider.oauthConfigured && !forceComingSoon;
 
   return (
     <Card className="!mb-0 flex h-full flex-col border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/60">
-      <ProviderCardHeader icon={icon} title={t(titleKey)} badge={<StatusBadge provider={provider} statusPhase={statusPhase} />} />
+      <ProviderCardHeader icon={icon} title={t(titleKey)} tier={tier} badge={<StatusBadge provider={provider} statusPhase={statusPhase} />} />
       <p className="twin-muted mt-2 flex-1 text-sm leading-relaxed">{t(bodyKey)}</p>
       {provider.connected && provider.email ? (
         <p className="mt-3 text-sm text-[var(--foreground)]">
@@ -236,7 +256,7 @@ function ProviderCard({
             >
               {t("dashboard.calendarRetry")}
             </Button>
-            {!provider.connected && provider.oauthConfigured ? (
+            {!provider.connected && oauthAvailable ? (
               <Button
                 type="button"
                 className="twin-btn-secondary twin-touch-target !w-auto self-start"
@@ -318,7 +338,7 @@ function ProviderCard({
         >
           {disconnectBusy ? "…" : t(disconnectLabelKey)}
         </Button>
-      ) : !provider.oauthConfigured ? (
+      ) : !oauthAvailable ? (
         <div className="mt-4 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/50 px-3 py-3">
           <p className="text-sm font-medium text-[var(--foreground)]">{t(soonTitleKey)}</p>
           <p className="twin-muted mt-1 text-sm leading-relaxed">{t(soonBodyKey)}</p>
@@ -383,8 +403,9 @@ export function CalendarConnectionsPanel({
       <div className="grid gap-4 md:grid-cols-2">
         <ProviderCard
           icon={<GoogleCalendarIcon className="h-5 w-5" />}
-          titleKey="dashboard.calendarPathGoogleTitle"
-          bodyKey="dashboard.calendarPathGoogleBody"
+          titleKey="productPolish.calendarGoogleTitle"
+          bodyKey="productPolish.calendarGoogleLead"
+          tier="google"
           provider={google}
           connectLabelKey="dashboard.calendarConnect"
           disconnectLabelKey="dashboard.calendarDisconnect"
@@ -405,8 +426,10 @@ export function CalendarConnectionsPanel({
         />
         <ProviderCard
           icon={<MicrosoftCalendarIcon className="h-5 w-5" />}
-          titleKey="dashboard.calendarPathMicrosoftTitle"
-          bodyKey="dashboard.calendarPathMicrosoftBody"
+          titleKey="productPolish.calendarMicrosoftTitle"
+          bodyKey="productPolish.calendarMicrosoftLead"
+          tier="microsoft"
+          forceComingSoon={FORCE_MICROSOFT_CALENDAR_COMING_SOON}
           provider={microsoft}
           connectLabelKey="dashboard.calendarConnectMicrosoft"
           disconnectLabelKey="dashboard.calendarDisconnectMicrosoft"
@@ -430,8 +453,11 @@ export function CalendarConnectionsPanel({
       <Card variant="accent" className="mt-4 border border-[var(--twin-border)]">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0 flex-1">
-            <h3 className="text-base font-semibold text-[var(--foreground)]">{t("dashboard.calendarPathOtherTitle")}</h3>
-            <p className="twin-muted mt-2 max-w-2xl text-sm leading-relaxed">{t("dashboard.calendarWebcalHint")}</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="text-base font-semibold text-[var(--foreground)]">{t("productPolish.calendarIcsTitle")}</h3>
+              <ProviderTierBadge provider="ics" />
+            </div>
+            <p className="twin-muted mt-2 max-w-2xl text-sm leading-relaxed">{t("productPolish.calendarIcsLead")}</p>
             <p className="twin-muted mt-2 text-xs leading-relaxed">{t("dashboard.calendarWebcalMacHint")}</p>
           </div>
           <Button

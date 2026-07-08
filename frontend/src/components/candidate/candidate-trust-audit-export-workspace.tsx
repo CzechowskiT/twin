@@ -25,6 +25,7 @@ import { candidateDataPortabilityHref } from "@/lib/candidate-data-portability";
 import { candidateExportPreviewHref } from "@/lib/candidate-export-preview";
 import { candidateRevokeDeleteHref } from "@/lib/candidate-revoke-delete";
 import type { TranslationKey } from "@/lib/i18n";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -116,12 +117,7 @@ function TrustAuditExportContent({ record }: { record: CandidateTrustAuditExport
               </p>
             </div>
             <div className="flex flex-col items-end gap-2">
-              <span
-                className="rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-200"
-                data-testid={CANDIDATE_TRUST_AUDIT_EXPORT_MARKERS.pilotBadge}
-              >
-                {t("candidateTrustAuditExport.pilotBadge")}
-              </span>
+              <DemoJourneyPilotStatus testId={CANDIDATE_TRUST_AUDIT_EXPORT_MARKERS.pilotBadge} />
               <span className="text-xs text-[var(--twin-muted-strong)]">{record.export_label}</span>
               <span className="text-[10px] text-[var(--twin-muted-strong)]">
                 {t("candidateTrustAuditExport.lastReviewed")}: {record.last_reviewed_at.slice(0, 10)}

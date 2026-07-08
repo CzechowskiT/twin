@@ -39,6 +39,7 @@ import {
   type TeamCollaborationView,
 } from "@/lib/team-collaboration";
 import { candidateCommunicationHref, jobCommunicationHref } from "@/lib/safe-communication";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -482,12 +483,7 @@ function CandidateHeader({
             {record.role_title} · {record.role_id}
           </p>
         </div>
-        <span
-          className="rounded-full border border-violet-500/40 bg-violet-500/10 px-3 py-1 text-xs font-semibold text-violet-200"
-          data-testid={TEAM_COLLABORATION_MARKERS.pilotBadge}
-        >
-          {t("teamCollaboration.pilotBadge")}
-        </span>
+        <DemoJourneyPilotStatus testId={TEAM_COLLABORATION_MARKERS.pilotBadge} />
       </div>
       <div className="mt-4 flex flex-wrap gap-3 text-xs">
         <span className="rounded-full border border-[var(--twin-border)] px-2 py-0.5">
@@ -547,12 +543,7 @@ function JobHeader({
             {record.department} · {record.role_id}
           </p>
         </div>
-        <span
-          className="rounded-full border border-violet-500/40 bg-violet-500/10 px-3 py-1 text-xs font-semibold text-violet-200"
-          data-testid={TEAM_COLLABORATION_MARKERS.pilotBadge}
-        >
-          {t("teamCollaboration.pilotBadge")}
-        </span>
+        <DemoJourneyPilotStatus testId={TEAM_COLLABORATION_MARKERS.pilotBadge} />
       </div>
       <div className="mt-4 flex flex-wrap gap-3 text-xs">
         <span className="rounded-full border border-[var(--twin-border)] px-2 py-0.5">

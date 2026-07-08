@@ -55,10 +55,7 @@ export function LandingRegisterTeaser() {
               {t("home.joinWishlist")}
             </Link>
             <p className="max-w-xs text-[11px] text-[var(--twin-muted-strong)]">{t("home.joinWishlistMicro")}</p>
-            <Link
-              href="/register"
-              className="section-cta-secondary twin-touch-target px-6 text-sm"
-            >
+            <Link href="/register" className="twin-link twin-touch-target text-sm font-semibold">
               {t("home.getStarted")}
             </Link>
           </div>

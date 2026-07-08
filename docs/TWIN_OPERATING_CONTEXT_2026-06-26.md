@@ -3,10 +3,13 @@
 **Purpose:** Single operator-facing snapshot for agents, founders, and CI smoke wrappers. Consolidates launch stance, deploy SHAs, recent PR history, Hiring Journey runtime state, test matrix, gates, blockers, and next steps.
 
 **Branch at capture:** `cursor/phase1-monorepo-scaffold`  
-**Captured UTC:** 2026-06-27 (post-#301 verification batch on scaffold HEAD `50ff73d`)
+**Captured UTC:** 2026-06-28 (post Gate D decision package on scaffold HEAD `2fbda38`)
+**Prior refresh:** 2026-06-27 post-#301 (`50ff73d`)
 
 **Canonical references:**
-- [HIRING_JOURNEY_TRACEABILITY_2026-06-26.md](./HIRING_JOURNEY_TRACEABILITY_2026-06-26.md) — Hiring Journey detail (#291–#298); operating context (#299)
+- [TWIN_PUBLIC_LAUNCH_READINESS_PLAN_2026-06-27.md](./TWIN_PUBLIC_LAUNCH_READINESS_PLAN_2026-06-27.md) — Slices 4–11 shipped (#315–#322); Slice 12 Gate B+C (#332 + Gate C PASS); Gate D decision package prepared
+- [TWIN_FEATURE_STATUS_AUDIT_2026-06-27.md](./TWIN_FEATURE_STATUS_AUDIT_2026-06-27.md) — module truthfulness inventory (#311)
+- [HIRING_JOURNEY_TRACEABILITY_2026-06-26.md](./HIRING_JOURNEY_TRACEABILITY_2026-06-26.md) — Hiring Journey detail (#291–#298); operating context (#299+)
 - [PROD_HEALTH_COMMIT_INTERPRETATION_2026-06-19.md](./PROD_HEALTH_COMMIT_INTERPRETATION_2026-06-19.md) — SHA drift rules
 - [PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md](./PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md) — founder gate rows
 - [.cursorrules](../.cursorrules) — product north star, calendar, placement verification
@@ -19,7 +22,7 @@
 |------|--------|---------|
 | **Public launch** | **NO-GO** | No uncontrolled signup spike, LinkedIn/X/PressOn announcement, or “we’re live” marketing. Pilot/demo/investor flows only. |
 | **P0 performance** | **OPEN** | No Phase 3B proof, no signed Lighthouse budgets, no multitab/stress closure. See [P0_PERFORMANCE_SAFE_EVIDENCE_2026-06-24.md](./P0_PERFORMANCE_SAFE_EVIDENCE_2026-06-24.md). |
-| **Phase 3B controlled multitab** | **HARD BLOCKED** | Founder STOP. Test harness exists (PR #167) but **must not run** until shell fix + explicit unblock. See [PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md](./PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md). |
+| **Phase 3B controlled multitab** | **FAIL** — prod **0/20** ([gate-e result](./gate-e-phase3b-result-2026-06-28.md)); attempt 1 ABORTED_RESOURCE_SAFETY; attempt 6 [ABORTED_RESOURCE_SAFETY/INCONCLUSIVE](./gate-e-phase3b-attempt6-resource-safety-abort-2026-06-29.md) (command started, manually interrupted, no route-level evidence) |
 | **Controlled pilot / demo** | **GO** (with constraints) | Named users, founder-watched. H5c/H5d recruiter cohort **HOLD**; external invites **0**. |
 | **Auto-apply / delegated apply** | **PAUSED / NOT LIVE** | Nightly beat may show OK on health; submission path not live for public. |
 
@@ -29,34 +32,42 @@
 
 ## 2. Branch, commits, and deploy interpretation
 
-### Checkout snapshot (2026-06-27, post-#301)
+### Checkout snapshot (2026-06-28, post Gate D decision package)
 
 | Field | Value |
 |-------|-------|
 | **Current branch** | `cursor/phase1-monorepo-scaffold` |
-| **repo_head / scaffold HEAD** | `50ff73d435d25259af60eae0fccb452f54010607` |
-| **prod_frontend_commit** (Vercel) | `50ff73d435d25259af60eae0fccb452f54010607` |
-| **prod_api_commit** (Railway) | `6d6d1e54f85f8f00fe1727f32cef700e9c2a20aa` |
+| **repo_head / scaffold HEAD** | `2fbda38ab24dc06694ff3f10a01b7c4a2a2bca05` (`2fbda38`, PR #333 Gate C docs merge) |
+| **prod_frontend_commit** (Vercel) | `62138dccd986bb068e717a9dafee38f822e94c66` (`62138dc`, PR #332 Gate B) |
+| **prod_api_commit** (Railway) | `6d6d1e54f85f8f00fe1727f32cef700e9c2a20aa` (`6d6d1e5`, PR #281) |
 | **public-health `status`** | `ok` |
 | **public-health `db_ok`** | `true` |
-| **hiring-journey routes HTTP** | **5/5 × 200** (curl prod, 2026-06-27 — candidate dashboard/profile, recruiter, company, board) |
-| **commit_interpretation** | Frontend (Vercel) and API (Railway) commits differ — expected after frontend/docs-only #287–#301; verify Alembic head separately. |
+| **Gate C local browser** | **PASS** 36/36 — [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md) |
+| **Gate D decision package** | **EXECUTED** — prod browser **36/36 PASS** — [gate-d-prod-browser-smoke-result-2026-06-28.md](./gate-d-prod-browser-smoke-result-2026-06-28.md) |
+| **HTTP smoke (14 routes)** | **14/14 × 200** (prod read-only) |
+| **commit_interpretation** | Frontend (Vercel) and API (Railway) commits differ — expected; verify Alembic head separately. |
 
 ### Alignment classification
 
 | Check | Result |
 |-------|--------|
-| `frontend_commit` vs `repo_head` | **ALIGNED** — both `50ff73d` (PR #301 merge) |
-| `api_commit` vs `repo_head` | **EXPECTED DRIFT** — API at `6d6d1e5` (PR #281, 2026-06-24); no backend changes in #287–#301 |
-| `alignment_status` | **ALIGNED** |
-| `docs_only_drift` | `false` / N/A — prod FE caught up to scaffold after docs-only #300–#301 |
+| `frontend_commit` vs `repo_head` | **DRIFT (docs-only)** — prod FE `62138dc`; scaffold `2fbda38` after Gate C/D docs merges |
+| `api_commit` vs `repo_head` | **EXPECTED DRIFT** — API at `6d6d1e5` (PR #281); no backend changes in Gate B/C/D batch |
+| `alignment_status` | **ALIGNED** (prod FE = Gate B code `62138dc`); scaffold ahead on docs |
+| `docs_only_drift` | `true` — **acceptable_docs_only_drift** (prod FE still `62138dc`) |
 
-### Production health highlights (curl 2026-06-27)
+### Production health highlights (curl 2026-06-28)
 
 ```json
 {
+  "status": "ok",
+  "db_ok": true,
+  "frontend_commit": "62138dccd986bb068e717a9dafee38f822e94c66",
+  "api_commit": "6d6d1e54f85f8f00fe1727f32cef700e9c2a20aa",
   "validated_jobs": 652,
   "market_coverage_progress_pct": 6,
+  "market_coverage_last_scrape_at": "2026-06-28T03:10:19Z",
+  "market_coverage_feed_stale": false,
   "microsoft_busy_read_enabled": false,
   "microsoft_oauth_connect_gate_enabled": false,
   "microsoft_calendar_write_enabled": false,
@@ -66,6 +77,8 @@
 ```
 
 **Important:** A newer Vercel `frontend_commit` does **not** prove Railway ran migrations. Alembic verification is separate — see [ALEMBIC_PROD_HEAD_VERIFICATION_2026-06-19.md](./ALEMBIC_PROD_HEAD_VERIFICATION_2026-06-19.md).
+
+**Slice 43 (2026-07-02, frontend-only):** `/api/public-health` previously ran health + celery-status **sequentially**; celery-status has been observed at ~4.3-4.5s, occasionally pushing total latency to 8-10s and tripping the platform's 10s timeout (502), with an unguarded `celeryRes.json()` producing an empty 500 on a bad body. The route now fetches health + celery-status **in parallel** (`Promise.allSettled`); `db_ok`/`status` remain **authoritative from health only** (unchanged shape, Gate E compat preserved); celery-status is **soft-fail-only** and degrades to `celery: {}` + an optional `celery_warning` string instead of ever 5xx-ing the route. See `frontend/scripts/public-health-route-stability.test.ts` (`test:public-health-route-stability`). This is a **frontend-only diagnostics fix** — no backend/API/DB change; a Vercel deploy is required before this improves the **prod** route.
 
 Verification command:
 
@@ -105,9 +118,41 @@ Verified via `gh pr list --state merged --limit 20` and `git log` on **2026-06-2
 | [#299](https://github.com/CzechowskiT/twin/pull/299) | docs: add TWIN operating context source of truth | `73ec745` | Operating context source-of-truth doc (1 file) | Docs-only | `test:hiring-journey`, `npm run build` | Initial operating context snapshot |
 | [#300](https://github.com/CzechowskiT/twin/pull/300) | Refresh operating context snapshot post-#299 | `f21e683` | Operating context refresh + 8-section snapshot template (2 files) | Docs-only | `test:hiring-journey`, `npm run build` | `acceptable_docs_only_drift` during partial deploy |
 | [#302](https://github.com/CzechowskiT/twin/pull/302) | docs: add PR #298 drill-in to operating context | `65e8488` | PR #298 drill-in section, route mapping, safety (1 file) | Docs-only | `test:hiring-journey` (25/25), full verification batch | Drill-in section reconciled post-#299 |
-| [#301](https://github.com/CzechowskiT/twin/pull/301) | Refresh operating context snapshot post-#299 | `50ff73d` | Reconcile operating context with #302 drill-in section (1 file) | Docs-only | `test:hiring-journey`, `npm run build`, `tsc` | **Current prod FE SHA**; browser smoke skipped (docs-only); public-health OK |
+| [#301](https://github.com/CzechowskiT/twin/pull/301) | Refresh operating context snapshot post-#299 | `50ff73d` | Reconcile operating context with #302 drill-in section (1 file) | Docs-only | `test:hiring-journey`, `npm run build`, `tsc` | Prod FE SHA before #309 batch |
 
-**Scaffold HEAD after #301:** `50ff73d435d25259af60eae0fccb452f54010607`
+### Operating context + P0 inventory (#302–#308)
+
+| PR | Title | Merge SHA | Scope | Safety | Tests | Prod verification |
+|----|-------|-----------|-------|--------|-------|-------------------|
+| [#302](https://github.com/CzechowskiT/twin/pull/302) | docs: add PR #298 drill-in to operating context | `65e8488` | PR #298 drill-in section, route mapping (1 file) | Docs-only | `test:hiring-journey` (25/25) | `acceptable_docs_only_drift` |
+| [#303](https://github.com/CzechowskiT/twin/pull/303) | docs: reconcile operating context post-#301 | `e60437a` | SHA reconcile to `50ff73d` (1 file) | Docs-only | build + tsc | `acceptable_docs_only_drift` |
+| [#304](https://github.com/CzechowskiT/twin/pull/304) | Add P0 performance inventory | `f202745` | `P0_PERFORMANCE_INVENTORY_2026-06-27.md` | Docs-only | N/A | Evidence doc |
+| [#305](https://github.com/CzechowskiT/twin/pull/305) | P0 Batch 1: hiring-journey route-weight inventory | `700f92c` | Route-weight guards for hiring-journey routes | Guard-only | `test:p0-route-weight-inventory` | FE-only |
+| [#306](https://github.com/CzechowskiT/twin/pull/306) | fix(frontend): landing auth-shell shows login for stale sessions | `6b114f4` | Stale JWT → login entry on landing | No auth weakening | `test:landing-auth-shell` | FE-only |
+| [#307](https://github.com/CzechowskiT/twin/pull/307) | *(superseded by #308 on scaffold)* | — | Landing auth fix lineage | — | — | — |
+| [#308](https://github.com/CzechowskiT/twin/pull/308) | Fix landing login entry for expired session | `dbedcf0` | Reconcile landing auth-shell onto scaffold | No auth weakening | landing-auth-shell guards | FE-only |
+
+### Launch readiness truthfulness batch (#309–#322)
+
+| PR | Title | Merge SHA | Scope | Safety | Tests | Prod verification |
+|----|-------|-----------|-------|--------|-------|-------------------|
+| [#309](https://github.com/CzechowskiT/twin/pull/309) | fix(frontend): reconcile landing auth-shell login fix onto scaffold | `4226551` | Header bars, `auth.ts` stale JWT fix | No auth weakening | `test:landing-auth-shell` | FE deploy |
+| [#310](https://github.com/CzechowskiT/twin/pull/310) | test(e2e): harden landing-auth-shell browser for stale JWT hydration | `ea8c1dc` | Browser test hardening only | Test-only; gated | e2e landing-auth-shell | No prod browser default |
+| [#311](https://github.com/CzechowskiT/twin/pull/311) | Add TWIN feature status audit 2026-06-27 | `57d9c92` | Module classification, SoR drift inventory | Docs-only | N/A | Surfaces MISLEADING_OR_RISKY cards |
+| [#312](https://github.com/CzechowskiT/twin/pull/312) | SoR registry reconcile — Slice 2 | `b43b135` | +4 SoR entries: recruiter_pipeline, recruiter_calendar, company_pipeline, candidate_career_compass | FE-only truthfulness | SoR + persona nav tests | FE deploy |
+| [#313](https://github.com/CzechowskiT/twin/pull/313) | Company SoR token hints — Slice 3 | `86c8c1b` | `hintKey` on all company **live** SoR modules | Reduces live-badge over-read | SoR hub tests | FE deploy |
+| [#315](https://github.com/CzechowskiT/twin/pull/315) | Launch readiness plan + recruiter inbox truthfulness (Slice 4) | `3b547c3` | `TWIN_PUBLIC_LAUNCH_READINESS_PLAN` + inbox collapse prep | Docs + FE boundaries | persona-dashboard, SoR hub | FE + docs |
+| [#316](https://github.com/CzechowskiT/twin/pull/316) | fix: clarify recruiter inbox duplicate modules | `b38565d` | Collapse duplicate inbox module cards (Slice 4) | No inbox UI/backend change | persona-dashboard | FE-only |
+| [#317](https://github.com/CzechowskiT/twin/pull/317) | fix: clarify company pipeline status boundaries | `b5b2f19` | Company pipeline WS vs SoR align (Slice 6) | `no_ats_sync` boundaries | persona-dashboard | FE-only |
+| [#318](https://github.com/CzechowskiT/twin/pull/318) | fix: surface candidate trust center in workspace (Slice 7) | `959deeb` | One pilot `trust_center` workspace card → `/dashboard/trust` | Read-only discoverability | persona-dashboard | FE-only |
+| [#319](https://github.com/CzechowskiT/twin/pull/319) | fix: group investor system of record modules (Slice 8) | `1098b10` | Investor SoR hub grouping (product/board/demo/access) | Copy-only grouping | SoR hub tests | FE-only |
+| [#320](https://github.com/CzechowskiT/twin/pull/320) | fix: clarify company settings workspace card (Slice 9) | `dcde5ce` | Remove orphan settings card; dashboard via SoR only | UX honesty | persona-dashboard | FE-only |
+| [#321](https://github.com/CzechowskiT/twin/pull/321) | fix: clarify investor product proof boundaries (Slice 10) | `5ea8647` | `sorHubHint` + bounded diligence copy on live SoR card | No status downgrade | SoR hub + trust guards | FE-only |
+| [#322](https://github.com/CzechowskiT/twin/pull/322) | fix: align marketing copy with launch boundaries (Slice 11) | `dcacc9d` | Homepage, `/how-it-works`, `/demo`, FAQ, onboarding EN/PL | **No live-action claims**; LAUNCH_STANCE unchanged | Safe-lane smoke **11/11** (see §7) | **Current prod FE SHA** |
+
+**Open (not merged at capture):** [#314](https://github.com/CzechowskiT/twin/pull/314) — full application audit (docs-only); merge after review; does not change launch stance.
+
+**Scaffold HEAD after #322:** `dcacc9d5c7fc30d56593994babd3e50a8d1aa863`
 
 ### PR #298 — provenance source-module drill-in (reconciled post-#299)
 
@@ -295,6 +340,9 @@ Scripts from `frontend/package.json`. Run from `frontend/` unless noted.
 | `npm run test:p0-browser-memory-multitab-performance` | Memory/multitab static guards |
 | `npm run test:p0-renderer-memory-bundle-reduction` | Bundle/renderer memory reductions |
 | `npm run test:phase3b-controlled-multitab` | Phase 3B static guards (**BLOCKED to run browser variant**) |
+| `npm run test:phase3b-harness-diagnostics` | Phase 3B harness diagnostics static guards (Slice 35) |
+| `npm run test:gate-e-retry-after-harness-fix-checkpoint` | Gate E retry-after-harness-fix checkpoint static guards (Slice 36) |
+| `npm run test:gate-e-retry-after-harness-fix-result` | Gate E post-harness retry result static guards (Slice 37) |
 | `npm run test:multi-tab-performance-hardening` | Multi-tab perf hardening guards |
 
 ### Build / typecheck
@@ -311,7 +359,26 @@ Scripts from `frontend/package.json`. Run from `frontend/` unless noted.
 | `pytest tests/test_public_health_regression.py -q` | Public health surface regression |
 | `pytest tests/test_auto_apply_trigger_sweep_admin_gate.py -q` | Auto-apply sweep gate |
 
-### Verification batch (2026-06-27, post-#301 / PR #298 drill-in reconciled)
+### Verification batch (2026-06-28, post-#322 / Slice 11 safe-lane)
+
+| Command | Result |
+|---------|--------|
+| `npm run test:trust-language-guard` | **PASS** |
+| `npm run test:i18n-native-copy-quality` | **PASS** |
+| `npm run test:i18n-coverage` | **PASS** |
+| `npm run test:system-of-record-navigation-hub` | **PASS** |
+| `npm run test:persona-dashboard-navigation` | **PASS** |
+| `npm run test:hiring-journey` | **PASS** (25/25) |
+| `npm run test:p0-route-weight-inventory` | **PASS** |
+| `npm run test:p0-performance-guardrails` | **PASS** |
+| `npm run test:landing-auth-shell` | **PASS** |
+| `npm run build` | **PASS** |
+| `npx tsc --noEmit` | **PASS** |
+| **Safe-lane total** | **11/11 PASS** |
+| `npm run test:hiring-journey-browser` | **SKIPPED** — no default prod browser smoke |
+| Public-health + 5 hiring-journey routes | **PASS** — `status=ok`, `db_ok=true`, HTTP 200 × 5 |
+
+### Prior verification batch (2026-06-27, post-#301)
 
 | Command | Result |
 |---------|--------|
@@ -323,8 +390,6 @@ Scripts from `frontend/package.json`. Run from `frontend/` unless noted.
 | `npm run test:trust-language-guard` | **PASS** (4) |
 | `npm run build` | **PASS** |
 | `npx tsc --noEmit` | **PASS** |
-| `npm run test:hiring-journey-browser` | **SKIPPED** — docs-only batch; no prod browser smoke |
-| Public-health + 5 hiring-journey routes | **PASS** — `status=ok`, `db_ok=true`, HTTP 200 × 5 |
 
 ---
 
@@ -347,7 +412,7 @@ Condensed from [PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md](./PUBLIC_LAUNCH_GATE
 | **Pilot** | P6 founder auth smoke | **PASS** (2026-05-29) | Re-run before external cohort |
 | **Pilot** | P7 limited recruiter | **H5b PASS; H5c/H5d HOLD** | 0 external invites |
 | **Calendar** | Microsoft busy-read prod | **OFF** | Staging prep docs exist; smoke blocked |
-| **Deploy** | FE/API SHA alignment | **ALIGNED** | `frontend_commit` = `repo_head` = `50ff73d`; API lag expected |
+| **Deploy** | FE/API SHA alignment | **ALIGNED** | `frontend_commit` = `repo_head` = `dcacc9d`; API lag `6d6d1e5` expected |
 
 **Decision matrix:** Any ❌ on Security S2–S5 → hold. Any ❌ on Pilot gates → pilot only, not public launch. Current stance: **pilot/demo GO; public NO-GO.**
 
@@ -376,7 +441,7 @@ Condensed from [PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md](./PUBLIC_LAUNCH_GATE
 
 ### API / deploy drift
 
-- `api_commit` (`6d6d1e5`) behind `frontend_commit` (`50ff73d`) — **expected** for frontend/docs-only batch; not a deploy failure by itself.
+- `api_commit` (`6d6d1e5`) behind `frontend_commit` (`dcacc9d`) — **expected** for frontend/docs-only batch #309–#322; not a deploy failure by itself.
 - Alembic head must be verified separately for persistence/backend slices.
 
 ### Auth shell for prod visual checks
@@ -392,41 +457,50 @@ Condensed from [PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md](./PUBLIC_LAUNCH_GATE
 
 ---
 
-## 10. Recommended next 30 steps
+## 10. Recommended next steps
 
-Realistic backlog from current session state — ordered by dependency and safety.
+### Blocked — requires founder unblock
 
-1. Treat this operating context doc as source of truth for agents (merged via #299).
-2. Run prod hiring-journey browser smoke after any FE deploy: `PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app npm run test:hiring-journey-browser`.
-3. Polish provenance drill-in UX copy (EN/PL) if founder feedback — read-only only.
-4. Investor-room i18n parity sweep (`test:investor-room-mvp`, `test:i18n-premium-product`).
-5. Long-form native copy QA continuation (#287/#288 pattern) on remaining surfaces.
-6. Staging Microsoft busy-read smoke when operator JWT available — **do not flip prod gates**.
-7. Document staging smoke evidence in `docs/MICROSOFT_BUSY_READ_STAGING_SMOKE_2026-06-24.md` follow-up.
-8. Founder authenticated prod persistence smoke re-run with JWT ([AUTHENTICATED_PROD_PERSISTENCE_SMOKE_2026-06-19.md](./AUTHENTICATED_PROD_PERSISTENCE_SMOKE_2026-06-19.md)).
-9. Alembic prod head read-only re-check (`050_stripe_webhook_events`).
-10. P0 persona navigation browser smoke on prod (optional, flagged).
-11. Shell fix for Phase 3B blocker — **founder review before any multitab run**.
-12. Phase 3B static guards only (`test:phase3b-controlled-multitab`) — no browser until unblocked.
-13. Scheduling proposal pack cross-link audit with hiring journey step 6.
-14. Offer readiness ↔ scheduling decision context alignment check.
-15. Placement verification preview ↔ hiring journey step 10 link audit.
-16. Board monitor routes — confirm no accidental live-action CTAs (`test:trust-language-guard`).
-17. Recruiter inbox decision rail readability regression (`test:recruiter-decision-rail-readability`).
-18. Company hiring command center perf memoization audit.
-19. Dashboard lazy-load inventory update in P0 performance doc.
-20. `test:p0-performance-guardrails` batch on scaffold HEAD after substantive FE changes.
-21. i18n rendered homepage guard (`test:i18n-rendered-homepage-guard`).
-22. Cookie consent + analytics consent tests in CI slice.
-23. Public health regression pytest on backend after API-touching PRs only.
-24. Scrape ops visibility review — `market_coverage_progress_pct` trend.
-25. Limited recruiter pilot: founder supplies H5d slot-1 shortlist names.
-26. H5c GO SMALL 1/2 decision pack review — **no outbound until explicit GO**.
-27. Vercel canonical alias drift check (`scripts/check-vercel-canonical-alias.sh`).
-28. Update traceability memo if hiring journey tests exceed 25.
-29. Investor demo dry-run against prod with curated accounts.
-30. Re-capture this doc’s §2 SHAs after next merged PR batch.
+| Slice | Item | Blocker |
+|-------|------|---------|
+| **12** | P0 shell fix (`LightweightRouteShell`) | **Founder review required** before any Phase 3B or multitab browser work |
+| **14** | Investor room i18n parity | ✅ Shipped — copy-only EN/PL + overlays |
+| **15** | Public nav investor entrypoint | ✅ Shipped — header persona lane adds `/investor` (desktop + mobile) |
+| **16** | Phase 3B static guard refresh | ✅ Shipped — `PHASE3B_ALL_ROUTES` = 20 routes; static guards 8; P0 36 unchanged |
+| **Phase 3B browser** | `test:phase3b-controlled-multitab-browser` | **HARD BLOCKED** — founder STOP |
 
+### Safe fallback next items (no live-action, no Phase 3B)
+
+Ordered by dependency and safety — autonomous batches allowed:
+
+1. **Merge PR #314** — full application audit (docs-only); complements launch readiness plan.
+2. Re-capture §2 SHAs after this operating context refresh merges (`docs_only_drift: true` → acceptable).
+3. Prod hiring-journey browser smoke after FE deploy: `PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app npm run test:hiring-journey-browser`.
+4. ~~**Slice 13** (prep only) — add 5 hiring-journey routes to `p0-no-headless` list; gated browser, no default CI.~~ ✅ Shipped — 36 routes.
+5. Staging Microsoft busy-read smoke when operator JWT available — **do not flip prod gates**.
+6. Founder authenticated prod persistence smoke re-run with JWT ([AUTHENTICATED_PROD_PERSISTENCE_SMOKE_2026-06-19.md](./AUTHENTICATED_PROD_PERSISTENCE_SMOKE_2026-06-19.md)).
+7. Alembic prod head read-only re-check (`050_stripe_webhook_events` / `068_placement_events_foundation`).
+8. ~~Investor-room i18n parity sweep (`test:investor-room-mvp`, `test:i18n-premium-product`).~~ ✅ Shipped — Slice 14.
+9. Long-form native copy QA continuation (#287/#288 pattern) on remaining surfaces.
+10. Scheduling proposal pack cross-link audit with hiring journey step 6.
+11. Offer readiness ↔ scheduling decision context alignment check.
+12. Placement verification preview ↔ hiring journey step 10 link audit.
+13. Board monitor routes — confirm no accidental live-action CTAs (`test:trust-language-guard`).
+14. Recruiter inbox decision rail readability regression (`test:recruiter-decision-rail-readability`).
+15. `test:p0-performance-guardrails` batch on scaffold HEAD after substantive FE changes.
+16. Vercel canonical alias drift check (`scripts/check-vercel-canonical-alias.sh`).
+17. Limited recruiter pilot: founder supplies H5d slot-1 shortlist names.
+18. H5c GO SMALL 1/2 decision pack review — **no outbound until explicit GO**.
+19. Investor demo dry-run against prod with curated accounts (§16 boundaries in launch readiness plan).
+20. Lighthouse budget definition doc — post-Phase 3B; docs-only prep OK now.
+
+### No-live-action boundaries (unchanged post-#322)
+
+All preview surfaces — Hiring Journey, Scheduling Proposal Pack, marketing copy, investor/company/recruiter workspace cards — remain **read-only or bounded**:
+- No automatic candidate advancement, scheduling write, invites, email, calendar sync, ATS writeback, or payments.
+- Auto-apply **PAUSED**; recruiter calendar sync **NOT LIVE**; Microsoft busy-read prod gates **OFF**.
+- Affirmative live-action copy guarded (#296); marketing copy bounded to prepare-only / human-decision language (#322).
+- `LAUNCH_STANCE = "noGo"` unchanged in `frontend/src/lib/investor-metrics-reality.ts`.
 ---
 
 ## Appendix: key files
@@ -452,3 +526,42 @@ Realistic backlog from current session state — ordered by dependency and safet
 - No secrets in this doc.
 
 **Public launch: NO-GO · P0: OPEN · Phase 3B: HARD BLOCKED**
+
+---
+
+## Changelog
+
+| Date | Change |
+|------|--------|
+| 2026-06-26 | Initial source of truth via PR #299 |
+| 2026-06-27 | Refreshed post-#301; prod FE `50ff73d`; PR tables through #301 |
+| 2026-06-28 | **Refresh post-PR #322** — prod FE/API SHAs (`dcacc9d` / `6d6d1e5`); PR history #302–#322; Slices 4–11 shipped; safe-lane smoke **11/11**; Slice **12 blocked** (P0 shell founder review); `docs_only_drift` note for this docs batch |
+| 2026-06-28 | **Slice 13 shipped** (#324) — p0-no-headless 36 routes; prod FE `9d0f9bc`; **Slice 12 founder-review package prepared** — [P0_SHELL_FOUNDER_REVIEW_2026-06-28.md](./P0_SHELL_FOUNDER_REVIEW_2026-06-28.md); implementation remains blocked pending §6 gates |
+| 2026-06-28 | **Slice 12 founder sign-off checklist added** — [SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md](./SLICE12_FOUNDER_SIGNOFF_CHECKLIST_2026-06-28.md); Gates A–F **PENDING**; shell implementation still **BLOCKED** |
+| 2026-06-28 | **Slice 17** — homepage Explore TWIN / Poznaj TWIN panel (7 existing-route cards); `public-explore-twin-routes.ts` registry; Gate B / Phase 3B / shell **unchanged BLOCKED** |
+| 2026-06-28 | **Slice 18** — footer secondary nav aligned with header + Explore TWIN model: stable 9-link sitemap (`public-footer-sitemap-routes.ts`); `/investor` vs `/for-investors` semantically distinct; Gate B / Phase 3B / shell **unchanged BLOCKED** |
+| 2026-06-28 | **Slice 19** — header Explore TWIN mega-panel + homepage 10-card panel; guest lane preserves #335 IA (`/for-*`, `/faq`, `/demo`); padding #336 verified; static tests only; Gate D/E **PENDING**; Gate B / Phase 3B / shell **unchanged BLOCKED** |
+| 2026-06-28 | **Slice 20** — public marketing consistency hardening: `/for-investors` → fundraising page (distinct from `/investor` executive room); CTA links to investor room + product proof + demo; FAQ/how-it-works → demo + Explore TWIN; container rhythm on product-proof; `test:public-marketing-consistency`; Gate D/E **PENDING**; Launch **NO-GO**; P0 **OPEN**; Phase 3B **BLOCKED** |
+| 2026-06-28 | **Slice 21** — founder-led demo cross-links (`founder-demo-crosslinks-routes.ts` + `MarketingCrosslinksBand`) on `/demo`, `/how-it-works`, `/faq`, `/investor`, `/investor/product-proof`; mobile spacing polish (header wrap, Explore trigger/panel, Explore TWIN grid, fundraising CTAs, footer gaps); `test:founder-demo-crosslinks`; Gate D/E **PENDING**; Launch **NO-GO**; P0 **OPEN**; Phase 3B **BLOCKED** |
+| 2026-06-28 | **Slice 22** — mobile founder demo readiness: hardened `MarketingCrosslinksBand` (container rhythm, responsive grid, tap targets, overflow-x-hidden); min-w-0 on `/demo`, `/how-it-works`, `/faq`, `/for-investors`, `/investor`, `/investor/product-proof`; header `min-w-0` + footer mobile grid; `test:mobile-public-readiness` + extended crosslink/consistency guards; Gate D/E **PENDING**; Launch **NO-GO**; P0 **OPEN**; Phase 3B **BLOCKED** |
+| 2026-06-28 | **Slice 23** — static mobile visual QA hardening: Explore mobile panel grouped `flex-col` + `overflow-x-hidden`; mobile link labels use `break-words` not `whitespace-nowrap`; extended `test:mobile-public-readiness`, `test:founder-demo-crosslinks`, `test:public-marketing-consistency`; Slice 21 cross-links unchanged; Gate D/E **PENDING**; Launch **NO-GO**; P0 **OPEN**; Phase 3B **BLOCKED** |
+| 2026-06-28 | **Slice 12 Gate C executed** — local browser **36/36 PASS** ([gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md)); prod FE `62138dc`; Gate D/E/F **PENDING**; P0 **OPEN**; Phase 3B **BLOCKED** |
+| 2026-06-28 | **Slice 12 Gate D decision package** — [gate-d-prod-browser-smoke-decision-2026-06-28.md](./gate-d-prod-browser-smoke-decision-2026-06-28.md); prod browser **not executed**; Gate D/E/F **PENDING**; `docs_only_drift` acceptable |
+| 2026-06-28 | **Slice 24** — public UX dead-import cleanup + `test:public-route-reference-guard`; Gate E prerequisites package [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md); Gate D/E **PENDING**; Launch **NO-GO**; P0 **OPEN**; Phase 3B **BLOCKED** |
+| 2026-06-28 | **Slice 25** — [LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md](./LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md) + [FOUNDER_DEMO_CHECKLIST_2026-06-28.md](./FOUNDER_DEMO_CHECKLIST_2026-06-28.md); `test:launch-readiness-evidence-guard`; prod FE aligned `b50ef103` post-#342; Gate D/E **PENDING**; Launch **NO-GO**; P0 **OPEN**; Phase 3B **NOT RUN** |
+| 2026-06-28 | **Slice 26** — Gate D preflight runbook + result template; `test:gate-d-preflight-readiness`; prod FE aligned `27aa372c` post-#343; Gate D/E **PENDING**; Launch **NO-GO**; P0 **OPEN**; Phase 3B **BLOCKED** |
+| 2026-06-28 | **Slice 27** — public marketing EN/PL copy consistency (`test:public-marketing-copy-consistency`); Investor Room / Sala executive / Product Proof / Trust Center label alignment; evidence doc drift clarified; prod FE aligned `fd36ae39` post-#344; Gate D preflight ready **not executed**; Gate D/E **PENDING**; Launch **NO-GO**; P0 **OPEN**; Phase 3B **BLOCKED** |
+| 2026-06-29 | **Slice 28** — Gate D founder decision checkpoint [GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md](./GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md); `test:gate-d-founder-decision-checkpoint`; prod FE aligned `3f156327` post-#345; Gate D/E **PENDING**; Launch **NO-GO**; P0 **OPEN**; Phase 3B **BLOCKED** |
+| 2026-06-29 | **Slice 29** — readiness decision consistency lock (`test:readiness-consistency-lock`); cross-doc gate/launch stance guards; prod FE aligned `28fb3b4d` post-#346; Gate D/E **PENDING**; Launch **NO-GO**; P0 **OPEN**; Phase 3B **BLOCKED** |
+| 2026-06-29 | **Slice 30** — Gate D founder decision prompt [GATE_D_FOUNDER_DECISION_PROMPT_2026-06-28.md](./GATE_D_FOUNDER_DECISION_PROMPT_2026-06-28.md); `test:gate-d-founder-decision-prompt`; founder_decision **PENDING**; prod FE aligned `bb0957b3` post-#347; Gate D browser **not run**; Launch **NO-GO**; P0 **OPEN**; Gate D/E **PENDING**; Phase 3B **BLOCKED** |
+| 2026-06-29 | **Slice 32** — Gate D prod browser smoke **36/36 PASS** ([gate-d-prod-browser-smoke-result-2026-06-28.md](./gate-d-prod-browser-smoke-result-2026-06-28.md)); `test:gate-d-prod-browser-smoke-result`; prod FE aligned `1a7acc00`; Launch **NO-GO**; P0 **OPEN**; Gate D **YES/PASS**; Gate E **PENDING**; Phase 3B **NOT RUN** |
+| 2026-06-29 | **Slice 33** — Gate E founder decision package [GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md](./GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md) + result template; `test:gate-e-founder-decision-package`; Gate D **YES/PASS** prerequisite; Gate E **PENDING**; Phase 3B **NOT RUN**; Launch **NO-GO**; P0 **OPEN** |
+| 2026-06-29 | **Slice 34** — Gate E Phase 3B prod reattempt [gate-e result](./gate-e-phase3b-result-2026-06-28.md) **0/20 FAIL**; attempt 1 [ABORTED_RESOURCE_SAFETY](./gate-e-phase3b-attempt-1-aborted-resource-safety-2026-06-28.md); `test:gate-e-phase3b-result`; Launch **NO-GO**; P0 **OPEN**; Gate F **PENDING** |
+| 2026-06-29 | **Slice 35** — Phase 3B multitab harness diagnostics [plan](./PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md); `test:phase3b-harness-diagnostics`; stale `fda7567` commit constant removed; preflight `frontend_commit` gate; Launch **NO-GO**; P0 **OPEN**; Phase 3B **FAIL**; Gate F **PENDING** |
+| 2026-07-01 | **Slice 37** — Gate E post-harness retry result [gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md](./gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md); `test:gate-e-retry-after-harness-fix-result`; founder YES (×2); **PARTIAL/AUTH_TOKEN_REQUIRED** on attempts #1 + #2; browser **NOT RUN**; Phase 3B **FAIL unchanged**; Launch **NO-GO**; P0 **OPEN**; Gate F **PENDING** |
+| 2026-07-01 | **Slice 38** — Gate E with-token retry result attempt 3 [gate-e-phase3b-retry-with-token-result-2026-06-29.md](./gate-e-phase3b-retry-with-token-result-2026-06-29.md); `test:gate-e-retry-with-token-result`; founder with-token YES; **PARTIAL/AUTH_TOKEN_REQUIRED**; browser **NOT RUN**; Phase 3B **FAIL unchanged**; Launch **NO-GO**; P0 **OPEN**; Gate F **PENDING** |
+| 2026-07-01 | **Slice 39** — Gate E with-token retry result attempt 4 [gate-e-phase3b-attempt4-with-token-result-2026-06-29.md](./gate-e-phase3b-attempt4-with-token-result-2026-06-29.md); `test:gate-e-attempt4-with-token-result`; founder with-token YES (attempt 4); **PARTIAL/AUTH_TOKEN_REQUIRED**; browser **NOT RUN**; prod FE aligned `a5d964d1`; Phase 3B **FAIL unchanged**; Launch **NO-GO**; P0 **OPEN**; Gate F **PENDING** |
+| 2026-06-29 | **Slice 36** — Gate E retry-after-harness-fix checkpoint [GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md](./GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md); `test:gate-e-retry-after-harness-fix-checkpoint`; prod FE aligned `2969b1f4` post-#353; Gate E retry **PENDING**; Phase 3B **FAIL unchanged**; Launch **NO-GO**; P0 **OPEN**; Gate F **PENDING** |
+| 2026-07-01 | **Slice 40** — Cursor-agent `TWIN_ACCESS_TOKEN` loading harness/tooling fix [CURSOR_AGENT_TOKEN_LOADING_2026-06-29.md](./CURSOR_AGENT_TOKEN_LOADING_2026-06-29.md); `frontend/e2e/helpers/load-local-test-env.ts` + `test:cursor-agent-token-preflight`; diagnoses why agent/npm/Playwright processes don't auto-load `.env.local` (Next.js dev does); **no browser run**, no gate stance change; Gate E remains **PARTIAL/AUTH_TOKEN_REQUIRED**; Phase 3B **FAIL unchanged**; Launch **NO-GO**; P0 **OPEN**; Gate F **PENDING** |
+| 2026-07-02 | **Slice 42** — Gate E Phase 3B prod retry attempt 6 [gate-e-phase3b-attempt6-resource-safety-abort-2026-06-29.md](./gate-e-phase3b-attempt6-resource-safety-abort-2026-06-29.md); `test:gate-e-attempt6-resource-abort`; founder YES; canonical command **started**, manually interrupted for local resource safety (`chrome-headless-shell` CPU saturation + elevated `kernel_task`); process cleanup confirmed (0/0); 0/20 routes evaluated; **ABORTED_RESOURCE_SAFETY/INCONCLUSIVE**, not a product FAIL; attempt 7 planned but **NOT authorized** — [GATE_E_ATTEMPT7_SAFETY_PLAN_2026-06-29.md](./GATE_E_ATTEMPT7_SAFETY_PLAN_2026-06-29.md); Phase 3B **FAIL unchanged**; Launch **NO-GO**; P0 **OPEN**; Gate F **PENDING** |
+| 2026-07-02 | **Slice 43 (frontend-only)** — `/api/public-health` proxy stability fix: health + celery-status fetched **in parallel** (`Promise.allSettled`) instead of sequentially (root cause of intermittent prod 502s: celery ~4.3-4.5s pushed total latency past the 10s platform timeout); celery-status now **soft-fail-only** (`celery: {}` + `celery_warning`, never crashes the route on bad/empty JSON, previously an unguarded 500); `db_ok`/`status` remain health-authoritative (Gate E compat unchanged); new `?mode=liveness` fast path (opt-in, no upstream calls); `test:public-health-route-stability` (9 tests, mocked fetch, no network/browser); **no backend/API/DB/env change**; prod improvement requires a Vercel deploy; Launch **NO-GO**; P0 **OPEN**; Gate F **PENDING** |

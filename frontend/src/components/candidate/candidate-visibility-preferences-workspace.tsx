@@ -20,6 +20,7 @@ import {
 } from "@/lib/candidate-visibility-preferences";
 import { candidateControlCenterHref } from "@/lib/candidate-control-center";
 import type { TranslationKey } from "@/lib/i18n";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 
 export function CandidateVisibilityPreferencesWorkspace() {
   const { t } = useTranslation();
@@ -83,13 +84,7 @@ export function CandidateVisibilityPreferencesWorkspace() {
           <p className="text-xs text-[var(--twin-muted)]" data-testid={CANDIDATE_VISIBILITY_PREFERENCES_MARKERS.dataSource}>
             {t(sourceKey)}
           </p>
-          <span
-            data-testid={CANDIDATE_VISIBILITY_PREFERENCES_MARKERS.pilotBadge}
-            className="inline-block rounded-full border px-3 py-1 text-xs"
-            data-launch-stance={LAUNCH_STANCE}
-          >
-            {t("candidateVisibilityPreferences.pilotBadge")}
-          </span>
+          <DemoJourneyPilotStatus testId={CANDIDATE_VISIBILITY_PREFERENCES_MARKERS.pilotBadge} />
           <Link
             href={candidateControlCenterHref()}
             data-testid={CANDIDATE_VISIBILITY_PREFERENCES_MARKERS.controlCenterLink}

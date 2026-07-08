@@ -17,6 +17,8 @@ export const P0_CRITICAL_CANDIDATE_ROUTES = [
   "/profile",
   "/dashboard/profile",
   "/dashboard/cv",
+  "/dashboard/hiring-journey",
+  "/profile/hiring-journey",
 ] as const;
 
 export const P0_CRITICAL_RECRUITER_ROUTES = [
@@ -30,6 +32,7 @@ export const P0_CRITICAL_RECRUITER_ROUTES = [
   "/recruiter/jobs/demo-role-001/team",
   "/recruiter/jobs/demo-role-001/tasks",
   "/recruiter/integrations/ats/import-readiness",
+  "/recruiter/hiring-journey",
 ] as const;
 
 export const P0_CRITICAL_COMPANY_ROUTES = [
@@ -43,13 +46,17 @@ export const P0_CRITICAL_COMPANY_ROUTES = [
   "/company/roles/demo-role-001/team",
   "/company/roles/demo-role-001/tasks",
   "/company/integrations/ats/import-readiness",
+  "/company/hiring-journey",
 ] as const;
+
+export const P0_CRITICAL_BOARD_ROUTES = ["/board/hiring-journey"] as const;
 
 export const P0_CRITICAL_ALL_ROUTES = [
   ...P0_CRITICAL_PUBLIC_ROUTES,
   ...P0_CRITICAL_CANDIDATE_ROUTES,
   ...P0_CRITICAL_RECRUITER_ROUTES,
   ...P0_CRITICAL_COMPANY_ROUTES,
+  ...P0_CRITICAL_BOARD_ROUTES,
 ] as const;
 
 /** Selectors for pilot/demo/guided-not-found surfaces — valid final states. */
@@ -67,6 +74,7 @@ export const P0_PAGE_MARKER_SELECTORS = [
   '[data-testid="founder-demo-flow-page"]',
   "[data-workspace-status]",
   "[data-workspace-module-card]",
+  '[data-hiring-journey-page="hiring-journey-page"]',
 ] as const;
 
 export type P0DomFinalState = {
@@ -149,6 +157,7 @@ export function snapshotFinalStateDom(): P0DomFinalState {
     '[data-testid="founder-demo-flow-page"]',
     "[data-workspace-status]",
     "[data-workspace-module-card]",
+    '[data-hiring-journey-page="hiring-journey-page"]',
   ];
 
   const hasDemoMarker = markerSelectors.some((sel) => document.querySelector(sel) !== null);

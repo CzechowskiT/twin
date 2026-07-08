@@ -37,6 +37,7 @@ import {
   type SafeCommunicationView,
 } from "@/lib/safe-communication";
 import { candidateTeamHref, jobTasksHref, jobTeamHref } from "@/lib/team-collaboration";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -489,12 +490,7 @@ function CandidateHeader({
             {record.role_title} · {record.role_id}
           </p>
         </div>
-        <span
-          className="rounded-full border border-violet-500/40 bg-violet-500/10 px-3 py-1 text-xs font-semibold text-violet-200"
-          data-testid={SAFE_COMMUNICATION_MARKERS.pilotBadge}
-        >
-          {t("safeCommunication.pilotBadge")}
-        </span>
+        <DemoJourneyPilotStatus testId={SAFE_COMMUNICATION_MARKERS.pilotBadge} />
       </div>
       <div className="mt-4 flex flex-wrap gap-3 text-xs">
         <span className="rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-amber-200">
@@ -554,12 +550,7 @@ function JobHeader({
             {record.department} · {record.role_id}
           </p>
         </div>
-        <span
-          className="rounded-full border border-violet-500/40 bg-violet-500/10 px-3 py-1 text-xs font-semibold text-violet-200"
-          data-testid={SAFE_COMMUNICATION_MARKERS.pilotBadge}
-        >
-          {t("safeCommunication.pilotBadge")}
-        </span>
+        <DemoJourneyPilotStatus testId={SAFE_COMMUNICATION_MARKERS.pilotBadge} />
       </div>
       <div className="mt-4 flex flex-wrap gap-3 text-xs">
         <span className="rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-amber-200">

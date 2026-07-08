@@ -3,10 +3,10 @@
 import Link from "next/link";
 
 import { useTranslation } from "@/components/language-provider";
-import { useMarketingPersona } from "@/components/persona-provider";
 import { clearCookieConsent } from "@/lib/cookie-consent";
-import { footerExploreHrefsForPersona } from "@/lib/persona-access";
-import type { TranslationKey } from "@/lib/i18n";
+import { PUBLIC_FOOTER_SITEMAP_ENTRIES } from "@/lib/public-footer-sitemap-routes";
+import { HIDE_THIN_MARKETING_NAV_LINKS, THIN_MARKETING_PATHS } from "@/lib/product-polish-p1";
+import { FOOTER_SOCIAL_PROOF_ILLUSTRATIVE_LABELS } from "@/lib/product-polish-p4";
 
 const SOCIAL_LINKEDIN = "https://www.linkedin.com";
 const SOCIAL_GITHUB = "https://github.com/CzechowskiT/twin";
@@ -31,67 +31,38 @@ function IconGithub({ className }: { className?: string }) {
   );
 }
 
-const EXPLORE_LABEL_KEYS: Record<string, TranslationKey> = {
-  "/": "site.footerHome",
-  "/waitlist": "site.footerWishlist",
-  "/demo": "nav.demo",
-  "/for-candidates": "nav.forCandidates",
-  "/for-recruiters": "nav.forRecruiters",
-  "/for-companies": "nav.forCompanies",
-  "/for-investors": "nav.forInvestors",
-  "/workspace/candidate": "workspace.candidateHome",
-  "/workspace/recruiter": "workspace.recruiterHome",
-  "/workspace/investor": "workspace.investorHome",
-  "/investor/calculator": "nav.calculatorInvestor",
-  "/investor/metrics": "investorMetrics.title",
-  "/faq": "nav.faq",
-  "/status": "site.footerStatus",
-  "/developers": "site.footerDevelopers",
-  "/calculator/b2b": "nav.calculator",
-  "/register": "nav.register",
-  "/register/candidate": "site.footerCandidateRegister",
-  "/login": "nav.login",
-  "/login/candidate": "site.footerCandidateLogin",
-  "/login/recruiter": "site.footerRecruiterLogin",
-  "/login/investor": "site.footerInvestorLogin",
-  "/login/company": "site.footerCompanyLogin",
-  "/companies/signup": "site.footerCompanySignup",
-  "/recruiter/inbox": "recruiterInbox.title",
-  "/contact": "nav.contact",
-};
-
-function exploreLabel(href: string, t: (key: TranslationKey) => string): string {
-  const key = EXPLORE_LABEL_KEYS[href];
-  if (key) return t(key);
-  if (process.env.NODE_ENV !== "production") {
-    console.warn(`[SiteFooter] Missing explore label for href: ${href}`);
-  }
-  return t("site.footerExplore");
-}
-
 export function SiteFooter() {
   const { t } = useTranslation();
-  const { persona } = useMarketingPersona();
 
   const company = [
     { href: "/about", label: t("nav.about") },
-    { href: "/case-studies", label: t("nav.cases") },
+    {
+      href: "/case-studies",
+      label: FOOTER_SOCIAL_PROOF_ILLUSTRATIVE_LABELS ? t("nav.casesIllustrative") : t("nav.cases"),
+    },
+    {
+      href: "/testimonials",
+      label: FOOTER_SOCIAL_PROOF_ILLUSTRATIVE_LABELS ? t("nav.testimonialsIllustrative") : t("nav.testimonials"),
+    },
     { href: "/careers", label: t("nav.careers") },
     { href: "/partners", label: t("nav.partners") },
     { href: "/media", label: t("nav.media") },
-    { href: "/for-investors", label: t("nav.forInvestors") },
     { href: "/contact", label: t("nav.contact") },
-  ];
+  ].filter(
+    (item) =>
+      !HIDE_THIN_MARKETING_NAV_LINKS ||
+      !THIN_MARKETING_PATHS.includes(item.href as (typeof THIN_MARKETING_PATHS)[number]),
+  );
 
-  const explore = footerExploreHrefsForPersona(persona).map((href) => ({
-    href,
-    label: exploreLabel(href, t),
+  const sitemap = PUBLIC_FOOTER_SITEMAP_ENTRIES.map((entry) => ({
+    href: entry.href,
+    label: t(entry.labelKey),
   }));
 
   return (
     <footer className="border-t border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/80">
-      <div className="twin-container py-10 sm:py-12">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="twin-container min-w-0 overflow-x-hidden py-10 sm:py-12">
+        <div className="grid min-w-0 grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-10 lg:grid-cols-4">
           <div className="min-w-0">
             <Link href="/" className="twin-logo inline-block text-lg no-underline hover:opacity-90">
               TWIN<span className="twin-logo-accent">.</span>
@@ -117,8 +88,8 @@ export function SiteFooter() {
               {t("site.footerExplore")}
             </h3>
             <ul className="mt-4 space-y-2.5 text-sm">
-              {explore.map((item) => (
-                <li key={item.href + item.label}>
+              {sitemap.map((item) => (
+                <li key={item.href}>
                   <Link href={item.href} className="twin-nav-link font-medium text-[var(--foreground)]">
                     {item.label}
                   </Link>

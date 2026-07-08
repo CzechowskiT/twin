@@ -28,6 +28,7 @@ import { candidateTeamHref } from "@/lib/team-collaboration";
 import { atsImportReadinessHref } from "@/lib/ats-import-readiness";
 import { candidateCommunicationHref } from "@/lib/safe-communication";
 import { hiringJourneyPersonaRoute } from "@/lib/hiring-journey";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 
 function fitLabelKey(fit: CandidateProfile360Record["fit_label"]): TranslationKey {
   const map: Record<CandidateProfile360Record["fit_label"], TranslationKey> = {
@@ -169,12 +170,7 @@ function ProfileContent({
               <p className="text-sm font-medium text-[var(--foreground)]">{record.role_fit_title}</p>
             </div>
             <div className="flex flex-col items-end gap-2">
-              <span
-                className="rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-200"
-                data-testid={CANDIDATE_PROFILE_360_MARKERS.pilotBadge}
-              >
-                {t("candidateProfile360.pilotBadge")}
-              </span>
+              <DemoJourneyPilotStatus testId={CANDIDATE_PROFILE_360_MARKERS.pilotBadge} />
               <span className="rounded-full border border-[var(--twin-accent)]/40 bg-[var(--twin-accent)]/10 px-3 py-1 text-sm font-semibold text-[var(--twin-accent)]">
                 {record.fit_score}% · {t(fitLabelKey(record.fit_label))}
               </span>

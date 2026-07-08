@@ -1,5 +1,4 @@
 import { COMPANY_BILLING_ROUTE } from "@/lib/company-billing-readiness";
-import { COMPANY_HIRING_ROUTE } from "@/lib/company-hiring-dashboard";
 import { COMPANY_HIRING_COCKPIT_ROUTE } from "@/lib/company-hiring-cockpit";
 import { COMPANY_HIRING_COMMAND_CENTER_ROUTE } from "@/lib/company-hiring-command-center";
 import { COMPANY_INTEGRATIONS_ROUTE } from "@/lib/company-integrations-readiness";
@@ -48,6 +47,7 @@ export const COMPANY_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     href: "/company/pipeline",
     titleKey: "workspaceModules.companyPipelineTitle",
     valuePropKey: "workspaceModules.companyPipelineValue",
+    hintKey: "workspaceModules.companyPipelineHint",
     ctaKey: "workspaceModules.companyPipelineCta",
     status: "live",
   },
@@ -77,14 +77,5 @@ export const COMPANY_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     hintKey: "workspaceModules.companyIntegrationsHint",
     ctaKey: "workspaceModules.companyIntegrationsCta",
     status: "pilot",
-  },
-  {
-    id: "settings",
-    href: COMPANY_HIRING_ROUTE,
-    titleKey: "workspaceModules.companySettingsTitle",
-    valuePropKey: "workspaceModules.companySettingsValue",
-    hintKey: "workspaceModules.companySettingsHint",
-    ctaKey: "workspaceModules.companySettingsCta",
-    status: "needs_setup",
   },
 ];

@@ -7,7 +7,6 @@ import { CandidateRewardsBand } from "@/components/marketing/candidate-rewards-b
 import { CompanyWorkspacePreview } from "@/components/marketing/company-workspace-preview";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { TalentPoolPreview } from "@/components/marketing/talent-pool-preview";
-import { Shell } from "@/components/ui";
 import { getPersonaBundle, type PersonaId } from "@/lib/persona-pages";
 import { COMPANY_ENTRY_MARKERS } from "@/lib/company-entry-navigation";
 
@@ -16,8 +15,7 @@ export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
   const c = getPersonaBundle(persona, locale);
 
   return (
-    <Shell wide>
-      <MarketingPageSurface wide withCard={false}>
+    <MarketingPageSurface wide withCard={false}>
       <div className="marketing-copy-rail space-y-14 sm:space-y-16">
         <header className={`space-y-4 text-start ${c.stackedCta ? "marketing-hero-rail" : ""}`}>
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">{c.heroEyebrow}</p>
@@ -207,6 +205,5 @@ export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
         </section>
       </div>
     </MarketingPageSurface>
-    </Shell>
   );
 }

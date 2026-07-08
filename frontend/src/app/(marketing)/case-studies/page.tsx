@@ -5,6 +5,7 @@ import Link from "next/link";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { useTranslation } from "@/components/language-provider";
+import { MARK_ILLUSTRATIVE_SOCIAL_PROOF } from "@/lib/product-polish-p4";
 import { Card, Shell } from "@/components/ui";
 
 export default function CaseStudiesPage() {
@@ -19,7 +20,16 @@ export default function CaseStudiesPage() {
   return (
     <Shell wide>
       <MarketingPageSurface>
-        <MarketingPageHeader title={t("site.casesTitle")} lead={t("site.casesLead")} />
+        <MarketingPageHeader title={t("site.casesTitle")} lead={t("site.casesLead")}>
+          {MARK_ILLUSTRATIVE_SOCIAL_PROOF ? (
+            <p className="text-sm font-medium text-[var(--twin-muted-strong)]">
+              <span className="mr-2 rounded-full border border-[var(--twin-border)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--twin-muted)]">
+                {t("productPolish.founderLedExamplesBadge")}
+              </span>
+              {t("site.casesDisclaimer")}
+            </p>
+          ) : null}
+        </MarketingPageHeader>
         <div className="mt-8 space-y-5">
           {cases.map((c) => (
             <Card key={c.title}>

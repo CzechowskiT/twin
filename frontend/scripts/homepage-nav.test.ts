@@ -14,6 +14,13 @@ import {
   headerMarketingLoginHref,
   showMarketingPersonaNav,
 } from "../src/lib/persona-access";
+import { PUBLIC_EXPLORE_TWIN_ENTRIES, PUBLIC_EXPLORE_TWIN_HREFS } from "../src/lib/public-explore-twin-routes";
+import {
+  HEADER_EXPLORE_MEGA_PANEL_GROUPS,
+  HEADER_EXPLORE_MEGA_PANEL_HREFS,
+} from "../src/lib/public-explore-mega-panel-routes";
+import { PUBLIC_FOOTER_SITEMAP_HREFS } from "../src/lib/public-footer-sitemap-routes";
+import { dictionaries, en } from "../src/lib/i18n";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -21,19 +28,32 @@ function read(path: string): string {
   return readFileSync(join(root, path), "utf8");
 }
 
-test("marketing lane links expose candidate, recruiter, company, and demo", () => {
+test("marketing lane links expose persona landings, FAQ, and demo — no workspace shortcuts", () => {
   const links = headerMarketingLaneLinks();
-  assert.equal(links.length, 4);
+  assert.equal(links.length, 6);
   assert.deepEqual(
     links.map((l) => l.href),
-    ["/for-candidates", "/for-recruiters", "/for-companies", "/demo"],
+    ["/for-candidates", "/for-recruiters", "/for-companies", "/for-investors", "/faq", "/demo"],
   );
   assert.deepEqual(links.map((l) => l.labelKey), [
     "nav.personaCandidate",
     "nav.personaRecruiter",
     "nav.personaCompany",
+    "nav.personaInvestor",
+    "nav.faq",
     "nav.demo",
   ]);
+  const workspaceShortcuts = ["/dashboard", "/recruiter", "/company/dashboard", "/investor", "/workspace"];
+  for (const href of links.map((l) => l.href)) {
+    assert.ok(!workspaceShortcuts.some((w) => href === w || href.startsWith(`${w}/`)), href);
+  }
+});
+
+test("marketing lane investor link points to public fundraising page, not executive room", () => {
+  const investor = headerMarketingLaneLinks().find((l) => l.labelKey === "nav.personaInvestor");
+  assert.ok(investor);
+  assert.equal(investor.href, "/for-investors");
+  assert.equal(investor.persona, "investor");
 });
 
 test("marketing login href points to role-choice hub", () => {
@@ -83,4 +103,164 @@ test("chrome header avoids workspace shell on landing without active session", (
   assert.match(chrome, /hasActiveSession/);
   assert.match(chrome, /return <MarketingHeader \/>/);
   assert.doesNotMatch(chrome, /Boolean\(getToken\(\)\)/);
+});
+
+test("site header renders Explore TWIN mega-panel trigger on marketing chrome", () => {
+  const header = read("src/components/site-header-bar.tsx");
+  assert.match(header, /SiteHeaderExplorePanel/);
+  assert.match(header, /variant="desktop"/);
+  assert.match(header, /variant="mobile"/);
+  assert.match(header, /min-w-0/);
+});
+
+test("site header exposes primary Demo CTA on account rail with analytics", () => {
+  const header = read("src/components/site-header-bar.tsx");
+  assert.match(header, /showHeaderDemoCta/);
+  assert.match(header, /header_demo_click/);
+  assert.match(header, /marketingNavLinks/);
+  assert.match(header, /ml-auto[\s\S]{0,1200}showHeaderDemoCta/);
+  assert.doesNotMatch(header, /marketingLaneLinks\.map\(\(item\) => \{[\s\S]*item\.href === "\/demo"/);
+});
+
+test("explore mega-panel excludes duplicate Demo link — header right rail is sole guest entry", () => {
+  assert.ok(!HEADER_EXPLORE_MEGA_PANEL_HREFS.includes("/demo"));
+  const demoGroup = HEADER_EXPLORE_MEGA_PANEL_GROUPS.find((g) => g.id === "demo");
+  assert.ok(demoGroup);
+  assert.ok(!demoGroup.links.some((l) => l.href === "/demo"));
+});
+
+test("guest header main lane excludes executive investor room shortcut", () => {
+  const links = headerMarketingLaneLinks();
+  assert.ok(!links.some((l) => l.href === "/investor"));
+  assert.ok(!links.some((l) => l.href.startsWith("/investor/")));
+});
+
+test("explore mega-panel groups route to existing public surfaces", () => {
+  assert.equal(HEADER_EXPLORE_MEGA_PANEL_GROUPS.length, 4);
+  assert.deepEqual(
+    HEADER_EXPLORE_MEGA_PANEL_GROUPS.map((g) => g.id),
+    ["product", "investors", "demo", "trust"],
+  );
+  assert.deepEqual(HEADER_EXPLORE_MEGA_PANEL_HREFS, [
+    "/dashboard",
+    "/recruiter",
+    "/company/dashboard",
+    "/for-investors",
+    "/investor",
+    "/investor/product-proof",
+    "/how-it-works",
+    "/faq",
+    "/dashboard/trust",
+    "/status",
+  ]);
+  const investorGroup = HEADER_EXPLORE_MEGA_PANEL_GROUPS.find((g) => g.id === "investors");
+  assert.ok(investorGroup?.links.some((l) => l.href === "/investor" && l.highlight));
+});
+
+test("homepage wires explore twin quick-entry panel with ten existing routes", () => {
+  const home = read("src/app/(marketing)/page.tsx");
+  const panel = read("src/components/marketing/landing-explore-twin.tsx");
+  assert.match(home, /LandingExploreTwin/);
+  assert.match(panel, /PUBLIC_EXPLORE_TWIN_ENTRIES/);
+  assert.match(panel, /id="explore-twin"/);
+});
+
+test("explore twin registry exposes ten bounded quick-entry links", () => {
+  assert.equal(PUBLIC_EXPLORE_TWIN_ENTRIES.length, 10);
+  assert.deepEqual(PUBLIC_EXPLORE_TWIN_HREFS, [
+    "/dashboard",
+    "/recruiter",
+    "/company/dashboard",
+    "/investor",
+    "/demo",
+    "/dashboard/trust",
+    "/status",
+    "/investor/product-proof",
+    "/faq",
+    "/how-it-works",
+  ]);
+  const ids = new Set(PUBLIC_EXPLORE_TWIN_ENTRIES.map((e) => e.id));
+  assert.equal(ids.size, 10);
+  for (const entry of PUBLIC_EXPLORE_TWIN_ENTRIES) {
+    assert.match(entry.titleKey, /^home\.exploreTwin/);
+    assert.match(entry.hintKey, /^home\.exploreTwin/);
+  }
+});
+
+test("marketing homepage rails keep horizontal padding regression guard", () => {
+  const required = ["mx-auto", "max-w-6xl", "px-4", "sm:px-6"];
+  for (const path of [
+    "src/components/marketing/landing-hero.tsx",
+    "src/components/marketing/candidate-rewards-band.tsx",
+    "src/components/marketing/landing-faq.tsx",
+    "src/components/marketing/landing-cta-band.tsx",
+    "src/app/(marketing)/page.tsx",
+    "src/components/marketing/investor-fundraising-page.tsx",
+    "src/components/investor/executive-product-proof-board.tsx",
+  ]) {
+    const src = read(path);
+    const viaSurface = src.includes("MarketingPageSurface");
+    for (const token of required) {
+      assert.ok(src.includes(token) || viaSurface, `${path} missing ${token}`);
+    }
+  }
+});
+
+test("explore twin EN/PL copy is bounded — no launch-ready or live ATS claims", () => {
+  const positiveForbidden = /\blaunch ready\b|\blive ats\b|\bauto-apply is live\b/i;
+  function hasPositiveClaim(blob: string, pattern: RegExp): boolean {
+    const re = new RegExp(pattern.source, pattern.flags.includes("g") ? pattern.flags : `${pattern.flags}g`);
+    for (const match of blob.matchAll(re)) {
+      const idx = match.index ?? 0;
+      const before = blob.slice(Math.max(0, idx - 28), idx);
+      if (/\b(not|no|bez|nie|brak|without)\s*$/i.test(before)) continue;
+      return true;
+    }
+    return false;
+  }
+  for (const locale of ["en", "pl"] as const) {
+    const h = dictionaries[locale].home;
+    const blob = [
+      h.exploreTwinLead,
+      h.exploreTwinCandidateHint,
+      h.exploreTwinRecruiterHint,
+      h.exploreTwinCompanyHint,
+      h.exploreTwinInvestorHint,
+      h.exploreTwinProductProofHint,
+      h.exploreTwinFaqHint,
+      h.exploreTwinHowItWorksHint,
+    ].join("\n");
+    assert.equal(hasPositiveClaim(blob, positiveForbidden), false, locale);
+    assert.match(blob.toLowerCase(), /paused|wstrzym|not live|nie jest live|no-go|pilot/);
+  }
+  assert.equal(en.home.exploreTwinEyebrow, "Explore TWIN");
+  assert.equal(dictionaries.pl.home.exploreTwinEyebrow, "Poznaj TWIN");
+});
+
+test("site footer renders stable public sitemap — distinct investor routes", () => {
+  const footer = read("src/components/site-footer.tsx");
+  assert.match(footer, /PUBLIC_FOOTER_SITEMAP_ENTRIES/);
+  assert.doesNotMatch(footer, /footerExploreHrefsForPersona/);
+  assert.doesNotMatch(footer, /useMarketingPersona/);
+  assert.doesNotMatch(footer, /\/for-investors.*footerCompany|footerCompany[\s\S]*\/for-investors/);
+  assert.deepEqual(PUBLIC_FOOTER_SITEMAP_HREFS, [
+    "/for-candidates",
+    "/for-recruiters",
+    "/for-companies",
+    "/for-investors",
+    "/investor",
+    "/demo",
+    "/faq",
+    "/status",
+    "/dashboard/trust",
+  ]);
+});
+
+test("footer investor labels distinguish marketing page from executive room (EN/PL)", () => {
+  assert.equal(en.site.footerForInvestors, "For Investors");
+  assert.equal(en.site.footerInvestorRoom, "Investor Room");
+  assert.notEqual(en.site.footerForInvestors, en.site.footerInvestorRoom);
+  assert.equal(dictionaries.pl.site.footerForInvestors, "Dla inwestorów");
+  assert.equal(dictionaries.pl.site.footerInvestorRoom, "Sala executive");
+  assert.notEqual(dictionaries.pl.site.footerForInvestors, dictionaries.pl.site.footerInvestorRoom);
 });

@@ -1,5 +1,5 @@
 /**
- * Executive Product Proof / Board Demo — routes, markers, and hard-ban guards (16 assertions).
+ * Executive Product Proof / Board Demo — routes, markers, and hard-ban guards (17 assertions).
  */
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
@@ -82,10 +82,21 @@ test("5 investor room demo map links to product proof", () => {
   assert.match(room, /\/investor\/product-proof/);
 });
 
-test("6 system-of-record hub registers investor product proof", () => {
+test("6 system-of-record hub registers investor product proof with boundaries", () => {
   const entry = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "investor_product_proof");
   assert.ok(entry);
   assert.equal(entry?.href, "/investor/product-proof");
+  assert.equal(entry?.status, "live");
+  assert.equal(entry?.investorGroup, "investorProduct");
+  assert.ok(entry?.hintKey);
+  assert.ok(entry?.boundaryTags.includes("human_decision_required"));
+  assert.ok(entry?.boundaryTags.includes("no_outreach"));
+  assert.ok(entry?.boundaryTags.includes("no_ats_sync"));
+  for (const locale of LOCALES) {
+    const hint = dictionaries[locale].executiveProductProof.sorHubHint;
+    assert.ok(typeof hint === "string" && hint.length > 0, locale);
+    assert.doesNotMatch(hint, /launch ready/i, locale);
+  }
 });
 
 test("7 demo data has no email patterns", () => {
@@ -153,4 +164,19 @@ test("15 P0 performance called OPEN not DONE", () => {
 test("16 Phase 3B referenced as blocked not shipped", () => {
   const demo = read("src/lib/executive-product-proof-demo-data.ts");
   assert.match(demo, /Phase 3B.*blocked/i);
+});
+
+test("17 PL executive product proof eyebrow localized vs EN", () => {
+  const pl = dictionaries.pl.executiveProductProof;
+  assert.notEqual(pl.pageEyebrow, en.executiveProductProof.pageEyebrow);
+  assert.doesNotMatch(pl.pageEyebrow, /^Executive product proof$/);
+  assert.match(pl.sorHubHint.toLowerCase(), /dowód|due diligence|kontakt|ats/);
+});
+
+test("18 investor room demo map label key resolves in all locales", () => {
+  for (const locale of LOCALES) {
+    const label = dictionaries[locale].investorRoom.demoMapProductProof;
+    assert.ok(label.length > 0, locale);
+    assert.doesNotMatch(label, /launch ready/i, locale);
+  }
 });

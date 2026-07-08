@@ -1,0 +1,553 @@
+name: gate-e-phase3b-manual
+
+# Manual-only, isolated Gate E Phase 3B prod runner — 2026-07-03.
+# See docs/GATE_E_ISOLATED_RUNNER_PLAN_2026-07-03.md.
+#
+# Why this exists: 10 founder-Mac Gate E Phase 3B prod attempts (see
+# docs/gate-e-phase3b-attempt10-result-2026-07-03.md) were aborted or
+# blocked by *local host* resource/process-detection ambiguity — never by
+# a genuine product defect. Moving execution to an ephemeral, single-purpose
+# GitHub Actions runner removes the founder Mac from Phase 3B entirely:
+# every run gets a clean host with nothing else competing for CPU/process
+# namespace, and the runner is destroyed afterward regardless of outcome.
+#
+# This workflow does NOT authorize any attempt by itself. It still requires
+# the operator to explicitly type "yes" to all three confirmation inputs
+# below, mirroring the founder-authorization discipline used for every
+# prior attempt. It does not deploy anything, does not run Gate D, and does
+# not claim Launch GO, P0 closure, or Gate F YES under any circumstance.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_gate_e:
+        description: 'Type "yes" to confirm explicit founder authorization for this Gate E Phase 3B prod attempt'
+        required: true
+        type: string
+      confirm_prod_smoke:
+        description: 'Type "yes" to confirm this is a READ-ONLY prod smoke run (no prod mutation, no writes)'
+        required: true
+        type: string
+      confirm_no_launch_go:
+        description: 'Type "yes" to confirm this run does NOT constitute Launch GO, Gate D, or P0 closure'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+# Never allow two Gate E Phase 3B prod attempts to race against the same
+# production target at once.
+concurrency:
+  group: gate-e-phase3b-manual
+  cancel-in-progress: false
+
+env:
+  PROD_BASE_URL: https://twin-sooty.vercel.app
+
+jobs:
+  gate-e-phase3b-prod:
+    name: "Gate E Phase 3B prod (isolated runner, route: ${{ matrix.slug }})"
+    runs-on: ubuntu-latest
+    # Gate E Phase 3B route-level sharding (2026-07-06, see
+    # docs/GATE_E_PHASE3B_ROUTE_SHARDING_PLAN_2026-07-03.md): one
+    # isolated-runner job per ROUTE (20 jobs) instead of per 6-7-route batch
+    # (3 jobs, the shape attempt 14 exercised) — attempt 14 (run
+    # 28771385932) showed all 3 batch jobs killed by RUNNER_SHUTDOWN_SIGNAL/
+    # exit 143 with 0/20 routes confirmed and no correlation between batch
+    # size/duration and the failure, so this shards one level finer: a
+    # single route's canonical-command window is far shorter than even the
+    # smallest prior batch, minimizing how much evidence any one runner
+    # termination can cost. 20 minutes is generous headroom over a
+    # single-route run (checkout + npm ci + playwright install ~1-2min,
+    # canonical command ~1-3min for one route's stagger/idle/CDP-capture
+    # window) — far below the 45-60min bound the old 6-7-route batch jobs
+    # needed.
+    timeout-minutes: 20
+    # max-parallel: 1 keeps routes strictly sequential (never more than one
+    # Phase 3B prod attempt in flight at a time, matching the workers=1 /
+    # retries=0 single-attempt discipline this workflow has always
+    # enforced); fail-fast: false means a failed/cancelled/shutdown-signal
+    # route does NOT cancel the remaining routes, so a single bad route no
+    # longer discards the other 19 routes' evidence.
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        include:
+          - { route: "/", slug: root }
+          - { route: "/demo", slug: demo }
+          - { route: "/for-companies", slug: for-companies }
+          - { route: "/dashboard", slug: dashboard }
+          - { route: "/dashboard/jobs", slug: dashboard-jobs }
+          - { route: "/dashboard/matches", slug: dashboard-matches }
+          - { route: "/profile", slug: profile }
+          - { route: "/recruiter", slug: recruiter }
+          - { route: "/recruiter/candidates/demo-candidate-001", slug: recruiter-candidates-demo-candidate-001 }
+          - { route: "/recruiter/candidates/demo-candidate-001/trust", slug: recruiter-candidates-demo-candidate-001-trust }
+          - { route: "/recruiter/candidates/demo-candidate-001/team", slug: recruiter-candidates-demo-candidate-001-team }
+          - { route: "/recruiter/candidates/demo-candidate-001/communication", slug: recruiter-candidates-demo-candidate-001-communication }
+          - { route: "/recruiter/jobs/demo-role-001/pipeline", slug: recruiter-jobs-demo-role-001-pipeline }
+          - { route: "/recruiter/integrations/ats/import-readiness", slug: recruiter-integrations-ats-import-readiness }
+          - { route: "/company/dashboard", slug: company-dashboard }
+          - { route: "/company/candidates/demo-candidate-001", slug: company-candidates-demo-candidate-001 }
+          - { route: "/company/candidates/demo-candidate-001/trust", slug: company-candidates-demo-candidate-001-trust }
+          - { route: "/company/candidates/demo-candidate-001/team", slug: company-candidates-demo-candidate-001-team }
+          - { route: "/company/candidates/demo-candidate-001/communication", slug: company-candidates-demo-candidate-001-communication }
+          - { route: "/company/roles/demo-role-001/pipeline", slug: company-roles-demo-role-001-pipeline }
+    env:
+      PHASE3B_ROUTE: ${{ matrix.route }}
+    steps:
+      - name: Validate hard-ban confirmation inputs
+        run: |
+          set -euo pipefail
+          fail=0
+          if [ "${{ inputs.confirm_gate_e }}" != "yes" ]; then
+            echo "::error::confirm_gate_e must be exactly 'yes' (explicit founder authorization required). Got: '${{ inputs.confirm_gate_e }}'"
+            fail=1
+          fi
+          if [ "${{ inputs.confirm_prod_smoke }}" != "yes" ]; then
+            echo "::error::confirm_prod_smoke must be exactly 'yes' (read-only prod smoke acknowledgement required). Got: '${{ inputs.confirm_prod_smoke }}'"
+            fail=1
+          fi
+          if [ "${{ inputs.confirm_no_launch_go }}" != "yes" ]; then
+            echo "::error::confirm_no_launch_go must be exactly 'yes' (this run must not be conflated with Launch GO/Gate D/P0 closure). Got: '${{ inputs.confirm_no_launch_go }}'"
+            fail=1
+          fi
+          if [ "$fail" -ne 0 ]; then
+            echo "::error::One or more required confirmations were not 'yes'. Aborting before checkout — no code checked out, no prod requests made."
+            exit 1
+          fi
+          echo "All three confirmation inputs = yes. Proceeding."
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: npm ci
+        working-directory: frontend
+        run: npm ci
+
+      - name: Install Playwright chromium (isolated runner only)
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: Persist attempt status — workflow start (heartbeat)
+        working-directory: frontend
+        run: |
+          echo "[gate-e-heartbeat] workflow-start: checkout + npm ci + playwright install complete, run_id=${GITHUB_RUN_ID} sha=${GITHUB_SHA}"
+          GATE_E_STAGE=workflow-start npx --yes tsx scripts/gate-e-attempt-status-write.ts
+
+      - name: Static preflight guards (no browser, no prod requests)
+        working-directory: frontend
+        run: |
+          npx tsc --noEmit -p .
+          npm run test:phase3b-resource-watchdog
+          npm run test:phase3b-controlled-multitab
+          npm run test:gate-e-isolated-runner-guard
+          npm run test:gate-e-phase3b-split-batch
+          npm run test:gate-e-phase3b-route-sharding
+          npm run test:gate-e-artifact-upload-guard
+          npm run test:phase3b-local-execution-blocked
+
+      - name: Verify workers=1 / retries=0 are code-enforced (not overridable by this workflow)
+        working-directory: frontend
+        run: |
+          set -euo pipefail
+          grep -q 'workers: 1,' playwright.config.ts
+          grep -q 'retries: process.env.CI ? 1 : 0' playwright.config.ts
+          grep -q 'retries: 0' e2e/phase3b-controlled-multitab.spec.ts
+          echo "OK: workers=1 / retries=0 confirmed in source, unchanged by this workflow."
+
+      - name: Prod public-health — 10x poll (read-only)
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 10); do
+            http_code=$(curl -fsS -o /tmp/public-health.json -w "%{http_code}" "${PROD_BASE_URL}/api/public-health" || echo "000")
+            if [ "$http_code" != "200" ]; then
+              echo "::error::public-health attempt ${i}/10 returned HTTP ${http_code}"
+              cat /tmp/public-health.json 2>/dev/null || true
+              exit 1
+            fi
+            status=$(python3 -c "import json;print(json.load(open('/tmp/public-health.json')).get('status'))")
+            db_ok=$(python3 -c "import json;print(json.load(open('/tmp/public-health.json')).get('db_ok'))")
+            echo "public-health attempt ${i}/10: HTTP ${http_code} status=${status} db_ok=${db_ok}"
+            if [ "$status" != "ok" ] || [ "$db_ok" != "True" ]; then
+              echo "::error::public-health attempt ${i}/10 unhealthy: status=${status} db_ok=${db_ok}"
+              exit 1
+            fi
+            sleep 0.5
+          done
+          echo "OK: public-health 10/10 x HTTP 200, status=ok, db_ok=true"
+
+      - name: Persist attempt status — public-health complete (heartbeat)
+        working-directory: frontend
+        run: |
+          echo "[gate-e-heartbeat] public-health-complete: 10/10 x HTTP 200, status=ok, db_ok=true"
+          GATE_E_STAGE=public-health-complete GATE_E_HEALTH=ok npx --yes tsx scripts/gate-e-attempt-status-write.ts
+
+      - name: HTTP smoke — 10 routes (read-only, prod)
+        run: |
+          set -euo pipefail
+          routes=(
+            "/"
+            "/for-candidates"
+            "/for-recruiters"
+            "/for-companies"
+            "/for-investors"
+            "/investor"
+            "/investor/product-proof"
+            "/demo"
+            "/how-it-works"
+            "/faq"
+          )
+          fail=0
+          for route in "${routes[@]}"; do
+            http_code=$(curl -fsS -o /dev/null -w "%{http_code}" "${PROD_BASE_URL}${route}" || echo "000")
+            echo "route ${route} -> HTTP ${http_code}"
+            if [ "$http_code" != "200" ]; then
+              echo "::error::route ${route} returned HTTP ${http_code}"
+              fail=1
+            fi
+          done
+          if [ "$fail" -ne 0 ]; then
+            echo "::error::HTTP smoke failed — one or more of the 10 routes did not return 200"
+            exit 1
+          fi
+          echo "OK: HTTP smoke 10/10 x HTTP 200"
+
+      - name: Persist attempt status — HTTP smoke complete (heartbeat)
+        working-directory: frontend
+        run: |
+          echo "[gate-e-heartbeat] http-smoke-complete: 10/10 x HTTP 200"
+          GATE_E_STAGE=http-smoke-complete GATE_E_HEALTH=ok GATE_E_SMOKE=ok npx --yes tsx scripts/gate-e-attempt-status-write.ts
+
+      - name: Pre-run cleanup — clear stale browser/orphan-pattern processes before Phase 3B (isolated runner, best-effort)
+        run: |
+          set -uo pipefail
+          patterns=(
+            "playwright.*phase3b"
+            "test:phase3b-controlled-multitab-prod"
+            "test:phase3b-controlled-multitab-browser"
+            "npm.*phase3b-controlled-multitab"
+            "node.*phase3b-controlled-multitab"
+          )
+          echo "Before cleanup:"
+          before_chrome=$(pgrep -fc chrome-headless-shell 2>/dev/null || echo 0)
+          echo "  chrome-headless-shell: ${before_chrome}"
+          for pattern in "${patterns[@]}"; do
+            count=$(pgrep -fc "$pattern" 2>/dev/null || echo 0)
+            echo "  pattern '${pattern}': ${count}"
+          done
+          # Best-effort only — never fails this step if nothing matches. Safe on
+          # this ephemeral, single-purpose runner: run 28650677999's own npm
+          # ci/playwright-install steps have already fully exited by this point
+          # (each `run:` step is a separate process tree), so anything still
+          # matching here would be a genuine leftover, never this run's own
+          # not-yet-started Phase 3B process chain.
+          pkill -f chrome-headless-shell 2>/dev/null || true
+          for pattern in "${patterns[@]}"; do
+            pkill -f "$pattern" 2>/dev/null || true
+          done
+          sleep 1
+          echo "After cleanup:"
+          after_chrome=$(pgrep -fc chrome-headless-shell 2>/dev/null || echo 0)
+          echo "  chrome-headless-shell: ${after_chrome}"
+          for pattern in "${patterns[@]}"; do
+            count=$(pgrep -fc "$pattern" 2>/dev/null || echo 0)
+            echo "  pattern '${pattern}': ${count}"
+          done
+          echo "Pre-run cleanup complete (best-effort, never fails this job)."
+          echo "Note: this step cannot clear a not-yet-started Phase 3B run's own npm/npx/playwright ancestor chain — that self-match false positive (run 28650677999) is fixed in the resource watchdog itself (frontend/e2e/helpers/phase3b-resource-watchdog.ts), which now excludes this run's own process ancestry when GITHUB_ACTIONS=true."
+          exit 0
+
+      - name: Persist attempt status — pre-run cleanup complete (heartbeat)
+        working-directory: frontend
+        run: |
+          echo "[gate-e-heartbeat] pre-run-cleanup-complete: orphan-pattern check done"
+          GATE_E_STAGE=pre-run-cleanup-complete GATE_E_HEALTH=ok GATE_E_SMOKE=ok npx --yes tsx scripts/gate-e-attempt-status-write.ts
+
+      # Cancellation-hardening (2026-07-03, see
+      # docs/gate-e-phase3b-attempt12-result-2026-07-03.md): attempt 12
+      # dispatch 2 (run 28652257796) passed every precondition above, then
+      # went silent for ~4m21s and was cancelled at the infrastructure level
+      # before any route batch ran, with zero artifacts uploaded (a
+      # job-level cancellation skips every subsequent step regardless of
+      # `if: always()`, including "Upload diagnostics"). This checkpoint —
+      # immediately before the canonical command — is the last point this
+      # workflow can log/persist before handing off to the long-running
+      # Playwright process, which now emits its own heartbeats internally
+      # (see phase3b-controlled-multitab.spec.ts).
+      - name: Persist attempt status — before canonical command (heartbeat)
+        working-directory: frontend
+        run: |
+          echo "[gate-e-heartbeat] before-canonical: starting npm run test:phase3b-controlled-multitab-prod at $(date -u +%FT%TZ)"
+          GATE_E_STAGE=before-canonical GATE_E_HEALTH=ok GATE_E_SMOKE=ok npx --yes tsx scripts/gate-e-attempt-status-write.ts
+
+      - name: Gate E Phase 3B prod — controlled multitab (canonical command)
+        working-directory: frontend
+        # Explicit step-level timeout (2026-07-03 hardening; re-scoped
+        # 2026-07-06 for route-level sharding), independent of the job
+        # timeout: bounds this specific step so a genuine harness hang
+        # produces an unambiguous `timed_out` conclusion instead of being
+        # indistinguishable from an external `cancelled`/shutdown-signal one
+        # (see attempt 12 §3, attempt 14 §3). A single route's own
+        # stagger/idle/CDP-capture window is well under 2 minutes (see
+        # PHASE3B_IDLE_MS_MIN/MAX in phase3b-controlled-routes.ts); 10
+        # minutes leaves generous headroom under the job's 20-minute budget.
+        timeout-minutes: 10
+        env:
+          TWIN_ACCESS_TOKEN: ${{ secrets.TWIN_ACCESS_TOKEN }}
+          PHASE3B_RESOURCE_WATCHDOG: "1"
+          PLAYWRIGHT_ALLOW_PROD_SMOKE: "1"
+          PLAYWRIGHT_SKIP_WEBSERVER: "1"
+          PLAYWRIGHT_BASE_URL: https://twin-sooty.vercel.app
+          CI: "true"
+        run: |
+          echo "TWIN_ACCESS_TOKEN present: $([ -n "$TWIN_ACCESS_TOKEN" ] && echo true || echo false)"
+          # Cancellation-hardening (2026-07-03): background heartbeat so the
+          # live GitHub Actions log shows this step is still alive every 30s
+          # even during Playwright's own idle waits — closing the ~4m21s
+          # silent gap observed in attempt 12 at the workflow-log level, on
+          # top of the spec-level heartbeats emitted by Playwright itself.
+          ( while true; do sleep 30; echo "[gate-e-heartbeat] canonical command still running at $(date -u +%FT%TZ)"; done ) &
+          HEARTBEAT_PID=$!
+          set +e
+          npm run test:phase3b-controlled-multitab-prod:route
+          CANONICAL_EXIT_CODE=$?
+          set -e
+          kill "$HEARTBEAT_PID" 2>/dev/null || true
+          wait "$HEARTBEAT_PID" 2>/dev/null || true
+          exit $CANONICAL_EXIT_CODE
+
+      - name: Persist attempt status — canonical command finished (heartbeat)
+        if: always()
+        working-directory: frontend
+        run: |
+          echo "[gate-e-heartbeat] canonical-complete: canonical command step reached a conclusion at $(date -u +%FT%TZ)"
+          GATE_E_STAGE=canonical-complete GATE_E_HEALTH=ok GATE_E_SMOKE=ok npx --yes tsx scripts/gate-e-attempt-status-write.ts || true
+
+      - name: Cleanup — kill any leftover browser/phase3b processes (isolated runner, best-effort)
+        if: always()
+        working-directory: frontend
+        run: |
+          echo "[gate-e-heartbeat] final-cleanup: starting best-effort cleanup at $(date -u +%FT%TZ)"
+          pkill -f chrome-headless-shell 2>/dev/null || true
+          pkill -f "playwright.*phase3b" 2>/dev/null || true
+          GATE_E_STAGE=workflow-cleanup npx --yes tsx scripts/gate-e-attempt-status-write.ts || true
+          echo "Cleanup step complete (runner is ephemeral and will be destroyed regardless)."
+
+      - name: Upload diagnostics + playwright report + ownership snapshot + attempt status
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate-e-phase3b-evidence-${{ matrix.slug }}-${{ github.run_id }}
+          path: |
+            frontend/.diagnostics/**
+            frontend/.diagnostics/gate-e-attempt-status.json
+            frontend/playwright-report/**
+            frontend/test-results/**
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Explicit non-claims (job summary)
+        if: always()
+        run: |
+          {
+            echo "## Gate E Phase 3B — isolated runner — explicit non-claims"
+            echo ""
+            echo "- This run does **not** constitute Launch GO."
+            echo "- This run does **not** close P0 (remains OPEN)."
+            echo "- This run does **not** execute or approve Gate D."
+            echo "- This run does **not** set Gate F (remains PENDING)."
+            echo "- No production deploy was performed by this workflow."
+            echo "- Result interpretation and any founder/launch stance update happens in a separate, human-reviewed docs change — never automatically from this workflow."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # Gate E Phase 3B route-level sharding (2026-07-06, see
+  # docs/GATE_E_PHASE3B_ROUTE_SHARDING_PLAN_2026-07-03.md): runs after all 20
+  # `gate-e-phase3b-prod` matrix route jobs reach a conclusion (pass, fail,
+  # cancelled, or shutdown-signal — `if: always()` + `needs:` on the matrix
+  # job id waits for every instance), and merges whatever per-route evidence
+  # each of them managed to produce into one combined summary. This job
+  # draws no new pass/fail verdict of its own — it only aggregates
+  # already-produced route evidence for human review, exactly like every
+  # other step in this workflow (and exactly like the prior per-batch
+  # aggregator it supersedes). If a route job never uploaded an artifact
+  # (e.g. a hard external cancellation before its own upload step could
+  # run), aggregation simply records that route as MISSING instead of
+  # failing the whole aggregation.
+  gate-e-phase3b-aggregate:
+    name: Gate E Phase 3B prod — aggregate route evidence
+    needs: gate-e-phase3b-prod
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Download all route evidence artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: gate-e-phase3b-evidence-*-${{ github.run_id }}
+          path: route-evidence
+          merge-multiple: false
+        continue-on-error: true
+
+      - name: Merge per-route diagnostics into one aggregate summary (best-effort, never fails the job)
+        run: |
+          set +e
+          python3 - <<'PYEOF'
+          import json
+          import os
+
+          # Keep in sync with the matrix `include:` list above and with
+          # PHASE3B_ROUTE_ENTRIES in
+          # frontend/e2e/helpers/phase3b-controlled-routes.ts — proven by
+          # frontend/scripts/gate-e-phase3b-route-sharding.test.ts.
+          ROUTES = [
+              ("root", "/"),
+              ("demo", "/demo"),
+              ("for-companies", "/for-companies"),
+              ("dashboard", "/dashboard"),
+              ("dashboard-jobs", "/dashboard/jobs"),
+              ("dashboard-matches", "/dashboard/matches"),
+              ("profile", "/profile"),
+              ("recruiter", "/recruiter"),
+              ("recruiter-candidates-demo-candidate-001", "/recruiter/candidates/demo-candidate-001"),
+              ("recruiter-candidates-demo-candidate-001-trust", "/recruiter/candidates/demo-candidate-001/trust"),
+              ("recruiter-candidates-demo-candidate-001-team", "/recruiter/candidates/demo-candidate-001/team"),
+              ("recruiter-candidates-demo-candidate-001-communication", "/recruiter/candidates/demo-candidate-001/communication"),
+              ("recruiter-jobs-demo-role-001-pipeline", "/recruiter/jobs/demo-role-001/pipeline"),
+              ("recruiter-integrations-ats-import-readiness", "/recruiter/integrations/ats/import-readiness"),
+              ("company-dashboard", "/company/dashboard"),
+              ("company-candidates-demo-candidate-001", "/company/candidates/demo-candidate-001"),
+              ("company-candidates-demo-candidate-001-trust", "/company/candidates/demo-candidate-001/trust"),
+              ("company-candidates-demo-candidate-001-team", "/company/candidates/demo-candidate-001/team"),
+              ("company-candidates-demo-candidate-001-communication", "/company/candidates/demo-candidate-001/communication"),
+              ("company-roles-demo-role-001-pipeline", "/company/roles/demo-role-001/pipeline"),
+          ]
+          root = "route-evidence"
+          summary = {"phase": "3B-controlled-multitab-route-aggregate", "routes": {}}
+
+          # os.walk (not glob) on purpose: the evidence tree contains a
+          # hidden `.diagnostics` directory, and Python's glob("**") does
+          # NOT descend into dot-directories by default.
+          all_files = []
+          for dirpath, _dirnames, filenames in os.walk(root):
+              for filename in filenames:
+                  all_files.append(os.path.join(dirpath, filename))
+
+          for slug, route in ROUTES:
+              entry = {
+                  "slug": slug,
+                  "route": route,
+                  "attemptStatus": None,
+                  "routeStatus": None,
+                  "artifactFound": False,
+              }
+              status_matches = [
+                  p for p in all_files
+                  if os.path.basename(p) == f"gate-e-attempt-status-{slug}.json"
+              ] or [
+                  p for p in all_files
+                  if os.path.basename(p) == "gate-e-attempt-status.json" and f"-{slug}-" in p
+              ]
+              route_matches = [
+                  p for p in all_files
+                  if os.path.basename(p) == f"phase3b-controlled-multitab-{slug}.json"
+              ]
+              if status_matches:
+                  entry["artifactFound"] = True
+                  try:
+                      with open(status_matches[0], "r", encoding="utf-8") as fh:
+                          status_json = json.load(fh)
+                      entry["attemptStatus"] = {
+                          "stage": status_json.get("stage"),
+                          "healthStatus": status_json.get("healthStatus"),
+                          "smokeStatus": status_json.get("smokeStatus"),
+                      }
+                  except Exception as exc:  # noqa: BLE001 - best-effort aggregation only
+                      entry["attemptStatus"] = {"error": str(exc)}
+              if route_matches:
+                  entry["artifactFound"] = True
+                  try:
+                      with open(route_matches[0], "r", encoding="utf-8") as fh:
+                          route_json = json.load(fh)
+                      route_reports = route_json.get("routes", [])
+                      entry["routeStatus"] = route_reports[0].get("status") if route_reports else "MISSING"
+                  except Exception as exc:  # noqa: BLE001 - best-effort aggregation only
+                      entry["routeStatus"] = f"error:{exc}"
+              summary["routes"][slug] = entry
+
+          totals = {"total": 0, "pass": 0, "partial": 0, "warn": 0, "fail": 0, "missing": 0}
+          for entry in summary["routes"].values():
+              totals["total"] += 1
+              status = str(entry.get("routeStatus") or "MISSING").lower()
+              key = status if status in ("pass", "partial", "warn", "fail") else "missing"
+              totals[key] += 1
+          summary["totals"] = totals
+
+          with open("gate-e-phase3b-route-aggregate.json", "w", encoding="utf-8") as fh:
+              json.dump(summary, fh, indent=2)
+
+          lines = [
+              "## Gate E Phase 3B — route-level sharding aggregate summary (20 routes)",
+              "",
+              "This aggregation merges evidence already produced by the 20 route jobs above. It draws no new pass/fail verdict of its own.",
+              "",
+              "| Route | Artifact found | Stage reached | Status |",
+              "|---|---|---|---|",
+          ]
+          for slug, route in ROUTES:
+              entry = summary["routes"][slug]
+              found = "yes" if entry["artifactFound"] else "MISSING"
+              stage = (entry.get("attemptStatus") or {}).get("stage", "n/a")
+              status = entry.get("routeStatus") or "MISSING"
+              lines.append(f"| {route} | {found} | {stage} | {status} |")
+          lines.append("")
+          lines.append(
+              f"**Aggregate totals — pass={totals['pass']} partial={totals['partial']} "
+              f"warn={totals['warn']} fail={totals['fail']} missing={totals['missing']} total={totals['total']}**"
+          )
+          lines.append("")
+          lines.append("This aggregation does **not** constitute a Phase 3B PASS, Launch GO, Gate D, or Gate F YES.")
+
+          summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
+          if summary_path:
+              with open(summary_path, "a", encoding="utf-8") as fh:
+                  fh.write("\n".join(lines) + "\n")
+          else:
+              print("\n".join(lines))
+          PYEOF
+          exit 0
+
+      - name: Upload aggregate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate-e-phase3b-evidence-aggregate-${{ github.run_id }}
+          path: |
+            route-evidence/**
+            gate-e-phase3b-route-aggregate.json
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Explicit non-claims (aggregate job summary)
+        if: always()
+        run: |
+          {
+            echo "## Gate E Phase 3B — route-sharding aggregation — explicit non-claims"
+            echo ""
+            echo "- This aggregation job does **not** constitute Launch GO."
+            echo "- This aggregation job does **not** close P0 (remains OPEN)."
+            echo "- This aggregation job does **not** execute or approve Gate D."
+            echo "- This aggregation job does **not** set Gate F (remains PENDING)."
+            echo "- No production deploy was performed by this workflow."
+            echo "- It only merges evidence already produced by the 20 route jobs above; it draws no new pass/fail conclusion of its own."
+          } >> "$GITHUB_STEP_SUMMARY"

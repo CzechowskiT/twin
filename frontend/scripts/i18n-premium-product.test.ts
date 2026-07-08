@@ -28,7 +28,22 @@ const REQUIRED_KEYS = [
   "recruiterCalendar.notLiveTitle",
   "login.hubTitle",
   "register.hubTitle",
+  "investorRoom.demoMapProductProof",
 ] as const;
+
+const INVESTOR_PL_ONLY_KEYS = [
+  "executiveProductProof.pageEyebrow",
+  "systemOfRecord.investorGroupProductLead",
+  "systemOfRecord.investorGroupDemoLead",
+] as const;
+
+function resolvePath(dict: unknown, path: string): string | undefined {
+  const value = path.split(".").reduce<unknown>((cur, part) => {
+    if (cur && typeof cur === "object") return (cur as Record<string, unknown>)[part];
+    return undefined;
+  }, dict);
+  return typeof value === "string" ? value : undefined;
+}
 
 test("premium surfaces route copy through t() — no raw string literals for titles", () => {
   for (const relativePath of PREMIUM_SURFACES) {
@@ -42,16 +57,19 @@ test("PL and ES include premium product keys", () => {
   for (const locale of ["pl", "es"] as const) {
     const dict = dictionaries[locale];
     for (const path of REQUIRED_KEYS) {
-      const value = path.split(".").reduce<unknown>((cur, part) => {
-        if (cur && typeof cur === "object") return (cur as Record<string, unknown>)[part];
-        return undefined;
-      }, dict as unknown);
+      const value = resolvePath(dict, path);
       assert.ok(typeof value === "string" && value.trim(), `${locale} missing ${path}`);
-      const enValue = path.split(".").reduce<unknown>((cur, part) => {
-        if (cur && typeof cur === "object") return (cur as Record<string, unknown>)[part];
-        return undefined;
-      }, en as unknown);
+      const enValue = resolvePath(en, path);
       assert.notEqual(value, enValue, `${locale} still English for ${path}`);
     }
+  }
+});
+
+test("PL investor room and SoR group keys localized vs EN", () => {
+  for (const path of INVESTOR_PL_ONLY_KEYS) {
+    const plValue = resolvePath(dictionaries.pl, path);
+    const enValue = resolvePath(en, path);
+    assert.ok(plValue?.trim(), `pl missing ${path}`);
+    assert.notEqual(plValue, enValue, `pl still English for ${path}`);
   }
 });

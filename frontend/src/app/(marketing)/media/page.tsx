@@ -1,15 +1,7 @@
 "use client";
 
-import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
-import { EmployerMediaHub } from "@/components/marketing/employer-media-hub";
-import { Shell } from "@/components/ui";
+import { MarketingComingSoonSurface } from "@/components/marketing/marketing-coming-soon-surface";
 
 export default function MediaPage() {
-  return (
-    <Shell wide>
-      <MarketingPageSurface wide withCard={false}>
-        <EmployerMediaHub initialTab="media" />
-      </MarketingPageSurface>
-    </Shell>
-  );
+  return <MarketingComingSoonSurface topic="/media" />;
 }

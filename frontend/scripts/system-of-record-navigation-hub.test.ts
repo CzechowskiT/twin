@@ -1,5 +1,5 @@
 /**
- * System-of-record navigation hub — static route registry and hub wiring (13 assertions).
+ * System-of-record navigation hub — static route registry and hub wiring (18 assertions).
  */
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
@@ -10,6 +10,8 @@ import test from "node:test";
 import {
   collectSystemOfRecordHrefs,
   getSystemOfRecordRoutesForPersona,
+  groupInvestorSoRRoutes,
+  resolveInvestorSoRGroup,
   SYSTEM_OF_RECORD_BOUNDARY_LABEL_KEYS,
   SYSTEM_OF_RECORD_HUB_MARKER,
   SYSTEM_OF_RECORD_ROUTES,
@@ -77,12 +79,13 @@ test("1 central registry exports routes for all four personas", () => {
   assert.ok(SYSTEM_OF_RECORD_ROUTES.length >= 40);
 });
 
-test("2 candidate hub includes panel jobs matches profile cv applications evidence calendar plan identity referrals", () => {
+test("2 candidate hub includes panel jobs matches career compass profile cv applications evidence calendar plan identity referrals", () => {
   const ids = getSystemOfRecordRoutesForPersona("candidate").map((r) => r.id);
   for (const id of [
     "candidate_panel",
     "candidate_jobs",
     "candidate_matches",
+    "candidate_career_compass",
     "candidate_profile",
     "candidate_cv",
     "candidate_applications",
@@ -96,10 +99,21 @@ test("2 candidate hub includes panel jobs matches profile cv applications eviden
   }
 });
 
-test("3 recruiter hub includes inbox jobs pipeline demo talent radar pool import profile collaboration trust team communication ats integrations analytics search", () => {
+test("2b candidate career compass is pilot read-only — no live-action CTA", () => {
+  const route = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "candidate_career_compass");
+  assert.ok(route);
+  assert.equal(route!.status, "pilot");
+  assert.equal(route!.href, "/dashboard/career");
+  assert.ok(route!.boundaryTags.includes("pilot"));
+  assert.ok(route!.hintKey);
+});
+
+test("3 recruiter hub includes inbox pipeline calendar jobs demo talent radar pool import profile collaboration trust team communication ats integrations analytics search", () => {
   const ids = getSystemOfRecordRoutesForPersona("recruiter").map((r) => r.id);
   for (const id of [
     "recruiter_inbox",
+    "recruiter_pipeline",
+    "recruiter_calendar",
     "recruiter_jobs",
     "recruiter_demo_pipeline",
     "recruiter_talent_radar",
@@ -113,11 +127,32 @@ test("3 recruiter hub includes inbox jobs pipeline demo talent radar pool import
   }
 });
 
+test("3b recruiter pipeline live with human decision and no ATS sync", () => {
+  const route = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "recruiter_pipeline");
+  assert.ok(route);
+  assert.equal(route!.status, "live");
+  assert.equal(route!.href, "/recruiter/pipeline");
+  assert.ok(route!.boundaryTags.includes("human_decision_required"));
+  assert.ok(route!.boundaryTags.includes("no_ats_sync"));
+});
+
+test("3c recruiter calendar not_live — calendar sync not live", () => {
+  const route = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "recruiter_calendar");
+  assert.ok(route);
+  assert.equal(route!.status, "not_live");
+  assert.equal(route!.href, "/recruiter/calendar");
+  assert.ok(route!.boundaryTags.includes("not_live"));
+  assert.ok(route!.hintKey);
+  const hint = en.workspaceModules.recruiterCalendarHint.toLowerCase();
+  assert.match(hint, /inbox|sync|not live|nie aktywn/i);
+});
+
 test("4 company hub includes dashboard roles pipeline demo talent pool profile collaboration trust team communication ats integrations team billing", () => {
   const ids = getSystemOfRecordRoutesForPersona("company").map((r) => r.id);
   for (const id of [
     "company_dashboard",
     "company_roles",
+    "company_pipeline",
     "company_demo_pipeline",
     "company_talent_pool",
     "company_demo_profile_360",
@@ -125,6 +160,51 @@ test("4 company hub includes dashboard roles pipeline demo talent pool profile c
     "company_billing",
   ]) {
     assert.ok(ids.includes(id), id);
+  }
+});
+
+test("4b company pipeline live with token hint and human decision boundary", () => {
+  const route = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "company_pipeline");
+  assert.ok(route);
+  assert.equal(route!.status, "live");
+  assert.equal(route!.href, "/company/pipeline");
+  assert.ok(route!.hintKey);
+  assert.ok(route!.boundaryTags.includes("human_decision_required"));
+  assert.ok(route!.boundaryTags.includes("no_ats_sync"));
+  const hint = en.workspaceModules.companyPipelineHint.toLowerCase();
+  assert.match(hint, /token|pilot|human|decision|review/i);
+  assert.match(hint, /no ats|ats writeback|writeback/i);
+});
+
+test("4e company demo pipeline pilot distinct from live workspace pipeline", () => {
+  const live = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "company_pipeline");
+  const demo = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "company_demo_pipeline");
+  assert.ok(live && demo);
+  assert.equal(live!.status, "live");
+  assert.equal(demo!.status, "pilot");
+  assert.notEqual(live!.href, demo!.href);
+  assert.ok(demo!.boundaryTags.includes("pilot"));
+  assert.ok(demo!.boundaryTags.includes("no_ats_sync"));
+  const demoTitle = en.jobPipeline.demoJourneyTitle.toLowerCase();
+  assert.match(demoTitle, /sample|demo|przykład|próbka/i);
+  const demoDesc = en.jobPipeline.demoJourneyDesc.toLowerCase();
+  assert.match(demoDesc, /sample|demo|not your live|live workspace/i);
+});
+
+test("4c company dashboard live with tenant token hint", () => {
+  const route = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "company_dashboard");
+  assert.ok(route);
+  assert.equal(route!.status, "live");
+  assert.ok(route!.hintKey);
+  const hint = en.systemOfRecord.companyDashboardHint.toLowerCase();
+  assert.match(hint, /token|pilot|slug|tenant|scope/i);
+});
+
+test("4d all company live SoR entries carry token or scope hints", () => {
+  const live = getSystemOfRecordRoutesForPersona("company").filter((r) => r.status === "live");
+  assert.ok(live.length >= 3);
+  for (const route of live) {
+    assert.ok(route.hintKey, `${route.id} missing hintKey`);
   }
 });
 
@@ -211,4 +291,104 @@ test("13 hub marker constant matches navigation hub test id", () => {
     en.systemOfRecord.recruiterHubLead,
   ].join("\n");
   assert.match(copy.toLowerCase(), /outreach|ats|sync/);
+});
+
+test("14 investor hub lists all 19 entries with explicit investorGroup", () => {
+  const investor = getSystemOfRecordRoutesForPersona("investor");
+  assert.equal(investor.length, 19);
+  for (const route of investor) {
+    assert.ok(route.investorGroup, `${route.id} missing investorGroup`);
+    assert.equal(resolveInvestorSoRGroup(route), route.investorGroup);
+  }
+});
+
+test("15 investor hub groups board under boardEvidence and demo under demoProof", () => {
+  const grouped = groupInvestorSoRRoutes(getSystemOfRecordRoutesForPersona("investor"));
+  assert.equal(grouped.investorProduct.length, 9);
+  assert.equal(grouped.boardEvidence.length, 6);
+  assert.equal(grouped.demoProof.length, 4);
+  assert.equal(grouped.accessContact.length, 0);
+
+  for (const route of grouped.boardEvidence) {
+    assert.ok(route.href.startsWith("/board/"), route.id);
+    assert.equal(route.investorGroup, "boardEvidence");
+  }
+  for (const route of grouped.demoProof) {
+    assert.ok(
+      route.href === "/demo" || route.moduleFamily === "demo",
+      `${route.id} should be demo proof`,
+    );
+    assert.equal(route.investorGroup, "demoProof");
+  }
+
+  const hub = read("src/components/workspace/system-of-record-navigation-hub.tsx");
+  assert.match(hub, /data-sor-investor-group=\{group\}/);
+  assert.match(hub, /INVESTOR_SOR_GROUP_ORDER/);
+  assert.match(hub, /INVESTOR_SOR_GROUP_HEADING_KEYS/);
+  assert.match(hub, /INVESTOR_SOR_GROUP_LEAD_KEYS/);
+});
+
+test("16 investor group i18n avoids launch-ready copy in all locales", () => {
+  const keys = [
+    "investorGroupProductTitle",
+    "investorGroupProductLead",
+    "investorGroupBoardTitle",
+    "investorGroupBoardLead",
+    "investorGroupDemoTitle",
+    "investorGroupDemoLead",
+    "investorGroupAccessTitle",
+    "investorGroupAccessLead",
+  ] as const;
+  for (const locale of LOCALES) {
+    for (const key of keys) {
+      const val = dictionaries[locale].systemOfRecord[key];
+      assert.ok(typeof val === "string" && val.length > 0, `${locale} ${key}`);
+      assert.doesNotMatch(val, /launch ready/i, `${locale} ${key}`);
+    }
+  }
+  const boardLead = en.systemOfRecord.investorGroupBoardLead.toLowerCase();
+  assert.match(boardLead, /read-only|read only/);
+  const demoLead = en.systemOfRecord.investorGroupDemoLead.toLowerCase();
+  assert.match(demoLead, /writeback|no ats|sample|demo/);
+});
+
+test("18 PL investor group leads avoid English loanwords for outreach and writeback", () => {
+  const pl = dictionaries.pl.systemOfRecord;
+  assert.doesNotMatch(pl.investorGroupDemoLead, /outreachu|writebacku/i);
+  assert.doesNotMatch(pl.investorGroupProductLead, /executive proof/i);
+  assert.match(pl.investorGroupDemoLead.toLowerCase(), /kontakt|ats|przykład|demo/);
+  assert.match(pl.investorGroupProductLead.toLowerCase(), /dowód|due diligence|produkt/);
+});
+
+test("17b investor product proof live with hint and diligence boundaries", () => {
+  const route = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "investor_product_proof");
+  assert.ok(route);
+  assert.equal(route!.status, "live");
+  assert.equal(route!.href, "/investor/product-proof");
+  assert.equal(route!.investorGroup, "investorProduct");
+  assert.ok(route!.hintKey);
+  assert.ok(route!.boundaryTags.includes("human_decision_required"));
+  assert.ok(route!.boundaryTags.includes("no_outreach"));
+  assert.ok(route!.boundaryTags.includes("no_ats_sync"));
+  assert.ok(!route!.boundaryTags.includes("pilot"));
+  assert.ok(!route!.boundaryTags.includes("not_live"));
+  const hint = en.executiveProductProof.sorHubHint.toLowerCase();
+  assert.match(hint, /bounded|proof|diligence|live/i);
+  assert.match(hint, /outreach|ats|human/i);
+  const desc = en.executiveProductProof.demoJourneyDesc.toLowerCase();
+  assert.match(desc, /read-only|diligence|no launch|no outreach|writeback/i);
+});
+
+test("17 non-investor hubs split live primary from collapsed pilot roadmap", () => {
+  const hub = read("src/components/workspace/system-of-record-navigation-hub.tsx");
+  assert.match(hub, /persona === "investor"/);
+  assert.match(hub, /splitProductSurfaceRoutes/);
+  assert.match(hub, /data-product-surface-primary/);
+  assert.match(hub, /data-product-surface-roadmap/);
+  assert.doesNotMatch(read("src/app/recruiter/page.tsx"), /data-sor-investor-group/);
+  assert.doesNotMatch(read("src/components/dashboard/candidate-module-nav.tsx"), /data-sor-investor-group/);
+  for (const persona of ["candidate", "recruiter", "company"] as const) {
+    const count = getSystemOfRecordRoutesForPersona(persona).length;
+    assert.ok(count >= 8, persona);
+  }
 });

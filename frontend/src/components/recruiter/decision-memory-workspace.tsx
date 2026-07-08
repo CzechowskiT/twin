@@ -29,6 +29,7 @@ import { jobPipelineHref } from "@/lib/job-pipeline";
 import type { TranslationKey } from "@/lib/i18n";
 import { candidateCommunicationHref } from "@/lib/safe-communication";
 import { candidateTeamHref } from "@/lib/team-collaboration";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -154,12 +155,7 @@ function DecisionMemoryContent({
               </p>
             </div>
             <div className="flex flex-col items-end gap-2">
-              <span
-                className="rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-200"
-                data-testid={DECISION_MEMORY_MARKERS.pilotBadge}
-              >
-                {t("decisionMemory.pilotBadge")}
-              </span>
+              <DemoJourneyPilotStatus testId={DECISION_MEMORY_MARKERS.pilotBadge} />
               <span className="rounded-full border border-emerald-500/30 bg-emerald-500/5 px-2.5 py-0.5 text-xs font-medium text-emerald-200">
                 {t("decisionMemory.decisionStatusBadge")}: {record.decision_status}
               </span>

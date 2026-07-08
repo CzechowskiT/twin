@@ -20,6 +20,7 @@ import {
 } from "@/lib/recruiter-trust-review-queue";
 import { requestIntakeRecruiterHref } from "@/lib/request-intake";
 import type { TranslationKey } from "@/lib/i18n";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 
 function sectionCard(marker: string, title: string, children: ReactNode): ReactNode {
   return (
@@ -86,12 +87,7 @@ export function RecruiterTrustReviewQueueWorkspace() {
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <span
-                className="rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1 text-[10px] font-semibold uppercase text-violet-200"
-                data-testid={RECRUITER_TRUST_REVIEW_QUEUE_MARKERS.pilotBadge}
-              >
-                {t("recruiterTrustReviewQueue.pilotBadge")}
-              </span>
+              <DemoJourneyPilotStatus testId={RECRUITER_TRUST_REVIEW_QUEUE_MARKERS.pilotBadge} />
               <span
                 className="rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[10px] font-semibold uppercase text-amber-200"
                 data-launch-stance={LAUNCH_STANCE}

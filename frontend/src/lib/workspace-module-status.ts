@@ -5,7 +5,9 @@ import type { TranslationKey } from "@/lib/i18n";
 export type WorkspaceModuleStatus =
   | "live"
   | "pilot"
+  | "preview"
   | "planned"
+  | "coming_soon"
   | "not_live"
   | "needs_setup"
   | "paused";
@@ -16,7 +18,9 @@ export const WORKSPACE_STATUS_LABEL_KEYS: Record<
 > = {
   live: "workspaceModules.statusLive",
   pilot: "workspaceModules.statusPilot",
+  preview: "workspaceModules.statusPreview",
   planned: "workspaceModules.statusPlanned",
+  coming_soon: "workspaceModules.statusComingSoon",
   not_live: "workspaceModules.statusNotLive",
   needs_setup: "workspaceModules.statusNeedsSetup",
   paused: "workspaceModules.statusPaused",
@@ -30,5 +34,7 @@ export type WorkspaceModuleDef = {
   hintKey?: TranslationKey;
   ctaKey: TranslationKey;
   status: WorkspaceModuleStatus;
+  /** Optional badge label override (e.g. investor invite-only preview). */
+  statusLabelKey?: TranslationKey;
   anchor?: string;
 };

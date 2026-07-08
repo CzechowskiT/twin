@@ -13,7 +13,7 @@ function ChevronIcon({ className }: { className?: string }) {
   );
 }
 
-export function LanguageSwitcher() {
+export function LanguageSwitcher({ className }: { className?: string }) {
   const { locale, setLocale, t } = useTranslation();
   const detailsRef = useRef<HTMLDetailsElement>(null);
 
@@ -30,7 +30,7 @@ export function LanguageSwitcher() {
   return (
     <details
       ref={detailsRef}
-      className="twin-lang-switcher relative shrink-0"
+      className={`twin-lang-switcher relative shrink-0 ${className ?? ""}`}
       onKeyDown={(e) => {
         if (e.key === "Escape") close();
       }}
