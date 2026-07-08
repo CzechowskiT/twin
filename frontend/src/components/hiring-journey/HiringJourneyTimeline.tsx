@@ -6,6 +6,7 @@ import { useMemo } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 import {
   HIRING_JOURNEY_DEMO_CANDIDATE_ID,
   HIRING_JOURNEY_DEMO_ROLE_ID,
@@ -91,26 +92,16 @@ export function HiringJourneyTimeline({ surface }: Props): ReactNode {
               </p>
               <h1 className="twin-section-title text-2xl sm:text-3xl">{t("hiringJourney.pageTitle")}</h1>
               <p className="text-sm text-[var(--twin-muted-strong)]">{t(PERSONA_SUBTITLE_KEYS[persona])}</p>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
               <span
                 className="inline-block rounded-full border border-[var(--twin-accent)]/40 px-3 py-1 text-xs font-semibold uppercase text-[var(--twin-accent)]"
                 data-testid={HIRING_JOURNEY_MARKERS.personaLabel}
               >
                 {t(hiringJourneyPersonaLabelKey(surface))}
               </span>
-              <span
-                className="inline-block rounded-full border border-[var(--twin-border)] px-3 py-1 text-xs font-semibold uppercase"
-                data-testid={HIRING_JOURNEY_MARKERS.readOnlyBadge}
-              >
-                {t("hiringJourney.readOnlyBadge")}
-              </span>
-              <span className="inline-block rounded-full border border-[var(--twin-border)] px-3 py-1 text-xs font-semibold uppercase">
-                {t("hiringJourney.pilotBadge")}
-              </span>
             </div>
+            <DemoJourneyPilotStatus testId={HIRING_JOURNEY_MARKERS.readOnlyBadge} />
           </div>
-          <p className="font-mono text-xs text-[var(--twin-muted)]">
+          <p className="sr-only" data-testid="hiring-journey-demo-ids">
             {journey.journeyId} · {HIRING_JOURNEY_DEMO_CANDIDATE_ID} · {HIRING_JOURNEY_DEMO_ROLE_ID}
           </p>
           <span

@@ -7,7 +7,7 @@ import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subna
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
-import { WorkspaceStatusBadge } from "@/components/workspace/workspace-status-badge";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 import type {
   CandidateDataSourceKind,
   CandidateTrustCenterRecord,
@@ -160,10 +160,7 @@ function TrustCenterContent({ record }: { record: CandidateTrustCenterRecord }) 
               </p>
             </div>
             <div className="flex flex-col items-end gap-2">
-              <WorkspaceStatusBadge
-                status="pilot"
-                testId={CANDIDATE_TRUST_CENTER_MARKERS.pilotBadge}
-              />
+              <DemoJourneyPilotStatus testId={CANDIDATE_TRUST_CENTER_MARKERS.pilotBadge} status="pilot" />
               <span className="text-xs text-[var(--twin-muted-strong)]">{record.trust_label}</span>
               <span className="text-[10px] text-[var(--twin-muted-strong)]">
                 {t("candidateTrustCenter.lastReviewed")}: {record.last_reviewed_at.slice(0, 10)}

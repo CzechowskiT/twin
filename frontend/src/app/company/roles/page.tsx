@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 
 import { CompanyRoleCard } from "@/components/company/company-role-card";
 import { CompanyWorkspaceNav } from "@/components/company/company-workspace-nav";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
@@ -152,11 +153,9 @@ export default function CompanyRolesPage() {
               {t("companyTalentPool.navLink")}
             </Link>
           </p>
-          <div className="mt-6 rounded-lg border border-amber-500/30 bg-amber-500/5 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-amber-200">
-              {t("jobPipeline.pilotBadge")}
-            </p>
-            <p className="mt-2 text-sm text-[var(--twin-muted-strong)]">{t("jobPipeline.demoJobsLead")}</p>
+          <div className="mt-6 rounded-lg border border-[var(--twin-border)]/80 p-4">
+            <DemoJourneyPilotStatus className="items-start" />
+            <p className="mt-3 text-sm text-[var(--twin-muted-strong)]">{t("jobPipeline.demoJobsLead")}</p>
             <Link
               href="/company/roles/demo-role-001/pipeline"
               className="twin-link mt-3 inline-block text-sm font-medium"

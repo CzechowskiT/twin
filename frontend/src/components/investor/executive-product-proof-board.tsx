@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { MarketingCrosslinksBand } from "@/components/marketing/marketing-crosslinks-band";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 import { Card, Shell } from "@/components/ui";
 import {
   EXECUTIVE_PRODUCT_PROOF_DEMO_LINKS,
@@ -59,18 +60,21 @@ export function ExecutiveProductProofBoard({ workspace = false }: { workspace?: 
         data-executive-product-proof-page={EXECUTIVE_PRODUCT_PROOF_PAGE_MARKER}
         className="mx-auto min-w-0 max-w-6xl space-y-6 overflow-x-hidden px-4 sm:px-6"
       >
-        <header className="min-w-0 space-y-3" data-testid={EXECUTIVE_PRODUCT_PROOF_MARKERS.header}>
-          <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
-            {t("executiveProductProof.pageEyebrow")}
-          </p>
-          <h1 className="twin-section-title text-2xl sm:text-3xl">{t("executiveProductProof.title")}</h1>
-          <p className="text-sm text-[var(--twin-muted-strong)]">{t("executiveProductProof.lead")}</p>
+        <header className="flex flex-wrap items-start justify-between gap-3 min-w-0" data-testid={EXECUTIVE_PRODUCT_PROOF_MARKERS.header}>
+          <div className="min-w-0 space-y-3">
+            <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
+              {t("executiveProductProof.pageEyebrow")}
+            </p>
+            <h1 className="twin-section-title text-2xl sm:text-3xl">{t("executiveProductProof.title")}</h1>
+            <p className="text-sm text-[var(--twin-muted-strong)]">{t("executiveProductProof.lead")}</p>
           {workspace ? (
             <p className="text-xs text-[var(--twin-muted-strong)]">{t("executiveProductProof.workspaceNote")}</p>
           ) : (
             <p className="text-xs text-[var(--twin-muted-strong)]">{t("executiveProductProof.publicNote")}</p>
           )}
           <MarketingCrosslinksBand page="investor-product-proof" className="pt-2" />
+          </div>
+          <DemoJourneyPilotStatus status="pilot" />
         </header>
 
         <div className="grid gap-5 lg:grid-cols-2">

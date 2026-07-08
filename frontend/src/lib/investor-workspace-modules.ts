@@ -73,6 +73,7 @@ export const INVESTOR_PUBLIC_PREVIEW_MODULES: readonly WorkspaceModuleDef[] = [
     valuePropKey: "workspaceModules.investorLoginValue",
     hintKey: "workspaceModules.investorLoginHint",
     ctaKey: "workspaceModules.investorLoginCta",
-    status: "needs_setup",
+    status: "preview",
+    statusLabelKey: "productPolish.investorInviteOnlyBadge",
   },
 ];

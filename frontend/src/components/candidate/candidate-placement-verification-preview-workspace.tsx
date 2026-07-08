@@ -8,6 +8,7 @@ import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subna
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 import { PlacementVerificationEvidencePanel } from "@/components/shared/placement-verification-evidence-panel";
 import { SchedulingDecisionContextPanel } from "@/components/shared/scheduling-decision-context-panel";
 import { MicrosoftBusyReadCrossLinkCard } from "@/components/shared/microsoft-busy-read-cross-link-card";
@@ -120,12 +121,9 @@ function PreviewContent({ record }: { record: PlacementVerificationRecord }) {
                 {record.role_title} · {record.company_label}
               </p>
             </div>
-            <span
-              className="inline-block rounded-full border px-3 py-1 text-xs"
-              data-testid={CANDIDATE_PLACEMENT_VERIFICATION_MARKERS.sourceBadge}
-            >
-              {t(placementVerificationSourceKey(record.source))}
-            </span>
+            <div className="flex flex-col items-end gap-2">
+              <DemoJourneyPilotStatus testId={CANDIDATE_PLACEMENT_VERIFICATION_MARKERS.sourceBadge} />
+            </div>
           </div>
         </header>
 

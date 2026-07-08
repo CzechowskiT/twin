@@ -34,5 +34,7 @@ export type WorkspaceModuleDef = {
   hintKey?: TranslationKey;
   ctaKey: TranslationKey;
   status: WorkspaceModuleStatus;
+  /** Optional badge label override (e.g. investor invite-only preview). */
+  statusLabelKey?: TranslationKey;
   anchor?: string;
 };

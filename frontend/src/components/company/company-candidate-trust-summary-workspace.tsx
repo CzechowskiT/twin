@@ -16,6 +16,7 @@ import {
   resolveCompanyCandidateTrustSummary,
 } from "@/lib/company-candidate-trust-summary";
 import type { TranslationKey } from "@/lib/i18n";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 
 function section(marker: string, title: string, children: ReactNode) {
   return (
@@ -57,7 +58,7 @@ export function CompanyCandidateTrustSummaryWorkspace({ candidateId }: { candida
           <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[var(--twin-accent)]">{t("companyCandidateTrustSummary.pageEyebrow")}</p>
           <h1 className="twin-section-title text-2xl">{t("companyCandidateTrustSummary.pageTitle")}</h1>
           <p className="text-sm text-[var(--twin-muted-strong)]">{record.headline}</p>
-          <span data-testid={COMPANY_CANDIDATE_TRUST_SUMMARY_MARKERS.pilotBadge} className="inline-block rounded-full border border-amber-500/40 px-3 py-1 text-xs text-amber-200">{t("companyCandidateTrustSummary.pilotBadge")}</span>
+          <DemoJourneyPilotStatus testId={COMPANY_CANDIDATE_TRUST_SUMMARY_MARKERS.pilotBadge} />
         </header>
         {section(COMPANY_CANDIDATE_TRUST_SUMMARY_MARKERS.status, t("companyCandidateTrustSummary.statusTitle"), <p>{t("companyCandidateTrustSummary.statusLead")}</p>)}
         {section(COMPANY_CANDIDATE_TRUST_SUMMARY_MARKERS.visibility, t("companyCandidateTrustSummary.visibilityTitle"), (

@@ -31,6 +31,7 @@ import type { TranslationKey } from "@/lib/i18n";
 import { candidateTeamHref } from "@/lib/team-collaboration";
 import { atsImportReadinessHref } from "@/lib/ats-import-readiness";
 import { candidateCommunicationHref } from "@/lib/safe-communication";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -177,12 +178,7 @@ function TrustContent({
               ) : null}
             </div>
             <div className="flex flex-col items-end gap-2">
-              <span
-                className="rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-200"
-                data-testid={CANDIDATE_TRUST_MARKERS.pilotBadge}
-              >
-                {t("candidateTrust.pilotBadge")}
-              </span>
+              <DemoJourneyPilotStatus testId={CANDIDATE_TRUST_MARKERS.pilotBadge} />
               <span className="rounded-full border border-amber-500/30 bg-amber-500/5 px-2.5 py-0.5 text-xs font-medium text-amber-200">
                 {t("candidateTrust.consentBadge")}: {record.consent_badge}
               </span>

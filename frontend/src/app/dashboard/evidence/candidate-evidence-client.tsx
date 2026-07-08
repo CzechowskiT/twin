@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
@@ -95,12 +96,15 @@ export default function CandidateEvidenceClient() {
   return (
     <Shell wide>
       <CandidateWorkspaceSubnav ariaLabel={t("candidateEvidence.title")} />
-      <header className="mb-8 mt-6 space-y-2">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
-          {t("candidateEvidence.eyebrow")}
-        </p>
-        <h1 className="twin-page-intro text-2xl font-semibold sm:text-3xl">{t("candidateEvidence.title")}</h1>
-        <p className="twin-muted max-w-2xl text-sm leading-relaxed">{t("candidateEvidence.lead")}</p>
+      <header className="mb-8 mt-6 flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0 space-y-2">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
+            {t("candidateEvidence.eyebrow")}
+          </p>
+          <h1 className="twin-page-intro text-2xl font-semibold sm:text-3xl">{t("candidateEvidence.title")}</h1>
+          <p className="twin-muted max-w-2xl text-sm leading-relaxed">{t("candidateEvidence.lead")}</p>
+        </div>
+        <DemoJourneyPilotStatus status="pilot" />
       </header>
 
       <Card variant="soft" className="mb-6 border-[var(--twin-border)]/80 p-4">

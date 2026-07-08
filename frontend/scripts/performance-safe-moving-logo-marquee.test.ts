@@ -118,8 +118,9 @@ test("10 no will-change, backdrop-filter, backdrop-blur on safe track/cards", ()
 test("11 readability scale CSS targets 40–48px partner logo height band", () => {
   const css = read("src/app/globals.css");
   assert.match(css, /\.partner-logo-card[\s\S]{0,200}min-height:\s*5rem/);
-  assert.match(css, /\.partner-logo-card[\s\S]{0,320}min-width:\s*12rem/);
-  assert.match(css, /\.partner-logo-card[\s\S]{0,400}padding:\s*1\.5rem 2rem/);
+  assert.match(css, /\.partner-logo-card[\s\S]{0,320}min-width:\s*88px/);
+  assert.match(css, /\.partner-logo-card[\s\S]{0,400}max-width:\s*140px/);
+  assert.match(css, /\.partner-logo-card[\s\S]{0,480}padding:\s*0\.75rem 1rem/);
   assert.match(css, /\.performance-safe-logo-mark[\s\S]{0,200}height:\s*2\.5rem/);
   assert.match(
     css,

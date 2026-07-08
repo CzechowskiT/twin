@@ -19,6 +19,7 @@ import {
 } from "@/lib/candidate-trust-overview";
 import { placementVerificationIntegrationHref } from "@/lib/placement-verification-integration";
 import type { TranslationKey } from "@/lib/i18n";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -103,12 +104,7 @@ function TrustOverviewContent({ record }: { record: CandidateTrustOverviewRecord
                 {record.display_name} · {record.role_title}
               </p>
             </div>
-            <span
-              className="rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-200"
-              data-testid={CANDIDATE_TRUST_OVERVIEW_MARKERS.pilotBadge}
-            >
-              {t("candidateTrustOverview.pilotBadge")}
-            </span>
+            <DemoJourneyPilotStatus testId={CANDIDATE_TRUST_OVERVIEW_MARKERS.pilotBadge} />
           </div>
           <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
             <Link href={CANDIDATE_TRUST_OVERVIEW_SAFE_LINKS.controlCenter} className="twin-link font-medium">

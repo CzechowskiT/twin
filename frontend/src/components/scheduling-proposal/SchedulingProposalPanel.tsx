@@ -6,6 +6,8 @@ import { useMemo } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
+import { WorkspaceStatusBadge } from "@/components/workspace/workspace-status-badge";
 import type { SchedulingProposalPersona } from "@/lib/scheduling-proposal-demo-data";
 import {
   SCHEDULING_PROPOSAL_MARKERS,
@@ -54,22 +56,16 @@ export function SchedulingProposalPanel({ persona }: Props): ReactNode {
               <h1 className="twin-section-title text-2xl sm:text-3xl">{t("schedulingProposal.pageTitle")}</h1>
               <p className="text-sm text-[var(--twin-muted-strong)]">{t(PERSONA_SUBTITLE_KEYS[persona])}</p>
             </div>
-            <span
-              className="inline-block rounded-full border border-[var(--twin-border)] px-3 py-1 text-xs font-semibold uppercase"
-              data-testid={SCHEDULING_PROPOSAL_MARKERS.readOnlyBadge}
-            >
-              {t("schedulingProposal.readOnlyBadge")}
-            </span>
+            <DemoJourneyPilotStatus testId={SCHEDULING_PROPOSAL_MARKERS.readOnlyBadge} />
           </div>
-          <p className="font-mono text-xs text-[var(--twin-muted)]">
+          <p className="sr-only" data-testid="scheduling-proposal-demo-ids">
             {proposal.proposalId} · {proposal.candidateId} · {proposal.roleId}
           </p>
-          <span
-            className="inline-block rounded-full border px-3 py-1 text-xs"
-            data-testid={SCHEDULING_PROPOSAL_MARKERS.sourceBadge}
-          >
-            {t(schedulingProposalSourceKey(proposal.source))}
-          </span>
+          <WorkspaceStatusBadge
+            status="preview"
+            testId={SCHEDULING_PROPOSAL_MARKERS.sourceBadge}
+            labelKey={schedulingProposalSourceKey(proposal.source)}
+          />
         </header>
 
         <Card

@@ -38,6 +38,7 @@ import { resolveCandidateTrustAuditExport } from "@/lib/candidate-trust-audit-ex
 import { candidateVisibilityPreferencesHref } from "@/lib/candidate-visibility-preferences";
 import type { CandidateControlCenterRecord } from "@/lib/candidate-control-center-demo-data";
 import type { TranslationKey } from "@/lib/i18n";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -169,12 +170,7 @@ function ControlCenterContent({ record }: { record: CandidateControlCenterRecord
               </p>
             </div>
             <div className="flex flex-col items-end gap-2">
-              <span
-                className="rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-200"
-                data-testid={CANDIDATE_CONTROL_CENTER_MARKERS.pilotBadge}
-              >
-                {t("candidateControlCenter.pilotBadge")}
-              </span>
+              <DemoJourneyPilotStatus testId={CANDIDATE_CONTROL_CENTER_MARKERS.pilotBadge} />
               <span className="text-xs text-[var(--twin-muted-strong)]">{record.control_label}</span>
               <span className="text-[10px] text-[var(--twin-muted-strong)]">
                 {t("candidateControlCenter.lastReviewed")}: {record.last_reviewed_at.slice(0, 10)}
