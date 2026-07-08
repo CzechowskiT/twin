@@ -117,6 +117,47 @@ Zaznacz **jedną** opcję na wiersz. Odpowiedź można też zapisać jako `YES` 
 
 ---
 
+
+---
+
+## Current repository state
+
+| Artefakt | Status |
+|----------|--------|
+| **PR #414** (product polish P3) | **MERGED** — `abb0f4d420381982806066f0ae8a4b0070d736df` |
+| **PR #415** (product scope reality review) | **MERGED** — `a6981eba8644b91d432d198ffcd5f855715ef914` |
+| **PR #416** (product polish P4) | **MERGED** — `b204b3c47074a63d25b84c85dbd9cd3d4e4116f3` |
+| **PR #417** (founder launch scope decision scaffold) | **MERGED** — `536adf80aa23ef6ff97b48a3baa23e95bb64fd45` |
+| **`cursor/phase1-monorepo-scaffold` HEAD** | `536adf80aa23ef6ff97b48a3baa23e95bb64fd45` |
+
+**Current stance (repo):**
+
+| Pole | Wartość |
+|------|---------|
+| **P0** | **CLOSED** |
+| **Gate E** | **PASS** |
+| **Gate F** | **PENDING** |
+| **Launch** | **NO-GO** |
+
+`CANONICAL_STANCE: P0_CLOSED | Gate_E_PASS | Gate_F_PENDING | Launch_NO-GO`
+
+---
+
+## Founder action required
+
+Founder uzupełnia decyzje **G1–G8** (puste do wypełnienia — bez auto-uzupełniania przez zespół):
+
+| ID | Temat | Decyzja foundera |
+|----|--------|------------------|
+| **G1** | Public launch scope | |
+| **G2** | Scoped launch vs full-platform | |
+| **G3** | Controlled pilot | |
+| **G4** | Hidden/hold list | |
+| **G5** | Auto-apply paused | |
+| **G6** | Logo disclaimer option | |
+| **G7** | Gate F next step | |
+| **G8** | Launch GO remains separate | |
+
 ## Metryki (guard / automation)
 
 ```
