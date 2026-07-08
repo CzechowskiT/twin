@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { useTranslation } from "@/components/language-provider";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 import { JobList } from "@/components/job-list";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
@@ -73,9 +74,9 @@ export function CandidateMatchesWorkspace() {
         {loading ? <p className="twin-muted text-sm">{t("dashboard.matchesLoading")}</p> : null}
 
         {showPilot ? (
-          <Card variant="soft" className="border border-amber-500/30 bg-amber-500/5 p-4 text-sm">
-            <p className="font-semibold text-amber-200">{t("candidateMatchesPage.pilotBadge")}</p>
-            <p className="mt-2 text-[var(--twin-muted-strong)]">{t("candidateMatchesPage.pilotLead")}</p>
+          <Card variant="soft" className="border border-[var(--twin-border)]/80 p-4 text-sm">
+            <DemoJourneyPilotStatus className="items-start" />
+            <p className="mt-3 text-[var(--twin-muted-strong)]">{t("candidateMatchesPage.pilotLead")}</p>
             <ul className="mt-3 list-inside list-disc text-[var(--twin-fg)]">
               {CANDIDATE_MATCHES_PILOT_MISSING.map((item) => (
                 <li key={item}>{item}</li>

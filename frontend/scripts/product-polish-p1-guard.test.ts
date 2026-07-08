@@ -60,7 +60,7 @@ test("3 trust center overview mode with advanced details", () => {
   const trust = read("src/components/candidate/candidate-trust-center-workspace.tsx");
   assert.match(trust, /TRUST_CENTER_OVERVIEW_MODE/);
   assert.match(trust, /advancedModulesToggle/);
-  assert.match(trust, /WorkspaceStatusBadge/);
+  assert.match(trust, /DemoJourneyPilotStatus|WorkspaceStatusBadge/);
 });
 
 test("4 recruiter hub next action when promos off", () => {

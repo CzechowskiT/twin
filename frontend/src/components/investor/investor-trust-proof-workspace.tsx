@@ -5,6 +5,7 @@ import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { INVESTOR_TRUST_PROOF_LINKS, INVESTOR_TRUST_PROOF_MARKERS, INVESTOR_TRUST_PROOF_PAGE_MARKER, LAUNCH_STANCE, resolveInvestorTrustProof } from "@/lib/investor-trust-proof";
 import type { TranslationKey } from "@/lib/i18n";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 
 function section(marker: string, title: string, body: string) {
   return (
@@ -24,7 +25,7 @@ export function InvestorTrustProofWorkspace() {
         <header data-testid={INVESTOR_TRUST_PROOF_MARKERS.header} className="space-y-2">
           <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[var(--twin-accent)]">{t("investorTrustProof.pageEyebrow")}</p>
           <h1 className="twin-section-title text-2xl">{t("investorTrustProof.pageTitle")}</h1>
-          <span data-testid={INVESTOR_TRUST_PROOF_MARKERS.pilotBadge} className="inline-block rounded-full border px-3 py-1 text-xs" data-launch-stance={LAUNCH_STANCE}>{t("investorTrustProof.pilotBadge")}</span>
+          <DemoJourneyPilotStatus testId={INVESTOR_TRUST_PROOF_MARKERS.pilotBadge} />
           <div className="flex gap-3 text-xs">{INVESTOR_TRUST_PROOF_LINKS.map((l) => <Link key={l.href} href={l.href} className="twin-link">{t(l.labelKey)}</Link>)}</div>
         </header>
         {section(INVESTOR_TRUST_PROOF_MARKERS.architecture, t("investorTrustProof.architectureTitle"), t("investorTrustProof.architectureLead"))}

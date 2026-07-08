@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/components/language-provider";
+import type { TranslationKey } from "@/lib/i18n";
 import {
   WORKSPACE_STATUS_LABEL_KEYS,
   type WorkspaceModuleStatus,
@@ -19,11 +20,12 @@ const TONE: Record<WorkspaceModuleStatus, string> = {
 
 type WorkspaceStatusBadgeProps = {
   status: WorkspaceModuleStatus;
+  labelKey?: TranslationKey;
   testId?: string;
   className?: string;
 };
 
-export function WorkspaceStatusBadge({ status, testId, className }: WorkspaceStatusBadgeProps) {
+export function WorkspaceStatusBadge({ status, labelKey, testId, className }: WorkspaceStatusBadgeProps) {
   const { t } = useTranslation();
   return (
     <span
@@ -31,7 +33,7 @@ export function WorkspaceStatusBadge({ status, testId, className }: WorkspaceSta
       data-workspace-status={status}
       data-testid={testId}
     >
-      {t(WORKSPACE_STATUS_LABEL_KEYS[status])}
+      {t(labelKey ?? WORKSPACE_STATUS_LABEL_KEYS[status])}
     </span>
   );
 }

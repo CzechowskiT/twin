@@ -19,6 +19,7 @@ import {
 } from "@/lib/recruiter-company-placement-verification-checklist";
 import { companyHiringCommandCenterHref } from "@/lib/company-hiring-command-center";
 import type { TranslationKey } from "@/lib/i18n";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 
 const PlacementEventsTimeline = dynamic(
   () => import("@/components/shared/placement-events-timeline").then((m) => m.PlacementEventsTimeline),
@@ -58,9 +59,7 @@ export function CompanyPlacementVerificationChecklistWorkspace() {
           <span className="inline-block rounded-full border px-3 py-1 text-xs" data-testid={COMPANY_PLACEMENT_VERIFICATION_MARKERS.sourceBadge}>
             {t(placementVerificationSourceKey(checklistSource()))}
           </span>
-          <span className="ml-2 inline-block rounded-full border px-3 py-1 text-xs" data-launch-stance={LAUNCH_STANCE}>
-            {t("placementChecklist.pilotBadge")}
-          </span>
+          <DemoJourneyPilotStatus />
         </header>
 
         <Card variant="soft" className="p-5" data-testid={COMPANY_PLACEMENT_VERIFICATION_MARKERS.checklist}>

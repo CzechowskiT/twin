@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Input, Label, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
@@ -242,7 +243,10 @@ export default function CareerCompassPage() {
   return (
     <Shell wide rail>
       <div className="mb-4 flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <h1 className="twin-section-title text-xl sm:text-2xl">{t("dashboard.careerCompassPageTitle")}</h1>
+        <div className="min-w-0 space-y-2">
+          <h1 className="twin-section-title text-xl sm:text-2xl">{t("dashboard.careerCompassPageTitle")}</h1>
+          <DemoJourneyPilotStatus className="items-start" status="pilot" />
+        </div>
         <CandidateWorkspaceSubnav ariaLabel={t("dashboard.careerCompassPageTitle")} />
       </div>
 
