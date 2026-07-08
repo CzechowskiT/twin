@@ -39,7 +39,6 @@ export const HEADER_EXPLORE_MEGA_PANEL_GROUPS: readonly ExploreMegaPanelGroup[] 
     id: "demo",
     titleKey: "nav.exploreGroupDemo",
     links: [
-      { href: "/demo", labelKey: "nav.demo" },
       { href: "/how-it-works", labelKey: "nav.howItWorks" },
       { href: "/faq", labelKey: "nav.faq" },
     ],

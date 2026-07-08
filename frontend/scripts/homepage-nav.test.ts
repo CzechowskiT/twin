@@ -118,7 +118,15 @@ test("site header exposes primary Demo CTA on account rail with analytics", () =
   assert.match(header, /showHeaderDemoCta/);
   assert.match(header, /header_demo_click/);
   assert.match(header, /marketingNavLinks/);
+  assert.match(header, /ml-auto[\s\S]{0,1200}showHeaderDemoCta/);
   assert.doesNotMatch(header, /marketingLaneLinks\.map\(\(item\) => \{[\s\S]*item\.href === "\/demo"/);
+});
+
+test("explore mega-panel excludes duplicate Demo link — header right rail is sole guest entry", () => {
+  assert.ok(!HEADER_EXPLORE_MEGA_PANEL_HREFS.includes("/demo"));
+  const demoGroup = HEADER_EXPLORE_MEGA_PANEL_GROUPS.find((g) => g.id === "demo");
+  assert.ok(demoGroup);
+  assert.ok(!demoGroup.links.some((l) => l.href === "/demo"));
 });
 
 test("guest header main lane excludes executive investor room shortcut", () => {
@@ -140,7 +148,6 @@ test("explore mega-panel groups route to existing public surfaces", () => {
     "/for-investors",
     "/investor",
     "/investor/product-proof",
-    "/demo",
     "/how-it-works",
     "/faq",
     "/dashboard/trust",

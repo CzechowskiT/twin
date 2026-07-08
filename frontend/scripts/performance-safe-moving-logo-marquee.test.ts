@@ -133,6 +133,8 @@ test("11 readability scale CSS targets 40–48px partner logo height band", () =
   const styles = read("src/lib/partner-logo-styles.ts");
   assert.match(styles, /PARTNER_LOGO_CARD_CLASS/);
   assert.match(styles, /partner-logo-card partner-logo/);
+  assert.match(styles, /PARTNER_LOGO_OPTICAL_SCALE_OVERRIDES/);
+  assert.match(css, /\.partner-logo\[data-optical-scale\] img/);
   const scales = PERFORMANCE_SAFE_CURATED_LOGO_SLUGS.map(
     (slug) => PERFORMANCE_SAFE_CURATED_LOGO_VISUALS[slug].opticalScale,
   );

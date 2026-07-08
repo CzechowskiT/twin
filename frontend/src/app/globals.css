@@ -726,6 +726,13 @@ html[data-cookie-banner="open"] main {
   box-shadow: 0 0 0 1px rgb(16 185 129 / 0.12);
 }
 
+.twin-auth-zone-hub__card > span[aria-hidden] svg {
+  display: block;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
 .twin-auth-zone-hub__hint {
   text-wrap: pretty;
 }
@@ -2294,6 +2301,11 @@ html[data-workspace-route="true"] .landing-ambient__orb {
   max-height: 2.5rem;
   width: auto;
   object-fit: contain;
+}
+
+.partner-logo[data-optical-scale] img {
+  transform: scale(var(--partner-logo-optical-scale, 1));
+  transform-origin: center center;
 }
 
 @media (min-width: 768px) {

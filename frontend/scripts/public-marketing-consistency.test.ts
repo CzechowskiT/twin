@@ -51,7 +51,6 @@ test("explore mega-panel groups and links remain complete", () => {
     "/for-investors",
     "/investor",
     "/investor/product-proof",
-    "/demo",
     "/how-it-works",
     "/faq",
     "/dashboard/trust",
@@ -119,7 +118,8 @@ test("mobile explore panel renders grouped mega-panel links", () => {
   const panel = read("src/components/site-header-explore-panel.tsx");
   assert.match(panel, /HEADER_EXPLORE_MEGA_PANEL_GROUPS/);
   assert.match(panel, /variant === "mobile"/);
-  assert.equal(HEADER_EXPLORE_MEGA_PANEL_HREFS.length, 11);
+  assert.equal(HEADER_EXPLORE_MEGA_PANEL_HREFS.length, 10);
+  assert.ok(!HEADER_EXPLORE_MEGA_PANEL_HREFS.includes("/demo"));
 });
 
 test("public marketing surfaces keep container rhythm", () => {
