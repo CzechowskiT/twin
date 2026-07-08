@@ -13,6 +13,7 @@
     "test:security-headers": "npx --yes tsx scripts/security-headers.test.ts",
     "test:safe-company-logo": "npx --yes tsx scripts/safe-company-logo.test.ts",
     "test:partner-logo-rendering": "npx --yes tsx scripts/partner-logo-rendering.test.ts",
+    "test:partner-logo-public-marquee-guard": "npx --yes tsx scripts/partner-logo-public-marquee-guard.test.ts",
     "test:nvidia-logo-chip-rendering": "npx --yes tsx scripts/nvidia-logo-chip-rendering.test.ts",
     "test:verified-readiness-guard": "npx --yes tsx scripts/verified-readiness-guard.test.ts",
     "test:dashboard-ux-safety": "npx --yes tsx scripts/dashboard-ux-safety.test.ts",

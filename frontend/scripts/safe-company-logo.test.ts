@@ -419,13 +419,13 @@ function testAllMarqueeBrandsAvoidRasterUrls() {
   }
 }
 
-function testMarqueeSortsLogosFirst() {
+function testMarqueeFiltersInitialsFallback() {
   const marquee = readFileSync(
     join(root, "src/components/marketing/company-logo-marquee.tsx"),
     "utf8",
   );
   assert.match(marquee, /MARQUEE_BRAND_ENTRIES/);
-  assert.match(marquee, /score\(b\) - score\(a\)/);
+  assert.match(marquee, /getPublicMarqueeLogos/);
 }
 
 function main() {
@@ -454,7 +454,7 @@ function main() {
   testEveryMarqueeBrandHasLogoOrInitialsFallback();
   testLocalMarqueeSlugsSubsetOfStable();
   testLocalMarqueeLogoFilesExist();
-  testMarqueeSortsLogosFirst();
+  testMarqueeFiltersInitialsFallback();
   console.log("safe-company-logo.test.ts: OK");
 }
 

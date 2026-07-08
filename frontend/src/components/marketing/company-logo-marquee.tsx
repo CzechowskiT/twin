@@ -8,6 +8,7 @@ import { useReducedMotionPreference } from "@/hooks/use-reduced-motion-preferenc
 import { SafeCompanyLogo } from "@/components/marketing/safe-company-logo";
 import type { TranslationKey } from "@/lib/i18n";
 import { brandLogoUrls, type Brand } from "@/lib/brand-logo-urls";
+import { getPublicMarqueeLogos } from "@/lib/partner-logo-display";
 import {
   PARTNER_LOGO_CARD_CLASS,
   PARTNER_LOGO_ROW_GAP_CLASS,
@@ -108,11 +109,8 @@ const MARQUEE_BRAND_ENTRIES: Brand[] = [
   { slug: "moderna", name: "Moderna", domain: "modernatx.com" },
 ];
 
-/** Logos-first order so the visible marquee loop leads with SI marks, not finance initials. */
-const BRANDS: Brand[] = [...MARQUEE_BRAND_ENTRIES].sort((a, b) => {
-  const score = (brand: Brand) => (brandLogoUrls(brand).length > 0 ? 1 : 0);
-  return score(b) - score(a);
-});
+/** Verified logo assets only — initials-only partners excluded from public marquee. */
+const BRANDS: Brand[] = getPublicMarqueeLogos(MARQUEE_BRAND_ENTRIES);
 
 /** Two identical strips; CSS animates -50% for a gapless loop. */
 const MARQUEE_SEGMENTS = 2;

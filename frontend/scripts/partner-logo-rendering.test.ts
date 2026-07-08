@@ -181,5 +181,6 @@ test("11 other curated brand chips are untouched by the nvidia fix (still render
 test("12 company-logo-marquee (public marketing rail) still uses SafeCompanyLogo, not a raw <img>", () => {
   const companyMarquee = read(COMPANY_MARQUEE_FILE);
   assert.match(companyMarquee, /SafeCompanyLogo/);
+  assert.match(companyMarquee, /getPublicMarqueeLogos/);
   assert.doesNotMatch(companyMarquee, /<img/);
 });
