@@ -5,6 +5,7 @@ import type { TranslationKey } from "@/lib/i18n";
 export type WorkspaceModuleStatus =
   | "live"
   | "pilot"
+  | "preview"
   | "planned"
   | "coming_soon"
   | "not_live"
@@ -17,6 +18,7 @@ export const WORKSPACE_STATUS_LABEL_KEYS: Record<
 > = {
   live: "workspaceModules.statusLive",
   pilot: "workspaceModules.statusPilot",
+  preview: "workspaceModules.statusPreview",
   planned: "workspaceModules.statusPlanned",
   coming_soon: "workspaceModules.statusComingSoon",
   not_live: "workspaceModules.statusNotLive",

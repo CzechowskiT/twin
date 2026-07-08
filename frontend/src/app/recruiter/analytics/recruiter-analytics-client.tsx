@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
 import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspace-nav";
 import { useTranslation } from "@/components/language-provider";
+import { WorkspacePilotPageHeader } from "@/components/workspace/workspace-pilot-page-header";
 import { Card, Shell } from "@/components/ui";
 import {
   RECRUITER_ANALYTICS_MARKERS,
@@ -66,10 +67,12 @@ export default function RecruiterAnalyticsClient() {
     <Shell wide>
       <div data-recruiter-analytics-page={RECRUITER_ANALYTICS_PAGE_MARKER}>
         <RecruiterWorkspaceNav />
-        <header className="mb-6 space-y-2">
-        <h1 className="twin-page-intro text-2xl font-semibold">{t("recruiterAnalytics.title")}</h1>
-        <p className="twin-muted max-w-2xl text-sm">{t("recruiterAnalytics.lead")}</p>
-      </header>
+        <WorkspacePilotPageHeader
+          eyebrowKey="workspaceModules.hubEyebrow"
+          titleKey="recruiterAnalytics.title"
+          leadKey="recruiterAnalytics.lead"
+          status="pilot"
+        />
       <Card variant="soft" className="mb-6 p-4" data-testid={RECRUITER_ANALYTICS_MARKERS.accessFields}>
         <RecruiterAccessFields
           token={token}

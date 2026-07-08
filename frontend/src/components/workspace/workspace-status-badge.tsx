@@ -9,6 +9,7 @@ import {
 const TONE: Record<WorkspaceModuleStatus, string> = {
   live: "border-emerald-500/40 bg-emerald-500/10 text-emerald-200",
   pilot: "border-amber-500/40 bg-amber-500/10 text-amber-200",
+  preview: "border-violet-500/40 bg-violet-500/10 text-violet-200",
   planned: "border-sky-500/40 bg-sky-500/10 text-sky-200",
   coming_soon: "border-sky-500/40 bg-sky-500/10 text-sky-200",
   not_live: "border-rose-500/40 bg-rose-500/10 text-rose-200",

@@ -9,7 +9,10 @@ import { useTranslation } from "@/components/language-provider";
 import { BillingPlanTierCard } from "@/components/billing/billing-plan-tier-card";
 import { BillingUpgradeExperience } from "@/components/billing/billing-upgrade-experience";
 import { Button, Card, Shell } from "@/components/ui";
+import { PremiumPreviewSurface } from "@/components/workspace/premium-preview-surface";
+import { WorkspaceStatusBadge } from "@/components/workspace/workspace-status-badge";
 import { apiFetch } from "@/lib/api";
+import { BILLING_PREMIUM_PREVIEW_ONLY } from "@/lib/product-polish-p2";
 import { clearToken, getToken } from "@/lib/auth";
 import type { TranslationKey } from "@/lib/i18n";
 import { CANDIDATE_PLAN_USD } from "@/lib/pricing-locale";
@@ -358,7 +361,10 @@ export default function BillingPage() {
       <div className="twin-billing-surface">
         <div className="twin-app-read-pane mb-6 flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0 max-w-2xl">
-            <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">{t("dashboard.billingPageTitle")}</h1>
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">{t("dashboard.billingPageTitle")}</h1>
+              {BILLING_PREMIUM_PREVIEW_ONLY ? <WorkspaceStatusBadge status="preview" /> : null}
+            </div>
             <p className="twin-muted mt-2 max-w-xl text-sm leading-relaxed">{t("dashboard.billingPageSubtitle")}</p>
           </div>
           <CandidateWorkspaceSubnav ariaLabel={t("dashboard.billingPageTitle")} />
@@ -505,7 +511,9 @@ export default function BillingPage() {
         </Card>
       ) : null}
 
-      {plans && !loading && !plans.checkout_configured ? (
+      {plans && !loading && !plans.checkout_configured && BILLING_PREMIUM_PREVIEW_ONLY ? (
+        <PremiumPreviewSurface variant="candidate" className="mb-6" />
+      ) : plans && !loading && !plans.checkout_configured ? (
         <Card variant="soft" className="mb-6 border-[var(--twin-accent-muted)]">
           <div className="marketing-hero-rail text-start">
             <p className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.billingStripeSoonTitle")}</p>

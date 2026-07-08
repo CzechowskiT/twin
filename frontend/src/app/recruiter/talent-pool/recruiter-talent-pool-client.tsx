@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
 import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspace-nav";
 import { useTranslation } from "@/components/language-provider";
+import { WorkspacePilotPageHeader } from "@/components/workspace/workspace-pilot-page-header";
 import { useAbortableFetch } from "@/hooks/use-abortable-fetch";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
@@ -68,18 +69,12 @@ export default function RecruiterTalentPoolClient() {
   return (
     <Shell wide data-testid={RECRUITER_TALENT_POOL_MARKERS.page}>
       <RecruiterWorkspaceNav />
-      <header className="mb-6 space-y-3">
-        <p className="twin-eyebrow text-xs uppercase tracking-widest text-[var(--twin-accent)]">
-          {t("recruiterTalentPool.eyebrow")}
-        </p>
-        <h1 className="twin-page-intro text-2xl font-semibold">{t("recruiterTalentPool.title")}</h1>
-        <p className="twin-muted max-w-2xl text-sm">{t("recruiterTalentPool.lead")}</p>
-        <div className="flex flex-wrap gap-2 text-xs">
-          <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5">{t("recruiterTalentPool.chipPilot")}</span>
-          <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5">{t("recruiterTalentPool.chipNoLiveSync")}</span>
-          <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5">{t("recruiterTalentPool.chipInternalOnly")}</span>
-        </div>
-      </header>
+      <WorkspacePilotPageHeader
+        eyebrowKey="recruiterTalentPool.eyebrow"
+        titleKey="recruiterTalentPool.title"
+        leadKey="recruiterTalentPool.lead"
+        status="pilot"
+      />
 
       <Card variant="soft" className="mb-6 p-4">
         <RecruiterAccessFields

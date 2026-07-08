@@ -14,6 +14,7 @@ import { CalendarOperatingEvidenceSection } from "@/components/calendar/calendar
 import { CalendarWeekView } from "@/components/calendar/calendar-week-view";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { useTranslation } from "@/components/language-provider";
+import { WorkspaceStatusBadge } from "@/components/workspace/workspace-status-badge";
 import { usePageVisibility } from "@/hooks/use-page-visibility";
 import { WorkspaceFlowSteps } from "@/components/ux/workspace-flow-steps";
 import { Button, Card, Shell } from "@/components/ui";
@@ -967,9 +968,12 @@ export default function DashboardCalendarPage() {
           <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
             {t("dashboard.calendarProvidersEyebrow")}
           </p>
-          <h1 className="twin-page-intro twin-section-title mt-1 text-xl sm:text-2xl">
-            {t("dashboard.calendarPageTitle")}
-          </h1>
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">
+              {t("dashboard.calendarPageTitle")}
+            </h1>
+            <WorkspaceStatusBadge status="live" />
+          </div>
           <p className="twin-muted mt-2 max-w-prose text-sm leading-relaxed">
             {isCalendarConnected ? t("dashboard.calendarPageLead") : t("dashboard.calendarPageLeadDisconnected")}
           </p>

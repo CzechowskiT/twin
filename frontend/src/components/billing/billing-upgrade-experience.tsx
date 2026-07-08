@@ -1,11 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { AnimatedCounter } from "@/components/waitlist/animated-counter";
+import { PremiumPreviewSurface } from "@/components/workspace/premium-preview-surface";
 import type { TranslationKey } from "@/lib/i18n";
+import { BILLING_PREMIUM_PREVIEW_ONLY } from "@/lib/product-polish-p2";
 
 type MvpStats = {
   validated_jobs: number;
@@ -141,25 +142,8 @@ export function BillingUpgradeExperience({ checkoutConfigured, currentTier }: Bi
           <li>{t("dashboard.billingEngagementTrustSecure")}</li>
         </ul>
 
-        {showWishlistBand ? (
-          <aside className="twin-billing-engage__wishlist text-start">
-            <p className="twin-billing-engage__wishlist-eyebrow">{t("dashboard.billingStripeNotReadyTitle")}</p>
-            <h3 className="twin-billing-engage__wishlist-title">{t("dashboard.billingEngagementWishlistTitle")}</h3>
-            <p className="twin-billing-engage__wishlist-lead">{t("dashboard.billingStripeNotReadyLead")}</p>
-            <div className="marketing-hero-rail mt-4 flex flex-wrap gap-3">
-              <Link href="/waitlist" className="twin-billing-engage__wishlist-cta twin-touch-target">
-                {t("dashboard.billingStripeNotReadyPricing")}
-              </Link>
-              <a
-                href="https://github.com/CzechowskiT/twin/blob/main/docs/STRIPE_E2E.md"
-                className="twin-link twin-touch-target inline-flex items-center text-sm font-semibold"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {t("dashboard.billingStripeNotReadyDocs")} ↗
-              </a>
-            </div>
-          </aside>
+        {showWishlistBand || BILLING_PREMIUM_PREVIEW_ONLY ? (
+          <PremiumPreviewSurface variant="candidate" className="twin-billing-engage__wishlist text-start" />
         ) : null}
       </div>
     </section>
