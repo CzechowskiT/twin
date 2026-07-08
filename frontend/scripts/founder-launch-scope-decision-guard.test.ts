@@ -87,6 +87,11 @@ test("7 founder checkboxes YES NO EDIT logo and Gate F next step", () => {
   assert.match(content, /FOUNDER_CHECKBOX_FORMAT: YES\|NO\|EDIT/);
   assert.match(content, /Logo disclaimer/);
   assert.match(content, /Gate F next step/);
+  assert.match(content, /Accept recommended scoped surface/);
+  assert.match(content, /Accept recommended pilot surface/);
+  assert.match(content, /Accept hidden\/hold list/);
+  assert.match(content, /Proceed to Gate F decision/);
+  assert.match(content, /Keep Gate F pending/);
   assert.match(content, /FOUNDER_GATE_F_NEXT_STEP/);
 });
 
