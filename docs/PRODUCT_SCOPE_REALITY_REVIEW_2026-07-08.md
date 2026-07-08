@@ -1,5 +1,7 @@
 # Product Scope Reality Review — 2026-07-08
 
+> **Korekta foundera (2026-07-08):** Szacunek **18–30 miesięcy / 2–3 FTE** na pełne pilot→live oraz pasywna rekomendacja „nie rozwijać wszystkiego przed launch” są **SUPERSEDED** na potrzeby strategii wykonawczej. Obowiązujący plan: **[7-dniowy agresywny execution plan](./SEVEN_DAY_PUBLIC_READY_EXECUTION_PLAN_2026-07-08.md)** — każdy widoczny moduł PILOT/PREVIEW/COMING SOON/PAUSED/NOT LIVE → **(A) działający public-ready** lub **(B) czysto ukryty/wyłączony** do Dnia 7. Dane historyczne poniżej pozostają jako evidence; **nie** jako aktywna rekomendacja czasowa.
+
 **Metoda:** rejestry `*-workspace-modules.ts`, `system-of-record-routes.ts` (83 wpisy), `product-surface-visibility.ts`, `product-polish-p0/p1/p2/p3.ts`, audyt `docs/PRODUCT_UX_AUDIT_2026-07-08.md`, slice’y Product Polish P0–P3, grep statusów (`pilot`, `preview`, `coming_soon`, `paused`, `not_live`, `hold`, `internal`, `needs_setup`).
 
 **Canonical stance:** P0 CLOSED | Gate E PASS | Gate F PENDING | **Launch NO-GO**
@@ -12,9 +14,9 @@
 
 TWIN ma **szeroką powierzchnię produktową** (83 trasy SoR, ~230 `page.tsx`) przy **wąskim rdzeniu live** (~26 tras SoR + marketing). Większość modułów pilot/preview ma **frontend i demo data**, ale brakuje **persistencji produkcyjnej**, **integracji zewnętrznych** (ATS writeback, Microsoft Calendar, Stripe) lub **workflow compliance** (GDPR revoke/portability, identity verification).
 
-**Odpowiedź na pytanie czasowe:** doprowadzenie **wszystkich** 57 tras pilot + 2 not_live + subflow’y demo do stanu **public-launch-ready** (prawdziwe dane, E2E, compliance, integracje) to **~18–30 miesięcy** przy 2–3 FTE full-stack — nie jeden sprint. **Nie warto** tego robić przed public launch.
+**Odpowiedź na pytanie czasowe (historyczna, SUPERSEDED dla strategii):** doprowadzenie **wszystkich** 57 tras pilot + 2 not_live + subflow’y demo do stanu **public-launch-ready** (prawdziwe dane, E2E, compliance, integracje) szacowano na **~18–30 miesięcy** przy 2–3 FTE full-stack. **Aktywna strategia:** zob. [7-dniowy plan wykonawczy](./SEVEN_DAY_PUBLIC_READY_EXECUTION_PLAN_2026-07-08.md).
 
-**Rekomendacja:** utrzymać **controlled pilot** (P0–P3 już wdrożone) z **~17 modułami live** na public launch surface; resztę trzymać w roadmap/hidden/internal. Szacowany czas do **honest limited public launch** (bez rozszerzania scope’u pilotów): **2–4 tygodnie** decyzji foundera + smoke QA, nie 18 miesięcy dev.
+**Rekomendacja (SUPERSEDED):** utrzymać **controlled pilot** (P0–P3 już wdrożone) z **~17 modułami live** na public launch surface; resztę trzymać w roadmap/hidden/internal. Zastąpione planem 7-dniowym — patrz nowy doc.
 
 **Logo disclaimer:** po P0 disclaimer `site.marqueeLogoDisclaimer` jest **pod marquee** na stronach marketingowych. **Zostawić** (opcja 1) lub przenieść do footera z widocznością above-the-fold (opcja 2). **Usunąć** (opcja 3) — **wysokie ryzyko overclaim** przy 80+ logotypach Fortune 500.
 
