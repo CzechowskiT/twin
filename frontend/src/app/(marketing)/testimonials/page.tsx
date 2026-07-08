@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { useTranslation } from "@/components/language-provider";
+import { MARK_ILLUSTRATIVE_SOCIAL_PROOF } from "@/lib/product-polish-p4";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { MarketingSectionCtas } from "@/components/marketing/marketing-section-ctas";
@@ -22,7 +23,14 @@ export default function TestimonialsPage() {
     <Shell wide>
       <MarketingPageSurface wide>
         <MarketingPageHeader title={t("site.testimonialsTitle")} lead={t("site.testimonialsLead")}>
-          <p className="text-sm italic text-[var(--twin-muted-strong)]">{t("site.testimonialsDisclaimer")}</p>
+          <p className="text-sm text-[var(--twin-muted-strong)]">
+            {MARK_ILLUSTRATIVE_SOCIAL_PROOF ? (
+              <span className="mr-2 rounded-full border border-[var(--twin-border)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--twin-muted)]">
+                {t("productPolish.illustrativeExamplesBadge")}
+              </span>
+            ) : null}
+            <span className="italic">{t("site.testimonialsDisclaimer")}</span>
+          </p>
           <MarketingSectionCtas
             primaryHref="/waitlist"
             primaryLabel={t("home.joinWishlist")}

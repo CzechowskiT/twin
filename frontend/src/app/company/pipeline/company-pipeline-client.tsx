@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
 import { useTranslation } from "@/components/language-provider";
+import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 import type { TranslationKey } from "@/lib/i18n";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
@@ -123,7 +124,10 @@ export default function CompanyPipelineClient() {
         <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
           {t("companyPipeline.eyebrow")}
         </p>
-        <h1 className="twin-page-intro text-2xl font-semibold sm:text-3xl">{t("companyPipeline.title")}</h1>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <h1 className="twin-page-intro text-2xl font-semibold sm:text-3xl">{t("companyPipeline.title")}</h1>
+          <DemoJourneyPilotStatus className="items-start" status="pilot" />
+        </div>
         <p className="twin-muted max-w-2xl text-sm leading-relaxed">{t("companyPipeline.lead")}</p>
         <p className="max-w-2xl rounded-md border border-[var(--twin-border)]/70 bg-[var(--twin-surface-2)]/50 px-3 py-2 text-xs text-[var(--twin-muted-strong)]">
           {t("companyPipeline.demoDisclaimer")}

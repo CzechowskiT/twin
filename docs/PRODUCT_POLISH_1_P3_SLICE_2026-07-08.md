@@ -21,6 +21,28 @@
 
 ---
 
+## Hotfix polish included in P3
+
+| # | Area | Change |
+|---|------|--------|
+| 1 | Homepage marquee | Partner logo cards narrowed — `width: auto`, `min-width: 88px`, `max-width: 140px`, `padding: 0.75rem 1rem` (`.partner-logo-card` in `globals.css`). |
+| 2 | Pilot preview bar | Hidden on public auth/landing: `/login`, `/register`, `/waitlist`, `/first-1000`, `/demo`, `/how-it-works` (and subpaths). |
+| 3 | Pilot chrome gating | `PilotPreviewBoundary` only mounts when `isPilotPreviewChromePath()` — true pilot/deep workspace demo paths only. |
+| 4 | Scope guard | No route deletion, no backend/API/auth/DB/env changes, launch stance unchanged. |
+
+**Commit:** `7827637e` — `fix(ui): tighten logo marquee cards and hide pilot preview bar on /login`
+
+---
+
+## Post-merge visual QA checklist
+
+- [ ] **Homepage marquee:** logo cards not oversized; plates hug logo marks.
+- [ ] **`/login`, `/register`, `/demo`:** no amber pilot preview bar in site chrome.
+- [ ] **Pilot/deep workspace path** (e.g. `/recruiter/daily-cockpit`): pilot preview boundary still visible.
+- [ ] **Investor login** (`/login/investor`): invite-only preview badge — not “needs setup”.
+
+---
+
 ## UX impact
 
 - **Demo journeys:** One calm badge tier (Preview / Limited Pilot) instead of ad-hoc amber chips and raw `pilotBadge` strings.
