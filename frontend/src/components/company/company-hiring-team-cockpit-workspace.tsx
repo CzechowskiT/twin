@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 
 import { CompanyWorkspaceNav } from "@/components/company/company-workspace-nav";
 import { useTranslation } from "@/components/language-provider";
+import { WorkspaceStatusBadge } from "@/components/workspace/workspace-status-badge";
 import { Card, Shell } from "@/components/ui";
 import type { CockpitQueueItem } from "@/lib/company-hiring-cockpit-demo-data";
 import {
@@ -87,21 +88,7 @@ export function CompanyHiringTeamCockpitWorkspace() {
               <p className="text-sm text-[var(--twin-muted-strong)]">{t("companyHiringCockpit.lead")}</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <span
-                className="rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-violet-200"
-                data-testid={COMPANY_HIRING_COCKPIT_MARKERS.pilotBadge}
-              >
-                {t("companyHiringCockpit.pilotBadge")}
-              </span>
-              <span
-                className="rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-amber-200"
-                data-launch-stance={LAUNCH_STANCE}
-              >
-                {t("companyHiringCockpit.launchNoGoBadge")}
-              </span>
-              <span className="rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-sky-200">
-                {t("companyHiringCockpit.draftOnlyBadge")}
-              </span>
+              <WorkspaceStatusBadge status="pilot" testId={COMPANY_HIRING_COCKPIT_MARKERS.pilotBadge} />
             </div>
           </div>
           <p className="text-xs text-[var(--twin-muted-strong)]">

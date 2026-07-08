@@ -10,6 +10,7 @@ import { useAbortableFetch } from "@/hooks/use-abortable-fetch";
 import { useLoadWhenVisible } from "@/hooks/use-load-when-visible";
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
 import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspace-nav";
+import { WorkspacePilotPageHeader } from "@/components/workspace/workspace-pilot-page-header";
 import { TalentRadarDecisionFilterBar } from "@/components/recruiter/talent-radar/talent-radar-decision-filter-bar";
 import { TalentRadarFilterToolbar } from "@/components/recruiter/talent-radar/talent-radar-filter-toolbar";
 import { TalentRadarSummaryPanel } from "@/components/recruiter/talent-radar/talent-radar-summary-panel";
@@ -87,13 +88,6 @@ const TalentRadarSnoozeModal = dynamic(
 );
 
 type RoleOption = { id: number; title: string };
-
-const STATUS_CHIP_KEYS = [
-  "chipPilot",
-  "chipHumanReview",
-  "chipNoAutoOutreach",
-  "chipInternalData",
-] as const;
 
 type PendingModal =
   | { kind: "snooze"; row: TalentRadarCandidate }
@@ -322,28 +316,14 @@ export default function RecruiterTalentRadarClient() {
       <RecruiterWorkspaceNav />
       <div className={RECRUITER_TALENT_RADAR_MARKERS.page} data-testid={RECRUITER_TALENT_RADAR_MARKERS.page}>
         <div className="mx-auto max-w-5xl px-1 pb-12 pt-2 sm:px-2">
-          <div className="space-y-6" data-testid={RECRUITER_TALENT_RADAR_MARKERS.hero}>
-            <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
-              {t("recruiterTalentRadar.eyebrow")}
-            </p>
-            <h1 className="twin-section-title mt-2 text-2xl sm:text-3xl">{t("recruiterTalentRadar.title")}</h1>
-            <p className="twin-muted mt-3 max-w-3xl text-sm leading-relaxed">{t("recruiterTalentRadar.lead")}</p>
-            <p className="mt-2 text-xs text-[var(--twin-muted-strong)]">{t("recruiterTalentRadar.subtitleAgent")}</p>
-          </div>
-
-          <div
-            className="mt-4 flex flex-wrap gap-2"
-            data-testid={RECRUITER_TALENT_RADAR_MARKERS.statusChips}
-          >
-            {STATUS_CHIP_KEYS.map((key) => (
-              <span
-                key={key}
-                className="rounded-full border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] px-3 py-1 text-xs font-medium text-[var(--twin-muted-strong)]"
-              >
-                {t(`recruiterTalentRadar.${key}` as TranslationKey)}
-              </span>
-            ))}
-          </div>
+          <WorkspacePilotPageHeader
+            eyebrowKey="recruiterTalentRadar.eyebrow"
+            titleKey="recruiterTalentRadar.title"
+            leadKey="recruiterTalentRadar.lead"
+            status="pilot"
+            testId={RECRUITER_TALENT_RADAR_MARKERS.hero}
+          />
+          <p className="text-xs text-[var(--twin-muted-strong)]">{t("recruiterTalentRadar.subtitleAgent")}</p>
 
           <Card variant="soft" className="border-[var(--twin-accent)]/20 p-5 sm:p-6">
             <p className="text-sm font-semibold text-[var(--foreground)]">{t("recruiterTalentRadar.scopeTitle")}</p>

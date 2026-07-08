@@ -7,6 +7,7 @@ import { useEffect, useMemo } from "react";
 import { CompanyWorkspaceNav } from "@/components/company/company-workspace-nav";
 import { useTranslation } from "@/components/language-provider";
 import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspace-nav";
+import { WorkspaceStatusBadge } from "@/components/workspace/workspace-status-badge";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
 import {
@@ -167,24 +168,7 @@ function AtsImportReadinessContent({ surface, view }: WorkspaceProps) {
           data-testid={ATS_IMPORT_READINESS_MARKERS.header}
         >
           <div className="flex flex-wrap items-center gap-2">
-            <span
-              className="rounded-full border border-[var(--twin-accent)]/40 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--twin-accent)]"
-              data-testid={ATS_IMPORT_READINESS_MARKERS.pilotBadge}
-            >
-              {t("atsImportReadiness.pilotBadge")}
-            </span>
-            <span
-              className="rounded-full border border-amber-500/40 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-300"
-              data-testid={ATS_IMPORT_READINESS_MARKERS.noSyncBadge}
-            >
-              {t("atsImportReadiness.noLiveSyncBadge")}
-            </span>
-            <span
-              className="rounded-full border border-rose-500/40 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-rose-600 dark:text-rose-300"
-              data-testid={ATS_IMPORT_READINESS_MARKERS.noWritebackBadge}
-            >
-              {t("atsImportReadiness.noWritebackBadge")}
-            </span>
+            <WorkspaceStatusBadge status="pilot" testId={ATS_IMPORT_READINESS_MARKERS.pilotBadge} />
           </div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
             {t("atsImportReadiness.pageEyebrow")}

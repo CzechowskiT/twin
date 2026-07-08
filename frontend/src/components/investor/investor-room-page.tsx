@@ -8,6 +8,8 @@ import { MarketingCrosslinksBand } from "@/components/marketing/marketing-crossl
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { SystemOfRecordNavigationHub } from "@/components/workspace/system-of-record-navigation-hub";
 import { WorkspaceModuleGrid } from "@/components/workspace/workspace-module-grid";
+import { WorkspaceStatusBadge } from "@/components/workspace/workspace-status-badge";
+import type { WorkspaceModuleStatus } from "@/lib/workspace-module-status";
 import { FAQ_INVESTOR_HREF } from "@/lib/faq-anchor";
 import {
   INVESTOR_ROOM_DEMO_MAP,
@@ -23,31 +25,19 @@ import {
   investorRoomRiskTitleKey,
   investorRoomRoadmapKey,
   investorRoomStatusBodyKey,
-  investorRoomStatusLabelKey,
   investorRoomStatusTitleKey,
   type InvestorRoomStatusTier,
 } from "@/lib/investor-room";
 import { INVESTOR_PUBLIC_PREVIEW_MODULES, INVESTOR_WORKSPACE_MODULES } from "@/lib/investor-workspace-modules";
+import { INVESTOR_ROOM_SIMPLIFIED_PREVIEW } from "@/lib/product-polish-p2";
 import { Shell } from "@/components/ui";
 
 const DECK_MAIL = "contact@twin.care";
 
 function StatusBadge({ tier }: { tier: InvestorRoomStatusTier }) {
-  const { t } = useTranslation();
-  const tone =
-    tier === "live"
-      ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-200"
-      : tier === "demo"
-        ? "border-amber-500/40 bg-amber-500/10 text-amber-200"
-        : "border-rose-500/40 bg-rose-500/10 text-rose-200";
-  return (
-    <span
-      className={`investor-room-status-badge inline-flex shrink-0 rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${tone}`}
-      data-tier={tier}
-    >
-      {t(investorRoomStatusLabelKey(tier))}
-    </span>
-  );
+  const status: WorkspaceModuleStatus =
+    tier === "live" ? "live" : tier === "demo" ? "pilot" : "not_live";
+  return <WorkspaceStatusBadge status={status} className="investor-room-status-badge" />;
 }
 
 function SectionCard({ title, lead, children }: { title: string; lead?: string; children: ReactNode }) {
@@ -110,6 +100,11 @@ export function InvestorRoomPage() {
             </h1>
             <p className="max-w-3xl text-lg font-medium text-[var(--twin-fg)]">{t("investorRoom.thesis")}</p>
             <p className="max-w-3xl text-base leading-relaxed text-[var(--twin-muted-strong)]">{t("investorRoom.lead")}</p>
+            <div className="flex flex-wrap gap-3 pt-2">
+              <CtaPill href={deckHref} primary>
+                {t("investorRoom.contactCta")}
+              </CtaPill>
+            </div>
             <MarketingCrosslinksBand page="investor" className="pt-2" />
           </header>
 
@@ -121,6 +116,7 @@ export function InvestorRoomPage() {
             <p className="mt-2 max-w-4xl text-sm leading-relaxed text-rose-100/90">{t("investorRoom.launchStanceBody")}</p>
           </div>
 
+          {INVESTOR_ROOM_SIMPLIFIED_PREVIEW ? null : (
           <section
             className="rounded-2xl border border-[var(--twin-border)] bg-[var(--twin-card)]/80 p-6 shadow-sm backdrop-blur-sm sm:p-8"
             data-testid="investor-gated-preview"
@@ -136,6 +132,7 @@ export function InvestorRoomPage() {
               <WorkspaceModuleGrid modules={[...INVESTOR_PUBLIC_PREVIEW_MODULES, ...INVESTOR_WORKSPACE_MODULES.slice(0, 3)]} />
             </div>
           </section>
+          )}
 
           <div className="mt-8" data-testid="investor-sor-proof-hub">
             <SystemOfRecordNavigationHub
@@ -255,9 +252,6 @@ export function InvestorRoomPage() {
 
           <SectionCard title={t("investorRoom.contactTitle")} lead={t("investorRoom.contactLead")}>
             <div className="flex flex-wrap gap-3">
-              <CtaPill href={deckHref} primary>
-                {t("investorRoom.contactCta")}
-              </CtaPill>
               <CtaPill href={FAQ_INVESTOR_HREF}>{t("investorRoom.contactFaq")}</CtaPill>
               <CtaPill href="/workspace/investor">{t("investorRoom.contactWorkspace")}</CtaPill>
             </div>

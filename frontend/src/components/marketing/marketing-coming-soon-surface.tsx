@@ -5,6 +5,7 @@ import Link from "next/link";
 import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { useTranslation } from "@/components/language-provider";
+import { WorkspaceStatusBadge } from "@/components/workspace/workspace-status-badge";
 import { Card, Shell } from "@/components/ui";
 import type { ThinMarketingPath } from "@/lib/product-polish-p1";
 import type { TranslationKey } from "@/lib/i18n";
@@ -26,7 +27,10 @@ export function MarketingComingSoonSurface({ topic }: MarketingComingSoonSurface
   return (
     <Shell wide>
       <MarketingPageSurface>
-        <MarketingPageHeader title={t(TOPIC_TITLE_KEYS[topic])} lead={t("productPolish.comingSoonLead")} />
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <MarketingPageHeader title={t(TOPIC_TITLE_KEYS[topic])} lead={t("productPolish.comingSoonLead")} />
+          <WorkspaceStatusBadge status="coming_soon" />
+        </div>
         <Card variant="soft" className="mt-8 border-[var(--twin-border)]/80 p-6 sm:p-8">
           <p className="text-sm leading-relaxed text-[var(--foreground)]">{t("productPolish.comingSoonBody")}</p>
           <p className="mt-4 text-sm text-[var(--twin-muted-strong)]">
