@@ -5,12 +5,17 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
-import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
+import { WorkspaceStatusBadge } from "@/components/workspace/workspace-status-badge";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
-import { CANDIDATE_INTERVIEW_PREP_ROUTE } from "@/lib/candidate-interview-prep";
+import {
+  INTERVIEW_PREP_STATIC_CHECKLIST_KEYS,
+  INTERVIEW_PREP_STATIC_MOCK_QUESTION_KEYS,
+  INTERVIEW_PREP_STATIC_PLAN_KEYS,
+} from "@/lib/candidate-interview-prep-static";
+import { INTERVIEW_PREP_SHIP_STATUS } from "@/lib/seven-day-d2-candidate";
 
 type ApplicationRow = { id: number; title: string; company: string };
 type PrepPack = {
@@ -92,11 +97,44 @@ export default function CandidateInterviewPrepClient() {
           <h1 className="twin-page-intro text-2xl font-semibold sm:text-3xl">{t("candidateInterviewPrep.title")}</h1>
           <p className="twin-muted max-w-2xl text-sm leading-relaxed">{t("candidateInterviewPrep.lead")}</p>
         </div>
-        <DemoJourneyPilotStatus status="pilot" />
+        <WorkspaceStatusBadge status={INTERVIEW_PREP_SHIP_STATUS} />
       </header>
 
+      <Card variant="soft" className="mb-6 border-[var(--twin-border)]/80 p-4" data-seven-day-interview-static-pack>
+        <h2 className="text-sm font-semibold">{t("candidateInterviewPrep.staticPackTitle")}</h2>
+        <p className="twin-muted mt-2 text-sm">{t("candidateInterviewPrep.staticPackLead")}</p>
+        <div className="mt-4 space-y-4 text-sm">
+          <section>
+            <h3 className="font-semibold">{t("candidateInterviewPrep.staticMockTitle")}</h3>
+            <ol className="mt-1 list-decimal pl-5">
+              {INTERVIEW_PREP_STATIC_MOCK_QUESTION_KEYS.map((key) => (
+                <li key={key}>{t(key)}</li>
+              ))}
+            </ol>
+          </section>
+          <section>
+            <h3 className="font-semibold">{t("candidateInterviewPrep.staticChecklistTitle")}</h3>
+            <ul className="mt-1 list-disc pl-5">
+              {INTERVIEW_PREP_STATIC_CHECKLIST_KEYS.map((key) => (
+                <li key={key}>{t(key)}</li>
+              ))}
+            </ul>
+          </section>
+          <section>
+            <h3 className="font-semibold">{t("candidateInterviewPrep.staticPlanTitle")}</h3>
+            <ol className="mt-1 list-decimal pl-5">
+              {INTERVIEW_PREP_STATIC_PLAN_KEYS.map((key) => (
+                <li key={key}>{t(key)}</li>
+              ))}
+            </ol>
+          </section>
+        </div>
+      </Card>
+
       <Card variant="soft" className="mb-6 border-[var(--twin-border)]/80 p-4">
-        <h2 className="text-sm font-semibold">{t("candidateInterviewPrep.selectTitle")}</h2>
+        <h2 className="text-sm font-semibold">{t("candidateInterviewPrep.applicationPackTitle")}</h2>
+        <p className="twin-muted mt-2 text-sm">{t("candidateInterviewPrep.applicationPackLead")}</p>
+        <h3 className="mt-4 text-sm font-semibold">{t("candidateInterviewPrep.selectTitle")}</h3>
         {loading ? <p className="twin-muted mt-2 text-sm">{t("candidateInterviewPrep.loading")}</p> : null}
         {!loading && applications.length === 0 ? (
           <p className="twin-muted mt-2 text-sm">{t("candidateInterviewPrep.empty")}</p>

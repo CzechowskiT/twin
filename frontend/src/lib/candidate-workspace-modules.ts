@@ -1,4 +1,10 @@
 import { CANDIDATE_CANONICAL_ROUTES } from "@/lib/candidate-canonical-routes";
+import {
+  CAREER_COMPASS_SHIP_STATUS,
+  EVIDENCE_VAULT_SHIP_STATUS,
+  INTERVIEW_PREP_SHIP_STATUS,
+  TRUST_CENTER_ROADMAP_STATUS,
+} from "@/lib/seven-day-d2-candidate";
 import type { WorkspaceModuleDef } from "@/lib/workspace-module-status";
 
 /** Candidate dashboard module cards — honest readiness, no fake live claims. */
@@ -35,8 +41,9 @@ export const CANDIDATE_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     href: "/dashboard/career",
     titleKey: "workspaceModules.candidateCareerTitle",
     valuePropKey: "workspaceModules.candidateCareerValue",
+    hintKey: "workspaceModules.candidateCareerHint",
     ctaKey: "workspaceModules.candidateCareerCta",
-    status: "pilot",
+    status: CAREER_COMPASS_SHIP_STATUS,
   },
   {
     id: "plan_payments",
@@ -71,7 +78,7 @@ export const CANDIDATE_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     valuePropKey: "workspaceModules.candidateTrustCenterValue",
     hintKey: "workspaceModules.candidateTrustCenterHint",
     ctaKey: "workspaceModules.candidateTrustCenterCta",
-    status: "pilot",
+    status: TRUST_CENTER_ROADMAP_STATUS,
   },
   {
     id: "calendar",
@@ -96,7 +103,7 @@ export const CANDIDATE_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     titleKey: "workspaceModules.candidateEvidenceTitle",
     valuePropKey: "workspaceModules.candidateEvidenceValue",
     ctaKey: "workspaceModules.candidateEvidenceCta",
-    status: "live",
+    status: EVIDENCE_VAULT_SHIP_STATUS,
   },
   {
     id: "interview_prep",
@@ -104,7 +111,7 @@ export const CANDIDATE_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     titleKey: "workspaceModules.candidateInterviewTitle",
     valuePropKey: "workspaceModules.candidateInterviewValue",
     ctaKey: "workspaceModules.candidateInterviewCta",
-    status: "pilot",
+    status: INTERVIEW_PREP_SHIP_STATUS,
   },
   {
     id: "auto_apply",

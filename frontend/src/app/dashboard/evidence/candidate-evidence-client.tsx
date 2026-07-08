@@ -1,26 +1,36 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
-import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
+import { WorkspaceStatusBadge } from "@/components/workspace/workspace-status-badge";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
 import {
-  CANDIDATE_EVIDENCE_ROUTE,
   EVIDENCE_TYPE_KEYS,
   type EvidenceType,
   type EvidenceVaultItem,
 } from "@/lib/candidate-evidence-vault";
 import type { TranslationKey } from "@/lib/i18n";
+import { EVIDENCE_VAULT_SHIP_STATUS } from "@/lib/seven-day-d2-candidate";
 
 type ListOut = { items: EvidenceVaultItem[]; total: number };
 
 const typeLabelKey = (t: EvidenceType): TranslationKey => `candidateEvidence.type_${t}` as TranslationKey;
+
+const READINESS_TYPES: EvidenceType[] = ["project", "case_study", "certificate", "github"];
+
+function evidenceReadiness(items: EvidenceVaultItem[]) {
+  const typesPresent = new Set(items.map((i) => i.evidence_type));
+  const filled = READINESS_TYPES.filter((type) => typesPresent.has(type)).length;
+  const hasNote = items.some((i) => Boolean(i.note?.trim()));
+  const hasUrl = items.some((i) => Boolean(i.source_url?.trim()));
+  return { filled, total: READINESS_TYPES.length, hasNote, hasUrl, typesPresent };
+}
 
 export default function CandidateEvidenceClient() {
   const { t, locale } = useTranslation();
@@ -34,6 +44,39 @@ export default function CandidateEvidenceClient() {
   const [note, setNote] = useState("");
   const [sourceUrl, setSourceUrl] = useState("");
   const loc = locale === "pl" ? "pl-PL" : "en-US";
+
+  const readiness = useMemo(() => evidenceReadiness(items), [items]);
+
+  const recruiterSummary = useMemo(() => {
+    if (items.length === 0) return null;
+    const highlights = items
+      .filter((i) => i.title || i.note)
+      .slice(0, 4)
+      .map((i) => {
+        const label = i.title?.trim() || i.skill_name;
+        const detail = i.note?.trim();
+        return detail ? `${label}: ${detail}` : label;
+      });
+    if (highlights.length === 0) return null;
+    return highlights.join(" · ");
+  }, [items]);
+
+  const missingChecks = useMemo(() => {
+    const checks: TranslationKey[] = [];
+    if (!readiness.typesPresent.has("project") && !readiness.typesPresent.has("case_study")) {
+      checks.push("candidateEvidence.missingProject");
+    }
+    if (!readiness.typesPresent.has("certificate") && !readiness.typesPresent.has("assessment")) {
+      checks.push("candidateEvidence.missingCertificate");
+    }
+    if (!readiness.typesPresent.has("github")) {
+      checks.push("candidateEvidence.missingGithub");
+    }
+    if (!readiness.hasNote) {
+      checks.push("candidateEvidence.missingNote");
+    }
+    return checks;
+  }, [readiness]);
 
   const load = useCallback(async () => {
     const token = getToken();
@@ -93,6 +136,8 @@ export default function CandidateEvidenceClient() {
     await load();
   };
 
+  const readinessReady = readiness.filled >= 2 && readiness.hasNote && readiness.hasUrl;
+
   return (
     <Shell wide>
       <CandidateWorkspaceSubnav ariaLabel={t("candidateEvidence.title")} />
@@ -104,8 +149,43 @@ export default function CandidateEvidenceClient() {
           <h1 className="twin-page-intro text-2xl font-semibold sm:text-3xl">{t("candidateEvidence.title")}</h1>
           <p className="twin-muted max-w-2xl text-sm leading-relaxed">{t("candidateEvidence.lead")}</p>
         </div>
-        <DemoJourneyPilotStatus status="pilot" />
+        <WorkspaceStatusBadge status={EVIDENCE_VAULT_SHIP_STATUS} />
       </header>
+
+      <div className="mb-6 grid gap-4 lg:grid-cols-2" data-seven-day-evidence-readiness>
+        <Card variant="soft" className="border-[var(--twin-border)]/80 p-4">
+          <h2 className="text-sm font-semibold">{t("candidateEvidence.readinessTitle")}</h2>
+          <p className="twin-muted mt-2 text-sm">{t("candidateEvidence.readinessLead")}</p>
+          <p className="mt-3 text-sm font-medium">
+            {t("candidateEvidence.readinessScore")
+              .replace("{filled}", String(readiness.filled))
+              .replace("{total}", String(readiness.total))}
+          </p>
+          <p className="twin-muted mt-2 text-xs">
+            {readinessReady
+              ? t("candidateEvidence.readinessReady")
+              : t("candidateEvidence.readinessNeedsWork")}
+          </p>
+        </Card>
+        <Card variant="soft" className="border-[var(--twin-border)]/80 p-4">
+          <h2 className="text-sm font-semibold">{t("candidateEvidence.recruiterSummaryTitle")}</h2>
+          <p className="twin-muted mt-2 text-sm">{t("candidateEvidence.recruiterSummaryLead")}</p>
+          <p className="mt-3 text-sm leading-relaxed text-[var(--foreground)]">
+            {recruiterSummary ?? t("candidateEvidence.recruiterSummaryEmpty")}
+          </p>
+        </Card>
+      </div>
+
+      {missingChecks.length > 0 ? (
+        <Card variant="soft" className="mb-6 border-[var(--twin-border)]/80 p-4">
+          <h2 className="text-sm font-semibold">{t("candidateEvidence.missingChecklistTitle")}</h2>
+          <ul className="mt-3 list-inside list-disc space-y-1 text-sm text-[var(--twin-muted-strong)]">
+            {missingChecks.map((key) => (
+              <li key={key}>{t(key)}</li>
+            ))}
+          </ul>
+        </Card>
+      ) : null}
 
       <Card variant="soft" className="mb-6 border-[var(--twin-border)]/80 p-4">
         <h2 className="text-sm font-semibold">{t("candidateEvidence.addTitle")}</h2>

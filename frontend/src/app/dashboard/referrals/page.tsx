@@ -4,7 +4,8 @@ import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subna
 import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 import { ReferralsDashboard } from "@/components/referrals/referrals-dashboard";
 import { useTranslation } from "@/components/language-provider";
-import { Shell } from "@/components/ui";
+import { Card, Shell } from "@/components/ui";
+import { REFERRALS_LIMITED_PILOT } from "@/lib/seven-day-d2-candidate";
 
 export default function DashboardReferralsPage() {
   const { t } = useTranslation();
@@ -20,9 +21,20 @@ export default function DashboardReferralsPage() {
         <p className="twin-muted max-w-2xl text-sm leading-relaxed">{t("referrals.lead")}</p>
         <p className="twin-muted max-w-2xl text-xs leading-relaxed">{t("referrals.rewardModelNote")}</p>
         </header>
-        <DemoJourneyPilotStatus status="pilot" />
+        <DemoJourneyPilotStatus status="pilot" showLead={false} />
         <CandidateWorkspaceSubnav ariaLabel={t("referrals.title")} />
       </div>
+      {REFERRALS_LIMITED_PILOT ? (
+        <Card
+          variant="soft"
+          className="mb-6 border-amber-500/30 bg-amber-500/5 p-4"
+          data-seven-day-referrals-pilot-boundary
+        >
+          <h2 className="text-sm font-semibold text-amber-100">{t("referrals.pilotBoundaryTitle")}</h2>
+          <p className="mt-2 text-sm leading-relaxed text-[var(--twin-muted-strong)]">{t("referrals.pilotBoundaryBody")}</p>
+          <p className="mt-2 text-xs text-[var(--twin-muted)]">{t("referrals.pilotNoOutreachNote")}</p>
+        </Card>
+      ) : null}
       <ReferralsDashboard />
     </Shell>
   );
