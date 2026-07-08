@@ -9,6 +9,10 @@ import { WorkspacePilotPageHeader } from "@/components/workspace/workspace-pilot
 import type { TranslationKey } from "@/lib/i18n";
 import { Shell } from "@/components/ui";
 import { COMPANY_INTEGRATION_ROWS } from "@/lib/company-integrations-readiness";
+import {
+  COMPANY_INTEGRATIONS_ROADMAP_STATUS,
+  INTEGRATIONS_HONEST_NO_LIVE_ATS_SYNC,
+} from "@/lib/seven-day-d4-company";
 
 const LABEL_KEYS: Record<string, TranslationKey> = {
   acceptance_inbox: "companyIntegrations.item_acceptance_inbox",
@@ -24,14 +28,19 @@ export default function CompanyIntegrationsClient() {
   const { t } = useTranslation();
 
   return (
-    <Shell wide>
+    <Shell wide data-seven-day-company-integrations>
       <CompanyWorkspaceNav />
       <WorkspacePilotPageHeader
         eyebrowKey="companyIntegrations.eyebrow"
         titleKey="companyIntegrations.title"
         leadKey="companyIntegrations.lead"
-        status="pilot"
+        status={COMPANY_INTEGRATIONS_ROADMAP_STATUS}
       />
+      {INTEGRATIONS_HONEST_NO_LIVE_ATS_SYNC ? (
+        <p className="twin-muted mb-4 text-sm leading-relaxed" data-seven-day-company-integrations-roadmap-boundary>
+          {t("companyIntegrations.roadmapBoundary")}
+        </p>
+      ) : null}
 
       <ul className="space-y-3">
         {COMPANY_INTEGRATION_ROWS.map((row) => {

@@ -76,6 +76,6 @@ export const COMPANY_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     valuePropKey: "workspaceModules.companyIntegrationsValue",
     hintKey: "workspaceModules.companyIntegrationsHint",
     ctaKey: "workspaceModules.companyIntegrationsCta",
-    status: "pilot",
+    status: "coming_soon",
   },
 ];

@@ -25,7 +25,10 @@ import {
   type CompanyTalentPoolPayload,
   type CompanyTalentPoolReadinessState,
 } from "@/lib/company-talent-pool";
-import { resolveCompanyTalentPoolNextBestAction } from "@/lib/company-talent-pool-next-best-action";
+import {
+  COLLAPSE_COMPANY_DEMO_JOURNEYS,
+  TALENT_POOL_LIMITED_PILOT,
+} from "@/lib/seven-day-d4-company";
 import {
   RECRUITER_DEMO_COMPANY_SLUG,
   companySlugToLabel,
@@ -42,6 +45,7 @@ import {
   recruiterInboxErrorMessageKey,
   type RecruiterInboxErrorMessageKey,
 } from "@/lib/recruiter-inbox-errors";
+import { resolveCompanyTalentPoolNextBestAction } from "@/lib/company-talent-pool-next-best-action";
 
 const CompanyTalentPoolReadinessGuide = dynamic(
   () =>
@@ -273,6 +277,11 @@ export default function CompanyTalentPoolClient() {
         </p>
         <h1 className="twin-page-intro text-2xl font-semibold sm:text-3xl">{t("companyTalentPool.title")}</h1>
         <p className="twin-muted max-w-2xl text-sm leading-relaxed">{t("companyTalentPool.lead")}</p>
+        {TALENT_POOL_LIMITED_PILOT ? (
+          <p className="twin-muted max-w-2xl text-sm leading-relaxed" data-seven-day-company-talent-pool-pilot-boundary>
+            {t("companyTalentPool.pilotBoundaryBody")}
+          </p>
+        ) : null}
         <div className="flex flex-wrap gap-2 text-xs">
           <span className="rounded-full border border-[var(--twin-border)] bg-[var(--twin-surface-soft)] px-2 py-0.5">
             {t("companyTalentPool.chipPilot")}

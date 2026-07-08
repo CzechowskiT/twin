@@ -37,6 +37,7 @@ const ALWAYS_HIDDEN_MODULE_IDS = new Set([
   "recruiter_operational_work_queue",
   "recruiter_ats_import_readiness",
   "company_billing",
+  "billing",
   "company_ats_import_readiness",
 ]);
 

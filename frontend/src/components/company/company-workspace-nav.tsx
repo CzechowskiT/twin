@@ -2,60 +2,112 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import type { TranslationKey } from "@/lib/i18n";
-import { COMPANY_ROLES_ROUTE } from "@/lib/company-jobs-roles";
 import { COMPANY_BILLING_ROUTE } from "@/lib/company-billing-readiness";
 import { COMPANY_HIRING_ROUTE } from "@/lib/company-hiring-dashboard";
 import { COMPANY_HIRING_COCKPIT_ROUTE } from "@/lib/company-hiring-cockpit";
 import { COMPANY_HIRING_COMMAND_CENTER_ROUTE } from "@/lib/company-hiring-command-center";
 import { COMPANY_INTEGRATIONS_ROUTE } from "@/lib/company-integrations-readiness";
+import { COMPANY_ROLES_ROUTE } from "@/lib/company-jobs-roles";
 import { COMPANY_TEAM_ROUTE } from "@/lib/company-team-permissions";
 import { COMPANY_TALENT_POOL_ROUTE } from "@/lib/company-talent-pool";
+import {
+  COMPANY_PRIMARY_NAV_HREFS,
+  COMPANY_WORKSPACE_NAV_COLLAPSED_DEFAULT,
+  HIDE_COMPANY_BILLING_FROM_NAV,
+} from "@/lib/seven-day-d4-company";
 
-const NAV = [
-  { href: COMPANY_HIRING_ROUTE, ns: "companyHiring" as const, key: "navDashboard" },
-  { href: COMPANY_HIRING_COCKPIT_ROUTE, ns: "companyHiringCockpit" as const, key: "navLink" },
-  { href: COMPANY_HIRING_COMMAND_CENTER_ROUTE, ns: "companyHiringCommandCenter" as const, key: "navLink" },
-  { href: COMPANY_INTEGRATIONS_ROUTE, ns: "companyIntegrations" as const, key: "navLink" },
-  { href: COMPANY_BILLING_ROUTE, ns: "companyBilling" as const, key: "navBilling" },
-  { href: COMPANY_ROLES_ROUTE, ns: "companyJobs" as const, key: "navRoles" },
-  { href: "/company/pipeline", ns: "companyPipeline" as const, key: "navLink" },
-  { href: COMPANY_TALENT_POOL_ROUTE, ns: "companyTalentPool" as const, key: "navLink" },
-  { href: COMPANY_TEAM_ROUTE, ns: "companyTeam" as const, key: "navTeam" },
-  { href: "/calculator/b2b", ns: "companyTeam" as const, key: "navCalculator" },
-  { href: "/recruiter/inbox", ns: "companyJobs" as const, key: "navInbox" },
-  { href: "/for-companies", ns: "companyJobs" as const, key: "navForCompanies" },
-] as const;
+type NavTab = { href: string; labelKey: TranslationKey };
+
+const PRIMARY_TABS: NavTab[] = [
+  { href: COMPANY_HIRING_ROUTE, labelKey: "companyHiring.navDashboard" },
+  { href: COMPANY_ROLES_ROUTE, labelKey: "companyJobs.navRoles" },
+  { href: "/company/pipeline", labelKey: "companyPipeline.navLink" },
+  { href: COMPANY_TALENT_POOL_ROUTE, labelKey: "companyTalentPool.navLink" },
+];
+
+const EXTENDED_TABS: NavTab[] = [
+  { href: COMPANY_HIRING_COCKPIT_ROUTE, labelKey: "companyHiringCockpit.navLink" },
+  { href: COMPANY_HIRING_COMMAND_CENTER_ROUTE, labelKey: "companyHiringCommandCenter.navLink" },
+  { href: COMPANY_INTEGRATIONS_ROUTE, labelKey: "companyIntegrations.navLink" },
+  { href: COMPANY_TEAM_ROUTE, labelKey: "companyTeam.navTeam" },
+  { href: "/calculator/b2b", labelKey: "companyTeam.navCalculator" },
+  { href: "/recruiter/inbox", labelKey: "companyJobs.navInbox" },
+  { href: "/for-companies", labelKey: "companyJobs.navForCompanies" },
+];
+
+function isPrimaryHref(href: string): boolean {
+  return (COMPANY_PRIMARY_NAV_HREFS as readonly string[]).includes(href);
+}
+
+function NavLink({ tab, pathname }: { tab: NavTab; pathname: string }) {
+  const { t } = useTranslation();
+  const active = pathname === tab.href || (tab.href !== "/for-companies" && pathname.startsWith(`${tab.href}/`));
+
+  return (
+    <Link
+      href={tab.href}
+      className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
+        active
+          ? "bg-[var(--twin-accent-soft)] text-[var(--twin-accent)]"
+          : "text-[var(--twin-muted-strong)] hover:bg-[var(--twin-surface-soft)]"
+      }`}
+      aria-current={active ? "page" : undefined}
+      data-company-nav-tier={isPrimaryHref(tab.href) ? "primary" : "extended"}
+    >
+      {t(tab.labelKey)}
+    </Link>
+  );
+}
 
 export function CompanyWorkspaceNav() {
-  const { t } = useTranslation();
   const pathname = usePathname();
+  const { t } = useTranslation();
+  const [expanded, setExpanded] = useState(!COMPANY_WORKSPACE_NAV_COLLAPSED_DEFAULT);
+
+  const extendedTabs = HIDE_COMPANY_BILLING_FROM_NAV
+    ? EXTENDED_TABS
+    : [...EXTENDED_TABS, { href: COMPANY_BILLING_ROUTE, labelKey: "companyBilling.navBilling" as TranslationKey }];
 
   return (
     <nav
-      className="mb-6 flex flex-wrap gap-2 border-b border-[var(--twin-border)] pb-4"
+      className="mb-6 border-b border-[var(--twin-border)] pb-4"
       aria-label={t("companyJobs.navAria")}
+      data-seven-day-company-workspace-nav
     >
-      {NAV.map((item) => {
-        const active =
-          pathname === item.href ||
-          (item.href !== "/for-companies" && pathname.startsWith(`${item.href}/`));
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={
-              active
-                ? "rounded-full bg-[var(--twin-accent-soft)] px-3 py-1.5 text-sm font-medium text-[var(--twin-accent)]"
-                : "rounded-full px-3 py-1.5 text-sm text-[var(--twin-muted-strong)] hover:bg-[var(--twin-surface-soft)]"
-            }
+      <div className="flex flex-wrap gap-2" data-company-nav-primary>
+        {PRIMARY_TABS.map((tab) => (
+          <NavLink key={tab.href} tab={tab} pathname={pathname} />
+        ))}
+      </div>
+      {expanded ? (
+        <div className="mt-3 flex flex-wrap gap-2 border-t border-[var(--twin-border)]/60 pt-3" data-company-nav-extended>
+          {extendedTabs.map((tab) => (
+            <NavLink key={tab.href} tab={tab} pathname={pathname} />
+          ))}
+          <button
+            type="button"
+            className="twin-link px-3 py-1.5 text-sm font-semibold"
+            onClick={() => setExpanded(false)}
+            aria-expanded={expanded}
           >
-            {t(`${item.ns}.${item.key}` as TranslationKey)}
-          </Link>
-        );
-      })}
+            {t("workspaceModules.showFewerModules")}
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          className="twin-link mt-3 text-sm font-semibold"
+          onClick={() => setExpanded(true)}
+          aria-expanded={expanded}
+          data-company-nav-extended-toggle
+        >
+          {t("productPolish.companyExtendedNavToggle")}
+        </button>
+      )}
     </nav>
   );
 }

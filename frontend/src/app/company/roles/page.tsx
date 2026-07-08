@@ -6,7 +6,6 @@ import toast from "react-hot-toast";
 
 import { CompanyRoleCard } from "@/components/company/company-role-card";
 import { CompanyWorkspaceNav } from "@/components/company/company-workspace-nav";
-import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
@@ -22,6 +21,7 @@ import {
   resolveCompanySlugFromRaw,
   writeRecruiterInboxSession,
 } from "@/lib/recruiter-inbox";
+import { COLLAPSE_COMPANY_DEMO_JOURNEYS } from "@/lib/seven-day-d4-company";
 
 export default function CompanyRolesPage() {
   const { t } = useTranslation();
@@ -154,15 +154,21 @@ export default function CompanyRolesPage() {
             </Link>
           </p>
           <div className="mt-6 rounded-lg border border-[var(--twin-border)]/80 p-4">
-            <DemoJourneyPilotStatus className="items-start" />
-            <p className="mt-3 text-sm text-[var(--twin-muted-strong)]">{t("jobPipeline.demoJobsLead")}</p>
-            <Link
-              href="/company/roles/demo-role-001/pipeline"
-              className="twin-link mt-3 inline-block text-sm font-medium"
-              data-testid="company-roles-demo-pipeline-link"
-            >
-              {t("jobPipeline.openPipeline")}
-            </Link>
+            {COLLAPSE_COMPANY_DEMO_JOURNEYS ? (
+              <details data-seven-day-company-demo-journeys-collapsed>
+                <summary className="twin-link cursor-pointer text-sm font-medium [&::-webkit-details-marker]:hidden">
+                  {t("companyJobs.demoJourneysToggle")}
+                </summary>
+                <p className="twin-muted mt-3 text-sm leading-relaxed">{t("companyJobs.demoJourneysBoundary")}</p>
+                <Link
+                  href="/company/roles/demo-role-001/pipeline"
+                  className="twin-link mt-3 inline-block text-sm font-medium"
+                  data-testid="company-roles-demo-pipeline-link"
+                >
+                  {t("jobPipeline.openPipeline")}
+                </Link>
+              </details>
+            ) : null}
           </div>
         </div>
       </Card>
