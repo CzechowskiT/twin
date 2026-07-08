@@ -246,6 +246,7 @@ export type TranslationKey =
   | `safeCommunication.${keyof typeof en.safeCommunication}`
   | `decisionMemory.${keyof typeof en.decisionMemory}`
   | `recruiterHub.${keyof typeof en.recruiterHub}`
+  | `companyHub.${keyof typeof en.companyHub}`
   | `recruiterDailyCockpit.${keyof typeof en.recruiterDailyCockpit}`
   | `companyHiringCockpit.${keyof typeof en.companyHiringCockpit}`
   | `companyHiringCommandCenter.${keyof typeof en.companyHiringCommandCenter}`
@@ -1938,7 +1939,7 @@ const en = {
     candidateAutoApplyHint: "Checklist: profile ready, verified readiness, consent, calendar optional.",
     candidateAutoApplyCta: "View readiness",
     recruiterHubTitle: "Recruiter workspace",
-    recruiterHubLead: "Inbox, pipeline, jobs, and search first — calendar sync, ATS, and integrations stay in the collapsed pilot section.",
+    recruiterHubLead: "Inbox, pipeline, jobs, and search first — calendar connect (preview), ATS, and integrations stay in the collapsed pilot section.",
     recruiterInboxTitle: "Acceptance inbox",
     recruiterInboxValue: "Pre-qualified candidates per company slug — accept, decline, reschedule.",
     recruiterInboxCta: "Open inbox",
@@ -2009,8 +2010,8 @@ const en = {
     companyBillingHint: "Founder-led procurement only today.",
     companyBillingCta: "Billing readiness",
     companyIntegrationsTitle: "Integrations",
-    companyIntegrationsValue: "ATS, calendar, and inbox readiness matrix.",
-    companyIntegrationsHint: "Status per row — no fake traction.",
+    companyIntegrationsValue: "ATS, calendar, and inbox readiness matrix — preview rows only.",
+    companyIntegrationsHint: "No live ATS sync — status per row, no fake traction.",
     companyIntegrationsCta: "Integrations",
     investorHubTitle: "Investor workspace",
     investorHubLead: "Metrics, roadmap, data room, and scenario tools — separate from employer pricing.",
@@ -2093,7 +2094,7 @@ const en = {
     investorProofAtsValue: "Import mapping and dedupe preview — no live sync or writeback.",
     investorProofAtsCta: "View ATS proof",
     candidateHubLead: "Core live modules first — pilot and roadmap lanes collapsed with honest boundary badges.",
-    recruiterHubLead: "Inbox, pipeline, jobs, and search first — calendar sync, ATS, and integrations stay collapsed under pilot.",
+    recruiterHubLead: "Inbox, pipeline, jobs, and search first — calendar connect (preview), ATS, and integrations stay collapsed under pilot.",
     companyHubLead: "Dashboard, roles, pipeline, and talent pool first — billing and integrations collapsed under pilot.",
     investorHubLead: "Metrics, roadmap, data room, and system-of-record proof cards for diligence.",
     investorGroupProductTitle: "Product & diligence",
@@ -3867,11 +3868,11 @@ eyebrow: "Product roadmap",
     title: "Integrations readiness",
     navLink: "Integrations",
     lead:
-      "Honest pilot scope for employer tooling — what is live today vs planned. No fake “all connected” claims.",
+      "Honest pilot scope for employer tooling — preview readiness rows only. No live ATS sync or fake “all connected” claims.",
     item_acceptance_inbox: "Acceptance inbox & review card",
     item_talent_pool_import: "Talent pool import (CSV)",
-    item_ats_webhooks: "ATS webhooks",
-    item_employer_calendar: "Recruiter calendar sync",
+    item_ats_webhooks: "ATS webhooks (readiness preview)",
+    item_employer_calendar: "Recruiter calendar holds (preview)",
     item_employer_billing: "Self-serve billing & seats",
     item_team_tokens: "Team access tokens",
     item_greenhouse_webhook: "Greenhouse placement webhooks",
@@ -4052,6 +4053,10 @@ eyebrow: "Product roadmap",
     founderLedExamplesBadge: "Founder-led examples",
     socialProofIllustrativeNote: "Illustrative example — not verified customer proof.",
     recruiterRoadmapPromosToggle: "Pilot roadmap modules",
+    companyRoadmapPromosToggle: "Pilot hiring cockpit & command center",
+    homepageStatsContextNote: "Product counters — representative market context, not verified customer proof.",
+    integrationsPreviewNotLiveSyncNote:
+      "Preview / limited pilot — ATS import and webhooks are readiness-only. No live two-way sync or automatic writeback.",
   },
   placementEmployer: {
     title: "Confirm hire for TWIN",
@@ -7185,6 +7190,14 @@ eyebrow: "Product roadmap",
       "With promo cards tucked away, start where decisions happen — accept, decline, or reschedule matched candidates.",
     nextActionCta: "Open recruiter inbox",
   },
+  companyHub: {
+    nextActionEyebrow: "Recommended next",
+    nextActionTitle: "Start with roles or pipeline",
+    nextActionLead:
+      "With cockpit promos tucked away, open roles to define hiring bars or pipeline to review segment counts — pilot data only.",
+    nextActionRolesCta: "Open roles",
+    nextActionPipelineCta: "View pipeline",
+  },
   recruiterDailyCockpit: {
     navLink: "Daily cockpit",
     pageEyebrow: "Recruiter daily operating cockpit",
@@ -9618,7 +9631,7 @@ const pl: MessageTree = {
     candidateAutoApplyHint: "Checklista: profil, gotowości zweryfikowanej, zgoda, kalendarz opcjonalnie.",
     candidateAutoApplyCta: "Zobacz gotowość",
     recruiterHubTitle: "Strefa rekrutera",
-    recruiterHubLead: "Najpierw inbox, pipeline, oferty i wyszukiwanie — sync kalendarza, ATS i integracje w zwiniętej sekcji pilota.",
+    recruiterHubLead: "Najpierw inbox, pipeline, oferty i wyszukiwanie — kalendarz (podgląd), ATS i integracje w zwiniętej sekcji pilota.",
     recruiterInboxTitle: "Skrzynka akceptacji",
     recruiterInboxValue: "Pre-kwalifikowani kandydaci per slug firmy — akceptuj, odrzuć, przełóż.",
     recruiterInboxCta: "Otwórz skrzynkę",
@@ -9689,8 +9702,8 @@ const pl: MessageTree = {
     companyBillingHint: "Dziś tylko procurement z founderami.",
     companyBillingCta: "Gotowość billingu",
     companyIntegrationsTitle: "Integracje",
-    companyIntegrationsValue: "Macierz gotowości ATS, kalendarza i skrzynki.",
-    companyIntegrationsHint: "Status per wiersz — bez fałszywej trakcji.",
+    companyIntegrationsValue: "Macierz gotowości ATS, kalendarza i skrzynki — tylko wiersze podglądu.",
+    companyIntegrationsHint: "Bez live sync ATS — status per wiersz, bez fałszywej trakcji.",
     companyIntegrationsCta: "Integracje",
     investorHubTitle: "Strefa inwestora",
     investorHubLead: "Metryki, roadmapa, data room i kalkulator — oddzielnie od cennika Firm.",
@@ -9773,7 +9786,7 @@ const pl: MessageTree = {
     investorProofAtsValue: "Mapowanie importu i podgląd deduplikacji — bez bieżącej synchronizacji ani zapisu zwrotnego do ATS.",
     investorProofAtsCta: "Zobacz dowód ATS",
     candidateHubLead: "Najpierw moduły live — ścieżki pilota i roadmapy zwinięte z uczciwymi badge'ami granic.",
-    recruiterHubLead: "Najpierw inbox, pipeline, oferty i wyszukiwanie — sync kalendarza, ATS i integracje zwinięte w sekcji pilota.",
+    recruiterHubLead: "Najpierw inbox, pipeline, oferty i wyszukiwanie — kalendarz (podgląd), ATS i integracje zwinięte w sekcji pilota.",
     companyHubLead: "Najpierw dashboard, role, pipeline i talent pool — billing i integracje zwinięte w sekcji pilota.",
     investorHubLead: "Metryki, roadmapa, data room i karty dowodów rejestru operacyjnego do due diligence.",
     investorGroupProductTitle: "Produkt i due diligence",
@@ -11555,11 +11568,11 @@ const pl: MessageTree = {
     title: "Gotowość integracji",
     navLink: "Integracje",
     lead:
-      "Uczciwy zakres pilotażu narzędzi pracodawcy — co jest live dziś vs planowane. Bez fałszywych „wszystko podpięte”.",
+      "Uczciwy zakres pilotażu narzędzi pracodawcy — tylko wiersze gotowości w podglądzie. Bez live sync ATS i bez fałszywych „wszystko podpięte”.",
     item_acceptance_inbox: "Skrzynka akceptacji i karta oceny",
     item_talent_pool_import: "Import puli talentów (CSV)",
-    item_ats_webhooks: "Webhooki ATS",
-    item_employer_calendar: "Sync kalendarza rekrutera",
+    item_ats_webhooks: "Webhooki ATS (podgląd gotowości)",
+    item_employer_calendar: "Rezerwacje kalendarza rekrutera (podgląd)",
     item_employer_billing: "Samodzielne rozliczenia i miejsca",
     item_team_tokens: "Tokeny dostępu zespołu",
     item_greenhouse_webhook: "Webhooki placement Greenhouse",
@@ -11740,6 +11753,10 @@ const pl: MessageTree = {
     founderLedExamplesBadge: "Przykłady founder-led",
     socialProofIllustrativeNote: "Przykład ilustracyjny — nie zweryfikowany dowód społeczny.",
     recruiterRoadmapPromosToggle: "Moduły pilota w roadmapie",
+    companyRoadmapPromosToggle: "Kokpit hiringu i command center (pilot)",
+    homepageStatsContextNote: "Liczniki produktu — reprezentatywny kontekst rynkowy, nie zweryfikowany dowód społeczny.",
+    integrationsPreviewNotLiveSyncNote:
+      "Podgląd / ograniczony pilot — import ATS i webhooki to tylko gotowość. Bez live sync w obie strony i bez automatycznego writeback.",
   },
   placementEmployer: {
     title: "Potwierdzenie zatrudnienia w TWIN",
@@ -14899,6 +14916,14 @@ const pl: MessageTree = {
     nextActionLead:
       "Gdy promocje są schowane, zacznij tam, gdzie zapadają decyzje — akceptuj, odrzucaj lub przekładaj dopasowanych kandydatów.",
     nextActionCta: "Otwórz skrzynkę rekrutera",
+  },
+  companyHub: {
+    nextActionEyebrow: "Rekomendowany krok",
+    nextActionTitle: "Zacznij od ról lub pipeline",
+    nextActionLead:
+      "Gdy promocje kokpitu są schowane, otwórz role, by ustawić bar hiringu, lub pipeline, by przejrzeć segmenty — tylko dane pilota.",
+    nextActionRolesCta: "Otwórz role",
+    nextActionPipelineCta: "Zobacz pipeline",
   },
   recruiterDailyCockpit: {
     navLink: "Kokpit dzienny",

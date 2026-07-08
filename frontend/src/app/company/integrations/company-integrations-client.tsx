@@ -7,6 +7,7 @@ import { useTranslation } from "@/components/language-provider";
 import { IntegrationRowStatusBadge } from "@/components/workspace/integration-row-status-badge";
 import { WorkspacePilotPageHeader } from "@/components/workspace/workspace-pilot-page-header";
 import type { TranslationKey } from "@/lib/i18n";
+import { INTEGRATIONS_HONEST_NOT_LIVE_SYNC } from "@/lib/product-polish-p5";
 import { Shell } from "@/components/ui";
 import { COMPANY_INTEGRATION_ROWS } from "@/lib/company-integrations-readiness";
 
@@ -32,6 +33,15 @@ export default function CompanyIntegrationsClient() {
         leadKey="companyIntegrations.lead"
         status="pilot"
       />
+
+      {INTEGRATIONS_HONEST_NOT_LIVE_SYNC ? (
+        <p
+          className="mb-6 rounded-xl border border-[var(--twin-border)]/80 bg-[var(--twin-surface-2)]/50 px-4 py-3 text-sm leading-relaxed text-[var(--twin-muted-strong)]"
+          data-testid="company-integrations-preview-note"
+        >
+          {t("productPolish.integrationsPreviewNotLiveSyncNote")}
+        </p>
+      ) : null}
 
       <ul className="space-y-3">
         {COMPANY_INTEGRATION_ROWS.map((row) => {

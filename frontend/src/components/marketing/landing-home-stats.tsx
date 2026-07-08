@@ -2,6 +2,7 @@
 
 import { useTranslation } from "@/components/language-provider";
 import { ScrollReveal } from "@/components/marketing/scroll-reveal";
+import { LIMIT_HOMEPAGE_SOCIAL_PROOF_BAND } from "@/lib/product-polish-p5";
 import { useMvpStats } from "@/lib/use-mvp-stats";
 
 export function LandingHomeStats() {
@@ -21,6 +22,11 @@ export function LandingHomeStats() {
   return (
     <section className="py-4 sm:py-6" aria-label={t("home.statsAria")}>
       <ScrollReveal>
+        {LIMIT_HOMEPAGE_SOCIAL_PROOF_BAND ? (
+          <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-muted)]">
+            {t("productPolish.homepageStatsContextNote")}
+          </p>
+        ) : null}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
           {items.map((item) => (
             <div
