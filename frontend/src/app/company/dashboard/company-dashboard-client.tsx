@@ -25,6 +25,7 @@ import {
   companySlugToLabel,
   writeRecruiterInboxSession,
 } from "@/lib/recruiter-inbox";
+import { SHOW_COMPANY_ONBOARDING_EMPTY_STATE } from "@/lib/product-polish-p1";
 
 function MetricCard({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
@@ -106,6 +107,20 @@ export default function CompanyDashboardClient() {
         <p className="twin-muted max-w-2xl text-sm leading-relaxed">{t("companyHiring.lead")}</p>
       </header>
 
+      {!payload && !loading && SHOW_COMPANY_ONBOARDING_EMPTY_STATE ? (
+        <GuidedEmptyState
+          title={t("companyHiring.onboardingTitle")}
+          message={t("companyHiring.onboardingBody")}
+          steps={[
+            t("companyHiring.onboardingStep1"),
+            t("companyHiring.onboardingStep2"),
+            t("companyHiring.onboardingStep3"),
+          ]}
+          actionLabel={t("companyHiring.onboardingCta")}
+          actionHref="#company-workspace-connect"
+        />
+      ) : null}
+
       <Link
         href={companyHiringCockpitHref()}
         data-testid={COMPANY_HIRING_COCKPIT_MARKERS.hubPromo}
@@ -132,33 +147,32 @@ export default function CompanyDashboardClient() {
         />
       </div>
 
-      <Card variant="soft" className="mb-6 border-[var(--twin-border)]/80 p-4">
-        <RecruiterAccessFields
-          token={token}
-          companySlug={companyRaw}
-          companyOptions={companyOptions}
-          onTokenChange={setToken}
-          onCompanySlugChange={setCompanyRaw}
-        />
-        <button
-          type="button"
-          onClick={() => void load()}
-          disabled={loading || !token.trim() || !companySlug}
-          className="twin-btn-primary mt-4 disabled:opacity-50"
-        >
-          {loading ? t("companyHiring.loading") : t("companyHiring.load")}
-        </button>
-      </Card>
-
-      {!payload && !loading ? (
-        <GuidedEmptyState
-          title={t("companyHiring.emptyTitle")}
-          message={t("companyHiring.emptyBody")}
-          steps={[t("companyHiring.emptyStep1"), t("companyHiring.emptyStep2")]}
-          actionLabel={t("companyHiring.load")}
-          onAction={() => void load()}
-        />
-      ) : null}
+      <details
+        id="company-workspace-connect"
+        className="mb-6 rounded-xl border border-[var(--twin-border)]/70 bg-[var(--twin-surface-2)]/30 p-4"
+        open={Boolean(payload)}
+      >
+        <summary className="twin-link cursor-pointer text-sm font-medium [&::-webkit-details-marker]:hidden">
+          {t("companyHiring.connectWorkspaceToggle")}
+        </summary>
+        <Card variant="soft" className="mt-4 border-[var(--twin-border)]/80 p-4">
+          <RecruiterAccessFields
+            token={token}
+            companySlug={companyRaw}
+            companyOptions={companyOptions}
+            onTokenChange={setToken}
+            onCompanySlugChange={setCompanyRaw}
+          />
+          <button
+            type="button"
+            onClick={() => void load()}
+            disabled={loading || !token.trim() || !companySlug}
+            className="twin-btn-primary mt-4 disabled:opacity-50"
+          >
+            {loading ? t("companyHiring.loading") : t("companyHiring.load")}
+          </button>
+        </Card>
+      </details>
 
       {payload ? (
         <div className="space-y-8">

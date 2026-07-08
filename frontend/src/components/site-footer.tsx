@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useTranslation } from "@/components/language-provider";
 import { clearCookieConsent } from "@/lib/cookie-consent";
 import { PUBLIC_FOOTER_SITEMAP_ENTRIES } from "@/lib/public-footer-sitemap-routes";
+import { HIDE_THIN_MARKETING_NAV_LINKS, THIN_MARKETING_PATHS } from "@/lib/product-polish-p1";
 
 const SOCIAL_LINKEDIN = "https://www.linkedin.com";
 const SOCIAL_GITHUB = "https://github.com/CzechowskiT/twin";
@@ -39,7 +40,11 @@ export function SiteFooter() {
     { href: "/partners", label: t("nav.partners") },
     { href: "/media", label: t("nav.media") },
     { href: "/contact", label: t("nav.contact") },
-  ];
+  ].filter(
+    (item) =>
+      !HIDE_THIN_MARKETING_NAV_LINKS ||
+      !THIN_MARKETING_PATHS.includes(item.href as (typeof THIN_MARKETING_PATHS)[number]),
+  );
 
   const sitemap = PUBLIC_FOOTER_SITEMAP_ENTRIES.map((entry) => ({
     href: entry.href,

@@ -27,6 +27,12 @@ import {
   showCorporateNav,
   showMarketingPersonaNav,
 } from "@/lib/persona-access";
+import {
+  HIDE_THIN_MARKETING_NAV_LINKS,
+  MOBILE_HEADER_DEMO_IN_MENU_ONLY,
+  MOBILE_HEADER_LANG_IN_MENU,
+  THIN_MARKETING_PATHS,
+} from "@/lib/product-polish-p1";
 
 function growthCtaClass(variant: GrowthCtaVariant, base: string): string {
   if (variant === "candidate") return `${base} twin-header-cta--roi twin-nav-roi-pill`;
@@ -117,7 +123,11 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
     { href: "/media" as const, label: t("nav.media") },
     { href: "/careers" as const, label: t("nav.careers") },
     { href: "/for-investors" as const, label: t("nav.forInvestors") },
-  ];
+  ].filter(
+    (item) =>
+      !HIDE_THIN_MARKETING_NAV_LINKS ||
+      !THIN_MARKETING_PATHS.includes(item.href as (typeof THIN_MARKETING_PATHS)[number]),
+  );
 
   const headerCtaBase = "twin-header-cta twin-touch-target";
   const demoPillClassName = `${headerCtaBase} twin-header-cta--roi twin-nav-roi-pill twin-nav-demo-pill${
@@ -241,7 +251,9 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
 
         <div className="ml-auto flex min-w-0 shrink-0 flex-wrap items-center justify-end gap-x-2 gap-y-1">
           {showHeaderDemoCta
-            ? renderHeaderDemoCta(`${demoPillClassName} inline-flex px-3 sm:px-4`)
+            ? renderHeaderDemoCta(
+                `${demoPillClassName} ${MOBILE_HEADER_DEMO_IN_MENU_ONLY ? "hidden md:inline-flex" : "inline-flex"} px-3 sm:px-4`,
+              )
             : null}
           {accountLinks.map((item) =>
             item.isLogout ? (
@@ -269,7 +281,7 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
             ),
           )}
           {showPersonaBadge && hasSession ? <PersonaBadge /> : null}
-          <LanguageSwitcher />
+          <LanguageSwitcher className={MOBILE_HEADER_LANG_IN_MENU ? "hidden md:block" : undefined} />
           <details ref={mobileMenuRef} className="relative md:hidden">
             <summary className="twin-touch-target flex cursor-pointer list-none items-center justify-center rounded border border-[var(--twin-border)] bg-[var(--twin-card)] px-3 text-sm font-semibold text-[var(--foreground)] [&::-webkit-details-marker]:hidden">
               {t("nav.menu")}
@@ -379,6 +391,11 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
                   </Link>
                 ),
               )}
+              {MOBILE_HEADER_LANG_IN_MENU ? (
+                <div className="mt-2 border-t border-[var(--twin-border)] pt-2 md:hidden">
+                  <LanguageSwitcher className="w-full [&_summary]:w-full [&_summary]:justify-center" />
+                </div>
+              ) : null}
             </nav>
           </details>
         </div>

@@ -403,23 +403,25 @@ export default function DashboardPage() {
           <>
             {hasProfile && profile ? <CareerCompassStrip profile={profile} /> : null}
 
-            <ProfileScrapePanel
-              user={user}
-              profile={profile}
-              showScrapePanel={showScrapePanel}
-              scraping={polling.scraping}
-              scrapePollActive={polling.scrapePollActive}
-              jobsTotal={jobs?.total ?? 0}
-              error={error}
-              onTriggerScrape={() =>
-                void polling.triggerScrapeAll({
-                  hasProfile,
-                  filters,
-                  jobsTotal: jobs?.total ?? 0,
-                })
-              }
-              onOpenLinkedinOptimizer={modals.openLinkedin}
-            />
+            {showScrapePanel ? (
+              <ProfileScrapePanel
+                user={user}
+                profile={profile}
+                showScrapePanel={showScrapePanel}
+                scraping={polling.scraping}
+                scrapePollActive={polling.scrapePollActive}
+                jobsTotal={jobs?.total ?? 0}
+                error={error}
+                onTriggerScrape={() =>
+                  void polling.triggerScrapeAll({
+                    hasProfile,
+                    filters,
+                    jobsTotal: jobs?.total ?? 0,
+                  })
+                }
+                onOpenLinkedinOptimizer={modals.openLinkedin}
+              />
+            ) : null}
 
             {hasProfile && (matchesInitialSkeleton || matches !== null) ? (
               <MatchesSection
