@@ -10,10 +10,20 @@ import { useTranslation } from "@/components/language-provider";
 import type { TranslationKey } from "@/lib/i18n";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
+import { CompanyHubNextAction } from "@/components/company/company-hub-next-action";
 import {
   COMPANY_HIRING_COCKPIT_MARKERS,
   companyHiringCockpitHref,
 } from "@/lib/company-hiring-cockpit";
+import {
+  COMPANY_HIRING_COMMAND_CENTER_MARKERS,
+  companyHiringCommandCenterHref,
+} from "@/lib/company-hiring-command-center";
+import {
+  SHOW_COMPANY_HUB_NEXT_ACTION,
+  SHOW_COMPANY_HUB_PRIMARY_PROMOS,
+  SHOW_COMPANY_HUB_ROADMAP_PROMOS_COLLAPSED,
+} from "@/lib/product-polish-p5";
 import {
   type CompanyHiringDashboardPayload,
 } from "@/lib/company-hiring-dashboard";
@@ -121,23 +131,62 @@ export default function CompanyDashboardClient() {
         />
       ) : null}
 
-      <Link
-        href={companyHiringCockpitHref()}
-        data-testid={COMPANY_HIRING_COCKPIT_MARKERS.hubPromo}
-        className="mb-6 block rounded-2xl transition hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--twin-accent)]"
-      >
-        <Card
-          variant="soft"
-          className="border-violet-500/25 bg-gradient-to-br from-violet-500/10 to-[var(--twin-surface-2)]/60 p-5 sm:p-6"
+      {SHOW_COMPANY_HUB_PRIMARY_PROMOS ? (
+        <Link
+          href={companyHiringCockpitHref()}
+          data-testid={COMPANY_HIRING_COCKPIT_MARKERS.hubPromo}
+          className="mb-6 block rounded-2xl transition hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--twin-accent)]"
         >
-          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-violet-300">
-            {t("companyHiringCockpit.pageEyebrow")}
-          </p>
-          <h2 className="mt-2 text-xl font-semibold text-[var(--foreground)]">{t("companyHiringCockpit.title")}</h2>
-          <p className="twin-muted mt-2 max-w-3xl text-sm leading-relaxed">{t("companyHiringCockpit.lead")}</p>
-          <p className="mt-4 text-sm font-medium text-[var(--twin-accent)]">{t("companyHiringCockpit.openHiringCockpit")} →</p>
-        </Card>
-      </Link>
+          <Card
+            variant="soft"
+            className="border-violet-500/25 bg-gradient-to-br from-violet-500/10 to-[var(--twin-surface-2)]/60 p-5 sm:p-6"
+          >
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-violet-300">
+              {t("companyHiringCockpit.pageEyebrow")}
+            </p>
+            <h2 className="mt-2 text-xl font-semibold text-[var(--foreground)]">{t("companyHiringCockpit.title")}</h2>
+            <p className="twin-muted mt-2 max-w-3xl text-sm leading-relaxed">{t("companyHiringCockpit.lead")}</p>
+            <p className="mt-4 text-sm font-medium text-[var(--twin-accent)]">
+              {t("companyHiringCockpit.openHiringCockpit")} →
+            </p>
+          </Card>
+        </Link>
+      ) : null}
+      {!SHOW_COMPANY_HUB_PRIMARY_PROMOS && SHOW_COMPANY_HUB_ROADMAP_PROMOS_COLLAPSED ? (
+        <details
+          className="mb-6 rounded-xl border border-[var(--twin-border)]/70 bg-[var(--twin-surface-2)]/30 p-4"
+          data-company-hub-roadmap-promos
+        >
+          <summary className="twin-link cursor-pointer text-sm font-medium [&::-webkit-details-marker]:hidden">
+            {t("productPolish.companyRoadmapPromosToggle")}
+          </summary>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <Link
+              href={companyHiringCockpitHref()}
+              data-testid={COMPANY_HIRING_COCKPIT_MARKERS.hubPromo}
+              className="rounded-lg border border-[var(--twin-border)]/80 bg-[var(--twin-surface)]/60 p-4 text-sm transition hover:border-[var(--twin-accent)]/40"
+            >
+              <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-muted)]">
+                {t("productPolish.previewLabel")}
+              </p>
+              <p className="mt-2 font-medium text-[var(--foreground)]">{t("companyHiringCockpit.title")}</p>
+              <p className="twin-muted mt-1 text-xs leading-relaxed">{t("companyHiringCockpit.lead")}</p>
+            </Link>
+            <Link
+              href={companyHiringCommandCenterHref()}
+              data-testid={COMPANY_HIRING_COMMAND_CENTER_MARKERS.page}
+              className="rounded-lg border border-[var(--twin-border)]/80 bg-[var(--twin-surface)]/60 p-4 text-sm transition hover:border-[var(--twin-accent)]/40"
+            >
+              <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-muted)]">
+                {t("productPolish.previewLabel")}
+              </p>
+              <p className="mt-2 font-medium text-[var(--foreground)]">{t("companyHiringCommandCenter.title")}</p>
+              <p className="twin-muted mt-1 text-xs leading-relaxed">{t("companyHiringCommandCenter.lead")}</p>
+            </Link>
+          </div>
+        </details>
+      ) : null}
+      {!SHOW_COMPANY_HUB_PRIMARY_PROMOS && SHOW_COMPANY_HUB_NEXT_ACTION ? <CompanyHubNextAction /> : null}
 
       <div className="mb-8" data-testid="company-module-grid">
         <SystemOfRecordNavigationHub

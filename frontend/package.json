@@ -73,6 +73,7 @@
     "test:product-polish-p2-guard": "npx --yes tsx scripts/product-polish-p2-guard.test.ts",
     "test:product-polish-p3-guard": "npx --yes tsx scripts/product-polish-p3-guard.test.ts",
     "test:product-polish-p4-guard": "npx --yes tsx scripts/product-polish-p4-guard.test.ts",
+    "test:product-polish-p5-guard": "npx --yes tsx scripts/product-polish-p5-guard.test.ts",
     "test:product-scope-reality-review-guard": "npx --yes tsx scripts/product-scope-reality-review-guard.test.ts",
     "test:public-marketing-consistency": "npx --yes tsx scripts/public-marketing-consistency.test.ts",
     "test:public-marketing-copy-consistency": "npx --yes tsx scripts/public-marketing-copy-consistency.test.ts",
