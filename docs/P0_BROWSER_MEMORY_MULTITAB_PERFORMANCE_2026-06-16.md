@@ -65,6 +65,8 @@ npx tsc --noEmit
 
 Unchanged: public **NO-GO**, auto-apply **PAUSED**, no auth relaxation.
 
+**Addendum (2026-07-07):** P0 performance track **CLOSED** per [P0 closure decision](./P0_CLOSURE_DECISION_2026-07-07.md). Remaining multitab RSS/memory/swap issues → **Performance 2.0** backlog — **not** P0 blockers. Gate F **PENDING**.
+
 ## Related docs
 
 - `docs/P0_RENDERER_MEMORY_PROFILE_2026-06-16.md` — renderer bundle split (this PR's companion)

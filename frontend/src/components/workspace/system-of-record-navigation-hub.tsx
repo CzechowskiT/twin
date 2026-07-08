@@ -1,16 +1,34 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import type { TranslationKey } from "@/lib/i18n";
 import type { MarketingPersona } from "@/lib/marketing-persona";
+import { splitProductSurfaceRoutes } from "@/lib/product-surface-visibility";
 import {
   getSystemOfRecordRoutesForPersona,
+  groupInvestorSoRRoutes,
+  INVESTOR_SOR_GROUP_HEADING_KEYS,
+  INVESTOR_SOR_GROUP_LEAD_KEYS,
+  INVESTOR_SOR_GROUP_ORDER,
   SYSTEM_OF_RECORD_HUB_MARKER,
+  type SystemOfRecordRouteEntry,
 } from "@/lib/system-of-record-routes";
 
 import { SystemOfRecordModuleCard } from "./system-of-record-module-card";
+
+function SoRModuleGrid({ routes }: { routes: readonly SystemOfRecordRouteEntry[] }) {
+  return (
+    <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {routes.map((route) => (
+        <li key={route.id} className="min-w-0">
+          <SystemOfRecordModuleCard route={route} />
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export function SystemOfRecordNavigationHub({
   persona,
@@ -27,6 +45,11 @@ export function SystemOfRecordNavigationHub({
 }) {
   const { t } = useTranslation();
   const routes = getSystemOfRecordRoutesForPersona(persona);
+  const [roadmapExpanded, setRoadmapExpanded] = useState(false);
+  const surface =
+    persona === "investor"
+      ? { primary: routes, roadmap: [] as readonly SystemOfRecordRouteEntry[], hidden: [] }
+      : splitProductSurfaceRoutes(persona, routes);
 
   return (
     <section
@@ -42,13 +65,63 @@ export function SystemOfRecordNavigationHub({
         {t(titleKey)}
       </h2>
       <p className="twin-muted mt-2 max-w-3xl text-sm leading-relaxed">{t(leadKey)}</p>
-      <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {routes.map((route) => (
-          <li key={route.id} className="min-w-0">
-            <SystemOfRecordModuleCard route={route} />
-          </li>
-        ))}
-      </ul>
+      {persona === "investor" ? (
+        <div className="mt-4 space-y-8">
+          {INVESTOR_SOR_GROUP_ORDER.map((group) => {
+            const groupRoutes = groupInvestorSoRRoutes(routes)[group];
+            if (groupRoutes.length === 0) return null;
+            return (
+              <div key={group} data-sor-investor-group={group}>
+                <h3 className="text-sm font-semibold text-[var(--foreground)]">
+                  {t(INVESTOR_SOR_GROUP_HEADING_KEYS[group])}
+                </h3>
+                <p className="twin-muted mt-1 max-w-3xl text-xs leading-relaxed">
+                  {t(INVESTOR_SOR_GROUP_LEAD_KEYS[group])}
+                </p>
+                <div className="mt-3">
+                  <SoRModuleGrid routes={groupRoutes} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="mt-4 space-y-6" data-product-surface-hub={persona}>
+          <div data-product-surface-primary>
+            <SoRModuleGrid routes={surface.primary} />
+          </div>
+          {surface.roadmap.length > 0 ? (
+            <div data-product-surface-roadmap>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h3 className="text-sm font-semibold text-[var(--foreground)]">
+                    {t("productSurface.roadmapSectionTitle")}
+                  </h3>
+                  <p className="twin-muted mt-1 max-w-3xl text-xs leading-relaxed">
+                    {t("productSurface.roadmapSectionLead")}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="twin-link text-sm font-semibold"
+                  onClick={() => setRoadmapExpanded((open) => !open)}
+                  aria-expanded={roadmapExpanded}
+                  data-testid="product-surface-roadmap-toggle"
+                >
+                  {roadmapExpanded
+                    ? t("productSurface.hideRoadmapModules")
+                    : t("productSurface.showRoadmapModules")}
+                </button>
+              </div>
+              {roadmapExpanded ? (
+                <div className="mt-3">
+                  <SoRModuleGrid routes={surface.roadmap} />
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+      )}
       {children}
     </section>
   );

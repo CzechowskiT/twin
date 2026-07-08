@@ -29,14 +29,6 @@ function MicrosoftSquares() {
   );
 }
 
-/**
- * Small rounded accent chip — decorative brand-color token, not a logo mark.
- * Sized/positioned to stay fully inside the 0–16 viewBox (no clipping).
- */
-function NvidiaAccent() {
-  return <rect x={0} y={0} width={8} height={8} rx={2} fill="#76B900" />;
-}
-
 function AmazonSmile() {
   return (
     <path
@@ -125,24 +117,21 @@ function BrandSvgContent({ slug }: { slug: PerformanceSafeCuratedLogoSlug }) {
         </>
       );
     case "nvidia":
+      // Text-only wordmark: no real NVIDIA logo asset is licensed in this repo,
+      // so we never render a pseudo-icon/accent shape standing in for the mark.
       return (
-        <>
-          <g transform="translate(14 4)">
-            <NvidiaAccent />
-          </g>
-          <text
-            x={56}
-            y={12.5}
-            textAnchor="middle"
-            fontFamily={FONT}
-            fontSize={13}
-            fontWeight={700}
-            letterSpacing={0.6}
-            fill={spec.brandColor}
-          >
-            NVIDIA
-          </text>
-        </>
+        <text
+          x={44}
+          y={12.5}
+          textAnchor="middle"
+          fontFamily={FONT}
+          fontSize={13}
+          fontWeight={700}
+          letterSpacing={0.6}
+          fill={spec.brandColor}
+        >
+          NVIDIA
+        </text>
       );
     case "meta":
       return (

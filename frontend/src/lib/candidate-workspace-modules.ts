@@ -36,7 +36,7 @@ export const CANDIDATE_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     titleKey: "workspaceModules.candidateCareerTitle",
     valuePropKey: "workspaceModules.candidateCareerValue",
     ctaKey: "workspaceModules.candidateCareerCta",
-    status: "live",
+    status: "pilot",
   },
   {
     id: "plan_payments",
@@ -63,6 +63,15 @@ export const CANDIDATE_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     hintKey: "workspaceModules.candidateIdentityHint",
     ctaKey: "workspaceModules.candidateIdentityCta",
     status: "live",
+  },
+  {
+    id: "trust_center",
+    href: CANDIDATE_CANONICAL_ROUTES.trust,
+    titleKey: "workspaceModules.candidateTrustCenterTitle",
+    valuePropKey: "workspaceModules.candidateTrustCenterValue",
+    hintKey: "workspaceModules.candidateTrustCenterHint",
+    ctaKey: "workspaceModules.candidateTrustCenterCta",
+    status: "pilot",
   },
   {
     id: "calendar",

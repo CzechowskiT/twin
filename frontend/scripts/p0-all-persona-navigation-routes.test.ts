@@ -97,14 +97,15 @@ test("7 investor module hrefs do not point at missing pages", () => {
   }
 });
 
-test("8 scorecard and scheduling CTAs deep-link to inbox not missing routes", () => {
-  const inbox = RECRUITER_WORKSPACE_MODULES.filter((m) =>
-    ["notes_scorecards", "scheduling", "audit"].includes(m.id),
+test("8 recruiter inbox is a single module card — no duplicate inbox CTAs", () => {
+  const inboxModules = RECRUITER_WORKSPACE_MODULES.filter(
+    (m) => normalizeHref(m.href) === "/recruiter/inbox",
   );
-  assert.ok(inbox.length >= 3);
-  for (const mod of inbox) {
-    assert.equal(normalizeHref(mod.href), "/recruiter/inbox");
-    assert.ok(routePageExists(mod.href));
+  assert.equal(inboxModules.length, 1);
+  assert.equal(inboxModules[0]?.id, "inbox");
+  assert.ok(routePageExists("/recruiter/inbox"));
+  for (const duplicateId of ["notes_scorecards", "scheduling", "audit"] as const) {
+    assert.ok(!RECRUITER_WORKSPACE_MODULES.some((m) => m.id === duplicateId));
   }
 });
 
@@ -166,4 +167,27 @@ test("15 workspace module cards avoid hidden PII field patterns in configs", () 
   const blob = JSON.stringify(allModules);
   assert.doesNotMatch(blob, /email|phone|ssn|password/i);
   assert.doesNotMatch(blob, /candidate_name|recruiter_email/i);
+});
+
+test("16 company live pipeline module exposes tenant hint — distinct from demo pipeline", () => {
+  const pipeline = COMPANY_WORKSPACE_MODULES.find((m) => m.id === "pipeline");
+  assert.ok(pipeline);
+  assert.equal(pipeline!.status, "live");
+  assert.ok(pipeline!.hintKey);
+  const hint = en.workspaceModules.companyPipelineHint.toLowerCase();
+  assert.match(hint, /no ats|ats writeback|writeback/i);
+  assert.match(en.workspaceModules.companyPipelineValue.toLowerCase(), /not the sample|live segment/i);
+  assert.match(en.jobPipeline.demoJourneyDesc.toLowerCase(), /sample|demo|not your live/i);
+});
+
+test("17 candidate trust center module resolves to canonical trust route", () => {
+  const trust = CANDIDATE_WORKSPACE_MODULES.find((m) => m.id === "trust_center");
+  assert.ok(trust);
+  assert.equal(trust!.href, CANDIDATE_CANONICAL_ROUTES.trust);
+  assert.equal(trust!.status, "pilot");
+  assert.ok(routePageExists(CANDIDATE_CANONICAL_ROUTES.trust));
+  const duplicateTrust = CANDIDATE_WORKSPACE_MODULES.filter(
+    (m) => m.href === CANDIDATE_CANONICAL_ROUTES.trust,
+  );
+  assert.equal(duplicateTrust.length, 1);
 });

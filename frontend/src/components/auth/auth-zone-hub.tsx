@@ -112,7 +112,9 @@ export function AuthZoneHub({
   );
 }
 
-function IconCandidate({ className = "h-5 w-5" }: { className?: string }) {
+const ZONE_ICON_CLASS = "block h-5 w-5 shrink-0";
+
+function IconCandidate({ className = ZONE_ICON_CLASS }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -121,7 +123,7 @@ function IconCandidate({ className = "h-5 w-5" }: { className?: string }) {
   );
 }
 
-function IconRecruiter({ className = "h-5 w-5" }: { className?: string }) {
+function IconRecruiter({ className = ZONE_ICON_CLASS }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
       <path d="M22 12h-6l-2 3h-4l-2-3H2" />
@@ -130,7 +132,7 @@ function IconRecruiter({ className = "h-5 w-5" }: { className?: string }) {
   );
 }
 
-function IconCompany({ className = "h-5 w-5" }: { className?: string }) {
+function IconCompany({ className = ZONE_ICON_CLASS }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
       <path d="M3 21h18" />
@@ -144,7 +146,7 @@ function IconCompany({ className = "h-5 w-5" }: { className?: string }) {
   );
 }
 
-function IconInvestor({ className = "h-5 w-5" }: { className?: string }) {
+function IconInvestor({ className = ZONE_ICON_CLASS }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
       <path d="M3 3v18h18" />

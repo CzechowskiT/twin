@@ -6,6 +6,7 @@ import {
   CANDIDATE_CALENDAR_HREF,
   candidateCalendarHref,
   headerAccountLinks,
+  headerGrowthLinksForPersona,
   headerMarketingLaneLinks,
   headerSessionNavLinks,
   isSessionNavLinkActive,
@@ -81,4 +82,10 @@ test("headerAccountLinks for logged-in users show panel and logout only", () => 
 test("marketing persona nav is logged-out marketing chrome only", () => {
   assert.equal(showMarketingPersonaNav(false, true), true);
   assert.equal(headerMarketingLaneLinks().some((l) => l.href === "/demo"), true);
+  assert.equal(headerMarketingLaneLinks().some((l) => l.href === "/investor"), false);
+});
+
+test("logged-out growth pill on recruiter lanes points to demo, not B2B calculator", () => {
+  const recruiter = headerGrowthLinksForPersona("recruiter", "/for-recruiters", false);
+  assert.deepEqual(recruiter, [{ href: "/demo", labelKey: "nav.demo", variant: "candidate" }]);
 });

@@ -1,0 +1,250 @@
+/**
+ * Slice 25 — launch readiness evidence index + founder demo checklist (static, no browser).
+ */
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import test from "node:test";
+
+const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const repoRoot = join(root, "..");
+
+const EVIDENCE_INDEX = "docs/LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md";
+const FOUNDER_CHECKLIST = "docs/FOUNDER_DEMO_CHECKLIST_2026-06-28.md";
+
+const DEMO_PATH_ROUTES = [
+  "/",
+  "/#explore-twin",
+  "/for-investors",
+  "/investor",
+  "/investor/product-proof",
+  "/demo",
+  "/how-it-works",
+  "/faq",
+  "/dashboard/trust",
+  "/status",
+] as const;
+
+const REQUIRED_SOURCE_DOCS = [
+  "gate-c-browser-validation-result-2026-06-28.md",
+  "gate-d-prod-browser-smoke-decision-2026-06-28.md",
+  "gate-d-prod-browser-smoke-preflight-2026-06-28.md",
+  "gate-d-prod-browser-smoke-result-2026-06-28.md",
+  "gate-d-prod-browser-smoke-result-template-2026-06-28.md",
+  "GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28.md",
+  "GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md",
+  "gate-e-phase3b-prerequisites-decision-2026-06-28.md",
+  "gate-e-phase3b-result-template-2026-06-28.md",
+  "gate-e-phase3b-result-2026-06-28.md",
+  "gate-e-phase3b-attempt-1-aborted-resource-safety-2026-06-28.md",
+  "PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md",
+  "GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29.md",
+  "gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md",
+  "gate-e-phase3b-retry-with-token-result-2026-06-29.md",
+  "TWIN_PUBLIC_LAUNCH_READINESS_PLAN_2026-06-27.md",
+  "TWIN_OPERATING_CONTEXT_2026-06-26.md",
+] as const;
+
+function readRepo(relativePath: string): string {
+  return readFileSync(join(repoRoot, relativePath), "utf8");
+}
+
+test("1 evidence index and founder checklist docs exist", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  const checklist = readRepo(FOUNDER_CHECKLIST);
+  assert.match(index, /Launch Readiness Evidence Index/);
+  assert.match(checklist, /Founder Demo Checklist/);
+});
+
+test("2 evidence index — Launch NO-GO, P0 CLOSED, Gate D YES prod PASS, Gate E PASS attempt 19", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /NO-GO/i);
+  assert.match(index, /P0.*CLOSED/i);
+  assert.match(index, /Gate D.*YES/i);
+  assert.match(index, /36\/36 PASS/i);
+  assert.match(index, /Gate E.*PASS|20\/20 PASS/i);
+  assert.match(index, /Phase 3B.*PASS.*20\/20|20\/20.*PASS/i);
+  assert.match(index, /28849996684/);
+});
+
+test("3 evidence index — no launch approval or Gate F YES claims", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.doesNotMatch(index, /Launch stance:\s*\*\*GO\*\*/i);
+  assert.doesNotMatch(index, /Gate F.*\*\*YES\*\*/i);
+  assert.doesNotMatch(index, /launch approved/i);
+  assert.match(index, /Canonical status \(2026-07-07\)/i);
+  assert.match(index, /P0.*CLOSED/i);
+});
+
+test("4 founder demo checklist — all demo path routes present", () => {
+  const checklist = readRepo(FOUNDER_CHECKLIST);
+  for (const route of DEMO_PATH_ROUTES) {
+    const escaped = route.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    assert.match(checklist, new RegExp(escaped));
+  }
+});
+
+test("5 founder demo checklist — What Not To Say section lists forbidden live claims", () => {
+  const checklist = readRepo(FOUNDER_CHECKLIST);
+  assert.match(checklist, /What Not To Say/i);
+  const section = checklist.split("## 5. What Not To Say")[1]?.split("## 6.")[0] ?? "";
+  assert.match(section, /launch-ready|production-ready/i);
+  assert.match(section, /P0 closed/i);
+  assert.match(section, /Phase 3B passed/i);
+  assert.match(section, /live ATS|ATS writeback/i);
+  assert.match(section, /outreach/i);
+  assert.match(section, /calendar write/i);
+  assert.match(section, /payment|revenue/i);
+  assert.match(section, /placement confirmed/i);
+});
+
+test("6 evidence index — source docs list includes gate C/D/E, launch plan, operating context", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  const sourceSection = index.split("## 10. Source Documents")[1] ?? index;
+  for (const doc of REQUIRED_SOURCE_DOCS) {
+    assert.match(sourceSection, new RegExp(doc.replace(".", "\\.")));
+  }
+});
+
+test("7 evidence index links founder demo checklist", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /FOUNDER_DEMO_CHECKLIST_2026-06-28\.md/);
+});
+
+test("8 LAUNCH_STANCE remains noGo in code", () => {
+  const launchStance = readFileSync(join(root, "src/lib/investor-metrics-reality.ts"), "utf8");
+  assert.match(launchStance, /LAUNCH_STANCE\s*=\s*"noGo"/);
+});
+
+test("9 evidence index references Gate D preflight and Gate D prod result", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /gate-d-prod-browser-smoke-preflight-2026-06-28\.md/);
+  assert.match(index, /gate-d-prod-browser-smoke-result-2026-06-28\.md/);
+  assert.match(index, /Gate D.*YES/i);
+  assert.match(index, /Gate E.*YES/i);
+  assert.match(index, /NO-GO/i);
+  assert.match(index, /P0.*CLOSED/i);
+});
+
+test("10 evidence index references Gate D result template or result process", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /gate-d-prod-browser-smoke-result-template-2026-06-28\.md/);
+  assert.match(index, /result template|fill.*template/i);
+});
+
+test("11 evidence index references Gate D prod result — not Phase 3B PASS", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /gate-d-prod-browser-smoke-result-2026-06-28\.md/);
+  assert.match(index, /Gate D.*YES/i);
+  assert.match(index, /Gate E.*YES/i);
+  assert.match(index, /NO-GO/i);
+  assert.match(index, /P0.*CLOSED/i);
+});
+
+test("12 evidence index references Gate D founder decision checkpoint", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /GATE_D_FOUNDER_DECISION_CHECKPOINT_2026-06-28\.md/);
+  assert.match(index, /Gate D.*YES/i);
+  assert.match(index, /Gate E.*YES/i);
+  assert.match(index, /NO-GO/i);
+  assert.match(index, /P0.*CLOSED/i);
+});
+
+test("13 evidence index references readiness consistency lock guard", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /test:readiness-consistency-lock/);
+  assert.match(index, /readiness-consistency-lock/);
+  assert.match(index, /Gate D.*YES/i);
+  assert.match(index, /Gate E.*YES/i);
+  assert.match(index, /NO-GO/i);
+  assert.match(index, /P0.*CLOSED/i);
+});
+
+test("14 evidence index references gate D prod browser smoke result guard", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /test:gate-d-prod-browser-smoke-result/);
+  assert.match(index, /gate-d-prod-browser-smoke-result/);
+  assert.match(index, /Gate D.*YES/i);
+  assert.match(index, /Gate E.*YES/i);
+  assert.match(index, /NO-GO/i);
+  assert.match(index, /P0.*CLOSED/i);
+});
+
+test("15 evidence index references Gate E founder decision package", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28\.md/);
+  assert.match(index, /test:gate-e-founder-decision-package/);
+  assert.match(index, /Gate D.*YES/i);
+  assert.match(index, /Gate E.*YES/i);
+  assert.match(index, /Phase 3B.*PASS.*20\/20|20\/20.*PASS/i);
+  assert.match(index, /NO-GO/i);
+  assert.match(index, /P0.*CLOSED/i);
+});
+
+test("16 evidence index references gate E phase3b result guard", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /test:gate-e-phase3b-result/);
+  assert.match(index, /gate-e-phase3b-result-2026-06-28/);
+  assert.match(index, /Gate E.*YES/i);
+  assert.match(index, /Phase 3B.*PASS.*20\/20|20\/20.*PASS/i);
+  assert.match(index, /NO-GO/i);
+  assert.match(index, /P0.*CLOSED/i);
+});
+
+test("17 evidence index references phase3b harness diagnostics guard", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /test:phase3b-harness-diagnostics/);
+  assert.match(index, /PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29/);
+  assert.match(index, /Phase 3B.*PASS.*20\/20|20\/20.*PASS/i);
+  assert.match(index, /NO-GO/i);
+  assert.match(index, /P0.*CLOSED/i);
+});
+
+test("18 evidence index references gate E retry-after-harness-fix checkpoint and post-harness result", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /GATE_E_RETRY_AFTER_HARNESS_FIX_CHECKPOINT_2026-06-29/);
+  assert.match(index, /gate-e-phase3b-retry-after-harness-fix-result-2026-06-29/);
+  assert.match(index, /test:gate-e-retry-after-harness-fix-checkpoint/);
+  assert.match(index, /test:gate-e-retry-after-harness-fix-result/);
+  assert.match(index, /2969b1f4/);
+  assert.match(index, /AUTH_TOKEN_REQUIRED|PARTIAL/i);
+  assert.match(index, /Phase 3B.*PASS.*20\/20|20\/20.*PASS/i);
+  assert.match(index, /NO-GO/i);
+  assert.match(index, /P0.*CLOSED/i);
+  assert.doesNotMatch(index, /Gate F.*\*\*YES\*\*/i);
+});
+
+test("19 evidence index — post-harness retry PARTIAL; browser NOT RUN", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /Gate E post-harness retry: PARTIAL|PARTIAL.*AUTH_TOKEN_REQUIRED/i);
+  assert.match(index, /browser.*NOT RUN|NOT RUN/i);
+  const result = readRepo("docs/gate-e-phase3b-retry-after-harness-fix-result-2026-06-29.md");
+  assert.match(result, /verdict:\s+PARTIAL/i);
+  assert.match(result, /token present in env:\s+false/i);
+});
+
+test("20 evidence index — with-token retry PARTIAL; browser NOT RUN", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /gate-e-phase3b-retry-with-token-result-2026-06-29/);
+  assert.match(index, /test:gate-e-retry-with-token-result/);
+  assert.match(index, /Gate E retry \(with token\).*PARTIAL|with-token.*PARTIAL/i);
+  assert.match(index, /browser.*NOT RUN|NOT RUN/i);
+  const result = readRepo("docs/gate-e-phase3b-retry-with-token-result-2026-06-29.md");
+  assert.match(result, /verdict:\s+PARTIAL/i);
+  assert.match(result, /token present in env:\s+false/i);
+  assert.match(result, /Attempt 3 — Execution Record/);
+  assert.doesNotMatch(result, /Phase 3B:\s*\*\*PASS\*\*/i);
+});
+
+test("21 evidence index references cursor-agent token loading fix (Slice 40); no overclaims", () => {
+  const index = readRepo(EVIDENCE_INDEX);
+  assert.match(index, /CURSOR_AGENT_TOKEN_LOADING_2026-06-29/);
+  assert.match(index, /test:cursor-agent-token-preflight/);
+  assert.match(index, /NO-GO/i);
+  assert.match(index, /P0.*CLOSED/i);
+  const tokenDoc = readRepo("docs/CURSOR_AGENT_TOKEN_LOADING_2026-06-29.md");
+  assert.match(tokenDoc, /load-local-test-env\.ts/);
+  assert.match(tokenDoc, /No print\/log\/commit token values|never log/i);
+  assert.doesNotMatch(tokenDoc, /Launch stance:\s*\*\*GO\*\*/i);
+});

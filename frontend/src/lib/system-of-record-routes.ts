@@ -64,6 +64,33 @@ export type SystemOfRecordModuleFamily =
   | "investor"
   | "demo";
 
+export type InvestorSoRGroup =
+  | "investorProduct"
+  | "boardEvidence"
+  | "demoProof"
+  | "accessContact";
+
+export const INVESTOR_SOR_GROUP_ORDER: readonly InvestorSoRGroup[] = [
+  "investorProduct",
+  "boardEvidence",
+  "demoProof",
+  "accessContact",
+];
+
+export const INVESTOR_SOR_GROUP_HEADING_KEYS: Record<InvestorSoRGroup, TranslationKey> = {
+  investorProduct: "systemOfRecord.investorGroupProductTitle",
+  boardEvidence: "systemOfRecord.investorGroupBoardTitle",
+  demoProof: "systemOfRecord.investorGroupDemoTitle",
+  accessContact: "systemOfRecord.investorGroupAccessTitle",
+};
+
+export const INVESTOR_SOR_GROUP_LEAD_KEYS: Record<InvestorSoRGroup, TranslationKey> = {
+  investorProduct: "systemOfRecord.investorGroupProductLead",
+  boardEvidence: "systemOfRecord.investorGroupBoardLead",
+  demoProof: "systemOfRecord.investorGroupDemoLead",
+  accessContact: "systemOfRecord.investorGroupAccessLead",
+};
+
 export type SystemOfRecordRouteEntry = {
   id: string;
   persona: MarketingPersona;
@@ -75,6 +102,8 @@ export type SystemOfRecordRouteEntry = {
   status: WorkspaceModuleStatus;
   moduleFamily: SystemOfRecordModuleFamily;
   boundaryTags: readonly SystemOfRecordBoundaryTag[];
+  /** Investor hub section — only set on investor persona entries. */
+  investorGroup?: InvestorSoRGroup;
 };
 
 export const SYSTEM_OF_RECORD_BOUNDARY_LABEL_KEYS: Record<
@@ -143,6 +172,18 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     status: "live",
     moduleFamily: "matches",
     boundaryTags: [],
+  },
+  {
+    id: "candidate_career_compass",
+    persona: "candidate",
+    href: "/dashboard/career",
+    titleKey: "workspaceModules.candidateCareerTitle",
+    descriptionKey: "workspaceModules.candidateCareerValue",
+    hintKey: "workspaceModules.candidateCareerHint",
+    ctaKey: "workspaceModules.candidateCareerCta",
+    status: "pilot",
+    moduleFamily: "dashboard",
+    boundaryTags: ["pilot"],
   },
   {
     id: "candidate_profile",
@@ -424,6 +465,17 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     boundaryTags: ["human_decision_required"],
   },
   {
+    id: "recruiter_pipeline",
+    persona: "recruiter",
+    href: "/recruiter/pipeline",
+    titleKey: "workspaceModules.recruiterPipelineTitle",
+    descriptionKey: "workspaceModules.recruiterPipelineValue",
+    ctaKey: "workspaceModules.recruiterPipelineCta",
+    status: "live",
+    moduleFamily: "pipeline",
+    boundaryTags: ["human_decision_required", "no_ats_sync"],
+  },
+  {
     id: "recruiter_jobs",
     persona: "recruiter",
     href: "/recruiter/jobs",
@@ -602,6 +654,18 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     moduleFamily: "talent",
     boundaryTags: [],
   },
+  {
+    id: "recruiter_calendar",
+    persona: "recruiter",
+    href: "/recruiter/calendar",
+    titleKey: "workspaceModules.recruiterCalendarTitle",
+    descriptionKey: "workspaceModules.recruiterCalendarValue",
+    hintKey: "workspaceModules.recruiterCalendarHint",
+    ctaKey: "workspaceModules.recruiterCalendarCta",
+    status: "not_live",
+    moduleFamily: "calendar",
+    boundaryTags: ["not_live"],
+  },
   // —— Company ——
   {
     id: "company_dashboard",
@@ -609,6 +673,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     href: COMPANY_HIRING_ROUTE,
     titleKey: "systemOfRecord.companyDashboardTitle",
     descriptionKey: "systemOfRecord.companyDashboardValue",
+    hintKey: "systemOfRecord.companyDashboardHint",
     ctaKey: "systemOfRecord.companyDashboardCta",
     status: "live",
     moduleFamily: "dashboard",
@@ -660,6 +725,18 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     boundaryTags: [],
   },
   {
+    id: "company_pipeline",
+    persona: "company",
+    href: "/company/pipeline",
+    titleKey: "workspaceModules.companyPipelineTitle",
+    descriptionKey: "workspaceModules.companyPipelineValue",
+    hintKey: "workspaceModules.companyPipelineHint",
+    ctaKey: "workspaceModules.companyPipelineCta",
+    status: "live",
+    moduleFamily: "pipeline",
+    boundaryTags: ["human_decision_required", "no_ats_sync"],
+  },
+  {
     id: "company_demo_pipeline",
     persona: "company",
     href: COMPANY_DEMO_PIPELINE,
@@ -668,7 +745,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     ctaKey: "systemOfRecord.openPipelineCta",
     status: "pilot",
     moduleFamily: "pipeline",
-    boundaryTags: ["pilot", "human_decision_required"],
+    boundaryTags: ["pilot", "human_decision_required", "no_ats_sync"],
   },
   {
     id: "company_talent_pool",
@@ -805,6 +882,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     status: "live",
     moduleFamily: "investor",
     boundaryTags: [],
+    investorGroup: "investorProduct",
   },
   {
     id: "investor_workspace_hub",
@@ -816,6 +894,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     status: "live",
     moduleFamily: "investor",
     boundaryTags: [],
+    investorGroup: "investorProduct",
   },
   {
     id: "investor_metrics",
@@ -828,6 +907,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     status: "live",
     moduleFamily: "investor",
     boundaryTags: [],
+    investorGroup: "investorProduct",
   },
   {
     id: "investor_roadmap",
@@ -839,6 +919,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     status: "live",
     moduleFamily: "investor",
     boundaryTags: [],
+    investorGroup: "investorProduct",
   },
   {
     id: "investor_data_room",
@@ -851,6 +932,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     status: "pilot",
     moduleFamily: "investor",
     boundaryTags: ["pilot"],
+    investorGroup: "investorProduct",
   },
   {
     id: "investor_calculator",
@@ -862,6 +944,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     status: "live",
     moduleFamily: "investor",
     boundaryTags: [],
+    investorGroup: "investorProduct",
   },
   {
     id: "investor_placement",
@@ -873,6 +956,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     status: "pilot",
     moduleFamily: "investor",
     boundaryTags: ["pilot", "human_decision_required"],
+    investorGroup: "investorProduct",
   },
   {
     id: "working_features_readiness",
@@ -884,6 +968,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     status: "pilot",
     moduleFamily: "trust",
     boundaryTags: ["pilot", "human_decision_required", "no_outreach"],
+    investorGroup: "boardEvidence",
   },
   {
     id: "working_data_readiness",
@@ -895,6 +980,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     status: "pilot",
     moduleFamily: "trust",
     boundaryTags: ["pilot", "human_decision_required", "no_outreach", "not_live"],
+    investorGroup: "boardEvidence",
   },
   {
     id: "board_implementation_tracker",
@@ -906,6 +992,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     status: "pilot",
     moduleFamily: "trust",
     boundaryTags: ["pilot", "human_decision_required", "no_outreach", "not_live"],
+    investorGroup: "boardEvidence",
   },
   {
     id: "production_persistence_status",
@@ -917,6 +1004,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     status: "pilot",
     moduleFamily: "trust",
     boundaryTags: ["pilot", "human_decision_required", "no_outreach", "not_live"],
+    investorGroup: "boardEvidence",
   },
   {
     id: "first_working_persistence_plan",
@@ -928,6 +1016,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     status: "pilot",
     moduleFamily: "trust",
     boundaryTags: ["pilot", "human_decision_required", "no_outreach", "not_live"],
+    investorGroup: "boardEvidence",
   },
   {
     id: "audit_event_foundation",
@@ -939,6 +1028,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     status: "pilot",
     moduleFamily: "trust",
     boundaryTags: ["pilot", "human_decision_required", "no_outreach", "not_live"],
+    investorGroup: "boardEvidence",
   },
   {
     id: "investor_trust_proof",
@@ -950,6 +1040,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     status: "pilot",
     moduleFamily: "trust",
     boundaryTags: ["pilot", "human_decision_required", "no_outreach"],
+    investorGroup: "investorProduct",
   },
   {
     id: "investor_product_proof",
@@ -957,10 +1048,12 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     href: "/investor/product-proof",
     titleKey: "executiveProductProof.demoJourneyTitle",
     descriptionKey: "executiveProductProof.demoJourneyDesc",
+    hintKey: "executiveProductProof.sorHubHint",
     ctaKey: "executiveProductProof.openProductProofCta",
     status: "live",
     moduleFamily: "investor",
     boundaryTags: ["human_decision_required", "no_outreach", "no_ats_sync"],
+    investorGroup: "investorProduct",
   },
   {
     id: "investor_demo",
@@ -972,6 +1065,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     status: "live",
     moduleFamily: "demo",
     boundaryTags: [],
+    investorGroup: "demoProof",
   },
   {
     id: "investor_sor_proof_pipeline",
@@ -983,6 +1077,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     status: "pilot",
     moduleFamily: "demo",
     boundaryTags: ["pilot", "human_decision_required"],
+    investorGroup: "demoProof",
   },
   {
     id: "investor_sor_proof_collaboration",
@@ -994,6 +1089,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     status: "pilot",
     moduleFamily: "demo",
     boundaryTags: ["pilot", "draft_only", "no_outreach"],
+    investorGroup: "demoProof",
   },
   {
     id: "investor_sor_proof_ats",
@@ -1005,6 +1101,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     status: "pilot",
     moduleFamily: "demo",
     boundaryTags: ["pilot", "no_ats_sync"],
+    investorGroup: "demoProof",
   },
 ] as const;
 
@@ -1012,6 +1109,29 @@ export function getSystemOfRecordRoutesForPersona(
   persona: MarketingPersona,
 ): readonly SystemOfRecordRouteEntry[] {
   return SYSTEM_OF_RECORD_ROUTES.filter((entry) => entry.persona === persona);
+}
+
+/** Resolve investor hub section — explicit field first, then href/moduleFamily heuristics. */
+export function resolveInvestorSoRGroup(entry: SystemOfRecordRouteEntry): InvestorSoRGroup {
+  if (entry.investorGroup) return entry.investorGroup;
+  if (entry.href.startsWith("/board/")) return "boardEvidence";
+  if (entry.href.startsWith("mailto:")) return "accessContact";
+  if (entry.href === "/demo" || entry.moduleFamily === "demo") return "demoProof";
+  return "investorProduct";
+}
+
+export function groupInvestorSoRRoutes(
+  routes: readonly SystemOfRecordRouteEntry[],
+): Readonly<Record<InvestorSoRGroup, readonly SystemOfRecordRouteEntry[]>> {
+  const buckets = Object.fromEntries(
+    INVESTOR_SOR_GROUP_ORDER.map((group) => [group, [] as SystemOfRecordRouteEntry[]]),
+  ) as Record<InvestorSoRGroup, SystemOfRecordRouteEntry[]>;
+
+  for (const route of routes) {
+    buckets[resolveInvestorSoRGroup(route)].push(route);
+  }
+
+  return buckets;
 }
 
 export function normalizeSystemOfRecordHref(href: string): string {

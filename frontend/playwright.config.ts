@@ -15,10 +15,18 @@ export default defineConfig({
   fullyParallel: false,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
-  workers: process.env.CI ? 1 : 1,
+  // Gate E attempt 7 execution guarantee (2026-06-29): hard-coded to the literal
+  // `1`, not derived from any env-overridable expression, so a future edit or
+  // CI env change cannot silently raise concurrency. Phase 3B additionally pins
+  // its own `retries: 0` via test.describe.configure — see
+  // docs/GATE_E_ATTEMPT7_EXECUTION_GUARANTEE_2026-06-29.md.
+  workers: 1,
   // globalTeardown only SIGTERM-kills orphaned ms-playwright shells; does not launch browsers.
   globalTeardown: "./scripts/playwright-global-teardown.mjs",
-  reporter: [["list"]],
+  // HTML report only in CI (e.g. the isolated Gate E Phase 3B runner, see
+  // docs/GATE_E_ISOLATED_RUNNER_PLAN_2026-07-03.md) so it can be uploaded as
+  // a workflow artifact. Local/founder-Mac runs are unaffected — list only.
+  reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : [["list"]],
   use: {
     baseURL,
     trace: "on-first-retry",

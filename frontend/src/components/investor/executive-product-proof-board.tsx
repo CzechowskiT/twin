@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { useTranslation } from "@/components/language-provider";
+import { MarketingCrosslinksBand } from "@/components/marketing/marketing-crosslinks-band";
 import { Card, Shell } from "@/components/ui";
 import {
   EXECUTIVE_PRODUCT_PROOF_DEMO_LINKS,
@@ -54,8 +55,11 @@ export function ExecutiveProductProofBoard({ workspace = false }: { workspace?: 
 
   return (
     <Shell wide>
-      <div data-executive-product-proof-page={EXECUTIVE_PRODUCT_PROOF_PAGE_MARKER} className="mx-auto max-w-5xl space-y-6">
-        <header className="space-y-3" data-testid={EXECUTIVE_PRODUCT_PROOF_MARKERS.header}>
+      <div
+        data-executive-product-proof-page={EXECUTIVE_PRODUCT_PROOF_PAGE_MARKER}
+        className="mx-auto min-w-0 max-w-6xl space-y-6 overflow-x-hidden px-4 sm:px-6"
+      >
+        <header className="min-w-0 space-y-3" data-testid={EXECUTIVE_PRODUCT_PROOF_MARKERS.header}>
           <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
             {t("executiveProductProof.pageEyebrow")}
           </p>
@@ -66,6 +70,7 @@ export function ExecutiveProductProofBoard({ workspace = false }: { workspace?: 
           ) : (
             <p className="text-xs text-[var(--twin-muted-strong)]">{t("executiveProductProof.publicNote")}</p>
           )}
+          <MarketingCrosslinksBand page="investor-product-proof" className="pt-2" />
         </header>
 
         <div className="grid gap-5 lg:grid-cols-2">

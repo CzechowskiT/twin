@@ -117,6 +117,8 @@ test("6 workspace layouts use LightweightRouteShell via WorkspaceRouteLayout", (
   const login = read("src/app/login/login-layout-client.tsx");
   assert.match(layout, /LightweightRouteShell/);
   assert.match(layout, /PersonaWorkspaceGate/);
+  assert.match(layout, /dynamic\(/);
+  assert.match(layout, /OnboardingGate/);
   assert.match(layout, /WorkspaceRouteSkeleton/);
   assert.match(dashboard, /WorkspaceRouteLayout/);
   assert.match(recruiter, /WorkspaceRouteLayout/);
@@ -309,4 +311,127 @@ test("15 package registers P0 and prior performance tests", () => {
   assert.ok(pkg.includes("test:recruiter-talent-radar-mvp"));
   assert.ok(pkg.includes("test:homepage-nav"));
   assert.ok(pkg.includes("test:investor-room-mvp"));
+});
+
+test("16 phase3b static inventory blocked — 20 routes, browser gated, P0 OPEN", () => {
+  const helper = read("e2e/helpers/phase3b-controlled-routes.ts");
+  assert.match(helper, /PHASE3B_ALL_ROUTES/);
+  assert.match(helper, /PHASE3B_ROUTE_COUNT/);
+
+  const phase3bTest = read("scripts/phase3b-controlled-multitab.test.ts");
+  assert.match(phase3bTest, /PHASE3B_ROUTE_COUNT, 20/);
+  assert.match(phase3bTest, /Phase 3B.*HARD BLOCKED/i);
+
+  const pkg = read("package.json");
+  assert.match(pkg, /test:phase3b-controlled-multitab-browser/);
+  assert.match(pkg, /PLAYWRIGHT_ENABLE_BROWSER_TESTS/);
+  assert.match(pkg, /test:e2e.*DISABLED/i);
+
+  const phase3bDoc = readFileSync(join(root, "..", "docs", "PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md"), "utf8");
+  assert.match(phase3bDoc, /STATUS: BLOCKED/i);
+  assert.match(phase3bDoc, /DO NOT RUN/i);
+
+  const p0Doc = readFileSync(join(root, "..", "docs", "P0_NO_HEADLESS_FINAL_STATE_2026-06-17.md"), "utf8");
+  assert.match(p0Doc, /36 routes/i);
+  assert.match(p0Doc, /Phase 3B.*BLOCKED/i);
+  assert.match(p0Doc, /gate-d-prod-browser-smoke-decision-2026-06-28/i);
+});
+
+test("17 gate e result — FAIL recorded, stance blocked, no launch GO claims", () => {
+  const gateEResult = readFileSync(join(root, "..", "docs", "gate-e-phase3b-result-2026-06-28.md"), "utf8");
+  assert.match(gateEResult, /Gate E = \*\*YES\*\*/);
+  assert.match(gateEResult, /0\/20/i);
+  assert.match(gateEResult, /verdict:\s+FAIL/i);
+  assert.match(gateEResult, /P0.*OPEN/i);
+  assert.match(gateEResult, /NO-GO/i);
+  assert.doesNotMatch(gateEResult, /Phase 3B:\s*\*\*PASS\*\*/i);
+  assert.doesNotMatch(gateEResult, /Launch stance:\s*\*\*GO\*\*/i);
+
+  const pkg = read("package.json");
+  assert.match(pkg, /test:gate-e-phase3b-result/);
+});
+
+test("18 gate d prod result — PASS recorded, stance blocked, no launch GO claims", () => {
+  const gateDResult = readFileSync(join(root, "..", "docs", "gate-d-prod-browser-smoke-result-2026-06-28.md"), "utf8");
+  assert.match(gateDResult, /Gate D = \*\*YES\*\*/);
+  assert.match(gateDResult, /36\/36 PASS/i);
+  assert.match(gateDResult, /Phase 3B.*HARD BLOCKED/i);
+  assert.match(gateDResult, /P0.*OPEN/i);
+  assert.match(gateDResult, /NO-GO/i);
+  assert.doesNotMatch(gateDResult, /\| \*\*P0:\*\* \| \*\*CLOSED\*\*/);
+  assert.doesNotMatch(gateDResult, /Launch stance:\s*\*\*GO\*\*/i);
+
+  const spec = read("e2e/p0-no-headless-final-state-browser.spec.ts");
+  assert.match(spec, /PLAYWRIGHT_ALLOW_PROD_SMOKE=1/);
+  assert.match(spec, /PLAYWRIGHT_SKIP_WEBSERVER=1/);
+
+  const smokeWorkflow = readFileSync(join(root, "..", ".github/workflows/smoke.yml"), "utf8");
+  assert.doesNotMatch(smokeWorkflow, /playwright test/i);
+  assert.doesNotMatch(smokeWorkflow, /p0-no-headless-final-state-browser/);
+
+  const launchStance = read("src/lib/investor-metrics-reality.ts");
+  assert.match(launchStance, /LAUNCH_STANCE\s*=\s*"noGo"/);
+});
+
+test("18 gate e prerequisites and founder package — explicit approval required, Gate D before E", () => {
+  const gateE = readFileSync(join(root, "..", "docs", "gate-e-phase3b-prerequisites-decision-2026-06-28.md"), "utf8");
+  const gateEPackage = readFileSync(
+    join(root, "..", "docs", "GATE_E_FOUNDER_DECISION_PACKAGE_2026-06-28.md"),
+    "utf8",
+  );
+  assert.match(gateE, /Gate E.*PENDING/i);
+  assert.match(gateE, /Gate D.*PASS/i);
+  assert.match(gateEPackage, /Gate E.*PENDING/i);
+  assert.match(gateEPackage, /gate-d-prod-browser-smoke-result-2026-06-28\.md/);
+  assert.match(gateEPackage, /36\/36 PASS/i);
+  assert.match(gateEPackage, /Phase 3B.*(NOT RUN|HARD BLOCKED)/i);
+  assert.match(gateE, /Phase 3B.*HARD BLOCKED/i);
+  assert.match(gateE, /PLAYWRIGHT_ENABLE_BROWSER_TESTS=1/);
+  assert.match(gateE, /PLAYWRIGHT_ALLOW_PROD_SMOKE=1/);
+  assert.match(gateE, /workers=1/i);
+  assert.match(gateE, /does NOT approve Gate E/i);
+  assert.doesNotMatch(gateE, /Launch stance:\s*\*\*GO\*\*/i);
+
+  const pkg = read("package.json");
+  assert.match(pkg, /test:phase3b-controlled-multitab-browser/);
+  assert.match(pkg, /PLAYWRIGHT_ENABLE_BROWSER_TESTS/);
+  assert.match(pkg, /PLAYWRIGHT_ALLOW_PROD_SMOKE/);
+  assert.match(pkg, /test:e2e.*DISABLED/i);
+  assert.doesNotMatch(pkg, /test:prod-recruiter-multitab-stuck-routes.*exit 0/i);
+
+  const smokeWorkflow = readFileSync(join(root, "..", ".github/workflows/smoke.yml"), "utf8");
+  assert.doesNotMatch(smokeWorkflow, /playwright test/i);
+  assert.doesNotMatch(smokeWorkflow, /phase3b-controlled-multitab/);
+
+  const p0Doc = readFileSync(join(root, "..", "docs", "P0_NO_HEADLESS_FINAL_STATE_2026-06-17.md"), "utf8");
+  assert.match(p0Doc, /gate-e-phase3b-prerequisites-decision-2026-06-28/i);
+  assert.match(p0Doc, /Phase 3B.*BLOCKED/i);
+
+  const pkgJson = read("package.json");
+  assert.match(pkgJson, /test:gate-e-founder-decision-package/);
+});
+
+test("20 readiness consistency lock — gate docs and npm script registered", () => {
+  const pkg = read("package.json");
+  assert.match(pkg, /test:readiness-consistency-lock/);
+  assert.match(pkg, /readiness-consistency-lock\.test\.ts/);
+
+  const evidenceIndex = readFileSync(join(root, "..", "docs", "LAUNCH_READINESS_EVIDENCE_INDEX_2026-06-28.md"), "utf8");
+  assert.match(evidenceIndex, /test:readiness-consistency-lock/);
+  assert.match(evidenceIndex, /Gate D.*YES/i);
+  assert.match(evidenceIndex, /Gate E.*YES/i);
+  assert.match(evidenceIndex, /Phase 3B.*FAIL/i);
+  assert.match(evidenceIndex, /NO-GO/i);
+  assert.match(evidenceIndex, /P0.*OPEN/i);
+});
+
+test("21 phase3b harness diagnostics — helper, no stale commit, Phase 3B FAIL", () => {
+  const pkg = read("package.json");
+  assert.match(pkg, /test:phase3b-harness-diagnostics/);
+  const spec = read("e2e/phase3b-controlled-multitab.spec.ts");
+  assert.match(spec, /phase3b-harness-diagnostics/);
+  assert.doesNotMatch(spec, /fda7567/);
+  const plan = readFileSync(join(root, "..", "docs", "PHASE3B_MULTITAB_HARNESS_DIAGNOSTIC_PLAN_2026-06-29.md"), "utf8");
+  assert.match(plan, /Phase 3B.*FAIL/i);
+  assert.match(plan, /NO-GO/i);
 });

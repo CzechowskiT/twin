@@ -40,14 +40,15 @@ Final state **passes** if the user sees:
 
 **Fix strategy in this PR:** sequential **one-page** browser smoke with `isChromeOnly` detection (sparse `main` + header/marquee present, no auth card). Route-level fixes only where a route lacks auth card, demo marker, or guided not-found.
 
-## Critical routes (29)
+## Critical routes (36)
 
 | Lane | Routes |
 | ---- | ------ |
 | Public | `/`, `/demo`, `/for-companies` |
-| Candidate | `/dashboard`, `/dashboard/jobs`, `/dashboard/matches`, `/profile`, `/dashboard/profile`, `/dashboard/cv` |
-| Recruiter | `/recruiter`, demo-candidate-001 (+ trust/team/communication/collaboration), demo-role-001 pipeline/team/tasks, `ats/import-readiness` |
-| Company | `/company/dashboard`, demo candidate surfaces, demo role pipeline/team/tasks, `ats/import-readiness` |
+| Candidate | `/dashboard`, `/dashboard/jobs`, `/dashboard/matches`, `/dashboard/trust`, `/dashboard/trust/controls`, `/profile`, `/dashboard/profile`, `/dashboard/cv`, `/dashboard/hiring-journey`, `/profile/hiring-journey` |
+| Recruiter | `/recruiter`, demo-candidate-001 (+ trust/team/communication/collaboration), demo-role-001 pipeline/team/tasks, `ats/import-readiness`, `/recruiter/hiring-journey` |
+| Company | `/company/dashboard`, demo candidate surfaces, demo role pipeline/team/tasks, `ats/import-readiness`, `/company/hiring-journey` |
+| Board | `/board/hiring-journey` |
 
 Inventory: `frontend/e2e/helpers/p0-no-headless-final-state.ts`
 
@@ -56,7 +57,7 @@ Inventory: `frontend/e2e/helpers/p0-no-headless-final-state.ts`
 | Artifact | Path |
 | -------- | ---- |
 | Shared evaluator | `frontend/e2e/helpers/p0-no-headless-final-state.ts` |
-| Static guards (8) | `frontend/scripts/p0-no-headless-final-state.test.ts` |
+| Static guards | `frontend/scripts/p0-no-headless-final-state.test.ts` |
 | Browser smoke | `frontend/e2e/p0-no-headless-final-state-browser.spec.ts` |
 
 ### Commands
@@ -104,6 +105,21 @@ npx tsc --noEmit
 
 **BLOCKED** — do not run `test:phase3b-controlled-multitab` or prod variant. See `docs/PHASE3B_CONTROLLED_MULTITAB_VERIFICATION_2026-06-17.md`.
 
+**Founder review:** Slice 12 Gate B minimal shell fix merged 2026-06-28 — see [P0_SHELL_FOUNDER_REVIEW_2026-06-28.md](./P0_SHELL_FOUNDER_REVIEW_2026-06-28.md). Gate C local browser **PASS** 36/36 — [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md). Gate D prod browser **PASS** 36/36 — [gate-d-prod-browser-smoke-result-2026-06-28.md](./gate-d-prod-browser-smoke-result-2026-06-28.md). Gate E **prerequisites package** prepared — [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md); Phase 3B **not executed**. Phase 3B remains **BLOCKED** until Gate E.
+
+## Changelog
+
+| Date | Change |
+|------|--------|
+| 2026-06-17 | Initial P0 no-headless guardrail; Phase 3B BLOCKED |
+| 2026-06-28 | **Slice 13** — 36 routes (5 hiring-journey added); browser smoke remains gated |
+| 2026-06-28 | **Slice 12 founder-review package** — static guard test 10; no shell implementation |
+| 2026-06-28 | **Slice 12 Gate B** — minimal shell/gate fix merged; Gate C local browser **PASS** 36/36; Gate E **PENDING**; 36 routes unchanged |
+| 2026-06-28 | **Gate C** — local `test:p0-no-headless-final-state-browser` PASS — [gate-c-browser-validation-result-2026-06-28.md](./gate-c-browser-validation-result-2026-06-28.md) |
+| 2026-06-28 | **Gate D decision package** — prod browser boundary docs; **not executed** — [gate-d-prod-browser-smoke-decision-2026-06-28.md](./gate-d-prod-browser-smoke-decision-2026-06-28.md) |
+| 2026-06-29 | **Gate D prod browser** — **PASS** 36/36 on prod — [gate-d-prod-browser-smoke-result-2026-06-28.md](./gate-d-prod-browser-smoke-result-2026-06-28.md) |
+| 2026-06-28 | **Gate E prerequisites package** — Phase 3B boundary docs; **not executed** — [gate-e-phase3b-prerequisites-decision-2026-06-28.md](./gate-e-phase3b-prerequisites-decision-2026-06-28.md) |
+
 ## Merge criteria
 
 Merge only if changes are **tests + route-level fixes** without touching `LightweightRouteShell`, `PersonaWorkspaceGate`, `workspace-route-layout.tsx`, or loading/fallback shells. If those are required → STOP, document exact files + plan, founder review before merge.
@@ -112,6 +128,6 @@ Merge only if changes are **tests + route-level fixes** without touching `Lightw
 
 | Label | Meaning |
 | ----- | ------- |
-| P0 headless guard **PASS** | All 29 routes pass sequential browser smoke |
+| P0 headless guard **PASS** | All 36 routes pass sequential browser smoke |
 | Phase 3B | **BLOCKED** |
 | Public launch | **NO-GO** (unchanged) |

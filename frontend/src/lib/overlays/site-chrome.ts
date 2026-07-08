@@ -27,6 +27,13 @@ const chromeNavEs: SiteChromeOverlay["nav"] = {
   waitlist: "Lista fundadora",
   calculator: "Calculadora ROI B2B",
   calculatorInvestor: "Calculadora inversor",
+  exploreTwin: "Explorar TWIN",
+  exploreProductProof: "Tablero product proof",
+  exploreGroupProduct: "Producto",
+  exploreGroupInvestors: "Inversores",
+  exploreGroupDemo: "Demo y aprendizaje",
+  exploreGroupTrust: "Confianza y estado",
+  ariaExplorePanel: "Rutas Explorar TWIN",
 };
 
 const chromeSiteEs: SiteChromeOverlay["site"] = {
@@ -39,6 +46,9 @@ const chromeSiteEs: SiteChromeOverlay["site"] = {
   footerPrivacy: "Política de privacidad",
   footerTerms: "Términos de servicio",
   footerStatus: "Estado del sistema",
+  footerForInvestors: "Para inversores",
+  footerInvestorRoom: "Sala del inversor",
+  footerTrustCenter: "Centro de confianza",
   footerDevelopers: "Desarrolladores",
   footerCandidateLogin: "Inicio de sesión candidato",
   footerCandidateRegister: "Registro candidato",
@@ -94,6 +104,13 @@ const chromeNavDe: SiteChromeOverlay["nav"] = {
   waitlist: "Gründerliste",
   calculator: "B2B-ROI-Rechner",
   calculatorInvestor: "Investor-Rechner",
+  exploreTwin: "TWIN entdecken",
+  exploreProductProof: "Product-Proof-Board",
+  exploreGroupProduct: "Produkt",
+  exploreGroupInvestors: "Investoren",
+  exploreGroupDemo: "Demo & Wissen",
+  exploreGroupTrust: "Vertrauen & Status",
+  ariaExplorePanel: "TWIN-Entdecken-Routen",
 };
 
 const chromeSiteDe: SiteChromeOverlay["site"] = {
@@ -106,6 +123,9 @@ const chromeSiteDe: SiteChromeOverlay["site"] = {
   footerPrivacy: "Datenschutzerklärung",
   footerTerms: "Nutzungsbedingungen",
   footerStatus: "Systemstatus",
+  footerForInvestors: "Für Investoren",
+  footerInvestorRoom: "Investor-Raum",
+  footerTrustCenter: "Vertrauenszentrum",
   footerDevelopers: "Entwickler",
   footerCandidateLogin: "Kandidaten-Anmeldung",
   footerCandidateRegister: "Kandidaten-Registrierung",
@@ -161,6 +181,13 @@ const chromeNavFr: SiteChromeOverlay["nav"] = {
   waitlist: "Liste des fondateurs",
   calculator: "Calculateur ROI B2B",
   calculatorInvestor: "Calculateur investisseur",
+  exploreTwin: "Explorer TWIN",
+  exploreProductProof: "Tableau product proof",
+  exploreGroupProduct: "Produit",
+  exploreGroupInvestors: "Investisseurs",
+  exploreGroupDemo: "Démo et infos",
+  exploreGroupTrust: "Confiance et statut",
+  ariaExplorePanel: "Routes Explorer TWIN",
 };
 
 const chromeSiteFr: SiteChromeOverlay["site"] = {
@@ -173,6 +200,9 @@ const chromeSiteFr: SiteChromeOverlay["site"] = {
   footerPrivacy: "Politique de confidentialité",
   footerTerms: "Conditions d'utilisation",
   footerStatus: "État du système",
+  footerForInvestors: "Pour investisseurs",
+  footerInvestorRoom: "Salle investisseur",
+  footerTrustCenter: "Centre de confiance",
   footerDevelopers: "Développeurs",
   footerCandidateLogin: "Connexion candidat",
   footerCandidateRegister: "Inscription candidat",
@@ -228,6 +258,13 @@ const chromeNavIt: SiteChromeOverlay["nav"] = {
   waitlist: "Lista fondatori",
   calculator: "Calcolatore ROI B2B",
   calculatorInvestor: "Calcolatore investitore",
+  exploreTwin: "Esplora TWIN",
+  exploreProductProof: "Board product proof",
+  exploreGroupProduct: "Prodotto",
+  exploreGroupInvestors: "Investitori",
+  exploreGroupDemo: "Demo e approfondimenti",
+  exploreGroupTrust: "Fiducia e stato",
+  ariaExplorePanel: "Percorsi Esplora TWIN",
 };
 
 const chromeSiteIt: SiteChromeOverlay["site"] = {
@@ -240,6 +277,9 @@ const chromeSiteIt: SiteChromeOverlay["site"] = {
   footerPrivacy: "Informativa sulla privacy",
   footerTerms: "Termini di servizio",
   footerStatus: "Stato del sistema",
+  footerForInvestors: "Per investitori",
+  footerInvestorRoom: "Sala investitori",
+  footerTrustCenter: "Centro fiducia",
   footerDevelopers: "Sviluppatori",
   footerCandidateLogin: "Accesso candidato",
   footerCandidateRegister: "Registrazione candidato",
@@ -295,6 +335,13 @@ const chromeNavZh: SiteChromeOverlay["nav"] = {
   waitlist: "创始候补名单",
   calculator: "B2B ROI 计算器",
   calculatorInvestor: "投资者计算器",
+  exploreTwin: "探索 TWIN",
+  exploreProductProof: "产品验证看板",
+  exploreGroupProduct: "产品",
+  exploreGroupInvestors: "投资者",
+  exploreGroupDemo: "演示与了解",
+  exploreGroupTrust: "信任与状态",
+  ariaExplorePanel: "探索 TWIN 路线",
 };
 
 const chromeSiteZh: SiteChromeOverlay["site"] = {
@@ -307,6 +354,9 @@ const chromeSiteZh: SiteChromeOverlay["site"] = {
   footerPrivacy: "隐私政策",
   footerTerms: "服务条款",
   footerStatus: "系统状态",
+  footerForInvestors: "面向投资者",
+  footerInvestorRoom: "投资者空间",
+  footerTrustCenter: "信任中心",
   footerDevelopers: "开发者",
   footerCandidateLogin: "候选人登录",
   footerCandidateRegister: "候选人注册",
@@ -357,6 +407,13 @@ const chromeNavAr: SiteChromeOverlay["nav"] = {
   waitlist: "قائمة المؤسسين",
   calculator: "حاسبة عائد B2B",
   calculatorInvestor: "حاسبة المستثمر",
+  exploreTwin: "استكشف TWIN",
+  exploreProductProof: "لوحة إثبات المنتج",
+  exploreGroupProduct: "المنتج",
+  exploreGroupInvestors: "المستثمرون",
+  exploreGroupDemo: "عرض وتعلّم",
+  exploreGroupTrust: "الثقة والحالة",
+  ariaExplorePanel: "مسارات استكشف TWIN",
 };
 
 const chromeSiteAr: SiteChromeOverlay["site"] = {
@@ -369,6 +426,9 @@ const chromeSiteAr: SiteChromeOverlay["site"] = {
   footerPrivacy: "سياسة الخصوصية",
   footerTerms: "شروط الخدمة",
   footerStatus: "حالة النظام",
+  footerForInvestors: "للمستثمرين",
+  footerInvestorRoom: "غرفة المستثمر",
+  footerTrustCenter: "مركز الثقة",
   footerDevelopers: "المطورون",
   footerCandidateLogin: "تسجيل دخول المرشح",
   footerCandidateRegister: "تسجيل المرشح",
@@ -419,6 +479,13 @@ const chromeNavJa: SiteChromeOverlay["nav"] = {
   waitlist: "ファウンダー待機リスト",
   calculator: "B2B ROI 計算機",
   calculatorInvestor: "投資家計算機",
+  exploreTwin: "TWINを探る",
+  exploreProductProof: "プロダクトプルーフボード",
+  exploreGroupProduct: "プロダクト",
+  exploreGroupInvestors: "投資家",
+  exploreGroupDemo: "デモと概要",
+  exploreGroupTrust: "信頼とステータス",
+  ariaExplorePanel: "TWIN探索ルート",
 };
 
 const chromeSiteJa: SiteChromeOverlay["site"] = {
@@ -431,6 +498,9 @@ const chromeSiteJa: SiteChromeOverlay["site"] = {
   footerPrivacy: "プライバシーポリシー",
   footerTerms: "利用規約",
   footerStatus: "システム状況",
+  footerForInvestors: "投資家向け",
+  footerInvestorRoom: "投資家ルーム",
+  footerTrustCenter: "トラストセンター",
   footerDevelopers: "開発者",
   footerCandidateLogin: "候補者ログイン",
   footerCandidateRegister: "候補者登録",

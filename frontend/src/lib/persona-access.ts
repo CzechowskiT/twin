@@ -327,12 +327,12 @@ export function headerGrowthLinksForPersona(
     return [{ href: "/demo", labelKey: "nav.demo", variant: "candidate" }];
   }
   if (persona === "recruiter") {
-    return [{ href: "/calculator/b2b", labelKey: "nav.calculator", variant: "recruiter" }];
+    return [{ href: "/demo", labelKey: "nav.demo", variant: "candidate" }];
   }
   if (persona === "company") {
     return [{ href: "/for-companies", labelKey: "nav.forCompanies", variant: "company" }];
   }
-  return [{ href: "/investor", labelKey: "nav.forInvestors", variant: "investor" }];
+  return [{ href: "/demo", labelKey: "nav.demo", variant: "candidate" }];
 }
 
 export type HeaderSessionNavLink = { href: string; labelKey: TranslationKey };
@@ -515,12 +515,14 @@ export type HeaderMarketingLaneLink = {
   persona?: MarketingPersona;
 };
 
-/** Logged-out marketing chrome: Kandydat · Rekruter · Firmy · Demo (flat links, not a dropdown). */
+/** Logged-out marketing chrome: persona landings + FAQ + Demo (flat links, not a dropdown). */
 export function headerMarketingLaneLinks(): HeaderMarketingLaneLink[] {
   return [
     { href: PERSONA_ROUTE.candidate, labelKey: "nav.personaCandidate", persona: "candidate" },
     { href: PERSONA_ROUTE.recruiter, labelKey: "nav.personaRecruiter", persona: "recruiter" },
     { href: PERSONA_ROUTE.company, labelKey: "nav.personaCompany", persona: "company" },
+    { href: PERSONA_ROUTE.investor, labelKey: "nav.personaInvestor", persona: "investor" },
+    { href: "/faq", labelKey: "nav.faq" },
     { href: "/demo", labelKey: "nav.demo" },
   ];
 }
@@ -570,51 +572,6 @@ export function headerAccountLinks(
   return [
     { href: sessionPanelHref(persona), labelKey: "nav.dashboard" },
     { href: "#", labelKey: "dashboard.logout", isLogout: true },
-  ];
-}
-
-export function footerExploreHrefsForPersona(persona: MarketingPersona): string[] {
-  const common = ["/waitlist", "/", "/demo", "/faq", "/status", "/developers"];
-  if (persona === "company") {
-    return [
-      ...common,
-      "/for-companies",
-      "/calculator/b2b",
-      "/login/company",
-      "/companies/signup",
-      "/contact",
-    ];
-  }
-  if (persona === "investor") {
-    return [
-      ...common,
-      "/for-investors",
-      "/workspace/investor",
-      "/investor/calculator",
-      "/investor/metrics",
-      "/login/investor",
-      "/contact",
-    ];
-  }
-  if (persona === "recruiter") {
-    return [
-      ...common,
-      "/for-recruiters",
-      "/workspace/recruiter",
-      "/calculator/b2b",
-      "/recruiter/inbox",
-      "/login/recruiter",
-      "/contact",
-    ];
-  }
-  return [
-    ...common,
-    "/for-candidates",
-    "/for-investors",
-    "/workspace/candidate",
-    "/login/candidate",
-    "/register/candidate",
-    "/contact",
   ];
 }
 

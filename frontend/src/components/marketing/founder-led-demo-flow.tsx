@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { useTranslation } from "@/components/language-provider";
+import { MarketingCrosslinksBand } from "@/components/marketing/marketing-crosslinks-band";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { Shell } from "@/components/ui";
 import {
@@ -44,8 +45,8 @@ export function FounderLedDemoFlow() {
   return (
     <Shell wide rail>
       <MarketingPageSurface wide withCard={false}>
-        <div className="marketing-copy-rail space-y-10 sm:space-y-14" data-founder-led-demo="root">
-          <header className="space-y-5" data-founder-led-demo="hero">
+        <div className="marketing-copy-rail min-w-0 space-y-10 sm:space-y-14" data-founder-led-demo="root">
+          <header className="min-w-0 space-y-5" data-founder-led-demo="hero">
             <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
               {t("founderLedDemo.pageEyebrow")}
             </p>
@@ -71,6 +72,7 @@ export function FounderLedDemoFlow() {
                 </Link>
               ))}
             </div>
+            <MarketingCrosslinksBand page="demo" className="pt-3" />
           </header>
 
           <section className="space-y-5" data-founder-led-demo="journey">
@@ -80,7 +82,7 @@ export function FounderLedDemoFlow() {
             <p className="text-sm leading-relaxed text-[var(--twin-muted-strong)] sm:text-base">
               {t("founderLedDemo.journeyLead")}
             </p>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {FOUNDER_LED_DEMO_JOURNEY_STEPS.map((step, index) => (
                 <DemoLinkCard
                   key={step.id}
@@ -97,7 +99,7 @@ export function FounderLedDemoFlow() {
             <h2 className="text-xl font-semibold text-[var(--twin-fg)] sm:text-2xl">
               {t("founderLedDemo.rolesHeading")}
             </h2>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2">
               {FOUNDER_LED_DEMO_ROLE_ENTRIES.map((role) => (
                 <DemoLinkCard
                   key={role.id}

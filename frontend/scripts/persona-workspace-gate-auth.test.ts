@@ -19,3 +19,10 @@ test("company surface uses company login path", () => {
   assert.match(gate, /company:/);
   assert.match(readFileSync(join(root, "src/app/company/layout.tsx"), "utf8"), /surface="company"/);
 });
+
+test("gate uses hasActiveSession so stale JWT shows auth card not workspace chrome", () => {
+  assert.match(gate, /hasActiveSession/);
+  assert.doesNotMatch(gate, /getToken\(\)/);
+  assert.match(gate, /PersonaWorkspaceGateShell/);
+  assert.doesNotMatch(gate, /from "@\/components\/ui"/);
+});

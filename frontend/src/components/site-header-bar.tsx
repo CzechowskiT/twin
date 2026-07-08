@@ -8,6 +8,8 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 import { useTranslation } from "@/components/language-provider";
 import { PersonaBadge } from "@/components/persona-badge";
 import { useMarketingPersona } from "@/components/persona-provider";
+import { SiteHeaderExplorePanel } from "@/components/site-header-explore-panel";
+import { trackEvent } from "@/lib/analytics";
 import { apiFetch } from "@/lib/api";
 import { clearToken, getToken, hasActiveSession } from "@/lib/auth";
 import { isDemoUserEmail } from "@/lib/demo-user";
@@ -34,7 +36,7 @@ function growthCtaClass(variant: GrowthCtaVariant, base: string): string {
 }
 
 type SiteHeaderBarProps = {
-  /** Flat Kandydat/Rekruter/Firmy/Demo links on public marketing chrome. */
+  /** Flat Kandydat/Rekruter/Firma/Inwestor/Demo links on public marketing chrome. */
   showMarketingPersonaNav?: boolean;
   /** Read-only persona badge for authenticated app chrome — never on public marketing. */
   showPersonaBadge: boolean;
@@ -135,46 +137,56 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
   };
 
   const primaryGrowth = growthLinks[0];
+  const showHeaderDemoCta =
+    personaLaneNav || showDemoNav || primaryGrowth?.href === "/demo";
+  const marketingNavLinks = marketingLaneLinks.filter((item) => item.href !== "/demo");
+  const leftRailGrowth =
+    primaryGrowth && primaryGrowth.href !== "/demo" ? primaryGrowth : null;
+
+  const onHeaderDemoClick = () => {
+    trackEvent("header_demo_click", { surface: "site_header" });
+    closeMobileMenu();
+  };
+
+  const renderHeaderDemoCta = (className: string) => (
+    <Link
+      href="/demo"
+      className={className}
+      aria-label={t("nav.demo")}
+      aria-current={demoActive ? "page" : undefined}
+      onClick={onHeaderDemoClick}
+    >
+      {t("nav.demo")}
+    </Link>
+  );
 
   return (
     <header className="twin-header-bar sticky top-0 z-50">
       <div className="twin-header-stripe" aria-hidden />
-      <div className="twin-container flex flex-wrap items-center gap-x-3 gap-y-2 py-3 lg:gap-x-4 lg:py-3.5">
+      <div className="twin-container flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 py-3 lg:gap-x-4 lg:py-3.5">
         <div className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3">
           <Link href="/" className="twin-logo shrink-0">
             TWIN<span className="twin-logo-accent">.</span>
           </Link>
-          {showDemoNav ? (
+          {leftRailGrowth ? (
             <Link
-              href="/demo"
-              className={demoPillClassName}
-              aria-current={demoActive ? "page" : undefined}
+              href={leftRailGrowth.href}
+              className={`${growthCtaClass(leftRailGrowth.variant, headerCtaBase)} hidden sm:inline-flex`}
             >
-              {t("nav.demo")}
-            </Link>
-          ) : primaryGrowth ? (
-            <Link
-              href={primaryGrowth.href}
-              className={`${growthCtaClass(primaryGrowth.variant, headerCtaBase)} hidden sm:inline-flex${
-                primaryGrowth.href === "/demo" && highlightDemoNav ? " twin-header-cta--demo-pulse" : ""
-              }`}
-              aria-current={primaryGrowth.href === "/demo" && demoActive ? "page" : undefined}
-            >
-              {t(primaryGrowth.labelKey)}
+              {t(leftRailGrowth.labelKey)}
             </Link>
           ) : null}
         </div>
 
         <nav
-          className="order-3 hidden min-w-0 flex-1 basis-full flex-nowrap items-center justify-center gap-x-3 overflow-x-auto overscroll-x-contain text-[13px] font-medium [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-x-4 sm:text-sm md:order-none md:flex md:basis-auto lg:gap-x-5 lg:text-[0.9375rem] [&::-webkit-scrollbar]:hidden"
+          className="order-3 hidden min-w-0 flex-1 flex-wrap items-center justify-center gap-x-3 gap-y-2 overflow-x-auto overscroll-x-contain text-[13px] font-medium [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-x-4 sm:text-sm md:order-none md:flex md:basis-auto lg:gap-x-5 lg:text-[0.9375rem] [&::-webkit-scrollbar]:hidden"
           aria-label={t("nav.ariaSiteNav")}
         >
-          {personaLaneNav
-            ? marketingLaneLinks.map((item) => {
+          {personaLaneNav ? (
+            <>
+              {marketingNavLinks.map((item) => {
                 const active =
-                  item.href === "/demo"
-                    ? demoActive
-                    : pathname === item.href || pathname.startsWith(`${item.href}/`);
+                  pathname === item.href || pathname.startsWith(`${item.href}/`);
                 return (
                   <Link
                     key={item.href}
@@ -185,8 +197,10 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
                     {t(item.labelKey)}
                   </Link>
                 );
-              })
-            : showMarketingNav
+              })}
+              <SiteHeaderExplorePanel variant="desktop" />
+            </>
+          ) : showMarketingNav
             ? corporateNavPrimary.map((item) => (
                 <Link key={item.href} href={item.href} className={linkClass}>
                   {item.label}
@@ -226,6 +240,9 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
         </nav>
 
         <div className="ml-auto flex min-w-0 shrink-0 flex-wrap items-center justify-end gap-x-2 gap-y-1">
+          {showHeaderDemoCta
+            ? renderHeaderDemoCta(`${demoPillClassName} inline-flex px-3 sm:px-4`)
+            : null}
           {accountLinks.map((item) =>
             item.isLogout ? (
               <button
@@ -262,27 +279,17 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
               aria-label={t("nav.ariaMobileNav")}
               style={{ boxShadow: "var(--twin-shadow-md)" }}
             >
-              {showDemoNav ? (
-                <Link
-                  href="/demo"
-                  onClick={closeMobileMenu}
-                  className={`${demoPillClassName} mb-2 w-full`}
-                  aria-current={demoActive ? "page" : undefined}
-                >
-                  {t("nav.demo")}
-                </Link>
-              ) : primaryGrowth ? (
-                <Link
-                  href={primaryGrowth.href}
-                  onClick={closeMobileMenu}
-                  className={`${growthCtaClass(primaryGrowth.variant, headerCtaBase)} mb-2 w-full${
-                    primaryGrowth.href === "/demo" && highlightDemoNav ? " twin-header-cta--demo-pulse" : ""
-                  }`}
-                  aria-current={primaryGrowth.href === "/demo" && demoActive ? "page" : undefined}
-                >
-                  {t(primaryGrowth.labelKey)}
-                </Link>
-              ) : null}
+              {showHeaderDemoCta
+                ? renderHeaderDemoCta(`${demoPillClassName} mb-2 w-full`)
+                : leftRailGrowth ? (
+                    <Link
+                      href={leftRailGrowth.href}
+                      onClick={closeMobileMenu}
+                      className={`${growthCtaClass(leftRailGrowth.variant, headerCtaBase)} mb-2 w-full`}
+                    >
+                      {t(leftRailGrowth.labelKey)}
+                    </Link>
+                  ) : null}
               {hasSession ? (
                 <>
                   <p className="mt-1 border-t border-[var(--twin-border)] px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
@@ -319,7 +326,7 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
                   <p className="mt-1 border-t border-[var(--twin-border)] px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
                     {t("nav.ariaPersonaNav")}
                   </p>
-                  {marketingLaneLinks.map((item) => (
+                  {marketingNavLinks.map((item) => (
                     <Link
                       key={item.href}
                       href={item.href}
@@ -329,6 +336,7 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
                       {t(item.labelKey)}
                     </Link>
                   ))}
+                  <SiteHeaderExplorePanel variant="mobile" onNavigate={closeMobileMenu} />
                 </>
               ) : showMarketingNav ? (
                 <>

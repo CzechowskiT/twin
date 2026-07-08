@@ -69,10 +69,9 @@ function resolvePersona(pathname: string, hasSession: boolean): MarketingPersona
 
 export function PersonaProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const [persona, setPersonaState] = useState<MarketingPersona>(() => {
-    if (typeof window === "undefined") return "candidate";
-    return resolvePersona(pathname, Boolean(getToken()));
-  });
+  // First paint must match the server (always "candidate") to avoid React #418 when JWT /
+  // session persona differ from SSR. Real session persona syncs in useLayoutEffect below.
+  const [persona, setPersonaState] = useState<MarketingPersona>("candidate");
   const [sessionLocked, setSessionLocked] = useState(false);
 
   useLayoutEffect(() => {

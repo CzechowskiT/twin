@@ -9,7 +9,7 @@
 
 ## Scope
 
-Controlled Phase 3B multitab — **not** the founder 50-tab session. 21 routes in 3 batches (≤8 tabs), staggered open, 60–90s idle, CDP heap/DOM per tab. Auth shell OK; 404/blank/redirect storm NOT OK.
+Controlled Phase 3B multitab — **not** the founder 50-tab session. **20 routes** in 3 batches (7+7+6, ≤8 tabs), staggered open, 60–90s idle, CDP heap/DOM per tab. Auth shell OK; 404/blank/redirect storm NOT OK.
 
 ### Route batches
 
@@ -64,7 +64,7 @@ PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 \
 ## Polish report (20 sections)
 
 ### 1. Cel weryfikacji
-Kontrolowana weryfikacja Phase 3B na buildzie `fda7567`: 21 tras w 3 partiach multitab (≤8 kart), idle 60–90s, metryki CDP heap/DOM, bez zmian shell/gate/layout.
+Kontrolowana weryfikacja Phase 3B na buildzie `fda7567`: **20 tras** w 3 partiach multitab (≤8 kart), idle 60–90s, metryki CDP heap/DOM, bez zmian shell/gate/layout.
 
 ### 2. Stan przed abortem
 Utworzono branch `verify/phase3b-controlled-multitab-2026-06-17`, pliki testów e2e + static guards, skrypty npm. Lokalny build + `tsc` zielone. Test przeglądarkowy uruchomiony, przerwany w trakcie pierwszej partii prod.
@@ -82,7 +82,7 @@ Odtworzono pliki testów na branchu verify @ `fda7567`. Ponowiono lokalny multit
 | recruiter | 7 | **PASS** | 86250 |
 | company | 6 | **PASS** | 82500 |
 
-**21/21 tras PASS.** Brak 404, redirect storm, pętli public-health/auth/marquee. Safe marquee **27 węzłów** na workspace (≤30). DOM 236–1039 (cel <6000). Marketing 89-logo **0** na workspace.
+**20/20 tras PASS.** Brak 404, redirect storm, pętli public-health/auth/marquee. Safe marquee **27 węzłów** na workspace (≤30). DOM 236–1039 (cel <6000). Marketing 89-logo **0** na workspace.
 
 ### 6. Wynik produkcyjny
 - `PHASE3B_COMMIT_MISMATCH`: expected `fda7567`, actual `4bb425d`
@@ -146,4 +146,11 @@ Istniejące `test:p0-browser-memory-multitab-performance`, `test:multi-tab-perfo
 - `/company/roles/demo-role-001/pipeline`: 535 DOM
 
 ### 20. Werdykt końcowy
-**PARTIAL** — lokalna kontrolowana weryfikacja Phase 3B na `fda7567` przeszła wszystkie 21 tras (marquee bounded, brak pętli, DOM w budżecie). Produkcja **nie zweryfikowana** na docelowym commicie (`4bb425d` live); prod multitab **FAIL** (crash kontekstu). Heurystyka PASS zbyt permissive dla skeleton+chrome. **Nie** oznaczać P0 DONE. Launch NO-GO bez zmian.
+**PARTIAL** — lokalna kontrolowana weryfikacja Phase 3B na `fda7567` przeszła wszystkie 20 tras (marquee bounded, brak pętli, DOM w budżecie). Produkcja **nie zweryfikowana** na docelowym commicie (`4bb425d` live); prod multitab **FAIL** (crash kontekstu). Heurystyka PASS zbyt permissive dla skeleton+chrome. **Nie** oznaczać P0 DONE. Launch NO-GO bez zmian.
+
+## Changelog
+
+| Date | Change |
+|------|--------|
+| 2026-06-17 | Initial Phase 3B harness; STATUS BLOCKED |
+| 2026-06-28 | **Slice 16** — static guard refresh: `PHASE3B_ALL_ROUTES` reconciled to **20 routes** (7+7+6 batches); static guards 3→8; P0 **36 routes unchanged**; Phase 3B **BLOCKED**; browser gated |

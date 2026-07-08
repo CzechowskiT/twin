@@ -16,7 +16,7 @@ export function MarketingPageSurface({ children, wide = false, withCard = true }
   const max = wide ? "max-w-6xl" : "max-w-3xl";
   return (
     <section className="marketing-section-page py-10 sm:py-14 md:py-16">
-      <div className={`mx-auto w-full px-4 sm:px-6 ${max}`}>
+      <div className={`mx-auto w-full min-w-0 px-4 sm:px-6 ${max}`}>
         {withCard ? (
           <div className="marketing-copy-rail py-1 sm:py-2">{children}</div>
         ) : (
