@@ -41,15 +41,15 @@ export default function ForCompaniesPage() {
             </Link>
             <span className="mx-2 text-[var(--twin-border)]">·</span>
             <Link href="/companies/signup" className="twin-link font-semibold text-[var(--foreground)]">
-              Company signup
+              {t("site.companySignupTitle")}
             </Link>
             <span className="mx-2 text-[var(--twin-border)]">·</span>
             <Link href="/testimonials" className="twin-link font-semibold text-[var(--foreground)]">
-              Testimonials
+              {t("nav.testimonialsIllustrative")}
             </Link>
             <span className="mx-2 text-[var(--twin-border)]">·</span>
             <Link href="/compare/agencies" className="twin-link font-semibold text-[var(--foreground)]">
-              TWIN vs agencies
+              {t("site.companySignupCompareAgencies")}
             </Link>
           </p>
         </div>
