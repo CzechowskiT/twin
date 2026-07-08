@@ -34,31 +34,6 @@ function extractCaseBlock(source: string, caseName: string): string {
   return block as string;
 }
 
-function extractFunctionBody(source: string, functionName: string): string {
-  const re = new RegExp(`function ${functionName}\\([^)]*\\)\\s*\\{([\\s\\S]*?)\\n\\}`);
-  const match = source.match(re);
-  assert.ok(match, `expected function ${functionName} in ${MARK_FILE}`);
-  return match![1];
-}
-
-function parseRect(rectMarkup: string): { x: number; y: number; width: number; height: number } {
-  const num = (attr: string) => {
-    const m = rectMarkup.match(new RegExp(`${attr}=\\{?([\\-0-9.]+)\\}?`));
-    assert.ok(m, `rect missing ${attr}: ${rectMarkup}`);
-    return Number(m![1]);
-  };
-  return { x: num("x"), y: num("y"), width: num("width"), height: num("height") };
-}
-
-function parseGroupTranslate(source: string, innerMarkup: string): { dx: number; dy: number } {
-  const idx = source.indexOf(innerMarkup);
-  assert.ok(idx >= 0, "inner markup not found in source");
-  const before = source.slice(0, idx);
-  const gMatch = before.match(/<g transform="translate\(([\-0-9.]+) ([\-0-9.]+)\)">\s*$/);
-  assert.ok(gMatch, `expected a wrapping <g transform="translate(x y)"> immediately before: ${innerMarkup}`);
-  return { dx: Number(gMatch![1]), dy: Number(gMatch![2]) };
-}
-
 test("1 nvidia renders a readable NVIDIA text label, not just a mark", () => {
   const mark = read(MARK_FILE);
   const nvidiaCase = extractCaseBlock(mark, "nvidia");
@@ -66,41 +41,26 @@ test("1 nvidia renders a readable NVIDIA text label, not just a mark", () => {
   assert.match(nvidiaCase, /fontWeight=\{700\}/);
 });
 
-test("2 nvidia accent is not a thin cropped vertical line", () => {
+test("2 nvidia is text-only — no pseudo-icon/accent shape (no thin cropped line)", () => {
   const mark = read(MARK_FILE);
-  const accentBody = extractFunctionBody(mark, "NvidiaAccent");
-  const rectMatch = accentBody.match(/<rect[^/]*\/>/);
-  assert.ok(rectMatch, "NvidiaAccent must render a single <rect>");
-  const rect = parseRect(rectMatch![0]);
-  assert.ok(rect.width > 0 && rect.height > 0, "accent rect must have positive dimensions");
-  const longSide = Math.max(rect.width, rect.height);
-  const shortSide = Math.min(rect.width, rect.height);
-  assert.ok(
-    longSide / shortSide <= 2,
-    `accent must read as a compact badge, not a line (got ${rect.width}x${rect.height})`,
-  );
+  assert.doesNotMatch(mark, /NvidiaAccent/);
+  const nvidiaCase = extractCaseBlock(mark, "nvidia");
+  assert.doesNotMatch(nvidiaCase, /<rect/);
+  assert.doesNotMatch(nvidiaCase, /<path/);
+  assert.doesNotMatch(nvidiaCase, /<g\s/);
+  assert.match(nvidiaCase, /<text/);
+  assert.match(nvidiaCase, />\s*NVIDIA\s*</);
 });
 
-test("3 nvidia accent stays fully inside the mark viewBox (no overflow clipping)", () => {
+test("3 nvidia text wordmark stays inside the mark viewBox (no overflow clipping)", () => {
   const mark = read(MARK_FILE);
   const nvidiaCase = extractCaseBlock(mark, "nvidia");
-  const nvidiaAccentTag = "<NvidiaAccent />";
-  const { dx, dy } = parseGroupTranslate(nvidiaCase, nvidiaAccentTag);
-
-  const accentBody = extractFunctionBody(mark, "NvidiaAccent");
-  const rectMatch = accentBody.match(/<rect[^/]*\/>/);
-  const rect = parseRect(rectMatch![0]);
-
-  const left = dx + rect.x;
-  const top = dy + rect.y;
-  const right = left + rect.width;
-  const bottom = top + rect.height;
-
-  assert.ok(left >= 0 && top >= 0, `accent must not start before the viewBox origin (left=${left}, top=${top})`);
-  assert.ok(
-    right <= VIEWBOX_WIDTH && bottom <= VIEWBOX_HEIGHT,
-    `accent must not extend past the viewBox (right=${right}/${VIEWBOX_WIDTH}, bottom=${bottom}/${VIEWBOX_HEIGHT})`,
-  );
+  const textMatch = nvidiaCase.match(/<text[^>]*x=\{([0-9.]+)\}[^>]*y=\{([0-9.]+)\}/);
+  assert.ok(textMatch, "nvidia case must position text with x/y inside viewBox");
+  const x = Number(textMatch![1]);
+  const y = Number(textMatch![2]);
+  assert.ok(x >= 0 && x <= VIEWBOX_WIDTH, `text x=${x} must be within viewBox width ${VIEWBOX_WIDTH}`);
+  assert.ok(y >= 0 && y <= VIEWBOX_HEIGHT, `text y=${y} must be within viewBox height ${VIEWBOX_HEIGHT}`);
 });
 
 test("4 nvidia has a non-empty aria label and verified-curated quality status", () => {
@@ -127,11 +87,10 @@ test("6 SafeCompanyLogo (full marquee) never renders an <img> with a missing/emp
 
 test("7 chip card has fixed box + centering classes so content cannot overflow or clip", () => {
   const marquee = read(MOVING_MARQUEE_FILE);
-  const boxClassMatch = marquee.match(/MARK_BOX_CLASS\s*=\s*\n?\s*"([^"]+)"/);
-  assert.ok(boxClassMatch, "MARK_BOX_CLASS must be defined");
-  const boxClass = boxClassMatch![1];
-  assert.match(boxClass, /\bh-\d/, "fixed height class prevents vertical layout shift");
-  assert.match(boxClass, /\bw-\[/, "fixed width class prevents horizontal overflow");
+  assert.match(marquee, /MARK_CARD_CLASS\s*=\s*PARTNER_LOGO_CARD_CLASS/);
+  assert.match(marquee, /from "@\/lib\/partner-logo-styles"/);
+  const css = read("src/app/globals.css");
+  assert.match(css, /\.partner-logo-card\s*\{[\s\S]{0,200}min-height:/);
   assert.match(marquee, /items-center justify-center rounded-lg/);
   assert.match(marquee, /relative flex shrink-0 items-center justify-center/);
 });
@@ -142,7 +101,7 @@ test("8 mark svg keeps a fixed height and bounded width so the plate never resha
   const ruleMatch = css.match(/\.performance-safe-logo-mark\s*\{([\s\S]{0,300}?)\}/);
   assert.ok(ruleMatch, ".performance-safe-logo-mark rule must exist");
   const rule = ruleMatch![1];
-  assert.match(rule, /height:\s*1\.4rem/, "fixed height prevents vertical layout shift");
+  assert.match(rule, /height:\s*2\.5rem/, "fixed height prevents vertical layout shift");
   assert.match(rule, /width:\s*(100%|[\d.]+rem)/, "width must be explicitly bounded, not auto");
   assert.match(rule, /flex-shrink:\s*0/, "must not get squeezed by flex siblings");
 });
