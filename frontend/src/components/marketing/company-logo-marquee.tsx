@@ -11,6 +11,8 @@ import { brandLogoUrls, type Brand } from "@/lib/brand-logo-urls";
 import {
   PARTNER_LOGO_CARD_CLASS,
   PARTNER_LOGO_ROW_GAP_CLASS,
+  partnerLogoOpticalDataAttrs,
+  partnerLogoOpticalStyle,
 } from "@/lib/partner-logo-styles";
 
 /** Fortune 500–heavy mix; domain keys map to verified SI slugs in `MARQUEE_BRAND_LOGO_MAP`. */
@@ -146,6 +148,8 @@ function BrandMark({
       aria-label={a11y}
       title={a11y}
       className={`${plateClass} snap-center`}
+      style={partnerLogoOpticalStyle(brand.slug)}
+      {...partnerLogoOpticalDataAttrs(brand.slug)}
     >
       <span className="relative flex h-full w-full items-center justify-center">
         <SafeCompanyLogo
