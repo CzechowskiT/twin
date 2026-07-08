@@ -8,6 +8,7 @@ import { WorkspaceQuickActions } from "@/components/workspace/workspace-quick-ac
 import { Card, Shell } from "@/components/ui";
 import { SHOW_RECRUITER_HUB_PRIMARY_PROMOS } from "@/lib/product-polish-p0";
 import { SHOW_RECRUITER_HUB_NEXT_ACTION } from "@/lib/product-polish-p1";
+import { SHOW_RECRUITER_HUB_ROADMAP_PROMOS_COLLAPSED } from "@/lib/product-polish-p4";
 import { RecruiterHubNextAction } from "@/components/recruiter/recruiter-hub-next-action";
 import { RECRUITER_DAILY_COCKPIT_MARKERS, recruiterDailyCockpitHref } from "@/lib/recruiter-daily-operating-cockpit";
 import { RECRUITER_TRUST_REVIEW_QUEUE_MARKERS, recruiterTrustReviewQueueHref } from "@/lib/recruiter-trust-review-queue";
@@ -67,6 +68,40 @@ export default function RecruiterHubPage() {
               </Card>
             </Link>
           </>
+        ) : null}
+        {!SHOW_RECRUITER_HUB_PRIMARY_PROMOS && SHOW_RECRUITER_HUB_ROADMAP_PROMOS_COLLAPSED ? (
+          <details
+            className="mt-6 rounded-xl border border-[var(--twin-border)]/70 bg-[var(--twin-surface-2)]/30 p-4"
+            data-recruiter-hub-roadmap-promos
+          >
+            <summary className="twin-link cursor-pointer text-sm font-medium [&::-webkit-details-marker]:hidden">
+              {t("productPolish.recruiterRoadmapPromosToggle")}
+            </summary>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <Link
+                href={recruiterDailyCockpitHref()}
+                data-testid={RECRUITER_DAILY_COCKPIT_MARKERS.hubPromo}
+                className="rounded-lg border border-[var(--twin-border)]/80 bg-[var(--twin-surface)]/60 p-4 text-sm transition hover:border-[var(--twin-accent)]/40"
+              >
+                <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-muted)]">
+                  {t("productPolish.previewLabel")}
+                </p>
+                <p className="mt-2 font-medium text-[var(--foreground)]">{t("recruiterDailyCockpit.title")}</p>
+                <p className="twin-muted mt-1 text-xs leading-relaxed">{t("recruiterDailyCockpit.lead")}</p>
+              </Link>
+              <Link
+                href={recruiterTrustReviewQueueHref()}
+                data-testid={RECRUITER_TRUST_REVIEW_QUEUE_MARKERS.hubPromo}
+                className="rounded-lg border border-[var(--twin-border)]/80 bg-[var(--twin-surface)]/60 p-4 text-sm transition hover:border-[var(--twin-accent)]/40"
+              >
+                <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-muted)]">
+                  {t("productPolish.previewLabel")}
+                </p>
+                <p className="mt-2 font-medium text-[var(--foreground)]">{t("recruiterTrustReviewQueue.pageTitle")}</p>
+                <p className="twin-muted mt-1 text-xs leading-relaxed">{t("recruiterTrustReviewQueue.demoJourneyDesc")}</p>
+              </Link>
+            </div>
+          </details>
         ) : null}
         {!SHOW_RECRUITER_HUB_PRIMARY_PROMOS && SHOW_RECRUITER_HUB_NEXT_ACTION ? (
           <RecruiterHubNextAction />

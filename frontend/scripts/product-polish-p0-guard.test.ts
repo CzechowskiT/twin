@@ -105,8 +105,8 @@ test("6 logo marquee disclaimer is i18n and visible on marketing chrome", () => 
   const marquee = read("src/components/site-top-marquee.tsx");
   assert.match(marquee, /marquee-logo-disclaimer/);
   assert.match(marquee, /site\.marqueeLogoDisclaimer/);
-  assert.match(en.site.marqueeLogoDisclaimer ?? "", /Representative company logos/i);
-  assert.match(dictionaries.pl.site.marqueeLogoDisclaimer ?? "", /Logotypy firm/i);
+  assert.match(en.site.marqueeLogoDisclaimer ?? "", /Representative market context/i);
+  assert.match(dictionaries.pl.site.marqueeLogoDisclaimer ?? "", /kontekst rynkowy/i);
 });
 
 test("7 slice doc states P0 CLOSED, Gate E PASS, Gate F PENDING, Launch NO-GO", () => {

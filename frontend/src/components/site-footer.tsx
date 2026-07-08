@@ -6,6 +6,7 @@ import { useTranslation } from "@/components/language-provider";
 import { clearCookieConsent } from "@/lib/cookie-consent";
 import { PUBLIC_FOOTER_SITEMAP_ENTRIES } from "@/lib/public-footer-sitemap-routes";
 import { HIDE_THIN_MARKETING_NAV_LINKS, THIN_MARKETING_PATHS } from "@/lib/product-polish-p1";
+import { FOOTER_SOCIAL_PROOF_ILLUSTRATIVE_LABELS } from "@/lib/product-polish-p4";
 
 const SOCIAL_LINKEDIN = "https://www.linkedin.com";
 const SOCIAL_GITHUB = "https://github.com/CzechowskiT/twin";
@@ -35,7 +36,14 @@ export function SiteFooter() {
 
   const company = [
     { href: "/about", label: t("nav.about") },
-    { href: "/case-studies", label: t("nav.cases") },
+    {
+      href: "/case-studies",
+      label: FOOTER_SOCIAL_PROOF_ILLUSTRATIVE_LABELS ? t("nav.casesIllustrative") : t("nav.cases"),
+    },
+    {
+      href: "/testimonials",
+      label: FOOTER_SOCIAL_PROOF_ILLUSTRATIVE_LABELS ? t("nav.testimonialsIllustrative") : t("nav.testimonials"),
+    },
     { href: "/careers", label: t("nav.careers") },
     { href: "/partners", label: t("nav.partners") },
     { href: "/media", label: t("nav.media") },

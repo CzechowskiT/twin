@@ -56,8 +56,7 @@ export const SITE_MESSAGES_EN = {
     "We prioritize partners who share standards on listing quality, rate limits, and candidate consent. If you represent a board or HR platform, reach out via Contact with “Partnership” in the subject and your API or data-sharing posture.",
   partnersNote:
     "Logos shown on the home marquee are illustrative of the global hiring landscape and are not partnership endorsements unless separately announced.",
-  marqueeLogoDisclaimer:
-    "Representative company logos shown for market context / target ecosystem. Not all are TWIN customers.",
+  marqueeLogoDisclaimer: "Representative market context.",
   partnersReferencesTitle: "Written references",
   partnersReferencesLead:
     "Letters of recommendation, security or procurement attestations, and signed integration summaries from partners who agree to publish them.",
@@ -75,7 +74,9 @@ export const SITE_MESSAGES_EN = {
     "Testimonials will be added when partners approve attributed quotes. Anonymous endorsements are not listed on this page.",
 
   casesTitle: "Case studies",
-  casesLead: "Anonymized scenarios aligned with workflows the MVP already supports or is explicitly building toward.",
+  casesLead:
+    "Founder-led illustrative scenarios — anonymized examples aligned with workflows the MVP supports or is building toward. Not verified customer outcomes.",
+  casesDisclaimer: "Illustrative examples — not verified live proof.",
   case1Title: "Pan-European SaaS scale-up",
   case1Body:
     "Consolidated discovery across PL and EU-wide boards into one pipeline; agency success fees modeled down with the in-app ROI calculator before procurement decisions.",
@@ -89,7 +90,7 @@ export const SITE_MESSAGES_EN = {
   testimonialsTitle: "What teams say",
   testimonialsLead:
     "TWIN is early; these voices describe the product intent — acceptance-ready scheduling, consent-first automation, and less noise for both sides. Replace with verified customer quotes as pilots graduate.",
-  testimonialsDisclaimer: "Illustrative quotes for the demo — not yet verified customer references.",
+  testimonialsDisclaimer: "Illustrative examples — founder-led quotes, not verified customer references.",
   testimonial1Quote:
     "I stopped drowning in listings I would never book. TWIN surfaces a short list that actually respects my salary band and city.",
   testimonial1Name: "Product lead",
@@ -244,8 +245,7 @@ export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } 
     "Priorytet mają partnerzy z podobnymi standardami jakości ogłoszeń, limitów zapytań i zgody kandydata. Jeśli reprezentujesz portal lub platformę HR, napisz z Kontaktu z tematem „Partnership” i informacją o API lub udostępnianiu danych.",
   partnersNote:
     "Logotypy na stronie głównej ilustrują globalny krajobraz rekrutacji i nie oznaczają partnerstwa, dopóki nie ogłosimy tego osobno.",
-  marqueeLogoDisclaimer:
-    "Logotypy firm pokazane orientacyjnie — kontekst rynku i docelowy ekosystem. Nie wszyscy są klientami TWIN.",
+  marqueeLogoDisclaimer: "Reprezentatywny kontekst rynkowy.",
   partnersReferencesTitle: "Referencje pisemne",
   partnersReferencesLead:
     "Listy referencyjne, poświadczenia bezpieczeństwa lub zakupów oraz podsumowania integracji od partnerów, którzy wyrażą zgodę na publikację.",
@@ -263,7 +263,9 @@ export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } 
     "Testimoniale dodamy, gdy partner zaakceptuje cytat z imieniem i nazwiskiem lub stanowiskiem. Nie publikujemy tu anonimowych pochwał.",
 
   casesTitle: "Studia przypadków",
-  casesLead: "Scenariusze zanonimizowane, zgodne z tym, co MVP już wspiera lub jawnie buduje.",
+  casesLead:
+    "Ilustracyjne scenariusze founder-led — zanonimizowane przykłady zgodne z tym, co MVP wspiera lub buduje. To nie zweryfikowane wyniki klientów.",
+  casesDisclaimer: "Przykłady ilustracyjne — nie zweryfikowany dowód społeczny.",
   case1Title: "Scale-up SaaS w Europie",
   case1Body:
     "Ujednolicenie odkrywania ofert na portalach PL i UE w jednej ścieżce; modelowanie kosztów agencji kalkulatorem ROI przed decyzjami zakupowymi.",
@@ -277,7 +279,7 @@ export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } 
   testimonialsTitle: "Co mówią zespoły",
   testimonialsLead:
     "TWIN jest na wczesnym etapie; te głosy opisują intencję produktu — kalendarz akceptacji, automatyzacja za zgodą i mniej szumu po obu stronach. Zastąpimy je zweryfikowanymi cytatami po pilotach.",
-  testimonialsDisclaimer: "Cytaty ilustracyjne do demo — to jeszcze nie oficjalne referencje klientów.",
+  testimonialsDisclaimer: "Przykłady ilustracyjne — cytaty founder-led, nie zweryfikowane referencje klientów.",
   testimonial1Quote:
     "Przestałem tonąć w ofertach, na które i tak bym nie poszedł. TWIN pokazuje krótką listę zgodną z widełkami i miastem.",
   testimonial1Name: "Product lead",

@@ -16,6 +16,7 @@ import { Shell } from "@/components/ui";
 import { WorkspaceQuickActions } from "@/components/workspace/workspace-quick-actions";
 import { isCalendarConnected } from "@/lib/dashboard-next-best-action";
 import { SHOW_DASHBOARD_EXTENDED_HOME_MODULES } from "@/lib/product-polish-p0";
+import { SHOW_CAREER_COMPASS_ON_DASHBOARD_HOME } from "@/lib/product-polish-p4";
 import { SHOW_SCRAPE_UI } from "@/lib/features";
 
 import { ApplicationsSection } from "@/components/dashboard/applications-section";
@@ -401,7 +402,9 @@ export default function DashboardPage() {
       {(() => {
         const extendedModules = (
           <>
-            {hasProfile && profile ? <CareerCompassStrip profile={profile} /> : null}
+            {SHOW_CAREER_COMPASS_ON_DASHBOARD_HOME && hasProfile && profile ? (
+              <CareerCompassStrip profile={profile} />
+            ) : null}
 
             {showScrapePanel ? (
               <ProfileScrapePanel
