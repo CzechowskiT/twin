@@ -7,12 +7,16 @@ import { useTranslation } from "@/components/language-provider";
 import { IntegrationRowStatusBadge } from "@/components/workspace/integration-row-status-badge";
 import { WorkspacePilotPageHeader } from "@/components/workspace/workspace-pilot-page-header";
 import type { TranslationKey } from "@/lib/i18n";
-import { Shell } from "@/components/ui";
+import { Shell, Card } from "@/components/ui";
 import { COMPANY_INTEGRATION_ROWS } from "@/lib/company-integrations-readiness";
 import {
   COMPANY_INTEGRATIONS_ROADMAP_STATUS,
-  INTEGRATIONS_HONEST_NO_LIVE_ATS_SYNC,
 } from "@/lib/seven-day-d4-company";
+import {
+  ATS_COMING_SOON_NO_LIVE_SYNC,
+  COMPANY_INTEGRATIONS_HONEST_NO_LIVE_ATS_SYNC,
+  COMPANY_SCHEDULING_ROADMAP_ONLY,
+} from "@/lib/seven-day-d6-integrations";
 
 const LABEL_KEYS: Record<string, TranslationKey> = {
   acceptance_inbox: "companyIntegrations.item_acceptance_inbox",
@@ -28,7 +32,7 @@ export default function CompanyIntegrationsClient() {
   const { t } = useTranslation();
 
   return (
-    <Shell wide data-seven-day-company-integrations>
+    <Shell wide data-seven-day-company-integrations data-seven-day-d6-company-integrations>
       <CompanyWorkspaceNav />
       <WorkspacePilotPageHeader
         eyebrowKey="companyIntegrations.eyebrow"
@@ -36,10 +40,21 @@ export default function CompanyIntegrationsClient() {
         leadKey="companyIntegrations.lead"
         status={COMPANY_INTEGRATIONS_ROADMAP_STATUS}
       />
-      {INTEGRATIONS_HONEST_NO_LIVE_ATS_SYNC ? (
+      {COMPANY_INTEGRATIONS_HONEST_NO_LIVE_ATS_SYNC ? (
         <p className="twin-muted mb-4 text-sm leading-relaxed" data-seven-day-company-integrations-roadmap-boundary>
           {t("companyIntegrations.roadmapBoundary")}
         </p>
+      ) : null}
+      {ATS_COMING_SOON_NO_LIVE_SYNC ? (
+        <p className="twin-muted mb-4 text-sm leading-relaxed" data-seven-day-d6-integrations-boundary>
+          {t("sevenDayD6.integrationsNoLiveSyncBoundary")}
+        </p>
+      ) : null}
+      {COMPANY_SCHEDULING_ROADMAP_ONLY ? (
+        <Card variant="soft" className="mb-4 border-[var(--twin-border)]/80 p-4" data-seven-day-d6-company-scheduling-boundary>
+          <p className="text-sm font-semibold text-[var(--foreground)]">{t("sevenDayD6.companySchedulingComingSoonTitle")}</p>
+          <p className="twin-muted mt-2 text-sm leading-relaxed">{t("sevenDayD6.companySchedulingComingSoonBody")}</p>
+        </Card>
       ) : null}
 
       <ul className="space-y-3">

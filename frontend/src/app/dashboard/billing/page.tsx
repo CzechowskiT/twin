@@ -13,6 +13,7 @@ import { PremiumPreviewSurface } from "@/components/workspace/premium-preview-su
 import { WorkspaceStatusBadge } from "@/components/workspace/workspace-status-badge";
 import { apiFetch } from "@/lib/api";
 import { BILLING_PREMIUM_PREVIEW_ONLY } from "@/lib/product-polish-p2";
+import { STRIPE_NOT_PUBLIC_LAUNCH } from "@/lib/seven-day-d6-integrations";
 import { clearToken, getToken } from "@/lib/auth";
 import type { TranslationKey } from "@/lib/i18n";
 import { CANDIDATE_PLAN_USD } from "@/lib/pricing-locale";
@@ -355,10 +356,18 @@ export default function BillingPage() {
       : null;
   const paid = subscriptionStatus != null && PAID.has(subscriptionStatus);
   const showPortal = paid;
+  const checkoutPublicEnabled =
+    (plans?.checkout_configured ?? false) && !STRIPE_NOT_PUBLIC_LAUNCH;
+  const showPremiumPreviewOnly = BILLING_PREMIUM_PREVIEW_ONLY || STRIPE_NOT_PUBLIC_LAUNCH;
 
   return (
     <Shell wide rail>
-      <div className="twin-billing-surface">
+      <div className="twin-billing-surface" data-seven-day-d6-candidate-billing>
+        {showPremiumPreviewOnly ? (
+          <p className="twin-muted mb-4 text-sm leading-relaxed" data-seven-day-d6-billing-stripe-boundary>
+            {t("sevenDayD6.billingStripePreviewBoundary")}
+          </p>
+        ) : null}
         <div className="twin-app-read-pane mb-6 flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0 max-w-2xl">
             <div className="flex flex-wrap items-center gap-2">
@@ -371,7 +380,7 @@ export default function BillingPage() {
         </div>
 
         <BillingUpgradeExperience
-          checkoutConfigured={plans?.checkout_configured ?? false}
+          checkoutConfigured={checkoutPublicEnabled}
           currentTier={me?.plan_tier ?? "free"}
         />
 
@@ -511,9 +520,9 @@ export default function BillingPage() {
         </Card>
       ) : null}
 
-      {plans && !loading && !plans.checkout_configured && BILLING_PREMIUM_PREVIEW_ONLY ? (
+      {plans && !loading && !checkoutPublicEnabled && showPremiumPreviewOnly ? (
         <PremiumPreviewSurface variant="candidate" className="mb-6" />
-      ) : plans && !loading && !plans.checkout_configured ? (
+      ) : plans && !loading && !checkoutPublicEnabled ? (
         <Card variant="soft" className="mb-6 border-[var(--twin-accent-muted)]">
           <div className="marketing-hero-rail text-start">
             <p className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.billingStripeSoonTitle")}</p>
@@ -572,12 +581,12 @@ export default function BillingPage() {
                 const canOpenWorkspace = p.id === "free" && !isCurrent;
                 const canJoinWishlist =
                   !paid &&
-                  !plans.checkout_configured &&
+                  !checkoutPublicEnabled &&
                   (p.id === "standard" || p.id === "premium" || p.id === "pro");
                 const canCheckout =
                   !paid &&
                   isCheckoutPlanId(p.id) &&
-                  plans.checkout_configured &&
+                  checkoutPublicEnabled &&
                   p.stripe_price_configured;
                 const actionable = canOpenWorkspace || canJoinWishlist || canCheckout;
                 const disabled = busy !== null || isCurrent || !actionable;
@@ -594,7 +603,7 @@ export default function BillingPage() {
                     };
                     if (canJoinWishlist) footerKey = "dashboard.billingCtaJoinWishlist";
                     else if (canCheckout) footerKey = upgradeKeys[p.id];
-                    else if (!plans.checkout_configured) {
+                    else if (!checkoutPublicEnabled) {
                       footerKey = "dashboard.billingCtaUnavailableShort";
                       statusNote = t("dashboard.billingNotConfigured");
                     } else if (p.id === "pro") {

@@ -9,6 +9,8 @@ import { WorkspaceFlowSteps } from "@/components/ux/workspace-flow-steps";
 import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
+import { WorkspaceStatusBadge } from "@/components/workspace/workspace-status-badge";
+import { AUTO_APPLY_PAUSED_HIDDEN } from "@/lib/seven-day-d6-integrations";
 
 type AutoApplySettings = {
   is_active: boolean;
@@ -107,17 +109,25 @@ export default function NightlyAutoApplySettingsPage() {
   const toggleChecked = Boolean(canEnableAutonomous && settings?.is_active);
 
   return (
-    <Shell wide rail>
+    <Shell wide rail data-seven-day-d6-auto-apply-settings>
       <div className="space-y-6">
         <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
-              {t("dashboard.nightlyAutoApplyTitle")}
-            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted)]">
+                {t("dashboard.nightlyAutoApplyTitle")}
+              </p>
+              {AUTO_APPLY_PAUSED_HIDDEN ? <WorkspaceStatusBadge status="paused" /> : null}
+            </div>
             <h1 className="twin-page-intro twin-section-title mt-1 text-xl sm:text-2xl">
               {t("dashboard.nightlyAutoApplyTitle")}
             </h1>
             <p className="twin-muted mt-2 max-w-prose text-sm leading-relaxed">{t("dashboard.nightlyAutoApplyLead")}</p>
+            {AUTO_APPLY_PAUSED_HIDDEN ? (
+              <p className="twin-muted mt-3 max-w-prose text-sm leading-relaxed" data-seven-day-d6-auto-apply-boundary>
+                {t("sevenDayD6.autoApplyPausedBoundary")}
+              </p>
+            ) : null}
           </div>
           <CandidateWorkspaceSubnav ariaLabel={t("dashboard.nightlyAutoApplyTitle")} />
         </div>

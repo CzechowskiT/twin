@@ -248,6 +248,7 @@ export type TranslationKey =
   | `recruiterHub.${keyof typeof en.recruiterHub}`
   | `companyHub.${keyof typeof en.companyHub}`
   | `sevenDayD5.${keyof typeof en.sevenDayD5}`
+  | `sevenDayD6.${keyof typeof en.sevenDayD6}`
   | `recruiterDailyCockpit.${keyof typeof en.recruiterDailyCockpit}`
   | `companyHiringCockpit.${keyof typeof en.companyHiringCockpit}`
   | `companyHiringCommandCenter.${keyof typeof en.companyHiringCommandCenter}`
@@ -3305,9 +3306,9 @@ eyebrow: "Product roadmap",
     title: "Recruiter calendar",
     lead:
       "TWIN’s north star is a short calendar of acceptance-ready interviews — for candidates and recruiters. The recruiter-side calendar view is not live in this pilot yet.",
-    notLiveTitle: "Not live in this environment",
+    notLiveTitle: "Coming soon",
     notLiveBody:
-      "Google and Microsoft calendar sync on this page is for candidates only today. Recruiter propose-slot, team holds, and Outlook/Teams integration are on the roadmap — not shipped.",
+      "Google and Microsoft calendar sync on this page is for candidates only today. Recruiter propose-slot, team holds, and Outlook/Teams integration are on the roadmap — not live on this launch.",
     roadmapItem1: "Acceptance inbox and match review card — live today.",
     roadmapItem2: "Recruiter-proposed interview slots + calendar sync — roadmap.",
     roadmapItem3: "Employer SSO and ATS webhooks — pilot scope only.",
@@ -4193,6 +4194,22 @@ eyebrow: "Product roadmap",
       "Illustrative five-year scenario model for internal discussion — not investment advice or a forecast of actual results.",
     roadmapControlledPreviewBody:
       "Controlled preview from production reality matrices — now / next / later without slide-deck launch dates or fabricated traction.",
+  },
+  sevenDayD6: {
+    calendarBoundaryLead:
+      "Calendar honesty: Google OAuth is live for candidates; Microsoft 365 is coming soon; ICS/WebCal is a preview export — not two-way sync.",
+    billingStripePreviewBoundary:
+      "Stripe checkout is not part of the public launch — premium preview and waitlist only. No card charge or fake upgrade flow.",
+    integrationsNoLiveSyncBoundary:
+      "Integrations roadmap — ATS connectors and calendar sync are coming soon or preview-only. No live sync, no fake connected state.",
+    autoApplyPausedBoundary:
+      "Auto-apply and delegated outreach stay paused on production — prepare packages only; no marketplace liquidity claims.",
+    recruiterCalendarComingSoonTitle: "Coming soon",
+    recruiterCalendarComingSoonBody:
+      "Recruiter-side calendar, propose-slot, and Teams holds are on the roadmap — not live on this launch. Use the acceptance inbox for interview decisions today.",
+    companySchedulingComingSoonTitle: "Scheduling coming soon",
+    companySchedulingComingSoonBody:
+      "Employer calendar and interview scheduling integrations are roadmap-only — not live sync on this launch.",
   },
   placementEmployer: {
     title: "Confirm hire for TWIN",
@@ -11133,9 +11150,9 @@ const pl: MessageTree = {
     title: "Kalendarz rekrutera",
     lead:
       "North star TWIN to krótki kalendarz rozmów gotowych do akceptacji — dla kandydatów i rekruterów. Widok kalendarza po stronie rekrutera nie jest jeszcze live w tym pilotażu.",
-    notLiveTitle: "Nie jest live w tym środowisku",
+    notLiveTitle: "Wkrótce",
     notLiveBody:
-      "Synchronizacja Google i Microsoft na tej stronie dotyczy dziś tylko kandydatów. Propozycje slotów przez rekrutera, holdy zespołowe i integracja Outlook/Teams to roadmapa — nieshipowane.",
+      "Synchronizacja Google i Microsoft na tej stronie dotyczy dziś tylko kandydatów. Propozycje slotów przez rekrutera, holdy zespołowe i integracja Outlook/Teams to roadmapa — nie live w tym launchu.",
     roadmapItem1: "Skrzynka akceptacji i karta oceny — live dziś.",
     roadmapItem2: "Sloty proponowane przez rekrutera + sync kalendarza — roadmapa.",
     roadmapItem3: "SSO pracodawcy i webhooki ATS — tylko zakres pilotażu.",
@@ -12023,6 +12040,22 @@ const pl: MessageTree = {
       "Ilustracyjny model pięcioletni do dyskusji wewnętrznej — nie porada inwestycyjna ani prognoza wyników.",
     roadmapControlledPreviewBody:
       "Kontrolowany podgląd z macierzy production reality — teraz / następne / później bez dat launchu ze slajdów ani sfabrykowanej trakcji.",
+  },
+  sevenDayD6: {
+    calendarBoundaryLead:
+      "Uczciwość kalendarza: Google OAuth jest live dla kandydatów; Microsoft 365 wkrótce; ICS/WebCal to podgląd eksportu — nie sync dwukierunkowy.",
+    billingStripePreviewBoundary:
+      "Stripe checkout nie jest częścią publicznego launchu — tylko premium preview i waitlist. Bez obciążenia karty i fałszywego upgrade.",
+    integrationsNoLiveSyncBoundary:
+      "Roadmapa integracji — konektory ATS i sync kalendarza są wkrótce lub tylko podgląd. Bez live sync i fałszywego stanu connected.",
+    autoApplyPausedBoundary:
+      "Auto-apply i delegated outreach pozostają wstrzymane na produkcji — tylko przygotowanie pakietów; bez obietnic płynności marketplace.",
+    recruiterCalendarComingSoonTitle: "Wkrótce",
+    recruiterCalendarComingSoonBody:
+      "Kalendarz rekrutera, propose-slot i holdy Teams są na roadmapie — nie live w tym launchu. Dziś decyzje o rozmowach przez acceptance inbox.",
+    companySchedulingComingSoonTitle: "Planowanie wkrótce",
+    companySchedulingComingSoonBody:
+      "Kalendarz pracodawcy i integracje planowania rozmów to tylko roadmapa — bez live sync w tym launchu.",
   },
   placementEmployer: {
     title: "Potwierdzenie zatrudnienia w TWIN",

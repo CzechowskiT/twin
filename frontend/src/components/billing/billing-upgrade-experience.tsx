@@ -7,6 +7,7 @@ import { AnimatedCounter } from "@/components/waitlist/animated-counter";
 import { PremiumPreviewSurface } from "@/components/workspace/premium-preview-surface";
 import type { TranslationKey } from "@/lib/i18n";
 import { BILLING_PREMIUM_PREVIEW_ONLY } from "@/lib/product-polish-p2";
+import { STRIPE_NOT_PUBLIC_LAUNCH } from "@/lib/seven-day-d6-integrations";
 
 type MvpStats = {
   validated_jobs: number;
@@ -57,6 +58,7 @@ export function BillingUpgradeExperience({ checkoutConfigured, currentTier }: Bi
   const [stats, setStats] = useState<MvpStats | null>(null);
   const tier = currentTier.toLowerCase();
   const showWishlistBand = !checkoutConfigured && tier === "free";
+  const showPremiumPreview = showWishlistBand || BILLING_PREMIUM_PREVIEW_ONLY || STRIPE_NOT_PUBLIC_LAUNCH;
 
   useEffect(() => {
     let cancelled = false;
@@ -142,7 +144,7 @@ export function BillingUpgradeExperience({ checkoutConfigured, currentTier }: Bi
           <li>{t("dashboard.billingEngagementTrustSecure")}</li>
         </ul>
 
-        {showWishlistBand || BILLING_PREMIUM_PREVIEW_ONLY ? (
+        {showPremiumPreview ? (
           <PremiumPreviewSurface variant="candidate" className="twin-billing-engage__wishlist text-start" />
         ) : null}
       </div>

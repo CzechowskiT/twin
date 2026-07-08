@@ -11,6 +11,7 @@ import { IntegrationRowStatusBadge } from "@/components/workspace/integration-ro
 import { WorkspacePilotPageHeader } from "@/components/workspace/workspace-pilot-page-header";
 import type { TranslationKey } from "@/lib/i18n";
 import { BILLING_PREMIUM_PREVIEW_ONLY } from "@/lib/product-polish-p2";
+import { STRIPE_NOT_PUBLIC_LAUNCH } from "@/lib/seven-day-d6-integrations";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
 import {
@@ -90,7 +91,7 @@ export default function CompanyBillingClient() {
     `companyBilling.integration_${key}` as TranslationKey;
 
   return (
-    <Shell wide>
+    <Shell wide data-seven-day-d6-company-billing>
       <CompanyWorkspaceNav />
       <WorkspacePilotPageHeader
         eyebrowKey="companyBilling.eyebrow"
@@ -99,8 +100,13 @@ export default function CompanyBillingClient() {
         status="preview"
       />
 
-      {BILLING_PREMIUM_PREVIEW_ONLY ? (
-        <PremiumPreviewSurface variant="company" className="mb-6" />
+      {BILLING_PREMIUM_PREVIEW_ONLY || STRIPE_NOT_PUBLIC_LAUNCH ? (
+        <>
+          <p className="twin-muted mb-4 text-sm leading-relaxed" data-seven-day-d6-billing-stripe-boundary>
+            {t("sevenDayD6.billingStripePreviewBoundary")}
+          </p>
+          <PremiumPreviewSurface variant="company" className="mb-6" />
+        </>
       ) : (
         <Card variant="soft" className="mb-6 border-amber-500/30 bg-amber-500/5 p-4">
           <h2 className="text-sm font-semibold text-[var(--foreground)]">{t("companyBilling.billingNotLiveTitle")}</h2>
