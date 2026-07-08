@@ -19,6 +19,7 @@ import {
   getExecutiveProductProofRisks,
   getExecutiveProductProofSorStack,
 } from "@/lib/executive-product-proof";
+import { PRODUCT_PROOF_PREVIEW_BOUNDARY } from "@/lib/seven-day-d5-investor";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -76,6 +77,12 @@ export function ExecutiveProductProofBoard({ workspace = false }: { workspace?: 
           </div>
           <DemoJourneyPilotStatus status="pilot" />
         </header>
+
+        {PRODUCT_PROOF_PREVIEW_BOUNDARY ? (
+          <Card variant="soft" className="border-[var(--twin-border)]/80 p-5" data-seven-day-investor-product-proof-preview-boundary>
+            <p className="text-sm leading-relaxed text-[var(--twin-muted-strong)]">{t("sevenDayD5.productProofPreviewBoundaryBody")}</p>
+          </Card>
+        ) : null}
 
         <div className="grid gap-5 lg:grid-cols-2">
           {sectionCard(

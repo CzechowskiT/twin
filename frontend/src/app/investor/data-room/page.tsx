@@ -1,10 +1,11 @@
 "use client";
 
 import { InvestorDataRoomPanel } from "@/components/investor/investor-data-room-panel";
-import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 import { PersonaWorkspaceGate } from "@/components/persona-workspace-gate";
 import { useTranslation } from "@/components/language-provider";
 import { Shell } from "@/components/ui";
+import { WorkspaceStatusBadge } from "@/components/workspace/workspace-status-badge";
+import { DATA_ROOM_INVITE_ONLY_PREVIEW } from "@/lib/seven-day-d5-investor";
 
 export default function InvestorDataRoomPage() {
   const { t } = useTranslation();
@@ -20,9 +21,13 @@ export default function InvestorDataRoomPage() {
             <h1 className="twin-page-intro text-2xl font-semibold sm:text-3xl">
               {t("investorDataRoom.title")}
             </h1>
-            <p className="twin-muted max-w-2xl text-sm leading-relaxed">{t("investorDataRoom.lead")}</p>
+            <p className="twin-muted max-w-2xl text-sm leading-relaxed">
+              {DATA_ROOM_INVITE_ONLY_PREVIEW ? t("sevenDayD5.dataRoomInviteOnlyLead") : t("investorDataRoom.lead")}
+            </p>
           </div>
-          <DemoJourneyPilotStatus status="pilot" />
+          {DATA_ROOM_INVITE_ONLY_PREVIEW ? (
+            <WorkspaceStatusBadge status="preview" labelKey="sevenDayD5.dataRoomInviteOnlyBadge" />
+          ) : null}
         </header>
         <InvestorDataRoomPanel />
       </Shell>

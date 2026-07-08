@@ -3,6 +3,11 @@
  * Routes and SoR entries stay intact; hubs only change grouping and default display.
  */
 import type { MarketingPersona } from "@/lib/marketing-persona";
+import {
+  HIDE_BOARD_FROM_INVESTOR_DEFAULT_HUB,
+  INVESTOR_PRIMARY_MODULE_IDS,
+  INVESTOR_ROADMAP_MODULE_IDS,
+} from "@/lib/seven-day-d5-investor";
 import type { SystemOfRecordRouteEntry } from "@/lib/system-of-record-routes";
 import type { WorkspaceModuleDef, WorkspaceModuleStatus } from "@/lib/workspace-module-status";
 
@@ -152,8 +157,11 @@ export const CONTROLLED_PILOT_PRIMARY_LIMITS: Readonly<Record<MarketingPersona, 
   candidate: 8,
   recruiter: 5,
   company: 4,
-  investor: 99,
+  investor: 6,
 };
+
+const INVESTOR_PRIMARY_IDS = new Set<string>(INVESTOR_PRIMARY_MODULE_IDS);
+const INVESTOR_ROADMAP_IDS = new Set<string>(INVESTOR_ROADMAP_MODULE_IDS);
 
 function hrefIsBoardOrAdmin(href: string): boolean {
   return BOARD_OR_ADMIN_PREFIXES.some((prefix) => href.startsWith(prefix));
@@ -187,6 +195,13 @@ export function classifyProductSurfaceTier(
   }
 
   if (persona === "investor") {
+    if (HIDE_BOARD_FROM_INVESTOR_DEFAULT_HUB && hrefIsBoardOrAdmin(moduleId)) {
+      return "INTERNAL";
+    }
+    if (INVESTOR_PRIMARY_IDS.has(moduleId)) return "LIVE";
+    if (INVESTOR_ROADMAP_IDS.has(moduleId)) {
+      return status === "preview" || status === "pilot" ? "PILOT" : "COMING_SOON";
+    }
     return status ? statusToTier(status) : "PILOT";
   }
 
@@ -220,14 +235,20 @@ export function classifyProductSurfaceTier(
 }
 
 export function shouldHideFromDefaultHub(persona: MarketingPersona, moduleId: string): boolean {
-  if (persona === "investor") return false;
+  if (persona === "investor") {
+    if (HIDE_BOARD_FROM_INVESTOR_DEFAULT_HUB && hrefIsBoardOrAdmin(moduleId)) return true;
+    return classifyProductSurfaceTier(persona, moduleId) === "INTERNAL";
+  }
   if (ALWAYS_HIDDEN_MODULE_IDS.has(moduleId)) return true;
   if (hrefIsBoardOrAdmin(moduleId)) return true;
   return classifyProductSurfaceTier(persona, moduleId) === "INTERNAL";
 }
 
 export function shouldShowAsRoadmap(persona: MarketingPersona, moduleId: string): boolean {
-  if (persona === "investor") return false;
+  if (persona === "investor") {
+    const tier = classifyProductSurfaceTier(persona, moduleId);
+    return tier === "PILOT" || tier === "COMING_SOON" || tier === "HOLD";
+  }
   const tier = classifyProductSurfaceTier(persona, moduleId);
   return tier === "PILOT" || tier === "COMING_SOON" || tier === "HOLD";
 }
@@ -248,10 +269,6 @@ export function splitProductSurfaceRoutes(
   persona: MarketingPersona,
   routes: readonly SystemOfRecordRouteEntry[],
 ): ProductSurfaceHubSlice<SystemOfRecordRouteEntry> {
-  if (persona === "investor") {
-    return { primary: routes, roadmap: [], hidden: [] };
-  }
-
   const primary: SystemOfRecordRouteEntry[] = [];
   const roadmap: SystemOfRecordRouteEntry[] = [];
   const hidden: SystemOfRecordRouteEntry[] = [];
@@ -279,10 +296,6 @@ export function splitWorkspaceModules(
   persona: MarketingPersona,
   modules: readonly WorkspaceModuleDef[],
 ): ProductSurfaceHubSlice<WorkspaceModuleDef> {
-  if (persona === "investor") {
-    return { primary: modules, roadmap: [], hidden: [] };
-  }
-
   const primary: WorkspaceModuleDef[] = [];
   const roadmap: WorkspaceModuleDef[] = [];
   const hidden: WorkspaceModuleDef[] = [];

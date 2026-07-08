@@ -19,6 +19,7 @@ import {
   type InvestorModuleKey,
   type PublicHealthSnapshot,
 } from "@/lib/investor-metrics-reality";
+import { INVESTOR_METRICS_CONTROLLED_PREVIEW } from "@/lib/seven-day-d5-investor";
 
 function ModuleList({ marker, keys, tone }: { marker: string; keys: readonly InvestorModuleKey[]; tone: "live" | "demo" | "notLive" }) {
   const { t } = useTranslation();
@@ -77,6 +78,11 @@ export function InvestorMetricsRealityDashboard() {
         <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-[var(--twin-accent)]">{t("investorMetrics.eyebrow")}</p>
         <h1 className="twin-page-intro mt-2 text-2xl font-semibold sm:text-3xl">{t("investorMetrics.title")}</h1>
         <p className="twin-muted mt-3 max-w-3xl text-sm leading-relaxed">{t("investorMetrics.lead")}</p>
+        {INVESTOR_METRICS_CONTROLLED_PREVIEW ? (
+          <Card variant="soft" className="mt-4 border-[var(--twin-border)]/80 p-4" data-seven-day-investor-metrics-controlled-preview>
+            <p className="text-sm leading-relaxed text-[var(--twin-muted-strong)]">{t("sevenDayD5.metricsControlledPreviewBody")}</p>
+          </Card>
+        ) : null}
         <Card variant="soft" className={`${INVESTOR_METRICS_VISUAL_MARKERS.transparencyBanner} mt-6 border-[var(--twin-accent)]/20 bg-[var(--twin-surface-2)] p-5 sm:p-6`}>
           <p className="text-sm font-semibold text-[var(--foreground)]">{t("investorMetrics.transparencyTitle")}</p>
           <p className="twin-muted mt-2 text-sm leading-relaxed">{t("investorMetrics.transparencyBody")}</p>

@@ -247,6 +247,7 @@ export type TranslationKey =
   | `decisionMemory.${keyof typeof en.decisionMemory}`
   | `recruiterHub.${keyof typeof en.recruiterHub}`
   | `companyHub.${keyof typeof en.companyHub}`
+  | `sevenDayD5.${keyof typeof en.sevenDayD5}`
   | `recruiterDailyCockpit.${keyof typeof en.recruiterDailyCockpit}`
   | `companyHiringCockpit.${keyof typeof en.companyHiringCockpit}`
   | `companyHiringCommandCenter.${keyof typeof en.companyHiringCommandCenter}`
@@ -2038,8 +2039,8 @@ const en = {
     investorRoadmapValue: "Now / next / later from production reality matrices.",
     investorRoadmapCta: "Open roadmap",
     investorDataRoomTitle: "Data room",
-    investorDataRoomValue: "Traction pack on request — confidential docs gated.",
-    investorDataRoomHint: "Sign in as investor for full access.",
+    investorDataRoomValue: "Invite-only preview — confidential pack on founder request.",
+    investorDataRoomHint: "No live secure data room — request access to review materials.",
     investorDataRoomCta: "Request access",
     investorCalculatorTitle: "Scenario calculator",
     investorCalculatorValue: "Five-year illustrative model — not investment advice.",
@@ -4147,6 +4148,51 @@ eyebrow: "Product roadmap",
     nextActionLead:
       "With pilot promos tucked away, start where hiring bar is set — publish roles, then review pipeline segments with human decisions only.",
     nextActionCta: "Open roles",
+  },
+  sevenDayD5: {
+    investorRoomPreviewEyebrow: "Investor preview",
+    investorRoomPreviewLead:
+      "Controlled diligence preview — metrics and roadmap are illustrative. Data room materials are on request. No public launch claim.",
+    investorRoomDataRoomCta: "Request data room access",
+    investorRoomDetailsTitle: "Executive detail (optional)",
+    investorRoomDetailsLead: "Personas, demo map, status matrix, roadmap, and risks — collapsed by default to reduce preview noise.",
+    investorRoomDetailsShow: "Show executive detail",
+    investorRoomDetailsHide: "Hide executive detail",
+    investorHubNextActionEyebrow: "Recommended next",
+    investorHubNextActionTitle: "Start with metrics reality",
+    investorHubNextActionLead:
+      "Review module readiness and safe technical signals before pilot-only placement or invite-only data room depth.",
+    investorHubNextActionCta: "Open metrics",
+    investorWorkspaceHubLead:
+      "Investor preview hub — live metrics, roadmap, and calculator; invite-only data room and pilot placement tucked in roadmap.",
+    investorRoadmapSectionTitle: "Invite-only & pilot modules",
+    investorRoadmapSectionLead:
+      "Data room, placement economics, and demo proof packs — founder-led preview, not public launch surfaces.",
+    investorBoardHiddenTitle: "Internal board evidence",
+    investorBoardHiddenLead:
+      "Read-only ops/board routes for founder diligence — not the default investor launch surface.",
+    investorBoardShow: "Show internal board routes",
+    investorBoardHide: "Hide internal board routes",
+    dataRoomInviteOnlyBadge: "Invite-only preview",
+    dataRoomInviteOnlyLead:
+      "Founder-led data room preview — public GitHub docs and verifiable product surfaces. No live secure data room or signed URLs on this page.",
+    dataRoomBoundaryTitle: "Data room on request",
+    dataRoomBoundaryBody:
+      "Cap table, financials, and legal packs require founder review and signed access. This page links public materials and verifiable surfaces only — not a fake live secure vault.",
+    dataRoomVerifySurfacesTitle: "Verifiable surfaces",
+    dataRoomVerifySurfacesLead: "Metrics, status, and calculator you can check yourself — not static screenshots or confidential downloads.",
+    placementPilotBoundaryBody:
+      "Placement economics are limited pilot only — DD cohort timeline with demo seed data. No verified external customer or revenue claims.",
+    trustProofPreviewBoundaryBody:
+      "Founder-led trust architecture preview — illustrative evidence from repo and pilot modules. No verified external customer attestations.",
+    productProofPreviewBoundaryBody:
+      "Executive product proof is a controlled preview — maturity matrix from production reality, not third-party customer logos or closed-won claims.",
+    metricsControlledPreviewBody:
+      "Controlled preview — module tiers and public-health signals only. Not audited financials, ARR, or cohort conversion metrics.",
+    calculatorIllustrativeBody:
+      "Illustrative five-year scenario model for internal discussion — not investment advice or a forecast of actual results.",
+    roadmapControlledPreviewBody:
+      "Controlled preview from production reality matrices — now / next / later without slide-deck launch dates or fabricated traction.",
   },
   placementEmployer: {
     title: "Confirm hire for TWIN",
@@ -9815,8 +9861,8 @@ const pl: MessageTree = {
     investorRoadmapValue: "Teraz / następne / później z macierzy produkcyjnych.",
     investorRoadmapCta: "Otwórz roadmapę",
     investorDataRoomTitle: "Data room",
-    investorDataRoomValue: "Pakiet trakcji na żądanie — dokumenty poufne gated.",
-    investorDataRoomHint: "Zaloguj się jako inwestor po pełny dostęp.",
+    investorDataRoomValue: "Podgląd tylko na zaproszenie — pakiet poufny na żądanie u foundera.",
+    investorDataRoomHint: "Bez live secure data room — poproś o dostęp do materiałów.",
     investorDataRoomCta: "Poproś o dostęp",
     investorCalculatorTitle: "Kalkulator scenariusza",
     investorCalculatorValue: "Model pięcioletni ilustracyjny — nie porada inwestycyjna.",
@@ -11932,6 +11978,51 @@ const pl: MessageTree = {
     nextActionLead:
       "Gdy promocje pilota są schowane, zacznij od ustawienia bara rekrutacyjnego — opublikuj role, potem przeglądaj segmenty pipeline wyłącznie z decyzjami człowieka.",
     nextActionCta: "Otwórz role",
+  },
+  sevenDayD5: {
+    investorRoomPreviewEyebrow: "Podgląd inwestora",
+    investorRoomPreviewLead:
+      "Kontrolowany podgląd due diligence — metryki i roadmapa są ilustracyjne. Materiały data room na żądanie. Bez obietnicy publicznego launchu.",
+    investorRoomDataRoomCta: "Poproś o dostęp do data room",
+    investorRoomDetailsTitle: "Szczegóły executive (opcjonalnie)",
+    investorRoomDetailsLead: "Persony, mapa demo, macierz statusu, roadmapa i ryzyka — domyślnie zwinięte, mniej szumu w podglądzie.",
+    investorRoomDetailsShow: "Pokaż szczegóły executive",
+    investorRoomDetailsHide: "Ukryj szczegóły executive",
+    investorHubNextActionEyebrow: "Rekomendowany krok",
+    investorHubNextActionTitle: "Zacznij od metryk reality",
+    investorHubNextActionLead:
+      "Przejrzyj gotowość modułów i bezpieczne sygnały techniczne przed pilot-only placement lub invite-only data room.",
+    investorHubNextActionCta: "Otwórz metryki",
+    investorWorkspaceHubLead:
+      "Hub podglądu inwestora — live metryki, roadmapa i kalkulator; invite-only data room i pilot placement w roadmapie.",
+    investorRoadmapSectionTitle: "Moduły invite-only i pilot",
+    investorRoadmapSectionLead:
+      "Data room, ekonomia placement i pakiety demo proof — podgląd founder-led, nie publiczne powierzchnie launchu.",
+    investorBoardHiddenTitle: "Wewnętrzne dowody board",
+    investorBoardHiddenLead:
+      "Trasy ops/board tylko do odczytu dla due diligence foundera — nie domyślna powierzchnia launchu inwestora.",
+    investorBoardShow: "Pokaż wewnętrzne trasy board",
+    investorBoardHide: "Ukryj wewnętrzne trasy board",
+    dataRoomInviteOnlyBadge: "Podgląd tylko na zaproszenie",
+    dataRoomInviteOnlyLead:
+      "Podgląd data room founder-led — publiczne docs na GitHub i weryfikowalne powierzchnie produktu. Bez live secure data room ani signed URLs na tej stronie.",
+    dataRoomBoundaryTitle: "Data room na żądanie",
+    dataRoomBoundaryBody:
+      "Cap table, finanse i pakiety legal wymagają review foundera i podpisanego dostępu. Ta strona linkuje materiały publiczne i weryfikowalne powierzchnie — nie fałszywy live secure vault.",
+    dataRoomVerifySurfacesTitle: "Weryfikowalne powierzchnie",
+    dataRoomVerifySurfacesLead: "Metryki, status i kalkulator do samodzielnej weryfikacji — nie statyczne screenshoty ani poufne pliki.",
+    placementPilotBoundaryBody:
+      "Ekonomia placement to ograniczony pilot — timeline kohorty DD z demo seed. Bez zweryfikowanych zewnętrznych klientów ani przychodów.",
+    trustProofPreviewBoundaryBody:
+      "Podgląd architektury trust founder-led — ilustracyjne dowody z repo i modułów pilota. Bez zewnętrznych attestacji klientów.",
+    productProofPreviewBoundaryBody:
+      "Executive product proof to kontrolowany podgląd — macierz dojrzałości z production reality, bez logo klientów ani closed-won.",
+    metricsControlledPreviewBody:
+      "Kontrolowany podgląd — tylko tiery modułów i sygnały public-health. Nie audytowane finanse, ARR ani metryki konwersji kohort.",
+    calculatorIllustrativeBody:
+      "Ilustracyjny model pięcioletni do dyskusji wewnętrznej — nie porada inwestycyjna ani prognoza wyników.",
+    roadmapControlledPreviewBody:
+      "Kontrolowany podgląd z macierzy production reality — teraz / następne / później bez dat launchu ze slajdów ani sfabrykowanej trakcji.",
   },
   placementEmployer: {
     title: "Potwierdzenie zatrudnienia w TWIN",

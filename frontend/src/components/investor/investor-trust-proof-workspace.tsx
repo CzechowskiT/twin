@@ -5,6 +5,7 @@ import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { INVESTOR_TRUST_PROOF_LINKS, INVESTOR_TRUST_PROOF_MARKERS, INVESTOR_TRUST_PROOF_PAGE_MARKER, LAUNCH_STANCE, resolveInvestorTrustProof } from "@/lib/investor-trust-proof";
 import type { TranslationKey } from "@/lib/i18n";
+import { TRUST_PROOF_PREVIEW_BOUNDARY } from "@/lib/seven-day-d5-investor";
 import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 
 function section(marker: string, title: string, body: string) {
@@ -28,6 +29,11 @@ export function InvestorTrustProofWorkspace() {
           <DemoJourneyPilotStatus testId={INVESTOR_TRUST_PROOF_MARKERS.pilotBadge} />
           <div className="flex gap-3 text-xs">{INVESTOR_TRUST_PROOF_LINKS.map((l) => <Link key={l.href} href={l.href} className="twin-link">{t(l.labelKey)}</Link>)}</div>
         </header>
+        {TRUST_PROOF_PREVIEW_BOUNDARY ? (
+          <Card variant="soft" className="border-[var(--twin-border)]/80 p-5" data-seven-day-investor-trust-proof-preview-boundary>
+            <p className="text-sm leading-relaxed text-[var(--twin-muted-strong)]">{t("sevenDayD5.trustProofPreviewBoundaryBody")}</p>
+          </Card>
+        ) : null}
         {section(INVESTOR_TRUST_PROOF_MARKERS.architecture, t("investorTrustProof.architectureTitle"), t("investorTrustProof.architectureLead"))}
         {section(INVESTOR_TRUST_PROOF_MARKERS.matrix, t("investorTrustProof.matrixTitle"), t("investorTrustProof.matrixLead"))}
         {section(INVESTOR_TRUST_PROOF_MARKERS.recruiter, t("investorTrustProof.recruiterTitle"), t("investorTrustProof.recruiterLead"))}

@@ -6,7 +6,8 @@ import { PlacementVerificationDemo } from "@/components/investor/placement-verif
 import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 import { PersonaWorkspaceGate } from "@/components/persona-workspace-gate";
 import { useTranslation } from "@/components/language-provider";
-import { Shell } from "@/components/ui";
+import { Card, Shell } from "@/components/ui";
+import { PLACEMENT_LIMITED_PILOT } from "@/lib/seven-day-d5-investor";
 
 export default function InvestorPlacementPage() {
   const { t } = useTranslation();
@@ -23,6 +24,16 @@ export default function InvestorPlacementPage() {
           </div>
           <DemoJourneyPilotStatus status="pilot" />
         </header>
+        {PLACEMENT_LIMITED_PILOT ? (
+          <Card
+            variant="soft"
+            className="mb-6 border-[var(--twin-border)]/80 p-5"
+            data-testid="seven-day-investor-placement-pilot-boundary"
+            data-seven-day-investor-placement-pilot-boundary
+          >
+            <p className="text-sm leading-relaxed text-[var(--twin-muted-strong)]">{t("sevenDayD5.placementPilotBoundaryBody")}</p>
+          </Card>
+        ) : null}
         <PlacementVerificationDemo />
         <Link href="/workspace/investor" className="twin-link mt-8 inline-block text-sm font-medium">
           ← {t("dataRoom.backInvestor")}
