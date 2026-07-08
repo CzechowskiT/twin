@@ -125,6 +125,7 @@
     "test:gate-f-decision-package-guard": "npx --yes tsx scripts/gate-f-decision-package-guard.test.ts",
     "test:gate-f-founder-review-note-guard": "npx --yes tsx scripts/gate-f-founder-review-note-guard.test.ts",
     "test:gate-f-founder-review-package-guard": "npx --yes tsx scripts/gate-f-founder-review-package-guard.test.ts",
+    "test:nightly-cursor-progress-guard": "npx --yes tsx scripts/nightly-cursor-progress-guard.test.ts",
     "test:gate-f-reaudit-plan-guard": "npx --yes tsx scripts/gate-f-reaudit-plan-guard.test.ts",
     "test:gate-f-reaudit-result-guard": "npx --yes tsx scripts/gate-f-reaudit-result-guard.test.ts",
     "test:p0-closure-package-guard": "npx --yes tsx scripts/p0-closure-package-guard.test.ts",
