@@ -246,6 +246,7 @@ export type TranslationKey =
   | `safeCommunication.${keyof typeof en.safeCommunication}`
   | `decisionMemory.${keyof typeof en.decisionMemory}`
   | `recruiterHub.${keyof typeof en.recruiterHub}`
+  | `companyHub.${keyof typeof en.companyHub}`
   | `recruiterDailyCockpit.${keyof typeof en.recruiterDailyCockpit}`
   | `companyHiringCockpit.${keyof typeof en.companyHiringCockpit}`
   | `companyHiringCommandCenter.${keyof typeof en.companyHiringCommandCenter}`
@@ -2930,6 +2931,9 @@ eyebrow: "Product roadmap",
     navForCompanies: "For companies",
     listTitle: "Your roles",
     createRole: "New role",
+    demoJourneysToggle: "Demo journeys (limited pilot)",
+    demoJourneysBoundary:
+      "Sample role and candidate journeys for sales proof — human decision required on every stage move. No delegated apply or automatic outreach.",
     refresh: "Refresh",
     createTitle: "Create role",
     createLead: "Draft an internal role profile for matching and recruiter review.",
@@ -3399,7 +3403,9 @@ eyebrow: "Product roadmap",
     eyebrow: "Company workspace",
     title: "Pipeline quality overview",
     lead:
-      "Executive view of your hiring pipeline by role — counts from real applications in your workspace, not industry benchmarks.",
+      "Executive view of your hiring pipeline by role — counts from real applications in your workspace, not industry benchmarks. Human review required at every stage; no ATS writeback.",
+    humanDecisionNote:
+      "Human decision required — TWIN tracks segments only. No delegated apply, automatic outreach, or live ATS sync in this preview.",
     demoDisclaimer:
       "Pilot data only. Public launch remains NO-GO; metrics reflect your TWIN workspace, not market-wide hire velocity.",
     navLink: "Pipeline quality overview",
@@ -3468,6 +3474,8 @@ eyebrow: "Product roadmap",
     chipInternalFirst: "Internal data first",
     chipNoOutreach: "No automatic outreach",
     chipRecruiterReview: "Recruiter review required",
+    pilotBoundaryBody:
+      "Limited pilot — internal talent memory only. No live ATS sync, marketplace liquidity, or automatic outreach.",
     chipAtsPlanned: "ATS sync planned",
     chipInternal: "Internal pool",
     load: "Load talent pool",
@@ -3908,7 +3916,9 @@ eyebrow: "Product roadmap",
     title: "Integrations readiness",
     navLink: "Integrations",
     lead:
-      "Honest pilot scope for employer tooling — what is live today vs planned. No fake “all connected” claims.",
+      "Honest roadmap for employer tooling — what is live today vs coming soon. No fake “all connected” or live ATS sync claims.",
+    roadmapBoundary:
+      "Coming soon — integration rows show readiness only. TWIN does not sync with external ATS or calendars in this preview.",
     item_acceptance_inbox: "Acceptance inbox & review card",
     item_talent_pool_import: "Talent pool import (CSV)",
     item_ats_webhooks: "ATS webhooks",
@@ -4128,6 +4138,15 @@ eyebrow: "Product roadmap",
     socialProofIllustrativeNote: "Illustrative example — not verified customer proof.",
     recruiterRoadmapPromosToggle: "Pilot roadmap modules",
     recruiterExtendedNavToggle: "More recruiter modules (pilot & roadmap)",
+    companyRoadmapPromosToggle: "Pilot roadmap modules (hiring cockpit & command center)",
+    companyExtendedNavToggle: "More company modules (pilot & roadmap)",
+  },
+  companyHub: {
+    nextActionEyebrow: "Recommended next",
+    nextActionTitle: "Define or review your roles",
+    nextActionLead:
+      "With pilot promos tucked away, start where hiring bar is set — publish roles, then review pipeline segments with human decisions only.",
+    nextActionCta: "Open roles",
   },
   placementEmployer: {
     title: "Confirm hire for TWIN",
@@ -10695,6 +10714,9 @@ const pl: MessageTree = {
     navForCompanies: "Dla firm",
     listTitle: "Twoje role",
     createRole: "Nowa rola",
+    demoJourneysToggle: "Ścieżki demo (ograniczony pilot)",
+    demoJourneysBoundary:
+      "Przykładowe ścieżki ról i kandydatów pod proof sprzedażowy — każdy ruch etapu wymaga decyzji człowieka. Bez delegated apply i automatycznego outreachu.",
     refresh: "Odśwież",
     createTitle: "Utwórz rolę",
     createLead: "Szkic wewnętrznego profilu roli do dopasowania i review rekrutera.",
@@ -11164,7 +11186,9 @@ const pl: MessageTree = {
     eyebrow: "Workspace firmy",
     title: "Przegląd jakości pipeline",
     lead:
-      "Widok executive pipeline wg roli — liczby z realnych aplikacji w workspace, nie branżowych benchmarków.",
+      "Widok executive pipeline wg roli — liczby z realnych aplikacji w workspace, nie branżowych benchmarków. Recenzja człowieka na każdym etapie; bez writebacku ATS.",
+    humanDecisionNote:
+      "Wymagana decyzja człowieka — TWIN śledzi tylko segmenty. Bez delegated apply, automatycznego outreachu i live sync ATS w tym podglądzie.",
     demoDisclaimer:
       "Tylko dane pilotażowe. Publiczny launch pozostaje NO-GO; metryki dotyczą workspace TWIN, nie rynkowej prędkości zatrudnień.",
     navLink: "Przegląd jakości pipeline",
@@ -11233,6 +11257,8 @@ const pl: MessageTree = {
     chipInternalFirst: "Najpierw dane wewnętrzne",
     chipNoOutreach: "Bez automatycznego kontaktu wychodzącego",
     chipRecruiterReview: "Wymagana recenzja rekrutera",
+    pilotBoundaryBody:
+      "Ograniczony pilot — tylko wewnętrzna pamięć talentów. Bez live sync ATS, płynności marketplace ani automatycznego outreachu.",
     chipAtsPlanned: "Synchronizacja ATS planowana",
     chipInternal: "Pula wewnętrzna",
     load: "Załaduj pamięć talentów",
@@ -11675,7 +11701,9 @@ const pl: MessageTree = {
     title: "Gotowość integracji",
     navLink: "Integracje",
     lead:
-      "Uczciwy zakres pilotażu narzędzi pracodawcy — co jest live dziś vs planowane. Bez fałszywych „wszystko podpięte”.",
+      "Uczciwa roadmapa narzędzi pracodawcy — co jest live dziś vs wkrótce. Bez fałszywych „wszystko podpięte” i obietnic live sync ATS.",
+    roadmapBoundary:
+      "Wkrótce — wiersze pokazują tylko gotowość. TWIN nie synchronizuje z zewnętrznym ATS ani kalendarzami w tym podglądzie.",
     item_acceptance_inbox: "Skrzynka akceptacji i karta oceny",
     item_talent_pool_import: "Import puli talentów (CSV)",
     item_ats_webhooks: "Webhooki ATS",
@@ -11895,6 +11923,15 @@ const pl: MessageTree = {
     socialProofIllustrativeNote: "Przykład ilustracyjny — nie zweryfikowany dowód społeczny.",
     recruiterRoadmapPromosToggle: "Moduły pilota w roadmapie",
     recruiterExtendedNavToggle: "Więcej modułów rekrutera (pilot i roadmapa)",
+    companyRoadmapPromosToggle: "Moduły roadmapy pilota (kokpit rekrutacji i centrum dowodzenia)",
+    companyExtendedNavToggle: "Więcej modułów firmy (pilot i roadmapa)",
+  },
+  companyHub: {
+    nextActionEyebrow: "Rekomendowany krok",
+    nextActionTitle: "Zdefiniuj lub przejrzyj role",
+    nextActionLead:
+      "Gdy promocje pilota są schowane, zacznij od ustawienia bara rekrutacyjnego — opublikuj role, potem przeglądaj segmenty pipeline wyłącznie z decyzjami człowieka.",
+    nextActionCta: "Otwórz role",
   },
   placementEmployer: {
     title: "Potwierdzenie zatrudnienia w TWIN",
