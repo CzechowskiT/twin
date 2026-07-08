@@ -6,6 +6,7 @@ export type WorkspaceModuleStatus =
   | "live"
   | "pilot"
   | "planned"
+  | "coming_soon"
   | "not_live"
   | "needs_setup"
   | "paused";
@@ -17,6 +18,7 @@ export const WORKSPACE_STATUS_LABEL_KEYS: Record<
   live: "workspaceModules.statusLive",
   pilot: "workspaceModules.statusPilot",
   planned: "workspaceModules.statusPlanned",
+  coming_soon: "workspaceModules.statusComingSoon",
   not_live: "workspaceModules.statusNotLive",
   needs_setup: "workspaceModules.statusNeedsSetup",
   paused: "workspaceModules.statusPaused",

@@ -25,10 +25,10 @@
 
 ## Deferred (P1+)
 
-- Partners/Careers/Media footer hide or single “coming soon” page.
-- Company dashboard guided onboarding (token jargon).
-- Trust center single overview vs 10+ cards.
-- Mobile header collapse (language + DEMO into menu).
+- ~~Partners/Careers/Media footer hide or single “coming soon” page.~~ → **P1 started** (`feat/product-polish-1-p1`)
+- ~~Company dashboard guided onboarding (token jargon).~~ → **P1**
+- ~~Trust center single overview vs 10+ cards.~~ → **P1**
+- ~~Mobile header collapse (language + DEMO into menu).~~ → **P1**
 - Microsoft calendar, billing checkout, verified testimonials.
 
 ---

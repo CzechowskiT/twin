@@ -245,6 +245,7 @@ export type TranslationKey =
   | `teamCollaboration.${keyof typeof en.teamCollaboration}`
   | `safeCommunication.${keyof typeof en.safeCommunication}`
   | `decisionMemory.${keyof typeof en.decisionMemory}`
+  | `recruiterHub.${keyof typeof en.recruiterHub}`
   | `recruiterDailyCockpit.${keyof typeof en.recruiterDailyCockpit}`
   | `companyHiringCockpit.${keyof typeof en.companyHiringCockpit}`
   | `companyHiringCommandCenter.${keyof typeof en.companyHiringCommandCenter}`
@@ -1842,6 +1843,7 @@ const en = {
     statusLive: "Live",
     statusPilot: "Pilot",
     statusPlanned: "Planned",
+    statusComingSoon: "Coming soon",
     statusNotLive: "Not live",
     statusNeedsSetup: "Needs setup",
     statusPaused: "Paused",
@@ -3306,6 +3308,14 @@ eyebrow: "Product roadmap",
     emptyBody: "Enter your pilot access code and company slug to see the executive snapshot.",
     emptyStep1: "Use the access code from your TWIN invite email.",
     emptyStep2: "Pick the company slug tied to your workspace.",
+    onboardingTitle: "Welcome to your company workspace",
+    onboardingBody:
+      "Start with the module grid below — connect your workspace when you are ready to load the executive hiring snapshot.",
+    onboardingStep1: "Review live vs pilot modules in the grid.",
+    onboardingStep2: "Open roles or pipeline when your team is ready.",
+    onboardingStep3: "Expand workspace connect only when you have invite details.",
+    onboardingCta: "Connect workspace",
+    connectWorkspaceToggle: "Connect workspace (pilot)",
   },
   companyBilling: {
     eyebrow: "Company workspace",
@@ -4008,6 +4018,11 @@ eyebrow: "Product roadmap",
   },
   productPolish: {
     pilotPreviewBanner: "Pilot preview — not part of public launch.",
+    comingSoonLead: "This section is not part of the limited launch yet.",
+    comingSoonBody:
+      "We are keeping the route live with an honest placeholder — no empty subsection cards or fake content. Reach out if you need partners, careers, or media updates before public launch.",
+    comingSoonContact: "Contact us",
+    comingSoonHome: "Back to home",
   },
   placementEmployer: {
     title: "Confirm hire for TWIN",
@@ -4936,6 +4951,8 @@ eyebrow: "Product roadmap",
   candidateTrustCenter: {
     pageEyebrow: "Trust & transparency",
     pageTitle: "Candidate trust center",
+    overviewEyebrow: "Overview",
+    advancedModulesToggle: "Advanced (pilot)",
     pilotBadge: "PILOT · SAMPLE TRUST CENTER",
     lastReviewed: "Last reviewed",
     whatTwinKnowsTitle: "What TWIN knows",
@@ -7131,6 +7148,13 @@ eyebrow: "Product roadmap",
     demoJourneyTitle: "Decision memory / audit (sample)",
     demoJourneyDesc: "Executive audit cockpit with timeline, evidence bundle, blockers, and human decision boundary.",
     openDecisionMemory: "Open decision memory",
+  },
+  recruiterHub: {
+    nextActionEyebrow: "Recommended next",
+    nextActionTitle: "Review your inbox first",
+    nextActionLead:
+      "With promo cards tucked away, start where decisions happen — accept, decline, or reschedule matched candidates.",
+    nextActionCta: "Open recruiter inbox",
   },
   recruiterDailyCockpit: {
     navLink: "Daily cockpit",
@@ -9470,6 +9494,7 @@ const pl: MessageTree = {
     statusLive: "Live",
     statusPilot: "Pilot",
     statusPlanned: "Planowane",
+    statusComingSoon: "Wkrótce",
     statusNotLive: "Nie live",
     statusNeedsSetup: "Wymaga konfiguracji",
     statusPaused: "Wstrzymane",
@@ -10940,6 +10965,14 @@ const pl: MessageTree = {
     emptyBody: "Wpisz kod dostępu pilotażowego i slug firmy, aby zobaczyć executive snapshot.",
     emptyStep1: "Użyj kodu dostępu z maila zaproszenia TWIN.",
     emptyStep2: "Wybierz slug firmy powiązany z workspace.",
+    onboardingTitle: "Witaj w workspace firmy",
+    onboardingBody:
+      "Zacznij od siatki modułów poniżej — połącz workspace, gdy będziesz gotowy załadować executive snapshot rekrutacji.",
+    onboardingStep1: "Przejrzyj moduły live vs pilot w siatce.",
+    onboardingStep2: "Otwórz role lub pipeline, gdy zespół jest gotowy.",
+    onboardingStep3: "Rozwiń połączenie workspace dopiero, gdy masz dane z zaproszenia.",
+    onboardingCta: "Połącz workspace",
+    connectWorkspaceToggle: "Połącz workspace (pilot)",
   },
   companyBilling: {
     eyebrow: "Workspace firmy",
@@ -11644,6 +11677,11 @@ const pl: MessageTree = {
   },
   productPolish: {
     pilotPreviewBanner: "Podgląd pilota — poza publicznym launch.",
+    comingSoonLead: "Ta sekcja nie jest jeszcze częścią ograniczonego launchu.",
+    comingSoonBody:
+      "Trzymamy trasę na żywo z uczciwym placeholderem — bez pustych kart i fikcyjnej treści. Napisz, jeśli potrzebujesz aktualizacji partners/careers/media przed launch.",
+    comingSoonContact: "Kontakt",
+    comingSoonHome: "Strona główna",
   },
   placementEmployer: {
     title: "Potwierdzenie zatrudnienia w TWIN",
@@ -12579,6 +12617,8 @@ const pl: MessageTree = {
   candidateTrustCenter: {
     pageEyebrow: "Zaufanie i przejrzystość",
     pageTitle: "Centrum zaufania kandydata",
+    overviewEyebrow: "Przegląd",
+    advancedModulesToggle: "Zaawansowane (pilot)",
     pilotBadge: "PILOT · PRZYKŁADOWE CENTRUM ZAUFANIA",
     lastReviewed: "Ostatni przegląd",
     whatTwinKnowsTitle: "Co TWIN wie",
@@ -14794,6 +14834,13 @@ const pl: MessageTree = {
     demoJourneyTitle: "Pamięć decyzji / audyt (przykład)",
     demoJourneyDesc: "Executive audit cockpit z osią czasu, pakietem dowodów, blokerami i granicą decyzji człowieka.",
     openDecisionMemory: "Otwórz pamięć decyzji",
+  },
+  recruiterHub: {
+    nextActionEyebrow: "Rekomendowany krok",
+    nextActionTitle: "Zacznij od skrzynki",
+    nextActionLead:
+      "Gdy promocje są schowane, zacznij tam, gdzie zapadają decyzje — akceptuj, odrzucaj lub przekładaj dopasowanych kandydatów.",
+    nextActionCta: "Otwórz skrzynkę rekrutera",
   },
   recruiterDailyCockpit: {
     navLink: "Kokpit dzienny",

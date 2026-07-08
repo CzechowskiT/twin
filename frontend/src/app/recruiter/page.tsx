@@ -7,6 +7,8 @@ import { SystemOfRecordNavigationHub } from "@/components/workspace/system-of-re
 import { WorkspaceQuickActions } from "@/components/workspace/workspace-quick-actions";
 import { Card, Shell } from "@/components/ui";
 import { SHOW_RECRUITER_HUB_PRIMARY_PROMOS } from "@/lib/product-polish-p0";
+import { SHOW_RECRUITER_HUB_NEXT_ACTION } from "@/lib/product-polish-p1";
+import { RecruiterHubNextAction } from "@/components/recruiter/recruiter-hub-next-action";
 import { RECRUITER_DAILY_COCKPIT_MARKERS, recruiterDailyCockpitHref } from "@/lib/recruiter-daily-operating-cockpit";
 import { RECRUITER_TRUST_REVIEW_QUEUE_MARKERS, recruiterTrustReviewQueueHref } from "@/lib/recruiter-trust-review-queue";
 
@@ -65,6 +67,9 @@ export default function RecruiterHubPage() {
               </Card>
             </Link>
           </>
+        ) : null}
+        {!SHOW_RECRUITER_HUB_PRIMARY_PROMOS && SHOW_RECRUITER_HUB_NEXT_ACTION ? (
+          <RecruiterHubNextAction />
         ) : null}
         <div className="mt-6">
           <SystemOfRecordNavigationHub
