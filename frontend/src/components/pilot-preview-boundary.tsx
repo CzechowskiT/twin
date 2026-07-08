@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 
 import { useTranslation } from "@/components/language-provider";
 import {
-  isPilotPreviewDeepLinkPath,
+  isPilotPreviewChromePath,
   PILOT_PREVIEW_BOUNDARY_MARKER,
 } from "@/lib/product-polish-p0";
 
@@ -13,7 +13,7 @@ export function PilotPreviewBoundary() {
   const pathname = usePathname() ?? "";
   const { t } = useTranslation();
 
-  if (!isPilotPreviewDeepLinkPath(pathname)) return null;
+  if (!isPilotPreviewChromePath(pathname)) return null;
 
   return (
     <div

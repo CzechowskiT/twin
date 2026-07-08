@@ -10,6 +10,7 @@ import test from "node:test";
 import { CANDIDATE_WORKSPACE_MODULES } from "../src/lib/candidate-workspace-modules";
 import { en, dictionaries } from "../src/lib/i18n";
 import {
+  isPilotPreviewChromePath,
   isPilotPreviewDeepLinkPath,
   PILOT_PREVIEW_BOUNDARY_MARKER,
   SHOW_DASHBOARD_AUTO_APPLY_STRIP,
@@ -70,14 +71,24 @@ test("4 demo deep links get pilot preview boundary without breaking routes", () 
   const boundary = read("src/components/pilot-preview-boundary.tsx");
   const chrome = read("src/components/site-chrome.tsx");
   assert.match(boundary, /PilotPreviewBoundary/);
+  assert.match(boundary, /isPilotPreviewChromePath/);
   assert.match(boundary, /PILOT_PREVIEW_BOUNDARY_MARKER/);
   assert.match(boundary, /data-testid=\{PILOT_PREVIEW_BOUNDARY_MARKER\}/);
   assert.match(boundary, /productPolish\.pilotPreviewBanner/);
   assert.match(chrome, /PilotPreviewBoundary/);
+  assert.match(chrome, /isPilotPreviewChromePath/);
   assert.equal(isPilotPreviewDeepLinkPath("/recruiter/daily-cockpit"), true);
   assert.equal(isPilotPreviewDeepLinkPath("/recruiter/trust-review-queue"), true);
   assert.equal(isPilotPreviewDeepLinkPath("/dashboard"), false);
   assert.equal(isPilotPreviewDeepLinkPath("/recruiter/inbox"), false);
+  assert.equal(isPilotPreviewChromePath("/login"), false);
+  assert.equal(isPilotPreviewChromePath("/login/candidate"), false);
+  assert.equal(isPilotPreviewChromePath("/register"), false);
+  assert.equal(isPilotPreviewChromePath("/waitlist"), false);
+  assert.equal(isPilotPreviewChromePath("/first-1000"), false);
+  assert.equal(isPilotPreviewChromePath("/demo"), false);
+  assert.equal(isPilotPreviewChromePath("/how-it-works"), false);
+  assert.equal(isPilotPreviewChromePath("/recruiter/daily-cockpit"), true);
 });
 
 test("5 homepage CTA fatigue reduced — primary waitlist, secondary text link", () => {

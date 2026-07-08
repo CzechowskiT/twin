@@ -64,6 +64,23 @@ function buildPilotPreviewDeepLinkPaths(): readonly string[] {
 
 const PILOT_PREVIEW_DEEP_LINK_PATHS = buildPilotPreviewDeepLinkPaths();
 
+/** Public auth/landing — never show the global pilot preview bar in site chrome. */
+const PILOT_PREVIEW_CHROME_EXCLUDED_PREFIXES = [
+  "/login",
+  "/register",
+  "/waitlist",
+  "/first-1000",
+  "/demo",
+  "/how-it-works",
+] as const;
+
+function isPilotPreviewChromeExcludedPath(pathname: string): boolean {
+  const base = normalizePath(pathname);
+  return PILOT_PREVIEW_CHROME_EXCLUDED_PREFIXES.some(
+    (p) => base === p || base.startsWith(`${p}/`),
+  );
+}
+
 /** True for founder-led demo deep links outside core limited-launch surfaces. */
 export function isPilotPreviewDeepLinkPath(pathname: string): boolean {
   const base = normalizePath(pathname);
@@ -71,6 +88,12 @@ export function isPilotPreviewDeepLinkPath(pathname: string): boolean {
   return PILOT_PREVIEW_DEEP_LINK_PATHS.some(
     (p) => base === p || base.startsWith(`${p}/`),
   );
+}
+
+/** True when site chrome should mount the pilot preview boundary banner. */
+export function isPilotPreviewChromePath(pathname: string): boolean {
+  if (isPilotPreviewChromeExcludedPath(pathname)) return false;
+  return isPilotPreviewDeepLinkPath(pathname);
 }
 
 export const PILOT_PREVIEW_BOUNDARY_MARKER = "pilot-preview-boundary";

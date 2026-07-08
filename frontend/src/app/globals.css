@@ -2291,9 +2291,11 @@ html[data-workspace-route="true"] .landing-ambient__orb {
 }
 
 .partner-logo-card {
+  width: auto;
   min-height: 5rem;
-  min-width: 12rem;
-  padding: 1.5rem 2rem;
+  min-width: 88px;
+  max-width: 140px;
+  padding: 0.75rem 1rem;
 }
 
 .partner-logo img {
