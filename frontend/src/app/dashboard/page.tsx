@@ -11,16 +11,12 @@ import { DashboardCommandCenter } from "@/components/dashboard-command-center";
 import { ProfileCompletenessHint } from "@/components/ux/profile-completeness-hint";
 import { WorkspaceFlowSteps } from "@/components/ux/workspace-flow-steps";
 import { EmailVerificationBanner } from "@/components/email-verification-banner";
-import { NightlyAutoApplyStrip } from "@/components/nightly-auto-apply-strip";
 import { useTranslation } from "@/components/language-provider";
 import { Shell } from "@/components/ui";
+import { WorkspaceQuickActions } from "@/components/workspace/workspace-quick-actions";
 import { isCalendarConnected } from "@/lib/dashboard-next-best-action";
+import { SHOW_DASHBOARD_EXTENDED_HOME_MODULES } from "@/lib/product-polish-p0";
 import { SHOW_SCRAPE_UI } from "@/lib/features";
-import {
-  DASHBOARD_HOME_APPLICATIONS_PREVIEW,
-  DASHBOARD_HOME_JOBS_PREVIEW,
-  DASHBOARD_HOME_MATCHES_PREVIEW,
-} from "@/lib/dashboard-dom-budget";
 
 import { ApplicationsSection } from "@/components/dashboard/applications-section";
 import { CareerCompassStrip } from "@/components/dashboard/career-compass-strip";
@@ -57,6 +53,14 @@ const DashboardModals = dynamic(
   () => import("@/components/dashboard/dashboard-modals").then((m) => m.DashboardModals),
   { ssr: false },
 );
+
+const DASHBOARD_CORE_QUICK_ACTIONS = [
+  { href: "/dashboard/jobs", labelKey: "workspaceModules.candidateJobsCta" as const },
+  { href: "/dashboard/matches", labelKey: "workspaceModules.candidateMatchesCta" as const },
+  { href: "/dashboard/applications", labelKey: "workspaceModules.candidateApplicationsCta" as const },
+  { href: "/dashboard/calendar", labelKey: "workspaceModules.candidateCalendarCta" as const },
+  { href: "/profile", labelKey: "workspaceModules.candidateProfileCta" as const },
+] as const;
 const OpportunityForecast = dynamic(
   () => import("@/components/dashboard/OpportunityForecast").then((m) => m.OpportunityForecast),
   { ssr: false },
@@ -331,10 +335,9 @@ export default function DashboardPage() {
       ) : null}
 
       {user ? <EmailVerificationBanner /> : null}
-      {user ? <NightlyAutoApplyStrip /> : null}
 
       {user ? (
-        <>
+        SHOW_DASHBOARD_EXTENDED_HOME_MODULES ? (
           <div className="dashboard-hero-grid mb-4 sm:mb-6">
             <div className="dashboard-hero-grid__welcome">
               <DashboardCommandCenter
@@ -349,10 +352,27 @@ export default function DashboardPage() {
               <ProgressDashboard />
             </div>
           </div>
+        ) : (
+          <>
+            <DashboardCommandCenter
+              email={user.email}
+              profileName={profile ? profile.name : undefined}
+              hasProfile={hasProfile}
+              showScrapeUi={showScrapePanel}
+              todayContext={todayContext}
+            />
+            <div className="mb-4 sm:mb-6" aria-label={t("dashboard.coreLinksAria")}>
+              <WorkspaceQuickActions actions={DASHBOARD_CORE_QUICK_ACTIONS} />
+            </div>
+          </>
+        )
+      ) : null}
+
+      {user && SHOW_DASHBOARD_EXTENDED_HOME_MODULES ? (
+        <>
           <div className="mb-4 min-w-0 sm:mb-6">
             <OpportunityForecast applyActionsGuard={applyActionsGuard} />
           </div>
-          <p className="twin-muted -mt-2 mb-4 max-w-prose text-sm leading-relaxed">{t("dashboard.northStarLead")}</p>
           <DashboardCalendarStrip
             bundle={dashboardCalendarBundle}
             calendarConnectBusy={calendarConnectBusy}
@@ -368,129 +388,150 @@ export default function DashboardPage() {
         </>
       ) : null}
 
-      {hasProfile && profile ? <CareerCompassStrip profile={profile} /> : null}
-
-      <ProfileScrapePanel
-        user={user}
-        profile={profile}
-        showScrapePanel={showScrapePanel}
-        scraping={polling.scraping}
-        scrapePollActive={polling.scrapePollActive}
-        jobsTotal={jobs?.total ?? 0}
-        error={error}
-        onTriggerScrape={() =>
-          void polling.triggerScrapeAll({
-            hasProfile,
-            filters,
-            jobsTotal: jobs?.total ?? 0,
-          })
-        }
-        onOpenLinkedinOptimizer={modals.openLinkedin}
-      />
-
-      {hasProfile && (matchesInitialSkeleton || matches !== null) ? (
-        <MatchesSection
-          matches={matches}
-          matchesInitialSkeleton={matchesInitialSkeleton}
-          visibleMatches={visibleMatches}
-          topHighlightMatches={topHighlightMatches}
-          moreRecommendationMatches={moreRecommendationMatches}
-          matchFeedbackByJobId={matchFeedbackByJobId}
-          matchFeedbackBusyJobId={matchFeedbackBusyJobId}
-          displayApplicationStatus={displayApplicationStatus}
-          autoApplyingId={autoApplyingId}
-          applyActionsGuard={applyActionsGuard}
-          matchesCsvBusy={exports.matchesCsvBusy}
-          matchesXlsxBusy={exports.matchesXlsxBusy}
-          showApplyPrompt={polling.showApplyPrompt}
-          previewLimit={DASHBOARD_HOME_MATCHES_PREVIEW}
-          viewAllHref="/dashboard/matches"
-          onSubmitFeedback={(jobId, value) => void submitMatchFeedback(jobId, value)}
-          onApply={applyToJob}
-          onAutoApply={autoApplyToJob}
-          onSave={saveJob}
-          onDismiss={dismissJob}
-          onResearch={modals.openIntel}
-          onHiringInsights={modals.openInsights}
-          onViewEmployer={modals.openEmployerHub}
-          onDownloadCsv={() => void exports.downloadMatchesCsv()}
-          onDownloadXlsx={() => void exports.downloadMatchesXlsx()}
-          onApplyPromptDismiss={() => polling.setShowApplyPrompt(false)}
-          onApplyPromptOpenFirst={() => {
-            polling.setShowApplyPrompt(false);
-            const first = visibleMatches[0];
-            if (first) window.open(first.url, "_blank", "noopener,noreferrer");
-          }}
-        />
-      ) : null}
-
-      {hasProfile ? (
-        <DevelopmentFocusSection devFocus={devFocus} hasData={developmentFocusHasData} />
-      ) : null}
-
-      {hasProfile ? (
-        <ApplicationsSection
-          applications={applications}
-          applicationsTotal={applicationsTotal}
-          applicationsCsvBusy={exports.applicationsCsvBusy}
-          applicationsXlsxBusy={exports.applicationsXlsxBusy}
-          feedbackBusy={feedbackBusy}
-          placementFlowBusy={placementFlowBusy}
-          placementEventsInvalidateKey={placementEventsInvalidateKey}
-          previewLimit={DASHBOARD_HOME_APPLICATIONS_PREVIEW}
-          viewAllHref="/dashboard/applications"
-          onDownloadCsv={() => void exports.downloadApplicationsCsv()}
-          onDownloadXlsx={() => void exports.downloadApplicationsXlsx()}
-          onStatusChange={updateApplicationStatus}
-          onRemove={removeApplication}
-          onSaveFeedback={saveApplicationFeedback}
-          onParseFeedback={parseApplicationFeedback}
-          onPlacementDeclare={declarePlacement}
-          onPlacementVerifyStart={startPlacementVerify}
-          onPlacementEmployerAttest={issuePlacementEmployerAttest}
-          onPlacementDispute={filePlacementDispute}
-          onPlacementEventsLoad={loadPlacementEvents}
-          onOpenAutoApplyPackage={openAutoApplyPackagePdf}
-          onOptimizeCv={modals.openCv}
-          onNegotiateSalary={modals.openNegotiate}
-        />
-      ) : null}
-
-      {lastUpdated ? (
-        <p className="twin-muted mb-4 text-xs">
-          {t("dashboard.lastUpdated")}{" "}
-          {lastUpdated.toLocaleTimeString(undefined, {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-          })}
+      {user ? (
+        <p
+          className={`twin-muted max-w-prose text-sm leading-relaxed ${
+            SHOW_DASHBOARD_EXTENDED_HOME_MODULES ? "-mt-2 mb-4" : "mb-4 sm:mb-6"
+          }`}
+        >
+          {t("dashboard.northStarLead")}
         </p>
       ) : null}
 
-      <JobsSection
-        jobs={jobs}
-        feedStats={feedStats}
-        filters={filters}
-        filterOptions={filterOptions}
-        hasProfile={hasProfile}
-        displayApplicationStatus={displayApplicationStatus}
-        autoApplyingId={autoApplyingId}
-        applyActionsGuard={applyActionsGuard}
-        jobsLoadMoreBusy={jobsLoadMoreBusy}
-        previewLimit={DASHBOARD_HOME_JOBS_PREVIEW}
-        viewAllHref="/dashboard/jobs"
-        onFiltersChange={setFilters}
-        onApplyFilters={() => void applyJobFilters()}
-        onLoadMore={() => void loadMoreJobs()}
-        setFilters={setFilters}
-        onApply={applyToJob}
-        onAutoApply={autoApplyToJob}
-        onSave={saveJob}
-        onDismiss={dismissJob}
-        onResearch={modals.openIntel}
-        onHiringInsights={modals.openInsights}
-        onViewEmployer={modals.openEmployerHub}
-      />
+      {(() => {
+        const extendedModules = (
+          <>
+            {hasProfile && profile ? <CareerCompassStrip profile={profile} /> : null}
+
+            <ProfileScrapePanel
+              user={user}
+              profile={profile}
+              showScrapePanel={showScrapePanel}
+              scraping={polling.scraping}
+              scrapePollActive={polling.scrapePollActive}
+              jobsTotal={jobs?.total ?? 0}
+              error={error}
+              onTriggerScrape={() =>
+                void polling.triggerScrapeAll({
+                  hasProfile,
+                  filters,
+                  jobsTotal: jobs?.total ?? 0,
+                })
+              }
+              onOpenLinkedinOptimizer={modals.openLinkedin}
+            />
+
+            {hasProfile && (matchesInitialSkeleton || matches !== null) ? (
+              <MatchesSection
+                matches={matches}
+                matchesInitialSkeleton={matchesInitialSkeleton}
+                visibleMatches={visibleMatches}
+                topHighlightMatches={topHighlightMatches}
+                moreRecommendationMatches={moreRecommendationMatches}
+                matchFeedbackByJobId={matchFeedbackByJobId}
+                matchFeedbackBusyJobId={matchFeedbackBusyJobId}
+                displayApplicationStatus={displayApplicationStatus}
+                autoApplyingId={autoApplyingId}
+                applyActionsGuard={applyActionsGuard}
+                matchesCsvBusy={exports.matchesCsvBusy}
+                matchesXlsxBusy={exports.matchesXlsxBusy}
+                showApplyPrompt={polling.showApplyPrompt}
+                onSubmitFeedback={(jobId, value) => void submitMatchFeedback(jobId, value)}
+                onApply={applyToJob}
+                onAutoApply={autoApplyToJob}
+                onSave={saveJob}
+                onDismiss={dismissJob}
+                onResearch={modals.openIntel}
+                onHiringInsights={modals.openInsights}
+                onViewEmployer={modals.openEmployerHub}
+                onDownloadCsv={() => void exports.downloadMatchesCsv()}
+                onDownloadXlsx={() => void exports.downloadMatchesXlsx()}
+                onApplyPromptDismiss={() => polling.setShowApplyPrompt(false)}
+                onApplyPromptOpenFirst={() => {
+                  polling.setShowApplyPrompt(false);
+                  const first = visibleMatches[0];
+                  if (first) window.open(first.url, "_blank", "noopener,noreferrer");
+                }}
+              />
+            ) : null}
+
+            {hasProfile ? (
+              <DevelopmentFocusSection devFocus={devFocus} hasData={developmentFocusHasData} />
+            ) : null}
+
+            {hasProfile ? (
+              <ApplicationsSection
+                applications={applications}
+                applicationsTotal={applicationsTotal}
+                applicationsCsvBusy={exports.applicationsCsvBusy}
+                applicationsXlsxBusy={exports.applicationsXlsxBusy}
+                feedbackBusy={feedbackBusy}
+                placementFlowBusy={placementFlowBusy}
+                placementEventsInvalidateKey={placementEventsInvalidateKey}
+                onDownloadCsv={() => void exports.downloadApplicationsCsv()}
+                onDownloadXlsx={() => void exports.downloadApplicationsXlsx()}
+                onStatusChange={updateApplicationStatus}
+                onRemove={removeApplication}
+                onSaveFeedback={saveApplicationFeedback}
+                onParseFeedback={parseApplicationFeedback}
+                onPlacementDeclare={declarePlacement}
+                onPlacementVerifyStart={startPlacementVerify}
+                onPlacementEmployerAttest={issuePlacementEmployerAttest}
+                onPlacementDispute={filePlacementDispute}
+                onPlacementEventsLoad={loadPlacementEvents}
+                onOpenAutoApplyPackage={openAutoApplyPackagePdf}
+                onOptimizeCv={modals.openCv}
+                onNegotiateSalary={modals.openNegotiate}
+              />
+            ) : null}
+
+            {lastUpdated ? (
+              <p className="twin-muted mb-4 text-xs">
+                {t("dashboard.lastUpdated")}{" "}
+                {lastUpdated.toLocaleTimeString(undefined, {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                })}
+              </p>
+            ) : null}
+
+            <JobsSection
+              jobs={jobs}
+              feedStats={feedStats}
+              filters={filters}
+              filterOptions={filterOptions}
+              hasProfile={hasProfile}
+              displayApplicationStatus={displayApplicationStatus}
+              autoApplyingId={autoApplyingId}
+              applyActionsGuard={applyActionsGuard}
+              jobsLoadMoreBusy={jobsLoadMoreBusy}
+              onFiltersChange={setFilters}
+              onApplyFilters={() => void applyJobFilters()}
+              onLoadMore={() => void loadMoreJobs()}
+              setFilters={setFilters}
+              onApply={applyToJob}
+              onAutoApply={autoApplyToJob}
+              onSave={saveJob}
+              onDismiss={dismissJob}
+              onResearch={modals.openIntel}
+              onHiringInsights={modals.openInsights}
+              onViewEmployer={modals.openEmployerHub}
+            />
+          </>
+        );
+
+        if (SHOW_DASHBOARD_EXTENDED_HOME_MODULES) return extendedModules;
+
+        return (
+          <details className="mb-6 rounded-xl border border-[var(--twin-border)]/70 bg-[var(--twin-surface-2)]/30 p-4" data-dashboard-extended-modules>
+            <summary className="twin-link cursor-pointer text-sm font-medium [&::-webkit-details-marker]:hidden">
+              {t("dashboard.extendedModulesToggle")}
+            </summary>
+            <div className="mt-4 space-y-4">{extendedModules}</div>
+          </details>
+        );
+      })()}
 
       <footer className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-[var(--twin-border)] pt-5 text-sm text-[var(--twin-muted-strong)]">
         <button type="button" className="twin-link" onClick={() => setFeedbackOpen(true)}>

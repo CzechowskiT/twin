@@ -128,6 +128,7 @@ export type TranslationKey =
   | `feedback.${keyof typeof en.feedback}`
   | `status.${keyof typeof en.status}`
   | `placementEmployer.${keyof typeof en.placementEmployer}`
+  | `productPolish.${keyof typeof en.productPolish}`
   | `candidateTimeline.${keyof typeof en.candidateTimeline}`
   | `candidateInterviewPrep.${keyof typeof en.candidateInterviewPrep}`
   | `candidateEvidence.${keyof typeof en.candidateEvidence}`
@@ -884,6 +885,8 @@ const en = {
     quickReferrals: "Refer friends & rewards",
     quickRefreshListings: "Refresh listings",
     quickMoreActions: "More shortcuts",
+    coreLinksAria: "Core workspace links",
+    extendedModulesToggle: "More dashboard sections (pilot preview)",
     demoHeroHint: "Open the full product walkthrough — CV, ranking, honest statuses, calendar north star.",
     statFeedTitle: "In your feed",
     statFeedGoal: "Target: {target} active validated listings (last {days} days).",
@@ -4002,6 +4005,9 @@ eyebrow: "Product roadmap",
     cancelInterview: "Cancel hold",
     save: "Save for later",
     decline: "Not for me",
+  },
+  productPolish: {
+    pilotPreviewBanner: "Pilot preview — not part of public launch.",
   },
   placementEmployer: {
     title: "Confirm hire for TWIN",
@@ -8491,6 +8497,8 @@ const pl: MessageTree = {
     quickReferrals: "Polecenia i nagrody",
     quickRefreshListings: "Odśwież listingi",
     quickMoreActions: "Więcej skrótów",
+    coreLinksAria: "Główne linki panelu",
+    extendedModulesToggle: "Więcej sekcji panelu (podgląd pilota)",
     demoHeroHint: "Pełny przewodnik po produkcie — CV, ranking, uczciwe statusy, kalendarz jako north star.",
     statFeedTitle: "W feedzie",
     statFeedGoal: "Cel: {target} aktywnych, zwalidowanych ofert (ostatnie {days} dni).",
@@ -11633,6 +11641,9 @@ const pl: MessageTree = {
     cancelInterview: "Anuluj rezerwację",
     save: "Zapisz na później",
     decline: "Nie dla mnie",
+  },
+  productPolish: {
+    pilotPreviewBanner: "Podgląd pilota — poza publicznym launch.",
   },
   placementEmployer: {
     title: "Potwierdzenie zatrudnienia w TWIN",

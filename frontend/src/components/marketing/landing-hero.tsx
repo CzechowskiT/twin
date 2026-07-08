@@ -49,15 +49,9 @@ export function LandingHero() {
               </Link>
               <p className="text-xs font-medium text-[var(--twin-muted-strong)]">{t("home.joinWishlistMicro")}</p>
             </div>
-            <div className="flex min-w-0 flex-col gap-2 sm:max-w-[min(100%,20rem)]">
-              <Link
-                href="/register"
-                className="landing-hero-register-cta section-cta-secondary marketing-hero-btn-cta twin-touch-target w-full transition duration-200 sm:w-auto"
-              >
-                {t("home.getStarted")}
-              </Link>
-              <p className="text-xs font-medium text-[var(--twin-accent)]">{t("home.ctaRegisterMicro")}</p>
-            </div>
+            <Link href="/register" className="twin-link twin-touch-target self-start text-sm font-semibold">
+              {t("home.getStarted")}
+            </Link>
           </div>
           <InteractiveDemoCta className="mt-1 max-w-xl" />
         </div>
