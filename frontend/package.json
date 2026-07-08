@@ -83,6 +83,7 @@
     "test:seven-day-d5-investor-guard": "npx --yes tsx scripts/seven-day-d5-investor-guard.test.ts",
     "test:seven-day-d6-integrations-guard": "npx --yes tsx scripts/seven-day-d6-integrations-guard.test.ts",
     "test:seven-day-d7-final-qa-guard": "npx --yes tsx scripts/seven-day-d7-final-qa-guard.test.ts",
+    "test:candidate-readiness-working-flow-guard": "npx --yes tsx scripts/candidate-readiness-working-flow-guard.test.ts",
     "test:founder-launch-scope-decision-guard": "npx --yes tsx scripts/founder-launch-scope-decision-guard.test.ts",
     "test:public-marketing-consistency": "npx --yes tsx scripts/public-marketing-consistency.test.ts",
     "test:public-marketing-copy-consistency": "npx --yes tsx scripts/public-marketing-copy-consistency.test.ts",

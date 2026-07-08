@@ -9,6 +9,7 @@ import type {
   VerifiedReadinessLoadState,
 } from "@/hooks/dashboard/use-dashboard-verified-readiness";
 import type { TranslationKey } from "@/lib/i18n";
+import { CANDIDATE_READINESS_COMPLETION_ROUTES } from "@/lib/candidate-readiness-working-flow";
 
 const CHECKLIST_KEYS = [
   "profile_present",
@@ -21,14 +22,7 @@ const CHECKLIST_KEYS = [
 
 type ChecklistKey = (typeof CHECKLIST_KEYS)[number];
 
-const MISSING_ITEM_HREF: Record<string, string> = {
-  profile: "/profile",
-  consent_general: "/consent/gdpr",
-  consent_storage: "/consent/gdpr",
-  cv: "/profile",
-  career_brief: "/dashboard/career",
-  skill_evidence: "/profile",
-};
+const MISSING_ITEM_HREF: Record<string, string> = CANDIDATE_READINESS_COMPLETION_ROUTES;
 
 const STATUS_KEYS: Record<string, TranslationKey> = {
   unverified: "verifiedReadiness.statusUnverified",
