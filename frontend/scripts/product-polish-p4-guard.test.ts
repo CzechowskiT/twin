@@ -70,7 +70,9 @@ test("3 illustrative social proof — pages, homepage, footer labels", () => {
 test("4 subtle marquee logo disclaimer — premium copy, i18n visible on chrome", () => {
   assert.equal(SUBTLE_MARQUEE_LOGO_DISCLAIMER, true);
   const marquee = read("src/components/site-top-marquee.tsx");
+  const companyMarquee = read("src/components/marketing/company-logo-marquee.tsx");
   assert.match(marquee, /site\.marqueeLogoDisclaimer/);
+  assert.match(companyMarquee, /getPublicMarqueeLogos/);
   assert.match(en.site.marqueeLogoDisclaimer ?? "", /Representative market context/i);
   assert.match(dictionaries.pl.site.marqueeLogoDisclaimer ?? "", /kontekst rynkowy/i);
 });
