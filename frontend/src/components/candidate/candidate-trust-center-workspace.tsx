@@ -32,6 +32,7 @@ import { candidateTrustOverviewHref } from "@/lib/candidate-trust-overview";
 import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
 import type { TranslationKey } from "@/lib/i18n";
 import { TRUST_CENTER_OVERVIEW_MODE } from "@/lib/product-polish-p1";
+import { TRUST_CENTER_ROADMAP_STATUS } from "@/lib/seven-day-d2-candidate";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -160,7 +161,12 @@ function TrustCenterContent({ record }: { record: CandidateTrustCenterRecord }) 
               </p>
             </div>
             <div className="flex flex-col items-end gap-2">
-              <DemoJourneyPilotStatus testId={CANDIDATE_TRUST_CENTER_MARKERS.pilotBadge} status="pilot" />
+              <DemoJourneyPilotStatus
+                testId={CANDIDATE_TRUST_CENTER_MARKERS.pilotBadge}
+                status={TRUST_CENTER_ROADMAP_STATUS}
+                showLead={false}
+                labelKey="candidateTrustCenter.roadmapBadge"
+              />
               <span className="text-xs text-[var(--twin-muted-strong)]">{record.trust_label}</span>
               <span className="text-[10px] text-[var(--twin-muted-strong)]">
                 {t("candidateTrustCenter.lastReviewed")}: {record.last_reviewed_at.slice(0, 10)}

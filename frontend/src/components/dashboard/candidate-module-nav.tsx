@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 
+import { CANDIDATE_MODULE_NAV_COLLAPSED_DEFAULT } from "@/lib/seven-day-d2-candidate";
+
 import { useTranslation } from "@/components/language-provider";
 import { SystemOfRecordNavigationHub } from "@/components/workspace/system-of-record-navigation-hub";
 
 /** Collapsible system-of-record navigation on candidate dashboard. */
 export function CandidateModuleNav() {
   const { t } = useTranslation();
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(!CANDIDATE_MODULE_NAV_COLLAPSED_DEFAULT);
 
   return (
     <div className="mb-4 sm:mb-6" data-testid="candidate-module-nav">

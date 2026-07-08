@@ -4,11 +4,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
-import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
+import { WorkspaceStatusBadge } from "@/components/workspace/workspace-status-badge";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Input, Label, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
+import { CAREER_COMPASS_SHIP_STATUS } from "@/lib/seven-day-d2-candidate";
 
 const MAX_VISIBLE_MILESTONES = 40;
 
@@ -245,7 +246,7 @@ export default function CareerCompassPage() {
       <div className="mb-4 flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 space-y-2">
           <h1 className="twin-section-title text-xl sm:text-2xl">{t("dashboard.careerCompassPageTitle")}</h1>
-          <DemoJourneyPilotStatus className="items-start" status="pilot" />
+          <WorkspaceStatusBadge status={CAREER_COMPASS_SHIP_STATUS} />
         </div>
         <CandidateWorkspaceSubnav ariaLabel={t("dashboard.careerCompassPageTitle")} />
       </div>
@@ -284,8 +285,36 @@ export default function CareerCompassPage() {
       {error ? <p className="mb-4 text-sm text-red-600">{error}</p> : null}
 
       {!data?.configured && !path ? (
-        <Card variant="soft" className="mb-6">
-          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.careerCompassNotConfigured")}</p>
+        <Card variant="soft" className="mb-6" data-seven-day-career-static-framework>
+          <h2 className="mb-2 text-sm font-semibold">{t("dashboard.careerCompassStaticFrameworkTitle")}</h2>
+          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.careerCompassStaticFrameworkLead")}</p>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div className="rounded-lg border border-[var(--twin-border)]/70 p-3">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--twin-muted)]">
+                {t("dashboard.careerCompassStaticTargetRoleTitle")}
+              </h3>
+              <p className="mt-1 text-sm text-[var(--twin-muted-strong)]">{t("dashboard.careerCompassStaticTargetRoleLead")}</p>
+            </div>
+            <div className="rounded-lg border border-[var(--twin-border)]/70 p-3">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--twin-muted)]">
+                {t("dashboard.careerCompassStaticSkillsGapTitle")}
+              </h3>
+              <p className="mt-1 text-sm text-[var(--twin-muted-strong)]">{t("dashboard.careerCompassStaticSkillsGapLead")}</p>
+            </div>
+            <div className="rounded-lg border border-[var(--twin-border)]/70 p-3">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--twin-muted)]">
+                {t("dashboard.careerCompassStaticNextStepsTitle")}
+              </h3>
+              <p className="mt-1 text-sm text-[var(--twin-muted-strong)]">{t("dashboard.careerCompassStaticNextStepsLead")}</p>
+            </div>
+            <div className="rounded-lg border border-[var(--twin-border)]/70 p-3">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--twin-muted)]">
+                {t("dashboard.careerCompassStaticLearningTitle")}
+              </h3>
+              <p className="mt-1 text-sm text-[var(--twin-muted-strong)]">{t("dashboard.careerCompassStaticLearningLead")}</p>
+            </div>
+          </div>
+          <p className="mt-4 text-sm text-[var(--twin-muted-strong)]">{t("dashboard.careerCompassNotConfigured")}</p>
         </Card>
       ) : null}
 

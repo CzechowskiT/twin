@@ -30,6 +30,7 @@ export const PUBLIC_SURFACE_HREFS = [
 
 const ALWAYS_HIDDEN_MODULE_IDS = new Set([
   "auto_apply",
+  "plan_payments",
   "candidate_revoke_delete",
   "recruiter_calendar",
   "recruiter_operational_work_queue",
@@ -60,6 +61,7 @@ const CANDIDATE_PRIMARY_IDS = new Set([
 const CANDIDATE_ROADMAP_IDS = new Set([
   "candidate_career_compass",
   "candidate_interview_prep",
+  "candidate_evidence",
   "candidate_plan",
   "candidate_referrals",
   "candidate_trust",
@@ -71,13 +73,12 @@ const CANDIDATE_ROADMAP_IDS = new Set([
   "candidate_trust_audit_export",
   "candidate_consent_receipt",
   "candidate_trust_overview",
-  "candidate_evidence",
   "career_compass",
+  "interview_prep",
+  "evidence",
   "plan_payments",
   "referrals",
   "trust_center",
-  "interview_prep",
-  "evidence",
 ]);
 
 const RECRUITER_PRIMARY_IDS = new Set([
