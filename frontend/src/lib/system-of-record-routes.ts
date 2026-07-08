@@ -28,6 +28,10 @@ import type { TranslationKey } from "@/lib/i18n";
 import type { MarketingPersona } from "@/lib/marketing-persona";
 import { RECRUITER_INTEGRATIONS_ROUTE } from "@/lib/recruiter-integrations-readiness";
 import {
+  RECRUITER_ANALYTICS_SHIP_STATUS,
+  RECRUITER_INTEGRATIONS_ROADMAP_STATUS,
+} from "@/lib/seven-day-d3-recruiter";
+import {
   candidateCommunicationHref,
   SAFE_COMMUNICATION_CANDIDATE_DEMO_ID,
 } from "@/lib/safe-communication";
@@ -628,9 +632,9 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     descriptionKey: "workspaceModules.recruiterIntegrationsValue",
     hintKey: "workspaceModules.recruiterIntegrationsHint",
     ctaKey: "workspaceModules.recruiterIntegrationsCta",
-    status: "pilot",
+    status: RECRUITER_INTEGRATIONS_ROADMAP_STATUS,
     moduleFamily: "integrations",
-    boundaryTags: ["pilot", "no_ats_sync"],
+    boundaryTags: ["no_ats_sync", "not_live"],
   },
   {
     id: "recruiter_analytics",
@@ -639,7 +643,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     titleKey: "workspaceModules.recruiterAnalyticsTitle",
     descriptionKey: "workspaceModules.recruiterAnalyticsValue",
     ctaKey: "workspaceModules.recruiterAnalyticsCta",
-    status: "pilot",
+    status: RECRUITER_ANALYTICS_SHIP_STATUS,
     moduleFamily: "analytics",
     boundaryTags: ["pilot"],
   },

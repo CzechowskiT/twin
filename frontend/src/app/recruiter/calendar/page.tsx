@@ -17,7 +17,7 @@ export default function RecruiterCalendarPage() {
 
   return (
     <Shell wide>
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-3xl" data-seven-day-recruiter-calendar-roadmap>
         <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--twin-muted-strong)]">
           {t("recruiterCalendar.eyebrow")}
         </p>
