@@ -20,6 +20,7 @@ import {
   FORCE_MICROSOFT_CALENDAR_COMING_SOON,
   type CalendarProviderTierKey,
 } from "@/lib/product-polish-p2";
+import { CANDIDATE_CALENDAR_HONEST_TIERS } from "@/lib/seven-day-d6-integrations";
 import { webcalToHttps } from "@/lib/webcal-subscribe";
 
 type ProviderState = {
@@ -390,7 +391,12 @@ export function CalendarConnectionsPanel({
   const { t } = useTranslation();
 
   return (
-    <section className="mb-6" aria-labelledby="calendar-connections-heading">
+    <section className="mb-6" aria-labelledby="calendar-connections-heading" data-seven-day-d6-candidate-calendar>
+      {CANDIDATE_CALENDAR_HONEST_TIERS ? (
+        <p className="twin-muted mb-4 text-sm leading-relaxed" data-seven-day-d6-calendar-boundary>
+          {t("sevenDayD6.calendarBoundaryLead")}
+        </p>
+      ) : null}
       <div className="mb-4">
         <h2 id="calendar-connections-heading" className="text-lg font-semibold text-[var(--foreground)]">
           {t("dashboard.calendarConnectedAccountsTitle")}

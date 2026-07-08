@@ -12,9 +12,12 @@ import {
   RECRUITER_INTEGRATION_ROWS,
 } from "@/lib/recruiter-integrations-readiness";
 import {
-  INTEGRATIONS_HONEST_NO_LIVE_ATS_SYNC,
   RECRUITER_INTEGRATIONS_ROADMAP_STATUS,
 } from "@/lib/seven-day-d3-recruiter";
+import {
+  ATS_COMING_SOON_NO_LIVE_SYNC,
+  RECRUITER_INTEGRATIONS_HONEST_NO_LIVE_ATS_SYNC,
+} from "@/lib/seven-day-d6-integrations";
 
 const LABEL_KEYS: Record<string, TranslationKey> = {
   acceptance_inbox: "recruiterIntegrations.item_acceptance_inbox",
@@ -29,7 +32,7 @@ export default function RecruiterIntegrationsClient() {
   const { t } = useTranslation();
 
   return (
-    <Shell wide data-seven-day-recruiter-integrations>
+    <Shell wide data-seven-day-recruiter-integrations data-seven-day-d6-recruiter-integrations>
       <RecruiterWorkspaceNav />
       <WorkspacePilotPageHeader
         eyebrowKey="recruiterIntegrations.eyebrow"
@@ -37,9 +40,14 @@ export default function RecruiterIntegrationsClient() {
         leadKey="recruiterIntegrations.lead"
         status={RECRUITER_INTEGRATIONS_ROADMAP_STATUS}
       />
-      {INTEGRATIONS_HONEST_NO_LIVE_ATS_SYNC ? (
+      {RECRUITER_INTEGRATIONS_HONEST_NO_LIVE_ATS_SYNC ? (
         <p className="twin-muted mb-4 text-sm leading-relaxed" data-seven-day-integrations-roadmap-boundary>
           {t("recruiterIntegrations.roadmapBoundary")}
+        </p>
+      ) : null}
+      {ATS_COMING_SOON_NO_LIVE_SYNC ? (
+        <p className="twin-muted mb-4 text-sm leading-relaxed" data-seven-day-d6-integrations-boundary>
+          {t("sevenDayD6.integrationsNoLiveSyncBoundary")}
         </p>
       ) : null}
 
