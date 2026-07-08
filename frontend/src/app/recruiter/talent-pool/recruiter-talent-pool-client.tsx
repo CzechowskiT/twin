@@ -18,6 +18,9 @@ import {
   writeRecruiterInboxSession,
 } from "@/lib/recruiter-inbox";
 import {
+  TALENT_POOL_LIMITED_PILOT,
+} from "@/lib/seven-day-d3-recruiter";
+import {
   RECRUITER_TALENT_POOL_IMPORT_ROUTE,
   RECRUITER_TALENT_POOL_MARKERS,
   RECRUITER_TALENT_POOL_ROUTE,
@@ -75,6 +78,11 @@ export default function RecruiterTalentPoolClient() {
         leadKey="recruiterTalentPool.lead"
         status="pilot"
       />
+      {TALENT_POOL_LIMITED_PILOT ? (
+        <p className="twin-muted mb-4 text-sm leading-relaxed" data-seven-day-talent-pool-pilot-boundary>
+          {t("recruiterTalentPool.pilotBoundaryBody")}
+        </p>
+      ) : null}
 
       <Card variant="soft" className="mb-6 p-4">
         <RecruiterAccessFields

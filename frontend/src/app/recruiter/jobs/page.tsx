@@ -5,10 +5,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
-import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
+import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspace-nav";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
+import { COLLAPSE_RECRUITER_DEMO_JOURNEYS } from "@/lib/seven-day-d3-recruiter";
 import {
   mergeCompanyOptions,
   readRecruiterInboxSession,
@@ -107,7 +108,8 @@ export default function RecruiterJobsPage() {
 
   return (
     <Shell wide>
-      <Card>
+      <RecruiterWorkspaceNav />
+      <Card data-seven-day-recruiter-jobs>
         <h1 className="mb-2 text-2xl font-semibold">{t("recruiterJobs.title")}</h1>
         <p className="twin-muted mb-6 text-sm">{t("recruiterJobs.lead")}</p>
         <RecruiterAccessFields
@@ -179,17 +181,24 @@ export default function RecruiterJobsPage() {
         <Link href="/recruiter/inbox" className="twin-link mt-6 inline-block text-sm">
           {t("recruiterJobs.inboxLink")}
         </Link>
-        <div className="mt-6 rounded-lg border border-[var(--twin-border)]/80 p-4">
-          <DemoJourneyPilotStatus className="items-start" />
-          <p className="mt-3 text-sm text-[var(--twin-muted-strong)]">{t("jobPipeline.demoJobsLead")}</p>
-          <Link
-            href="/recruiter/jobs/demo-role-001/pipeline"
-            className="twin-link mt-3 inline-block text-sm font-medium"
-            data-testid="recruiter-jobs-demo-pipeline-link"
+        {COLLAPSE_RECRUITER_DEMO_JOURNEYS ? (
+          <details
+            className="mt-6 rounded-lg border border-[var(--twin-border)]/80 p-4"
+            data-seven-day-recruiter-demo-journeys-collapsed
           >
-            {t("jobPipeline.openPipeline")}
-          </Link>
-        </div>
+            <summary className="twin-link cursor-pointer text-sm font-medium [&::-webkit-details-marker]:hidden">
+              {t("recruiterJobs.demoJourneysToggle")}
+            </summary>
+            <p className="twin-muted mt-3 text-sm leading-relaxed">{t("recruiterJobs.demoJourneysBoundary")}</p>
+            <Link
+              href="/recruiter/jobs/demo-role-001/pipeline"
+              className="twin-link mt-3 inline-block text-sm font-medium"
+              data-testid="recruiter-jobs-demo-pipeline-link"
+            >
+              {t("jobPipeline.openPipeline")}
+            </Link>
+          </details>
+        ) : null}
       </Card>
     </Shell>
   );

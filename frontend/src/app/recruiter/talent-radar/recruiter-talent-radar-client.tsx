@@ -30,6 +30,9 @@ import {
   writeRecruiterInboxSession,
 } from "@/lib/recruiter-inbox";
 import {
+  TALENT_RADAR_LIMITED_PILOT,
+} from "@/lib/seven-day-d3-recruiter";
+import {
   buildOutreachDraftText,
   DEFAULT_TALENT_RADAR_FILTERS,
   RECRUITER_TALENT_RADAR_MARKERS,
@@ -323,6 +326,14 @@ export default function RecruiterTalentRadarClient() {
             status="pilot"
             testId={RECRUITER_TALENT_RADAR_MARKERS.hero}
           />
+          {TALENT_RADAR_LIMITED_PILOT ? (
+            <p
+              className="twin-muted mb-4 text-sm leading-relaxed"
+              data-seven-day-talent-radar-pilot-boundary
+            >
+              {t("recruiterTalentRadar.pilotBoundaryBody")}
+            </p>
+          ) : null}
           <p className="text-xs text-[var(--twin-muted-strong)]">{t("recruiterTalentRadar.subtitleAgent")}</p>
 
           <Card variant="soft" className="border-[var(--twin-accent)]/20 p-5 sm:p-6">

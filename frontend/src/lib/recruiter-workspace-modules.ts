@@ -1,6 +1,10 @@
 import { RECRUITER_DAILY_COCKPIT_ROUTE } from "@/lib/recruiter-daily-operating-cockpit";
 import { RECRUITER_TRUST_REVIEW_QUEUE_ROUTE } from "@/lib/recruiter-trust-review-queue";
 import { RECRUITER_INTEGRATIONS_ROUTE } from "@/lib/recruiter-integrations-readiness";
+import {
+  RECRUITER_ANALYTICS_SHIP_STATUS,
+  RECRUITER_INTEGRATIONS_ROADMAP_STATUS,
+} from "@/lib/seven-day-d3-recruiter";
 import type { WorkspaceModuleDef } from "@/lib/workspace-module-status";
 
 /** Recruiter hub module cards — calendar sync explicitly NOT LIVE. */
@@ -77,7 +81,7 @@ export const RECRUITER_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     titleKey: "workspaceModules.recruiterAnalyticsTitle",
     valuePropKey: "workspaceModules.recruiterAnalyticsValue",
     ctaKey: "workspaceModules.recruiterAnalyticsCta",
-    status: "pilot",
+    status: RECRUITER_ANALYTICS_SHIP_STATUS,
   },
   {
     id: "integrations",
@@ -86,7 +90,7 @@ export const RECRUITER_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     valuePropKey: "workspaceModules.recruiterIntegrationsValue",
     hintKey: "workspaceModules.recruiterIntegrationsHint",
     ctaKey: "workspaceModules.recruiterIntegrationsCta",
-    status: "pilot",
+    status: RECRUITER_INTEGRATIONS_ROADMAP_STATUS,
   },
   {
     id: "calendar",

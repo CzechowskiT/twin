@@ -31,6 +31,7 @@ const PILOT_PREVIEW_ALLOWLIST = new Set([
   "/recruiter/pipeline",
   "/recruiter/jobs",
   "/recruiter/search",
+  "/recruiter/analytics",
   "/company/dashboard",
   "/company/roles",
   "/company/pipeline",

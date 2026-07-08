@@ -11,6 +11,10 @@ import { Shell } from "@/components/ui";
 import {
   RECRUITER_INTEGRATION_ROWS,
 } from "@/lib/recruiter-integrations-readiness";
+import {
+  INTEGRATIONS_HONEST_NO_LIVE_ATS_SYNC,
+  RECRUITER_INTEGRATIONS_ROADMAP_STATUS,
+} from "@/lib/seven-day-d3-recruiter";
 
 const LABEL_KEYS: Record<string, TranslationKey> = {
   acceptance_inbox: "recruiterIntegrations.item_acceptance_inbox",
@@ -25,14 +29,19 @@ export default function RecruiterIntegrationsClient() {
   const { t } = useTranslation();
 
   return (
-    <Shell wide>
+    <Shell wide data-seven-day-recruiter-integrations>
       <RecruiterWorkspaceNav />
       <WorkspacePilotPageHeader
         eyebrowKey="recruiterIntegrations.eyebrow"
         titleKey="recruiterIntegrations.title"
         leadKey="recruiterIntegrations.lead"
-        status="pilot"
+        status={RECRUITER_INTEGRATIONS_ROADMAP_STATUS}
       />
+      {INTEGRATIONS_HONEST_NO_LIVE_ATS_SYNC ? (
+        <p className="twin-muted mb-4 text-sm leading-relaxed" data-seven-day-integrations-roadmap-boundary>
+          {t("recruiterIntegrations.roadmapBoundary")}
+        </p>
+      ) : null}
 
       <ul className="space-y-3">
         {RECRUITER_INTEGRATION_ROWS.map((row) => {

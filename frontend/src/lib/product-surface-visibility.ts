@@ -32,6 +32,7 @@ const ALWAYS_HIDDEN_MODULE_IDS = new Set([
   "auto_apply",
   "plan_payments",
   "candidate_revoke_delete",
+  "recruiter_hub",
   "recruiter_calendar",
   "recruiter_operational_work_queue",
   "recruiter_ats_import_readiness",
@@ -82,15 +83,16 @@ const CANDIDATE_ROADMAP_IDS = new Set([
 ]);
 
 const RECRUITER_PRIMARY_IDS = new Set([
-  "recruiter_hub",
   "recruiter_inbox",
   "recruiter_pipeline",
   "recruiter_jobs",
   "recruiter_search",
+  "recruiter_analytics",
   "inbox",
   "pipeline",
   "jobs",
   "search",
+  "analytics",
 ]);
 
 const RECRUITER_ROADMAP_IDS = new Set([
@@ -100,7 +102,6 @@ const RECRUITER_ROADMAP_IDS = new Set([
   "recruiter_talent_radar_digest",
   "recruiter_talent_pool",
   "recruiter_talent_pool_import",
-  "recruiter_analytics",
   "recruiter_integrations",
   "recruiter_demo_pipeline",
   "recruiter_demo_profile_360",
@@ -114,7 +115,6 @@ const RECRUITER_ROADMAP_IDS = new Set([
   "talent_pool",
   "talent_radar_digest",
   "talent_radar",
-  "analytics",
   "integrations",
 ]);
 
@@ -203,7 +203,15 @@ export function classifyProductSurfaceTier(
 
   if (primaryByPersona[persona].has(moduleId)) return "LIVE";
   if (roadmapByPersona[persona].has(moduleId)) {
-    return status === "planned" || status === "needs_setup" ? "COMING_SOON" : "PILOT";
+    if (
+      status === "planned" ||
+      status === "needs_setup" ||
+      status === "coming_soon" ||
+      status === "not_live"
+    ) {
+      return status === "not_live" ? "HOLD" : "COMING_SOON";
+    }
+    return "PILOT";
   }
 
   if (status) return statusToTier(status);
