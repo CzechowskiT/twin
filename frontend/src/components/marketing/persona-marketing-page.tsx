@@ -21,6 +21,9 @@ export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">{c.heroEyebrow}</p>
           <h1 className="marketing-gradient-heading max-w-4xl text-2xl sm:text-3xl md:text-4xl">{c.heroTitle}</h1>
           <p className="max-w-3xl text-base leading-relaxed text-[var(--twin-muted-strong)] sm:text-lg">{c.heroLead}</p>
+          {persona === "recruiters" || persona === "companies" ? (
+            <p className="max-w-3xl text-xs leading-relaxed text-[var(--twin-muted)]">{t("persona.marketingLimitedLaunchFootnote")}</p>
+          ) : null}
           {c.stackedCta ? (
             <div className="marketing-cta-stack pt-2">
               <Link

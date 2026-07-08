@@ -7806,6 +7806,8 @@ eyebrow: "Product roadmap",
     talentPoolLoadMore: "Load more",
     growthRoadmapFootnote:
       "Order of delivery can change; some items may be tier-gated when they ship. Tell us what you would open weekly. It steers the roadmap.",
+    marketingLimitedLaunchFootnote:
+      "Limited launch: Preview, controlled pilot, and Coming Soon labels mean exactly that. No live ATS writeback, delegated auto-apply, or Microsoft calendar sync on production today.",
   },
   employerMedia: EMPLOYER_MEDIA_MESSAGES_EN,
   jobEmployer: JOB_EMPLOYER_MESSAGES_EN,
@@ -15440,6 +15442,8 @@ const pl: MessageTree = {
     talentPoolLoadMore: "Załaduj więcej",
     growthRoadmapFootnote:
       "Kolejność wdrożeń może się zmieniać; część funkcji może być powiązana z planem po starcie. Napisz, co otwierałbyś co tydzień: to ustawia roadmapę.",
+    marketingLimitedLaunchFootnote:
+      "Ograniczony launch: etykiety Preview, kontrolowany pilot i Coming Soon znaczą dokładnie to. Brak live writeback ATS, delegated auto-apply i synchronizacji Microsoft Calendar na produkcji dziś.",
   },
   compare: {
     disclaimer:
