@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
+import { CandidateReadinessFlowBanner } from "@/components/candidate/candidate-readiness-flow-banner";
 import { WorkspaceStatusBadge } from "@/components/workspace/workspace-status-badge";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Shell } from "@/components/ui";
@@ -151,6 +152,8 @@ export default function CandidateEvidenceClient() {
         </div>
         <WorkspaceStatusBadge status={EVIDENCE_VAULT_SHIP_STATUS} />
       </header>
+
+      <CandidateReadinessFlowBanner context="skill_evidence" />
 
       <div className="mb-6 grid gap-4 lg:grid-cols-2" data-seven-day-evidence-readiness>
         <Card variant="soft" className="border-[var(--twin-border)]/80 p-4">

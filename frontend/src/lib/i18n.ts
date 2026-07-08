@@ -259,6 +259,7 @@ export type TranslationKey =
   | `first1000.${keyof typeof en.first1000}`
   | `ux.${keyof typeof en.ux}`
   | `verifiedReadiness.${keyof typeof en.verifiedReadiness}`
+  | `candidateReadinessWorkingFlow.${keyof typeof en.candidateReadinessWorkingFlow}`
   | `employerMedia.${keyof typeof EMPLOYER_MEDIA_MESSAGES_EN}`
   | `jobEmployer.${keyof typeof JOB_EMPLOYER_MESSAGES_EN}`
   | `jobBoard.${keyof typeof JOB_BOARD_MESSAGES_EN}`
@@ -8065,6 +8066,15 @@ eyebrow: "Product roadmap",
     blockMissingCvMaterial: "CV material is missing.",
     blockMissingCareerBrief: "Career brief is missing.",
     blockGeneric: "A requirement is not met yet.",
+  },
+  candidateReadinessWorkingFlow: {
+    backToChecklist: "Back to readiness checklist",
+    bannerCareerBrief:
+      "Saving your career compass updates the career brief item on your checklist. Delegated sending stays off.",
+    bannerSkillEvidence:
+      "Proof you add here counts toward your skill evidence baseline. Delegated sending stays off.",
+    profileReadyDelegatedOff:
+      "Your profile can be ready for review; delegated applications remain disabled in this environment.",
   },
   common: {
     language: "Language",
@@ -15938,6 +15948,15 @@ const pl: MessageTree = {
     blockMissingCvMaterial: "Brakuje materiału CV.",
     blockMissingCareerBrief: "Brakuje briefu kariery.",
     blockGeneric: "Wymaganie nie jest jeszcze spełnione.",
+  },
+  candidateReadinessWorkingFlow: {
+    backToChecklist: "Wróć do listy gotowości",
+    bannerCareerBrief:
+      "Zapis kompasu kariery aktualizuje pozycję briefu na liście gotowości. Wysyłka delegowana pozostaje wyłączona.",
+    bannerSkillEvidence:
+      "Dowody dodane tutaj liczą się do baseline umiejętności na liście gotowości. Wysyłka delegowana pozostaje wyłączona.",
+    profileReadyDelegatedOff:
+      "Profil może być gotowy do przeglądu; aplikacje delegowane pozostają wyłączone w tym środowisku.",
   },
   common: {
     language: "Język",
