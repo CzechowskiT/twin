@@ -12,6 +12,7 @@ import {
   isWorkspaceGreenVisible,
   WAVE1_HIDDEN_WORKSPACE_CARD_COUNT,
   WAVE1_HIDDEN_WORKSPACE_CARD_IDS,
+  WAVE2A_RESTORED_WORKSPACE_CARD_IDS,
   WORKSPACE_GREEN_ONLY_MODE,
   WORKSPACE_GREEN_PRIMARY_LIMITS,
 } from "../src/lib/all-workspace-green-gate";
@@ -32,14 +33,13 @@ import {
   HIDE_CANDIDATE_TRUST_CENTER_FROM_HUB,
 } from "../src/lib/seven-day-d2-candidate";
 import {
-  HIDE_RECRUITER_ANALYTICS_FROM_HUB,
-  RECRUITER_PRIMARY_NAV_HREFS,
-} from "../src/lib/seven-day-d3-recruiter";
-import { COMPANY_PRIMARY_NAV_HREFS } from "../src/lib/seven-day-d4-company";
-import {
   HIDE_INVESTOR_DATA_ROOM_FROM_HUB,
   INVESTOR_ROADMAP_MODULE_IDS,
 } from "../src/lib/seven-day-d5-investor";
+import {
+  RECRUITER_PRIMARY_NAV_HREFS,
+} from "../src/lib/seven-day-d3-recruiter";
+import { COMPANY_PRIMARY_NAV_HREFS } from "../src/lib/seven-day-d4-company";
 import { getSystemOfRecordRoutesForPersona } from "../src/lib/system-of-record-routes";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -74,15 +74,14 @@ test("2 WORKSPACE_GREEN_ONLY_MODE enabled with gate exports", () => {
   assert.equal(WAVE1_HIDDEN_WORKSPACE_CARD_COUNT, 20);
 });
 
-test("3 seven-day wave1 hide flags", () => {
+test("3 seven-day wave1 hide flags — wave1 hidden modules; analytics restored in Wave 2A", () => {
   assert.equal(HIDE_CANDIDATE_REFERRALS_FROM_HUB, true);
   assert.equal(HIDE_CANDIDATE_TRUST_CENTER_FROM_HUB, true);
-  assert.equal(HIDE_RECRUITER_ANALYTICS_FROM_HUB, true);
   assert.equal(HIDE_INVESTOR_DATA_ROOM_FROM_HUB, true);
   assert.equal(INVESTOR_ROADMAP_MODULE_IDS.length, 0);
-  assert.equal(RECRUITER_PRIMARY_NAV_HREFS.length, 4);
+  assert.equal(RECRUITER_PRIMARY_NAV_HREFS.length, 5);
+  assert.ok((RECRUITER_PRIMARY_NAV_HREFS as readonly string[]).includes("/recruiter/analytics"));
   assert.equal(COMPANY_PRIMARY_NAV_HREFS.length, 3);
-  assert.ok(!(RECRUITER_PRIMARY_NAV_HREFS as readonly string[]).includes("/recruiter/analytics"));
   assert.ok(!(COMPANY_PRIMARY_NAV_HREFS as readonly string[]).includes("/company/talent-pool"));
 });
 
@@ -126,6 +125,7 @@ test("5 wave1 hidden card IDs not in primary hub", () => {
             : INVESTOR_WORKSPACE_MODULES;
     const split = splitWorkspaceModules(persona, modules);
     for (const id of WAVE1_HIDDEN_WORKSPACE_CARD_IDS[persona]) {
+      if ((WAVE2A_RESTORED_WORKSPACE_CARD_IDS[persona] as readonly string[]).includes(id)) continue;
       assert.ok(!split.primary.some((m) => m.id === id), `${persona}/${id} must not be primary`);
       assert.equal(shouldHideFromDefaultHub(persona, id), true);
       assert.equal(shouldShowAsRoadmap(persona, id), false);
@@ -149,7 +149,7 @@ test("7 green allowed IDs cover expected visible modules", () => {
   assert.ok(isWorkspaceGreenVisible("candidate", "evidence"));
   assert.ok(!isWorkspaceGreenVisible("candidate", "referrals"));
   assert.ok(isWorkspaceGreenVisible("recruiter", "inbox"));
-  assert.ok(!isWorkspaceGreenVisible("recruiter", "analytics"));
+  assert.ok(isWorkspaceGreenVisible("recruiter", "analytics"));
   assert.ok(isWorkspaceGreenVisible("company", "roles"));
   assert.ok(!isWorkspaceGreenVisible("company", "talent_pool"));
   assert.ok(isWorkspaceGreenVisible("investor", "metrics"));

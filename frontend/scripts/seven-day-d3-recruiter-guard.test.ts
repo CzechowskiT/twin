@@ -60,8 +60,8 @@ test("1 D3 execution doc exists with stance footer", () => {
   assert.doesNotMatch(doc, /Launch:\s*\*\*GO\*\*/);
 });
 
-test("2 seven-day-d3 flags — analytics preview, integrations roadmap, collapsed nav", () => {
-  assert.equal(RECRUITER_ANALYTICS_SHIP_STATUS, "preview");
+test("2 seven-day-d3 flags — analytics live, integrations roadmap, collapsed nav", () => {
+  assert.equal(RECRUITER_ANALYTICS_SHIP_STATUS, "live");
   assert.equal(RECRUITER_INTEGRATIONS_ROADMAP_STATUS, "coming_soon");
   assert.equal(HIDE_RECRUITER_CALENDAR_FROM_NAV, true);
   assert.equal(RECRUITER_WORKSPACE_NAV_COLLAPSED_DEFAULT, true);
@@ -71,11 +71,11 @@ test("2 seven-day-d3 flags — analytics preview, integrations roadmap, collapse
   assert.equal(INTEGRATIONS_HONEST_NO_LIVE_ATS_SYNC, true);
   assert.equal(SHOW_RECRUITER_HUB_PRIMARY_PROMOS, false);
   assert.equal(SHOW_RECRUITER_HUB_ROADMAP_PROMOS_COLLAPSED, false);
-  assert.equal(RECRUITER_PRIMARY_NAV_HREFS.length, 4);
+  assert.equal(RECRUITER_PRIMARY_NAV_HREFS.length, 5);
 });
 
-test("3 workspace modules — analytics preview, integrations coming soon, calendar not live", () => {
-  assert.equal(moduleStatus("analytics"), "preview");
+test("3 workspace modules — analytics live, integrations coming soon, calendar not live", () => {
+  assert.equal(moduleStatus("analytics"), "live");
   assert.equal(moduleStatus("integrations"), "coming_soon");
   assert.equal(moduleStatus("calendar"), "not_live");
   assert.equal(moduleStatus("inbox"), "live");
@@ -84,17 +84,17 @@ test("3 workspace modules — analytics preview, integrations coming soon, calen
   assert.equal(moduleStatus("search"), "live");
 });
 
-test("4 product surface — green-only primary four; non-green hidden", () => {
+test("4 product surface — green-only primary five; non-green hidden", () => {
   const split = splitWorkspaceModules("recruiter", RECRUITER_WORKSPACE_MODULES);
   assert.ok(split.primary.some((m) => m.id === "inbox"));
-  assert.ok(!split.primary.some((m) => m.id === "analytics"));
-  assert.equal(split.primary.filter((m) => m.status === "live").length, 4);
+  assert.ok(split.primary.some((m) => m.id === "analytics"));
+  assert.equal(split.primary.filter((m) => m.status === "live").length, 5);
   assert.equal(split.roadmap.length, 0);
   assert.ok(split.hidden.some((m) => m.id === "calendar"));
   assert.ok(split.hidden.some((m) => m.id === "integrations"));
   assert.equal(shouldHideFromDefaultHub("recruiter", "calendar"), true);
-  assert.equal(shouldHideFromDefaultHub("recruiter", "analytics"), true);
-  assert.equal(classifyProductSurfaceTier("recruiter", "analytics"), "INTERNAL");
+  assert.equal(shouldHideFromDefaultHub("recruiter", "analytics"), false);
+  assert.equal(classifyProductSurfaceTier("recruiter", "analytics"), "LIVE");
   assert.equal(classifyProductSurfaceTier("recruiter", "integrations", "coming_soon"), "INTERNAL");
 });
 
@@ -110,13 +110,13 @@ test("5 recruiter workspace nav — primary four, calendar hidden, collapsed ext
   assert.doesNotMatch(primaryBlock, /\/recruiter\/calendar/);
 });
 
-test("6 recruiter hub — green quick actions, roadmap promos off", () => {
+test("6 recruiter hub — green quick actions include analytics, roadmap promos off", () => {
   const page = read("src/app/recruiter/page.tsx");
-  assert.doesNotMatch(page, /\/recruiter\/analytics/);
+  assert.match(page, /\/recruiter\/analytics/);
   assert.equal(SHOW_RECRUITER_HUB_ROADMAP_PROMOS_COLLAPSED, false);
 });
 
-test("7 analytics — preview badge, summary metrics, BE proxy + FE derive", () => {
+test("7 analytics — live badge, summary metrics, BE proxy + FE derive", () => {
   const client = read("src/app/recruiter/analytics/recruiter-analytics-client.tsx");
   assert.match(client, /RECRUITER_ANALYTICS_SHIP_STATUS/);
   assert.match(client, /data-seven-day-recruiter-analytics-summary/);
