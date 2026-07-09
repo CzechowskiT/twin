@@ -76,6 +76,7 @@
     "test:product-polish-p4-guard": "npx --yes tsx scripts/product-polish-p4-guard.test.ts",
     "test:product-scope-reality-review-guard": "npx --yes tsx scripts/product-scope-reality-review-guard.test.ts",
     "test:seven-day-public-ready-plan-guard": "npx --yes tsx scripts/seven-day-public-ready-plan-guard.test.ts",
+    "test:all-workspace-modules-green-plan-guard": "npx --yes tsx scripts/all-workspace-modules-green-plan-guard.test.ts",
     "test:seven-day-d1-marketing-guard": "npx --yes tsx scripts/seven-day-d1-marketing-guard.test.ts",
     "test:seven-day-d2-candidate-guard": "npx --yes tsx scripts/seven-day-d2-candidate-guard.test.ts",
     "test:seven-day-d3-recruiter-guard": "npx --yes tsx scripts/seven-day-d3-recruiter-guard.test.ts",
