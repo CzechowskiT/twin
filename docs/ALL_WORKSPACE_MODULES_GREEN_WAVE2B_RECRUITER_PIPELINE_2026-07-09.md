@@ -120,5 +120,5 @@ WAVE2B_PIPELINE_ALWAYS_IN_HUB: true
 WAVE2B_SLICE2_M7_SMOKE: NEEDS_FOUNDER_AUTH_SMOKE
 WAVE2B_EFFECTIVE_HIDDEN_WORKSPACE_CARD_COUNT: 19
 WORKSPACE_GREEN_PRIMARY_LIMITS: candidate_10, recruiter_5, company_3, investor_4
-NEXT_SLICE: Wave 2B Slice 3 MAKE_GREEN (company dashboard M8)
+NEXT_SLICE: Wave 2B Slice 3 MAKE_GREEN (company dashboard M8) — DONE; Slice 4 (investor workspace — TBD from green plan)
 ```

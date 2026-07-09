@@ -32,7 +32,7 @@ import {
   recruiterInboxErrorMessageKey,
   type RecruiterInboxErrorMessageKey,
 } from "@/lib/recruiter-inbox-errors";
-import { COLLAPSE_COMPANY_DEMO_JOURNEYS } from "@/lib/seven-day-d4-company";
+import { COLLAPSE_COMPANY_DEMO_JOURNEYS, COMPANY_PIPELINE_SHIP_STATUS } from "@/lib/seven-day-d4-company";
 
 const SEGMENT_LABEL_KEYS: Record<keyof CompanyPipelineSegments, TranslationKey> = {
   in_review: "companyPipeline.metricInReview",
@@ -119,7 +119,7 @@ export default function CompanyPipelineClient() {
   const companyLabel = companySlugToLabel(companySlug || companyRaw);
 
   return (
-    <Shell wide>
+    <Shell wide data-wave2b-company-pipeline-green={COMPANY_PIPELINE_SHIP_STATUS}>
       <header className="mb-8 space-y-3">
         <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
           {t("companyPipeline.eyebrow")}

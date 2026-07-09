@@ -31,6 +31,15 @@ export const HIDE_COMPANY_BILLING_FROM_NAV = true;
 /** Extended company nav collapsed by default — core ≤4 on hub home. */
 export const COMPANY_WORKSPACE_NAV_COLLAPSED_DEFAULT = true;
 
+/** Wave 2B slice 3 — company dashboard executive snapshot confirmed GREEN_WORKING (was visible in Wave 1; M8 smoke-close). */
+export const COMPANY_DASHBOARD_SHIP_STATUS = "live" as const;
+
+/** Wave 2B slice 3 — company roles list confirmed GREEN_WORKING. */
+export const COMPANY_ROLES_SHIP_STATUS = "live" as const;
+
+/** Wave 2B slice 3 — company pipeline quality overview confirmed GREEN_WORKING. */
+export const COMPANY_PIPELINE_SHIP_STATUS = "live" as const;
+
 /** Primary company surfaces (≤3 green) — dashboard, roles, pipeline. */
 export const COMPANY_PRIMARY_NAV_HREFS = [
   "/company/dashboard",

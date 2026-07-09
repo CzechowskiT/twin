@@ -681,7 +681,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     ctaKey: "systemOfRecord.companyDashboardCta",
     status: "live",
     moduleFamily: "dashboard",
-    boundaryTags: [],
+    boundaryTags: ["human_decision_required", "no_ats_sync"],
   },
   {
     id: "company_candidate_trust_summary",
@@ -726,7 +726,7 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     ctaKey: "workspaceModules.companyRolesCta",
     status: "live",
     moduleFamily: "pipeline",
-    boundaryTags: [],
+    boundaryTags: ["human_decision_required", "no_ats_sync"],
   },
   {
     id: "company_pipeline",
