@@ -1,5 +1,5 @@
 /**
- * Wave 1 — workspace hubs show GREEN_WORKING modules only.
+ * Wave 1+2A — workspace hubs show GREEN_WORKING modules only.
  * Routes and SoR entries stay intact; visibility layer only.
  */
 import type { MarketingPersona } from "@/lib/marketing-persona";
@@ -39,6 +39,8 @@ export const GREEN_WORKSPACE_ALLOWED_IDS: Readonly<Record<MarketingPersona, read
     "recruiter_jobs",
     "search",
     "recruiter_search",
+    "analytics",
+    "recruiter_analytics",
   ],
   company: [
     "company_dashboard",
@@ -96,17 +98,35 @@ const ALLOWED_BY_PERSONA = Object.fromEntries(
 /** Post–Wave 1 primary card limits (green-only visible modules). */
 export const WORKSPACE_GREEN_PRIMARY_LIMITS: Readonly<Record<MarketingPersona, number>> = {
   candidate: 10,
-  recruiter: 4,
+  recruiter: 5,
   company: 3,
   investor: 4,
 };
 
-export function isWorkspaceGreenVisible(persona: MarketingPersona, moduleId: string): boolean {
-  if (!WORKSPACE_GREEN_ONLY_MODE) return true;
-  return ALLOWED_BY_PERSONA[persona].has(moduleId);
-}
+/** Wave 2A — first MAKE_GREEN module restored to workspace hub/nav. */
+export const WAVE2A_MAKE_GREEN_MODULE_ID = "analytics" as const;
+
+export const WAVE2A_MAKE_GREEN_SOR_IDS = ["analytics", "recruiter_analytics"] as const;
+
+/** Wave 1 hidden cards restored in Wave 2A (still listed in WAVE1_HIDDEN for audit trail). */
+export const WAVE2A_RESTORED_WORKSPACE_CARD_IDS: Readonly<Record<MarketingPersona, readonly string[]>> = {
+  candidate: [],
+  recruiter: [WAVE2A_MAKE_GREEN_MODULE_ID],
+  company: [],
+  investor: [],
+};
 
 /** Total workspace cards removed from hub/nav in Wave 1 (per green plan inventory). */
 export const WAVE1_HIDDEN_WORKSPACE_CARD_COUNT = (
   Object.values(WAVE1_HIDDEN_WORKSPACE_CARD_IDS)
 ).reduce((sum, ids) => sum + ids.length, 0);
+
+/** Wave 1 hidden count minus Wave 2A restored cards. */
+export const WAVE2A_EFFECTIVE_HIDDEN_WORKSPACE_CARD_COUNT =
+  WAVE1_HIDDEN_WORKSPACE_CARD_COUNT -
+  Object.values(WAVE2A_RESTORED_WORKSPACE_CARD_IDS).reduce((sum, ids) => sum + ids.length, 0);
+
+export function isWorkspaceGreenVisible(persona: MarketingPersona, moduleId: string): boolean {
+  if (!WORKSPACE_GREEN_ONLY_MODE) return true;
+  return ALLOWED_BY_PERSONA[persona].has(moduleId);
+}

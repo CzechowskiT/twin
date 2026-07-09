@@ -9,11 +9,11 @@ export { SHOW_RECRUITER_HUB_PRIMARY_PROMOS } from "@/lib/product-polish-p0";
 /** Wave 1 — roadmap promo cards hidden from recruiter hub (deep links preserved). */
 export const SHOW_RECRUITER_HUB_ROADMAP_PROMOS_COLLAPSED = false;
 
-/** Analytics ships as read-only workspace aggregates — hidden from hub until MAKE_GREEN (Wave 2). */
-export const RECRUITER_ANALYTICS_SHIP_STATUS = "preview" as const;
+/** Wave 2A — analytics read-only workspace aggregates ship as Live (GREEN_WORKING). */
+export const RECRUITER_ANALYTICS_SHIP_STATUS = "live" as const;
 
-/** Wave 1 — analytics preview hidden from workspace hub/nav (route preserved). */
-export const HIDE_RECRUITER_ANALYTICS_FROM_HUB = true;
+/** Wave 2A — analytics restored to workspace hub/nav (was hidden in Wave 1). */
+export const HIDE_RECRUITER_ANALYTICS_FROM_HUB = false;
 
 /** Integrations stay roadmap — no live ATS sync impression. */
 export const RECRUITER_INTEGRATIONS_ROADMAP_STATUS = "coming_soon" as const;
@@ -27,12 +27,13 @@ export const HIDE_RECRUITER_CALENDAR_FROM_NAV = true;
 /** Extended recruiter nav collapsed by default — core ≤5 on hub home. */
 export const RECRUITER_WORKSPACE_NAV_COLLAPSED_DEFAULT = true;
 
-/** Primary recruiter surfaces (≤4 green) — inbox, pipeline, jobs, search. */
+/** Primary recruiter surfaces (≤5 green) — inbox, pipeline, jobs, search, analytics. */
 export const RECRUITER_PRIMARY_NAV_HREFS = [
   "/recruiter/inbox",
   "/recruiter/pipeline",
   "/recruiter/jobs",
   "/recruiter/search",
+  "/recruiter/analytics",
 ] as const;
 
 /** Demo journeys collapsed — human decision required, not primary core. */

@@ -27,6 +27,7 @@ export default function RecruiterHubPage() {
               { href: "/recruiter/pipeline", labelKey: "workspaceModules.recruiterPipelineCta" },
               { href: "/recruiter/jobs", labelKey: "workspaceModules.recruiterJobsCta" },
               { href: "/recruiter/search", labelKey: "workspaceModules.recruiterSearchCta" },
+              { href: "/recruiter/analytics", labelKey: "workspaceModules.recruiterAnalyticsCta" },
             ]}
           />
         </div>
