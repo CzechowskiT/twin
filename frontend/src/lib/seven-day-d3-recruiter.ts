@@ -9,6 +9,9 @@ export { SHOW_RECRUITER_HUB_PRIMARY_PROMOS } from "@/lib/product-polish-p0";
 /** Wave 1 — roadmap promo cards hidden from recruiter hub (deep links preserved). */
 export const SHOW_RECRUITER_HUB_ROADMAP_PROMOS_COLLAPSED = false;
 
+/** Wave 2B slice 2 — pipeline read-only stage board confirmed GREEN_WORKING (was visible in Wave 1; M7 smoke-close). */
+export const RECRUITER_PIPELINE_SHIP_STATUS = "live" as const;
+
 /** Wave 2A — analytics read-only workspace aggregates ship as Live (GREEN_WORKING). */
 export const RECRUITER_ANALYTICS_SHIP_STATUS = "live" as const;
 

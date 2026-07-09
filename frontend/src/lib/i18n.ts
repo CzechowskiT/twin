@@ -1963,7 +1963,8 @@ const en = {
     recruiterInboxValue: "Pre-qualified candidates per company slug — accept, decline, reschedule.",
     recruiterInboxCta: "Open inbox",
     recruiterPipelineTitle: "Pipeline",
-    recruiterPipelineValue: "Segment counts and stage movement for your workspace.",
+    recruiterPipelineValue:
+      "Human decision per stage — review, contact, invite, hold. Token + company slug required; no live ATS sync; no auto outreach.",
     recruiterPipelineCta: "View pipeline",
     recruiterSearchTitle: "Candidate search",
     recruiterSearchValue: "Filter candidates already in your pool — no external sourcing yet.",
@@ -3967,6 +3968,8 @@ eyebrow: "Product roadmap",
   recruiterPipeline: {
     title: "Pipeline",
     lead: "ATS-lite stages for accepted candidates — review, contact, invite, and hold. No external email or calendar sync.",
+    boundaryNote:
+      "Read-only stage board from workspace API — every move requires explicit recruiter action. No live ATS import or automated outreach.",
     navAria: "Recruiter workspace",
     loadFailed: "Could not load pipeline for this workspace.",
     empty: "No candidates in this filter yet.",
@@ -9811,7 +9814,8 @@ const pl: MessageTree = {
     recruiterInboxValue: "Pre-kwalifikowani kandydaci per slug firmy — akceptuj, odrzuć, przełóż.",
     recruiterInboxCta: "Otwórz skrzynkę",
     recruiterPipelineTitle: "Pipeline",
-    recruiterPipelineValue: "Liczniki segmentów i ruch między etapami w workspace.",
+    recruiterPipelineValue:
+      "Decyzja człowieka na każdym etapie — przegląd, kontakt, zaproszenie, wstrzymanie. Token + slug firmy; bez live sync ATS; bez auto outreach.",
     recruiterPipelineCta: "Zobacz pipeline",
     recruiterSearchTitle: "Szukaj kandydatów",
     recruiterSearchValue: "Filtruj kandydatów już w puli — bez zewnętrznego sourcingu.",
@@ -11823,6 +11827,8 @@ const pl: MessageTree = {
   recruiterPipeline: {
     title: "Pipeline",
     lead: "Etapy ATS-lite dla zaakceptowanych kandydatów — przegląd, kontakt, zaproszenie i wstrzymanie. Bez zewnętrznego maila ani sync kalendarza.",
+    boundaryNote:
+      "Tablica etapów tylko do odczytu z API workspace — każdy ruch wymaga jawnej akcji rekrutera. Bez importu ATS ani automatycznego outreach.",
     navAria: "Przestrzeń rekrutera",
     loadFailed: "Nie udało się załadować pipeline dla tej przestrzeni.",
     empty: "Brak kandydatów w tym filtrze.",

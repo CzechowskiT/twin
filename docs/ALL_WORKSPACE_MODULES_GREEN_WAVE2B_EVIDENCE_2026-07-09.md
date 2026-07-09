@@ -112,5 +112,5 @@ WAVE2B_BACK_IN_HUB: true
 WAVE2B_EVIDENCE_ALWAYS_IN_HUB: true
 WAVE2B_EFFECTIVE_HIDDEN_WORKSPACE_CARD_COUNT: 19
 WORKSPACE_GREEN_PRIMARY_LIMITS: candidate_10, recruiter_5, company_3, investor_4
-NEXT_SLICE: Wave 2B Slice 2 MAKE_GREEN (recruiter pipeline M7, company dashboard M8)
+NEXT_SLICE: Wave 2B Slice 2 MAKE_GREEN (recruiter pipeline M7) — DONE; Slice 3 (company dashboard M8)
 ```
