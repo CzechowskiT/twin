@@ -4,14 +4,14 @@ import { InvestorRoadmapFounderUpdatesPanel } from "@/components/investor/invest
 import { PersonaWorkspaceGate } from "@/components/persona-workspace-gate";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
-import { INVESTOR_ROADMAP_CONTROLLED_PREVIEW } from "@/lib/seven-day-d5-investor";
+import { INVESTOR_ROADMAP_CONTROLLED_PREVIEW, INVESTOR_ROADMAP_SHIP_STATUS } from "@/lib/seven-day-d5-investor";
 
 export default function InvestorRoadmapPage() {
   const { t } = useTranslation();
 
   return (
     <PersonaWorkspaceGate allowed={["investor"]} surface="investor">
-      <Shell wide>
+      <Shell wide data-wave2b-investor-roadmap-green={INVESTOR_ROADMAP_SHIP_STATUS}>
         <header className="mb-8 space-y-2">
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
             {t("investorRoadmap.eyebrow")}

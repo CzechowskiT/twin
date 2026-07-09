@@ -1,4 +1,10 @@
 import type { WorkspaceModuleDef } from "@/lib/workspace-module-status";
+import {
+  INVESTOR_CALCULATOR_SHIP_STATUS,
+  INVESTOR_CONTACT_SHIP_STATUS,
+  INVESTOR_METRICS_SHIP_STATUS,
+  INVESTOR_ROADMAP_SHIP_STATUS,
+} from "@/lib/seven-day-d5-investor";
 
 const DECK_MAIL = "contact@twin.care";
 
@@ -11,7 +17,7 @@ export const INVESTOR_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     valuePropKey: "workspaceModules.investorMetricsValue",
     hintKey: "workspaceModules.investorMetricsHint",
     ctaKey: "workspaceModules.investorMetricsCta",
-    status: "live",
+    status: INVESTOR_METRICS_SHIP_STATUS,
   },
   {
     id: "roadmap",
@@ -19,7 +25,7 @@ export const INVESTOR_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     titleKey: "workspaceModules.investorRoadmapTitle",
     valuePropKey: "workspaceModules.investorRoadmapValue",
     ctaKey: "workspaceModules.investorRoadmapCta",
-    status: "live",
+    status: INVESTOR_ROADMAP_SHIP_STATUS,
   },
   {
     id: "data_room",
@@ -37,7 +43,7 @@ export const INVESTOR_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     titleKey: "workspaceModules.investorCalculatorTitle",
     valuePropKey: "workspaceModules.investorCalculatorValue",
     ctaKey: "workspaceModules.investorCalculatorCta",
-    status: "live",
+    status: INVESTOR_CALCULATOR_SHIP_STATUS,
   },
   {
     id: "placement",
@@ -53,7 +59,7 @@ export const INVESTOR_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     titleKey: "workspaceModules.investorContactTitle",
     valuePropKey: "workspaceModules.investorContactValue",
     ctaKey: "workspaceModules.investorContactCta",
-    status: "live",
+    status: INVESTOR_CONTACT_SHIP_STATUS,
   },
 ];
 

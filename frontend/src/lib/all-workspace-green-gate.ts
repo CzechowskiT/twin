@@ -58,9 +58,6 @@ export const GREEN_WORKSPACE_ALLOWED_IDS: Readonly<Record<MarketingPersona, read
     "investor_calculator",
     "contact",
     "investor_contact",
-    "investor_workspace_hub",
-    "investor_public_room",
-    "public_room",
   ],
 };
 
@@ -158,6 +155,26 @@ export const WAVE2B_SLICE3_MAKE_GREEN_SOR_IDS = [
 
 /** Company core trio stayed in hub since Wave 1 — Wave 2B slice 3 formalizes GREEN_WORKING, not a restore. */
 export const WAVE2B_COMPANY_CORE_ALWAYS_IN_HUB = true as const;
+
+/** Wave 2B slice 4 — investor core quartet confirmed GREEN_WORKING (visible in Wave 1; M9 smoke-close). */
+export const WAVE2B_SLICE4_MAKE_GREEN_MODULE_ID = "metrics" as const;
+
+export const WAVE2B_SLICE4_MAKE_GREEN_SOR_IDS = [
+  "metrics",
+  "investor_metrics",
+  "roadmap",
+  "investor_roadmap",
+  "calculator",
+  "investor_calculator",
+  "contact",
+  "investor_contact",
+] as const;
+
+/** Investor core quartet stayed in hub since Wave 1 — Wave 2B slice 4 formalizes GREEN_WORKING, not a restore. */
+export const WAVE2B_INVESTOR_CORE_ALWAYS_IN_HUB = true as const;
+
+/** Same as Wave 2B slice 3 effective hidden — investor core was never in WAVE1_HIDDEN list. */
+export const WAVE2B_SLICE4_EFFECTIVE_HIDDEN_WORKSPACE_CARD_COUNT = WAVE2B_EFFECTIVE_HIDDEN_WORKSPACE_CARD_COUNT;
 
 export function isWorkspaceGreenVisible(persona: MarketingPersona, moduleId: string): boolean {
   if (!WORKSPACE_GREEN_ONLY_MODE) return true;

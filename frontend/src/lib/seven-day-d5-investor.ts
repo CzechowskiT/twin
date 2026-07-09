@@ -47,7 +47,19 @@ export const INVESTOR_ROADMAP_CONTROLLED_PREVIEW = true;
 /** Investor UI must not claim public launch GO. */
 export const NO_PUBLIC_LAUNCH_CLAIMS_INVESTOR_UI = true;
 
-/** Live public-preview investor modules — green-only workspace hub. */
+/** Wave 2B slice 4 — investor metrics confirmed GREEN_WORKING (read-only diligence aggregates). */
+export const INVESTOR_METRICS_SHIP_STATUS = "live" as const;
+
+/** Wave 2B slice 4 — investor roadmap confirmed GREEN_WORKING (transparent production reality). */
+export const INVESTOR_ROADMAP_SHIP_STATUS = "live" as const;
+
+/** Wave 2B slice 4 — investor calculator confirmed GREEN_WORKING (illustrative planning only). */
+export const INVESTOR_CALCULATOR_SHIP_STATUS = "live" as const;
+
+/** Wave 2B slice 4 — investor contact confirmed GREEN_WORKING (founder conversation CTA). */
+export const INVESTOR_CONTACT_SHIP_STATUS = "live" as const;
+
+/** Live public-preview investor modules — green-only workspace hub (4 cards). */
 export const INVESTOR_PRIMARY_MODULE_IDS = [
   "metrics",
   "roadmap",
@@ -57,8 +69,6 @@ export const INVESTOR_PRIMARY_MODULE_IDS = [
   "investor_roadmap",
   "investor_calculator",
   "investor_contact",
-  "investor_public_room",
-  "investor_workspace_hub",
 ] as const;
 
 /** Wave 1 — pilot/preview modules hidden from workspace hub (routes preserved). */

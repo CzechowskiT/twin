@@ -25,7 +25,7 @@ import {
   type InvestorScenario,
 } from "@/lib/investor-calculator-model";
 import type { Locale } from "@/lib/i18n";
-import { INVESTOR_CALCULATOR_ILLUSTRATIVE_ONLY } from "@/lib/seven-day-d5-investor";
+import { INVESTOR_CALCULATOR_ILLUSTRATIVE_ONLY, INVESTOR_CALCULATOR_SHIP_STATUS } from "@/lib/seven-day-d5-investor";
 import {
   effectiveMonthlySubscriptionUsd,
   formatCandidateListPriceUsd,
@@ -260,7 +260,7 @@ export function InvestorCalculator() {
     .replace("{max}", String(inputs.interviewBonusMaxPerQuarter));
 
   return (
-    <Shell wide rail>
+    <Shell wide rail data-wave2b-investor-calculator-green={INVESTOR_CALCULATOR_SHIP_STATUS}>
       <MarketingPageSurface wide withCard={false}>
         <header className="mb-8 text-center sm:mb-10">
           <h1 className="twin-page-intro twin-section-title text-2xl sm:text-3xl">{t("investorCalc.title")}</h1>
