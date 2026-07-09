@@ -25,13 +25,14 @@ const REQUIRED_SECTIONS = [
   "1. Purpose & stance",
   "2. Evidence summary (current)",
   "3. Ready / not ready",
-  "4. Manual smoke checklist (founder morning)",
-  "5. Re-audit row snapshot (PASS / FAIL / NEEDS_REVIEW)",
-  "6. Founder decisions needed (morning)",
-  "7. What Gate F YES will not do",
-  "8. Recommendation",
-  "9. Deliverables",
-  "10. Launch stance footer",
+  "4. Deploy alignment (morning 2026-07-09)",
+  "5. Manual smoke checklist (founder morning)",
+  "6. Re-audit row snapshot (PASS / FAIL / NEEDS_REVIEW)",
+  "7. Founder decisions needed (morning)",
+  "8. What Gate F YES will not do",
+  "9. Recommendation (engineering — not founder final YES)",
+  "10. Deliverables",
+  "11. Launch stance footer",
 ] as const;
 
 function readRepo(rel: string): string {
@@ -76,12 +77,13 @@ test("4 package — Gate F YES is not Launch GO", () => {
 
 test("5 manual smoke checklist has PASS FAIL NEEDS_REVIEW columns", () => {
   const pkg = readRepo(PACKAGE_DOC);
-  const smoke = pkgSection(pkg, "4. Manual smoke checklist (founder morning)");
+  const smoke = pkgSection(pkg, "5. Manual smoke checklist (founder morning)");
   assert.match(smoke, /PASS/);
   assert.match(smoke, /FAIL/);
   assert.match(smoke, /NEEDS_REVIEW/);
   assert.match(smoke, /dashboard-readiness|readiness checklist/i);
   assert.match(smoke, /delegated/i);
+  assert.match(smoke, /AUTHENTICATED_SMOKE_DATE|authenticated slice/i);
 });
 
 test("6 package references D7, candidate readiness, and re-audit evidence", () => {
@@ -98,7 +100,7 @@ test("6 package references D7, candidate readiness, and re-audit evidence", () =
 
 test("7 package — founder decision prompt with YES NO PENDING", () => {
   const pkg = readRepo(PACKAGE_DOC);
-  const decisions = pkgSection(pkg, "6. Founder decisions needed (morning)");
+  const decisions = pkgSection(pkg, "7. Founder decisions needed (morning)");
   assert.match(decisions, /Gate F = YES/);
   assert.match(decisions, /NO/);
   assert.match(decisions, /PENDING/);
@@ -114,4 +116,12 @@ test("9 npm script test:gate-f-founder-review-package-guard registered", () => {
   const pkgJson = read("package.json");
   assert.match(pkgJson, /"test:gate-f-founder-review-package-guard":/);
   assert.match(pkgJson, /gate-f-founder-review-package-guard\.test\.ts/);
+});
+
+test("10 package footer records authenticated smoke counts", () => {
+  const pkg = readRepo(PACKAGE_DOC);
+  assert.match(pkg, /AUTHENTICATED_SMOKE_DATE: 2026-07-09/);
+  assert.match(pkg, /M_SMOKE_PASS: 6/);
+  assert.match(pkg, /M_SMOKE_NEEDS_REVIEW: 6/);
+  assert.match(pkg, /ENGINEERING_GATE_F_RECOMMENDATION: PENDING/);
 });

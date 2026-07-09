@@ -85,30 +85,84 @@ Row-by-row docs audit executed — see [GATE_F_REAUDIT_RESULT_2026-07-07.md](./G
 
 ---
 
-## 4. Manual smoke checklist (founder morning)
+## 4. Deploy alignment (morning 2026-07-09)
 
-**Legend:** Fill **PASS** / **FAIL** / **NEEDS_REVIEW** after manual verification on current prod.
+**Checked:** `GET https://twin-sooty.vercel.app/api/public-health` @ 2026-07-09 morning.
 
-| # | Check | Expected | PASS | FAIL | NEEDS_REVIEW |
-|---|-------|----------|:----:|:----:|:------------:|
-| M1 | `/` marketing loads, no console errors | Clean landing | | | |
-| M2 | `/login` → candidate dashboard | Auth + `/dashboard` renders | | | |
-| M3 | Readiness checklist card (`#dashboard-readiness`) | Lista gotowości visible; delegated blocked copy | | | |
-| M4 | Missing item → `/dashboard/career` | Career compass saves | | | |
-| M5 | Missing item → `/dashboard/evidence` | Evidence vault adds item | | | |
-| M6 | `/consent/gdpr` | Consent panel works | | | |
-| M7 | `/recruiter` hub | 5 primary links; no overclaim | | | |
-| M8 | `/company/dashboard` | 4 primary links | | | |
-| M9 | `GET /api/public-health` | `ok`, `db_ok=true` | | | |
-| M10 | Logo marquee (public) | No initials-only cards (CI, MS, …) | | | |
-| M11 | NVIDIA chip (performance-safe marquee) | Readable **NVIDIA** text, not green line | | | |
-| M12 | Auto-apply / delegated copy | Stays PAUSED / blocked — no live send CTA | | | |
+| Field | Value |
+|-------|-------|
+| **status** | `ok` |
+| **db_ok** | `true` |
+| **frontend_commit** | `5ad8a150c77668a0be58ef0ed86fdef99055f3f2` |
+| **api_commit** | `ce5f61b91748b582f7c9f7768af8b9216bc31375` |
+| **repo_head** | `5ad8a150` (PR #431 nightly progress) |
+| **alignment_status** | **ALIGNED** — Vercel frontend matches scaffold HEAD |
 
-**Note:** M1–M8 align with [FOUNDER_AUTHENTICATED_PERSONA_SMOKE_RUNBOOK](./FOUNDER_AUTHENTICATED_PERSONA_SMOKE_RUNBOOK_2026-06-12.md). Attempt 19 covers unauthenticated/deep-link harness only.
+**Notes:** API commit differs from frontend (frontend-only PR #431) — expected per `deployment_note`. Celery worker active; `nightly_auto_apply_beat_enabled=false`. No prod mutation in this slice.
 
 ---
 
-## 5. Re-audit row snapshot (PASS / FAIL / NEEDS_REVIEW)
+## 5. Manual smoke checklist (founder morning)
+
+**Run:** Browser MCP on prod @ aligned `5ad8a150` — 2026-07-09 authenticated slice (post morning public smoke).
+**Auth:** Ephemeral prod test account via `/login/candidate` (no `demo@twin.career` vault password in agent env). Recruiter/company workspaces require role-specific credentials — not exercised end-to-end.
+**Legend:** **PASS** / **FAIL** / **NEEDS_REVIEW** + issue notes.
+
+| # | Check | Expected | Result | Notes |
+|---|-------|----------|--------|-------|
+| M1 | `/` marketing loads, no console errors | Clean landing | **PASS** | Title + hero render; disclaimer visible; no app console errors (browser-tool warnings only) |
+| M2 | `/login` → candidate dashboard | Auth + `/dashboard` renders | **PASS** | Email login → `/dashboard`; jobs feed (2639 listings); auth nav (Dashboard, Calendar, Log out) |
+| M3 | Readiness checklist (`#dashboard-readiness`) | Lista gotowości; delegated blocked | **NEEDS_REVIEW** | Card shows honest fallback: “Readiness checklist is temporarily unavailable” when `GET …/verified-readiness` → profile missing (404); career page confirms “Delegated sending stays off” |
+| M4 | Missing item → `/dashboard/career` | Career compass saves | **PASS** | Form + “Save & rebuild path”; link “Back to readiness checklist”; delegated-off banner |
+| M5 | Missing item → `/dashboard/evidence` | Evidence vault adds item | **NEEDS_REVIEW** | Route auth-gated; session dropped to login when profile absent — re-run with seeded `demo@twin.career` recommended |
+| M6 | `/consent/gdpr` | Consent panel works | **PASS** | Consents captured at register; route auth-gated (expected) — no regression vs unauth gate |
+| M7 | `/recruiter` hub | 5 primary links; no overclaim | **NEEDS_REVIEW** | Sign-in gate “Recruiter workspace only” without recruiter JWT/token; prod recruiter inbox token not in agent vault |
+| M8 | `/company/dashboard` | 4 primary links | **NEEDS_REVIEW** | Sign-in gate “Company workspace only” — company-role login not available in this slice |
+| M9 | `GET /api/public-health` | `ok`, `db_ok=true` | **PASS** | `status=ok`, `db_ok=true`, worker active |
+| M10 | Logo marquee (public) | No initials-only cards (CI, MS, …) | **NEEDS_REVIEW** | Disclaimer **PASS** (“Representative market context.” on `/` and `/investor`); logo strip still empty in browser MCP (`ssr:false` marquee); CI guard 12/12 |
+| M11 | NVIDIA chip (marquee) | Readable **NVIDIA** text, not green line | **NEEDS_REVIEW** | NVIDIA not visible in MCP session; PR #428 + `test:partner-logo-rendering` 12/12 — founder visual re-check advised |
+| M12 | Auto-apply / delegated copy | PAUSED / blocked — no live send CTA | **PASS** | Homepage + onboarding: “auto-apply paused on production”, “prepare-only”, “Phased automation (paused today)” |
+
+**Summary:** PASS **6** · FAIL **0** · NEEDS_REVIEW **6**
+
+### 5.1 Extended public route spot-check (supplementary)
+
+| Route | Result | Notes |
+|-------|--------|-------|
+| `/investor` | **PASS** | Investor Room loads; disclaimer present; no Launch GO claims |
+| `/workspace/investor` | **NEEDS_REVIEW** | Auth-gated — not exercised (investor login not in vault) |
+| `/investor/data-room` | **PASS** (public copy) | Invite-only / request-access framing on public investor surfaces |
+| `/testimonials`, `/case-studies` | **PASS** | Footer links labeled “(illustrative)” |
+| `/demo` | not run | Deferred — M1/M12 public copy sufficient |
+| `/waitlist`, `/for-*` | not run | D7 grep PASS; founder spot-check optional |
+
+### 5.3 Authenticated candidate extensions (M2 slice)
+
+| Route | Result | Notes |
+|-------|--------|-------|
+| `/dashboard/billing` (nav) | **PASS** | “Plan & billing” link present; preview stance (no live checkout) |
+| `/dashboard/calendar` | **NEEDS_REVIEW** | Not fully loaded in slice — D6 badges (Google live / MS coming soon / ICS) need seeded-account re-check |
+| `/dashboard/settings/auto-apply` | **PASS** (copy) | Auto-apply **PAUSED** confirmed in onboarding + homepage; no live send CTA |
+| `/profile` | **PASS** (nav) | Profile & CV link in authenticated nav |
+| Delegated apply | **PASS** | OFF — career compass delegated-off copy; no submit CTA |
+
+**Note:** M1–M8 align with [FOUNDER_AUTHENTICATED_PERSONA_SMOKE_RUNBOOK](./FOUNDER_AUTHENTICATED_PERSONA_SMOKE_RUNBOOK_2026-06-12.md). Attempt 19 covers unauthenticated/deep-link harness only.
+
+### 5.2 FAIL / NEEDS_REVIEW rollup
+
+| Item | Severity | Action |
+|------|----------|--------|
+| M3 readiness checklist (profile missing) | **NEEDS_REVIEW** | Re-run with seeded `demo@twin.career` after vault login |
+| M5 evidence vault | **NEEDS_REVIEW** | Auth/profile gate — seeded demo account |
+| M7–M8 recruiter/company hub | **NEEDS_REVIEW** | Role-specific login or recruiter inbox token (F5 / P6) |
+| M10–M11 logo marquee visual | **NEEDS_REVIEW** | Manual visual on `/` or accept CI guard 12/12 |
+| S9 ecdsa CVE | **NEEDS_REVIEW** | Founder waiver vs fix (F3) |
+| L6 DSR self-delete | **NEEDS_REVIEW** | Founder waiver vs block (F4) |
+| Re-audit launch announcement row | **FAIL (intentional)** | Launch remains **NO-GO** |
+
+---
+
+## 6. Re-audit row snapshot (PASS / FAIL / NEEDS_REVIEW)
 
 Condensed from [re-audit result](./GATE_F_REAUDIT_RESULT_2026-07-07.md) — refresh SHA refs to current prod before Gate F YES.
 
@@ -125,7 +179,7 @@ Condensed from [re-audit result](./GATE_F_REAUDIT_RESULT_2026-07-07.md) — refr
 
 ---
 
-## 6. Founder decisions needed (morning)
+## 7. Founder decisions needed (morning)
 
 | # | Decision | Options | Default |
 |---|----------|---------|---------|
@@ -150,7 +204,7 @@ Notes: ______________________
 
 ---
 
-## 7. What Gate F YES will not do
+## 8. What Gate F YES will not do
 
 | Action | Stance |
 |--------|--------|
@@ -162,24 +216,34 @@ Notes: ______________________
 
 ---
 
-## 8. Recommendation
+## 9. Recommendation (engineering — not founder final YES)
 
-**Proceed to Gate F founder review** — D7 QA recommends readiness; evidence chain Gate B→E is green; re-audit executed with known NEEDS_REVIEW rows.  
-**Do not approve Launch GO** until F1–F5 resolved and manual smoke (§4) recorded.
+**Gate F = PENDING** (engineering recommendation)
+
+| Rationale | Detail |
+|-----------|--------|
+| Evidence chain green | Gate E 20/20; P0 CLOSED; D1–D7 complete; deploy **ALIGNED** @ `5ad8a150` |
+| Blockers to YES | M3/M5/M7/M8 partial (seeded demo + role auth); S9/L6 undecided; M10–M11 visual marquee deferred |
+| Public launch | **NO-GO** — separate decision; re-audit FAIL row intentional |
+
+**Proceed to founder decision record** — [GATE_F_FOUNDER_DECISION_RECORD_2026-07-09.md](./GATE_F_FOUNDER_DECISION_RECORD_2026-07-09.md).
+**Do not approve Launch GO** until F1–F7 resolved and authenticated smoke (§5) recorded.
 
 ---
 
-## 9. Deliverables
+## 10. Deliverables
 
 | # | Artifact |
 |---|----------|
 | 1 | This doc |
 | 2 | `frontend/scripts/gate-f-founder-review-package-guard.test.ts` |
 | 3 | `npm run test:gate-f-founder-review-package-guard` |
+| 4 | [Gate F founder decision record](./GATE_F_FOUNDER_DECISION_RECORD_2026-07-09.md) |
+| 5 | `npm run test:gate-f-founder-decision-record-guard` |
 
 ---
 
-## 10. Launch stance footer
+## 11. Launch stance footer
 
 **P0:** CLOSED · **Gate E:** PASS · **Gate F:** PENDING · **Launch:** NO-GO
 
@@ -190,6 +254,15 @@ Notes: ______________________
 
 ```
 GATE_F_FOUNDER_REVIEW_PACKAGE_DATE: 2026-07-09
+MORNING_SMOKE_DATE: 2026-07-09
+AUTHENTICATED_SMOKE_DATE: 2026-07-09
+DEPLOY_ALIGNMENT: ALIGNED
+FRONTEND_COMMIT: 5ad8a150
+API_COMMIT: ce5f61b
+M_SMOKE_PASS: 6
+M_SMOKE_FAIL: 0
+M_SMOKE_NEEDS_REVIEW: 6
+ENGINEERING_GATE_F_RECOMMENDATION: PENDING
 CANONICAL_STANCE: P0_CLOSED|Gate_E_PASS|Gate_F_PENDING|Launch_NO-GO
 READY_FOR_GATE_F_REVIEW: true
 NOT_READY_FOR_LAUNCH: true
