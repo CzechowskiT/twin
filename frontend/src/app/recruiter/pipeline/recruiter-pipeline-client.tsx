@@ -24,6 +24,7 @@ import {
   type RecruiterPipelineRow,
 } from "@/lib/recruiter-pipeline";
 import { RECRUITER_SCHEDULING_VISUAL_MARKERS } from "@/lib/recruiter-scheduling";
+import { RECRUITER_PIPELINE_SHIP_STATUS } from "@/lib/seven-day-d3-recruiter";
 
 export function RecruiterPipelineClient() {
   const { t, locale } = useTranslation();
@@ -74,9 +75,14 @@ export function RecruiterPipelineClient() {
   return (
     <Shell wide>
       {queueLoaded ? <RecruiterWorkspaceNav /> : null}
-      <Card variant="soft" className="p-5 sm:p-6">
+      <Card
+        variant="soft"
+        className="p-5 sm:p-6"
+        data-wave2b-recruiter-pipeline-green={RECRUITER_PIPELINE_SHIP_STATUS}
+      >
         <h1 className="twin-section-title text-2xl">{t("recruiterPipeline.title")}</h1>
         <p className="twin-muted mt-2 text-sm leading-relaxed">{t("recruiterPipeline.lead")}</p>
+        <p className="twin-muted mt-2 text-xs leading-relaxed">{t("recruiterPipeline.boundaryNote")}</p>
         <p className="mt-3 text-xs font-medium text-amber-700 dark:text-amber-400">
           {t("recruiterScheduling.trustLabel")}
         </p>

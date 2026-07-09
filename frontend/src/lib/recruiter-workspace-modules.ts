@@ -4,6 +4,7 @@ import { RECRUITER_INTEGRATIONS_ROUTE } from "@/lib/recruiter-integrations-readi
 import {
   RECRUITER_ANALYTICS_SHIP_STATUS,
   RECRUITER_INTEGRATIONS_ROADMAP_STATUS,
+  RECRUITER_PIPELINE_SHIP_STATUS,
 } from "@/lib/seven-day-d3-recruiter";
 import type { WorkspaceModuleDef } from "@/lib/workspace-module-status";
 
@@ -39,7 +40,7 @@ export const RECRUITER_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     titleKey: "workspaceModules.recruiterPipelineTitle",
     valuePropKey: "workspaceModules.recruiterPipelineValue",
     ctaKey: "workspaceModules.recruiterPipelineCta",
-    status: "live",
+    status: RECRUITER_PIPELINE_SHIP_STATUS,
   },
   {
     id: "talent_pool",

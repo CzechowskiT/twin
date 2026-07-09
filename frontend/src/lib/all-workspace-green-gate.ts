@@ -137,6 +137,14 @@ export const WAVE2A_EFFECTIVE_HIDDEN_WORKSPACE_CARD_COUNT =
 /** Same as Wave 2A effective hidden — evidence was never in WAVE1_HIDDEN list. */
 export const WAVE2B_EFFECTIVE_HIDDEN_WORKSPACE_CARD_COUNT = WAVE2A_EFFECTIVE_HIDDEN_WORKSPACE_CARD_COUNT;
 
+/** Wave 2B slice 2 — recruiter pipeline confirmed GREEN_WORKING (was visible in Wave 1; M7 smoke-close). */
+export const WAVE2B_SLICE2_MAKE_GREEN_MODULE_ID = "pipeline" as const;
+
+export const WAVE2B_SLICE2_MAKE_GREEN_SOR_IDS = ["pipeline", "recruiter_pipeline"] as const;
+
+/** Pipeline stayed in hub since Wave 1 — Wave 2B slice 2 formalizes GREEN_WORKING, not a restore. */
+export const WAVE2B_PIPELINE_ALWAYS_IN_HUB = true as const;
+
 export function isWorkspaceGreenVisible(persona: MarketingPersona, moduleId: string): boolean {
   if (!WORKSPACE_GREEN_ONLY_MODE) return true;
   return ALLOWED_BY_PERSONA[persona].has(moduleId);
