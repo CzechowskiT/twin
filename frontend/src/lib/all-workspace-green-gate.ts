@@ -108,5 +108,5 @@ export function isWorkspaceGreenVisible(persona: MarketingPersona, moduleId: str
 
 /** Total workspace cards removed from hub/nav in Wave 1 (per green plan inventory). */
 export const WAVE1_HIDDEN_WORKSPACE_CARD_COUNT = (
-  Object.values(WAVE1_HIDDEN_WORKSPACE_CARD_IDS) as readonly string[][]
+  Object.values(WAVE1_HIDDEN_WORKSPACE_CARD_IDS)
 ).reduce((sum, ids) => sum + ids.length, 0);

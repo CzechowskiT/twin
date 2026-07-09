@@ -82,8 +82,8 @@ test("3 seven-day wave1 hide flags", () => {
   assert.equal(INVESTOR_ROADMAP_MODULE_IDS.length, 0);
   assert.equal(RECRUITER_PRIMARY_NAV_HREFS.length, 4);
   assert.equal(COMPANY_PRIMARY_NAV_HREFS.length, 3);
-  assert.ok(!RECRUITER_PRIMARY_NAV_HREFS.includes("/recruiter/analytics"));
-  assert.ok(!COMPANY_PRIMARY_NAV_HREFS.includes("/company/talent-pool"));
+  assert.ok(!(RECRUITER_PRIMARY_NAV_HREFS as readonly string[]).includes("/recruiter/analytics"));
+  assert.ok(!(COMPANY_PRIMARY_NAV_HREFS as readonly string[]).includes("/company/talent-pool"));
 });
 
 test("4 splitWorkspaceModules — empty roadmap, only live primary cards", () => {
