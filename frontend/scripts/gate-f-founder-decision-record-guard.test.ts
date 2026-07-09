@@ -75,6 +75,14 @@ test("8 references delegated apply OFF and auto-apply PAUSED", () => {
   assert.match(doc, /auto-apply.*PAUSED|Auto-apply.*PAUSED/i);
 });
 
+test("8b authenticated smoke evidence block present", () => {
+  const doc = record();
+  assert.match(doc, /AUTHENTICATED_SMOKE_DATE: 2026-07-09/);
+  assert.match(doc, /M_SMOKE_PASS: 6/);
+  assert.match(doc, /Delegated apply \*\*OFF\*\*/i);
+  assert.match(doc, /auto-apply \*\*PAUSED\*\*/i);
+});
+
 test("9 preserves P0 CLOSED Gate E PASS Gate F PENDING Launch NO-GO", () => {
   const doc = record();
   assert.match(doc, /P0.*CLOSED/i);

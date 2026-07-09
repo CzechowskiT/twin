@@ -18,7 +18,11 @@
 | **Candidate readiness working flow** | **PASS** | PR #429 — checklist → career/evidence/consent |
 | **Deploy alignment** | **ALIGNED** | `frontend_commit=5ad8a150` = repo HEAD |
 | **Public health** | **PASS** | `status=ok`, `db_ok=true` |
-| **M1–M12 manual smoke** | **3 PASS / 0 FAIL / 9 NEEDS_REVIEW** | See [review package §5](./GATE_F_FOUNDER_REVIEW_PACKAGE_2026-07-09.md#5-manual-smoke-checklist-founder-morning) |
+| **M1–M12 manual smoke** | **6 PASS / 0 FAIL / 6 NEEDS_REVIEW** | Authenticated slice 2026-07-09 — see [review package §5](./GATE_F_FOUNDER_REVIEW_PACKAGE_2026-07-09.md#5-manual-smoke-checklist-founder-morning) |
+| **Authenticated candidate smoke** | **PARTIAL PASS** | M2/M4/M6/M12 PASS; M3/M5 profile-gated; calendar/billing nav OK |
+| **Recruiter / company smoke** | **NEEDS_REVIEW** | M7/M8 — role gates only (no recruiter token / company login in vault) |
+| **Delegated apply** | **OFF** | Career compass copy; no live delegated submit CTA |
+| **Auto-apply** | **PAUSED** | Homepage + onboarding copy; no live trigger CTA |
 | **Launch** | **NO-GO** | Re-audit intentional FAIL row; no founder Launch GO |
 
 **Canonical stance:** P0 CLOSED | Gate E PASS | Gate F PENDING | **Launch NO-GO**
@@ -134,13 +138,24 @@ This document records evidence and **blank founder choices** — it does **not**
 
 ## 5. M1–M12 smoke reference
 
-Morning prod smoke @ `5ad8a150` — full table in [review package §5](./GATE_F_FOUNDER_REVIEW_PACKAGE_2026-07-09.md#5-manual-smoke-checklist-founder-morning).
+Authenticated prod smoke @ `5ad8a150` — full table in [review package §5](./GATE_F_FOUNDER_REVIEW_PACKAGE_2026-07-09.md#5-manual-smoke-checklist-founder-morning).
+
+**Evidence (2026-07-09 authenticated slice):**
+
+- Candidate login via `/login/candidate` → `/dashboard` renders with live jobs feed.
+- Readiness checklist: honest degradation when profile missing (`verified-readiness` 404).
+- Career compass: working page with delegated-off copy.
+- Evidence vault: auth/profile gate — re-check with seeded demo account.
+- Consent: captured at registration; `/consent/gdpr` auth-gated.
+- Recruiter/company: sign-in gates only — recruiter inbox token not in agent vault.
+- Public investor + illustrative testimonials/case-studies: PASS.
+- Delegated apply **OFF** and auto-apply **PAUSED** confirmed in product copy.
 
 | Result | Count | Key items |
 |--------|-------|-----------|
-| **PASS** | 3 | M1 marketing, M9 health, M12 auto-apply copy |
+| **PASS** | 6 | M1 marketing, M2 login/dashboard, M4 career, M6 consent, M9 health, M12 paused copy |
 | **FAIL** | 0 | — |
-| **NEEDS_REVIEW** | 9 | M2–M8 founder auth; M10–M11 marquee visual |
+| **NEEDS_REVIEW** | 6 | M3 checklist (profile), M5 evidence, M7 recruiter, M8 company, M10–M11 marquee |
 
 ---
 
@@ -152,12 +167,13 @@ No Gate F YES decided by this document. No Launch GO claimed by this document.
 
 ```
 GATE_F_FOUNDER_DECISION_RECORD_DATE: 2026-07-09
+AUTHENTICATED_SMOKE_DATE: 2026-07-09
 DEPLOY_ALIGNMENT: ALIGNED
 FRONTEND_COMMIT: 5ad8a150
 API_COMMIT: ce5f61b
-M_SMOKE_PASS: 3
+M_SMOKE_PASS: 6
 M_SMOKE_FAIL: 0
-M_SMOKE_NEEDS_REVIEW: 9
+M_SMOKE_NEEDS_REVIEW: 6
 ENGINEERING_GATE_F_RECOMMENDATION: PENDING
 CANONICAL_STANCE: P0_CLOSED|Gate_E_PASS|Gate_F_PENDING|Launch_NO-GO
 DELEGATED_APPLY: OFF

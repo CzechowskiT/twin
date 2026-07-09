@@ -83,6 +83,7 @@ test("5 manual smoke checklist has PASS FAIL NEEDS_REVIEW columns", () => {
   assert.match(smoke, /NEEDS_REVIEW/);
   assert.match(smoke, /dashboard-readiness|readiness checklist/i);
   assert.match(smoke, /delegated/i);
+  assert.match(smoke, /AUTHENTICATED_SMOKE_DATE|authenticated slice/i);
 });
 
 test("6 package references D7, candidate readiness, and re-audit evidence", () => {
@@ -115,4 +116,12 @@ test("9 npm script test:gate-f-founder-review-package-guard registered", () => {
   const pkgJson = read("package.json");
   assert.match(pkgJson, /"test:gate-f-founder-review-package-guard":/);
   assert.match(pkgJson, /gate-f-founder-review-package-guard\.test\.ts/);
+});
+
+test("10 package footer records authenticated smoke counts", () => {
+  const pkg = readRepo(PACKAGE_DOC);
+  assert.match(pkg, /AUTHENTICATED_SMOKE_DATE: 2026-07-09/);
+  assert.match(pkg, /M_SMOKE_PASS: 6/);
+  assert.match(pkg, /M_SMOKE_NEEDS_REVIEW: 6/);
+  assert.match(pkg, /ENGINEERING_GATE_F_RECOMMENDATION: PENDING/);
 });
