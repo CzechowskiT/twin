@@ -1947,7 +1947,8 @@ const en = {
     candidateApplicationsValue: "Timeline, statuses, placement events, and exports.",
     candidateApplicationsCta: "View applications",
     candidateEvidenceTitle: "Evidence vault",
-    candidateEvidenceValue: "Portfolio links and proof points for recruiters.",
+    candidateEvidenceValue:
+      "Manual portfolio links and proof points — recruiter-ready summary when you add them.",
     candidateEvidenceCta: "Open vault",
     candidateInterviewTitle: "Interview prep",
     candidateInterviewValue: "Role-based prompt pack, checklist, and preparation plan.",
@@ -9794,7 +9795,8 @@ const pl: MessageTree = {
     candidateApplicationsValue: "Oś czasu, statusy, placement i eksporty.",
     candidateApplicationsCta: "Zobacz aplikacje",
     candidateEvidenceTitle: "Skarbiec dowodów",
-    candidateEvidenceValue: "Linki portfolio i proof points dla rekruterów.",
+    candidateEvidenceValue:
+      "Ręczne linki portfolio i dowody — podsumowanie dla rekrutera po dodaniu pozycji.",
     candidateEvidenceCta: "Otwórz skarbiec",
     candidateInterviewTitle: "Przygotowanie do rozmowy",
     candidateInterviewValue: "Pakiet promptów per rola, checklista i plan przygotowania.",

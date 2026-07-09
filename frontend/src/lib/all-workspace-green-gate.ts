@@ -116,15 +116,26 @@ export const WAVE2A_RESTORED_WORKSPACE_CARD_IDS: Readonly<Record<MarketingPerson
   investor: [],
 };
 
+/** Wave 2B slice 1 — candidate evidence confirmed GREEN_WORKING (was visible in Wave 1; M5 smoke-close). */
+export const WAVE2B_MAKE_GREEN_MODULE_ID = "evidence" as const;
+
+export const WAVE2B_MAKE_GREEN_SOR_IDS = ["evidence", "candidate_evidence"] as const;
+
+/** Evidence stayed in hub since Wave 1 — Wave 2B formalizes GREEN_WORKING, not a restore. */
+export const WAVE2B_EVIDENCE_ALWAYS_IN_HUB = true as const;
+
 /** Total workspace cards removed from hub/nav in Wave 1 (per green plan inventory). */
 export const WAVE1_HIDDEN_WORKSPACE_CARD_COUNT = (
   Object.values(WAVE1_HIDDEN_WORKSPACE_CARD_IDS)
 ).reduce((sum, ids) => sum + ids.length, 0);
 
-/** Wave 1 hidden count minus Wave 2A restored cards. */
+/** Wave 1 hidden count minus Wave 2A restored cards (Wave 2B evidence unchanged). */
 export const WAVE2A_EFFECTIVE_HIDDEN_WORKSPACE_CARD_COUNT =
   WAVE1_HIDDEN_WORKSPACE_CARD_COUNT -
   Object.values(WAVE2A_RESTORED_WORKSPACE_CARD_IDS).reduce((sum, ids) => sum + ids.length, 0);
+
+/** Same as Wave 2A effective hidden — evidence was never in WAVE1_HIDDEN list. */
+export const WAVE2B_EFFECTIVE_HIDDEN_WORKSPACE_CARD_COUNT = WAVE2A_EFFECTIVE_HIDDEN_WORKSPACE_CARD_COUNT;
 
 export function isWorkspaceGreenVisible(persona: MarketingPersona, moduleId: string): boolean {
   if (!WORKSPACE_GREEN_ONLY_MODE) return true;
