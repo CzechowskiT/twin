@@ -21,7 +21,7 @@ import {
   resolveCompanySlugFromRaw,
   writeRecruiterInboxSession,
 } from "@/lib/recruiter-inbox";
-import { COLLAPSE_COMPANY_DEMO_JOURNEYS } from "@/lib/seven-day-d4-company";
+import { COLLAPSE_COMPANY_DEMO_JOURNEYS, COMPANY_ROLES_SHIP_STATUS } from "@/lib/seven-day-d4-company";
 
 export default function CompanyRolesPage() {
   const { t } = useTranslation();
@@ -76,12 +76,15 @@ export default function CompanyRolesPage() {
   }, [load]);
 
   return (
-    <Shell wide>
+    <Shell wide data-wave2b-company-roles-green={COMPANY_ROLES_SHIP_STATUS}>
       <Card>
         <CompanyWorkspaceNav />
         <div data-company-roles-page="true">
           <h1 className="text-2xl font-semibold">{t("companyJobs.title")}</h1>
-          <p className="twin-muted mb-6 mt-2 text-sm">{t("companyJobs.lead")}</p>
+          <p className="twin-muted mb-2 mt-2 text-sm">{t("companyJobs.lead")}</p>
+          <p className="mb-6 max-w-2xl rounded-md border border-[var(--twin-border)]/70 bg-[var(--twin-surface-2)]/50 px-3 py-2 text-xs text-[var(--twin-muted-strong)]">
+            {t("companyJobs.boundaryNote")}
+          </p>
           <RecruiterAccessFields
             idPrefix="company-roles"
             token={token}

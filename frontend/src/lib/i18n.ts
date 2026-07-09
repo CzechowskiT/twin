@@ -2009,16 +2009,19 @@ const en = {
       "Weekly review of candidates, decisions, and follow-ups from Talent Radar.",
     recruiterTalentRadarDigestCta: "Open digest",
     companyHubTitle: "Company workspace",
-    companyHubLead: "Dashboard, roles, pipeline, and talent pool first — billing and integrations stay in the collapsed pilot section.",
+    companyHubLead:
+      "Dashboard, roles, and pipeline only — human decision per stage; billing, integrations, team, and talent pool stay hidden.",
     companyRolesTitle: "Roles",
-    companyRolesValue: "Create and publish open roles for your slug.",
-    companyRolesHint: "Requires pilot token + company slug.",
+    companyRolesValue:
+      "Create and publish open roles for your slug — human decision on every queue move; no delegated apply live; no auto outreach.",
+    companyRolesHint: "Requires pilot token + company slug; no live ATS sync.",
     companyRolesCta: "Manage roles",
     companyTeamTitle: "Team & permissions",
     companyTeamValue: "Recruiter tokens and access scopes — pilot.",
     companyTeamCta: "Team settings",
     companyPipelineTitle: "Pipeline",
-    companyPipelineValue: "Live segment counts per role in your workspace — not the sample demo board.",
+    companyPipelineValue:
+      "Human decision per stage — segment counts per role in your workspace; token + company slug required; no live ATS sync; no auto outreach.",
     companyPipelineHint: "Requires pilot token + company slug. Human review per stage; no ATS writeback.",
     companyPipelineCta: "View pipeline",
     companyTalentPoolTitle: "Talent Pool",
@@ -2097,8 +2100,9 @@ const en = {
     decisionMemoryValue: "Executive audit cockpit — timeline, evidence, blockers, and human decision boundary.",
     decisionMemoryCta: "Open decision memory",
     companyDashboardTitle: "Hiring dashboard",
-    companyDashboardValue: "Roles, pipeline segments, and team tokens for your company slug.",
-    companyDashboardHint: "Requires pilot token + company slug; tenant-scoped overview only.",
+    companyDashboardValue:
+      "Executive snapshot — roles, pipeline segments, and team tokens for your slug; human decision only; no delegated apply live.",
+    companyDashboardHint: "Requires pilot token + company slug; tenant-scoped overview only; no live ATS sync.",
     companyDashboardCta: "Open dashboard",
     investorWorkspaceCta: "Investor workspace",
     investorDemoTitle: "Founder-led demo",
@@ -2115,7 +2119,7 @@ const en = {
     investorProofAtsCta: "View ATS proof",
     candidateHubLead: "Core live modules first — pilot and roadmap lanes collapsed with honest boundary badges.",
     recruiterHubLead: "Inbox, pipeline, jobs, and search first — calendar sync, ATS, and integrations stay collapsed under pilot.",
-    companyHubLead: "Dashboard, roles, pipeline, and talent pool first — billing and integrations collapsed under pilot.",
+    companyHubLead: "Dashboard, roles, and pipeline first — billing, integrations, team, and talent pool stay collapsed under pilot.",
     investorHubLead: "Metrics, roadmap, data room, and system-of-record proof cards for diligence.",
     investorGroupProductTitle: "Product & diligence",
     investorGroupProductLead:
@@ -2930,6 +2934,8 @@ eyebrow: "Product roadmap",
   companyJobs: {
     title: "Roles & hiring bar",
     lead: "Define internal roles that feed your recruiter queue — not external job boards.",
+    boundaryNote:
+      "Human decision required on every role and queue move. No delegated apply live, automatic outreach, or live ATS sync.",
     navAria: "Company workspace",
     navRoles: "Roles",
     navInbox: "Inbox",
@@ -3326,6 +3332,8 @@ eyebrow: "Product roadmap",
     title: "Hiring dashboard",
     lead:
       "Executive snapshot of roles, pipeline segments, and team access for your TWIN workspace — pilot data only, no revenue or hire-velocity claims.",
+    boundaryNote:
+      "Human decision required — explicit recruiter action per stage. No delegated apply live, automatic outreach, or live ATS sync.",
     navDashboard: "Hiring dashboard",
     load: "Load dashboard",
     loading: "Loading dashboard…",
@@ -9860,16 +9868,19 @@ const pl: MessageTree = {
       "Tygodniowy przegląd kandydatów, decyzji i follow-upów z Radaru Talentów.",
     recruiterTalentRadarDigestCta: "Otwórz digest",
     companyHubTitle: "Strefa firmy",
-    companyHubLead: "Najpierw dashboard, role, pipeline i talent pool — billing i integracje w zwiniętej sekcji pilota.",
+    companyHubLead:
+      "Tylko dashboard, role i pipeline — decyzja człowieka na każdym etapie; billing, integracje, zespół i talent pool pozostają ukryte.",
     companyRolesTitle: "Role",
-    companyRolesValue: "Twórz i publikuj otwarte role dla swojego slug.",
-    companyRolesHint: "Wymaga tokenu pilota + slug firmy.",
+    companyRolesValue:
+      "Twórz i publikuj otwarte role dla swojego slug — decyzja człowieka przy każdym ruchu w kolejce; bez live delegated apply; bez auto outreach.",
+    companyRolesHint: "Wymaga tokenu pilota + slug firmy; bez live sync ATS.",
     companyRolesCta: "Zarządzaj rolami",
     companyTeamTitle: "Zespół i uprawnienia",
     companyTeamValue: "Tokeny rekruterów i scope dostępu — pilot.",
     companyTeamCta: "Ustawienia zespołu",
     companyPipelineTitle: "Pipeline",
-    companyPipelineValue: "Live liczniki segmentów per rola w workspace — nie przykładowa tablica demo.",
+    companyPipelineValue:
+      "Decyzja człowieka na każdym etapie — liczniki segmentów per rola w workspace; token + slug wymagane; bez live sync ATS; bez auto outreach.",
     companyPipelineHint: "Wymaga tokenu pilota + slug firmy. Decyzja człowieka na każdym etapie; bez zapisu do ATS.",
     companyPipelineCta: "Zobacz pipeline",
     companyTalentPoolTitle: "Pamięć talentów",
@@ -9948,8 +9959,9 @@ const pl: MessageTree = {
     decisionMemoryValue: "Executive audit cockpit — oś czasu, dowody, blokery i granica decyzji człowieka.",
     decisionMemoryCta: "Otwórz pamięć decyzji",
     companyDashboardTitle: "Panel rekrutacji",
-    companyDashboardValue: "Role, segmenty pipeline i tokeny zespołu dla slug firmy.",
-    companyDashboardHint: "Wymaga tokenu pilota + slug firmy; tylko przegląd w zakresie tenantu.",
+    companyDashboardValue:
+      "Executive snapshot — role, segmenty pipeline i tokeny zespołu dla slug; tylko decyzja człowieka; bez live delegated apply.",
+    companyDashboardHint: "Wymaga tokenu pilota + slug firmy; tylko przegląd w zakresie tenantu; bez live sync ATS.",
     companyDashboardCta: "Otwórz panel",
     investorWorkspaceCta: "Workspace inwestora",
     investorDemoTitle: "Demo founder-led",
@@ -9966,7 +9978,7 @@ const pl: MessageTree = {
     investorProofAtsCta: "Zobacz dowód ATS",
     candidateHubLead: "Najpierw moduły live — ścieżki pilota i roadmapy zwinięte z uczciwymi badge'ami granic.",
     recruiterHubLead: "Najpierw inbox, pipeline, oferty i wyszukiwanie — sync kalendarza, ATS i integracje zwinięte w sekcji pilota.",
-    companyHubLead: "Najpierw dashboard, role, pipeline i talent pool — billing i integracje zwinięte w sekcji pilota.",
+    companyHubLead: "Najpierw dashboard, role i pipeline — billing, integracje, zespół i talent pool zwinięte w sekcji pilota.",
     investorHubLead: "Metryki, roadmapa, data room i karty dowodów rejestru operacyjnego do due diligence.",
     investorGroupProductTitle: "Produkt i due diligence",
     investorGroupProductLead:
@@ -10787,6 +10799,8 @@ const pl: MessageTree = {
   companyJobs: {
     title: "Role i bar rekrutacyjny",
     lead: "Definiuj wewnętrzne role zasilające kolejkę rekrutera — bez zewnętrznych portali.",
+    boundaryNote:
+      "Wymagana decyzja człowieka przy każdej roli i ruchu w kolejce. Bez live delegated apply, automatycznego outreachu i live sync ATS.",
     navAria: "Przestrzeń firmy",
     navRoles: "Role",
     navInbox: "Skrzynka",
@@ -11183,6 +11197,8 @@ const pl: MessageTree = {
     title: "Panel rekrutacyjny",
     lead:
       "Executive snapshot ról, segmentów lejku rekrutacyjnym i dostępu zespołu w workspace TWIN — tylko dane pilotażowe, bez przychodu ani metryk prędkości zatrudnień.",
+    boundaryNote:
+      "Wymagana decyzja człowieka — jawna akcja rekrutera na każdym etapie. Bez live delegated apply, automatycznego outreachu i live sync ATS.",
     navDashboard: "Panel rekrutacyjny",
     load: "Załaduj panel",
     loading: "Ładowanie panelu…",

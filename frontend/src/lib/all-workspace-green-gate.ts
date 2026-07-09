@@ -145,6 +145,20 @@ export const WAVE2B_SLICE2_MAKE_GREEN_SOR_IDS = ["pipeline", "recruiter_pipeline
 /** Pipeline stayed in hub since Wave 1 — Wave 2B slice 2 formalizes GREEN_WORKING, not a restore. */
 export const WAVE2B_PIPELINE_ALWAYS_IN_HUB = true as const;
 
+/** Wave 2B slice 3 — company core (dashboard, roles, pipeline) confirmed GREEN_WORKING (visible in Wave 1; M8 smoke-close). */
+export const WAVE2B_SLICE3_MAKE_GREEN_MODULE_ID = "company_dashboard" as const;
+
+export const WAVE2B_SLICE3_MAKE_GREEN_SOR_IDS = [
+  "company_dashboard",
+  "roles",
+  "company_roles",
+  "pipeline",
+  "company_pipeline",
+] as const;
+
+/** Company core trio stayed in hub since Wave 1 — Wave 2B slice 3 formalizes GREEN_WORKING, not a restore. */
+export const WAVE2B_COMPANY_CORE_ALWAYS_IN_HUB = true as const;
+
 export function isWorkspaceGreenVisible(persona: MarketingPersona, moduleId: string): boolean {
   if (!WORKSPACE_GREEN_ONLY_MODE) return true;
   return ALLOWED_BY_PERSONA[persona].has(moduleId);

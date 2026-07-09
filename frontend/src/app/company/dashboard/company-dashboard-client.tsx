@@ -35,6 +35,7 @@ import {
   SHOW_COMPANY_HUB_NEXT_ACTION,
   SHOW_COMPANY_HUB_PRIMARY_PROMOS,
   SHOW_COMPANY_HUB_ROADMAP_PROMOS_COLLAPSED,
+  COMPANY_DASHBOARD_SHIP_STATUS,
 } from "@/lib/seven-day-d4-company";
 
 function MetricCard({ label, value, hint }: { label: string; value: string; hint?: string }) {
@@ -107,7 +108,7 @@ export default function CompanyDashboardClient() {
   const companyLabel = companySlugToLabel(companySlug || companyRaw);
 
   return (
-    <Shell wide>
+    <Shell wide data-wave2b-company-dashboard-green={COMPANY_DASHBOARD_SHIP_STATUS}>
       <CompanyWorkspaceNav />
       <header className="mb-8 space-y-2">
         <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
@@ -115,6 +116,9 @@ export default function CompanyDashboardClient() {
         </p>
         <h1 className="twin-page-intro text-2xl font-semibold sm:text-3xl">{t("companyHiring.title")}</h1>
         <p className="twin-muted max-w-2xl text-sm leading-relaxed">{t("companyHiring.lead")}</p>
+        <p className="max-w-2xl rounded-md border border-[var(--twin-border)]/70 bg-[var(--twin-surface-2)]/50 px-3 py-2 text-xs text-[var(--twin-muted-strong)]">
+          {t("companyHiring.boundaryNote")}
+        </p>
       </header>
 
       {!payload && !loading && SHOW_COMPANY_ONBOARDING_EMPTY_STATE ? (

@@ -5,6 +5,10 @@ import { COMPANY_INTEGRATIONS_ROUTE } from "@/lib/company-integrations-readiness
 import { COMPANY_ROLES_ROUTE } from "@/lib/company-jobs-roles";
 import { COMPANY_TEAM_ROUTE } from "@/lib/company-team-permissions";
 import { COMPANY_TALENT_POOL_ROUTE } from "@/lib/company-talent-pool";
+import {
+  COMPANY_PIPELINE_SHIP_STATUS,
+  COMPANY_ROLES_SHIP_STATUS,
+} from "@/lib/seven-day-d4-company";
 import type { WorkspaceModuleDef } from "@/lib/workspace-module-status";
 
 /** Company workspace module cards — honest billing/integrations readiness. */
@@ -32,7 +36,7 @@ export const COMPANY_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     valuePropKey: "workspaceModules.companyRolesValue",
     hintKey: "workspaceModules.companyRolesHint",
     ctaKey: "workspaceModules.companyRolesCta",
-    status: "live",
+    status: COMPANY_ROLES_SHIP_STATUS,
   },
   {
     id: "team",
@@ -49,7 +53,7 @@ export const COMPANY_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     valuePropKey: "workspaceModules.companyPipelineValue",
     hintKey: "workspaceModules.companyPipelineHint",
     ctaKey: "workspaceModules.companyPipelineCta",
-    status: "live",
+    status: COMPANY_PIPELINE_SHIP_STATUS,
   },
   {
     id: "talent_pool",
