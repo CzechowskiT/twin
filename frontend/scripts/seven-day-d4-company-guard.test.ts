@@ -73,7 +73,7 @@ test("1 D4 execution doc exists with stance footer", () => {
 
 test("2 seven-day-d4 flags — hub next action, integrations roadmap, collapsed nav", () => {
   assert.equal(SHOW_COMPANY_HUB_PRIMARY_PROMOS, false);
-  assert.equal(SHOW_COMPANY_HUB_ROADMAP_PROMOS_COLLAPSED, true);
+  assert.equal(SHOW_COMPANY_HUB_ROADMAP_PROMOS_COLLAPSED, false);
   assert.equal(SHOW_COMPANY_HUB_NEXT_ACTION, true);
   assert.equal(COMPANY_HUB_NEXT_ACTION_HREF, "/company/roles");
   assert.equal(COMPANY_INTEGRATIONS_ROADMAP_STATUS, "coming_soon");
@@ -84,7 +84,7 @@ test("2 seven-day-d4 flags — hub next action, integrations roadmap, collapsed 
   assert.equal(HIRING_COCKPIT_LIMITED_PILOT, true);
   assert.equal(INTEGRATIONS_HONEST_NO_LIVE_ATS_SYNC, true);
   assert.equal(DELEGATED_APPLY_NOT_LIVE_IN_COMPANY_UI, true);
-  assert.equal(COMPANY_PRIMARY_NAV_HREFS.length, 4);
+  assert.equal(COMPANY_PRIMARY_NAV_HREFS.length, 3);
 });
 
 test("3 workspace modules — integrations coming soon, billing not live, core live", () => {
@@ -96,18 +96,19 @@ test("3 workspace modules — integrations coming soon, billing not live, core l
   assert.equal(moduleStatus("team"), "pilot");
 });
 
-test("4 product surface — core primary, billing hidden, integrations roadmap", () => {
+test("4 product surface — green-only roles/pipeline primary; non-green hidden", () => {
   const split = splitWorkspaceModules("company", COMPANY_WORKSPACE_MODULES);
   assert.ok(split.primary.some((m) => m.id === "roles"));
   assert.ok(split.primary.some((m) => m.id === "pipeline"));
-  assert.ok(split.roadmap.some((m) => m.id === "integrations"));
-  assert.ok(split.roadmap.some((m) => m.id === "hiring_cockpit"));
+  assert.equal(split.roadmap.length, 0);
+  assert.ok(split.hidden.some((m) => m.id === "integrations"));
+  assert.ok(split.hidden.some((m) => m.id === "hiring_cockpit"));
   assert.ok(split.hidden.some((m) => m.id === "billing"));
   assert.equal(shouldHideFromDefaultHub("company", "billing"), true);
-  assert.equal(classifyProductSurfaceTier("company", "integrations", "coming_soon"), "COMING_SOON");
+  assert.equal(classifyProductSurfaceTier("company", "integrations", "coming_soon"), "INTERNAL");
 });
 
-test("5 company workspace nav — primary four, billing hidden, collapsed extended", () => {
+test("5 company workspace nav — primary three, billing hidden, collapsed extended", () => {
   const nav = read("src/components/company/company-workspace-nav.tsx");
   assert.match(nav, /COMPANY_PRIMARY_NAV_HREFS/);
   assert.match(nav, /COMPANY_WORKSPACE_NAV_COLLAPSED_DEFAULT/);

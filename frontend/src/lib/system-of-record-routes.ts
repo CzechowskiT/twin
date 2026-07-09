@@ -185,9 +185,9 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     descriptionKey: "workspaceModules.candidateCareerValue",
     hintKey: "workspaceModules.candidateCareerHint",
     ctaKey: "workspaceModules.candidateCareerCta",
-    status: "pilot",
+    status: "live",
     moduleFamily: "dashboard",
-    boundaryTags: ["pilot"],
+    boundaryTags: [],
   },
   {
     id: "candidate_profile",
@@ -241,9 +241,9 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     titleKey: "workspaceModules.candidateInterviewTitle",
     descriptionKey: "workspaceModules.candidateInterviewValue",
     ctaKey: "workspaceModules.candidateInterviewCta",
-    status: "pilot",
+    status: "live",
     moduleFamily: "applications",
-    boundaryTags: ["pilot"],
+    boundaryTags: [],
   },
   {
     id: "candidate_calendar",

@@ -70,8 +70,8 @@ test("2 seven-day-d3 flags — analytics preview, integrations roadmap, collapse
   assert.equal(TALENT_POOL_LIMITED_PILOT, true);
   assert.equal(INTEGRATIONS_HONEST_NO_LIVE_ATS_SYNC, true);
   assert.equal(SHOW_RECRUITER_HUB_PRIMARY_PROMOS, false);
-  assert.equal(SHOW_RECRUITER_HUB_ROADMAP_PROMOS_COLLAPSED, true);
-  assert.equal(RECRUITER_PRIMARY_NAV_HREFS.length, 5);
+  assert.equal(SHOW_RECRUITER_HUB_ROADMAP_PROMOS_COLLAPSED, false);
+  assert.equal(RECRUITER_PRIMARY_NAV_HREFS.length, 4);
 });
 
 test("3 workspace modules — analytics preview, integrations coming soon, calendar not live", () => {
@@ -84,19 +84,21 @@ test("3 workspace modules — analytics preview, integrations coming soon, calen
   assert.equal(moduleStatus("search"), "live");
 });
 
-test("4 product surface — analytics primary, calendar hidden, integrations roadmap", () => {
+test("4 product surface — green-only primary four; non-green hidden", () => {
   const split = splitWorkspaceModules("recruiter", RECRUITER_WORKSPACE_MODULES);
-  assert.ok(split.primary.some((m) => m.id === "analytics"));
   assert.ok(split.primary.some((m) => m.id === "inbox"));
-  assert.equal(split.primary.filter((m) => m.status === "live" || m.id === "analytics").length, 5);
-  assert.ok(split.roadmap.some((m) => m.id === "integrations"));
+  assert.ok(!split.primary.some((m) => m.id === "analytics"));
+  assert.equal(split.primary.filter((m) => m.status === "live").length, 4);
+  assert.equal(split.roadmap.length, 0);
   assert.ok(split.hidden.some((m) => m.id === "calendar"));
+  assert.ok(split.hidden.some((m) => m.id === "integrations"));
   assert.equal(shouldHideFromDefaultHub("recruiter", "calendar"), true);
-  assert.equal(classifyProductSurfaceTier("recruiter", "analytics"), "LIVE");
-  assert.equal(classifyProductSurfaceTier("recruiter", "integrations", "coming_soon"), "COMING_SOON");
+  assert.equal(shouldHideFromDefaultHub("recruiter", "analytics"), true);
+  assert.equal(classifyProductSurfaceTier("recruiter", "analytics"), "INTERNAL");
+  assert.equal(classifyProductSurfaceTier("recruiter", "integrations", "coming_soon"), "INTERNAL");
 });
 
-test("5 recruiter workspace nav — primary five, calendar hidden, collapsed extended", () => {
+test("5 recruiter workspace nav — primary four, calendar hidden, collapsed extended", () => {
   const nav = read("src/components/recruiter/recruiter-workspace-nav.tsx");
   assert.match(nav, /RECRUITER_PRIMARY_NAV_HREFS/);
   assert.match(nav, /RECRUITER_WORKSPACE_NAV_COLLAPSED_DEFAULT/);
@@ -108,11 +110,10 @@ test("5 recruiter workspace nav — primary five, calendar hidden, collapsed ext
   assert.doesNotMatch(primaryBlock, /\/recruiter\/calendar/);
 });
 
-test("6 recruiter hub — analytics in quick actions, roadmap promos collapsed", () => {
+test("6 recruiter hub — green quick actions, roadmap promos off", () => {
   const page = read("src/app/recruiter/page.tsx");
-  assert.match(page, /\/recruiter\/analytics/);
-  assert.match(page, /SHOW_RECRUITER_HUB_ROADMAP_PROMOS_COLLAPSED/);
-  assert.match(page, /data-recruiter-hub-roadmap-promos/);
+  assert.doesNotMatch(page, /\/recruiter\/analytics/);
+  assert.equal(SHOW_RECRUITER_HUB_ROADMAP_PROMOS_COLLAPSED, false);
 });
 
 test("7 analytics — preview badge, summary metrics, BE proxy + FE derive", () => {

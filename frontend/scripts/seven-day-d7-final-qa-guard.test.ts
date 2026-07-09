@@ -88,8 +88,8 @@ test("3 launch surface A — candidate 8, recruiter 5, company 4", () => {
   assert.equal(CONTROLLED_PILOT_PRIMARY_LIMITS.candidate, 8);
   assert.equal(CONTROLLED_PILOT_PRIMARY_LIMITS.recruiter, 5);
   assert.equal(CONTROLLED_PILOT_PRIMARY_LIMITS.company, 4);
-  assert.equal(RECRUITER_PRIMARY_NAV_HREFS.length, 5);
-  assert.equal(COMPANY_PRIMARY_NAV_HREFS.length, 4);
+  assert.equal(RECRUITER_PRIMARY_NAV_HREFS.length, 4);
+  assert.equal(COMPANY_PRIMARY_NAV_HREFS.length, 3);
 });
 
 test("4 primary UI grep — no banned user-facing copy literals", () => {
@@ -113,7 +113,7 @@ test("5 EN workspace badge vocabulary — needs_setup and not_live map to Coming
 test("6 D1–D6 regression flags still locked", () => {
   assert.equal(CAREER_COMPASS_SHIP_STATUS, "live");
   assert.equal(HIDE_CANDIDATE_BILLING_FROM_HUB, true);
-  assert.equal(RECRUITER_PRIMARY_NAV_HREFS.length, 5);
+  assert.equal(RECRUITER_PRIMARY_NAV_HREFS.length, 4);
   assert.equal(SHOW_COMPANY_HUB_NEXT_ACTION, true);
   assert.equal(DATA_ROOM_FOUNDER_DECISION, true);
   assert.equal(NO_PUBLIC_LAUNCH_CLAIMS_INVESTOR_UI, true);
@@ -138,11 +138,12 @@ test("8 site chrome — marquee disclaimer and footer illustrative labels", () =
   assert.match(footer, /FOOTER_SOCIAL_PROOF_ILLUSTRATIVE_LABELS/);
 });
 
-test("9 recruiter hub — five core quick actions, primary promos off", () => {
+test("9 recruiter hub — four green quick actions, primary promos off", () => {
   const hub = read("src/app/recruiter/page.tsx");
   assert.match(hub, /SHOW_RECRUITER_HUB_PRIMARY_PROMOS/);
   assert.match(hub, /\/recruiter\/inbox/);
-  assert.match(hub, /\/recruiter\/analytics/);
+  assert.match(hub, /\/recruiter\/search/);
+  assert.doesNotMatch(hub, /\/recruiter\/analytics/);
   assert.equal((hub.match(/\/recruiter\/inbox/g) ?? []).length >= 1, true);
 });
 
