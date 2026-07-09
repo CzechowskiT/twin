@@ -11,10 +11,11 @@ import { CANDIDATE_WORKSPACE_MODULES } from "../src/lib/candidate-workspace-modu
 import { COMPANY_WORKSPACE_MODULES } from "../src/lib/company-workspace-modules";
 import { INVESTOR_ROOM_STATUS } from "../src/lib/investor-room";
 import {
-  CONTROLLED_PILOT_PRIMARY_LIMITS,
+  getWorkspacePrimaryLimits,
   splitProductSurfaceRoutes,
   splitWorkspaceModules,
 } from "../src/lib/product-surface-visibility";
+import { WORKSPACE_GREEN_ONLY_MODE, WORKSPACE_GREEN_PRIMARY_LIMITS } from "../src/lib/all-workspace-green-gate";
 import { RECRUITER_WORKSPACE_MODULES } from "../src/lib/recruiter-workspace-modules";
 import {
   getSystemOfRecordRoutesForPersona,
@@ -92,28 +93,26 @@ test("6 board/admin routes stay out of candidate recruiter company default hubs"
   }
 });
 
-test("7 primary hub card counts stay bounded for controlled pilot", () => {
+test("7 primary hub card counts stay bounded for green-only workspace", () => {
+  const limits = getWorkspacePrimaryLimits();
+  assert.equal(WORKSPACE_GREEN_ONLY_MODE, true);
   for (const persona of ["candidate", "recruiter", "company"] as const) {
     const split = splitProductSurfaceRoutes(persona, getSystemOfRecordRoutesForPersona(persona));
-    const limit = CONTROLLED_PILOT_PRIMARY_LIMITS[persona];
+    const limit = limits[persona];
     assert.ok(split.primary.length <= limit, `${persona}: ${split.primary.length} > ${limit}`);
-    assert.ok(split.primary.length >= 3, `${persona} primary too small`);
-    assert.ok(split.roadmap.length >= 3, `${persona} roadmap section expected`);
+    assert.ok(split.primary.length >= 2, `${persona} primary too small`);
+    assert.equal(split.roadmap.length, 0, `${persona} roadmap must be empty in green mode`);
   }
 });
 
-test("8 pilot modules are separated from live in hub UI", () => {
+test("8 green-only modules in primary hub UI — no roadmap tier", () => {
   const hub = read("src/components/workspace/system-of-record-navigation-hub.tsx");
   assert.match(hub, /splitProductSurfaceRoutes/);
   assert.match(hub, /data-product-surface-primary/);
-  assert.match(hub, /data-product-surface-roadmap/);
-  assert.match(hub, /product-surface-roadmap-toggle/);
 
   const candidate = splitProductSurfaceRoutes("candidate", getSystemOfRecordRoutesForPersona("candidate"));
   assert.ok(candidate.primary.every((r) => r.status === "live"));
-  const primaryIds = new Set(candidate.primary.map((r) => r.id));
-  assert.ok(candidate.roadmap.every((r) => !primaryIds.has(r.id)));
-  assert.ok(candidate.roadmap.length > 0);
+  assert.equal(candidate.roadmap.length, 0);
 });
 
 test("9 recruiter operational work queue hidden from default hub", () => {
@@ -126,11 +125,12 @@ test("10 self-service delete hidden from default candidate hub", () => {
   assert.ok(split.hidden.some((r) => r.id === "candidate_revoke_delete"));
 });
 
-test("11 company workspace billing hidden; talent pool stays primary", () => {
+test("11 company workspace billing hidden; talent pool hidden in green mode", () => {
   const split = splitWorkspaceModules("company", COMPANY_WORKSPACE_MODULES);
   assert.ok(split.hidden.some((m) => m.id === "billing"));
-  assert.ok(split.primary.some((m) => m.id === "talent_pool"));
+  assert.ok(!split.primary.some((m) => m.id === "talent_pool"));
   assert.ok(split.primary.some((m) => m.id === "pipeline"));
+  assert.deepEqual(getWorkspacePrimaryLimits().company, WORKSPACE_GREEN_PRIMARY_LIMITS.company);
 });
 
 test("12 audit doc states controlled pilot stance — not Launch GO, Gate F PENDING", () => {

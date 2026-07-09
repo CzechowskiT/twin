@@ -100,7 +100,7 @@ test("2 seven-day-d5 flags — preview hierarchy, data room founder decision, bo
   assert.equal(INVESTOR_ROADMAP_CONTROLLED_PREVIEW, true);
   assert.equal(NO_PUBLIC_LAUNCH_CLAIMS_INVESTOR_UI, true);
   assert.ok(INVESTOR_PRIMARY_MODULE_IDS.includes("metrics"));
-  assert.ok(INVESTOR_ROADMAP_MODULE_IDS.includes("data_room"));
+  assert.equal(INVESTOR_ROADMAP_MODULE_IDS.length, 0);
 });
 
 test("3 workspace modules — data room preview invite-only, placement pilot", () => {
@@ -112,18 +112,19 @@ test("3 workspace modules — data room preview invite-only, placement pilot", (
   assert.equal(moduleStatus("calculator").status, "live");
 });
 
-test("4 product surface — board hidden, data room roadmap, metrics primary", () => {
+test("4 product surface — board hidden, data room/placement hidden, metrics primary", () => {
   const split = splitWorkspaceModules("investor", INVESTOR_WORKSPACE_MODULES);
   assert.ok(split.primary.some((m) => m.id === "metrics"));
-  assert.ok(split.roadmap.some((m) => m.id === "data_room"));
-  assert.ok(split.roadmap.some((m) => m.id === "placement"));
+  assert.ok(!split.primary.some((m) => m.id === "data_room"));
+  assert.ok(!split.primary.some((m) => m.id === "placement"));
+  assert.equal(split.roadmap.length, 0);
 
   const sor = splitProductSurfaceRoutes("investor", getSystemOfRecordRoutesForPersona("investor"));
   assert.ok(sor.primary.some((r) => r.id === "investor_metrics"));
-  assert.ok(sor.roadmap.some((r) => r.id === "investor_data_room"));
+  assert.ok(sor.hidden.some((r) => r.id === "investor_data_room"));
   assert.ok(sor.hidden.some((r) => r.href.startsWith("/board/")));
   assert.equal(shouldHideFromDefaultHub("investor", "/board/working-features-readiness"), true);
-  assert.equal(classifyProductSurfaceTier("investor", "data_room", "preview"), "PILOT");
+  assert.equal(classifyProductSurfaceTier("investor", "data_room", "preview"), "INTERNAL");
 });
 
 test("5 investor room — preview copy, collapsed details, no duplicate SoR", () => {

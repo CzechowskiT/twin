@@ -1,7 +1,13 @@
 /**
  * Controlled-pilot product surface — default hub visibility without removing routes.
  * Routes and SoR entries stay intact; hubs only change grouping and default display.
+ * Wave 1: WORKSPACE_GREEN_ONLY_MODE — only GREEN_WORKING modules in workspace hubs.
  */
+import {
+  isWorkspaceGreenVisible,
+  WORKSPACE_GREEN_ONLY_MODE,
+  WORKSPACE_GREEN_PRIMARY_LIMITS,
+} from "@/lib/all-workspace-green-gate";
 import type { MarketingPersona } from "@/lib/marketing-persona";
 import {
   HIDE_BOARD_FROM_INVESTOR_DEFAULT_HUB,
@@ -190,6 +196,14 @@ export function classifyProductSurfaceTier(
   moduleId: string,
   status?: WorkspaceModuleStatus,
 ): ProductSurfaceTier {
+  if (WORKSPACE_GREEN_ONLY_MODE && !isWorkspaceGreenVisible(persona, moduleId)) {
+    return "INTERNAL";
+  }
+
+  if (WORKSPACE_GREEN_ONLY_MODE && isWorkspaceGreenVisible(persona, moduleId)) {
+    return "LIVE";
+  }
+
   if (ALWAYS_HIDDEN_MODULE_IDS.has(moduleId) || hrefIsBoardOrAdmin(moduleId)) {
     return "INTERNAL";
   }
@@ -235,6 +249,15 @@ export function classifyProductSurfaceTier(
 }
 
 export function shouldHideFromDefaultHub(persona: MarketingPersona, moduleId: string): boolean {
+  if (WORKSPACE_GREEN_ONLY_MODE) {
+    if (ALWAYS_HIDDEN_MODULE_IDS.has(moduleId)) return true;
+    if (hrefIsBoardOrAdmin(moduleId)) return true;
+    if (persona === "investor" && HIDE_BOARD_FROM_INVESTOR_DEFAULT_HUB && hrefIsBoardOrAdmin(moduleId)) {
+      return true;
+    }
+    return !isWorkspaceGreenVisible(persona, moduleId);
+  }
+
   if (persona === "investor") {
     if (HIDE_BOARD_FROM_INVESTOR_DEFAULT_HUB && hrefIsBoardOrAdmin(moduleId)) return true;
     return classifyProductSurfaceTier(persona, moduleId) === "INTERNAL";
@@ -245,6 +268,8 @@ export function shouldHideFromDefaultHub(persona: MarketingPersona, moduleId: st
 }
 
 export function shouldShowAsRoadmap(persona: MarketingPersona, moduleId: string): boolean {
+  if (WORKSPACE_GREEN_ONLY_MODE) return false;
+
   if (persona === "investor") {
     const tier = classifyProductSurfaceTier(persona, moduleId);
     return tier === "PILOT" || tier === "COMING_SOON" || tier === "HOLD";
@@ -317,4 +342,9 @@ export function splitWorkspaceModules(
 
 export function tierFromWorkspaceStatus(status: WorkspaceModuleStatus): ProductSurfaceTier {
   return statusToTier(status);
+}
+
+/** Primary hub card limits — green-only when WORKSPACE_GREEN_ONLY_MODE is on. */
+export function getWorkspacePrimaryLimits(): Readonly<Record<MarketingPersona, number>> {
+  return WORKSPACE_GREEN_ONLY_MODE ? WORKSPACE_GREEN_PRIMARY_LIMITS : CONTROLLED_PILOT_PRIMARY_LIMITS;
 }

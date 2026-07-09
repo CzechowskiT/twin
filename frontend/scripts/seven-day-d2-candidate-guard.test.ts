@@ -77,14 +77,16 @@ test("3 workspace modules — career and interview prep live; auto-apply paused;
   assert.equal(moduleStatus("auto_apply"), "paused");
 });
 
-test("4 product surface — ship modules in roadmap tier; auto-apply and billing hidden", () => {
-  assert.equal(classifyProductSurfaceTier("candidate", "career_compass"), "PILOT");
-  assert.equal(classifyProductSurfaceTier("candidate", "interview_prep"), "PILOT");
-  assert.equal(classifyProductSurfaceTier("candidate", "evidence"), "PILOT");
+test("4 product surface — green-only: ship modules primary; referrals/trust hidden", () => {
+  assert.equal(classifyProductSurfaceTier("candidate", "career_compass"), "LIVE");
+  assert.equal(classifyProductSurfaceTier("candidate", "interview_prep"), "LIVE");
+  assert.equal(classifyProductSurfaceTier("candidate", "evidence"), "LIVE");
   assert.equal(shouldHideFromDefaultHub("candidate", "auto_apply"), true);
   assert.equal(shouldHideFromDefaultHub("candidate", "plan_payments"), true);
-  assert.equal(classifyProductSurfaceTier("candidate", "referrals"), "PILOT");
-  assert.equal(classifyProductSurfaceTier("candidate", "trust_center"), "PILOT");
+  assert.equal(shouldHideFromDefaultHub("candidate", "referrals"), true);
+  assert.equal(shouldHideFromDefaultHub("candidate", "trust_center"), true);
+  assert.equal(classifyProductSurfaceTier("candidate", "referrals"), "INTERNAL");
+  assert.equal(classifyProductSurfaceTier("candidate", "trust_center"), "INTERNAL");
   assert.equal(moduleStatus("career_compass"), "live");
   assert.equal(moduleStatus("interview_prep"), "live");
   assert.equal(moduleStatus("evidence"), "live");

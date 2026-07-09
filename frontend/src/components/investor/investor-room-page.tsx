@@ -30,6 +30,7 @@ import {
   type InvestorRoomStatusTier,
 } from "@/lib/investor-room";
 import { INVESTOR_PUBLIC_PREVIEW_MODULES, INVESTOR_WORKSPACE_MODULES } from "@/lib/investor-workspace-modules";
+import { splitWorkspaceModules } from "@/lib/product-surface-visibility";
 import { INVESTOR_ROOM_SIMPLIFIED_PREVIEW } from "@/lib/product-polish-p2";
 import {
   COLLAPSE_INVESTOR_ROOM_DETAIL_SECTIONS,
@@ -141,7 +142,12 @@ export function InvestorRoomPage() {
               {t("workspaceModules.investorPreviewLead")}
             </p>
             <div className="mt-6">
-              <WorkspaceModuleGrid modules={[...INVESTOR_PUBLIC_PREVIEW_MODULES, ...INVESTOR_WORKSPACE_MODULES.slice(0, 3)]} />
+              <WorkspaceModuleGrid
+                modules={[
+                  ...splitWorkspaceModules("investor", INVESTOR_PUBLIC_PREVIEW_MODULES).primary,
+                  ...splitWorkspaceModules("investor", INVESTOR_WORKSPACE_MODULES).primary,
+                ]}
+              />
             </div>
           </section>
           )}

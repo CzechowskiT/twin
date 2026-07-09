@@ -8,7 +8,7 @@
 export const SHOW_COMPANY_HUB_PRIMARY_PROMOS = false;
 
 /** Cockpit and command center tucked into collapsed roadmap on dashboard. */
-export const SHOW_COMPANY_HUB_ROADMAP_PROMOS_COLLAPSED = true;
+export const SHOW_COMPANY_HUB_ROADMAP_PROMOS_COLLAPSED = false;
 
 /** Single honest next action on dashboard when primary promos are off. */
 export const SHOW_COMPANY_HUB_NEXT_ACTION = true;
@@ -19,6 +19,9 @@ export const COMPANY_HUB_NEXT_ACTION_HREF = "/company/roles" as const;
 /** Integrations stay roadmap — no live ATS sync impression. */
 export const COMPANY_INTEGRATIONS_ROADMAP_STATUS = "coming_soon" as const;
 
+/** Wave 1 — integrations hidden from workspace hub (route preserved). */
+export const HIDE_COMPANY_INTEGRATIONS_FROM_HUB = true;
+
 /** Integrations page honest boundary — no live ATS/marketplace sync. */
 export const INTEGRATIONS_HONEST_NO_LIVE_ATS_SYNC = true;
 
@@ -28,12 +31,11 @@ export const HIDE_COMPANY_BILLING_FROM_NAV = true;
 /** Extended company nav collapsed by default — core ≤4 on hub home. */
 export const COMPANY_WORKSPACE_NAV_COLLAPSED_DEFAULT = true;
 
-/** Primary company surfaces (≤4) — dashboard, roles, pipeline, talent pool. */
+/** Primary company surfaces (≤3 green) — dashboard, roles, pipeline. */
 export const COMPANY_PRIMARY_NAV_HREFS = [
   "/company/dashboard",
   "/company/roles",
   "/company/pipeline",
-  "/company/talent-pool",
 ] as const;
 
 /** Demo journeys collapsed — human decision required, not primary core. */

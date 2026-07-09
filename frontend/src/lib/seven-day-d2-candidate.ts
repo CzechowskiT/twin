@@ -29,6 +29,12 @@ export const TRUST_CENTER_ROADMAP_STATUS = "pilot" as const;
 /** Referrals limited to founder-led cohort — boundary banner on page. */
 export const REFERRALS_LIMITED_PILOT = true;
 
+/** Wave 1 — referrals hidden from workspace hub/nav (route preserved). */
+export const HIDE_CANDIDATE_REFERRALS_FROM_HUB = true;
+
+/** Wave 1 — trust center card hidden from workspace hub (route preserved). */
+export const HIDE_CANDIDATE_TRUST_CENTER_FROM_HUB = true;
+
 /** Billing/plan hidden from candidate hub primary surface. */
 export const HIDE_CANDIDATE_BILLING_FROM_HUB = true;
 
