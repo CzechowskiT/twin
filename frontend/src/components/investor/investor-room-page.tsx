@@ -34,6 +34,7 @@ import { splitWorkspaceModules } from "@/lib/product-surface-visibility";
 import { INVESTOR_ROOM_SIMPLIFIED_PREVIEW } from "@/lib/product-polish-p2";
 import {
   COLLAPSE_INVESTOR_ROOM_DETAIL_SECTIONS,
+  HIDE_INVESTOR_PUBLIC_LOGIN_FROM_PREVIEW,
   HIDE_INVESTOR_SOR_ON_PUBLIC_ROOM,
   INVESTOR_ROOM_SIMPLIFIED_HIERARCHY,
 } from "@/lib/seven-day-d5-investor";
@@ -144,7 +145,9 @@ export function InvestorRoomPage() {
             <div className="mt-6">
               <WorkspaceModuleGrid
                 modules={[
-                  ...splitWorkspaceModules("investor", INVESTOR_PUBLIC_PREVIEW_MODULES).primary,
+                  ...(HIDE_INVESTOR_PUBLIC_LOGIN_FROM_PREVIEW
+                    ? []
+                    : splitWorkspaceModules("investor", INVESTOR_PUBLIC_PREVIEW_MODULES).primary),
                   ...splitWorkspaceModules("investor", INVESTOR_WORKSPACE_MODULES).primary,
                 ]}
               />

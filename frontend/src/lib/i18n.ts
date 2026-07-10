@@ -159,6 +159,7 @@ export type TranslationKey =
   | `verifyEmail.${keyof typeof en.verifyEmail}`
   | `investorMetrics.${keyof typeof en.investorMetrics}`
   | `investorFundraising.${keyof typeof en.investorFundraising}`
+  | `investorLogin.${keyof typeof en.investorLogin}`
   | `investorRoom.${keyof typeof en.investorRoom}`
   | `investorRoadmap.${keyof typeof en.investorRoadmap}`
   | `placementDemo.${keyof typeof en.placementDemo}`
@@ -1402,7 +1403,8 @@ const en = {
   login: {
     title: "Log in",
     hubTitle: "Choose your role",
-    hubLead: "Same TWIN account — different tools after sign-in. Pick the role that matches how you use TWIN.",
+    hubLead:
+      "Same TWIN account — different tools after sign-in. Pick the role that matches how you use TWIN. Investor access is invite-only — see the roadmap, not self-service signup.",
     selectRoleHint: "Choose a role to sign in",
     selectRoleModalTitle: "Choose your role first",
     selectRoleModalMessage:
@@ -1416,8 +1418,8 @@ const en = {
     zoneCompanyLead: "Enterprise procurement — annual pricing and B2B ROI are on the Companies lane.",
     zoneCompanyDemoHint:
       "Founder demo: sign in with demo@twin.career (password from docs/INVESTOR_DEMO_RUNBOOK.md), then open /for-companies or /calculator/b2b.",
-    zoneInvestorTitle: "Investor sign-in",
-    zoneInvestorLead: "Fund scenario calculator and traction metrics — not employer procurement.",
+    zoneInvestorTitle: "Investor access",
+    zoneInvestorLead: "Invite-only preview — metrics and roadmap on the product surface; request founder access, not open signup.",
     allZones: "All sign-in options",
     email: "Email",
     password: "Password",
@@ -1517,7 +1519,7 @@ const en = {
     companyTitle: "Companies",
     companyTools: "For companies · B2B calculator",
     investorTitle: "Investor",
-    investorTools: "Scenario calculator · Metrics",
+    investorTools: "Invite-only · Roadmap · Request access",
     enterZone: "Open workspace",
   },
   authCallback: {
@@ -2070,10 +2072,10 @@ const en = {
     investorPublicRoomTitle: "Investor Room",
     investorPublicRoomValue: "Public honest status — launch stance, risks, and demo map.",
     investorPublicRoomCta: "Browse room",
-    investorLoginTitle: "Sign in for tools",
-    investorLoginValue: "Invite-only preview — gated metrics, data room, and calculator after investor access.",
-    investorLoginHint: "Not part of public launch — request an invite link.",
-    investorLoginCta: "Investor sign in",
+    investorLoginTitle: "Investor access (roadmap)",
+    investorLoginValue: "Invite-only preview on the product roadmap — no public self-service login or open data room.",
+    investorLoginHint: "Request founder access — deep link preview only.",
+    investorLoginCta: "Request access",
     investorPreviewEyebrow: "Gated tools preview",
     investorPreviewLead: "Sign in to open live tools — this preview shows what unlocks after authentication.",
   },
@@ -2474,6 +2476,8 @@ eyebrow: "Product roadmap",
     nextGoSmallDecision: "H5d slot-1 reviewer selection + explicit GO SMALL 1/2 founder sign-off before any external invitation.",
     nextCandidateTrustCenter:
       "Candidate Trust Center — advanced compliance workflows on the product roadmap; core privacy controls stay in profile settings.",
+    nextInvestorPublicLogin:
+      "Investor public login — invite-only preview on the product roadmap; no self-service onboarding or open data room today.",
     nextRecruiterIntegrations:
       "Recruiter integrations — ATS sync, calendar sync, CSV import, webhooks/OAuth on the product roadmap; readiness previews only, no live sync.",
     nextCompanyIntegrations:
@@ -2547,6 +2551,27 @@ eyebrow: "Product roadmap",
     companyIntegrationsRoadmapCsv: "Talent pool CSV import — limited pilot only.",
     companyIntegrationsRoadmapWebhooks: "Greenhouse/Lever webhooks and OAuth — roadmap scaffold, no live writeback.",
     companyIntegrationsReadinessLink: "Company integrations readiness preview →",
+    investorPublicLoginRoadmapTitle: "Investor public login (roadmap)",
+    investorPublicLoginRoadmapLead: "Investor workspace login is on the product roadmap.",
+    investorPublicLoginRoadmapBody:
+      "Access is invite-only and founder-led today — no public self-service onboarding, no open data room, and no live investor account creation flow.",
+    investorPublicLoginRoadmapInviteOnly: "Invite-only preview — request access from the founder team.",
+    investorPublicLoginRoadmapDataRoom: "Data room materials — request-based, not open self-serve download.",
+    investorPublicLoginRoadmapNoOnboarding: "No public investor signup or OAuth onboarding in the current pilot.",
+    investorPublicLoginPreviewLink: "Invite-only login preview (deep link) →",
+  },
+  investorLogin: {
+    roadmapBadge: "On product roadmap",
+    outsideWorkspaceNote:
+      "Investor login preview is outside the green workspace — not an active public sign-in path.",
+    noPublicSelfServiceBody:
+      "Public investor account creation and self-service onboarding are not available. Request founder-led access instead.",
+    requestAccessCta: "Request access",
+    contactFounderCta: "Contact founder",
+    roadmapLink: "Investor login roadmap →",
+    requestAccessMailSubject: "TWIN investor access request",
+    marketingRoadmapNote:
+      "Investor workspace login is invite-only and on the product roadmap — request access or contact the founder; no public self-service sign-in.",
   },
   investorRoom: {
     eyebrow: "Investor Room",
@@ -9303,7 +9328,8 @@ const pl: MessageTree = {
   login: {
     title: "Zaloguj się",
     hubTitle: "Wybierz rolę",
-    hubLead: "To samo konto TWIN — po zalogowaniu inne narzędzia. Wybierz rolę, której dotyczy Twoja praca.",
+    hubLead:
+      "To samo konto TWIN — po zalogowaniu inne narzędzia. Wybierz rolę, której dotyczy Twoja praca. Dostęp inwestora tylko na zaproszenie — zobacz roadmapę, nie samoobsługową rejestrację.",
     selectRoleHint: "Wybierz rolę, aby się zalogować",
     selectRoleModalTitle: "Najpierw wybierz rolę",
     selectRoleModalMessage:
@@ -9317,8 +9343,8 @@ const pl: MessageTree = {
     zoneCompanyLead: "Procurement enterprise — cennik roczny i ROI B2B są w sekcji Firmy.",
     zoneCompanyDemoHint:
       "Demo założyciela: zaloguj się jako demo@twin.career (hasło w docs/INVESTOR_DEMO_RUNBOOK.md), potem /for-companies lub /calculator/b2b.",
-    zoneInvestorTitle: "Logowanie inwestora",
-    zoneInvestorLead: "Kalkulator scenariusza i metryki — nie procurement pracodawcy.",
+    zoneInvestorTitle: "Dostęp inwestora",
+    zoneInvestorLead: "Podgląd tylko na zaproszenie — metryki i roadmapa na powierzchni produktu; poproś o dostęp u founderów, bez otwartej rejestracji.",
     allZones: "Wszystkie opcje logowania",
     email: "E-mail",
     password: "Hasło",
@@ -9420,7 +9446,7 @@ const pl: MessageTree = {
     companyTitle: "Firmy",
     companyTools: "Dla firm · Kalkulator B2B",
     investorTitle: "Inwestor",
-    investorTools: "Kalkulator scenariusza · Metryki",
+    investorTools: "Tylko zaproszenie · Roadmapa · Poproś o dostęp",
     enterZone: "Wejdź do strefy",
   },
   authCallback: {
@@ -9979,10 +10005,10 @@ const pl: MessageTree = {
     investorPublicRoomTitle: "Sala executive",
     investorPublicRoomValue: "Publiczny uczciwy status — stan launchu, ryzyka i mapa demo.",
     investorPublicRoomCta: "Przeglądaj salę",
-    investorLoginTitle: "Zaloguj się do narzędzi",
-    investorLoginValue: "Podgląd tylko na zaproszenie — metryki, data room i kalkulator po dostępie inwestora.",
-    investorLoginHint: "Poza publicznym launch — poproś o link zaproszenia.",
-    investorLoginCta: "Logowanie inwestora",
+    investorLoginTitle: "Dostęp inwestora (roadmapa)",
+    investorLoginValue: "Podgląd tylko na zaproszenie na roadmapie produktu — bez publicznego logowania ani otwartego data room.",
+    investorLoginHint: "Poproś o dostęp u founderów — tylko deep link podglądu.",
+    investorLoginCta: "Poproś o dostęp",
     investorPreviewEyebrow: "Podgląd narzędzi gated",
     investorPreviewLead: "Zaloguj się, aby otworzyć narzędzia na żywo — ten podgląd pokazuje, co odblokujesz po autentykacji.",
   },
@@ -10387,6 +10413,8 @@ const pl: MessageTree = {
     nextGoSmallDecision: "Wybór recenzenta H5d slot-1 + jawny podpis GO SMALL 1/2 przed jakimkolwiek zaproszeniem zewnętrznym.",
     nextCandidateTrustCenter:
       "Candidate Trust Center — zaawansowane workflow compliance na roadmapie produktu; podstawowa prywatność zostaje w ustawieniach profilu.",
+    nextInvestorPublicLogin:
+      "Publiczne logowanie inwestora — podgląd tylko na zaproszenie na roadmapie produktu; bez samoobsługowego onboardingu ani otwartego data room.",
     nextRecruiterIntegrations:
       "Integracje rekrutera — sync ATS, sync kalendarza, import CSV, webhooki/OAuth na roadmapie produktu; tylko podglądy gotowości, bez live sync.",
     nextCompanyIntegrations:
@@ -10460,6 +10488,27 @@ const pl: MessageTree = {
     companyIntegrationsRoadmapCsv: "Import CSV puli talentów — tylko ograniczony pilot.",
     companyIntegrationsRoadmapWebhooks: "Webhooki Greenhouse/Lever i OAuth — scaffold roadmapy, bez live writeback.",
     companyIntegrationsReadinessLink: "Podgląd gotowości integracji firmy →",
+    investorPublicLoginRoadmapTitle: "Publiczne logowanie inwestora (roadmapa)",
+    investorPublicLoginRoadmapLead: "Logowanie do workspace inwestora jest na roadmapie produktu.",
+    investorPublicLoginRoadmapBody:
+      "Dostęp jest dziś tylko na zaproszenie i pod kontrolą founderów — bez publicznego onboardingu, otwartego data room ani live tworzenia kont inwestora.",
+    investorPublicLoginRoadmapInviteOnly: "Podgląd tylko na zaproszenie — poproś o dostęp u zespołu founderów.",
+    investorPublicLoginRoadmapDataRoom: "Materiały data room — na żądanie, bez otwartego self-serve download.",
+    investorPublicLoginRoadmapNoOnboarding: "Brak publicznej rejestracji inwestora ani OAuth onboardingu w obecnym pilocie.",
+    investorPublicLoginPreviewLink: "Podgląd logowania tylko na zaproszenie (deep link) →",
+  },
+  investorLogin: {
+    roadmapBadge: "Na roadmapie produktu",
+    outsideWorkspaceNote:
+      "Podgląd logowania inwestora jest poza zielonym workspace — to nie aktywna publiczna ścieżka logowania.",
+    noPublicSelfServiceBody:
+      "Publiczne tworzenie kont inwestora i samoobsługowy onboarding nie są dostępne. Poproś o dostęp u founderów.",
+    requestAccessCta: "Poproś o dostęp",
+    contactFounderCta: "Kontakt z founderem",
+    roadmapLink: "Roadmapa logowania inwestora →",
+    requestAccessMailSubject: "Prośba o dostęp inwestora TWIN",
+    marketingRoadmapNote:
+      "Logowanie do workspace inwestora jest tylko na zaproszenie i na roadmapie produktu — poproś o dostęp lub skontaktuj się z founderem; bez publicznego self-serve sign-in.",
   },
   investorRoom: {
     eyebrow: "Sala executive",

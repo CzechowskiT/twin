@@ -4,6 +4,10 @@
  * Numeric tier MSRP is localized to the active locale currency in getPersonaBundle.
  */
 import { localizeTierPrice } from "@/lib/pricing-locale";
+import { INVESTOR_LOGIN_ROADMAP_OUTSIDE_HREF } from "@/lib/all-workspace-green-gate";
+
+const INVESTOR_ACCESS_MAIL = "contact@twin.care";
+const INVESTOR_REQUEST_ACCESS_HREF = `mailto:${INVESTOR_ACCESS_MAIL}?subject=${encodeURIComponent("TWIN investor access request")}`;
 
 export type PersonaId = "candidates" | "recruiters" | "companies" | "investors";
 
@@ -551,8 +555,9 @@ const investorsEn: PersonaBundle = {
       body: "No annual enterprise SKUs here. If you are HR or procurement, switch to Companies for program pricing and vendor security.",
     },
   ],
-  pricingTitle: "Access (post sign-in)",
-  pricingLead: "Tools open after investor workspace login. Marketing below is a preview; calculators are not mixed with employer checkout.",
+  pricingTitle: "Access",
+  pricingLead:
+    "Public diligence tools — metrics, roadmap, and calculator — are on the investor room without self-service login. Workspace sign-in stays invite-only on the product roadmap.",
   pricingFootnote: "Numbers are illustrative models only — not an offer or forecast.",
   tiers: [
     {
@@ -562,34 +567,34 @@ const investorsEn: PersonaBundle = {
       cadence: "marketing",
       bullets: [
         "Read the investor story and lane boundaries on this page",
-        "See which tools exist before you authenticate",
+        "Open metrics, roadmap, and calculator without account creation",
       ],
-      cta: "Sign in to workspace",
-      href: "/login/investor",
+      cta: "Request access",
+      href: INVESTOR_REQUEST_ACCESS_HREF,
     },
     {
       id: "workspace",
       name: "Investor workspace",
       price: "Invite",
-      cadence: "gated",
+      cadence: "roadmap",
       highlight: true,
       bullets: [
         "Five-year scenario calculator (/investor/calculator)",
         "Metrics panel (/investor/metrics)",
-        "Deck-oriented exports (as shipped in workspace)",
+        "Invite-only login preview on roadmap — not live self-serve signup",
       ],
-      cta: "Open workspace",
-      href: "/workspace/investor",
+      cta: "Investor roadmap",
+      href: INVESTOR_LOGIN_ROADMAP_OUTSIDE_HREF,
     },
   ],
   logisticsTitle: "Not the same as Companies",
   logistics: [
     "Companies owns B2B ROI, DPA templates, and annual program tiers.",
-    "Investor owns fund-style models — sign in to run calculators, not to buy recruiter seats.",
+    "Investor owns fund-style models — request access for founder-led preview, not recruiter seat checkout.",
     "Recruiter SKUs remain on the Recruiters lane.",
   ],
-  primaryCta: { label: "Sign in to investor workspace", href: "/login/investor" },
-  secondaryCta: { label: "Browse Companies pricing", href: "/for-companies" },
+  primaryCta: { label: "Request access", href: INVESTOR_REQUEST_ACCESS_HREF },
+  secondaryCta: { label: "Investor login roadmap", href: INVESTOR_LOGIN_ROADMAP_OUTSIDE_HREF },
 };
 
 const investorsPl: PersonaBundle = {
@@ -611,8 +616,9 @@ const investorsPl: PersonaBundle = {
       body: "Bez rocznych SKU enterprise. HR i procurement → przełącz na Firmy.",
     },
   ],
-  pricingTitle: "Dostęp (po logowaniu)",
-  pricingLead: "Narzędzia po zalogowaniu do workspace inwestora. Poniżej podgląd — kalkulatory nie są mieszane z checkoutem pracodawcy.",
+  pricingTitle: "Dostęp",
+  pricingLead:
+    "Publiczne narzędzia due diligence — metryki, roadmapa i kalkulator — są w sali inwestora bez samoobsługowego logowania. Logowanie do workspace zostaje tylko na zaproszenie na roadmapie produktu.",
   pricingFootnote: "Liczby to modele ilustracyjne — nie oferta ani prognoza.",
   tiers: [
     {
@@ -620,33 +626,33 @@ const investorsPl: PersonaBundle = {
       name: "Podgląd publiczny",
       price: "—",
       cadence: "marketing",
-      bullets: ["Historia inwestora i granice ścieżek", "Lista narzędzi przed autentykacją"],
-      cta: "Zaloguj się",
-      href: "/login/investor",
+      bullets: ["Historia inwestora i granice ścieżek", "Metryki, roadmapa i kalkulator bez tworzenia konta"],
+      cta: "Poproś o dostęp",
+      href: INVESTOR_REQUEST_ACCESS_HREF,
     },
     {
       id: "workspace",
       name: "Workspace inwestora",
       price: "Zaproszenie",
-      cadence: "po logowaniu",
+      cadence: "roadmapa",
       highlight: true,
       bullets: [
         "Kalkulator pięcioletni (/investor/calculator)",
         "Panel metryk (/investor/metrics)",
-        "Eksporty pod deck (wg workspace)",
+        "Podgląd logowania tylko na zaproszenie na roadmapie — bez live self-serve signup",
       ],
-      cta: "Otwórz workspace",
-      href: "/workspace/investor",
+      cta: "Roadmapa logowania",
+      href: INVESTOR_LOGIN_ROADMAP_OUTSIDE_HREF,
     },
   ],
   logisticsTitle: "To nie to samo co Firmy",
   logistics: [
     "Firmy: ROI B2B, DPA, roczne programy.",
-    "Inwestor: modele funduszowe — logowanie, nie zakup miejsc rekrutera.",
+    "Inwestor: modele funduszowe — poproś o dostęp u founderów, nie checkout miejsc rekrutera.",
     "SKU rekrutera zostaje w ścieżce Rekruterów.",
   ],
-  primaryCta: { label: "Zaloguj do workspace inwestora", href: "/login/investor" },
-  secondaryCta: { label: "Cennik Firm", href: "/for-companies" },
+  primaryCta: { label: "Poproś o dostęp", href: INVESTOR_REQUEST_ACCESS_HREF },
+  secondaryCta: { label: "Roadmapa logowania inwestora", href: INVESTOR_LOGIN_ROADMAP_OUTSIDE_HREF },
 };
 
 const companiesPl: PersonaBundle = {

@@ -11,6 +11,7 @@ import {
 import type { MarketingPersona } from "@/lib/marketing-persona";
 import {
   HIDE_BOARD_FROM_INVESTOR_DEFAULT_HUB,
+  HIDE_INVESTOR_PUBLIC_LOGIN_FROM_PREVIEW,
   INVESTOR_PRIMARY_MODULE_IDS,
   INVESTOR_ROADMAP_MODULE_IDS,
 } from "@/lib/seven-day-d5-investor";
@@ -252,6 +253,9 @@ export function shouldHideFromDefaultHub(persona: MarketingPersona, moduleId: st
   if (WORKSPACE_GREEN_ONLY_MODE) {
     if (ALWAYS_HIDDEN_MODULE_IDS.has(moduleId)) return true;
     if (hrefIsBoardOrAdmin(moduleId)) return true;
+    if (persona === "investor" && HIDE_INVESTOR_PUBLIC_LOGIN_FROM_PREVIEW && moduleId === "login") {
+      return true;
+    }
     if (persona === "investor" && HIDE_BOARD_FROM_INVESTOR_DEFAULT_HUB && hrefIsBoardOrAdmin(moduleId)) {
       return true;
     }

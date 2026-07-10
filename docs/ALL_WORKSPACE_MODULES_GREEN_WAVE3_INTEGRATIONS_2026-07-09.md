@@ -133,7 +133,7 @@ Copy (EN):
 
 | Module | Action | Status |
 |--------|--------|--------|
-| investor public login preview | MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE | Planned |
+| investor public login preview | MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE | **Done** — [Wave 3 Slice 3](./ALL_WORKSPACE_MODULES_GREEN_WAVE3_INVESTOR_LOGIN_2026-07-09.md) |
 
 ---
 
@@ -164,5 +164,5 @@ RECRUITER_INTEGRATIONS_ROADMAP_OUTSIDE_HREF: /investor/roadmap#recruiter-integra
 COMPANY_INTEGRATIONS_ROADMAP_OUTSIDE_HREF: /investor/roadmap#company-integrations
 WAVE3_SLICE2_EFFECTIVE_HIDDEN_WORKSPACE_CARD_COUNT: 19
 WORKSPACE_GREEN_PRIMARY_LIMITS: candidate_10, recruiter_5, company_3, investor_4
-NEXT_SLICE: Wave 3 — investor public login preview MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE
+NEXT_SLICE: Wave 3 complete — investor public login preview MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE (see WAVE3_INVESTOR_LOGIN doc)
 ```

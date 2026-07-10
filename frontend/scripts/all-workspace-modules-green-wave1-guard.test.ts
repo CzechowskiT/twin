@@ -45,6 +45,8 @@ import {
 } from "../src/lib/seven-day-d4-company";
 import {
   HIDE_INVESTOR_DATA_ROOM_FROM_HUB,
+  HIDE_INVESTOR_PUBLIC_LOGIN_FROM_PREVIEW,
+  INVESTOR_PUBLIC_LOGIN_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE,
   INVESTOR_ROADMAP_MODULE_IDS,
 } from "../src/lib/seven-day-d5-investor";
 import {
@@ -96,6 +98,8 @@ test("3 seven-day wave1 hide flags — wave1 hidden modules; analytics restored 
   assert.equal(COMPANY_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE, true);
   assert.equal(HIDE_COMPANY_INTEGRATIONS_FROM_NAV, true);
   assert.equal(HIDE_INVESTOR_DATA_ROOM_FROM_HUB, true);
+  assert.equal(HIDE_INVESTOR_PUBLIC_LOGIN_FROM_PREVIEW, true);
+  assert.equal(INVESTOR_PUBLIC_LOGIN_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE, true);
   assert.equal(INVESTOR_ROADMAP_MODULE_IDS.length, 0);
   assert.equal(RECRUITER_PRIMARY_NAV_HREFS.length, 5);
   assert.ok((RECRUITER_PRIMARY_NAV_HREFS as readonly string[]).includes("/recruiter/analytics"));
