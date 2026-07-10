@@ -34,6 +34,16 @@ import {
   TRUST_CENTER_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE,
 } from "../src/lib/seven-day-d2-candidate";
 import {
+  HIDE_RECRUITER_INTEGRATIONS_FROM_HUB,
+  HIDE_RECRUITER_INTEGRATIONS_FROM_NAV,
+  RECRUITER_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE,
+} from "../src/lib/seven-day-d3-recruiter";
+import {
+  HIDE_COMPANY_INTEGRATIONS_FROM_HUB,
+  HIDE_COMPANY_INTEGRATIONS_FROM_NAV,
+  COMPANY_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE,
+} from "../src/lib/seven-day-d4-company";
+import {
   HIDE_INVESTOR_DATA_ROOM_FROM_HUB,
   INVESTOR_ROADMAP_MODULE_IDS,
 } from "../src/lib/seven-day-d5-investor";
@@ -79,6 +89,12 @@ test("3 seven-day wave1 hide flags — wave1 hidden modules; analytics restored 
   assert.equal(HIDE_CANDIDATE_REFERRALS_FROM_HUB, true);
   assert.equal(HIDE_CANDIDATE_TRUST_CENTER_FROM_HUB, true);
   assert.equal(TRUST_CENTER_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE, true);
+  assert.equal(HIDE_RECRUITER_INTEGRATIONS_FROM_HUB, true);
+  assert.equal(RECRUITER_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE, true);
+  assert.equal(HIDE_RECRUITER_INTEGRATIONS_FROM_NAV, true);
+  assert.equal(HIDE_COMPANY_INTEGRATIONS_FROM_HUB, true);
+  assert.equal(COMPANY_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE, true);
+  assert.equal(HIDE_COMPANY_INTEGRATIONS_FROM_NAV, true);
   assert.equal(HIDE_INVESTOR_DATA_ROOM_FROM_HUB, true);
   assert.equal(INVESTOR_ROADMAP_MODULE_IDS.length, 0);
   assert.equal(RECRUITER_PRIMARY_NAV_HREFS.length, 5);
@@ -151,6 +167,8 @@ test("7 green allowed IDs cover expected visible modules", () => {
   assert.ok(isWorkspaceGreenVisible("candidate", "evidence"));
   assert.ok(!isWorkspaceGreenVisible("candidate", "referrals"));
   assert.ok(!isWorkspaceGreenVisible("candidate", "trust_center"));
+  assert.ok(!isWorkspaceGreenVisible("recruiter", "integrations"));
+  assert.ok(!isWorkspaceGreenVisible("company", "integrations"));
   assert.ok(isWorkspaceGreenVisible("recruiter", "inbox"));
   assert.ok(isWorkspaceGreenVisible("recruiter", "analytics"));
   assert.ok(isWorkspaceGreenVisible("company", "roles"));

@@ -2474,6 +2474,10 @@ eyebrow: "Product roadmap",
     nextGoSmallDecision: "H5d slot-1 reviewer selection + explicit GO SMALL 1/2 founder sign-off before any external invitation.",
     nextCandidateTrustCenter:
       "Candidate Trust Center — advanced compliance workflows on the product roadmap; core privacy controls stay in profile settings.",
+    nextRecruiterIntegrations:
+      "Recruiter integrations — ATS sync, calendar sync, CSV import, webhooks/OAuth on the product roadmap; readiness previews only, no live sync.",
+    nextCompanyIntegrations:
+      "Company integrations — employer ATS webhooks, calendar, CSV import on the product roadmap; readiness previews only, no production writeback.",
     nextRecruiterCalendar: "Recruiter calendar placeholder honest copy — sync NOT LIVE; candidate Google/Microsoft calendar verified.",
     nextMoreBoards: "More EU job boards and employer ATS webhook readiness (design + gated rollout).",
     nextBillingRollout: "Stripe billing activation when founder turns on production subscriptions — pre-revenue today.",
@@ -2525,6 +2529,24 @@ eyebrow: "Product roadmap",
       "Core privacy and consent controls remain available in account settings. Advanced trust workflows are not part of the current pilot.",
     candidateTrustCenterRoadmapPrivacyLink: "Privacy policy",
     candidateTrustCenterRoadmapTermsLink: "Terms",
+    recruiterIntegrationsRoadmapTitle: "Recruiter integrations (roadmap)",
+    recruiterIntegrationsRoadmapLead: "Integrations are on the product roadmap.",
+    recruiterIntegrationsRoadmapBody:
+      "No live ATS or calendar sync in the current pilot. Current surfaces are readiness previews only — no production writeback.",
+    recruiterIntegrationsRoadmapAts: "ATS sync (Greenhouse, Lever, OAuth connectors) — planned, not live.",
+    recruiterIntegrationsRoadmapCalendar: "Recruiter calendar sync (Google / Microsoft) — not live.",
+    recruiterIntegrationsRoadmapCsv: "Structured CSV talent pool import — limited pilot only.",
+    recruiterIntegrationsRoadmapWebhooks: "Placement webhooks and OAuth — roadmap scaffold, no live connections.",
+    recruiterIntegrationsReadinessLink: "Recruiter integrations readiness preview →",
+    companyIntegrationsRoadmapTitle: "Company integrations (roadmap)",
+    companyIntegrationsRoadmapLead: "Integrations are on the product roadmap.",
+    companyIntegrationsRoadmapBody:
+      "No live ATS or calendar sync in the current pilot. Current surfaces are readiness previews only — no production writeback.",
+    companyIntegrationsRoadmapAts: "Employer ATS webhooks and outbound sync — planned, not live.",
+    companyIntegrationsRoadmapCalendar: "Employer calendar scheduling — not live.",
+    companyIntegrationsRoadmapCsv: "Talent pool CSV import — limited pilot only.",
+    companyIntegrationsRoadmapWebhooks: "Greenhouse/Lever webhooks and OAuth — roadmap scaffold, no live writeback.",
+    companyIntegrationsReadinessLink: "Company integrations readiness preview →",
   },
   investorRoom: {
     eyebrow: "Investor Room",
@@ -3488,8 +3510,9 @@ eyebrow: "Product roadmap",
     previewTalentPoolDesc: "Internal candidate records — data quality and readiness before Radar surfacing.",
     previewTalentPoolCta: "Open talent memory",
     previewIntegrationsTitle: "Integrations",
-    previewIntegrationsDesc: "Honest ATS and calendar readiness rows — no fake connected claims.",
-    previewIntegrationsCta: "View integrations",
+    previewIntegrationsDesc:
+      "On the product roadmap — ATS and calendar readiness previews only. No live sync in the current pilot.",
+    previewIntegrationsCta: "View integrations roadmap",
     previewCalculatorTitle: "B2B calculator",
     previewCalculatorDesc: "Model agency fees vs TWIN operating economics for CFO conversations.",
     previewCalculatorCta: "Open calculator",
@@ -3927,6 +3950,9 @@ eyebrow: "Product roadmap",
       "Roadmap preview for recruiter tooling — what is live today vs coming soon. No live ATS sync, no marketplace connections.",
     roadmapBoundary:
       "Coming soon — integration rows show readiness only. TWIN does not sync with external ATS or calendars in this preview.",
+    outsideWorkspaceNote:
+      "Integrations are on the product roadmap — not part of the current pilot workspace. No live ATS or calendar sync.",
+    roadmapLink: "View integrations on the product roadmap →",
     item_acceptance_inbox: "Acceptance inbox & review card",
     item_talent_pool_import: "Structured talent pool CSV import",
     item_ats_oauth: "ATS OAuth connections (stub)",
@@ -3949,6 +3975,9 @@ eyebrow: "Product roadmap",
       "Honest roadmap for employer tooling — what is live today vs coming soon. No fake “all connected” or live ATS sync claims.",
     roadmapBoundary:
       "Coming soon — integration rows show readiness only. TWIN does not sync with external ATS or calendars in this preview.",
+    outsideWorkspaceNote:
+      "Integrations are on the product roadmap — not part of the current pilot workspace. No live ATS or calendar sync.",
+    roadmapLink: "View integrations on the product roadmap →",
     item_acceptance_inbox: "Acceptance inbox & review card",
     item_talent_pool_import: "Talent pool import (CSV)",
     item_ats_webhooks: "ATS webhooks",
@@ -7997,6 +8026,10 @@ eyebrow: "Product roadmap",
       "Order of delivery can change; some items may be tier-gated when they ship. Tell us what you would open weekly. It steers the roadmap.",
     marketingLimitedLaunchFootnote:
       "Limited launch: Preview, controlled pilot, and Coming Soon labels mean exactly that. No live ATS writeback, delegated auto-apply, or Microsoft calendar sync on production today.",
+    integrationsRoadmapNote:
+      "ATS, calendar, webhook, and OAuth integrations are on the product roadmap — not live in the current pilot.",
+    integrationsRoadmapLinkRecruiter: "Recruiter integrations roadmap →",
+    integrationsRoadmapLinkCompany: "Company integrations roadmap →",
   },
   employerMedia: EMPLOYER_MEDIA_MESSAGES_EN,
   jobEmployer: JOB_EMPLOYER_MESSAGES_EN,
@@ -10354,6 +10387,10 @@ const pl: MessageTree = {
     nextGoSmallDecision: "Wybór recenzenta H5d slot-1 + jawny podpis GO SMALL 1/2 przed jakimkolwiek zaproszeniem zewnętrznym.",
     nextCandidateTrustCenter:
       "Candidate Trust Center — zaawansowane workflow compliance na roadmapie produktu; podstawowa prywatność zostaje w ustawieniach profilu.",
+    nextRecruiterIntegrations:
+      "Integracje rekrutera — sync ATS, sync kalendarza, import CSV, webhooki/OAuth na roadmapie produktu; tylko podglądy gotowości, bez live sync.",
+    nextCompanyIntegrations:
+      "Integracje firmy — webhooki ATS pracodawcy, kalendarz, import CSV na roadmapie produktu; tylko podglądy gotowości, bez writeback na produkcji.",
     nextRecruiterCalendar: "Placeholder kalendarza rekrutera — sync NOT LIVE; kalendarz kandydata Google/Microsoft zweryfikowany.",
     nextMoreBoards: "Więcej portali UE i gotowość webhooków ATS (design + gated rollout).",
     nextBillingRollout: "Aktywacja Stripe po decyzji founderów — dziś pre-revenue.",
@@ -10405,6 +10442,24 @@ const pl: MessageTree = {
       "Podstawowe kontrolki prywatności i zgody pozostają w ustawieniach konta. Zaawansowane workflow zaufania nie są częścią bieżącego pilota.",
     candidateTrustCenterRoadmapPrivacyLink: "Polityka prywatności",
     candidateTrustCenterRoadmapTermsLink: "Regulamin",
+    recruiterIntegrationsRoadmapTitle: "Integracje rekrutera (roadmapa)",
+    recruiterIntegrationsRoadmapLead: "Integracje są na roadmapie produktu.",
+    recruiterIntegrationsRoadmapBody:
+      "Brak live sync ATS ani kalendarza w bieżącym pilocie. Obecne powierzchnie to tylko podglądy gotowości — bez writeback na produkcji.",
+    recruiterIntegrationsRoadmapAts: "Sync ATS (Greenhouse, Lever, konektory OAuth) — planowane, nie live.",
+    recruiterIntegrationsRoadmapCalendar: "Sync kalendarza rekrutera (Google / Microsoft) — nie live.",
+    recruiterIntegrationsRoadmapCsv: "Strukturalny import CSV puli talentów — tylko ograniczony pilot.",
+    recruiterIntegrationsRoadmapWebhooks: "Webhooki placement i OAuth — scaffold roadmapy, bez live połączeń.",
+    recruiterIntegrationsReadinessLink: "Podgląd gotowości integracji rekrutera →",
+    companyIntegrationsRoadmapTitle: "Integracje firmy (roadmapa)",
+    companyIntegrationsRoadmapLead: "Integracje są na roadmapie produktu.",
+    companyIntegrationsRoadmapBody:
+      "Brak live sync ATS ani kalendarza w bieżącym pilocie. Obecne powierzchnie to tylko podglądy gotowości — bez writeback na produkcji.",
+    companyIntegrationsRoadmapAts: "Webhooki ATS pracodawcy i sync wychodzący — planowane, nie live.",
+    companyIntegrationsRoadmapCalendar: "Planowanie kalendarza pracodawcy — nie live.",
+    companyIntegrationsRoadmapCsv: "Import CSV puli talentów — tylko ograniczony pilot.",
+    companyIntegrationsRoadmapWebhooks: "Webhooki Greenhouse/Lever i OAuth — scaffold roadmapy, bez live writeback.",
+    companyIntegrationsReadinessLink: "Podgląd gotowości integracji firmy →",
   },
   investorRoom: {
     eyebrow: "Sala executive",
@@ -11370,8 +11425,9 @@ const pl: MessageTree = {
     previewTalentPoolDesc: "Wewnętrzne rekordy kandydatów — jakość danych i gotowość przed surfacingiem w Radarze.",
     previewTalentPoolCta: "Otwórz pamięć talentów",
     previewIntegrationsTitle: "Integracje",
-    previewIntegrationsDesc: "Uczciwe wiersze gotowości ATS i kalendarza — bez fałszywych „wszystko podłączone”.",
-    previewIntegrationsCta: "Zobacz integracje",
+    previewIntegrationsDesc:
+      "Na roadmapie produktu — tylko podglądy gotowości ATS i kalendarza. Brak live sync w bieżącym pilocie.",
+    previewIntegrationsCta: "Zobacz roadmapę integracji",
     previewCalculatorTitle: "Kalkulator B2B",
     previewCalculatorDesc: "Modeluj success fee agencji vs ekonomię operacyjną TWIN pod rozmowy z CFO.",
     previewCalculatorCta: "Otwórz kalkulator",
@@ -11811,6 +11867,9 @@ const pl: MessageTree = {
       "Podgląd roadmapy narzędzi rekrutera — co jest live dziś vs wkrótce. Bez live sync ATS, bez połączeń marketplace.",
     roadmapBoundary:
       "Wkrótce — wiersze integracji pokazują tylko gotowość. TWIN nie synchronizuje się z zewnętrznym ATS ani kalendarzami w tym podglądzie.",
+    outsideWorkspaceNote:
+      "Integracje są na roadmapie produktu — nie są częścią bieżącego workspace pilota. Brak live sync ATS ani kalendarza.",
+    roadmapLink: "Zobacz integracje na roadmapie produktu →",
     item_acceptance_inbox: "Skrzynka akceptacji i karta oceny",
     item_talent_pool_import: "Strukturalny import CSV puli talentów",
     item_ats_oauth: "Połączenia ATS OAuth (stub)",
@@ -11833,6 +11892,9 @@ const pl: MessageTree = {
       "Uczciwa roadmapa narzędzi pracodawcy — co jest live dziś vs wkrótce. Bez fałszywych „wszystko podpięte” i obietnic live sync ATS.",
     roadmapBoundary:
       "Wkrótce — wiersze pokazują tylko gotowość. TWIN nie synchronizuje z zewnętrznym ATS ani kalendarzami w tym podglądzie.",
+    outsideWorkspaceNote:
+      "Integracje są na roadmapie produktu — nie są częścią bieżącego workspace pilota. Brak live sync ATS ani kalendarza.",
+    roadmapLink: "Zobacz integracje na roadmapie produktu →",
     item_acceptance_inbox: "Skrzynka akceptacji i karta oceny",
     item_talent_pool_import: "Import puli talentów (CSV)",
     item_ats_webhooks: "Webhooki ATS",
@@ -15827,6 +15889,10 @@ const pl: MessageTree = {
       "Kolejność wdrożeń może się zmieniać; część funkcji może być powiązana z planem po starcie. Napisz, co otwierałbyś co tydzień: to ustawia roadmapę.",
     marketingLimitedLaunchFootnote:
       "Ograniczony launch: etykiety Preview, kontrolowany pilot i Coming Soon znaczą dokładnie to. Brak live writeback ATS, delegated auto-apply i synchronizacji Microsoft Calendar na produkcji dziś.",
+    integrationsRoadmapNote:
+      "Integracje ATS, kalendarza, webhooków i OAuth są na roadmapie produktu — nie są live w bieżącym pilocie.",
+    integrationsRoadmapLinkRecruiter: "Roadmapa integracji rekrutera →",
+    integrationsRoadmapLinkCompany: "Roadmapa integracji firmy →",
   },
   compare: {
     disclaimer:

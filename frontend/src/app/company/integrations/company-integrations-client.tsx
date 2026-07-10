@@ -7,9 +7,11 @@ import { useTranslation } from "@/components/language-provider";
 import { IntegrationRowStatusBadge } from "@/components/workspace/integration-row-status-badge";
 import { WorkspacePilotPageHeader } from "@/components/workspace/workspace-pilot-page-header";
 import type { TranslationKey } from "@/lib/i18n";
+import { COMPANY_INTEGRATIONS_ROADMAP_OUTSIDE_HREF } from "@/lib/all-workspace-green-gate";
 import { Shell, Card } from "@/components/ui";
 import { COMPANY_INTEGRATION_ROWS } from "@/lib/company-integrations-readiness";
 import {
+  COMPANY_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE,
   COMPANY_INTEGRATIONS_ROADMAP_STATUS,
 } from "@/lib/seven-day-d4-company";
 import {
@@ -32,7 +34,7 @@ export default function CompanyIntegrationsClient() {
   const { t } = useTranslation();
 
   return (
-    <Shell wide data-seven-day-company-integrations data-seven-day-d6-company-integrations>
+    <Shell wide data-seven-day-company-integrations data-seven-day-d6-company-integrations data-wave3-company-integrations-roadmap>
       <CompanyWorkspaceNav />
       <WorkspacePilotPageHeader
         eyebrowKey="companyIntegrations.eyebrow"
@@ -40,6 +42,11 @@ export default function CompanyIntegrationsClient() {
         leadKey="companyIntegrations.lead"
         status={COMPANY_INTEGRATIONS_ROADMAP_STATUS}
       />
+      {COMPANY_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE ? (
+        <p className="twin-muted mb-4 text-sm leading-relaxed" data-wave3-integrations-outside-workspace>
+          {t("companyIntegrations.outsideWorkspaceNote")}
+        </p>
+      ) : null}
       {COMPANY_INTEGRATIONS_HONEST_NO_LIVE_ATS_SYNC ? (
         <p className="twin-muted mb-4 text-sm leading-relaxed" data-seven-day-company-integrations-roadmap-boundary>
           {t("companyIntegrations.roadmapBoundary")}
@@ -84,6 +91,13 @@ export default function CompanyIntegrationsClient() {
       </ul>
 
       <p className="twin-muted mt-8 text-xs leading-relaxed">{t("companyIntegrations.scopeNote")}</p>
+      {COMPANY_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE ? (
+        <p className="mt-4 text-sm">
+          <Link href={COMPANY_INTEGRATIONS_ROADMAP_OUTSIDE_HREF} className="twin-link font-medium">
+            {t("companyIntegrations.roadmapLink")}
+          </Link>
+        </p>
+      ) : null}
       <p className="mt-4 text-sm">
         <Link href="/company/talent-pool" className="twin-link font-medium">
           {t("companyTalentPool.navLink")}

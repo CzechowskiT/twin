@@ -12,8 +12,18 @@ import {
   SHIPPED_ITEMS,
   type RoadmapPhase,
 } from "@/lib/investor-founder-roadmap";
-import { TRUST_CENTER_ROADMAP_OUTSIDE_HREF } from "@/lib/all-workspace-green-gate";
+import {
+  COMPANY_INTEGRATIONS_ROADMAP_OUTSIDE_HREF,
+  RECRUITER_INTEGRATIONS_ROADMAP_OUTSIDE_HREF,
+  TRUST_CENTER_ROADMAP_OUTSIDE_HREF,
+} from "@/lib/all-workspace-green-gate";
 import { TRUST_CENTER_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE } from "@/lib/seven-day-d2-candidate";
+import {
+  COMPANY_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE,
+} from "@/lib/seven-day-d4-company";
+import {
+  RECRUITER_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE,
+} from "@/lib/seven-day-d3-recruiter";
 import type { TranslationKey } from "@/lib/i18n";
 
 function phaseTitleKey(phase: RoadmapPhase): TranslationKey {
@@ -99,6 +109,80 @@ export function InvestorRoadmapFounderUpdatesPanel() {
               </Link>
               <Link href={TRUST_CENTER_ROADMAP_OUTSIDE_HREF} className="twin-link font-medium">
                 {t("profile.trustRoadmapLink")}
+              </Link>
+            </div>
+          </Card>
+        </section>
+      ) : null}
+
+      {RECRUITER_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE ? (
+        <section
+          id="recruiter-integrations"
+          aria-labelledby="recruiter-integrations-heading"
+          data-wave3-recruiter-integrations-roadmap
+        >
+          <h2
+            id="recruiter-integrations-heading"
+            className="mb-3 text-xs font-bold uppercase tracking-[0.22em] text-[var(--twin-muted)]"
+          >
+            {t("investorRoadmap.recruiterIntegrationsRoadmapTitle")}
+          </h2>
+          <Card className="border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] p-5">
+            <p className="text-sm font-semibold text-[var(--foreground)]">
+              {t("investorRoadmap.recruiterIntegrationsRoadmapLead")}
+            </p>
+            <p className="mt-2 text-sm leading-relaxed text-[var(--twin-muted-strong)]">
+              {t("investorRoadmap.recruiterIntegrationsRoadmapBody")}
+            </p>
+            <ul className="mt-4 space-y-2 text-sm leading-relaxed text-[var(--twin-muted-strong)]">
+              <li>{t("investorRoadmap.recruiterIntegrationsRoadmapAts")}</li>
+              <li>{t("investorRoadmap.recruiterIntegrationsRoadmapCalendar")}</li>
+              <li>{t("investorRoadmap.recruiterIntegrationsRoadmapCsv")}</li>
+              <li>{t("investorRoadmap.recruiterIntegrationsRoadmapWebhooks")}</li>
+            </ul>
+            <div className="mt-4 flex flex-wrap gap-4 text-sm">
+              <Link href="/recruiter/integrations" className="twin-link font-medium">
+                {t("investorRoadmap.recruiterIntegrationsReadinessLink")}
+              </Link>
+              <Link href={RECRUITER_INTEGRATIONS_ROADMAP_OUTSIDE_HREF} className="twin-link font-medium">
+                {t("recruiterIntegrations.roadmapLink")}
+              </Link>
+            </div>
+          </Card>
+        </section>
+      ) : null}
+
+      {COMPANY_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE ? (
+        <section
+          id="company-integrations"
+          aria-labelledby="company-integrations-heading"
+          data-wave3-company-integrations-roadmap
+        >
+          <h2
+            id="company-integrations-heading"
+            className="mb-3 text-xs font-bold uppercase tracking-[0.22em] text-[var(--twin-muted)]"
+          >
+            {t("investorRoadmap.companyIntegrationsRoadmapTitle")}
+          </h2>
+          <Card className="border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] p-5">
+            <p className="text-sm font-semibold text-[var(--foreground)]">
+              {t("investorRoadmap.companyIntegrationsRoadmapLead")}
+            </p>
+            <p className="mt-2 text-sm leading-relaxed text-[var(--twin-muted-strong)]">
+              {t("investorRoadmap.companyIntegrationsRoadmapBody")}
+            </p>
+            <ul className="mt-4 space-y-2 text-sm leading-relaxed text-[var(--twin-muted-strong)]">
+              <li>{t("investorRoadmap.companyIntegrationsRoadmapAts")}</li>
+              <li>{t("investorRoadmap.companyIntegrationsRoadmapCalendar")}</li>
+              <li>{t("investorRoadmap.companyIntegrationsRoadmapCsv")}</li>
+              <li>{t("investorRoadmap.companyIntegrationsRoadmapWebhooks")}</li>
+            </ul>
+            <div className="mt-4 flex flex-wrap gap-4 text-sm">
+              <Link href="/company/integrations" className="twin-link font-medium">
+                {t("investorRoadmap.companyIntegrationsReadinessLink")}
+              </Link>
+              <Link href={COMPANY_INTEGRATIONS_ROADMAP_OUTSIDE_HREF} className="twin-link font-medium">
+                {t("companyIntegrations.roadmapLink")}
               </Link>
             </div>
           </Card>

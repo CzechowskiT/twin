@@ -12,6 +12,7 @@ import { RECRUITER_WORKSPACE_MODULES } from "../src/lib/recruiter-workspace-modu
 import {
   COLLAPSE_RECRUITER_DEMO_JOURNEYS,
   HIDE_RECRUITER_CALENDAR_FROM_NAV,
+  HIDE_RECRUITER_INTEGRATIONS_FROM_NAV,
   INTEGRATIONS_HONEST_NO_LIVE_ATS_SYNC,
   RECRUITER_ANALYTICS_SHIP_STATUS,
   RECRUITER_INTEGRATIONS_ROADMAP_STATUS,
@@ -64,6 +65,7 @@ test("2 seven-day-d3 flags — analytics live, integrations roadmap, collapsed n
   assert.equal(RECRUITER_ANALYTICS_SHIP_STATUS, "live");
   assert.equal(RECRUITER_INTEGRATIONS_ROADMAP_STATUS, "coming_soon");
   assert.equal(HIDE_RECRUITER_CALENDAR_FROM_NAV, true);
+  assert.equal(HIDE_RECRUITER_INTEGRATIONS_FROM_NAV, true);
   assert.equal(RECRUITER_WORKSPACE_NAV_COLLAPSED_DEFAULT, true);
   assert.equal(COLLAPSE_RECRUITER_DEMO_JOURNEYS, true);
   assert.equal(TALENT_RADAR_LIMITED_PILOT, true);
@@ -103,7 +105,10 @@ test("5 recruiter workspace nav — primary four, calendar hidden, collapsed ext
   assert.match(nav, /RECRUITER_PRIMARY_NAV_HREFS/);
   assert.match(nav, /RECRUITER_WORKSPACE_NAV_COLLAPSED_DEFAULT/);
   assert.match(nav, /HIDE_RECRUITER_CALENDAR_FROM_NAV/);
+  assert.match(nav, /HIDE_RECRUITER_INTEGRATIONS_FROM_NAV/);
   assert.match(nav, /data-recruiter-nav-primary/);
+  const extendedBlock = nav.split("const EXTENDED_TABS")[1]?.split("function isPrimaryHref")[0] ?? "";
+  assert.doesNotMatch(extendedBlock, /\/recruiter\/integrations/);
   assert.match(nav, /data-recruiter-nav-extended-toggle/);
   assert.match(nav, /data-recruiter-nav-extended-toggle/);
   const primaryBlock = nav.split("const EXTENDED_TABS")[0] ?? nav;

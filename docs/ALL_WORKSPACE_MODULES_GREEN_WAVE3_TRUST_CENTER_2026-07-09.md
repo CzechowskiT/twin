@@ -149,8 +149,8 @@ Copy (EN):
 
 | Module | Action | Status |
 |--------|--------|--------|
-| recruiter `integrations` | MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE | Planned Wave 3 Slice 2 |
-| company `integrations` | MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE | Planned Wave 3 Slice 2 |
+| recruiter `integrations` | MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE | **Done — Wave 3 Slice 2** |
+| company `integrations` | MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE | **Done — Wave 3 Slice 2** |
 | investor public login preview | MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE | Planned |
 
 ---

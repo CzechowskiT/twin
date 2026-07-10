@@ -8,6 +8,7 @@ import { useTranslation } from "@/components/language-provider";
 import type { TranslationKey } from "@/lib/i18n";
 import {
   HIDE_RECRUITER_CALENDAR_FROM_NAV,
+  HIDE_RECRUITER_INTEGRATIONS_FROM_NAV,
   RECRUITER_PRIMARY_NAV_HREFS,
   RECRUITER_WORKSPACE_NAV_COLLAPSED_DEFAULT,
 } from "@/lib/seven-day-d3-recruiter";
@@ -28,7 +29,6 @@ const EXTENDED_TABS: NavTab[] = [
   { href: "/recruiter/talent-radar", labelKey: "recruiterTalentRadar.navLink" },
   { href: "/recruiter/talent-pool", labelKey: "recruiterTalentPool.title" },
   { href: "/recruiter/talent-radar/digest", labelKey: "recruiterTalentRadarDigest.navLink" },
-  { href: "/recruiter/integrations", labelKey: "recruiterIntegrations.navLink" },
 ];
 
 function isPrimaryHref(href: string): boolean {
@@ -73,7 +73,9 @@ export function RecruiterWorkspaceNav() {
       </div>
       {expanded ? (
         <div className="mt-3 flex flex-wrap gap-2 border-t border-[var(--twin-border)]/60 pt-3" data-recruiter-nav-extended>
-          {EXTENDED_TABS.map((tab) => (
+          {EXTENDED_TABS.filter(
+            (tab) => !HIDE_RECRUITER_INTEGRATIONS_FROM_NAV || tab.href !== "/recruiter/integrations",
+          ).map((tab) => (
             <NavLink key={tab.href} tab={tab} pathname={pathname} />
           ))}
           {!HIDE_RECRUITER_CALENDAR_FROM_NAV ? (
