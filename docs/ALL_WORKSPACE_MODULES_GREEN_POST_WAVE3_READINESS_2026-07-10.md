@@ -13,12 +13,12 @@
 
 ## 1. Executive summary
 
-Wave 1–3 complete on scaffold. Static guards green after merge. **Prod frontend deploy pending** — founder authenticated smoke **not executed** on prod.
+Wave 1–3 complete on scaffold. Static guards green after merge. **Prod frontend aligned** to PR #443 merge SHA — founder authenticated smoke **not executed** on prod.
 
 ```
-POST_WAVE3_RECOMMENDATION: NOT_READY — prod PENDING_DEPLOY; recruiter/company credentials gap
+POST_WAVE3_RECOMMENDATION: NOT_READY — recruiter/company credentials gap; manual smoke pending
 FOUNDER_SMOKE_STATIC_PREP: READY_FOR_FOUNDER_SMOKE
-GATE_F_REVIEW: PENDING — blockers remain (credentials, prod deploy, manual smoke)
+GATE_F_REVIEW: PENDING — blockers remain (credentials, manual smoke)
 ```
 
 ---
@@ -35,7 +35,7 @@ GATE_F_REVIEW: PENDING — blockers remain (credentials, prod deploy, manual smo
 | **Base branch** | `cursor/phase1-monorepo-scaffold` |
 | **CI at merge** | backend-smoke PASS · frontend-build PASS · Vercel PASS |
 
-### 2.2 Prod alignment (checked 2026-07-10 morning)
+### 2.2 Prod alignment (checked 2026-07-10 afternoon)
 
 **Endpoint:** `GET https://twin-sooty.vercel.app/api/public-health`
 
@@ -43,13 +43,13 @@ GATE_F_REVIEW: PENDING — blockers remain (credentials, prod deploy, manual smo
 |-------|-------|
 | **status** | `ok` |
 | **db_ok** | `true` |
-| **frontend_commit** | `8335bf8523f04b6beb9b0939e795e416c9a661bc` |
+| **frontend_commit** | `e9cd074dada320713a94e77b28f905781ab7c3e2` |
 | **api_commit** | `ce5f61b91748b582f7c9f7768af8b9216bc31375` |
 | **merge SHA #443** | `e9cd074dada320713a94e77b28f905781ab7c3e2` |
-| **alignment_status** | **PENDING_DEPLOY** — Vercel frontend is parent of #443 (`8335bf85` = PR #442); does **not** include investor-login Wave 3 slice |
-| **polls** | 3× @ 5s interval — `frontend_commit` unchanged |
+| **alignment_status** | **ALIGNED** — Vercel frontend matches PR #443 merge SHA |
+| **polls** | 1× — `frontend_commit` = merge SHA |
 
-**Rule:** Do **not** run full founder smoke on prod or claim aligned until `frontend_commit` ≥ `e9cd074d`.
+**Rule:** Prod deploy pre-flight (P1) **PASS** — `frontend_commit` ≥ `e9cd074d`.
 
 ---
 
@@ -168,7 +168,7 @@ Run on scaffold @ post-#443 merge:
 |-------|--------|
 | Runbook doc complete (21 modules + 9 invariants) | **YES** |
 | Static guards green on scaffold | **YES** |
-| Prod deploy aligned to #443 | **NO** — PENDING_DEPLOY |
+| Prod deploy aligned to #443 | **YES** — ALIGNED |
 | Candidate credentials available | **YES** (`demo@twin.career`) |
 | Recruiter token in founder vault | **NO** |
 | Company access (token gate) | **NO** |
@@ -176,7 +176,7 @@ Run on scaffold @ post-#443 merge:
 | Demo seed on prod verified | **NEEDS_FOUNDER_AUTH_SMOKE** |
 | Manual smoke executed | **NO** |
 
-**Founder smoke readiness:** `NOT_READY` for prod execution — deploy + credentials blockers.
+**Founder smoke readiness:** `NOT_READY` for prod execution — credentials blockers remain.
 
 **Static prep readiness:** `READY_FOR_FOUNDER_SMOKE` — runbook and guards complete.
 
@@ -200,7 +200,7 @@ See [DEMO_LOGIN_FOR_FOUNDER.md](./DEMO_LOGIN_FOR_FOUNDER.md) — **no secrets lo
 
 | # | Blocker | Severity |
 |---|---------|----------|
-| B1 | Prod frontend not deployed to #443 merge SHA | **P0 for prod smoke** |
+| B1 | Prod frontend not deployed to #443 merge SHA | **CLOSED** — ALIGNED |
 | B2 | Recruiter/company token not in founder vault | **P1** — blocks M-R*, M-B* modules |
 | B3 | Founder manual smoke not executed (21 modules + 9 invariants) | **P1** — Gate F requires evidence |
 | B4 | Gate F founder decision still PENDING | **Expected** — not a regression |
@@ -215,8 +215,8 @@ See [DEMO_LOGIN_FOR_FOUNDER.md](./DEMO_LOGIN_FOR_FOUNDER.md) — **no secrets lo
 | **Launch GO** | **NO** | Explicit NO-GO — unchanged |
 | **Gate F YES** | **NO** | Manual smoke incomplete; founder decision pending |
 | **Gate F review prep** | **READY** | Wave 1–3 complete; static guards green; runbook ready |
-| **Founder smoke execution** | **NOT_READY** | PENDING_DEPLOY + credential gaps |
-| **Overall** | **NOT_READY** | Execute smoke after Vercel aligns + token provision |
+| **Founder smoke execution** | **NOT_READY** | Credential gaps + manual smoke pending |
+| **Overall** | **NOT_READY** | Execute smoke after token provision |
 
 ---
 
@@ -229,7 +229,7 @@ NOT_GATE_F_YES: true
 NOT_PHASE_3B: true
 WAVE3_COMPLETE: true
 PR_443_MERGE_SHA: e9cd074dada320713a94e77b28f905781ab7c3e2
-PROD_ALIGNMENT: PENDING_DEPLOY
+PROD_ALIGNMENT: ALIGNED
 FOUNDER_SMOKE_EXECUTED: false
 RECOMMENDATION: NOT_READY
 ```

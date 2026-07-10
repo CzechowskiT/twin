@@ -26,7 +26,7 @@ curl -sS https://twin-sooty.vercel.app/api/public-health | jq '{status,db_ok,fro
 | Pre | Criterion | PASS |
 | --- | --------- | ---- |
 | P0 | `status: ok`, `db_ok: true` | Required |
-| P1 | `frontend_commit` ≥ PR #443 merge SHA `e9cd074d` | Required — **PENDING_DEPLOY** until Vercel aligns |
+| P1 | `frontend_commit` ≥ PR #443 merge SHA `e9cd074d` | Required — **ALIGNED** (Vercel @ `e9cd074d`) |
 | P2 | Workspace hub shows **only** GREEN modules (no Pilot/Preview/Coming soon/Paused cards) | Required |
 
 **Prod URL:** https://twin-sooty.vercel.app
@@ -201,8 +201,8 @@ NOT_LAUNCH_GO: true
 NOT_GATE_F_YES: true
 NOT_PHASE_3B: true
 FOUNDER_SMOKE_EXECUTED: false
-FOUNDER_SMOKE_READINESS: NOT_READY — prod frontend_commit pending PR #443 deploy
-RECOMMENDATION: READY_FOR_FOUNDER_SMOKE — static prep complete; execute after Vercel aligns + recruiter token provisioned
+FOUNDER_SMOKE_READINESS: NOT_READY — recruiter/company credentials gap
+RECOMMENDATION: READY_FOR_FOUNDER_SMOKE — static prep complete; execute after recruiter token provisioned
 ```
 
 *No secrets in this doc — use founder creds from secure store only.*

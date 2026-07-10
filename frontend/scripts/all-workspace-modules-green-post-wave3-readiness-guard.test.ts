@@ -66,14 +66,14 @@ test("1 post-wave3 readiness doc exists with required sections", () => {
   assert.ok(content.length > 5000, "readiness doc must be substantive");
 });
 
-test("2 PR #443 merge SHA and prod alignment PENDING_DEPLOY", () => {
+test("2 PR #443 merge SHA and prod alignment ALIGNED", () => {
   const content = readinessDoc();
   assert.match(content, new RegExp(PR_443_MERGE_SHA));
   assert.match(content, /PR.*443|#443/);
-  assert.match(content, /PENDING_DEPLOY/);
+  assert.match(content, /ALIGNED/);
   assert.match(content, /public-health/);
   assert.match(content, /frontend_commit/);
-  assert.match(content, /8335bf85/);
+  assert.doesNotMatch(content, /PENDING_DEPLOY/);
 });
 
 test("3 wave 1-3 complete with wave3 docs on scaffold", () => {
