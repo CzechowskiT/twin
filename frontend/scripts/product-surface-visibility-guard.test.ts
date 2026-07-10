@@ -123,6 +123,8 @@ test("9 recruiter operational work queue hidden from default hub", () => {
 test("10 self-service delete hidden from default candidate hub", () => {
   const split = splitProductSurfaceRoutes("candidate", getSystemOfRecordRoutesForPersona("candidate"));
   assert.ok(split.hidden.some((r) => r.id === "candidate_revoke_delete"));
+  assert.ok(split.hidden.some((r) => r.id === "candidate_trust"));
+  assert.ok(!split.primary.some((r) => r.id === "candidate_trust"));
 });
 
 test("11 company workspace billing hidden; talent pool hidden in green mode", () => {

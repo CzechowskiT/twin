@@ -1,4 +1,5 @@
 import type { TranslationKey } from "@/lib/i18n";
+import { TRUST_CENTER_ROADMAP_OUTSIDE_HREF } from "@/lib/all-workspace-green-gate";
 
 /** Homepage Explore TWIN quick-entry cards — 10 existing public routes (Slice 17 → expanded Slice 19). */
 export type PublicExploreTwinEntryId =
@@ -53,7 +54,7 @@ export const PUBLIC_EXPLORE_TWIN_ENTRIES: readonly PublicExploreTwinEntry[] = [
   },
   {
     id: "trust",
-    href: "/dashboard/trust",
+    href: TRUST_CENTER_ROADMAP_OUTSIDE_HREF,
     titleKey: "home.exploreTwinTrustTitle",
     hintKey: "home.exploreTwinTrustHint",
   },

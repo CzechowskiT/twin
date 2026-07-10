@@ -12,6 +12,8 @@ import {
   SHIPPED_ITEMS,
   type RoadmapPhase,
 } from "@/lib/investor-founder-roadmap";
+import { TRUST_CENTER_ROADMAP_OUTSIDE_HREF } from "@/lib/all-workspace-green-gate";
+import { TRUST_CENTER_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE } from "@/lib/seven-day-d2-candidate";
 import type { TranslationKey } from "@/lib/i18n";
 
 function phaseTitleKey(phase: RoadmapPhase): TranslationKey {
@@ -68,6 +70,40 @@ export function InvestorRoadmapFounderUpdatesPanel() {
           ))}
         </div>
       </section>
+
+      {TRUST_CENTER_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE ? (
+        <section
+          id="candidate-trust-center"
+          aria-labelledby="candidate-trust-center-heading"
+          data-wave3-trust-center-roadmap
+        >
+          <h2
+            id="candidate-trust-center-heading"
+            className="mb-3 text-xs font-bold uppercase tracking-[0.22em] text-[var(--twin-muted)]"
+          >
+            {t("investorRoadmap.candidateTrustCenterRoadmapTitle")}
+          </h2>
+          <Card className="border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] p-5">
+            <p className="text-sm font-semibold text-[var(--foreground)]">
+              {t("investorRoadmap.candidateTrustCenterRoadmapLead")}
+            </p>
+            <p className="mt-2 text-sm leading-relaxed text-[var(--twin-muted-strong)]">
+              {t("investorRoadmap.candidateTrustCenterRoadmapBody")}
+            </p>
+            <div className="mt-4 flex flex-wrap gap-4 text-sm">
+              <Link href="/privacy" className="twin-link font-medium">
+                {t("investorRoadmap.candidateTrustCenterRoadmapPrivacyLink")}
+              </Link>
+              <Link href="/terms" className="twin-link font-medium">
+                {t("investorRoadmap.candidateTrustCenterRoadmapTermsLink")}
+              </Link>
+              <Link href={TRUST_CENTER_ROADMAP_OUTSIDE_HREF} className="twin-link font-medium">
+                {t("profile.trustRoadmapLink")}
+              </Link>
+            </div>
+          </Card>
+        </section>
+      ) : null}
 
       <div className="grid gap-6 lg:grid-cols-2">
         <section aria-labelledby="recently-shipped-heading">

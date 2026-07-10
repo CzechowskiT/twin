@@ -1114,6 +1114,26 @@ export default function ProfilePage() {
             {saving ? t("profile.saving") : t("profile.submit")}
           </Button>
         </form>
+        <section
+          className="mt-6 rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/30 p-4"
+          data-profile-privacy-controls
+        >
+          <h2 className="text-sm font-semibold text-[var(--foreground)]">{t("profile.privacyControlsTitle")}</h2>
+          <p className="twin-muted mt-1 text-xs leading-relaxed">{t("profile.privacyControlsLead")}</p>
+          <p className="twin-muted mt-2 text-xs leading-relaxed">{t("profile.privacyExportHint")}</p>
+          <p className="twin-muted mt-2 text-xs leading-relaxed">{t("profile.privacyDeleteHint")}</p>
+          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+            <Link href="/privacy" className="twin-link">
+              {t("profile.privacyPolicyLink")}
+            </Link>
+            <Link href="/terms" className="twin-link">
+              {t("profile.termsLink")}
+            </Link>
+            <Link href="/dashboard/identity" className="twin-link">
+              {t("dashboard.identityLink")}
+            </Link>
+          </div>
+        </section>
         <p className="twin-muted mt-4 text-center text-sm">
           <Link href="/dashboard/identity" className="twin-link mr-3">
             {t("dashboard.identityLink")}

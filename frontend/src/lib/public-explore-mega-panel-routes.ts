@@ -1,4 +1,5 @@
 import type { TranslationKey } from "@/lib/i18n";
+import { TRUST_CENTER_ROADMAP_OUTSIDE_HREF } from "@/lib/all-workspace-green-gate";
 
 /** Desktop/mobile Explore TWIN mega-panel — existing public routes only. */
 export type ExploreMegaPanelLink = {
@@ -47,7 +48,7 @@ export const HEADER_EXPLORE_MEGA_PANEL_GROUPS: readonly ExploreMegaPanelGroup[] 
     id: "trust",
     titleKey: "nav.exploreGroupTrust",
     links: [
-      { href: "/dashboard/trust", labelKey: "site.footerTrustCenter" },
+      { href: TRUST_CENTER_ROADMAP_OUTSIDE_HREF, labelKey: "site.footerTrustCenter" },
       { href: "/status", labelKey: "site.footerStatus" },
     ],
   },

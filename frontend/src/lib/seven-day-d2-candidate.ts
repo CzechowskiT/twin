@@ -35,6 +35,11 @@ export const HIDE_CANDIDATE_REFERRALS_FROM_HUB = true;
 /** Wave 1 — trust center card hidden from workspace hub (route preserved). */
 export const HIDE_CANDIDATE_TRUST_CENTER_FROM_HUB = true;
 
+/** Wave 3 — trust center on product roadmap outside workspace; core privacy stays in profile/settings. */
+export const TRUST_CENTER_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE = true;
+
+export { TRUST_CENTER_ROADMAP_OUTSIDE_HREF } from "@/lib/all-workspace-green-gate";
+
 /** Billing/plan hidden from candidate hub primary surface. */
 export const HIDE_CANDIDATE_BILLING_FROM_HUB = true;
 
