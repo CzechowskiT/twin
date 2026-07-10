@@ -19,7 +19,7 @@ import {
   type InvestorModuleKey,
   type PublicHealthSnapshot,
 } from "@/lib/investor-metrics-reality";
-import { INVESTOR_METRICS_CONTROLLED_PREVIEW } from "@/lib/seven-day-d5-investor";
+import { INVESTOR_METRICS_CONTROLLED_PREVIEW, INVESTOR_METRICS_SHIP_STATUS } from "@/lib/seven-day-d5-investor";
 
 function ModuleList({ marker, keys, tone }: { marker: string; keys: readonly InvestorModuleKey[]; tone: "live" | "demo" | "notLive" }) {
   const { t } = useTranslation();
@@ -73,7 +73,7 @@ export function InvestorMetricsRealityDashboard() {
   const nightlyPaused = health?.celery?.nightly_auto_apply_beat_enabled !== true;
 
   return (
-    <Shell wide>
+    <Shell wide data-wave2b-investor-metrics-green={INVESTOR_METRICS_SHIP_STATUS}>
       <div className="mx-auto max-w-5xl" data-testid={INVESTOR_METRICS_VISUAL_MARKERS.page}>
         <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-[var(--twin-accent)]">{t("investorMetrics.eyebrow")}</p>
         <h1 className="twin-page-intro mt-2 text-2xl font-semibold sm:text-3xl">{t("investorMetrics.title")}</h1>
