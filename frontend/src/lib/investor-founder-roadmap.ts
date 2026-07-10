@@ -1,7 +1,16 @@
 export type RoadmapPhase = "now" | "next" | "later";
 export const ROADMAP_PHASES = [
   { phase: "now" as const, items: ["nowH5cSlot1", "nowFounderQa", "nowRecruiterPilot", "nowI18nCoverage"] as const },
-  { phase: "next" as const, items: ["nextGoSmallDecision", "nextRecruiterCalendar", "nextMoreBoards", "nextBillingRollout"] as const },
+  {
+    phase: "next" as const,
+    items: [
+      "nextCandidateTrustCenter",
+      "nextGoSmallDecision",
+      "nextRecruiterCalendar",
+      "nextMoreBoards",
+      "nextBillingRollout",
+    ] as const,
+  },
   { phase: "later" as const, items: ["laterPublicLaunch", "laterAutoApply", "laterAtsWebhooks", "laterAuditedFinancials"] as const },
 ];
 export const SHIPPED_ITEMS = ["shippedRecruiterInbox","shippedGlobalChromeI18n","shippedCandidateCalendar","shippedCspEnforce","shippedH5bPass","shippedPremiumPolish"] as const;

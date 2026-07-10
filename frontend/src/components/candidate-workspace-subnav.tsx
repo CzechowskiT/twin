@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useTranslation } from "@/components/language-provider";
 import { candidateCalendarHref } from "@/lib/persona-access";
+import { TRUST_CENTER_ROADMAP_OUTSIDE_HREF } from "@/lib/all-workspace-green-gate";
+import { TRUST_CENTER_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE } from "@/lib/seven-day-d2-candidate";
 
 const navClass =
   "twin-workspace-subnav flex min-w-0 max-w-full flex-wrap items-center gap-x-3 gap-y-2 text-sm sm:gap-x-4";
@@ -16,7 +18,7 @@ type CandidateWorkspaceSubnavProps = {
   exportJsonBusy?: boolean;
 };
 
-/** Account workspace links (profile, compass, billing, …) — one scrollable row like the site header. */
+/** Green-only account workspace links — no trust_center pilot module chrome. */
 export function CandidateWorkspaceSubnav({
   ariaLabel,
   onExportJson,
@@ -25,7 +27,7 @@ export function CandidateWorkspaceSubnav({
   const { t } = useTranslation();
 
   return (
-    <nav className={navClass} aria-label={ariaLabel}>
+    <nav className={navClass} aria-label={ariaLabel} data-candidate-workspace-subnav-green-only>
       <Link href="/profile" className={itemClass}>
         {t("nav.profile")}
       </Link>
@@ -38,30 +40,20 @@ export function CandidateWorkspaceSubnav({
       <Link href="/dashboard/career" className={itemClass}>
         {t("dashboard.careerCompassLink")}
       </Link>
-      <Link href="/dashboard/billing" className={itemClass}>
-        {t("dashboard.billingLink")}
-      </Link>
-      <Link href="/dashboard/referrals" className={itemClass}>
-        {t("dashboard.referralsLink")}
-      </Link>
       <Link href="/dashboard/identity" className={itemClass}>
         {t("dashboard.identityLink")}
-      </Link>
-      <Link href="/dashboard/trust/identity-verification" className={itemClass}>
-        {t("workspaceModules.candidateIdentityVerificationTitle")}
-      </Link>
-      <Link href="/dashboard/trust" className={itemClass}>
-        {t("workspaceModules.candidateTrustCenterTitle")}
-      </Link>
-      <Link href="/dashboard/trust/controls" className={itemClass}>
-        {t("workspaceModules.candidateControlCenterTitle")}
       </Link>
       <Link href={candidateCalendarHref()} className={itemClass}>
         {t("dashboard.calendarLink")}
       </Link>
-      <Link href="/dashboard/settings/auto-apply" className={itemClass}>
-        {t("dashboard.nightlyAutoApplyLink")}
+      <Link href="/privacy" className={itemClass}>
+        {t("profile.privacyPolicyLink")}
       </Link>
+      {TRUST_CENTER_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE ? (
+        <Link href={TRUST_CENTER_ROADMAP_OUTSIDE_HREF} className={itemClass}>
+          {t("profile.trustRoadmapLink")}
+        </Link>
+      ) : null}
       {onExportJson ? (
         <button
           type="button"

@@ -176,6 +176,31 @@ export const WAVE2B_INVESTOR_CORE_ALWAYS_IN_HUB = true as const;
 /** Same as Wave 2B slice 3 effective hidden — investor core was never in WAVE1_HIDDEN list. */
 export const WAVE2B_SLICE4_EFFECTIVE_HIDDEN_WORKSPACE_CARD_COUNT = WAVE2B_EFFECTIVE_HIDDEN_WORKSPACE_CARD_COUNT;
 
+/** Wave 3 slice 1 — candidate trust center moved to product roadmap outside workspace. */
+export const WAVE3_MOVE_TO_ROADMAP_MODULE_ID = "trust_center" as const;
+
+export const WAVE3_MOVE_TO_ROADMAP_ACTION = "MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE" as const;
+
+export const WAVE3_MOVE_TO_ROADMAP_SOR_IDS = [
+  "candidate_trust",
+  "trust_center",
+  "candidate_trust_overview",
+  "candidate_control_center",
+  "candidate_export_preview",
+  "candidate_correction_request",
+  "candidate_identity_verification",
+  "candidate_data_portability",
+  "candidate_trust_audit_export",
+  "candidate_consent_receipt",
+  "candidate_revoke_delete",
+] as const;
+
+/** Public roadmap anchor — advanced trust workflows; routes preserved for deep links. */
+export const TRUST_CENTER_ROADMAP_OUTSIDE_HREF = "/investor/roadmap#candidate-trust-center" as const;
+
+/** Unchanged from Wave 2B — trust_center was already in WAVE1_HIDDEN. */
+export const WAVE3_EFFECTIVE_HIDDEN_WORKSPACE_CARD_COUNT = WAVE2B_SLICE4_EFFECTIVE_HIDDEN_WORKSPACE_CARD_COUNT;
+
 export function isWorkspaceGreenVisible(persona: MarketingPersona, moduleId: string): boolean {
   if (!WORKSPACE_GREEN_ONLY_MODE) return true;
   return ALLOWED_BY_PERSONA[persona].has(moduleId);

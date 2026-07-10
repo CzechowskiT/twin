@@ -16,6 +16,7 @@ import {
   SYSTEM_OF_RECORD_HUB_MARKER,
   SYSTEM_OF_RECORD_ROUTES,
 } from "../src/lib/system-of-record-routes";
+import { splitProductSurfaceRoutes } from "../src/lib/product-surface-visibility";
 import { dictionaries, en, LOCALES } from "../src/lib/i18n";
 import type { MarketingPersona } from "../src/lib/marketing-persona";
 
@@ -99,12 +100,11 @@ test("2 candidate hub includes panel jobs matches career compass profile cv appl
   }
 });
 
-test("2b candidate career compass is pilot read-only — no live-action CTA", () => {
+test("2b candidate career compass is live — static framework, no pilot CTA", () => {
   const route = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "candidate_career_compass");
   assert.ok(route);
-  assert.equal(route!.status, "pilot");
+  assert.equal(route!.status, "live");
   assert.equal(route!.href, "/dashboard/career");
-  assert.ok(route!.boundaryTags.includes("pilot"));
   assert.ok(route!.hintKey);
 });
 
@@ -391,4 +391,13 @@ test("17 non-investor hubs split live primary from collapsed pilot roadmap", () 
     const count = getSystemOfRecordRoutesForPersona(persona).length;
     assert.ok(count >= 8, persona);
   }
+});
+
+test("18 wave3 — candidate trust SoR hidden from primary hub, routes preserved", () => {
+  const split = splitProductSurfaceRoutes("candidate", getSystemOfRecordRoutesForPersona("candidate"));
+  assert.ok(split.hidden.some((r) => r.id === "candidate_trust"));
+  assert.ok(!split.primary.some((r) => r.id === "candidate_trust"));
+  assert.equal(split.roadmap.length, 0);
+  const trust = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "candidate_trust");
+  assert.equal(trust?.href, "/dashboard/trust");
 });

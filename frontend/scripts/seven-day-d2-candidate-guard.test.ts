@@ -21,7 +21,9 @@ import {
   SHOW_DASHBOARD_EXTENDED_HOME_MODULES,
   TRUST_CENTER_OVERVIEW_MODE,
   TRUST_CENTER_ROADMAP_STATUS,
+  TRUST_CENTER_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE,
 } from "../src/lib/seven-day-d2-candidate";
+import { TRUST_CENTER_ROADMAP_OUTSIDE_HREF } from "../src/lib/all-workspace-green-gate";
 import {
   classifyProductSurfaceTier,
   shouldHideFromDefaultHub,
@@ -163,4 +165,14 @@ test("12 npm script test:seven-day-d2-candidate-guard registered", () => {
   const pkg = read("package.json");
   assert.match(pkg, /"test:seven-day-d2-candidate-guard":/);
   assert.match(pkg, /seven-day-d2-candidate-guard\.test\.ts/);
+});
+
+test("13 wave3 — trust center moved to roadmap outside workspace", () => {
+  assert.equal(TRUST_CENTER_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE, true);
+  assert.equal(TRUST_CENTER_ROADMAP_OUTSIDE_HREF, "/investor/roadmap#candidate-trust-center");
+  const subnav = read("src/components/candidate-workspace-subnav.tsx");
+  assert.match(subnav, /data-candidate-workspace-subnav-green-only/);
+  assert.doesNotMatch(subnav, /href="\/dashboard\/trust"/);
+  const profile = read("src/app/profile/page.tsx");
+  assert.match(profile, /data-profile-privacy-controls/);
 });
