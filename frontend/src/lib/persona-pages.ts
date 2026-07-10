@@ -327,6 +327,7 @@ const recruitersEn: PersonaBundle = {
   logistics: [
     "Live: `/recruiter/inbox` (token), match scores, batch respond, `/recruiter/jobs` POST.",
     "Roadmap / not shipped: watchlists, HM packets, governance presets, employer SSO.",
+    "Integrations (ATS, calendar, webhooks, OAuth): product roadmap only — no live sync in pilot. See /investor/roadmap#recruiter-integrations.",
     "Talent pool browse for recruiters is anonymized by design — separate from inbox application review.",
   ],
   primaryCta: { label: "Open recruiter inbox", href: "/recruiter/inbox" },
@@ -403,6 +404,7 @@ const recruitersPl: PersonaBundle = {
   logistics: [
     "Live: `/recruiter/inbox` (token), wyniki dopasowania, batch respond, POST `/recruiter/jobs`.",
     "Roadmapa / nieshipowane: watchlisty, paczki HM, presety zgodności, SSO pracodawcy.",
+    "Integracje (ATS, kalendarz, webhooki, OAuth): tylko roadmapa produktu — brak live sync w pilocie. Zobacz /investor/roadmap#recruiter-integrations.",
     "Przegląd puli talentów dla rekruterów jest anonimizowany — osobno od przeglądu aplikacji w skrzynce.",
   ],
   primaryCta: { label: "Otwórz skrzynkę rekrutera", href: "/recruiter/inbox" },
@@ -425,7 +427,7 @@ const companiesEn: PersonaBundle = {
     },
     {
       title: "Delivery & SLA",
-      body: "Named CSM, uptime targets on paid integrations, quarterly business reviews, and custom board contracts when volume warrants. Not the same support queue as Premium candidates.",
+      body: "Named CSM, uptime targets on contractually named integrations (roadmap — not live today), quarterly business reviews, and custom board contracts when volume warrants. Not the same support queue as Premium candidates.",
     },
   ],
   pricingTitle: "Company programs (annual)",
@@ -518,6 +520,7 @@ const companiesEn: PersonaBundle = {
   logistics: [
     "Company programs anchor on procurement, residency, and ROI, not on per-sourcer packet volume.",
     "Candidate marketing SKUs never include SSO or custom DPA unless upgraded through this lane.",
+    "ATS, calendar, webhook, and OAuth integrations are on the product roadmap — see /investor/roadmap#company-integrations.",
     "Calculator output remains illustrative; legal and financial sign-off stays with your teams.",
   ],
   primaryCta: { label: "Open company dashboard", href: "/company/dashboard" },
@@ -662,7 +665,7 @@ const companiesPl: PersonaBundle = {
     },
     {
       title: "Dostawa i SLA",
-      body: "Nazwany CSM, cele uptime na płatnych integracjach, QBR i kontrakty na portale przy wolumenie. Inna kolejka niż support Premium dla kandydatów.",
+      body: "Nazwany CSM, cele uptime na umownie nazwanych integracjach (roadmapa — nie live dziś), QBR i kontrakty na portale przy wolumenie. Inna kolejka niż support Premium dla kandydatów.",
     },
   ],
   pricingTitle: "Programy dla firm (rocznie)",
@@ -755,6 +758,7 @@ const companiesPl: PersonaBundle = {
   logistics: [
     "Program firmowy kotwiczy w procurement, residency i ROI, a nie w liczbie paczek sourcerskich.",
     "SKU kandydata nie obejmuje SSO ani custom DPA bez przejścia tę ścieżką.",
+    "Integracje ATS, kalendarza, webhooków i OAuth są na roadmapie produktu — zobacz /investor/roadmap#company-integrations.",
     "Wynik kalkulatora pozostaje ilustracyjny; akceptacja prawno-finansowa pozostaje po stronie klienta.",
   ],
   primaryCta: { label: "Otwórz panel firmy", href: "/company/dashboard" },

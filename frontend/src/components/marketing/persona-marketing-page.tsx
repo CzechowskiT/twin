@@ -8,6 +8,10 @@ import { CompanyWorkspacePreview } from "@/components/marketing/company-workspac
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { TalentPoolPreview } from "@/components/marketing/talent-pool-preview";
 import { getPersonaBundle, type PersonaId } from "@/lib/persona-pages";
+import {
+  COMPANY_INTEGRATIONS_ROADMAP_OUTSIDE_HREF,
+  RECRUITER_INTEGRATIONS_ROADMAP_OUTSIDE_HREF,
+} from "@/lib/all-workspace-green-gate";
 import { COMPANY_ENTRY_MARKERS } from "@/lib/company-entry-navigation";
 
 export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
@@ -130,6 +134,35 @@ export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
 
         {persona === "recruiters" || persona === "companies" ? (
           <TalentPoolPreview />
+        ) : null}
+
+        {persona === "recruiters" || persona === "companies" ? (
+          <section
+            aria-labelledby="persona-integrations-roadmap"
+            className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/90 p-5 text-start"
+            data-wave3-integrations-marketing-roadmap
+          >
+            <h2 id="persona-integrations-roadmap" className="twin-section-title text-lg sm:text-xl">
+              {t("workspaceModules.recruiterIntegrationsTitle")}
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[var(--twin-muted-strong)] sm:text-base">
+              {t("persona.integrationsRoadmapNote")}
+            </p>
+            <p className="mt-4 text-sm">
+              <Link
+                href={
+                  persona === "recruiters"
+                    ? RECRUITER_INTEGRATIONS_ROADMAP_OUTSIDE_HREF
+                    : COMPANY_INTEGRATIONS_ROADMAP_OUTSIDE_HREF
+                }
+                className="twin-link font-semibold"
+              >
+                {persona === "recruiters"
+                  ? t("persona.integrationsRoadmapLinkRecruiter")
+                  : t("persona.integrationsRoadmapLinkCompany")}
+              </Link>
+            </p>
+          </section>
         ) : null}
 
         {persona === "companies" ? <CompanyWorkspacePreview /> : null}

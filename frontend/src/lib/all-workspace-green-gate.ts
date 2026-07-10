@@ -201,6 +201,31 @@ export const TRUST_CENTER_ROADMAP_OUTSIDE_HREF = "/investor/roadmap#candidate-tr
 /** Unchanged from Wave 2B — trust_center was already in WAVE1_HIDDEN. */
 export const WAVE3_EFFECTIVE_HIDDEN_WORKSPACE_CARD_COUNT = WAVE2B_SLICE4_EFFECTIVE_HIDDEN_WORKSPACE_CARD_COUNT;
 
+/** Wave 3 slice 2 — recruiter integrations moved to product roadmap outside workspace. */
+export const WAVE3_SLICE2_RECRUITER_INTEGRATIONS_MODULE_ID = "integrations" as const;
+
+export const WAVE3_SLICE2_COMPANY_INTEGRATIONS_MODULE_ID = "integrations" as const;
+
+export const WAVE3_SLICE2_MOVE_TO_ROADMAP_ACTION = "MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE" as const;
+
+export const WAVE3_SLICE2_RECRUITER_INTEGRATIONS_SOR_IDS = [
+  "recruiter_integrations",
+  "recruiter_ats_import_readiness",
+] as const;
+
+export const WAVE3_SLICE2_COMPANY_INTEGRATIONS_SOR_IDS = [
+  "company_integrations",
+  "company_ats_import_readiness",
+] as const;
+
+/** Public roadmap anchors — integration readiness previews; routes preserved for deep links. */
+export const RECRUITER_INTEGRATIONS_ROADMAP_OUTSIDE_HREF = "/investor/roadmap#recruiter-integrations" as const;
+
+export const COMPANY_INTEGRATIONS_ROADMAP_OUTSIDE_HREF = "/investor/roadmap#company-integrations" as const;
+
+/** Unchanged from Wave 3 slice 1 — integrations were already in WAVE1_HIDDEN. */
+export const WAVE3_SLICE2_EFFECTIVE_HIDDEN_WORKSPACE_CARD_COUNT = WAVE3_EFFECTIVE_HIDDEN_WORKSPACE_CARD_COUNT;
+
 export function isWorkspaceGreenVisible(persona: MarketingPersona, moduleId: string): boolean {
   if (!WORKSPACE_GREEN_ONLY_MODE) return true;
   return ALLOWED_BY_PERSONA[persona].has(moduleId);

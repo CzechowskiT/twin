@@ -22,6 +22,14 @@ export const COMPANY_INTEGRATIONS_ROADMAP_STATUS = "coming_soon" as const;
 /** Wave 1 — integrations hidden from workspace hub (route preserved). */
 export const HIDE_COMPANY_INTEGRATIONS_FROM_HUB = true;
 
+/** Wave 3 slice 2 — integrations on product roadmap outside workspace; deep link route preserved. */
+export const COMPANY_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE = true;
+
+/** Wave 3 — integrations removed from extended workspace nav. */
+export const HIDE_COMPANY_INTEGRATIONS_FROM_NAV = true;
+
+export { COMPANY_INTEGRATIONS_ROADMAP_OUTSIDE_HREF } from "@/lib/all-workspace-green-gate";
+
 /** Integrations page honest boundary — no live ATS/marketplace sync. */
 export const INTEGRATIONS_HONEST_NO_LIVE_ATS_SYNC = true;
 

@@ -7,11 +7,13 @@ import { useTranslation } from "@/components/language-provider";
 import { IntegrationRowStatusBadge } from "@/components/workspace/integration-row-status-badge";
 import { WorkspacePilotPageHeader } from "@/components/workspace/workspace-pilot-page-header";
 import type { TranslationKey } from "@/lib/i18n";
+import { RECRUITER_INTEGRATIONS_ROADMAP_OUTSIDE_HREF } from "@/lib/all-workspace-green-gate";
 import { Shell } from "@/components/ui";
 import {
   RECRUITER_INTEGRATION_ROWS,
 } from "@/lib/recruiter-integrations-readiness";
 import {
+  RECRUITER_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE,
   RECRUITER_INTEGRATIONS_ROADMAP_STATUS,
 } from "@/lib/seven-day-d3-recruiter";
 import {
@@ -32,7 +34,7 @@ export default function RecruiterIntegrationsClient() {
   const { t } = useTranslation();
 
   return (
-    <Shell wide data-seven-day-recruiter-integrations data-seven-day-d6-recruiter-integrations>
+    <Shell wide data-seven-day-recruiter-integrations data-seven-day-d6-recruiter-integrations data-wave3-recruiter-integrations-roadmap>
       <RecruiterWorkspaceNav />
       <WorkspacePilotPageHeader
         eyebrowKey="recruiterIntegrations.eyebrow"
@@ -40,6 +42,11 @@ export default function RecruiterIntegrationsClient() {
         leadKey="recruiterIntegrations.lead"
         status={RECRUITER_INTEGRATIONS_ROADMAP_STATUS}
       />
+      {RECRUITER_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE ? (
+        <p className="twin-muted mb-4 text-sm leading-relaxed" data-wave3-integrations-outside-workspace>
+          {t("recruiterIntegrations.outsideWorkspaceNote")}
+        </p>
+      ) : null}
       {RECRUITER_INTEGRATIONS_HONEST_NO_LIVE_ATS_SYNC ? (
         <p className="twin-muted mb-4 text-sm leading-relaxed" data-seven-day-integrations-roadmap-boundary>
           {t("recruiterIntegrations.roadmapBoundary")}
@@ -78,6 +85,13 @@ export default function RecruiterIntegrationsClient() {
       </ul>
 
       <p className="twin-muted mt-8 text-xs leading-relaxed">{t("recruiterIntegrations.scopeNote")}</p>
+      {RECRUITER_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE ? (
+        <p className="mt-4 text-sm">
+          <Link href={RECRUITER_INTEGRATIONS_ROADMAP_OUTSIDE_HREF} className="twin-link font-medium">
+            {t("recruiterIntegrations.roadmapLink")}
+          </Link>
+        </p>
+      ) : null}
     </Shell>
   );
 }

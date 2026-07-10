@@ -5,14 +5,14 @@ import { PersonaWorkspaceGate } from "@/components/persona-workspace-gate";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { INVESTOR_ROADMAP_CONTROLLED_PREVIEW, INVESTOR_ROADMAP_SHIP_STATUS } from "@/lib/seven-day-d5-investor";
-import { WAVE3_MOVE_TO_ROADMAP_MODULE_ID } from "@/lib/all-workspace-green-gate";
+import { WAVE3_MOVE_TO_ROADMAP_MODULE_ID, WAVE3_SLICE2_RECRUITER_INTEGRATIONS_MODULE_ID } from "@/lib/all-workspace-green-gate";
 
 export default function InvestorRoadmapPage() {
   const { t } = useTranslation();
 
   return (
     <PersonaWorkspaceGate allowed={["investor"]} surface="investor">
-      <Shell wide data-wave2b-investor-roadmap-green={INVESTOR_ROADMAP_SHIP_STATUS} data-wave3-trust-center-roadmap={WAVE3_MOVE_TO_ROADMAP_MODULE_ID}>
+      <Shell wide data-wave2b-investor-roadmap-green={INVESTOR_ROADMAP_SHIP_STATUS} data-wave3-trust-center-roadmap={WAVE3_MOVE_TO_ROADMAP_MODULE_ID} data-wave3-integrations-roadmap={WAVE3_SLICE2_RECRUITER_INTEGRATIONS_MODULE_ID}>
         <header className="mb-8 space-y-2">
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
             {t("investorRoadmap.eyebrow")}

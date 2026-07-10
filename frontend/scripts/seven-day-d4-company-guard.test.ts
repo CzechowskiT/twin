@@ -18,6 +18,7 @@ import {
   COMPANY_WORKSPACE_NAV_COLLAPSED_DEFAULT,
   DELEGATED_APPLY_NOT_LIVE_IN_COMPANY_UI,
   HIDE_COMPANY_BILLING_FROM_NAV,
+  HIDE_COMPANY_INTEGRATIONS_FROM_NAV,
   HIRING_COCKPIT_LIMITED_PILOT,
   INTEGRATIONS_HONEST_NO_LIVE_ATS_SYNC,
   SHOW_COMPANY_HUB_NEXT_ACTION,
@@ -78,6 +79,7 @@ test("2 seven-day-d4 flags — hub next action, integrations roadmap, collapsed 
   assert.equal(COMPANY_HUB_NEXT_ACTION_HREF, "/company/roles");
   assert.equal(COMPANY_INTEGRATIONS_ROADMAP_STATUS, "coming_soon");
   assert.equal(HIDE_COMPANY_BILLING_FROM_NAV, true);
+  assert.equal(HIDE_COMPANY_INTEGRATIONS_FROM_NAV, true);
   assert.equal(COMPANY_WORKSPACE_NAV_COLLAPSED_DEFAULT, true);
   assert.equal(COLLAPSE_COMPANY_DEMO_JOURNEYS, true);
   assert.equal(TALENT_POOL_LIMITED_PILOT, true);
@@ -113,7 +115,10 @@ test("5 company workspace nav — primary three, billing hidden, collapsed exten
   assert.match(nav, /COMPANY_PRIMARY_NAV_HREFS/);
   assert.match(nav, /COMPANY_WORKSPACE_NAV_COLLAPSED_DEFAULT/);
   assert.match(nav, /HIDE_COMPANY_BILLING_FROM_NAV/);
+  assert.match(nav, /HIDE_COMPANY_INTEGRATIONS_FROM_NAV/);
   assert.match(nav, /data-company-nav-primary/);
+  const extendedBlock = nav.split("const EXTENDED_TABS")[1]?.split("function isPrimaryHref")[0] ?? "";
+  assert.doesNotMatch(extendedBlock, /\/company\/integrations/);
   assert.match(nav, /data-company-nav-extended-toggle/);
   const primaryBlock = nav.split("const EXTENDED_TABS")[0] ?? nav;
   assert.doesNotMatch(primaryBlock, /\/company\/billing/);

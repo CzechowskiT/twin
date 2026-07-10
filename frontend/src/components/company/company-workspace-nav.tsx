@@ -18,6 +18,7 @@ import {
   COMPANY_PRIMARY_NAV_HREFS,
   COMPANY_WORKSPACE_NAV_COLLAPSED_DEFAULT,
   HIDE_COMPANY_BILLING_FROM_NAV,
+  HIDE_COMPANY_INTEGRATIONS_FROM_NAV,
 } from "@/lib/seven-day-d4-company";
 
 type NavTab = { href: string; labelKey: TranslationKey };
@@ -32,7 +33,6 @@ const PRIMARY_TABS: NavTab[] = [
 const EXTENDED_TABS: NavTab[] = [
   { href: COMPANY_HIRING_COCKPIT_ROUTE, labelKey: "companyHiringCockpit.navLink" },
   { href: COMPANY_HIRING_COMMAND_CENTER_ROUTE, labelKey: "companyHiringCommandCenter.navLink" },
-  { href: COMPANY_INTEGRATIONS_ROUTE, labelKey: "companyIntegrations.navLink" },
   { href: COMPANY_TEAM_ROUTE, labelKey: "companyTeam.navTeam" },
   { href: "/calculator/b2b", labelKey: "companyTeam.navCalculator" },
   { href: "/recruiter/inbox", labelKey: "companyJobs.navInbox" },
@@ -68,9 +68,10 @@ export function CompanyWorkspaceNav() {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(!COMPANY_WORKSPACE_NAV_COLLAPSED_DEFAULT);
 
-  const extendedTabs = HIDE_COMPANY_BILLING_FROM_NAV
+  const extendedTabs = (HIDE_COMPANY_BILLING_FROM_NAV
     ? EXTENDED_TABS
-    : [...EXTENDED_TABS, { href: COMPANY_BILLING_ROUTE, labelKey: "companyBilling.navBilling" as TranslationKey }];
+    : [...EXTENDED_TABS, { href: COMPANY_BILLING_ROUTE, labelKey: "companyBilling.navBilling" as TranslationKey }]
+  ).filter((tab) => !HIDE_COMPANY_INTEGRATIONS_FROM_NAV || tab.href !== COMPANY_INTEGRATIONS_ROUTE);
 
   return (
     <nav
