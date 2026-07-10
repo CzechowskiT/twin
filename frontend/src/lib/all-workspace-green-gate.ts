@@ -226,6 +226,19 @@ export const COMPANY_INTEGRATIONS_ROADMAP_OUTSIDE_HREF = "/investor/roadmap#comp
 /** Unchanged from Wave 3 slice 1 — integrations were already in WAVE1_HIDDEN. */
 export const WAVE3_SLICE2_EFFECTIVE_HIDDEN_WORKSPACE_CARD_COUNT = WAVE3_EFFECTIVE_HIDDEN_WORKSPACE_CARD_COUNT;
 
+/** Wave 3 slice 3 — investor public login preview moved to product roadmap outside workspace. */
+export const WAVE3_SLICE3_INVESTOR_LOGIN_MODULE_ID = "login" as const;
+
+export const WAVE3_SLICE3_MOVE_TO_ROADMAP_ACTION = "MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE" as const;
+
+export const WAVE3_SLICE3_INVESTOR_LOGIN_SOR_IDS = ["login", "investor_login"] as const;
+
+/** Public roadmap anchor — invite-only investor access; /login/investor deep link preserved. */
+export const INVESTOR_LOGIN_ROADMAP_OUTSIDE_HREF = "/investor/roadmap#investor-public-login" as const;
+
+/** Unchanged from Wave 3 slice 2 — login preview was never in WAVE1_HIDDEN card audit. */
+export const WAVE3_SLICE3_EFFECTIVE_HIDDEN_WORKSPACE_CARD_COUNT = WAVE3_SLICE2_EFFECTIVE_HIDDEN_WORKSPACE_CARD_COUNT;
+
 export function isWorkspaceGreenVisible(persona: MarketingPersona, moduleId: string): boolean {
   if (!WORKSPACE_GREEN_ONLY_MODE) return true;
   return ALLOWED_BY_PERSONA[persona].has(moduleId);

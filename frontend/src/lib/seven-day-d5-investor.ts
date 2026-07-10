@@ -73,3 +73,17 @@ export const INVESTOR_PRIMARY_MODULE_IDS = [
 
 /** Wave 1 — pilot/preview modules hidden from workspace hub (routes preserved). */
 export const INVESTOR_ROADMAP_MODULE_IDS = [] as const;
+
+/** Investor public login preview — invite-only, not a live self-service onboarding path. */
+export const INVESTOR_PUBLIC_LOGIN_ROADMAP_STATUS = "coming_soon" as const;
+
+/** Wave 3 slice 3 — login preview card hidden from public investor room grid. */
+export const HIDE_INVESTOR_PUBLIC_LOGIN_FROM_PREVIEW = true;
+
+/** Wave 3 slice 3 — investor login on product roadmap outside workspace; deep link route preserved. */
+export const INVESTOR_PUBLIC_LOGIN_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE = true;
+
+/** Login hub investor zone — roadmap anchor, not primary self-service sign-in CTA. */
+export const LOGIN_HUB_INVESTOR_ZONE_HREF = "/investor/roadmap#investor-public-login" as const;
+
+export { INVESTOR_LOGIN_ROADMAP_OUTSIDE_HREF } from "@/lib/all-workspace-green-gate";

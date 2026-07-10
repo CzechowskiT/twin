@@ -10,9 +10,11 @@ import { TalentPoolPreview } from "@/components/marketing/talent-pool-preview";
 import { getPersonaBundle, type PersonaId } from "@/lib/persona-pages";
 import {
   COMPANY_INTEGRATIONS_ROADMAP_OUTSIDE_HREF,
+  INVESTOR_LOGIN_ROADMAP_OUTSIDE_HREF,
   RECRUITER_INTEGRATIONS_ROADMAP_OUTSIDE_HREF,
 } from "@/lib/all-workspace-green-gate";
 import { COMPANY_ENTRY_MARKERS } from "@/lib/company-entry-navigation";
+import { INVESTOR_PUBLIC_LOGIN_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE } from "@/lib/seven-day-d5-investor";
 
 export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
   const { locale, t } = useTranslation();
@@ -160,6 +162,26 @@ export function PersonaMarketingPage({ persona }: { persona: PersonaId }) {
                 {persona === "recruiters"
                   ? t("persona.integrationsRoadmapLinkRecruiter")
                   : t("persona.integrationsRoadmapLinkCompany")}
+              </Link>
+            </p>
+          </section>
+        ) : null}
+
+        {persona === "investors" && INVESTOR_PUBLIC_LOGIN_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE ? (
+          <section
+            aria-labelledby="persona-investor-login-roadmap"
+            className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/90 p-5 text-start"
+            data-wave3-investor-login-marketing-roadmap
+          >
+            <h2 id="persona-investor-login-roadmap" className="twin-section-title text-lg sm:text-xl">
+              {t("investorRoadmap.investorPublicLoginRoadmapTitle")}
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[var(--twin-muted-strong)] sm:text-base">
+              {t("investorLogin.marketingRoadmapNote")}
+            </p>
+            <p className="mt-4 text-sm">
+              <Link href={INVESTOR_LOGIN_ROADMAP_OUTSIDE_HREF} className="twin-link font-semibold">
+                {t("investorLogin.roadmapLink")}
               </Link>
             </p>
           </section>

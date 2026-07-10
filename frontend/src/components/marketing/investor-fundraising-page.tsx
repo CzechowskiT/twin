@@ -9,6 +9,7 @@ import { MarketingPageSurface } from "@/components/marketing/marketing-page-surf
 import { MvpLiveStatsStrip } from "@/components/marketing/mvp-live-stats-strip";
 import { clearCookieConsent } from "@/lib/cookie-consent";
 import { FAQ_INVESTOR_HREF } from "@/lib/faq-anchor";
+import { INVESTOR_LOGIN_ROADMAP_OUTSIDE_HREF } from "@/lib/all-workspace-green-gate";
 import { Shell } from "@/components/ui";
 
 const DECK_MAIL = "contact@twin.care";
@@ -128,8 +129,12 @@ export function InvestorFundraisingPage({ ycMode = false }: { ycMode?: boolean }
               <MvpLiveStatsStrip />
             </div>
             <p className="mt-4">
-              <Link href="/login/investor" className="twin-link text-sm font-medium">
+              <Link href="/investor/metrics" className="twin-link text-sm font-medium">
                 {t("investorFundraising.ctaMetrics")} →
+              </Link>
+              {" · "}
+              <Link href={INVESTOR_LOGIN_ROADMAP_OUTSIDE_HREF} className="twin-link text-sm font-medium">
+                {t("investorLogin.roadmapLink")}
               </Link>
             </p>
           </section>

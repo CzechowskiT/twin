@@ -191,9 +191,11 @@ test("7 honest copy — read-only metrics, illustrative calculator, founder cont
   assert.match(plCalc, /nie porada inwestycyjna/i);
 });
 
-test("8 investor login — invite-only preview, no needs_setup", () => {
+test("8 investor login — invite-only preview, roadmap outside workspace, no needs_setup", () => {
   const login = read("src/app/login/investor/page.tsx");
   assert.match(login, /INVESTOR_LOGIN_INVITE_ONLY_PREVIEW/);
+  assert.match(login, /data-wave3-investor-public-login-roadmap/);
+  assert.match(login, /investorLogin\.requestAccessCta/);
   assert.doesNotMatch(login, /needs_setup/i);
 });
 

@@ -85,6 +85,7 @@
     "test:all-workspace-modules-green-wave2b-investor-workspace-guard": "npx --yes tsx scripts/all-workspace-modules-green-wave2b-investor-workspace-guard.test.ts",
     "test:all-workspace-modules-green-wave3-trust-center-guard": "npx --yes tsx scripts/all-workspace-modules-green-wave3-trust-center-guard.test.ts",
     "test:all-workspace-modules-green-wave3-integrations-guard": "npx --yes tsx scripts/all-workspace-modules-green-wave3-integrations-guard.test.ts",
+    "test:all-workspace-modules-green-wave3-investor-login-guard": "npx --yes tsx scripts/all-workspace-modules-green-wave3-investor-login-guard.test.ts",
     "test:seven-day-d1-marketing-guard": "npx --yes tsx scripts/seven-day-d1-marketing-guard.test.ts",
     "test:seven-day-d2-candidate-guard": "npx --yes tsx scripts/seven-day-d2-candidate-guard.test.ts",
     "test:seven-day-d3-recruiter-guard": "npx --yes tsx scripts/seven-day-d3-recruiter-guard.test.ts",

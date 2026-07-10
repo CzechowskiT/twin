@@ -5,6 +5,7 @@ export const ROADMAP_PHASES = [
     phase: "next" as const,
     items: [
       "nextCandidateTrustCenter",
+      "nextInvestorPublicLogin",
       "nextRecruiterIntegrations",
       "nextCompanyIntegrations",
       "nextGoSmallDecision",

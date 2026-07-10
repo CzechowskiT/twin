@@ -6,6 +6,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { useMarketingPersona } from "@/components/persona-provider";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
+import { INVESTOR_LOGIN_ROADMAP_OUTSIDE_HREF } from "@/lib/all-workspace-green-gate";
+
+const INVESTOR_ACCESS_MAIL = "contact@twin.care";
 
 const linkClass =
   "twin-link inline-flex min-h-[2.75rem] w-full items-center justify-center rounded-md border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] px-3 text-sm font-medium transition hover:border-[var(--twin-accent)]/40 hover:bg-[var(--twin-accent-muted)]";
@@ -82,8 +85,14 @@ export function CandidateWorkspaceGate({ surface }: { surface: "dashboard" | "pr
 
         {persona === "investor" ? (
           <div className="marketing-cta-stack mt-8">
-            <Link href="/login/investor" className={primaryStackClass}>
-              {t("login.zoneInvestorTitle")}
+            <Link
+              href={`mailto:${INVESTOR_ACCESS_MAIL}?subject=${encodeURIComponent("TWIN investor access request")}`}
+              className={primaryStackClass}
+            >
+              {t("investorLogin.requestAccessCta")}
+            </Link>
+            <Link href={INVESTOR_LOGIN_ROADMAP_OUTSIDE_HREF} className={linkClass}>
+              {t("investorLogin.roadmapLink")}
             </Link>
             <Link href="/for-investors" className={linkClass}>
               {t("nav.forInvestors")}

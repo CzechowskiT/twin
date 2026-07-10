@@ -15,15 +15,18 @@ import {
   DATA_ROOM_FOUNDER_DECISION,
   DATA_ROOM_INVITE_ONLY_PREVIEW,
   HIDE_BOARD_FROM_INVESTOR_DEFAULT_HUB,
+  HIDE_INVESTOR_PUBLIC_LOGIN_FROM_PREVIEW,
   HIDE_INVESTOR_SOR_ON_PUBLIC_ROOM,
   INVESTOR_BOARD_COLLAPSED_DEFAULT,
   INVESTOR_CALCULATOR_ILLUSTRATIVE_ONLY,
   INVESTOR_HUB_NEXT_ACTION_HREF,
   INVESTOR_METRICS_CONTROLLED_PREVIEW,
   INVESTOR_PRIMARY_MODULE_IDS,
+  INVESTOR_PUBLIC_LOGIN_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE,
   INVESTOR_ROADMAP_CONTROLLED_PREVIEW,
   INVESTOR_ROADMAP_MODULE_IDS,
   INVESTOR_ROOM_SIMPLIFIED_HIERARCHY,
+  LOGIN_HUB_INVESTOR_ZONE_HREF,
   NO_PUBLIC_LAUNCH_CLAIMS_INVESTOR_UI,
   PLACEMENT_LIMITED_PILOT,
   PRODUCT_PROOF_PREVIEW_BOUNDARY,
@@ -99,6 +102,9 @@ test("2 seven-day-d5 flags — preview hierarchy, data room founder decision, bo
   assert.equal(INVESTOR_CALCULATOR_ILLUSTRATIVE_ONLY, true);
   assert.equal(INVESTOR_ROADMAP_CONTROLLED_PREVIEW, true);
   assert.equal(NO_PUBLIC_LAUNCH_CLAIMS_INVESTOR_UI, true);
+  assert.equal(HIDE_INVESTOR_PUBLIC_LOGIN_FROM_PREVIEW, true);
+  assert.equal(INVESTOR_PUBLIC_LOGIN_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE, true);
+  assert.equal(LOGIN_HUB_INVESTOR_ZONE_HREF, "/investor/roadmap#investor-public-login");
   assert.ok(INVESTOR_PRIMARY_MODULE_IDS.includes("metrics"));
   assert.equal(INVESTOR_ROADMAP_MODULE_IDS.length, 0);
 });
@@ -171,11 +177,13 @@ test("8 placement and proof — pilot/preview boundaries", () => {
   assert.match(en.sevenDayD5.productProofPreviewBoundaryBody ?? "", /third-party customer/i);
 });
 
-test("9 investor login — invite-only preview builds on P3", () => {
+test("9 investor login — invite-only preview, roadmap outside workspace, no needs_setup", () => {
   assert.equal(INVESTOR_LOGIN_INVITE_ONLY_PREVIEW, true);
   const login = read("src/app/login/investor/page.tsx");
   assert.match(login, /INVESTOR_LOGIN_INVITE_ONLY_PREVIEW/);
   assert.match(login, /productPolish\.investorInviteOnlyBadge/);
+  assert.match(login, /data-wave3-investor-public-login-roadmap/);
+  assert.match(login, /INVESTOR_PUBLIC_LOGIN_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE/);
   assert.doesNotMatch(login, /needs_setup/i);
 });
 

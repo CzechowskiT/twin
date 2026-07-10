@@ -14,6 +14,7 @@ import {
 } from "@/lib/investor-founder-roadmap";
 import {
   COMPANY_INTEGRATIONS_ROADMAP_OUTSIDE_HREF,
+  INVESTOR_LOGIN_ROADMAP_OUTSIDE_HREF,
   RECRUITER_INTEGRATIONS_ROADMAP_OUTSIDE_HREF,
   TRUST_CENTER_ROADMAP_OUTSIDE_HREF,
 } from "@/lib/all-workspace-green-gate";
@@ -24,6 +25,9 @@ import {
 import {
   RECRUITER_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE,
 } from "@/lib/seven-day-d3-recruiter";
+import {
+  INVESTOR_PUBLIC_LOGIN_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE,
+} from "@/lib/seven-day-d5-investor";
 import type { TranslationKey } from "@/lib/i18n";
 
 function phaseTitleKey(phase: RoadmapPhase): TranslationKey {
@@ -183,6 +187,42 @@ export function InvestorRoadmapFounderUpdatesPanel() {
               </Link>
               <Link href={COMPANY_INTEGRATIONS_ROADMAP_OUTSIDE_HREF} className="twin-link font-medium">
                 {t("companyIntegrations.roadmapLink")}
+              </Link>
+            </div>
+          </Card>
+        </section>
+      ) : null}
+
+      {INVESTOR_PUBLIC_LOGIN_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE ? (
+        <section
+          id="investor-public-login"
+          aria-labelledby="investor-public-login-heading"
+          data-wave3-investor-public-login-roadmap
+        >
+          <h2
+            id="investor-public-login-heading"
+            className="mb-3 text-xs font-bold uppercase tracking-[0.22em] text-[var(--twin-muted)]"
+          >
+            {t("investorRoadmap.investorPublicLoginRoadmapTitle")}
+          </h2>
+          <Card className="border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] p-5">
+            <p className="text-sm font-semibold text-[var(--foreground)]">
+              {t("investorRoadmap.investorPublicLoginRoadmapLead")}
+            </p>
+            <p className="mt-2 text-sm leading-relaxed text-[var(--twin-muted-strong)]">
+              {t("investorRoadmap.investorPublicLoginRoadmapBody")}
+            </p>
+            <ul className="mt-4 space-y-2 text-sm leading-relaxed text-[var(--twin-muted-strong)]">
+              <li>{t("investorRoadmap.investorPublicLoginRoadmapInviteOnly")}</li>
+              <li>{t("investorRoadmap.investorPublicLoginRoadmapDataRoom")}</li>
+              <li>{t("investorRoadmap.investorPublicLoginRoadmapNoOnboarding")}</li>
+            </ul>
+            <div className="mt-4 flex flex-wrap gap-4 text-sm">
+              <Link href="/login/investor" className="twin-link font-medium">
+                {t("investorRoadmap.investorPublicLoginPreviewLink")}
+              </Link>
+              <Link href={INVESTOR_LOGIN_ROADMAP_OUTSIDE_HREF} className="twin-link font-medium">
+                {t("investorLogin.roadmapLink")}
               </Link>
             </div>
           </Card>

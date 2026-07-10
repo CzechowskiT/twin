@@ -1,5 +1,5 @@
 import type { TranslationKey } from "@/lib/i18n";
-import { TRUST_CENTER_ROADMAP_OUTSIDE_HREF } from "@/lib/all-workspace-green-gate";
+import { INVESTOR_LOGIN_ROADMAP_OUTSIDE_HREF, TRUST_CENTER_ROADMAP_OUTSIDE_HREF } from "@/lib/all-workspace-green-gate";
 
 /** Desktop/mobile Explore TWIN mega-panel — existing public routes only. */
 export type ExploreMegaPanelLink = {
@@ -33,6 +33,7 @@ export const HEADER_EXPLORE_MEGA_PANEL_GROUPS: readonly ExploreMegaPanelGroup[] 
     links: [
       { href: "/for-investors", labelKey: "site.footerForInvestors" },
       { href: "/investor", labelKey: "site.footerInvestorRoom", highlight: true },
+      { href: INVESTOR_LOGIN_ROADMAP_OUTSIDE_HREF, labelKey: "site.footerInvestorAccessRoadmap" },
       { href: "/investor/product-proof", labelKey: "nav.exploreProductProof" },
     ],
   },
