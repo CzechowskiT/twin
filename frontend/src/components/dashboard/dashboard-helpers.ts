@@ -32,10 +32,9 @@ export type DashboardProfile = {
   location: string | null;
   career_compass_preview?: {
     configured: boolean;
-    readiness_score: number | null;
-    level: number | null;
-    xp_total: number | null;
-    next_milestone_title: string | null;
+    completion_percent: number | null;
+    readiness_complete: boolean;
+    next_step_title: string | null;
   } | null;
 };
 

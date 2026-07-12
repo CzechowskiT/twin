@@ -10,16 +10,15 @@ type Props = {
   profile: DashboardProfile;
 };
 
-/**
- * Tiny Career Compass strip — visible to candidates with a profile.
- * Shows configured preview (readiness/level/xp) or a soft hint when
- * the candidate has not configured it yet.
- */
+/** Career compass strip — persisted completion preview from API. */
 export function CareerCompassStrip({ profile }: Props) {
   const { t } = useTranslation();
   const preview = profile.career_compass_preview;
 
   if (preview?.configured) {
+    const statusLabel = preview.readiness_complete
+      ? t("dashboard.careerCompassStatsReady")
+      : t("dashboard.careerCompassStatsIncomplete");
     return (
       <Card variant="soft" className="mb-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -27,11 +26,10 @@ export function CareerCompassStrip({ profile }: Props) {
             <p className="text-sm font-semibold text-[var(--foreground)]">{t("dashboard.careerCompassLink")}</p>
             <p className="twin-muted mt-1 text-xs">
               {t("dashboard.careerCompassStats")
-                .replace("{readiness}", String(preview.readiness_score ?? "—"))
-                .replace("{level}", String(preview.level ?? "—"))
-                .replace("{xp}", String(preview.xp_total ?? "—"))}
-              {preview.next_milestone_title
-                ? ` · ${t("dashboard.careerCompassNextMilestone").replace("{title}", preview.next_milestone_title)}`
+                .replace("{readiness}", String(preview.completion_percent ?? "—"))
+                .replace("{status}", statusLabel)}
+              {preview.next_step_title
+                ? ` · ${t("dashboard.careerCompassNextMilestone").replace("{title}", preview.next_step_title)}`
                 : ""}
             </p>
           </div>

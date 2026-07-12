@@ -10,71 +10,68 @@ import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Input, Label, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
+import {
+  CAREER_COMPASS_API_PATH,
+  CURRENCY_OPTIONS,
+  type CareerCompassData,
+  SENIORITY_OPTIONS,
+  WORK_MODE_OPTIONS,
+  compassToForm,
+  formToPayload,
+  formsEqual,
+  validateForm,
+} from "@/lib/candidate-career-compass";
 import { CAREER_COMPASS_SHIP_STATUS } from "@/lib/seven-day-d2-candidate";
+import type { TranslationKey } from "@/lib/i18n";
 
-const MAX_VISIBLE_MILESTONES = 40;
-
-type Ideal = {
-  target_role_titles: string[];
-  target_salary_gross_monthly_pln: number | null;
-  work_formats: string[];
-  must_have_tools: string[];
-  key_responsibilities: string;
-  industries: string[];
-  location_preferences: string | null;
-  target_horizon_months: number;
+const VALIDATION_KEYS: Record<string, TranslationKey> = {
+  salary_min_gt_max: "dashboard.careerCompassValidationSalaryMinGtMax",
+  seniority_required_with_role: "dashboard.careerCompassValidationSeniorityRequired",
 };
 
-type Milestone = { id: string; title: string; week: number; xp: number; done: boolean; hint: string };
-type Phase = { id: string; title: string; week_start: number; week_end: number; milestones: Milestone[] };
-type Path = {
-  phases: Phase[];
-  xp_total: number;
-  level: number;
-  horizon_months: number;
-  current_phase_index: number;
-  source: string;
-};
-type Snapshot = {
-  readiness_score: number;
-  gaps_summary: string[];
-  strengths_aligned: string[];
-  you_are_here: string;
+const SENIORITY_LABEL_KEYS: Record<string, TranslationKey> = {
+  junior: "dashboard.careerCompassSeniorityJunior",
+  mid: "dashboard.careerCompassSeniorityMid",
+  senior: "dashboard.careerCompassSenioritySenior",
+  lead: "dashboard.careerCompassSeniorityLead",
+  director: "dashboard.careerCompassSeniorityDirector",
+  executive: "dashboard.careerCompassSeniorityExecutive",
 };
 
-type CompassResponse = {
-  configured: boolean;
-  ideal: Ideal | null;
-  path: Path | null;
-  snapshot: Snapshot | null;
+const WORK_MODE_LABEL_KEYS: Record<string, TranslationKey> = {
+  remote: "dashboard.careerCompassWorkModeRemote",
+  hybrid: "dashboard.careerCompassWorkModeHybrid",
+  onsite: "dashboard.careerCompassWorkModeOnsite",
+  flexible: "dashboard.careerCompassWorkModeFlexible",
 };
 
-function splitCsv(s: string): string[] {
-  return s
-    .split(",")
-    .map((x) => x.trim())
-    .filter(Boolean);
-}
+type FormState = ReturnType<typeof compassToForm>;
 
-function applyIdealToForm(d: CompassResponse, setters: {
-  setRoles: (v: string) => void;
-  setSalary: (v: string) => void;
-  setFormats: (v: string) => void;
-  setTools: (v: string) => void;
-  setResp: (v: string) => void;
-  setIndustries: (v: string) => void;
-  setLocation: (v: string) => void;
-  setHorizon: (v: string) => void;
-}) {
-  if (!d.ideal) return;
-  setters.setRoles(d.ideal.target_role_titles.join(", "));
-  setters.setSalary(d.ideal.target_salary_gross_monthly_pln != null ? String(d.ideal.target_salary_gross_monthly_pln) : "");
-  setters.setFormats(d.ideal.work_formats.join(", "));
-  setters.setTools(d.ideal.must_have_tools.join(", "));
-  setters.setResp(d.ideal.key_responsibilities || "");
-  setters.setIndustries(d.ideal.industries.join(", "));
-  setters.setLocation(d.ideal.location_preferences || "");
-  setters.setHorizon(String(d.ideal.target_horizon_months || 12));
+const EMPTY_FORM: FormState = compassToForm({
+  configured: false,
+  target_role: null,
+  target_seniority: null,
+  preferred_industries: [],
+  preferred_locations: [],
+  work_mode: null,
+  salary_expectation_min: null,
+  salary_expectation_max: null,
+  salary_currency: "PLN",
+  career_priorities: [],
+  skill_gaps: [],
+  strengths: [],
+  next_steps: [],
+  learning_actions: [],
+  notes: null,
+  completion_status: "draft",
+  completion_percent: 0,
+  missing_fields: [],
+  readiness_complete: false,
+  updated_at: null,
+});
+
+function FieldSkeleton() {
+  return <div className="h-10 animate-pulse rounded-md bg-[var(--twin-border)]/60" />;
 }
 
 export default function CareerCompassPage() {
@@ -83,33 +80,25 @@ export default function CareerCompassPage() {
   const loadOnce = useRef(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<CompassResponse | null>(null);
-  const [roles, setRoles] = useState("");
-  const [salary, setSalary] = useState("");
-  const [formats, setFormats] = useState("");
-  const [tools, setTools] = useState("");
-  const [resp, setResp] = useState("");
-  const [industries, setIndustries] = useState("");
-  const [location, setLocation] = useState("");
-  const [horizon, setHorizon] = useState("12");
-  const [regenerate, setRegenerate] = useState(true);
-  const [toggleBusy, setToggleBusy] = useState<string | null>(null);
-  const [showAllMilestones, setShowAllMilestones] = useState(false);
+  const [data, setData] = useState<CareerCompassData | null>(null);
+  const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [savedForm, setSavedForm] = useState<FormState>(EMPTY_FORM);
 
-  const formSetters = useMemo(
-    () => ({ setRoles, setSalary, setFormats, setTools, setResp, setIndustries, setLocation, setHorizon }),
-    [],
-  );
+  const dirty = useMemo(() => !formsEqual(form, savedForm), [form, savedForm]);
+  const validationError = useMemo(() => validateForm(form), [form]);
 
   const load = useCallback(async () => {
     const token = getToken();
     if (!token) return null;
-    const d = await apiFetch<CompassResponse>("/api/v1/candidates/me/career-compass", {}, token);
+    const d = await apiFetch<CareerCompassData>(CAREER_COMPASS_API_PATH, {}, token);
     setData(d);
-    applyIdealToForm(d, formSetters);
+    const nextForm = compassToForm(d);
+    setForm(nextForm);
+    setSavedForm(nextForm);
     return d;
-  }, [formSetters]);
+  }, []);
 
   useEffect(() => {
     const token = getToken();
@@ -126,121 +115,64 @@ export default function CareerCompassPage() {
     });
   }, [router, load, t]);
 
-  const visiblePhases = useMemo(() => {
-    const phases = data?.path?.phases ?? [];
-    if (showAllMilestones) return phases;
-    let count = 0;
-    const out: Phase[] = [];
-    for (const ph of phases) {
-      const remaining = MAX_VISIBLE_MILESTONES - count;
-      if (remaining <= 0) break;
-      const milestones = ph.milestones.slice(0, remaining);
-      count += milestones.length;
-      out.push({ ...ph, milestones });
-    }
-    return out;
-  }, [data?.path?.phases, showAllMilestones]);
-
-  const totalMilestoneCount = useMemo(
-    () => (data?.path?.phases ?? []).reduce((n, ph) => n + ph.milestones.length, 0),
-    [data?.path?.phases],
-  );
-
-  const milestonesTruncated = !showAllMilestones && totalMilestoneCount > MAX_VISIBLE_MILESTONES;
+  useEffect(() => {
+    if (!dirty) return;
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [dirty]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
+    if (validationError) {
+      setError(t(VALIDATION_KEYS[validationError] ?? "dashboard.careerCompassSaveError"));
+      return;
+    }
     const token = getToken();
     if (!token) return;
     setSaving(true);
     setError(null);
-    const hz = Math.min(60, Math.max(1, Number(horizon) || 12));
-    const body = {
-      ideal: {
-        target_role_titles: splitCsv(roles),
-        target_salary_gross_monthly_pln: salary.trim() ? Number(salary) : null,
-        work_formats: splitCsv(formats).map((x) => x.toLowerCase()),
-        must_have_tools: splitCsv(tools),
-        key_responsibilities: resp,
-        industries: splitCsv(industries),
-        location_preferences: location.trim() || null,
-        target_horizon_months: hz,
-      },
-      regenerate_path: regenerate,
-    };
+    setSaveSuccess(false);
     try {
-      const d = await apiFetch<CompassResponse>(
-        "/api/v1/candidates/me/career-compass",
-        { method: "PUT", body: JSON.stringify(body) },
+      const d = await apiFetch<CareerCompassData>(
+        CAREER_COMPASS_API_PATH,
+        { method: "PUT", body: JSON.stringify(formToPayload(form)) },
         token,
       );
       setData(d);
-      applyIdealToForm(d, formSetters);
-      setShowAllMilestones(false);
+      const nextForm = compassToForm(d);
+      setForm(nextForm);
+      setSavedForm(nextForm);
+      setSaveSuccess(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Save failed");
+      setError(err instanceof Error ? err.message : t("dashboard.careerCompassSaveError"));
     } finally {
       setSaving(false);
     }
   }
 
-  async function toggleMilestone(id: string, done: boolean) {
-    const token = getToken();
-    if (!token) return;
-    setToggleBusy(id);
-    setError(null);
-    try {
-      const d = await apiFetch<CompassResponse>(
-        `/api/v1/candidates/me/career-compass/milestones/${encodeURIComponent(id)}`,
-        { method: "PATCH", body: JSON.stringify({ done }) },
-        token,
-      );
-      setData(d);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Update failed");
-    } finally {
-      setToggleBusy(null);
-    }
-  }
-
-  async function clearCompass() {
-    const token = getToken();
-    if (!token) return;
-    if (!globalThis.confirm(t("dashboard.careerCompassDeleteConfirm"))) return;
-    setSaving(true);
-    setError(null);
-    try {
-      await apiFetch("/api/v1/candidates/me/career-compass", { method: "DELETE" }, token);
-      setData({ configured: false, ideal: null, path: null, snapshot: null });
-      setRoles("");
-      setSalary("");
-      setFormats("");
-      setTools("");
-      setResp("");
-      setIndustries("");
-      setLocation("");
-      setHorizon("12");
-      setShowAllMilestones(false);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Delete failed");
-    } finally {
-      setSaving(false);
-    }
+  function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
+    setSaveSuccess(false);
+    setForm((prev) => ({ ...prev, [key]: value }));
   }
 
   if (loading) {
     return (
       <Shell wide rail>
-        <p className="twin-muted text-sm">{t("dashboard.billingLoading")}</p>
+        <div className="space-y-4" data-career-compass-loading>
+          <FieldSkeleton />
+          <FieldSkeleton />
+          <FieldSkeleton />
+        </div>
       </Shell>
     );
   }
 
-  const snap = data?.snapshot;
-  const path = data?.path;
-  const xp = path?.xp_total ?? 0;
-  const level = path?.level ?? 1;
-  const xpBarPct = Math.min(100, Math.round((xp % 400) / 4));
+  const completion = data?.completion_percent ?? 0;
+  const isEmpty = !data?.configured;
 
   return (
     <Shell wide rail>
@@ -263,221 +195,241 @@ export default function CareerCompassPage() {
 
       <CandidateReadinessFlowBanner context="career_brief" />
 
-      <Card variant="soft" className="mb-6">
+      <Card variant="soft" className="mb-6" data-career-compass-completion>
         <p className="text-sm leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.careerCompassPageLead")}</p>
-        {path ? (
-          <div className="mt-4">
-            <div className="mb-1 flex justify-between text-xs font-medium text-[var(--foreground)]">
-              <span>
-                {t("dashboard.careerCompassXpBar")
-                  .replace("{xp}", String(xp))
-                  .replace("{level}", String(level))}
-              </span>
-              {snap ? <span>{snap.readiness_score}%</span> : null}
+        <div className="mt-4">
+          <div className="mb-1 flex justify-between text-xs font-medium text-[var(--foreground)]">
+            <span>{t("dashboard.careerCompassCompletionLabel").replace("{percent}", String(completion))}</span>
+            {data?.readiness_complete ? (
+              <span className="text-emerald-600">{t("dashboard.careerCompassReadinessComplete")}</span>
+            ) : (
+              <span className="text-[var(--twin-muted)]">{t("dashboard.careerCompassReadinessIncomplete")}</span>
+            )}
+          </div>
+          <div className="h-2 overflow-hidden rounded-full bg-[var(--twin-border)]">
+            <div
+              className="h-full rounded-full bg-[var(--twin-accent)] transition-all"
+              style={{ width: `${Math.min(100, completion)}%` }}
+            />
+          </div>
+        </div>
+      </Card>
+
+      {error ? (
+        <Card variant="soft" className="mb-4 border-red-200 bg-red-50/50">
+          <p className="text-sm text-red-600">{error}</p>
+          <button
+            type="button"
+            className="twin-link mt-2 text-sm font-semibold"
+            onClick={() => {
+              setError(null);
+              setLoading(true);
+              void load()
+                .catch((e) => setError(e instanceof Error ? e.message : t("dashboard.identityError")))
+                .finally(() => setLoading(false));
+            }}
+          >
+            {t("dashboard.careerCompassRetry")}
+          </button>
+        </Card>
+      ) : null}
+
+      {saveSuccess ? (
+        <p className="mb-4 text-sm text-emerald-600" data-career-compass-save-success>
+          {t("dashboard.careerCompassSaveSuccess")}
+        </p>
+      ) : null}
+
+      {isEmpty ? (
+        <Card variant="soft" className="mb-6" data-career-compass-empty>
+          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.careerCompassEmptyLead")}</p>
+        </Card>
+      ) : null}
+
+      <form onSubmit={onSubmit} className="space-y-6" data-career-compass-form>
+        <Card>
+          <h2 className="mb-4 text-sm font-semibold">{t("dashboard.careerCompassSectionTarget")}</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <Label>{t("dashboard.careerCompassTargetRole")}</Label>
+              <Input
+                value={form.targetRole}
+                onChange={(e) => updateField("targetRole", e.target.value)}
+                placeholder={t("dashboard.careerCompassTargetRolePlaceholder")}
+                required
+              />
             </div>
-            <div className="h-2 overflow-hidden rounded-full bg-[var(--twin-border)]">
-              <div
-                className="h-full rounded-full bg-[var(--twin-accent)] transition-all"
-                style={{ width: `${xpBarPct}%` }}
+            <div>
+              <Label>{t("dashboard.careerCompassTargetSeniority")}</Label>
+              <select
+                className="w-full rounded border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-3 py-2 text-sm"
+                value={form.targetSeniority}
+                onChange={(e) => updateField("targetSeniority", e.target.value)}
+                required
+              >
+                <option value="">{t("dashboard.careerCompassSelectPlaceholder")}</option>
+                {SENIORITY_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {t(SENIORITY_LABEL_KEYS[opt])}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <Label>{t("dashboard.careerCompassWorkMode")}</Label>
+              <select
+                className="w-full rounded border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-3 py-2 text-sm"
+                value={form.workMode}
+                onChange={(e) => updateField("workMode", e.target.value)}
+              >
+                <option value="">{t("dashboard.careerCompassSelectPlaceholder")}</option>
+                {WORK_MODE_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {t(WORK_MODE_LABEL_KEYS[opt])}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <Label>{t("dashboard.careerCompassIndustries")}</Label>
+              <Input
+                value={form.preferredIndustries}
+                onChange={(e) => updateField("preferredIndustries", e.target.value)}
+                placeholder={t("dashboard.careerCompassIndustriesPlaceholder")}
+              />
+            </div>
+            <div>
+              <Label>{t("dashboard.careerCompassLocation")}</Label>
+              <Input
+                value={form.preferredLocations}
+                onChange={(e) => updateField("preferredLocations", e.target.value)}
+                placeholder={t("dashboard.careerCompassLocationPlaceholder")}
               />
             </div>
           </div>
-        ) : null}
-      </Card>
-
-      {error ? <p className="mb-4 text-sm text-red-600">{error}</p> : null}
-
-      {!data?.configured && !path ? (
-        <Card variant="soft" className="mb-6" data-seven-day-career-static-framework>
-          <h2 className="mb-2 text-sm font-semibold">{t("dashboard.careerCompassStaticFrameworkTitle")}</h2>
-          <p className="text-sm text-[var(--twin-muted-strong)]">{t("dashboard.careerCompassStaticFrameworkLead")}</p>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <div className="rounded-lg border border-[var(--twin-border)]/70 p-3">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--twin-muted)]">
-                {t("dashboard.careerCompassStaticTargetRoleTitle")}
-              </h3>
-              <p className="mt-1 text-sm text-[var(--twin-muted-strong)]">{t("dashboard.careerCompassStaticTargetRoleLead")}</p>
-            </div>
-            <div className="rounded-lg border border-[var(--twin-border)]/70 p-3">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--twin-muted)]">
-                {t("dashboard.careerCompassStaticSkillsGapTitle")}
-              </h3>
-              <p className="mt-1 text-sm text-[var(--twin-muted-strong)]">{t("dashboard.careerCompassStaticSkillsGapLead")}</p>
-            </div>
-            <div className="rounded-lg border border-[var(--twin-border)]/70 p-3">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--twin-muted)]">
-                {t("dashboard.careerCompassStaticNextStepsTitle")}
-              </h3>
-              <p className="mt-1 text-sm text-[var(--twin-muted-strong)]">{t("dashboard.careerCompassStaticNextStepsLead")}</p>
-            </div>
-            <div className="rounded-lg border border-[var(--twin-border)]/70 p-3">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--twin-muted)]">
-                {t("dashboard.careerCompassStaticLearningTitle")}
-              </h3>
-              <p className="mt-1 text-sm text-[var(--twin-muted-strong)]">{t("dashboard.careerCompassStaticLearningLead")}</p>
-            </div>
-          </div>
-          <p className="mt-4 text-sm text-[var(--twin-muted-strong)]">{t("dashboard.careerCompassNotConfigured")}</p>
         </Card>
-      ) : null}
 
-      {snap && data?.configured ? (
-        <Card className="mb-6">
-          <h2 className="mb-2 text-sm font-semibold">{t("dashboard.careerCompassWhereYouAre")}</h2>
-          <p className="whitespace-pre-wrap text-sm text-[var(--twin-muted-strong)]">{snap.you_are_here}</p>
-          {snap.gaps_summary.length > 0 ? (
-            <div className="mt-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--twin-muted)]">
-                {t("dashboard.careerCompassGaps")}
-              </p>
-              <ul className="mt-1 list-inside list-disc text-sm text-[var(--twin-muted-strong)]">
-                {snap.gaps_summary.map((g) => (
-                  <li key={g}>{g}</li>
-                ))}
-              </ul>
+        <Card>
+          <h2 className="mb-4 text-sm font-semibold">{t("dashboard.careerCompassSectionCompensation")}</h2>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div>
+              <Label>{t("dashboard.careerCompassSalaryMin")}</Label>
+              <Input
+                type="number"
+                min={0}
+                value={form.salaryMin}
+                onChange={(e) => updateField("salaryMin", e.target.value)}
+              />
             </div>
-          ) : null}
-          {snap.strengths_aligned.length > 0 ? (
-            <div className="mt-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--twin-muted)]">
-                {t("dashboard.careerCompassStrengths")}
-              </p>
-              <ul className="mt-1 list-inside list-disc text-sm text-[var(--twin-muted-strong)]">
-                {snap.strengths_aligned.map((g) => (
-                  <li key={g}>{g}</li>
-                ))}
-              </ul>
+            <div>
+              <Label>{t("dashboard.careerCompassSalaryMax")}</Label>
+              <Input
+                type="number"
+                min={0}
+                value={form.salaryMax}
+                onChange={(e) => updateField("salaryMax", e.target.value)}
+              />
             </div>
-          ) : null}
-        </Card>
-      ) : null}
-
-      {visiblePhases.length > 0 ? (
-        <Card className="mb-6">
-          <h2 className="mb-4 text-sm font-semibold">{t("dashboard.careerCompassPath")}</h2>
-          <ol className="space-y-6">
-            {visiblePhases.map((ph, idx) => (
-              <li key={ph.id} className="border-l-2 border-[var(--twin-accent)]/40 pl-4">
-                <p className="font-medium text-[var(--foreground)]">{ph.title}</p>
-                <p className="twin-muted text-xs">
-                  {t("dashboard.careerCompassWeeks")
-                    .replace("{start}", String(ph.week_start))
-                    .replace("{end}", String(ph.week_end))}
-                </p>
-                <ul className="mt-2 space-y-2">
-                  {ph.milestones.map((m) => (
-                    <li
-                      key={m.id}
-                      className="flex flex-col gap-2 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/30 p-3 sm:flex-row sm:items-center sm:justify-between"
-                    >
-                      <div className="min-w-0">
-                        <p className={`text-sm font-medium ${m.done ? "text-[var(--twin-muted)] line-through" : ""}`}>
-                          {m.title}
-                        </p>
-                        {m.hint ? <p className="twin-muted mt-1 text-xs">{m.hint}</p> : null}
-                        <p className="twin-muted mt-1 text-xs">
-                          +{m.xp} XP · week {m.week}
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        disabled={toggleBusy === m.id}
-                        onClick={() => void toggleMilestone(m.id, !m.done)}
-                        className="twin-btn-secondary twin-touch-target shrink-0 !w-auto px-3 py-1.5 text-xs"
-                      >
-                        {toggleBusy === m.id
-                          ? "…"
-                          : m.done
-                            ? t("dashboard.careerCompassMarkOpen")
-                            : t("dashboard.careerCompassMarkDone")}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-                {path && idx === path.current_phase_index ? (
-                  <p className="mt-2 text-xs font-medium text-[var(--twin-accent)]">
-                    → {t("dashboard.careerCompassCurrentPhase")}
-                  </p>
-                ) : null}
-              </li>
-            ))}
-          </ol>
-          {milestonesTruncated ? (
-            <button
-              type="button"
-              className="twin-link mt-4 text-sm font-semibold"
-              onClick={() => setShowAllMilestones(true)}
-            >
-              {t("dashboard.careerCompassShowAllMilestones").replace("{count}", String(totalMilestoneCount))}
-            </button>
-          ) : null}
-        </Card>
-      ) : data?.configured ? (
-        <p className="twin-muted mb-6 text-sm">{t("dashboard.careerCompassNotConfigured")}</p>
-      ) : null}
-
-      <Card>
-        <h2 className="mb-4 text-sm font-semibold">{t("dashboard.careerCompassIdealSection")}</h2>
-        <form onSubmit={onSubmit} className="max-w-2xl space-y-3">
-          <Label>{t("dashboard.careerCompassRoles")}</Label>
-          <Input value={roles} onChange={(e) => setRoles(e.target.value)} required placeholder="VP Engineering, …" />
-          <Label>{t("dashboard.careerCompassSalary")}</Label>
-          <Input value={salary} onChange={(e) => setSalary(e.target.value)} type="number" min={0} placeholder="25000" />
-          <Label>{t("dashboard.careerCompassWorkFormats")}</Label>
-          <Input value={formats} onChange={(e) => setFormats(e.target.value)} placeholder="hybrid, remote" />
-          <Label>{t("dashboard.careerCompassTools")}</Label>
-          <Input value={tools} onChange={(e) => setTools(e.target.value)} placeholder="Snowflake, dbt, …" />
-          <Label>{t("dashboard.careerCompassIndustries")}</Label>
-          <Input value={industries} onChange={(e) => setIndustries(e.target.value)} />
-          <Label>{t("dashboard.careerCompassLocation")}</Label>
-          <Input value={location} onChange={(e) => setLocation(e.target.value)} />
-          <Label>{t("dashboard.careerCompassResponsibilities")}</Label>
-          <textarea
-            className="mb-4 min-h-[100px] w-full rounded border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-3 py-2 text-sm"
-            value={resp}
-            onChange={(e) => setResp(e.target.value)}
-          />
-          <Label>{t("dashboard.careerCompassHorizon")}</Label>
-          <Input value={horizon} onChange={(e) => setHorizon(e.target.value)} type="number" min={1} max={60} />
-          <label className="flex cursor-pointer items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={regenerate}
-              onChange={(e) => setRegenerate(e.target.checked)}
-              className="h-4 w-4 rounded border-[var(--twin-border)]"
-            />
-            {t("dashboard.careerCompassRegenerate")}
-          </label>
-          <div className="flex flex-wrap gap-2 pt-2">
-            <Button type="submit" disabled={saving}>
-              {saving ? t("dashboard.careerCompassSaving") : t("dashboard.careerCompassSave")}
-            </Button>
-            <button
-              type="button"
-              className="twin-btn-secondary twin-touch-target !w-auto px-4 py-2 text-sm"
-              disabled={saving}
-              onClick={() => {
-                setLoading(true);
-                void load()
-                  .catch((e) => setError(e instanceof Error ? e.message : "Error"))
-                  .finally(() => setLoading(false));
-              }}
-            >
-              {t("dashboard.careerCompassReload")}
-            </button>
-            {data?.configured ? (
-              <button
-                type="button"
-                className="text-sm text-red-600 hover:underline"
-                disabled={saving}
-                onClick={() => void clearCompass()}
+            <div>
+              <Label>{t("dashboard.careerCompassSalaryCurrency")}</Label>
+              <select
+                className="w-full rounded border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-3 py-2 text-sm"
+                value={form.salaryCurrency}
+                onChange={(e) => updateField("salaryCurrency", e.target.value as FormState["salaryCurrency"])}
               >
-                {t("dashboard.careerCompassDelete")}
-              </button>
-            ) : null}
+                {CURRENCY_OPTIONS.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-        </form>
-      </Card>
+        </Card>
+
+        <Card>
+          <h2 className="mb-4 text-sm font-semibold">{t("dashboard.careerCompassSectionPriorities")}</h2>
+          <Label>{t("dashboard.careerCompassPriorities")}</Label>
+          <Input
+            value={form.careerPriorities}
+            onChange={(e) => updateField("careerPriorities", e.target.value)}
+            placeholder={t("dashboard.careerCompassPrioritiesPlaceholder")}
+          />
+        </Card>
+
+        <Card>
+          <h2 className="mb-4 text-sm font-semibold">{t("dashboard.careerCompassSectionStrengthsGaps")}</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <Label>{t("dashboard.careerCompassStrengths")}</Label>
+              <Input
+                value={form.strengths}
+                onChange={(e) => updateField("strengths", e.target.value)}
+                placeholder={t("dashboard.careerCompassStrengthsPlaceholder")}
+              />
+            </div>
+            <div>
+              <Label>{t("dashboard.careerCompassSkillGaps")}</Label>
+              <Input
+                value={form.skillGaps}
+                onChange={(e) => updateField("skillGaps", e.target.value)}
+                placeholder={t("dashboard.careerCompassSkillGapsPlaceholder")}
+              />
+            </div>
+          </div>
+        </Card>
+
+        <Card>
+          <h2 className="mb-4 text-sm font-semibold">{t("dashboard.careerCompassSectionNextActions")}</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <Label>{t("dashboard.careerCompassNextSteps")}</Label>
+              <Input
+                value={form.nextSteps}
+                onChange={(e) => updateField("nextSteps", e.target.value)}
+                placeholder={t("dashboard.careerCompassNextStepsPlaceholder")}
+              />
+            </div>
+            <div>
+              <Label>{t("dashboard.careerCompassLearningActions")}</Label>
+              <Input
+                value={form.learningActions}
+                onChange={(e) => updateField("learningActions", e.target.value)}
+                placeholder={t("dashboard.careerCompassLearningActionsPlaceholder")}
+              />
+            </div>
+          </div>
+        </Card>
+
+        <Card>
+          <h2 className="mb-4 text-sm font-semibold">{t("dashboard.careerCompassSectionNotes")}</h2>
+          <textarea
+            className="min-h-[100px] w-full rounded border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-3 py-2 text-sm"
+            value={form.notes}
+            onChange={(e) => updateField("notes", e.target.value)}
+            placeholder={t("dashboard.careerCompassNotesPlaceholder")}
+          />
+        </Card>
+
+        <div className="flex flex-wrap gap-2">
+          <Button type="submit" disabled={saving || !dirty || Boolean(validationError)}>
+            {saving ? t("dashboard.careerCompassSaving") : t("dashboard.careerCompassSave")}
+          </Button>
+          <button
+            type="button"
+            className="twin-btn-secondary twin-touch-target !w-auto px-4 py-2 text-sm"
+            disabled={saving}
+            onClick={() => {
+              setLoading(true);
+              void load()
+                .catch((e) => setError(e instanceof Error ? e.message : t("dashboard.identityError")))
+                .finally(() => setLoading(false));
+            }}
+          >
+            {t("dashboard.careerCompassReload")}
+          </button>
+        </div>
+      </form>
     </Shell>
   );
 }

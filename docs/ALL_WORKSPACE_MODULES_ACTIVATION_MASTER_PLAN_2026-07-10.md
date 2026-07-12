@@ -20,7 +20,7 @@ Restore **full product surface visibility** with honest activation statuses. Act
 - New guards + founder decision doc
 
 ### Wave B — Candidate activation
-- **Slice 1 (first implementation):** Career Compass full persistence
+- **Slice 1 (shipped):** Career Compass full persistence — see `docs/ALL_MODULES_GREEN_WAVE_B1_CAREER_COMPASS_2026-07-10.md` (PILOT until founder browser smoke)
 - Trust Center persistence + consent receipts
 - Referrals pilot hardening
 
@@ -183,3 +183,4 @@ Auto-apply (PAUSED / INTERNAL), delegated apply, Stripe checkout, ATS writeback,
 
 - test:all-workspace-modules-visible-guard
 - test:all-workspace-modules-activation-plan-guard
+- test:all-modules-green-wave-b1-career-compass-guard

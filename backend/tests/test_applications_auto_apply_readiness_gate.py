@@ -14,16 +14,14 @@ from sqlalchemy.pool import StaticPool
 
 from app.automation.types import ApplyOutcome
 from app.core.security import create_access_token
-from app.database.models import Base, Candidate, Job, User
+from app.database.models import Base, Candidate, CandidateCareerCompass, Job, User
 from app.database.session import get_db
 from app.main import app
+from tests.career_compass_fixtures import seed_complete_career_compass
 
 
 def _gateway_signals() -> dict:
-    return {
-        "career_compass": {"ideal": {"job_title": "Backend Engineer"}},
-        "cv_insights": {"summary": "Strong Python profile"},
-    }
+    return {"cv_insights": {"summary": "Strong Python profile"}}
 
 
 @pytest.fixture
@@ -63,6 +61,7 @@ def apply_gate_client():
     )
     db.add(candidate)
     db.commit()
+    seed_complete_career_compass(db, candidate)
 
     def override_db():
         try:
@@ -80,6 +79,7 @@ def apply_gate_client():
 
 def test_applications_auto_apply_blocked_without_readiness(apply_gate_client) -> None:
     client, headers, db, _user, candidate, job = apply_gate_client
+    db.query(CandidateCareerCompass).filter(CandidateCareerCompass.candidate_id == candidate.id).delete()
     candidate.profile_signals_json = json.dumps({"cv_insights": {"summary": "only"}})
     db.commit()
     with patch("app.api.applications.auto_apply_for_user") as mock_apply:

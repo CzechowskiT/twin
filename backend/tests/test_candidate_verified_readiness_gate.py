@@ -10,9 +10,11 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.core.security import create_access_token
-from app.database.models import Base, Candidate, User
+from app.database.models import Base, Candidate, CandidateCareerCompass, User
 from app.database.session import get_db
 from app.main import app
+
+from tests.career_compass_fixtures import seed_complete_career_compass
 
 FORBIDDEN_RESPONSE_SUBSTRINGS = (
     "postgresql://",
@@ -51,15 +53,11 @@ def readiness_client():
         name="Candidate",
         cv_text="CV body",
         cv_processing_consent_at=datetime.now(timezone.utc),
-        profile_signals_json=json.dumps(
-            {
-                "career_compass": {"ideal": {"job_title": "Backend Engineer"}},
-                "cv_insights": {"summary": "Strong Python profile"},
-            }
-        ),
+        profile_signals_json=json.dumps({"cv_insights": {"summary": "Strong Python profile"}}),
     )
     db.add(candidate)
     db.commit()
+    seed_complete_career_compass(db, candidate)
 
     def override_db():
         try:
@@ -130,12 +128,7 @@ def test_verified_readiness_cv_missing(readiness_client) -> None:
     candidate.cv_text = None
     candidate.cv_filename = None
     candidate.resume_path = None
-    candidate.profile_signals_json = json.dumps(
-        {
-            "career_compass": {"ideal": {"job_title": "Backend Engineer"}},
-            "cv_insights": {"summary": "Strong Python profile"},
-        }
-    )
+    candidate.profile_signals_json = json.dumps({"cv_insights": {"summary": "Strong Python profile"}})
     db.add(candidate)
     db.commit()
 
@@ -148,6 +141,7 @@ def test_verified_readiness_cv_missing(readiness_client) -> None:
 
 def test_verified_readiness_missing_career_brief(readiness_client) -> None:
     client, headers, db, _user, candidate = readiness_client
+    db.query(CandidateCareerCompass).filter(CandidateCareerCompass.candidate_id == candidate.id).delete()
     candidate.profile_signals_json = json.dumps({"cv_insights": {"summary": "Only evidence"}})
     db.add(candidate)
     db.commit()
@@ -161,9 +155,7 @@ def test_verified_readiness_missing_career_brief(readiness_client) -> None:
 
 def test_verified_readiness_skill_evidence_missing(readiness_client) -> None:
     client, headers, db, _user, candidate = readiness_client
-    candidate.profile_signals_json = json.dumps(
-        {"career_compass": {"ideal": {"job_title": "Backend Engineer"}}}
-    )
+    candidate.profile_signals_json = json.dumps({})
     db.add(candidate)
     db.commit()
 

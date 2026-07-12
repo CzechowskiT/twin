@@ -14,6 +14,7 @@ from app.services.candidate_readiness import (
     qualifies_for_ready_for_review,
     resolve_verification_status,
 )
+from tests.career_compass_fixtures import attach_complete_career_compass
 
 
 def _user(*, onboarding: bool = True) -> User:
@@ -71,13 +72,9 @@ def test_compute_gate_ready_for_review_without_marker() -> None:
         name="Alex",
         cv_text="CV",
         cv_processing_consent_at=now,
-        profile_signals_json=json.dumps(
-            {
-                "career_compass": {"ideal": {"job_title": "Engineer"}},
-                "cv_insights": {"summary": "ok"},
-            }
-        ),
+        profile_signals_json=json.dumps({"cv_insights": {"summary": "ok"}}),
     )
+    attach_complete_career_compass(c)
     gate = compute_verified_candidate_gate(user, c)
     assert gate["verification_status"] == "ready_for_review"
     assert gate["can_prepare_application_package"] is True
@@ -150,13 +147,9 @@ def test_compute_gate_verified_basic_via_identity_at() -> None:
         name="Alex",
         cv_text="CV",
         cv_processing_consent_at=now,
-        profile_signals_json=json.dumps(
-            {
-                "career_compass": {"ideal": {"job_title": "Engineer"}},
-                "cv_insights": {"summary": "ok"},
-            }
-        ),
+        profile_signals_json=json.dumps({"cv_insights": {"summary": "ok"}}),
     )
+    attach_complete_career_compass(c)
     gate = compute_verified_candidate_gate(user, c)
     assert gate["verification_status"] == "verified_basic"
     assert gate["delegated_apply_allowed"] is False
@@ -175,13 +168,9 @@ def test_compute_gate_suspended_when_user_inactive() -> None:
         name="Alex",
         cv_text="CV",
         cv_processing_consent_at=now,
-        profile_signals_json=json.dumps(
-            {
-                "career_compass": {"ideal": {"job_title": "Engineer"}},
-                "cv_insights": {"summary": "ok"},
-            }
-        ),
+        profile_signals_json=json.dumps({"cv_insights": {"summary": "ok"}}),
     )
+    attach_complete_career_compass(c)
     gate = compute_verified_candidate_gate(user, c)
     assert gate["verification_status"] == "suspended"
     assert gate["can_prepare_application_package"] is False
@@ -198,10 +187,6 @@ def test_autonomous_apply_allowed_requires_full_gateway() -> None:
     c = Candidate(user_id=1, name="Alex", cv_text="CV")
     assert autonomous_apply_allowed(user, c) is False
     c.cv_processing_consent_at = now
-    c.profile_signals_json = json.dumps(
-        {
-            "career_compass": {"ideal": {"job_title": "Engineer"}},
-            "cv_insights": {"summary": "ok"},
-        }
-    )
+    c.profile_signals_json = json.dumps({"cv_insights": {"summary": "ok"}})
+    attach_complete_career_compass(c)
     assert autonomous_apply_allowed(user, c) is True

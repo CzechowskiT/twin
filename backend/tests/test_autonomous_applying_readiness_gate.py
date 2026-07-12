@@ -13,17 +13,15 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.core.security import create_access_token
-from app.database.models import AutoApplyConsent, Base, Candidate, User
+from app.database.models import AutoApplyConsent, Base, Candidate, CandidateCareerCompass, User
 from app.database.session import get_db
 from app.main import app
 from app.services.candidate_readiness import autonomous_apply_allowed
+from tests.career_compass_fixtures import seed_complete_career_compass
 
 
 def _gateway_signals() -> dict:
-    return {
-        "career_compass": {"ideal": {"job_title": "Backend Engineer"}},
-        "cv_insights": {"summary": "Strong Python profile"},
-    }
+    return {"cv_insights": {"summary": "Strong Python profile"}}
 
 
 @pytest.fixture
@@ -54,6 +52,7 @@ def gate_client():
     )
     db.add(candidate)
     db.commit()
+    seed_complete_career_compass(db, candidate)
 
     def override_db():
         try:
@@ -87,6 +86,7 @@ def test_settings_reports_verified_readiness_ready(gate_client) -> None:
 
 def test_consent_blocked_without_career_brief(gate_client) -> None:
     client, headers, db, _user, candidate = gate_client
+    db.query(CandidateCareerCompass).filter(CandidateCareerCompass.candidate_id == candidate.id).delete()
     candidate.profile_signals_json = json.dumps({"cv_insights": {"summary": "x"}})
     db.commit()
     res = client.post(
@@ -136,6 +136,7 @@ def test_trigger_blocked_without_verified_readiness(gate_client, monkeypatch) ->
         daily_limit=5,
     )
     db.add(consent)
+    db.query(CandidateCareerCompass).filter(CandidateCareerCompass.candidate_id == candidate.id).delete()
     candidate.profile_signals_json = json.dumps({"cv_insights": {"summary": "only"}})
     db.commit()
     res = client.post("/api/v1/auto-apply/trigger", headers=headers)

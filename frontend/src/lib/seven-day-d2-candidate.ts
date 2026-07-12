@@ -14,7 +14,9 @@ export {
   FORCE_MICROSOFT_CALENDAR_COMING_SOON,
 } from "@/lib/product-polish-p2";
 
-/** Career compass visible as PILOT — full persistence is Wave B slice 1. */
+/** Career compass visible — Wave B slice 1 persistence (PILOT until founder browser smoke). */
+export const CAREER_COMPASS_BROWSER_SMOKE_STATUS = "NEEDS_FOUNDER_AUTH_SMOKE" as const;
+
 export const CAREER_COMPASS_SHIP_STATUS = "pilot" as const;
 
 /** Interview prep ships as static pack + optional application context — not live AI coaching. */

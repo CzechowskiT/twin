@@ -13,6 +13,7 @@ from app.core.security import create_access_token
 from app.database.models import Application, AutoApplyConsent, AutoApplyRun, Base, Candidate, Job, JobMatch, User
 from app.database.session import get_db
 from app.main import app
+from tests.career_compass_fixtures import seed_complete_career_compass
 
 
 @pytest.fixture
@@ -39,15 +40,11 @@ def auto_apply_client():
         name="Auto",
         cv_text="Backend engineer CV",
         cv_processing_consent_at=datetime.now(timezone.utc),
-        profile_signals_json=json.dumps(
-            {
-                "career_compass": {"ideal": {"job_title": "Backend"}},
-                "cv_insights": {"summary": "Python"},
-            }
-        ),
+        profile_signals_json=json.dumps({"cv_insights": {"summary": "Python"}}),
     )
     db.add(candidate)
     db.commit()
+    seed_complete_career_compass(db, candidate)
     job = Job(
         title="Dev",
         company="Acme",
