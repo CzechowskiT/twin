@@ -1,5 +1,7 @@
 # All workspace modules GREEN — Wave 1 implementation
 
+> **Superseded by founder decision 2026-07-10** — see `FOUNDER_ALL_MODULES_VISIBLE_AND_GREEN_DECISION_2026-07-10.md`.
+
 **Date:** 2026-07-09  
 **Branch:** `feat/hide-non-green-workspace-modules-wave1`  
 **Parent plan:** [ALL_WORKSPACE_MODULES_GREEN_PLAN_2026-07-09.md](./ALL_WORKSPACE_MODULES_GREEN_PLAN_2026-07-09.md)

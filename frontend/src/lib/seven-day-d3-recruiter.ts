@@ -21,14 +21,14 @@ export const HIDE_RECRUITER_ANALYTICS_FROM_HUB = false;
 /** Integrations stay roadmap — no live ATS sync impression. */
 export const RECRUITER_INTEGRATIONS_ROADMAP_STATUS = "coming_soon" as const;
 
-/** Wave 1 — integrations hidden from workspace hub (route preserved). */
-export const HIDE_RECRUITER_INTEGRATIONS_FROM_HUB = true;
+/** Wave 1 reversed — integrations visible on workspace hub with COMING SOON badge. */
+export const HIDE_RECRUITER_INTEGRATIONS_FROM_HUB = false;
 
-/** Wave 3 slice 2 — integrations on product roadmap outside workspace; deep link route preserved. */
-export const RECRUITER_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE = true;
+/** Integrations stay in workspace; roadmap anchor is additional context only. */
+export const RECRUITER_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE = false;
 
-/** Wave 3 — integrations removed from extended workspace nav (hub quick actions already green-only). */
-export const HIDE_RECRUITER_INTEGRATIONS_FROM_NAV = true;
+/** Integrations restored to extended workspace nav. */
+export const HIDE_RECRUITER_INTEGRATIONS_FROM_NAV = false;
 
 export { RECRUITER_INTEGRATIONS_ROADMAP_OUTSIDE_HREF } from "@/lib/all-workspace-green-gate";
 

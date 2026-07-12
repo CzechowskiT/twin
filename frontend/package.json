@@ -77,6 +77,8 @@
     "test:product-scope-reality-review-guard": "npx --yes tsx scripts/product-scope-reality-review-guard.test.ts",
     "test:seven-day-public-ready-plan-guard": "npx --yes tsx scripts/seven-day-public-ready-plan-guard.test.ts",
     "test:all-workspace-modules-green-plan-guard": "npx --yes tsx scripts/all-workspace-modules-green-plan-guard.test.ts",
+    "test:all-workspace-modules-visible-guard": "npx --yes tsx scripts/all-workspace-modules-visible-guard.test.ts",
+    "test:all-workspace-modules-activation-plan-guard": "npx --yes tsx scripts/all-workspace-modules-activation-plan-guard.test.ts",
     "test:all-workspace-modules-green-wave1-guard": "npx --yes tsx scripts/all-workspace-modules-green-wave1-guard.test.ts",
     "test:all-workspace-modules-green-wave2a-guard": "npx --yes tsx scripts/all-workspace-modules-green-wave2a-guard.test.ts",
     "test:all-workspace-modules-green-wave2b-evidence-guard": "npx --yes tsx scripts/all-workspace-modules-green-wave2b-evidence-guard.test.ts",

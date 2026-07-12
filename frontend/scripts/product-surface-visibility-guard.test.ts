@@ -57,14 +57,15 @@ test("3 delegated apply is not live in investor reality matrix", () => {
   assert.equal(INVESTOR_ROOM_STATUS.delegatedApply, "notLive");
 });
 
-test("4 recruiter calendar is not live and hidden from default hub", () => {
+test("4 recruiter calendar is not live and visible in coming-soon section", () => {
   const mod = RECRUITER_WORKSPACE_MODULES.find((m) => m.id === "calendar");
   assert.ok(mod);
   assert.equal(mod!.status, "not_live");
   const sor = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "recruiter_calendar");
   assert.equal(sor?.status, "not_live");
   const split = splitProductSurfaceRoutes("recruiter", getSystemOfRecordRoutesForPersona("recruiter"));
-  assert.ok(split.hidden.some((r) => r.id === "recruiter_calendar"));
+  const shown = [...split.primary, ...split.roadmap];
+  assert.ok(shown.some((r) => r.id === "recruiter_calendar"));
 });
 
 test("5 billing and ATS import readiness are not live in default hubs", () => {
@@ -93,26 +94,25 @@ test("6 board/admin routes stay out of candidate recruiter company default hubs"
   }
 });
 
-test("7 primary hub card counts stay bounded for green-only workspace", () => {
+test("7 primary hub shows full surface — green-only mode disabled", () => {
   const limits = getWorkspacePrimaryLimits();
-  assert.equal(WORKSPACE_GREEN_ONLY_MODE, true);
+  assert.equal(WORKSPACE_GREEN_ONLY_MODE, false);
   for (const persona of ["candidate", "recruiter", "company"] as const) {
     const split = splitProductSurfaceRoutes(persona, getSystemOfRecordRoutesForPersona(persona));
-    const limit = limits[persona];
-    assert.ok(split.primary.length <= limit, `${persona}: ${split.primary.length} > ${limit}`);
-    assert.ok(split.primary.length >= 2, `${persona} primary too small`);
-    assert.equal(split.roadmap.length, 0, `${persona} roadmap must be empty in green mode`);
+    const shown = [...split.primary, ...split.roadmap];
+    assert.ok(shown.length >= 8, `${persona}: ${shown.length}`);
+    assert.ok(split.roadmap.length >= 1, `${persona} roadmap/pilot section must be non-empty`);
+    assert.ok(limits[persona] >= 90, persona);
   }
 });
 
-test("8 green-only modules in primary hub UI — no roadmap tier", () => {
+test("8 activation sections in hub — honest badges not all LIVE", () => {
   const hub = read("src/components/workspace/system-of-record-navigation-hub.tsx");
-  assert.match(hub, /splitProductSurfaceRoutes/);
-  assert.match(hub, /data-product-surface-primary/);
+  assert.match(hub, /splitActivationSurfaceRoutes/);
+  assert.match(hub, /data-activation-hub-section/);
 
   const candidate = splitProductSurfaceRoutes("candidate", getSystemOfRecordRoutesForPersona("candidate"));
-  assert.ok(candidate.primary.every((r) => r.status === "live"));
-  assert.equal(candidate.roadmap.length, 0);
+  assert.ok(candidate.roadmap.some((r) => r.id === "candidate_career_compass" || r.id === "candidate_trust"));
 });
 
 test("9 recruiter operational work queue hidden from default hub", () => {
@@ -120,19 +120,19 @@ test("9 recruiter operational work queue hidden from default hub", () => {
   assert.ok(split.hidden.some((r) => r.id === "recruiter_operational_work_queue"));
 });
 
-test("10 self-service delete hidden from default candidate hub", () => {
+test("10 candidate trust visible in hub; revoke_delete stays internal", () => {
   const split = splitProductSurfaceRoutes("candidate", getSystemOfRecordRoutesForPersona("candidate"));
+  const shown = [...split.primary, ...split.roadmap];
+  assert.ok(shown.some((r) => r.id === "candidate_trust"));
   assert.ok(split.hidden.some((r) => r.id === "candidate_revoke_delete"));
-  assert.ok(split.hidden.some((r) => r.id === "candidate_trust"));
-  assert.ok(!split.primary.some((r) => r.id === "candidate_trust"));
 });
 
-test("11 company workspace billing hidden; talent pool hidden in green mode", () => {
+test("11 company workspace talent pool visible; billing internal", () => {
   const split = splitWorkspaceModules("company", COMPANY_WORKSPACE_MODULES);
   assert.ok(split.hidden.some((m) => m.id === "billing"));
-  assert.ok(!split.primary.some((m) => m.id === "talent_pool"));
-  assert.ok(split.primary.some((m) => m.id === "pipeline"));
-  assert.deepEqual(getWorkspacePrimaryLimits().company, WORKSPACE_GREEN_PRIMARY_LIMITS.company);
+  const shown = [...split.primary, ...split.roadmap];
+  assert.ok(shown.some((m) => m.id === "talent_pool"));
+  assert.ok(shown.some((m) => m.id === "integrations"));
 });
 
 test("12 audit doc states controlled pilot stance — not Launch GO, Gate F PENDING", () => {

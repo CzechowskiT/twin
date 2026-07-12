@@ -1,25 +1,21 @@
 /**
- * Controlled-pilot product surface — default hub visibility without removing routes.
- * Routes and SoR entries stay intact; hubs only change grouping and default display.
- * Wave 1: WORKSPACE_GREEN_ONLY_MODE — only GREEN_WORKING modules in workspace hubs.
+ * Product surface visibility — honest activation statuses, full module inventory.
+ * Supersedes WORKSPACE_GREEN_ONLY_MODE (founder decision 2026-07-10).
  */
 import {
-  isWorkspaceGreenVisible,
-  WORKSPACE_GREEN_ONLY_MODE,
-  WORKSPACE_GREEN_PRIMARY_LIMITS,
-} from "@/lib/all-workspace-green-gate";
+  activationStatusToBadgeStatus,
+  getWorkspaceModuleActivationStatus,
+  isWorkspaceModuleVisible,
+  splitByActivationHubSection,
+  type ActivationHubSlice,
+} from "@/lib/all-workspace-modules-activation";
 import type { MarketingPersona } from "@/lib/marketing-persona";
-import {
-  HIDE_BOARD_FROM_INVESTOR_DEFAULT_HUB,
-  HIDE_INVESTOR_PUBLIC_LOGIN_FROM_PREVIEW,
-  INVESTOR_PRIMARY_MODULE_IDS,
-  INVESTOR_ROADMAP_MODULE_IDS,
-} from "@/lib/seven-day-d5-investor";
 import type { SystemOfRecordRouteEntry } from "@/lib/system-of-record-routes";
 import type { WorkspaceModuleDef, WorkspaceModuleStatus } from "@/lib/workspace-module-status";
 
-export type ProductSurfaceTier = "LIVE" | "PILOT" | "HOLD" | "INTERNAL" | "COMING_SOON";
+export type ProductSurfaceTier = "LIVE" | "PILOT" | "PREVIEW" | "COMING_SOON" | "PAUSED" | "INTERNAL";
 
+/** @deprecated Use ActivationHubSlice — kept for guard compatibility. */
 export type ProductSurfaceHubSlice<T> = {
   primary: readonly T[];
   roadmap: readonly T[];
@@ -40,250 +36,46 @@ export const PUBLIC_SURFACE_HREFS = [
   "/status",
 ] as const;
 
-const ALWAYS_HIDDEN_MODULE_IDS = new Set([
-  "auto_apply",
-  "plan_payments",
-  "candidate_revoke_delete",
-  "recruiter_hub",
-  "recruiter_calendar",
-  "recruiter_operational_work_queue",
-  "recruiter_ats_import_readiness",
-  "company_billing",
-  "billing",
-  "company_ats_import_readiness",
-]);
-
 const BOARD_OR_ADMIN_PREFIXES = ["/board/", "/admin/"] as const;
 
-const CANDIDATE_PRIMARY_IDS = new Set([
-  "candidate_panel",
-  "candidate_jobs",
-  "candidate_matches",
-  "candidate_profile",
-  "candidate_cv",
-  "candidate_applications",
-  "candidate_calendar",
-  "candidate_identity",
-  "profile",
-  "jobs",
-  "matches",
-  "applications",
-  "calendar",
-  "identity",
-]);
-
-const CANDIDATE_ROADMAP_IDS = new Set([
-  "candidate_career_compass",
-  "candidate_interview_prep",
-  "candidate_evidence",
-  "candidate_plan",
-  "candidate_referrals",
-  "candidate_trust",
-  "candidate_control_center",
-  "candidate_export_preview",
-  "candidate_correction_request",
-  "candidate_identity_verification",
-  "candidate_data_portability",
-  "candidate_trust_audit_export",
-  "candidate_consent_receipt",
-  "candidate_trust_overview",
-  "career_compass",
-  "interview_prep",
-  "evidence",
-  "plan_payments",
-  "referrals",
-  "trust_center",
-]);
-
-const RECRUITER_PRIMARY_IDS = new Set([
-  "recruiter_inbox",
-  "recruiter_pipeline",
-  "recruiter_jobs",
-  "recruiter_search",
-  "recruiter_analytics",
-  "inbox",
-  "pipeline",
-  "jobs",
-  "search",
-  "analytics",
-]);
-
-const RECRUITER_ROADMAP_IDS = new Set([
-  "recruiter_trust_review_queue",
-  "recruiter_daily_cockpit",
-  "recruiter_talent_radar",
-  "recruiter_talent_radar_digest",
-  "recruiter_talent_pool",
-  "recruiter_talent_pool_import",
-  "recruiter_integrations",
-  "recruiter_demo_pipeline",
-  "recruiter_demo_profile_360",
-  "recruiter_demo_collaboration",
-  "recruiter_demo_trust",
-  "recruiter_demo_team",
-  "recruiter_demo_communication",
-  "recruiter_demo_decision_memory",
-  "trust_review_queue",
-  "daily_cockpit",
-  "talent_pool",
-  "talent_radar_digest",
-  "talent_radar",
-  "integrations",
-]);
-
-const COMPANY_PRIMARY_IDS = new Set([
-  "company_dashboard",
-  "company_roles",
-  "company_pipeline",
-  "company_talent_pool",
-  "roles",
-  "pipeline",
-  "talent_pool",
-]);
-
-const COMPANY_ROADMAP_IDS = new Set([
-  "company_hiring_cockpit",
-  "company_hiring_command_center",
-  "company_team",
-  "company_integrations",
-  "company_candidate_trust_summary",
-  "company_demo_pipeline",
-  "company_demo_profile_360",
-  "company_demo_collaboration",
-  "company_demo_trust",
-  "company_demo_team",
-  "company_demo_communication",
-  "company_demo_decision_memory",
-  "hiring_cockpit",
-  "hiring_command_center",
-  "team",
-  "integrations",
-]);
-
+/** @deprecated Green-only limits — activation model shows full surface. */
 export const CONTROLLED_PILOT_PRIMARY_LIMITS: Readonly<Record<MarketingPersona, number>> = {
-  candidate: 8,
-  recruiter: 5,
-  company: 4,
-  investor: 6,
+  candidate: 99,
+  recruiter: 99,
+  company: 99,
+  investor: 99,
 };
-
-const INVESTOR_PRIMARY_IDS = new Set<string>(INVESTOR_PRIMARY_MODULE_IDS);
-const INVESTOR_ROADMAP_IDS = new Set<string>(INVESTOR_ROADMAP_MODULE_IDS);
 
 function hrefIsBoardOrAdmin(href: string): boolean {
   return BOARD_OR_ADMIN_PREFIXES.some((prefix) => href.startsWith(prefix));
 }
 
-function statusToTier(status: WorkspaceModuleStatus): ProductSurfaceTier {
-  switch (status) {
-    case "live":
-      return "LIVE";
-    case "pilot":
-      return "PILOT";
-    case "planned":
-      return "COMING_SOON";
-    case "not_live":
-    case "paused":
-      return "HOLD";
-    case "needs_setup":
-      return "COMING_SOON";
-    default:
-      return "HOLD";
-  }
+function isInternalModule(persona: MarketingPersona, moduleId: string, href?: string): boolean {
+  if (!isWorkspaceModuleVisible(moduleId)) return true;
+  if (href && hrefIsBoardOrAdmin(href) && persona !== "investor") return true;
+  return getWorkspaceModuleActivationStatus(moduleId) === "INTERNAL";
 }
 
 export function classifyProductSurfaceTier(
   persona: MarketingPersona,
   moduleId: string,
-  status?: WorkspaceModuleStatus,
+  _status?: WorkspaceModuleStatus,
 ): ProductSurfaceTier {
-  if (WORKSPACE_GREEN_ONLY_MODE && !isWorkspaceGreenVisible(persona, moduleId)) {
-    return "INTERNAL";
-  }
-
-  if (WORKSPACE_GREEN_ONLY_MODE && isWorkspaceGreenVisible(persona, moduleId)) {
-    return "LIVE";
-  }
-
-  if (ALWAYS_HIDDEN_MODULE_IDS.has(moduleId) || hrefIsBoardOrAdmin(moduleId)) {
-    return "INTERNAL";
-  }
-
-  if (persona === "investor") {
-    if (HIDE_BOARD_FROM_INVESTOR_DEFAULT_HUB && hrefIsBoardOrAdmin(moduleId)) {
-      return "INTERNAL";
-    }
-    if (INVESTOR_PRIMARY_IDS.has(moduleId)) return "LIVE";
-    if (INVESTOR_ROADMAP_IDS.has(moduleId)) {
-      return status === "preview" || status === "pilot" ? "PILOT" : "COMING_SOON";
-    }
-    return status ? statusToTier(status) : "PILOT";
-  }
-
-  const primaryByPersona: Record<Exclude<MarketingPersona, "investor">, Set<string>> = {
-    candidate: CANDIDATE_PRIMARY_IDS,
-    recruiter: RECRUITER_PRIMARY_IDS,
-    company: COMPANY_PRIMARY_IDS,
-  };
-
-  const roadmapByPersona: Record<Exclude<MarketingPersona, "investor">, Set<string>> = {
-    candidate: CANDIDATE_ROADMAP_IDS,
-    recruiter: RECRUITER_ROADMAP_IDS,
-    company: COMPANY_ROADMAP_IDS,
-  };
-
-  if (primaryByPersona[persona].has(moduleId)) return "LIVE";
-  if (roadmapByPersona[persona].has(moduleId)) {
-    if (
-      status === "planned" ||
-      status === "needs_setup" ||
-      status === "coming_soon" ||
-      status === "not_live"
-    ) {
-      return status === "not_live" ? "HOLD" : "COMING_SOON";
-    }
-    return "PILOT";
-  }
-
-  if (status) return statusToTier(status);
-  return "INTERNAL";
+  if (isInternalModule(persona, moduleId)) return "INTERNAL";
+  return getWorkspaceModuleActivationStatus(moduleId);
 }
 
 export function shouldHideFromDefaultHub(persona: MarketingPersona, moduleId: string): boolean {
-  if (WORKSPACE_GREEN_ONLY_MODE) {
-    if (ALWAYS_HIDDEN_MODULE_IDS.has(moduleId)) return true;
-    if (hrefIsBoardOrAdmin(moduleId)) return true;
-    if (persona === "investor" && HIDE_INVESTOR_PUBLIC_LOGIN_FROM_PREVIEW && moduleId === "login") {
-      return true;
-    }
-    if (persona === "investor" && HIDE_BOARD_FROM_INVESTOR_DEFAULT_HUB && hrefIsBoardOrAdmin(moduleId)) {
-      return true;
-    }
-    return !isWorkspaceGreenVisible(persona, moduleId);
-  }
-
-  if (persona === "investor") {
-    if (HIDE_BOARD_FROM_INVESTOR_DEFAULT_HUB && hrefIsBoardOrAdmin(moduleId)) return true;
-    return classifyProductSurfaceTier(persona, moduleId) === "INTERNAL";
-  }
-  if (ALWAYS_HIDDEN_MODULE_IDS.has(moduleId)) return true;
-  if (hrefIsBoardOrAdmin(moduleId)) return true;
-  return classifyProductSurfaceTier(persona, moduleId) === "INTERNAL";
+  return isInternalModule(persona, moduleId);
 }
 
 export function shouldShowAsRoadmap(persona: MarketingPersona, moduleId: string): boolean {
-  if (WORKSPACE_GREEN_ONLY_MODE) return false;
-
-  if (persona === "investor") {
-    const tier = classifyProductSurfaceTier(persona, moduleId);
-    return tier === "PILOT" || tier === "COMING_SOON" || tier === "HOLD";
-  }
+  if (shouldHideFromDefaultHub(persona, moduleId)) return false;
   const tier = classifyProductSurfaceTier(persona, moduleId);
-  return tier === "PILOT" || tier === "COMING_SOON" || tier === "HOLD";
+  return tier === "PILOT" || tier === "PREVIEW" || tier === "COMING_SOON" || tier === "PAUSED";
 }
 
 export function isVisibleInControlledPilot(persona: MarketingPersona, moduleId: string): boolean {
-  if (persona === "investor") return true;
   return !shouldHideFromDefaultHub(persona, moduleId);
 }
 
@@ -294,61 +86,89 @@ export function isVisibleInPublicSurface(href: string): boolean {
   return false;
 }
 
+/** Legacy slice — maps activation sections to primary/roadmap/hidden for guards. */
 export function splitProductSurfaceRoutes(
   persona: MarketingPersona,
   routes: readonly SystemOfRecordRouteEntry[],
 ): ProductSurfaceHubSlice<SystemOfRecordRouteEntry> {
-  const primary: SystemOfRecordRouteEntry[] = [];
-  const roadmap: SystemOfRecordRouteEntry[] = [];
-  const hidden: SystemOfRecordRouteEntry[] = [];
-
-  for (const route of routes) {
-    if (hrefIsBoardOrAdmin(route.href) || ALWAYS_HIDDEN_MODULE_IDS.has(route.id)) {
-      hidden.push(route);
-      continue;
-    }
-    if (shouldHideFromDefaultHub(persona, route.id)) {
-      hidden.push(route);
-      continue;
-    }
-    if (shouldShowAsRoadmap(persona, route.id)) {
-      roadmap.push(route);
-      continue;
-    }
-    primary.push(route);
-  }
-
-  return { primary, roadmap, hidden };
+  const slice = splitActivationSurfaceRoutes(persona, routes);
+  return {
+    primary: [...slice.core, ...slice.extended],
+    roadmap: [...slice.pilotPreview, ...slice.comingSoonPaused],
+    hidden: slice.internal,
+  };
 }
 
 export function splitWorkspaceModules(
   persona: MarketingPersona,
   modules: readonly WorkspaceModuleDef[],
 ): ProductSurfaceHubSlice<WorkspaceModuleDef> {
-  const primary: WorkspaceModuleDef[] = [];
-  const roadmap: WorkspaceModuleDef[] = [];
-  const hidden: WorkspaceModuleDef[] = [];
+  const slice = splitActivationWorkspaceModules(persona, modules);
+  return {
+    primary: [...slice.core, ...slice.extended],
+    roadmap: [...slice.pilotPreview, ...slice.comingSoonPaused],
+    hidden: slice.internal,
+  };
+}
 
-  for (const mod of modules) {
-    if (shouldHideFromDefaultHub(persona, mod.id)) {
-      hidden.push(mod);
-      continue;
-    }
-    if (shouldShowAsRoadmap(persona, mod.id)) {
-      roadmap.push(mod);
-      continue;
-    }
-    primary.push(mod);
-  }
+export function splitActivationSurfaceRoutes(
+  persona: MarketingPersona,
+  routes: readonly SystemOfRecordRouteEntry[],
+): ActivationHubSlice<SystemOfRecordRouteEntry> {
+  const visible = routes.filter(
+    (route) => !isInternalModule(persona, route.id, route.href),
+  );
+  const forcedInternal = routes.filter((route) =>
+    isInternalModule(persona, route.id, route.href),
+  );
+  const slice = splitByActivationHubSection(visible, persona);
+  return {
+    ...slice,
+    internal: [...slice.internal, ...forcedInternal],
+  };
+}
 
-  return { primary, roadmap, hidden };
+export function splitActivationWorkspaceModules(
+  persona: MarketingPersona,
+  modules: readonly WorkspaceModuleDef[],
+): ActivationHubSlice<WorkspaceModuleDef> {
+  const visible = modules.filter((mod) => !isInternalModule(persona, mod.id, mod.href));
+  const forcedInternal = modules.filter((mod) => isInternalModule(persona, mod.id, mod.href));
+  const slice = splitByActivationHubSection(visible, persona);
+  return {
+    ...slice,
+    internal: [...slice.internal, ...forcedInternal],
+  };
 }
 
 export function tierFromWorkspaceStatus(status: WorkspaceModuleStatus): ProductSurfaceTier {
-  return statusToTier(status);
+  const badge = activationStatusToBadgeStatus(
+    status === "live"
+      ? "LIVE"
+      : status === "pilot"
+        ? "PILOT"
+        : status === "preview"
+          ? "PREVIEW"
+          : status === "coming_soon" || status === "planned" || status === "needs_setup"
+            ? "COMING_SOON"
+            : status === "paused" || status === "not_live"
+              ? "PAUSED"
+              : "PILOT",
+  );
+  return badge === "live"
+    ? "LIVE"
+    : badge === "pilot"
+      ? "PILOT"
+      : badge === "preview"
+        ? "PREVIEW"
+        : badge === "coming_soon"
+          ? "COMING_SOON"
+          : badge === "paused"
+            ? "PAUSED"
+            : "INTERNAL";
 }
 
-/** Primary hub card limits — green-only when WORKSPACE_GREEN_ONLY_MODE is on. */
+/** @deprecated No primary limits — full product surface visible. */
 export function getWorkspacePrimaryLimits(): Readonly<Record<MarketingPersona, number>> {
-  return WORKSPACE_GREEN_ONLY_MODE ? WORKSPACE_GREEN_PRIMARY_LIMITS : CONTROLLED_PILOT_PRIMARY_LIMITS;
+  return CONTROLLED_PILOT_PRIMARY_LIMITS;
 }

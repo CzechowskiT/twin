@@ -4,6 +4,10 @@ import Link from "next/link";
 
 import { useTranslation } from "@/components/language-provider";
 import { Card } from "@/components/ui";
+import {
+  activationStatusToBadgeStatus,
+  getWorkspaceModuleActivationStatus,
+} from "@/lib/all-workspace-modules-activation";
 import { scrollToDashboardHash } from "@/lib/dashboard-anchor";
 import type { SystemOfRecordRouteEntry } from "@/lib/system-of-record-routes";
 
@@ -14,12 +18,14 @@ export function SystemOfRecordModuleCard({ route }: { route: SystemOfRecordRoute
   const { t } = useTranslation();
   const href = route.href;
   const isExternal = href.startsWith("mailto:");
+  const activationStatus = getWorkspaceModuleActivationStatus(route.id);
+  const badgeStatus = activationStatusToBadgeStatus(activationStatus);
 
   const cardBody = (
     <>
       <div className="flex flex-wrap items-start justify-between gap-2">
         <h3 className="text-base font-semibold text-[var(--foreground)]">{t(route.titleKey)}</h3>
-        <WorkspaceStatusBadge status={route.status} />
+        <WorkspaceStatusBadge status={badgeStatus} />
       </div>
       <p className="twin-muted mt-2 flex-1 text-sm leading-relaxed">{t(route.descriptionKey)}</p>
       {route.hintKey ? (
