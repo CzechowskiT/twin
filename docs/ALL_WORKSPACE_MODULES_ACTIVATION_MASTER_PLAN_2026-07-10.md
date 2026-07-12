@@ -21,7 +21,7 @@ Restore **full product surface visibility** with honest activation statuses. Act
 
 ### Wave B — Candidate activation
 - **Slice 1 (shipped):** Career Compass full persistence — see `docs/ALL_MODULES_GREEN_WAVE_B1_CAREER_COMPASS_2026-07-10.md` (PILOT until founder browser smoke)
-- Trust Center persistence + consent receipts
+- **Slice 2 (shipped):** Trust Center persistence + consent receipts — see `docs/ALL_MODULES_GREEN_WAVE_B2_CANDIDATE_TRUST_CENTER_2026-07-10.md` (PILOT until founder browser smoke)
 - Referrals pilot hardening
 
 ### Wave C — Recruiter activation

@@ -47,12 +47,37 @@ from app.schemas.career_compass import (
     CareerCompassPreviewOut,
     CareerCompassPutIn,
 )
+from app.schemas.candidate_trust import (
+    ConsentGrantIn,
+    ConsentListOut,
+    ConsentPatchIn,
+    ConsentReceiptListOut,
+    PrivacyRequestCreateIn,
+    PrivacyRequestListOut,
+    PrivacyRequestOut,
+    TrustAuditEventListOut,
+    TrustCenterOut,
+)
 from app.services.candidate_career_compass_persistence import (
     get_compass_row,
     patch_compass,
     serialize_compass,
     upsert_compass,
 )
+from app.services.candidate_consent_service import (
+    grant_consent,
+    list_consent_receipts,
+    list_consents,
+    patch_consent,
+)
+from app.services.candidate_privacy_request_service import (
+    cancel_privacy_request,
+    create_privacy_request,
+    get_privacy_request,
+    list_privacy_requests,
+)
+from app.services.candidate_trust_audit_service import list_trust_audit_events
+from app.services.candidate_trust_center_service import build_trust_center
 from app.schemas.acceptance_queue import AcceptanceQueueOut, AcceptanceRespondIn
 from app.schemas.job_match_feedback import (
     JobMatchFeedbackIn,
@@ -800,6 +825,165 @@ def patch_career_compass(
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
     return CareerCompassOut.model_validate(data)
+
+
+@router.get("/me/trust", response_model=TrustCenterOut)
+def get_trust_center(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> TrustCenterOut:
+    candidate = _get_candidate_or_404(db, user.id)
+    row = db.query(User).filter(User.id == user.id).first()
+    assert row is not None
+    return TrustCenterOut.model_validate(build_trust_center(db, candidate=candidate, user=row))
+
+
+@router.get("/me/consents", response_model=ConsentListOut)
+def get_consents(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> ConsentListOut:
+    candidate = _get_candidate_or_404(db, user.id)
+    row = db.query(User).filter(User.id == user.id).first()
+    assert row is not None
+    return ConsentListOut.model_validate(list_consents(db, candidate=candidate, user=row))
+
+
+@router.post("/me/consents", response_model=ConsentListOut, status_code=201)
+def post_consent(
+    body: ConsentGrantIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> ConsentListOut:
+    candidate = _get_candidate_or_404(db, user.id)
+    row = db.query(User).filter(User.id == user.id).first()
+    assert row is not None
+    try:
+        data = grant_consent(
+            db,
+            candidate=candidate,
+            user=row,
+            purpose=body.purpose,
+            idempotency_key=body.idempotency_key,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+    return ConsentListOut.model_validate(data)
+
+
+@router.patch("/me/consents", response_model=ConsentListOut)
+def patch_consents(
+    body: ConsentPatchIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> ConsentListOut:
+    candidate = _get_candidate_or_404(db, user.id)
+    row = db.query(User).filter(User.id == user.id).first()
+    assert row is not None
+    try:
+        data = patch_consent(
+            db,
+            candidate=candidate,
+            user=row,
+            purpose=body.purpose,
+            action=body.action,
+            idempotency_key=body.idempotency_key,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+    return ConsentListOut.model_validate(data)
+
+
+@router.get("/me/consent-receipts", response_model=ConsentReceiptListOut)
+def get_consent_receipts(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+    limit: int = Query(default=50, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+) -> ConsentReceiptListOut:
+    candidate = _get_candidate_or_404(db, user.id)
+    return ConsentReceiptListOut.model_validate(
+        list_consent_receipts(db, candidate_id=candidate.id, limit=limit, offset=offset)
+    )
+
+
+@router.get("/me/privacy-requests", response_model=PrivacyRequestListOut)
+def get_privacy_requests(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+    limit: int = Query(default=50, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+) -> PrivacyRequestListOut:
+    candidate = _get_candidate_or_404(db, user.id)
+    return PrivacyRequestListOut.model_validate(
+        list_privacy_requests(db, candidate_id=candidate.id, limit=limit, offset=offset)
+    )
+
+
+@router.post("/me/privacy-requests", response_model=PrivacyRequestOut, status_code=201)
+def post_privacy_request(
+    body: PrivacyRequestCreateIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> PrivacyRequestOut:
+    candidate = _get_candidate_or_404(db, user.id)
+    try:
+        data = create_privacy_request(
+            db,
+            candidate_id=candidate.id,
+            user_id=user.id,
+            request_type=body.request_type,
+            payload=body.payload,
+            idempotency_key=body.idempotency_key,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+    return PrivacyRequestOut.model_validate(data)
+
+
+@router.get("/me/privacy-requests/{request_id}", response_model=PrivacyRequestOut)
+def get_privacy_request_by_id(
+    request_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> PrivacyRequestOut:
+    candidate = _get_candidate_or_404(db, user.id)
+    data = get_privacy_request(db, candidate_id=candidate.id, request_id=request_id)
+    if not data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Privacy request not found")
+    return PrivacyRequestOut.model_validate(data)
+
+
+@router.post("/me/privacy-requests/{request_id}/cancel", response_model=PrivacyRequestOut)
+def cancel_privacy_request_endpoint(
+    request_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> PrivacyRequestOut:
+    candidate = _get_candidate_or_404(db, user.id)
+    try:
+        data = cancel_privacy_request(
+            db,
+            candidate_id=candidate.id,
+            request_id=request_id,
+            user_id=user.id,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+    return PrivacyRequestOut.model_validate(data)
+
+
+@router.get("/me/trust/audit-events", response_model=TrustAuditEventListOut)
+def get_trust_audit_events(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+    limit: int = Query(default=50, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+) -> TrustAuditEventListOut:
+    candidate = _get_candidate_or_404(db, user.id)
+    return TrustAuditEventListOut.model_validate(
+        list_trust_audit_events(db, candidate_id=candidate.id, limit=limit, offset=offset)
+    )
 
 
 def _get_candidate_or_404(db: Session, user_id: int) -> Candidate:

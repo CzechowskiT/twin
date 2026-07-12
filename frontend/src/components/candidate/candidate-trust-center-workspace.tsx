@@ -1,25 +1,32 @@
 "use client";
 
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
 import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
-import type {
-  CandidateDataSourceKind,
-  CandidateTrustCenterRecord,
-  CommunicationPreference,
-  TrustTimelineEventType,
-  VisibilityScope,
+import { apiFetch } from "@/lib/api";
+import { getToken } from "@/lib/auth";
+import type { TrustCenterData } from "@/lib/candidate-trust-api";
+import { TRUST_CENTER_API_PATH } from "@/lib/candidate-trust-api";
+import {
+  getCandidateTrustCenterDemo,
+  type CandidateDataSourceKind,
+  type CandidateTrustCenterRecord,
+  type CommunicationPreference,
+  type TrustTimelineEventType,
+  type VisibilityScope,
 } from "@/lib/candidate-trust-center-demo-data";
 import {
   CANDIDATE_TRUST_CENTER_MARKERS,
   CANDIDATE_TRUST_CENTER_PAGE_MARKER,
   CANDIDATE_TRUST_CENTER_SAFE_LINKS,
-  resolveCandidateTrustCenter,
+  isCandidateTrustCenterDemoId,
+  trustCenterDataToRecord,
 } from "@/lib/candidate-trust-center";
 import { candidateControlCenterHref } from "@/lib/candidate-control-center";
 import { candidateExportPreviewHref } from "@/lib/candidate-export-preview";
@@ -447,7 +454,62 @@ type CandidateTrustCenterWorkspaceProps = {
 };
 
 export function CandidateTrustCenterWorkspace({ candidateId }: CandidateTrustCenterWorkspaceProps) {
-  const record = resolveCandidateTrustCenter(candidateId);
-  if (!record) return <TrustCenterNotFound />;
+  const router = useRouter();
+  const { t } = useTranslation();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [record, setRecord] = useState<CandidateTrustCenterRecord | null>(null);
+
+  const load = useCallback(async () => {
+    const token = getToken();
+    if (!token) {
+      router.replace("/login/candidate");
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await apiFetch<TrustCenterData>(TRUST_CENTER_API_PATH, {}, token);
+      setRecord(trustCenterDataToRecord(data));
+    } catch {
+      if (candidateId && isCandidateTrustCenterDemoId(candidateId)) {
+        setRecord(getCandidateTrustCenterDemo());
+      } else {
+        setError("load_failed");
+        setRecord(null);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [candidateId, router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  if (loading) {
+    return (
+      <Shell wide rail>
+        <div data-testid="candidate-trust-center-loading" className="space-y-4 p-6">
+          <div className="h-8 w-48 animate-pulse rounded bg-[var(--twin-border)]/60" />
+          <div className="h-32 animate-pulse rounded bg-[var(--twin-border)]/40" />
+        </div>
+      </Shell>
+    );
+  }
+
+  if (error || !record) {
+    return (
+      <Shell wide rail>
+        <div data-testid="candidate-trust-center-error" className="space-y-4 p-6">
+          <p className="text-sm text-[var(--twin-muted-strong)]">{t("candidateTrustCenter.loadError")}</p>
+          <button type="button" className="twin-btn-secondary twin-touch-target" onClick={() => void load()}>
+            {t("candidateTrustCenter.retryButton")}
+          </button>
+        </div>
+      </Shell>
+    );
+  }
+
   return <TrustCenterContent record={record} />;
 }

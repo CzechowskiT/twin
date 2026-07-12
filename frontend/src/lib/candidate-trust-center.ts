@@ -4,8 +4,11 @@ import {
   CANDIDATE_TRUST_CENTER_DEMO_ID,
   getCandidateTrustCenterDemo,
   type CandidateTrustCenterRecord,
+  type ConsentDataUseItem,
+  type TrustTimelineEvent,
 } from "@/lib/candidate-trust-center-demo-data";
 import { CANDIDATE_CANONICAL_ROUTES } from "@/lib/candidate-canonical-routes";
+import type { TrustCenterData } from "@/lib/candidate-trust-api";
 
 export { CANDIDATE_TRUST_CENTER_DEMO_ID };
 
@@ -57,4 +60,60 @@ export function resolveCandidateTrustCenter(candidateId?: string): CandidateTrus
 
 export function isCandidateTrustCenterDemoId(candidateId: string): boolean {
   return candidateId.trim() === CANDIDATE_TRUST_CENTER_DEMO_ID;
+}
+
+/** Map persisted API payload to workspace record shape. */
+export function trustCenterDataToRecord(data: TrustCenterData): CandidateTrustCenterRecord {
+  const consentItems: ConsentDataUseItem[] = data.consent_items.map((item) => ({
+    id: item.purpose,
+    purpose: item.purpose.replace(/_/g, " "),
+    status:
+      item.status === "active"
+        ? "active"
+        : item.status === "review_required"
+          ? "review_required"
+          : "not_live",
+    note: item.note,
+  }));
+  const trustTimeline: TrustTimelineEvent[] = data.trust_timeline.map((event) => ({
+    id: event.id,
+    type: mapAuditEventType(event.type),
+    at: event.at,
+    summary: event.summary,
+    outbound_sent: false,
+  }));
+  return {
+    id: String(data.candidate_id),
+    display_name: data.display_name,
+    headline: data.twin_knows_summary,
+    role_id: "",
+    role_title: "—",
+    trust_label: "PILOT",
+    last_reviewed_at: data.updated_at ?? new Date().toISOString(),
+    twin_knows_summary: data.twin_knows_summary,
+    twin_knows_items: data.twin_knows_items,
+    data_sources: data.data_sources.map((source) => ({
+      id: source.id,
+      kind: source.kind as CandidateTrustCenterRecord["data_sources"][number]["kind"],
+      label: source.label,
+      detail: source.detail,
+      last_synced_at: source.last_synced_at ?? new Date().toISOString(),
+      sample_only: true,
+    })),
+    visibility_scopes: [],
+    consent_items: consentItems,
+    communication_preferences: [],
+    human_decision_note: data.manual_processing_notice,
+    controls_export_disabled: true,
+    controls_delete_disabled: true,
+    trust_timeline: trustTimeline,
+    pilot_labelled: true as const,
+  };
+}
+
+function mapAuditEventType(type: string): TrustTimelineEvent["type"] {
+  if (type === "consent_granted" || type === "consent_withdrawn") return "consent_recorded";
+  if (type === "privacy_request_created") return "export_requested";
+  if (type === "profile_updated") return "profile_updated";
+  return "consent_recorded";
 }
