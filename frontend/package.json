@@ -79,6 +79,7 @@
     "test:all-workspace-modules-green-plan-guard": "npx --yes tsx scripts/all-workspace-modules-green-plan-guard.test.ts",
     "test:all-workspace-modules-visible-guard": "npx --yes tsx scripts/all-workspace-modules-visible-guard.test.ts",
     "test:all-workspace-modules-activation-plan-guard": "npx --yes tsx scripts/all-workspace-modules-activation-plan-guard.test.ts",
+    "test:all-modules-green-wave-b1-career-compass-guard": "npx --yes tsx scripts/all-modules-green-wave-b1-career-compass-guard.test.ts",
     "test:all-workspace-modules-green-wave1-guard": "npx --yes tsx scripts/all-workspace-modules-green-wave1-guard.test.ts",
     "test:all-workspace-modules-green-wave2a-guard": "npx --yes tsx scripts/all-workspace-modules-green-wave2a-guard.test.ts",
     "test:all-workspace-modules-green-wave2b-evidence-guard": "npx --yes tsx scripts/all-workspace-modules-green-wave2b-evidence-guard.test.ts",

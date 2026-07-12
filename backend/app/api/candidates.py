@@ -43,11 +43,15 @@ from app.services.candidate_evidence_vault import (
 )
 from app.schemas.career_compass import (
     CareerCompassOut,
+    CareerCompassPatchIn,
     CareerCompassPreviewOut,
     CareerCompassPutIn,
-    CareerSnapshotOut,
-    MilestonePatchIn,
-    PathOut,
+)
+from app.services.candidate_career_compass_persistence import (
+    get_compass_row,
+    patch_compass,
+    serialize_compass,
+    upsert_compass,
 )
 from app.schemas.acceptance_queue import AcceptanceQueueOut, AcceptanceRespondIn
 from app.schemas.job_match_feedback import (
@@ -62,14 +66,6 @@ from app.services.cv_parser import CvParseError
 from app.services.cv_storage import delete_cv_for_candidate, save_cv_for_candidate
 from app.services.cv_tailoring import build_cv_tailoring_blob
 from app.services.request_locale import locale_from_request
-from app.services.career_compass import (
-    build_career_compass,
-    candidate_profile_dict,
-    get_career_compass_blob,
-    ideal_dict_from_pydantic,
-    next_open_milestone_title,
-    set_milestone_done,
-)
 from app.services.intro_audio_storage import save_intro_audio_for_candidate
 from app.services.profile_document_storage import (
     delete_profile_document_file,
@@ -111,7 +107,7 @@ def create_profile(
     db.add(candidate)
     db.commit()
     db.refresh(candidate)
-    return _to_out(candidate)
+    return _to_out(db, candidate)
 
 
 @router.get("/me", response_model=CandidateOut)
@@ -120,7 +116,7 @@ def get_my_profile(
     user: User = Depends(get_current_user),
 ) -> CandidateOut:
     candidate = _get_candidate_or_404(db, user.id)
-    return _to_out(candidate)
+    return _to_out(db, candidate)
 
 
 def _enforce_profile_edit(user: User) -> None:
@@ -158,7 +154,7 @@ def update_profile(
         _apply_update(candidate, body)
     db.commit()
     db.refresh(candidate)
-    return _to_out(candidate)
+    return _to_out(db, candidate)
 
 
 @router.post("/me/cv", response_model=CvUploadOut)
@@ -284,7 +280,7 @@ def remove_cv(
 ) -> CandidateOut:
     candidate = _get_candidate_or_404(db, user.id)
     candidate = delete_cv_for_candidate(db, candidate)
-    return _to_out(candidate)
+    return _to_out(db, candidate)
 
 
 def _profile_docs_storage_covered(db: Session, user: User) -> bool:
@@ -576,7 +572,7 @@ def remove_cv_tailoring(
     db.add(candidate)
     db.commit()
     db.refresh(candidate)
-    return _to_out(candidate)
+    return _to_out(db, candidate)
 
 
 @router.get("/me/acceptance-queue", response_model=AcceptanceQueueOut)
@@ -769,7 +765,8 @@ def get_career_compass(
     user: User = Depends(get_current_user),
 ) -> CareerCompassOut:
     candidate = _get_candidate_or_404(db, user.id)
-    return _career_compass_detail(candidate)
+    row = get_compass_row(db, candidate_id=candidate.id)
+    return CareerCompassOut.model_validate(serialize_compass(row))
 
 
 @router.put("/me/career-compass", response_model=CareerCompassOut)
@@ -779,58 +776,30 @@ def put_career_compass(
     user: User = Depends(get_current_user),
 ) -> CareerCompassOut:
     candidate = _get_candidate_or_404(db, user.id)
-    skills = json.loads(candidate.skills) if candidate.skills else []
-    titles_raw = json.loads(candidate.preferred_job_titles) if candidate.preferred_job_titles else []
-    titles = [str(t) for t in titles_raw] if isinstance(titles_raw, list) else []
-    ideal = ideal_dict_from_pydantic(body.ideal)
-    profile = candidate_profile_dict(candidate, skills, titles)
-    sig = _signals_dict(candidate)
-    prev = get_career_compass_blob(sig) or {}
-    cc = build_career_compass(ideal, profile, prev=prev, regenerate_path=body.regenerate_path)
-    sig["career_compass"] = cc
-    candidate.profile_signals_json = json.dumps(sig) if sig else None
-    db.add(candidate)
-    db.commit()
-    db.refresh(candidate)
-    return _career_compass_detail(candidate)
+    payload = body.model_dump(exclude_unset=False)
+    try:
+        data = upsert_compass(db, candidate_id=candidate.id, payload=payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+    return CareerCompassOut.model_validate(data)
 
 
-@router.patch("/me/career-compass/milestones/{milestone_id}", response_model=CareerCompassOut)
-def patch_career_compass_milestone(
-    milestone_id: str,
-    body: MilestonePatchIn,
+@router.patch("/me/career-compass", response_model=CareerCompassOut)
+def patch_career_compass(
+    body: CareerCompassPatchIn,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> CareerCompassOut:
     candidate = _get_candidate_or_404(db, user.id)
-    sig = _signals_dict(candidate)
-    cc = get_career_compass_blob(sig)
-    if not cc:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Career compass not configured")
-    cc2, err = set_milestone_done(cc, milestone_id, body.done)
-    if err:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=err)
-    sig["career_compass"] = cc2
-    candidate.profile_signals_json = json.dumps(sig) if sig else None
-    db.add(candidate)
-    db.commit()
-    db.refresh(candidate)
-    return _career_compass_detail(candidate)
-
-
-@router.delete("/me/career-compass", response_model=CandidateOut)
-def delete_career_compass(
-    db: Session = Depends(get_db),
-    user: User = Depends(get_current_user),
-) -> CandidateOut:
-    candidate = _get_candidate_or_404(db, user.id)
-    sig = _signals_dict(candidate)
-    sig.pop("career_compass", None)
-    candidate.profile_signals_json = json.dumps(sig) if sig else None
-    db.add(candidate)
-    db.commit()
-    db.refresh(candidate)
-    return _to_out(candidate)
+    payload = body.model_dump(exclude_unset=True)
+    if not payload:
+        row = get_compass_row(db, candidate_id=candidate.id)
+        return CareerCompassOut.model_validate(serialize_compass(row))
+    try:
+        data = patch_compass(db, candidate_id=candidate.id, payload=payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+    return CareerCompassOut.model_validate(data)
 
 
 def _get_candidate_or_404(db: Session, user_id: int) -> Candidate:
@@ -941,58 +910,24 @@ def _signals_dict(candidate: Candidate) -> dict[str, Any]:
         return {}
 
 
-def _career_compass_detail(candidate: Candidate) -> CareerCompassOut:
-    sig = _signals_dict(candidate)
-    cc = get_career_compass_blob(sig)
-    if not cc or not cc.get("ideal"):
-        return CareerCompassOut(configured=False)
-    ideal = cc["ideal"]
-    snap_out = None
-    if isinstance(cc.get("snapshot"), dict):
-        try:
-            snap_out = CareerSnapshotOut.model_validate(cc["snapshot"])
-        except Exception:
-            snap_out = None
-    path_out = None
-    if isinstance(cc.get("path"), dict):
-        try:
-            path_out = PathOut.model_validate(cc["path"])
-        except Exception:
-            path_out = None
-    return CareerCompassOut(configured=True, ideal=ideal, snapshot=snap_out, path=path_out)
-
-
-def _career_compass_preview_for_out(candidate: Candidate) -> CareerCompassPreviewOut | None:
-    sig = _signals_dict(candidate)
-    cc = get_career_compass_blob(sig)
-    if not cc or not cc.get("ideal"):
+def _career_compass_preview_for_out(db: Session, candidate: Candidate) -> CareerCompassPreviewOut | None:
+    row = get_compass_row(db, candidate_id=candidate.id)
+    if row is None:
         return None
-    snap = cc.get("snapshot") if isinstance(cc.get("snapshot"), dict) else {}
-    path = cc.get("path") if isinstance(cc.get("path"), dict) else {}
-    try:
-        xp = int(path.get("xp_total") or 0)
-    except (TypeError, ValueError):
-        xp = 0
-    try:
-        lv = int(path.get("level") or 1)
-    except (TypeError, ValueError):
-        lv = 1
-    rs = snap.get("readiness_score")
-    rss: int | None
-    try:
-        rss = int(rs) if rs is not None else None
-    except (TypeError, ValueError):
-        rss = None
+    data = serialize_compass(row)
+    if not data.get("configured"):
+        return None
+    next_steps = data.get("next_steps") or []
+    next_title = str(next_steps[0]).strip()[:200] if next_steps else None
     return CareerCompassPreviewOut(
         configured=True,
-        readiness_score=rss,
-        level=lv,
-        xp_total=xp,
-        next_milestone_title=next_open_milestone_title(cc),
+        completion_percent=int(data.get("completion_percent") or 0),
+        readiness_complete=bool(data.get("readiness_complete")),
+        next_step_title=next_title,
     )
 
 
-def _to_out(candidate: Candidate) -> CandidateOut:
+def _to_out(db: Session, candidate: Candidate) -> CandidateOut:
     skills = json.loads(candidate.skills) if candidate.skills else []
     titles_raw = json.loads(candidate.preferred_job_titles) if candidate.preferred_job_titles else []
     titles = [str(t) for t in titles_raw] if isinstance(titles_raw, list) else []
@@ -1015,5 +950,5 @@ def _to_out(candidate: Candidate) -> CandidateOut:
         cv_processing_consent_at=candidate.cv_processing_consent_at,
         intro_audio_processing_consent_at=candidate.intro_audio_processing_consent_at,
         cv_tailoring=_cv_tailoring_from_candidate(candidate),
-        career_compass_preview=_career_compass_preview_for_out(candidate),
+        career_compass_preview=_career_compass_preview_for_out(db, candidate),
     )

@@ -323,6 +323,11 @@ class Candidate(Base):
         back_populates="candidate",
         cascade="all, delete-orphan",
     )
+    career_compass: Mapped["CandidateCareerCompass | None"] = relationship(
+        back_populates="candidate",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
     progress: Mapped["CandidateProgress | None"] = relationship(
         back_populates="candidate",
         uselist=False,
@@ -784,6 +789,43 @@ class CandidateEvidenceItem(Base):
     )
 
     candidate: Mapped["Candidate"] = relationship(back_populates="evidence_items")
+
+
+class CandidateCareerCompass(Base):
+    """Persistent career compass — one record per candidate (Wave B slice 1)."""
+
+    __tablename__ = "candidate_career_compass"
+    __table_args__ = (UniqueConstraint("candidate_id", name="uq_candidate_career_compass_candidate_id"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"),
+        index=True,
+        unique=True,
+    )
+    target_role: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    target_seniority: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    preferred_industries: Mapped[str] = mapped_column(Text, default="[]")
+    preferred_locations: Mapped[str] = mapped_column(Text, default="[]")
+    work_mode: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    salary_expectation_min: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    salary_expectation_max: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    salary_currency: Mapped[str] = mapped_column(String(8), default="PLN")
+    career_priorities: Mapped[str] = mapped_column(Text, default="[]")
+    skill_gaps: Mapped[str] = mapped_column(Text, default="[]")
+    strengths: Mapped[str] = mapped_column(Text, default="[]")
+    next_steps: Mapped[str] = mapped_column(Text, default="[]")
+    learning_actions: Mapped[str] = mapped_column(Text, default="[]")
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    completion_status: Mapped[str] = mapped_column(String(20), default="draft")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
+
+    candidate: Mapped["Candidate"] = relationship(back_populates="career_compass")
 
 
 class RecruiterApplicationScorecard(Base):

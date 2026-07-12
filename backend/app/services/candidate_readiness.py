@@ -110,8 +110,12 @@ def auto_apply_profile_ready(user: User, candidate: Candidate | None) -> bool:
     return has_cv_material(candidate) or has_cv_tailoring(candidate) or has_profile_fields(candidate)
 
 
-def has_career_brief(signals: dict[str, Any]) -> bool:
-    return isinstance(signals.get("career_compass"), dict)
+def has_career_brief(candidate: Candidate) -> bool:
+    """Career brief complete when persisted compass meets readiness bar."""
+    from app.services.candidate_career_compass_persistence import career_brief_readiness_complete
+
+    row = getattr(candidate, "career_compass", None)
+    return career_brief_readiness_complete(row)
 
 
 def has_skill_evidence(signals: dict[str, Any]) -> bool:
@@ -202,7 +206,7 @@ def build_gateway_checklist(
     return GatewayChecklist(
         profile_present=has_profile,
         cv_present=has_cv,
-        career_brief_present=has_career_brief(signals),
+        career_brief_present=has_career_brief(candidate),
         skill_evidence_present=has_skill_evidence(signals),
         consent_general_present=has_general_consent,
         consent_storage_present=has_cv_consent or has_docs_consent,
