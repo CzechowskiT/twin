@@ -3,6 +3,7 @@ import {
   CAREER_COMPASS_SHIP_STATUS,
   EVIDENCE_VAULT_SHIP_STATUS,
   INTERVIEW_PREP_SHIP_STATUS,
+  REFERRALS_SHIP_STATUS,
   TRUST_CENTER_ROADMAP_STATUS,
 } from "@/lib/seven-day-d2-candidate";
 import type { WorkspaceModuleDef } from "@/lib/workspace-module-status";
@@ -60,7 +61,7 @@ export const CANDIDATE_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     titleKey: "workspaceModules.candidateReferralsTitle",
     valuePropKey: "workspaceModules.candidateReferralsValue",
     ctaKey: "workspaceModules.candidateReferralsCta",
-    status: "pilot",
+    status: REFERRALS_SHIP_STATUS,
   },
   {
     id: "identity",

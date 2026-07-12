@@ -64,7 +64,6 @@ For #448 preview (after Vercel deploy): repeat public-health on preview URL from
 **Pass criteria:** all steps without API/console errors; data survives refresh.
 
 ---
-
 ## Trust Center smoke checklist (B2)
 
 1. Login as `demo@twin.career`
@@ -119,7 +118,6 @@ Screenshots: (optional path, no PII)
 On all Wave B modules **PASS**: add line `FOUNDER_SMOKE: PASS` below and update ship flags per flip rules.
 
 ---
-
 ## Status flip rules (founder only)
 
 | Module | Flip on PASS |

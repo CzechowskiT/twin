@@ -3,7 +3,8 @@
 > **Stance:** P0 CLOSED | Gate E PASS | Gate F PENDING | Launch NO-GO  
 > **NOT_GATE_F_YES:** true  
 > **NOT_PHASE_3B:** true  
-> **PR #446 merge SHA:** `1c2547d96d2f921935c14b34fcf927a184435b3d`
+> **PR #446 merge SHA:** `1c2547d96d2f921935c14b34fcf927a184435b3d`  
+> **PR #447 merge SHA:** `c2a08b025ca950b341540f0bc80f710825c778ce`
 
 ## Summary
 

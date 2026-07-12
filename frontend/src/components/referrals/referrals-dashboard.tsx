@@ -8,6 +8,15 @@ import { useTranslation } from "@/components/language-provider";
 import { Button, Card } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
+import {
+  buildReferralShareUrl,
+  CANDIDATE_REFERRALS_API_PATH,
+  CANDIDATE_REFERRALS_ENSURE_CODE_PATH,
+  CANDIDATE_REFERRALS_INVITE_PATH,
+  type CandidateReferralItem,
+  type CandidateReferralsData,
+  referralStatusLabelKey,
+} from "@/lib/candidate-referrals-api";
 import type { TranslationKey } from "@/lib/i18n";
 
 type ReferralPayout = {
@@ -60,23 +69,32 @@ function formatMoney(cents: number): string {
 
 export function ReferralsDashboard() {
   const { t } = useTranslation();
+  const [persisted, setPersisted] = useState<CandidateReferralsData | null>(null);
   const [me, setMe] = useState<ReferralMe | null>(null);
   const [board, setBoard] = useState<LeaderboardEntry[]>([]);
   const [cashOutHistory, setCashOutHistory] = useState<CashOutRequest[]>([]);
   const [lbWindow, setLbWindow] = useState<"month" | "all">("month");
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteBusy, setInviteBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
   const shareUrl = useMemo(() => {
-    if (!me || typeof window === "undefined") return "";
-    return `${window.location.origin}${me.share_example_path}`;
-  }, [me]);
+    if (persisted?.program?.share_path && typeof window !== "undefined") {
+      return buildReferralShareUrl(window.location.origin, persisted.program.share_path);
+    }
+    if (me && typeof window !== "undefined") {
+      return `${window.location.origin}${me.share_example_path}`;
+    }
+    return "";
+  }, [me, persisted]);
 
   const load = useCallback(async () => {
     const token = getToken();
     if (!token) return;
     setErr(null);
     try {
-      const [meRes, lbRes, histRes] = await Promise.all([
+      const [persistedRes, meRes, lbRes, histRes] = await Promise.all([
+        apiFetch<CandidateReferralsData>(CANDIDATE_REFERRALS_API_PATH, {}, token),
         apiFetch<ReferralMe>("/api/v1/referrals/me", {}, token),
         apiFetch<{ entries: LeaderboardEntry[] }>(
           `/api/v1/referrals/leaderboard?window=${lbWindow}`,
@@ -85,6 +103,7 @@ export function ReferralsDashboard() {
         ),
         apiFetch<{ requests: CashOutRequest[] }>("/api/v1/referrals/cash-out/history", {}, token),
       ]);
+      setPersisted(persistedRes);
       setMe(meRes);
       setBoard(lbRes.entries);
       setCashOutHistory(histRes.requests);
@@ -109,29 +128,89 @@ export function ReferralsDashboard() {
     }
   };
 
+  const ensureCode = async () => {
+    const token = getToken();
+    if (!token) return;
+    try {
+      await apiFetch(CANDIDATE_REFERRALS_ENSURE_CODE_PATH, { method: "POST" }, token);
+      await load();
+      toast.success(t("referrals.codeReady"));
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : t("referrals.loadFailed"));
+    }
+  };
+
+  const submitInvite = async () => {
+    const token = getToken();
+    if (!token || !inviteEmail.trim()) return;
+    setInviteBusy(true);
+    try {
+      await apiFetch(
+        CANDIDATE_REFERRALS_INVITE_PATH,
+        { method: "POST", body: JSON.stringify({ invite_email: inviteEmail.trim() }) },
+        token,
+      );
+      setInviteEmail("");
+      await load();
+      toast.success(t("referrals.inviteRecorded"));
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : t("referrals.loadFailed"));
+    } finally {
+      setInviteBusy(false);
+    }
+  };
+
   if (err) {
-    return <p className="twin-muted text-sm">{err}</p>;
+    return (
+      <div data-candidate-referrals-error>
+        <p className="twin-muted text-sm">{err}</p>
+        <Button type="button" className="mt-3" onClick={() => void load()}>
+          {t("common.tryAgain")}
+        </Button>
+      </div>
+    );
   }
-  if (!me) {
-    return <p className="twin-muted text-sm">{t("common.loading")}</p>;
+  if (!me || !persisted) {
+    return (
+      <p className="twin-muted text-sm" data-candidate-referrals-loading>
+        {t("common.loading")}
+      </p>
+    );
   }
 
+  const referrals = persisted.referrals;
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-8" data-candidate-referrals-dashboard>
       <Card className="p-5 sm:p-6">
         <h2 className="text-lg font-semibold">{t("referrals.shareTitle")}</h2>
-        <p className="twin-muted mt-2 break-all rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] px-3 py-2 text-sm">
+        <p className="twin-muted mt-2 break-all rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] px-3 py-2 text-sm" data-candidate-referrals-share-url>
           {shareUrl}
         </p>
-        <Button type="button" className="mt-4" onClick={() => void copyLink()}>
-          {t("referrals.copyLink")}
-        </Button>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Button type="button" onClick={() => void copyLink()}>
+            {t("referrals.copyLink")}
+          </Button>
+          <Button type="button" className="twin-btn-secondary" onClick={() => void ensureCode()}>
+            {t("referrals.ensureCode")}
+          </Button>
+        </div>
+      </Card>
+
+      <Card className="p-5 sm:p-6" data-candidate-referrals-how-it-works>
+        <h2 className="text-lg font-semibold">{t("referrals.howItWorksTitle")}</h2>
+        <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-[var(--twin-muted-strong)]">
+          <li>{t("referrals.howItWorksStep1")}</li>
+          <li>{t("referrals.howItWorksStep2")}</li>
+          <li>{t("referrals.howItWorksStep3")}</li>
+        </ol>
+        <p className="twin-muted mt-3 text-xs">{persisted.manual_processing_notice}</p>
       </Card>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
           { label: t("referrals.tier"), value: me.referral_tier },
-          { label: t("referrals.referred"), value: String(me.referred_user_count) },
+          { label: t("referrals.referred"), value: String(persisted.program.total_referrals) },
           { label: t("referrals.qualified"), value: String(me.qualified_referrals) },
           { label: t("referrals.pending"), value: formatMoney(me.pending_earnings_cents) },
         ].map((tile) => (
@@ -146,6 +225,44 @@ export function ReferralsDashboard() {
       <p className="twin-muted text-sm">
         {t("referrals.lifetime")}: <strong>{formatMoney(me.lifetime_earnings_cents)}</strong>
       </p>
+
+      <Card className="p-5 sm:p-6">
+        <h2 className="text-lg font-semibold">{t("referrals.inviteTitle")}</h2>
+        <p className="twin-muted mt-1 text-sm">{t("referrals.inviteLead")}</p>
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+          <input
+            type="email"
+            value={inviteEmail}
+            onChange={(e) => setInviteEmail(e.target.value)}
+            placeholder={t("referrals.inviteEmailPlaceholder")}
+            className="twin-input flex-1 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)] px-3 py-2 text-sm"
+            data-candidate-referrals-invite-input
+          />
+          <Button type="button" disabled={inviteBusy || !inviteEmail.trim()} onClick={() => void submitInvite()}>
+            {t("referrals.inviteSubmit")}
+          </Button>
+        </div>
+      </Card>
+
+      <section data-candidate-referrals-list>
+        <h2 className="text-lg font-semibold">{t("referrals.listTitle")}</h2>
+        {referrals.length === 0 ? (
+          <p className="twin-muted mt-2 text-sm">{t("referrals.listEmpty")}</p>
+        ) : (
+          <ul className="mt-3 space-y-2">
+            {referrals.map((row: CandidateReferralItem) => (
+              <li
+                key={row.id}
+                className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[var(--twin-border)] px-3 py-2 text-sm"
+              >
+                <span>{row.invite_email ?? t("referrals.anonymousSignup")}</span>
+                <span className="text-xs font-medium capitalize">{t(referralStatusLabelKey(row.status))}</span>
+                <span className="twin-muted text-xs">{new Date(row.created_at).toLocaleString()}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       {me.pending_earnings_cents > 0 ? (
         <Link

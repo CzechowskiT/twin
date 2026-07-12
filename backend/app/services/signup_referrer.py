@@ -106,4 +106,13 @@ def resolve_combined_signup_referrer_user_id(
     )
     if tid is not None:
         return tid
+    from app.services.candidate_referral_persistence import (
+        resolve_referrer_user_id_from_candidate_code,
+    )
+
+    cid = resolve_referrer_user_id_from_candidate_code(
+        db, code=token, new_user_email=new_user_email
+    )
+    if cid is not None:
+        return cid
     return resolve_signup_referrer_user_id(db, stored_note=stored_note, new_user_email=new_user_email)

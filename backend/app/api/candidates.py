@@ -60,6 +60,21 @@ from app.schemas.candidate_trust import (
     TrustAuditEventListOut,
     TrustCenterOut,
 )
+from app.schemas.candidate_referral import (
+    CandidateReferralEnsureCodeOut,
+    CandidateReferralInviteIn,
+    CandidateReferralInviteOut,
+    CandidateReferralItemOut,
+    CandidateReferralResolveOut,
+    CandidateReferralsOut,
+)
+from app.services.candidate_referral_persistence import (
+    build_referrals_summary,
+    ensure_referral_program,
+    get_referral_by_id,
+    preview_candidate_referral_code,
+    record_invite,
+)
 from app.services.candidate_career_compass_persistence import (
     get_compass_row,
     patch_compass,
@@ -1012,6 +1027,91 @@ def get_trust_audit_events(
     return TrustAuditEventListOut.model_validate(
         list_trust_audit_events(db, candidate_id=candidate.id, limit=limit, offset=offset)
     )
+
+
+@router.get("/referrals/resolve", response_model=CandidateReferralResolveOut)
+def resolve_candidate_referral_code(
+    code: str = Query(..., min_length=4, max_length=32),
+    db: Session = Depends(get_db),
+) -> CandidateReferralResolveOut:
+    data = preview_candidate_referral_code(db, code=code)
+    if not data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown referral code.")
+    return CandidateReferralResolveOut.model_validate(data)
+
+
+@router.get("/me/referrals", response_model=CandidateReferralsOut)
+def get_my_referrals(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+    limit: int = Query(default=50, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+) -> CandidateReferralsOut:
+    candidate = _get_candidate_or_404(db, user.id)
+    row = db.query(User).filter(User.id == user.id).first()
+    assert row is not None
+    summary = build_referrals_summary(
+        db, candidate=candidate, user=row, limit=limit, offset=offset
+    )
+    db.commit()
+    return CandidateReferralsOut.model_validate(summary)
+
+
+@router.post("/me/referrals/ensure-code", response_model=CandidateReferralEnsureCodeOut)
+def ensure_my_referral_code(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> CandidateReferralEnsureCodeOut:
+    candidate = _get_candidate_or_404(db, user.id)
+    row = db.query(User).filter(User.id == user.id).first()
+    assert row is not None
+    program, created = ensure_referral_program(db, candidate=candidate, user=row)
+    db.commit()
+    db.refresh(program)
+    summary = build_referrals_summary(db, candidate=candidate, user=row, limit=1, offset=0)
+    return CandidateReferralEnsureCodeOut(
+        program=summary["program"],
+        created=created,
+    )
+
+
+@router.post("/me/referrals/invite", response_model=CandidateReferralInviteOut, status_code=201)
+def invite_referral_contact(
+    body: CandidateReferralInviteIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> CandidateReferralInviteOut:
+    candidate = _get_candidate_or_404(db, user.id)
+    row = db.query(User).filter(User.id == user.id).first()
+    assert row is not None
+    program, _ = ensure_referral_program(db, candidate=candidate, user=row)
+    try:
+        referral = record_invite(db, program=program, invite_email=body.invite_email)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+    db.commit()
+    from app.services.candidate_referral_persistence import NO_OUTREACH_NOTICE
+
+    return CandidateReferralInviteOut(
+        referral=CandidateReferralItemOut.model_validate(referral),
+        no_outreach_notice=NO_OUTREACH_NOTICE,
+    )
+
+
+@router.get("/me/referrals/{referral_id}", response_model=CandidateReferralItemOut)
+def get_my_referral_by_id(
+    referral_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> CandidateReferralItemOut:
+    candidate = _get_candidate_or_404(db, user.id)
+    row = db.query(User).filter(User.id == user.id).first()
+    assert row is not None
+    program, _ = ensure_referral_program(db, candidate=candidate, user=row)
+    referral = get_referral_by_id(db, program_id=program.id, referral_id=referral_id)
+    if not referral:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Referral not found.")
+    return CandidateReferralItemOut.model_validate(referral)
 
 
 def _get_candidate_or_404(db: Session, user_id: int) -> Candidate:

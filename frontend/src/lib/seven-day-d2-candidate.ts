@@ -36,6 +36,11 @@ export const TRUST_CENTER_ROADMAP_STATUS = "pilot" as const;
 /** Referrals limited to founder-led cohort — boundary banner on page. */
 export const REFERRALS_LIMITED_PILOT = true;
 
+/** Referrals persistence shipped — PILOT until founder browser smoke. */
+export const REFERRALS_BROWSER_SMOKE_STATUS = "NEEDS_FOUNDER_AUTH_SMOKE" as const;
+
+export const REFERRALS_SHIP_STATUS = "pilot" as const;
+
 /** Wave 1 — referrals visible on workspace hub with honest PILOT badge. */
 export const HIDE_CANDIDATE_REFERRALS_FROM_HUB = false;
 
