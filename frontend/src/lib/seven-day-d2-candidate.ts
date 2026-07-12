@@ -19,6 +19,11 @@ export const CAREER_COMPASS_BROWSER_SMOKE_STATUS = "NEEDS_FOUNDER_AUTH_SMOKE" as
 
 export const CAREER_COMPASS_SHIP_STATUS = "pilot" as const;
 
+/** Trust center persistence shipped — PILOT until founder browser smoke. */
+export const TRUST_CENTER_BROWSER_SMOKE_STATUS = "NEEDS_FOUNDER_AUTH_SMOKE" as const;
+
+export const TRUST_CENTER_SHIP_STATUS = "pilot" as const;
+
 /** Interview prep ships as static pack + optional application context — not live AI coaching. */
 export const INTERVIEW_PREP_SHIP_STATUS = "live" as const;
 

@@ -328,6 +328,18 @@ class Candidate(Base):
         uselist=False,
         cascade="all, delete-orphan",
     )
+    consent_receipts: Mapped[list["CandidateConsentReceipt"]] = relationship(
+        back_populates="candidate",
+        cascade="all, delete-orphan",
+    )
+    privacy_requests: Mapped[list["CandidatePrivacyRequest"]] = relationship(
+        back_populates="candidate",
+        cascade="all, delete-orphan",
+    )
+    trust_audit_events: Mapped[list["CandidateTrustAuditEvent"]] = relationship(
+        back_populates="candidate",
+        cascade="all, delete-orphan",
+    )
     progress: Mapped["CandidateProgress | None"] = relationship(
         back_populates="candidate",
         uselist=False,
@@ -826,6 +838,78 @@ class CandidateCareerCompass(Base):
     )
 
     candidate: Mapped["Candidate"] = relationship(back_populates="career_compass")
+
+
+class CandidateConsentReceipt(Base):
+    """Append-only consent receipt — issued on grant/withdraw."""
+
+    __tablename__ = "candidate_consent_receipts"
+    __table_args__ = (
+        UniqueConstraint(
+            "candidate_id",
+            "idempotency_key",
+            name="uq_candidate_consent_receipt_idempotency",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(ForeignKey("candidates.id", ondelete="CASCADE"), index=True)
+    consent_purpose: Mapped[str] = mapped_column(String(64), index=True)
+    action: Mapped[str] = mapped_column(String(32))
+    status: Mapped[str] = mapped_column(String(32), default="issued")
+    payload_json: Mapped[str] = mapped_column(Text, default="{}")
+    idempotency_key: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    created_by_user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    candidate: Mapped["Candidate"] = relationship(back_populates="consent_receipts")
+
+
+class CandidatePrivacyRequest(Base):
+    """Candidate privacy request — manual processing; candidate cannot set completed."""
+
+    __tablename__ = "candidate_privacy_requests"
+    __table_args__ = (
+        UniqueConstraint(
+            "candidate_id",
+            "idempotency_key",
+            name="uq_candidate_privacy_request_idempotency",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(ForeignKey("candidates.id", ondelete="CASCADE"), index=True)
+    request_type: Mapped[str] = mapped_column(String(64), index=True)
+    status: Mapped[str] = mapped_column(String(32), default="open", index=True)
+    payload_json: Mapped[str] = mapped_column(Text, default="{}")
+    idempotency_key: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    created_by_user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+    candidate: Mapped["Candidate"] = relationship(back_populates="privacy_requests")
+
+
+class CandidateTrustAuditEvent(Base):
+    """Append-only candidate trust audit trail — no update/delete."""
+
+    __tablename__ = "candidate_trust_audit_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(ForeignKey("candidates.id", ondelete="CASCADE"), index=True)
+    event_type: Mapped[str] = mapped_column(String(64), index=True)
+    summary: Mapped[str] = mapped_column(String(500))
+    metadata_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    actor: Mapped[str] = mapped_column(String(32), default="candidate")
+    actor_user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+
+    candidate: Mapped["Candidate"] = relationship(back_populates="trust_audit_events")
 
 
 class RecruiterApplicationScorecard(Base):
