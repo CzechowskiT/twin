@@ -100,12 +100,13 @@ test("2 candidate hub includes panel jobs matches career compass profile cv appl
   }
 });
 
-test("2b candidate career compass is live — static framework, no pilot CTA", () => {
+test("2b candidate career compass is PILOT — persistence activation Wave B", () => {
   const route = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "candidate_career_compass");
   assert.ok(route);
-  assert.equal(route!.status, "live");
+  assert.equal(route!.status, "pilot");
   assert.equal(route!.href, "/dashboard/career");
   assert.ok(route!.hintKey);
+  assert.ok(route!.boundaryTags.includes("pilot"));
 });
 
 test("3 recruiter hub includes inbox pipeline calendar jobs demo talent radar pool import profile collaboration trust team communication ats integrations analytics search", () => {
@@ -379,12 +380,11 @@ test("17b investor product proof live with hint and diligence boundaries", () =>
   assert.match(desc, /read-only|diligence|no launch|no outreach|writeback/i);
 });
 
-test("17 non-investor hubs split live primary from collapsed pilot roadmap", () => {
+test("17 non-investor hubs use activation sections with collapsible pilot lanes", () => {
   const hub = read("src/components/workspace/system-of-record-navigation-hub.tsx");
   assert.match(hub, /persona === "investor"/);
-  assert.match(hub, /splitProductSurfaceRoutes/);
-  assert.match(hub, /data-product-surface-primary/);
-  assert.match(hub, /data-product-surface-roadmap/);
+  assert.match(hub, /splitActivationSurfaceRoutes/);
+  assert.match(hub, /data-activation-hub-section/);
   assert.doesNotMatch(read("src/app/recruiter/page.tsx"), /data-sor-investor-group/);
   assert.doesNotMatch(read("src/components/dashboard/candidate-module-nav.tsx"), /data-sor-investor-group/);
   for (const persona of ["candidate", "recruiter", "company"] as const) {
@@ -393,11 +393,11 @@ test("17 non-investor hubs split live primary from collapsed pilot roadmap", () 
   }
 });
 
-test("18 wave3 — candidate trust SoR hidden from primary hub, routes preserved", () => {
+test("18 candidate trust SoR visible in hub with honest PILOT badge", () => {
   const split = splitProductSurfaceRoutes("candidate", getSystemOfRecordRoutesForPersona("candidate"));
-  assert.ok(split.hidden.some((r) => r.id === "candidate_trust"));
-  assert.ok(!split.primary.some((r) => r.id === "candidate_trust"));
-  assert.equal(split.roadmap.length, 0);
+  const shown = [...split.primary, ...split.roadmap];
+  assert.ok(shown.some((r) => r.id === "candidate_trust"));
   const trust = SYSTEM_OF_RECORD_ROUTES.find((r) => r.id === "candidate_trust");
   assert.equal(trust?.href, "/dashboard/trust");
+  assert.equal(trust?.status, "pilot");
 });

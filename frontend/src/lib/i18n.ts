@@ -1862,6 +1862,16 @@ const en = {
     toolInvestorRoadmapDesc: "Honest now/next/later, risks, and validation milestones from production matrices.",
   },
   productSurface: {
+    coreSectionTitle: "Core modules (LIVE)",
+    coreSectionLead: "Ready to use — GREEN_WORKING modules with smoke-verified flows.",
+    extendedSectionTitle: "Extended modules",
+    extendedSectionLead: "Additional surfaces beyond core — may need activation to full LIVE.",
+    pilotPreviewSectionTitle: "Pilot & preview modules",
+    pilotPreviewSectionLead: "Honest PILOT and PREVIEW badges — collapsed by default.",
+    comingSoonPausedSectionTitle: "Coming soon & paused",
+    comingSoonPausedSectionLead: "Modules in development or paused by founder decision.",
+    showSection: "Show section",
+    hideSection: "Hide section",
     roadmapSectionTitle: "Pilot & roadmap modules",
     roadmapSectionLead:
       "Preview lanes with honest PILOT, COMING SOON, or PAUSED badges — collapsed by default so the core product looks finished.",
@@ -1882,7 +1892,8 @@ const en = {
     statusNeedsSetup: "Coming soon",
     statusPaused: "Paused",
     candidateHubTitle: "Your candidate modules",
-    candidateHubLead: "Core live modules first — pilot and roadmap lanes stay in a collapsed section with honest badges.",
+    candidateHubLead:
+      "Explore the full TWIN workspace. LIVE modules are ready to use. Other modules are being developed and will progressively move to LIVE.",
     candidateProfileTitle: "Profile & CV",
     candidateProfileValue: "Completeness, LinkedIn sync, and verified readiness gate.",
     candidateProfileHint: "Start here before matches and applications.",
@@ -1969,7 +1980,8 @@ const en = {
     candidateAutoApplyHint: "Checklist: profile ready, verified readiness, consent, calendar optional.",
     candidateAutoApplyCta: "View readiness",
     recruiterHubTitle: "Recruiter workspace",
-    recruiterHubLead: "Inbox, pipeline, jobs, and search first — calendar sync, ATS, and integrations stay in the collapsed pilot section.",
+    recruiterHubLead:
+      "Explore the full TWIN workspace. LIVE modules are ready to use. Other modules are being developed and will progressively move to LIVE.",
     recruiterInboxTitle: "Acceptance inbox",
     recruiterInboxValue: "Pre-qualified candidates per company slug — accept, decline, reschedule.",
     recruiterInboxCta: "Open inbox",
@@ -2021,7 +2033,7 @@ const en = {
     recruiterTalentRadarDigestCta: "Open digest",
     companyHubTitle: "Company workspace",
     companyHubLead:
-      "Dashboard, roles, and pipeline only — human decision per stage; billing, integrations, team, and talent pool stay hidden.",
+      "Explore the full TWIN workspace. LIVE modules are ready to use. Other modules are being developed and will progressively move to LIVE.",
     companyRolesTitle: "Roles",
     companyRolesValue:
       "Create and publish open roles for your slug — human decision on every queue move; no delegated apply live; no auto outreach.",
@@ -2048,7 +2060,8 @@ const en = {
     companyIntegrationsHint: "Status per row — no fake traction.",
     companyIntegrationsCta: "Integrations",
     investorHubTitle: "Investor workspace",
-    investorHubLead: "Metrics, roadmap, data room, and scenario tools — separate from employer pricing.",
+    investorHubLead:
+      "Explore the full TWIN workspace. LIVE modules are ready to use. Other modules are being developed and will progressively move to LIVE.",
     investorMetricsTitle: "Metrics",
     investorMetricsValue: "Read-only investor metrics — public aggregates, module tiers, and safe technical signals.",
     investorMetricsHint: "No PII in investor views.",
@@ -2128,10 +2141,14 @@ const en = {
     investorProofAtsTitle: "ATS readiness proof",
     investorProofAtsValue: "Import mapping and dedupe preview — no live sync or writeback.",
     investorProofAtsCta: "View ATS proof",
-    candidateHubLead: "Core live modules first — pilot and roadmap lanes collapsed with honest boundary badges.",
-    recruiterHubLead: "Inbox, pipeline, jobs, and search first — calendar sync, ATS, and integrations stay collapsed under pilot.",
-    companyHubLead: "Dashboard, roles, and pipeline first — billing, integrations, team, and talent pool stay collapsed under pilot.",
-    investorHubLead: "Metrics, roadmap, data room, and system-of-record proof cards for diligence.",
+    candidateHubLead:
+      "Explore the full TWIN workspace. LIVE modules are ready to use. Other modules are being developed and will progressively move to LIVE.",
+    recruiterHubLead:
+      "Explore the full TWIN workspace. LIVE modules are ready to use. Other modules are being developed and will progressively move to LIVE.",
+    companyHubLead:
+      "Explore the full TWIN workspace. LIVE modules are ready to use. Other modules are being developed and will progressively move to LIVE.",
+    investorHubLead:
+      "Explore the full TWIN workspace. LIVE modules are ready to use. Other modules are being developed and will progressively move to LIVE.",
     investorGroupProductTitle: "Product & diligence",
     investorGroupProductLead:
       "Investor-facing metrics, roadmap, data room, and executive proof — honest status badges; product proof is bounded diligence, not a production workflow.",
@@ -9795,6 +9812,16 @@ const pl: MessageTree = {
     toolInvestorRoadmapDesc: "Uczciwe teraz/następne/później, ryzyka i kamienie walidacji z macierzy produkcyjnych.",
   },
   productSurface: {
+    coreSectionTitle: "Moduły rdzeniowe (LIVE)",
+    coreSectionLead: "Gotowe do użycia — moduły GREEN_WORKING ze smoke-verified flow.",
+    extendedSectionTitle: "Moduły rozszerzone",
+    extendedSectionLead: "Dodatkowe powierzchnie poza rdzeniem — mogą wymagać aktywacji do pełnego LIVE.",
+    pilotPreviewSectionTitle: "Moduły pilota i podglądu",
+    pilotPreviewSectionLead: "Uczciwe badge'e PILOT i PREVIEW — domyślnie zwinięte.",
+    comingSoonPausedSectionTitle: "Wkrótce i wstrzymane",
+    comingSoonPausedSectionLead: "Moduły w rozwoju lub wstrzymane decyzją founderów.",
+    showSection: "Pokaż sekcję",
+    hideSection: "Ukryj sekcję",
     roadmapSectionTitle: "Moduły pilota i roadmapy",
     roadmapSectionLead:
       "Podglądowe ścieżki z uczciwymi badge'ami PILOT, COMING SOON lub PAUSED — domyślnie zwinięte, żeby rdzeń produktu wyglądał na dopracowany.",
@@ -9815,7 +9842,8 @@ const pl: MessageTree = {
     statusNeedsSetup: "Wkrótce",
     statusPaused: "Wstrzymane",
     candidateHubTitle: "Twoje moduły kandydata",
-    candidateHubLead: "Najpierw moduły live — ścieżki pilota i roadmapy w zwiniętej sekcji z uczciwymi badge'ami.",
+    candidateHubLead:
+      "Poznaj pełny zakres TWIN. Moduły oznaczone jako LIVE są gotowe do użycia. Pozostałe są rozwijane i będą sukcesywnie przechodzić do statusu LIVE.",
     candidateProfileTitle: "Profil i CV",
     candidateProfileValue: "Kompletność, sync LinkedIn i bramka gotowości zweryfikowanej.",
     candidateProfileHint: "Zacznij tutaj przed dopasowaniami i aplikacjami.",
@@ -9902,7 +9930,8 @@ const pl: MessageTree = {
     candidateAutoApplyHint: "Checklista: profil, gotowości zweryfikowanej, zgoda, kalendarz opcjonalnie.",
     candidateAutoApplyCta: "Zobacz gotowość",
     recruiterHubTitle: "Strefa rekrutera",
-    recruiterHubLead: "Najpierw inbox, pipeline, oferty i wyszukiwanie — sync kalendarza, ATS i integracje w zwiniętej sekcji pilota.",
+    recruiterHubLead:
+      "Poznaj pełny zakres TWIN. Moduły oznaczone jako LIVE są gotowe do użycia. Pozostałe są rozwijane i będą sukcesywnie przechodzić do statusu LIVE.",
     recruiterInboxTitle: "Skrzynka akceptacji",
     recruiterInboxValue: "Pre-kwalifikowani kandydaci per slug firmy — akceptuj, odrzuć, przełóż.",
     recruiterInboxCta: "Otwórz skrzynkę",
@@ -9954,7 +9983,7 @@ const pl: MessageTree = {
     recruiterTalentRadarDigestCta: "Otwórz digest",
     companyHubTitle: "Strefa firmy",
     companyHubLead:
-      "Tylko dashboard, role i pipeline — decyzja człowieka na każdym etapie; billing, integracje, zespół i talent pool pozostają ukryte.",
+      "Poznaj pełny zakres TWIN. Moduły oznaczone jako LIVE są gotowe do użycia. Pozostałe są rozwijane i będą sukcesywnie przechodzić do statusu LIVE.",
     companyRolesTitle: "Role",
     companyRolesValue:
       "Twórz i publikuj otwarte role dla swojego slug — decyzja człowieka przy każdym ruchu w kolejce; bez live delegated apply; bez auto outreach.",
@@ -9981,7 +10010,8 @@ const pl: MessageTree = {
     companyIntegrationsHint: "Status per wiersz — bez fałszywej trakcji.",
     companyIntegrationsCta: "Integracje",
     investorHubTitle: "Strefa inwestora",
-    investorHubLead: "Metryki, roadmapa, data room i kalkulator — oddzielnie od cennika Firm.",
+    investorHubLead:
+      "Poznaj pełny zakres TWIN. Moduły oznaczone jako LIVE są gotowe do użycia. Pozostałe są rozwijane i będą sukcesywnie przechodzić do statusu LIVE.",
     investorMetricsTitle: "Metryki",
     investorMetricsValue: "Metryki tylko do odczytu — agregaty publiczne, poziomy modułów i bezpieczne sygnały techniczne.",
     investorMetricsHint: "Bez PII w widokach inwestora.",
@@ -10061,10 +10091,14 @@ const pl: MessageTree = {
     investorProofAtsTitle: "Dowód gotowości ATS",
     investorProofAtsValue: "Mapowanie importu i podgląd deduplikacji — bez bieżącej synchronizacji ani zapisu zwrotnego do ATS.",
     investorProofAtsCta: "Zobacz dowód ATS",
-    candidateHubLead: "Najpierw moduły live — ścieżki pilota i roadmapy zwinięte z uczciwymi badge'ami granic.",
-    recruiterHubLead: "Najpierw inbox, pipeline, oferty i wyszukiwanie — sync kalendarza, ATS i integracje zwinięte w sekcji pilota.",
-    companyHubLead: "Najpierw dashboard, role i pipeline — billing, integracje, zespół i talent pool zwinięte w sekcji pilota.",
-    investorHubLead: "Metryki, roadmapa, data room i karty dowodów rejestru operacyjnego do due diligence.",
+    candidateHubLead:
+      "Poznaj pełny zakres TWIN. Moduły oznaczone jako LIVE są gotowe do użycia. Pozostałe są rozwijane i będą sukcesywnie przechodzić do statusu LIVE.",
+    recruiterHubLead:
+      "Poznaj pełny zakres TWIN. Moduły oznaczone jako LIVE są gotowe do użycia. Pozostałe są rozwijane i będą sukcesywnie przechodzić do statusu LIVE.",
+    companyHubLead:
+      "Poznaj pełny zakres TWIN. Moduły oznaczone jako LIVE są gotowe do użycia. Pozostałe są rozwijane i będą sukcesywnie przechodzić do statusu LIVE.",
+    investorHubLead:
+      "Poznaj pełny zakres TWIN. Moduły oznaczone jako LIVE są gotowe do użycia. Pozostałe są rozwijane i będą sukcesywnie przechodzić do statusu LIVE.",
     investorGroupProductTitle: "Produkt i due diligence",
     investorGroupProductLead:
       "Metryki, roadmapa, data room i dowód produktu dla zarządu — uczciwe badge statusu; product proof to ograniczony due diligence, nie workflow produkcyjny.",

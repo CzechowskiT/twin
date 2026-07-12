@@ -1,11 +1,16 @@
 /**
  * Wave 1+2A — workspace hubs show GREEN_WORKING modules only.
  * Routes and SoR entries stay intact; visibility layer only.
+ *
+ * @deprecated Superseded by founder decision 2026-07-10 — see
+ * `all-workspace-modules-activation.ts` and
+ * `docs/FOUNDER_ALL_MODULES_VISIBLE_AND_GREEN_DECISION_2026-07-10.md`.
+ * WORKSPACE_GREEN_ONLY_MODE is false; historical constants kept for audit.
  */
 import type { MarketingPersona } from "@/lib/marketing-persona";
 
-/** When true, workspace hubs/nav show only allowed green module IDs — no roadmap tier. */
-export const WORKSPACE_GREEN_ONLY_MODE = true;
+/** @deprecated false — all target modules visible with honest activation statuses. */
+export const WORKSPACE_GREEN_ONLY_MODE = false;
 
 /** Module / SoR IDs visible in workspace hub, primary nav, and module cards. */
 export const GREEN_WORKSPACE_ALLOWED_IDS: Readonly<Record<MarketingPersona, readonly string[]>> = {

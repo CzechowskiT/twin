@@ -1,5 +1,7 @@
 # All workspace modules GREEN plan — 2026-07-09
 
+> **Superseded by founder decision 2026-07-10** — see `FOUNDER_ALL_MODULES_VISIBLE_AND_GREEN_DECISION_2026-07-10.md` and `ALL_WORKSPACE_MODULES_ACTIVATION_MASTER_PLAN_2026-07-10.md`. Historical audit only.
+
 **Type:** docs + guard only (this PR). **No mass functional changes.**  
 **Branch:** `docs/all-workspace-modules-green-plan-2026-07-09`  
 **Sources:** `*-workspace-modules.ts`, `system-of-record-routes.ts` (83 wpisy), `product-surface-visibility.ts`, `seven-day-d*.ts`, `product-polish-*.ts`, [Gate F review package](./GATE_F_FOUNDER_REVIEW_PACKAGE_2026-07-09.md), [D7 QA](./SEVEN_DAY_D7_FINAL_QA_2026-07-08.md), [candidate readiness flow](./CANDIDATE_READINESS_WORKING_FLOW_2026-07-09.md).

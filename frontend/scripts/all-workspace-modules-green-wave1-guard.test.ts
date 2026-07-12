@@ -1,5 +1,7 @@
 /**
  * Wave 1 — hide non-green workspace modules (static guard, 2026-07-09).
+ * @deprecated Superseded by founder decision 2026-07-10 — historical audit only.
+ * See test:all-workspace-modules-visible-guard and activation-plan-guard.
  */
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -59,6 +61,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const repoRoot = join(root, "..");
 
 const WAVE1_DOC = "docs/ALL_WORKSPACE_MODULES_GREEN_WAVE1_2026-07-09.md";
+const SUPERSEDED_DOC = "docs/FOUNDER_ALL_MODULES_VISIBLE_AND_GREEN_DECISION_2026-07-10.md";
 
 function readRepo(rel: string): string {
   return readFileSync(join(repoRoot, rel), "utf8");
@@ -79,35 +82,34 @@ test("1 wave1 doc exists with stance and green-only mode", () => {
   assert.match(doc, /NOT_PHASE_3B: true/);
 });
 
-test("2 WORKSPACE_GREEN_ONLY_MODE enabled with gate exports", () => {
+test("2 WORKSPACE_GREEN_ONLY_MODE disabled — historical gate exports retained", () => {
   const src = read("src/lib/all-workspace-green-gate.ts");
-  assert.equal(WORKSPACE_GREEN_ONLY_MODE, true);
+  assert.equal(WORKSPACE_GREEN_ONLY_MODE, false);
   assert.match(src, /isWorkspaceGreenVisible/);
   assert.match(src, /GREEN_WORKSPACE_ALLOWED_IDS/);
+  assert.match(src, /@deprecated/i);
   assert.equal(WAVE1_HIDDEN_WORKSPACE_CARD_COUNT, 20);
+  const superseded = readRepo(SUPERSEDED_DOC);
+  assert.match(superseded, /Supersedes/);
 });
 
-test("3 seven-day wave1 hide flags — wave1 hidden modules; analytics restored in Wave 2A", () => {
-  assert.equal(HIDE_CANDIDATE_REFERRALS_FROM_HUB, true);
-  assert.equal(HIDE_CANDIDATE_TRUST_CENTER_FROM_HUB, true);
-  assert.equal(TRUST_CENTER_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE, true);
-  assert.equal(HIDE_RECRUITER_INTEGRATIONS_FROM_HUB, true);
-  assert.equal(RECRUITER_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE, true);
-  assert.equal(HIDE_RECRUITER_INTEGRATIONS_FROM_NAV, true);
-  assert.equal(HIDE_COMPANY_INTEGRATIONS_FROM_HUB, true);
-  assert.equal(COMPANY_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE, true);
-  assert.equal(HIDE_COMPANY_INTEGRATIONS_FROM_NAV, true);
-  assert.equal(HIDE_INVESTOR_DATA_ROOM_FROM_HUB, true);
-  assert.equal(HIDE_INVESTOR_PUBLIC_LOGIN_FROM_PREVIEW, true);
-  assert.equal(INVESTOR_PUBLIC_LOGIN_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE, true);
-  assert.equal(INVESTOR_ROADMAP_MODULE_IDS.length, 0);
-  assert.equal(RECRUITER_PRIMARY_NAV_HREFS.length, 5);
-  assert.ok((RECRUITER_PRIMARY_NAV_HREFS as readonly string[]).includes("/recruiter/analytics"));
-  assert.equal(COMPANY_PRIMARY_NAV_HREFS.length, 3);
-  assert.ok(!(COMPANY_PRIMARY_NAV_HREFS as readonly string[]).includes("/company/talent-pool"));
+test("3 seven-day hide flags reversed — modules restored to hub", () => {
+  assert.equal(HIDE_CANDIDATE_REFERRALS_FROM_HUB, false);
+  assert.equal(HIDE_CANDIDATE_TRUST_CENTER_FROM_HUB, false);
+  assert.equal(TRUST_CENTER_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE, false);
+  assert.equal(HIDE_RECRUITER_INTEGRATIONS_FROM_HUB, false);
+  assert.equal(RECRUITER_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE, false);
+  assert.equal(HIDE_RECRUITER_INTEGRATIONS_FROM_NAV, false);
+  assert.equal(HIDE_COMPANY_INTEGRATIONS_FROM_HUB, false);
+  assert.equal(COMPANY_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE, false);
+  assert.equal(HIDE_COMPANY_INTEGRATIONS_FROM_NAV, false);
+  assert.equal(HIDE_INVESTOR_DATA_ROOM_FROM_HUB, false);
+  assert.equal(HIDE_INVESTOR_PUBLIC_LOGIN_FROM_PREVIEW, false);
+  assert.equal(INVESTOR_PUBLIC_LOGIN_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE, false);
+  assert.ok(INVESTOR_ROADMAP_MODULE_IDS.length > 0);
 });
 
-test("4 splitWorkspaceModules — empty roadmap, only live primary cards", () => {
+test("4 splitWorkspaceModules — pilot modules in roadmap section", () => {
   const personas = ["candidate", "recruiter", "company", "investor"] as const;
   const modulesByPersona = {
     candidate: CANDIDATE_WORKSPACE_MODULES,
@@ -118,77 +120,39 @@ test("4 splitWorkspaceModules — empty roadmap, only live primary cards", () =>
 
   for (const persona of personas) {
     const split = splitWorkspaceModules(persona, modulesByPersona[persona]);
-    assert.equal(split.roadmap.length, 0, `${persona} roadmap must be empty`);
     assert.ok(split.primary.length > 0, `${persona} primary must not be empty`);
-    assert.ok(
-      split.primary.every((m) => m.status === "live"),
-      `${persona} primary must be live-only`,
-    );
-    assert.ok(
-      !split.primary.some((m) => NON_GREEN_BADGES.includes(m.status as (typeof NON_GREEN_BADGES)[number])),
-      `${persona} primary must not show non-green badges`,
-    );
-    const limit = WORKSPACE_GREEN_PRIMARY_LIMITS[persona];
-    assert.ok(split.primary.length <= limit, `${persona}: ${split.primary.length} > ${limit}`);
-  }
-});
-
-test("5 wave1 hidden card IDs not in primary hub", () => {
-  for (const persona of Object.keys(WAVE1_HIDDEN_WORKSPACE_CARD_IDS) as Array<
-    keyof typeof WAVE1_HIDDEN_WORKSPACE_CARD_IDS
-  >) {
-    const modules =
-      persona === "candidate"
-        ? CANDIDATE_WORKSPACE_MODULES
-        : persona === "recruiter"
-          ? RECRUITER_WORKSPACE_MODULES
-          : persona === "company"
-            ? COMPANY_WORKSPACE_MODULES
-            : INVESTOR_WORKSPACE_MODULES;
-    const split = splitWorkspaceModules(persona, modules);
-    for (const id of WAVE1_HIDDEN_WORKSPACE_CARD_IDS[persona]) {
-      if ((WAVE2A_RESTORED_WORKSPACE_CARD_IDS[persona] as readonly string[]).includes(id)) continue;
-      assert.ok(!split.primary.some((m) => m.id === id), `${persona}/${id} must not be primary`);
-      assert.equal(shouldHideFromDefaultHub(persona, id), true);
-      assert.equal(shouldShowAsRoadmap(persona, id), false);
+    if (persona !== "investor") {
+      assert.ok(split.roadmap.length >= 1, `${persona} roadmap must show pilot modules`);
     }
   }
 });
 
-test("6 splitProductSurfaceRoutes — empty roadmap for all workspaces", () => {
-  for (const persona of ["candidate", "recruiter", "company", "investor"] as const) {
-    const split = splitProductSurfaceRoutes(persona, getSystemOfRecordRoutesForPersona(persona));
-    assert.equal(split.roadmap.length, 0, `${persona} SoR roadmap must be empty`);
-    assert.ok(
-      split.primary.every((r) => r.status === "live"),
-      `${persona} SoR primary must be live-only`,
-    );
-  }
+test("5 wave1 hidden card IDs may appear in roadmap — historical audit list preserved", () => {
+  assert.equal(WAVE1_HIDDEN_WORKSPACE_CARD_IDS.candidate.includes("trust_center"), true);
+  assert.equal(WAVE1_HIDDEN_WORKSPACE_CARD_IDS.recruiter.includes("integrations"), true);
+  const candidateSplit = splitWorkspaceModules("candidate", CANDIDATE_WORKSPACE_MODULES);
+  const shown = [...candidateSplit.primary, ...candidateSplit.roadmap];
+  assert.ok(shown.some((m) => m.id === "trust_center"));
 });
 
-test("7 green allowed IDs cover expected visible modules", () => {
-  assert.ok(isWorkspaceGreenVisible("candidate", "jobs"));
-  assert.ok(isWorkspaceGreenVisible("candidate", "evidence"));
-  assert.ok(!isWorkspaceGreenVisible("candidate", "referrals"));
-  assert.ok(!isWorkspaceGreenVisible("candidate", "trust_center"));
-  assert.ok(!isWorkspaceGreenVisible("recruiter", "integrations"));
-  assert.ok(!isWorkspaceGreenVisible("company", "integrations"));
-  assert.ok(isWorkspaceGreenVisible("recruiter", "inbox"));
-  assert.ok(isWorkspaceGreenVisible("recruiter", "analytics"));
-  assert.ok(isWorkspaceGreenVisible("company", "roles"));
-  assert.ok(!isWorkspaceGreenVisible("company", "talent_pool"));
-  assert.ok(isWorkspaceGreenVisible("investor", "metrics"));
-  assert.ok(!isWorkspaceGreenVisible("investor", "data_room"));
+test("6 splitProductSurfaceRoutes — roadmap non-empty for candidate", () => {
+  const split = splitProductSurfaceRoutes("candidate", getSystemOfRecordRoutesForPersona("candidate"));
+  assert.ok(split.roadmap.length >= 1);
+  const shown = [...split.primary, ...split.roadmap];
+  assert.ok(shown.some((r) => r.id === "candidate_trust"));
+});
+
+test("7 green allowed IDs — historical audit constants unchanged", () => {
   assert.ok(GREEN_WORKSPACE_ALLOWED_IDS.candidate.includes("career_compass"));
   assert.ok(GREEN_WORKSPACE_ALLOWED_IDS.recruiter.includes("search"));
+  assert.ok(!GREEN_WORKSPACE_ALLOWED_IDS.candidate.includes("referrals"));
 });
 
-test("8 product-surface-visibility integrates green gate", () => {
+test("8 product-surface-visibility uses activation model", () => {
   const src = read("src/lib/product-surface-visibility.ts");
-  assert.match(src, /WORKSPACE_GREEN_ONLY_MODE/);
-  assert.match(src, /all-workspace-green-gate/);
+  assert.match(src, /all-workspace-modules-activation/);
+  assert.match(src, /splitActivationSurfaceRoutes/);
   assert.match(src, /getWorkspacePrimaryLimits/);
-  assert.deepEqual(getWorkspacePrimaryLimits(), WORKSPACE_GREEN_PRIMARY_LIMITS);
 });
 
 test("9 canonical stance preserved — NOT Launch GO", () => {
