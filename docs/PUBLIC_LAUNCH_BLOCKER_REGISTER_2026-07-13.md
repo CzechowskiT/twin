@@ -12,7 +12,7 @@
 | LB-002 | Founder smoke credentials UNSET | P0 | Founder | **OPEN** | Set `DEMO_USER_PASSWORD` + recruiter token; run Wave B/C smoke runbooks |
 | LB-003 | Wave B3 referrals not merged (#448) | P0 | Eng | **OPEN** | Merge train #449→#450→#448 after smoke PASS |
 | LB-004 | Public launch stance `noGo` | P0 | Product | **OPEN** | Founder scoped launch decision §G checkboxes |
-| LB-005 | Self-service account delete (R-019) | P1→P0 at scale | Eng | **PARTIAL** | API+UI shipped on #451 branch; prod deploy + founder smoke pending |
+| LB-005 | Self-service account delete (R-019) | P1→P0 at scale | Eng | **PARTIAL** | API+UI on #451; `test:candidate-revoke-delete` 25/25 @ `519ed956`; prod deploy + founder smoke pending |
 
 ---
 
@@ -49,6 +49,7 @@
 | LB-302 | `/dashboard/trust` missing from route registries | P2 | **FIXED** | founder demo crosslinks |
 | LB-303 | `CONTROLLED_PILOT_PRIMARY_LIMITS` drift | P1 | **FIXED** | 8/5/4 restored |
 | LB-304 | R-019 self-service delete API | P1 | **FIXED** (branch) | `POST /candidates/me/delete-account` + live UI |
+| LB-305 | R-019 static guard matrix incomplete | P2 | **FIXED** | Trust link marker + 25-test matrix @ `519ed956` |
 
 ---
 
