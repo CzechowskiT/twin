@@ -83,6 +83,7 @@
     "test:all-modules-green-wave-b2-trust-center-guard": "npx --yes tsx scripts/all-modules-green-wave-b2-trust-center-guard.test.ts",
     "test:all-modules-green-wave-c1-recruiter-activation-guard": "npx --yes tsx scripts/all-modules-green-wave-c1-recruiter-activation-guard.test.ts",
     "test:all-modules-green-wave-c2-talent-pool-trust-review-guard": "npx --yes tsx scripts/all-modules-green-wave-c2-talent-pool-trust-review-guard.test.ts",
+    "test:all-modules-green-wave-c3-notification-prefs-guard": "npx --yes tsx scripts/all-modules-green-wave-c3-notification-prefs-guard.test.ts",
     "test:candidate-green-modules-founder-smoke-guard": "npx --yes tsx scripts/candidate-green-modules-founder-smoke-guard.test.ts",
     "test:recruiter-wave-c-founder-smoke-guard": "npx --yes tsx scripts/recruiter-wave-c-founder-smoke-guard.test.ts",
     "test:alembic-duplicate-revision-guard": "npx --yes tsx scripts/alembic-duplicate-revision-guard.test.ts",
