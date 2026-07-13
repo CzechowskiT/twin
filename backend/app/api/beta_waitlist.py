@@ -291,7 +291,9 @@ def beta_join(
 
 
 @router.get("/waitlist/{referral_code}", response_model=BetaDashboardOut)
+@limiter.limit("60/minute")
 def beta_dashboard(
+    request: Request,
     referral_code: str,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),

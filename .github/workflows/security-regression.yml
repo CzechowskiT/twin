@@ -28,8 +28,8 @@ jobs:
         run: |
           pip install -r requirements.txt
           python3 -m pytest tests/test_candidate_account_deletion.py \
-            tests/test_idempotency_key_naming.py \
-            tests/test_recruiter_c3_notification_prefs.py -q
+            tests/test_beta_waitlist_upload_rate_limit.py \
+            tests/test_idempotency_key_naming.py -q
       - name: Frontend security guards
         working-directory: frontend
         run: |

@@ -35,7 +35,7 @@ db_ok: true
 | 2026-05-29 | FAIL (incident) | Wrong volume mount — recovered same day |
 | 2026-06-01 | **PASS** | pg_dump prod → staging clone; counts matched |
 | 2026-06-11 | NOT DONE | Post-audit re-drill required after redeploy |
-| 2026-07-13 | **SYNTHETIC PASS** | `sim:integration-070-077:dry-run` migration chain 070→077; no prod backup access |
+| 2026-07-13 | **MAX REHEARSAL** | Synthetic PASS | `restore-rehearsal.yml` + `sim:integration-070-077:dry-run` + `test:rollback-engine-v2`; real pg_dump blocked (no founder Railway creds) |
 
 ---
 

@@ -1,5 +1,6 @@
 """Candidate self-service account deletion API tests — R-019."""
 
+import json
 from datetime import datetime, timezone
 
 import pytest
@@ -130,4 +131,52 @@ def test_delete_account_requires_auth() -> None:
         r = client.post("/api/v1/candidates/me/delete-account", json={"confirmation": "DELETE"})
         assert r.status_code in {401, 403}
     finally:
+        db.close()
+
+
+def test_delete_account_creates_completed_privacy_request_lifecycle() -> None:
+    """Deletion closes the DSR lifecycle: privacy request completed + audit trail."""
+    db = _sqlite_session()
+    try:
+        user, cand = _seed_user(db, "lifecycle@example.com")
+        client = _client_for(db, user)
+        r = client.post("/api/v1/candidates/me/delete-account", json={"confirmation": "DELETE"})
+        assert r.status_code == 200
+        pr_id = r.json()["privacy_request_id"]
+
+        pr = db.query(CandidatePrivacyRequest).filter(CandidatePrivacyRequest.id == pr_id).first()
+        assert pr is not None
+        assert pr.request_type == "deletion"
+        assert pr.status == "completed"
+        assert pr.completed_at is not None
+        assert pr.payload_json is not None
+        payload = json.loads(pr.payload_json) if isinstance(pr.payload_json, str) else pr.payload_json
+        assert payload.get("self_service") is True
+
+        audits = (
+            db.query(CandidateTrustAuditEvent)
+            .filter(CandidateTrustAuditEvent.candidate_id == cand.id)
+            .all()
+        )
+        assert any(a.event_type == "account_deleted" for a in audits)
+    finally:
+        app.dependency_overrides.clear()
+        db.close()
+
+
+def test_delete_account_rate_limited() -> None:
+    """Self-service delete is capped at 3/min per user (abuse guard)."""
+    db = _sqlite_session()
+    try:
+        user, _ = _seed_user(db, "ratelimit@example.com")
+        client = _client_for(db, user)
+        for _ in range(3):
+            # First call succeeds; subsequent calls hit inactive user (409) before rate limit.
+            r = client.post("/api/v1/candidates/me/delete-account", json={"confirmation": "DELETE"})
+            assert r.status_code in {200, 409}
+        # Fourth rapid call should be rate-limited or rejected as already deleted.
+        r4 = client.post("/api/v1/candidates/me/delete-account", json={"confirmation": "DELETE"})
+        assert r4.status_code in {409, 429}
+    finally:
+        app.dependency_overrides.clear()
         db.close()

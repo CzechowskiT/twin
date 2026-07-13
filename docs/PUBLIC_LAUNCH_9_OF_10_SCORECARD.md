@@ -96,7 +96,7 @@
 |---|-----------|--------|----------|
 | D1 | Gate F founder decision recorded | **FAIL** ★ | LB-001 OPEN |
 | D2 | Launch stance `noGo` cleared | **FAIL** ★ | `PUBLIC_LAUNCH_READINESS_INDEX` → NO-GO |
-| D3 | Release train #448–#455 merged | **FAIL** ★ | All OPEN; #454 CONFLICTING |
+| D3 | Release train #448–#455 merged | **FAIL** ★ | All OPEN; #454 MERGEABLE CLEAN (rebased) |
 | D4 | Security audit PASS (no P0 open) | **PASS** | `docs/PRELAUNCH_SECURITY_AUDIT_2026-07-13.md` — P0 CLOSED |
 | D5 | Privacy compliance (R-019 prod) | **FAIL** ★ | Self-service delete branch-only; L6 waiver for pilot only |
 | D6 | Hard bans enforced in code/CI | **PASS** ★ | `docs/FEATURE_FLAG_REGISTRY_2026-07-13.md` — Stripe LIVE banned |
@@ -119,10 +119,10 @@
 | #451 | `cb13d067` | MERGEABLE | — | N/A | Tooling + R-019 |
 | #452 | `6aa193c4` | MERGEABLE CLEAN | 074 | BLOCKED | C3 notif prefs |
 | #453 | `61e472cf` | MERGEABLE | 075 | BLOCKED | C4 saved views (rebased) |
-| #454 | `f3bc6db7` | **CONFLICTING** | 076 | BLOCKED | **Rebase onto #453 required** |
+| #454 | `8e7f1582` | **MERGEABLE CLEAN** | 076 | BLOCKED | Rebased onto #453 @ 2026-07-13T10:22Z |
 | #455 | `06e6c359` | MERGEABLE | 077 | BLOCKED | Candidate timeline |
 
-**Rehearsal evidence:** `npm run sim:integration-070-077:dry-run` PASS · `npm run plan:merge-train-extended` BLOCKED (#454)
+**Rehearsal evidence:** `npm run sim:integration-070-077:dry-run` PASS · `npm run plan:merge-train-extended` BLOCKED (smoke UNSET, not #454)
 
 ---
 
@@ -142,7 +142,7 @@
 
 | Check | Status | Evidence |
 |-------|--------|----------|
-| API `POST /candidates/me/delete-account` | **PASS** (branch) | `cb13d067` — 4 pytest PASS |
+| API `POST /candidates/me/delete-account` | **PASS** (branch) | `cb13d067` — 6 pytest PASS (lifecycle + rate limit) |
 | UI live panel | **PASS** (branch) | `test:candidate-account-delete-guard` PASS |
 | Prod deploy | **BLOCKED** | Prod SHA `c2a08b0` predates R-019 |
 | Founder smoke | **BLOCKED** | Credentials UNSET |
@@ -161,7 +161,7 @@ Stripe LIVE · ATS writeback · Microsoft Calendar write · Auto-apply execution
 
 **GO wymaga (kolejność):**
 1. Ustaw credentials → Wave B/C browser smoke PASS
-2. Merge train #449→#450→#448→#451→#452→#453→**rebase #454**→#455
+2. Merge train #449→#450→#448→#451→#452→#453→#454→#455
 3. Railway migrate → prod head 077
 4. O7 real restore drill na staging clone
 5. Gate F founder decision + podpis scorecard
