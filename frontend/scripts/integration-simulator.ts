@@ -138,7 +138,7 @@ function tryResolvePr451Tooling(files: string[]): boolean {
     const theirs = gitShow("MERGE_HEAD", file);
     if (!theirs) return false;
     writeFileSync(join(repoRoot, file), theirs);
-    execSync(`git add -- ${JSON.stringify(file)}`, { cwd: repoRoot, shell: true });
+    execSync(`git add -- ${JSON.stringify(file)}`, { cwd: repoRoot });
   }
   try {
     git('git commit --no-edit -m "chore(sim): accept #451 tooling on merge conflicts"');
