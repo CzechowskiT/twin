@@ -74,3 +74,25 @@
 ---
 
 **Register stance:** 6 OPEN · 5 FIXED/CLOSED · 1 PARTIAL · 2 WAIVED/ACCEPTED · Launch **NO-GO**
+
+---
+
+## Path A operator handoff (2026-07-13T12:25Z)
+
+Credentials **UNSET** — merge train and founder smoke **NOT executed** (no fake PASS).
+
+When credentials SET, founder runs (in order):
+
+1. `export DEMO_USER_PASSWORD=…` + `export RECRUITER_TOKEN=…`
+2. `cd frontend && npm run preflight:founder-smoke-env && npm run preflight:founder-smoke-orchestration`
+3. Wave B/C browser smoke with `PLAYWRIGHT_ALLOW_PROD_SMOKE=1` (evidence → `reports/founder-smoke/`)
+4. Manual GitHub merge #449→#450→#448→#451→#452→#453→#454→#455 (NO auto-merge; CI wait after each)
+5. Railway `alembic upgrade head` → 077
+6. `npm run probe:prod-public && npm run verify:production-v3:077`
+7. R-019 on **disposable** test account only
+8. O7 Railway restore drill
+9. Gate F decision
+
+Rehearsal @ UNSET batch: `sim:integration-070-077` PASS · `plan:merge-train-extended` PASS · `probe:prod-public` 110/110.
+
+#462 demo (`e788dd9f`): separate founder narrative approval; do not merge without sign-off.
