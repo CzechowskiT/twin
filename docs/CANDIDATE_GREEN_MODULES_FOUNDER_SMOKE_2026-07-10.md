@@ -40,6 +40,7 @@ Founder-auth browser smoke runbook for **Wave B** candidate modules: Career Comp
 ## Preflight commands (no secrets in output)
 
 ```bash
+cd frontend && npm run preflight:founder-smoke-env   # after #450 tooling merged / cherry-picked
 curl -sS https://twin-sooty.vercel.app/api/public-health | jq '{status,db_ok,git_commit}'
 cd frontend && npm run test:candidate-green-modules-founder-smoke-guard
 cd frontend && npm run test:all-modules-green-wave-b1-career-compass-guard
@@ -47,7 +48,9 @@ cd frontend && npm run test:all-modules-green-wave-b2-trust-center-guard
 cd frontend && npm run test:all-modules-green-wave-b3-referrals-guard
 ```
 
-For #448 preview (after Vercel deploy): repeat public-health on preview URL from PR checks.
+For #448 preview (after Vercel deploy): set `TWIN_PREVIEW_URL_448` and run `npm run preflight:preview-reachability`.
+
+**Migration note:** #448 branch has `073_candidate_referrals` with `down_revision = 072` — parent `072` arrives only after rebase onto merged #450. Do not fake full Alembic graph PASS on #448 alone.
 
 ---
 
