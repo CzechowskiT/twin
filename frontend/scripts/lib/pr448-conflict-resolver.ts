@@ -24,10 +24,10 @@ export function resolvePackageJsonScripts(
   theirs: string,
 ): { content: string; ok: boolean; detail: string } {
   try {
-    const baseObj = JSON.parse(base) as { scripts?: Record<string, string> };
+    const baseObj = base ? (JSON.parse(base) as { scripts?: Record<string, string> }) : {};
     const oursObj = JSON.parse(ours) as { scripts?: Record<string, string> };
     const theirsObj = JSON.parse(theirs) as { scripts?: Record<string, string> };
-    const merged = { ...baseObj };
+    const merged = { ...oursObj, ...theirsObj };
     merged.scripts = {
       ...(baseObj.scripts ?? {}),
       ...(oursObj.scripts ?? {}),
@@ -44,18 +44,10 @@ export function resolvePackageJsonScripts(
   }
 }
 
-/** Extract WORKSPACE_MODULE_ACTIVATION array entries by id. */
+/** Merge activation registry — union module keys (candidate_referrals + C2 recruiter modules). */
 export function mergeActivationById(ours: string, theirs: string): { content: string; ok: boolean; detail: string } {
-  const entryRe = /\{\s*id:\s*"([^"]+)"/g;
-  const oursIds = new Set<string>();
-  const theirsIds = new Set<string>();
-  let m: RegExpExecArray | null;
-  while ((m = entryRe.exec(ours)) !== null) oursIds.add(m[1]!);
-  entryRe.lastIndex = 0;
-  while ((m = entryRe.exec(theirs)) !== null) theirsIds.add(m[1]!);
-  const union = new Set([...oursIds, ...theirsIds]);
-  const hasReferrals = union.has("candidate_referrals");
-  const hasC2 = union.has("recruiter_talent_pool") || union.has("recruiter_trust_review_queue");
+  const hasReferrals = /candidate_referrals\s*:/.test(theirs) || /candidate_referrals\s*:/.test(ours);
+  const hasC2 = /recruiter_talent_pool\s*:/.test(ours) || /recruiter_talent_pool\s*:/.test(theirs);
   if (!hasReferrals || !hasC2) {
     return {
       content: ours,
@@ -63,35 +55,20 @@ export function mergeActivationById(ours: string, theirs: string): { content: st
       detail: `missing modules: referrals=${hasReferrals} c2=${hasC2}`,
     };
   }
-  // Prefer theirs (B3) as base when it includes referrals; patch missing C2 ids from ours
-  const useBase = theirs.includes("candidate_referrals") ? theirs : ours;
-  const missingFromTheirs = [...oursIds].filter((id) => !theirsIds.has(id));
-  if (missingFromTheirs.length === 0) {
-    return { content: useBase, ok: true, detail: `union ${union.size} module ids` };
+  if (/candidate_referrals\s*:/.test(ours)) {
+    return { content: ours, ok: true, detail: "referrals already present in ours" };
   }
-  const insertBlock = extractEntriesByIds(ours, missingFromTheirs);
+  const blockMatch = theirs.match(/candidate_referrals:\s*\{[\s\S]*?\n  \},?\n/);
+  if (!blockMatch) {
+    return { content: ours, ok: false, detail: "referrals block not extractable" };
+  }
   const marker = "export const WORKSPACE_MODULE_ACTIVATION";
-  const idx = useBase.indexOf(marker);
+  const idx = ours.indexOf(marker);
   if (idx < 0) {
-    return { content: useBase, ok: false, detail: "activation array marker missing" };
+    return { content: ours + "\n" + blockMatch[0], ok: true, detail: "appended referrals block at EOF" };
   }
-  const closeIdx = useBase.indexOf("];", idx);
-  if (closeIdx < 0) {
-    return { content: useBase, ok: false, detail: "activation array close missing" };
-  }
-  const merged =
-    useBase.slice(0, closeIdx) + (insertBlock ? `,\n${insertBlock}` : "") + useBase.slice(closeIdx);
-  return { content: merged, ok: true, detail: `merged ${union.size} module ids` };
-}
-
-function extractEntriesByIds(src: string, ids: string[]): string {
-  const blocks: string[] = [];
-  for (const id of ids) {
-    const re = new RegExp(`\\{[^{}]*id:\\s*"${id}"[^{}]*(?:\\{[^{}]*\\}[^{}]*)*\\}`, "s");
-    const match = src.match(re);
-    if (match) blocks.push(match[0]!);
-  }
-  return blocks.join(",\n");
+  const merged = ours.slice(0, idx) + blockMatch[0] + ours.slice(idx);
+  return { content: merged, ok: true, detail: "inserted candidate_referrals before activation array" };
 }
 
 /** Union test blocks — prefer longer file with referral coverage. */

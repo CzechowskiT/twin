@@ -36,9 +36,11 @@ test("2 package.json union merges scripts", () => {
   assert.equal(parsed.scripts["test:b3"], "tsx b3");
 });
 
-test("3 activation merge unions partial module lists", () => {
-  const ours = 'export const WORKSPACE_MODULE_ACTIVATION = [{ id: "recruiter_talent_pool" }];';
-  const theirs = 'export const WORKSPACE_MODULE_ACTIVATION = [{ id: "candidate_referrals" }];';
+test("3 activation merge unions module key blocks", () => {
+  const ours =
+    "recruiter_talent_pool: { activationStatus: 'PILOT' },\nexport const WORKSPACE_MODULE_ACTIVATION = [];";
+  const theirs =
+    "candidate_referrals: {\n    activationStatus: 'PILOT',\n  },\nexport const WORKSPACE_MODULE_ACTIVATION = [];";
   const r = mergeActivationById(ours, theirs);
   assert.equal(r.ok, true);
   assert.match(r.content, /recruiter_talent_pool/);
