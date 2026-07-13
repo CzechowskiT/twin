@@ -1,6 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3000";
+const vercelBypassSecret =
+  process.env.PLAYWRIGHT_VERCEL_BYPASS_SECRET ?? process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
 
 /**
  * INCIDENT 2026-06-16: overlapping agent/CI Playwright runs + multitab e2e spawned
@@ -30,6 +32,12 @@ export default defineConfig({
   use: {
     baseURL,
     trace: "on-first-retry",
+    extraHTTPHeaders: vercelBypassSecret
+      ? {
+          "x-vercel-protection-bypass": vercelBypassSecret,
+          "x-vercel-set-bypass-cookie": "true",
+        }
+      : undefined,
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: enableWebServer

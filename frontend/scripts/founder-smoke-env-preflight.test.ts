@@ -22,7 +22,10 @@ test("1 reports all required env vars", () => {
 });
 
 test("2 UNSET when no env or files", () => {
-  const checks = checkFounderSmokeEnv({}, { rootEnvLocal: "/nonexistent", frontendEnvLocal: "/nonexistent" });
+  const checks = checkFounderSmokeEnv(
+    { NODE_ENV: "test" },
+    { rootEnvLocal: "/nonexistent", frontendEnvLocal: "/nonexistent" },
+  );
   assert.ok(checks.every((c) => c.status === "UNSET"));
   const report = formatFounderSmokeEnvReport(checks);
   assert.match(report, /DEMO_USER_PASSWORD: UNSET/);
@@ -32,7 +35,7 @@ test("2 UNSET when no env or files", () => {
 
 test("3 SET from process env without exposing value", () => {
   const checks = checkFounderSmokeEnv(
-    { DEMO_USER_PASSWORD: "secret-not-logged" },
+    { NODE_ENV: "test", DEMO_USER_PASSWORD: "secret-not-logged" },
     { rootEnvLocal: "/nonexistent", frontendEnvLocal: "/nonexistent" },
   );
   const demo = checks.find((c) => c.name === "DEMO_USER_PASSWORD");
@@ -48,7 +51,10 @@ test("4 SET from frontend .env.local key presence only", () => {
   const frontendEnv = join(dir, "frontend.env.local");
   writeFileSync(frontendEnv, "RECRUITER_TOKEN=from-file\n");
   try {
-    const checks = checkFounderSmokeEnv({}, { rootEnvLocal: join(dir, "missing"), frontendEnvLocal: frontendEnv });
+    const checks = checkFounderSmokeEnv(
+      { NODE_ENV: "test" },
+      { rootEnvLocal: join(dir, "missing"), frontendEnvLocal: frontendEnv },
+    );
     const token = checks.find((c) => c.name === "RECRUITER_TOKEN");
     assert.equal(token?.status, "SET");
     assert.equal(token?.source, "frontend-env-local");
@@ -59,7 +65,7 @@ test("4 SET from frontend .env.local key presence only", () => {
 
 test("5 recruiter token from either RECRUITER_TOKEN or TWIN_RECRUITER_TOKEN", () => {
   const checks = checkFounderSmokeEnv(
-    { TWIN_RECRUITER_TOKEN: "x" },
+    { NODE_ENV: "test", TWIN_RECRUITER_TOKEN: "x" },
     { rootEnvLocal: "/nonexistent", frontendEnvLocal: "/nonexistent" },
   );
   const report = formatFounderSmokeEnvReport(checks);

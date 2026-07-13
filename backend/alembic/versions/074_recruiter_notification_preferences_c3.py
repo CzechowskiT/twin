@@ -6,7 +6,7 @@ import sqlalchemy as sa
 from alembic import op
 
 revision: str = "074_recruiter_notification_preferences_c3"
-down_revision: Union[str, None] = "072_recruiter_talent_pool_trust_review_c2"
+down_revision: Union[str, None] = "073_candidate_referrals"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

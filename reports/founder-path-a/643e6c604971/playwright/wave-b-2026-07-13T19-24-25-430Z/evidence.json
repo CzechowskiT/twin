@@ -1,0 +1,10 @@
+{
+  "generatedUtc": "2026-07-13T19:25:32.539Z",
+  "repoHead": "643e6c604971d73954f8ec7cb4a893f205a865d7",
+  "label": "wave-b",
+  "baseUrl": "https://twin-sooty.vercel.app",
+  "command": "cd frontend && PLAYWRIGHT_BASE_URL=https://twin-sooty.vercel.app PLAYWRIGHT_VERCEL_BYPASS_SECRET=*** npx playwright test e2e/smoke.spec.ts --workers=1 --trace=on --output=/Users/tomek/Projects/twin/reports/founder-path-a/643e6c604971/playwright/wave-b-2026-07-13T19-24-25-430Z --reporter=line,json",
+  "exitCode": 0,
+  "result": "PASS",
+  "reportsDir": "/Users/tomek/Projects/twin/reports/founder-path-a/643e6c604971/playwright/wave-b-2026-07-13T19-24-25-430Z"
+}

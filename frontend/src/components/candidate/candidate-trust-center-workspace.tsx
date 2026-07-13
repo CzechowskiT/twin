@@ -404,7 +404,11 @@ function trustCenterAdvancedSections(
             <Link href={candidateDataPortabilityHref()} className="twin-link">
               {t("candidateDataPortability.pageTitle")}
             </Link>
-            <Link href={candidateRevokeDeleteHref()} className="twin-link">
+            <Link
+              href={candidateRevokeDeleteHref()}
+              className="twin-link"
+              data-testid="candidate-trust-center-revoke-delete-link"
+            >
               {t("candidateRevokeDelete.pageTitle")}
             </Link>
             <Link href={candidateTrustAuditExportHref()} className="twin-link">
