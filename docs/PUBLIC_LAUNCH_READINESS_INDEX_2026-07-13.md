@@ -9,7 +9,7 @@
 | Field | Value |
 |-------|-------|
 | **Path** | B+++ (credentials UNSET) |
-| **repo_head** | `e7a568ac` (PR #451 — orchestrator drift fixed) |
+| **repo_head** | `c542e706` (PR #451 — orchestrator synced in-commit) |
 | **prod_api_commit** | `c2a08b025ca950b341540f0bc80f710825c778ce` (public-health) |
 | **prod_frontend** | `https://twin-sooty.vercel.app` |
 | **alignment_status** | **DRIFT** — train branches ahead of prod (070 vs 077 target) |

@@ -16,9 +16,9 @@
 | Stack #453 `61e472cf` | **SUPERSEDED** | `934a48a7` (rebased on #452) |
 | Stack #454 `8e7f1582` | **SUPERSEDED** | `26f9da96` (rebased on #453) |
 | Stack #455 `06e6c359` | **SUPERSEDED** | `e36df2cb` (rebased on #454) |
-| Merge plan drift @ `876133ce` vs `e7a568ac` | **CLOSED** | `EXPECTED_HEADS[451]` → `e7a568ac` |
+| Merge plan drift loop on #451 tooling commits | **CLOSED** | #451 omitted from `EXPECTED_HEADS` (tooling-only, no DB head) |
 
-**Canonical repo_head:** `e7a568ac` (branch `chore/extended-integration-batch-2026-07-13`, PR #451)
+**Canonical repo_head:** `c542e706` (branch `chore/extended-integration-batch-2026-07-13`, PR #451) — orchestrator `EXPECTED_HEADS[451]` synced in-commit (no separate bump)
 
 ---
 
@@ -26,7 +26,7 @@
 
 | Pole | Wartość |
 |------|---------|
-| **repo_head** | `e7a568acf48fc8130a8e4dffc35a85f4b930328d` |
+| **repo_head** | `c542e706` (post final closure push) |
 | **prod_api_commit** | `c2a08b025ca950b341540f0bc80f710825c778ce` |
 | **prod_frontend** | `https://twin-sooty.vercel.app` |
 | **prod_db_head** | `070_candidate_trust_center` (train target: `077`) |

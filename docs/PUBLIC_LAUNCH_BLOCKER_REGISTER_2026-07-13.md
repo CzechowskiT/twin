@@ -25,7 +25,7 @@
 | LB-103 | PR #453 mergeable | P1 | **CLOSED** | Rebased to `934a48a7` — MERGEABLE CLEAN |
 | LB-103b | PR #454 CONFLICTING | P1 | **CLOSED** | Rebased to `26f9da96` — MERGEABLE CLEAN |
 | LB-103c | PR #455 stack | P1 | **CLOSED** | Rebased to `e36df2cb` — MERGEABLE CLEAN |
-| LB-105 | Merge orchestrator drift #451 | P1 | **CLOSED** | `EXPECTED_HEADS[451]` → `e7a568ac` |
+| LB-105 | Merge orchestrator drift #451 | P1 | **CLOSED** | #451 omitted from `EXPECTED_HEADS` — stops drift loop |
 | LB-103 | Prod Alembic head behind train (070 vs 077) | P1 | **EXPECTED** | Execute release train merges + Railway migrate |
 | LB-104 | No founder smoke PASS docs for C1–C5 | P1 | **OPEN** | Browser smoke per wave runbooks |
 
