@@ -11,13 +11,14 @@
 | Check | Result | Evidence |
 |-------|--------|----------|
 | Scaffold HEAD | `c2a08b025ca950b341540f0bc80f710825c778ce` | `git rev-parse origin/cursor/phase1-monorepo-scaffold` |
-| PR #448 | **OPEN** MERGEABLE CLEAN | HEAD `322fdb45`, migration **073**, CI green, Vercel SUCCESS |
-| PR #449 | **OPEN** MERGEABLE CLEAN | HEAD `905a660c`, CI green, Vercel SUCCESS |
-| PR #450 | **OPEN** MERGEABLE CLEAN | HEAD `9b88c18a` (+ batch tooling push), stacked on #449, CI green |
+| PR #448 | **OPEN** MERGEABLE CLEAN | HEAD `5c3c4825`, migration **073**, CI green, Vercel SUCCESS |
+| PR #449 | **OPEN** MERGEABLE CLEAN | HEAD `905a660c`, migration **071**, CI green, Vercel SUCCESS |
+| PR #450 | **OPEN** MERGEABLE CLEAN | HEAD `059fa4e9`, stacked on #449, migration **072**, CI green |
 | #448 merged since last report | **NO** | `gh pr view 448` state=OPEN |
 | Smoke PASS since last report | **NO** | No `FOUNDER_SMOKE: PASS` in runbooks |
-| Batch stashes | **NONE** | No 448/449/450/migration stashes |
-| Uncommitted on worked branches | **NONE** | Clean after push |
+| Integration sim (batch 2026-07-13) | **PASS** | Temp branch `tmp/integration-pr448-449-450-verify` @ `6ed56afd` — deleted after verify |
+| Batch stashes | **NONE** | No 448/449/450/migration stashes (125 unrelated stashes exist repo-wide) |
+| Uncommitted on worked branches | **NONE** | Clean on `feat/all-modules-green-wave-c2-talent-pool-trust-review` |
 
 ---
 
@@ -47,6 +48,21 @@ Both #448 and #449 originally claimed Alembic revision **`071_*`**:
 | #450 | `070 → 071 → 072` linear, no duplicate IDs | Honest partial graph — no 073 file |
 | #448 | `073_candidate_referrals` exists, down_revision `072` | Full chain via fixture test after rebase |
 | Fixture | `070 → 071 → 072 → 073` | `alembic-migration-graph.ts` post-merge chain |
+| Integration sim | Full chain + single head `073` | Temp merge #449→#450→#448 @ `6ed56afd` — **PASS**, branch deleted |
+
+### Integration simulation (batch 2026-07-13, Path B)
+
+| Step | Result |
+|------|--------|
+| Branch from scaffold `c2a08b0` | OK |
+| Merge #449 (fast-forward) | OK → `905a660c` |
+| Merge #450 (fast-forward) | OK → `059fa4e9` |
+| Merge #448 (conflicts in package.json, activation.ts, guard test, doc) | Resolved manually — commit `6ed56afd` |
+| Migration chain 070→071→072→073 | **PASS** — single head `073_candidate_referrals` |
+| Downgrade contract (071/072/073) | **PASS** — upgrade/downgrade callable |
+| Backend persistence tests (C1+C2+B3) | **39 passed** |
+| Frontend guards (B1/B2/B3/C1/C2 + founder smoke) | **ALL PASS** |
+| Temp branch cleanup | **DELETED** `tmp/integration-pr448-449-450-verify` |
 
 ---
 
@@ -73,7 +89,15 @@ Both #448 and #449 originally claimed Alembic revision **`071_*`**:
 | `DEMO_USER_PASSWORD` | NOT SET | No Wave B browser smoke |
 | Recruiter token | NOT SET | No Wave C browser smoke |
 
-**Smoke executed:** **NO** — do not record fake PASS.
+**Smoke executed:** **NO** — preflight + orchestration only; prod + all 3 PR previews **REACHABLE** (public-health 200).
+
+### Preview URLs (from gh PR comments, batch 2026-07-13)
+
+| PR | Preview base URL | public-health |
+|----|----------------|---------------|
+| #449 | `https://twin-git-feat-all-modules-green-wave-c1-recruiter-a-26266f-twin.vercel.app` | 200 OK |
+| #450 | `https://twin-git-feat-all-modules-green-wave-c2-talent-pool-0350d9-twin.vercel.app` | 200 OK |
+| #448 | `https://twin-git-feat-all-modules-green-wave-b3-candidate-r-9c796e-twin.vercel.app` | 200 OK |
 
 ---
 
@@ -89,9 +113,11 @@ Both #448 and #449 originally claimed Alembic revision **`071_*`**:
 
 ---
 
-## Part G — Post-merge verification
+## Part G — Post-merge verification / rollback readiness
 
 Not applicable — no merges in this batch.
+
+**Rollback stance (unchanged):** No automatic `alembic downgrade` on production. Failed migration → stop deploy, restore from Railway backup per `docs/PERSISTENCE_MIGRATION_RUNBOOK_2026-06-19.md`. Launch-day rollback playbook: `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` (pilot/demo only — public **NO-GO**).
 
 ---
 
