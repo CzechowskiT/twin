@@ -21,6 +21,7 @@ from app.services.recruiter_activation_persistence import (
 from app.services.recruiter_analytics import build_recruiter_analytics
 from app.services.recruiter_audit_trail import (
     RECRUITER_CLIENT_AUDIT_ACTION_TYPES,
+    list_company_activity_timeline,
     list_recruiter_audit_events,
     log_recruiter_audit_event,
 )
@@ -1049,3 +1050,28 @@ def recruiter_saved_views_delete(
         return delete_saved_view(db, company_slug=slug, view_id=view_id)
     except ValueError as exc:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+
+
+@router.get("/activity-timeline")
+def recruiter_activity_timeline(
+    request: Request,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    action_type: str | None = Query(None, max_length=64),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return list_company_activity_timeline(
+            db,
+            company_slug=slug,
+            limit=limit,
+            offset=offset,
+            action_type=action_type,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
