@@ -20,10 +20,12 @@
 
 | ID | Blocker | Severity | Status | Remediation |
 |----|---------|----------|--------|-------------|
-| LB-101 | PR #452 mergeable | P1 | **CLOSED** | Rebased to `6aa193c4` — MERGEABLE CLEAN |
-| LB-102 | #451 remote CI frontend-build | P1 | **CLOSED** | `release-train-v4-scenarios.ts` fix on branch |
-| LB-103 | PR #453 mergeable | P1 | **CLOSED** | Rebased to `61e472cf` — MERGEABLE |
-| LB-103b | PR #454 CONFLICTING | P1 | **CLOSED** | Rebased to `8e7f1582` — MERGEABLE CLEAN |
+| LB-101 | PR #452 mergeable | P1 | **CLOSED** | Rebased to `753ecf70` — MERGEABLE CLEAN |
+| LB-102 | #451 remote CI frontend-build | P1 | **CLOSED** | All workflows green + Vercel Ready @ `e7a568ac` |
+| LB-103 | PR #453 mergeable | P1 | **CLOSED** | Rebased to `934a48a7` — MERGEABLE CLEAN |
+| LB-103b | PR #454 CONFLICTING | P1 | **CLOSED** | Rebased to `26f9da96` — MERGEABLE CLEAN |
+| LB-103c | PR #455 stack | P1 | **CLOSED** | Rebased to `e36df2cb` — MERGEABLE CLEAN |
+| LB-105 | Merge orchestrator drift #451 | P1 | **CLOSED** | `EXPECTED_HEADS[451]` → `e7a568ac` |
 | LB-103 | Prod Alembic head behind train (070 vs 077) | P1 | **EXPECTED** | Execute release train merges + Railway migrate |
 | LB-104 | No founder smoke PASS docs for C1–C5 | P1 | **OPEN** | Browser smoke per wave runbooks |
 
