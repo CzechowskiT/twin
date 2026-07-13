@@ -43,6 +43,38 @@ export const WAVE_API_CONTRACTS = {
     ],
     responseFields: ["records", "items", "decisions"],
   },
+  C3: {
+    slice: "Notification Preferences",
+    methods: ["GET", "PUT"] as const,
+    path: "/api/v1/recruiter/notification-preferences",
+    responseFields: ["channels", "categories", "updated_at"],
+    pr: 452,
+    migration: "074_recruiter_notification_preferences_c3",
+  },
+  C4: {
+    slice: "Saved Filter Views",
+    methods: ["GET", "POST", "PATCH", "DELETE"] as const,
+    path: "/api/v1/recruiter/saved-views",
+    responseFields: ["views", "default_view_id"],
+    pr: 453,
+    migration: "075_recruiter_saved_views_c4",
+  },
+  C5: {
+    slice: "Activity Timeline",
+    methods: ["GET"] as const,
+    path: "/api/v1/recruiter/activity-timeline",
+    responseFields: ["events", "cursor", "has_more"],
+    pr: 454,
+    migration: "076_recruiter_activity_timeline_c5",
+  },
+  CANDIDATE_TIMELINE: {
+    slice: "Candidate Trust Activity Timeline",
+    methods: ["GET"] as const,
+    path: "/api/v1/candidates/me/activity-timeline",
+    responseFields: ["events", "cursor", "has_more"],
+    pr: 455,
+    migration: "077_candidate_activity_timeline",
+  },
 } as const;
 
 export type ContractDrift = {

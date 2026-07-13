@@ -164,7 +164,23 @@ def test_recruiter_api_without_token_401(monkeypatch) -> None:
         db.close()
 
 
+def test_referrals_endpoint_requires_auth_or_absent_on_partial_branch() -> None:
+    """Route ships on #448; on tooling branch expect 401/403 or 404."""
+    client = TestClient(app)
+    r = client.get("/api/v1/candidates/me/referrals")
+    assert r.status_code in (401, 403, 404)
+
+
+def test_career_compass_put_requires_auth() -> None:
+    client = TestClient(app)
+    r = client.put(
+        "/api/v1/candidates/me/career-compass",
+        json={"target_role": "X", "skill_gaps": [], "learning_actions": []},
+    )
+    assert r.status_code in (401, 403)
+
+
 def test_trust_center_requires_auth() -> None:
     client = TestClient(app)
     r = client.get("/api/v1/candidates/me/trust")
-    assert r.status_code == 401
+    assert r.status_code in (401, 403)

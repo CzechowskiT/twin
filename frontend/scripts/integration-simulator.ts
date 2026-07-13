@@ -31,6 +31,14 @@ import {
   parseMigrationSource,
   type MigrationMeta,
 } from "./lib/alembic-migration-graph";
+import {
+  PR448_CONFLICT_FILES,
+  appendMasterPlanDoc,
+  mergeActivationById,
+  resolvePackageJsonScripts,
+  resolvePr448File,
+  unionGuardTests,
+} from "./lib/pr448-conflict-resolver";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const REPORT_DIR = join(repoRoot, "reports/integration-sim");
@@ -63,6 +71,62 @@ process.on("SIGINT", () => {
   cleanupOnInterrupt();
   process.exit(130);
 });
+
+function gitShow(ref: string, path: string): string {
+  try {
+    return execSync(`git show ${ref}:${path}`, { cwd: repoRoot, encoding: "utf8" });
+  } catch {
+    return "";
+  }
+}
+
+function readStage(stage: string, path: string): string {
+  try {
+    return execSync(`git show :${stage}:${path}`, { cwd: repoRoot, encoding: "utf8" });
+  } catch {
+    return "";
+  }
+}
+
+function resolvedContent(file: string, base: string, ours: string, theirs: string): string {
+  switch (file) {
+    case "frontend/package.json":
+      return resolvePackageJsonScripts(base, ours, theirs).content;
+    case "frontend/src/lib/all-workspace-modules-activation.ts":
+      return mergeActivationById(ours, theirs).content;
+    case "frontend/scripts/candidate-green-modules-founder-smoke-guard.test.ts":
+      return unionGuardTests(ours, theirs).content;
+    case "docs/ALL_WORKSPACE_MODULES_ACTIVATION_MASTER_PLAN_2026-07-10.md":
+      return appendMasterPlanDoc(ours, theirs).content;
+    default:
+      return ours;
+  }
+}
+
+function tryResolvePr448Conflicts(files: string[]): boolean {
+  const known = files.filter((f) => (PR448_CONFLICT_FILES as readonly string[]).includes(f));
+  if (known.length === 0) return false;
+  let allOk = true;
+  for (const file of known) {
+    const base = readStage("1", file) || gitShow(`MERGE_HEAD`, file);
+    const ours = readStage("2", file) || readFileSync(join(repoRoot, file), "utf8");
+    const theirs = readStage("3", file) || gitShow(`MERGE_HEAD`, file);
+    const resolution = resolvePr448File(file, base, ours, theirs);
+    if (!resolution.ok) {
+      allOk = false;
+      continue;
+    }
+    writeFileSync(join(repoRoot, file), resolvedContent(file, base, ours, theirs));
+    execSync(`git add ${JSON.stringify(file)}`, { cwd: repoRoot });
+  }
+  if (!allOk) return false;
+  try {
+    git('git commit --no-edit -m "chore(sim): resolve PR448 conflicts per contract"');
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 function loadMigrationsFromDisk(): { migrations: MigrationMeta[]; report: MigrationReport } {
   const srcByFile = new Map<string, string>();
@@ -152,6 +216,10 @@ function runSimulator(): SimulatorReport {
       } catch {
         const status = git("git diff --name-only --diff-filter=U");
         const files = status ? status.split("\n").filter(Boolean) : ["unknown"];
+        if (pr === 448 && tryResolvePr448Conflicts(files)) {
+          conflicts.push({ pr, files, resolved: true });
+          continue;
+        }
         conflicts.push({ pr, files, resolved: false });
         git("git merge --abort 2>/dev/null || true");
         exitCode = 2;

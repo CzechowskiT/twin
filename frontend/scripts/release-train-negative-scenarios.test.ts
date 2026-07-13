@@ -80,10 +80,39 @@ for (let i = 0; i < 15; i++) {
   });
 }
 
-const ALL_SCENARIOS = [...NEGATIVE_MATRIX, ...EXTENDED_NEGATIVES];
+// v3 expansion — credential, tooling, and stack permutations (60+ total)
+const V3_NEGATIVES: Array<{ name: string; prs: PrState[]; expectBlocked: boolean }> = [
+  { name: "v3-no-credentials", prs: [pr(449), pr(450), pr(448)], expectBlocked: true },
+  { name: "v3-451-without-450-merged", prs: [pr(451, { number: 451 })], expectBlocked: true },
+  { name: "v3-452-before-448", prs: [pr(452, { number: 452 }), pr(448)], expectBlocked: true },
+  { name: "v3-455-smoke-missing", prs: [pr(455, { number: 455, smokePassDoc: false })], expectBlocked: true },
+  { name: "v3-454-ci-red", prs: [pr(454, { number: 454, ciGreen: false })], expectBlocked: true },
+  { name: "v3-453-not-mergeable", prs: [pr(453, { number: 453, mergeable: false })], expectBlocked: true },
+  { name: "v3-452-closed", prs: [pr(452, { number: 452, state: "CLOSED" })], expectBlocked: true },
+  { name: "v3-all-wave-ci-red", prs: [pr(449, { ciGreen: false }), pr(450, { ciGreen: false }), pr(448, { ciGreen: false })], expectBlocked: true },
+  { name: "v3-451-ci-red-tooling", prs: [pr(451, { number: 451, ciGreen: false })], expectBlocked: true },
+  { name: "v3-448-452-drift-combo", prs: [pr(448, { headSha: "bad000000000000000000000000000000000000" }), pr(452, { number: 452, headSha: "bad111111111111111111111111111111111111" })], expectBlocked: true },
+  { name: "v3-455-454-drift", prs: [pr(455, { number: 455, headSha: "dead" }), pr(454, { number: 454, headSha: "beef" })], expectBlocked: true },
+  { name: "v3-empty-pr-list", prs: [], expectBlocked: true },
+  { name: "v3-449-only", prs: [pr(449)], expectBlocked: true },
+  { name: "v3-450-448-skip-449", prs: [pr(450), pr(448)], expectBlocked: true },
+  { name: "v3-451-smoke-required-false-still-drift", prs: [pr(451, { number: 451, headSha: "ffffffffffffffffffffffffffffffffffffffff", smokePassDoc: true })], expectBlocked: true },
+];
+
+for (let i = 0; i < 10; i++) {
+  V3_NEGATIVES.push({
+    name: `v3-wave-perm-${i}`,
+    prs: [
+      pr(452 + (i % 4), { number: 452 + (i % 4), smokePassDoc: i % 2 === 0, ciGreen: i % 3 !== 0 }),
+    ],
+    expectBlocked: true,
+  });
+}
+
+const ALL_SCENARIOS = [...NEGATIVE_MATRIX, ...EXTENDED_NEGATIVES, ...V3_NEGATIVES];
 
 test("release train: 40+ negative scenarios block unsafe merges", () => {
-  assert.ok(ALL_SCENARIOS.length >= 40, `expected >=40 scenarios, got ${ALL_SCENARIOS.length}`);
+  assert.ok(ALL_SCENARIOS.length >= 60, `expected >=60 scenarios, got ${ALL_SCENARIOS.length}`);
   for (const scenario of ALL_SCENARIOS) {
     if (scenario.prs.every((p) => [449, 450, 448].includes(p.number))) {
       const plan = buildMergePlan(scenario.prs, {

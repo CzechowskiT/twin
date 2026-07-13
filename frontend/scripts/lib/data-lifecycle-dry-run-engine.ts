@@ -31,8 +31,11 @@ export function parseLifecycleEnv(flags: Record<string, string | undefined>): st
 export function buildCandidateTrustLifecyclePlan(): LifecycleStep[] {
   return [
     { phase: "export", table: "candidate_trust_events", rowEstimate: 0, destructive: false },
+    { phase: "export", table: "candidate_referrals", rowEstimate: 0, destructive: false },
     { phase: "anonymize", table: "candidate_referrals", rowEstimate: 0, destructive: true },
+    { phase: "anonymize", table: "recruiter_notification_prefs", rowEstimate: 0, destructive: true },
     { phase: "purge", table: "recruiter_audit_events", rowEstimate: 0, destructive: true },
+    { phase: "purge", table: "recruiter_activity_timeline_events", rowEstimate: 0, destructive: true },
     { phase: "rollback_check", table: "alembic_version", rowEstimate: 1, destructive: false },
   ];
 }

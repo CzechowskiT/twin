@@ -15,7 +15,11 @@
 | `OBSERVABILITY_STRUCTURED_LOGGING_2026-07-13.md` | Logging, redaction, metrics |
 | `RECRUITER_OPS_FAILURE_STATES_2026-07-13.md` | Recruiter empty/error states |
 | `schemas/FOUNDER_SMOKE_EVIDENCE_SCHEMA.md` | Smoke evidence format |
-| `RECRUITER_WAVE_C_FOUNDER_SMOKE_2026-07-13.md` | C1/C2 smoke runbook |
+| `MIGRATION_AND_RELEASE_TRAIN_DECISION_070_077_2026-07-13.md` | Full 070–077 train order |
+| `CONFLICT_RESOLUTION_CONTRACT_PR448_2026-07-13.md` | #448 merge conflict resolver |
+| `REBASE_REHEARSAL_PLAYBOOK_451_455_2026-07-13.md` | C3–C5 rebase exact commands |
+| `HARDENING_FEATURE_FLAG_AUDIT_2026-07-13.md` | Feature flag audit track |
+| `HARDENING_RETENTION_PREVIEW_2026-07-13.md` | Retention dry-run preview track |
 | `CANDIDATE_GREEN_MODULES_FOUNDER_SMOKE_2026-07-10.md` | B1/B2/B3 smoke runbook |
 
 ## SUPERSEDED

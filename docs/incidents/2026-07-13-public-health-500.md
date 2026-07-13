@@ -60,6 +60,16 @@ No hotfix branch opened. Observability hardening added in #451 (latency guard + 
 2. Document canonical alias in runbooks (`docs/VERCEL_PROJECT_ALIAS_RUNBOOK_2026-05-26.md`).
 3. Re-run founder smoke only when credentials SET — not required for this incident closure.
 
+### Batch 2026-07-13 (extended) — re-verification
+
+| Probe | Result | Notes |
+|-------|--------|-------|
+| `twin-sooty.vercel.app/api/public-health` | 200 | p95 ~4.5–5.1s — within soft-fail band; no liveness/readiness split warranted |
+| Railway `/api/v1/health` | 200 | ~0.2s |
+| Wrong alias `twin-career.vercel.app` | 404 | `DEPLOYMENT_NOT_FOUND` |
+
+**Liveness/readiness split:** not warranted at p95≤5.1s on canonical alias; monitor only.
+
 ---
 
 ## Hard bans (unchanged)

@@ -21,3 +21,15 @@ test("lifecycle dry-run: includes export before destructive", () => {
   const purgeIdx = report.steps.findIndex((s) => s.phase === "purge");
   assert.ok(exportIdx >= 0 && purgeIdx > exportIdx);
 });
+
+test("lifecycle dry-run: wave C tables in plan", () => {
+  const report = runLifecycleDryRun({});
+  const tables = report.steps.map((s) => s.table);
+  assert.ok(tables.includes("recruiter_notification_prefs"));
+  assert.ok(tables.includes("recruiter_activity_timeline_events"));
+});
+
+test("lifecycle dry-run: 7 steps minimum", () => {
+  const report = runLifecycleDryRun({});
+  assert.ok(report.steps.length >= 7);
+});

@@ -48,6 +48,16 @@ test("6 B3 marked as PR 448", () => {
   assert.equal(WAVE_API_CONTRACTS.B3.pr, 448);
 });
 
+test("7 C3-C5 contracts in baseline", () => {
+  for (const key of ["C3", "C4", "C5", "CANDIDATE_TIMELINE"] as const) {
+    assert.ok(WAVE_API_CONTRACTS[key].responseFields.length >= 2, key);
+  }
+});
+
+test("8 C3 notification path documented", () => {
+  assert.match(WAVE_API_CONTRACTS.C3.path, /notification-preferences/);
+});
+
 test("7 openapi snapshot baseline file exists", () => {
   assert.ok(
     readFileSync(join(repoRoot, "backend/tests/snapshots/wave_api_contract_paths.txt"), "utf8").length > 20,

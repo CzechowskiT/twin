@@ -31,6 +31,10 @@
 | `recruiter_activation_complete_total` | C1 | per company_slug |
 | `talent_pool_record_total` | C2 | active vs archived |
 | `trust_review_decision_total` | C2 | by outcome |
+| `recruiter_notification_pref_save_total` | C3 | by channel |
+| `recruiter_saved_view_total` | C4 | create/update/delete |
+| `recruiter_activity_timeline_fetch_total` | C5 | by company_slug |
+| `candidate_activity_timeline_fetch_total` | 077 | by user |
 
 ## Recruiter ops failure logging
 

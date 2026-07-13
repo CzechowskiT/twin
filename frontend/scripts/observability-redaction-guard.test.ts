@@ -29,3 +29,9 @@ test("4 backend main does not print recruiter token", () => {
   const main = readFileSync(join(repoRoot, "backend/app/main.py"), "utf8");
   assert.doesNotMatch(main, /print\(.*recruiter.*token/i);
 });
+
+test("5 observability events catalog documented", () => {
+  const doc = readFileSync(DOC, "utf8");
+  assert.match(doc, /career_compass_save_total/);
+  assert.match(doc, /trust_review_decision_total/);
+});
