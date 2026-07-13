@@ -62,10 +62,39 @@ PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 npm run demo:capture:pipeline
 
 | Check | Result |
 |-------|--------|
-| Homepage story section | **PASS** — 0 serious/critical |
-| /demo interactive player | **PASS** — 0 serious/critical |
+| `@axe-core/playwright` added | YES — devDependency |
+| Homepage story section (scoped) | **PASS** — 0 serious/critical |
+| /demo interactive player (scoped) | **PASS** — 0 serious/critical (after `demo-role-selector` contrast fix) |
 | `test:interactive-demo-guard` | PASS |
 | `test:homepage-candidate-story` | PASS |
+| `role="progressbar"`, `aria-label`, reduced motion | PASS (code) |
+
+Command: `PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 PLAYWRIGHT_ENABLE_WEBSERVER=1 npm run test:interactive-demo-a11y` → **2/2 PASS**
+
+---
+
+## Lint (#462 touched demo files only)
+
+| File | Result |
+|------|--------|
+| `candidate-homepage-story-player.tsx` | PASS (derived `activeIndex`, no setState-in-effect) |
+| `interactive-demo-player.tsx` | PASS |
+| `demo-role-selector.tsx` | PASS |
+| `demo-video-export.ts` | PASS |
+
+---
+
+## Browser smoke summary (local production build)
+
+| Check | EN | PL | Result |
+|-------|----|----|--------|
+| Homepage loads | ✓ | ✓ | PASS |
+| Candidate story section | ✓ | ✓ | PASS |
+| /demo interactive player | ✓ | ✓ | PASS |
+| Play / Pause / Takeover | ✓ | ✓ | PASS |
+| 35-link catalog (collapsed) | ✓ | ✓ | PASS |
+| Hard-banned CTAs absent | ✓ | ✓ | PASS |
+| Vercel preview anonymous | — | — | **BLOCKED** (SSO) |
 
 ---
 
@@ -73,10 +102,11 @@ PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 npm run demo:capture:pipeline
 
 | Command | Result |
 |---------|--------|
-| `test:homepage-candidate-story` | PASS |
-| `test:interactive-demo-guard` | PASS |
+| `test:homepage-candidate-story` | 10/10 PASS |
+| `test:interactive-demo-guard` | 10/10 PASS |
 | `test:interactive-demo-a11y` | **2/2 PASS** |
 | `npm run build` | PASS |
+| Scoped eslint (demo touched) | PASS |
 | `demo:capture:pipeline` | **8/8 RENDERED** |
 
 ---

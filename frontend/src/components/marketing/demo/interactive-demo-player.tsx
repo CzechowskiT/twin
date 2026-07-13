@@ -25,6 +25,7 @@ import {
   totalDurationMs,
   type DemoRole,
 } from "@/lib/demo/demo-scene-manifest";
+import { indexForElapsed } from "@/lib/demo/demo-playback";
 
 const TICK_MS = 200;
 
@@ -44,7 +45,6 @@ export function InteractiveDemoPlayer() {
   const { t, locale } = useTranslation();
   const reducedMotion = usePrefersReducedMotion();
   const [role, setRole] = useState<DemoRole>("overview");
-  const [activeIndex, setActiveIndex] = useState(0);
   const [elapsedMs, setElapsedMs] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [takeover, setTakeover] = useState(false);
@@ -52,6 +52,7 @@ export function InteractiveDemoPlayer() {
   const viewedRef = useRef(false);
 
   const scenes = useMemo(() => scenesForRole(role), [role]);
+  const activeIndex = useMemo(() => indexForElapsed(scenes, elapsedMs), [elapsedMs, scenes]);
   const scene = scenes[activeIndex] ?? scenes[0];
   const sceneElapsed = useMemo(() => {
     let offset = 0;
@@ -85,17 +86,6 @@ export function InteractiveDemoPlayer() {
   }, [playing, takeover, reducedMotion, scenes, role, locale]);
 
   useEffect(() => {
-    let offset = 0;
-    for (let i = 0; i < scenes.length; i++) {
-      offset += scenes[i]?.durationMs ?? 0;
-      if (elapsedMs < offset) {
-        if (i !== activeIndex) setActiveIndex(i);
-        break;
-      }
-    }
-  }, [elapsedMs, scenes, activeIndex]);
-
-  useEffect(() => {
     if (!scene) return;
     trackDemoScene({ scene_id: scene.analyticsEvent, role, locale, reduced_motion: reducedMotion });
   }, [scene?.id, role, locale, reducedMotion, scene]);
@@ -104,7 +94,6 @@ export function InteractiveDemoPlayer() {
     (index: number) => {
       let offset = 0;
       for (let i = 0; i < index; i++) offset += scenes[i]?.durationMs ?? 0;
-      setActiveIndex(index);
       setElapsedMs(offset);
       setTakeover(true);
       setPlaying(false);
@@ -122,7 +111,6 @@ export function InteractiveDemoPlayer() {
 
   const handleRoleChange = (next: DemoRole) => {
     setRole(next);
-    setActiveIndex(0);
     setElapsedMs(0);
     setPlaying(false);
     setTakeover(false);
@@ -164,7 +152,6 @@ export function InteractiveDemoPlayer() {
                 onPlayPause={handlePlayPause}
                 onRestart={() => {
                   setElapsedMs(0);
-                  setActiveIndex(0);
                   setPlaying(false);
                 }}
                 takeover={takeover}

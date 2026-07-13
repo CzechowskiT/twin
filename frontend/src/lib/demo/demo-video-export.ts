@@ -2,11 +2,7 @@
  * Single video render pipeline config — homepage + full-product variants.
  */
 
-import {
-  DEMO_SEQUENCES,
-  sequenceDurationMs,
-  type DemoSequenceId,
-} from "@/lib/demo/demo-scene-manifest";
+import { sequenceDurationMs, type DemoSequenceId } from "@/lib/demo/demo-scene-manifest";
 
 export type DemoVideoExportTarget = "homepage" | "full";
 

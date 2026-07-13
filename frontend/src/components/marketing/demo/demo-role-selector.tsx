@@ -23,7 +23,7 @@ export function DemoRoleSelector({ activeRole, onSelect, disabled }: DemoRoleSel
           onClick={() => onSelect(role)}
           className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
             activeRole === role
-              ? "bg-[var(--twin-accent)] text-white"
+              ? "bg-[var(--twin-accent)] text-[var(--twin-on-accent)]"
               : "border border-[var(--twin-border)] bg-[var(--twin-surface-elevated)] text-[var(--twin-muted-strong)] hover:border-[var(--twin-accent)]/40"
           }`}
         >

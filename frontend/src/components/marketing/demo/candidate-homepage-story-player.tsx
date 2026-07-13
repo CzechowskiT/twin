@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { DemoCaption } from "@/components/marketing/demo/demo-caption";
@@ -9,6 +9,7 @@ import { DemoSceneStage } from "@/components/marketing/demo/demo-scene-stage";
 import { DemoTimeline } from "@/components/marketing/demo/demo-timeline";
 import { DemoSampleBadge } from "@/components/marketing/demo-sample-badge";
 import { trackHomepageCandidateStory } from "@/lib/demo/demo-analytics";
+import { indexForElapsed } from "@/lib/demo/demo-playback";
 import { resolveSequenceScenes, totalDurationMs } from "@/lib/demo/demo-scene-manifest";
 import { LAUNCH_STANCE } from "@/lib/investor-metrics-reality";
 
@@ -35,11 +36,15 @@ export function CandidateHomepageStoryPlayer({ inViewport = true }: CandidateHom
   const { t } = useTranslation();
   const reducedMotion = usePrefersReducedMotion();
   const scenes = useMemo(() => resolveSequenceScenes(SEQUENCE_ID), []);
-  const [activeIndex, setActiveIndex] = useState(0);
   const [elapsedMs, setElapsedMs] = useState(0);
-  const [playing, setPlaying] = useState(false);
+  const [animationDone, setAnimationDone] = useState(false);
   const [readMode, setReadMode] = useState(false);
+  const autoplayEligible = inViewport && !reducedMotion && !readMode;
+  const playing = autoplayEligible && !animationDone;
+  const activeIndex = useMemo(() => indexForElapsed(scenes, elapsedMs), [elapsedMs, scenes]);
   const scene = scenes[activeIndex] ?? scenes[0];
+  const prevIndexRef = useRef(activeIndex);
+  const prevEligibleRef = useRef(autoplayEligible);
 
   const sceneElapsed = useMemo(() => {
     let offset = 0;
@@ -51,56 +56,43 @@ export function CandidateHomepageStoryPlayer({ inViewport = true }: CandidateHom
     scene && scene.durationMs > 0 ? Math.min(1, sceneElapsed / scene.durationMs) : 0;
 
   useEffect(() => {
-    if (reducedMotion || readMode) {
-      setPlaying(false);
-      return;
+    if (prevIndexRef.current !== activeIndex) {
+      trackHomepageCandidateStory("homepage_candidate_story_scene_change", { step: activeIndex });
+      prevIndexRef.current = activeIndex;
     }
-    if (inViewport) {
-      setPlaying(true);
-      trackHomepageCandidateStory("homepage_candidate_story_autoplay_start", { step: activeIndex });
-    } else {
-      setPlaying(false);
-      trackHomepageCandidateStory("homepage_candidate_story_autoplay_pause", { step: activeIndex });
-    }
-  }, [inViewport, reducedMotion, readMode, activeIndex]);
+  }, [activeIndex]);
 
   useEffect(() => {
-    if (!playing || reducedMotion || readMode) return;
+    if (autoplayEligible && !prevEligibleRef.current) {
+      trackHomepageCandidateStory("homepage_candidate_story_autoplay_start", { step: activeIndex });
+    } else if (!autoplayEligible && prevEligibleRef.current) {
+      trackHomepageCandidateStory("homepage_candidate_story_autoplay_pause", { step: activeIndex });
+    }
+    prevEligibleRef.current = autoplayEligible;
+  }, [autoplayEligible, activeIndex]);
+
+  useEffect(() => {
+    if (!playing) return;
     const id = window.setInterval(() => {
       setElapsedMs((prev) => {
         const total = totalDurationMs(scenes);
         const next = prev + TICK_MS;
         if (next >= total) {
-          setPlaying(false);
+          setAnimationDone(true);
           return total;
         }
         return next;
       });
     }, TICK_MS);
     return () => window.clearInterval(id);
-  }, [playing, reducedMotion, readMode, scenes]);
-
-  useEffect(() => {
-    let offset = 0;
-    for (let i = 0; i < scenes.length; i++) {
-      offset += scenes[i]?.durationMs ?? 0;
-      if (elapsedMs < offset) {
-        if (i !== activeIndex) {
-          setActiveIndex(i);
-          trackHomepageCandidateStory("homepage_candidate_story_scene_change", { step: i });
-        }
-        break;
-      }
-    }
-  }, [elapsedMs, scenes, activeIndex]);
+  }, [playing, scenes]);
 
   const seekToIndex = useCallback(
     (index: number) => {
       let offset = 0;
       for (let i = 0; i < index; i++) offset += scenes[i]?.durationMs ?? 0;
-      setActiveIndex(index);
       setElapsedMs(offset);
-      setPlaying(false);
+      setAnimationDone(true);
       trackHomepageCandidateStory("homepage_candidate_story_scene_change", { step: index });
     },
     [scenes],
@@ -113,7 +105,6 @@ export function CandidateHomepageStoryPlayer({ inViewport = true }: CandidateHom
 
   const enterReadMode = () => {
     setReadMode(true);
-    setPlaying(false);
     trackHomepageCandidateStory("homepage_candidate_story_read_story", { step: activeIndex });
   };
 
