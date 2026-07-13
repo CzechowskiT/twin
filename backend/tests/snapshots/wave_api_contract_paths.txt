@@ -1,0 +1,15 @@
+# Wave B/C API contract path baseline — do not remove without migration plan
+GET /api/v1/candidates/me/career-compass
+PUT /api/v1/candidates/me/career-compass
+PATCH /api/v1/candidates/me/career-compass
+GET /api/v1/candidates/me/trust
+POST /api/v1/candidates/me/privacy-requests
+GET /api/v1/candidates/me/referrals
+POST /api/v1/candidates/me/referrals
+GET /api/v1/recruiter/activation
+GET /api/v1/recruiter/talent-pool/candidates
+POST /api/v1/recruiter/talent-pool/candidates
+PATCH /api/v1/recruiter/talent-pool/{record_id}
+DELETE /api/v1/recruiter/talent-pool/{record_id}
+GET /api/v1/recruiter/trust-review-queue
+POST /api/v1/recruiter/trust-review-queue/{item_id}/decisions

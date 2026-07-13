@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1",
+  "pr": 448,
+  "title": "feat: make candidate referrals persistent (Wave B slice 3)",
+  "headSha": "5c3c48257903cbb34ebc7270c6de3f1292267a31",
+  "migration": "073_candidate_referrals",
+  "dependsOn": [449, 450],
+  "mergeOrder": 3,
+  "smokeDoc": "docs/CANDIDATE_GREEN_MODULES_FOUNDER_SMOKE_2026-07-10.md",
+  "smokeSlices": ["B3_referrals"],
+  "status": "OPEN",
+  "pilot": true,
+  "launchGo": false,
+  "gateF": "PENDING",
+  "rollbackDoc": "docs/ROLLBACK_DECISION_PR448_449_450_2026-07-13.md",
+  "rebaseRequired": "after #450 merged"
+}

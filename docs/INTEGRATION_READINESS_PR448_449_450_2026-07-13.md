@@ -13,7 +13,7 @@
 | Scaffold HEAD | `c2a08b025ca950b341540f0bc80f710825c778ce` | `git rev-parse origin/cursor/phase1-monorepo-scaffold` |
 | PR #448 | **OPEN** MERGEABLE CLEAN | HEAD `5c3c4825`, migration **073**, CI green, Vercel SUCCESS |
 | PR #449 | **OPEN** MERGEABLE CLEAN | HEAD `905a660c`, migration **071**, CI green, Vercel SUCCESS |
-| PR #450 | **OPEN** MERGEABLE CLEAN | HEAD `059fa4e9`, stacked on #449, migration **072**, CI green |
+| PR #450 | **OPEN** MERGEABLE CLEAN | HEAD `cda7a206`, stacked on #449, migration **072**, CI green |
 | #448 merged since last report | **NO** | `gh pr view 448` state=OPEN |
 | Smoke PASS since last report | **NO** | No `FOUNDER_SMOKE: PASS` in runbooks |
 | Integration sim (batch 2026-07-13) | **PASS** | Temp branch `tmp/integration-pr448-449-450-verify` @ `6ed56afd` — deleted after verify |
@@ -141,6 +141,20 @@ Not applicable — no merges in this batch.
 4. Merge **#449**
 5. Rebase **#450**, smoke C2 on preview, merge **#450**
 6. Rebase **#448** onto merged scaffold+C1+C2; confirm migration **073**; smoke referrals; merge **#448**
+
+---
+
+## Part H — Integration tooling (batch 2026-07-13 extended)
+
+| Tool | npm script | Purpose |
+|------|------------|---------|
+| Integration simulator | `sim:integration-pr448-449-450` | Temp branch merge 449→450→448, migration + pytest |
+| Integration dry-run | `sim:integration-pr448-449-450:dry-run` | Graph check on current branch (honest partial) |
+| Merge orchestrator | `plan:merge-pr448-449-450` | Dry-run plan; `--execute` blocked |
+| Post-merge verifier | `verify:post-merge` | Checklist after hypothetical merge |
+| Smoke evidence schema | `docs/schemas/FOUNDER_SMOKE_EVIDENCE_SCHEMA.md` | Validator rejects fake PASS |
+| Release manifests | `releases/manifest-pr{448,449,450}.json` | Per-PR merge metadata |
+| All tooling guards | `test:integration-tooling-guards` | 80+ static scenarios |
 
 ---
 
