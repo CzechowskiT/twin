@@ -249,6 +249,7 @@ export type TranslationKey =
   | `recruiterHub.${keyof typeof en.recruiterHub}`
   | `recruiterActivation.${keyof typeof en.recruiterActivation}`
   | `recruiterNotificationPrefs.${keyof typeof en.recruiterNotificationPrefs}`
+  | `recruiterActivityTimeline.${keyof typeof en.recruiterActivityTimeline}`
   | `companyHub.${keyof typeof en.companyHub}`
   | `sevenDayD5.${keyof typeof en.sevenDayD5}`
   | `sevenDayD6.${keyof typeof en.sevenDayD6}`
@@ -7582,6 +7583,13 @@ eyebrow: "Product roadmap",
     in_app_trust_review_alertHint: "Notify when privacy or consent items need recruiter review.",
     in_app_pipeline_updateLabel: "Pipeline updates",
     in_app_pipeline_updateHint: "Show stage changes on roles you follow in the pilot workspace.",
+  },
+  recruiterActivityTimeline: {
+    title: "Activity timeline",
+    lead: "Read-only audit explorer for recruiter actions in your pilot workspace — no mutations or external sync.",
+    loadError: "Could not load activity timeline",
+    listAria: "Recruiter activity events",
+    empty: "No audit events yet for this workspace.",
   },
   recruiterDailyCockpit: {
     navLink: "Daily cockpit",
@@ -15705,6 +15713,13 @@ const pl: MessageTree = {
     in_app_trust_review_alertHint: "Powiadamiaj, gdy pozycje prywatności lub zgody wymagają przeglądu rekrutera.",
     in_app_pipeline_updateLabel: "Aktualizacje pipeline",
     in_app_pipeline_updateHint: "Pokazuj zmiany etapów na rolach śledzonych w workspace pilota.",
+  },
+  recruiterActivityTimeline: {
+    title: "Oś aktywności",
+    lead: "Explorer audytu tylko do odczytu dla akcji rekrutera w workspace pilota — bez mutacji ani zewnętrznej synchronizacji.",
+    loadError: "Nie udało się wczytać osi aktywności",
+    listAria: "Zdarzenia aktywności rekrutera",
+    empty: "Brak zdarzeń audytu dla tego workspace.",
   },
   recruiterDailyCockpit: {
     navLink: "Kokpit dzienny",
