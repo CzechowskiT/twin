@@ -42,6 +42,9 @@ backend/data/
 backend/celerybeat-schedule*
 *.log
 
+# Integration sim reports (generated locally)
+reports/integration-sim/
+
 # Alembic (keep versions tracked)
 # migrations are committed
 .cursor/

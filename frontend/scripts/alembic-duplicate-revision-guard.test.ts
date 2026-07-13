@@ -14,6 +14,7 @@ import {
   findCycle,
   findDuplicateRevisions,
   findHeads,
+  findOrphans,
   parseMigrationSource,
   validateChainSegment,
   validateLinearChain,
@@ -157,4 +158,23 @@ test("7 npm scripts registered", () => {
   assert.match(pkg, /test:alembic-duplicate-revision-guard/);
   assert.match(pkg, /founder-smoke-env-preflight/);
   assert.match(pkg, /preview-reachability-preflight/);
+});
+
+test("8 fixture — orphans detected", () => {
+  const orphan: MigrationMeta[] = [
+    { file: "root.py", revision: "070_candidate_trust_center", downRevision: null },
+    { file: "orphan.py", revision: "orphan_rev", downRevision: "missing_parent" },
+  ];
+  const orphans = findOrphans(orphan);
+  assert.ok(orphans.includes("orphan_rev"));
+});
+
+test("9 repo — wave chain reachable from 070 parent in full graph", () => {
+  const migrations = loadRepoMigrations();
+  const byRev = new Map(migrations.map((m) => [m.revision, m]));
+  const m070 = byRev.get("070_candidate_trust_center");
+  assert.ok(m070);
+  assert.ok(m070!.downRevision && byRev.has(m070!.downRevision), "070 parent exists in repo");
+  const chain = buildChain("070_candidate_trust_center", migrations);
+  assert.ok(chain.includes("072_recruiter_talent_pool_trust_review_c2"));
 });
