@@ -248,6 +248,7 @@ export type TranslationKey =
   | `decisionMemory.${keyof typeof en.decisionMemory}`
   | `recruiterHub.${keyof typeof en.recruiterHub}`
   | `recruiterActivation.${keyof typeof en.recruiterActivation}`
+  | `recruiterNotificationPrefs.${keyof typeof en.recruiterNotificationPrefs}`
   | `companyHub.${keyof typeof en.companyHub}`
   | `sevenDayD5.${keyof typeof en.sevenDayD5}`
   | `sevenDayD6.${keyof typeof en.sevenDayD6}`
@@ -7558,6 +7559,29 @@ eyebrow: "Product roadmap",
     activationCompleteNote: "Activation complete — first decision recorded. Daily cockpit remains PILOT until founder smoke.",
     pilotBoundary:
       "No auto-outreach, ATS writeback, or calendar sync. Pilot metrics only — not public launch traction.",
+  },
+  recruiterNotificationPrefs: {
+    eyebrow: "Notification preferences",
+    title: "In-app notification toggles",
+    lead:
+      "Control which in-app signals appear in your recruiter workspace — no email, SMS, push, or external webhooks in this pilot slice.",
+    pilotBadge: "PILOT · IN-APP ONLY",
+    emptyLead: "Connect your recruiter token and company slug on the inbox page to manage notification preferences.",
+    loadError: "Could not load notification preferences",
+    saveError: "Could not save notification preferences",
+    resetError: "Could not reset notification preferences",
+    toggleListAria: "In-app notification toggles",
+    saveCta: "Save changes",
+    resetCta: "Reset to defaults",
+    inAppOnlyNote: "In-app toggles only — external channels are out of scope for Wave C3.",
+    in_app_inbox_digestLabel: "Inbox digest",
+    in_app_inbox_digestHint: "Summarize new pre-qualified inbox items in the workspace.",
+    in_app_interview_reminderLabel: "Interview reminders",
+    in_app_interview_reminderHint: "Surface upcoming interview holds and confirmations.",
+    in_app_trust_review_alertLabel: "Trust review alerts",
+    in_app_trust_review_alertHint: "Notify when privacy or consent items need recruiter review.",
+    in_app_pipeline_updateLabel: "Pipeline updates",
+    in_app_pipeline_updateHint: "Show stage changes on roles you follow in the pilot workspace.",
   },
   recruiterDailyCockpit: {
     navLink: "Daily cockpit",
@@ -15658,6 +15682,29 @@ const pl: MessageTree = {
       "Aktywacja ukończona — pierwsza decyzja zapisana. Kokpit dzienny pozostaje PILOT do founder smoke.",
     pilotBoundary:
       "Bez auto-outreach, writeback ATS ani sync kalendarza. Tylko metryki pilota — nie publiczna trakcja.",
+  },
+  recruiterNotificationPrefs: {
+    eyebrow: "Preferencje powiadomień",
+    title: "Przełączniki powiadomień in-app",
+    lead:
+      "Kontroluj, które sygnały in-app pojawiają się w workspace rekrutera — bez e-mail, SMS, push ani zewnętrznych webhooków w tym slajdzie pilota.",
+    pilotBadge: "PILOT · TYLKO IN-APP",
+    emptyLead: "Połącz token rekrutera i slug firmy na stronie inbox, aby zarządzać preferencjami powiadomień.",
+    loadError: "Nie udało się wczytać preferencji powiadomień",
+    saveError: "Nie udało się zapisać preferencji powiadomień",
+    resetError: "Nie udało się zresetować preferencji powiadomień",
+    toggleListAria: "Przełączniki powiadomień in-app",
+    saveCta: "Zapisz zmiany",
+    resetCta: "Przywróć domyślne",
+    inAppOnlyNote: "Tylko przełączniki in-app — kanały zewnętrzne są poza zakresem Wave C3.",
+    in_app_inbox_digestLabel: "Podsumowanie inbox",
+    in_app_inbox_digestHint: "Podsumuj nowe pre-kwalifikowane pozycje w workspace.",
+    in_app_interview_reminderLabel: "Przypomnienia o rozmowach",
+    in_app_interview_reminderHint: "Pokazuj nadchodzące holdy i potwierdzenia rozmów.",
+    in_app_trust_review_alertLabel: "Alerty trust review",
+    in_app_trust_review_alertHint: "Powiadamiaj, gdy pozycje prywatności lub zgody wymagają przeglądu rekrutera.",
+    in_app_pipeline_updateLabel: "Aktualizacje pipeline",
+    in_app_pipeline_updateHint: "Pokazuj zmiany etapów na rolach śledzonych w workspace pilota.",
   },
   recruiterDailyCockpit: {
     navLink: "Kokpit dzienny",
