@@ -277,6 +277,7 @@ const ACTIVATION_OVERRIDES: Partial<
     effort: "M",
     targetWave: "C",
     owner: "recruiter-squad",
+  },
   candidate_referrals: {
     activationStatus: "PILOT",
     hubSection: "pilot_preview",
