@@ -38,11 +38,11 @@ export const PUBLIC_SURFACE_HREFS = [
 
 const BOARD_OR_ADMIN_PREFIXES = ["/board/", "/admin/"] as const;
 
-/** @deprecated Green-only limits — activation model shows full surface. */
+/** Founder-scoped primary nav limits — see FOUNDER_LAUNCH_SCOPE_DECISION_2026-07-08.md */
 export const CONTROLLED_PILOT_PRIMARY_LIMITS: Readonly<Record<MarketingPersona, number>> = {
-  candidate: 99,
-  recruiter: 99,
-  company: 99,
+  candidate: 8,
+  recruiter: 5,
+  company: 4,
   investor: 99,
 };
 

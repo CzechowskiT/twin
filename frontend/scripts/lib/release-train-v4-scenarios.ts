@@ -12,7 +12,6 @@ export function pr(
     "905a660c00000000000000000000000000000000".slice(0, 40);
   return {
     number,
-    headSha: defaultSha,
     state: "OPEN",
     mergeable: true,
     ciGreen: true,

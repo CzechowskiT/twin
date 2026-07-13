@@ -23,6 +23,7 @@ export const FOUNDER_DEMO_CROSSLINKS_BY_PAGE: Record<
   demo: [
     { href: "/investor", labelKey: "investorFundraising.ctaInvestorRoom" },
     { href: "/investor/product-proof", labelKey: "investorFundraising.ctaProductProof" },
+    { href: "/dashboard/trust", labelKey: "workspaceModules.candidateTrustCenterCta" },
     { href: "/how-it-works", labelKey: "nav.howItWorks" },
     { href: "/faq", labelKey: "nav.faq" },
     { href: "/#explore-twin", labelKey: "nav.exploreTwin" },
