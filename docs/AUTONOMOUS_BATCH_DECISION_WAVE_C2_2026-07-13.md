@@ -15,7 +15,7 @@
 | PR #448 | **OPEN** — HEAD `f609f89b`, CI green, MERGEABLE, Vercel SUCCESS — **NOT MERGED** |
 | PR #449 | **OPEN** — HEAD `905a660c`, CI green, MERGEABLE, Vercel SUCCESS — **NOT MERGED** |
 | #448 merge | **BLOCKED** — no founder smoke PASS doc for referrals |
-| Migration 071 conflict | **RESOLVED** — C2 uses `072` chained from C1 `071`; #448 keeps separate `071_candidate_referrals` on its branch |
+| Migration 071 conflict | **RESOLVED** — C2 uses `072` chained from C1 `071`; #448 renumbered to `073_candidate_referrals` (see `docs/INTEGRATION_READINESS_PR448_449_450_2026-07-13.md`) |
 | Prod public-health | aligned `c2a08b0` (input) |
 
 ---
@@ -45,7 +45,7 @@
 | 070 | candidate_trust_center | scaffold | Trust Center (#447) |
 | 071 | recruiter_workspace_activation | #449 C1 | activation onboarding |
 | 072 | `072_recruiter_talent_pool_trust_review_c2` | C2 PR | pool extensions + trust review |
-| 071 | candidate_referrals | #448 OPEN | parallel branch — merge only after founder smoke |
+| 073 | candidate_referrals | #448 OPEN | renumbered from 071 — merge after #450 + founder smoke |
 
 ---
 
