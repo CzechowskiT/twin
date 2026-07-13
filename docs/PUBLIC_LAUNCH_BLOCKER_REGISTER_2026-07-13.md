@@ -77,7 +77,7 @@
 
 ---
 
-## Path A operator handoff (2026-07-13T12:25Z)
+## Path A operator handoff (2026-07-13T12:35Z)
 
 Credentials **UNSET** — merge train and founder smoke **NOT executed** (no fake PASS).
 
@@ -93,6 +93,6 @@ When credentials SET, founder runs (in order):
 8. O7 Railway restore drill
 9. Gate F decision
 
-Rehearsal @ UNSET batch: `sim:integration-070-077` PASS · `plan:merge-train-extended` PASS · `probe:prod-public` 110/110.
+Rehearsal @ UNSET batch: `sim:integration-070-077` PASS @ 12:32Z · `plan:merge-train-extended` PASS · `probe:prod-public` 110/110 @ 12:32Z · `verify:production-v3:077` FAIL (prod head 072 on partial branch — expected until merge+migrate).
 
-#462 demo (`e788dd9f`): separate founder narrative approval; do not merge without sign-off.
+#462 demo (`e788dd9f`): axe 2/2 PASS re-verified @ 12:35Z; SHORT video exports ffprobe PASS; FULL 38.5s/108s NOT rendered; separate founder narrative approval; do not merge without sign-off.
