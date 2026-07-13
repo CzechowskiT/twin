@@ -3,6 +3,10 @@
  * Git operations live in integration-simulator.ts CLI.
  */
 
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
 import {
   buildChain,
   findDuplicateRevisions,
@@ -23,6 +27,23 @@ export const PR_BRANCHES = {
 
 export const MERGE_SEQUENCE = [449, 450, 448] as const;
 export const TEMP_BRANCH = "tmp/integration-pr448-449-450-verify";
+
+const DEFAULT_MANIFEST_PATH = "releases/integration-sim-manifest.json";
+
+/** Load PR merge order from manifest when present; fallback to MERGE_SEQUENCE. */
+export function loadManifestPrList(manifestPath?: string): number[] {
+  try {
+    const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
+    const raw = readFileSync(join(repoRoot, manifestPath ?? DEFAULT_MANIFEST_PATH), "utf8");
+    const parsed = JSON.parse(raw) as { mergeSequence?: number[] };
+    if (Array.isArray(parsed.mergeSequence) && parsed.mergeSequence.length > 0) {
+      return parsed.mergeSequence;
+    }
+  } catch {
+    /* manifest optional */
+  }
+  return [...MERGE_SEQUENCE];
+}
 
 export type ConflictReport = {
   pr: number;

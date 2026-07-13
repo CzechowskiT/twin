@@ -13,14 +13,20 @@ import { fileURLToPath } from "node:url";
 
 import {
   formatSimulatorMarkdown,
+  loadManifestPrList,
   PR_BRANCHES,
   SCAFFOLD_REF,
   TEMP_BRANCH,
   validatePostMergeMigrations,
   type ConflictReport,
+  type MigrationReport,
   type SimulatorReport,
 } from "./lib/integration-simulator-core";
-import { findDestructiveOps, parseMigrationSource } from "./lib/alembic-migration-graph";
+import {
+  findDestructiveOps,
+  parseMigrationSource,
+  type MigrationMeta,
+} from "./lib/alembic-migration-graph";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const REPORT_DIR = join(repoRoot, "reports/integration-sim");
@@ -29,11 +35,31 @@ const VERSIONS_DIR = join(repoRoot, "backend/alembic/versions");
 const dryRun = process.argv.includes("--dry-run");
 const keepBranch = process.argv.includes("--keep-branch");
 
+let interrupted = false;
+let cleanupBranch: string | null = null;
+let restoreBranch: string | null = null;
+
 function git(cmd: string): string {
   return execSync(cmd, { cwd: repoRoot, encoding: "utf8" }).trim();
 }
 
-function loadMigrationsFromDisk(): ReturnType<typeof validatePostMergeMigrations> extends infer R ? Parameters<typeof validatePostMergeMigrations>[0] : never {
+function cleanupOnInterrupt(): void {
+  if (!interrupted || !cleanupBranch || !restoreBranch) return;
+  try {
+    git(`git checkout ${restoreBranch}`);
+    git(`git branch -D ${cleanupBranch}`);
+  } catch {
+    /* best-effort */
+  }
+}
+
+process.on("SIGINT", () => {
+  interrupted = true;
+  cleanupOnInterrupt();
+  process.exit(130);
+});
+
+function loadMigrationsFromDisk(): { migrations: MigrationMeta[]; report: MigrationReport } {
   const srcByFile = new Map<string, string>();
   const migrations = readdirSync(VERSIONS_DIR)
     .filter((f) => f.endsWith(".py") && !f.startsWith("__"))
@@ -67,7 +93,7 @@ function runSimulator(): SimulatorReport {
       schemaVersion: "1",
       startedAt,
       scaffoldSha: SCAFFOLD_REF,
-      mergeSequence: [449, 450, 448],
+      mergeSequence: loadManifestPrList(),
       conflicts,
       migration: migrationReport,
       testsRun: ["dry-run: migration graph only"],
@@ -77,9 +103,13 @@ function runSimulator(): SimulatorReport {
     };
   }
 
+  const mergeSequence = loadManifestPrList();
   try {
     const currentBranch = git("git rev-parse --abbrev-ref HEAD");
-    git(`git fetch origin ${SCAFFOLD_REF.slice(0, 7)} ${Object.values(PR_BRANCHES).join(" ")} 2>/dev/null || git fetch --all`);
+    restoreBranch = currentBranch;
+    cleanupBranch = TEMP_BRANCH;
+    const branches = mergeSequence.map((pr) => PR_BRANCHES[pr as keyof typeof PR_BRANCHES]).filter(Boolean);
+    git(`git fetch origin ${SCAFFOLD_REF.slice(0, 7)} ${branches.join(" ")} 2>/dev/null || git fetch --all`);
 
     try {
       git(`git branch -D ${TEMP_BRANCH} 2>/dev/null || true`);
@@ -89,8 +119,10 @@ function runSimulator(): SimulatorReport {
 
     git(`git checkout -B ${TEMP_BRANCH} ${SCAFFOLD_REF}`);
 
-    for (const pr of [449, 450, 448] as const) {
-      const branch = PR_BRANCHES[pr];
+    for (const pr of mergeSequence) {
+      if (interrupted) break;
+      const branch = PR_BRANCHES[pr as keyof typeof PR_BRANCHES];
+      if (!branch) continue;
       try {
         git(`git merge --no-edit origin/${branch}`);
         conflicts.push({ pr, files: [], resolved: true });
@@ -121,10 +153,12 @@ function runSimulator(): SimulatorReport {
       }
     }
 
-    if (!keepBranch) {
+    if (!keepBranch && !interrupted) {
       git(`git checkout ${currentBranch}`);
       git(`git branch -D ${TEMP_BRANCH}`);
       cleanup = true;
+      cleanupBranch = null;
+      restoreBranch = null;
     }
   } catch (err) {
     exitCode = 3;
@@ -135,7 +169,7 @@ function runSimulator(): SimulatorReport {
     schemaVersion: "1",
     startedAt,
     scaffoldSha: SCAFFOLD_REF,
-    mergeSequence: [449, 450, 448],
+    mergeSequence: loadManifestPrList(),
     conflicts,
     migration: migrationReport,
     testsRun: dryRun ? [] : ["test_recruiter_activation_persistence", "test_recruiter_c2_persistence"],

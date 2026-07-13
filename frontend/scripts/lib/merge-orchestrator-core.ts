@@ -20,6 +20,12 @@ export type MergePlanStep = {
   action: "merge" | "rebase_then_merge" | "blocked";
   reason: string;
   dependsOn: number[];
+  requiredSha?: string;
+};
+
+export type MergeDag = {
+  nodes: number[];
+  edges: Array<{ from: number; to: number }>;
 };
 
 export type MergePlan = {
@@ -27,6 +33,7 @@ export type MergePlan = {
   blocked: boolean;
   blockers: string[];
   driftDetected: boolean;
+  dag: MergeDag;
 };
 
 export const EXPECTED_HEADS: Record<number, string> = {
@@ -36,6 +43,51 @@ export const EXPECTED_HEADS: Record<number, string> = {
 };
 
 export const MERGE_ORDER = [449, 450, 448] as const;
+
+/** Directed acyclic graph for stacked PR merge order. */
+export function buildMergeDag(): MergeDag {
+  return {
+    nodes: [...MERGE_ORDER],
+    edges: [
+      { from: 449, to: 450 },
+      { from: 450, to: 448 },
+    ],
+  };
+}
+
+export function validateDagAcyclic(dag: MergeDag): string[] {
+  const issues: string[] = [];
+  const visited = new Set<number>();
+  const stack = new Set<number>();
+  const adj = new Map<number, number[]>();
+  for (const e of dag.edges) {
+    const kids = adj.get(e.from) ?? [];
+    kids.push(e.to);
+    adj.set(e.from, kids);
+  }
+  function dfs(n: number): boolean {
+    if (stack.has(n)) {
+      issues.push(`cycle detected at PR #${n}`);
+      return false;
+    }
+    if (visited.has(n)) return true;
+    stack.add(n);
+    for (const kid of adj.get(n) ?? []) dfs(kid);
+    stack.delete(n);
+    visited.add(n);
+    return true;
+  }
+  for (const n of dag.nodes) dfs(n);
+  return issues;
+}
+
+export function bindShaToSteps(steps: MergePlanStep[], prs: PrState[]): MergePlanStep[] {
+  const byNum = new Map(prs.map((p) => [p.number, p]));
+  return steps.map((s) => ({
+    ...s,
+    requiredSha: byNum.get(s.pr)?.headSha.slice(0, 12),
+  }));
+}
 
 export function detectHeadDrift(prs: PrState[]): string[] {
   const drift: string[] = [];
@@ -103,10 +155,11 @@ export function buildMergePlan(prs: PrState[], opts?: { scaffoldAligned?: boolea
   }
 
   return {
-    steps,
+    steps: bindShaToSteps(steps, prs),
     blocked: blockers.length > 0,
     blockers,
     driftDetected: drift.length > 0,
+    dag: buildMergeDag(),
   };
 }
 
