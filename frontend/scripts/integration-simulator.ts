@@ -137,11 +137,39 @@ function tryResolvePr451Tooling(files: string[]): boolean {
   for (const file of files) {
     const theirs = gitShow("MERGE_HEAD", file);
     if (!theirs) return false;
-    writeFileSync(join(repoRoot, file), theirs);
+    if (file === "frontend/package.json") {
+      const ours = gitShow("HEAD", file);
+      const resolved = resolvePackageJsonScripts("", ours, theirs);
+      writeFileSync(join(repoRoot, file), resolved.content);
+    } else {
+      writeFileSync(join(repoRoot, file), theirs);
+    }
     execSync(`git add -- ${JSON.stringify(file)}`, { cwd: repoRoot });
   }
   try {
     git('git commit --no-edit -m "chore(sim): accept #451 tooling on merge conflicts"');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Wave C3–C5 (#452–#455): accept stacked branch, union package.json scripts. */
+function tryResolveWaveStackMerge(pr: number, files: string[]): boolean {
+  if (pr < 452 || pr > 455 || files.length === 0) return false;
+  for (const file of files) {
+    const ours = gitShow("HEAD", file);
+    const theirs = gitShow("MERGE_HEAD", file);
+    if (!theirs) return false;
+    const content =
+      file === "frontend/package.json" && ours
+        ? resolvePackageJsonScripts("", ours, theirs).content
+        : theirs;
+    writeFileSync(join(repoRoot, file), content);
+    execSync(`git add -- ${JSON.stringify(file)}`, { cwd: repoRoot });
+  }
+  try {
+    git(`git commit --no-edit -m "chore(sim): resolve PR${pr} wave stack conflicts"`);
     return true;
   } catch {
     return false;
@@ -262,6 +290,10 @@ function runSimulator(): SimulatorReport {
           continue;
         }
         if (pr === 451 && tryResolvePr451Tooling(files)) {
+          conflicts.push({ pr, files, resolved: true });
+          continue;
+        }
+        if (pr >= 452 && pr <= 455 && tryResolveWaveStackMerge(pr, files)) {
           conflicts.push({ pr, files, resolved: true });
           continue;
         }
