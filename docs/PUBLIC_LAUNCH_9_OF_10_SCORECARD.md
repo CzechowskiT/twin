@@ -18,7 +18,7 @@
 | Stack #455 `06e6c359` | **SUPERSEDED** | `e36df2cb` (rebased on #454) |
 | Merge plan drift loop on #451 tooling commits | **CLOSED** | #451 omitted from `EXPECTED_HEADS` (tooling-only, no DB head) |
 
-**Canonical repo_head:** `c542e706` (branch `chore/extended-integration-batch-2026-07-13`, PR #451) — orchestrator `EXPECTED_HEADS[451]` synced in-commit (no separate bump)
+**Canonical repo_head:** `cd7827fb` (branch `chore/extended-integration-batch-2026-07-13`, PR #451)
 
 ---
 
@@ -26,7 +26,7 @@
 
 | Pole | Wartość |
 |------|---------|
-| **repo_head** | `c542e706` (post final closure push) |
+| **repo_head** | `cd7827fb` |
 | **prod_api_commit** | `c2a08b025ca950b341540f0bc80f710825c778ce` |
 | **prod_frontend** | `https://twin-sooty.vercel.app` |
 | **prod_db_head** | `070_candidate_trust_center` (train target: `077`) |
