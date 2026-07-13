@@ -80,12 +80,18 @@ function gitShow(ref: string, path: string): string {
   }
 }
 
-function readStage(stage: string, path: string): string {
+function readMergeSides(path: string): { base: string; ours: string; theirs: string } {
+  let base = "";
   try {
-    return execSync(`git show :${stage}:${path}`, { cwd: repoRoot, encoding: "utf8" });
+    base = execSync(`git show :1:${path}`, { cwd: repoRoot, encoding: "utf8" });
   } catch {
-    return "";
+    base = "";
   }
+  return {
+    base,
+    ours: gitShow("HEAD", path),
+    theirs: gitShow("MERGE_HEAD", path),
+  };
 }
 
 function resolvedContent(file: string, base: string, ours: string, theirs: string): string {
@@ -108,9 +114,11 @@ function tryResolvePr448Conflicts(files: string[]): boolean {
   if (known.length === 0) return false;
   let allOk = true;
   for (const file of known) {
-    const base = readStage("1", file) || gitShow(`MERGE_HEAD`, file);
-    const ours = readStage("2", file) || readFileSync(join(repoRoot, file), "utf8");
-    const theirs = readStage("3", file) || gitShow(`MERGE_HEAD`, file);
+    const { base, ours, theirs } = readMergeSides(file);
+    if (!ours || !theirs) {
+      allOk = false;
+      continue;
+    }
     const resolution = resolvePr448File(file, base, ours, theirs);
     if (!resolution.ok) {
       allOk = false;
@@ -125,6 +133,27 @@ function tryResolvePr448Conflicts(files: string[]): boolean {
     return true;
   } catch {
     return false;
+  }
+}
+
+function patchC3MigrationParent(): void {
+  const migrationPath = join(
+    repoRoot,
+    "backend/alembic/versions/074_recruiter_notification_preferences_c3.py",
+  );
+  try {
+    let src = readFileSync(migrationPath, "utf8");
+    if (src.includes("072_recruiter_talent_pool_trust_review_c2")) {
+      src = src.replace(
+        /072_recruiter_talent_pool_trust_review_c2/g,
+        "073_candidate_referrals",
+      );
+      writeFileSync(migrationPath, src);
+      git("git add backend/alembic/versions/074_recruiter_notification_preferences_c3.py");
+      git('git commit -m "chore(sim): fix 074 down_revision 072→073 after #448"');
+    }
+  } catch {
+    /* migration not present until #452 merged */
   }
 }
 
@@ -225,6 +254,10 @@ function runSimulator(): SimulatorReport {
         exitCode = 2;
         break;
       }
+    }
+
+    if (exitCode === 0 && extended) {
+      patchC3MigrationParent();
     }
 
     if (exitCode === 0) {
