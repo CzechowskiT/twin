@@ -14,7 +14,7 @@ Wave B slice 3 delivers **candidate-scoped referral persistence**: PostgreSQL pr
 | Layer | Deliverable |
 |-------|-------------|
 | DB | `candidate_referral_programs`, `candidate_referrals` |
-| Migration | `071_candidate_referrals` — unique code, FK, indexes |
+| Migration | `073_candidate_referrals` — renumbered from 071; chains after `072_recruiter_talent_pool_trust_review_c2` (merge after #449+#450) |
 | API | `GET /me/referrals`, `POST /me/referrals/ensure-code`, `POST /me/referrals/invite`, `GET /me/referrals/{id}`, `GET /referrals/resolve?code=` |
 | Signup | Candidate code resolution in `resolve_combined_signup_referrer_user_id` + `attach_signup_to_candidate_referral` |
 | FE | `/dashboard/referrals` — persistent link, copy, invite tracking, list, how-it-works, earnings from legacy `/referrals/me` |

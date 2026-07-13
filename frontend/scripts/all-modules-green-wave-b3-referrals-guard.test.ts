@@ -37,7 +37,7 @@ const REFERRALS_DASHBOARD = "src/components/referrals/referrals-dashboard.tsx";
 const REFERRALS_API_LIB = "src/lib/candidate-referrals-api.ts";
 const BACKEND_SERVICE = "backend/app/services/candidate_referral_persistence.py";
 const BACKEND_TESTS = "backend/tests/test_candidate_referral_persistence.py";
-const MIGRATION = "backend/alembic/versions/071_candidate_referrals.py";
+const MIGRATION = "backend/alembic/versions/073_candidate_referrals.py";
 
 function read(rel: string): string {
   return readFileSync(join(root, rel), "utf8");
@@ -64,6 +64,8 @@ test("2 master plan references Wave B slice 3 referrals", () => {
 
 test("3 backend persistence — migration, service, 15+ tests", () => {
   const migration = readRepo(MIGRATION);
+  assert.match(migration, /073_candidate_referrals/);
+  assert.match(migration, /072_recruiter_talent_pool_trust_review_c2/);
   assert.match(migration, /candidate_referral_programs/);
   assert.match(migration, /candidate_referrals/);
   assert.match(migration, /uq_candidate_referral_programs_referral_code/);

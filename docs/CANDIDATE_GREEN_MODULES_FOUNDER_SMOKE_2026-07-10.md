@@ -44,6 +44,7 @@ curl -sS https://twin-sooty.vercel.app/api/public-health | jq '{status,db_ok,git
 cd frontend && npm run test:candidate-green-modules-founder-smoke-guard
 cd frontend && npm run test:all-modules-green-wave-b1-career-compass-guard
 cd frontend && npm run test:all-modules-green-wave-b2-trust-center-guard
+cd frontend && npm run test:all-modules-green-wave-b3-referrals-guard
 ```
 
 For #448 preview (after Vercel deploy): repeat public-health on preview URL from PR checks.
