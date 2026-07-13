@@ -7,6 +7,10 @@ export const RECRUITER_TALENT_POOL_MARKERS = {
   qualityPanel: "recruiter-talent-pool-quality-panel",
   sourceCoverage: "recruiter-talent-pool-source-coverage",
   recordsList: "recruiter-talent-pool-records-list",
+  addForm: "recruiter-talent-pool-add-form",
+  filterInput: "recruiter-talent-pool-filter-input",
+  detailPanel: "recruiter-talent-pool-detail-panel",
+  archiveButton: "recruiter-talent-pool-archive-button",
   emptyState: "recruiter-talent-pool-empty",
   importLink: "recruiter-talent-pool-import-link",
   importPage: "recruiter-talent-pool-import-page",
@@ -49,6 +53,11 @@ export type TalentPoolRecord = {
   application_id?: number | null;
   pipeline_status?: string | null;
   source?: string;
+  source_type?: string;
+  snapshot?: Record<string, unknown> | null;
+  consent_visibility?: string;
+  archived?: boolean;
+  archived_at?: string | null;
   created_at?: string | null;
 };
 

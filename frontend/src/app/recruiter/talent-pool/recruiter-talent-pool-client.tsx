@@ -18,6 +18,11 @@ import {
   writeRecruiterInboxSession,
 } from "@/lib/recruiter-inbox";
 import {
+  addRecruiterTalentPoolCandidate,
+  archiveRecruiterTalentPoolRecord,
+  fetchRecruiterTalentPoolDetail,
+} from "@/lib/recruiter-talent-pool-api";
+import {
   TALENT_POOL_LIMITED_PILOT,
 } from "@/lib/seven-day-d3-recruiter";
 import {
@@ -25,6 +30,7 @@ import {
   RECRUITER_TALENT_POOL_MARKERS,
   RECRUITER_TALENT_POOL_ROUTE,
   type TalentPoolPayload,
+  type TalentPoolRecord,
 } from "@/lib/recruiter-talent-pool";
 
 export default function RecruiterTalentPoolClient() {
@@ -34,6 +40,14 @@ export default function RecruiterTalentPoolClient() {
   const [companyRaw, setCompanyRaw] = useState("");
   const [payload, setPayload] = useState<TalentPoolPayload | null>(null);
   const [loading, setLoading] = useState(false);
+  const [filter, setFilter] = useState("");
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [detail, setDetail] = useState<TalentPoolRecord | null>(null);
+  const [addName, setAddName] = useState("");
+  const [addTitle, setAddTitle] = useState("");
+  const [addSkills, setAddSkills] = useState("");
+  const [addBusy, setAddBusy] = useState(false);
+  const [addMessage, setAddMessage] = useState<string | null>(null);
 
   const companyOptions = useMemo(
     () => mergeCompanyOptions(companyRaw, readRecruiterInboxSession().companySlug),
@@ -61,13 +75,63 @@ export default function RecruiterTalentPoolClient() {
     setLoading(true);
     try {
       const q = recruiterInboxQuery(tkn, slug);
-      const res = await fetchAbortable(`/api/recruiter/talent-pool?${q}`);
+      const params = new URLSearchParams(q);
+      if (filter.trim()) params.set("search", filter.trim());
+      const res = await fetchAbortable(`/api/recruiter/talent-pool?${params.toString()}`);
       if (res.ok) setPayload((await res.json()) as TalentPoolPayload);
       else setPayload(null);
     } finally {
       setLoading(false);
     }
-  }, [token, companySlug, fetchAbortable]);
+  }, [token, companySlug, filter, fetchAbortable]);
+
+  const openDetail = useCallback(async (recordId: number) => {
+    const tkn = token.trim();
+    const slug = companySlug;
+    if (!tkn || !slug) return;
+    setSelectedId(recordId);
+    const row = await fetchRecruiterTalentPoolDetail(tkn, slug, recordId);
+    setDetail(row);
+  }, [token, companySlug]);
+
+  const handleAdd = useCallback(async () => {
+    const tkn = token.trim();
+    const slug = companySlug;
+    if (!tkn || !slug || !addName.trim()) return;
+    setAddBusy(true);
+    setAddMessage(null);
+    try {
+      const skills = addSkills.split(/[,;]/).map((s) => s.trim()).filter(Boolean);
+      const out = await addRecruiterTalentPoolCandidate(tkn, slug, {
+        display_name: addName.trim(),
+        job_title: addTitle.trim() || undefined,
+        skills,
+      });
+      if (!out) {
+        setAddMessage(t("recruiterTalentPool.addFailed"));
+        return;
+      }
+      setAddMessage(out.duplicate ? t("recruiterTalentPool.addDuplicate") : t("recruiterTalentPool.addSuccess"));
+      setAddName("");
+      setAddTitle("");
+      setAddSkills("");
+      await load();
+    } finally {
+      setAddBusy(false);
+    }
+  }, [token, companySlug, addName, addTitle, addSkills, load, t]);
+
+  const handleArchive = useCallback(async () => {
+    if (!selectedId) return;
+    const tkn = token.trim();
+    const slug = companySlug;
+    if (!tkn || !slug) return;
+    const archived = await archiveRecruiterTalentPoolRecord(tkn, slug, selectedId);
+    if (archived) {
+      setDetail(archived);
+      await load();
+    }
+  }, [selectedId, token, companySlug, load]);
 
   return (
     <Shell wide data-testid={RECRUITER_TALENT_POOL_MARKERS.page}>
@@ -103,6 +167,35 @@ export default function RecruiterTalentPoolClient() {
           >
             {t("recruiterTalentPool.importCta")}
           </Link>
+        </div>
+        <div className="mt-4">
+          <label className="twin-muted mb-1 block text-xs" htmlFor="talent-pool-filter">
+            {t("recruiterTalentPool.filterLabel")}
+          </label>
+          <input
+            id="talent-pool-filter"
+            className="twin-input w-full max-w-md"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            data-testid={RECRUITER_TALENT_POOL_MARKERS.filterInput}
+            placeholder={t("recruiterTalentPool.filterPlaceholder")}
+          />
+        </div>
+      </Card>
+
+      <Card variant="soft" className="mb-6 p-4" data-testid={RECRUITER_TALENT_POOL_MARKERS.addForm}>
+        <h2 className="mb-2 text-sm font-semibold">{t("recruiterTalentPool.addTitle")}</h2>
+        <p className="twin-muted mb-3 text-xs">{t("recruiterTalentPool.addBody")}</p>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <input className="twin-input" value={addName} onChange={(e) => setAddName(e.target.value)} placeholder={t("recruiterTalentPool.addNamePlaceholder")} aria-label={t("recruiterTalentPool.addNamePlaceholder")} />
+          <input className="twin-input" value={addTitle} onChange={(e) => setAddTitle(e.target.value)} placeholder={t("recruiterTalentPool.addJobTitlePlaceholder")} aria-label={t("recruiterTalentPool.addJobTitlePlaceholder")} />
+          <input className="twin-input" value={addSkills} onChange={(e) => setAddSkills(e.target.value)} placeholder={t("recruiterTalentPool.addSkillsPlaceholder")} aria-label={t("recruiterTalentPool.addSkillsPlaceholder")} />
+        </div>
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <button type="button" className="twin-btn-secondary" disabled={addBusy || !addName.trim()} onClick={() => void handleAdd()}>
+            {addBusy ? t("recruiterTalentPool.adding") : t("recruiterTalentPool.addCta")}
+          </button>
+          {addMessage ? <p className="text-xs text-[var(--twin-muted-strong)]">{addMessage}</p> : null}
         </div>
       </Card>
 
@@ -152,16 +245,19 @@ export default function RecruiterTalentPoolClient() {
                 {payload.items.map((rec) => (
                   <li key={rec.id} className="py-3">
                     <div className="flex flex-wrap items-start justify-between gap-2">
-                      <div>
-                        <p className="font-medium">{rec.display_name}</p>
+                      <button type="button" className="text-left" onClick={() => void openDetail(rec.id)}>
+                        <p className="font-medium twin-link">{rec.display_name}</p>
                         <p className="twin-muted text-xs">{rec.job_title || t("recruiterTalentPool.noJobTitle")}</p>
-                      </div>
+                      </button>
                       <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-xs">
-                        {t("recruiterTalentPool.chipTalentPool")}
+                        {rec.source_type === "manual_add" ? t("recruiterTalentPool.chipManualAdd") : t("recruiterTalentPool.chipTalentPool")}
                       </span>
                     </div>
                     {rec.skills && rec.skills.length > 0 ? (
                       <p className="twin-muted mt-1 text-xs">{rec.skills.slice(0, 5).join(" · ")}</p>
+                    ) : null}
+                    {rec.consent_visibility ? (
+                      <p className="twin-muted mt-1 text-[10px] uppercase">{t("recruiterTalentPool.consentLabel")}: {rec.consent_visibility}</p>
                     ) : null}
                   </li>
                 ))}
@@ -178,6 +274,27 @@ export default function RecruiterTalentPoolClient() {
               />
             </div>
           )}
+          {detail ? (
+            <Card variant="soft" className="p-4" data-testid={RECRUITER_TALENT_POOL_MARKERS.detailPanel}>
+              <h2 className="mb-2 text-sm font-semibold">{t("recruiterTalentPool.detailTitle")}</h2>
+              <dl className="grid gap-2 text-sm sm:grid-cols-2">
+                <div><dt className="twin-muted">{t("recruiterTalentPool.addNamePlaceholder")}</dt><dd>{detail.display_name}</dd></div>
+                <div><dt className="twin-muted">{t("recruiterTalentPool.addJobTitlePlaceholder")}</dt><dd>{detail.job_title || "—"}</dd></div>
+                <div><dt className="twin-muted">{t("recruiterTalentPool.consentLabel")}</dt><dd>{detail.consent_visibility || "unknown"}</dd></div>
+                <div><dt className="twin-muted">{t("recruiterTalentPool.sourceLabel")}</dt><dd>{detail.source_type || detail.source}</dd></div>
+              </dl>
+              {detail.snapshot ? (
+                <pre className="mt-3 overflow-x-auto rounded border border-white/10 p-2 text-xs">{JSON.stringify(detail.snapshot, null, 2)}</pre>
+              ) : null}
+              {!detail.archived ? (
+                <button type="button" className="twin-btn-secondary mt-3" data-testid={RECRUITER_TALENT_POOL_MARKERS.archiveButton} onClick={() => void handleArchive()}>
+                  {t("recruiterTalentPool.archiveCta")}
+                </button>
+              ) : (
+                <p className="twin-muted mt-3 text-xs">{t("recruiterTalentPool.archivedLabel")}</p>
+              )}
+            </Card>
+          ) : null}
         </div>
       ) : null}
 
