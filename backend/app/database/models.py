@@ -1072,6 +1072,49 @@ class RecruiterTrustReviewDecision(Base):
     item: Mapped["RecruiterTrustReviewItem"] = relationship(back_populates="decisions")
 
 
+class RecruiterNotificationPreferences(Base):
+    """Per-company recruiter in-app notification toggles — Wave C3."""
+
+    __tablename__ = "recruiter_notification_preferences"
+    __table_args__ = (UniqueConstraint("company_slug", name="uq_recruiter_notification_prefs_company"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    company_slug: Mapped[str] = mapped_column(String(80), index=True)
+    in_app_inbox_digest: Mapped[bool] = mapped_column(Boolean, default=True)
+    in_app_interview_reminder: Mapped[bool] = mapped_column(Boolean, default=True)
+    in_app_trust_review_alert: Mapped[bool] = mapped_column(Boolean, default=True)
+    in_app_pipeline_update: Mapped[bool] = mapped_column(Boolean, default=True)
+    updated_by_ref: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
+
+
+class RecruiterSavedView(Base):
+    """Per-company saved filter views — Wave C4."""
+
+    __tablename__ = "recruiter_saved_views"
+    __table_args__ = (
+        UniqueConstraint("company_slug", "surface", "name", name="uq_recruiter_saved_view_name"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    company_slug: Mapped[str] = mapped_column(String(80), index=True)
+    surface: Mapped[str] = mapped_column(String(32), index=True)
+    name: Mapped[str] = mapped_column(String(120))
+    filter_json: Mapped[str] = mapped_column(Text)
+    is_default: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
+
+
 class AutoApplyConsent(Base):
     """GDPR-style consent for nightly autonomous applications."""
 

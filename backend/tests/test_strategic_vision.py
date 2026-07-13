@@ -21,6 +21,7 @@ from app.services.linkedin_profile_import import (
 from app.automation.types import ApplyOutcome
 from app.services.opportunity_forecaster import forecast_opportunities, generate_ai_learning_path
 from app.services.skill_matcher import compute_skill_match
+from tests.career_compass_fixtures import seed_complete_career_compass
 
 
 @pytest.fixture
@@ -60,6 +61,7 @@ def vision_client():
     )
     db.add(candidate)
     db.commit()
+    seed_complete_career_compass(db, candidate)
     for i in range(3):
         db.add(
             Job(

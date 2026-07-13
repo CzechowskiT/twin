@@ -51,6 +51,51 @@ export function findHeads(migrations: MigrationMeta[]): string[] {
   return migrations.filter((m) => !childOf.has(m.revision)).map((m) => m.revision);
 }
 
+/** Revisions not reachable from any root (down_revision null) via child links. */
+export function findOrphans(migrations: MigrationMeta[]): string[] {
+  const roots = migrations.filter((m) => m.downRevision === null).map((m) => m.revision);
+  const childOf = new Map<string, string[]>();
+  for (const m of migrations) {
+    if (m.downRevision) {
+      const kids = childOf.get(m.downRevision) ?? [];
+      kids.push(m.revision);
+      childOf.set(m.downRevision, kids);
+    }
+  }
+  const reachable = new Set<string>();
+  const stack = [...roots];
+  while (stack.length) {
+    const rev = stack.pop()!;
+    if (reachable.has(rev)) continue;
+    reachable.add(rev);
+    for (const kid of childOf.get(rev) ?? []) stack.push(kid);
+  }
+  return migrations.filter((m) => !reachable.has(m.revision)).map((m) => m.revision);
+}
+
+const DESTRUCTIVE_PATTERNS = [
+  /op\.drop_table/i,
+  /op\.drop_column/i,
+  /op\.execute\s*\(\s*["']DROP\s/i,
+  /batch_op\.drop_column/i,
+];
+
+export function findDestructiveOps(migrations: MigrationMeta[], srcByFile?: Map<string, string>): string[] {
+  if (!srcByFile) return [];
+  const hits: string[] = [];
+  for (const m of migrations) {
+    const src = srcByFile.get(m.file);
+    if (!src) continue;
+    for (const pat of DESTRUCTIVE_PATTERNS) {
+      if (pat.test(src)) {
+        hits.push(`${m.revision} (${m.file}): destructive op detected`);
+        break;
+      }
+    }
+  }
+  return hits;
+}
+
 export function findCycle(migrations: MigrationMeta[]): string[] | null {
   const byRevision = new Map(migrations.map((m) => [m.revision, m]));
   for (const start of migrations) {
@@ -156,3 +201,42 @@ export function waveStackWith073Fixture(): MigrationMeta[] {
     },
   ];
 }
+
+/** Fixture: full release train 070→077 after C3–C5 + candidate slice rebased post-#448. */
+export function waveStack077Fixture(): MigrationMeta[] {
+  const base = waveStackWith073Fixture();
+  return [
+    ...base,
+    {
+      file: "074_recruiter_notification_preferences_c3.py",
+      revision: "074_recruiter_notification_preferences_c3",
+      downRevision: "073_candidate_referrals",
+    },
+    {
+      file: "075_recruiter_saved_views_c4.py",
+      revision: "075_recruiter_saved_views_c4",
+      downRevision: "074_recruiter_notification_preferences_c3",
+    },
+    {
+      file: "076_recruiter_activity_timeline_c5.py",
+      revision: "076_recruiter_activity_timeline_c5",
+      downRevision: "075_recruiter_saved_views_c4",
+    },
+    {
+      file: "077_candidate_activity_timeline.py",
+      revision: "077_candidate_activity_timeline",
+      downRevision: "076_recruiter_activity_timeline_c5",
+    },
+  ];
+}
+
+export const WAVE_070_077_CHAIN = [
+  "070_candidate_trust_center",
+  "071_recruiter_workspace_activation",
+  "072_recruiter_talent_pool_trust_review_c2",
+  "073_candidate_referrals",
+  "074_recruiter_notification_preferences_c3",
+  "075_recruiter_saved_views_c4",
+  "076_recruiter_activity_timeline_c5",
+  "077_candidate_activity_timeline",
+] as const;

@@ -1,0 +1,27 @@
+name: restore-rehearsal
+
+on:
+  workflow_dispatch:
+
+jobs:
+  synthetic-restore:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - name: Migration chain synthetic rehearsal (070-077)
+        run: npm run sim:integration-070-077:dry-run
+      - name: Rollback engine v2
+        run: npm run test:rollback-engine-v2
+      - name: Note
+        run: |
+          echo "Real Railway backup restore requires founder credentials — not executed in CI."
+          echo "See docs/O7_RESTORE_DRILL_RUNBOOK_2026-06-11.md"

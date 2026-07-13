@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 
-import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
+import { CandidateAccountDeleteLivePanel } from "@/components/candidate/candidate-account-delete-live-panel";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
@@ -18,6 +19,8 @@ import { candidateConsentReceiptHref } from "@/lib/candidate-consent-receipt";
 import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
 import type { TranslationKey } from "@/lib/i18n";
 import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
+import { getToken } from "@/lib/auth";
+import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -387,6 +390,20 @@ type CandidateRevokeDeleteWorkspaceProps = {
 };
 
 export function CandidateRevokeDeleteWorkspace({ candidateId }: CandidateRevokeDeleteWorkspaceProps) {
+  const [authChecked, setAuthChecked] = useState(false);
+  const [hasToken, setHasToken] = useState(false);
+
+  useEffect(() => {
+    setHasToken(Boolean(getToken()));
+    setAuthChecked(true);
+  }, []);
+
+  if (!authChecked) return null;
+
+  if (hasToken) {
+    return <CandidateAccountDeleteLivePanel />;
+  }
+
   const record = resolveCandidateRevokeDelete(candidateId);
   if (!record) return <RevokeDeleteNotFound />;
   return <RevokeDeleteContent record={record} />;

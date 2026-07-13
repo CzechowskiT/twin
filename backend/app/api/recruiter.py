@@ -45,6 +45,17 @@ from app.services.recruiter_trust_review_persistence import (
     record_trust_review_decision,
 )
 from app.schemas.recruiter_c2 import TalentPoolAddIn, TrustReviewDecisionIn
+from app.schemas.recruiter_notification_prefs import (
+    RecruiterNotificationPrefsOut,
+    RecruiterNotificationPrefsPatchIn,
+    RecruiterNotificationPrefsPutIn,
+)
+from app.services.recruiter_notification_prefs_persistence import (
+    get_notification_prefs,
+    patch_notification_prefs,
+    put_notification_prefs,
+    reset_notification_prefs,
+)
 from app.services.recruiter_talent_pool_import import (
     commit_talent_pool_import,
     preview_talent_pool_import,
@@ -876,5 +887,80 @@ def recruiter_talent_pool_import_commit(
             company_slug=slug,
             import_id=body.import_id,
         )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.get("/notification-preferences", response_model=RecruiterNotificationPrefsOut)
+def recruiter_notification_preferences_get(
+    request: Request,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> RecruiterNotificationPrefsOut:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return RecruiterNotificationPrefsOut.model_validate(get_notification_prefs(db, company_slug=slug))
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.put("/notification-preferences", response_model=RecruiterNotificationPrefsOut)
+@limiter.limit("30/minute", key_func=recruiter_token_key)
+def recruiter_notification_preferences_put(
+    request: Request,
+    body: RecruiterNotificationPrefsPutIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> RecruiterNotificationPrefsOut:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        out = put_notification_prefs(db, company_slug=slug, data=body.model_dump())
+        return RecruiterNotificationPrefsOut.model_validate(out)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.patch("/notification-preferences", response_model=RecruiterNotificationPrefsOut)
+@limiter.limit("30/minute", key_func=recruiter_token_key)
+def recruiter_notification_preferences_patch(
+    request: Request,
+    body: RecruiterNotificationPrefsPatchIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> RecruiterNotificationPrefsOut:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    data = body.model_dump(exclude_unset=True)
+    if not data:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="empty_body")
+    try:
+        out = patch_notification_prefs(db, company_slug=slug, data=data)
+        return RecruiterNotificationPrefsOut.model_validate(out)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/notification-preferences/reset", response_model=RecruiterNotificationPrefsOut)
+@limiter.limit("20/minute", key_func=recruiter_token_key)
+def recruiter_notification_preferences_reset(
+    request: Request,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> RecruiterNotificationPrefsOut:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        out = reset_notification_prefs(db, company_slug=slug)
+        return RecruiterNotificationPrefsOut.model_validate(out)
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc

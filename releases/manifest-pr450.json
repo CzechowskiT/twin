@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1",
+  "pr": 450,
+  "title": "feat: talent pool + trust review queue persistence (Wave C slice 2)",
+  "headSha": "cda7a2060faab5597274b1bb9751c5ecdfeeb79a",
+  "migration": "072_recruiter_talent_pool_trust_review_c2",
+  "dependsOn": [449],
+  "mergeOrder": 2,
+  "smokeDoc": "docs/RECRUITER_WAVE_C_FOUNDER_SMOKE_2026-07-13.md",
+  "smokeSlices": ["C2_talent_pool", "C2_trust_review"],
+  "status": "OPEN",
+  "pilot": true,
+  "launchGo": false,
+  "gateF": "PENDING",
+  "rollbackDoc": "docs/ROLLBACK_DECISION_PR448_449_450_2026-07-13.md"
+}

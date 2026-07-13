@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1",
+  "pr": 449,
+  "title": "feat: recruiter workspace activation onboarding (Wave C slice 1)",
+  "headSha": "905a660c7d627b389dedc6a41a6346997b0398b3",
+  "migration": "071_recruiter_workspace_activation",
+  "dependsOn": [],
+  "mergeOrder": 1,
+  "smokeDoc": "docs/RECRUITER_WAVE_C_FOUNDER_SMOKE_2026-07-13.md",
+  "smokeSlices": ["C1_activation"],
+  "status": "OPEN",
+  "pilot": true,
+  "launchGo": false,
+  "gateF": "PENDING",
+  "rollbackDoc": "docs/ROLLBACK_DECISION_PR448_449_450_2026-07-13.md"
+}

@@ -1,4 +1,4 @@
-"""Rate limits on public beta waitlist CV/voice uploads."""
+"""Rate limits on public beta waitlist CV/voice uploads and dashboard GET (R-007–R-009)."""
 
 from __future__ import annotations
 
@@ -89,3 +89,38 @@ def test_beta_cv_upload_rate_limit_returns_429(client: TestClient) -> None:
         files={"file": (name, io.BytesIO(body), mime)},
     )
     assert r11.status_code == 429
+
+
+def _tiny_audio() -> tuple[str, bytes, str]:
+    content = b"RIFF....WAVEfmt "
+    return ("voice.webm", content, "audio/webm")
+
+
+def test_beta_voice_upload_rate_limit_returns_429(client: TestClient) -> None:
+    """Eleventh voice upload in a minute is rejected (10/min cap) — R-008."""
+    code = "uploadlimit01"
+    for _ in range(10):
+        name, body, mime = _tiny_audio()
+        r = client.post(
+            f"/api/v1/beta/waitlist/{code}/voice",
+            files={"file": (name, io.BytesIO(body), mime)},
+        )
+        assert r.status_code == 200, r.text
+
+    name, body, mime = _tiny_audio()
+    r11 = client.post(
+        f"/api/v1/beta/waitlist/{code}/voice",
+        files={"file": (name, io.BytesIO(body), mime)},
+    )
+    assert r11.status_code == 429
+
+
+def test_beta_dashboard_get_rate_limit_returns_429(client: TestClient) -> None:
+    """Sixty-first dashboard GET in a minute is rejected (60/min cap) — R-009."""
+    code = "uploadlimit01"
+    for _ in range(60):
+        r = client.get(f"/api/v1/beta/waitlist/{code}")
+        assert r.status_code == 200, r.text
+
+    r61 = client.get(f"/api/v1/beta/waitlist/{code}")
+    assert r61.status_code == 429

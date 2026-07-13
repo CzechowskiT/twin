@@ -124,6 +124,24 @@ Append one row to `docs/BACKUP_RESTORE_DRILL_LOG.md`:
 
 ---
 
+## Max rehearsal (CI synthetic — 2026-07-13)
+
+Agent/CI can run **without** Railway credentials:
+
+```bash
+cd frontend
+npm run sim:integration-070-077:dry-run   # migration chain 070→077
+npm run test:rollback-engine-v2             # rollback decision guards
+```
+
+GitHub Actions: `.github/workflows/restore-rehearsal.yml` (manual `workflow_dispatch`).
+
+**PASS criteria (synthetic):** exit 0 on both commands; evidence in `reports/integration-sim/`.
+
+**Does NOT substitute** for Method A pg_dump/pg_restore — founder must still execute Steps 1–5 below after prod migrate to head `077`.
+
+---
+
 ## Related documents
 
 - `docs/BACKUP_RESTORE_DRILL_LOG.md` — append-only evidence

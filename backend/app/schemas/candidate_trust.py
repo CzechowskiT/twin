@@ -107,6 +107,18 @@ class TrustTimelineEventOut(BaseModel):
     summary: str
 
 
+class AccountDeleteIn(BaseModel):
+    confirmation: str = Field(..., min_length=1, max_length=32)
+    idempotency_key: str | None = Field(default=None, max_length=128)
+
+
+class AccountDeleteOut(BaseModel):
+    deleted: bool
+    deleted_at: datetime
+    privacy_request_id: int
+    message: str
+
+
 class TrustCenterOut(BaseModel):
     candidate_id: int
     display_name: str
