@@ -12,6 +12,12 @@ from app.config import Settings, get_settings
 from app.database.session import get_db
 from app.limiter import limiter, recruiter_token_key
 from app.services.recruiter_company_auth import resolve_recruiter_access
+from app.schemas.recruiter_activation import RecruiterActivationOut
+from app.services.recruiter_activation_persistence import (
+    record_first_decision,
+    record_queue_loaded,
+    serialize_activation,
+)
 from app.services.recruiter_analytics import build_recruiter_analytics
 from app.services.recruiter_audit_trail import (
     RECRUITER_CLIENT_AUDIT_ACTION_TYPES,
@@ -105,6 +111,19 @@ class RecruiterJobCreateIn(BaseModel):
     salary_max: int | None = Field(None, ge=0)
 
 
+@router.get("/activation", response_model=RecruiterActivationOut)
+def recruiter_activation(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    """Recruiter onboarding state — steps through first decision activation event."""
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    return serialize_activation(db, company_slug=slug)
+
+
 @router.get("/inbox")
 def recruiter_inbox(
     request: Request,
@@ -118,12 +137,14 @@ def recruiter_inbox(
     """Pre-qualified applications for one employer (batch accept/decline in UI)."""
     slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
     try:
-        return build_recruiter_batch(
+        payload = build_recruiter_batch(
             db,
             company_slug=slug,
             limit=limit,
             locale=locale_from_request(request),
         )
+        record_queue_loaded(db, company_slug=slug, queue_total=payload.get("total", 0))
+        return payload
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
@@ -142,13 +163,20 @@ def recruiter_inbox_respond(
 ) -> dict:
     slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
     try:
-        return respond_recruiter_batch(
+        result = respond_recruiter_batch(
             db,
             company_slug=slug,
             application_id=application_id,
             action=body.action,
             decline_note=body.decline_note,
         )
+        record_first_decision(
+            db,
+            company_slug=slug,
+            action=body.action,
+            application_id=application_id,
+        )
+        return result
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
@@ -276,13 +304,25 @@ def recruiter_inbox_respond_batch(
 ) -> dict:
     slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
     try:
-        return respond_recruiter_batch_bulk(
+        result = respond_recruiter_batch_bulk(
             db,
             company_slug=slug,
             application_ids=body.application_ids,
             action=body.action,
             decline_note=body.decline_note,
         )
+        first_ok = next(
+            (r for r in result.get("results", []) if r.get("ok")),
+            None,
+        )
+        if first_ok:
+            record_first_decision(
+                db,
+                company_slug=slug,
+                action=body.action,
+                application_id=first_ok.get("application_id"),
+            )
+        return result
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 

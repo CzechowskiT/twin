@@ -760,6 +760,34 @@ class RecruiterAuditEvent(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
+class RecruiterWorkspaceActivation(Base):
+    """Per-company recruiter onboarding state — Wave C slice 1."""
+
+    __tablename__ = "recruiter_workspace_activation"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    company_slug: Mapped[str] = mapped_column(String(80), unique=True, index=True)
+    workspace_connected_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    queue_loaded_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    first_decision_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    first_decision_action: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    activation_completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class RecruiterActivationEvent(Base):
+    """Append-only recruiter activation milestone audit."""
+
+    __tablename__ = "recruiter_activation_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    company_slug: Mapped[str] = mapped_column(String(80), index=True)
+    step: Mapped[str] = mapped_column(String(64))
+    meta_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
 class RecruiterTalentRadarDecision(Base):
     """Persisted talent radar recruiter actions (shortlist, snooze, dismiss, audit-only)."""
 

@@ -2,6 +2,9 @@ import { RECRUITER_DAILY_COCKPIT_ROUTE } from "@/lib/recruiter-daily-operating-c
 import { RECRUITER_TRUST_REVIEW_QUEUE_ROUTE } from "@/lib/recruiter-trust-review-queue";
 import { RECRUITER_INTEGRATIONS_ROUTE } from "@/lib/recruiter-integrations-readiness";
 import {
+  RECRUITER_ACTIVATION_SHIP_STATUS,
+} from "@/lib/seven-day-c-recruiter";
+import {
   RECRUITER_ANALYTICS_SHIP_STATUS,
   RECRUITER_INTEGRATIONS_ROADMAP_STATUS,
   RECRUITER_PIPELINE_SHIP_STATUS,
@@ -24,7 +27,7 @@ export const RECRUITER_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     titleKey: "recruiterDailyCockpit.demoJourneyTitle",
     valuePropKey: "recruiterDailyCockpit.demoJourneyDesc",
     ctaKey: "recruiterDailyCockpit.openDailyCockpit",
-    status: "pilot",
+    status: RECRUITER_ACTIVATION_SHIP_STATUS,
   },
   {
     id: "inbox",
