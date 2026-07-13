@@ -1,12 +1,25 @@
 {
-  "schemaVersion": "1",
-  "description": "Integration simulator merge order — scaffold → #449 → #450 → #448",
-  "mergeSequence": [449, 450, 448],
+  "schemaVersion": "2",
+  "description": "Integration simulator merge order — scaffold through #455 (070→077)",
+  "mergeSequence": [449, 450, 448, 451, 452, 453, 454, 455],
+  "legacyMergeSequence": [449, 450, 448],
   "scaffoldRef": "c2a08b025ca950b341540f0bc80f710825c778ce",
-  "expectedHead": "073_candidate_referrals",
+  "expectedHead": "077_candidate_activity_timeline",
+  "legacyExpectedHead": "073_candidate_referrals",
   "prBranches": {
     "448": "feat/all-modules-green-wave-b3-candidate-referrals",
     "449": "feat/all-modules-green-wave-c1-recruiter-activation",
-    "450": "feat/all-modules-green-wave-c2-talent-pool-trust-review"
+    "450": "feat/all-modules-green-wave-c2-talent-pool-trust-review",
+    "451": "chore/extended-integration-batch-2026-07-13",
+    "452": "feat/all-modules-green-wave-c3-notification-prefs",
+    "453": "feat/all-modules-green-wave-c4-saved-views",
+    "454": "feat/all-modules-green-wave-c5-activity-timeline",
+    "455": "feat/all-modules-green-wave-candidate-activity-timeline"
+  },
+  "rebaseNotes": {
+    "452": "Update 074 down_revision from 072 to 073 after #448 merges",
+    "453": "Stack on merged #452",
+    "454": "Stack on merged #453",
+    "455": "Stack on merged #454"
   }
 }

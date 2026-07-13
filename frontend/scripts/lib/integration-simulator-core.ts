@@ -15,6 +15,8 @@ import {
   findDestructiveOps,
   validateChainSegment,
   waveStackWith073Fixture,
+  waveStack077Fixture,
+  WAVE_070_077_CHAIN,
   type MigrationMeta,
 } from "./alembic-migration-graph";
 
@@ -23,10 +25,17 @@ export const PR_BRANCHES = {
   449: "feat/all-modules-green-wave-c1-recruiter-activation",
   450: "feat/all-modules-green-wave-c2-talent-pool-trust-review",
   448: "feat/all-modules-green-wave-b3-candidate-referrals",
+  451: "chore/extended-integration-batch-2026-07-13",
+  452: "feat/all-modules-green-wave-c3-notification-prefs",
+  453: "feat/all-modules-green-wave-c4-saved-views",
+  454: "feat/all-modules-green-wave-c5-activity-timeline",
+  455: "feat/all-modules-green-wave-candidate-activity-timeline",
 } as const;
 
 export const MERGE_SEQUENCE = [449, 450, 448] as const;
+export const EXTENDED_MERGE_SEQUENCE = [449, 450, 448, 451, 452, 453, 454, 455] as const;
 export const TEMP_BRANCH = "tmp/integration-pr448-449-450-verify";
+export const EXTENDED_TEMP_BRANCH = "tmp/integration-070-077-verify";
 
 const DEFAULT_MANIFEST_PATH = "releases/integration-sim-manifest.json";
 
@@ -114,6 +123,47 @@ export function validatePostMergeMigrations(migrations: MigrationMeta[]): Migrat
     };
   }
   return { ok: true, chain, head: heads[0], duplicates, orphans, destructive };
+}
+
+export function validateExtended070077Migrations(migrations: MigrationMeta[]): MigrationReport {
+  const expected = [...WAVE_070_077_CHAIN];
+  const segment = validateChainSegment(migrations, expected);
+  const duplicates = findDuplicateRevisions(migrations);
+  const orphans = findOrphans(migrations);
+  const destructive = findDestructiveOps(migrations);
+  const heads = findHeads(migrations);
+  const chain = buildChain("070_candidate_trust_center", migrations);
+
+  if (!segment.ok) {
+    return {
+      ok: false,
+      chain,
+      head: heads[0] ?? null,
+      duplicates,
+      orphans,
+      destructive,
+      reason: segment.reason,
+    };
+  }
+  if (duplicates.length > 0) {
+    return { ok: false, chain, head: heads[0] ?? null, duplicates, orphans, destructive, reason: "duplicate revisions" };
+  }
+  if (heads.length !== 1 || heads[0] !== "077_candidate_activity_timeline") {
+    return {
+      ok: false,
+      chain,
+      head: heads[0] ?? null,
+      duplicates,
+      orphans,
+      destructive,
+      reason: `expected single head 077, got ${heads.join(", ")}`,
+    };
+  }
+  return { ok: true, chain, head: heads[0], duplicates, orphans, destructive };
+}
+
+export function validateFixtureExtended070077(): MigrationReport {
+  return validateExtended070077Migrations(waveStack077Fixture());
 }
 
 export function validateFixturePostMerge(): MigrationReport {

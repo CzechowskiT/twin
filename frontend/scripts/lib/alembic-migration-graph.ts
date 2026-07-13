@@ -201,3 +201,42 @@ export function waveStackWith073Fixture(): MigrationMeta[] {
     },
   ];
 }
+
+/** Fixture: full release train 070→077 after C3–C5 + candidate slice rebased post-#448. */
+export function waveStack077Fixture(): MigrationMeta[] {
+  const base = waveStackWith073Fixture();
+  return [
+    ...base,
+    {
+      file: "074_recruiter_notification_preferences_c3.py",
+      revision: "074_recruiter_notification_preferences_c3",
+      downRevision: "073_candidate_referrals",
+    },
+    {
+      file: "075_recruiter_saved_views_c4.py",
+      revision: "075_recruiter_saved_views_c4",
+      downRevision: "074_recruiter_notification_preferences_c3",
+    },
+    {
+      file: "076_recruiter_activity_timeline_c5.py",
+      revision: "076_recruiter_activity_timeline_c5",
+      downRevision: "075_recruiter_saved_views_c4",
+    },
+    {
+      file: "077_candidate_activity_timeline.py",
+      revision: "077_candidate_activity_timeline",
+      downRevision: "076_recruiter_activity_timeline_c5",
+    },
+  ];
+}
+
+export const WAVE_070_077_CHAIN = [
+  "070_candidate_trust_center",
+  "071_recruiter_workspace_activation",
+  "072_recruiter_talent_pool_trust_review_c2",
+  "073_candidate_referrals",
+  "074_recruiter_notification_preferences_c3",
+  "075_recruiter_saved_views_c4",
+  "076_recruiter_activity_timeline_c5",
+  "077_candidate_activity_timeline",
+] as const;

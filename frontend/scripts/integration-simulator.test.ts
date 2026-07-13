@@ -5,17 +5,25 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  validateFixtureExtended070077,
   validateFixturePostMerge,
   validatePostMergeMigrations,
   formatSimulatorMarkdown,
   type SimulatorReport,
 } from "./lib/integration-simulator-core";
-import { waveStackWith073Fixture } from "./lib/alembic-migration-graph";
+import { waveStack077Fixture, waveStackWith073Fixture } from "./lib/alembic-migration-graph";
 
 test("1 fixture post-merge migration PASS", () => {
   const r = validateFixturePostMerge();
   assert.equal(r.ok, true);
   assert.equal(r.head, "073_candidate_referrals");
+});
+
+test("1b fixture 070-077 extended PASS", () => {
+  const r = validateFixtureExtended070077();
+  assert.equal(r.ok, true);
+  assert.equal(r.head, "077_candidate_activity_timeline");
+  assert.equal(waveStack077Fixture().length, 8);
 });
 
 test("2 duplicate revision fails", () => {
