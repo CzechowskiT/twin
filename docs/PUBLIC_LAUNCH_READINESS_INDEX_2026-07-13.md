@@ -8,8 +8,8 @@
 
 | Field | Value |
 |-------|-------|
-| **Path** | B++ (credentials UNSET) |
-| **repo_head** | `c3d35c0be15cca5cace93dedef199b7a6274d66a` |
+| **Path** | B+++ (credentials UNSET) |
+| **repo_head** | `b00f027c` → post-batch push pending |
 | **prod_api_commit** | `c2a08b025ca950b341540f0bc80f710825c778ce` (public-health) |
 | **prod_frontend** | `https://twin-sooty.vercel.app` |
 | **alignment_status** | **DRIFT** — train branches ahead of prod (070 vs 077 target) |

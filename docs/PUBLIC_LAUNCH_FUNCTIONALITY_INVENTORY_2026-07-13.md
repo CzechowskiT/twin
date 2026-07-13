@@ -68,8 +68,8 @@
 | Search | `/recruiter/search` | LIVE | |
 | Workspace activation | `/recruiter/activation` | NOT_IN_TRAIN | PR #449 OPEN — C1 smoke pending |
 | Talent pool + trust review | `/recruiter/talent-pool` | NOT_IN_TRAIN | PR #450 OPEN |
-| Notification prefs | `/recruiter/settings/notifications` | NOT_IN_TRAIN | PR #452 CONFLICTING |
-| Saved views | `/recruiter/saved-views` | NOT_IN_TRAIN | PR #453 OPEN |
+| Notification prefs | `/recruiter/settings/notifications` | NOT_IN_TRAIN | PR #452 MERGEABLE — C3 smoke pending |
+| Saved views | `/recruiter/saved-views` | NOT_IN_TRAIN | PR #453 CONFLICTING — rebase pending |
 | Activity timeline | `/recruiter/activity` | NOT_IN_TRAIN | PR #454 OPEN |
 | Calendar | `/recruiter/calendar` | COMING_SOON | Hard ban |
 | ATS import | `/recruiter/integrations` | COMING_SOON | `ATS_COMING_SOON_NO_LIVE_SYNC` |
@@ -121,9 +121,9 @@
 | #448 | B3 referrals | CLEAN | green | 073 |
 | #449 | C1 activation | CLEAN | green | 071 |
 | #450 | C2 talent pool | CLEAN | green | 072 |
-| #451 | Integration tooling | CLEAN | **build fix pending push** | — |
-| #452 | C3 notification prefs | **CONFLICTING** | green on branch | 074 (parent 072→073 fix required) |
-| #453 | C4 saved views | CLEAN | green | 075 |
+| #451 | Integration tooling | CLEAN | green | — |
+| #452 | C3 notification prefs | **CLEAN** | green | 074 (rebase fix applied `6aa193c4`) |
+| #453 | C4 saved views | **CONFLICTING** | green on branch | 075 — rebase onto #452 required |
 | #454 | C5 activity timeline | CLEAN | green | 076 |
 | #455 | Candidate timeline | CLEAN | green | 077 |
 | #456–#460 | Hardening guards | CLEAN | green | — |

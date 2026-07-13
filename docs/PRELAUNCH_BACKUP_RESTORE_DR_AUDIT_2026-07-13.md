@@ -35,7 +35,7 @@ db_ok: true
 | 2026-05-29 | FAIL (incident) | Wrong volume mount — recovered same day |
 | 2026-06-01 | **PASS** | pg_dump prod → staging clone; counts matched |
 | 2026-06-11 | NOT DONE | Post-audit re-drill required after redeploy |
-| 2026-07-13 | **PENDING** | Founder credentials required |
+| 2026-07-13 | **SYNTHETIC PASS** | `sim:integration-070-077:dry-run` migration chain 070→077; no prod backup access |
 
 ---
 

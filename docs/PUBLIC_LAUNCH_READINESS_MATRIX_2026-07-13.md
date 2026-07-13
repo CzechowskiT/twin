@@ -28,7 +28,7 @@
 | No secrets in repo | ✅ | Spot check batch |
 | Wave C3–C5 matrix | ✅ | `SECURITY_MATRIX_WAVE_C3_C5_2026-07-13.md` |
 | Drain signature / DRAIN_SECRET | ⚠️ | No Vercel drains configured (Hobby path) |
-| R-019 self-service delete | ⚠️ OPEN | Manual DSR waiver only |
+| R-019 self-service delete | ⚠️ PARTIAL | API on #451 branch; prod `c2a08b0` not deployed |
 
 ---
 
@@ -75,7 +75,8 @@
 |-------|--------|
 | #449→#450→#448 order documented | ✅ |
 | #451 tooling sim | ✅ PASS |
-| #452 CONFLICTING | ⚠️ LAUNCH_BLOCKER for C3 merge |
+| #452 CONFLICTING | ✅ CLOSED | MERGEABLE CLEAN @ `6aa193c4` |
+| #453 CONFLICTING | ⚠️ OPEN | Rebase C4 onto #452 |
 | #456–#460 hardening | ✅ CI green; merge after tooling |
 | Rebase playbook 448–460 | ✅ `FINAL_RELEASE_TRAIN_REBASE_PLAYBOOK_448_460_2026-07-13.md` |
 

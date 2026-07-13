@@ -12,7 +12,7 @@
 | Cookie consent PL/EN | **LIVE** | ✅ |
 | `/privacy`, `/terms` | **LIVE** | ✅ |
 | GDPR signup consent | **LIVE** | `gdpr_consent_at` |
-| Self-service erasure | **NOT LIVE** | ⚠️ LAUNCH_BLOCKER at scale |
+| Self-service erasure | **PARTIAL (branch)** | `POST /api/v1/candidates/me/delete-account` on #451 — not on prod |
 | Manual DSR workflow | **WAIVED** | Signed 2026-06-03 — pilot only |
 | Trust center persistence | **PILOT** | PR #450 scaffold; full on train |
 
@@ -34,10 +34,10 @@
 
 | Expected | Status |
 |----------|--------|
-| `DELETE /api/v1/auth/me` or equivalent | **Not found** |
+| `DELETE /api/v1/auth/me` or equivalent | **Shipped as** `POST /api/v1/candidates/me/delete-account` (#451 branch) |
 | Manual erasure runbook | `docs/GDPR_MANUAL_DSR.md` |
 
-**Risk register:** R-019 OPEN
+**Risk register:** R-019 **PARTIAL** — API+tests on branch; prod deploy pending
 
 ---
 

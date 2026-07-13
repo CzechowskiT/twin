@@ -12,7 +12,7 @@
 | AuthZ on wave APIs | ✅ GREEN | Tenant isolation tests on C1–C5 |
 | Secrets handling | ✅ GREEN | No secrets in batch commits; env encrypted on Vercel |
 | Hard bans | ✅ ENFORCED | No Stripe LIVE, ATS write, MS cal write, auto-apply |
-| DSR erasure | ⚠️ YELLOW | Manual workflow only (R-019) |
+| DSR erasure | ⚠️ YELLOW | Self-service API on #451 branch; prod still manual |
 | Observability | ⚠️ YELLOW | No log drains; CLI/Dashboard fallback |
 | Dependency audit | ⚠️ RE-VERIFY | Last full audit 2026-05-27 — re-run before GO |
 

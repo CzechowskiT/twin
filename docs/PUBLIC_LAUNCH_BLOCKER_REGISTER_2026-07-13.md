@@ -12,7 +12,7 @@
 | LB-002 | Founder smoke credentials UNSET | P0 | Founder | **OPEN** | Set `DEMO_USER_PASSWORD` + recruiter token; run Wave B/C smoke runbooks |
 | LB-003 | Wave B3 referrals not merged (#448) | P0 | Eng | **OPEN** | Merge train #449→#450→#448 after smoke PASS |
 | LB-004 | Public launch stance `noGo` | P0 | Product | **OPEN** | Founder scoped launch decision §G checkboxes |
-| LB-005 | Self-service account delete (R-019) | P1→P0 at scale | Eng | **OPEN** | Ship delete API or limit to controlled pilot signup |
+| LB-005 | Self-service account delete (R-019) | P1→P0 at scale | Eng | **PARTIAL** | API+UI shipped on #451 branch; prod deploy + founder smoke pending |
 
 ---
 
@@ -20,8 +20,9 @@
 
 | ID | Blocker | Severity | Status | Remediation |
 |----|---------|----------|--------|-------------|
-| LB-101 | PR #452 mergeable CONFLICTING | P1 | **OPEN** | Rebase onto #448; fix `074` down_revision `072`→`073` |
-| LB-102 | #451 remote CI frontend-build FAILURE | P1 | **IN_PROGRESS** | Push `release-train-v4-scenarios.ts` duplicate-key fix |
+| LB-101 | PR #452 mergeable | P1 | **CLOSED** | Rebased to `6aa193c4` — MERGEABLE CLEAN |
+| LB-102 | #451 remote CI frontend-build | P1 | **CLOSED** | `release-train-v4-scenarios.ts` fix on branch |
+| LB-103 | PR #453 mergeable CONFLICTING | P1 | **OPEN** | Rebase `feat/all-modules-green-wave-c4-saved-views` onto #452 HEAD |
 | LB-103 | Prod Alembic head behind train (070 vs 077) | P1 | **EXPECTED** | Execute release train merges + Railway migrate |
 | LB-104 | No founder smoke PASS docs for C1–C5 | P1 | **OPEN** | Browser smoke per wave runbooks |
 
@@ -41,9 +42,10 @@
 
 | ID | Blocker | Severity | Status | Fix |
 |----|---------|----------|--------|-----|
-| LB-301 | `release-train-v4-scenarios.ts` duplicate `headSha` | P1 | **FIXED** | Local commit pending push |
-| LB-302 | `/dashboard/trust` missing from route registries | P2 | **FIXED** | Added to founder demo crosslinks |
-| LB-303 | `CONTROLLED_PILOT_PRIMARY_LIMITS` drift (99 vs 8/5/4) | P1 | **FIXED** | Restored founder limits |
+| LB-301 | `release-train-v4-scenarios.ts` duplicate `headSha` | P1 | **FIXED** | Pushed on #451 |
+| LB-302 | `/dashboard/trust` missing from route registries | P2 | **FIXED** | founder demo crosslinks |
+| LB-303 | `CONTROLLED_PILOT_PRIMARY_LIMITS` drift | P1 | **FIXED** | 8/5/4 restored |
+| LB-304 | R-019 self-service delete API | P1 | **FIXED** (branch) | `POST /candidates/me/delete-account` + live UI |
 
 ---
 
@@ -67,4 +69,4 @@
 
 ---
 
-**Register stance:** 8 OPEN · 3 FIXED (pending push) · 2 WAIVED/ACCEPTED · Launch **NO-GO**
+**Register stance:** 6 OPEN · 5 FIXED/CLOSED · 1 PARTIAL · 2 WAIVED/ACCEPTED · Launch **NO-GO**
