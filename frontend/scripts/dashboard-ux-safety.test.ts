@@ -21,15 +21,15 @@ const COMPONENT_PATHS = [
   "src/app/dashboard/billing/page.tsx",
 ];
 
+/** Green-only subnav — billing/auto-apply live on dedicated routes, not subnav chrome. */
 const SUBNAV_I18N_KEYS = [
   "nav.profile",
   "nav.jobs",
+  "candidateMatchesPage.pageTitle",
   "careerCompassLink",
-  "billingLink",
-  "referralsLink",
   "identityLink",
   "calendarLink",
-  "nightlyAutoApplyLink",
+  "profile.privacyPolicyLink",
 ] as const;
 
 /** Hard-coded UI literals only (components must use t() for copy). */
@@ -122,7 +122,7 @@ for (const rel of COMPONENT_PATHS) {
 
 const subnav = read("src/components/candidate-workspace-subnav.tsx");
 for (const key of SUBNAV_I18N_KEYS) {
-  const lookup = key.startsWith("nav.") ? key : `dashboard.${key}`;
+  const lookup = key.includes(".") ? key : `dashboard.${key}`;
   assert(subnav.includes(`t("${lookup}")`), `Subnav must use i18n key ${lookup}`);
 }
 assert(subnav.includes("flex-wrap"), "Subnav must wrap labels instead of clipping");
