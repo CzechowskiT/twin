@@ -28,7 +28,8 @@ Restore **full product surface visibility** with honest activation statuses. Act
 - **Slice 1 (shipped):** Recruiter workspace activation onboarding — see `docs/ALL_MODULES_GREEN_WAVE_C1_RECRUITER_ACTIVATION_2026-07-13.md` (PILOT until founder browser smoke)
 - **Slice 2 (shipped):** Talent Pool + Trust Review Queue persistence — see `docs/ALL_MODULES_GREEN_WAVE_C2_TALENT_POOL_TRUST_REVIEW_2026-07-13.md` (PILOT until founder browser smoke)
 - Integration readiness PRs #448–#450 — see `docs/INTEGRATION_READINESS_PR448_449_450_2026-07-13.md`
-- Talent Radar, Daily Cockpit operational queue
+- Founder smoke handoff (env, order, routes) — `docs/FOUNDER_SMOKE_HANDOFF_PR448_449_450_2026-07-13.md`
+- **Slice 3 (PR #448 OPEN):** Candidate referrals persistence — migration `073_candidate_referrals` (rebase after #450)
 - Demo collaboration → production paths
 
 ### Wave D — Company activation

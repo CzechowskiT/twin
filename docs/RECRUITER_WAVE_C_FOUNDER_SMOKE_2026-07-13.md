@@ -40,6 +40,9 @@ Smoke **C1 on #449 preview first**, then **C2 on #450 preview** (includes C1 mig
 ## Preflight commands (no secrets in output)
 
 ```bash
+cd frontend && npm run preflight:founder-smoke-env
+cd frontend && npm run preflight:preview-reachability
+# Optional: set TWIN_PREVIEW_URL_449 / TWIN_PREVIEW_URL_450 before preview probe
 curl -sS https://twin-sooty.vercel.app/api/public-health | jq '{status,db_ok,git_commit}'
 cd frontend && npm run test:all-modules-green-wave-c1-recruiter-activation-guard
 cd frontend && npm run test:all-modules-green-wave-c2-talent-pool-trust-review-guard
@@ -147,3 +150,4 @@ cd frontend && npm run test:recruiter-wave-c-founder-smoke-guard
 - `docs/ALL_MODULES_GREEN_WAVE_C2_TALENT_POOL_TRUST_REVIEW_2026-07-13.md`
 - `docs/LIMITED_RECRUITER_PILOT_TRACKER_2026-06-06.md`
 - `docs/INTEGRATION_READINESS_PR448_449_450_2026-07-13.md`
+- `docs/FOUNDER_SMOKE_HANDOFF_PR448_449_450_2026-07-13.md`
