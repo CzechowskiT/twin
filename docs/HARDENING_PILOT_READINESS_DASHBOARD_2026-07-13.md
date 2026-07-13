@@ -13,7 +13,7 @@ Surface honest PILOT/NO-GO status per wave module without inflating launch metri
 ## Acceptance
 
 - Ship status constants remain `PILOT` until founder smoke  
-- No `LIVE` or `GA` strings in C3–C5 recruiter modules  
+- No `LIVE` or general-availability launch strings in C3–C5 recruiter modules  
 - Dashboard links do not claim calendar/ATS integration
 
 **Status:** guard present on stacked branches; founder smoke PENDING.

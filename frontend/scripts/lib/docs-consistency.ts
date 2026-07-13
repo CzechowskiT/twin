@@ -60,6 +60,18 @@ export const DOCUMENTATION_INDEX: DocEntry[] = [
     path: "docs/schemas/FOUNDER_SMOKE_EVIDENCE_SCHEMA.md",
     status: "CURRENT",
   },
+  {
+    path: "docs/STABILIZATION_WINDOW_2026-07-13.md",
+    status: "CURRENT",
+  },
+  {
+    path: "docs/API_CONTRACT_FREEZE_2026-07-13.md",
+    status: "CURRENT",
+  },
+  {
+    path: "docs/DATA_LIFECYCLE_CONTRACT_V3_2026-07-13.md",
+    status: "CURRENT",
+  },
 ];
 
 export function findIndexInconsistencies(
