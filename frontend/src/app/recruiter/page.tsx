@@ -9,7 +9,9 @@ import { Card, Shell } from "@/components/ui";
 import { SHOW_RECRUITER_HUB_PRIMARY_PROMOS } from "@/lib/product-polish-p0";
 import { SHOW_RECRUITER_HUB_NEXT_ACTION } from "@/lib/product-polish-p1";
 import { SHOW_RECRUITER_HUB_ROADMAP_PROMOS_COLLAPSED } from "@/lib/seven-day-d3-recruiter";
+import { RecruiterActivationPanel } from "@/components/recruiter/recruiter-activation-panel";
 import { RecruiterHubNextAction } from "@/components/recruiter/recruiter-hub-next-action";
+import { SHOW_RECRUITER_HUB_ACTIVATION_PANEL } from "@/lib/seven-day-c-recruiter";
 import { RECRUITER_DAILY_COCKPIT_MARKERS, recruiterDailyCockpitHref } from "@/lib/recruiter-daily-operating-cockpit";
 import { RECRUITER_TRUST_REVIEW_QUEUE_MARKERS, recruiterTrustReviewQueueHref } from "@/lib/recruiter-trust-review-queue";
 
@@ -104,9 +106,10 @@ export default function RecruiterHubPage() {
             </div>
           </details>
         ) : null}
-        {!SHOW_RECRUITER_HUB_PRIMARY_PROMOS && SHOW_RECRUITER_HUB_NEXT_ACTION ? (
+        {!SHOW_RECRUITER_HUB_PRIMARY_PROMOS && SHOW_RECRUITER_HUB_NEXT_ACTION && !SHOW_RECRUITER_HUB_ACTIVATION_PANEL ? (
           <RecruiterHubNextAction />
         ) : null}
+        {SHOW_RECRUITER_HUB_ACTIVATION_PANEL ? <RecruiterActivationPanel /> : null}
         <div className="mt-6">
           <SystemOfRecordNavigationHub
             persona="recruiter"

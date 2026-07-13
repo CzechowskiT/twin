@@ -25,6 +25,7 @@ Restore **full product surface visibility** with honest activation statuses. Act
 - Referrals pilot hardening
 
 ### Wave C — Recruiter activation
+- **Slice 1 (shipped):** Recruiter workspace activation onboarding — see `docs/ALL_MODULES_GREEN_WAVE_C1_RECRUITER_ACTIVATION_2026-07-13.md` (PILOT until founder browser smoke)
 - Talent Pool, Talent Radar, Trust Review Queue
 - Daily Cockpit operational queue
 - Demo collaboration → production paths
@@ -184,3 +185,5 @@ Auto-apply (PAUSED / INTERNAL), delegated apply, Stripe checkout, ATS writeback,
 - test:all-workspace-modules-visible-guard
 - test:all-workspace-modules-activation-plan-guard
 - test:all-modules-green-wave-b1-career-compass-guard
+- test:all-modules-green-wave-c1-recruiter-activation-guard
+- test:candidate-green-modules-founder-smoke-guard

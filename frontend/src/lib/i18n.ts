@@ -247,6 +247,7 @@ export type TranslationKey =
   | `safeCommunication.${keyof typeof en.safeCommunication}`
   | `decisionMemory.${keyof typeof en.decisionMemory}`
   | `recruiterHub.${keyof typeof en.recruiterHub}`
+  | `recruiterActivation.${keyof typeof en.recruiterActivation}`
   | `companyHub.${keyof typeof en.companyHub}`
   | `sevenDayD5.${keyof typeof en.sevenDayD5}`
   | `sevenDayD6.${keyof typeof en.sevenDayD6}`
@@ -7494,6 +7495,30 @@ eyebrow: "Product roadmap",
     nextActionLead:
       "With promo cards tucked away, start where decisions happen — accept, decline, or reschedule matched candidates.",
     nextActionCta: "Open recruiter inbox",
+  },
+  recruiterActivation: {
+    eyebrow: "Workspace activation",
+    title: "Pilot onboarding progress",
+    lead:
+      "Track setup through your first inbox decision — activation completes when you accept or decline a matched candidate.",
+    pilotBadge: "PILOT · NEEDS FOUNDER SMOKE",
+    progressLabel: "{pct}% complete",
+    loading: "Loading activation state…",
+    loadError: "Could not load activation state",
+    retry: "Retry",
+    emptyTitle: "Connect your pilot workspace",
+    emptyLead: "Enter your recruiter token and company slug on the inbox page to start tracked activation.",
+    emptyCta: "Connect on inbox",
+    stepConnectWorkspace: "Connect workspace (token + company slug validated)",
+    stepLoadInboxQueue: "Load pre-qualified inbox queue (empty queue counts)",
+    stepFirstDecision: "First decision — accept or decline (activation event)",
+    nextConnectWorkspace: "Connect workspace on inbox",
+    nextLoadInboxQueue: "Load your inbox queue",
+    nextFirstDecision: "Review queue and make first decision",
+    nextActivationComplete: "Open pipeline — activation complete",
+    activationCompleteNote: "Activation complete — first decision recorded. Daily cockpit remains PILOT until founder smoke.",
+    pilotBoundary:
+      "No auto-outreach, ATS writeback, or calendar sync. Pilot metrics only — not public launch traction.",
   },
   recruiterDailyCockpit: {
     navLink: "Daily cockpit",
@@ -15530,6 +15555,31 @@ const pl: MessageTree = {
     nextActionLead:
       "Gdy promocje są schowane, zacznij tam, gdzie zapadają decyzje — akceptuj, odrzucaj lub przekładaj dopasowanych kandydatów.",
     nextActionCta: "Otwórz skrzynkę rekrutera",
+  },
+  recruiterActivation: {
+    eyebrow: "Aktywacja workspace",
+    title: "Postęp onboardingu pilota",
+    lead:
+      "Śledź setup do pierwszej decyzji w skrzynce — aktywacja kończy się po akceptacji lub odrzuceniu dopasowanego kandydata.",
+    pilotBadge: "PILOT · WYMAGA FOUNDER SMOKE",
+    progressLabel: "{pct}% ukończone",
+    loading: "Ładowanie stanu aktywacji…",
+    loadError: "Nie udało się wczytać stanu aktywacji",
+    retry: "Ponów",
+    emptyTitle: "Połącz pilot workspace",
+    emptyLead: "Wpisz token rekrutera i slug firmy na stronie skrzynki, aby rozpocząć śledzoną aktywację.",
+    emptyCta: "Połącz w skrzynce",
+    stepConnectWorkspace: "Połącz workspace (token + slug firmy zweryfikowane)",
+    stepLoadInboxQueue: "Wczytaj kolejkę inbox (pusta kolejka też liczy się jako PASS)",
+    stepFirstDecision: "Pierwsza decyzja — akceptuj lub odrzuć (zdarzenie aktywacji)",
+    nextConnectWorkspace: "Połącz workspace w skrzynce",
+    nextLoadInboxQueue: "Wczytaj kolejkę inbox",
+    nextFirstDecision: "Przejrzyj kolejkę i podejmij pierwszą decyzję",
+    nextActivationComplete: "Otwórz pipeline — aktywacja ukończona",
+    activationCompleteNote:
+      "Aktywacja ukończona — pierwsza decyzja zapisana. Kokpit dzienny pozostaje PILOT do founder smoke.",
+    pilotBoundary:
+      "Bez auto-outreach, writeback ATS ani sync kalendarza. Tylko metryki pilota — nie publiczna trakcja.",
   },
   recruiterDailyCockpit: {
     navLink: "Kokpit dzienny",
