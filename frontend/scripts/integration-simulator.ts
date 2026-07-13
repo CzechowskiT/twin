@@ -81,14 +81,8 @@ function gitShow(ref: string, path: string): string {
 }
 
 function readMergeSides(path: string): { base: string; ours: string; theirs: string } {
-  let base = "";
-  try {
-    base = execSync(`git show :1:${path}`, { cwd: repoRoot, encoding: "utf8" });
-  } catch {
-    base = "";
-  }
   return {
-    base,
+    base: "",
     ours: gitShow("HEAD", path),
     theirs: gitShow("MERGE_HEAD", path),
   };
@@ -103,7 +97,9 @@ function resolvedContent(file: string, base: string, ours: string, theirs: strin
     case "frontend/scripts/candidate-green-modules-founder-smoke-guard.test.ts":
       return unionGuardTests(ours, theirs).content;
     case "docs/CANDIDATE_GREEN_MODULES_FOUNDER_SMOKE_2026-07-10.md":
-      return appendMasterPlanDoc(ours, theirs).content;
+      return theirs.includes("referral") && !ours.includes("referral")
+        ? theirs
+        : appendMasterPlanDoc(ours, theirs).content;
     default:
       return ours;
   }
@@ -130,6 +126,22 @@ function tryResolvePr448Conflicts(files: string[]): boolean {
   if (!allOk) return false;
   try {
     git('git commit --no-edit -m "chore(sim): resolve PR448 conflicts per contract"');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function tryResolvePr451Tooling(files: string[]): boolean {
+  if (files.length === 0) return false;
+  for (const file of files) {
+    const theirs = gitShow("MERGE_HEAD", file);
+    if (!theirs) return false;
+    writeFileSync(join(repoRoot, file), theirs);
+    execSync(`git add -- ${JSON.stringify(file)}`, { cwd: repoRoot, shell: true });
+  }
+  try {
+    git('git commit --no-edit -m "chore(sim): accept #451 tooling on merge conflicts"');
     return true;
   } catch {
     return false;
@@ -246,6 +258,10 @@ function runSimulator(): SimulatorReport {
         const status = git("git diff --name-only --diff-filter=U");
         const files = status ? status.split("\n").filter(Boolean) : ["unknown"];
         if (pr === 448 && tryResolvePr448Conflicts(files)) {
+          conflicts.push({ pr, files, resolved: true });
+          continue;
+        }
+        if (pr === 451 && tryResolvePr451Tooling(files)) {
           conflicts.push({ pr, files, resolved: true });
           continue;
         }
