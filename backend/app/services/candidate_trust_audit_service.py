@@ -11,6 +11,7 @@ from app.database.models import CandidateTrustAuditEvent
 
 ALLOWED_EVENT_TYPES = frozenset(
     {
+        "account_deleted",
         "consent_granted",
         "consent_withdrawn",
         "privacy_request_created",

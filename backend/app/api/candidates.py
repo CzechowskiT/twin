@@ -48,6 +48,8 @@ from app.schemas.career_compass import (
     CareerCompassPutIn,
 )
 from app.schemas.candidate_trust import (
+    AccountDeleteIn,
+    AccountDeleteOut,
     ConsentGrantIn,
     ConsentListOut,
     ConsentPatchIn,
@@ -76,6 +78,7 @@ from app.services.candidate_privacy_request_service import (
     get_privacy_request,
     list_privacy_requests,
 )
+from app.services.candidate_account_deletion import execute_candidate_account_deletion
 from app.services.candidate_trust_audit_service import list_trust_audit_events
 from app.services.candidate_trust_center_service import build_trust_center
 from app.schemas.acceptance_queue import AcceptanceQueueOut, AcceptanceRespondIn
@@ -971,6 +974,31 @@ def cancel_privacy_request_endpoint(
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
     return PrivacyRequestOut.model_validate(data)
+
+
+@router.post("/me/delete-account", response_model=AccountDeleteOut)
+@limiter.limit("3/minute", key_func=user_or_ip_key)
+def delete_my_account(
+    request: Request,
+    body: AccountDeleteIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> AccountDeleteOut:
+    """Self-service account deletion — anonymizes PII and deactivates sign-in (R-019)."""
+    candidate = _get_candidate_or_404(db, user.id)
+    try:
+        data = execute_candidate_account_deletion(
+            db,
+            user=user,
+            candidate=candidate,
+            confirmation=body.confirmation,
+            idempotency_key=body.idempotency_key,
+        )
+    except ValueError as exc:
+        detail = str(exc)
+        code = status.HTTP_409_CONFLICT if "already deleted" in detail.lower() else status.HTTP_422_UNPROCESSABLE_ENTITY
+        raise HTTPException(status_code=code, detail=detail) from exc
+    return AccountDeleteOut.model_validate(data)
 
 
 @router.get("/me/trust/audit-events", response_model=TrustAuditEventListOut)

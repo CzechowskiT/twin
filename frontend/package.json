@@ -135,6 +135,7 @@
     "test:public-route-reference-guard": "npx --yes tsx scripts/public-route-reference-guard.test.ts",
     "test:launch-readiness-evidence-guard": "npx --yes tsx scripts/launch-readiness-evidence-guard.test.ts",
     "test:public-launch-readiness-guard": "npx --yes tsx scripts/public-launch-readiness-guard.test.ts",
+    "test:candidate-account-delete-guard": "npx --yes tsx scripts/candidate-account-delete-guard.test.ts",
     "test:public-health-route-stability": "npx --yes tsx scripts/public-health-route-stability.test.ts",
     "test:public-health-prod-latency": "npx --yes tsx scripts/public-health-prod-latency-regression.test.ts",
     "test:release-train-negative-scenarios": "npx --yes tsx scripts/release-train-negative-scenarios.test.ts",
