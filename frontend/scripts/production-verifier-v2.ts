@@ -32,7 +32,7 @@ export function runProductionVerifierV2(opts?: {
   probePublicHealth?: boolean;
 }): ProdVerifierCheck[] {
   const checks: ProdVerifierCheck[] = [];
-  const base = runPostMergeVerifier({ expect073: !opts?.expect077 });
+  const base = runPostMergeVerifier({ expect077: opts?.expect077 });
   for (const c of base) {
     checks.push({ ...c, severity: c.ok ? "P2" : "P0" });
   }

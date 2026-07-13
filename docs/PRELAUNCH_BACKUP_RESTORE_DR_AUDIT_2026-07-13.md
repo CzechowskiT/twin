@@ -20,11 +20,11 @@
 
 ```
 GET https://twin-sooty.vercel.app/api/public-health
-git_commit: c2a08b025ca950b341540f0bc80f710825c778ce
+git_commit: ae14bfb58fc0c2db56a6fa0f417ca41c534b7960
 db_ok: true
 ```
 
-**Note:** Prod API at scaffold head `070`; release train target head `077` not yet deployed.
+**Note:** Post-merge alignment batch 2026-07-13 — API+FE aligned @ `ae14bfb5`; Alembic upgraded to head `077` on deploy (logs: deployment `ead5b0a0`).
 
 ---
 

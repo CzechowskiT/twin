@@ -21,7 +21,7 @@ const VERSIONS = join(repoRoot, "backend/alembic/versions");
 
 export type VerifierCheck = { name: string; ok: boolean; detail: string };
 
-export function runPostMergeVerifier(opts?: { expect073: boolean }): VerifierCheck[] {
+export function runPostMergeVerifier(opts?: { expect073?: boolean; expect077?: boolean }): VerifierCheck[] {
   const checks: VerifierCheck[] = [];
   const migrations = readdirSync(VERSIONS)
     .filter((f) => f.endsWith(".py") && !f.startsWith("__"))
@@ -44,7 +44,29 @@ export function runPostMergeVerifier(opts?: { expect073: boolean }): VerifierChe
   });
 
   const has073 = migrations.some((m) => m.revision === "073_candidate_referrals");
-  if (opts?.expect073 ?? false) {
+  if (opts?.expect077) {
+    const full077 = [
+      ...wave,
+      "073_candidate_referrals",
+      "074_recruiter_notification_preferences_c3",
+      "075_recruiter_saved_views_c4",
+      "076_recruiter_activity_timeline_c5",
+      "077_candidate_activity_timeline",
+    ];
+    const fullSubset = migrations.filter((m) => full077.includes(m.revision));
+    const fullSeg = validateChainSegment(fullSubset, full077);
+    checks.push({
+      name: "full_chain_includes_077",
+      ok: fullSeg.ok && full077.every((r) => fullSubset.some((m) => m.revision === r)),
+      detail: fullSeg.ok ? full077.join(" → ") : (fullSeg as { reason: string }).reason,
+    });
+    const heads = findHeads(migrations);
+    checks.push({
+      name: "single_head_077",
+      ok: heads.length === 1 && heads[0] === "077_candidate_activity_timeline",
+      detail: heads.join(", "),
+    });
+  } else if (opts?.expect073 ?? false) {
     const full = [...wave, "073_candidate_referrals"];
     const fullSubset = migrations.filter((m) => full.includes(m.revision));
     const fullSeg = validateChainSegment(fullSubset, full);
