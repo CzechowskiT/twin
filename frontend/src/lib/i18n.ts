@@ -250,6 +250,7 @@ export type TranslationKey =
   | `recruiterActivation.${keyof typeof en.recruiterActivation}`
   | `recruiterNotificationPrefs.${keyof typeof en.recruiterNotificationPrefs}`
   | `recruiterActivityTimeline.${keyof typeof en.recruiterActivityTimeline}`
+  | `candidateActivityTimeline.${keyof typeof en.candidateActivityTimeline}`
   | `companyHub.${keyof typeof en.companyHub}`
   | `sevenDayD5.${keyof typeof en.sevenDayD5}`
   | `sevenDayD6.${keyof typeof en.sevenDayD6}`
@@ -5303,6 +5304,13 @@ eyebrow: "Product roadmap",
     notFoundCta: "Back to workspace",
     demoJourneyTitle: "Trust & consent (sample)",
     demoJourneyDesc: "Consent status, data source, contact permission, history timeline, retention, and risk flags.",
+  },
+  candidateActivityTimeline: {
+    title: "Trust activity timeline",
+    lead: "Read-only view of trust-related audit events on your account — no edits or exports from this screen.",
+    loadError: "Could not load trust activity timeline",
+    listAria: "Trust audit events",
+    empty: "No trust audit events yet.",
   },
   candidateTrustCenter: {
     pageEyebrow: "Trust & transparency",
@@ -13412,6 +13420,13 @@ const pl: MessageTree = {
     notFoundCta: "Wróć do przestrzeni roboczej",
     demoJourneyTitle: "Zaufanie i zgoda (przykład)",
     demoJourneyDesc: "Status zgody, źródło danych, pozwolenie na kontakt, oś czasu, retencja i flagi ryzyka.",
+  },
+  candidateActivityTimeline: {
+    title: "Oś czasu aktywności zaufania",
+    lead: "Read-only widok zdarzeń audytu zaufania na Twoim koncie — bez edycji ani eksportu z tego ekranu.",
+    loadError: "Nie udało się wczytać osi czasu zaufania",
+    listAria: "Zdarzenia audytu zaufania",
+    empty: "Brak zdarzeń audytu zaufania.",
   },
   candidateTrustCenter: {
     pageEyebrow: "Zaufanie i przejrzystość",
