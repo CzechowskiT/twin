@@ -15,7 +15,7 @@ When merging #448 after #449→#450 on temp branch `tmp/integration-pr448-449-45
 | 1 | `frontend/package.json` | **Union** `scripts` test entries — keep both C2 and B3 `test:*` keys; sort keys alphabetically |
 | 2 | `frontend/src/lib/all-workspace-modules-activation.ts` | **Merge by `id`** — union `WORKSPACE_MODULE_ACTIVATION` entries; preserve C2 recruiter modules + B3 `candidate_referrals` |
 | 3 | `frontend/scripts/candidate-green-modules-founder-smoke-guard.test.ts` | **Union** — keep C2 smoke assertions + B3 referrals assertions (both `test()` blocks) |
-| 4 | `docs/ALL_WORKSPACE_MODULES_ACTIVATION_MASTER_PLAN_2026-07-10.md` | **Append** — retain C2 Wave C slice 2 section; append B3 referrals slice if absent |
+| 4 | `docs/CANDIDATE_GREEN_MODULES_FOUNDER_SMOKE_2026-07-10.md` | **Append** — retain C2 smoke sections + B3 referrals smoke steps |
 
 **Not auto-resolved (manual review if present):** `frontend/src/lib/i18n.ts`, `backend/app/database/models.py` — usually clean merge; if conflict, abort sim and file issue.
 

@@ -102,7 +102,7 @@ function resolvedContent(file: string, base: string, ours: string, theirs: strin
       return mergeActivationById(ours, theirs).content;
     case "frontend/scripts/candidate-green-modules-founder-smoke-guard.test.ts":
       return unionGuardTests(ours, theirs).content;
-    case "docs/ALL_WORKSPACE_MODULES_ACTIVATION_MASTER_PLAN_2026-07-10.md":
+    case "docs/CANDIDATE_GREEN_MODULES_FOUNDER_SMOKE_2026-07-10.md":
       return appendMasterPlanDoc(ours, theirs).content;
     default:
       return ours;

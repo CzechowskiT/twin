@@ -7,7 +7,7 @@ export const PR448_CONFLICT_FILES = [
   "frontend/package.json",
   "frontend/src/lib/all-workspace-modules-activation.ts",
   "frontend/scripts/candidate-green-modules-founder-smoke-guard.test.ts",
-  "docs/ALL_WORKSPACE_MODULES_ACTIVATION_MASTER_PLAN_2026-07-10.md",
+  "docs/CANDIDATE_GREEN_MODULES_FOUNDER_SMOKE_2026-07-10.md",
 ] as const;
 
 export type ConflictResolution = {
@@ -145,7 +145,7 @@ export function resolvePr448File(
       const r = unionGuardTests(ours, theirs);
       return { file, strategy: "union_test_blocks", ok: r.ok, detail: r.detail };
     }
-    case "docs/ALL_WORKSPACE_MODULES_ACTIVATION_MASTER_PLAN_2026-07-10.md": {
+    case "docs/CANDIDATE_GREEN_MODULES_FOUNDER_SMOKE_2026-07-10.md": {
       const r = appendMasterPlanDoc(ours, theirs);
       return { file, strategy: "append_doc", ok: r.ok, detail: r.detail };
     }
