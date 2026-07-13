@@ -1,0 +1,48 @@
+{
+  "generatedUtc": "2026-07-13T19:21:09.768Z",
+  "repoHead": "643e6c604971d73954f8ec7cb4a893f205a865d7",
+  "previews": [
+    {
+      "label": "preview-449",
+      "baseUrl": "https://twin-git-feat-all-modules-green-wave-c1-recruiter-a-26266f-twin.vercel.app",
+      "results": [
+        {
+          "label": "preview-449",
+          "url": "https://twin-git-feat-all-modules-green-wave-c1-recruiter-a-26266f-twin.vercel.app/api/public-health",
+          "status": 200,
+          "ok": true,
+          "finalUrl": "https://twin-git-feat-all-modules-green-wave-c1-recruiter-a-26266f-twin.vercel.app/api/public-health"
+        },
+        {
+          "label": "preview-449",
+          "url": "https://twin-git-feat-all-modules-green-wave-c1-recruiter-a-26266f-twin.vercel.app/",
+          "status": 200,
+          "ok": true,
+          "finalUrl": "https://twin-git-feat-all-modules-green-wave-c1-recruiter-a-26266f-twin.vercel.app/"
+        }
+      ]
+    },
+    {
+      "label": "preview-450",
+      "baseUrl": "https://twin-git-feat-all-modules-green-wave-c2-talent-pool-0350d9-twin.vercel.app",
+      "results": [
+        {
+          "label": "preview-450",
+          "url": "https://twin-git-feat-all-modules-green-wave-c2-talent-pool-0350d9-twin.vercel.app/api/public-health",
+          "status": 200,
+          "ok": true,
+          "finalUrl": "https://twin-git-feat-all-modules-green-wave-c2-talent-pool-0350d9-twin.vercel.app/api/public-health"
+        },
+        {
+          "label": "preview-450",
+          "url": "https://twin-git-feat-all-modules-green-wave-c2-talent-pool-0350d9-twin.vercel.app/",
+          "status": 200,
+          "ok": true,
+          "finalUrl": "https://twin-git-feat-all-modules-green-wave-c2-talent-pool-0350d9-twin.vercel.app/"
+        }
+      ]
+    }
+  ],
+  "overall": "PASS",
+  "stopRule": "Stop at first real FAIL"
+}

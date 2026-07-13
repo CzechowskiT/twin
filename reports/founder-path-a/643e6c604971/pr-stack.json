@@ -1,0 +1,38 @@
+{
+  "generated_utc": "2026-07-13T19:25:30Z",
+  "repo_head": "643e6c604971d73954f8ec7cb4a893f205a865d7",
+  "source": "reports/founder-path-a/wave-c-preview-reachability-2026-07-13T19-09-25Z.json",
+  "prs": [
+    {
+      "number": 449,
+      "head_sha": "905a660c7d627b389dedc6a41a6346997b0398b3",
+      "preview_url": "https://twin-git-feat-all-modules-green-wave-c1-recruiter-a-26266f-twin.vercel.app"
+    },
+    {
+      "number": 450,
+      "head_sha": "cda7a2060faab5597274b1bb9751c5ecdfeeb79a",
+      "preview_url": "https://twin-git-feat-all-modules-green-wave-c2-talent-pool-0350d9-twin.vercel.app"
+    },
+    {
+      "number": 452,
+      "head_sha": "753ecf7066bd141a580e577f841787ab914bf6d1",
+      "preview_url": "https://twin-git-feat-all-modules-green-wave-c3-notification-prefs-twin.vercel.app"
+    },
+    {
+      "number": 453,
+      "head_sha": "934a48a726fc701250420240cc7ab5c573e20da6",
+      "preview_url": "https://twin-git-feat-all-modules-green-wave-c4-saved-views-twin.vercel.app"
+    },
+    {
+      "number": 454,
+      "head_sha": "26f9da96213564277aef631e687573326772b22c",
+      "preview_url": "https://twin-git-feat-all-modules-green-wave-c5-activity-timeline-twin.vercel.app"
+    },
+    {
+      "number": 455,
+      "head_sha": "e36df2cb5fbb74dce7662e11643476d55777aeae",
+      "preview_url": "https://twin-git-feat-all-modules-green-wave-candidate-acti-0d2b02-twin.vercel.app"
+    }
+  ]
+}
+
