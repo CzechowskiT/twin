@@ -3,8 +3,9 @@
  * Real demo video + visual regression capture — Playwright frames → ffmpeg MP4/WebM.
  * Usage: PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 PLAYWRIGHT_ENABLE_WEBSERVER=1 npx tsx scripts/demo-capture-pipeline.ts
  */
+import { createHash } from "node:crypto";
 import { execSync, spawnSync } from "node:child_process";
-import { mkdirSync, writeFileSync, existsSync, readdirSync, statSync } from "node:fs";
+import { mkdirSync, writeFileSync, existsSync, readdirSync, statSync, readFileSync, copyFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -28,13 +29,92 @@ const previewUrl =
 
 type Locale = "en" | "pl";
 type Target = "homepage" | "full";
+type Tier = "short" | "full";
 
-const CAPTURES: { target: Target; locale: Locale; sequenceId: DemoSequenceId; path: string }[] = [
-  { target: "homepage", locale: "en", sequenceId: "video-export-homepage", path: "/" },
-  { target: "homepage", locale: "pl", sequenceId: "video-export-homepage", path: "/?lang=pl" },
-  { target: "full", locale: "en", sequenceId: "video-export-full", path: "/demo" },
-  { target: "full", locale: "pl", sequenceId: "video-export-full", path: "/demo?lang=pl" },
+type CaptureSpec = {
+  target: Target;
+  locale: Locale;
+  tier: Tier;
+  sequenceId: DemoSequenceId;
+  path: string;
+  fps: number;
+};
+
+const CAPTURES: CaptureSpec[] = [
+  {
+    target: "homepage",
+    locale: "en",
+    tier: "short",
+    sequenceId: "video-export-homepage",
+    path: "/",
+    fps: 2,
+  },
+  {
+    target: "homepage",
+    locale: "pl",
+    tier: "short",
+    sequenceId: "video-export-homepage",
+    path: "/?lang=pl",
+    fps: 2,
+  },
+  {
+    target: "full",
+    locale: "en",
+    tier: "short",
+    sequenceId: "video-export-full",
+    path: "/demo",
+    fps: 2,
+  },
+  {
+    target: "full",
+    locale: "pl",
+    tier: "short",
+    sequenceId: "video-export-full",
+    path: "/demo?lang=pl",
+    fps: 2,
+  },
+  {
+    target: "homepage",
+    locale: "en",
+    tier: "full",
+    sequenceId: "candidate-homepage-story",
+    path: "/",
+    fps: 1,
+  },
+  {
+    target: "homepage",
+    locale: "pl",
+    tier: "full",
+    sequenceId: "candidate-homepage-story",
+    path: "/?lang=pl",
+    fps: 1,
+  },
+  {
+    target: "full",
+    locale: "en",
+    tier: "full",
+    sequenceId: "full-product-story",
+    path: "/demo",
+    fps: 1,
+  },
+  {
+    target: "full",
+    locale: "pl",
+    tier: "full",
+    sequenceId: "full-product-story",
+    path: "/demo?lang=pl",
+    fps: 1,
+  },
 ];
+
+function outputBasename(target: Target, tier: Tier, locale: Locale): string {
+  const prefix = target === "homepage" ? "twin-homepage-candidate" : "twin-demo";
+  return `${prefix}-${tier}-${locale}-16x9`;
+}
+
+function legacyBasename(target: Target, locale: Locale): string {
+  return `twin-demo-${target}-${locale}`;
+}
 
 function ensureDir(p: string): void {
   mkdirSync(p, { recursive: true });
@@ -67,6 +147,7 @@ async function captureSceneFrames(
   sequenceId: DemoSequenceId,
   outDir: string,
   selector: string,
+  tier: Tier,
 ): Promise<number> {
   ensureDir(outDir);
   const scenes = resolveSequenceScenes(sequenceId);
@@ -77,17 +158,33 @@ async function captureSceneFrames(
       await sceneEl.screenshot({ path: join(outDir, `frame-${String(frameIdx).padStart(4, "0")}.png`) });
       frameIdx += 1;
     }
-    const mid = Math.max(1, Math.floor(scene.durationMs / 2000));
-    for (let i = 0; i < mid; i++) {
-      await page.waitForTimeout(500);
-      const el = page.locator(selector).first();
-      if (await el.isVisible().catch(() => false)) {
-        await el.screenshot({ path: join(outDir, `frame-${String(frameIdx).padStart(4, "0")}.png`) });
-        frameIdx += 1;
+    if (tier === "full") {
+      const seconds = Math.max(1, Math.ceil(scene.durationMs / 1000));
+      for (let i = 0; i < seconds; i++) {
+        await page.waitForTimeout(1000);
+        const el = page.locator(selector).first();
+        if (await el.isVisible().catch(() => false)) {
+          await el.screenshot({ path: join(outDir, `frame-${String(frameIdx).padStart(4, "0")}.png`) });
+          frameIdx += 1;
+        }
+      }
+    } else {
+      const mid = Math.max(1, Math.floor(scene.durationMs / 2000));
+      for (let i = 0; i < mid; i++) {
+        await page.waitForTimeout(500);
+        const el = page.locator(selector).first();
+        if (await el.isVisible().catch(() => false)) {
+          await el.screenshot({ path: join(outDir, `frame-${String(frameIdx).padStart(4, "0")}.png`) });
+          frameIdx += 1;
+        }
       }
     }
   }
   return frameIdx;
+}
+
+function sha256File(path: string): string {
+  return createHash("sha256").update(readFileSync(path)).digest("hex");
 }
 
 function stitchVideo(framesDir: string, outMp4: string, outWebm: string, fps: number): void {
@@ -183,12 +280,13 @@ async function main(): Promise<void> {
 
     for (const cap of CAPTURES) {
       const cfg = buildVideoRenderConfig(cap.target);
-      const slug = `${cap.target}-${cap.locale}`;
+      const slug = `${cap.target}-${cap.tier}-${cap.locale}`;
+      const basename = outputBasename(cap.target, cap.tier, cap.locale);
       const framesDir = join(videoDir, `frames-${slug}`);
-      const mp4 = join(videoDir, `twin-demo-${slug}.mp4`);
-      const webm = join(videoDir, `twin-demo-${slug}.webm`);
-      const poster = join(videoDir, `twin-demo-${slug}-poster.jpg`);
-      const vtt = join(videoDir, `twin-demo-${slug}.vtt`);
+      const mp4 = join(videoDir, `${basename}.mp4`);
+      const webm = join(videoDir, `${basename}.webm`);
+      const poster = join(videoDir, `${basename}-poster.jpg`);
+      const vtt = join(videoDir, `${basename}.vtt`);
 
       await page.setViewportSize({ width: cfg.width, height: cfg.height });
       await page.goto(`${baseUrl}${cap.path}`, { waitUntil: "networkidle" });
@@ -200,37 +298,66 @@ async function main(): Promise<void> {
         await page.waitForSelector('[data-testid="homepage-candidate-story"]', { timeout: 15_000 });
         const playBtn = page.getByRole("button", { name: /play|odtwórz/i }).first();
         if (await playBtn.isVisible().catch(() => false)) await playBtn.click();
-        await captureSceneFrames(page, cap.sequenceId, framesDir, '[data-testid="homepage-candidate-story"]');
+        await captureSceneFrames(
+          page,
+          cap.sequenceId,
+          framesDir,
+          '[data-testid="homepage-candidate-story"]',
+          cap.tier,
+        );
       } else {
         await page.waitForSelector("[data-demo-controls]", { timeout: 15_000 });
         const playBtn = page.getByRole("button", { name: /play|odtwórz/i }).first();
         if (await playBtn.isVisible().catch(() => false)) await playBtn.click();
-        await captureSceneFrames(page, cap.sequenceId, framesDir, "[data-demo-scene]");
+        await captureSceneFrames(page, cap.sequenceId, framesDir, "[data-demo-scene]", cap.tier);
       }
 
-      stitchVideo(framesDir, mp4, webm, 2);
+      stitchVideo(framesDir, mp4, webm, cap.fps);
       extractPoster(mp4, poster);
       writeVtt(cap.sequenceId, cap.locale, vtt);
 
       const probe = ffprobeJson(mp4);
+      const checksums = {
+        mp4: sha256File(mp4),
+        webm: sha256File(webm),
+        poster: sha256File(poster),
+      };
       const meta = {
         sha,
         previewUrl,
         timestamp: ts,
         target: cap.target,
+        tier: cap.tier,
         locale: cap.locale,
         sequenceId: cap.sequenceId,
         durationMs: sequenceDurationMs(cap.sequenceId),
         width: cfg.width,
         height: cfg.height,
+        fps: cap.fps,
         files: { mp4, webm, poster, vtt, framesDir },
+        checksums,
         ffprobe: probe,
         status: existsSync(mp4) && statSync(mp4).size > 0 ? "RENDERED" : "FAILED",
       };
       writeFileSync(join(videoDir, `metadata-${slug}.json`), JSON.stringify(meta, null, 2));
       artifacts.push(meta);
       console.log(`✓ ${slug}: ${meta.status} (${statSync(mp4).size} bytes)`);
+
+      if (cap.tier === "short") {
+        const legacy = legacyBasename(cap.target, cap.locale);
+        copyFileSync(mp4, join(videoDir, `${legacy}.mp4`));
+        copyFileSync(webm, join(videoDir, `${legacy}.webm`));
+        copyFileSync(poster, join(videoDir, `${legacy}-poster.jpg`));
+        copyFileSync(vtt, join(videoDir, `${legacy}.vtt`));
+        writeFileSync(join(videoDir, `metadata-${cap.target}-${cap.locale}.json`), JSON.stringify(meta, null, 2));
+      }
     }
+
+    const checksumManifest = artifacts.map((a) => {
+      const m = a as { tier: string; target: string; locale: string; checksums: Record<string, string> };
+      return { key: `${m.target}-${m.tier}-${m.locale}`, ...m.checksums };
+    });
+    writeFileSync(join(videoDir, `checksums-${sha}-${ts}.json`), JSON.stringify(checksumManifest, null, 2));
 
     const manifest = { sha, previewUrl, timestamp: ts, artifacts };
     writeFileSync(join(videoDir, `manifest-${sha}-${ts}.json`), JSON.stringify(manifest, null, 2));
