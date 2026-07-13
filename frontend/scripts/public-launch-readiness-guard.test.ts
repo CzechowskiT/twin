@@ -14,6 +14,7 @@ const REQUIRED_DOCS = [
   "docs/PUBLIC_LAUNCH_READINESS_MATRIX_2026-07-13.md",
   "docs/PUBLIC_LAUNCH_BLOCKER_REGISTER_2026-07-13.md",
   "docs/PUBLIC_LAUNCH_READINESS_INDEX_2026-07-13.md",
+  "docs/PUBLIC_LAUNCH_9_OF_10_SCORECARD.md",
   "docs/PRELAUNCH_SECURITY_AUDIT_2026-07-13.md",
   "docs/PRELAUNCH_PRIVACY_COMPLIANCE_AUDIT_2026-07-13.md",
   "docs/PRELAUNCH_BACKUP_RESTORE_DR_AUDIT_2026-07-13.md",
@@ -39,7 +40,7 @@ test("2 readiness index links inventory matrix blockers and playbooks", () => {
   assert.match(index, /PUBLIC_LAUNCH_READINESS_MATRIX_2026-07-13/);
   assert.match(index, /PUBLIC_LAUNCH_BLOCKER_REGISTER_2026-07-13/);
   assert.match(index, /FINAL_RELEASE_TRAIN_REBASE_PLAYBOOK_448_460_2026-07-13/);
-  assert.match(index, /NO-GO/);
+  assert.match(index, /PUBLIC_LAUNCH_9_OF_10_SCORECARD/);
 });
 
 test("3 blocker register documents LB-001 Gate F and LB-002 credentials", () => {

@@ -1,8 +1,10 @@
 #!/usr/bin/env npx tsx
 /**
  * Controlled merge orchestrator — dry-run only. --execute is always blocked.
+ * Use --extended for full train #449→#455.
  */
 import { execSync } from "node:child_process";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -10,13 +12,20 @@ import { fileURLToPath } from "node:url";
 import {
   assertExecuteBlocked,
   buildMergePlan,
+  EXTENDED_MERGE_ORDER,
   formatMergePlan,
+  MERGE_ORDER,
   type PrState,
 } from "./lib/merge-orchestrator-core";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
-function ghPrJson(num: number): { headRefOid: string; state: string; mergeable: string; headRefName: string } {
+function ghPrJson(num: number): {
+  headRefOid: string;
+  state: string;
+  mergeable: string;
+  headRefName: string;
+} {
   const raw = execSync(`gh pr view ${num} --json headRefOid,state,mergeable,headRefName`, {
     cwd: repoRoot,
     encoding: "utf8",
@@ -38,8 +47,7 @@ function smokePassForPr(num: number): boolean {
   }
 }
 
-function loadPrStates(): PrState[] {
-  const nums = [449, 450, 448];
+function loadPrStates(nums: number[]): PrState[] {
   return nums.map((num) => {
     const pr = ghPrJson(num);
     let checks: { conclusion: string }[] = [];
@@ -69,22 +77,36 @@ function loadPrStates(): PrState[] {
 
 function main(): void {
   const execute = process.argv.includes("--execute");
+  const extended = process.argv.includes("--extended");
   const executeBlock = assertExecuteBlocked(execute);
   if (executeBlock.length > 0) {
     console.error(executeBlock.map((i) => i.message).join("\n"));
     process.exit(4);
   }
 
+  const order = extended ? [...EXTENDED_MERGE_ORDER] : [...MERGE_ORDER];
   let prs: PrState[];
   try {
-    prs = loadPrStates();
+    prs = loadPrStates(order);
   } catch (err) {
     console.error(`Cannot load PR states (gh required): ${err}`);
     process.exit(3);
   }
 
-  const plan = buildMergePlan(prs, { scaffoldAligned: true });
-  console.log(formatMergePlan(plan));
+  const plan = buildMergePlan(prs, { scaffoldAligned: true, extended });
+  const label = order.map((n) => `#${n}`).join("→");
+  const output = formatMergePlan(plan, label);
+  console.log(output);
+
+  const outDir = join(repoRoot, "reports", "merge-plan");
+  mkdirSync(outDir, { recursive: true });
+  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+  writeFileSync(join(outDir, `merge-plan-${stamp}.md`), output);
+  writeFileSync(
+    join(outDir, `merge-plan-${stamp}.json`),
+    JSON.stringify({ generatedUtc: new Date().toISOString(), extended, plan, prs }, null, 2),
+  );
+
   process.exit(plan.blocked ? 1 : 0);
 }
 

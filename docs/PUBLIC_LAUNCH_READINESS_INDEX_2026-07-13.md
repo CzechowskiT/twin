@@ -9,10 +9,11 @@
 | Field | Value |
 |-------|-------|
 | **Path** | B+++ (credentials UNSET) |
-| **repo_head** | `b00f027c` → post-batch push pending |
+| **repo_head** | `cb13d067` (post-batch push pending) |
 | **prod_api_commit** | `c2a08b025ca950b341540f0bc80f710825c778ce` (public-health) |
 | **prod_frontend** | `https://twin-sooty.vercel.app` |
 | **alignment_status** | **DRIFT** — train branches ahead of prod (070 vs 077 target) |
+| **Scorecard** | [PUBLIC_LAUNCH_9_OF_10_SCORECARD.md](./PUBLIC_LAUNCH_9_OF_10_SCORECARD.md) — **NO-GO** (A7 B2 C6 D5) |
 | **P0** | CLOSED |
 | **Gate E** | PASS |
 | **Gate F** | PENDING |
@@ -24,6 +25,7 @@
 
 | Doc | Purpose |
 |-----|---------|
+| **[PUBLIC_LAUNCH_9_OF_10_SCORECARD.md](./PUBLIC_LAUNCH_9_OF_10_SCORECARD.md)** | **Canonical GO/NO-GO scorecard (40 criteria)** |
 | [PUBLIC_LAUNCH_FUNCTIONALITY_INVENTORY_2026-07-13.md](./PUBLIC_LAUNCH_FUNCTIONALITY_INVENTORY_2026-07-13.md) | Route/module inventory with status |
 | [PUBLIC_LAUNCH_READINESS_MATRIX_2026-07-13.md](./PUBLIC_LAUNCH_READINESS_MATRIX_2026-07-13.md) | Gate matrix A–H |
 | [PUBLIC_LAUNCH_BLOCKER_REGISTER_2026-07-13.md](./PUBLIC_LAUNCH_BLOCKER_REGISTER_2026-07-13.md) | Open blockers + waivers |
@@ -52,6 +54,9 @@
 ```bash
 cd frontend
 npm run test:public-launch-readiness-guard
+npm run probe:prod-public
+npm run preflight:founder-smoke-orchestration
+npm run plan:merge-train-extended
 npm run test:integration-tooling-guards
 npm run test:public-route-reference-guard
 npm run test:founder-launch-scope-decision-guard

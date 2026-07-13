@@ -22,7 +22,8 @@
 |----|---------|----------|--------|-------------|
 | LB-101 | PR #452 mergeable | P1 | **CLOSED** | Rebased to `6aa193c4` — MERGEABLE CLEAN |
 | LB-102 | #451 remote CI frontend-build | P1 | **CLOSED** | `release-train-v4-scenarios.ts` fix on branch |
-| LB-103 | PR #453 mergeable CONFLICTING | P1 | **OPEN** | Rebase `feat/all-modules-green-wave-c4-saved-views` onto #452 HEAD |
+| LB-103 | PR #453 mergeable | P1 | **CLOSED** | Rebased to `61e472cf` — MERGEABLE |
+| LB-103b | PR #454 CONFLICTING | P1 | **OPEN** | Rebase C5 onto #453 HEAD (`61e472cf`) |
 | LB-103 | Prod Alembic head behind train (070 vs 077) | P1 | **EXPECTED** | Execute release train merges + Railway migrate |
 | LB-104 | No founder smoke PASS docs for C1–C5 | P1 | **OPEN** | Browser smoke per wave runbooks |
 

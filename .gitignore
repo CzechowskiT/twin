@@ -44,6 +44,9 @@ backend/celerybeat-schedule*
 
 # Integration sim reports (generated locally)
 reports/integration-sim/
+reports/prod-probes/
+reports/founder-smoke/
+reports/merge-plan/
 
 # Alembic (keep versions tracked)
 # migrations are committed
