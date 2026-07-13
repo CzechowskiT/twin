@@ -12,32 +12,45 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    op.add_column(
-        "recruiter_talent_pool_records",
-        sa.Column("source_type", sa.String(length=32), nullable=False, server_default="csv_import"),
-    )
-    op.add_column(
-        "recruiter_talent_pool_records",
-        sa.Column("snapshot_json", sa.Text(), nullable=True),
-    )
-    op.add_column(
-        "recruiter_talent_pool_records",
-        sa.Column("archived_at", sa.DateTime(), nullable=True),
-    )
-    op.add_column(
-        "recruiter_talent_pool_records",
-        sa.Column("consent_visibility", sa.String(length=32), nullable=False, server_default="unknown"),
-    )
-    op.create_index(
-        "ix_recruiter_talent_pool_records_archived_at",
-        "recruiter_talent_pool_records",
-        ["archived_at"],
-    )
-    op.create_index(
-        "ix_recruiter_talent_pool_records_source_type",
-        "recruiter_talent_pool_records",
-        ["source_type"],
-    )
+    bind = op.get_bind()
+    insp = sa.inspect(bind)
+    pool_cols = {c["name"] for c in insp.get_columns("recruiter_talent_pool_records")}
+    if "source_type" not in pool_cols:
+        op.add_column(
+            "recruiter_talent_pool_records",
+            sa.Column("source_type", sa.String(length=32), nullable=False, server_default="csv_import"),
+        )
+    if "snapshot_json" not in pool_cols:
+        op.add_column(
+            "recruiter_talent_pool_records",
+            sa.Column("snapshot_json", sa.Text(), nullable=True),
+        )
+    if "archived_at" not in pool_cols:
+        op.add_column(
+            "recruiter_talent_pool_records",
+            sa.Column("archived_at", sa.DateTime(), nullable=True),
+        )
+    if "consent_visibility" not in pool_cols:
+        op.add_column(
+            "recruiter_talent_pool_records",
+            sa.Column("consent_visibility", sa.String(length=32), nullable=False, server_default="unknown"),
+        )
+    pool_indexes = {idx["name"] for idx in insp.get_indexes("recruiter_talent_pool_records")}
+    if "ix_recruiter_talent_pool_records_archived_at" not in pool_indexes:
+        op.create_index(
+            "ix_recruiter_talent_pool_records_archived_at",
+            "recruiter_talent_pool_records",
+            ["archived_at"],
+        )
+    if "ix_recruiter_talent_pool_records_source_type" not in pool_indexes:
+        op.create_index(
+            "ix_recruiter_talent_pool_records_source_type",
+            "recruiter_talent_pool_records",
+            ["source_type"],
+        )
+
+    if bind.dialect.has_table(bind, "recruiter_trust_review_items"):
+        return
 
     op.create_table(
         "recruiter_trust_review_items",

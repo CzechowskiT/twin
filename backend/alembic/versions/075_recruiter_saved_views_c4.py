@@ -14,6 +14,9 @@ SURFACES = ("inbox", "talent_pool", "trust_review")
 
 
 def upgrade() -> None:
+    bind = op.get_bind()
+    if bind.dialect.has_table(bind, "recruiter_saved_views"):
+        return
     op.create_table(
         "recruiter_saved_views",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
