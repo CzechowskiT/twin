@@ -1,0 +1,101 @@
+{
+  "sha": "01f6545b",
+  "previewUrl": "https://twin-git-feat-interactive-demo-homepage-candidate-twin.vercel.app",
+  "timestamp": "2026-07-13T11-56-48-213Z",
+  "target": "full",
+  "locale": "en",
+  "sequenceId": "video-export-full",
+  "durationMs": 76000,
+  "width": 1440,
+  "height": 900,
+  "files": {
+    "mp4": "/Users/tomek/Projects/twin/reports/demo-video/twin-demo-full-en.mp4",
+    "webm": "/Users/tomek/Projects/twin/reports/demo-video/twin-demo-full-en.webm",
+    "poster": "/Users/tomek/Projects/twin/reports/demo-video/twin-demo-full-en-poster.jpg",
+    "vtt": "/Users/tomek/Projects/twin/reports/demo-video/twin-demo-full-en.vtt",
+    "framesDir": "/Users/tomek/Projects/twin/reports/demo-video/frames-full-en"
+  },
+  "ffprobe": {
+    "streams": [
+      {
+        "index": 0,
+        "codec_name": "h264",
+        "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+        "profile": "High",
+        "codec_type": "video",
+        "codec_tag_string": "avc1",
+        "codec_tag": "0x31637661",
+        "mime_codec_string": "avc1.640015",
+        "width": 796,
+        "height": 240,
+        "coded_width": 796,
+        "coded_height": 240,
+        "has_b_frames": 2,
+        "pix_fmt": "yuv420p",
+        "level": 21,
+        "chroma_location": "left",
+        "field_order": "progressive",
+        "is_avc": "true",
+        "nal_length_size": "4",
+        "id": "0x1",
+        "r_frame_rate": "2/1",
+        "avg_frame_rate": "2/1",
+        "time_base": "1/16384",
+        "start_pts": 0,
+        "start_time": "0.000000",
+        "duration_ts": 319488,
+        "duration": "19.500000",
+        "bit_rate": "90165",
+        "bits_per_raw_sample": "8",
+        "nb_frames": "39",
+        "extradata_size": 46,
+        "disposition": {
+          "default": 1,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "language": "und",
+          "handler_name": "VideoHandler",
+          "encoder": "Lavc62.28.102 libx264"
+        }
+      }
+    ],
+    "format": {
+      "filename": "/Users/tomek/Projects/twin/reports/demo-video/twin-demo-full-en.mp4",
+      "nb_streams": 1,
+      "nb_programs": 0,
+      "nb_stream_groups": 0,
+      "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+      "format_long_name": "QuickTime / MOV",
+      "start_time": "0.000000",
+      "duration": "19.500000",
+      "size": "221102",
+      "bit_rate": "90708",
+      "probe_score": 100,
+      "tags": {
+        "major_brand": "isom",
+        "minor_version": "512",
+        "compatible_brands": "isomiso2avc1mp41",
+        "encoder": "Lavf62.12.102"
+      }
+    }
+  },
+  "status": "RENDERED"
+}

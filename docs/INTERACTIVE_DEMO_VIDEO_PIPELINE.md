@@ -5,8 +5,8 @@
 | Step | Status | Notes |
 |------|--------|-------|
 | Scene manifest | PASS | `demo:validate-scenes` |
-| Frame capture spec | NOT_RUN | Requires `PLAYWRIGHT_ENABLE_BROWSER_TESTS=1` |
-| MP4 render | NOT_RENDERED | FFmpeg commands documented only |
+| Frame capture spec | PASS | `demo:capture:pipeline` @ `01f6545b` — Playwright frames |
+| MP4 render | **RENDERED** | 4 variants EN/PL homepage+full — ffprobe PASS in `reports/demo-video/` |
 
 ## Commands
 

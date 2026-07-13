@@ -56,7 +56,9 @@ test("walkthrough respects prefers-reduced-motion", () => {
 });
 
 test("demo copy avoids forbidden live-apply claims", () => {
-  const demoI18n = i18n.slice(i18n.indexOf("interactiveDemo:"));
+  const start = i18n.indexOf("interactiveDemo:");
+  const end = i18n.indexOf("interactiveDemoPlayer:", start);
+  const demoI18n = i18n.slice(start, end > start ? end : undefined);
   for (const pattern of FORBIDDEN_IN_DEMO) {
     assert(!pattern.test(walkthrough), `Forbidden in walkthrough: ${pattern}`);
     assert(!pattern.test(demoI18n), `Forbidden in i18n interactiveDemo: ${pattern}`);
