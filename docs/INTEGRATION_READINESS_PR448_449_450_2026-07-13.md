@@ -1,8 +1,7 @@
-# Integration readiness — PRs #448, #449, #450 (2026-07-13)
+# Integration readiness — PRs #448–#451 + Wave C3–C5 (2026-07-13)
 
-> **Batch:** Integration-readiness (NO Wave C3)  
-> **Path:** **B** — no founder credentials in agent env; no merges requiring smoke  
-> **Stance:** P0 CLOSED | Gate E PASS | Gate F PENDING | Launch NO-GO
+> **Batch:** MULTI-WAVE EXTENDED (Path B)  
+> **Stance:** P0 CLOSED | Gate E PASS | Gate F PENDING | Launch **NO-GO**
 
 ---
 
@@ -10,162 +9,43 @@
 
 | Check | Result | Evidence |
 |-------|--------|----------|
-| Scaffold HEAD | `c2a08b025ca950b341540f0bc80f710825c778ce` | `git rev-parse origin/cursor/phase1-monorepo-scaffold` |
-| PR #448 | **OPEN** MERGEABLE CLEAN | HEAD `5c3c4825`, migration **073**, CI green, Vercel SUCCESS |
-| PR #449 | **OPEN** MERGEABLE CLEAN | HEAD `905a660c`, migration **071**, CI green, Vercel SUCCESS |
-| PR #450 | **OPEN** MERGEABLE CLEAN | HEAD `cda7a206`, stacked on #449, migration **072**, CI green |
-| #448 merged since last report | **NO** | `gh pr view 448` state=OPEN |
-| Smoke PASS since last report | **NO** | No `FOUNDER_SMOKE: PASS` in runbooks |
-| Integration sim (batch 2026-07-13) | **PASS** | Temp branch `tmp/integration-pr448-449-450-verify` @ `6ed56afd` — deleted after verify |
-| Batch stashes | **NONE** | No 448/449/450/migration stashes (125 unrelated stashes exist repo-wide) |
-| Uncommitted on worked branches | **NONE** | Clean on `feat/all-modules-green-wave-c2-talent-pool-trust-review` |
+| Scaffold HEAD | `c2a08b025ca950b341540f0bc80f710825c778ce` | verified |
+| PR #448 | **OPEN** MERGEABLE | HEAD `5c3c4825`, migration **073** |
+| PR #449 | **OPEN** MERGEABLE | HEAD `905a660c`, migration **071** |
+| PR #450 | **OPEN** MERGEABLE | HEAD `cda7a206`, stacked on #449, migration **072** |
+| PR #451 | **OPEN** (tooling hardening) | HEAD updated post-batch, stacked on #450 |
+| Smoke PASS | **NO** | Preflight only — credentials UNSET |
+| Preflight env | `DEMO_USER_PASSWORD` UNSET, recruiter tokens UNSET | `preflight:founder-smoke-env` |
+| Public-health | prod + previews **REACHABLE** (200) | batch 2026-07-13 |
 
 ---
 
-## Part B — Migration resolution
+## Migration graph (expected post-merge)
 
-### Conflict (resolved on #448)
+`070 → 071 → 072 → 073 (#448) → 074 (C3) → 075 (C4) → 076 (C5) → 077 (candidate)`
 
-Both #448 and #449 originally claimed Alembic revision **`071_*`**:
-- #449: `071_recruiter_workspace_activation` (merged path via C1)
-- #448: `071_candidate_referrals` (parallel branch from scaffold)
-
-### Resolution plan (applied on #448 branch)
-
-| Order | Revision | Source | down_revision |
-|-------|----------|--------|---------------|
-| 070 | `candidate_trust_center` | scaffold | 069 |
-| 071 | `recruiter_workspace_activation` | #449 C1 | 070 |
-| 072 | `recruiter_talent_pool_trust_review_c2` | #450 C2 | 071 |
-| 073 | `candidate_referrals` | #448 (renumbered) | 072 |
-
-**#448 renumber:** `071_candidate_referrals` → **`073_candidate_referrals`**, `down_revision = 072_recruiter_talent_pool_trust_review_c2`. Branch must **rebase onto scaffold + #449 + #450 before merge** — parent `072` not present on #448 branch alone.
-
-### Migration test
-
-| Branch | Validates | Notes |
-|--------|-----------|-------|
-| #450 | `070 → 071 → 072` linear, no duplicate IDs | Honest partial graph — no 073 file |
-| #448 | `073_candidate_referrals` exists, down_revision `072` | Full chain via fixture test after rebase |
-| Fixture | `070 → 071 → 072 → 073` | `alembic-migration-graph.ts` post-merge chain |
-| Integration sim | Full chain + single head `073` | Temp merge #449→#450→#448 @ `6ed56afd` — **PASS**, branch deleted |
-
-### Integration simulation (batch 2026-07-13, Path B)
-
-| Step | Result |
-|------|--------|
-| Branch from scaffold `c2a08b0` | OK |
-| Merge #449 (fast-forward) | OK → `905a660c` |
-| Merge #450 (fast-forward) | OK → `059fa4e9` |
-| Merge #448 (conflicts in package.json, activation.ts, guard test, doc) | Resolved manually — commit `6ed56afd` |
-| Migration chain 070→071→072→073 | **PASS** — single head `073_candidate_referrals` |
-| Downgrade contract (071/072/073) | **PASS** — upgrade/downgrade callable |
-| Backend persistence tests (C1+C2+B3) | **39 passed** |
-| Frontend guards (B1/B2/B3/C1/C2 + founder smoke) | **ALL PASS** |
-| Temp branch cleanup | **DELETED** `tmp/integration-pr448-449-450-verify` |
+Single head after full queue: **`077_candidate_activity_timeline`**
 
 ---
 
-## Part C — Runbooks & handoff
+## Open PR stack (do not merge)
 
-| Doc | Status |
-|-----|--------|
-| `docs/CANDIDATE_GREEN_MODULES_FOUNDER_SMOKE_2026-07-10.md` | B1/B2/B3 steps, evidence template |
-| `docs/RECRUITER_WAVE_C_FOUNDER_SMOKE_2026-07-13.md` | C1 + C2 steps, evidence template |
-| `docs/FOUNDER_SMOKE_HANDOFF_PR448_449_450_2026-07-13.md` | Operational handoff — env, order, routes, failure handling |
-
----
-
-## Part D — Founder smoke preflight tooling
-
-| Tool | Purpose |
-|------|---------|
-| `preflight:founder-smoke-env` | Reports SET/UNSET for `DEMO_USER_PASSWORD`, recruiter tokens — **no values** |
-| `preflight:preview-reachability` | Probes public routes on prod + optional `TWIN_PREVIEW_URL_448/449/450` |
-| `preflight:founder-smoke-orchestration` | Wrapper: env + reachability + evidence template — **no fake PASS** |
-
-| Credential | Agent env | Decision |
-|------------|-----------|----------|
-| `DEMO_USER_PASSWORD` | NOT SET | No Wave B browser smoke |
-| Recruiter token | NOT SET | No Wave C browser smoke |
-
-**Smoke executed:** **NO** — preflight + orchestration only; prod + all 3 PR previews **REACHABLE** (public-health 200).
-
-### Preview URLs (from gh PR comments, batch 2026-07-13)
-
-| PR | Preview base URL | public-health |
-|----|----------------|---------------|
-| #449 | `https://twin-git-feat-all-modules-green-wave-c1-recruiter-a-26266f-twin.vercel.app` | 200 OK |
-| #450 | `https://twin-git-feat-all-modules-green-wave-c2-talent-pool-0350d9-twin.vercel.app` | 200 OK |
-| #448 | `https://twin-git-feat-all-modules-green-wave-b3-candidate-r-9c796e-twin.vercel.app` | 200 OK |
+| PR | Branch | Migration |
+|----|--------|-----------|
+| #451 | `chore/extended-integration-batch-2026-07-13` | — (tooling) |
+| C3 | `feat/all-modules-green-wave-c3-notification-prefs` | 074 |
+| C4 | `feat/all-modules-green-wave-c4-saved-views` | 075 |
+| C5 | `feat/all-modules-green-wave-c5-activity-timeline` | 076 |
+| Candidate | `feat/all-modules-green-wave-candidate-activity-timeline` | 077 |
 
 ---
 
-## Part E-F — Merge gates (all OPEN)
+## Hard bans
 
-| PR | Merge when |
-|----|------------|
-| #449 | C1 smoke PASS + CI green + PILOT status intact |
-| #450 | #449 merged + C2 smoke PASS + branch rebased on merged C1 |
-| #448 | Wave B referrals smoke PASS + migration 073 + rebase after #450 + CI green |
-
-**This batch:** all PRs remain **OPEN**. No auto-merge.
+Launch **NO-GO** · Gate F **PENDING** · Phase 3B **BLOCKED** · no merge without smoke PASS · no fake smoke · no founder credentials merges
 
 ---
 
-## Part G — Post-merge verification / rollback readiness
+## Decision doc
 
-Not applicable — no merges in this batch.
-
-**Rollback stance (unchanged):** No automatic `alembic downgrade` on production. Failed migration → stop deploy, restore from Railway backup per `docs/PERSISTENCE_MIGRATION_RUNBOOK_2026-06-19.md`. Launch-day rollback playbook: `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` (pilot/demo only — public **NO-GO**).
-
----
-
-## Part I — Guards
-
-| Guard | Status |
-|-------|--------|
-| `test:alembic-duplicate-revision-guard` | Enhanced — fixture tests + 070→071→072 repo + 073 fixture |
-| `test:candidate-green-modules-founder-smoke-guard` | Blocks LIVE without PASS doc (+ B3 on #448) |
-| `test:recruiter-wave-c-founder-smoke-guard` | Enhanced — handoff links, no fake PASS |
-| `test:founder-smoke-env-preflight` | SET/UNSET only |
-| `test:preview-reachability-preflight` | Public routes, mocked + live prod probe |
-
----
-
-## Merge sequence (when credentials available)
-
-1. Preflight env + reachability
-2. Smoke Wave B (Career Compass + Trust Center) on prod — no #448 merge yet
-3. Smoke C1 on #449 preview
-4. Merge **#449**
-5. Rebase **#450**, smoke C2 on preview, merge **#450**
-6. Rebase **#448** onto merged scaffold+C1+C2; confirm migration **073**; smoke referrals; merge **#448**
-
----
-
-## Part H — Integration tooling (batch 2026-07-13 extended)
-
-| Tool | npm script | Purpose |
-|------|------------|---------|
-| Integration simulator | `sim:integration-pr448-449-450` | Temp branch merge 449→450→448, migration + pytest |
-| Integration dry-run | `sim:integration-pr448-449-450:dry-run` | Graph check on current branch (honest partial) |
-| Merge orchestrator | `plan:merge-pr448-449-450` | Dry-run plan; `--execute` blocked |
-| Post-merge verifier | `verify:post-merge` | Checklist after hypothetical merge |
-| Smoke evidence schema | `docs/schemas/FOUNDER_SMOKE_EVIDENCE_SCHEMA.md` | Validator rejects fake PASS |
-| Release manifests | `releases/manifest-pr{448,449,450}.json` | Per-PR merge metadata |
-| All tooling guards | `test:integration-tooling-guards` | 80+ static scenarios |
-
----
-
-## Hard bans (unchanged)
-
-Launch **NO-GO** · Gate F **PENDING** · Phase 3B **BLOCKED** · auto-apply **PAUSED** · delegated apply **OFF** · no Stripe/ATS/MS Calendar live · no fake smoke · no merge without required smoke PASS · **no Wave C3**
-
----
-
-## PR links
-
-- [#448 Wave B3 referrals](https://github.com/CzechowskiT/twin/pull/448)
-- [#449 Wave C1 activation](https://github.com/CzechowskiT/twin/pull/449)
-- [#450 Wave C2 talent pool + trust review](https://github.com/CzechowskiT/twin/pull/450)
+`docs/AUTONOMOUS_BATCH_DECISION_WAVE_C3_C5_2026-07-13.md`

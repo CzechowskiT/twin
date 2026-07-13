@@ -13,3 +13,13 @@ PATCH /api/v1/recruiter/talent-pool/{record_id}
 DELETE /api/v1/recruiter/talent-pool/{record_id}
 GET /api/v1/recruiter/trust-review-queue
 POST /api/v1/recruiter/trust-review-queue/{item_id}/decisions
+GET /api/v1/recruiter/notification-preferences
+PUT /api/v1/recruiter/notification-preferences
+PATCH /api/v1/recruiter/notification-preferences
+POST /api/v1/recruiter/notification-preferences/reset
+GET /api/v1/recruiter/saved-views
+POST /api/v1/recruiter/saved-views
+PATCH /api/v1/recruiter/saved-views/{view_id}
+DELETE /api/v1/recruiter/saved-views/{view_id}
+GET /api/v1/recruiter/activity-timeline
+GET /api/v1/candidates/me/trust/audit-events
