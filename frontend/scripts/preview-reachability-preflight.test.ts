@@ -26,13 +26,14 @@ function mockFetch(statusByUrl: Record<string, number>): typeof fetch {
 }
 
 test("1 prod target always included", () => {
-  const targets = resolveReachabilityTargets({});
+  const targets = resolveReachabilityTargets({ NODE_ENV: "test" });
   assert.ok(targets.some((t) => t.label === "prod"));
   assert.deepEqual(targets[0].paths, [...DEFAULT_PUBLIC_PATHS]);
 });
 
 test("2 preview targets only when env set", () => {
   const withPreviews = resolveReachabilityTargets({
+    NODE_ENV: "test",
     TWIN_PREVIEW_URL_448: "https://preview-448.example.com",
     TWIN_PREVIEW_URL_449: "https://preview-449.example.com/",
   });
@@ -63,7 +64,7 @@ test("4 mocked reachability — failure reported", async () => {
 
 test("5 no auth bypass — only public paths probed", () => {
   for (const key of PREVIEW_ENV_KEYS) {
-    const targets = resolveReachabilityTargets({ [key]: "https://p.example.com" });
+    const targets = resolveReachabilityTargets({ NODE_ENV: "test", [key]: "https://p.example.com" });
     const preview = targets.find((t) => t.label.startsWith("preview-"));
     assert.ok(preview);
     assert.ok(!preview!.paths.some((p) => p.includes("/dashboard")));
