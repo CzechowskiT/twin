@@ -340,6 +340,11 @@ class Candidate(Base):
         back_populates="candidate",
         cascade="all, delete-orphan",
     )
+    referral_program: Mapped["CandidateReferralProgram | None"] = relationship(
+        back_populates="candidate",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
     progress: Mapped["CandidateProgress | None"] = relationship(
         back_populates="candidate",
         uselist=False,
@@ -866,6 +871,61 @@ class CandidateCareerCompass(Base):
     )
 
     candidate: Mapped["Candidate"] = relationship(back_populates="career_compass")
+
+
+class CandidateReferralProgram(Base):
+    """One referral program per candidate — unique share code (Wave B slice 3)."""
+
+    __tablename__ = "candidate_referral_programs"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", name="uq_candidate_referral_programs_candidate_id"),
+        UniqueConstraint("referral_code", name="uq_candidate_referral_programs_referral_code"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"),
+        index=True,
+        unique=True,
+    )
+    referral_code: Mapped[str] = mapped_column(String(32), unique=True, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
+
+    candidate: Mapped["Candidate"] = relationship(back_populates="referral_program")
+    referrals: Mapped[list["CandidateReferral"]] = relationship(
+        back_populates="program",
+        cascade="all, delete-orphan",
+    )
+
+
+class CandidateReferral(Base):
+    """Tracked referral edge from candidate program — invite or signup attribution."""
+
+    __tablename__ = "candidate_referrals"
+    __table_args__ = (UniqueConstraint("referred_user_id", name="uq_candidate_referrals_referred_user_id"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    program_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_referral_programs.id", ondelete="CASCADE"),
+        index=True,
+    )
+    referred_user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+        unique=True,
+    )
+    invite_email: Mapped[str | None] = mapped_column(String(320), nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="pending")
+    ref_code_used: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    signed_up_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+    program: Mapped["CandidateReferralProgram"] = relationship(back_populates="referrals")
 
 
 class CandidateConsentReceipt(Base):

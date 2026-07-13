@@ -245,6 +245,7 @@ def register(request: Request, body: UserRegister, db: Session = Depends(get_db)
     ensure_user_referral_public_token(db, user)
     if referrer_id:
         from app.services import referral_program as rp
+        from app.services.candidate_referral_persistence import attach_signup_to_candidate_referral
 
         rp.record_account_referral_edge(
             db,
@@ -255,6 +256,12 @@ def register(request: Request, body: UserRegister, db: Session = Depends(get_db)
             utm_medium=user.signup_utm_medium,
             utm_campaign=user.signup_utm_campaign,
             utm_content=user.signup_utm_content,
+        )
+        attach_signup_to_candidate_referral(
+            db,
+            referrer_user_id=referrer_id,
+            referred_user_id=user.id,
+            ref_code_used=ref_snapshot or tok_match,
         )
     db.commit()
     db.refresh(user)
