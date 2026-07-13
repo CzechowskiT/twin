@@ -40,9 +40,15 @@ export const EXPECTED_HEADS: Record<number, string> = {
   449: "905a660c",
   450: "cda7a206",
   448: "5c3c4825",
+  451: "02fa2ecd",
+  452: "7f9f7bab",
+  453: "99e423a9",
+  454: "f3bc6db7",
+  455: "06e6c359",
 };
 
 export const MERGE_ORDER = [449, 450, 448] as const;
+export const EXTENDED_MERGE_ORDER = [449, 450, 448, 451, 452, 453, 454, 455] as const;
 
 /** Directed acyclic graph for stacked PR merge order. */
 export function buildMergeDag(): MergeDag {
