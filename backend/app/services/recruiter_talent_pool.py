@@ -34,14 +34,20 @@ def build_recruiter_talent_pool(
 
     records = (
         db.query(RecruiterTalentPoolRecord)
-        .filter(RecruiterTalentPoolRecord.company_slug == slug)
+        .filter(
+            RecruiterTalentPoolRecord.company_slug == slug,
+            RecruiterTalentPoolRecord.archived_at.is_(None),
+        )
         .order_by(RecruiterTalentPoolRecord.created_at.desc())
         .limit(cap)
         .all()
     )
     total = (
         db.query(RecruiterTalentPoolRecord)
-        .filter(RecruiterTalentPoolRecord.company_slug == slug)
+        .filter(
+            RecruiterTalentPoolRecord.company_slug == slug,
+            RecruiterTalentPoolRecord.archived_at.is_(None),
+        )
         .count()
     )
     imports = (
@@ -78,7 +84,10 @@ def build_recruiter_talent_pool(
                 "candidate_id": rec.candidate_id,
                 "application_id": rec.application_id,
                 "pipeline_status": rec.pipeline_status,
-                "source": "imported_internal_pool",
+                "source": rec.source_type or "imported_internal_pool",
+                "source_type": rec.source_type or "csv_import",
+                "consent_visibility": rec.consent_visibility or "unknown",
+                "archived": rec.archived_at is not None,
                 "created_at": rec.created_at.isoformat() if rec.created_at else None,
             }
         )

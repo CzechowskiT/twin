@@ -16,6 +16,11 @@ import {
 } from "@/lib/recruiter-trust-review-queue-demo-data";
 import { requestIntakeRecruiterHref } from "@/lib/request-intake";
 import { fetchSafePersistenceList } from "@/lib/safe-persistence-api";
+import {
+  fetchRecruiterTrustReviewQueue,
+  type TrustReviewQueueItemLive,
+} from "@/lib/recruiter-trust-review-api";
+import { readRecruiterInboxSession } from "@/lib/recruiter-inbox";
 
 export type SafePersistenceSource = "live" | "demo";
 
@@ -41,6 +46,8 @@ export const RECRUITER_TRUST_REVIEW_QUEUE_MARKERS = {
   hubPromo: "recruiter-trust-review-queue-hub-promo",
   navLink: "recruiter-trust-review-queue-nav-link",
   requestIntakeLink: "recruiter-trust-review-queue-request-intake-link",
+  decisionPanel: "recruiter-trust-review-queue-decision-panel",
+  liveTable: "recruiter-trust-review-queue-live-table",
 } as const;
 
 export const RECRUITER_TRUST_REVIEW_QUEUE_FORBIDDEN_PATTERNS: RegExp[] = [
@@ -82,11 +89,29 @@ export async function loadRecruiterTrustReviewQueue(): Promise<{
   source: SafePersistenceSource;
   record: RecruiterTrustReviewQueueRecord;
   liveCount: number;
+  liveItems: TrustReviewQueueItemLive[];
 }> {
   const demo = getRecruiterTrustReviewQueueDemo();
+  const session = readRecruiterInboxSession();
+  if (session.token && session.companySlug) {
+    const live = await fetchRecruiterTrustReviewQueue(session.token, session.companySlug);
+    if (live && live.items.length >= 0) {
+      return {
+        source: "live",
+        record: {
+          ...demo,
+          summary_total: live.summary.total,
+          summary_review_required: live.summary.pending_review,
+          summary_preview_only: Math.max(0, live.summary.total - live.summary.pending_review),
+        },
+        liveCount: live.items.length,
+        liveItems: live.items,
+      };
+    }
+  }
   const result = await fetchSafePersistenceList<ApiReviewResponse>(REVIEW_QUEUE_API_PATH, { items: [] });
   if (result.source === "live") {
-    return { source: "live", record: demo, liveCount: result.data.items.length };
+    return { source: "live", record: demo, liveCount: result.data.items.length, liveItems: [] };
   }
-  return { source: "demo", record: demo, liveCount: 0 };
+  return { source: "demo", record: demo, liveCount: 0, liveItems: [] };
 }

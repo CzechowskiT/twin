@@ -32,6 +32,19 @@ from app.services.recruiter_talent_radar_decisions import (
 )
 from app.services.recruiter_talent_radar_digest import build_recruiter_talent_radar_digest
 from app.services.recruiter_talent_pool import build_recruiter_talent_pool
+from app.services.recruiter_talent_pool_persistence import (
+    add_talent_pool_record,
+    archive_talent_pool_record,
+    get_talent_pool_record,
+    list_talent_pool_records,
+)
+from app.services.recruiter_trust_review_persistence import (
+    get_trust_review_item,
+    list_trust_review_decisions,
+    list_trust_review_queue,
+    record_trust_review_decision,
+)
+from app.schemas.recruiter_c2 import TalentPoolAddIn, TrustReviewDecisionIn
 from app.services.recruiter_talent_pool_import import (
     commit_talent_pool_import,
     preview_talent_pool_import,
@@ -632,9 +645,33 @@ def recruiter_talent_pool_list(
     token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
     limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    include_archived: bool = Query(False),
+    source_type: str | None = Query(None, max_length=32),
+    pipeline_status: str | None = Query(None, max_length=32),
+    search: str | None = Query(None, max_length=80),
+    detail: bool = Query(False),
 ) -> dict:
     slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
     try:
+        if detail or search or source_type or pipeline_status or include_archived or offset:
+            listed = list_talent_pool_records(
+                db,
+                company_slug=slug,
+                limit=limit,
+                offset=offset,
+                include_archived=include_archived,
+                source_type=source_type,
+                pipeline_status=pipeline_status,
+                search=search,
+            )
+            summary = build_recruiter_talent_pool(
+                db,
+                company_slug=slug,
+                locale=locale_from_request(request),
+                limit=limit,
+            )
+            return {**summary, **listed, "items": listed["items"]}
         return build_recruiter_talent_pool(
             db,
             company_slug=slug,
@@ -643,6 +680,159 @@ def recruiter_talent_pool_list(
         )
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/talent-pool/candidates", status_code=201)
+@limiter.limit("30/minute", key_func=recruiter_token_key)
+def recruiter_talent_pool_add_candidate(
+    request: Request,
+    body: TalentPoolAddIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return add_talent_pool_record(
+            db,
+            company_slug=slug,
+            display_name=body.display_name,
+            job_title=body.job_title,
+            location=body.location,
+            seniority=body.seniority,
+            skills=body.skills,
+            external_ats_id=body.external_ats_id,
+            candidate_id=body.candidate_id,
+            pipeline_status=body.pipeline_status,
+            idempotency_key=body.idempotency_key,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.get("/talent-pool/{record_id}")
+def recruiter_talent_pool_detail(
+    request: Request,
+    record_id: int,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return get_talent_pool_record(db, company_slug=slug, record_id=record_id)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+
+
+@router.patch("/talent-pool/{record_id}")
+@limiter.limit("30/minute", key_func=recruiter_token_key)
+def recruiter_talent_pool_archive(
+    request: Request,
+    record_id: int,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return archive_talent_pool_record(db, company_slug=slug, record_id=record_id)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+
+
+@router.get("/trust-review-queue")
+def recruiter_trust_review_queue_list(
+    request: Request,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    status: str | None = Query(None, max_length=32),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return list_trust_review_queue(
+            db,
+            company_slug=slug,
+            settings=settings,
+            limit=limit,
+            offset=offset,
+            status=status,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.get("/trust-review-queue/{item_id}")
+def recruiter_trust_review_queue_detail(
+    request: Request,
+    item_id: int,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return get_trust_review_item(db, company_slug=slug, item_id=item_id)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+
+
+@router.post("/trust-review-queue/{item_id}/decisions", status_code=201)
+@limiter.limit("30/minute", key_func=recruiter_token_key)
+def recruiter_trust_review_queue_decide(
+    request: Request,
+    item_id: int,
+    body: TrustReviewDecisionIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    actor = (x_twin_recruiter_token or token or "recruiter")[:120]
+    try:
+        return record_trust_review_decision(
+            db,
+            company_slug=slug,
+            item_id=item_id,
+            decision=body.decision,
+            note=body.note,
+            actor_ref=actor,
+        )
+    except ValueError as exc:
+        code = 404 if "not found" in str(exc).lower() else 400
+        raise HTTPException(code, detail=str(exc)) from exc
+
+
+@router.get("/trust-review-queue/{item_id}/decisions")
+def recruiter_trust_review_queue_decisions(
+    request: Request,
+    item_id: int,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    try:
+        return list_trust_review_decisions(db, company_slug=slug, item_id=item_id)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
 
 
 @router.post("/talent-pool/import/preview")

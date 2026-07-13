@@ -5,6 +5,10 @@ import {
   RECRUITER_ACTIVATION_SHIP_STATUS,
 } from "@/lib/seven-day-c-recruiter";
 import {
+  RECRUITER_TALENT_POOL_SHIP_STATUS,
+  RECRUITER_TRUST_REVIEW_SHIP_STATUS,
+} from "@/lib/seven-day-c2-recruiter";
+import {
   RECRUITER_ANALYTICS_SHIP_STATUS,
   RECRUITER_INTEGRATIONS_ROADMAP_STATUS,
   RECRUITER_PIPELINE_SHIP_STATUS,
@@ -19,7 +23,7 @@ export const RECRUITER_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     titleKey: "recruiterTrustReviewQueue.demoJourneyTitle",
     valuePropKey: "recruiterTrustReviewQueue.demoJourneyDesc",
     ctaKey: "recruiterTrustReviewQueue.openTrustReviewQueue",
-    status: "pilot",
+    status: RECRUITER_TRUST_REVIEW_SHIP_STATUS,
   },
   {
     id: "daily_cockpit",
@@ -52,7 +56,7 @@ export const RECRUITER_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     valuePropKey: "workspaceModules.recruiterTalentPoolValue",
     hintKey: "workspaceModules.recruiterTalentPoolHint",
     ctaKey: "workspaceModules.recruiterTalentPoolCta",
-    status: "pilot",
+    status: RECRUITER_TALENT_POOL_SHIP_STATUS,
   },
   {
     id: "search",

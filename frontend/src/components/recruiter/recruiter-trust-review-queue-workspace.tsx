@@ -18,6 +18,13 @@ import {
   resolveRecruiterTrustReviewQueue,
   type SafePersistenceSource,
 } from "@/lib/recruiter-trust-review-queue";
+import {
+  fetchRecruiterTrustReviewDecisions,
+  postRecruiterTrustReviewDecision,
+  type TrustReviewDecision,
+  type TrustReviewQueueItemLive,
+} from "@/lib/recruiter-trust-review-api";
+import { readRecruiterInboxSession } from "@/lib/recruiter-inbox";
 import { requestIntakeRecruiterHref } from "@/lib/request-intake";
 import type { TranslationKey } from "@/lib/i18n";
 import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
@@ -45,6 +52,12 @@ export function RecruiterTrustReviewQueueWorkspace() {
   const [record, setRecord] = useState(() => resolveRecruiterTrustReviewQueue());
   const [source, setSource] = useState<SafePersistenceSource>("demo");
   const [liveCount, setLiveCount] = useState(0);
+  const [liveItems, setLiveItems] = useState<TrustReviewQueueItemLive[]>([]);
+  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
+  const [decisions, setDecisions] = useState<TrustReviewDecision[]>([]);
+  const [decisionNote, setDecisionNote] = useState("");
+  const [decisionBusy, setDecisionBusy] = useState(false);
+  const [decisionMessage, setDecisionMessage] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -53,11 +66,51 @@ export function RecruiterTrustReviewQueueWorkspace() {
       setRecord(res.record);
       setSource(res.source);
       setLiveCount(res.liveCount);
+      setLiveItems(res.liveItems);
     });
     return () => {
       active = false;
     };
   }, []);
+
+  const reloadLive = async () => {
+    const res = await loadRecruiterTrustReviewQueue();
+    setRecord(res.record);
+    setSource(res.source);
+    setLiveCount(res.liveCount);
+    setLiveItems(res.liveItems);
+  };
+
+  const openLiveItem = async (itemId: number) => {
+    setSelectedItemId(itemId);
+    const session = readRecruiterInboxSession();
+    if (!session.token || !session.companySlug) return;
+    const rows = await fetchRecruiterTrustReviewDecisions(session.token, session.companySlug, itemId);
+    setDecisions(rows);
+  };
+
+  const submitDecision = async (decision: string) => {
+    if (!selectedItemId) return;
+    const session = readRecruiterInboxSession();
+    if (!session.token || !session.companySlug) return;
+    setDecisionBusy(true);
+    setDecisionMessage(null);
+    try {
+      const out = await postRecruiterTrustReviewDecision(session.token, session.companySlug, selectedItemId, {
+        decision,
+        note: decisionNote.trim() || undefined,
+      });
+      if (!out) {
+        setDecisionMessage(t("recruiterTrustReviewQueue.decisionFailed"));
+        return;
+      }
+      setDecisionMessage(t("recruiterTrustReviewQueue.decisionSaved"));
+      await openLiveItem(selectedItemId);
+      await reloadLive();
+    } finally {
+      setDecisionBusy(false);
+    }
+  };
 
   const sourceKey = source === "live" ? "safePersistence.liveApi" : "safePersistence.demoFallback";
 
@@ -153,8 +206,52 @@ export function RecruiterTrustReviewQueueWorkspace() {
                 </li>
               ))}
             </ul>
+            {source === "live" && liveItems.length > 0 ? (
+              <ul className="mt-4 space-y-2" data-testid={RECRUITER_TRUST_REVIEW_QUEUE_MARKERS.liveTable}>
+                {liveItems.map((item) => (
+                  <li key={item.id} className="rounded-lg border border-[var(--twin-border)]/60 px-3 py-2">
+                    <button type="button" className="twin-link text-left font-medium" onClick={() => void openLiveItem(item.id)}>
+                      {item.reason_summary}
+                    </button>
+                    <div className="mt-1 flex flex-wrap gap-2 text-[10px] uppercase">
+                      <span className="text-[var(--twin-muted)]">{item.item_kind}</span>
+                      <span className="text-[var(--twin-accent)]">{item.status}</span>
+                      <span className="text-[var(--twin-muted)]">{item.consent_state}</span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </>,
         )}
+
+        {source === "live" ? sectionCard(
+          RECRUITER_TRUST_REVIEW_QUEUE_MARKERS.decisionPanel,
+          t("recruiterTrustReviewQueue.decisionTitle"),
+          <>
+            <p className="text-[var(--twin-muted-strong)]">{t("recruiterTrustReviewQueue.decisionLead")}</p>
+            <textarea
+              className="twin-input mt-2 min-h-[72px] w-full"
+              value={decisionNote}
+              onChange={(e) => setDecisionNote(e.target.value)}
+              placeholder={t("recruiterTrustReviewQueue.decisionNotePlaceholder")}
+              aria-label={t("recruiterTrustReviewQueue.decisionNotePlaceholder")}
+            />
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button type="button" className="twin-btn-secondary" disabled={decisionBusy || !selectedItemId} onClick={() => void submitDecision("approve")}>{t("recruiterTrustReviewQueue.decisionApprove")}</button>
+              <button type="button" className="twin-btn-secondary" disabled={decisionBusy || !selectedItemId} onClick={() => void submitDecision("reject")}>{t("recruiterTrustReviewQueue.decisionReject")}</button>
+              <button type="button" className="twin-btn-secondary" disabled={decisionBusy || !selectedItemId} onClick={() => void submitDecision("request_clarification")}>{t("recruiterTrustReviewQueue.decisionClarify")}</button>
+            </div>
+            {decisionMessage ? <p className="mt-2 text-xs">{decisionMessage}</p> : null}
+            {decisions.length > 0 ? (
+              <ul className="mt-3 space-y-1 text-xs">
+                {decisions.map((d) => (
+                  <li key={d.id}>{d.decision} · {d.note || "—"} · {d.created_at || ""}</li>
+                ))}
+              </ul>
+            ) : null}
+          </>,
+        ) : null}
 
         {sectionCard(
           RECRUITER_TRUST_REVIEW_QUEUE_MARKERS.priority,

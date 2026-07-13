@@ -1006,8 +1006,70 @@ class RecruiterTalentPoolRecord(Base):
     data_quality_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     duplicate_key: Mapped[str] = mapped_column(String(128), index=True)
     pipeline_status: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    source_type: Mapped[str] = mapped_column(String(32), default="csv_import")
+    snapshot_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    archived_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, index=True)
+    consent_visibility: Mapped[str] = mapped_column(String(32), default="unknown")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class RecruiterTrustReviewItem(Base):
+    """Recruiter trust review queue item — consent-safe, company-scoped."""
+
+    __tablename__ = "recruiter_trust_review_items"
+    __table_args__ = (
+        UniqueConstraint(
+            "company_slug",
+            "privacy_request_id",
+            name="uq_recruiter_trust_review_company_privacy_request",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    company_slug: Mapped[str] = mapped_column(String(80), index=True)
+    item_kind: Mapped[str] = mapped_column(String(64))
+    subject_ref: Mapped[str] = mapped_column(String(128))
+    privacy_request_id: Mapped[int | None] = mapped_column(
+        ForeignKey("candidate_privacy_requests.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    candidate_ref: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    reason_key: Mapped[str] = mapped_column(String(64))
+    reason_summary: Mapped[str] = mapped_column(String(500))
+    status: Mapped[str] = mapped_column(String(32), default="pending_review", index=True)
+    priority: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    consent_state: Mapped[str] = mapped_column(String(32), default="unknown")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
+
+    decisions: Mapped[list["RecruiterTrustReviewDecision"]] = relationship(
+        back_populates="item",
+        cascade="all, delete-orphan",
+        order_by="RecruiterTrustReviewDecision.created_at.desc()",
+    )
+
+
+class RecruiterTrustReviewDecision(Base):
+    """Append-only recruiter trust review decision history."""
+
+    __tablename__ = "recruiter_trust_review_decisions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    item_id: Mapped[int] = mapped_column(
+        ForeignKey("recruiter_trust_review_items.id", ondelete="CASCADE"),
+        index=True,
+    )
+    decision: Mapped[str] = mapped_column(String(32))
+    note: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    actor_ref: Mapped[str] = mapped_column(String(120))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+
+    item: Mapped["RecruiterTrustReviewItem"] = relationship(back_populates="decisions")
 
 
 class AutoApplyConsent(Base):
