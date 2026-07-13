@@ -13,6 +13,7 @@ import { LandingHowItWorks } from "@/components/marketing/landing-how-it-works";
 import { LandingInsideSteps } from "@/components/marketing/landing-inside-steps";
 import { LandingRegisterTeaser } from "@/components/marketing/landing-register-teaser";
 import { LandingStickyCta } from "@/components/marketing/landing-sticky-cta";
+import { CandidateHomepageStorySection } from "@/components/marketing/candidate-homepage-story-section";
 import { LandingTrustCue } from "@/components/marketing/landing-trust-cue";
 import { PageMomentumRail } from "@/components/page-momentum-rail";
 
@@ -21,6 +22,7 @@ export default function Home() {
     <>
         <LandingHero />
         <CandidateRewardsBand variant="home" />
+        <CandidateHomepageStorySection />
         <LandingTrustCue />
         <LandingExploreTwin />
         <div className="mx-auto max-w-6xl space-y-2 px-4 sm:px-6">
