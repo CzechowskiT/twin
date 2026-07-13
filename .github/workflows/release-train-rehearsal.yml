@@ -29,3 +29,91 @@ jobs:
         run: npm run test:release-train-v4
       - name: Merge orchestrator unit tests
         run: npm run test:merge-orchestrator
+
+  db-migrations-clean-000-077:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: twin_clean
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d twin_clean"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/twin_clean
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - run: pip install -r requirements.txt
+      - name: Verify single alembic head
+        run: python -m alembic heads
+      - name: Upgrade clean DB 000→head (077)
+        run: python -m alembic upgrade head
+      - name: Verify current revision is head
+        run: python -m alembic current
+
+  db-migrations-prodlike-070-077:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: twin_prodlike
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d twin_prodlike"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5433/twin_prodlike
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - run: pip install -r requirements.txt
+      - name: Verify single alembic head
+        run: python -m alembic heads
+      - name: Bring prod-like DB to 070
+        run: |
+          python -m alembic upgrade 070_candidate_trust_center
+          python -m alembic current
+      - name: Step upgrades 071→077
+        run: |
+          set -euo pipefail
+          for rev in \
+            071_recruiter_workspace_activation \
+            072_recruiter_talent_pool_trust_review_c2 \
+            073_candidate_referrals \
+            074_recruiter_notification_preferences_c3 \
+            075_recruiter_saved_views_c4 \
+            076_recruiter_activity_timeline_c5 \
+            077_candidate_activity_timeline
+          do
+            echo "=== upgrading to $rev ==="
+            python -m alembic upgrade "$rev"
+            python -m alembic current
+          done
