@@ -1,6 +1,6 @@
 # Public launch 9/10 scorecard — canonical
 
-> **Generated:** 2026-07-13T10:50:00Z · **Path:** B (credentials UNSET) · **Owner:** Eng agent batch (final closure)  
+> **Generated:** 2026-07-13T12:02:00Z · **Path:** B (credentials UNSET) · **Owner:** Eng agent batch (multi-hour closure)  
 > **Verdict:** **NO-GO** — żaden obszar nie osiąga 9/10; obowiązkowe kryteria FAIL w każdym obszarze.
 
 ---
@@ -9,17 +9,14 @@
 
 | Report / SHA | Status | Superseded by |
 |--------------|--------|---------------|
-| Scorecard @ `d8ba49fa` | **SUPERSEDED** | `519ed956` (R-019 guard expansion) |
-| Scorecard @ `cb13d067` | **SUPERSEDED** | This doc @ post-`519ed956` push |
-| Scorecard @ `8e7413ff` (9/10 tooling commit) | **SUPERSEDED** | `2753d948` → `4925d8a9` → `876133ce` → `e7a568ac` |
-| Scorecard @ `4925d8a9` (orchestrator sync) | **SUPERSEDED** | `e7a568ac` (orchestrator HEAD fix) |
-| Stack #452 `6aa193c4` | **SUPERSEDED** | `753ecf70` (rebased on #451) |
-| Stack #453 `61e472cf` | **SUPERSEDED** | `934a48a7` (rebased on #452) |
-| Stack #454 `8e7f1582` | **SUPERSEDED** | `26f9da96` (rebased on #453) |
-| Stack #455 `06e6c359` | **SUPERSEDED** | `e36df2cb` (rebased on #454) |
-| Merge plan drift loop on #451 tooling commits | **CLOSED** | #451 omitted from `EXPECTED_HEADS` (tooling-only, no DB head) |
+| Scorecard @ `519ed956` | **SUPERSEDED** | This doc @ `890fe104` |
+| Scorecard @ `d8ba49fa` | **SUPERSEDED** | `519ed956` → `890fe104` |
+| PR #461 demo reports | **SUPERSEDED** | #462 @ `cb0b9f80` + `reports/FOUNDER_DEMO_REVIEW_PACKAGE.md` |
+| Demo video NOT_RENDERED docs | **SUPERSEDED** | Real MP4/WebM @ `cb0b9f80` — ffprobe PASS |
+| Stack #452 merge-plan transient block | **CLOSED** | Re-run @ 12:02Z — all gates PASS |
 
-**Canonical repo_head:** `519ed956` (branch `chore/extended-integration-batch-2026-07-13`, PR #451)
+**Canonical repo_head:** `890fe104` (branch `chore/extended-integration-batch-2026-07-13`, PR #451)  
+**Canonical demo PR:** #462 @ `cb0b9f80` (feature `01f6545b` + evidence batch)
 
 ---
 
@@ -27,7 +24,7 @@
 
 | Pole | Wartość |
 |------|---------|
-| **repo_head** | `519ed956` |
+| **repo_head** | `890fe104` |
 | **prod_api_commit** | `c2a08b025ca950b341540f0bc80f710825c778ce` |
 | **prod_frontend** | `https://twin-sooty.vercel.app` |
 | **prod_db_head** | `070_candidate_trust_center` (train target: `077`) |
@@ -57,9 +54,9 @@
 |---|-----------|--------|----------|
 | A1 | Prod FE canonical URL 200 | **PASS** | `curl -I https://twin-sooty.vercel.app` → 200 @ 2026-07-13T10:55Z |
 | A2 | Prod API `/health?db=true` db_ok=true | **PASS** ★ | SHA `c2a08b0`, db_ok=true @ probe suite |
-| A3 | FE/API SHA alignment (public-health) | **PASS** | fe=api=`c2a08b025ca9` — `reports/prod-probes/prod-probes-2026-07-13T10-55-52-892Z.json` |
+| A3 | FE/API SHA alignment (public-health) | **PASS** | fe=api=`c2a08b025ca9` — `reports/prod-probes/prod-probes-2026-07-13T11-52-06-163Z.json` |
 | A4 | Public-health traceability fields | **PASS** | `frontend_commit`, `api_commit`, `commit_interpretation` — guard PASS |
-| A5 | Latency p95 < 10s SLO | **PASS** | 110 probes: p50=81ms p95=332ms p99=4516ms — prod probe suite @ 10:55Z |
+| A5 | Latency p95 < 10s SLO | **PASS** | 110 probes: p50=84ms p95=940ms p99=4437ms — prod probe suite @ 11:52Z |
 | A6 | Alembic head = train target 077 | **FAIL** ★ | Prod scaffold 070; train 077 unmerged — `sim:integration-070-077:dry-run` PASS locally only |
 | A7 | Security headers on FE | **PASS** | CSP, HSTS, X-Frame-Options @ Vercel response headers |
 | A8 | No open P0 prod incidents | **PASS** ★ | INC public-health 500 CLOSED — `docs/incidents/2026-07-13-public-health-500.md` |
@@ -134,7 +131,7 @@
 | #449 | `905a660c` | MERGEABLE CLEAN | 071 | green | C1 activation |
 | #450 | `cda7a206` | MERGEABLE CLEAN | 072 | green | C2 talent pool |
 | #448 | `5c3c4825` | MERGEABLE CLEAN | 073 | green | B3 referrals |
-| #451 | `519ed956` | MERGEABLE | — | **all green** | Tooling + R-019 guards; Vercel Ready |
+| #451 | `890fe104` | MERGEABLE | — | **all green** | Tooling + R-019 guards; Vercel Ready |
 | #452 | `753ecf70` | MERGEABLE CLEAN | 074 | green | C3 notif prefs (rebased) |
 | #453 | `934a48a7` | MERGEABLE CLEAN | 075 | green | C4 saved views (rebased) |
 | #454 | `26f9da96` | MERGEABLE CLEAN | 076 | green | C5 activity timeline (rebased) |
@@ -142,7 +139,7 @@
 
 **Hardening #456–#460:** all MERGEABLE CLEAN, smoke green (post-#455 stack).
 
-**Rehearsal evidence:** `npm run sim:integration-070-077:dry-run` PASS · `npm run plan:merge-train-extended` PASS (no drift)
+**Rehearsal evidence:** `npm run sim:integration-070-077` PASS @ 11:52Z · `npm run plan:merge-train-extended` PASS @ 12:02Z (all gates)
 
 ---
 
@@ -165,7 +162,7 @@
 |-------|--------|----------|
 | API `POST /candidates/me/delete-account` | **PASS** (branch) | `e7a568ac` — 6 pytest PASS |
 | UI live panel | **PASS** (branch) | `test:candidate-account-delete-guard` 5/5 PASS |
-| Test matrix (target 20+) | **PASS** (25) | `test:candidate-revoke-delete` 25/25 @ `519ed956` |
+| Test matrix (target 20+) | **PASS** (25) | `test:candidate-revoke-delete` 25/25 @ `890fe104` |
 | Prod deploy | **BLOCKED** | Prod SHA `c2a08b0` predates R-019 |
 | Founder smoke | **BLOCKED** | Credentials UNSET |
 
