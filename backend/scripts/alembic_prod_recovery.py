@@ -33,6 +33,9 @@ OLD_RENAME_WHEN_CALENDAR_READY = {
 
 ORPHAN_REVISIONS = frozenset({"051_recruiter_audit_events"})
 
+# Post-#97 linear chain — never stamp these back to 051 (would re-run 051→077 every deploy).
+CURRENT_CHAIN_PREFIXES = ("058_", "059_", "060_", "061_", "062_", "063_", "064_", "065_", "066_", "067_", "068_", "069_", "070_", "071_", "072_", "073_", "074_", "075_", "076_", "077_")
+
 STAMP_BACK_TARGET = "051_company_role_fields"
 CALENDAR_COLUMN = "access_token_encrypted"
 CALENDAR_TABLES = ("user_google_calendar", "user_microsoft_calendar")
@@ -81,6 +84,9 @@ def recover_alembic_version(database_url: str) -> None:
             return
 
         if current not in KNOWN_REVISIONS:
+            # 058–077 release train: trust alembic_version; idempotent migrations handle re-run.
+            if any(current.startswith(p) for p in CURRENT_CHAIN_PREFIXES):
+                return
             if current != "050_stripe_webhook_events":
                 _stamp(conn, STAMP_BACK_TARGET, current)
             return

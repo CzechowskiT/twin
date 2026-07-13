@@ -50,3 +50,12 @@ def test_alembic_recovery_module_exports() -> None:
 
     assert "056_recruiter_application_scorecards" in KNOWN_REVISIONS
     assert callable(recover_alembic_version)
+
+
+def test_alembic_recovery_skips_current_chain_revisions() -> None:
+    from scripts.alembic_prod_recovery import CURRENT_CHAIN_PREFIXES
+
+    assert "077_candidate_activity_timeline".startswith(
+        next(p for p in CURRENT_CHAIN_PREFIXES if p == "077_")
+    )
+    assert "071_recruiter_workspace_activation".startswith("071_")
