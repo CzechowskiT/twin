@@ -132,6 +132,34 @@ def list_recruiter_audit_events(
     }
 
 
+def list_company_activity_timeline(
+    db: Session,
+    *,
+    company_slug: str,
+    limit: int = 50,
+    offset: int = 0,
+    action_type: str | None = None,
+) -> dict:
+    """Read-only company-scoped audit explorer — Wave C5."""
+    slug = _require_company_slug(company_slug)
+    cap = max(1, min(limit, 100))
+    off = max(0, offset)
+    q = db.query(RecruiterAuditEvent).filter(RecruiterAuditEvent.company_slug == slug)
+    if action_type:
+        act = action_type.strip()
+        if act in RECRUITER_AUDIT_ACTION_TYPES:
+            q = q.filter(RecruiterAuditEvent.action_type == act)
+    total = q.count()
+    rows = q.order_by(RecruiterAuditEvent.created_at.desc()).offset(off).limit(cap).all()
+    return {
+        "company_slug": slug,
+        "items": [_serialize_event(row) for row in rows],
+        "total": total,
+        "limit": cap,
+        "offset": off,
+    }
+
+
 def _serialize_event(row: RecruiterAuditEvent) -> dict:
     meta: dict[str, str] = {}
     if row.meta_json:
