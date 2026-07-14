@@ -24,9 +24,9 @@ function read(rel: string): string {
 
 test("1 demo page mounts InteractiveDemoPlayer before below-fold journey", () => {
   const page = read("src/app/(marketing)/demo/page.tsx");
-  assert.match(page, /InteractiveDemoPlayer/);
+  assert.match(page, /DemoAboveFoldSection|InteractiveDemoPlayer/);
   assert.doesNotMatch(page, /InteractiveDemoWalkthrough/);
-  const playerIdx = page.indexOf("InteractiveDemoPlayer");
+  const playerIdx = page.indexOf("DemoAboveFoldSection");
   const belowIdx = page.indexOf("FounderLedDemoBelowFold");
   assert.ok(playerIdx >= 0 && belowIdx >= 0 && playerIdx < belowIdx);
 });

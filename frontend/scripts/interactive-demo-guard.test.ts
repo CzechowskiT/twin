@@ -94,3 +94,20 @@ test("10 demo fixtures use synthetic IDs only", () => {
   assert.match(fixtures, /demo-candidate-001/);
   assert.doesNotMatch(fixtures, /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i);
 });
+
+test("11 full-demo scenes render rich product surfaces not text-only", () => {
+  const stage = read("src/components/marketing/demo/demo-scene-stage.tsx");
+  const surfaces = read("src/components/marketing/demo/demo-scene-surfaces.tsx");
+  assert.match(stage, /demo-scene-surfaces/);
+  assert.match(surfaces, /DemoIntroSurface/);
+  assert.match(surfaces, /DemoNorthStarSurface/);
+  assert.match(surfaces, /DemoCandidatePipelineSurface/);
+  assert.match(surfaces, /DemoRecruiterInboxSurface/);
+  assert.match(surfaces, /DemoCompanyMemorySurface/);
+  assert.match(surfaces, /DemoCalendarHoldSurface/);
+  assert.match(surfaces, /DemoTrustBoundarySurface/);
+  assert.match(surfaces, /DemoPilotCtaSurface/);
+  assert.doesNotMatch(stage, /scene\.descriptionKey\).*north_star/);
+  const player = read("src/components/marketing/demo/interactive-demo-player.tsx");
+  assert.match(player, /min-h-\[180px\]|DemoSceneStage/);
+});
