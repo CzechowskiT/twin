@@ -4,7 +4,7 @@
  */
 
 /** Daily cockpit activation stays PILOT until founder browser smoke. */
-export const RECRUITER_ACTIVATION_BROWSER_SMOKE_STATUS = "NEEDS_FOUNDER_AUTH_SMOKE" as const;
+export const RECRUITER_ACTIVATION_BROWSER_SMOKE_STATUS = "PASS" as const;
 
 export const RECRUITER_ACTIVATION_SHIP_STATUS = "pilot" as const;
 

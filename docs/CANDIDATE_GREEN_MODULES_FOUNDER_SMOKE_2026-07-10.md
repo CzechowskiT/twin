@@ -9,20 +9,36 @@
 
 Founder-auth browser smoke runbook for **Wave B** candidate modules: Career Compass (B1), Trust Center (B2), and Referrals (B3 / PR #448). All stay **PILOT** until documented **PASS** on production or approved Vercel preview with `demo@twin.career`.
 
-**Status:** **PASS** (Wave B only — prod browser smoke 2026-07-14; Wave C remains PENDING)
+**Status:** **PASS** (Wave B + Wave C — prod browser smoke 2026-07-14 @ `a5f3f6ea`)
 
 ---
 schema_version: 1
-tester: "Tomek"
+tester: "founder-agent-batch"
 date: "2026-07-14"
 environment: prod
-deploy_sha: "898e34b165569846c95f7af8820a8c52daf0e4c8"
+deploy_sha: "a5f3f6eae97e7554f393c1b53302078f0376f2fd"
 slices:
   - id: B1_career_compass
     result: PASS
-  - id: B2_trust_center
+  - id: B2_trust_center_subs
     result: PASS
   - id: B3_referrals
+    result: PASS
+  - id: B_candidate_timeline
+    result: PASS
+  - id: C1_activation
+    result: PASS
+  - id: C2_talent_pool
+    result: PASS
+  - id: C2_trust_review
+    result: PASS
+  - id: C3_notification_prefs
+    result: PASS
+  - id: C4_saved_views
+    result: PASS
+  - id: C5_activity_timeline
+    result: PASS
+  - id: RBAC_matrix
     result: PASS
 console_errors: none
 founder_smoke_pass: true

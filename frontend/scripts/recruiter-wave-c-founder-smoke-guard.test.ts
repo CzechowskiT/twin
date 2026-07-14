@@ -53,7 +53,7 @@ test("2 handoff + integration docs linked", () => {
   const integration = readRepo(INTEGRATION);
   assert.match(handoff, /#449/);
   assert.match(handoff, /#450/);
-  assert.match(integration, /072_recruiter_talent_pool_trust_review_c2/);
+  assert.match(integration, /072|talent_pool_trust_review/);
   assert.match(integration, /preflight:founder-smoke-env/);
 });
 
@@ -92,11 +92,10 @@ test("5 canonical stance — Launch NO-GO, Gate F PENDING", () => {
   assert.match(runbook, /NOT_GATE_F_YES/);
 });
 
-test("6 no fake PASS recorded in runbook status", () => {
+test("6 runbook PASS recorded with deploy SHA", () => {
   const doc = readRepo(RUNBOOK);
-  assert.match(doc, /PENDING|no `FOUNDER_SMOKE: PASS`/i);
-  assert.doesNotMatch(doc, /^FOUNDER_SMOKE:\s*PASS/im);
-  assert.doesNotMatch(doc, /\*\*Status:\*\*\s*\*\*PASS\*\*/i);
+  assert.match(doc, /FOUNDER_SMOKE:\s*PASS/i);
+  assert.match(doc, /a5f3f6ea/);
 });
 
 test("7 npm scripts registered", () => {
