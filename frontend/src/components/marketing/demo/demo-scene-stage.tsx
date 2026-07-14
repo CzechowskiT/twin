@@ -11,39 +11,56 @@ import type { DemoScene } from "@/lib/demo/demo-scene-manifest";
 type DemoSceneStageProps = {
   scene: DemoScene;
   reducedMotion: boolean;
+  compact?: boolean;
   onCtaDemo?: () => void;
   onCtaPilot?: () => void;
 };
 
-export function DemoSceneStage({ scene, reducedMotion, onCtaDemo, onCtaPilot }: DemoSceneStageProps) {
+export function DemoSceneStage({ scene, reducedMotion, compact, onCtaDemo, onCtaPilot }: DemoSceneStageProps) {
   const { t } = useTranslation();
   const fade = reducedMotion ? "" : "transition-opacity duration-500";
+  const heightClass = compact
+    ? "max-h-[120px] min-h-[88px] overflow-y-auto sm:max-h-none sm:min-h-[160px]"
+    : "min-h-[200px] sm:min-h-[240px]";
 
   return (
     <div
-      className={`relative min-h-[200px] overflow-hidden rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-elevated)] p-4 sm:min-h-[240px] sm:p-5 ${fade}`}
+      className={`relative overflow-hidden rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-elevated)] p-3 sm:p-4 ${heightClass} ${fade}`}
       data-demo-scene={scene.id}
       role="img"
       aria-label={t(scene.titleKey)}
     >
       {scene.id === "intro" ? (
-        <div className="grid gap-3 sm:grid-cols-3">
-          {(["candidate", "recruiter", "company"] as const).map((role) => (
-            <div key={role} className="rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-soft)] p-3">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--twin-accent)]">
+        compact ? (
+          <div className="flex flex-wrap gap-2">
+            {(["candidate", "recruiter", "company"] as const).map((role) => (
+              <span
+                key={role}
+                className="rounded-full border border-[var(--twin-border)] bg-[var(--twin-surface-soft)] px-2.5 py-1 text-xs font-medium text-[var(--twin-fg)]"
+              >
                 {t(`interactiveDemoPlayer.roleLabel_${role}`)}
-              </p>
-              <p className="mt-1 text-sm font-medium text-[var(--twin-fg)]">
-                {t(`interactiveDemoPlayer.roleCard_${role}`)}
-              </p>
-            </div>
-          ))}
-        </div>
+              </span>
+            ))}
+          </div>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-3">
+            {(["candidate", "recruiter", "company"] as const).map((role) => (
+              <div key={role} className="rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-soft)] p-3">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--twin-accent)]">
+                  {t(`interactiveDemoPlayer.roleLabel_${role}`)}
+                </p>
+                <p className="mt-1 text-sm font-medium text-[var(--twin-fg)]">
+                  {t(`interactiveDemoPlayer.roleCard_${role}`)}
+                </p>
+              </div>
+            ))}
+          </div>
+        )
       ) : null}
 
       {scene.id === "candidate_pipeline" || scene.id === "hp_compass" ? (
         <ul className="space-y-2">
-          {DEMO_FIXTURE_BUNDLE.topJobs.map((job) => (
+          {(compact ? DEMO_FIXTURE_BUNDLE.topJobs.slice(0, 2) : DEMO_FIXTURE_BUNDLE.topJobs).map((job) => (
             <li
               key={job.id}
               className="interactive-demo-match-row flex items-center justify-between gap-3 rounded-lg border border-[var(--twin-border)] px-3 py-2 text-sm"

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { MarketingCrosslinksBand } from "@/components/marketing/marketing-crosslinks-band";
@@ -13,16 +12,6 @@ import {
   FOUNDER_LED_DEMO_ROLE_ENTRIES,
   resolveFounderLedDemoHref,
 } from "@/lib/founder-led-demo-routes";
-
-function scrollToInteractivePlayer(): void {
-  const section = document.getElementById("interactive-story");
-  if (!section) return;
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  section.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
-  section.focus({ preventScroll: true });
-  const playBtn = section.querySelector<HTMLButtonElement>("[data-demo-controls] button");
-  playBtn?.focus({ preventScroll: true });
-}
 
 function DemoLinkCard({
   href,
@@ -51,35 +40,7 @@ function DemoLinkCard({
 
 /** Compact hero — interactive player sits directly below on first screen. */
 export function FounderLedDemoHero() {
-  const { t } = useTranslation();
-  const onLaunchDemo = useCallback(() => scrollToInteractivePlayer(), []);
-
-  return (
-    <Shell wide rail>
-      <MarketingPageSurface wide withCard={false}>
-        <header className="marketing-copy-rail min-w-0 space-y-4 pb-2 sm:space-y-5" data-founder-led-demo="hero">
-          <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
-            {t("founderLedDemo.pageEyebrow")}
-          </p>
-          <h1 className="twin-section-title text-2xl sm:text-3xl md:text-4xl">{t("founderLedDemo.pageTitle")}</h1>
-          <p className="max-w-3xl text-base leading-relaxed text-[var(--twin-muted-strong)] sm:text-lg">
-            {t("founderLedDemo.pageLead")}
-          </p>
-          <div className="flex flex-wrap gap-3 pt-1">
-            <button
-              type="button"
-              data-founder-led-demo-cta="launch"
-              className="twin-btn-primary twin-touch-target"
-              onClick={onLaunchDemo}
-            >
-              {t("founderLedDemo.heroCtaLaunch")}
-            </button>
-          </div>
-          <MarketingCrosslinksBand page="demo" className="pt-2" />
-        </header>
-      </MarketingPageSurface>
-    </Shell>
-  );
+  return null;
 }
 
 /** Journey, role entries, and boundaries — below interactive player. */
@@ -90,6 +51,12 @@ export function FounderLedDemoBelowFold() {
     <Shell wide rail>
       <MarketingPageSurface wide withCard={false}>
         <div className="marketing-copy-rail min-w-0 space-y-10 sm:space-y-14" data-founder-led-demo="root">
+          <section className="space-y-3 border-b border-[var(--twin-border)]/60 pb-8">
+            <p className="max-w-3xl text-sm leading-relaxed text-[var(--twin-muted-strong)] sm:text-base">
+              {t("founderLedDemo.pageLead")}
+            </p>
+            <MarketingCrosslinksBand page="demo" />
+          </section>
           <section className="space-y-5" data-founder-led-demo="journey">
             <h2 className="text-xl font-semibold text-[var(--twin-fg)] sm:text-2xl">
               {t("founderLedDemo.journeyHeading")}

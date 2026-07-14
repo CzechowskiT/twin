@@ -7,10 +7,21 @@ type DemoCaptionProps = {
   titleKey: TranslationKey;
   descriptionKey: TranslationKey;
   highlightKeys: readonly TranslationKey[];
+  compact?: boolean;
 };
 
-export function DemoCaption({ titleKey, descriptionKey, highlightKeys }: DemoCaptionProps) {
+export function DemoCaption({ titleKey, descriptionKey, highlightKeys, compact }: DemoCaptionProps) {
   const { t } = useTranslation();
+  if (compact) {
+    return (
+      <p className="text-sm font-medium text-[var(--twin-fg)] sm:text-base" data-demo-caption>
+        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--twin-accent)]">
+          {t("interactiveDemoPlayer.chaptersAria")}:{" "}
+        </span>
+        {t(titleKey)}
+      </p>
+    );
+  }
   return (
     <div className="space-y-3" data-demo-caption>
       <h3 className="text-lg font-semibold text-[var(--twin-fg)] sm:text-xl">{t(titleKey)}</h3>

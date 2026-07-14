@@ -29,12 +29,11 @@ const i18n = read("src/lib/i18n.ts");
 const globals = read("src/app/globals.css");
 
 test("demo page mounts InteractiveDemoPlayer above journey catalog", () => {
-  assert.match(demoPage, /InteractiveDemoPlayer/);
-  assert.match(demoPage, /FounderLedDemoHero/);
+  assert.match(demoPage, /DemoAboveFoldSection|InteractiveDemoPlayer/);
   assert.match(demoPage, /FounderLedDemoBelowFold/);
   assert.doesNotMatch(demoPage, /InteractiveDemoWalkthrough/);
   assert.doesNotMatch(demoPage, /DemoProductWalkthrough/);
-  const playerIdx = demoPage.indexOf("InteractiveDemoPlayer");
+  const playerIdx = demoPage.indexOf("DemoAboveFoldSection");
   const journeyIdx = demoPage.indexOf("FounderLedDemoBelowFold");
   assert.ok(playerIdx >= 0 && journeyIdx >= 0 && playerIdx < journeyIdx);
 });
