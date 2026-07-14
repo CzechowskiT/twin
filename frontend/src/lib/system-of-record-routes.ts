@@ -185,9 +185,9 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     descriptionKey: "workspaceModules.candidateCareerValue",
     hintKey: "workspaceModules.candidateCareerHint",
     ctaKey: "workspaceModules.candidateCareerCta",
-    status: "pilot",
+    status: "live",
     moduleFamily: "dashboard",
-    boundaryTags: ["pilot"],
+    boundaryTags: [],
   },
   {
     id: "candidate_profile",
@@ -289,9 +289,9 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     descriptionKey: "workspaceModules.candidateTrustCenterValue",
     hintKey: "workspaceModules.candidateTrustCenterHint",
     ctaKey: "workspaceModules.candidateTrustCenterCta",
-    status: "pilot",
+    status: "live",
     moduleFamily: "trust",
-    boundaryTags: ["pilot", "human_decision_required", "no_outreach"],
+    boundaryTags: ["human_decision_required", "no_outreach"],
   },
   {
     id: "candidate_control_center",
@@ -408,9 +408,9 @@ export const SYSTEM_OF_RECORD_ROUTES: readonly SystemOfRecordRouteEntry[] = [
     titleKey: "workspaceModules.candidateReferralsTitle",
     descriptionKey: "workspaceModules.candidateReferralsValue",
     ctaKey: "workspaceModules.candidateReferralsCta",
-    status: "pilot",
+    status: "live",
     moduleFamily: "referrals",
-    boundaryTags: ["pilot"],
+    boundaryTags: [],
   },
   // —— Recruiter ——
   {
