@@ -1,5 +1,5 @@
 /**
- * Static guard for /demo interactive walkthrough — 8 steps, simulation copy, motion safety.
+ * Static guard for /demo interactive player — autoplay, simulation copy, motion safety.
  */
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -24,49 +24,56 @@ const FORBIDDEN_IN_DEMO = [
 ];
 
 const demoPage = read("src/app/(marketing)/demo/page.tsx");
-const walkthrough = read("src/components/marketing/interactive-demo-walkthrough.tsx");
+const player = read("src/components/marketing/demo/interactive-demo-player.tsx");
 const i18n = read("src/lib/i18n.ts");
 const globals = read("src/app/globals.css");
 
-test("demo page mounts interactive walkthrough component", () => {
-  assert.match(demoPage, /InteractiveDemoWalkthrough/);
+test("demo page mounts InteractiveDemoPlayer above journey catalog", () => {
+  assert.match(demoPage, /InteractiveDemoPlayer/);
+  assert.match(demoPage, /FounderLedDemoHero/);
+  assert.match(demoPage, /FounderLedDemoBelowFold/);
+  assert.doesNotMatch(demoPage, /InteractiveDemoWalkthrough/);
   assert.doesNotMatch(demoPage, /DemoProductWalkthrough/);
+  const playerIdx = demoPage.indexOf("InteractiveDemoPlayer");
+  const journeyIdx = demoPage.indexOf("FounderLedDemoBelowFold");
+  assert.ok(playerIdx >= 0 && journeyIdx >= 0 && playerIdx < journeyIdx);
 });
 
-test("walkthrough defines eight steps with next/back and progress", () => {
-  assert.match(walkthrough, /STEP_COUNT = 8/);
-  assert.match(walkthrough, /interactiveDemo\.back/);
-  assert.match(walkthrough, /interactiveDemo\.next/);
-  assert.match(walkthrough, /role="progressbar"/);
-  assert.match(walkthrough, /interactiveDemo\.autoplay/);
+test("player autoplays on load with reduced-motion guard", () => {
+  assert.match(player, /autoplayStartedRef/);
+  assert.match(player, /prefers-reduced-motion/);
+  assert.match(player, /setPlaying\(true\)/);
 });
 
-test("walkthrough uses synthetic data only and simulation label", () => {
-  assert.match(walkthrough, /demo-walkthrough-data/);
-  assert.match(walkthrough, /interactiveDemo\.simulationLabel/);
-  assert.match(walkthrough, /interactiveDemo\.calendarSimulation/);
+test("player exposes play/pause, restart, takeover, role tabs, timeline", () => {
+  assert.match(player, /DemoControls/);
+  assert.match(player, /DemoRoleSelector/);
+  assert.match(player, /DemoTimeline/);
+  assert.match(player, /DemoChapterNavigation/);
+});
+
+test("player uses synthetic fixtures and boundary note", () => {
+  assert.match(player, /demo-scene-manifest/);
+  assert.match(player, /boundaryNote/);
   assert.match(i18n, /SIMULATION · SAMPLE DATA ONLY/);
   assert.match(i18n, /SYMULACJA · TYLKO PRÓBKA/);
 });
 
-test("walkthrough respects prefers-reduced-motion", () => {
-  assert.match(walkthrough, /prefers-reduced-motion/);
+test("player respects prefers-reduced-motion CSS", () => {
   assert.match(globals, /@media \(prefers-reduced-motion: reduce\)/);
-  assert.match(globals, /\.interactive-demo-step-enter/);
 });
 
 test("demo copy avoids forbidden live-apply claims", () => {
-  const start = i18n.indexOf("interactiveDemo:");
-  const end = i18n.indexOf("interactiveDemoPlayer:", start);
+  const start = i18n.indexOf("interactiveDemoPlayer:");
+  const end = i18n.indexOf("homepageCandidateStory:", start);
   const demoI18n = i18n.slice(start, end > start ? end : undefined);
   for (const pattern of FORBIDDEN_IN_DEMO) {
-    assert(!pattern.test(walkthrough), `Forbidden in walkthrough: ${pattern}`);
-    assert(!pattern.test(demoI18n), `Forbidden in i18n interactiveDemo: ${pattern}`);
+    assert(!pattern.test(player), `Forbidden in player: ${pattern}`);
+    assert(!pattern.test(demoI18n), `Forbidden in i18n interactiveDemoPlayer: ${pattern}`);
   }
 });
 
-test("eight step title keys exist in EN and PL", () => {
-  for (let i = 1; i <= 8; i += 1) {
-    assert.match(i18n, new RegExp(`step${i}Title:`));
-  }
+test("hero launch CTA keys exist in EN and PL", () => {
+  assert.match(i18n, /heroCtaLaunch: "Launch demo"/);
+  assert.match(i18n, /heroCtaLaunch: "Uruchom demo"/);
 });

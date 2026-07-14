@@ -10,7 +10,7 @@ import test from "node:test";
 import {
   collectFounderLedDemoHrefs,
   FOUNDER_LED_DEMO_EXTENDED_ROUTES,
-  FOUNDER_LED_DEMO_HERO_CTAS,
+  FOUNDER_LED_DEMO_ROLE_ENTRIES,
   FOUNDER_LED_BOUNDARY_KEYS,
   resolveFounderLedDemoHref,
 } from "../src/lib/founder-led-demo-routes";
@@ -86,35 +86,36 @@ test("1 /demo route page exists", () => {
   assert.ok(existsSync(join(appRoot, "(marketing)", "demo", "page.tsx")));
 });
 
-test("2 /demo page renders founder-led demo flow component", () => {
+test("2 /demo page renders hero and below-fold journey", () => {
   const page = read("src/app/(marketing)/demo/page.tsx");
-  assert.match(page, /FounderLedDemoFlow/);
-  assert.match(page, /data-founder-led-demo|FounderLedDemoFlow/);
+  assert.match(page, /FounderLedDemoHero/);
+  assert.match(page, /FounderLedDemoBelowFold/);
   const flow = read("src/components/marketing/founder-led-demo-flow.tsx");
-  assert.match(flow, /data-founder-led-demo="root"/);
+  assert.match(flow, /data-founder-led-demo="hero"/);
+  assert.match(flow, /data-founder-led-demo="journey"/);
   assert.match(flow, /founderLedDemo\.pageTitle/);
   assert.ok(en.founderLedDemo.pageTitle.length > 10);
   assert.ok(en.founderLedDemo.closingStatement.includes("auto-apply"));
 });
 
-test("3 /demo has CTA to company demo path", () => {
-  const company = FOUNDER_LED_DEMO_HERO_CTAS.find((c) => c.id === "company");
-  assert.ok(company);
-  assert.equal(normalizeHref(company.href), "/for-companies");
+test("3 /demo hero launch CTA scrolls to interactive player", () => {
   const flow = read("src/components/marketing/founder-led-demo-flow.tsx");
-  assert.match(flow, /data-founder-led-demo-cta=\{cta\.id\}/);
+  assert.match(flow, /data-founder-led-demo-cta="launch"/);
+  assert.match(flow, /heroCtaLaunch/);
+  assert.match(flow, /interactive-story/);
+  assert.ok(en.founderLedDemo.heroCtaLaunch.length > 3);
 });
 
-test("4 /demo has CTA to recruiter cockpit path", () => {
-  const recruiter = FOUNDER_LED_DEMO_HERO_CTAS.find((c) => c.id === "recruiter");
+test("4 /demo role entries include recruiter cockpit path", () => {
+  const recruiter = FOUNDER_LED_DEMO_ROLE_ENTRIES.find((r) => r.id === "role_recruiter");
   assert.ok(recruiter);
   assert.equal(normalizeHref(recruiter.href), "/recruiter");
   const resolved = resolveFounderLedDemoHref(recruiter);
   assert.match(resolved, /next=%2Frecruiter/);
 });
 
-test("5 /demo has CTA to candidate view path", () => {
-  const candidate = FOUNDER_LED_DEMO_HERO_CTAS.find((c) => c.id === "candidate");
+test("5 /demo role entries include candidate view path", () => {
+  const candidate = FOUNDER_LED_DEMO_ROLE_ENTRIES.find((r) => r.id === "role_candidate");
   assert.ok(candidate);
   assert.equal(normalizeHref(candidate.href), "/dashboard");
   const resolved = resolveFounderLedDemoHref(candidate);

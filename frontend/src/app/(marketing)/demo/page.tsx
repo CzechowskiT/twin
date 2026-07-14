@@ -6,8 +6,10 @@ import {
   InteractiveDemoPlayer,
   InteractiveDemoSystemMap,
 } from "@/components/marketing/demo/interactive-demo-player";
-import { FounderLedDemoFlow } from "@/components/marketing/founder-led-demo-flow";
-import { InteractiveDemoWalkthrough } from "@/components/marketing/interactive-demo-walkthrough";
+import {
+  FounderLedDemoBelowFold,
+  FounderLedDemoHero,
+} from "@/components/marketing/founder-led-demo-flow";
 
 export const metadata: Metadata = {
   title: "Founder-led demo — TWIN product walkthrough",
@@ -18,13 +20,11 @@ export const metadata: Metadata = {
 export default function DemoPage() {
   return (
     <>
-      <FounderLedDemoFlow />
+      <FounderLedDemoHero />
       <InteractiveDemoPlayer />
       <InteractiveDemoSystemMap />
       <DemoSurfaceCatalog />
-      <div id="interactive-simulation" className="border-t border-[var(--twin-border)]">
-        <InteractiveDemoWalkthrough />
-      </div>
+      <FounderLedDemoBelowFold />
       <DemoPilotCta />
     </>
   );
