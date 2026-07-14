@@ -2,7 +2,7 @@
  * Company marketing entry → workspace routes (/for-companies CTAs and preview cards).
  */
 import { COMPANY_HIRING_ROUTE } from "@/lib/company-hiring-dashboard";
-import { COMPANY_INTEGRATIONS_ROADMAP_OUTSIDE_HREF } from "@/lib/all-workspace-green-gate";
+import { COMPANY_INTEGRATIONS_ROUTE } from "@/lib/company-integrations-readiness";
 import { COMPANY_ROLES_ROUTE } from "@/lib/company-jobs-roles";
 import { COMPANY_TALENT_POOL_ROUTE } from "@/lib/company-talent-pool";
 import type { TranslationKey } from "@/lib/i18n";
@@ -51,7 +51,7 @@ export const COMPANY_ENTRY_PREVIEW_CARDS: readonly CompanyEntryPreviewCard[] = [
   },
   {
     id: "integrations",
-    href: COMPANY_INTEGRATIONS_ROADMAP_OUTSIDE_HREF,
+    href: COMPANY_INTEGRATIONS_ROUTE,
     titleKey: "companyEntry.previewIntegrationsTitle",
     descKey: "companyEntry.previewIntegrationsDesc",
     ctaKey: "companyEntry.previewIntegrationsCta",
@@ -70,7 +70,7 @@ export const COMPANY_ENTRY_PREVIEW_CARDS: readonly CompanyEntryPreviewCard[] = [
 /** Canonical company workspace back-links surfaced from talent pool footer. */
 export const COMPANY_TALENT_POOL_BACK_LINKS = {
   dashboard: COMPANY_ENTRY_DASHBOARD_ROUTE,
-  integrations: COMPANY_INTEGRATIONS_ROADMAP_OUTSIDE_HREF,
+  integrations: COMPANY_INTEGRATIONS_ROUTE,
   roles: COMPANY_ROLES_ROUTE,
   pipeline: "/company/pipeline",
 } as const;

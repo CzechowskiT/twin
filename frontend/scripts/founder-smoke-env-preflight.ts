@@ -35,6 +35,31 @@ function loadDotEnvKeys(path: string): Set<string> {
   return keys;
 }
 
+/** Load founder smoke vars from .env.local into process.env (never logs values). */
+export function loadFounderSmokeEnvIntoProcess(
+  env: NodeJS.ProcessEnv = process.env,
+  opts?: { rootEnvLocal?: string; frontendEnvLocal?: string },
+): void {
+  const rootPath = opts?.rootEnvLocal ?? join(repoRoot, ".env.local");
+  const frontendPath = opts?.frontendEnvLocal ?? join(repoRoot, "frontend", ".env.local");
+  for (const path of [rootPath, frontendPath]) {
+    if (!existsSync(path)) continue;
+    for (const line of readFileSync(path, "utf8").split("\n")) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("#")) continue;
+      const eq = trimmed.indexOf("=");
+      if (eq <= 0) continue;
+      const key = trimmed.slice(0, eq).trim();
+      if (!FOUNDER_SMOKE_ENV_VARS.includes(key as (typeof FOUNDER_SMOKE_ENV_VARS)[number])) continue;
+      const value = trimmed.slice(eq + 1).trim().replace(/^["']|["']$/g, "");
+      if (!value) continue;
+      if (env[key] === undefined || env[key] === "") env[key] = value;
+    }
+  }
+  const recruiter = env.RECRUITER_TOKEN?.trim() || env.TWIN_RECRUITER_TOKEN?.trim();
+  if (recruiter && !env.RECRUITER_INBOX_TOKEN) env.RECRUITER_INBOX_TOKEN = recruiter;
+}
+
 export function checkFounderSmokeEnv(
   env: NodeJS.ProcessEnv = process.env,
   opts?: { rootEnvLocal?: string; frontendEnvLocal?: string },
