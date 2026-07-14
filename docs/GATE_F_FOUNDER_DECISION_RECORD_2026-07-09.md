@@ -18,10 +18,14 @@
 | **Candidate readiness working flow** | **PASS** | PR #429 — checklist → career/evidence/consent |
 | **Deploy alignment** | **ACCEPTABLE_DOCS_ONLY_DRIFT** | prod `ae14bfb58fc0`; repo `09b9963a` (PR #471 tooling) |
 | **Guard suite** | **PASS** | visible-guard #10 LIVE; Wave B/C 16/16; `verify:production-v3:077` credentialsSet=true |
-| **Stabilization soak** | **CLOSED** | GH #29315813862 PASS — 3731s, 13 snapshots, `identityDriftDetected=false`, `credentialsSet=true`, DB 077 (LB-106 CLOSED); rejected drift run #29313170353 |
+| **Stabilization soak** | **CLOSED** | GH #29315813862 PASS — 3731s, 13 snapshots, `identityDriftDetected=false`, `credentialsSet=true`, DB 077 (LB-106 CLOSED) |
+| **LB-104 C1–C5 smoke** | **CLOSED** | Per-module evidence `docs/FOUNDER_SMOKE_C1_C5_PER_MODULE_EVIDENCE_2026-07-14.md` — all PASS @ `a5f3f6ea` |
+| **O7 DR re-drill** | **BLOCKED** | LB-201 — `RAILWAY_TOKEN`/`DATABASE_PUBLIC_URL` UNSET in agent env |
+| **R-019 delete E2E** | **BLOCKED** | LB-005 — `TWIN_PROD_TEST_JWT`/`TWIN_PROD_TEST_EMAIL` UNSET |
+| **Phase 3B @ current SHA** | **NOT_RUN** | Gate E functional PASS historical (attempt 19, 20/20 @ `80d981c`); local execution HARD BLOCKED |
 | **Public health** | **PASS** | `status=ok`, `db_ok=true`, head 077 |
 | **Recruiter prod smoke** | **PASS** | 6-route sequential behavioral @ `ae14bfb5` — 2026-07-14 |
-| **Authenticated candidate smoke** | **PARTIAL** | API login + Wave B endpoints 200; browser checklist pending |
+| **Authenticated candidate smoke** | **PASS** | Wave B browser 16/16 @ `a5f3f6ea` — career, trust, referrals, timeline |
 | **Recruiter / company smoke** | **PASS (recruiter)** | Wave C sequential smoke 6/6 @ 2026-07-14; company not re-run |
 | **Delegated apply** | **OFF** | Career compass copy; no live delegated submit CTA |
 | **Auto-apply** | **PAUSED** | Homepage + onboarding copy; no live trigger CTA |
@@ -169,13 +173,18 @@ No Gate F YES decided by this document. No Launch GO claimed by this document.
 
 ```
 GATE_F_FOUNDER_DECISION_RECORD_DATE: 2026-07-09
-BATCH_UPDATE: 2026-07-14T09:30Z
+BATCH_UPDATE: 2026-07-14T12:00Z
 AUTHENTICATED_SMOKE_DATE: 2026-07-09
 AUTHENTICATED_SMOKE_REFRESH: 2026-07-14
 DEPLOY_ALIGNMENT: ACCEPTABLE_DOCS_ONLY_DRIFT
-FRONTEND_COMMIT: ad7944b8 (prod FE)
+FRONTEND_COMMIT: 874b8586 (prod FE)
 API_COMMIT: ae14bfb58fc0
-REPO_HEAD: 09b9963a
+REPO_HEAD: 874b8586
+LB_104: CLOSED
+LB_201: BLOCKED
+LB_005: BLOCKED
+PHASE_3B_CURRENT_SHA: NOT_RUN
+PHASE_3B_FUNCTIONAL: PASS_ATTEMPT_19
 CREDENTIALS_SET: true
 STABILIZATION_MONITOR_RUN: 29315813862
 STABILIZATION_60MIN_SOAK: CLOSED

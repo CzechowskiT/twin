@@ -8,13 +8,14 @@
 
 | Field | Value |
 |-------|-------|
-| **Path** | A (credentials SET — partial smoke) |
-| **repo_head** | `26416bee` |
+| **Path** | A (credentials SET — Wave B/C smoke PASS) |
+| **repo_head** | `874b8586` |
 | **prod_api_commit** | `ae14bfb58fc0` (public-health) |
-| **prod_frontend** | `https://twin-sooty.vercel.app` (`26416beec545`) |
+| **prod_frontend** | `https://twin-sooty.vercel.app` (`874b8586`) |
 | **prod_db_head** | `077_candidate_activity_timeline` |
-| **alignment_status** | **ACCEPTABLE_DOCS_ONLY_DRIFT** — prod FE `26416bee`; repo tooling aligned |
+| **alignment_status** | **ACCEPTABLE_DOCS_ONLY_DRIFT** — prod FE `874b8586`; repo docs batch |
 | **Scorecard** | [PUBLIC_LAUNCH_9_OF_10_SCORECARD.md](./PUBLIC_LAUNCH_9_OF_10_SCORECARD.md) — **NO-GO** |
+| **LB-104** | **CLOSED** — C1–C5 per-module evidence |
 | **LB-106** | **CLOSED** — soak #29315813862 PASS |
 | **P0** | CLOSED |
 | **Gate E** | PASS |
@@ -28,6 +29,7 @@
 | Doc | Purpose |
 |-----|---------|
 | **[PUBLIC_LAUNCH_9_OF_10_SCORECARD.md](./PUBLIC_LAUNCH_9_OF_10_SCORECARD.md)** | **Canonical GO/NO-GO scorecard (40 criteria)** |
+| [FOUNDER_SMOKE_C1_C5_PER_MODULE_EVIDENCE_2026-07-14.md](./FOUNDER_SMOKE_C1_C5_PER_MODULE_EVIDENCE_2026-07-14.md) | LB-104 canonical C1–C5 per-module smoke |
 | [Stabilization soak evidence](../reports/stabilization/29315813862/) | LB-106 canonical PASS — GH #29315813862 |
 | [PUBLIC_LAUNCH_FUNCTIONALITY_INVENTORY_2026-07-13.md](./PUBLIC_LAUNCH_FUNCTIONALITY_INVENTORY_2026-07-13.md) | Route/module inventory with status |
 | [PUBLIC_LAUNCH_READINESS_MATRIX_2026-07-13.md](./PUBLIC_LAUNCH_READINESS_MATRIX_2026-07-13.md) | Gate matrix A–H |
@@ -76,4 +78,4 @@ python3 -m pytest tests/ -q --ignore=tests/test_nightly_auto_apply_integration.p
 
 ## Executive launch verdict
 
-**NO-GO** — Core marketing + scoped LIVE modules are production-stable (Gate E PASS; LB-106 60min soak CLOSED @ #29315813862), but Gate F is pending, LB-001/LB-004/LB-005/LB-201/LB-104 remain open/blocked, and O7 DR re-drill is blocked. Controlled founder-led pilot remains supported; public uncontrolled launch is forbidden.
+**NO-GO** — Core marketing + scoped LIVE modules are production-stable (Gate E PASS; LB-106 60min soak CLOSED @ #29315813862; LB-104 C1–C5 smoke CLOSED), but Gate F is pending, LB-001/LB-004/LB-005/LB-201 remain open/blocked, and O7 DR re-drill is blocked. Controlled founder-led pilot remains supported; public uncontrolled launch is forbidden.

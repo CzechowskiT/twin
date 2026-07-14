@@ -32,7 +32,7 @@ Per **LIMITED_RECRUITER_PILOT_TRACKER**:
 | Module ID | `recruiter_daily_cockpit` / `daily_cockpit` |
 | Route | `/recruiter/daily-cockpit` (+ hub panel on `/recruiter`) |
 | Activation | **PILOT** (not GREEN_WORKING) |
-| Browser smoke | **NEEDS_FOUNDER_AUTH_SMOKE** — no recruiter token in founder doc |
+| Browser smoke | **PASS** @ prod `a5f3f6ea` (2026-07-14) — [per-module evidence](./FOUNDER_SMOKE_C1_C5_PER_MODULE_EVIDENCE_2026-07-14.md) |
 
 Daily cockpit demo queues **unchanged** — persistence tracks onboarding only.
 
@@ -64,6 +64,6 @@ cd frontend && npm run test:all-modules-green-wave-c1-recruiter-activation-guard
 cd frontend && npm run test:candidate-green-modules-founder-smoke-guard
 ```
 
-## Next batch
+## Founder smoke (CLOSED)
 
-Founder browser smoke: pilot recruiter token → `/recruiter` → connect → inbox load → first decision → verify persistence. On pass: document in founder smoke runbook; consider flipping daily cockpit toward GREEN_WORKING in a later wave.
+Prod browser smoke **PASS** @ `a5f3f6eae97e7554f393c1b53302078f0376f2fd` — slice `C1_activation`. Evidence: [FOUNDER_SMOKE_C1_C5_PER_MODULE_EVIDENCE_2026-07-14.md](./FOUNDER_SMOKE_C1_C5_PER_MODULE_EVIDENCE_2026-07-14.md). Module remains **PILOT** until separate founder LIVE decision.
