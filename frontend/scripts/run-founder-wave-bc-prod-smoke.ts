@@ -78,14 +78,23 @@ function loadBypassSecret(): string {
   return secret;
 }
 
+type PlaywrightJsonSpec = {
+  title: string;
+  ok?: boolean;
+  tests?: Array<{ results?: Array<{ status?: string }> }>;
+};
+
+type PlaywrightJsonSuite = {
+  specs?: PlaywrightJsonSpec[];
+  suites?: PlaywrightJsonSuite[];
+};
+
 function parsePlaywrightJsonReport(jsonPath: string): SmokeEvidenceSlice[] {
   if (!existsSync(jsonPath)) return [];
   try {
-    const raw = JSON.parse(readFileSync(jsonPath, "utf8")) as {
-      suites?: Array<{ suites?: Array<{ specs?: Array<{ title: string; ok?: boolean; tests?: Array<{ results?: Array<{ status?: string }> }> }> }> }>;
-    };
+    const raw = JSON.parse(readFileSync(jsonPath, "utf8")) as { suites?: PlaywrightJsonSuite[] };
     const slices: SmokeEvidenceSlice[] = [];
-    const walk = (suites: typeof raw.suites) => {
+    const walk = (suites: PlaywrightJsonSuite[] | undefined) => {
       for (const suite of suites ?? []) {
         for (const spec of suite.specs ?? []) {
           const status = spec.tests?.[0]?.results?.[0]?.status;
@@ -209,7 +218,11 @@ async function main(): Promise<void> {
       stdio: "inherit",
     });
   } catch (err: unknown) {
-    exitCode = typeof (err as NodeJS.ErrnoException)?.status === "number" ? (err as NodeJS.ErrnoException).status! : 1;
+    const maybeStatus =
+      err && typeof err === "object" && "status" in err
+        ? (err as { status?: unknown }).status
+        : undefined;
+    exitCode = typeof maybeStatus === "number" ? maybeStatus : 1;
   }
 
   const slices: SmokeEvidenceSlice[] =
