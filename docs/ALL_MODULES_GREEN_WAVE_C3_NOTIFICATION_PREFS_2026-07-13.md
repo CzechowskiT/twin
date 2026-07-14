@@ -1,6 +1,6 @@
 # Wave C slice 3 — recruiter in-app notification preferences (2026-07-13)
 
-> **Status:** PILOT — `NEEDS_FOUNDER_AUTH_SMOKE`  
+> **Status:** PILOT — founder smoke **PASS** @ prod `a5f3f6ea` (2026-07-14)  
 > **Stance:** P0 CLOSED | Gate F PENDING | Launch NO-GO  
 > **PR branch:** `feat/all-modules-green-wave-c3-notification-prefs`  
 > **Migration:** `074_recruiter_notification_preferences_c3` (`down_revision=072`)
@@ -35,9 +35,9 @@ Frontend proxy: `/api/recruiter/notification-preferences`
 
 `073_candidate_referrals` comes from PR #448 at merge time. C3 stacks on #450/#451 with `074` chained from `072`.
 
-## Founder smoke
+## Founder smoke (CLOSED)
 
-See `docs/RECRUITER_WAVE_C_FOUNDER_SMOKE_2026-07-13.md` — add C3 steps when credentials available. **No fake PASS.**
+Slice `C3_notification_prefs` **PASS** @ prod `a5f3f6eae97e7554f393c1b53302078f0376f2fd`. Evidence: [FOUNDER_SMOKE_C1_C5_PER_MODULE_EVIDENCE_2026-07-14.md](./FOUNDER_SMOKE_C1_C5_PER_MODULE_EVIDENCE_2026-07-14.md) · [FOUNDER_WAVE_BC_SMOKE_EVIDENCE_2026-07-14.md](./FOUNDER_WAVE_BC_SMOKE_EVIDENCE_2026-07-14.md).
 
 ## Rollback
 

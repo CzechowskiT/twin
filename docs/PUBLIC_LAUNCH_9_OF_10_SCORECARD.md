@@ -1,9 +1,9 @@
 # Public launch 9/10 scorecard — canonical
 
-> **Generated:** 2026-07-14T09:30:00Z · **Path:** A (credentials SET) · **Owner:** Eng agent closed batch  
-> **Verdict:** **NO-GO** — Gate F PENDING founder sign-off; mandatory E2E/DR rows still FAIL/BLOCKED; LB-106 stabilization soak **CLOSED**.
+> **Generated:** 2026-07-14T12:00:00Z · **Path:** A (credentials SET) · **Owner:** Eng agent closed batch  
+> **Verdict:** **NO-GO** — Gate F PENDING founder sign-off; LB-104 CLOSED; O7/R-019 BLOCKED; LB-106 stabilization soak **CLOSED**.
 
-**Supersedes:** scorecard @ 2026-07-14T06:45Z · PR #471 merged @ `09b9963a` · stabilization soak #29315813862 PASS.
+**Supersedes:** scorecard @ 2026-07-14T09:30Z · PR #473 merged @ `874b8586` · LB-104 per-module evidence batch.
 
 ---
 
@@ -25,11 +25,11 @@
 
 | Pole | Wartość |
 |------|---------|
-| **repo_head** | `26416bee` (stabilization soak + LB-106 evidence batch) |
+| **repo_head** | `874b8586` (LB-104 + Gate F pack batch) |
 | **prod_api_commit** | `ae14bfb58fc0` |
 | **prod_frontend** | `https://twin-sooty.vercel.app` |
 | **prod_db_head** | `077_candidate_activity_timeline` (`db_ok=true`) |
-| **alignment_status** | **ACCEPTABLE_DOCS_ONLY_DRIFT** — prod `ae14bfb5`; repo tooling +1 commit |
+| **alignment_status** | **ACCEPTABLE_DOCS_ONLY_DRIFT** — prod FE `874b8586`; repo docs batch |
 | **Credentials** | SET (`DEMO_USER_PASSWORD`, `RECRUITER_TOKEN` via `frontend/.env.local`; verifier `credentialsSet=true`) |
 | **Gate F** | PENDING |
 | **Launch** | **NO-GO** |
@@ -73,17 +73,17 @@
 | # | Kryterium | Status | Evidence |
 |---|-----------|--------|----------|
 | B1 | Founder smoke credentials SET | **PASS** ★ | `preflight:founder-smoke-env` SET @ 2026-07-14 |
-| B2 | Wave B candidate smoke PASS | **PARTIAL** ★ | API login + career/referrals/consents 200; browser checklist NOT_RUN |
-| B3 | Wave C recruiter smoke PASS | **PASS** ★ | `test:prod-recruiter-sequential-behavioral-smoke` 6/6 routes PASS |
+| B2 | Wave B candidate smoke PASS | **PASS** ★ | 16/16 Playwright @ `a5f3f6ea` — `docs/FOUNDER_WAVE_BC_SMOKE_EVIDENCE_2026-07-14.md` |
+| B3 | Wave C recruiter smoke PASS | **PASS** ★ | C1–C5 per-module PASS — `docs/FOUNDER_SMOKE_C1_C5_PER_MODULE_EVIDENCE_2026-07-14.md` |
 | B4 | Manual E2E matrix documented | **PASS** | `docs/PUBLIC_LAUNCH_FUNCTIONALITY_INVENTORY_2026-07-13.md` |
-| B5 | Console-error-free browser sessions | **BLOCKED** ★ | `reports/founder-smoke/founder-smoke-2026-07-13T12-33-35-837Z.json` — smokeExecuted=false |
-| B6 | Authenticated persistence smoke | **BLOCKED** | Credentials UNSET |
-| B7 | Multitab stability (Phase 3B) | **BLOCKED** | Gate E PASS historical; no fresh manual run @ current SHA |
+| B5 | Console-error-free browser sessions | **PASS** ★ | Wave B/C smoke `console_errors: none` @ 2026-07-14 |
+| B6 | Authenticated persistence smoke | **PASS** | Wave B/C refresh persistence verified @ `a5f3f6ea` |
+| B7 | Multitab stability (Phase 3B) | **PASS** (historical) | Gate E attempt 19 — 20/20 @ `80d981c`; **NOT_RUN** @ current SHA `874b8586` |
 | B8 | Scoped launch routes (8/5/4) verified | **PASS** (public only) | Public routes 200; auth routes unreachable without creds |
-| B9 | R-019 delete flow E2E smoke | **BLOCKED** | API on #451 branch only; prod `c2a08b0` lacks endpoint |
+| B9 | R-019 delete flow E2E smoke | **BLOCKED** | LB-005 — `TWIN_PROD_TEST_JWT` UNSET; no disposable test account |
 | B10 | Founder E2E sign-off recorded | **BLOCKED** ★ | Gate F PENDING — LB-001 |
 
-**Area B score: 2/10** (5 mandatory BLOCKED → auto NO-GO)
+**Area B score: 7/10** (B9, B10 mandatory BLOCKED → auto NO-GO)
 
 ---
 

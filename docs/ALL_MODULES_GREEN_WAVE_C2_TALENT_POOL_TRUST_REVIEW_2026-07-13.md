@@ -23,8 +23,8 @@ Wave C slice 2 delivers **PostgreSQL persistence** for recruiter Talent Pool (ma
 
 | Module ID | Route | Status | Browser smoke |
 |-----------|-------|--------|---------------|
-| `recruiter_talent_pool` / `talent_pool` | `/recruiter/talent-pool` | **PILOT** | **NEEDS_FOUNDER_AUTH_SMOKE** |
-| `recruiter_trust_review_queue` / `trust_review_queue` | `/recruiter/trust-review-queue` | **PILOT** | **NEEDS_FOUNDER_AUTH_SMOKE** |
+| `recruiter_talent_pool` / `talent_pool` | `/recruiter/talent-pool` | **PILOT** | **PASS** @ prod `a5f3f6ea` (2026-07-14) |
+| `recruiter_trust_review_queue` / `trust_review_queue` | `/recruiter/trust-review-queue` | **PILOT** | **PASS** @ prod `a5f3f6ea` (2026-07-14) |
 
 ## Trust Center integration (#447)
 
@@ -72,6 +72,6 @@ cd frontend && npm run test:candidate-green-modules-founder-smoke-guard
 cd frontend && npm run build
 ```
 
-## Next batch
+## Founder smoke (CLOSED)
 
-Founder browser smoke with pilot recruiter token: load talent pool → add candidate → archive → open trust review queue → record decision → refresh verify persistence. Document PASS in founder smoke runbook before flipping modules toward GREEN_WORKING.
+Prod browser smoke **PASS** @ `a5f3f6eae97e7554f393c1b53302078f0376f2fd` — slices `C2_talent_pool`, `C2_trust_review`. Evidence: [FOUNDER_SMOKE_C1_C5_PER_MODULE_EVIDENCE_2026-07-14.md](./FOUNDER_SMOKE_C1_C5_PER_MODULE_EVIDENCE_2026-07-14.md). Modules remain **PILOT**.
