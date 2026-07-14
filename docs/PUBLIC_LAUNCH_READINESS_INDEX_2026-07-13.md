@@ -9,11 +9,11 @@
 | Field | Value |
 |-------|-------|
 | **Path** | A (credentials SET — Wave B/C smoke PASS) |
-| **repo_head** | `874b8586` |
+| **repo_head** | `934cbbeb` |
 | **prod_api_commit** | `ae14bfb58fc0` (public-health) |
-| **prod_frontend** | `https://twin-sooty.vercel.app` (`874b8586`) |
+| **prod_frontend** | `https://twin-society.vercel.app` (`934cbbeb`) |
 | **prod_db_head** | `077_candidate_activity_timeline` |
-| **alignment_status** | **ACCEPTABLE_DOCS_ONLY_DRIFT** — prod FE `874b8586`; repo docs batch |
+| **alignment_status** | **ALIGNED** — prod FE = repo HEAD |
 | **Scorecard** | [PUBLIC_LAUNCH_9_OF_10_SCORECARD.md](./PUBLIC_LAUNCH_9_OF_10_SCORECARD.md) — **NO-GO** |
 | **LB-104** | **CLOSED** — C1–C5 per-module evidence |
 | **LB-106** | **CLOSED** — soak #29315813862 PASS |
@@ -30,6 +30,7 @@
 |-----|---------|
 | **[PUBLIC_LAUNCH_9_OF_10_SCORECARD.md](./PUBLIC_LAUNCH_9_OF_10_SCORECARD.md)** | **Canonical GO/NO-GO scorecard (40 criteria)** |
 | [FOUNDER_SMOKE_C1_C5_PER_MODULE_EVIDENCE_2026-07-14.md](./FOUNDER_SMOKE_C1_C5_PER_MODULE_EVIDENCE_2026-07-14.md) | LB-104 canonical C1–C5 per-module smoke |
+| [DEMO_FOUNDER_REVIEW_EVIDENCE_2026-07-14.md](./DEMO_FOUNDER_REVIEW_EVIDENCE_2026-07-14.md) | Prod real-video demo 18/18 visual PASS |
 | [Stabilization soak evidence](../reports/stabilization/29315813862/) | LB-106 canonical PASS — GH #29315813862 |
 | [PUBLIC_LAUNCH_FUNCTIONALITY_INVENTORY_2026-07-13.md](./PUBLIC_LAUNCH_FUNCTIONALITY_INVENTORY_2026-07-13.md) | Route/module inventory with status |
 | [PUBLIC_LAUNCH_READINESS_MATRIX_2026-07-13.md](./PUBLIC_LAUNCH_READINESS_MATRIX_2026-07-13.md) | Gate matrix A–H |
