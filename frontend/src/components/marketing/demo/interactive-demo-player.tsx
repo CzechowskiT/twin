@@ -29,27 +29,28 @@ import { indexForElapsed } from "@/lib/demo/demo-playback";
 
 const TICK_MS = 200;
 
-function usePrefersReducedMotion(): boolean {
-  const [reduce, setReduce] = useState(false);
+function usePrefersReducedMotion(): { reducedMotion: boolean; checked: boolean } {
+  const [state, setState] = useState({ reducedMotion: false, checked: false });
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const sync = () => setReduce(mq.matches);
+    const sync = () => setState({ reducedMotion: mq.matches, checked: true });
     sync();
     mq.addEventListener("change", sync);
     return () => mq.removeEventListener("change", sync);
   }, []);
-  return reduce;
+  return state;
 }
 
 export function InteractiveDemoPlayer() {
   const { t, locale } = useTranslation();
-  const reducedMotion = usePrefersReducedMotion();
+  const { reducedMotion, checked: motionChecked } = usePrefersReducedMotion();
   const [role, setRole] = useState<DemoRole>("overview");
   const [elapsedMs, setElapsedMs] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [takeover, setTakeover] = useState(false);
   const startedRef = useRef(false);
   const viewedRef = useRef(false);
+  const autoplayStartedRef = useRef(false);
 
   const scenes = useMemo(() => scenesForRole(role), [role]);
   const activeIndex = useMemo(() => indexForElapsed(scenes, elapsedMs), [elapsedMs, scenes]);
@@ -67,6 +68,14 @@ export function InteractiveDemoPlayer() {
     viewedRef.current = true;
     trackDemoViewed({ locale, reduced_motion: reducedMotion });
   }, [locale, reducedMotion]);
+
+  useEffect(() => {
+    if (!motionChecked || reducedMotion || autoplayStartedRef.current) return;
+    autoplayStartedRef.current = true;
+    startedRef.current = true;
+    trackDemoStarted({ role, locale, mode: "full" });
+    setPlaying(true);
+  }, [motionChecked, reducedMotion, role, locale]);
 
   useEffect(() => {
     if (!playing || takeover || reducedMotion) return;
@@ -122,12 +131,17 @@ export function InteractiveDemoPlayer() {
   return (
     <Shell wide rail>
       <MarketingPageSurface wide withCard={false}>
-        <section className="marketing-copy-rail space-y-6" data-interactive-demo-player id="interactive-story">
+        <section
+          className="marketing-copy-rail scroll-mt-20 space-y-5 sm:space-y-6"
+          data-interactive-demo-player
+          id="interactive-story"
+          tabIndex={-1}
+        >
           <header className="space-y-2">
             <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
               {t("interactiveDemoPlayer.eyebrow")}
             </p>
-            <h2 className="twin-section-title text-2xl sm:text-3xl">{t("interactiveDemoPlayer.title")}</h2>
+            <h2 className="twin-section-title text-2xl sm:text-3xl lg:text-4xl">{t("interactiveDemoPlayer.title")}</h2>
             <p className="max-w-3xl text-sm leading-relaxed text-[var(--twin-muted-strong)] sm:text-base">
               {t("interactiveDemoPlayer.lead")}
             </p>

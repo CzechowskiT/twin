@@ -22,10 +22,13 @@ function read(rel: string): string {
   return readFileSync(join(root, rel), "utf8");
 }
 
-test("1 demo page mounts InteractiveDemoPlayer and walkthrough", () => {
+test("1 demo page mounts InteractiveDemoPlayer before below-fold journey", () => {
   const page = read("src/app/(marketing)/demo/page.tsx");
   assert.match(page, /InteractiveDemoPlayer/);
-  assert.match(page, /InteractiveDemoWalkthrough/);
+  assert.doesNotMatch(page, /InteractiveDemoWalkthrough/);
+  const playerIdx = page.indexOf("InteractiveDemoPlayer");
+  const belowIdx = page.indexOf("FounderLedDemoBelowFold");
+  assert.ok(playerIdx >= 0 && belowIdx >= 0 && playerIdx < belowIdx);
 });
 
 test("2 manifest defines DemoSurface on every scene", () => {
@@ -61,8 +64,8 @@ test("6 launch stance NO-GO in player boundary copy", () => {
   assert.match(player, /boundaryNote/);
 });
 
-test("7 walkthrough still eight steps with simulation label", () => {
-  const walkthrough = read("src/components/marketing/interactive-demo-walkthrough.tsx");
-  assert.match(walkthrough, /STEP_COUNT = 8/);
-  assert.match(walkthrough, /interactiveDemo\.simulationLabel/);
+test("7 player autoplays with reduced-motion guard", () => {
+  const player = read("src/components/marketing/demo/interactive-demo-player.tsx");
+  assert.match(player, /autoplayStartedRef/);
+  assert.match(player, /prefers-reduced-motion/);
 });

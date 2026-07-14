@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useCallback } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { MarketingCrosslinksBand } from "@/components/marketing/marketing-crosslinks-band";
@@ -8,11 +9,20 @@ import { MarketingPageSurface } from "@/components/marketing/marketing-page-surf
 import { Shell } from "@/components/ui";
 import {
   FOUNDER_LED_BOUNDARY_KEYS,
-  FOUNDER_LED_DEMO_HERO_CTAS,
   FOUNDER_LED_DEMO_JOURNEY_STEPS,
   FOUNDER_LED_DEMO_ROLE_ENTRIES,
   resolveFounderLedDemoHref,
 } from "@/lib/founder-led-demo-routes";
+
+function scrollToInteractivePlayer(): void {
+  const section = document.getElementById("interactive-story");
+  if (!section) return;
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  section.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+  section.focus({ preventScroll: true });
+  const playBtn = section.querySelector<HTMLButtonElement>("[data-demo-controls] button");
+  playBtn?.focus({ preventScroll: true });
+}
 
 function DemoLinkCard({
   href,
@@ -39,42 +49,47 @@ function DemoLinkCard({
   );
 }
 
-export function FounderLedDemoFlow() {
+/** Compact hero — interactive player sits directly below on first screen. */
+export function FounderLedDemoHero() {
+  const { t } = useTranslation();
+  const onLaunchDemo = useCallback(() => scrollToInteractivePlayer(), []);
+
+  return (
+    <Shell wide rail>
+      <MarketingPageSurface wide withCard={false}>
+        <header className="marketing-copy-rail min-w-0 space-y-4 pb-2 sm:space-y-5" data-founder-led-demo="hero">
+          <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
+            {t("founderLedDemo.pageEyebrow")}
+          </p>
+          <h1 className="twin-section-title text-2xl sm:text-3xl md:text-4xl">{t("founderLedDemo.pageTitle")}</h1>
+          <p className="max-w-3xl text-base leading-relaxed text-[var(--twin-muted-strong)] sm:text-lg">
+            {t("founderLedDemo.pageLead")}
+          </p>
+          <div className="flex flex-wrap gap-3 pt-1">
+            <button
+              type="button"
+              data-founder-led-demo-cta="launch"
+              className="twin-btn-primary twin-touch-target"
+              onClick={onLaunchDemo}
+            >
+              {t("founderLedDemo.heroCtaLaunch")}
+            </button>
+          </div>
+          <MarketingCrosslinksBand page="demo" className="pt-2" />
+        </header>
+      </MarketingPageSurface>
+    </Shell>
+  );
+}
+
+/** Journey, role entries, and boundaries — below interactive player. */
+export function FounderLedDemoBelowFold() {
   const { t } = useTranslation();
 
   return (
     <Shell wide rail>
       <MarketingPageSurface wide withCard={false}>
         <div className="marketing-copy-rail min-w-0 space-y-10 sm:space-y-14" data-founder-led-demo="root">
-          <header className="min-w-0 space-y-5" data-founder-led-demo="hero">
-            <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
-              {t("founderLedDemo.pageEyebrow")}
-            </p>
-            <h1 className="twin-section-title text-2xl sm:text-3xl md:text-4xl">
-              {t("founderLedDemo.pageTitle")}
-            </h1>
-            <p className="max-w-3xl text-base leading-relaxed text-[var(--twin-muted-strong)] sm:text-lg">
-              {t("founderLedDemo.pageLead")}
-            </p>
-            <div className="flex flex-wrap gap-3 pt-1">
-              {FOUNDER_LED_DEMO_HERO_CTAS.map((cta) => (
-                <Link
-                  key={cta.id}
-                  href={resolveFounderLedDemoHref(cta)}
-                  data-founder-led-demo-cta={cta.id}
-                  className={
-                    cta.id === "company"
-                      ? "twin-btn-primary twin-touch-target"
-                      : "twin-btn-secondary twin-touch-target"
-                  }
-                >
-                  {t(cta.labelKey)}
-                </Link>
-              ))}
-            </div>
-            <MarketingCrosslinksBand page="demo" className="pt-3" />
-          </header>
-
           <section className="space-y-5" data-founder-led-demo="journey">
             <h2 className="text-xl font-semibold text-[var(--twin-fg)] sm:text-2xl">
               {t("founderLedDemo.journeyHeading")}
@@ -117,9 +132,7 @@ export function FounderLedDemoFlow() {
             className="rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-soft)] p-6 sm:p-8"
             data-founder-led-demo="boundaries"
           >
-            <h2 className="text-xl font-semibold text-[var(--twin-fg)]">
-              {t("founderLedDemo.boundariesHeading")}
-            </h2>
+            <h2 className="text-xl font-semibold text-[var(--twin-fg)]">{t("founderLedDemo.boundariesHeading")}</h2>
             <p className="mt-3 text-sm leading-relaxed text-[var(--twin-muted-strong)] sm:text-base">
               {t("founderLedDemo.boundariesLead")}
             </p>
@@ -133,18 +146,18 @@ export function FounderLedDemoFlow() {
             </ul>
             <p className="mt-6 text-base font-medium text-[var(--twin-fg)]">{t("founderLedDemo.closingStatement")}</p>
           </section>
-
-          <section className="rounded-xl border border-dashed border-[var(--twin-border)] p-5 sm:p-6">
-            <h2 className="text-lg font-semibold text-[var(--twin-fg)]">{t("founderLedDemo.interactiveSectionTitle")}</h2>
-            <p className="mt-2 text-sm leading-relaxed text-[var(--twin-muted-strong)]">
-              {t("founderLedDemo.interactiveSectionLead")}
-            </p>
-            <Link href="#interactive-simulation" className="twin-btn-secondary twin-touch-target mt-4 inline-flex">
-              {t("founderLedDemo.interactiveSectionCta")}
-            </Link>
-          </section>
         </div>
       </MarketingPageSurface>
     </Shell>
+  );
+}
+
+/** @deprecated Use FounderLedDemoHero + FounderLedDemoBelowFold on /demo. */
+export function FounderLedDemoFlow() {
+  return (
+    <>
+      <FounderLedDemoHero />
+      <FounderLedDemoBelowFold />
+    </>
   );
 }

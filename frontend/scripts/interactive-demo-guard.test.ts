@@ -43,15 +43,19 @@ test("3 analytics wrapper avoids PII props", () => {
   assert.doesNotMatch(analytics, /email/);
 });
 
-test("4 reduced motion hook present in player", () => {
+test("4 reduced motion hook and autoplay guard present in player", () => {
   const player = read("src/components/marketing/demo/interactive-demo-player.tsx");
   assert.match(player, /prefers-reduced-motion/);
+  assert.match(player, /autoplayStartedRef/);
 });
 
-test("5 catalog keeps founder-led journey count", () => {
+test("5 catalog collapsed toggle uses explore-all copy", () => {
   assert.ok(FOUNDER_LED_DEMO_JOURNEY_STEPS.length >= 30);
   const catalog = read("src/components/marketing/demo/demo-surface-catalog.tsx");
   assert.match(catalog, /FOUNDER_LED_DEMO_JOURNEY_STEPS/);
+  assert.match(catalog, /catalogToggle/);
+  assert.match(en.interactiveDemoPlayer.catalogToggle, /Explore all product surfaces/);
+  assert.match(dictionaries.pl.interactiveDemoPlayer.catalogToggle, /Zobacz wszystkie moduły produktu/);
 });
 
 test("6 i18n interactiveDemoPlayer keys mirrored EN/PL", () => {

@@ -39,7 +39,7 @@ async function assertNo404Blank(page: Page, path: string): Promise<void> {
 test.describe("Founder-led demo flow browser", () => {
   test.describe.configure({ timeout: 120_000 });
 
-  test("homepage Demo button links to /demo; page shows hero and journey", async ({ browser }) => {
+  test("homepage Demo button links to /demo; player visible above journey", async ({ browser }) => {
     await withFreshContext(browser, async (context) => {
       const page = await context.newPage();
       await page.goto("/", { waitUntil: "domcontentloaded" });
@@ -50,10 +50,15 @@ test.describe("Founder-led demo flow browser", () => {
       await page.goto("/demo", { waitUntil: "domcontentloaded" });
       await dismissCookieBanner(page);
       await expect(page.locator('[data-founder-led-demo="hero"]')).toBeVisible({ timeout: ROUTE_SETTLE_MS });
-      await expect(page.locator('[data-founder-led-demo="journey"]')).toBeVisible();
-      await expect(page.locator('[data-founder-led-demo-cta="company"]')).toBeVisible();
-      await expect(page.locator('[data-founder-led-demo-cta="recruiter"]')).toBeVisible();
-      await expect(page.locator('[data-founder-led-demo-cta="candidate"]')).toBeVisible();
+      await expect(page.locator("[data-interactive-demo-player]")).toBeVisible();
+      const playerBox = await page.locator("[data-interactive-demo-player]").boundingBox();
+      const journeyBox = await page.locator('[data-founder-led-demo="journey"]').boundingBox();
+      expect(playerBox).toBeTruthy();
+      expect(journeyBox).toBeTruthy();
+      if (playerBox && journeyBox) {
+        expect(playerBox.y).toBeLessThan(journeyBox.y);
+      }
+      await expect(page.locator('[data-founder-led-demo-cta="launch"]')).toBeVisible();
     });
   });
 
@@ -80,16 +85,16 @@ test.describe("Founder-led demo flow browser", () => {
     });
   });
 
-  test("auth-gated recruiter cockpit preserves next on login path", async ({ browser }) => {
+  test("auth-gated recruiter role entry preserves next on login path", async ({ browser }) => {
     await withFreshContext(browser, async (context) => {
       const page = await context.newPage();
       await page.goto("/demo", { waitUntil: "domcontentloaded" });
       await dismissCookieBanner(page);
-      const recruiterCta = page.locator('[data-founder-led-demo-cta="recruiter"]');
-      await expect(recruiterCta).toBeVisible();
-      const href = await recruiterCta.getAttribute("href");
+      const recruiterLink = page.locator('[data-founder-led-demo-link="role_recruiter"]');
+      await expect(recruiterLink).toBeVisible();
+      const href = await recruiterLink.getAttribute("href");
       expect(href ?? "").toMatch(/next=%2Frecruiter|next=\/recruiter/);
-      await recruiterCta.click();
+      await recruiterLink.click();
       await page.waitForURL(/login|recruiter/, { timeout: ROUTE_SETTLE_MS });
       const url = page.url();
       const body = (await page.locator("body").innerText()).toLowerCase();
@@ -102,15 +107,15 @@ test.describe("Founder-led demo flow browser", () => {
     });
   });
 
-  test("company demo entry and boundaries section render", async ({ browser }) => {
+  test("company role entry and boundaries section render", async ({ browser }) => {
     await withFreshContext(browser, async (context) => {
       const page = await context.newPage();
       await assertNo404Blank(page, "/demo");
       await expect(page.locator('[data-founder-led-demo="boundaries"]')).toBeVisible();
-      const companyCta = page.locator('[data-founder-led-demo-cta="company"]');
-      await expect(companyCta).toHaveAttribute("href", /for-companies/);
-      await companyCta.click();
-      await page.waitForURL(/for-companies/, { timeout: ROUTE_SETTLE_MS });
+      const companyLink = page.locator('[data-founder-led-demo-link="role_company"]');
+      await expect(companyLink).toHaveAttribute("href", /company\/dashboard|login/);
+      await companyLink.click();
+      await page.waitForURL(/company|login/, { timeout: ROUTE_SETTLE_MS });
       const textLen = await visibleTextLength(page);
       expect(textLen).toBeGreaterThan(MIN_VISIBLE_TEXT);
     });

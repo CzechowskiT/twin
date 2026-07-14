@@ -20,22 +20,33 @@ export function DemoSurfaceCatalog() {
     <Shell wide rail>
       <MarketingPageSurface wide withCard={false}>
         <section className="marketing-copy-rail space-y-4" id="surface-catalog" data-demo-surface-catalog>
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <h2 className="text-xl font-semibold text-[var(--twin-fg)]">{t("interactiveDemoPlayer.catalogHeading")}</h2>
-              <p className="mt-1 text-sm text-[var(--twin-muted-strong)]">
-                {t("interactiveDemoPlayer.catalogLead").replace("35", String(count))}
-              </p>
-            </div>
+          {!open ? (
             <button
               type="button"
               className="twin-btn-secondary twin-touch-target text-sm"
-              aria-expanded={open}
-              onClick={() => setOpen((v) => !v)}
+              aria-expanded={false}
+              onClick={() => setOpen(true)}
             >
-              {open ? t("interactiveDemoPlayer.catalogToggleHide") : t("interactiveDemoPlayer.catalogToggle")}
+              {t("interactiveDemoPlayer.catalogToggle")}
             </button>
-          </div>
+          ) : (
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <h2 className="text-xl font-semibold text-[var(--twin-fg)]">{t("interactiveDemoPlayer.catalogHeading")}</h2>
+                <p className="mt-1 text-sm text-[var(--twin-muted-strong)]">
+                  {t("interactiveDemoPlayer.catalogLead").replace("35", String(count))}
+                </p>
+              </div>
+              <button
+                type="button"
+                className="twin-btn-secondary twin-touch-target text-sm"
+                aria-expanded
+                onClick={() => setOpen(false)}
+              >
+                {t("interactiveDemoPlayer.catalogToggleHide")}
+              </button>
+            </div>
+          )}
           {open ? (
             <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
               {FOUNDER_LED_DEMO_JOURNEY_STEPS.map((step) => (
