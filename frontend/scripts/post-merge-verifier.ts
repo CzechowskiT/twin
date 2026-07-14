@@ -100,8 +100,9 @@ export function runPostMergeVerifier(opts?: { expect073?: boolean; expect077?: b
 }
 
 function main(): void {
+  const expect077 = process.argv.includes("--expect-077");
   const expect073 = process.argv.includes("--expect-073");
-  const checks = runPostMergeVerifier({ expect073 });
+  const checks = runPostMergeVerifier(expect077 ? { expect077: true } : { expect073 });
   console.log("Post-merge verifier (dry-run):\n");
   let failed = 0;
   for (const c of checks) {

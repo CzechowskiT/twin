@@ -1,7 +1,9 @@
 # Public launch 9/10 scorecard — canonical
 
-> **Generated:** 2026-07-13T12:35:00Z · **Path:** A (credentials UNSET — preflight only) · **Owner:** Eng agent batch  
-> **Verdict:** **NO-GO** — żaden obszar nie osiąga 9/10; obowiązkowe kryteria FAIL/BLOCKED w każdym obszarze.
+> **Generated:** 2026-07-14T04:35:00Z · **Path:** A (credentials SET — partial smoke) · **Owner:** Eng agent batch  
+> **Verdict:** **NO-GO** — Gate F PENDING founder sign-off; mandatory E2E/DR rows still FAIL/BLOCKED.
+
+**Supersedes:** scorecard @ 2026-07-13T12:35Z (UNSET batch) · prod baseline now `ae14bfb58fc0` / DB 077.
 
 ---
 
@@ -23,12 +25,12 @@
 
 | Pole | Wartość |
 |------|---------|
-| **repo_head** | `0c76a1ca` |
-| **prod_api_commit** | `c2a08b025ca950b341540f0bc80f710825c778ce` |
+| **repo_head** | `3818542f` (verifier-only drift from prod) |
+| **prod_api_commit** | `ae14bfb58fc0` |
 | **prod_frontend** | `https://twin-sooty.vercel.app` |
-| **prod_db_head** | `070_candidate_trust_center` (train target: `077`) |
-| **alignment_status** | **DRIFT** — train branches ahead of prod |
-| **Credentials** | UNSET (`DEMO_USER_PASSWORD`, recruiter token) |
+| **prod_db_head** | `077_candidate_activity_timeline` (`db_ok=true`) |
+| **alignment_status** | **ACCEPTABLE_DOCS_ONLY_DRIFT** — prod `ae14bfb5`; repo +1 verifier commit |
+| **Credentials** | SET (`DEMO_USER_PASSWORD`, `RECRUITER_TOKEN`; `TWIN_RECRUITER_TOKEN` UNSET) |
 | **Gate F** | PENDING |
 | **Launch** | **NO-GO** |
 
@@ -40,10 +42,10 @@
 
 | Obszar | Score | Mandatory FAIL | Verdict |
 |--------|-------|----------------|---------|
-| A — Production confirmation | **7/10** | #6 Alembic 077 | FAIL |
-| B — Manual E2E | **2/10** | #1,#2,#3,#5,#10 | FAIL |
+| A — Production confirmation | **9/10** | — | PASS (mandatory met) |
+| B — Manual E2E | **5/10** | #2,#5,#10 | FAIL |
 | C — DR readiness | **6/10** | #2,#5,#8 | FAIL |
-| D — Public launch readiness | **5/10** | #1,#2,#3,#5,#10 | FAIL |
+| D — Public launch readiness | **5/10** | #1,#2,#10 | FAIL |
 
 ---
 
@@ -56,11 +58,11 @@
 | A3 | FE/API SHA alignment (public-health) | **PASS** | fe=api=`c2a08b025ca9` — `reports/prod-probes/prod-probes-2026-07-13T12-20-41-996Z.json` |
 | A4 | Public-health traceability fields | **PASS** | `frontend_commit`, `api_commit`, `commit_interpretation` — guard PASS |
 | A5 | Latency p95 < 10s SLO | **PASS** | 110 probes: p50=79ms p95=359ms p99=4475ms — prod probe suite @ 12:32Z |
-| A6 | Alembic head = train target 077 | **FAIL** ★ | Prod scaffold 070; train 077 unmerged — `sim:integration-070-077` PASS locally @ 12:32Z |
+| A6 | Alembic head = train target 077 | **PASS** ★ | `verify:production-v3:077` full PASS @ 2026-07-14 |
 | A7 | Security headers on FE | **PASS** | CSP, HSTS, X-Frame-Options @ Vercel response headers |
 | A8 | No open P0 prod incidents | **PASS** ★ | INC public-health 500 CLOSED — `docs/incidents/2026-07-13-public-health-500.md` |
 | A9 | ≥100 public route probes PASS | **PASS** | 110/110 PASS — prod probe suite |
-| A10 | Post-train deploy SHA verification | **BLOCKED** | Train #448–#455 unmerged; `verify:production-v3:077` blocked until merge+migrate |
+| A10 | Post-train deploy SHA verification | **PASS** | Railway `ead5b0a0` SUCCESS; `verify:production-v3:077` PASS @ 2026-07-14 |
 
 **Area A score: 7/10** (mandatory A6 FAIL → auto NO-GO)
 
@@ -70,9 +72,9 @@
 
 | # | Kryterium | Status | Evidence |
 |---|-----------|--------|----------|
-| B1 | Founder smoke credentials SET | **BLOCKED** ★ | `npm run preflight:founder-smoke-env` → UNSET @ 2026-07-13T12:33Z |
-| B2 | Wave B candidate smoke PASS | **BLOCKED** ★ | Wave B — smoke NOT executed (no fake PASS) |
-| B3 | Wave C recruiter smoke PASS | **BLOCKED** ★ | Wave C — NEEDS_FOUNDER_AUTH |
+| B1 | Founder smoke credentials SET | **PASS** ★ | `preflight:founder-smoke-env` SET @ 2026-07-14 |
+| B2 | Wave B candidate smoke PASS | **PARTIAL** ★ | API login + career/referrals/consents 200; browser checklist NOT_RUN |
+| B3 | Wave C recruiter smoke PASS | **PASS** ★ | `test:prod-recruiter-sequential-behavioral-smoke` 6/6 routes PASS |
 | B4 | Manual E2E matrix documented | **PASS** | `docs/PUBLIC_LAUNCH_FUNCTIONALITY_INVENTORY_2026-07-13.md` |
 | B5 | Console-error-free browser sessions | **BLOCKED** ★ | `reports/founder-smoke/founder-smoke-2026-07-13T12-33-35-837Z.json` — smokeExecuted=false |
 | B6 | Authenticated persistence smoke | **BLOCKED** | Credentials UNSET |
@@ -257,8 +259,8 @@ npm run probe:prod-public && npm run verify:production-v3:077
 |------|--------|
 | Scorecard (this doc) | **RECORDED** — NO-GO |
 | Blocker register | `docs/PUBLIC_LAUNCH_BLOCKER_REGISTER_2026-07-13.md` |
-| Founder smoke evidence | `reports/founder-smoke/founder-smoke-2026-07-13T12-33-35-837Z.json` — BLOCKED (UNSET) |
-| Prod probes | `reports/prod-probes/prod-probes-2026-07-13T12-32-26-245Z.json` — 110/110 PASS |
+| Founder smoke evidence | `reports/founder-smoke/founder-smoke-evidence-2026-07-14T04-35-00Z.json` — recruiter PASS, candidate PARTIAL |
+| Prod probes | `reports/prod-probes/prod-probes-2026-07-14T04-29-26-650Z.json` — 110/110 PASS |
 | Integration sim | `reports/integration-sim/integration-sim-2026-07-13T12-32-08-704Z.json` — PASS |
 | Demo founder package | `reports/FOUNDER_DEMO_REVIEW_PACKAGE.md` — #462 @ `e788dd9f` |
 | Founder signature | **ABSENT** — Gate F PENDING |

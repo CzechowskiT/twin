@@ -16,11 +16,11 @@
 | **Gate E (Phase 3B prod)** | **PASS** | Attempt 19 — **20/20** @ `80d981c` |
 | **Seven-day D1–D7** | **Complete** | D7 QA **Ready for Gate F review** |
 | **Candidate readiness working flow** | **PASS** | PR #429 — checklist → career/evidence/consent |
-| **Deploy alignment** | **ALIGNED** | `frontend_commit=5ad8a150` = repo HEAD |
-| **Public health** | **PASS** | `status=ok`, `db_ok=true` |
-| **M1–M12 manual smoke** | **6 PASS / 0 FAIL / 6 NEEDS_REVIEW** | Authenticated slice 2026-07-09 — see [review package §5](./GATE_F_FOUNDER_REVIEW_PACKAGE_2026-07-09.md#5-manual-smoke-checklist-founder-morning) |
-| **Authenticated candidate smoke** | **PARTIAL PASS** | M2/M4/M6/M12 PASS; M3/M5 profile-gated; calendar/billing nav OK |
-| **Recruiter / company smoke** | **NEEDS_REVIEW** | M7/M8 — role gates only (no recruiter token / company login in vault) |
+| **Deploy alignment** | **ACCEPTABLE_DRIFT** | prod `ae14bfb58fc0`; repo `3818542f` docs-only verifier drift |
+| **Public health** | **PASS** | `status=ok`, `db_ok=true`, head 077 |
+| **Recruiter prod smoke** | **PASS** | 6-route sequential behavioral @ `ae14bfb5` — 2026-07-14 |
+| **Authenticated candidate smoke** | **PARTIAL** | API login + Wave B endpoints 200; browser checklist pending |
+| **Recruiter / company smoke** | **PASS (recruiter)** | Wave C sequential smoke 6/6 @ 2026-07-14; company not re-run |
 | **Delegated apply** | **OFF** | Career compass copy; no live delegated submit CTA |
 | **Auto-apply** | **PAUSED** | Homepage + onboarding copy; no live trigger CTA |
 | **Launch** | **NO-GO** | Re-audit intentional FAIL row; no founder Launch GO |

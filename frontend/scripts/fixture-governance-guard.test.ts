@@ -36,8 +36,13 @@ test("3 integration sim core imports fixture", () => {
   assert.match(src, /waveStackWith073Fixture/);
 });
 
-test("4 no fake 073 file on disk for #450 branch", () => {
+test("4 repo 073 migration file present and chained on merged scaffold", () => {
   const repo = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
-  const files = readdirSync(join(repo, "backend/alembic/versions"));
-  assert.equal(files.some((f) => f.includes("073_candidate_referrals")), false);
+  const versionsDir = join(repo, "backend/alembic/versions");
+  const files = readdirSync(versionsDir);
+  const file073 = files.find((f) => f.includes("073_candidate_referrals"));
+  assert.ok(file073, "073_candidate_referrals migration must exist after full train merge");
+  const src = readFileSync(join(versionsDir, file073!), "utf8");
+  assert.match(src, /revision:\s*str\s*=\s*["']073_candidate_referrals["']/);
+  assert.match(src, /down_revision.*072_recruiter_talent_pool_trust_review_c2/);
 });

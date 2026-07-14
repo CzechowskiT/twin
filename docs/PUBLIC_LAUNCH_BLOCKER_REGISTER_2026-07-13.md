@@ -2,6 +2,8 @@
 
 > Append-only register. Each blocker must be **GREEN** or explicitly **WAIVED** with founder sign-off before public GO.
 
+**Batch update 2026-07-14T04:35Z:** Founder Evidence Chain + Gate F Readiness — prod @ `ae14bfb58fc0`, DB 077, credentials SET, recruiter smoke PASS, candidate API PARTIAL, O7/R-019 BLOCKED.
+
 ---
 
 ## P0 / launch-critical
@@ -9,10 +11,10 @@
 | ID | Blocker | Severity | Owner | Status | Remediation |
 |----|---------|----------|-------|--------|-------------|
 | LB-001 | Gate F founder decision not recorded | P0 | Founder | **OPEN** | Complete Gate F checklist; record YES/NO in decision doc |
-| LB-002 | Founder smoke credentials UNSET | P0 | Founder | **OPEN** | Set `DEMO_USER_PASSWORD` + recruiter token; run Wave B/C smoke runbooks |
+| LB-002 | Founder smoke credentials UNSET | P0 | Founder | **PARTIAL** | Credentials SET via dotenv; recruiter sequential smoke PASS; candidate browser Wave B checklist + persistence JWT pending |
 | LB-003 | Wave B3 referrals not merged (#448) | P0 | Eng | **OPEN** | Merge train #449→#450→#448 after smoke PASS |
 | LB-004 | Public launch stance `noGo` | P0 | Product | **OPEN** | Founder scoped launch decision §G checkboxes |
-| LB-005 | Self-service account delete (R-019) | P1→P0 at scale | Eng | **PARTIAL** | API+UI on #451; `test:candidate-revoke-delete` 25/25 @ `519ed956`; prod deploy + founder smoke pending |
+| LB-005 | Self-service account delete (R-019) | P1→P0 at scale | Eng | **BLOCKED** | API on prod; no disposable test account in env — never founder/demo@twin.career |
 
 ---
 
@@ -26,7 +28,7 @@
 | LB-103b | PR #454 CONFLICTING | P1 | **CLOSED** | Rebased to `26f9da96` — MERGEABLE CLEAN |
 | LB-103c | PR #455 stack | P1 | **CLOSED** | Rebased to `e36df2cb` — MERGEABLE CLEAN |
 | LB-105 | Merge orchestrator drift #451 | P1 | **CLOSED** | #451 omitted from `EXPECTED_HEADS` — stops drift loop |
-| LB-103 | Prod Alembic head behind train (070 vs 077) | P1 | **EXPECTED** | Execute release train merges + Railway migrate |
+| LB-103 | Prod Alembic head behind train (070 vs 077) | P1 | **CLOSED** | Post-merge deploy `ead5b0a0` SUCCESS; prod `db_ok=true`; verifier `expect-077` PASS @ 2026-07-14 |
 | LB-104 | No founder smoke PASS docs for C1–C5 | P1 | **OPEN** | Browser smoke per wave runbooks |
 
 ---
@@ -35,7 +37,7 @@
 
 | ID | Blocker | Severity | Status | Remediation |
 |----|---------|----------|--------|-------------|
-| LB-201 | O7 post-scaffold DR re-drill | P1 | **OPEN** | Founder staging restore per `O7_RESTORE_DRILL_RUNBOOK_2026-06-11.md` |
+| LB-201 | O7 post-scaffold DR re-drill | P1 | **BLOCKED** | `RAILWAY_TOKEN`/`DATABASE_PUBLIC_URL` UNSET in agent env — founder staging restore per `O7_RESTORE_DRILL_RUNBOOK_2026-06-11.md` |
 | LB-202 | L6 erasure self-service gap | P2 at pilot | **WAIVED** | Manual DSR runbook; re-verify before uncontrolled signup |
 | LB-203 | No centralized log drains | P2 | **ACCEPTED** | Hobby plan; Dashboard/CLI; upgrade path documented |
 
@@ -73,7 +75,7 @@
 
 ---
 
-**Register stance:** 6 OPEN · 5 FIXED/CLOSED · 1 PARTIAL · 2 WAIVED/ACCEPTED · Launch **NO-GO**
+**Register stance:** 4 OPEN · 7 FIXED/CLOSED · 2 PARTIAL/BLOCKED · 2 WAIVED/ACCEPTED · Launch **NO-GO**
 
 ---
 

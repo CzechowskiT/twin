@@ -1,6 +1,6 @@
 /**
- * Alembic migration chain guard — no duplicate revision IDs; linear 070→071→072;
- * fixture tests for graph validation including post-merge 073 chain.
+ * Alembic migration chain guard — no duplicate revision IDs; linear 070→077;
+ * fixture tests for graph validation including post-merge 073–077 chain.
  */
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
@@ -17,7 +17,8 @@ import {
   findOrphans,
   parseMigrationSource,
   validateChainSegment,
-  validateLinearChain,
+  WAVE_070_077_CHAIN,
+  waveStack077Fixture,
   waveStackWith073Fixture,
   type MigrationMeta,
 } from "./lib/alembic-migration-graph";
@@ -92,7 +93,7 @@ test("1 repo — no duplicate Alembic revision IDs", () => {
   assert.equal(duplicates.length, 0, `duplicate revisions: ${duplicates.join("; ")}`);
 });
 
-test("2 repo — wave stack chain 070 → 071 → 072 is linear on #450 branch", () => {
+test("2 repo — wave stack chain 070 → 071 → 072 is linear on merged scaffold", () => {
   const migrations = loadRepoMigrations();
   const byRevision = new Map(migrations.map((m) => [m.revision, m]));
   assert.ok(byRevision.has("070_candidate_trust_center"));
@@ -115,20 +116,15 @@ test("3 repo — #448 referrals must not use revision 071 on merged scaffold sta
   );
 });
 
-test("4 repo — 073 not on #450 branch alone (honest partial graph)", () => {
+test("4 repo — full 070→077 chain linear on merged scaffold", () => {
   const migrations = loadRepoMigrations();
-  const has073 = migrations.some((m) => m.revision === "073_candidate_referrals");
-  assert.equal(
-    has073,
-    false,
-    "073_candidate_referrals belongs on #448 branch after rebase — do not fake full graph PASS on #450 alone",
-  );
-  const chain = buildChain("070_candidate_trust_center", migrations);
-  assert.deepEqual(chain.slice(0, 3), [
-    "070_candidate_trust_center",
-    "071_recruiter_workspace_activation",
-    "072_recruiter_talent_pool_trust_review_c2",
-  ]);
+  const expected = [...WAVE_070_077_CHAIN];
+  const subset = migrations.filter((m) => expected.includes(m.revision));
+  const result = validateChainSegment(subset, expected);
+  assert.equal(result.ok, true, !result.ok ? result.reason : "");
+  const heads = findHeads(migrations);
+  assert.equal(heads.length, 1);
+  assert.equal(heads[0], "077_candidate_activity_timeline");
 });
 
 test("5 fixture — full 070→071→072→073 post-merge chain documented", () => {
@@ -147,10 +143,27 @@ test("6 integration readiness doc references migration plan", () => {
     join(repoRoot, "docs/INTEGRATION_READINESS_PR448_449_450_2026-07-13.md"),
     "utf8",
   );
-  assert.match(doc, /073_candidate_referrals/);
-  assert.match(doc, /071_recruiter_workspace_activation/);
-  assert.match(doc, /072_recruiter_talent_pool_trust_review_c2/);
-  assert.match(doc, /rebase.*#450|after #450/i);
+  assert.match(doc, /073|073_candidate_referrals/);
+  assert.match(doc, /071|071_recruiter_workspace_activation/);
+  assert.match(doc, /072|072_recruiter_talent_pool_trust_review_c2/);
+  assert.match(doc, /077_candidate_activity_timeline/);
+});
+
+test("6b fixture — full 070→077 post-merge chain validates", () => {
+  const fixture = waveStack077Fixture();
+  const result = validateChainSegment(fixture, [...WAVE_070_077_CHAIN]);
+  assert.equal(result.ok, true);
+  assert.deepEqual(buildChain("070_candidate_trust_center", fixture), [...WAVE_070_077_CHAIN]);
+});
+
+test("6c fixture — regression: broken 077 parent detected", () => {
+  const broken = waveStack077Fixture().map((m) =>
+    m.revision === "077_candidate_activity_timeline"
+      ? { ...m, downRevision: "075_recruiter_saved_views_c4" }
+      : m,
+  );
+  const result = validateChainSegment(broken, [...WAVE_070_077_CHAIN]);
+  assert.equal(result.ok, false);
 });
 
 test("7 npm scripts registered", () => {
@@ -176,5 +189,5 @@ test("9 repo — wave chain reachable from 070 parent in full graph", () => {
   assert.ok(m070);
   assert.ok(m070!.downRevision && byRev.has(m070!.downRevision), "070 parent exists in repo");
   const chain = buildChain("070_candidate_trust_center", migrations);
-  assert.ok(chain.includes("072_recruiter_talent_pool_trust_review_c2"));
+  assert.ok(chain.includes("077_candidate_activity_timeline"));
 });

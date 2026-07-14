@@ -8,12 +8,13 @@
 
 | Field | Value |
 |-------|-------|
-| **Path** | A (credentials UNSET — preflight only) |
-| **repo_head** | `0c76a1ca` (PR #451) |
-| **prod_api_commit** | `c2a08b025ca950b341540f0bc80f710825c778ce` (public-health) |
+| **Path** | A (credentials SET — partial smoke) |
+| **repo_head** | `3818542f` |
+| **prod_api_commit** | `ae14bfb58fc0` (public-health) |
 | **prod_frontend** | `https://twin-sooty.vercel.app` |
-| **alignment_status** | **DRIFT** — train branches ahead of prod (070 vs 077 target) |
-| **Scorecard** | [PUBLIC_LAUNCH_9_OF_10_SCORECARD.md](./PUBLIC_LAUNCH_9_OF_10_SCORECARD.md) — **NO-GO** (A7 B2 C6 D5) |
+| **prod_db_head** | `077_candidate_activity_timeline` |
+| **alignment_status** | **ACCEPTABLE_DOCS_ONLY_DRIFT** — prod deployed; repo +1 verifier commit |
+| **Scorecard** | [PUBLIC_LAUNCH_9_OF_10_SCORECARD.md](./PUBLIC_LAUNCH_9_OF_10_SCORECARD.md) — **NO-GO** |
 | **P0** | CLOSED |
 | **Gate E** | PASS |
 | **Gate F** | PENDING |
