@@ -1,6 +1,6 @@
 # Launch Readiness Evidence Index — 2026-06-28
 
-**Canonical status (2026-07-14):** **P0: CLOSED** | **Gate E: PASS (attempt 19, 20/20)** | **Gate F: PENDING** | **LB-104: CLOSED** (C1–C5 per-module evidence) | **LB-106: CLOSED** (soak #29315813862 PASS) | **Launch: NO-GO** — [blocker register](./PUBLIC_LAUNCH_BLOCKER_REGISTER_2026-07-13.md) · [scorecard](./PUBLIC_LAUNCH_9_OF_10_SCORECARD.md).
+**Canonical status (2026-07-14):** **P0: CLOSED** | **Gate E: PASS (attempt 19, 20/20)** | **Gate F: PENDING** | **LB-104: CLOSED** (C1–C5 per-module evidence) | **LB-106: CLOSED** (soak #29315813862 PASS) | **Demo founder review: PASS 18/18** @ `934cbbeb` | **Launch: NO-GO** — [blocker register](./PUBLIC_LAUNCH_BLOCKER_REGISTER_2026-07-13.md) · [scorecard](./PUBLIC_LAUNCH_9_OF_10_SCORECARD.md) · [demo evidence](./DEMO_FOUNDER_REVIEW_EVIDENCE_2026-07-14.md).
 
 **Canonical status (2026-07-07):** **P0: CLOSED** | **Gate E: PASS (attempt 19, 20/20, run `28849996684`, SHA `80d981c`)** | **Gate F: PENDING** | **Launch: NO-GO** — [P0 closure decision](./P0_CLOSURE_DECISION_2026-07-07.md) · [attempt 19 result](./gate-e-phase3b-attempt19-result-2026-07-06.md) · [Gate F re-audit](./GATE_F_REAUDIT_RESULT_2026-07-07.md). Attempt 18 **superseded** by attempt 19. Performance issues → **Performance 2.0** backlog (not P0 blockers).
 
