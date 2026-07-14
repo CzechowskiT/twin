@@ -22,6 +22,7 @@ import {
   resolveEffectiveSessionPersona,
 } from "@/lib/persona-access";
 import { LOGIN_PATH, WORKSPACE_PATH } from "@/lib/persona-auth";
+import { hasRecruiterPilotInboxSession } from "@/lib/recruiter-inbox";
 
 const SURFACE_COPY: Record<
   "candidate" | "recruiter" | "investor" | "company",
@@ -72,6 +73,7 @@ export function PersonaWorkspaceGate({
   const loginZone = allowed[0] ?? "candidate";
   const loginPath = LOGIN_PATH[loginZone];
   const [hasSession, setHasSession] = useState<boolean | null>(null);
+  const [hasPilotRecruiter, setHasPilotRecruiter] = useState(false);
   const effectivePersona = resolveEffectiveSessionPersona(pathname, persona);
   const authDestinationRef = useRef<string | null>(null);
   const personaRedirectedRef = useRef(false);
@@ -86,8 +88,11 @@ export function PersonaWorkspaceGate({
   }, [loginPath, pathname]);
 
   useEffect(() => {
-    queueMicrotask(() => setHasSession(hasActiveSession()));
-  }, [pathname]);
+    queueMicrotask(() => {
+      setHasSession(hasActiveSession());
+      setHasPilotRecruiter(surface === "recruiter" && hasRecruiterPilotInboxSession());
+    });
+  }, [pathname, surface]);
 
   useEffect(() => {
     if (!hasSession) return;
@@ -103,6 +108,9 @@ export function PersonaWorkspaceGate({
   }
 
   if (!hasSession) {
+    if (surface === "recruiter" && hasPilotRecruiter) {
+      return <>{children}</>;
+    }
     return (
       <PersonaWorkspaceGateShell>
         <PersonaWorkspaceGateCard>

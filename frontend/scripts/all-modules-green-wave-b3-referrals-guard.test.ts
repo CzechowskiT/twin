@@ -88,27 +88,24 @@ test("4 frontend referrals — API load, share, invite, list", () => {
   assert.match(dashboard, /data-candidate-referrals-list/);
 });
 
-test("5 module activation — PILOT until founder browser smoke", () => {
+test("5 module activation — LIVE after founder browser smoke PASS", () => {
   assert.equal(WORKSPACE_GREEN_ONLY_MODE, false);
   const entry = getWorkspaceModuleActivationEntry("candidate_referrals");
   const card = getWorkspaceModuleActivationEntry("referrals");
   assert.ok(entry);
   assert.ok(card);
-  if (REFERRALS_BROWSER_SMOKE_STATUS === "NEEDS_FOUNDER_AUTH_SMOKE") {
-    assert.equal(entry!.activationStatus, "PILOT");
-    assert.equal(card!.activationStatus, "PILOT");
-    assert.equal(entry!.green, false);
-    assert.equal(REFERRALS_SHIP_STATUS, "pilot");
-  }
+  assert.equal(REFERRALS_BROWSER_SMOKE_STATUS, "PASS");
+  assert.equal(entry!.activationStatus, "LIVE");
+  assert.equal(card!.activationStatus, "LIVE");
+  assert.equal(entry!.green, true);
+  assert.equal(REFERRALS_SHIP_STATUS, "live");
 });
 
-test("6 SoR route — referrals visible with honest status", () => {
+test("6 SoR route — referrals visible with live status", () => {
   const route = getSystemOfRecordRoutesForPersona("candidate").find((r) => r.id === "candidate_referrals");
   assert.ok(route);
   assert.equal(route!.href, "/dashboard/referrals");
-  if (REFERRALS_BROWSER_SMOKE_STATUS === "NEEDS_FOUNDER_AUTH_SMOKE") {
-    assert.equal(route!.status, "pilot");
-  }
+  assert.equal(route!.status, "live");
 });
 
 test("7 workspace card — status matches ship flag", () => {
@@ -123,12 +120,11 @@ test("8 pilot boundary banner on page", () => {
   assert.equal(REFERRALS_LIMITED_PILOT, true);
 });
 
-test("9 no fake LIVE without browser smoke pass", () => {
-  if (REFERRALS_BROWSER_SMOKE_STATUS === "NEEDS_FOUNDER_AUTH_SMOKE") {
-    assert.notEqual(REFERRALS_SHIP_STATUS, "live");
-    const entry = getWorkspaceModuleActivationEntry("candidate_referrals");
-    assert.notEqual(entry!.activationStatus, "LIVE");
-  }
+test("9 founder smoke PASS — LIVE activation confirmed", () => {
+  assert.equal(REFERRALS_BROWSER_SMOKE_STATUS, "PASS");
+  assert.equal(REFERRALS_SHIP_STATUS, "live");
+  const entry = getWorkspaceModuleActivationEntry("candidate_referrals");
+  assert.equal(entry!.activationStatus, "LIVE");
 });
 
 test("10 canonical stance locked — no launch GO", () => {

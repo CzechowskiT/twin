@@ -74,13 +74,18 @@ test.describe("Founder-led demo flow browser", () => {
         const link = roleLinks.nth(i);
         const href = await link.getAttribute("href");
         expect(href, `role link ${i} href`).toBeTruthy();
+        await link.scrollIntoViewIfNeeded();
         await link.click();
+        await page.waitForURL((url) => !url.pathname.endsWith("/demo") || url.search.length > 0, {
+          timeout: ROUTE_SETTLE_MS,
+        }).catch(() => page.waitForLoadState("domcontentloaded"));
         await page.waitForLoadState("domcontentloaded");
         expect(page.url().toLowerCase()).not.toContain("404");
         const textLen = await visibleTextLength(page);
         expect(textLen).toBeGreaterThan(MIN_VISIBLE_TEXT);
         await page.goto("/demo", { waitUntil: "domcontentloaded" });
         await dismissCookieBanner(page);
+        await expect(page.locator("[data-interactive-demo-player]")).toBeVisible({ timeout: ROUTE_SETTLE_MS });
       }
     });
   });

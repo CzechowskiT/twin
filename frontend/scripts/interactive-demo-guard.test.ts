@@ -111,3 +111,13 @@ test("11 full-demo scenes render rich product surfaces not text-only", () => {
   const player = read("src/components/marketing/demo/interactive-demo-player.tsx");
   assert.match(player, /min-h-\[180px\]|DemoSceneStage/);
 });
+
+test("12 full-demo scenes expose data-testid hooks for browser smoke", () => {
+  const stage = read("src/components/marketing/demo/demo-scene-stage.tsx");
+  assert.match(stage, /data-testid=\{`demo-scene-\$\{scene\.id\}`\}/);
+  const spec = read("e2e/interactive-demo-scenes-browser.spec.ts");
+  assert.match(spec, /full-product-story/);
+  assert.match(spec, /demo-scene-/);
+  const pkg = read("package.json");
+  assert.match(pkg, /test:interactive-demo-scenes-browser/);
+});

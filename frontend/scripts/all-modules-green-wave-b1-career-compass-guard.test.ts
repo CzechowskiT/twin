@@ -85,30 +85,21 @@ test("4 frontend career page — API load/save, no demo hardcoding", () => {
   assert.doesNotMatch(page, /VP Engineering/);
 });
 
-test("5 module activation — PILOT until founder browser smoke", () => {
+test("5 module activation — LIVE after founder browser smoke PASS", () => {
   assert.equal(WORKSPACE_GREEN_ONLY_MODE, false);
   const entry = getWorkspaceModuleActivationEntry("candidate_career_compass");
   assert.ok(entry);
-  if (CAREER_COMPASS_BROWSER_SMOKE_STATUS === "NEEDS_FOUNDER_AUTH_SMOKE") {
-    assert.equal(entry!.activationStatus, "PILOT");
-    assert.equal(entry!.green, false);
-    assert.equal(CAREER_COMPASS_SHIP_STATUS, "pilot");
-  } else {
-    assert.equal(entry!.activationStatus, "LIVE");
-    assert.equal(entry!.green, true);
-    assert.equal(CAREER_COMPASS_SHIP_STATUS, "live");
-  }
+  assert.equal(CAREER_COMPASS_BROWSER_SMOKE_STATUS, "PASS");
+  assert.equal(entry!.activationStatus, "LIVE");
+  assert.equal(entry!.green, true);
+  assert.equal(CAREER_COMPASS_SHIP_STATUS, "live");
 });
 
-test("6 SoR route — career compass visible with honest status", () => {
+test("6 SoR route — career compass visible with live status", () => {
   const route = getSystemOfRecordRoutesForPersona("candidate").find((r) => r.id === "candidate_career_compass");
   assert.ok(route);
   assert.equal(route!.href, "/dashboard/career");
-  if (CAREER_COMPASS_BROWSER_SMOKE_STATUS === "NEEDS_FOUNDER_AUTH_SMOKE") {
-    assert.equal(route!.status, "pilot");
-  } else {
-    assert.equal(route!.status, "live");
-  }
+  assert.equal(route!.status, "live");
 });
 
 test("7 workspace card — status matches ship flag", () => {
