@@ -1,5 +1,7 @@
 # Launch Readiness Evidence Index — 2026-06-28
 
+**Canonical status (2026-07-14):** **P0: CLOSED** | **Gate E: PASS (attempt 19, 20/20)** | **Gate F: PENDING** | **LB-106: CLOSED** (soak #29315813862 PASS, 3731s, 13 snapshots) | **Launch: NO-GO** — [blocker register](./PUBLIC_LAUNCH_BLOCKER_REGISTER_2026-07-13.md) · [scorecard](./PUBLIC_LAUNCH_9_OF_10_SCORECARD.md).
+
 **Canonical status (2026-07-07):** **P0: CLOSED** | **Gate E: PASS (attempt 19, 20/20, run `28849996684`, SHA `80d981c`)** | **Gate F: PENDING** | **Launch: NO-GO** — [P0 closure decision](./P0_CLOSURE_DECISION_2026-07-07.md) · [attempt 19 result](./gate-e-phase3b-attempt19-result-2026-07-06.md) · [Gate F re-audit](./GATE_F_REAUDIT_RESULT_2026-07-07.md). Attempt 18 **superseded** by attempt 19. Performance issues → **Performance 2.0** backlog (not P0 blockers).
 
 **Branch at capture:** `fix/phase3b-macos-process-detection` (Gate E Phase 3B prod attempt 10 — USER_ABORTED/INCONCLUSIVE; merged resource watchdog reported `chrome-headless-shell=0`, but the operator observed real Chrome/Chromium process pressure the watchdog's narrow single-process-name detection could not see — a resource/process-detection confidence gap, not a scripted precondition or a watchdog-corroborated runaway; 0/20 routes evaluated; attempt 11 **BLOCKED** until macOS process-detection hardening is merged — [attempt 10 result](./gate-e-phase3b-attempt10-result-2026-07-03.md) · [macOS process detection](./PHASE3B_MACOS_PROCESS_DETECTION_2026-07-03.md))
@@ -300,6 +302,8 @@ This index summarizes evidence; the checklist is the **operational run sheet** f
 | [P0_CLOSURE_DECISION_2026-07-07.md](./P0_CLOSURE_DECISION_2026-07-07.md) | P0 **CLOSED** — founder RSS validation |
 | [P0_FINAL_BLOCKERS_2026-07-07.md](./P0_FINAL_BLOCKERS_2026-07-07.md) | Post-P0 remaining blockers (Gate F track) |
 | [GATE_F_REAUDIT_RESULT_2026-07-07.md](./GATE_F_REAUDIT_RESULT_2026-07-07.md) | Gate F re-audit executed — founder decision PENDING |
+| [../reports/stabilization/29315813862/stabilization-evidence-29315813862.md](../reports/stabilization/29315813862/stabilization-evidence-29315813862.md) | LB-106 60min prod stabilization soak **PASS** — GH #29315813862 (3731s, 13 snapshots, DB 077) |
+| [PUBLIC_LAUNCH_BLOCKER_REGISTER_2026-07-13.md](./PUBLIC_LAUNCH_BLOCKER_REGISTER_2026-07-13.md) | Launch blocker register — LB-106 **CLOSED** @ 2026-07-14 |
 | [TWIN_PUBLIC_LAUNCH_READINESS_PLAN_2026-06-27.md](./TWIN_PUBLIC_LAUNCH_READINESS_PLAN_2026-06-27.md) | Launch roadmap + demo boundaries |
 | [TWIN_FEATURE_STATUS_AUDIT_2026-06-27.md](./TWIN_FEATURE_STATUS_AUDIT_2026-06-27.md) | Module classification |
 | [TWIN_OPERATING_CONTEXT_2026-06-26.md](./TWIN_OPERATING_CONTEXT_2026-06-26.md) | Ops source of truth |

@@ -2,7 +2,9 @@
 
 > Append-only register. Each blocker must be **GREEN** or explicitly **WAIVED** with founder sign-off before public GO.
 
-**Batch update 2026-07-14T06:45Z:** Closed batch — PR #471 merged @ `09b9963a`; guard #10 LIVE truth; verifier `credentialsSet=true` via dotenv; stabilization-monitor run #29312315268 PASS (54s, **no 60min soak**).
+**Batch update 2026-07-14T09:30Z:** LB-106 **CLOSED** — canonical 60min stabilization soak GH run #29315813862 PASS (3731s, 13 snapshots, `identityDriftDetected=false`, `credentialsSet=true`, DB 077, `failReasons=[]`); evidence `reports/stabilization/29315813862/`; rejected drift run #29313170353; duplicate #29316738867 already completed (cancel N/A).
+
+**Batch update 2026-07-14T06:45Z:** Closed batch — PR #471 merged @ `09b9963a`; guard #10 LIVE truth; verifier `credentialsSet=true` via dotenv; stabilization-monitor run #29312315268 PASS (54s, **superseded** by #29315813862 60min soak).
 
 **Batch update 2026-07-14T04:35Z:** Founder Evidence Chain + Gate F Readiness — prod @ `ae14bfb58fc0`, DB 077, credentials SET, recruiter smoke PASS, candidate API PARTIAL, O7/R-019 BLOCKED.
 
@@ -32,7 +34,7 @@
 | LB-105 | Merge orchestrator drift #451 | P1 | **CLOSED** | #451 omitted from `EXPECTED_HEADS` — stops drift loop |
 | LB-103 | Prod Alembic head behind train (070 vs 077) | P1 | **CLOSED** | Post-merge deploy `ead5b0a0` SUCCESS; prod `db_ok=true`; verifier `expect-077` PASS @ 2026-07-14 |
 | LB-104 | No founder smoke PASS docs for C1–C5 | P1 | **PARTIAL** | Wave B/C browser PASS recorded; C1–C5 per-module docs pending |
-| LB-106 | 60-minute prod stabilization soak evidence | P1 | **OPEN** | `stabilization-monitor` run #29312315268 PASS in 54s — workflow has no 60min loop; extend workflow or founder soak |
+| LB-106 | 60-minute prod stabilization soak evidence | P1 | **CLOSED** | GH run #29315813862 PASS — 3731s, 13 snapshots, `identityDriftDetected=false`, `credentialsSet=true`, DB `077_candidate_activity_timeline`, `failReasons=[]`; evidence `reports/stabilization/29315813862/stabilization-evidence-29315813862.{json,md}` |
 
 ---
 
@@ -78,7 +80,7 @@
 
 ---
 
-**Register stance:** 3 OPEN · 9 FIXED/CLOSED · 1 PARTIAL · 2 BLOCKED · 2 WAIVED/ACCEPTED · Launch **NO-GO**
+**Register stance:** 3 OPEN · 10 FIXED/CLOSED · 1 PARTIAL · 2 BLOCKED · 2 WAIVED/ACCEPTED · Launch **NO-GO**
 
 ---
 
