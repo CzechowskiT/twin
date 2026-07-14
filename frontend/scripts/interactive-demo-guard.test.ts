@@ -1,5 +1,5 @@
 /**
- * Interactive /demo rebuild — component, i18n, launch stance, and route guards.
+ * Interactive /demo cinematic rebuild — component, i18n, launch stance, and route guards.
  */
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
@@ -23,9 +23,9 @@ function read(rel: string): string {
   return readFileSync(join(root, rel), "utf8");
 }
 
-test("1 demo page wires interactive player stack", () => {
+test("1 demo page wires cinematic experience stack", () => {
   const page = read("src/app/(marketing)/demo/page.tsx");
-  assert.match(page, /DemoAboveFoldSection|InteractiveDemoPlayer/);
+  assert.match(page, /DemoExperience/);
   assert.match(page, /DemoSurfaceCatalog/);
   assert.match(page, /InteractiveDemoSystemMap/);
   assert.match(page, /DemoPilotCta/);
@@ -33,20 +33,23 @@ test("1 demo page wires interactive player stack", () => {
 
 test("2 manifest module is single source", () => {
   assert.ok(existsSync(join(root, "src/lib/demo/demo-scene-manifest.ts")));
-  const player = read("src/components/marketing/demo/interactive-demo-player.tsx");
-  assert.match(player, /demo-scene-manifest/);
+  const roleStory = read("src/components/marketing/demo/experience/role-story.tsx");
+  assert.match(roleStory, /demo-scene-manifest/);
 });
 
 test("3 analytics wrapper avoids PII props", () => {
   const analytics = read("src/lib/demo/demo-analytics.ts");
   assert.match(analytics, /trackEvent/);
+  assert.match(analytics, /demo_cta_clicked/);
+  assert.match(analytics, /demo_scene_viewed/);
   assert.doesNotMatch(analytics, /email/);
 });
 
-test("4 reduced motion hook and autoplay guard present in player", () => {
-  const player = read("src/components/marketing/demo/interactive-demo-player.tsx");
-  assert.match(player, /prefers-reduced-motion/);
-  assert.match(player, /autoplayStartedRef/);
+test("4 reduced motion hook and autoplay guard present in experience", () => {
+  const experience = read("src/components/marketing/demo/experience/demo-experience.tsx");
+  assert.match(experience, /prefers-reduced-motion/);
+  const roleStory = read("src/components/marketing/demo/experience/role-story.tsx");
+  assert.match(roleStory, /autoplayStartedRef/);
 });
 
 test("5 catalog collapsed toggle uses explore-all copy", () => {
@@ -58,18 +61,19 @@ test("5 catalog collapsed toggle uses explore-all copy", () => {
   assert.match(dictionaries.pl.interactiveDemoPlayer.catalogToggle, /Zobacz wszystkie moduły produktu/);
 });
 
-test("6 i18n interactiveDemoPlayer keys mirrored EN/PL", () => {
-  const enKeys = Object.keys(en.interactiveDemoPlayer);
-  const plKeys = Object.keys(dictionaries.pl.interactiveDemoPlayer);
+test("6 i18n demoExperience keys mirrored EN/PL", () => {
+  const enKeys = Object.keys(en.demoExperience);
+  const plKeys = Object.keys(dictionaries.pl.demoExperience);
   assert.deepEqual(plKeys.sort(), enKeys.sort());
 });
 
 test("7 launch stance — demo copy has no hard-banned CTAs", () => {
   const blob = [
-    read("src/components/marketing/demo/interactive-demo-player.tsx"),
+    read("src/components/marketing/demo/experience/demo-experience.tsx"),
+    read("src/components/marketing/demo/experience/outcome-screen.tsx"),
     read("src/components/marketing/demo/demo-pilot-cta.tsx"),
-    JSON.stringify(en.interactiveDemoPlayer),
-    JSON.stringify(dictionaries.pl.interactiveDemoPlayer),
+    JSON.stringify(en.demoExperience),
+    JSON.stringify(dictionaries.pl.demoExperience),
   ].join("\n");
   for (const pattern of FORBIDDEN_DEMO_COPY) {
     assert.doesNotMatch(blob, pattern, String(pattern));
@@ -77,9 +81,9 @@ test("7 launch stance — demo copy has no hard-banned CTAs", () => {
 });
 
 test("8 bundle imports stay marketing-local", () => {
-  const demoDir = read("src/components/marketing/demo/interactive-demo-player.tsx");
-  assert.doesNotMatch(demoDir, /from "@\/app\/api/);
-  assert.doesNotMatch(demoDir, /fetch\(/);
+  const experience = read("src/components/marketing/demo/experience/demo-experience.tsx");
+  assert.doesNotMatch(experience, /from "@\/app\/api/);
+  assert.doesNotMatch(experience, /fetch\(/);
 });
 
 test("9 keyboard controls exposed on timeline", () => {
@@ -108,8 +112,8 @@ test("11 full-demo scenes render rich product surfaces not text-only", () => {
   assert.match(surfaces, /DemoTrustBoundarySurface/);
   assert.match(surfaces, /DemoPilotCtaSurface/);
   assert.doesNotMatch(stage, /scene\.descriptionKey\).*north_star/);
-  const player = read("src/components/marketing/demo/interactive-demo-player.tsx");
-  assert.match(player, /min-h-\[180px\]|DemoSceneStage/);
+  const animated = read("src/components/marketing/demo/experience/animated-product-surface.tsx");
+  assert.match(animated, /DemoSceneStage/);
 });
 
 test("12 full-demo scenes expose data-testid hooks for browser smoke", () => {
@@ -118,6 +122,8 @@ test("12 full-demo scenes expose data-testid hooks for browser smoke", () => {
   const spec = read("e2e/interactive-demo-scenes-browser.spec.ts");
   assert.match(spec, /full-product-story/);
   assert.match(spec, /demo-scene-/);
+  const cinematic = read("e2e/cinematic-demo-browser.spec.ts");
+  assert.match(cinematic, /data-demo-experience/);
   const pkg = read("package.json");
-  assert.match(pkg, /test:interactive-demo-scenes-browser/);
+  assert.match(pkg, /test:cinematic-demo-browser/);
 });

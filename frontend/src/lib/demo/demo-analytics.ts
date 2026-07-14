@@ -36,6 +36,22 @@ export function trackDemoRoleSelected(role: DemoRole) {
   trackEvent("demo_role_selected", { role });
 }
 
+export function trackDemoSceneViewed(props: { scene_id: string } & DemoAnalyticsProps) {
+  trackEvent("demo_scene_viewed", props);
+}
+
+export function trackDemoCtaClicked(props: { cta_id: string; role: string } & DemoAnalyticsProps) {
+  trackEvent("demo_cta_clicked", props);
+}
+
+export function trackDemoFilmStarted(props?: DemoAnalyticsProps) {
+  trackEvent("demo_film_started", props);
+}
+
+export function trackDemoFilmCompleted(props?: DemoAnalyticsProps) {
+  trackEvent("demo_film_completed", props);
+}
+
 export function trackHomepageCandidateStory(
   event: HomepageCandidateStoryEvent,
   props?: DemoAnalyticsProps,

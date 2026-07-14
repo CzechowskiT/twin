@@ -61,9 +61,10 @@ async function seedLocale(context: BrowserContext, locale: string): Promise<void
 async function gotoDemoPlayer(page: Page): Promise<void> {
   await page.goto("/demo", { waitUntil: "domcontentloaded", timeout: 30_000 });
   await dismissCookieBanner(page);
+  await page.waitForLoadState("networkidle").catch(() => undefined);
   const player = page.locator("#interactive-story").first();
-  await player.scrollIntoViewIfNeeded();
   await expect(player).toBeVisible({ timeout: SETTLE_MS });
+  await page.locator("[data-demo-hero-cta]").first().click({ timeout: 5_000 }).catch(() => undefined);
   await page.locator("[data-demo-timeline] button").first().waitFor({ state: "visible", timeout: SETTLE_MS });
 }
 
