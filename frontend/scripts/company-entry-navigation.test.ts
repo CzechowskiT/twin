@@ -38,7 +38,7 @@ test("for-companies hero CTAs route to workspace", () => {
   assert.equal(en.stackedCta?.href, COMPANY_TALENT_POOL_ROUTE);
   assert.equal(en.secondaryCta?.href, COMPANY_ENTRY_B2B_CALCULATOR_ROUTE);
   assert.match(pl.primaryCta.label, /panel firmy/i);
-  assert.match(pl.stackedCta?.label ?? "", /Pamięć Talentów/i);
+  assert.match(pl.stackedCta?.label ?? "", /pula talent/i);
   assert.equal(en.supplementaryCtas?.length, 2);
 });
 
@@ -51,7 +51,7 @@ test("marketing page wires company entry markers and preview", () => {
   assert.equal(COMPANY_ENTRY_PREVIEW_CARDS.length, 4);
 });
 
-test("company workspace preview cards link to canonical routes", () => {
+test("company workspace preview cards link to canonical workspace routes", () => {
   const hrefs = COMPANY_ENTRY_PREVIEW_CARDS.map((c) => c.href);
   assert.deepEqual(hrefs, [
     "/company/dashboard",
@@ -59,6 +59,9 @@ test("company workspace preview cards link to canonical routes", () => {
     "/company/integrations",
     "/calculator/b2b",
   ]);
+  for (const href of hrefs) {
+    assert.ok(href.startsWith("/company/") || href.startsWith("/calculator/"), href);
+  }
 });
 
 test("header panel href for company persona targets dashboard", () => {
@@ -105,10 +108,11 @@ test("for-companies footer exposes dashboard and talent pool", () => {
   assert.match(page, /companyEntry\.footerDashboard/);
 });
 
-test("company dashboard module grid includes talent pool pilot card", () => {
+test("company dashboard hub includes talent pool pilot module", () => {
   const dash = read("src/app/company/dashboard/company-dashboard-client.tsx");
   const modules = read("src/lib/company-workspace-modules.ts");
-  assert.match(dash, /WorkspaceModuleGrid/);
+  assert.match(dash, /SystemOfRecordNavigationHub/);
+  assert.match(dash, /data-testid="company-module-grid"/);
   assert.match(modules, /companyTalentPoolTitle/);
   assert.match(modules, /COMPANY_TALENT_POOL_ROUTE/);
   assert.match(modules, /status: "pilot"/);
@@ -117,6 +121,13 @@ test("company dashboard module grid includes talent pool pilot card", () => {
 test("package.json registers company entry navigation test", () => {
   const pkg = read("package.json");
   assert.match(pkg, /test:company-entry-navigation/);
+});
+
+test("for-companies integrations preview stays in company workspace", () => {
+  const integrations = COMPANY_ENTRY_PREVIEW_CARDS.find((c) => c.id === "integrations");
+  assert.ok(integrations);
+  assert.equal(integrations!.href, "/company/integrations");
+  assert.notEqual(integrations!.href, "/investor/roadmap#company-integrations");
 });
 
 test("company entry markers are stable test ids", () => {
