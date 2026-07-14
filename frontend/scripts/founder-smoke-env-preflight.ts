@@ -83,6 +83,21 @@ export function checkFounderSmokeEnv(
   });
 }
 
+/** RECRUITER_TOKEN (or TWIN_RECRUITER_TOKEN) is sufficient for verifier credentialsSet. */
+export function isFounderSmokeCredentialsReady(
+  env: NodeJS.ProcessEnv = process.env,
+  opts?: { rootEnvLocal?: string; frontendEnvLocal?: string; loadIntoProcess?: boolean },
+): boolean {
+  if (opts?.loadIntoProcess !== false) {
+    loadFounderSmokeEnvIntoProcess(env, opts);
+  }
+  const checks = checkFounderSmokeEnv(env, opts);
+  return checks.some(
+    (c) =>
+      (c.name === "RECRUITER_TOKEN" || c.name === "TWIN_RECRUITER_TOKEN") && c.status === "SET",
+  );
+}
+
 export function formatFounderSmokeEnvReport(checks: EnvCheck[]): string {
   const lines = ["Founder smoke env preflight (SET/UNSET only — no values):"];
   for (const c of checks) {

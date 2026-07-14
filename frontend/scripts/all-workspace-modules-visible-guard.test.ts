@@ -10,6 +10,7 @@ import test from "node:test";
 import {
   ALL_WORKSPACE_MODULE_IDS,
   getActivationEntriesForWorkspace,
+  getWorkspaceModuleActivationEntry,
   isWorkspaceModuleVisible,
   WORKSPACE_MODULE_ACTIVATION,
 } from "../src/lib/all-workspace-modules-activation";
@@ -24,6 +25,8 @@ import {
 import { RECRUITER_WORKSPACE_MODULES } from "../src/lib/recruiter-workspace-modules";
 import { getSystemOfRecordRoutesForPersona } from "../src/lib/system-of-record-routes";
 import {
+  CAREER_COMPASS_BROWSER_SMOKE_STATUS,
+  CAREER_COMPASS_SHIP_STATUS,
   HIDE_CANDIDATE_TRUST_CENTER_FROM_HUB,
   TRUST_CENTER_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE,
 } from "../src/lib/seven-day-d2-candidate";
@@ -157,12 +160,18 @@ test("9 INTERNAL modules hidden — auto_apply revoke_delete billing", () => {
   assert.ok(candidateSplit.hidden.some((r) => r.id === "candidate_revoke_delete"));
 });
 
-test("10 career compass not falsely LIVE", () => {
+test("10 career compass GREEN LIVE after Wave B smoke PASS", () => {
+  assert.equal(CAREER_COMPASS_BROWSER_SMOKE_STATUS, "PASS");
+  assert.equal(CAREER_COMPASS_SHIP_STATUS, "live");
   const route = getSystemOfRecordRoutesForPersona("candidate").find((r) => r.id === "candidate_career_compass");
   assert.ok(route);
-  assert.equal(route!.status, "pilot");
+  assert.equal(route!.status, "live");
   const mod = CANDIDATE_WORKSPACE_MODULES.find((m) => m.id === "career_compass");
-  assert.equal(mod!.status, "pilot");
+  assert.equal(mod!.status, "live");
+  const entry = getWorkspaceModuleActivationEntry("candidate_career_compass");
+  assert.ok(entry);
+  assert.equal(entry!.activationStatus, "LIVE");
+  assert.equal(entry!.green, true);
 });
 
 test("11 npm script registered", () => {

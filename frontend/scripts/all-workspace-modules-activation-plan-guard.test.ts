@@ -69,7 +69,7 @@ test("3 LIVE status requires green flag", () => {
   }
 });
 
-test("4 career compass first activation slice documented", () => {
+test("4 career compass Wave B slice — LIVE after smoke PASS", () => {
   const plan = readRepo(MASTER_PLAN);
   assert.match(plan, /Career Compass/i);
   assert.match(plan, /Wave B/);
@@ -80,9 +80,9 @@ test("4 career compass first activation slice documented", () => {
   const career = WORKSPACE_MODULE_ACTIVATION.find((e) => e.id === "candidate_career_compass");
   assert.ok(career);
   assert.equal(career!.targetWave, "B");
-  assert.equal(career!.green, false);
-  assert.equal(career!.activationStatus, "PILOT");
-  assert.match(career!.nextAction, /persistence/i);
+  assert.equal(career!.green, true);
+  assert.equal(career!.activationStatus, "LIVE");
+  assert.match(career!.nextAction, /Wave B complete|persistence|monitor/i);
 });
 
 test("5 excluded from first slice — auto-apply stripe ats ms calendar", () => {
