@@ -19,7 +19,7 @@ import {
   trackDemoViewed,
 } from "@/lib/demo/demo-analytics";
 import { journeyScenes } from "@/lib/demo/demo-experience-config";
-import { totalDurationMs, type DemoRole } from "@/lib/demo/demo-scene-manifest";
+import { totalDurationMs, type DemoRole, type DemoScene } from "@/lib/demo/demo-scene-manifest";
 import { indexForElapsed } from "@/lib/demo/demo-playback";
 
 const TICK_MS = 200;
@@ -40,9 +40,17 @@ type RoleStoryProps = {
   role: DemoRole;
   onRoleChange: (role: DemoRole) => void;
   autoStart?: boolean;
+  scenesOverride?: readonly DemoScene[];
+  hideRoleSelector?: boolean;
 };
 
-export function RoleStory({ role, onRoleChange, autoStart = false }: RoleStoryProps) {
+export function RoleStory({
+  role,
+  onRoleChange,
+  autoStart = false,
+  scenesOverride,
+  hideRoleSelector = false,
+}: RoleStoryProps) {
   const { t, locale } = useTranslation();
   const { reducedMotion, checked: motionChecked } = usePrefersReducedMotion();
   const [elapsedMs, setElapsedMs] = useState(0);
@@ -53,7 +61,10 @@ export function RoleStory({ role, onRoleChange, autoStart = false }: RoleStoryPr
   const autoplayStartedRef = useRef(false);
   const lastSceneRef = useRef<string | null>(null);
 
-  const scenes = useMemo(() => journeyScenes(role), [role]);
+  const scenes = useMemo(
+    () => scenesOverride ?? journeyScenes(role),
+    [role, scenesOverride],
+  );
   const activeIndex = useMemo(() => indexForElapsed(scenes, elapsedMs), [elapsedMs, scenes]);
   const scene = scenes[activeIndex] ?? scenes[0];
   const totalMs = totalDurationMs(scenes);
@@ -142,7 +153,9 @@ export function RoleStory({ role, onRoleChange, autoStart = false }: RoleStoryPr
 
   return (
     <div className="demo-role-story" data-demo-role-story data-role={role}>
-      <RoleSelector activeRole={role} onSelect={handleRoleChange} disabled={playing && !takeover} />
+      {!hideRoleSelector ? (
+        <RoleSelector activeRole={role} onSelect={handleRoleChange} disabled={playing && !takeover} />
+      ) : null}
       <SceneTimeline scenes={scenes} activeIndex={activeIndex} elapsedMs={elapsedMs} onSeek={seekToIndex} />
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px] lg:gap-6">

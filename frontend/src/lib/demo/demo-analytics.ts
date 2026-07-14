@@ -52,6 +52,53 @@ export function trackDemoFilmCompleted(props?: DemoAnalyticsProps) {
   trackEvent("demo_film_completed", props);
 }
 
+/** Sales demo — real video player events (no PII). */
+export function trackDemoVideoImpression(props?: DemoAnalyticsProps) {
+  trackEvent("demo_video_impression", props);
+}
+
+export function trackDemoVideoPlay(props?: DemoAnalyticsProps) {
+  trackEvent("demo_video_play", props);
+}
+
+export function trackDemoVideoPause(props?: DemoAnalyticsProps) {
+  trackEvent("demo_video_pause", props);
+}
+
+export function trackDemoVideoProgress(props: { progress: number } & DemoAnalyticsProps) {
+  const event =
+    props.progress === 0.25
+      ? "demo_video_25"
+      : props.progress === 0.5
+        ? "demo_video_50"
+        : "demo_video_75";
+  trackEvent(event, props);
+}
+
+export function trackDemoVideoComplete(props?: DemoAnalyticsProps) {
+  trackEvent("demo_video_complete", props);
+}
+
+export function trackDemoVideoSkip(props?: DemoAnalyticsProps) {
+  trackEvent("demo_video_skip", props);
+}
+
+export function trackDemoRoleSelect(props: { role: string } & DemoAnalyticsProps) {
+  trackEvent("demo_role_select", props);
+}
+
+export function trackDemoInteraction(props: { action: string } & DemoAnalyticsProps) {
+  trackEvent("demo_interaction", props);
+}
+
+export function trackDemoOutcome(props: { role: string; outcome: string } & DemoAnalyticsProps) {
+  trackEvent("demo_outcome", props);
+}
+
+export function trackDemoCtaClick(props: { cta_id: string } & DemoAnalyticsProps) {
+  trackEvent("demo_cta_click", props);
+}
+
 export function trackHomepageCandidateStory(
   event: HomepageCandidateStoryEvent,
   props?: DemoAnalyticsProps,

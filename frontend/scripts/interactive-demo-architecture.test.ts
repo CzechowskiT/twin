@@ -22,13 +22,11 @@ function read(rel: string): string {
   return readFileSync(join(root, rel), "utf8");
 }
 
-test("1 demo page mounts DemoExperience before below-fold journey", () => {
+test("1 demo page mounts SalesDemoExperience with real video pipeline", () => {
   const page = read("src/app/(marketing)/demo/page.tsx");
-  assert.match(page, /DemoExperience/);
+  assert.match(page, /SalesDemoExperience/);
+  assert.doesNotMatch(page, /FounderLedDemoBelowFold/);
   assert.doesNotMatch(page, /InteractiveDemoWalkthrough/);
-  const playerIdx = page.indexOf("DemoExperience");
-  const belowIdx = page.indexOf("FounderLedDemoBelowFold");
-  assert.ok(playerIdx >= 0 && belowIdx >= 0 && playerIdx < belowIdx);
 });
 
 test("2 manifest defines DemoSurface on every scene", () => {
