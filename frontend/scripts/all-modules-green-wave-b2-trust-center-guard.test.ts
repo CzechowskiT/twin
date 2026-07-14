@@ -87,27 +87,24 @@ test("4 frontend trust hub — API load, no demo-only gate for auth users", () =
   assert.match(workspace, /trustCenterDataToRecord/);
 });
 
-test("5 module activation — PILOT until founder browser smoke", () => {
+test("5 module activation — LIVE after founder browser smoke PASS", () => {
   assert.equal(WORKSPACE_GREEN_ONLY_MODE, false);
   const trust = getWorkspaceModuleActivationEntry("candidate_trust");
   const hub = getWorkspaceModuleActivationEntry("trust_center");
   assert.ok(trust);
   assert.ok(hub);
-  if (TRUST_CENTER_BROWSER_SMOKE_STATUS === "NEEDS_FOUNDER_AUTH_SMOKE") {
-    assert.equal(trust!.activationStatus, "PILOT");
-    assert.equal(hub!.activationStatus, "PILOT");
-    assert.equal(trust!.green, false);
-    assert.equal(TRUST_CENTER_SHIP_STATUS, "pilot");
-  }
+  assert.equal(TRUST_CENTER_BROWSER_SMOKE_STATUS, "PASS");
+  assert.equal(trust!.activationStatus, "LIVE");
+  assert.equal(hub!.activationStatus, "LIVE");
+  assert.equal(trust!.green, true);
+  assert.equal(TRUST_CENTER_SHIP_STATUS, "live");
 });
 
-test("6 SoR route — trust center visible with honest status", () => {
+test("6 SoR route — trust center visible with live status", () => {
   const route = getSystemOfRecordRoutesForPersona("candidate").find((r) => r.id === "candidate_trust");
   assert.ok(route);
   assert.equal(route!.href, "/dashboard/trust");
-  if (TRUST_CENTER_BROWSER_SMOKE_STATUS === "NEEDS_FOUNDER_AUTH_SMOKE") {
-    assert.equal(route!.status, "pilot");
-  }
+  assert.equal(route!.status, "live");
 });
 
 test("7 workspace card — status matches ship flag", () => {
@@ -116,12 +113,11 @@ test("7 workspace card — status matches ship flag", () => {
   assert.equal(mod!.status, TRUST_CENTER_SHIP_STATUS);
 });
 
-test("8 no fake LIVE without browser smoke pass", () => {
-  if (TRUST_CENTER_BROWSER_SMOKE_STATUS === "NEEDS_FOUNDER_AUTH_SMOKE") {
-    assert.notEqual(TRUST_CENTER_SHIP_STATUS, "live");
-    const entry = getWorkspaceModuleActivationEntry("candidate_trust");
-    assert.notEqual(entry!.activationStatus, "LIVE");
-  }
+test("8 founder smoke PASS — LIVE activation confirmed", () => {
+  assert.equal(TRUST_CENTER_BROWSER_SMOKE_STATUS, "PASS");
+  assert.equal(TRUST_CENTER_SHIP_STATUS, "live");
+  const entry = getWorkspaceModuleActivationEntry("candidate_trust");
+  assert.equal(entry!.activationStatus, "LIVE");
 });
 
 test("9 canonical stance locked — no launch GO", () => {

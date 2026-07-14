@@ -119,7 +119,8 @@ test("3 repo — #448 referrals must not use revision 071 on merged scaffold sta
 test("4 repo — full 070→077 chain linear on merged scaffold", () => {
   const migrations = loadRepoMigrations();
   const expected = [...WAVE_070_077_CHAIN];
-  const subset = migrations.filter((m) => expected.includes(m.revision));
+  const expectedSet = new Set<string>(expected);
+  const subset = migrations.filter((m) => expectedSet.has(m.revision));
   const result = validateChainSegment(subset, expected);
   assert.equal(result.ok, true, !result.ok ? result.reason : "");
   const heads = findHeads(migrations);

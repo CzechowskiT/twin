@@ -324,6 +324,8 @@
     "test:founder-led-demo-flow-browser:raw": "playwright test e2e/founder-led-demo-flow-browser.spec.ts --workers=1",
     "test:interactive-demo-a11y": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'&&process.env.PLAYWRIGHT_ENABLE_BROWSER_TESTS!=='1'){console.error('Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 (local) or PLAYWRIGHT_ALLOW_PROD_SMOKE=1 (prod).');process.exit(1)}\" && npm run test:interactive-demo-a11y:raw",
     "test:interactive-demo-a11y:raw": "playwright test e2e/interactive-demo-a11y.spec.ts --workers=1",
+    "test:interactive-demo-scenes-browser": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'&&process.env.PLAYWRIGHT_ENABLE_BROWSER_TESTS!=='1'){console.error('Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 (local) or PLAYWRIGHT_ALLOW_PROD_SMOKE=1 (prod).');process.exit(1)}\" && npm run test:interactive-demo-scenes-browser:raw",
+    "test:interactive-demo-scenes-browser:raw": "playwright test e2e/interactive-demo-scenes-browser.spec.ts --workers=1",
     "test:candidate-offers-matches-real-content": "npx --yes tsx scripts/candidate-offers-matches-real-content.test.ts",
     "test:candidate-offers-matches-real-content-browser": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'&&process.env.PLAYWRIGHT_ENABLE_BROWSER_TESTS!=='1'){console.error('Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 (local) or PLAYWRIGHT_ALLOW_PROD_SMOKE=1 (prod).');process.exit(1)}\" && npm run test:candidate-offers-matches-real-content-browser:raw",
     "test:candidate-offers-matches-real-content-browser:raw": "playwright test e2e/candidate-offers-matches-real-content-browser.spec.ts --workers=1",

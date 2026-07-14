@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ButtonHTMLAttributes, ComponentProps, InputHTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, ComponentProps, HTMLAttributes, InputHTMLAttributes, ReactNode } from "react";
 
 import { PageMomentumRail } from "@/components/page-momentum-rail";
 
@@ -47,17 +47,18 @@ export function Shell({
   rail = false,
   /** Passed through to `PageMomentumRail` (e.g. dashboard snapshot counts). */
   pageMomentumRailProps,
+  ...rest
 }: {
   children: ReactNode;
   wide?: boolean;
   rail?: boolean;
   pageMomentumRailProps?: Omit<PageMomentumRailProps, "variant">;
-}) {
+} & HTMLAttributes<HTMLDivElement>) {
   // Narrow (28rem) + side-by-side rail crushes the main column; full wide (80rem) stretches auth forms.
   // `twin-shell--rail` is an intermediate max width for two-column rail layouts.
   const shellWidthClass = wide ? "twin-shell--wide" : rail ? "twin-shell--rail" : "twin-shell--narrow";
   return (
-    <div className={`twin-shell flex min-h-0 min-w-0 flex-1 flex-col ${shellWidthClass}`}>
+    <div className={`twin-shell flex min-h-0 min-w-0 flex-1 flex-col ${shellWidthClass}`} {...rest}>
       {rail ? (
         <ShellRailLayout>
           <ShellRailAside>

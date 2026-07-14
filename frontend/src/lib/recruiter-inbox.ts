@@ -60,6 +60,12 @@ export function readRecruiterInboxSession(): { token: string; companySlug: strin
   }
 }
 
+/** Pilot inbox invite — token + company slug in session (no candidate JWT). */
+export function hasRecruiterPilotInboxSession(): boolean {
+  const { token, companySlug } = readRecruiterInboxSession();
+  return token.length >= 8 && companySlug.length > 0;
+}
+
 export function writeRecruiterInboxSession(token: string, companySlug: string): void {
   if (typeof window === "undefined") return;
   try {

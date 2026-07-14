@@ -79,6 +79,7 @@ export function DemoSceneStage({ scene, reducedMotion, compact, onCtaDemo, onCta
     <div
       className={`relative overflow-hidden rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-elevated)] p-3 sm:p-4 ${heightClass} ${fade}`}
       data-demo-scene={scene.id}
+      data-testid={`demo-scene-${scene.id}`}
       role="img"
       aria-label={t(scene.titleKey)}
     >
