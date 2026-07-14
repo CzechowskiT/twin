@@ -41,7 +41,14 @@ function usePrefersReducedMotion(): { reducedMotion: boolean; checked: boolean }
   return state;
 }
 
-export function InteractiveDemoPlayer() {
+function focusDemoControls(): void {
+  const section = document.getElementById("interactive-story");
+  section?.scrollIntoView({ behavior: "auto", block: "nearest" });
+  section?.focus({ preventScroll: true });
+  section?.querySelector<HTMLButtonElement>("[data-demo-controls] button")?.focus({ preventScroll: true });
+}
+
+function InteractiveDemoPlayerBody() {
   const { t, locale } = useTranslation();
   const { reducedMotion, checked: motionChecked } = usePrefersReducedMotion();
   const [role, setRole] = useState<DemoRole>("overview");
@@ -129,59 +136,93 @@ export function InteractiveDemoPlayer() {
   if (!scene) return null;
 
   return (
-    <Shell wide rail>
+    <>
+      <DemoRoleSelector activeRole={role} onSelect={handleRoleChange} disabled={playing && !takeover} />
+      <DemoTimeline scenes={scenes} activeIndex={activeIndex} elapsedMs={elapsedMs} onSeek={seekToIndex} />
+
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px] lg:gap-6">
+        <div className="space-y-3 sm:space-y-4">
+          <div className="relative">
+            <DemoSceneStage scene={scene} reducedMotion={reducedMotion || takeover} compact />
+            <DemoCursor path={scene.cursorPath} progress={sceneProgress} visible={playing && !reducedMotion && !takeover} />
+          </div>
+          <DemoControls
+            playing={playing}
+            onPlayPause={handlePlayPause}
+            onRestart={() => {
+              setElapsedMs(0);
+              setPlaying(false);
+            }}
+            takeover={takeover}
+            onTakeoverToggle={() => setTakeover((t) => !t)}
+          />
+          <DemoCaption
+            titleKey={scene.titleKey}
+            descriptionKey={scene.descriptionKey}
+            highlightKeys={scene.highlightKeys}
+            compact
+          />
+        </div>
+        <aside className="hidden lg:block">
+          <DemoChapterNavigation scenes={scenes} activeIndex={activeIndex} onSelect={seekToIndex} />
+        </aside>
+      </div>
+
+      <p className="text-xs leading-relaxed text-[var(--twin-muted-strong)] sm:text-sm">{t("interactiveDemoPlayer.lead")}</p>
+      <p className="text-xs text-[var(--twin-muted)]">{t("interactiveDemoPlayer.boundaryNote")}</p>
+    </>
+  );
+}
+
+/** Compact hero + interactive player in one above-fold shell. */
+export function DemoAboveFoldSection() {
+  const { t } = useTranslation();
+  const onLaunchDemo = useCallback(() => focusDemoControls(), []);
+
+  return (
+    <Shell wide>
       <MarketingPageSurface wide withCard={false}>
-        <section
-          className="marketing-copy-rail scroll-mt-20 space-y-5 sm:space-y-6"
-          data-interactive-demo-player
-          id="interactive-story"
-          tabIndex={-1}
-        >
-          <header className="space-y-2">
-            <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
-              {t("interactiveDemoPlayer.eyebrow")}
-            </p>
-            <h2 className="twin-section-title text-2xl sm:text-3xl lg:text-4xl">{t("interactiveDemoPlayer.title")}</h2>
-            <p className="max-w-3xl text-sm leading-relaxed text-[var(--twin-muted-strong)] sm:text-base">
-              {t("interactiveDemoPlayer.lead")}
-            </p>
+        <div className="marketing-copy-rail min-w-0 space-y-4 sm:space-y-5">
+          <header
+            className="flex flex-wrap items-end justify-between gap-3 border-b border-[var(--twin-border)]/60 pb-4"
+            data-founder-led-demo="hero"
+          >
+            <div className="min-w-0 space-y-1">
+              <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
+                {t("founderLedDemo.pageEyebrow")}
+              </p>
+              <h1 className="twin-section-title text-lg sm:text-2xl md:text-3xl">{t("founderLedDemo.pageTitle")}</h1>
+            </div>
+            <button
+              type="button"
+              data-founder-led-demo-cta="launch"
+              className="twin-btn-primary twin-touch-target shrink-0"
+              onClick={onLaunchDemo}
+            >
+              {t("founderLedDemo.heroCtaLaunch")}
+            </button>
           </header>
 
-          <DemoRoleSelector activeRole={role} onSelect={handleRoleChange} disabled={playing && !takeover} />
-
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_220px]">
-            <div className="space-y-4">
-              <div className="relative">
-                <DemoSceneStage scene={scene} reducedMotion={reducedMotion || takeover} />
-                <DemoCursor path={scene.cursorPath} progress={sceneProgress} visible={playing && !reducedMotion && !takeover} />
-              </div>
-              <DemoCaption
-                titleKey={scene.titleKey}
-                descriptionKey={scene.descriptionKey}
-                highlightKeys={scene.highlightKeys}
-              />
-              <DemoTimeline scenes={scenes} activeIndex={activeIndex} elapsedMs={elapsedMs} onSeek={seekToIndex} />
-              <DemoControls
-                playing={playing}
-                onPlayPause={handlePlayPause}
-                onRestart={() => {
-                  setElapsedMs(0);
-                  setPlaying(false);
-                }}
-                takeover={takeover}
-                onTakeoverToggle={() => setTakeover((t) => !t)}
-              />
-            </div>
-            <aside className="hidden lg:block">
-              <DemoChapterNavigation scenes={scenes} activeIndex={activeIndex} onSelect={seekToIndex} />
-            </aside>
-          </div>
-
-          <p className="text-xs text-[var(--twin-muted)]">{t("interactiveDemoPlayer.boundaryNote")}</p>
-        </section>
+          <section
+            className="scroll-mt-20 space-y-3 sm:space-y-4"
+            data-interactive-demo-player
+            id="interactive-story"
+            tabIndex={-1}
+            aria-label={t("interactiveDemoPlayer.title")}
+          >
+            <p className="sr-only sm:not-sr-only text-[10px] font-bold uppercase tracking-[0.28em] text-[var(--twin-accent)]">
+              {t("interactiveDemoPlayer.eyebrow")}
+            </p>
+            <InteractiveDemoPlayerBody />
+          </section>
+        </div>
       </MarketingPageSurface>
     </Shell>
   );
+}
+
+export function InteractiveDemoPlayer() {
+  return <DemoAboveFoldSection />;
 }
 
 export function InteractiveDemoSystemMap() {

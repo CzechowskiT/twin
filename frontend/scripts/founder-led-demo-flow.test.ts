@@ -88,21 +88,22 @@ test("1 /demo route page exists", () => {
 
 test("2 /demo page renders hero and below-fold journey", () => {
   const page = read("src/app/(marketing)/demo/page.tsx");
-  assert.match(page, /FounderLedDemoHero/);
+  assert.match(page, /DemoAboveFoldSection|InteractiveDemoPlayer/);
   assert.match(page, /FounderLedDemoBelowFold/);
+  const player = read("src/components/marketing/demo/interactive-demo-player.tsx");
+  assert.match(player, /data-founder-led-demo="hero"/);
+  assert.match(player, /founderLedDemo\.pageTitle/);
   const flow = read("src/components/marketing/founder-led-demo-flow.tsx");
-  assert.match(flow, /data-founder-led-demo="hero"/);
   assert.match(flow, /data-founder-led-demo="journey"/);
-  assert.match(flow, /founderLedDemo\.pageTitle/);
   assert.ok(en.founderLedDemo.pageTitle.length > 10);
   assert.ok(en.founderLedDemo.closingStatement.includes("auto-apply"));
 });
 
 test("3 /demo hero launch CTA scrolls to interactive player", () => {
-  const flow = read("src/components/marketing/founder-led-demo-flow.tsx");
-  assert.match(flow, /data-founder-led-demo-cta="launch"/);
-  assert.match(flow, /heroCtaLaunch/);
-  assert.match(flow, /interactive-story/);
+  const player = read("src/components/marketing/demo/interactive-demo-player.tsx");
+  assert.match(player, /data-founder-led-demo-cta="launch"/);
+  assert.match(player, /heroCtaLaunch/);
+  assert.match(player, /interactive-story/);
   assert.ok(en.founderLedDemo.heroCtaLaunch.length > 3);
 });
 

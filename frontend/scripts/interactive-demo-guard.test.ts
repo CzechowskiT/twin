@@ -25,7 +25,7 @@ function read(rel: string): string {
 
 test("1 demo page wires interactive player stack", () => {
   const page = read("src/app/(marketing)/demo/page.tsx");
-  assert.match(page, /InteractiveDemoPlayer/);
+  assert.match(page, /DemoAboveFoldSection|InteractiveDemoPlayer/);
   assert.match(page, /DemoSurfaceCatalog/);
   assert.match(page, /InteractiveDemoSystemMap/);
   assert.match(page, /DemoPilotCta/);

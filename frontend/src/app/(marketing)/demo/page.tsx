@@ -3,13 +3,10 @@ import type { Metadata } from "next";
 import { DemoPilotCta } from "@/components/marketing/demo/demo-pilot-cta";
 import { DemoSurfaceCatalog } from "@/components/marketing/demo/demo-surface-catalog";
 import {
-  InteractiveDemoPlayer,
+  DemoAboveFoldSection,
   InteractiveDemoSystemMap,
 } from "@/components/marketing/demo/interactive-demo-player";
-import {
-  FounderLedDemoBelowFold,
-  FounderLedDemoHero,
-} from "@/components/marketing/founder-led-demo-flow";
+import { FounderLedDemoBelowFold } from "@/components/marketing/founder-led-demo-flow";
 
 export const metadata: Metadata = {
   title: "Founder-led demo — TWIN product walkthrough",
@@ -20,8 +17,7 @@ export const metadata: Metadata = {
 export default function DemoPage() {
   return (
     <>
-      <FounderLedDemoHero />
-      <InteractiveDemoPlayer />
+      <DemoAboveFoldSection />
       <InteractiveDemoSystemMap />
       <DemoSurfaceCatalog />
       <FounderLedDemoBelowFold />
