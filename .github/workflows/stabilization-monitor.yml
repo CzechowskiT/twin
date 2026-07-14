@@ -5,23 +5,67 @@ on:
     - cron: "0 */6 * * *"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
-  prod-public-probes:
+  prod-stabilization-soak:
+    name: "60min prod stabilization soak (13 snapshots)"
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     defaults:
       run:
         working-directory: frontend
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: npm
           cache-dependency-path: frontend/package-lock.json
+
       - run: npm ci
-      - name: Public route probe suite (3x repeat)
+
+      - name: Load founder smoke credentials (SET/UNSET only — never print values)
         env:
-          PROBE_REPEATS: "3"
-        run: npm run probe:prod-public
-      - name: Public health route stability
+          RECRUITER_TOKEN: ${{ secrets.RECRUITER_TOKEN }}
+          TWIN_RECRUITER_TOKEN: ${{ secrets.TWIN_RECRUITER_TOKEN }}
+          DEMO_USER_PASSWORD: ${{ secrets.DEMO_USER_PASSWORD }}
+        run: |
+          set -euo pipefail
+          touch .env.local
+          if [ -n "${RECRUITER_TOKEN:-}" ]; then
+            printf 'RECRUITER_TOKEN=%s\n' "$RECRUITER_TOKEN" >> .env.local
+          fi
+          if [ -n "${DEMO_USER_PASSWORD:-}" ]; then
+            printf 'DEMO_USER_PASSWORD=%s\n' "$DEMO_USER_PASSWORD" >> .env.local
+          fi
+          npx --yes tsx scripts/founder-smoke-env-preflight.ts || true
+
+      - name: Run 60min stabilization soak (T+0..T+60, 5min intervals = 13 snapshots)
+        env:
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          STABILIZATION_EXPECT_DB_HEAD: "077_candidate_activity_timeline"
+        run: npm run stabilization-soak
+
+      - name: Validate stabilization evidence artifact
+        run: |
+          EVIDENCE="../reports/stabilization/stabilization-evidence-${{ github.run_id }}.json"
+          test -f "$EVIDENCE"
+          npm run validate:stabilization-evidence -- "$EVIDENCE"
+
+      - name: Upload stabilization evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stabilization-evidence-${{ github.run_id }}
+          path: |
+            reports/stabilization/stabilization-evidence-${{ github.run_id }}.json
+            reports/stabilization/stabilization-evidence-${{ github.run_id }}.md
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Public health route stability guard
+        if: always()
         run: npm run test:public-health-route-stability
