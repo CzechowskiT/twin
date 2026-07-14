@@ -1,9 +1,9 @@
 # Public launch 9/10 scorecard — canonical
 
-> **Generated:** 2026-07-14T06:45:00Z · **Path:** A (credentials SET) · **Owner:** Eng agent closed batch  
-> **Verdict:** **NO-GO** — Gate F PENDING founder sign-off; 60min stabilization soak OPEN; mandatory E2E/DR rows still FAIL/BLOCKED.
+> **Generated:** 2026-07-14T09:30:00Z · **Path:** A (credentials SET) · **Owner:** Eng agent closed batch  
+> **Verdict:** **NO-GO** — Gate F PENDING founder sign-off; mandatory E2E/DR rows still FAIL/BLOCKED; LB-106 stabilization soak **CLOSED**.
 
-**Supersedes:** scorecard @ 2026-07-14T04:35Z · PR #471 merged @ `09b9963a`.
+**Supersedes:** scorecard @ 2026-07-14T06:45Z · PR #471 merged @ `09b9963a` · stabilization soak #29315813862 PASS.
 
 ---
 
@@ -25,7 +25,7 @@
 
 | Pole | Wartość |
 |------|---------|
-| **repo_head** | `09b9963a` (PR #471 guard/credentials merge) |
+| **repo_head** | `26416bee` (stabilization soak + LB-106 evidence batch) |
 | **prod_api_commit** | `ae14bfb58fc0` |
 | **prod_frontend** | `https://twin-sooty.vercel.app` |
 | **prod_db_head** | `077_candidate_activity_timeline` (`db_ok=true`) |
@@ -62,9 +62,9 @@
 | A7 | Security headers on FE | **PASS** | CSP, HSTS, X-Frame-Options @ Vercel response headers |
 | A8 | No open P0 prod incidents | **PASS** ★ | INC public-health 500 CLOSED — `docs/incidents/2026-07-13-public-health-500.md` |
 | A9 | ≥100 public route probes PASS | **PASS** | 110/110 PASS — prod probe suite |
-| A10 | Post-train deploy SHA verification | **PASS** | Railway `ead5b0a0` SUCCESS; `verify:production-v3:077` PASS @ 2026-07-14 |
+| A10 | Post-train deploy SHA verification | **PASS** | Railway `ead5b0a0` SUCCESS; `verify:production-v3:077` PASS @ 2026-07-14; 60min stabilization soak #29315813862 PASS |
 
-**Area A score: 7/10** (mandatory A6 FAIL → auto NO-GO)
+**Area A score: 9/10** (mandatory met; stabilization soak CLOSED)
 
 ---
 
@@ -197,8 +197,8 @@ npm run probe:prod-public && npm run verify:production-v3:077
 | Prod public probes (110×) | `npm run probe:prod-public` | 110/110 PASS @ 12:32Z |
 | Extended merge plan | `npm run plan:merge-train-extended` | PASS — manual merge order ready |
 | Integration sim 070→077 | `npm run sim:integration-070-077` | PASS @ 12:32Z |
-| Production verifier v3 | `npm run verify:production-v3:077` | **PASS** — `credentialsSet=true`; stabilization INACTIVE @ 2026-07-14 |
-| Stabilization monitor | `gh workflow run stabilization-monitor.yml` | **PARTIAL** — run #29312315268 PASS 54s; **no 60min soak** (LB-106 OPEN) |
+| Production verifier v3 | `npm run verify:production-v3:077` | **PASS** — `credentialsSet=true`; stabilization CLOSED @ 2026-07-14 |
+| Stabilization monitor | GH run #29315813862 | **PASS** — 3731s, 13 snapshots, `identityDriftDetected=false`, DB 077 (LB-106 **CLOSED**) |
 
 ---
 
@@ -260,9 +260,9 @@ npm run probe:prod-public && npm run verify:production-v3:077
 |------|--------|
 | Scorecard (this doc) | **RECORDED** — NO-GO |
 | Blocker register | `docs/PUBLIC_LAUNCH_BLOCKER_REGISTER_2026-07-13.md` |
-| Founder smoke evidence | `reports/founder-smoke/founder-smoke-evidence-2026-07-14T04-35-00Z.json` — recruiter PASS, candidate PARTIAL |
-| Prod probes | `reports/prod-probes/prod-probes-2026-07-14T06-45-18-692Z.json` — 110/110 PASS |
-| Stabilization workflow | GH Actions #29312315268 — PASS 54s (3× probe repeat + public-health stability) |
+| Founder smoke evidence | `reports/founder-smoke/26416beec545/wave-bc-2026-07-14T09-24-51-915Z` — Wave B/C 16/16 PASS |
+| Prod probes | `reports/prod-probes/prod-probes-2026-07-14T09-24-47-356Z.json` — 220/220 PASS (2×110) |
+| Stabilization workflow | GH #29315813862 — 3731s, 13 snapshots, PASS, `identityDriftDetected=false`, LB-106 CLOSED |
 | Integration sim | `reports/integration-sim/integration-sim-2026-07-13T12-32-08-704Z.json` — PASS |
 | Demo founder package | `reports/FOUNDER_DEMO_REVIEW_PACKAGE.md` — #462 @ `e788dd9f` |
 | Founder signature | **ABSENT** — Gate F PENDING |
@@ -277,14 +277,13 @@ Stripe LIVE · ATS writeback · Microsoft Calendar write · Auto-apply execution
 
 ## Final decision
 
-**NO-GO** — Kontrolowany pilot założycielski dozwolony; publiczny launch zabroniony.
+**NO-GO** — Kontrolowany pilot założycielski dozwolony; publiczny launch zabroniony. LB-106 stabilization soak CLOSED; Gate F founder sign-off nadal wymagany.
 
 **GO wymaga (kolejność):**
-1. Ustaw credentials → Wave B/C browser smoke PASS
-2. Merge train #449→#450→#448→#451→#452→#453→#454→#455
-3. Railway migrate → prod head 077
-4. O7 real restore drill na staging clone
-5. Gate F founder decision + podpis scorecard
+1. Wave B/C browser smoke PASS (done @ `26416bee`)
+2. Gate F founder decision + podpis scorecard
+3. O7 real restore drill na staging clone
+4. R-019 disposable-account smoke na prod
 
 ---
 

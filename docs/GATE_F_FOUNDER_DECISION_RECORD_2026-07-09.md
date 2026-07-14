@@ -18,7 +18,7 @@
 | **Candidate readiness working flow** | **PASS** | PR #429 — checklist → career/evidence/consent |
 | **Deploy alignment** | **ACCEPTABLE_DOCS_ONLY_DRIFT** | prod `ae14bfb58fc0`; repo `09b9963a` (PR #471 tooling) |
 | **Guard suite** | **PASS** | visible-guard #10 LIVE; Wave B/C 16/16; `verify:production-v3:077` credentialsSet=true |
-| **Stabilization soak** | **PARTIAL** | GH #29312315268 PASS 54s — **no 60min evidence** (LB-106 OPEN) |
+| **Stabilization soak** | **CLOSED** | GH #29315813862 PASS — 3731s, 13 snapshots, `identityDriftDetected=false`, `credentialsSet=true`, DB 077 (LB-106 CLOSED); rejected drift run #29313170353 |
 | **Public health** | **PASS** | `status=ok`, `db_ok=true`, head 077 |
 | **Recruiter prod smoke** | **PASS** | 6-route sequential behavioral @ `ae14bfb5` — 2026-07-14 |
 | **Authenticated candidate smoke** | **PARTIAL** | API login + Wave B endpoints 200; browser checklist pending |
@@ -169,7 +169,7 @@ No Gate F YES decided by this document. No Launch GO claimed by this document.
 
 ```
 GATE_F_FOUNDER_DECISION_RECORD_DATE: 2026-07-09
-BATCH_UPDATE: 2026-07-14T06:45Z
+BATCH_UPDATE: 2026-07-14T09:30Z
 AUTHENTICATED_SMOKE_DATE: 2026-07-09
 AUTHENTICATED_SMOKE_REFRESH: 2026-07-14
 DEPLOY_ALIGNMENT: ACCEPTABLE_DOCS_ONLY_DRIFT
@@ -177,8 +177,12 @@ FRONTEND_COMMIT: ad7944b8 (prod FE)
 API_COMMIT: ae14bfb58fc0
 REPO_HEAD: 09b9963a
 CREDENTIALS_SET: true
-STABILIZATION_MONITOR_RUN: 29312315268
-STABILIZATION_60MIN_SOAK: OPEN
+STABILIZATION_MONITOR_RUN: 29315813862
+STABILIZATION_60MIN_SOAK: CLOSED
+STABILIZATION_DURATION_SEC: 3731
+STABILIZATION_SNAPSHOT_COUNT: 13
+STABILIZATION_IDENTITY_DRIFT: false
+STABILIZATION_EVIDENCE: reports/stabilization/29315813862/
 M_SMOKE_PASS: 6
 M_SMOKE_FAIL: 0
 M_SMOKE_NEEDS_REVIEW: 6

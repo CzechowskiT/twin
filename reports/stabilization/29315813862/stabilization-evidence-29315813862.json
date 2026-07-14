@@ -1,0 +1,1046 @@
+{
+  "schemaVersion": "1",
+  "runId": "29315813862",
+  "githubRunId": "29315813862",
+  "startedUtc": "2026-07-14T07:49:07.949Z",
+  "finishedUtc": "2026-07-14T08:51:18.714Z",
+  "durationSec": 3731,
+  "intervalMin": 5,
+  "snapshotCount": 13,
+  "pinnedIdentities": {
+    "frontendCommit": "26416beec5452aa0f06dd7bea7b3baf04b47a535",
+    "apiCommit": "ae14bfb58fc0c2db56a6fa0f417ca41c534b7960",
+    "dbOk": true,
+    "dbHead": "077_candidate_activity_timeline",
+    "vercelDeploymentId": "sfo1::iad1::47zln-1784015348202-7254ebaf75df",
+    "railwayEdge": "lax1"
+  },
+  "identityDriftDetected": false,
+  "credentialsSet": true,
+  "snapshots": [
+    {
+      "index": 0,
+      "label": "T+0",
+      "capturedUtc": "2026-07-14T07:49:22.728Z",
+      "elapsedSec": 5,
+      "identities": {
+        "frontendCommit": "26416beec5452aa0f06dd7bea7b3baf04b47a535",
+        "apiCommit": "ae14bfb58fc0c2db56a6fa0f417ca41c534b7960",
+        "dbOk": true,
+        "dbHead": "077_candidate_activity_timeline",
+        "vercelDeploymentId": "sfo1::iad1::scmr9-1784015353297-35e7bbbf79b8",
+        "railwayEdge": "lax1"
+      },
+      "identityDrift": false,
+      "publicRoutes": [
+        {
+          "route": "/",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 103
+        },
+        {
+          "route": "/status",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 47
+        },
+        {
+          "route": "/for-candidates",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 53
+        },
+        {
+          "route": "/for-recruiters",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 53
+        },
+        {
+          "route": "/api/public-health",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 4341
+        }
+      ],
+      "candidateRoutes": [
+        {
+          "route": "/api/v1/candidates/me",
+          "layer": "candidate",
+          "status": 200,
+          "ok": true,
+          "ms": 291
+        }
+      ],
+      "recruiterRoutes": [
+        {
+          "route": "/recruiter/inbox",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 51
+        },
+        {
+          "route": "/recruiter/talent-pool",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 57
+        }
+      ],
+      "snapshotOk": true
+    },
+    {
+      "index": 1,
+      "label": "T+5",
+      "capturedUtc": "2026-07-14T07:54:32.591Z",
+      "elapsedSec": 315,
+      "identities": {
+        "frontendCommit": "26416beec5452aa0f06dd7bea7b3baf04b47a535",
+        "apiCommit": "ae14bfb58fc0c2db56a6fa0f417ca41c534b7960",
+        "dbOk": true,
+        "dbHead": "077_candidate_activity_timeline",
+        "vercelDeploymentId": "sfo1::iad1::q6dpj-1784015662817-448cf8cdfa48",
+        "railwayEdge": "lax1"
+      },
+      "identityDrift": false,
+      "publicRoutes": [
+        {
+          "route": "/",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 54
+        },
+        {
+          "route": "/status",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 117
+        },
+        {
+          "route": "/for-candidates",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 61
+        },
+        {
+          "route": "/for-recruiters",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 194
+        },
+        {
+          "route": "/api/public-health",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 4401
+        }
+      ],
+      "candidateRoutes": [
+        {
+          "route": "/api/v1/candidates/me",
+          "layer": "candidate",
+          "status": 200,
+          "ok": true,
+          "ms": 293
+        }
+      ],
+      "recruiterRoutes": [
+        {
+          "route": "/recruiter/inbox",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 52
+        },
+        {
+          "route": "/recruiter/talent-pool",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 57
+        }
+      ],
+      "snapshotOk": true
+    },
+    {
+      "index": 2,
+      "label": "T+10",
+      "capturedUtc": "2026-07-14T07:59:42.049Z",
+      "elapsedSec": 625,
+      "identities": {
+        "frontendCommit": "26416beec5452aa0f06dd7bea7b3baf04b47a535",
+        "apiCommit": "ae14bfb58fc0c2db56a6fa0f417ca41c534b7960",
+        "dbOk": true,
+        "dbHead": "077_candidate_activity_timeline",
+        "vercelDeploymentId": "sfo1::iad1::dg7gf-1784015972692-7355d5dfad79",
+        "railwayEdge": "lax1"
+      },
+      "identityDrift": false,
+      "publicRoutes": [
+        {
+          "route": "/",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 57
+        },
+        {
+          "route": "/status",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 97
+        },
+        {
+          "route": "/for-candidates",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 53
+        },
+        {
+          "route": "/for-recruiters",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 51
+        },
+        {
+          "route": "/api/public-health",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 4258
+        }
+      ],
+      "candidateRoutes": [
+        {
+          "route": "/api/v1/candidates/me",
+          "layer": "candidate",
+          "status": 200,
+          "ok": true,
+          "ms": 306
+        }
+      ],
+      "recruiterRoutes": [
+        {
+          "route": "/recruiter/inbox",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 49
+        },
+        {
+          "route": "/recruiter/talent-pool",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 47
+        }
+      ],
+      "snapshotOk": true
+    },
+    {
+      "index": 3,
+      "label": "T+15",
+      "capturedUtc": "2026-07-14T08:04:51.597Z",
+      "elapsedSec": 934,
+      "identities": {
+        "frontendCommit": "26416beec5452aa0f06dd7bea7b3baf04b47a535",
+        "apiCommit": "ae14bfb58fc0c2db56a6fa0f417ca41c534b7960",
+        "dbOk": true,
+        "dbHead": "077_candidate_activity_timeline",
+        "vercelDeploymentId": "sfo1::iad1::dk8gp-1784016282187-f78b65c6fe4a",
+        "railwayEdge": "lax1"
+      },
+      "identityDrift": false,
+      "publicRoutes": [
+        {
+          "route": "/",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 66
+        },
+        {
+          "route": "/status",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 102
+        },
+        {
+          "route": "/for-candidates",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 53
+        },
+        {
+          "route": "/for-recruiters",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 48
+        },
+        {
+          "route": "/api/public-health",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 4371
+        }
+      ],
+      "candidateRoutes": [
+        {
+          "route": "/api/v1/candidates/me",
+          "layer": "candidate",
+          "status": 200,
+          "ok": true,
+          "ms": 294
+        }
+      ],
+      "recruiterRoutes": [
+        {
+          "route": "/recruiter/inbox",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 50
+        },
+        {
+          "route": "/recruiter/talent-pool",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 53
+        }
+      ],
+      "snapshotOk": true
+    },
+    {
+      "index": 4,
+      "label": "T+20",
+      "capturedUtc": "2026-07-14T08:10:01.262Z",
+      "elapsedSec": 1244,
+      "identities": {
+        "frontendCommit": "26416beec5452aa0f06dd7bea7b3baf04b47a535",
+        "apiCommit": "ae14bfb58fc0c2db56a6fa0f417ca41c534b7960",
+        "dbOk": true,
+        "dbHead": "077_candidate_activity_timeline",
+        "vercelDeploymentId": "sfo1::iad1::rx7tm-1784016591769-4154ab5e41d7",
+        "railwayEdge": "lax1"
+      },
+      "identityDrift": false,
+      "publicRoutes": [
+        {
+          "route": "/",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 68
+        },
+        {
+          "route": "/status",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 95
+        },
+        {
+          "route": "/for-candidates",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 58
+        },
+        {
+          "route": "/for-recruiters",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 86
+        },
+        {
+          "route": "/api/public-health",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 4325
+        }
+      ],
+      "candidateRoutes": [
+        {
+          "route": "/api/v1/candidates/me",
+          "layer": "candidate",
+          "status": 200,
+          "ok": true,
+          "ms": 300
+        }
+      ],
+      "recruiterRoutes": [
+        {
+          "route": "/recruiter/inbox",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 47
+        },
+        {
+          "route": "/recruiter/talent-pool",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 61
+        }
+      ],
+      "snapshotOk": true
+    },
+    {
+      "index": 5,
+      "label": "T+25",
+      "capturedUtc": "2026-07-14T08:15:10.985Z",
+      "elapsedSec": 1553,
+      "identities": {
+        "frontendCommit": "26416beec5452aa0f06dd7bea7b3baf04b47a535",
+        "apiCommit": "ae14bfb58fc0c2db56a6fa0f417ca41c534b7960",
+        "dbOk": true,
+        "dbHead": "077_candidate_activity_timeline",
+        "vercelDeploymentId": "sfo1::iad1::4dj7n-1784016901432-91cc0296ca15",
+        "railwayEdge": "lax1"
+      },
+      "identityDrift": false,
+      "publicRoutes": [
+        {
+          "route": "/",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 64
+        },
+        {
+          "route": "/status",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 120
+        },
+        {
+          "route": "/for-candidates",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 243
+        },
+        {
+          "route": "/for-recruiters",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 48
+        },
+        {
+          "route": "/api/public-health",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 4254
+        }
+      ],
+      "candidateRoutes": [
+        {
+          "route": "/api/v1/candidates/me",
+          "layer": "candidate",
+          "status": 200,
+          "ok": true,
+          "ms": 290
+        }
+      ],
+      "recruiterRoutes": [
+        {
+          "route": "/recruiter/inbox",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 51
+        },
+        {
+          "route": "/recruiter/talent-pool",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 115
+        }
+      ],
+      "snapshotOk": true
+    },
+    {
+      "index": 6,
+      "label": "T+30",
+      "capturedUtc": "2026-07-14T08:20:20.362Z",
+      "elapsedSec": 1863,
+      "identities": {
+        "frontendCommit": "26416beec5452aa0f06dd7bea7b3baf04b47a535",
+        "apiCommit": "ae14bfb58fc0c2db56a6fa0f417ca41c534b7960",
+        "dbOk": true,
+        "dbHead": "077_candidate_activity_timeline",
+        "vercelDeploymentId": "sfo1::iad1::sc7c7-1784017211098-96d693fd4dbc",
+        "railwayEdge": "lax1"
+      },
+      "identityDrift": false,
+      "publicRoutes": [
+        {
+          "route": "/",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 60
+        },
+        {
+          "route": "/status",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 116
+        },
+        {
+          "route": "/for-candidates",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 52
+        },
+        {
+          "route": "/for-recruiters",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 54
+        },
+        {
+          "route": "/api/public-health",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 4263
+        }
+      ],
+      "candidateRoutes": [
+        {
+          "route": "/api/v1/candidates/me",
+          "layer": "candidate",
+          "status": 200,
+          "ok": true,
+          "ms": 296
+        }
+      ],
+      "recruiterRoutes": [
+        {
+          "route": "/recruiter/inbox",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 49
+        },
+        {
+          "route": "/recruiter/talent-pool",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 42
+        }
+      ],
+      "snapshotOk": true
+    },
+    {
+      "index": 7,
+      "label": "T+35",
+      "capturedUtc": "2026-07-14T08:25:29.696Z",
+      "elapsedSec": 2172,
+      "identities": {
+        "frontendCommit": "26416beec5452aa0f06dd7bea7b3baf04b47a535",
+        "apiCommit": "ae14bfb58fc0c2db56a6fa0f417ca41c534b7960",
+        "dbOk": true,
+        "dbHead": "077_candidate_activity_timeline",
+        "vercelDeploymentId": "sfo1::iad1::mp8hl-1784017520448-9bedc0f9f0af",
+        "railwayEdge": "lax1"
+      },
+      "identityDrift": false,
+      "publicRoutes": [
+        {
+          "route": "/",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 83
+        },
+        {
+          "route": "/status",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 126
+        },
+        {
+          "route": "/for-candidates",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 50
+        },
+        {
+          "route": "/for-recruiters",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 49
+        },
+        {
+          "route": "/api/public-health",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 4212
+        }
+      ],
+      "candidateRoutes": [
+        {
+          "route": "/api/v1/candidates/me",
+          "layer": "candidate",
+          "status": 200,
+          "ok": true,
+          "ms": 291
+        }
+      ],
+      "recruiterRoutes": [
+        {
+          "route": "/recruiter/inbox",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 49
+        },
+        {
+          "route": "/recruiter/talent-pool",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 43
+        }
+      ],
+      "snapshotOk": true
+    },
+    {
+      "index": 8,
+      "label": "T+40",
+      "capturedUtc": "2026-07-14T08:30:39.404Z",
+      "elapsedSec": 2482,
+      "identities": {
+        "frontendCommit": "26416beec5452aa0f06dd7bea7b3baf04b47a535",
+        "apiCommit": "ae14bfb58fc0c2db56a6fa0f417ca41c534b7960",
+        "dbOk": true,
+        "dbHead": "077_candidate_activity_timeline",
+        "vercelDeploymentId": "sfo1::iad1::2wklt-1784017829846-976f7a7f9042",
+        "railwayEdge": "lax1"
+      },
+      "identityDrift": false,
+      "publicRoutes": [
+        {
+          "route": "/",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 58
+        },
+        {
+          "route": "/status",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 117
+        },
+        {
+          "route": "/for-candidates",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 59
+        },
+        {
+          "route": "/for-recruiters",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 73
+        },
+        {
+          "route": "/api/public-health",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 4264
+        }
+      ],
+      "candidateRoutes": [
+        {
+          "route": "/api/v1/candidates/me",
+          "layer": "candidate",
+          "status": 200,
+          "ok": true,
+          "ms": 309
+        }
+      ],
+      "recruiterRoutes": [
+        {
+          "route": "/recruiter/inbox",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 66
+        },
+        {
+          "route": "/recruiter/talent-pool",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 57
+        }
+      ],
+      "snapshotOk": true
+    },
+    {
+      "index": 9,
+      "label": "T+45",
+      "capturedUtc": "2026-07-14T08:35:49.023Z",
+      "elapsedSec": 2791,
+      "identities": {
+        "frontendCommit": "26416beec5452aa0f06dd7bea7b3baf04b47a535",
+        "apiCommit": "ae14bfb58fc0c2db56a6fa0f417ca41c534b7960",
+        "dbOk": true,
+        "dbHead": "077_candidate_activity_timeline",
+        "vercelDeploymentId": "sfo1::iad1::pn5jn-1784018139487-0d3a6b24558e",
+        "railwayEdge": "lax1"
+      },
+      "identityDrift": false,
+      "publicRoutes": [
+        {
+          "route": "/",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 82
+        },
+        {
+          "route": "/status",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 124
+        },
+        {
+          "route": "/for-candidates",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 64
+        },
+        {
+          "route": "/for-recruiters",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 61
+        },
+        {
+          "route": "/api/public-health",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 4283
+        }
+      ],
+      "candidateRoutes": [
+        {
+          "route": "/api/v1/candidates/me",
+          "layer": "candidate",
+          "status": 200,
+          "ok": true,
+          "ms": 285
+        }
+      ],
+      "recruiterRoutes": [
+        {
+          "route": "/recruiter/inbox",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 49
+        },
+        {
+          "route": "/recruiter/talent-pool",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 42
+        }
+      ],
+      "snapshotOk": true
+    },
+    {
+      "index": 10,
+      "label": "T+50",
+      "capturedUtc": "2026-07-14T08:40:58.422Z",
+      "elapsedSec": 3101,
+      "identities": {
+        "frontendCommit": "26416beec5452aa0f06dd7bea7b3baf04b47a535",
+        "apiCommit": "ae14bfb58fc0c2db56a6fa0f417ca41c534b7960",
+        "dbOk": true,
+        "dbHead": "077_candidate_activity_timeline",
+        "vercelDeploymentId": "sfo1::iad1::6bhg5-1784018449114-3b4077ec1e9c",
+        "railwayEdge": "lax1"
+      },
+      "identityDrift": false,
+      "publicRoutes": [
+        {
+          "route": "/",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 65
+        },
+        {
+          "route": "/status",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 121
+        },
+        {
+          "route": "/for-candidates",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 52
+        },
+        {
+          "route": "/for-recruiters",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 59
+        },
+        {
+          "route": "/api/public-health",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 4243
+        }
+      ],
+      "candidateRoutes": [
+        {
+          "route": "/api/v1/candidates/me",
+          "layer": "candidate",
+          "status": 200,
+          "ok": true,
+          "ms": 328
+        }
+      ],
+      "recruiterRoutes": [
+        {
+          "route": "/recruiter/inbox",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 44
+        },
+        {
+          "route": "/recruiter/talent-pool",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 47
+        }
+      ],
+      "snapshotOk": true
+    },
+    {
+      "index": 11,
+      "label": "T+55",
+      "capturedUtc": "2026-07-14T08:46:08.863Z",
+      "elapsedSec": 3411,
+      "identities": {
+        "frontendCommit": "26416beec5452aa0f06dd7bea7b3baf04b47a535",
+        "apiCommit": "ae14bfb58fc0c2db56a6fa0f417ca41c534b7960",
+        "dbOk": true,
+        "dbHead": "077_candidate_activity_timeline",
+        "vercelDeploymentId": "sfo1::iad1::hrj2g-1784018758598-8351d45cb758",
+        "railwayEdge": "lax1"
+      },
+      "identityDrift": false,
+      "publicRoutes": [
+        {
+          "route": "/",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 857
+        },
+        {
+          "route": "/status",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 101
+        },
+        {
+          "route": "/for-candidates",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 46
+        },
+        {
+          "route": "/for-recruiters",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 71
+        },
+        {
+          "route": "/api/public-health",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 4344
+        }
+      ],
+      "candidateRoutes": [
+        {
+          "route": "/api/v1/candidates/me",
+          "layer": "candidate",
+          "status": 200,
+          "ok": true,
+          "ms": 283
+        }
+      ],
+      "recruiterRoutes": [
+        {
+          "route": "/recruiter/inbox",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 57
+        },
+        {
+          "route": "/recruiter/talent-pool",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 52
+        }
+      ],
+      "snapshotOk": true
+    },
+    {
+      "index": 12,
+      "label": "T+60",
+      "capturedUtc": "2026-07-14T08:51:18.714Z",
+      "elapsedSec": 3721,
+      "identities": {
+        "frontendCommit": "26416beec5452aa0f06dd7bea7b3baf04b47a535",
+        "apiCommit": "ae14bfb58fc0c2db56a6fa0f417ca41c534b7960",
+        "dbOk": true,
+        "dbHead": "077_candidate_activity_timeline",
+        "vercelDeploymentId": "sfo1::iad1::7hcb7-1784019069102-73a127d95b25",
+        "railwayEdge": "lax1"
+      },
+      "identityDrift": false,
+      "publicRoutes": [
+        {
+          "route": "/",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 67
+        },
+        {
+          "route": "/status",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 138
+        },
+        {
+          "route": "/for-candidates",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 55
+        },
+        {
+          "route": "/for-recruiters",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 54
+        },
+        {
+          "route": "/api/public-health",
+          "layer": "public",
+          "status": 200,
+          "ok": true,
+          "ms": 4328
+        }
+      ],
+      "candidateRoutes": [
+        {
+          "route": "/api/v1/candidates/me",
+          "layer": "candidate",
+          "status": 200,
+          "ok": true,
+          "ms": 298
+        }
+      ],
+      "recruiterRoutes": [
+        {
+          "route": "/recruiter/inbox",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 214
+        },
+        {
+          "route": "/recruiter/talent-pool",
+          "layer": "recruiter",
+          "status": 200,
+          "ok": true,
+          "ms": 57
+        }
+      ],
+      "snapshotOk": true
+    }
+  ],
+  "passThresholds": {
+    "minDurationSec": 3600,
+    "requiredSnapshots": 13,
+    "publicPassRate": 1,
+    "authenticatedPassRate": 1,
+    "maxIdentityDrift": 0
+  },
+  "verdict": "PASS",
+  "failReasons": [],
+  "transientNotes": []
+}
