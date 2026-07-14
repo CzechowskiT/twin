@@ -12,21 +12,21 @@
 | prod_api_commit | ae14bfb5 |
 | db_revision | 077 |
 | alignment_status | ALIGNED |
-| generated_utc | 2026-07-14T05:49:19.503Z |
+| generated_utc | 2026-07-14T06:29:05.197Z |
 
 ## Product live summary
 
 | Metric | Count |
 |--------|-------|
 | LIVE | 30 |
-| PILOT | 54 |
+| PILOT | 59 |
 | PREVIEW | 3 |
 | COMING_SOON | 3 |
 | PAUSED | 2 |
 | INTERNAL | 9 |
-| GREEN_WORKING | 30 |
-| Visible in hub | 92 |
-| Total modules | 101 |
+| GREEN_WORKING | 41 |
+| Visible in hub | 97 |
+| Total modules | 106 |
 
 ## Legend
 
@@ -61,6 +61,7 @@
 | referrals | /dashboard/referrals | LIVE | LIVE (repo=9cb96e30) | yes | yes | Wave B complete — referrals read-only smoke PASS on prod. |
 | candidate_trust | /dashboard/trust | LIVE | LIVE (repo=9cb96e30) | yes | yes | Wave B complete — trust subs load on prod; mutation smoke excluded for demo account. |
 | trust_center | /dashboard/trust | LIVE | LIVE (repo=9cb96e30) | yes | yes | Wave B complete — trust hub + subs verified on prod. |
+| candidate_activity_timeline | /dashboard/trust/activity-timeline | LIVE | LIVE (repo=9cb96e30) | yes | yes | Wave C candidate timeline complete — read-only smoke PASS on prod. |
 | candidate_trust_audit_export | /dashboard/trust/audit-export | PILOT | PILOT (repo=9cb96e30) | no | yes | Schedule activation wave. |
 | candidate_consent_receipt | /dashboard/trust/consent-receipt | PILOT | PILOT (repo=9cb96e30) | no | yes | Schedule activation wave. |
 | candidate_control_center | /dashboard/trust/controls | PILOT | PILOT (repo=9cb96e30) | no | yes | Schedule activation wave. |
@@ -78,6 +79,7 @@
 | Module | Route | Repo | Prod | Green | Visible | Next action |
 |--------|-------|------|------|-------|---------|-------------|
 | recruiter_hub | /recruiter | INTERNAL | INTERNAL | no | no | Schedule activation wave. |
+| recruiter_activity_timeline | /recruiter/activity-timeline | LIVE | LIVE (repo=9cb96e30) | yes | yes | Wave C5 complete — activity timeline read-only smoke PASS on prod. |
 | recruiter_analytics | /recruiter/analytics | LIVE | LIVE (repo=9cb96e30) | yes | yes | Maintain — regression smoke. |
 | recruiter_calendar | /recruiter/calendar | BLOCKED | BLOCKED | no | yes | Wave F — MS/Google calendar after core green. |
 | recruiter_demo_profile_360 | /recruiter/candidates/demo-candidate-001 | PILOT | PILOT (repo=9cb96e30) | no | yes | Schedule activation wave. |
@@ -86,26 +88,29 @@
 | recruiter_demo_decision_memory | /recruiter/candidates/demo-candidate-001/decision-memory | PILOT | PILOT (repo=9cb96e30) | no | yes | Schedule activation wave. |
 | recruiter_demo_team | /recruiter/candidates/demo-candidate-001/team | PILOT | PILOT (repo=9cb96e30) | no | yes | Schedule activation wave. |
 | recruiter_demo_trust | /recruiter/candidates/demo-candidate-001/trust | PILOT | PILOT (repo=9cb96e30) | no | yes | Schedule activation wave. |
-| recruiter_daily_cockpit | /recruiter/daily-cockpit | PILOT_PENDING_SMOKE | PILOT_PENDING_SMOKE (repo=9cb96e30) | no | yes | Wave C slice 1 shipped — run founder smoke on /recruiter with pilot token. |
-| daily_cockpit | /recruiter/daily-cockpit | PILOT_PENDING_SMOKE | PILOT_PENDING_SMOKE (repo=9cb96e30) | no | yes | Wave C slice 1 shipped — run founder smoke on /recruiter with pilot token. |
+| recruiter_daily_cockpit | /recruiter/daily-cockpit | LIVE | LIVE (repo=9cb96e30) | yes | yes | Wave C1 complete — monitor activation persistence on pilot token. |
+| daily_cockpit | /recruiter/daily-cockpit | LIVE | LIVE (repo=9cb96e30) | yes | yes | Wave C1 complete — monitor activation persistence on pilot token. |
 | recruiter_inbox | /recruiter/inbox | LIVE | LIVE (repo=9cb96e30) | yes | yes | Maintain — regression smoke. |
+| recruiter_saved_views | /recruiter/inbox | LIVE | LIVE (repo=9cb96e30) | yes | yes | Wave C4 complete — saved views API smoke PASS on prod. |
 | recruiter_integrations | /recruiter/integrations | BLOCKED | BLOCKED | no | yes | Wave F — integrations after core personas green. |
 | integrations | /recruiter/integrations | BLOCKED | BLOCKED | no | yes | Wave F — recruiter integrations activation. |
 | recruiter_ats_import_readiness | /recruiter/integrations/ats/import-readiness | INTERNAL | INTERNAL | no | no | Schedule activation wave. |
 | recruiter_jobs | /recruiter/jobs | LIVE | LIVE (repo=9cb96e30) | yes | yes | Maintain — regression smoke. |
 | recruiter_demo_pipeline | /recruiter/jobs/demo-role-001/pipeline | PILOT | PILOT (repo=9cb96e30) | no | yes | Schedule activation wave. |
+| notification_preferences | /recruiter/notification-preferences | LIVE | LIVE (repo=9cb96e30) | yes | yes | Wave C3 complete — notification prefs read-only smoke PASS on prod. |
+| recruiter_notification_preferences | /recruiter/notification-preferences | LIVE | LIVE (repo=9cb96e30) | yes | yes | Wave C3 complete — notification prefs read-only smoke PASS on prod. |
 | recruiter_operational_work_queue | /recruiter/operational-work-queue | INTERNAL | INTERNAL | no | no | Schedule activation wave. |
 | recruiter_pipeline | /recruiter/pipeline | LIVE | LIVE (repo=9cb96e30) | yes | yes | Maintain — regression smoke. |
 | recruiter_search | /recruiter/search | LIVE | LIVE (repo=9cb96e30) | yes | yes | Maintain — regression smoke. |
-| recruiter_talent_pool | /recruiter/talent-pool | PILOT_PENDING_SMOKE | PILOT_PENDING_SMOKE (repo=9cb96e30) | no | yes | Wave C slice 2 shipped — run founder smoke on /recruiter/talent-pool with pilot token. |
-| talent_pool | /recruiter/talent-pool | PILOT_PENDING_SMOKE | PILOT_PENDING_SMOKE (repo=9cb96e30) | no | yes | Wave C slice 2 shipped — run founder smoke on /recruiter/talent-pool with pilot token. |
+| recruiter_talent_pool | /recruiter/talent-pool | LIVE | LIVE (repo=9cb96e30) | yes | yes | Wave C2 complete — talent pool read-only smoke PASS on prod. |
+| talent_pool | /recruiter/talent-pool | LIVE | LIVE (repo=9cb96e30) | yes | yes | Wave C2 complete — talent pool read-only smoke PASS on prod. |
 | recruiter_talent_pool_import | /recruiter/talent-pool/import | PILOT | PILOT (repo=9cb96e30) | no | yes | Schedule activation wave. |
 | recruiter_talent_radar | /recruiter/talent-radar | PILOT | PILOT (repo=9cb96e30) | no | yes | Schedule activation wave. |
 | talent_radar | /recruiter/talent-radar | PILOT | PILOT (repo=9cb96e30) | no | yes | Schedule activation wave. |
 | recruiter_talent_radar_digest | /recruiter/talent-radar/digest | PILOT | PILOT (repo=9cb96e30) | no | yes | Schedule activation wave. |
 | talent_radar_digest | /recruiter/talent-radar/digest | PILOT | PILOT (repo=9cb96e30) | no | yes | Schedule activation wave. |
-| recruiter_trust_review_queue | /recruiter/trust-review-queue | PILOT_PENDING_SMOKE | PILOT_PENDING_SMOKE (repo=9cb96e30) | no | yes | Wave C slice 2 shipped — run founder smoke on /recruiter/trust-review-queue with pilot token. |
-| trust_review_queue | /recruiter/trust-review-queue | PILOT_PENDING_SMOKE | PILOT_PENDING_SMOKE (repo=9cb96e30) | no | yes | Wave C slice 2 shipped — run founder smoke on /recruiter/trust-review-queue with pilot token. |
+| recruiter_trust_review_queue | /recruiter/trust-review-queue | LIVE | LIVE (repo=9cb96e30) | yes | yes | Wave C2 complete — trust review queue read-only smoke PASS on prod. |
+| trust_review_queue | /recruiter/trust-review-queue | LIVE | LIVE (repo=9cb96e30) | yes | yes | Wave C2 complete — trust review queue read-only smoke PASS on prod. |
 
 ## Company workspace
 

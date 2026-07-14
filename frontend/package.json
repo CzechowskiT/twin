@@ -95,6 +95,7 @@
     "preflight:preview-reachability": "npx --yes tsx scripts/preview-reachability-preflight.ts",
     "preflight:founder-smoke-orchestration": "npx --yes tsx scripts/founder-smoke-orchestration.ts",
     "smoke:founder-wave-bc-prod": "npx --yes tsx scripts/run-founder-wave-bc-prod-smoke.ts",
+    "test:founder-wave-bc-evidence-guard": "npx --yes tsx scripts/founder-wave-bc-evidence-guard.test.ts",
     "sim:integration-pr448-449-450": "npx --yes tsx scripts/integration-simulator.ts",
     "sim:integration-pr448-449-450:dry-run": "npx --yes tsx scripts/integration-simulator.ts --dry-run",
     "sim:integration-070-077:dry-run": "npx --yes tsx scripts/integration-simulator.ts --dry-run --extended",

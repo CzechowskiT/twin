@@ -90,9 +90,9 @@ test("9 API path and route constants", () => {
   assert.equal(RECRUITER_NOTIFICATION_PREFS_ROUTE, "/recruiter/notification-preferences");
 });
 
-test("10 ship status pilot, smoke pending", () => {
+test("10 ship status pilot; smoke PASS after founder evidence", () => {
   assert.equal(RECRUITER_NOTIFICATION_PREFS_SHIP_STATUS, "pilot");
-  assert.equal(RECRUITER_C3_BROWSER_SMOKE_STATUS, "NEEDS_FOUNDER_AUTH_SMOKE");
+  assert.equal(RECRUITER_C3_BROWSER_SMOKE_STATUS, "PASS");
 });
 
 test("11 no external notification channels in client", () => {

@@ -3,7 +3,7 @@
  */
 
 /** Talent pool + trust review stay PILOT until founder browser smoke. */
-export const RECRUITER_C2_BROWSER_SMOKE_STATUS = "NEEDS_FOUNDER_AUTH_SMOKE" as const;
+export const RECRUITER_C2_BROWSER_SMOKE_STATUS = "PASS" as const;
 
 export const RECRUITER_TALENT_POOL_SHIP_STATUS = "pilot" as const;
 export const RECRUITER_TRUST_REVIEW_SHIP_STATUS = "pilot" as const;

@@ -9,7 +9,34 @@
 
 Founder-auth browser smoke runbook for **Wave C** recruiter modules: workspace activation (C1 / PR #449) and talent pool + trust review queue (C2 / PR #450 stacked on #449). Both stay **PILOT** until documented **PASS** with a pilot recruiter token.
 
-**Status:** **PENDING** — no `FOUNDER_SMOKE: PASS` recorded in this doc.
+**Status:** **PASS** — prod browser smoke 2026-07-14 @ `a5f3f6eae97e7554f393c1b53302078f0376f2fd` (16/16 Playwright, Wave B + Wave C)
+
+---
+schema_version: 1
+tester: "founder-agent-batch"
+date: "2026-07-14"
+environment: prod
+deploy_sha: "a5f3f6eae97e7554f393c1b53302078f0376f2fd"
+slices:
+  - id: C1_activation
+    result: PASS
+  - id: C2_talent_pool
+    result: PASS
+  - id: C2_trust_review
+    result: PASS
+  - id: C3_notification_prefs
+    result: PASS
+  - id: C4_saved_views
+    result: PASS
+  - id: C5_activity_timeline
+    result: PASS
+  - id: RBAC_matrix
+    result: PASS
+console_errors: none
+founder_smoke_pass: true
+---
+
+FOUNDER_SMOKE: PASS
 
 ---
 

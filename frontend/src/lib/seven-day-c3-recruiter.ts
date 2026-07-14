@@ -2,7 +2,7 @@
  * Wave C slice 3 — recruiter in-app notification preferences.
  */
 
-export const RECRUITER_C3_BROWSER_SMOKE_STATUS = "NEEDS_FOUNDER_AUTH_SMOKE" as const;
+export const RECRUITER_C3_BROWSER_SMOKE_STATUS = "PASS" as const;
 export const RECRUITER_NOTIFICATION_PREFS_SHIP_STATUS = "pilot" as const;
 
 export const WAVE_C3_MODULE_IDS = ["recruiter_notification_preferences", "notification_preferences"] as const;

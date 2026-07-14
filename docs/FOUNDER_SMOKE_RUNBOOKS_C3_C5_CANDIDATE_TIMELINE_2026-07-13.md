@@ -1,31 +1,32 @@
 # Founder smoke runbooks — C3, C4, C5, candidate timeline (2026-07-13)
 
-> **Status:** PENDING — credentials UNSET in agent env  
-> **Do not record PASS without browser evidence**
+> **Status:** **PASS** — prod browser smoke 2026-07-14 @ `a5f3f6ea`  
+> **Evidence:** `docs/FOUNDER_WAVE_BC_SMOKE_EVIDENCE_2026-07-14.md`
 
 ## Preflight
 
 ```bash
 cd frontend && npm run preflight:founder-smoke-env
 npm run preflight:preview-reachability
+npm run smoke:founder-wave-bc-prod
 ```
 
-| Credential | Agent env |
-|------------|-----------|
-| `DEMO_USER_PASSWORD` | UNSET |
-| Recruiter token | UNSET |
+| Credential | Status |
+|------------|--------|
+| `DEMO_USER_PASSWORD` | SET (frontend/.env.local) |
+| Recruiter token | SET (frontend/.env.local) |
 
-## Runbooks (execute manually when SET)
+## Runbooks — PASS @ prod
 
-| Slice | Route | Evidence template |
-|-------|-------|-------------------|
-| C3 notification prefs | `/recruiter/notification-preferences` | `docs/schemas/FOUNDER_SMOKE_EVIDENCE_SCHEMA.md` |
-| C4 saved views | API `/api/v1/recruiter/saved-views` | Same schema — filter CRUD |
-| C5 activity timeline | `/recruiter/activity-timeline` | Same schema — read-only list |
-| Candidate timeline | `/dashboard/trust/activity-timeline` | Candidate session required |
+| Slice | Route | Result |
+|-------|-------|--------|
+| C3 notification prefs | `/recruiter/notification-preferences` | PASS |
+| C4 saved views | API `/api/recruiter/saved-views` | PASS |
+| C5 activity timeline | `/recruiter/activity-timeline` | PASS |
+| Candidate timeline | `/dashboard/trust/activity-timeline` | PASS |
 
 ## PILOT badges
 
-All slices show **PILOT · NEEDS FOUNDER SMOKE** until evidence filed.
+Slices remain **PILOT** ship status with **green:true** after founder smoke PASS — not promoted to LIVE.
 
-**Merge gate:** NO merge #452–#455 without `FOUNDER_SMOKE: PASS` in evidence doc.
+**Merge gate:** Launch remains NO-GO · Gate F PENDING.
