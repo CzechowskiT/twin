@@ -4178,3 +4178,243 @@ html[data-marketing-surface="studio"] .demo-glass-panel {
   }
 }
 
+/* ── Sales demo — real video hero + role cards (light premium SaaS) ── */
+.sales-demo {
+  --sales-accent: rgb(52 211 153);
+  --sales-surface: rgb(248 250 252);
+  --sales-elevated: #fff;
+  --sales-border: rgb(226 232 240);
+  --sales-fg: rgb(15 23 42);
+  --sales-muted: rgb(100 116 139);
+}
+
+.sales-demo-hero {
+  text-align: center;
+  padding: 2rem 0 1.5rem;
+}
+
+.sales-demo-hero__eyebrow {
+  margin: 0 0 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--sales-accent);
+}
+
+.sales-demo-hero__title {
+  margin: 0;
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--sales-fg);
+  letter-spacing: -0.02em;
+}
+
+.sales-demo-hero__lead {
+  margin: 1rem auto 0;
+  max-width: 42rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--sales-muted);
+}
+
+.sales-demo-hero__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.sales-demo-film {
+  margin: 1.5rem auto 2rem;
+  max-width: min(78vw, 1500px);
+  width: 100%;
+}
+
+.sales-demo-film__player-wrap {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: var(--sales-elevated);
+  border: 1px solid var(--sales-border);
+  box-shadow:
+    0 4px 24px rgb(15 23 42 / 0.06),
+    0 0 0 1px rgb(255 255 255 / 0.8) inset;
+}
+
+.sales-demo-film__video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: var(--sales-surface);
+  object-fit: cover;
+}
+
+.sales-demo-film__play-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border: none;
+  background: rgb(15 23 42 / 0.25);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.sales-demo-film__play-overlay:hover {
+  background: rgb(15 23 42 / 0.35);
+}
+
+.sales-demo-film__play-icon {
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  color: #fff;
+  background: var(--sales-accent);
+  box-shadow: 0 8px 32px rgb(52 211 153 / 0.45);
+}
+
+.sales-demo-film__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 0.75rem;
+}
+
+.sales-demo-film__poster-only {
+  margin: 1.5rem auto 2rem;
+  max-width: min(78vw, 1500px);
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid var(--sales-border);
+}
+
+.sales-demo-film__poster-img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.sales-demo-roles {
+  margin: 2rem 0;
+  padding: 2rem 0;
+}
+
+.sales-demo-roles__heading {
+  margin: 0;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--sales-fg);
+}
+
+.sales-demo-roles__lead {
+  margin: 0.75rem auto 1.5rem;
+  max-width: 36rem;
+  text-align: center;
+  font-size: 0.9375rem;
+  color: var(--sales-muted);
+}
+
+.sales-demo-roles__grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .sales-demo-roles__grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+.sales-demo-role-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid var(--sales-border);
+  background: var(--sales-elevated);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.sales-demo-role-card:hover,
+.sales-demo-role-card--active {
+  border-color: rgb(52 211 153 / 0.55);
+  box-shadow: 0 8px 32px rgb(52 211 153 / 0.12);
+  transform: translateY(-2px);
+}
+
+.sales-demo-role-card__icon {
+  font-size: 1.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.sales-demo-role-card__title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--sales-fg);
+}
+
+.sales-demo-role-card__lead {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--sales-muted);
+}
+
+.sales-demo-role-card__decision {
+  margin: 1rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--sales-fg);
+}
+
+.sales-demo-role-card__outcome {
+  margin: 0.5rem 0 0;
+  font-size: 0.75rem;
+  color: var(--sales-accent);
+  font-weight: 600;
+}
+
+.sales-demo-flow {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid var(--sales-border);
+  background: var(--sales-elevated);
+}
+
+@media (max-width: 390px) {
+  .sales-demo-hero__ctas {
+    position: sticky;
+    bottom: 0.75rem;
+    z-index: 20;
+    padding: 0.5rem;
+    margin: 1rem -0.5rem 0;
+    background: rgb(248 250 252 / 0.92);
+    backdrop-filter: blur(8px);
+    border-radius: 0.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sales-demo-role-card {
+    transition: none;
+  }
+}
+
