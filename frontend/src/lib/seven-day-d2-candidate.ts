@@ -15,14 +15,14 @@ export {
 } from "@/lib/product-polish-p2";
 
 /** Career compass visible — Wave B slice 1 persistence (PILOT until founder browser smoke). */
-export const CAREER_COMPASS_BROWSER_SMOKE_STATUS = "NEEDS_FOUNDER_AUTH_SMOKE" as const;
+export const CAREER_COMPASS_BROWSER_SMOKE_STATUS = "PASS" as const;
 
-export const CAREER_COMPASS_SHIP_STATUS = "pilot" as const;
+export const CAREER_COMPASS_SHIP_STATUS = "live" as const;
 
-/** Trust center persistence shipped — PILOT until founder browser smoke. */
-export const TRUST_CENTER_BROWSER_SMOKE_STATUS = "NEEDS_FOUNDER_AUTH_SMOKE" as const;
+/** Trust center persistence shipped — founder prod smoke PASS 2026-07-14. */
+export const TRUST_CENTER_BROWSER_SMOKE_STATUS = "PASS" as const;
 
-export const TRUST_CENTER_SHIP_STATUS = "pilot" as const;
+export const TRUST_CENTER_SHIP_STATUS = "live" as const;
 
 /** Interview prep ships as static pack + optional application context — not live AI coaching. */
 export const INTERVIEW_PREP_SHIP_STATUS = "live" as const;
@@ -37,9 +37,9 @@ export const TRUST_CENTER_ROADMAP_STATUS = "pilot" as const;
 export const REFERRALS_LIMITED_PILOT = true;
 
 /** Referrals persistence shipped — PILOT until founder browser smoke. */
-export const REFERRALS_BROWSER_SMOKE_STATUS = "NEEDS_FOUNDER_AUTH_SMOKE" as const;
+export const REFERRALS_BROWSER_SMOKE_STATUS = "PASS" as const;
 
-export const REFERRALS_SHIP_STATUS = "pilot" as const;
+export const REFERRALS_SHIP_STATUS = "live" as const;
 
 /** Wave 1 — referrals visible on workspace hub with honest PILOT badge. */
 export const HIDE_CANDIDATE_REFERRALS_FROM_HUB = false;

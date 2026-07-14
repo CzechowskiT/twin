@@ -5,6 +5,7 @@ import {
   INTERVIEW_PREP_SHIP_STATUS,
   REFERRALS_SHIP_STATUS,
   TRUST_CENTER_ROADMAP_STATUS,
+  TRUST_CENTER_SHIP_STATUS,
 } from "@/lib/seven-day-d2-candidate";
 import type { WorkspaceModuleDef } from "@/lib/workspace-module-status";
 
@@ -79,7 +80,7 @@ export const CANDIDATE_WORKSPACE_MODULES: readonly WorkspaceModuleDef[] = [
     valuePropKey: "workspaceModules.candidateTrustCenterValue",
     hintKey: "workspaceModules.candidateTrustCenterHint",
     ctaKey: "workspaceModules.candidateTrustCenterCta",
-    status: TRUST_CENTER_ROADMAP_STATUS,
+    status: TRUST_CENTER_SHIP_STATUS,
   },
   {
     id: "calendar",
