@@ -284,7 +284,7 @@ async function verifyVideoOnPage(
     autoplay: el.autoplay,
   }));
 
-  const bypassHdr = bypass
+  const bypassHdr: Record<string, string> = bypass
     ? { "x-vercel-protection-bypass": bypass, "x-vercel-set-bypass-cookie": "true" }
     : {};
   const assets: Record<string, { status: number; contentType: string }> = {};
