@@ -5,6 +5,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { isFounderSmokeCredentialsReady } from "./founder-smoke-env-preflight";
 import { runProductionVerifierV2, type ProdVerifierCheck } from "./production-verifier-v2";
 import { evaluateStabilizationWindow } from "./lib/stabilization-window";
 
@@ -96,8 +97,10 @@ export function runProductionVerifierV3(opts?: {
 
 function main(): void {
   const expect077 = process.argv.includes("--expect-077");
-  const checks = runProductionVerifierV3({ expect077, credentialsSet: false });
+  const credentialsSet = isFounderSmokeCredentialsReady();
+  const checks = runProductionVerifierV3({ expect077, credentialsSet });
   console.log("Production verifier v3 (dry-run):\n");
+  console.log(`  credentialsSet: ${credentialsSet} (RECRUITER_TOKEN sufficient; no secret values logged)\n`);
   let failed = 0;
   for (const c of checks) {
     const tag = c.ok ? "PASS" : "FAIL";
