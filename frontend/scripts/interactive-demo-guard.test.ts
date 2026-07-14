@@ -1,5 +1,5 @@
 /**
- * Interactive /demo cinematic rebuild — component, i18n, launch stance, and route guards.
+ * Interactive /demo sales experience — component, i18n, launch stance, and route guards.
  */
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
@@ -7,7 +7,6 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
-import { FOUNDER_LED_DEMO_JOURNEY_STEPS } from "../src/lib/founder-led-demo-routes";
 import { dictionaries, en } from "../src/lib/i18n";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -19,87 +18,95 @@ const FORBIDDEN_DEMO_COPY = [
   /\bwe message candidates automatically\b/i,
 ];
 
+const LEGACY_DEMO_IMPORTS = [
+  /FounderLedDemoBelowFold/,
+  /InteractiveDemoWalkthrough/,
+  /InteractiveDemoSystemMap/,
+  /DemoSurfaceCatalog/,
+  /InteractiveDemoPlayer/,
+  /from "@\/components\/marketing\/demo\/experience\/demo-experience"/,
+  /from "@\/components\/marketing\/demo\/interactive-demo-player"/,
+];
+
 function read(rel: string): string {
   return readFileSync(join(root, rel), "utf8");
 }
 
-test("1 demo page wires cinematic experience stack", () => {
+test("1 demo page wires SalesDemoExperience stack", () => {
   const page = read("src/app/(marketing)/demo/page.tsx");
-  assert.match(page, /DemoExperience/);
-  assert.match(page, /DemoSurfaceCatalog/);
-  assert.match(page, /InteractiveDemoSystemMap/);
+  assert.match(page, /SalesDemoExperience/);
   assert.match(page, /DemoPilotCta/);
+  for (const pattern of LEGACY_DEMO_IMPORTS) {
+    assert.doesNotMatch(page, pattern, String(pattern));
+  }
 });
 
-test("2 manifest module is single source", () => {
+test("2 manifest module is single source for role flows", () => {
   assert.ok(existsSync(join(root, "src/lib/demo/demo-scene-manifest.ts")));
   const roleStory = read("src/components/marketing/demo/experience/role-story.tsx");
   assert.match(roleStory, /demo-scene-manifest/);
+  const sales = read("src/components/marketing/demo/sales/sales-demo-experience.tsx");
+  assert.match(sales, /salesRoleJourneyScenes/);
 });
 
 test("3 analytics wrapper avoids PII props", () => {
   const analytics = read("src/lib/demo/demo-analytics.ts");
   assert.match(analytics, /trackEvent/);
-  assert.match(analytics, /demo_cta_clicked/);
-  assert.match(analytics, /demo_scene_viewed/);
+  assert.match(analytics, /demo_video_impression/);
+  assert.match(analytics, /demo_cta_click/);
+  assert.match(analytics, /demo_role_select/);
   assert.doesNotMatch(analytics, /email/);
 });
 
-test("4 reduced motion hook and autoplay guard present in experience", () => {
-  const experience = read("src/components/marketing/demo/experience/demo-experience.tsx");
+test("4 reduced motion and save-data guards present in sales experience", () => {
+  const experience = read("src/components/marketing/demo/sales/sales-demo-experience.tsx");
   assert.match(experience, /prefers-reduced-motion/);
+  assert.match(experience, /prefers-reduced-data/);
   const roleStory = read("src/components/marketing/demo/experience/role-story.tsx");
   assert.match(roleStory, /autoplayStartedRef/);
 });
 
-test("5 catalog collapsed toggle uses explore-all copy", () => {
-  assert.ok(FOUNDER_LED_DEMO_JOURNEY_STEPS.length >= 30);
-  const catalog = read("src/components/marketing/demo/demo-surface-catalog.tsx");
-  assert.match(catalog, /FOUNDER_LED_DEMO_JOURNEY_STEPS/);
-  assert.match(catalog, /catalogToggle/);
-  assert.match(en.interactiveDemoPlayer.catalogToggle, /Explore all product surfaces/);
-  assert.match(dictionaries.pl.interactiveDemoPlayer.catalogToggle, /Zobacz wszystkie moduły produktu/);
-});
-
-test("6 i18n demoExperience keys mirrored EN/PL", () => {
-  const enKeys = Object.keys(en.demoExperience);
-  const plKeys = Object.keys(dictionaries.pl.demoExperience);
+test("5 i18n demoSales keys mirrored EN/PL", () => {
+  const enKeys = Object.keys(en.demoSales);
+  const plKeys = Object.keys(dictionaries.pl.demoSales);
   assert.deepEqual(plKeys.sort(), enKeys.sort());
 });
 
-test("7 launch stance — demo copy has no hard-banned CTAs", () => {
+test("6 launch stance — demo copy has no hard-banned CTAs", () => {
   const blob = [
-    read("src/components/marketing/demo/experience/demo-experience.tsx"),
+    read("src/components/marketing/demo/sales/sales-demo-experience.tsx"),
     read("src/components/marketing/demo/experience/outcome-screen.tsx"),
     read("src/components/marketing/demo/demo-pilot-cta.tsx"),
-    JSON.stringify(en.demoExperience),
-    JSON.stringify(dictionaries.pl.demoExperience),
+    JSON.stringify(en.demoSales),
+    JSON.stringify(dictionaries.pl.demoSales),
   ].join("\n");
   for (const pattern of FORBIDDEN_DEMO_COPY) {
     assert.doesNotMatch(blob, pattern, String(pattern));
   }
 });
 
-test("8 bundle imports stay marketing-local", () => {
-  const experience = read("src/components/marketing/demo/experience/demo-experience.tsx");
+test("7 bundle imports stay marketing-local", () => {
+  const experience = read("src/components/marketing/demo/sales/sales-demo-experience.tsx");
   assert.doesNotMatch(experience, /from "@\/app\/api/);
   assert.doesNotMatch(experience, /fetch\(/);
 });
 
-test("9 keyboard controls exposed on timeline", () => {
-  const timeline = read("src/components/marketing/demo/demo-timeline.tsx");
-  assert.match(timeline, /role="progressbar"/);
-  const controls = read("src/components/marketing/demo/demo-controls.tsx");
-  assert.match(controls, /type="button"/);
+test("8 video controls exposed on product film player", () => {
+  const player = read("src/components/marketing/demo/sales/product-film-player.tsx");
+  assert.match(player, /data-demo-video-play/);
+  assert.match(player, /data-demo-video-pause/);
+  assert.match(player, /data-demo-video-skip/);
+  assert.match(player, /data-demo-video-captions/);
+  assert.match(player, /data-demo-product-video/);
 });
 
-test("10 demo fixtures use synthetic IDs only", () => {
+test("9 demo fixtures use synthetic IDs only", () => {
   const fixtures = read("src/lib/demo/demo-fixtures.ts");
   assert.match(fixtures, /demo-candidate-001/);
   assert.doesNotMatch(fixtures, /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i);
 });
 
-test("11 full-demo scenes render rich product surfaces not text-only", () => {
+test("10 full-demo scenes render rich product surfaces not text-only", () => {
   const stage = read("src/components/marketing/demo/demo-scene-stage.tsx");
   const surfaces = read("src/components/marketing/demo/demo-scene-surfaces.tsx");
   assert.match(stage, /demo-scene-surfaces/);
@@ -116,14 +123,38 @@ test("11 full-demo scenes render rich product surfaces not text-only", () => {
   assert.match(animated, /DemoSceneStage/);
 });
 
-test("12 full-demo scenes expose data-testid hooks for browser smoke", () => {
-  const stage = read("src/components/marketing/demo/demo-scene-stage.tsx");
-  assert.match(stage, /data-testid=\{`demo-scene-\$\{scene\.id\}`\}/);
-  const spec = read("e2e/interactive-demo-scenes-browser.spec.ts");
-  assert.match(spec, /full-product-story/);
-  assert.match(spec, /demo-scene-/);
-  const cinematic = read("e2e/cinematic-demo-browser.spec.ts");
-  assert.match(cinematic, /data-demo-experience/);
-  const pkg = read("package.json");
-  assert.match(pkg, /test:cinematic-demo-browser/);
+test("11 sales demo e2e hooks for browser smoke", () => {
+  const founderSpec = read("e2e/founder-led-demo-flow-browser.spec.ts");
+  assert.match(founderSpec, /data-sales-demo-hero/);
+  assert.match(founderSpec, /data-demo-product-video/);
+  assert.match(founderSpec, /data-sales-demo-roles/);
+  assert.match(founderSpec, /toHaveCount\(0\)/);
+  assert.doesNotMatch(founderSpec, /data-founder-led-demo-link/);
+  assert.match(founderSpec, /data-sales-demo-flow/);
+
+  const a11ySpec = read("e2e/interactive-demo-a11y.spec.ts");
+  assert.match(a11ySpec, /data-sales-demo/);
+  assert.doesNotMatch(a11ySpec, /data-interactive-demo-player/);
+
+  const realVideoSpec = read("e2e/real-video-demo-browser.spec.ts");
+  assert.match(realVideoSpec, /data-sales-demo-hero/);
+  assert.match(realVideoSpec, /data-demo-product-video/);
+});
+
+test("12 architecture guard blocks legacy demo return on /demo route", () => {
+  const page = read("src/app/(marketing)/demo/page.tsx");
+  const forbidden = [
+    ...LEGACY_DEMO_IMPORTS,
+    /data-founder-led-demo/,
+    /data-demo-opening-film/,
+    /data-interactive-demo-player/,
+    /FounderLedDemoHero/,
+  ];
+  for (const pattern of forbidden) {
+    assert.doesNotMatch(page, pattern, String(pattern));
+  }
+  const sales = read("src/components/marketing/demo/sales/sales-demo-experience.tsx");
+  const roles = read("src/components/marketing/demo/sales/role-flow-cards.tsx");
+  assert.match(sales, /data-sales-demo-hero/);
+  assert.match(roles, /data-sales-demo-roles/);
 });

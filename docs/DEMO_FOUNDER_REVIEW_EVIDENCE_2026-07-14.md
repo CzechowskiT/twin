@@ -96,14 +96,16 @@ Milestones captured @ 0, 5, 10, 18, 22, 26, 33, 38s + final interactive frame.
 | Spec | Result | Notes |
 |------|--------|-------|
 | `real-video-demo-browser` | **PASS** | PR #476 sales demo harness |
-| `founder-led-demo-flow-browser` | **FAIL** | Stale selectors — expects pre-#476 `data-founder-led-demo` / `data-interactive-demo-player`; **not a prod demo regression** |
-| `interactive-demo-a11y` | **FAIL** | Stale `[data-interactive-demo-player]` — prod mounts `SalesDemoExperience` |
+| `founder-led-demo-flow-browser` | **PASS** | Updated to `SalesDemoExperience` selectors (`data-sales-demo-hero`, `data-demo-product-video`, `data-sales-demo-roles`) |
+| `interactive-demo-a11y` | **PASS** | Axe scope `[data-sales-demo]` — prod mounts `SalesDemoExperience` |
 | Viewports (6) | **PASS** | 1920×1080 … 375×667 via custom capture |
 | Chromium + WebKit | **PASS** / **PASS** | |
 
 ---
 
 ## 6. Analytics events
+
+**Classification:** **CODE_PRESENT** — event exports verified in `demo-analytics.ts`; live prod capture **not PASS** (PostHog UNSET).
 
 | Event | Prod capture | Code export |
 |-------|--------------|-------------|
@@ -118,7 +120,7 @@ Milestones captured @ 0, 5, 10, 18, 22, 26, 33, 38s + final interactive frame.
 | demo_outcome | CODE_ONLY | ✓ |
 | demo_cta_click | CODE_ONLY | ✓ |
 
-PostHog not configured in agent env — events verified via `demo-analytics.ts` static guards; live capture **BLOCKED** (no POSTHOG_KEY).
+PostHog not configured in agent env — events verified via static guards only; live capture **BLOCKED** (no `NEXT_PUBLIC_POSTHOG_KEY`).
 
 **PII:** event props use locale/role/action only — no email/name fields in demo analytics exports.
 
@@ -141,7 +143,9 @@ PostHog not configured in agent env — events verified via `demo-analytics.ts` 
 | `verify:production-v3:077` | **PASS** |
 | `probe:prod-public` ×2 | **220/220 PASS** |
 | `test:real-video-demo` (static) | **7/7 PASS** |
-| `test:interactive-demo-guard` | **PARTIAL** — cinematic spec references legacy `data-demo-experience` (harness debt) |
+| `test:interactive-demo-guard` | **12/12 PASS** — blocks legacy demo return on `/demo` |
+| `founder-led-demo-flow-browser` | **PASS** — SalesDemoExperience selectors |
+| `interactive-demo-a11y` | **PASS** — `[data-sales-demo]` axe scope |
 
 ---
 
@@ -150,7 +154,7 @@ PostHog not configured in agent env — events verified via `demo-analytics.ts` 
 - **Gate F:** PENDING — founder checkbox **empty**
 - **Launch:** NO-GO
 - **Demo prod:** Real video @ PR #476 — **verified PASS** on prod
-- **Harness debt:** Update `founder-led-demo-flow-browser` + `interactive-demo-a11y` selectors in follow-up (not blocking demo evidence)
+- **Harness debt:** Closed in PR follow-up — `founder-led-demo-flow-browser` + `interactive-demo-a11y` updated to SalesDemoExperience selectors
 
 ```
 DEMO_FOUNDER_REVIEW_DATE: 2026-07-14

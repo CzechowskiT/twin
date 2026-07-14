@@ -1,0 +1,405 @@
+{
+  "schemaVersion": "1",
+  "generatedUtc": "2026-07-14T14:00:38.633Z",
+  "repoHead": "aa33afe61ae82e7ce3f6ea9565c97d86aced8b88",
+  "prodFeSha": "aa33afe61ae82e7ce3f6ea9565c97d86aced8b88",
+  "prodApiSha": "ae14bfb58fc0c2db56a6fa0f417ca41c534b7960",
+  "dbOk": true,
+  "vercelDeploymentId": "dpl_GrHTLLyKi7c3HLH82LioY4z6MTgF",
+  "preflight": {
+    "PLAYWRIGHT_ALLOW_PROD_SMOKE": "SET",
+    "VERCEL_AUTOMATION_BYPASS_SECRET": "SET",
+    "NEXT_PUBLIC_POSTHOG_KEY": "UNSET",
+    "NEXT_PUBLIC_POSTHOG_HOST": "UNSET",
+    "POSTHOG_PERSONAL_API_KEY": "UNSET",
+    "repoHead": "aa33afe61ae82e7ce3f6ea9565c97d86aced8b88",
+    "healthStatus": "ok",
+    "alignment": "ALIGNED"
+  },
+  "videoProof": {
+    "duration": 42,
+    "currentSrc": "https://twin-society.vercel.app/demo/twin-product-film-en.webm",
+    "readyState": 4,
+    "videoWidth": 1920,
+    "videoHeight": 1080,
+    "poster": "https://twin-society.vercel.app/demo/twin-product-film-poster-en.webp",
+    "muted": true,
+    "autoplay": false,
+    "assets": {
+      "mp4": {
+        "status": 200,
+        "contentType": "video/mp4"
+      },
+      "webm": {
+        "status": 200,
+        "contentType": "video/webm"
+      },
+      "vtt": {
+        "status": 200,
+        "contentType": "text/vtt; charset=utf-8"
+      },
+      "poster": {
+        "status": 200,
+        "contentType": "image/webp"
+      }
+    },
+    "playbackGrowth": true,
+    "analyticsCaptured": [],
+    "currentSrcValid": true,
+    "durationOk": true,
+    "dimensionsOk": true
+  },
+  "screenshots": [
+    {
+      "file": "hero-EN-1920x1080.png",
+      "prodUrl": "https://twin-society.vercel.app/demo",
+      "feSha": "aa33afe6",
+      "locale": "EN",
+      "viewport": "1920x1080",
+      "state": "hero-loaded",
+      "capturedUtc": "2026-07-14T14:00:57.112Z"
+    },
+    {
+      "file": "hero-EN-390x844.png",
+      "prodUrl": "https://twin-society.vercel.app/demo",
+      "feSha": "aa33afe6",
+      "locale": "EN",
+      "viewport": "390x844",
+      "state": "hero-loaded",
+      "capturedUtc": "2026-07-14T14:00:58.824Z"
+    },
+    {
+      "file": "hero-PL-1920x1080.png",
+      "prodUrl": "https://twin-society.vercel.app/demo",
+      "feSha": "aa33afe6",
+      "locale": "PL",
+      "viewport": "1920x1080",
+      "state": "hero-loaded",
+      "capturedUtc": "2026-07-14T14:01:01.025Z"
+    },
+    {
+      "file": "hero-PL-390x844.png",
+      "prodUrl": "https://twin-society.vercel.app/demo",
+      "feSha": "aa33afe6",
+      "locale": "PL",
+      "viewport": "390x844",
+      "state": "hero-loaded",
+      "capturedUtc": "2026-07-14T14:01:02.629Z"
+    },
+    {
+      "file": "video-milestone-0s-EN.png",
+      "prodUrl": "https://twin-society.vercel.app/demo",
+      "feSha": "aa33afe6",
+      "locale": "EN",
+      "viewport": "1280x800",
+      "state": "video-t=0s",
+      "capturedUtc": "2026-07-14T14:01:08.081Z"
+    },
+    {
+      "file": "video-milestone-5s-EN.png",
+      "prodUrl": "https://twin-society.vercel.app/demo",
+      "feSha": "aa33afe6",
+      "locale": "EN",
+      "viewport": "1280x800",
+      "state": "video-t=5s",
+      "capturedUtc": "2026-07-14T14:01:08.534Z"
+    },
+    {
+      "file": "video-milestone-10s-EN.png",
+      "prodUrl": "https://twin-society.vercel.app/demo",
+      "feSha": "aa33afe6",
+      "locale": "EN",
+      "viewport": "1280x800",
+      "state": "video-t=10s",
+      "capturedUtc": "2026-07-14T14:01:08.979Z"
+    },
+    {
+      "file": "video-milestone-18s-EN.png",
+      "prodUrl": "https://twin-society.vercel.app/demo",
+      "feSha": "aa33afe6",
+      "locale": "EN",
+      "viewport": "1280x800",
+      "state": "video-t=18s",
+      "capturedUtc": "2026-07-14T14:01:09.432Z"
+    },
+    {
+      "file": "video-milestone-22s-EN.png",
+      "prodUrl": "https://twin-society.vercel.app/demo",
+      "feSha": "aa33afe6",
+      "locale": "EN",
+      "viewport": "1280x800",
+      "state": "video-t=22s",
+      "capturedUtc": "2026-07-14T14:01:09.880Z"
+    },
+    {
+      "file": "video-milestone-26s-EN.png",
+      "prodUrl": "https://twin-society.vercel.app/demo",
+      "feSha": "aa33afe6",
+      "locale": "EN",
+      "viewport": "1280x800",
+      "state": "video-t=26s",
+      "capturedUtc": "2026-07-14T14:01:10.330Z"
+    },
+    {
+      "file": "video-milestone-33s-EN.png",
+      "prodUrl": "https://twin-society.vercel.app/demo",
+      "feSha": "aa33afe6",
+      "locale": "EN",
+      "viewport": "1280x800",
+      "state": "video-t=33s",
+      "capturedUtc": "2026-07-14T14:01:10.782Z"
+    },
+    {
+      "file": "video-milestone-38s-EN.png",
+      "prodUrl": "https://twin-society.vercel.app/demo",
+      "feSha": "aa33afe6",
+      "locale": "EN",
+      "viewport": "1280x800",
+      "state": "video-t=38s",
+      "capturedUtc": "2026-07-14T14:01:11.229Z"
+    },
+    {
+      "file": "video-complete-interactive-EN.png",
+      "prodUrl": "https://twin-society.vercel.app/demo",
+      "feSha": "aa33afe6",
+      "locale": "EN",
+      "viewport": "1280x800",
+      "state": "post-skip-roles-visible",
+      "capturedUtc": "2026-07-14T14:01:11.482Z"
+    },
+    {
+      "file": "role-candidate-flow-EN-desktop.png",
+      "prodUrl": "https://twin-society.vercel.app/demo",
+      "feSha": "aa33afe6",
+      "locale": "EN",
+      "viewport": "1280x800",
+      "state": "role-candidate-selected",
+      "capturedUtc": "2026-07-14T14:01:11.649Z"
+    },
+    {
+      "file": "role-recruiter-flow-EN-desktop.png",
+      "prodUrl": "https://twin-society.vercel.app/demo",
+      "feSha": "aa33afe6",
+      "locale": "EN",
+      "viewport": "1280x800",
+      "state": "role-recruiter-selected",
+      "capturedUtc": "2026-07-14T14:01:42.058Z"
+    },
+    {
+      "file": "role-company-flow-EN-desktop.png",
+      "prodUrl": "https://twin-society.vercel.app/demo",
+      "feSha": "aa33afe6",
+      "locale": "EN",
+      "viewport": "1280x800",
+      "state": "role-company-selected",
+      "capturedUtc": "2026-07-14T14:02:12.476Z"
+    },
+    {
+      "file": "a11y-reduced-motion-EN.png",
+      "prodUrl": "https://twin-society.vercel.app/demo",
+      "feSha": "aa33afe6",
+      "locale": "EN",
+      "viewport": "1280x800",
+      "state": "reduced-motion",
+      "capturedUtc": "2026-07-14T14:02:45.133Z"
+    },
+    {
+      "file": "a11y-reduced-data-EN.png",
+      "prodUrl": "https://twin-society.vercel.app/demo",
+      "feSha": "aa33afe6",
+      "locale": "EN",
+      "viewport": "1280x800",
+      "state": "reduced-data",
+      "capturedUtc": "2026-07-14T14:02:47.100Z"
+    },
+    {
+      "file": "a11y-keyboard-focus-EN.png",
+      "prodUrl": "https://twin-society.vercel.app/demo",
+      "feSha": "aa33afe6",
+      "locale": "EN",
+      "viewport": "1280x800",
+      "state": "keyboard-tab-focus",
+      "capturedUtc": "2026-07-14T14:02:49.310Z"
+    },
+    {
+      "file": "role-candidate-flow-PL-mobile.png",
+      "prodUrl": "https://twin-society.vercel.app/demo",
+      "feSha": "aa33afe6",
+      "locale": "PL",
+      "viewport": "390x844",
+      "state": "role-candidate-mobile",
+      "capturedUtc": "2026-07-14T14:02:51.155Z"
+    }
+  ],
+  "criteria": [
+    {
+      "id": 1,
+      "name": "Hero EN desktop",
+      "verdict": "PASS",
+      "evidence": "hero-EN-1920x1080.png",
+      "detail": "Sales demo hero visible"
+    },
+    {
+      "id": 2,
+      "name": "Hero PL desktop",
+      "verdict": "PASS",
+      "evidence": "hero-PL-1920x1080.png",
+      "detail": "PL locale hero"
+    },
+    {
+      "id": 3,
+      "name": "Hero EN mobile",
+      "verdict": "PASS",
+      "evidence": "hero-EN-390x844.png",
+      "detail": "Mobile hero"
+    },
+    {
+      "id": 4,
+      "name": "Hero PL mobile",
+      "verdict": "PASS",
+      "evidence": "hero-PL-390x844.png",
+      "detail": "PL mobile hero"
+    },
+    {
+      "id": 5,
+      "name": "Real video element",
+      "verdict": "PASS",
+      "evidence": "video-milestone-0s-EN.png",
+      "detail": "<video data-demo-product-video>"
+    },
+    {
+      "id": 6,
+      "name": "currentSrc mp4/webm not blob",
+      "verdict": "PASS",
+      "evidence": "https://twin-society.vercel.app/demo/twin-product-film-en.webm",
+      "detail": "Prod CDN asset"
+    },
+    {
+      "id": 7,
+      "name": "Duration >= 40s",
+      "verdict": "PASS",
+      "evidence": "duration=42",
+      "detail": "FILM_DURATION_SEC=42"
+    },
+    {
+      "id": 8,
+      "name": "1920x1080 dimensions",
+      "verdict": "PASS",
+      "evidence": "1920x1080",
+      "detail": "ffprobe canonical"
+    },
+    {
+      "id": 9,
+      "name": "readyState metadata",
+      "verdict": "PASS",
+      "evidence": "readyState=4",
+      "detail": "preload=metadata"
+    },
+    {
+      "id": 10,
+      "name": "Poster present",
+      "verdict": "PASS",
+      "evidence": "https://twin-society.vercel.app/demo/twin-product-film-poster-en.webp",
+      "detail": "webp poster"
+    },
+    {
+      "id": 11,
+      "name": "MP4/WebM/VTT HTTP 200",
+      "verdict": "PASS",
+      "evidence": "{\"mp4\":{\"status\":200,\"contentType\":\"video/mp4\"},\"webm\":{\"status\":200,\"contentType\":\"video/webm\"},\"vtt\":{\"status\":200,\"contentType\":\"text/vtt; charset=utf-8\"},\"poster\":{\"status\":200,\"contentType\":\"image/webp\"}}",
+      "detail": "Asset HEAD probes"
+    },
+    {
+      "id": 12,
+      "name": "Playback growth pause seek",
+      "verdict": "PASS",
+      "evidence": "video-milestone-10s-EN.png",
+      "detail": "currentTime advanced"
+    },
+    {
+      "id": 13,
+      "name": "Skip → interactive roles",
+      "verdict": "PASS",
+      "evidence": "video-complete-interactive-EN.png",
+      "detail": "Role cards visible"
+    },
+    {
+      "id": 14,
+      "name": "Candidate role flow",
+      "verdict": "PASS",
+      "evidence": "role-candidate-flow-EN-desktop.png",
+      "detail": "Flow surface visible"
+    },
+    {
+      "id": 15,
+      "name": "Recruiter role flow",
+      "verdict": "PASS",
+      "evidence": "role-recruiter-flow-EN-desktop.png",
+      "detail": "Flow surface visible"
+    },
+    {
+      "id": 16,
+      "name": "Company role flow",
+      "verdict": "PASS",
+      "evidence": "role-company-flow-EN-desktop.png",
+      "detail": "Flow surface visible"
+    },
+    {
+      "id": 17,
+      "name": "Reduced motion fallback",
+      "verdict": "PASS",
+      "evidence": "a11y-reduced-motion-EN.png",
+      "detail": "Skips film, shows roles"
+    },
+    {
+      "id": 18,
+      "name": "No autoplay audio + captions",
+      "verdict": "PASS",
+      "evidence": "a11y-keyboard-focus-EN.png",
+      "detail": "muted=true"
+    }
+  ],
+  "roleJourneys": {
+    "candidate": "PASS",
+    "recruiter": "PASS",
+    "company": "PASS",
+    "mobile_pl_candidate": "PASS"
+  },
+  "accessibility": {
+    "reduced-motion": "PASS",
+    "reduced-data": "FAIL",
+    "keyboard-focus": "PASS",
+    "captions-mobile-pl": "PASS"
+  },
+  "performance": {
+    "demoTtfbMs": 1596,
+    "demoStatus": 200,
+    "demoHtmlBytes": 26089,
+    "healthTtfbMs": 4415
+  },
+  "analyticsEvents": {
+    "demo_video_impression": "CODE_ONLY",
+    "demo_video_play": "CODE_ONLY",
+    "demo_video_pause": "CODE_ONLY",
+    "demo_video_25": "CODE_ONLY",
+    "demo_video_50": "CODE_ONLY",
+    "demo_video_75": "CODE_ONLY",
+    "demo_video_complete": "CODE_ONLY",
+    "demo_video_skip": "CODE_ONLY",
+    "demo_role_select": "CODE_ONLY",
+    "demo_interaction": "CODE_ONLY",
+    "demo_outcome": "CODE_ONLY",
+    "demo_cta_click": "CODE_ONLY"
+  },
+  "playwrightSmoke": {
+    "real-video-demo": "PASS (exit 0)",
+    "founder-led-demo": "PASS (exit 0)",
+    "interactive-demo-a11y": "PASS (exit 0)"
+  },
+  "posthog": {
+    "status": "BLOCKED",
+    "spec": "TWIN Demo Founder Review dashboard — funnel: demo_video_impression→play→complete→demo_role_select→demo_outcome→demo_cta_click; breakdowns: locale, role, viewport, device; video engagement quartiles; data quality: no PII fields",
+    "founderAction": "Set NEXT_PUBLIC_POSTHOG_KEY + POSTHOG_PERSONAL_API_KEY in frontend/.env.local, then re-run batch Stage 11"
+  },
+  "finalVerification": {}
+}
