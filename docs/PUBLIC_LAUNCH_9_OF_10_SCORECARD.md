@@ -1,9 +1,9 @@
 # Public launch 9/10 scorecard — canonical
 
-> **Generated:** 2026-07-14T04:35:00Z · **Path:** A (credentials SET — partial smoke) · **Owner:** Eng agent batch  
-> **Verdict:** **NO-GO** — Gate F PENDING founder sign-off; mandatory E2E/DR rows still FAIL/BLOCKED.
+> **Generated:** 2026-07-14T06:45:00Z · **Path:** A (credentials SET) · **Owner:** Eng agent closed batch  
+> **Verdict:** **NO-GO** — Gate F PENDING founder sign-off; 60min stabilization soak OPEN; mandatory E2E/DR rows still FAIL/BLOCKED.
 
-**Supersedes:** scorecard @ 2026-07-13T12:35Z (UNSET batch) · prod baseline now `ae14bfb58fc0` / DB 077.
+**Supersedes:** scorecard @ 2026-07-14T04:35Z · PR #471 merged @ `09b9963a`.
 
 ---
 
@@ -25,12 +25,12 @@
 
 | Pole | Wartość |
 |------|---------|
-| **repo_head** | `3818542f` (verifier-only drift from prod) |
+| **repo_head** | `09b9963a` (PR #471 guard/credentials merge) |
 | **prod_api_commit** | `ae14bfb58fc0` |
 | **prod_frontend** | `https://twin-sooty.vercel.app` |
 | **prod_db_head** | `077_candidate_activity_timeline` (`db_ok=true`) |
-| **alignment_status** | **ACCEPTABLE_DOCS_ONLY_DRIFT** — prod `ae14bfb5`; repo +1 verifier commit |
-| **Credentials** | SET (`DEMO_USER_PASSWORD`, `RECRUITER_TOKEN`; `TWIN_RECRUITER_TOKEN` UNSET) |
+| **alignment_status** | **ACCEPTABLE_DOCS_ONLY_DRIFT** — prod `ae14bfb5`; repo tooling +1 commit |
+| **Credentials** | SET (`DEMO_USER_PASSWORD`, `RECRUITER_TOKEN` via `frontend/.env.local`; verifier `credentialsSet=true`) |
 | **Gate F** | PENDING |
 | **Launch** | **NO-GO** |
 
@@ -197,7 +197,8 @@ npm run probe:prod-public && npm run verify:production-v3:077
 | Prod public probes (110×) | `npm run probe:prod-public` | 110/110 PASS @ 12:32Z |
 | Extended merge plan | `npm run plan:merge-train-extended` | PASS — manual merge order ready |
 | Integration sim 070→077 | `npm run sim:integration-070-077` | PASS @ 12:32Z |
-| Production verifier v3 | `npm run verify:production-v3:077` | **BLOCKED** until merge+migrate |
+| Production verifier v3 | `npm run verify:production-v3:077` | **PASS** — `credentialsSet=true`; stabilization INACTIVE @ 2026-07-14 |
+| Stabilization monitor | `gh workflow run stabilization-monitor.yml` | **PARTIAL** — run #29312315268 PASS 54s; **no 60min soak** (LB-106 OPEN) |
 
 ---
 
@@ -260,7 +261,8 @@ npm run probe:prod-public && npm run verify:production-v3:077
 | Scorecard (this doc) | **RECORDED** — NO-GO |
 | Blocker register | `docs/PUBLIC_LAUNCH_BLOCKER_REGISTER_2026-07-13.md` |
 | Founder smoke evidence | `reports/founder-smoke/founder-smoke-evidence-2026-07-14T04-35-00Z.json` — recruiter PASS, candidate PARTIAL |
-| Prod probes | `reports/prod-probes/prod-probes-2026-07-14T04-29-26-650Z.json` — 110/110 PASS |
+| Prod probes | `reports/prod-probes/prod-probes-2026-07-14T06-45-18-692Z.json` — 110/110 PASS |
+| Stabilization workflow | GH Actions #29312315268 — PASS 54s (3× probe repeat + public-health stability) |
 | Integration sim | `reports/integration-sim/integration-sim-2026-07-13T12-32-08-704Z.json` — PASS |
 | Demo founder package | `reports/FOUNDER_DEMO_REVIEW_PACKAGE.md` — #462 @ `e788dd9f` |
 | Founder signature | **ABSENT** — Gate F PENDING |

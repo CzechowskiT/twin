@@ -2,9 +2,9 @@
 
 **Type:** Founder decision record (docs only) — **not launch approval**  
 **Branch:** `docs/gate-f-founder-decision-record-2026-07-09` → `cursor/phase1-monorepo-scaffold`  
-**Post-merge baseline:** PR #431 @ `5ad8a150` (nightly progress) + morning smoke slice
+**Post-merge baseline:** PR #471 @ `09b9963a` (guard/credentials batch) + PR #470 @ `ad7944b8` (Wave B/C activation)
 
-**Related:** [Gate F review package](./GATE_F_FOUNDER_REVIEW_PACKAGE_2026-07-09.md) · [D7 final QA](./SEVEN_DAY_D7_FINAL_QA_2026-07-08.md) · [candidate readiness flow](./CANDIDATE_READINESS_WORKING_FLOW_2026-07-09.md) · [Gate F re-audit](./GATE_F_REAUDIT_RESULT_2026-07-07.md) · [P0 closure](./P0_CLOSURE_DECISION_2026-07-07.md)
+**Related:** [Gate F review package](./GATE_F_FOUNDER_REVIEW_PACKAGE_2026-07-09.md) · [D7 final QA](./SEVEN_DAY_D7_FINAL_QA_2026-07-08.md) · [candidate readiness flow](./CANDIDATE_READINESS_WORKING_FLOW_2026-07-09.md) · [Gate F re-audit](./GATE_F_REAUDIT_RESULT_2026-07-07.md) · [P0 closure](./P0_CLOSURE_DECISION_2026-07-07.md) · [blocker register](./PUBLIC_LAUNCH_BLOCKER_REGISTER_2026-07-13.md)
 
 ---
 
@@ -16,7 +16,9 @@
 | **Gate E (Phase 3B prod)** | **PASS** | Attempt 19 — **20/20** @ `80d981c` |
 | **Seven-day D1–D7** | **Complete** | D7 QA **Ready for Gate F review** |
 | **Candidate readiness working flow** | **PASS** | PR #429 — checklist → career/evidence/consent |
-| **Deploy alignment** | **ACCEPTABLE_DRIFT** | prod `ae14bfb58fc0`; repo `3818542f` docs-only verifier drift |
+| **Deploy alignment** | **ACCEPTABLE_DOCS_ONLY_DRIFT** | prod `ae14bfb58fc0`; repo `09b9963a` (PR #471 tooling) |
+| **Guard suite** | **PASS** | visible-guard #10 LIVE; Wave B/C 16/16; `verify:production-v3:077` credentialsSet=true |
+| **Stabilization soak** | **PARTIAL** | GH #29312315268 PASS 54s — **no 60min evidence** (LB-106 OPEN) |
 | **Public health** | **PASS** | `status=ok`, `db_ok=true`, head 077 |
 | **Recruiter prod smoke** | **PASS** | 6-route sequential behavioral @ `ae14bfb5` — 2026-07-14 |
 | **Authenticated candidate smoke** | **PARTIAL** | API login + Wave B endpoints 200; browser checklist pending |
@@ -167,10 +169,15 @@ No Gate F YES decided by this document. No Launch GO claimed by this document.
 
 ```
 GATE_F_FOUNDER_DECISION_RECORD_DATE: 2026-07-09
-AUTHENTICATED_SMOKE_DATE: 2026-07-09
-DEPLOY_ALIGNMENT: ALIGNED
-FRONTEND_COMMIT: 5ad8a150
-API_COMMIT: ce5f61b
+BATCH_UPDATE: 2026-07-14T06:45Z
+AUTHENTICATED_SMOKE_DATE: 2026-07-14
+DEPLOY_ALIGNMENT: ACCEPTABLE_DOCS_ONLY_DRIFT
+FRONTEND_COMMIT: ad7944b8 (prod FE)
+API_COMMIT: ae14bfb58fc0
+REPO_HEAD: 09b9963a
+CREDENTIALS_SET: true
+STABILIZATION_MONITOR_RUN: 29312315268
+STABILIZATION_60MIN_SOAK: OPEN
 M_SMOKE_PASS: 6
 M_SMOKE_FAIL: 0
 M_SMOKE_NEEDS_REVIEW: 6
