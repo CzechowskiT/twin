@@ -1,21 +1,31 @@
 import type { Metadata } from "next";
 
+import { DemoPilotCta } from "@/components/marketing/demo/demo-pilot-cta";
+import { DemoSurfaceCatalog } from "@/components/marketing/demo/demo-surface-catalog";
+import {
+  InteractiveDemoPlayer,
+  InteractiveDemoSystemMap,
+} from "@/components/marketing/demo/interactive-demo-player";
 import { FounderLedDemoFlow } from "@/components/marketing/founder-led-demo-flow";
 import { InteractiveDemoWalkthrough } from "@/components/marketing/interactive-demo-walkthrough";
 
 export const metadata: Metadata = {
   title: "Founder-led demo — TWIN product walkthrough",
   description:
-    "Controlled founder-led walkthrough: company talent memory, recruiter Talent Pool import, Talent Radar, candidate trust, decision memory, weekly digest, and safe human decision boundaries.",
+    "Interactive product story plus founder-led surface catalog: company talent memory, recruiter inbox, candidate trust, calendar north star — sample data only.",
 };
 
 export default function DemoPage() {
   return (
     <>
       <FounderLedDemoFlow />
-      <div id="interactive-simulation">
+      <InteractiveDemoPlayer />
+      <InteractiveDemoSystemMap />
+      <DemoSurfaceCatalog />
+      <div id="interactive-simulation" className="border-t border-[var(--twin-border)]">
         <InteractiveDemoWalkthrough />
       </div>
+      <DemoPilotCta />
     </>
   );
 }
